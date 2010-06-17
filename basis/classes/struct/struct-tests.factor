@@ -474,4 +474,7 @@ CONSULT: struct-test-delegate struct-test-delegator del>> ;
         7 >>a
         8 >>b
 ] unit-test
+<<<<<<< HEAD
+=======
 
+>>>>>>> alien.data: make binary-zero? public and move it from classes.struct.private

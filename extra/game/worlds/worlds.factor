@@ -1,7 +1,8 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors combinators fry game.input game.loop generic kernel math
-parser sequences ui ui.gadgets ui.gadgets.worlds ui.gestures threads
-words audio.engine destructors ;
+USING: accessors audio.engine combinators destructors fry
+game.input game.loop generic kernel math parser sequences
+threads ui ui.gadgets ui.gadgets.worlds ui.gestures words
+words.constant ;
 IN: game.worlds
 
 TUPLE: game-world < world
@@ -48,7 +49,7 @@ M: game-world begin-world
     [ >>game-loop begin-game-world ] keep start-loop ;
 
 M: game-world end-world
-    [ [ stop-loop ] when* f ] change-game-loop
+    dup game-loop>> [ stop-loop ] when*
     [ end-game-world ]
     [ audio-engine>> [ dispose ] when* ]
     [ use-game-input?>> [ close-game-input ] when ] tri ;
@@ -70,8 +71,18 @@ M: game-world apply-world-attributes
         [ call-next-method ]
     } cleave ;
 
+: start-game ( attributes -- game-world )
+    f swap open-window* ;
+
+: wait-game ( attributes -- game-world )
+    f swap open-window* dup promise>> ?promise drop ;
+
+: define-attributes-word ( word tuple -- )
+    [ name>> "-attributes" append create-in ] dip define-constant ;
+
 SYNTAX: GAME:
     CREATE
     game-attributes parse-main-window-attributes
+    2dup define-attributes-word
     parse-definition
     define-main-window ;
