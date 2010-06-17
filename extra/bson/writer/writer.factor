@@ -56,7 +56,7 @@ DEFER: write-pair
 
 TYPED: write-byte-array ( binary: byte-array -- )
     [ length write-int32 ]
-    [ T_Binary_Bytes write1 write ] bi ; inline
+    [ T_Binary_Default write1 write ] bi ; inline
 
 TYPED: write-mdbregexp ( regexp: mdbregexp -- )
    [ regexp>> write-cstring ]
