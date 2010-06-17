@@ -65,8 +65,8 @@ HELP: user-groups
 
 HELP: with-effective-group
 { $values
-     { "string/id" "a string or a group id" } { "quot" quotation } }
-{ $description "Sets the effective group name and calls the quotation. Restors the effective group name on success or on error after the call." } ;
+     { "string/id/f" "a string, a group id, or f" } { "quot" quotation } }
+{ $description "Sets the effective group name and calls the quotation. Restors the effective group name on success or on error after the call. If the first parameter is " { $link f } ", the quotation is called as the current user." } ;
 
 HELP: with-group-cache
 { $values
@@ -75,8 +75,8 @@ HELP: with-group-cache
 
 HELP: with-real-group
 { $values
-     { "string/id" "a string or a group id" } { "quot" quotation } }
-{ $description "Sets the real group name and calls the quotation. Restores the current group name on success or on error after the call." } ;
+     { "string/id/f" "a string or a group id" } { "quot" quotation } }
+{ $description "Sets the real group name and calls the quotation. Restores the current group name on success or on error after the call. If the first parameter is " { $link f } ", the quotation is called as the current user." } ;
 
 ARTICLE: "unix.groups" "Unix groups"
 "The " { $vocab-link "unix.groups" } " vocabulary contains words that return information about Unix groups."

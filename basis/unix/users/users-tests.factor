@@ -28,3 +28,6 @@ IN: unix.users.tests
 
 [ f ] [ "thisusershouldnotexistabcdefg12345asdfasdfasdfasdfasdfasdfasdf" user-id ] unit-test
 [ "thisusershouldnotexistabcdefg12345asdfasdfasdfasdfasdfasdfasdf" ?user-id ] must-fail
+
+[ 3 ] [ f [ 3 ] with-effective-user ] unit-test
+[ 3 ] [ f [ 3 ] with-real-user ] unit-test
