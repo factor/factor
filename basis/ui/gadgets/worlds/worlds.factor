@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs continuations kernel math models
-namespaces opengl opengl.textures sequences io colors combinators
-combinators.short-circuit fry math.vectors math.rectangles cache
-ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-ui.pixel-formats destructors literals strings ;
+USING: accessors arrays assocs cache colors combinators
+combinators.short-circuit concurrency.promises continuations
+destructors fry io kernel literals math math.rectangles
+math.vectors models namespaces opengl opengl.textures sequences
+strings ui.backend ui.gadgets ui.gadgets.tracks ui.gestures
+ui.pixel-formats ui.render ;
 IN: ui.gadgets.worlds
 
 SYMBOLS:
@@ -40,6 +41,7 @@ TUPLE: world < track
     window-loc
     pixel-format-attributes
     background-color
+    promise
     window-controls
     window-resources ;
 
@@ -118,7 +120,8 @@ M: world request-focus-on ( child gadget -- )
         f >>active?
         { 0 0 } >>window-loc
         f >>grab-input?
-        V{ } clone >>window-resources ;
+        V{ } clone >>window-resources
+        <promise> >>promise ;
 
 : initial-background-color ( attributes -- color )
     window-controls>> textured-background swap member-eq?
