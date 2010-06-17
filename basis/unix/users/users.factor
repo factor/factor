@@ -64,6 +64,11 @@ M: string user-passwd ( string -- passwd/f )
 : user-id ( string -- id/f )
     user-passwd dup [ uid>> ] when ;
 
+ERROR: no-user string ;
+
+: ?user-id ( string -- id/f )
+    dup user-passwd [ nip uid>> ] [ no-user ] if* ;
+
 : real-user-id ( -- id )
     unix.ffi:getuid ; inline
 
@@ -100,17 +105,17 @@ GENERIC: set-effective-user ( string/id -- )
 
 PRIVATE>
 
-M: string set-real-user ( string -- )
-    user-id (set-real-user) ;
-
 M: integer set-real-user ( id -- )
     (set-real-user) ;
+
+M: string set-real-user ( string -- )
+    ?user-id (set-real-user) ;
 
 M: integer set-effective-user ( id -- )
     (set-effective-user) ; 
 
 M: string set-effective-user ( string -- )
-    user-id (set-effective-user) ;
+    ?user-id (set-effective-user) ;
 
 os {
     { [ dup bsd? ] [ drop "unix.users.bsd" require ] }

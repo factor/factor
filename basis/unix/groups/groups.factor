@@ -61,6 +61,11 @@ PRIVATE>
 : group-id ( string -- id/f )
     group-struct dup [ gr_gid>> ] when ;
 
+ERROR: no-group string ;
+
+: ?group-id ( string -- id )
+    dup group-struct [ nip gr_gid>> ] [ no-group ] if* ;
+
 <PRIVATE
 
 : >groups ( byte-array n -- groups )
@@ -122,14 +127,14 @@ GENERIC: set-effective-group ( obj -- )
 
 PRIVATE>
     
-M: string set-real-group ( string -- )
-    group-id (set-real-group) ;
-
 M: integer set-real-group ( id -- )
     (set-real-group) ;
+
+M: string set-real-group ( string -- )
+    ?group-id (set-real-group) ;
 
 M: integer set-effective-group ( id -- )    
     (set-effective-group) ;
 
 M: string set-effective-group ( string -- )
-    group-id (set-effective-group) ;
+    ?group-id (set-effective-group) ;
