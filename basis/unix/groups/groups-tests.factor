@@ -28,3 +28,6 @@ IN: unix.groups.tests
 [ f ]
 [ "please-oh-please-don't-have-a-group-named-this123lalala" group-struct ] unit-test
 [ "please-oh-please-don't-have-a-group-named-this123lalala" ?group-id ] must-fail
+
+[ 3 ] [ f [ 3 ] with-effective-group ] unit-test
+[ 3 ] [ f [ 3 ] with-real-group ] unit-test
