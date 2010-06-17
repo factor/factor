@@ -54,7 +54,8 @@ DEFER: read-elements
 : bson-binary-read ( -- binary )
    read-int32 read-byte 
    {
-        { T_Binary_Bytes [ read ] }
+        { T_Binary_Default [ read ] }
+        { T_Binary_Bytes_Deprecated [ drop read-int32 read ] }
         { T_Binary_Custom [ read bytes>object ] }
         { T_Binary_Function [ read ] }
         [ drop read >string ]
