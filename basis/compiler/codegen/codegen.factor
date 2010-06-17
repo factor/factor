@@ -258,7 +258,6 @@ CODEGEN: ##restore-context %restore-context
 CODEGEN: ##vm-field %vm-field
 CODEGEN: ##set-vm-field %set-vm-field
 CODEGEN: ##alien-global %alien-global
-CODEGEN: ##gc-map %gc-map
 CODEGEN: ##call-gc %call-gc
 CODEGEN: ##spill %spill
 CODEGEN: ##reload %reload

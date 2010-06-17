@@ -67,7 +67,11 @@ STRUCT: ud
     { c3 uchar }
     { inp_cache uchar[256] }
     { inp_sess uchar[64] }
-    { itab_entry void* } ;
+    { have_modrm uchar }
+    { modrm uchar }
+    { user_opaque_data void* }
+    { itab_entry void* }
+    { le void* } ;
 
 FUNCTION: void ud_translate_intel ( ud* u ) ;
 FUNCTION: void ud_translate_att ( ud* u ) ;

@@ -670,27 +670,28 @@ literal: size align offset ;
 INSN: ##box
 def: dst/tagged-rep
 use: src
-literal: boxer rep ;
+literal: boxer rep gc-map ;
 
 INSN: ##box-long-long
 def: dst/tagged-rep
 use: src1/int-rep src2/int-rep
-literal: boxer ;
+literal: boxer gc-map ;
 
 INSN: ##allot-byte-array
 def: dst/tagged-rep
-literal: size ;
+literal: size gc-map ;
 
 INSN: ##prepare-var-args ;
 
 INSN: ##alien-invoke
-literal: symbols dll ;
+literal: symbols dll gc-map ;
 
 INSN: ##cleanup
 literal: n ;
 
 INSN: ##alien-indirect
-use: src/int-rep ;
+use: src/int-rep
+literal: gc-map ;
 
 INSN: ##alien-assembly
 literal: quot ;
@@ -819,10 +820,7 @@ INSN: ##check-nursery-branch
 literal: size cc
 temp: temp1/int-rep temp2/int-rep ;
 
-INSN: ##call-gc ;
-
-INSN: ##gc-map
-literal: scrub-d scrub-r gc-roots ;
+INSN: ##call-gc literal: gc-map ;
 
 ! Spills and reloads, inserted by register allocator
 TUPLE: spill-slot { n integer } ;
@@ -859,6 +857,23 @@ UNION: conditional-branch-insn
 ! For alias analysis
 UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
 UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
+
+! Instructions that contain subroutine calls to functions which
+! allocate memory
+UNION: gc-map-insn
+##call-gc
+##alien-invoke
+##alien-indirect
+##box
+##box-long-long
+##allot-byte-array ;
+
+M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
+
+! Each one has a gc-map slot
+TUPLE: gc-map scrub-d scrub-r gc-roots ;
+
+: <gc-map> ( -- gc-map ) gc-map new ;
 
 ! Instructions that clobber registers. They receive inputs and
 ! produce outputs in spill slots.
