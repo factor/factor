@@ -90,30 +90,29 @@ M:: x86.64 %store-reg-param ( src reg rep -- )
 M:: x86.64 %unbox ( dst src func rep -- )
     param-reg-0 src tagged-rep %copy
     param-reg-1 %mov-vm-ptr
-    func f %alien-invoke
+    func f f %alien-invoke
     dst rep %load-return ;
 
-M:: x86.64 %box ( dst src func rep -- )
+M:: x86.64 %box ( dst src func rep gc-map -- )
     0 rep reg-class-of cdecl param-regs at nth src rep %copy
     rep int-rep? os windows? or param-reg-1 param-reg-0 ? %mov-vm-ptr
-    func f %alien-invoke
+    func f gc-map %alien-invoke
     dst int-rep %load-return ;
 
-M:: x86.64 %allot-byte-array ( dst size -- )
+M:: x86.64 %allot-byte-array ( dst size gc-map -- )
     param-reg-0 size MOV
     param-reg-1 %mov-vm-ptr
-    "allot_byte_array" f %alien-invoke
+    "allot_byte_array" f gc-map %alien-invoke
     dst int-rep %load-return ;
 
 M: x86.64 %alien-invoke
-    R11 0 MOV
-    rc-absolute-cell rel-dlsym
-    R11 CALL ;
+    [ R11 0 MOV rc-absolute-cell rel-dlsym R11 CALL ] dip
+    gc-map-here ;
 
 M: x86.64 %begin-callback ( -- )
     param-reg-0 %mov-vm-ptr
     param-reg-1 0 MOV
-    "begin_callback" f %alien-invoke ;
+    "begin_callback" f f %alien-invoke ;
 
 M: x86.64 %alien-callback ( quot -- )
     [ param-reg-0 ] dip %load-reference
@@ -121,14 +120,14 @@ M: x86.64 %alien-callback ( quot -- )
 
 M: x86.64 %end-callback ( -- )
     param-reg-0 %mov-vm-ptr
-    "end_callback" f %alien-invoke ;
+    "end_callback" f f %alien-invoke ;
 
 : float-function-param ( i src -- )
     [ float-regs cdecl param-regs at nth ] dip double-rep %copy ;
 
 M:: x86.64 %unary-float-function ( dst src func -- )
     0 src float-function-param
-    func "libm" load-library %alien-invoke
+    func "libm" load-library f %alien-invoke
     dst double-rep %load-return ;
 
 M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
@@ -136,7 +135,7 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     ! src2 is always a spill slot
     0 src1 float-function-param
     1 src2 float-function-param
-    func "libm" load-library %alien-invoke
+    func "libm" load-library f %alien-invoke
     dst double-rep %load-return ;
 
 M: x86.64 long-long-on-stack? f ;

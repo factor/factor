@@ -108,7 +108,25 @@ stack_frame *factor_vm::frame_successor(stack_frame *frame)
 	return (stack_frame *)((cell)frame - frame->size);
 }
 
-/* Allocates memory */
+cell factor_vm::frame_offset(stack_frame *frame)
+{
+	char *entry_point = (char *)frame_code(frame)->entry_point();
+	char *return_address = (char *)FRAME_RETURN_ADDRESS(frame,this);
+	if(return_address)
+		return return_address - entry_point;
+	else
+		return (cell)-1;
+}
+
+void factor_vm::set_frame_offset(stack_frame *frame, cell offset)
+{
+	char *entry_point = (char *)frame_code(frame)->entry_point();
+	if(offset == (cell)-1)
+		FRAME_RETURN_ADDRESS(frame,this) = NULL;
+	else
+		FRAME_RETURN_ADDRESS(frame,this) = entry_point + offset;
+}
+
 cell factor_vm::frame_scan(stack_frame *frame)
 {
 	switch(frame_type(frame))
@@ -120,13 +138,7 @@ cell factor_vm::frame_scan(stack_frame *frame)
 				obj = obj.as<word>()->def;
 
 			if(obj.type_p(QUOTATION_TYPE))
-			{
-				char *return_addr = (char *)FRAME_RETURN_ADDRESS(frame,this);
-				char *quot_entry_point = (char *)frame_code(frame)->entry_point();
-
-				return tag_fixnum(quot_code_offset_to_scan(
-					obj.value(),(cell)(return_addr - quot_entry_point)));
-			}    
+				return tag_fixnum(quot_code_offset_to_scan(obj.value(),frame_offset(frame)));
 			else
 				return false_object;
 		}
@@ -136,11 +148,6 @@ cell factor_vm::frame_scan(stack_frame *frame)
 		critical_error("Bad frame type",frame_type(frame));
 		return false_object;
 	}
-}
-
-cell factor_vm::frame_offset(stack_frame *frame)
-{
-	return (cell)FRAME_RETURN_ADDRESS(frame,this) - (cell)frame_code(frame)->entry_point();
 }
 
 struct stack_frame_accumulator {
@@ -209,9 +216,9 @@ void factor_vm::primitive_set_innermost_stack_frame_quot()
 	jit_compile_quot(quot.value(),true);
 
 	stack_frame *inner = innermost_stack_frame(callstack.untagged());
-	cell offset = (char *)FRAME_RETURN_ADDRESS(inner,this) - (char *)inner->entry_point;
+	cell offset = frame_offset(inner);
 	inner->entry_point = quot->entry_point;
-	FRAME_RETURN_ADDRESS(inner,this) = (char *)quot->entry_point + offset;
+	set_frame_offset(inner,offset);
 }
 
 void factor_vm::primitive_callstack_bounds()

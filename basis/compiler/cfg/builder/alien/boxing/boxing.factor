@@ -105,13 +105,13 @@ M: struct-c-type flatten-parameter-type frob-struct flatten-c-type ;
 GENERIC: box ( vregs reps c-type -- dst )
 
 M: c-type box
-    [ first ] [ drop ] [ [ boxer>> ] [ rep>> ] bi ] tri* ^^box ;
+    [ first ] [ drop ] [ [ boxer>> ] [ rep>> ] bi ] tri* <gc-map> ^^box ;
 
 M: long-long-type box
-    [ first2 ] [ drop ] [ boxer>> ] tri* ^^box-long-long ;
+    [ first2 ] [ drop ] [ boxer>> ] tri* <gc-map> ^^box-long-long ;
 
 M: struct-c-type box
-    '[ _ heap-size ^^allot-byte-array dup ^^unbox-byte-array ] 2dip
+    '[ _ heap-size <gc-map> ^^allot-byte-array dup ^^unbox-byte-array ] 2dip
     implode-struct ;
 
 GENERIC: box-parameter ( vregs reps c-type -- dst )

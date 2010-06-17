@@ -284,22 +284,33 @@ struct call_frame_slot_visitor {
 	*/
 	void operator()(stack_frame *frame)
 	{
-		const code_block *compiled = visitor->fixup.translate_code(parent->frame_code(frame));
-		gc_info *info = compiled->block_gc_info();
 		cell return_address = parent->frame_offset(frame);
+		if(return_address == (cell)-1)
+			return;
+
+		code_block *compiled = visitor->fixup.translate_code(parent->frame_code(frame));
+		gc_info *info = compiled->block_gc_info();
+
 		assert(return_address < compiled->size());
 		int index = info->return_address_index(return_address);
+		if(index == -1)
+			return;
 
-		if(index != -1)
+#ifdef DEBUG_GC_MAPS
+		std::cout << "call frame code block " << compiled << " with offset " << return_address << std::endl;
+#endif
+		u8 *bitmap = info->gc_info_bitmap();
+		cell base = info->spill_slot_base(index);
+		cell *stack_pointer = (cell *)(parent->frame_successor(frame) + 1);
+
+		for(cell spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++)
 		{
-			u8 *bitmap = info->gc_info_bitmap();
-			cell base = info->spill_slot_base(index);
-			cell *stack_pointer = (cell *)(parent->frame_successor(frame) + 1);
-
-			for(cell spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++)
+			if(bitmap_p(bitmap,base + spill_slot))
 			{
-				if(bitmap_p(bitmap,base + spill_slot))
-					visitor->visit_handle(&stack_pointer[spill_slot]);
+#ifdef DEBUG_GC_MAPS
+				std::cout << "visiting spill slot " << spill_slot << std::endl;
+#endif
+				visitor->visit_handle(&stack_pointer[spill_slot]);
 			}
 		}
 	}

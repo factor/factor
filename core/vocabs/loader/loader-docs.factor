@@ -11,7 +11,7 @@ $nl
 $nl
 "The second way is to create a configuration file. You can list additional vocabulary roots in a file that Factor reads at startup:"
 { $subsections "factor-roots" }
-"Finally, you can add vocabulary roots dynamically using a word:"
+"Finally, you can add vocabulary roots by calling a word from your " { $snippet "factor-rc" } " file (see " { $link "factor-rc" } "):"
 { $subsections add-vocab-root } ;
 
 ARTICLE: "vocabs.roots" "Vocabulary roots"
