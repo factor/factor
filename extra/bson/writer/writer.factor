@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bson.constants byte-arrays
 calendar combinators.short-circuit fry hashtables io io.binary
+io.encodings.utf8 io.encodings io.streams.byte-array
 kernel linked-assocs literals math math.parser namespaces byte-vectors
 quotations sequences serialize strings vectors dlists alien.accessors ;
 FROM: words => word? word ;
@@ -42,8 +43,11 @@ TYPED: write-int32 ( int: integer -- ) INT32-SIZE (>le) ; inline
 
 TYPED: write-double ( real: float -- ) double>bits INT64-SIZE (>le) ; inline
 
+TYPED: write-utf8-string ( string: string -- )
+    output-stream get utf8 <encoder> stream-write ; inline
+
 TYPED: write-cstring ( string: string -- )
-    get-output [ length ] [  ] bi copy 0 write1 ; inline
+    write-utf8-string 0 write1 ; inline
 
 : write-longlong ( object -- ) INT64-SIZE (>le) ; inline
 
@@ -94,8 +98,12 @@ TYPED: (serialize-code) ( code: code -- )
   [ length write-int32 ]
   [ T_Binary_Custom write1 write ] bi ; inline
 
+: write-string-length ( string -- )
+    [ length>> 1 + ] 
+    [ aux>> [ length ] [ 0 ] if* ] bi + write-int32 ; inline
+
 TYPED: write-string ( string: string -- )
-    '[ _ write-cstring ] with-length-prefix-excl ; inline
+    dup write-string-length write-cstring ; inline
 
 TYPED: write-boolean ( bool: boolean -- )
     [ 1 write1 ] [ 0 write1 ] if ; inline
