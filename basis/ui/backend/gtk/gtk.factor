@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Anton Gorenko, Philipp Brüschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types alien.data alien.enums
+USING: accessors alien.accessors alien.c-types alien.data
 alien.strings arrays assocs classes.struct command-line destructors
 gdk.ffi gdk.gl.ffi glib.ffi gobject.ffi gtk.ffi gtk.gl.ffi
 io.backend.unix.multiplexers io.encodings.utf8 io.thread kernel libc
@@ -28,26 +28,26 @@ TUPLE: gtk-clipboard handle ;
 
 C: <gtk-clipboard> gtk-clipboard
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: gl-config-attribs { $[ GDK_GL_USE_GL enum>number GDK_GL_RGBA enum>number ] } H{
-    { double-buffered { $[ GDK_GL_DOUBLEBUFFER enum>number ] } }
-    { stereo { $[ GDK_GL_STEREO enum>number ] } }
-    ! { offscreen { $[ GDK_GL_DRAWABLE_TYPE enum>number ] 2 } }
-    ! { fullscreen { $[ GDK_GL_DRAWABLE_TYPE enum>number ] 1 } }
-    ! { windowed { $[ GDK_GL_DRAWABLE_TYPE enum>number ] 1 } }
-    { color-bits { $[ GDK_GL_BUFFER_SIZE enum>number ] } }
-    { red-bits { $[ GDK_GL_RED_SIZE enum>number ] } }
-    { green-bits { $[ GDK_GL_GREEN_SIZE enum>number ] } }
-    { blue-bits { $[ GDK_GL_BLUE_SIZE enum>number ] } }
-    { alpha-bits { $[ GDK_GL_ALPHA_SIZE enum>number ] } }
-    { accum-red-bits { $[ GDK_GL_ACCUM_RED_SIZE enum>number ] } }
-    { accum-green-bits { $[ GDK_GL_ACCUM_GREEN_SIZE enum>number ] } }
-    { accum-blue-bits { $[ GDK_GL_ACCUM_BLUE_SIZE enum>number ] } }
-    { accum-alpha-bits { $[ GDK_GL_ACCUM_ALPHA_SIZE enum>number ] } }
-    { depth-bits { $[ GDK_GL_DEPTH_SIZE enum>number ] } }
-    { stencil-bits { $[ GDK_GL_STENCIL_SIZE enum>number ] } }
-    { aux-buffers { $[ GDK_GL_AUX_BUFFERS enum>number ] } }
-    { sample-buffers { $[ GDK_GL_SAMPLE_BUFFERS enum>number ] } }
-    { samples { $[ GDK_GL_SAMPLES enum>number ] } }
+PIXEL-FORMAT-ATTRIBUTE-TABLE: gl-config-attribs ${ GDK_GL_USE_GL GDK_GL_RGBA } H{
+    { double-buffered ${ GDK_GL_DOUBLEBUFFER } }
+    { stereo ${ GDK_GL_STEREO } }
+    ! { offscreen ${ GDK_GL_DRAWABLE_TYPE 2 } }
+    ! { fullscreen ${ GDK_GL_DRAWABLE_TYPE 1 } }
+    ! { windowed ${ GDK_GL_DRAWABLE_TYPE 1 } }
+    { color-bits ${ GDK_GL_BUFFER_SIZE } }
+    { red-bits ${ GDK_GL_RED_SIZE } }
+    { green-bits ${ GDK_GL_GREEN_SIZE } }
+    { blue-bits ${ GDK_GL_BLUE_SIZE } }
+    { alpha-bits ${ GDK_GL_ALPHA_SIZE } }
+    { accum-red-bits ${ GDK_GL_ACCUM_RED_SIZE } }
+    { accum-green-bits ${ GDK_GL_ACCUM_GREEN_SIZE } }
+    { accum-blue-bits ${ GDK_GL_ACCUM_BLUE_SIZE } }
+    { accum-alpha-bits ${ GDK_GL_ACCUM_ALPHA_SIZE } }
+    { depth-bits ${ GDK_GL_DEPTH_SIZE } }
+    { stencil-bits ${ GDK_GL_STENCIL_SIZE } }
+    { aux-buffers ${ GDK_GL_AUX_BUFFERS } }
+    { sample-buffers ${ GDK_GL_SAMPLE_BUFFERS } }
+    { samples ${ GDK_GL_SAMPLES } }
 }
 
 M: gtk-ui-backend (make-pixel-format)
@@ -62,7 +62,7 @@ M: gtk-ui-backend (pixel-format-attribute)
     with-out-parameters ;
 
 CONSTANT: events-mask
-    {
+    flags{
         GDK_POINTER_MOTION_MASK
         GDK_POINTER_MOTION_HINT_MASK
         GDK_ENTER_NOTIFY_MASK
@@ -76,40 +76,40 @@ CONSTANT: events-mask
 
 CONSTANT: modifiers
     {
-        { S+ $[ GDK_SHIFT_MASK enum>number ] }
-        { C+ $[ GDK_CONTROL_MASK enum>number ] }
-        { A+ $[ GDK_MOD1_MASK enum>number ] }
+        { S+ $ GDK_SHIFT_MASK }
+        { C+ $ GDK_CONTROL_MASK }
+        { A+ $ GDK_MOD1_MASK }
     }
 
 CONSTANT: action-key-codes
     H{
-        ${ GDK_BackSpace "BACKSPACE" }
-        ${ GDK_Tab "TAB" }
-        ${ GDK_Return "RET" }
-        ${ GDK_KP_Enter "ENTER" }
-        ${ GDK_Escape "ESC" }
-        ${ GDK_Delete "DELETE" }
-        ${ GDK_Home "HOME" }
-        ${ GDK_Left "LEFT" }
-        ${ GDK_Up "UP" }
-        ${ GDK_Right "RIGHT" }
-        ${ GDK_Down "DOWN" }
-        ${ GDK_Page_Up "PAGE_UP" }
-        ${ GDK_Page_Down "PAGE_DOWN" }
-        ${ GDK_End "END" }
-        ${ GDK_Begin "BEGIN" }
-        ${ GDK_F1 "F1" }
-        ${ GDK_F2 "F2" }
-        ${ GDK_F3 "F3" }
-        ${ GDK_F4 "F4" }
-        ${ GDK_F5 "F5" }
-        ${ GDK_F6 "F6" }
-        ${ GDK_F7 "F7" }
-        ${ GDK_F8 "F8" }
-        ${ GDK_F9 "F9" }
-        ${ GDK_F10 "F10" }
-        ${ GDK_F11 "F11" }
-        ${ GDK_F12 "F12" }
+        { $ GDK_BackSpace "BACKSPACE" }
+        { $ GDK_Tab "TAB" }
+        { $ GDK_Return "RET" }
+        { $ GDK_KP_Enter "ENTER" }
+        { $ GDK_Escape "ESC" }
+        { $ GDK_Delete "DELETE" }
+        { $ GDK_Home "HOME" }
+        { $ GDK_Left "LEFT" }
+        { $ GDK_Up "UP" }
+        { $ GDK_Right "RIGHT" }
+        { $ GDK_Down "DOWN" }
+        { $ GDK_Page_Up "PAGE_UP" }
+        { $ GDK_Page_Down "PAGE_DOWN" }
+        { $ GDK_End "END" }
+        { $ GDK_Begin "BEGIN" }
+        { $ GDK_F1 "F1" }
+        { $ GDK_F2 "F2" }
+        { $ GDK_F3 "F3" }
+        { $ GDK_F4 "F4" }
+        { $ GDK_F5 "F5" }
+        { $ GDK_F6 "F6" }
+        { $ GDK_F7 "F7" }
+        { $ GDK_F8 "F8" }
+        { $ GDK_F9 "F9" }
+        { $ GDK_F10 "F10" }
+        { $ GDK_F11 "F11" }
+        { $ GDK_F12 "F12" }
     }
 
 : event-modifiers ( event -- seq )
@@ -123,10 +123,10 @@ CONSTANT: action-key-codes
 
 : scroll-direction ( event -- pair )
     direction>> {
-        ${ GDK_SCROLL_UP { 0 -1 } }
-        ${ GDK_SCROLL_DOWN { 0 1 } }
-        ${ GDK_SCROLL_LEFT { -1 0 } }
-        ${ GDK_SCROLL_RIGHT { 1 0 } }
+        { $ GDK_SCROLL_UP { 0 -1 } }
+        { $ GDK_SCROLL_DOWN { 0 1 } }
+        { $ GDK_SCROLL_LEFT { -1 0 } }
+        { $ GDK_SCROLL_RIGHT { 1 0 } }
     } at ;
 
 : mouse-event>gesture ( event -- modifiers button loc )
@@ -215,7 +215,7 @@ CONSTANT: action-key-codes
      yield t ;
 
 CONSTANT: poll-fd-events
-    {
+    flags{
         G_IO_IN
         G_IO_OUT
         G_IO_PRI
@@ -227,7 +227,7 @@ CONSTANT: poll-fd-events
 : create-poll-fd ( -- poll-fd )
     GPollFD malloc-struct &free
         mx get fd>> >>fd
-        poll-fd-events [ enum>number ] [ bitor ] map-reduce >>events ;
+        poll-fd-events >>events ;
 
 : init-io-event-source ( -- )
     GSourceFuncs malloc-struct &free
@@ -285,8 +285,7 @@ M: gtk-ui-backend (with-ui)
     f connect-signal-with-data ;
 
 :: connect-signals ( win -- )
-    win events-mask [ enum>number ] [ bitor ] map-reduce
-    gtk_widget_add_events
+    win events-mask gtk_widget_add_events
     
     win "expose-event" [ on-expose yield ]
     GtkWidget:expose-event connect-signal
@@ -392,9 +391,9 @@ M: editor get-cursor-loc&dim
     2drop window handle>> im-context>>
     [ gtk_im_context_focus_out ] [ gtk_im_context_reset ] bi f ;
 
-: im-on-destroy ( sender user-data -- result )
+: im-on-destroy ( sender user-data -- )
     nip [ f gtk_im_context_set_client_window ]
-    [ g_object_unref ] bi f ;
+    [ g_object_unref ] bi ;
 
 ! for testing only
 
@@ -442,20 +441,20 @@ editor "input-method" f  {
 CONSTANT: window-controls>decor-flags
     H{
         { close-button 0 }
-        { minimize-button $[ GDK_DECOR_MINIMIZE enum>number ] }
-        { maximize-button $[ GDK_DECOR_MAXIMIZE enum>number ] }
-        { resize-handles $[ GDK_DECOR_RESIZEH enum>number ] }
-        { small-title-bar $[ GDK_DECOR_TITLE enum>number ] }
-        { normal-title-bar $[ GDK_DECOR_TITLE enum>number ] }
+        { minimize-button $ GDK_DECOR_MINIMIZE }
+        { maximize-button $ GDK_DECOR_MAXIMIZE }
+        { resize-handles $ GDK_DECOR_RESIZEH }
+        { small-title-bar $ GDK_DECOR_TITLE }
+        { normal-title-bar $ GDK_DECOR_TITLE }
         { textured-background 0 }
     }
     
 CONSTANT: window-controls>func-flags
     H{
-        { close-button $[ GDK_FUNC_CLOSE enum>number ] }
-        { minimize-button $[ GDK_FUNC_MINIMIZE enum>number ] }
-        { maximize-button $[ GDK_FUNC_MAXIMIZE enum>number ] }
-        { resize-handles $[ GDK_FUNC_RESIZE enum>number ] }
+        { close-button $ GDK_FUNC_CLOSE }
+        { minimize-button $ GDK_FUNC_MINIMIZE }
+        { maximize-button $ GDK_FUNC_MAXIMIZE }
+        { resize-handles $ GDK_FUNC_RESIZE }
         { small-title-bar 0 }
         { normal-title-bar 0 }
         { textured-background 0 }
@@ -469,17 +468,17 @@ CONSTANT: window-controls>func-flags
     ] [
         [ gtk_widget_get_window ] dip
         window-controls>decor-flags symbols>flags
-        GDK_DECOR_BORDER enum>number bitor gdk_window_set_decorations
+        GDK_DECOR_BORDER bitor gdk_window_set_decorations
     ] [
         [ gtk_widget_get_window ] dip
         window-controls>func-flags symbols>flags
-        GDK_FUNC_MOVE enum>number bitor gdk_window_set_functions
+        GDK_FUNC_MOVE bitor gdk_window_set_functions
     ] 2tri ;
 
 : setup-gl ( world -- ? )
     [
         [ handle>> window>> ] [ handle>> ] bi*
-        f t GDK_GL_RGBA_TYPE enum>number gtk_widget_set_gl_capability
+        f t GDK_GL_RGBA_TYPE gtk_widget_set_gl_capability
     ] with-world-pixel-format ;
 
 : auto-position ( win loc -- )
