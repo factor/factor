@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.enums alien.parser arrays
-assocs classes.parser classes.struct combinators
-combinators.short-circuit definitions effects fry gir.common gir.types
-kernel locals math.parser namespaces parser quotations sequences
-sequences.generalizations vocabs.parser words words.constant ;
+USING: accessors alien alien.c-types alien.parser arrays
+classes.parser classes.struct combinators combinators.short-circuit
+definitions effects fry gir.common gir.types kernel math.parser
+namespaces parser quotations sequences sequences.generalizations words
+words.constant ;
 IN: gir.ffi
 
 : string>c-type ( str -- c-type )
@@ -78,13 +78,12 @@ IN: gir.ffi
     } case ;
 
 : define-ffi-enum ( enum -- word )
-    [ c-type>> (CREATE-C-TYPE) dup ]
     [
        members>> [
            [ c-identifier>> create-in ]
-           [ value>> ] bi 2array
-       ] map 
-    ] bi int swap define-enum ;
+           [ value>> ] bi define-constant
+       ] each 
+    ] [ c-type>> (CREATE-C-TYPE) [ int swap typedef ] keep ] bi ;
 
 : define-ffi-enums ( enums -- )
     [ define-ffi-enum ] define-each ;
@@ -102,7 +101,6 @@ IN: gir.ffi
         [ drop { } ] tri <struct-slot-spec>
     ] map ;
 
-! Сделать для всех типов создание DEFER:
 : define-ffi-record-defer ( record -- word )
     c-type>> create-in void* swap [ typedef ] keep ;
 
@@ -151,7 +149,6 @@ IN: gir.ffi
 : define-ffi-interfaces ( interfaces -- )
     [ define-ffi-interface ] define-each ;
 
-! Доделать
 : define-ffi-interface-content ( interface -- )
     {
         [ methods>> define-ffi-functions ]

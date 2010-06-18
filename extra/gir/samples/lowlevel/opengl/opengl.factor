@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.enums alien.strings gobject.ffi gtk.ffi gdk.gl.ffi
-gtk.gl.ffi io.encodings.utf8 kernel locals math opengl.gl prettyprint ;
+USING: alien.strings gdk.gl.ffi gobject.ffi gtk.ffi gtk.gl.ffi
+io.encodings.utf8 kernel locals opengl.gl ;
 IN: gir.samples.lowlevel.opengl
 
-! This sample based on
+! This sample is based on
 ! http://code.valaide.org/content/simple-opengl-sample-using-gtkglext
 
 :: on-configure ( sender event user-data -- result )
@@ -49,10 +49,9 @@ IN: gir.samples.lowlevel.opengl
     [ 200 200 gtk_window_set_default_size ]
     [ GTK_WIN_POS_CENTER gtk_window_set_position ] tri
 
-    GDK_GL_MODE_RGBA enum>number
-    gdk_gl_config_new_by_mode :> gl-config
+    GDK_GL_MODE_RGBA gdk_gl_config_new_by_mode :> gl-config
     
-    window gl-config f t GDK_GL_RGBA_TYPE enum>number
+    window gl-config f t GDK_GL_RGBA_TYPE
     gtk_widget_set_gl_capability drop
 
     window "configure-event" utf8 string>alien
