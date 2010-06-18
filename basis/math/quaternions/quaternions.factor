@@ -35,8 +35,8 @@ M: object qconjugate ( u -- u' )
 : q/ ( u v -- u/v )
     qrecip q* ; inline
 
-: n*q ( q n -- r )
-    v*n ; inline
+: n*q ( n q -- r )
+    n*v ; inline
 
 : q*n ( q n -- r )
     v*n ; inline
