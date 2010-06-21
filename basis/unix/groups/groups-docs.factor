@@ -78,11 +78,36 @@ HELP: with-real-group
      { "string/id/f" "a string or a group id" } { "quot" quotation } }
 { $description "Sets the real group name and calls the quotation. Restores the current group name on success or on error after the call. If the first parameter is " { $link f } ", the quotation is called as the current user." } ;
 
+HELP: ?group-id
+{ $values
+    { "string" string }
+    { "id" "a group id" }
+}
+{ $description "Returns a group id or throws an exception." } ;
+
+HELP: all-group-names
+{ $values
+    
+    { "seq" sequence }
+}
+{ $description "Returns a sequence of group names as strings." } ;
+
+HELP: group-exists?
+{ $values
+    { "name/id" "a name or a group id" }
+    { "?" boolean }
+}
+{ $description "Returns a boolean representing the group's existence." } ;
+
 ARTICLE: "unix.groups" "Unix groups"
 "The " { $vocab-link "unix.groups" } " vocabulary contains words that return information about Unix groups."
 $nl
-"Listing all groups:"
+"Listing all group structures:"
 { $subsections all-groups }
+"Listing all group names:"
+{ $subsections all-group-names }
+"Checking if a group exists:"
+{ $subsections group-exists? }
 "Real groups:"
 { $subsections
     real-group-name
@@ -94,6 +119,10 @@ $nl
     effective-group-name
     effective-group-id
     set-effective-group
+}
+"Getting a group id from a group name or id:"
+{ $subsections
+    ?group-id
 }
 "Combinators to change groups:"
 { $subsections
