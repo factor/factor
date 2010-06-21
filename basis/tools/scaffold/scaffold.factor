@@ -22,7 +22,9 @@ M: bad-developer-name summary
 
 <PRIVATE
 
-: vocab-root? ( string -- ? ) vocab-roots get member? ;
+: vocab-root? ( string -- ? )
+    trim-tail-separators
+    vocab-roots get member? ;
 
 : contains-dot? ( string -- ? ) ".." swap subseq? ;
 
