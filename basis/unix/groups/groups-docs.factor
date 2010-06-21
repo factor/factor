@@ -108,13 +108,13 @@ $nl
 { $subsections all-group-names }
 "Checking if a group exists:"
 { $subsections group-exists? }
-"Real groups:"
+"Querying/setting the current real group:"
 { $subsections
     real-group-name
     real-group-id
     set-real-group
 }
-"Effective groups:"
+"Querying/setting the current effective group:"
 { $subsections
     effective-group-name
     effective-group-id

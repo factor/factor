@@ -116,13 +116,13 @@ $nl
 { $subsections all-user-names }
 "Checking if a user exists:"
 { $subsections user-exists? }
-"Real user:"
+"Querying/setting the current real user:"
 { $subsections
     real-user-name
     real-user-id
     set-real-user
 }
-"Effective user:"
+"Querying/setting the current effective user:"
 { $subsections
     effective-user-name
     effective-user-id
