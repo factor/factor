@@ -86,11 +86,36 @@ HELP: with-real-user
     set-effective-user
 } related-words
 
+HELP: ?user-id
+{ $values
+    { "string" string }
+    { "id/f" "an integer or " { $link f } }
+}
+{ $description "Returns a group id or throws an exception." } ;
+
+HELP: all-user-names
+{ $values
+    
+    { "seq" sequence }
+}
+{ $description "Returns a sequence of group names as strings." } ;
+
+HELP: user-exists?
+{ $values
+    { "name/id" "a string or an integer" }
+    { "?" boolean }
+}
+{ $description "Returns a boolean representing the user's existence." } ;
+
 ARTICLE: "unix.users" "Unix users"
 "The " { $vocab-link "unix.users" } " vocabulary contains words that return information about Unix users."
 $nl
 "Listing all users:"
 { $subsections all-users }
+"Listing all user names:"
+{ $subsections all-user-names }
+"Checking if a user exists:"
+{ $subsections user-exists? }
 "Real user:"
 { $subsections
     real-user-name

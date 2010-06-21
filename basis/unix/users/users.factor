@@ -40,6 +40,9 @@ PRIVATE>
         [ unix.ffi:getpwent dup ] [ passwd>new-passwd ] produce nip
     ] with-pwent ;
 
+: all-user-names ( -- seq )
+    all-users [ user-name>> ] map ;
+
 SYMBOL: user-cache
 
 : <user-cache> ( -- assoc )
@@ -80,6 +83,8 @@ ERROR: no-user string ;
 
 : effective-user-name ( -- string )
     effective-user-id user-name ; inline
+
+: user-exists? ( name/id -- ? ) user-id >boolean ;
 
 GENERIC: set-real-user ( string/id -- )
 
