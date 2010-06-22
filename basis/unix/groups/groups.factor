@@ -1,15 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings io.encodings.utf8
-io.backend.unix kernel math sequences splitting strings
-combinators.short-circuit byte-arrays combinators
-accessors math.parser fry assocs namespaces continuations
-unix.users unix.utilities classes.struct unix ;
-IN: unix.groups
-
+USING: accessors alien alien.c-types alien.strings assocs
+byte-arrays classes.struct combinators
+combinators.short-circuit continuations fry io.backend.unix
+io.encodings.utf8 kernel math math.parser namespaces sequences
+splitting strings unix unix.ffi unix.users unix.utilities ;
 QUALIFIED: unix.ffi
-
 QUALIFIED: grouping
+IN: unix.groups
 
 TUPLE: group id name passwd members ;
 
@@ -61,6 +59,11 @@ PRIVATE>
 : group-id ( string -- id/f )
     group-struct dup [ gr_gid>> ] when ;
 
+ERROR: no-group string ;
+
+: ?group-id ( string -- id )
+    dup group-struct [ nip gr_gid>> ] [ no-group ] if* ;
+
 <PRIVATE
 
 : >groups ( byte-array n -- groups )
@@ -83,7 +86,11 @@ M: integer user-groups ( id -- seq )
     user-name (user-groups) ;
     
 : all-groups ( -- seq )
-    [ unix.ffi:getgrent dup ] [ group-struct>group ] produce nip ;
+    [ unix.ffi:getgrent dup ] [ group-struct>group ] produce nip
+    endgrent ;
+
+: all-group-names ( -- seq )
+    all-groups [ name>> ] map ;
 
 : <group-cache> ( -- assoc )
     all-groups [ [ id>> ] keep ] H{ } map>assoc ;
@@ -100,17 +107,25 @@ M: integer user-groups ( id -- seq )
 : effective-group-name ( -- string )
     effective-group-id group-name ; inline
 
+: group-exists? ( name/id -- ? ) group-id >boolean ;
+
 GENERIC: set-real-group ( obj -- )
 
 GENERIC: set-effective-group ( obj -- )
 
-: with-real-group ( string/id quot -- )
+: (with-real-group) ( string/id quot -- )
     '[ _ set-real-group @ ]
     real-group-id '[ _ set-real-group ] [ ] cleanup ; inline
 
-: with-effective-group ( string/id quot -- )
+: with-real-group ( string/id/f quot -- )
+    over [ (with-real-group) ] [ nip call ] if ; inline
+
+: (with-effective-group) ( string/id quot -- )
     '[ _ set-effective-group @ ]
     effective-group-id '[ _ set-effective-group ] [ ] cleanup ; inline
+
+: with-effective-group ( string/id/f quot -- )
+    over [ (with-effective-group) ] [ nip call ] if ; inline
 
 <PRIVATE
 
@@ -122,14 +137,14 @@ GENERIC: set-effective-group ( obj -- )
 
 PRIVATE>
     
-M: string set-real-group ( string -- )
-    group-id (set-real-group) ;
-
 M: integer set-real-group ( id -- )
     (set-real-group) ;
+
+M: string set-real-group ( string -- )
+    ?group-id (set-real-group) ;
 
 M: integer set-effective-group ( id -- )    
     (set-effective-group) ;
 
 M: string set-effective-group ( string -- )
-    group-id (set-effective-group) ;
+    ?group-id (set-effective-group) ;

@@ -94,6 +94,7 @@ FUNCTION: int getpriority ( int which, id_t who ) ;
 FUNCTION: int setpriority ( int which, id_t who, int prio ) ;
 FUNCTION: int getrusage ( int who, rusage* r_usage ) ;
 FUNCTION: group* getgrent ;
+FUNCTION: void endgrent ( ) ;
 FUNCTION: int gethostname ( c-string name, int len ) ;
 FUNCTION: int getsockname ( int socket, sockaddr* address, socklen_t* address_len ) ;
 FUNCTION: int getpeername ( int socket, sockaddr* address, socklen_t* address_len ) ;
