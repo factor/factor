@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alarms arrays calendar combinators
+USING: accessors timers arrays calendar combinators
 combinators.smart continuations debugger http.client fry
 init io.streams.string kernel locals math math.parser db
 namespaces sequences site-watcher.db site-watcher.email ;
@@ -48,4 +48,4 @@ PRIVATE>
     ] unless ;
 
 : stop-site-watcher ( -- )
-    running-site-watcher get [ stop-alarm ] when* ;
+    running-site-watcher get [ stop-timer ] when* ;

@@ -303,14 +303,14 @@ struct call_frame_slot_visitor {
 		cell base = info->spill_slot_base(index);
 		cell *stack_pointer = (cell *)(parent->frame_successor(frame) + 1);
 
-		for(cell spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++)
+		for(int spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++)
 		{
 			if(bitmap_p(bitmap,base + spill_slot))
 			{
 #ifdef DEBUG_GC_MAPS
 				std::cout << "visiting spill slot " << spill_slot << std::endl;
 #endif
-				visitor->visit_handle(&stack_pointer[spill_slot]);
+				visitor->visit_handle(stack_pointer + spill_slot);
 			}
 		}
 	}
