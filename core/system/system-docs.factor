@@ -14,10 +14,6 @@ ARTICLE: "system" "System interface"
     vm
     image
 }
-"Getting the current time:"
-{ $subsections
-    system-micros
-}
 "Getting a monotonically increasing nanosecond count:"
 { $subsections nano-count }
 "Exiting the Factor VM:"
@@ -78,15 +74,10 @@ HELP: exit ( n -- )
 { $values { "n" "an integer exit code" } }
 { $description "Exits the Factor process." } ;
 
-HELP: system-micros ( -- us )
-{ $values { "us" integer } }
-{ $description "Outputs the number of microseconds elapsed since midnight January 1, 1970." }
-{ $notes "This is a low-level word. The " { $vocab-link "calendar" } " vocabulary provides features for date/time arithmetic and formatting. For timing code, use " { $link nano-count } "." } ;
-
 HELP: nano-count ( -- ns )
 { $values { "ns" integer } }
 { $description "Outputs a monotonically increasing count of nanoseconds elapsed since an arbitrary starting time. The difference of two calls to this word allows timing. This word is unaffected by system clock changes." }
-{ $notes "This is a low-level word. The " { $vocab-link "tools.time" } " vocabulary defines words to time code execution time. For system time, use " { $link system-micros } "." } ;
+{ $notes "This is a low-level word. The " { $vocab-link "tools.time" } " vocabulary defines words to time code execution time." } ;
 
 HELP: image
 { $values { "path" "a pathname string" } }
