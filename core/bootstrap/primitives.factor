@@ -424,10 +424,10 @@ tuple
     { "dll-valid?" "alien.libraries" "primitive_dll_validp" (( dll -- ? )) }
     { "current-callback" "alien.private" "primitive_current_callback" (( -- n )) }
     { "<array>" "arrays" "primitive_array" (( n elt -- array )) }
-    { "resize-array" "arrays" "primitive_resize_array" (( n array -- newarray )) }
+    { "resize-array" "arrays" "primitive_resize_array" (( n array -- new-array )) }
     { "(byte-array)" "byte-arrays" "primitive_uninitialized_byte_array" (( n -- byte-array )) }
     { "<byte-array>" "byte-arrays" "primitive_byte_array" (( n -- byte-array )) }
-    { "resize-byte-array" "byte-arrays" "primitive_resize_byte_array" (( n byte-array -- newbyte-array )) }
+    { "resize-byte-array" "byte-arrays" "primitive_resize_byte_array" (( n byte-array -- new-byte-array )) }
     { "<tuple-boa>" "classes.tuple.private" "primitive_tuple_boa" (( slots... layout -- tuple )) }
     { "<tuple>" "classes.tuple.private" "primitive_tuple" (( layout -- tuple )) }
     { "modify-code-heap" "compiler.units" "primitive_modify_code_heap" (( alist update-existing? reset-pics? -- )) }
