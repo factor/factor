@@ -42,13 +42,12 @@ V{
 
 [
     V{
-        T{ ##gc-map f V{ 0 } V{ 3 } { 0 1 2 } }
-        T{ ##call-gc }
+        T{ ##call-gc f T{ gc-map } }
         T{ ##branch }
     }
 ]
 [
-    V{ D 0 R 3 } { 0 1 2 } <gc-call> instructions>>
+    <gc-call> instructions>>
 ] unit-test
 
 30 \ vreg-counter set-global
@@ -82,7 +81,7 @@ V{
 
 [ ] [ cfg get needs-predecessors drop ] unit-test
 
-[ ] [ { D 1 R 2 } { 10 20 } V{ } 31337 3 get (insert-gc-check) ] unit-test
+[ ] [ V{ } 31337 3 get (insert-gc-check) ] unit-test
 
 [ t ] [ 1 get successors>> first gc-check? ] unit-test
 
@@ -146,8 +145,7 @@ H{
 
 [
     V{
-        T{ ##gc-map f V{ 0 1 2 } V{ } { 2 } }
-        T{ ##call-gc }
+        T{ ##call-gc f T{ gc-map } }
         T{ ##branch }
     }
 ] [ 2 get predecessors>> second instructions>> ] unit-test

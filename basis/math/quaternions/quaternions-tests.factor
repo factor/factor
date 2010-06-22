@@ -29,3 +29,6 @@ CONSTANT: qk { 0 0 0 1 }
 [ t ] [ qi qi q- q0 = ] unit-test
 [ t ] [ qi qj q+ qj qi q+ = ] unit-test
 [ t ] [ qi qj q- qj qi q- -1 q*n = ] unit-test
+
+[ { 2 2 2 2 } ] [ { 1 1 1 1 } 2 q*n ] unit-test
+[ { 2 2 2 2 } ] [ 2 { 1 1 1 1 } n*q ] unit-test

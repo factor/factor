@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien audio classes.struct fry calendar alarms
+USING: accessors alien audio classes.struct fry calendar timers
 combinators combinators.short-circuit destructors generalizations
 kernel literals locals math openal sequences
 sequences.generalizations specialized-arrays strings ;
@@ -70,7 +70,7 @@ TUPLE: audio-engine < disposable
     listener
     { next-source integer }
     clips
-    update-alarm ;
+    update-timer ;
 
 TUPLE: audio-clip < disposable
     { audio-engine audio-engine }
@@ -226,20 +226,20 @@ DEFER: update-audio
 
 : start-audio ( audio-engine -- )
     dup start-audio*
-    dup '[ _ update-audio ] 20 milliseconds every >>update-alarm
+    dup '[ _ update-audio ] 20 milliseconds every >>update-timer
     drop ;
 
 : stop-audio ( audio-engine -- )
     dup al-sources>> [
         {
             [ make-engine-current ]
-            [ update-alarm>> [ stop-alarm ] when* ]
+            [ update-timer>> [ stop-timer ] when* ]
             [ clips>> clone [ dispose ] each ]
             [ al-sources>> free-sources ]
             [
                 f >>al-sources
                 f >>clips
-                f >>update-alarm
+                f >>update-timer
                 drop
             ]
             [ al-context>> alcSuspendContext ]

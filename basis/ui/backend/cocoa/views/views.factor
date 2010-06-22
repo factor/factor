@@ -138,8 +138,8 @@ CONSTANT: selector>action H{
 }
 
 : validate-action ( world selector -- ? validated? )
-    selector>action at 
-    [ swap world-focus parents-handle-gesture? t ] [ drop f f ] if* ; 
+    selector>action at
+    [ swap world-focus parents-handle-gesture? t ] [ drop f f ] if* ;
 
 CLASS: {
     { +superclass+ "NSOpenGLView" }
@@ -305,8 +305,6 @@ CLASS: {
     ]
 }
 
-! "rotateWithEvent:" void { id SEL id }}
-
 { "acceptsFirstResponder" char { id SEL }
     [ 2drop 1 ]
 }
@@ -408,10 +406,9 @@ CLASS: {
 { "dealloc" void { id SEL }
     [
         drop
-        [ unregister-window ]
         [ remove-observer ]
         [ SUPER-> dealloc ]
-        tri
+        bi
     ]
 } ;
 
@@ -446,8 +443,8 @@ CLASS: {
     [
         forget-rollover
         2nip -> object -> contentView
-        dup -> isInFullScreenMode zero? 
-        [ window unfocus-world ]
+        dup -> isInFullScreenMode 0 =
+        [ window [ unfocus-world ] when* ]
         [ drop ] if
     ]
 }
@@ -460,7 +457,8 @@ CLASS: {
 
 { "windowWillClose:" void { id SEL id }
     [
-        2nip -> object -> contentView window ungraft
+        2nip -> object -> contentView
+        [ window ungraft ] [ unregister-window ] bi
     ]
 } ;
 

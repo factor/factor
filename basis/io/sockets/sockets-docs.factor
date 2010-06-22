@@ -34,6 +34,10 @@ ARTICLE: "network-connection" "Connection-oriented networking"
     <client>
     with-client
 }
+"The local address of a client socket can be controlled with this word:"
+{ $subsections
+    with-local-address
+}
 "Connection-oriented network servers are implemented by first opening a server socket, then waiting for connections:"
 { $subsections
     <server>
@@ -215,3 +219,17 @@ HELP: send
 HELP: resolve-host
 { $values { "addrspec" "an address specifier" } { "seq" "a sequence of address specifiers" } }
 { $description "Resolves host names to IP addresses." } ;
+
+HELP: with-local-address
+{ $values { "addr" "an " { $link inet4 } " or " { $link inet6 } " address specifier" } { "quot" quotation } }
+{ $description "Client sockets opened within the scope of the quotation passed to this combinator will have their local address bound to the given address." }
+{ $examples
+  { "Binds the local address of a newly created client socket within the quotation to 127.0.0.1."
+    "This ensures that all traffic originates from the given address (the port is choosen by the TCP stack)." }
+  { $code "\"127.0.0.1\" 0 <inet4> [ ] with-local-address" }
+  $nl
+  { "Binds the local address of a newly created client socket within the quotation to the local address 192.168.0.1 and the local port 23000. "
+    "Be aware that you can only have one client socket with the same local address at a time or else an I/O error (\"address already in use\") will be thrown."
+  }
+  { $code "\"192.168.0.1\" 23000 <inet4> [ ] with-local-address" }
+} ;
