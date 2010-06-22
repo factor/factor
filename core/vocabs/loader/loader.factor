@@ -22,6 +22,7 @@ SYMBOL: add-vocab-root-hook
 ] "vocabs.loader" add-startup-hook
 
 : add-vocab-root ( root -- )
+    trim-tail-separators
     [ vocab-roots get adjoin ]
     [ add-vocab-root-hook get-global call( root -- ) ] bi ;
 

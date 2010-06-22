@@ -459,7 +459,6 @@ M: bad-executable summary
 \ special-object { fixnum } { object } define-primitive \ special-object make-flushable
 \ string-nth-fast { fixnum string } { fixnum } define-primitive \ string-nth-fast make-flushable
 \ strip-stack-traces { } { } define-primitive
-\ system-micros { } { integer } define-primitive \ system-micros make-flushable
 \ tag { object } { fixnum } define-primitive \ tag make-foldable
 \ unimplemented { } { } define-primitive
 \ word-code { word } { integer integer } define-primitive \ word-code make-flushable

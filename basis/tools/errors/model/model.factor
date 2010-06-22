@@ -15,5 +15,4 @@ M: updater errors-changed
     f <model> (error-list-model) set-global
     (error-list-model) get-global 100 milliseconds <delay> error-list-model set-global
     updater add-error-observer
-] "ui.tools.error-list" add-startup-hook
-
+] "tools.errors.model" add-startup-hook
