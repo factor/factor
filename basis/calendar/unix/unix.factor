@@ -29,6 +29,12 @@ IN: calendar.unix
 M: unix gmt-offset ( -- hours minutes seconds )
     get-time gmtoff>> 3600 /mod 60 /mod ;
 
+: current-timeval ( -- timeval )
+    timeval <struct> f [ gettimeofday io-error ] 2keep drop ;
+
+: system-micros ( -- n )
+    current-timeval
+    [ sec>> 1,000,000 * ] [ usec>> ] bi + ;
+
 M: unix gmt
-    timeval <struct> f [ gettimeofday io-error ] 2keep drop
-    timeval>unix-time ;
+    current-timeval timeval>unix-time ;
