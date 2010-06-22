@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators continuations fry io io.backend
 io.directories io.directories.hierarchy io.files io.pathnames
-kernel math math.bitwise math.parser namespaces random
+kernel locals math math.bitwise math.parser namespaces random
 sequences system vocabs.loader ;
 IN: io.files.unique
 
@@ -78,9 +78,10 @@ PRIVATE>
 
 : temporary-file ( -- path ) "" unique-file ;
 
-: with-working-directory ( path quot -- )
-    over make-directories
-    dupd '[ _ _ with-temporary-directory ] with-directory ; inline
+:: cleanup-unique-working-directory ( quot -- )
+    unique-directory :> path
+    path [ path quot with-temporary-directory ] with-directory
+    path delete-tree ; inline
 
 {
     { [ os unix? ] [ "io.files.unique.unix" ] }

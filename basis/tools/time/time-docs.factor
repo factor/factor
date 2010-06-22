@@ -24,7 +24,7 @@ HELP: time
 { $values { "quot" quotation } }
 { $description "Runs a quotation, gathering statistics about method dispatch and garbage collection, and then prints the total run time." } ;
 
-{ benchmark system-micros time } related-words
+{ benchmark time } related-words
 
 HELP: collect-gc-events
 { $values { "quot" quotation } { "gc-events" "a sequence of " { $link gc-event } " instances" } }

@@ -57,6 +57,7 @@ M: unix really-delete-tree delete-tree ;
             [ day>> , ]
             [ hour>> , ]
             [ minute>> , ]
+            [ drop nano-count , ]
         } cleave
     ] { } make [ pad-00 ] map "-" join ;
 

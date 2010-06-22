@@ -35,11 +35,10 @@ IN: mason.version.source
 
 : make-source-release ( version git-id -- path )
     "Creating source release..." print flush
-    unique-directory
     [
         clone-factor prepare-source (make-source-release)
         "Package created: " write absolute-path dup print
-    ] with-directory ;
+    ] with-unique-directory ;
 
 : upload-source-release ( package version -- )
     "Uploading source release..." print flush

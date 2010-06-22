@@ -146,7 +146,6 @@ struct factor_vm
 
 	// run
 	void primitive_exit();
-	void primitive_system_micros();
 	void primitive_nano_count();
 	void primitive_sleep();
 	void primitive_set_slot();

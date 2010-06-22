@@ -64,7 +64,7 @@ $nl
 HELP: deploy-threads?
 { $description "Deploy flag. If set, thread support will be included in the final image."
 $nl
-"On by default. Most programs depend on libraries which use threads even if they don't use threads directly; for example, alarms, non-blocking I/O, and the UI are built on top of threads. If after testing your program still works without threads, you can disable this feature to save some space." } ;
+"On by default. Most programs depend on libraries which use threads even if they don't use threads directly; for example, timers, non-blocking I/O, and the UI are built on top of threads. If after testing your program still works without threads, you can disable this feature to save some space." } ;
 
 HELP: deploy-ui?
 { $description "Deploy flag. If set, the Factor UI will be included in the deployed image."

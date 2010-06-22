@@ -21,7 +21,6 @@ char *getenv(char *name);
 #define snprintf _snprintf
 #define snwprintf _snwprintf
 
-u64 system_micros();
 void c_to_factor_toplevel(cell quot);
 void open_console();
 
