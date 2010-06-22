@@ -2,10 +2,10 @@ namespace factor
 {
 
 struct gc_info {
-	u32 scrub_d_count;
-	u32 scrub_r_count;
-	u32 gc_root_count;
-	u32 return_address_count;
+	int scrub_d_count;
+	int scrub_r_count;
+	int gc_root_count;
+	int return_address_count;
 
 	cell total_bitmap_size()
 	{

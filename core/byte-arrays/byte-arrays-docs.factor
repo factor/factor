@@ -22,7 +22,7 @@ $nl
     3byte-array
     4byte-array
 }
-"Resizing byte-arrays:"
+"Resizing byte arrays:"
 { $subsections resize-byte-array } ;
 
 ABOUT: "byte-arrays"
@@ -70,7 +70,7 @@ HELP: 4byte-array
 
 { 1byte-array 2byte-array 3byte-array 4byte-array } related-words
 
-HELP: resize-byte-array ( n byte-array -- newbyte-array )
-{ $values { "n" "a non-negative integer" } { "byte-array" byte-array }
-        { "newbyte-array" byte-array } }
-{ $description "Creates a new byte-array of n elements.  The contents of the existing byte-array are copied into the new byte-array; if the new byte-array is shorter, only an initial segment is copied, and if the new byte-array is longer the remaining space is filled in with 0." } ;
+HELP: resize-byte-array ( n byte-array -- new-byte-array )
+{ $values { "n" "a non-negative integer" } { "byte-array" byte-array } { "new-byte-array" byte-array } }
+{ $description "Resizes the byte array to have a length of " { $snippet "n" } " elements. When making the byte array shorter, this word may either create a new byte array or modify the existing byte array in place. When making the byte array longer, this word always allocates a new byte array, filling remaining space with zeroes." }
+{ $side-effects "byte-array" } ;

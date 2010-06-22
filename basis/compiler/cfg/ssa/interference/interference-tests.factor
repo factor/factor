@@ -182,7 +182,7 @@ V{
 
 V{
     T{ ##save-context f 77 78 }
-    T{ ##call-gc f { } }
+    T{ ##call-gc f T{ gc-map } }
     T{ ##branch }
 } 2 test-bb
 

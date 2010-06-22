@@ -188,7 +188,7 @@ ERROR: invalid-header-string string ;
         "<" %
         64 random-bits #
         "-" %
-        system-micros #
+        gmt timestamp>micros #
         "@" %
         smtp-domain get [ host-name ] unless* %
         ">" %
