@@ -3,7 +3,7 @@
 USING: assocs kernel math.intervals math.parser namespaces
 strings random accessors quotations hashtables sequences
 continuations fry calendar combinators combinators.short-circuit
-destructors alarms io.sockets db db.tuples db.types
+destructors io.sockets db db.tuples db.types
 http http.server http.server.dispatchers http.server.filters
 furnace.cache furnace.scopes furnace.utilities ;
 IN: furnace.sessions

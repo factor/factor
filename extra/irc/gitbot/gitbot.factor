@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry irc.client irc.client.chats kernel namespaces
 sequences threads io.launcher io splitting
-make mason.common mason.updates calendar math alarms
+make mason.common mason.updates calendar math timers
 io.encodings.8-bit.latin1 debugger ;
 IN: irc.gitbot
 
