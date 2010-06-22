@@ -7,6 +7,8 @@ IN: calendar
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
 
+HOOK: gmt os ( -- timestamp )
+
 TUPLE: duration
     { year real }
     { month real }
@@ -370,10 +372,6 @@ M: duration time-
 
 : timestamp>micros ( timestamp -- n )
     unix-1970 (time-) 1000000 * >integer ;
-
-: gmt ( -- timestamp )
-    #! GMT time, right now
-    unix-1970 system-micros microseconds time+ ;
 
 : now ( -- timestamp ) gmt >local-time ;
 : hence ( duration -- timestamp ) now swap time+ ;

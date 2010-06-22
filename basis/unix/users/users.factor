@@ -40,6 +40,9 @@ PRIVATE>
         [ unix.ffi:getpwent dup ] [ passwd>new-passwd ] produce nip
     ] with-pwent ;
 
+: all-user-names ( -- seq )
+    all-users [ user-name>> ] map ;
+
 SYMBOL: user-cache
 
 : <user-cache> ( -- assoc )
@@ -64,6 +67,11 @@ M: string user-passwd ( string -- passwd/f )
 : user-id ( string -- id/f )
     user-passwd dup [ uid>> ] when ;
 
+ERROR: no-user string ;
+
+: ?user-id ( string -- id/f )
+    dup user-passwd [ nip uid>> ] [ no-user ] if* ;
+
 : real-user-id ( -- id )
     unix.ffi:getuid ; inline
 
@@ -76,19 +84,27 @@ M: string user-passwd ( string -- passwd/f )
 : effective-user-name ( -- string )
     effective-user-id user-name ; inline
 
+: user-exists? ( name/id -- ? ) user-id >boolean ;
+
 GENERIC: set-real-user ( string/id -- )
 
 GENERIC: set-effective-user ( string/id -- )
 
-: with-real-user ( string/id quot -- )
+: (with-real-user) ( string/id quot -- )
     '[ _ set-real-user @ ]
     real-user-id '[ _ set-real-user ]
     [ ] cleanup ; inline
 
-: with-effective-user ( string/id quot -- )
+: with-real-user ( string/id/f quot -- )
+    over [ (with-real-user) ] [ nip call ] if ; inline
+
+: (with-effective-user) ( string/id quot -- )
     '[ _ set-effective-user @ ]
     effective-user-id '[ _ set-effective-user ]
     [ ] cleanup ; inline
+
+: with-effective-user ( string/id/f quot -- )
+    over [ (with-effective-user) ] [ nip call ] if ; inline
 
 <PRIVATE
 
@@ -100,17 +116,17 @@ GENERIC: set-effective-user ( string/id -- )
 
 PRIVATE>
 
-M: string set-real-user ( string -- )
-    user-id (set-real-user) ;
-
 M: integer set-real-user ( id -- )
     (set-real-user) ;
+
+M: string set-real-user ( string -- )
+    ?user-id (set-real-user) ;
 
 M: integer set-effective-user ( id -- )
     (set-effective-user) ; 
 
 M: string set-effective-user ( string -- )
-    user-id (set-effective-user) ;
+    ?user-id (set-effective-user) ;
 
 os {
     { [ dup bsd? ] [ drop "unix.users.bsd" require ] }
