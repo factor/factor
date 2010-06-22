@@ -5,12 +5,10 @@ io.directories io.launcher kernel mason.common mason.platform ;
 IN: mason.updates
 
 : git-reset-cmd ( -- cmd )
-    {
-        "git"
-        "reset"
-        "--hard"
-        "HEAD"
-    } ;
+    { "git" "reset" "--hard" "HEAD" } ;
+
+: git-clean-cmd ( -- cmd )
+    { "git" "clean" "-f" "-d" "-x" } ;
 
 : git-pull-cmd ( -- cmd )
     {
@@ -21,9 +19,13 @@ IN: mason.updates
         "master"
     } ;
 
-: updates-available? ( -- ? )
+: pristine-git ( -- )
     ".git/index" delete-file
     git-reset-cmd short-running-process
+    git-clean-cmd short-running-process ;
+
+: updates-available? ( -- ? )
+    pristine-git
     git-id
     git-pull-cmd short-running-process
     git-id
