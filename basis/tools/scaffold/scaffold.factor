@@ -5,7 +5,7 @@ io.encodings.utf8 hashtables kernel namespaces sequences
 vocabs.loader vocabs.metadata io combinators calendar accessors
 math.parser io.streams.string ui.tools.operations quotations
 strings arrays prettyprint words vocabs sorting sets classes
-math alien urls splitting ascii combinators.short-circuit alarms
+math alien urls splitting ascii combinators.short-circuit timers
 words.symbol system summary ;
 IN: tools.scaffold
 
@@ -22,7 +22,9 @@ M: bad-developer-name summary
 
 <PRIVATE
 
-: vocab-root? ( string -- ? ) vocab-roots get member? ;
+: vocab-root? ( string -- ? )
+    trim-tail-separators
+    vocab-roots get member? ;
 
 : contains-dot? ( string -- ? ) ".." swap subseq? ;
 
@@ -128,7 +130,7 @@ M: bad-developer-name summary
         { "ch" "a character" }
         { "word" word }
         { "array" array }
-        { "alarm" alarm }
+        { "timers" timer }
         { "duration" duration }
         { "path" "a pathname string" }
         { "vocab" "a vocabulary specifier" }

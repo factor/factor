@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: deques threads kernel arrays sequences alarms fry ;
+USING: deques threads kernel arrays sequences timers fry ;
 IN: concurrency.conditions
 
 : notify-1 ( deque -- )
@@ -9,8 +9,8 @@ IN: concurrency.conditions
 : notify-all ( deque -- )
     [ resume-now ] slurp-deque ; inline
 
-: queue-timeout ( queue timeout -- alarm )
-    #! Add an alarm which removes the current thread from the
+: queue-timeout ( queue timeout -- timer )
+    #! Add an timer which removes the current thread from the
     #! queue, and resumes it, passing it a value of t.
     [
         [ self swap push-front* ] keep '[
@@ -28,7 +28,7 @@ ERROR: wait-timeout ;
 : wait ( queue timeout status -- )
     over [
         [ queue-timeout ] dip suspend
-        [ wait-timeout ] [ stop-alarm ] if
+        [ wait-timeout ] [ stop-timer ] if
     ] [
         [ drop queue ] dip suspend drop
     ] if ; inline

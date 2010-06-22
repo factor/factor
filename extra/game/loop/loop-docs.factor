@@ -26,22 +26,6 @@ $nl
 
 { <game-loop> <game-loop*> } related-words
 
-HELP: benchmark-frames-per-second
-{ $values
-    { "loop" game-loop }
-    { "n" float }
-}
-{ $description "Returns the average number of times per second the game loop has called " { $link draw* } " on its delegate since the game loop was started with " { $link start-loop } " or since the benchmark counters have been reset with " { $link reset-loop-benchmark } "." } ;
-
-HELP: benchmark-ticks-per-second
-{ $values
-    { "loop" game-loop }
-    { "n" float }
-}
-{ $description "Returns the average number of times per second the game loop has called " { $link tick* } " on its tick delegate since the game loop was started with " { $link start-loop } " or since the benchmark counters have been reset with " { $link reset-loop-benchmark } "." } ;
-
-{ reset-loop-benchmark benchmark-frames-per-second benchmark-ticks-per-second } related-words
-
 HELP: draw*
 { $values
     { "tick-slice" float } { "delegate" "a " { $link "game.loop-delegates" } }
@@ -58,12 +42,6 @@ HELP: game-loop-error
     { "game-loop" game-loop } { "error" "an error object" }
 }
 { $description "If an uncaught error is thrown from inside a game loop delegate's " { $link tick* } " or " { $link draw* } ", the game loop will catch the error, stop the game loop, and rethrow an error of this class." } ;
-
-HELP: reset-loop-benchmark
-{ $values
-    { "loop" game-loop }
-}
-{ $description "Resets the benchmark counters on a " { $link game-loop } ". Subsequent calls to " { $link benchmark-frames-per-second } " and " { $link benchmark-ticks-per-second } " will measure their values from the point " { $snippet "reset-loop-benchmark" } " was called." } ;
 
 HELP: start-loop
 { $values
@@ -108,12 +86,6 @@ ARTICLE: "game.loop" "Game loops"
 { $subsections
     start-loop
     stop-loop
-}
-"The game loop maintains performance counters:"
-{ $subsections
-    reset-loop-benchmark
-    benchmark-frames-per-second
-    benchmark-ticks-per-second
 }
 "The game loop catches errors that occur in the delegate's methods during the course of the game loop:"
 { $subsections
