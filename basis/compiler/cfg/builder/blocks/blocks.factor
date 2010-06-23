@@ -70,4 +70,3 @@ IN: compiler.cfg.builder.blocks
         begin-basic-block
         set-successors
     ] [ 2drop ] if ;
-
