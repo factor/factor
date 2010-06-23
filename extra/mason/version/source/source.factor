@@ -38,7 +38,7 @@ IN: mason.version.source
     [
         clone-factor prepare-source (make-source-release)
         "Package created: " write absolute-path dup print
-    ] with-unique-directory ;
+    ] with-unique-directory drop ;
 
 : upload-source-release ( package version -- )
     "Uploading source release..." print flush
