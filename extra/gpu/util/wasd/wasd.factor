@@ -54,12 +54,21 @@ M: wasd-world wasd-fly-vertically? drop t ;
 
 CONSTANT: fov 0.7
 
+: wasd-fov-vector ( world -- fov )
+    dim>> dup first2 min >float v/n fov v*n ; inline
+
 :: generate-p-matrix ( world -- matrix )
     world wasd-near-plane :> near-plane
     world wasd-far-plane :> far-plane
 
-    world dim>> dup first2 min >float v/n fov v*n near-plane v*n
+    world wasd-fov-vector near-plane v*n
     near-plane far-plane frustum-matrix4 ;
+
+:: wasd-pixel-ray ( world loc -- direction )
+    loc world dim>> [ /f 0.5 - 2.0 * ] 2map 
+    world wasd-fov-vector v*
+    first2 neg -1.0 0.0 4array
+    world wasd-mv-inv-matrix swap m.v ;
 
 : set-wasd-view ( world location yaw pitch -- world )
     [ >>location ] [ >>yaw ] [ >>pitch ] tri* ;
