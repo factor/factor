@@ -83,6 +83,8 @@ FUNCTION: c-string getenv ( c-string name ) ;
 FUNCTION: int getgrgid_r ( gid_t gid, group* grp, c-string buffer, size_t bufsize, group** result ) ;
 FUNCTION: int getgrnam_r ( c-string name, group* grp, c-string buffer, size_t bufsize, group** result ) ;
 FUNCTION: passwd* getpwent ( ) ;
+FUNCTION: void setpwent ( ) ;
+FUNCTION: void setpassent ( int stayopen ) ;
 FUNCTION: passwd* getpwuid ( uid_t uid ) ;
 FUNCTION: passwd* getpwnam ( c-string login ) ;
 FUNCTION: int getpwnam_r ( c-string login, passwd* pwd, c-string buffer, size_t bufsize, passwd** result ) ;
