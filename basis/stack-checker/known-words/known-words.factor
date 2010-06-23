@@ -431,9 +431,9 @@ M: bad-executable summary
 \ quot-compiled? { quotation } { object } define-primitive
 \ quotation-code { quotation } { integer integer } define-primitive \ quotation-code make-flushable
 \ reset-dispatch-stats { } { } define-primitive
-\ resize-array { integer array } { array } define-primitive \ resize-array make-flushable
-\ resize-byte-array { integer byte-array } { byte-array } define-primitive \ resize-byte-array make-flushable
-\ resize-string { integer string } { string } define-primitive \ resize-string make-flushable
+\ resize-array { integer array } { array } define-primitive
+\ resize-byte-array { integer byte-array } { byte-array } define-primitive
+\ resize-string { integer string } { string } define-primitive
 \ retainstack { } { array } define-primitive \ retainstack make-flushable
 \ retainstack-for { c-ptr } { array } define-primitive \ retainstack-for make-flushable
 \ set-alien-cell { c-ptr c-ptr integer } { } define-primitive

@@ -10,6 +10,9 @@ IN: mason.version.files
 : remote-directory ( string -- string' )
     [ upload-directory get ] dip "/" glue ;
 
+SLOT: os
+SLOT: cpu
+
 : platform ( builder -- string )
     [ os>> ] [ cpu>> ] bi (platform) ;
 
