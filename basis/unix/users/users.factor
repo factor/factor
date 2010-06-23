@@ -31,6 +31,7 @@ M: unix passwd>new-passwd ( passwd -- seq )
     } cleave ;
 
 : with-pwent ( quot -- )
+    setpwent
     [ unix.ffi:endpwent ] [ ] cleanup ; inline
 
 PRIVATE>
