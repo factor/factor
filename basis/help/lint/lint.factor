@@ -92,8 +92,8 @@ PRIVATE>
 
 : :lint-failures ( -- ) lint-failures get values errors. ;
 
-: unlinked-words ( words -- seq )
-    all-word-help [ article-parent not ] filter ;
+: unlinked-words ( vocab -- seq )
+    words all-word-help [ article-parent not ] filter ;
 
 : linked-undocumented-words ( -- seq )
     all-words
