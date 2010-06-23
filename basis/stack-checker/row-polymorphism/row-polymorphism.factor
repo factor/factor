@@ -16,8 +16,8 @@ IN: stack-checker.row-polymorphism
 
 :: (effect-here) ( inner-d old-meta-d-length old-input-count -- effect )
     old-meta-d-length inner-d - input-count get old-input-count - +
-    terminated? get [ 0 ] [ meta-d length inner-d - ] if
-    [ "x" <array> ] bi@ terminated? get <terminated-effect> ; inline
+    terminated? get [ [ 0 ] [ meta-d length inner-d - ] if [ "x" <array> ] bi@ ] keep
+    <terminated-effect> ; inline
 
 : with-effect-here ( quot -- effect )
     meta-d length input-count get
