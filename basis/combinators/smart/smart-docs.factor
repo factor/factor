@@ -116,27 +116,6 @@ HELP: keep-inputs
 
 { drop-outputs keep-inputs } related-words
 
-HELP: boa-preserving
-{ $values
-    { "tuple-class" tuple-class }
-    { "quot" quotation }
-}
-{ $description "Constructs a tuple using a boa construtor and keeps the objects on the stack. The tuple will be at the top of the stack." }
-{ $examples
-    { $example
-        """USING: colors combinators.smart kernel prettyprint ;
-IN: combinators.smart.tests
-TUPLE: painting title artist ;
-"L'Origine du monde" "Courbet" painting boa-preserving [ . ] tri@ """
-""""L'Origine du monde"
-"Courbet"
-T{ painting
-    { title "L'Origine du monde" }
-    { artist "Courbet" }
-}"""
-    }
-} ;
-
 HELP: dropping
 { $values
     { "quot" quotation }
@@ -284,10 +263,6 @@ ARTICLE: "combinators.smart" "Smart combinators"
 { $subsections
     append-outputs
     append-outputs-as
-}
-"Constructing tuples:"
-{ $subsections
-    boa-preserving
 }
 "Drop the outputs after calling a quotation:"
 { $subsections drop-outputs }
