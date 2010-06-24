@@ -166,7 +166,7 @@ SYMBOL: +no-method+
 M: depends-on-single-method satisfied?
     [ method-class>> ] [ object-class>> ] [ generic>> ] tri
     {
-        [ [ class? ] [ class? ] [ generic? ] tri* and and ]
+        [ [ drop ] [ classoid? ] [ generic? ] tri* and ]
         [ subclass-with-only-method = ]
     } 3&& ;
 
