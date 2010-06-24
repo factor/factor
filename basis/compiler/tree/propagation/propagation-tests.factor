@@ -9,7 +9,7 @@ compiler.tree.debugger compiler.tree.checker slots.private words
 hashtables classes assocs locals specialized-arrays system
 sorting math.libm math.floats.private math.integers.private
 math.intervals quotations effects alien alien.data sets
-strings.private classes.tuple eval generic.single ;
+strings.private ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
@@ -693,7 +693,7 @@ M: fixnum bad-generic 1 fixnum+fast ; inline
 
 [ V{ fixnum } ] [ [ bad-behavior ] final-classes ] unit-test
 
-[ V{ integer } ] [
+[ V{ number } ] [
     [
         0 10 [ bad-generic dup 123 bitand drop bad-generic 1 + ] times
     ] final-classes
@@ -863,11 +863,11 @@ TUPLE: foo bar ;
 GENERIC: whatever ( x -- y )
 M: number whatever drop foo ; inline
 
-[ t ] [ [ 1 whatever new ] { new } M\ tuple-class new suffix inlined? ] unit-test
+[ t ] [ [ 1 whatever new ] { new } inlined? ] unit-test
 
 : that-thing ( -- class ) foo ;
 
-[ f ] [ [ that-thing new ] { new } M\ tuple-class new suffix inlined? ] unit-test
+[ f ] [ [ that-thing new ] { new } inlined? ] unit-test
 
 GENERIC: whatever2 ( x -- y )
 M: number whatever2 drop H{ { 1 1 } { 2 2 } { 3 3 } { 4 4 } { 5 6 } } ; inline
@@ -878,8 +878,7 @@ M: f whatever2 ; inline
 
 SYMBOL: not-an-assoc
 
-[ t ] [ [ not-an-assoc at ] { at* } inlined? ] unit-test
-[ f ] [ [ not-an-assoc at ] { no-method } inlined? ] unit-test
+[ f ] [ [ not-an-assoc at ] { at* } inlined? ] unit-test
 
 [ t ] [ [ { 1 2 3 } member? ] { member? } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap member? ] { member? } inlined? ] unit-test
@@ -891,8 +890,7 @@ SYMBOL: not-an-assoc
 [ f ] [ [ { } clone ] { clone (clone) } inlined? ] unit-test
 
 [ f ] [ [ instance? ] { instance? } inlined? ] unit-test
-[ t ] [ [ 5 instance? ] { instance? } inlined? ] unit-test
-[ f ] [ [ 5 instance? ] { no-method } inlined? ] unit-test
+[ f ] [ [ 5 instance? ] { instance? } inlined? ] unit-test
 [ t ] [ [ array instance? ] { instance? } inlined? ] unit-test
 
 [ t ] [ [ (( a b c -- c b a )) shuffle ] { shuffle } inlined? ] unit-test
@@ -979,45 +977,6 @@ M: tuple-with-read-only-slot clone
     [ string-nth ] final-info first interval>> 0 23 2^ [a,b] =
 ] unit-test
 
-! Optimization on instance?
-[ f ] [ [ { number } declare fixnum instance? ] { tag fixnum? } inlined? ] unit-test
-
-UNION: ?fixnum fixnum POSTPONE: f ;
-[ t ] [ [ { ?fixnum } declare fixnum instance? ] { tag fixnum? } inlined? ] unit-test
-[ t ] [ [ { fixnum } declare fixnum instance? ] { tag fixnum? } inlined? ] unit-test
-
-! Actually check to make sure that the generated code works properly
-: instance-test-1 ( x -- ? ) { ?fixnum } declare fixnum instance? ;
-: instance-test-2 ( x -- ? ) { number } declare fixnum instance? ;
-: instance-test-3 ( x -- ? ) { POSTPONE: f } declare \ f instance? ;
-
-[ t ] [ 1 instance-test-1 ] unit-test
-[ f ] [ f instance-test-1 ] unit-test
-[ t ] [ 1 instance-test-2 ] unit-test
-[ f ] [ 1.1 instance-test-2 ] unit-test
-[ t ] [ f instance-test-3 ] unit-test
-
-[ t ] [ [ { ?fixnum } declare >fixnum ] { >fixnum } inlined? ] unit-test
-[ f ] [ [ { integer } declare >fixnum ] { >fixnum } inlined? ] unit-test
-
-[ f ] [ [ { word } declare parent-word ] { parent-word } inlined? ] unit-test
-
-! Make sure guarded method inlining installs the right dependencies
-
-[ ] [
-    "IN: compiler.tree.propagation.tests
-    USING: kernel.private accessors ;
-    TUPLE: foo bar ;
-    UNION: ?foo foo POSTPONE: f ;
-    : baz ( ?foo -- bar ) { ?foo } declare bar>> ;" eval( -- )
-] unit-test
-
-[ 3 ] [ "USE: kernel IN: compiler.tree.propagation.tests 3 foo boa baz" eval( -- x ) ] unit-test
-
-[ ] [ "IN: compiler.tree.propagation.tests TUPLE: foo baz bar ;" eval( -- ) ] unit-test
-
-[ 3 ] [ "USE: kernel IN: compiler.tree.propagation.tests 2 3 foo boa baz" eval( -- x ) ] unit-test
-
 ! Non-zero displacement for <displaced-alien> restricts the output type
 [ t ] [
     [ { byte-array } declare <displaced-alien> ] final-classes
@@ -1036,9 +995,3 @@ UNION: ?fixnum fixnum POSTPONE: f ;
 [ V{ alien } ] [
     [ { byte-array } declare [ 10 bitand 2 + ] dip <displaced-alien> ] final-classes
 ] unit-test
-
-! Ensuring that calling a generic word on a class where it's undefined inlines no-method
-GENERIC: undefined-generic-test ( x -- y )
-
-[ t ] [ [ 1 undefined-generic-test ] { undefined-generic-test } inlined? ] unit-test
-[ f ] [ [ 1 undefined-generic-test ] { no-method } inlined? ] unit-test

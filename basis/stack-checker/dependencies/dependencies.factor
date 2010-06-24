@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs accessors classes classes.algebra fry
 generic kernel math namespaces sequences words sets
-combinators.short-circuit classes.tuple alien.c-types
-locals ;
+combinators.short-circuit classes.tuple alien.c-types ;
 FROM: classes.tuple.private => tuple-layout ;
 FROM: assocs => change-at ;
 FROM: namespaces => set ;
@@ -144,40 +143,6 @@ TUPLE: depends-on-final class ;
 
 M: depends-on-final satisfied?
     class>> { [ class? ] [ final-class? ] } 1&& ;
-
-TUPLE: depends-on-single-method method-class object-class generic ;
-
-: depends-on-single-method ( method-class object-class generic -- )
-    [ nip [ depends-on-conditionally ] bi@ ]
-    [ \ depends-on-single-method add-conditional-dependency ] 3bi ;
-
-SYMBOL: +no-method+
-
-:: subclass-with-only-method ( class generic -- subclass/f/+no-method+ )
-    f generic method-classes
-    [| last-class new-class |
-        class new-class classes-intersect? [
-            last-class [ f f ] [ new-class t ] if
-        ] [ last-class t ] if
-    ] all?
-    [ +no-method+ or class null class<= not swap and ]
-    [ drop f ] if ;
-
-M: depends-on-single-method satisfied?
-    [ method-class>> ] [ object-class>> ] [ generic>> ] tri
-    {
-        [ [ drop ] [ classoid? ] [ generic? ] tri* and ]
-        [ subclass-with-only-method = ]
-    } 3&& ;
-
-TUPLE: depends-on-method-identity class generic method ;
-
-: depends-on-method-identity ( class generic method -- )
-    [ [ depends-on-conditionally ] tri@ ]
-    [ \ depends-on-method-identity add-conditional-dependency ] 3bi ;
-
-M: depends-on-method-identity satisfied?
-    [ class>> ] [ generic>> method ] [ method>> ] tri = ;
 
 : init-dependencies ( -- )
     H{ } clone dependencies set
