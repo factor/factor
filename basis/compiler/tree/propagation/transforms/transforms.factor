@@ -142,23 +142,6 @@ IN: compiler.tree.propagation.transforms
     } case
 ] "custom-inlining" set-word-prop
 
-:: inline-instance ( node -- quot/f )
-    node in-d>> first2 [ value-info ] bi@ literal>> :> ( obj class )
-    class class? [
-        {
-            [ class \ f = not ]
-            [ obj class>> \ f class-not class-and class class<= ]
-        } 0&& [
-            ! TODO: replace this with an implicit null check when
-            ! profitable, once Factor gets OSR implemented
-            [ drop >boolean ]
-        ] [
-            class "predicate" word-prop '[ drop @ ]
-        ] if
-    ] [ f ] if ;
-
-\ instance? [ inline-instance ] "custom-inlining" set-word-prop
-
 ERROR: bad-partial-eval quot word ;
 
 : check-effect ( quot word -- )
@@ -190,6 +173,11 @@ ERROR: bad-partial-eval quot word ;
     ] [ drop f ] if ;
 
 \ new [ inline-new ] 1 define-partial-eval
+
+\ instance? [
+    dup class?
+    [ "predicate" word-prop ] [ drop f ] if
+] 1 define-partial-eval
 
 ! Shuffling
 : nths-quot ( indices -- quot )
@@ -311,6 +299,12 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
 \ push [
     in-d>> second value-info class>> growable class<=
     [ \ push def>> ] [ f ] if
+] "custom-inlining" set-word-prop
+
+! Speeds up fasta benchmark
+\ >fixnum [
+    in-d>> first value-info class>> fixnum \ f class-or class<=
+    [ [ dup [ \ >fixnum no-method ] unless ] ] [ f ] if
 ] "custom-inlining" set-word-prop
 
 ! We want to constant-fold calls to heap-size, and recompile those
