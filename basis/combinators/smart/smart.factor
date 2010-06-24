@@ -46,9 +46,6 @@ MACRO: append-outputs ( quot -- seq )
 MACRO: preserving ( quot -- )
     [ inputs ] keep '[ _ ndup @ ] ;
 
-MACRO: boa-preserving ( tuple-class -- )
-    '[ [ _ boa ] preserving ] ;
-
 MACRO: dropping ( quot -- quot' )
     inputs '[ [ _ ndrop ] ] ;
 
