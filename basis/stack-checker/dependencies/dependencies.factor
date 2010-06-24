@@ -165,7 +165,10 @@ SYMBOL: +no-method+
 
 M: depends-on-single-method satisfied?
     [ method-class>> ] [ object-class>> ] [ generic>> ] tri
-    subclass-with-only-method = ;
+    {
+        [ [ class? ] [ class? ] [ generic? ] tri* and and ]
+        [ subclass-with-only-method = ]
+    } 3&& ;
 
 TUPLE: depends-on-method-identity class generic method ;
 
