@@ -5,7 +5,6 @@ math.partial-dispatch generic generic.standard generic.single generic.math
 classes.algebra classes.union sets quotations assocs combinators
 combinators.short-circuit words namespaces continuations classes
 fry hints locals
-stack-checker.dependencies
 compiler.tree
 compiler.tree.builder
 compiler.tree.recursive
@@ -48,33 +47,13 @@ M: callable splicing-nodes splicing-body ;
         ] if
     ] [ 2drop undo-inlining ] if ;
 
-ERROR: bad-guarded-method-call class generic ;
-
-:: guard-code ( class generic -- quot/f )
-    class generic method :> my-method
-    my-method [ class generic bad-guarded-method-call ] unless
-    class generic my-method depends-on-method-identity
-    generic dispatch# (picker) :> picker
-    [
-        picker call class instance?
-        [ my-method execute ]
-        [ generic no-method ] if
-    ] ;
-
-:: guarded-method-call ( class generic -- quot/f )
-    class generic subclass-with-only-method [
-        [ class generic depends-on-single-method ] [
-            dup +no-method+ =
-            [ drop [ generic no-method ] ]
-            [ generic guard-code ] if
-        ] bi
-    ] [ f ] if* ;
-
 : inlining-standard-method ( #call word -- class/f method/f )
-    2dup [ in-d>> length ] [ dispatch# ] bi* <= [ 2drop f f ] [
-        [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
-        [ swap nth value-info class>> dup ] dip
-        { [ method-for-class ] [ guarded-method-call ] } 2||
+    dup "methods" word-prop assoc-empty? [ 2drop f f ] [
+        2dup [ in-d>> length ] [ dispatch# ] bi* <= [ 2drop f f ] [
+            [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
+            [ swap nth value-info class>> dup ] dip
+            method-for-class
+        ] if
     ] if ;
 
 : inline-standard-method ( #call word -- ? )
