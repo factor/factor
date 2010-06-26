@@ -1,15 +1,17 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.destructors
-classes.struct combinators destructors gdbm.ffi io.backend kernel libc
-literals locals math namespaces sequences serialize strings ;
+alien.enums classes.struct combinators destructors gdbm.ffi io.backend
+kernel libc locals math namespaces sequences serialize strings ;
 IN: gdbm
 
 TUPLE: gdbm
-    { name       string  }
+    { name string }
     { block-size integer }
-    { flags      integer initial: $ GDBM_WRCREAT }
-    { mode       integer initial: OCT: 644 } ;
+    { role initial: wrcreat }
+    { sync boolean }
+    { nolock boolean }
+    { mode integer initial: OCT: 644 } ;
 
 
 <PRIVATE
@@ -22,10 +24,16 @@ SYMBOL: current-dbf
 
 : dbf ( -- dbf ) current-dbf get ;
 
+: get-flag ( gdbm -- n )
+    [ role>>   enum>number ]
+    [ sync>>   GDBM_SYNC 0 ? ]
+    [ nolock>> GDBM_NOLOCK 0 ? ]
+    tri bitor bitor ;
+
 : gdbm-open ( gdbm -- dbf )
     {
         [ name>> normalize-path ]
-        [ block-size>> ] [ flags>> ] [ mode>> ]
+        [ block-size>> ] [ get-flag ] [ mode>> ]
     } cleave f gdbm_open [ gdbm-throw ] unless* ;
 
 DESTRUCTOR: gdbm-close

@@ -14,10 +14,8 @@ LIBRARY: libgdbm
 
 C-GLOBAL: c-string gdbm_version
 
-CONSTANT: GDBM_READER  0
-CONSTANT: GDBM_WRITER  1
-CONSTANT: GDBM_WRCREAT 2
-CONSTANT: GDBM_NEWDB   3
+ENUM: gdbm-role reader writer wrcreat newdb ;
+
 CONSTANT: GDBM_SYNC   HEX: 20
 CONSTANT: GDBM_NOLOCK HEX: 40
 
