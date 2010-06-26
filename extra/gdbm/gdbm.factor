@@ -44,12 +44,15 @@ DESTRUCTOR: gdbm-close
         gdbm_store check-error
     ] with-destructors ;
 
-:: (gdbm-setopt) ( option value -- )
+:: (setopt) ( value option -- )
     [
         int heap-size dup malloc &free :> ( size ptr )
         value ptr 0 int set-alien-value
         dbf option ptr size gdbm_setopt check-error
     ] with-destructors ;
+
+: setopt ( value option -- )
+    [ GDBM_CACHESIZE = [ >c-bool ] unless ] keep (setopt) ;
 
 PRIVATE>
 
@@ -86,8 +89,10 @@ ALIAS: gdbm-error-message gdbm_strerror
     [ dbf swap object>datum gdbm_exists c-bool> ]
     with-destructors ;
 
-: gdbm-setopt ( option value -- )
-    over GDBM_CACHESIZE = [ >c-bool ] unless (gdbm-setopt) ;
+: gdbm-set-cache-size ( size -- ) GDBM_CACHESIZE setopt ;
+: gdbm-set-sync-mode ( ? -- ) GDBM_SYNCMODE setopt ;
+: gdbm-set-block-pool ( ? -- ) GDBM_CENTFREE setopt ;
+: gdbm-set-block-merging ( ? -- ) GDBM_COALESCEBLKS setopt ;
 
 : gdbm-fdesc ( -- desc ) dbf gdbm_fdesc ;
 
