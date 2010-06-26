@@ -50,7 +50,29 @@ FUNCTION: int gdbm_exists ( GDBM_FILE dbf, datum key ) ;
 FUNCTION: int gdbm_setopt ( GDBM_FILE dbf, int option, int* value, int size ) ;
 FUNCTION: int gdbm_fdesc ( GDBM_FILE dbf ) ;
 
-TYPEDEF: int gdbm_error
-C-GLOBAL: gdbm_error gdbm_errno
+ENUM: gdbm-error
+    gdbm-no-error
+    gdbm-malloc-error
+    gdbm-block-size-error
+    gdbm-file-open-error
+    gdbm-file-write-error
+    gdbm-file-seek-error
+    gdbm-file-read-error
+    gdbm-bad-magic-number
+    gdbm-empty-database
+    gdbm-cant-be-reader
+    gdbm-cant-be-writer
+    gdbm-reader-cant-delete
+    gdbm-reader-cant-store
+    gdbm-reader-cant-reorganize
+    gdbm-unknown-update
+    gdbm-item-not-found
+    gdbm-reorganize-failed
+    gdbm-cannot-replace
+    gdbm-illegal-data
+    gdbm-option-already-set
+    gdbm-illegal-option ;
 
-FUNCTION: c-string gdbm_strerror ( gdbm_error errno ) ;
+C-GLOBAL: gdbm-error gdbm_errno
+
+FUNCTION: c-string gdbm_strerror ( gdbm-error errno ) ;
