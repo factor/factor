@@ -92,7 +92,7 @@ HELP: gdbm-set-block-pool
 
 HELP: gdbm-set-cache-size
 { $values { "size" integer } }
-{ $description "Sets the size of the internal bucket cache. The default value is 100." } ;
+{ $description "Sets the size of the internal bucket cache. The default value is 100. This option may only be set once." } ;
 
 HELP: gdbm-set-sync-mode
 { $values { "?" boolean } }
