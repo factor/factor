@@ -83,7 +83,7 @@ ALIAS: gdbm-error-message gdbm_strerror
 : gdbm-first-key* ( -- key ? )
     [ dbf gdbm_firstkey datum>object* ] with-destructors ;
 
-: gdbm-next-key* ( key -- key ? )
+: gdbm-next-key* ( key -- next-key ? )
     [ dbf swap object>datum gdbm_nextkey datum>object* ]
     with-destructors ;
 
