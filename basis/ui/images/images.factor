@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces cache images images.loader accessors assocs
-kernel opengl opengl.gl opengl.textures ui.gadgets.worlds
-memoize images.png images.tiff ;
+USING: accessors assocs cache combinators images images.loader
+kernel memoize namespaces opengl opengl.gl opengl.textures system
+ui.gadgets.worlds vocabs.loader ;
 IN: ui.images
 
 TUPLE: image-name path ;
@@ -30,3 +30,15 @@ PRIVATE>
 
 : image-dim ( image-name -- dim )
     cached-image dim>> ;
+
+<<
+{
+    { [ os macosx? ] [
+        "images.cocoa" require
+    ] }
+    [
+        "images.png" require
+        "images.tiff" require
+    ]
+} cond
+>>
