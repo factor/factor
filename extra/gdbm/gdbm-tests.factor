@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors continuations gdbm gdbm.ffi io.directories
+USING: accessors arrays continuations gdbm gdbm.ffi io.directories
 io.files.temp kernel sequences sets tools.test ;
 IN: gdbm.tests
 
@@ -49,12 +49,8 @@ CLEANUP
 
 [ t ]
 [
-    V{ }
-    [
-        first-key
-        [ next-key* ] [ [ swap push ] 2keep ] do while drop
-    ] with-test.db
-    V{ "foo" "bar" "baz" } set=
+    V{ } [ [ 2array append ] each-record ] with-test.db
+    V{ "foo" "bar" "baz" 42 43 44 } set=
 
 ] unit-test
 
