@@ -67,7 +67,7 @@ DESTRUCTOR: gdbm-close
 PRIVATE>
 
 
-ALIAS: gdbm-error-message gdbm_strerror
+: gdbm-error-message ( error -- msg ) gdbm_strerror ;
 
 : gdbm-replace ( key content -- ) GDBM_REPLACE gdbm-store ;
 : gdbm-insert ( key content -- ) GDBM_INSERT gdbm-store ;
