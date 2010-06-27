@@ -1,9 +1,12 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.destructors
-alien.enums classes.struct combinators destructors gdbm.ffi io.backend
-kernel libc locals math namespaces sequences serialize strings ;
+alien.enums alien.syntax classes.struct combinators destructors
+gdbm.ffi io.backend kernel libc locals math namespaces sequences
+serialize strings ;
 IN: gdbm
+
+ENUM: gdbm-role reader writer wrcreat newdb ;
 
 TUPLE: gdbm
     { name string }
@@ -15,10 +18,33 @@ TUPLE: gdbm
 
 : <gdbm> ( -- gdbm ) gdbm new ;
 
+ENUM: gdbm-error
+    gdbm-no-error
+    gdbm-malloc-error
+    gdbm-block-size-error
+    gdbm-file-open-error
+    gdbm-file-write-error
+    gdbm-file-seek-error
+    gdbm-file-read-error
+    gdbm-bad-magic-number
+    gdbm-empty-database
+    gdbm-cant-be-reader
+    gdbm-cant-be-writer
+    gdbm-reader-cant-delete
+    gdbm-reader-cant-store
+    gdbm-reader-cant-reorganize
+    gdbm-unknown-update
+    gdbm-item-not-found
+    gdbm-reorganize-failed
+    gdbm-cannot-replace
+    gdbm-illegal-data
+    gdbm-option-already-set
+    gdbm-illegal-option ;
+
 
 <PRIVATE
 
-: gdbm-throw ( -- * ) gdbm_errno throw ;
+: gdbm-throw ( -- * ) gdbm_errno gdbm-error number>enum throw ;
 
 : check-error ( ret -- ) 0 = [ gdbm-throw ] unless ;
 
@@ -69,7 +95,8 @@ PRIVATE>
 
 : gdbm-info ( -- str ) gdbm_version ;
 
-: gdbm-error-message ( error -- msg ) gdbm_strerror ;
+: gdbm-error-message ( error -- msg )
+    enum>number gdbm_strerror ;
 
 : replace ( key content -- ) GDBM_REPLACE gdbm-store ;
 : insert ( key content -- ) GDBM_INSERT gdbm-store ;
