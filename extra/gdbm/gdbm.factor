@@ -13,6 +13,8 @@ TUPLE: gdbm
     { nolock boolean }
     { mode integer initial: OCT: 644 } ;
 
+: <gdbm> ( -- gdbm ) gdbm new ;
+
 
 <PRIVATE
 
