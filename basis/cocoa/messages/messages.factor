@@ -109,7 +109,7 @@ H{
     { "d" c:double }
     { "B" c:bool }
     { "v" c:void }
-    { "*" c:c-string }
+    { "*" c:void* }
     { "?" unknown_type }
     { "@" id }
     { "#" Class }
