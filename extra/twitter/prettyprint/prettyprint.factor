@@ -23,7 +23,8 @@ CONSTANT: tweet-username-style
 CONSTANT: tweet-text-style 
     H{
         { font-name "sans-serif" }
-        { font-size 18 }
+        { font-size 16 }
+        { wrap-margin 500 }
     } 
 
 CONSTANT: tweet-metadata-style
@@ -36,18 +37,20 @@ CONSTANT: tweet-metadata-style
         [
             [ dup user>> user-image [ image. ] when* ] with-cell
             [
-                tweet-text-style [
-                    tweet-username-style [
-                        dup user>> screen-name>> write
-                    ] with-style
-                    " " write dup text>> print
+                H{ { wrap-margin 600 } } [
+                    tweet-text-style [
+                        tweet-username-style [
+                            dup user>> screen-name>> write
+                        ] with-style
+                        " " write dup text>> print
 
-                    tweet-metadata-style [
-                        dup created-at>> write
-                        " via " write
-                        dup source>> write
+                        tweet-metadata-style [
+                            dup created-at>> write
+                            " via " write
+                            dup source>> write
+                        ] with-style
                     ] with-style
-                ] with-style
+                ] with-nesting 
             ] with-cell
         ] with-row
     ] tabular-output nl
