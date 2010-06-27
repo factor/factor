@@ -1,7 +1,8 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors alien.data cocoa cocoa.classes cocoa.messages
 combinators core-foundation.data core-graphics.types fry images
-images.loader io io.streams.limited kernel literals ;
+images.loader io io.streams.limited kernel literals math 
+sequences ;
 IN: images.cocoa
 
 SINGLETON: ns-image
@@ -52,12 +53,13 @@ PRIVATE>
 
 : image-rep>image ( image-rep -- image )
     image new swap {
-        [ -> size CGSize>dim >>dim ]
+        [ -> size CGSize>dim [ >integer ] map >>dim ]
         [ -> bitmapData ]
         [ -> bytesPerPlane memory>byte-array >>bitmap ]
     } cleave
         RGBA >>component-order
         ubyte-components >>component-type
+        t >>premultiplied-alpha?
         f >>upside-down? ;
 
 M: ns-image stream>image

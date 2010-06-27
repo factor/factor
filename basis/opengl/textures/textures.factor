@@ -312,12 +312,21 @@ TUPLE: single-texture < disposable image dim loc texture-coords texture display-
     [ init-texture texture-coords>> gl-texture-coord-pointer ] tri
     swap gl-fill-rect ;
 
+: set-blend-mode ( texture -- )
+    image>> dup has-alpha?
+    [ premultiplied-alpha?>> [ GL_ONE GL_ONE_MINUS_SRC_ALPHA glBlendFunc ] when ]
+    [ drop GL_BLEND glDisable ] if ;
+
+: reset-blend-mode ( texture -- )
+    image>> dup has-alpha?
+    [ premultiplied-alpha?>> [ GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc ] when ]
+    [ drop GL_BLEND glEnable ] if ;
+
 : draw-textured-rect ( dim texture -- )
     [
-        [ image>> has-alpha? [ GL_BLEND glDisable ] unless ]
+        [ set-blend-mode ]
         [ (draw-textured-rect) GL_TEXTURE_2D 0 glBindTexture ]
-        [ image>> has-alpha? [ GL_BLEND glEnable ] unless ]
-        tri
+        [ reset-blend-mode ] tri
     ] with-texturing ;
 
 : texture-coords ( texture -- coords )
