@@ -28,6 +28,10 @@ HELP: <gdbm>
 { $values { "gdbm" gdbm } }
 { $description "Creates database configuration object with all slots set to their default values. See " { $link gdbm } " for complete slots description." } ;
 
+HELP: gdbm-info
+{ $values { "str" string } }
+{ $description "Returns version number and build date." } ;
+
 HELP: gdbm-delete
 { $values { "key" object } }
 { $description "Removes the keyed item from the database." } ;
