@@ -20,30 +20,30 @@ CLEANUP
     test.db reader >>role [ ] with-gdbm
 ] [ gdbm-file-open-error = ] must-fail-with
 
-[ f ] [ [ "foo" gdbm-exists ] with-test.db ] unit-test
+[ f ] [ [ "foo" exists? ] with-test.db ] unit-test
 
-[ ] [ [ "foo" 41 gdbm-insert ] with-test.db ] unit-test
+[ ] [ [ "foo" 41 insert ] with-test.db ] unit-test
 
 [
-    [ "foo" 42 gdbm-insert ] with-test.db
+    [ "foo" 42 insert ] with-test.db
 ] [ gdbm-cannot-replace = ] must-fail-with
 
 [ ]
 [
     [
-        "foo" 42 gdbm-replace
-        "bar" 43 gdbm-replace
-        "baz" 44 gdbm-replace
+        "foo" 42 replace
+        "bar" 43 replace
+        "baz" 44 replace
     ] with-test.db
 ] unit-test
 
-[ 42 t ] [ [ "foo" gdbm-fetch* ] with-test.db ] unit-test
+[ 42 t ] [ [ "foo" fetch* ] with-test.db ] unit-test
 
-[ f f ] [ [ "unknown" gdbm-fetch* ] with-test.db ] unit-test
+[ f f ] [ [ "unknown" fetch* ] with-test.db ] unit-test
 
 [
     [
-        300 gdbm-set-cache-size 300 gdbm-set-cache-size
+        300 set-cache-size 300 set-cache-size
     ] with-test.db
 ] [ gdbm-option-already-set = ] must-fail-with
 
@@ -51,8 +51,8 @@ CLEANUP
 [
     V{ }
     [
-        gdbm-first-key
-        [ gdbm-next-key* ] [ [ swap push ] 2keep ] do while drop
+        first-key
+        [ next-key* ] [ [ swap push ] 2keep ] do while drop
     ] with-test.db
     V{ "foo" "bar" "baz" } set=
 
@@ -60,7 +60,7 @@ CLEANUP
 
 [ f ]
 [
-    test.db newdb >>role [ "foo" gdbm-exists ] with-gdbm
+    test.db newdb >>role [ "foo" exists? ] with-gdbm
 ] unit-test
 
 
