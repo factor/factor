@@ -93,6 +93,16 @@ PRIVATE>
 : first-key ( -- key/f ) first-key* drop ;
 : next-key ( key -- key/f ) next-key* drop ;
 
+:: each-key ( ... quot: ( ... key -- ... ) -- ... )
+    first-key*
+    [ [ next-key* ] [ quot keep ] do while ] when drop ; inline
+
+: each-value ( ... quot: ( ... value -- ... ) -- ... )
+    [ fetch ] prepose each-key ; inline
+
+: each-record ( ... quot: ( ... key value -- ... ) -- ... )
+    [ dup fetch ] prepose each-key ; inline
+
 : reorganize ( -- ) dbf gdbm_reorganize check-error ;
 
 : synchronize ( -- ) dbf gdbm_sync ;

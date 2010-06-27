@@ -44,6 +44,18 @@ HELP: exists?
 { $values { "key" object } { "?" boolean } }
 { $description "Searches for a particular key without retreiving it." } ;
 
+HELP: each-key
+{ $values { "quot" quotation } }
+{ $description "Applies the quotation to the each key in the database." } ;
+
+HELP: each-value
+{ $values { "quot" quotation } }
+{ $description "Applies the quotation to the each value in the database." } ;
+
+HELP: each-record
+{ $values { "quot" quotation } }
+{ $description "Applies the quotation to the each key-value pair in the database." } ;
+
 HELP: gdbm-file-descriptor
 { $values { "desc" integer } }
 { $description "Returns the file descriptor of the database. This is used for manual database locking if it was opened with " { $snippet "nolock" } " flag set to " { $link t } "." } ;
@@ -125,8 +137,10 @@ $nl
 { $subsections insert exists? fetch delete }
 
 { $heading "Sequential access" }
-"It is possible to iterate through all records in the database with."
+"It is possible to iterate through all records in the database with"
 { $subsections first-key next-key }
+"The following combinators, however, provide more convenient way to do that:"
+{ $subsections each-key each-value each-record }
 "The order in which records are accessed has nothing to do with the order in which records have been stored. Note that these words can only be used in read-only algorithms since delete operation re-arranges the hash table."
 ;
 
