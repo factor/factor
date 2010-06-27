@@ -71,42 +71,42 @@ PRIVATE>
 
 : gdbm-error-message ( error -- msg ) gdbm_strerror ;
 
-: gdbm-replace ( key content -- ) GDBM_REPLACE gdbm-store ;
-: gdbm-insert ( key content -- ) GDBM_INSERT gdbm-store ;
+: replace ( key content -- ) GDBM_REPLACE gdbm-store ;
+: insert ( key content -- ) GDBM_INSERT gdbm-store ;
 
-: gdbm-delete ( key -- )
+: delete ( key -- )
     [ dbf swap object>datum gdbm_delete check-error ]
     with-destructors ;
 
-: gdbm-fetch* ( key -- content ? )
+: fetch* ( key -- content ? )
     [ dbf swap object>datum gdbm_fetch datum>object* ]
     with-destructors ;
 
-: gdbm-first-key* ( -- key ? )
+: first-key* ( -- key ? )
     [ dbf gdbm_firstkey datum>object* ] with-destructors ;
 
-: gdbm-next-key* ( key -- next-key ? )
+: next-key* ( key -- next-key ? )
     [ dbf swap object>datum gdbm_nextkey datum>object* ]
     with-destructors ;
 
-: gdbm-fetch ( key -- content/f ) gdbm-fetch* drop ;
-: gdbm-first-key ( -- key/f ) gdbm-first-key* drop ;
-: gdbm-next-key ( key -- key/f ) gdbm-next-key* drop ;
+: fetch ( key -- content/f ) fetch* drop ;
+: first-key ( -- key/f ) first-key* drop ;
+: next-key ( key -- key/f ) next-key* drop ;
 
-: gdbm-reorganize ( -- ) dbf gdbm_reorganize check-error ;
+: reorganize ( -- ) dbf gdbm_reorganize check-error ;
 
-: gdbm-sync ( -- ) dbf gdbm_sync ;
+: synchronize ( -- ) dbf gdbm_sync ;
 
-: gdbm-exists ( key -- ? )
+: exists? ( key -- ? )
     [ dbf swap object>datum gdbm_exists c-bool> ]
     with-destructors ;
 
-: gdbm-set-cache-size ( size -- ) GDBM_CACHESIZE setopt ;
-: gdbm-set-sync-mode ( ? -- ) GDBM_SYNCMODE setopt ;
-: gdbm-set-block-pool ( ? -- ) GDBM_CENTFREE setopt ;
-: gdbm-set-block-merging ( ? -- ) GDBM_COALESCEBLKS setopt ;
+: set-cache-size ( size -- ) GDBM_CACHESIZE setopt ;
+: set-sync-mode ( ? -- ) GDBM_SYNCMODE setopt ;
+: set-block-pool ( ? -- ) GDBM_CENTFREE setopt ;
+: set-block-merging ( ? -- ) GDBM_COALESCEBLKS setopt ;
 
-: gdbm-fdesc ( -- desc ) dbf gdbm_fdesc ;
+: gdbm-file-descriptor ( -- desc ) dbf gdbm_fdesc ;
 
 : with-gdbm ( gdbm quot -- )
     [ gdbm-open &gdbm-close current-dbf set ] prepose curry
