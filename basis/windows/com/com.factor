@@ -51,3 +51,7 @@ FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
     over [ com-release ] curry [ ] cleanup ; inline
 
 DESTRUCTOR: com-release
+
+! XXX interfaces used by other libraries that should be fleshed out
+C-TYPE: IStream
+
