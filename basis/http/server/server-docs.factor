@@ -74,17 +74,17 @@ ARTICLE: "http.server.requests" "HTTP request variables"
 { $subsections
     request
     url
-    post-request?
     responder-nesting
     params
 }
 "Utility words:"
 { $subsections
+    post-request?
     param
     set-param
     request-params
 }
-"Additional vocabularies may be set by vocabularies such as " { $vocab-link "html.forms" } " and " { $vocab-link "furnace.sessions" } "." ;
+"Additional variables may be set by vocabularies such as " { $vocab-link "html.forms" } " and " { $vocab-link "furnace.sessions" } "." ;
 
 ARTICLE: "http.server.responders" "HTTP server responders"
 "Responders process requests and output " { $link "http.responses" } ". To implement a responder, define a new class and implement a method on the following generic word:"
