@@ -70,7 +70,7 @@ HELP: params
 { $notes "Instead of using this word, it is better to use " { $vocab-link "furnace.actions" } " and the associated validation machinery, which allows you to access values using " { $link "html.forms.values" } " words." } ;
 
 ARTICLE: "http.server.requests" "HTTP request variables"
-"The following variables are set by the HTTP server at the beginning of a request."
+"The following variables are set by the HTTP server at the beginning of a request. Responder implementations may access these variables."
 { $subsections
     request
     url
@@ -87,21 +87,19 @@ ARTICLE: "http.server.requests" "HTTP request variables"
 "Additional vocabularies may be set by vocabularies such as " { $vocab-link "html.forms" } " and " { $vocab-link "furnace.sessions" } "." ;
 
 ARTICLE: "http.server.responders" "HTTP server responders"
+"Responders process requests and output " { $link "http.responses" } ". To implement a responder, define a new class and implement a method on the following generic word:"
+{ $subsections call-responder* }
 "The HTTP server dispatches requests to a main responder:"
 { $subsections main-responder }
-"The main responder may in turn dispatch it a subordinate dispatcher, and so on."
-$nl
-"Responders process requests and output " { $link "http.responses" } "; concretely are instances of classes which implement a generic word:"
-{ $subsections call-responder* }
-"To actually call a subordinate responder, use the following word instead:"
+"The main responder may in turn dispatch it a subordinate dispatcher, and so on. To call a subordinate responder, use the following word:"
 { $subsections call-responder }
 "A simple implementation of a responder which always outputs the same response:"
 { $subsections
     trivial-responder
     <trivial-responder>
 }
-{ $vocab-subsection "Furnace actions" "furnace.actions" }
-"In particular, writing new responders by hand is rarely necessary, because in most cases it is easier to use " { $vocab-link "furnace.actions" } " instead." ;
+"Writing new responders by hand is rarely necessary, because in most cases it is easier to use " { $vocab-link "furnace.actions" } " instead."
+{ $vocab-subsection "Furnace actions" "furnace.actions" } ;
 
 ARTICLE: "http.server.variables" "HTTP server variables"
 "The following global variables control the behavior of the HTTP server. Both are off by default."
