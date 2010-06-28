@@ -33,3 +33,7 @@ ENUM: instrument_t < ushort trombone trumpet ;
 
 { V{ { red 0 } { green 3 } { blue 4 } } }
 [ color_t "c-type" word-prop members>> ] unit-test
+
+ENUM: colores { rojo red } { verde green } { azul blue } { colorado rojo } ;
+
+[ { 0 3 4 0 } ] [ { rojo verde azul colorado } [ enum>number ] map ] unit-test
