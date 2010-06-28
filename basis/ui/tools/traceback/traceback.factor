@@ -1,11 +1,11 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors continuations kernel models namespaces arrays
-fry prettyprint ui ui.commands ui.gadgets ui.gadgets.labeled assocs
+fry prettyprint sequences inspector models.arrow fonts ui
+ui.commands ui.gadgets ui.gadgets.labeled assocs
 ui.gadgets.tracks ui.gadgets.buttons ui.gadgets.panes
 ui.gadgets.status-bar ui.gadgets.scrollers ui.gadgets.borders
-ui.gadgets.tables ui.gestures sequences inspector
-models.arrow fonts ;
+ui.gadgets.tables ui.gestures ui.tools.common ;
 QUALIFIED-WITH: ui.tools.inspector i
 IN: ui.tools.traceback
 
@@ -45,7 +45,7 @@ M: stack-entry-renderer row-value drop object>> ;
 : <retainstack-display> ( model -- gadget )
     [ retain>> ] "Retain stack" <stack-display> ;
 
-TUPLE: traceback-gadget < track ;
+TUPLE: traceback-gadget < tool ;
 
 : <traceback-gadget> ( model -- gadget )
     [
