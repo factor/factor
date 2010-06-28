@@ -12,7 +12,7 @@ PRIVATE>
 
 GENERIC: enum>number ( enum -- number ) foldable
 M: integer enum>number ;
-M: symbol enum>number "enum-value" word-prop ;
+M: word enum>number "enum-value" word-prop ;
 
 <PRIVATE
 : enum-boxer ( members -- quot )
@@ -32,13 +32,10 @@ M: enum-c-type c-type-setter
 <PRIVATE
 
 : define-enum-value ( class value -- )
-    "enum-value" set-word-prop ;
+    enum>number "enum-value" set-word-prop ;
 
 : define-enum-members ( member-names -- )
-    [
-        [ first define-symbol ]
-        [ first2 define-enum-value ] bi
-    ] each ;
+    [ first define-symbol ] each ;
 
 : define-enum-constructor ( word -- )
     [ name>> "<" ">" surround create-in ] keep
