@@ -226,9 +226,13 @@ M: object pprint-object ( obj -- )
 M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
 M: byte-vector pprint* pprint-object ;
+
+: with-extra-nesting-level ( quot -- )
+    nesting-limit [ dup [ 1 + ] [ f ] if* ] change
+    [ nesting-limit set ] curry [ ] cleanup ; inline
+
 M: hashtable pprint*
-    nesting-limit inc
-    [ pprint-object ] [ nesting-limit dec ] [ ] cleanup ;
+    [ pprint-object ] with-extra-nesting-level ;
 M: curry pprint* pprint-object ;
 M: compose pprint* pprint-object ;
 M: hash-set pprint* pprint-object ;

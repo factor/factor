@@ -374,3 +374,16 @@ TUPLE: final-tuple ; final
 ] [
     [ \ final-tuple see ] with-string-writer "\n" split
 ] unit-test
+
+[ "H{ { 1 2 } }\n" ] [ [ H{ { 1 2 } } short. ] with-string-writer ] unit-test
+
+[ "H{ { 1 ~array~ } }\n" ] [ [ H{ { 1 { 2 } } } short. ] with-string-writer ] unit-test
+
+[ "{ ~array~ }\n" ] [ [ { { 1 2 } } short. ] with-string-writer ] unit-test
+
+[ "H{ { 1 { 2 3 } } }\n" ] [
+    f nesting-limit [
+        [ H{ { 1 { 2 3 } } } . ] with-string-writer
+    ] with-variable
+] unit-test
+
