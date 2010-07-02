@@ -84,7 +84,7 @@ PRIVATE>
 
 : start-timer ( timer -- )
     [
-        '[ _ timer-loop ] "Alarm execution" spawn
+        '[ _ timer-loop ] "Timer execution" spawn
     ] keep thread<< ;
 
 : stop-timer ( timer -- )
