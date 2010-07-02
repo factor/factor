@@ -198,17 +198,17 @@ M: #shuffle emit-node
     dup dup [ mapping>> ] [ make-input-map ] bi load-shuffle store-shuffle ;
 
 ! #return
-: emit-return ( -- )
+: end-word ( -- )
     ##branch
     begin-basic-block
     make-kill-block
     ##epilogue
     ##return ;
 
-M: #return emit-node drop emit-return ;
+M: #return emit-node drop end-word ;
 
 M: #return-recursive emit-node
-    label>> id>> loops get key? [ emit-return ] unless ;
+    label>> id>> loops get key? [ end-word ] unless ;
 
 ! #terminate
 M: #terminate emit-node drop ##no-tco end-basic-block ;
