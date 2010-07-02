@@ -1,6 +1,7 @@
 USING: accessors compiler.cfg.debugger
 compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.save-contexts kernel namespaces tools.test ;
+compiler.cfg.save-contexts kernel namespaces tools.test
+cpu.x86.assembler.operands cpu.architecture ;
 IN: compiler.cfg.save-contexts.tests
 
 0 vreg-counter set-global
@@ -34,6 +35,37 @@ V{
     V{
         T{ ##add f 1 2 3 }
         T{ ##branch }
+    }
+] [
+    0 get instructions>>
+] unit-test
+
+4 vreg-counter set-global
+
+V{
+    T{ ##inc-d f 3 }
+    T{ ##load-reg-param f 0 RCX int-rep }
+    T{ ##load-reg-param f 1 RDX int-rep }
+    T{ ##load-reg-param f 2 R8 int-rep }
+    T{ ##begin-callback }
+    T{ ##box f 4 3 "from_signed_4" int-rep
+        T{ gc-map { scrub-d B{ 0 0 0 } } { scrub-r B{ } } { gc-roots { } } }
+    }
+} 0 test-bb
+
+0 get insert-save-context
+
+[
+    V{
+        T{ ##inc-d f 3 }
+        T{ ##load-reg-param f 0 RCX int-rep }
+        T{ ##load-reg-param f 1 RDX int-rep }
+        T{ ##load-reg-param f 2 R8 int-rep }
+        T{ ##save-context f 5 6 }
+        T{ ##begin-callback }
+        T{ ##box f 4 3 "from_signed_4" int-rep
+            T{ gc-map { scrub-d B{ 0 0 0 } } { scrub-r B{ } } { gc-roots { } } }
+        }
     }
 ] [
     0 get instructions>>
