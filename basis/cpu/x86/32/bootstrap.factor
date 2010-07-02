@@ -25,6 +25,7 @@ IN: bootstrap.x86
 : nv-reg ( -- reg ) ESI ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;
+: link-reg ( -- reg ) EBX ;
 : fixnum>slot@ ( -- ) temp0 2 SAR ;
 : rex-length ( -- n ) 0 ;
 
@@ -90,15 +91,9 @@ IN: bootstrap.x86
     ESP 4 [+] EAX MOV
     "begin_callback" jit-call
 
-    jit-load-vm
-    jit-load-context
-    jit-restore-context
-
     jit-call-quot
 
     jit-load-vm
-    jit-save-context
-
     ESP [] vm-reg MOV
     "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive

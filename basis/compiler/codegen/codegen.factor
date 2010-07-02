@@ -254,7 +254,6 @@ CODEGEN: ##compare-integer-imm %compare-integer-imm
 CODEGEN: ##compare-float-ordered %compare-float-ordered
 CODEGEN: ##compare-float-unordered %compare-float-unordered
 CODEGEN: ##save-context %save-context
-CODEGEN: ##restore-context %restore-context
 CODEGEN: ##vm-field %vm-field
 CODEGEN: ##set-vm-field %set-vm-field
 CODEGEN: ##alien-global %alien-global
@@ -304,4 +303,5 @@ CODEGEN: ##begin-callback %begin-callback
 CODEGEN: ##alien-callback %alien-callback
 CODEGEN: ##end-callback %end-callback
 
-M: ##alien-assembly generate-insn quot>> call( -- ) ;
+M: ##alien-assembly generate-insn
+    [ gc-map>> gc-map set ] [ quot>> call( -- ) ] bi ;

@@ -38,15 +38,17 @@ big-endian off
     ! Save C callstack pointer
     nv-reg context-callstack-save-offset [+] stack-reg MOV
 
-    ! Load Factor callstack pointer
+    ! Load Factor stack pointers
     stack-reg nv-reg context-callstack-bottom-offset [+] MOV
-
     nv-reg jit-update-tib
     jit-install-seh
 
+    rs-reg nv-reg context-retainstack-offset [+] MOV
+    ds-reg nv-reg context-datastack-offset [+] MOV
+
     ! Call into Factor code
-    nv-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
-    nv-reg CALL
+    link-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
+    link-reg CALL
 
     ! Load VM into vm-reg; only needed on x86-32, but doesn't
     ! hurt on x86-64

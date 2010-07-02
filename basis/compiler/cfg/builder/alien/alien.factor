@@ -1,25 +1,26 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs arrays layouts math math.order math.parser
-combinators combinators.short-circuit fry make sequences
-sequences.generalizations alien alien.private alien.strings
-alien.c-types alien.libraries classes.struct namespaces kernel
-strings libc locals quotations words cpu.architecture
-compiler.utilities compiler.tree compiler.cfg
+USING: accessors assocs arrays layouts math math.order
+math.parser combinators combinators.short-circuit fry make
+sequences sequences.generalizations alien alien.private
+alien.strings alien.c-types alien.libraries classes.struct
+namespaces kernel strings libc locals quotations words
+cpu.architecture compiler.utilities compiler.tree compiler.cfg
 compiler.cfg.builder compiler.cfg.builder.alien.params
 compiler.cfg.builder.alien.boxing compiler.cfg.builder.blocks
 compiler.cfg.instructions compiler.cfg.stack-frame
-compiler.cfg.stacks compiler.cfg.registers compiler.cfg.hats ;
+compiler.cfg.stacks compiler.cfg.stacks.local
+compiler.cfg.registers compiler.cfg.hats ;
 FROM: compiler.errors => no-such-symbol no-such-library ;
 IN: compiler.cfg.builder.alien
 
 : unbox-parameters ( parameters -- vregs reps )
     [
         [ length iota <reversed> ] keep
-        [ [ <ds-loc> ^^peek ] [ base-type ] bi* unbox-parameter ]
+        [ [ <ds-loc> peek-loc ] [ base-type ] bi* unbox-parameter ]
         2 2 mnmap [ concat ] bi@
     ]
-    [ length neg ##inc-d ] bi ;
+    [ length neg inc-d ] bi ;
 
 : prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
     dup large-struct? [
@@ -54,7 +55,7 @@ IN: compiler.cfg.builder.alien
     struct-return-area set ;
 
 : box-return* ( node -- )
-    return>> [ ] [ base-type box-return 1 ##inc-d D 0 ##replace ] if-void ;
+    return>> [ ] [ base-type box-return ds-push ] if-void ;
 
 GENERIC# dlsym-valid? 1 ( symbols dll -- ? )
 
@@ -83,49 +84,38 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
     [ library>> load-library ]
     bi 2dup check-dlsym ;
 
-: alien-node-height ( params -- )
-    [ out-d>> length ] [ in-d>> length ] bi - adjust-d ;
-
-: emit-alien-block ( node quot: ( params -- ) -- )
-    '[
-        make-kill-block
-        params>>
-        _ [ alien-node-height ] bi
-    ] emit-trivial-block ; inline
-
 : emit-stack-frame ( stack-size params -- )
     [ [ return>> ] [ abi>> ] bi stack-cleanup ##cleanup ]
     [ drop ##stack-frame ]
     2bi ;
 
 M: #alien-invoke emit-node
-    [
-        {
-            [ caller-parameters ]
-            [ ##prepare-var-args alien-invoke-dlsym <gc-map> ##alien-invoke ]
-            [ emit-stack-frame ]
-            [ box-return* ]
-        } cleave
-    ] emit-alien-block ;
-
-M:: #alien-indirect emit-node ( node -- )
-    node [
-        D 0 ^^peek -1 ##inc-d ^^unbox-any-c-ptr :> src
-        [ caller-parameters src <gc-map> ##alien-indirect ]
+    params>>
+    {
+        [ caller-parameters ]
+        [ ##prepare-var-args alien-invoke-dlsym <gc-map> ##alien-invoke ]
         [ emit-stack-frame ]
         [ box-return* ]
-        tri
-    ] emit-alien-block ;
+    } cleave ;
+
+M: #alien-indirect emit-node ( node -- )
+    params>>
+    [
+        ds-pop ^^unbox-any-c-ptr
+        [ caller-parameters ] dip
+        <gc-map> ##alien-indirect
+    ]
+    [ emit-stack-frame ]
+    [ box-return* ]
+    tri ;
 
 M: #alien-assembly emit-node
-    [
-        {
-            [ caller-parameters ]
-            [ quot>> ##alien-assembly ]
-            [ emit-stack-frame ]
-            [ box-return* ]
-        } cleave
-    ] emit-alien-block ;
+    params>> {
+        [ caller-parameters ]
+        [ quot>> <gc-map> ##alien-assembly ]
+        [ emit-stack-frame ]
+        [ box-return* ]
+    } cleave ;
 
 : callee-parameter ( rep on-stack? -- dst insn )
     [ next-vreg dup ] 2dip
@@ -148,13 +138,7 @@ M: #alien-assembly emit-node
     bi ;
 
 : box-parameters ( vregs reps params -- )
-    ##begin-callback
-    next-vreg next-vreg ##restore-context
-    [
-        next-vreg next-vreg ##save-context
-        box-parameter
-        1 ##inc-d D 0 ##replace
-    ] 3each ;
+    ##begin-callback [ box-parameter ds-push ] 3each ;
 
 : callee-parameters ( params -- stack-size )
     [ abi>> ] [ return>> ] [ parameters>> ] tri
@@ -174,25 +158,29 @@ M: #alien-assembly emit-node
     cfg get t >>frame-pointer? drop ;
 
 M: #alien-callback emit-node
-    dup params>> xt>> dup
+    params>> dup xt>> dup
     [
         needs-frame-pointer
 
-        ##prologue
-        [
-            {
-                [ callee-parameters ]
-                [ quot>> ##alien-callback ]
+        begin-word
+
+        {
+            [ callee-parameters ]
+            [
                 [
-                    return>> [ ##end-callback ] [
-                        [ D 0 ^^peek ] dip
-                        ##end-callback
-                        base-type unbox-return
-                    ] if-void
-                ]
-                [ callback-stack-cleanup ]
-            } cleave
-        ] emit-alien-block
-        ##epilogue
-        ##return
+                    make-kill-block
+                    quot>> ##alien-callback
+                ] emit-trivial-block
+            ]
+            [
+                return>> [ ##end-callback ] [
+                    [ ds-pop ] dip
+                    ##end-callback
+                    base-type unbox-return
+                ] if-void
+            ]
+            [ callback-stack-cleanup ]
+        } cleave
+
+        end-word
     ] with-cfg-builder ;
