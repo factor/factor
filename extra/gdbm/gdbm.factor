@@ -148,3 +148,13 @@ PRIVATE>
 : with-gdbm ( gdbm quot -- )
     [ gdbm-open &gdbm-close current-dbf set ] prepose curry
     [ with-scope ] curry with-destructors ; inline
+
+:: with-gdbm-role ( name role quot -- )
+    <gdbm> name >>name role >>role quot with-gdbm ; inline
+
+: with-gdbm-reader ( name quot -- )
+    reader swap with-gdbm-role ; inline
+
+: with-gdbm-writer ( name quot -- )
+    writer swap with-gdbm-role ; inline
+
