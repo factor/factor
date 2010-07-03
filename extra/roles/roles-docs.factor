@@ -46,3 +46,13 @@ HELP: multiple-inheritance-attempted
 HELP: role-slot-overlap
 { $class-description "This error is thrown if a " { $link POSTPONE: TUPLE: } " or " { $link POSTPONE: ROLE: } " definition attempts to inherit a set of " { $link role } "s in which more than one attempts to define the same slot." } ;
 
+ARTICLE: "roles" "Roles"
+"The " { $vocab-link "roles" } " vocabulary implements a way to extend tuple classes that allows them to be composed of multiple roles objects that contain slots." $nl
+"The role superclass:"
+{ $subsections role }
+"Syntax for making a new role:"
+{ $subsection POSTPONE: ROLE: } 
+"Syntax for making tuples that use roles:"
+{ $subsection POSTPONE: TUPLE: } 
+"Errors with roles:"
+{ $subsections multiple-inheritance-attempted role-slot-overlap } ;
