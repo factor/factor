@@ -25,7 +25,7 @@ CLEANUP
 [ ] [ [ "foo" 41 insert ] with-test.db ] unit-test
 
 [
-    [ "foo" 42 insert ] with-test.db
+    db-path [ "foo" 42 insert ] with-gdbm-writer
 ] [ gdbm-cannot-replace = ] must-fail-with
 
 [ ]
@@ -37,7 +37,7 @@ CLEANUP
     ] with-test.db
 ] unit-test
 
-[ 42 t ] [ [ "foo" fetch* ] with-test.db ] unit-test
+[ 42 t ] [ db-path [ "foo" fetch* ] with-gdbm-reader ] unit-test
 
 [ f f ] [ [ "unknown" fetch* ] with-test.db ] unit-test
 
