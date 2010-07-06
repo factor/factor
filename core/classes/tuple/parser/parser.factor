@@ -34,21 +34,19 @@ ERROR: invalid-slot-name name ;
     [ scan , \ } parse-until % ] { } make ;
 
 : parse-slot-name-delim ( end-delim string/f -- ? )
-    #! This isn't meant to enforce any kind of policy, just
-    #! to check for mistakes of this form:
-    #!
-    #! TUPLE: blahblah foo bing
-    #!
-    #! : ...
+    ! Check for mistakes of this form:
+    !
+    ! TUPLE: blahblah foo bing
+    !
+    ! : ...
     {
-        { [ dup not ] [ unexpected-eof ] }
         { [ dup { ":" "(" "<" "\"" "!" } member? ] [ invalid-slot-name ] }
         { [ 2dup = ] [ drop f ] }
         [ dup "{" = [ drop parse-long-slot-name ] when , t ]
     } cond nip ;
 
 : parse-tuple-slots-delim ( end-delim -- )
-    dup scan parse-slot-name-delim [ parse-tuple-slots-delim ] [ drop ] if ;
+    dup scan-token parse-slot-name-delim [ parse-tuple-slots-delim ] [ drop ] if ;
 
 : parse-slot-name ( string/f -- ? )
     ";" swap parse-slot-name-delim ;
@@ -74,16 +72,14 @@ ERROR: bad-slot-name class slot ;
     2dup swap slot-named* nip [ 2nip ] [ nip bad-slot-name ] if ;
 
 : parse-slot-value ( class slots -- )
-    scan check-slot-name scan-object 2array , scan {
-        { f [ \ } unexpected-eof ] }
+    scan check-slot-name scan-object 2array , scan-token {
         { "}" [ ] }
         [ bad-literal-tuple ]
     } case ;
 
 : (parse-slot-values) ( class slots -- )
     2dup parse-slot-value
-    scan {
-        { f [ 2drop \ } unexpected-eof ] }
+    scan-token {
         { "{" [ (parse-slot-values) ] }
         { "}" [ 2drop ] }
         [ 2nip bad-literal-tuple ]
@@ -109,8 +105,7 @@ M: tuple-class boa>object
     assoc-union! seq>> boa>object ;
 
 : parse-tuple-literal-slots ( class slots -- tuple )
-    scan {
-        { f [ unexpected-eof ] }
+    scan-token {
         { "f" [ drop \ } parse-until boa>object ] }
         { "{" [ 2dup parse-slot-values assoc>object ] }
         { "}" [ drop new ] }
