@@ -88,7 +88,7 @@ PRIVATE>
     [ V{ 0 } clone V{ 1 } clone ] 2dip swap (pgcd) [ >array ] bi@ ;
 
 : pdiff ( p -- p' )
-    dup length iota v* unclip drop ;
+    dup length iota v* rest ;
 
 : polyval ( x p -- p[x] )
     [ length swap powers ] [ nip ] 2bi v. ;
