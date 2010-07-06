@@ -21,30 +21,28 @@ IN: ui.backend.cocoa.tools
     image save-panel [ save-image ] when* ;
 
 ! Handle Open events from the Finder
-CLASS: {
-    { +superclass+ "FactorApplicationDelegate" }
-    { +name+ "FactorWorkspaceApplicationDelegate" }
-}
+CLASS: FactorWorkspaceApplicationDelegate < FactorApplicationDelegate
+[
+    METHOD: void application: id app openFiles: id files [ files finder-run-files ]
 
-METHOD: void application: id app openFiles: id files [ files finder-run-files ]
+    METHOD: int applicationShouldHandleReopen: id app hasVisibleWindows: int flag [ flag 0 = [ show-listener ] when 1 ]
 
-METHOD: int applicationShouldHandleReopen: id app hasVisibleWindows: int flag [ flag 0 = [ show-listener ] when 1 ]
+    METHOD: id factorListener: id app [ show-listener f ]
 
-METHOD: id factorListener: id app [ show-listener f ]
+    METHOD: id factorBrowser: id app [ show-browser f ]
 
-METHOD: id factorBrowser: id app [ show-browser f ]
+    METHOD: id newFactorListener: id app [ listener-window f ]
 
-METHOD: id newFactorListener: id app [ listener-window f ]
+    METHOD: id newFactorBrowser: id app [ browser-window f ]
 
-METHOD: id newFactorBrowser: id app [ browser-window f ]
+    METHOD: id runFactorFile: id app [ menu-run-files f ]
 
-METHOD: id runFactorFile: id app [ menu-run-files f ]
+    METHOD: id saveFactorImage: id app [ save f ]
 
-METHOD: id saveFactorImage: id app [ save f ]
+    METHOD: id saveFactorImageAs: id app [ menu-save-image f ]
 
-METHOD: id saveFactorImageAs: id app [ menu-save-image f ]
-
-METHOD: id refreshAll: id app [ [ refresh-all ] \ refresh-all call-listener f ] ;
+    METHOD: id refreshAll: id app [ [ refresh-all ] \ refresh-all call-listener f ]
+]
 
 : install-app-delegate ( -- )
     NSApp FactorWorkspaceApplicationDelegate install-delegate ;
@@ -55,19 +53,17 @@ METHOD: id refreshAll: id app [ [ refresh-all ] \ refresh-all call-listener f ] 
     dup [ quot call( string -- result/f ) ] when
     [ pboard set-pasteboard-string ] when* ;
 
-CLASS: {
-    { +superclass+ "NSObject" }
-    { +name+ "FactorServiceProvider" }
-}
-
-METHOD: void evalInListener: id pboard userData: id userData error: id error
-[ pboard error [ eval-listener f ] do-service ]
-
-METHOD: void evalToString: id pboard userData: id userData error: id error
+CLASS: FactorServiceProvider < NSObject
 [
-    pboard error
-    [ [ (eval>string) ] with-interactive-vocabs ] do-service
-] ;
+    METHOD: void evalInListener: id pboard userData: id userData error: id error
+    [ pboard error [ eval-listener f ] do-service ]
+
+    METHOD: void evalToString: id pboard userData: id userData error: id error
+    [
+        pboard error
+        [ [ (eval>string) ] with-interactive-vocabs ] do-service
+    ]
+]
 
 : register-services ( -- )
     NSApp

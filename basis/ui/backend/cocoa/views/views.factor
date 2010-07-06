@@ -3,14 +3,16 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs cocoa kernel math cocoa.messages cocoa.subclassing
 cocoa.classes cocoa.views cocoa.application cocoa.pasteboard
-cocoa.runtime cocoa.types cocoa.windows sequences io.encodings.utf8
-ui ui.private ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
-core-foundation.strings core-graphics core-graphics.types threads
-combinators math.rectangles ;
+cocoa.runtime cocoa.types cocoa.windows sequences
+io.encodings.utf8 locals ui ui.private ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures
+core-foundation.strings core-graphics core-graphics.types
+threads combinators math.rectangles ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
-    [ mouse-location ] [ drop window ] 2bi move-hand fire-motion yield ;
+    [ mouse-location ] [ drop window ] 2bi
+    dup [ move-hand fire-motion yield ] [ 2drop ] if ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
@@ -62,7 +64,7 @@ CONSTANT: key-codes
     [ event-modifiers ] [ key-code ] bi ;
 
 : send-key-event ( view gesture -- )
-    swap window propagate-key-gesture ;
+    swap window dup [ propagate-key-gesture ] [ 2drop ] if ;
 
 : interpret-key-event ( view event -- )
     NSArray swap -> arrayWithObject: -> interpretKeyEvents: ;
@@ -82,22 +84,25 @@ CONSTANT: key-codes
     [ nip mouse-event>gesture <button-down> ]
     [ mouse-location ]
     [ drop window ]
-    2tri send-button-down ;
+    2tri
+    dup [ send-button-down ] [ 3drop ] if ;
 
 : send-button-up$ ( view event -- )
     [ nip mouse-event>gesture <button-up> ]
     [ mouse-location ]
     [ drop window ]
-    2tri send-button-up ;
+    2tri
+    dup [ send-button-up ] [ 3drop ] if ;
 
 : send-scroll$ ( view event -- )
     [ nip [ -> deltaX ] [ -> deltaY ] bi [ neg ] bi@ 2array ]
     [ mouse-location ]
     [ drop window ]
-    2tri send-scroll ;
+    2tri
+    dup [ send-scroll ] [ 3drop ] if ;
 
-: send-action$ ( view event gesture -- junk )
-    [ drop window ] dip send-action f ;
+: send-action$ ( view event gesture -- )
+    [ drop window ] dip over [ send-action ] [ 2drop ] if ;
 
 : add-resize-observer ( observer object -- )
     [
@@ -141,175 +146,190 @@ CONSTANT: selector>action H{
     selector>action at
     [ swap world-focus parents-handle-gesture? t ] [ drop f f ] if* ;
 
-CLASS: {
-    { +superclass+ "NSOpenGLView" }
-    { +name+ "FactorView" }
-    { +protocols+ { "NSTextInput" } }
-}
-
-! Rendering
-METHOD: void drawRect: NSRect rect [ self window draw-world ]
-
-! Events
-METHOD: char acceptsFirstMouse: id event [ 1 ]
-
-METHOD: void mouseEntered: id event [ self event send-mouse-moved ]
-
-METHOD: void mouseExited: id event [ forget-rollover ]
-
-METHOD: void mouseMoved: id event [ self event send-mouse-moved ]
-
-METHOD: void mouseDragged: id event [ self event send-mouse-moved ]
-
-METHOD: void rightMouseDragged: id event [ self event send-mouse-moved ]
-
-METHOD: void otherMouseDragged: id event [ self event send-mouse-moved ]
-
-METHOD: void mouseDown: id event [ self event send-button-down$ ]
-
-METHOD: void mouseUp: id event [ self event send-button-up$ ]
-
-METHOD: void rightMouseDown: id event [ self event send-button-down$ ]
-
-METHOD: void rightMouseUp: id event [ self event send-button-up$ ]
-
-METHOD: void otherMouseDown: id event [ self event send-button-down$ ]
-
-METHOD: void otherMouseUp: id event [ self event send-button-up$ ]
-
-METHOD: void scrollWheel: id event [ self event send-scroll$ ]
-
-METHOD: void keyDown: id event [ self event send-key-down-event ]
-
-METHOD: void keyUp: id event [ self event send-key-up-event ]
-
-METHOD: char validateUserInterfaceItem: id event
+CLASS: FactorView < NSOpenGLView NSTextInput
 [
-    self window
-    event -> action utf8 alien>string validate-action
-    [ >c-bool ] [ drop self event SUPER-> validateUserInterfaceItem: ] if
+    ! Rendering
+    METHOD: void drawRect: NSRect rect [ self window [ draw-world ] when* ]
+
+    ! Events
+    METHOD: char acceptsFirstMouse: id event [ 1 ]
+
+    METHOD: void mouseEntered: id event [ self event send-mouse-moved ]
+
+    METHOD: void mouseExited: id event [ forget-rollover ]
+
+    METHOD: void mouseMoved: id event [ self event send-mouse-moved ]
+
+    METHOD: void mouseDragged: id event [ self event send-mouse-moved ]
+
+    METHOD: void rightMouseDragged: id event [ self event send-mouse-moved ]
+
+    METHOD: void otherMouseDragged: id event [ self event send-mouse-moved ]
+
+    METHOD: void mouseDown: id event [ self event send-button-down$ ]
+
+    METHOD: void mouseUp: id event [ self event send-button-up$ ]
+
+    METHOD: void rightMouseDown: id event [ self event send-button-down$ ]
+
+    METHOD: void rightMouseUp: id event [ self event send-button-up$ ]
+
+    METHOD: void otherMouseDown: id event [ self event send-button-down$ ]
+
+    METHOD: void otherMouseUp: id event [ self event send-button-up$ ]
+
+    METHOD: void scrollWheel: id event [ self event send-scroll$ ]
+
+    METHOD: void keyDown: id event [ self event send-key-down-event ]
+
+    METHOD: void keyUp: id event [ self event send-key-up-event ]
+
+    METHOD: char validateUserInterfaceItem: id event
+    [
+        self window [
+            event -> action utf8 alien>string validate-action
+            [ >c-bool ] [ drop self event SUPER-> validateUserInterfaceItem: ] if
+        ] [ 0 ] if*
+    ]
+
+    METHOD: id undo: id event [ self event undo-action send-action$ f ]
+
+    METHOD: id redo: id event [ self event redo-action send-action$ f ]
+
+    METHOD: id cut: id event [ self event cut-action send-action$ f ]
+
+    METHOD: id copy: id event [ self event copy-action send-action$ f ]
+
+    METHOD: id paste: id event [ self event paste-action send-action$ f ]
+
+    METHOD: id delete: id event [ self event delete-action send-action$ f ]
+
+    METHOD: id selectAll: id event [ self event select-all-action send-action$ f ]
+
+    METHOD: id newDocument: id event [ self event new-action send-action$ f ]
+
+    METHOD: id openDocument: id event [ self event open-action send-action$ f ]
+
+    METHOD: id saveDocument: id event [ self event save-action send-action$ f ]
+
+    METHOD: id saveDocumentAs: id event [ self event save-as-action send-action$ f ]
+
+    METHOD: id revertDocumentToSaved: id event [ self event revert-action send-action$ f ]
+
+    ! Multi-touch gestures
+    METHOD: void magnifyWithEvent: id event
+    [
+        self event
+        dup -> deltaZ sgn {
+            {  1 [ zoom-in-action send-action$ ] }
+            { -1 [ zoom-out-action send-action$ ] }
+            {  0 [ 2drop ] }
+        } case
+    ]
+
+    METHOD: void swipeWithEvent: id event
+    [
+        self event
+        dup -> deltaX sgn {
+            {  1 [ left-action send-action$ ] }
+            { -1 [ right-action send-action$ ] }
+            {  0
+                [
+                    dup -> deltaY sgn {
+                        {  1 [ up-action send-action$ ] }
+                        { -1 [ down-action send-action$ ] }
+                        {  0 [ 2drop ] }
+                    } case
+                ]
+            }
+        } case
+    ]
+
+    METHOD: char acceptsFirstResponder [ 1 ]
+
+    ! Services
+    METHOD: id validRequestorForSendType: id sendType returnType: id returnType
+    [
+        ! We return either self or nil
+        self window [
+            world-focus sendType returnType
+            valid-service? [ self ] [ f ] if
+        ] [ f ] if*
+    ]
+
+    METHOD: char writeSelectionToPasteboard: id pboard types: id types
+    [
+        NSStringPboardType types CF>string-array member? [
+            self window [
+                world-focus gadget-selection
+                [ pboard set-pasteboard-string 1 ] [ 0 ] if*
+            ] [ 0 ] if*
+        ] [ 0 ] if
+    ]
+
+    METHOD: char readSelectionFromPasteboard: id pboard
+    [
+        self window :> window
+        window [
+            pboard pasteboard-string
+            [ window user-input 1 ] [ 0 ] if*
+        ] [ 0 ] if
+    ]
+
+    ! Text input
+    METHOD: void insertText: id text
+    [
+        self window :> window
+        window [
+            text CF>string window user-input
+        ] when
+    ]
+
+    METHOD: char hasMarkedText [ 0 ]
+
+    METHOD: NSRange markedRange [ 0 0 <NSRange> ]
+
+    METHOD: NSRange selectedRange [ 0 0 <NSRange> ]
+
+    METHOD: void setMarkedText: id text selectedRange: NSRange range [ ]
+
+    METHOD: void unmarkText [ ]
+
+    METHOD: id validAttributesForMarkedText [ NSArray -> array ]
+
+    METHOD: id attributedSubstringFromRange: NSRange range [ f ]
+
+    METHOD: NSUInteger characterIndexForPoint: NSPoint point [ 0 ]
+
+    METHOD: NSRect firstRectForCharacterRange: NSRange range [ 0 0 0 0 <CGRect> ]
+
+    METHOD: NSInteger conversationIdentifier [ self alien-address ]
+
+    ! Initialization
+    METHOD: void updateFactorGadgetSize: id notification
+    [
+        self window :> window
+        window [
+            self view-dim window dim<< yield
+        ] when
+    ]
+
+    METHOD: void doCommandBySelector: SEL selector [ ]
+
+    METHOD: id initWithFrame: NSRect frame pixelFormat: id pixelFormat
+    [
+        self frame pixelFormat SUPER-> initWithFrame:pixelFormat:
+        dup dup add-resize-observer
+    ]
+
+    METHOD: char isOpaque [ 0 ]
+
+    METHOD: void dealloc
+    [
+        self remove-observer
+        self SUPER-> dealloc
+    ]
 ]
-
-METHOD: id undo: id event [ self event undo-action send-action$ ]
-
-METHOD: id redo: id event [ self event redo-action send-action$ ]
-
-METHOD: id cut: id event [ self event cut-action send-action$ ]
-
-METHOD: id copy: id event [ self event copy-action send-action$ ]
-
-METHOD: id paste: id event [ self event paste-action send-action$ ]
-
-METHOD: id delete: id event [ self event delete-action send-action$ ]
-
-METHOD: id selectAll: id event [ self event select-all-action send-action$ ]
-
-METHOD: id newDocument: id event [ self event new-action send-action$ ]
-
-METHOD: id openDocument: id event [ self event open-action send-action$ ]
-
-METHOD: id saveDocument: id event [ self event save-action send-action$ ]
-
-METHOD: id saveDocumentAs: id event [ self event save-as-action send-action$ ]
-
-METHOD: id revertDocumentToSaved: id event [ self event revert-action send-action$ ]
-
-! Multi-touch gestures
-METHOD: void magnifyWithEvent: id event
-[
-    self event
-    dup -> deltaZ sgn {
-        {  1 [ zoom-in-action send-action$ drop ] }
-        { -1 [ zoom-out-action send-action$ drop ] }
-        {  0 [ 2drop ] }
-    } case
-]
-
-METHOD: void swipeWithEvent: id event
-[
-    self event
-    dup -> deltaX sgn {
-        {  1 [ left-action send-action$ drop ] }
-        { -1 [ right-action send-action$ drop ] }
-        {  0
-            [
-                dup -> deltaY sgn {
-                    {  1 [ up-action send-action$ drop ] }
-                    { -1 [ down-action send-action$ drop ] }
-                    {  0 [ 2drop ] }
-                } case
-            ]
-        }
-    } case
-]
-
-METHOD: char acceptsFirstResponder [ 1 ]
-
-! Services
-METHOD: id validRequestorForSendType: id sendType returnType: id returnType
-[
-    ! We return either self or nil
-    self window world-focus sendType returnType
-    valid-service? [ self ] [ f ] if
-]
-
-METHOD: char writeSelectionToPasteboard: id pboard types: id types
-[
-    NSStringPboardType types CF>string-array member? [
-        self window world-focus gadget-selection
-        [ pboard set-pasteboard-string 1 ] [ 0 ] if*
-    ] [ 0 ] if
-]
-
-METHOD: char readSelectionFromPasteboard: id pboard
-[
-    pboard pasteboard-string
-    [ self window user-input 1 ] [ 0 ] if*
-]
-
-! Text input
-METHOD: void insertText: id text
-[ text CF>string self window user-input ]
-
-METHOD: char hasMarkedText [ 0 ]
-
-METHOD: NSRange markedRange [ 0 0 <NSRange> ]
-
-METHOD: NSRange selectedRange [ 0 0 <NSRange> ]
-
-METHOD: void setMarkedText: id text selectedRange: NSRange range [ ]
-
-METHOD: void unmarkText [ ]
-
-METHOD: id validAttributesForMarkedText [ NSArray -> array ]
-
-METHOD: id attributedSubstringFromRange: NSRange range [ f ]
-
-METHOD: NSUInteger characterIndexForPoint: NSPoint point [ 0 ]
-
-METHOD: NSRect firstRectForCharacterRange: NSRange range [ 0 0 0 0 <CGRect> ]
-
-METHOD: NSInteger conversationIdentifier [ self alien-address ]
-
-! Initialization
-METHOD: void updateFactorGadgetSize: id notification
-[ self view-dim self window dim<< yield ]
-
-METHOD: void doCommandBySelector: SEL selector [ ]
-
-METHOD: id initWithFrame: NSRect frame pixelFormat: id pixelFormat
-[
-    self frame pixelFormat SUPER-> initWithFrame:pixelFormat:
-    dup dup add-resize-observer
-]
-
-METHOD: char isOpaque [ 0 ]
-
-METHOD: void dealloc
-[
-    self remove-observer
-    self SUPER-> dealloc
-] ;
 
 : sync-refresh-to-screen ( GLView -- )
     -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 <int>
@@ -321,38 +341,39 @@ METHOD: void dealloc
 : save-position ( world window -- )
     -> frame CGRect-top-left 2array >>window-loc drop ;
 
-CLASS: {
-    { +name+ "FactorWindowDelegate" }
-    { +superclass+ "NSObject" }
-}
-
-METHOD: void windowDidMove: id notification
+CLASS: FactorWindowDelegate < NSObject
 [
-    notification -> object -> contentView window
-    notification -> object save-position
+    METHOD: void windowDidMove: id notification
+    [
+        notification -> object -> contentView window
+        [ notification -> object save-position ] when*
+    ]
+
+    METHOD: void windowDidBecomeKey: id notification
+    [
+        notification -> object -> contentView window
+        [ focus-world ] when*
+    ]
+
+    METHOD: void windowDidResignKey: id notification
+    [
+        forget-rollover
+        notification -> object -> contentView :> view
+        view window :> window
+        window [
+            view -> isInFullScreenMode 0 =
+            [ window unfocus-world ] when
+        ] when
+    ]
+
+    METHOD: char windowShouldClose: id notification [ 1 ]
+
+    METHOD: void windowWillClose: id notification
+    [
+        notification -> object -> contentView
+        [ window ungraft ] [ unregister-window ] bi
+    ]
 ]
-
-METHOD: void windowDidBecomeKey: id notification
-[
-    notification -> object -> contentView window
-    focus-world
-]
-
-METHOD: void windowDidResignKey: id notification
-[
-    forget-rollover
-    notification -> object -> contentView
-    dup -> isInFullScreenMode 0 =
-    [ window [ unfocus-world ] when* ] [ drop ] if
-]
-
-METHOD: char windowShouldClose: id notification [ 1 ]
-
-METHOD: void windowWillClose: id notification
-[
-    notification -> object -> contentView
-    [ window ungraft ] [ unregister-window ] bi
-] ;
 
 : install-window-delegate ( window -- )
     FactorWindowDelegate install-delegate ;
