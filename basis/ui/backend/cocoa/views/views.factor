@@ -148,269 +148,168 @@ CLASS: {
 }
 
 ! Rendering
-{ "drawRect:" void { id SEL NSRect }
-    [ 2drop window draw-world ]
-}
+METHOD: void drawRect: NSRect rect [ self window draw-world ]
 
 ! Events
-{ "acceptsFirstMouse:" char { id SEL id }
-    [ 3drop 1 ]
-}
+METHOD: char acceptsFirstMouse: id event [ 1 ]
 
-{ "mouseEntered:" void { id SEL id }
-    [ nip send-mouse-moved ]
-}
+METHOD: void mouseEntered: id event [ self event send-mouse-moved ]
 
-{ "mouseExited:" void { id SEL id }
-    [ 3drop forget-rollover ]
-}
+METHOD: void mouseExited: id event [ forget-rollover ]
 
-{ "mouseMoved:" void { id SEL id }
-    [ nip send-mouse-moved ]
-}
+METHOD: void mouseMoved: id event [ self event send-mouse-moved ]
 
-{ "mouseDragged:" void { id SEL id }
-    [ nip send-mouse-moved ]
-}
+METHOD: void mouseDragged: id event [ self event send-mouse-moved ]
 
-{ "rightMouseDragged:" void { id SEL id }
-    [ nip send-mouse-moved ]
-}
+METHOD: void rightMouseDragged: id event [ self event send-mouse-moved ]
 
-{ "otherMouseDragged:" void { id SEL id }
-    [ nip send-mouse-moved ]
-}
+METHOD: void otherMouseDragged: id event [ self event send-mouse-moved ]
 
-{ "mouseDown:" void { id SEL id }
-    [ nip send-button-down$ ]
-}
+METHOD: void mouseDown: id event [ self event send-button-down$ ]
 
-{ "mouseUp:" void { id SEL id }
-    [ nip send-button-up$ ]
-}
+METHOD: void mouseUp: id event [ self event send-button-up$ ]
 
-{ "rightMouseDown:" void { id SEL id }
-    [ nip send-button-down$ ]
-}
+METHOD: void rightMouseDown: id event [ self event send-button-down$ ]
 
-{ "rightMouseUp:" void { id SEL id }
-    [ nip send-button-up$ ]
-}
+METHOD: void rightMouseUp: id event [ self event send-button-up$ ]
 
-{ "otherMouseDown:" void { id SEL id }
-    [ nip send-button-down$ ]
-}
+METHOD: void otherMouseDown: id event [ self event send-button-down$ ]
 
-{ "otherMouseUp:" void { id SEL id }
-    [ nip send-button-up$ ]
-}
+METHOD: void otherMouseUp: id event [ self event send-button-up$ ]
 
-{ "scrollWheel:" void { id SEL id }
-    [ nip send-scroll$ ]
-}
+METHOD: void scrollWheel: id event [ self event send-scroll$ ]
 
-{ "keyDown:" void { id SEL id }
-    [ nip send-key-down-event ]
-}
+METHOD: void keyDown: id event [ self event send-key-down-event ]
 
-{ "keyUp:" void { id SEL id }
-    [ nip send-key-up-event ]
-}
+METHOD: void keyUp: id event [ self event send-key-up-event ]
 
-{ "validateUserInterfaceItem:" char { id SEL id }
-    [
-        nip -> action
-        2dup [ window ] [ utf8 alien>string ] bi* validate-action
-        [ [ 2drop ] dip >c-bool ] [ SUPER-> validateUserInterfaceItem: ] if
-    ]
-}
+METHOD: char validateUserInterfaceItem: id event
+[
+    self window
+    event -> action utf8 alien>string validate-action
+    [ >c-bool ] [ drop self event SUPER-> validateUserInterfaceItem: ] if
+]
 
-{ "undo:" id { id SEL id }
-    [ nip undo-action send-action$ ]
-}
+METHOD: id undo: id event [ self event undo-action send-action$ ]
 
-{ "redo:" id { id SEL id }
-    [ nip redo-action send-action$ ]
-}
+METHOD: id redo: id event [ self event redo-action send-action$ ]
 
-{ "cut:" id { id SEL id }
-    [ nip cut-action send-action$ ]
-}
+METHOD: id cut: id event [ self event cut-action send-action$ ]
 
-{ "copy:" id { id SEL id }
-    [ nip copy-action send-action$ ]
-}
+METHOD: id copy: id event [ self event copy-action send-action$ ]
 
-{ "paste:" id { id SEL id }
-    [ nip paste-action send-action$ ]
-}
+METHOD: id paste: id event [ self event paste-action send-action$ ]
 
-{ "delete:" id { id SEL id }
-    [ nip delete-action send-action$ ]
-}
+METHOD: id delete: id event [ self event delete-action send-action$ ]
 
-{ "selectAll:" id { id SEL id }
-    [ nip select-all-action send-action$ ]
-}
+METHOD: id selectAll: id event [ self event select-all-action send-action$ ]
 
-{ "newDocument:" id { id SEL id }
-    [ nip new-action send-action$ ]
-}
+METHOD: id newDocument: id event [ self event new-action send-action$ ]
 
-{ "openDocument:" id { id SEL id }
-    [ nip open-action send-action$ ]
-}
+METHOD: id openDocument: id event [ self event open-action send-action$ ]
 
-{ "saveDocument:" id { id SEL id }
-    [ nip save-action send-action$ ]
-}
+METHOD: id saveDocument: id event [ self event save-action send-action$ ]
 
-{ "saveDocumentAs:" id { id SEL id }
-    [ nip save-as-action send-action$ ]
-}
+METHOD: id saveDocumentAs: id event [ self event save-as-action send-action$ ]
 
-{ "revertDocumentToSaved:" id { id SEL id }
-    [ nip revert-action send-action$ ]
-}
+METHOD: id revertDocumentToSaved: id event [ self event revert-action send-action$ ]
 
-! Multi-touch gestures: this is undocumented.
-! http://cocoadex.com/2008/02/nsevent-modifications-swipe-ro.html
-{ "magnifyWithEvent:" void { id SEL id }
-    [
-        nip
-        dup -> deltaZ sgn {
-            {  1 [ zoom-in-action send-action$ ] }
-            { -1 [ zoom-out-action send-action$ ] }
-            {  0 [ 2drop ] }
-        } case
-    ]
-}
+! Multi-touch gestures
+METHOD: void magnifyWithEvent: id event
+[
+    self event
+    dup -> deltaZ sgn {
+        {  1 [ zoom-in-action send-action$ drop ] }
+        { -1 [ zoom-out-action send-action$ drop ] }
+        {  0 [ 2drop ] }
+    } case
+]
 
-{ "swipeWithEvent:" void { id SEL id }
-    [
-        nip
-        dup -> deltaX sgn {
-            {  1 [ left-action send-action$ ] }
-            { -1 [ right-action send-action$ ] }
-            {  0
-                [
-                    dup -> deltaY sgn {
-                        {  1 [ up-action send-action$ ] }
-                        { -1 [ down-action send-action$ ] }
-                        {  0 [ 2drop ] }
-                    } case
-                ]
-            }
-        } case
-    ]
-}
+METHOD: void swipeWithEvent: id event
+[
+    self event
+    dup -> deltaX sgn {
+        {  1 [ left-action send-action$ drop ] }
+        { -1 [ right-action send-action$ drop ] }
+        {  0
+            [
+                dup -> deltaY sgn {
+                    {  1 [ up-action send-action$ drop ] }
+                    { -1 [ down-action send-action$ drop ] }
+                    {  0 [ 2drop ] }
+                } case
+            ]
+        }
+    } case
+]
 
-{ "acceptsFirstResponder" char { id SEL }
-    [ 2drop 1 ]
-}
+METHOD: char acceptsFirstResponder [ 1 ]
 
 ! Services
-{ "validRequestorForSendType:returnType:" id { id SEL id id }
-    [
-        ! We return either self or nil
-        [ over window-focus ] 2dip
-        valid-service? [ drop ] [ 2drop f ] if
-    ]
-}
+METHOD: id validRequestorForSendType: id sendType returnType: id returnType
+[
+    ! We return either self or nil
+    self window world-focus sendType returnType
+    valid-service? [ self ] [ f ] if
+]
 
-{ "writeSelectionToPasteboard:types:" char { id SEL id id }
-    [
-        CF>string-array NSStringPboardType swap member? [
-            [ drop window-focus gadget-selection ] dip over
-            [ set-pasteboard-string 1 ] [ 2drop 0 ] if
-        ] [ 3drop 0 ] if
-    ]
-}
+METHOD: char writeSelectionToPasteboard: id pboard types: id types
+[
+    NSStringPboardType types CF>string-array member? [
+        self window world-focus gadget-selection
+        [ pboard set-pasteboard-string 1 ] [ 0 ] if*
+    ] [ 0 ] if
+]
 
-{ "readSelectionFromPasteboard:" char { id SEL id }
-    [
-        pasteboard-string dup [
-            [ drop window ] dip swap user-input 1
-        ] [ 3drop 0 ] if
-    ]
-}
+METHOD: char readSelectionFromPasteboard: id pboard
+[
+    pboard pasteboard-string
+    [ self window user-input 1 ] [ 0 ] if*
+]
 
 ! Text input
-{ "insertText:" void { id SEL id }
-    [ nip CF>string swap window user-input ]
-}
+METHOD: void insertText: id text
+[ text CF>string self window user-input ]
 
-{ "hasMarkedText" char { id SEL }
-    [ 2drop 0 ]
-}
+METHOD: char hasMarkedText [ 0 ]
 
-{ "markedRange" NSRange { id SEL }
-    [ 2drop 0 0 <NSRange> ]
-}
+METHOD: NSRange markedRange [ 0 0 <NSRange> ]
 
-{ "selectedRange" NSRange { id SEL }
-    [ 2drop 0 0 <NSRange> ]
-}
+METHOD: NSRange selectedRange [ 0 0 <NSRange> ]
 
-{ "setMarkedText:selectedRange:" void { id SEL id NSRange }
-    [ 2drop 2drop ]
-}
+METHOD: void setMarkedText: id text selectedRange: NSRange range [ ]
 
-{ "unmarkText" void { id SEL }
-    [ 2drop ]
-}
+METHOD: void unmarkText [ ]
 
-{ "validAttributesForMarkedText" id { id SEL }
-    [ 2drop NSArray -> array ]
-}
+METHOD: id validAttributesForMarkedText [ NSArray -> array ]
 
-{ "attributedSubstringFromRange:" id { id SEL NSRange }
-    [ 3drop f ]
-}
+METHOD: id attributedSubstringFromRange: NSRange range [ f ]
 
-{ "characterIndexForPoint:" NSUInteger { id SEL NSPoint }
-    [ 3drop 0 ]
-}
+METHOD: NSUInteger characterIndexForPoint: NSPoint point [ 0 ]
 
-{ "firstRectForCharacterRange:" NSRect { id SEL NSRange }
-    [ 3drop 0 0 0 0 <CGRect> ]
-}
+METHOD: NSRect firstRectForCharacterRange: NSRange range [ 0 0 0 0 <CGRect> ]
 
-{ "conversationIdentifier" NSInteger { id SEL }
-    [ drop alien-address ]
-}
+METHOD: NSInteger conversationIdentifier [ self alien-address ]
 
 ! Initialization
-{ "updateFactorGadgetSize:" void { id SEL id }
-    [ 2drop [ window ] [ view-dim ] bi >>dim drop yield ]
-}
+METHOD: void updateFactorGadgetSize: id notification
+[ self view-dim self window dim<< yield ]
 
-{ "doCommandBySelector:" void { id SEL SEL }
-    [ 3drop ]
-}
+METHOD: void doCommandBySelector: SEL selector [ ]
 
-{ "initWithFrame:pixelFormat:" id { id SEL NSRect id }
-    [
-        [ drop ] 2dip
-        SUPER-> initWithFrame:pixelFormat:
-        dup dup add-resize-observer
-    ]
-}
+METHOD: id initWithFrame: NSRect frame pixelFormat: id pixelFormat
+[
+    self frame pixelFormat SUPER-> initWithFrame:pixelFormat:
+    dup dup add-resize-observer
+]
 
-{ "isOpaque" char { id SEL }
-    [
-        2drop 0
-    ]
-}
+METHOD: char isOpaque [ 0 ]
 
-{ "dealloc" void { id SEL }
-    [
-        drop
-        [ remove-observer ]
-        [ SUPER-> dealloc ]
-        bi
-    ]
-} ;
+METHOD: void dealloc
+[
+    self remove-observer
+    self SUPER-> dealloc
+] ;
 
 : sync-refresh-to-screen ( GLView -- )
     -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 <int>
@@ -423,44 +322,37 @@ CLASS: {
     -> frame CGRect-top-left 2array >>window-loc drop ;
 
 CLASS: {
-    { +superclass+ "NSObject" }
     { +name+ "FactorWindowDelegate" }
+    { +superclass+ "NSObject" }
 }
 
-{ "windowDidMove:" void { id SEL id }
-    [
-        2nip -> object [ -> contentView window ] keep save-position
-    ]
-}
+METHOD: void windowDidMove: id notification
+[
+    notification -> object -> contentView window
+    notification -> object save-position
+]
 
-{ "windowDidBecomeKey:" void { id SEL id }
-    [
-        2nip -> object -> contentView window focus-world
-    ]
-}
+METHOD: void windowDidBecomeKey: id notification
+[
+    notification -> object -> contentView window
+    focus-world
+]
 
-{ "windowDidResignKey:" void { id SEL id }
-    [
-        forget-rollover
-        2nip -> object -> contentView
-        dup -> isInFullScreenMode 0 =
-        [ window [ unfocus-world ] when* ]
-        [ drop ] if
-    ]
-}
+METHOD: void windowDidResignKey: id notification
+[
+    forget-rollover
+    notification -> object -> contentView
+    dup -> isInFullScreenMode 0 =
+    [ window [ unfocus-world ] when* ] [ drop ] if
+]
 
-{ "windowShouldClose:" char { id SEL id }
-    [
-        3drop 1
-    ]
-}
+METHOD: char windowShouldClose: id notification [ 1 ]
 
-{ "windowWillClose:" void { id SEL id }
-    [
-        2nip -> object -> contentView
-        [ window ungraft ] [ unregister-window ] bi
-    ]
-} ;
+METHOD: void windowWillClose: id notification
+[
+    notification -> object -> contentView
+    [ window ungraft ] [ unregister-window ] bi
+] ;
 
 : install-window-delegate ( window -- )
     FactorWindowDelegate install-delegate ;

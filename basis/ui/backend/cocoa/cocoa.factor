@@ -233,9 +233,7 @@ CLASS: {
     { +name+ "FactorApplicationDelegate" }
 }
 
-{ "applicationDidUpdate:" void { id SEL id }
-    [ 3drop reset-run-loop ]
-} ;
+METHOD: void applicationDidUpdate: id obj [ reset-run-loop ] ;
 
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;
