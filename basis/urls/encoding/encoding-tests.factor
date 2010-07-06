@@ -11,6 +11,12 @@ USING: urls.encoding tools.test arrays kernel assocs present accessors ;
 [ "hello world" ] [ "hello world%x" url-decode ] unit-test
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test
 
+[ "~foo" ] [ "~foo" url-encode ] unit-test
+[ "~foo" ] [ "~foo" url-encode-full ] unit-test
+
+[ ":foo" ] [ ":foo" url-encode ] unit-test
+[ "%3Afoo" ] [ ":foo" url-encode-full ] unit-test
+
 [ "hello world" ] [ "hello+world" query-decode ] unit-test
 
 [ "\u001234hi\u002045" ] [ "\u001234hi\u002045" url-encode url-decode ] unit-test
@@ -24,6 +30,8 @@ USING: urls.encoding tools.test arrays kernel assocs present accessors ;
 [ H{ { "a" { "b" "c" } } } ] [ "a=b;a=c" query>assoc ] unit-test
 
 [ H{ { "text" "hello world" } } ] [ "text=hello+world" query>assoc ] unit-test
+
+[ "foo=%3A" ] [ { { "foo" ":" } } assoc>query ] unit-test
 
 [ "a=3" ] [ { { "a" 3 } } assoc>query ] unit-test
 
