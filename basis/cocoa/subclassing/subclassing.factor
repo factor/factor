@@ -1,9 +1,11 @@
-! Copyright (C) 2006, 2008 Slava Pestov, Joe Groff.
+! Copyright (C) 2006, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings arrays assocs
-combinators compiler hashtables kernel libc math namespaces
-parser sequences words cocoa.messages cocoa.runtime locals
-compiler.units io.encodings.utf8 continuations make fry ;
+USING: alien alien.c-types alien.parser alien.strings arrays
+assocs combinators compiler hashtables kernel lexer libc
+locals.parser locals.types math namespaces parser sequences
+words cocoa.messages cocoa.runtime locals compiler.units
+io.encodings.utf8 continuations make fry effects stack-checker
+stack-checker.errors ;
 IN: cocoa.subclassing
 
 : init-method ( method -- sel imp types )
@@ -49,13 +51,13 @@ IN: cocoa.subclassing
     ] with-compilation-unit ;
 
 :: (redefine-objc-method) ( class method -- )
-    method init-method [| sel imp types |
-        class sel class_getInstanceMethod [
-            imp method_setImplementation drop
-        ] [
-            class sel imp types add-method
-        ] if*
-    ] call ;
+    method init-method :> ( sel imp types )
+
+    class sel class_getInstanceMethod [
+        imp method_setImplementation drop
+    ] [
+        class sel imp types add-method
+    ] if* ;
     
 : redefine-objc-methods ( imeth name -- )
     dup class-exists? [
@@ -79,3 +81,35 @@ SYMBOL: +superclass+
 SYNTAX: CLASS:
     parse-definition unclip
     >hashtable define-objc-class ;
+
+: (parse-selector) ( -- )
+    scan-token {
+        { [ dup "[" = ] [ drop ] }
+        { [ dup ":" tail? ] [ scan-c-type scan-token 3array , (parse-selector) ] }
+        [ f f 3array , "[" expect ]
+    } cond ;
+
+: parse-selector ( -- selector types names )
+    [ (parse-selector) ] { } make
+    flip first3
+    [ concat ]
+    [ sift { id SEL } prepend ]
+    [ sift { "self" "selector" } prepend ] tri* ;
+
+: parse-method-body ( names -- quot )
+    [ [ make-local ] map ] H{ } make-assoc
+    (parse-lambda) <lambda> ?rewrite-closures first ;
+
+: method-effect ( quadruple -- effect )
+    [ third ] [ second void? { } { "x" } ? ] bi <effect> ;
+
+: check-method ( quadruple -- )
+    [ fourth infer ] [ method-effect ] bi
+    2dup effect<= [ 2drop ] [ effect-error ] if ;
+
+SYNTAX: METHOD:
+    scan-c-type
+    parse-selector
+    parse-method-body [ swap ] 2dip 4array
+    dup check-method
+    suffix! ;

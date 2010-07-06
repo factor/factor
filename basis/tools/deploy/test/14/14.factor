@@ -9,16 +9,13 @@ IN: tools.deploy.test.14
 CLASS: {
     { +superclass+ "NSObject" }
     { +name+ "Bar" }
-} {
-    "bar:"
-    float
-    { id SEL NSRect }
-    [
-        [ origin>> [ x>> ] [ y>> ] bi + ]
-        [ size>> [ w>> ] [ h>> ] bi + ]
-        bi +
-    ]
-} ;
+}
+
+METHOD: float bar: NSRect rect [
+    rect origin>> [ x>> ] [ y>> ] bi +
+    rect size>> [ w>> ] [ h>> ] bi +
+    +
+] ;
 
 : main ( -- )
     Bar -> alloc -> init

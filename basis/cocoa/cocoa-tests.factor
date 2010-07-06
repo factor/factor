@@ -7,12 +7,11 @@ IN: cocoa.tests
 CLASS: {
     { +superclass+ "NSObject" }
     { +name+ "Foo" }
-} {
-    "foo:"
-    void
-    { id SEL NSRect }
-    [ gc "x" set 2drop ]
-} ;
+}
+
+METHOD: void foo: NSRect rect [
+    gc rect "x" set
+] ;
 
 : test-foo ( -- )
     Foo -> alloc -> init
@@ -29,12 +28,9 @@ test-foo
 CLASS: {
     { +superclass+ "NSObject" }
     { +name+ "Bar" }
-} {
-    "bar"
-    NSRect
-    { id SEL }
-    [ 2drop test-foo "x" get ]
-} ;
+}
+
+METHOD: NSRect bar [ test-foo "x" get ] ;
 
 Bar [
     -> alloc -> init
@@ -51,22 +47,16 @@ Bar [
 CLASS: {
     { +superclass+ "NSObject" }
     { +name+ "Bar" }
-} {
-    "bar"
-    NSRect
-    { id SEL }
-    [ 2drop test-foo "x" get ]
-} {
-    "babb"
-    int
-    { id SEL int }
-    [ 2nip sq ]
-} ;
+}
+
+METHOD: NSRect bar [ test-foo "x" get ]
+
+METHOD: int babb: int x [ x sq ] ;
 
 [ 144 ] [
     Bar [
         -> alloc -> init
-        dup 12 -> babb
+        dup 12 -> babb:
         swap -> release
     ] compile-call
 ] unit-test
