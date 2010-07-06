@@ -41,32 +41,32 @@ IN: bootstrap.syntax
 
     "#!" [ POSTPONE: ! ] define-core-syntax
 
-    "IN:" [ scan set-current-vocab ] define-core-syntax
+    "IN:" [ scan-token set-current-vocab ] define-core-syntax
 
     "<PRIVATE" [ begin-private ] define-core-syntax
 
     "PRIVATE>" [ end-private ] define-core-syntax
 
-    "USE:" [ scan use-vocab ] define-core-syntax
+    "USE:" [ scan-token use-vocab ] define-core-syntax
 
-    "UNUSE:" [ scan unuse-vocab ] define-core-syntax
+    "UNUSE:" [ scan-token unuse-vocab ] define-core-syntax
 
     "USING:" [ ";" [ use-vocab ] each-token ] define-core-syntax
 
-    "QUALIFIED:" [ scan dup add-qualified ] define-core-syntax
+    "QUALIFIED:" [ scan-token dup add-qualified ] define-core-syntax
 
-    "QUALIFIED-WITH:" [ scan scan add-qualified ] define-core-syntax
+    "QUALIFIED-WITH:" [ scan-token scan-token add-qualified ] define-core-syntax
 
     "FROM:" [
-        scan "=>" expect ";" parse-tokens add-words-from
+        scan-token "=>" expect ";" parse-tokens add-words-from
     ] define-core-syntax
 
     "EXCLUDE:" [
-        scan "=>" expect ";" parse-tokens add-words-excluding
+        scan-token "=>" expect ";" parse-tokens add-words-excluding
     ] define-core-syntax
 
     "RENAME:" [
-        scan scan "=>" expect scan add-renamed-word
+        scan-token scan-token "=>" expect scan-token add-renamed-word
     ] define-core-syntax
 
     "HEX:" [ 16 parse-base ] define-core-syntax
@@ -79,7 +79,7 @@ IN: bootstrap.syntax
     "t" "syntax" lookup define-singleton-class
 
     "CHAR:" [
-        scan {
+        scan-token {
             { [ dup length 1 = ] [ first ] }
             { [ "\\" ?head ] [ next-escape >string "" assert= ] }
             [ name>char-hook get call( name -- char ) ]
@@ -133,7 +133,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "DEFER:" [
-        scan current-vocab create
+        scan-token current-vocab create
         [ fake-definition ] [ set-word ] [ undefined-def define ] tri
     ] define-core-syntax
     
@@ -190,7 +190,7 @@ IN: bootstrap.syntax
 
     "PREDICATE:" [
         CREATE-CLASS
-        scan "<" assert=
+        "<" expect
         scan-word
         parse-definition define-predicate-class
     ] define-core-syntax
@@ -208,7 +208,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "SLOT:" [
-        scan define-protocol-slot
+        scan-token define-protocol-slot
     ] define-core-syntax
 
     "C:" [

@@ -59,7 +59,12 @@ HELP: parse-token
 
 HELP: scan
 { $values { "str/f" { $maybe string } } }
-{ $description "Reads the next token from the lexer. See " { $link parse-token } " for details." }
+{ $description "Reads the next token from the lexer. Tokens are delimited by whitespace, with the exception that " { $snippet "\"" } " is treated like a single token even when not followed by whitespace. This word outputs " { $link f } " on end of input. To throw an error on end of input, use " { $link scan-token } " instead." }
+$parsing-note ;
+
+HELP: scan-token
+{ $values { "str" string } }
+{ $description "Reads the next token from the lexer. Tokens are delimited by whitespace, with the exception that " { $snippet "\"" } " is treated like a single token even when not followed by whitespace. This word throws " { $link unexpected-eof } " on end of input. To output " { $link f } " on end of input, use " { $link scan } " instead." }
 $parsing-note ;
 
 HELP: still-parsing?
