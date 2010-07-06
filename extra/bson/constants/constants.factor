@@ -79,9 +79,10 @@ CONSTANT: T_Integer64 HEX: 12
 CONSTANT: T_MinKey  HEX: FF
 CONSTANT: T_MaxKey  HEX: 7F
 
-CONSTANT: T_Binary_Function     HEX: 1
-CONSTANT: T_Binary_Bytes        HEX: 2
-CONSTANT: T_Binary_UUID         HEX: 3
-CONSTANT: T_Binary_MD5          HEX: 5
-CONSTANT: T_Binary_Custom       HEX: 80
+CONSTANT: T_Binary_Default                  HEX: 0
+CONSTANT: T_Binary_Function                 HEX: 1
+CONSTANT: T_Binary_Bytes_Deprecated         HEX: 2
+CONSTANT: T_Binary_UUID                     HEX: 3
+CONSTANT: T_Binary_MD5                      HEX: 5
+CONSTANT: T_Binary_Custom                   HEX: 80
 
