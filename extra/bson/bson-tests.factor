@@ -8,8 +8,8 @@ IN: bson.tests
 
 [ H{ { "a" "a string" } } ] [ H{ { "a" "a string" } } turnaround ] unit-test
 
-[ H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } ]
-[ H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } turnaround ] unit-test
+[ H{ { "a" "a string" } { "b" H{ { "a" "アップルからの最新のニュースや情報を読む" } } } } ]
+[ H{ { "a" "a string" } { "b" H{ { "a" "アップルからの最新のニュースや情報を読む" } } } } turnaround ] unit-test
 
 [ H{ { "a list" { 1 2.234 "hello world" } } } ]
 [ H{ { "a list" { 1 2.234 "hello world" } } } turnaround ] unit-test
