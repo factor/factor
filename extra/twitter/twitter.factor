@@ -27,7 +27,7 @@ PRIVATE>
 
 : obtain-twitter-request-token ( -- request-token )
     [
-        "http://twitter.com/oauth/request_token"
+        "https://twitter.com/oauth/request_token"
         <request-token-params>
         obtain-request-token
     ] with-twitter-oauth ;
@@ -38,7 +38,7 @@ PRIVATE>
 
 : obtain-twitter-access-token ( request-token verifier -- access-token )
     [
-        [ "http://twitter.com/oauth/access_token" ] 2dip
+        [ "https://twitter.com/oauth/access_token" ] 2dip
         <access-token-params>
             swap >>verifier
             swap >>request-token
