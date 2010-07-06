@@ -8,23 +8,7 @@ namespace factor
 
 void factor_vm::c_to_factor_toplevel(cell quot)
 {
-	for(;;)
-	{
-NS_DURING
-		c_to_factor(quot);
-		NS_VOIDRETURN;
-NS_HANDLER
-		ctx->push(allot_alien(false_object,(cell)localException));
-		quot = special_objects[OBJ_COCOA_EXCEPTION];
-		if(!tagged<object>(quot).type_p(QUOTATION_TYPE))
-		{
-			/* No Cocoa exception handler was registered, so
-			basis/cocoa/ is not loaded. So we pass the exception
-			along. */
-			[localException raise];
-		}
-NS_ENDHANDLER
-	}
+	c_to_factor(quot);
 }
 
 void early_init(void)

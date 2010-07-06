@@ -26,8 +26,6 @@ enum special_object {
 	OBJ_YIELD_CALLBACK,        /* used when Factor is embedded in a C app */
 	OBJ_SLEEP_CALLBACK,        /* used when Factor is embedded in a C app */
 
-	OBJ_COCOA_EXCEPTION = 19,  /* Cocoa exception handler quotation */
-
 	OBJ_STARTUP_QUOT = 20,     /* startup quotation */
 	OBJ_GLOBAL,                /* global namespace */
 	OBJ_SHUTDOWN_QUOT,         /* shutdown quotation */
