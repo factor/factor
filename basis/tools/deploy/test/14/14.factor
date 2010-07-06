@@ -6,16 +6,14 @@ kernel math ;
 FROM: alien.c-types => float ;
 IN: tools.deploy.test.14
 
-CLASS: {
-    { +superclass+ "NSObject" }
-    { +name+ "Bar" }
-}
-
-METHOD: float bar: NSRect rect [
-    rect origin>> [ x>> ] [ y>> ] bi +
-    rect size>> [ w>> ] [ h>> ] bi +
-    +
-] ;
+CLASS: Bar < NSObject
+[
+    METHOD: float bar: NSRect rect [
+        rect origin>> [ x>> ] [ y>> ] bi +
+        rect size>> [ w>> ] [ h>> ] bi +
+        +
+    ]
+]
 
 : main ( -- )
     Bar -> alloc -> init

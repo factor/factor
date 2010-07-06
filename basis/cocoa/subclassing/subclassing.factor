@@ -29,7 +29,7 @@ IN: cocoa.subclassing
 : add-protocols ( protocols class -- )
     '[ [ _ ] dip objc-protocol add-protocol ] each ;
 
-: (define-objc-class) ( imeth protocols superclass name -- )
+: (define-objc-class) ( methods protocols superclass name -- )
     [ objc-class ] dip 0 objc_allocateClassPair
     [ add-protocols ] [ add-methods ] [ objc_registerClassPair ]
     tri ;
@@ -59,28 +59,23 @@ IN: cocoa.subclassing
         class sel imp types add-method
     ] if* ;
     
-: redefine-objc-methods ( imeth name -- )
+: redefine-objc-methods ( methods name -- )
     dup class-exists? [
         objc_getClass '[ [ _ ] dip (redefine-objc-method) ] each
     ] [ 2drop ] if ;
 
-SYMBOL: +name+
-SYMBOL: +protocols+
-SYMBOL: +superclass+
-
-: define-objc-class ( imeth hash -- )
-    clone [
-        prepare-methods
-        +name+ get "cocoa.classes" create drop
-        +name+ get 2dup redefine-objc-methods swap
-        +protocols+ get +superclass+ get +name+ get
-        '[ _ _ _ _ (define-objc-class) ]
-        import-objc-class
-    ] bind ;
+:: define-objc-class ( name superclass protocols methods -- )
+    methods prepare-methods :> methods
+    name "cocoa.classes" create drop
+    methods name redefine-objc-methods
+    name [ methods protocols superclass name (define-objc-class) ] import-objc-class ;
 
 SYNTAX: CLASS:
-    parse-definition unclip
-    >hashtable define-objc-class ;
+    scan-token
+    "<" expect
+    scan-token
+    "[" parse-tokens
+    \ ] parse-until define-objc-class ;
 
 : (parse-selector) ( -- )
     scan-token {
