@@ -1,5 +1,5 @@
 ! (c)2010 Joe Groff bsd license
-USING: alien.c-types alien.destructors alien.syntax
+USING: alien.c-types alien.data alien.destructors alien.syntax
 classes.struct kernel math windows.com windows.com.syntax
 windows.kernel32 windows.ole32 windows.types ;
 FROM: alien.c-types => float ;
@@ -1624,3 +1624,26 @@ FUNCTION: GpStatus GdipCreateStreamOnFile ( WCHAR* x, UINT x, IStream** x ) ;
 FUNCTION: GpStatus GdipGetImageEncodersSize ( UINT* numEncoders,  UINT* size ) ;
 FUNCTION: GpStatus GdipGetImageEncoders ( UINT numEncoders,  UINT size,  ImageCodecInfo* encoders ) ;
 FUNCTION: GpStatus GdipTestControl ( GpTestControlEnum x, void* x ) ;
+
+ERROR: gdi+-error status ;
+
+: check-gdi+-status ( GpStatus -- )
+    dup Ok = [ drop ] [ gdi+-error ] if ;
+
+CONSTANT: standard-gdi+-startup-input
+    S{ GdiplusStartupInput
+        { GdiplusVersion 1 }
+        { DebugEventCallback f }
+        { SuppressBackgroundThread 0 }
+        { SuppressExternalCodecs 0 }
+    }
+
+: (start-gdi+) ( startup-input -- token startup-output )
+    { ULONG_PTR GdiplusStartupOutput }
+    [ swapd GdiplusStartup check-gdi+-status ] [ ] with-out-parameters ;
+: start-gdi+ ( -- token )
+    standard-gdi+-startup-input (start-gdi+) drop ; inline
+: stop-gdi+ ( token -- )
+    GdiplusShutdown ;
+
+DESTRUCTOR: stop-gdi+
