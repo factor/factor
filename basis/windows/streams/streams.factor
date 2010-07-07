@@ -69,11 +69,10 @@ SPECIALIZED-ARRAY: uchar
 :: IStream-unlock-region ( stream offset cb lock-type -- hresult )
     STG_E_INVALIDFUNCTION ;
 
-FROM: io.ports => tell-handle ;
 :: stream-size ( stream -- size )
     stream stream-tell :> old-pos
     0 seek-end stream stream-seek
-    stream handle>> tell-handle :> size
+    stream stream-tell :> size
     old-pos seek-absolute stream stream-seek
     size ;
 
