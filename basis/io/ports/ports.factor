@@ -105,7 +105,8 @@ TUPLE: output-port < buffered-port ;
     [ nip ] [ buffer>> buffer-capacity <= ] 2bi
     [ drop ] [ stream-flush ] if ; inline
 
-M: output-port stream-element-type stream>> stream-element-type ; inline
+M: output-port stream-element-type
+    stream>> stream-element-type ; inline
 
 M: output-port stream-write1
     dup check-disposed
@@ -128,13 +129,24 @@ M: output-port stream-write
 
 HOOK: (wait-to-write) io-backend ( port -- )
 
+: port-flush ( port -- )
+    dup buffer>> buffer-empty?
+    [ drop ] [ dup (wait-to-write) port-flush ] if ;
+
+M: output-port stream-flush ( port -- )
+    [ check-disposed ] [ port-flush ] bi ;
+
 HOOK: tell-handle os ( handle -- n )
+
 HOOK: seek-handle os ( n seek-type handle -- )
 
-M: buffered-port stream-tell ( stream -- n )
+M: input-port stream-tell ( stream -- n )
     [ check-disposed ]
-    [ handle>> tell-handle ]
-    [ [ buffer>> size>> - 0 max ] [ buffer>> pos>> ] bi + ] tri ;
+    [ [ handle>> tell-handle ] [ buffer>> buffer-length ] bi - ] bi ;
+
+M: output-port stream-tell ( stream -- n )
+    [ check-disposed ]
+    [ [ handle>> tell-handle ] [ buffer>> buffer-length ] bi + ] bi ;
 
 M: input-port stream-seek ( n seek-type stream -- )
     [ check-disposed ]
@@ -149,13 +161,6 @@ M: output-port stream-seek ( n seek-type stream -- )
 GENERIC: shutdown ( handle -- )
 
 M: object shutdown drop ;
-
-: port-flush ( port -- )
-    dup buffer>> buffer-empty?
-    [ drop ] [ dup (wait-to-write) port-flush ] if ;
-
-M: output-port stream-flush ( port -- )
-    [ check-disposed ] [ port-flush ] bi ;
 
 M: output-port dispose*
     [
