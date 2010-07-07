@@ -7,14 +7,14 @@ FROM: images => ARGB ;
 IN: images.gdiplus
 
 SINGLETON: gdi+-image
-! "png" gdi+-image register-image-class
-! "tif" gdi+-image register-image-class
-! "tiff" gdi+-image register-image-class
-! "gif" gdi+-image register-image-class
-! "jpg" gdi+-image register-image-class
-! "jpeg" gdi+-image register-image-class
-! "bmp" gdi+-image register-image-class
-! "ico" gdi+-image register-image-class
+"png" gdi+-image register-image-class
+"tif" gdi+-image register-image-class
+"tiff" gdi+-image register-image-class
+"gif" gdi+-image register-image-class
+"jpg" gdi+-image register-image-class
+"jpeg" gdi+-image register-image-class
+"bmp" gdi+-image register-image-class
+"ico" gdi+-image register-image-class
 
 <PRIVATE
 : <GpRect> ( x y w h -- rect )
