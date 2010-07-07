@@ -694,7 +694,7 @@ use: src/int-rep
 literal: gc-map ;
 
 INSN: ##alien-assembly
-literal: quot ;
+literal: quot gc-map ;
 
 INSN: ##begin-callback ;
 
@@ -812,9 +812,6 @@ literal: cc ;
 INSN: ##save-context
 temp: temp1/int-rep temp2/int-rep ;
 
-INSN: ##restore-context
-temp: temp1/int-rep temp2/int-rep ;
-
 ! GC checks
 INSN: ##check-nursery-branch
 literal: size cc
@@ -859,14 +856,20 @@ UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
 UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
 
 ! Instructions that contain subroutine calls to functions which
+! can callback arbitrary Factor code
+UNION: factor-call-insn
+##alien-invoke
+##alien-indirect
+##alien-assembly ;
+
+! Instructions that contain subroutine calls to functions which
 ! allocate memory
 UNION: gc-map-insn
 ##call-gc
-##alien-invoke
-##alien-indirect
 ##box
 ##box-long-long
-##allot-byte-array ;
+##allot-byte-array
+factor-call-insn ;
 
 M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
 

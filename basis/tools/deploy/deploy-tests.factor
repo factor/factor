@@ -2,8 +2,11 @@ USING: tools.test system io io.encodings.ascii io.pathnames
 io.files io.files.info io.files.temp kernel tools.deploy.config
 tools.deploy.config.editor tools.deploy.backend math sequences
 io.launcher arrays namespaces continuations layouts accessors
-urls math.parser io.directories tools.deploy.test ;
+urls math.parser io.directories tools.deploy tools.deploy.test
+vocabs ;
 IN: tools.deploy.tests
+
+[ "no such vocab, fool!" deploy ] [ no-vocab? ] must-fail-with
 
 [ ] [ "hello-world" shake-and-bake 500000 small-enough? ] unit-test
 
@@ -127,3 +130,7 @@ os macosx? [
     deploy-test-command ascii [ readln ] with-process-reader
     "test.image" temp-file =
 ] unit-test
+
+[ ] [ "resource:license.txt" "license.txt" temp-file copy-file ] unit-test
+
+[ ] [ "tools.deploy.test.19" shake-and-bake run-temp-image ] unit-test
