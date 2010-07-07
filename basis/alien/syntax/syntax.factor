@@ -19,7 +19,7 @@ SYNTAX: FUNCTION:
     (FUNCTION:) make-function define-declared ;
 
 SYNTAX: FUNCTION-ALIAS:
-    scan create-function
+    scan-token create-function
     (FUNCTION:) (make-function) define-declared ;
 
 SYNTAX: CALLBACK:

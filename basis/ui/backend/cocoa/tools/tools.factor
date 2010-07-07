@@ -21,50 +21,28 @@ IN: ui.backend.cocoa.tools
     image save-panel [ save-image ] when* ;
 
 ! Handle Open events from the Finder
-CLASS: {
-    { +superclass+ "FactorApplicationDelegate" }
-    { +name+ "FactorWorkspaceApplicationDelegate" }
-}
+CLASS: FactorWorkspaceApplicationDelegate < FactorApplicationDelegate
+[
+    METHOD: void application: id app openFiles: id files [ files finder-run-files ]
 
-{ "application:openFiles:" void { id SEL id id }
-    [ [ 3drop ] dip finder-run-files ]
-}
+    METHOD: int applicationShouldHandleReopen: id app hasVisibleWindows: int flag [ flag 0 = [ show-listener ] when 1 ]
 
-{ "applicationShouldHandleReopen:hasVisibleWindows:" int { id SEL id int }
-    [ [ 3drop ] dip 0 = [ show-listener ] when 1 ]
-}
+    METHOD: id factorListener: id app [ show-listener f ]
 
-{ "factorListener:" id { id SEL id }
-    [ 3drop show-listener f ]
-}
+    METHOD: id factorBrowser: id app [ show-browser f ]
 
-{ "factorBrowser:" id { id SEL id }
-    [ 3drop show-browser f ]
-}
+    METHOD: id newFactorListener: id app [ listener-window f ]
 
-{ "newFactorListener:" id { id SEL id }
-    [ 3drop listener-window f ]
-}
+    METHOD: id newFactorBrowser: id app [ browser-window f ]
 
-{ "newFactorBrowser:" id { id SEL id }
-    [ 3drop browser-window f ]
-}
+    METHOD: id runFactorFile: id app [ menu-run-files f ]
 
-{ "runFactorFile:" id { id SEL id }
-    [ 3drop menu-run-files f ]
-}
+    METHOD: id saveFactorImage: id app [ save f ]
 
-{ "saveFactorImage:" id { id SEL id }
-    [ 3drop save f ]
-}
+    METHOD: id saveFactorImageAs: id app [ menu-save-image f ]
 
-{ "saveFactorImageAs:" id { id SEL id }
-    [ 3drop menu-save-image f ]
-}
-
-{ "refreshAll:" id { id SEL id }
-    [ 3drop [ refresh-all ] \ refresh-all call-listener f ]
-} ;
+    METHOD: id refreshAll: id app [ [ refresh-all ] \ refresh-all call-listener f ]
+]
 
 : install-app-delegate ( -- )
     NSApp FactorWorkspaceApplicationDelegate install-delegate ;
@@ -75,28 +53,17 @@ CLASS: {
     dup [ quot call( string -- result/f ) ] when
     [ pboard set-pasteboard-string ] when* ;
 
-CLASS: {
-    { +superclass+ "NSObject" }
-    { +name+ "FactorServiceProvider" }
-} {
-    "evalInListener:userData:error:"
-    void
-    { id SEL id id id }
+CLASS: FactorServiceProvider < NSObject
+[
+    METHOD: void evalInListener: id pboard userData: id userData error: id error
+    [ pboard error [ eval-listener f ] do-service ]
+
+    METHOD: void evalToString: id pboard userData: id userData error: id error
     [
-        nip
-        [ eval-listener f ] do-service
-        2drop
-    ]
-} {
-    "evalToString:userData:error:"
-    void
-    { id SEL id id id }
-    [
-        nip
+        pboard error
         [ [ (eval>string) ] with-interactive-vocabs ] do-service
-        2drop
     ]
-} ;
+]
 
 : register-services ( -- )
     NSApp

@@ -334,10 +334,9 @@ PRIVATE>
     scan scan-c-type \ } parse-until <struct-slot-spec> ;
 
 : parse-struct-slots ( slots -- slots' more? )
-    scan {
+    scan-token {
         { ";" [ f ] }
         { "{" [ parse-struct-slot suffix! t ] }
-        { f [ unexpected-eof ] }
         [ invalid-struct-slot ]
     } case ;
 
