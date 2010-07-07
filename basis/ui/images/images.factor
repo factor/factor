@@ -33,9 +33,8 @@ PRIVATE>
 
 <<
 {
-    { [ os macosx? ] [
-        "images.cocoa" require
-    ] }
+    { [ os macosx? ] [ "images.cocoa"   require ] }
+    { [ os winnt?  ] [ "images.gdiplus" require ] }
     [
         "images.png" require
         "images.tiff" require
