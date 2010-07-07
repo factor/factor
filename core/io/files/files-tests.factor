@@ -245,6 +245,15 @@ CONSTANT: pt-array-1
     ] with-file-reader
 ] must-fail
 
+[ ] [
+    "resource:misc/icons/Factor_48x48.png" binary [
+        44 read drop
+        tell-input 44 assert=
+        -44 seek-relative seek-input
+        tell-input 0 assert=
+    ] with-file-reader
+] unit-test
+
 [
     "non-string-error" unique-file ascii [
         { } write
