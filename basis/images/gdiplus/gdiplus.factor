@@ -39,7 +39,7 @@ SINGLETON: gdi+-image
     bitmap [ gdi+-bitmap-width ] [ gdi+-bitmap-height ] bi :> ( w h )
     bitmap 0 0 w h <GpRect> ImageLockModeRead enum>number
     PixelFormat32bppARGB gdi+-lock-bitmap :> bitmap-data
-    bitmap-data [ Scan0>> ] [ Stride>> ] [ Height>> * 4 * ] tri
+    bitmap-data [ Scan0>> ] [ Stride>> ] [ Height>> * ] tri
     memory>byte-array :> pixels
     bitmap bitmap-data GdipBitmapUnlockBits check-gdi+-status
     w h pixels ;
