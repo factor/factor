@@ -36,9 +36,6 @@ HELP: install-delegate
 { $values { "receiver" "an " { $snippet "NSObject" } } { "delegate" "an Objective C class" } }
 { $description "Sets the receiver's delegate to a new instance of the delegate class." } ;
 
-HELP: objc-error
-{ $error-description "Thrown by the Objective C runtime when an error occurs, for example, sending a message to an object with an unrecognized selector." } ;
-
 ARTICLE: "cocoa-application-utils" "Cocoa application utilities"
 "Utilities:"
 { $subsections

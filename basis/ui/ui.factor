@@ -16,8 +16,6 @@ SYMBOL: windows
 
 : window ( handle -- world ) windows get-global at ;
 
-: window-focus ( handle -- gadget ) window world-focus ;
-
 : register-window ( world handle -- )
     #! Add the new window just below the topmost window. Why?
     #! So that if the new window doesn't actually receive focus

@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces math words strings
 io vectors arrays math.parser combinators continuations
@@ -18,12 +18,12 @@ TUPLE: lexer-parsing-word word line line-text column ;
 
 : push-parsing-word ( word -- )
     lexer-parsing-word new
-        swap >>word
-        lexer get [
-            [ line>>      >>line      ]
-            [ line-text>> >>line-text ]
-            [ column>>    >>column    ] tri
-        ] [ parsing-words>> push ] bi ;
+    swap >>word
+    lexer get [
+        [ line>>      >>line      ]
+        [ line-text>> >>line-text ]
+        [ column>>    >>column    ] tri
+    ] [ parsing-words>> push ] bi ;
 
 : pop-parsing-word ( -- )
     lexer get parsing-words>> pop drop ;
@@ -77,7 +77,7 @@ M: lexer skip-word ( lexer -- )
         [ line-text>> ]
     } cleave subseq ;
 
-:  parse-token ( lexer -- str/f )
+: parse-token ( lexer -- str/f )
     dup still-parsing? [
         dup skip-blank
         dup still-parsing-line?
@@ -90,18 +90,14 @@ PREDICATE: unexpected-eof < unexpected got>> not ;
 
 : unexpected-eof ( word -- * ) f unexpected ;
 
+: scan-token ( -- str ) scan [ "token" unexpected-eof ] unless* ;
+
 : expect ( token -- )
-    scan
-    [ 2dup = [ 2drop ] [ unexpected ] if ]
-    [ unexpected-eof ]
-    if* ;
+    scan-token 2dup = [ 2drop ] [ unexpected ] if ;
 
 : each-token ( ... end quot: ( ... token -- ... ) -- ... )
-    [ scan ] 2dip {
-        { [ 2over = ] [ 3drop ] }
-        { [ pick not ] [ drop unexpected-eof ] }
-        [ [ nip call ] [ each-token ] 2bi ]
-    } cond ; inline recursive
+    [ scan-token ] 2dip 2over =
+    [ 3drop ] [ [ nip call ] [ each-token ] 2bi ] if ; inline recursive
 
 : map-tokens ( ... end quot: ( ... token -- ... elt ) -- ... seq )
     collector [ each-token ] dip { } like ; inline
@@ -117,14 +113,14 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
 
 : <lexer-error> ( msg -- error )
     \ lexer-error new
-        lexer get [
-            [ line>> >>line ]
-            [ column>> >>column ] bi
-        ] [ 
-            [ line-text>> >>line-text ]
-            [ parsing-words>> clone >>parsing-words ] bi
-        ] bi
-        swap >>error ;
+    lexer get [
+        [ line>> >>line ]
+        [ column>> >>column ] bi
+    ] [
+        [ line-text>> >>line-text ]
+        [ parsing-words>> clone >>parsing-words ] bi
+    ] bi
+    swap >>error ;
 
 : simple-lexer-dump ( error -- )
     [ line>> number>string ": " append ]
@@ -148,7 +144,9 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
     [ (parsing-word-lexer-dump) ] if ;
 
 : lexer-dump ( error -- )
-    dup parsing-words>> [ simple-lexer-dump ] [ last parsing-word-lexer-dump ] if-empty ;
+    dup parsing-words>>
+    [ simple-lexer-dump ]
+    [ last parsing-word-lexer-dump ] if-empty ;
 
 : with-lexer ( lexer quot -- newquot )
     [ lexer set ] dip [ <lexer-error> rethrow ] recover ; inline
