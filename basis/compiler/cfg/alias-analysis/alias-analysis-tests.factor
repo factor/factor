@@ -287,3 +287,75 @@ IN: compiler.cfg.alias-analysis.tests
         T{ ##compare f 6 5 1 cc= }
     } test-alias-analysis
 ] unit-test
+
+! We can't make any assumptions about heap-ac between alien
+! calls, since they might callback into Factor code
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f "free" }
+        T{ ##slot-imm f 2 0 1 0 }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f "free" }
+        T{ ##slot-imm f 2 0 1 0 }
+    } test-alias-analysis
+] unit-test
+
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f "free" }
+        T{ ##slot-imm f 2 0 1 0 }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f "free" }
+        T{ ##slot-imm f 2 0 1 0 }
+    } test-alias-analysis
+] unit-test
+
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
+        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f "free" }
+        T{ ##set-slot-imm f 2 0 1 0 }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
+        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f "free" }
+        T{ ##set-slot-imm f 2 0 1 0 }
+    } test-alias-analysis
+] unit-test
+
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f "free" }
+        T{ ##set-slot-imm f 1 0 1 0 }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f "free" }
+        T{ ##set-slot-imm f 1 0 1 0 }
+    } test-alias-analysis
+] unit-test

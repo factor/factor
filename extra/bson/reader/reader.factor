@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs bson.constants calendar combinators
 combinators.short-circuit io io.binary kernel math locals
+io.encodings.utf8 io.encodings
 namespaces sequences serialize strings vectors byte-arrays ;
 
 FROM: io.encodings.binary => binary ;
@@ -34,10 +35,11 @@ DEFER: read-elements
     read-byte-raw first ; inline
 
 : read-cstring ( -- string )
-    "\0" read-until drop >string ; inline
+    input-stream get utf8 <decoder>
+    "\0" swap stream-read-until drop ; inline
 
 : read-sized-string ( length -- string )
-    read 1 head-slice* >string ; inline
+    read binary [ read-cstring ] with-byte-reader ; inline
 
 : read-timestamp ( -- timestamp )
     8 read [ 4 head signed-le> ] [ 4 tail signed-le> ] bi <mongo-timestamp> ;
@@ -54,7 +56,8 @@ DEFER: read-elements
 : bson-binary-read ( -- binary )
    read-int32 read-byte 
    {
-        { T_Binary_Bytes [ read ] }
+        { T_Binary_Default [ read ] }
+        { T_Binary_Bytes_Deprecated [ drop read-int32 read ] }
         { T_Binary_Custom [ read bytes>object ] }
         { T_Binary_Function [ read ] }
         [ drop read >string ]

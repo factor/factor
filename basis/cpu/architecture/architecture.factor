@@ -602,8 +602,6 @@ HOOK: %box-long-long cpu ( dst src1 src2 func gc-map -- )
 
 HOOK: %allot-byte-array cpu ( dst size gc-map -- )
 
-HOOK: %restore-context cpu ( temp1 temp2 -- )
-
 HOOK: %save-context cpu ( temp1 temp2 -- )
 
 HOOK: %prepare-var-args cpu ( -- )

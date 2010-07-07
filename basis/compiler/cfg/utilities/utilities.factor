@@ -32,13 +32,13 @@ SYMBOL: visited
     H{ } clone visited [ (skip-empty-blocks) ] with-variable ;
 
 :: update-predecessors ( from to bb -- )
-    ! Update 'to' predecessors for insertion of 'bb' between
-    ! 'from' and 'to'.
+    ! Whenever 'from' appears in the list of predecessors of 'to'
+    ! replace it with 'bb'.
     to predecessors>> [ dup from eq? [ drop bb ] when ] map! drop ;
 
 :: update-successors ( from to bb -- )
-    ! Update 'from' successors for insertion of 'bb' between
-    ! 'from' and 'to'.
+    ! Whenever 'to' appears in the list of successors of 'from'
+    ! replace it with 'bb'.
     from successors>> [ dup to eq? [ drop bb ] when ] map! drop ;
 
 :: insert-basic-block ( from to insns -- )
