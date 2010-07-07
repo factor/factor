@@ -2,8 +2,8 @@
 USING: accessors alien.c-types alien.data alien.enums
 classes.struct destructors images images.loader
 io.streams.limited kernel locals math windows.com
-windows.gdiplus windows.streams windows.types ;
-FROM: images => ARGB ;
+windows.gdiplus windows.streams windows.types typed
+byte-arrays grouping sequences ;
 IN: images.gdiplus
 
 SINGLETON: gdi+-image
@@ -48,7 +48,7 @@ SINGLETON: gdi+-image
     image new
         { w h } >>dim
         pixels >>bitmap
-        ARGB >>component-order
+        BGRA >>component-order
         ubyte-components >>component-type
         f >>upside-down? ;
 
