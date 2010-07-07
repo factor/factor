@@ -99,20 +99,6 @@ FROM: io.ports => tell-handle ;
     f out-clone-stream 0 void* set-alien-value
     STG_E_INVALIDFUNCTION ;
 
-USE: tools.annotations
-: watch-istream-callbacks ( -- )
-    \ IStream-read watch
-    \ IStream-write watch
-    \ IStream-seek watch
-    \ IStream-set-size watch
-    \ IStream-copy-to watch
-    \ IStream-commit watch
-    \ IStream-revert watch
-    \ IStream-lock-region watch
-    \ IStream-unlock-region watch
-    \ IStream-stat watch
-    \ IStream-clone watch ;
-
 CONSTANT: stream-wrapper
     $[
         {
