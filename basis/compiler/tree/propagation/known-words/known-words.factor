@@ -288,14 +288,12 @@ generic-comparison-ops [
     literal>> dup tuple-class? [ drop tuple ] unless <class-info>
 ] "outputs" set-word-prop
 
-! the output of clone has the same type as the input
+! the output of (clone) has the same type as the input
 : cloned-value-info ( value-info -- value-info' )
     clone f >>literal f >>literal?
     [ [ dup [ cloned-value-info ] when ] map ] change-slots ;
 
-{ clone (clone) } [
-    [ cloned-value-info ] "outputs" set-word-prop
-] each
+\ (clone) [ cloned-value-info ] "outputs" set-word-prop
 
 \ slot [
     dup literal?>>
