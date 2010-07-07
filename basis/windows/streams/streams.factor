@@ -69,12 +69,20 @@ SPECIALIZED-ARRAY: uchar
 :: IStream-unlock-region ( stream offset cb lock-type -- hresult )
     STG_E_INVALIDFUNCTION ;
 
+FROM: io.ports => tell-handle ;
+:: stream-size ( stream -- size )
+    stream stream-tell :> old-pos
+    0 seek-end stream stream-seek
+    stream handle>> tell-handle :> size
+    old-pos seek-absolute stream stream-seek
+    size ;
+
 :: IStream-stat ( stream out-stat stat-flag -- hresult )
     [
         out-stat
             f >>pwcsName
             STGTY_STREAM >>type
-            0 >>cbSize
+            stream stream-size >>cbSize
             FILETIME <struct> >>mtime
             FILETIME <struct> >>ctime
             FILETIME <struct> >>atime
@@ -83,28 +91,46 @@ SPECIALIZED-ARRAY: uchar
             GUID_NULL >>clsid
             0 >>grfStateBits
             0 >>reserved
+            drop
+        S_OK
     ] with-hresult ;
 
 :: IStream-clone ( out-clone-stream -- hresult )
     f out-clone-stream 0 void* set-alien-value
     STG_E_INVALIDFUNCTION ;
 
-MEMO: stream-wrapper ( -- wrapper )
-    {
-        { IStream {
-            [ IStream-read ]
-            [ IStream-write ]
-            [ IStream-seek ]
-            [ IStream-set-size ]
-            [ IStream-copy-to ]
-            [ IStream-commit ]
-            [ IStream-revert ]
-            [ IStream-lock-region ]
-            [ IStream-unlock-region ]
-            [ IStream-stat ]
-            [ IStream-clone ]
-        } }
-    } <com-wrapper> ;
+USE: tools.annotations
+: watch-istream-callbacks ( -- )
+    \ IStream-read watch
+    \ IStream-write watch
+    \ IStream-seek watch
+    \ IStream-set-size watch
+    \ IStream-copy-to watch
+    \ IStream-commit watch
+    \ IStream-revert watch
+    \ IStream-lock-region watch
+    \ IStream-unlock-region watch
+    \ IStream-stat watch
+    \ IStream-clone watch ;
+
+CONSTANT: stream-wrapper
+    $[
+        {
+            { IStream {
+                [ IStream-read ]
+                [ IStream-write ]
+                [ IStream-seek ]
+                [ IStream-set-size ]
+                [ IStream-copy-to ]
+                [ IStream-commit ]
+                [ IStream-revert ]
+                [ IStream-lock-region ]
+                [ IStream-unlock-region ]
+                [ IStream-stat ]
+                [ IStream-clone ]
+            } }
+        } <com-wrapper>
+    ]
 
 PRIVATE>
 
