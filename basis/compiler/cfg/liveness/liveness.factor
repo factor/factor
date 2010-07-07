@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors assocs sequences sets
+USING: kernel accessors assocs namespaces sequences sets
 compiler.cfg.def-use compiler.cfg.dataflow-analysis
 compiler.cfg.instructions compiler.cfg.registers
 cpu.architecture ;
@@ -24,7 +24,12 @@ GENERIC: visit-insn ( live-set insn -- live-set )
 M: vreg-insn visit-insn [ kill-defs ] [ gen-uses ] bi ;
 
 : fill-gc-map ( live-set insn -- live-set )
-    gc-map>> over keys [ rep-of tagged-rep? ] filter >>gc-roots drop ;
+    representations get [
+        gc-map>> over keys
+        [ rep-of tagged-rep? ] filter
+        >>gc-roots
+    ] when
+    drop ;
 
 M: gc-map-insn visit-insn
     [ kill-defs ] [ fill-gc-map ] [ gen-uses ] tri ;

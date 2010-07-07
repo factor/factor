@@ -20,6 +20,7 @@ IN: bootstrap.x86
 : nv-reg ( -- reg ) RBX ;
 : stack-reg ( -- reg ) RSP ;
 : frame-reg ( -- reg ) RBP ;
+: link-reg ( -- reg ) R11 ;
 : ctx-reg ( -- reg ) R12 ;
 : vm-reg ( -- reg ) R13 ;
 : ds-reg ( -- reg ) R14 ;
@@ -84,14 +85,9 @@ IN: bootstrap.x86
     arg1 vm-reg MOV
     "begin_callback" jit-call
 
-    jit-load-context
-    jit-restore-context
-
     ! call the quotation
     arg1 return-reg MOV
     jit-call-quot
-
-    jit-save-context
 
     arg1 vm-reg MOV
     "end_callback" jit-call

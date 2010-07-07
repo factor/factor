@@ -75,9 +75,8 @@ SYMBOL: upload-limit
     ] when ;
 
 : extract-host ( request -- request )
-    [ ] [ url>> ] [ "host" header parse-host ] tri
-    [ >>host ] [ >>port ] bi*
-    drop ;
+    [ ] [ url>> ] [ "host" header dup [ url-decode ] when ] tri
+    >>host drop ;
 
 : extract-cookies ( request -- request )
     dup "cookie" header [ parse-cookie >>cookies ] when* ;
