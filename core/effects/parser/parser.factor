@@ -26,9 +26,8 @@ SYMBOL: effect-var
 
 : parse-effect-value ( token -- value )
     ":" ?tail [
-        scan {
+        scan-token {
             { [ dup "(" = ] [ drop ")" parse-effect ] }
-            { [ dup f = ] [ ")" unexpected-eof ] }
             [ parse-word dup class? [ bad-effect ] unless ]
         } cond 2array
     ] when ;

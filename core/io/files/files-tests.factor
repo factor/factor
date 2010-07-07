@@ -161,8 +161,12 @@ CONSTANT: pt-array-1
     "seek-test1" unique-file binary
     [
         [
-            B{ 1 2 3 4 5 } write 0 seek-absolute seek-output
+            B{ 1 2 3 4 5 } write
+            tell-output 5 assert=
+            0 seek-absolute seek-output
+            tell-output 0 assert=
             B{ 3 } write
+            tell-output 1 assert=
         ] with-file-writer
     ] [
         file-contents
@@ -174,8 +178,12 @@ CONSTANT: pt-array-1
     "seek-test2" unique-file binary
     [
         [
-            B{ 1 2 3 4 5 } write -1 seek-relative seek-output
+            B{ 1 2 3 4 5 } write
+            tell-output 5 assert=
+            -1 seek-relative seek-output
+            tell-output 4 assert=
             B{ 3 } write
+            tell-output 5 assert=
         ] with-file-writer
     ] [
         file-contents
@@ -187,8 +195,12 @@ CONSTANT: pt-array-1
     "seek-test3" unique-file binary
     [
         [
-            B{ 1 2 3 4 5 } write 1 seek-relative seek-output
+            B{ 1 2 3 4 5 } write
+            tell-output 5 assert=
+            1 seek-relative seek-output
+            tell-output 6 assert=
             B{ 3 } write
+            tell-output 7 assert=
         ] with-file-writer
     ] [
         file-contents
@@ -201,7 +213,11 @@ CONSTANT: pt-array-1
         set-file-contents
     ] [
         [
-            -3 seek-end seek-input 1 read
+            tell-input 0 assert=
+            -3 seek-end seek-input
+            tell-input 2 assert=
+            1 read
+            tell-input 3 assert=
         ] with-file-reader
     ] 2bi
 ] unit-test
@@ -212,9 +228,13 @@ CONSTANT: pt-array-1
         set-file-contents
     ] [
         [
+            tell-input 0 assert=
             3 seek-absolute seek-input
+            tell-input 3 assert=
             -2 seek-relative seek-input
+            tell-input 1 assert=
             1 read
+            tell-input 2 assert=
         ] with-file-reader
     ] 2bi
 ] unit-test

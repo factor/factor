@@ -55,8 +55,7 @@ M: lambda-parser parse-quotation ( -- quotation )
     H{ } clone (parse-lambda) ;
 
 : parse-binding ( end -- pair/f )
-    scan {
-        { [ dup not ] [ unexpected-eof ] }
+    scan-token {
         { [ 2dup = ] [ 2drop f ] }
         [ nip scan-object 2array ]
     } cond ;
