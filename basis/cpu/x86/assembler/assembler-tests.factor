@@ -103,6 +103,15 @@ cell 4 = [
 [ [ EAX [] XMM1 UCOMISD ] { } make ] must-fail
 [ { HEX: 66 HEX: 0f HEX: 38 HEX: 2a HEX: 01 } ] [ [ XMM0 ECX [] MOVNTDQA ] { } make ] unit-test
 
+[ { HEX: 66 HEX: 48 HEX: 0f HEX: 6e HEX: c8 } ] [ [ XMM1 RAX MOVD ] { } make ] unit-test
+[ { HEX: 66 HEX: 0f HEX: 6e HEX: c8 } ] [ [ XMM1 EAX MOVD ] { } make ] unit-test
+[ { HEX: 66 HEX: 48 HEX: 0f HEX: 7e HEX: c8 } ] [ [ RAX XMM1 MOVD ] { } make ] unit-test
+[ { HEX: 66 HEX: 0f HEX: 7e HEX: c8 } ] [ [ EAX XMM1 MOVD ] { } make ] unit-test
+
+[ { HEX: f3 HEX: 0f HEX: 7e HEX: 08 } ] [ [ XMM1 EAX [] MOVQ ] { } make ] unit-test
+[ { HEX: f3 HEX: 0f HEX: 7e HEX: 08 } ] [ [ XMM1 EAX [] MOVQ ] { } make ] unit-test
+[ { HEX: f3 HEX: 0f HEX: 7e HEX: ca } ] [ [ XMM1 XMM2 MOVQ ] { } make ] unit-test
+
 ! rm-r only sse instructions
 [ { HEX: 0f HEX: 2b HEX: 08 } ] [ [ EAX [] XMM1 MOVNTPS ] { } make ] unit-test
 [ { HEX: 66 HEX: 0f HEX: e7 HEX: 08 } ] [ [ EAX [] XMM1 MOVNTDQ ] { } make ] unit-test
