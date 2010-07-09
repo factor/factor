@@ -3,7 +3,7 @@
 USING: accessors images images.loader io io.binary kernel
 locals math sequences io.encodings.ascii io.encodings.string
 calendar math.ranges math.parser colors arrays hashtables
-ui.pixel-formats combinators continuations ;
+ui.pixel-formats combinators continuations io.streams.throwing ;
 IN: images.tga
 
 SINGLETON: tga-image
@@ -254,7 +254,7 @@ ERROR: bad-tga-unsupported ;
     ubyte-components                   >>component-type ;
     
 M: tga-image stream>image
-    drop [ read-tga ] with-input-stream ;
+    drop [ [ read-tga ] input-throws-on-eof ] with-input-stream ;
 
 M: tga-image image>stream
     drop
