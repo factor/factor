@@ -28,6 +28,12 @@ M:: throws-on-eof stream-read-partial ( n stream -- seq )
     n stream stream>> stream-read-partial
     [ n stream \ read-partial stream-exhausted ] unless* ;
 
+M: throws-on-eof stream-tell
+    stream>> stream-tell ;
+
+M: throws-on-eof stream-seek
+    stream>> stream-seek ;
+
 PRIVATE>
 
 : throws-on-eof ( stream quot -- )
