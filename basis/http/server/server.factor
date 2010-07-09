@@ -51,14 +51,13 @@ ERROR: no-boundary ;
 SYMBOL: upload-limit
 
 : read-multipart-data ( request -- mime-parts )
-    upload-limit get limited-input 
     [ "content-type" header ]
-    [ "content-length" header string>number limited-input ] bi
-    [
-        binary decode-input
-        parse-multipart-form-data parse-multipart
-    ] input-throws-on-eof ;
-
+    [ "content-length" header string>number ] bi
+    upload-limit get limited-input ! throw limit
+    limited-input ! eof limit
+    binary decode-input
+    parse-multipart-form-data parse-multipart ;
+ 
 : read-content ( request -- bytes )
     "content-length" header string>number read ;
 
@@ -278,17 +277,15 @@ TUPLE: http-server < threaded-server ;
 
 SYMBOL: request-limit
 
-request-limit [ 64 1024 * ] initialize
+64 1024 * request-limit set-global
 
 M: http-server handle-client*
     drop [
         request-limit get limited-input
-        [
-            ?refresh-all
-            [ read-request ] ?benchmark
-            [ do-request ] ?benchmark
-            [ do-response ] ?benchmark
-        ] input-throws-on-eof
+        ?refresh-all
+        [ read-request ] ?benchmark
+        [ do-request ] ?benchmark
+        [ do-response ] ?benchmark
     ] with-destructors ;
 
 : <http-server> ( -- server )
