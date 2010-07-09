@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors destructors io kernel locals namespaces
-sequences ;
+sequences fry ;
 IN: io.streams.throwing
 
 ERROR: stream-exhausted n stream word ;
@@ -33,6 +33,10 @@ M: throws-on-eof stream-tell
 
 M: throws-on-eof stream-seek
     stream>> stream-seek ;
+
+M: throws-on-eof stream-read-until
+    [ stream>> stream-read-until ]
+    [ '[ length _ \ read-until stream-exhausted ] unless* ] bi ;
 
 PRIVATE>
 

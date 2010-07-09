@@ -40,6 +40,16 @@ IN: io.streams.throwing.tests
     [ 1 seek-absolute seek-input 4 read drop ] throws-on-eof
 ] [ stream-exhausted? ] must-fail-with
 
+[ "asd" CHAR: f ] [
+    "asdf" <string-reader>
+    [ "f" read-until ] throws-on-eof
+] unit-test
+
+[
+    "asdf" <string-reader>
+    [ "g" read-until ] throws-on-eof
+] [ stream-exhausted? ] must-fail-with
+
 [ 1 ] [
     "asdf" <string-reader> 2 <limited-stream>
     [ 1 seek-absolute seek-input tell-input ] throws-on-eof
