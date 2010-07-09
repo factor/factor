@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors ascii combinators images images.loader io
 io.encodings.ascii io.encodings.string kernel locals make math
-math.parser sequences ;
+math.parser sequences io.streams.throwing ;
 IN: images.ppm
 
 SINGLETON: ppm-image
@@ -47,7 +47,7 @@ SINGLETON: ppm-image
     ubyte-components >>component-type ;
 
 M: ppm-image stream>image
-    drop [ read-ppm ] with-input-stream ;
+    drop [ [ read-ppm ] input-throws-on-eof ] with-input-stream ;
 
 M: ppm-image image>stream
     drop {
