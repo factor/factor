@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.streams.limited io.streams.string
-io.streams.throwing tools.test ;
+io.streams.throwing tools.test kernel ;
 IN: io.streams.throwing.tests
 
 [ "as" ]
@@ -34,3 +34,13 @@ IN: io.streams.throwing.tests
     "asdf" <string-reader> 2 <limited-stream>
     [ contents contents ] throws-on-eof
 ] [ stream-exhausted? ] must-fail-with
+
+[
+    "asdf" <string-reader> 2 <limited-stream>
+    [ 1 seek-absolute seek-input 4 read drop ] throws-on-eof
+] [ stream-exhausted? ] must-fail-with
+
+[ 1 ] [
+    "asdf" <string-reader> 2 <limited-stream>
+    [ 1 seek-absolute seek-input tell-input ] throws-on-eof
+] unit-test
