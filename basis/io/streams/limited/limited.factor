@@ -39,12 +39,6 @@ M: object unlimit-stream ( stream -- stream' ) ;
 : limited-input ( limit -- )
     [ input-stream ] dip '[ _ limit-stream ] change ;
 
-: unlimited-input ( -- )
-    input-stream [ unlimit-stream ] change ;
-
-: with-unlimited-stream ( stream quot -- )
-    [ clone unlimit-stream ] dip call ; inline
-
 : with-limited-stream ( stream limit quot -- )
     [ limit-stream ] dip call ; inline
 

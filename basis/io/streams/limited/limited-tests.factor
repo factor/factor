@@ -54,35 +54,6 @@ IN: io.streams.limited.tests
     4 over stream-read drop 10 swap stream-read
 ] unit-test
 
-[ t ]
-[
-    "abc" <string-reader> 3 limit-stream unlimit-stream
-    "abc" <string-reader> =
-] unit-test
-
-[ t ]
-[
-    "abc" <string-reader> 3 limit-stream unlimit-stream
-    "abc" <string-reader> =
-] unit-test
-
-[ t ]
-[
-    [
-        "resource:license.txt" utf8 <file-reader> &dispose
-        3 limit-stream unlimit-stream
-        "resource:license.txt" utf8 <file-reader> &dispose
-        [ decoder? ] both?
-    ] with-destructors
-] unit-test
-
-
-[ "asdf" ] [
-    "asdf" <string-reader> 2 <limited-stream> [
-        unlimited-input contents
-    ] with-input-stream
-] unit-test
-
 ! pipes are duplex and not seekable
 [ "as" ] [
     latin1 <pipe> [ 2 <limited-stream> ] change-in
