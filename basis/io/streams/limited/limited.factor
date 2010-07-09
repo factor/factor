@@ -27,15 +27,6 @@ M: decoder limit-stream ( stream limit -- stream' )
 M: object limit-stream ( stream limit -- stream' )
     <limited-stream> ;
 
-GENERIC: unlimit-stream ( stream -- stream' )
-
-M: decoder unlimit-stream ( stream -- stream' )
-    [ stream>> ] change-stream ;
-
-M: limited-stream unlimit-stream ( stream -- stream' ) stream>> ;
-
-M: object unlimit-stream ( stream -- stream' ) ;
-
 : limited-input ( limit -- )
     [ input-stream ] dip '[ _ limit-stream ] change ;
 
