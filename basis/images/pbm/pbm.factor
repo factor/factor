@@ -3,7 +3,7 @@
 USING: accessors arrays ascii bit-arrays byte-arrays combinators
 continuations grouping images images.loader io io.encodings.ascii
 io.encodings.string kernel locals make math math.functions math.parser
-sequences ;
+sequences io.streams.throwing ;
 IN: images.pbm
 
 SINGLETON: pbm-image
@@ -73,7 +73,7 @@ SINGLETON: pbm-image
 PRIVATE>
 
 M: pbm-image stream>image
-    drop [ read-pbm ] with-input-stream ;
+    drop [ [ read-pbm ] input-throws-on-eof ] with-input-stream ;
 
 M: pbm-image image>stream
     drop {
