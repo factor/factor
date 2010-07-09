@@ -28,6 +28,7 @@ html.templates
 html.streams
 html
 mime.types
+math.order
 xml.writer ;
 FROM: mime.multipart => parse-multipart ;
 IN: http.server
@@ -53,8 +54,7 @@ SYMBOL: upload-limit
 : read-multipart-data ( request -- mime-parts )
     [ "content-type" header ]
     [ "content-length" header string>number ] bi
-    upload-limit get limited-input ! throw limit
-    limited-input ! eof limit
+    upload-limit get min limited-input
     binary decode-input
     parse-multipart-form-data parse-multipart ;
  
@@ -277,7 +277,7 @@ TUPLE: http-server < threaded-server ;
 
 SYMBOL: request-limit
 
-64 1024 * request-limit set-global
+request-limit [ 64 1024 * ] initialize
 
 M: http-server handle-client*
     drop [
