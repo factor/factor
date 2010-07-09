@@ -1,11 +1,9 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types arrays byte-arrays columns
-combinators compression.run-length endian fry grouping images
-images.loader images.normalization io io.binary
-io.encodings.8-bit.latin1 io.encodings.binary
-io.encodings.string io.files io.streams.limited kernel locals
-macros math math.bitwise math.functions namespaces sequences
+USING: accessors alien.c-types arrays byte-arrays combinators
+compression.run-length fry grouping images images.loader
+images.normalization io io.binary io.encodings.8-bit.latin1
+io.encodings.string kernel math math.bitwise sequences
 specialized-arrays summary ;
 QUALIFIED-WITH: bitstreams b
 SPECIALIZED-ARRAYS: uint ushort ;

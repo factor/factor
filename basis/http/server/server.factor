@@ -14,6 +14,7 @@ io.encodings.ascii
 io.encodings.binary
 io.streams.limited
 io.streams.string
+io.streams.throwing
 io.servers.connection
 io.timeouts
 io.crlf
@@ -50,13 +51,14 @@ ERROR: no-boundary ;
 SYMBOL: upload-limit
 
 : read-multipart-data ( request -- mime-parts )
-    [ "content-type" header ]
-    [ "content-length" header string>number ] bi
     unlimited-input
-    upload-limit get stream-throws limit-input
-    stream-eofs limit-input
-    binary decode-input
-    parse-multipart-form-data parse-multipart ;
+    upload-limit get limited-input 
+    [ "content-type" header ]
+    [ "content-length" header string>number limited-input ] bi
+    [
+        binary decode-input
+        parse-multipart-form-data parse-multipart
+    ] input-throws-on-eof ;
 
 : read-content ( request -- bytes )
     "content-length" header string>number read ;
@@ -277,15 +279,17 @@ TUPLE: http-server < threaded-server ;
 
 SYMBOL: request-limit
 
-64 1024 * request-limit set-global
+request-limit [ 64 1024 * ] initialize
 
 M: http-server handle-client*
     drop [
-        request-limit get stream-throws limit-input
-        ?refresh-all
-        [ read-request ] ?benchmark
-        [ do-request ] ?benchmark
-        [ do-response ] ?benchmark
+        request-limit get limited-input
+        [
+            ?refresh-all
+            [ read-request ] ?benchmark
+            [ do-request ] ?benchmark
+            [ do-response ] ?benchmark
+        ] input-throws-on-eof
     ] with-destructors ;
 
 : <http-server> ( -- server )
