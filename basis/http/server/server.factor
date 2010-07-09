@@ -51,7 +51,6 @@ ERROR: no-boundary ;
 SYMBOL: upload-limit
 
 : read-multipart-data ( request -- mime-parts )
-    unlimited-input
     upload-limit get limited-input 
     [ "content-type" header ]
     [ "content-length" header string>number limited-input ] bi

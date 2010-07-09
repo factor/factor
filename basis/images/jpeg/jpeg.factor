@@ -366,7 +366,7 @@ ERROR: not-a-jpeg-image ;
     [
         parse-marker { SOI } = [ not-a-jpeg-image ] unless
         parse-headers
-        unlimited-input contents <loading-jpeg>
+        contents <loading-jpeg>
     ] with-input-stream ;
 
 PRIVATE>
