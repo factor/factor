@@ -34,13 +34,10 @@ GENERIC: stream>image ( stream class -- image )
 : load-image ( path -- image )
     [ open-image-file ] [ image-class ] bi load-image* ;
 
-M: byte-array load-image*
-    [
-        [ binary <byte-reader> ] [ length ] bi
-        <limited-stream> dup
-    ] dip '[ _ stream>image ] throws-on-eof ;
+M: object load-image* stream>image ;
 
-M: limited-stream load-image* stream>image ;
+M: byte-array load-image*
+    [ binary <byte-reader> ] dip stream>image ;
 
 M: string load-image* [ open-image-file ] dip stream>image ;
 

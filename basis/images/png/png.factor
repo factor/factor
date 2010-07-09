@@ -4,7 +4,7 @@ USING: accessors arrays checksums checksums.crc32 combinators
 compression.inflate fry grouping images images.loader io
 io.binary io.encodings.ascii io.encodings.string kernel locals
 math math.bitwise math.ranges sequences sorting assocs
-math.functions math.order byte-arrays ;
+math.functions math.order byte-arrays io.streams.throwing ;
 QUALIFIED-WITH: bitstreams bs
 IN: images.png
 
@@ -319,10 +319,12 @@ ERROR: invalid-color-type/bit-depth loading-png ;
 
 : load-png ( stream -- loading-png )
     [
-        <loading-png>
-        read-png-header
-        read-png-chunks
-        parse-ihdr-chunk
+        [
+            <loading-png>
+            read-png-header
+            read-png-chunks
+            parse-ihdr-chunk
+        ] input-throws-on-eof
     ] with-input-stream ;
 
 M: png-image stream>image
