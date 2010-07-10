@@ -254,7 +254,7 @@ ERROR: bad-tga-unsupported ;
     ubyte-components                   >>component-type ;
     
 M: tga-image stream>image
-    drop [ [ read-tga ] input-throws-on-eof ] with-input-stream ;
+    drop [ [ read-tga ] throw-on-eof ] with-input-stream ;
 
 M: tga-image image>stream
     drop

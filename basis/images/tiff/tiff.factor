@@ -561,6 +561,6 @@ ERROR: unknown-component-order ifd ;
 
 ! tiff files can store several images -- we just take the first for now
 M: tiff-image stream>image ( stream tiff-image -- image )
-    drop [ [ load-tiff tiff>image ] input-throws-on-eof ] with-input-stream ;
+    drop [ [ load-tiff tiff>image ] throw-on-eof ] with-input-stream ;
 
 { "tif" "tiff" } [ tiff-image register-image-class ] each

@@ -50,7 +50,7 @@ SINGLETON: pgm-image
     wide [ ushort-components ] [ ubyte-components ] if >>component-type ;
 
 M: pgm-image stream>image
-    drop [ [ read-pgm ] input-throws-on-eof ] with-input-stream ;
+    drop [ [ read-pgm ] throw-on-eof ] with-input-stream ;
 
 M: pgm-image image>stream
     drop {

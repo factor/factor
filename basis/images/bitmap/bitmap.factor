@@ -363,7 +363,7 @@ ERROR: unsupported-bitmap-file magic ;
                 ! { "PT" [ parse-os2-pointer ] }
                 [ unsupported-bitmap-file ]
             } case
-        ] input-throws-on-eof
+        ] throw-on-eof
     ] with-input-stream ;
 
 : loading-bitmap>bytes ( loading-bitmap -- byte-array )

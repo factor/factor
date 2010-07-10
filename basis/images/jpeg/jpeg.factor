@@ -121,15 +121,17 @@ TUPLE: jpeg-color-info
 
 : decode-huff-table ( chunk -- )
     data>> [ binary <byte-reader> ] [ length ] bi limit-stream [
-        [ input-stream get stream>> [ count>> ] [ limit>> ] bi < ]
         [
-            read4/4 swap 2 * +
-            16 read
-            dup [ ] [ + ] map-reduce read
-            binary [ [ read [ B{ } ] unless* ] { } map-as ] with-byte-reader
-            swap jpeg> huff-tables>> set-nth
-        ] while
-    ] throws-on-eof ;
+            [ input-stream get stream>> [ count>> ] [ limit>> ] bi < ]
+            [
+                read4/4 swap 2 * +
+                16 read
+                dup [ ] [ + ] map-reduce read
+                binary [ [ read [ B{ } ] unless* ] { } map-as ] with-byte-reader
+                swap jpeg> huff-tables>> set-nth
+            ] while
+        ] with-input-stream*
+    ] stream-throw-on-eof ;
 
 : decode-scan ( chunk -- )
     data>>
