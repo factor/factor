@@ -47,7 +47,7 @@ SINGLETON: ppm-image
     ubyte-components >>component-type ;
 
 M: ppm-image stream>image
-    drop [ [ read-ppm ] input-throws-on-eof ] with-input-stream ;
+    drop [ [ read-ppm ] throw-on-eof ] with-input-stream ;
 
 M: ppm-image image>stream
     drop {

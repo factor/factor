@@ -324,7 +324,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
             read-png-header
             read-png-chunks
             parse-ihdr-chunk
-        ] input-throws-on-eof
+        ] throw-on-eof
     ] with-input-stream ;
 
 M: png-image stream>image
