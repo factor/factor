@@ -73,7 +73,7 @@ SINGLETON: pbm-image
 PRIVATE>
 
 M: pbm-image stream>image
-    drop [ [ read-pbm ] input-throws-on-eof ] with-input-stream ;
+    drop [ [ read-pbm ] throw-on-eof ] with-input-stream ;
 
 M: pbm-image image>stream
     drop {
