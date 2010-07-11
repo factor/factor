@@ -554,6 +554,9 @@ PRIVATE>
 : 2-operand-rm-mr-sse ( dst src op1{rm,mr} op2 -- )
     [ , ] when* direction-op-sse extended-opcode (2-operand) ;
 
+: 2-operand-rm-mr-sse* ( dst src op12{rm,mr} -- )
+    direction-op-sse first2 [ , ] when* extended-opcode (2-operand) ;
+
 : 2-operand-rm-sse ( dst src op1 op2 -- )
     [ , ] when* extended-opcode (2-operand) ;
 
@@ -770,6 +773,9 @@ ALIAS: PINSRQ PINSRD
 : MOVD       ( dest src -- ) { HEX: 6e HEX: 7e } HEX: 66 2-operand-rm-mr-sse ;
 : MOVDQA     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: 66 2-operand-rm-mr-sse ;
 : MOVDQU     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: f3 2-operand-rm-mr-sse ;
+
+: MOVQ       ( dest src -- )
+    { { HEX: 7e HEX: f3 } { HEX: d6 HEX: 66 } } 2-operand-rm-mr-sse* ;
 
 <PRIVATE
 
