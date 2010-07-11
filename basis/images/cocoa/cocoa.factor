@@ -1,8 +1,7 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors alien.data cocoa cocoa.classes cocoa.messages
 combinators core-foundation.data core-graphics.types fry images
-images.loader io io.streams.limited kernel literals math 
-sequences ;
+images.loader io kernel literals math sequences ;
 IN: images.cocoa
 
 SINGLETON: ns-image
@@ -64,5 +63,4 @@ PRIVATE>
 
 M: ns-image stream>image
     drop
-    dup limited-stream? [ stream-eofs >>mode ] when
     [ load-image-rep ] with-input-stream image-rep>image ;

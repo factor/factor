@@ -55,8 +55,7 @@ SINGLETON: gdi+-image
 PRIVATE>
 
 M: gdi+-image stream>image
-    drop
-    dup limited-stream? [ stream-eofs >>mode ] when [
+    drop [
         start-gdi+ &stop-gdi+ drop
         stream>gdi+-bitmap
         gdi+-bitmap>data
