@@ -6,57 +6,34 @@ io.encodings io.files io.files.info kernel locals math
 namespaces sequences ;
 IN: io.streams.limited
 
-TUPLE: limited-stream
-    stream mode
-    count limit
-    current start stop ;
+TUPLE: limited-stream stream count limit current start stop ;
 
-SINGLETONS: stream-throws stream-eofs ;
-
-: <limited-stream> ( stream limit mode -- stream' )
+: <limited-stream> ( stream limit -- stream' )
     limited-stream new
-        swap >>mode
         swap >>limit
         swap >>stream
         0 >>count ;
 
-: <limited-file-reader> ( path encoding mode -- stream' )
-    [
-        [ <file-reader> ]
-        [ drop file-info size>> ] 2bi
-    ] dip <limited-stream> ;
+: <limited-file-reader> ( path encoding -- stream' )
+    [ <file-reader> ]
+    [ drop file-info size>> ] 2bi
+    <limited-stream> ;
 
-GENERIC# limit 2 ( stream limit mode -- stream' )
+GENERIC# limit-stream 1 ( stream limit -- stream' )
 
-M: decoder limit ( stream limit mode -- stream' )
-    [ clone ] 2dip '[ _ _ limit ] change-stream ;
+M: decoder limit-stream ( stream limit -- stream' )
+    [ clone ] dip '[ _ limit-stream ] change-stream ;
 
-M: object limit ( stream limit mode -- stream' )
-    over [ <limited-stream> ] [ 2drop ] if ;
+M: object limit-stream ( stream limit -- stream' )
+    <limited-stream> ;
 
-GENERIC: unlimited ( stream -- stream' )
+: limited-input ( limit -- )
+    [ input-stream ] dip '[ _ limit-stream ] change ;
 
-M: decoder unlimited ( stream -- stream' )
-    [ stream>> ] change-stream ;
-
-M: object unlimited ( stream -- stream' )
-    stream>> ;
-
-: limit-input ( limit mode -- )
-    [ input-stream ] 2dip '[ _ _ limit ] change ;
-
-: unlimited-input ( -- )
-    input-stream [ unlimited ] change ;
-
-: with-unlimited-stream ( stream quot -- )
-    [ clone unlimited ] dip call ; inline
-
-: with-limited-stream ( stream limit mode quot -- )
-    [ limit ] dip call ; inline
+: with-limited-stream ( stream limit quot -- )
+    [ limit-stream ] dip call ; inline
 
 ERROR: limit-exceeded n stream ;
-
-ERROR: bad-stream-mode mode ;
 
 <PRIVATE
 
@@ -64,29 +41,17 @@ ERROR: bad-stream-mode mode ;
     2dup [ + ] change-current
     [ current>> ] [ stop>> ] bi >
     [
-        dup mode>> {
-            { stream-throws [ limit-exceeded ] }
-            { stream-eofs [ 
-                dup [ current>> ] [ stop>> ] bi -
-                '[ _ - ] dip
-            ] }
-            [ bad-stream-mode ]
-        } case
+        dup [ current>> ] [ stop>> ] bi -
+        '[ _ - ] dip
     ] when ; inline
 
 : adjust-count-limit ( n stream -- n' stream )
     2dup [ + ] change-count
     [ count>> ] [ limit>> ] bi >
     [
-        dup mode>> {
-            { stream-throws [ limit-exceeded ] }
-            { stream-eofs [ 
-                dup [ count>> ] [ limit>> ] bi -
-                '[ _ - ] dip
-                dup limit>> >>count
-            ] }
-            [ bad-stream-mode ]
-        } case
+        dup [ count>> ] [ limit>> ] bi -
+        '[ _ - ] dip
+        dup limit>> >>count
     ] when ; inline
 
 : check-count-bounds ( n stream -- n stream )
@@ -124,7 +89,11 @@ M: limited-stream stream-read-partial
 
 : (read-until) ( stream seps buf -- stream seps buf sep/f )
     3dup [ [ stream-read1 dup ] dip member-eq? ] dip
-    swap [ drop ] [ push (read-until) ] if ;
+    swap [
+        drop
+    ] [
+        over [ push (read-until) ] [ drop ] if
+    ] if ;
 
 :: limited-stream-seek ( n seek-type stream -- )
     seek-type {

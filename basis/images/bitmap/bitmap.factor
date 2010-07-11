@@ -1,12 +1,10 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types arrays byte-arrays columns
-combinators compression.run-length endian fry grouping images
-images.loader images.normalization io io.binary
-io.encodings.8-bit.latin1 io.encodings.binary
-io.encodings.string io.files io.streams.limited kernel locals
-macros math math.bitwise math.functions namespaces sequences
-specialized-arrays summary ;
+USING: accessors alien.c-types arrays byte-arrays combinators
+compression.run-length fry grouping images images.loader
+images.normalization io io.binary io.encodings.8-bit.latin1
+io.encodings.string kernel math math.bitwise sequences
+specialized-arrays summary io.streams.throwing ;
 QUALIFIED-WITH: bitstreams b
 SPECIALIZED-ARRAYS: uint ushort ;
 IN: images.bitmap
@@ -350,20 +348,22 @@ ERROR: unsupported-bitmap-file magic ;
 
 : load-bitmap ( stream -- loading-bitmap )
     [
-        \ loading-bitmap new
-        parse-file-header [ >>file-header ] [ ] bi magic>> {
-            { "BM" [
-                dup file-header>> header-length>> parse-header >>header
-                parse-color-palette
-                parse-color-data
-            ] }
-            ! { "BA" [ parse-os2-bitmap-array ] }
-            ! { "CI" [ parse-os2-color-icon ] }
-            ! { "CP" [ parse-os2-color-pointer ] }
-            ! { "IC" [ parse-os2-icon ] }
-            ! { "PT" [ parse-os2-pointer ] }
-            [ unsupported-bitmap-file ]
-        } case
+        [
+            \ loading-bitmap new
+            parse-file-header [ >>file-header ] [ ] bi magic>> {
+                { "BM" [
+                    dup file-header>> header-length>> parse-header >>header
+                    parse-color-palette
+                    parse-color-data
+                ] }
+                ! { "BA" [ parse-os2-bitmap-array ] }
+                ! { "CI" [ parse-os2-color-icon ] }
+                ! { "CP" [ parse-os2-color-pointer ] }
+                ! { "IC" [ parse-os2-icon ] }
+                ! { "PT" [ parse-os2-pointer ] }
+                [ unsupported-bitmap-file ]
+            } case
+        ] throw-on-eof
     ] with-input-stream ;
 
 : loading-bitmap>bytes ( loading-bitmap -- byte-array )
