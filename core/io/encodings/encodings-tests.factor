@@ -1,7 +1,7 @@
-USING: io.files io.streams.string io io.streams.byte-array
-tools.test kernel io.encodings.ascii io.encodings.utf8
-namespaces accessors io.encodings io.streams.limited ;
-IN: io.streams.encodings.tests
+USING: accessors io io.encodings io.encodings.ascii
+io.encodings.utf8 io.files io.streams.byte-array
+io.streams.string kernel namespaces tools.test ;
+IN: io.encodings.tests
 
 [ { } ]
 [ "vocab:io/test/empty-file.txt" ascii file-lines ]

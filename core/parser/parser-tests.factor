@@ -101,7 +101,7 @@ DEFER: foo
 
 ! parse-tokens should do the right thing on EOF
 [ "USING: kernel" eval( -- ) ]
-[ error>> T{ unexpected { want ";" } } = ] must-fail-with
+[ error>> T{ unexpected { want "token" } } = ] must-fail-with
 
 ! Test smudging
 

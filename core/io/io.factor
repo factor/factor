@@ -101,9 +101,6 @@ SYMBOL: error-stream
 : stream-element-exemplar ( stream -- exemplar )
     stream-element-type (stream-element-exemplar) ; inline
 
-: element-exemplar ( -- exemplar )
-    input-stream get stream-element-exemplar ; inline
-
 PRIVATE>
 
 : each-stream-line ( stream quot -- )
