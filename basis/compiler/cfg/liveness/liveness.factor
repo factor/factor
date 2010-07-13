@@ -16,7 +16,7 @@ BACKWARD-ANALYSIS: live
 GENERIC: visit-insn ( live-set insn -- live-set )
 
 : kill-defs ( live-set insn -- live-set )
-    defs-vreg [ over delete-at ] when* ; inline
+    defs-vregs [ over delete-at ] each ; inline
 
 : gen-uses ( live-set insn -- live-set )
     uses-vregs [ over conjoin ] each ; inline

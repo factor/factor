@@ -48,39 +48,59 @@ IN: compiler.cfg.linear-scan.allocation
     2dup spill-at-sync-point?
     [ swap n>> spill f ] [ 2drop t ] if ;
 
-GENERIC: handle-progress* ( obj -- )
+: handle-interval ( live-interval -- )
+    [ start>> deactivate-intervals ]
+    [ start>> activate-intervals ]
+    [ assign-register ]
+    tri ;
 
-M: live-interval handle-progress* drop ;
-
-M: sync-point handle-progress*
+: (handle-sync-point) ( sync-point -- )
     active-intervals get values
     [ [ spill-at-sync-point ] with filter! drop ] with each ;
 
-:: handle-progress ( n obj -- )
-    n progress set
-    n deactivate-intervals
-    obj handle-progress*
-    n activate-intervals ;
+: handle-sync-point ( sync-point -- )
+    [ n>> deactivate-intervals ]
+    [ (handle-sync-point) ]
+    [ n>> activate-intervals ]
+    tri ;
 
-GENERIC: handle ( obj -- )
-
-M: live-interval handle ( live-interval -- )
-    [ [ start>> ] keep handle-progress ] [ assign-register ] bi ;
-
-M: sync-point handle ( sync-point -- )
-    [ n>> ] keep handle-progress ;
-
-: smallest-heap ( heap1 heap2 -- heap )
-    ! If heap1 and heap2 have the same key, favors heap1.
+:: (allocate-registers-step) ( unhandled-intervals unhandled-sync-points -- )
     {
-        { [ dup heap-empty? ] [ drop ] }
-        { [ over heap-empty? ] [ nip ] }
-        [ [ [ heap-peek nip ] bi@ <= ] most ]
+        {
+            [ unhandled-intervals heap-empty? ]
+            [ unhandled-sync-points heap-pop drop handle-sync-point ]
+        }
+        {
+            [ unhandled-sync-points heap-empty? ]
+            [ unhandled-intervals heap-pop drop handle-interval ]
+        }
+        [
+            unhandled-intervals heap-peek :> ( i ik )
+            unhandled-sync-points heap-peek :> ( s sk )
+            {
+                {
+                    [ ik sk < ]
+                    [ unhandled-intervals heap-pop* i handle-interval ]
+                }
+                {
+                    [ ik sk > ]
+                    [ unhandled-sync-points heap-pop* s handle-sync-point ]
+                }
+                [
+                    unhandled-intervals heap-pop*
+                    i handle-interval
+                    s (handle-sync-point)
+                ]
+            } cond
+        ]
     } cond ;
 
-: (allocate-registers) ( -- )
-    unhandled-intervals get unhandled-sync-points get smallest-heap
-    dup heap-empty? [ drop ] [ heap-pop drop handle (allocate-registers) ] if ;
+: (allocate-registers) ( unhandled-intervals unhandled-sync-points -- )
+    2dup [ heap-empty? ] both? [ 2drop ] [
+        [ (allocate-registers-step) ]
+        [ (allocate-registers) ]
+        2bi
+    ] if ;
 
 : finish-allocation ( -- )
     active-intervals inactive-intervals
@@ -89,6 +109,6 @@ M: sync-point handle ( sync-point -- )
 : allocate-registers ( live-intervals sync-point machine-registers -- live-intervals )
     init-allocator
     init-unhandled
-    (allocate-registers)
+    unhandled-intervals get unhandled-sync-points get (allocate-registers)
     finish-allocation
     handled-intervals get ;

@@ -46,7 +46,7 @@ M: ##phi visit-insn
     ] if ;
 
 M: vreg-insn visit-insn
-    defs-vreg [ dup record-copy ] when* ;
+    defs-vregs [ dup record-copy ] each ;
 
 M: insn visit-insn drop ;
 

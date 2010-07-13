@@ -587,14 +587,8 @@ M:: x86 %spill ( src rep dst -- )
 M:: x86 %reload ( dst rep src -- )
     dst src rep %copy ;
 
-M:: x86 %store-stack-param ( src n rep -- )
-    n reserved-stack-space + stack@ src rep %copy ;
-
-: %load-return ( dst rep -- )
-    [ reg-class-of return-regs at first ] keep %load-reg-param ;
-
-: %store-return ( dst rep -- )
-    [ reg-class-of return-regs at first ] keep %store-reg-param ;
+M:: x86 %local-allot ( dst size align offset -- )
+    dst offset local-allot-offset special-offset stack@ LEA ;
 
 : next-stack@ ( n -- operand )
     #! nth parameter from the next stack frame. Used to box
@@ -603,14 +597,62 @@ M:: x86 %store-stack-param ( src n rep -- )
     #! set up by the caller.
     [ frame-reg ] dip 2 cells + reserved-stack-space + [+] ;
 
-M:: x86 %load-stack-param ( dst n rep -- )
-    dst n next-stack@ rep %copy ;
+: return-reg ( rep -- reg )
+    reg-class-of return-regs at first ;
 
-M:: x86 %local-allot ( dst size align offset -- )
-    dst offset local-allot-offset special-offset stack@ LEA ;
+:: %load-stack-param ( dst rep n -- )
+    rep return-reg n next-stack@ rep %copy
+    dst rep return-reg rep %copy ;
 
-M: x86 %alien-indirect ( src gc-map -- )
-    [ ?spill-slot CALL ] [ gc-map-here ] bi* ;
+:: %store-stack-param ( src rep n -- )
+    rep return-reg src rep %copy
+    n reserved-stack-space + stack@ rep return-reg rep %copy ;
+
+HOOK: %load-reg-param cpu ( vreg rep reg -- )
+
+HOOK: %store-reg-param cpu ( vreg rep reg -- )
+
+: %load-return ( dst rep -- )
+    dup return-reg %load-reg-param ;
+
+: %store-return ( dst rep -- )
+    dup return-reg %store-reg-param ;
+
+HOOK: %prepare-var-args cpu ( -- )
+
+HOOK: %cleanup cpu ( n -- )
+
+:: emit-alien-insn ( reg-inputs stack-inputs reg-outputs cleanup stack-size quot -- )
+    stack-inputs [ first3 %store-stack-param ] each
+    reg-inputs [ first3 %store-reg-param ] each
+    quot call
+    cleanup %cleanup
+    reg-outputs [ first3 %load-reg-param ] each ; inline
+
+M: x86 %alien-invoke ( reg-inputs stack-inputs reg-outputs cleanup stack-size symbols dll gc-map -- )
+    '[ _ _ _ %c-invoke ] emit-alien-insn ;
+
+M:: x86 %alien-indirect ( src reg-inputs stack-inputs reg-outputs cleanup stack-size gc-map -- )
+    reg-inputs stack-inputs reg-outputs cleanup stack-size [
+        src ?spill-slot CALL
+        gc-map gc-map-here
+    ] emit-alien-insn ;
+
+M: x86 %alien-assembly ( reg-inputs stack-inputs reg-outputs cleanup stack-size quot gc-map -- )
+    '[ _ _ gc-map set call( -- ) ] emit-alien-insn ;
+
+HOOK: %begin-callback cpu ( -- )
+
+M: x86 %callback-inputs ( reg-outputs stack-outputs -- )
+    [ [ first3 %load-reg-param ] each ]
+    [ [ first3 %load-stack-param ] each ] bi*
+    %begin-callback ;
+
+HOOK: %end-callback cpu ( -- )
+
+M: x86 %callback-outputs ( reg-inputs -- )
+    %end-callback
+    [ first3 %store-reg-param ] each ;
 
 M: x86 %loop-entry 16 alignment [ NOP ] times ;
 
@@ -655,20 +697,20 @@ M: x86 immediate-bitwise? ( n -- ? )
 
 :: (%compare-float) ( dst src1 src2 cc temp compare -- )
     cc {
-        { cc<    [ src2 src1 \ compare call( a b -- ) dst temp \ CMOVA  (%boolean) ] }
-        { cc<=   [ src2 src1 \ compare call( a b -- ) dst temp \ CMOVAE (%boolean) ] }
-        { cc>    [ src1 src2 \ compare call( a b -- ) dst temp \ CMOVA  (%boolean) ] }
-        { cc>=   [ src1 src2 \ compare call( a b -- ) dst temp \ CMOVAE (%boolean) ] }
-        { cc=    [ src1 src2 \ compare call( a b -- ) dst temp \ %cmov-float= (%boolean) ] }
-        { cc<>   [ src1 src2 \ compare call( a b -- ) dst temp \ CMOVNE (%boolean) ] }
-        { cc<>=  [ src1 src2 \ compare call( a b -- ) dst temp \ CMOVNP (%boolean) ] }
-        { cc/<   [ src2 src1 \ compare call( a b -- ) dst temp \ CMOVBE (%boolean) ] }
-        { cc/<=  [ src2 src1 \ compare call( a b -- ) dst temp \ CMOVB  (%boolean) ] }
-        { cc/>   [ src1 src2 \ compare call( a b -- ) dst temp \ CMOVBE (%boolean) ] }
-        { cc/>=  [ src1 src2 \ compare call( a b -- ) dst temp \ CMOVB  (%boolean) ] }
-        { cc/=   [ src1 src2 \ compare call( a b -- ) dst temp \ %cmov-float/= (%boolean) ] }
-        { cc/<>  [ src1 src2 \ compare call( a b -- ) dst temp \ CMOVE  (%boolean) ] }
-        { cc/<>= [ src1 src2 \ compare call( a b -- ) dst temp \ CMOVP  (%boolean) ] }
+        { cc<    [ src2 src1 compare call( a b -- ) dst temp \ CMOVA (%boolean) ] }
+        { cc<=   [ src2 src1 compare call( a b -- ) dst temp \ CMOVAE (%boolean) ] }
+        { cc>    [ src1 src2 compare call( a b -- ) dst temp \ CMOVA (%boolean) ] }
+        { cc>=   [ src1 src2 compare call( a b -- ) dst temp \ CMOVAE (%boolean) ] }
+        { cc=    [ src1 src2 compare call( a b -- ) dst temp \ %cmov-float= (%boolean) ] }
+        { cc<>   [ src1 src2 compare call( a b -- ) dst temp \ CMOVNE (%boolean) ] }
+        { cc<>=  [ src1 src2 compare call( a b -- ) dst temp \ CMOVNP (%boolean) ] }
+        { cc/<   [ src2 src1 compare call( a b -- ) dst temp \ CMOVBE (%boolean) ] }
+        { cc/<=  [ src2 src1 compare call( a b -- ) dst temp \ CMOVB (%boolean) ] }
+        { cc/>   [ src1 src2 compare call( a b -- ) dst temp \ CMOVBE (%boolean) ] }
+        { cc/>=  [ src1 src2 compare call( a b -- ) dst temp \ CMOVB (%boolean) ] }
+        { cc/=   [ src1 src2 compare call( a b -- ) dst temp \ %cmov-float/= (%boolean) ] }
+        { cc/<>  [ src1 src2 compare call( a b -- ) dst temp \ CMOVE (%boolean) ] }
+        { cc/<>= [ src1 src2 compare call( a b -- ) dst temp \ CMOVP (%boolean) ] }
     } case ; inline
 
 : %jump-float= ( label -- )
@@ -684,20 +726,20 @@ M: x86 immediate-bitwise? ( n -- ? )
 
 :: (%compare-float-branch) ( label src1 src2 cc compare -- )
     cc {
-        { cc<    [ src2 src1 \ compare call( a b -- ) label JA  ] }
-        { cc<=   [ src2 src1 \ compare call( a b -- ) label JAE ] }
-        { cc>    [ src1 src2 \ compare call( a b -- ) label JA  ] }
-        { cc>=   [ src1 src2 \ compare call( a b -- ) label JAE ] }
-        { cc=    [ src1 src2 \ compare call( a b -- ) label %jump-float= ] }
-        { cc<>   [ src1 src2 \ compare call( a b -- ) label JNE ] }
-        { cc<>=  [ src1 src2 \ compare call( a b -- ) label JNP ] }
-        { cc/<   [ src2 src1 \ compare call( a b -- ) label JBE ] }
-        { cc/<=  [ src2 src1 \ compare call( a b -- ) label JB  ] }
-        { cc/>   [ src1 src2 \ compare call( a b -- ) label JBE ] }
-        { cc/>=  [ src1 src2 \ compare call( a b -- ) label JB  ] }
-        { cc/=   [ src1 src2 \ compare call( a b -- ) label %jump-float/= ] }
-        { cc/<>  [ src1 src2 \ compare call( a b -- ) label JE  ] }
-        { cc/<>= [ src1 src2 \ compare call( a b -- ) label JP  ] }
+        { cc<    [ src2 src1 compare call( a b -- ) label JA ] }
+        { cc<=   [ src2 src1 compare call( a b -- ) label JAE ] }
+        { cc>    [ src1 src2 compare call( a b -- ) label JA ] }
+        { cc>=   [ src1 src2 compare call( a b -- ) label JAE ] }
+        { cc=    [ src1 src2 compare call( a b -- ) label %jump-float= ] }
+        { cc<>   [ src1 src2 compare call( a b -- ) label JNE ] }
+        { cc<>=  [ src1 src2 compare call( a b -- ) label JNP ] }
+        { cc/<   [ src2 src1 compare call( a b -- ) label JBE ] }
+        { cc/<=  [ src2 src1 compare call( a b -- ) label JB ] }
+        { cc/>   [ src1 src2 compare call( a b -- ) label JBE ] }
+        { cc/>=  [ src1 src2 compare call( a b -- ) label JB ] }
+        { cc/=   [ src1 src2 compare call( a b -- ) label %jump-float/= ] }
+        { cc/<>  [ src1 src2 compare call( a b -- ) label JE ] }
+        { cc/<>= [ src1 src2 compare call( a b -- ) label JP ] }
     } case ;
 
 enable-min/max

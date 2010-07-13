@@ -224,13 +224,13 @@ M: vreg-insn analyze-aliases
     ! anywhere its used as a tagged pointer. Boxing allocates
     ! a new value, except boxing instructions haven't been
     ! inserted yet.
-    dup defs-vreg [
-        over defs-vreg-rep { int-rep tagged-rep } member?
+    dup [
+        { int-rep tagged-rep } member?
         [ set-heap-ac ] [ set-new-ac ] if
-    ] when* ;
+    ] each-def-rep ;
 
 M: ##phi analyze-aliases
-    dup defs-vreg set-heap-ac ;
+    dup dst>> set-heap-ac ;
 
 M: ##allocation analyze-aliases
     #! A freshly allocated object is distinct from any other

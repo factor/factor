@@ -90,6 +90,7 @@ ERROR: register-already-used live-interval ;
     ! Any active intervals which have ended are moved to handled
     ! Any active intervals which cover the current position
     ! are moved to inactive
+    dup progress set
     active-intervals {
         { [ 2dup finished? ] [ finish ] }
         { [ 2dup covers? not ] [ deactivate ] }

@@ -36,7 +36,7 @@ IN: compiler.cfg.hats
 PRIVATE>
 
 insn-classes get [
-    dup [ insn-def-slot ] [ name>> "##" head? ] bi and
+    dup [ insn-def-slots length 1 = ] [ name>> "##" head? ] bi and
     [ define-hat ] [ drop ] if
 ] each
 

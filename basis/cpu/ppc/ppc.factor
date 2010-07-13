@@ -230,13 +230,13 @@ M: integer float-function-param* FMR ;
 
 M:: ppc %unary-float-function ( dst src func -- )
     0 src float-function-param
-    func f %alien-invoke
+    func f %c-invoke
     dst float-function-return ;
 
 M:: ppc %binary-float-function ( dst src1 src2 func -- )
     0 src1 float-function-param
     1 src2 float-function-param
-    func f %alien-invoke
+    func f %c-invoke
     dst float-function-return ;
 
 ! Internal format is always double-precision on PowerPC
@@ -513,7 +513,7 @@ M:: ppc %check-nursery-branch ( label size cc temp1 temp2 -- )
 M: ppc %call-gc ( gc-roots -- )
     3 swap gc-root-offsets %load-reference
     4 %load-vm-addr
-    "inline_gc" f %alien-invoke ;
+    "inline_gc" f %c-invoke ;
 
 M: ppc %prologue ( n -- )
     0 11 LOAD32 rc-absolute-ppc-2/2 rel-this
@@ -689,7 +689,7 @@ M: spill-slot store-param [ 1 ] dip n>> spill@ STW ;
 :: call-unbox-func ( src func -- )
     3 src load-param
     4 %load-vm-addr
-    func f %alien-invoke ;
+    func f %c-invoke ;
 
 M:: ppc %unbox ( src n rep func -- )
     src func call-unbox-func
@@ -708,12 +708,12 @@ M:: ppc %unbox-large-struct ( src n c-type -- )
     4 src load-param
     3 1 n local@ ADDI
     c-type heap-size 5 LI
-    "memcpy" "libc" load-library %alien-invoke ;
+    "memcpy" "libc" load-library %c-invoke ;
 
 M:: ppc %box ( dst n rep func -- )
     n [ 0 rep reg-class-of cdecl param-reg rep %load-param-reg ] when*
     rep double-rep? 5 4 ? %load-vm-addr
-    func f %alien-invoke
+    func f %c-invoke
     3 dst store-param ;
 
 M:: ppc %box-long-long ( dst n func -- )
@@ -722,7 +722,7 @@ M:: ppc %box-long-long ( dst n func -- )
         4 1 n cell + local@ LWZ
     ] when
     5 %load-vm-addr
-    func f %alien-invoke
+    func f %c-invoke
     3 dst store-param ;
 
 : struct-return@ ( n -- n )
@@ -740,7 +740,7 @@ M:: ppc %box-large-struct ( dst n c-type -- )
     c-type heap-size 4 LI
     5 %load-vm-addr
     ! Call the function
-    "from_value_struct" f %alien-invoke
+    "from_value_struct" f %c-invoke
     3 dst store-param ;
 
 M:: ppc %restore-context ( temp1 temp2 -- )
@@ -754,7 +754,7 @@ M:: ppc %save-context ( temp1 temp2 -- )
     ds-reg temp1 "datastack" context-field-offset STW
     rs-reg temp1 "retainstack" context-field-offset STW ;
 
-M: ppc %alien-invoke ( symbol dll -- )
+M: ppc %c-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
 
 M: ppc %alien-indirect ( src -- )
@@ -773,7 +773,7 @@ M:: ppc %box-small-struct ( dst c-type -- )
     #! Box a <= 16-byte struct returned in r3:r4:r5:r6
     c-type heap-size 7 LI
     8 %load-vm-addr
-    "from_medium_struct" f %alien-invoke
+    "from_medium_struct" f %c-invoke
     3 dst store-param ;
 
 : %unbox-struct-1 ( -- )
@@ -802,7 +802,7 @@ M:: ppc %unbox-small-struct ( src c-type -- )
 
 M: ppc %begin-callback ( -- )
     3 %load-vm-addr
-    "begin_callback" f %alien-invoke ;
+    "begin_callback" f %c-invoke ;
 
 M: ppc %alien-callback ( quot -- )
     3 swap %load-reference
@@ -812,7 +812,7 @@ M: ppc %alien-callback ( quot -- )
 
 M: ppc %end-callback ( -- )
     3 %load-vm-addr
-    "end_callback" f %alien-invoke ;
+    "end_callback" f %c-invoke ;
 
 enable-float-functions
 
