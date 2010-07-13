@@ -45,7 +45,7 @@ M: node hashcode* nip number>> ;
     ! we only care about local def-use
     H{ } clone :> definers
     nodes [| node |
-        node insn>> defs-vreg [ node swap definers set-at ] when*
+        node insn>> defs-vregs [ node swap definers set-at ] each
         node insn>> uses-vregs [ definers at [ node +data+ precedes ] when* ] each
     ] each ;
 

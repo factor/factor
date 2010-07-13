@@ -54,8 +54,11 @@ M: live-interval covers? ( insn# live-interval -- ? )
         covers?
     ] if ;
 
+: (find-use) ( insn# live-interval -- vreg-use )
+    uses>> [ n>> <=> ] with search nip ;
+
 :: find-use ( insn# live-interval -- vreg-use )
-    insn# live-interval uses>> [ n>> <=> ] with search nip
+    insn# live-interval (find-use)
     dup [ dup n>> insn# = [ drop f ] unless ] when ;
 
 : add-new-range ( from to live-interval -- )
@@ -122,7 +125,7 @@ M: insn compute-live-intervals* drop ;
 
 M: vreg-insn compute-live-intervals* ( insn -- )
     dup insn#>>
-    [ [ defs-vreg ] dip '[ _ record-def ] when* ]
+    [ [ defs-vregs ] dip '[ _ record-def ] each ]
     [ [ uses-vregs ] dip '[ _ record-use ] each ]
     [ [ temp-vregs ] dip '[ _ record-temp ] each ]
     2tri ;

@@ -587,10 +587,6 @@ HOOK: %unbox cpu ( dst src func rep -- )
 
 HOOK: %unbox-long-long cpu ( src out func -- )
 
-HOOK: %store-reg-param cpu ( src reg rep -- )
-
-HOOK: %store-stack-param cpu ( src n rep -- )
-
 HOOK: %local-allot cpu ( dst size align offset -- )
 
 ! Call a function to convert a value into a tagged pointer,
@@ -604,28 +600,18 @@ HOOK: %allot-byte-array cpu ( dst size gc-map -- )
 
 HOOK: %save-context cpu ( temp1 temp2 -- )
 
-HOOK: %prepare-var-args cpu ( -- )
+HOOK: %c-invoke cpu ( symbols dll gc-map -- )
 
-M: object %prepare-var-args ;
+HOOK: %alien-invoke cpu ( reg-inputs stack-inputs reg-outputs cleanup stack-size symbols dll gc-map -- )
 
-HOOK: %alien-invoke cpu ( function library gc-map -- )
+HOOK: %alien-indirect cpu ( src reg-inputs stack-inputs reg-outputs cleanup stack-size gc-map -- )
 
-HOOK: %cleanup cpu ( n -- )
+HOOK: %alien-assembly cpu ( reg-inputs stack-inputs reg-outputs cleanup stack-size quot gc-map -- )
 
-M: object %cleanup ( n -- ) drop ;
-
-HOOK: %alien-indirect cpu ( src gc-map -- )
-
-HOOK: %load-reg-param cpu ( dst reg rep -- )
-
-HOOK: %load-stack-param cpu ( dst n rep -- )
-
-HOOK: %begin-callback cpu ( -- )
+HOOK: %callback-inputs cpu ( reg-outputs stack-outputs -- )
 
 HOOK: %alien-callback cpu ( quot -- )
 
-HOOK: %end-callback cpu ( -- )
+HOOK: %callback-outputs cpu ( reg-inputs -- )
 
 HOOK: stack-cleanup cpu ( stack-size return abi -- n )
-
-M: object stack-cleanup 3drop 0 ;

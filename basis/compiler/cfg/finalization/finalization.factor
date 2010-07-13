@@ -3,7 +3,7 @@
 USING: kernel compiler.cfg.gc-checks
 compiler.cfg.representations compiler.cfg.save-contexts
 compiler.cfg.ssa.destruction compiler.cfg.build-stack-frame
-compiler.cfg.linear-scan compiler.cfg.scheduling
+compiler.cfg.linear-scan
 compiler.cfg.stacks.uninitialized ;
 IN: compiler.cfg.finalization
 
