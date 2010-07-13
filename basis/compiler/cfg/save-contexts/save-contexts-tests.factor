@@ -44,10 +44,6 @@ V{
 
 V{
     T{ ##inc-d f 3 }
-    T{ ##load-reg-param f 0 RCX int-rep }
-    T{ ##load-reg-param f 1 RDX int-rep }
-    T{ ##load-reg-param f 2 R8 int-rep }
-    T{ ##begin-callback }
     T{ ##box f 4 3 "from_signed_4" int-rep
         T{ gc-map { scrub-d B{ 0 0 0 } } { scrub-r B{ } } { gc-roots { } } }
     }
@@ -58,11 +54,7 @@ V{
 [
     V{
         T{ ##inc-d f 3 }
-        T{ ##load-reg-param f 0 RCX int-rep }
-        T{ ##load-reg-param f 1 RDX int-rep }
-        T{ ##load-reg-param f 2 R8 int-rep }
         T{ ##save-context f 5 6 }
-        T{ ##begin-callback }
         T{ ##box f 4 3 "from_signed_4" int-rep
             T{ gc-map { scrub-d B{ 0 0 0 } } { scrub-r B{ } } { gc-roots { } } }
         }

@@ -61,9 +61,7 @@ M: insn gc-check-offsets* 2drop ;
 GENERIC: allocation-size* ( insn -- n )
 
 M: ##allot allocation-size* size>> ;
-
 M: ##box-alien allocation-size* drop 5 cells ;
-
 M: ##box-displaced-alien allocation-size* drop 5 cells ;
 
 : allocation-size ( insns -- n )
