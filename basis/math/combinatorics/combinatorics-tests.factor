@@ -70,3 +70,20 @@ IN: math.combinatorics.tests
 [ { { "a" "b" } { "a" "c" }
     { "a" "d" } { "b" "c" }
     { "b" "d" } { "c" "d" } } ] [ { "a" "b" "c" "d" } 2 all-combinations ] unit-test
+
+[ { { } } ] [ { } all-subsets ] unit-test
+
+[ { { } { 1 } { 2 } { 3 } { 1 2 } { 1 3 } { 2 3 } { 1 2 3 } } ]
+[ { 1 2 3 } all-subsets ] unit-test
+
+[ { } ] [ { 1 2 } 0 selections ] unit-test
+
+[ { { 1 2 } } ] [ { 1 2 } 1 selections ] unit-test
+
+[ { { 1 1 } { 1 2 } { 2 1 } { 2 2 } } ]
+[ { 1 2 } 2 selections ] unit-test
+
+[ { { 1 1 1 } { 1 1 2 } { 1 2 1 } { 1 2 2 }
+    { 2 1 1 } { 2 1 2 } { 2 2 1 } { 2 2 2 } } ]
+[ { 1 2 } 3 selections ] unit-test
+
