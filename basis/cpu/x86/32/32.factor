@@ -96,6 +96,20 @@ M: x86.32 %prologue ( n -- )
 M: x86.32 %prepare-jump
     pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
 
+M: x86.32 %load-stack-param ( dst rep n -- )
+    next-stack@ swap {
+        { int-rep [ [ EAX ] dip MOV ?spill-slot EAX MOV ] }
+        { float-rep [ FLDS ?spill-slot FSTPS ] }
+        { double-rep [ FLDL ?spill-slot FSTPL ] }
+    } case ;
+
+M: x86.32 %store-stack-param ( src rep n -- )
+    reserved-stack-space + stack@ swap {
+        { int-rep [ [ [ EAX ] dip ?spill-slot MOV ] [ EAX MOV ] bi* ] }
+        { float-rep [ [ ?spill-slot FLDS ] [ FSTPS ] bi* ] }
+        { double-rep [ [ ?spill-slot FLDL ] [ FSTPL ] bi* ] }
+    } case ;
+
 :: load-float-return ( dst x87-insn rep -- )
     dst register? [
         ESP 4 SUB
@@ -192,10 +206,10 @@ M:: spill-slot float-function-param ( n dst src -- )
     ! We can clobber dst here since its going to contain the
     ! final result
     dst src double-rep %copy
-    dst n double-rep %store-stack-param ;
+    dst double-rep n %store-stack-param ;
 
 M:: register float-function-param ( n dst src -- )
-    src n double-rep %store-stack-param ;
+    src double-rep n %store-stack-param ;
 
 M:: x86.32 %unary-float-function ( dst src func -- )
     0 dst src float-function-param

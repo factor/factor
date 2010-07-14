@@ -600,13 +600,9 @@ M:: x86 %local-allot ( dst size align offset -- )
 : return-reg ( rep -- reg )
     reg-class-of return-regs at first ;
 
-:: %load-stack-param ( dst rep n -- )
-    rep return-reg n next-stack@ rep %copy
-    dst rep return-reg rep %copy ;
+HOOK: %load-stack-param cpu ( vreg rep n -- )
 
-:: %store-stack-param ( src rep n -- )
-    rep return-reg src rep %copy
-    n reserved-stack-space + stack@ rep return-reg rep %copy ;
+HOOK: %store-stack-param cpu ( vreg rep n -- )
 
 HOOK: %load-reg-param cpu ( vreg rep reg -- )
 
