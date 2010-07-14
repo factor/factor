@@ -81,6 +81,14 @@ M: x86.64 %mark-deck
     dup load-decks-offset
     [+] card-mark <byte> MOV ;
 
+M:: x86.64 %load-stack-param ( vreg rep n -- )
+    rep return-reg n next-stack@ rep %copy
+    dst rep return-reg rep %copy ;
+
+M:: x86.64 %store-stack-param ( vreg rep n -- )
+    rep return-reg src rep %copy
+    n reserved-stack-space + stack@ rep return-reg rep %copy ;
+
 M:: x86.64 %load-reg-param ( vreg rep reg -- )
     vreg reg rep %copy ;
 
