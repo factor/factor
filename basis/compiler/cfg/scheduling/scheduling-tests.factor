@@ -1,4 +1,5 @@
-USING: compiler.cfg.scheduling vocabs.loader namespaces tools.test ;
+USING: compiler.cfg.scheduling compiler.cfg.instructions
+vocabs.loader namespaces tools.test arrays kernel ;
 IN: compiler.cfg.scheduling.tests
 
 ! Recompile compiler.cfg.scheduling with extra tests,
@@ -9,3 +10,31 @@ t check-scheduling? [
     [ ] [ "compiler.cfg.scheduling" reload ] unit-test
     [ ] [ "compiler.cfg.dependence" reload ] unit-test
 ] with-variable
+
+[
+    { }
+    { }
+    { T{ ##test-branch } }
+] [
+    V{ T{ ##test-branch } }
+    split-3-ways
+    [ >array ] tri@
+] unit-test
+
+[
+    { T{ ##inc-d } T{ ##inc-r } T{ ##callback-inputs } }
+    { T{ ##add } T{ ##sub } T{ ##mul } }
+    { T{ ##test-branch } }
+] [
+    V{
+        T{ ##inc-d }
+        T{ ##inc-r }
+        T{ ##callback-inputs }
+        T{ ##add }
+        T{ ##sub }
+        T{ ##mul }
+        T{ ##test-branch }
+    }
+    split-3-ways
+    [ >array ] tri@
+] unit-test

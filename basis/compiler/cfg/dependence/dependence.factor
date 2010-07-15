@@ -24,7 +24,7 @@ TUPLE: node
     children parent
     registers parent-index ;
 
-M: node equal?  [ number>> ] bi@ = ;
+M: node equal? over node? [ [ number>> ] bi@ = ] [ 2drop f ] if ;
 
 M: node hashcode* nip number>> ;
 
@@ -56,12 +56,9 @@ UNION: slot-insn
 
 UNION: memory-insn
     ##load-memory ##load-memory-imm
-    ##store-memory ##store-memory-imm ;
-
-UNION: alien-call-insn
-    ##save-context
-    ##alien-invoke ##alien-indirect ##alien-callback
-    ##unary-float-function ##binary-float-function ;
+    ##store-memory ##store-memory-imm
+    alien-call-insn
+    slot-insn ;
 
 : chain ( node var -- )
     dup get [
@@ -71,24 +68,14 @@ UNION: alien-call-insn
 
 GENERIC: add-control-edge ( node insn -- )
 
-M: stack-insn add-control-edge
-    loc>> chain ;
+M: stack-insn add-control-edge loc>> chain ;
 
-M: memory-insn add-control-edge
-    drop memory-insn chain ;
-
-M: slot-insn add-control-edge
-    drop slot-insn chain ;
-
-M: alien-call-insn add-control-edge
-    drop alien-call-insn chain ;
+M: memory-insn add-control-edge drop memory-insn chain ;
 
 M: object add-control-edge 2drop ;
 
 : add-control-edges ( nodes -- )
-    [
-        [ dup insn>> add-control-edge ] each
-    ] with-scope ;
+    [ [ dup insn>> add-control-edge ] each ] with-scope ;
 
 : set-follows ( nodes -- )
     [
