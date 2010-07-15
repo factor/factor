@@ -158,27 +158,23 @@ M:: x86.32 %unbox ( dst src func rep -- )
     src func call-unbox-func
     dst rep %load-return ;
 
-M:: x86.32 %unbox-long-long ( src out func -- )
-    EAX src int-rep %copy
-    0 stack@ EAX MOV
-    EAX out int-rep %copy
-    4 stack@ EAX MOV
-    8 save-vm-ptr
-    func f f %c-invoke ;
+M:: x86.32 %unbox-long-long ( dst1 dst2 src func -- )
+    src int-rep 0 %store-stack-param
+    4 save-vm-ptr
+    func f f %c-invoke
+    dst1 EAX int-rep %copy
+    dst2 EDX int-rep %copy ;
 
 M:: x86.32 %box ( dst src func rep gc-map -- )
+    src rep 0 %store-stack-param
     rep rep-size save-vm-ptr
-    src rep %store-return
-    0 stack@ rep %load-return
     func f gc-map %c-invoke
     dst EAX tagged-rep %copy ;
 
 M:: x86.32 %box-long-long ( dst src1 src2 func gc-map -- )
+    src1 int-rep 0 %store-stack-param
+    src2 int-rep 4 %store-stack-param
     8 save-vm-ptr
-    EAX src1 int-rep %copy
-    0 stack@ EAX int-rep %copy
-    EAX src2 int-rep %copy
-    4 stack@ EAX int-rep %copy
     func f gc-map %c-invoke
     dst EAX tagged-rep %copy ;
 
