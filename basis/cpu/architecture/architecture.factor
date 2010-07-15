@@ -585,7 +585,7 @@ HOOK: struct-return-on-stack? cpu ( -- ? )
 ! can be passed to a C function, or returned from a callback
 HOOK: %unbox cpu ( dst src func rep -- )
 
-HOOK: %unbox-long-long cpu ( src out func -- )
+HOOK: %unbox-long-long cpu ( dst1 dst2 src func -- )
 
 HOOK: %local-allot cpu ( dst size align offset -- )
 
