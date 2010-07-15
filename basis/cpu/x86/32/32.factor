@@ -97,18 +97,22 @@ M: x86.32 %prepare-jump
     pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
 
 M: x86.32 %load-stack-param ( dst rep n -- )
-    next-stack@ swap {
-        { int-rep [ [ EAX ] dip MOV ?spill-slot EAX MOV ] }
-        { float-rep [ FLDS ?spill-slot FSTPS ] }
-        { double-rep [ FLDL ?spill-slot FSTPL ] }
-    } case ;
+    next-stack@ swap pick register? [ %copy ] [
+        {
+            { int-rep [ [ EAX ] dip MOV ?spill-slot EAX MOV ] }
+            { float-rep [ FLDS ?spill-slot FSTPS ] }
+            { double-rep [ FLDL ?spill-slot FSTPL ] }
+        } case
+    ] if ;
 
 M: x86.32 %store-stack-param ( src rep n -- )
-    reserved-stack-space + stack@ swap {
-        { int-rep [ [ [ EAX ] dip ?spill-slot MOV ] [ EAX MOV ] bi* ] }
-        { float-rep [ [ ?spill-slot FLDS ] [ FSTPS ] bi* ] }
-        { double-rep [ [ ?spill-slot FLDL ] [ FSTPL ] bi* ] }
-    } case ;
+    stack@ swap pick register? [ [ swap ] dip %copy ] [
+        {
+            { int-rep [ [ [ EAX ] dip ?spill-slot MOV ] [ EAX MOV ] bi* ] }
+            { float-rep [ [ ?spill-slot FLDS ] [ FSTPS ] bi* ] }
+            { double-rep [ [ ?spill-slot FLDL ] [ FSTPL ] bi* ] }
+        } case
+    ] if ;
 
 :: load-float-return ( dst x87-insn rep -- )
     dst register? [
@@ -200,25 +204,14 @@ M: x86.32 %end-callback ( -- )
     0 save-vm-ptr
     "end_callback" f f %c-invoke ;
 
-GENERIC: float-function-param ( n dst src -- )
-
-M:: spill-slot float-function-param ( n dst src -- )
-    ! We can clobber dst here since its going to contain the
-    ! final result
-    dst src double-rep %copy
-    dst double-rep n %store-stack-param ;
-
-M:: register float-function-param ( n dst src -- )
-    src double-rep n %store-stack-param ;
-
 M:: x86.32 %unary-float-function ( dst src func -- )
-    0 dst src float-function-param
+    src double-rep 0 %store-stack-param
     func "libm" load-library f %c-invoke
     dst double-rep %load-return ;
 
 M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
-    0 dst src1 float-function-param
-    8 dst src2 float-function-param
+    src1 double-rep 0 %store-stack-param
+    src2 double-rep 8 %store-stack-param
     func "libm" load-library f %c-invoke
     dst double-rep %load-return ;
 
