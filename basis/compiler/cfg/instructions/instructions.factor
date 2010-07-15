@@ -645,7 +645,8 @@ use: src/tagged-rep
 literal: unboxer rep ;
 
 FOLDABLE-INSN: ##unbox-long-long
-use: src/tagged-rep out/int-rep
+def: dst1/int-rep dst2/int-rep
+use: src/tagged-rep
 literal: unboxer ;
 
 FLUSHABLE-INSN: ##local-allot
@@ -875,7 +876,8 @@ UNION: hairy-clobber-insn
 ##call-gc
 alien-call-insn
 ##callback-inputs
-##callback-outputs ;
+##callback-outputs
+##unbox-long-long ;
 
 ! Instructions that clobber registers but are allowed to produce
 ! outputs in registers. Inputs are in spill slots, except for
@@ -886,7 +888,6 @@ hairy-clobber-insn
 ##unary-float-function
 ##binary-float-function
 ##unbox
-##unbox-long-long
 ##box
 ##box-long-long
 ##allot-byte-array ;
