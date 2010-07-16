@@ -56,6 +56,7 @@ UNION: initial-insn ##phi ##inc-d ##inc-r ##callback-inputs ;
 
 UNION: final-insn
 ##branch
+##dispatch
 conditional-branch-insn
 ##epilogue ##return
 ##callback-outputs ;
