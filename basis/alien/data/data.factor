@@ -70,7 +70,10 @@ M: value-type c-type-rep drop int-rep ;
 M: value-type c-type-getter
     drop [ swap <displaced-alien> ] ;
 
-M: value-type c-type-setter ( type -- quot )
+M: value-type c-type-copier
+    heap-size '[ _ memory>byte-array ] ;
+
+M: value-type c-type-setter
     [ c-type-getter ] [ heap-size ] bi '[ @ swap _ memcpy ] ;
 
 M: array c-type-boxer-quot
@@ -117,7 +120,7 @@ MACRO: box-values ( c-types -- quot )
 
 MACRO: out-parameters ( c-types -- quot )
     [ dup hairy-local-allot? [ first ] when ] map
-    [ length ] [ [ '[ 0 _ alien-value ] ] map ] bi
+    [ length ] [ [ '[ 0 _ alien-copy-value ] ] map ] bi
     '[ _ nkeep _ spread ] ;
 
 PRIVATE>
@@ -126,8 +129,8 @@ PRIVATE>
     [ [ (local-allots) ] [ box-values ] bi ] dip call
     (cleanup-allot) ; inline
 
-: with-out-parameters ( c-types quot finish -- values... )
-    [ [ drop (local-allots) ] [ swap out-parameters ] 2bi ] dip call
+: with-out-parameters ( c-types quot -- values... )
+    [ drop (local-allots) ] [ swap out-parameters ] 2bi
     (cleanup-allot) ; inline
 
 GENERIC: binary-zero? ( value -- ? )
@@ -137,4 +140,3 @@ M: f binary-zero? drop t ; inline
 M: integer binary-zero? zero? ; inline
 M: math:float binary-zero? double>bits zero? ; inline
 M: complex binary-zero? >rect [ binary-zero? ] both? ; inline
-

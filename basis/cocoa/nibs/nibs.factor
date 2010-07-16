@@ -16,6 +16,6 @@ IN: cocoa.nibs
 
 : nib-objects ( anNSNib -- objects/f )
     f
-    { void* } [ -> instantiateNibWithOwner:topLevelObjects: ] [ ]
+    { void* } [ -> instantiateNibWithOwner:topLevelObjects: ]
     with-out-parameters
     swap [ CF>array ] [ drop f ] if ;

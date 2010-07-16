@@ -57,7 +57,7 @@ M: cocoa-ui-backend (pixel-format-attribute)
     [ drop f ]
     [
         first
-        { int } [ swap 0 -> getValues:forAttribute:forVirtualScreen: ] [ ]
+        { int } [ swap 0 -> getValues:forAttribute:forVirtualScreen: ]
         with-out-parameters
     ] if-empty ;
 

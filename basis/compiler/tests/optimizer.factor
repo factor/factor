@@ -454,7 +454,6 @@ STRUCT: BitmapData { Scan0 void* } ;
     [
         { BitmapData }
         [ BitmapData memory>struct ALIEN: 123 >>Scan0 drop ]
-        [ clone ]
         with-out-parameters Scan0>>
     ] compile-call
 ] unit-test
