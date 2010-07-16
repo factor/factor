@@ -35,9 +35,6 @@ PRIVATE>
 {
     { [ os macosx? ] [ "images.cocoa"   require ] }
     { [ os winnt?  ] [ "images.gdiplus" require ] }
-    [
-        "images.png" require
-        "images.tiff" require
-    ]
+    [ "images.gtk" require ]
 } cond
 >>
