@@ -1,0 +1,1 @@
+Image loading using GTK's GdkPixbuf API
