@@ -31,3 +31,13 @@ PRIVATE>
 : image-dim ( image-name -- dim )
     cached-image dim>> ;
 
+<<
+{
+    { [ os macosx? ] [ "images.cocoa"   require ] }
+    { [ os winnt?  ] [ "images.gdiplus" require ] }
+    [
+        "images.png" require
+        "images.tiff" require
+    ]
+} cond
+>>
