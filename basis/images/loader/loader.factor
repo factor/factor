@@ -3,7 +3,7 @@
 USING: assocs byte-arrays io.encodings.binary io.files
 io.pathnames io.streams.byte-array io.streams.limited
 io.streams.throwing kernel namespaces sequences strings
-unicode.case fry system vocabs.loader combinators ;
+unicode.case fry ;
 IN: images.loader
 
 ERROR: unknown-image-extension extension ;
@@ -51,13 +51,3 @@ GENERIC: image>stream ( image class -- )
     [ image-class ] [ ] bi
     binary [ image>stream ] with-file-writer ;
 
-<<
-{
-    { [ os macosx? ] [ "images.cocoa"   require ] }
-    { [ os winnt?  ] [ "images.gdiplus" require ] }
-    [
-        "images.png" require
-        "images.tiff" require
-    ]
-} cond
->>
