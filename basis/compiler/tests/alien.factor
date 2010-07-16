@@ -777,18 +777,18 @@ mingw? [
 [ 3 ] [ blah ] unit-test
 
 : out-param-test-1 ( -- b )
-    { int } [ [ 12 ] dip 0 int set-alien-value ] [ ] with-out-parameters ;
+    { int } [ [ 12 ] dip 0 int set-alien-value ] with-out-parameters ;
 
 [ 12 ] [ out-param-test-1 ] unit-test
 
 : out-param-test-2 ( -- b )
-    { { int initial: 12 } } [ drop ] [ ] with-out-parameters ;
+    { { int initial: 12 } } [ drop ] with-out-parameters ;
 
 [ 12 ] [ out-param-test-2 ] unit-test
 
 : out-param-test-3 ( -- x y )
     { { RECT initial: S{ RECT { x 3 } { y 4 } } } } [ drop ]
-    [ clone ] with-out-parameters
+    with-out-parameters
     [ x>> ] [ y>> ] bi ;
 
 [ 3.0 4.0 ] [ out-param-test-3 ] unit-test
@@ -801,6 +801,6 @@ mingw? [
     { int } [
         swap void { int pointer: int } cdecl
         alien-indirect
-    ] [ ] with-out-parameters ;
+    ] with-out-parameters ;
 
 [ 12 ] [ 6 out-param-callback out-param-indirect ] unit-test

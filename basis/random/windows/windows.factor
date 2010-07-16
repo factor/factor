@@ -23,7 +23,7 @@ CONSTANT: factor-crypto-container "FactorCryptoContainer"
         type
         flags
         CryptAcquireContextW
-    ] [ ] with-out-parameters ;
+    ] with-out-parameters ;
 
 : acquire-crypto-context ( provider type -- handle )
     CRYPT_MACHINE_KEYSET

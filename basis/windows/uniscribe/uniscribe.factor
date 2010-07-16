@@ -20,12 +20,12 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
         swap ! icp
         FALSE ! fTrailing
     ] if
-    { int } [ ScriptStringCPtoX ole32-error ] [ ] with-out-parameters ;
+    { int } [ ScriptStringCPtoX ole32-error ] with-out-parameters ;
 
 : x>line-offset ( x script-string -- n trailing )
     ssa>> ! ssa
     swap ! iX
-    { int int } [ ScriptStringXtoCP ole32-error ] [ ] with-out-parameters ;
+    { int int } [ ScriptStringXtoCP ole32-error ] with-out-parameters ;
 
 <PRIVATE
 

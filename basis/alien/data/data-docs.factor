@@ -76,7 +76,7 @@ scoped-allocation-test ."
 } ;
 
 HELP: with-out-parameters
-{ $values { "c-types" "a list of scoped allocation specifiers" } { "quot" quotation } { "finish" quotation } { "values..." "zero or more values" } }
+{ $values { "c-types" "a list of scoped allocation specifiers" } { "quot" quotation } { "values..." "zero or more values" } }
 { $description "Allocates values on the call stack, calls the quotation, then copies all stack allocated values to the data heap after the quotation returns."
 $nl
 "A scoped allocation specifier is either:"

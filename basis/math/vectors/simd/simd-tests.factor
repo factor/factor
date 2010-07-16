@@ -684,7 +684,7 @@ USE: alien
     { c:int float-4 } [
         [ 123 swap 0 c:int c:set-alien-value ]
         [ float-4{ 1 2 3 4 } swap 0 float-4 c:set-alien-value ] bi*
-    ] [ ] with-out-parameters ;
+    ] with-out-parameters ;
 
 [ 123 float-4{ 1 2 3 4 } ] [ simd-stack-test ] unit-test
 
@@ -696,7 +696,7 @@ USE: alien
     { c:int } [
         123 swap 0 c:int c:set-alien-value
         >float (simd-stack-spill-test) float-4-with swap cos v*n
-    ] [ ] with-out-parameters ;
+    ] with-out-parameters ;
 
 [ ] [
     1.047197551196598 simd-stack-spill-test

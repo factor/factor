@@ -48,9 +48,8 @@ M: evp-md-context dispose*
 : digest-value ( ctx -- value )
     handle>>
     { { int EVP_MAX_MD_SIZE } int }
-    [ EVP_DigestFinal_ex ssl-error ]
-    [ memory>byte-array ]
-    with-out-parameters ;
+    [ EVP_DigestFinal_ex ssl-error ] with-out-parameters
+    memory>byte-array ;
 
 PRIVATE>
 
