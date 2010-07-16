@@ -67,7 +67,7 @@ TYPEDEF: guint16 gunichar2
 TYPEDEF: gpointer pointer
 TYPEDEF: gpointer any
 
-IMPLEMENT-STRUCTS: GPollFD GSource GSourceFuncs ;
+IMPLEMENT-STRUCTS: GError GPollFD GSource GSourceFuncs ;
 
 GIR: vocab:glib/GLib-2.0.gir
 
