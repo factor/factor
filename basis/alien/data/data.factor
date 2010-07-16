@@ -2,7 +2,8 @@
 USING: accessors alien alien.c-types alien.arrays alien.strings
 arrays byte-arrays cpu.architecture fry io io.encodings.binary
 io.files io.streams.memory kernel libc math math.functions 
-sequences words macros combinators generalizations ;
+sequences words macros combinators generalizations
+stack-checker.dependencies combinators.short-circuit ;
 QUALIFIED: math
 IN: alien.data
 
@@ -88,13 +89,34 @@ ERROR: local-allocation-error ;
     ! to still be abl to access scope-allocated data.
     ;
 
+MACRO: (simple-local-allot) ( c-type -- quot )
+    [ depends-on-c-type ]
+    [ dup '[ _ heap-size _ c-type-align (local-allot) ] ] bi ;
+
+: [hairy-local-allot] ( c-type initial -- quot )
+    over '[ _ (simple-local-allot) _ over 0 _ set-alien-value ] ;
+
+: hairy-local-allot? ( obj -- ? )
+    {
+        [ array? ]
+        [ length 3 = ]
+        [ second initial: eq? ]
+    } 1&& ;
+
+MACRO: (hairy-local-allot) ( obj -- quot )
+    dup hairy-local-allot?
+    [ first3 nip [hairy-local-allot] ]
+    [ '[ _ (simple-local-allot) ] ]
+    if ;
+
 MACRO: (local-allots) ( c-types -- quot )
-    [ '[ _ [ heap-size ] [ c-type-align ] bi (local-allot) ] ] map [ ] join ;
+    [ '[ _ (hairy-local-allot) ] ] map [ ] join ;
 
 MACRO: box-values ( c-types -- quot )
     [ c-type-boxer-quot ] map '[ _ spread ] ;
 
 MACRO: out-parameters ( c-types -- quot )
+    [ dup hairy-local-allot? [ first ] when ] map
     [ length ] [ [ '[ 0 _ alien-value ] ] map ] bi
     '[ _ nkeep _ spread ] ;
 
@@ -104,7 +126,7 @@ PRIVATE>
     [ [ (local-allots) ] [ box-values ] bi ] dip call
     (cleanup-allot) ; inline
 
-: with-out-parameters ( c-types quot finish -- values )
+: with-out-parameters ( c-types quot finish -- values... )
     [ [ drop (local-allots) ] [ swap out-parameters ] 2bi ] dip call
     (cleanup-allot) ; inline
 
