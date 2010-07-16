@@ -1,7 +1,7 @@
 USING: alien alien.c-types help.syntax help.markup libc
 kernel.private byte-arrays math strings hashtables alien.syntax
 alien.strings sequences io.encodings.string debugger destructors
-vocabs.loader classes.struct ;
+vocabs.loader classes.struct quotations ;
 IN: alien.data
 
 HELP: <c-array>
@@ -43,6 +43,49 @@ HELP: malloc-byte-array
 { <c-array> <c-direct-array> malloc-array } related-words
 
 { string>alien alien>string malloc-string } related-words
+
+HELP: with-scoped-allocation
+{ $values { "c-types" "a list of scoped allocation specifiers" } { "quot" quotation } }
+{ $description "Allocates values on the call stack, calls the quotation, then deallocates the values as soon as the quotation returns."
+$nl
+"A scoped allocation specifier is either:"
+{ $list
+    "a C type name,"
+    { "or a triple with shape " { $snippet "{ c-type initial: initial }" } ", where " { $snippet "c-type" } " is a C type name and " { $snippet "initial" } " is a literal value." }
+}
+"If no initial value is specified, the contents of the allocated memory are undefined." }
+{ $warning "Reading or writing a scoped allocation buffer outside of the given quotation will cause memory corruption." }
+{ $examples
+    { $example
+        "USING: accessors alien.c-types alien.data
+classes.struct kernel math math.functions
+prettyprint ;
+IN: scratchpad
+
+STRUCT: point { x int } { y int } ;
+
+: scoped-allocation-test ( -- x )
+    { point } [
+        3 >>x 4 >>y
+        [ x>> sq ] [ y>> sq ] bi + sqrt
+    ] with-scoped-allocation ;
+
+scoped-allocation-test ."
+"5.0"
+    }
+} ;
+
+HELP: with-out-parameters
+{ $values { "c-types" "a list of scoped allocation specifiers" } { "quot" quotation } { "finish" quotation } { "values..." "zero or more values" } }
+{ $description "Allocates values on the call stack, calls the quotation, then copies all stack allocated values to the data heap after the quotation returns."
+$nl
+"A scoped allocation specifier is either:"
+{ $list
+    "a C type name,"
+    { "or a triple with shape " { $snippet "{ c-type initial: initial }" } ", where " { $snippet "c-type" } " is a C type name and " { $snippet "initial" } " is a literal value." }
+}
+"If no initial value is specified, the contents of the allocated memory are undefined." }
+{ $warning "Reading or writing a scoped allocation buffer outside of the given quotation will cause memory corruption." } ;
 
 ARTICLE: "malloc" "Manual memory management"
 "Sometimes data passed to C functions must be allocated at a fixed address. See " { $link "byte-arrays-gc" } " for an explanation of when this is the case."
