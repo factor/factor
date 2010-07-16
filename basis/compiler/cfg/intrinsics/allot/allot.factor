@@ -66,13 +66,12 @@ IN: compiler.cfg.intrinsics.allot
     16 + byte-array ^^allot ;
 
 : emit-allot-byte-array ( len -- dst )
-    ds-drop
     dup ^^allot-byte-array
     [ byte-array store-length ] [ ds-push ] [ ] tri ;
 
 : emit-(byte-array) ( node -- )
     dup node-input-infos first literal>> dup expand-(byte-array)?
-    [ nip emit-allot-byte-array drop ] [ drop emit-primitive ] if ;
+    [ nip ds-drop emit-allot-byte-array drop ] [ drop emit-primitive ] if ;
 
 :: zero-byte-array ( len reg -- )
     0 ^^load-literal :> elt
@@ -84,6 +83,7 @@ IN: compiler.cfg.intrinsics.allot
 :: emit-<byte-array> ( node -- )
     node node-input-infos first literal>> dup expand-<byte-array>? [
         :> len
+        ds-drop
         len emit-allot-byte-array :> reg
         len reg zero-byte-array
     ] [ drop node emit-primitive ] if ;

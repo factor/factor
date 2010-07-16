@@ -596,8 +596,6 @@ HOOK: %box cpu ( dst src func rep gc-map -- )
 
 HOOK: %box-long-long cpu ( dst src1 src2 func gc-map -- )
 
-HOOK: %allot-byte-array cpu ( dst size gc-map -- )
-
 HOOK: %save-context cpu ( temp1 temp2 -- )
 
 HOOK: %c-invoke cpu ( symbols dll gc-map -- )

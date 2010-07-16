@@ -107,12 +107,6 @@ M:: x86.64 %box ( dst src func rep gc-map -- )
     func f gc-map %c-invoke
     dst int-rep %load-return ;
 
-M:: x86.64 %allot-byte-array ( dst size gc-map -- )
-    param-reg-0 size MOV
-    param-reg-1 %mov-vm-ptr
-    "allot_byte_array" f gc-map %c-invoke
-    dst int-rep %load-return ;
-
 M: x86.64 %c-invoke
     [ R11 0 MOV rc-absolute-cell rel-dlsym R11 CALL ] dip
     gc-map-here ;

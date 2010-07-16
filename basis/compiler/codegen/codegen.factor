@@ -288,7 +288,6 @@ CODEGEN: ##unbox-long-long %unbox-long-long
 CODEGEN: ##local-allot %local-allot
 CODEGEN: ##box %box
 CODEGEN: ##box-long-long %box-long-long
-CODEGEN: ##allot-byte-array %allot-byte-array
 CODEGEN: ##alien-invoke %alien-invoke
 CODEGEN: ##alien-indirect %alien-indirect
 CODEGEN: ##alien-assembly %alien-assembly

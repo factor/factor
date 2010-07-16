@@ -663,10 +663,6 @@ def: dst/tagged-rep
 use: src1/int-rep src2/int-rep
 literal: boxer gc-map ;
 
-FLUSHABLE-INSN: ##allot-byte-array
-def: dst/tagged-rep
-literal: size gc-map ;
-
 ! Alien call inputs and outputs are arrays of triples with shape
 ! { vreg rep stack#/reg }
 
@@ -855,7 +851,6 @@ UNION: gc-map-insn
 ##call-gc
 ##box
 ##box-long-long
-##allot-byte-array
 factor-call-insn ;
 
 M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
@@ -889,8 +884,7 @@ hairy-clobber-insn
 ##binary-float-function
 ##unbox
 ##box
-##box-long-long
-##allot-byte-array ;
+##box-long-long ;
 
 ! Instructions that have complex expansions and require that the
 ! output registers are not equal to any of the input registers
