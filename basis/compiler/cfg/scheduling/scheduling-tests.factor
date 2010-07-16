@@ -38,3 +38,18 @@ t check-scheduling? [
     split-3-ways
     [ >array ] tri@
 ] unit-test
+
+[
+    { }
+    { T{ ##add } T{ ##sub } T{ ##mul } }
+    { T{ ##dispatch } }
+] [
+    V{
+        T{ ##add }
+        T{ ##sub }
+        T{ ##mul }
+        T{ ##dispatch }
+    }
+    split-3-ways
+    [ >array ] tri@
+] unit-test
