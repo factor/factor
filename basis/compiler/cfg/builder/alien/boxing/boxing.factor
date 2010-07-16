@@ -4,7 +4,8 @@ USING: accessors alien.c-types arrays assocs combinators
 classes.struct fry kernel layouts locals math namespaces
 sequences sequences.generalizations system
 compiler.cfg.builder.alien.params compiler.cfg.hats
-compiler.cfg.registers compiler.cfg.instructions cpu.architecture ;
+compiler.cfg.registers compiler.cfg.instructions
+compiler.cfg.intrinsics.allot cpu.architecture ;
 IN: compiler.cfg.builder.alien.boxing
 
 SYMBOL: struct-return-area
@@ -117,7 +118,7 @@ M: long-long-type box
     <gc-map> ^^box-long-long ;
 
 M: struct-c-type box
-    '[ _ heap-size <gc-map> ^^allot-byte-array dup ^^unbox-byte-array ] 2dip
+    '[ _ heap-size emit-allot-byte-array dup ^^unbox-byte-array ] 2dip
     implode-struct ;
 
 GENERIC: box-parameter ( vregs reps c-type -- dst )

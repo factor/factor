@@ -178,12 +178,6 @@ M:: x86.32 %box-long-long ( dst src1 src2 func gc-map -- )
     func f gc-map %c-invoke
     dst EAX tagged-rep %copy ;
 
-M:: x86.32 %allot-byte-array ( dst size gc-map -- )
-    4 save-vm-ptr
-    0 stack@ size MOV
-    "allot_byte_array" f gc-map %c-invoke
-    dst EAX tagged-rep %copy ;
-
 M: x86.32 %c-invoke
     [ 0 CALL rc-relative rel-dlsym ] dip gc-map-here ;
 
