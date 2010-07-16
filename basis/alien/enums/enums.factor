@@ -29,10 +29,10 @@ M: enum-c-type c-type-unboxer-quot drop [ enum>number ] ;
 M: enum-c-type c-type-setter
    [ enum>number ] swap base-type>> c-type-setter '[ _ 2dip @ ] ;
 
-<PRIVATE
-
 : define-enum-value ( class value -- )
     enum>number "enum-value" set-word-prop ;
+
+<PRIVATE
 
 : define-enum-members ( member-names -- )
     [ first define-symbol ] each ;
@@ -43,10 +43,14 @@ M: enum-c-type c-type-setter
 
 PRIVATE>
 
-: define-enum ( word base-type members -- )
+: (define-enum) ( word base-type members -- )
     [ dup define-enum-constructor ] 2dip
     dup define-enum-members
     <enum-c-type> swap typedef ;
+
+: define-enum ( word base-type members -- )
+    [ (define-enum) ]
+    [ [ first2 define-enum-value ] each ] bi ;
     
 PREDICATE: enum-c-type-word < c-type-word
     "c-type" word-prop enum-c-type? ;
