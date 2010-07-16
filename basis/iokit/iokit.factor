@@ -131,11 +131,11 @@ TUPLE: mach-error error-code error-string ;
     dup KERN_SUCCESS = [ drop ] [ <mach-error> throw ] if ;
 
 : master-port ( -- port )
-    MACH_PORT_NULL { uint } [ IOMasterPort mach-error ] [ ] with-out-parameters ;
+    MACH_PORT_NULL { uint } [ IOMasterPort mach-error ] with-out-parameters ;
 
 : io-services-matching-dictionary ( nsdictionary -- iterator )
     master-port swap
-    { uint } [ IOServiceGetMatchingServices mach-error ] [ ] with-out-parameters ;
+    { uint } [ IOServiceGetMatchingServices mach-error ] with-out-parameters ;
 
 : io-services-matching-service ( service -- iterator )
     IOServiceMatching io-services-matching-dictionary ;

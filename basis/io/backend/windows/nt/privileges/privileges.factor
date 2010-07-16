@@ -15,7 +15,7 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 : (open-process-token) ( handle -- handle )
     flags{ TOKEN_ADJUST_PRIVILEGES TOKEN_QUERY }
     { PHANDLE }
-    [ OpenProcessToken win32-error=0/f ] [ ]
+    [ OpenProcessToken win32-error=0/f ]
     with-out-parameters ;
 
 : open-process-token ( -- handle )
