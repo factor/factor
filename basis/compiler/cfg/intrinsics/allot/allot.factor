@@ -62,16 +62,15 @@ IN: compiler.cfg.intrinsics.allot
 
 : bytes>cells ( m -- n ) cell align cell /i ;
 
-: ^^allot-byte-array ( n -- dst )
-    16 + byte-array ^^allot ;
+: ^^allot-byte-array ( len -- dst )
+    dup 16 + byte-array ^^allot [ byte-array store-length ] keep ;
 
 : emit-allot-byte-array ( len -- dst )
-    dup ^^allot-byte-array
-    [ byte-array store-length ] [ ds-push ] [ ] tri ;
+    ds-drop ^^allot-byte-array dup ds-push ;
 
 : emit-(byte-array) ( node -- )
     dup node-input-infos first literal>> dup expand-(byte-array)?
-    [ nip ds-drop emit-allot-byte-array drop ] [ drop emit-primitive ] if ;
+    [ nip emit-allot-byte-array drop ] [ drop emit-primitive ] if ;
 
 :: zero-byte-array ( len reg -- )
     0 ^^load-literal :> elt
@@ -83,7 +82,6 @@ IN: compiler.cfg.intrinsics.allot
 :: emit-<byte-array> ( node -- )
     node node-input-infos first literal>> dup expand-<byte-array>? [
         :> len
-        ds-drop
         len emit-allot-byte-array :> reg
         len reg zero-byte-array
     ] [ drop node emit-primitive ] if ;
