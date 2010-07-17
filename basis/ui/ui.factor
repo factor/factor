@@ -90,8 +90,8 @@ M: world ungraft*
         [ hand-gadget close-global ]
         [ end-world ]
         [ [ <reversed> [ [ dispose ] when* ] each V{ } clone ] change-window-resources drop ]
-        [ [ (close-window) f ] change-handle drop ]
         [ unfocus-world ]
+        [ [ (close-window) f ] change-handle drop ]
         [ promise>> t swap fulfill ]
     } cleave ;
 
