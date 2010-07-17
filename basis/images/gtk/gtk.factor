@@ -39,27 +39,30 @@ ERROR: g-error domain code message ;
         throw
     ] when* ;
 
-STRUCT: GErrorPointer { to pointer: GError } ;
-
 : GInputStream>GdkPixbuf ( GInputStream -- GdkPixbuf )
-    f GErrorPointer malloc-struct &free
-    [ gdk_pixbuf_new_from_stream ] keep
-    to>> handle-GError &g_object_unref ;
+    f { { pointer: GError initial: f } }
+    [ gdk_pixbuf_new_from_stream ] with-out-parameters
+    handle-GError &g_object_unref ;
 
 : image-data ( GdkPixbuf -- data )
-    [let
-        {
-            [ gdk_pixbuf_get_pixels ]
-            [ gdk_pixbuf_get_width ]
-            [ gdk_pixbuf_get_height ]
-            [ gdk_pixbuf_get_rowstride ]
-            [ gdk_pixbuf_get_n_channels ]
-            [ gdk_pixbuf_get_bits_per_sample ]
-        } cleave :> ( pixels w h rowstride channels bps )
+    {
+        [ gdk_pixbuf_get_pixels ]
+        [ gdk_pixbuf_get_width ]
+        [ gdk_pixbuf_get_height ]
+        [ gdk_pixbuf_get_rowstride ]
+        [ gdk_pixbuf_get_n_channels ]
+        [ gdk_pixbuf_get_bits_per_sample ]
+    } cleave
+    [let :> ( pixels w h rowstride channels bps )
         bps channels * 7 + 8 /i w * :> bytes-per-row
-        pixels rowstride h * <direct-uchar-array>
-        rowstride <sliced-groups>
-        [ bytes-per-row head-slice ] map concat
+
+        bytes-per-row rowstride =
+        [ pixels h rowstride * memory>byte-array ]
+        [
+            pixels rowstride h * <direct-uchar-array>
+            rowstride <sliced-groups>
+            [ bytes-per-row head-slice ] map concat
+        ] if
     ] ;
 
 : component-type ( GdkPixbuf -- component-type )
