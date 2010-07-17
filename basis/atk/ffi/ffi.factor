@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.libraries alien.syntax combinators kernel
 system
-gir glib.ffi gobject.ffi ;
+gobject-introspection glib.ffi gobject.ffi ;
 IN: atk.ffi
 
 <<
