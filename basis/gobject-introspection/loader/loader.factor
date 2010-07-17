@@ -1,10 +1,11 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii combinators fry gir.common gir.repository
-gir.types kernel math.parser sequences splitting xml.data
-xml.traversal ;
+USING: accessors ascii combinators fry
+gobject-introspection.common gobject-introspection.repository
+gobject-introspection.types kernel math.parser sequences
+splitting xml.data xml.traversal ;
 FROM: namespaces => set get ;
-IN: gir.loader
+IN: gobject-introspection.loader
 
 SYMBOL: namespace-prefix
 SYMBOL: namespace-PREFIX
@@ -221,7 +222,6 @@ SYMBOL: namespace-PREFIX
     [ field new ] dip {
         [ "name" attr >>name ]
         [ "writable" attr "1" = >>writable? ]
-        ! Для некоторых field  есть callback в качестве типа, решить, как лучше сделать
         [
             first-child-tag dup name>> main>> "callback" =
             [ drop "gpointer" ] [ "type" attr ] if
