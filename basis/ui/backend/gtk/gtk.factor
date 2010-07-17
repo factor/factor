@@ -58,7 +58,7 @@ M: gtk-ui-backend (free-pixel-format)
 
 M: gtk-ui-backend (pixel-format-attribute)
     [ handle>> ] [ >gl-config-attribs ] bi*
-    { int } [ gdk_gl_config_get_attrib drop ] [ ]
+    { int } [ gdk_gl_config_get_attrib drop ]
     with-out-parameters ;
 
 CONSTANT: events-mask
@@ -354,8 +354,8 @@ M: editor get-cursor-loc&dim
 
 : get-preedit-string ( im-context -- str cursor-pos )
     { void* int } [ f swap gtk_im_context_get_preedit_string ]
-    [ [ [ utf8 alien>string ] [ g_free ] bi ] dip ]
-    with-out-parameters ;
+    with-out-parameters 
+    [ [ utf8 alien>string ] [ g_free ] bi ] dip ;
             
 : on-preedit-changed ( im-context user-data -- )
     window world-focus dup support-input-methods? [
