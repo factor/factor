@@ -3,8 +3,84 @@ compiler.cfg.gc-checks.private compiler.cfg.debugger
 compiler.cfg.registers compiler.cfg.instructions compiler.cfg
 compiler.cfg.predecessors compiler.cfg.rpo cpu.architecture
 tools.test kernel vectors namespaces accessors sequences alien
-memory classes make combinators.short-circuit byte-arrays ;
+memory classes make combinators.short-circuit byte-arrays
+compiler.cfg.comparisons ;
 IN: compiler.cfg.gc-checks.tests
+
+[ { } ] [
+    V{
+        T{ ##inc-d }
+        T{ ##peek }
+        T{ ##add }
+        T{ ##branch }
+    } gc-check-offsets
+] unit-test
+
+[ { } ] [
+    V{
+        T{ ##inc-d }
+        T{ ##peek }
+        T{ ##alien-invoke }
+        T{ ##add }
+        T{ ##branch }
+    } gc-check-offsets
+] unit-test
+
+[ { 0 } ] [
+    V{
+        T{ ##inc-d }
+        T{ ##peek }
+        T{ ##allot }
+        T{ ##alien-invoke }
+        T{ ##add }
+        T{ ##branch }
+    } gc-check-offsets
+] unit-test
+
+[ { 0 } ] [
+    V{
+        T{ ##inc-d }
+        T{ ##peek }
+        T{ ##allot }
+        T{ ##allot }
+        T{ ##add }
+        T{ ##branch }
+    } gc-check-offsets
+] unit-test
+
+[ { 0 4 } ] [
+    V{
+        T{ ##inc-d }
+        T{ ##peek }
+        T{ ##allot }
+        T{ ##alien-invoke }
+        T{ ##allot }
+        T{ ##add }
+        T{ ##sub }
+        T{ ##branch }
+    } gc-check-offsets
+] unit-test
+
+[ { 3 } ] [
+    V{
+        T{ ##inc-d }
+        T{ ##peek }
+        T{ ##alien-invoke }
+        T{ ##allot }
+        T{ ##add }
+        T{ ##branch }
+    } gc-check-offsets
+] unit-test
+
+[ { { "a" } } ] [ { "a" } { } split-instructions ] unit-test
+
+[ { { } { "a" } } ] [ { "a" } { 0 } split-instructions ] unit-test
+
+[ { { "a" } { } } ] [ { "a" } { 1 } split-instructions ] unit-test
+
+[ { { "a" } { "b" } } ] [ { "a" "b" } { 1 } split-instructions ] unit-test
+
+[ { { } { "a" } { "b" "c" } } ] [ { "a" "b" "c" } { 0 1 } split-instructions ] unit-test
 
 : test-gc-checks ( -- )
     H{ } clone representations set
@@ -25,7 +101,7 @@ V{
 
 [ t ] [ cfg get blocks-with-gc 1 get 1array sequence= ] unit-test
 
-[ ] [ 1 get allocation-size 123 <alien> size assert= ] unit-test
+[ ] [ 1 get instructions>> allocation-size 123 <alien> size assert= ] unit-test
 
 2 \ vreg-counter set-global
 
@@ -36,58 +112,16 @@ V{
         [ first ##check-nursery-branch? ]
     } 1&& ;
 
-[ t ] [ V{ } 100 <gc-check> gc-check? ] unit-test
-
-4 \ vreg-counter set-global
-
-[
+: gc-call? ( bb -- ? )
+    instructions>>
     V{
         T{ ##call-gc f T{ gc-map } }
         T{ ##branch }
-    }
-]
-[
-    <gc-call> instructions>>
-] unit-test
+    } = ;
 
-30 \ vreg-counter set-global
+4 \ vreg-counter set-global
 
-V{
-    T{ ##branch }
-} 0 test-bb
-
-V{
-    T{ ##branch }
-} 1 test-bb
-
-V{
-    T{ ##branch }
-} 2 test-bb
-
-V{
-    T{ ##branch }
-} 3 test-bb
-
-V{
-    T{ ##branch }
-} 4 test-bb
-
-0 { 1 2 } edges
-1 3 edge
-2 3 edge
-3 4 edge
-
-[ ] [ test-gc-checks ] unit-test
-
-[ ] [ cfg get needs-predecessors drop ] unit-test
-
-[ ] [ V{ } 31337 3 get (insert-gc-check) ] unit-test
-
-[ t ] [ 1 get successors>> first gc-check? ] unit-test
-
-[ t ] [ 2 get successors>> first gc-check? ] unit-test
-
-[ t ] [ 3 get predecessors>> first gc-check? ] unit-test
+[ t ] [ <gc-call> gc-call? ] unit-test
 
 30 \ vreg-counter set-global
 
@@ -134,6 +168,8 @@ H{
 } representations set
 
 [ ] [ cfg get insert-gc-checks drop ] unit-test
+
+[ ] [ 1 get successors>> first successors>> first 2 set ] unit-test
 
 [ 2 ] [ 2 get predecessors>> length ] unit-test
 
@@ -187,5 +223,148 @@ H{
 } representations set
 
 [ ] [ cfg get insert-gc-checks drop ] unit-test
+[ ] [ 1 get successors>> first successors>> first 3 set ] unit-test
 [ t ] [ 2 get successors>> first instructions>> first ##phi? ] unit-test
 [ 2 ] [ 3 get instructions>> length ] unit-test
+
+! GC check in a block that is its own successor
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##allot f 1 64 byte-array }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 2 test-bb
+
+0 1 edge
+1 { 1 2 } edges
+
+[ ] [ test-gc-checks ] unit-test
+
+[ ] [ cfg get insert-gc-checks drop ] unit-test
+
+[ ] [
+    0 get successors>> first predecessors>>
+    [ first 0 get assert= ]
+    [ second 1 get [ instructions>> ] bi@ assert= ] bi
+] unit-test
+
+[ ] [
+    0 get successors>> first successors>>
+    [ first 1 get [ instructions>> ] bi@ assert= ]
+    [ second gc-call? t assert= ] bi
+] unit-test
+
+[ ] [
+    2 get predecessors>> first predecessors>>
+    [ first gc-check? t assert= ]
+    [ second gc-call? t assert= ] bi
+] unit-test
+
+! Brave new world of calls in the middle of BBs
+
+! call then allot
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##alien-invoke f "malloc" f T{ gc-map } }
+    T{ ##allot f 1 64 byte-array }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 2 test-bb
+
+0 1 edge
+1 2 edge
+
+2 \ vreg-counter set-global
+
+[ ] [ test-gc-checks ] unit-test
+
+[ ] [ cfg get insert-gc-checks drop ] unit-test
+
+! The GC check should come after the alien-invoke
+[
+    V{
+        T{ ##alien-invoke f "malloc" f T{ gc-map } }
+        T{ ##check-nursery-branch f 64 cc<= 3 4 }
+    }
+] [ 0 get successors>> first instructions>> ] unit-test
+
+! call then allot then call then allot
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##alien-invoke f "malloc" f T{ gc-map } }
+    T{ ##allot f 1 64 byte-array }
+    T{ ##alien-invoke f "malloc" f T{ gc-map } }
+    T{ ##allot f 2 64 byte-array }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 2 test-bb
+
+0 1 edge
+1 2 edge
+
+2 \ vreg-counter set-global
+
+[ ] [ test-gc-checks ] unit-test
+
+[ ] [ cfg get insert-gc-checks drop ] unit-test
+
+[
+    V{
+        T{ ##alien-invoke f "malloc" f T{ gc-map } }
+        T{ ##check-nursery-branch f 64 cc<= 3 4 }
+    }
+] [
+    0 get
+    successors>> first
+    instructions>>
+] unit-test
+
+[
+    V{
+        T{ ##allot f 1 64 byte-array }
+        T{ ##alien-invoke f "malloc" f T{ gc-map } }
+        T{ ##check-nursery-branch f 64 cc<= 5 6 }
+    }
+] [
+    0 get
+    successors>> first
+    successors>> first
+    instructions>>
+] unit-test
+
+[
+    V{
+        T{ ##allot f 2 64 byte-array }
+        T{ ##branch }
+    }
+] [
+    0 get
+    successors>> first
+    successors>> first
+    successors>> first
+    instructions>>
+] unit-test

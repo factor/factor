@@ -57,7 +57,7 @@ M: cocoa-ui-backend (pixel-format-attribute)
     [ drop f ]
     [
         first
-        { int } [ swap 0 -> getValues:forAttribute:forVirtualScreen: ] [ ]
+        { int } [ swap 0 -> getValues:forAttribute:forVirtualScreen: ]
         with-out-parameters
     ] if-empty ;
 
@@ -228,14 +228,11 @@ M: cocoa-ui-backend system-alert
     ] [ 2drop ] if*
     init-thread-timer ;
 
-CLASS: {
-    { +superclass+ "NSObject" }
-    { +name+ "FactorApplicationDelegate" }
-}
-
-{ "applicationDidUpdate:" void { id SEL id }
-    [ 3drop reset-run-loop ]
-} ;
+CLASS: FactorApplicationDelegate < NSObject
+[
+    METHOD: void applicationDidUpdate: id obj
+    [ reset-run-loop ]
+]
 
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;

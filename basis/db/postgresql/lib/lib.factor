@@ -146,7 +146,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
                 ] [
                     &postgresql-free
                 ] if
-            ] [ ] with-out-parameters memory>byte-array
+            ] with-out-parameters memory>byte-array
         ] with-destructors 
     ] [
         drop pq-get-is-null nip [ f ] [ B{ } clone ] if

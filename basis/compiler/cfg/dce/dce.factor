@@ -28,11 +28,11 @@ SYMBOL: allocations
 
 GENERIC: build-liveness-graph ( insn -- )
 
-: add-edges ( insn register -- )
-    [ uses-vregs ] dip liveness-graph get [ union ] change-at ;
+: add-edges ( uses def -- )
+    liveness-graph get [ union ] change-at ;
 
 : setter-liveness-graph ( insn vreg -- )
-    dup allocation? [ add-edges ] [ 2drop ] if ;
+    dup allocation? [ [ uses-vregs ] dip add-edges ] [ 2drop ] if ;
 
 M: ##set-slot build-liveness-graph
     dup obj>> setter-liveness-graph ;
@@ -50,7 +50,7 @@ M: ##allot build-liveness-graph
     [ dst>> allocations get adjoin ] [ call-next-method ] bi ;
 
 M: vreg-insn build-liveness-graph
-    dup defs-vreg dup [ add-edges ] [ 2drop ] if ;
+    [ uses-vregs ] [ defs-vregs ] bi [ add-edges ] with each ;
 
 M: insn build-liveness-graph drop ;
 
@@ -83,14 +83,9 @@ M: ##write-barrier compute-live-vregs
 M: ##write-barrier-imm compute-live-vregs
     dup src>> setter-live-vregs ;
 
-M: ##fixnum-add compute-live-vregs record-live ;
+M: flushable-insn compute-live-vregs drop ;
 
-M: ##fixnum-sub compute-live-vregs record-live ;
-
-M: ##fixnum-mul compute-live-vregs record-live ;
-
-M: vreg-insn compute-live-vregs
-    dup defs-vreg [ drop ] [ record-live ] if ;
+M: vreg-insn compute-live-vregs record-live ;
 
 M: insn compute-live-vregs drop ;
 
@@ -104,15 +99,9 @@ M: ##write-barrier live-insn? src>> live-vreg? ;
 
 M: ##write-barrier-imm live-insn? src>> live-vreg? ;
 
-M: ##fixnum-add live-insn? drop t ;
+M: flushable-insn live-insn? defs-vregs [ live-vreg? ] any? ;
 
-M: ##fixnum-sub live-insn? drop t ;
-
-M: ##fixnum-mul live-insn? drop t ;
-
-M: vreg-insn live-insn? defs-vreg [ live-vreg? ] [ t ] if* ;
-
-M: insn live-insn? defs-vreg drop t ;
+M: insn live-insn? drop t ;
 
 : eliminate-dead-code ( cfg -- cfg' )
     ! Even though we don't use predecessors directly, we depend

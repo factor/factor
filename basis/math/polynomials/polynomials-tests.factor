@@ -31,3 +31,5 @@ IN: math.polynomials.tests
 [ t ] [ { 1 1 1 } { 1 1 1 } p= ] unit-test
 [ { 0 0 } { 1 1 } ] [ { 1 1 1 1 } { 1 1 } pgcd ] unit-test
 
+[ { 10 200 3000 } ] [ { 1 10 100 1000 } pdiff ] unit-test
+

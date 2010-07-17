@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test unix.groups kernel strings math ;
+USING: kernel math sequences strings tools.test unix.groups ;
 IN: unix.groups.tests
 
 [ ] [ all-groups drop ] unit-test
@@ -25,5 +25,15 @@ IN: unix.groups.tests
 [ ] [ real-group-id group-name drop ] unit-test
 
 [ "888888888888888" ] [ 888888888888888 group-name ] unit-test
+[ f ] [ "please-oh-please-don't-have-a-group-named-this123lalala" group-struct ] unit-test
+[ f ] [ "please-oh-please-don't-have-a-group-named-this123lalala" group-exists? ] unit-test
+[ "please-oh-please-don't-have-a-group-named-this123lalala" ?group-id ] must-fail
+
+[ 3 ] [ f [ 3 ] with-effective-group ] unit-test
+[ 3 ] [ f [ 3 ] with-real-group ] unit-test
+
 [ f ]
-[ "please-oh-please-don't-have-a-group-named-this123lalala" group-struct ] unit-test
+[ all-groups drop all-groups empty? ] unit-test
+
+[ f ]
+[ all-group-names drop all-group-names empty? ] unit-test

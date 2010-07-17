@@ -78,8 +78,7 @@ FUNCTION: CFStringRef CFStringCreateWithCString (
     [ 0 swap <CFRange> kCFStringEncodingUTF8 0 f ] keep
     4 * 1 + <byte-array> [
         dup length
-        { CFIndex } [ CFStringGetBytes drop ] [ ]
-        with-out-parameters
+        { CFIndex } [ CFStringGetBytes drop ] with-out-parameters
     ] keep
     swap head-slice utf8 decode ;
 

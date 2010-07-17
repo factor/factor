@@ -20,7 +20,7 @@ SYNTAX: FUNCTOR-SYNTAX:
     dup search dup lexical? [ nip ] [ drop ] if ;
 
 : scan-string-param ( -- name/param )
-    scan >string-param ;
+    scan-token >string-param ;
 
 : scan-c-type-param ( -- c-type/param )
     scan dup "{" = [ drop \ } parse-until >array ] [ >string-param ] if ;

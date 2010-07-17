@@ -1,15 +1,15 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays combinators
-grouping compression.huffman images fry
-images.processing io io.binary io.encodings.binary io.files
-io.streams.byte-array kernel locals math math.bitwise
-math.constants math.functions math.matrices math.order
-math.ranges math.vectors memoize multiline namespaces
-sequences sequences.deep images.loader io.streams.limited ;
-IN: images.jpeg
-
+compression.huffman fry grouping images images.loader
+images.processing io io.binary io.encodings.binary
+io.streams.byte-array io.streams.limited io.streams.throwing
+kernel locals math math.bitwise math.blas.matrices
+math.blas.vectors math.constants math.functions math.matrices
+math.order math.vectors memoize namespaces sequences
+sequences.deep ;
 QUALIFIED-WITH: bitstreams bs
+IN: images.jpeg
 
 SINGLETON: jpeg-image
 
@@ -120,18 +120,18 @@ TUPLE: jpeg-color-info
     ] with-byte-reader ;
 
 : decode-huff-table ( chunk -- )
-    data>> [ binary <byte-reader> ] [ length ] bi
-    stream-throws limit
-    [   
-        [ input-stream get [ count>> ] [ limit>> ] bi < ]
+    data>> [ binary <byte-reader> ] [ length ] bi limit-stream [
         [
-            read4/4 swap 2 * +
-            16 read
-            dup [ ] [ + ] map-reduce read
-            binary [ [ read [ B{ } ] unless* ] { } map-as ] with-byte-reader
-            swap jpeg> huff-tables>> set-nth
-        ] while
-    ] with-input-stream* ;
+            [ input-stream get stream>> [ count>> ] [ limit>> ] bi < ]
+            [
+                read4/4 swap 2 * +
+                16 read
+                dup [ ] [ + ] map-reduce read
+                binary [ [ read [ B{ } ] unless* ] { } map-as ] with-byte-reader
+                swap jpeg> huff-tables>> set-nth
+            ] while
+        ] with-input-stream*
+    ] stream-throw-on-eof ;
 
 : decode-scan ( chunk -- )
     data>>
@@ -218,9 +218,6 @@ MEMO: dct-matrix ( -- m ) 64 iota [ 8 /mod dct-vect flatten ] map ;
 : reverse-zigzag ( b -- b' ) zig-zag swap [ nth ] curry map ;
 
 : idct-factor ( b -- b' ) dct-matrix v.m ;
-
-USE: math.blas.vectors
-USE: math.blas.matrices
 
 MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
 : V.M ( x A -- x.A ) Mtranspose swap M.V ;
@@ -369,7 +366,7 @@ ERROR: not-a-jpeg-image ;
     [
         parse-marker { SOI } = [ not-a-jpeg-image ] unless
         parse-headers
-        unlimited-input contents <loading-jpeg>
+        contents <loading-jpeg>
     ] with-input-stream ;
 
 PRIVATE>

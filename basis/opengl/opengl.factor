@@ -139,7 +139,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     swap glPushAttrib call glPopAttrib ; inline
 
 : (gen-gl-object) ( quot -- id )
-    [ 1 { uint } ] dip [ ] with-out-parameters ; inline
+    [ 1 { uint } ] dip with-out-parameters ; inline
 
 : (delete-gl-object) ( id quot -- )
     [ 1 swap <uint> ] dip call ; inline

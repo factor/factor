@@ -96,6 +96,24 @@ M: x86.32 %prologue ( n -- )
 M: x86.32 %prepare-jump
     pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
 
+M: x86.32 %load-stack-param ( dst rep n -- )
+    next-stack@ swap pick register? [ %copy ] [
+        {
+            { int-rep [ [ EAX ] dip MOV ?spill-slot EAX MOV ] }
+            { float-rep [ FLDS ?spill-slot FSTPS ] }
+            { double-rep [ FLDL ?spill-slot FSTPL ] }
+        } case
+    ] if ;
+
+M: x86.32 %store-stack-param ( src rep n -- )
+    stack@ swap pick register? [ [ swap ] dip %copy ] [
+        {
+            { int-rep [ [ [ EAX ] dip ?spill-slot MOV ] [ EAX MOV ] bi* ] }
+            { float-rep [ [ ?spill-slot FLDS ] [ FSTPS ] bi* ] }
+            { double-rep [ [ ?spill-slot FLDL ] [ FSTPL ] bi* ] }
+        } case
+    ] if ;
+
 :: load-float-return ( dst x87-insn rep -- )
     dst register? [
         ESP 4 SUB
@@ -106,8 +124,8 @@ M: x86.32 %prepare-jump
         dst ?spill-slot x87-insn execute
     ] if ; inline
 
-M: x86.32 %load-reg-param ( dst reg rep -- )
-    {
+M: x86.32 %load-reg-param ( vreg rep reg -- )
+    swap {
         { int-rep [ int-rep %copy ] }
         { float-rep [ drop \ FSTPS float-rep load-float-return ] }
         { double-rep [ drop \ FSTPL double-rep load-float-return ] }
@@ -123,8 +141,8 @@ M: x86.32 %load-reg-param ( dst reg rep -- )
         src ?spill-slot x87-insn execute
     ] if ; inline
 
-M: x86.32 %store-reg-param ( src reg rep -- )
-    {
+M: x86.32 %store-reg-param ( vreg rep reg -- )
+    swap {
         { int-rep [ swap int-rep %copy ] }
         { float-rep [ drop \ FLDS float-rep store-float-return ] }
         { double-rep [ drop \ FLDL double-rep store-float-return ] }
@@ -134,49 +152,39 @@ M: x86.32 %store-reg-param ( src reg rep -- )
     EAX src tagged-rep %copy
     4 save-vm-ptr
     0 stack@ EAX MOV
-    func f f %alien-invoke ;
+    func f f %c-invoke ;
 
 M:: x86.32 %unbox ( dst src func rep -- )
     src func call-unbox-func
     dst rep %load-return ;
 
-M:: x86.32 %unbox-long-long ( src out func -- )
-    EAX src int-rep %copy
-    0 stack@ EAX MOV
-    EAX out int-rep %copy
-    4 stack@ EAX MOV
-    8 save-vm-ptr
-    func f f %alien-invoke ;
+M:: x86.32 %unbox-long-long ( dst1 dst2 src func -- )
+    src int-rep 0 %store-stack-param
+    4 save-vm-ptr
+    func f f %c-invoke
+    dst1 EAX int-rep %copy
+    dst2 EDX int-rep %copy ;
 
 M:: x86.32 %box ( dst src func rep gc-map -- )
+    src rep 0 %store-stack-param
     rep rep-size save-vm-ptr
-    src rep %store-return
-    0 stack@ rep %load-return
-    func f gc-map %alien-invoke
+    func f gc-map %c-invoke
     dst EAX tagged-rep %copy ;
 
 M:: x86.32 %box-long-long ( dst src1 src2 func gc-map -- )
+    src1 int-rep 0 %store-stack-param
+    src2 int-rep 4 %store-stack-param
     8 save-vm-ptr
-    EAX src1 int-rep %copy
-    0 stack@ EAX int-rep %copy
-    EAX src2 int-rep %copy
-    4 stack@ EAX int-rep %copy
-    func f gc-map %alien-invoke
+    func f gc-map %c-invoke
     dst EAX tagged-rep %copy ;
 
-M:: x86.32 %allot-byte-array ( dst size gc-map -- )
-    4 save-vm-ptr
-    0 stack@ size MOV
-    "allot_byte_array" f gc-map %alien-invoke
-    dst EAX tagged-rep %copy ;
-
-M: x86.32 %alien-invoke
+M: x86.32 %c-invoke
     [ 0 CALL rc-relative rel-dlsym ] dip gc-map-here ;
 
 M: x86.32 %begin-callback ( -- )
     0 save-vm-ptr
     4 stack@ 0 MOV
-    "begin_callback" f f %alien-invoke ;
+    "begin_callback" f f %c-invoke ;
 
 M: x86.32 %alien-callback ( quot -- )
     [ EAX ] dip %load-reference
@@ -184,28 +192,17 @@ M: x86.32 %alien-callback ( quot -- )
 
 M: x86.32 %end-callback ( -- )
     0 save-vm-ptr
-    "end_callback" f f %alien-invoke ;
-
-GENERIC: float-function-param ( n dst src -- )
-
-M:: spill-slot float-function-param ( n dst src -- )
-    ! We can clobber dst here since its going to contain the
-    ! final result
-    dst src double-rep %copy
-    dst n double-rep %store-stack-param ;
-
-M:: register float-function-param ( n dst src -- )
-    src n double-rep %store-stack-param ;
+    "end_callback" f f %c-invoke ;
 
 M:: x86.32 %unary-float-function ( dst src func -- )
-    0 dst src float-function-param
-    func "libm" load-library f %alien-invoke
+    src double-rep 0 %store-stack-param
+    func "libm" load-library f %c-invoke
     dst double-rep %load-return ;
 
 M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
-    0 dst src1 float-function-param
-    8 dst src2 float-function-param
-    func "libm" load-library f %alien-invoke
+    src1 double-rep 0 %store-stack-param
+    src2 double-rep 8 %store-stack-param
+    func "libm" load-library f %c-invoke
     dst double-rep %load-return ;
 
 : funny-large-struct-return? ( return abi -- ? )

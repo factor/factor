@@ -47,7 +47,7 @@ SYMBOL: class-element-map
 SYMBOL: copies
 
 : value-of ( vreg -- value )
-    insn-of dup ##tagged>integer? [ src>> ] [ dst>> ] if ;
+    dup insn-of dup ##tagged>integer? [ nip src>> ] [ drop ] if ;
 
 : init-coalescing ( -- )
     defs get
@@ -85,9 +85,9 @@ M: insn prepare-insn drop ;
 M: vreg-insn prepare-insn
     [ temp-vregs [ leader-map get conjoin ] each ]
     [
-        [ defs-vreg ] [ uses-vregs ] bi
-        2dup empty? not and [
-            first
+        [ defs-vregs ] [ uses-vregs ] bi
+        2dup [ empty? not ] both? [
+            [ first ] bi@
             2dup [ rep-of reg-class-of ] bi@ eq?
             [ maybe-eliminate-copy-later ] [ 2drop ] if
         ] [ 2drop ] if

@@ -21,6 +21,7 @@ QUALIFIED: layouts
 QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
+QUALIFIED: vocabs.loader
 FROM: alien.libraries.private => >deployed-library-path ;
 FROM: namespaces => set ;
 FROM: sets => members ;
@@ -317,7 +318,7 @@ IN: tools.deploy.shaker
         strip-io? [ io-backend , ] when
 
         { } {
-            "alarms"
+            "timers"
             "tools"
             "io.launcher"
             "random"
@@ -358,6 +359,7 @@ IN: tools.deploy.shaker
                 vocabs:dictionary
                 vocabs:load-vocab-hook
                 vocabs:vocab-observers
+                vocabs.loader:add-vocab-root-hook
                 word
                 parser-notes
             } %
@@ -467,7 +469,8 @@ SYMBOL: deploy-vocab
 : startup-stripper ( -- )
     t "quiet" set-global
     f output-stream set-global
-    V{ "resource:" } clone vocab-roots set-global ;
+    [ V{ "resource:" } clone vocab-roots set-global ]
+    "vocabs.loader" startup-hooks get-global set-at ;
 
 : next-method* ( method -- quot )
     [ "method-class" word-prop ]

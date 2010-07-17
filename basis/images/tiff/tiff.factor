@@ -6,7 +6,7 @@ io.binary io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack sequences
 strings math.vectors specialized-arrays locals
-images.loader ;
+images.loader io.streams.throwing ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: images.tiff
@@ -519,14 +519,12 @@ ERROR: unknown-component-order ifd ;
 : with-tiff-endianness ( loading-tiff quot -- )
     [ dup endianness>> ] dip with-endianness ; inline
 
-: load-tiff-ifds ( stream -- loading-tiff )
-    [
-        <loading-tiff>
-        read-header [
-            dup ifd-offset>> read-ifds
-            process-ifds
-        ] with-tiff-endianness
-    ] with-input-stream* ;
+: load-tiff-ifds ( -- loading-tiff )
+    <loading-tiff>
+    read-header [
+        dup ifd-offset>> read-ifds
+        process-ifds
+    ] with-tiff-endianness ;
 
 : process-chunky-ifd ( ifd -- )
     read-strips
@@ -556,19 +554,13 @@ ERROR: unknown-component-order ifd ;
 : process-tif-ifds ( loading-tiff -- )
     ifds>> [ process-ifd ] each ;
 
-: load-tiff ( stream -- loading-tiff )
-    [ load-tiff-ifds dup ]
-    [
-        [ [ 0 seek-absolute ] dip stream-seek ]
-        [
-            [
-                [ process-tif-ifds ] with-tiff-endianness
-            ] with-input-stream
-        ] bi
-    ] bi ;
+: load-tiff ( -- loading-tiff )
+    load-tiff-ifds dup
+    0 seek-absolute seek-input
+    [ process-tif-ifds ] with-tiff-endianness ;
 
 ! tiff files can store several images -- we just take the first for now
 M: tiff-image stream>image ( stream tiff-image -- image )
-    drop load-tiff tiff>image ;
+    drop [ [ load-tiff tiff>image ] throw-on-eof ] with-input-stream ;
 
 { "tif" "tiff" } [ tiff-image register-image-class ] each

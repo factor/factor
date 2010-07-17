@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alarms fry kernel models ;
+USING: accessors timers fry kernel models ;
 IN: models.delay
 
-TUPLE: delay < model model timeout alarm ;
+TUPLE: delay < model model timeout timer ;
 
 : update-delay-model ( delay -- )
     [ model>> value>> ] keep set-model ;
@@ -15,13 +15,13 @@ TUPLE: delay < model model timeout alarm ;
         [ add-dependency ] keep ;
 
 : stop-delay ( delay -- )
-    alarm>> [ stop-alarm ] when* ;
+    timer>> [ stop-timer ] when* ;
 
 : start-delay ( delay -- )
     dup
-    [ '[ _ f >>alarm update-delay-model ] ] [ timeout>> ] bi
+    [ '[ _ f >>timer update-delay-model ] ] [ timeout>> ] bi
     later
-    >>alarm drop ;
+    >>timer drop ;
 
 M: delay model-changed nip dup stop-delay start-delay ;
 

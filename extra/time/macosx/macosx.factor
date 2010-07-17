@@ -1,0 +1,15 @@
+! Copyright (C) 2010 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: alien.data calendar calendar.unix classes.struct
+io.files.info.unix.private kernel system time unix unix.time ;
+IN: time.macosx
+
+M: macosx adjust-time-monotonic
+    timestamp>timeval
+    \ timeval <struct>
+    [ adjtime io-error ] keep dup binary-zero? [
+        drop instant
+    ] [
+        timeval>duration since-1970 now time-
+    ] if ;
+

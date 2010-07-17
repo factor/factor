@@ -12,26 +12,26 @@ IN: compiler.cfg.ssa.interference.live-ranges
 
 SYMBOLS: local-def-indices local-kill-indices ;
 
-: record-def ( n insn -- )
-    defs-vreg dup [ local-def-indices get set-at ] [ 2drop ] if ;
+: record-defs ( n insn -- )
+    defs-vregs [ local-def-indices get set-at ] with each ;
 
 : record-uses ( n insn -- )
     ! Record live intervals so that all but the first input interfere
     ! with the output. This lets us coalesce the output with the
     ! first input.
-    dup uses-vregs dup empty? [ 3drop ] [
+    dup uses-vregs [ 2drop ] [
         swap def-is-use-insn?
         [ [ first local-kill-indices get set-at ] [ rest-slice ] 2bi ] unless
         [ 1 + ] dip [ local-kill-indices get set-at ] with each
-    ] if ;
+    ] if-empty ;
 
 GENERIC: record-insn ( n insn -- )
 
 M: ##phi record-insn
-    record-def ;
+    record-defs ;
 
 M: vreg-insn record-insn
-    [ 2 * ] dip [ record-def ] [ record-uses ] 2bi ;
+    [ 2 * ] dip [ record-defs ] [ record-uses ] 2bi ;
 
 M: insn record-insn
     2drop ;

@@ -56,7 +56,7 @@ M: winnt add-completion ( win32-handle -- )
     nanos [ 1,000,000 /i ] [ INFINITE ] if* :> timeout
     master-completion-port get-global
     { int void* pointer: OVERLAPPED }
-    [ timeout GetQueuedCompletionStatus zero? ] [ ] with-out-parameters
+    [ timeout GetQueuedCompletionStatus zero? ] with-out-parameters
     :> ( error? bytes key overlapped )
     bytes overlapped error? ;
 

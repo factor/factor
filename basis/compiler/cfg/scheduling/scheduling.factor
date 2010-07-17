@@ -52,21 +52,34 @@ ERROR: bad-delete-at key assoc ;
         , (reorder)
     ] when* ;
 
-: cut-by ( seq quot -- before after )
-    dupd find drop [ cut ] [ f ] if* ; inline
+UNION: initial-insn ##phi ##inc-d ##inc-r ##callback-inputs ;
 
-UNION: initial-insn
-    ##phi ##inc-d ##inc-r ;
+UNION: final-insn
+##branch
+##dispatch
+conditional-branch-insn
+##epilogue ##return
+##callback-outputs ;
 
-: split-3-ways ( insns -- first middle last )
-    [ initial-insn? not ] cut-by unclip-last ;
+: initial-insn-end ( insns -- n )
+    [ initial-insn? not ] find drop 0 or ;
+
+: final-insn-start ( insns -- n )
+    [ final-insn? not ] find-last drop [ 1 + ] [ 0 ] if* ;
+
+:: split-3-ways ( insns -- first middle last )
+    insns initial-insn-end :> a
+    insns final-insn-start :> b
+    insns a head-slice
+    a b insns <slice>
+    insns b tail-slice ;
 
 : reorder ( insns -- insns' )
     split-3-ways [
         build-dependence-graph
         build-fan-in-trees
         [ (reorder) ] V{ } make reverse
-    ] dip suffix append ;
+    ] dip 3append ;
 
 ERROR: not-all-instructions-were-scheduled old-bb new-bb ;
 
@@ -78,16 +91,16 @@ f check-scheduling? set-global
     [ [ length ] bi@ = ] [ [ unique ] bi@ = ] 2bi and
     [ old-bb new-bb not-all-instructions-were-scheduled ] unless ;
 
-ERROR: definition-after-usage vreg old-bb new-bb ;
+ERROR: definition-after-usage vregs old-bb new-bb ;
 
 :: check-usages ( new-bb old-bb -- )
     HS{ } clone :> useds
     new-bb instructions>> split-3-ways drop nip
     [| insn |
         insn uses-vregs [ useds adjoin ] each
-        insn defs-vreg :> def-reg
-        def-reg useds in?
-        [ def-reg old-bb new-bb definition-after-usage ] when
+        insn defs-vregs :> defs-vregs
+        defs-vregs useds intersects?
+        [ defs-vregs old-bb new-bb definition-after-usage ] when
     ] each ;
 
 : check-scheduling ( new-bb old-bb -- )
@@ -124,7 +137,7 @@ ERROR: definition-after-usage vreg old-bb new-bb ;
 
 : might-spill? ( bb -- ? )
     [ live-in assoc-size ]
-    [ instructions>> [ defs-vreg ] count ] bi
+    [ instructions>> [ defs-vregs length ] map-sum ] bi
     + num-registers >= ;
 
 : schedule-instructions ( cfg -- cfg' )

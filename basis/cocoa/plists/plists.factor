@@ -38,7 +38,7 @@ DEFER: plist>
 : (read-plist) ( NSData -- id )
     NSPropertyListSerialization swap kCFPropertyListImmutable f
     { void* }
-    [ -> propertyListFromData:mutabilityOption:format:errorDescription: ] [ ]
+    [ -> propertyListFromData:mutabilityOption:format:errorDescription: ]
     with-out-parameters
     [ -> release "read-plist failed" throw ] when* ;
 

@@ -406,7 +406,7 @@ PRIVATE>
     [ [ max-texture-size tesselate ] dip <multi-texture> ] if ;
 
 : get-texture-float ( target level enum -- value )
-    { float } [ glGetTexLevelParameterfv ] [ ] with-out-parameters ; inline
+    { float } [ glGetTexLevelParameterfv ] with-out-parameters ; inline
 
 : get-texture-int ( target level enum -- value )
-    { int } [ glGetTexLevelParameteriv ] [ ] with-out-parameters ; inline
+    { int } [ glGetTexLevelParameteriv ] with-out-parameters ; inline

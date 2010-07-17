@@ -121,7 +121,7 @@ M: rs-loc pprint* \ R pprint-loc ;
     post-order [
         instructions>> [
             [ [ temp-vregs ] [ temp-vreg-reps ] bi zip ]
-            [ [ defs-vreg ] [ defs-vreg-rep ] bi 2dup and [ 2array ] [ 2drop f ] if ]
-            bi [ suffix ] when*
+            [ [ defs-vregs ] [ defs-vreg-reps ] bi zip ]
+            bi append
         ] map concat
     ] map concat >hashtable representations set ;
