@@ -1800,7 +1800,7 @@ FUNCTION: BOOL SetProcessPriorityBoost ( HANDLE hProcess, BOOL disablePriorityBo
 ! FUNCTION: SetProcessWorkingSetSize
 ! FUNCTION: SetStdHandle
 ! FUNCTION: SetSystemPowerState
-! FUNCTION: SetSystemTime
+FUNCTION: BOOL SetSystemTime ( SYSTEMTIME* lpSystemTime ) ;
 ! FUNCTION: SetSystemTimeAdjustment
 ! FUNCTION: SetTapeParameters
 ! FUNCTION: SetTapePosition

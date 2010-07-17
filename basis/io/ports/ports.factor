@@ -4,7 +4,8 @@ USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.encodings math.order io.backend
 continuations classes byte-arrays namespaces splitting grouping
 dlists alien alien.c-types assocs io.encodings.binary summary
-accessors destructors combinators fry specialized-arrays ;
+accessors destructors combinators fry specialized-arrays
+locals ;
 SPECIALIZED-ARRAY: uchar
 IN: io.ports
 
@@ -105,7 +106,8 @@ TUPLE: output-port < buffered-port ;
     [ nip ] [ buffer>> buffer-capacity <= ] 2bi
     [ drop ] [ stream-flush ] if ; inline
 
-M: output-port stream-element-type stream>> stream-element-type ; inline
+M: output-port stream-element-type
+    stream>> stream-element-type ; inline
 
 M: output-port stream-write1
     dup check-disposed
@@ -128,20 +130,40 @@ M: output-port stream-write
 
 HOOK: (wait-to-write) io-backend ( port -- )
 
+: port-flush ( port -- )
+    dup buffer>> buffer-empty?
+    [ drop ] [ dup (wait-to-write) port-flush ] if ;
+
+M: output-port stream-flush ( port -- )
+    [ check-disposed ] [ port-flush ] bi ;
+
 HOOK: tell-handle os ( handle -- n )
+
 HOOK: seek-handle os ( n seek-type handle -- )
 
-M: buffered-port stream-tell ( stream -- n )
+M: input-port stream-tell ( stream -- n )
     [ check-disposed ]
-    [ handle>> tell-handle ]
-    [ [ buffer>> size>> - 0 max ] [ buffer>> pos>> ] bi + ] tri ;
+    [ [ handle>> tell-handle ] [ buffer>> buffer-length ] bi - ] bi ;
+
+M: output-port stream-tell ( stream -- n )
+    [ check-disposed ]
+    [ [ handle>> tell-handle ] [ buffer>> buffer-length ] bi + ] bi ;
+
+:: do-seek-relative ( n seek-type stream -- n seek-type stream )
+    ! seek-relative needs special handling here, because of the
+    ! buffer.
+    seek-type seek-relative eq?
+    [ n stream stream-tell + seek-absolute ] [ n seek-type ] if
+    stream ;
 
 M: input-port stream-seek ( n seek-type stream -- )
+    do-seek-relative
     [ check-disposed ]
     [ buffer>> 0 swap buffer-reset ]
     [ handle>> seek-handle ] tri ;
 
 M: output-port stream-seek ( n seek-type stream -- )
+    do-seek-relative
     [ check-disposed ]
     [ stream-flush ]
     [ handle>> seek-handle ] tri ;
@@ -149,13 +171,6 @@ M: output-port stream-seek ( n seek-type stream -- )
 GENERIC: shutdown ( handle -- )
 
 M: object shutdown drop ;
-
-: port-flush ( port -- )
-    dup buffer>> buffer-empty?
-    [ drop ] [ dup (wait-to-write) port-flush ] if ;
-
-M: output-port stream-flush ( port -- )
-    [ check-disposed ] [ port-flush ] bi ;
 
 M: output-port dispose*
     [

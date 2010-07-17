@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io.launcher bootstrap.image.download
-mason.common mason.platform ;
+USING: bootstrap.image.download io.directories io.launcher
+kernel mason.common mason.platform ;
 IN: mason.updates
 
 : git-pull-cmd ( -- cmd )
@@ -23,6 +23,4 @@ IN: mason.updates
     boot-image-name maybe-download-image ;
 
 : new-code-available? ( -- ? )
-    updates-available?
-    new-image-available?
-    or ;
+    updates-available? new-image-available? or ;

@@ -14,6 +14,7 @@ io.encodings.ascii
 io.encodings.binary
 io.streams.limited
 io.streams.string
+io.streams.throwing
 io.servers.connection
 io.timeouts
 io.crlf
@@ -27,6 +28,7 @@ html.templates
 html.streams
 html
 mime.types
+math.order
 xml.writer ;
 FROM: mime.multipart => parse-multipart ;
 IN: http.server
@@ -52,12 +54,10 @@ SYMBOL: upload-limit
 : read-multipart-data ( request -- mime-parts )
     [ "content-type" header ]
     [ "content-length" header string>number ] bi
-    unlimited-input
-    upload-limit get stream-throws limit-input
-    stream-eofs limit-input
+    upload-limit get min limited-input
     binary decode-input
     parse-multipart-form-data parse-multipart ;
-
+ 
 : read-content ( request -- bytes )
     "content-length" header string>number read ;
 
@@ -75,9 +75,8 @@ SYMBOL: upload-limit
     ] when ;
 
 : extract-host ( request -- request )
-    [ ] [ url>> ] [ "host" header parse-host ] tri
-    [ >>host ] [ >>port ] bi*
-    drop ;
+    [ ] [ url>> ] [ "host" header dup [ url-decode ] when ] tri
+    >>host drop ;
 
 : extract-cookies ( request -- request )
     dup "cookie" header [ parse-cookie >>cookies ] when* ;
@@ -278,11 +277,11 @@ TUPLE: http-server < threaded-server ;
 
 SYMBOL: request-limit
 
-64 1024 * request-limit set-global
+request-limit [ 64 1024 * ] initialize
 
 M: http-server handle-client*
     drop [
-        request-limit get stream-throws limit-input
+        request-limit get limited-input
         ?refresh-all
         [ read-request ] ?benchmark
         [ do-request ] ?benchmark

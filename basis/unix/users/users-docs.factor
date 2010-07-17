@@ -67,8 +67,8 @@ HELP: user-id
 
 HELP: with-effective-user
 { $values
-     { "string/id" "a string or a uid" } { "quot" quotation } }
-{ $description "Sets the effective user-name and calls the quotation. Restores the current user-name on success or on error after the call." } ;
+     { "string/id/f" "a string, a uid, or f" } { "quot" quotation } }
+{ $description "Sets the effective user-name and calls the quotation. Restores the current user-name on success or on error after the call. If the first parameter is " { $link f } ", the quotation is called as the current user." } ;
 
 HELP: with-user-cache
 { $values
@@ -77,8 +77,8 @@ HELP: with-user-cache
 
 HELP: with-real-user
 { $values
-     { "string/id" "a string or a uid" } { "quot" quotation } }
-{ $description "Sets the real user-name and calls the quotation. Restores the current user-name on success or on error after the call." } ;
+     { "string/id/f" "a string, a uid, or f" } { "quot" quotation } }
+{ $description "Sets the real user-name and calls the quotation. Restores the current user-name on success or on error after the call. If the first parameter is " { $link f } ", the quotation is called as the current user." } ;
 
 {
     real-user-name real-user-id set-real-user
@@ -86,18 +86,43 @@ HELP: with-real-user
     set-effective-user
 } related-words
 
+HELP: ?user-id
+{ $values
+    { "string" string }
+    { "id/f" "an integer or " { $link f } }
+}
+{ $description "Returns a group id or throws an exception." } ;
+
+HELP: all-user-names
+{ $values
+    
+    { "seq" sequence }
+}
+{ $description "Returns a sequence of group names as strings." } ;
+
+HELP: user-exists?
+{ $values
+    { "name/id" "a string or an integer" }
+    { "?" boolean }
+}
+{ $description "Returns a boolean representing the user's existence." } ;
+
 ARTICLE: "unix.users" "Unix users"
 "The " { $vocab-link "unix.users" } " vocabulary contains words that return information about Unix users."
 $nl
 "Listing all users:"
 { $subsections all-users }
-"Real user:"
+"Listing all user names:"
+{ $subsections all-user-names }
+"Checking if a user exists:"
+{ $subsections user-exists? }
+"Querying/setting the current real user:"
 { $subsections
     real-user-name
     real-user-id
     set-real-user
 }
-"Effective user:"
+"Querying/setting the current effective user:"
 { $subsections
     effective-user-name
     effective-user-id

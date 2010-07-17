@@ -42,7 +42,6 @@ inline static THREADHANDLE thread_id() { return pthread_self(); }
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);
 void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 
-u64 system_micros();
 u64 nano_count();
 void sleep_nanos(u64 nsec);
 void open_console();

@@ -10,11 +10,6 @@ byte_array *factor_vm::allot_byte_array(cell size)
 	return array;
 }
 
-VM_C_API cell allot_byte_array(cell size, factor_vm *parent)
-{
-	return tag<byte_array>(parent->allot_byte_array(size));
-}
-
 void factor_vm::primitive_byte_array()
 {
 	cell size = unbox_array_size();

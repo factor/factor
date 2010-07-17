@@ -46,14 +46,10 @@ MACRO: append-outputs ( quot -- seq )
 MACRO: preserving ( quot -- )
     [ inputs ] keep '[ _ ndup @ ] ;
 
-MACRO: nullary ( quot -- quot' )
-    dup outputs '[ @ _ ndrop ] ;
-
 MACRO: dropping ( quot -- quot' )
     inputs '[ [ _ ndrop ] ] ;
 
-MACRO: balancing ( quot -- quot' )
-    '[ _ [ preserving ] [ dropping ] bi ] ;
+MACRO: nullary ( quot -- quot' ) dropping ;
 
 MACRO: smart-if ( pred true false -- quot )
     '[ _ preserving _ _ if ] ;
@@ -65,7 +61,7 @@ MACRO: smart-unless ( pred false -- quot )
     '[ _ [ ] _ smart-if ] ;
 
 MACRO: smart-if* ( pred true false -- quot )
-    '[ _ balancing _ swap _ compose if ] ;
+    '[ _ [ preserving ] [ dropping ] bi _ swap _ compose if ] ;
 
 MACRO: smart-when* ( pred true -- quot )
     '[ _ _ [ ] smart-if* ] ;

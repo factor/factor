@@ -17,11 +17,6 @@ SYMBOL: builder-from
 ! Who receives build report e-mails.
 SYMBOL: builder-recipients
 
-! (Optional) twitter credentials for status updates.
-SYMBOL: builder-twitter-username
-
-SYMBOL: builder-twitter-password
-
 ! (Optional) CPU architecture to build for.
 SYMBOL: target-cpu
 

@@ -60,14 +60,14 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
 
 : arb-make-pixel-format ( world attributes -- pf )
     [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 { int int }
-    [ wglChoosePixelFormatARB win32-error=0/f ] [ ] with-out-parameters drop ;
+    [ wglChoosePixelFormatARB win32-error=0/f ] with-out-parameters drop ;
 
 : arb-pixel-format-attribute ( pixel-format attribute -- value )
     >WGL_ARB
     [ drop f ] [
         [ [ world>> handle>> hDC>> ] [ handle>> ] bi 0 1 ] dip
         first <int> { int }
-        [ wglGetPixelFormatAttribivARB win32-error=0/f ] [ ]
+        [ wglGetPixelFormatAttribivARB win32-error=0/f ]
         with-out-parameters
     ] if-empty ;
 
@@ -568,6 +568,9 @@ H{ } clone wm-handlers set-global
     dup array?
     [ [ execute( -- wm ) add-wm-handler ] with each ]
     [ wm-handlers get-global set-at ] if ;
+
+: remove-wm-handler ( wm -- )
+    wm-handlers get-global delete-at ;
 
 [ handle-wm-close 0                  ] WM_CLOSE add-wm-handler
 [ 4dup handle-wm-paint DefWindowProc ] WM_PAINT add-wm-handler

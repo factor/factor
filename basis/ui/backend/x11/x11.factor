@@ -39,11 +39,11 @@ SINGLETON: x11-ui-backend
         XGetWindowProperty
         Success assert=
     ]
+    with-out-parameters
     [| type format n-atoms bytes-after atoms |
         atoms n-atoms <direct-ulong-array> >array
         atoms XFree
-    ]
-    with-out-parameters ;
+    ] call ;
 
 : net-wm-hint-supported? ( atom -- ? )
     supported-net-wm-hints member? ;
@@ -93,7 +93,7 @@ M: x11-ui-backend (pixel-format-attribute)
     [ handle>> ] [ >glx-visual ] bi*
     [ 2drop f ] [
         first
-        { int } [ glXGetConfig drop ] [ ] with-out-parameters
+        { int } [ glXGetConfig drop ] with-out-parameters
     ] if-empty ;
 
 CONSTANT: modifiers
