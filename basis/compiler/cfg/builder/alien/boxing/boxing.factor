@@ -118,7 +118,7 @@ M: long-long-type box
     <gc-map> ^^box-long-long ;
 
 M: struct-c-type box
-    '[ _ heap-size emit-allot-byte-array dup ^^unbox-byte-array ] 2dip
+    '[ _ heap-size ^^allot-byte-array dup ^^unbox-byte-array ] 2dip
     implode-struct ;
 
 GENERIC: box-parameter ( vregs reps c-type -- dst )
