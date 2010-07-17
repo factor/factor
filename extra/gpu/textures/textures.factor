@@ -309,7 +309,7 @@ TYPED: read-compressed-texture ( tdt: texture-data-target level: integer -- byte
 
 : read-texture-image ( tdt level -- image )
     [ texture-dim ]
-    [ drop texture-object [ component-order>> ] [ component-type>> ] bi f ]
+    [ drop texture-object [ component-order>> ] [ component-type>> ] bi f f ]
     [ read-texture ] 2tri
     image boa ; inline
 
