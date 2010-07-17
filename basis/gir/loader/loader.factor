@@ -88,11 +88,25 @@ SYMBOL: namespace-PREFIX
         [ load-parameter ]
     } cleave ;
 
-: load-parameters ( xml callable -- callable )
+: throws-parameter ( -- parameter )
+    parameter new
+        "error" >>name
+        "in" >>direction
+        "none" >>transfer-ownership
+        "GError**" >>c-type
+        "GLib.Error" full-type-name>type >>type ;
+
+: extract-parameters ( xml -- parameters )
+    "parameters" tag-named "parameter" tags-named
+    [ xml>parameter ] map ;
+
+: load-parameters ( callable xml -- callable )
     [
-        "parameters" tag-named "parameter" tags-named
-        [ xml>parameter ] map
-        dup { f } tail? [ but-last [ t >>varargs? ] dip ] when
+        [
+            extract-parameters
+            dup { f } tail? [ but-last [ t >>varargs? ] dip ] when
+        ]
+        [ "throws" attr "1" = [ throws-parameter suffix ] when ] bi
         >>parameters
     ]
     [ "return-value" tag-named xml>return >>return ] bi ;
