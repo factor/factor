@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.libraries combinators kernel system
-gir gio.ffi glib.ffi gmodule.ffi gobject.ffi ;
+gobject-introspection gio.ffi glib.ffi gmodule.ffi gobject.ffi ;
 EXCLUDE: alien.c-types => pointer ;
 IN: gdk.pixbuf.ffi
 

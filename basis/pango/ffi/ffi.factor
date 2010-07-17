@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.syntax combinators kernel system
-gir glib.ffi ;
+gobject-introspection glib.ffi ;
 IN: pango.ffi
 
 << 
@@ -13,7 +13,7 @@ IN: pango.ffi
 } cond 
 >>
 
-TYPEDEF: void PangoLayoutRun ! не совсем верно
+TYPEDEF: void PangoLayoutRun
 TYPEDEF: guint32 PangoGlyph
 
 IMPLEMENT-STRUCTS: PangoRectangle ;
