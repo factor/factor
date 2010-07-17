@@ -2,7 +2,8 @@
 USING: accessors alien alien.c-types alien.arrays alien.strings
 arrays byte-arrays cpu.architecture fry io io.encodings.binary
 io.files io.streams.memory kernel libc math math.functions 
-sequences words macros combinators generalizations ;
+sequences words macros combinators generalizations
+stack-checker.dependencies combinators.short-circuit ;
 QUALIFIED: math
 IN: alien.data
 
@@ -69,7 +70,10 @@ M: value-type c-type-rep drop int-rep ;
 M: value-type c-type-getter
     drop [ swap <displaced-alien> ] ;
 
-M: value-type c-type-setter ( type -- quot )
+M: value-type c-type-copier
+    heap-size '[ _ memory>byte-array ] ;
+
+M: value-type c-type-setter
     [ c-type-getter ] [ heap-size ] bi '[ @ swap _ memcpy ] ;
 
 M: array c-type-boxer-quot
@@ -88,14 +92,35 @@ ERROR: local-allocation-error ;
     ! to still be abl to access scope-allocated data.
     ;
 
+MACRO: (simple-local-allot) ( c-type -- quot )
+    [ depends-on-c-type ]
+    [ dup '[ _ heap-size _ c-type-align (local-allot) ] ] bi ;
+
+: [hairy-local-allot] ( c-type initial -- quot )
+    over '[ _ (simple-local-allot) _ over 0 _ set-alien-value ] ;
+
+: hairy-local-allot? ( obj -- ? )
+    {
+        [ array? ]
+        [ length 3 = ]
+        [ second initial: eq? ]
+    } 1&& ;
+
+MACRO: (hairy-local-allot) ( obj -- quot )
+    dup hairy-local-allot?
+    [ first3 nip [hairy-local-allot] ]
+    [ '[ _ (simple-local-allot) ] ]
+    if ;
+
 MACRO: (local-allots) ( c-types -- quot )
-    [ '[ _ [ heap-size ] [ c-type-align ] bi (local-allot) ] ] map [ ] join ;
+    [ '[ _ (hairy-local-allot) ] ] map [ ] join ;
 
 MACRO: box-values ( c-types -- quot )
     [ c-type-boxer-quot ] map '[ _ spread ] ;
 
 MACRO: out-parameters ( c-types -- quot )
-    [ length ] [ [ '[ 0 _ alien-value ] ] map ] bi
+    [ dup hairy-local-allot? [ first ] when ] map
+    [ length ] [ [ '[ 0 _ alien-copy-value ] ] map ] bi
     '[ _ nkeep _ spread ] ;
 
 PRIVATE>
@@ -104,8 +129,8 @@ PRIVATE>
     [ [ (local-allots) ] [ box-values ] bi ] dip call
     (cleanup-allot) ; inline
 
-: with-out-parameters ( c-types quot finish -- values )
-    [ [ drop (local-allots) ] [ swap out-parameters ] 2bi ] dip call
+: with-out-parameters ( c-types quot -- values... )
+    [ drop (local-allots) ] [ swap out-parameters ] 2bi
     (cleanup-allot) ; inline
 
 GENERIC: binary-zero? ( value -- ? )
@@ -115,4 +140,3 @@ M: f binary-zero? drop t ; inline
 M: integer binary-zero? zero? ; inline
 M: math:float binary-zero? double>bits zero? ; inline
 M: complex binary-zero? >rect [ binary-zero? ] both? ; inline
-

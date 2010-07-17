@@ -32,7 +32,7 @@ SYMBOL: current-library
     (parse-c-type) dup valid-c-type? [ no-c-type ] unless ;
 
 : scan-c-type ( -- c-type )
-    scan {
+    scan-token {
         { [ dup "{" = ] [ drop \ } parse-until >array ] }
         { [ dup "pointer:" = ] [ drop scan-c-type <pointer> ] }
         [ parse-c-type ]

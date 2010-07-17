@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov
+! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax io kernel namespaces core-foundation
 core-foundation.strings cocoa.messages cocoa cocoa.classes
@@ -39,16 +39,6 @@ FUNCTION: void NSBeep ( ) ;
 
 : install-delegate ( receiver delegate -- )
     -> alloc -> init -> setDelegate: ;
-
-TUPLE: objc-error alien reason ;
-
-: objc-error ( alien -- * )
-    dup -> reason CF>string \ objc-error boa throw ;
-
-M: objc-error summary ( error -- )
-    drop "Objective C exception" ;
-
-[ [ objc-error ] 19 set-special-object ] "cocoa.application" add-startup-hook
 
 : running.app? ( -- ? )
     #! Test if we're running a .app.

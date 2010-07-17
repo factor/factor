@@ -21,12 +21,8 @@ ERROR: too-many-redirects ;
     [ "HTTP/" write version>> write crlf ]
     tri ;
 
-: url-host ( url -- string )
-    [ host>> ] [ port>> ] bi dup "http" protocol-port =
-    [ drop ] [ ":" swap number>string 3append ] if ;
-
 : set-host-header ( request header -- request header )
-    over url>> url-host "host" pick set-at ;
+    over url>> host>> "host" pick set-at ;
 
 : set-cookie-header ( header cookies -- header )
     unparse-cookie "cookie" pick set-at ;

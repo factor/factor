@@ -4,7 +4,8 @@ sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
 continuations growable namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
-compiler.test definitions generic.single shuffle math.order ;
+compiler.test definitions generic.single shuffle math.order
+compiler.cfg.debugger classes.struct alien.syntax alien.data ;
 IN: compiler.tests.optimizer
 
 GENERIC: xyz ( obj -- obj )
@@ -440,3 +441,19 @@ TUPLE: grid-mesh-tuple { length read-only } { step read-only } ;
     ] keep ;
 
 [ { 0.5 } ] [ grid-mesh-test-case ] unit-test
+
+[ { 1 } "bar" ] [ { 1 } [ [ [ [ "foo" throw ] [ "bar" throw ] recover ] attempt-all f ] [ ] recover ] compile-call ] unit-test
+
+GENERIC: bad-push-test-case ( a -- b )
+M: object bad-push-test-case "foo" throw ; inline
+[ { 1 } "bar" ] [ { 1 } [ [ [ [ bad-push-test-case ] [ "bar" throw ] recover ] attempt-all f ] [ ] recover ] compile-call ] unit-test
+
+STRUCT: BitmapData { Scan0 void* } ;
+
+[ ALIEN: 123 ] [
+    [
+        { BitmapData }
+        [ BitmapData memory>struct ALIEN: 123 >>Scan0 drop ]
+        with-out-parameters Scan0>>
+    ] compile-call
+] unit-test

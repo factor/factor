@@ -18,9 +18,15 @@ M: variant-class initial-value*
 : define-variant-member ( member -- class )
     dup array? [ first3 pick [ define-tuple-class-and-boa-word ] dip ] [ dup define-singleton-class ] if ;
 
-: define-variant-class ( class members -- )
-    [ [ define-mixin-class ] [ t "variant" set-word-prop ] [ ] tri ] dip
-    [ define-variant-member swap add-mixin-instance ] with each ;
+: define-variant-class ( class -- )
+    [ define-mixin-class ] [ t "variant" set-word-prop ] bi ;
+
+: define-variant-class-member ( class member -- )
+    define-variant-member swap add-mixin-instance ;
+
+: define-variant-class-members ( class members -- )
+    [ dup define-variant-class ] dip
+    [ define-variant-class-member ] with each ;
 
 : parse-variant-tuple-member ( name -- member )
     create-class-in tuple
@@ -38,7 +44,12 @@ M: variant-class initial-value*
 SYNTAX: VARIANT:
     CREATE-CLASS
     parse-variant-members
-    define-variant-class ;
+    define-variant-class-members ;
+
+SYNTAX: VARIANT-MEMBER:
+    scan-word
+    scan parse-variant-member
+    define-variant-class-member ;
 
 MACRO: unboa ( class -- )
     <wrapper> \ boa [ ] 2sequence [undo] ;

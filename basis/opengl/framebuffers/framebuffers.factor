@@ -51,4 +51,4 @@ IN: opengl.framebuffers
 
 : framebuffer-attachment ( attachment -- id )
     GL_FRAMEBUFFER swap GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME
-    { uint } [ glGetFramebufferAttachmentParameteriv ] [ ] with-out-parameters ;
+    { uint } [ glGetFramebufferAttachmentParameteriv ] with-out-parameters ;

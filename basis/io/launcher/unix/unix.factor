@@ -95,7 +95,7 @@ TUPLE: signal n ;
     dup WIFSIGNALED [ WTERMSIG signal boa ] [ WEXITSTATUS ] if ;
 
 M: unix wait-for-processes ( -- ? )
-    { int } [ -1 swap WNOHANG waitpid ] [ ] with-out-parameters
+    { int } [ -1 swap WNOHANG waitpid ] with-out-parameters
     swap dup 0 <= [
         2drop t
     ] [

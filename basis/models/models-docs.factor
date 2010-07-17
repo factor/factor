@@ -1,5 +1,5 @@
 USING: help.syntax help.markup kernel math classes classes.tuple
-calendar ;
+calendar sequences growable ;
 IN: models
 
 HELP: model
@@ -64,16 +64,28 @@ HELP: set-model
 { $values { "value" object } { "model" model } }
 { $description "Changes the value of a model and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
 
-{ set-model change-model (change-model) } related-words
+{ set-model change-model change-model* (change-model) push-model pop-model } related-words
 
 HELP: change-model
-{ $values { "model" model } { "quot" { $quotation "( obj -- newobj )" } } }
+{ $values { "model" model } { "quot" { $quotation "( ..a obj -- ..b newobj )" } } }
 { $description "Applies the quotation to the current value of the model to yield a new value, then changes the value of the model to the new value, and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
 
+HELP: change-model*
+{ $values { "model" model } { "quot" { $quotation "( ..a obj -- ..b )" } } }
+{ $description "Applies the quotation to the current value of the model and calls " { $link model-changed } " on all observers registered with " { $link add-connection } " without actually changing the value of the model. This is useful for notifying observers of operations that mutate a value, as in " { $link push-model } " and " { $link pop-model } "." } ;
+
 HELP: (change-model)
-{ $values { "model" model } { "quot" { $quotation "( obj -- newobj )" } } }
+{ $values { "model" model } { "quot" { $quotation "( ..a obj -- ..b newobj )" } } }
 { $description "Applies the quotation to the current value of the model to yield a new value, then changes the value of the model to the new value without notifying any observers registered with " { $link add-connection } "." }
 { $notes "There are very few reasons for user code to call this word. Instead, call " { $link change-model } ", which notifies observers." } ;
+
+HELP: push-model
+{ $values { "value" object } { "model" model } }
+{ $description { $link push } "es " { $snippet "value" } " onto the " { $link growable } " sequence stored as the value of " { $snippet "model" } " and calls " { $link model-changed } " on all observers registered for the model with " { $link add-connection } "." } ;
+
+HELP: pop-model
+{ $values { "model" model } { "value" object } }
+{ $description { $link pop } "s the topmost " { $snippet "value" } " off of the " { $link growable } " sequence stored as the value of " { $snippet "model" } " and calls " { $link model-changed } " on all observers registered for the model with " { $link add-connection } "." } ;
 
 HELP: range-value
 { $values { "model" model } { "value" object } }

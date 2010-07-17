@@ -11,6 +11,7 @@ compiler.cfg.rpo
 compiler.cfg.debugger
 compiler.cfg.def-use
 compiler.cfg.comparisons
+compiler.cfg.ssa.destruction
 compiler.cfg.linear-scan
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.live-intervals
@@ -25,6 +26,36 @@ IN: compiler.cfg.linear-scan.tests
 check-allocation? on
 check-numbering? on
 
+! Live interval calculation
+
+! A value is defined and never used; make sure it has the right
+! live range
+V{
+    T{ ##load-integer f 1 0 }
+    T{ ##replace-imm f D 0 "hi" }
+    T{ ##branch }
+} 0 test-bb
+
+: test-live-intervals ( -- )
+    cfg new 0 get >>entry
+    [ cfg set ] [ number-instructions ] [ compute-live-intervals ] tri
+    2drop ;
+
+[ ] [
+    H{
+        { 1 int-rep }
+    } representations set
+    H{
+        { 1 1 }
+    } leader-map set
+    test-live-intervals
+] unit-test
+
+[ 0 0 ] [
+    1 live-intervals get at [ start>> ] [ end>> ] bi
+] unit-test
+
+! Live range and interval splitting
 [
     { T{ live-range f 1 10 } T{ live-range f 15 15 } }
     { T{ live-range f 16 20 } }

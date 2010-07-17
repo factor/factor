@@ -8,14 +8,6 @@ THREADHANDLE start_thread(void *(*start_routine)(void *), void *args)
 	return (void *)CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0);
 }
 
-u64 system_micros()
-{
-	FILETIME t;
-	GetSystemTimeAsFileTime(&t);
-	return (((u64)t.dwLowDateTime | (u64)t.dwHighDateTime<<32)
-		- EPOCH_OFFSET) / 10;
-}
-
 u64 nano_count()
 {
 	static double scale_factor;

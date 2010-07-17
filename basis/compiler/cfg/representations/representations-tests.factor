@@ -16,13 +16,13 @@ IN: compiler.cfg.representations
     } uses-vreg-reps
 ] unit-test
 
-[ double-rep ] [
+[ { double-rep } ] [
     T{ ##load-memory-imm
        { dst 5 }
        { base 3 }
        { offset 0 }
        { rep double-rep }
-    } defs-vreg-rep
+    } defs-vreg-reps
 ] unit-test
 
 H{ } clone representations set

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math math.order models
 namespaces make sequences words strings system hashtables math.parser
-math.vectors classes.tuple classes boxes calendar alarms combinators
+math.vectors classes.tuple classes boxes calendar timers combinators
 sets columns fry deques ui.gadgets ui.gadgets.private ascii
 combinators.short-circuit ;
 FROM: namespaces => set ;
@@ -188,15 +188,15 @@ SYMBOL: drag-timer
         [ drag-gesture ]
         300 milliseconds
         100 milliseconds
-        <alarm>
+        <timer>
         [ drag-timer get-global >box ]
-        [ start-alarm ] bi
+        [ start-timer ] bi
     ] when ;
 
 : stop-drag-timer ( -- )
     hand-buttons get-global empty? [
         drag-timer get-global ?box
-        [ stop-alarm ] [ drop ] if
+        [ stop-timer ] [ drop ] if
     ] when ;
 
 : fire-motion ( -- )

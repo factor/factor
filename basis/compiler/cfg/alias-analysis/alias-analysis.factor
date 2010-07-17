@@ -186,6 +186,15 @@ SYMBOL: heap-ac
         slot# vreg kill-constant-set-slot
     ] [ vreg kill-computed-set-slot ] if ;
 
+: init-alias-analysis ( -- )
+    H{ } clone vregs>acs set
+    H{ } clone acs>vregs set
+    H{ } clone live-slots set
+    H{ } clone copies set
+    H{ } clone recent-stores set
+    HS{ } clone dead-stores set
+    0 ac-counter set ;
+
 GENERIC: insn-slot# ( insn -- slot#/f )
 GENERIC: insn-object ( insn -- vreg )
 
@@ -215,13 +224,13 @@ M: vreg-insn analyze-aliases
     ! anywhere its used as a tagged pointer. Boxing allocates
     ! a new value, except boxing instructions haven't been
     ! inserted yet.
-    dup defs-vreg [
-        over defs-vreg-rep { int-rep tagged-rep } member?
+    dup [
+        { int-rep tagged-rep } member?
         [ set-heap-ac ] [ set-new-ac ] if
-    ] when* ;
+    ] each-def-rep ;
 
 M: ##phi analyze-aliases
-    dup defs-vreg set-heap-ac ;
+    dup dst>> set-heap-ac ;
 
 M: ##allocation analyze-aliases
     #! A freshly allocated object is distinct from any other
@@ -277,22 +286,6 @@ M: ##compare analyze-aliases
         analyze-aliases
     ] when ;
 
-GENERIC: eliminate-dead-stores ( insn -- ? )
-
-M: ##set-slot-imm eliminate-dead-stores
-    insn#>> dead-stores get in? not ;
-
-M: insn eliminate-dead-stores drop t ;
-
-: init-alias-analysis ( -- )
-    H{ } clone vregs>acs set
-    H{ } clone acs>vregs set
-    H{ } clone live-slots set
-    H{ } clone copies set
-    H{ } clone recent-stores set
-    HS{ } clone dead-stores set
-    0 ac-counter set ;
-
 : reset-alias-analysis ( -- )
     recent-stores get clear-assoc
     vregs>acs get clear-assoc
@@ -304,6 +297,19 @@ M: insn eliminate-dead-stores drop t ;
     next-ac heap-ac set
     \ ##vm-field set-new-ac
     \ ##alien-global set-new-ac ;
+
+M: factor-call-insn analyze-aliases
+    heap-ac get ac>vregs [
+        [ live-slots get at clear-assoc ]
+        [ recent-stores get at clear-assoc ] bi
+    ] each ;
+
+GENERIC: eliminate-dead-stores ( insn -- ? )
+
+M: ##set-slot-imm eliminate-dead-stores
+    insn#>> dead-stores get in? not ;
+
+M: insn eliminate-dead-stores drop t ;
 
 : alias-analysis-step ( insns -- insns' )
     reset-alias-analysis

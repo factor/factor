@@ -91,8 +91,6 @@ M: ##dispatch generate-insn
 ! Special cases
 M: ##no-tco generate-insn drop ;
 
-M: ##stack-frame generate-insn drop ;
-
 M: ##prologue generate-insn
     drop
     cfg get stack-frame>>
@@ -254,7 +252,6 @@ CODEGEN: ##compare-integer-imm %compare-integer-imm
 CODEGEN: ##compare-float-ordered %compare-float-ordered
 CODEGEN: ##compare-float-unordered %compare-float-unordered
 CODEGEN: ##save-context %save-context
-CODEGEN: ##restore-context %restore-context
 CODEGEN: ##vm-field %vm-field
 CODEGEN: ##set-vm-field %set-vm-field
 CODEGEN: ##alien-global %alien-global
@@ -288,20 +285,12 @@ CONDITIONAL: ##fixnum-mul %fixnum-mul
 ! FFI
 CODEGEN: ##unbox %unbox
 CODEGEN: ##unbox-long-long %unbox-long-long
-CODEGEN: ##store-reg-param %store-reg-param
-CODEGEN: ##store-stack-param %store-stack-param
-CODEGEN: ##load-reg-param %load-reg-param
-CODEGEN: ##load-stack-param %load-stack-param
 CODEGEN: ##local-allot %local-allot
 CODEGEN: ##box %box
 CODEGEN: ##box-long-long %box-long-long
-CODEGEN: ##allot-byte-array %allot-byte-array
-CODEGEN: ##prepare-var-args %prepare-var-args
 CODEGEN: ##alien-invoke %alien-invoke
-CODEGEN: ##cleanup %cleanup
 CODEGEN: ##alien-indirect %alien-indirect
-CODEGEN: ##begin-callback %begin-callback
+CODEGEN: ##alien-assembly %alien-assembly
+CODEGEN: ##callback-inputs %callback-inputs
 CODEGEN: ##alien-callback %alien-callback
-CODEGEN: ##end-callback %end-callback
-
-M: ##alien-assembly generate-insn quot>> call( -- ) ;
+CODEGEN: ##callback-outputs %callback-outputs

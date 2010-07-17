@@ -431,9 +431,9 @@ M: bad-executable summary
 \ quot-compiled? { quotation } { object } define-primitive
 \ quotation-code { quotation } { integer integer } define-primitive \ quotation-code make-flushable
 \ reset-dispatch-stats { } { } define-primitive
-\ resize-array { integer array } { array } define-primitive \ resize-array make-flushable
-\ resize-byte-array { integer byte-array } { byte-array } define-primitive \ resize-byte-array make-flushable
-\ resize-string { integer string } { string } define-primitive \ resize-string make-flushable
+\ resize-array { integer array } { array } define-primitive
+\ resize-byte-array { integer byte-array } { byte-array } define-primitive
+\ resize-string { integer string } { string } define-primitive
 \ retainstack { } { array } define-primitive \ retainstack make-flushable
 \ retainstack-for { c-ptr } { array } define-primitive \ retainstack-for make-flushable
 \ set-alien-cell { c-ptr c-ptr integer } { } define-primitive
@@ -459,7 +459,6 @@ M: bad-executable summary
 \ special-object { fixnum } { object } define-primitive \ special-object make-flushable
 \ string-nth-fast { fixnum string } { fixnum } define-primitive \ string-nth-fast make-flushable
 \ strip-stack-traces { } { } define-primitive
-\ system-micros { } { integer } define-primitive \ system-micros make-flushable
 \ tag { object } { fixnum } define-primitive \ tag make-foldable
 \ unimplemented { } { } define-primitive
 \ word-code { word } { integer integer } define-primitive \ word-code make-flushable

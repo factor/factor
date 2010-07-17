@@ -1,12 +1,12 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs boxes io kernel math models namespaces make
-dlists deques sequences threads words continuations init
-combinators combinators.short-circuit hashtables
-concurrency.flags sets accessors calendar fry destructors
-ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gadgets.tracks ui.gestures ui.backend ui.render strings
-classes.tuple classes.tuple.parser lexer vocabs.parser parser ;
+USING: accessors arrays assocs boxes classes.tuple
+classes.tuple.parser combinators combinators.short-circuit
+concurrency.flags concurrency.promises continuations deques
+destructors dlists fry init kernel lexer make math namespaces
+parser sequences sets strings threads ui.backend ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures vocabs.parser
+words ;
 IN: ui
 
 <PRIVATE
@@ -15,8 +15,6 @@ IN: ui
 SYMBOL: windows
 
 : window ( handle -- world ) windows get-global at ;
-
-: window-focus ( handle -- gadget ) window world-focus ;
 
 : register-window ( world handle -- )
     #! Add the new window just below the topmost window. Why?
@@ -94,6 +92,7 @@ M: world ungraft*
         [ [ <reversed> [ [ dispose ] when* ] each V{ } clone ] change-window-resources drop ]
         [ [ (close-window) f ] change-handle drop ]
         [ unfocus-world ]
+        [ promise>> t swap fulfill ]
     } cleave ;
 
 : init-ui ( -- )
