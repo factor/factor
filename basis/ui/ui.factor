@@ -81,6 +81,9 @@ M: world graft*
         [ [ clean-up-broken-window ] [ ui-error ] bi* ] recover
     ] bi ;
 
+: dispose-window-resources ( world -- )
+    [ <reversed> [ [ dispose ] when* ] each V{ } clone ] change-window-resources drop ;
+
 M: world ungraft*
     {
         [ set-gl-context ]
@@ -89,7 +92,7 @@ M: world ungraft*
         [ hand-clicked close-global ]
         [ hand-gadget close-global ]
         [ end-world ]
-        [ [ <reversed> [ [ dispose ] when* ] each V{ } clone ] change-window-resources drop ]
+        [ dispose-window-resources ]
         [ unfocus-world ]
         [ [ (close-window) f ] change-handle drop ]
         [ promise>> t swap fulfill ]
