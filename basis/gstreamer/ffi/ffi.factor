@@ -4,10 +4,10 @@ USING: alien alien.syntax alien.libraries combinators kernel
 system
 gobject-introspection glib.ffi gmodule.ffi gobject.ffi ;
 EXCLUDE: alien.c-types => pointer ;
-IN: gst.ffi
+IN: gstreamer.ffi
 
 <<
-"gst" {
+"gstreamer" {
     { [ os winnt? ] [ drop ] }
     { [ os macosx? ] [ drop ] }
     { [ os unix? ] [ "libgstreamer-0.10.so" cdecl add-library ] }
@@ -23,5 +23,5 @@ TYPEDEF: void* xmlNodePtr
 TYPEDEF: void* xmlDocPtr
 TYPEDEF: void* xmlNsPtr
 
-GIR: vocab:gst/Gst-0.10.gir
+GIR: vocab:gstreamer/Gst-0.10.gir
 
