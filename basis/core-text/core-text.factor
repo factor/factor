@@ -51,7 +51,7 @@ TUPLE: line < disposable line metrics image loc dim ;
 
 : typographic-bounds ( line -- width ascent descent leading )
     { CGFloat CGFloat CGFloat }
-    [ CTLineGetTypographicBounds ] [ ] with-out-parameters ; inline
+    [ CTLineGetTypographicBounds ] with-out-parameters ; inline
 
 : store-typographic-bounds ( metrics width ascent descent leading -- metrics )
     {

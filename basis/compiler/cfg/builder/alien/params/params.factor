@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cpu.architecture fry kernel layouts math math.order
-namespaces sequences vectors assocs ;
+namespaces sequences vectors assocs arrays ;
 IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params
@@ -46,6 +46,13 @@ M: double-rep next-reg-param
 
 : with-param-regs ( abi quot -- )
     '[ param-regs init-regs 0 stack-params set @ ] with-scope ; inline
+
+SYMBOLS: stack-values reg-values ;
+
+: next-parameter ( vreg rep on-stack? -- )
+    [ dup dup reg-class-of reg-class-full? ] dip or
+    [ alloc-stack-param stack-values ] [ next-reg-param reg-values ] if
+    [ 3array ] dip get push ;
 
 : next-return-reg ( rep -- reg ) reg-class-of get pop ;
 

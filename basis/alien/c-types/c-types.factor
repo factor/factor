@@ -89,6 +89,10 @@ GENERIC: c-type-getter ( name -- quot )
 
 M: c-type c-type-getter getter>> ;
 
+GENERIC: c-type-copier ( name -- quot )
+
+M: c-type c-type-copier drop [ ] ;
+
 GENERIC: c-type-setter ( name -- quot )
 
 M: c-type c-type-setter setter>> ;
@@ -118,6 +122,9 @@ MIXIN: value-type
 MACRO: alien-value ( c-type -- quot: ( c-ptr offset -- value ) )
     [ c-type-getter ] [ c-type-boxer-quot ] bi append ;
 
+MACRO: alien-copy-value ( c-type -- quot: ( c-ptr offset -- value ) )
+    [ c-type-getter ] [ c-type-copier ] [ c-type-boxer-quot ] tri 3append ;
+
 MACRO: set-alien-value ( c-type -- quot: ( value c-ptr offset -- ) )
     [ c-type-unboxer-quot [ [ ] ] [ '[ _ 2dip ] ] if-empty ]
     [ c-type-setter ]
@@ -139,6 +146,7 @@ PROTOCOL: c-type-protocol
     c-type-unboxer-quot
     c-type-rep
     c-type-getter
+    c-type-copier
     c-type-setter
     c-type-align
     c-type-align-first

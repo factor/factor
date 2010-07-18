@@ -27,7 +27,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
 
 : sqlite-open ( path -- db )
     normalize-path
-    { void* } [ sqlite3_open sqlite-check-result ] [ ]
+    { void* } [ sqlite3_open sqlite-check-result ]
     with-out-parameters ;
 
 : sqlite-close ( db -- )
@@ -36,8 +36,8 @@ ERROR: sqlite-sql-error < sql-error n string ;
 : sqlite-prepare ( db sql -- handle )
     utf8 encode dup length
     { void* void* }
-    [ sqlite3_prepare_v2 sqlite-check-result ] [ drop ]
-    with-out-parameters ;
+    [ sqlite3_prepare_v2 sqlite-check-result ]
+    with-out-parameters drop ;
 
 : sqlite-bind-parameter-index ( handle name -- index )
     sqlite3_bind_parameter_index ;

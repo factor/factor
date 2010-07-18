@@ -103,3 +103,29 @@ HELP: >permutation
 { $notes "For clarification, the following two statements are equivalent:" { $code "10 factoradic >permutation" "{ 1 2 0 0 } >permutation" } }
 { $examples { $example "USING: math.combinatorics.private prettyprint ;" "{ 0 0 0 0 } >permutation ." "{ 0 1 2 3 }" } } ;
 
+HELP: all-subsets
+{ $values { "seq" sequence } { "subsets" sequence } }
+{ $description
+    "Returns all the subsets of a sequence."
+}
+{ $examples
+    { $example
+        "USING: math.combinatorics prettyprint ;"
+        "{ 1 2 3 } all-subsets ."
+        "{ { } { 1 } { 2 } { 3 } { 1 2 } { 1 3 } { 2 3 } { 1 2 3 } }"
+    }
+} ;
+
+HELP: selections
+{ $values { "seq" sequence } { "n" integer } { "selections" sequence } }
+{ $description
+    "Returns all the ways to take n (possibly the same) items from the "
+    "sequence of items."
+} 
+{ $examples
+    { $example
+        "USING: math.combinatorics prettyprint ;"
+        "{ 1 2 } 2 selections ."
+        "{ { 1 1 } { 1 2 } { 2 1 } { 2 2 } }"
+    }
+} ;

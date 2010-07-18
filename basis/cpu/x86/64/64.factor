@@ -81,38 +81,40 @@ M: x86.64 %mark-deck
     dup load-decks-offset
     [+] card-mark <byte> MOV ;
 
-M:: x86.64 %load-reg-param ( dst reg rep -- )
-    dst reg rep %copy ;
+M:: x86.64 %load-stack-param ( vreg rep n -- )
+    rep return-reg n next-stack@ rep %copy
+    vreg rep return-reg rep %copy ;
 
-M:: x86.64 %store-reg-param ( src reg rep -- )
-    reg src rep %copy ;
+M:: x86.64 %store-stack-param ( vreg rep n -- )
+    rep return-reg vreg rep %copy
+    n reserved-stack-space + stack@ rep return-reg rep %copy ;
+
+M:: x86.64 %load-reg-param ( vreg rep reg -- )
+    vreg reg rep %copy ;
+
+M:: x86.64 %store-reg-param ( vreg rep reg -- )
+    reg vreg rep %copy ;
 
 M:: x86.64 %unbox ( dst src func rep -- )
     param-reg-0 src tagged-rep %copy
     param-reg-1 %mov-vm-ptr
-    func f f %alien-invoke
+    func f f %c-invoke
     dst rep %load-return ;
 
 M:: x86.64 %box ( dst src func rep gc-map -- )
     0 rep reg-class-of cdecl param-regs at nth src rep %copy
     rep int-rep? os windows? or param-reg-1 param-reg-0 ? %mov-vm-ptr
-    func f gc-map %alien-invoke
+    func f gc-map %c-invoke
     dst int-rep %load-return ;
 
-M:: x86.64 %allot-byte-array ( dst size gc-map -- )
-    param-reg-0 size MOV
-    param-reg-1 %mov-vm-ptr
-    "allot_byte_array" f gc-map %alien-invoke
-    dst int-rep %load-return ;
-
-M: x86.64 %alien-invoke
+M: x86.64 %c-invoke
     [ R11 0 MOV rc-absolute-cell rel-dlsym R11 CALL ] dip
     gc-map-here ;
 
 M: x86.64 %begin-callback ( -- )
     param-reg-0 %mov-vm-ptr
     param-reg-1 0 MOV
-    "begin_callback" f f %alien-invoke ;
+    "begin_callback" f f %c-invoke ;
 
 M: x86.64 %alien-callback ( quot -- )
     [ param-reg-0 ] dip %load-reference
@@ -120,14 +122,14 @@ M: x86.64 %alien-callback ( quot -- )
 
 M: x86.64 %end-callback ( -- )
     param-reg-0 %mov-vm-ptr
-    "end_callback" f f %alien-invoke ;
+    "end_callback" f f %c-invoke ;
 
 : float-function-param ( i src -- )
     [ float-regs cdecl param-regs at nth ] dip double-rep %copy ;
 
 M:: x86.64 %unary-float-function ( dst src func -- )
     0 src float-function-param
-    func "libm" load-library f %alien-invoke
+    func "libm" load-library f %c-invoke
     dst double-rep %load-return ;
 
 M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
@@ -135,8 +137,12 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     ! src2 is always a spill slot
     0 src1 float-function-param
     1 src2 float-function-param
-    func "libm" load-library f %alien-invoke
+    func "libm" load-library f %c-invoke
     dst double-rep %load-return ;
+
+M: x86.64 stack-cleanup 3drop 0 ;
+
+M: x86.64 %cleanup 0 assert= ;
 
 M: x86.64 long-long-on-stack? f ;
 

@@ -216,7 +216,7 @@ ERROR: no-objc-type name ;
     objc-methods get set-at ;
 
 : each-method-in-class ( class quot -- )
-    [ { uint } [ class_copyMethodList ] [ ] with-out-parameters ] dip
+    [ { uint } [ class_copyMethodList ] with-out-parameters ] dip
     over 0 = [ 3drop ] [
         [ <direct-void*-array> ] dip
         [ each ] [ drop (free) ] 2bi
