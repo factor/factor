@@ -1,7 +1,8 @@
-! Copyright (c) 2007-2010 Slava Pestov, Doug Coleman, Aaron Schaefer.
+! Copyright (c) 2007-2010 Slava Pestov, Doug Coleman, Aaron Schaefer, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs binary-search fry kernel locals math math.order
-    math.ranges namespaces sequences sorting ;
+    math.ranges namespaces sequences sorting make sequences.deep arrays
+    combinators ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -126,3 +127,23 @@ PRIVATE>
 
 : reduce-combinations ( seq k identity quot -- result )
     [ -rot ] dip each-combination ; inline
+
+: all-subsets ( seq -- subsets )
+    dup length [0,b] [
+        [ dupd all-combinations [ , ] each ] each
+    ] { } make nip ;
+
+: (selections) ( seq n -- selections )
+    dupd [ dup 1 > ] [
+        swap pick cartesian-product [
+            [ [ dup length 1 > [ flatten ] when , ] each ] each
+        ] { } make swap 1 -
+    ] while drop nip ;
+
+: selections ( seq n -- selections )
+    {
+        { 0 [ drop { } ] }
+        { 1 [ 1array ] }
+        [ (selections) ]
+    } case ;
+

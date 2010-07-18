@@ -137,7 +137,7 @@ SYMBOL: dpi
 : line-offset>x ( layout n -- x )
     #! n is an index into the UTF8 encoding of the text
     [ drop first-line ] [ swap string>> >utf8-index ] 2bi
-    0 { int } [ pango_layout_line_index_to_x ] [ ] with-out-parameters
+    0 { int } [ pango_layout_line_index_to_x ] with-out-parameters
     pango>float ;
 
 : x>line-offset ( layout x -- n )
@@ -146,7 +146,7 @@ SYMBOL: dpi
         [ first-line ] dip
         float>pango
         { int int }
-        [ pango_layout_line_x_to_index drop ] [ ] with-out-parameters
+        [ pango_layout_line_x_to_index drop ] with-out-parameters
         swap
     ] [ drop string>> ] 2bi utf8-index> + ;
 

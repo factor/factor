@@ -32,11 +32,15 @@ SYMBOL: defs
 ! Set of vregs defined in more than one basic block
 SYMBOL: defs-multi
 
-: compute-insn-defs ( bb insn -- )
-    defs-vreg dup [
+GENERIC: compute-insn-defs ( bb insn -- )
+
+M: insn compute-insn-defs 2drop ;
+
+M: vreg-insn compute-insn-defs
+    defs-vregs [
         defs get [ conjoin-at ] [ drop ] [ at assoc-size 1 > ] 2tri
         [ defs-multi get conjoin ] [ drop ] if
-    ] [ 2drop ] if ;
+    ] with each ;
 
 : compute-defs ( cfg -- )
     H{ } clone defs set

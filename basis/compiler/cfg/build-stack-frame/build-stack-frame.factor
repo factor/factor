@@ -21,9 +21,9 @@ M:: ##local-allot compute-stack-frame* ( insn -- )
     allot-area-align [ a max ] change
     allot-area-size [ a align [ insn offset<< ] [ s + ] bi ] change ;
 
-M: ##stack-frame compute-stack-frame*
+M: alien-call-insn compute-stack-frame*
     frame-required
-    stack-frame>> param-area-size [ max ] change ;
+    stack-size>> param-area-size [ max ] change ;
 
 : vm-frame-required ( -- )
     frame-required
@@ -33,8 +33,8 @@ M: ##call-gc compute-stack-frame* drop vm-frame-required ;
 M: ##box compute-stack-frame* drop vm-frame-required ;
 M: ##unbox compute-stack-frame* drop vm-frame-required ;
 M: ##box-long-long compute-stack-frame* drop vm-frame-required ;
-M: ##begin-callback compute-stack-frame* drop vm-frame-required ;
-M: ##end-callback compute-stack-frame* drop vm-frame-required ;
+M: ##callback-inputs compute-stack-frame* drop vm-frame-required ;
+M: ##callback-outputs compute-stack-frame* drop vm-frame-required ;
 M: ##unary-float-function compute-stack-frame* drop vm-frame-required ;
 M: ##binary-float-function compute-stack-frame* drop vm-frame-required ;
 

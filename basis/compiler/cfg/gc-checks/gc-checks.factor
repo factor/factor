@@ -31,6 +31,7 @@ GENERIC# gc-check-offsets* 1 ( call-index seen-allocation? insn n -- call-index 
     seen-allocation? [ call-index , ] when
     insn-index 1 + f ;
 
+M: ##callback-inputs gc-check-offsets* gc-check-here ;
 M: ##phi gc-check-offsets* gc-check-here ;
 M: gc-map-insn gc-check-offsets* gc-check-here ;
 M: ##allocation gc-check-offsets* 3drop t ;
@@ -61,9 +62,7 @@ M: insn gc-check-offsets* 2drop ;
 GENERIC: allocation-size* ( insn -- n )
 
 M: ##allot allocation-size* size>> ;
-
 M: ##box-alien allocation-size* drop 5 cells ;
-
 M: ##box-displaced-alien allocation-size* drop 5 cells ;
 
 : allocation-size ( insns -- n )

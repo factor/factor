@@ -4,10 +4,10 @@ USING: alien alien.c-types alien.libraries alien.syntax classes.struct
 combinators system ;
 IN: gdbm.ffi
 
-<< "libgdbm" os {
-    { [ unix?   ] [ "libgdbm.so"    ] }
-    { [ winnt?  ] [ "gdbm.dll"      ] }
-    { [ macosx? ] [ "libgdbm.dylib" ] }
+<< "libgdbm" {
+    { [ os macosx? ] [ "libgdbm.dylib" ] }
+    { [ os unix?   ] [ "libgdbm.so"    ] }
+    { [ os winnt?  ] [ "gdbm.dll"      ] }
 } cond cdecl add-library >>
 
 LIBRARY: libgdbm

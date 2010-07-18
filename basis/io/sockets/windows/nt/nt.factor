@@ -26,7 +26,7 @@ M: winnt WSASocket-flags ( -- DWORD )
         WSAIoctl SOCKET_ERROR = [
             winsock-error-string throw
         ] when
-    ] [ ] with-out-parameters ;
+    ] with-out-parameters ;
 
 TUPLE: ConnectEx-args port
     s name namelen lpSendBuffer dwSendDataLength
