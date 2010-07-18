@@ -9,15 +9,13 @@ FROM: namespaces => set ;
 FROM: sets => members ;
 IN: compiler.cfg.def-use
 
-GENERIC: defs-vreg ( insn -- vreg/f )
+GENERIC: defs-vregs ( insn -- seq )
 GENERIC: temp-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
 
-M: insn defs-vreg drop f ;
+M: insn defs-vregs drop { } ;
 M: insn temp-vregs drop { } ;
 M: insn uses-vregs drop { } ;
-
-M: ##phi uses-vregs inputs>> values ;
 
 <PRIVATE
 
@@ -29,33 +27,55 @@ M: ##phi uses-vregs inputs>> values ;
         [ '[ _ cleave _ narray ] ]
     } case ;
 
-: define-defs-vreg-method ( insn -- )
-    dup insn-def-slot dup [
-        [ \ defs-vreg create-method ]
-        [ name>> reader-word 1quotation ] bi*
+: define-vregs-method ( insn slots word -- )
+    [ [ drop ] ] dip '[
+        [ _ create-method ]
+        [ [ name>> ] map slot-array-quot ] bi*
         define
-    ] [ 2drop ] if ;
+    ] if-empty ; inline
+
+: define-defs-vregs-method ( insn -- )
+    dup insn-def-slots \ defs-vregs define-vregs-method ;
 
 : define-uses-vregs-method ( insn -- )
-    dup insn-use-slots [ drop ] [
-        [ \ uses-vregs create-method ]
-        [ [ name>> ] map slot-array-quot ] bi*
-        define
-    ] if-empty ;
+    dup insn-use-slots \ uses-vregs define-vregs-method ;
 
 : define-temp-vregs-method ( insn -- )
-    dup insn-temp-slots [ drop ] [
-        [ \ temp-vregs create-method ]
-        [ [ name>> ] map slot-array-quot ] bi*
-        define
-    ] if-empty ;
+    dup insn-temp-slots \ temp-vregs define-vregs-method ;
 
 PRIVATE>
 
+CONSTANT: special-vreg-insns
+{ ##phi ##alien-invoke ##alien-indirect ##alien-assembly ##callback-inputs ##callback-outputs }
+
+M: ##phi defs-vregs dst>> 1array ;
+
+M: alien-call-insn defs-vregs
+    reg-outputs>> [ first ] map ;
+
+M: ##callback-inputs defs-vregs
+    [ reg-outputs>> ] [ stack-outputs>> ] bi append [ first ] map ;
+
+M: ##callback-outputs defs-vregs drop { } ;
+
+M: ##phi uses-vregs inputs>> values ;
+
+M: alien-call-insn uses-vregs
+    [ reg-inputs>> ] [ stack-inputs>> ] bi append [ first ] map ;
+
+M: ##alien-indirect uses-vregs
+    [ call-next-method ] [ src>> ] bi prefix ;
+
+M: ##callback-inputs uses-vregs
+    drop { } ;
+
+M: ##callback-outputs uses-vregs
+    reg-inputs>> [ first ] map ;
+
 [
     insn-classes get
-    [ [ define-defs-vreg-method ] each ]
-    [ { ##phi } diff [ define-uses-vregs-method ] each ]
+    [ special-vreg-insns diff [ define-defs-vregs-method ] each ]
+    [ special-vreg-insns diff [ define-uses-vregs-method ] each ]
     [ [ define-temp-vregs-method ] each ]
     tri
 ] with-compilation-unit
@@ -69,7 +89,7 @@ SYMBOLS: defs insns uses ;
 : insn-of ( vreg -- insn ) insns get at ;
 
 : set-def-of ( obj insn assoc -- )
-    swap defs-vreg dup [ swap set-at ] [ 3drop ] if ;
+    swap defs-vregs [ swap set-at ] with with each ;
 
 : compute-defs ( cfg -- )
     H{ } clone [
@@ -89,16 +109,3 @@ SYMBOLS: defs insns uses ;
             ] each
         ] each-basic-block
     ] keep insns set ;
-
-:: compute-uses ( cfg -- )
-    ! Here, a phi node uses its argument in the block that it comes from.
-    H{ } clone :> use
-    cfg [| block |
-        block instructions>> [
-            dup ##phi?
-            [ inputs>> [ use adjoin-at ] assoc-each ]
-            [ uses-vregs [ block swap use adjoin-at ] each ]
-            if
-        ] each
-    ] each-basic-block
-    use [ members ] assoc-map uses set ;

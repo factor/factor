@@ -91,6 +91,8 @@ PRIVATE>
 : free ( alien -- )
     >c-ptr [ delete-malloc ] [ (free) ] bi ;
 
+FUNCTION: void memset ( void* buf, int char, size_t size ) ;
+
 FUNCTION: void memcpy ( void* dst, void* src, ulong size ) ;
 
 FUNCTION: int memcmp ( void* a, void* b, ulong size ) ;

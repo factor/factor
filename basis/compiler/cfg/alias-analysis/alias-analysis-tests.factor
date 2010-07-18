@@ -294,14 +294,14 @@ IN: compiler.cfg.alias-analysis.tests
     V{
         T{ ##peek f 0 D 0 }
         T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f "free" }
+        T{ ##alien-invoke f { } { } { } 0 0 "free" }
         T{ ##slot-imm f 2 0 1 0 }
     }
 ] [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f "free" }
+        T{ ##alien-invoke f { } { } { } 0 0 "free" }
         T{ ##slot-imm f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
@@ -311,7 +311,7 @@ IN: compiler.cfg.alias-analysis.tests
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
         T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f "free" }
+        T{ ##alien-invoke f { } { } { } 0 0 "free" }
         T{ ##slot-imm f 2 0 1 0 }
     }
 ] [
@@ -319,7 +319,7 @@ IN: compiler.cfg.alias-analysis.tests
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
         T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f "free" }
+        T{ ##alien-invoke f { } { } { } 0 0 "free" }
         T{ ##slot-imm f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
@@ -330,7 +330,7 @@ IN: compiler.cfg.alias-analysis.tests
         T{ ##peek f 1 D 1 }
         T{ ##peek f 2 D 2 }
         T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f "free" }
+        T{ ##alien-invoke f { } { } { } 0 0 "free" }
         T{ ##set-slot-imm f 2 0 1 0 }
     }
 ] [
@@ -339,7 +339,7 @@ IN: compiler.cfg.alias-analysis.tests
         T{ ##peek f 1 D 1 }
         T{ ##peek f 2 D 2 }
         T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f "free" }
+        T{ ##alien-invoke f { } { } { } 0 0 "free" }
         T{ ##set-slot-imm f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
@@ -348,14 +348,14 @@ IN: compiler.cfg.alias-analysis.tests
     V{
         T{ ##peek f 0 D 0 }
         T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f "free" }
+        T{ ##alien-invoke f { } { } { } 0 0 "free" }
         T{ ##set-slot-imm f 1 0 1 0 }
     }
 ] [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f "free" }
+        T{ ##alien-invoke f { } { } { } 0 0 "free" }
         T{ ##set-slot-imm f 1 0 1 0 }
     } test-alias-analysis
 ] unit-test

@@ -20,7 +20,7 @@ GENERIC: modifies-context? ( insn -- ? )
 
 M: ##inc-d modifies-context? drop t ;
 M: ##inc-r modifies-context? drop t ;
-M: ##load-reg-param modifies-context? drop t ;
+M: ##callback-inputs modifies-context? drop t ;
 M: insn modifies-context? drop f ;
 
 : save-context-offset ( bb -- n )

@@ -56,6 +56,9 @@ M: string-type c-type-unboxer-quot
 M: string-type c-type-getter
     drop [ alien-cell ] ;
 
+M: string-type c-type-copier
+    drop [ ] ;
+
 M: string-type c-type-setter
     drop [ set-alien-cell ] ;
 

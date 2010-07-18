@@ -21,7 +21,7 @@ IN: io.files.info.windows
 TUPLE: windows-file-info < file-info attributes ;
 
 : get-compressed-file-size ( path -- n )
-    { DWORD } [ GetCompressedFileSize ] [ ] with-out-parameters
+    { DWORD } [ GetCompressedFileSize ] with-out-parameters
     over INVALID_FILE_SIZE = [ win32-error-string throw ] [ >64bit ] if ;
 
 : set-windows-size-on-disk ( file-info path -- file-info )
@@ -100,12 +100,12 @@ CONSTANT: path-length $[ MAX_PATH 1 + ]
 : volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
     { { ushort path-length } DWORD DWORD DWORD { ushort path-length } }
     [ [ path-length ] 4dip path-length GetVolumeInformation win32-error=0/f ]
-    [ [ utf16n alien>string ] 4dip utf16n alien>string ]
-    with-out-parameters ;
+    with-out-parameters
+    [ utf16n alien>string ] 4dip utf16n alien>string ;
 
 : file-system-space ( normalized-path -- available-space total-space free-space )
     { ULARGE_INTEGER ULARGE_INTEGER ULARGE_INTEGER }
-    [ GetDiskFreeSpaceEx win32-error=0/f ] [ ]
+    [ GetDiskFreeSpaceEx win32-error=0/f ]
     with-out-parameters ;
 
 : calculate-file-system-info ( file-system-info -- file-system-info' )
@@ -149,24 +149,21 @@ CONSTANT: names-buf-length 16384
 : volume>paths ( string -- array )
     { { ushort names-buf-length } uint }
     [ [ names-buf-length ] dip GetVolumePathNamesForVolumeName win32-error=0/f ]
-    [ head utf16n alien>string { CHAR: \0 } split ]
-    with-out-parameters ;
+    with-out-parameters
+    head utf16n alien>string { CHAR: \0 } split ;
 
 : find-first-volume ( -- string handle )
     { { ushort path-length } }
     [ path-length FindFirstVolume dup win32-error=0/f ]
-    [ utf16n alien>string ]
-    with-out-parameters swap ;
+    with-out-parameters utf16n alien>string swap ;
 
 : find-next-volume ( handle -- string/f )
     { { ushort path-length } }
-    [ path-length FindNextVolume ]
-    [
-        swap 0 = [
-            GetLastError ERROR_NO_MORE_FILES =
-            [ drop f ] [ win32-error-string throw ] if
-        ] [ utf16n alien>string ] if
-    ] with-out-parameters ;
+    [ path-length FindNextVolume ] with-out-parameters
+    swap 0 = [
+        GetLastError ERROR_NO_MORE_FILES =
+        [ drop f ] [ win32-error-string throw ] if
+    ] [ utf16n alien>string ] if ;
 
 : find-volumes ( -- array )
     find-first-volume
@@ -189,8 +186,8 @@ M: winnt file-systems ( -- array )
         normalize-path open-read &dispose handle>>
         { FILETIME FILETIME FILETIME }
         [ GetFileTime win32-error=0/f ]
-        [ [ FILETIME>timestamp >local-time ] tri@ ]
         with-out-parameters
+        [ FILETIME>timestamp >local-time ] tri@
     ] with-destructors ;
 
 : set-file-times ( path timestamp/f timestamp/f timestamp/f -- )

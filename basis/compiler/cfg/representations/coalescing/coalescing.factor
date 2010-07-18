@@ -12,7 +12,7 @@ SYMBOL: components
 : init-components ( cfg components -- )
     '[
         instructions>> [
-            defs-vreg [ _ add-atom ] when*
+            defs-vregs [ _ add-atom ] each
         ] each
     ] each-basic-block ;
 

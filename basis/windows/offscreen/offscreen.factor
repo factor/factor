@@ -27,7 +27,7 @@ IN: windows.offscreen
     [ nip ]
     [
         swap (bitmap-info) DIB_RGB_COLORS { void* }
-        [ f 0 CreateDIBSection ] [ ] with-out-parameters
+        [ f 0 CreateDIBSection ] with-out-parameters
     ] 2bi
     [ [ SelectObject drop ] keep ] dip ;
 

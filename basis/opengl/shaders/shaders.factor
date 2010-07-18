@@ -20,7 +20,7 @@ IN: opengl.shaders
     dup integer? [ glIsShader c-bool> ] [ drop f ] if ;
 
 : gl-shader-get-int ( shader enum -- value )
-    { int } [ glGetShaderiv ] [ ] with-out-parameters ;
+    { int } [ glGetShaderiv ] with-out-parameters ;
 
 : gl-shader-ok? ( shader -- ? )
     GL_COMPILE_STATUS gl-shader-get-int c-bool> ;
@@ -79,7 +79,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
     dup integer? [ glIsProgram c-bool> ] [ drop f ] if ;
 
 : gl-program-get-int ( program enum -- value )
-    { int } [ glGetProgramiv ] [ ] with-out-parameters ;
+    { int } [ glGetProgramiv ] with-out-parameters ;
 
 : gl-program-ok? ( program -- ? )
     GL_LINK_STATUS gl-program-get-int c-bool> ;

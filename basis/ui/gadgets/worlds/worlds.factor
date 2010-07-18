@@ -129,6 +129,7 @@ M: world request-focus-on ( child gadget -- )
     [ T{ rgba f 1.0 1.0 1.0 1.0 } ] if ;
 
 GENERIC# apply-world-attributes 1 ( world attributes -- world )
+
 M: world apply-world-attributes
     {
         [ title>> >>title ]
@@ -166,15 +167,11 @@ flush-layout-cache-hook [ [ ] ] initialize
 
 GENERIC: begin-world ( world -- )
 GENERIC: end-world ( world -- )
-
 GENERIC: resize-world ( world -- )
 
-M: world begin-world
-    drop ;
-M: world end-world
-    drop ;
-M: world resize-world
-    drop ;
+M: world begin-world drop ;
+M: world end-world drop ;
+M: world resize-world drop ;
 
 M: world dim<<
     [ call-next-method ]
