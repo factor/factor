@@ -16,7 +16,7 @@ FUNCTION: Display* gdk_x11_display_get_xdisplay ( GdkDisplay* display ) ;
     gdk_display_get_default gdk_x11_display_get_xdisplay ;
 
 M: gtk-game-input-backend (open-game-input)
-    ;
+    reset-mouse ;
 
 M: gtk-game-input-backend (close-game-input)
     ;
@@ -98,10 +98,7 @@ M: gtk-game-input-backend read-keyboard
     [ XQueryPointer drop ] with-out-parameters
     [ 4 ndrop ] 3dip ;
 
-SYMBOL: mouse-reset?
-     
 M: gtk-game-input-backend read-mouse
-    mouse-reset? get [ reset-mouse ] unless
     query-pointer
     mouse-state new
     swap 256 /i >>buttons
@@ -111,4 +108,4 @@ M: gtk-game-input-backend read-mouse
      
 M: gtk-game-input-backend reset-mouse
     get-dpy dup XDefaultRootWindow dup
-    0 0 0 0 400 400 XWarpPointer drop t mouse-reset? set-global ;
+    0 0 0 0 400 400 XWarpPointer drop ;
