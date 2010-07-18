@@ -145,7 +145,9 @@ IN: stack-checker.transforms
         [ depends-on-tuple-layout ]
         [ [ "boa-check" word-prop [ ] or ] dip ] 2bi
         '[ @ _ <tuple-boa> ]
-    ] [ drop f ] if
+    ] [
+        \ boa time-bomb
+    ] if
 ] 1 define-transform
 
 \ boa t "no-compile" set-word-prop
