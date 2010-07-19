@@ -102,12 +102,12 @@ void factor_vm::memory_protection_error(cell addr, stack_frame *stack)
 	else if(ctx->callstack_seg->overflow_p(addr))
 		general_error(ERROR_CALLSTACK_UNDERFLOW,false_object,false_object,stack);
 	else
-		general_error(ERROR_MEMORY,allot_cell(addr),false_object,stack);
+		general_error(ERROR_MEMORY,from_unsigned_cell(addr),false_object,stack);
 }
 
 void factor_vm::signal_error(cell signal, stack_frame *stack)
 {
-	general_error(ERROR_SIGNAL,allot_cell(signal),false_object,stack);
+	general_error(ERROR_SIGNAL,from_unsigned_cell(signal),false_object,stack);
 }
 
 void factor_vm::divide_by_zero_error()

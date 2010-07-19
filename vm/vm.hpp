@@ -475,14 +475,6 @@ struct factor_vm
 	void primitive_bits_double();
 	fixnum to_fixnum(cell tagged);
 	cell to_cell(cell tagged);
-	cell from_signed_1(s8 n);
-	cell from_unsigned_1(u8 n);
-	cell from_signed_2(s16 n);
-	cell from_unsigned_2(u16 n);
-	cell from_signed_4(s32 n);
-	cell from_unsigned_4(u32 n);
-	cell from_signed_cell(fixnum integer);
-	cell from_unsigned_cell(cell integer);
 	cell from_signed_8(s64 n);
 	s64 to_signed_8(cell obj);
 	cell from_unsigned_8(u64 n);
@@ -492,8 +484,8 @@ struct factor_vm
 	inline void overflow_fixnum_add(fixnum x, fixnum y);
 	inline void overflow_fixnum_subtract(fixnum x, fixnum y);
 	inline void overflow_fixnum_multiply(fixnum x, fixnum y);
-	inline cell allot_integer(fixnum x);
-	inline cell allot_cell(cell x);
+	inline cell from_signed_cell(fixnum x);
+	inline cell from_unsigned_cell(cell x);
 	inline cell allot_float(double n);
 	inline bignum *float_to_bignum(cell tagged);
 	inline double bignum_to_float(cell tagged);

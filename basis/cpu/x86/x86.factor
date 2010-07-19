@@ -345,6 +345,29 @@ M: x86.64 has-small-reg? 2drop t ;
         [ quot call ] with-save/restore
     ] if ; inline
 
+:: (%convert-integer) ( dst src bits quot -- )
+    dst { src } bits [| new-dst |
+        new-dst dup bits n-bit-version-of dup src MOV
+        quot call
+        dst new-dst int-rep %copy
+    ] with-small-register ; inline
+
+: %zero-extend ( dst src bits -- )
+    [ MOVZX ] (%convert-integer) ; inline
+
+: %sign-extend ( dst src bits -- )
+    [ MOVSX ] (%convert-integer) ; inline
+
+M: x86 %convert-integer ( dst src c-type -- )
+    {
+        { c:char   [ 8 %sign-extend ] }
+        { c:uchar  [ 8 %zero-extend ] }
+        { c:short  [ 16 %sign-extend ] }
+        { c:ushort [ 16 %zero-extend ] }
+        { c:int    [ 32 %sign-extend ] }
+        { c:uint   [ 32 [ 2drop ] (%convert-integer) ] }
+    } case ;
+
 :: %alien-integer-getter ( dst exclude address bits quot -- )
     dst exclude bits [| new-dst |
         new-dst dup bits n-bit-version-of dup address MOV

@@ -27,11 +27,6 @@ char *factor_vm::pinned_alien_offset(cell obj)
 	}
 }
 
-VM_C_API char *pinned_alien_offset(cell obj, factor_vm *parent)
-{
-	return parent->pinned_alien_offset(obj);
-}
-
 /* make an alien */
 cell factor_vm::allot_alien(cell delegate_, cell displacement)
 {
@@ -62,11 +57,6 @@ cell factor_vm::allot_alien(void *address)
 	return allot_alien(false_object,(cell)address);
 }
 
-VM_C_API cell allot_alien(void *address, factor_vm *vm)
-{
-	return vm->allot_alien(address);
-}
-
 /* make an alien pointing at an offset of another alien */
 void factor_vm::primitive_displaced_alien()
 {
@@ -90,7 +80,7 @@ void factor_vm::primitive_displaced_alien()
 if the object is a byte array, as a sanity check. */
 void factor_vm::primitive_alien_address()
 {
-	ctx->push(allot_cell((cell)pinned_alien_offset(ctx->pop())));
+	ctx->push(from_unsigned_cell((cell)pinned_alien_offset(ctx->pop())));
 }
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
@@ -180,11 +170,6 @@ char *factor_vm::alien_offset(cell obj)
 		type_error(ALIEN_TYPE,obj);
 		return NULL; /* can't happen */
 	}
-}
-
-VM_C_API char *alien_offset(cell obj, factor_vm *parent)
-{
-	return parent->alien_offset(obj);
 }
 
 }
