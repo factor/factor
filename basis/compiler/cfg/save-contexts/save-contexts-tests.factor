@@ -65,7 +65,7 @@ V{
 
 V{
     T{ ##phi }
-    T{ ##add }
+    T{ ##box }
 } 0 test-bb
 
 0 get insert-save-context
@@ -74,7 +74,7 @@ V{
     V{
         T{ ##phi }
         T{ ##save-context f 7 8 }
-        T{ ##add }
+        T{ ##box }
     }
 ] [
     0 get instructions>>
