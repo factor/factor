@@ -73,7 +73,7 @@ M: sync-point handle ( sync-point -- )
     {
         { [ unhandled-intervals heap-empty? ] [ unhandled-sync-points ] }
         { [ unhandled-sync-points heap-empty? ] [ unhandled-intervals ] }
-        [ unhandled-sync-points unhandled-intervals smallest-heap ]
+        [ unhandled-intervals unhandled-sync-points smallest-heap ]
     } cond heap-pop drop handle ;
 
 : (allocate-registers) ( unhandled-intervals unhandled-sync-points -- )
