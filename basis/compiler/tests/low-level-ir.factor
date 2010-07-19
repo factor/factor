@@ -105,3 +105,24 @@ IN: compiler.tests.low-level-ir
         T{ ##add-imm f 0 0 -16 }
     } compile-test-bb
 ] unit-test
+
+[ -1 ] [
+    V{
+        T{ ##load-tagged f 1 $[ -1 tag-fixnum ] }
+        T{ ##convert-integer f 0 1 char }
+    } compile-test-bb
+] unit-test
+
+[ -1 ] [
+    V{
+        T{ ##load-tagged f 1 $[ -1 9 2^ bitxor tag-fixnum ] }
+        T{ ##convert-integer f 0 1 char }
+    } compile-test-bb
+] unit-test
+
+[ $[ 255 tag-bits get neg shift ] ] [
+    V{
+        T{ ##load-tagged f 1 $[ -1 9 2^ bitxor tag-fixnum ] }
+        T{ ##convert-integer f 0 1 uchar }
+    } compile-test-bb
+] unit-test
