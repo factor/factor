@@ -140,6 +140,8 @@ M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
     func "libm" load-library f %c-invoke
     dst double-rep %load-return ;
 
+M: x86.64 %prepare-var-args ( -- ) RAX RAX XOR ;
+
 M: x86.64 stack-cleanup 3drop 0 ;
 
 M: x86.64 %cleanup 0 assert= ;
