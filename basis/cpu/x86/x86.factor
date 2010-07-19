@@ -347,8 +347,8 @@ M: x86.64 has-small-reg? 2drop t ;
 
 :: (%convert-integer) ( dst src bits quot -- )
     dst { src } bits [| new-dst |
-        new-dst dup bits n-bit-version-of dup src MOV
-        quot call
+        new-dst src int-rep %copy
+        new-dst dup bits n-bit-version-of quot call
         dst new-dst int-rep %copy
     ] with-small-register ; inline
 
@@ -644,6 +644,7 @@ HOOK: %cleanup cpu ( n -- )
 :: emit-alien-insn ( reg-inputs stack-inputs reg-outputs cleanup stack-size quot -- )
     stack-inputs [ first3 %store-stack-param ] each
     reg-inputs [ first3 %store-reg-param ] each
+    %prepare-var-args
     quot call
     cleanup %cleanup
     reg-outputs [ first3 %load-reg-param ] each ; inline
