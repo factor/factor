@@ -6,7 +6,7 @@ math memory namespaces namespaces.private parser
 quotations sequences specialized-arrays stack-checker
 stack-checker.errors system threads tools.test words
 alien.complex concurrency.promises alien.data
-byte-arrays classes ;
+byte-arrays classes compiler.test ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: char
@@ -804,3 +804,20 @@ mingw? [
     ] with-out-parameters ;
 
 [ 12 ] [ 6 out-param-callback out-param-indirect ] unit-test
+
+! Alias analysis regression
+: aa-callback-1 ( -- c )
+    double { } cdecl [ 5.0 ] alien-callback ;
+
+: aa-indirect-1 ( c -- x )
+    double { } cdecl alien-indirect ; inline
+
+TUPLE: some-tuple x ;
+
+[ T{ some-tuple f 5.0 } ] [
+    [
+        some-tuple new
+        aa-callback-1
+        aa-indirect-1 >>x
+    ] compile-call
+] unit-test
