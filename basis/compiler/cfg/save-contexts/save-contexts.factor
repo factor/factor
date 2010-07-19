@@ -18,6 +18,7 @@ M: insn needs-save-context? drop f ;
 
 GENERIC: modifies-context? ( insn -- ? )
 
+M: ##phi modifies-context? drop t ;
 M: ##inc-d modifies-context? drop t ;
 M: ##inc-r modifies-context? drop t ;
 M: ##callback-inputs modifies-context? drop t ;

@@ -80,12 +80,9 @@ M: ##callback-outputs uses-vregs
     tri
 ] with-compilation-unit
 
-! Computing def-use chains.
-
-SYMBOLS: defs insns uses ;
+SYMBOLS: defs insns ;
 
 : def-of ( vreg -- node ) defs get at ;
-: uses-of ( vreg -- nodes ) uses get at ;
 : insn-of ( vreg -- insn ) insns get at ;
 
 : set-def-of ( obj insn assoc -- )
@@ -98,8 +95,7 @@ SYMBOLS: defs insns uses ;
                 _ set-def-of
             ] with each
         ] each-basic-block
-    ] keep
-    defs set ;
+    ] keep defs set ;
 
 : compute-insns ( cfg -- )
     H{ } clone [
