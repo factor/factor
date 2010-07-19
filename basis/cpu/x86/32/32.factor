@@ -209,6 +209,8 @@ M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
     #! MINGW ABI incompatibility disaster
     [ large-struct? ] [ mingw eq? os windows? not or ] bi* and ;
 
+M: x86.32 %prepare-var-args ( -- ) ;
+
 M:: x86.32 stack-cleanup ( stack-size return abi -- n )
     #! a) Functions which are stdcall/fastcall/thiscall have to
     #! clean up the caller's stack frame.
