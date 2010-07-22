@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.destructors
-alien.libraries alien.syntax combinators compiler.units gir
-kernel system vocabs.parser words ;
+alien.libraries alien.strings alien.syntax combinators gir
+io.encodings.utf8 kernel system vocabs.parser words ;
 IN: glib.ffi
 
 <<
@@ -78,3 +78,17 @@ CALLBACK: gboolean GSourceFuncsPrepareFunc ( GSource* source, gint* timeout_ ) ;
 CALLBACK: gboolean GSourceFuncsCheckFunc ( GSource* source ) ;
 CALLBACK: gboolean GSourceFuncsDispatchFunc ( GSource* source, GSourceFunc callback, gpointer user_data ) ;
 
+ERROR: g-error domain code message ;
+
+: GError>g-error ( GError -- g-error )
+    [ domain>> g_quark_to_string utf8 alien>string ]
+    [ code>> ]
+    [ message>> utf8 alien>string ] tri
+    \ g-error boa ;
+
+: handle-GError ( GError/f -- )
+    [
+        [ GError>g-error ]
+        [ g_error_free ] bi
+        throw
+    ] when* ;
