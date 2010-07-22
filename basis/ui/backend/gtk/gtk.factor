@@ -270,7 +270,7 @@ SYMBOL: next-timeout
     ! This file is not in a resource.txt because it can be
     ! overwritten when deploying. See 'Vocabulary icons'
     ! in the docs.
-    "vocab:ui/backend/gtk/icon.ico"
+    "vocab:ui/backend/gtk/icon.png"
     normalize-path utf8 string>alien
     { { pointer: GError initial: f } }
     [ gtk_window_set_default_icon_from_file ] with-out-parameters
