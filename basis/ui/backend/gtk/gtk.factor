@@ -1,17 +1,15 @@
 ! Copyright (C) 2010 Anton Gorenko, Philipp Brüschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct command-line destructors
-gdk.ffi gdk.gl.ffi glib.ffi gobject.ffi gtk.ffi gtk.gl.ffi
-io.backend.unix.multiplexers io.encodings.utf8 io.thread kernel libc
-literals locals math math.bitwise math.order math.vectors namespaces
-sequences strings system threads ui ui.backend ui.clipboards
-ui.commands ui.event-loop ui.gadgets ui.gadgets.menus
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.pixel-formats.private ui.private ;
-RENAME: windows ui.private => ui:windows
-EXCLUDE: ui.gadgets.editors => change-caret ;
-RENAME: change-caret ui.gadgets.editors => editors:change-caret
+alien.strings arrays assocs classes.struct command-line
+destructors gdk.ffi gdk.gl.ffi glib.ffi gobject.ffi gtk.ffi
+gtk.gl.ffi io.backend io.backend.unix.multiplexers
+io.encodings.utf8 io.thread kernel libc literals locals math
+math.bitwise math.order math.vectors namespaces sequences
+strings system threads ui ui.backend ui.clipboards ui.commands
+ui.event-loop ui.gadgets ui.gadgets.editors ui.gadgets.menus
+ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.pixel-formats ui.pixel-formats.private ui.private ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -229,7 +227,12 @@ CONSTANT: poll-fd-events
         mx get fd>> >>fd
         poll-fd-events >>events ;
 
-: init-io-event-source ( -- )
+HOOK: init-io-event-source io-backend ( -- )
+
+M: c-io-backend init-io-event-source
+    ;
+
+M: object init-io-event-source
     GSourceFuncs malloc-struct &free
         [ io-source-prepare ] GSourceFuncsPrepareFunc >>prepare
         [ io-source-check ] GSourceFuncsCheckFunc >>check
