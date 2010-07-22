@@ -28,7 +28,7 @@ ARTICLE: "vocabs.roots" "Vocabulary roots"
 { $subsections "add-vocab-roots" } ;
 
 ARTICLE: "vocabs.icons" "Vocabulary icons"
-"An icon file representing the vocabulary can be provided for use by " { $link "tools.deploy" } ". A file named " { $snippet "icon.ico" } " will be used as the application icon when the application is deployed on Windows. A file named " { $snippet "icon.icns" } " will be used when the application is deployed on MacOS X." ;
+"An icon file representing the vocabulary can be provided for use by " { $link "tools.deploy" } ". A file named " { $snippet "icon.ico" } " will be used as the application icon when the application is deployed on Windows, Linux or the *BSD. A file named " { $snippet "icon.icns" } " will be used when the application is deployed on MacOS X." ;
 
 ARTICLE: "vocabs.loader" "Vocabulary loader"
 "The " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " words load vocabularies using the vocabulary loader. The vocabulary loader is implemented in the " { $vocab-link "vocabs.loader" } " vocabulary."

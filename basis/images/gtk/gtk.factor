@@ -18,26 +18,11 @@ SINGLETON: gtk-image
 "bmp"  gtk-image register-image-class
 "ico"  gtk-image register-image-class
 
-ERROR: g-error domain code message ;
-
 <PRIVATE
 
 : data>GInputStream ( data -- GInputStream )
     [ malloc-byte-array &free ] [ length ] bi
     f g_memory_input_stream_new_from_data &g_object_unref ;
-
-: GError>g-error ( GError -- g-error )
-    [ domain>> g_quark_to_string utf8 alien>string ]
-    [ code>> ]
-    [ message>> utf8 alien>string ] tri
-    \ g-error boa ;
-
-: handle-GError ( GError/f -- )
-    [
-        [ GError>g-error ]
-        [ g_error_free ] bi
-        throw
-    ] when* ;
 
 : GInputStream>GdkPixbuf ( GInputStream -- GdkPixbuf )
     f { { pointer: GError initial: f } }

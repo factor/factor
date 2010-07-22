@@ -1,14 +1,16 @@
 ! Copyright (C) 2010 Anton Gorenko, Philipp Brüschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct command-line destructors
-gdk.ffi gdk.gl.ffi glib.ffi gobject.ffi gtk.ffi gtk.gl.ffi
-io.backend.unix.multiplexers io.encodings.utf8 io.thread kernel libc
-literals locals math math.bitwise math.order math.vectors namespaces
-sequences strings system threads ui ui.backend ui.clipboards
-ui.commands ui.event-loop ui.gadgets ui.gadgets.menus
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.pixel-formats.private ui.private ;
+alien.strings alien.syntax arrays assocs classes.struct
+command-line destructors gdk.ffi gdk.gl.ffi glib.ffi
+gobject.ffi gtk.ffi gtk.gl.ffi io.backend
+io.backend.unix.multiplexers io.encodings.utf8 io.thread kernel
+libc literals locals math math.bitwise math.order math.vectors
+namespaces sequences strings system threads ui ui.backend
+ui.clipboards ui.commands ui.event-loop ui.gadgets
+ui.gadgets.menus ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.pixel-formats ui.pixel-formats.private
+ui.private ;
 RENAME: windows ui.private => ui:windows
 EXCLUDE: ui.gadgets.editors => change-caret ;
 RENAME: change-caret ui.gadgets.editors => editors:change-caret
@@ -264,10 +266,21 @@ SYMBOL: next-timeout
     f g_source_attach drop
     nano-count next-timeout set-global ;
 
+: load-icon ( -- )
+    ! This file is not in a resource.txt because it can be
+    ! overwritten when deploying. See 'Vocabulary icons'
+    ! in the docs.
+    "vocab:ui/backend/gtk/icon.ico"
+    normalize-path utf8 string>alien
+    { { pointer: GError initial: f } }
+    [ gtk_window_set_default_icon_from_file ] with-out-parameters
+    handle-GError drop ;
+
 M: gtk-ui-backend (with-ui)
     [
         f f gtk_init
         f f gtk_gl_init
+        load-icon
         init-clipboard
         start-ui
         stop-io-thread
