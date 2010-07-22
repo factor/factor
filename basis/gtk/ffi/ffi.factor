@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax alien.destructors alien.libraries
 cairo.ffi combinators kernel system
-gir atk.ffi gdk.ffi gdk.pixbuf.ffi gio.ffi glib.ffi gmodule.ffi
-gobject.ffi pango.ffi ;
+gobject-introspection atk.ffi gdk.ffi gdk.pixbuf.ffi gio.ffi
+glib.ffi gmodule.ffi gobject.ffi pango.ffi ;
 EXCLUDE: alien.c-types => pointer ;
 IN: gtk.ffi
 
