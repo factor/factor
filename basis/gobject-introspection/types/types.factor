@@ -1,8 +1,10 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types assocs combinators.short-circuit
-gir.common gir.repository kernel namespaces specialized-arrays ;
-IN: gir.types
+USING: accessors alien alien.c-types assocs
+combinators.short-circuit gobject-introspection.common
+gobject-introspection.repository kernel namespaces
+specialized-arrays ;
+IN: gobject-introspection.types
 
 TUPLE: gwrapper { underlying alien } ;
 TUPLE: grecord < gwrapper ;

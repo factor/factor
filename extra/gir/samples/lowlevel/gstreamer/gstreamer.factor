@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.strings fry byte-arrays classes.struct
 io.encodings.utf8 kernel locals math prettyprint 
-gst.ffi glib.ffi gobject.ffi gtk.ffi ;
+gstreamer.ffi glib.ffi gobject.ffi gtk.ffi ;
 IN: gir.samples.lowlevel.gstreamer
 
 ! CONSTANT: uri "http://www.xiph.org/vorbis/listen/compilation-ogg-q4.ogg"

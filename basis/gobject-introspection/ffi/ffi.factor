@@ -1,11 +1,12 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.parser arrays
-classes.parser classes.struct combinators combinators.short-circuit
-definitions effects fry gir.common gir.types kernel math.parser
-namespaces parser quotations sequences sequences.generalizations words
-words.constant ;
-IN: gir.ffi
+classes.parser classes.struct combinators
+combinators.short-circuit definitions effects fry
+gobject-introspection.common gobject-introspection.types kernel
+math.parser namespaces parser quotations sequences
+sequences.generalizations words words.constant ;
+IN: gobject-introspection.ffi
 
 : string>c-type ( str -- c-type )
     parse-c-type ;

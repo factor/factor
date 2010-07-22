@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax alien.destructors alien.libraries
 combinators kernel literals math system
-gir glib.ffi ;
+gobject-introspection glib.ffi ;
 EXCLUDE: alien.c-types => pointer ;
 IN: gobject.ffi
 
