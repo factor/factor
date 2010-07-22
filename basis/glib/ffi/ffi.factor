@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.destructors
-alien.libraries alien.strings alien.syntax combinators gir
-io.encodings.utf8 kernel system vocabs.parser words ;
+alien.libraries alien.strings alien.syntax combinators
+gobject-introspection io.encodings.utf8 kernel system
+vocabs.parser words ;
 IN: glib.ffi
 
 <<

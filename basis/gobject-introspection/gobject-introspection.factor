@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators gir.common gir.ffi gir.loader
+USING: accessors assocs combinators gobject-introspection.common
+gobject-introspection.ffi gobject-introspection.loader
 kernel lexer locals math namespaces sequences vocabs.parser xml ;
-IN: gir
+IN: gobject-introspection
 
 : with-child-vocab ( name quot -- )
     swap current-vocab name>>
