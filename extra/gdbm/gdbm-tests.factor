@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays continuations gdbm io.directories
-io.files.temp kernel sequences sets tools.test ;
+io.files.temp kernel sequences sets system tools.test ;
 IN: gdbm.tests
 
 : db-path ( -- filename ) "test.db" temp-file ;
