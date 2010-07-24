@@ -291,7 +291,7 @@ unit-test
 
 [ { "h" "llo" } ] [ "hello" R/ e+/ re-split [ >string ] map ] unit-test
 
-[ { "" "h" "l" "l" "o" "" } ] [ "hello" R/ e*/ re-split [ >string ] map ] unit-test
+[ { "" "h" "" "l" "l" "o" "" } ] [ "hello" R/ e*/ re-split [ >string ] map ] unit-test
 
 [ { { 0 5 "hellohello" } { 5 10 "hellohello" } } ]
 [ "hellohello" R/ hello/ [ 3array ] map-matches ]
