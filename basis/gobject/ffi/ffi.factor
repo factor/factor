@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax alien.destructors alien.libraries
-combinators kernel literals math system
+classes.struct combinators kernel literals math system
 gobject-introspection glib.ffi ;
 EXCLUDE: alien.c-types => pointer ;
 IN: gobject.ffi
@@ -18,11 +18,12 @@ TYPEDEF: void* GSignalCMarshaller
 TYPEDEF: void GStrv
 TYPEDEF: gchar* gchararray
 
-IMPLEMENT-STRUCTS: GValue ;
-
 GIR: vocab:gobject/GObject-2.0.gir
 
 IN: gobject.ffi
+
+FORGET: GValue
+STRUCT: GValue { g_type GType } { data guint64[2] } ;
 
 FORGET: GIOCondition
 FORGET: G_IO_IN
