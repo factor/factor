@@ -299,6 +299,7 @@ M: ##compare analyze-aliases
     \ ##alien-global set-new-ac ;
 
 M: factor-call-insn analyze-aliases
+    call-next-method
     heap-ac get ac>vregs [
         [ live-slots get at clear-assoc ]
         [ recent-stores get at clear-assoc ] bi

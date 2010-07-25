@@ -79,7 +79,7 @@ cell factor_vm::object_size(cell tagged)
 
 void factor_vm::primitive_size()
 {
-	ctx->push(allot_cell(object_size(ctx->pop())));
+	ctx->push(from_unsigned_cell(object_size(ctx->pop())));
 }
 
 struct slot_become_fixup : no_fixup {
