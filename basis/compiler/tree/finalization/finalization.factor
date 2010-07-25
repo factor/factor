@@ -1,8 +1,9 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences words memoize combinators
 classes classes.builtin classes.tuple classes.singleton
 math.partial-dispatch fry assocs combinators.short-circuit
+stack-checker.dependencies
 compiler.tree
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -26,6 +27,9 @@ GENERIC: finalize* ( node -- nodes )
 
 : splice-final ( quot -- nodes ) splice-quot finalize ;
 
+: splice-predicate ( word -- nodes )
+    [ depends-on-definition ] [ def>> splice-final ] bi ;
+
 M: #copy finalize* drop f ;
 
 M: #shuffle finalize*
@@ -44,8 +48,8 @@ GENERIC: finalize-word ( #call word -- nodes )
 M: predicate finalize-word
     "predicating" word-prop {
         { [ dup builtin-class? ] [ drop word>> cached-expansion ] }
-        { [ dup tuple-class? ] [ drop word>> def>> splice-final ] }
-        { [ dup singleton-class? ] [ drop word>> def>> splice-final ] }
+        { [ dup tuple-class? ] [ drop word>> splice-predicate ] }
+        { [ dup singleton-class? ] [ drop word>> splice-predicate ] }
         [ drop ]
     } cond ;
 

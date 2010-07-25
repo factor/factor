@@ -616,10 +616,14 @@ STRUCT: simd-struct
 
 ! Test cross product
 [ float-4{ 0.0 0.0 1.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 1.0 0.0 0.0 } cross ] unit-test
+[ float-4{ 0.0 0.0 1.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 1.0 0.0 0.0 } [ { float-4 float-4 } declare cross ] compile-call ] unit-test
 [ float-4{ 0.0 -1.0 0.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 0.0 1.0 0.0 } cross ] unit-test
+[ float-4{ 0.0 -1.0 0.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 0.0 1.0 0.0 } [ { float-4 float-4 } declare cross ] compile-call ] unit-test
 
 [ double-4{ 0.0 0.0 1.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 1.0 0.0 0.0 } cross ] unit-test
+[ double-4{ 0.0 0.0 1.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 1.0 0.0 0.0 } [ { double-4 double-4 } declare cross ] compile-call ] unit-test
 [ double-4{ 0.0 -1.0 0.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 0.0 1.0 0.0 } cross ] unit-test
+[ double-4{ 0.0 -1.0 0.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 0.0 1.0 0.0 } [ { double-4 double-4 } declare cross ] compile-call ] unit-test
 
 ! CSSA bug
 [ 4000000 ] [

@@ -79,12 +79,13 @@ ERROR: bad-live-ranges interval ;
 : split-for-spill ( live-interval n -- before after )
     split-interval [ spill-before ] [ spill-after ] bi* ;
 
-: find-use-position ( live-interval new -- n )
-    [ uses>> ] [ start>> '[ n>> _ >= ] ] bi* find nip
+: find-next-use ( live-interval new -- n )
+    [ uses>> ] [ start>> ] bi*
+    '[ [ spill-slot?>> not ] [ n>> ] bi _ >= and ] find nip
     [ n>> ] [ 1/0. ] if* ;
 
 : find-use-positions ( live-intervals new assoc -- )
-    '[ [ _ find-use-position ] [ reg>> ] bi _ add-use-position ] each ;
+    '[ [ _ find-next-use ] [ reg>> ] bi _ add-use-position ] each ;
 
 : active-positions ( new assoc -- )
     [ [ active-intervals-for ] keep ] dip

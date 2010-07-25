@@ -156,17 +156,12 @@ M: object infer-call* \ call bad-macro-input ;
 
 \ compose [ infer-compose ] "special" set-word-prop
 
-ERROR: bad-executable obj ;
-
-M: bad-executable summary
-    drop "execute must be given a word" ;
-
 : infer-execute ( -- )
     pop-literal nip
     dup word? [
         apply-object
     ] [
-        \ bad-executable boa time-bomb
+        \ execute time-bomb
     ] if ;
 
 \ execute [ infer-execute ] "special" set-word-prop

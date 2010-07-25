@@ -16,7 +16,7 @@ TUPLE: live-range from to ;
 
 C: <live-range> live-range
 
-TUPLE: vreg-use n def-rep use-rep ;
+TUPLE: vreg-use n def-rep use-rep spill-slot? ;
 
 : <vreg-use> ( n -- vreg-use ) vreg-use new swap >>n ;
 
@@ -36,8 +36,10 @@ reg-class ;
 : last-use? ( insn# uses -- use/f )
     [ drop f ] [ last [ n>> = ] keep and ] if-empty ;
 
-: (add-use) ( insn# live-interval -- use )
-    uses>> 2dup last-use? dup [ 2nip ] [ drop new-use ] if ;
+:: (add-use) ( insn# live-interval spill-slot? -- use )
+    live-interval uses>> :> uses
+    insn# uses last-use? [ insn# uses new-use ] unless*
+    spill-slot? [ t >>spill-slot? ] when ;
 
 GENERIC: covers? ( insn# obj -- ? )
 
@@ -105,28 +107,42 @@ GENERIC: compute-live-intervals* ( insn -- )
 
 M: insn compute-live-intervals* drop ;
 
-:: record-def ( vreg n -- )
+:: record-def ( vreg n spill-slot? -- )
     vreg live-interval :> live-interval
 
     n live-interval shorten-range
-    n live-interval (add-use) vreg rep-of >>def-rep drop ;
+    n live-interval spill-slot? (add-use) vreg rep-of >>def-rep drop ;
 
-:: record-use ( vreg n -- )
+:: record-use ( vreg n spill-slot? -- )
     vreg live-interval :> live-interval
 
     from get n live-interval add-range
-    n live-interval (add-use) vreg rep-of >>use-rep drop ;
+    n live-interval spill-slot? (add-use) vreg rep-of >>use-rep drop ;
 
 :: record-temp ( vreg n -- )
     vreg live-interval :> live-interval
 
     n n live-interval add-range
-    n live-interval (add-use) vreg rep-of >>def-rep drop ;
+    n live-interval f (add-use) vreg rep-of >>def-rep drop ;
 
 M: vreg-insn compute-live-intervals* ( insn -- )
     dup insn#>>
-    [ [ defs-vregs ] dip '[ _ record-def ] each ]
-    [ [ uses-vregs ] dip '[ _ record-use ] each ]
+    [ [ defs-vregs ] dip '[ _ f record-def ] each ]
+    [ [ uses-vregs ] dip '[ _ f record-use ] each ]
+    [ [ temp-vregs ] dip '[ _ record-temp ] each ]
+    2tri ;
+
+M: clobber-insn compute-live-intervals* ( insn -- )
+    dup insn#>>
+    [ [ defs-vregs ] dip '[ _ f record-def ] each ]
+    [ [ uses-vregs ] dip '[ _ t record-use ] each ]
+    [ [ temp-vregs ] dip '[ _ record-temp ] each ]
+    2tri ;
+
+M: hairy-clobber-insn compute-live-intervals* ( insn -- )
+    dup insn#>>
+    [ [ defs-vregs ] dip '[ _ t record-def ] each ]
+    [ [ uses-vregs ] dip '[ _ t record-use ] each ]
     [ [ temp-vregs ] dip '[ _ record-temp ] each ]
     2tri ;
 

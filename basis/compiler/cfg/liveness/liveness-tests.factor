@@ -1,12 +1,18 @@
-USING: compiler.cfg.liveness compiler.cfg.debugger
-compiler.cfg.instructions compiler.cfg.predecessors
-compiler.cfg.registers compiler.cfg cpu.architecture
-accessors namespaces sequences kernel tools.test vectors ;
+USING: compiler.cfg.liveness compiler.cfg.liveness.ssa
+compiler.cfg.debugger compiler.cfg.instructions
+compiler.cfg.predecessors compiler.cfg.registers compiler.cfg
+cpu.architecture accessors namespaces sequences kernel
+tools.test vectors alien math compiler.cfg.comparisons
+cpu.x86.assembler.operands ;
 IN: compiler.cfg.liveness.tests
 
 : test-liveness ( -- )
     cfg new 1 get >>entry
     compute-live-sets ;
+
+: test-ssa-liveness ( -- )
+    cfg new 1 get >>entry
+    compute-ssa-live-sets ;
 
 ! Sanity check...
 
@@ -30,7 +36,7 @@ V{
 
 1 { 2 3 } edges
 
-test-liveness
+[ ] [ test-liveness ] unit-test
 
 [
     H{
@@ -56,6 +62,95 @@ V{
 
 1 2 edge
 
-test-liveness
+[ ] [ test-liveness ] unit-test
 
 [ H{ { 0 0 } } ] [ 2 get live-in ] unit-test
+
+! Regression
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##inc-r f 2 }
+    T{ ##inc-d f -2 }
+    T{ ##peek f 21 D -1 }
+    T{ ##peek f 22 D -2 }
+    T{ ##replace f 21 R 0 }
+    T{ ##replace f 22 R 1 }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##call f >c-ptr }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##inc-r f -1 }
+    T{ ##inc-d f 1 }
+    T{ ##peek f 25 R -1 }
+    T{ ##replace f 25 D 0 }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##call f >float }
+    T{ ##branch }
+} 4 test-bb
+
+V{
+    T{ ##inc-r f -1 }
+    T{ ##inc-d f 2 }
+    T{ ##peek f 27 R -1 }
+    T{ ##peek f 28 D 2 }
+    T{ ##peek f 29 D 3 }
+    T{ ##load-integer f 30 1 }
+    T{ ##load-integer f 31 0 }
+    T{ ##compare-imm-branch f 27 f cc/= }
+} 5 test-bb
+
+V{
+    T{ ##inc-d f -1 }
+    T{ ##branch }
+} 6 test-bb
+
+V{
+    T{ ##inc-d f -1 }
+    T{ ##branch }
+} 7 test-bb
+
+V{
+    T{ ##phi f 36 H{ { 6 30 } { 7 31 } } }
+    T{ ##inc-d f -2 }
+    T{ ##unbox f 37 29 "alien_offset" int-rep }
+    T{ ##unbox f 38 28 "to_double" double-rep }
+    T{ ##unbox f 39 36 "to_cell" int-rep }
+    T{ ##alien-invoke f V{ } V{ { 37 int-rep 0 } { 38 double-rep 4 } { 39 int-rep 12 } } { { 40 int-rep EAX } } 0 16 "CFRunLoopRunInMode" f T{ gc-map } }
+    T{ ##box f 41 40 "from_signed_cell" int-rep T{ gc-map } }
+    T{ ##replace f 41 D 0 }
+    T{ ##branch }
+} 8 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 9 test-bb
+
+0 1 edge
+1 2 edge
+2 3 edge
+3 4 edge
+4 5 edge
+5 { 6 7 } edges
+6 8 edge
+7 8 edge
+8 9 edge
+
+[ ] [ test-ssa-liveness ] unit-test
+
+[ H{ { 28 28 } { 29 29 } { 30 30 } { 31 31 } } ] [ 5 get live-out ] unit-test
+[ H{ { 28 28 } { 29 29 } { 30 30 } } ] [ 6 get live-in ] unit-test
+[ H{ { 28 28 } { 29 29 } { 31 31 } } ] [ 7 get live-in ] unit-test
+[ H{ { 30 30 } } ] [ 6 get 8 get edge-live-in ] unit-test
