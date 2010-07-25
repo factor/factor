@@ -13,5 +13,7 @@ IN: gstreamer.net.ffi
 } cond
 >>
 
+REPLACE-C-TYPE: any gpointer
+
 GIR: vocab:gstreamer/net/GstNet-0.10.gir
 
