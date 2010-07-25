@@ -18,6 +18,8 @@ TYPEDEF: guint32 GdkNativeWindow
 TYPEDEF: guint32 GdkWChar
 C-TYPE: GdkXEvent
 
+REPLACE-C-TYPE: any gpointer
+
 IMPLEMENT-STRUCTS: GdkEventAny GdkEventKey GdkEventButton
 GdkEventScroll GdkEventMotion GdkEventExpose GdkEventVisibility
 GdkEventCrossing GdkEventFocus GdkEventConfigure GdkEventProperty
