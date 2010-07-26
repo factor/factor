@@ -14,8 +14,6 @@ IN: glib.ffi
 } cond
 >>
 
-<< double "long double" current-vocab create typedef >>
-
 TYPEDEF: char gchar
 TYPEDEF: uchar guchar
 TYPEDEF: short gshort
@@ -66,7 +64,9 @@ TYPEDEF: guint32 gunichar
 TYPEDEF: guint16 gunichar2
 
 TYPEDEF: gpointer pointer
-TYPEDEF: gpointer any
+
+REPLACE-C-TYPE: long\sdouble double
+REPLACE-C-TYPE: any gpointer
 
 IMPLEMENT-STRUCTS: GError GPollFD GSource GSourceFuncs ;
 

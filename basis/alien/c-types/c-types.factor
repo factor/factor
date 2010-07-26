@@ -258,7 +258,7 @@ M: pointer c-type
         2 >>align
         2 >>align-first
         "from_signed_2" >>boxer
-        "to_fixnum" >>unboxer
+        "to_signed_2" >>unboxer
         [ >fixnum ] >>unboxer-quot
     \ short define-primitive-type
 
@@ -271,7 +271,7 @@ M: pointer c-type
         2 >>align
         2 >>align-first
         "from_unsigned_2" >>boxer
-        "to_cell" >>unboxer
+        "to_unsigned_2" >>unboxer
         [ >fixnum ] >>unboxer-quot
     \ ushort define-primitive-type
 
@@ -284,7 +284,7 @@ M: pointer c-type
         1 >>align
         1 >>align-first
         "from_signed_1" >>boxer
-        "to_fixnum" >>unboxer
+        "to_signed_1" >>unboxer
         [ >fixnum ] >>unboxer-quot
     \ char define-primitive-type
 
@@ -297,7 +297,7 @@ M: pointer c-type
         1 >>align
         1 >>align-first
         "from_unsigned_1" >>boxer
-        "to_cell" >>unboxer
+        "to_unsigned_1" >>unboxer
         [ >fixnum ] >>unboxer-quot
     \ uchar define-primitive-type
 
@@ -338,7 +338,7 @@ M: pointer c-type
             4 >>align
             4 >>align-first
             "from_signed_4" >>boxer
-            "to_fixnum" >>unboxer
+            "to_signed_4" >>unboxer
             [ >fixnum ] >>unboxer-quot
         \ int define-primitive-type
     
@@ -351,7 +351,7 @@ M: pointer c-type
             4 >>align
             4 >>align-first
             "from_unsigned_4" >>boxer
-            "to_cell" >>unboxer
+            "to_unsigned_4" >>unboxer
             [ >fixnum ] >>unboxer-quot
         \ uint define-primitive-type
 

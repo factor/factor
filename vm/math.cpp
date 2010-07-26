@@ -21,7 +21,7 @@ void factor_vm::primitive_fixnum_divint()
 	fixnum x = untag_fixnum(ctx->peek());
 	fixnum result = x / y;
 	if(result == -fixnum_min)
-		ctx->replace(allot_integer(-fixnum_min));
+		ctx->replace(from_signed_cell(-fixnum_min));
 	else
 		ctx->replace(tag_fixnum(result));
 }
@@ -32,7 +32,7 @@ void factor_vm::primitive_fixnum_divmod()
 	cell x = ((cell *)ctx->datastack)[-1];
 	if(y == tag_fixnum(-1) && x == tag_fixnum(fixnum_min))
 	{
-		((cell *)ctx->datastack)[-1] = allot_integer(-fixnum_min);
+		((cell *)ctx->datastack)[-1] = from_signed_cell(-fixnum_min);
 		((cell *)ctx->datastack)[0] = tag_fixnum(0);
 	}
 	else
@@ -335,7 +335,7 @@ void factor_vm::primitive_float_greatereq()
 
 void factor_vm::primitive_float_bits()
 {
-	ctx->push(from_unsigned_4(float_bits((float)untag_float_check(ctx->pop()))));
+	ctx->push(from_unsigned_cell(float_bits((float)untag_float_check(ctx->pop()))));
 }
 
 void factor_vm::primitive_bits_float()
@@ -381,76 +381,6 @@ cell factor_vm::to_cell(cell tagged)
 VM_C_API cell to_cell(cell tagged, factor_vm *parent)
 {
 	return parent->to_cell(tagged);
-}
-
-cell factor_vm::from_signed_1(s8 n)
-{
-	return tag_fixnum(n);
-}
-
-VM_C_API cell from_signed_1(s8 n, factor_vm *parent)
-{
-	return parent->from_signed_1(n);
-}
-
-cell factor_vm::from_unsigned_1(u8 n)
-{
-	return tag_fixnum(n);
-}
-
-VM_C_API cell from_unsigned_1(u8 n, factor_vm *parent)
-{
-	return parent->from_unsigned_1(n);
-}
-
-cell factor_vm::from_signed_2(s16 n)
-{
-	return tag_fixnum(n);
-}
-
-VM_C_API cell from_signed_2(s16 n, factor_vm *parent)
-{
-	return parent->from_signed_2(n);
-}
-
-cell factor_vm::from_unsigned_2(u16 n)
-{
-	return tag_fixnum(n);
-}
-
-VM_C_API cell from_unsigned_2(u16 n, factor_vm *parent)
-{
-	return parent->from_unsigned_2(n);
-}
-
-cell factor_vm::from_signed_4(s32 n)
-{
-	return allot_integer(n);
-}
-
-VM_C_API cell from_signed_4(s32 n, factor_vm *parent)
-{
-	return parent->from_signed_4(n);
-}
-
-cell factor_vm::from_unsigned_4(u32 n)
-{
-	return allot_cell(n);
-}
-
-VM_C_API cell from_unsigned_4(u32 n, factor_vm *parent)
-{
-	return parent->from_unsigned_4(n);
-}
-
-cell factor_vm::from_signed_cell(fixnum integer)
-{
-	return allot_integer(integer);
-}
-
-cell factor_vm::from_unsigned_cell(cell integer)
-{
-	return allot_cell(integer);
 }
 
 VM_C_API cell from_signed_cell(fixnum integer, factor_vm *parent)
@@ -529,36 +459,16 @@ VM_C_API u64 to_unsigned_8(cell obj, factor_vm *parent)
 	return parent->to_unsigned_8(obj);
 }
  
-VM_C_API cell from_float(float flo, factor_vm *parent)
-{
-	return parent->allot_float(flo);
-}
-
 /* Cannot allocate */
 float factor_vm::to_float(cell value)
 {
 	return (float)untag_float_check(value);
 }
 
-VM_C_API float to_float(cell value, factor_vm *parent)
-{
-	return parent->to_float(value);
-}
-
-VM_C_API cell from_double(double flo, factor_vm *parent)
-{
-	return parent->allot_float(flo);
-}
-
 /* Cannot allocate */
 double factor_vm::to_double(cell value)
 {
 	return untag_float_check(value);
-}
-
-VM_C_API double to_double(cell value, factor_vm *parent)
-{
-	return parent->to_double(value);
 }
 
 /* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
