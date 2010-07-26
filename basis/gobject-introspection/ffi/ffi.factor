@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.parser arrays
+USING: accessors alien alien.c-types alien.parser arrays assocs
 classes.parser classes.struct combinators
 combinators.short-circuit definitions effects fry
 gobject-introspection.common gobject-introspection.types kernel
@@ -9,7 +9,9 @@ sequences.generalizations words words.constant ;
 IN: gobject-introspection.ffi
 
 : string>c-type ( str -- c-type )
-    parse-c-type ;
+    dup CHAR: * swap index [ cut ] [ "" ] if*
+    [ replaced-c-types get-global ?at drop ] dip
+    append parse-c-type ;
     
 : define-each ( nodes quot -- )
     '[ dup @ >>ffi drop ] each ; inline

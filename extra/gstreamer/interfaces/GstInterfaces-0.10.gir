@@ -1,0 +1,3570 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.0"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gst" version="0.10"/>
+  <include name="libxml2" version="2.0"/>
+  <package name="gstreamer-0.10"/>
+  <c:include name="gst/interfaces/colorbalance.h"/>
+  <c:include name="gst/interfaces/colorbalancechannel.h"/>
+  <c:include name="gst/interfaces/interfaces-enumtypes.h"/>
+  <c:include name="gst/interfaces/mixer.h"/>
+  <c:include name="gst/interfaces/mixeroptions.h"/>
+  <c:include name="gst/interfaces/mixertrack.h"/>
+  <c:include name="gst/interfaces/navigation.h"/>
+  <c:include name="gst/interfaces/propertyprobe.h"/>
+  <c:include name="gst/interfaces/streamvolume.h"/>
+  <c:include name="gst/interfaces/tuner.h"/>
+  <c:include name="gst/interfaces/tunerchannel.h"/>
+  <c:include name="gst/interfaces/tunernorm.h"/>
+  <c:include name="gst/interfaces/videoorientation.h"/>
+  <c:include name="gst/interfaces/xoverlay.h"/>
+  <namespace name="GstInterfaces"
+             version="0.10"
+             shared-library="libgstinterfaces-0.10.so.0"
+             c:prefix="Gst">
+    <interface name="ColorBalance"
+               c:type="GstColorBalance"
+               glib:type-name="GstColorBalance"
+               glib:get-type="gst_color_balance_get_type"
+               glib:type-struct="ColorBalanceClass">
+      <prerequisite name="Gst.ImplementsInterface"/>
+      <prerequisite name="Gst.Element"/>
+      <virtual-method name="list_channels" invoker="list_channels">
+        <return-value transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="set_value" invoker="set_value">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="ColorBalanceChannel" c:type="GstColorBalanceChannel*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_value" invoker="get_value">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="gint"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="ColorBalanceChannel" c:type="GstColorBalanceChannel*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="list_channels"
+              c:identifier="gst_color_balance_list_channels"
+              doc="Retrieve a list of the available channels.
+The list is owned by the #GstColorBalance instance and must not
+be freed.">
+        <return-value transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </method>
+      <method name="set_value"
+              c:identifier="gst_color_balance_set_value"
+              doc="Sets the current value of the channel to the passed value, which must
+be between min_value and max_value.
+#GstColorBalanceChannel::max_value members of the
+#GstColorBalanceChannel object.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="ColorBalanceChannel" c:type="GstColorBalanceChannel*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_value"
+              c:identifier="gst_color_balance_get_value"
+              doc="Retrieve the current value of the indicated channel, between min_value
+and max_value.
+#GstColorBalanceChannel::max_value members of the
+#GstColorBalanceChannel object.">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="gint"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="ColorBalanceChannel" c:type="GstColorBalanceChannel*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_balance_type"
+              c:identifier="gst_color_balance_get_balance_type"
+              doc="Get the #GstColorBalanceType of this implementation."
+              version="0.10.24">
+        <return-value transfer-ownership="full">
+          <type name="ColorBalanceType" c:type="GstColorBalanceType"/>
+        </return-value>
+      </method>
+      <method name="value_changed"
+              c:identifier="gst_color_balance_value_changed"
+              doc="A helper function called by implementations of the GstColorBalance
+interface. It fires the #GstColorBalance::value-changed signal on the
+instance, and the #GstColorBalanceChannel::value-changed signal on the
+channel object.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="ColorBalanceChannel" c:type="GstColorBalanceChannel*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <glib:signal name="value-changed"
+                   doc="Fired when the value of the indicated channel has changed.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="ColorBalanceChannel" c:type="GstColorBalanceChannel"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+    </interface>
+    <class name="ColorBalanceChannel"
+           c:type="GstColorBalanceChannel"
+           parent="GObject.Object"
+           glib:type-name="GstColorBalanceChannel"
+           glib:get-type="gst_color_balance_channel_get_type"
+           glib:type-struct="ColorBalanceChannelClass">
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="label">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="min_value">
+        <type name="int" c:type="gint"/>
+      </field>
+      <field name="max_value">
+        <type name="int" c:type="gint"/>
+      </field>
+      <glib:signal name="value-changed"
+                   doc="Fired when the value of the indicated channel has changed.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+    </class>
+    <record name="ColorBalanceChannelClass"
+            c:type="GstColorBalanceChannelClass"
+            glib:is-gtype-struct-for="ColorBalanceChannel">
+      <field name="parent">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="value_changed">
+        <callback name="value_changed" c:type="value_changed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="ColorBalanceChannel"
+                    c:type="GstColorBalanceChannel*"/>
+            </parameter>
+            <parameter name="value" transfer-ownership="none">
+              <type name="int" c:type="gint"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <record name="ColorBalanceClass"
+            c:type="GstColorBalanceClass"
+            glib:is-gtype-struct-for="ColorBalance">
+      <field name="klass">
+        <type name="GObject.TypeInterface" c:type="GTypeInterface"/>
+      </field>
+      <field name="balance_type">
+        <type name="ColorBalanceType" c:type="GstColorBalanceType"/>
+      </field>
+      <field name="list_channels">
+        <callback name="list_channels" c:type="list_channels">
+          <return-value transfer-ownership="none">
+            <type name="GLib.List" c:type="GList*"/>
+          </return-value>
+          <parameters>
+            <parameter name="balance" transfer-ownership="none">
+              <type name="ColorBalance" c:type="GstColorBalance*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_value">
+        <callback name="set_value" c:type="set_value">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="balance" transfer-ownership="none">
+              <type name="ColorBalance" c:type="GstColorBalance*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="ColorBalanceChannel"
+                    c:type="GstColorBalanceChannel*"/>
+            </parameter>
+            <parameter name="value" transfer-ownership="none">
+              <type name="int" c:type="gint"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_value">
+        <callback name="get_value" c:type="get_value">
+          <return-value transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </return-value>
+          <parameters>
+            <parameter name="balance" transfer-ownership="none">
+              <type name="ColorBalance" c:type="GstColorBalance*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="ColorBalanceChannel"
+                    c:type="GstColorBalanceChannel*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="value_changed">
+        <callback name="value_changed" c:type="value_changed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="balance" transfer-ownership="none">
+              <type name="ColorBalance" c:type="GstColorBalance*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="ColorBalanceChannel"
+                    c:type="GstColorBalanceChannel*"/>
+            </parameter>
+            <parameter name="value" transfer-ownership="none">
+              <type name="int" c:type="gint"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <enumeration name="ColorBalanceType"
+                 doc="hardware.
+processing.
+An enumeration indicating whether an element implements color balancing
+operations in software or in dedicated hardware. In general, dedicated
+hardware implementations (such as those provided by xvimagesink) are
+preferred."
+                 glib:type-name="GstColorBalanceType"
+                 glib:get-type="gst_color_balance_type_get_type"
+                 c:type="GstColorBalanceType">
+      <member name="hardware"
+              value="0"
+              c:identifier="GST_COLOR_BALANCE_HARDWARE"
+              glib:nick="hardware"/>
+      <member name="software"
+              value="1"
+              c:identifier="GST_COLOR_BALANCE_SOFTWARE"
+              glib:nick="software"/>
+    </enumeration>
+    <interface name="Mixer"
+               c:type="GstMixer"
+               glib:type-name="GstMixer"
+               glib:get-type="gst_mixer_get_type"
+               glib:type-struct="MixerClass">
+      <prerequisite name="Gst.ImplementsInterface"/>
+      <prerequisite name="Gst.Element"/>
+      <virtual-method name="list_tracks" invoker="list_tracks">
+        <return-value transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="set_volume" invoker="set_volume">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="track" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack*"/>
+          </parameter>
+          <parameter name="volumes" direction="out" transfer-ownership="full">
+            <type name="int" c:type="gint*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_volume" invoker="get_volume">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="track" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack*"/>
+          </parameter>
+          <parameter name="volumes" direction="out" transfer-ownership="full">
+            <type name="int" c:type="gint*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="set_mute" invoker="set_mute">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="track" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack*"/>
+          </parameter>
+          <parameter name="mute" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="set_record" invoker="set_record">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="track" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack*"/>
+          </parameter>
+          <parameter name="record" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="set_option" invoker="set_option">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="opts" transfer-ownership="none">
+            <type name="MixerOptions" c:type="GstMixerOptions*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="full">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_option" invoker="get_option">
+        <return-value transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="opts" transfer-ownership="none">
+            <type name="MixerOptions" c:type="GstMixerOptions*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_mixer_flags" invoker="get_mixer_flags">
+        <return-value transfer-ownership="full">
+          <type name="MixerFlags" c:type="GstMixerFlags"/>
+        </return-value>
+      </virtual-method>
+      <method name="list_tracks"
+              c:identifier="gst_mixer_list_tracks"
+              doc="Returns a list of available tracks for this mixer/element. Note
+that it is allowed for sink (output) elements to only provide
+the output tracks in this list. Likewise, for sources (inputs),
+it is allowed to only provide input elements in this list.
+The list is owned by the #GstMixer instance and must not be freed
+or modified.">
+        <return-value transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </method>
+      <method name="set_volume"
+              c:identifier="gst_mixer_set_volume"
+              doc="that gives the wanted volume for each channel in
+this track.
+Sets the volume on each channel in a track. Short note about
+the mixer/element, such as &apos;Line-in&apos; or &apos;Microphone&apos;. A
+channel is said to be a mono-stream inside this track. A
+stereo track thus contains two channels.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="track" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack*"/>
+          </parameter>
+          <parameter name="volumes" direction="out" transfer-ownership="full">
+            <type name="int" c:type="gint*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_volume"
+              c:identifier="gst_mixer_get_volume"
+              doc="track-&gt;num_channels) to store the current volume
+of each channel in the given track in.
+Get the current volume(s) on the given track.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="track" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack*"/>
+          </parameter>
+          <parameter name="volumes" direction="out" transfer-ownership="full">
+            <type name="int" c:type="gint*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_mute"
+              c:identifier="gst_mixer_set_mute"
+              doc="muting.
+Mutes or unmutes the given channel. To find out whether a
+track is currently muted, use GST_MIXER_TRACK_HAS_FLAG ().">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="track" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack*"/>
+          </parameter>
+          <parameter name="mute" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_record"
+              c:identifier="gst_mixer_set_record"
+              doc="or off recording.
+Enables or disables recording on the given track. Note that
+this is only possible on input tracks, not on output tracks
+(see GST_MIXER_TRACK_HAS_FLAG () and the GST_MIXER_TRACK_INPUT
+flag).">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="track" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack*"/>
+          </parameter>
+          <parameter name="record" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_option"
+              c:identifier="gst_mixer_set_option"
+              doc="Sets a name/value option in the mixer to the requested value.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="opts" transfer-ownership="none">
+            <type name="MixerOptions" c:type="GstMixerOptions*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="full">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_option"
+              c:identifier="gst_mixer_get_option"
+              doc="Get the current value of a name/value option in the mixer.">
+        <return-value transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="opts" transfer-ownership="none">
+            <type name="MixerOptions" c:type="GstMixerOptions*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="mute_toggled"
+              c:identifier="gst_mixer_mute_toggled"
+              doc="This function is called by the mixer implementation to produce
+a notification message on the bus indicating that the given track
+has changed mute state.
+This function only works for GstElements that are implementing the
+GstMixer interface, and the element needs to have been provided a bus.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="track" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack*"/>
+          </parameter>
+          <parameter name="mute" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="record_toggled"
+              c:identifier="gst_mixer_record_toggled"
+              doc="This function is called by the mixer implementation to produce
+a notification message on the bus indicating that the given track
+has changed recording state.
+This function only works for GstElements that are implementing the
+GstMixer interface, and the element needs to have been provided a bus.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="track" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack*"/>
+          </parameter>
+          <parameter name="record" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="volume_changed"
+              c:identifier="gst_mixer_volume_changed"
+              doc="This function is called by the mixer implementation to produce
+a notification message on the bus indicating that the volume(s) for the
+given track have changed.
+This function only works for GstElements that are implementing the
+GstMixer interface, and the element needs to have been provided a bus.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="track" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack*"/>
+          </parameter>
+          <parameter name="volumes" direction="out" transfer-ownership="full">
+            <type name="int" c:type="gint*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="option_changed"
+              c:identifier="gst_mixer_option_changed"
+              doc="This function is called by the mixer implementation to produce
+a notification message on the bus indicating that the given options
+object has changed state.
+This function only works for GstElements that are implementing the
+GstMixer interface, and the element needs to have been provided a bus.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="opts" transfer-ownership="none">
+            <type name="MixerOptions" c:type="GstMixerOptions*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="mixer_changed"
+              c:identifier="gst_mixer_mixer_changed"
+              doc="This function is called by the mixer implementation to produce
+a notification message on the bus indicating that the list of available
+mixer tracks for a given mixer object has changed. Applications should
+rebuild their interface when they receive this message.
+This function only works for GstElements that are implementing the
+GstMixer interface, and the element needs to have been provided a bus."
+              version="0.10.18">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="options_list_changed"
+              c:identifier="gst_mixer_options_list_changed"
+              doc="This function is called by the mixer implementation to produce
+a notification message on the bus indicating that the list of possible
+options of a given options object has changed.
+The new options are not contained in the message on purpose. Applications
+should call gst_mixer_option_get_values() on @opts to make @opts update
+its internal state and obtain the new list of values.
+This function only works for GstElements that are implementing the
+GstMixer interface, and the element needs to have been provided a bus
+for this to work."
+              version="0.10.18">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="opts" transfer-ownership="none">
+            <type name="MixerOptions" c:type="GstMixerOptions*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_mixer_type"
+              c:identifier="gst_mixer_get_mixer_type"
+              doc="Get the #GstMixerType of this mixer implementation."
+              version="0.10.24">
+        <return-value transfer-ownership="full">
+          <type name="MixerType" c:type="GstMixerType"/>
+        </return-value>
+      </method>
+      <method name="get_mixer_flags"
+              c:identifier="gst_mixer_get_mixer_flags"
+              doc="Get the set of supported flags for this mixer implementation.">
+        <return-value transfer-ownership="full">
+          <type name="MixerFlags" c:type="GstMixerFlags"/>
+        </return-value>
+      </method>
+      <glib:signal name="mute-toggled">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack"/>
+          </parameter>
+          <parameter name="p0" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="option-changed">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <type name="MixerOptions" c:type="GstMixerOptions"/>
+          </parameter>
+          <parameter name="p0" transfer-ownership="none">
+            <type name="utf8" c:type="gchararray"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="record-toggled">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack"/>
+          </parameter>
+          <parameter name="p0" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="volume-changed">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <type name="MixerTrack" c:type="GstMixerTrack"/>
+          </parameter>
+          <parameter name="p0" transfer-ownership="none">
+            <type name="any" c:type="gpointer"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+    </interface>
+    <record name="MixerClass"
+            c:type="GstMixerClass"
+            glib:is-gtype-struct-for="Mixer">
+      <field name="klass">
+        <type name="GObject.TypeInterface" c:type="GTypeInterface"/>
+      </field>
+      <field name="mixer_type">
+        <type name="MixerType" c:type="GstMixerType"/>
+      </field>
+      <field name="list_tracks">
+        <callback name="list_tracks" c:type="list_tracks">
+          <return-value transfer-ownership="none">
+            <type name="GLib.List" c:type="GList*"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_volume">
+        <callback name="set_volume" c:type="set_volume">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+            <parameter name="track" transfer-ownership="none">
+              <type name="MixerTrack" c:type="GstMixerTrack*"/>
+            </parameter>
+            <parameter name="volumes"
+                       direction="out"
+                       transfer-ownership="full">
+              <type name="int" c:type="gint*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_volume">
+        <callback name="get_volume" c:type="get_volume">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+            <parameter name="track" transfer-ownership="none">
+              <type name="MixerTrack" c:type="GstMixerTrack*"/>
+            </parameter>
+            <parameter name="volumes"
+                       direction="out"
+                       transfer-ownership="full">
+              <type name="int" c:type="gint*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_mute">
+        <callback name="set_mute" c:type="set_mute">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+            <parameter name="track" transfer-ownership="none">
+              <type name="MixerTrack" c:type="GstMixerTrack*"/>
+            </parameter>
+            <parameter name="mute" transfer-ownership="none">
+              <type name="boolean" c:type="gboolean"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_record">
+        <callback name="set_record" c:type="set_record">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+            <parameter name="track" transfer-ownership="none">
+              <type name="MixerTrack" c:type="GstMixerTrack*"/>
+            </parameter>
+            <parameter name="record" transfer-ownership="none">
+              <type name="boolean" c:type="gboolean"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="mute_toggled">
+        <callback name="mute_toggled" c:type="mute_toggled">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="MixerTrack" c:type="GstMixerTrack*"/>
+            </parameter>
+            <parameter name="mute" transfer-ownership="none">
+              <type name="boolean" c:type="gboolean"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="record_toggled">
+        <callback name="record_toggled" c:type="record_toggled">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="MixerTrack" c:type="GstMixerTrack*"/>
+            </parameter>
+            <parameter name="record" transfer-ownership="none">
+              <type name="boolean" c:type="gboolean"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="volume_changed">
+        <callback name="volume_changed" c:type="volume_changed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="MixerTrack" c:type="GstMixerTrack*"/>
+            </parameter>
+            <parameter name="volumes"
+                       direction="out"
+                       transfer-ownership="full">
+              <type name="int" c:type="gint*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_option">
+        <callback name="set_option" c:type="set_option">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+            <parameter name="opts" transfer-ownership="none">
+              <type name="MixerOptions" c:type="GstMixerOptions*"/>
+            </parameter>
+            <parameter name="value" transfer-ownership="full">
+              <type name="utf8" c:type="gchar*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_option">
+        <callback name="get_option" c:type="get_option">
+          <return-value transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+            <parameter name="opts" transfer-ownership="none">
+              <type name="MixerOptions" c:type="GstMixerOptions*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="option_changed">
+        <callback name="option_changed" c:type="option_changed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+            <parameter name="opts" transfer-ownership="none">
+              <type name="MixerOptions" c:type="GstMixerOptions*"/>
+            </parameter>
+            <parameter name="option" transfer-ownership="full">
+              <type name="utf8" c:type="gchar*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_mixer_flags">
+        <callback name="get_mixer_flags" c:type="get_mixer_flags">
+          <return-value transfer-ownership="full">
+            <type name="MixerFlags" c:type="GstMixerFlags"/>
+          </return-value>
+          <parameters>
+            <parameter name="mixer" transfer-ownership="none">
+              <type name="Mixer" c:type="GstMixer*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="3">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <bitfield name="MixerFlags"
+              doc="sends notification messages.
+marked without either input or output.  Controls marked as input or
+output should be grouped with input &amp; output sliders, even if they
+Flags indicating which optional features are supported by a mixer
+implementation."
+              version="0.10.14"
+              glib:type-name="GstMixerFlags"
+              glib:get-type="gst_mixer_flags_get_type"
+              c:type="GstMixerFlags">
+      <member name="none"
+              value="0"
+              c:identifier="GST_MIXER_FLAG_NONE"
+              glib:nick="none"/>
+      <member name="auto_notifications"
+              value="1"
+              c:identifier="GST_MIXER_FLAG_AUTO_NOTIFICATIONS"
+              glib:nick="auto-notifications"/>
+      <member name="has_whitelist"
+              value="2"
+              c:identifier="GST_MIXER_FLAG_HAS_WHITELIST"
+              glib:nick="has-whitelist"/>
+      <member name="grouping"
+              value="4"
+              c:identifier="GST_MIXER_FLAG_GROUPING"
+              glib:nick="grouping"/>
+    </bitfield>
+    <enumeration name="MixerMessageType"
+                 doc="GstMixer message, posted when the list of available options for a
+when the list of available mixer tracks has changed. The application
+An enumeration for the type of a GstMixer message received on the bus"
+                 version="0.10.14"
+                 glib:type-name="GstMixerMessageType"
+                 glib:get-type="gst_mixer_message_type_get_type"
+                 c:type="GstMixerMessageType">
+      <member name="invalid"
+              value="0"
+              c:identifier="GST_MIXER_MESSAGE_INVALID"
+              glib:nick="invalid"/>
+      <member name="mute_toggled"
+              value="1"
+              c:identifier="GST_MIXER_MESSAGE_MUTE_TOGGLED"
+              glib:nick="mute-toggled"/>
+      <member name="record_toggled"
+              value="2"
+              c:identifier="GST_MIXER_MESSAGE_RECORD_TOGGLED"
+              glib:nick="record-toggled"/>
+      <member name="volume_changed"
+              value="3"
+              c:identifier="GST_MIXER_MESSAGE_VOLUME_CHANGED"
+              glib:nick="volume-changed"/>
+      <member name="option_changed"
+              value="4"
+              c:identifier="GST_MIXER_MESSAGE_OPTION_CHANGED"
+              glib:nick="option-changed"/>
+      <member name="options_list_changed"
+              value="5"
+              c:identifier="GST_MIXER_MESSAGE_OPTIONS_LIST_CHANGED"
+              glib:nick="options-list-changed"/>
+      <member name="mixer_changed"
+              value="6"
+              c:identifier="GST_MIXER_MESSAGE_MIXER_CHANGED"
+              glib:nick="mixer-changed"/>
+    </enumeration>
+    <class name="MixerOptions"
+           c:type="GstMixerOptions"
+           doc="always use gst_mixer_options_get_values() instead."
+           parent="MixerTrack"
+           glib:type-name="GstMixerOptions"
+           glib:get-type="gst_mixer_options_get_type"
+           glib:type-struct="MixerOptionsClass">
+      <virtual-method name="get_values" invoker="get_values">
+        <return-value transfer-ownership="full">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </virtual-method>
+      <method name="get_values"
+              c:identifier="gst_mixer_options_get_values"
+              doc="Get the values for the mixer option.
+option. You must not free or modify the list or its contents, it belongs
+to the @mixer_options object.">
+        <return-value transfer-ownership="full">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </method>
+      <field name="parent">
+        <type name="MixerTrack" c:type="GstMixerTrack"/>
+      </field>
+      <field name="values">
+        <type name="GLib.List" c:type="GList*"/>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="any"/>
+        </array>
+      </field>
+    </class>
+    <record name="MixerOptionsClass"
+            c:type="GstMixerOptionsClass"
+            glib:is-gtype-struct-for="MixerOptions">
+      <field name="parent">
+        <type name="MixerTrackClass" c:type="GstMixerTrackClass"/>
+      </field>
+      <field name="get_values">
+        <callback name="get_values" c:type="get_values">
+          <return-value transfer-ownership="full">
+            <type name="GLib.List" c:type="GList*"/>
+          </return-value>
+          <parameters>
+            <parameter name="opts" transfer-ownership="none">
+              <type name="MixerOptions" c:type="GstMixerOptions*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="3">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <class name="MixerTrack"
+           c:type="GstMixerTrack"
+           parent="GObject.Object"
+           glib:type-name="GstMixerTrack"
+           glib:get-type="gst_mixer_track_get_type"
+           glib:type-struct="MixerTrackClass">
+      <property name="flags">
+        <type name="uint" c:type="guint"/>
+      </property>
+      <property name="index" writable="1" construct-only="1">
+        <type name="uint" c:type="guint"/>
+      </property>
+      <property name="label">
+        <type name="utf8" c:type="gchararray"/>
+      </property>
+      <property name="max-volume">
+        <type name="int" c:type="gint"/>
+      </property>
+      <property name="min-volume">
+        <type name="int" c:type="gint"/>
+      </property>
+      <property name="num-channels">
+        <type name="int" c:type="gint"/>
+      </property>
+      <property name="untranslated-label" writable="1" construct-only="1">
+        <type name="utf8" c:type="gchararray"/>
+      </property>
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="label">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="flags">
+        <type name="MixerTrackFlags" c:type="GstMixerTrackFlags"/>
+      </field>
+      <field name="num_channels">
+        <type name="int" c:type="gint"/>
+      </field>
+      <field name="min_volume">
+        <type name="int" c:type="gint"/>
+      </field>
+      <field name="max_volume">
+        <type name="int" c:type="gint"/>
+      </field>
+    </class>
+    <record name="MixerTrackClass"
+            c:type="GstMixerTrackClass"
+            glib:is-gtype-struct-for="MixerTrack">
+      <field name="parent">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <bitfield name="MixerTrackFlags"
+              doc="(for #GST_MIXER_TRACK_INPUT mixer tracks only)
+in software (as opposed to a hardware control)
+Mixer track flags."
+              version="0.10.23"
+              glib:type-name="GstMixerTrackFlags"
+              glib:get-type="gst_mixer_track_flags_get_type"
+              c:type="GstMixerTrackFlags">
+      <member name="input"
+              value="1"
+              c:identifier="GST_MIXER_TRACK_INPUT"
+              glib:nick="input"/>
+      <member name="output"
+              value="2"
+              c:identifier="GST_MIXER_TRACK_OUTPUT"
+              glib:nick="output"/>
+      <member name="mute"
+              value="4"
+              c:identifier="GST_MIXER_TRACK_MUTE"
+              glib:nick="mute"/>
+      <member name="record"
+              value="8"
+              c:identifier="GST_MIXER_TRACK_RECORD"
+              glib:nick="record"/>
+      <member name="master"
+              value="16"
+              c:identifier="GST_MIXER_TRACK_MASTER"
+              glib:nick="master"/>
+      <member name="software"
+              value="32"
+              c:identifier="GST_MIXER_TRACK_SOFTWARE"
+              glib:nick="software"/>
+      <member name="no_record"
+              value="64"
+              c:identifier="GST_MIXER_TRACK_NO_RECORD"
+              glib:nick="no-record"/>
+      <member name="no_mute"
+              value="128"
+              c:identifier="GST_MIXER_TRACK_NO_MUTE"
+              glib:nick="no-mute"/>
+      <member name="whitelist"
+              value="256"
+              c:identifier="GST_MIXER_TRACK_WHITELIST"
+              glib:nick="whitelist"/>
+      <member name="readonly"
+              value="512"
+              c:identifier="GST_MIXER_TRACK_READONLY"
+              glib:nick="readonly"/>
+      <member name="writeonly"
+              value="1024"
+              c:identifier="GST_MIXER_TRACK_WRITEONLY"
+              glib:nick="writeonly"/>
+    </bitfield>
+    <enumeration name="MixerType"
+                 glib:type-name="GstMixerType"
+                 glib:get-type="gst_mixer_type_get_type"
+                 c:type="GstMixerType">
+      <member name="hardware"
+              value="0"
+              c:identifier="GST_MIXER_HARDWARE"
+              glib:nick="hardware"/>
+      <member name="software"
+              value="1"
+              c:identifier="GST_MIXER_SOFTWARE"
+              glib:nick="software"/>
+    </enumeration>
+    <interface name="Navigation"
+               c:type="GstNavigation"
+               glib:type-name="GstNavigation"
+               glib:get-type="gst_navigation_get_type"
+               glib:type-struct="NavigationInterface">
+      <virtual-method name="send_event" invoker="send_event">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="structure" transfer-ownership="none">
+            <type name="Gst.Structure" c:type="GstStructure*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="send_event" c:identifier="gst_navigation_send_event">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="structure" transfer-ownership="none">
+            <type name="Gst.Structure" c:type="GstStructure*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="send_key_event"
+              c:identifier="gst_navigation_send_key_event"
+              doc="&quot;key-release&quot;
+by XKeysymToString.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="event" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="key" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="send_mouse_event"
+              c:identifier="gst_navigation_send_mouse_event"
+              doc="&quot;mouse-button-press&quot;, &quot;mouse-button-release&quot; and &quot;mouse-move&quot;.
+for mouse-move events.
+Sends a mouse event to the navigation interface. Mouse event coordinates
+are sent relative to the display space of the related output area. This is
+usually the size in pixels of the window associated with the element
+implementing the #GstNavigation interface.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="event" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="button" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="x" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+          <parameter name="y" transfer-ownership="none">
+            <type name="double" c:type="double"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="send_command"
+              c:identifier="gst_navigation_send_command"
+              doc="Sends the indicated command to the navigation interface."
+              version="0.10.23">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="command" transfer-ownership="none">
+            <type name="NavigationCommand" c:type="GstNavigationCommand"/>
+          </parameter>
+        </parameters>
+      </method>
+    </interface>
+    <enumeration name="NavigationCommand"
+                 doc="this enters the DVD root menu, or exits back to the title from the menu.
+this jumps to the DVD title menu.
+this jumps into the DVD root menu.
+this jumps to the Subpicture menu.
+the jumps to the audio menu.
+this jumps to the angles menu.
+this jumps to the chapter menu.
+if such a button exists.
+if such a button exists.
+menu, if such a button exists.
+menu, if such a button exists.
+button in a menu, if such a button exists.
+multiangle feature.
+feature.
+A set of commands that may be issued to an element providing the
+#GstNavigation interface. The available commands can be queried via
+the gst_navigation_query_new_commands() query.
+For convenience in handling DVD navigation, the MENU commands are aliased as:
+GST_NAVIGATION_COMMAND_DVD_MENU            = @GST_NAVIGATION_COMMAND_MENU1
+GST_NAVIGATION_COMMAND_DVD_TITLE_MENU      = @GST_NAVIGATION_COMMAND_MENU2
+GST_NAVIGATION_COMMAND_DVD_ROOT_MENU       = @GST_NAVIGATION_COMMAND_MENU3
+GST_NAVIGATION_COMMAND_DVD_SUBPICTURE_MENU = @GST_NAVIGATION_COMMAND_MENU4
+GST_NAVIGATION_COMMAND_DVD_AUDIO_MENU      = @GST_NAVIGATION_COMMAND_MENU5
+GST_NAVIGATION_COMMAND_DVD_ANGLE_MENU      = @GST_NAVIGATION_COMMAND_MENU6
+GST_NAVIGATION_COMMAND_DVD_CHAPTER_MENU    = @GST_NAVIGATION_COMMAND_MENU7"
+                 version="0.10.23"
+                 glib:type-name="GstNavigationCommand"
+                 glib:get-type="gst_navigation_command_get_type"
+                 c:type="GstNavigationCommand">
+      <member name="invalid"
+              value="0"
+              c:identifier="GST_NAVIGATION_COMMAND_INVALID"
+              glib:nick="invalid"/>
+      <member name="menu1"
+              value="1"
+              c:identifier="GST_NAVIGATION_COMMAND_MENU1"
+              glib:nick="menu1"/>
+      <member name="menu2"
+              value="2"
+              c:identifier="GST_NAVIGATION_COMMAND_MENU2"
+              glib:nick="menu2"/>
+      <member name="menu3"
+              value="3"
+              c:identifier="GST_NAVIGATION_COMMAND_MENU3"
+              glib:nick="menu3"/>
+      <member name="menu4"
+              value="4"
+              c:identifier="GST_NAVIGATION_COMMAND_MENU4"
+              glib:nick="menu4"/>
+      <member name="menu5"
+              value="5"
+              c:identifier="GST_NAVIGATION_COMMAND_MENU5"
+              glib:nick="menu5"/>
+      <member name="menu6"
+              value="6"
+              c:identifier="GST_NAVIGATION_COMMAND_MENU6"
+              glib:nick="menu6"/>
+      <member name="menu7"
+              value="7"
+              c:identifier="GST_NAVIGATION_COMMAND_MENU7"
+              glib:nick="menu7"/>
+      <member name="left"
+              value="20"
+              c:identifier="GST_NAVIGATION_COMMAND_LEFT"
+              glib:nick="left"/>
+      <member name="right"
+              value="21"
+              c:identifier="GST_NAVIGATION_COMMAND_RIGHT"
+              glib:nick="right"/>
+      <member name="up"
+              value="22"
+              c:identifier="GST_NAVIGATION_COMMAND_UP"
+              glib:nick="up"/>
+      <member name="down"
+              value="23"
+              c:identifier="GST_NAVIGATION_COMMAND_DOWN"
+              glib:nick="down"/>
+      <member name="activate"
+              value="24"
+              c:identifier="GST_NAVIGATION_COMMAND_ACTIVATE"
+              glib:nick="activate"/>
+      <member name="prev_angle"
+              value="30"
+              c:identifier="GST_NAVIGATION_COMMAND_PREV_ANGLE"
+              glib:nick="prev-angle"/>
+      <member name="next_angle"
+              value="31"
+              c:identifier="GST_NAVIGATION_COMMAND_NEXT_ANGLE"
+              glib:nick="next-angle"/>
+    </enumeration>
+    <enumeration name="NavigationEventType"
+                 doc="gst_navigation_event_get_type() when the passed event is not a navigation event.
+gst_navigation_event_parse_key_event() to extract the details from the event.
+gst_navigation_event_parse_key_event() to extract the details from the event.
+gst_navigation_event_parse_mouse_button_event() to extract the details from the
+event.
+gst_navigation_event_parse_mouse_button_event() to extract the details from the
+event.
+gst_navigation_event_parse_mouse_move_event() to extract the details from the
+event.
+gst_navigation_event_parse_command() to extract the details from the event.
+Enum values for the various events that an element implementing the
+GstNavigation interface might send up the pipeline."
+                 version="0.10.23"
+                 glib:type-name="GstNavigationEventType"
+                 glib:get-type="gst_navigation_event_type_get_type"
+                 c:type="GstNavigationEventType">
+      <member name="invalid"
+              value="0"
+              c:identifier="GST_NAVIGATION_EVENT_INVALID"
+              glib:nick="invalid"/>
+      <member name="key_press"
+              value="1"
+              c:identifier="GST_NAVIGATION_EVENT_KEY_PRESS"
+              glib:nick="key-press"/>
+      <member name="key_release"
+              value="2"
+              c:identifier="GST_NAVIGATION_EVENT_KEY_RELEASE"
+              glib:nick="key-release"/>
+      <member name="mouse_button_press"
+              value="3"
+              c:identifier="GST_NAVIGATION_EVENT_MOUSE_BUTTON_PRESS"
+              glib:nick="mouse-button-press"/>
+      <member name="mouse_button_release"
+              value="4"
+              c:identifier="GST_NAVIGATION_EVENT_MOUSE_BUTTON_RELEASE"
+              glib:nick="mouse-button-release"/>
+      <member name="mouse_move"
+              value="5"
+              c:identifier="GST_NAVIGATION_EVENT_MOUSE_MOVE"
+              glib:nick="mouse-move"/>
+      <member name="command"
+              value="6"
+              c:identifier="GST_NAVIGATION_EVENT_COMMAND"
+              glib:nick="command"/>
+    </enumeration>
+    <record name="NavigationInterface"
+            c:type="GstNavigationInterface"
+            glib:is-gtype-struct-for="Navigation">
+      <field name="g_iface">
+        <type name="GObject.TypeInterface" c:type="GTypeInterface"/>
+      </field>
+      <field name="send_event">
+        <callback name="send_event" c:type="send_event">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="navigation" transfer-ownership="none">
+              <type name="Navigation" c:type="GstNavigation*"/>
+            </parameter>
+            <parameter name="structure" transfer-ownership="none">
+              <type name="Gst.Structure" c:type="GstStructure*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <enumeration name="NavigationMessageType"
+                 doc="gst_navigation_message_get_type() when the passed message is not a
+navigation message.
+clickable region of the output, such as a DVD menu button.
+changes and should re-queried by interested applications.
+feature (such as a multiangle DVD) change - either angles have appeared or
+disappeared.
+A set of notifications that may be received on the bus when navigation
+related status changes."
+                 version="0.10.23"
+                 glib:type-name="GstNavigationMessageType"
+                 glib:get-type="gst_navigation_message_type_get_type"
+                 c:type="GstNavigationMessageType">
+      <member name="invalid"
+              value="0"
+              c:identifier="GST_NAVIGATION_MESSAGE_INVALID"
+              glib:nick="invalid"/>
+      <member name="mouse_over"
+              value="1"
+              c:identifier="GST_NAVIGATION_MESSAGE_MOUSE_OVER"
+              glib:nick="mouse-over"/>
+      <member name="commands_changed"
+              value="2"
+              c:identifier="GST_NAVIGATION_MESSAGE_COMMANDS_CHANGED"
+              glib:nick="commands-changed"/>
+      <member name="angles_changed"
+              value="3"
+              c:identifier="GST_NAVIGATION_MESSAGE_ANGLES_CHANGED"
+              glib:nick="angles-changed"/>
+    </enumeration>
+    <enumeration name="NavigationQueryType"
+                 glib:type-name="GstNavigationQueryType"
+                 glib:get-type="gst_navigation_query_type_get_type"
+                 c:type="GstNavigationQueryType">
+      <member name="invalid"
+              value="0"
+              c:identifier="GST_NAVIGATION_QUERY_INVALID"
+              glib:nick="invalid"/>
+      <member name="commands"
+              value="1"
+              c:identifier="GST_NAVIGATION_QUERY_COMMANDS"
+              glib:nick="commands"/>
+      <member name="angles"
+              value="2"
+              c:identifier="GST_NAVIGATION_QUERY_ANGLES"
+              glib:nick="angles"/>
+    </enumeration>
+    <interface name="PropertyProbe"
+               c:type="GstPropertyProbe"
+               doc="Opaque #GstPropertyProbe data structure."
+               glib:type-name="GstPropertyProbe"
+               glib:get-type="gst_property_probe_get_type"
+               glib:type-struct="PropertyProbeInterface">
+      <virtual-method name="get_properties" invoker="get_properties">
+        <return-value transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="needs_probe">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="prop_id" transfer-ownership="none">
+            <type name="uint" c:type="guint"/>
+          </parameter>
+          <parameter name="pspec" transfer-ownership="none">
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="probe_property">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="prop_id" transfer-ownership="none">
+            <type name="uint" c:type="guint"/>
+          </parameter>
+          <parameter name="pspec" transfer-ownership="none">
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_values">
+        <return-value transfer-ownership="full">
+          <type name="GObject.ValueArray" c:type="GValueArray*"/>
+        </return-value>
+        <parameters>
+          <parameter name="prop_id" transfer-ownership="none">
+            <type name="uint" c:type="guint"/>
+          </parameter>
+          <parameter name="pspec" transfer-ownership="none">
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="get_properties"
+              c:identifier="gst_property_probe_get_properties"
+              doc="Get a list of properties for which probing is supported.
+by this element.">
+        <return-value transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </method>
+      <method name="get_property"
+              c:identifier="gst_property_probe_get_property"
+              doc="Get #GParamSpec for a property for which probing is supported.">
+        <return-value transfer-ownership="none">
+          <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="probe_property"
+              c:identifier="gst_property_probe_probe_property"
+              doc="Runs a probe on the property specified by @pspec">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="pspec" transfer-ownership="none">
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="probe_property_name"
+              c:identifier="gst_property_probe_probe_property_name"
+              doc="Runs a probe on the property specified by @name.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="needs_probe"
+              c:identifier="gst_property_probe_needs_probe"
+              doc="Checks whether a property needs a probe. This might be because
+the property wasn&apos;t initialized before, or because host setup
+changed. This might be, for example, because a new device was
+added, and thus device probing needs to be refreshed to display
+the new device.">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="pspec" transfer-ownership="none">
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="needs_probe_name"
+              c:identifier="gst_property_probe_needs_probe_name"
+              doc="Same as gst_property_probe_needs_probe ().">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_values"
+              c:identifier="gst_property_probe_get_values"
+              doc="Gets the possible (probed) values for the given property,
+requires the property to have been probed before.">
+        <return-value transfer-ownership="full">
+          <type name="GObject.ValueArray" c:type="GValueArray*"/>
+        </return-value>
+        <parameters>
+          <parameter name="pspec" transfer-ownership="none">
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_values_name"
+              c:identifier="gst_property_probe_get_values_name"
+              doc="Same as gst_property_probe_get_values ().">
+        <return-value transfer-ownership="full">
+          <type name="GObject.ValueArray" c:type="GValueArray*"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="probe_and_get_values"
+              c:identifier="gst_property_probe_probe_and_get_values"
+              doc="Check whether the given property requires a new probe. If so,
+fo the probe. After that, retrieve a value list. Meant as a
+utility function that wraps the above functions.">
+        <return-value transfer-ownership="full">
+          <type name="GObject.ValueArray" c:type="GValueArray*"/>
+        </return-value>
+        <parameters>
+          <parameter name="pspec" transfer-ownership="none">
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="probe_and_get_values_name"
+              c:identifier="gst_property_probe_probe_and_get_values_name"
+              doc="Same as gst_property_probe_probe_and_get_values ().">
+        <return-value transfer-ownership="full">
+          <type name="GObject.ValueArray" c:type="GValueArray*"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <glib:signal name="probe-needed">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <type name="any" c:type="gpointer"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+    </interface>
+    <record name="PropertyProbeInterface"
+            c:type="GstPropertyProbeInterface"
+            glib:is-gtype-struct-for="PropertyProbe"
+            doc="#GstPropertyProbe interface.">
+      <field name="klass">
+        <type name="GObject.TypeInterface" c:type="GTypeInterface"/>
+      </field>
+      <field name="probe_needed">
+        <callback name="probe_needed" c:type="probe_needed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="probe" transfer-ownership="none">
+              <type name="PropertyProbe" c:type="GstPropertyProbe*"/>
+            </parameter>
+            <parameter name="pspec" transfer-ownership="none">
+              <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_properties">
+        <callback name="get_properties" c:type="get_properties">
+          <return-value transfer-ownership="none">
+            <type name="GLib.List" c:type="GList*"/>
+          </return-value>
+          <parameters>
+            <parameter name="probe" transfer-ownership="none">
+              <type name="PropertyProbe" c:type="GstPropertyProbe*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="needs_probe">
+        <callback name="needs_probe" c:type="needs_probe">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="probe" transfer-ownership="none">
+              <type name="PropertyProbe" c:type="GstPropertyProbe*"/>
+            </parameter>
+            <parameter name="prop_id" transfer-ownership="none">
+              <type name="uint" c:type="guint"/>
+            </parameter>
+            <parameter name="pspec" transfer-ownership="none">
+              <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="probe_property">
+        <callback name="probe_property" c:type="probe_property">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="probe" transfer-ownership="none">
+              <type name="PropertyProbe" c:type="GstPropertyProbe*"/>
+            </parameter>
+            <parameter name="prop_id" transfer-ownership="none">
+              <type name="uint" c:type="guint"/>
+            </parameter>
+            <parameter name="pspec" transfer-ownership="none">
+              <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_values">
+        <callback name="get_values" c:type="get_values">
+          <return-value transfer-ownership="full">
+            <type name="GObject.ValueArray" c:type="GValueArray*"/>
+          </return-value>
+          <parameters>
+            <parameter name="probe" transfer-ownership="none">
+              <type name="PropertyProbe" c:type="GstPropertyProbe*"/>
+            </parameter>
+            <parameter name="prop_id" transfer-ownership="none">
+              <type name="uint" c:type="guint"/>
+            </parameter>
+            <parameter name="pspec" transfer-ownership="none">
+              <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <interface name="StreamVolume"
+               c:type="GstStreamVolume"
+               glib:type-name="GstStreamVolume"
+               glib:get-type="gst_stream_volume_get_type"
+               glib:type-struct="StreamVolumeInterface">
+      <method name="set_volume"
+              c:identifier="gst_stream_volume_set_volume"
+              version="0.10.25">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="format" transfer-ownership="none">
+            <type name="StreamVolumeFormat" c:type="GstStreamVolumeFormat"/>
+          </parameter>
+          <parameter name="val" transfer-ownership="none">
+            <type name="double" c:type="gdouble"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_volume"
+              c:identifier="gst_stream_volume_get_volume"
+              version="0.10.25">
+        <return-value transfer-ownership="none">
+          <type name="double" c:type="gdouble"/>
+        </return-value>
+        <parameters>
+          <parameter name="format" transfer-ownership="none">
+            <type name="StreamVolumeFormat" c:type="GstStreamVolumeFormat"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_mute"
+              c:identifier="gst_stream_volume_set_mute"
+              version="0.10.25">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="mute" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_mute"
+              c:identifier="gst_stream_volume_get_mute"
+              version="0.10.25">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <property name="mute" writable="1">
+        <type name="boolean" c:type="gboolean"/>
+      </property>
+      <property name="volume" writable="1">
+        <type name="double" c:type="gdouble"/>
+      </property>
+    </interface>
+    <enumeration name="StreamVolumeFormat"
+                 doc="Different representations of a stream volume. gst_stream_volume_convert()
+allows to convert between the different representations.
+Formulas to convert from a linear to a cubic or dB volume are
+cbrt(val) and 20 * log10 (val)."
+                 version="0.10.25"
+                 glib:type-name="GstStreamVolumeFormat"
+                 glib:get-type="gst_stream_volume_format_get_type"
+                 c:type="GstStreamVolumeFormat">
+      <member name="linear"
+              value="0"
+              c:identifier="GST_STREAM_VOLUME_FORMAT_LINEAR"
+              glib:nick="linear"/>
+      <member name="cubic"
+              value="1"
+              c:identifier="GST_STREAM_VOLUME_FORMAT_CUBIC"
+              glib:nick="cubic"/>
+      <member name="db"
+              value="2"
+              c:identifier="GST_STREAM_VOLUME_FORMAT_DB"
+              glib:nick="db"/>
+    </enumeration>
+    <record name="StreamVolumeInterface"
+            c:type="GstStreamVolumeInterface"
+            glib:is-gtype-struct-for="StreamVolume">
+      <field name="parent">
+        <type name="GObject.TypeInterface" c:type="GTypeInterface"/>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <interface name="Tuner"
+               c:type="GstTuner"
+               glib:type-name="GstTuner"
+               glib:get-type="gst_tuner_get_type"
+               glib:type-struct="TunerClass">
+      <prerequisite name="Gst.ImplementsInterface"/>
+      <prerequisite name="Gst.Element"/>
+      <virtual-method name="list_channels" invoker="list_channels">
+        <return-value transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="set_channel" invoker="set_channel">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_channel" invoker="get_channel">
+        <return-value transfer-ownership="full">
+          <type name="TunerChannel" c:type="GstTunerChannel*"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="list_norms" invoker="list_norms">
+        <return-value transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="set_norm" invoker="set_norm">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="norm" transfer-ownership="none">
+            <type name="TunerNorm" c:type="GstTunerNorm*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_norm" invoker="get_norm">
+        <return-value transfer-ownership="full">
+          <type name="TunerNorm" c:type="GstTunerNorm*"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="set_frequency" invoker="set_frequency">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </parameter>
+          <parameter name="frequency" transfer-ownership="none">
+            <type name="ulong" c:type="gulong"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_frequency" invoker="get_frequency">
+        <return-value transfer-ownership="none">
+          <type name="ulong" c:type="gulong"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="signal_strength" invoker="signal_strength">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="gint"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="list_channels"
+              c:identifier="gst_tuner_list_channels"
+              doc="Retrieve a #GList of #GstTunerChannels available
+(e.g. &apos;composite&apos;, &apos;s-video&apos;, ...) from the given tuner object.
+owned by the GstTuner and must not be freed.">
+        <return-value transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </method>
+      <method name="set_channel"
+              c:identifier="gst_tuner_set_channel"
+              doc="Tunes the object to the given channel, which should be one of the
+channels returned by gst_tuner_list_channels().">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_channel"
+              c:identifier="gst_tuner_get_channel"
+              doc="Retrieve the current channel from the tuner.">
+        <return-value transfer-ownership="full">
+          <type name="TunerChannel" c:type="GstTunerChannel*"/>
+        </return-value>
+      </method>
+      <method name="list_norms"
+              c:identifier="gst_tuner_list_norms"
+              doc="Retrieve a GList of available #GstTunerNorm settings for the currently
+tuned channel on the given tuner object.
+tuner object. The list is owned by the GstTuner and must not
+be freed.">
+        <return-value transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*"/>
+        </return-value>
+      </method>
+      <method name="set_norm"
+              c:identifier="gst_tuner_set_norm"
+              doc="Changes the video norm on this tuner to the given norm, which should be
+one of the norms returned by gst_tuner_list_norms().">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="norm" transfer-ownership="none">
+            <type name="TunerNorm" c:type="GstTunerNorm*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_norm"
+              c:identifier="gst_tuner_get_norm"
+              doc="Get the current video norm from the given tuner object for the
+currently selected channel.">
+        <return-value transfer-ownership="full">
+          <type name="TunerNorm" c:type="GstTunerNorm*"/>
+        </return-value>
+      </method>
+      <method name="set_frequency"
+              c:identifier="gst_tuner_set_frequency"
+              doc="Sets a tuning frequency on the given tuner/channel. Note that this
+requires the given channel to be a &quot;tuning&quot; channel, which can be
+checked using GST_TUNER_CHANNEL_HAS_FLAG (), with the proper flag
+being GST_TUNER_CHANNEL_FREQUENCY.
+The frequency is in Hz, with minimum steps indicated by the
+frequency_multiplicator provided in the #GstTunerChannel. The
+valid range is provided in the min_frequency and max_frequency properties
+of the #GstTunerChannel.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </parameter>
+          <parameter name="frequency" transfer-ownership="none">
+            <type name="ulong" c:type="gulong"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_frequency"
+              c:identifier="gst_tuner_get_frequency"
+              doc="Retrieve the current frequency from the given channel. As for
+gst_tuner_set_frequency(), the #GstTunerChannel must support frequency
+operations, as indicated by the GST_TUNER_CHANNEL_FREQUENCY flag.">
+        <return-value transfer-ownership="none">
+          <type name="ulong" c:type="gulong"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="signal_strength"
+              c:identifier="gst_tuner_signal_strength"
+              doc="Get the strength of the signal on this channel. Note that this
+requires the current channel to be a &quot;tuning&quot; channel, i.e. a
+channel on which frequency can be set. This can be checked using
+GST_TUNER_CHANNEL_HAS_FLAG (), and the appropriate flag to check
+for is GST_TUNER_CHANNEL_FREQUENCY.
+The valid range of the signal strength is indicated in the
+min_signal and max_signal properties of the #GstTunerChannel.">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="gint"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="find_norm_by_name"
+              c:identifier="gst_tuner_find_norm_by_name"
+              doc="Look up a #GstTunerNorm by name.
+is available.">
+        <return-value transfer-ownership="full">
+          <type name="TunerNorm" c:type="GstTunerNorm*"/>
+        </return-value>
+        <parameters>
+          <parameter name="norm" transfer-ownership="full">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="find_channel_by_name"
+              c:identifier="gst_tuner_find_channel_by_name"
+              doc="Look up a #GstTunerChannel by name.
+is available.">
+        <return-value transfer-ownership="full">
+          <type name="TunerChannel" c:type="GstTunerChannel*"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="full">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="channel_changed"
+              c:identifier="gst_tuner_channel_changed"
+              doc="Called by elements implementing the #GstTuner interface when the
+current channel changes. Fires the #GstTuner::channel-changed signal.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="norm_changed"
+              c:identifier="gst_tuner_norm_changed"
+              doc="Called by elements implementing the #GstTuner interface when the
+current norm changes. Fires the #GstTuner::norm-changed signal.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="norm" transfer-ownership="none">
+            <type name="TunerNorm" c:type="GstTunerNorm*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="frequency_changed"
+              c:identifier="gst_tuner_frequency_changed"
+              doc="Called by elements implementing the #GstTuner interface when the
+configured frequency changes. Fires the #GstTuner::frequency-changed
+signal on the tuner, and the #GstTunerChannel::frequency-changed signal
+on the channel.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </parameter>
+          <parameter name="frequency" transfer-ownership="none">
+            <type name="ulong" c:type="gulong"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="signal_changed"
+              c:identifier="gst_tuner_signal_changed"
+              doc="Called by elements implementing the #GstTuner interface when the
+incoming signal strength changes. Fires the #GstTuner::signal-changed
+signal on the tuner and the #GstTunerChannel::signal-changed signal on
+the channel.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </parameter>
+          <parameter name="signal" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <glib:signal name="channel-changed"
+                   doc="Reports that the current #GstTunerChannel has changed.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="frequency-changed"
+                   doc="Reports that the current frequency has changed.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel"/>
+          </parameter>
+          <parameter name="p0" transfer-ownership="none">
+            <type name="ulong" c:type="gulong"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="norm-changed"
+                   doc="Reports that the current #GstTunerNorm has changed.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="norm" transfer-ownership="none">
+            <type name="TunerNorm" c:type="GstTunerNorm"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="signal-changed"
+                   doc="Reports that the signal strength has changed.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="channel" transfer-ownership="none">
+            <type name="TunerChannel" c:type="GstTunerChannel"/>
+          </parameter>
+          <parameter name="signal" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+    </interface>
+    <class name="TunerChannel"
+           c:type="GstTunerChannel"
+           parent="GObject.Object"
+           glib:type-name="GstTunerChannel"
+           glib:get-type="gst_tuner_channel_get_type"
+           glib:type-struct="TunerChannelClass">
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="label">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="flags">
+        <type name="TunerChannelFlags" c:type="GstTunerChannelFlags"/>
+      </field>
+      <field name="freq_multiplicator">
+        <type name="float" c:type="gfloat"/>
+      </field>
+      <field name="min_frequency">
+        <type name="ulong" c:type="gulong"/>
+      </field>
+      <field name="max_frequency">
+        <type name="ulong" c:type="gulong"/>
+      </field>
+      <field name="min_signal">
+        <type name="int" c:type="gint"/>
+      </field>
+      <field name="max_signal">
+        <type name="int" c:type="gint"/>
+      </field>
+      <glib:signal name="frequency-changed"
+                   doc="Reports that the current frequency has changed.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="frequency" transfer-ownership="none">
+            <type name="ulong" c:type="gulong"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="signal-changed"
+                   doc="Reports that the signal strength has changed.">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="signal" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+    </class>
+    <record name="TunerChannelClass"
+            c:type="GstTunerChannelClass"
+            glib:is-gtype-struct-for="TunerChannel">
+      <field name="parent">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="frequency_changed">
+        <callback name="frequency_changed" c:type="frequency_changed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="TunerChannel" c:type="GstTunerChannel*"/>
+            </parameter>
+            <parameter name="frequency" transfer-ownership="none">
+              <type name="ulong" c:type="gulong"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="signal_changed">
+        <callback name="signal_changed" c:type="signal_changed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="TunerChannel" c:type="GstTunerChannel*"/>
+            </parameter>
+            <parameter name="signal" transfer-ownership="none">
+              <type name="int" c:type="gint"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <bitfield name="TunerChannelFlags"
+              doc="and signal strength.
+An enumeration for flags indicating the available capabilities
+of a #GstTunerChannel."
+              glib:type-name="GstTunerChannelFlags"
+              glib:get-type="gst_tuner_channel_flags_get_type"
+              c:type="GstTunerChannelFlags">
+      <member name="input"
+              value="1"
+              c:identifier="GST_TUNER_CHANNEL_INPUT"
+              glib:nick="input"/>
+      <member name="output"
+              value="2"
+              c:identifier="GST_TUNER_CHANNEL_OUTPUT"
+              glib:nick="output"/>
+      <member name="frequency"
+              value="4"
+              c:identifier="GST_TUNER_CHANNEL_FREQUENCY"
+              glib:nick="frequency"/>
+      <member name="audio"
+              value="8"
+              c:identifier="GST_TUNER_CHANNEL_AUDIO"
+              glib:nick="audio"/>
+    </bitfield>
+    <record name="TunerClass"
+            c:type="GstTunerClass"
+            glib:is-gtype-struct-for="Tuner">
+      <field name="klass">
+        <type name="GObject.TypeInterface" c:type="GTypeInterface"/>
+      </field>
+      <field name="list_channels">
+        <callback name="list_channels" c:type="list_channels">
+          <return-value transfer-ownership="none">
+            <type name="GLib.List" c:type="GList*"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_channel">
+        <callback name="set_channel" c:type="set_channel">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="TunerChannel" c:type="GstTunerChannel*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_channel">
+        <callback name="get_channel" c:type="get_channel">
+          <return-value transfer-ownership="full">
+            <type name="TunerChannel" c:type="GstTunerChannel*"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="list_norms">
+        <callback name="list_norms" c:type="list_norms">
+          <return-value transfer-ownership="none">
+            <type name="GLib.List" c:type="GList*"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_norm">
+        <callback name="set_norm" c:type="set_norm">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+            <parameter name="norm" transfer-ownership="none">
+              <type name="TunerNorm" c:type="GstTunerNorm*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_norm">
+        <callback name="get_norm" c:type="get_norm">
+          <return-value transfer-ownership="full">
+            <type name="TunerNorm" c:type="GstTunerNorm*"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_frequency">
+        <callback name="set_frequency" c:type="set_frequency">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="TunerChannel" c:type="GstTunerChannel*"/>
+            </parameter>
+            <parameter name="frequency" transfer-ownership="none">
+              <type name="ulong" c:type="gulong"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_frequency">
+        <callback name="get_frequency" c:type="get_frequency">
+          <return-value transfer-ownership="none">
+            <type name="ulong" c:type="gulong"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="TunerChannel" c:type="GstTunerChannel*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="signal_strength">
+        <callback name="signal_strength" c:type="signal_strength">
+          <return-value transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="TunerChannel" c:type="GstTunerChannel*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="channel_changed">
+        <callback name="channel_changed" c:type="channel_changed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="TunerChannel" c:type="GstTunerChannel*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="norm_changed">
+        <callback name="norm_changed" c:type="norm_changed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+            <parameter name="norm" transfer-ownership="none">
+              <type name="TunerNorm" c:type="GstTunerNorm*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="frequency_changed">
+        <callback name="frequency_changed" c:type="frequency_changed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="TunerChannel" c:type="GstTunerChannel*"/>
+            </parameter>
+            <parameter name="frequency" transfer-ownership="none">
+              <type name="ulong" c:type="gulong"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="signal_changed">
+        <callback name="signal_changed" c:type="signal_changed">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="tuner" transfer-ownership="none">
+              <type name="Tuner" c:type="GstTuner*"/>
+            </parameter>
+            <parameter name="channel" transfer-ownership="none">
+              <type name="TunerChannel" c:type="GstTunerChannel*"/>
+            </parameter>
+            <parameter name="signal" transfer-ownership="none">
+              <type name="int" c:type="gint"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <class name="TunerNorm"
+           c:type="GstTunerNorm"
+           doc="if any. (May be unset)."
+           parent="GObject.Object"
+           glib:type-name="GstTunerNorm"
+           glib:get-type="gst_tuner_norm_get_type"
+           glib:type-struct="TunerNormClass">
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="label">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="framerate">
+        <type name="GObject.Value" c:type="GValue"/>
+      </field>
+    </class>
+    <record name="TunerNormClass"
+            c:type="GstTunerNormClass"
+            glib:is-gtype-struct-for="TunerNorm">
+      <field name="parent">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <interface name="VideoOrientation"
+               c:type="GstVideoOrientation"
+               doc="Opaque #GstVideoOrientation data structure."
+               glib:type-name="GstVideoOrientation"
+               glib:get-type="gst_video_orientation_get_type"
+               glib:type-struct="VideoOrientationInterface">
+      <prerequisite name="Gst.ImplementsInterface"/>
+      <prerequisite name="Gst.Element"/>
+      <virtual-method name="get_hflip" invoker="get_hflip">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="flip" direction="out" transfer-ownership="full">
+            <type name="boolean" c:type="gboolean*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_vflip" invoker="get_vflip">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="flip" direction="out" transfer-ownership="full">
+            <type name="boolean" c:type="gboolean*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_hcenter" invoker="get_hcenter">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="center" direction="out" transfer-ownership="full">
+            <type name="int" c:type="gint*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="get_vcenter" invoker="get_vcenter">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="center" direction="out" transfer-ownership="full">
+            <type name="int" c:type="gint*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="set_hflip" invoker="set_hflip">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="flip" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="set_vflip" invoker="set_vflip">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="flip" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="set_hcenter" invoker="set_hcenter">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="center" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="set_vcenter" invoker="set_vcenter">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="center" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="get_hflip"
+              c:identifier="gst_video_orientation_get_hflip"
+              doc="Get the horizontal flipping state (%TRUE for flipped) from the given object."
+              version="0.10.11">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="flip" direction="out" transfer-ownership="full">
+            <type name="boolean" c:type="gboolean*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_vflip"
+              c:identifier="gst_video_orientation_get_vflip"
+              doc="Get the vertical flipping state (%TRUE for flipped) from the given object."
+              version="0.10.11">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="flip" direction="out" transfer-ownership="full">
+            <type name="boolean" c:type="gboolean*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_hcenter"
+              c:identifier="gst_video_orientation_get_hcenter"
+              doc="Get the horizontal centering offset from the given object."
+              version="0.10.11">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="center" direction="out" transfer-ownership="full">
+            <type name="int" c:type="gint*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_vcenter"
+              c:identifier="gst_video_orientation_get_vcenter"
+              doc="Get the vertical centering offset from the given object."
+              version="0.10.11">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="center" direction="out" transfer-ownership="full">
+            <type name="int" c:type="gint*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_hflip"
+              c:identifier="gst_video_orientation_set_hflip"
+              doc="Set the horizontal flipping state (%TRUE for flipped) for the given object."
+              version="0.10.11">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="flip" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_vflip"
+              c:identifier="gst_video_orientation_set_vflip"
+              doc="Set the vertical flipping state (%TRUE for flipped) for the given object."
+              version="0.10.11">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="flip" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_hcenter"
+              c:identifier="gst_video_orientation_set_hcenter"
+              doc="Set the horizontal centering offset for the given object."
+              version="0.10.11">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="center" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_vcenter"
+              c:identifier="gst_video_orientation_set_vcenter"
+              doc="Set the vertical centering offset for the given object."
+              version="0.10.11">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="center" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </method>
+    </interface>
+    <record name="VideoOrientationInterface"
+            c:type="GstVideoOrientationInterface"
+            glib:is-gtype-struct-for="VideoOrientation"
+            doc="#GstVideoOrientationInterface interface.">
+      <field name="parent">
+        <type name="GObject.TypeInterface" c:type="GTypeInterface"/>
+      </field>
+      <field name="get_hflip">
+        <callback name="get_hflip" c:type="get_hflip">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="video_orientation" transfer-ownership="none">
+              <type name="VideoOrientation" c:type="GstVideoOrientation*"/>
+            </parameter>
+            <parameter name="flip" direction="out" transfer-ownership="full">
+              <type name="boolean" c:type="gboolean*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_vflip">
+        <callback name="get_vflip" c:type="get_vflip">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="video_orientation" transfer-ownership="none">
+              <type name="VideoOrientation" c:type="GstVideoOrientation*"/>
+            </parameter>
+            <parameter name="flip" direction="out" transfer-ownership="full">
+              <type name="boolean" c:type="gboolean*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_hcenter">
+        <callback name="get_hcenter" c:type="get_hcenter">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="video_orientation" transfer-ownership="none">
+              <type name="VideoOrientation" c:type="GstVideoOrientation*"/>
+            </parameter>
+            <parameter name="center" direction="out" transfer-ownership="full">
+              <type name="int" c:type="gint*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_vcenter">
+        <callback name="get_vcenter" c:type="get_vcenter">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="video_orientation" transfer-ownership="none">
+              <type name="VideoOrientation" c:type="GstVideoOrientation*"/>
+            </parameter>
+            <parameter name="center" direction="out" transfer-ownership="full">
+              <type name="int" c:type="gint*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_hflip">
+        <callback name="set_hflip" c:type="set_hflip">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="video_orientation" transfer-ownership="none">
+              <type name="VideoOrientation" c:type="GstVideoOrientation*"/>
+            </parameter>
+            <parameter name="flip" transfer-ownership="none">
+              <type name="boolean" c:type="gboolean"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_vflip">
+        <callback name="set_vflip" c:type="set_vflip">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="video_orientation" transfer-ownership="none">
+              <type name="VideoOrientation" c:type="GstVideoOrientation*"/>
+            </parameter>
+            <parameter name="flip" transfer-ownership="none">
+              <type name="boolean" c:type="gboolean"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_hcenter">
+        <callback name="set_hcenter" c:type="set_hcenter">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="video_orientation" transfer-ownership="none">
+              <type name="VideoOrientation" c:type="GstVideoOrientation*"/>
+            </parameter>
+            <parameter name="center" transfer-ownership="none">
+              <type name="int" c:type="gint"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_vcenter">
+        <callback name="set_vcenter" c:type="set_vcenter">
+          <return-value transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="video_orientation" transfer-ownership="none">
+              <type name="VideoOrientation" c:type="GstVideoOrientation*"/>
+            </parameter>
+            <parameter name="center" transfer-ownership="none">
+              <type name="int" c:type="gint"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <interface name="XOverlay"
+               c:type="GstXOverlay"
+               doc="Opaque #GstXOverlay data structure."
+               glib:type-name="GstXOverlay"
+               glib:get-type="gst_x_overlay_get_type"
+               glib:type-struct="XOverlayClass">
+      <prerequisite name="Gst.ImplementsInterface"/>
+      <prerequisite name="Gst.Element"/>
+      <virtual-method name="set_xwindow_id" invoker="set_xwindow_id">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="xwindow_id" transfer-ownership="none">
+            <type name="ulong" c:type="gulong"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="expose" invoker="expose">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </virtual-method>
+      <virtual-method name="handle_events" invoker="handle_events">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="handle_events" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="set_render_rectangle"
+                      invoker="set_render_rectangle">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="x" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="y" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="set_xwindow_id"
+              c:identifier="gst_x_overlay_set_xwindow_id"
+              doc="This will call the video overlay&apos;s set_xwindow_id method. You should
+use this method to tell to a XOverlay to display video output to a
+specific XWindow. Passing 0 as the xwindow_id will tell the overlay to
+stop using that window and create an internal one.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="xwindow_id" transfer-ownership="none">
+            <type name="ulong" c:type="gulong"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_render_rectangle"
+              c:identifier="gst_x_overlay_set_render_rectangle"
+              doc="Configure a subregion as a video target within the window set by
+gst_x_overlay_set_xwindow_id(). If this is not used or not supported
+the video will fill the area of the window set as the overlay to 100%.
+By specifying the rectangle, the video can be overlayed to a specific region
+of that window only. After setting the new rectangle one should call
+gst_x_overlay_expose() to force a redraw. To unset the region pass -1 for
+the @x, @y, @width, and @height parameters.
+This method is needed for non fullscreen video overlay in UI toolkits that
+do not support subwindows."
+              version="0.10.29">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="x" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="y" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="width" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+          <parameter name="height" transfer-ownership="none">
+            <type name="int" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="expose"
+              c:identifier="gst_x_overlay_expose"
+              doc="Tell an overlay that it has been exposed. This will redraw the current frame
+in the drawable even if the pipeline is PAUSED.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="handle_events"
+              c:identifier="gst_x_overlay_handle_events"
+              doc="Tell an overlay that it should handle events from the window system. These
+events are forwared upstream as navigation events. In some window system,
+events are not propagated in the window hierarchy if a client is listening
+for them. This method allows you to disable events handling completely
+from the XOverlay."
+              version="0.10.12">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="handle_events" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="got_xwindow_id"
+              c:identifier="gst_x_overlay_got_xwindow_id"
+              doc="This will post a &quot;have-xwindow-id&quot; element message on the bus.
+This function should only be used by video overlay plugin developers.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="xwindow_id" transfer-ownership="none">
+            <type name="ulong" c:type="gulong"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="prepare_xwindow_id"
+              c:identifier="gst_x_overlay_prepare_xwindow_id"
+              doc="This will post a &quot;prepare-xwindow-id&quot; element message on the bus
+to give applications an opportunity to call
+gst_x_overlay_set_xwindow_id() before a plugin creates its own
+window.
+This function should only be used by video overlay plugin developers.">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+    </interface>
+    <record name="XOverlayClass"
+            c:type="GstXOverlayClass"
+            glib:is-gtype-struct-for="XOverlay"
+            doc="#GstXOverlay interface">
+      <field name="klass">
+        <type name="GObject.TypeInterface" c:type="GTypeInterface"/>
+      </field>
+      <field name="set_xwindow_id">
+        <callback name="set_xwindow_id" c:type="set_xwindow_id">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="overlay" transfer-ownership="none">
+              <type name="XOverlay" c:type="GstXOverlay*"/>
+            </parameter>
+            <parameter name="xwindow_id" transfer-ownership="none">
+              <type name="ulong" c:type="gulong"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="expose">
+        <callback name="expose" c:type="expose">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="overlay" transfer-ownership="none">
+              <type name="XOverlay" c:type="GstXOverlay*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="handle_events">
+        <callback name="handle_events" c:type="handle_events">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="overlay" transfer-ownership="none">
+              <type name="XOverlay" c:type="GstXOverlay*"/>
+            </parameter>
+            <parameter name="handle_events" transfer-ownership="none">
+              <type name="boolean" c:type="gboolean"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_render_rectangle">
+        <callback name="set_render_rectangle" c:type="set_render_rectangle">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="overlay" transfer-ownership="none">
+              <type name="XOverlay" c:type="GstXOverlay*"/>
+            </parameter>
+            <parameter name="x" transfer-ownership="none">
+              <type name="int" c:type="gint"/>
+            </parameter>
+            <parameter name="y" transfer-ownership="none">
+              <type name="int" c:type="gint"/>
+            </parameter>
+            <parameter name="width" transfer-ownership="none">
+              <type name="int" c:type="gint"/>
+            </parameter>
+            <parameter name="height" transfer-ownership="none">
+              <type name="int" c:type="gint"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="2">
+          <type name="any"/>
+        </array>
+      </field>
+    </record>
+    <function name="mixer_message_get_type"
+              c:identifier="gst_mixer_message_get_type"
+              doc="Check a bus message to see if it is a GstMixer notification
+message and return the GstMixerMessageType identifying which
+type of notification it is.
+if the message is not a GstMixer notification."
+              version="0.10.14">
+      <return-value transfer-ownership="full">
+        <type name="MixerMessageType" c:type="GstMixerMessageType"/>
+      </return-value>
+      <parameters>
+        <parameter name="message" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="mixer_message_parse_mute_toggled"
+              c:identifier="gst_mixer_message_parse_mute_toggled"
+              doc="Extracts the contents of a mute-toggled bus message. Reads
+the GstMixerTrack that has changed, and the new value of the mute
+flag.
+The GstMixerTrack remains valid until the message is freed."
+              version="0.10.14">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="message" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+        <parameter name="track" transfer-ownership="none">
+          <type name="MixerTrack" c:type="GstMixerTrack**"/>
+        </parameter>
+        <parameter name="mute" direction="out" transfer-ownership="full">
+          <type name="boolean" c:type="gboolean*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="mixer_message_parse_option_changed"
+              c:identifier="gst_mixer_message_parse_option_changed"
+              doc="Extracts the GstMixerOptions and new value from a option-changed bus notification
+message.
+The options and value returned remain valid until the message is freed."
+              version="0.10.14">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="message" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+        <parameter name="options" transfer-ownership="none">
+          <type name="MixerOptions" c:type="GstMixerOptions**"/>
+        </parameter>
+        <parameter name="value" transfer-ownership="none">
+          <array c:type="gchar**">
+            <type name="utf8"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="mixer_message_parse_options_list_changed"
+              c:identifier="gst_mixer_message_parse_options_list_changed"
+              doc="Extracts the GstMixerOptions whose value list has changed from an
+options-list-changed bus notification message.
+The options object returned remains valid until the message is freed. You
+do not need to unref it."
+              version="0.10.18">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="message" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+        <parameter name="options" transfer-ownership="none">
+          <type name="MixerOptions" c:type="GstMixerOptions**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="mixer_message_parse_record_toggled"
+              c:identifier="gst_mixer_message_parse_record_toggled"
+              doc="Extracts the contents of a record-toggled bus message. Reads
+the GstMixerTrack that has changed, and the new value of the
+recording flag.
+The GstMixerTrack remains valid until the message is freed."
+              version="0.10.14">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="message" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+        <parameter name="track" transfer-ownership="none">
+          <type name="MixerTrack" c:type="GstMixerTrack**"/>
+        </parameter>
+        <parameter name="record" direction="out" transfer-ownership="full">
+          <type name="boolean" c:type="gboolean*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="mixer_message_parse_volume_changed"
+              c:identifier="gst_mixer_message_parse_volume_changed"
+              doc="Parses a volume-changed notification message and extracts the track object
+it refers to, as well as an array of volumes and the size of the volumes array.
+The track object remains valid until the message is freed.
+The caller must free the array returned in the volumes parameter using g_free
+when they are done with it."
+              version="0.10.14">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="message" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+        <parameter name="track" transfer-ownership="none">
+          <type name="MixerTrack" c:type="GstMixerTrack**"/>
+        </parameter>
+        <parameter name="volumes" direction="out" transfer-ownership="full">
+          <type name="int" c:type="gint**"/>
+        </parameter>
+        <parameter name="num_channels"
+                   direction="out"
+                   transfer-ownership="full">
+          <type name="int" c:type="gint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_event_get_type"
+              c:identifier="gst_navigation_event_get_type"
+              doc="Inspect a #GstEvent and return the #GstNavigationEventType of the event, or
+#GST_NAVIGATION_EVENT_INVALID if the event is not a #GstNavigation event."
+              version="0.10.23">
+      <return-value transfer-ownership="full">
+        <type name="NavigationEventType" c:type="GstNavigationEventType"/>
+      </return-value>
+      <parameters>
+        <parameter name="event" transfer-ownership="none">
+          <type name="Gst.Event" c:type="GstEvent*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_event_parse_command"
+              c:identifier="gst_navigation_event_parse_command"
+              doc="navigation event.
+Inspect a #GstNavigation command event and retrieve the enum value of the
+associated command."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="event" transfer-ownership="none">
+          <type name="Gst.Event" c:type="GstEvent*"/>
+        </parameter>
+        <parameter name="command" transfer-ownership="none">
+          <type name="NavigationCommand" c:type="GstNavigationCommand*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_event_parse_key_event"
+              c:identifier="gst_navigation_event_parse_key_event"
+              doc="press. The returned string is owned by the event, and valid only until the
+event is unreffed."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="event" transfer-ownership="none">
+          <type name="Gst.Event" c:type="GstEvent*"/>
+        </parameter>
+        <parameter name="key" transfer-ownership="none">
+          <array c:type="gchar**">
+            <type name="utf8"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_event_parse_mouse_button_event"
+              c:identifier="gst_navigation_event_parse_mouse_button_event"
+              doc="with the event.
+event.
+event.
+Retrieve the details of either a #GstNavigation mouse button press event or
+a mouse button release event. Determine which type the event is using
+gst_navigation_event_get_type() to retrieve the #GstNavigationEventType.
+otherwise FALSE."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="event" transfer-ownership="none">
+          <type name="Gst.Event" c:type="GstEvent*"/>
+        </parameter>
+        <parameter name="button" direction="out" transfer-ownership="full">
+          <type name="int" c:type="gint*"/>
+        </parameter>
+        <parameter name="x" direction="out" transfer-ownership="full">
+          <type name="double" c:type="gdouble*"/>
+        </parameter>
+        <parameter name="y" direction="out" transfer-ownership="full">
+          <type name="double" c:type="gdouble*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_event_parse_mouse_move_event"
+              c:identifier="gst_navigation_event_parse_mouse_move_event"
+              doc="Inspect a #GstNavigation mouse movement event and extract the coordinates
+of the event."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="event" transfer-ownership="none">
+          <type name="Gst.Event" c:type="GstEvent*"/>
+        </parameter>
+        <parameter name="x" direction="out" transfer-ownership="full">
+          <type name="double" c:type="gdouble*"/>
+        </parameter>
+        <parameter name="y" direction="out" transfer-ownership="full">
+          <type name="double" c:type="gdouble*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_message_get_type"
+              c:identifier="gst_navigation_message_get_type"
+              doc="Check a bus message to see if it is a #GstNavigation event, and return
+the #GstNavigationMessageType identifying the type of the message if so.
+#GST_NAVIGATION_MESSAGE_INVALID if the message is not a #GstNavigation
+notification."
+              version="0.10.23">
+      <return-value transfer-ownership="full">
+        <type name="NavigationMessageType" c:type="GstNavigationMessageType"/>
+      </return-value>
+      <parameters>
+        <parameter name="message" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_message_new_angles_changed"
+              c:identifier="gst_navigation_message_new_angles_changed"
+              doc="Creates a new #GstNavigation message with type
+#GST_NAVIGATION_MESSAGE_ANGLES_CHANGED for notifying an application
+that the current angle, or current number of angles available in a
+multiangle video has changed."
+              version="0.10.23">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="src" transfer-ownership="none">
+          <type name="Gst.Object" c:type="GstObject*"/>
+        </parameter>
+        <parameter name="cur_angle" transfer-ownership="none">
+          <type name="uint" c:type="guint"/>
+        </parameter>
+        <parameter name="n_angles" transfer-ownership="none">
+          <type name="uint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_message_new_commands_changed"
+              c:identifier="gst_navigation_message_new_commands_changed"
+              doc="Creates a new #GstNavigation message with type
+#GST_NAVIGATION_MESSAGE_COMMANDS_CHANGED"
+              version="0.10.23">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="src" transfer-ownership="none">
+          <type name="Gst.Object" c:type="GstObject*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_message_new_mouse_over"
+              c:identifier="gst_navigation_message_new_mouse_over"
+              doc="%FALSE if it over a non-clickable area.
+Creates a new #GstNavigation message with type
+#GST_NAVIGATION_MESSAGE_MOUSE_OVER."
+              version="0.10.23">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="src" transfer-ownership="none">
+          <type name="Gst.Object" c:type="GstObject*"/>
+        </parameter>
+        <parameter name="active" transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_message_parse_angles_changed"
+              c:identifier="gst_navigation_message_parse_angles_changed"
+              doc="or NULL
+Parse a #GstNavigation message of type GST_NAVIGATION_MESSAGE_ANGLES_CHANGED
+and extract the @cur_angle and @n_angles parameters."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="message" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+        <parameter name="cur_angle" direction="out" transfer-ownership="full">
+          <type name="uint" c:type="guint*"/>
+        </parameter>
+        <parameter name="n_angles" direction="out" transfer-ownership="full">
+          <type name="uint" c:type="guint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_message_parse_mouse_over"
+              c:identifier="gst_navigation_message_parse_mouse_over"
+              doc="or NULL.
+Parse a #GstNavigation message of type #GST_NAVIGATION_MESSAGE_MOUSE_OVER
+and extract the active/inactive flag. If the mouse over event is marked
+active, it indicates that the mouse is over a clickable area."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="message" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+        <parameter name="active" direction="out" transfer-ownership="full">
+          <type name="boolean" c:type="gboolean*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_query_get_type"
+              c:identifier="gst_navigation_query_get_type"
+              doc="Inspect a #GstQuery and return the #GstNavigationQueryType associated with
+it if it is a #GstNavigation query.
+#GST_NAVIGATION_QUERY_INVALID"
+              version="0.10.23">
+      <return-value transfer-ownership="full">
+        <type name="NavigationQueryType" c:type="GstNavigationQueryType"/>
+      </return-value>
+      <parameters>
+        <parameter name="query" transfer-ownership="none">
+          <type name="Gst.Query" c:type="GstQuery*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_query_new_angles"
+              c:identifier="gst_navigation_query_new_angles"
+              doc="Create a new #GstNavigation angles query. When executed, it will
+query the pipeline for the set of currently available angles, which may be
+greater than one in a multiangle video."
+              version="0.10.23">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Query" c:type="GstQuery*"/>
+      </return-value>
+    </function>
+    <function name="navigation_query_new_commands"
+              c:identifier="gst_navigation_query_new_commands"
+              doc="Create a new #GstNavigation commands query. When executed, it will
+query the pipeline for the set of currently available commands."
+              version="0.10.23">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Query" c:type="GstQuery*"/>
+      </return-value>
+    </function>
+    <function name="navigation_query_parse_angles"
+              c:identifier="gst_navigation_query_parse_angles"
+              doc="angle value from the query, or NULL
+value from the query, or NULL
+Parse the current angle number in the #GstNavigation angles @query into the
+#guint pointed to by the @cur_angle variable, and the number of available
+angles into the #guint pointed to by the @n_angles variable."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="query" transfer-ownership="none">
+          <type name="Gst.Query" c:type="GstQuery*"/>
+        </parameter>
+        <parameter name="cur_angle" direction="out" transfer-ownership="full">
+          <type name="uint" c:type="guint*"/>
+        </parameter>
+        <parameter name="n_angles" direction="out" transfer-ownership="full">
+          <type name="uint" c:type="guint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_query_parse_commands_length"
+              c:identifier="gst_navigation_query_parse_commands_length"
+              doc="Parse the number of commands in the #GstNavigation commands @query."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="query" transfer-ownership="none">
+          <type name="Gst.Query" c:type="GstQuery*"/>
+        </parameter>
+        <parameter name="n_cmds" direction="out" transfer-ownership="full">
+          <type name="uint" c:type="guint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_query_parse_commands_nth"
+              c:identifier="gst_navigation_query_parse_commands_nth"
+              doc="Parse the #GstNavigation command query and retrieve the @nth command from
+it into @cmd. If the list contains less elements than @nth, @cmd will be
+set to #GST_NAVIGATION_COMMAND_INVALID."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="query" transfer-ownership="none">
+          <type name="Gst.Query" c:type="GstQuery*"/>
+        </parameter>
+        <parameter name="nth" transfer-ownership="none">
+          <type name="uint" c:type="guint"/>
+        </parameter>
+        <parameter name="cmd" transfer-ownership="none">
+          <type name="NavigationCommand" c:type="GstNavigationCommand*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_query_set_angles"
+              c:identifier="gst_navigation_query_set_angles"
+              doc="Set the #GstNavigation angles query result field in @query."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="query" transfer-ownership="none">
+          <type name="Gst.Query" c:type="GstQuery*"/>
+        </parameter>
+        <parameter name="cur_angle" transfer-ownership="none">
+          <type name="uint" c:type="guint"/>
+        </parameter>
+        <parameter name="n_angles" transfer-ownership="none">
+          <type name="uint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_query_set_commands"
+              c:identifier="gst_navigation_query_set_commands"
+              doc="Set the #GstNavigation command query result fields in @query. The number
+of commands passed must be equal to @n_commands."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="query" transfer-ownership="none">
+          <type name="Gst.Query" c:type="GstQuery*"/>
+        </parameter>
+        <parameter name="n_cmds" transfer-ownership="none">
+          <type name="int" c:type="gint"/>
+        </parameter>
+        <parameter transfer-ownership="none">
+          <varargs>
+          </varargs>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="navigation_query_set_commandsv"
+              c:identifier="gst_navigation_query_set_commandsv"
+              doc="Set the #GstNavigation command query result fields in @query. The number
+of commands passed must be equal to @n_commands."
+              version="0.10.23">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="query" transfer-ownership="none">
+          <type name="Gst.Query" c:type="GstQuery*"/>
+        </parameter>
+        <parameter name="n_cmds" transfer-ownership="none">
+          <type name="int" c:type="gint"/>
+        </parameter>
+        <parameter name="cmds" transfer-ownership="none">
+          <type name="NavigationCommand" c:type="GstNavigationCommand*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="stream_volume_convert_volume"
+              c:identifier="gst_stream_volume_convert_volume"
+              version="0.10.25">
+      <return-value transfer-ownership="none">
+        <type name="double" c:type="gdouble"/>
+      </return-value>
+      <parameters>
+        <parameter name="from" transfer-ownership="none">
+          <type name="StreamVolumeFormat" c:type="GstStreamVolumeFormat"/>
+        </parameter>
+        <parameter name="to" transfer-ownership="none">
+          <type name="StreamVolumeFormat" c:type="GstStreamVolumeFormat"/>
+        </parameter>
+        <parameter name="val" transfer-ownership="none">
+          <type name="double" c:type="gdouble"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>

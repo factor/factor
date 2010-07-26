@@ -1,7 +1,5 @@
-! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: regexp tools.test kernel sequences regexp.parser regexp.private
-eval strings multiline accessors ;
+USING: arrays regexp tools.test kernel sequences regexp.parser
+regexp.private eval strings multiline accessors ;
 IN: regexp-tests
 
 [ f ] [ "b" "a*" <regexp> matches? ] unit-test
@@ -241,6 +239,9 @@ IN: regexp-tests
 [ t ] [ 3 "xabc" R/ abc/r match-index-from >boolean ] unit-test
 [ t ] [ 3 "xabc" R/ a[bB][cC]/r match-index-from >boolean ] unit-test
 
+[ 2 ] [ 0 "llamallol" R/ ll/ match-index-from ] unit-test
+[ 5 ] [ 8 "lolmallol" R/ lol/r match-index-from ] unit-test
+
 [ t ] [ "s@f" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
 [ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
 [ t ] [ ".o" "\\.[a-z]" <regexp> matches? ] unit-test
@@ -272,6 +273,10 @@ IN: regexp-tests
 
 [ "b" ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match >string ] unit-test
 
+[ T{ slice { from 5 } { to 10 } { seq "hellohello" } } ]
+[ "hellohello" R/ hello/r first-match ]
+unit-test
+
 [ { "1" "2" "3" "4" } ]
 [ "1ABC2DEF3GHI4" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
 
@@ -282,18 +287,52 @@ IN: regexp-tests
 
 [ { "a" "" } ] [ "a=" R/ =/ re-split [ >string ] map ] unit-test
 
+[ { "he" "o" } ] [ "hello" R/ l+/ re-split [ >string ] map ] unit-test
+
+[ { "h" "llo" } ] [ "hello" R/ e+/ re-split [ >string ] map ] unit-test
+
+[ { "" "h" "" "l" "l" "o" "" } ] [ "hello" R/ e*/ re-split [ >string ] map ] unit-test
+
+[ { { 0 5 "hellohello" } { 5 10 "hellohello" } } ]
+[ "hellohello" R/ hello/ [ 3array ] map-matches ]
+unit-test
+
+[ { { 5 10 "hellohello" } { 0 5 "hellohello" } } ]
+[ "hellohello" R/ hello/r [ 3array ] map-matches ]
+unit-test
+
 [ { "ABC" "DEF" "GHI" } ]
 [ "1ABC2DEF3GHI4" R/ [A-Z]+/ all-matching-subseqs ] unit-test
 
-[ 3 ]
-[ "1ABC2DEF3GHI4" R/ [A-Z]+/ count-matches ] unit-test
+[ { "ee" "e" } ] [ "heellohello" R/ e+/ all-matching-subseqs ] unit-test
+[ { "e" "ee" } ] [ "heellohello" R/ e+/r all-matching-subseqs ] unit-test
 
-[ 0 ]
-[ "123" R/ [A-Z]+/ count-matches ] unit-test
+[ 3 ] [ "1ABC2DEF3GHI4" R/ [A-Z]+/ count-matches ] unit-test
 
-[ "1.2.3.4." ]
-[ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ "." re-replace ] unit-test
-  
+[ 3 ] [ "1ABC2DEF3GHI4" R/ [A-Z]+/r count-matches ] unit-test
+
+[ 1 ] [ "" R/ / count-matches ] unit-test
+
+[ 1 ] [ "" R/ /r count-matches ] unit-test
+
+[ 0 ] [ "123" R/ [A-Z]+/ count-matches ] unit-test
+
+[ 0 ] [ "123" R/ [A-Z]+/r count-matches ] unit-test
+
+[ 6 ] [ "hello" R/ e*/ count-matches ] unit-test
+
+[ 6 ] [ "hello" R/ e*/r count-matches ] unit-test
+
+[ 11 ] [ "hello world" R/ l*/ count-matches ] unit-test
+
+[ 11 ] [ "hello world" R/ l*/r count-matches ] unit-test
+
+[ 1 ] [ "hello" R/ e+/ count-matches ] unit-test
+
+[ 2 ] [ "hello world" R/ l+/r count-matches ] unit-test
+
+[ "1.2.3.4." ] [ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ "." re-replace ] unit-test
+[ "XhXXlXlXoX XwXoXrXlXdX" ] [ "hello world" R/ e*/ "X" re-replace ] unit-test
 [ "-- title --" ] [ "== title ==" R/ =/ "-" re-replace ] unit-test
 
 [ "" ] [ "ab" "a(?!b)" <regexp> first-match >string ] unit-test
