@@ -591,6 +591,12 @@ FOLDABLE-INSN: ##unbox-alien
 def: dst/int-rep
 use: src/tagged-rep ;
 
+! Zero-extending and sign-extending integers
+FOLDABLE-INSN: ##convert-integer
+def: dst/int-rep
+use: src/int-rep
+literal: c-type ;
+
 ! Raw memory accessors
 FLUSHABLE-INSN: ##load-memory
 def: dst

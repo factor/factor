@@ -6,6 +6,7 @@ sequences sequences.generalizations system
 compiler.cfg.builder.alien.params compiler.cfg.hats
 compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.intrinsics.allot cpu.architecture ;
+QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.builder.alien.boxing
 
 SYMBOL: struct-return-area
@@ -49,9 +50,15 @@ M: c-type unbox
     [ rep>> ] [ unboxer>> ] bi
     [
         {
-            ! { "to_float" [ drop ] }
-            ! { "to_double" [ drop ] }
-            ! { "alien_offset" [ drop ^^unbox-any-c-ptr ] }
+            { "to_float" [ drop ] }
+            { "to_double" [ drop ] }
+            { "to_signed_1" [ drop ] }
+            { "to_unsigned_1" [ drop ] }
+            { "to_signed_2" [ drop ] }
+            { "to_unsigned_2" [ drop ] }
+            { "to_signed_4" [ drop ] }
+            { "to_unsigned_4" [ drop ] }
+            { "alien_offset" [ drop ^^unbox-any-c-ptr ] }
             [ swap ^^unbox ]
         } case 1array
     ]
@@ -107,9 +114,15 @@ GENERIC: box ( vregs reps c-type -- dst )
 M: c-type box
     [ [ first ] bi@ ] [ boxer>> ] bi*
     {
-        ! { "from_float" [ drop ] }
-        ! { "from_double" [ drop ] }
-        ! { "allot_alien" [ drop ^^box-alien ] }
+        { "from_float" [ drop ] }
+        { "from_double" [ drop ] }
+        { "from_signed_1" [ drop c:char ^^convert-integer ] }
+        { "from_unsigned_1" [ drop c:uchar ^^convert-integer ] }
+        { "from_signed_2" [ drop c:short ^^convert-integer ] }
+        { "from_unsigned_2" [ drop c:ushort ^^convert-integer ] }
+        { "from_signed_4" [ drop c:int ^^convert-integer ] }
+        { "from_unsigned_4" [ drop c:uint ^^convert-integer ] }
+        { "allot_alien" [ drop ^^box-alien ] }
         [ swap <gc-map> ^^box ]
     } case ;
 

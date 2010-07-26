@@ -532,7 +532,7 @@ M: integer end-of-year 12 31 <date> ;
     dup midnight time- ;
 
 : since-1970 ( duration -- timestamp )
-    unix-1970 time+ >local-time ;
+    unix-1970 time+ ;
 
 : timestamp>unix-time ( timestamp -- seconds )
     unix-1970 time- second>> ;

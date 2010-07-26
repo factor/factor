@@ -185,3 +185,6 @@ IN: calendar.tests
     2008 1 29 <date> 1 months time+
     2008 2 29 <date> =
 ] unit-test
+
+[ 0 ]
+[ gmt gmt-offset>> duration>seconds ] unit-test

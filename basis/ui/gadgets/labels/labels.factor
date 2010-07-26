@@ -106,12 +106,12 @@ M: f >label drop <gadget> ;
         { 5 5 } >>gap ; inline
 PRIVATE>
 
-: label-on-left ( gadget label -- button )
+: label-on-left ( gadget label -- track )
     label-on-left/right
         swap >label f track-add
         swap 1 track-add ;
 
-: label-on-right ( label gadget -- button )
+: label-on-right ( label gadget -- track )
     label-on-left/right
         swap f track-add
         swap >label 1 track-add ;
