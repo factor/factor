@@ -78,7 +78,7 @@ IN: math.combinatorics.tests
 
 [ { } ] [ { 1 2 } 0 selections ] unit-test
 
-[ { { 1 2 } } ] [ { 1 2 } 1 selections ] unit-test
+[ { { 1 } { 2 } } ] [ { 1 2 } 1 selections ] unit-test
 
 [ { { 1 1 } { 1 2 } { 2 1 } { 2 2 } } ]
 [ { 1 2 } 2 selections ] unit-test
