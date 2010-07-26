@@ -8,3 +8,9 @@ TUPLE: color red green blue ;
 
 [ T{ color f f f f } ]
 [ [ color new ] compile-call ] unit-test
+
+SYMBOL: foo
+
+[ [ foo new ] compile-call ] must-fail
+
+[ [ foo boa ] compile-call ] must-fail

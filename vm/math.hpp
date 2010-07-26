@@ -5,7 +5,7 @@ static const fixnum fixnum_max = (((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
 static const fixnum fixnum_min = (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)));
 static const fixnum array_size_max = ((cell)1 << (WORD_SIZE - TAG_BITS - 2));
 
-inline cell factor_vm::allot_integer(fixnum x)
+inline cell factor_vm::from_signed_cell(fixnum x)
 {
 	if(x < fixnum_min || x > fixnum_max)
 		return tag<bignum>(fixnum_to_bignum(x));
@@ -13,7 +13,7 @@ inline cell factor_vm::allot_integer(fixnum x)
 		return tag_fixnum(x);
 }
 
-inline cell factor_vm::allot_cell(cell x)
+inline cell factor_vm::from_unsigned_cell(cell x)
 {
 	if(x > (cell)fixnum_max)
 		return tag<bignum>(cell_to_bignum(x));
@@ -74,17 +74,6 @@ inline cell factor_vm::unbox_array_size()
 	return unbox_array_size_slow();
 }
 
-VM_C_API cell from_float(float flo, factor_vm *vm);
-VM_C_API float to_float(cell value, factor_vm *vm);
-VM_C_API cell from_double(double flo, factor_vm *vm);
-VM_C_API double to_double(cell value, factor_vm *vm);
-
-VM_C_API cell from_signed_1(s8 n, factor_vm *vm);
-VM_C_API cell from_unsigned_1(u8 n, factor_vm *vm);
-VM_C_API cell from_signed_2(s16 n, factor_vm *vm);
-VM_C_API cell from_unsigned_2(u16 n, factor_vm *vm);
-VM_C_API cell from_signed_4(s32 n, factor_vm *vm);
-VM_C_API cell from_unsigned_4(u32 n, factor_vm *vm);
 VM_C_API cell from_signed_cell(fixnum integer, factor_vm *vm);
 VM_C_API cell from_unsigned_cell(cell integer, factor_vm *vm);
 VM_C_API cell from_signed_8(s64 n, factor_vm *vm);

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators gobject-introspection.common
-gobject-introspection.ffi gobject-introspection.loader
-kernel lexer locals math namespaces sequences vocabs.parser xml ;
+gobject-introspection.ffi gobject-introspection.loader kernel lexer
+locals math namespaces sequences strings.parser vocabs.parser xml ;
 IN: gobject-introspection
 
 : with-child-vocab ( name quot -- )
@@ -19,9 +19,15 @@ IN: gobject-introspection
     {
         [ define-ffi-repository ]
     } cleave
-    f implement-structs set-global ;
+    V{ } clone implement-structs set-global
+    H{ } clone replaced-c-types set-global ;
 
 SYNTAX: GIR: scan define-gir-vocab ;
 
 SYNTAX: IMPLEMENT-STRUCTS:
-    ";" parse-tokens implement-structs set-global ;
+    ";" parse-tokens
+    implement-structs [ swap append! ] change-global ;
+
+SYNTAX: REPLACE-C-TYPE:
+    scan unescape-string scan swap
+    replaced-c-types get-global set-at ;

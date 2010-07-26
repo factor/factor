@@ -62,3 +62,20 @@ V{
 ] [
     0 get instructions>>
 ] unit-test
+
+V{
+    T{ ##phi }
+    T{ ##box }
+} 0 test-bb
+
+0 get insert-save-context
+
+[
+    V{
+        T{ ##phi }
+        T{ ##save-context f 7 8 }
+        T{ ##box }
+    }
+] [
+    0 get instructions>>
+] unit-test

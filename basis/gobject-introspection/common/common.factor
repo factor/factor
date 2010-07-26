@@ -14,4 +14,8 @@ SYMBOL: aliases
 aliases [ H{ } ] initialize
 
 SYMBOL: implement-structs
+implement-structs [ V{ } ] initialize
+
+SYMBOL: replaced-c-types
+replaced-c-types [ H{ } ] initialize
 
