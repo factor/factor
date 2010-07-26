@@ -229,8 +229,8 @@ CONSTANT: poll-fd-events
 
 HOOK: init-io-event-source io-backend ( -- )
 
-M: c-io-backend init-io-event-source
-    ;
+M: f init-io-event-source ;
+M: c-io-backend init-io-event-source ;
 
 M: object init-io-event-source
     GSourceFuncs malloc-struct &free
