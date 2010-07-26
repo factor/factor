@@ -110,13 +110,11 @@ M: object apply-object push-literal ;
         infer-quot-here
     ] dip recursive-state set ;
 
-: time-bomb ( error -- )
-    '[ _ throw ] infer-quot-here ;
+: time-bomb-quot ( obj generic -- quot )
+    [ literalize ] [ "default-method" word-prop ] bi* [ ] 2sequence ;
 
-ERROR: bad-call obj ;
-
-M: bad-call summary
-    drop "call must be given a callable" ;
+: time-bomb ( obj generic -- )
+    time-bomb-quot infer-quot-here ;
 
 : infer-literal-quot ( literal -- )
     dup recursive-quotation? [
@@ -127,7 +125,7 @@ M: bad-call summary
             [ [ recursion>> ] keep add-local-quotation ]
             bi infer-quot
         ] [
-            value>> \ bad-call boa time-bomb
+            value>> \ call time-bomb
         ] if
     ] if ;
 

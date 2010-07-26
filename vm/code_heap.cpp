@@ -222,9 +222,10 @@ struct code_block_accumulator {
 
 		/* Note: the entry point is always a multiple of the heap
 		alignment (16 bytes). We cannot allocate while iterating
-		through the code heap, so it is not possible to call allot_cell()
-		here. It is OK, however, to add it as if it were a fixnum, and
-		have library code shift it to the left by 4. */
+		through the code heap, so it is not possible to call
+		from_unsigned_cell() here. It is OK, however, to add it as
+		if it were a fixnum, and have library code shift it to the
+		left by 4. */
 		cell entry_point = (cell)compiled->entry_point();
 		assert((entry_point & (data_alignment - 1)) == 0);
 		assert((entry_point & TAG_MASK) == FIXNUM_TYPE);
