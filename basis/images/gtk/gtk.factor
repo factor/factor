@@ -1,10 +1,9 @@
 ! Copyright (C) 2010 Philipp Brüschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.strings
-alien.syntax arrays classes.struct combinators destructors
-gdk.pixbuf.ffi gio.ffi glib.ffi gobject.ffi grouping images
-images.loader io io.encodings.utf8
-kernel libc locals math sequences specialized-arrays ;
+USING: accessors alien.c-types alien.data arrays combinators
+destructors gdk.pixbuf.ffi gobject.ffi grouping images
+images.loader io kernel locals math sequences
+specialized-arrays ;
 IN: images.gtk
 SPECIALIZED-ARRAY: uchar
 
@@ -19,15 +18,6 @@ SINGLETON: gtk-image
 "ico"  gtk-image register-image-class
 
 <PRIVATE
-
-: data>GInputStream ( data -- GInputStream )
-    [ malloc-byte-array &free ] [ length ] bi
-    f g_memory_input_stream_new_from_data &g_object_unref ;
-
-: GInputStream>GdkPixbuf ( GInputStream -- GdkPixbuf )
-    f { { pointer: GError initial: f } }
-    [ gdk_pixbuf_new_from_stream ] with-out-parameters
-    handle-GError &g_object_unref ;
 
 : image-data ( GdkPixbuf -- data )
     {
@@ -72,6 +62,7 @@ PRIVATE>
 
 M: gtk-image stream>image
     drop [
-        stream-contents data>GInputStream
-        GInputStream>GdkPixbuf GdkPixbuf>image
+        stream-contents data>GInputStream &g_object_unref
+        GInputStream>GdkPixbuf &g_object_unref
+        GdkPixbuf>image
     ] with-destructors ;
