@@ -1,7 +1,8 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.short-circuit kernel sequences math
-compiler.utilities compiler.cfg compiler.cfg.instructions compiler.cfg.rpo
+USING: accessors combinators.short-circuit kernel namespaces
+sequences math compiler.utilities compiler.cfg
+compiler.cfg.instructions compiler.cfg.rpo
 compiler.cfg.predecessors compiler.cfg.utilities ;
 IN: compiler.cfg.block-joining
 
@@ -23,15 +24,23 @@ IN: compiler.cfg.block-joining
 : update-successors ( bb pred -- )
     [ successors>> ] dip successors<< ;
 
+: join-unlikely ( bb pred -- )
+    over unlikely?>> [ t >>unlikely? ] when 2drop ;
+
 : join-block ( bb pred -- )
-    [ join-instructions ] [ update-successors ] 2bi ;
+    [ join-instructions ]
+    [ update-successors ]
+    [ join-unlikely ]
+    2tri ;
+
+SYMBOL: changed?
 
 : join-blocks ( cfg -- cfg' )
     needs-predecessors
 
     dup post-order [
         dup join-block?
-        [ dup predecessor join-block ] [ drop ] if
+        [ changed? on dup predecessor join-block ] [ drop ] if
     ] each
 
-    cfg-changed predecessors-changed ;
+    changed? get [ cfg-changed predecessors-changed ] when ;
