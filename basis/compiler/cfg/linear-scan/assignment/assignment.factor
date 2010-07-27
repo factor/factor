@@ -158,20 +158,22 @@ M: insn assign-registers-in-insn drop ;
     } cleave ;
 
 :: assign-registers-in-block ( bb -- )
-    bb [
-        [
-            bb begin-block
+    bb kill-block?>> [
+        bb [
             [
-                {
-                    [ insn#>> 1 - prepare-insn ]
-                    [ insn#>> prepare-insn ]
-                    [ assign-registers-in-insn ]
-                    [ , ]
-                } cleave
-            ] each
-            bb compute-live-out
-        ] V{ } make
-    ] change-instructions drop ;
+                bb begin-block
+                [
+                    {
+                        [ insn#>> 1 - prepare-insn ]
+                        [ insn#>> prepare-insn ]
+                        [ assign-registers-in-insn ]
+                        [ , ]
+                    } cleave
+                ] each
+                bb compute-live-out
+            ] V{ } make
+        ] change-instructions drop
+    ] unless ;
 
 : assign-registers ( live-intervals cfg -- )
     [ init-assignment ] dip

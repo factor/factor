@@ -103,12 +103,9 @@ M: ##phi prepare-insn
     [ dst>> ] [ inputs>> values ] bi
     [ maybe-eliminate-copy ] with each ;
 
-: prepare-block ( bb -- )
-    instructions>> [ prepare-insn ] each ;
-
 : prepare-coalescing ( cfg -- )
     init-coalescing
-    [ prepare-block ] each-basic-block ;
+    [ [ prepare-insn ] each ] simple-analysis ;
 
 : process-copies ( -- )
     copies get [ maybe-eliminate-copy ] assoc-each ;

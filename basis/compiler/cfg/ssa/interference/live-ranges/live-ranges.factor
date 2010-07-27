@@ -38,13 +38,12 @@ M: insn record-insn
 
 SYMBOLS: def-indices kill-indices ;
 
-: compute-local-live-ranges ( bb -- )
+: compute-local-live-ranges ( insns -- )
     H{ } clone local-def-indices set
     H{ } clone local-kill-indices set
-    [ instructions>> [ swap record-insn ] each-index ]
-    [ [ local-def-indices get ] dip def-indices get set-at ]
-    [ [ local-kill-indices get ] dip kill-indices get set-at ]
-    tri ;
+    [ swap record-insn ] each-index
+    local-def-indices get basic-block get def-indices get set-at
+    local-kill-indices get basic-block get kill-indices get set-at ;
 
 PRIVATE>
 
@@ -53,7 +52,7 @@ PRIVATE>
 
     H{ } clone def-indices set
     H{ } clone kill-indices set
-    [ compute-local-live-ranges ] each-basic-block ;
+    [ compute-local-live-ranges ] simple-analysis ;
 
 : def-index ( vreg bb -- n )
     def-indices get at at ;

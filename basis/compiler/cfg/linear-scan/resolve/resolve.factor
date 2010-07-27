@@ -99,7 +99,9 @@ SYMBOL: temp
     2dup compute-mappings perform-mappings ;
 
 : resolve-block-data-flow ( bb -- )
-    dup successors>> [ resolve-edge-data-flow ] with each ;
+    dup kill-block?>> [ drop ] [
+        dup successors>> [ resolve-edge-data-flow ] with each
+    ] if ;
 
 : resolve-data-flow ( cfg -- )
     needs-predecessors
