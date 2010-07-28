@@ -70,7 +70,8 @@ SYMBOLS: work-list loop-heads visited ;
     init-linearization-order
 
     [ work-list get [ process-block ] slurp-deque ] { } make
-    [ unlikely?>> not ] partition append ;
+    ! [ unlikely?>> not ] partition append
+    ;
 
 PRIVATE>
 
