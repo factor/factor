@@ -117,3 +117,6 @@ M: #terminate remove-dead-code*
 
 M: #alien-node remove-dead-code*
     maybe-drop-dead-outputs ;
+
+M: #alien-callback remove-dead-code*
+    [ (remove-dead-code) ] change-child ;

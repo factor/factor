@@ -45,6 +45,8 @@ FUNCTION: void ffi_test_0 ;
 FUNCTION: int ffi_test_1 ;
 [ 3 ] [ ffi_test_1 ] unit-test
 
+[ ] [ \ ffi_test_1 def>> [ drop ] append compile-call ] unit-test
+
 FUNCTION: int ffi_test_2 int x int y ;
 [ 5 ] [ 2 3 ffi_test_2 ] unit-test
 [ "hi" 3 ffi_test_2 ] must-fail

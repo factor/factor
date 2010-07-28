@@ -186,10 +186,6 @@ M: x86.32 %begin-callback ( -- )
     4 stack@ 0 MOV
     "begin_callback" f f %c-invoke ;
 
-M: x86.32 %alien-callback ( quot -- )
-    [ EAX ] dip %load-reference
-    EAX quot-entry-point-offset [+] CALL ;
-
 M: x86.32 %end-callback ( -- )
     0 save-vm-ptr
     "end_callback" f f %c-invoke ;

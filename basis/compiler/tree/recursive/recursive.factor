@@ -61,6 +61,9 @@ M: #recursive node-call-graph
 M: #branch node-call-graph
     children>> [ (build-call-graph) ] with each ;
 
+M: #alien-callback node-call-graph
+    child>> (build-call-graph) ;
+
 M: node node-call-graph 2drop ;
 
 SYMBOLS: not-loops recursive-nesting ;

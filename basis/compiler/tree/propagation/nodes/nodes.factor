@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences accessors kernel assocs
 compiler.tree
@@ -16,7 +16,7 @@ GENERIC: annotate-node ( node -- )
 
 GENERIC: propagate-around ( node -- )
 
-: (propagate) ( node -- )
+: (propagate) ( nodes -- )
     [ [ compute-copy-equiv ] [ propagate-around ] bi ] each ;
 
 : extract-value-info ( values -- assoc )

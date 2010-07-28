@@ -473,3 +473,31 @@ FROM: splitting.private => split, ;
 ! M\ declared-effect infer-call* didn't properly unify branches
 { 1 0 } [ [ 1 [ drop ] [ drop ] if ] each ] must-infer-as
 
+! Make sure alien-callback effects are checked properly
+USING: alien.c-types alien ;
+
+[ void { } cdecl [ ] alien-callback ] must-infer
+
+[ [ void { } cdecl [ f [ drop ] unless ] alien-callback ] infer ] [ unbalanced-branches-error? ] must-fail-with
+
+[ [ void { } cdecl [ drop ] alien-callback ] infer ] [ effect-error? ] must-fail-with
+
+[ [ int { } cdecl [ ] alien-callback ] infer ] [ effect-error? ] must-fail-with
+
+[ int { } cdecl [ 5 ] alien-callback ] must-infer
+
+[ int { int } cdecl [ ] alien-callback ] must-infer
+
+[ int { int } cdecl [ 1 + ] alien-callback ] must-infer
+
+[ void { int } cdecl [ . ] alien-callback ] must-infer
+
+: recursive-callback-1 ( -- x )
+    void { } cdecl [ recursive-callback-1 drop ] alien-callback ;
+
+\ recursive-callback-1 def>> must-infer
+
+: recursive-callback-2 ( -- x )
+    void { } cdecl [ recursive-callback-2 drop ] alien-callback ; inline recursive
+
+[ recursive-callback-2 ] must-infer

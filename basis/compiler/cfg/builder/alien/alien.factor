@@ -173,24 +173,22 @@ M: #alien-assembly emit-node
 : needs-frame-pointer ( -- )
     cfg get t >>frame-pointer? drop ;
 
+: emit-callback-body ( nodes -- )
+    [ last #return? t assert= ] [ but-last emit-nodes ] bi ;
+
 M: #alien-callback emit-node
-    params>> dup xt>> dup
+    dup params>> xt>> dup
     [
         needs-frame-pointer
 
         begin-word
 
         {
-            [ callee-parameters ##callback-inputs ]
-            [ box-parameters ]
-            [
-                [
-                    make-kill-block
-                    quot>> ##alien-callback
-                ] emit-trivial-block
-            ]
-            [ callee-return ##callback-outputs ]
-            [ callback-stack-cleanup ]
+            [ params>> callee-parameters ##callback-inputs ]
+            [ params>> box-parameters ]
+            [ child>> emit-callback-body ]
+            [ params>> callee-return ##callback-outputs ]
+            [ params>> callback-stack-cleanup ]
         } cleave
 
         end-word
