@@ -153,4 +153,6 @@ M: #call propagate-after
 
 M: #alien-node propagate-before propagate-alien-invoke ;
 
+M: #alien-callback propagate-around child>> (propagate) ;
+
 M: #return annotate-node dup in-d>> (annotate-node) ;

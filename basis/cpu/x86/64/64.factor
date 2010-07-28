@@ -116,10 +116,6 @@ M: x86.64 %begin-callback ( -- )
     param-reg-1 0 MOV
     "begin_callback" f f %c-invoke ;
 
-M: x86.64 %alien-callback ( quot -- )
-    [ param-reg-0 ] dip %load-reference
-    param-reg-0 quot-entry-point-offset [+] CALL ;
-
 M: x86.64 %end-callback ( -- )
     param-reg-0 %mov-vm-ptr
     "end_callback" f f %c-invoke ;

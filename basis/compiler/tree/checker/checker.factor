@@ -188,7 +188,7 @@ M: #copy check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
 
 M: #alien-node check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
 
-M: #alien-callback check-stack-flow* drop ;
+M: #alien-callback check-stack-flow* child>> check-stack-flow ;
 
 M: #declare check-stack-flow* drop ;
 

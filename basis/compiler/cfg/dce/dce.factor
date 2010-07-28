@@ -99,6 +99,18 @@ M: ##write-barrier live-insn? src>> live-vreg? ;
 
 M: ##write-barrier-imm live-insn? src>> live-vreg? ;
 
+: filter-alien-outputs ( triples -- triples' )
+    [ first live-vreg? ] filter ;
+
+M: alien-call-insn live-insn?
+    [ filter-alien-outputs ] change-reg-outputs
+    drop t ;
+
+M: ##callback-inputs live-insn?
+    [ filter-alien-outputs ] change-reg-outputs
+    [ filter-alien-outputs ] change-stack-outputs
+    drop t ;
+
 M: flushable-insn live-insn? defs-vregs [ live-vreg? ] any? ;
 
 M: insn live-insn? drop t ;
