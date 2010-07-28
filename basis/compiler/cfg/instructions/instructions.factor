@@ -685,9 +685,6 @@ literal: reg-inputs stack-inputs reg-outputs cleanup stack-size quot gc-map ;
 VREG-INSN: ##callback-inputs
 literal: reg-outputs stack-outputs ;
 
-INSN: ##alien-callback
-literal: quot ;
-
 VREG-INSN: ##callback-outputs
 literal: reg-inputs ;
 

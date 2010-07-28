@@ -293,5 +293,4 @@ CODEGEN: ##alien-invoke %alien-invoke
 CODEGEN: ##alien-indirect %alien-indirect
 CODEGEN: ##alien-assembly %alien-assembly
 CODEGEN: ##callback-inputs %callback-inputs
-CODEGEN: ##alien-callback %alien-callback
 CODEGEN: ##callback-outputs %callback-outputs

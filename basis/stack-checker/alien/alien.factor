@@ -4,7 +4,8 @@ USING: kernel arrays sequences accessors combinators math
 namespaces init sets words assocs alien.libraries alien
 alien.private alien.c-types fry quotations strings
 stack-checker.backend stack-checker.errors stack-checker.visitor
-stack-checker.dependencies compiler.utilities ;
+stack-checker.dependencies stack-checker.state
+compiler.utilities effects ;
 IN: stack-checker.alien
 
 TUPLE: alien-node-params
@@ -19,7 +20,7 @@ TUPLE: alien-indirect-params < alien-node-params ;
 
 TUPLE: alien-assembly-params < alien-node-params { quot callable } ;
 
-TUPLE: alien-callback-params < alien-node-params { quot callable } xt ;
+TUPLE: alien-callback-params < alien-node-params xt ;
 
 : param-prep-quot ( params -- quot )
     parameters>> [ c-type c-type-unboxer-quot ] map spread>quot ;
@@ -106,6 +107,7 @@ TUPLE: alien-callback-params < alien-node-params { quot callable } xt ;
     callbacks get [ dup "stack-cleanup" word-prop <callback> ] cache ;
 
 : callback-bottom ( params -- )
+    "( callback )" <uninterned-word> >>xt
     xt>> '[ _ callback-xt ] infer-quot-here ;
 
 : callback-return-quot ( ctype -- quot )
@@ -114,19 +116,36 @@ TUPLE: alien-callback-params < alien-node-params { quot callable } xt ;
 : callback-prep-quot ( params -- quot )
     parameters>> [ c-type c-type-boxer-quot ] map spread>quot ;
 
-: wrap-callback-quot ( params -- quot )
-    [ callback-prep-quot ] [ quot>> ] [ callback-return-quot ] tri 3append
-     yield-hook get
-     '[ _ _ do-callback ]
-     >quotation ;
+GENERIC: wrap-callback-quot ( params quot -- quot' )
+
+M: callable wrap-callback-quot
+    swap [ callback-prep-quot ] [ callback-return-quot ] bi surround
+    yield-hook get
+    '[ _ _ do-callback ]
+    >quotation ;
+
+: callback-effect ( params -- effect )
+    [ parameters>> length "x" <array> ] [ return>> void? { } { "x" } ? ] bi
+    <effect> ;
+
+: infer-callback-quot ( params quot -- child )
+    [
+        init-inference
+        nest-visitor
+        infer-quot-here
+        end-infer
+        callback-effect check-effect
+        stack-visitor get
+    ] with-scope ;
 
 : infer-alien-callback ( -- )
-    alien-callback-params new
-    pop-quot
-    pop-abi
-    pop-params
-    pop-return
-    "( callback )" <uninterned-word> >>xt
-    dup wrap-callback-quot >>quot
-    dup callback-bottom
+    pop-literal nip [
+        alien-callback-params new
+        pop-abi
+        pop-params
+        pop-return
+        dup callback-bottom
+        dup
+        dup
+    ] dip wrap-callback-quot infer-callback-quot
     #alien-callback, ;

@@ -519,3 +519,10 @@ cell-bits 32 = [
         14 ndrop
     ] cleaned-up-tree nodes>quot
 ] unit-test
+
+USING: alien alien.c-types ;
+
+[ t ] [
+    [ int { } cdecl [ 2 2 + ] alien-callback ]
+    { + } inlined?
+] unit-test

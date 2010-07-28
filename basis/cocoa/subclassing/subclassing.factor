@@ -95,16 +95,8 @@ SYNTAX: CLASS:
     [ [ make-local ] map ] H{ } make-assoc
     (parse-lambda) <lambda> ?rewrite-closures first ;
 
-: method-effect ( quadruple -- effect )
-    [ third ] [ second void? { } { "x" } ? ] bi <effect> ;
-
-: check-method ( quadruple -- )
-    [ fourth infer ] [ method-effect ] bi
-    2dup effect<= [ 2drop ] [ effect-error ] if ;
-
 SYNTAX: METHOD:
     scan-c-type
     parse-selector
     parse-method-body [ swap ] 2dip 4array
-    dup check-method
     suffix! ;

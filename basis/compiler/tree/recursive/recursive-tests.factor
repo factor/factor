@@ -1,4 +1,4 @@
-USING: tools.test kernel combinators.short-circuit math sequences accessors
+USING: tools.test kernel combinators.short-circuit math sequences accessors make
 compiler.tree
 compiler.tree.builder
 compiler.tree.combinators
@@ -12,22 +12,24 @@ IN: compiler.tree.recursive.tests
 [ { f f f t } ] [ t { f f t f } (tail-calls) ] unit-test
 
 : label-is-loop? ( nodes word -- ? )
-    [
-        {
-            [ drop #recursive? ]
-            [ drop label>> loop?>> ]
-            [ swap label>> word>> eq? ]
-        } 2&&
-    ] curry contains-node? ;
+    swap [
+        [
+            dup {
+                [ #recursive? ]
+                [ label>> loop?>> ]
+            } 1&& [ label>> word>> , ] [ drop ] if
+        ] each-node
+    ] V{ } make member? ;
 
 : label-is-not-loop? ( nodes word -- ? )
-    [
-        {
-            [ drop #recursive? ]
-            [ drop label>> loop?>> not ]
-            [ swap label>> word>> eq? ]
-        } 2&&
-    ] curry contains-node? ;
+    swap [
+        [
+            dup {
+                [ #recursive? ]
+                [ label>> loop?>> not ]
+            } 1&& [ label>> word>> , ] [ drop ] if
+        ] each-node
+    ] V{ } make member? ;
 
 : loop-test-1 ( a -- )
     dup [ 1 + loop-test-1 ] [ drop ] if ; inline recursive

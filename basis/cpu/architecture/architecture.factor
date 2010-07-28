@@ -610,8 +610,6 @@ HOOK: %alien-assembly cpu ( reg-inputs stack-inputs reg-outputs cleanup stack-si
 
 HOOK: %callback-inputs cpu ( reg-outputs stack-outputs -- )
 
-HOOK: %alien-callback cpu ( quot -- )
-
 HOOK: %callback-outputs cpu ( reg-inputs -- )
 
 HOOK: stack-cleanup cpu ( stack-size return abi -- n )
