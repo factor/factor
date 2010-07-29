@@ -300,7 +300,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ <callback> { integer word } { alien } define-primitive
 \ <displaced-alien> { integer c-ptr } { c-ptr } define-primitive \ <displaced-alien> make-flushable
 \ <string> { integer integer } { string } define-primitive \ <string> make-flushable
-\ <tuple> { tuple-layout } { tuple } define-primitive \ <tuple> make-flushable
+\ <tuple> { array } { tuple } define-primitive \ <tuple> make-flushable
 \ <wrapper> { object } { wrapper } define-primitive \ <wrapper> make-foldable
 \ alien-address { alien } { integer } define-primitive \ alien-address make-flushable
 \ alien-cell { c-ptr integer } { pinned-c-ptr } define-primitive \ alien-cell make-flushable
