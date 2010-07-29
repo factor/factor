@@ -25,7 +25,7 @@ PREDICATE: intersection-class < class
 
 M: intersection-class update-class define-intersection-predicate ;
 
-M: intersection-class rank-class drop 2 ;
+M: intersection-class rank-class drop 5 ;
 
 M: intersection-class instance?
     "participants" word-prop [ instance? ] with all? ;

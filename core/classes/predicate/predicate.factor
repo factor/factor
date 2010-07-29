@@ -35,7 +35,7 @@ PRIVATE>
 M: predicate-class reset-class
     [ call-next-method ] [ { "predicate-definition" } reset-props ] bi ;
 
-M: predicate-class rank-class drop 1 ;
+M: predicate-class rank-class drop 2 ;
 
 M: predicate-class instance?
     2dup superclass instance? [

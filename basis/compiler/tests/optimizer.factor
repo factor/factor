@@ -291,6 +291,9 @@ PREDICATE: list < improper-list
     [ list instance? ] compile-call
 ] unit-test
 
+! <tuple> type function bustage
+[ T{ cons } 7 ] [ cons tuple-layout [ [ <tuple> ] [ length ] bi ] compile-call ] unit-test
+
 ! Regression
 : interval-inference-bug ( obj -- obj x )
     dup "a" get { array-capacity } declare >=

@@ -93,7 +93,7 @@ M: #declare propagate-before
     recover ;
 
 : predicate-output-infos/class ( info class -- info )
-    [ class>> ] dip compare-classes
+    [ class>> ] dip evaluate-class-predicate
     dup +incomparable+ eq? [ drop object-info ] [ <literal-info> ] if ;
 
 : predicate-output-infos ( info class -- info )
