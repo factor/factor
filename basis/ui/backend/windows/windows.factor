@@ -615,8 +615,12 @@ SYMBOL: trace-messages?
 : ui-wndproc ( -- object )
     uint { void* uint long long } stdcall [
         pick
-        trace-messages? get-global [ dup windows-message-name name>> print flush ] when
-        wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
+
+        trace-messages? get-global
+        [ dup windows-message-name name>> print flush ] when
+
+        wm-handlers get-global at*
+        [ call( hWnd Msg wParam lParam -- result ) ] [ drop DefWindowProc ] if
      ] alien-callback ;
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
