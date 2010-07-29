@@ -16,7 +16,7 @@ M: mixin-class (classes-intersect?)
 M: mixin-class reset-class
     [ call-next-method ] [ { "mixin" } reset-props ] bi ;
 
-M: mixin-class rank-class drop 3 ;
+M: mixin-class rank-class drop 8 ;
 
 TUPLE: check-mixin-class class ;
 
