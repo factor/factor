@@ -295,6 +295,7 @@ IN: bootstrap.x86
 : jit-start-context ( -- )
     ! Create the new context in return-reg
     jit-load-vm
+    jit-save-context
     ESP [] vm-reg MOV
     "new_context" jit-call
 
