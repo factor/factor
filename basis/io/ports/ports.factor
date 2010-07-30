@@ -46,11 +46,17 @@ M: input-port stream-read1
     dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ; inline
 
 : read-step ( count port -- byte-array/f )
-    dup wait-to-read [ 2drop f ] [ buffer>> buffer-read ] if ;
+    {
+        { [ over 0 = ] [ 2drop f ] }
+        { [ dup wait-to-read ] [ 2drop f ] }
+        [ buffer>> buffer-read ]
+    } cond ;
+
+: prepare-read ( count stream -- count stream )
+    dup check-disposed [ 0 max >fixnum ] dip ; inline
 
 M: input-port stream-read-partial ( max stream -- byte-array/f )
-    dup check-disposed
-    [ 0 max >integer ] dip read-step ;
+    prepare-read read-step ;
 
 : read-loop ( count port accum -- )
     pick over length - dup 0 > [
@@ -64,8 +70,7 @@ M: input-port stream-read-partial ( max stream -- byte-array/f )
     ] if ;
 
 M: input-port stream-read
-    dup check-disposed
-    [ 0 max >fixnum ] dip
+    prepare-read
     2dup read-step dup [
         pick over length > [
             pick <byte-vector>
