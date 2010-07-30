@@ -67,11 +67,9 @@ IN: stack-checker.transforms
     [
         [ no-case ]
     ] [
-        dup last callable? [
-            dup last swap but-last
-        ] [
-            [ no-case ] swap
-        ] if case>quot
+        dup [ callable? ] find dup
+        [ [ head ] dip ] [ 2drop [ no-case ] ] if
+        swap case>quot
     ] if-empty
 ] 1 define-transform
 
