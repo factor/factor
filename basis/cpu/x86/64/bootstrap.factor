@@ -270,6 +270,7 @@ IN: bootstrap.x86
 
 : jit-start-context ( -- )
     ! Create the new context in return-reg
+    jit-save-context
     arg1 vm-reg MOV
     "new_context" jit-call
 
