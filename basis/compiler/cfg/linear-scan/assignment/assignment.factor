@@ -39,6 +39,11 @@ SYMBOL: pending-interval-assoc
         drop leader vreg rep-of lookup-spill-slot
     ] unless ;
 
+ERROR: not-spilled-error vreg ;
+
+: vreg>spill-slot ( vreg -- spill-slot )
+    dup vreg>reg dup spill-slot? [ nip ] [ drop leader not-spilled-error ] if ;
+
 : vregs>regs ( vregs -- assoc )
     [ f ] [ [ dup vreg>reg ] H{ } map>assoc ] if-empty ;
 
@@ -144,7 +149,7 @@ M: vreg-insn assign-registers-in-insn
 
 M: gc-map-insn assign-registers-in-insn
     [ [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ]
-    [ gc-map>> [ [ vreg>reg ] map ] change-gc-roots drop ]
+    [ gc-map>> [ [ vreg>spill-slot ] map ] change-gc-roots drop ]
     bi ;
 
 M: insn assign-registers-in-insn drop ;
