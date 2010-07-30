@@ -6,6 +6,7 @@ alien.private alien.c-types fry quotations strings
 stack-checker.backend stack-checker.errors stack-checker.visitor
 stack-checker.dependencies stack-checker.state
 compiler.utilities effects ;
+FROM: kernel.private => declare ;
 IN: stack-checker.alien
 
 TUPLE: alien-node-params
@@ -113,13 +114,16 @@ TUPLE: alien-callback-params < alien-node-params xt ;
 : callback-return-quot ( ctype -- quot )
     return>> [ [ ] ] [ c-type c-type-unboxer-quot ] if-void ;
 
-: callback-prep-quot ( params -- quot )
-    parameters>> [ c-type c-type-boxer-quot ] map spread>quot ;
+: callback-parameter-quot ( params -- quot )
+    parameters>> [ c-type ] map
+    [ [ c-type-class ] map '[ _ declare ] ]
+    [ [ c-type-boxer-quot ] map spread>quot ]
+    bi append ;
 
 GENERIC: wrap-callback-quot ( params quot -- quot' )
 
 M: callable wrap-callback-quot
-    swap [ callback-prep-quot ] [ callback-return-quot ] bi surround
+    swap [ callback-parameter-quot ] [ callback-return-quot ] bi surround
     yield-hook get
     '[ _ _ do-callback ]
     >quotation ;
