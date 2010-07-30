@@ -526,3 +526,18 @@ USING: alien alien.c-types ;
     [ int { } cdecl [ 2 2 + ] alien-callback ]
     { + } inlined?
 ] unit-test
+
+[ t ] [
+    [ double { double double } cdecl [ + ] alien-callback ]
+    \ + inlined?
+] unit-test
+
+[ f ] [
+    [ double { double double } cdecl [ + ] alien-callback ]
+    \ float+ inlined?
+] unit-test
+
+[ f ] [
+    [ char { char char } cdecl [ + ] alien-callback ]
+    \ fixnum+fast inlined?
+] unit-test
