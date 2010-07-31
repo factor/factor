@@ -349,8 +349,4 @@ M: ftp-server handle-client* ( server -- )
 : ftpd ( directory port -- )
     <ftp-server> start-server ;
 
-: ftpd-main ( path -- ) 2100 ftpd ;
-
-MAIN: ftpd-main
-
 ! sudo tcpdump -i en1 -A -s 10000  tcp port 21
