@@ -1,6 +1,6 @@
 ;;; fuel-listener.el --- starting the fuel listener
 
-;; Copyright (C) 2008, 2009  Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009, 2010  Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -69,6 +69,11 @@ buffer."
   :type 'integer
   :group 'fuel-listener)
 
+(defcustom fuel-listener-prompt-read-only-p t
+  "Whether listener's prompt should be read-only."
+  :type 'boolean
+  :group 'fuel-listener)
+
 
 ;;; Listener history:
 
@@ -82,11 +87,14 @@ buffer."
           (insert "Press C-cz to bring me back.\n" ))))))
 
 (defun fuel-listener--history-setup ()
-  (set (make-local-variable 'comint-input-ring-file-name) fuel-listener-history-filename)
-  (set (make-local-variable 'comint-input-ring-size) fuel-listener-history-size)
+  (set (make-local-variable 'comint-input-ring-file-name)
+       fuel-listener-history-filename)
+  (set (make-local-variable 'comint-input-ring-size)
+       fuel-listener-history-size)
   (add-hook 'kill-buffer-hook 'comint-write-input-ring nil t)
   (comint-read-input-ring t)
-  (set-process-sentinel (get-buffer-process (current-buffer)) 'fuel-listener--sentinel))
+  (set-process-sentinel (get-buffer-process (current-buffer))
+                        'fuel-listener--sentinel))
 
 
 ;;; Fuel listener buffer/process:
@@ -236,7 +244,8 @@ the vocabulary name."
 \\{fuel-listener-mode-map}"
   (set (make-local-variable 'comint-prompt-regexp) fuel-con--prompt-regex)
   (set (make-local-variable 'comint-use-prompt-regexp) t)
-  (set (make-local-variable 'comint-prompt-read-only) t)
+  (set (make-local-variable 'comint-prompt-read-only)
+       fuel-listener-prompt-read-only-p)
   (fuel-listener--setup-completion)
   (fuel-listener--setup-stack-mode))
 
