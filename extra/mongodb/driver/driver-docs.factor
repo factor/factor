@@ -81,13 +81,13 @@ HELP: create-collection
 
 HELP: delete
 { $values
-  { "delete-msg" "a delete msg" }
+  { "mdb-delete-msg" "a delete msg" }
 }
 { $description "removes objects from the collection (with lasterror check)" } ;
 
 HELP: delete-unsafe
 { $values
-  { "delete-msg" "a delete msg" }
+  { "mdb-delete-msg" "a delete msg" }
 }
 { $description "removes objects from the collection (without error check)" } ;
 
