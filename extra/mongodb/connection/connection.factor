@@ -2,7 +2,7 @@ USING: accessors arrays assocs byte-vectors checksums
 checksums.md5 constructors continuations destructors fry
 hashtables io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.streams.duplex kernel locals
-math math.parser mongodb.cmd mongodb.msg mongodb.operations
+math math.parser mongodb.cmd mongodb.msg
 namespaces sequences splitting ;
 IN: mongodb.connection
 
