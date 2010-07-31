@@ -81,15 +81,13 @@ HELP: create-collection
 
 HELP: delete
 { $values
-  { "collection" "a collection" }
-  { "selector" "assoc which identifies the objects to be removed from the collection" }
+  { "delete-msg" "a delete msg" }
 }
 { $description "removes objects from the collection (with lasterror check)" } ;
 
 HELP: delete-unsafe
 { $values
-  { "collection" "a collection" }
-  { "selector" "assoc which identifies the objects to be removed from the collection" }
+  { "delete-msg" "a delete msg" }
 }
 { $description "removes objects from the collection (without error check)" } ;
 

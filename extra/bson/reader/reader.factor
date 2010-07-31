@@ -15,6 +15,8 @@ SYMBOL: state
 
 DEFER: stream>assoc
 
+ERROR: unknown-bson-type type msg ;
+
 <PRIVATE
 
 DEFER: read-elements
@@ -59,8 +61,10 @@ DEFER: read-elements
         { T_Binary_Default [ read ] }
         { T_Binary_Bytes_Deprecated [ drop read-int32 read ] }
         { T_Binary_Custom [ read bytes>object ] }
-        { T_Binary_Function [ read ] }
-        [ drop read >string ]
+        { T_Binary_Function [ read-sized-string ] }
+        { T_Binary_MD5 [ read >string ] }
+        { T_Binary_UUID [ read >string ] }
+        [ "unknown binary sub-type" unknown-bson-type ]
    } case ; inline
 
 TYPED: bson-regexp-read ( -- mdbregexp: mdbregexp )
@@ -90,6 +94,7 @@ TYPED: element-data-read ( type: integer -- object )
         { T_Code        [ read-int32 read-sized-string ] }
         { T_ScopedCode  [ read-int32 drop read-cstring H{ } clone stream>assoc <mongo-scoped-code> ] }
         { T_NULL        [ f ] }
+        [ "type unknown" unknown-bson-type ]
     } case ; inline recursive
 
 TYPED: (read-object) ( type: integer name: string -- )
