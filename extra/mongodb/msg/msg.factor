@@ -44,6 +44,7 @@ TUPLE: mdb-update-msg < mdb-msg
 
 TUPLE: mdb-delete-msg < mdb-msg
     { collection string }
+    { delete-flags integer initial: 0 }
     { selector assoc } ;
 
 TUPLE: mdb-getmore-msg < mdb-msg
