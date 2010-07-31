@@ -120,7 +120,7 @@ PRIVATE>
         { 
             [ flags>> write-int32 ]
             [ collection>> write-cstring ]
-            [ upsert?>> write-int32 ]
+            [ update-flags>> write-int32 ]
             [ selector>> assoc>stream ]
             [ object>> assoc>stream ]
         } cleave
