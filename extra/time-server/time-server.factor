@@ -13,7 +13,7 @@ IN: time-server
         1234 >>insecure
         [ handle-time-client ] >>handler ;
 
-: start-time-server ( -- threaded-server )
-    <time-server> [ start-server ] in-thread ;
+: start-time-server ( -- )
+    <time-server> start-server ;
 
 MAIN: start-time-server
