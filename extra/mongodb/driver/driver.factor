@@ -5,6 +5,7 @@ mongodb.cmd mongodb.connection mongodb.msg namespaces parser
 prettyprint prettyprint.custom prettyprint.sections sequences
 sets splitting strings ;
 FROM: ascii => ascii? ;
+FROM: math.bitwise => set-bit ;
 IN: mongodb.driver
 
 TUPLE: mdb-pool < pool mdb ;
@@ -278,7 +279,10 @@ PRIVATE>
     [ check-collection ] 2dip <mdb-update-msg> ;
 
 : >upsert ( mdb-update-msg -- mdb-update-msg )
-    1 >>upsert? ; 
+    [ 0 set-bit ] change-update-flags ;
+
+: >multi ( mdb-update-msg -- mdb-update-msg )
+    [ 1 set-bit ] change-update-flags ;
 
 : update ( mdb-update-msg -- )
     send-message-check-error ;

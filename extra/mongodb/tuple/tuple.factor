@@ -7,8 +7,6 @@ FROM: mongodb.tuple.persistent => assoc>tuple ;
 
 IN: mongodb.tuple
 
-SINGLETONS: +fieldindex+ +compoundindex+ +deepindex+ +unique+ ;
-
 SYNTAX: MDBTUPLE:
     parse-tuple-definition
     mdb-check-slots
