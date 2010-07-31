@@ -185,6 +185,15 @@ PRIVATE>
 : <query> ( collection assoc -- mdb-query-msg )
     <mdb-query-msg> ; inline
 
+: >slave-ok ( mdb-query-msg -- mdb-query-msg )
+    [ 2 set-bit ] change-flags ;
+
+: >await-data ( mdb-query-msg -- mdb-query-msg )
+    [ 5 set-bit ] change-flags ;
+
+: >tailable ( mdb-query-msg -- mdb-query-msg )
+    [ 1 set-bit ] change-flags ;
+
 : limit ( mdb-query-msg limit# -- mdb-query-msg )
     >>return# ; inline
 
@@ -299,13 +308,17 @@ PRIVATE>
 : run-cmd ( cmd -- result )
     send-cmd ; inline
 
-: delete ( collection selector -- )
-    [ check-collection ] dip
-    <mdb-delete-msg> send-message-check-error ;
+: <delete> ( collection selector -- mdb-delete-msg )
+    [ check-collection ] dip <mdb-delete-msg> ;
 
-: delete-unsafe ( collection selector -- )
-    [ check-collection ] dip
-    <mdb-delete-msg> send-message ;
+: >single-remove ( mdb-delete-msg -- mdb-delete-msg )
+    [ 0 set-bit ] change-delete-flags ;
+
+: delete ( mdb-delete-msg -- )
+    send-message-check-error ;
+
+: delete-unsafe ( mdb-delete-msg -- )
+    send-message ;
 
 : kill-cursor ( mdb-cursor -- )
     id>> <mdb-killcursors-msg> send-message ;
