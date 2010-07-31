@@ -1,9 +1,9 @@
 USING: accessors arrays assocs byte-vectors checksums
-checksums.md5 constructors destructors fry hashtables
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.sockets io.streams.duplex kernel locals math math.parser
-mongodb.cmd mongodb.msg namespaces sequences
-splitting ;
+checksums.md5 constructors continuations destructors fry
+hashtables io.encodings.binary io.encodings.string
+io.encodings.utf8 io.sockets io.streams.duplex kernel locals
+math math.parser mongodb.cmd mongodb.msg mongodb.operations
+namespaces sequences splitting ;
 IN: mongodb.connection
 
 : md5-checksum ( string -- digest )
@@ -101,9 +101,9 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
    ] with-connection ; inline
 
 : open-connection ( mdb-connection node -- mdb-connection )
-   [ >>node ] [ address>> ] bi
-   [ >>remote ] keep binary <client>
-   [ >>handle ] dip >>local 4096 <byte-vector> >>buffer ;
+    [ >>node ] [ address>> ] bi
+    [ >>remote ] keep binary <client>
+    [ >>handle ] dip >>local 4096 <byte-vector> >>buffer ;
 
 : get-ismaster ( -- result )
     "admin.$cmd" H{ { "ismaster" 1 } } send-query-1result ; 
@@ -119,8 +119,8 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
 
 : check-node ( mdb node --  )
    [ <mdb-connection> &dispose ] dip
-   [ open-connection ] keep swap
-   [ get-ismaster eval-ismaster-result ] with-connection ;
+   [ [ open-connection ] [ 3drop f ] recover ] keep swap
+   [ [ get-ismaster eval-ismaster-result ] with-connection ] [ drop ] if* ;
 
 : nodelist>table ( seq -- assoc )
    [ [ master?>> ] keep 2array ] map >hashtable ;
@@ -134,19 +134,21 @@ PRIVATE>
         mdb node1 remote>>
         [ [ check-node ] keep ]
         [ drop f ] if*  :> node2
-
         node1 [ acc push ] when*
         node2 [ acc push ] when*
         mdb acc nodelist>table >>nodes drop 
-    ] with-destructors ; 
+    ] with-destructors ;
+
+ERROR: mongod-connection-error address message ;
               
 : mdb-open ( mdb -- mdb-connection )
-    clone [ <mdb-connection> ] keep
-    master-node open-connection
-    [ authenticate-connection ] keep ; 
+    clone [ verify-nodes ] [ <mdb-connection> ] [ ] tri
+    master-node [
+        open-connection [ authenticate-connection ] keep
+    ] [ drop nip address>> "Could not open connection to mongod" mongod-connection-error ] recover ;
 
 : mdb-close ( mdb-connection -- )
-     [ dispose f ] change-handle drop ;
+     [ [ dispose ] when* f ] change-handle drop ;
 
 M: mdb-connection dispose
      mdb-close ;
