@@ -243,7 +243,7 @@ the vocabulary name."
   "Major mode for interacting with an inferior Factor listener process.
 \\{fuel-listener-mode-map}"
   (set (make-local-variable 'comint-prompt-regexp) fuel-con--prompt-regex)
-  (set (make-local-variable 'comint-use-prompt-regexp) t)
+  (set (make-local-variable 'comint-use-prompt-regexp) nil)
   (set (make-local-variable 'comint-prompt-read-only)
        fuel-listener-prompt-read-only-p)
   (fuel-listener--setup-completion)
@@ -261,7 +261,8 @@ the vocabulary name."
 (define-key fuel-listener-mode-map "\C-cv" 'fuel-edit-vocabulary)
 (define-key fuel-listener-mode-map "\C-c\C-v" 'fuel-edit-vocabulary)
 (define-key fuel-listener-mode-map "\C-ck" 'fuel-run-file)
-(define-key fuel-listener-mode-map (kbd "TAB") 'fuel-completion--complete-symbol)
+(define-key fuel-listener-mode-map (kbd "TAB")
+  'fuel-completion--complete-symbol)
 
 
 (provide 'fuel-listener)
