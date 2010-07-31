@@ -38,7 +38,7 @@ TUPLE: mdb-insert-msg < mdb-msg
 
 TUPLE: mdb-update-msg < mdb-msg
     { collection string }
-    { upsert? integer initial: 0 }
+    { update-flags integer initial: 0 }
     { selector assoc }
     { object assoc } ;
 
