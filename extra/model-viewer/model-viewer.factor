@@ -88,12 +88,18 @@ TUPLE: vbo
     index-buffer index-count vertex-format texture bump ka ;
 
 : white-image ( -- image )
-    { 1 1 } BGR ubyte-components f
-    B{ 255 255 255 } image boa ;
+    <image>
+        { 1 1 } >>dim
+        BGR >>component-order
+        ubyte-components >>component-type
+        B{ 255 255 255 } >>bitmap ;
 
 : up-image ( -- image )
-    { 1 1 } BGR ubyte-components f
-    B{ 0 0 0 } image boa ;
+    <image>
+        { 1 1 } >>dim
+        BGR >>component-order
+        ubyte-components >>component-type
+        B{ 0 0 0 } >>bitmap ;
         
 : make-texture ( pathname alt -- texture )
     swap [ nip load-image ] [ ] if*
