@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <wchar.h>
 
 /* C++ headers */
 #include <algorithm>
@@ -27,6 +28,7 @@
 #include <set>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 
 #define FACTOR_STRINGIZE(x) #x
 

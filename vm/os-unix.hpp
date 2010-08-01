@@ -27,8 +27,6 @@ typedef char symbol_char;
 #define FTELL ftello
 #define FSEEK fseeko
 
-#define CELL_HEX_FORMAT "%lx"
-
 #define OPEN_READ(path) fopen(path,"rb")
 #define OPEN_WRITE(path) fopen(path,"wb")
 

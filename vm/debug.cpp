@@ -377,9 +377,10 @@ void factor_vm::factorbug()
 		char cmd[1024];
 
 		std::cout << "READY\n";
-		fflush(stdout);
+		std::cout.flush();
 
-		if(scanf("%1000s",cmd) <= 0)
+		std::cin >> std::setw(1024) >> cmd >> std::setw(0); 
+		if(!std::cin.good())
 		{
 			if(!seen_command)
 			{
@@ -402,7 +403,10 @@ void factor_vm::factorbug()
 		if(strcmp(cmd,"d") == 0)
 		{
 			cell addr = read_cell_hex();
-			if(scanf(" ") < 0) break;
+			if (std::cin.peek() == ' ')
+				std::cin.ignore();
+
+			if(!std::cin.good()) break;
 			cell count = read_cell_hex();
 			dump_memory(addr,addr+count);
 		}
