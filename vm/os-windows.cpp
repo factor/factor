@@ -58,7 +58,7 @@ BOOL factor_vm::windows_stat(vm_char *path)
 void factor_vm::windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length)
 {
 	wcsncpy(temp_path, full_path, length - 1);
-        unsigned full_path_len = wcslen(full_path);
+        size_t full_path_len = wcslen(full_path);
 	if (full_path_len < length - 1)
 		wcsncat(temp_path, L".image", length - full_path_len - 1);
 	temp_path[length - 1] = 0;
@@ -78,8 +78,8 @@ const vm_char *factor_vm::default_image_path()
 		*ptr = 0;
 
 	wcsncpy(temp_path, full_path, MAX_UNICODE_PATH - 1);
-        unsigned full_path_len = wcslen(full_path);
-	if (full_path_len < length - 1)
+        size_t full_path_len = wcslen(full_path);
+	if (full_path_len < MAX_UNICODE_PATH - 1)
 		wcsncat(temp_path, L".image", MAX_UNICODE_PATH - full_path_len - 1);
 	temp_path[MAX_UNICODE_PATH - 1] = 0;
 
