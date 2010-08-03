@@ -230,9 +230,6 @@ IN: bootstrap.x86
 : jit-switch-context ( reg -- )
     -8 jit-scrub-return
 
-    ! Save ds, rs registers
-    jit-save-context
-
     ! Make the new context the current one
     ctx-reg swap MOV
     vm-reg vm-context-offset [+] ctx-reg MOV
@@ -257,6 +254,7 @@ IN: bootstrap.x86
 
 : jit-set-context ( -- )
     jit-pop-context-and-param
+    jit-save-context
     arg1 jit-switch-context
     RSP 8 ADD
     jit-push-param ;
@@ -269,17 +267,17 @@ IN: bootstrap.x86
     ds-reg 16 SUB ;
 
 : jit-start-context ( -- )
-    ! Create the new context in return-reg
+    ! Create the new context in return-reg. Have to save context
+    ! twice, first before calling new_context() which may GC,
+    ! and again after popping the two parameters from the stack.
     jit-save-context
     arg1 vm-reg MOV
     "new_context" jit-call
 
     jit-pop-quot-and-param
-
+    jit-save-context
     return-reg jit-switch-context
-
     jit-push-param
-
     jit-jump-quot ;
 
 [ jit-start-context ] \ (start-context) define-sub-primitive
@@ -295,7 +293,17 @@ IN: bootstrap.x86
     jit-set-context
 ] \ (set-context-and-delete) define-sub-primitive
 
+: jit-start-context-and-delete ( -- )
+    jit-load-context
+    arg1 vm-reg MOV
+    arg2 ctx-reg MOV
+    "reset_context" jit-call
+
+    jit-pop-quot-and-param
+    ctx-reg jit-switch-context
+    jit-push-param
+    jit-jump-quot ;
+
 [
-    jit-delete-current-context
-    jit-start-context
+    jit-start-context-and-delete
 ] \ (start-context-and-delete) define-sub-primitive

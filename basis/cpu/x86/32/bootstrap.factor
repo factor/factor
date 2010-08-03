@@ -335,7 +335,18 @@ IN: bootstrap.x86
     jit-set-context
 ] \ (set-context-and-delete) define-sub-primitive
 
+: jit-start-context-and-delete ( -- )
+    jit-load-vm
+    jit-load-context
+    ESP [] vm-reg MOV
+    ESP 4 [+] ctx-reg MOV
+    "reset_context" jit-call
+
+    jit-pop-quot-and-param
+    ctx-reg jit-switch-context
+    jit-push-param
+    jit-jump-quot ;
+
 [
-    jit-delete-current-context
-    jit-start-context
+    jit-start-context-and-delete
 ] \ (start-context-and-delete) define-sub-primitive
