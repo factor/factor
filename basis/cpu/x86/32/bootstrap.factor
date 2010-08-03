@@ -292,6 +292,15 @@ IN: bootstrap.x86
 
 [ jit-set-context ] \ (set-context) define-sub-primitive
 
+: jit-save-quot-and-param ( -- )
+    EDX ds-reg MOV
+    ds-reg 8 SUB ;
+
+: jit-push-param ( -- )
+    EAX EDX -4 [+] MOV
+    ds-reg 4 ADD
+    ds-reg [] EAX MOV ;
+
 : jit-start-context ( -- )
     ! Create the new context in return-reg
     jit-load-vm
@@ -299,17 +308,12 @@ IN: bootstrap.x86
     ESP [] vm-reg MOV
     "new_context" jit-call
 
-    ! Save pointer to quotation and parameter
-    EDX ds-reg MOV
-    ds-reg 8 SUB
+    jit-save-quot-and-param
 
     ! Make the new context active
     EAX jit-switch-context
 
-    ! Push parameter
-    EAX EDX -4 [+] MOV
-    ds-reg 4 ADD
-    ds-reg [] EAX MOV
+    jit-push-param
 
     ! Windows-specific setup
     jit-install-seh
@@ -342,9 +346,11 @@ IN: bootstrap.x86
     ESP 4 [+] ctx-reg MOV
     "reset_context" jit-call
 
-    jit-pop-quot-and-param
+    jit-save-quot-and-param
     ctx-reg jit-switch-context
     jit-push-param
+
+    EAX EDX [] MOV
     jit-jump-quot ;
 
 [
