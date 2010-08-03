@@ -166,8 +166,8 @@ M: bad-developer-name summary
     "    " write ; inline
 
 : ?print-nl ( seq1 seq2 -- )
-    { [ nip empty? ] [ drop empty? ] } 2|| not
-    [ nl ] when ;
+    [ empty? ] either? [ nl ] unless ;
+
 : $values. ( word -- )
     "declared-effect" word-prop [
         [ in>> ] [ out>> ] bi
