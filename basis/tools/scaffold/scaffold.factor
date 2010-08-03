@@ -7,6 +7,7 @@ math.parser io.streams.string ui.tools.operations quotations
 strings arrays prettyprint words vocabs sorting sets classes
 math alien urls splitting ascii combinators.short-circuit timers
 words.symbol system summary ;
+FROM: sets => members ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -164,15 +165,20 @@ M: bad-developer-name summary
 : 4bl ( -- )
     "    " write ; inline
 
+: ?print-nl ( seq1 seq2 -- )
+    { [ nip empty? ] [ drop empty? ] } 2|| not
+    [ nl ] when ;
 : $values. ( word -- )
     "declared-effect" word-prop [
         [ in>> ] [ out>> ] bi
         2dup [ empty? ] bi@ and [
             2drop
         ] [
+            [ members ] dip over diff
             "{ $values" print
-            [ 4bl ($values.) ]
-            [ [ nl 4bl ($values.) ] unless-empty ] bi*
+            [ drop 4bl ($values.) ]
+            [ ?print-nl ]
+            [ nip 4bl ($values.) ] 2tri
             nl "}" print
         ] if
     ] when* ;
