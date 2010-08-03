@@ -166,6 +166,12 @@ VM_C_API void delete_context(factor_vm *parent, context *old_context)
 	parent->delete_context(old_context);
 }
 
+VM_C_API void reset_context(factor_vm *parent, context *ctx)
+{
+	ctx->reset();
+	parent->init_context(ctx);
+}
+
 cell factor_vm::begin_callback(cell quot_)
 {
 	data_root<object> quot(quot_,this);
