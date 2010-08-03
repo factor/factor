@@ -219,7 +219,4 @@ clean:
 	rm -f libfactor-ffi-test.*
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
-tags:
-	etags vm/*.{cpp,hpp,mm,S,c}
-
 .PHONY: factor factor-lib factor-console factor-ffi-test tags clean macosx.app
