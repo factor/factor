@@ -106,8 +106,6 @@ SYMBOL: dpi
     swap cache-font-description pango_layout_set_font_description ;
 
 : set-layout-text ( str layout -- )
-    #! Replace nulls with something else since Pango uses null-terminated
-    #! strings
     swap -1 pango_layout_set_text ;
 
 : layout-extents ( layout -- ink-rect logical-rect )
