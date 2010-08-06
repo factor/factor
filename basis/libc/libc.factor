@@ -97,8 +97,7 @@ FUNCTION: void memcpy ( void* dst, void* src, ulong size ) ;
 
 FUNCTION: int memcmp ( void* a, void* b, ulong size ) ;
 
-: memory= ( a b size -- ? )
-    memcmp 0 = ;
+: memory= ( a b size -- ? ) memcmp 0 = ; inline
 
 FUNCTION: size_t strlen ( c-string alien ) ;
 
