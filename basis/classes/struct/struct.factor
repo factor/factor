@@ -48,13 +48,18 @@ M: struct >c-ptr
     2 slot { c-ptr } declare ; inline
 
 M: struct equal?
-    {
-        [ [ class ] bi@ = ]
-        [ [ >c-ptr ] [ binary-object ] bi* memory= ]
-    } 2&& ; inline
+    over struct? [
+        2dup [ class ] bi@ = [
+            2dup [ >c-ptr ] both?
+            [ [ >c-ptr ] [ binary-object ] bi* memory= ]
+            [ [ >c-ptr not ] both? ]
+            if
+        ] [ 2drop f ] if
+    ] [ 2drop f ] if ; inline
 
 M: struct hashcode*
-    binary-object <direct-uchar-array> hashcode* ; inline
+    binary-object over
+    [ <direct-uchar-array> hashcode* ] [ 3drop 0 ] if ; inline
 
 : struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
 
