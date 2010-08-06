@@ -1,5 +1,5 @@
 USING: tuple-arrays sequences tools.test namespaces kernel
-math accessors classes.tuple eval ;
+math accessors classes.tuple eval classes.struct ;
 IN: tuple-arrays.tests
 
 SYMBOL: mat
@@ -42,3 +42,30 @@ TUPLE: non-final x ;
 [ "IN: tuple-arrays.tests USE: tuple-arrays TUPLE-ARRAY: non-final" eval( -- ) ]
 [ error>> not-final? ]
 must-fail-with
+
+! Empty tuple
+TUPLE: empty-tuple ; final
+
+TUPLE-ARRAY: empty-tuple
+
+[ 100 ] [ 100 <empty-tuple-array> length ] unit-test
+[ T{ empty-tuple } ] [ 100 <empty-tuple-array> first ] unit-test
+[ ] [ T{ empty-tuple } 100 <empty-tuple-array> set-first ] unit-test
+
+! Changing a tuple into a struct shouldn't break the tuple array to the point
+! of crashing Factor
+TUPLE: tuple-to-struct x ; final
+
+TUPLE-ARRAY: tuple-to-struct
+
+[ f ] [ tuple-to-struct struct-class? ] unit-test
+
+! This shouldn't crash
+[ ] [
+    "IN: tuple-arrays.tests
+    USING: alien.c-types classes.struct ;
+    STRUCT: tuple-to-struct { x int } ;"
+    eval( -- )
+] unit-test
+
+[ t ] [ tuple-to-struct struct-class? ] unit-test
