@@ -245,6 +245,8 @@ STRUCT: struct-test-equality-1
 STRUCT: struct-test-equality-2
     { y int } ;
 
+[ 0 ] [ struct-test-equality-1 new hashcode ] unit-test
+
 [ t ] [
     [
         struct-test-equality-1 <struct> 5 >>x
