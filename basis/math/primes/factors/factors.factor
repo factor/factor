@@ -47,8 +47,10 @@ PRIVATE>
     dup 1 = [
         1array
     ] [
-        group-factors [ first2 [0,b] [ ^ ] with map ] map
-        [ product ] product-map natural-sort
+        group-factors dup empty? [
+            [ first2 [0,b] [ ^ ] with map ] map
+            [ product ] product-map natural-sort
+        ] unless
     ] if ;
 
 : unix-factor ( string -- )
