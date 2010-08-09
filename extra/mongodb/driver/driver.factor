@@ -225,6 +225,15 @@ M: mdb-query-msg find
 M: mdb-cursor find
     get-more ;
 
+: each-chunk ( selector quot: ( seq -- ) -- )
+    swap find
+    [ pick call( seq -- ) ] when*
+    [ swap each-chunk ] [ drop ] if* ;
+
+: find-all ( selector -- seq )
+    [ V{ } clone ] dip
+    over '[ _ push-all ] each-chunk >array ;
+
 : explain. ( mdb-query-msg -- )
     t >>explain find nip . ;
 
