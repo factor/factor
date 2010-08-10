@@ -98,9 +98,11 @@ SYNTAX: r/ ( token -- mdbregexp )
     [ <mdb-pool> ] dip
     [ mdb-pool swap with-variable ] curry with-disposal ; inline
 
-: with-mdb-connection ( quot -- )
-    [ mdb-pool get ] dip 
+: with-mdb-pool ( ..a mdb-pool quot -- ..b )
     '[ _ with-connection ] with-pooled-connection ; inline
+
+: with-mdb-connection ( quot -- )
+    [ mdb-pool get ] dip with-mdb-pool ; inline
 
 : >id-selector ( assoc -- selector )
     [ MDB_OID_FIELD swap at ] keep
