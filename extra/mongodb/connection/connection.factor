@@ -2,7 +2,7 @@ USING: accessors arrays assocs byte-vectors checksums
 checksums.md5 constructors continuations destructors fry
 hashtables io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.streams.duplex kernel locals
-math math.parser mongodb.cmd mongodb.msg
+math math.parser mongodb.cmd mongodb.msg strings
 namespaces sequences splitting ;
 IN: mongodb.connection
 
@@ -112,10 +112,13 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
    ":" split [ first ] [ second string>number ] bi ; inline
 
 : eval-ismaster-result ( node result -- )
-   [ [ "ismaster" ] dip at >integer 1 = >>master? drop ]
-   [ [ "remote" ] dip at
-     [ split-host-str <inet> f <mdb-node> >>remote ] when*
-     drop ] 2bi ;
+   [
+        [ "ismaster" ] dip at dup string?
+        [ >integer 1 = ] [ ] if >>master? drop
+   ] [
+        [ "remote" ] dip at
+        [ split-host-str <inet> f <mdb-node> >>remote ] when* drop
+    ] 2bi ;
 
 : check-node ( mdb node --  )
    [ <mdb-connection> &dispose ] dip
