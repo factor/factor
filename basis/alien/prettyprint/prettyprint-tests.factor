@@ -25,6 +25,23 @@ FUNCTION-ALIAS: function-test int function_test
     [ \ function-test see ] with-string-writer
 ] unit-test
 
+TYPEDEF: c-string[ascii] string-typedef
+TYPEDEF: char[1][2][3] array-typedef
+
+[ "USING: alien.c-types alien.syntax ;
+IN: alien.prettyprint.tests
+TYPEDEF: c-string[ascii] string-typedef
+" ] [
+    [ \ string-typedef see ] with-string-writer
+] unit-test
+
+[ "USING: alien.c-types alien.syntax ;
+IN: alien.prettyprint.tests
+TYPEDEF: char[1][2][3] array-typedef
+" ] [
+    [ \ array-typedef see ] with-string-writer
+] unit-test
+
 C-TYPE: opaque-c-type
 
 [ "USING: alien.syntax ;
