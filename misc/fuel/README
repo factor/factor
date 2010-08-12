@@ -96,67 +96,67 @@ beast.
     Commands in parenthesis can be invoked interactively with
     M-x <command>, not necessarily in a factor buffer.
 
-    |-----------------+------------------------------------------------------------|
-    | C-cz            | switch to listener (run-factor)                            |
-    | C-co            | cycle between code, tests and docs files                   |
-    | C-ct            | run the unit tests for a vocabulary                        |
-    | C-cr            | switch to listener and refresh all loaded vocabs           |
-    | C-cs            | switch to other factor buffer (fuel-switch-to-buffer)      |
-    | C-x4s           | switch to other factor buffer in other window              |
-    | C-x5s           | switch to other factor buffer in other frame               |
-    |-----------------+------------------------------------------------------------|
-    | M-.             | edit word at point in Emacs (fuel-edit-word)               |
-    | M-,             | go back to where M-. was last invoked                      |
-    | M-TAB           | complete word at point                                     |
-    | C-cC-eu         | update USING: line (fuel-update-usings)                    |
-    | C-cC-ev         | edit vocabulary (fuel-edit-vocabulary)                     |
-    | C-cC-ew         | edit word (fuel-edit-word-at-point)                        |
-    | C-cC-ed         | edit word's doc (C-u M-x fuel-edit-word-doc-at-point)      |
-    | C-cC-el         | load vocabs in USING: form                                 |
-    |-----------------+------------------------------------------------------------|
-    | C-cC-er         | eval region                                                |
-    | C-M-r, C-cC-ee  | eval region, extending it to definition boundaries         |
-    | C-M-x, C-cC-ex  | eval definition around point                               |
-    | C-ck, C-cC-ek   | run file (fuel-run-file)                                   |
-    |-----------------+------------------------------------------------------------|
-    | C-cC-da         | toggle autodoc mode (fuel-autodoc-mode)                    |
-    | C-cC-dd         | help for word at point (fuel-help)                         |
-    | C-cC-ds         | short help word at point (fuel-help-short)                 |
-    | C-cC-de         | show stack effect of current sexp (with prefix, region)    |
-    | C-cC-dp         | find words containing given substring (fuel-apropos)       |
-    | C-cC-dv         | show words in current file (with prefix, ask for vocab)    |
-    |-----------------+------------------------------------------------------------|
-    | C-cM-<, C-cC-d< | show callers of word or vocabulary at point                |
-    |                 | (fuel-show-callers, fuel-vocab-usage)                      |
-    | C-cM->, C-cC-d> | show callees of word or vocabulary at point                |
-    |                 | (fuel-show-callees, fuel-vocab-uses)                       |
-    |-----------------+------------------------------------------------------------|
-    | C-cC-xs         | extract innermost sexp (up to point) as a separate word    |
-    |                 | (fuel-refactor-extract-sexp)                               |
-    | C-cC-xr         | extract region as a separate word                          |
-    |                 | (fuel-refactor-extract-region)                             |
-    | C-cC-xv         | extract region as a separate vocabulary                    |
-    |                 | (fuel-refactor-extract-vocab)                              |
-    | C-cC-xi         | replace word by its definition (fuel-refactor-inline-word) |
-    | C-cC-xw         | rename all uses of a word (fuel-refactor-rename-word)      |
-    | C-cC-xa         | extract region as a separate ARTICLE: form                 |
-    | C-cC-xg         | convert current word definition into GENERIC + method      |
-    |                 | (fuel-refactor-make-generic)                               |
-    |-----------------+------------------------------------------------------------|
+    |--------------------+------------------------------------------------------------|
+    | C-c C-z            | switch to listener (run-factor)                            |
+    | C-c C-o            | cycle between code, tests and docs files                   |
+    | C-c C-t            | run the unit tests for a vocabulary                        |
+    | C-c C-r            | switch to listener and refresh all loaded vocabs           |
+    | C-c C-s            | switch to other factor buffer (fuel-switch-to-buffer)      |
+    | C-x 4 s            | switch to other factor buffer in other window              |
+    | C-x 5 s            | switch to other factor buffer in other frame               |
+    |--------------------+------------------------------------------------------------|
+    | M-.                | edit word at point in Emacs (fuel-edit-word)               |
+    | M-,                | go back to where M-. was last invoked                      |
+    | M-TAB              | complete word at point                                     |
+    | C-c C-e u          | update USING: line (fuel-update-usings)                    |
+    | C-c C-e v          | edit vocabulary (fuel-edit-vocabulary)                     |
+    | C-c C-e w          | edit word (fuel-edit-word-at-point)                        |
+    | C-c C-e d          | edit word's doc (C-u M-x fuel-edit-word-doc-at-point)      |
+    | C-c C-e l          | load vocabs in USING: form                                 |
+    |--------------------+------------------------------------------------------------|
+    | C-c C-e r          | eval region                                                |
+    | C-M-r, C-c C-e e   | eval region, extending it to definition boundaries         |
+    | C-M-x, C-c C-e x   | eval definition around point                               |
+    | C-c C-k, C-c C-e k | run file (fuel-run-file)                                   |
+    |--------------------+------------------------------------------------------------|
+    | C-c C-d a          | toggle autodoc mode (fuel-autodoc-mode)                    |
+    | C-c C-d d          | help for word at point (fuel-help)                         |
+    | C-c C-d s          | short help word at point (fuel-help-short)                 |
+    | C-c C-d e          | show stack effect of current sexp (with prefix, region)    |
+    | C-c C-d p          | find words containing given substring (fuel-apropos)       |
+    | C-c C-d v          | show words in current file (with prefix, ask for vocab)    |
+    |--------------------+------------------------------------------------------------|
+    | C-c M-<, C-c C-d < | show callers of word or vocabulary at point                |
+    |                    | (fuel-show-callers, fuel-vocab-usage)                      |
+    | C-c M->, C-c C-d>  | show callees of word or vocabulary at point                |
+    |                    | (fuel-show-callees, fuel-vocab-uses)                       |
+    |--------------------+------------------------------------------------------------|
+    | C-c C-x s          | extract innermost sexp (up to point) as a separate word    |
+    |                    | (fuel-refactor-extract-sexp)                               |
+    | C-c C-x r          | extract region as a separate word                          |
+    |                    | (fuel-refactor-extract-region)                             |
+    | C-c C-x v          | extract region as a separate vocabulary                    |
+    |                    | (fuel-refactor-extract-vocab)                              |
+    | C-c C-x i          | replace word by its definition (fuel-refactor-inline-word) |
+    | C-c C-x w          | rename all uses of a word (fuel-refactor-rename-word)      |
+    | C-c C-x a          | extract region as a separate ARTICLE: form                 |
+    | C-c C-x g          | convert current word definition into GENERIC + method      |
+    |                    | (fuel-refactor-make-generic)                               |
+    |--------------------+------------------------------------------------------------|
 
 *** In the listener:
 
-    |------+----------------------------------------------------------|
-    | TAB  | complete word at point                                   |
-    | M-.  | edit word at point in Emacs                              |
-    | C-cr | refresh all loaded vocabs                                |
-    | C-ca | toggle autodoc mode                                      |
-    | C-cp | find words containing given substring (M-x fuel-apropos) |
-    | C-cs | toggle stack mode                                        |
-    | C-cv | edit vocabulary                                          |
-    | C-ch | help for word at point                                   |
-    | C-ck | run file                                                 |
-    |------+----------------------------------------------------------|
+    |---------+----------------------------------------------------------|
+    | TAB     | complete word at point                                   |
+    | M-.     | edit word at point in Emacs                              |
+    | C-c C-r | refresh all loaded vocabs                                |
+    | C-c C-a | toggle autodoc mode                                      |
+    | C-c C-p | find words containing given substring (M-x fuel-apropos) |
+    | C-c C-s | toggle stack mode                                        |
+    | C-c C-v | edit vocabulary                                          |
+    | C-c C-w | help for word at point                                   |
+    | C-c C-k | run file                                                 |
+    |---------+----------------------------------------------------------|
 
 *** In the debugger (it pops up upon eval/compilation errors):
 
@@ -174,9 +174,9 @@ beast.
     | v         | help for a vocabulary                                    |
     | a         | find words containing given substring (M-x fuel-apropos) |
     | e         | edit current article                                     |
-    | ba        | bookmark current page                                    |
-    | bb        | display bookmarks                                        |
-    | bd        | delete bookmark at point                                 |
+    | b a       | bookmark current page                                    |
+    | b b       | display bookmarks                                        |
+    | b d       | delete bookmark at point                                 |
     | n/p       | next/previous page                                       |
     | l         | previous page                                            |
     | SPC/S-SPC | scroll up/down                                           |
@@ -185,7 +185,7 @@ beast.
     | r         | refresh page                                             |
     | c         | clean browsing history                                   |
     | M-.       | edit word at point in Emacs                              |
-    | C-cz      | switch to listener                                       |
+    | C-c C-z   | switch to listener                                       |
     | q         | bury buffer                                              |
     |-----------+----------------------------------------------------------|
 
