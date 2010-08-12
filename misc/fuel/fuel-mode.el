@@ -1,6 +1,6 @@
 ;;; fuel-mode.el -- Minor mode enabling FUEL niceties
 
-;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -184,7 +184,6 @@ interacting with a factor listener is at your disposal.
 ;;; Keys:
 
 (defun fuel-mode--key-1 (k c)
-  (define-key fuel-mode-map (vector '(control ?c) k) c)
   (define-key fuel-mode-map (vector '(control ?c) `(control ,k))  c))
 
 (defun fuel-mode--key (p k c)

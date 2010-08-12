@@ -1,6 +1,6 @@
 ;;; fuel-help.el -- accessing Factor's help system
 
-;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -330,7 +330,6 @@ With prefix, the current page is deleted from history."
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)
     (define-key map "\M-." 'fuel-edit-word-at-point)
-    (define-key map "\C-cz" 'run-factor)
     (define-key map "\C-c\C-z" 'run-factor)
     map))
 
