@@ -1,5 +1,6 @@
 USING: alien.c-types alien.prettyprint alien.syntax
-io.streams.string see tools.test prettyprint ;
+io.streams.string see tools.test prettyprint
+io.encodings.ascii ;
 IN: alien.prettyprint.tests
 
 CONSTANT: FOO 10
