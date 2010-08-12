@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types classes.struct kernel memory
 system vm ;
-IN: benchmark.struct
+IN: tools.time.struct
 
 STRUCT: benchmark-data
     { time ulonglong }
