@@ -19,6 +19,7 @@
 (require 'fuel-eval)
 (require 'fuel-connection)
 (require 'fuel-syntax)
+(require 'fuel-menu)
 (require 'fuel-base)
 
 (require 'comint)
@@ -84,7 +85,7 @@ buffer."
         (comint-write-input-ring)
         (when (buffer-name (current-buffer))
           (insert "\nBye bye. It's been nice listening to you!\n")
-          (insert "Press C-cz to bring me back.\n" ))))))
+          (insert "Press C-c C-z to bring me back.\n" ))))))
 
 (defun fuel-listener--history-setup ()
   (set (make-local-variable 'comint-input-ring-file-name)
@@ -249,18 +250,24 @@ the vocabulary name."
   (fuel-listener--setup-completion)
   (fuel-listener--setup-stack-mode))
 
-(define-key fuel-listener-mode-map "\C-c\C-z" 'run-factor)
 (define-key fuel-listener-mode-map "\C-a" 'fuel-listener--bol)
-(define-key fuel-listener-mode-map "\C-c\C-a" 'fuel-autodoc-mode)
-(define-key fuel-listener-mode-map "\C-c\C-w" 'fuel-help)
-(define-key fuel-listener-mode-map "\C-c\C-r" 'fuel-refresh-all)
-(define-key fuel-listener-mode-map "\C-c\C-s" 'fuel-stack-mode)
-(define-key fuel-listener-mode-map "\C-c\C-p" 'fuel-apropos)
-(define-key fuel-listener-mode-map "\M-." 'fuel-edit-word-at-point)
-(define-key fuel-listener-mode-map "\C-c\C-v" 'fuel-edit-vocabulary)
-(define-key fuel-listener-mode-map "\C-c\C-k" 'fuel-run-file)
-(define-key fuel-listener-mode-map (kbd "TAB")
-  'fuel-completion--complete-symbol)
+
+(fuel-menu--defmenu listener fuel-listener-mode-map
+  ("Complete symbol" ((kbd "TAB") (kbd "M-TAB"))
+   fuel-completion--complete-symbol :enable (symbol-at-point))
+  ("Edit word definition" "\M-." fuel-edit-word-at-point
+   :enable (symbol-at-point))
+  ("Edit vocabulary" "\C-c\C-v" fuel-edit-vocabulary)
+  --
+  ("Word help" "\C-c\C-w" fuel-help)
+  ("Apropos" "\C-c\C-p" fuel-apropos)
+  (mode "Autodoc mode" "\C-c\C-a" fuel-autodoc-mode)
+  (mode "Show stack mode" "\C-c\C-s" fuel-stack-mode)
+  --
+  ("Run file" "\C-c\C-k" fuel-run-file)
+  ("Refresh vocabs" "\C-c\C-r" fuel-refresh-all))
+
+(define-key fuel-listener-mode-map [menu-bar completion] 'undefined)
 
 
 (provide 'fuel-listener)
