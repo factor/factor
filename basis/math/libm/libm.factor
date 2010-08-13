@@ -1,6 +1,6 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax ;
+USING: alien alien.c-types alien.syntax kernel words accessors ;
 IN: math.libm
 
 LIBRARY: libm
@@ -49,7 +49,19 @@ FUNCTION-ALIAS: fpow
 
 FUNCTION-ALIAS: fsqrt
     double sqrt ( double x ) ;
-    
+
+! fsqrt has an intrinsic so we don't actually want to inline it
+! unconditionally
+<<
+\ fsqrt f "inline" set-word-prop
+
+\ fsqrt [
+    drop
+    \ fsqrt "intrinsic" word-prop
+    f \ fsqrt def>> ?
+] "custom-inlining" set-word-prop
+>>
+
 ! Windows doesn't have these...
 FUNCTION-ALIAS: flog1+
     double log1p ( double x ) ;
