@@ -89,7 +89,7 @@ beast.
 * Quick key reference
 
   Triple chords ending in a single letter <x> accept also C-<x> (e.g.
-  C-cC-eC-r is the same as C-cC-er).
+  C-c C-e C-r is the same as C-c C-e r).
 
 *** In factor source files:
 
@@ -126,9 +126,9 @@ beast.
     | C-c C-d p          | find words containing given substring (fuel-apropos)       |
     | C-c C-d v          | show words in current file (with prefix, ask for vocab)    |
     |--------------------+------------------------------------------------------------|
-    | C-c M-<, C-c C-d < | show callers of word or vocabulary at point                |
+    | C-c M-<            | show callers of word or vocabulary at point                |
     |                    | (fuel-show-callers, fuel-vocab-usage)                      |
-    | C-c M->, C-c C-d>  | show callees of word or vocabulary at point                |
+    | C-c M->            | show callees of word or vocabulary at point                |
     |                    | (fuel-show-callees, fuel-vocab-uses)                       |
     |--------------------+------------------------------------------------------------|
     | C-c C-x s          | extract innermost sexp (up to point) as a separate word    |
