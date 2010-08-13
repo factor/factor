@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs binary-search fry kernel locals
-math math.order math.ranges namespaces sequences sequences.deep
-sorting ;
+math math.order math.ranges namespaces sequences sorting ;
 
 IN: math.combinatorics
 
@@ -133,10 +132,14 @@ PRIVATE>
 : all-subsets ( seq -- subsets )
     dup length [0,b] [ all-combinations ] with map concat ;
 
+<PRIVATE
+
 : (selections) ( seq n -- selections )
-    [ [ 1array ] map dup ] [ 1 - ] bi*
-    [ cartesian-product concat ] with times
-    [ flatten ] map ;
+    [ [ 1array ] map dup ] [ 1 - ] bi* [
+        cartesian-product concat [ { } concat-as ] map
+    ] with times ;
+
+PRIVATE>
 
 : selections ( seq n -- selections )
     dup 0 > [ (selections) ] [ 2drop { } ] if ;
