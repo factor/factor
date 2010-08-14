@@ -95,7 +95,7 @@ M:: x86.64 %load-reg-param ( vreg rep reg -- )
 M:: x86.64 %store-reg-param ( vreg rep reg -- )
     reg vreg rep %copy ;
 
-M: x86.32 %discard-reg-param ( rep reg -- )
+M: x86.64 %discard-reg-param ( rep reg -- )
     2drop ;
 
 M:: x86.64 %unbox ( dst src func rep -- )
