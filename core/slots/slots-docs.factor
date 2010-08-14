@@ -7,7 +7,7 @@ IN: slots
 ARTICLE: "accessors" "Slot accessors"
 "For every tuple slot, a " { $emphasis "reader" } " method is defined in the " { $vocab-link "accessors" } " vocabulary. The reader is named " { $snippet { $emphasis "slot" } ">>" } " and given a tuple, pushes the slot value on the stack."
 $nl
-"Writable slots - that is, those not attributed " { $link read-only } " - also have a " { $emphasis "writer" } ". The writer is named " { $snippet { $emphasis "slot" } "<<" } " and stores a value into a slot. It has stack effect " { $snippet "( value object -- )" } ". If the slot is specialized to a specific class, the writer checks that the value being written into the slot is an instance of that class first. See " { $link "tuple-declarations" } " for details."
+"Writable slots—that is, those not attributed " { $link read-only } "—also have a " { $emphasis "writer" } ". The writer is named " { $snippet { $emphasis "slot" } "<<" } " and stores a value into a slot. It has stack effect " { $snippet "( value object -- )" } ". If the slot is specialized to a specific class, the writer checks that the value being written into the slot is an instance of that class first. See " { $link "tuple-declarations" } " for details."
 $nl
 "In addition, two utility words are defined for each writable slot."
 $nl
