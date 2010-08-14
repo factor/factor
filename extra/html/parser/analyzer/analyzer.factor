@@ -29,8 +29,7 @@ TUPLE: link attributes clickable ;
 : find-between* ( vector i/f tag/f -- vector )
     over integer? [
         [ tail-slice ] [ name>> ] bi*
-        dupd find-matching-close drop dup [ 1 + ] when
-        [ head ] [ first ] if*
+        dupd find-matching-close drop 0 or 1 + head
     ] [
         3drop V{ } clone
     ] if ; inline
