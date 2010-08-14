@@ -464,7 +464,6 @@ struct factor_vm
 	void primitive_float_subtract();
 	void primitive_float_multiply();
 	void primitive_float_divfloat();
-	void primitive_float_mod();
 	void primitive_float_less();
 	void primitive_float_lesseq();
 	void primitive_float_greater();

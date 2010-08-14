@@ -78,7 +78,6 @@ namespace factor
 	_(float_greatereq) \
 	_(float_less) \
 	_(float_lesseq) \
-	_(float_mod) \
 	_(float_multiply) \
 	_(float_subtract) \
 	_(float_to_bignum) \

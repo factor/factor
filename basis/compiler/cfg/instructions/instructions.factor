@@ -256,17 +256,6 @@ FOLDABLE-INSN: ##sqrt
 def: dst/double-rep
 use: src/double-rep ;
 
-! libc intrinsics
-FOLDABLE-INSN: ##unary-float-function
-def: dst/double-rep
-use: src/double-rep
-literal: func ;
-
-FOLDABLE-INSN: ##binary-float-function
-def: dst/double-rep
-use: src1/double-rep src2/double-rep
-literal: func ;
-
 ! Single/double float conversion
 FOLDABLE-INSN: ##single>double-float
 def: dst/double-rep
@@ -883,8 +872,6 @@ alien-call-insn
 ! will be in a register.
 UNION: clobber-insn
 hairy-clobber-insn
-##unary-float-function
-##binary-float-function
 ##unbox
 ##box
 ##box-long-long ;

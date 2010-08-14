@@ -170,8 +170,6 @@ CODEGEN: ##div-float %div-float
 CODEGEN: ##min-float %min-float
 CODEGEN: ##max-float %max-float
 CODEGEN: ##sqrt %sqrt
-CODEGEN: ##unary-float-function %unary-float-function
-CODEGEN: ##binary-float-function %binary-float-function
 CODEGEN: ##single>double-float %single>double-float
 CODEGEN: ##double>single-float %double>single-float
 CODEGEN: ##integer>float %integer>float
