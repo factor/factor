@@ -54,8 +54,8 @@ IN: compiler.cfg.builder.alien
         (caller-parameters)
     ] with-param-regs* ;
 
-: prepare-caller-return ( params -- reg-outputs )
-    return>> [ { } ] [ base-type load-return ] if-void ;
+: prepare-caller-return ( params -- reg-outputs dead-outputs )
+    return>> [ { } ] [ base-type load-return ] if-void { } ;
 
 : caller-stack-frame ( params -- cleanup stack-size )
     [ stack-params get ] dip [ return>> ] [ abi>> ] bi stack-cleanup

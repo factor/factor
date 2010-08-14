@@ -148,6 +148,13 @@ M: x86.32 %store-reg-param ( vreg rep reg -- )
         { double-rep [ drop \ FLDL double-rep store-float-return ] }
     } case ;
 
+M: x86.32 %discard-reg-param ( rep reg -- )
+    drop {
+        { int-rep [ ] }
+        { float-rep [ ST0 FSTP ] }
+        { double-rep [ ST0 FSTP ] }
+    } case ;
+
 :: call-unbox-func ( src func -- )
     EAX src tagged-rep %copy
     4 save-vm-ptr

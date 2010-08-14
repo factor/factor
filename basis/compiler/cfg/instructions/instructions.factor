@@ -673,14 +673,14 @@ literal: boxer gc-map ;
 ! { vreg rep stack#/reg }
 
 VREG-INSN: ##alien-invoke
-literal: reg-inputs stack-inputs reg-outputs cleanup stack-size symbols dll gc-map ;
+literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map ;
 
 VREG-INSN: ##alien-indirect
 use: src/int-rep
-literal: reg-inputs stack-inputs reg-outputs cleanup stack-size gc-map ;
+literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map ;
 
 VREG-INSN: ##alien-assembly
-literal: reg-inputs stack-inputs reg-outputs cleanup stack-size quot gc-map ;
+literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot gc-map ;
 
 VREG-INSN: ##callback-inputs
 literal: reg-outputs stack-outputs ;

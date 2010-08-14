@@ -1,6 +1,6 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel namespaces sequences
+USING: accessors arrays assocs kernel namespaces sequences
 compiler.cfg.instructions compiler.cfg.def-use
 compiler.cfg.rpo compiler.cfg.predecessors hash-sets sets ;
 FROM: namespaces => set ;
@@ -99,16 +99,17 @@ M: ##write-barrier live-insn? src>> live-vreg? ;
 
 M: ##write-barrier-imm live-insn? src>> live-vreg? ;
 
-: filter-alien-outputs ( triples -- triples' )
-    [ first live-vreg? ] filter ;
+: filter-alien-outputs ( outputs -- live-outputs dead-outputs )
+    [ first live-vreg? ] partition
+    [ first3 2array nip ] map ;
 
 M: alien-call-insn live-insn?
-    [ filter-alien-outputs ] change-reg-outputs
+    dup reg-outputs>> filter-alien-outputs [ >>reg-outputs ] [ >>dead-outputs ] bi*
     drop t ;
 
 M: ##callback-inputs live-insn?
-    [ filter-alien-outputs ] change-reg-outputs
-    [ filter-alien-outputs ] change-stack-outputs
+    [ filter-alien-outputs drop ] change-reg-outputs
+    [ filter-alien-outputs drop ] change-stack-outputs
     drop t ;
 
 M: flushable-insn live-insn? defs-vregs [ live-vreg? ] any? ;
