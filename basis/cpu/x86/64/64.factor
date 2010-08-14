@@ -123,22 +123,6 @@ M: x86.64 %end-callback ( -- )
     param-reg-0 %mov-vm-ptr
     "end_callback" f f %c-invoke ;
 
-: float-function-param ( i src -- )
-    [ float-regs cdecl param-regs at nth ] dip double-rep %copy ;
-
-M:: x86.64 %unary-float-function ( dst src func -- )
-    0 src float-function-param
-    func "libm" load-library f %c-invoke
-    dst double-rep %load-return ;
-
-M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
-    ! src1 might equal dst; otherwise it will be a spill slot
-    ! src2 is always a spill slot
-    0 src1 float-function-param
-    1 src2 float-function-param
-    func "libm" load-library f %c-invoke
-    dst double-rep %load-return ;
-
 M: x86.64 %prepare-var-args ( -- ) RAX RAX XOR ;
 
 M: x86.64 stack-cleanup 3drop 0 ;
