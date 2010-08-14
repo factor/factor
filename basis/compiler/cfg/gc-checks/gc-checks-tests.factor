@@ -277,7 +277,7 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##alien-invoke f "malloc" f T{ gc-map } }
+    T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
     T{ ##allot f 1 64 byte-array }
     T{ ##branch }
 } 1 test-bb
@@ -299,7 +299,7 @@ V{
 ! The GC check should come after the alien-invoke
 [
     V{
-        T{ ##alien-invoke f "malloc" f T{ gc-map } }
+        T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
         T{ ##check-nursery-branch f 64 cc<= 3 4 }
     }
 ] [ 0 get successors>> first instructions>> ] unit-test
@@ -311,9 +311,9 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##alien-invoke f "malloc" f T{ gc-map } }
+    T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
     T{ ##allot f 1 64 byte-array }
-    T{ ##alien-invoke f "malloc" f T{ gc-map } }
+    T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
     T{ ##allot f 2 64 byte-array }
     T{ ##branch }
 } 1 test-bb
@@ -334,7 +334,7 @@ V{
 
 [
     V{
-        T{ ##alien-invoke f "malloc" f T{ gc-map } }
+        T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
         T{ ##check-nursery-branch f 64 cc<= 3 4 }
     }
 ] [
@@ -346,7 +346,7 @@ V{
 [
     V{
         T{ ##allot f 1 64 byte-array }
-        T{ ##alien-invoke f "malloc" f T{ gc-map } }
+        T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
         T{ ##check-nursery-branch f 64 cc<= 5 6 }
     }
 ] [
