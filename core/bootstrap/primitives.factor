@@ -501,7 +501,6 @@ tuple
     { "float*" "math.private" "primitive_float_multiply" (( x y -- z )) }
     { "float+" "math.private" "primitive_float_add" (( x y -- z )) }
     { "float-" "math.private" "primitive_float_subtract" (( x y -- z )) }
-    { "float-mod" "math.private" "primitive_float_mod" (( x y -- z )) }
     { "float-u<" "math.private" "primitive_float_less" (( x y -- ? )) }
     { "float-u<=" "math.private" "primitive_float_lesseq" (( x y -- ? )) }
     { "float-u>" "math.private" "primitive_float_greater" (( x y -- ? )) }

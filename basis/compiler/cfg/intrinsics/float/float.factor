@@ -9,9 +9,3 @@ IN: compiler.cfg.intrinsics.float
 
 : emit-float-unordered-comparison ( cc -- )
     '[ _ ^^compare-float-unordered ] binary-op ; inline
-
-: emit-unary-float-function ( func -- )
-    '[ _ ^^unary-float-function ] unary-op ;
-
-: emit-binary-float-function ( func -- )
-    '[ _ ^^binary-float-function ] binary-op ;

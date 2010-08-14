@@ -123,31 +123,6 @@ IN: compiler.cfg.intrinsics
         { math.floats.private:float-max [ drop [ ^^max-float ] binary-op ] }
     } enable-intrinsics ;
 
-: enable-float-functions ( -- )
-    {
-        { math.libm:facos [ drop "acos" emit-unary-float-function ] }
-        { math.libm:fasin [ drop "asin" emit-unary-float-function ] }
-        { math.libm:fatan [ drop "atan" emit-unary-float-function ] }
-        { math.libm:fatan2 [ drop "atan2" emit-binary-float-function ] }
-        { math.libm:fcos [ drop "cos" emit-unary-float-function ] }
-        { math.libm:fsin [ drop "sin" emit-unary-float-function ] }
-        { math.libm:ftan [ drop "tan" emit-unary-float-function ] }
-        { math.libm:fcosh [ drop "cosh" emit-unary-float-function ] }
-        { math.libm:fsinh [ drop "sinh" emit-unary-float-function ] }
-        { math.libm:ftanh [ drop "tanh" emit-unary-float-function ] }
-        { math.libm:fexp [ drop "exp" emit-unary-float-function ] }
-        { math.libm:flog [ drop "log" emit-unary-float-function ] }
-        { math.libm:flog10 [ drop "log10" emit-unary-float-function ] }
-        { math.libm:fpow [ drop "pow" emit-binary-float-function ] }
-        { math.libm:facosh [ drop "acosh" emit-unary-float-function ] }
-        { math.libm:fasinh [ drop "asinh" emit-unary-float-function ] }
-        { math.libm:fatanh [ drop "atanh" emit-unary-float-function ] }
-        { math.libm:fsqrt [ drop "sqrt" emit-unary-float-function ] }
-        { math.floats.private:float-min [ drop "fmin" emit-binary-float-function ] }
-        { math.floats.private:float-max [ drop "fmax" emit-binary-float-function ] }
-        { math.private:float-mod [ drop "fmod" emit-binary-float-function ] }
-    } enable-intrinsics ;
-
 : enable-min/max ( -- )
     {
         { math.integers.private:fixnum-min [ drop [ ^^min ] binary-op ] }

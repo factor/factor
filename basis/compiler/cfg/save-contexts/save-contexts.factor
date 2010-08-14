@@ -9,8 +9,6 @@ IN: compiler.cfg.save-contexts
 
 GENERIC: needs-save-context? ( insn -- ? )
 
-M: ##unary-float-function needs-save-context? drop t ;
-M: ##binary-float-function needs-save-context? drop t ;
 M: gc-map-insn needs-save-context? drop t ;
 M: insn needs-save-context? drop f ;
 

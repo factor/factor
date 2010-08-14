@@ -394,7 +394,6 @@ M: object infer-call* \ call bad-macro-input ;
 \ float* { float float } { float } define-primitive \ float* make-foldable
 \ float+ { float float } { float } define-primitive \ float+ make-foldable
 \ float- { float float } { float } define-primitive \ float- make-foldable
-\ float-mod { float float } { float } define-primitive \ float-mod make-foldable
 \ float-u< { float float } { object } define-primitive \ float-u< make-foldable
 \ float-u<= { float float } { object } define-primitive \ float-u<= make-foldable
 \ float-u> { float float } { object } define-primitive \ float-u> make-foldable
