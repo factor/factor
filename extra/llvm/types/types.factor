@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators kernel llvm.core locals
-math.parser math multiline namespaces parser peg.ebnf sequences
-sequences.deep specialized-arrays strings vocabs words ;
+USING: accessors alien.c-types arrays combinators kernel
+llvm.core locals math.parser math multiline namespaces parser
+peg.ebnf sequences sequences.deep specialized-arrays strings
+vocabs words ;
 SPECIALIZED-ARRAY: void*
 IN: llvm.types
 
