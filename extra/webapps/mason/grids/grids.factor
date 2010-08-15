@@ -26,7 +26,6 @@ CONSTANT: cpus
 {
     { "x86.32" "x86" }
     { "x86.64" "x86-64" }
-    { "ppc" "PowerPC" }
 }
 
 : render-grid-header ( -- xml )
