@@ -14,15 +14,18 @@ SYMBOL: current-library
 
 DEFER: (parse-c-type)
 
+ERROR: bad-array-type ;
+
 : parse-array-type ( name -- c-type )
     "[" split unclip
-    [ [ "]" ?tail drop parse-word ] map ] [ (parse-c-type) ] bi*
-    prefix ;
+    [ [ "]" ?tail [ bad-array-type ] unless parse-word ] map ]
+    [ (parse-c-type) ]
+    bi* prefix ;
 
 : (parse-c-type) ( string -- type )
     {
-        { [ CHAR: ] over member? ] [ parse-array-type ] }
         { [ "*" ?tail ] [ (parse-c-type) <pointer> ] }
+        { [ CHAR: ] over member? ] [ parse-array-type ] }
         { [ dup search ] [ parse-c-type-name ] }
         [ dup search [ ] [ no-word ] ?if ]
     } cond ;

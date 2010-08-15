@@ -33,6 +33,8 @@ TYPEDEF: int MyInt
 
 [ 32 ] [ { int 8 } heap-size ] unit-test
 
+[ ] [ pointer: { int 8 } heap-size pointer: void heap-size assert= ] unit-test
+
 TYPEDEF: char MyChar
 
 [ t ] [ pointer: void c-type pointer: MyChar c-type = ] unit-test
