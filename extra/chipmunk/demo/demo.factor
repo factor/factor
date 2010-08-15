@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: accessors alien chipmunk.ffi classes.struct game.loop
-game.worlds kernel literals locals math method-chains opengl.gl
-random sequences specialized-arrays ui ui.gadgets.worlds
-ui.pixel-formats ;
+USING: accessors alien alien.c-types chipmunk.ffi classes.struct
+game.loop game.worlds kernel literals locals math method-chains
+opengl.gl random sequences specialized-arrays ui
+ui.gadgets.worlds ui.pixel-formats ;
 SPECIALIZED-ARRAY: void*
 IN: chipmunk.demo
 
