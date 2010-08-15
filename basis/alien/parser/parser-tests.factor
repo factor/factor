@@ -24,12 +24,15 @@ CONSTANT: eleven 11
     [ pointer: int** ] [ "int***" parse-c-type ] unit-test
     [ pointer: int*** ] [ "int****" parse-c-type ] unit-test
     [ { pointer: int 3 } ] [ "int*[3]" parse-c-type ] unit-test
-    [ "void[3]" parse-c-type ] must-fail
     [ { pointer: void 3 } ] [ "void*[3]" parse-c-type ] unit-test
+    [ pointer: { int 3 } ] [ "int[3]*" parse-c-type ] unit-test
     [ c-string ] [ "c-string" parse-c-type ] unit-test
     [ char2 ] [ "char2" parse-c-type ] unit-test
     [ pointer: char2 ] [ "char2*" parse-c-type ] unit-test
 
+    [ "void[3]" parse-c-type ] must-fail
+    [ "int[3" parse-c-type ] must-fail
+    [ "int[3][4" parse-c-type ] must-fail
     [ "not-word" parse-c-type ] [ error>> no-word-error? ] must-fail-with
 ] with-file-vocabs
 
