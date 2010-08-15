@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.accessors alien.syntax kernel kernel.private
-math system ;
+USING: alien alien.accessors alien.c-types alien.syntax kernel
+kernel.private math system ;
 IN: javascriptcore.ffi.hack
 
 HOOK: set-callstack-bounds os ( -- )
