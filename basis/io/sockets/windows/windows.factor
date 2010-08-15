@@ -30,8 +30,8 @@ TUPLE: win32-socket < win32-file ;
 : <win32-socket> ( handle -- win32-socket )
     win32-socket new-win32-handle ;
 
-M: win32-socket dispose ( stream -- )
-    handle>> closesocket drop ;
+M: win32-socket dispose* ( stream -- )
+    handle>> closesocket socket-error* ;
 
 : unspecific-sockaddr/size ( addrspec -- sockaddr len )
     [ empty-sockaddr/size ] [ protocol-family ] bi pick family<< ;
