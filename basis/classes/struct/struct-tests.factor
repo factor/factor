@@ -476,3 +476,9 @@ CONSULT: struct-test-delegate struct-test-delegator del>> ;
         7 >>a
         8 >>b
 ] unit-test
+
+SPECIALIZED-ARRAY: void*
+
+STRUCT: silly-array-field-test { x int*[3] } ;
+
+[ t ] [ silly-array-field-test <struct> x>> void*-array? ] unit-test
