@@ -21,10 +21,6 @@ twitter-source [ "factor" ] initialize
 
 PRIVATE>
 
-! obtain-twitter-request-token and obtain-twitter-access-token
-! should use https: URLs but Twitter sends a 301 Redirect back
-! to the same URL. Twitter bug?
-
 : obtain-twitter-request-token ( -- request-token )
     [
         "https://twitter.com/oauth/request_token"
