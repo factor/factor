@@ -1,23 +1,17 @@
 USING: help.markup help.syntax quotations kernel
-stack-checker.transforms sequences ;
+stack-checker.transforms sequences combinators ;
 IN: macros
 
 HELP: MACRO:
 { $syntax "MACRO: word ( inputs... -- ) definition... ;" }
-{ $description "Defines a code transformation. The definition must have stack effect " { $snippet "( inputs... -- quot )" } "." }
+{ $description "Defines a macro word. The definition must have stack effect " { $snippet "( inputs... -- quot )" } "." }
 { $notes
-  "A call of a macro inside a word definition is replaced with the quotation expansion at compile-time if precisely the following conditions hold:"
+  "A call of a macro inside a word definition is replaced with the quotation expansion at compile-time. The following two conditions must hold:"
   { $list
-    { "All inputs to the macro call are literal" }
-    { "The word calling the macro has a static stack effect" }
+    { "All inputs to the macro call must be literals" }
     { "The expansion quotation produced by the macro has a static stack effect" }
   }
-  "If any of these conditions fail to hold, the macro will still work, but expansion will be performed at run-time."
-  $nl
-  "Other than possible compile-time expansion, the following two definition styles are equivalent:"
-    { $code "MACRO: foo ... ;" }
-    { $code ": foo ... call ;" }
-  "Conceptually, macros allow computation to be moved from run-time to compile-time, splicing the result of this computation into the generated quotation."
+  "Macros allow computation to be moved from run-time to compile-time, splicing the result of this computation into the generated quotation."
 }
 { $examples
   "A macro that calls a quotation but preserves any values it consumes off the stack:"
@@ -41,15 +35,16 @@ HELP: macro
 ARTICLE: "macros" "Macros"
 "The " { $vocab-link "macros" } " vocabulary implements " { $emphasis "macros" } ", which are code transformations that may run at compile-time under the right circumstances."
 $nl
-"Macros can be used to give static stack effects to combinators that otherwise would not have static stack effects. Macros can be used to calculate lookup tables and generate code at compile time, which can improve performance, the level of abstraction and simplify code."
+"Macros can be used to implement combinators whose stack effects depend on an input parameter. Since macros are expanded at compile time, this permits the compiler to infer a static stack effect for the word calling the macro."
+$nl
+"Macros can also be used to calculate lookup tables and generate code at compile time, which can improve performance, raise the level of abstraction, and simplify code."
 $nl
 "Factor macros are similar to Lisp macros; they are not like C preprocessor macros."
 $nl
 "Defining new macros:"
 { $subsections POSTPONE: MACRO: }
-"A slightly lower-level facility, " { $emphasis "compiler transforms" } ", allows an ordinary word definition to co-exist with a version that performs compile-time expansion."
+"A slightly lower-level facility, " { $emphasis "compiler transforms" } ", allows an ordinary word definition to co-exist with a version that performs compile-time expansion. The ordinary definition is only used from code compiled with the non-optimizing compiler. Under normal circumstances, macros should be used instead of compiler transforms; compiler transforms are only used for words such as " { $link cond } " which are frequently invoked during the bootstrap process, and this having a performant non-optimized definition which does not generate code on the fly is important."
 { $subsections define-transform }
-"An example is the " { $link member? } " word. If the input sequence is a literal, the compile transform kicks in and converts the " { $link member? } " call into a series of conditionals. Otherwise, if the input sequence is not literal, a call to the definition of " { $link member? } " is generated."
 { $see-also "generalizations" "fry" } ;
 
 ABOUT: "macros"
