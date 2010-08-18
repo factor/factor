@@ -31,12 +31,14 @@ fetched-in parsed-html links processed-in fetched-at ;
 : <spider-result> ( url depth -- spider-result )
     spider-result new
         swap >>depth
-        swap >>url ;
+        swap >>url ; inline
 
 <PRIVATE
 
 : apply-filters ( links spider -- links' )
-    filters>> [ '[ [ _ 1&& ] filter ] call( seq -- seq' ) ] when* ;
+    filters>> [
+        '[ [ _ 1&& ] filter ] call( seq -- seq' )
+    ] when* ;
 
 : push-links ( links level unique-deque -- )
     '[ _ _ push-url ] each ;
@@ -51,13 +53,18 @@ fetched-in parsed-html links processed-in fetched-at ;
     [ base>> host>> ] [ links>> members ] bi*
     [ host>> = ] with partition ;
 
-: add-spidered ( spider spider-result -- )
-    [ [ 1 + ] change-count ] dip
-    2dup [ spidered>> ] [ dup url>> ] bi* rot set-at
-    [ filter-base-links ] 2keep
-    depth>> 1 + swap
-    [ add-nonmatching ]
-    [ dup '[ _ apply-filters ] curry 2dip add-todo ] 2bi ;
+:: add-spidered ( spider spider-result -- )
+    spider [ 1 + ] change-count drop
+
+    spider-result dup url>>
+    spider spidered>> set-at
+
+    spider spider-result filter-base-links :> ( matching nonmatching )
+    spider-result depth>> 1 + :> depth
+
+    nonmatching depth spider add-nonmatching
+
+    matching spider apply-filters depth spider add-todo ;
 
 : normalize-hrefs ( base links -- links' )
     [ derive-url ] with map ;
@@ -93,10 +100,10 @@ fetched-in parsed-html links processed-in fetched-at ;
 
 : spider-sleep ( spider -- ) sleep>> [ sleep ] when* ;
 
-: queue-initial-links ( spider -- )
-    [
-        [ currently-spidering>> ] [ initial-links>> ] bi normalize-hrefs 0
-    ] keep add-todo ;
+: queue-initial-links ( spider -- spider )
+    [ [ currently-spidering>> ] [ initial-links>> ] bi normalize-hrefs 0 ]
+    [ add-todo ]
+    [ ] tri ;
 
 : spider-page? ( spider -- ? )
     {
@@ -123,5 +130,6 @@ PRIVATE>
 
 : run-spider ( spider -- spider )
     "spider" [
-        dup queue-initial-links [ run-spider-loop ] keep
+        queue-initial-links
+        [ run-spider-loop ] keep
     ] with-logging ;
