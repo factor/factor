@@ -29,13 +29,20 @@ M: template-error error.
 : call-template ( template -- )
     [ call-template* ] [ \ template-error boa rethrow ] recover ;
 
+ERROR: no-boilerplate ;
+
+M: no-boilerplate error.
+    drop
+    "get-title and set-title can only be used from within" print
+    "a with-boilerplate form" print ;
+
 SYMBOL: title
 
 : set-title ( string -- )
-    title get >box ;
+    title get [ >box ] [ no-boilerplate ] if* ;
 
 : get-title ( -- string )
-    title get value>> ;
+    title get [ value>> ] [ no-boilerplate ] if* ;
 
 : write-title ( -- )
     get-title write ;

@@ -5,6 +5,9 @@ splitting furnace accessors
 html.templates.chloe.compiler ;
 IN: html.templates.chloe.tests
 
+! So that changes to code are reflected
+[ ] [ reset-cache ] unit-test
+
 : run-template ( quot -- string )
     with-string-writer [ "\r\n\t" member? not ] filter
     "?>" split1 nip ; inline
@@ -170,3 +173,24 @@ TUPLE: person first-name last-name ;
         "test13" test-template call-template
     ] run-template
 ] [ error>> T{ unknown-chloe-tag f "this-tag-does-not-exist" } = ] must-fail-with
+
+[ "Hello &lt;world&gt; &amp;escaping test;" "Hello <world> &escaping test;" ] [
+    [
+        <box> title set
+        [
+            begin-form
+            "&escaping test;" "a-value" set-value
+            "test14" test-template call-template
+        ] run-template
+        title get box>
+    ] with-scope
+] unit-test
+
+[
+    [
+        <box> title set
+        [
+            "test15" test-template call-template
+        ] run-template
+    ] with-scope
+] [ error>> tag-not-allowed-here? ] must-fail-with
