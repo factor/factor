@@ -414,20 +414,156 @@ M: integer non-flushable-generic ; flushable
 [ f ] [ \ non-flushable-generic flushable? ] unit-test
 [ t ] [ M\ integer non-flushable-generic flushable? ] unit-test
 
-! method-for-object and method-for-class
+! method-for-object, method-for-class, effective-method
 GENERIC: foozul ( a -- b )
 M: reversed foozul ;
 M: integer foozul ;
 M: slice foozul ;
 
-[ t ] [
-    reversed \ foozul method-for-class
-    reversed \ foozul method
-    eq?
+[ ] [ reversed \ foozul method-for-class M\ reversed foozul assert= ] unit-test
+[ ] [ { 1 2 3 } <reversed> \ foozul method-for-object M\ reversed foozul assert= ] unit-test
+[ ] [ { 1 2 3 } <reversed> \ foozul effective-method M\ reversed foozul assert= drop ] unit-test
+
+[ ] [ fixnum \ foozul method-for-class M\ integer foozul assert= ] unit-test
+[ ] [ 13 \ foozul method-for-object M\ integer foozul assert= ] unit-test
+[ ] [ 13 \ foozul effective-method M\ integer foozul assert= drop ] unit-test
+
+! Ensure dynamic and static dispatch match in ambiguous cases
+UNION: amb-union-1a integer float ;
+UNION: amb-union-1b float string ;
+
+GENERIC: amb-generic-1 ( a -- b )
+
+M: amb-union-1a amb-generic-1 drop "a" ;
+M: amb-union-1b amb-generic-1 drop "b" ;
+
+[ ] [
+    5.0 amb-generic-1
+    5.0 \ amb-generic-1 effective-method execute( a -- b ) assert=
 ] unit-test
 
-[ t ] [
-    fixnum \ <=> method-for-class
-    real \ <=> method
-    eq?
+[ ] [
+    5.0 amb-generic-1
+    5.0 float \ amb-generic-1 method-for-class execute( a -- b ) assert=
+] unit-test
+
+UNION: amb-union-2a float string ;
+UNION: amb-union-2b integer float ;
+
+GENERIC: amb-generic-2 ( a -- b )
+
+M: amb-union-2a amb-generic-2 drop "a" ;
+M: amb-union-2b amb-generic-2 drop "b" ;
+
+[ ] [
+    5.0 amb-generic-1
+    5.0 \ amb-generic-1 effective-method execute( a -- b ) assert=
+] unit-test
+
+[ ] [
+    5.0 amb-generic-1
+    5.0 float \ amb-generic-1 method-for-class execute( a -- b ) assert=
+] unit-test
+
+TUPLE: amb-tuple-a x ;
+TUPLE: amb-tuple-b < amb-tuple-a ;
+PREDICATE: amb-tuple-c < amb-tuple-a x>> 3 = ;
+
+GENERIC: amb-generic-3 ( a -- b )
+
+M: amb-tuple-b amb-generic-3 drop "b" ;
+M: amb-tuple-c amb-generic-3 drop "c" ;
+
+[ ] [
+    T{ amb-tuple-b f 3 } amb-generic-3
+    T{ amb-tuple-b f 3 } \ amb-generic-3 effective-method execute( a -- b ) assert=
+] unit-test
+
+TUPLE: amb-tuple-d ;
+UNION: amb-union-4 amb-tuple-a amb-tuple-d ;
+
+GENERIC: amb-generic-4 ( a -- b )
+
+M: amb-tuple-b amb-generic-4 drop "b" ;
+M: amb-union-4 amb-generic-4 drop "4" ;
+
+[ ] [
+    T{ amb-tuple-b f 3 } amb-generic-4
+    T{ amb-tuple-b f 3 } \ amb-generic-4 effective-method execute( a -- b ) assert=
+] unit-test
+
+[ ] [
+    T{ amb-tuple-b f 3 } amb-generic-4
+    T{ amb-tuple-b f 3 } amb-tuple-b \ amb-generic-4 method-for-class execute( a -- b ) assert=
+] unit-test
+
+MIXIN: amb-mixin-5
+INSTANCE: amb-tuple-a amb-mixin-5
+INSTANCE: amb-tuple-d amb-mixin-5
+
+GENERIC: amb-generic-5 ( a -- b )
+
+M: amb-tuple-b amb-generic-5 drop "b" ;
+M: amb-mixin-5 amb-generic-5 drop "5" ;
+
+[ ] [
+    T{ amb-tuple-b f 3 } amb-generic-5
+    T{ amb-tuple-b f 3 } \ amb-generic-5 effective-method execute( a -- b ) assert=
+] unit-test
+
+[ ] [
+    T{ amb-tuple-b f 3 } amb-generic-5
+    T{ amb-tuple-b f 3 } amb-tuple-b \ amb-generic-5 method-for-class execute( a -- b ) assert=
+] unit-test
+
+UNION: amb-union-6 amb-tuple-b amb-tuple-d ;
+
+GENERIC: amb-generic-6 ( a -- b )
+
+M: amb-tuple-a amb-generic-6 drop "a" ;
+M: amb-union-6 amb-generic-6 drop "6" ;
+
+[ ] [
+    T{ amb-tuple-b f 3 } amb-generic-6
+    T{ amb-tuple-b f 3 } \ amb-generic-6 effective-method execute( a -- b ) assert=
+] unit-test
+
+[ ] [
+    T{ amb-tuple-b f 3 } amb-generic-6
+    T{ amb-tuple-b f 3 } amb-tuple-b \ amb-generic-6 method-for-class execute( a -- b ) assert=
+] unit-test
+
+MIXIN: amb-mixin-7
+INSTANCE: amb-tuple-b amb-mixin-7
+INSTANCE: amb-tuple-d amb-mixin-7
+
+GENERIC: amb-generic-7 ( a -- b )
+
+M: amb-tuple-a amb-generic-7 drop "a" ;
+M: amb-mixin-7 amb-generic-7 drop "7" ;
+
+[ ] [
+    T{ amb-tuple-b f 3 } amb-generic-7
+    T{ amb-tuple-b f 3 } \ amb-generic-7 effective-method execute( a -- b ) assert=
+] unit-test
+
+[ ] [
+    T{ amb-tuple-b f 3 } amb-generic-7
+    T{ amb-tuple-b f 3 } amb-tuple-b \ amb-generic-7 method-for-class execute( a -- b ) assert=
+] unit-test
+
+! Same thing as above but with predicate classes
+PREDICATE: amb-predicate-a < integer 10 mod even? ;
+PREDICATE: amb-predicate-b < amb-predicate-a 10 mod 4 = ;
+
+UNION: amb-union-8 amb-predicate-b string ;
+
+GENERIC: amb-generic-8 ( a -- b )
+
+M: amb-union-8 amb-generic-8 drop "8" ;
+M: amb-predicate-a amb-generic-8 drop "a" ;
+
+[ ] [
+    4 amb-generic-8
+    4 \ amb-generic-8 effective-method execute( a -- b ) assert=
 ] unit-test
