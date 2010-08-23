@@ -49,7 +49,7 @@ IN: furnace.chloe-tags
     } cleave [ a-url ] [code] ;
 
 CHLOE: atom
-    [ compile-children>string ] [ compile-a-url ] bi
+    [ compile-children>xml-string ] [ compile-a-url ] bi
     [ add-atom-feed ] [code] ;
 
 CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
@@ -73,7 +73,7 @@ CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
 CHLOE: a
     [
         [ a-attrs ]
-        [ compile-children>string ] bi
+        [ compile-children>xml-string ] bi
         [ <unescaped> [XML <a><-></a> XML] second swap >>attrs ]
         [xml-code]
     ] compile-with-scope ;
@@ -120,7 +120,7 @@ CHLOE: form
     [
         [ compile-form-attrs ]
         [ hidden-fields ]
-        [ compile-children>string ] tri
+        [ compile-children>xml-string ] tri
         [
             <unescaped> [XML <form><-><-></form> XML] second
                 swap >>attrs
