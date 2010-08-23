@@ -253,10 +253,6 @@ IN: bootstrap.x86
 : jit-switch-context ( reg -- )
     -4 jit-scrub-return
 
-    ! Save ds, rs registers
-    jit-load-vm
-    jit-save-context
-
     ! Make the new context the current one
     ctx-reg swap MOV
     vm-reg vm-context-offset [+] ctx-reg MOV
@@ -276,6 +272,10 @@ IN: bootstrap.x86
     EAX EAX alien-offset [+] MOV
     EDX ds-reg -4 [+] MOV
     ds-reg 8 SUB
+
+    ! Save ds, rs registers
+    jit-load-vm
+    jit-save-context
 
     ! Make the new context active
     EAX jit-switch-context
@@ -311,6 +311,8 @@ IN: bootstrap.x86
     jit-save-quot-and-param
 
     ! Make the new context active
+    jit-load-vm
+    jit-save-context
     EAX jit-switch-context
 
     jit-push-param

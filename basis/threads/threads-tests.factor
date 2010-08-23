@@ -1,6 +1,6 @@
-USING: namespaces io tools.test threads kernel
+USING: namespaces io tools.test threads threads.private kernel
 concurrency.combinators concurrency.promises locals math
-words calendar sequences ;
+words calendar sequences fry ;
 IN: threads.tests
 
 3 "x" set
@@ -59,3 +59,21 @@ yield
 
 ! Test system traps inside threads
 [ ] [ [ dup ] in-thread yield ] unit-test
+
+! The start-context-and-delete primitive wasn't rewinding the
+! callstack properly.
+
+! This got fixed for x86-64 but the problem remained on x86-32.
+
+! The unit test asserts that the callstack is empty from the
+! quotation passed to start-context-and-delete.
+
+[ { } ] [
+    <promise> [
+        '[
+            _ [
+                callstack swap fulfill stop
+            ] start-context-and-delete
+        ] in-thread
+    ] [ ?promise callstack>array ] bi
+] unit-test
