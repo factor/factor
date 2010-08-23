@@ -133,9 +133,12 @@ ERROR: unknown-chloe-tag tag ;
 : process-children ( tag quot -- )
     [ [ compile-children ] compile-quot ] [ % ] bi* ; inline
 
+: compile-children>xml-string ( tag -- )
+    [ with-string-writer ] process-children ;
+
 : compile-children>string ( tag -- )
     t string-context? [
-        [ with-string-writer ] process-children
+        compile-children>xml-string
     ] with-variable ;
 
 : compile-with-scope ( quot -- )
