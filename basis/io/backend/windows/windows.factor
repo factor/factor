@@ -30,9 +30,7 @@ TUPLE: win32-file < win32-handle ptr ;
     win32-file new-win32-handle ;
 
 M: win32-file dispose
-    [ dup disposed>> [ drop ] [ cancel-operation ] if ]
-    [ call-next-method ]
-    bi ;
+    [ cancel-operation ] [ call-next-method ] bi ;
 
 HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )

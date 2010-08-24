@@ -56,10 +56,10 @@ M: linux (monitor) ( path recursive? mailbox -- monitor )
 M: linux-monitor dispose* ( monitor -- )
     [ [ wd>> ] [ watches>> ] bi delete-at ]
     [
-        dup inotify>> disposed>> [ drop ] [
+        dup inotify>> [
             [ inotify>> handle>> handle-fd ] [ wd>> ] bi
             inotify_rm_watch io-error
-        ] if
+        ] unless-disposed
     ]
     [ call-next-method ]
     tri ;
