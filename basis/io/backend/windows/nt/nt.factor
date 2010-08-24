@@ -71,7 +71,7 @@ M: winnt add-completion ( win32-handle -- )
     ] [ resume-callback t ] if ;
 
 M: win32-handle cancel-operation
-    [ check-disposed ] [ handle>> CancelIo drop ] bi ;
+    [ handle>> CancelIo win32-error=0/f ] unless-disposed ;
 
 M: winnt io-multiplex ( nanos -- )
     handle-overlapped [ 0 io-multiplex ] when ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2009 Doug Coleman, Slava Pestov.
+! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors continuations kernel namespaces make
 sequences vectors sets assocs init math ;
@@ -40,15 +40,17 @@ ERROR: already-disposed disposable ;
 
 GENERIC: dispose ( disposable -- )
 
-M: object dispose
-    dup disposed>> [ drop ] [ t >>disposed dispose* ] if ;
+: unless-disposed ( disposable quot -- )
+    [ dup disposed>> [ drop ] ] dip if ; inline
+
+M: object dispose [ t >>disposed dispose* ] unless-disposed ;
 
 M: disposable dispose
-    dup disposed>> [ drop ] [
+    [
         [ unregister-disposable ]
         [ call-next-method ]
         bi
-    ] if ;
+    ] unless-disposed ;
 
 : dispose-each ( seq -- )
     [
