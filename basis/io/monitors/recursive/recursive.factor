@@ -49,10 +49,10 @@ M: recursive-monitor dispose*
     monitor tget children>> values dispose-each ;
 
 : pump-step ( msg -- )
-    monitor tget disposed>> [ drop ] [
+    monitor tget [
         [ [ monitor>> path>> ] [ path>> ] bi append-path ] [ changed>> ] bi
         monitor tget queue-change
-    ] if ;
+    ] unless-disposed ;
 
 : child-added ( path monitor -- )
     path>> prepend-path add-child-monitor ;
