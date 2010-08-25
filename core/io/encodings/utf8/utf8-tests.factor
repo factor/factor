@@ -10,8 +10,6 @@ IN: io.encodings.utf8.tests
 
 [ { CHAR: replacement-character } ] [ { BIN: 11110,101 BIN: 10,111111 BIN: 10,000000 BIN: 11111111 } decode-utf8-w/stream ] unit-test
 
-[ { BIN: 101111111000000111111 } ] [ { BIN: 11110,101 BIN: 10,111111 BIN: 10,000000 BIN: 10,111111 } decode-utf8-w/stream ] unit-test
-
 [ "x" ] [ "x" decode-utf8-w/stream >string ] unit-test
 
 [ { BIN: 11111000000 } ] [ { BIN: 110,11111 BIN: 10,000000 } decode-utf8-w/stream >array ] unit-test
@@ -40,4 +38,6 @@ IN: io.encodings.utf8.tests
 
 [ { CHAR: replacement-character } ] [ { BIN: 11110,000 BIN: 10,000000 BIN: 10,000000 BIN: 10,000000 } decode-utf8-w/stream ] unit-test
 [ { CHAR: replacement-character } ] [ { BIN: 11110,000 BIN: 10,001111 BIN: 10,111111 BIN: 10,111111 } decode-utf8-w/stream ] unit-test
+[ { CHAR: replacement-character } ] [ { BIN: 11110,100 BIN: 10,010000 BIN: 10,000000 BIN: 10,000000 } decode-utf8-w/stream ] unit-test
 [ { HEX: 10000 } ] [ { BIN: 11110,000 BIN: 10,010000 BIN: 10,000000 BIN: 10,000000 } decode-utf8-w/stream ] unit-test
+[ { HEX: 10FFFF } ] [ { BIN: 11110,100 BIN: 10,001111 BIN: 10,111111 BIN: 10,111111 } decode-utf8-w/stream ] unit-test

@@ -20,7 +20,9 @@ SINGLETON: utf8
     [ 2drop replacement-char ] if ; inline
 
 : minimum-code-point ( char minimum -- char )
-    over > [ drop replacement-char ] when ; 
+    over > [ drop replacement-char ] when ;  inline
+: maximum-code-point ( char maximum -- char )
+    over < [ drop replacement-char ] when ;  inline
 
 : double ( stream byte -- stream char )
     BIN: 11111 bitand append-nums
@@ -32,7 +34,8 @@ SINGLETON: utf8
 
 : quadruple ( stream byte -- stream char )
     BIN: 111 bitand append-nums append-nums append-nums
-    HEX: 10000 minimum-code-point ; inline
+    HEX: 10000 minimum-code-point
+    HEX: 10FFFF maximum-code-point ; inline
 
 : begin-utf8 ( stream byte -- stream char )
     {
