@@ -20,9 +20,10 @@ SINGLETON: utf8
     [ 2drop replacement-char ] if ; inline
 
 : minimum-code-point ( char minimum -- char )
-    over > [ drop replacement-char ] when ;  inline
+    over > [ drop replacement-char ] when ; inline
+
 : maximum-code-point ( char maximum -- char )
-    over < [ drop replacement-char ] when ;  inline
+    over < [ drop replacement-char ] when ; inline
 
 : double ( stream byte -- stream char )
     BIN: 11111 bitand append-nums
