@@ -3,7 +3,7 @@
 USING: accessors assocs combinators combinators.short-circuit
 fry html.parser http.client io kernel locals math sequences
 sets splitting unicode.case unicode.categories urls
-urls.encoding ;
+urls.encoding shuffle ;
 IN: html.parser.analyzer
 
 : scrape-html ( url -- headers vector )
@@ -21,23 +21,32 @@ IN: html.parser.analyzer
 : find-all ( seq quot -- alist )
    [ <enum> >alist ] [ '[ second @ ] ] bi* filter ; inline
 
-: loopn-index ( ... pred: ( ... n -- ... ? ) n -- ... )
-    dup 0 > [
-        [ swap call ] [ 1 - ] 2bi
-        [ loopn-index ] 2curry when
-    ] [
-        2drop
-    ] if ; inline recursive
+: loopn-index ( n quot -- )
+    [ iota ] [ '[ @ not ] ] bi* find 2drop ; inline
 
-: loopn ( ... pred: ( ... -- ... ? ) n -- ... )
-    [ [ drop ] prepose ] dip loopn-index ; inline
+: loopn ( n quot -- )
+    [ drop ] prepose loopn-index ; inline
 
-:: find-nth ( n seq quot -- i/f elt/f )
-    0 t [
-        [ drop seq quot find-from ] dip 1 = [
-            over [ [ 1 + ] dip ] when
-        ] unless over >boolean
-    ] n loopn-index ; inline
+ERROR: undefined-find-nth m n seq quot ;
+
+: check-trivial-find ( m n seq quot -- m n seq quot )
+    pick 0 = [ undefined-find-nth ] when ; inline
+
+: find-nth-from ( m n seq quot -- i/f elt/f )
+    check-trivial-find [ f ] 3dip '[
+        drop _ _ find-from [ dup [ 1 + ] when ] dip over
+    ] loopn [ dup [ 1 - ] when ] dip ; inline
+
+: find-nth ( n seq quot -- i/f elt/f )
+    [ 0 ] 3dip find-nth-from ; inline
+
+: find-last-nth-from ( m n seq quot -- i/f elt/f )
+    check-trivial-find [ f ] 3dip '[
+        drop _ _ find-last-from [ dup [ 1 - ] when ] dip over
+    ] loopn [ dup [ 1 + ] when ] dip ; inline
+
+: find-last-nth ( n seq quot -- i/f elt/f )
+    [ [ nip length 1 - ] [ ] 2bi ] dip find-last-nth-from ; inline
 
 : find-first-name ( vector string -- i/f tag/f )
     >lower '[ name>> _ = ] find ; inline
