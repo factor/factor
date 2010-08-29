@@ -1,23 +1,43 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs html.parser kernel math sequences strings ascii
-arrays generalizations shuffle namespaces make
-splitting http accessors io combinators http.client urls
-urls.encoding fry prettyprint sets combinators.short-circuit ;
+USING: accessors assocs combinators combinators.short-circuit
+fry html.parser http.client io kernel locals math sequences
+sets splitting unicode.case unicode.categories urls
+urls.encoding ;
 IN: html.parser.analyzer
-
-TUPLE: link attributes clickable ;
 
 : scrape-html ( url -- headers vector )
     http-get parse-html ;
 
+: attribute ( tag string -- obj/f )
+    swap attributes>> [ at ] [ drop f ] if* ;
+
+: attribute* ( tag string -- obj ? )
+    swap attributes>> [ at* ] [ drop f f ] if* ;
+
+: attribute? ( tag string -- obj )
+    swap attributes>> [ key? ] [ drop f ] if* ;
+
 : find-all ( seq quot -- alist )
    [ <enum> >alist ] [ '[ second @ ] ] bi* filter ; inline
 
-: find-nth ( seq quot n -- i elt )
-    [ <enum> >alist ] 2dip -rot
-    '[ _ [ second @ ] find-from rot drop swap 1 + ]
-    [ f 0 ] 2dip times drop first2 ; inline
+: loopn-index ( ... pred: ( ... n -- ... ? ) n -- ... )
+    dup 0 > [
+        [ swap call ] [ 1 - ] 2bi
+        [ loopn-index ] 2curry when
+    ] [
+        2drop
+    ] if ; inline recursive
+
+: loopn ( ... pred: ( ... -- ... ? ) n -- ... )
+    [ [ drop ] prepose ] dip loopn-index ; inline
+
+:: find-nth ( n seq quot -- i/f elt/f )
+    0 t [
+        [ drop seq quot find-from ] dip 1 = [
+            over [ [ 1 + ] dip ] when
+        ] unless over >boolean
+    ] n loopn-index ; inline
 
 : find-first-name ( vector string -- i/f tag/f )
     >lower '[ name>> _ = ] find ; inline
@@ -29,7 +49,8 @@ TUPLE: link attributes clickable ;
 : find-between* ( vector i/f tag/f -- vector )
     over integer? [
         [ tail-slice ] [ name>> ] bi*
-        dupd find-matching-close drop 0 or 1 + head
+        dupd find-matching-close drop [ 1 + ] [ 1 ] if*
+        head
     ] [
         3drop V{ } clone
     ] if ; inline
@@ -60,27 +81,31 @@ TUPLE: link attributes clickable ;
     ] map ;
 
 : find-by-id ( vector id -- vector' elt/f )
-    '[ attributes>> "id" swap at _ = ] find ;
+    '[ "id" attribute _ = ] find ;
     
 : find-by-class ( vector id -- vector' elt/f )
-    '[ attributes>> "class" swap at _ = ] find ;
+    '[ "class" attribute _ = ] find ;
 
 : find-by-name ( vector string -- vector elt/f )
     >lower '[ name>> _ = ] find ;
 
 : find-by-id-between ( vector string -- vector' )
     dupd
-    '[ attributes>> "id" swap at _ = ] find find-between* ;
+    '[ "id" attribute _ = ] find find-between* ;
     
 : find-by-class-between ( vector string -- vector' )
     dupd
-    '[ attributes>> "class" swap at _ = ] find find-between* ;
+    '[ "class" attribute _ = ] find find-between* ;
     
 : find-by-class-id-between ( vector class id -- vector' )
-    '[
-        [ attributes>> "class" swap at _ = ]
-        [ attributes>> "id" swap at _ = ] bi and
-    ] dupd find find-between* ;
+    [
+        '[
+            [ "class" attribute _ = ]
+            [ "id" attribute _ = ] bi and
+        ] find
+    ] [
+        2drop find-between*
+    ] 3bi ;
 
 : find-by-attribute-key ( vector key -- vector' elt/? )
     >lower
@@ -88,59 +113,44 @@ TUPLE: link attributes clickable ;
 
 : find-by-attribute-key-value ( vector value key -- vector' )
     >lower
-    [ attributes>> at over = ] with filter nip
-    sift ;
+    [ attributes>> at over = ] with filter nip sift ;
 
 : find-first-attribute-key-value ( vector value key -- i/f tag/f )
     >lower
     [ attributes>> at over = ] with find rot drop ;
 
-: tag-link ( tag -- link/f )
-    attributes>> [ "href" swap at ] [ f ] if* ;
+: tag-link ( tag -- link/f ) "href" attribute ;
 
 : find-links ( vector -- vector' )
-    [ [ name>> "a" = ] [ attributes>> "href" swap at ] bi and ]
+    [ { [ name>> "a" = ] [ "href" attribute ] } 1&& ]
     find-between-all ;
 
 : find-images ( vector -- vector' )
     [
         {
             [ name>> "img" = ]
-            [ attributes>> "src" swap at ]
+            [ "src" attribute ]
         } 1&&
     ] find-all
-    values [ attributes>> "src" swap at ] map ;
-
-: <link> ( vector -- link )
-    [ first attributes>> ]
-    [ [ name>> { text "img" } member? ] filter ] bi
-    link boa ;
-
-: link. ( vector -- )
-    [ attributes>> "href" swap at write nl ]
-    [ clickable>> [ bl bl text>> print ] each nl ] bi ;
+    values [ "src" attribute ] map ;
 
 : find-by-text ( seq quot -- tag )
     [ dup name>> text = ] prepose find drop ; inline
 
 : find-opening-tags-by-name ( name seq -- seq )
-    [ [ name>> = ] [ closing?>> not ] bi and ] with find-all ;
+    [ { [ name>> = ] [ closing?>> not ] } 1&& ] with find-all ;
 
 : href-contains? ( str tag -- ? )
-    attributes>> "href" swap at* [ subseq? ] [ 2drop f ] if ;
+    "href" attribute* [ subseq? ] [ 2drop f ] if ;
 
 : find-hrefs ( vector -- vector' )
     find-links
-    [ [
-        [ name>> "a" = ]
-        [ attributes>> "href" swap key? ] bi and ] filter
-    ] map sift
-    [ [ attributes>> "href" swap at ] map ] map concat
-    [ >url ] map ;
+    [ [ { [ name>> "a" = ] [ "href" attribute? ] } 1&& ] filter ] map sift
+    [ [ "href" attribute ] map ] map concat [ >url ] map ;
 
 : find-frame-links ( vector -- vector' )
     [ name>> "frame" = ] find-between-all
-    [ [ attributes>> "src" swap at ] map sift ] map concat sift
+    [ [ "src" attribute ] map sift ] map concat sift
     [ >url ] map ;
 
 : find-all-links ( vector -- vector' )
@@ -156,11 +166,10 @@ TUPLE: link attributes clickable ;
     [ first2 find-between* ] curry map ;
 
 : form-action ( vector -- string )
-    [ name>> "form" = ] find nip 
-    attributes>> "action" swap at ;
+    [ name>> "form" = ] find nip "action" attribute ;
 
 : hidden-form-values ( vector -- strings )
-    [ attributes>> "type" swap at "hidden" = ] filter ;
+    [ "type" attribute "hidden" = ] filter ;
 
 : input. ( tag -- )
     dup name>> print
@@ -172,7 +181,7 @@ TUPLE: link attributes clickable ;
     [
         {
             { [ dup name>> "form" = ]
-                [ "form action: " write attributes>> "action" swap at print ] }
+                [ "form action: " write "action" attribute print ] }
             { [ dup name>> "input" = ] [ input. ] }
             [ drop ]
         } cond
@@ -182,10 +191,21 @@ TUPLE: link attributes clickable ;
     "?" split1 nip query>assoc ;
     
 : html-class? ( tag string -- ? )
-    swap attributes>> "class" swap at = ;
+    swap "class" attribute = ;
     
 : html-id? ( tag string -- ? )
-    swap attributes>> "id" swap at = ;
+    swap "id" attribute = ;
 
 : opening-tag? ( tag -- ? )
     closing?>> not ;
+
+TUPLE: link attributes clickable ;
+
+: <link> ( vector -- link )
+    [ first attributes>> ]
+    [ [ name>> { text "img" } member? ] filter ] bi
+    link boa ;
+
+: link. ( vector -- )
+    [ "href" attribute write nl ]
+    [ clickable>> [ bl bl text>> print ] each nl ] bi ;
