@@ -8,9 +8,23 @@ continuations calendar prettyprint dlists deques locals
 spider.unique-deque combinators concurrency.semaphores ;
 IN: spider
 
-TUPLE: spider base count max-count sleep max-depth initial-links
-filters spidered todo nonmatching quiet currently-spidering
-#threads semaphore follow-robots? robots ;
+TUPLE: spider
+    base
+    { count integer initial: 0 }
+    { max-count number initial: 1/0. }
+    sleep
+    { max-depth integer initial: 0 }
+    initial-links
+    filters
+    spidered
+    todo
+    nonmatching
+    quiet?
+    currently-spidering
+    { #threads integer initial: 1 }
+    semaphore
+    follow-robots?
+    robots ;
 
 TUPLE: spider-result url depth headers
 fetched-in parsed-html links processed-in fetched-at ;
@@ -22,11 +36,8 @@ fetched-in parsed-html links processed-in fetched-at ;
         over >>currently-spidering
         swap 0 <unique-deque> [ push-url ] keep >>todo
         <unique-deque> >>nonmatching
-        0 >>max-depth
-        0 >>count
-        1/0. >>max-count
         H{ } clone >>spidered
-        1 [ >>#threads ] [ <semaphore> >>semaphore ] bi ;
+        1 <semaphore> >>semaphore ;
 
 : <spider-result> ( url depth -- spider-result )
     spider-result new
@@ -91,9 +102,9 @@ fetched-in parsed-html links processed-in fetched-at ;
         now >>fetched-at drop ;
 
 :: spider-page ( spider spider-result -- )
-    spider quiet>> [ spider-result print-spidering ] unless
+    spider quiet?>> [ spider-result print-spidering ] unless
     spider spider-result fill-spidered-result
-    spider quiet>> [ spider-result describe ] unless
+    spider quiet?>> [ spider-result describe ] unless
     spider spider-result add-spidered ;
 
 \ spider-page ERROR add-error-logging
@@ -108,7 +119,7 @@ fetched-in parsed-html links processed-in fetched-at ;
 : spider-page? ( spider -- ? )
     {
         [ todo>> deque>> deque-empty? not ]
-        [ [ todo>> peek-url depth>> ] [ max-depth>> ] bi < ]
+        [ [ todo>> peek-url depth>> ] [ max-depth>> ] bi <= ]
         [ [ count>> ] [ max-count>> ] bi < ]
     } 1&& ;
 
