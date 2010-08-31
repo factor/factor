@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors ascii combinators fry
 gobject-introspection.common gobject-introspection.repository
-gobject-introspection.types kernel math.parser sequences
+gobject-introspection.types literals kernel math.parser sequences
 splitting xml.data xml.traversal ;
 FROM: namespaces => set get ;
 IN: gobject-introspection.loader
@@ -57,12 +57,24 @@ SYMBOL: namespace-PREFIX
         { "varargs" [ drop f f ] }
         { "callback" [ drop f "any" f type boa ] }
     } case ;
+
+CONSTANT: type-tags {
+    $[ "array" <null-name> ]
+    $[ "type" <null-name> ]
+    $[ "varargs" <null-name> ]
+    $[ "callback" <null-name> ]
+}
+
+: child-type-tag ( xml -- type-tag )
+    children-tags [
+        type-tags [ swap tag-named? ] with any?
+    ] find nip ;
     
 : load-parameter ( param xml -- param )
     [ "transfer-ownership" attr >>transfer-ownership ]
-    [ first-child-tag "type" attr >>c-type ]
+    [ child-type-tag "type" attr >>c-type ]
     [
-        first-child-tag xml>type
+        child-type-tag xml>type
         [ [ >>array-info ] [ >>type ] bi* ] [ 2drop f ] if*
     ] tri ;
 
@@ -146,7 +158,7 @@ SYMBOL: namespace-PREFIX
         [ "readable" attr "0" = not >>readable? ]
         [ "construct" attr "1" = >>construct? ]
         [ "construct-only" attr "1" = >>construct-only? ]
-        [ first-child-tag xml>type nip >>type ]
+        [ child-type-tag xml>type nip >>type ]
     } cleave ;
 
 : xml>callback ( xml -- callback )
@@ -223,12 +235,12 @@ SYMBOL: namespace-PREFIX
         [ "name" attr >>name ]
         [ "writable" attr "1" = >>writable? ]
         [
-            first-child-tag dup name>> main>> "callback" =
+            child-type-tag dup name>> main>> "callback" =
             [ drop "gpointer" ] [ "type" attr ] if
             >>c-type
         ]
         [
-            first-child-tag xml>type
+            child-type-tag xml>type
             [ [ >>array-info ] [ >>type ] bi* ] [ 2drop f ] if*
         ]
     } cleave ;
@@ -264,8 +276,8 @@ SYMBOL: namespace-PREFIX
             >>c-identifier
         ]
         [ "value" attr >>value ]
-        [ first-child-tag "type" attr >>c-type ]
-        [ first-child-tag xml>type nip >>type ]
+        [ child-type-tag "type" attr >>c-type ]
+        [ child-type-tag xml>type nip >>type ]
     } cleave ;
 
 : xml>namespace ( xml -- namespace )
