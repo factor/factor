@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.destructors
-alien.libraries alien.syntax combinators compiler.units
-gobject-introspection kernel system vocabs.parser words ;
+alien.libraries alien.syntax classes.struct combinators
+compiler.units gobject-introspection kernel system vocabs.parser
+words ;
 IN: glib.ffi
 
 <<
@@ -64,10 +65,25 @@ TYPEDEF: guint16 gunichar2
 
 TYPEDEF: gpointer pointer
 
-REPLACE-C-TYPE: long\sdouble double
+STRUCT: fake-long-double { data char[10] } ;
+REPLACE-C-TYPE: long\sdouble fake-long-double
+
 REPLACE-C-TYPE: any gpointer
 
 IMPLEMENT-STRUCTS: GPollFD GSource GSourceFuncs ;
+
+CONSTANT: G_MININT8   HEX: -80
+CONSTANT: G_MAXINT8   HEX:  7f
+CONSTANT: G_MAXUINT8  HEX:  ff
+CONSTANT: G_MININT16  HEX: -8000
+CONSTANT: G_MAXINT16  HEX:  7fff
+CONSTANT: G_MAXUINT16 HEX:  ffff
+CONSTANT: G_MININT32  HEX: -80000000
+CONSTANT: G_MAXINT32  HEX:  7fffffff
+CONSTANT: G_MAXUINT32 HEX:  ffffffff
+CONSTANT: G_MININT64  HEX: -8000000000000000
+CONSTANT: G_MAXINT64  HEX:  7fffffffffffffff
+CONSTANT: G_MAXUINT64 HEX:  ffffffffffffffff
 
 GIR: vocab:glib/GLib-2.0.gir
 
