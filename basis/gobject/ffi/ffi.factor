@@ -15,7 +15,7 @@ IN: gobject.ffi
 >>
 
 TYPEDEF: void* GSignalCMarshaller
-TYPEDEF: void GStrv
+TYPEDEF: gchar** GStrv
 TYPEDEF: gchar* gchararray
 
 GIR: vocab:gobject/GObject-2.0.gir
