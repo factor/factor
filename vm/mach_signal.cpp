@@ -38,6 +38,7 @@ void factor_vm::call_fault_handler(
 	MACH_STACK_POINTER(thread_state) = (cell)fix_callstack_top((stack_frame *)MACH_STACK_POINTER(thread_state));
 
 	signal_callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
+	ctx->callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
 
 	/* Now we point the program counter at the right handler function. */
 	if(exception == EXC_BAD_ACCESS)
