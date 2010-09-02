@@ -10,7 +10,7 @@ ARTICLE: "timing" "Timing code and collecting statistics"
 "A lower-level word puts timings on the stack, intead of printing:"
 { $subsections benchmark }
 "You can also read the system clock directly; see " { $link "system" } "."
-{ $see-also "profiling" "calendar" } ;
+{ $see-also "profiling" "tools.annotations" "calendar" } ;
 
 ABOUT: "timing"
 
