@@ -51,6 +51,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, 
 {
 	c->ESP = (cell)fix_callstack_top((stack_frame *)c->ESP);
 	signal_callstack_top = (stack_frame *)c->ESP;
+	ctx->callstack_top = (stack_frame *)c->ESP;
 
 	switch (e->ExceptionCode)
 	{
@@ -72,6 +73,8 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, 
 		signal_fpu_status = fpu_status(MXCSR(c));
 #else
 		signal_fpu_status = fpu_status(X87SW(c) | MXCSR(c));
+
+		/* This seems to have no effect */
 		X87SW(c) = 0;
 #endif
 		MXCSR(c) &= 0xffffffc0;
