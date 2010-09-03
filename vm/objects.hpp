@@ -55,6 +55,8 @@ enum special_object {
 	C_TO_FACTOR_WORD,
 	LAZY_JIT_COMPILE_WORD,
 	UNWIND_NATIVE_FRAMES_WORD,
+	GET_FPU_STATE_WORD,
+	SET_FPU_STATE_WORD,
 
 	/* Incremented on every modify-code-heap call; invalidates call( inline
 	caching */

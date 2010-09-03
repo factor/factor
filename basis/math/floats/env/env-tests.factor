@@ -1,7 +1,7 @@
 USING: kernel math math.floats.env math.floats.env.private
 math.functions math.libm sequences tools.test locals
 compiler.units kernel.private fry compiler.test math.private
-words system ;
+words system memory ;
 IN: math.floats.env.tests
 
 : set-default-fp-env ( -- )
@@ -193,6 +193,9 @@ os openbsd eq? cpu x86.32 eq? and [
 [ +denormal-keep+ ] [ denormal-mode ] unit-test
 [ { } ] [ fp-traps ] unit-test
 
+[ ] [
+    all-fp-exceptions [ compact-gc ] with-fp-traps
+] unit-test
+
 ! In case the tests screw up the FP env because of bugs in math.floats.env
 set-default-fp-env
-

@@ -118,7 +118,7 @@ void factor_vm::dispatch_signal(void *uap, void (handler)())
 	UAP_STACK_POINTER(uap) = (UAP_STACK_POINTER_TYPE)fix_callstack_top((stack_frame *)UAP_STACK_POINTER(uap));
 	UAP_PROGRAM_COUNTER(uap) = (cell)handler;
 
-	signal_callstack_top = (stack_frame *)UAP_STACK_POINTER(uap);
+	ctx->callstack_top = (stack_frame *)UAP_STACK_POINTER(uap);
 }
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
@@ -133,6 +133,10 @@ void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 	factor_vm *vm = current_vm();
 	vm->signal_number = signal;
 	vm->dispatch_signal(uap,factor::misc_signal_handler_impl);
+}
+
+void ignore_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
 }
 
 void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
@@ -206,9 +210,13 @@ void factor_vm::unix_init_signals()
 	sigaction_safe(SIGQUIT,&misc_sigaction,NULL);
 	sigaction_safe(SIGILL,&misc_sigaction,NULL);
 
+	/* We don't use SA_IGN here because then the ignore action is inherited
+	by subprocesses, which we don't want. There is a unit test in
+	io.launcher.unix for this. */
 	memset(&ignore_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&ignore_sigaction.sa_mask);
-	ignore_sigaction.sa_handler = SIG_IGN;
+	ignore_sigaction.sa_sigaction = ignore_signal_handler;
+	ignore_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
 	sigaction_safe(SIGPIPE,&ignore_sigaction,NULL);
 }
 
