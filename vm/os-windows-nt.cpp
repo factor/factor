@@ -50,7 +50,6 @@ void sleep_nanos(u64 nsec)
 LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
 {
 	c->ESP = (cell)fix_callstack_top((stack_frame *)c->ESP);
-	signal_callstack_top = (stack_frame *)c->ESP;
 	ctx->callstack_top = (stack_frame *)c->ESP;
 
 	switch (e->ExceptionCode)
