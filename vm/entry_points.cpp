@@ -26,4 +26,18 @@ void factor_vm::unwind_native_frames(cell quot, stack_frame *to)
 	unwind_native_frames_func(quot,to);
 }
 
+cell factor_vm::get_fpu_state()
+{
+	tagged<word> get_fpu_state_word(special_objects[GET_FPU_STATE_WORD]);
+	get_fpu_state_func_type get_fpu_state_func = (get_fpu_state_func_type)get_fpu_state_word->entry_point;
+	return get_fpu_state_func();
+}
+
+void factor_vm::set_fpu_state(cell state)
+{
+	tagged<word> set_fpu_state_word(special_objects[SET_FPU_STATE_WORD]);
+	set_fpu_state_func_type set_fpu_state_func = (set_fpu_state_func_type)set_fpu_state_word->entry_point;
+	set_fpu_state_func(state);
+}
+
 }

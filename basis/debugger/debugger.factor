@@ -136,7 +136,7 @@ PREDICATE: vm-error < array
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }
-        [ second 0 16 between? ]
+        [ second 0 17 between? ]
     } cond ;
 
 : vm-errors ( error -- n errors )

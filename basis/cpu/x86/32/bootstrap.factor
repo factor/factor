@@ -64,9 +64,6 @@ IN: bootstrap.x86
     ds-reg ctx-reg context-datastack-offset [+] MOV
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
-: jit-scrub-return ( n -- )
-    ESP swap [+] 0 MOV ;
-
 [
     ! ctx-reg is preserved across the call because it is non-volatile
     ! in the C ABI
@@ -115,23 +112,27 @@ IN: bootstrap.x86
     ! Windows-specific setup
     ctx-reg jit-update-seh
 
-    ! Clear x87 stack, but preserve rounding mode and exception flags
-    ESP 2 SUB
-    ESP [] FNSTCW
-    FNINIT
-    ESP [] FLDCW
-    ESP 2 ADD
-
     ! Load arguments
     EAX ESP stack-frame-size [+] MOV
     EDX ESP stack-frame-size 4 + [+] MOV
 
     ! Unwind stack frames
     ESP EDX MOV
-    0 jit-scrub-return
 
     jit-jump-quot
 ] \ unwind-native-frames define-sub-primitive
+
+[
+    ESP 2 SUB
+    ESP [] FNSTCW
+    FNINIT
+    AX ESP [] MOV
+    ESP 2 ADD
+] \ get-fpu-state define-sub-primitive
+
+[
+    ESP stack-frame-size [+] FLDCW
+] \ set-fpu-state define-sub-primitive
 
 [
     ! Load callstack object
@@ -251,7 +252,9 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
-    -4 jit-scrub-return
+    ! Reset return value since its bogus right now, to avoid
+    ! confusing the GC
+    ESP -4 [+] 0 MOV
 
     ! Make the new context the current one
     ctx-reg swap MOV
