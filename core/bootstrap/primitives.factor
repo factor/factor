@@ -340,6 +340,8 @@ tuple
     { "tag" "kernel.private" (( object -- n )) }
     { "(execute)" "kernel.private" (( word -- )) }
     { "(call)" "kernel.private" (( quot -- )) }
+    { "get-fpu-state" "kernel.private" (( -- )) }
+    { "set-fpu-state" "kernel.private" (( -- )) }
     { "unwind-native-frames" "kernel.private" (( -- )) }
     { "set-callstack" "kernel.private" (( callstack -- * )) }
     { "lazy-jit-compile" "kernel.private" (( -- )) }

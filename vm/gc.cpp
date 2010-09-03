@@ -128,6 +128,11 @@ void factor_vm::start_gc_again()
 
 void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 {
+	/* Save and reset FPU state before, restore it after, so that
+	nano_count() doesn't bomb on Windows if inexact traps are enabled
+	(fun huh?) */
+	cell fpu_state = get_fpu_state();
+
 	assert(!gc_off);
 	assert(!current_gc);
 
@@ -192,6 +197,8 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 
 	delete current_gc;
 	current_gc = NULL;
+
+	set_fpu_state(fpu_state);
 }
 
 /* primitive_minor_gc() is invoked by inline GC checks, and it needs to fill in

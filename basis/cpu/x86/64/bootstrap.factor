@@ -62,9 +62,6 @@ IN: bootstrap.x86
     ds-reg ctx-reg context-datastack-offset [+] MOV
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
-: jit-scrub-return ( n -- )
-    RSP swap [+] 0 MOV ;
-
 [
     ! ctx-reg is preserved across the call because it is non-volatile
     ! in the C ABI
@@ -102,15 +99,8 @@ IN: bootstrap.x86
 \ (call) define-combinator-primitive
 
 [
-    ! Clear x87 stack, but preserve rounding mode and exception flags
-    RSP 2 SUB
-    RSP [] FNSTCW
-    FNINIT
-    RSP [] FLDCW
-
     ! Unwind stack frames
     RSP arg2 MOV
-    0 jit-scrub-return
 
     ! Load VM pointer into vm-reg, since we're entering from
     ! C code
@@ -123,6 +113,21 @@ IN: bootstrap.x86
     ! Call quotation
     jit-jump-quot
 ] \ unwind-native-frames define-sub-primitive
+
+[
+    RSP 2 SUB
+    RSP [] FNSTCW
+    FNINIT
+    AX RSP [] MOV
+    RSP 2 ADD
+] \ get-fpu-state define-sub-primitive
+
+[
+    RSP 2 SUB
+    RSP [] arg1 16-bit-version-of MOV
+    RSP [] FLDCW
+    RSP 2 ADD
+] \ set-fpu-state define-sub-primitive
 
 [
     ! Load callstack object
@@ -228,7 +233,9 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
-    -8 jit-scrub-return
+    ! Reset return value since its bogus right now, to avoid
+    ! confusing the GC
+    RSP -8 [+] 0 MOV
 
     ! Make the new context the current one
     ctx-reg swap MOV
