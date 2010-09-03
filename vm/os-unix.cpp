@@ -118,7 +118,6 @@ void factor_vm::dispatch_signal(void *uap, void (handler)())
 	UAP_STACK_POINTER(uap) = (UAP_STACK_POINTER_TYPE)fix_callstack_top((stack_frame *)UAP_STACK_POINTER(uap));
 	UAP_PROGRAM_COUNTER(uap) = (cell)handler;
 
-	signal_callstack_top = (stack_frame *)UAP_STACK_POINTER(uap);
 	ctx->callstack_top = (stack_frame *)UAP_STACK_POINTER(uap);
 }
 
