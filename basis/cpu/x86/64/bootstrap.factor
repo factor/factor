@@ -124,7 +124,7 @@ IN: bootstrap.x86
 
 [
     RSP 2 SUB
-    RSP [] arg1 16-bit-vesion-of MOV
+    RSP [] arg1 16-bit-version-of MOV
     RSP [] FLDCW
     RSP 2 ADD
 ] \ set-fpu-state define-sub-primitive
