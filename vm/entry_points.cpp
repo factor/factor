@@ -19,25 +19,29 @@ void factor_vm::c_to_factor(cell quot)
 	c_to_factor_func(quot);
 }
 
+template<typename Func> Func factor_vm::get_entry_point(cell n)
+{
+	/* We return word->code->entry_point() and not word->entry_point,
+	because if profiling is enabled, we don't want to go through the
+	entry point's profiling stub. This clobbers registers, since entry
+	points use the C ABI and not the Factor ABI. */
+	tagged<word> entry_point_word(special_objects[n]);
+	return (Func)entry_point_word->code->entry_point();
+}
+
 void factor_vm::unwind_native_frames(cell quot, stack_frame *to)
 {
-	tagged<word> unwind_native_frames_word(special_objects[UNWIND_NATIVE_FRAMES_WORD]);
-	unwind_native_frames_func_type unwind_native_frames_func = (unwind_native_frames_func_type)unwind_native_frames_word->entry_point;
-	unwind_native_frames_func(quot,to);
+	get_entry_point<unwind_native_frames_func_type>(UNWIND_NATIVE_FRAMES_WORD)(quot,to);
 }
 
 cell factor_vm::get_fpu_state()
 {
-	tagged<word> get_fpu_state_word(special_objects[GET_FPU_STATE_WORD]);
-	get_fpu_state_func_type get_fpu_state_func = (get_fpu_state_func_type)get_fpu_state_word->entry_point;
-	return get_fpu_state_func();
+	return get_entry_point<get_fpu_state_func_type>(GET_FPU_STATE_WORD)();
 }
 
 void factor_vm::set_fpu_state(cell state)
 {
-	tagged<word> set_fpu_state_word(special_objects[SET_FPU_STATE_WORD]);
-	set_fpu_state_func_type set_fpu_state_func = (set_fpu_state_func_type)set_fpu_state_word->entry_point;
-	set_fpu_state_func(state);
+	get_entry_point<set_fpu_state_func_type>(GET_FPU_STATE_WORD)(state);
 }
 
 }
