@@ -652,6 +652,7 @@ struct factor_vm
 
 	// entry points
 	void c_to_factor(cell quot);
+	template<typename Func> Func get_entry_point(cell n);
 	void unwind_native_frames(cell quot, stack_frame *to);
 	cell get_fpu_state();
 	void set_fpu_state(cell state);
