@@ -18,8 +18,8 @@ M: windows sockaddr-of-family ( alien af -- addrspec )
 
 M: windows addrspec-of-family ( af -- addrspec )
     {
-        { AF_INET [ T{ inet4 } ] }
-        { AF_INET6 [ T{ inet6 } ] }
+        { AF_INET [ T{ ipv4 } ] }
+        { AF_INET6 [ T{ ipv6 } ] }
         [ drop f ]
     } case ;
 
