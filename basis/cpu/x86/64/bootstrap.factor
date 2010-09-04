@@ -120,7 +120,7 @@ IN: bootstrap.x86
     FNINIT
     AX RSP [] MOV
     RSP 2 ADD
-] \ get-fpu-state define-sub-primitive
+] \ fpu-state define-sub-primitive
 
 [
     RSP 2 SUB

@@ -128,7 +128,7 @@ IN: bootstrap.x86
     FNINIT
     AX ESP [] MOV
     ESP 2 ADD
-] \ get-fpu-state define-sub-primitive
+] \ fpu-state define-sub-primitive
 
 [
     ESP stack-frame-size [+] FLDCW

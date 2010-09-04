@@ -407,6 +407,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ float>bignum { float } { bignum } define-primitive \ float>bignum make-foldable
 \ float>bits { real } { integer } define-primitive \ float>bits make-foldable
 \ float>fixnum { float } { fixnum } define-primitive \ bignum>fixnum make-foldable
+\ fpu-state { } { } define-primitive
 \ fputc { object alien } { } define-primitive
 \ fread { integer alien } { object } define-primitive
 \ fseek { integer integer alien } { } define-primitive
@@ -444,6 +445,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ set-alien-unsigned-8 { integer c-ptr integer } { } define-primitive
 \ set-alien-unsigned-cell { integer c-ptr integer } { } define-primitive
 \ set-context-object { object fixnum } { } define-primitive
+\ set-fpu-state { } { } define-primitive
 \ set-innermost-frame-quot { quotation callstack } { } define-primitive
 \ set-slot { object object fixnum } { } define-primitive
 \ set-special-object { object fixnum } { } define-primitive
