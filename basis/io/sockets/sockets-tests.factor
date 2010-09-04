@@ -70,6 +70,18 @@ io.streams.string ;
     [ [ [ ipv4? ] [ ipv6? ] bi or ] all? ] bi
 ] unit-test
 
+[ t t ] [
+    f resolve-host
+    [ length 1 >= ]
+    [ [ [ ipv4? ] [ ipv6? ] bi or ] all? ] bi
+] unit-test
+
+[ t t ] [
+    f 0 <inet> resolve-host
+    [ length 1 >= ]
+    [ [ [ ipv4? ] [ ipv6? ] bi or ] all? ] bi
+] unit-test
+
 ! Smoke-test UDP
 [ ] [ "127.0.0.1" 0 <inet4> <datagram> "datagram1" set ] unit-test
 [ ] [ "datagram1" get addr>> "addr1" set ] unit-test
@@ -117,3 +129,6 @@ io.streams.string ;
         "hi\n" write flush readln readln
     ] with-client
 ] unit-test
+
+! Binding to all interfaces should work
+[ ] [ f 0 <inet4> <datagram> dispose ] unit-test
