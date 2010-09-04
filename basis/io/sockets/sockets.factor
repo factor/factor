@@ -6,7 +6,7 @@ arrays io.encodings io.ports io.streams.duplex io.encodings.ascii
 alien.strings io.binary accessors destructors classes byte-arrays
 parser alien.c-types math.parser splitting grouping math assocs
 summary system vocabs.loader combinators present fry vocabs.parser
-classes.struct alien.data ;
+classes.struct alien.data strings ;
 IN: io.sockets
 
 << {
@@ -30,6 +30,8 @@ GENERIC: address-size ( addrspec -- n )
 GENERIC: inet-ntop ( data addrspec -- str )
 
 GENERIC: inet-pton ( str addrspec -- data )
+
+GENERIC# with-port 1 ( addrspec port -- addrspec )
 
 : make-sockaddr/size ( addrspec -- sockaddr size )
     [ make-sockaddr ] [ sockaddr-size ] bi ;
@@ -56,7 +58,9 @@ M: local present path>> "Unix domain socket: " prepend ;
 
 SLOT: port
 
-TUPLE: ipv4 host ;
+TUPLE: ipv4 { host string read-only } ;
+
+C: <ipv4> ipv4
 
 M: ipv4 inet-ntop ( data addrspec -- str )
     drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
@@ -96,18 +100,24 @@ M: ipv4 make-sockaddr ( inet -- sockaddr )
         [ host>> "0.0.0.0" or ]
         [ inet-pton *uint >>addr ] tri ;
 
-TUPLE: inet4 < ipv4 port ;
+M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
+    [ addr>> <uint> ] dip inet-ntop <ipv4> ;
+
+TUPLE: inet4 < ipv4 { port integer read-only } ;
 
 C: <inet4> inet4
 
+M: ipv4 with-port [ host>> ] dip <inet4> ;
+
 M: inet4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
-    [ [ addr>> <uint> ] dip inet-ntop ]
-    [ drop port>> ntohs ] 2bi <inet4> ;
+    [ call-next-method ] [ drop port>> ntohs ] 2bi with-port ;
 
 M: inet4 present
     [ host>> ] [ port>> number>string ] bi ":" glue ;
 
-TUPLE: ipv6 host ;
+TUPLE: ipv6 { host string read-only } ;
+
+C: <ipv6> ipv6
 
 M: ipv6 inet-ntop ( data addrspec -- str )
     drop 16 memory>byte-array 2 <groups> [ be> >hex ] map ":" join ;
@@ -162,17 +172,22 @@ M: ipv6 empty-sockaddr drop sockaddr-in6 <struct> ;
 M: ipv6 make-sockaddr ( inet -- sockaddr )
     sockaddr-in6 <struct>
         AF_INET6 >>family
-        swap [ port>> htons >>port ]
-            [ host>> "::" or ]
-            [ inet-pton >>addr ] tri ;
+        swap
+        [ port>> htons >>port ]
+        [ host>> "::" or ]
+        [ inet-pton >>addr ] tri ;
 
-TUPLE: inet6 < ipv6 port ;
+M: ipv6 parse-sockaddr
+    [ addr>> ] dip inet-ntop <ipv6> ;
+
+TUPLE: inet6 < ipv6 { port integer read-only } ;
 
 C: <inet6> inet6
 
+M: ipv6 with-port [ host>> ] dip <inet6> ;
+
 M: inet6 parse-sockaddr
-    [ [ addr>> ] dip inet-ntop ]
-    [ drop port>> ntohs ] 2bi <inet6> ;
+    [ call-next-method ] [ drop port>> ntohs ] 2bi with-port ;
 
 M: inet6 present
     [ host>> ] [ port>> number>string ] bi ":" glue ;
@@ -254,16 +269,10 @@ HOOK: (send) io-backend ( packet addrspec datagram -- )
 
 HOOK: addrinfo-error io-backend ( n -- )
 
-: resolve-passive-host ( -- addrspecs )
-    { T{ inet6 f "::" f } T{ inet4 f "0.0.0.0" f } } [ clone ] map ;
-
 : prepare-addrinfo ( -- addrinfo )
     addrinfo <struct>
         PF_UNSPEC >>family
         IPPROTO_TCP >>protocol ;
-
-: fill-in-ports ( addrspecs port -- addrspecs )
-    '[ _ >>port ] map ;
 
 PRIVATE>
 
@@ -322,19 +331,25 @@ M: inet present
 
 C: <inet> inet
 
+M: string resolve-host
+    f prepare-addrinfo f <void*>
+    [ getaddrinfo addrinfo-error ] keep *void* addrinfo memory>struct
+    [ parse-addrinfo-list ] keep freeaddrinfo ;
+
 M: hostname resolve-host
-    host>> [
-        f prepare-addrinfo f <void*>
-        [ getaddrinfo addrinfo-error ] keep *void* addrinfo memory>struct
-        [ parse-addrinfo-list ] keep freeaddrinfo
-    ] [ resolve-passive-host ] if* ;
+    host>> resolve-host ;
 
 M: inet resolve-host
-    [ call-next-method ] [ port>> ] bi fill-in-ports ;
+    [ call-next-method ] [ port>> ] bi '[ _ with-port ] map ;
 
-M: f resolve-host drop { } ;
+M: inet4 resolve-host 1array ;
 
-M: object resolve-host 1array ;
+M: inet6 resolve-host 1array ;
+
+M: local resolve-host 1array ;
+
+M: f resolve-host
+    drop { T{ ipv6 f "::" } T{ ipv4 f "0.0.0.0" } } ;
 
 : host-name ( -- string )
     256 <byte-array> dup dup length gethostname

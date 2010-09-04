@@ -58,7 +58,17 @@ io.streams.string ;
 [ "2001:6f8:37a:5:0:0:0:1" ]
 [ "2001:6f8:37a:5::1" T{ inet6 } [ inet-pton ] [ inet-ntop ] bi ] unit-test
 
-[ t ] [ "localhost" 80 <inet> resolve-host length 1 >= ] unit-test
+[ t t ] [
+    "localhost" 80 <inet> resolve-host
+    [ length 1 >= ]
+    [ [ [ inet4? ] [ inet6? ] bi or ] all? ] bi
+] unit-test
+
+[ t t ] [
+    "localhost" resolve-host
+    [ length 1 >= ]
+    [ [ [ ipv4? ] [ ipv6? ] bi or ] all? ] bi
+] unit-test
 
 ! Smoke-test UDP
 [ ] [ "127.0.0.1" 0 <inet4> <datagram> "datagram1" set ] unit-test
