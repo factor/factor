@@ -92,15 +92,17 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p)
 
 void factor_vm::collect_sweep_impl()
 {
-	current_gc->event->started_data_sweep();
+	gc_event *event = current_gc->event;
+
+	if(event) event->started_data_sweep();
 	data->tenured->sweep();
-	current_gc->event->ended_data_sweep();
+	if(event) event->ended_data_sweep();
 
 	update_code_roots_for_sweep();
 
-	current_gc->event->started_code_sweep();
+	if(event) event->started_code_sweep();
 	code->allocator->sweep();
-	current_gc->event->ended_code_sweep();
+	if(event) event->ended_code_sweep();
 }
 
 void factor_vm::collect_full(bool trace_contexts_p)
@@ -110,14 +112,12 @@ void factor_vm::collect_full(bool trace_contexts_p)
 
 	if(data->low_memory_p())
 	{
-		current_gc->op = collect_growing_heap_op;
-		current_gc->event->op = collect_growing_heap_op;
+		set_current_gc_op(collect_growing_heap_op);
 		collect_growing_heap(0,trace_contexts_p);
 	}
 	else if(data->high_fragmentation_p())
 	{
-		current_gc->op = collect_compact_op;
-		current_gc->event->op = collect_compact_op;
+		set_current_gc_op(collect_compact_op);
 		collect_compact_impl(trace_contexts_p);
 	}
 
