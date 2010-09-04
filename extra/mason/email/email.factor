@@ -1,18 +1,24 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces accessors combinators make smtp debugger
-prettyprint sequences io io.streams.string io.encodings.utf8 io.files
-io.sockets mason.common mason.platform mason.config ;
+USING: kernel namespaces accessors combinators make smtp
+debugger prettyprint sequences io io.streams.string
+io.encodings.utf8 io.files io.sockets fry continuations
+mason.common mason.platform mason.config ;
 IN: mason.email
 
 : mason-email ( body content-type subject -- )
-    <email>
-        builder-from get >>from
-        builder-recipients get >>to
-        swap >>subject
-        swap >>content-type
-        swap >>body
-    send-email ;
+    '[
+        <email>
+            builder-from get >>from
+            builder-recipients get >>to
+            _ >>body
+            _ >>content-type
+            _ >>subject
+        send-email
+    ] [
+        "E-MAILING FAILED:" print
+        error. flush
+    ] recover ;
 
 : subject-prefix ( -- string )
     "mason on " platform ": " 3append ;
