@@ -299,6 +299,7 @@ struct factor_vm
 
 	// gc
 	void end_gc();
+	void set_current_gc_op(gc_op op);
 	void start_gc_again();
 	void update_code_heap_for_minor_gc(std::set<code_block *> *remembered_set);
 	void collect_nursery();
