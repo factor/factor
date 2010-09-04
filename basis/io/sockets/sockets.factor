@@ -17,6 +17,8 @@ IN: io.sockets
 ! Addressing
 <PRIVATE
 
+UNION: ?string string POSTPONE: f ;
+
 GENERIC: protocol-family ( addrspec -- af )
 
 GENERIC: sockaddr-size ( addrspec -- n )
@@ -58,7 +60,7 @@ M: local present path>> "Unix domain socket: " prepend ;
 
 SLOT: port
 
-TUPLE: ipv4 { host string read-only } ;
+TUPLE: ipv4 { host ?string read-only } ;
 
 C: <ipv4> ipv4
 
@@ -115,7 +117,7 @@ M: inet4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
 M: inet4 present
     [ host>> ] [ port>> number>string ] bi ":" glue ;
 
-TUPLE: ipv6 { host string read-only } ;
+TUPLE: ipv6 { host ?string read-only } ;
 
 C: <ipv6> ipv6
 
@@ -322,7 +324,7 @@ SYMBOL: remote-address
 
 GENERIC: resolve-host ( addrspec -- seq )
 
-TUPLE: hostname host ;
+TUPLE: hostname { host ?string read-only } ;
 
 TUPLE: inet < hostname port ;
 
