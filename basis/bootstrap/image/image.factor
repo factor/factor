@@ -201,7 +201,7 @@ SPECIAL-OBJECT: jit-declare-word 41
 SPECIAL-OBJECT: c-to-factor-word 42
 SPECIAL-OBJECT: lazy-jit-compile-word 43
 SPECIAL-OBJECT: unwind-native-frames-word 44
-SPECIAL-OBJECT: get-fpu-state-word 45
+SPECIAL-OBJECT: fpu-state-word 45
 SPECIAL-OBJECT: set-fpu-state-word 46
 
 SPECIAL-OBJECT: callback-stub 48
@@ -542,7 +542,7 @@ M: quotation '
     \ c-to-factor c-to-factor-word set
     \ lazy-jit-compile lazy-jit-compile-word set
     \ unwind-native-frames unwind-native-frames-word set
-    \ get-fpu-state get-fpu-state-word set
+    \ fpu-state fpu-state-word set
     \ set-fpu-state set-fpu-state-word set
     undefined-def undefined-quot set ;
 
