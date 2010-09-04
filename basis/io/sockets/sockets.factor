@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman,
+! Copyright (C) 2007, 2010 Slava Pestov, Doug Coleman,
 ! Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: generic kernel io.backend namespaces continuations sequences
@@ -39,16 +39,13 @@ GENERIC: inet-pton ( str addrspec -- data )
 
 GENERIC: parse-sockaddr ( sockaddr addrspec -- newaddrspec )
 
+M: f parse-sockaddr nip ;
+
 HOOK: sockaddr-of-family os ( alien af -- sockaddr )
 
 HOOK: addrspec-of-family os ( af -- addrspec )
 
 PRIVATE>
-
-TUPLE: abstract-inet host port ;
-
-M: abstract-inet present
-    [ host>> ":" ] [ port>> number>string ] bi 3append ;
 
 TUPLE: local path ;
 
@@ -57,62 +54,65 @@ TUPLE: local path ;
 
 M: local present path>> "Unix domain socket: " prepend ;
 
-TUPLE: inet4 < abstract-inet ;
+SLOT: port
 
-C: <inet4> inet4
+TUPLE: ipv4 host ;
 
-M: inet4 inet-ntop ( data addrspec -- str )
+M: ipv4 inet-ntop ( data addrspec -- str )
     drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
 
-ERROR: malformed-inet4 sequence ;
-ERROR: bad-inet4-component string ;
+<PRIVATE
 
-: parse-inet4 ( string -- seq )
-    "." split dup length 4 = [
-        malformed-inet4
-    ] unless
-    [
-        string>number
-        [ "Dotted component not a number" throw ] unless*
-    ] B{ } map-as ;
+ERROR: malformed-ipv4 sequence ;
 
-ERROR: invalid-inet4 string reason ;
+ERROR: bad-ipv4-component string ;
 
-M: invalid-inet4 summary drop "Invalid IPv4 address" ;
+: parse-ipv4 ( string -- seq )
+    "." split dup length 4 = [ malformed-ipv4 ] unless
+    [ dup string>number [ ] [ bad-ipv4-component ] ?if ] B{ } map-as ;
 
-M: inet4 inet-pton ( str addrspec -- data )
-    drop
-    [ parse-inet4 ] [ invalid-inet4 ] recover ;
+ERROR: invalid-ipv4 string reason ;
 
-M: inet4 address-size drop 4 ;
+M: invalid-ipv4 summary drop "Invalid IPv4 address" ;
 
-M: inet4 protocol-family drop PF_INET ;
+PRIVATE>
 
-M: inet4 sockaddr-size drop sockaddr-in heap-size ;
+M: ipv4 inet-pton ( str addrspec -- data )
+    drop [ parse-ipv4 ] [ invalid-ipv4 ] recover ;
 
-M: inet4 empty-sockaddr drop sockaddr-in <struct> ;
+M: ipv4 address-size drop 4 ;
 
-M: inet4 make-sockaddr ( inet -- sockaddr )
+M: ipv4 protocol-family drop PF_INET ;
+
+M: ipv4 sockaddr-size drop sockaddr-in heap-size ;
+
+M: ipv4 empty-sockaddr drop sockaddr-in <struct> ;
+
+M: ipv4 make-sockaddr ( inet -- sockaddr )
     sockaddr-in <struct>
         AF_INET >>family
-        swap [ port>> htons >>port ]
-            [ host>> "0.0.0.0" or ]
-            [ inet-pton *uint >>addr ] tri ;
+        swap
+        [ port>> htons >>port ]
+        [ host>> "0.0.0.0" or ]
+        [ inet-pton *uint >>addr ] tri ;
+
+TUPLE: inet4 < ipv4 port ;
+
+C: <inet4> inet4
 
 M: inet4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
     [ [ addr>> <uint> ] dip inet-ntop ]
     [ drop port>> ntohs ] 2bi <inet4> ;
 
-TUPLE: inet6 < abstract-inet ;
+M: inet4 present
+    [ host>> ] [ port>> number>string ] bi ":" glue ;
 
-C: <inet6> inet6
+TUPLE: ipv6 host ;
 
-M: inet6 inet-ntop ( data addrspec -- str )
+M: ipv6 inet-ntop ( data addrspec -- str )
     drop 16 memory>byte-array 2 <groups> [ be> >hex ] map ":" join ;
 
-ERROR: invalid-inet6 string reason ;
-
-M: invalid-inet6 summary drop "Invalid IPv6 address" ;
+ERROR: invalid-ipv6 string reason ;
 
 <PRIVATE
 
@@ -120,55 +120,62 @@ ERROR: bad-ipv6-component obj ;
 
 ERROR: bad-ipv4-embedded-prefix obj ;
 
+ERROR: more-than-8-components ;
+
 : parse-ipv6-component ( seq -- seq' )
     [ dup hex> [ nip ] [ bad-ipv6-component ] if* ] { } map-as ;
 
-: parse-inet6 ( string -- seq )
+: parse-ipv6 ( string -- seq )
     [ f ] [
         ":" split CHAR: . over last member? [
             unclip-last
-            [ parse-ipv6-component ] [ parse-inet4 ] bi* append
+            [ parse-ipv6-component ] [ parse-ipv4 ] bi* append
         ] [
             parse-ipv6-component
         ] if
     ] if-empty ;
 
-: pad-inet6 ( string1 string2 -- seq )
+: pad-ipv6 ( string1 string2 -- seq )
     2dup [ length ] bi@ + 8 swap -
-    dup 0 < [ "More than 8 components" throw ] when
+    dup 0 < [ more-than-8-components ] when
     <byte-array> glue ;
 
-: inet6-bytes ( seq -- bytes )
+: ipv6-bytes ( seq -- bytes )
     [ 2 >be ] { } map-as B{ } concat-as ;
 
 PRIVATE>
 
-M: inet6 inet-pton ( str addrspec -- data )
+M: ipv6 inet-pton ( str addrspec -- data )
     drop
-    [
-        "::" split1 [ parse-inet6 ] bi@ pad-inet6 inet6-bytes
-    ] [ invalid-inet6 ] recover ;
+    [ "::" split1 [ parse-ipv6 ] bi@ pad-ipv6 ipv6-bytes ]
+    [ invalid-ipv6 ]
+    recover ;
 
-M: inet6 address-size drop 16 ;
+M: ipv6 address-size drop 16 ;
 
-M: inet6 protocol-family drop PF_INET6 ;
+M: ipv6 protocol-family drop PF_INET6 ;
 
-M: inet6 sockaddr-size drop sockaddr-in6 heap-size ;
+M: ipv6 sockaddr-size drop sockaddr-in6 heap-size ;
 
-M: inet6 empty-sockaddr drop sockaddr-in6 <struct> ;
+M: ipv6 empty-sockaddr drop sockaddr-in6 <struct> ;
 
-M: inet6 make-sockaddr ( inet -- sockaddr )
+M: ipv6 make-sockaddr ( inet -- sockaddr )
     sockaddr-in6 <struct>
         AF_INET6 >>family
         swap [ port>> htons >>port ]
             [ host>> "::" or ]
             [ inet-pton >>addr ] tri ;
 
+TUPLE: inet6 < ipv6 port ;
+
+C: <inet6> inet6
+
 M: inet6 parse-sockaddr
     [ [ addr>> ] dip inet-ntop ]
     [ drop port>> ntohs ] 2bi <inet6> ;
 
-M: f parse-sockaddr nip ;
+M: inet6 present
+    [ host>> ] [ port>> number>string ] bi ":" glue ;
 
 <PRIVATE
 
@@ -306,17 +313,24 @@ SYMBOL: remote-address
 
 GENERIC: resolve-host ( addrspec -- seq )
 
-TUPLE: inet < abstract-inet ;
+TUPLE: hostname host ;
+
+TUPLE: inet < hostname port ;
+
+M: inet present
+    [ host>> ] [ port>> number>string ] bi ":" glue ;
 
 C: <inet> inet
 
-M: inet resolve-host
-    [ port>> ] [ host>> ] bi [
+M: hostname resolve-host
+    host>> [
         f prepare-addrinfo f <void*>
         [ getaddrinfo addrinfo-error ] keep *void* addrinfo memory>struct
         [ parse-addrinfo-list ] keep freeaddrinfo
-    ] [ resolve-passive-host ] if*
-    swap fill-in-ports ;
+    ] [ resolve-passive-host ] if* ;
+
+M: inet resolve-host
+    [ call-next-method ] [ port>> ] bi fill-in-ports ;
 
 M: f resolve-host drop { } ;
 
