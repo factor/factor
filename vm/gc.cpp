@@ -80,23 +80,33 @@ void gc_event::ended_gc(factor_vm *parent)
 	total_time = (cell)(nano_count() - start_time);
 }
 
-gc_state::gc_state(gc_op op_, factor_vm *parent) : op(op_), start_time(nano_count())
+gc_state::gc_state(gc_op op_, factor_vm *parent) : op(op_)
 {
-	event = new gc_event(op,parent);
+	if(parent->gc_events)
+	{
+		event = new gc_event(op,parent);
+		start_time = nano_count();
+	}
+	else
+		event = NULL;
 }
 
 gc_state::~gc_state()
 {
-	delete event;
-	event = NULL;
+	if(event)
+	{
+		delete event;
+		event = NULL;
+	}
 }
 
 void factor_vm::end_gc()
 {
-	current_gc->event->ended_gc(this);
-	if(gc_events) gc_events->push_back(*current_gc->event);
-	delete current_gc->event;
-	current_gc->event = NULL;
+	if(gc_events)
+	{
+		current_gc->event->ended_gc(this);
+		gc_events->push_back(*current_gc->event);
+	}
 }
 
 void factor_vm::start_gc_again()
@@ -123,7 +133,14 @@ void factor_vm::start_gc_again()
 		break;
 	}
 
-	current_gc->event = new gc_event(current_gc->op,this);
+	if(gc_events)
+		current_gc->event = new gc_event(current_gc->op,this);
+}
+
+void factor_vm::set_current_gc_op(gc_op op)
+{
+	current_gc->op = op;
+	if(gc_events) current_gc->event->op = op;
 }
 
 void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
@@ -144,7 +161,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 	{
 		try
 		{
-			current_gc->event->op = current_gc->op;
+			if(gc_events) current_gc->event->op = current_gc->op;
 
 			switch(current_gc->op)
 			{
@@ -155,8 +172,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 				collect_aging();
 				if(data->high_fragmentation_p())
 				{
-					current_gc->op = collect_full_op;
-					current_gc->event->op = collect_full_op;
+					set_current_gc_op(collect_full_op);
 					collect_full(trace_contexts_p);
 				}
 				break;
@@ -164,8 +180,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 				collect_to_tenured();
 				if(data->high_fragmentation_p())
 				{
-					current_gc->op = collect_full_op;
-					current_gc->event->op = collect_full_op;
+					set_current_gc_op(collect_full_op);
 					collect_full(trace_contexts_p);
 				}
 				break;
