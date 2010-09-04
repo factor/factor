@@ -1,21 +1,20 @@
 ! Copyright (C) 2010 Anton Gorenko, Philipp Brüschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct command-line
-destructors gdk.ffi gdk.gl.ffi glib.ffi gobject.ffi gtk.ffi
-gtk.gl.ffi io.backend io.backend.unix.multiplexers
-io.encodings.utf8 io.thread kernel libc literals locals math
-math.bitwise math.order math.vectors namespaces sequences
-strings system threads ui ui.backend ui.clipboards ui.commands
-ui.event-loop ui.gadgets ui.gadgets.editors ui.gadgets.menus
-ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.pixel-formats ui.pixel-formats.private ui.private ;
+alien.strings arrays assocs classes.struct command-line destructors
+gdk.ffi gdk.gl.ffi glib.ffi gobject.ffi gtk.ffi gtk.gl.ffi io.backend
+io.backend.unix.multiplexers io.encodings.utf8 io.thread kernel libc
+literals locals math math.bitwise math.order math.vectors namespaces
+sequences strings system threads ui ui.backend ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.editors ui.gadgets.private
+ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.pixel-formats.private ui.private ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
 
 TUPLE: handle ;
-TUPLE: window-handle < handle window fullscreen? im-context im-menu ;
+TUPLE: window-handle < handle window fullscreen? im-context ;
 
 : <window-handle> ( window im-context -- window-handle )
     window-handle new
@@ -398,28 +397,9 @@ M: editor get-cursor-loc&dim
     nip [ f gtk_im_context_set_client_window ]
     [ g_object_unref ] bi ;
 
-! for testing only
-
-: com-input-method ( world -- )
-    find-world handle>> im-menu>> f f f f 0
-    gtk_get_current_event_time gtk_menu_popup ;
-
-: im-menu ( world -- )
-    { com-input-method } show-commands-menu ;
-
-editor "input-method" f  {
-    { T{ button-down f { S+ C+ } 3 } im-menu }
-} define-command-map
-
-! --------
-
 :: configure-im ( win im -- )
     im win gtk_widget_get_window gtk_im_context_set_client_window
     im f gtk_im_context_set_use_preedit
-
-    gtk_menu_new :> menu
-    im menu gtk_im_multicontext_append_menuitems
-    menu win window handle>> im-menu<<
     
     im "commit" [ on-commit yield ]
     GtkIMContext:commit win connect-signal-with-data
@@ -494,7 +474,7 @@ CONSTANT: window-controls>func-flags
 M:: gtk-ui-backend (open-window) ( world -- )
     GTK_WINDOW_TOPLEVEL gtk_window_new :> win
     gtk_im_multicontext_new :> im
-    
+
     win im <window-handle> world handle<<
 
     world win register-window
