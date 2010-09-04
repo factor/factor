@@ -152,6 +152,7 @@ unix.process debugger.unix io.timeouts io.launcher.unix ;
 ! Spawn a process
 [ T{ signal f 13 } ] [
     "sleep 1000" run-detached
+    1 seconds sleep
     [ handle>> send-sigpipe ]
     [ 2 seconds swap set-timeout ]
     [ wait-for-process ]
