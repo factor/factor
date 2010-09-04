@@ -71,13 +71,15 @@ SYMBOL: next-email-time
     ?prepare-build-machine
     notify-heartbeat
     [
-        builds/factor set-current-directory
-        check-disk-space
-        new-code-available? [ build ] when
+        builds/factor [
+            check-disk-space
+            update-code
+            build? [ build ] [ 5 minutes sleep ] if
+        ] with-directory
     ] [
         build-loop-error
+        5 minutes sleep
     ] recover
-    5 minutes sleep
     build-loop ;
 
 MAIN: build-loop
