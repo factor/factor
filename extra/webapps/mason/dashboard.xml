@@ -8,7 +8,7 @@
 		<p><button type="submit">Increment counter</button></p>
 	</t:form>
 
-	<h1>Crashed builders</h1>
+	<h1>Crashed build machines</h1>
 	<t:xml t:name="crashed" />
 
 	<h1>Make a release</h1>
