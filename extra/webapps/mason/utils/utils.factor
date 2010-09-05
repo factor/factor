@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs db.tuples furnace.actions
-html.forms kernel mason.server mason.version.data sequences
-validators xml.syntax ;
+furnace.utilities html.forms kernel mason.server
+mason.version.data sequences validators xml.syntax urls ;
 IN: webapps.mason.utils
 
 : link ( url label -- xml )
@@ -41,3 +41,15 @@ IN: webapps.mason.utils
 
 : download-url ( string -- string' )
     "http://downloads.factorcode.org/" prepend ;
+
+: package-url ( builder -- url )
+    [ URL" $mason-app/package" ] dip
+    [ os>> "os" set-query-param ]
+    [ cpu>> "cpu" set-query-param ] bi
+    adjust-url ;
+
+: release-url ( builder -- url )
+    [ URL" $mason-app/release" ] dip
+    [ os>> "os" set-query-param ]
+    [ cpu>> "cpu" set-query-param ] bi
+    adjust-url ;
