@@ -64,11 +64,9 @@ IN: webapps.mason.status-update
 
     [
         [
-            [
-                find-builder
-                now >>current-timestamp
-                [ update-builder ] [ update-tuple ] bi
-            ] with-mason-db
-            "OK" "text/html" <content>
-        ] if-secure
+            find-builder
+            now >>current-timestamp
+            [ update-builder ] [ update-tuple ] bi
+        ] with-mason-db
+        "OK" "text/plain" <content>
     ] >>submit ;
