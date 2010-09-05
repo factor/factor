@@ -73,7 +73,7 @@ SYMBOL: next-email-time
     [
         builds/factor [
             check-disk-space
-            update-code
+            update-sources
             build? [ build ] [ 5 minutes sleep ] if
         ] with-directory
     ] [
