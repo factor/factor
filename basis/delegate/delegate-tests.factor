@@ -93,6 +93,17 @@ CONSULT: slot-protocol-test-2 slot-protocol-test-3 d>> ;
     [ a>> ] [ b>> ] [ c>> ] tri
 ] unit-test
 
+TUPLE: slot-protocol-test-4 { x read-only } ;
+
+TUPLE: slot-protocol-test-5 { a-read-only-slot read-only } ;
+
+CONSULT: slot-protocol-test-5 slot-protocol-test-4 x>> ;
+
+[ "hey" ] [
+    "hey" slot-protocol-test-5 boa slot-protocol-test-4 boa
+    a-read-only-slot>>
+] unit-test
+
 GENERIC: do-me ( x -- )
 
 M: f do-me drop ;
