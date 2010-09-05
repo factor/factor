@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel calendar io.directories io.encodings.utf8
 io.files io.launcher io.pathnames namespaces prettyprint
-combinators mason.child mason.cleanup mason.common mason.help
-mason.release mason.report mason.email mason.notify
-mason.platform mason.updates ;
+combinators mason.child mason.cleanup mason.common mason.config
+mason.help mason.release mason.report mason.email mason.git
+mason.notify mason.platform mason.updates ;
 QUALIFIED: continuations
 IN: mason.build
 
@@ -16,10 +16,11 @@ IN: mason.build
     build-dir set-current-directory ;
 
 : clone-source ( -- )
-    "git" "clone" builds/factor 3array short-running-process ;
+    "git" "clone" builds-dir get "factor" append-path 3array
+    short-running-process ;
 
 : copy-image ( -- )
-    builds/factor boot-image-name append-path
+    builds-dir get boot-image-name append-path
     [ "." copy-file-into ] [ "factor" copy-file-into ] bi ;
 
 : save-git-id ( -- )

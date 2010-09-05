@@ -5,13 +5,6 @@ io.files.temp io.encodings.utf8 sequences ;
 
 [ "00:01:02" ] [ 62,000,000,000 nanos>time ] unit-test
 
-[ "/home/bobby/builds/factor" ] [
-    [
-        "/home/bobby/builds" builds-dir set
-        builds/factor
-    ] with-scope
-] unit-test
-
 [ t ] [
     [
         "/home/bobby/builds" builds-dir set
