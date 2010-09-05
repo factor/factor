@@ -34,7 +34,7 @@ SYMBOLS: latest-sources last-built-sources ;
     [ maybe-download-image drop ] [ file-checksum ] bi ;
 
 : latest-counter ( -- counter )
-    counter-url http-get nip string>number ;
+    counter-url get-global http-get nip string>number ;
 
 : update-sources ( -- )
     latest-git-id latest-boot-image latest-counter <sources>
