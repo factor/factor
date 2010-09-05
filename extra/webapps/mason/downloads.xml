@@ -14,4 +14,6 @@
 	<t:xml t:name="package-grid" />
 </table>
 
+<p><t:a t:href="$mason-app/dashboard">Build farm dashboard</t:a> (core team only)</p>
+
 </t:chloe>

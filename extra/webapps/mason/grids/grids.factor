@@ -45,12 +45,6 @@ CONSTANT: cpus
         </table>
     XML] ;
 
-: package-url ( builder -- url )
-    [ URL" $mason-app/package" ] dip
-    [ os>> "os" set-query-param ]
-    [ cpu>> "cpu" set-query-param ] bi
-    adjust-url ;
-
 : package-date ( filename -- date )
     "." split1 drop 16 tail* 6 head* ;
 
@@ -71,12 +65,6 @@ CONSTANT: cpus
             "text/html" <content>
         ] with-mason-db
     ] >>display ;
-
-: release-url ( builder -- url )
-    [ URL" $mason-app/release" ] dip
-    [ os>> "os" set-query-param ]
-    [ cpu>> "cpu" set-query-param ] bi
-    adjust-url ;
 
 : release-version ( filename -- release )
     ".tar.gz" ?tail drop ".zip" ?tail drop ".dmg" ?tail drop

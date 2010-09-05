@@ -25,12 +25,15 @@ webapps.planet
 webapps.wiki
 webapps.user-admin
 webapps.help
-webapps.mason ;
+webapps.mason
+mason.server ;
 IN: websites.concatenative
 
 : test-db ( -- db ) "resource:test.db" <sqlite-db> ;
 
 : init-factor-db ( -- )
+    mason-db [ init-mason-db ] with-db
+
     test-db [
         init-furnace-tables
 
@@ -86,7 +89,7 @@ SYMBOL: dh-file
         <user-admin> <login-config> <factor-boilerplate> "user-admin" add-responder
         <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> "pastebin" add-responder
         <planet> <login-config> <factor-boilerplate> "planet" add-responder
-        <mason-app> <login-config> "mason" add-responder
+        <mason-app> <login-config> <factor-boilerplate> "mason" add-responder
         "/tmp/docs/" <help-webapp> "docs" add-responder
     test-db <alloy>
     main-responder set-global ;
@@ -105,7 +108,7 @@ SYMBOL: dh-file
         <login-config> <factor-boilerplate> test-db <alloy> "concatenative.org" add-responder
         <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> test-db <alloy> "paste.factorcode.org" add-responder
         <planet> <login-config> <factor-boilerplate> test-db <alloy> "planet.factorcode.org" add-responder
-        <mason-app> <login-config> test-db <alloy> "builds.factorcode.org" add-responder
+        <mason-app> <login-config> <factor-boilerplate> test-db <alloy> "builds.factorcode.org" add-responder
         home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
         home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
     main-responder set-global ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces combinators words
-assocs db.tuples arrays splitting strings validators urls
+assocs db.tuples arrays splitting strings validators urls fry
 html.forms
 html.components
 furnace
@@ -158,8 +158,10 @@ can-administer-users? define-capability
         "administer users" >>description
         { can-administer-users? } >>capabilities ;
 
-: make-admin ( username -- )
-    <user>
-    select-tuple
-    [ can-administer-users? suffix ] change-capabilities
+: give-capability ( username capability -- )
+    [ <user> select-tuple ] dip
+    '[ _ suffix ] change-capabilities
     update-tuple ;
+
+: make-admin ( username -- )
+    can-administer-users? give-capability ;

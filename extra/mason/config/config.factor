@@ -34,8 +34,15 @@ target-os get-global [
 ! Keep test-log around?
 SYMBOL: builder-debug
 
+! URL for counter notifications.
+SYMBOL: counter-url
+
+counter-url [ "http://builds.factorcode.org/counter" ] initialize
+
 ! URL for status notifications.
 SYMBOL: status-url
+
+status-url [ "http://builds.factorcode.org/status-update" ] initialize
 
 ! Password for status notifications.
 SYMBOL: status-secret
