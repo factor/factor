@@ -115,7 +115,7 @@ ERROR: type-error type ;
     ] recover ;
 
 : random-local-server ( -- server )
-    remote-address get class new 0 >>port binary <server> ;
+    remote-address get class new binary <server> ;
 
 : port>bytes ( port -- hi lo )
     [ -8 shift ] keep [ 8 bits ] bi@ ;
