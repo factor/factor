@@ -1,17 +1,19 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.download init io.directories io.launcher
-kernel namespaces mason.common mason.platform ;
+USING: bootstrap.image.download http.client init io.directories
+io.launcher kernel math.parser namespaces mason.config
+mason.common mason.platform ;
 IN: mason.updates
 
-SYMBOLS: latest-git-id latest-boot-image ;
-SYMBOLS: last-git-id last-boot-image ;
+TUPLE: sources git-id boot-image counter ;
+
+C: <sources> sources
+
+SYMBOLS: latest-sources last-built-sources ;
 
 [
-    f latest-git-id set-global
-    f latest-boot-image set-global
-    f last-git-id set-global
-    f last-boot-image set-global
+    f latest-sources set-global
+    f last-built-sources set-global
 ] "mason.updates" add-startup-hook
 
 : git-pull-cmd ( -- cmd )
@@ -23,31 +25,26 @@ SYMBOLS: last-git-id last-boot-image ;
         "master"
     } ;
 
-: update-source ( -- )
+: latest-git-id ( -- git-id )
     git-pull-cmd short-running-process
-    git-id latest-git-id set-global ;
+    git-id ;
 
-: update-boot-image ( -- )
+: latest-boot-image ( -- boot-image )
     boot-image-name
-    [ maybe-download-image drop ]
-    [ file-checksum latest-boot-image set-global ] bi ;
+    [ maybe-download-image drop ] [ file-checksum ] bi ;
 
-: update-code ( -- )
-    update-source
-    update-boot-image ;
+: latest-counter ( -- counter )
+    counter-url http-get nip string>number ;
 
-: new-source-available? ( -- ? )
-    last-git-id get-global latest-git-id get-global = not ;
-
-: new-image-available? ( -- ? )
-    last-boot-image get-global latest-boot-image get-global = not ;
+: update-sources ( -- )
+    latest-git-id latest-boot-image latest-counter <sources>
+    latest-sources set-global ;
 
 : build? ( -- ? )
-    new-source-available? new-image-available? or ;
+    latest-sources get-global last-built-sources get-global = not ;
 
 : finish-build ( -- )
     #! If the build completed (successfully or not) without
     #! mason crashing or being killed, don't build this git ID
     #! and boot image hash again.
-    latest-git-id get-global last-git-id set-global
-    latest-boot-image get-global last-boot-image set-global ;
+    latest-sources get-global last-built-sources set-global ;
