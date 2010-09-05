@@ -4,14 +4,16 @@
 	<t:title>Mason dashboard</t:title>
 
 	<h1>Crashed build machines</h1>
-	<p>Crashed machines have not sent a heartbeat for several hours:</p>
-
+	<p>Machines which have not sent a heartbeat for several hours:</p>
 	<t:xml t:name="crashed" />
 
 	<h1>Broken build machines</h1>
-	<p>Broken machines have not had a successful build for over a week:</p>
-
+	<p>Machines which have not had a successful build for over a week:</p>
 	<t:xml t:name="broken" />
+
+	<h1>Build machines in limbo</h1>
+	<p>Machines with a clean build that have not uploaded binary for that build:</p>
+	<t:xml t:name="limbo" />
 
 	<h1>Force build now</h1>
 	<p>Requires build engineer status.</p>
