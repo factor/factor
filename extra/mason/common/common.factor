@@ -68,21 +68,7 @@ M: unix (really-delete-tree) delete-tree ;
 
 SYMBOL: stamp
 
-: builds/factor ( -- path ) builds-dir get "factor" append-path ;
 : build-dir ( -- path ) builds-dir get stamp get append-path ;
-
-: prepare-build-machine ( -- )
-    builds-dir get make-directories
-    builds-dir get
-    [ { "git" "clone" "git://factorcode.org/git/factor.git" } try-output-process ]
-    with-directory ;
-
-: git-id ( -- id )
-    { "git" "show" } utf8 [ lines ] with-process-reader
-    first " " split second ;
-
-: ?prepare-build-machine ( -- )
-    builds/factor exists? [ prepare-build-machine ] unless ;
 
 CONSTANT: load-all-vocabs-file "load-everything-vocabs"
 CONSTANT: load-all-errors-file "load-everything-errors"
