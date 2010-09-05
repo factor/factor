@@ -76,6 +76,8 @@ ERROR: no-parent-directory path ;
         [ f ]
     } cond ;
 
+PRIVATE>
+
 : absolute-path? ( path -- ? )
     {
         { [ dup empty? ] [ f ] }
@@ -85,7 +87,9 @@ ERROR: no-parent-directory path ;
         [ f ]
     } cond nip ;
 
-PRIVATE>
+: append-path-naive ( path1 path2 -- path )
+    [ trim-tail-separators ]
+    [ trim-head-separators ] bi* "/" glue ;
 
 : append-path ( path1 path2 -- path )
     {
@@ -101,10 +105,7 @@ PRIVATE>
         { [ over absolute-path? over first path-separator? and ] [
             [ 2 head ] dip append
         ] }
-        [
-            [ trim-tail-separators ]
-            [ trim-head-separators ] bi* "/" glue
-        ]
+        [ append-path-naive ]
     } cond ;
 
 : prepend-path ( path1 path2 -- path )
