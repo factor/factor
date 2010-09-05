@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db db.sqlite db.tuples db.types kernel
-math math.order sequences ;
+math math.order sequences combinators.short-circuit ;
 IN: mason.server
 
 CONSTANT: +starting+ "starting"
@@ -63,6 +63,13 @@ counter "COUNTER" {
 : crashed-builders ( -- seq )
     builder new select-tuples
     [ current-timestamp>> 5 hours ago before? ] filter ;
+
+: broken-builders ( -- seq )
+    builder new select-tuples
+    [
+        clean-timestamp>>
+        { [ not ] [ 1 weeks ago before? ] } 1||
+    ] filter ;
 
 : mason-db ( -- db ) "resource:mason.db" <sqlite-db> ;
 
