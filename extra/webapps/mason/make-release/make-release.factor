@@ -5,7 +5,7 @@ http.server.responses mason.server mason.version validators ;
 IN: webapps.mason.make-release
 
 : <make-release-action> ( -- action )
-    <page-action>
+    <action>
     [
         {
             { "version" [ v-one-line ] }
