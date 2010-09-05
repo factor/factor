@@ -17,7 +17,10 @@ IN: webapps.mason.downloads
     <page-action>
     [
         [
-            crashed-builders builder-list "crashed" set-value
-            broken-builders builder-list "broken" set-value
+            funny-builders
+            [ builder-list ] tri@
+            [ "crashed" set-value ]
+            [ "broken" set-value ]
+            [ "limbo" set-value ] tri*
         ] with-mason-db
     ] >>init ;
