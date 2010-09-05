@@ -48,7 +48,7 @@ build-engineer? define-capability
             "" add-responder
 
         <make-release-action> <mason-protected>
-            "increment-counter" add-responder
+            "make-release" add-responder
 
         <increment-counter-action> <mason-protected>
             "increment-counter" add-responder
