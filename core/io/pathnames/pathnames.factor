@@ -87,7 +87,7 @@ PRIVATE>
         [ f ]
     } cond nip ;
 
-: append-path-naive ( path1 path2 -- path )
+: append-relative-path ( path1 path2 -- path )
     [ trim-tail-separators ]
     [ trim-head-separators ] bi* "/" glue ;
 
@@ -105,7 +105,7 @@ PRIVATE>
         { [ over absolute-path? over first path-separator? and ] [
             [ 2 head ] dip append
         ] }
-        [ append-path-naive ]
+        [ append-relative-path ]
     } cond ;
 
 : prepend-path ( path1 path2 -- path )

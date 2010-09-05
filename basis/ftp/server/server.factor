@@ -49,6 +49,17 @@ C: <ftp-disconnect> ftp-disconnect
     [ but-last-slice [ "-" (send-response) ] with each ]
     [ first " " (send-response) ] 2bi ;
 
+: make-path-relative? ( path -- ? )
+    {
+        [ absolute-path? ]
+        [ drop server get serving-directory>> ]
+    } 1&& ;
+
+: fixup-relative-path ( string -- string' )
+    dup make-path-relative? [
+        [ server get serving-directory>> ] dip append-relative-path
+    ] when ;
+
 : server-response ( string n -- )
     2dup number>string swap ":" glue \ server-response DEBUG log-message
     <ftp-response>
@@ -120,9 +131,13 @@ ERROR: type-error type ;
 : port>bytes ( port -- hi lo )
     [ -8 shift ] keep [ 8 bits ] bi@ ;
 
+: display-directory ( -- string )
+    current-directory get server get serving-directory>> swap ?head drop
+    [ "/" ] when-empty ;
+
 : handle-PWD ( obj -- )
     drop
-    current-directory get "\"" dup surround 257 server-response ;
+    display-directory get "\"" dup surround 257 server-response ;
 
 : handle-SYST ( obj -- )
     drop
@@ -167,8 +182,9 @@ GENERIC: handle-passive-command ( stream obj -- )
 M: ftp-list handle-passive-command ( stream obj -- )
     drop
     start-directory [
-        utf8 encode-output
-        [ current-directory get directory. ] with-string-writer string-lines
+        utf8 encode-output [
+            current-directory get directory.
+        ] with-string-writer string-lines
         harvest [ ftp-send ] each
     ] with-output-stream finish-directory ;
 
@@ -225,6 +241,7 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
 
 : handle-RETR ( obj -- )
     tokenized>> second
+    fixup-relative-path
     dup can-serve-file? [
         <ftp-get> fulfill-client
     ] [
@@ -261,6 +278,7 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
 
 : handle-MDTM ( obj -- )
     tokenized>> 1 swap ?nth [
+        fixup-relative-path
         dup file-info dup directory? [
             drop not-a-plain-file
         ] [
@@ -280,17 +298,6 @@ ERROR: no-directory-permissions ;
 
 : directory-change-failed ( -- )
     "Failed to change directory." 553 server-response ;
-
-: make-path-relative? ( path -- ? )
-    {
-        [ absolute-path? ]
-        [ drop server get serving-directory>> ]
-    } 1&& ;
-
-: fixup-relative-path ( string -- string' )
-    dup make-path-relative? [
-        [ server get serving-directory>> ] dip append-path-naive
-    ] when ;
 
 : handle-CWD ( obj -- )
     tokenized>> 1 swap ?nth [
