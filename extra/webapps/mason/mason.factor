@@ -47,10 +47,10 @@ build-engineer? define-capability
             { mason-app "dashboard" } >>template
             "" add-responder
 
-        <make-release-action>
+        <make-release-action> <mason-protected>
             "increment-counter" add-responder
 
-        <increment-counter-action>
+        <increment-counter-action> <mason-protected>
             "increment-counter" add-responder
 
-    <mason-protected> "dashboard" add-responder ;
+    "dashboard" add-responder ;

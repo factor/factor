@@ -9,7 +9,9 @@ IN: webapps.mason.downloads
         [ package-url ] [ [ os>> ] [ cpu>> ] bi "/" glue ] bi
         [XML <li><a href=<->><-></a></li> XML]
     ] map
-    [XML <ul><-></ul> XML] ;
+    [ [XML <p>No machines.</p> XML] ]
+    [ [XML <ul><-></ul> XML] ]
+    if-empty ;
 
 : <dashboard-action> ( -- action )
     <page-action>
