@@ -51,7 +51,7 @@ HOOK: addrspec-of-family os ( af -- addrspec )
 
 PRIVATE>
 
-TUPLE: local path ;
+TUPLE: local { path read-only } ;
 
 : <local> ( path -- addrspec )
     normalize-path local boa ;
