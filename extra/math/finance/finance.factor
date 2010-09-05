@@ -15,7 +15,7 @@ IN: math.finance
 PRIVATE>
 
 : ema ( seq n -- newseq )
-    a swap unclip [ [ dup ] 2dip spin weighted ] accumulate 2nip ;
+    a swap unclip [ swap pick weighted ] accumulate 2nip ;
 
 : sma ( seq n -- newseq )
     clump [ mean ] map ;
