@@ -4,8 +4,8 @@ USING: accessors kernel mason.server furnace.actions
 html.forms sequences xml.syntax webapps.mason.utils ;
 IN: webapps.mason.downloads
 
-: crashed-builder-list ( -- xml )
-    crashed-builders [
+: builder-list ( seq -- xml )
+    [
         [ package-url ] [ [ os>> ] [ cpu>> ] bi "/" glue ] bi
         [XML <li><a href=<->><-></a></li> XML]
     ] map
@@ -15,6 +15,7 @@ IN: webapps.mason.downloads
     <page-action>
     [
         [
-            crashed-builder-list "crashed" set-value
+            crashed-builders builder-list "crashed" set-value
+            broken-builders builder-list "broken" set-value
         ] with-mason-db
     ] >>init ;
