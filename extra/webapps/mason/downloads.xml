@@ -14,6 +14,6 @@
 	<t:xml t:name="package-grid" />
 </table>
 
-<p>If you're curious, take a look at the <t:a t:href="$mason-app/dashboard">Build farm dashboard</t:a>.</p>
+<p>Stable and development releases are built and uploaded by the <a href="http://concatenative.org/wiki/view/Factor/Build farm">build farm</a>. Follow <a href="http://twitter.com/FactorBuilds">@FactorBuilds</a> on Twitter to receive notifications. If you're curious, take a look at the <t:a t:href="$mason-app/dashboard">build farm dashboard</t:a>.</p>
 
 </t:chloe>
