@@ -823,3 +823,25 @@ TUPLE: some-tuple x ;
         aa-indirect-1 >>x
     ] compile-call
 ] unit-test
+
+! Write barrier elimination was being done before scheduling and
+! GC check insertion, and didn't take subroutine calls into
+! account. Oops...
+: write-barrier-elim-in-wrong-place ( -- obj )
+    ! A callback used below
+    void { } cdecl [ compact-gc ] alien-callback
+    ! Allocate an object A in the nursery
+    1 f <array>
+    ! Subroutine call promotes the object to tenured
+    swap void { } cdecl alien-indirect
+    ! Allocate another object B in the nursery, store it into
+    ! the first
+    1 f <array> over set-first
+    ! Now object A's card should be marked and minor GC should
+    ! promote B to aging
+    minor-gc
+    ! Do stuff
+    [ 100 [ ] times ] infer.
+    ;
+
+[ { { f } } ] [ write-barrier-elim-in-wrong-place ] unit-test
