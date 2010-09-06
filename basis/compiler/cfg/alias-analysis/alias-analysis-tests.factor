@@ -288,8 +288,8 @@ IN: compiler.cfg.alias-analysis.tests
     } test-alias-analysis
 ] unit-test
 
-! We can't make any assumptions about heap-ac between alien
-! calls, since they might callback into Factor code
+! We can't make any assumptions about heap-ac between
+! instructions which can call back into Factor code
 [
     V{
         T{ ##peek f 0 D 0 }
@@ -357,5 +357,92 @@ IN: compiler.cfg.alias-analysis.tests
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##set-slot-imm f 1 0 1 0 }
+    } test-alias-analysis
+] unit-test
+
+! We can't eliminate stores on any alias class across a GC-ing
+! instruction
+[
+    V{
+        T{ ##allot f 0 }
+        T{ ##slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
+        T{ ##copy f 2 1 any-rep }
+    }
+] [
+    V{
+        T{ ##allot f 0 }
+        T{ ##slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
+        T{ ##slot-imm f 2 0 1 0 }
+    } test-alias-analysis
+] unit-test
+
+[
+    V{
+        T{ ##allot f 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
+        T{ ##copy f 2 1 any-rep }
+    }
+] [
+    V{
+        T{ ##allot f 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
+        T{ ##slot-imm f 2 0 1 0 }
+    } test-alias-analysis
+] unit-test
+
+[
+    V{
+        T{ ##allot f 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
+        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
+        T{ ##set-slot-imm f 2 0 1 0 }
+    }
+] [
+    V{
+        T{ ##allot f 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
+        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
+        T{ ##set-slot-imm f 2 0 1 0 }
+    } test-alias-analysis
+] unit-test
+
+[
+    V{
+        T{ ##allot f 0 }
+        T{ ##slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
+    }
+] [
+    V{
+        T{ ##allot f 0 }
+        T{ ##slot-imm f 1 0 1 0 }
+        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
+        T{ ##set-slot-imm f 1 0 1 0 }
+    } test-alias-analysis
+] unit-test
+
+! Make sure that gc-map-insns which are also vreg-insns are
+! handled properly
+[
+    V{
+        T{ ##allot f 0 }
+        T{ ##alien-indirect f { } { } { { 2 double-rep 0 } } { } 0 0 "free" }
+        T{ ##set-slot-imm f 2 0 1 0 }
+    }
+] [
+    V{
+        T{ ##allot f 0 }
+        T{ ##alien-indirect f { } { } { { 2 double-rep 0 } } { } 0 0 "free" }
+        T{ ##set-slot-imm f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
