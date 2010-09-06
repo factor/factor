@@ -109,7 +109,7 @@ TUPLE: alien-callback-params < alien-node-params xt ;
 
 : callback-bottom ( params -- )
     "( callback )" <uninterned-word> >>xt
-    xt>> '[ _ callback-xt ] infer-quot-here ;
+    xt>> '[ _ callback-xt { alien } declare ] infer-quot-here ;
 
 : callback-return-quot ( ctype -- quot )
     return>> [ [ ] ] [ c-type c-type-unboxer-quot ] if-void ;
