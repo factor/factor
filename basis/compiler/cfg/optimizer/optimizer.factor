@@ -9,8 +9,7 @@ compiler.cfg.ssa.construction
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
 compiler.cfg.copy-prop
-compiler.cfg.dce
-compiler.cfg.write-barrier ;
+compiler.cfg.dce ;
 IN: compiler.cfg.optimizer
 
 : optimize-cfg ( cfg -- cfg' )
@@ -23,5 +22,4 @@ IN: compiler.cfg.optimizer
     alias-analysis
     value-numbering
     copy-propagation
-    eliminate-dead-code
-    eliminate-write-barriers ;
+    eliminate-dead-code ;
