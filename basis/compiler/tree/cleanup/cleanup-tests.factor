@@ -541,3 +541,8 @@ USING: alien alien.c-types ;
     [ char { char char } cdecl [ + ] alien-callback ]
     \ fixnum+fast inlined?
 ] unit-test
+
+[ t ] [
+    [ void { } cdecl [ ] alien-callback void { } cdecl alien-indirect ]
+    \ >c-ptr inlined?
+] unit-test
