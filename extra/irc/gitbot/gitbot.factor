@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry irc.client irc.client.chats kernel namespaces
 sequences threads io.launcher io splitting
-make mason.common mason.updates calendar math timers
+make mason.common mason.git calendar math timers
 io.encodings.8-bit.latin1 debugger ;
 IN: irc.gitbot
 
@@ -47,7 +47,9 @@ M: object handle-message drop ;
 
 : check-for-updates ( chat -- )
     '[
-        git-id git-pull-cmd short-running-process git-id
+        git-id
+        { "git" "pull" "origin" "master" } short-running-process
+        git-id
         _ report-updates
     ] try ;
 
