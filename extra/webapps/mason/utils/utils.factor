@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs db.tuples furnace.actions
-furnace.utilities html.forms kernel mason.server
-mason.version.data sequences validators xml.syntax urls ;
+furnace.utilities html.forms kernel mason.config mason.server
+mason.version.data namespaces sequences validators xml.syntax
+urls ;
 IN: webapps.mason.utils
 
 : link ( url label -- xml )
@@ -53,3 +54,7 @@ IN: webapps.mason.utils
     [ os>> "os" set-query-param ]
     [ cpu>> "cpu" set-query-param ] bi
     adjust-url ;
+
+: validate-secret ( -- )
+    "secret" value status-secret get =
+    [ validation-failed ] unless ;
