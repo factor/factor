@@ -50,7 +50,7 @@ M: gc-map-insn eliminate-write-barrier
     fresh-allocations get clear-assoc ;
 
 M: ##copy eliminate-write-barrier
-    [ src>> ] [ dst>> ] bi copies get set-at t ;
+    [ src>> resolve-copy ] [ dst>> ] bi copies get set-at t ;
 
 M: insn eliminate-write-barrier drop t ;
 
