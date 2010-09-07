@@ -24,6 +24,6 @@ IN: webapps.mason.docs-update
     <action>
     [ validate-secret ] >>validate
     [
-        update-docs
+        [ update-docs ] "Documentation update" spawn drop
         "OK" "text/plain" <content>
     ] >>submit ;
