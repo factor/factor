@@ -56,5 +56,6 @@ IN: webapps.mason.utils
     adjust-url ;
 
 : validate-secret ( -- )
+    { { "secret" [ v-one-line ] } } validate-params
     "secret" value status-secret get =
     [ validation-failed ] unless ;
