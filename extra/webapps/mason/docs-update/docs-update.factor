@@ -9,7 +9,7 @@ IN: webapps.mason.docs-update
 : update-docs ( -- )
     home [
         "newdocs" make-directory
-        "newdocs" [ { "tar" "xvf" "../docs.tar.gz" } try-process ] with-directory
+        "newdocs" [ { "tar" "xfz" "../docs.tar.gz" } try-process ] with-directory
 
         "docs" exists? [ "docs" "docs.old" move-file ] when
         "newdocs/docs" "docs" move-file

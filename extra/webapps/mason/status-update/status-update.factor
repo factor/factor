@@ -56,7 +56,6 @@ IN: webapps.mason.status-update
             { "message" [ v-one-line ] }
             { "arg" [ [ v-one-line ] v-optional ] }
             { "report" [ ] }
-            { "secret" [ v-one-line ] }
         } validate-params
 
         validate-secret
