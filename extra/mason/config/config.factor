@@ -47,18 +47,23 @@ status-url [ "http://builds.factorcode.org/status-update" ] initialize
 ! Password for status notifications.
 SYMBOL: status-secret
 
-SYMBOL: upload-help?
+SYMBOL: upload-docs?
 
-! The below are only needed if upload-help is true.
+! The below are only needed if upload-docs? is true.
 
-! Host with HTML help
-SYMBOL: help-host
+! Host to upload docs to
+SYMBOL: docs-host
 
 ! Username to log in.
-SYMBOL: help-username
+SYMBOL: docs-username
 
 ! Directory to upload docs to.
-SYMBOL: help-directory
+SYMBOL: docs-directory
+
+! URL to notify server about new docs
+SYMBOL: docs-update-url
+
+docs-update-url [ "http://builds.factorcode.org/docs-update" ] initialize
 
 ! Boolean. Do we release binaries and update the clean branch?
 SYMBOL: upload-to-factorcode?
