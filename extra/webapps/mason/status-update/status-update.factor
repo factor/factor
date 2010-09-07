@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators db.tuples furnace.actions
 furnace.redirection html.forms http.server.responses io kernel
-mason.config mason.server namespaces validators ;
+mason.server namespaces validators webapps.mason.utils ;
 IN: webapps.mason.status-update
 
 : find-builder ( -- builder )
@@ -59,7 +59,7 @@ IN: webapps.mason.status-update
             { "secret" [ v-one-line ] }
         } validate-params
 
-        "secret" value status-secret get = [ validation-failed ] unless
+        validate-secret
     ] >>validate
 
     [
