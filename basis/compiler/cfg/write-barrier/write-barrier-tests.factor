@@ -91,3 +91,64 @@ IN: compiler.cfg.write-barrier.tests
         T{ ##write-barrier-imm f 1 }
     } write-barriers-step
 ] unit-test
+
+! ##copy instructions
+[
+    V{
+        T{ ##copy f 2 1 }
+        T{ ##set-slot-imm f 3 1 }
+        T{ ##write-barrier-imm f 2 }
+    }
+] [
+    V{
+        T{ ##copy f 2 1 }
+        T{ ##set-slot-imm f 3 1 }
+        T{ ##write-barrier-imm f 2 }
+    } write-barriers-step
+] unit-test
+
+[
+    V{
+        T{ ##copy f 2 1 }
+        T{ ##set-slot-imm f 3 2 }
+        T{ ##write-barrier-imm f 1 }
+    }
+] [
+    V{
+        T{ ##copy f 2 1 }
+        T{ ##set-slot-imm f 3 2 }
+        T{ ##write-barrier-imm f 1 }
+    } write-barriers-step
+] unit-test
+
+[
+    V{
+        T{ ##copy f 2 1 }
+        T{ ##copy f 3 2 }
+        T{ ##set-slot-imm f 3 1 }
+        T{ ##write-barrier-imm f 2 }
+    }
+] [
+    V{
+        T{ ##copy f 2 1 }
+        T{ ##copy f 3 2 }
+        T{ ##set-slot-imm f 3 1 }
+        T{ ##write-barrier-imm f 2 }
+    } write-barriers-step
+] unit-test
+
+[
+    V{
+        T{ ##copy f 2 1 }
+        T{ ##copy f 3 2 }
+        T{ ##set-slot-imm f 4 1 }
+        T{ ##write-barrier-imm f 3 }
+    }
+] [
+    V{
+        T{ ##copy f 2 1 }
+        T{ ##copy f 3 2 }
+        T{ ##set-slot-imm f 4 1 }
+        T{ ##write-barrier-imm f 3 }
+    } write-barriers-step
+] unit-test
