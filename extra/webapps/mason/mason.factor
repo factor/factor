@@ -4,8 +4,9 @@ USING: accessors furnace.actions furnace.auth furnace.db
 http.server.dispatchers mason.server webapps.mason.grids
 webapps.mason.package webapps.mason.release webapps.mason.report
 webapps.mason.downloads webapps.mason.counter
-webapps.mason.status-update webapps.mason.dashboard
-webapps.mason.make-release webapps.mason.increment-counter ;
+webapps.mason.status-update webapps.mason.docs-update
+webapps.mason.dashboard webapps.mason.make-release
+webapps.mason.increment-counter ;
 IN: webapps.mason
 
 TUPLE: mason-app < dispatcher ;
@@ -38,6 +39,9 @@ build-engineer? define-capability
 
     <status-update-action>
         "status-update" add-responder
+
+    <docs-update-action>
+        "docs-update" add-responder
 
     <counter-action>
         "counter" add-responder
