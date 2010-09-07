@@ -3,7 +3,7 @@
 USING: arrays kernel calendar io.directories io.encodings.utf8
 io.files io.launcher io.pathnames namespaces prettyprint
 combinators mason.child mason.cleanup mason.common mason.config
-mason.help mason.release mason.report mason.email mason.git
+mason.docs mason.release mason.report mason.email mason.git
 mason.notify mason.platform mason.updates ;
 QUALIFIED: continuations
 IN: mason.build
@@ -43,7 +43,7 @@ IN: mason.build
         begin-build
         build-child
         [ notify-report ]
-        [ status-clean eq? [ upload-help release ] when ] bi
+        [ status-clean eq? [ upload-docs release ] when ] bi
         finish-build
     ] [ cleanup ] [ ] continuations:cleanup ;
 
