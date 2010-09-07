@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors continuations furnace.actions help.html
 http.server.responses io.directories io.directories.hierarchy
-io.launcher io.files io.pathnames kernel memoize
+io.launcher io.files io.pathnames kernel memoize threads
 webapps.mason.utils ;
 IN: webapps.mason.docs-update
 
