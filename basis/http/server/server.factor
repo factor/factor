@@ -49,12 +49,19 @@ ERROR: no-boundary ;
     ";" split1 nip
     "=" split1 nip [ no-boundary ] unless* ;
 
+SYMBOL: request-limit
+
+request-limit [ 64 1024 * ] initialize
+
 SYMBOL: upload-limit
+
+upload-limit [ 200,000,000 ] initialize
 
 : read-multipart-data ( request -- mime-parts )
     [ "content-type" header ]
     [ "content-length" header string>number ] bi
-    upload-limit get min limited-input
+    unlimited-input
+    upload-limit get [ min ] when* limited-input
     binary decode-input
     parse-multipart-form-data parse-multipart ;
  
@@ -276,14 +283,10 @@ LOG: httpd-benchmark DEBUG
 
 TUPLE: http-server < threaded-server ;
 
-SYMBOL: request-limit
-
-request-limit [ 64 1024 * ] initialize
-
 M: http-server handle-client*
     drop [
-        request-limit get limited-input
         ?refresh-all
+        request-limit get limited-input
         [ read-request ] ?benchmark
         [ do-request ] ?benchmark
         [ do-response ] ?benchmark
