@@ -79,3 +79,46 @@ IN: io.streams.limited.tests
     "asdf" over stream-write dup stream-flush
     3 swap stream-read
 ] unit-test
+
+[ t ]
+[
+    "abc" <string-reader> 3 limit-stream unlimit-stream
+    "abc" <string-reader> =
+] unit-test
+
+[ t ]
+[
+    "abc" <string-reader> 3 limit-stream unlimit-stream
+    "abc" <string-reader> =
+] unit-test
+
+[ t ]
+[
+    [
+        "resource:license.txt" utf8 <file-reader> &dispose
+        3 limit-stream unlimit-stream
+        "resource:license.txt" utf8 <file-reader> &dispose
+        [ decoder? ] both?
+    ] with-destructors
+] unit-test
+
+[ "asdf" ] [
+    "asdf" <string-reader> 2 <limited-stream> [
+        unlimited-input contents
+    ] with-input-stream
+] unit-test
+
+[ "asdf" ] [
+    "asdf" <string-reader> 2 <limited-stream> [
+        [ contents ] with-unlimited-input
+    ] with-input-stream
+] unit-test
+
+[ "gh" ] [
+    "asdfgh" <string-reader> 4 <limited-stream> [
+        2 [
+            [ contents drop ] with-unlimited-input
+        ] with-limited-input
+        [ contents ] with-unlimited-input
+    ] with-input-stream
+] unit-test

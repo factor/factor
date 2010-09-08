@@ -33,6 +33,10 @@ M: object limit-stream ( stream limit -- stream' )
 : with-limited-stream ( stream limit quot -- )
     [ limit-stream ] dip call ; inline
 
+: with-limited-input ( limit quot -- )
+    [ [ input-stream get ] dip limit-stream input-stream ] dip
+    with-variable ; inline
+
 ERROR: limit-exceeded n stream ;
 
 <PRIVATE
@@ -127,3 +131,20 @@ M: limited-stream dispose stream>> dispose ;
 
 M: limited-stream stream-element-type
     stream>> stream-element-type ;
+
+GENERIC: unlimit-stream ( stream -- stream' )
+
+M: decoder unlimit-stream ( stream -- stream' )
+    [ stream>> ] change-stream ;
+
+M: limited-stream unlimit-stream ( stream -- stream' ) stream>> ;
+
+: unlimited-input ( -- )
+    input-stream [ unlimit-stream ] change ;
+
+: with-unlimited-stream ( stream quot -- )
+    [ unlimit-stream ] dip call ; inline
+
+: with-unlimited-input ( quot -- )
+    [ input-stream get unlimit-stream input-stream ] dip
+    with-variable ; inline
