@@ -1746,7 +1746,7 @@ $nl
 { $subsections "sequences-if" }
 "For inner loops:"
 { $subsections "sequences-unsafe" }
-"Implemeting sequence combinators:"
+"Implementing sequence combinators:"
 { $subsections "sequences-combinator-implementation" } ;
 
 ABOUT: "sequences"
