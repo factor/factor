@@ -17,7 +17,7 @@ ARTICLE: "class-operations" "Class operations"
 ARTICLE: "class-linearization" "Class linearization"
 "Classes have an intrinsic partial order; given two classes A and B, we either have that A is a subset of B, B is a subset of A, A and B are equal as sets, or they are incomparable. The last two situations present difficulties for method dispatch:"
 { $list
-    "If a generic word defines a method on a mixin class A and another class B, and B is the only instance of A, there is an ambiguity because A and B are equal as sets; any object that is an instance of one is an instance of both."
+    "If a generic word defines a method on a mixin class A and another on class B, and B is the only instance of A, there is an ambiguity because A and B are equal as sets; any object that is an instance of one is an instance of both."
     { "If a generic word defines methods on two union classes which are incomparable but not disjoint, for example " { $link sequence } " and " { $link number } ", there is an ambiguity because the generic word may be called on an object that is an instance of both unions." }
 }
 "The first ambiguity is resolved with a tie-breaker that compares metaclasses. The intrinsic meta-class order, from most-specific to least-specific:"
