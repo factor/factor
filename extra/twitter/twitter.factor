@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators hashtables http
 http.client json.reader kernel macros namespaces sequences
-urls.secure fry oauth urls ;
+urls.secure fry oauth urls system ;
 IN: twitter
 
 ! Configuration
@@ -19,22 +19,27 @@ twitter-source [ "factor" ] initialize
         call
     ] with-scope ; inline
 
+: twitter-url ( string -- string' )
+    os windows?
+    "http://twitter.com/"
+    "https://twitter.com/" ? prepend ;
+
 PRIVATE>
 
 : obtain-twitter-request-token ( -- request-token )
     [
-        "https://twitter.com/oauth/request_token"
+        "oauth/request_token" twitter-url
         <request-token-params>
         obtain-request-token
     ] with-twitter-oauth ;
 
 : twitter-authorize-url ( token -- url )
-    "https://twitter.com/oauth/authorize" >url
+    "oauth/authorize" twitter-url >url
         swap key>> "oauth_token" set-query-param ;
 
 : obtain-twitter-access-token ( request-token verifier -- access-token )
     [
-        [ "https://twitter.com/oauth/access_token" ] 2dip
+        [ "oauth/access_token" twitter-url ] 2dip
         <access-token-params>
             swap >>verifier
             swap >>request-token
@@ -48,8 +53,8 @@ MACRO: keys-boa ( keys class -- )
     [ [ '[ _ swap at ] ] map ] dip '[ _ cleave _ boa ] ;
 
 ! Twitter requests
-: twitter-url ( string -- url )
-    "https://twitter.com/statuses/" ".json" surround ;
+: status-url ( string -- url )
+    "statuses/" ".json" surround twitter-url ;
 
 : set-request-twitter-auth ( request -- request )
     [ <oauth-request-params> set-oauth ] with-twitter-oauth ;
@@ -131,7 +136,7 @@ PRIVATE>
     ] H{ } make-assoc ;
 
 : (tweet) ( string -- json )
-    update-post-data "update" twitter-url
+    update-post-data "update" status-url
     <post-request> twitter-request ;
 
 PRIVATE>
@@ -145,7 +150,7 @@ PRIVATE>
 <PRIVATE
 
 : timeline ( url -- tweets )
-    twitter-url <get-request>
+    status-url <get-request>
     twitter-request json>twitter-statuses ;
 
 PRIVATE>
