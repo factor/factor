@@ -228,6 +228,8 @@ void factor_vm::dump_generation(const char *name, Generation *gen)
 
 void factor_vm::dump_generations()
 {
+	std::cout << std::hex;
+
 	dump_generation("Nursery",&nursery);
 	dump_generation("Aging",data->aging);
 	dump_generation("Tenured",data->tenured);
@@ -235,6 +237,8 @@ void factor_vm::dump_generations()
 	std::cout << "Cards:";
 	std::cout << "base=" << (cell)data->cards << ", ";
 	std::cout << "size=" << (cell)(data->cards_end - data->cards) << std::endl;
+
+	std::cout << std::dec;
 }
 
 struct object_dumper {
