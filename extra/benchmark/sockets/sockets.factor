@@ -55,7 +55,7 @@ CONSTANT: number-of-requests 1000
         [ server set ] [ addr>> port>> port set ] bi
 
         [ simple-server ] "Simple server" spawn drop
-        [ [ simple-client ] "Simple client" spawn drop ] times
+        [ yield [ simple-client ] "Simple client" spawn drop ] times
 
         counter get await
         stop-server
