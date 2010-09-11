@@ -206,8 +206,8 @@ HELP: throw-restarts
 { $examples
     "Try invoking one of the two restarts which are offered after the below code throws an error:"
     { $code
-        ": restart-test"
-        "    \"Oops!\" { { \"One\" 1 } { \"Two\" 2 } } condition"
+        ": restart-test ( -- )"
+        "    \"Oops!\" { { \"One\" 1 } { \"Two\" 2 } } throw-restarts"
         "    \"You restarted: \" write . ;"
         "restart-test"
     }
