@@ -80,7 +80,7 @@ SYMBOL: error-stream
 
 : with-streams ( input output quot -- )
     [ [ with-streams* ] 3curry ]
-    [ [ drop dispose dispose ] 3curry ] 3bi
+    [ [ [ drop [ &dispose drop ] bi@ ] 3curry ] with-destructors ] 3bi
     [ ] cleanup ; inline
 
 : print ( str -- ) output-stream get stream-print ;
