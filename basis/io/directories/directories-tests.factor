@@ -22,24 +22,6 @@ IN: io.directories.tests
     ] with-directory-files
 ] unit-test
 
-[ { "classes/tuple/tuple.factor" } ] [
-    "resource:core" [
-        "." directory-tree-files [ "classes/tuple/tuple.factor" = ] filter
-    ] with-directory
-] unit-test
-
-[ { "classes/tuple" } ] [
-    "resource:core" [
-        "." directory-tree-files [ "classes/tuple" = ] filter
-    ] with-directory
-] unit-test
-
-[ { "classes/tuple/tuple.factor" } ] [
-    "resource:core" [
-        [ "classes/tuple/tuple.factor" = ] filter
-    ] with-directory-tree-files
-] unit-test
-
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test
 [ t ] [ "blahblah" temp-file file-info directory? ] unit-test
