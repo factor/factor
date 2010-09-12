@@ -316,8 +316,6 @@ M: gtk-ui-backend (with-ui)
     win "delete-event" [ on-delete yield ]
     GtkWidget:delete-event connect-signal ;
 
-! ----------------------
-
 GENERIC: support-input-methods? ( gadget -- ? )
 GENERIC: get-cursor-surrounding ( gadget -- text cursor-pos )
 GENERIC: delete-cursor-surrounding ( offset count gadget -- )
@@ -335,14 +333,10 @@ M: editor delete-cursor-surrounding
     3drop ;
 
 M: editor set-preedit-string
-    nip dup [ editor-caret ] keep
-    [ user-input* drop ] 2dip
-    set-caret ;
+    3drop ;
 
 M: editor get-cursor-loc&dim
     [ caret-loc ] [ caret-dim ] bi ;
-
-! ----------------------
 
 : on-retrieve-surrounding ( im-context win -- ? )
     window world-focus dup support-input-methods? [
@@ -481,6 +475,9 @@ M:: gtk-ui-backend (open-window) ( world -- )
     
     win world [ window-loc>> auto-position ]
     [ dim>> first2 gtk_window_set_default_size ] 2bi
+
+    win "factor" "Factor" [ utf8 string>alien ] bi@
+    gtk_window_set_wmclass
     
     world setup-gl drop
 
