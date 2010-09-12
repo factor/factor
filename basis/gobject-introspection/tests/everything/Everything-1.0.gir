@@ -1,0 +1,2340 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.1"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gio" version="2.0"/>
+  <include name="cairo" version="1.0"/>
+  <package name="cairo"/>
+  <package name="gio-2.0"/>
+  <package name="gobject-2.0"/>
+  <namespace name="Everything"
+             version="1.0"
+             shared-library="libgirepository-everything-1.0.so.1"
+             c:prefix="Everything">
+    <record name="TestBoxed"
+            c:type="TestBoxed"
+            glib:type-name="TestBoxed"
+            glib:get-type="test_boxed_get_type">
+      <field name="some_int8" writable="1">
+        <type name="int8" c:type="gint8"/>
+      </field>
+      <field name="nested_a" writable="1">
+        <type name="TestSimpleBoxedA" c:type="TestSimpleBoxedA"/>
+      </field>
+      <field name="priv" writable="1">
+        <type name="TestBoxedPrivate" c:type="TestBoxedPrivate*"/>
+      </field>
+      <constructor name="new" c:identifier="test_boxed_new">
+        <return-value transfer-ownership="full">
+          <type name="TestBoxed" c:type="TestBoxed*"/>
+        </return-value>
+      </constructor>
+      <constructor name="new_alternative_constructor1"
+                   c:identifier="test_boxed_new_alternative_constructor1">
+        <return-value transfer-ownership="full">
+          <type name="TestBoxed" c:type="TestBoxed*"/>
+        </return-value>
+        <parameters>
+          <parameter name="i" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_alternative_constructor2"
+                   c:identifier="test_boxed_new_alternative_constructor2">
+        <return-value transfer-ownership="full">
+          <type name="TestBoxed" c:type="TestBoxed*"/>
+        </return-value>
+        <parameters>
+          <parameter name="i" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="j" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_alternative_constructor3"
+                   c:identifier="test_boxed_new_alternative_constructor3">
+        <return-value transfer-ownership="full">
+          <type name="TestBoxed" c:type="TestBoxed*"/>
+        </return-value>
+        <parameters>
+          <parameter name="s" transfer-ownership="full">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <method name="copy" c:identifier="test_boxed_copy">
+        <return-value transfer-ownership="full">
+          <type name="TestBoxed" c:type="TestBoxed*"/>
+        </return-value>
+      </method>
+      <method name="equals" c:identifier="test_boxed_equals">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="other" transfer-ownership="none">
+            <type name="TestBoxed" c:type="TestBoxed*"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <record name="TestBoxedPrivate" c:type="TestBoxedPrivate">
+    </record>
+    <callback name="TestCallback" c:type="TestCallback">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+    </callback>
+    <callback name="TestCallbackUserData" c:type="TestCallbackUserData">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="user_data" transfer-ownership="none" closure="0">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <enumeration name="TestEnum"
+                 glib:type-name="TestEnum"
+                 glib:get-type="test_enum_get_type"
+                 c:type="TestEnum">
+      <member name="value1"
+              value="0"
+              c:identifier="TEST_VALUE1"
+              glib:nick="value1"/>
+      <member name="value2"
+              value="1"
+              c:identifier="TEST_VALUE2"
+              glib:nick="value2"/>
+      <member name="value3"
+              value="42"
+              c:identifier="TEST_VALUE3"
+              glib:nick="value3"/>
+    </enumeration>
+    <bitfield name="TestFlags"
+              glib:type-name="TestFlags"
+              glib:get-type="test_flags_get_type"
+              c:type="TestFlags">
+      <member name="flag1"
+              value="1"
+              c:identifier="TEST_FLAG1"
+              glib:nick="flag1"/>
+      <member name="flag2"
+              value="2"
+              c:identifier="TEST_FLAG2"
+              glib:nick="flag2"/>
+      <member name="flag3"
+              value="4"
+              c:identifier="TEST_FLAG3"
+              glib:nick="flag3"/>
+    </bitfield>
+    <class name="TestFloating"
+           c:type="TestFloating"
+           parent="GObject.InitiallyUnowned"
+           glib:type-name="TestFloating"
+           glib:get-type="test_floating_get_type"
+           glib:type-struct="TestFloatingClass">
+      <constructor name="new" c:identifier="test_floating_new">
+        <return-value transfer-ownership="full">
+          <type name="TestFloating" c:type="TestFloating*"/>
+        </return-value>
+      </constructor>
+      <field name="parent_instance">
+        <type name="GObject.InitiallyUnowned" c:type="GInitiallyUnowned"/>
+      </field>
+    </class>
+    <record name="TestFloatingClass"
+            c:type="TestFloatingClass"
+            glib:is-gtype-struct-for="TestFloating">
+      <field name="parent_class">
+        <type name="GObject.InitiallyUnownedClass"
+              c:type="GInitiallyUnownedClass"/>
+      </field>
+    </record>
+    <class name="TestFundamentalObject"
+           c:type="TestFundamentalObject"
+           abstract="1"
+           glib:type-name="TestFundamentalObject"
+           glib:get-type="test_fundamental_object_get_type"
+           glib:type-struct="TestFundamentalObjectClass"
+           glib:fundamental="1"
+           glib:ref-func="test_fundamental_object_ref"
+           glib:unref-func="test_fundamental_object_unref"
+           glib:set-value-func="test_value_set_fundamental_object"
+           glib:get-value-func="test_value_get_fundamental_object">
+      <method name="ref" c:identifier="test_fundamental_object_ref">
+        <return-value transfer-ownership="full">
+          <type name="TestFundamentalObject" c:type="TestFundamentalObject*"/>
+        </return-value>
+      </method>
+      <method name="unref" c:identifier="test_fundamental_object_unref">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <field name="instance">
+        <type name="GObject.TypeInstance" c:type="GTypeInstance"/>
+      </field>
+      <field name="refcount">
+        <type name="int" c:type="gint"/>
+      </field>
+      <field name="flags">
+        <type name="uint" c:type="guint"/>
+      </field>
+    </class>
+    <record name="TestFundamentalObjectClass"
+            c:type="TestFundamentalObjectClass"
+            glib:is-gtype-struct-for="TestFundamentalObject">
+      <field name="type_class">
+        <type name="GObject.TypeClass" c:type="GTypeClass"/>
+      </field>
+      <field name="copy">
+        <type name="TestFundamentalObjectCopyFunction"
+              c:type="TestFundamentalObjectCopyFunction"/>
+      </field>
+      <field name="finalize">
+        <type name="TestFundamentalObjectFinalizeFunction"
+              c:type="TestFundamentalObjectFinalizeFunction"/>
+      </field>
+    </record>
+    <callback name="TestFundamentalObjectCopyFunction"
+              c:type="TestFundamentalObjectCopyFunction">
+      <return-value transfer-ownership="full">
+        <type name="TestFundamentalObject" c:type="TestFundamentalObject*"/>
+      </return-value>
+      <parameters>
+        <parameter name="obj" transfer-ownership="none">
+          <type name="TestFundamentalObject" c:type="TestFundamentalObject*"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <callback name="TestFundamentalObjectFinalizeFunction"
+              c:type="TestFundamentalObjectFinalizeFunction">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="obj" transfer-ownership="none">
+          <type name="TestFundamentalObject" c:type="TestFundamentalObject*"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <class name="TestFundamentalSubObject"
+           c:type="TestFundamentalSubObject"
+           parent="TestFundamentalObject"
+           glib:type-name="TestFundamentalSubObject"
+           glib:get-type="test_fundamental_sub_object_get_type"
+           glib:type-struct="TestFundamentalSubObjectClass"
+           glib:fundamental="1">
+      <constructor name="new" c:identifier="test_fundamental_sub_object_new">
+        <return-value transfer-ownership="full">
+          <type name="TestFundamentalSubObject"
+                c:type="TestFundamentalSubObject*"/>
+        </return-value>
+        <parameters>
+          <parameter name="data" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <field name="fundamental_object">
+        <type name="TestFundamentalObject" c:type="TestFundamentalObject"/>
+      </field>
+      <field name="data">
+        <type name="utf8" c:type="char*"/>
+      </field>
+    </class>
+    <record name="TestFundamentalSubObjectClass"
+            c:type="TestFundamentalSubObjectClass"
+            glib:is-gtype-struct-for="TestFundamentalSubObject">
+      <field name="fundamental_object_class">
+        <type name="TestFundamentalObjectClass"
+              c:type="TestFundamentalObjectClass"/>
+      </field>
+    </record>
+    <interface name="TestInterface"
+               c:type="EverythingTestInterface"
+               glib:type-name="EverythingTestInterface"
+               glib:get-type="test_interface_get_type"
+               glib:type-struct="TestInterfaceIface">
+    </interface>
+    <record name="TestInterfaceIface"
+            c:type="TestInterfaceIface"
+            glib:is-gtype-struct-for="TestInterface">
+      <field name="base_iface">
+        <type name="GObject.TypeInterface" c:type="GTypeInterface"/>
+      </field>
+    </record>
+    <class name="TestObj"
+           c:type="TestObj"
+           parent="GObject.Object"
+           glib:type-name="TestObj"
+           glib:get-type="test_obj_get_type"
+           glib:type-struct="TestObjClass">
+      <constructor name="new_from_file"
+                   c:identifier="test_obj_new_from_file"
+                   throws="1">
+        <return-value transfer-ownership="full">
+          <type name="TestObj" c:type="TestObj*"/>
+        </return-value>
+        <parameters>
+          <parameter name="x" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_callback" c:identifier="test_obj_new_callback">
+        <return-value transfer-ownership="full">
+          <type name="TestObj" c:type="TestObj*"/>
+        </return-value>
+        <parameters>
+          <parameter name="callback"
+                     transfer-ownership="none"
+                     scope="notified"
+                     closure="1"
+                     destroy="2">
+            <type name="TestCallbackUserData" c:type="TestCallbackUserData"/>
+          </parameter>
+          <parameter name="user_data" transfer-ownership="none">
+            <type name="any" c:type="gpointer"/>
+          </parameter>
+          <parameter name="notify" transfer-ownership="none" scope="call">
+            <type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <function name="static_method" c:identifier="test_obj_static_method">
+        <return-value transfer-ownership="none">
+          <type name="double" c:type="double"/>
+        </return-value>
+        <parameters>
+          <parameter name="x" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="static_method_callback"
+                c:identifier="test_obj_static_method_callback">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="callback"
+                     transfer-ownership="none"
+                     allow-none="1"
+                     scope="call">
+            <type name="TestCallback" c:type="TestCallback"/>
+          </parameter>
+        </parameters>
+      </function>
+      <virtual-method name="matrix" invoker="do_matrix">
+        <doc xml:whitespace="preserve">This method is virtual.  Notably its name differs from the virtual
+slot name, which makes it useful for testing bindings handle this
+case.</doc>
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+        <parameters>
+          <parameter name="somestr" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Meaningless string</doc>
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="set_bare" c:identifier="test_obj_set_bare">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="bare" transfer-ownership="none" allow-none="1">
+            <type name="GObject.Object" c:type="GObject*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="instance_method" c:identifier="test_obj_instance_method">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+      </method>
+      <method name="torture_signature_0"
+              c:identifier="test_obj_torture_signature_0">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="x" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="y"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full">
+            <type name="double" c:type="double*"/>
+          </parameter>
+          <parameter name="z"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full">
+            <type name="int" c:type="int*"/>
+          </parameter>
+          <parameter name="foo" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="q"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full">
+            <type name="int" c:type="int*"/>
+          </parameter>
+          <parameter name="m" transfer-ownership="none">
+            <type name="uint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="torture_signature_1"
+              c:identifier="test_obj_torture_signature_1"
+              throws="1">
+        <doc xml:whitespace="preserve">This function throws an error if m is odd.</doc>
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="x" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+          <parameter name="y"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full">
+            <type name="double" c:type="double*"/>
+          </parameter>
+          <parameter name="z"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full">
+            <type name="int" c:type="int*"/>
+          </parameter>
+          <parameter name="foo" transfer-ownership="none">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="q"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full">
+            <type name="int" c:type="int*"/>
+          </parameter>
+          <parameter name="m" transfer-ownership="none">
+            <type name="uint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="do_matrix" c:identifier="test_obj_do_matrix">
+        <doc xml:whitespace="preserve">This method is virtual.  Notably its name differs from the virtual
+slot name, which makes it useful for testing bindings handle this
+case.</doc>
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+        <parameters>
+          <parameter name="somestr" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Meaningless string</doc>
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="instance_method_callback"
+              c:identifier="test_obj_instance_method_callback">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="callback"
+                     transfer-ownership="none"
+                     allow-none="1"
+                     scope="call">
+            <type name="TestCallback" c:type="TestCallback"/>
+          </parameter>
+        </parameters>
+      </method>
+      <property name="bare" writable="1" transfer-ownership="none">
+        <type name="GObject.Object" c:type="GObject"/>
+      </property>
+      <property name="boxed" writable="1" transfer-ownership="none">
+        <type name="TestBoxed" c:type="TestBoxed"/>
+      </property>
+      <property name="hash-table" writable="1" transfer-ownership="container">
+        <type name="GLib.HashTable" c:type="GHashTable">
+          <type name="utf8"/>
+          <type name="int8"/>
+        </type>
+      </property>
+      <property name="list" writable="1" transfer-ownership="none">
+        <type name="GLib.List" c:type="gpointer">
+          <type name="utf8"/>
+        </type>
+      </property>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="bare">
+        <type name="GObject.Object" c:type="GObject*"/>
+      </field>
+      <field name="boxed">
+        <type name="TestBoxed" c:type="TestBoxed*"/>
+      </field>
+      <field name="hash_table">
+        <type name="GLib.HashTable" c:type="GHashTable*"/>
+      </field>
+      <field name="list">
+        <type name="GLib.List" c:type="GList*">
+          <type name="any" c:type="gpointer"/>
+        </type>
+      </field>
+      <glib:signal name="test">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </glib:signal>
+      <glib:signal name="test-with-static-scope-arg">
+        <return-value transfer-ownership="full">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <type name="TestSimpleBoxedA" c:type="TestSimpleBoxedA"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+    </class>
+    <record name="TestObjClass"
+            c:type="TestObjClass"
+            glib:is-gtype-struct-for="TestObj">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="matrix">
+        <callback name="matrix" c:type="matrix">
+          <return-value transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </return-value>
+          <parameters>
+            <parameter name="obj" transfer-ownership="none">
+              <type name="TestObj" c:type="TestObj*"/>
+            </parameter>
+            <parameter name="somestr" transfer-ownership="none">
+              <doc xml:whitespace="preserve">Meaningless string</doc>
+              <type name="utf8" c:type="char*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="test_signal">
+        <type name="uint" c:type="guint"/>
+      </field>
+      <field name="test_signal_with_static_scope_arg">
+        <type name="uint" c:type="guint"/>
+      </field>
+    </record>
+    <record name="TestSimpleBoxedA"
+            c:type="TestSimpleBoxedA"
+            glib:type-name="TestSimpleBoxedA"
+            glib:get-type="test_simple_boxed_a_get_type">
+      <field name="some_int" writable="1">
+        <type name="int" c:type="gint"/>
+      </field>
+      <field name="some_int8" writable="1">
+        <type name="int8" c:type="gint8"/>
+      </field>
+      <field name="some_double" writable="1">
+        <type name="double" c:type="gdouble"/>
+      </field>
+      <field name="some_enum" writable="1">
+        <type name="TestEnum" c:type="TestEnum"/>
+      </field>
+      <method name="copy" c:identifier="test_simple_boxed_a_copy">
+        <return-value transfer-ownership="full">
+          <type name="TestSimpleBoxedA" c:type="TestSimpleBoxedA*"/>
+        </return-value>
+      </method>
+      <method name="equals" c:identifier="test_simple_boxed_a_equals">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="other_a" transfer-ownership="none">
+            <type name="TestSimpleBoxedA" c:type="TestSimpleBoxedA*"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <record name="TestSimpleBoxedB"
+            c:type="TestSimpleBoxedB"
+            glib:type-name="TestSimpleBoxedB"
+            glib:get-type="test_simple_boxed_b_get_type">
+      <field name="some_int8" writable="1">
+        <type name="int8" c:type="gint8"/>
+      </field>
+      <field name="nested_a" writable="1">
+        <type name="TestSimpleBoxedA" c:type="TestSimpleBoxedA"/>
+      </field>
+      <method name="copy" c:identifier="test_simple_boxed_b_copy">
+        <return-value transfer-ownership="full">
+          <type name="TestSimpleBoxedB" c:type="TestSimpleBoxedB*"/>
+        </return-value>
+      </method>
+    </record>
+    <callback name="TestSimpleCallback" c:type="TestSimpleCallback">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+    </callback>
+    <record name="TestStructA" c:type="TestStructA">
+      <field name="some_int" writable="1">
+        <type name="int" c:type="gint"/>
+      </field>
+      <field name="some_int8" writable="1">
+        <type name="int8" c:type="gint8"/>
+      </field>
+      <field name="some_double" writable="1">
+        <type name="double" c:type="gdouble"/>
+      </field>
+      <field name="some_enum" writable="1">
+        <type name="TestEnum" c:type="TestEnum"/>
+      </field>
+      <method name="clone" c:identifier="test_struct_a_clone">
+        <doc xml:whitespace="preserve">Make a copy of a TestStructA</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="a_out"
+                     direction="out"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <doc xml:whitespace="preserve">the cloned structure</doc>
+            <type name="TestStructA" c:type="TestStructA*"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <record name="TestStructB" c:type="TestStructB">
+      <field name="some_int8" writable="1">
+        <type name="int8" c:type="gint8"/>
+      </field>
+      <field name="nested_a" writable="1">
+        <type name="TestStructA" c:type="TestStructA"/>
+      </field>
+      <method name="clone" c:identifier="test_struct_b_clone">
+        <doc xml:whitespace="preserve">Make a copy of a TestStructB</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="b_out"
+                     direction="out"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <doc xml:whitespace="preserve">the cloned structure</doc>
+            <type name="TestStructB" c:type="TestStructB*"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <record name="TestStructC" c:type="_TestStructC">
+      <field name="another_int" writable="1">
+        <type name="int" c:type="gint"/>
+      </field>
+      <field name="obj" writable="1">
+        <type name="GObject.Object" c:type="GObject*"/>
+      </field>
+    </record>
+    <class name="TestSubObj"
+           c:type="TestSubObj"
+           parent="TestObj"
+           glib:type-name="TestSubObj"
+           glib:get-type="test_sub_obj_get_type"
+           glib:type-struct="TestSubObjClass">
+      <constructor name="new" c:identifier="test_sub_obj_new">
+        <return-value transfer-ownership="full">
+          <type name="TestSubObj" c:type="TestSubObj*"/>
+        </return-value>
+      </constructor>
+      <method name="unset_bare" c:identifier="test_sub_obj_unset_bare">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="instance_method"
+              c:identifier="test_sub_obj_instance_method">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+      </method>
+      <field name="parent_instance">
+        <type name="TestObj" c:type="TestObj"/>
+      </field>
+    </class>
+    <record name="TestSubObjClass"
+            c:type="TestSubObjClass"
+            glib:is-gtype-struct-for="TestSubObj">
+      <field name="parent_class">
+        <type name="TestObjClass" c:type="TestObjClass"/>
+      </field>
+    </record>
+    <class name="TestWi8021x"
+           c:type="TestWi8021x"
+           parent="GObject.Object"
+           glib:type-name="TestWi8021x"
+           glib:get-type="test_wi_802_1x_get_type"
+           glib:type-struct="TestWi8021xClass">
+      <constructor name="new" c:identifier="test_wi_802_1x_new">
+        <return-value transfer-ownership="full">
+          <type name="TestWi8021x" c:type="TestWi8021x*"/>
+        </return-value>
+      </constructor>
+      <function name="static_method"
+                c:identifier="test_wi_802_1x_static_method">
+        <return-value transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </return-value>
+        <parameters>
+          <parameter name="x" transfer-ownership="none">
+            <type name="int" c:type="int"/>
+          </parameter>
+        </parameters>
+      </function>
+      <method name="get_testbool" c:identifier="test_wi_802_1x_get_testbool">
+        <return-value transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="set_testbool" c:identifier="test_wi_802_1x_set_testbool">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="v" transfer-ownership="none">
+            <type name="boolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <property name="testbool" writable="1" transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </property>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="testbool">
+        <type name="boolean" c:type="gboolean"/>
+      </field>
+    </class>
+    <record name="TestWi8021xClass"
+            c:type="TestWi8021xClass"
+            glib:is-gtype-struct-for="TestWi8021x">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+    </record>
+    <function name="set_abort_on_error" c:identifier="set_abort_on_error">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="abort_on_error" transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_fixed_size_int_in"
+              c:identifier="test_array_fixed_size_int_in">
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the sum of the items in @ints</doc>
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="ints" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a list of 5 integers</doc>
+          <array c:type="int*" fixed-size="5">
+            <type name="int"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_fixed_size_int_out"
+              c:identifier="test_array_fixed_size_int_out">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="ints"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">a list of 5 integers ranging from 0 to 4</doc>
+          <array c:type="int**" fixed-size="5">
+            <type name="int"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_fixed_size_int_return"
+              c:identifier="test_array_fixed_size_int_return">
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a list of 5 integers ranging from 0 to 4</doc>
+        <array c:type="int*" fixed-size="5">
+          <type name="int"/>
+        </array>
+      </return-value>
+    </function>
+    <function name="test_array_gint16_in" c:identifier="test_array_gint16_in">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="n_ints" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="ints" transfer-ownership="none">
+          <doc xml:whitespace="preserve">List of ints</doc>
+          <array length="0" c:type="gint16*">
+            <type name="int16"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_gint32_in" c:identifier="test_array_gint32_in">
+      <return-value transfer-ownership="none">
+        <type name="int32" c:type="gint32"/>
+      </return-value>
+      <parameters>
+        <parameter name="n_ints" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="ints" transfer-ownership="none">
+          <doc xml:whitespace="preserve">List of ints</doc>
+          <array length="0" c:type="gint32*">
+            <type name="int32"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_gint64_in" c:identifier="test_array_gint64_in">
+      <return-value transfer-ownership="none">
+        <type name="int64" c:type="gint64"/>
+      </return-value>
+      <parameters>
+        <parameter name="n_ints" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="ints" transfer-ownership="none">
+          <doc xml:whitespace="preserve">List of ints</doc>
+          <array length="0" c:type="gint64*">
+            <type name="int64"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_gint8_in" c:identifier="test_array_gint8_in">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="n_ints" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="ints" transfer-ownership="none">
+          <doc xml:whitespace="preserve">List of ints</doc>
+          <array length="0" c:type="gint8*">
+            <type name="int8"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_gtype_in" c:identifier="test_array_gtype_in">
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">string representation of provided types</doc>
+        <type name="utf8" c:type="char*"/>
+      </return-value>
+      <parameters>
+        <parameter name="n_types" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="types" transfer-ownership="none">
+          <doc xml:whitespace="preserve">List of types</doc>
+          <array length="0" c:type="GType*">
+            <type name="GType"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_int_full_out"
+              c:identifier="test_array_int_full_out">
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a new array of integers.</doc>
+        <array length="0" c:type="int*">
+          <type name="int"/>
+        </array>
+      </return-value>
+      <parameters>
+        <parameter name="len"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">length of the returned array.</doc>
+          <type name="int" c:type="int*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_int_in" c:identifier="test_array_int_in">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="n_ints" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="ints" transfer-ownership="none">
+          <doc xml:whitespace="preserve">List of ints</doc>
+          <array length="0" c:type="int*">
+            <type name="int"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_int_in_take"
+              c:identifier="test_array_int_in_take">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="n_ints" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="ints" transfer-ownership="full">
+          <doc xml:whitespace="preserve">List of ints</doc>
+          <array length="0" c:type="int*">
+            <type name="int"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_int_inout" c:identifier="test_array_int_inout">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="n_ints"
+                   direction="inout"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">the length of @ints</doc>
+          <type name="int" c:type="int*"/>
+        </parameter>
+        <parameter name="ints"
+                   direction="inout"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">a list of integers whose items will be increased by 1, except the first that will be dropped</doc>
+          <array length="0" c:type="int**">
+            <type name="int"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_int_none_out"
+              c:identifier="test_array_int_none_out">
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">a static array of integers.</doc>
+        <array length="0" c:type="int*">
+          <type name="int"/>
+        </array>
+      </return-value>
+      <parameters>
+        <parameter name="len"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">length of the returned array.</doc>
+          <type name="int" c:type="int*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_int_null_in"
+              c:identifier="test_array_int_null_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="arr" transfer-ownership="none" allow-none="1">
+          <array length="1" c:type="int*">
+            <type name="int"/>
+          </array>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">length</doc>
+          <type name="int" c:type="int"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_int_null_out"
+              c:identifier="test_array_int_null_out">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="arr"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full"
+                   allow-none="1">
+          <array length="1" c:type="int**">
+            <type name="int"/>
+          </array>
+        </parameter>
+        <parameter name="len"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">length</doc>
+          <type name="int" c:type="int*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_array_int_out" c:identifier="test_array_int_out">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="n_ints"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">the length of @ints</doc>
+          <type name="int" c:type="int*"/>
+        </parameter>
+        <parameter name="ints"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">a list of 5 integers, from 0 to 4 in consecutive order</doc>
+          <array length="0" c:type="int**">
+            <type name="int"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_async_ready_callback"
+              c:identifier="test_async_ready_callback">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="callback" transfer-ownership="none" scope="async">
+          <type name="Gio.AsyncReadyCallback" c:type="GAsyncReadyCallback"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_boolean" c:identifier="test_boolean">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_boolean_false" c:identifier="test_boolean_false">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_boolean_true" c:identifier="test_boolean_true">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="boolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_cairo_context_full_return"
+              c:identifier="test_cairo_context_full_return">
+      <return-value transfer-ownership="full">
+        <type name="cairo.Context" c:type="cairo_t*"/>
+      </return-value>
+    </function>
+    <function name="test_cairo_context_none_in"
+              c:identifier="test_cairo_context_none_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="context" transfer-ownership="none">
+          <type name="cairo.Context" c:type="cairo_t*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_cairo_surface_full_out"
+              c:identifier="test_cairo_surface_full_out">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="surface"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="cairo.Surface" c:type="cairo_surface_t**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_cairo_surface_full_return"
+              c:identifier="test_cairo_surface_full_return">
+      <return-value transfer-ownership="full">
+        <type name="cairo.Surface" c:type="cairo_surface_t*"/>
+      </return-value>
+    </function>
+    <function name="test_cairo_surface_none_in"
+              c:identifier="test_cairo_surface_none_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="surface" transfer-ownership="none">
+          <type name="cairo.Surface" c:type="cairo_surface_t*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_cairo_surface_none_return"
+              c:identifier="test_cairo_surface_none_return">
+      <return-value transfer-ownership="none">
+        <type name="cairo.Surface" c:type="cairo_surface_t*"/>
+      </return-value>
+    </function>
+    <function name="test_callback" c:identifier="test_callback">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="callback"
+                   transfer-ownership="none"
+                   allow-none="1"
+                   scope="call">
+          <type name="TestCallback" c:type="TestCallback"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_callback_async" c:identifier="test_callback_async">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="callback"
+                   transfer-ownership="none"
+                   scope="async"
+                   closure="1">
+          <type name="TestCallbackUserData" c:type="TestCallbackUserData"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_callback_destroy_notify"
+              c:identifier="test_callback_destroy_notify">
+      <doc xml:whitespace="preserve">Notified - callback persists until a DestroyNotify delegate
+is invoked.</doc>
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="callback"
+                   transfer-ownership="none"
+                   scope="notified"
+                   closure="1"
+                   destroy="2">
+          <type name="TestCallbackUserData" c:type="TestCallbackUserData"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+        <parameter name="notify" transfer-ownership="none" scope="call">
+          <type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_callback_thaw_async"
+              c:identifier="test_callback_thaw_async">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+    </function>
+    <function name="test_callback_thaw_notifications"
+              c:identifier="test_callback_thaw_notifications">
+      <doc xml:whitespace="preserve">Invokes all callbacks installed by #test_callback_destroy_notify(),
+adding up their return values, and removes them, invoking the
+corresponding destroy notfications.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">Sum of the return values of the invoked callbacks.</doc>
+        <type name="int" c:type="int"/>
+      </return-value>
+    </function>
+    <function name="test_callback_user_data"
+              c:identifier="test_callback_user_data">
+      <doc xml:whitespace="preserve">Call - callback parameter persists for the duration of the method
+call and can be released on return.</doc>
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="callback"
+                   transfer-ownership="none"
+                   scope="call"
+                   closure="1">
+          <type name="TestCallbackUserData" c:type="TestCallbackUserData"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_closure" c:identifier="test_closure">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="closure" transfer-ownership="none">
+          <type name="GObject.Closure" c:type="GClosure*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_closure_one_arg" c:identifier="test_closure_one_arg">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="closure" transfer-ownership="none">
+          <type name="GObject.Closure" c:type="GClosure*"/>
+        </parameter>
+        <parameter name="arg" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_date_in_gvalue" c:identifier="test_date_in_gvalue">
+      <return-value transfer-ownership="full">
+        <type name="GObject.Value" c:type="GValue*"/>
+      </return-value>
+    </function>
+    <function name="test_double" c:identifier="test_double">
+      <return-value transfer-ownership="none">
+        <type name="double" c:type="gdouble"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="double" c:type="gdouble"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_enum_param" c:identifier="test_enum_param">
+      <return-value transfer-ownership="none">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="e" transfer-ownership="none">
+          <type name="TestEnum" c:type="TestEnum"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_filename_return" c:identifier="test_filename_return">
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">list of strings</doc>
+        <type name="GLib.SList" c:type="GSList*">
+          <type name="filename"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_float" c:identifier="test_float">
+      <return-value transfer-ownership="none">
+        <type name="float" c:type="gfloat"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="float" c:type="gfloat"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_ghash_container_in"
+              c:identifier="test_ghash_container_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="container">
+          <type name="GLib.HashTable" c:type="GHashTable*">
+            <type name="utf8"/>
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_ghash_container_return"
+              c:identifier="test_ghash_container_return">
+      <return-value transfer-ownership="container">
+        <type name="GLib.HashTable" c:type="GHashTable*">
+          <type name="utf8"/>
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_ghash_everything_in"
+              c:identifier="test_ghash_everything_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="full">
+          <type name="GLib.HashTable" c:type="GHashTable*">
+            <type name="utf8"/>
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_ghash_everything_return"
+              c:identifier="test_ghash_everything_return">
+      <return-value transfer-ownership="full">
+        <type name="GLib.HashTable" c:type="GHashTable*">
+          <type name="utf8"/>
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_ghash_free" c:identifier="test_ghash_free">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="full">
+          <type name="GLib.HashTable" c:type="GHashTable*">
+            <type name="utf8"/>
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_ghash_nested_everything_return"
+              c:identifier="test_ghash_nested_everything_return">
+      <doc xml:whitespace="preserve">Specify nested parameterized types directly with the (type ) annotation.</doc>
+      <return-value transfer-ownership="full">
+        <type name="GLib.HashTable" c:type="GHashTable*">
+          <type name="utf8"/>
+          <type name="GLib.HashTable">
+            <type name="utf8"/>
+            <type name="utf8"/>
+          </type>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_ghash_nested_everything_return2"
+              c:identifier="test_ghash_nested_everything_return2">
+      <doc xml:whitespace="preserve">element-type annotation.</doc>
+      <return-value transfer-ownership="full">
+        <type name="GLib.HashTable" c:type="GHashTable*">
+          <type name="utf8"/>
+          <type name="GLib.HashTable">
+            <type name="utf8"/>
+            <type name="utf8"/>
+          </type>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_ghash_nothing_in"
+              c:identifier="test_ghash_nothing_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="GLib.HashTable" c:type="GHashTable*">
+            <type name="utf8"/>
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_ghash_nothing_in2"
+              c:identifier="test_ghash_nothing_in2">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="GLib.HashTable" c:type="GHashTable*">
+            <type name="utf8"/>
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_ghash_nothing_return"
+              c:identifier="test_ghash_nothing_return">
+      <return-value transfer-ownership="none">
+        <type name="GLib.HashTable" c:type="GHashTable*">
+          <type name="utf8"/>
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_ghash_nothing_return2"
+              c:identifier="test_ghash_nothing_return2">
+      <return-value transfer-ownership="none">
+        <type name="GLib.HashTable" c:type="GHashTable*">
+          <type name="utf8"/>
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_ghash_null_in" c:identifier="test_ghash_null_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none" allow-none="1">
+          <type name="GLib.HashTable" c:type="GHashTable*">
+            <type name="utf8"/>
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_ghash_null_out" c:identifier="test_ghash_null_out">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="out"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full"
+                   allow-none="1">
+          <type name="GLib.HashTable" c:type="GHashTable**">
+            <type name="utf8"/>
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_ghash_null_return"
+              c:identifier="test_ghash_null_return">
+      <return-value transfer-ownership="none">
+        <type name="GLib.HashTable" c:type="GHashTable*">
+          <type name="utf8"/>
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_glist_container_in"
+              c:identifier="test_glist_container_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="container">
+          <type name="GLib.List" c:type="GList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_glist_container_return"
+              c:identifier="test_glist_container_return">
+      <return-value transfer-ownership="container">
+        <type name="GLib.List" c:type="GList*">
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_glist_everything_in"
+              c:identifier="test_glist_everything_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="full">
+          <type name="GLib.List" c:type="GList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_glist_everything_return"
+              c:identifier="test_glist_everything_return">
+      <return-value transfer-ownership="full">
+        <type name="GLib.List" c:type="GList*">
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_glist_free" c:identifier="test_glist_free">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="full">
+          <type name="GLib.List" c:type="GList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_glist_nothing_in"
+              c:identifier="test_glist_nothing_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_glist_nothing_in2"
+              c:identifier="test_glist_nothing_in2">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_glist_nothing_return"
+              c:identifier="test_glist_nothing_return">
+      <return-value transfer-ownership="none">
+        <type name="GLib.List" c:type="GList*">
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_glist_nothing_return2"
+              c:identifier="test_glist_nothing_return2">
+      <return-value transfer-ownership="none">
+        <type name="GLib.List" c:type="GList*">
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_glist_null_in" c:identifier="test_glist_null_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none" allow-none="1">
+          <type name="GLib.SList" c:type="GSList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_glist_null_out" c:identifier="test_glist_null_out">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="out_list"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full"
+                   allow-none="1">
+          <type name="GLib.SList" c:type="GSList**">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_gslist_container_in"
+              c:identifier="test_gslist_container_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="container">
+          <type name="GLib.SList" c:type="GSList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_gslist_container_return"
+              c:identifier="test_gslist_container_return">
+      <return-value transfer-ownership="container">
+        <type name="GLib.SList" c:type="GSList*">
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_gslist_everything_in"
+              c:identifier="test_gslist_everything_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="full">
+          <type name="GLib.SList" c:type="GSList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_gslist_everything_return"
+              c:identifier="test_gslist_everything_return">
+      <return-value transfer-ownership="full">
+        <type name="GLib.SList" c:type="GSList*">
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_gslist_free" c:identifier="test_gslist_free">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="full">
+          <type name="GLib.SList" c:type="GSList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_gslist_nothing_in"
+              c:identifier="test_gslist_nothing_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="GLib.SList" c:type="GSList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_gslist_nothing_in2"
+              c:identifier="test_gslist_nothing_in2">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="GLib.SList" c:type="GSList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_gslist_nothing_return"
+              c:identifier="test_gslist_nothing_return">
+      <return-value transfer-ownership="none">
+        <type name="GLib.SList" c:type="GSList*">
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_gslist_nothing_return2"
+              c:identifier="test_gslist_nothing_return2">
+      <return-value transfer-ownership="none">
+        <type name="GLib.SList" c:type="GSList*">
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="test_gslist_null_in" c:identifier="test_gslist_null_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none" allow-none="1">
+          <type name="GLib.SList" c:type="GSList*">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_gslist_null_out" c:identifier="test_gslist_null_out">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="out_list"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full"
+                   allow-none="1">
+          <type name="GLib.SList" c:type="GSList**">
+            <type name="utf8"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_gtype" c:identifier="test_gtype">
+      <return-value transfer-ownership="none">
+        <type name="GType" c:type="GType"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="GType" c:type="GType"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_int" c:identifier="test_int">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="gint"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="int" c:type="gint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_int16" c:identifier="test_int16">
+      <return-value transfer-ownership="none">
+        <type name="int16" c:type="gint16"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="int16" c:type="gint16"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_int32" c:identifier="test_int32">
+      <return-value transfer-ownership="none">
+        <type name="int32" c:type="gint32"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="int32" c:type="gint32"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_int64" c:identifier="test_int64">
+      <return-value transfer-ownership="none">
+        <type name="int64" c:type="gint64"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="int64" c:type="gint64"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_int8" c:identifier="test_int8">
+      <return-value transfer-ownership="none">
+        <type name="int8" c:type="gint8"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="int8" c:type="gint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_int_out_utf8" c:identifier="test_int_out_utf8">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="length"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="int" c:type="int*"/>
+        </parameter>
+        <parameter name="in" transfer-ownership="none">
+          <type name="utf8" c:type="char*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_int_value_arg" c:identifier="test_int_value_arg">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="v" transfer-ownership="none">
+          <type name="GObject.Value" c:type="GValue*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_long" c:identifier="test_long">
+      <return-value transfer-ownership="none">
+        <type name="long" c:type="glong"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="long" c:type="glong"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_multi_callback" c:identifier="test_multi_callback">
+      <return-value transfer-ownership="none">
+        <type name="int" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="callback"
+                   transfer-ownership="none"
+                   allow-none="1"
+                   scope="call">
+          <type name="TestCallback" c:type="TestCallback"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_multi_double_args"
+              c:identifier="test_multi_double_args">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="double" c:type="gdouble"/>
+        </parameter>
+        <parameter name="one"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="double" c:type="gdouble*"/>
+        </parameter>
+        <parameter name="two"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="double" c:type="gdouble*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_object_null_in" c:identifier="test_object_null_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="obj" transfer-ownership="none" allow-none="1">
+          <doc xml:whitespace="preserve">A #TestObj</doc>
+          <type name="TestObj" c:type="TestObj*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_object_null_out" c:identifier="test_object_null_out">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="obj"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full"
+                   allow-none="1">
+          <doc xml:whitespace="preserve">A #TestObj</doc>
+          <type name="TestObj" c:type="TestObj**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_short" c:identifier="test_short">
+      <return-value transfer-ownership="none">
+        <type name="short" c:type="gshort"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="short" c:type="gshort"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_simple_boxed_a_const_return"
+              c:identifier="test_simple_boxed_a_const_return">
+      <return-value transfer-ownership="none">
+        <type name="TestSimpleBoxedA" c:type="TestSimpleBoxedA*"/>
+      </return-value>
+    </function>
+    <function name="test_simple_callback" c:identifier="test_simple_callback">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="callback"
+                   transfer-ownership="none"
+                   allow-none="1"
+                   scope="call">
+          <type name="TestSimpleCallback" c:type="TestSimpleCallback"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_size" c:identifier="test_size">
+      <return-value transfer-ownership="none">
+        <type name="gsize" c:type="gsize"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="gsize" c:type="gsize"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_ssize" c:identifier="test_ssize">
+      <return-value transfer-ownership="none">
+        <type name="gssize" c:type="gssize"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="gssize" c:type="gssize"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_strv_in" c:identifier="test_strv_in">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="arr" transfer-ownership="none">
+          <array c:type="char**">
+            <type name="utf8"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_strv_in_container"
+              c:identifier="test_strv_in_container">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="arr" transfer-ownership="container">
+          <array c:type="char**">
+            <type name="utf8"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_strv_in_gvalue" c:identifier="test_strv_in_gvalue">
+      <return-value transfer-ownership="full">
+        <type name="GObject.Value" c:type="GValue*"/>
+      </return-value>
+    </function>
+    <function name="test_strv_out" c:identifier="test_strv_out">
+      <doc xml:whitespace="preserve">No annotations here.  We want the default to Do The Right Thing.</doc>
+      <return-value transfer-ownership="full">
+        <array c:type="char**">
+          <type name="utf8"/>
+        </array>
+      </return-value>
+    </function>
+    <function name="test_strv_out_c" c:identifier="test_strv_out_c">
+      <doc xml:whitespace="preserve">No annotations here.  We want the default to Do The Right Thing.</doc>
+      <return-value transfer-ownership="full">
+        <array c:type="char**">
+          <type name="utf8"/>
+        </array>
+      </return-value>
+    </function>
+    <function name="test_strv_out_container"
+              c:identifier="test_strv_out_container">
+      <return-value transfer-ownership="container">
+        <array c:type="char**">
+          <type name="utf8"/>
+        </array>
+      </return-value>
+    </function>
+    <function name="test_strv_outarg" c:identifier="test_strv_outarg">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="retp"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="container">
+          <array c:type="char***">
+            <type name="utf8"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_timet" c:identifier="test_timet">
+      <return-value transfer-ownership="none">
+        <type name="long" c:type="time_t"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="long" c:type="time_t"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_torture_signature_0"
+              c:identifier="test_torture_signature_0">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="x" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="y"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="double" c:type="double*"/>
+        </parameter>
+        <parameter name="z"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="int" c:type="int*"/>
+        </parameter>
+        <parameter name="foo" transfer-ownership="none">
+          <type name="utf8" c:type="char*"/>
+        </parameter>
+        <parameter name="q"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="int" c:type="int*"/>
+        </parameter>
+        <parameter name="m" transfer-ownership="none">
+          <type name="uint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_torture_signature_1"
+              c:identifier="test_torture_signature_1"
+              throws="1">
+      <doc xml:whitespace="preserve">This function throws an error if m is odd.</doc>
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="x" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="y"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="double" c:type="double*"/>
+        </parameter>
+        <parameter name="z"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="int" c:type="int*"/>
+        </parameter>
+        <parameter name="foo" transfer-ownership="none">
+          <type name="utf8" c:type="char*"/>
+        </parameter>
+        <parameter name="q"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="int" c:type="int*"/>
+        </parameter>
+        <parameter name="m" transfer-ownership="none">
+          <type name="uint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_torture_signature_2"
+              c:identifier="test_torture_signature_2">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="x" transfer-ownership="none">
+          <type name="int" c:type="int"/>
+        </parameter>
+        <parameter name="callback"
+                   transfer-ownership="none"
+                   scope="notified"
+                   closure="2"
+                   destroy="3">
+          <type name="TestCallbackUserData" c:type="TestCallbackUserData"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+        <parameter name="notify" transfer-ownership="none" scope="call">
+          <type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
+        </parameter>
+        <parameter name="y"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="double" c:type="double*"/>
+        </parameter>
+        <parameter name="z"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="int" c:type="int*"/>
+        </parameter>
+        <parameter name="foo" transfer-ownership="none">
+          <type name="utf8" c:type="char*"/>
+        </parameter>
+        <parameter name="q"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="int" c:type="int*"/>
+        </parameter>
+        <parameter name="m" transfer-ownership="none">
+          <type name="uint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_uint" c:identifier="test_uint">
+      <return-value transfer-ownership="none">
+        <type name="uint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="uint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_uint16" c:identifier="test_uint16">
+      <return-value transfer-ownership="none">
+        <type name="uint16" c:type="guint16"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="uint16" c:type="guint16"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_uint32" c:identifier="test_uint32">
+      <return-value transfer-ownership="none">
+        <type name="uint32" c:type="guint32"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="uint32" c:type="guint32"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_uint64" c:identifier="test_uint64">
+      <return-value transfer-ownership="none">
+        <type name="uint64" c:type="guint64"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="uint64" c:type="guint64"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_uint8" c:identifier="test_uint8">
+      <return-value transfer-ownership="none">
+        <type name="uint8" c:type="guint8"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="uint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_ulong" c:identifier="test_ulong">
+      <return-value transfer-ownership="none">
+        <type name="ulong" c:type="gulong"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="ulong" c:type="gulong"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_ushort" c:identifier="test_ushort">
+      <return-value transfer-ownership="none">
+        <type name="ushort" c:type="gushort"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="ushort" c:type="gushort"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_utf8_const_in" c:identifier="test_utf8_const_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="none">
+          <type name="utf8" c:type="char*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_utf8_const_return"
+              c:identifier="test_utf8_const_return">
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">&lt;const char*&gt; UTF-8 string</doc>
+        <type name="utf8" c:type="char*"/>
+      </return-value>
+    </function>
+    <function name="test_utf8_inout" c:identifier="test_utf8_inout">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="inout"
+                   direction="inout"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="utf8" c:type="char**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_utf8_nonconst_in"
+              c:identifier="test_utf8_nonconst_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="full">
+          <type name="utf8" c:type="char*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_utf8_nonconst_return"
+              c:identifier="test_utf8_nonconst_return">
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">&lt;char*&gt; UTF-8 string</doc>
+        <type name="utf8" c:type="char*"/>
+      </return-value>
+    </function>
+    <function name="test_utf8_null_in" c:identifier="test_utf8_null_in">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="in" transfer-ownership="full" allow-none="1">
+          <type name="utf8" c:type="char*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_utf8_null_out" c:identifier="test_utf8_null_out">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="char_out"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full"
+                   allow-none="1">
+          <type name="utf8" c:type="char**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_utf8_out" c:identifier="test_utf8_out">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="out"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="utf8" c:type="char**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_utf8_out_nonconst_return"
+              c:identifier="test_utf8_out_nonconst_return">
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a copy of "first"</doc>
+        <type name="utf8" c:type="char*"/>
+      </return-value>
+      <parameters>
+        <parameter name="out"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">a copy of "second"</doc>
+          <type name="utf8" c:type="char**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_utf8_out_out" c:identifier="test_utf8_out_out">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="out0"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">a copy of "first"</doc>
+          <type name="utf8" c:type="char**"/>
+        </parameter>
+        <parameter name="out1"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">a copy of "second"</doc>
+          <type name="utf8" c:type="char**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_value_get_fundamental_object"
+              c:identifier="test_value_get_fundamental_object"
+              introspectable="0">
+      <return-value transfer-ownership="full">
+        <type name="TestFundamentalObject" c:type="TestFundamentalObject*"/>
+      </return-value>
+      <parameters>
+        <parameter name="value" transfer-ownership="none">
+          <type name="GObject.Value" c:type="GValue*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_value_return" c:identifier="test_value_return">
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the int wrapped in a GValue.</doc>
+        <type name="GObject.Value" c:type="GValue*"/>
+      </return-value>
+      <parameters>
+        <parameter name="i" transfer-ownership="none">
+          <doc xml:whitespace="preserve">an int</doc>
+          <type name="int" c:type="int"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="test_value_set_fundamental_object"
+              c:identifier="test_value_set_fundamental_object"
+              introspectable="0">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="value" transfer-ownership="none">
+          <type name="GObject.Value" c:type="GValue*"/>
+        </parameter>
+        <parameter name="fundamental_object" transfer-ownership="none">
+          <type name="TestFundamentalObject" c:type="TestFundamentalObject*"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>
