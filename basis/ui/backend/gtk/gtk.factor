@@ -21,42 +21,106 @@ TUPLE: window-handle < handle window fullscreen? im-context ;
         swap >>im-context
         swap >>window ;
 
+: connect-signal-with-data ( object signal-name callback data -- )
+    [ utf8 string>alien ] 2dip g_signal_connect drop ;
+
+: connect-signal ( object signal-name callback -- )
+    f connect-signal-with-data ;
+
+! Clipboards
+
 TUPLE: gtk-clipboard handle ;
 
 C: <gtk-clipboard> gtk-clipboard
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: gl-config-attribs ${ GDK_GL_USE_GL GDK_GL_RGBA } H{
-    { double-buffered ${ GDK_GL_DOUBLEBUFFER } }
-    { stereo ${ GDK_GL_STEREO } }
-    ! { offscreen ${ GDK_GL_DRAWABLE_TYPE 2 } }
-    ! { fullscreen ${ GDK_GL_DRAWABLE_TYPE 1 } }
-    ! { windowed ${ GDK_GL_DRAWABLE_TYPE 1 } }
-    { color-bits ${ GDK_GL_BUFFER_SIZE } }
-    { red-bits ${ GDK_GL_RED_SIZE } }
-    { green-bits ${ GDK_GL_GREEN_SIZE } }
-    { blue-bits ${ GDK_GL_BLUE_SIZE } }
-    { alpha-bits ${ GDK_GL_ALPHA_SIZE } }
-    { accum-red-bits ${ GDK_GL_ACCUM_RED_SIZE } }
-    { accum-green-bits ${ GDK_GL_ACCUM_GREEN_SIZE } }
-    { accum-blue-bits ${ GDK_GL_ACCUM_BLUE_SIZE } }
-    { accum-alpha-bits ${ GDK_GL_ACCUM_ALPHA_SIZE } }
-    { depth-bits ${ GDK_GL_DEPTH_SIZE } }
-    { stencil-bits ${ GDK_GL_STENCIL_SIZE } }
-    { aux-buffers ${ GDK_GL_AUX_BUFFERS } }
-    { sample-buffers ${ GDK_GL_SAMPLE_BUFFERS } }
-    { samples ${ GDK_GL_SAMPLES } }
-}
+M: gtk-clipboard clipboard-contents
+    [
+        handle>> gtk_clipboard_wait_for_text
+        [ &g_free utf8 alien>string ] [ f ] if*
+    ] with-destructors ;
 
-M: gtk-ui-backend (make-pixel-format)
-    nip >gl-config-attribs-int-array gdk_gl_config_new ;
+M: gtk-clipboard set-clipboard-contents
+    swap [ handle>> ] [ utf8 string>alien ] bi*
+    -1 gtk_clipboard_set_text ;
 
-M: gtk-ui-backend (free-pixel-format)
-    handle>> g_object_unref ;
+: init-clipboard ( -- )
+    selection "PRIMARY"
+    clipboard "CLIPBOARD"
+    [
+        utf8 string>alien gdk_atom_intern_static_string
+        gtk_clipboard_get <gtk-clipboard> swap set-global
+    ] 2bi@ ;
 
-M: gtk-ui-backend (pixel-format-attribute)
-    [ handle>> ] [ >gl-config-attribs ] bi*
-    { int } [ gdk_gl_config_get_attrib drop ]
-    with-out-parameters ;
+! IO events
+
+: io-source-prepare ( source timeout -- ? )
+    2drop f ;
+
+: io-source-check ( source -- ? )
+    poll_fds>> 0 g_slist_nth_data GPollFD memory>struct
+    revents>> 0 = not ;
+
+: io-source-dispatch ( source callback user_data -- ? )
+     3drop
+     0 mx get wait-for-events
+     yield t ;
+
+CONSTANT: poll-fd-events
+    flags{
+        G_IO_IN
+        G_IO_OUT
+        G_IO_PRI
+        G_IO_ERR
+        G_IO_HUP
+        G_IO_NVAL
+    }
+
+: create-poll-fd ( -- poll-fd )
+    GPollFD malloc-struct &free
+        mx get fd>> >>fd
+        poll-fd-events >>events ;
+
+HOOK: init-io-event-source io-backend ( -- )
+
+M: f init-io-event-source ;
+M: c-io-backend init-io-event-source ;
+
+M: object init-io-event-source
+    GSourceFuncs malloc-struct &free
+        [ io-source-prepare ] GSourceFuncsPrepareFunc >>prepare
+        [ io-source-check ] GSourceFuncsCheckFunc >>check
+        [ io-source-dispatch ] GSourceFuncsDispatchFunc >>dispatch
+    GSource heap-size g_source_new &g_source_unref
+    [ create-poll-fd g_source_add_poll ]
+    [ f g_source_attach drop ] bi ;
+
+SYMBOL: next-timeout
+
+: set-timeout*-value ( alien value -- )
+    swap 0 set-alien-signed-4 ; inline
+
+: timeout-prepare ( source timeout* -- ? )
+    nip next-timeout get-global nano-count [-]
+    [ 1,000,000 /i set-timeout*-value ] keep 0 = ;
+
+: timeout-check ( source -- ? )
+    drop next-timeout get-global nano-count [-] 0 = ;
+
+: timeout-dispatch ( source callback user_data -- ? )
+    3drop sleep-time [ 1,000,000,000 ] unless* nano-count +
+    next-timeout set-global
+    yield t ;
+
+: init-timeout ( -- )
+    GSourceFuncs malloc-struct &free
+        [ timeout-prepare ] GSourceFuncsPrepareFunc >>prepare
+        [ timeout-check ] GSourceFuncsCheckFunc >>check
+        [ timeout-dispatch ] GSourceFuncsDispatchFunc >>dispatch
+    GSource heap-size g_source_new &g_source_unref
+    f g_source_attach drop
+    nano-count next-timeout set-global ;
+
+! User input
 
 CONSTANT: events-mask
     flags{
@@ -129,30 +193,30 @@ CONSTANT: action-key-codes
 : mouse-event>gesture ( event -- modifiers button loc )
     [ event-modifiers ] [ button>> ] [ event-loc ] tri ;
 
-: on-motion ( sender event user-data -- result )
+: on-motion ( win event user-data -- ? )
     drop swap
     [ GdkEventMotion memory>struct event-loc ] dip window
     move-hand fire-motion t ;
 
-: on-enter ( sender event user-data -- result )
+: on-enter ( win event user-data -- ? )
     on-motion ;
 
-: on-leave ( sender event user-data -- result )
+: on-leave ( win event user-data -- ? )
     3drop forget-rollover t ;
 
-: on-button-press ( sender event user-data -- result )
+: on-button-press ( win event user-data -- ? )
     drop swap [
         GdkEventButton memory>struct
         mouse-event>gesture [ <button-down> ] dip
     ] dip window send-button-down t ;
 
-: on-button-release ( sender event user-data -- result )
+: on-button-release ( win event user-data -- ? )
     drop swap [
         GdkEventButton memory>struct
         mouse-event>gesture [ <button-up> ] dip
     ] dip window send-button-up t ;
 
-: on-scroll ( sender event user-data -- result )
+: on-scroll ( win event user-data -- ? )
     drop swap [
         GdkEventScroll memory>struct
         [ scroll-direction ] [ event-loc ] bi
@@ -166,133 +230,22 @@ CONSTANT: action-key-codes
     GdkEventKey memory>struct
     [ event-modifiers ] [ key-sym ] bi ;
   
-: on-key-press ( sender event user-data -- result )
+: on-key-press ( win event user-data -- ? )
     drop swap [ key-event>gesture <key-down> ] [ window ] bi*
     propagate-key-gesture t ;
 
-: on-key-release ( sender event user-data -- result )
+: on-key-release ( win event user-data -- ? )
     drop swap [ key-event>gesture <key-up> ] [ window ] bi*
     propagate-key-gesture t ;
 
-: on-focus-in ( sender event user-data -- result )
+: on-focus-in ( win event user-data -- ? )
     2drop window focus-world t ;
 
-: on-focus-out ( sender event user-data -- result )
+: on-focus-out ( win event user-data -- ? )
     2drop window unfocus-world t ;
 
-: on-expose ( sender event user-data -- result )
-    2drop window relayout t ;
-
-: on-configure ( sender event user-data -- result )
-    drop [ window ] dip GdkEventConfigure memory>struct
-    [ event-loc >>window-loc ] [ event-dim >>dim  ] bi
-    relayout-1 f ;
-
-: on-delete ( sender event user-data -- result )
-    2drop window ungraft t ;
-
-: init-clipboard ( -- )
-    selection "PRIMARY"
-    clipboard "CLIPBOARD"
-    [
-        utf8 string>alien gdk_atom_intern_static_string
-        gtk_clipboard_get <gtk-clipboard> swap set-global
-    ] 2bi@ ;
-
-: io-source-prepare ( source timeout -- result )
-    2drop f ;
-
-: io-source-check ( source -- result )
-    poll_fds>> 0 g_slist_nth_data GPollFD memory>struct
-    revents>> 0 = not ;
-
-: io-source-dispatch ( source callback user_data -- result )
-     3drop
-     0 mx get wait-for-events
-     yield t ;
-
-CONSTANT: poll-fd-events
-    flags{
-        G_IO_IN
-        G_IO_OUT
-        G_IO_PRI
-        G_IO_ERR
-        G_IO_HUP
-        G_IO_NVAL
-    }
-
-: create-poll-fd ( -- poll-fd )
-    GPollFD malloc-struct &free
-        mx get fd>> >>fd
-        poll-fd-events >>events ;
-
-HOOK: init-io-event-source io-backend ( -- )
-
-M: f init-io-event-source ;
-M: c-io-backend init-io-event-source ;
-
-M: object init-io-event-source
-    GSourceFuncs malloc-struct &free
-        [ io-source-prepare ] GSourceFuncsPrepareFunc >>prepare
-        [ io-source-check ] GSourceFuncsCheckFunc >>check
-        [ io-source-dispatch ] GSourceFuncsDispatchFunc >>dispatch
-    GSource heap-size g_source_new &g_source_unref
-    [ create-poll-fd g_source_add_poll ]
-    [ f g_source_attach drop ] bi ;
-
-SYMBOL: next-timeout
-
-: set-timeout*-value ( alien value -- )
-    swap 0 set-alien-signed-4 ; inline
-
-: timeout-prepare ( source timeout* -- result )
-    nip next-timeout get-global nano-count [-]
-    [ 1,000,000 /i set-timeout*-value ] keep 0 = ;
-
-: timeout-check ( source -- result )
-    drop next-timeout get-global nano-count [-] 0 = ;
-
-: timeout-dispatch ( source callback user_data -- result )
-    3drop sleep-time [ 1,000,000,000 ] unless* nano-count +
-    next-timeout set-global
-    yield t ;
-
-: init-timeout ( -- )
-    GSourceFuncs malloc-struct &free
-        [ timeout-prepare ] GSourceFuncsPrepareFunc >>prepare
-        [ timeout-check ] GSourceFuncsCheckFunc >>check
-        [ timeout-dispatch ] GSourceFuncsDispatchFunc >>dispatch
-    GSource heap-size g_source_new &g_source_unref
-    f g_source_attach drop
-    nano-count next-timeout set-global ;
-
-M: gtk-ui-backend (with-ui)
-    [
-        f f gtk_init
-        f f gtk_gl_init
-        init-clipboard
-        start-ui
-        stop-io-thread
-        [
-            init-io-event-source
-            init-timeout
-            gtk_main
-        ] with-destructors
-    ] ui-running ;
-
-: connect-signal-with-data ( object signal-name callback data -- )
-    [ utf8 string>alien ] 2dip g_signal_connect drop ;
-
-: connect-signal ( object signal-name callback -- )
-    f connect-signal-with-data ;
-
-:: connect-signals ( win -- )
+:: connect-user-input-signals ( win -- )
     win events-mask gtk_widget_add_events
-    
-    win "expose-event" [ on-expose yield ]
-    GtkWidget:expose-event connect-signal
-    win "configure-event" [ on-configure yield ]
-    GtkWidget:configure-event connect-signal
     win "motion-notify-event" [ on-motion yield ]
     GtkWidget:motion-notify-event connect-signal
     win "leave-notify-event" [ on-leave yield ]
@@ -312,9 +265,30 @@ M: gtk-ui-backend (with-ui)
     win "focus-in-event" [ on-focus-in yield ]
     GtkWidget:focus-in-event connect-signal
     win "focus-out-event" [ on-focus-out yield ]
-    GtkWidget:focus-out-event connect-signal
+    GtkWidget:focus-out-event connect-signal ;
+
+! Window state events
+
+: on-expose ( win event user-data -- ? )
+    2drop window relayout t ;
+
+: on-configure ( win event user-data -- ? )
+    drop [ window ] [ GdkEventConfigure memory>struct ] bi*
+    [ event-loc >>window-loc ] [ event-dim >>dim  ] bi
+    relayout-1 f ;
+
+: on-delete ( win event user-data -- ? )
+    2drop window ungraft t ;
+
+:: connect-win-state-signals ( win -- )
+    win "expose-event" [ on-expose yield ]
+    GtkWidget:expose-event connect-signal
+    win "configure-event" [ on-configure yield ]
+    GtkWidget:configure-event connect-signal
     win "delete-event" [ on-delete yield ]
     GtkWidget:delete-event connect-signal ;
+
+! Input methods
 
 GENERIC: support-input-methods? ( gadget -- ? )
 GENERIC: get-cursor-surrounding ( gadget -- text cursor-pos )
@@ -353,12 +327,12 @@ M: editor get-cursor-loc&dim
     with-out-parameters 
     [ [ utf8 alien>string ] [ g_free ] bi ] dip ;
             
-: on-preedit-changed ( im-context user-data -- )
+: on-preedit-changed ( im-context win -- )
     window world-focus dup support-input-methods? [
         [ get-preedit-string ] dip set-preedit-string
     ] [ 2drop ] if ;
 
-: on-commit ( sender str user_data -- )
+: on-commit ( im-context str win -- )
     [ drop ] [ utf8 alien>string ] [ window ] tri* user-input ;
 
 : gadget-location ( gadget -- loc )
@@ -372,24 +346,26 @@ M: editor get-cursor-loc&dim
     gadget-cursor-location gtk_im_context_set_cursor_location ;
 
 ! has to be called before the window signal handler
-:: im-on-key-event ( sender event im-context -- result )
-    sender window world-focus :> gadget
+:: im-on-key-event ( win event im-context -- ? )
+    win window world-focus :> gadget
     gadget support-input-methods? [
         im-context gadget update-cursor-location
         im-context event gtk_im_context_filter_keypress
     ] [ im-context gtk_im_context_reset f ] if ;
 
-: im-on-focus-in ( sender event user-data -- result )
-    2drop window handle>> im-context>>
+: im-on-focus-in ( win event im-context -- ? )
+    2nip
     [ gtk_im_context_focus_in ] [ gtk_im_context_reset ] bi f ;
 
-: im-on-focus-out ( sender event user-data -- result )
-    2drop window handle>> im-context>>
+: im-on-focus-out ( win event im-context -- ? )
+    2nip
     [ gtk_im_context_focus_out ] [ gtk_im_context_reset ] bi f ;
 
-: im-on-destroy ( sender user-data -- )
+: im-on-destroy ( win im-context -- )
     nip [ f gtk_im_context_set_client_window ]
-    [ g_object_unref ] bi ;
+    ! weird GLib-GObject-WARNING message appears after calling this code
+    ! [ g_object_unref ] bi ;
+    [ drop ] bi ;
 
 :: configure-im ( win im -- )
     im win gtk_widget_get_window gtk_im_context_set_client_window
@@ -414,6 +390,8 @@ M: editor get-cursor-loc&dim
     GtkWidget:focus-out-event im connect-signal-with-data
     win "destroy" [ im-on-destroy yield ]
     GtkObject:destroy im connect-signal-with-data ;
+
+! Window controls
 
 CONSTANT: window-controls>decor-flags
     H{
@@ -452,10 +430,58 @@ CONSTANT: window-controls>func-flags
         GDK_FUNC_MOVE bitor gdk_window_set_functions
     ] 2tri ;
 
-: setup-gl ( world -- ? )
+! OpenGL and Pixel formats
+
+PIXEL-FORMAT-ATTRIBUTE-TABLE: gl-config-attribs
+    ${ GDK_GL_USE_GL GDK_GL_RGBA }
+    H{
+        { double-buffered ${ GDK_GL_DOUBLEBUFFER } }
+        { stereo ${ GDK_GL_STEREO } }
+        ! { offscreen ${ GDK_GL_DRAWABLE_TYPE 2 } }
+        ! { fullscreen ${ GDK_GL_DRAWABLE_TYPE 1 } }
+        ! { windowed ${ GDK_GL_DRAWABLE_TYPE 1 } }
+        { color-bits ${ GDK_GL_BUFFER_SIZE } }
+        { red-bits ${ GDK_GL_RED_SIZE } }
+        { green-bits ${ GDK_GL_GREEN_SIZE } }
+        { blue-bits ${ GDK_GL_BLUE_SIZE } }
+        { alpha-bits ${ GDK_GL_ALPHA_SIZE } }
+        { accum-red-bits ${ GDK_GL_ACCUM_RED_SIZE } }
+        { accum-green-bits ${ GDK_GL_ACCUM_GREEN_SIZE } }
+        { accum-blue-bits ${ GDK_GL_ACCUM_BLUE_SIZE } }
+        { accum-alpha-bits ${ GDK_GL_ACCUM_ALPHA_SIZE } }
+        { depth-bits ${ GDK_GL_DEPTH_SIZE } }
+        { stencil-bits ${ GDK_GL_STENCIL_SIZE } }
+        { aux-buffers ${ GDK_GL_AUX_BUFFERS } }
+        { sample-buffers ${ GDK_GL_SAMPLE_BUFFERS } }
+        { samples ${ GDK_GL_SAMPLES } }
+    }
+
+M: gtk-ui-backend (make-pixel-format)
+    nip >gl-config-attribs-int-array gdk_gl_config_new ;
+
+M: gtk-ui-backend (free-pixel-format)
+    handle>> g_object_unref ;
+
+M: gtk-ui-backend (pixel-format-attribute)
+    [ handle>> ] [ >gl-config-attribs ] bi*
+    { int } [ gdk_gl_config_get_attrib drop ]
+    with-out-parameters ;
+
+M: window-handle select-gl-context ( handle -- )
+    window>>
+    [ gtk_widget_get_gl_window ] [ gtk_widget_get_gl_context ] bi
+    gdk_gl_drawable_make_current drop ;
+
+M: window-handle flush-gl-context ( handle -- )
+    window>> gtk_widget_get_gl_window
+    gdk_gl_drawable_swap_buffers ;
+
+! Window
+
+: configure-gl ( world -- )
     [
         [ handle>> window>> ] [ handle>> ] bi*
-        f t GDK_GL_RGBA_TYPE gtk_widget_set_gl_capability
+        f t GDK_GL_RGBA_TYPE gtk_widget_set_gl_capability drop
     ] with-world-pixel-format ;
 
 : auto-position ( win loc -- )
@@ -479,13 +505,14 @@ M:: gtk-ui-backend (open-window) ( world -- )
     win "factor" "Factor" [ utf8 string>alien ] bi@
     gtk_window_set_wmclass
     
-    world setup-gl drop
+    world configure-gl
 
     win gtk_widget_realize
     win world window-controls>> configure-window-controls
     
     win im configure-im
-    win connect-signals
+    win connect-user-input-signals
+    win connect-win-state-signals
 
     win gtk_widget_show_all ;
 
@@ -524,14 +551,7 @@ M: gtk-ui-backend (ungrab-input)
     window>>
     [ gtk_grab_remove ] [ GDK_LEFT_PTR set-cursor ] bi ;
 
-M: window-handle select-gl-context ( handle -- )
-    window>>
-    [ gtk_widget_get_gl_window ] [ gtk_widget_get_gl_context ] bi
-    gdk_gl_drawable_make_current drop ;
-
-M: window-handle flush-gl-context ( handle -- )
-    window>> gtk_widget_get_gl_window
-    gdk_gl_drawable_swap_buffers ;
+! Misc.
 
 M: gtk-ui-backend beep
     gdk_beep ;
@@ -543,15 +563,19 @@ M:: gtk-ui-backend system-alert ( caption text -- )
     [ gtk_dialog_run drop ]
     [ gtk_widget_destroy ] tri ;
 
-M: gtk-clipboard clipboard-contents
+M: gtk-ui-backend (with-ui)
     [
-        handle>> gtk_clipboard_wait_for_text
-        [ &g_free utf8 alien>string ] [ f ] if*
-    ] with-destructors ;
-
-M: gtk-clipboard set-clipboard-contents
-    swap [ handle>> ] [ utf8 string>alien ] bi*
-    -1 gtk_clipboard_set_text ;
+        f f gtk_init
+        f f gtk_gl_init
+        init-clipboard
+        start-ui
+        stop-io-thread
+        [
+            init-io-event-source
+            init-timeout
+            gtk_main
+        ] with-destructors
+    ] ui-running ;
 
 gtk-ui-backend ui-backend set-global
 
