@@ -161,7 +161,8 @@ IN: gobject-introspection.ffi
     [ define-ffi-interface-content ] each ;
 
 : get-type-invoker ( name -- quot )
-    [ "GType" current-lib get-global ] dip
+    ! hack
+    [ "GType" "glib.ffi" lookup current-lib get-global ] dip
     { } \ alien-invoke 5 narray >quotation ;
     
 : define-ffi-class ( class -- word )
@@ -230,6 +231,8 @@ IN: gobject-introspection.ffi
         [ classes>> define-ffi-classes-content ]
         [ interfaces>> define-ffi-interfaces-content ]
         [ functions>> define-ffi-functions ]
+
+        [ define-get-types ]
     } cleave ;
 
 : define-ffi-repository ( repository -- )
