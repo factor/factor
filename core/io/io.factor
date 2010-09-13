@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators continuations destructors kernel
 math namespaces sequences ;
@@ -25,20 +25,6 @@ SINGLETONS: seek-absolute seek-relative seek-end ;
 
 GENERIC: stream-tell ( stream -- n )
 GENERIC: stream-seek ( n seek-type stream -- )
-
-<PRIVATE
-
-SLOT: i
-
-: (stream-seek) ( n seek-type stream -- )
-    swap {
-        { seek-absolute [ i<< ] }
-        { seek-relative [ [ + ] change-i drop ] }
-        { seek-end [ [ underlying>> length + ] [ i<< ] bi ] }
-        [ bad-seek-type ]
-    } case ;
-
-PRIVATE>
 
 : stream-print ( str stream -- ) [ stream-write ] [ stream-nl ] bi ;
 
@@ -76,12 +62,13 @@ SYMBOL: error-stream
     [ with-output-stream* ] curry with-disposal ; inline
 
 : with-streams* ( input output quot -- )
-    [ output-stream set input-stream set ] prepose with-scope ; inline
+    swapd [ with-output-stream* ] curry with-input-stream* ; inline
 
 : with-streams ( input output quot -- )
-    [ [ with-streams* ] 3curry ]
-    [ [ [ drop [ &dispose drop ] bi@ ] 3curry ] with-destructors ] 3bi
-    [ ] cleanup ; inline
+    #! We have to dispose of the output stream first, so that
+    #! if both streams point to the same FD, we get to flush the
+    #! buffer before closing the FD.
+    swapd [ with-output-stream ] curry with-input-stream ; inline
 
 : print ( str -- ) output-stream get stream-print ;
 
