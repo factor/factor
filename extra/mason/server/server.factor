@@ -78,6 +78,9 @@ counter "COUNTER" {
     [ [ [ clean-git-id>> ] [ release-git-id>> ] bi = not ] filter ]
     tri ;
 
+: os/cpu ( builder -- string )
+    [ os>> ] [ cpu>> ] bi "/" glue ;
+
 : mason-db ( -- db ) "resource:mason.db" <sqlite-db> ;
 
 : with-mason-db ( quot -- )

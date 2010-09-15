@@ -6,7 +6,7 @@ IN: webapps.mason.downloads
 
 : builder-list ( seq -- xml )
     [
-        [ package-url ] [ [ os>> ] [ cpu>> ] bi "/" glue ] bi
+        [ package-url ] [ os/cpu ] bi
         [XML <li><a href=<->><-></a></li> XML]
     ] map
     [ [XML <p>No machines.</p> XML] ]
