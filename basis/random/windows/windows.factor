@@ -13,35 +13,26 @@ M: windows-crypto-context dispose* ( tuple -- )
 
 CONSTANT: factor-crypto-container "FactorCryptoContainer"
 
-:: (acquire-crypto-context) ( provider type flags -- ret handle )
+:: (acquire-crypto-context) ( provider type flags -- handle )
     { HCRYPTPROV } [
         factor-crypto-container
         provider
         type
         flags
-        CryptAcquireContextW
+        CryptAcquireContextW win32-error=0/f
     ] with-out-parameters ;
 
 : acquire-crypto-context ( provider type -- handle )
-    CRYPT_MACHINE_KEYSET
-    (acquire-crypto-context)
-    swap 0 = [
-        GetLastError NTE_BAD_KEYSET =
-        [ drop f ] [ win32-error-string throw ] if
-    ] when ;
+    CRYPT_MACHINE_KEYSET (acquire-crypto-context) ;
 
 : create-crypto-context ( provider type -- handle )
-    flags{ CRYPT_MACHINE_KEYSET CRYPT_NEWKEYSET }
-    (acquire-crypto-context) win32-error=0/f *void* ;
+    flags{ CRYPT_MACHINE_KEYSET CRYPT_NEWKEYSET } (acquire-crypto-context) ;
 
-ERROR: acquire-crypto-context-failed provider type ;
+ERROR: acquire-crypto-context-failed provider type error ;
 
 : attempt-crypto-context ( provider type -- handle )
-    {
-        [ acquire-crypto-context ] 
-        [ create-crypto-context ] 
-        [ acquire-crypto-context-failed ]
-    } 2|| ;
+    [ acquire-crypto-context ]
+    [ drop [ create-crypto-context ] [ acquire-crypto-context-failed ] recover ] recover ;
 
 : initialize-crypto-context ( crypto-context -- crypto-context )
     dup [ provider>> ] [ type>> ] bi attempt-crypto-context >>handle ;
