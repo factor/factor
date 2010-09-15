@@ -59,10 +59,6 @@ M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )
         handle>> swap dup <byte-array>
         [ CryptGenRandom win32-error=0/f ] keep
     ] with-destructors ;
-    
-: with-windows-rng ( windows-rng quot -- )
-    [ windows-crypto-context ] dip with-disposal
-    ; inline
 
 ERROR: no-windows-crypto-provider error ;
         
