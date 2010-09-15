@@ -5,14 +5,11 @@ windows.kernel32 windows.types math.bitwise sequences fry
 literals ;
 IN: random.windows
 
-TUPLE: windows-rng provider type ;
-C: <windows-rng> windows-rng
+TUPLE: windows-crypto-context < disposable provider type handle ;
 
-TUPLE: windows-crypto-context handle ;
-C: <windows-crypto-context> windows-crypto-context
-
-M: windows-crypto-context dispose ( tuple -- )
-    handle>> 0 CryptReleaseContext win32-error=0/f ;
+M: windows-crypto-context dispose* ( tuple -- )
+    [ handle>> 0 CryptReleaseContext win32-error=0/f ]
+    [ f >>handle drop ] bi ;
 
 CONSTANT: factor-crypto-container "FactorCryptoContainer"
 
@@ -46,39 +43,41 @@ ERROR: acquire-crypto-context-failed provider type ;
         [ acquire-crypto-context-failed ]
     } 2|| ;
 
-: windows-crypto-context ( provider type -- context )
-    attempt-crypto-context <windows-crypto-context> ;
+: initialize-crypto-context ( crypto-context -- crypto-context )
+    dup [ provider>> ] [ type>> ] bi attempt-crypto-context >>handle ;
 
-M: windows-rng random-bytes* ( n tuple -- bytes )
+: <windows-crypto-context> ( provider type -- windows-crypto-type )
+    windows-crypto-context new
+        swap >>type
+        swap >>provider
+        initialize-crypto-context ; inline
+
+M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )
+    dup already-disposed? [ initialize-crypto-context f >>disposed ] when
     [
-        [ provider>> ] [ type>> ] bi
-        windows-crypto-context &dispose
+        |dispose
         handle>> swap dup <byte-array>
         [ CryptGenRandom win32-error=0/f ] keep
     ] with-destructors ;
+    
+: with-windows-rng ( windows-rng quot -- )
+    [ windows-crypto-context ] dip with-disposal
+    ; inline
 
 ERROR: no-windows-crypto-provider error ;
-
-: try-crypto-providers ( seq -- windows-rng )
-    [ first2 <windows-rng> ] attempt-all
-    dup windows-rng? [ no-windows-crypto-provider ] unless ;
+        
+: try-crypto-providers ( seq -- windows-crypto-context )
+    [ first2 <windows-crypto-context> ] attempt-all
+    dup windows-crypto-context? [ no-windows-crypto-provider ] unless ;
 
 [
     {
         ${ MS_ENHANCED_PROV PROV_RSA_FULL }
         ${ MS_DEF_PROV PROV_RSA_FULL }
-    } try-crypto-providers
-    system-random-generator set-global
+    } try-crypto-providers system-random-generator set-global
 
     {
         ${ MS_STRONG_PROV PROV_RSA_FULL }
         ${ MS_ENH_RSA_AES_PROV PROV_RSA_AES }
     } try-crypto-providers secure-random-generator set-global
 ] "random.windows" add-startup-hook
-
-[
-    [
-        ! system-random-generator get-global &dispose drop
-        ! secure-random-generator get-global &dispose drop
-    ] with-destructors
-] "random.windows" add-shutdown-hook
