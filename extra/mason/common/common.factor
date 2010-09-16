@@ -38,12 +38,17 @@ M: unix (really-delete-tree) delete-tree ;
     [ iota ] dip
     '[ drop @ f ] attempt-all drop ; inline
 
+: upload-process ( process -- )
+    #! Give network operations and shell commands at most
+    #! 30 minutes to complete, to catch hangs.
+    >process upload-timeout get >>timeout try-output-process ;
+
 :: upload-safely ( local username host remote -- )
     remote ".incomplete" append :> temp
     { username "@" host ":" temp } concat :> scp-remote
     scp-command get :> scp
     ssh-command get :> ssh
-    5 [ { scp local scp-remote } short-running-process ] retry
+    5 [ { scp local scp-remote } upload-process ] retry
     5 [ { ssh host "-l" username "mv" temp remote } short-running-process ] retry ;
 
 : eval-file ( file -- obj )
