@@ -1,8 +1,7 @@
-USING: accessors alien.c-types alien.data byte-arrays
-combinators.short-circuit continuations destructors init kernel
-locals namespaces random windows.advapi32 windows.errors
-windows.kernel32 windows.types math.bitwise sequences fry
-literals io.backend.windows ;
+USING: accessors alien.data byte-arrays continuations
+destructors init kernel literals locals namespaces random
+sequences windows.advapi32 windows.errors windows.handles
+windows.types ;
 IN: random.windows
 
 TUPLE: windows-crypto-context < win32-handle provider type ;

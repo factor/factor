@@ -1,11 +1,10 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays continuations destructors io
-io.backend.windows libc io.ports io.pipes windows.types math
-windows.kernel32 windows namespaces make io.launcher kernel
-sequences windows.errors assocs splitting system strings
-io.launcher.windows io.files.windows io.backend io.files
-io.files.private combinators shuffle accessors locals ;
+USING: accessors alien.c-types combinators destructors
+io.backend io.backend.windows io.files.windows io.launcher
+io.launcher.windows io.pipes io.ports kernel locals strings
+system windows.errors windows.handles windows.kernel32
+windows.types ;
 IN: io.launcher.windows.nt
 
 : duplicate-handle ( handle -- handle' )
