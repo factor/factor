@@ -1,13 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.binary io.backend io.files
-io.files.types io.buffers io.encodings.utf16n io.ports
-io.backend.windows kernel math splitting fry alien.strings
-windows windows.kernel32 windows.time windows.types calendar
-combinators math.functions sequences namespaces make words
-system destructors accessors math.bitwise continuations
-windows.errors arrays byte-arrays generalizations alien.data
-literals ;
+USING: accessors alien.c-types alien.data combinators
+destructors io.backend.windows io.binary io.buffers io.files
+io.files.types io.ports kernel literals make math.bitwise
+system windows.errors windows.handles windows.kernel32
+windows.time windows.types ;
 IN: io.files.windows
 
 : open-file ( path access-mode create-mode flags -- handle )

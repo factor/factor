@@ -1,11 +1,11 @@
-USING: continuations destructors io.buffers io.files io.backend
-io.timeouts io.ports io.pathnames io.files.private
-io.backend.windows io.files.windows io.encodings.utf16n windows
-windows.kernel32 kernel libc math threads system environment
-alien.c-types alien.arrays alien.strings sequences combinators
-combinators.short-circuit ascii splitting alien strings assocs
-namespaces make accessors tr windows.time windows.shell32
-windows.errors specialized-arrays classes.struct ;
+USING: accessors alien.c-types alien.strings classes.struct
+combinators combinators.short-circuit continuations environment
+io.backend io.backend.windows io.encodings.utf16n
+io.files.private io.files.windows io.pathnames kernel math
+sequences specialized-arrays
+specialized-arrays.instances.alien.c-types.ushort system tr
+windows windows.errors windows.kernel32 windows.shell32
+windows.time ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.windows.nt
 
