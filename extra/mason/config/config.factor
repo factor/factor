@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system io.files io.pathnames namespaces kernel accessors
-assocs ;
+USING: calendar system io.files io.pathnames namespaces kernel
+accessors assocs ;
 IN: mason.config
 
 ! (Optional) Location for build directories
@@ -96,6 +96,10 @@ SYMBOL: upload-username
 
 ! Directory with binary packages.
 SYMBOL: upload-directory
+
+! Upload timeout
+SYMBOL: upload-timeout
+1 hours upload-timeout set-global
 
 ! Optional: override ssh and scp command names
 SYMBOL: scp-command
