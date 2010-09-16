@@ -2,10 +2,10 @@ USING: accessors alien.c-types alien.data byte-arrays
 combinators.short-circuit continuations destructors init kernel
 locals namespaces random windows.advapi32 windows.errors
 windows.kernel32 windows.types math.bitwise sequences fry
-literals ;
+literals io.backend.windows ;
 IN: random.windows
 
-TUPLE: windows-crypto-context < disposable provider type handle ;
+TUPLE: windows-crypto-context < win32-handle provider type ;
 
 M: windows-crypto-context dispose* ( tuple -- )
     [ handle>> 0 CryptReleaseContext win32-error=0/f ]
@@ -38,24 +38,17 @@ ERROR: acquire-crypto-context-failed provider type error ;
     dup [ provider>> ] [ type>> ] bi attempt-crypto-context >>handle ;
 
 : <windows-crypto-context> ( provider type -- windows-crypto-type )
-    windows-crypto-context new
+    windows-crypto-context new-disposable
         swap >>type
         swap >>provider
         initialize-crypto-context ; inline
 
-M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )
-    dup already-disposed? [ initialize-crypto-context f >>disposed ] when
-    [
-        |dispose
-        handle>> swap dup <byte-array>
-        [ CryptGenRandom win32-error=0/f ] keep
-    ] with-destructors ;
+M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )    
+    handle>> swap [ ] [ <byte-array> ] bi
+    [ CryptGenRandom win32-error=0/f ] keep ;
 
-ERROR: no-windows-crypto-provider error ;
-        
 : try-crypto-providers ( seq -- windows-crypto-context )
-    [ first2 <windows-crypto-context> ] attempt-all
-    dup windows-crypto-context? [ no-windows-crypto-provider ] unless ;
+    [ first2 <windows-crypto-context> ] attempt-all ;
 
 [
     {
