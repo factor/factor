@@ -1,11 +1,12 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors bit.ly combinators db.tuples debugger fry
-grouping io io.streams.string kernel locals make mason.email
-mason.server mason.twitter mason.version.binary
-mason.version.common mason.version.data mason.version.files
-mason.version.source sequences threads ;
-IN: mason.version
+grouping io io.streams.string kernel locals make sequences
+threads mason.email mason.twitter webapps.mason.backend
+webapps.mason.version.common webapps.mason.version.data
+webapps.mason.version.files webapps.mason.version.source
+webapps.mason.version.binary ;
+IN: webapps.mason.version
 
 : check-releases ( builders -- )
     [ release-git-id>> ] map all-equal?

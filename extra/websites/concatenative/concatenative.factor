@@ -26,7 +26,7 @@ webapps.wiki
 webapps.user-admin
 webapps.help
 webapps.mason
-mason.server ;
+webapps.mason.backend ;
 IN: websites.concatenative
 
 : test-db ( -- db ) "resource:test.db" <sqlite-db> ;

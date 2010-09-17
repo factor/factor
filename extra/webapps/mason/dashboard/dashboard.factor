@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel mason.server furnace.actions
-html.forms sequences xml.syntax webapps.mason.utils ;
+USING: accessors kernel furnace.actions html.forms sequences
+xml.syntax webapps.mason.backend webapps.mason.utils ;
 IN: webapps.mason.downloads
 
 : builder-list ( seq -- xml )

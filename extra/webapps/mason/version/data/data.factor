@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db db.tuples db.types kernel locals
-mason.version.files sequences ;
-IN: mason.version.data
+webapps.mason.version.files sequences ;
+IN: webapps.mason.version.data
 
 TUPLE: release
 host-name os cpu
