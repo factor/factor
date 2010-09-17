@@ -73,7 +73,7 @@ counter "COUNTER" {
 
 : funny-builders ( -- crashed broken limbo )
     builder new select-tuples
-    [ [ current-timestamp>> 5 hours ago before? ] filter ]
+    [ [ current-timestamp>> 1 hours ago before? ] filter ]
     [ [ clean-timestamp>> 1 weeks ago before? ] filter ]
     [ [ [ clean-git-id>> ] [ release-git-id>> ] bi = not ] filter ]
     tri ;
@@ -84,7 +84,7 @@ counter "COUNTER" {
 : mason-db ( -- db ) "resource:mason.db" <sqlite-db> ;
 
 : with-mason-db ( quot -- )
-    [ mason-db ] dip with-db ; inline
+    mason-db [ with-transaction ] with-db ; inline
 
 : init-mason-db ( -- )
     { builder counter } ensure-tables ;
