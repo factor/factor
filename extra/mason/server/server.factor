@@ -4,16 +4,20 @@ USING: accessors calendar db db.sqlite db.tuples db.types kernel
 math math.order sequences combinators.short-circuit ;
 IN: mason.server
 
+CONSTANT: +idle+ "idle"
 CONSTANT: +starting+ "starting"
 CONSTANT: +make-vm+ "make-vm"
 CONSTANT: +boot+ "boot"
 CONSTANT: +test+ "test"
-CONSTANT: +clean+ "status-clean"
+CONSTANT: +upload+ "upload"
+CONSTANT: +finish+ "finish"
+
 CONSTANT: +dirty+ "status-dirty"
 CONSTANT: +error+ "status-error"
+CONSTANT: +clean+ "status-clean"
 
 TUPLE: builder
-host-name os cpu
+host-name os cpu heartbeat-timestamp
 clean-git-id clean-timestamp
 last-release release-git-id
 last-git-id last-timestamp last-report
@@ -24,6 +28,7 @@ builder "BUILDERS" {
     { "host-name" "HOST_NAME" TEXT +user-assigned-id+ }
     { "os" "OS" TEXT +user-assigned-id+ }
     { "cpu" "CPU" TEXT +user-assigned-id+ }
+    { "heartbeat-timestamp" "HEARTBEAT_TIMESTAMP" TIMESTAMP }
 
     { "clean-git-id" "CLEAN_GIT_ID" TEXT }
     { "clean-timestamp" "CLEAN_TIMESTAMP" TIMESTAMP }
@@ -60,23 +65,11 @@ counter "COUNTER" {
         counter-tuple [ 0 or 1 + dup ] change-value update-tuple
     ] with-transaction ;
 
-: crashed-builders ( -- seq )
+: funny-builders ( -- crashed broken )
     builder new select-tuples
-    [ current-timestamp>> 5 hours ago before? ] filter ;
-
-: broken-builders ( -- seq )
-    builder new select-tuples
-    [
-        clean-timestamp>>
-        { [ not ] [ 1 weeks ago before? ] } 1||
-    ] filter ;
-
-: funny-builders ( -- crashed broken limbo )
-    builder new select-tuples
-    [ [ current-timestamp>> 1 hours ago before? ] filter ]
-    [ [ clean-timestamp>> 1 weeks ago before? ] filter ]
-    [ [ [ clean-git-id>> ] [ release-git-id>> ] bi = not ] filter ]
-    tri ;
+    [ [ heartbeat-timestamp>> 30 minutes ago before? ] filter ]
+    [ [ [ clean-git-id>> ] [ last-git-id>> ] bi = not ] filter ]
+    bi ;
 
 : os/cpu ( builder -- string )
     [ os>> ] [ cpu>> ] bi "/" glue ;
