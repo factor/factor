@@ -42,9 +42,13 @@ IN: mason.build
     [
         begin-build
         build-child
-        [ notify-report ]
-        [ status-clean eq? [ upload-docs release ] when ] bi
+        [ notify-report ] [
+            status-clean eq?
+            [ notify-upload upload-docs release ] when
+        ] bi
+        notify-finish
         finish-build
-    ] [ cleanup ] [ ] continuations:cleanup ;
+    ] [ cleanup ] [ ] continuations:cleanup
+    notify-idle ;
 
 MAIN: build

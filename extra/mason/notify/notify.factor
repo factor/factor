@@ -27,6 +27,9 @@ IN: mason.notify
 : notify-heartbeat ( -- )
     f f "heartbeat" status-notify ;
 
+: notify-idle ( -- )
+    f f "idle" status-notify ;
+
 : notify-begin-build ( git-id -- )
     [ "Starting build of GIT ID " write print flush ]
     [ f swap "git-id" status-notify ]
@@ -50,6 +53,12 @@ IN: mason.notify
         [ "report" utf8 file-contents ] dip
         [ name>> "report" status-notify ] [ email-report ] 2bi
     ] bi ;
+
+: notify-upload ( -- )
+    f f "upload" status-notify ;
+
+: notify-finish ( -- )
+    f f "finish" status-notify ;
 
 : notify-release ( archive-name -- )
     [ "Uploaded " prepend [ print flush ] [ mason-tweet ] bi ]
