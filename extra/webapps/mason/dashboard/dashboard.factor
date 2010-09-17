@@ -20,7 +20,6 @@ IN: webapps.mason.downloads
             funny-builders
             [ builder-list ] tri@
             [ "crashed" set-value ]
-            [ "broken" set-value ]
-            [ "limbo" set-value ] tri*
+            [ "broken" set-value ] bi*
         ] with-mason-db
     ] >>init ;

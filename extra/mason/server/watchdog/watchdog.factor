@@ -9,7 +9,7 @@ IN: mason.server.watchdog
     <XML
         <html>
             <body>
-                <p>Machines which have not sent a heartbeat for several hours:</p>
+                <p>Machines which are not sending heartbeats:</p>
                 <ul><-></ul>
                 <a href="http://builds.factorcode.org/dashboard">Dashboard</a>
             </body>
@@ -31,6 +31,6 @@ IN: mason.server.watchdog
 
 : check-builders ( -- )
     [
-        funny-builders 2drop
+        funny-builders drop
         [ send-crashed-builder-email ] unless-empty
     ] with-mason-db ;
