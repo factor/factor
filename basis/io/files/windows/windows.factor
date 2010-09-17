@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data combinators
 destructors io.backend.windows io.binary io.buffers io.files
-io.files.types io.ports kernel literals make math.bitwise
-system windows.errors windows.handles windows.kernel32
-windows.time windows.types ;
+io.files.types io.ports kernel literals make
+math.bitwise system windows.errors windows.handles
+windows.kernel32 windows.time windows.types vocabs.loader ;
 IN: io.files.windows
 
 : open-file ( path access-mode create-mode flags -- handle )
@@ -98,7 +98,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
 +sparse-file+ +reparse-point+ +compressed+ +offline+
 +not-content-indexed+ +encrypted+ ;
 
-: win32-file-attribute ( n attr symbol -- )
+: win32-file-attribute ( n symbol attr -- )
     rot mask? [ , ] [ drop ] if ;
 
 : win32-file-attributes ( n -- seq )
@@ -127,3 +127,5 @@ SYMBOLS: +read-only+ +hidden+ +system+
 : (set-file-times) ( handle timestamp/f timestamp/f timestamp/f -- )
     [ timestamp>FILETIME ] tri@
     SetFileTime win32-error=0/f ;
+
+"io.files.windows.nt" require
