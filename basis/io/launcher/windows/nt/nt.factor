@@ -23,7 +23,7 @@ IN: io.launcher.windows.nt
     (pipe) [ in>> &dispose ] [ out>> dispose ] bi ;
 
 : null-output ( -- pipe )
-    (pipe) [ in>> dispose ] [ out>> &dispose ] bi ;
+    (pipe) [ out>> &dispose ] [ in>> dispose ] bi ;
 
 : null-pipe ( mode -- pipe )
     {
@@ -48,7 +48,7 @@ IN: io.launcher.windows.nt
     create-mode
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
-    CreateFile dup invalid-handle? <win32-file> &dispose ;
+    CreateFile check-invalid-handle <win32-file> &dispose ;
 
 : redirect-append ( path access-mode create-mode -- handle )
     [ path>> ] 2dip

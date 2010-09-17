@@ -2,8 +2,7 @@ USING: accessors alien.c-types alien.strings classes.struct
 combinators combinators.short-circuit continuations environment
 io.backend io.backend.windows io.encodings.utf16n
 io.files.private io.files.windows io.pathnames kernel math
-sequences specialized-arrays
-specialized-arrays.instances.alien.c-types.ushort system tr
+sequences specialized-arrays system tr
 windows windows.errors windows.kernel32 windows.shell32
 windows.time ;
 SPECIALIZED-ARRAY: ushort

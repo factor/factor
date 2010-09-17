@@ -38,7 +38,7 @@ M: win32-socket dispose* ( stream -- )
     [ empty-sockaddr/size ] [ protocol-family ] bi pick family<< ;
 
 : opened-socket ( handle -- win32-socket )
-    <win32-socket> |dispose dup add-completion ;
+    <win32-socket> |dispose add-completion ;
 
 : open-socket ( addrspec type -- win32-socket )
     [ protocol-family ] dip
