@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image bootstrap.image.download io
 io.directories io.directories.hierarchy io.files.unique
-io.launcher io.pathnames kernel mason.common mason.config
-mason.version.files namespaces sequences ;
-IN: mason.version.source
+io.launcher io.pathnames kernel namespaces sequences
+mason.common mason.config webapps.mason.version.files ;
+IN: webapps.mason.version.source
 
 : clone-factor ( -- )
     { "git" "clone" "git://factorcode.org/git/factor.git" } try-process ;

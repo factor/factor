@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math mason.email mason.server math.parser sequences
-xml.syntax xml.writer ;
-IN: mason.server.watchdog
+USING: kernel math math.parser sequences xml.syntax xml.writer
+mason.email webapps.mason.backend ;
+IN: webapps.mason.backend.watchdog
 
 : crashed-builder-body ( crashed-builders -- string content-type )
     [ os/cpu [XML <li><-></li> XML] ] map

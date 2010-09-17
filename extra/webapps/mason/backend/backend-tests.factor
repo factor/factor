@@ -1,6 +1,6 @@
 USING: continuations db db.sqlite io.directories io.files.temp
-mason.server tools.test ;
-IN: mason.server.tests
+webapps.mason.backend tools.test ;
+IN: webapps.mason.backend.tests
 
 [ "test.db" temp-file delete-file ] ignore-errors
 
