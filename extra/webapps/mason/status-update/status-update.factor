@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators db.tuples furnace.actions
 furnace.redirection html.forms http.server.responses io kernel
-mason.server namespaces validators webapps.mason.utils ;
+namespaces validators webapps.mason.utils webapps.mason.backend ;
 IN: webapps.mason.status-update
 
 : find-builder ( host-name os cpu -- builder )

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel make mason.config mason.platform
 mason.release.archive namespaces sequences ;
-IN: mason.version.files
+IN: webapps.mason.version.files
 
 : release-directory ( string version -- string )
     [ "releases/" % % "/" % % ] "" make ;

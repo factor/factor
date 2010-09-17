@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db db.sqlite db.tuples db.types kernel
 math math.order sequences combinators.short-circuit ;
-IN: mason.server
+IN: webapps.mason.backend
 
 CONSTANT: +idle+ "idle"
 CONSTANT: +starting+ "starting"
