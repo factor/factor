@@ -137,11 +137,6 @@ void factor_vm::scrub_return_address()
 		frame = frame_successor(frame);
 
 	set_frame_offset(frame,0);
-
-#ifdef FACTOR_DEBUG
-	/* Doing a GC here triggers all kinds of funny errors */
-	primitive_compact_gc();
-#endif
 }
 
 cell factor_vm::frame_scan(stack_frame *frame)
