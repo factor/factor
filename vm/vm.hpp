@@ -35,7 +35,7 @@ struct factor_vm
 	int callback_id;
 
 	/* Pooling unused contexts to make context allocation cheaper */
-	std::vector<context *> unused_contexts;
+	std::list<context *> unused_contexts;
 
 	/* Active contexts, for tracing by the GC */
 	std::set<context *> active_contexts;
