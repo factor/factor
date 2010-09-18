@@ -24,6 +24,7 @@
 
 /* C++ headers */
 #include <algorithm>
+#include <list>
 #include <map>
 #include <set>
 #include <vector>
