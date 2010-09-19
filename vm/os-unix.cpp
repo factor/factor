@@ -349,15 +349,4 @@ void open_console()
 	start_thread(stdin_loop,NULL);
 }
 
-VM_C_API void wait_for_stdin()
-{
-	if(write(control_write,"X",1) != 1)
-	{
-		if(errno == EINTR)
-			wait_for_stdin();
-		else
-			fatal_error("Error writing control fd",errno);
-	}
-}
-
 }
