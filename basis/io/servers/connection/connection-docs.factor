@@ -126,11 +126,11 @@ HELP: with-threaded-server
 { $description "Runs a server and calls a quotation, stopping the server once the quotation returns." } ;
 
 HELP: secure-port
-{ $values { "n" { $maybe integer } } }
+{ $values { "n/f" { $maybe integer } } }
 { $description "Outputs one of the port numbers on which the current threaded server accepts secure socket connections. Outputs " { $link f } " if the current threaded server does not accept secure socket connections." }
 { $notes "Can only be used from the dynamic scope of a " { $link handle-client* } " call." } ;
 
 HELP: insecure-port
-{ $values { "n" { $maybe integer } } }
+{ $values { "n/f" { $maybe integer } } }
 { $description "Outputs one of the port numbers on which the current threaded server accepts ordinary socket connections. Outputs " { $link f } " if the current threaded server does not accept ordinary socket connections." }
 { $notes "Can only be used from the dynamic scope of a " { $link handle-client* } " call." } ;
