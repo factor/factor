@@ -3,12 +3,12 @@
 USING: alien alien.c-types alien.data alien.strings libc destructors
 locals kernel math assocs namespaces make continuations sequences
 hashtables sorting arrays combinators math.bitwise strings
-system accessors threads splitting io.backend io.backend.windows
-io.backend.windows.nt io.files.windows.nt io.monitors io.ports
+system accessors threads splitting io.backend
+io.files.windows io.monitors io.ports
 io.buffers io.files io.timeouts io.encodings.string literals
 io.encodings.utf16n io windows.errors windows.kernel32 windows.types
 io.pathnames classes.struct ;
-IN: io.monitors.windows.nt
+IN: io.monitors.windows
 
 : open-directory ( path -- handle )
     normalize-path
