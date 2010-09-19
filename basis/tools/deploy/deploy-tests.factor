@@ -68,7 +68,7 @@ M: quit-responder call-responder*
         <http-server>
             0 >>insecure
             f >>secure
-        dup start-server*
+        start-server
         sockets>> first addr>> port>>
         dup number>string "resource:temp/port-number" ascii set-file-contents
     ] with-scope

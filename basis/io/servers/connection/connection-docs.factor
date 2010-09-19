@@ -1,9 +1,9 @@
+USING: calendar classes concurrency.semaphores help.markup
+help.syntax io io.sockets io.sockets.secure math quotations ;
 IN: io.servers.connection
-USING: help help.syntax help.markup io io.sockets
-io.sockets.secure concurrency.semaphores calendar classes math ;
 
 ARTICLE: "server-config" "Threaded server configuration"
-"The " { $link threaded-server } " tuple has a variety of slots which can be set before starting the server with " { $link start-server } " or " { $link start-server* } "."
+"The " { $link threaded-server } " tuple has a variety of slots which can be set before starting the server with " { $link start-server } "."
 { $subsections
     "server-config-logging"
     "server-config-listen"
@@ -66,13 +66,13 @@ ARTICLE: "io.servers.connection" "Threaded servers"
 "The server must be configured before it can be started." 
 { $subsections "server-config" }
 "Starting the server:"
-{ $subsections
-    start-server
-    start-server*
-    wait-for-server
-}
+{ $subsections start-server }
 "Stopping the server:"
 { $subsections stop-server }
+"Waiting for the server to stop:"
+{ $subsections wait-for-server }
+"Combinator for running a server:"
+{ $subsections with-threaded-server }
 "From within the dynamic scope of a client handler, several words can be used to interact with the threaded server:"
 { $subsections
     stop-this-server
@@ -105,30 +105,32 @@ HELP: handle-client*
 
 HELP: start-server
 { $values { "threaded-server" threaded-server } }
-{ $description "Starts a threaded server." }
+{ $description "Starts a threaded server and returns after the server is fully running. Throws an error if any of the ports cannot be aquired." }
 { $notes "Use " { $link stop-server } " or " { $link stop-this-server } " to stop the server." } ;
-
-HELP: wait-for-server
-{ $values { "threaded-server" threaded-server } }
-{ $description "Waits for a threaded server to begin accepting connections." } ;
-
-HELP: start-server*
-{ $values { "threaded-server" threaded-server } }
-{ $description "Starts a threaded server, returning as soon as it is ready to begin accepting connections." } ;
 
 HELP: stop-server
 { $values { "threaded-server" threaded-server } }
-{ $description "Stops a threaded server, preventing it from accepting any more connections and returning to the caller of " { $link start-server } ". All client connections which have already been opened continue to be serviced." } ;
+{ $description "Stops a threaded server, preventing it from accepting any more connections. All client connections which have already been opened continue to be serviced." } ;
+
+HELP: wait-for-server
+{ $values { "threaded-server" threaded-server } }
+{ $description "Waits for a threaded server to stop serving new connections." } ;
 
 HELP: stop-this-server
-{ $description "Stops the current threaded server, preventing it from accepting any more connections and returning to the caller of " { $link start-server } ". All client connections which have already been opened continue to be serviced." } ;
+{ $description "Stops the current threaded server, preventing it from accepting any more connections. All client connections which have already been opened continue to be serviced." } ;
+
+HELP: with-threaded-server
+{ $values
+    { "threaded-server" threaded-server } { "quot" quotation }    
+}
+{ $description "Runs a server and calls a quotation, stopping the server once the quotation returns." } ;
 
 HELP: secure-port
 { $values { "n" { $maybe integer } } }
-{ $description "Outputs the port number on which the current threaded server accepts secure socket connections. Outputs " { $link f } " if the current threaded server does not accept secure socket connections." }
+{ $description "Outputs one of the port numbers on which the current threaded server accepts secure socket connections. Outputs " { $link f } " if the current threaded server does not accept secure socket connections." }
 { $notes "Can only be used from the dynamic scope of a " { $link handle-client* } " call." } ;
 
 HELP: insecure-port
 { $values { "n" { $maybe integer } } }
-{ $description "Outputs the port number on which the current threaded server accepts ordinary socket connections. Outputs " { $link f } " if the current threaded server does not accept ordinary socket connections." }
+{ $description "Outputs one of the port numbers on which the current threaded server accepts ordinary socket connections. Outputs " { $link f } " if the current threaded server does not accept ordinary socket connections." }
 { $notes "Can only be used from the dynamic scope of a " { $link handle-client* } " call." } ;

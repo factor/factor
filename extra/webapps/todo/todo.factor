@@ -162,6 +162,6 @@ io.sockets.secure ;
 : run-todo ( -- )
     <todo-app> main-responder set-global
     todo-db start-expiring
-    <todo-website-server> start-server ;
+    <todo-website-server> start-server drop ;
 
 MAIN: run-todo

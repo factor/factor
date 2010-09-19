@@ -365,7 +365,7 @@ M: ftp-server handle-client* ( server -- )
         "ftp.server" >>name
         5 minutes >>timeout ;
 
-: ftpd ( directory port -- )
+: ftpd ( directory port -- server )
     <ftp-server> start-server ;
 
 ! sudo tcpdump -i en1 -A -s 10000  tcp port 21
