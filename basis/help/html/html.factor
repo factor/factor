@@ -113,11 +113,15 @@ MEMO: load-index ( name -- index )
 
 TUPLE: result title href ;
 
+: partition-exact ( string results -- results' )
+    [ title>> = ] with partition append ;
+
 : offline-apropos ( string index -- results )
-    load-index swap >lower
+    load-index over >lower
     '[ [ drop _ ] dip >lower subseq? ] assoc-filter
     [ swap result boa ] { } assoc>map
-    [ title>> ] sort-with ;
+    [ title>> ] sort-with
+    partition-exact ;
 
 : article-apropos ( string -- results )
     "articles.idx" offline-apropos ;
