@@ -298,7 +298,7 @@ M: http-server handle-client*
         "http" protocol-port >>insecure
         "https" protocol-port >>secure ;
 
-: httpd ( port -- )
+: httpd ( port -- http-server )
     <http-server>
         swap >>insecure
         f >>secure

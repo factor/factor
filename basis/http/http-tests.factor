@@ -231,7 +231,7 @@ test-db [
         <http-server>
             0 >>insecure
             f >>secure
-        dup start-server*
+        start-server
         sockets>> first addr>> port>>
     ] with-scope "port" set ;
 

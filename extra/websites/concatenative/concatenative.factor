@@ -125,7 +125,7 @@ SYMBOL: dh-file
         8080 >>insecure
         8431 >>secure ;
 
-: start-website ( -- )
+: start-website ( -- server )
     test-db start-expiring
     test-db start-update-task
     http-insomniac

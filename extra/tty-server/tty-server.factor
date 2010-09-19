@@ -7,7 +7,7 @@ IN: tty-server
         "tty-server" >>name
         swap local-server >>insecure
         [ listener ] >>handler
-    start-server ;
+    start-server drop ;
 
 : tty-server ( -- ) 9999 <tty-server> ;
 

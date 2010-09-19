@@ -13,7 +13,7 @@ IN: concurrency.distributed.tests
 
 [ ] [ [ "distributed-concurrency-test" temp-file delete-file ] ignore-errors ] unit-test
 
-[ ] [ test-node dup (start-node) ] unit-test
+[ ] [ test-node dup (start-node) drop ] unit-test
 
 [ ] [
     [

@@ -46,7 +46,7 @@ HELP: <http-server>
 { $description "Creates a new HTTP server with default parameters." } ;
 
 HELP: httpd
-{ $values { "port" integer } }
+{ $values { "port" integer } { "http-server" http-server } }
 { $description "Starts an HTTP server on the specified port number." }
 { $notes "For more flexibility, use " { $link <http-server> } " and fill in the tuple slots before calling " { $link start-server } "." } ;
 
