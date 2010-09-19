@@ -3,7 +3,7 @@
 USING: arrays combinators continuations fry io io.backend
 io.directories io.directories.hierarchy io.files io.pathnames
 kernel locals math math.bitwise math.parser namespaces random
-sequences system vocabs.loader ;
+sequences system vocabs.loader random.data ;
 IN: io.files.unique
 
 HOOK: (touch-unique-file) io-backend ( path -- )
@@ -25,22 +25,15 @@ SYMBOL: unique-retries
 
 <PRIVATE
 
-: random-letter ( -- ch )
-    26 random { CHAR: a CHAR: A } random + ;
-
-: random-ch ( -- ch )
-    { t f } random
-    [ 10 random CHAR: 0 + ] [ random-letter ] if ;
-
-: random-name ( -- string )
-    unique-length get [ random-ch ] "" replicate-as ;
+: random-file-name ( -- string )
+    unique-length get random-string ;
 
 : retry ( quot: ( -- ? ) n -- )
     iota swap [ drop ] prepose attempt-all ; inline
 
 : (make-unique-file) ( path prefix suffix -- path )
     '[
-        _ _ _ random-name glue append-path
+        _ _ _ random-file-name glue append-path
         dup touch-unique-file
     ] unique-retries get retry ;
 
@@ -55,7 +48,7 @@ PRIVATE>
 : unique-directory ( -- path )
     [
         current-temporary-directory get
-        random-name append-path
+        random-file-name append-path
         dup make-directory
     ] unique-retries get retry ;
 
