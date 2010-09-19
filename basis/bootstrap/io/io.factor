@@ -6,6 +6,6 @@ IN: bootstrap.io
     "io.backend." {
         { [ "io-backend" get ] [ "io-backend" get ] }
         { [ os unix? ] [ "unix." os name>> append ] }
-        { [ os winnt? ] [ "windows.nt" ] }
+        { [ os windows? ] [ "windows" ] }
     } cond append require
 ] when

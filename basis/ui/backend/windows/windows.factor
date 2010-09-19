@@ -7,7 +7,7 @@ ui.clipboards ui.gadgets.worlds ui.gestures ui.event-loop io
 kernel math math.vectors namespaces make sequences strings
 vectors words windows.dwmapi system-info.windows windows.kernel32
 windows.gdi32 windows.user32 windows.opengl32 windows.messages
-windows.types windows.offscreen windows.nt threads libc combinators
+windows.types windows.offscreen windows threads libc combinators
 fry combinators.short-circuit continuations command-line shuffle
 opengl ui.render math.bitwise locals accessors math.rectangles
 math.order calendar ascii sets io.encodings.utf16n

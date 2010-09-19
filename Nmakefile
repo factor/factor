@@ -14,18 +14,17 @@ CL_FLAGS = $(CL_FLAGS) /Zi /DFACTOR_DEBUG
 
 !IF "$(PLATFORM)" == "x86-32"
 LINK_FLAGS = $(LINK_FLAGS) /safeseh
-PLAF_DLL_OBJS = vm\os-windows-nt-x86.32.obj vm\safeseh.obj
+PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj
 !ELSEIF "$(PLATFORM)" == "x86-64"
-PLAF_DLL_OBJS = vm\os-windows-nt-x86.64.obj
+PLAF_DLL_OBJS = vm\os-windows-x86.64.obj
 !ENDIF
 
 ML_FLAGS = /nologo /safeseh
 
-EXE_OBJS = vm\main-windows-nt.obj vm\factor.res
+EXE_OBJS = vm/main-windows.obj vm\factor.res
 
 DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\os-windows.obj \
-	vm\os-windows-nt.obj \
 	vm\aging_collector.obj \
 	vm\alien.obj \
 	vm\arrays.obj \
@@ -56,7 +55,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\jit.obj \
 	vm\math.obj \
 	vm\mvm.obj \
-	vm\mvm-windows-nt.obj \
+	vm\mvm-windows.obj \
 	vm\nursery_collector.obj \
 	vm\object_start_map.obj \
 	vm\objects.obj \
@@ -68,7 +67,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\to_tenured_collector.obj \
 	vm\tuples.obj \
 	vm\utilities.obj \
-        vm\vm.obj \
+	vm\vm.obj \
 	vm\words.obj
 
 .cpp.obj:

@@ -1,13 +1,14 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data arrays continuations io
-io.backend.windows io.pipes.windows.nt io.pathnames libc
-io.ports windows.types math windows.kernel32 namespaces make
-io.launcher kernel sequences windows.errors splitting system
-threads init strings combinators io.backend accessors
-concurrency.flags io.files assocs io.files.private windows
-destructors classes classes.struct specialized-arrays
-debugger prettyprint ;
+USING: accessors alien alien.c-types alien.data arrays assocs
+classes classes.struct combinators concurrency.flags
+continuations debugger destructors init io io.backend
+io.backend.windows io.files io.files.private io.files.windows
+io.launcher io.pathnames io.pipes io.pipes.windows io.ports
+kernel libc locals make math namespaces prettyprint sequences
+specialized-arrays splitting
+strings system threads windows windows.errors windows.handles
+windows.kernel32 windows.types ;
 SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: void*
 IN: io.launcher.windows
@@ -174,3 +175,104 @@ M: windows wait-for-processes ( -- ? )
     WaitForMultipleObjects
     dup HEX: ffffffff = [ win32-error ] when
     dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth process-exited f ] if ;
+
+: duplicate-handle ( handle -- handle' )
+    GetCurrentProcess ! source process
+    swap handle>> ! handle
+    GetCurrentProcess ! target process
+    f <void*> [ ! target handle
+        DUPLICATE_SAME_ACCESS ! desired access
+        TRUE ! inherit handle
+        0 ! options
+        DuplicateHandle win32-error=0/f
+    ] keep *void* <win32-handle> &dispose ;
+
+! /dev/null simulation
+: null-input ( -- pipe )
+    (pipe) [ in>> &dispose ] [ out>> dispose ] bi ;
+
+: null-output ( -- pipe )
+    (pipe) [ out>> &dispose ] [ in>> dispose ] bi ;
+
+: null-pipe ( mode -- pipe )
+    {
+        { GENERIC_READ [ null-input ] }
+        { GENERIC_WRITE [ null-output ] }
+    } case ;
+
+! The below code is based on the example given in
+! http://msdn2.microsoft.com/en-us/library/ms682499.aspx
+
+: redirect-default ( obj access-mode create-mode -- handle )
+    3drop f ;
+
+: redirect-closed ( obj access-mode create-mode -- handle )
+    drop nip null-pipe ;
+
+:: redirect-file ( path access-mode create-mode -- handle )
+    path normalize-path
+    access-mode
+    share-mode
+    default-security-attributes
+    create-mode
+    FILE_ATTRIBUTE_NORMAL ! flags and attributes
+    f ! template file
+    CreateFile check-invalid-handle <win32-file> &dispose ;
+
+: redirect-append ( path access-mode create-mode -- handle )
+    [ path>> ] 2dip
+    drop OPEN_ALWAYS
+    redirect-file
+    dup 0 FILE_END set-file-pointer ;
+
+: redirect-handle ( handle access-mode create-mode -- handle )
+    2drop ;
+
+: redirect-stream ( stream access-mode create-mode -- handle )
+    [ underlying-handle ] 2dip redirect-handle ;
+
+: redirect ( obj access-mode create-mode -- handle )
+    {
+        { [ pick not ] [ redirect-default ] }
+        { [ pick +closed+ eq? ] [ redirect-closed ] }
+        { [ pick string? ] [ redirect-file ] }
+        { [ pick appender? ] [ redirect-append ] }
+        { [ pick win32-file? ] [ redirect-handle ] }
+        [ redirect-stream ]
+    } cond
+    dup [ dup t set-inherit handle>> ] when ;
+
+: redirect-stdout ( process args -- handle )
+    drop
+    stdout>>
+    GENERIC_WRITE
+    CREATE_ALWAYS
+    redirect
+    STD_OUTPUT_HANDLE GetStdHandle or ;
+
+: redirect-stderr ( process args -- handle )
+    over stderr>> +stdout+ eq? [
+        nip
+        lpStartupInfo>> hStdOutput>>
+    ] [
+        drop
+        stderr>>
+        GENERIC_WRITE
+        CREATE_ALWAYS
+        redirect
+        STD_ERROR_HANDLE GetStdHandle or
+    ] if ;
+
+: redirect-stdin ( process args -- handle )
+    drop
+    stdin>>
+    GENERIC_READ
+    OPEN_EXISTING
+    redirect
+    STD_INPUT_HANDLE GetStdHandle or ;
+
+M: winnt fill-redirection ( process args -- )
+    dup lpStartupInfo>>
+    [ [ redirect-stdout ] dip hStdOutput<< ]
+    [ [ redirect-stderr ] dip hStdError<< ]
+    [ [ redirect-stdin ] dip hStdInput<< ] 3tri ;

@@ -1,6 +1,8 @@
+! Copyright (C) 2010 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io.pathnames kernel tools.test io.backend
-io.files.windows.nt splitting sequences io.pathnames.private ;
-IN: io.files.windows.nt.tests
+io.files.windows splitting sequences io.pathnames.private ;
+IN: io.files.windows.tests
 
 [ f ] [ "\\foo" absolute-path? ] unit-test
 [ t ] [ "\\\\?\\c:\\foo" absolute-path? ] unit-test
