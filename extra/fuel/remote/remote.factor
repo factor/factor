@@ -24,7 +24,7 @@ IN: fuel.remote
 PRIVATE>
 
 : fuel-start-remote-listener ( port/f -- )
-    print-banner integer? [ 9000 ] unless* server start-server ;
+    print-banner integer? [ 9000 ] unless* server start-server drop ;
 
 : fuel-start-remote-listener* ( -- ) f fuel-start-remote-listener ;
 

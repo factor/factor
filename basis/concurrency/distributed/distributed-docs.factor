@@ -5,7 +5,7 @@ HELP: local-node
 { $var-description "A variable containing the node the current thread is running on." } ;
 
 HELP: start-node
-{ $values { "port" "a port number between 0 and 65535" } }
+{ $values { "port" "a port number between 0 and 65535" } { "threaded-server" "a threaded-server tuple" } }
 { $description "Starts a node server for receiving messages from remote Factor instances." } ;
 
 ARTICLE: "concurrency.distributed.example" "Distributed Concurrency Example"
