@@ -382,5 +382,5 @@ M: invalid-local-address summary
 
 {
     { [ os unix? ] [ "io.sockets.unix" require ] }
-    { [ os winnt? ] [ "io.sockets.windows.nt" require ] }
+    { [ os windows? ] [ "io.sockets.windows" require ] }
 } cond

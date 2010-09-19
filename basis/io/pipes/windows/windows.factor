@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays destructors io io.backend.windows libc
-windows.types math.bitwise windows.kernel32 windows namespaces
-make kernel sequences windows.errors assocs math.parser system
-random combinators accessors io.pipes io.ports literals ;
-IN: io.pipes.windows.nt
+USING: accessors alien alien.c-types arrays assocs combinators
+destructors io io.files.windows io.pipes
+io.ports kernel libc literals make math.bitwise math.parser
+namespaces random sequences system windows windows.errors
+windows.kernel32 windows.types ;
+IN: io.pipes.windows
 
 ! This code is based on
 ! http://twistedmatrix.com/trac/browser/trunk/twisted/internet/iocpreactor/process.py

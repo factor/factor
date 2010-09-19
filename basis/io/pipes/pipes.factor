@@ -60,6 +60,6 @@ PRIVATE>
 
 {
     { [ os unix? ] [ "io.pipes.unix" require ] }
-    { [ os winnt? ] [ "io.pipes.windows.nt" require ] }
+    { [ os windows? ] [ "io.pipes.windows" require ] }
     [ ]
 } cond

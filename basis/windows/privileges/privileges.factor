@@ -1,11 +1,9 @@
-USING: alien alien.c-types alien.data alien.syntax arrays
-continuations destructors generic io.mmap io.ports
-io.backend.windows io.files.windows kernel libc fry locals math
-math.bitwise namespaces quotations sequences windows
-windows.advapi32 windows.kernel32 windows.types io.backend
-system accessors io.backend.windows.privileges classes.struct
-windows.errors literals ;
-IN: io.backend.windows.nt.privileges
+! Copyright (C) 2010 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.data alien.syntax classes.struct
+continuations fry kernel libc literals locals sequences
+windows.advapi32 windows.errors windows.kernel32 windows.types ;
+IN: windows.privileges
 
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 
@@ -40,7 +38,7 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
             name lookup-privilege >>Luid
         >>Privileges ;
 
-M: winnt set-privilege ( name ? -- )
+: set-privilege ( name ? -- )
     '[
         0
         _ _ make-token-privileges
@@ -49,3 +47,8 @@ M: winnt set-privilege ( name ? -- )
         f
         AdjustTokenPrivileges win32-error=0/f
     ] with-process-token ;
+
+: with-privileges ( seq quot -- )
+    [ '[ _ [ t set-privilege ] each @ ] ]
+    [ drop '[ _ [ f set-privilege ] each ] ]
+    2bi [ ] cleanup ; inline
