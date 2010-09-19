@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data classes.struct
-combinators destructors io.backend io.ports
+combinators destructors io.backend io.ports io.files.windows
 io.sockets io.sockets.private kernel libc math sequences system
 windows.handles windows.kernel32 windows.types windows.winsock ;
 FROM: namespaces => get ;
