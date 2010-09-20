@@ -100,7 +100,7 @@ M: winnt WSASocket-flags ( -- DWORD )
         f
         f
         WSAIoctl SOCKET_ERROR = [
-            winsock-error-string throw
+            maybe-winsock-exception throw
         ] when
     ] with-out-parameters ;
 
@@ -134,7 +134,7 @@ TUPLE: ConnectEx-args port
     int
     { SOCKET void* int PVOID DWORD LPDWORD void* }
     stdcall alien-indirect drop
-    winsock-error-string [ throw ] when* ; inline
+    winsock-error ; inline
 
 M: object establish-connection ( client-out remote -- )
     make-sockaddr/size <ConnectEx-args>
@@ -164,6 +164,7 @@ TUPLE: AcceptEx-args port
         f >>lpdwBytesReceived
         (make-overlapped) >>lpOverlapped ; inline
 
+! AcceptEx return value is useless
 : call-AcceptEx ( AcceptEx -- )
     {
         [ sListenSocket>> ]
@@ -174,8 +175,7 @@ TUPLE: AcceptEx-args port
         [ dwRemoteAddressLength>> ]
         [ lpdwBytesReceived>> ]
         [ lpOverlapped>> ]
-    } cleave AcceptEx drop
-    winsock-error-string [ throw ] when* ; inline
+    } cleave AcceptEx drop winsock-error ; inline
 
 : (extract-remote-address) ( lpOutputBuffer dwReceiveDataLength dwLocalAddressLength dwRemoteAddressLength -- sockaddr )
     f <void*> 0 <int> f <void*> [ 0 <int> GetAcceptExSockaddrs ] keep *void* ;
