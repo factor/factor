@@ -44,7 +44,7 @@ ERROR: server-not-running threaded-server ;
     running-servers get adjoin ;
 
 : remove-running-server ( threaded-server -- )
-    must-be-running
+    ! must-be-running
     running-servers get delete ;
 
 PRIVATE>
@@ -72,6 +72,8 @@ GENERIC: handle-client* ( threaded-server -- )
 GENERIC: (>insecure) ( obj -- obj )
 
 M: inet (>insecure) ;
+M: inet4 (>insecure) ;
+M: inet6 (>insecure) ;
 M: local (>insecure) ;
 M: integer (>insecure) internet-server ;
 M: string (>insecure) internet-server ;
@@ -224,6 +226,12 @@ PRIVATE>
 
 : insecure-port ( -- n/f ) [ addr>> secure? not ] first-port ;
 
+: secure-addr ( -- inet )
+    threaded-server get servers>> [ addr>> secure? ] filter random ;
+
+: insecure-addr ( -- inet )
+    threaded-server get servers>> [ addr>> secure? not ] filter random addr>> ;
+    
 : server. ( threaded-server -- )
     [ [ "=== " write name>> ] [ ] bi write-object nl ]
     [ servers>> [ addr>> present print ] each ] bi ;
@@ -231,6 +239,9 @@ PRIVATE>
 : all-servers ( -- sequence )
     running-servers get-global members ;
 
+: get-servers-named ( string -- sequence )
+    [ all-servers ] dip '[ name>> _ = ] filter ;
+    
 : servers. ( -- )
     all-servers [ server. ] each ;
 

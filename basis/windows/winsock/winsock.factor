@@ -7,7 +7,7 @@ classes.struct windows.com.syntax init ;
 FROM: alien.c-types => short ;
 IN: windows.winsock
 
-TYPEDEF: void* SOCKET
+TYPEDEF: int* SOCKET
 
 : <wsadata> ( -- byte-array )
     HEX: 190 <byte-array> ;
@@ -394,35 +394,40 @@ CONSTANT: SIO_GET_EXTENSION_FUNCTION_POINTER -939524090
 
 CONSTANT: WSAID_CONNECTEX GUID: {25a207b9-ddf3-4660-8ee9-76e58c74063e}
 
+ERROR: winsock-exception n string ;
+
 : winsock-expected-error? ( n -- ? )
     ${ ERROR_IO_PENDING ERROR_SUCCESS WSA_IO_PENDING } member? ;
 
-: (winsock-error-string) ( n -- str )
+: (maybe-winsock-exception) ( n -- winsock-exception/f )
     ! #! WSAStartup returns the error code 'n' directly
     dup winsock-expected-error?
-    [ drop f ] [ n>win32-error-string ] if ;
+    [ drop f ] [ [ ] [ n>win32-error-string ] bi \ winsock-exception boa ] if ;
 
-: winsock-error-string ( -- string/f )
-    WSAGetLastError (winsock-error-string) ;
+: maybe-winsock-exception ( -- winsock-exception/f )
+    WSAGetLastError (maybe-winsock-exception) ;
 
 : winsock-error ( -- )
-    winsock-error-string [ throw ] when* ;
+    maybe-winsock-exception [ throw ] when* ;
 
+: (throw-winsock-error) ( n -- * )
+    [ ] [ n>win32-error-string ] bi winsock-exception ;
+
+: throw-winsock-error ( -- * )
+    WSAGetLastError (throw-winsock-error) ;
+    
 : winsock-error=0/f ( n/f -- )
-    { 0 f } member? [
-        winsock-error-string throw
-    ] when ;
+    { 0 f } member? [ throw-winsock-error ] when ;
 
 : winsock-error!=0/f ( n/f -- )
-    { 0 f } member? [
-        winsock-error-string throw
-    ] unless ;
+    { 0 f } member? [ throw-winsock-error ] unless ;
 
+! WSAStartup and WSACleanup return the error code directly
 : winsock-return-check ( n/f -- )
     dup { 0 f } member? [
         drop
     ] [
-        (winsock-error-string) throw
+        [ ] [ n>win32-error-string ] bi winsock-exception
     ] if ;
 
 : socket-error* ( n -- )
@@ -431,7 +436,7 @@ CONSTANT: WSAID_CONNECTEX GUID: {25a207b9-ddf3-4660-8ee9-76e58c74063e}
         dup WSA_IO_PENDING = [
             drop
         ] [
-            (winsock-error-string) throw
+            (maybe-winsock-exception) throw
         ] if
     ] when ;
 
