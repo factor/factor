@@ -66,11 +66,6 @@ TUPLE: image dim component-order component-type upside-down? bitmap ;
 
 : <image> ( -- image ) image new ; inline
 
-: <rgb-image> ( -- image )
-    <image>
-        RGB >>component-order
-        ubyte-components >>component-type ; inline
-
 : has-alpha? ( image -- ? ) component-order>> alpha-channel? ;
 
 : bytes-per-component ( component-type -- n )
