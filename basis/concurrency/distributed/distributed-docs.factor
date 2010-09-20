@@ -1,22 +1,9 @@
 USING: help.markup help.syntax concurrency.messaging threads ;
 IN: concurrency.distributed
 
-HELP: local-node
-{ $var-description "A variable containing the node the current thread is running on." } ;
-
-HELP: start-node
-{ $values { "port" "a port number between 0 and 65535" } { "threaded-server" "a threaded-server tuple" } }
-{ $description "Starts a node server for receiving messages from remote Factor instances." } ;
-
 ARTICLE: "concurrency.distributed.example" "Distributed Concurrency Example"
-"For a Factor instance to be able to send and receive distributed "
-"concurrency messages it must first have " { $link start-node } " called."
-$nl
-"In one factor instance call " { $link start-node } " with the port 9000, "
-"and in another with the port 9001."
-$nl
 "In this example the Factor instance associated with port 9000 will run "
-"a thread that sits receiving messages and printing the received message "
+"a thread that receives and prints messages "
 "in the listener. The code to start the thread is: "
 { $examples
     { $unchecked-example
@@ -51,11 +38,9 @@ $nl
 
 ARTICLE: "concurrency.distributed" "Distributed message passing"
 "The " { $vocab-link "concurrency.distributed" } " implements transparent distributed message passing, inspired by Erlang and Termite."
-{ $subsections start-node }
 "Instances of " { $link thread } " can be sent to remote threads, at which point they are converted to objects holding the thread ID and the current node's host name:"
 { $subsections remote-thread }
 "The " { $vocab-link "serialize" } " vocabulary is used to convert Factor objects to byte arrays for transfer over a socket." 
 { $subsections "concurrency.distributed.example" } ;
-
 
 ABOUT: "concurrency.distributed"
