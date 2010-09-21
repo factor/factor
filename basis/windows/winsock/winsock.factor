@@ -126,6 +126,11 @@ STRUCT: hostent
     { length short }
     { addr-list void* } ;
 
+STRUCT: protoent
+    { name c-string }
+    { aliases void* }
+    { proto short } ;
+
 STRUCT: addrinfo
     { flags int }
     { family int }
@@ -170,6 +175,8 @@ FUNCTION: int recv ( SOCKET s, c-string buf, int len, int flags ) ;
 
 FUNCTION: int getsockname ( SOCKET s, sockaddr-in* address, int* addrlen ) ;
 FUNCTION: int getpeername ( SOCKET s, sockaddr-in* address, int* addrlen ) ;
+
+FUNCTION: protoent* getprotobyname ( c-string name ) ;
 
 TYPEDEF: uint SERVICETYPE
 TYPEDEF: OVERLAPPED WSAOVERLAPPED

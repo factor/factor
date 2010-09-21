@@ -13,8 +13,8 @@ EXCLUDE: io.sockets => accept ;
 
 IN: io.sockets.unix
 
-: socket-fd ( domain type -- fd )
-    0 socket dup io-error <fd> init-fd |dispose ;
+: socket-fd ( domain type protocol -- fd )
+    socket dup io-error <fd> init-fd |dispose ;
 
 : set-socket-option ( fd level opt -- )
     [ handle-fd ] 2dip 1 <int> dup byte-length setsockopt io-error ;
@@ -83,7 +83,7 @@ M:: object establish-connection ( client-out remote -- )
     ] if* ; inline
 
 M: object ((client)) ( addrspec -- fd )
-    protocol-family SOCK_STREAM socket-fd
+    [ protocol-family SOCK_STREAM ] [ protocol ] bi socket-fd
     [ init-client-socket ] [ ?bind-client ] [ ] tri ;
 
 ! Server sockets - TCP and Unix domain
@@ -91,7 +91,7 @@ M: object ((client)) ( addrspec -- fd )
     SOL_SOCKET SO_REUSEADDR set-socket-option ;
 
 : server-socket-fd ( addrspec type -- fd )
-    [ dup protocol-family ] dip socket-fd
+    [ dup protocol-family ] dip pick protocol socket-fd
     [ init-server-socket ] keep
     [ handle-fd swap make-sockaddr/size [ bind ] unix-system-call drop ] keep ;
 
