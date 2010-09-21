@@ -44,7 +44,7 @@ ERROR: server-not-running threaded-server ;
     running-servers get adjoin ;
 
 : remove-running-server ( threaded-server -- )
-    ! must-be-running
+    must-be-running
     running-servers get delete ;
 
 PRIVATE>
@@ -210,9 +210,9 @@ PRIVATE>
     server-stopped>> wait-for-flag ;
 
 : with-threaded-server ( threaded-server quot -- )
-    over
+    [ start-server ] dip over
     '[
-        [ _ start-server threaded-server _ with-variable ]
+        [ _ threaded-server _ with-variable ]
         [ _ stop-server ]
         [ ] cleanup
     ] call ; inline
