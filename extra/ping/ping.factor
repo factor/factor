@@ -4,7 +4,7 @@
 USING: accessors byte-arrays calendar checksums
 checksums.internet combinators combinators.smart continuations
 destructors io.sockets io.sockets.icmp io.timeouts kernel pack
-random sequences ;
+random sequences locals ;
 
 IN: ping
 
@@ -35,8 +35,12 @@ TUPLE: echo type identifier sequence data ;
 : send-ping ( addr datagram -- )
     [ 0 { } <echo> echo>byte-array ] 2dip send ;
 
-: recv-ping ( datagram -- echo )
-    receive drop 20 tail byte-array>echo ;
+:: recv-ping ( addr datagram -- echo )
+    datagram receive addr = [
+        20 tail byte-array>echo
+    ] [
+        drop addr datagram recv-ping
+    ] if ;
 
 PRIVATE>
 
@@ -44,12 +48,11 @@ PRIVATE>
     <icmp> resolve-host [ icmp4? ] filter random
     f <icmp4> <datagram>
         1 seconds over set-timeout
-    [ [ send-ping ] [ recv-ping ] bi ] with-disposal ;
+    [ [ send-ping ] [ recv-ping ] 2bi ] with-disposal ;
 
 : local-ping ( -- reply )
     "127.0.0.1" ping ;
 
 : alive? ( host -- ? )
     [ ping drop t ] [ 2drop f ] recover ;
-
 
