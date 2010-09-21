@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel make math math.order math.parser
 sequences sorting.functor strings unicode.case
-unicode.categories ;
+unicode.categories unicode.collation ;
 IN: sorting.human
 
 : cut-find ( seq pred -- before after )
@@ -33,7 +33,7 @@ TUPLE: hybrid obj ;
 
 : <hybrid-insensitive> ( obj -- hybrid )
     hybrid new
-        swap dup string? [ >case-fold ] when >>obj ; inline
+        swap dup string? [ w/collation-key ] when >>obj ; inline
 
 M: hybrid <=>
     [ obj>> ] bi@
