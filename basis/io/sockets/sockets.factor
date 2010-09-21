@@ -6,7 +6,7 @@ arrays io.encodings io.ports io.streams.duplex io.encodings.ascii
 alien.strings io.binary accessors destructors classes byte-arrays
 parser alien.c-types math.parser splitting grouping math assocs
 summary system vocabs.loader combinators present fry vocabs.parser
-classes.struct alien.data strings ;
+classes.struct alien.data strings io.encodings.binary ;
 IN: io.sockets
 
 << {
@@ -379,6 +379,9 @@ M: invalid-local-address summary
         [ bind-local-address ]
         [ invalid-local-address ] if
     ] dip with-variable ; inline
+
+: ipv6-supported? ( -- ? )
+    [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;
 
 {
     { [ os unix? ] [ "io.sockets.unix" require ] }
