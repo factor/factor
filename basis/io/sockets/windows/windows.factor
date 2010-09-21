@@ -41,8 +41,8 @@ M: win32-socket dispose* ( stream -- )
     <win32-socket> |dispose add-completion ;
 
 : open-socket ( addrspec type -- win32-socket )
-    [ protocol-family ] dip
-    0 f 0 WSASocket-flags WSASocket
+    [ drop protocol-family ] [ swap protocol ] 2bi
+    f 0 WSASocket-flags WSASocket
     dup socket-error
     opened-socket ;
 

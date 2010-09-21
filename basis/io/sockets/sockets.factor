@@ -19,6 +19,8 @@ IN: io.sockets
 
 UNION: ?string string POSTPONE: f ;
 
+GENERIC: protocol ( addrspec -- n )
+
 GENERIC: protocol-family ( addrspec -- af )
 
 GENERIC: sockaddr-size ( addrspec -- n )
@@ -57,6 +59,8 @@ TUPLE: local { path read-only } ;
     normalize-path local boa ;
 
 M: local present path>> "Unix domain socket: " prepend ;
+
+M: local protocol drop 0 ;
 
 SLOT: port
 
@@ -116,6 +120,8 @@ M: inet4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
 
 M: inet4 present
     [ host>> ] [ port>> number>string ] bi ":" glue ;
+
+M: inet4 protocol drop 0 ;
 
 TUPLE: ipv6 { host ?string read-only } ;
 
@@ -193,6 +199,8 @@ M: inet6 parse-sockaddr
 
 M: inet6 present
     [ host>> ] [ port>> number>string ] bi ":" glue ;
+
+M: inet6 protocol drop 0 ;
 
 <PRIVATE
 

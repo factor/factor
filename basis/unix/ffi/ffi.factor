@@ -52,6 +52,11 @@ STRUCT: group
     { gr_gid int }
     { gr_mem c-string* } ;
 
+STRUCT: protoent
+    { name c-string }
+    { aliases void* }
+    { proto int } ;
+
 FUNCTION: int accept ( int s, void* sockaddr, socklen_t* socklen ) ;
 FUNCTION: int bind ( int s, void* name, socklen_t namelen ) ;
 FUNCTION: int chdir ( c-string path ) ;
@@ -100,6 +105,7 @@ FUNCTION: void endgrent ( ) ;
 FUNCTION: int gethostname ( c-string name, int len ) ;
 FUNCTION: int getsockname ( int socket, sockaddr* address, socklen_t* address_len ) ;
 FUNCTION: int getpeername ( int socket, sockaddr* address, socklen_t* address_len ) ;
+FUNCTION: protoent* getprotobyname ( c-string name ) ;
 FUNCTION: uid_t getuid ;
 FUNCTION: uint htonl ( uint n ) ;
 FUNCTION: ushort htons ( ushort n ) ;
