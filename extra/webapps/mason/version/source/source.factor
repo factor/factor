@@ -20,7 +20,7 @@ IN: webapps.mason.version.source
     ".gitignore" delete-file ;
 
 : download-images ( -- )
-    images [ download-image ] each ;
+    images [ boot-image-name download-image ] each ;
 
 : prepare-source ( git-id -- )
     "factor" [
@@ -36,8 +36,10 @@ IN: webapps.mason.version.source
 : make-source-release ( version git-id -- path )
     "Creating source release..." print flush
     [
-        clone-factor prepare-source (make-source-release)
-        "Package created: " write absolute-path dup print
+        current-temporary-directory get [
+            clone-factor prepare-source (make-source-release)
+            "Package created: " write absolute-path dup print
+        ] with-directory
     ] with-unique-directory drop ;
 
 : upload-source-release ( package version -- )
