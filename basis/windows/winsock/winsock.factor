@@ -96,7 +96,7 @@ CONSTANT: INADDR_ANY 0
 
 : INVALID_SOCKET ( -- n ) -1 <alien> ; inline
 
-CONSTANT: SOCKET_ERROR -1
+: SOCKET_ERROR ( -- n ) -1 <alien> ; inline
 
 CONSTANT: SD_RECV 0
 CONSTANT: SD_SEND 1
@@ -383,7 +383,6 @@ FUNCTION: DWORD WSAWaitForMultipleEvents ( DWORD cEvents,
 
 LIBRARY: mswsock
 
-! Not in Windows CE
 FUNCTION: int AcceptEx ( void* listen, void* accept, void* out-buf, int recv-len, int addr-len, int remote-len, void* out-len, void* overlapped ) ;
 
 FUNCTION: void GetAcceptExSockaddrs (
