@@ -5,13 +5,13 @@ sequences sorting.functor strings unicode.case
 unicode.categories unicode.collation ;
 IN: sorting.human
 
-: cut-find ( seq pred -- before after )
+: cut-find ( sequence pred -- before after )
     [ drop ] [ find drop ] 2bi dup [ cut ] when ; inline
 
-: cut3 ( seq pred -- first mid last )
+: cut3 ( sequence pred -- first mid last )
     [ cut-find ] keep [ not ] compose cut-find ; inline
 
-: find-sequences ( sequence pred quot -- seq )
+: find-sequences ( sequence pred quot -- sequences )
     '[
         [
             _ cut3 [
@@ -21,7 +21,7 @@ IN: sorting.human
         ] loop drop
     ] { } make ; inline
 
-: find-numbers ( seq -- newseq )
+: find-numbers ( sequence -- sequence' )
     [ digit? ] [ string>number ] find-sequences ;
 
 ! For comparing integers or sequences
