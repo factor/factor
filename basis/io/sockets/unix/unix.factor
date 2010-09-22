@@ -123,6 +123,9 @@ M: object (accept) ( server addrspec -- fd sockaddr )
 M: unix (datagram)
     [ SOCK_DGRAM server-socket-fd ] with-destructors ;
 
+M: unix (raw)
+    [ SOCK_RAW server-socket-fd ] with-destructors ;
+
 SYMBOL: receive-buffer
 
 CONSTANT: packet-size 65536

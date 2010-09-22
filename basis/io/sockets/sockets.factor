@@ -1,12 +1,13 @@
 ! Copyright (C) 2007, 2010 Slava Pestov, Doug Coleman,
 ! Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic kernel io.backend namespaces continuations sequences
-arrays io.encodings io.ports io.streams.duplex io.encodings.ascii
-alien.strings io.binary accessors destructors classes byte-arrays
-parser alien.c-types math.parser splitting grouping math assocs
-summary system vocabs.loader combinators present fry vocabs.parser
-classes.struct alien.data strings io.encodings.binary ;
+USING: accessors alien.c-types alien.data alien.strings arrays
+assocs byte-arrays classes classes.struct combinators
+combinators.short-circuit continuations destructors fry generic
+grouping io.backend io.binary io.encodings io.encodings.ascii
+io.encodings.binary io.ports io.streams.duplex kernel math
+math.parser namespaces parser present sequences splitting
+strings summary system vocabs.loader vocabs.parser ;
 IN: io.sockets
 
 << {
@@ -254,17 +255,28 @@ TUPLE: datagram-port < port addr ;
 
 HOOK: (datagram) io-backend ( addr -- datagram )
 
-: check-datagram-port ( port -- port )
-    dup check-disposed
-    dup datagram-port? [ "Not a datagram port" throw ] unless ; inline
+
+TUPLE: raw-port < port addr ;
+
+HOOK: (raw) io-backend ( addr -- raw )
 
 HOOK: (receive) io-backend ( datagram -- packet addrspec )
 
-: check-datagram-send ( packet addrspec port -- packet addrspec port )
-    check-datagram-port
+ERROR: invalid-port object ;
+
+: check-port ( packet addrspec port -- packet addrspec port )
     2dup addr>> [ class ] bi@ assert=
     pick class byte-array assert= ;
 
+: check-connectionless-port ( port -- port )
+    dup { [ datagram-port? ] [ raw-port? ] } 1|| [ invalid-port ] unless ;
+    
+: check-send ( packet addrspec port -- packet addrspec port )
+    check-connectionless-port dup check-disposed check-port ;
+    
+: check-receive ( port -- port )
+    check-connectionless-port dup check-disposed ;
+    
 HOOK: (send) io-backend ( packet addrspec datagram -- )
 
 : addrinfo>addrspec ( addrinfo -- addrspec )
@@ -323,12 +335,19 @@ SYMBOL: remote-address
         >>addr
     ] with-destructors ;
 
+: <raw> ( addrspec -- datagram )
+    [
+        [ (raw) |dispose ] keep
+        [ drop raw-port <port> ] [ get-local-address ] 2bi
+        >>addr
+    ] with-destructors ;
+
 : receive ( datagram -- packet addrspec )
-    check-datagram-port
+    check-receive
     [ (receive) ] [ addr>> ] bi parse-sockaddr ;
 
 : send ( packet addrspec datagram -- )
-    check-datagram-send (send) ;
+    check-send (send) ;
 
 GENERIC: resolve-host ( addrspec -- seq )
 
