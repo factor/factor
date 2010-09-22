@@ -1,0 +1,1 @@
+Client for getting information from a bitcoin server
