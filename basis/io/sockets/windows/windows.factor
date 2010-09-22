@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data classes.struct
-combinators destructors io.backend io.ports io.files.windows
-io.sockets io.sockets.private kernel libc math sequences system
-windows.handles windows.kernel32 windows.types windows.winsock ;
+combinators destructors io.backend io.files.windows io.ports
+io.sockets io.sockets.icmp io.sockets.private kernel libc math
+sequences system windows.handles windows.kernel32 windows.types
+windows.winsock ;
 FROM: namespaces => get ;
 IN: io.sockets.windows
 
@@ -79,8 +80,18 @@ M: object (server) ( addrspec -- handle )
         dup handle>> listen-backlog listen winsock-return-check
     ] with-destructors ;
 
+GENERIC: windows-socket-type ( obj -- n )
+
+M: inet4 windows-socket-type drop SOCK_DGRAM ;
+
+M: inet6 windows-socket-type drop SOCK_DGRAM ;
+
+M: icmp4 windows-socket-type drop SOCK_RAW ;
+
+M: icmp6 windows-socket-type drop SOCK_RAW ;
+    
 M: windows (datagram) ( addrspec -- handle )
-    [ SOCK_DGRAM server-socket ] with-destructors ;
+    [ dup windows-socket-type server-socket ] with-destructors ;
 
 
 : malloc-int ( n -- alien )
