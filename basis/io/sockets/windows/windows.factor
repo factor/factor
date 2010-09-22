@@ -80,19 +80,11 @@ M: object (server) ( addrspec -- handle )
         dup handle>> listen-backlog listen winsock-return-check
     ] with-destructors ;
 
-GENERIC: windows-socket-type ( obj -- n )
-
-M: inet4 windows-socket-type drop SOCK_DGRAM ;
-
-M: inet6 windows-socket-type drop SOCK_DGRAM ;
-
-M: icmp4 windows-socket-type drop SOCK_RAW ;
-
-M: icmp6 windows-socket-type drop SOCK_RAW ;
-    
 M: windows (datagram) ( addrspec -- handle )
-    [ dup windows-socket-type server-socket ] with-destructors ;
+    [ SOCK_DGRAM server-socket ] with-destructors ;
 
+M: windows (raw) ( addrspec -- handle )
+    [ SOCK_RAW server-socket ] with-destructors ;
 
 : malloc-int ( n -- alien )
     <int> malloc-byte-array ; inline

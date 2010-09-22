@@ -1,6 +1,5 @@
-
-USING: ping tools.test ;
-
+USING: continuations destructors io.sockets kernel ping
+tools.test ;
 IN: ping.tests
 
 [ t ] [ "localhost" alive? ] unit-test
