@@ -4,10 +4,11 @@
 USING: accessors alien.c-types alien.data alien.strings arrays
 assocs byte-arrays classes classes.struct combinators
 combinators.short-circuit continuations destructors fry generic
-grouping io.backend io.binary io.encodings io.encodings.ascii
-io.encodings.binary io.ports io.streams.duplex kernel math
-math.parser namespaces parser present sequences splitting
-strings summary system vocabs.loader vocabs.parser ;
+grouping init io.backend io.binary io.encodings
+io.encodings.ascii io.encodings.binary io.ports
+io.streams.duplex kernel math math.parser memoize namespaces
+parser present sequences splitting strings summary system
+vocabs.loader vocabs.parser ;
 IN: io.sockets
 
 << {
@@ -349,7 +350,15 @@ SYMBOL: remote-address
 : send ( packet addrspec datagram -- )
     check-send (send) ;
 
+MEMO: ipv6-supported? ( -- ? )
+    [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;
+
+[ \ ipv6-supported? reset-memoized ipv6-supported? drop ]
+"ipv6-support-check" add-startup-hook
+
 GENERIC: resolve-host ( addrspec -- seq )
+
+HOOK: resolve-localhost os ( -- obj )
 
 TUPLE: hostname { host ?string read-only } ;
 
@@ -378,7 +387,14 @@ M: inet6 resolve-host 1array ;
 M: local resolve-host 1array ;
 
 M: f resolve-host
-    drop { T{ ipv6 f "::" } T{ ipv4 f "0.0.0.0" } } ;
+    drop resolve-localhost ;
+
+M: object resolve-localhost
+    ipv6-supported? [
+        { T{ ipv4 f "0.0.0.0" } T{ ipv6 f "::" } }
+    ] [
+        { T{ ipv4 f "0.0.0.0" } }
+    ] if ;
 
 : host-name ( -- string )
     256 <byte-array> dup dup length gethostname
@@ -406,9 +422,6 @@ M: invalid-local-address summary
         [ bind-local-address ]
         [ invalid-local-address ] if
     ] dip with-variable ; inline
-
-: ipv6-supported? ( -- ? )
-    [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;
 
 {
     { [ os unix? ] [ "io.sockets.unix" require ] }
