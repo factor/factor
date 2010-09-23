@@ -87,12 +87,9 @@ M: f (>insecure) ;
     >insecure
     [ dup { [ secure? ] [ not ] } 1|| [ <secure> ] unless ] map ;
 
-: filter-ipv6 ( seq -- seq' )
-    ipv6-supported? [ [ ipv6? not ] filter ] unless ;
-
 : listen-on ( threaded-server -- addrspecs )
     [ secure>> >secure ] [ insecure>> >insecure ] bi append
-    [ resolve-host ] map concat filter-ipv6 ;
+    [ resolve-host ] map concat ;
 
 : accepted-connection ( remote local -- )
     [
