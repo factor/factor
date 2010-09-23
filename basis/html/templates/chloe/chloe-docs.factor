@@ -150,8 +150,8 @@ ARTICLE: "html.templates.chloe.tags.form" "Chloe link and form tags"
         { $code
             "<t:button t:method=\"POST\""
             "          t:action=\"$wiki/delete\""
-            "          t:for=\"id\">"
-            "          class=\"link-button\""
+            "          t:for=\"id\""
+            "          class=\"link-button\">"
             "    Delete"
             "</t:button>"
         }
