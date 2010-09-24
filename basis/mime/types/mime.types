@@ -726,6 +726,7 @@ audio/mpa
 audio/mpa-robust
 audio/mpeg					mpga mp2 mp2a mp3 m2a m3a
 audio/mpeg4-generic
+audio/ogg                                       oga
 audio/parityfec
 audio/pcma
 audio/pcmu
@@ -954,6 +955,7 @@ video/mpeg					mpeg mpg mpe m1v m2v
 video/mpeg4-generic
 video/mpv
 video/nv
+video/ogg                                       ogv
 video/parityfec
 video/pointer
 video/quicktime					qt mov
@@ -976,6 +978,7 @@ video/vnd.sealed.mpeg4
 video/vnd.sealed.swf
 video/vnd.sealedmedia.softseal.mov
 video/vnd.vivo					viv
+video/webm                                      webm
 video/x-dv			dv dif
 video/x-fli					fli
 video/x-ms-asf					asf asx
