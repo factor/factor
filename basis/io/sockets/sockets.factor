@@ -256,7 +256,6 @@ TUPLE: datagram-port < port addr ;
 
 HOOK: (datagram) io-backend ( addr -- datagram )
 
-
 TUPLE: raw-port < port addr ;
 
 HOOK: (raw) io-backend ( addr -- raw )
@@ -353,8 +352,7 @@ SYMBOL: remote-address
 MEMO: ipv6-supported? ( -- ? )
     [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;
 
-[ \ ipv6-supported? reset-memoized ipv6-supported? drop ]
-"ipv6-support-check" add-startup-hook
+[ \ ipv6-supported? reset-memoized ] "io.sockets" add-startup-hook
 
 GENERIC: resolve-host ( addrspec -- seq )
 
@@ -390,11 +388,10 @@ M: f resolve-host
     drop resolve-localhost ;
 
 M: object resolve-localhost
-    ipv6-supported? [
-        { T{ ipv4 f "0.0.0.0" } T{ ipv6 f "::" } }
-    ] [
-        { T{ ipv4 f "0.0.0.0" } }
-    ] if ;
+    ipv6-supported?
+    { T{ ipv4 f "0.0.0.0" } T{ ipv6 f "::" } }
+    { T{ ipv4 f "0.0.0.0" } }
+    ? ;
 
 : host-name ( -- string )
     256 <byte-array> dup dup length gethostname
