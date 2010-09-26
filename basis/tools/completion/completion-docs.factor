@@ -1,5 +1,5 @@
 USING: help.markup help.syntax strings generic vectors assocs
-math ;
+math make ;
 IN: tools.completion
 
 ARTICLE: "tools.completion" "Fuzzy completion"
@@ -48,6 +48,14 @@ HELP: completion
         { "how close " { $snippet "short" } " is to " { $snippet "full" } " by edit distance" }
         { "the original value of " { $snippet "obj" } }
     }
+} ;
+
+HELP: completion,
+{ $values { "short" string } { "candidate" "a pair " { $snippet "{ obj full }" } } }
+{ $description
+    "Adds the result of " { $link completion }
+    " to the end of the sequence being constructed by " { $link make }
+    " if the score is positive."
 } ;
 
 HELP: completions

@@ -17,7 +17,7 @@ void early_init(void)
 	Gestalt(gestaltSystemVersion,&version);
 	if(version < 0x1050)
 	{
-		printf("Factor requires Mac OS X 10.5 or later.\n");
+		std::cout << "Factor requires Mac OS X 10.5 or later.\n";
 		exit(1);
 	}
 

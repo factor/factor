@@ -325,7 +325,7 @@ M: tuple-class metaclass-changed
     ! default superclass
     nip tuple over "slots" word-prop define-tuple-class ;
 
-M: tuple-class rank-class drop 0 ;
+M: tuple-class rank-class drop 1 ;
 
 M: tuple-class instance?
     dup echelon-of layout-class-offset tuple-instance? ;
@@ -334,10 +334,8 @@ M: tuple-class (flatten-class) dup set ;
 
 M: tuple-class (classes-intersect?)
     {
-        { [ over tuple eq? ] [ 2drop t ] }
-        { [ over builtin-class? ] [ 2drop f ] }
+        { [ over builtin-class? ] [ drop tuple eq? ] }
         { [ over tuple-class? ] [ [ class<= ] [ swap class<= ] 2bi or ] }
-        [ swap classes-intersect? ]
     } cond ;
 
 M: tuple clone (clone) ; inline

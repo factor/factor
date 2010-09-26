@@ -1,8 +1,7 @@
-USING: alien alien.c-types arrays destructors generic io.mmap
-io.ports io.backend.windows io.files.windows io.backend.windows.privileges
-io.mmap.private kernel libc math math.bitwise namespaces quotations sequences
-windows windows.advapi32 windows.kernel32 io.backend system
-accessors locals windows.errors literals ;
+USING: accessors destructors windows.privileges
+io.files.windows io.mmap io.mmap.private kernel literals locals
+math math.bitwise system windows.errors windows.handles
+windows.kernel32 ;
 IN: io.mmap.windows
 
 : create-file-mapping ( hFile lpAttributes flProtect dwMaximumSizeHigh dwMaximumSizeLow lpName -- HANDLE )

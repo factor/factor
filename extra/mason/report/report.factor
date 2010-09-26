@@ -1,10 +1,10 @@
-! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: benchmark combinators.smart debugger fry io assocs
 io.encodings.utf8 io.files io.sockets io.streams.string kernel
-locals mason.common mason.config mason.platform math namespaces
-prettyprint sequences xml.syntax xml.writer combinators.short-circuit
-literals splitting ;
+locals mason.common mason.config mason.disk mason.platform math
+namespaces prettyprint sequences xml.syntax xml.writer
+combinators.short-circuit literals splitting ;
 IN: mason.report
 
 : git-link ( id -- link )
@@ -15,12 +15,14 @@ IN: mason.report
     target-os get
     target-cpu get
     short-host-name
+    disk-usage
     build-dir
     current-git-id get git-link
     [XML
     <h1>Build report for <->/<-></h1>
     <table>
     <tr><td>Build machine:</td><td><-></td></tr>
+    <tr><td>Disk usage:</td><td><-></td></tr>
     <tr><td>Build directory:</td><td><-></td></tr>
     <tr><td>GIT ID:</td><td><-></td></tr>
     </table>

@@ -148,6 +148,13 @@ M: x86.32 %store-reg-param ( vreg rep reg -- )
         { double-rep [ drop \ FLDL double-rep store-float-return ] }
     } case ;
 
+M: x86.32 %discard-reg-param ( rep reg -- )
+    drop {
+        { int-rep [ ] }
+        { float-rep [ ST0 FSTP ] }
+        { double-rep [ ST0 FSTP ] }
+    } case ;
+
 :: call-unbox-func ( src func -- )
     EAX src tagged-rep %copy
     4 save-vm-ptr
@@ -186,24 +193,9 @@ M: x86.32 %begin-callback ( -- )
     4 stack@ 0 MOV
     "begin_callback" f f %c-invoke ;
 
-M: x86.32 %alien-callback ( quot -- )
-    [ EAX ] dip %load-reference
-    EAX quot-entry-point-offset [+] CALL ;
-
 M: x86.32 %end-callback ( -- )
     0 save-vm-ptr
     "end_callback" f f %c-invoke ;
-
-M:: x86.32 %unary-float-function ( dst src func -- )
-    src double-rep 0 %store-stack-param
-    func "libm" load-library f %c-invoke
-    dst double-rep %load-return ;
-
-M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
-    src1 double-rep 0 %store-stack-param
-    src2 double-rep 8 %store-stack-param
-    func "libm" load-library f %c-invoke
-    dst double-rep %load-return ;
 
 : funny-large-struct-return? ( return abi -- ? )
     #! MINGW ABI incompatibility disaster

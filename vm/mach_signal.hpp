@@ -44,36 +44,36 @@ extern "C" boolean_t exc_server (mach_msg_header_t *request_msg, mach_msg_header
 extern "C"
 kern_return_t
 catch_exception_raise (mach_port_t exception_port,
-                       mach_port_t thread,
-                       mach_port_t task,
-                       exception_type_t exception,
-                       exception_data_t code,
-                       mach_msg_type_number_t code_count);
+		       mach_port_t thread,
+		       mach_port_t task,
+		       exception_type_t exception,
+		       exception_data_t code,
+		       mach_msg_type_number_t code_count);
 extern "C"
 kern_return_t
 catch_exception_raise_state (mach_port_t exception_port,
-                             exception_type_t exception,
-                             exception_data_t code,
-                             mach_msg_type_number_t code_count,
-                             thread_state_flavor_t *flavor,
-                             thread_state_t in_state,
-                             mach_msg_type_number_t in_state_count,
-                             thread_state_t out_state,
-                             mach_msg_type_number_t *out_state_count);
+			     exception_type_t exception,
+			     exception_data_t code,
+			     mach_msg_type_number_t code_count,
+			     thread_state_flavor_t *flavor,
+			     thread_state_t in_state,
+			     mach_msg_type_number_t in_state_count,
+			     thread_state_t out_state,
+			     mach_msg_type_number_t *out_state_count);
 
 extern "C"
 kern_return_t
 catch_exception_raise_state_identity (mach_port_t exception_port,
-                                      mach_port_t thread,
-                                      mach_port_t task,
-                                      exception_type_t exception,
-                                      exception_data_t code,
-                                      mach_msg_type_number_t codeCnt,
-                                      thread_state_flavor_t *flavor,
-                                      thread_state_t in_state,
-                                      mach_msg_type_number_t in_state_count,
-                                      thread_state_t out_state,
-                                      mach_msg_type_number_t *out_state_count);
+				      mach_port_t thread,
+				      mach_port_t task,
+				      exception_type_t exception,
+				      exception_data_t code,
+				      mach_msg_type_number_t codeCnt,
+				      thread_state_flavor_t *flavor,
+				      thread_state_t in_state,
+				      mach_msg_type_number_t in_state_count,
+				      thread_state_t out_state,
+				      mach_msg_type_number_t *out_state_count);
 
 namespace factor
 {

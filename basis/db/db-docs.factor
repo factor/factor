@@ -27,7 +27,7 @@ HELP: dispose-statements
 { $description "Disposes an associative list of statements." } ;
 
 HELP: statement
-{ $description "A " { $snippet "statement" } " stores the information about a statemen, such as the SQL statement text, the in/out parameters, and type information." } ;
+{ $description "A " { $snippet "statement" } " stores the information about a statement, such as the SQL statement text, the in/out parameters, and type information." } ;
 
 HELP: result-set
 { $description "An object encapsulating a raw SQL result object. There are two ways in which a result set can be accessed, but they are specific to the database backend in use."

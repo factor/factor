@@ -28,7 +28,7 @@ struct gc_event {
 	cell compaction_time;
 	u64 temp_time;
 
-	explicit gc_event(gc_op op_, factor_vm *parent);
+	gc_event(gc_op op_, factor_vm *parent);
 	void started_card_scan();
 	void ended_card_scan(cell cards_scanned_, cell decks_scanned_);
 	void started_code_scan();

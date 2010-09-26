@@ -218,7 +218,7 @@ GENERIC: analyze-aliases ( insn -- insn' )
 
 M: insn analyze-aliases ;
 
-M: vreg-insn analyze-aliases
+: def-acs ( insn -- insn' )
     ! If an instruction defines a value with a non-integer
     ! representation it means that the value will be boxed
     ! anywhere its used as a tagged pointer. Boxing allocates
@@ -228,6 +228,9 @@ M: vreg-insn analyze-aliases
         { int-rep tagged-rep } member?
         [ set-heap-ac ] [ set-new-ac ] if
     ] each-def-rep ;
+
+M: vreg-insn analyze-aliases
+    def-acs ;
 
 M: ##phi analyze-aliases
     dup dst>> set-heap-ac ;
@@ -286,6 +289,29 @@ M: ##compare analyze-aliases
         analyze-aliases
     ] when ;
 
+: clear-live-slots ( -- )
+    heap-ac get ac>vregs [ live-slots get at clear-assoc ] each ;
+
+: clear-recent-stores ( -- )
+    recent-stores get values [ clear-assoc ] each ;
+
+M: gc-map-insn analyze-aliases
+    ! Can't use call-next-method here because of a limitation, gah
+    def-acs
+    clear-recent-stores ;
+
+M: factor-call-insn analyze-aliases
+    def-acs
+    clear-recent-stores
+    clear-live-slots ;
+
+GENERIC: eliminate-dead-stores ( insn -- ? )
+
+M: ##set-slot-imm eliminate-dead-stores
+    insn#>> dead-stores get in? not ;
+
+M: insn eliminate-dead-stores drop t ;
+
 : reset-alias-analysis ( -- )
     recent-stores get clear-assoc
     vregs>acs get clear-assoc
@@ -297,20 +323,6 @@ M: ##compare analyze-aliases
     next-ac heap-ac set
     \ ##vm-field set-new-ac
     \ ##alien-global set-new-ac ;
-
-M: factor-call-insn analyze-aliases
-    call-next-method
-    heap-ac get ac>vregs [
-        [ live-slots get at clear-assoc ]
-        [ recent-stores get at clear-assoc ] bi
-    ] each ;
-
-GENERIC: eliminate-dead-stores ( insn -- ? )
-
-M: ##set-slot-imm eliminate-dead-stores
-    insn#>> dead-stores get in? not ;
-
-M: insn eliminate-dead-stores drop t ;
 
 : alias-analysis-step ( insns -- insns' )
     reset-alias-analysis

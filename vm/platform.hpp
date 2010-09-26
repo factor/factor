@@ -1,15 +1,11 @@
 #if defined(WINDOWS)
-	#if defined(WINCE)
-		#include "os-windows-ce.hpp"
+	#if defined(WINNT)
 		#include "os-windows.hpp"
-	#elif defined(WINNT)
-		#include "os-windows.hpp"
-		#include "os-windows-nt.hpp"
 
 		#if defined(FACTOR_AMD64)
-			#include "os-windows-nt.64.hpp"
+			#include "os-windows.64.hpp"
 		#elif defined(FACTOR_X86)
-			#include "os-windows-nt.32.hpp"
+			#include "os-windows.32.hpp"
 		#else
 			#error "Unsupported Windows flavor"
 		#endif

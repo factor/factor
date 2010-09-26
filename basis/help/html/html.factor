@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings.utf8 io.encodings.binary
 io.files io.files.temp io.directories html.streams help kernel
@@ -26,6 +26,7 @@ IN: help.html
             { CHAR: , "__comma__" }
             { CHAR: @ "__at__" }
             { CHAR: # "__hash__" }
+            { CHAR: % "__percent__" }
         } at [ % ] [ , ] ?if
     ] [ number>string "__" "__" surround % ] if ;
 
@@ -112,11 +113,15 @@ MEMO: load-index ( name -- index )
 
 TUPLE: result title href ;
 
+: partition-exact ( string results -- results' )
+    [ title>> = ] with partition append ;
+
 : offline-apropos ( string index -- results )
-    load-index swap >lower
+    load-index over >lower
     '[ [ drop _ ] dip >lower subseq? ] assoc-filter
     [ swap result boa ] { } assoc>map
-    [ title>> ] sort-with ;
+    [ title>> ] sort-with
+    partition-exact ;
 
 : article-apropos ( string -- results )
     "articles.idx" offline-apropos ;

@@ -8,9 +8,23 @@ continuations calendar prettyprint dlists deques locals
 spider.unique-deque combinators concurrency.semaphores ;
 IN: spider
 
-TUPLE: spider base count max-count sleep max-depth initial-links
-filters spidered todo nonmatching quiet currently-spidering
-#threads semaphore follow-robots? robots ;
+TUPLE: spider
+    base
+    { count integer initial: 0 }
+    { max-count number initial: 1/0. }
+    sleep
+    { max-depth integer initial: 0 }
+    initial-links
+    filters
+    spidered
+    todo
+    nonmatching
+    quiet?
+    currently-spidering
+    { #threads integer initial: 1 }
+    semaphore
+    follow-robots?
+    robots ;
 
 TUPLE: spider-result url depth headers
 fetched-in parsed-html links processed-in fetched-at ;
@@ -22,21 +36,20 @@ fetched-in parsed-html links processed-in fetched-at ;
         over >>currently-spidering
         swap 0 <unique-deque> [ push-url ] keep >>todo
         <unique-deque> >>nonmatching
-        0 >>max-depth
-        0 >>count
-        1/0. >>max-count
         H{ } clone >>spidered
-        1 [ >>#threads ] [ <semaphore> >>semaphore ] bi ;
+        1 <semaphore> >>semaphore ;
 
 : <spider-result> ( url depth -- spider-result )
     spider-result new
         swap >>depth
-        swap >>url ;
+        swap >>url ; inline
 
 <PRIVATE
 
 : apply-filters ( links spider -- links' )
-    filters>> [ '[ [ _ 1&& ] filter ] call( seq -- seq' ) ] when* ;
+    filters>> [
+        '[ [ _ 1&& ] filter ] call( seq -- seq' )
+    ] when* ;
 
 : push-links ( links level unique-deque -- )
     '[ _ _ push-url ] each ;
@@ -51,13 +64,18 @@ fetched-in parsed-html links processed-in fetched-at ;
     [ base>> host>> ] [ links>> members ] bi*
     [ host>> = ] with partition ;
 
-: add-spidered ( spider spider-result -- )
-    [ [ 1 + ] change-count ] dip
-    2dup [ spidered>> ] [ dup url>> ] bi* rot set-at
-    [ filter-base-links ] 2keep
-    depth>> 1 + swap
-    [ add-nonmatching ]
-    [ dup '[ _ apply-filters ] curry 2dip add-todo ] 2bi ;
+:: add-spidered ( spider spider-result -- )
+    spider [ 1 + ] change-count drop
+
+    spider-result dup url>>
+    spider spidered>> set-at
+
+    spider spider-result filter-base-links :> ( matching nonmatching )
+    spider-result depth>> 1 + :> depth
+
+    nonmatching depth spider add-nonmatching
+
+    matching spider apply-filters depth spider add-todo ;
 
 : normalize-hrefs ( base links -- links' )
     [ derive-url ] with map ;
@@ -84,24 +102,24 @@ fetched-in parsed-html links processed-in fetched-at ;
         now >>fetched-at drop ;
 
 :: spider-page ( spider spider-result -- )
-    spider quiet>> [ spider-result print-spidering ] unless
+    spider quiet?>> [ spider-result print-spidering ] unless
     spider spider-result fill-spidered-result
-    spider quiet>> [ spider-result describe ] unless
+    spider quiet?>> [ spider-result describe ] unless
     spider spider-result add-spidered ;
 
 \ spider-page ERROR add-error-logging
 
 : spider-sleep ( spider -- ) sleep>> [ sleep ] when* ;
 
-: queue-initial-links ( spider -- )
-    [
-        [ currently-spidering>> ] [ initial-links>> ] bi normalize-hrefs 0
-    ] keep add-todo ;
+: queue-initial-links ( spider -- spider )
+    [ [ currently-spidering>> ] [ initial-links>> ] bi normalize-hrefs 0 ]
+    [ add-todo ]
+    [ ] tri ;
 
 : spider-page? ( spider -- ? )
     {
         [ todo>> deque>> deque-empty? not ]
-        [ [ todo>> peek-url depth>> ] [ max-depth>> ] bi < ]
+        [ [ todo>> peek-url depth>> ] [ max-depth>> ] bi <= ]
         [ [ count>> ] [ max-count>> ] bi < ]
     } 1&& ;
 
@@ -123,5 +141,6 @@ PRIVATE>
 
 : run-spider ( spider -- spider )
     "spider" [
-        dup queue-initial-links [ run-spider-loop ] keep
+        queue-initial-links
+        [ run-spider-loop ] keep
     ] with-logging ;

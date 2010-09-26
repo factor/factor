@@ -20,10 +20,6 @@ M: callable (build-tree) infer-quot-here ;
 : check-no-compile ( word -- )
     dup "no-compile" word-prop [ do-not-compile ] [ drop ] if ;
 
-: check-effect ( word effect -- )
-    swap required-stack-effect 2dup effect<=
-    [ 2drop ] [ effect-error ] if ;
-
 : inline-recursive? ( word -- ? )
     [ "inline" word-prop ] [ "recursive" word-prop ] bi and ;
 
@@ -33,7 +29,7 @@ M: callable (build-tree) infer-quot-here ;
 M: word (build-tree)
     [ check-no-compile ]
     [ word-body infer-quot-here ]
-    [ current-effect check-effect ] tri ;
+    [ required-stack-effect check-effect ] tri ;
 
 : build-tree-with ( in-stack word/quot -- nodes )
     [

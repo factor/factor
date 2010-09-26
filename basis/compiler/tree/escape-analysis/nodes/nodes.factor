@@ -13,7 +13,7 @@ SYMBOL: next-node
 : each-with-next ( ... seq quot: ( ... elt -- ... ) -- ... )
     dupd '[ 1 + _ ?nth next-node set @ ] each-index ; inline
 
-: (escape-analysis) ( node -- )
+: (escape-analysis) ( nodes -- )
     [
         [ node-defs-values introduce-values ]
         [ escape-analysis* ]

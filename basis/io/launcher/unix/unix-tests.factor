@@ -3,7 +3,8 @@ USING: io.files io.files.temp io.directories io.pathnames
 tools.test io.launcher arrays io namespaces continuations math
 io.encodings.binary io.encodings.ascii accessors kernel
 sequences io.encodings.utf8 destructors io.streams.duplex locals
-concurrency.promises threads unix.process calendar unix ;
+concurrency.promises threads unix.process calendar unix
+unix.process debugger.unix io.timeouts io.launcher.unix ;
 
 [ ] [
     [ "launcher-test-1" temp-file delete-file ] ignore-errors
@@ -137,4 +138,23 @@ concurrency.promises threads unix.process calendar unix ;
         p 1 seconds ?promise-timeout handle>> kill-process*
         s 3 seconds ?promise-timeout 0 =
     ]
+] unit-test
+
+! Make sure that subprocesses don't inherit our signal mask
+
+! First, ensure that the Factor VM ignores SIGPIPE
+: send-sigpipe ( pid -- )
+    "SIGPIPE" signal-names index 1 +
+    kill io-error ;
+
+[ ] [ current-process-handle send-sigpipe ] unit-test
+
+! Spawn a process
+[ T{ signal f 13 } ] [
+    "sleep 1000" run-detached
+    1 seconds sleep
+    [ handle>> send-sigpipe ]
+    [ 2 seconds swap set-timeout ]
+    [ wait-for-process ]
+    tri
 ] unit-test

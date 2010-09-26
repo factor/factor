@@ -27,8 +27,6 @@ typedef char symbol_char;
 #define FTELL ftello
 #define FSEEK fseeko
 
-#define CELL_HEX_FORMAT "%lx"
-
 #define OPEN_READ(path) fopen(path,"rb")
 #define OPEN_WRITE(path) fopen(path,"wb")
 
@@ -38,9 +36,6 @@ typedef pthread_t THREADHANDLE;
 
 THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
 inline static THREADHANDLE thread_id() { return pthread_self(); }
-
-void signal_handler(int signal, siginfo_t* siginfo, void* uap);
-void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 
 u64 nano_count();
 void sleep_nanos(u64 nsec);

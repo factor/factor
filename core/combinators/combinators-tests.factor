@@ -1,5 +1,5 @@
 USING: alien strings kernel math tools.test io prettyprint
-namespaces combinators words classes sequences accessors 
+namespaces combinators words classes sequences accessors
 math.functions arrays combinators.private ;
 IN: combinators.tests
 
@@ -53,7 +53,7 @@ IN: combinators.tests
 
 [ 10 \ . compile-execute(-test-4 ] [ wrong-values? ] must-fail-with
 
-! Compiled
+! Cond
 : cond-test-1 ( obj -- str )
     {
         { [ dup 2 mod 0 = ] [ drop "even" ] }
@@ -63,7 +63,9 @@ IN: combinators.tests
 \ cond-test-1 def>> must-infer
 
 [ "even" ] [ 2 cond-test-1 ] unit-test
+[ "even" ] [ 2 \ cond-test-1 def>> call ] unit-test
 [ "odd" ] [ 3 cond-test-1 ] unit-test
+[ "odd" ] [ 3 \ cond-test-1 def>> call ] unit-test
 
 : cond-test-2 ( obj -- str )
     {
@@ -75,8 +77,11 @@ IN: combinators.tests
 \ cond-test-2 def>> must-infer
 
 [ "true" ] [ t cond-test-2 ] unit-test
+[ "true" ] [ t \ cond-test-2 def>> call ] unit-test
 [ "false" ] [ f cond-test-2 ] unit-test
+[ "false" ] [ f \ cond-test-2 def>> call ] unit-test
 [ "something else" ] [ "ohio" cond-test-2 ] unit-test
+[ "something else" ] [ "ohio" \ cond-test-2 def>> call ] unit-test
 
 : cond-test-3 ( obj -- str )
     {
@@ -88,8 +93,11 @@ IN: combinators.tests
 \ cond-test-3 def>> must-infer
 
 [ "something else" ] [ t cond-test-3 ] unit-test
+[ "something else" ] [ t \ cond-test-3 def>> call ] unit-test
 [ "something else" ] [ f cond-test-3 ] unit-test
+[ "something else" ] [ f \ cond-test-3 def>> call ] unit-test
 [ "something else" ] [ "ohio" cond-test-3 ] unit-test
+[ "something else" ] [ "ohio" \ cond-test-3 def>> call ] unit-test
 
 : cond-test-4 ( -- )
     {
@@ -97,87 +105,30 @@ IN: combinators.tests
 
 \ cond-test-4 def>> must-infer
 
-[ cond-test-4 ] [ class \ no-cond = ] must-fail-with
+[ cond-test-4 ] [ no-cond? ] must-fail-with
+[ \ cond-test-4 def>> call ] [ no-cond? ] must-fail-with
 
-! Interpreted
-[ "even" ] [
-    2 {
-        { [ dup 2 mod 0 = ] [ drop "even" ] }
-        { [ dup 2 mod 1 = ] [ drop "odd" ] }
-    } cond
-] unit-test
-
-[ "odd" ] [
-    3 {
-        { [ dup 2 mod 0 = ] [ drop "even" ] }
-        { [ dup 2 mod 1 = ] [ drop "odd" ] }
-    } cond
-] unit-test
-
-[ "neither" ] [
-    3 {
-        { [ dup string? ] [ drop "string" ] }
-        { [ dup float? ] [ drop "float" ] }
-        { [ dup alien? ] [ drop "alien" ] }
-        [ drop "neither" ]
-    } cond
-] unit-test
-
-[ "neither" ] [
-    3 {
-        { [ dup string? ] [ drop "string" ] }
-        { [ dup float? ] [ drop "float" ] }
-        { [ dup alien? ] [ drop "alien" ] }
-        [ drop "neither" ]
-    } cond
-] unit-test
-
-[ "neither" ] [
-    3 {
-        { [ dup string? ] [ drop "string" ] }
-        { [ dup float? ] [ drop "float" ] }
-        { [ dup alien? ] [ drop "alien" ] }
-        [ drop "neither" ]
-    } cond
-] unit-test
-
-[ "early" ] [
-    2 {
+: cond-test-5 ( a -- b )
+    {
         { [ dup 2 mod 1 = ] [ drop "odd" ] }
         [ drop "early" ]
         { [ dup 2 mod 0 = ] [ drop "even" ] }
-    } cond
-] unit-test
+    } cond ;
 
-[ "really early" ] [
-    2 {
+[ "early" ] [ 2 cond-test-5 ] unit-test
+[ "early" ] [ 2 \ cond-test-5 def>> call ] unit-test
+
+: cond-test-6 ( a -- b )
+    {
        [ drop "really early" ]
-        { [ dup 2 mod 1 = ] [ drop "odd" ] }
-        { [ dup 2 mod 0 = ] [ drop "even" ] }
-    } cond
-] unit-test
+       { [ dup 2 mod 1 = ] [ drop "odd" ] }
+       { [ dup 2 mod 0 = ] [ drop "even" ] }
+    } cond ;
 
-[ { } cond ] [ class \ no-cond = ] must-fail-with
- 
-[ "early" ] [
-    2 {
-        { [ dup 2 mod 1 = ] [ drop "odd" ] }
-        [ drop "early" ]
-        { [ dup 2 mod 0 = ] [ drop "even" ] }
-    } cond
-] unit-test
+[ "really early" ] [ 2 cond-test-6 ] unit-test
+[ "really early" ] [ 2 \ cond-test-6 def>> call ] unit-test
 
-[ "really early" ] [
-    2 {
-        [ drop "really early" ]
-        { [ dup 2 mod 1 = ] [ drop "odd" ] }
-        { [ dup 2 mod 0 = ] [ drop "even" ] }
-    } cond
-] unit-test
-
-[ { } cond ] [ class \ no-cond = ] must-fail-with
-
-! Compiled
+! Case
 : case-test-1 ( obj -- obj' )
     {
         { 1 [ "one" ] }
@@ -189,11 +140,10 @@ IN: combinators.tests
 \ case-test-1 def>> must-infer
 
 [ "two" ] [ 2 case-test-1 ] unit-test
-
-! Interpreted
 [ "two" ] [ 2 \ case-test-1 def>> call ] unit-test
 
 [ "x" case-test-1 ] must-fail
+[ "x" \ case-test-1 def>> call ] must-fail
 
 : case-test-2 ( obj -- obj' )
     {
@@ -207,8 +157,6 @@ IN: combinators.tests
 \ case-test-2 def>> must-infer
 
 [ 25 ] [ 5 case-test-2 ] unit-test
-
-! Interpreted
 [ 25 ] [ 5 \ case-test-2 def>> call ] unit-test
 
 : case-test-3 ( obj -- obj' )
@@ -225,6 +173,7 @@ IN: combinators.tests
 \ case-test-3 def>> must-infer
 
 [ "an array" ] [ { 1 2 3 } case-test-3 ] unit-test
+[ "an array" ] [ { 1 2 3 } \ case-test-3 def>> call ] unit-test
 
 CONSTANT: case-const-1 1
 CONSTANT: case-const-2 2
@@ -234,9 +183,9 @@ CONSTANT: case-const-2 2
     {
         { case-const-1 [ "uno" ] }
         { case-const-2 [ "dos" ] }
-        { 3 [ "tres" ] } 
-        { 4 [ "cuatro" ] } 
-        { 5 [ "cinco" ] } 
+        { 3 [ "tres" ] }
+        { 4 [ "cuatro" ] }
+        { 5 [ "cinco" ] }
         [ drop "demasiado" ]
     } case ;
 
@@ -247,64 +196,25 @@ CONSTANT: case-const-2 2
 [ "tres" ] [ 3 case-test-4 ] unit-test
 [ "demasiado" ] [ 100 case-test-4 ] unit-test
 
+[ "uno" ] [ 1 \ case-test-4 def>> call ] unit-test
+[ "dos" ] [ 2 \ case-test-4 def>> call ] unit-test
+[ "tres" ] [ 3 \ case-test-4 def>> call ] unit-test
+[ "demasiado" ] [ 100 \ case-test-4 def>> call ] unit-test
+
 : case-test-5 ( obj -- )
     {
         { case-const-1 [ "uno" print ] }
         { case-const-2 [ "dos" print ] }
-        { 3 [ "tres" print ] } 
-        { 4 [ "cuatro" print ] } 
-        { 5 [ "cinco" print ] } 
+        { 3 [ "tres" print ] }
+        { 4 [ "cuatro" print ] }
+        { 5 [ "cinco" print ] }
         [ drop "demasiado" print ]
     } case ;
 
 \ case-test-5 def>> must-infer
 
 [ ] [ 1 case-test-5 ] unit-test
-
-! Interpreted
-[ "uno" ] [
-    1 {
-        { case-const-1 [ "uno" ] }
-        { case-const-2 [ "dos" ] }
-        { 3 [ "tres" ] } 
-        { 4 [ "cuatro" ] } 
-        { 5 [ "cinco" ] } 
-        [ drop "demasiado" ]
-    } case
-] unit-test
-
-[ "dos" ] [
-    2 {
-        { case-const-1 [ "uno" ] }
-        { case-const-2 [ "dos" ] }
-        { 3 [ "tres" ] } 
-        { 4 [ "cuatro" ] } 
-        { 5 [ "cinco" ] } 
-        [ drop "demasiado" ]
-    } case
-] unit-test
-
-[ "tres" ] [
-    3 {
-        { case-const-1 [ "uno" ] }
-        { case-const-2 [ "dos" ] }
-        { 3 [ "tres" ] } 
-        { 4 [ "cuatro" ] } 
-        { 5 [ "cinco" ] } 
-        [ drop "demasiado" ]
-    } case
-] unit-test
-
-[ "demasiado" ] [
-    100 {
-        { case-const-1 [ "uno" ] }
-        { case-const-2 [ "dos" ] }
-        { 3 [ "tres" ] } 
-        { 4 [ "cuatro" ] } 
-        { 5 [ "cinco" ] } 
-        [ drop "demasiado" ]
-    } case
-] unit-test
+[ ] [ 1 \ case-test-5 def>> call ] unit-test
 
 : do-not-call ( -- * ) "do not call" throw ;
 
@@ -318,30 +228,6 @@ CONSTANT: case-const-2 2
 
 [ "three" ] [ 3 test-case-6 ] unit-test
 [ "do-not-call" ] [ \ do-not-call test-case-6 ] unit-test
-
-[ "three" ] [
-    3 {
-        { \ do-not-call [ "do-not-call" ] }
-        { 3 [ "three" ] }
-    } case
-] unit-test
-
-[ "do-not-call" ] [
-    [ do-not-call ] first {
-        { \ do-not-call [ "do-not-call" ] }
-        { 3 [ "three" ] }
-    } case
-] unit-test
-
-[ "do-not-call" ] [
-    \ do-not-call {
-        { \ do-not-call [ "do-not-call" ] }
-        { 3 [ "three" ] }
-    } case
-] unit-test
-
-! Interpreted
-[ "a hashtable" ] [ H{ } \ case-test-3 def>> call ] unit-test
 
 [ t ] [ { 1 3 2 } contiguous-range? ] unit-test
 [ f ] [ { 1 2 2 4 } contiguous-range? ] unit-test
@@ -358,33 +244,79 @@ CONSTANT: case-const-2 2
         { \ / [ "divide" ] }
         { \ ^ [ "power" ] }
         { \ [ [ "obama" ] }
-        { \ ] [ "KFC" ] }
     } case ;
 
 \ test-case-7 def>> must-infer
 
 [ "plus" ] [ \ + test-case-7 ] unit-test
+[ "plus" ] [ \ + \ test-case-7 def>> call ] unit-test
 
-! Some corner cases (no pun intended)
 DEFER: corner-case-1
 
 << \ corner-case-1 2 [ + ] curry 1array [ case ] curry (( a -- b )) define-declared >>
 
 [ t ] [ \ corner-case-1 optimized? ] unit-test
-[ 4 ] [ 2 corner-case-1 ] unit-test
 
-[ 4 ] [ 2 2 [ + ] curry 1array case ] unit-test
+[ 4 ] [ 2 corner-case-1 ] unit-test
+[ 4 ] [ 2 \ corner-case-1 def>> call ] unit-test
 
 : test-case-8 ( n -- string )
     {
         { 1 [ "foo" ] }
     } case ;
 
-[ 3 test-case-8 ]
-[ object>> 3 = ] must-fail-with
+[ 3 test-case-8 ] [ object>> 3 = ] must-fail-with
+[ 3 \ test-case-8 def>> call ] [ object>> 3 = ] must-fail-with
 
-[
-    3 {
-        { 1 [ "foo" ] }
-    } case
-] [ object>> 3 = ] must-fail-with
+: test-case-9 ( a -- b )
+    {
+        { \ + [ "plus" ] }
+        { \ + [ "plus 2" ] }
+        { \ - [ "minus" ] }
+        { \ - [ "minus 2" ] }
+    } case ;
+
+[ "plus" ] [ \ + test-case-9 ] unit-test
+[ "plus" ] [ \ + \ test-case-9 def>> call ] unit-test
+
+[ "minus" ] [ \ - test-case-9 ] unit-test
+[ "minus" ] [ \ - \ test-case-9 def>> call ] unit-test
+
+: test-case-10 ( a -- b )
+    {
+        { 1 [ "uno" ] }
+        { 2 [ "dos" ] }
+        { 2 [ "DOS" ] }
+        { 3 [ "tres" ] }
+        { 4 [ "cuatro" ] }
+        { 5 [ "cinco" ] }
+    } case ;
+
+[ "dos" ] [ 2 test-case-10 ] unit-test
+[ "dos" ] [ 2 \ test-case-10 def>> call ] unit-test
+
+: test-case-11 ( a -- b )
+    {
+        { 11 [ "uno" ] }
+        { 22 [ "dos" ] }
+        { 22 [ "DOS" ] }
+        { 33 [ "tres" ] }
+        { 44 [ "cuatro" ] }
+        { 55 [ "cinco" ] }
+    } case ;
+
+[ "dos" ] [ 22 test-case-11 ] unit-test
+[ "dos" ] [ 22 \ test-case-11 def>> call ] unit-test
+
+: test-case-12 ( a -- b )
+    {
+        { 11 [ "uno" ] }
+        { 22 [ "dos" ] }
+        [ drop "nachos" ]
+        { 33 [ "tres" ] }
+        { 44 [ "cuatro" ] }
+        { 55 [ "cinco" ] }
+    } case ;
+
+[ "nachos" ] [ 33 test-case-12 ] unit-test
+[ "nachos" ] [ 33 \ test-case-12 def>> call ] unit-test

@@ -1,6 +1,6 @@
 ;;; fuel-mode.el -- Minor mode enabling FUEL niceties
 
-;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -27,6 +27,7 @@
 (require 'fuel-font-lock)
 (require 'fuel-edit)
 (require 'fuel-syntax)
+(require 'fuel-menu)
 (require 'fuel-base)
 
 
@@ -181,59 +182,64 @@ interacting with a factor listener is at your disposal.
       (fuel-scaffold--maybe-insert))))
 
 
-;;; Keys:
+;;; Keys and menu:
 
-(defun fuel-mode--key-1 (k c)
-  (define-key fuel-mode-map (vector '(control ?c) k) c)
-  (define-key fuel-mode-map (vector '(control ?c) `(control ,k))  c))
-
-(defun fuel-mode--key (p k c)
-  (define-key fuel-mode-map (vector '(control ?c) `(control ,p) k) c)
-  (define-key fuel-mode-map (vector '(control ?c) `(control ,p) `(control ,k)) c))
-
-(fuel-mode--key-1 ?k 'fuel-run-file)
-(fuel-mode--key-1 ?l 'fuel-run-file)
-(fuel-mode--key-1 ?r 'fuel-refresh-all)
-(fuel-mode--key-1 ?t 'fuel-test-vocab)
-(fuel-mode--key-1 ?z 'run-factor)
-(fuel-mode--key-1 ?s 'fuel-switch-to-buffer)
-(define-key fuel-mode-map "\C-x4s" 'fuel-switch-to-buffer-other-window)
-(define-key fuel-mode-map "\C-x5s" 'fuel-switch-to-buffer-other-frame)
-
-(define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
-(define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)
-(define-key fuel-mode-map "\M-." 'fuel-edit-word-at-point)
-(define-key fuel-mode-map "\M-," 'fuel-edit-pop-edit-word-stack)
-(define-key fuel-mode-map "\C-c\M-<" 'fuel-show-callers)
-(define-key fuel-mode-map "\C-c\M->" 'fuel-show-callees)
-(define-key fuel-mode-map (kbd "M-TAB") 'fuel-completion--complete-symbol)
-
-(fuel-mode--key ?e ?d 'fuel-edit-word-doc-at-point)
-(fuel-mode--key ?e ?e 'fuel-eval-extended-region)
-(fuel-mode--key ?e ?k 'fuel-run-file)
-(fuel-mode--key ?e ?l 'fuel-load-usings)
-(fuel-mode--key ?e ?r 'fuel-eval-region)
-(fuel-mode--key ?e ?u 'fuel-update-usings)
-(fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
-(fuel-mode--key ?e ?w 'fuel-edit-word)
-(fuel-mode--key ?e ?x 'fuel-eval-definition)
-
-(fuel-mode--key ?x ?a 'fuel-refactor-extract-article)
-(fuel-mode--key ?x ?i 'fuel-refactor-inline-word)
-(fuel-mode--key ?x ?g 'fuel-refactor-make-generic)
-(fuel-mode--key ?x ?r 'fuel-refactor-extract-region)
-(fuel-mode--key ?x ?s 'fuel-refactor-extract-sexp)
-(fuel-mode--key ?x ?v 'fuel-refactor-extract-vocab)
-(fuel-mode--key ?x ?w 'fuel-refactor-rename-word)
-
-(fuel-mode--key ?d ?> 'fuel-show-callees)
-(fuel-mode--key ?d ?< 'fuel-show-callers)
-(fuel-mode--key ?d ?v 'fuel-show-file-words)
-(fuel-mode--key ?d ?a 'fuel-autodoc-mode)
-(fuel-mode--key ?d ?p 'fuel-apropos)
-(fuel-mode--key ?d ?d 'fuel-help)
-(fuel-mode--key ?d ?e 'fuel-stack-effect-sexp)
-(fuel-mode--key ?d ?s 'fuel-help-short)
+(fuel-menu--defmenu fuel fuel-mode-map
+  ("Complete symbol" ((kbd "M-TAB"))
+   fuel-completion--complete-symbol :enable (symbol-at-point))
+  ("Update USING:" ("\C-c\C-e\C-u" "\C-c\C-eu") fuel-update-usings)
+  --
+  ("Eval definition" ("\C-\M-x" "\C-c\C-e\C-x" "\C-c\C-ex")
+   fuel-eval-definition)
+  ("Eval extended region" ("\C-\M-r" "\C-c\C-e\C-e" "\C-c\C-ee")
+   fuel-eval-extended-region :enable mark-active)
+  ("Eval region" ("\C-c\C-r" "\C-c\C-e\C-r" "\C-c\C-er")
+   fuel-eval-region :enable mark-active)
+  --
+  ("Edit word at point" ("\M-." "\C-c\C-e\C-d" "\C-c\C-ed")
+   fuel-edit-word-at-point :enable (symbol-at-point))
+  ("Edit word..." ("\C-c\C-e\C-w" "\C-c\C-ew") fuel-edit-word)
+  ("Edit vocab..." ("\C-c\C-e\C-v" "\C-c\C-ev") fuel-edit-vocabulary)
+  ("Jump back" "\M-," fuel-edit-pop-edit-word-stack)
+  --
+  ("Help on word" ("\C-c\C-d\C-d" "\C-c\C-dd") fuel-help)
+  ("Short help on word" ("\C-c\C-d\C-s" "\C-c\C-ds") fuel-help)
+  ("Apropos..." ("\C-c\C-d\C-p" "\C-c\C-dp") fuel-apropos)
+  ("Show stack effect" ("\C-c\C-d\C-e" "\C-c\C-de") fuel-stack-effect-sexp)
+  --
+  ("Show all words" ("\C-c\C-d\C-v" "\C-c\C-dv") fuel-show-file-words)
+  ("Word callers" "\C-c\M-<" fuel-show-callers :enable (symbol-at-point))
+  ("Word callees" "\C-c\M->" fuel-show-callees :enable (symbol-at-point))
+  (mode "Autodoc mode" ("\C-c\C-d\C-a" "\C-c\C-da") fuel-autodoc-mode)
+  --
+  (menu "Refactor"
+        ("Rename word" ("\C-c\C-x\C-w" "\C-c\C-xw") fuel-refactor-rename-word)
+        ("Inline word" ("\C-c\C-x\C-i" "\C-c\C-xi") fuel-refactor-inline-word)
+        ("Extract region" ("\C-c\C-x\C-r" "\C-c\C-xr")
+         fuel-refactor-extract-region :enable mark-active)
+        ("Extract subregion" ("\C-c\C-x\C-s" "\C-c\C-xs")
+         fuel-refactor-extract-sexp)
+        ("Extract vocab" ("\C-c\C-x\C-v" "\C-c\C-xv")
+         fuel-refactor-extract-vocab)
+        ("Make generic" ("\C-c\C-x\C-g" "\C-c\C-xg")
+         fuel-refactor-make-generic)
+        --
+        ("Extract article" ("\C-c\C-x\C-a" "\C-c\C-xa")
+         fuel-refactor-extract-article))
+  --
+  ("Load used vocabs" ("\C-c\C-e\C-l" "\C-c\C-el") fuel-load-usings)
+  ("Run file" ("\C-c\C-k" "\C-c\C-l" "\C-c\C-e\C-k") fuel-run-file)
+  ("Run unit tests" "\C-c\C-t" fuel-test-vocab)
+  ("Refresh vocabs" "\C-c\C-r" fuel-refresh-all)
+  --
+  (menu "Switch to"
+        ("Listener" "\C-c\C-z" run-factor)
+        ("Related Factor file" "\C-c\C-o" factor-mode-visit-other-file)
+        ("Other Factor buffer" "\C-c\C-s" fuel-switch-to-buffer)
+        ("Other Factor buffer other window" "\C-x4s"
+         fuel-switch-to-buffer-other-window)
+        ("Other Factor buffer other frame" "\C-x5s"
+         fuel-switch-to-buffer-other-frame)))
 
 
 (provide 'fuel-mode)

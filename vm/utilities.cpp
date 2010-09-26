@@ -14,7 +14,8 @@ vm_char *safe_strdup(const vm_char *str)
 cell read_cell_hex()
 {
 	cell cell;
-	if(scanf(CELL_HEX_FORMAT,&cell) < 0) exit(1);
+	std::cin >> std::hex >> cell >> std::dec;
+	if(!std::cin.good()) exit(1);
 	return cell;
 }
 

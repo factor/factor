@@ -95,6 +95,9 @@ M:: x86.64 %load-reg-param ( vreg rep reg -- )
 M:: x86.64 %store-reg-param ( vreg rep reg -- )
     reg vreg rep %copy ;
 
+M: x86.64 %discard-reg-param ( rep reg -- )
+    2drop ;
+
 M:: x86.64 %unbox ( dst src func rep -- )
     param-reg-0 src tagged-rep %copy
     param-reg-1 %mov-vm-ptr
@@ -116,29 +119,9 @@ M: x86.64 %begin-callback ( -- )
     param-reg-1 0 MOV
     "begin_callback" f f %c-invoke ;
 
-M: x86.64 %alien-callback ( quot -- )
-    [ param-reg-0 ] dip %load-reference
-    param-reg-0 quot-entry-point-offset [+] CALL ;
-
 M: x86.64 %end-callback ( -- )
     param-reg-0 %mov-vm-ptr
     "end_callback" f f %c-invoke ;
-
-: float-function-param ( i src -- )
-    [ float-regs cdecl param-regs at nth ] dip double-rep %copy ;
-
-M:: x86.64 %unary-float-function ( dst src func -- )
-    0 src float-function-param
-    func "libm" load-library f %c-invoke
-    dst double-rep %load-return ;
-
-M:: x86.64 %binary-float-function ( dst src1 src2 func -- )
-    ! src1 might equal dst; otherwise it will be a spill slot
-    ! src2 is always a spill slot
-    0 src1 float-function-param
-    1 src2 float-function-param
-    func "libm" load-library f %c-invoke
-    dst double-rep %load-return ;
 
 M: x86.64 %prepare-var-args ( -- ) RAX RAX XOR ;
 

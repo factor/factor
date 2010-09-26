@@ -120,7 +120,7 @@ PRIVATE>
         { 
             [ flags>> write-int32 ]
             [ collection>> write-cstring ]
-            [ upsert?>> write-int32 ]
+            [ update-flags>> write-int32 ]
             [ selector>> assoc>stream ]
             [ object>> assoc>stream ]
         } cleave
@@ -128,9 +128,12 @@ PRIVATE>
 
 : write-delete-message ( message -- )
     [
-       [ flags>> write-int32 ]
-       [ collection>> write-cstring ]
-       [ 0 write-int32 selector>> assoc>stream ] tri
+        {
+            [ flags>> write-int32 ]
+            [ collection>> write-cstring ]
+            [ delete-flags>> write-int32 ]
+            [ selector>> assoc>stream ]
+        } cleave
     ] (write-message) ; inline
 
 : write-getmore-message ( message -- )

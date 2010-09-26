@@ -5,6 +5,7 @@ mongodb.cmd mongodb.connection mongodb.msg namespaces parser
 prettyprint prettyprint.custom prettyprint.sections sequences
 sets splitting strings ;
 FROM: ascii => ascii? ;
+FROM: math.bitwise => set-bit ;
 IN: mongodb.driver
 
 TUPLE: mdb-pool < pool mdb ;
@@ -184,6 +185,15 @@ PRIVATE>
 : <query> ( collection assoc -- mdb-query-msg )
     <mdb-query-msg> ; inline
 
+: >slave-ok ( mdb-query-msg -- mdb-query-msg )
+    [ 2 set-bit ] change-flags ;
+
+: >await-data ( mdb-query-msg -- mdb-query-msg )
+    [ 5 set-bit ] change-flags ;
+
+: >tailable ( mdb-query-msg -- mdb-query-msg )
+    [ 1 set-bit ] change-flags ;
+
 : limit ( mdb-query-msg limit# -- mdb-query-msg )
     >>return# ; inline
 
@@ -278,7 +288,10 @@ PRIVATE>
     [ check-collection ] 2dip <mdb-update-msg> ;
 
 : >upsert ( mdb-update-msg -- mdb-update-msg )
-    1 >>upsert? ; 
+    [ 0 set-bit ] change-update-flags ;
+
+: >multi ( mdb-update-msg -- mdb-update-msg )
+    [ 1 set-bit ] change-update-flags ;
 
 : update ( mdb-update-msg -- )
     send-message-check-error ;
@@ -295,13 +308,17 @@ PRIVATE>
 : run-cmd ( cmd -- result )
     send-cmd ; inline
 
-: delete ( collection selector -- )
-    [ check-collection ] dip
-    <mdb-delete-msg> send-message-check-error ;
+: <delete> ( collection selector -- mdb-delete-msg )
+    [ check-collection ] dip <mdb-delete-msg> ;
 
-: delete-unsafe ( collection selector -- )
-    [ check-collection ] dip
-    <mdb-delete-msg> send-message ;
+: >single-remove ( mdb-delete-msg -- mdb-delete-msg )
+    [ 0 set-bit ] change-delete-flags ;
+
+: delete ( mdb-delete-msg -- )
+    send-message-check-error ;
+
+: delete-unsafe ( mdb-delete-msg -- )
+    send-message ;
 
 : kill-cursor ( mdb-cursor -- )
     id>> <mdb-killcursors-msg> send-message ;

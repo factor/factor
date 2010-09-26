@@ -519,7 +519,7 @@ HELP: since-1970
 { $description "Adds the duration to the beginning of Unix time and returns the result as a timestamp." } ;
 
 ARTICLE: "calendar" "Calendar"
-"The two data types used throughout the calendar library:"
+"The " { $vocab-link "calendar" } " vocabulary defines two data types and a set of operations on them:"
 { $subsections
     timestamp
     duration
@@ -533,13 +533,12 @@ ARTICLE: "calendar" "Calendar"
     now
     gmt
 }
-"Converting between timestamps:"
+"Time zones:"
 { $subsections
     >local-time
     >gmt
+    convert-timezone
 }
-"Converting between timezones:"
-{ $subsections convert-timezone }
 "Timestamps relative to each other:"
 { $subsections "relative-timestamps" }
 "Operations on units of time:"
@@ -548,9 +547,10 @@ ARTICLE: "calendar" "Calendar"
     "months"
     "days"
 }
+"Both " { $link timestamp } "s and " { $link duration } "s implement the " { $link "math.order" } "."
+$nl
 "Meta-data about the calendar:"
-{ $subsections "calendar-facts" }
-;
+{ $subsections "calendar-facts" } ;
 
 ARTICLE: "timestamp-arithmetic" "Timestamp arithmetic"
 "Adding timestamps and durations, or durations and durations:"

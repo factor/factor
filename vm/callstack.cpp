@@ -127,6 +127,18 @@ void factor_vm::set_frame_offset(stack_frame *frame, cell offset)
 		FRAME_RETURN_ADDRESS(frame,this) = entry_point + offset;
 }
 
+void factor_vm::scrub_return_address()
+{
+	stack_frame *top = ctx->callstack_top;
+	stack_frame *bottom = ctx->callstack_bottom;
+	stack_frame *frame = bottom - 1;
+
+	while(frame >= top && frame_successor(frame) >= top)
+		frame = frame_successor(frame);
+
+	set_frame_offset(frame,0);
+}
+
 cell factor_vm::frame_scan(stack_frame *frame)
 {
 	switch(frame_type(frame))

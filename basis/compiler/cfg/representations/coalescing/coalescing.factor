@@ -11,10 +11,10 @@ SYMBOL: components
 
 : init-components ( cfg components -- )
     '[
-        instructions>> [
+        [
             defs-vregs [ _ add-atom ] each
         ] each
-    ] each-basic-block ;
+    ] simple-analysis ;
 
 GENERIC# visit-insn 1 ( insn disjoint-set -- )
 
@@ -28,10 +28,10 @@ M: insn visit-insn 2drop ;
 
 : merge-components ( cfg components -- )
     '[
-        instructions>> [
+        [
             _ visit-insn
         ] each
-    ] each-basic-block ;
+    ] simple-analysis ;
 
 : compute-components ( cfg -- )
     <disjoint-set>

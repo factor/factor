@@ -17,22 +17,6 @@ USING: mason.child mason.config tools.test namespaces io kernel sequences ;
     ] with-scope
 ] unit-test
 
-[ { "gmake" "netbsd-ppc" } ] [
-    [
-        "netbsd" target-os set
-        "ppc" target-cpu set
-        make-cmd
-    ] with-scope
-] unit-test
-
-[ { "./factor" "-i=boot.macosx-ppc.image" "-no-user-init" } ] [
-    [
-        "macosx" target-os set
-        "ppc" target-cpu set
-        boot-cmd
-    ] with-scope
-] unit-test
-
 [ { "./factor.com" "-i=boot.winnt-x86.32.image" "-no-user-init" } ] [
     [
         "winnt" target-os set

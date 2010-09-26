@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs db.tuples furnace.actions
-furnace.utilities http.server.responses kernel locals
-mason.server mason.version.data sequences splitting urls
-webapps.mason.utils xml.syntax xml.writer ;
+furnace.utilities http.server.responses kernel locals sequences
+splitting urls xml.syntax xml.writer webapps.mason.backend
+webapps.mason.version.data webapps.mason.utils ;
 IN: webapps.mason.grids
 
 : render-grid-cell ( cpu os quot -- xml )
@@ -26,7 +26,6 @@ CONSTANT: cpus
 {
     { "x86.32" "x86" }
     { "x86.64" "x86-64" }
-    { "ppc" "PowerPC" }
 }
 
 : render-grid-header ( -- xml )
@@ -45,12 +44,6 @@ CONSTANT: cpus
             <->
         </table>
     XML] ;
-
-: package-url ( builder -- url )
-    [ URL" $mason-app/package" ] dip
-    [ os>> "os" set-query-param ]
-    [ cpu>> "cpu" set-query-param ] bi
-    adjust-url ;
 
 : package-date ( filename -- date )
     "." split1 drop 16 tail* 6 head* ;
@@ -72,12 +65,6 @@ CONSTANT: cpus
             "text/html" <content>
         ] with-mason-db
     ] >>display ;
-
-: release-url ( builder -- url )
-    [ URL" $mason-app/release" ] dip
-    [ os>> "os" set-query-param ]
-    [ cpu>> "cpu" set-query-param ] bi
-    adjust-url ;
 
 : release-version ( filename -- release )
     ".tar.gz" ?tail drop ".zip" ?tail drop ".dmg" ?tail drop

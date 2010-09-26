@@ -53,8 +53,8 @@ M: insn visit-insn drop ;
 : (collect-copies) ( cfg -- )
     [
         phis get clear-assoc
-        instructions>> [ visit-insn ] each
-    ] each-basic-block ;
+        [ visit-insn ] each
+    ] simple-analysis ;
 
 : collect-copies ( cfg -- )
     H{ } clone copies set

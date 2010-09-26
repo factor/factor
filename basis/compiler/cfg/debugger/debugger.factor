@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words sequences quotations namespaces io vectors
-arrays hashtables classes.tuple accessors prettyprint
+arrays hashtables classes.tuple math accessors prettyprint
 prettyprint.config assocs prettyprint.backend prettyprint.custom
 prettyprint.sections parser compiler.tree.builder
 compiler.tree.optimizer cpu.architecture compiler.cfg.builder
@@ -125,3 +125,10 @@ M: rs-loc pprint* \ R pprint-loc ;
             bi append
         ] map concat
     ] map concat >hashtable representations set ;
+
+: count-insns ( quot insn-check -- ? )
+    [ test-regs [ post-order [ instructions>> ] map concat ] map concat ] dip
+    count ; inline
+
+: contains-insn? ( quot insn-check -- ? )
+    count-insns 0 > ; inline

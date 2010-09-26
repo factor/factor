@@ -44,7 +44,7 @@ HELP: with-mapped-array
 { $values
     { "path" "a pathname string" } { "c-type" c-type } { "quot" quotation }
 }
-{ $description "Memory-maps a file for reading and writing as a mapped-array of the given c-type. The mapped file is disposed of when the quotation returns, or if an error is thrown." }
+{ $description "Memory-maps a file for reading and writing, wrapping it in a specialized array with the given element type. The mapped file is disposed of when the quotation returns, or if an error is thrown." }
 { $examples
     { $unchecked-example
         "USING: alien.c-types io.mmap prettyprint specialized-arrays ;"
@@ -81,7 +81,7 @@ ARTICLE: "io.mmap.examples" "Memory-mapped file examples"
     ""
     "\"mydata.dat\" char ["
     "    4 <sliced-groups>"
-    "    [ reverse! drop ] map! drop"
+    "    [ reverse! drop ] each"
     "] with-mapped-array"
 }
 "Normalize a file containing packed quadrupes of floats:"

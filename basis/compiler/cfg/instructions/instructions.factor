@@ -256,17 +256,6 @@ FOLDABLE-INSN: ##sqrt
 def: dst/double-rep
 use: src/double-rep ;
 
-! libc intrinsics
-FOLDABLE-INSN: ##unary-float-function
-def: dst/double-rep
-use: src/double-rep
-literal: func ;
-
-FOLDABLE-INSN: ##binary-float-function
-def: dst/double-rep
-use: src1/double-rep src2/double-rep
-literal: func ;
-
 ! Single/double float conversion
 FOLDABLE-INSN: ##single>double-float
 def: dst/double-rep
@@ -673,20 +662,17 @@ literal: boxer gc-map ;
 ! { vreg rep stack#/reg }
 
 VREG-INSN: ##alien-invoke
-literal: reg-inputs stack-inputs reg-outputs cleanup stack-size symbols dll gc-map ;
+literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map ;
 
 VREG-INSN: ##alien-indirect
 use: src/int-rep
-literal: reg-inputs stack-inputs reg-outputs cleanup stack-size gc-map ;
+literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map ;
 
 VREG-INSN: ##alien-assembly
-literal: reg-inputs stack-inputs reg-outputs cleanup stack-size quot gc-map ;
+literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot gc-map ;
 
 VREG-INSN: ##callback-inputs
 literal: reg-outputs stack-outputs ;
-
-INSN: ##alien-callback
-literal: quot ;
 
 VREG-INSN: ##callback-outputs
 literal: reg-inputs ;
@@ -886,8 +872,6 @@ alien-call-insn
 ! will be in a register.
 UNION: clobber-insn
 hairy-clobber-insn
-##unary-float-function
-##binary-float-function
 ##unbox
 ##box
 ##box-long-long ;

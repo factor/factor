@@ -292,8 +292,6 @@ HOOK: %div-float cpu ( dst src1 src2 -- )
 HOOK: %min-float cpu ( dst src1 src2 -- )
 HOOK: %max-float cpu ( dst src1 src2 -- )
 HOOK: %sqrt cpu ( dst src -- )
-HOOK: %unary-float-function cpu ( dst src func -- )
-HOOK: %binary-float-function cpu ( dst src1 src2 func -- )
 
 HOOK: %single>double-float cpu ( dst src -- )
 HOOK: %double>single-float cpu ( dst src -- )
@@ -602,15 +600,13 @@ HOOK: %save-context cpu ( temp1 temp2 -- )
 
 HOOK: %c-invoke cpu ( symbols dll gc-map -- )
 
-HOOK: %alien-invoke cpu ( reg-inputs stack-inputs reg-outputs cleanup stack-size symbols dll gc-map -- )
+HOOK: %alien-invoke cpu ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map -- )
 
-HOOK: %alien-indirect cpu ( src reg-inputs stack-inputs reg-outputs cleanup stack-size gc-map -- )
+HOOK: %alien-indirect cpu ( src reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map -- )
 
-HOOK: %alien-assembly cpu ( reg-inputs stack-inputs reg-outputs cleanup stack-size quot gc-map -- )
+HOOK: %alien-assembly cpu ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot gc-map -- )
 
 HOOK: %callback-inputs cpu ( reg-outputs stack-outputs -- )
-
-HOOK: %alien-callback cpu ( quot -- )
 
 HOOK: %callback-outputs cpu ( reg-inputs -- )
 

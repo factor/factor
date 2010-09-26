@@ -19,14 +19,24 @@ SINGLETON: utf8
     [ swap 6 shift swap BIN: 111111 bitand bitor ]
     [ 2drop replacement-char ] if ; inline
 
+: minimum-code-point ( char minimum -- char )
+    over > [ drop replacement-char ] when ; inline
+
+: maximum-code-point ( char maximum -- char )
+    over < [ drop replacement-char ] when ; inline
+
 : double ( stream byte -- stream char )
-    BIN: 11111 bitand append-nums ; inline
+    BIN: 11111 bitand append-nums
+    HEX: 80 minimum-code-point ; inline
 
 : triple ( stream byte -- stream char )
-    BIN: 1111 bitand append-nums append-nums ; inline
+    BIN: 1111 bitand append-nums append-nums
+    HEX: 800 minimum-code-point ; inline
 
 : quadruple ( stream byte -- stream char )
-    BIN: 111 bitand append-nums append-nums append-nums ; inline
+    BIN: 111 bitand append-nums append-nums append-nums
+    HEX: 10000 minimum-code-point
+    HEX: 10FFFF maximum-code-point ; inline
 
 : begin-utf8 ( stream byte -- stream char )
     {
