@@ -44,7 +44,7 @@ TYPED: write-int32 ( int: integer -- ) INT32-SIZE (>le) ; inline
 TYPED: write-double ( real: float -- ) double>bits INT64-SIZE (>le) ; inline
 
 TYPED: write-utf8-string ( string: string -- )
-    output-stream get utf8 <encoder> stream-write ; inline
+    get-output utf8 encode-string ; inline
 
 TYPED: write-cstring ( string: string -- )
     write-utf8-string 0 write1 ; inline

@@ -8,6 +8,9 @@ HELP: disassemble
 
 ARTICLE: "tools.disassembler" "Disassembling words"
 "The " { $vocab-link "tools.disassembler" } " vocabulary provides support for disassembling compiled word definitions. It uses the " { $snippet "libudis86" } " library on x86-32 and x86-64, and " { $snippet "gdb" } " on PowerPC."
+$nl
+"See also " { $vocab-link "compiler.tree.debugger" } " and " { $vocab-link "compiler.cfg.debugger" } "."
+$nl
 { $subsections disassemble } ;
 
 ABOUT: "tools.disassembler"

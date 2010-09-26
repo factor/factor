@@ -1,20 +1,22 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.rpo cpu.architecture kernel sequences vectors ;
+compiler.cfg.rpo cpu.architecture kernel sequences vectors
+combinators.short-circuit ;
 IN: compiler.cfg.save-contexts
 
 ! Insert context saves.
 
 GENERIC: needs-save-context? ( insn -- ? )
 
-M: ##unary-float-function needs-save-context? drop t ;
-M: ##binary-float-function needs-save-context? drop t ;
 M: gc-map-insn needs-save-context? drop t ;
 M: insn needs-save-context? drop f ;
 
 : bb-needs-save-context? ( insn -- ? )
-    instructions>> [ needs-save-context? ] any? ;
+    {
+        [ kill-block?>> not ]
+        [ instructions>> [ needs-save-context? ] any? ]
+    } 1&& ;
 
 GENERIC: modifies-context? ( insn -- ? )
 

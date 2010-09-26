@@ -35,7 +35,7 @@ struct factor_vm
 	int callback_id;
 
 	/* Pooling unused contexts to make context allocation cheaper */
-	std::vector<context *> unused_contexts;
+	std::list<context *> unused_contexts;
 
 	/* Active contexts, for tracing by the GC */
 	std::set<context *> active_contexts;
@@ -49,12 +49,11 @@ struct factor_vm
 	/* Is call counting enabled? */
 	bool profiling_p;
 
-	/* Global variables used to pass fault handler state from signal handler to
-	   user-space */
+	/* Global variables used to pass fault handler state from signal handler
+	to VM */
 	cell signal_number;
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
-	stack_frame *signal_callstack_top;
 
 	/* GC is off during heap walking */
 	bool gc_off;
@@ -168,15 +167,13 @@ struct factor_vm
 	void primitive_profiling();
 
 	// errors
-	void throw_error(cell error, stack_frame *stack);
-	void general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *stack);
 	void general_error(vm_error_type error, cell arg1, cell arg2);
 	void type_error(cell type, cell tagged);
 	void not_implemented_error();
-	void memory_protection_error(cell addr, stack_frame *stack);
-	void signal_error(cell signal, stack_frame *stack);
+	void memory_protection_error(cell addr);
+	void signal_error(cell signal);
 	void divide_by_zero_error();
-	void fp_trap_error(unsigned int fpu_status, stack_frame *stack);
+	void fp_trap_error(unsigned int fpu_status);
 	void primitive_unimplemented();
 	void memory_signal_handler_impl();
 	void misc_signal_handler_impl();
@@ -301,6 +298,7 @@ struct factor_vm
 
 	// gc
 	void end_gc();
+	void set_current_gc_op(gc_op op);
 	void start_gc_again();
 	void update_code_heap_for_minor_gc(std::set<code_block *> *remembered_set);
 	void collect_nursery();
@@ -464,7 +462,6 @@ struct factor_vm
 	void primitive_float_subtract();
 	void primitive_float_multiply();
 	void primitive_float_divfloat();
-	void primitive_float_mod();
 	void primitive_float_less();
 	void primitive_float_lesseq();
 	void primitive_float_greater();
@@ -589,6 +586,7 @@ struct factor_vm
 	cell frame_scan(stack_frame *frame);
 	cell frame_offset(stack_frame *frame);
 	void set_frame_offset(stack_frame *frame, cell offset);
+	void scrub_return_address();
 	void primitive_callstack_to_array();
 	stack_frame *innermost_stack_frame(callstack *stack);
 	void primitive_innermost_stack_frame_executing();
@@ -654,7 +652,10 @@ struct factor_vm
 
 	// entry points
 	void c_to_factor(cell quot);
+	template<typename Func> Func get_entry_point(cell n);
 	void unwind_native_frames(cell quot, stack_frame *to);
+	cell get_fpu_state();
+	void set_fpu_state(cell state);
 
 	// factor
 	void default_parameters(vm_parameters *p);

@@ -182,4 +182,7 @@ M: #recursive cleanup*
     [ cleanup ] change-child
     dup label>> calls>> empty? [ flatten-recursive ] when ;
 
+M: #alien-callback cleanup*
+    [ cleanup ] change-child ;
+
 M: node cleanup* ;

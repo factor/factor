@@ -1,13 +1,14 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel math math.parser namespaces make
-sequences strings splitting calendar continuations accessors vectors
-math.order hashtables byte-arrays destructors
-io io.sockets io.streams.string io.files io.timeouts
-io.pathnames io.encodings io.encodings.string io.encodings.ascii
-io.encodings.utf8 io.encodings.binary io.encodings.iana io.crlf
-io.streams.duplex fry ascii urls urls.encoding present locals
-http http.parsers http.client.post-data mime.types ;
+USING: assocs combinators.short-circuit kernel math math.parser
+namespaces make sequences strings splitting calendar
+continuations accessors vectors math.order hashtables
+byte-arrays destructors io io.sockets io.streams.string io.files
+io.timeouts io.pathnames io.encodings io.encodings.string
+io.encodings.ascii io.encodings.utf8 io.encodings.binary
+io.encodings.iana io.crlf io.streams.duplex fry ascii urls
+urls.encoding present locals http http.parsers
+http.client.post-data mime.types ;
 IN: http.client
 
 ERROR: too-many-redirects ;
@@ -21,8 +22,19 @@ ERROR: too-many-redirects ;
     [ "HTTP/" write version>> write crlf ]
     tri ;
 
+: default-port? ( url -- ? )
+    {
+        [ port>> not ]
+        [ [ port>> ] [ protocol>> protocol-port ] bi = ]
+    } 1|| ;
+
+: unparse-host ( url -- string )
+    dup default-port? [ host>> ] [
+        [ host>> ] [ port>> number>string ] bi ":" glue
+    ] if ;
+
 : set-host-header ( request header -- request header )
-    over url>> host>> "host" pick set-at ;
+    over url>> unparse-host "host" pick set-at ;
 
 : set-cookie-header ( header cookies -- header )
     unparse-cookie "cookie" pick set-at ;

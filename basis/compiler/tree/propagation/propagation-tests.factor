@@ -9,11 +9,17 @@ compiler.tree.debugger compiler.tree.checker slots.private words
 hashtables classes assocs locals specialized-arrays system
 sorting math.libm math.floats.private math.integers.private
 math.intervals quotations effects alien alien.data sets
-strings.private ;
+strings.private vocabs ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
 IN: compiler.tree.propagation.tests
+
+[ { } ] [
+    all-words [
+        "input-classes" word-prop [ class? ] all? not
+    ] filter
+] unit-test
 
 [ V{ } ] [ [ ] final-classes ] unit-test
 

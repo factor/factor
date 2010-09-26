@@ -15,12 +15,7 @@ generalizations ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
-    [ dup "winnt" = "winnt" "unix" ? ] dip
-    {
-        { "ppc" [ drop "-ppc" append ] }
-        { "x86.32" [ nip "-x86.32" append ] }
-        { "x86.64" [ nip "-x86.64" append ] }
-    } case ;
+    [ "winnt" = "winnt" "unix" ? ] dip "-" glue ;
 
 : my-arch ( -- arch )
     os name>> cpu name>> arch ;
@@ -35,7 +30,6 @@ IN: bootstrap.image
     {
         "winnt-x86.32" "unix-x86.32"
         "winnt-x86.64" "unix-x86.64"
-        "linux-ppc" "macosx-ppc"
     } ;
 
 <PRIVATE
@@ -207,6 +201,8 @@ SPECIAL-OBJECT: jit-declare-word 41
 SPECIAL-OBJECT: c-to-factor-word 42
 SPECIAL-OBJECT: lazy-jit-compile-word 43
 SPECIAL-OBJECT: unwind-native-frames-word 44
+SPECIAL-OBJECT: fpu-state-word 45
+SPECIAL-OBJECT: set-fpu-state-word 46
 
 SPECIAL-OBJECT: callback-stub 48
 
@@ -546,6 +542,8 @@ M: quotation '
     \ c-to-factor c-to-factor-word set
     \ lazy-jit-compile lazy-jit-compile-word set
     \ unwind-native-frames unwind-native-frames-word set
+    \ fpu-state fpu-state-word set
+    \ set-fpu-state set-fpu-state-word set
     undefined-def undefined-quot set ;
 
 : emit-special-objects ( -- )

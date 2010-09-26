@@ -303,12 +303,6 @@ void factor_vm::primitive_float_divfloat()
 	ctx->push(allot_float(x / y));
 }
 
-void factor_vm::primitive_float_mod()
-{
-	POP_FLOATS(x,y);
-	ctx->push(allot_float(fmod(x,y)));
-}
-
 void factor_vm::primitive_float_less()
 {
 	POP_FLOATS(x,y);

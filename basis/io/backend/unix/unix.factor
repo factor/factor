@@ -25,25 +25,25 @@ TUPLE: fd < disposable fd ;
     fd new-disposable swap >>fd ;
 
 M: fd dispose
-    dup disposed>> [ drop ] [
+    [
         {
             [ cancel-operation ]
             [ t >>disposed drop ]
             [ unregister-disposable ]
             [ fd>> close-file ]
         } cleave
-    ] if ;
+    ] unless-disposed ;
 
 M: fd handle-fd dup check-disposed fd>> ;
 
 M: fd cancel-operation ( fd -- )
-    dup disposed>> [ drop ] [
+    [
         fd>>
         mx get-global
         [ remove-input-callbacks [ t swap resume-with ] each ]
         [ remove-output-callbacks [ t swap resume-with ] each ]
         2bi
-    ] if ;
+    ] unless-disposed ;
 
 M: unix tell-handle ( handle -- n )
     fd>> 0 SEEK_CUR [ lseek ] unix-system-call [ io-error ] [ ] bi ;

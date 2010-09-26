@@ -4,7 +4,7 @@ USING: accessors assocs arrays classes combinators
 compiler.units fry generalizations sequences.generalizations
 generic kernel locals namespaces quotations sequences sets slots
 words compiler.cfg.instructions compiler.cfg.instructions.syntax
-compiler.cfg.rpo ;
+compiler.cfg.rpo compiler.cfg ;
 FROM: namespaces => set ;
 FROM: sets => members ;
 IN: compiler.cfg.def-use
@@ -91,17 +91,17 @@ SYMBOLS: defs insns ;
 : compute-defs ( cfg -- )
     H{ } clone [
         '[
-            dup instructions>> [
+            [ basic-block get ] dip [
                 _ set-def-of
             ] with each
-        ] each-basic-block
+        ] simple-analysis
     ] keep defs set ;
 
 : compute-insns ( cfg -- )
     H{ } clone [
         '[
-            instructions>> [
+            [
                 dup _ set-def-of
             ] each
-        ] each-basic-block
+        ] simple-analysis
     ] keep insns set ;

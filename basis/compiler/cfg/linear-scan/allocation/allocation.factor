@@ -62,8 +62,8 @@ M: live-interval handle
 
 M: sync-point handle ( sync-point -- )
     [ n>> deactivate-intervals ]
-    [ handle-sync-point ]
     [ n>> activate-intervals ]
+    [ handle-sync-point ]
     tri ;
 
 : smallest-heap ( heap1 heap2 -- heap )

@@ -70,7 +70,15 @@ DEFER: compile-element
     name>string [write]
     ">" [write] ;
 
+SYMBOL: string-context?
+
+ERROR: tag-not-allowed-here ;
+
+: check-tag ( -- )
+    string-context? get [ tag-not-allowed-here ] when ;
+
 : compile-tag ( tag -- )
+    check-tag
     {
         [ main>> tag-stack get push ]
         [ compile-start-tag ]
@@ -87,13 +95,20 @@ ERROR: unknown-chloe-tag tag ;
     [ unknown-chloe-tag ]
     ?if ;
 
+: compile-string ( string -- )
+    string-context? get [ escape-string ] unless [write] ;
+
+: compile-misc ( object -- )
+    check-tag
+    [ write-xml ] [code-with] ;
+
 : compile-element ( element -- )
     {
         { [ dup chloe-tag? ] [ compile-chloe-tag ] }
         { [ dup [ tag? ] [ xml? ] bi or ] [ compile-tag ] }
-        { [ dup string? ] [ escape-string [write] ] }
+        { [ dup string? ] [ compile-string ] }
         { [ dup comment? ] [ drop ] }
-        [ [ write-xml ] [code-with] ]
+        [ compile-misc ]
     } cond ;
 
 : with-compiler ( quot -- quot' )
@@ -118,8 +133,13 @@ ERROR: unknown-chloe-tag tag ;
 : process-children ( tag quot -- )
     [ [ compile-children ] compile-quot ] [ % ] bi* ; inline
 
-: compile-children>string ( tag -- )
+: compile-children>xml-string ( tag -- )
     [ with-string-writer ] process-children ;
+
+: compile-children>string ( tag -- )
+    t string-context? [
+        compile-children>xml-string
+    ] with-variable ;
 
 : compile-with-scope ( quot -- )
     compile-quot [ with-scope ] [code] ; inline

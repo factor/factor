@@ -161,13 +161,6 @@ IN: compiler.cfg.builder.tests
     { pinned-c-ptr class fixnum } \ set-alien-cell '[ _ declare _ execute ] unit-test-builder
 ] each
 
-: count-insns ( quot insn-check -- ? )
-    [ test-regs [ post-order [ instructions>> ] map concat ] map concat ] dip
-    count ; inline
-
-: contains-insn? ( quot insn-check -- ? )
-    count-insns 0 > ; inline
-
 [ t ] [ [ swap ] [ ##replace? ] contains-insn? ] unit-test
 
 [ f ] [ [ swap swap ] [ ##replace? ] contains-insn? ] unit-test

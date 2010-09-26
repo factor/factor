@@ -190,7 +190,10 @@ void factor_vm::primitive_fgetc()
 
 	int c = safe_fgetc(file);
 	if(c == EOF && feof(file))
+	{
+		clearerr(file);
 		ctx->push(false_object);
+	}
 	else
 		ctx->push(tag_fixnum(c));
 }
@@ -210,11 +213,15 @@ void factor_vm::primitive_fread()
 
 	size_t c = safe_fread(buf.untagged() + 1,1,size,file);
 	if(c == 0)
+	{
+		clearerr(file);
 		ctx->push(false_object);
+	}
 	else
 	{
 		if(feof(file))
 		{
+			clearerr(file);
 			byte_array *new_buf = allot_byte_array(c);
 			memcpy(new_buf->data<char>(), buf->data<char>(),c);
 			buf = new_buf;

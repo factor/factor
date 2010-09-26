@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions http.server
 http.server.dispatchers html.forms io.sockets
-namespaces prettyprint ;
+namespaces prettyprint kernel ;
 IN: webapps.ip
 
 TUPLE: ip-app < dispatcher ;
@@ -18,6 +18,6 @@ TUPLE: ip-app < dispatcher ;
 
 : run-ip-app ( -- )
     <ip-app> main-responder set-global
-    8080 httpd ;
+    8080 httpd drop ;
 
 MAIN: run-ip-app

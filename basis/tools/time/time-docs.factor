@@ -10,13 +10,13 @@ ARTICLE: "timing" "Timing code and collecting statistics"
 "A lower-level word puts timings on the stack, intead of printing:"
 { $subsections benchmark }
 "You can also read the system clock directly; see " { $link "system" } "."
-{ $see-also "profiling" "calendar" } ;
+{ $see-also "profiling" "tools.annotations" "calendar" } ;
 
 ABOUT: "timing"
 
 HELP: benchmark
 { $values { "quot" quotation }
-          { "runtime" "the runtime in microseconds" } }
+          { "runtime" "the runtime in nanoseconds" } }
       { $description "Runs a quotation, measuring the total wall clock time." }
 { $notes "A nicer word for interactive use is " { $link time } "." } ;
 

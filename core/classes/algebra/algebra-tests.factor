@@ -135,6 +135,14 @@ MIXIN: empty-mixin
 [ f ] [ empty-mixin class-not null class<= ] unit-test
 [ f ] [ empty-mixin null class<= ] unit-test
 
+[ t ] [ empty-mixin class-not object class<= ] unit-test
+[ t ] [ empty-mixin object class<= ] unit-test
+
+[ t ] [ empty-mixin class-not object class<= ] unit-test
+[ t ] [ empty-mixin object class<= ] unit-test
+
+[ t ] [ object empty-mixin class-not class<= ] unit-test
+
 [ t ] [ array sequence vector class-not class-and class<= ] unit-test
 [ f ] [ vector sequence vector class-not class-and class<= ] unit-test
 
@@ -156,35 +164,52 @@ MIXIN: empty-mixin
 
 [ t ] [ vector array class-not vector class-and* ] unit-test
 
+[ object ] [ object empty-mixin class-not class-and ] unit-test
+[ object ] [ empty-mixin class-not object class-and ] unit-test
+
 ! class-or
 : class-or* ( cls1 cls2 cls3 -- ? ) [ class-or ] dip class= ;
 
 [ t ] [ \ f class-not \ f      object class-or*  ] unit-test
+
+[ object ] [ object empty-mixin class-not class-or ] unit-test
+[ object ] [ empty-mixin class-not object class-or ] unit-test
 
 ! class-not
 [ vector ] [ vector class-not class-not ] unit-test
 
 ! classes-intersect?
 [ t ] [ both tuple classes-intersect? ] unit-test
+[ t ] [ tuple both classes-intersect? ] unit-test
 
 [ f ] [ vector virtual-sequence classes-intersect? ] unit-test
+[ f ] [ virtual-sequence vector classes-intersect? ] unit-test
 
 [ t ] [ number vector class-or sequence classes-intersect? ] unit-test
+[ t ] [ sequence number vector class-or classes-intersect? ] unit-test
 
 [ f ] [ number vector class-and sequence classes-intersect? ] unit-test
+[ f ] [ sequence number vector class-and classes-intersect? ] unit-test
 
 [ f ] [ y1 z1 class-and x1 classes-intersect? ] unit-test
+[ f ] [ x1 y1 z1 class-and classes-intersect? ] unit-test
 
 [ f ] [ a1 c1 class-or b1 c1 class-or class-and a1 b1 class-or classes-intersect? ] unit-test
+[ f ] [ a1 b1 class-or a1 c1 class-or b1 c1 class-or class-and classes-intersect? ] unit-test
 
 [ f ] [ integer integer class-not classes-intersect? ] unit-test
+[ f ] [ integer class-not integer classes-intersect? ] unit-test
 
 [ f ] [ fixnum class-not number class-and array classes-intersect? ] unit-test
+[ f ] [ array fixnum class-not number class-and classes-intersect? ] unit-test
 
 [ t ] [ \ word generic-class classes-intersect? ] unit-test
+[ t ] [ generic-class \ word classes-intersect? ] unit-test
 [ f ] [ number generic-class classes-intersect? ] unit-test
+[ f ] [ generic-class number classes-intersect? ] unit-test
 
 [ f ] [ sa sb classes-intersect? ] unit-test
+[ f ] [ sb sa classes-intersect? ] unit-test
 
 [ t ] [ a union-with-one-member classes-intersect? ] unit-test
 [ f ] [ fixnum union-with-one-member classes-intersect? ] unit-test
@@ -202,7 +227,9 @@ MIXIN: empty-mixin
 [ f ] [ mixin-with-one-member fixnum classes-intersect? ] unit-test
 [ t ] [ mixin-with-one-member object classes-intersect? ] unit-test
 
-! class=
+[ f ] [ null object classes-intersect? ] unit-test
+[ f ] [ object null classes-intersect? ] unit-test
+
 [ t ] [ null class-not object class= ] unit-test
 
 [ t ] [ object class-not null class= ] unit-test

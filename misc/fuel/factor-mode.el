@@ -1,6 +1,6 @@
 ;;; factor-mode.el -- mode for editing Factor source
 
-;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -271,7 +271,6 @@ With prefix, non-existing files will be created."
     (define-key map [?\]] 'factor-mode--insert-and-indent)
     (define-key map [?}] 'factor-mode--insert-and-indent)
     (define-key map "\C-m" 'newline-and-indent)
-    (define-key map "\C-co" 'factor-mode-visit-other-file)
     (define-key map "\C-c\C-o" 'factor-mode-visit-other-file)
     map))
 

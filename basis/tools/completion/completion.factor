@@ -1,9 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel arrays sequences math namespaces strings io
-fry vectors words assocs combinators sorting unicode.case
-unicode.categories math.order vocabs vocabs.hierarchy unicode.data
-locals ;
+
+USING: accessors arrays assocs combinators fry io kernel locals
+make math math.order namespaces sequences sorting strings
+unicode.case unicode.categories unicode.data vectors vocabs
+vocabs.hierarchy words ;
+
 IN: tools.completion
 
 :: (fuzzy) ( accum i full ch -- accum i full ? )
@@ -64,9 +66,14 @@ IN: tools.completion
 : completion ( short candidate -- result )
     [ second >lower swap complete ] keep 2array ;
 
+: completion, ( short candidate -- )
+    completion dup first 0 > [ , ] [ drop ] if ;
+
 : completions ( short candidates -- seq )
-    [ ] [ [ >lower ] dip [ completion ] with map rank-completions ]
-    bi-curry if-empty ;
+    [ ] [
+        [ >lower ] dip [ [ completion, ] with each ] { } make
+        rank-completions
+    ] bi-curry if-empty ;
 
 : name-completions ( str seq -- seq' )
     [ dup name>> ] { } map>assoc completions ;
@@ -79,3 +86,4 @@ IN: tools.completion
 
 : chars-matching ( str -- seq )
     name-map keys dup zip completions ;
+

@@ -39,7 +39,7 @@ HOOK: <secure-context> secure-socket-backend ( config -- context )
         with-disposal
     ] with-scope ; inline
 
-TUPLE: secure addrspec ;
+TUPLE: secure { addrspec read-only } ;
 
 C: <secure> secure
 

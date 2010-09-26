@@ -38,12 +38,13 @@ TUPLE: mdb-insert-msg < mdb-msg
 
 TUPLE: mdb-update-msg < mdb-msg
     { collection string }
-    { upsert? integer initial: 0 }
+    { update-flags integer initial: 0 }
     { selector assoc }
     { object assoc } ;
 
 TUPLE: mdb-delete-msg < mdb-msg
     { collection string }
+    { delete-flags integer initial: 0 }
     { selector assoc } ;
 
 TUPLE: mdb-getmore-msg < mdb-msg

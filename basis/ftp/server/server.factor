@@ -1,14 +1,14 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs byte-arrays calendar classes combinators
+USING: accessors calendar calendar.format classes combinators
 combinators.short-circuit concurrency.promises continuations
-destructors ftp io io.backend io.directories io.encodings
-io.encodings.binary tools.files io.encodings.utf8 io.files
-io.files.info io.pathnames io.servers.connection io.sockets
-io.streams.duplex io.streams.string io.timeouts kernel make math
-math.bitwise math.parser namespaces sequences splitting threads
-unicode.case logging calendar.format strings io.files.links
-io.files.types io.encodings.8-bit.latin1 simple-tokenizer ;
+destructors ftp io io.directories io.encodings
+io.encodings.8-bit.latin1 io.encodings.binary io.encodings.utf8
+io.files io.files.info io.files.types io.pathnames
+io.servers.connection io.sockets io.streams.string io.timeouts
+kernel logging math math.bitwise math.parser namespaces
+sequences simple-tokenizer splitting strings threads
+tools.files unicode.case ;
 IN: ftp.server
 
 SYMBOL: server
@@ -48,6 +48,17 @@ C: <ftp-disconnect> ftp-disconnect
     [ n>> ] [ strings>> ] bi
     [ but-last-slice [ "-" (send-response) ] with each ]
     [ first " " (send-response) ] 2bi ;
+
+: make-path-relative? ( path -- ? )
+    {
+        [ absolute-path? ]
+        [ drop server get serving-directory>> ]
+    } 1&& ;
+
+: fixup-relative-path ( string -- string' )
+    dup make-path-relative? [
+        [ server get serving-directory>> ] dip append-relative-path
+    ] when ;
 
 : server-response ( string n -- )
     2dup number>string swap ":" glue \ server-response DEBUG log-message
@@ -115,14 +126,18 @@ ERROR: type-error type ;
     ] recover ;
 
 : random-local-server ( -- server )
-    remote-address get class new 0 >>port binary <server> ;
+    remote-address get class new binary <server> ;
 
 : port>bytes ( port -- hi lo )
     [ -8 shift ] keep [ 8 bits ] bi@ ;
 
+: display-directory ( -- string )
+    current-directory get server get serving-directory>> swap ?head drop
+    [ "/" ] when-empty ;
+
 : handle-PWD ( obj -- )
     drop
-    current-directory get "\"" dup surround 257 server-response ;
+    display-directory get "\"" dup surround 257 server-response ;
 
 : handle-SYST ( obj -- )
     drop
@@ -167,8 +182,9 @@ GENERIC: handle-passive-command ( stream obj -- )
 M: ftp-list handle-passive-command ( stream obj -- )
     drop
     start-directory [
-        utf8 encode-output
-        [ current-directory get directory. ] with-string-writer string-lines
+        utf8 encode-output [
+            current-directory get directory.
+        ] with-string-writer string-lines
         harvest [ ftp-send ] each
     ] with-output-stream finish-directory ;
 
@@ -225,6 +241,7 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
 
 : handle-RETR ( obj -- )
     tokenized>> second
+    fixup-relative-path
     dup can-serve-file? [
         <ftp-get> fulfill-client
     ] [
@@ -261,6 +278,7 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
 
 : handle-MDTM ( obj -- )
     tokenized>> 1 swap ?nth [
+        fixup-relative-path
         dup file-info dup directory? [
             drop not-a-plain-file
         ] [
@@ -283,6 +301,7 @@ ERROR: no-directory-permissions ;
 
 : handle-CWD ( obj -- )
     tokenized>> 1 swap ?nth [
+        fixup-relative-path
         dup can-serve-directory? [
             set-current-directory
             directory-change-success
@@ -346,11 +365,9 @@ M: ftp-server handle-client* ( server -- )
         "ftp.server" >>name
         5 minutes >>timeout ;
 
-: ftpd ( directory port -- )
+: ftpd ( directory port -- server )
     <ftp-server> start-server ;
 
-: ftpd-main ( path -- ) 2100 ftpd ;
-
-MAIN: ftpd-main
-
 ! sudo tcpdump -i en1 -A -s 10000  tcp port 21
+! [2010-09-04T22:07:58-05:00] DEBUG server-response: 500:Unrecognized command: EPRT |2|0:0:0:0:0:0:0:1|59359|
+

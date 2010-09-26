@@ -57,6 +57,7 @@ UNION: slot-insn
 UNION: memory-insn
     ##load-memory ##load-memory-imm
     ##store-memory ##store-memory-imm
+    ##write-barrier ##write-barrier-imm
     alien-call-insn
     slot-insn ;
 
