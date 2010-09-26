@@ -171,18 +171,20 @@ M: clobber-insn compute-sync-points*
 M: insn compute-sync-points* drop ;
 
 : compute-live-intervals-step ( bb -- )
-    {
-        [ block-from from set ]
-        [ block-to to set ]
-        [ handle-live-out ]
-        [
-            instructions>> <reversed> [
-                [ compute-live-intervals* ]
-                [ compute-sync-points* ]
-                bi
-            ] each
-        ]
-    } cleave ;
+    dup kill-block?>> [ drop ] [
+        {
+            [ block-from from set ]
+            [ block-to to set ]
+            [ handle-live-out ]
+            [
+                instructions>> <reversed> [
+                    [ compute-live-intervals* ]
+                    [ compute-sync-points* ]
+                    bi
+                ] each
+            ]
+        } cleave
+    ] if ;
 
 : init-live-intervals ( -- )
     H{ } clone live-intervals set

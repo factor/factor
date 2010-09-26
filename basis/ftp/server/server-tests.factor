@@ -1,12 +1,12 @@
 USING: calendar ftp.server io.encodings.ascii io.files
 io.files.unique namespaces threads tools.test kernel
 io.servers.connection ftp.client accessors urls
-io.pathnames io.directories sequences fry io.backend ;
+io.pathnames io.directories sequences fry io.backend
+continuations ;
 FROM: ftp.client => ftp-get ;
 IN: ftp.server.tests
 
-: test-file-contents ( -- string )
-    "Files are so boring anymore." ;
+CONSTANT: test-file-contents "Files are so boring anymore."
 
 : create-test-file ( -- path )
     test-file-contents
@@ -15,28 +15,24 @@ IN: ftp.server.tests
 
 : test-ftp-server ( quot -- )
     '[
-        current-temporary-directory get 0
-        <ftp-server>
-        [ start-server* ]
-        [
-            sockets>> first addr>> port>>
+        current-temporary-directory get
+        0 <ftp-server> [
+            insecure-port
             <url>
                 swap >>port
                 "ftp" >>protocol
                 "localhost" >>host
                 create-test-file >>path
-                _ call
-        ]
-        [ stop-server ] tri
-    ] with-unique-directory drop ; inline
+                @
+        ] with-threaded-server
+    ] cleanup-unique-directory ; inline
 
 [ t ]
 [
-    
     [
-        unique-directory [
+        [
             [ ftp-get ] [ path>> file-name ascii file-contents ] bi
-        ] with-directory
+        ] cleanup-unique-working-directory
     ] test-ftp-server test-file-contents =
 ] unit-test
 
@@ -44,8 +40,8 @@ IN: ftp.server.tests
     
     [
         "/" >>path
-        unique-directory [
+        [
             [ ftp-get ] [ path>> file-name ascii file-contents ] bi
-        ] with-directory
+        ] cleanup-unique-working-directory
     ] test-ftp-server test-file-contents =
 ] must-fail

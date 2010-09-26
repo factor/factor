@@ -190,7 +190,9 @@ void factor_vm::update_code_roots_for_compaction()
 /* Compact data and code heaps */
 void factor_vm::collect_compact_impl(bool trace_contexts_p)
 {
-	current_gc->event->started_compaction();
+	gc_event *event = current_gc->event;
+
+	if(event) event->started_compaction();
 
 	tenured_space *tenured = data->tenured;
 	mark_bits<object> *data_forwarding_map = &tenured->state;
@@ -232,7 +234,7 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 	update_code_roots_for_compaction();
 	callbacks->update();
 
-	current_gc->event->ended_compaction();
+	if(event) event->ended_compaction();
 }
 
 struct code_compaction_fixup {

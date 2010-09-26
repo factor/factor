@@ -23,7 +23,7 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->callstack_size = 128 * sizeof(cell);
 #endif
 
-	p->code_size = 8 * sizeof(cell);
+	p->code_size = 64;
 	p->young_size = sizeof(cell) / 4;
 	p->aging_size = sizeof(cell) / 2;
 	p->tenured_size = 24 * sizeof(cell);

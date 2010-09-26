@@ -319,10 +319,9 @@ generic-comparison-ops [
     ] [ 2drop object-info ] if
 ] "outputs" set-word-prop
 
-{ facos fasin fatan fatan2 fcos fsin ftan fcosh fsinh ftanh fexp
-flog fpow fsqrt facosh fasinh fatanh } [
-    { float } "default-output-classes" set-word-prop
-] each
+! Unlike the other words in math.libm, fsqrt is not inline
+! since it has an intrinsic, so we need to give it outputs here.
+\ fsqrt { float } "default-output-classes" set-word-prop
 
 ! Find a less repetitive way of doing this
 \ float-min { float float } "input-classes" set-word-prop

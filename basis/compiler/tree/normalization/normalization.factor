@@ -109,8 +109,13 @@ M: #call-recursive normalize*
 M: node normalize* ;
 
 : normalize ( nodes -- nodes' )
-    dup count-introductions make-values
-    H{ } clone rename-map set
-    [ (normalize) ] [ nip ] 2bi
-    [ #introduce prefix ] unless-empty
-    rename-node-values ;
+    [
+        dup count-introductions make-values
+        H{ } clone rename-map set
+        [ (normalize) ] [ nip ] 2bi
+        [ #introduce prefix ] unless-empty
+        rename-node-values
+    ] with-scope ;
+
+M: #alien-callback normalize*
+    [ normalize ] change-child ;

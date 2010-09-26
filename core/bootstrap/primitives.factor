@@ -22,9 +22,6 @@ architecture get {
     { "unix-x86.32" "x86/32/unix" }
     { "winnt-x86.64" "x86/64/winnt" }
     { "unix-x86.64" "x86/64/unix" }
-    { "linux-ppc" "ppc/linux" }
-    { "macosx-ppc" "ppc/macosx" }
-    { "arm" "arm" }
 } ?at [ "Bad architecture: " prepend throw ] unless
 "vocab:cpu/" "/bootstrap.factor" surround parse-file
 
@@ -343,6 +340,8 @@ tuple
     { "tag" "kernel.private" (( object -- n )) }
     { "(execute)" "kernel.private" (( word -- )) }
     { "(call)" "kernel.private" (( quot -- )) }
+    { "fpu-state" "kernel.private" (( -- )) }
+    { "set-fpu-state" "kernel.private" (( -- )) }
     { "unwind-native-frames" "kernel.private" (( -- )) }
     { "set-callstack" "kernel.private" (( callstack -- * )) }
     { "lazy-jit-compile" "kernel.private" (( -- )) }
@@ -501,7 +500,6 @@ tuple
     { "float*" "math.private" "primitive_float_multiply" (( x y -- z )) }
     { "float+" "math.private" "primitive_float_add" (( x y -- z )) }
     { "float-" "math.private" "primitive_float_subtract" (( x y -- z )) }
-    { "float-mod" "math.private" "primitive_float_mod" (( x y -- z )) }
     { "float-u<" "math.private" "primitive_float_less" (( x y -- ? )) }
     { "float-u<=" "math.private" "primitive_float_lesseq" (( x y -- ? )) }
     { "float-u>" "math.private" "primitive_float_greater" (( x y -- ? )) }

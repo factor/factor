@@ -62,9 +62,6 @@ IN: bootstrap.x86
     ds-reg ctx-reg context-datastack-offset [+] MOV
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
-: jit-scrub-return ( n -- )
-    RSP swap [+] 0 MOV ;
-
 [
     ! ctx-reg is preserved across the call because it is non-volatile
     ! in the C ABI
@@ -102,15 +99,8 @@ IN: bootstrap.x86
 \ (call) define-combinator-primitive
 
 [
-    ! Clear x87 stack, but preserve rounding mode and exception flags
-    RSP 2 SUB
-    RSP [] FNSTCW
-    FNINIT
-    RSP [] FLDCW
-
     ! Unwind stack frames
     RSP arg2 MOV
-    0 jit-scrub-return
 
     ! Load VM pointer into vm-reg, since we're entering from
     ! C code
@@ -123,6 +113,21 @@ IN: bootstrap.x86
     ! Call quotation
     jit-jump-quot
 ] \ unwind-native-frames define-sub-primitive
+
+[
+    RSP 2 SUB
+    RSP [] FNSTCW
+    FNINIT
+    AX RSP [] MOV
+    RSP 2 ADD
+] \ fpu-state define-sub-primitive
+
+[
+    RSP 2 SUB
+    RSP [] arg1 16-bit-version-of MOV
+    RSP [] FLDCW
+    RSP 2 ADD
+] \ set-fpu-state define-sub-primitive
 
 [
     ! Load callstack object
@@ -228,10 +233,9 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
-    -8 jit-scrub-return
-
-    ! Save ds, rs registers
-    jit-save-context
+    ! Reset return value since its bogus right now, to avoid
+    ! confusing the GC
+    RSP -8 [+] 0 MOV
 
     ! Make the new context the current one
     ctx-reg swap MOV
@@ -257,6 +261,7 @@ IN: bootstrap.x86
 
 : jit-set-context ( -- )
     jit-pop-context-and-param
+    jit-save-context
     arg1 jit-switch-context
     RSP 8 ADD
     jit-push-param ;
@@ -269,16 +274,17 @@ IN: bootstrap.x86
     ds-reg 16 SUB ;
 
 : jit-start-context ( -- )
-    ! Create the new context in return-reg
+    ! Create the new context in return-reg. Have to save context
+    ! twice, first before calling new_context() which may GC,
+    ! and again after popping the two parameters from the stack.
+    jit-save-context
     arg1 vm-reg MOV
     "new_context" jit-call
 
     jit-pop-quot-and-param
-
+    jit-save-context
     return-reg jit-switch-context
-
     jit-push-param
-
     jit-jump-quot ;
 
 [ jit-start-context ] \ (start-context) define-sub-primitive
@@ -294,7 +300,17 @@ IN: bootstrap.x86
     jit-set-context
 ] \ (set-context-and-delete) define-sub-primitive
 
+: jit-start-context-and-delete ( -- )
+    jit-load-context
+    arg1 vm-reg MOV
+    arg2 ctx-reg MOV
+    "reset_context" jit-call
+
+    jit-pop-quot-and-param
+    ctx-reg jit-switch-context
+    jit-push-param
+    jit-jump-quot ;
+
 [
-    jit-delete-current-context
-    jit-start-context
+    jit-start-context-and-delete
 ] \ (start-context-and-delete) define-sub-primitive

@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax io kernel namespaces core-foundation
-core-foundation.strings cocoa.messages cocoa cocoa.classes
-cocoa.runtime sequences init summary kernel.private
-assocs ;
+USING: alien alien.c-types alien.syntax io kernel namespaces
+core-foundation core-foundation.strings cocoa.messages cocoa
+cocoa.classes cocoa.runtime sequences init summary
+kernel.private assocs ;
 IN: cocoa.application
 
 : <NSString> ( str -- alien ) <CFString> -> autorelease ;

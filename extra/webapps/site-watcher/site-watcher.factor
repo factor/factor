@@ -90,4 +90,4 @@ M: site-watcher-app init-user-profile
 : start-site-watcher ( -- )
     init-db
     site-watcher-db run-site-watcher
-    <site-watcher-server> start-server ;
+    <site-watcher-server> start-server drop ;

@@ -154,10 +154,11 @@ TUPLE: #alien-assembly < #alien-node in-d out-d ;
 : #alien-assembly ( params -- node )
     \ #alien-assembly new-alien-node ;
 
-TUPLE: #alien-callback < node params ;
+TUPLE: #alien-callback < node params child ;
 
-: #alien-callback ( params -- node )
+: #alien-callback ( params child -- node )
     \ #alien-callback new
+        swap >>child
         swap >>params ;
 
 : node, ( node -- ) stack-visitor get push ;

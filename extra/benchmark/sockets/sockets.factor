@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math threads io io.sockets
 io.encodings.ascii io.streams.duplex debugger tools.time
@@ -7,13 +7,14 @@ namespaces arrays continuations destructors ;
 IN: benchmark.sockets
 
 SYMBOL: counter
-SYMBOL: port-promise
+SYMBOL: server-promise
 SYMBOL: server
+SYMBOL: port
 
 CONSTANT: number-of-requests 1000
 
 : server-addr ( -- addr )
-    "127.0.0.1" port-promise get ?promise <inet4> ;
+    "127.0.0.1" port get <inet4> ;
 
 : server-loop ( server -- )
     dup accept drop [
@@ -28,13 +29,8 @@ CONSTANT: number-of-requests 1000
     ] curry "Client handler" spawn drop server-loop ;
 
 : simple-server ( -- )
-    [
-        "127.0.0.1" 0 <inet4> ascii <server>
-        [ server set ]
-        [ addr>> port>> port-promise get fulfill ]
-        [ [ server-loop ] with-disposal ]
-        tri
-    ] ignore-errors ;
+    [ server get [ server-loop ] with-disposal ] ignore-errors
+    t server-promise get fulfill ;
 
 : simple-client ( -- )
     [
@@ -53,14 +49,17 @@ CONSTANT: number-of-requests 1000
 
 : clients ( n -- )
     dup pprint " clients: " write [
-        <promise> port-promise set
+        <promise> server-promise set
         dup <count-down> counter set
+        "127.0.0.1" 0 <inet4> ascii <server>
+        [ server set ] [ addr>> port>> port set ] bi
+
         [ simple-server ] "Simple server" spawn drop
-        yield yield
-        [ [ simple-client ] "Simple client" spawn drop ] times
+        [ yield [ simple-client ] "Simple client" spawn drop ] times
+
         counter get await
         stop-server
-        yield yield
+        server-promise get ?promise drop
     ] benchmark . flush ;
 
 : socket-benchmarks ( -- )

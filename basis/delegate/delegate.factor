@@ -4,7 +4,7 @@
 USING: accessors arrays assocs classes.tuple definitions effects generic
 generic.standard hashtables kernel lexer math parser
 generic.parser sequences sets slots words words.symbol fry
-compiler.units ;
+compiler.units make ;
 IN: delegate
 
 ERROR: broadcast-words-must-have-no-outputs group ;
@@ -22,13 +22,16 @@ GENERIC: group-words ( group -- words )
 M: standard-generic group-words
     dup "combination" word-prop #>> 2array 1array ;
 
-: slot-group-words ( slots -- words )
+: slot-words, ( slot-spec -- )
+    [ name>> reader-word 0 2array , ]
     [
-        name>>
-        [ reader-word 0 2array ]
-        [ writer-word 0 2array ] bi
-        2array
-    ] map concat ;
+        dup read-only>> [ drop ] [
+            name>> writer-word 0 2array ,
+        ] if
+    ] bi ;
+
+: slot-group-words ( slots -- words )
+    [ [ slot-words, ] each ] { } make ;
 
 M: tuple-class group-words
     all-slots slot-group-words ;

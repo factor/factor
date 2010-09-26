@@ -1,7 +1,8 @@
+USING: accessors calendar concurrency.promises fry io
+io.encodings.ascii io.servers.connection
+io.servers.connection.private io.sockets kernel namespaces
+sequences threads tools.test ;
 IN: io.servers.connection
-USING: tools.test io.servers.connection io.sockets namespaces
-io.servers.connection.private kernel accessors sequences
-concurrency.promises io.encodings.ascii io threads calendar ;
 
 [ t ] [ ascii <threaded-server> listen-on empty? ] unit-test
 
@@ -27,12 +28,19 @@ concurrency.promises io.encodings.ascii io threads calendar ;
     init-server semaphore>> count>> 
 ] unit-test
 
-[ ] [
+[ "Hello world." ] [
     ascii <threaded-server>
         5 >>max-connections
         0 >>insecure
         [ "Hello world." write stop-this-server ] >>handler
-    dup start-server* sockets>> first addr>> port>> "port" set
+    [
+        "localhost" insecure-port <inet> ascii <client> drop stream-contents
+    ] with-threaded-server
 ] unit-test
 
-[ "Hello world." ] [ "localhost" "port" get <inet> ascii <client> drop stream-contents ] unit-test
+[ ] [
+    ascii <threaded-server>
+        5 >>max-connections
+        0 >>insecure
+    start-server [ '[ _ wait-for-server ] in-thread ] [ stop-server ] bi
+] unit-test

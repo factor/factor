@@ -22,15 +22,24 @@ GENERIC: <c-array> ( len c-type -- array )
 M: word <c-array>
     c-array-constructor execute( len -- array ) ; inline
 
+M: pointer <c-array>
+    drop void* <c-array> ;
+
 GENERIC: (c-array) ( len c-type -- array )
 
 M: word (c-array)
     c-(array)-constructor execute( len -- array ) ; inline
 
+M: pointer (c-array)
+    drop void* (c-array) ;
+
 GENERIC: <c-direct-array> ( alien len c-type -- array )
 
 M: word <c-direct-array>
     c-direct-array-constructor execute( alien len -- array ) ; inline
+
+M: pointer <c-direct-array>
+    drop void* <c-direct-array> ;
 
 : malloc-array ( n type -- array )
     [ heap-size calloc ] [ <c-direct-array> ] 2bi ; inline
@@ -43,12 +52,6 @@ M: word <c-direct-array>
 
 : (c-object) ( type -- array )
     heap-size (byte-array) ; inline
-
-: malloc-object ( type -- alien )
-    1 swap heap-size calloc ; inline
-
-: (malloc-object) ( type -- alien )
-    heap-size malloc ; inline
 
 : malloc-byte-array ( byte-array -- alien )
     binary-object [ nip malloc dup ] 2keep memcpy ;

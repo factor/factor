@@ -157,7 +157,7 @@ CONSULT: c-type-protocol c-type-name
     c-type ;
 
 PREDICATE: typedef-word < c-type-word
-    "c-type" word-prop c-type-name? ;
+    "c-type" word-prop [ c-type-name? ] [ array? ] bi or ;
 
 : typedef ( old new -- )
     {

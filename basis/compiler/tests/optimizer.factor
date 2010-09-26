@@ -5,7 +5,8 @@ quotations classes classes.algebra classes.tuple.private
 continuations growable namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
 compiler.test definitions generic.single shuffle math.order
-compiler.cfg.debugger classes.struct alien.syntax alien.data ;
+compiler.cfg.debugger classes.struct alien.syntax alien.data
+alien.c-types ;
 IN: compiler.tests.optimizer
 
 GENERIC: xyz ( obj -- obj )
@@ -290,6 +291,9 @@ PREDICATE: list < improper-list
     T{ cons f 1 T{ cons f 2 T{ cons f 3 f } } }
     [ list instance? ] compile-call
 ] unit-test
+
+! <tuple> type function bustage
+[ T{ cons } 7 ] [ cons tuple-layout [ [ <tuple> ] [ length ] bi ] compile-call ] unit-test
 
 ! Regression
 : interval-inference-bug ( obj -- obj x )

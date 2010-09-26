@@ -10,13 +10,17 @@ CONSTANT: url URL" http://factorcode.org/images/latest/"
     url "checksums.txt" >url derive-url http-get nip
     string-lines [ " " split1 ] { } map>assoc ;
 
+: file-checksum ( image -- checksum )
+    md5 checksum-file hex-string ;
+
+: download-checksum ( image -- checksum )
+    download-checksums at ;
+
 : need-new-image? ( image -- ? )
     dup exists?
-    [
-        [ md5 checksum-file hex-string ]
-        [ download-checksums at ]
-        bi = not
-    ] [ drop t ] if ;
+    [ [ file-checksum ] [ download-checksum ] bi = not ]
+    [ drop t ]
+    if ;
 
 : verify-image ( image -- )
     need-new-image? [ "Boot image corrupt" throw ] when ;

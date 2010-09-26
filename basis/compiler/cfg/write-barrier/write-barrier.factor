@@ -6,23 +6,39 @@ sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.write-barrier
 
+! This pass must run after GC check insertion and scheduling.
+
 SYMBOL: fresh-allocations
 
 SYMBOL: mutated-objects
 
+SYMBOL: copies
+
+: resolve-copy ( src -- dst )
+    copies get ?at drop ;
+
 GENERIC: eliminate-write-barrier ( insn -- ? )
 
+: fresh-allocation ( vreg -- )
+    fresh-allocations get conjoin ;
+
 M: ##allot eliminate-write-barrier
-    dst>> fresh-allocations get conjoin t ;
+    dst>> fresh-allocation t ;
+
+: mutated-object ( vreg -- )
+    resolve-copy mutated-objects get conjoin ;
 
 M: ##set-slot eliminate-write-barrier
-    obj>> mutated-objects get conjoin t ;
+    obj>> mutated-object t ;
 
 M: ##set-slot-imm eliminate-write-barrier
-    obj>> mutated-objects get conjoin t ;
+    obj>> mutated-object t ;
 
 : needs-write-barrier? ( insn -- ? )
-    { [ fresh-allocations get key? not ] [ mutated-objects get key? ] } 1&& ;
+    resolve-copy {
+        [ fresh-allocations get key? not ]
+        [ mutated-objects get key? ]
+    } 1&& ;
 
 M: ##write-barrier eliminate-write-barrier
     src>> needs-write-barrier? ;
@@ -30,14 +46,18 @@ M: ##write-barrier eliminate-write-barrier
 M: ##write-barrier-imm eliminate-write-barrier
     src>> needs-write-barrier? ;
 
+M: gc-map-insn eliminate-write-barrier
+    fresh-allocations get clear-assoc ;
+
 M: ##copy eliminate-write-barrier
-    "Run copy propagation first" throw ;
+    [ src>> resolve-copy ] [ dst>> ] bi copies get set-at t ;
 
 M: insn eliminate-write-barrier drop t ;
 
 : write-barriers-step ( insns -- insns' )
     H{ } clone fresh-allocations set
     H{ } clone mutated-objects set
+    H{ } clone copies set
     [ eliminate-write-barrier ] filter! ;
 
 : eliminate-write-barriers ( cfg -- cfg )

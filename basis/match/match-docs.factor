@@ -17,7 +17,7 @@ HELP: match-cond
 { $values { "assoc" "a sequence of pairs" } }
 { $description "Calls the second quotation in the first pair whose first sequence yields a successful " { $link match } " against the top of the stack. The second quotation, when called, has the hashtable returned from the " { $link match } " call bound as the top namespace so " { $link get } " can be used to retrieve the values. To have a fallthrough match clause use the '_' match variable." } 
 { $examples 
-    { $code "USE: match" "MATCH-VARS: ?value ;\n{ increment ?value } {\n  { { increment ?value } [ ?value do-something ] }\n  { { decrement ?value } [ ?value do-something-else ] }\n  { _ [ no-match-found ] }\n} match-cond" }
+    { $code "USE: match" "MATCH-VARS: ?value ;\n{ increment 346126 } {\n  { { increment ?value } [ ?value do-something ] }\n  { { decrement ?value } [ ?value do-something-else ] }\n  { _ [ no-match-found ] }\n} match-cond" }
 }
 { $see-also match POSTPONE: MATCH-VARS: replace-patterns match-replace } ;
 
@@ -27,7 +27,7 @@ HELP: MATCH-VARS:
 { $values { "var" "a match variable name beginning with '?'" } }
 { $description "Creates a symbol that can be used in " { $link match } " and " { $link match-cond } " for binding values in the matched sequence. The symbol name is created as a word that is defined to get the value of the symbol out of the current namespace. This can be used in " { $link match-cond } " to retrive the values in the quotation body." }
 { $examples 
-    { $code "USE: match" "MATCH-VARS: ?value ;\n{ increment ?value } {\n  { { increment ?value } [ ?value do-something ] }\n  { { decrement ?value } [ ?value do-something-else ] }\n  { _ [ no-match-found ] }\n} match-cond" }
+    { $code "USE: match" "MATCH-VARS: ?value ;\n{ increment 346126 } {\n  { { increment ?value } [ ?value do-something ] }\n  { { decrement ?value } [ ?value do-something-else ] }\n  { _ [ no-match-found ] }\n} match-cond" }
 }
 { $see-also match match-cond replace-patterns match-replace } ;
 

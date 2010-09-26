@@ -1,5 +1,5 @@
 USING: tools.test namespaces assocs alien.syntax kernel
-compiler.errors accessors alien ;
+compiler.errors accessors alien alien.c-types ;
 FROM: alien.libraries => add-library ;
 IN: compiler.tests.linkage-errors
 

@@ -12,21 +12,29 @@ SYMBOL: current-library
 : parse-c-type-name ( name -- word )
     dup search [ ] [ no-word ] ?if ;
 
-: parse-array-type ( name -- dims c-type )
+DEFER: (parse-c-type)
+
+ERROR: bad-array-type ;
+
+: parse-array-type ( name -- c-type )
     "[" split unclip
-    [ [ "]" ?tail drop parse-word ] map ] dip ;
+    [ [ "]" ?tail [ bad-array-type ] unless parse-word ] map ]
+    [ (parse-c-type) ]
+    bi* prefix ;
 
 : (parse-c-type) ( string -- type )
     {
-        { [ dup "void" =         ] [ drop void ] }
-        { [ CHAR: ] over member? ] [ parse-array-type parse-c-type-name prefix ] }
-        { [ "*" ?tail            ] [ (parse-c-type) <pointer> ] }
-        { [ dup search           ] [ parse-c-type-name ] }
+        { [ "*" ?tail ] [ (parse-c-type) <pointer> ] }
+        { [ CHAR: ] over member? ] [ parse-array-type ] }
+        { [ dup search ] [ parse-c-type-name ] }
         [ dup search [ ] [ no-word ] ?if ]
     } cond ;
 
+: c-array? ( c-type -- ? )
+    { [ array? ] [ first { [ c-type-word? ] [ pointer? ] } 1|| ] } 1&& ;
+
 : valid-c-type? ( c-type -- ? )
-    { [ array? ] [ c-type-word? ] [ pointer? ] [ void? ] } 1|| ;
+    { [ c-array? ] [ c-type-word? ] [ pointer? ] [ void? ] } 1|| ;
 
 : parse-c-type ( string -- type )
     (parse-c-type) dup valid-c-type? [ no-c-type ] unless ;

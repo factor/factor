@@ -228,6 +228,8 @@ void factor_vm::dump_generation(const char *name, Generation *gen)
 
 void factor_vm::dump_generations()
 {
+	std::cout << std::hex;
+
 	dump_generation("Nursery",&nursery);
 	dump_generation("Aging",data->aging);
 	dump_generation("Tenured",data->tenured);
@@ -235,6 +237,8 @@ void factor_vm::dump_generations()
 	std::cout << "Cards:";
 	std::cout << "base=" << (cell)data->cards << ", ";
 	std::cout << "size=" << (cell)(data->cards_end - data->cards) << std::endl;
+
+	std::cout << std::dec;
 }
 
 struct object_dumper {
@@ -377,9 +381,10 @@ void factor_vm::factorbug()
 		char cmd[1024];
 
 		std::cout << "READY\n";
-		fflush(stdout);
+		std::cout.flush();
 
-		if(scanf("%1000s",cmd) <= 0)
+		std::cin >> std::setw(1024) >> cmd >> std::setw(0); 
+		if(!std::cin.good())
 		{
 			if(!seen_command)
 			{
@@ -402,7 +407,10 @@ void factor_vm::factorbug()
 		if(strcmp(cmd,"d") == 0)
 		{
 			cell addr = read_cell_hex();
-			if(scanf(" ") < 0) break;
+			if (std::cin.peek() == ' ')
+				std::cin.ignore();
+
+			if(!std::cin.good()) break;
 			cell count = read_cell_hex();
 			dump_memory(addr,addr+count);
 		}

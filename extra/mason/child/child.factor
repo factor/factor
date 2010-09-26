@@ -29,13 +29,6 @@ IN: mason.child
         try-process
     ] with-directory ;
 
-: builds-factor-image ( -- img )
-    builds/factor boot-image-name append-path ;
-
-: copy-image ( -- )
-    builds-factor-image "." copy-file-into
-    builds-factor-image "factor" copy-file-into ;
-
 : factor-vm ( -- string )
     target-os get "winnt" = "./factor.com" "./factor" ? ;
 
@@ -81,7 +74,6 @@ MACRO: recover-cond ( alist -- )
     ] if ;
 
 : build-child ( -- status )
-    copy-image
     {
         { [ notify-make-vm make-vm ] [ compile-failed ] }
         { [ notify-boot boot ] [ boot-failed ] }

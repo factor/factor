@@ -20,7 +20,7 @@ ARTICLE: "mongodb" "MongoDB factor integration"
   "person \"persons\" { } { $[ \"ageIdx\" [ \"age\" asc ] key-spec <tuple-index> ] } define-persistent "
   "\"db\" \"127.0.0.1\" 27017 <mdb>"
   "person new \"Alfred\" >>name 57 >>age"
-  "'[ _ save-tuple person new 57 >>age select-tuple ] with-db"
+  "'[ person ensure-table _ save-tuple person new 57 >>age select-tuple ] with-db"
   "" }
 ;
 

@@ -96,7 +96,6 @@ help:
 	@echo "macosx-ppc"
 	@echo "solaris-x86-32"
 	@echo "solaris-x86-64"
-	@echo "wince-arm"
 	@echo "winnt-x86-32"
 	@echo "winnt-x86-64"
 	@echo ""
@@ -162,9 +161,6 @@ winnt-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.windows.nt.x86.64
 	$(MAKE) factor-console CONFIG=vm/Config.windows.nt.x86.64
 
-wince-arm:
-	$(MAKE) $(ALL) CONFIG=vm/Config.windows.ce.arm
-
 ifdef CONFIG
 
 macosx.app: factor
@@ -218,8 +214,5 @@ clean:
 	rm -f libfactor.*
 	rm -f libfactor-ffi-test.*
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
-
-tags:
-	etags vm/*.{cpp,hpp,mm,S,c}
 
 .PHONY: factor factor-lib factor-console factor-ffi-test tags clean macosx.app

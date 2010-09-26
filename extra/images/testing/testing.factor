@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Keith Lazuka.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry images.loader images.normalization images.viewer io
-io.directories io.encodings.binary io.files io.pathnames
-io.streams.byte-array kernel locals namespaces quotations
-sequences serialize tools.test io.backend ;
+USING: accessors fry images images.loader images.normalization
+images.viewer io io.backend io.directories io.encodings.binary
+io.files io.pathnames io.streams.byte-array kernel locals
+namespaces quotations random sequences serialize tools.test ;
 IN: images.testing
 
 <PRIVATE
@@ -53,3 +53,11 @@ PRIVATE>
         [ '[ _ load-reference-image ] ] bi
         unit-test
     ] with-variable ;
+    
+: <rgb-image> ( -- image )
+    <image>
+        RGB >>component-order
+        ubyte-components >>component-type ; inline
+
+: randomize-image ( image -- image )
+    dup bytes-per-image random-bytes >>bitmap ;

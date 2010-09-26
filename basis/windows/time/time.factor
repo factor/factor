@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types kernel math windows.errors
 windows.kernel32 windows.types namespaces calendar math.bitwise
-accessors classes.struct ;
+accessors classes.struct windows.handles ;
 IN: windows.time
 
 : >64bit ( lo hi -- n )

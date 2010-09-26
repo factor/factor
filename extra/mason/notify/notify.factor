@@ -2,23 +2,33 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry http.client io io.encodings.utf8 io.files
 kernel mason.common mason.config mason.email mason.twitter
-namespaces prettyprint sequences ;
+namespaces prettyprint sequences debugger continuations ;
 IN: mason.notify
 
 : status-notify ( report arg message -- )
-    [
-        short-host-name "host-name" set
-        target-cpu get "target-cpu" set
-        target-os get "target-os" set
-        status-secret get "secret" set
-        "message" set
-        "arg" set
-        "report" set
-    ] H{ } make-assoc
-    [ 5 ] dip '[ _ status-url get http-post 2drop ] retry ;
+    '[
+        5 [
+            [
+                short-host-name "host-name" set
+                target-cpu get "target-cpu" set
+                target-os get "target-os" set
+                status-secret get "secret" set
+                _ "report" set
+                _ "arg" set
+                _ "message" set
+            ] H{ } make-assoc
+            status-url get http-post 2drop
+        ] retry
+    ] [
+        "STATUS NOTIFY FAILED:" print
+        error. flush
+    ] recover ;
 
 : notify-heartbeat ( -- )
     f f "heartbeat" status-notify ;
+
+: notify-idle ( -- )
+    f f "idle" status-notify ;
 
 : notify-begin-build ( git-id -- )
     [ "Starting build of GIT ID " write print flush ]
@@ -43,6 +53,12 @@ IN: mason.notify
         [ "report" utf8 file-contents ] dip
         [ name>> "report" status-notify ] [ email-report ] 2bi
     ] bi ;
+
+: notify-upload ( -- )
+    f f "upload" status-notify ;
+
+: notify-finish ( -- )
+    f f "finish" status-notify ;
 
 : notify-release ( archive-name -- )
     [ "Uploaded " prepend [ print flush ] [ mason-tweet ] bi ]

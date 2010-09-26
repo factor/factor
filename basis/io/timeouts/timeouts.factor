@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel calendar timers io io.encodings accessors
-namespaces fry io.streams.null ;
+USING: accessors fry io io.encodings io.streams.null kernel
+namespaces timers ;
 IN: io.timeouts
 
 GENERIC: timeout ( obj -- dt/f )
