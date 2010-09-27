@@ -1,7 +1,7 @@
 IN: mason.release.branch.tests
 USING: mason.release.branch mason.config tools.test namespaces ;
 
-[ { "git" "push" "joe@blah.com:/my/git" "master:clean-linux-x86-32" } ] [
+[ { "git" "push" "-f" "joe@blah.com:/my/git" "master:clean-linux-x86-32" } ] [
     [
         "joe" branch-username set
         "blah.com" branch-host set
