@@ -6,7 +6,6 @@ cpu.architecture layouts
 compiler.cfg
 compiler.cfg.def-use
 compiler.cfg.liveness
-compiler.cfg.liveness.ssa
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linearization
