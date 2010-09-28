@@ -70,23 +70,20 @@ GENERIC: handle-client* ( threaded-server -- )
 
 <PRIVATE
 
-GENERIC: (>insecure) ( obj -- obj )
+GENERIC: >insecure ( obj -- obj )
 
-M: inet (>insecure) ;
-M: inet4 (>insecure) ;
-M: inet6 (>insecure) ;
-M: local (>insecure) ;
-M: integer (>insecure) internet-server ;
-M: string (>insecure) internet-server ;
-M: array (>insecure) [ (>insecure) ] map ;
-M: f (>insecure) ;
-
-: >insecure ( obj -- seq )
-    (>insecure) dup sequence? [ 1array ] unless ;
+M: inet >insecure 1array ;
+M: inet4 >insecure 1array ;
+M: inet6 >insecure 1array ;
+M: local >insecure 1array ;
+M: integer >insecure internet-server 1array ;
+M: string >insecure internet-server 1array ;
+M: array >insecure [ >insecure ] map ;
+M: f >insecure ;
 
 : >secure ( addrspec -- addrspec' )
     >insecure
-    [ dup { [ secure? ] [ not ] } 1|| [ <secure> ] unless ] map ;
+    [ dup secure? [ <secure> ] unless ] map ;
 
 : listen-on ( threaded-server -- addrspecs )
     [ secure>> >secure ] [ insecure>> >insecure ] bi append
