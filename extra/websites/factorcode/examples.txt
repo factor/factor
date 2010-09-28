@@ -1,0 +1,57 @@
+USING: io math sequences ;
+
+"Hello world" print
+10 [ "Hello, Factor" print ] times
+"Hello, " "Factor" append print
+----
+USING: io kernel sequences
+http.client xml xml.data xml.traversal ;
+
+"http://factorcode.org" http-get nip string>xml
+"a" deep-tags-named
+[ "href" attr ] map
+[ print ] each
+----
+USING: accessors kernel math math.constants
+math.functions prettyprint ;
+IN: shapes
+
+TUPLE: circle radius ;
+TUPLE: rectangle width height ;
+
+GENERIC: area ( shape -- area )
+M: circle area radius>> sq pi * ;
+M: rectangle area [ width>> ] [ height>> ] bi * ;
+
+rectangle new 10 >>width 20 >>height area .
+----
+USING: accessors smtp ;
+
+&lt;email>
+    "john@foobar.com" >>from
+    { "jane@foobar.com" } >>to
+    "Up for lunch?" >>subject
+    "At Tracy's." >>body
+send-email
+----
+USING: io.files io.encodings.utf8 kernel
+sequences splitting ;
+
+"table.txt" utf8 [
+    file-lines
+    [ "|" split ] map flip [ "|" join ] map
+] 2keep
+set-file-lines
+----
+USING: sequences xml.syntax xml.writer ;
+
+{ "three" "blind" "mice" }
+[ [XML &lt;li>&lt;->&lt;/li> XML] ] map
+[XML &lt;ul>&lt;->&lt;/ul> XML]
+pprint-xml
+----
+USING: inspector io.files.info io.pathnames system tools.files ;
+
+home directory.
+home file-system-info free-space>> .
+image file-info describe
