@@ -44,13 +44,13 @@ IN: webapps.mason.utils
     "http://downloads.factorcode.org/" prepend ;
 
 : package-url ( builder -- url )
-    [ URL" $mason-app/package" ] dip
+    [ URL" http://builds.factorcode.org/package" ] dip
     [ os>> "os" set-query-param ]
     [ cpu>> "cpu" set-query-param ] bi
     adjust-url ;
 
 : release-url ( builder -- url )
-    [ URL" $mason-app/release" ] dip
+    [ URL" http://builds.factorcode.org/release" ] dip
     [ os>> "os" set-query-param ]
     [ cpu>> "cpu" set-query-param ] bi
     adjust-url ;

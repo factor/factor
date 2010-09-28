@@ -1,4 +1,7 @@
-<% USING: namespaces http.client kernel io.files splitting random io io.encodings.utf8 sequences ; %>
+<% USING: namespaces http.client kernel io.files splitting random io io.encodings.utf8 sequences
+webapps.mason.version.data webapps.mason.backend webapps.mason.grids webapps.mason.downloads 
+webapps.mason.utils html.elements accessors
+xml.writer ; %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -58,11 +61,31 @@
 
 <h1>Downloads</h1>
 
+<% [ %>
+
 <p>To download a binary, follow the link corresponding to your computer's CPU/OS configuration. Binary packages are the recommended route for new users who wish to try Factor.</p>
 
-<%
-"http://builds.factorcode.org/downloads" http-get nip write
-%>
+<h2>Stable release:
+<% latest-version <a [ announcement-url>> =href a> ] [ version>> write ] bi </a> %>
+</h2>
+
+<table id="mytable" cellspacing="0" summary="Stable releases">
+	<% release-grid write-xml %>
+</table>
+
+<p><b>Source code</b>:
+<% latest-version <a [ source-path>> download-url =href a> ] [ version>> write ] bi </a> %>
+</p>
+
+<h2>Development release</h2>
+
+<table id="mytable" cellspacing="0" summary="Development releases">
+	<% package-grid write-xml %>
+</table>
+
+<% ] with-mason-db %>
+
+<p>Stable and development releases are built and uploaded by the <a href="http://concatenative.org/wiki/view/Factor/Build farm">build farm</a>. Follow <a href="http://twitter.com/FactorBuilds">@FactorBuilds</a> on Twitter to receive notifications. If you're curious, take a look at the <a href="http://builds.factorcode.org/dashboard">build farm dashboard</t:a>.</p>
 
 <p><b>Source code</b> is stored in our <a href="http://concatenative.org/wiki/view/Factor/GIT repository">GIT repository</a>. Source can can be browsed online via <a href="http://github.com/slavapestov/factor/">github</a> or <a href="http://gitweb.factorcode.org/">gitweb</a>.</p>
 
