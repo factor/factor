@@ -1,7 +1,7 @@
 USING: tools.test concurrency.distributed kernel io.files
 io.files.temp io.directories arrays io.sockets system calendar
 combinators threads math sequences concurrency.messaging
-continuations accessors prettyprint io.servers.connection ;
+continuations accessors prettyprint io.servers ;
 FROM: concurrency.messaging => receive send ;
 IN: concurrency.distributed.tests
 

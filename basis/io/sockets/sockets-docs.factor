@@ -52,7 +52,7 @@ $nl
     { { $link inet4 } " - a TCP/IP connection to an IPv4 address and port number; no name lookup is performed" }
     { { $link inet6 } " - a TCP/IP connection to an IPv6 address and port number; no name lookup is performed" }
 }
-"The " { $vocab-link "io.servers.connection" } " library defines high-level wrappers around " { $link <server> } " which makes it easy to listen for IPv4, IPv6 and secure socket connections simultaneously, perform logging, and optionally only allow connections from the loopback interface."
+"The " { $vocab-link "io.servers" } " library defines high-level wrappers around " { $link <server> } " which makes it easy to listen for IPv4, IPv6 and secure socket connections simultaneously, perform logging, and optionally only allow connections from the loopback interface."
 $nl
 "The " { $vocab-link "io.sockets.secure" } " vocabulary implements secure, encrypted sockets via SSL and TLS." ;
 
@@ -170,7 +170,7 @@ HELP: <server>
     { $code "f 1234 <inet> resolve-host" }
     "To start a server which listens for connections from the loopback interface only, use an address specifier returned by the following code, where 1234 is the desired port number:"
     { $code "\"localhost\" 1234 <inet> resolve-host" }
-    "Since " { $link resolve-host } " can return multiple address specifiers, your server code must listen on them all to work properly. The " { $vocab-link "io.servers.connection" } " vocabulary can be used to help with this."
+    "Since " { $link resolve-host } " can return multiple address specifiers, your server code must listen on them all to work properly. The " { $vocab-link "io.servers" } " vocabulary can be used to help with this."
     $nl
     "To start a TCP/IP server which listens for connections on a randomly-assigned port, set the port number in the address specifier to 0, and then read the " { $snippet "addr" } " slot of the server instance to obtain the actual port number it is listening on:"
     { $unchecked-example

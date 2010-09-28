@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar calendar.format io io.encodings.ascii
-io.servers.connection kernel threads ;
+io.servers kernel threads ;
 IN: time-server
 
 : handle-time-client ( -- )

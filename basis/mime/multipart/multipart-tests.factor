@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations fry http.server io
 io.encodings.ascii io.files io.files.unique
-io.servers.connection io.streams.duplex io.streams.string
+io.servers io.streams.duplex io.streams.string
 kernel math.ranges mime.multipart multiline namespaces random
 sequences strings threads tools.test ;
 IN: mime.multipart.tests

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io.streams.string quotations strings urls
-http vocabs.refresh math io.servers.connection assocs ;
+http vocabs.refresh math io.servers assocs ;
 IN: http.server
 
 HELP: trivial-responder
@@ -109,7 +109,7 @@ ARTICLE: "http.server.variables" "HTTP server variables"
 } ;
 
 ARTICLE: "http.server" "HTTP server"
-"The " { $vocab-link "http.server" } " vocabulary implements an HTTP and HTTPS server on top of " { $vocab-link "io.servers.connection" } "."
+"The " { $vocab-link "http.server" } " vocabulary implements an HTTP and HTTPS server on top of " { $vocab-link "io.servers" } "."
 { $subsections
     "http.server.responders"
     "http.server.requests"

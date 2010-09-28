@@ -359,7 +359,7 @@ CONSTANT: google-slides
     }
     { $slide "Example: time server"
         { $vocab-link "time-server" }
-        { "Demonstrates " { $vocab-link "io.servers.connection" } " vocabulary, threads" }
+        { "Demonstrates " { $vocab-link "io.servers" } " vocabulary, threads" }
     }
     { $slide "Example: what is my IP?"
         { $vocab-link "webapps.ip" }
