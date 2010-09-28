@@ -1,6 +1,7 @@
 ! (c)2010 Joe Groff, Erik Charlebois bsd license
 USING: accessors alien.c-types arrays combinators delegate fry
-generic.parser kernel macros math parser sequences words words.symbol ;
+generic.parser kernel macros math parser sequences words words.symbol
+classes.singleton assocs ;
 IN: alien.enums
 
 <PRIVATE
@@ -34,11 +35,11 @@ M: enum-c-type c-type-setter
 : define-enum-value ( class value -- )
     "enum-value" set-word-prop ;
 
-: define-enum-members ( member-names -- )
+: define-enum-members ( members -- )
     [
-        [ first define-symbol ]
-        [ first2 define-enum-value ] bi
-    ] each ;
+        [ drop define-singleton-class ]
+        [ define-enum-value ] 2bi
+    ] assoc-each ;
 
 : define-enum-constructor ( word -- )
     [ name>> "<" ">" surround create-in ] keep
@@ -48,8 +49,8 @@ PRIVATE>
 
 : define-enum ( word base-type members -- )
     [ dup define-enum-constructor ] 2dip
-    dup define-enum-members
-    <enum-c-type> swap typedef ;
+    [ define-enum-members ]
+    [ <enum-c-type> swap typedef ] bi ;
     
 PREDICATE: enum-c-type-word < c-type-word
     "c-type" word-prop enum-c-type? ;
