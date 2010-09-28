@@ -46,7 +46,7 @@ nmake /nologo /f Nmakefile %_target%
 if errorlevel 1 goto fail
 
 echo Fetching %_bootimage_version% boot image...
-cscript /nologo build-support\http-get.vbs http://factorcode.org/images/%_bootimage_path%/%_bootimage% %_bootimage%
+cscript /nologo build-support\http-get.vbs http://downloads.factorcode.org/images/%_bootimage_path%/%_bootimage% %_bootimage%
 if errorlevel 1 goto fail
 
 echo Bootstrapping...

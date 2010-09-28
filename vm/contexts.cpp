@@ -60,9 +60,9 @@ void context::scrub_stacks(gc_info *info, cell index)
 	u8 *bitmap = info->gc_info_bitmap();
 
 	{
-		cell base = info->scrub_d_base(index);
+		cell base = info->callsite_scrub_d(index);
 
-		for(int loc = 0; loc < info->scrub_d_count; loc++)
+		for(cell loc = 0; loc < info->scrub_d_count; loc++)
 		{
 			if(bitmap_p(bitmap,base + loc))
 			{
@@ -75,9 +75,9 @@ void context::scrub_stacks(gc_info *info, cell index)
 	}
 
 	{
-		cell base = info->scrub_r_base(index);
+		cell base = info->callsite_scrub_r(index);
 
-		for(int loc = 0; loc < info->scrub_r_count; loc++)
+		for(cell loc = 0; loc < info->scrub_r_count; loc++)
 		{
 			if(bitmap_p(bitmap,base + loc))
 			{

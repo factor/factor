@@ -8,7 +8,7 @@ io io.sockets io.sockets.secure io.streams.duplex io.styles
 io.timeouts kernel logging make math math.parser namespaces
 present prettyprint random sequences sets strings threads ;
 FROM: namespaces => set ;
-IN: io.servers.connection
+IN: io.servers
 
 TUPLE: threaded-server < identity-tuple
 name
@@ -22,7 +22,8 @@ semaphore
 timeout
 encoding
 handler
-server-stopped ;
+server-stopped
+secure-context ;
 
 SYMBOL: running-servers
 running-servers [ HS{ } clone ] initialize
@@ -69,23 +70,20 @@ GENERIC: handle-client* ( threaded-server -- )
 
 <PRIVATE
 
-GENERIC: (>insecure) ( obj -- obj )
+GENERIC: >insecure ( obj -- obj )
 
-M: inet (>insecure) ;
-M: inet4 (>insecure) ;
-M: inet6 (>insecure) ;
-M: local (>insecure) ;
-M: integer (>insecure) internet-server ;
-M: string (>insecure) internet-server ;
-M: array (>insecure) [ (>insecure) ] map ;
-M: f (>insecure) ;
-
-: >insecure ( obj -- seq )
-    (>insecure) dup sequence? [ 1array ] unless ;
+M: inet >insecure 1array ;
+M: inet4 >insecure 1array ;
+M: inet6 >insecure 1array ;
+M: local >insecure 1array ;
+M: integer >insecure internet-server 1array ;
+M: string >insecure internet-server 1array ;
+M: array >insecure [ >insecure ] map ;
+M: f >insecure ;
 
 : >secure ( addrspec -- addrspec' )
     >insecure
-    [ dup { [ secure? ] [ not ] } 1|| [ <secure> ] unless ] map ;
+    [ dup secure? [ <secure> ] unless ] map ;
 
 : listen-on ( threaded-server -- addrspecs )
     [ secure>> >secure ] [ insecure>> >insecure ] bi append
@@ -131,14 +129,24 @@ M: threaded-server handle-client* handler>> call( -- ) ;
     [ (accept-connection) ]
     if* ;
 
+: with-existing-secure-context ( threaded-server quot -- )
+    [ secure-context>> secure-context ] dip with-variable ; inline
+
 : accept-loop ( server -- )
     [ accept-connection ] [ accept-loop ] bi ;
 
-: start-accept-loop ( server -- ) accept-loop ;
+: start-accept-loop ( threaded-server server -- )
+    '[ _ accept-loop ] with-existing-secure-context ;
 
 \ start-accept-loop NOTICE add-error-logging
 
+: create-secure-context ( threaded-server -- threaded-server )
+    dup secure>> [
+        dup secure-config>> <secure-context> >>secure-context
+    ] when ;
+
 : init-server ( threaded-server -- threaded-server )
+    create-secure-context
     <flag> >>server-stopped
     dup semaphore>> [
         dup max-connections>> [
@@ -153,48 +161,45 @@ ERROR: no-ports-configured threaded-server ;
     '[ [ _ <server> |dispose ] map ] with-destructors ;
 
 : set-servers ( threaded-server -- threaded-server )
-    dup dup listen-on [ no-ports-configured ] [ (make-servers) ] if-empty
-    >>servers ;
+    dup [
+        dup dup listen-on [ no-ports-configured ] [ (make-servers) ] if-empty
+        >>servers
+    ] with-existing-secure-context ;
 
 : server-thread-name ( threaded-server addrspec -- string )
     [ name>> ] [ addr>> present ] bi* " server on " glue ;
 
-: (start-server) ( threaded-server -- )
-    init-server
-    dup threaded-server [
-        [ ] [ name>> ] bi
-        [
-            set-servers
-            dup add-running-server
-            dup servers>>
-            [
-                [ nip '[ _ [ start-accept-loop ] with-disposal ] ]
-                [ server-thread-name ] 2bi spawn drop
-            ] with each
-        ] with-logging
-    ] with-variable ;
-
 PRIVATE>
 
 : start-server ( threaded-server -- threaded-server )
-    #! Only create a secure-context if we want to listen on
-    #! a secure port, otherwise start-server won't work at
-    #! all if SSL is not available.
-    dup dup secure>> [
-        dup secure-config>> [
-            (start-server)
-        ] with-secure-context
-    ] [
-        (start-server)
-    ] if ;
+    init-server
+    [
+        dup threaded-server [
+            [ ] [ name>> ] bi
+            [
+                set-servers
+                dup add-running-server
+                dup servers>>
+                [
+                    [ '[ _ _ [ start-accept-loop ] with-disposal ] ]
+                    [ server-thread-name ] 2bi spawn drop
+                ] with each
+            ] with-logging
+        ] with-variable
+    ] keep ;
 
 : server-running? ( threaded-server -- ? )
     server-stopped>> [ value>> not ] [ f ] if* ;
 
 : stop-server ( threaded-server -- )
     dup server-running? [
-        [ [ f ] change-servers drop dispose-each ]
         [ remove-running-server ]
+        [
+            [
+                [ secure-context>> [ &dispose drop ] when* ]
+                [ [ f ] change-servers drop dispose-each ] bi
+            ] with-destructors
+        ]
         [ server-stopped>> raise-flag ] tri
     ] [
         drop

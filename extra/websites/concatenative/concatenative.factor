@@ -1,7 +1,7 @@
 ! Copyright (c) 2008, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences assocs io.files io.pathnames
-io.sockets io.sockets.secure io.servers.connection
+io.sockets io.sockets.secure io.servers
 namespaces db db.tuples db.sqlite smtp urls
 logging.insomniac
 html.templates.chloe
@@ -26,7 +26,8 @@ webapps.wiki
 webapps.user-admin
 webapps.help
 webapps.mason
-webapps.mason.backend ;
+webapps.mason.backend
+websites.factorcode ;
 IN: websites.concatenative
 
 : test-db ( -- db ) "resource:test.db" <sqlite-db> ;
@@ -44,11 +45,11 @@ IN: websites.concatenative
         } ensure-tables
     ] with-db ;
 
-TUPLE: factor-website < dispatcher ;
+TUPLE: concatenative-website < dispatcher ;
 
 : <factor-boilerplate> ( responder -- responder' )
     <boilerplate>
-        { factor-website "page" } >>template ;
+        { concatenative-website "page" } >>template ;
 
 : <login-config> ( responder -- responder' )
     "Factor website" <login-realm>
@@ -64,8 +65,8 @@ TUPLE: factor-website < dispatcher ;
         "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
         "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key ;
 
-: <factor-website> ( -- responder )
-    factor-website new-dispatcher
+: <concatenative-website> ( -- responder )
+    concatenative-website new-dispatcher
         URL" /wiki/view/Front Page" <redirect-responder> "" add-responder ;
 
 SYMBOL: key-password
@@ -84,7 +85,7 @@ SYMBOL: dh-file
     "vocab:openssl/test/server.pem" key-file set-global
     "password" key-password set-global
     common-configuration
-    <factor-website>
+    <concatenative-website>
         <wiki> <login-config> <factor-boilerplate> "wiki" add-responder
         <user-admin> <login-config> <factor-boilerplate> "user-admin" add-responder
         <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> "pastebin" add-responder
@@ -102,7 +103,7 @@ SYMBOL: dh-file
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
-        <factor-website>
+        <concatenative-website>
             <wiki> "wiki" add-responder
             <user-admin> "user-admin" add-responder
         <login-config> <factor-boilerplate> test-db <alloy> "concatenative.org" add-responder
@@ -111,6 +112,7 @@ SYMBOL: dh-file
         <mason-app> <login-config> <factor-boilerplate> test-db <alloy> "builds.factorcode.org" add-responder
         home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
         home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
+        <factor-website> "new.factorcode.org" add-responder
     main-responder set-global ;
 
 : <factor-secure-config> ( -- config )
@@ -119,7 +121,7 @@ SYMBOL: dh-file
         dh-file get >>dh-file
         key-password get >>password ;
 
-: <factor-website-server> ( -- threaded-server )
+: <concatenative-website-server> ( -- threaded-server )
     <http-server>
         <factor-secure-config> >>secure-config
         8080 >>insecure
@@ -129,4 +131,4 @@ SYMBOL: dh-file
     test-db start-expiring
     test-db start-update-task
     http-insomniac
-    <factor-website-server> start-server ;
+    <concatenative-website-server> start-server ;
