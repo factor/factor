@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: serialize sequences concurrency.messaging threads io
-io.servers.connection io.encodings.binary assocs init
+io.servers io.encodings.binary assocs init
 arrays namespaces kernel accessors ;
 FROM: io.sockets => host-name <inet> with-client ;
 IN: concurrency.distributed

@@ -1,6 +1,6 @@
 USING: calendar ftp.server io.encodings.ascii io.files
 io.files.unique namespaces threads tools.test kernel
-io.servers.connection ftp.client accessors urls
+io.servers ftp.client accessors urls
 io.pathnames io.directories sequences fry io.backend
 continuations ;
 FROM: ftp.client => ftp-get ;
