@@ -8,7 +8,7 @@ SYMBOL: users
 
 : <factor-website> ( -- website )
     <dispatcher>
-        "resource:extra/websites/factorcode/" <static> >>default
+        "resource:extra/websites/factorcode/" <static> enable-fhtml >>default
         users get [
             [ "/home/" "/www/" surround <static> ] keep add-responder
         ] each ;
