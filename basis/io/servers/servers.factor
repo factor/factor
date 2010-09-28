@@ -8,7 +8,7 @@ io io.sockets io.sockets.secure io.streams.duplex io.styles
 io.timeouts kernel logging make math math.parser namespaces
 present prettyprint random sequences sets strings threads ;
 FROM: namespaces => set ;
-IN: io.servers.connection
+IN: io.servers
 
 TUPLE: threaded-server < identity-tuple
 name

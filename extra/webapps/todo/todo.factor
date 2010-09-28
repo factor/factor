@@ -122,7 +122,7 @@ furnace.auth.features.edit-profile
 furnace.auth.features.deactivate-user
 db.sqlite
 furnace.alloy
-io.servers.connection
+io.servers
 io.sockets.secure ;
 
 : <login-config> ( responder -- responder' )

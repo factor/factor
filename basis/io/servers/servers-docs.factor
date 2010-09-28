@@ -1,6 +1,6 @@
 USING: calendar classes concurrency.semaphores help.markup
 help.syntax io io.sockets io.sockets.secure math quotations ;
-IN: io.servers.connection
+IN: io.servers
 
 ARTICLE: "server-config" "Threaded server configuration"
 "The " { $link threaded-server } " tuple has a variety of slots which can be set before starting the server with " { $link start-server } "."
@@ -52,8 +52,8 @@ $nl
 ARTICLE: "server-examples" "Threaded server examples"
 "The " { $vocab-link "time-server" } " vocabulary implements a simple threaded server which sends the current time to the client. The " { $vocab-link "concurrency.distributed" } ", " { $vocab-link "ftp.server" } ", and " { $vocab-link "http.server" } " vocabularies demonstrate more complex usage of the threaded server library." ;
 
-ARTICLE: "io.servers.connection" "Threaded servers"
-"The " { $vocab-link "io.servers.connection" } " vocabulary implements a generic server abstraction for " { $link "network-connection" } ". A set of threads listen for connections, and additional threads are spawned for each client connection. In addition to this basic functionality, it provides some advanced features such as logging, connection limits and secure socket support."
+ARTICLE: "io.servers" "Threaded servers"
+"The " { $vocab-link "io.servers" } " vocabulary implements a generic server abstraction for " { $link "network-connection" } ". A set of threads listen for connections, and additional threads are spawned for each client connection. In addition to this basic functionality, it provides some advanced features such as logging, connection limits and secure socket support."
 { $subsections "server-examples" }
 "Creating threaded servers with client handler quotations:"
 { $subsections <threaded-server> }
@@ -82,7 +82,7 @@ ARTICLE: "io.servers.connection" "Threaded servers"
 "Additionally, the " { $link local-address } " and "
 { $subsections remote-address } " variables are set, as in " { $link with-client } "." ;
 
-ABOUT: "io.servers.connection"
+ABOUT: "io.servers"
 
 HELP: threaded-server
 { $var-description "In client handlers, stores the current threaded server instance." }
