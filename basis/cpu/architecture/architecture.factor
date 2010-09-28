@@ -225,7 +225,7 @@ M: object vm-stack-space 0 ;
 ! %store-memory work
 HOOK: complex-addressing? cpu ( -- ? )
 
-HOOK: gc-root-offsets cpu ( seq -- seq' )
+HOOK: gc-root-offset cpu ( spill-slot -- n )
 
 HOOK: %load-immediate cpu ( reg val -- )
 HOOK: %load-reference cpu ( reg obj -- )

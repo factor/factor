@@ -329,14 +329,16 @@ struct factor_vm
 		return (Type *)allot_object(Type::type_number,size);
 	}
 
+	inline bool in_data_heap_p(cell pointer)
+	{
+		return (pointer >= data->seg->start && pointer < data->seg->end);
+	}
+
 	inline void check_data_pointer(object *pointer)
 	{
 	#ifdef FACTOR_DEBUG
 		if(!(current_gc && current_gc->op == collect_growing_heap_op))
-		{
-			assert((cell)pointer >= data->seg->start
-				&& (cell)pointer < data->seg->end);
-		}
+			assert(in_data_heap_p((cell)pointer));
 	#endif
 	}
 

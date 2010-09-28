@@ -5,7 +5,7 @@ combinators.short-circuit concurrency.promises continuations
 destructors ftp io io.directories io.encodings
 io.encodings.8-bit.latin1 io.encodings.binary io.encodings.utf8
 io.files io.files.info io.files.types io.pathnames
-io.servers.connection io.sockets io.streams.string io.timeouts
+io.servers io.sockets io.streams.string io.timeouts
 kernel logging math math.bitwise math.parser namespaces
 sequences simple-tokenizer splitting strings threads
 tools.files unicode.case ;

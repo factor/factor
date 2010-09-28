@@ -15,7 +15,7 @@ io.encodings.binary
 io.streams.limited
 io.streams.string
 io.streams.throwing
-io.servers.connection
+io.servers
 io.timeouts
 io.crlf
 fry logging logging.insomniac calendar urls urls.encoding
