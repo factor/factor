@@ -85,7 +85,7 @@ xml.writer ; %>
 
 <% ] with-mason-db %>
 
-<p>Stable and development releases are built and uploaded by the <a href="http://concatenative.org/wiki/view/Factor/Build farm">build farm</a>. Follow <a href="http://twitter.com/FactorBuilds">@FactorBuilds</a> on Twitter to receive notifications. If you're curious, take a look at the <a href="http://builds.factorcode.org/dashboard">build farm dashboard</t:a>.</p>
+<p>Stable and development releases are built and uploaded by the <a href="http://concatenative.org/wiki/view/Factor/Build farm">build farm</a>. Follow <a href="http://twitter.com/FactorBuilds">@FactorBuilds</a> on Twitter to receive notifications. If you're curious, take a look at the <a href="http://builds.factorcode.org/dashboard">build farm dashboard</a>.</p>
 
 <p><b>Source code</b> is stored in our <a href="http://concatenative.org/wiki/view/Factor/GIT repository">GIT repository</a>. Source can can be browsed online via <a href="http://github.com/slavapestov/factor/">github</a> or <a href="http://gitweb.factorcode.org/">gitweb</a>.</p>
 
