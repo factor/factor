@@ -206,3 +206,42 @@ V{
 [ H{ { 0 0 } } ] [ 2 get 4 get edge-live-in ] unit-test
 
 [ H{ { 1 1 } } ] [ 3 get 4 get edge-live-in ] unit-test
+
+
+V{
+    T{ ##prologue }
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##peek f 0 D 0 }
+    T{ ##tagged>integer f 1 0 }
+    T{ ##call-gc f T{ gc-map } }
+    T{ ##replace f 0 D 0 }
+    T{ ##call-gc f T{ gc-map } }
+    T{ ##replace f 1 D 0 }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##epilogue }
+    T{ ##return }
+} 2 test-bb
+
+0 1 edge
+1 2 edge
+
+H{
+    { 0 tagged-rep }
+    { 1 int-rep }
+} representations set
+
+[ ] [ cfg new 0 get >>entry dup cfg set compute-live-sets ] unit-test
+
+[ V{ { 1 0 } } ] [ 1 get instructions>> 2 swap nth gc-map>> derived-roots>> ] unit-test
+
+[ { 0 } ] [ 1 get instructions>> 2 swap nth gc-map>> gc-roots>> ] unit-test
+
+[ V{ { 1 0 } } ] [ 1 get instructions>> 4 swap nth gc-map>> derived-roots>> ] unit-test
+
+[ { 0 } ] [ 1 get instructions>> 4 swap nth gc-map>> gc-roots>> ] unit-test

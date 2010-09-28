@@ -52,7 +52,7 @@ os macosx? [
 ] each
 
 USING: http.client http.server http.server.dispatchers
-http.server.responses http.server.static io.servers.connection ;
+http.server.responses http.server.static io.servers ;
 
 SINGLETON: quit-responder
 

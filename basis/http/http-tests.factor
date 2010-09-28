@@ -205,7 +205,7 @@ Set-Cookie: oo="bar; a=b"; comment="your mom"; httponly=yes
 ! Live-fire exercise
 USING: http.server.static furnace.sessions furnace.alloy
 furnace.actions furnace.auth furnace.auth.login furnace.db
-io.servers.connection io.files io.files.temp io.directories io
+io.servers io.files io.files.temp io.directories io
 threads
 http.server.responses http.server.redirection furnace.redirection
 http.server.dispatchers db.tuples ;

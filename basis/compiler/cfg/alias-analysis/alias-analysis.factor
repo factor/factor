@@ -14,7 +14,8 @@ compiler.cfg.representations.preferred ;
 FROM: namespaces => set ;
 IN: compiler.cfg.alias-analysis
 
-! We try to eliminate redundant slot operations using some simple heuristics.
+! We try to eliminate redundant slot operations using some
+! simple heuristics.
 ! 
 ! All heap-allocated objects which are loaded from the stack, or
 ! other object slots are pessimistically assumed to belong to
@@ -108,7 +109,7 @@ SYMBOL: heap-ac
     2dup eq? [ 2drop ] [
         [ ac>vregs ] dip
         [ vregs>acs get '[ [ _ ] dip _ set-at ] each ]
-        [ acs>vregs get at push-all ]
+        [ ac>vregs push-all ]
         2bi
     ] if ;
 
@@ -129,7 +130,7 @@ ERROR: vreg-not-new vreg ;
     #! Set alias class of newly-seen vreg.
     vreg vregs>acs get key? [ vreg vreg-not-new ] when
     ac vreg vregs>acs get set-at
-    vreg ac acs>vregs get push-at ;
+    vreg ac ac>vregs push ;
 
 : live-slot ( slot#/f vreg -- vreg' )
     #! If the slot number is unknown, we never reuse a previous

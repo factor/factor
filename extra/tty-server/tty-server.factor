@@ -1,5 +1,4 @@
-USING: listener io.servers.connection io.encodings.utf8
-accessors kernel ;
+USING: listener io.servers io.encodings.utf8 accessors kernel ;
 IN: tty-server
 
 : <tty-server> ( port -- )
