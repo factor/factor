@@ -447,7 +447,7 @@ update_boot_images() {
     $DELETE $BOOT_IMAGE.{?,??} > /dev/null 2>&1
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
-        get_url http://factorcode.org/images/latest/checksums.txt
+        get_url http://downloads.factorcode.org/images/latest/checksums.txt
         factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`;
         set_md5sum
         case $OS in
@@ -469,7 +469,7 @@ update_boot_images() {
 
 get_boot_image() {
     $ECHO "Downloading boot image $BOOT_IMAGE."
-    get_url http://factorcode.org/images/latest/$BOOT_IMAGE
+    get_url http://downloads.factorcode.org/images/latest/$BOOT_IMAGE
 }
 
 get_url() {
