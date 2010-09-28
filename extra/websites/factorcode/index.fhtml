@@ -44,7 +44,7 @@
 
 <pre>
 <%
-"/var/www/factorcode.org/newsite/examples.txt" utf8 file-lines
+"resource:extra/websites/factorcode/examples.txt" utf8 file-lines
 { "----" } split random "\n" join write
 %>
 </pre>
