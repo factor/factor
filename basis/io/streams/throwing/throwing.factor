@@ -6,11 +6,11 @@ IN: io.streams.throwing
 
 ERROR: stream-exhausted n stream word ;
 
-<PRIVATE
-
 TUPLE: throws-on-eof-stream stream ;
 
 C: <throws-on-eof-stream> throws-on-eof-stream
+
+<PRIVATE
 
 M: throws-on-eof-stream stream-element-type stream>> stream-element-type ;
 
@@ -41,7 +41,7 @@ M: throws-on-eof-stream stream-read-until
 PRIVATE>
 
 : stream-throw-on-eof ( ..a stream quot: ( ..a stream' -- ..b ) -- ..b )
-    [ <throws-on-eof-stream> ] dip call ; inline
+    [ <throws-on-eof-stream> ] dip with-input-stream* ; inline
 
 : throw-on-eof ( ..a quot: ( ..a -- ..b ) -- ..b )
     [ input-stream get <throws-on-eof-stream> ] dip with-input-stream* ; inline
