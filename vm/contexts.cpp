@@ -77,7 +77,7 @@ void context::scrub_stacks(gc_info *info, cell index)
 	{
 		cell base = info->callsite_scrub_r(index);
 
-		for(int loc = 0; loc < info->scrub_r_count; loc++)
+		for(cell loc = 0; loc < info->scrub_r_count; loc++)
 		{
 			if(bitmap_p(bitmap,base + loc))
 			{
