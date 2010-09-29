@@ -9,7 +9,7 @@ HELP: <action>
 
 HELP: <chloe-content>
 { $values
-     { "path" "a pathname string" }
+     { "pair" "a pair with shape " { $snippet "{ class string }" } }
      { "response" response }
 }
 { $description "Creates an HTTP response which serves a Chloe template. See " { $link "html.templates.chloe" } "." } ;
