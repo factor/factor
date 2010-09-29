@@ -1,9 +1,14 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax cairo.ffi
-combinators kernel system
-gobject-introspection pango.ffi ;
+USING: alien alien.libraries alien.syntax cairo.ffi combinators
+gobject-introspection system vocabs.loader ;
 IN: pango.cairo.ffi
+
+<<
+"pango.ffi" require
+>>
+
+LIBRARY: pango.cairo
 
 << 
 "pango.cairo" {
@@ -13,14 +18,9 @@ IN: pango.cairo.ffi
 } cond 
 >>
 
+FOREIGN-RECORD-TYPE: cairo.Context cairo_t
+FOREIGN-RECORD-TYPE: cairo.ScaledFont cairo_scaled_font_t
+FOREIGN-ENUM-TYPE: cairo.FontType cairo_font_type_t
+FOREIGN-RECORD-TYPE: cairo.FontOptions cairo_font_options_t
+
 GIR: vocab:pango/cairo/PangoCairo-1.0.gir
-
-FUNCTION: void
-pango_cairo_update_layout ( cairo_t* cr, PangoLayout* layout ) ;
-
-FUNCTION: void
-pango_cairo_show_layout ( cairo_t* cr, PangoLayout* layout ) ;
-
-FUNCTION: PangoLayout*
-pango_cairo_create_layout ( cairo_t* cr ) ;
-

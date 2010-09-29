@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.strings arrays assocs cache cairo
-cairo.ffi classes.struct combinators destructors fonts fry
-init io.encodings.utf8 kernel math math.rectangles math.vectors
-memoize namespaces sequences ui.text ui.text.private
-gobject.ffi pango.ffi pango.cairo.ffi ;
+USING: accessors alien.c-types alien.data alien.strings arrays assocs
+cache cairo cairo.ffi classes.struct combinators destructors fonts fry
+gobject.ffi init io.encodings.utf8 kernel math math.rectangles
+math.vectors memoize namespaces pango.cairo.ffi pango.ffi sequences
+ui.text ui.text.private ;
 IN: ui.text.pango
 
 : pango>float ( n -- x ) PANGO_SCALE /f ; inline
@@ -69,16 +69,17 @@ SYMBOL: dpi
 : line-offset>x ( layout n -- x )
     #! n is an index into the UTF8 encoding of the text
     [ drop first-line ] [ swap string>> >utf8-index ] 2bi
-    f 0 <int> [ pango_layout_line_index_to_x ] keep
-    *int pango>float ;
+    f { int } [ pango_layout_line_index_to_x ] with-out-parameters
+    pango>float ;
 
 : x>line-offset ( layout x -- n )
     #! n is an index into the UTF8 encoding of the text
     [
         [ first-line ] dip
-        float>pango 0 <int> 0 <int>
-        [ pango_layout_line_x_to_index drop ] 2keep
-        [ *int ] bi@ swap
+        float>pango
+        { int int }
+        [ pango_layout_line_x_to_index drop ] with-out-parameters
+        swap
     ] [ drop string>> ] 2bi utf8-index> + ;
 
 : selection-start/end ( selection -- start end )

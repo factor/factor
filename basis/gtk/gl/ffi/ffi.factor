@@ -1,10 +1,15 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.libraries combinators kernel system
-gobject-introspection gdk.ffi gdk.pixbuf.ffi gdk.gl.ffi gio.ffi
-glib.ffi gmodule.ffi gobject.ffi gtk.ffi ;
-EXCLUDE: alien.c-types => pointer ;
+USING: alien alien.libraries alien.syntax combinators
+gobject-introspection kernel system vocabs.loader ;
 IN: gtk.gl.ffi
+
+<<
+"gtk.ffi" require
+"gdk.gl.ffi" require
+>>
+
+LIBRARY: gtk.gl
 
 <<
 "gtk.gl" {
@@ -14,5 +19,4 @@ IN: gtk.gl.ffi
 } cond
 >>
 
-GIR: vocab:gtk/gl/GtkGL-1.0.gir
-
+GIR: vocab:gtk/gl/GtkGLExt-1.0.gir

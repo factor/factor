@@ -1,138 +1,112 @@
-! Copyright (C) 2009 Anton Gorenko.
+! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types assocs
-combinators.short-circuit gobject-introspection.common
-gobject-introspection.repository kernel namespaces
-specialized-arrays ;
+USING: accessors alien.c-types assocs combinators.short-circuit
+gobject-introspection.common gobject-introspection.repository kernel
+locals namespaces parser sequences sets ;
 IN: gobject-introspection.types
 
-TUPLE: gwrapper { underlying alien } ;
-TUPLE: grecord < gwrapper ;
-TUPLE: gobject < gwrapper ;
+SYMBOL: type-infos
+type-infos [ H{ } ] initialize
 
-SPECIALIZED-ARRAYS:
-    void* bool int uint char uchar short ushort long ulong
-    longlong ulonglong float double ;
+SYMBOL: standard-types
+standard-types [ V{ } ] initialize
 
-CONSTANT: simple-types H{
-    { "any" {
-        void* *void* >void*-array <direct-void*-array>
-    } }
-    { "boolean" {
-        bool *bool >bool-array <direct-bool-array>
-    } }
-    { "int" {
-        int *int >int-array <direct-int-array>
-    } }
-    { "uint" {
-        uint *uint >uint-array <direct-uint-array>
-    } }
-    { "int8" {
-        char *char >char-array <direct-char-array>
-    } }
-    { "uint8" {
-        uchar *uchar >uchar-array <direct-uchar-array>
-    } }
-    { "int16" {
-        short *short >short-array <direct-short-array>
-    } }
-    { "uint16" {
-        ushort *ushort >ushort-array <direct-ushort-array>
-    } }
-    { "int32" {
-        int *int >int-array <direct-int-array>
-    } }
-    { "uint32" {
-        uint *uint >uint-array <direct-uint-array>
-    } }
-    { "int64" {
-        longlong *longlong
-        >longlong-array <direct-longlong-array>
-    } }
-    { "uint64" {
-        ulonglong *ulonglong
-        >ulonglong-array <direct-ulonglong-array>
-    } }
-    { "long" {
-        long *long >long-array <direct-long-array>
-    } }
-    { "ulong" {
-        ulong *ulong >ulong-array <direct-ulong-array>
-    } }
-    { "float" {
-        float *float >float-array <direct-float-array>
-    } }
-    { "double" {
-        double *double >double-array <direct-double-array>
-    } }
-     { "size_t" {
-        ulong *ulong >ulong-array <direct-ulong-array>
-    } }
-    { "ssize_t" {
-        long *long >long-array <direct-long-array>
-    } }
-    { "time_t" {
-        long *long >long-array <direct-long-array>
-    } }
-     { "gtype" {
-        ulong *ulong >ulong-array <direct-ulong-array>
-    } }    
-}
+TUPLE: type-info c-type ;
 
-TUPLE: type-info c-type-word type-word ;
-
+TUPLE: atomic-info < type-info ;
 TUPLE: enum-info < type-info ;
-
 TUPLE: bitfield-info < type-info ;
-
 TUPLE: record-info < type-info ;
-
 TUPLE: union-info < type-info ;
-
+TUPLE: boxed-info < type-info ;
 TUPLE: callback-info < type-info ;
-
 TUPLE: class-info < type-info ;
-
 TUPLE: interface-info < type-info ;
 
-: aliased-type ( alias -- type )
-    aliases get ?at [ aliased-type ] when ;
+DEFER: find-type-info
 
-: get-type-info ( type -- info )
-    aliased-type type-infos get at ;
+PREDICATE: none-type < simple-type
+    name>> "none" = ;
 
-PREDICATE: none-type < type
-    [ namespace>> not ] [ name>> "none" = ] bi and ;
+PREDICATE: atomic-type < simple-type
+    find-type-info atomic-info? ;
 
-PREDICATE: simple-type < type
-    aliased-type
-    [ namespace>> not ] [ name>> simple-types key? ] bi and ;
+PREDICATE: utf8-type < atomic-type
+    name>> "utf8" = ;
 
-PREDICATE: utf8-type < type
-    aliased-type
-    [ namespace>> not ] [ name>> "utf8" = ] bi and ;
+PREDICATE: enum-type < simple-type
+    find-type-info enum-info? ;
 
-PREDICATE: any-type < type
-    aliased-type
-    [ namespace>> not ] [ name>> "any" = ] bi and ;
-   
-PREDICATE: enum-type < type get-type-info enum-info? ;
+PREDICATE: bitfield-type < simple-type
+    find-type-info bitfield-info? ;
 
-PREDICATE: bitfield-type < type get-type-info bitfield-info? ;
+PREDICATE: record-type < simple-type
+    find-type-info record-info? ;
 
-PREDICATE: record-type < type get-type-info record-info? ;
+PREDICATE: union-type < simple-type
+    find-type-info union-info? ;
 
-PREDICATE: union-type < type get-type-info union-info? ;
+PREDICATE: boxed-type < simple-type
+    find-type-info boxed-info? ;
 
-PREDICATE: callback-type < type get-type-info callback-info? ;
+PREDICATE: callback-type < simple-type
+    find-type-info callback-info? ;
 
-PREDICATE: class-type < type get-type-info class-info? ;
+PREDICATE: class-type < simple-type
+    find-type-info class-info? ;
 
-PREDICATE: interface-type < type get-type-info interface-info? ;
+PREDICATE: interface-type < simple-type
+    find-type-info interface-info? ;
 
-: absolute-type ( type -- type' )
-    dup {
-        [ namespace>> ] [ simple-type? ]
-        [ utf8-type? ] [ none-type? ]
-    } 1|| [ current-lib get-global >>namespace ] unless ;
+PREDICATE: boxed-array-type < array-type name>> >boolean ;
+PREDICATE: c-array-type < array-type name>> not ;
+PREDICATE: fixed-size-array-type < c-array-type fixed-size>> >boolean ;
 
+: standard-type? ( data-type -- ? )
+    name>> standard-types get-global in? ;
+
+: qualified-name ( name -- qualified-name )
+    current-namespace-name get-global swap "." glue ;
+
+: qualified-type-name ( data-type -- name )
+    [ name>> ] keep {
+        [ name>> CHAR: . swap member? ]
+        [ none-type? ]
+        [ standard-type? ]
+    } 1|| [ qualified-name ] unless ;
+
+ERROR: unknown-type-error type ;
+
+: get-type-info ( data-type -- info )
+    qualified-type-name dup type-infos get-global at
+    [ ] [ unknown-type-error ] ?if ;
+
+: find-type-info ( data-type -- info/f )
+    qualified-type-name type-infos get-global at ;
+
+:: register-type ( c-type type-info name -- )
+    type-info c-type >>c-type name
+    type-infos get-global set-at ;
+
+: register-standard-type ( c-type name -- )
+    dup standard-types get-global adjoin
+    atomic-info new swap register-type ;
+
+: register-atomic-type ( c-type name -- )
+    atomic-info new swap register-type ;
+
+: register-enum-type ( c-type name -- )
+    enum-info new swap register-type ;
+
+: register-record-type ( c-type name -- )
+    record-info new swap register-type ;
+
+ERROR: deferred-type-error ;
+
+<<
+void* c-type clone
+    [ drop deferred-type-error ] >>unboxer-quot
+    [ drop deferred-type-error ] >>boxer-quot
+    object >>boxed-class
+"deferred-type" create-in typedef
+>>

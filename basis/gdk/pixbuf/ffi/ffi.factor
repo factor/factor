@@ -1,9 +1,14 @@
-! Copyright (C) 2009 Anton Gorenko.
+! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.libraries combinators kernel system
-gobject-introspection gio.ffi glib.ffi gmodule.ffi gobject.ffi ;
-EXCLUDE: alien.c-types => pointer ;
+USING: alien alien.libraries alien.syntax combinators
+gobject-introspection kernel system vocabs.loader ;
 IN: gdk.pixbuf.ffi
+
+<<
+"gio.ffi" require
+>>
+
+LIBRARY: gdk.pixbuf
 
 <<
 "gdk.pixbuf" {
@@ -14,4 +19,3 @@ IN: gdk.pixbuf.ffi
 >>
 
 GIR: vocab:gdk/pixbuf/GdkPixbuf-2.0.gir
-
