@@ -1,10 +1,14 @@
-! Copyright (C) 2009 Anton Gorenko.
+! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax alien.destructors alien.libraries
-classes.struct combinators kernel literals math system
-gobject-introspection glib.ffi ;
-EXCLUDE: alien.c-types => pointer ;
+USING: alien alien.destructors alien.libraries alien.syntax
+combinators gobject-introspection literals math system vocabs.loader ;
 IN: gobject.ffi
+
+<<
+"glib.ffi" require
+>>
+
+LIBRARY: gobject
 
 <<
 "gobject" {
@@ -14,16 +18,11 @@ IN: gobject.ffi
 } cond
 >>
 
-TYPEDEF: void* GSignalCMarshaller
-TYPEDEF: gchar** GStrv
-TYPEDEF: gchar* gchararray
+IMPLEMENT-STRUCTS: GValue GParamSpecVariant ;
 
 GIR: vocab:gobject/GObject-2.0.gir
 
 IN: gobject.ffi
-
-FORGET: GValue
-STRUCT: GValue { g_type GType } { data guint64[2] } ;
 
 FORGET: GIOCondition
 FORGET: G_IO_IN
@@ -33,11 +32,7 @@ FORGET: G_IO_ERR
 FORGET: G_IO_HUP
 FORGET: G_IO_NVAL
 
-FUNCTION: void g_object_unref ( GObject* self ) ;
-
 DESTRUCTOR: g_object_unref
-
-TYPEDEF: GParamSpec GParam
 
 CONSTANT: G_TYPE_INVALID $[ 0 2 shift ]
 CONSTANT: G_TYPE_NONE $[ 1 2 shift ]
@@ -71,4 +66,3 @@ CONSTANT: G_TYPE_OBJECT $[ 20 2 shift ]
 
 : g_signal_connect_swapped ( instance detailed_signal c_handler data -- result )
     f G_CONNECT_SWAPPED g_signal_connect_data ;
-

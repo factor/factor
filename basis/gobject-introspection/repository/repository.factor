@@ -1,64 +1,134 @@
-! Copyright (C) 2009 Anton Gorenko.
+! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ;
 IN: gobject-introspection.repository
 
-TUPLE: node name ;
+TUPLE: repository
+    namespace ;
 
-TUPLE: repository includes namespace ;
+TUPLE: namespace
+    name
+    identifier-prefixes
+    symbol-prefixes
+    aliases
+    consts
+    enums
+    bitfields
+    records
+    unions
+    boxeds
+    callbacks
+    classes
+    interfaces
+    functions ;
 
-TUPLE: namespace < node
-    prefix aliases consts classes interfaces records unions callbacks
-    enums bitfields functions ;
+TUPLE: data-type
+    name ;
 
-TUPLE: alias < node target ;
+TUPLE: simple-type < data-type
+    element-types ;
 
-TUPLE: typed < node type c-type ;
+TUPLE: array-type < data-type
+    zero-terminated?
+    fixed-size
+    length
+    element-type ;
 
-TUPLE: const < typed
-    value c-identifier ffi ;
+TUPLE: inner-callback-type < data-type ;
 
-TUPLE: type-node < node
-    type c-type type-name get-type ffi ;
+TUPLE: varargs-type < data-type ;
 
-TUPLE: field < typed
-    writable? length? array-info ;
+TUPLE: alias
+    name
+    c-type
+    type ;
 
-TUPLE: record < type-node
-    fields constructors methods functions disguised? ;
+TUPLE: const
+    name
+    value
+    type ;
 
-TUPLE: union < type-node ;
+TUPLE: type
+    name
+    c-type
+    get-type ;
 
-TUPLE: class < record
-    abstract? parent type-struct signals ;
+TUPLE: enum-member
+    name
+    value
+    c-identifier ;
 
-TUPLE: interface < type-node
-    methods ;
+TUPLE: enum < type
+    members ;
 
-TUPLE: property < type-node
-    readable? writable? construct? construct-only? ;
+TUPLE: record < type
+    fields
+    constructors
+    methods
+    functions
+    disguised? ;
 
-TUPLE: callable < type-node
-    return parameters varargs? ;
+TUPLE: field
+    name
+    writable?
+    bits
+    type ;
 
-TUPLE: function < callable identifier ;
+TUPLE: union < type
+    fields
+    constructors
+    methods
+    functions ;
 
-TUPLE: callback < type-node return parameters varargs? ;
+TUPLE: return
+    type
+    transfer-ownership ;
 
-TUPLE: signal < callback ;
+TUPLE: parameter
+    name
+    type
+    direction
+    allow-none?
+    transfer-ownership ;
 
-TUPLE: parameter < typed
-    direction allow-none? length? transfer-ownership array-info
-    local ;
+TUPLE: function
+    name
+    identifier
+    return
+    parameters
+    throws? ;
 
-TUPLE: return < typed
-    transfer-ownership array-info local ;
+TUPLE: callback < type
+    return
+    parameters
+    throws? ;
 
-TUPLE: type name namespace ;
+TUPLE: class < type
+    abstract?
+    parent
+    type-struct
+    constructors
+    methods
+    functions
+    signals ;
 
-TUPLE: array-info zero-terminated? fixed-size length ;
+TUPLE: interface < type
+    constructors
+    methods
+    functions
+    signals ;
 
-TUPLE: enum-member < node value c-identifier ;
+TUPLE: boxed < type ;
 
-TUPLE: enum < type-node members ;
+TUPLE: signal
+    name
+    return
+    parameters ;
 
+TUPLE: property
+    name
+    readable?
+    writable?
+    construct?
+    construct-only?
+    type ;

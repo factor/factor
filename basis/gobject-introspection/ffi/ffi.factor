@@ -1,240 +1,341 @@
-! Copyright (C) 2009 Anton Gorenko.
+! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.parser arrays assocs
 classes.parser classes.struct combinators
 combinators.short-circuit definitions effects fry
 gobject-introspection.common gobject-introspection.types kernel
 math.parser namespaces parser quotations sequences
+
+gobject-introspection.standard-types
+prettyprint ascii gobject-introspection.repository locals
+compiler.units make splitting.monotonic
+
 sequences.generalizations words words.constant ;
 IN: gobject-introspection.ffi
 
-: string>c-type ( str -- c-type )
-    dup CHAR: * swap index [ cut ] [ "" ] if*
-    [ replaced-c-types get-global ?at drop ] dip
-    append parse-c-type ;
-    
-: define-each ( nodes quot -- )
-    '[ dup @ >>ffi drop ] each ; inline
+SYMBOL: constant-prefix
 
-: function-ffi-invoker ( func -- quot )
-    {
-        [ return>> c-type>> string>c-type ]
-        [ drop current-lib get-global ]
-        [ identifier>> ]
-        [ parameters>> [ c-type>> string>c-type ] map ]
-        [ varargs?>> [ void* suffix ] when ]
-    } cleave function-quot ;
+: def-c-type ( c-type-name base-c-type -- )
+    swap (CREATE-C-TYPE) typedef ;
 
-: function-ffi-effect ( func -- effect )
-    [ parameters>> [ name>> ] map ]
-    [ varargs?>> [ "varargs" suffix ] when ]
-    [ return>> type>> none-type? { } { "result" } ? ] tri
-    <effect> ;
+: defer-c-type ( c-type-name -- c-type )
+    deferred-type swap (CREATE-C-TYPE) [ typedef ] keep ;
+!     create-in dup
+!     [ fake-definition ] [ undefined-def define ] bi ;
 
-: define-ffi-function ( func -- word )
-    [ identifier>> create-in dup ]
-    [ function-ffi-invoker ] [ function-ffi-effect ] tri
-    define-declared ;
+:: defer-types ( types type-info-class -- )
+    types [
+        [ c-type>> defer-c-type ]
+        [ name>> qualified-name ] bi
+        type-info-class new swap register-type
+    ] each ;
 
-: define-ffi-functions ( functions -- )
-    [ define-ffi-function ] define-each ;
+: def-alias-c-type ( base-c-type c-type-name -- c-type )
+    (CREATE-C-TYPE) [ typedef ] keep ;
 
-: callback-ffi-invoker ( callback -- quot )
-    [ return>> c-type>> string>c-type ]
-    [ parameters>> [ c-type>> string>c-type ] map ] bi
-    cdecl callback-quot ;
+: alias-c-type-name ( alias -- c-type-name )
+    ! <workaround for alises w/o c:type (Atk)
+    [ c-type>> ] [ name>> ] bi or ;
+    ! workaround>
+    ! c-type>> ;
 
-: callback-ffi-effect ( callback -- effect )
-    [ parameters>> [ name>> ] map ]
-    [ return>> type>> none-type? { } { "result" } ? ] bi
-    <effect> ;
+:: def-alias ( alias -- )
+    alias type>> get-type-info
+    [ c-type>> alias alias-c-type-name def-alias-c-type ]
+    [ clone ] bi alias name>> qualified-name register-type ;
 
-: define-ffi-callback ( callback -- word )
-    [ c-type>> create-in [ void* swap typedef ] keep dup ] keep
-    [ callback-ffi-effect "callback-effect" set-word-prop ]
-    [ drop current-lib get-global "callback-library" set-word-prop ] 
-    [ callback-ffi-invoker (( quot -- alien )) define-inline ] 2tri ;
+: def-aliases ( aliases -- )
+    [ def-alias ] each ;
 
-: fix-signal-param-c-type ( param -- )
-    dup [ c-type>> ] [ type>> ] bi
-    {
-        [ none-type? ]
-        [ simple-type? ]
-        [ enum-type? ]
-        [ bitfield-type? ]
-    } 1|| [ dup "*" tail? [ CHAR: * suffix ] unless ] unless
-    >>c-type drop ;
+GENERIC: type>c-type ( type -- c-type )
 
-: define-ffi-signal ( signal -- word )
-    [ return>> fix-signal-param-c-type ]
-    [ parameters>> [ fix-signal-param-c-type ] each ]
-    [ define-ffi-callback ] tri ;
-    
-: define-ffi-signals ( signals -- )
-    [ define-ffi-signal ] define-each ;
+M: atomic-type type>c-type get-type-info c-type>> ;
+M: enum-type type>c-type get-type-info c-type>> ;
+M: bitfield-type type>c-type get-type-info c-type>> ;
+M: record-type type>c-type get-type-info c-type>> <pointer> ;
+M: union-type type>c-type get-type-info c-type>> <pointer> ;
+M: boxed-type type>c-type get-type-info c-type>> <pointer> ;
+M: callback-type type>c-type get-type-info c-type>> ;
+M: class-type type>c-type get-type-info c-type>> <pointer> ;
+M: interface-type type>c-type get-type-info c-type>> <pointer> ;
 
-: const-value ( const -- value )
-    [ value>> ] [ type>> name>> ] bi {
-        { "int" [ string>number ] }
-        { "double" [ string>number ] }
-        { "utf8" [ ] }
+M: boxed-array-type type>c-type
+    name>> simple-type new swap >>name type>c-type ;
+
+M: c-array-type type>c-type
+    element-type>> type>c-type <pointer> ;
+
+M: fixed-size-array-type type>c-type
+    [ element-type>> type>c-type ] [ fixed-size>> ] bi 2array ;
+
+! <workaround for <type/> (in some signals and properties)
+PREDICATE: incorrect-type < simple-type name>> not ;
+M: incorrect-type type>c-type drop void* ;
+! workaround>
+
+GENERIC: parse-const-value ( str data-type -- value )
+
+M: atomic-type parse-const-value
+    name>> {
+        { "gint" [ string>number ] }
+        { "gdouble" [ string>number ] }
     } case ;
 
-: define-ffi-enum ( enum -- word )
-    [
-       members>> [
-           [ c-identifier>> create-in ]
-           [ value>> ] bi define-constant
-       ] each 
-    ] [ c-type>> (CREATE-C-TYPE) [ int swap typedef ] keep ] bi ;
+M: utf8-type parse-const-value drop ;
 
-: define-ffi-enums ( enums -- )
-    [ define-ffi-enum ] define-each ;
-    
-: define-ffi-bitfields ( bitfields -- )
-    [ define-ffi-enum ] define-each ;
+: const-value ( const -- value )
+    [ value>> ] [ type>> ] bi parse-const-value ;
 
-: fields>struct-slots ( fields -- slots )
-    [
-        [ name>> ]
+: const-name ( const -- name )
+    name>> constant-prefix get swap "_" glue ;
+
+: def-const ( const -- )
+    [ const-name create-in dup reset-generic ]
+    [ const-value ] bi define-constant ;
+
+: def-consts ( consts -- )
+    [ def-const ] each ;
+
+: define-enum-member ( member -- )
+    [ c-identifier>> create-in dup reset-generic ]
+    [ value>> ] bi define-constant ;
+           
+: def-enum-type ( enum -- )
+    [ members>> [ define-enum-member ] each ]
+    [ c-type>> int def-c-type ] bi ;
+
+: def-bitfield-type ( bitfield -- )
+    def-enum-type ;
+
+GENERIC: parameter-type>c-type ( data-type -- c-type )
+
+M: data-type parameter-type>c-type type>c-type ;
+M: varargs-type parameter-type>c-type drop void* ;
+
+: parameter-c-type ( parameter -- c-type )
+    [ type>> parameter-type>c-type ] keep
+    direction>> "in" = [ <pointer> ] unless ;
+
+GENERIC: return-type>c-type ( data-type -- c-type )
+
+M: data-type return-type>c-type type>c-type ;
+M: none-type return-type>c-type drop void ;
+
+: return-c-type ( return -- c-type )
+    type>> return-type>c-type ;
+
+: parameter-name ( parameter -- name )
+    dup type>> varargs-type?
+    [ drop "varargs" ] [ name>> "!incorrect-name!" or ] if ;
+
+: error-parameter ( -- parameter )
+    parameter new
+        "error" >>name
+        "in" >>direction
+        "none" >>transfer-ownership
+        simple-type new "GLib.Error" >>name >>type ;
+
+: ?suffix-parameters-with-error ( callable -- parameters )
+    [ parameters>> ] [ throws?>> ] bi
+    [ error-parameter suffix ] when ;
+
+: parameter-names&types ( callable -- names types )
+    [ [ parameter-c-type ] map ] [ [ parameter-name ] map ] bi ;
+
+: def-function ( function --  )
+    {
+        [ return>> return-c-type ]
+        [ identifier>> ]
+        [ drop current-library get ]
+        [ ?suffix-parameters-with-error parameter-names&types ]
+    } cleave make-function define-inline ;
+
+: def-functions ( functions -- )
+    [ def-function ] each ;
+
+GENERIC: type>data-type ( type -- data-type )
+
+M: type type>data-type
+    [ simple-type new ] dip name>> >>name ;
+
+: word-started? ( word letter -- ? )
+    [ letter? ] [ LETTER? ] bi* and ; inline
+
+: camel-case>underscore-separated ( str -- str' )
+    [ word-started? not ] monotonic-split "_" join >lower ;
+
+: type>parameter-name ( type -- name )
+    name>> camel-case>underscore-separated ;
+
+: type>parameter ( type -- parameter )
+    [ parameter new ] dip {
+        [ type>parameter-name >>name ]
+        [ type>data-type >>type ]
+        [ drop "in" >>direction "none" >>transfer-ownership ]
+    } cleave ;
+
+:: def-method ( method type --  )
+    method {
+        [ return>> return-c-type ]
+        [ identifier>> ]
+        [ drop current-library get ]
         [
-            [ c-type>> string>c-type ] [ array-info>> ] bi
-            [ fixed-size>> [ 2array ] when* ] when*
+            ?suffix-parameters-with-error
+            type type>parameter prefix
+            parameter-names&types
         ]
-        [ drop { } ] tri <struct-slot-spec>
-    ] map ;
+    } cleave make-function define-inline ;
 
-: define-ffi-record-defer ( record -- word )
-    c-type>> create-in void* swap [ typedef ] keep ;
+: def-methods ( methods type -- )
+    [ def-method ] curry each ;
 
-: define-ffi-records-defer ( records -- )
-    [ define-ffi-record-defer ] define-each ;
+: def-callback-type ( callback -- )
+    {
+        [ drop current-library get ]
+        [ return>> return-c-type ]
+        [ c-type>> ]
+        [ ?suffix-parameters-with-error parameter-names&types ]
+    } cleave make-callback-type define-inline ;
 
-: define-ffi-record ( record -- word )
-    dup ffi>> forget
-    dup {
-        [ fields>> empty? not ]
-        [ c-type>> implement-structs get-global member? ]
-    } 1&&
+GENERIC: field-type>c-type ( data-type -- c-type )
+
+M: simple-type field-type>c-type type>c-type ;
+M: inner-callback-type field-type>c-type drop void* ;
+M: array-type field-type>c-type type>c-type ;
+
+: field>struct-slot ( field -- slot )
+    [ name>> ]
+    [ dup bits>> [ drop uint ] [ type>> field-type>c-type ] if ]
     [
-        [ c-type>> create-class-in dup ]
-        [ fields>> fields>struct-slots ] bi define-struct-class        
-    ] [
-        [ disguised?>> void* void ? ]
-        [ c-type>> create-in ] bi [ typedef ] keep
-    ] if ;
+        [
+            [ drop ] ! [ writable?>> [ read-only , ] unless ]
+            [ bits>> [ bits: , , ] when* ] bi
+        ] V{ } make
+    ] tri <struct-slot-spec> ;
 
-: define-ffi-records ( records -- )
-    [ define-ffi-record ] define-each ;
+: def-record-type ( record -- )
+    dup c-type>> implement-structs get-global member?
+    [
+        [ c-type>> create-class-in ]
+        [ fields>> [ field>struct-slot ] map ] bi
+        define-struct-class
+    ] [ c-type>> void def-c-type ] if ;
 
-: define-ffi-record-content ( record -- )
+: def-record ( record -- )
     {
-        [ constructors>> define-ffi-functions ]
-        [ functions>> define-ffi-functions ]
-        [ methods>> define-ffi-functions ]
+        [ def-record-type ]
+        [ constructors>> def-functions ]
+        [ functions>> def-functions ]
+        [ [ methods>> ] keep def-methods ]
     } cleave ;
 
-: define-ffi-records-content ( records -- )
-    [ define-ffi-record-content ] each ;
+: def-union-type ( union -- )
+    c-type>> void def-c-type ;
 
-: define-ffi-union ( union -- word )
-    c-type>> create-in [ void* swap typedef ] keep ;
-
-: define-ffi-unions ( unions -- )
-    [ define-ffi-union ] define-each ;
-
-: define-ffi-callbacks ( callbacks -- )
-    [ define-ffi-callback ] define-each ;
-
-: define-ffi-interface ( interface -- word )
-    c-type>> create-in [ void swap typedef ] keep ;
-
-: define-ffi-interfaces ( interfaces -- )
-    [ define-ffi-interface ] define-each ;
-
-: define-ffi-interface-content ( interface -- )
+: def-union ( union -- )
     {
-        [ methods>> define-ffi-functions ]
+        [ def-union-type ]
+        [ constructors>> def-functions ]
+        [ functions>> def-functions ]
+        [ [ methods>> ] keep def-methods ]
     } cleave ;
 
-: define-ffi-interfaces-content ( interfaces -- )
-    [ define-ffi-interface-content ] each ;
+: def-boxed-type ( boxed -- )
+    c-type>> void def-c-type ;
 
-: get-type-invoker ( name -- quot )
-    ! hack
-    [ "GType" "glib.ffi" lookup current-lib get-global ] dip
-    { } \ alien-invoke 5 narray >quotation ;
+: signal-name ( signal type -- name )
+    swap [ c-type>> ] [ name>> ] bi* ":" glue ;
+
+: user-data-parameter ( -- parameter )
+    parameter new
+        "user_data" >>name
+        "in" >>direction
+        "none" >>transfer-ownership
+        simple-type new "gpointer" >>name >>type ;
+
+:: def-signal ( signal type -- )
+    signal {
+        [ drop current-library get ]
+        [ return>> return-c-type ]
+        [ type signal-name ]
+        [
+            parameters>> type type>parameter prefix
+            user-data-parameter suffix parameter-names&types
+        ]
+    } cleave make-callback-type define-inline ;
     
-: define-ffi-class ( class -- word )
-    c-type>> create-in [ void swap typedef ] keep ;
+: def-signals ( signals type -- )
+    [ def-signal ] curry each ;
 
-: define-ffi-classes ( class -- )
-    [ define-ffi-class ] define-each ;
+: def-class-type ( class -- )
+    c-type>> void def-c-type ;
 
-: define-ffi-class-content ( class -- )
+: def-class ( class -- )
     {
-        [ constructors>> define-ffi-functions ]
-        [ functions>> define-ffi-functions ]
-        [ methods>> define-ffi-functions ]
-        [ signals>> define-ffi-signals ]
+        [ def-class-type ]
+        [ constructors>> def-functions ]
+        [ functions>> def-functions ]
+        [ [ methods>> ] keep def-methods ]
+        [ [ signals>> ] keep def-signals ]
     } cleave ;
 
-: define-ffi-classes-content ( class -- )
-    [ define-ffi-class-content ] each ;
+: def-interface-type ( interface -- )
+    c-type>> void def-c-type ;
 
-: define-get-type ( node -- word )
-    get-type>> dup { "intern" f } member? [ drop f ]
-    [
-        [ create-in dup ] [ get-type-invoker ] bi
-        { } { "type" } <effect> define-declared
-    ] if ;
-
-: define-get-types ( namespace -- )
+: def-interface ( class -- )
     {
-        [ enums>> [ define-get-type drop ] each ]
-        [ bitfields>> [ define-get-type drop ] each ]
-        [ records>> [ define-get-type drop ] each ]
-        [ unions>> [ define-get-type drop ] each ]
-        [ interfaces>> [ define-get-type drop ] each ]
-        [ classes>> [ define-get-type drop ] each ]
+        [ def-interface-type ]
+        [ functions>> def-functions ]
+        [ [ methods>> ] keep def-methods ]
+        [ [ signals>> ] keep def-signals ]
     } cleave ;
 
-: define-ffi-const ( const -- word )
-    [ c-identifier>> create-in dup ] [ const-value ] bi
-    define-constant ;
+: defer-enums ( enums -- ) enum-info defer-types ;
+: defer-bitfields ( bitfields -- ) bitfield-info defer-types ;
+: defer-records ( records -- ) record-info defer-types ;
+: defer-unions ( unions -- ) union-info defer-types ;
+: defer-boxeds ( boxeds -- ) boxed-info defer-types ;
+: defer-callbacks ( callbacks -- ) callback-info defer-types ;
+: defer-interfaces ( interfaces -- ) interface-info defer-types ;
+: defer-classes ( class -- ) class-info defer-types ;
 
-: define-ffi-consts ( consts -- )
-    [ define-ffi-const ] define-each ;
+: def-enums ( enums -- ) [ def-enum-type ] each ;
+: def-bitfields ( bitfields -- ) [ def-bitfield-type ] each ;
+: def-records ( records -- ) [ def-record ] each ;
+: def-unions ( unions -- ) [ def-union ] each ;
+: def-boxeds ( boxeds -- ) [ def-boxed-type ] each ;
+: def-callbacks ( callbacks -- ) [ def-callback-type ] each ;
+: def-interfaces ( interfaces -- ) [ def-interface ] each ;
+: def-classes ( classes -- ) [ def-class ] each ;
 
-: define-ffi-alias ( alias -- )
-    drop ;
-
-: define-ffi-aliases ( aliases -- )
-    [ define-ffi-alias ] each ;
-
-: define-ffi-namespace ( namespace -- )
+: def-namespace ( namespace -- )
     {
-        [ aliases>> define-ffi-aliases ]
-        [ consts>> define-ffi-consts ]
-        [ enums>> define-ffi-enums ]
-        [ bitfields>> define-ffi-bitfields ]
-        
-        [ records>> define-ffi-records-defer ]
+        [ symbol-prefixes>> first >upper constant-prefix set ]
+        [ consts>> def-consts ]
 
-        [ unions>> define-ffi-unions ]
-        [ interfaces>> define-ffi-interfaces ]
-        [ classes>> define-ffi-classes ]
-        [ callbacks>> define-ffi-callbacks ]
-        [ records>> define-ffi-records ]
-                
-        [ records>> define-ffi-records-content ]
-        [ classes>> define-ffi-classes-content ]
-        [ interfaces>> define-ffi-interfaces-content ]
-        [ functions>> define-ffi-functions ]
+        [ enums>> defer-enums ]
+        [ bitfields>> defer-bitfields ]
+        [ records>> defer-records ]
+        [ unions>> defer-unions ]
+        [ boxeds>> defer-boxeds ]
+        [ callbacks>> defer-callbacks ]
+        [ interfaces>> defer-interfaces ]
+        [ classes>> defer-classes ]
 
-        [ define-get-types ]
+        [ aliases>> def-aliases ]
+
+        [ enums>> def-enums ]
+        [ bitfields>> def-bitfields ]
+        [ records>> def-records ]
+        [ unions>> def-unions ]
+        [ boxeds>> def-boxeds ]
+        [ callbacks>> def-callbacks ]
+        [ interfaces>> def-interfaces ]
+        [ classes>> def-classes ]
+
+        [ functions>> def-functions ]
     } cleave ;
 
-: define-ffi-repository ( repository -- )
-    namespace>> define-ffi-namespace ;
+: def-ffi-repository ( repository -- )
+    namespace>> def-namespace ;
      

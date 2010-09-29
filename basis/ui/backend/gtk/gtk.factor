@@ -1,13 +1,14 @@
 ! Copyright (C) 2010 Anton Gorenko, Philipp Brüschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct command-line destructors
-gdk.ffi gdk.gl.ffi glib.ffi gobject.ffi gtk.ffi gtk.gl.ffi io.backend
-io.backend.unix.multiplexers io.encodings.utf8 io.thread kernel libc
-literals locals math math.bitwise math.order math.vectors namespaces
-sequences strings system threads ui ui.backend ui.clipboards
-ui.event-loop ui.gadgets ui.gadgets.editors ui.gadgets.private
-ui.gadgets.worlds ui.gestures ui.pixel-formats
+alien.strings alien.syntax arrays assocs classes.struct command-line
+destructors gdk.ffi gdk.gl.ffi glib.ffi
+gobject-introspection.standard-types gobject.ffi gtk.ffi gtk.gl.ffi
+io.backend io.backend.unix.multiplexers io.encodings.utf8 io.thread
+kernel libc literals locals math math.bitwise math.order math.vectors
+namespaces sequences strings system threads ui ui.backend
+ui.clipboards ui.event-loop ui.gadgets ui.gadgets.editors
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
 ui.pixel-formats.private ui.private ;
 IN: ui.backend.gtk
 
@@ -144,33 +145,33 @@ CONSTANT: modifiers
 
 CONSTANT: action-key-codes
     H{
-        { $ GDK_BackSpace "BACKSPACE" }
-        { $ GDK_Tab "TAB" }
-        { $ GDK_Return "RET" }
-        { $ GDK_KP_Enter "ENTER" }
-        { $ GDK_Escape "ESC" }
-        { $ GDK_Delete "DELETE" }
-        { $ GDK_Home "HOME" }
-        { $ GDK_Left "LEFT" }
-        { $ GDK_Up "UP" }
-        { $ GDK_Right "RIGHT" }
-        { $ GDK_Down "DOWN" }
-        { $ GDK_Page_Up "PAGE_UP" }
-        { $ GDK_Page_Down "PAGE_DOWN" }
-        { $ GDK_End "END" }
-        { $ GDK_Begin "BEGIN" }
-        { $ GDK_F1 "F1" }
-        { $ GDK_F2 "F2" }
-        { $ GDK_F3 "F3" }
-        { $ GDK_F4 "F4" }
-        { $ GDK_F5 "F5" }
-        { $ GDK_F6 "F6" }
-        { $ GDK_F7 "F7" }
-        { $ GDK_F8 "F8" }
-        { $ GDK_F9 "F9" }
-        { $ GDK_F10 "F10" }
-        { $ GDK_F11 "F11" }
-        { $ GDK_F12 "F12" }
+        { $ GDK_KEY_BackSpace "BACKSPACE" }
+        { $ GDK_KEY_Tab "TAB" }
+        { $ GDK_KEY_Return "RET" }
+        { $ GDK_KEY_KP_Enter "ENTER" }
+        { $ GDK_KEY_Escape "ESC" }
+        { $ GDK_KEY_Delete "DELETE" }
+        { $ GDK_KEY_Home "HOME" }
+        { $ GDK_KEY_Left "LEFT" }
+        { $ GDK_KEY_Up "UP" }
+        { $ GDK_KEY_Right "RIGHT" }
+        { $ GDK_KEY_Down "DOWN" }
+        { $ GDK_KEY_Page_Up "PAGE_UP" }
+        { $ GDK_KEY_Page_Down "PAGE_DOWN" }
+        { $ GDK_KEY_End "END" }
+        { $ GDK_KEY_Begin "BEGIN" }
+        { $ GDK_KEY_F1 "F1" }
+        { $ GDK_KEY_F2 "F2" }
+        { $ GDK_KEY_F3 "F3" }
+        { $ GDK_KEY_F4 "F4" }
+        { $ GDK_KEY_F5 "F5" }
+        { $ GDK_KEY_F6 "F6" }
+        { $ GDK_KEY_F7 "F7" }
+        { $ GDK_KEY_F8 "F8" }
+        { $ GDK_KEY_F9 "F9" }
+        { $ GDK_KEY_F10 "F10" }
+        { $ GDK_KEY_F11 "F11" }
+        { $ GDK_KEY_F12 "F12" }
     }
 
 : event-modifiers ( event -- seq )
@@ -195,30 +196,24 @@ CONSTANT: action-key-codes
 
 : on-motion ( win event user-data -- ? )
     drop swap
-    [ GdkEventMotion memory>struct event-loc ] dip window
+    [ event-loc ] dip window
     move-hand fire-motion t ;
-
-: on-enter ( win event user-data -- ? )
-    on-motion ;
 
 : on-leave ( win event user-data -- ? )
     3drop forget-rollover t ;
 
 : on-button-press ( win event user-data -- ? )
     drop swap [
-        GdkEventButton memory>struct
         mouse-event>gesture [ <button-down> ] dip
     ] dip window send-button-down t ;
 
 : on-button-release ( win event user-data -- ? )
     drop swap [
-        GdkEventButton memory>struct
         mouse-event>gesture [ <button-up> ] dip
     ] dip window send-button-up t ;
 
 : on-scroll ( win event user-data -- ? )
     drop swap [
-        GdkEventScroll memory>struct
         [ scroll-direction ] [ event-loc ] bi
     ] dip window send-scroll t ;
 
@@ -227,7 +222,6 @@ CONSTANT: action-key-codes
     [ gdk_keyval_to_unicode [ f ] [ 1string ] if-zero f ] ?if ;
 
 : key-event>gesture ( event -- mods sym/f action? )
-    GdkEventKey memory>struct
     [ event-modifiers ] [ key-sym ] bi ;
   
 : on-key-press ( win event user-data -- ? )
@@ -250,8 +244,6 @@ CONSTANT: action-key-codes
     GtkWidget:motion-notify-event connect-signal
     win "leave-notify-event" [ on-leave yield ]
     GtkWidget:leave-notify-event connect-signal
-    win "enter-notify-event" [ on-enter yield ]
-    GtkWidget:enter-notify-event connect-signal
     win "button-press-event" [ on-button-press yield ]
     GtkWidget:button-press-event connect-signal
     win "button-release-event" [ on-button-release yield ]
@@ -274,7 +266,7 @@ CONSTANT: action-key-codes
 
 : on-configure ( win event user-data -- ? )
     drop [ window ] [ GdkEventConfigure memory>struct ] bi*
-    [ event-loc >>window-loc ] [ event-dim >>dim  ] bi
+    [ event-loc >>window-loc ] [ event-dim >>dim ] bi
     relayout-1 f ;
 
 : on-delete ( win event user-data -- ? )
@@ -323,7 +315,7 @@ M: editor get-cursor-loc&dim
     [ delete-cursor-surrounding t ] [ 3drop f ] if nip ;
 
 : get-preedit-string ( im-context -- str cursor-pos )
-    { void* int } [ f swap gtk_im_context_get_preedit_string ]
+    { pointer: gchar gint } [ f swap gtk_im_context_get_preedit_string ]
     with-out-parameters 
     [ [ utf8 alien>string ] [ g_free ] bi ] dip ;
             
@@ -340,7 +332,11 @@ M: editor get-cursor-loc&dim
 
 : gadget-cursor-location ( gadget -- rectangle )
     [ gadget-location ] [ get-cursor-loc&dim ] bi [ v+ ] dip
-    [ first2 ] bi@ GdkRectangle <struct-boa> ;
+    [ first2 ] bi@
+    ! <workaround
+    cairo_rectangle_int_t <struct-boa> ;
+    ! workaround>
+    ! GdkRectangle <struct-boa> ;
 
 : update-cursor-location ( im-context gadget -- )
     gadget-cursor-location gtk_im_context_set_cursor_location ;
@@ -464,7 +460,7 @@ M: gtk-ui-backend (free-pixel-format)
 
 M: gtk-ui-backend (pixel-format-attribute)
     [ handle>> ] [ >gl-config-attribs ] bi*
-    { int } [ gdk_gl_config_get_attrib drop ]
+    { gint } [ gdk_gl_config_get_attrib drop ]
     with-out-parameters ;
 
 M: window-handle select-gl-context ( handle -- )
@@ -557,16 +553,20 @@ M: gtk-ui-backend beep
     gdk_beep ;
 
 M:: gtk-ui-backend system-alert ( caption text -- )
-    f GTK_DIALOG_MODAL GTK_MESSAGE_WARNING GTK_BUTTONS_OK
-    caption utf8 string>alien f gtk_message_dialog_new
-    [ text utf8 string>alien f gtk_message_dialog_format_secondary_text ]
-    [ gtk_dialog_run drop ]
-    [ gtk_widget_destroy ] tri ;
+    [
+        f GTK_DIALOG_MODAL GTK_MESSAGE_WARNING GTK_BUTTONS_OK
+        caption utf8 string>alien f
+        gtk_message_dialog_new &gtk_widget_destroy
+        [
+            text utf8 string>alien f
+            gtk_message_dialog_format_secondary_text
+        ] [ gtk_dialog_run drop ] bi
+    ] with-destructors ;
 
 M: gtk-ui-backend (with-ui)
     [
-        f f gtk_init
-        f f gtk_gl_init
+        0 <int> f <void*> gtk_init
+        0 <int> f <void*> gtk_gl_init
         init-clipboard
         start-ui
         stop-io-thread
@@ -576,6 +576,7 @@ M: gtk-ui-backend (with-ui)
             gtk_main
         ] with-destructors
     ] ui-running ;
+
 
 gtk-ui-backend ui-backend set-global
 

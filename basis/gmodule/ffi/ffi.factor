@@ -1,8 +1,14 @@
-! Copyright (C) 2009 Anton Gorenko.
+! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.libraries combinators kernel system
-gobject-introspection glib.ffi ;
+USING: alien alien.libraries alien.syntax combinators
+gobject-introspection kernel system vocabs.loader ;
 IN: gmodule.ffi
+
+<<
+"glib.ffi" require
+>>
+
+LIBRARY: gmodule
 
 <<
 "gmodule" {
@@ -13,4 +19,3 @@ IN: gmodule.ffi
 >>
 
 GIR: vocab:gmodule/GModule-2.0.gir
-
