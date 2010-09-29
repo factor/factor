@@ -235,6 +235,13 @@ test-db [
         servers>> random addr>> port>>
     ] with-scope "port" set ;
 
+: add-port ( url -- url' )
+    >url clone "port" get >>port ;
+
+: stop-test-httpd ( -- )
+    "http://localhost/quit" add-port http-get nip
+    "Goodbye" assert= ;
+
 [ ] [
     <dispatcher>
         add-quit-action
@@ -247,9 +254,6 @@ test-db [
 
     test-httpd
 ] unit-test
-
-: add-port ( url -- url' )
-    >url clone "port" get >>port ;
 
 [ t ] [
     "vocab:http/test/foo.html" ascii file-contents
@@ -279,7 +283,7 @@ test-db [
 
 
 [ ] [
-    [ "http://localhost/quit" add-port http-get 2drop ] ignore-errors
+    [ stop-test-httpd ] ignore-errors
 ] unit-test
 
 ! Dispatcher bugs
@@ -402,7 +406,7 @@ SYMBOL: a
     "vocab:http/test/foo.html" ascii file-contents =
 ] unit-test
 
-[ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
+[ ] [ stop-test-httpd ] unit-test
 
 ! Check behavior of 307 redirect (reported by Chris Double)
 [ ] [
@@ -429,4 +433,16 @@ SYMBOL: a
     ] with-directory
 ] must-fail
 
-[ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
+[ ] [ stop-test-httpd ] unit-test
+
+! Check that index.fhtml works
+[ ] [
+    <dispatcher>
+        "resource:basis/http/test/" <static> enable-fhtml >>default
+        add-quit-action
+    test-httpd
+] unit-test
+
+[ "OK\n\n" ] [ "http://localhost/" add-port http-get nip ] unit-test
+
+[ ] [ stop-test-httpd ] unit-test
