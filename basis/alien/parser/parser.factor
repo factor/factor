@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.libraries arrays
 assocs classes combinators combinators.short-circuit
 compiler.units effects grouping kernel parser sequences
 splitting words fry locals lexer namespaces summary math
-vocabs.parser words.constant ;
+vocabs.parser words.constant classes.parser ;
 IN: alien.parser
 
 SYMBOL: current-library
