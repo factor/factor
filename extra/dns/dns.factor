@@ -273,7 +273,7 @@ M: SOA parse-rdata 2drop parse-soa ;
             [ type>> enum>number 2 >be ]
             [ class>> enum>number 2 >be ]
         } cleave
-    ] output>array concat ;
+    ] B{ } append-outputs-as ;
 
 GENERIC: rdata>byte-array ( rdata type -- obj )
 
@@ -307,7 +307,7 @@ M: SOA rdata>byte-array
             [ expire>> 4 >be ]
             [ minimum>> 4 >be ]
         } cleave
-    ] output>array concat ;
+    ] B{ } append-outputs-as ;
 
 : rr>byte-array ( rr -- ba )
     [
@@ -321,7 +321,7 @@ M: SOA rdata>byte-array
                 [ length 2 >be ] [ ] bi append
             ]
         } cleave
-    ] output>array concat ;
+    ] B{ } append-outputs-as ;
 
 : message>byte-array ( message -- ba )
     [
@@ -337,7 +337,7 @@ M: SOA rdata>byte-array
             [ authority-section>> [ rr>byte-array ] map concat ]
             [ additional-section>> [ rr>byte-array ] map concat ]
         } cleave
-    ] output>array concat ;
+    ] B{ } append-outputs-as ;
 
 : udp-query ( bytes server -- bytes' )
     f 0 <inet4> <datagram>
