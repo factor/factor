@@ -96,8 +96,8 @@ M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
 
 : parse-enum-member ( members name value -- members value' )
     over "{" =
-    [ 2drop scan create-in scan-object next-enum-member "}" expect ]
-    [ [ create-in ] dip next-enum-member ] if ;
+    [ 2drop scan create-class-in scan-object next-enum-member "}" expect ]
+    [ [ create-class-in ] dip next-enum-member ] if ;
 
 : parse-enum-members ( members counter token -- members )
     dup ";" = not
