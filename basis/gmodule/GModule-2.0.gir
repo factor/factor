@@ -2,7 +2,7 @@
 <!-- This file was automatically generated from C sources - DO NOT EDIT!
 To affect the contents of this file, edit the original C definitions,
 and/or use gtk-doc annotations.  -->
-<repository version="1.0"
+<repository version="1.2"
             xmlns="http://www.gtk.org/introspection/core/1.0"
             xmlns:c="http://www.gtk.org/introspection/c/1.0"
             xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
@@ -12,11 +12,12 @@ and/or use gtk-doc annotations.  -->
   <namespace name="GModule"
              version="2.0"
              shared-library="libgmodule-2.0.so.0"
-             c:prefix="g">
-    <record name="Module" c:type="GModule">
+             c:identifier-prefixes="G"
+             c:symbol-prefixes="g">
+    <record name="Module" c:type="GModule" disguised="1">
       <method name="close" c:identifier="g_module_close">
         <return-value transfer-ownership="none">
-          <type name="boolean" c:type="gboolean"/>
+          <type name="gboolean" c:type="gboolean"/>
         </return-value>
       </method>
       <method name="make_resident" c:identifier="g_module_make_resident">
@@ -24,23 +25,23 @@ and/or use gtk-doc annotations.  -->
           <type name="none" c:type="void"/>
         </return-value>
       </method>
+      <method name="name" c:identifier="g_module_name">
+        <return-value transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
       <method name="symbol" c:identifier="g_module_symbol">
         <return-value transfer-ownership="none">
-          <type name="boolean" c:type="gboolean"/>
+          <type name="gboolean" c:type="gboolean"/>
         </return-value>
         <parameters>
           <parameter name="symbol_name" transfer-ownership="none">
             <type name="utf8" c:type="gchar*"/>
           </parameter>
           <parameter name="symbol" transfer-ownership="none">
-            <type name="any" c:type="gpointer*"/>
+            <type name="gpointer" c:type="gpointer*"/>
           </parameter>
         </parameters>
-      </method>
-      <method name="name" c:identifier="g_module_name">
-        <return-value transfer-ownership="none">
-          <type name="utf8" c:type="gchar*"/>
-        </return-value>
       </method>
     </record>
     <callback name="ModuleCheckInit" c:type="GModuleCheckInit">
@@ -68,7 +69,7 @@ and/or use gtk-doc annotations.  -->
         </parameter>
       </parameters>
     </callback>
-    <function name="build_path" c:identifier="g_module_build_path">
+    <function name="module_build_path" c:identifier="g_module_build_path">
       <return-value transfer-ownership="full">
         <type name="utf8" c:type="gchar*"/>
       </return-value>
@@ -81,13 +82,15 @@ and/or use gtk-doc annotations.  -->
         </parameter>
       </parameters>
     </function>
-    <function name="error" c:identifier="g_module_error">
+    <function name="module_error" c:identifier="g_module_error">
       <return-value transfer-ownership="none">
         <type name="utf8" c:type="gchar*"/>
       </return-value>
     </function>
-    <function name="open" c:identifier="g_module_open">
-      <return-value transfer-ownership="full">
+    <function name="module_open"
+              c:identifier="g_module_open"
+              introspectable="0">
+      <return-value>
         <type name="Module" c:type="GModule*"/>
       </return-value>
       <parameters>
@@ -99,9 +102,9 @@ and/or use gtk-doc annotations.  -->
         </parameter>
       </parameters>
     </function>
-    <function name="supported" c:identifier="g_module_supported">
+    <function name="module_supported" c:identifier="g_module_supported">
       <return-value transfer-ownership="none">
-        <type name="boolean" c:type="gboolean"/>
+        <type name="gboolean" c:type="gboolean"/>
       </return-value>
     </function>
   </namespace>
