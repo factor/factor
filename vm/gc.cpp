@@ -230,7 +230,7 @@ struct call_frame_scrubber {
 		gc_info *info = compiled->block_gc_info();
 
 		assert(return_address < compiled->size());
-		cell index = info->return_address_index(return_address);
+		int index = info->return_address_index(return_address);
 		if(index != -1)
 			ctx->scrub_stacks(info,index);
 	}

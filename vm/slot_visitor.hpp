@@ -292,7 +292,7 @@ struct call_frame_slot_visitor {
 		gc_info *info = compiled->block_gc_info();
 
 		assert(return_address < compiled->size());
-		cell callsite = info->return_address_index(return_address);
+		u32 callsite = info->return_address_index(return_address);
 		if(callsite == gc_info_missing_value)
 			return;
 
