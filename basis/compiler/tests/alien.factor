@@ -6,7 +6,7 @@ math memory namespaces namespaces.private parser
 quotations sequences specialized-arrays stack-checker
 stack-checker.errors system threads tools.test words
 alien.complex concurrency.promises alien.data
-byte-arrays classes compiler.test ;
+byte-arrays classes compiler.test libc ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: char
@@ -823,3 +823,9 @@ TUPLE: some-tuple x ;
         aa-indirect-1 >>x
     ] compile-call
 ] unit-test
+
+! GC maps regression
+: anton's-regression ( -- )
+    f (free) f (free) ;
+
+[ ] [ anton's-regression ] unit-test
