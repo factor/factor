@@ -734,6 +734,13 @@ ERROR: windows-error n string ;
 : win32-error<0 ( n -- ) 0 < [ win32-error ] when ;
 : win32-error<>0 ( n -- ) zero? [ win32-error ] unless ;
 
+: n>win32-error-check ( n -- )
+    dup ERROR_SUCCESS = [
+        drop
+    ] [
+        dup n>win32-error-string windows-error
+    ] if ;
+
 : check-invalid-handle ( handle -- handle )
     dup INVALID_HANDLE_VALUE = [ win32-error-string throw ] when ;
 
