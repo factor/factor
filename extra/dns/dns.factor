@@ -4,11 +4,11 @@ USING: accessors alien.enums alien.syntax arrays assocs
 byte-arrays calendar combinators combinators.smart constructors
 destructors fry grouping io io.binary io.buffers
 io.encodings.binary io.encodings.string io.encodings.utf8
-io.files io.ports io.sockets io.streams.byte-array io.timeouts
-kernel make math math.bitwise math.parser math.ranges
-math.statistics memoize namespaces random sequences
-slots.syntax splitting strings system unicode.categories
-vectors nested-comments io.sockets.private ;
+io.files io.ports io.sockets io.sockets.private
+io.streams.byte-array io.timeouts kernel make math math.bitwise
+math.parser math.ranges math.statistics memoize namespaces
+nested-comments random sequences slots.syntax splitting strings
+system unicode.categories vectors vocabs.loader ;
 IN: dns
 
 GENERIC: stream-peek1 ( stream -- byte/f )
@@ -58,17 +58,6 @@ SYMBOL: dns-servers
 
 : clear-dns-servers ( -- )
     V{ } clone dns-servers set-global ;
-
-! Google DNS servers
-CONSTANT: initial-dns-servers { "8.8.8.8" "8.8.4.4" }
-
-: load-resolve.conf ( -- seq )
-    "/etc/resolv.conf" utf8 file-lines
-    [ [ blank? ] trim ] map
-    [ "#" head? not ] filter
-    [ [ " " split1 swap ] dip push-at ] sequence>hashtable "nameserver" swap at ;
-
-dns-servers [ initial-dns-servers >vector ] initialize
 
 : >dotted ( domain -- domain' )
     dup "." tail? [ "." append ] unless ;
@@ -406,3 +395,12 @@ M: SOA rdata>byte-array
     [ dns-A-query a-message. ]
     [ dns-AAAA-query a-message. ]
     [ dns-MX-query mx-message. ] tri ;
+    
+HOOK: initial-dns-servers os ( -- seq )
+
+{
+    { [ os windows? ] [ "dns.windows" ] }
+    { [ os unix? ] [ "dns.unix" ] }
+} cond require
+    
+dns-servers [ initial-dns-servers >vector ] initialize
