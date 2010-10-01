@@ -132,17 +132,30 @@ M: vreg-insn compute-live-intervals* ( insn -- )
     [ [ temp-vregs ] dip '[ _ record-temp ] each ]
     2tri ;
 
+! Extend lifetime intervals of base pointers, so that their
+! values are available even if the base pointer is never used
+! again.
+
+GENERIC: uses-vregs* ( insn -- seq )
+
+M: gc-map-insn uses-vregs* ( insn -- )
+    [ uses-vregs ] [ gc-map>> derived-roots>> values ] bi append ;
+
+M: vreg-insn uses-vregs* uses-vregs ;
+
+M: insn uses-vregs* drop f ;
+
 M: clobber-insn compute-live-intervals* ( insn -- )
     dup insn#>>
     [ [ defs-vregs ] dip '[ _ f record-def ] each ]
-    [ [ uses-vregs ] dip '[ _ t record-use ] each ]
+    [ [ uses-vregs* ] dip '[ _ t record-use ] each ]
     [ [ temp-vregs ] dip '[ _ record-temp ] each ]
     2tri ;
 
 M: hairy-clobber-insn compute-live-intervals* ( insn -- )
     dup insn#>>
     [ [ defs-vregs ] dip '[ _ t record-def ] each ]
-    [ [ uses-vregs ] dip '[ _ t record-use ] each ]
+    [ [ uses-vregs* ] dip '[ _ t record-use ] each ]
     [ [ temp-vregs ] dip '[ _ record-temp ] each ]
     2tri ;
 
