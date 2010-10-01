@@ -58,12 +58,10 @@ counter "COUNTER" {
     [ counter new dup insert-tuple ] unless* ;
 
 : counter-value ( -- n )
-    [ counter-tuple value>> 0 or ] with-transaction ;
+    counter-tuple value>> 0 or ;
 
 : increment-counter-value ( -- n )
-    [
-        counter-tuple [ 0 or 1 + dup ] change-value update-tuple
-    ] with-transaction ;
+    counter-tuple [ 0 or 1 + dup ] change-value update-tuple ;
 
 : funny-builders ( -- crashed broken )
     builder new select-tuples
