@@ -18,7 +18,7 @@ IN: webapps.mason.downloads
     [
         [
             funny-builders
-            [ builder-list ] tri@
+            [ builder-list ] bi@
             [ "crashed" set-value ]
             [ "broken" set-value ] bi*
         ] with-mason-db
