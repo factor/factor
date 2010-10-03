@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: logging.analysis logging.server logging smtp kernel
 io.files io.streams.string namespaces make timers assocs
@@ -14,7 +14,7 @@ SYMBOL: insomniac-recipients
 
 : email-subject ( service -- string )
     [
-        "[INSOMNIAC] " % % " on " % io.sockets:host-name %
+        "Log analysis for " % % " on " % io.sockets:host-name %
     ] "" make ;
 
 : (email-log-report) ( service word-names -- )
@@ -33,5 +33,5 @@ SYMBOL: insomniac-recipients
     "logging.insomniac" [ (email-log-report) ] with-logging ;
 
 : schedule-insomniac ( service word-names -- )
-    [ [ email-log-report ] assoc-each rotate-logs ] 2curry
-    1 days delayed-every drop ;
+    [ email-log-report rotate-logs ] 2curry
+    1 days every drop ;
