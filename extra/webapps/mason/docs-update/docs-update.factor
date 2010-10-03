@@ -1,17 +1,18 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors continuations namespaces sequences
-furnace.actions help.html http.server.responses io.directories
-io.directories.hierarchy io.launcher io.files io.pathnames
-kernel memoize threads webapps.mason.utils ;
+USING: accessors furnace.actions help.html
+http.server.responses io.directories io.directories.hierarchy
+io.files io.launcher io.pathnames kernel mason.config memoize
+namespaces sequences threads webapps.mason.utils ;
 IN: webapps.mason.docs-update
 
-SYMBOL: docs-path
+: docs-path ( -- path )
+    docs-directory get "docs.tar.gz" append-path ;
 
 : update-docs ( -- )
     home [
         "newdocs" make-directory
-        "newdocs" [ { "tar" "xfz" } docs-path get suffix try-process ] with-directory
+        "newdocs" [ { "tar" "xfz" } docs-path suffix try-process ] with-directory
 
         "docs" exists? [ "docs" "docs.old" move-file ] when
         "newdocs/docs" "docs" move-file
