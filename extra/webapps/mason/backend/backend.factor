@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db db.sqlite db.tuples db.types kernel
-math math.order sequences combinators.short-circuit ;
+math math.order sequences combinators.short-circuit
+io.pathnames ;
 IN: webapps.mason.backend
 
 CONSTANT: +idle+ "idle"
@@ -72,7 +73,7 @@ counter "COUNTER" {
 : os/cpu ( builder -- string )
     [ os>> ] [ cpu>> ] bi "/" glue ;
 
-: mason-db ( -- db ) "resource:mason.db" <sqlite-db> ;
+: mason-db ( -- db ) home "mason.db" append-path <sqlite-db> ;
 
 : with-mason-db ( quot -- )
     mason-db [ with-transaction ] with-db ; inline
