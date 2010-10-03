@@ -30,12 +30,12 @@ webapps.mason.backend
 websites.factorcode ;
 IN: websites.concatenative
 
-: test-db ( -- db ) "resource:test.db" <sqlite-db> ;
+: website-db ( -- db ) home "website.db" append-path <sqlite-db> ;
 
 : init-factor-db ( -- )
     mason-db [ init-mason-db ] with-db
 
-    test-db [
+    website-db [
         init-furnace-tables
 
         {
@@ -92,7 +92,7 @@ SYMBOLS: key-password key-file dh-file ;
         <planet> <login-config> <factor-boilerplate> "planet" add-responder
         <mason-app> <login-config> <factor-boilerplate> "mason" add-responder
         "/tmp/docs/" <help-webapp> "docs" add-responder
-    test-db <alloy>
+    website-db <alloy>
     main-responder set-global ;
 
 : <gitweb> ( path -- responder )
@@ -106,10 +106,10 @@ SYMBOLS: key-password key-file dh-file ;
         <concatenative-website>
             <wiki> "wiki" add-responder
             <user-admin> "user-admin" add-responder
-        <login-config> <factor-boilerplate> test-db <alloy> "concatenative.org" add-responder
-        <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> test-db <alloy> "paste.factorcode.org" add-responder
-        <planet> <login-config> <factor-boilerplate> test-db <alloy> "planet.factorcode.org" add-responder
-        <mason-app> <login-config> <factor-boilerplate> test-db <alloy> "builds.factorcode.org" add-responder
+        <login-config> <factor-boilerplate> website-db <alloy> "concatenative.org" add-responder
+        <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> website-db <alloy> "paste.factorcode.org" add-responder
+        <planet> <login-config> <factor-boilerplate> website-db <alloy> "planet.factorcode.org" add-responder
+        <mason-app> <login-config> <factor-boilerplate> website-db <alloy> "builds.factorcode.org" add-responder
         home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
         home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
     main-responder set-global ;
@@ -127,7 +127,7 @@ SYMBOLS: key-password key-file dh-file ;
         8431 >>secure ;
 
 : start-website ( -- server )
-    test-db start-expiring
-    test-db start-update-task
+    website-db start-expiring
+    website-db start-update-task
     http-insomniac
     <concatenative-website-server> start-server ;
