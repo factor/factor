@@ -24,7 +24,7 @@ HELP: >url
     "We can examine the URL object:"
     { $example
         "USING: accessors io urls ;"
-        "\"http://www.apple.com\" >url host>> print"
+        "\"http://www.apple.com\" >url addr>> host>> print"
         "www.apple.com"
     }
     "A relative URL does not have a protocol, host or port:"
@@ -41,7 +41,7 @@ HELP: URL"
 { $examples
     { $example
         "USING: accessors prettyprint urls ;"
-        "URL\" http://factorcode.org:80\" port>> ."
+        "URL\" http://factorcode.org:80\" addr>> port>> ."
         "80"
     }
 } ;
@@ -70,13 +70,13 @@ HELP: ensure-port
 { $examples
     { $example
         "USING: accessors prettyprint urls ;"
-        "URL\" https://concatenative.org\" ensure-port port>> ."
+        "URL\" https://concatenative.org\" ensure-port addr>> port>> ."
         "443"
     }
 } ;
 
 HELP: parse-host
-{ $values { "string" string } { "host" string } { "port" { $maybe integer } } }
+{ $values { "string" string } { "host/f" string } { "port/f" { $maybe integer } } }
 { $description "Splits a string of the form " { $snippet "host:port" } " into a host and a port number. If the port number is not specified, outputs " { $link f } "." }
 { $notes "This word is used by " { $link >url } ". It can also be used directly to parse " { $snippet "host:port" } " strings which are not full URLs." }
 { $examples

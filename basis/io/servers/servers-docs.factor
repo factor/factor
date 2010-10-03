@@ -76,8 +76,8 @@ ARTICLE: "io.servers" "Threaded servers"
 "From within the dynamic scope of a client handler, several words can be used to interact with the threaded server:"
 { $subsections
     stop-this-server
-    secure-port
-    insecure-port
+    secure-addr
+    insecure-addr
 }
 "Additionally, the " { $link local-address } " and "
 { $subsections remote-address } " variables are set, as in " { $link with-client } "." ;
@@ -125,12 +125,12 @@ HELP: with-threaded-server
 }
 { $description "Runs a server and calls a quotation, stopping the server once the quotation returns." } ;
 
-HELP: secure-port
-{ $values { "n/f" { $maybe integer } } }
+HELP: secure-addr
+{ $values { "inet/f" { $maybe inet } } }
 { $description "Outputs one of the port numbers on which the current threaded server accepts secure socket connections. Outputs " { $link f } " if the current threaded server does not accept secure socket connections." }
 { $notes "Can only be used from the dynamic scope of a " { $link handle-client* } " call." } ;
 
-HELP: insecure-port
-{ $values { "n/f" { $maybe integer } } }
+HELP: insecure-addr
+{ $values { "inet/f" { $maybe inet } } }
 { $description "Outputs one of the port numbers on which the current threaded server accepts ordinary socket connections. Outputs " { $link f } " if the current threaded server does not accept ordinary socket connections." }
 { $notes "Can only be used from the dynamic scope of a " { $link handle-client* } " call." } ;

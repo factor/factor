@@ -34,7 +34,7 @@ IN: io.servers
         0 >>insecure
         [ "Hello world." write stop-this-server ] >>handler
     [
-        "localhost" insecure-port <inet> ascii <client> drop stream-contents
+        insecure-addr ascii <client> drop stream-contents
     ] with-threaded-server
 ] unit-test
 

@@ -17,11 +17,11 @@ IN: http.tests
 [ "localhost" f ] [ "localhost" parse-host ] unit-test
 [ "localhost" 8888 ] [ "localhost:8888" parse-host ] unit-test
 
-[ "localhost" ] [ T{ url { protocol "http" } { host "localhost" } } unparse-host ] unit-test
-[ "localhost" ] [ T{ url { protocol "http" } { host "localhost" } { port 80 } } unparse-host ] unit-test
-[ "localhost" ] [ T{ url { protocol "https" } { host "localhost" } { port 443 } } unparse-host ] unit-test
-[ "localhost:8080" ] [ T{ url { protocol "http" } { host "localhost" } { port 8080 } } unparse-host ] unit-test
-[ "localhost:8443" ] [ T{ url { protocol "https" } { host "localhost" } { port 8443 } } unparse-host ] unit-test
+[ "localhost" ] [ T{ url { protocol "http" } { addr T{ inet f "localhost" } } } unparse-host ] unit-test
+[ "localhost" ] [ T{ url { protocol "http" } { addr T{ inet f "localhost" 80 } } } unparse-host ] unit-test
+[ "localhost" ] [ T{ url { protocol "https" } { addr T{ inet f "localhost" 443 } } } unparse-host ] unit-test
+[ "localhost:8080" ] [ T{ url { protocol "http" } { addr T{ inet f "localhost" 8080 } } } unparse-host ] unit-test
+[ "localhost:8443" ] [ T{ url { protocol "https" } { addr T{ inet f "localhost" 8443 } } } unparse-host ] unit-test
 
 : lf>crlf ( string -- string' ) "\n" split "\r\n" join ;
 
@@ -37,7 +37,7 @@ blah
 
 [
     T{ request
-        { url T{ url { path "/bar" } } }
+        { url T{ url { path "/bar" } { addr T{ inet } } } }
         { method "POST" }
         { version "1.1" }
         { header H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } } }
@@ -76,7 +76,7 @@ Host: www.sex.com
 
 [
     T{ request
-        { url T{ url { host "www.sex.com" } { path "/bar" } } }
+        { url T{ url { addr T{ inet f "www.sex.com" } } { path "/bar" } } }
         { method "HEAD" }
         { version "1.1" }
         { header H{ { "host" "www.sex.com" } } }
@@ -97,7 +97,7 @@ Host: www.sex.com:101
 
 [
     T{ request
-        { url T{ url { host "www.sex.com" } { port 101 } { path "/bar" } } }
+        { url T{ url { addr T{ inet f "www.sex.com" 101 } } { path "/bar" } } }
         { method "HEAD" }
         { version "1.1" }
         { header H{ { "host" "www.sex.com:101" } } }
@@ -232,14 +232,14 @@ test-db [
             0 >>insecure
             f >>secure
         start-server
-        servers>> random addr>> port>>
-    ] with-scope "port" set ;
+        servers>> random addr>>
+    ] with-scope "addr" set ;
 
-: add-port ( url -- url' )
-    >url clone "port" get >>port ;
+: add-addr ( url -- url' )
+    >url clone "addr" get >>addr ;
 
 : stop-test-httpd ( -- )
-    "http://localhost/quit" add-port http-get nip
+    "http://localhost/quit" add-addr http-get nip
     "Goodbye" assert= ;
 
 [ ] [
@@ -257,14 +257,14 @@ test-db [
 
 [ t ] [
     "vocab:http/test/foo.html" ascii file-contents
-    "http://localhost/nested/foo.html" add-port http-get nip =
+    "http://localhost/nested/foo.html" add-addr http-get nip =
 ] unit-test
 
-[ "http://localhost/redirect-loop" add-port http-get nip ]
+[ "http://localhost/redirect-loop" add-addr http-get nip ]
 [ too-many-redirects? ] must-fail-with
 
 [ "Goodbye" ] [
-    "http://localhost/quit" add-port http-get nip
+    "http://localhost/quit" add-addr http-get nip
 ] unit-test
 
 ! HTTP client redirect bug
@@ -278,9 +278,8 @@ test-db [
 ] unit-test
 
 [ "Goodbye" ] [
-    "http://localhost/redirect" add-port http-get nip
+    "http://localhost/redirect" add-addr http-get nip
 ] unit-test
-
 
 [ ] [
     [ stop-test-httpd ] ignore-errors
@@ -305,12 +304,12 @@ test-db [
 : 404? ( response -- ? ) [ download-failed? ] [ response>> code>> 404 = ] bi and ;
 
 ! This should give a 404 not an infinite redirect loop
-[ "http://localhost/d/blah" add-port http-get nip ] [ 404? ] must-fail-with
+[ "http://localhost/d/blah" add-addr http-get nip ] [ 404? ] must-fail-with
 
 ! This should give a 404 not an infinite redirect loop
-[ "http://localhost/blah/" add-port http-get nip ] [ 404? ] must-fail-with
+[ "http://localhost/blah/" add-addr http-get nip ] [ 404? ] must-fail-with
 
-[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
 
 [ ] [
     <dispatcher>
@@ -324,9 +323,9 @@ test-db [
     test-httpd
 ] unit-test
 
-[ "Hi" ] [ "http://localhost/" add-port http-get nip ] unit-test
+[ "Hi" ] [ "http://localhost/" add-addr http-get nip ] unit-test
 
-[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
 
 USING: html.components html.forms
 xml xml.traversal validators
@@ -356,7 +355,7 @@ SYMBOL: a
     string>xml body>> "input" deep-tag-named "value" attr ;
 
 [ "3" ] [
-    "http://localhost/" add-port http-get
+    "http://localhost/" add-addr http-get
     swap dup cookies>> "cookies" set session-id-key get-cookie
     value>> "session-id" set test-a
 ] unit-test
@@ -364,10 +363,10 @@ SYMBOL: a
 [ "4" ] [
     [
         "4" "a" set
-        "http://localhost" add-port "__u" set
+        "http://localhost" add-addr "__u" set
         "session-id" get session-id-key set
     ] H{ } make-assoc
-    "http://localhost/" add-port <post-request> "cookies" get >>cookies http-request nip test-a
+    "http://localhost/" add-addr <post-request> "cookies" get >>cookies http-request nip test-a
 ] unit-test
 
 [ 4 ] [ a get-global ] unit-test
@@ -376,15 +375,15 @@ SYMBOL: a
 [ "xyz" ] [
     [
         "xyz" "a" set
-        "http://localhost" add-port "__u" set
+        "http://localhost" add-addr "__u" set
         "session-id" get session-id-key set
     ] H{ } make-assoc
-    "http://localhost/" add-port <post-request> "cookies" get >>cookies http-request nip test-a
+    "http://localhost/" add-addr <post-request> "cookies" get >>cookies http-request nip test-a
 ] unit-test
 
 [ 4 ] [ a get-global ] unit-test
 
-[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
 
 ! Test cloning
 [ f ] [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test
@@ -402,7 +401,7 @@ SYMBOL: a
 ] unit-test
 
 [ t ] [
-    "http://localhost/" add-port http-get nip
+    "http://localhost/" add-addr http-get nip
     "vocab:http/test/foo.html" ascii file-contents =
 ] unit-test
 
@@ -424,12 +423,12 @@ SYMBOL: a
     test-httpd
 ] unit-test
 
-[ "OK" ] [ "data" "http://localhost/a" add-port http-post nip ] unit-test
+[ "OK" ] [ "data" "http://localhost/a" add-addr http-post nip ] unit-test
 
 ! Check that download throws errors (reported by Chris Double)
 [
     "resource:temp" [
-        "http://localhost/tweet_my_twat" add-port download
+        "http://localhost/tweet_my_twat" add-addr download
     ] with-directory
 ] must-fail
 
@@ -443,6 +442,6 @@ SYMBOL: a
     test-httpd
 ] unit-test
 
-[ "OK\n\n" ] [ "http://localhost/" add-port http-get nip ] unit-test
+[ "OK\n\n" ] [ "http://localhost/" add-addr http-get nip ] unit-test
 
 [ ] [ stop-test-httpd ] unit-test

@@ -219,23 +219,13 @@ PRIVATE>
         [ ] cleanup
     ] call ; inline
 
-<PRIVATE
+: secure-addr ( -- inet/f )
+    threaded-server get servers>>
+    [ addr>> ] map [ secure? ] filter random ;
 
-: first-port ( quot -- n/f )
-    [ threaded-server get servers>> ] dip
-    filter [ f ] [ first addr>> port>> ] if-empty ; inline
-
-PRIVATE>
-
-: secure-port ( -- n/f ) [ addr>> secure? ] first-port ;
-
-: insecure-port ( -- n/f ) [ addr>> secure? not ] first-port ;
-
-: secure-addr ( -- inet )
-    threaded-server get servers>> [ addr>> secure? ] filter random ;
-
-: insecure-addr ( -- inet )
-    threaded-server get servers>> [ addr>> secure? not ] filter random addr>> ;
+: insecure-addr ( -- inet/f )
+    threaded-server get servers>>
+    [ addr>> ] map [ secure? not ] filter random ;
     
 : server. ( threaded-server -- )
     [ [ "=== " write name>> ] [ ] bi write-object nl ]
