@@ -59,19 +59,19 @@ TUPLE: concatenative-website < dispatcher ;
         allow-edit-profile
         allow-deactivation ;
 
+SYMBOLS: factor-recaptcha-public-key factor-recaptcha-private-key ;
+
 : <factor-recaptcha> ( responder -- responder' )
     <recaptcha>
         "concatenative.org" >>domain
-        "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
-        "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key ;
+        factor-recaptcha-public-key get >>public-key
+        factor-recaptcha-private-key get >>private-key ;
 
 : <concatenative-website> ( -- responder )
     concatenative-website new-dispatcher
         URL" /wiki/view/Front Page" <redirect-responder> "" add-responder ;
 
-SYMBOL: key-password
-SYMBOL: key-file
-SYMBOL: dh-file
+SYMBOLS: key-password key-file dh-file ;
 
 : common-configuration ( -- )
     "concatenative.org" 25 <inet> smtp-server set-global
@@ -112,7 +112,6 @@ SYMBOL: dh-file
         <mason-app> <login-config> <factor-boilerplate> test-db <alloy> "builds.factorcode.org" add-responder
         home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
         home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
-        <factor-website> "new.factorcode.org" add-responder
     main-responder set-global ;
 
 : <factor-secure-config> ( -- config )
