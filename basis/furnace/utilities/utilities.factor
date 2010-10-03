@@ -96,7 +96,7 @@ CONSTANT: nested-forms-key "__n"
 : referrer ( -- referrer/f )
     #! Typo is intentional, it's in the HTTP spec!
     "referer" request get header>> at
-    dup [ >url ensure-port [ remap-port ] change-port ] when ;
+    dup [ >url ensure-port [ remap-addr ] change-addr ] when ;
 
 : user-agent ( -- user-agent )
     "user-agent" request get header>> at "" or ;
@@ -105,9 +105,7 @@ CONSTANT: nested-forms-key "__n"
     dup [
         url get [
             [ protocol>> ]
-            [ host>> ]
-            [ port>> remap-port ]
-            tri 3array
+            [ addr>> remap-addr ] bi 2array
         ] bi@ =
     ] when ;
 

@@ -1,12 +1,12 @@
-USING: http http.server.redirection urls accessors
-namespaces tools.test present kernel ;
+USING: accessors http http.server.redirection io.sockets kernel
+namespaces present tools.test urls ;
 IN: http.server.redirection.tests
 
 [
     <request>
         <url>
             "http" >>protocol
-            "www.apple.com" >>host
+            T{ inet f "www.apple.com" } >>addr
             "/xxx/bar" >>path
             { { "a" "b" } } >>query
         dup url set

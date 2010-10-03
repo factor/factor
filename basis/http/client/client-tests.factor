@@ -1,5 +1,5 @@
 USING: http.client http.client.private http tools.test
-namespaces urls ;
+namespaces urls io.sockets ;
 IN: http.client.tests
 
 [ "localhost" f ] [ "localhost" parse-host ] unit-test
@@ -12,7 +12,7 @@ IN: http.client.tests
 
 [
     T{ request
-        { url T{ url { protocol "http" } { host "www.apple.com" } { port 80 } { path "/index.html" } } }
+        { url T{ url { protocol "http" } { addr T{ inet f "www.apple.com" 80 } } { path "/index.html" } } }
         { method "GET" }
         { version "1.1" }
         { cookies V{ } }
@@ -26,7 +26,7 @@ IN: http.client.tests
 
 [
     T{ request
-        { url T{ url { protocol "https" } { host "www.amazon.com" } { port 443 } { path "/index.html" } } }
+        { url T{ url { protocol "https" } { addr T{ inet f "www.amazon.com" 443 } } { path "/index.html" } } }
         { method "GET" }
         { version "1.1" }
         { cookies V{ } }

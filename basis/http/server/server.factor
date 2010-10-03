@@ -82,8 +82,7 @@ upload-limit [ 200,000,000 ] initialize
     ] when ;
 
 : extract-host ( request -- request )
-    [ ] [ url>> ] [ "host" header parse-host ] tri
-    [ >>host ] [ >>port ] bi*
+    [ ] [ url>> ] [ "host" header parse-host <inet> >>addr ] tri
     drop ;
 
 : extract-cookies ( request -- request )
@@ -116,7 +115,7 @@ GENERIC: write-full-response ( request response -- )
 
 : ensure-domain ( cookie -- cookie )
     [
-        url get host>> dup "localhost" =
+        url get addr>> host>> dup "localhost" =
         [ drop ] [ or ] if
     ] change-domain ;
 
@@ -251,13 +250,12 @@ SYMBOL: params
     [
         local-address get
         [ secure? "https" "http" ? >>protocol ]
-        [ port>> remap-port '[ _ or ] change-port ]
-        bi
+        [ remap-addr '[ _ or ] change-addr ] bi
     ] change-url drop ;
 
 : valid-request? ( request -- ? )
-    url>> port>> remap-port
-    local-address get port>> remap-port = ;
+    url>> addr>> remap-addr
+    local-address get remap-addr = ;
 
 : do-request ( request -- response )
     '[

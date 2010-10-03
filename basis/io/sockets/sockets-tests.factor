@@ -1,8 +1,17 @@
-IN: io.sockets.tests
 USING: io.sockets io.sockets.private sequences math tools.test
 namespaces accessors kernel destructors calendar io.timeouts
 io.encodings.utf8 io concurrency.promises threads
 io.streams.string ;
+IN: io.sockets.tests
+
+[ T{ inet4 f f 0 } ] [ f 0 <inet4> ] unit-test
+[ T{ inet6 f f 0 } ] [ f 0 <inet6> ] unit-test
+
+[ T{ inet f "google.com" f } ] [ "google.com" f <inet> ] unit-test
+
+[ T{ inet f "google.com" 0 } ] [ "google.com" 0 <inet> ] unit-test
+[ T{ inet4 f "8.8.8.8" 0 } ] [ "8.8.8.8" 0 <inet> ] unit-test
+[ T{ inet6 f "5:5:5:5:6:6:6:6" 0 } ] [ "5:5:5:5:6:6:6:6" 0 <inet> ] unit-test
 
 [ B{ 1 2 3 4 } ]
 [ "1.2.3.4" T{ inet4 } inet-pton ] unit-test
@@ -24,6 +33,8 @@ io.streams.string ;
 
 [ B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } ]
 [ "::" T{ inet6 } inet-pton ] unit-test
+
+[ f T{ inet6 } inet-pton ] [ reason>> empty-ipv6? ] must-fail-with
 
 [ "0:0:0:0:0:0:0:0" ]
 [ B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } T{ inet6 } inet-ntop ] unit-test
@@ -132,3 +143,4 @@ io.streams.string ;
 
 ! Binding to all interfaces should work
 [ ] [ f 0 <inet4> <datagram> dispose ] unit-test
+[ ] [ f 0 <inet6> <datagram> dispose ] unit-test

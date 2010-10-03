@@ -18,7 +18,7 @@ $nl
 { $subsections port-remapping }
 "For example, with the above setup, we would set it as follows:"
 { $code
-    "{ { 8080 80 } { 8443 443 } } port-remapping set-global"
+    "{ { T{ inet4 f f 8080 } T{ inet4 f f 80 } } { T{ inet4 f f 8443 } T{ inet4 f f 443 } } } port-remapping set-global"
 } ;
 
 ABOUT: "http.server.remapping"

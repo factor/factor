@@ -5,8 +5,8 @@ IN: http.server.remapping
 
 SYMBOL: port-remapping
 
-: remap-port ( n -- n' )
+: remap-addr ( addr -- addr' )
     [ port-remapping get at ] keep or ;
 
-: secure-http-port ( -- n )
-    secure-port remap-port ;
+: secure-http-port ( -- addr )
+    secure-addr remap-addr ;

@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel ascii combinators combinators.short-circuit
-sequences splitting fry namespaces make assocs arrays strings
-io.sockets io.encodings.string io.encodings.utf8 math
-math.parser accessors parser strings.parser lexer
-hashtables present peg.ebnf urls.encoding ;
+USING: accessors arrays ascii assocs classes combinators
+combinators.short-circuit fry hashtables io.encodings.string
+io.encodings.utf8 io.sockets kernel lexer make math math.parser
+namespaces parser peg.ebnf present sequences splitting strings
+strings.parser urls.encoding ;
 IN: urls
 
-TUPLE: url protocol username password host port path query anchor ;
+TUPLE: url protocol username password addr path query anchor ;
 
 : <url> ( -- url ) url new ;
 
@@ -24,14 +24,12 @@ TUPLE: url protocol username password host port path query anchor ;
         nip delete-query-param
     ] if ;
 
-: parse-host ( string -- host port )
+ERROR: malformed-port ;
+
+: parse-host ( string -- host/f port/f )
     [
-        ":" split1 [ url-decode ] [
-            dup [
-                string>number
-                dup [ "Invalid port" throw ] unless
-            ] when
-        ] bi*
+        ":" split1-last [ url-decode ]
+        [ dup [ string>number [ malformed-port ] unless* ] when ] bi*
     ] [ f f ] if* ;
 
 GENERIC: >url ( obj -- url )
@@ -68,23 +66,33 @@ url      = ((protocol "://")        => [[ first ]] auth hostname)?
 PRIVATE>
 
 M: string >url
+    [ <url> ] dip
     parse-url {
         [
             first [
-                [ first ] ! protocol
+                [ first >>protocol ]
                 [
                     second
-                    [ first [ first2 ] [ f f ] if* ] ! username, password
-                    [ second parse-host ] ! host, port
-                    bi
+                    [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
+                    [ second parse-host <inet> >>addr ] bi
                 ] bi
-            ] [ f f f f f ] if*
+            ] when*
         ]
-        [ second ] ! pathname
-        [ third ] ! query
-        [ fourth ] ! anchor
-    } cleave url boa
-    dup host>> [ [ "/" or ] change-path ] when ;
+        [ second >>path ]
+        [ third >>query ]
+        [ fourth >>anchor ]
+    } cleave
+    dup addr>> [ [ "/" or ] change-path ] when ;
+
+<PRIVATE
+
+: inet>url ( inet -- url ) [ <url> ] dip >>addr ;
+
+PRIVATE>
+
+M: inet >url inet>url ;
+M: inet4 >url inet>url ;
+M: inet6 >url inet>url ;
 
 : protocol-port ( protocol -- port )
     {
@@ -102,7 +110,9 @@ M: string >url
     ] [ 2drop ] if ;
 
 : url-port ( url -- port/f )
-    [ port>> ] [ port>> ] [ protocol>> protocol-port ] tri =
+    [ addr>> port>> ]
+    [ addr>> port>> ]
+    [ protocol>> protocol-port ] tri =
     [ drop f ] when ;
 
 : unparse-host-part ( url protocol -- )
@@ -110,7 +120,7 @@ M: string >url
     "://" %
     {
         [ unparse-username-password ]
-        [ host>> url-encode % ]
+        [ addr>> host>> url-encode % ]
         [ url-port [ ":" % # ] when* ]
         [ path>> "/" head? [ "/" % ] unless ]
     } cleave ;
@@ -143,8 +153,7 @@ PRIVATE>
         [ [ protocol>>  ] either? >>protocol ]
         [ [ username>>  ] either? >>username ]
         [ [ password>>  ] either? >>password ]
-        [ [ host>>      ] either? >>host ]
-        [ [ port>>      ] either? >>port ]
+        [ [ addr>>      ] either? >>addr ]
         [ [ path>>      ] bi@ swap url-append-path >>path ]
         [ [ query>>     ] either? >>query ]
         [ [ anchor>>    ] either? >>anchor ]
@@ -153,8 +162,7 @@ PRIVATE>
 : relative-url ( url -- url' )
     clone
         f >>protocol
-        f >>host
-        f >>port ;
+        f >>addr ;
 
 : relative-url? ( url -- ? ) protocol>> not ;
 
@@ -170,15 +178,15 @@ PRIVATE>
 
 : url-addr ( url -- addr )
     [
-        [ host>> ]
-        [ port>> ]
-        [ protocol>> protocol-port ]
-        tri or <inet>
+        [ addr>> ]
+        [ [ addr>> port>> ] [ protocol>> protocol-port ] bi or ] bi with-port
     ] [ protocol>> ] bi
     secure-protocol? [ >secure-addr ] when ;
 
 : ensure-port ( url -- url' )
-    clone dup protocol>> '[ _ protocol-port or ] change-port ;
+    clone dup protocol>> '[
+        dup port>> _ protocol-port or with-port
+    ] change-addr ;
 
 ! Literal syntax
 SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
