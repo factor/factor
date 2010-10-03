@@ -48,7 +48,7 @@
 				    <a href="http://planet.lisp.org">Planet Lisp</a>.
 				</p>
 				<p>
-				    <img src="$planet/icons/feed-icon-14x14.png" />
+				    <img src="http://planet.factorcode.org/icons/feed-icon-14x14.png" />
 				    <t:a t:href="$planet/feed.xml">Syndicate</t:a>
 				</p>
 			</td>
