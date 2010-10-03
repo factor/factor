@@ -8,7 +8,7 @@ io.files io.ports io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
 math.parser math.ranges math.statistics memoize namespaces
 nested-comments random sequences slots.syntax splitting strings
-system unicode.categories vectors vocabs.loader ;
+system unicode.categories vectors vocabs.loader unicode.case ;
 IN: dns
 
 GENERIC: stream-peek1 ( stream -- byte/f )
@@ -400,7 +400,15 @@ M: SOA rdata>byte-array
     [ dns-AAAA-query a-message. ]
     [ dns-MX-query mx-message. ] tri ;
 
-! M: string resolve-host dns-A-query message>a-names [ <ipv4> ] map ;
+USE: nested-comments
+(*
+M: string resolve-host
+    dup >lower "localhost" = [
+        drop resolve-localhost
+    ] [
+        dns-A-query message>a-names [ <ipv4> ] map
+    ] if ;
+*)
     
 HOOK: initial-dns-servers os ( -- seq )
 
