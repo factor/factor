@@ -330,7 +330,7 @@ M: SOA rdata>byte-array
 
 : udp-query ( bytes server -- bytes' )
     f 0 <inet4> <datagram>
-    5 seconds over set-timeout [
+    30 seconds over set-timeout [
         [ send ] [ receive drop ] bi
     ] with-disposal ;
 
@@ -357,6 +357,10 @@ M: SOA rdata>byte-array
 
 : message>names ( message -- names )
     answer-section>> [ rdata>> name>> ] map ;
+
+: message>a-names ( message -- names )
+    answer-section>>
+    [ rdata>> ] map [ a? ] filter [ name>> ] map ;
 
 : message>mxs ( message -- assoc )
     answer-section>> [ rdata>> [ preference>> ] [ exchange>> ] bi 2array ] map ;
@@ -395,6 +399,8 @@ M: SOA rdata>byte-array
     [ dns-A-query a-message. ]
     [ dns-AAAA-query a-message. ]
     [ dns-MX-query mx-message. ] tri ;
+
+! M: string resolve-host dns-A-query message>a-names [ <ipv4> ] map ;
     
 HOOK: initial-dns-servers os ( -- seq )
 
