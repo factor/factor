@@ -3,7 +3,7 @@
 USING: accessors kernel sequences assocs io.files io.pathnames
 io.sockets io.sockets.secure io.servers
 namespaces db db.tuples db.sqlite smtp urls
-logging.insomniac
+logging.insomniac calendar timers
 html.templates.chloe
 http.server
 http.server.dispatchers
@@ -27,6 +27,7 @@ webapps.user-admin
 webapps.help
 webapps.mason
 webapps.mason.backend
+webapps.mason.backend.watchdog
 websites.factorcode ;
 IN: websites.concatenative
 
@@ -123,8 +124,12 @@ SYMBOLS: key-password key-file dh-file ;
         8080 >>insecure
         8431 >>secure ;
 
+: start-watchdog ( -- )
+    [ check-builders ] 6 hours every drop ;
+
 : start-website ( -- server )
     website-db start-expiring
     website-db start-update-task
     http-insomniac
+    start-watchdog
     <concatenative-website-server> start-server ;
