@@ -16,7 +16,7 @@ CONSTANT: test-ip "127.0.0.1"
 : test-node-client ( -- addrspec )
     {
         { [ os unix? ] [ "distributed-concurrency-test" temp-file <local> ] }
-        { [ os windows? ] [ test-ip insecure-port <inet4> ] }
+        { [ os windows? ] [ insecure-addr ] }
     } cond ;
 
     

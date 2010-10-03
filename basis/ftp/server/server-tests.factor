@@ -17,11 +17,9 @@ CONSTANT: test-file-contents "Files are so boring anymore."
     '[
         current-temporary-directory get
         0 <ftp-server> [
-            insecure-port
-            <url>
-                swap >>port
+            insecure-addr
+            >url
                 "ftp" >>protocol
-                "localhost" >>host
                 create-test-file >>path
                 @
         ] with-threaded-server
