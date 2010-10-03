@@ -42,7 +42,7 @@ IN: bunny.model
 
 : model-path ( -- path ) "bun_zipper.ply" temp-file ;
 
-: model-url ( -- url ) "http://factorcode.org/bun_zipper.ply" ;
+: model-url ( -- url ) "http://factorcode.org/slava/bun_zipper.ply" ;
 
 : maybe-download ( -- path )
     model-path dup exists? [

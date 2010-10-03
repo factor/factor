@@ -145,7 +145,7 @@ UNIFORM-TUPLE: loading-uniforms
 
 : bunny-model-path ( -- path ) "bun_zipper.ply" temp-file ;
 
-CONSTANT: bunny-model-url "http://factorcode.org/bun_zipper.ply"
+CONSTANT: bunny-model-url "http://factorcode.org/slava/bun_zipper.ply"
 
 : download-bunny ( -- path )
     bunny-model-path dup exists? [
