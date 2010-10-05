@@ -11,6 +11,8 @@ IN: webapps.mason.docs-update
 
 : update-docs ( -- )
     home [
+        "newdocs" exists? [ "newdocs" delete-tree ] when
+
         "newdocs" make-directory
         "newdocs" [ { "tar" "xfz" } docs-path suffix try-process ] with-directory
 
