@@ -6,7 +6,7 @@ IN: dns.unix
 
 : load-resolve.conf ( -- seq )
     "/etc/resolv.conf" utf8 file-lines
-    [ [ blank? ] trim ] map
+    [ [ blank? ] trim ] map harvest
     [ "#" head? not ] filter
     [ [ " " split1 swap ] dip push-at ] sequence>hashtable "nameserver" swap at ;
 
