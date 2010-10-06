@@ -369,26 +369,6 @@ M: SOA rdata>byte-array
 : message>query-name ( message -- string )
     query>> first name>> dotted> ;
 
-: a-line. ( host ip -- )
-    [ write " has address " write ] [ print ] bi* ;
-
-: a-message. ( message -- )
-    [ message>query-name ] [ message>names ] bi
-    [ a-line. ] with each ;
-
-: mx-line. ( host pair -- )
-    [ write " mail is handled by " write ]
-    [ first2 [ number>string write bl ] [ print ] bi* ] bi* ;
-
-: mx-message. ( message -- )
-    [ message>query-name ] [ message>mxs ] bi
-    [ mx-line. ] with each ;
-
-: host ( domain -- )
-    [ dns-A-query a-message. ]
-    [ dns-AAAA-query a-message. ]
-    [ dns-MX-query mx-message. ] tri ;
-
 USE: nested-comments
 (*
 M: string resolve-host
