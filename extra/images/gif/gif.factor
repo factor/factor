@@ -74,14 +74,6 @@ CONSTANT: block-terminator HEX: 00
         V{ } clone >>comment-extensions
         t >>loading? ;
 
-GENERIC: stream-peek1 ( stream -- byte )
-
-M: input-port stream-peek1
-    dup check-disposed dup wait-to-read
-    [ drop f ] [ buffer>> buffer-peek ] if ; inline
-
-: peek1 ( -- byte ) input-stream get stream-peek1 ;
-
 : (read-sub-blocks) ( -- )
     read1 [ read , (read-sub-blocks) ] unless-zero ;
 

@@ -41,6 +41,10 @@ HOOK: (wait-to-read) io-backend ( port -- )
         dup (wait-to-read) buffer>> buffer-empty?
     ] [ drop f ] if ; inline
 
+M: input-port stream-peek1
+    dup check-disposed dup wait-to-read
+    [ drop f ] [ buffer>> buffer-peek1 ] if ; inline
+
 M: input-port stream-read1
     dup check-disposed
     dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ; inline

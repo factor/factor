@@ -11,17 +11,6 @@ nested-comments random sequences slots.syntax splitting strings
 system unicode.categories vectors vocabs.loader unicode.case ;
 IN: dns
 
-GENERIC: stream-peek1 ( stream -- byte/f )
-
-M: input-port stream-peek1
-    dup check-disposed dup wait-to-read
-    [ drop f ] [ buffer>> buffer-peek ] if ; inline
-
-M: byte-reader stream-peek1
-    [ i>> ] [ underlying>> ] bi ?nth ;
-
-: peek1 ( -- byte ) input-stream get stream-peek1 ;
-
 : with-temporary-input-seek ( n seek-type quot -- )
     tell-input [
         [ seek-input ] dip call
