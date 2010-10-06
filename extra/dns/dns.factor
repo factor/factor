@@ -11,11 +11,6 @@ nested-comments random sequences slots.syntax splitting strings
 system unicode.categories vectors vocabs.loader unicode.case ;
 IN: dns
 
-: with-temporary-input-seek ( n seek-type quot -- )
-    tell-input [
-        [ seek-input ] dip call
-    ] dip seek-absolute seek-input ; inline
-
 ENUM: dns-type
 { A 1 } { NS 2 } { MD 3 } { MF 4 }
 { CNAME 5 } { SOA 6 } { MB 7 } { MG 8 }
@@ -176,7 +171,7 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
     ] [
         HEX: C0 mask? [
             2 read be> HEX: 3fff bitand
-            seek-absolute [ parse-length-bytes , (parse-name) ] with-temporary-input-seek
+            seek-absolute [ parse-length-bytes , (parse-name) ] with-input-seek
         ] [
             parse-length-bytes , (parse-name)
         ] if
