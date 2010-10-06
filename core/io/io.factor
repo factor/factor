@@ -8,6 +8,7 @@ SYMBOLS: +byte+ +character+ ;
 
 GENERIC: stream-element-type ( stream -- type )
 
+GENERIC: stream-peek1 ( stream -- byte/f )
 GENERIC: stream-read1 ( stream -- elt )
 GENERIC: stream-read ( n stream -- seq )
 GENERIC: stream-read-until ( seps stream -- seq sep/f )
@@ -33,6 +34,7 @@ SYMBOL: input-stream
 SYMBOL: output-stream
 SYMBOL: error-stream
 
+: peek1 ( -- byte ) input-stream get stream-peek1 ;
 : readln ( -- str/f ) input-stream get stream-readln ;
 : read1 ( -- elt ) input-stream get stream-read1 ;
 : read ( n -- seq ) input-stream get stream-read ;
