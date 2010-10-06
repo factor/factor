@@ -30,17 +30,18 @@ CONSTRUCTOR: resolv.conf ( -- resolv.conf )
 
 : trim-blanks ( string -- string' ) [ blank? ] trim ;
 
-: parse-nameserver ( resolv.conf string -- resolv.conf )
+: split-line ( resolv.conf string -- resolv.conf seq resolv.conf )
     trim-blanks " " split
-    [ trim-blanks ] map harvest over nameserver>> push-all ;
+    [ trim-blanks ] map harvest over ;
+
+: parse-nameserver ( resolv.conf string -- resolv.conf )
+    split-line nameserver>> push-all ;
 
 : parse-domain ( resolv.conf string -- resolv.conf )
-    trim-blanks " " split
-    [ trim-blanks ] map harvest over domain>> push-all ;
+    split-line domain>> push-all ;
 
 : parse-search ( resolv.conf string -- resolv.conf )
-    trim-blanks " " split
-    [ trim-blanks ] map harvest over search>> push-all ;
+    split-line search>> push-all ;
 
 : parse-sortlist ( resolv.conf string -- resolv.conf )
     trim-blanks " " split
