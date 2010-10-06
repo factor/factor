@@ -20,9 +20,17 @@ M:: throws-on-eof-stream stream-read1 ( stream -- obj )
     stream stream>> stream-read1
     [ 1 stream \ read1 stream-exhausted ] unless* ;
 
+M:: throws-on-eof-stream stream-peek1 ( stream -- obj )
+    stream stream>> stream-peek1
+    [ 1 stream \ peek1 stream-exhausted ] unless* ;
+
 M:: throws-on-eof-stream stream-read ( n stream -- seq )
     n stream stream>> stream-read
     dup length n = [ n stream \ read stream-exhausted ] unless ;
+
+M:: throws-on-eof-stream stream-peek ( n stream -- seq )
+    n stream stream>> stream-peek
+    dup length n = [ n stream \ peek stream-exhausted ] unless ;
 
 M:: throws-on-eof-stream stream-read-partial ( n stream -- seq )
     n stream stream>> stream-read-partial

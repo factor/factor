@@ -10,6 +10,9 @@ TUPLE: memory-stream alien index ;
 
 M: memory-stream stream-element-type drop +byte+ ;
 
+M: memory-stream stream-peek1
+    [ alien>> ] [ index>> ] bi alien-unsigned-1 ;
+
 M: memory-stream stream-read1
-    [ [ alien>> ] [ index>> ] bi alien-unsigned-1 ]
+    [ stream-peek1 ]
     [ [ 1 + ] change-index drop ] bi ;
