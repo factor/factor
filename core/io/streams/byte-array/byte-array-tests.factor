@@ -8,6 +8,7 @@ IN: io.streams.byte-array.tests
 [ B{ 1 2 3 } ] [ binary [ B{ 1 2 3 } write ] with-byte-writer ] unit-test
 [ B{ 1 2 3 4 5 6 } ] [ binary [ B{ 1 2 3 } write B{ 4 5 6 } write ] with-byte-writer ] unit-test
 [ B{ 1 2 3 } ] [ { 1 2 3 } binary [ 3 read ] with-byte-reader ] unit-test
+[ B{ 1 2 } ] [ B{ 1 2 3 4 } binary [ 2 peek ] with-byte-reader ] unit-test
 
 [ B{ BIN: 11110101 BIN: 10111111 BIN: 10000000 BIN: 10111111 BIN: 11101111 BIN: 10000000 BIN: 10111111 BIN: 11011111 BIN: 10000000 CHAR: x } ]
 [ { BIN: 101111111000000111111 BIN: 1111000000111111 BIN: 11111000000 CHAR: x } >string utf8 [ write ] with-byte-writer ] unit-test

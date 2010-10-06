@@ -84,6 +84,8 @@ M: input-port stream-read
         ] [ 2nip ] if
     ] [ 2nip ] if ;
 
+M: input-port stream-peek [ stream-read ] with-input-rewind ;
+
 : read-until-step ( separators port -- string/f separator/f )
     dup wait-to-read [ 2drop f f ] [ buffer>> buffer-until ] if ;
 

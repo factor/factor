@@ -19,6 +19,7 @@ TUPLE: byte-reader { underlying byte-array read-only } { i array-capacity } ;
 M: byte-reader stream-element-type drop +byte+ ;
 
 M: byte-reader stream-peek1 sequence-peek1 ;
+M: byte-reader stream-peek sequence-peek ;
 M: byte-reader stream-read-partial stream-read ;
 M: byte-reader stream-read sequence-read ;
 M: byte-reader stream-read1 sequence-read1 ;

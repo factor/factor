@@ -47,9 +47,13 @@ M: c-reader stream-element-type drop +byte+ ;
 
 M: c-reader stream-read dup check-disposed handle>> fread ;
 
+M: c-reader stream-peek [ stream-read ] with-input-rewind ;
+
 M: c-reader stream-read-partial stream-read ;
 
 M: c-reader stream-read1 dup check-disposed handle>> fgetc ;
+
+M: c-reader stream-peek1 [ stream-read1 ] with-input-rewind ;
 
 : read-until-loop ( stream delim -- ch )
     over stream-read1 dup [
