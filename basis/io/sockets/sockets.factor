@@ -16,6 +16,8 @@ IN: io.sockets
     { [ os unix? ] [ "unix.ffi" ] }
 } cond use-vocab >>
 
+GENERIC# with-port 1 ( addrspec port -- addrspec )
+
 ! Addressing
 <PRIVATE
 
@@ -52,8 +54,6 @@ HOOK: sockaddr-of-family os ( alien af -- sockaddr )
 HOOK: addrspec-of-family os ( af -- addrspec )
 
 PRIVATE>
-
-GENERIC# with-port 1 ( addrspec port -- addrspec )
 
 TUPLE: local { path read-only } ;
 
@@ -113,18 +113,7 @@ M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
 
 TUPLE: inet4 < ipv4 { port integer read-only } ;
 
-: inet-string? ( string exemplar -- ? )
-    '[ _ _ inet-pton drop t ] [ drop f ] recover ;
-
-: inet4-string? ( string -- ? ) T{ inet4 } inet-string? ;
-
-ERROR: invalid-inet4 string ;
-
-: ensure-inet4-string ( string -- string )
-    dup [ dup inet4-string? [ invalid-inet4 ] unless ] when ;
-
-: <inet4> ( host port -- inet4 )
-    [ ensure-inet4-string ] dip inet4 boa ;
+C: <inet4> inet4
 
 M: ipv4 with-port [ host>> ] dip <inet4> ;
 
@@ -176,13 +165,11 @@ ERROR: more-than-8-components ;
 
 PRIVATE>
 
-ERROR: empty-ipv6 ;
-
 M: ipv6 inet-pton ( str addrspec -- data )
-    drop [
-        [ empty-ipv6 ]
-        [ "::" split1 [ parse-ipv6 ] bi@ pad-ipv6 ipv6-bytes ] if-empty
-    ] [ invalid-ipv6 ] recover ;
+    drop
+    [ "::" split1 [ parse-ipv6 ] bi@ pad-ipv6 ipv6-bytes ]
+    [ invalid-ipv6 ]
+    recover ;
 
 M: ipv6 address-size drop 16 ;
 
@@ -205,15 +192,7 @@ M: ipv6 parse-sockaddr
 
 TUPLE: inet6 < ipv6 { port integer read-only } ;
 
-: inet6-string? ( string -- ? ) T{ inet6 } inet-string? ;
-
-ERROR: invalid-inet6 string ;
-
-: ensure-inet6-string ( string -- string )
-    dup [ dup inet6-string? [ invalid-inet6 ] unless ] when ;
-
-: <inet6> ( host port -- inet6 )
-    [ ensure-inet6-string ] dip inet6 boa ;
+C: <inet6> inet6
 
 M: ipv6 with-port [ host>> ] dip <inet6> ;
 
@@ -386,22 +365,20 @@ TUPLE: inet < hostname port ;
 M: inet present
     [ host>> ] [ port>> number>string ] bi ":" glue ;
 
-: <inet> ( host port -- inet )
-    {
-        { [ over inet4-string? ] [ inet4 boa ] }
-        { [ over inet6-string? ] [ inet6 boa ] }
-        [ inet boa ]
-    } cond ;
-
-M: inet with-port [ host>> ] dip <inet> ;
+C: <inet> inet
 
 M: string resolve-host
     f prepare-addrinfo f <void*>
     [ getaddrinfo addrinfo-error ] keep *void* addrinfo memory>struct
     [ parse-addrinfo-list ] keep freeaddrinfo ;
 
+M: string with-port <inet> ;
+
 M: hostname resolve-host
     host>> resolve-host ;
+
+M: hostname with-port
+    [ host>> ] dip <inet> ;
 
 M: inet resolve-host
     [ call-next-method ] [ port>> ] bi '[ _ with-port ] map ;
