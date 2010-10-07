@@ -24,13 +24,13 @@ ERROR: too-many-redirects ;
 
 : default-port? ( url -- ? )
     {
-        [ addr>> port>> not ]
-        [ [ addr>> port>> ] [ protocol>> protocol-port ] bi = ]
+        [ port>> not ]
+        [ [ port>> ] [ protocol>> protocol-port ] bi = ]
     } 1|| ;
 
 : unparse-host ( url -- string )
-    dup default-port? [ addr>> host>> ] [
-        [ addr>> host>> ] [ addr>> port>> number>string ] bi ":" glue
+    dup default-port? [ host>> ] [
+        [ host>> ] [ port>> number>string ] bi ":" glue
     ] if ;
 
 : set-host-header ( request header -- request header )
@@ -41,7 +41,7 @@ ERROR: too-many-redirects ;
 
 : write-request-header ( request -- request )
     dup header>> >hashtable
-    over url>> addr>> host>> [ set-host-header ] when
+    over url>> host>> [ set-host-header ] when
     over post-data>> [ set-post-data-headers ] when*
     over cookies>> [ set-cookie-header ] unless-empty
     write-header ;

@@ -162,7 +162,8 @@ ERROR: no-ports-configured threaded-server ;
 
 : set-servers ( threaded-server -- threaded-server )
     dup [
-        dup dup listen-on [ no-ports-configured ] [ (make-servers) ] if-empty
+        dup dup listen-on
+        [ no-ports-configured ] [ (make-servers) ] if-empty
         >>servers
     ] with-existing-secure-context ;
 
@@ -219,13 +220,26 @@ PRIVATE>
         [ ] cleanup
     ] call ; inline
 
-: secure-addr ( -- inet/f )
-    threaded-server get servers>>
-    [ addr>> ] map [ secure? ] filter random ;
+<PRIVATE
 
-: insecure-addr ( -- inet/f )
-    threaded-server get servers>>
-    [ addr>> ] map [ secure? not ] filter random ;
+GENERIC: connect-addr ( addrspec -- addrspec )
+
+M: inet4 connect-addr [ "127.0.0.1" ] dip port>> <inet4> ;
+
+M: inet6 connect-addr [ "::1" ] dip port>> <inet6> ;
+
+M: secure connect-addr addrspec>> connect-addr <secure> ;
+
+PRIVATE>
+
+: server-addrs ( -- addrspecs )
+    threaded-server get servers>> [ addr>> connect-addr ] map ;
+
+: secure-addr ( -- addrspec )
+    server-addrs [ secure? ] filter random ;
+
+: insecure-addr ( -- addrspec )
+    server-addrs [ secure? not ] filter random ;
     
 : server. ( threaded-server -- )
     [ [ "=== " write name>> ] [ ] bi write-object nl ]
