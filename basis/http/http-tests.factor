@@ -3,7 +3,7 @@ multiline io.streams.string io.encodings.utf8 io.encodings.8-bit
 io.encodings.binary io.encodings.string io.encodings.ascii kernel
 arrays splitting sequences assocs io.sockets db db.sqlite
 continuations urls hashtables accessors namespaces xml.data
-io.encodings.8-bit.latin1 random ;
+io.encodings.8-bit.latin1 random combinators.short-circuit ;
 IN: http.tests
 
 [ "text/plain" "UTF-8" ] [ "text/plain" parse-content-type ] unit-test
@@ -16,12 +16,14 @@ IN: http.tests
 
 [ "localhost" f ] [ "localhost" parse-host ] unit-test
 [ "localhost" 8888 ] [ "localhost:8888" parse-host ] unit-test
+[ "::1" 8888 ] [ "::1:8888" parse-host ] unit-test
+[ "127.0.0.1" 8888 ] [ "127.0.0.1:8888" parse-host ] unit-test
 
-[ "localhost" ] [ T{ url { protocol "http" } { addr T{ inet f "localhost" } } } unparse-host ] unit-test
-[ "localhost" ] [ T{ url { protocol "http" } { addr T{ inet f "localhost" 80 } } } unparse-host ] unit-test
-[ "localhost" ] [ T{ url { protocol "https" } { addr T{ inet f "localhost" 443 } } } unparse-host ] unit-test
-[ "localhost:8080" ] [ T{ url { protocol "http" } { addr T{ inet f "localhost" 8080 } } } unparse-host ] unit-test
-[ "localhost:8443" ] [ T{ url { protocol "https" } { addr T{ inet f "localhost" 8443 } } } unparse-host ] unit-test
+[ "localhost" ] [ T{ url { protocol "http" } { host "localhost" } } unparse-host ] unit-test
+[ "localhost" ] [ T{ url { protocol "http" } { host "localhost" } { port 80 } } unparse-host ] unit-test
+[ "localhost" ] [ T{ url { protocol "https" } { host "localhost" } { port 443 } } unparse-host ] unit-test
+[ "localhost:8080" ] [ T{ url { protocol "http" } { host "localhost" } { port 8080 } } unparse-host ] unit-test
+[ "localhost:8443" ] [ T{ url { protocol "https" } { host "localhost" } { port 8443 } } unparse-host ] unit-test
 
 : lf>crlf ( string -- string' ) "\n" split "\r\n" join ;
 
@@ -37,7 +39,7 @@ blah
 
 [
     T{ request
-        { url T{ url { path "/bar" } { addr T{ inet } } } }
+        { url T{ url { path "/bar" } } }
         { method "POST" }
         { version "1.1" }
         { header H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } } }
@@ -76,7 +78,7 @@ Host: www.sex.com
 
 [
     T{ request
-        { url T{ url { addr T{ inet f "www.sex.com" } } { path "/bar" } } }
+        { url T{ url { host "www.sex.com" } { path "/bar" } } }
         { method "HEAD" }
         { version "1.1" }
         { header H{ { "host" "www.sex.com" } } }
@@ -97,7 +99,7 @@ Host: www.sex.com:101
 
 [
     T{ request
-        { url T{ url { addr T{ inet f "www.sex.com" 101 } } { path "/bar" } } }
+        { url T{ url { host "www.sex.com" } { port 101 } { path "/bar" } } }
         { method "HEAD" }
         { version "1.1" }
         { header H{ { "host" "www.sex.com:101" } } }
@@ -219,12 +221,6 @@ http.server.dispatchers db.tuples ;
 
 : test-db ( -- db ) test-db-file <sqlite-db> ;
 
-[ test-db-file delete-file ] ignore-errors
-
-test-db [
-    init-furnace-tables
-] with-db
-
 : test-httpd ( responder -- )
     [
         main-responder set
@@ -232,15 +228,24 @@ test-db [
             0 >>insecure
             f >>secure
         start-server
-        servers>> random addr>>
+        threaded-server set
+        server-addrs random
     ] with-scope "addr" set ;
 
 : add-addr ( url -- url' )
-    >url clone "addr" get >>addr ;
+    >url clone "addr" get set-url-addr ;
 
 : stop-test-httpd ( -- )
     "http://localhost/quit" add-addr http-get nip
     "Goodbye" assert= ;
+
+[ ] [
+    [ test-db-file delete-file ] ignore-errors
+
+    test-db [
+        init-furnace-tables
+    ] with-db
+] unit-test
 
 [ ] [
     <dispatcher>
@@ -281,6 +286,7 @@ test-db [
     "http://localhost/redirect" add-addr http-get nip
 ] unit-test
 
+
 [ ] [
     [ stop-test-httpd ] ignore-errors
 ] unit-test
@@ -301,7 +307,12 @@ test-db [
     test-httpd
 ] unit-test
 
-: 404? ( response -- ? ) [ download-failed? ] [ response>> code>> 404 = ] bi and ;
+: 404? ( response -- ? )
+    {
+        [ download-failed? ]
+        [ response>> response? ]
+        [ response>> code>> 404 = ]
+    } 1&& ;
 
 ! This should give a 404 not an infinite redirect loop
 [ "http://localhost/d/blah" add-addr http-get nip ] [ 404? ] must-fail-with

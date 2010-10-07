@@ -1,13 +1,14 @@
-USING: accessors arrays assocs io.sockets kernel present
-prettyprint tools.test urls urls.private ;
 IN: urls.tests
+USING: urls urls.private tools.test prettyprint
+arrays kernel assocs present accessors ;
 
 CONSTANT: urls
     {
         {
             T{ url
                 { protocol "http" }
-                { addr T{ inet f "www.apple.com" 1234 } }
+                { host "www.apple.com" }
+                { port 1234 }
                 { path "/a/path" }
                 { query H{ { "a" "b" } } }
                 { anchor "foo" }
@@ -17,7 +18,7 @@ CONSTANT: urls
         {
             T{ url
                 { protocol "http" }
-                { addr T{ inet f "www.apple.com" } }
+                { host "www.apple.com" }
                 { path "/a/path" }
                 { query H{ { "a" "b" } } }
                 { anchor "foo" }
@@ -27,7 +28,8 @@ CONSTANT: urls
         {
             T{ url
                 { protocol "http" }
-                { addr T{ inet f "www.apple.com" 1234 } }
+                { host "www.apple.com" }
+                { port 1234 }
                 { path "/another/fine/path" }
                 { anchor "foo" }
             }
@@ -62,7 +64,7 @@ CONSTANT: urls
         {
             T{ url
                 { protocol "ftp" }
-                { addr T{ inet f "ftp.kernel.org" } }
+                { host "ftp.kernel.org" }
                 { username "slava" }
                 { path "/" }
             }
@@ -71,7 +73,7 @@ CONSTANT: urls
         {
             T{ url
                 { protocol "ftp" }
-                { addr T{ inet f "ftp.kernel.org" } }
+                { host "ftp.kernel.org" }
                 { username "slava" }
                 { password "secret" }
                 { path "/" }
@@ -81,7 +83,7 @@ CONSTANT: urls
         {
             T{ url
                { protocol "http" }
-               { addr T{ inet f "foo.com" } }
+               { host "foo.com" }
                { path "/" }
                { query H{ { "a" f } } }
             }
@@ -112,13 +114,15 @@ urls [
 [
     T{ url
         { protocol "http" }
-        { addr T{ inet f "www.apple.com" 1234 } }
+        { host "www.apple.com" }
+        { port 1234 }
         { path "/a/path" }
     }
 ] [
     T{ url
         { protocol "http" }
-        { addr T{ inet f "www.apple.com" 1234 } }
+        { host "www.apple.com" }
+        { port 1234 }
         { path "/foo" }
     }
 
@@ -132,7 +136,8 @@ urls [
 [
     T{ url
         { protocol "http" }
-        { addr T{ inet f "www.apple.com" 1234 } }
+        { host "www.apple.com" }
+        { port 1234 }
         { path "/a/path/relative/path" }
         { query H{ { "a" "b" } } }
         { anchor "foo" }
@@ -140,7 +145,8 @@ urls [
 ] [
     T{ url
         { protocol "http" }
-        { addr T{ inet f "www.apple.com" 1234 } }
+        { host "www.apple.com" }
+        { port 1234 }
         { path "/a/path/" }
     }
 
@@ -156,7 +162,8 @@ urls [
 [
     T{ url
         { protocol "http" }
-        { addr T{ inet f "www.apple.com" 1234 } }
+        { host "www.apple.com" }
+        { port 1234 }
         { path "/a/path/relative/path" }
         { query H{ { "a" "b" } } }
         { anchor "foo" }
@@ -164,7 +171,8 @@ urls [
 ] [
     T{ url
         { protocol "http" }
-        { addr T{ inet f "www.apple.com" 1234 } }
+        { host "www.apple.com" }
+        { port 1234 }
         { path "/a/path/" }
     }
 
@@ -180,13 +188,13 @@ urls [
 [
     T{ url
         { protocol "http" }
-        { addr T{ inet f "www.apple.com" } }
+        { host "www.apple.com" }
         { path "/xxx/baz" }
     }
 ] [
     T{ url
         { protocol "http" }
-        { addr T{ inet f "www.apple.com" } }
+        { host "www.apple.com" }
         { path "/xxx/bar" }
     }
 
@@ -210,7 +218,7 @@ urls [
 [
     T{ url
         { protocol "http" }
-        { addr T{ inet f "localhost" } }
+        { host "localhost" }
         { query H{ { "foo" "bar" } } }
         { path "/" }
     }
@@ -220,7 +228,7 @@ urls [
 [
     T{ url
         { protocol "http" }
-        { addr T{ inet f "localhost" } }
+        { host "localhost" }
         { query H{ { "foo" "bar" } } }
         { path "/" }
     }

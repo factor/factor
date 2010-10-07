@@ -17,8 +17,7 @@ CONSTANT: test-file-contents "Files are so boring anymore."
     '[
         current-temporary-directory get
         0 <ftp-server> [
-            insecure-addr
-            >url
+            "ftp://localhost" >url insecure-addr set-url-addr
                 "ftp" >>protocol
                 create-test-file >>path
                 @

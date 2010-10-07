@@ -1,13 +1,13 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ascii assocs classes combinators
-combinators.short-circuit fry hashtables io.encodings.string
-io.encodings.utf8 io.sockets kernel lexer make math math.parser
-namespaces parser peg.ebnf present sequences splitting strings
-strings.parser urls.encoding ;
+USING: kernel ascii combinators combinators.short-circuit
+sequences splitting fry namespaces make assocs arrays strings
+io.sockets io.encodings.string io.encodings.utf8 math
+math.parser accessors parser strings.parser lexer
+hashtables present peg.ebnf urls.encoding ;
 IN: urls
 
-TUPLE: url protocol username password addr path query anchor ;
+TUPLE: url protocol username password host port path query anchor ;
 
 : <url> ( -- url ) url new ;
 
@@ -74,7 +74,7 @@ M: string >url
                 [
                     second
                     [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
-                    [ second parse-host <inet> >>addr ] bi
+                    [ second parse-host [ >>host ] [ >>port ] bi* ] bi
                 ] bi
             ] when*
         ]
@@ -82,17 +82,7 @@ M: string >url
         [ third >>query ]
         [ fourth >>anchor ]
     } cleave
-    dup addr>> [ [ "/" or ] change-path ] when ;
-
-<PRIVATE
-
-: inet>url ( inet -- url ) [ <url> ] dip >>addr ;
-
-PRIVATE>
-
-M: inet >url inet>url ;
-M: inet4 >url inet>url ;
-M: inet6 >url inet>url ;
+    dup host>> [ [ "/" or ] change-path ] when ;
 
 : protocol-port ( protocol -- port )
     {
@@ -110,9 +100,7 @@ M: inet6 >url inet>url ;
     ] [ 2drop ] if ;
 
 : url-port ( url -- port/f )
-    [ addr>> port>> ]
-    [ addr>> port>> ]
-    [ protocol>> protocol-port ] tri =
+    [ port>> ] [ port>> ] [ protocol>> protocol-port ] tri =
     [ drop f ] when ;
 
 : unparse-host-part ( url protocol -- )
@@ -120,7 +108,7 @@ M: inet6 >url inet>url ;
     "://" %
     {
         [ unparse-username-password ]
-        [ addr>> host>> url-encode % ]
+        [ host>> url-encode % ]
         [ url-port [ ":" % # ] when* ]
         [ path>> "/" head? [ "/" % ] unless ]
     } cleave ;
@@ -153,7 +141,8 @@ PRIVATE>
         [ [ protocol>>  ] either? >>protocol ]
         [ [ username>>  ] either? >>username ]
         [ [ password>>  ] either? >>password ]
-        [ [ addr>>      ] either? >>addr ]
+        [ [ host>>      ] either? >>host ]
+        [ [ port>>      ] either? >>port ]
         [ [ path>>      ] bi@ swap url-append-path >>path ]
         [ [ query>>     ] either? >>query ]
         [ [ anchor>>    ] either? >>anchor ]
@@ -162,7 +151,8 @@ PRIVATE>
 : relative-url ( url -- url' )
     clone
         f >>protocol
-        f >>addr ;
+        f >>host
+        f >>port ;
 
 : relative-url? ( url -- ? ) protocol>> not ;
 
@@ -178,15 +168,18 @@ PRIVATE>
 
 : url-addr ( url -- addr )
     [
-        [ addr>> ]
-        [ [ addr>> port>> ] [ protocol>> protocol-port ] bi or ] bi with-port
+        [ host>> ]
+        [ port>> ]
+        [ protocol>> protocol-port ]
+        tri or <inet>
     ] [ protocol>> ] bi
     secure-protocol? [ >secure-addr ] when ;
 
+: set-url-addr ( url addr -- url )
+    [ host>> >>host ] [ port>> >>port ] bi ;
+
 : ensure-port ( url -- url' )
-    clone dup protocol>> '[
-        dup port>> _ protocol-port or with-port
-    ] change-addr ;
+    clone dup protocol>> '[ _ protocol-port or ] change-port ;
 
 ! Literal syntax
 SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
