@@ -122,10 +122,6 @@ HINTS: >title string ;
 : >case-fold ( string -- fold )
     >upper >lower ;
 
-: ch-lower? ( ch -- ? ) dup ch>lower = ;
-
-: ch-upper? ( ch -- ? ) dup ch>upper = ;
-
 : lower? ( string -- ? ) dup >lower = ;
 
 : upper? ( string -- ? ) dup >upper = ;
