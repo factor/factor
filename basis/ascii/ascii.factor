@@ -18,6 +18,9 @@ IN: ascii
 : >lower ( str -- lower ) [ ch>lower ] map ;
 : ch>upper ( ch -- upper ) dup letter? [ HEX: 20 - ] when ; inline
 : >upper ( str -- upper ) [ ch>upper ] map ;
+: ch-lower? ( ch -- ? ) dup ch>lower = ;
+: ch-upper? ( ch -- ? ) dup ch>upper = ;
+
 
 HINTS: >lower string ;
 HINTS: >upper string ;
