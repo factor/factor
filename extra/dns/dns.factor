@@ -1,14 +1,12 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.enums alien.syntax arrays assocs
-byte-arrays calendar combinators combinators.smart constructors
-destructors fry grouping io io.binary io.buffers
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.files io.ports io.sockets io.sockets.private
+USING: accessors alien.enums alien.syntax arrays calendar
+combinators combinators.smart constructors destructors grouping
+io io.binary io.encodings.binary io.encodings.string
+io.encodings.utf8 io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
-math.parser math.ranges math.statistics memoize namespaces
-nested-comments random sequences slots.syntax splitting strings
-system unicode.categories vectors vocabs.loader unicode.case ;
+math.parser namespaces nested-comments random sequences
+slots.syntax splitting system vectors vocabs.loader ;
 IN: dns
 
 ENUM: dns-type
@@ -163,7 +161,7 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
         first2 swap [ hex> ] bi@ [ 4 shift ] [ ] bi* bitor
     ] B{ } map-as byte-array>ipv6 ;
 
-: parse-length-bytes ( -- seq ) read1 read utf8 decode ;
+: parse-length-bytes ( -- sequence ) read1 read utf8 decode ;
 
 : (parse-name) ( -- )
     peek1 [
@@ -177,7 +175,7 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
         ] if
     ] if-zero ;
 
-: parse-name ( -- seq )
+: parse-name ( -- sequence )
     [ (parse-name) ] { } make "." join ;
 
 : parse-query ( -- query )
@@ -219,7 +217,7 @@ M: SOA parse-rdata 2drop parse-soa ;
         4 read be> >>ttl
         2 read be> over type>> parse-rdata >>rdata ;
 
-: parse-message ( ba -- message )
+: parse-message ( byte-array -- message )
     [ message new ] dip
     binary [
         2 read be> >>id
@@ -234,12 +232,12 @@ M: SOA parse-rdata 2drop parse-soa ;
         [ [ parse-rr ] replicate ] change-additional-section
     ] with-byte-reader ;
 
-: >n/label ( string -- ba )
+: >n/label ( string -- byte-array )
     [ length 1array ] [ utf8 encode ] bi B{ } append-as ;
 
-: >name ( dn -- ba ) "." split [ >n/label ] map concat ;
+: >name ( domain -- byte-array ) "." split [ >n/label ] map concat ;
 
-: query>byte-array ( query -- ba )
+: query>byte-array ( query -- byte-array )
     [
         {
             [ name>> >name ]
@@ -282,7 +280,7 @@ M: SOA rdata>byte-array
         } cleave
     ] B{ } append-outputs-as ;
 
-: rr>byte-array ( rr -- ba )
+: rr>byte-array ( rr -- byte-array )
     [
         {
             [ name>> >name ]
@@ -296,7 +294,7 @@ M: SOA rdata>byte-array
         } cleave
     ] B{ } append-outputs-as ;
 
-: message>byte-array ( message -- ba )
+: message>byte-array ( message -- byte-array )
     [
         {
             [ id>> 2 >be ]
@@ -374,7 +372,7 @@ M: string resolve-host
     ] if ;
 *)
     
-HOOK: initial-dns-servers os ( -- seq )
+HOOK: initial-dns-servers os ( -- sequence )
 
 {
     { [ os windows? ] [ "dns.windows" ] }
