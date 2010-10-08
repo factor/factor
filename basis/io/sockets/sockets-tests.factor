@@ -38,8 +38,6 @@ IN: io.sockets.tests
 [ B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } ]
 [ "::" T{ inet6 } inet-pton ] unit-test
 
-[ f T{ inet6 } inet-pton ] [ reason>> empty-ipv6? ] must-fail-with
-
 [ "0:0:0:0:0:0:0:0" ]
 [ B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } T{ inet6 } inet-ntop ] unit-test
 
