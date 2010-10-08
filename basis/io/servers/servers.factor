@@ -230,6 +230,8 @@ M: inet6 connect-addr [ "::1" ] dip port>> <inet6> ;
 
 M: secure connect-addr addrspec>> connect-addr <secure> ;
 
+M: local connect-addr ;
+
 PRIVATE>
 
 : server-addrs ( -- addrspecs )
