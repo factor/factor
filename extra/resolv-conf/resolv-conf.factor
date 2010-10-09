@@ -10,20 +10,24 @@ CONSTRUCTOR: network ( ip netmask -- network ) ;
 
 TUPLE: options
 debug?
+edns0?
+insecure1?
+insecure2?
 { ndots integer initial: 1 }
 { timeout integer initial: 5 }
 { attempts integer initial: 2 }
-rotate? no-check-names? inet6? ;
+rotate? no-check-names? inet6? tcp? ;
 
 CONSTRUCTOR: options ( -- options ) ;
 
-TUPLE: resolv.conf nameserver domain search sortlist options ;
+TUPLE: resolv.conf nameserver domain lookup search sortlist options ;
 
 CONSTRUCTOR: resolv.conf ( -- resolv.conf )
     V{ } clone >>nameserver
     V{ } clone >>domain
     V{ } clone >>search
     V{ } clone >>sortlist
+    V{ } clone >>lookup
     <options> >>options ;
 
 <PRIVATE
@@ -39,6 +43,9 @@ CONSTRUCTOR: resolv.conf ( -- resolv.conf )
 
 : parse-domain ( resolv.conf string -- resolv.conf )
     split-line domain>> push-all ;
+
+: parse-lookup ( resolv.conf string -- resolv.conf )
+    split-line lookup>> push-all ;
 
 : parse-search ( resolv.conf string -- resolv.conf )
     split-line search>> push-all ;
@@ -70,6 +77,7 @@ ERROR: unsupported-resolv.conf-line string ;
     {
         { [ "nameserver" ?head ] [ parse-nameserver ] }
         { [ "domain" ?head ] [ parse-domain ] }
+        { [ "lookup" ?head ] [ parse-lookup ] }
         { [ "search" ?head ] [ parse-search ] }
         { [ "sortlist" ?head ] [ parse-sortlist ] }
         { [ "options" ?head ] [ parse-option ] }
