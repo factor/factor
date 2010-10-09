@@ -1,6 +1,8 @@
 USING: alien.c-types alien.syntax classes.struct unix.types ;
 IN: unix.ffi
 
+CONSTANT: AF_INET6 28
+
 CONSTANT: FD_SETSIZE 1024
 
 STRUCT: addrinfo
