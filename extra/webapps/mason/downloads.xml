@@ -1,7 +1,5 @@
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-<t:style t:include="resource:extra/webapps/mason/downloads.css" />
-
 <h2>Stable release: <t:link t:name="stable-release" /></h2>
 
 <table id="mytable" cellspacing="0" summary="Stable releases">
