@@ -14,8 +14,6 @@ M: null-reader stream-readln drop f ;
 M: null-reader stream-read1 drop f ;
 M: null-reader stream-read-until 2drop f f ;
 M: null-reader stream-read 2drop f ;
-M: null-reader stream-peek1 drop f ;
-M: null-reader stream-peek 2drop f ;
 
 M: null-writer stream-element-type drop +byte+ ;
 M: null-writer stream-write1 2drop ;

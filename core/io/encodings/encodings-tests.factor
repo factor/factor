@@ -73,13 +73,3 @@ unit-test
         output-stream get code>>
     ] with-byte-writer drop
 ] unit-test
-
-[ t ] [
-    "vocab:io/test/mac-os-eol.txt"
-    ascii [ 10 peek 10 peek = ] with-file-reader
-] unit-test
-
-[ t ] [
-    "vocab:io/test/mac-os-eol.txt"
-    ascii [ peek1 peek1 = ] with-file-reader
-] unit-test

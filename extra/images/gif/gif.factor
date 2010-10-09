@@ -3,7 +3,7 @@
 USING: accessors arrays combinators compression.lzw
 constructors destructors grouping images images.loader io
 io.binary io.buffers io.encodings.string io.encodings.utf8
-io.ports kernel make math math.bitwise namespaces sequences ;
+kernel make math math.bitwise namespaces sequences ;
 IN: images.gif
 
 SINGLETON: gif-image
