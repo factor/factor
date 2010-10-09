@@ -1,7 +1,7 @@
 namespace factor
 {
 
-const u32 gc_info_missing_value = (u32)-1;
+const cell gc_info_missing_value = (cell)-1;
 
 struct gc_info {
 	u32 scrub_d_count;
