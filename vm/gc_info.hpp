@@ -1,8 +1,6 @@
 namespace factor
 {
 
-const cell gc_info_missing_value = (cell)-1;
-
 struct gc_info {
 	u32 scrub_d_count;
 	u32 scrub_r_count;
@@ -58,7 +56,7 @@ struct gc_info {
 			+ index * gc_root_count;
 	}
 
-	cell lookup_base_pointer(cell index, cell derived_root)
+	u32 lookup_base_pointer(cell index, cell derived_root)
 	{
 		return base_pointer_map()[index * derived_root_count + derived_root];
 	}
