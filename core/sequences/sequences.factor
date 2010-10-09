@@ -293,12 +293,6 @@ PRIVATE>
 : subseq ( from to seq -- subseq )
     [ check-slice subseq>copy (copy) ] keep like ;
 
-: ?subseq ( from to seq -- subseq )
-    [
-        [ 0 ] dip length [ clamp ] 2curry bi@
-        2dup > [ nip dup ] when
-    ] keep subseq f like ;
-
 : head ( seq n -- headseq ) (head) subseq ;
 
 : tail ( seq n -- tailseq ) (tail) subseq ;

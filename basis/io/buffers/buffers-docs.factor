@@ -25,7 +25,7 @@ $nl
 }
 "Reading from the buffer:"
 { $subsections
-    buffer-peek1
+    buffer-peek
     buffer-pop
     buffer-read
 }
@@ -98,7 +98,7 @@ HELP: n>buffer
 { $description "Advances the fill pointer by " { $snippet "n" } " bytes." }
 { $warning "This word will leave the buffer in an invalid state if it does not have " { $snippet "n" } " bytes available." } ;
 
-HELP: buffer-peek1
+HELP: buffer-peek
 { $values { "buffer" buffer } { "byte" "a byte" } }
 { $description "Outputs the byte at the buffer position." } ;
 

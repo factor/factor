@@ -9,6 +9,11 @@ math.parser namespaces nested-comments random sequences
 slots.syntax splitting system vectors vocabs.loader ;
 IN: dns
 
+: with-temporary-input-seek ( n seek-type quot -- )
+    tell-input [
+        [ seek-input ] dip call
+    ] dip seek-absolute seek-input ; inline
+
 ENUM: dns-type
 { A 1 } { NS 2 } { MD 3 } { MF 4 }
 { CNAME 5 } { SOA 6 } { MB 7 } { MG 8 }
@@ -143,7 +148,8 @@ CONSTANT: ipv4-arpa-suffix ".in-addr.arpa"
 CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
 
 : ipv6>arpa ( string -- string )
-    ipv6>byte-array [ [ -4 shift 4 bits ] [ 4 bits ] bi 2array ] { } map-as
+    ipv6>byte-array
+    [ [ -4 shift 4 bits ] [ 4 bits ] bi 2array ] { } map-as
     B{ } concat-as reverse
     [ >hex ] { } map-as "." join ipv6-arpa-suffix append ;
 
@@ -161,19 +167,19 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
         first2 swap [ hex> ] bi@ [ 4 shift ] [ ] bi* bitor
     ] B{ } map-as byte-array>ipv6 ;
 
-: parse-length-bytes ( -- sequence ) read1 read utf8 decode ;
+: parse-length-bytes ( byte -- sequence ) read utf8 decode ;
 
 : (parse-name) ( -- )
-    peek1 [
-        read1 drop
-    ] [
-        HEX: C0 mask? [
-            2 read be> HEX: 3fff bitand
-            seek-absolute [ parse-length-bytes , (parse-name) ] with-input-seek
+    read1 [
+        dup HEX: C0 mask? [
+            8 shift read1 bitor HEX: 3fff bitand
+            seek-absolute [
+                read1 parse-length-bytes , (parse-name)
+            ] with-temporary-input-seek
         ] [
             parse-length-bytes , (parse-name)
         ] if
-    ] if-zero ;
+    ] unless-zero ;
 
 : parse-name ( -- sequence )
     [ (parse-name) ] { } make "." join ;

@@ -13,8 +13,6 @@ M: string-reader stream-element-type drop +character+ ;
 M: string-reader stream-read-partial stream-read ;
 M: string-reader stream-read sequence-read ;
 M: string-reader stream-read1 sequence-read1 ;
-M: string-reader stream-peek sequence-peek ;
-M: string-reader stream-peek1 sequence-peek1 ;
 M: string-reader stream-read-until sequence-read-until ;
 M: string-reader stream-tell i>> ;
 M: string-reader stream-seek (stream-seek) ;
