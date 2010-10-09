@@ -1,0 +1,55 @@
+#downloads {
+	width: 520px;
+	padding: 0;
+	margin: 0;
+}
+
+th {
+	font: bold 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+	color: #4f6b72;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-top: 1px solid #C1DAD7;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	padding: 6px 6px 6px 6px;
+	background: #CAE8EA url(bg_header.jpg) no-repeat;
+}
+
+th.nobg {
+	border-top: 0;
+	border-left: 0;
+	border-right: 1px solid #C1DAD7;
+	background: none;
+}
+
+td.alt {
+	background: #F5FAFA;
+	color: #797268;
+}
+
+td.doesnotexist {
+	background: #E5EAEA;
+}
+
+
+td.unsupported {
+	background: #ffaaaa;
+}
+
+
+td.supported {
+	background: #aaffaa;
+}
+
+td.supported :hover { background-color: #88ff88; }  
+
+td.nobinary {
+	background: #eeee88;
+}
+
+div.bigdiv {
+	width: 100px;
+	text-align: center;
+	color: #050;
+}
