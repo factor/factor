@@ -13,7 +13,7 @@ cell gc_info::return_address_index(cell return_address)
 			return i;
 	}
 
-	return gc_info_missing_value;
+	return (cell)-1;
 }
 
 }
