@@ -84,13 +84,13 @@ ARTICLE: "html.templates.chloe.tags.boilerplate" "Boilerplate Chloe tags"
 $nl
 "The tags marked with (*) are only available if the " { $vocab-link "furnace.chloe-tags" } " vocabulary is loaded."
 { $table
-    { { $snippet "t:title" } "Sets the title from a child template" }
-    { { $snippet "t:write-title" } "Renders the child's title from a master template" }
-    { { $snippet "t:style" } "Adds CSS markup from a child template" }
-    { { $snippet "t:write-style" } "Renders the children's CSS from a master template" }
-    { { $snippet "t:atom" } "Adds an Atom feed link from a child template (*)" }
-    { { $snippet "t:write-atom" } "Renders the children's list of Atom feed links (*)" }
-    { { $snippet "t:call-next-template" } "Calls the child template from a master template" }
+    { { $snippet "t:title" } "Sets the title. Intended for use in a master template." }
+    { { $snippet "t:write-title" } "Renders the child's title. Intended for use in a child template." }
+    { { $snippet "t:style" } { "Adds CSS markup from the file named by the " { $snippet "t:include" } " attribute. Intended for use in a child template." } }
+    { { $snippet "t:write-style" } "Renders the children's CSS markup. Intended for use in a master template." }
+    { { $snippet "t:atom" } { "Adds an Atom feed link. The attributes are the same as the " { $snippet "t:link" } " tag. Intended for use in a child template. (*)" } }
+    { { $snippet "t:write-atom" } "Renders the children's list of Atom feed links. Intended for use in a master template. (*)" }
+    { { $snippet "t:call-next-template" } "Calls the next child template from a master template." }
 } ;
 
 ARTICLE: "html.templates.chloe.tags.control" "Control-flow Chloe tags"
