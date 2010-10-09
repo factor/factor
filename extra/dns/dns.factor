@@ -9,7 +9,7 @@ math.parser namespaces nested-comments random sequences
 slots.syntax splitting system vectors vocabs.loader ;
 IN: dns
 
-: with-temporary-input-seek ( n seek-type quot -- )
+: with-input-seek ( n seek-type quot -- )
     tell-input [
         [ seek-input ] dip call
     ] dip seek-absolute seek-input ; inline
@@ -175,7 +175,7 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
             8 shift read1 bitor HEX: 3fff bitand
             seek-absolute [
                 read1 parse-length-bytes , (parse-name)
-            ] with-temporary-input-seek
+            ] with-input-seek
         ] [
             parse-length-bytes , (parse-name)
         ] if
