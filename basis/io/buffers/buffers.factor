@@ -32,11 +32,11 @@ M: buffer dispose* ptr>> free ;
     dup [ pos>> ] [ fill>> ] bi <
     [ 0 >>pos 0 >>fill ] unless drop ; inline
 
-: buffer-peek1 ( buffer -- byte )
+: buffer-peek ( buffer -- byte )
     [ ptr>> ] [ pos>> ] bi alien-unsigned-1 ; inline
 
 : buffer-pop ( buffer -- byte )
-    [ buffer-peek1 ] [ 1 swap buffer-consume ] bi ; inline
+    [ buffer-peek ] [ 1 swap buffer-consume ] bi ; inline
 
 : buffer-length ( buffer -- n )
     [ fill>> ] [ pos>> ] bi - ; inline

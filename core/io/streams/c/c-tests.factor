@@ -34,18 +34,6 @@ IN: io.streams.c.tests
     int-array-cast
 ] unit-test
 
-[ t ] [
-    "test.txt" temp-file "rb" fopen <c-reader> [
-        3 4 * [ peek ] [ peek ] bi =
-    ] with-input-stream
-] unit-test
-
-[ t ] [
-    "test.txt" temp-file "rb" fopen <c-reader> [
-        peek1 peek1 =
-    ] with-input-stream
-] unit-test
-
 ! Writing strings to binary streams should fail
 [
     "test.txt" temp-file "wb" fopen <c-writer> [

@@ -13,11 +13,6 @@ IN: sequences.tests
 [ V{ 4 5 } ] [ { 1 2 3 4 5 } 2 tail-slice* >vector ] unit-test
 [ V{ 3 4 } ] [ 2 4 1 10 dup iota <slice> subseq >vector ] unit-test
 [ V{ 3 4 } ] [ 0 2 2 4 1 10 dup iota <slice> <slice> subseq >vector ] unit-test
-
-[ "abc" ] [ 0 3 "abc" ?subseq ] unit-test
-[ "abc" ] [ 0 5 "abc" ?subseq ] unit-test
-[ "bc" ] [ 1 5 "abc" ?subseq ] unit-test
-[ "abc" ] [ -1 3 "abc" ?subseq ] unit-test
 [ 0 10 "hello" <slice> ] must-fail
 [ -10 3 "hello" <slice> ] must-fail
 [ 2 1 "hello" <slice> ] must-fail

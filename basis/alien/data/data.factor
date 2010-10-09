@@ -62,13 +62,11 @@ M: pointer <c-direct-array>
 : malloc-string ( string encoding -- alien )
     string>alien malloc-byte-array ;
 
-M: memory-stream stream-peek
-    [ index>> ] [ alien>> ] bi <displaced-alien>
-    swap memory>byte-array ;
-
 M: memory-stream stream-read
-    [ stream-peek ]
-    [ [ + ] change-index drop ] 2bi ;
+    [
+        [ index>> ] [ alien>> ] bi <displaced-alien>
+        swap memory>byte-array
+    ] [ [ + ] change-index drop ] 2bi ;
 
 M: value-type c-type-rep drop int-rep ;
 

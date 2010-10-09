@@ -14,12 +14,6 @@ SLOT: i
 : next ( stream -- )
     [ 1 + ] change-i drop ; inline
 
-: sequence-peek1 ( seq -- elt/f )
-    [ i>> ] [ underlying>> ] bi ?nth ;
-
-: sequence-peek ( n seq -- elt/f )
-    [ nip i>> dup ] [ [ + ] [ underlying>> ] bi* ] 2bi ?subseq ;
-
 : sequence-read1 ( stream -- elt/f )
     [ >sequence-stream< ?nth ] [ next ] bi ; inline
 

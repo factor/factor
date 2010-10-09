@@ -262,37 +262,6 @@ HELP: contents
 { $description "Reads all elements in the " { $link input-stream } " until the stream is exhausted. The type of the sequence depends on the stream's element type." }
 $io-error ;
 
-HELP: peek
-{ $values
-    { "n" integer }
-    { "seq/f" "a sequence or f" }
-}
-{ $description "Reads the next " { $snippet "n" } " elements from the stream and seeks the stream to before the read." } ;
-
-HELP: peek1
-{ $values
-        { "elt" "an element or f" }
-}
-{ $description "Reads the next object from a stream and seeks the stream to before the read." } ;
-
-HELP: stream-peek
-{ $values
-    { "n" integer } { "stream" "an input stream" }
-    { "seq/f" "a sequence or f" }
-}
-{ $contract "Peeks " { $snippet "n" } " elements from the stream. Outputs " { $link f } " on stream exhaustion." }
-{ $notes "Most code only works on one stream at a time and should instead use " { $link peek } "; see " { $link "stdio" } "." }
-$io-error ;
-
-HELP: stream-peek1
-{ $values
-    { "stream" "an input stream" }
-    { "elt/f" "an element or f" }
-}
-{ $contract "Peeks an element from the stream. Outputs " { $link f } " on stream exhaustion." }
-{ $notes "Most code only works on one stream at a time and should instead use " { $link peek1 } "; see " { $link "stdio" } "." }
-$io-error ;
-
 HELP: tell-input
 { $values
         { "n" integer }
@@ -305,18 +274,6 @@ HELP: tell-output
 }
 { $description "Returns the index of the stream stored in " { $link output-stream } "." } ;
 
-HELP: with-input-rewind
-{ $values
-    { "quot" quotation }    
-}
-{ $description "Records the current seek position of the stream and calls the quotation. The position is then reset after the call." } ;
-
-HELP: with-input-seek
-{ $values
-    { "n" integer } { "seek-type" "a seek singleton" } { "quot" quotation }    
-}
-{ $description "Seeks the stream to a location, calls " { $snippet "quot" } ", and resets the input stream to where it was before the quotation was called." } ;
-
 ARTICLE: "stream-protocol" "Stream protocol"
 "The stream protocol consists of a large number of generic words, many of which are optional."
 $nl
@@ -326,8 +283,6 @@ $nl
 { $subsections "stream-types" }
 "These words are required for binary and string input streams:"
 { $subsections
-    stream-peek1
-    stream-peek
     stream-read1
     stream-read
     stream-read-until
@@ -397,8 +352,6 @@ ARTICLE: "stdio" "Default input and output streams"
 $nl
 "Words reading from the default input stream:"
 { $subsections
-    peek1
-    peek
     read1
     read
     read-until
@@ -431,17 +384,6 @@ $nl
 }
 "Seeking on the default output stream:"
 { $subsections seek-output }
-"Seeking descriptors:"
-{ $subsections
-    seek-absolute
-    seek-relative
-    seek-end
-}
-"Seeking combinators:"
-{ $subsections
-    with-input-seek
-    with-input-rewind
-}
 "A pair of combinators for rebinding the " { $link output-stream } " variable:"
 { $subsections
     with-output-stream

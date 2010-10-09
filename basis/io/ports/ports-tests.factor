@@ -23,8 +23,3 @@ IN: io.ports.tests
 ] unit-test
 
 [ ] [ "test.txt" temp-file delete-file ] unit-test
-
-[ t ]
-[
-    "resource:license.txt" binary [ 10 peek 10 peek ] with-file-reader =
-] unit-test
