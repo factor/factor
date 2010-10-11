@@ -298,6 +298,10 @@ HELP: assoc-all?
 { $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "?" "a boolean" } }
 { $description "Tests if all entries in the assoc satisfy a predicate by applying the quotation to each entry in turn. a predicate quotation to entry in the assoc. Iteration stops if an entry is found for which the quotation outputs " { $link f } ". If the assoc is empty, always outputs " { $link t } "." } ;
 
+HELP: assoc-refine
+{ $values { "seq" sequence } { "assoc" assoc } }
+{ $description "Outputs the intersection of all the assocs of the assocs sequence " { $snippet "seq" } ", or " { $link f } " if " { $snippet "seq" } " is empty." } ;
+
 HELP: assoc-subset?
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" "a new assoc" } }
 { $description "Tests if " { $snippet "assoc2" } " contains all key/value pairs of " { $snippet "assoc1" } "." } ;
