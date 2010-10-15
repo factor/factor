@@ -365,6 +365,7 @@ M: pointer c-type
             8 >>align-first
             "from_signed_cell" >>boxer
             "to_fixnum" >>unboxer
+            [ >integer ] >>unboxer-quot
         \ longlong define-primitive-type
 
         <c-type>
@@ -377,6 +378,7 @@ M: pointer c-type
             8 >>align-first
             "from_unsigned_cell" >>boxer
             "to_cell" >>unboxer
+            [ >integer ] >>unboxer-quot
         \ ulonglong define-primitive-type
 
         os windows? [
@@ -403,6 +405,7 @@ M: pointer c-type
             4 >>align-first
             "from_signed_cell" >>boxer
             "to_fixnum" >>unboxer
+            [ >integer ] >>unboxer-quot
         \ int define-primitive-type
     
         <c-type>
@@ -415,6 +418,7 @@ M: pointer c-type
             4 >>align-first
             "from_unsigned_cell" >>boxer
             "to_cell" >>unboxer
+            [ >integer ] >>unboxer-quot
         \ uint define-primitive-type
 
         <long-long-type>
@@ -426,6 +430,7 @@ M: pointer c-type
             8-byte-alignment
             "from_signed_8" >>boxer
             "to_signed_8" >>unboxer
+            [ >integer ] >>unboxer-quot
         \ longlong define-primitive-type
 
         <long-long-type>
@@ -437,6 +442,7 @@ M: pointer c-type
             8-byte-alignment
             "from_unsigned_8" >>boxer
             "to_unsigned_8" >>unboxer
+            [ >integer ] >>unboxer-quot
         \ ulonglong define-primitive-type
 
         \ int c-type \ long define-primitive-type

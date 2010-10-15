@@ -12,6 +12,15 @@ CONSTANT: xyz 123
 [ -1 ] [ -1 <short> *short ] unit-test
 [ -1 ] [ -1 <int> *int ] unit-test
 
+! I don't care if this throws an error or works, but at least
+! it should be consistent between platforms
+[ -1 ] [ -1.0 <int> *int ] unit-test
+[ -1 ] [ -1.0 <long> *long ] unit-test
+[ -1 ] [ -1.0 <longlong> *longlong ] unit-test
+[ 1 ] [ 1.0 <uint> *uint ] unit-test
+[ 1 ] [ 1.0 <ulong> *ulong ] unit-test
+[ 1 ] [ 1.0 <ulonglong> *ulonglong ] unit-test
+
 UNION-STRUCT: foo
     { a int }
     { b int } ;
