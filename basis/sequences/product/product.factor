@@ -14,7 +14,7 @@ M: product-sequence length lengths>> product ;
 <PRIVATE
 
 : ns ( n lengths -- ns )
-    [ V{ } clone ] 2dip [ /mod swap [ over push ] dip ] each drop ;
+    [ /mod ] map nip ;
 
 : nths ( ns seqs -- nths )
     [ nth ] { } 2map-as ;
@@ -38,10 +38,10 @@ M: product-sequence length lengths>> product ;
     [ 0 over [ 1 + ] change-nth ] dip carry-ns ;
 
 : start-product-iter ( sequences -- ns lengths )
-    [ [ drop 0 ] map ] [ [ length ] map ] bi ;
+    [ length 0 <array> ] [ [ length ] map ] bi ;
 
 : end-product-iter? ( ns lengths -- ? )
-    [ 1 tail* first ] bi@ = ;
+    [ last ] bi@ = ;
 
 PRIVATE>
 
