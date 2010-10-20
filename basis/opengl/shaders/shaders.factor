@@ -47,7 +47,7 @@ IN: opengl.shaders
 : gl-shader-info-log ( shader -- log )
     dup gl-shader-info-log-length dup [
         1 calloc &free
-        [ 0 <int> swap glGetShaderInfoLog ] keep
+        [ 0 int <ref> swap glGetShaderInfoLog ] keep
         ascii alien>string
     ] with-destructors ;
 
@@ -90,7 +90,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 : gl-program-info-log ( program -- log )
     dup gl-program-info-log-length dup [
         1 calloc &free
-        [ 0 <int> swap glGetProgramInfoLog ] keep
+        [ 0 int <ref> swap glGetProgramInfoLog ] keep
         ascii alien>string
     ] with-destructors ;
 
@@ -107,7 +107,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 
 : gl-program-shaders ( program -- shaders )
     dup gl-program-shaders-length 2 *
-    0 <int>
+    0 int <ref>
     over <uint-array>
     [ glGetAttachedShaders ] keep [ zero? not ] filter ;
 

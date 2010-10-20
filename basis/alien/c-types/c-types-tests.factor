@@ -2,24 +2,25 @@ USING: alien alien.syntax alien.c-types alien.parser
 eval kernel tools.test sequences system libc alien.strings
 io.encodings.ascii io.encodings.utf8 math.constants classes.struct classes
 accessors compiler.units ;
+FROM: alien.c-types => short ;
 IN: alien.c-types.tests
 
 CONSTANT: xyz 123
 
 [ 492 ] [ { int xyz } heap-size ] unit-test
 
-[ -1 ] [ -1 <char> *char ] unit-test
-[ -1 ] [ -1 <short> *short ] unit-test
-[ -1 ] [ -1 <int> *int ] unit-test
+[ -1 ] [ -1 char <ref> char deref ] unit-test
+[ -1 ] [ -1 short <ref> short deref ] unit-test
+[ -1 ] [ -1 int <ref> int deref ] unit-test
 
 ! I don't care if this throws an error or works, but at least
 ! it should be consistent between platforms
-[ -1 ] [ -1.0 <int> *int ] unit-test
-[ -1 ] [ -1.0 <long> *long ] unit-test
-[ -1 ] [ -1.0 <longlong> *longlong ] unit-test
-[ 1 ] [ 1.0 <uint> *uint ] unit-test
-[ 1 ] [ 1.0 <ulong> *ulong ] unit-test
-[ 1 ] [ 1.0 <ulonglong> *ulonglong ] unit-test
+[ -1 ] [ -1.0 int <ref> int deref ] unit-test
+[ -1 ] [ -1.0 long <ref> long deref ] unit-test
+[ -1 ] [ -1.0 longlong <ref> longlong deref ] unit-test
+[ 1 ] [ 1.0 uint <ref> uint deref ] unit-test
+[ 1 ] [ 1.0 ulong <ref> ulong deref ] unit-test
+[ 1 ] [ 1.0 ulonglong <ref> ulonglong deref ] unit-test
 
 UNION-STRUCT: foo
     { a int }

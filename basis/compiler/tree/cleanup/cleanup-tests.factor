@@ -244,22 +244,22 @@ cell-bits 32 = [
 ] when
 
 [ t ] [
-    [ B{ 1 0 } *short 0 number= ]
+    [ B{ 1 0 } short deref 0 number= ]
     \ number= inlined?
 ] unit-test
 
 [ t ] [
-    [ B{ 1 0 } *short 0 { number number } declare number= ]
+    [ B{ 1 0 } short deref 0 { number number } declare number= ]
     \ number= inlined?
 ] unit-test
 
 [ t ] [
-    [ B{ 1 0 } *short 0 = ]
+    [ B{ 1 0 } short deref 0 = ]
     \ number= inlined?
 ] unit-test
 
 [ t ] [
-    [ B{ 1 0 } *short dup number? [ 0 number= ] [ drop f ] if ]
+    [ B{ 1 0 } short deref dup number? [ 0 number= ] [ drop f ] if ]
     \ number= inlined?
 ] unit-test
 

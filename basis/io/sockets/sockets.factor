@@ -106,10 +106,10 @@ M: ipv4 make-sockaddr ( inet -- sockaddr )
         swap
         [ port>> htons >>port ]
         [ host>> "0.0.0.0" or ]
-        [ inet-pton *uint >>addr ] tri ;
+        [ inet-pton uint deref >>addr ] tri ;
 
 M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
-    [ addr>> <uint> ] dip inet-ntop <ipv4> ;
+    [ addr>> uint <ref> ] dip inet-ntop <ipv4> ;
 
 TUPLE: inet4 < ipv4 { port integer read-only } ;
 

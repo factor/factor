@@ -16,7 +16,7 @@ IN: io.sockets.unix
     socket dup io-error <fd> init-fd |dispose ;
 
 : set-socket-option ( fd level opt -- )
-    [ handle-fd ] 2dip 1 <int> dup byte-length setsockopt io-error ;
+    [ handle-fd ] 2dip 1 int <ref> dup byte-length setsockopt io-error ;
 
 M: unix addrinfo-error ( n -- )
     [ gai_strerror throw ] unless-zero ;
@@ -39,11 +39,11 @@ M: unix addrspec-of-family ( af -- addrspec )
 
 ! Client sockets - TCP and Unix domain
 M: object (get-local-address) ( handle remote -- sockaddr )
-    [ handle-fd ] dip empty-sockaddr/size <int>
+    [ handle-fd ] dip empty-sockaddr/size int <ref>
     [ getsockname io-error ] 2keep drop ;
 
 M: object (get-remote-address) ( handle local -- sockaddr )
-    [ handle-fd ] dip empty-sockaddr/size <int>
+    [ handle-fd ] dip empty-sockaddr/size int <ref>
     [ getpeername io-error ] 2keep drop ;
 
 : init-client-socket ( fd -- )
@@ -101,7 +101,7 @@ M: object (server) ( addrspec -- handle )
     ] with-destructors ;
 
 : do-accept ( server addrspec -- fd sockaddr )
-    [ handle>> handle-fd ] [ empty-sockaddr/size <int> ] bi*
+    [ handle>> handle-fd ] [ empty-sockaddr/size int <ref> ] bi*
     [ accept ] 2keep drop ; inline
 
 M: object (accept) ( server addrspec -- fd sockaddr )
@@ -138,7 +138,7 @@ CONSTANT: packet-size 65536
     packet-size ! nbytes
     0 ! flags
     sockaddr ! from
-    len <int> ! fromlen
+    len int <ref> ! fromlen
     recvfrom dup 0 >=
     [ receive-buffer get-global swap memory>byte-array sockaddr ]
     [ drop f f ]

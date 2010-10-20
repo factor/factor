@@ -90,8 +90,8 @@ ERROR: too-many-samples seq n ;
     secure-random-generator get swap with-random ; inline
 
 : uniform-random-float ( min max -- n )
-    4 random-bytes underlying>> *uint >float
-    4 random-bytes underlying>> *uint >float
+    4 random-bytes underlying>> uint deref >float
+    4 random-bytes underlying>> uint deref >float
     2.0 32 ^ * +
     [ over - 2.0 -64 ^ * ] dip
     * + ; inline

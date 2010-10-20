@@ -21,7 +21,7 @@ CONSTANT: registry-value-max-length 16384
             [ key subkey mode ] dip n>win32-error-string
             open-key-failed
         ] if
-    ] keep *uint ;
+    ] keep uint deref ;
 
 :: create-key* ( hKey lpSubKey lpClass dwOptions samDesired lpSecurityAttributes -- hkey new? )
     hKey lpSubKey 0 lpClass dwOptions samDesired lpSecurityAttributes
@@ -29,8 +29,8 @@ CONSTANT: registry-value-max-length 16384
     DWORD <c-object>
     f :> ret!
     [ RegCreateKeyEx ret! ] 2keep
-    [ *uint ]
-    [ *uint REG_CREATED_NEW_KEY = ] bi*
+    [ uint deref ]
+    [ uint deref REG_CREATED_NEW_KEY = ] bi*
     ret ERROR_SUCCESS = [
         [
             hKey lpSubKey 0 lpClass dwOptions samDesired
@@ -67,11 +67,11 @@ CONSTANT: registry-value-max-length 16384
     length 2 * <byte-array> ;
 
 :: reg-query-value-ex ( key subkey ptr1 ptr2 buffer -- buffer )
-    buffer length <uint> :> pdword
+    buffer length uint <ref> :> pdword
     key subkey ptr1 ptr2 buffer pdword [ RegQueryValueEx ] 2keep
     rot :> ret
     ret ERROR_SUCCESS = [
-        *uint head
+        uint deref head
     ] [
         ret ERROR_MORE_DATA = [
             2drop
@@ -116,7 +116,7 @@ TUPLE: registry-enum-key ;
     key
     MAX_PATH
     dup TCHAR <c-array> dup :> class-buffer
-    swap <int> dup :> class-buffer-length
+    swap int <ref> dup :> class-buffer-length
     f
     DWORD <c-object> dup :> sub-keys
     DWORD <c-object> dup :> longest-subkey
@@ -130,13 +130,13 @@ TUPLE: registry-enum-key ;
     ret ERROR_SUCCESS = [
         key
         class-buffer
-        sub-keys *uint
-        longest-subkey *uint
-        longest-class-string *uint
-        #values *uint
-        max-value *uint
-        max-value-data *uint
-        security-descriptor *uint
+        sub-keys uint deref
+        longest-subkey uint deref
+        longest-class-string uint deref
+        #values uint deref
+        max-value uint deref
+        max-value-data uint deref
+        security-descriptor uint deref
         last-write-time FILETIME>timestamp
         registry-info boa
     ] [

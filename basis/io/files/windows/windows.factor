@@ -131,7 +131,7 @@ M: winnt init-io ( -- )
 ERROR: invalid-file-size n ;
 
 : handle>file-size ( handle -- n )
-    0 <ulonglong> [ GetFileSizeEx win32-error=0/f ] keep *ulonglong ;
+    0 ulonglong <ref> [ GetFileSizeEx win32-error=0/f ] keep ulonglong deref ;
 
 ERROR: seek-before-start n ;
 
@@ -249,7 +249,7 @@ M: winnt init-stdio
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length method -- )
-    [ [ handle>> ] dip d>w/w <uint> ] dip SetFilePointer
+    [ [ handle>> ] dip d>w/w uint <ref> ] dip SetFilePointer
     INVALID_SET_FILE_POINTER = [ "SetFilePointer failed" throw ] when ;
 
 M: windows (file-reader) ( path -- stream )

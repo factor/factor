@@ -66,7 +66,7 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
     >WGL_ARB
     [ drop f ] [
         [ [ world>> handle>> hDC>> ] [ handle>> ] bi 0 1 ] dip
-        first <int> { int }
+        first int <ref> { int }
         [ wglGetPixelFormatAttribivARB win32-error=0/f ]
         with-out-parameters
     ] if-empty ;
@@ -168,7 +168,7 @@ M: windows-ui-backend (pixel-format-attribute)
 
 PRIVATE>
 
-: lo-word ( wparam -- lo ) <short> *short ; inline
+: lo-word ( wparam -- lo ) short <ref> short deref ; inline
 : hi-word ( wparam -- hi ) -16 shift lo-word ; inline
 : >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
 : GET_APPCOMMAND_LPARAM ( lParam -- appCommand )
