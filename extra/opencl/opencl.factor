@@ -17,7 +17,7 @@ ERROR: cl-error err ;
     dup f = [ cl-error ] [ drop ] if ; inline
  
 : info-data-size ( handle name info-quot -- size_t )
-    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop *size_t ; inline
+    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
 
 : info-data-bytes ( handle name info-quot size -- bytes )
     swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
@@ -26,7 +26,7 @@ ERROR: cl-error err ;
     [ 3dup info-data-size info-data-bytes ] dip call ; inline
 
 : 2info-data-size ( handle1 handle2 name info-quot -- size_t )
-    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop *size_t ; inline
+    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
 
 : 2info-data-bytes ( handle1 handle2 name info-quot size -- bytes )
     swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
@@ -35,22 +35,22 @@ ERROR: cl-error err ;
     [ 4dup 2info-data-size 2info-data-bytes ] dip call ; inline
     
 : info-bool ( handle name quot -- ? )
-    [ *uint CL_TRUE = ] info ; inline
+    [ uint deref CL_TRUE = ] info ; inline
 
 : info-ulong ( handle name quot -- ulong )
-    [ *ulonglong ] info ; inline
+    [ ulonglong deref ] info ; inline
 
 : info-int ( handle name quot -- int )
-    [ *int ] info ; inline
+    [ int deref ] info ; inline
 
 : info-uint ( handle name quot -- uint )
-    [ *uint ] info ; inline
+    [ uint deref ] info ; inline
 
 : info-size_t ( handle name quot -- size_t )
-    [ *size_t ] info ; inline
+    [ size_t deref ] info ; inline
 
 : 2info-size_t ( handle1 handle2 name quot -- size_t )
-    [ *size_t ] 2info ; inline
+    [ size_t deref ] 2info ; inline
 
 : info-string ( handle name quot -- string )
     [ ascii decode 1 head* ] info ; inline
@@ -311,7 +311,7 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
 
 : platform-devices ( platform-id -- devices )
     CL_DEVICE_TYPE_ALL [
-        0 f 0 <uint> [ clGetDeviceIDs cl-success ] keep *uint
+        0 f 0 uint <ref> [ clGetDeviceIDs cl-success ] keep uint deref
     ] [
         rot dup <void*-array> [ f clGetDeviceIDs cl-success ] keep
     ] 2bi ; inline
@@ -340,7 +340,7 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
         [ length ]
         [ strings>char*-array ]
         [ [ length ] size_t-array{ } map-as ] tri
-        0 <int> [ clCreateProgramWithSource ] keep *int cl-success
+        0 int <ref> [ clCreateProgramWithSource ] keep int deref cl-success
     ] with-destructors ;
 
 :: (build-program) ( program-handle device options -- program )
@@ -425,7 +425,7 @@ PRIVATE>
     ] dip bind ; inline
 
 : cl-platforms ( -- platforms )
-    0 f 0 <uint> [ clGetPlatformIDs cl-success ] keep *uint
+    0 f 0 uint <ref> [ clGetPlatformIDs cl-success ] keep uint deref
     dup <void*-array> [ f clGetPlatformIDs cl-success ] keep
     [
         dup
@@ -437,14 +437,14 @@ PRIVATE>
 : <cl-context> ( devices -- cl-context )
     [ f ] dip
     [ length ] [ [ id>> ] void*-array{ } map-as ] bi
-    f f 0 <int> [ clCreateContext ] keep *int cl-success
+    f f 0 int <ref> [ clCreateContext ] keep int deref cl-success
     cl-context new-disposable swap >>handle ;
 
 : <cl-queue> ( context device out-of-order? profiling? -- command-queue )
     [ [ handle>> ] [ id>> ] bi* ] 2dip
     [ [ CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE ] [ 0 ] if ]
     [ [ CL_QUEUE_PROFILING_ENABLE ] [ 0 ] if ] bi* bitor
-    0 <int> [ clCreateCommandQueue ] keep *int cl-success
+    0 int <ref> [ clCreateCommandQueue ] keep int deref cl-success
     cl-queue new-disposable swap >>handle ;
 
 : cl-out-of-order-execution? ( command-queue -- ? )
@@ -462,7 +462,7 @@ PRIVATE>
         [ buffer-access-constant ]
         [ [ CL_MEM_COPY_HOST_PTR ] [ CL_MEM_ALLOC_HOST_PTR ] if ] tri* bitor
     ] 2dip
-    0 <int> [ clCreateBuffer ] keep *int cl-success
+    0 int <ref> [ clCreateBuffer ] keep int deref cl-success
     cl-buffer new-disposable swap >>handle ;
 
 : cl-read-buffer ( buffer-range -- byte-array )
@@ -512,7 +512,7 @@ PRIVATE>
     [ [ CL_TRUE ] [ CL_FALSE ] if ]
     [ addressing-mode-constant ]
     [ filter-mode-constant ]
-    tri* 0 <int> [ clCreateSampler ] keep *int cl-success 
+    tri* 0 int <ref> [ clCreateSampler ] keep int deref cl-success 
     cl-sampler new-disposable swap >>handle ;
 
 : cl-normalized-coords? ( sampler -- ? )
@@ -531,7 +531,7 @@ PRIVATE>
 
 : <cl-kernel> ( program kernel-name -- kernel )
     [ handle>> ] [ ascii encode 0 suffix ] bi*
-    0 <int> [ clCreateKernel ] keep *int cl-success
+    0 int <ref> [ clCreateKernel ] keep int deref cl-success
     cl-kernel new-disposable swap >>handle ; inline
 
 : cl-kernel-name ( kernel -- string )

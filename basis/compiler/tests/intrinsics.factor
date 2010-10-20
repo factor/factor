@@ -6,6 +6,7 @@ sbufs strings.private slots.private alien math.order
 alien.accessors alien.c-types alien.data alien.syntax alien.strings
 namespaces libc io.encodings.ascii classes compiler.test ;
 FROM: math => float ;
+FROM: alien.c-types => short ;
 IN: compiler.tests.intrinsics
 
 ! Make sure that intrinsic ops compile to correct code.
@@ -442,31 +443,31 @@ ERROR: bug-in-fixnum* x y a b ;
 [ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
 [ -4 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-signed-1 ] compile-call ] unit-test
 
-[ -100 ] [ -100 <char> [ { byte-array } declare *char ] compile-call ] unit-test
-[ 156 ] [ -100 <uchar> [ { byte-array } declare *uchar ] compile-call ] unit-test
+[ -100 ] [ -100 char <ref> [ { byte-array } declare char deref ] compile-call ] unit-test
+[ 156 ] [ -100 uchar <ref> [ { byte-array } declare uchar deref ] compile-call ] unit-test
 
-[ -100 ] [ -100 \ <char> def>> [ { fixnum } declare ] prepend compile-call *char ] unit-test
-[ 156 ] [ -100 \ <uchar> def>> [ { fixnum } declare ] prepend compile-call *uchar ] unit-test
+[ -100 ] [ -100 \ <char> def>> [ { fixnum } declare ] prepend compile-call char deref ] unit-test
+[ 156 ] [ -100 \ <uchar> def>> [ { fixnum } declare ] prepend compile-call uchar deref ] unit-test
 
-[ -1000 ] [ -1000 <short> [ { byte-array } declare *short ] compile-call ] unit-test
-[ 64536 ] [ -1000 <ushort> [ { byte-array } declare *ushort ] compile-call ] unit-test
+[ -1000 ] [ -1000 short <ref> [ { byte-array } declare short deref ] compile-call ] unit-test
+[ 64536 ] [ -1000 ushort <ref> [ { byte-array } declare ushort deref ] compile-call ] unit-test
 
-[ -1000 ] [ -1000 \ <short> def>> [ { fixnum } declare ] prepend compile-call *short ] unit-test
-[ 64536 ] [ -1000 \ <ushort> def>> [ { fixnum } declare ] prepend compile-call *ushort ] unit-test
+[ -1000 ] [ -1000 \ <short> def>> [ { fixnum } declare ] prepend compile-call short deref ] unit-test
+[ 64536 ] [ -1000 \ <ushort> def>> [ { fixnum } declare ] prepend compile-call ushort deref ] unit-test
 
-[ -100000 ] [ -100000 <int> [ { byte-array } declare *int ] compile-call ] unit-test
-[ 4294867296 ] [ -100000 <uint> [ { byte-array } declare *uint ] compile-call ] unit-test
+[ -100000 ] [ -100000 int <ref> [ { byte-array } declare int deref ] compile-call ] unit-test
+[ 4294867296 ] [ -100000 uint <ref> [ { byte-array } declare uint deref ] compile-call ] unit-test
 
-[ -100000 ] [ -100000 \ <int> def>> [ { fixnum } declare ] prepend compile-call *int ] unit-test
-[ 4294867296 ] [ -100000 \ <uint> def>> [ { fixnum } declare ] prepend compile-call *uint ] unit-test
+[ -100000 ] [ -100000 \ <int> def>> [ { fixnum } declare ] prepend compile-call int deref ] unit-test
+[ 4294867296 ] [ -100000 \ <uint> def>> [ { fixnum } declare ] prepend compile-call uint deref ] unit-test
 
-[ t ] [ pi pi <double> *double = ] unit-test
+[ t ] [ pi pi double <ref> double deref = ] unit-test
 
-[ t ] [ pi <double> [ { byte-array } declare *double ] compile-call pi = ] unit-test
+[ t ] [ pi double <ref> [ { byte-array } declare double deref ] compile-call pi = ] unit-test
 
 ! Silly
 [ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-call ] keep *float pi - -0.001 0.001 between? ] unit-test
-[ t ] [ pi <float> [ { byte-array } declare *float ] compile-call pi - -0.001 0.001 between? ] unit-test
+[ t ] [ pi float <ref> [ { byte-array } declare float deref ] compile-call pi - -0.001 0.001 between? ] unit-test
 
 [ t ] [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-call ] keep *double pi = ] unit-test
 

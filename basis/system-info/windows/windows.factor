@@ -95,10 +95,10 @@ M: winnt available-virtual-mem ( -- n )
 
 : computer-name ( -- string )
     MAX_COMPUTERNAME_LENGTH 1 +
-    [ <byte-array> dup ] keep <uint>
+    [ <byte-array> dup ] keep uint <ref>
     GetComputerName win32-error=0/f alien>native-string ;
  
 : username ( -- string )
     UNLEN 1 +
-    [ <byte-array> dup ] keep <uint>
+    [ <byte-array> dup ] keep uint <ref>
     GetUserName win32-error=0/f alien>native-string ;

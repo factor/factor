@@ -11,23 +11,23 @@ LIBRARY: libc
 FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, void* newp, size_t newlen ) ;
 
 : make-int-array ( seq -- byte-array )
-    [ <int> ] map concat ;
+    [ int <ref> ] map concat ;
 
 : (sysctl-query) ( name namelen oldp oldlenp -- oldp )
     over [ f 0 sysctl io-error ] dip ;
 
 : sysctl-query ( seq n -- byte-array )
     [ [ make-int-array ] [ length ] bi ] dip
-    [ <byte-array> ] [ <uint> ] bi (sysctl-query) ;
+    [ <byte-array> ] [ uint <ref> ] bi (sysctl-query) ;
 
 : sysctl-query-string ( seq -- n )
     4096 sysctl-query utf8 alien>string ;
 
 : sysctl-query-uint ( seq -- n )
-    4 sysctl-query *uint ;
+    4 sysctl-query uint deref ;
 
 : sysctl-query-ulonglong ( seq -- n )
-    8 sysctl-query *ulonglong ;
+    8 sysctl-query ulonglong deref ;
 
 : machine ( -- str ) { 6 1 } sysctl-query-string ;
 : model ( -- str ) { 6 2 } sysctl-query-string ;

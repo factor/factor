@@ -1,12 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays arrays assocs delegate kernel kernel.private math
-math.order math.parser namespaces make parser sequences strings
-words splitting cpu.architecture alien alien.accessors
-alien.strings quotations layouts system compiler.units io
-io.files io.encodings.binary io.streams.memory accessors
-combinators effects continuations fry classes vocabs
-vocabs.loader words.symbol macros ;
+USING: accessors alien alien.accessors arrays byte-arrays
+classes combinators compiler.units cpu.architecture delegate
+fry kernel layouts locals macros math math.order quotations
+sequences system words words.symbol ;
 QUALIFIED: math
 IN: alien.c-types
 
@@ -21,8 +18,8 @@ SYMBOLS:
 
 SINGLETON: void
 
-DEFER: <int>
-DEFER: *char
+DEFER: <ref>
+DEFER: deref
 
 TUPLE: abstract-c-type
 { class class initial: object }
@@ -111,7 +108,7 @@ M: c-type-name base-type c-type ;
 
 M: c-type base-type ;
 
-: little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
+: little-endian? ( -- ? ) 1 int <ref> char deref 1 = ; foldable
 
 GENERIC: heap-size ( name -- size )
 
@@ -489,3 +486,11 @@ M: double-2-rep rep-component-type drop double ;
 : c-type-clamp ( value c-type -- value' )
     dup { float double } member-eq?
     [ drop ] [ c-type-interval clamp ] if ; inline
+
+:: <ref> ( value c-type -- c-ptr )
+    c-type heap-size <byte-array> :> c-ptr
+    value c-ptr 0 c-type set-alien-value
+    c-ptr ; inline
+
+: deref ( c-ptr c-type -- value )
+    [ 0 ] dip alien-value ; inline
