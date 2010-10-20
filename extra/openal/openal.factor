@@ -264,13 +264,13 @@ DESTRUCTOR: alcDestroyContext
     alSourcei ;
 
 : get-source-param ( source param -- value )
-    0 <uint> dup [ alGetSourcei ] dip *uint ;
+    0 uint <ref> dup [ alGetSourcei ] dip uint deref ;
 
 : set-buffer-param ( source param value -- )
     alBufferi ;
 
 : get-buffer-param ( source param -- value )
-    0 <uint> dup [ alGetBufferi ] dip *uint ;
+    0 uint <ref> dup [ alGetBufferi ] dip uint deref ;
 
 : source-play ( source -- ) alSourcePlay ;
 

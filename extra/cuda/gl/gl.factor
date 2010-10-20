@@ -24,7 +24,7 @@ IN: cuda.gl
     [ 1 swap <void*> f cuGraphicsMapResources cuda-error ] [
         [ CUdeviceptr <c-object> uint <c-object> ] dip
         [ cuGraphicsResourceGetMappedPointer cuda-error ] 3keep drop
-        [ *uint ] [ *uint ] bi*
+        [ uint deref ] [ uint deref ] bi*
     ] bi ; inline
 
 : unmap-resource ( resource -- )

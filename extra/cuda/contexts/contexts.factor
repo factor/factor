@@ -16,7 +16,7 @@ IN: cuda.contexts
     cuCtxSynchronize cuda-error ; inline
 
 : context-device ( -- n )
-    CUdevice <c-object> [ cuCtxGetDevice cuda-error ] keep *int ; inline
+    CUdevice <c-object> [ cuCtxGetDevice cuda-error ] keep int deref ; inline
 
 : destroy-context ( context -- ) cuCtxDestroy cuda-error ; inline
 

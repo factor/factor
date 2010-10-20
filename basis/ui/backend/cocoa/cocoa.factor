@@ -128,7 +128,7 @@ CONSTANT: window-control>styleMask
 
 : make-context-transparent ( view -- )
     -> openGLContext
-    0 <int> NSOpenGLCPSurfaceOpacity -> setValues:forParameter: ;
+    0 int <ref> NSOpenGLCPSurfaceOpacity -> setValues:forParameter: ;
 
 M:: cocoa-ui-backend (open-window) ( world -- )
     world [ [ dim>> ] dip <FactorView> ]

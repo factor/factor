@@ -67,13 +67,13 @@ ERROR: no-group string ;
 <PRIVATE
 
 : >groups ( byte-array n -- groups )
-    [ 4 grouping:group ] dip head-slice [ *uint group-name ] map ;
+    [ 4 grouping:group ] dip head-slice [ uint deref group-name ] map ;
 
 : (user-groups) ( string -- seq )
     #! first group is -1337, legacy unix code
     -1337 unix.ffi:NGROUPS_MAX [ 4 * <byte-array> ] keep
-    <int> [ [ unix.ffi:getgrouplist ] unix-system-call drop ] 2keep
-    [ 4 tail-slice ] [ *int 1 - ] bi* >groups ;
+    int <ref> [ [ unix.ffi:getgrouplist ] unix-system-call drop ] 2keep
+    [ 4 tail-slice ] [ int deref 1 - ] bi* >groups ;
 
 PRIVATE>
     

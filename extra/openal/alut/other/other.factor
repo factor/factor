@@ -9,6 +9,9 @@ LIBRARY: alut
 FUNCTION: void alutLoadWAVFile ( c-string fileName, ALenum* format, void** data, ALsizei* size, ALsizei* frequency, ALboolean* looping ) ;
 
 M: object load-wav-file ( filename -- format data size frequency )
-    0 <int> f <void*> 0 <int> 0 <int>
-    [ 0 <char> alutLoadWAVFile ] 4 nkeep
-    { [ *int ] [ *void* ] [ *int ] [ *int ] } spread ;
+    0 int <ref>
+    f <void*>
+    0 int <ref>
+    0 int <ref>
+    [ 0 char <ref> alutLoadWAVFile ] 4 nkeep
+    { [ int deref ] [ *void* ] [ int deref ] [ int deref ] } spread ;
