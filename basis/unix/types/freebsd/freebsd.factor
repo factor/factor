@@ -23,4 +23,4 @@ TYPEDEF: long           ssize_t
 TYPEDEF: int            pid_t
 TYPEDEF: long           time_t
 
-ALIAS: <time_t> <long>
+: <time_t> ( n -- long ) long <ref> ;

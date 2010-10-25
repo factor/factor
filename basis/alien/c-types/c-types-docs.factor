@@ -38,16 +38,6 @@ HELP: set-alien-value
 { $description "Stores a value at a byte offset from a base C pointer." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
-HELP: define-deref
-{ $values { "c-type" "a C type" } }
-{ $description "Defines a word " { $snippet "*name" } " with stack effect " { $snippet "( c-ptr -- value )" } " for reading a value with C type " { $snippet "name" } " stored at an alien pointer." }
-{ $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
-
-HELP: define-out
-{ $values { "c-type" "a C type" } }
-{ $description "Defines a word " { $snippet "<" { $emphasis "name" } ">" } " with stack effect " { $snippet "( value -- array )" } ". This word allocates a byte array large enough to hold a value with C type " { $snippet "name" } ", and writes the value at the top of the stack to the array." }
-{ $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
-
 HELP: char
 { $description "This C type represents a one-byte signed integer type. Input values will be converted to " { $link math:integer } "s and truncated to eight bits; output values will be returned as " { $link math:fixnum } "s." } ;
 HELP: uchar

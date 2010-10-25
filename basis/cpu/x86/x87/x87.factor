@@ -38,12 +38,12 @@ M: double-rep copy-memory* copy-memory-x87 ;
 
 M: x86 %load-float
     0 [] FLDS
-    <float> rc-absolute rel-binary-literal
+    float <ref> rc-absolute rel-binary-literal
     shuffle-down FSTP ;
 
 M: x86 %load-double
     0 [] FLDL
-    <double> rc-absolute rel-binary-literal
+    double <ref> rc-absolute rel-binary-literal
     shuffle-down FSTP ;
 
 :: binary-op ( dst src1 src2 quot -- )
