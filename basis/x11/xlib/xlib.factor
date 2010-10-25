@@ -48,17 +48,17 @@ TYPEDEF: int Bool
 TYPEDEF: ulong VisualID
 TYPEDEF: ulong Time
 
-ALIAS: <XID> <ulong>
+: <XID> ( n -- ulong ) ulong <ref> ;
 ALIAS: <Window> <XID>
 ALIAS: <Drawable> <XID>
 ALIAS: <KeySym> <XID>
-ALIAS: <Atom> <ulong>
+: <Atom> ( n -- ulong ) ulong <ref> ;
 
-ALIAS: *XID *ulong
+: *XID ( bytes -- n ) ulong deref ;
 ALIAS: *Window *XID
 ALIAS: *Drawable *XID
 ALIAS: *KeySym *XID
-ALIAS: *Atom *ulong
+: *Atom ( bytes -- n ) ulong deref ;
 !
 ! 2 - Display Functions
 !

@@ -420,7 +420,7 @@ M: mask-state set-gpu-state*
 : get-gl-int ( enum -- value )
     0 int <ref> [ glGetIntegerv ] keep int deref ;
 : get-gl-float ( enum -- value )
-    0 float <ref> [ glGetFloatv ] keep float deref ;
+    0 c:float <ref> [ glGetFloatv ] keep c:float deref ;
 
 : get-gl-bools ( enum count -- value )
     <byte-array> [ glGetBooleanv ] keep [ c-bool> ] { } map-as ;

@@ -172,7 +172,7 @@ MACRO: cuda-invoke ( module-name function-name arguments -- )
 : cuda-global* ( module-name symbol-name -- device-ptr size )
     [ CUdeviceptr <c-object> c:uint <c-object> ] 2dip
     [ cached-module ] dip 
-    '[ _ _ cuModuleGetGlobal cuda-error ] 2keep [ c:*uint ] bi@ ; inline
+    '[ _ _ cuModuleGetGlobal cuda-error ] 2keep [ c:uint c:deref ] bi@ ; inline
 
 : cuda-global ( module-name symbol-name -- device-ptr )
     cuda-global* drop ; inline

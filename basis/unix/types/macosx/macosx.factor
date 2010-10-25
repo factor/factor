@@ -36,4 +36,4 @@ TYPEDEF: uint IOOptionBits
 
 
 
-ALIAS: <time_t> <long>
+: <time_t> ( n -- long ) long <ref> ;

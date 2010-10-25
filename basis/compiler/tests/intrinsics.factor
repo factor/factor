@@ -430,14 +430,14 @@ ERROR: bug-in-fixnum* x y a b ;
 [ ] [ "hello world" ascii malloc-string "s" set ] unit-test
 
 "s" get [
-    [ "hello world" ] [ "s" get <void*> [ { byte-array } declare void* deref ] compile-call ascii alien>string ] unit-test
-    [ "hello world" ] [ "s" get <void*> [ { c-ptr } declare void* deref ] compile-call ascii alien>string ] unit-test
+    [ "hello world" ] [ "s" get void* deref [ { byte-array } declare void* deref ] compile-call ascii alien>string ] unit-test
+    [ "hello world" ] [ "s" get void* deref [ { c-ptr } declare void* deref ] compile-call ascii alien>string ] unit-test
 
     [ ] [ "s" get free ] unit-test
 ] when
 
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { alien } declare <void*> ] compile-call void* deref ] unit-test
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { c-ptr } declare <void*> ] compile-call void* deref ] unit-test
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { alien } declare void* deref ] compile-call void* deref ] unit-test
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { c-ptr } declare void* deref ] compile-call void* deref ] unit-test
 [ f ] [ f [ { POSTPONE: f } declare void* <ref> ] compile-call void* deref ] unit-test
 
 [ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
@@ -466,10 +466,10 @@ ERROR: bug-in-fixnum* x y a b ;
 [ t ] [ pi double <ref> [ { byte-array } declare double deref ] compile-call pi = ] unit-test
 
 ! Silly
-[ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-call ] keep *float pi - -0.001 0.001 between? ] unit-test
+[ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-call ] keep float deref pi - -0.001 0.001 between? ] unit-test
 [ t ] [ pi float <ref> [ { byte-array } declare float deref ] compile-call pi - -0.001 0.001 between? ] unit-test
 
-[ t ] [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-call ] keep *double pi = ] unit-test
+[ t ] [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-call ] keep double deref pi = ] unit-test
 
 [ 4 ] [
     2 B{ 1 2 3 4 5 6 } <displaced-alien> [
@@ -534,11 +534,11 @@ ERROR: bug-in-fixnum* x y a b ;
 ] unit-test
 
 [
-    B{ 0 0 0 0 } [ { byte-array } declare <void*> ] compile-call
+    B{ 0 0 0 0 } [ { byte-array } declare void* deref ] compile-call
 ] must-fail
 
 [
-    B{ 0 0 0 0 } [ { c-ptr } declare <void*> ] compile-call
+    B{ 0 0 0 0 } [ { c-ptr } declare void* deref ] compile-call
 ] must-fail
 
 [

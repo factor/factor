@@ -36,15 +36,15 @@ ERROR: zlib-failed n string ;
 
 : compress ( byte-array -- compressed )
     [
-        [ compressed-size <byte-array> dup length <ulong> ] keep [
+        [ compressed-size <byte-array> dup length ulong <ref> ] keep [
             dup length compression.zlib.ffi:compress zlib-error
-        ] 3keep drop *ulong head
+        ] 3keep drop ulong deref head
     ] keep length <compressed> ;
 
 : uncompress ( compressed -- byte-array )
     [
-        length>> [ <byte-array> ] keep <ulong> 2dup
+        length>> [ <byte-array> ] keep ulong <ref> 2dup
     ] [
         data>> dup length
         compression.zlib.ffi:uncompress zlib-error
-    ] bi *ulong head ;
+    ] bi ulong deref head ;
