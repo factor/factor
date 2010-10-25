@@ -16,7 +16,7 @@ TUPLE: cuda-error code ;
     dup CUDA_SUCCESS = [ drop ] [ \ cuda-error boa throw ] if ;
 
 : cuda-version ( -- n )
-    c:int <c-object> [ cuDriverGetVersion cuda-error ] keep c:*int ;
+    c:int <c-object> [ cuDriverGetVersion cuda-error ] keep c:int c:deref ;
 
 : init-cuda ( -- )
     0 cuInit cuda-error ; inline

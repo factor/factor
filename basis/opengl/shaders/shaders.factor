@@ -8,7 +8,7 @@ SPECIALIZED-ARRAY: uint
 IN: opengl.shaders
 
 : with-gl-shader-source-ptr ( string quot -- )
-    swap ascii malloc-string [ <void*> swap call ] keep free ; inline
+    swap ascii malloc-string [ void* <ref> swap call ] keep free ; inline
 
 : <gl-shader> ( source kind -- shader )
     glCreateShader dup rot

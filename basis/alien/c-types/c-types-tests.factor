@@ -63,11 +63,11 @@ TYPEDEF: int* MyIntArray
 [ t ] [ void* c-type MyIntArray c-type = ] unit-test
 
 [
-    0 B{ 1 2 3 4 } <displaced-alien> <void*>
+    0 B{ 1 2 3 4 } <displaced-alien> void* <ref>
 ] must-fail
 
 os windows? cpu x86.64? and [
-    [ -2147467259 ] [ 2147500037 <long> *long ] unit-test
+    [ -2147467259 ] [ 2147500037 long <ref> long deref ] unit-test
 ] when
 
 [ 0 ] [ -10 uchar c-type-clamp ] unit-test
