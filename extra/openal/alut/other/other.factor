@@ -10,8 +10,8 @@ FUNCTION: void alutLoadWAVFile ( c-string fileName, ALenum* format, void** data,
 
 M: object load-wav-file ( filename -- format data size frequency )
     0 int <ref>
-    f <void*>
+    f void* <ref>
     0 int <ref>
     0 int <ref>
     [ 0 char <ref> alutLoadWAVFile ] 4 nkeep
-    { [ int deref ] [ *void* ] [ int deref ] [ int deref ] } spread ;
+    { [ int deref ] [ void* deref ] [ int deref ] [ int deref ] } spread ;

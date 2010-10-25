@@ -75,7 +75,7 @@ PRIVATE>
 
 : load-module ( path -- module )
     [ CUmodule <c-object> ] dip
-    [ cuModuleLoad cuda-error ] 2keep drop c:*void* ;
+    [ cuModuleLoad cuda-error ] 2keep drop c:void* c:deref ;
 
 : unload-module ( module -- )
     cuModuleUnload cuda-error ;
@@ -152,7 +152,7 @@ MACRO: cuda-arguments ( c-types abi -- quot: ( args... function -- ) )
 
 : get-function-ptr ( module string -- function )
     [ CUfunction <c-object> ] 2dip
-    [ cuModuleGetFunction cuda-error ] 3keep 2drop c:*void* ;
+    [ cuModuleGetFunction cuda-error ] 3keep 2drop c:void* c:deref ;
 
 : cached-module ( module-name -- alien )
     lookup-cuda-library
