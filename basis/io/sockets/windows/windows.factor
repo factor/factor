@@ -181,7 +181,8 @@ TUPLE: AcceptEx-args port
     } cleave AcceptEx drop winsock-error ; inline
 
 : (extract-remote-address) ( lpOutputBuffer dwReceiveDataLength dwLocalAddressLength dwRemoteAddressLength -- sockaddr )
-    f <void*> 0 int <ref> f <void*> [ 0 int <ref> GetAcceptExSockaddrs ] keep *void* ;
+    f void* <ref> 0 int <ref> f void* <ref>
+    [ 0 int <ref> GetAcceptExSockaddrs ] keep void* deref ;
 
 : extract-remote-address ( AcceptEx -- sockaddr )
     [

@@ -22,10 +22,10 @@ GENERIC: group-struct ( obj -- group/f )
 
 : (group-struct) ( id -- group-struct id group-struct byte-array length void* )
     [ \ unix.ffi:group <struct> ] dip over 4096
-    [ <byte-array> ] keep f <void*> ;
+    [ <byte-array> ] keep f void* <ref> ;
 
 : check-group-struct ( group-struct ptr -- group-struct/f )
-    *void* [ drop f ] unless ;
+    void* deref [ drop f ] unless ;
 
 M: integer group-struct ( id -- group/f )
     (group-struct)

@@ -10,7 +10,7 @@ IN: cuda.contexts
 : create-context ( device flags -- context )
     swap
     [ CUcontext <c-object> ] 2dip
-    [ cuCtxCreate cuda-error ] 3keep 2drop *void* ; inline
+    [ cuCtxCreate cuda-error ] 3keep 2drop void* deref ; inline
 
 : sync-context ( -- )
     cuCtxSynchronize cuda-error ; inline

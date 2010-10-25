@@ -37,9 +37,9 @@ HOOK: find-next-file os ( DIR* -- byte-array )
 
 M: unix find-next-file ( DIR* -- byte-array )
     dirent <struct>
-    f <void*>
+    f void* <ref>
     [ readdir_r 0 = [ (io-error) ] unless ] 2keep
-    *void* [ drop f ] unless ;
+    void* deref [ drop f ] unless ;
 
 : dirent-type>file-type ( ch -- type )
     {

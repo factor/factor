@@ -157,7 +157,7 @@ ERROR: no-vorbis-in-ogg ;
     [ init-vorbis-codec ] if ;
 
 : get-pending-decoded-audio ( vorbis-stream -- pcm len )
-    dsp-state>> f <void*> [ vorbis_synthesis_pcmout ] keep *void* swap ;
+    dsp-state>> f void* <ref> [ vorbis_synthesis_pcmout ] keep void* deref swap ;
 
 : float>short-sample ( float -- short )
     -32767.5 * 0.5 - >integer -32768 32767 clamp ; inline

@@ -430,15 +430,15 @@ ERROR: bug-in-fixnum* x y a b ;
 [ ] [ "hello world" ascii malloc-string "s" set ] unit-test
 
 "s" get [
-    [ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-call ascii alien>string ] unit-test
-    [ "hello world" ] [ "s" get <void*> [ { c-ptr } declare *void* ] compile-call ascii alien>string ] unit-test
+    [ "hello world" ] [ "s" get <void*> [ { byte-array } declare void* deref ] compile-call ascii alien>string ] unit-test
+    [ "hello world" ] [ "s" get <void*> [ { c-ptr } declare void* deref ] compile-call ascii alien>string ] unit-test
 
     [ ] [ "s" get free ] unit-test
 ] when
 
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { alien } declare <void*> ] compile-call *void* ] unit-test
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { c-ptr } declare <void*> ] compile-call *void* ] unit-test
-[ f ] [ f [ { POSTPONE: f } declare <void*> ] compile-call *void* ] unit-test
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { alien } declare <void*> ] compile-call void* deref ] unit-test
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { c-ptr } declare <void*> ] compile-call void* deref ] unit-test
+[ f ] [ f [ { POSTPONE: f } declare void* <ref> ] compile-call void* deref ] unit-test
 
 [ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
 [ -4 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-signed-1 ] compile-call ] unit-test
@@ -446,20 +446,20 @@ ERROR: bug-in-fixnum* x y a b ;
 [ -100 ] [ -100 char <ref> [ { byte-array } declare char deref ] compile-call ] unit-test
 [ 156 ] [ -100 uchar <ref> [ { byte-array } declare uchar deref ] compile-call ] unit-test
 
-[ -100 ] [ -100 \ <char> def>> [ { fixnum } declare ] prepend compile-call char deref ] unit-test
-[ 156 ] [ -100 \ <uchar> def>> [ { fixnum } declare ] prepend compile-call uchar deref ] unit-test
+[ -100 ] [ -100 [ char <ref> ] [ { fixnum } declare ] prepend compile-call char deref ] unit-test
+[ 156 ] [ -100 [ uchar <ref> ] [ { fixnum } declare ] prepend compile-call uchar deref ] unit-test
 
 [ -1000 ] [ -1000 short <ref> [ { byte-array } declare short deref ] compile-call ] unit-test
 [ 64536 ] [ -1000 ushort <ref> [ { byte-array } declare ushort deref ] compile-call ] unit-test
 
-[ -1000 ] [ -1000 \ <short> def>> [ { fixnum } declare ] prepend compile-call short deref ] unit-test
-[ 64536 ] [ -1000 \ <ushort> def>> [ { fixnum } declare ] prepend compile-call ushort deref ] unit-test
+[ -1000 ] [ -1000 [ short <ref> ] [ { fixnum } declare ] prepend compile-call short deref ] unit-test
+[ 64536 ] [ -1000 [ ushort <ref> ] [ { fixnum } declare ] prepend compile-call ushort deref ] unit-test
 
 [ -100000 ] [ -100000 int <ref> [ { byte-array } declare int deref ] compile-call ] unit-test
 [ 4294867296 ] [ -100000 uint <ref> [ { byte-array } declare uint deref ] compile-call ] unit-test
 
-[ -100000 ] [ -100000 \ <int> def>> [ { fixnum } declare ] prepend compile-call int deref ] unit-test
-[ 4294867296 ] [ -100000 \ <uint> def>> [ { fixnum } declare ] prepend compile-call uint deref ] unit-test
+[ -100000 ] [ -100000 [ int <ref> ] [ { fixnum } declare ] prepend compile-call int deref ] unit-test
+[ 4294867296 ] [ -100000 [ uint <ref> ] [ { fixnum } declare ] prepend compile-call uint deref ] unit-test
 
 [ t ] [ pi pi double <ref> double deref = ] unit-test
 
