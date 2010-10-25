@@ -6,6 +6,6 @@ IN: io.directories.unix.linux
 
 M: linux find-next-file ( DIR* -- dirent )
     dirent <struct>
-    f <void*>
+    f void* <ref>
     [ [ readdir64_r ] unix-system-call 0 = [ (io-error) ] unless ] 2keep
-    *void* [ drop f ] unless ;
+    void* deref [ drop f ] unless ;

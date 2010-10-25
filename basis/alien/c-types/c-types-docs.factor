@@ -124,8 +124,7 @@ $nl
 "To wrap Factor data for consumption by the FFI, we use a utility word that constructs a byte array of the correct size and converts the Factor object to a C value stored into that byte array:"
 { $subsections <ref> }
 "You call the out parameter constructor with the required initial value, then pass the byte array to the C function, which receives a pointer to the start of the byte array's data area. The C function then returns, leaving the result in the byte array; you read it back using this word:"
-{ $subsections deref }
-"Note that while structure and union types do not get these words defined for them, there is no loss of generality since " { $link <void*> } " and " { $link *void* } " may be used." ;
+{ $subsections deref } ;
 
 ARTICLE: "c-types.primitives" "Primitive C types"
 "The following numerical types are defined in the " { $vocab-link "alien.c-types" } " vocabulary; a " { $snippet "u" } " prefix denotes an unsigned type:"

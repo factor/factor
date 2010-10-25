@@ -403,7 +403,7 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     [ clGetEventProfilingInfo ] info-ulong ;
 
 : bind-kernel-arg-buffer ( kernel index buffer -- )
-    [ handle>> ] [ cl_mem heap-size ] [ handle>> <void*> ] tri*
+    [ handle>> ] [ cl_mem heap-size ] [ handle>> void* deref ] tri*
     clSetKernelArg cl-success ; inline
 
 : bind-kernel-arg-data ( kernel index byte-array -- )
@@ -488,7 +488,7 @@ PRIVATE>
         [ [ buffer>> handle>> ] [ offset>> ] bi ]
         tri* swapd
     ] 2dip [ length ] keep [ f ] [ [ handle>> ] void*-array{ } map-as ] if-empty
-    f <void*> [ clEnqueueCopyBuffer cl-success ] keep *void* cl-event
+    f void* <ref> [ clEnqueueCopyBuffer cl-success ] keep void* deref cl-event
     new-disposable swap >>handle ;
 
 : cl-queue-read-buffer ( buffer-range alien dependent-events -- event )
@@ -496,7 +496,7 @@ PRIVATE>
         [ (current-cl-queue) handle>> ] dip
         [ buffer>> handle>> CL_FALSE ] [ offset>> ] [ size>> ] tri
     ] 2dip [ length ] keep [ f ] [ [ handle>> ] void*-array{ } map-as ] if-empty
-    f <void*> [ clEnqueueReadBuffer cl-success ] keep *void* cl-event
+    f void* <ref> [ clEnqueueReadBuffer cl-success ] keep void* <ref> cl-event
     new-disposable swap >>handle ;
 
 : cl-queue-write-buffer ( buffer-range alien dependent-events -- event )
@@ -504,7 +504,7 @@ PRIVATE>
         [ (current-cl-queue) handle>> ] dip
         [ buffer>> handle>> CL_FALSE ] [ offset>> ] [ size>> ] tri
     ] 2dip [ length ] keep [ f ] [ [ handle>> ] void*-array{ } map-as ] if-empty
-    f <void*> [ clEnqueueWriteBuffer cl-success ] keep *void* cl-event
+    f void* <ref> [ clEnqueueWriteBuffer cl-success ] keep void* deref cl-event
     new-disposable swap >>handle ;
 
 : <cl-sampler> ( normalized-coords? addressing-mode filter-mode -- sampler )
@@ -549,7 +549,7 @@ PRIVATE>
     kernel handle>>
     sizes [ length f ] [ [ ] size_t-array{ } map-as f ] bi
     dependent-events [ length ] [ [ f ] [ [ handle>> ] void*-array{ } map-as ] if-empty ] bi
-    f <void*> [ clEnqueueNDRangeKernel cl-success ] keep *void*
+    f void* <ref> [ clEnqueueNDRangeKernel cl-success ] keep void* deref
     cl-event new-disposable swap >>handle ;
 
 : cl-event-type ( event -- command-type )
@@ -573,7 +573,7 @@ PRIVATE>
 
 : cl-marker ( -- event )
     (current-cl-queue)
-    f <void*> [ clEnqueueMarker cl-success ] keep *void* cl-event new-disposable
+    f void* <ref> [ clEnqueueMarker cl-success ] keep void* deref cl-event new-disposable
     swap >>handle ; inline
 
 : cl-barrier ( -- )

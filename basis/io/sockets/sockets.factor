@@ -368,8 +368,8 @@ M: inet present
 C: <inet> inet
 
 M: string resolve-host
-    f prepare-addrinfo f <void*>
-    [ getaddrinfo addrinfo-error ] keep *void* addrinfo memory>struct
+    f prepare-addrinfo f void* <ref>
+    [ getaddrinfo addrinfo-error ] keep void* deref addrinfo memory>struct
     [ parse-addrinfo-list ] keep freeaddrinfo ;
 
 M: string with-port <inet> ;

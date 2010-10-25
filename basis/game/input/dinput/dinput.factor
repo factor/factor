@@ -23,15 +23,15 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : create-dinput ( -- )
     f GetModuleHandle DIRECTINPUT_VERSION IDirectInput8W-iid
-    f <void*> [ f DirectInput8Create ole32-error ] keep *void*
+    f void* <ref> [ f DirectInput8Create ole32-error ] keep void* deref
     +dinput+ set-global ;
 
 : delete-dinput ( -- )
     +dinput+ [ com-release f ] change-global ;
 
 : device-for-guid ( guid -- device )
-    +dinput+ get-global swap f <void*>
-    [ f IDirectInput8W::CreateDevice ole32-error ] keep *void* ;
+    +dinput+ get-global swap f void* <ref>
+    [ f IDirectInput8W::CreateDevice ole32-error ] keep void* deref ;
 
 : set-coop-level ( device -- )
     +device-change-window+ get-global DISCL_BACKGROUND DISCL_NONEXCLUSIVE bitor
