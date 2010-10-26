@@ -303,7 +303,7 @@ CONSTANT: pov-values
     } 2cleave ;
 
 : read-device-buffer ( device buffer count -- buffer count' )
-    [ DIDEVICEOBJECTDATA heap-size ] 2dip uint <def>
+    [ DIDEVICEOBJECTDATA heap-size ] 2dip uint <ref>
     [ 0 IDirectInputDevice8W::GetDeviceData ole32-error ] 2keep uint deref ;
 
 : (fill-mouse-state) ( state DIDEVICEOBJECTDATA -- state )
