@@ -17,5 +17,3 @@ TYPEDEF: __uint32_t     fflags_t
 TYPEDEF: long           ssize_t
 TYPEDEF: int            pid_t
 TYPEDEF: int            time_t
-
-: <time_t> ( n -- time_t ) int <ref> ;
