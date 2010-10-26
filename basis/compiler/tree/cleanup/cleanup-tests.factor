@@ -17,6 +17,7 @@ compiler.tree.propagation.info
 compiler.tree.checker
 compiler.tree.debugger ;
 FROM: math => float ;
+QUALIFIED-WITH: alien.c-types c
 IN: compiler.tree.cleanup.tests
 
 [ t ] [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
@@ -244,22 +245,22 @@ cell-bits 32 = [
 ] when
 
 [ t ] [
-    [ B{ 1 0 } short deref 0 number= ]
+    [ B{ 1 0 } c:short deref 0 number= ]
     \ number= inlined?
 ] unit-test
 
 [ t ] [
-    [ B{ 1 0 } short deref 0 { number number } declare number= ]
+    [ B{ 1 0 } c:short deref 0 { number number } declare number= ]
     \ number= inlined?
 ] unit-test
 
 [ t ] [
-    [ B{ 1 0 } short deref 0 = ]
+    [ B{ 1 0 } c:short deref 0 = ]
     \ number= inlined?
 ] unit-test
 
 [ t ] [
-    [ B{ 1 0 } short deref dup number? [ 0 number= ] [ drop f ] if ]
+    [ B{ 1 0 } c:short deref dup number? [ 0 number= ] [ drop f ] if ]
     \ number= inlined?
 ] unit-test
 

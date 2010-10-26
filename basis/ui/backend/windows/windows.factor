@@ -16,6 +16,7 @@ ui.pixel-formats.private memoize classes colors
 specialized-arrays classes.struct alien.data ;
 FROM: namespaces => set ;
 SPECIALIZED-ARRAY: POINT
+QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
@@ -168,7 +169,7 @@ M: windows-ui-backend (pixel-format-attribute)
 
 PRIVATE>
 
-: lo-word ( wparam -- lo ) short <ref> short deref ; inline
+: lo-word ( wparam -- lo ) c:short <ref> c:short deref ; inline
 : hi-word ( wparam -- hi ) -16 shift lo-word ; inline
 : >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
 : GET_APPCOMMAND_LPARAM ( lParam -- appCommand )
