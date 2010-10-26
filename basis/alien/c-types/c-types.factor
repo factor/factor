@@ -18,9 +18,6 @@ SYMBOLS:
 
 SINGLETON: void
 
-DEFER: <ref>
-DEFER: deref
-
 TUPLE: abstract-c-type
 { class class initial: object }
 { boxed-class class initial: object }
@@ -107,8 +104,6 @@ GENERIC: base-type ( c-type -- c-type )
 M: c-type-name base-type c-type ;
 
 M: c-type base-type ;
-
-: little-endian? ( -- ? ) 1 int <ref> char deref 1 = ; foldable
 
 GENERIC: heap-size ( name -- size )
 
@@ -474,10 +469,11 @@ M: double-2-rep rep-component-type drop double ;
     dup { float double } member-eq?
     [ drop ] [ c-type-interval clamp ] if ; inline
 
-:: <ref> ( value c-type -- c-ptr )
-    c-type heap-size <byte-array> :> c-ptr
-    value c-ptr 0 c-type set-alien-value
-    c-ptr ; inline
+: <ref> ( value c-type -- c-ptr )
+    [ heap-size <byte-array> ] keep
+    '[ 0 _ set-alien-value ] keep ; inline
 
 : deref ( c-ptr c-type -- value )
     [ 0 ] dip alien-value ; inline
+
+: little-endian? ( -- ? ) 1 int <ref> char deref 1 = ; foldable

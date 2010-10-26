@@ -32,7 +32,7 @@ TUPLE: x-clipboard atom contents ;
 
 : window-property ( win prop delete? -- string )
     [ [ dpy get ] 2dip 0 -1 ] dip AnyPropertyType
-    0 <Atom> 0 int <ref> 0 ulong <ref> 0 ulong <ref> f void* <ref>
+    0 Atom <ref> 0 int <ref> 0 ulong <ref> 0 ulong <ref> f void* <ref>
     [ XGetWindowProperty drop ] keep snarf-property ;
 
 : selection-from-event ( event window -- string )
