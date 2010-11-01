@@ -17,7 +17,7 @@ M: unix set-os-env ( value key -- ) swap 1 setenv io-error ;
 M: unix unset-os-env ( key -- ) unsetenv io-error ;
 
 M: unix (os-envs) ( -- seq )
-    environ *void* utf8 alien>strings ;
+    environ void* deref utf8 alien>strings ;
 
 : set-void* ( value alien -- ) 0 set-alien-cell ;
 

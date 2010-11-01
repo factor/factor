@@ -192,10 +192,10 @@ intel-unix-abi fortran-abi [
         {
             [ {
                 [ ascii string>alien ]
-                [ <longlong> ]
-                [ <float> ]
+                [ longlong <ref> ]
+                [ float <ref> ]
                 [ <complex-float> ]
-                [ 1 0 ? <short> ]
+                [ 1 0 ? c:short <ref> ]
             } spread ]
             [ { [ length ] [ drop ] [ drop ] [ drop ] [ drop ] } spread ]
         } 5 ncleave
@@ -211,7 +211,7 @@ intel-unix-abi fortran-abi [
             [ drop ]
             [ drop ]
             [ drop ]
-            [ *float ]
+            [ float deref ]
             [ drop ]
             [ drop ]
         } spread
@@ -280,7 +280,7 @@ intel-unix-abi fortran-abi [
         {
             [ {
                 [ ascii string>alien ]
-                [ <float> ]
+                [ float <ref> ]
                 [ ascii string>alien ]
             } spread ]
             [ { [ length ] [ drop ] [ length ] } spread ]
@@ -298,7 +298,7 @@ intel-unix-abi fortran-abi [
             [ ascii alien>nstring ]
             [ ]
             [ ascii alien>nstring ]
-            [ *float ]
+            [ float deref ]
             [ ]
             [ ascii alien>nstring ]
         } spread

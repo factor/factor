@@ -7,9 +7,9 @@ IN: llvm.reader
 
 : buffer>module ( buffer -- module )
     [
-        value>> f <void*> f <void*>
+        value>> f void* <ref> f void* <ref>
         [ LLVMParseBitcode drop ] 2keep
-        *void* [ llvm-throw ] when* *void*
+        void* deref [ llvm-throw ] when* void* deref
         module new swap >>value
     ] with-disposal ;
 

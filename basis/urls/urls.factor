@@ -187,3 +187,4 @@ SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
 USE: vocabs.loader
 
 { "urls" "prettyprint" } "urls.prettyprint" require-when
+{ "urls" "io.sockets.secure" } "urls.secure" require-when

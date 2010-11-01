@@ -17,5 +17,3 @@ TYPEDEF: __uint32_t     fflags_t
 TYPEDEF: long           ssize_t
 TYPEDEF: int            pid_t
 TYPEDEF: int            time_t
-
-ALIAS: <time_t> <int>

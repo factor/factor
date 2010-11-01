@@ -7,7 +7,7 @@ IN: endian
 SINGLETONS: big-endian little-endian ;
 
 : compute-native-endianness ( -- class )
-    1 <int> *char 0 = big-endian little-endian ? ;
+    1 int <ref> char deref 0 = big-endian little-endian ? ;
 
 SYMBOL: native-endianness
 native-endianness [ compute-native-endianness ] initialize

@@ -28,11 +28,11 @@ TUPLE: x-clipboard atom contents ;
     CurrentTime XConvertSelection drop ;
 
 : snarf-property ( prop-return -- string )
-    dup *void* [ *void* utf8 alien>string ] [ drop f ] if ;
+    dup void* deref [ void* deref utf8 alien>string ] [ drop f ] if ;
 
 : window-property ( win prop delete? -- string )
     [ [ dpy get ] 2dip 0 -1 ] dip AnyPropertyType
-    0 <Atom> 0 <int> 0 <ulong> 0 <ulong> f <void*>
+    0 Atom <ref> 0 int <ref> 0 ulong <ref> 0 ulong <ref> f void* <ref>
     [ XGetWindowProperty drop ] keep snarf-property ;
 
 : selection-from-event ( event window -- string )
@@ -53,7 +53,7 @@ TUPLE: x-clipboard atom contents ;
     [ dpy get ] dip
     [ requestor>> ]
     [ property>> XA_TIMESTAMP 32 PropModeReplace ]
-    [ time>> <int> ] tri
+    [ time>> int <ref> ] tri
     1 XChangeProperty drop ;
 
 : send-notify ( evt prop -- )
