@@ -32,4 +32,4 @@ TYPEDEF: ulonglong __fsfilcnt64_t
 TYPEDEF: ulonglong ino64_t
 TYPEDEF: ulonglong off64_t
 
-ALIAS: <time_t> <long>
+: <time_t> ( n -- long ) long <ref> ;

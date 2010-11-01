@@ -94,7 +94,7 @@ $nl
     ""
     "FUNCTION: void get_device_info ( int* length ) ;"
     ""
-    "0 <int> [ get_device_info ] keep <direct-int-array> ."
+    "0 int <ref> [ get_device_info ] keep <direct-int-array> ."
 }
 "For a full discussion of Factor heap allocation versus unmanaged memory allocation, see " { $link "byte-arrays-gc" } "."
 $nl

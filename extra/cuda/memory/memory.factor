@@ -10,7 +10,7 @@ IN: cuda.memory
 : cuda-malloc ( n -- ptr )
     [ CUdeviceptr <c-object> ] dip
     '[ _ cuMemAlloc cuda-error ] keep
-    c:*int ; inline
+    c:int c:deref ; inline
 
 : cuda-malloc-type ( n type -- ptr )
     c:heap-size * cuda-malloc ; inline

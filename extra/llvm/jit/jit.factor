@@ -25,9 +25,9 @@ TUPLE: jit ee mps ;
     LLVMGetFirstFunction dup ALIEN: 0 = [ drop ] [ (remove-functions) ] if ;
 
 : remove-provider ( provider -- )
-    current-jit ee>> value>> swap value>> f <void*> f <void*>
-    [ LLVMRemoveModuleProvider drop ] 2keep *void* [ llvm-throw ] when*
-    *void* module new swap >>value
+    current-jit ee>> value>> swap value>> f void* <ref> f void* <ref>
+    [ LLVMRemoveModuleProvider drop ] 2keep void* deref [ llvm-throw ] when*
+    void* deref module new swap >>value
     [ value>> remove-functions ] with-disposal ;
 
 : remove-module ( name -- )
@@ -44,5 +44,5 @@ TUPLE: jit ee mps ;
 
 : function-pointer ( name -- alien )
     current-jit ee>> value>> dup
-    rot f <void*> [ LLVMFindFunction drop ] keep
-    *void* LLVMGetPointerToGlobal ;
+    rot f void* <ref> [ LLVMFindFunction drop ] keep
+    void* deref LLVMGetPointerToGlobal ;
