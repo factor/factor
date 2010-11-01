@@ -18,7 +18,8 @@ TUPLE: renderbuffer < gpu-object
 <PRIVATE
 
 : get-framebuffer-int ( enum -- value )
-    GL_RENDERBUFFER swap 0 <int> [ glGetRenderbufferParameteriv ] keep *int ;
+    GL_RENDERBUFFER swap 0 int <ref>
+    [ glGetRenderbufferParameteriv ] keep int deref ;
 
 PRIVATE>
 

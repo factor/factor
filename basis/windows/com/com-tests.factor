@@ -58,7 +58,7 @@ C: <test-implementation> test-implementation
         dup +guinea-pig-implementation+ set [ drop
 
             S_OK 1array [ +guinea-pig-implementation+ get ISimple::returnOK ] unit-test
-            E_FAIL <long> *long 1array [ +guinea-pig-implementation+ get ISimple::returnError ] unit-test
+            E_FAIL long <ref> long deref 1array [ +guinea-pig-implementation+ get ISimple::returnError ] unit-test
             20 1array [
                 +guinea-pig-implementation+ get
                 [ 20 IInherited::setX ]

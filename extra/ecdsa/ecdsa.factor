@@ -67,9 +67,9 @@ PRIVATE>
 :: ecdsa-sign ( DGST -- sig )
     ec-key-handle :> KEY
     KEY ECDSA_size dup ssl-error <byte-array> :> SIG
-    0 <uint> :> LEN
+    0 uint <ref> :> LEN
     0 DGST dup length SIG LEN KEY ECDSA_sign ssl-error
-    LEN *uint SIG resize ;
+    LEN uint deref SIG resize ;
 
 : ecdsa-verify ( dgst sig -- ? )
     ec-key-handle [ 0 -rot [ dup length ] bi@ ] dip ECDSA_verify 0 > ;

@@ -5,7 +5,7 @@ x11.constants x11.xinput2.ffi ;
 IN: x11.xinput2
 
 : (xi2-available?) ( display -- ? )
-    2 0 [ <int> ] bi@
+    2 0 [ int <ref> ] bi@
     XIQueryVersion
     {
         { BadRequest [ f ] }

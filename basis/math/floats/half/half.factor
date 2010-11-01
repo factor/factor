@@ -41,6 +41,6 @@ SYMBOL: half
     2 >>align
     2 >>align-first
     [ >float ] >>unboxer-quot
-\ half define-primitive-type
+\ half typedef
 
 >>

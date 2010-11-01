@@ -275,7 +275,8 @@ M: cucumber equal? "The cucumber has no equal" throw ;
 
 [ 4294967295 B{ 255 255 255 255 } -1 ]
 [
-    -1 <int> -1 <int>
+    -1 int <ref>
+    -1 int <ref>
     [ [ 0 alien-unsigned-4 swap ] [ 0 alien-signed-2 ] bi ]
     compile-call
 ] unit-test

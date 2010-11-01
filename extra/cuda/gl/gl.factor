@@ -7,7 +7,7 @@ IN: cuda.gl
 : create-gl-cuda-context ( device flags -- context )
     swap
     [ CUcontext <c-object> ] 2dip
-    [ cuGLCtxCreate cuda-error ] 3keep 2drop *void* ; inline
+    [ cuGLCtxCreate cuda-error ] 3keep 2drop void* deref ; inline
 
 : with-gl-cuda-context ( device flags quot -- )
     [ set-up-cuda-context create-gl-cuda-context ] dip (with-cuda-context) ; inline 
@@ -15,20 +15,20 @@ IN: cuda.gl
 : gl-buffer>resource ( gl-buffer flags -- resource )
     enum>number
     [ CUgraphicsResource <c-object> ] 2dip
-    [ cuGraphicsGLRegisterBuffer cuda-error ] 3keep 2drop *void* ; inline
+    [ cuGraphicsGLRegisterBuffer cuda-error ] 3keep 2drop void* deref ; inline
 
 : buffer>resource ( buffer flags -- resource )
     [ handle>> ] dip gl-buffer>resource ; inline
 
 : map-resource ( resource -- device-ptr size )
-    [ 1 swap <void*> f cuGraphicsMapResources cuda-error ] [
+    [ 1 swap void* <ref> f cuGraphicsMapResources cuda-error ] [
         [ CUdeviceptr <c-object> uint <c-object> ] dip
         [ cuGraphicsResourceGetMappedPointer cuda-error ] 3keep drop
-        [ *uint ] [ *uint ] bi*
+        [ uint deref ] [ uint deref ] bi*
     ] bi ; inline
 
 : unmap-resource ( resource -- )
-    1 swap <void*> f cuGraphicsUnmapResources cuda-error ; inline
+    1 swap void* <ref> f cuGraphicsUnmapResources cuda-error ; inline
 
 DESTRUCTOR: unmap-resource
 
