@@ -3,7 +3,7 @@
 USING: help.markup help.syntax ;
 IN: path-finding
 
-{ <astar> <bfs> } related-words
+{ <astar> <bfs> <dijkstra> } related-words
 
 HELP: astar
 { $description "This tuple must be subclassed and its method " { $link cost } ", "
@@ -63,6 +63,17 @@ HELP: <bfs>
 { $description "Build an astar object from the " { $snippet "neighbours" } " assoc. "
   "When used with " { $link find-path } ", this astar tuple will use the breadth-first search (BFS) "
   "path finding algorithm which is a particular case of the general A* algorithm."
+} ;
+
+HELP: <dijkstra>
+{ $values
+  { "costs" "an assoc" }
+}
+{ $description "Build an astar object from the " { $snippet "costs" } " assoc. "
+  "The assoc keys are edges of the graph, while the corresponding values are assocs whose keys are "
+  "the edges that can be reached and whose values are the costs to reach those edges. When used with "
+  { $link find-path } ", this astar tuple will use the Dijkstra path finding algorithm which is "
+  "a particular case of the general A* algorithm."
 } ;
 
 HELP: find-path
