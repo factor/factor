@@ -71,4 +71,4 @@ M: apropos >link ;
 INSTANCE: apropos topic
 
 : apropos ( str -- )
-    <apropos> print-topic nl ;
+    [ blank? ] trim <apropos> print-topic nl ;
