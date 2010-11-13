@@ -240,7 +240,7 @@ ERROR: unknown-component-type n ;
 : scale-factor ( n -- n' )
     {
         { 1 [ 255 ] }
-        { 2 [ 127 ] }
+        { 2 [ 85 ] }
         { 4 [ 17 ] }
     } case ;
 
