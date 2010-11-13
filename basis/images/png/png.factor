@@ -170,22 +170,35 @@ ERROR: bad-filter n ;
     byte-array bs:<msb0-bit-reader> :> bs
     loading-png width>> :> width
     loading-png height>> :> height
-
     bs loading-png width height read-scanlines ;
 
-: adam7-subimage-height ( png-height pass -- subimage-height )
-    [ starting-row nth + ] keep
-    row-increment nth /i ;
+:: adam7-subimage-height ( png-height pass -- subimage-height )
+    pass starting-row nth png-height >= [
+        0
+    ] [
+        png-height 1 -
+        pass block-height nth +
+        pass row-increment nth /i
+    ] if ;
 
-: adam7-subimage-width ( png-width pass -- subimage-width )
-    [ starting-col nth + ] keep
-    col-increment nth /i ;
+:: adam7-subimage-width ( png-width pass -- subimage-width )
+    pass starting-col nth png-width >= [
+        0
+    ] [
+        png-width 1 -
+        pass block-width nth +
+        pass col-increment nth /i
+    ] if ;
 
 :: read-adam7-subimage ( bit-reader loading-png pass -- lines )
     loading-png height>> pass adam7-subimage-height :> height
     loading-png width>> pass adam7-subimage-width :> width
 
-    bit-reader loading-png width height read-scanlines ;
+    height width * zero? [
+        B{ } clone
+    ] [
+        bit-reader loading-png width height read-scanlines
+    ] if ;
 
 :: reverse-interlace-adam7 ( byte-array loading-png -- byte-array )
     byte-array bs:<msb0-bit-reader> :> bs
