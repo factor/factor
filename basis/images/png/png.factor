@@ -147,10 +147,7 @@ ERROR: unimplemented-color-type image ;
 
 ERROR: bad-filter n ;
 
-:: reverse-interlace-none ( byte-array loading-png -- array )
-    byte-array bs:<msb0-bit-reader> :> bs
-    loading-png width>> :> width
-    loading-png height>> :> height
+:: read-scanlines ( bit-reader loading-png width height -- array )
     loading-png png-components-per-pixel :> #components
     loading-png bit-depth>> :> bit-depth
     bit-depth :> depth!
@@ -163,65 +160,76 @@ ERROR: bad-filter n ;
     ] when
 
     height [
-        8 bs bs:read dup 0 4 between? [ bad-filter ] unless
-        count [ depth bs bs:read ] replicate swap prefix
-        8 bs bs:align
+        8 bit-reader bs:read dup 0 4 between? [ bad-filter ] unless
+        count [ depth bit-reader bs:read ] replicate swap prefix
+        8 bit-reader bs:align
     ] replicate
     #components bit-depth 16 = [ 2 * ] when reverse-png-filter ;
+
+:: reverse-interlace-none ( byte-array loading-png -- array )
+    byte-array bs:<msb0-bit-reader> :> bs
+    loading-png width>> :> width
+    loading-png height>> :> height
+
+    bs loading-png width height read-scanlines ;
+
+: adam7-subimage-height ( png-height pass -- subimage-height )
+    [ starting-row nth + ] keep
+    row-increment nth /i ;
+
+: adam7-subimage-width ( png-width pass -- subimage-width )
+    [ starting-col nth + ] keep
+    col-increment nth /i ;
+
+:: read-adam7-subimage ( bit-reader loading-png pass -- lines )
+    loading-png height>> pass adam7-subimage-height :> height
+    loading-png width>> pass adam7-subimage-width :> width
+
+    bit-reader loading-png width height read-scanlines ;
 
 :: reverse-interlace-adam7 ( byte-array loading-png -- byte-array )
     byte-array bs:<msb0-bit-reader> :> bs
     loading-png height>> :> height
     loading-png width>> :> width
     loading-png bit-depth>> :> bit-depth
-    loading-png png-components-per-pixel :> #bytes
-    width height #bytes * * <byte-array> width <sliced-groups> :> image
+    loading-png png-components-per-pixel :> #bytes!
+    width height * f <array> width <sliced-groups> :> image
+
+    bit-depth 16 = [
+        #bytes 2 * #bytes!
+    ] when
 
     0 :> row!
     0 :> col!
 
     0 :> pass!
     [ pass 7 < ] [
-        pass starting-row nth row!
-        [
-            row height <
-        ] [
-            pass starting-col nth col!
-            [
-                col width <
-            ] [
-                row
-                col
+      bs loading-png pass read-adam7-subimage
 
-                pass block-height nth
-                height row - min
+      #bytes <sliced-groups>
 
-                pass block-width nth
-                width col - min
+      pass starting-row nth row!
+      pass starting-col nth col!
+      [
+          [ row col f f ] dip image visit
 
-                bit-depth bs bs:read
-                image
-                visit
+          col pass col-increment nth + col!
+          col width >= [
+              pass starting-col nth col!
+              row pass row-increment nth + row!
+          ] when
+      ] each
 
-                col pass col-increment nth + col!
-            ] while
-            row pass row-increment nth + row!
-        ] while
-        pass 1 + pass!
+      pass 1 + pass!
     ] while
-    bit-depth 16 = [
-        image { } concat-as
-        [ 2 >be ] map B{ } concat-as
-    ] [
-        image B{ } concat-as
-    ] if ;
+    image concat B{ } concat-as ;
 
 ERROR: unimplemented-interlace ;
 
 : uncompress-bytes ( loading-png -- bitstream )
     [ inflate-data ] [ ] [ interlace-method>> ] tri {
         { interlace-none [ reverse-interlace-none ] }
-        { interlace-adam7 [ "adam7 is broken" throw reverse-interlace-adam7 ] }
+        { interlace-adam7 [ reverse-interlace-adam7 ] }
         [ unimplemented-interlace ]
     } case ;
 
