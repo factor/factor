@@ -7,6 +7,12 @@ IN: images.png.tests
 
 ! The subset of the suite that should work given the current implementation.
 "vocab:images/testing/png" [
+    "basi0g01.png" decode-test
+    "basi0g02.png" decode-test
+    "basi0g04.png" decode-test
+    "basi0g08.png" decode-test
+    "basi0g16.png" decode-test
+    "basi2c08.png" decode-test
     "basn0g01.png" decode-test
     "basn0g02.png" decode-test
     "basn0g04.png" decode-test
