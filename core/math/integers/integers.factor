@@ -142,12 +142,8 @@ M: bignum (log2) bignum-log2 ; inline
 
 ! Main word
 : /f-abs ( m n -- f )
-    over zero? [
-        2drop 0.0
-    ] [
-        [
-            drop 1/0.
-        ] [
+    over zero? [ nip zero? 0/0. 0.0 ? ] [
+        [ drop 1/0. ] [
             pre-scale
             /f-loop
             [ over odd? [ zero? [ 1 + ] unless ] [ drop ] if ] dip
