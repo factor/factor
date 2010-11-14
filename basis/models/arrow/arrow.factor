@@ -14,4 +14,5 @@ M: arrow model-changed
     [ [ value>> ] [ quot>> ] bi* call( old -- new ) ] [ nip ] 2bi
     set-model ;
 
-M: arrow model-activated [ dependencies>> ] keep [ model-changed ] curry each ;
+M: arrow model-activated
+    [ dependencies>> ] keep [ model-changed ] curry each ;
