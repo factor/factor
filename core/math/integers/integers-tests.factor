@@ -216,8 +216,8 @@ unit-test
 
 : random-integer ( -- n )
     32 random-bits
-    1 random zero? [ neg ] when
-    1 random zero? [ >bignum ] when ;
+    { t f } random [ neg ] when
+    { t f } random [ >bignum ] when ;
 
 [ t ] [
     10000 [
@@ -231,6 +231,12 @@ unit-test
 ! Ensure that /f is accurate for fixnums > 2^53 on 64-bit platforms
 [ HEX: 1.758bec11492f9p-54 ] [ 1 12345678901234567 /f ] unit-test
 [ HEX: -1.758bec11492f9p-54 ] [ 1 -12345678901234567 /f ] unit-test
+
+! Ensure that /f rounds to nearest and not to zero
+[ HEX: 1.0p55 ] [ HEX: 7f,ffff,ffff,ffff >bignum 1 /f ] unit-test
+[ HEX: 1.0p55 ] [ HEX: -7f,ffff,ffff,ffff >bignum -1 /f ] unit-test
+[ HEX: -1.0p55 ] [ HEX: -7f,ffff,ffff,ffff >bignum 1 /f ] unit-test
+[ HEX: -1.0p55 ] [ HEX: 7f,ffff,ffff,ffff >bignum -1 /f ] unit-test
 
 [ 17 ] [ 17 >bignum 5 max ] unit-test
 [ 5 ] [ 17 >bignum 5 min ] unit-test
