@@ -1,15 +1,14 @@
 ! Copyright (C) 2010 Anton Gorenko, Philipp Brüschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings alien.syntax arrays assocs classes.struct command-line
-destructors gdk.ffi gdk.gl.ffi glib.ffi
-gobject-introspection.standard-types gobject.ffi gtk.ffi gtk.gl.ffi
-io.backend io.backend.unix.multiplexers io.encodings.utf8 io.thread
-kernel libc literals locals math math.bitwise math.order math.vectors
-namespaces sequences strings system threads ui ui.backend
-ui.clipboards ui.event-loop ui.gadgets ui.gadgets.editors
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.pixel-formats.private ui.private ;
+alien.strings arrays assocs classes.struct command-line destructors
+gdk.ffi gdk.gl.ffi glib.ffi gobject-introspection.standard-types
+gobject.ffi gtk.ffi gtk.gl.ffi io.backend io.backend.unix.multiplexers
+io.encodings.utf8 io.thread kernel libc literals locals math
+math.bitwise math.order math.vectors namespaces sequences strings
+system threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.editors ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.pixel-formats ui.pixel-formats.private ui.private ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -285,7 +284,6 @@ CONSTANT: action-key-codes
 GENERIC: support-input-methods? ( gadget -- ? )
 GENERIC: get-cursor-surrounding ( gadget -- text cursor-pos )
 GENERIC: delete-cursor-surrounding ( offset count gadget -- )
-GENERIC: set-preedit-string ( str cursor-pos gadget -- )
 GENERIC: get-cursor-loc&dim ( gadget -- loc dim )
 
 M: gadget support-input-methods? drop f ;
@@ -296,9 +294,6 @@ M: editor get-cursor-surrounding
     dup editor-caret first2 [ swap editor-line ] dip ;
 
 M: editor delete-cursor-surrounding
-    3drop ;
-
-M: editor set-preedit-string
     3drop ;
 
 M: editor get-cursor-loc&dim
@@ -314,29 +309,13 @@ M: editor get-cursor-loc&dim
     window world-focus dup support-input-methods?
     [ delete-cursor-surrounding t ] [ 3drop f ] if nip ;
 
-: get-preedit-string ( im-context -- str cursor-pos )
-    { pointer: gchar gint } [ f swap gtk_im_context_get_preedit_string ]
-    with-out-parameters 
-    [ [ utf8 alien>string ] [ g_free ] bi ] dip ;
-            
-: on-preedit-changed ( im-context win -- )
-    window world-focus dup support-input-methods? [
-        [ get-preedit-string ] dip set-preedit-string
-    ] [ 2drop ] if ;
-
 : on-commit ( im-context str win -- )
     [ drop ] [ utf8 alien>string ] [ window ] tri* user-input ;
 
-: gadget-location ( gadget -- loc )
-    [ loc>> ] [ parent>> [ gadget-location v+ ] when* ] bi ;
-
 : gadget-cursor-location ( gadget -- rectangle )
-    [ gadget-location ] [ get-cursor-loc&dim ] bi [ v+ ] dip
-    [ first2 ] bi@
-    ! <workaround
+    [ screen-loc ] [ get-cursor-loc&dim ] bi [ v+ ] dip
+    [ first2 [ >fixnum ] bi@ ] bi@
     cairo_rectangle_int_t <struct-boa> ;
-    ! workaround>
-    ! GdkRectangle <struct-boa> ;
 
 : update-cursor-location ( im-context gadget -- )
     gadget-cursor-location gtk_im_context_set_cursor_location ;
@@ -373,8 +352,6 @@ M: editor get-cursor-loc&dim
     GtkIMContext:retrieve-surrounding win connect-signal-with-data
     im "delete-surrounding" [ on-delete-surrounding yield ]
     GtkIMContext:delete-surrounding win connect-signal-with-data
-    im "preedit-changed" [ on-preedit-changed yield ]
-    GtkIMContext:preedit-changed win connect-signal-with-data
 
     win "key-press-event" [ im-on-key-event yield ]
     GtkWidget:key-press-event im connect-signal-with-data
