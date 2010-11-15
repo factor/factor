@@ -74,6 +74,11 @@ M: bfs cost 3drop 1 ;
 M: bfs heuristic 3drop 0 ;
 M: bfs neighbours neighbours>> at ;
 
+TUPLE: dijkstra < astar costs ;
+M: dijkstra cost costs>> swapd at at ;
+M: dijkstra heuristic 3drop 0 ;
+M: dijkstra neighbours costs>> at keys ;
+
 PRIVATE>
 
 : find-path ( start target astar -- path/f )
@@ -87,3 +92,6 @@ PRIVATE>
 
 : <bfs> ( neighbours -- astar )
     [ bfs new ] dip >>neighbours ;
+
+: <dijkstra> ( costs -- astar )
+    [ dijkstra new ] dip >>costs ;

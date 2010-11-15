@@ -86,7 +86,9 @@ M: f >insecure ;
     [ dup secure? [ <secure> ] unless ] map ;
 
 : listen-on ( threaded-server -- addrspecs )
-    [ secure>> >secure ] [ insecure>> >insecure ] bi append
+    [ secure>> ssl-supported? [ >secure ] [ drop { } ] if ]
+    [ insecure>> >insecure ]
+    bi append
     [ resolve-host ] map concat ;
 
 : accepted-connection ( remote local -- )
@@ -141,7 +143,7 @@ M: threaded-server handle-client* handler>> call( -- ) ;
 \ start-accept-loop NOTICE add-error-logging
 
 : create-secure-context ( threaded-server -- threaded-server )
-    dup secure>> [
+    dup secure>> ssl-supported? and [
         dup secure-config>> <secure-context> >>secure-context
     ] when ;
 
