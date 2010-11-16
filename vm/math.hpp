@@ -33,11 +33,6 @@ inline bignum *factor_vm::float_to_bignum(cell tagged)
 	return double_to_bignum(untag_float(tagged));
 }
 
-inline double factor_vm::bignum_to_float(cell tagged)
-{
-	return bignum_to_double(untag<bignum>(tagged));
-}
-
 inline double factor_vm::untag_float(cell tagged)
 {
 	return untag<boxed_float>(tagged)->n;
