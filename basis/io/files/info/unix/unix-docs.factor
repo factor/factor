@@ -102,15 +102,15 @@ HELP: set-file-permissions
      { "path" "a pathname string" } { "n" "an integer, interepreted as a string of bits" } }
 { $description "Sets the file permissions for a given file with the supplied Unix permissions integer. Supplying an octal number with " { $link POSTPONE: OCT: } " is recommended." }
 { $examples "Using the tradidional octal value:"
-    { $unchecked-example "USING: io.files.unix kernel ;"
+    { $unchecked-example "USING: io.files.info.unix kernel ;"
         "\"resource:license.txt\" OCT: 755 set-file-permissions"
         ""
     }
     "Higher-level, setting named bits:"
-    { $unchecked-example "USING: io.files.unix kernel math.bitwise ;"
+    { $unchecked-example "USING: io.files.info.unix kernel literals ;"
     "\"resource:license.txt\""
-    "{ USER-ALL GROUP-READ GROUP-EXECUTE OTHER-READ OTHER-EXECUTE }"
-    "flags set-file-permissions"
+    "flags{ USER-ALL GROUP-READ GROUP-EXECUTE OTHER-READ OTHER-EXECUTE }"
+    "set-file-permissions"
     "" }
 } ;
 
