@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.strings gdk.gl.ffi gobject.ffi gtk.ffi gtk.gl.ffi
 io.encodings.utf8 kernel locals opengl.gl ;
-IN: gir.samples.lowlevel.opengl
+IN: gtk-samples.opengl
 
 ! This sample is based on
 ! http://code.valaide.org/content/simple-opengl-sample-using-gtkglext
@@ -55,12 +55,12 @@ IN: gir.samples.lowlevel.opengl
     gtk_widget_set_gl_capability drop
 
     window "configure-event" utf8 string>alien
-    [ on-configure ] GtkWidget:configure-event
-    f f 0 g_signal_connect_data drop
+    [ on-configure ] GtkWidget:configure-event f
+    g_signal_connect drop
 
     window "expose-event" utf8 string>alien
-    [ on-expose ] GtkWidget:expose-event
-    f f 0 g_signal_connect_data drop
+    [ on-expose ] GtkWidget:expose-event f
+    g_signal_connect drop
 
     window ;
 
