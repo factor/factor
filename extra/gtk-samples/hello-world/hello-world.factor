@@ -2,8 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.strings gobject.ffi gtk.ffi io.encodings.utf8
 kernel locals ;
-IN: gir.samples.lowlevel.hello-world
+IN: gtk-samples.hello-world
 
+: on-button-clicked ( button label-user-data -- )
+    nip "Hello! :)" utf8 string>alien gtk_label_set_text ;
+    
 :: hello-world-win ( -- window )  
     GTK_WINDOW_TOPLEVEL gtk_window_new :> window
 
@@ -23,8 +26,8 @@ IN: gir.samples.lowlevel.hello-world
     frame label 120 110 gtk_fixed_put
 
     button "clicked" utf8 string>alien
-    [ nip "Hello! :)" utf8 string>alien gtk_label_set_text t ] GtkButton:clicked
-    label f 0 g_signal_connect_data drop
+    [ on-button-clicked ] GtkButton:clicked label
+    g_signal_connect drop
     
     window ;
 
@@ -33,8 +36,8 @@ IN: gir.samples.lowlevel.hello-world
     hello-world-win :> window
 
     window "destroy" utf8 string>alien
-    [ 2drop gtk_main_quit ] GtkObject:destroy
-    f f 0 g_signal_connect_data drop
+    [ 2drop gtk_main_quit ] GtkObject:destroy f
+    g_signal_connect drop
 
     window gtk_widget_show_all
     
