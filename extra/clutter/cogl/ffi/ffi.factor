@@ -1,9 +1,14 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax
-combinators kernel opengl.gl system
-gobject-introspection glib.ffi ;
+USING: alien alien.libraries alien.syntax combinators
+gobject-introspection kernel opengl.gl system vocabs.loader ;
 IN: clutter.cogl.ffi
+
+<<
+"gobject.ffi" require
+>>
+
+LIBRARY: clutter.cogl
 
 <<
 "clutter.cogl" {
@@ -13,13 +18,8 @@ IN: clutter.cogl.ffi
 } cond
 >>
 
-TYPEDEF: int CoglAngle
-TYPEDEF: int CoglFixed
-TYPEDEF: void* CoglHandle
-
-REPLACE-C-TYPE: unsigned\schar uchar
-REPLACE-C-TYPE: unsigned\sint uint
-REPLACE-C-TYPE: unsigned\slong ulong
+FOREIGN-ATOMIC-TYPE: GL.uint GLuint
+FOREIGN-ATOMIC-TYPE: GL.enum GLenum
 
 GIR: vocab:clutter/cogl/Cogl-1.0.gir
 
