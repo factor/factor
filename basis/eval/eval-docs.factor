@@ -50,7 +50,7 @@ $nl
 { $code
     """USING: eval listener vocabs.parser ;
 [
-    "cad-objects" use-vocab
+    "cad.objects" use-vocab
     (( -- seq )) (eval)
 ] with-interactive-vocabs"""
 }
