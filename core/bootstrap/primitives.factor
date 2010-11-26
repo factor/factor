@@ -491,7 +491,6 @@ tuple
     { "bignum>" "math.private" "primitive_bignum_greater" (( x y -- ? )) }
     { "bignum>=" "math.private" "primitive_bignum_greatereq" (( x y -- ? )) }
     { "bignum>fixnum" "math.private" "primitive_bignum_to_fixnum" (( x -- y )) }
-    { "bignum>float" "math.private" "primitive_bignum_to_float" (( x -- y )) }
     { "fixnum-shift" "math.private" "primitive_fixnum_shift" (( x y -- z )) }
     { "fixnum/i" "math.private" "primitive_fixnum_divint" (( x y -- z )) }
     { "fixnum/mod" "math.private" "primitive_fixnum_divmod" (( x y -- z w )) }
