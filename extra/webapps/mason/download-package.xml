@@ -7,7 +7,7 @@
 
 	<t:title>Factor binary package for <t:label t:name="platform" /></t:title>
 
-	<div><img src="http://factorcode.org/graphics/logo.png" alt="Logo" /></div>
+	<div><img src="http://factorcode.org/logo.png" alt="Logo" /></div>
 
 	<h1>Factor binary package for <t:label t:name="platform" /></h1>
 
@@ -24,7 +24,7 @@
 
 	<table border="1">
 		<tr><td>Host name:</td><td><t:xml t:name="host-name" /></td></tr>
-		<tr><td>Last heartbeat:</td><td><t:label t:name="current-timestamp" /></td></tr>
+		<tr><td>Last heartbeat:</td><td><t:label t:name="heartbeat-timestamp" /></td></tr>
 		<tr><td>Current status:</td><td><t:xml t:name="status" /></td></tr>
 		<tr><td>Last build:</td><td><t:xml t:name="last-build" /></td></tr>
 		<tr><td>Last clean build:</td><td><t:xml t:name="last-clean-build" /></td></tr>

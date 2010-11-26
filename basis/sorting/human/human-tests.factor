@@ -12,3 +12,10 @@ IN: sorting.human.tests
 
 [ { "4dup" "4nip" "5drop" "nip" "nip2" "nipd" } ]
 [ { "nip" "4dup" "4nip" "5drop" "nip2" "nipd" } [ human<=> ] sort ] unit-test
+
+
+{ { "Abc" "abc" "def" "gh" } }
+[ { "abc" "Abc" "def" "gh" } [ human<=> ] sort ] unit-test
+
+{ { "abc" "Abc" "def" "gh" } }
+[ { "abc" "Abc" "def" "gh" } [ humani<=> ] sort ] unit-test

@@ -1,9 +1,9 @@
 ! Copyright (c) 2008, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences assocs io.files io.pathnames
-io.sockets io.sockets.secure io.servers.connection
+io.sockets io.sockets.secure io.servers
 namespaces db db.tuples db.sqlite smtp urls
-logging.insomniac
+logging.insomniac calendar timers
 html.templates.chloe
 http.server
 http.server.dispatchers
@@ -26,15 +26,17 @@ webapps.wiki
 webapps.user-admin
 webapps.help
 webapps.mason
-mason.server ;
+webapps.mason.backend
+webapps.mason.backend.watchdog
+websites.factorcode ;
 IN: websites.concatenative
 
-: test-db ( -- db ) "resource:test.db" <sqlite-db> ;
+: website-db ( -- db ) home "website.db" append-path <sqlite-db> ;
 
 : init-factor-db ( -- )
     mason-db [ init-mason-db ] with-db
 
-    test-db [
+    website-db [
         init-furnace-tables
 
         {
@@ -44,11 +46,11 @@ IN: websites.concatenative
         } ensure-tables
     ] with-db ;
 
-TUPLE: factor-website < dispatcher ;
+TUPLE: concatenative-website < dispatcher ;
 
 : <factor-boilerplate> ( responder -- responder' )
     <boilerplate>
-        { factor-website "page" } >>template ;
+        { concatenative-website "page" } >>template ;
 
 : <login-config> ( responder -- responder' )
     "Factor website" <login-realm>
@@ -58,25 +60,22 @@ TUPLE: factor-website < dispatcher ;
         allow-edit-profile
         allow-deactivation ;
 
+SYMBOLS: factor-recaptcha-public-key factor-recaptcha-private-key ;
+
 : <factor-recaptcha> ( responder -- responder' )
     <recaptcha>
         "concatenative.org" >>domain
-        "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
-        "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key ;
+        factor-recaptcha-public-key get >>public-key
+        factor-recaptcha-private-key get >>private-key ;
 
-: <factor-website> ( -- responder )
-    factor-website new-dispatcher
+: <concatenative-website> ( -- responder )
+    concatenative-website new-dispatcher
         URL" /wiki/view/Front Page" <redirect-responder> "" add-responder ;
 
-SYMBOL: key-password
-SYMBOL: key-file
-SYMBOL: dh-file
+SYMBOLS: key-password key-file dh-file ;
 
 : common-configuration ( -- )
-    "concatenative.org" 25 <inet> smtp-server set-global
     "noreply@concatenative.org" lost-password-from set-global
-    "website@concatenative.org" insomniac-sender set-global
-    { "slava@factorcode.org" } insomniac-recipients set-global
     init-factor-db ;
 
 : init-testing ( -- )
@@ -84,14 +83,14 @@ SYMBOL: dh-file
     "vocab:openssl/test/server.pem" key-file set-global
     "password" key-password set-global
     common-configuration
-    <factor-website>
+    <concatenative-website>
         <wiki> <login-config> <factor-boilerplate> "wiki" add-responder
         <user-admin> <login-config> <factor-boilerplate> "user-admin" add-responder
         <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> "pastebin" add-responder
         <planet> <login-config> <factor-boilerplate> "planet" add-responder
         <mason-app> <login-config> <factor-boilerplate> "mason" add-responder
         "/tmp/docs/" <help-webapp> "docs" add-responder
-    test-db <alloy>
+    website-db <alloy>
     main-responder set-global ;
 
 : <gitweb> ( path -- responder )
@@ -102,13 +101,13 @@ SYMBOL: dh-file
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
-        <factor-website>
+        <concatenative-website>
             <wiki> "wiki" add-responder
             <user-admin> "user-admin" add-responder
-        <login-config> <factor-boilerplate> test-db <alloy> "concatenative.org" add-responder
-        <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> test-db <alloy> "paste.factorcode.org" add-responder
-        <planet> <login-config> <factor-boilerplate> test-db <alloy> "planet.factorcode.org" add-responder
-        <mason-app> <login-config> <factor-boilerplate> test-db <alloy> "builds.factorcode.org" add-responder
+        <login-config> <factor-boilerplate> website-db <alloy> "concatenative.org" add-responder
+        <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> website-db <alloy> "paste.factorcode.org" add-responder
+        <planet> <login-config> <factor-boilerplate> website-db <alloy> "planet.factorcode.org" add-responder
+        <mason-app> <login-config> <factor-boilerplate> website-db <alloy> "builds.factorcode.org" add-responder
         home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
         home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
     main-responder set-global ;
@@ -119,14 +118,18 @@ SYMBOL: dh-file
         dh-file get >>dh-file
         key-password get >>password ;
 
-: <factor-website-server> ( -- threaded-server )
+: <concatenative-website-server> ( -- threaded-server )
     <http-server>
         <factor-secure-config> >>secure-config
         8080 >>insecure
         8431 >>secure ;
 
-: start-website ( -- )
-    test-db start-expiring
-    test-db start-update-task
+: start-watchdog ( -- )
+    [ check-builders ] 6 hours every drop ;
+
+: start-website ( -- server )
+    website-db start-expiring
+    website-db start-update-task
     http-insomniac
-    <factor-website-server> start-server ;
+    start-watchdog
+    <concatenative-website-server> start-server ;

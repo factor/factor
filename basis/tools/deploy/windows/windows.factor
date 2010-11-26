@@ -6,7 +6,7 @@ sequences locals system splitting tools.deploy.backend
 tools.deploy.config tools.deploy.config.editor assocs hashtables
 prettyprint combinators windows.kernel32 windows.shell32 windows.user32
 alien.c-types vocabs.metadata vocabs.loader tools.deploy.windows.ico
-io.files.windows.nt ;
+io.files.windows ;
 IN: tools.deploy.windows
 
 CONSTANT: app-icon-resource-id "APPICON"

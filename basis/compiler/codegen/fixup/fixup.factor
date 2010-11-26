@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays bit-arrays byte-arrays byte-vectors generic assocs
 hashtables io.binary kernel kernel.private math namespaces make
-sequences words quotations strings alien.accessors alien.strings
-layouts system combinators math.bitwise math.order
+sequences words quotations strings sorting alien.accessors
+alien.strings layouts system combinators math.bitwise math.order
 combinators.short-circuit combinators.smart accessors growable
 fry memoize compiler.constants compiler.cfg.instructions
 cpu.architecture ;
@@ -144,12 +144,14 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 ! - <scrubbed data stack locations>
 ! - <scrubbed retain stack locations>
 ! - <GC root spill slots>
+! uint[] <base pointers>
 ! uint[] <return addresses>
 ! uint <largest scrubbed data stack location>
 ! uint <largest scrubbed retain stack location>
 ! uint <largest GC root spill slot>
-! uint <number of return addresses>
-
+! uint <largest derived root spill slot>
+! int <number of return addresses>
+!
 SYMBOLS: return-addresses gc-maps ;
 
 : gc-map-needed? ( gc-map -- ? )
@@ -160,6 +162,7 @@ SYMBOLS: return-addresses gc-maps ;
             [ scrub-d>> empty? ]
             [ scrub-r>> empty? ]
             [ gc-roots>> empty? ]
+            [ derived-roots>> empty? ]
         } 1&& not
     ] when ;
 
@@ -169,33 +172,64 @@ SYMBOLS: return-addresses gc-maps ;
         compiled-offset return-addresses get push
     ] [ drop ] if ;
 
+: longest ( seqs -- n )
+    [ length ] [ max ] map-reduce ;
+
 : emit-scrub ( seqs -- n )
     ! seqs is a sequence of sequences of 0/1
-    dup [ length ] [ max ] map-reduce
+    dup longest
     [ '[ [ 0 = ] ?{ } map-as _ f pad-tail % ] each ] keep ;
 
 : integers>bits ( seq n -- bit-array )
     <bit-array> [ '[ [ t ] dip _ set-nth ] each ] keep ;
 
+: largest-spill-slot ( seqs -- n )
+    [ [ 0 ] [ supremum 1 + ] if-empty ] [ max ] map-reduce ;
+
 : emit-gc-roots ( seqs -- n )
     ! seqs is a sequence of sequences of integers 0..n-1
-    dup [ [ 0 ] [ supremum 1 + ] if-empty ] [ max ] map-reduce
+    dup largest-spill-slot
     [ '[ _ integers>bits % ] each ] keep ;
 
 : emit-uint ( n -- )
     building get push-uint ;
 
+: emit-uints ( n -- )
+    [ emit-uint ] each ;
+
+: gc-root-offsets ( gc-map -- offsets )
+    gc-roots>> [ gc-root-offset ] map ;
+
+: emit-gc-info-bitmaps ( -- scrub-d-count scrub-r-count gc-root-count )
+    [
+        gc-maps get {
+            [ [ scrub-d>> ] map emit-scrub ]
+            [ [ scrub-r>> ] map emit-scrub ]
+            [ [ gc-root-offsets ] map emit-gc-roots ]
+        } cleave
+    ] ?{ } make underlying>> % ;
+
+: emit-base-table ( alist longest -- )
+    -1 <array> <enum> swap assoc-union! seq>> emit-uints ;
+
+: derived-root-offsets ( gc-map -- offsets )
+    derived-roots>> [ [ gc-root-offset ] bi@ ] assoc-map ;
+
+: emit-base-tables ( -- count )
+    gc-maps get [ derived-root-offsets ] map
+    dup [ keys ] map largest-spill-slot
+    [ '[ _ emit-base-table ] each ] keep ;
+
+: emit-return-addresses ( -- )
+    return-addresses get emit-uints ;
+
 : gc-info ( -- byte-array )
     [
         return-addresses get empty? [ 0 emit-uint ] [
-            gc-maps get
-            [
-                [ [ scrub-d>> ] map emit-scrub ]
-                [ [ scrub-r>> ] map emit-scrub ]
-                [ [ gc-roots>> gc-root-offsets ] map emit-gc-roots ] tri
-            ] ?{ } make underlying>> %
-            return-addresses get [ emit-uint ] each
-            [ emit-uint ] tri@
+            emit-gc-info-bitmaps
+            emit-base-tables
+            emit-return-addresses
+            4array emit-uints
             return-addresses get length emit-uint
         ] if
     ] B{ } make ;

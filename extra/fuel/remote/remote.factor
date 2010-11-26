@@ -1,8 +1,7 @@
 ! Copyright (C) 2009, 2010 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors debugger io io.encodings.utf8 io.servers.connection
+USING: accessors debugger io io.encodings.utf8 io.servers
 kernel listener math namespaces ;
-
 IN: fuel.remote
 
 <PRIVATE
@@ -24,7 +23,7 @@ IN: fuel.remote
 PRIVATE>
 
 : fuel-start-remote-listener ( port/f -- )
-    print-banner integer? [ 9000 ] unless* server start-server ;
+    print-banner integer? [ 9000 ] unless* server start-server drop ;
 
 : fuel-start-remote-listener* ( -- ) f fuel-start-remote-listener ;
 

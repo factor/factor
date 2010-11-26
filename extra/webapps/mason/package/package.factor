@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators furnace.actions html.forms
-kernel mason.platform mason.report mason.server present
-sequences webapps.mason webapps.mason.report webapps.mason.utils
-xml.syntax ;
-FROM: mason.version.files => platform ;
+kernel xml.syntax mason.platform mason.report present
+sequences webapps.mason webapps.mason.report
+webapps.mason.backend webapps.mason.utils ;
+FROM: webapps.mason.version.files => platform ;
 IN: webapps.mason.package
 
 : building ( builder string -- xml )
@@ -13,13 +13,16 @@ IN: webapps.mason.package
 
 : status-string ( builder -- string )
     dup status>> {
-        { +dirty+ [ drop "Dirty" ] }
-        { +clean+ [ drop "Clean" ] }
-        { +error+ [ drop "Error" ] }
+        { +idle+ [ drop "Idle" ] }
         { +starting+ [ "Starting build" building ] }
         { +make-vm+ [ "Compiling VM" building ] }
         { +boot+ [ "Bootstrapping" building ] }
         { +test+ [ "Testing" building ] }
+        { +upload+ [ "Uploading package" building ] }
+        { +finish+ [ "Finishing build" building ] }
+        { +dirty+ [ drop "Dirty" ] }
+        { +clean+ [ drop "Clean" ] }
+        { +error+ [ drop "Error" ] }
         [ 2drop "Unknown" ]
     } case ;
 
@@ -41,7 +44,7 @@ IN: webapps.mason.package
     packages-url dup link ;
 
 : clean-image-url ( builder -- url )
-    platform "http://factorcode.org/images/clean/" prepend ;
+    platform "http://downloads.factorcode.org/images/clean/" prepend ;
 
 : clean-image-link ( builder -- link )
     clean-image-url dup link ;
@@ -63,6 +66,7 @@ IN: webapps.mason.package
                 [ release-git-id>> git-link "git-id" set-value ]
                 [ requirements "requirements" set-value ]
                 [ host-name>> "host-name" set-value ]
+                [ heartbeat-timestamp>> "heartbeat-timestamp" set-value ]
                 [ current-status "status" set-value ]
                 [ last-build-status "last-build" set-value ]
                 [ clean-build-status "last-clean-build" set-value ]

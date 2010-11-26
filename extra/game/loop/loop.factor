@@ -2,7 +2,7 @@
 USING: accessors timers alien.c-types calendar classes.struct
 continuations destructors fry kernel math math.order memory
 namespaces sequences specialized-vectors system
-tools.memory ui ui.gadgets.worlds vm vocabs.loader arrays
+ui ui.gadgets.worlds vm vocabs.loader arrays
 tools.time.struct locals ;
 IN: game.loop
 

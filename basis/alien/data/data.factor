@@ -53,12 +53,6 @@ M: pointer <c-direct-array>
 : (c-object) ( type -- array )
     heap-size (byte-array) ; inline
 
-: malloc-object ( type -- alien )
-    1 swap heap-size calloc ; inline
-
-: (malloc-object) ( type -- alien )
-    heap-size malloc ; inline
-
 : malloc-byte-array ( byte-array -- alien )
     binary-object [ nip malloc dup ] 2keep memcpy ;
 

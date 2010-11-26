@@ -199,7 +199,7 @@ TR: hyphens>underscores "-" "_" ;
     name length 1 + :> name-buffer-length
     {
         index name-buffer-length dup
-        [ f 0 <int> 0 <int> ] dip <byte-array>
+        [ f 0 int <ref> 0 int <ref> ] dip <byte-array>
         [ glGetTransformFeedbackVarying ] 3keep
         ascii alien>string
         vertex-attribute assert-feedback-attribute    

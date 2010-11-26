@@ -6,7 +6,6 @@ sets classes layouts fry locals cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
-compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.utilities
 compiler.cfg.comparisons
@@ -15,7 +14,8 @@ compiler.cfg.representations.preferred ;
 FROM: namespaces => set ;
 IN: compiler.cfg.alias-analysis
 
-! We try to eliminate redundant slot operations using some simple heuristics.
+! We try to eliminate redundant slot operations using some
+! simple heuristics.
 ! 
 ! All heap-allocated objects which are loaded from the stack, or
 ! other object slots are pessimistically assumed to belong to
@@ -79,19 +79,23 @@ SYMBOL: copies
 ! Map vregs -> alias classes
 SYMBOL: vregs>acs
 
-ERROR: vreg-ac-not-set vreg ;
+! Map alias classes -> sequence of vregs
+SYMBOL: acs>vregs
+
+! Alias class for objects which are loaded from the data stack
+! or other object slots. We pessimistically assume that they
+! can all alias each other.
+SYMBOL: heap-ac
+
+: ac>vregs ( ac -- vregs )
+    acs>vregs get [ drop V{ } clone ] cache ;
 
 : vreg>ac ( vreg -- ac )
     #! Only vregs produced by ##allot, ##peek and ##slot can
     #! ever be used as valid inputs to ##slot and ##set-slot,
     #! so we assert this fact by not giving alias classes to
     #! other vregs.
-    vregs>acs get ?at [ vreg-ac-not-set ] unless ;
-
-! Map alias classes -> sequence of vregs
-SYMBOL: acs>vregs
-
-: ac>vregs ( ac -- vregs ) acs>vregs get at ;
+    vregs>acs get [ heap-ac get [ ac>vregs push ] keep ] cache ;
 
 : aliases ( vreg -- vregs )
     #! All vregs which may contain the same value as vreg.
@@ -105,7 +109,7 @@ SYMBOL: acs>vregs
     2dup eq? [ 2drop ] [
         [ ac>vregs ] dip
         [ vregs>acs get '[ [ _ ] dip _ set-at ] each ]
-        [ acs>vregs get at push-all ]
+        [ ac>vregs push-all ]
         2bi
     ] if ;
 
@@ -120,22 +124,21 @@ SYMBOL: dead-stores
 
 : dead-store ( insn# -- ) dead-stores get adjoin ;
 
+ERROR: vreg-not-new vreg ;
+
 :: set-ac ( vreg ac -- )
     #! Set alias class of newly-seen vreg.
-    H{ } clone vreg recent-stores get set-at
-    H{ } clone vreg live-slots get set-at
+    vreg vregs>acs get key? [ vreg vreg-not-new ] when
     ac vreg vregs>acs get set-at
-    vreg ac acs>vregs get push-at ;
+    vreg ac ac>vregs push ;
 
 : live-slot ( slot#/f vreg -- vreg' )
     #! If the slot number is unknown, we never reuse a previous
     #! value.
     over [ live-slots get at at ] [ 2drop f ] if ;
 
-ERROR: vreg-has-no-slots vreg ;
-
 : load-constant-slot ( value slot# vreg -- )
-    live-slots get ?at [ vreg-has-no-slots ] unless set-at ;
+    live-slots get [ drop H{ } clone ] cache set-at ;
 
 : load-slot ( value slot#/f vreg -- )
     over [ load-constant-slot ] [ 3drop ] if ;
@@ -160,20 +163,16 @@ SYMBOL: ac-counter
 : next-ac ( -- n )
     ac-counter [ dup 1 + ] change ;
 
-! Alias class for objects which are loaded from the data stack
-! or other object slots. We pessimistically assume that they
-! can all alias each other.
-SYMBOL: heap-ac
-
-: set-heap-ac ( vreg -- ) heap-ac get set-ac ;
-
 : set-new-ac ( vreg -- ) next-ac set-ac ;
 
 : kill-constant-set-slot ( slot# vreg -- )
     [ live-slots get at delete-at ] with each-alias ;
 
+: recent-stores-of ( vreg -- assoc )
+    recent-stores get [ drop H{ } clone ] cache ;
+
 :: record-constant-set-slot ( insn# slot# vreg -- )
-    vreg recent-stores get at :> recent-stores
+    vreg recent-stores-of :> recent-stores
     slot# recent-stores at [ dead-store ] when*
     insn# slot# recent-stores set-at ;
 
@@ -226,14 +225,11 @@ M: insn analyze-aliases ;
     ! inserted yet.
     dup [
         { int-rep tagged-rep } member?
-        [ set-heap-ac ] [ set-new-ac ] if
+        [ drop ] [ set-new-ac ] if
     ] each-def-rep ;
 
 M: vreg-insn analyze-aliases
     def-acs ;
-
-M: ##phi analyze-aliases
-    dup dst>> set-heap-ac ;
 
 M: ##allocation analyze-aliases
     #! A freshly allocated object is distinct from any other
@@ -326,9 +322,8 @@ M: insn eliminate-dead-stores drop t ;
 
 : alias-analysis-step ( insns -- insns' )
     reset-alias-analysis
-    [ local-live-in [ set-heap-ac ] each ]
     [ 0 [ [ insn#<< ] [ drop 1 + ] 2bi ] reduce drop ]
-    [ [ analyze-aliases ] map! [ eliminate-dead-stores ] filter! ] tri ;
+    [ [ analyze-aliases ] map! [ eliminate-dead-stores ] filter! ] bi ;
 
 : alias-analysis ( cfg -- cfg )
     init-alias-analysis

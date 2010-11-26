@@ -60,9 +60,9 @@ void context::scrub_stacks(gc_info *info, cell index)
 	u8 *bitmap = info->gc_info_bitmap();
 
 	{
-		cell base = info->scrub_d_base(index);
+		cell base = info->callsite_scrub_d(index);
 
-		for(int loc = 0; loc < info->scrub_d_count; loc++)
+		for(cell loc = 0; loc < info->scrub_d_count; loc++)
 		{
 			if(bitmap_p(bitmap,base + loc))
 			{
@@ -75,9 +75,9 @@ void context::scrub_stacks(gc_info *info, cell index)
 	}
 
 	{
-		cell base = info->scrub_r_base(index);
+		cell base = info->callsite_scrub_r(index);
 
-		for(int loc = 0; loc < info->scrub_r_count; loc++)
+		for(cell loc = 0; loc < info->scrub_r_count; loc++)
 		{
 			if(bitmap_p(bitmap,base + loc))
 			{
@@ -111,8 +111,8 @@ void factor_vm::init_contexts(cell datastack_size_, cell retainstack_size_, cell
 void factor_vm::delete_contexts()
 {
 	assert(!ctx);
-	std::vector<context *>::const_iterator iter = unused_contexts.begin();
-	std::vector<context *>::const_iterator end = unused_contexts.end();
+	std::list<context *>::const_iterator iter = unused_contexts.begin();
+	std::list<context *>::const_iterator end = unused_contexts.end();
 	while(iter != end)
 	{
 		delete *iter;
@@ -159,6 +159,13 @@ void factor_vm::delete_context(context *old_context)
 {
 	unused_contexts.push_back(old_context);
 	active_contexts.erase(old_context);
+
+	while(unused_contexts.size() > 10)
+	{
+		context *stale_context = unused_contexts.front();
+		unused_contexts.pop_front();
+		delete stale_context;
+	}
 }
 
 VM_C_API void delete_context(factor_vm *parent, context *old_context)

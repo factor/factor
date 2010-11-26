@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
+! Copyright (C) 2007, 2010, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors unix byte-arrays kernel sequences namespaces
 math math.order combinators init alien alien.c-types
@@ -10,6 +10,8 @@ io.sockets.secure.openssl io.timeouts system summary fry
 unix.ffi ;
 FROM: io.ports => shutdown ;
 IN: io.sockets.secure.unix
+
+M: openssl ssl-supported? t ;
 
 M: ssl-handle handle-fd file>> handle-fd ;
 

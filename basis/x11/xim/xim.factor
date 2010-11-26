@@ -42,7 +42,7 @@ SYMBOL: keysym
 
 : prepare-lookup ( -- )
     buf-size <uint-array> keybuf set
-    0 <KeySym> keysym set ;
+    0 KeySym <ref> keysym set ;
 
 : finish-lookup ( len -- string keysym )
     keybuf get swap 2 * head utf16n decode
@@ -51,7 +51,7 @@ SYMBOL: keysym
 : lookup-string ( event xic -- string keysym )
     [
         prepare-lookup
-        swap keybuf get buf-size keysym get 0 <int>
+        swap keybuf get buf-size keysym get 0 int <ref>
         XwcLookupString
         finish-lookup
     ] with-scope ;

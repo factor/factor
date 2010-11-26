@@ -29,33 +29,33 @@ ERROR: cl-error err ;
     str-alien str-buffer dup length memcpy str-alien ;
     
 :: opencl-square ( in -- out )
-    0 f 0 <uint> [ clGetPlatformIDs cl-success ] keep *uint
+    0 f 0 uint <ref> [ clGetPlatformIDs cl-success ] keep uint deref
     dup <void*-array> [ f clGetPlatformIDs cl-success ] keep first
-    CL_DEVICE_TYPE_DEFAULT 1 f <void*> [ f clGetDeviceIDs cl-success ] keep *void* :> device-id
-    f 1 device-id <void*> f f 0 <int> [ clCreateContext ] keep *int cl-success   :> context
-    context device-id 0 0 <int> [ clCreateCommandQueue ] keep *int cl-success    :> queue
+    CL_DEVICE_TYPE_DEFAULT 1 f void* <ref> [ f clGetDeviceIDs cl-success ] keep void* deref :> device-id
+    f 1 device-id void* <ref> f f 0 int <ref> [ clCreateContext ] keep int deref cl-success   :> context
+    context device-id 0 0 int <ref> [ clCreateCommandQueue ] keep int deref cl-success    :> queue
  
     [
-        context 1 kernel-source cl-string-array <void*>
-        f 0 <int> [ clCreateProgramWithSource ] keep *int cl-success
+        context 1 kernel-source cl-string-array void* <ref>
+        f 0 int <ref> [ clCreateProgramWithSource ] keep int deref cl-success
         [ 0 f f f f clBuildProgram cl-success ]
-        [ "square" cl-string-array 0 <int> [ clCreateKernel ] keep *int cl-success ]
+        [ "square" cl-string-array 0 int <ref> [ clCreateKernel ] keep int deref cl-success ]
         [ ] tri
     ] with-destructors :> ( kernel program )
 
     context CL_MEM_READ_ONLY in byte-length f
-    0 <int> [ clCreateBuffer ] keep *int cl-success :> input
+    0 int <ref> [ clCreateBuffer ] keep int deref cl-success :> input
     
     context CL_MEM_WRITE_ONLY in byte-length f
-    0 <int> [ clCreateBuffer ] keep *int cl-success :> output
+    0 int <ref> [ clCreateBuffer ] keep int deref cl-success :> output
 
     queue input CL_TRUE 0 in byte-length in 0 f f clEnqueueWriteBuffer cl-success
 
-    kernel 0 cl_mem heap-size input <void*> clSetKernelArg cl-success
-    kernel 1 cl_mem heap-size output <void*> clSetKernelArg cl-success
-    kernel 2 uint heap-size in length <uint> clSetKernelArg cl-success
+    kernel 0 cl_mem heap-size input void* <ref> clSetKernelArg cl-success
+    kernel 1 cl_mem heap-size output void* <ref> clSetKernelArg cl-success
+    kernel 2 uint heap-size in length uint <ref> clSetKernelArg cl-success
  
-    queue kernel 1 f in length <ulonglong> f
+    queue kernel 1 f in length ulonglong <ref> f
     0 f f clEnqueueNDRangeKernel cl-success
  
     queue clFinish cl-success

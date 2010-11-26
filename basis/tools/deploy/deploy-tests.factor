@@ -52,7 +52,7 @@ os macosx? [
 ] each
 
 USING: http.client http.server http.server.dispatchers
-http.server.responses http.server.static io.servers.connection ;
+http.server.responses http.server.static io.servers ;
 
 SINGLETON: quit-responder
 
@@ -68,8 +68,8 @@ M: quit-responder call-responder*
         <http-server>
             0 >>insecure
             f >>secure
-        dup start-server*
-        sockets>> first addr>> port>>
+        start-server
+        servers>> first addr>> port>>
         dup number>string "resource:temp/port-number" ascii set-file-contents
     ] with-scope
     "port" set ;
@@ -134,3 +134,5 @@ os macosx? [
 [ ] [ "resource:license.txt" "license.txt" temp-file copy-file ] unit-test
 
 [ ] [ "tools.deploy.test.19" shake-and-bake run-temp-image ] unit-test
+
+[ ] [ "benchmark.ui-panes" shake-and-bake run-temp-image ] unit-test
