@@ -324,40 +324,29 @@ void *stdin_loop(void *arg)
 	return NULL;
 }
 
-void open_console()
+void safe_pipe(int *in, int *out)
 {
 	int filedes[2];
 
 	if(pipe(filedes) < 0)
-		fatal_error("Error opening control pipe",errno);
+		fatal_error("Error opening pipe",errno);
 
-	control_read = filedes[0];
-	control_write = filedes[1];
+	*in = filedes[0];
+	*out = filedes[1];
 
-	if(pipe(filedes) < 0)
-		fatal_error("Error opening size pipe",errno);
+	if(fcntl(*in,F_SETFD,FD_CLOEXEC) < 0)
+		fatal_error("Error with fcntl",errno);
 
-	size_read = filedes[0];
-	size_write = filedes[1];
-
-	if(pipe(filedes) < 0)
-		fatal_error("Error opening stdin pipe",errno);
-
-	stdin_read = filedes[0];
-	stdin_write = filedes[1];
-
-	start_thread(stdin_loop,NULL);
+	if(fcntl(*out,F_SETFD,FD_CLOEXEC) < 0)
+		fatal_error("Error with fcntl",errno);
 }
 
-VM_C_API void wait_for_stdin()
+void open_console()
 {
-	if(write(control_write,"X",1) != 1)
-	{
-		if(errno == EINTR)
-			wait_for_stdin();
-		else
-			fatal_error("Error writing control fd",errno);
-	}
+	safe_pipe(&control_read,&control_write);
+	safe_pipe(&size_read,&size_write);
+	safe_pipe(&stdin_read,&stdin_write);
+	start_thread(stdin_loop,NULL);
 }
 
 }

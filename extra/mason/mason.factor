@@ -7,6 +7,11 @@ namespaces prettyprint threads ;
 FROM: mason.build => build ;
 IN: mason
 
+: heartbeat-loop ( -- )
+    notify-heartbeat
+    5 minutes sleep
+    heartbeat-loop ;
+
 : fatal-error-body ( error callstack -- string )
     [
         "Fatal error on " write host-name print nl
@@ -19,8 +24,6 @@ IN: mason
      email-fatal ;
 
 : build-loop ( -- )
-    notify-heartbeat
-
     [
         builds-dir get make-directories
         builds-dir get [
@@ -35,4 +38,9 @@ IN: mason
 
     build-loop ;
 
-MAIN: build-loop
+: mason ( -- * )
+    [ heartbeat-loop ] "Heartbeat loop" spawn
+    [ build-loop ] "Build loop" spawn
+    stop ;
+
+MAIN: mason

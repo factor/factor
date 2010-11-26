@@ -8,7 +8,7 @@ furnace.auth.features.registration furnace.auth.login
 furnace.boilerplate furnace.redirection html.forms http.server
 http.server.dispatchers kernel namespaces site-watcher site-watcher.db
 site-watcher.private urls validators io.sockets.secure.unix.debug
-io.servers.connection io.files.temp db db.tuples sequences
+io.servers io.files.temp db db.tuples sequences
 webapps.site-watcher.common webapps.site-watcher.watching
 webapps.site-watcher.spidering ;
 QUALIFIED: assocs
@@ -90,4 +90,4 @@ M: site-watcher-app init-user-profile
 : start-site-watcher ( -- )
     init-db
     site-watcher-db run-site-watcher
-    <site-watcher-server> start-server ;
+    <site-watcher-server> start-server drop ;

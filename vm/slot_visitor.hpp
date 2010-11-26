@@ -292,26 +292,51 @@ struct call_frame_slot_visitor {
 		gc_info *info = compiled->block_gc_info();
 
 		assert(return_address < compiled->size());
-		int index = info->return_address_index(return_address);
-		if(index == -1)
+		cell callsite = info->return_address_index(return_address);
+		if(callsite == (cell)-1)
 			return;
 
 #ifdef DEBUG_GC_MAPS
 		std::cout << "call frame code block " << compiled << " with offset " << return_address << std::endl;
 #endif
-		u8 *bitmap = info->gc_info_bitmap();
-		cell base = info->spill_slot_base(index);
 		cell *stack_pointer = (cell *)(parent->frame_successor(frame) + 1);
+		u8 *bitmap = info->gc_info_bitmap();
 
-		for(int spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++)
+		/* Subtract old value of base pointer from every derived pointer. */
+		for(cell spill_slot = 0; spill_slot < info->derived_root_count; spill_slot++)
 		{
-			if(bitmap_p(bitmap,base + spill_slot))
+			u32 base_pointer = info->lookup_base_pointer(callsite, spill_slot);
+			if(base_pointer != (u32)-1)
 			{
 #ifdef DEBUG_GC_MAPS
-				std::cout << "visiting spill slot " << spill_slot << std::endl;
+				std::cout << "visiting derived root " << spill_slot
+					<< " with base pointer " << base_pointer
+					<< std::endl;
+#endif
+				stack_pointer[spill_slot] -= stack_pointer[base_pointer];
+			}
+		}
+
+		/* Update all GC roots, including base pointers. */
+		cell callsite_gc_roots = info->callsite_gc_roots(callsite);
+
+		for(cell spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++)
+		{
+			if(bitmap_p(bitmap,callsite_gc_roots + spill_slot))
+			{
+#ifdef DEBUG_GC_MAPS
+				std::cout << "visiting GC root " << spill_slot << std::endl;
 #endif
 				visitor->visit_handle(stack_pointer + spill_slot);
 			}
+		}
+
+		/* Add the base pointers to obtain new derived pointer values. */
+		for(cell spill_slot = 0; spill_slot < info->derived_root_count; spill_slot++)
+		{
+			u32 base_pointer = info->lookup_base_pointer(callsite, spill_slot);
+			if(base_pointer != (u32)-1)
+				stack_pointer[spill_slot] += stack_pointer[base_pointer];
 		}
 	}
 };

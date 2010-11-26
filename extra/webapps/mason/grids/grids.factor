@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs db.tuples furnace.actions
-furnace.utilities http.server.responses kernel locals
-mason.server mason.version.data sequences splitting urls
-webapps.mason.utils xml.syntax xml.writer ;
+furnace.utilities http.server.responses kernel locals sequences
+splitting urls xml.syntax xml.writer webapps.mason.backend
+webapps.mason.version.data webapps.mason.utils ;
 IN: webapps.mason.grids
 
 : render-grid-cell ( cpu os quot -- xml )

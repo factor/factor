@@ -46,7 +46,6 @@ $nl
     { $link heap-size }
     { $link <c-object> }
     { $link <c-array> }
-    { $link malloc-object }
     { $link malloc-array }
 }
 "If your program looks up C types dynamically or from words which do not have a stack effect, you must enable this flag, because in these situations the C type lookup code is not folded away and the word properties must be consulted at runtime." } ;

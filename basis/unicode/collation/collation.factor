@@ -149,10 +149,8 @@ PRIVATE>
 : quaternary= ( str1 str2 -- ? )
     0 insensitive= ;
 
-<PRIVATE
 : w/collation-key ( str -- {str,key} )
     [ collation-key ] keep 2array ;
-PRIVATE>
 
 : sort-strings ( strings -- sorted )
     [ w/collation-key ] map natural-sort values ;

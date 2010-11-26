@@ -36,10 +36,9 @@ FUNCTION: HRESULT RevokeDragDrop ( HWND hWnd ) ;
 FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
 
 : com-query-interface ( interface iid -- interface' )
-    [
-        void* malloc-object &free
-        [ IUnknown::QueryInterface ole32-error ] keep *void*
-    ] with-destructors ;
+    { void* }
+    [ IUnknown::QueryInterface ole32-error ]
+    with-out-parameters ;
 
 : com-add-ref ( interface -- interface )
      [ IUnknown::AddRef drop ] keep ; inline

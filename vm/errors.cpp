@@ -27,25 +27,35 @@ void out_of_memory()
 	exit(1);
 }
 
-void factor_vm::throw_error(cell error)
+void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
 {
+	/* Reset local roots before allocating anything */
+	data_roots.clear();
+	bignum_roots.clear();
+	code_roots.clear();
+
+	/* If we had an underflow or overflow, data or retain stack
+	pointers might be out of bounds, so fix them before allocating
+	anything */
+	ctx->fix_stacks();
+
+	/* If error was thrown during heap scan, we re-enable the GC */
+	gc_off = false;
+
 	/* If the error handler is set, we rewind any C stack frames and
 	pass the error to user-space. */
 	if(!current_gc && to_boolean(special_objects[ERROR_HANDLER_QUOT]))
 	{
-		/* If error was thrown during heap scan, we re-enable the GC */
-		gc_off = false;
+#ifdef FACTOR_DEBUG
+		/* Doing a GC here triggers all kinds of funny errors */
+		primitive_compact_gc();
+#endif
 
-		/* Reset local roots */
-		data_roots.clear();
-		bignum_roots.clear();
-		code_roots.clear();
+		/* Now its safe to allocate and GC */
+		cell error_object = allot_array_4(special_objects[OBJ_ERROR],
+			tag_fixnum(error),arg1,arg2);
 
-		/* If we had an underflow or overflow, data or retain stack
-		pointers might be out of bounds */
-		ctx->fix_stacks();
-
-		ctx->push(error);
+		ctx->push(error_object);
 
 		unwind_native_frames(special_objects[ERROR_HANDLER_QUOT],
 			ctx->callstack_top);
@@ -55,17 +65,11 @@ void factor_vm::throw_error(cell error)
 	else
 	{
 		std::cout << "You have triggered a bug in Factor. Please report.\n";
-		std::cout << "early_error: ";
-		print_obj(error);
-		std::cout << std::endl;
+		std::cout << "error: " << error << std::endl;
+		std::cout << "arg 1: "; print_obj(arg1); std::cout << std::endl;
+		std::cout << "arg 2: "; print_obj(arg2); std::cout << std::endl;
 		factorbug();
 	}
-}
-
-void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
-{
-	throw_error(allot_array_4(special_objects[OBJ_ERROR],
-		tag_fixnum(error),arg1,arg2));
 }
 
 void factor_vm::type_error(cell type, cell tagged)

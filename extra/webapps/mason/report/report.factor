@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions http.server.responses kernel
-urls mason.server webapps.mason.utils xml.syntax ;
+urls xml.syntax webapps.mason.backend webapps.mason.utils ;
 IN: webapps.mason.report
 
 : <build-report-action> ( -- action )

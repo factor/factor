@@ -1,8 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings.ascii io.files io.files.unique kernel
-mime.multipart tools.test io.streams.duplex io multiline
-assocs accessors ;
+USING: accessors assocs continuations fry http.server io
+io.encodings.ascii io.files io.files.unique
+io.servers io.streams.duplex io.streams.string
+kernel math.ranges mime.multipart multiline namespaces random
+sequences strings threads tools.test ;
 IN: mime.multipart.tests
 
 : upload-separator ( -- seq )
@@ -33,3 +35,22 @@ IN: mime.multipart.tests
     "file1" swap at filename>> "up.txt" =
 ] unit-test
 
+SYMBOL: mime-test-server
+
+: with-test-server ( quot -- )
+    [
+        <http-server>
+            f >>secure
+            0 >>insecure
+    ] dip with-threaded-server ; inline
+
+: test-server-port ( -- n )
+    mime-test-server get insecure>> ;
+
+: a-stream ( n -- stream )
+    CHAR: a <string> <string-reader> ;
+
+[ ] [
+    [
+    ] with-test-server
+] unit-test

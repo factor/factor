@@ -262,6 +262,18 @@ HELP: contents
 { $description "Reads all elements in the " { $link input-stream } " until the stream is exhausted. The type of the sequence depends on the stream's element type." }
 $io-error ;
 
+HELP: tell-input
+{ $values
+        { "n" integer }
+}
+{ $description "Returns the index of the stream stored in " { $link input-stream } "." } ;
+
+HELP: tell-output
+{ $values
+        { "n" integer }
+}
+{ $description "Returns the index of the stream stored in " { $link output-stream } "." } ;
+
 ARTICLE: "stream-protocol" "Stream protocol"
 "The stream protocol consists of a large number of generic words, many of which are optional."
 $nl
@@ -290,6 +302,8 @@ $nl
 { $subsections
     stream-tell
     stream-seek
+    tell-input
+    tell-output
 }
 { $see-also "io.timeouts" } ;
 
@@ -370,12 +384,6 @@ $nl
 }
 "Seeking on the default output stream:"
 { $subsections seek-output }
-"Seeking descriptors:"
-{ $subsections
-    seek-absolute
-    seek-relative
-    seek-end
-}
 "A pair of combinators for rebinding the " { $link output-stream } " variable:"
 { $subsections
     with-output-stream

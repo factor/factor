@@ -503,8 +503,8 @@ M:: x86 %check-nursery-branch ( label size cc temp1 temp2 -- )
         { cc/<= [ label JG ] }
     } case ;
 
-M: x86 gc-root-offsets
-    [ n>> spill-offset special-offset cell + cell /i ] map f like ;
+M: x86 gc-root-offset
+    n>> spill-offset special-offset cell + cell /i ;
 
 M: x86 %call-gc ( gc-map -- )
     \ minor-gc %call

@@ -1,5 +1,5 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: accessors alien alien.c-types alien.complex alien.data
+USING: accessors alien alien.complex alien.c-types alien.data
 alien.parser grouping alien.strings alien.syntax arrays ascii
 assocs byte-arrays combinators combinators.short-circuit fry
 generalizations kernel lexer macros math math.parser namespaces
@@ -211,11 +211,11 @@ GENERIC: (fortran-arg>c-args) ( type -- main-quot added-quot )
 M: integer-type (fortran-arg>c-args)
     [
         size>> {
-            { f [ [ <int>      ] [ drop ] ] }
-            { 1 [ [ <char>     ] [ drop ] ] }
-            { 2 [ [ <short>    ] [ drop ] ] }
-            { 4 [ [ <int>      ] [ drop ] ] }
-            { 8 [ [ <longlong> ] [ drop ] ] }
+            { f [ [ c:int <ref>     ] [ drop ] ] }
+            { 1 [ [ c:char <ref>    ] [ drop ] ] }
+            { 2 [ [ c:short <ref>   ] [ drop ] ] }
+            { 4 [ [ c:int <ref>     ] [ drop ] ] }
+            { 8 [ [ c:longlong <ref> ] [ drop ] ] }
             [ invalid-fortran-type ]
         } case
     ] args?dims ;
@@ -226,9 +226,9 @@ M: logical-type (fortran-arg>c-args)
 M: real-type (fortran-arg>c-args)
     [
         size>> {
-            { f [ [ <float>  ] [ drop ] ] }
-            { 4 [ [ <float>  ] [ drop ] ] }
-            { 8 [ [ <double> ] [ drop ] ] }
+            { f [ [ c:float <ref> ] [ drop ] ] }
+            { 4 [ [ c:float <ref> ] [ drop ] ] }
+            { 8 [ [ c:double <ref> ] [ drop ] ] }
             [ invalid-fortran-type ]
         } case
     ] args?dims ;
@@ -244,14 +244,14 @@ M: real-complex-type (fortran-arg>c-args)
     ] args?dims ;
 
 M: double-precision-type (fortran-arg>c-args)
-    [ drop [ <double> ] [ drop ] ] args?dims ;
+    [ drop [ c:double <ref> ] [ drop ] ] args?dims ;
 
 M: double-complex-type (fortran-arg>c-args)
     [ drop [ <complex-double> ] [ drop ] ] args?dims ;
 
 M: character-type (fortran-arg>c-args)
     fix-character-type single-char?
-    [ [ first <char> ] [ drop ] ]
+    [ [ first c:char <ref> ] [ drop ] ]
     [ [ ascii string>alien ] [ length ] ] if ;
 
 M: misc-type (fortran-arg>c-args)
@@ -263,23 +263,25 @@ GENERIC: (fortran-result>) ( type -- quots )
     [ dup dims>> [ drop { [ ] } ] ] dip if ; inline
 
 M: integer-type (fortran-result>)
-    [ size>> {
-        { f [ { [ *int      ] } ] }
-        { 1 [ { [ *char     ] } ] }
-        { 2 [ { [ *short    ] } ] }
-        { 4 [ { [ *int      ] } ] }
-        { 8 [ { [ *longlong ] } ] }
-        [ invalid-fortran-type ]
-    } case ] result?dims ;
+    [
+        size>> {
+            { f [ { [ c:int deref      ] } ] }
+            { 1 [ { [ c:char deref     ] } ] }
+            { 2 [ { [ c:short deref    ] } ] }
+            { 4 [ { [ c:int deref      ] } ] }
+            { 8 [ { [ c:longlong deref ] } ] }
+            [ invalid-fortran-type ]
+        } case
+    ] result?dims ;
 
 M: logical-type (fortran-result>)
     [ call-next-method first [ zero? not ] append 1array ] result?dims ;
 
 M: real-type (fortran-result>)
     [ size>> {
-        { f [ { [ *float  ] } ] }
-        { 4 [ { [ *float  ] } ] }
-        { 8 [ { [ *double ] } ] }
+        { f [ { [ c:float deref ] } ] }
+        { 4 [ { [ c:float deref ] } ] }
+        { 8 [ { [ c:double deref ] } ] }
         [ invalid-fortran-type ]
     } case ] result?dims ;
 
@@ -292,14 +294,14 @@ M: real-complex-type (fortran-result>)
     } case ] result?dims ;
 
 M: double-precision-type (fortran-result>)
-    [ drop { [ *double ] } ] result?dims ;
+    [ drop { [ c:double deref ] } ] result?dims ;
 
 M: double-complex-type (fortran-result>)
     [ drop { [ *complex-double ] } ] result?dims ;
 
 M: character-type (fortran-result>)
     fix-character-type single-char?
-    [ { [ *char 1string ] } ]
+    [ { [ c:char deref 1string ] } ]
     [ { [ ] [ ascii alien>nstring ] } ] if ;
 
 M: misc-type (fortran-result>)

@@ -3,13 +3,13 @@
 USING: combinators kernel generic math math.functions
 math.parser namespaces io sequences trees shuffle
 assocs parser accessors math.order prettyprint.custom
-trees.private ;
+trees.private fry ;
 IN: trees.avl
 
 TUPLE: avl < tree ;
 
 : <avl> ( -- tree )
-    avl new-tree ;
+    avl new-tree ; inline
 
 <PRIVATE
 
@@ -17,15 +17,16 @@ TUPLE: avl-node < node balance ;
 
 : <avl-node> ( key value -- node )
     avl-node new-node
-        0 >>balance ;
+        0 >>balance ; inline
 
-: increase-balance ( node amount -- )
-    swap [ + ] change-balance drop ;
+: increase-balance ( node amount -- node )
+    '[ _ + ] change-balance ;
 
 : rotate ( node -- node )
-    dup node+link
-    dup node-link
-    pick set-node+link
+    dup
+    [ node+link ]
+    [ node-link ]
+    [ set-node+link ] tri
     [ set-node-link ] keep ;    
 
 : single-rotate ( node -- node )
@@ -36,8 +37,8 @@ TUPLE: avl-node < node balance ;
 : pick-balances ( a node -- balance balance )
     balance>> {
         { [ dup zero? ] [ 2drop 0 0 ] }
-        { [ over = ] [ neg 0 ] }
-        [ 0 swap ]
+        { [ 2dup = ] [ nip neg 0 ] }
+        [ drop 0 swap ]
     } cond ;
 
 : double-rotate ( node -- node )
@@ -57,9 +58,8 @@ TUPLE: avl-node < node balance ;
 : balance-insert ( node -- node taller? )
     dup balance>> {
         { [ dup zero? ] [ drop f ] }
-        { [ dup abs 2 = ]
-          [ sgn neg [ select-rotate ] with-side f ] }
-        { [ drop t ] [ t ] } ! balance is -1 or 1, tree is taller
+        { [ dup abs 2 = ] [ sgn neg [ select-rotate ] with-side f ] }
+        [ drop t ] ! balance is -1 or 1, tree is taller
     } cond ;
 
 DEFER: avl-set
@@ -68,7 +68,7 @@ DEFER: avl-set
     2dup key>> before? left right ? [
         [ node-link avl-set ] keep swap
         [ [ set-node-link ] keep ] dip
-        [ dup current-side get increase-balance balance-insert ]
+        [ current-side get increase-balance balance-insert ]
         [ f ] if
     ] with-side ;
 
@@ -95,14 +95,14 @@ M: avl set-at ( value key node -- node )
     dup balance>> {
         { [ dup zero? ] [ drop t ] }
         { [ dup abs 2 = ] [ sgn neg [ delete-select-rotate ] with-side ] }
-        { [ drop t ] [ f ] } ! balance is -1 or 1, tree is not shorter
+        [ drop f ] ! balance is -1 or 1, tree is not shorter
     } cond ;
 
 : balance-delete ( node -- node shorter? )
     current-side get over balance>> {
         { [ dup zero? ] [ drop neg over balance<< f ] }
-        { [ dupd = ] [ drop 0 >>balance t ] }
-        [ dupd neg increase-balance rebalance-delete ]
+        { [ 2dup = ] [ 2drop 0 >>balance t ] }
+        [ drop neg increase-balance rebalance-delete ]
     } cond ;
 
 : avl-replace-with-extremity ( to-replace node -- node shorter? )
@@ -155,7 +155,7 @@ M: avl new-assoc 2drop <avl> ;
 PRIVATE>
 
 : >avl ( assoc -- avl )
-    T{ avl f f 0 } assoc-clone-like ;
+    T{ avl } assoc-clone-like ;
 
 M: avl assoc-like
     drop dup avl? [ >avl ] unless ;

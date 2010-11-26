@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences namespaces words assocs logging sorting
 prettyprint io io.styles io.files io.encodings.utf8
-strings combinators accessors arrays
+strings combinators accessors arrays math
 logging.server logging.parser calendar.format ;
 IN: logging.analysis
 
@@ -20,6 +20,9 @@ SYMBOL: message-histogram
     ] when
     drop ;
 
+: recent-histogram ( assoc n -- alist )
+    [ >alist sort-values <reversed> ] dip short head ;
+
 : analyze-entries ( entries word-names -- errors word-histogram message-histogram )
     [
         word-names set
@@ -27,44 +30,40 @@ SYMBOL: message-histogram
         H{ } clone word-histogram set
         H{ } clone message-histogram set
 
-        [
-            analyze-entry
-        ] each
+        [ analyze-entry ] each
 
         errors get
-        word-histogram get
-        message-histogram get
+        word-histogram get 10 recent-histogram
+        message-histogram get 10 recent-histogram
     ] with-scope ;
 
 : histogram. ( assoc quot -- )
     standard-table-style [
-        [ >alist sort-values <reversed> ] dip [
+        [
             [ swapd with-cell pprint-cell ] with-row
         ] curry assoc-each
     ] tabular-output ; inline
 
-: log-entry. ( entry -- )
-    "====== " write
-    {
-        [ date>> (timestamp>string) bl ]
-        [ level>> pprint bl ]
-        [ word-name>> write nl ]
-        [ message>> "\n" join print ]
-    } cleave ;
+: 10-most-recent ( errors -- errors )
+    10 tail* "Only showing 10 most recent errors" print nl ;
 
 : errors. ( errors -- )
-    [ log-entry. ] each ;
+    dup length 10 >= [ 10-most-recent ] when
+    log-entries. ;
 
 : analysis. ( errors word-histogram message-histogram -- )
-    "==== INTERESTING MESSAGES:" print nl
+    nl "==== FREQUENT MESSAGES:" print nl
     "Total: " write dup values sum . nl
     [
-        dup level>> write ": " write message>> "\n" join write
+        [ first name>> write bl ]
+        [ second write ": " write ]
+        [ third "\n" join write ]
+        tri
     ] histogram.
-    nl
-    "==== WORDS:" print nl
+    nl nl
+    "==== FREQUENT WORDS:" print nl
     [ write ] histogram.
-    nl
+    nl nl
     "==== ERRORS:" print nl
     errors. ;
 

@@ -38,16 +38,6 @@ HELP: set-alien-value
 { $description "Stores a value at a byte offset from a base C pointer." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
-HELP: define-deref
-{ $values { "c-type" "a C type" } }
-{ $description "Defines a word " { $snippet "*name" } " with stack effect " { $snippet "( c-ptr -- value )" } " for reading a value with C type " { $snippet "name" } " stored at an alien pointer." }
-{ $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
-
-HELP: define-out
-{ $values { "c-type" "a C type" } }
-{ $description "Defines a word " { $snippet "<" { $emphasis "name" } ">" } " with stack effect " { $snippet "( value -- array )" } ". This word allocates a byte array large enough to hold a value with C type " { $snippet "name" } ", and writes the value at the top of the stack to the array." }
-{ $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
-
 HELP: char
 { $description "This C type represents a one-byte signed integer type. Input values will be converted to " { $link math:integer } "s and truncated to eight bits; output values will be returned as " { $link math:fixnum } "s." } ;
 HELP: uchar
@@ -121,39 +111,10 @@ $nl
 ARTICLE: "c-out-params" "Output parameters in C"
 "A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
 $nl
-"Each numerical C type, together with " { $snippet "void*" } ", has an associated " { $emphasis "out parameter constructor" } " word which takes a Factor object as input, constructs a byte array of the correct size, and converts the Factor object to a C value stored into the byte array:"
-{ $subsections
-    <char>
-    <uchar>
-    <short>
-    <ushort>
-    <int>
-    <uint>
-    <long>
-    <ulong>
-    <longlong>
-    <ulonglong>
-    <float>
-    <double>
-    <void*>
-}
-"You call the out parameter constructor with the required initial value, then pass the byte array to the C function, which receives a pointer to the start of the byte array's data area. The C function then returns, leaving the result in the byte array; you read it back using the next set of words:"
-{ $subsections
-    *char
-    *uchar
-    *short
-    *ushort
-    *int
-    *uint
-    *long
-    *ulong
-    *longlong
-    *ulonglong
-    *float
-    *double
-    *void*
-}
-"Note that while structure and union types do not get these words defined for them, there is no loss of generality since " { $link <void*> } " and " { $link *void* } " may be used." ;
+"To wrap Factor data for consumption by the FFI, we use a utility word that constructs a byte array of the correct size and converts the Factor object to a C value stored into that byte array:"
+{ $subsections <ref> }
+"You call the out parameter constructor with the required initial value, then pass the byte array to the C function, which receives a pointer to the start of the byte array's data area. The C function then returns, leaving the result in the byte array; you read it back using this word:"
+{ $subsections deref } ;
 
 ARTICLE: "c-types.primitives" "Primitive C types"
 "The following numerical types are defined in the " { $vocab-link "alien.c-types" } " vocabulary; a " { $snippet "u" } " prefix denotes an unsigned type:"

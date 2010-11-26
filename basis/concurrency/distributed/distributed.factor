@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: serialize sequences concurrency.messaging threads io
-io.servers.connection io.encodings.binary assocs init
+io.servers io.encodings.binary assocs init
 arrays namespaces kernel accessors ;
 FROM: io.sockets => host-name <inet> with-client ;
 IN: concurrency.distributed
@@ -22,8 +22,6 @@ PRIVATE>
 : get-remote-thread ( name -- thread )
     dup registered-remote-threads at [ ] [ threads at ] ?if ;
 
-SYMBOL: local-node
-
 : handle-node-client ( -- )
     deserialize
     [ first2 get-remote-thread send ] [ stop-this-server ] if* ;
@@ -33,12 +31,6 @@ SYMBOL: local-node
         swap >>insecure
         "concurrency.distributed" >>name
         [ handle-node-client ] >>handler ;
-
-: (start-node) ( addrspec addrspec -- )
-    local-node set-global <node-server> start-server* ;
-
-: start-node ( port -- )
-    host-name over <inet> (start-node) ;
 
 TUPLE: remote-thread node id ;
 
@@ -52,8 +44,7 @@ M: remote-thread send ( message thread -- )
     send-remote-message ;
 
 M: thread (serialize) ( obj -- )
-    id>> [ local-node get-global ] dip <remote-thread>
-    (serialize) ;
+    id>> [ insecure-addr ] dip <remote-thread> (serialize) ;
 
 : stop-node ( node -- )
     f swap send-remote-message ;

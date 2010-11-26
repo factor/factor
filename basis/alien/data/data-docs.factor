@@ -15,8 +15,6 @@ HELP: <c-object>
 { $description "Creates a byte array suitable for holding a value with the given C type." }
 { $errors "Throws an " { $link no-c-type } " error if the type does not exist." } ;
 
-{ <c-object> malloc-object } related-words
-
 HELP: memory>byte-array
 { $values { "alien" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new byte array." } ;
@@ -27,12 +25,6 @@ HELP: malloc-array
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. The vocabulary can be loaded with the " { $link require-c-array } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if the type does not exist, if the requested size is negative, if a direct specialized array class appropriate to the type is not loaded, or if memory allocation fails." } ;
-
-HELP: malloc-object
-{ $values { "type" "a C type" } { "alien" alien } }
-{ $description "Allocates an unmanaged memory block large enough to hold a value of a C type." }
-{ $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
-{ $errors "Throws an error if the type does not exist or if memory allocation fails." } ;
 
 HELP: malloc-byte-array
 { $values { "byte-array" byte-array } { "alien" alien } }
@@ -92,7 +84,6 @@ ARTICLE: "malloc" "Manual memory management"
 $nl
 "Allocating a C datum with a fixed address:"
 { $subsections
-    malloc-object
     malloc-byte-array
 }
 "The " { $vocab-link "libc" } " vocabulary defines several words which directly call C standard library memory management functions:"
