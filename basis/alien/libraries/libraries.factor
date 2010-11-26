@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.strings assocs io.backend
 kernel namespaces destructors sequences strings
-system io.pathnames ;
+system io.pathnames fry ;
 IN: alien.libraries
 
 : dlopen ( path -- dll ) native-string>alien (dlopen) ;
@@ -32,9 +32,15 @@ M: library dispose dll>> [ dispose ] when* ;
 : remove-library ( name -- )
     libraries get delete-at* [ dispose ] [ drop ] if ;
 
+: add-library? ( name path abi -- ? )
+    [ library ] 2dip
+    '[ [ path>> _ = ] [ abi>> _ = ] bi and not ] [ t ] if* ;
+
 : add-library ( name path abi -- )
-    [ 2drop remove-library ]
-    [ <library> swap libraries get set-at ] 3bi ;
+    3dup add-library? [
+        [ 2drop remove-library ]
+        [ <library> swap libraries get set-at ] 3bi
+    ] [ 3drop ] if ;
 
 : library-abi ( library -- abi )
     library [ abi>> ] [ cdecl ] if* ;

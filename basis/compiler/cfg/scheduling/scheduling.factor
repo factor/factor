@@ -3,8 +3,7 @@
 USING: accessors arrays assocs fry kernel locals make math
 namespaces sequences sets combinators.short-circuit
 compiler.cfg.def-use compiler.cfg.dependence
-compiler.cfg.instructions compiler.cfg.liveness compiler.cfg.rpo
-cpu.architecture ;
+compiler.cfg.instructions compiler.cfg.rpo cpu.architecture ;
 IN: compiler.cfg.scheduling
 
 ! Instruction scheduling to reduce register pressure, from:
@@ -130,18 +129,7 @@ ERROR: definition-after-usage vregs old-bb new-bb ;
         ] change-instructions drop
     ] with-scheduling-check ;
 
-! Really, instruction scheduling should be aware that there are
-! multiple types of registers, but this number is just used
-! to decide whether to schedule instructions
-: num-registers ( -- x ) int-regs machine-registers at length ;
-
-: might-spill? ( bb -- ? )
-    [ live-in assoc-size ]
-    [ instructions>> [ defs-vregs length ] map-sum ] bi
-    + num-registers >= ;
-
 : schedule-instructions ( cfg -- cfg' )
     dup [
-        dup { [ kill-block?>> not ] [ might-spill? ] } 1&&
-        [ schedule-block ] [ drop ] if
+        dup kill-block?>> [ drop ] [ schedule-block ] if
     ] each-basic-block ;

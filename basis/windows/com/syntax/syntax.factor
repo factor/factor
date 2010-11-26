@@ -11,7 +11,7 @@ IN: windows.com.syntax
 MACRO: com-invoke ( n return parameters -- )
     [ 2nip length ] 3keep
     '[
-        _ npick *void* _ cell * alien-cell _ _
+        _ npick void* deref _ cell * alien-cell _ _
         stdcall alien-indirect
     ] ;
 

@@ -1,8 +1,21 @@
-IN: io.sockets.tests
 USING: io.sockets io.sockets.private sequences math tools.test
 namespaces accessors kernel destructors calendar io.timeouts
 io.encodings.utf8 io concurrency.promises threads
 io.streams.string ;
+IN: io.sockets.tests
+
+[ T{ inet4 f f 0 } ] [ f 0 <inet4> ] unit-test
+[ T{ inet6 f f 0 } ] [ f 0 <inet6> ] unit-test
+
+[ T{ inet f "google.com" f } ] [ "google.com" f <inet> ] unit-test
+
+[ T{ inet f "google.com" 0 } ] [ "google.com" 0 <inet> ] unit-test
+[ T{ inet f "google.com" 80 } ] [ "google.com" 0 <inet> 80 with-port ] unit-test
+[ T{ inet4 f "8.8.8.8" 0 } ] [ "8.8.8.8" 0 <inet4> ] unit-test
+[ T{ inet4 f "8.8.8.8" 53 } ] [ "8.8.8.8" 0 <inet4> 53 with-port ] unit-test
+[ T{ inet6 f "5:5:5:5:6:6:6:6" 12 } ] [ "5:5:5:5:6:6:6:6" 0 <inet6> 12 with-port ] unit-test
+
+[ T{ inet f "google.com" 80 } ] [ "google.com" 80 with-port ] unit-test
 
 [ B{ 1 2 3 4 } ]
 [ "1.2.3.4" T{ inet4 } inet-pton ] unit-test
@@ -132,3 +145,4 @@ io.streams.string ;
 
 ! Binding to all interfaces should work
 [ ] [ f 0 <inet4> <datagram> dispose ] unit-test
+[ ] [ f 0 <inet6> <datagram> dispose ] unit-test

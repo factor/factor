@@ -15,9 +15,8 @@ IN: io.streams.throwing.tests
 
 [
     [
-        "asdf" <string-reader> &dispose [
-            [ 4 swap stream-read ]
-            [ stream-read1 ] bi
+        "asdf" <string-reader> [
+            4 read read1
         ] stream-throw-on-eof
     ] with-destructors
 ] [ stream-exhausted? ] must-fail-with

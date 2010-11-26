@@ -9,13 +9,14 @@ STRUCT: gc-info
 { scrub-d-count uint }
 { scrub-r-count uint }
 { gc-root-count uint }
+{ derived-root-count uint }
 { return-address-count uint } ;
 
 SINGLETON: fake-cpu
 
 fake-cpu \ cpu set
 
-M: fake-cpu gc-root-offsets ;
+M: fake-cpu gc-root-offset ;
 
 [ ] [
     [
@@ -27,7 +28,7 @@ M: fake-cpu gc-root-offsets ;
 
         50 <byte-array> %
 
-        T{ gc-map f B{ 0 1 1 1 0 } B{ 1 0 } V{ 1 3 } } gc-map-here
+        T{ gc-map f B{ 0 1 1 1 0 } B{ 1 0 } V{ 1 3 } V{ { 2 4 } } } gc-map-here
 
         emit-gc-info
     ] B{ } make
@@ -54,7 +55,10 @@ M: fake-cpu gc-root-offsets ;
             f t f t
         } underlying>> %
 
-        ! Return addresses - 4 bytes
+        ! Derived pointers
+        uint-array{ -1 -1 4 } underlying>> %
+
+        ! Return addresses
         uint-array{ 100 } underlying>> %
 
         ! GC info footer - 16 bytes
@@ -62,6 +66,7 @@ M: fake-cpu gc-root-offsets ;
             { scrub-d-count 5 }
             { scrub-r-count 2 }
             { gc-root-count 4 }
+            { derived-root-count 3 }
             { return-address-count 1 }
         } (underlying)>> %
     ] B{ } make

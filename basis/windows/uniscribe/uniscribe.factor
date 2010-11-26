@@ -42,9 +42,9 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
     f ! piDx
     f ! pTabdef
     f ! pbInClass
-    f <void*> ! pssa
+    f void* <ref> ! pssa
     [ ScriptStringAnalyse ] keep
-    [ ole32-error ] [ |ScriptStringFree *void* ] bi* ;
+    [ ole32-error ] [ |ScriptStringFree void* deref ] bi* ;
 
 : set-dc-colors ( dc font -- )
     [ background>> color>RGB SetBkColor drop ]
@@ -103,7 +103,7 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
 PRIVATE>
 
 M: script-string dispose*
-    ssa>> <void*> ScriptStringFree ole32-error ;
+    ssa>> void* <ref> ScriptStringFree ole32-error ;
 
 SYMBOL: cached-script-strings
 

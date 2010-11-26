@@ -33,7 +33,3 @@ TYPEDEF: char[512] io_string_t
 TYPEDEF: kern_return_t IOReturn
 
 TYPEDEF: uint IOOptionBits
-
-
-
-ALIAS: <time_t> <long>

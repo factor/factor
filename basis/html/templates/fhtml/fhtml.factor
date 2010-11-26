@@ -1,5 +1,5 @@
 ! Copyright (C) 2005 Alex Chapman
-! Copyright (C) 2006, 2009 Slava Pestov
+! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations sequences kernel namespaces debugger
 combinators math quotations generic strings splitting accessors
@@ -26,7 +26,7 @@ M: template-lexer skip-word
 DEFER: <% delimiter
 
 : check-<% ( lexer -- col )
-    "<%" over line-text>> rot column>> start* ;
+    "<%" swap [ line-text>> ] [ column>> ] bi start* ;
 
 : found-<% ( accum lexer col -- accum )
     [
@@ -59,10 +59,10 @@ SYNTAX: %> lexer get parse-%> ;
 : parse-template ( string -- quot )
     [
         [
-        "quiet" on
-        parser-notes off
-        "html.templates.fhtml" use-vocab
-        string-lines parse-template-lines
+            "quiet" on
+            parser-notes off
+            "html.templates.fhtml" use-vocab
+            string-lines parse-template-lines
         ] with-file-vocabs
     ] with-compilation-unit ;
 
@@ -74,6 +74,6 @@ TUPLE: fhtml path ;
 C: <fhtml> fhtml
 
 M: fhtml call-template* ( filename -- )
-    [ path>> utf8 file-contents eval-template ] call( filename -- ) ;
+    path>> utf8 file-contents eval-template ;
 
 INSTANCE: fhtml template

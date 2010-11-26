@@ -7,7 +7,7 @@ ui.clipboards ui.gadgets.worlds ui.gestures ui.event-loop io
 kernel math math.vectors namespaces make sequences strings
 vectors words windows.dwmapi system-info.windows windows.kernel32
 windows.gdi32 windows.user32 windows.opengl32 windows.messages
-windows.types windows.offscreen windows.nt threads libc combinators
+windows.types windows.offscreen windows threads libc combinators
 fry combinators.short-circuit continuations command-line shuffle
 opengl ui.render math.bitwise locals accessors math.rectangles
 math.order calendar ascii sets io.encodings.utf16n
@@ -16,6 +16,7 @@ ui.pixel-formats.private memoize classes colors
 specialized-arrays classes.struct alien.data ;
 FROM: namespaces => set ;
 SPECIALIZED-ARRAY: POINT
+QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
@@ -66,7 +67,7 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
     >WGL_ARB
     [ drop f ] [
         [ [ world>> handle>> hDC>> ] [ handle>> ] bi 0 1 ] dip
-        first <int> { int }
+        first int <ref> { int }
         [ wglGetPixelFormatAttribivARB win32-error=0/f ]
         with-out-parameters
     ] if-empty ;
@@ -168,7 +169,7 @@ M: windows-ui-backend (pixel-format-attribute)
 
 PRIVATE>
 
-: lo-word ( wparam -- lo ) <short> *short ; inline
+: lo-word ( wparam -- lo ) c:short <ref> c:short deref ; inline
 : hi-word ( wparam -- hi ) -16 shift lo-word ; inline
 : >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
 : GET_APPCOMMAND_LPARAM ( lParam -- appCommand )

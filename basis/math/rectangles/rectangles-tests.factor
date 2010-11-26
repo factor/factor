@@ -1,4 +1,5 @@
-USING: tools.test math.rectangles ;
+USING: tools.test math.rectangles prettyprint io.streams.string
+kernel accessors ;
 IN: math.rectangles.tests
 
 [ RECT: { 10 10 } { 20 20 } ]
@@ -40,3 +41,6 @@ IN: math.rectangles.tests
         { 30 30 }
     } rect-containing
 ] unit-test
+
+! Prettyprint for RECT: didn't do nesting check properly
+[ ] [ [ RECT: f f dup >>dim . ] with-string-writer drop ] unit-test

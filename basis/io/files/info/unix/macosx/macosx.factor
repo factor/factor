@@ -13,8 +13,8 @@ TUPLE: macosx-file-system-info < unix-file-system-info
 io-size owner type-id filesystem-subtype ;
 
 M: macosx file-systems ( -- array )
-    f <void*> dup 0 getmntinfo64 dup io-error
-    [ *void* ] dip <direct-statfs64-array>
+    f void* <ref> dup 0 getmntinfo64 dup io-error
+    [ void* deref ] dip <direct-statfs64-array>
     [ f_mntonname>> utf8 alien>string file-system-info ] { } map-as ;
 
 M: macosx new-file-system-info macosx-file-system-info new ;

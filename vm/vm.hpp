@@ -35,7 +35,7 @@ struct factor_vm
 	int callback_id;
 
 	/* Pooling unused contexts to make context allocation cheaper */
-	std::vector<context *> unused_contexts;
+	std::list<context *> unused_contexts;
 
 	/* Active contexts, for tracing by the GC */
 	std::set<context *> active_contexts;
@@ -167,7 +167,6 @@ struct factor_vm
 	void primitive_profiling();
 
 	// errors
-	void throw_error(cell error);
 	void general_error(vm_error_type error, cell arg1, cell arg2);
 	void type_error(cell type, cell tagged);
 	void not_implemented_error();
@@ -330,14 +329,16 @@ struct factor_vm
 		return (Type *)allot_object(Type::type_number,size);
 	}
 
+	inline bool in_data_heap_p(cell pointer)
+	{
+		return (pointer >= data->seg->start && pointer < data->seg->end);
+	}
+
 	inline void check_data_pointer(object *pointer)
 	{
 	#ifdef FACTOR_DEBUG
 		if(!(current_gc && current_gc->op == collect_growing_heap_op))
-		{
-			assert((cell)pointer >= data->seg->start
-				&& (cell)pointer < data->seg->end);
-		}
+			assert(in_data_heap_p((cell)pointer));
 	#endif
 	}
 

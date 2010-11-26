@@ -122,7 +122,7 @@ furnace.auth.features.edit-profile
 furnace.auth.features.deactivate-user
 db.sqlite
 furnace.alloy
-io.servers.connection
+io.servers
 io.sockets.secure ;
 
 : <login-config> ( responder -- responder' )
@@ -162,6 +162,6 @@ io.sockets.secure ;
 : run-todo ( -- )
     <todo-app> main-responder set-global
     todo-db start-expiring
-    <todo-website-server> start-server ;
+    <todo-website-server> start-server drop ;
 
 MAIN: run-todo

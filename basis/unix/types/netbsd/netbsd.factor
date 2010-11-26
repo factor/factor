@@ -17,8 +17,6 @@ TYPEDEF: long           ssize_t
 TYPEDEF: int            pid_t
 TYPEDEF: int            time_t
 
-ALIAS: <time_t> <int>
-
 cell-bits {
     { 32 [ "unix.types.netbsd.32" require ] }
     { 64 [ "unix.types.netbsd.64" require ] }

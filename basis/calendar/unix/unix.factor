@@ -21,7 +21,7 @@ IN: calendar.unix
     timespec>duration since-1970 ;
 
 : get-time ( -- alien )
-    f time <time_t> localtime ;
+    f time time_t <ref> localtime ;
 
 : timezone-name ( -- string )
     get-time zone>> ;

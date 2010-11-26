@@ -1,12 +1,14 @@
 ! Copyright (C) 2007, 2010 Slava Pestov, Doug Coleman,
 ! Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic kernel io.backend namespaces continuations sequences
-arrays io.encodings io.ports io.streams.duplex io.encodings.ascii
-alien.strings io.binary accessors destructors classes byte-arrays
-parser alien.c-types math.parser splitting grouping math assocs
-summary system vocabs.loader combinators present fry vocabs.parser
-classes.struct alien.data strings ;
+USING: accessors alien.c-types alien.data alien.strings arrays
+assocs byte-arrays classes classes.struct combinators
+combinators.short-circuit continuations destructors fry generic
+grouping init io.backend io.binary io.encodings
+io.encodings.ascii io.encodings.binary io.ports
+io.streams.duplex kernel math math.parser memoize namespaces
+parser present sequences splitting strings summary system
+vocabs.loader vocabs.parser ;
 IN: io.sockets
 
 << {
@@ -14,10 +16,14 @@ IN: io.sockets
     { [ os unix? ] [ "unix.ffi" ] }
 } cond use-vocab >>
 
+GENERIC# with-port 1 ( addrspec port -- addrspec )
+
 ! Addressing
 <PRIVATE
 
 UNION: ?string string POSTPONE: f ;
+
+GENERIC: protocol ( addrspec -- n )
 
 GENERIC: protocol-family ( addrspec -- af )
 
@@ -32,8 +38,6 @@ GENERIC: address-size ( addrspec -- n )
 GENERIC: inet-ntop ( data addrspec -- str )
 
 GENERIC: inet-pton ( str addrspec -- data )
-
-GENERIC# with-port 1 ( addrspec port -- addrspec )
 
 : make-sockaddr/size ( addrspec -- sockaddr size )
     [ make-sockaddr ] [ sockaddr-size ] bi ;
@@ -57,6 +61,8 @@ TUPLE: local { path read-only } ;
     normalize-path local boa ;
 
 M: local present path>> "Unix domain socket: " prepend ;
+
+M: local protocol drop 0 ;
 
 SLOT: port
 
@@ -100,10 +106,10 @@ M: ipv4 make-sockaddr ( inet -- sockaddr )
         swap
         [ port>> htons >>port ]
         [ host>> "0.0.0.0" or ]
-        [ inet-pton *uint >>addr ] tri ;
+        [ inet-pton uint deref >>addr ] tri ;
 
 M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
-    [ addr>> <uint> ] dip inet-ntop <ipv4> ;
+    [ addr>> uint <ref> ] dip inet-ntop <ipv4> ;
 
 TUPLE: inet4 < ipv4 { port integer read-only } ;
 
@@ -116,6 +122,8 @@ M: inet4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
 
 M: inet4 present
     [ host>> ] [ port>> number>string ] bi ":" glue ;
+
+M: inet4 protocol drop 0 ;
 
 TUPLE: ipv6 { host ?string read-only } ;
 
@@ -194,6 +202,8 @@ M: inet6 parse-sockaddr
 M: inet6 present
     [ host>> ] [ port>> number>string ] bi ":" glue ;
 
+M: inet6 protocol drop 0 ;
+
 <PRIVATE
 
 GENERIC: (get-local-address) ( handle remote -- sockaddr )
@@ -246,17 +256,27 @@ TUPLE: datagram-port < port addr ;
 
 HOOK: (datagram) io-backend ( addr -- datagram )
 
-: check-datagram-port ( port -- port )
-    dup check-disposed
-    dup datagram-port? [ "Not a datagram port" throw ] unless ; inline
+TUPLE: raw-port < port addr ;
+
+HOOK: (raw) io-backend ( addr -- raw )
 
 HOOK: (receive) io-backend ( datagram -- packet addrspec )
 
-: check-datagram-send ( packet addrspec port -- packet addrspec port )
-    check-datagram-port
+ERROR: invalid-port object ;
+
+: check-port ( packet addrspec port -- packet addrspec port )
     2dup addr>> [ class ] bi@ assert=
     pick class byte-array assert= ;
 
+: check-connectionless-port ( port -- port )
+    dup { [ datagram-port? ] [ raw-port? ] } 1|| [ invalid-port ] unless ;
+    
+: check-send ( packet addrspec port -- packet addrspec port )
+    check-connectionless-port dup check-disposed check-port ;
+    
+: check-receive ( port -- port )
+    check-connectionless-port dup check-disposed ;
+    
 HOOK: (send) io-backend ( packet addrspec datagram -- )
 
 : addrinfo>addrspec ( addrinfo -- addrspec )
@@ -315,14 +335,28 @@ SYMBOL: remote-address
         >>addr
     ] with-destructors ;
 
+: <raw> ( addrspec -- datagram )
+    [
+        [ (raw) |dispose ] keep
+        [ drop raw-port <port> ] [ get-local-address ] 2bi
+        >>addr
+    ] with-destructors ;
+
 : receive ( datagram -- packet addrspec )
-    check-datagram-port
+    check-receive
     [ (receive) ] [ addr>> ] bi parse-sockaddr ;
 
 : send ( packet addrspec datagram -- )
-    check-datagram-send (send) ;
+    check-send (send) ;
+
+MEMO: ipv6-supported? ( -- ? )
+    [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;
+
+[ \ ipv6-supported? reset-memoized ] "io.sockets" add-startup-hook
 
 GENERIC: resolve-host ( addrspec -- seq )
+
+HOOK: resolve-localhost os ( -- obj )
 
 TUPLE: hostname { host ?string read-only } ;
 
@@ -334,12 +368,17 @@ M: inet present
 C: <inet> inet
 
 M: string resolve-host
-    f prepare-addrinfo f <void*>
-    [ getaddrinfo addrinfo-error ] keep *void* addrinfo memory>struct
+    f prepare-addrinfo f void* <ref>
+    [ getaddrinfo addrinfo-error ] keep void* deref addrinfo memory>struct
     [ parse-addrinfo-list ] keep freeaddrinfo ;
+
+M: string with-port <inet> ;
 
 M: hostname resolve-host
     host>> resolve-host ;
+
+M: hostname with-port
+    [ host>> ] dip <inet> ;
 
 M: inet resolve-host
     [ call-next-method ] [ port>> ] bi '[ _ with-port ] map ;
@@ -351,7 +390,13 @@ M: inet6 resolve-host 1array ;
 M: local resolve-host 1array ;
 
 M: f resolve-host
-    drop { T{ ipv6 f "::" } T{ ipv4 f "0.0.0.0" } } ;
+    drop resolve-localhost ;
+
+M: object resolve-localhost
+    ipv6-supported?
+    { T{ ipv4 f "0.0.0.0" } T{ ipv6 f "::" } }
+    { T{ ipv4 f "0.0.0.0" } }
+    ? ;
 
 : host-name ( -- string )
     256 <byte-array> dup dup length gethostname
@@ -382,5 +427,5 @@ M: invalid-local-address summary
 
 {
     { [ os unix? ] [ "io.sockets.unix" require ] }
-    { [ os winnt? ] [ "io.sockets.windows.nt" require ] }
+    { [ os windows? ] [ "io.sockets.windows" require ] }
 } cond

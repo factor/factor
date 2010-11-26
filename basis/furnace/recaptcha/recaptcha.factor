@@ -21,7 +21,7 @@ M: recaptcha call-responder*
 
 <PRIVATE
 
-: (render-recaptcha) ( private-key -- xml )
+: (render-recaptcha) ( url -- xml )
     dup
     [XML
         <script type="text/javascript"

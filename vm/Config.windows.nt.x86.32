@@ -1,5 +1,0 @@
-PLAF_DLL_OBJS += vm/os-windows-nt-x86.32.o
-DLL_PATH=http://factorcode.org/dlls
-WINDRES=windres
-include vm/Config.windows.nt
-include vm/Config.x86.32

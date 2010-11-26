@@ -140,17 +140,18 @@ M: bignum (log2) bignum-log2 ; inline
     [ 2/ ] dip over log2 52 > [ [ 2/ ] [ 1 + ] bi* ] when
     [ unscaled-float ] dip scale-float ; inline
 
+: round-to-nearest ( fraction-and-guard rem -- fraction-and-guard' )
+    over odd?
+    [ zero? [ dup zero? [ 1 + ] unless ] [ 1 + ] if ] [ drop ] if ;
+    inline
+
 ! Main word
 : /f-abs ( m n -- f )
-    over zero? [
-        2drop 0.0
-    ] [
-        [
-            drop 1/0.
-        ] [
+    over zero? [ nip zero? 0/0. 0.0 ? ] [
+        [ drop 1/0. ] [
             pre-scale
             /f-loop
-            [ over odd? [ zero? [ 1 + ] unless ] [ drop ] if ] dip
+            [ round-to-nearest ] dip
             post-scale
         ] if-zero
     ] if ; inline

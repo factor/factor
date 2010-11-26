@@ -1,11 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel accessors sequences fry assocs
-sets math combinators
+sets math combinators deques dlists
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
-compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.dominance
 compiler.cfg.instructions
@@ -15,12 +14,18 @@ compiler.cfg.ssa.construction.tdmsc ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.construction
 
-! The phi placement algorithm is implemented in
-! compiler.cfg.ssa.construction.tdmsc.
+! Iterated dominance frontiers are computed using the DJ Graph
+! method in compiler.cfg.ssa.construction.tdmsc.
 
 ! The renaming algorithm is based on "Practical Improvements to
-! the Construction and Destruction of Static Single Assignment Form",
-! however we construct pruned SSA, not semi-pruned SSA.
+! the Construction and Destruction of Static Single Assignment
+! Form".
+
+! We construct pruned SSA without computing live sets, by
+! building a dependency graph for phi instructions, marking the
+! transitive closure of a vertex as live if it is referenced by
+! some non-phi instruction. Thanks to Cameron Zwarich for the
+! trick.
 
 ! http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.49.9683
 
@@ -50,31 +55,32 @@ M: vreg-insn compute-insn-defs
         [ compute-insn-defs ] with each
     ] simple-analysis ;
 
-! Maps basic blocks to sequences of vregs
-SYMBOL: inserting-phi-nodes
+! Maps basic blocks to sequences of ##phi instructions
+SYMBOL: inserting-phis
 
-: insert-phi-node-later ( vreg bb -- )
-    2dup live-in key? [
-        [ predecessors>> over '[ _ ] H{ } map>assoc \ ##phi new-insn ] keep
-        inserting-phi-nodes get push-at
-    ] [ 2drop ] if ;
+: insert-phi-later ( vreg bb -- )
+    [ predecessors>> over '[ _ ] H{ } map>assoc \ ##phi new-insn ] keep
+    inserting-phis get push-at ;
 
-: compute-phi-nodes-for ( vreg bbs -- )
-    keys merge-set [ insert-phi-node-later ] with each ;
+: compute-phis-for ( vreg bbs -- )
+    keys merge-set [ insert-phi-later ] with each ;
 
-: compute-phi-nodes ( -- )
-    H{ } clone inserting-phi-nodes set
-    defs-multi get defs get '[ _ at compute-phi-nodes-for ] assoc-each ;
+: compute-phis ( -- )
+    H{ } clone inserting-phis set
+    defs-multi get defs get '[ _ at compute-phis-for ] assoc-each ;
 
-: insert-phi-nodes-in ( phis bb -- )
-    [ append ] change-instructions drop ;
+! Maps vregs to ##phi instructions
+SYMBOL: phis
 
-: insert-phi-nodes ( -- )
-    inserting-phi-nodes get [ swap insert-phi-nodes-in ] assoc-each ;
+! Worklist of used vregs, to calculate used phis
+SYMBOL: used-vregs
 
+! Maps vregs to renaming stacks
 SYMBOLS: stacks pushed ;
 
 : init-renaming ( -- )
+    H{ } clone phis set
+    <hashed-dlist>  used-vregs set
     H{ } clone stacks set ;
 
 : gen-name ( vreg -- vreg' )
@@ -84,8 +90,12 @@ SYMBOLS: stacks pushed ;
     [ conjoin stacks get push-at ]
     if ;
 
+: (top-name) ( vreg -- vreg' )
+    stacks get at [ f ] [ last ] if-empty ;
+
 : top-name ( vreg -- vreg' )
-    stacks get at last ;
+    (top-name)
+    dup [ dup used-vregs get push-front ] when ;
 
 RENAMING: ssa-rename [ gen-name ] [ top-name ] [ ]
 
@@ -98,17 +108,22 @@ M: vreg-insn rename-insn
     [ ssa-rename-insn-defs ]
     bi ;
 
-M: ##phi rename-insn
-    ssa-rename-insn-defs ;
+: rename-phis ( bb -- )
+    inserting-phis get at [
+        [
+            [ ssa-rename-insn-defs ]
+            [ dup dst>> phis get set-at ] bi
+        ] each
+    ] when* ;
 
 : rename-insns ( bb -- )
     instructions>> [ rename-insn ] each ;
 
 : rename-successor-phi ( phi bb -- )
-    swap inputs>> [ top-name ] change-at ;
+    swap inputs>> [ (top-name) ] change-at ;
 
 : rename-successor-phis ( succ bb -- )
-    [ inserting-phi-nodes get at ] dip
+    [ inserting-phis get at ] dip
     '[ _ rename-successor-phi ] each ;
 
 : rename-successors-phis ( bb -- )
@@ -119,26 +134,56 @@ M: ##phi rename-insn
 
 : rename-in-block ( bb -- )
     H{ } clone pushed set
-    [ rename-insns ]
-    [ rename-successors-phis ]
-    [
-        pushed get
-        [ dom-children [ rename-in-block ] each ] dip
-        pushed set
-    ] tri
+    {
+        [ rename-phis ]
+        [ rename-insns ]
+        [ rename-successors-phis ]
+        [
+            pushed get
+            [ dom-children [ rename-in-block ] each ] dip
+            pushed set
+        ]
+    } cleave
     pop-stacks ;
 
 : rename ( cfg -- )
     init-renaming
     entry>> rename-in-block ;
 
+! Live phis
+SYMBOL: live-phis
+
+: live-phi? ( ##phi -- ? )
+    dst>> live-phis get key? ;
+
+: compute-live-phis ( -- )
+    H{ } clone live-phis set
+    used-vregs get [
+        phis get at [
+            [
+                dst>>
+                [ live-phis get conjoin ]
+                [ phis get delete-at ]
+                bi
+            ]
+            [ inputs>> [ nip used-vregs get push-front ] assoc-each ] bi
+        ] when*
+    ] slurp-deque ;
+
+: insert-phis-in ( phis bb -- )
+    [ [ live-phi? ] filter! ] dip
+    [ append ] change-instructions drop ;
+
+: insert-phis ( -- )
+    inserting-phis get
+    [ swap insert-phis-in ] assoc-each ;
+
 PRIVATE>
 
 : construct-ssa ( cfg -- cfg' )
     {
-        [ compute-live-sets ]
         [ compute-merge-sets ]
-        [ compute-defs compute-phi-nodes insert-phi-nodes ]
-        [ rename ]
+        [ compute-defs compute-phis ]
+        [ rename compute-live-phis insert-phis ]
         [ ]
     } cleave ;

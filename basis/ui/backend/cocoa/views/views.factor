@@ -332,7 +332,7 @@ CLASS: FactorView < NSOpenGLView NSTextInput
 ]
 
 : sync-refresh-to-screen ( GLView -- )
-    -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 <int>
+    -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 int <ref>
     CGLSetParameter drop ;
 
 : <FactorView> ( dim pixel-format -- view )

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays math io.backend io.files.info
-io.files.windows io.files.windows.nt kernel windows.kernel32
+io.files.windows kernel windows.kernel32
 windows.time windows.types windows accessors alien.c-types
 combinators generalizations system alien.strings
 io.encodings.utf16n sequences splitting windows.errors fry

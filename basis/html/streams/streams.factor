@@ -73,7 +73,7 @@ MACRO: make-css ( pairs -- str )
     span-css-style
     [ swap [XML <span style=<->><-></span> XML] ] unless-empty ; inline
 
-: emit-html ( quot stream -- )
+: emit-html ( stream quot -- )
     dip data>> push ; inline
 
 : image-path ( path -- images-path )

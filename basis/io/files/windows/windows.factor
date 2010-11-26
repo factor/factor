@@ -1,14 +1,215 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.binary io.backend io.files
-io.files.types io.buffers io.encodings.utf16n io.ports
-io.backend.windows kernel math splitting fry alien.strings
-windows windows.kernel32 windows.time windows.types calendar
-combinators math.functions sequences namespaces make words
-system destructors accessors math.bitwise continuations
-windows.errors arrays byte-arrays generalizations alien.data
-literals ;
+USING: accessors alien alien.c-types alien.data alien.strings
+alien.syntax arrays assocs classes.struct combinators
+combinators.short-circuit continuations destructors environment
+io io.backend io.binary io.buffers
+io.encodings.utf16n io.files io.files.private io.files.types
+io.pathnames io.ports io.streams.c io.streams.null io.timeouts
+kernel libc literals locals make math math.bitwise namespaces
+sequences specialized-arrays system
+threads tr windows windows.errors windows.handles
+windows.kernel32 windows.shell32 windows.time windows.types ;
+SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
+
+HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
+HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
+HOOK: add-completion io-backend ( port -- port )
+HOOK: open-append os ( path -- win32-file )
+
+TUPLE: win32-file < win32-handle ptr ;
+
+: <win32-file> ( handle -- win32-file )
+    win32-file new-win32-handle ;
+
+M: win32-file dispose
+    [ cancel-operation ] [ call-next-method ] bi ;
+    
+: opened-file ( handle -- win32-file )
+    check-invalid-handle <win32-file> |dispose add-completion ;
+
+CONSTANT: share-mode
+    flags{
+        FILE_SHARE_READ
+        FILE_SHARE_WRITE
+        FILE_SHARE_DELETE
+    }
+    
+: default-security-attributes ( -- obj )
+    SECURITY_ATTRIBUTES <struct>
+    SECURITY_ATTRIBUTES heap-size >>nLength ;
+
+TUPLE: FileArgs
+    hFile lpBuffer nNumberOfBytesToRead
+    lpNumberOfBytesRet lpOverlapped ;
+
+C: <FileArgs> FileArgs
+
+: make-FileArgs ( port -- <FileArgs> )
+    {
+        [ handle>> check-disposed ]
+        [ handle>> handle>> ]
+        [ buffer>> ]
+        [ buffer>> buffer-length ]
+        [ drop DWORD <c-object> ]
+        [ FileArgs-overlapped ]
+    } cleave <FileArgs> ;
+    
+! Global variable with assoc mapping overlapped to threads
+SYMBOL: pending-overlapped
+
+TUPLE: io-callback port thread ;
+
+C: <io-callback> io-callback
+
+: (make-overlapped) ( -- overlapped-ext )
+    OVERLAPPED malloc-struct &free ;
+
+: make-overlapped ( port -- overlapped-ext )
+    [ (make-overlapped) ] dip
+    handle>> ptr>> [ >>offset ] when* ;
+
+M: winnt FileArgs-overlapped ( port -- overlapped )
+    make-overlapped ;
+
+: <completion-port> ( handle existing -- handle )
+     f 1 CreateIoCompletionPort dup win32-error=0/f ;
+
+SYMBOL: master-completion-port
+
+: <master-completion-port> ( -- handle )
+    INVALID_HANDLE_VALUE f <completion-port> ;
+
+M: winnt add-completion ( win32-handle -- win32-handle )
+    dup handle>> master-completion-port get-global <completion-port> drop ;
+
+: eof? ( error -- ? )
+    { [ ERROR_HANDLE_EOF = ] [ ERROR_BROKEN_PIPE = ] } 1|| ;
+
+: twiddle-thumbs ( overlapped port -- bytes-transferred )
+    [
+        drop
+        [ self ] dip >c-ptr pending-overlapped get-global set-at
+        "I/O" suspend {
+            { [ dup integer? ] [ ] }
+            { [ dup array? ] [
+                first dup eof?
+                [ drop 0 ] [ n>win32-error-string throw ] if
+            ] }
+        } cond
+    ] with-timeout ;
+
+:: wait-for-overlapped ( nanos -- bytes-transferred overlapped error? )
+    nanos [ 1,000,000 /i ] [ INFINITE ] if* :> timeout
+    master-completion-port get-global
+    { int void* pointer: OVERLAPPED }
+    [ timeout GetQueuedCompletionStatus zero? ] with-out-parameters
+    :> ( error? bytes key overlapped )
+    bytes overlapped error? ;
+
+: resume-callback ( result overlapped -- )
+    >c-ptr pending-overlapped get-global delete-at* drop resume-with ;
+
+: handle-overlapped ( nanos -- ? )
+    wait-for-overlapped [
+        [
+            [ drop GetLastError 1array ] dip resume-callback t
+        ] [ drop f ] if*
+    ] [ resume-callback t ] if ;
+
+M: win32-handle cancel-operation
+    [ handle>> CancelIo win32-error=0/f ] unless-disposed ;
+
+M: winnt io-multiplex ( nanos -- )
+    handle-overlapped [ 0 io-multiplex ] when ;
+
+M: winnt init-io ( -- )
+    <master-completion-port> master-completion-port set-global
+    H{ } clone pending-overlapped set-global ;
+
+ERROR: invalid-file-size n ;
+
+: handle>file-size ( handle -- n )
+    0 ulonglong <ref> [ GetFileSizeEx win32-error=0/f ] keep ulonglong deref ;
+
+ERROR: seek-before-start n ;
+
+: set-seek-ptr ( n handle -- )
+    [ dup 0 < [ seek-before-start ] when ] dip ptr<< ;
+
+M: winnt tell-handle ( handle -- n ) ptr>> ;
+
+M: winnt seek-handle ( n seek-type handle -- )
+    swap {
+        { seek-absolute [ set-seek-ptr ] }
+        { seek-relative [ [ ptr>> + ] keep set-seek-ptr ] }
+        { seek-end [ [ handle>> handle>file-size + ] keep set-seek-ptr ] }
+        [ bad-seek-type ]
+    } case ;
+
+: file-error? ( n -- eof? )
+    zero? [
+        GetLastError {
+            { [ dup expected-io-error? ] [ drop f ] }
+            { [ dup eof? ] [ drop t ] }
+            [ n>win32-error-string throw ]
+        } cond
+    ] [ f ] if ;
+
+: wait-for-file ( FileArgs n port -- n )
+    swap file-error?
+    [ 2drop 0 ] [ [ lpOverlapped>> ] dip twiddle-thumbs ] if ;
+
+: update-file-ptr ( n port -- )
+    handle>> dup ptr>> [ rot + >>ptr drop ] [ 2drop ] if* ;
+
+: finish-write ( n port -- )
+    [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
+
+: setup-read ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRead lpOverlapped )
+    {
+        [ hFile>> ]
+        [ lpBuffer>> buffer-end ]
+        [ lpBuffer>> buffer-capacity ]
+        [ lpNumberOfBytesRet>> ]
+        [ lpOverlapped>> ]
+    } cleave ;
+
+: setup-write ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToWrite lpNumberOfBytesWritten lpOverlapped )
+    {
+        [ hFile>> ]
+        [ lpBuffer>> buffer@ ]
+        [ lpBuffer>> buffer-length ]
+        [ lpNumberOfBytesRet>> ]
+        [ lpOverlapped>> ]
+    } cleave ;
+    
+M: winnt (wait-to-write)
+    [
+        [ make-FileArgs dup setup-write WriteFile ]
+        [ wait-for-file ]
+        [ finish-write ]
+        tri
+    ] with-destructors ;
+
+: finish-read ( n port -- )
+    [ update-file-ptr ] [ buffer>> n>buffer ] 2bi ;
+
+M: winnt (wait-to-read) ( port -- )
+    [
+        [ make-FileArgs dup setup-read ReadFile ]
+        [ wait-for-file ]
+        [ finish-read ]
+        tri
+    ] with-destructors ;
+
+: console-app? ( -- ? ) GetConsoleWindow >boolean ;
+
+M: winnt init-stdio
+    console-app?
+    [ init-c-stdio ]
+    [ null-reader null-writer null-writer set-stdio ] if ;
 
 : open-file ( path access-mode create-mode flags -- handle )
     [
@@ -48,44 +249,8 @@ IN: io.files.windows
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length method -- )
-    [ [ handle>> ] dip d>w/w <uint> ] dip SetFilePointer
+    [ [ handle>> ] dip d>w/w uint <ref> ] dip SetFilePointer
     INVALID_SET_FILE_POINTER = [ "SetFilePointer failed" throw ] when ;
-
-HOOK: open-append os ( path -- win32-file )
-
-TUPLE: FileArgs
-    hFile lpBuffer nNumberOfBytesToRead
-    lpNumberOfBytesRet lpOverlapped ;
-
-C: <FileArgs> FileArgs
-
-: make-FileArgs ( port -- <FileArgs> )
-    {
-        [ handle>> check-disposed ]
-        [ handle>> handle>> ]
-        [ buffer>> ]
-        [ buffer>> buffer-length ]
-        [ drop DWORD <c-object> ]
-        [ FileArgs-overlapped ]
-    } cleave <FileArgs> ;
-
-: setup-read ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRead lpOverlapped )
-    {
-        [ hFile>> ]
-        [ lpBuffer>> buffer-end ]
-        [ lpBuffer>> buffer-capacity ]
-        [ lpNumberOfBytesRet>> ]
-        [ lpOverlapped>> ]
-    } cleave ;
-
-: setup-write ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToWrite lpNumberOfBytesWritten lpOverlapped )
-    {
-        [ hFile>> ]
-        [ lpBuffer>> buffer@ ]
-        [ lpBuffer>> buffer-length ]
-        [ lpNumberOfBytesRet>> ]
-        [ lpOverlapped>> ]
-    } cleave ;
 
 M: windows (file-reader) ( path -- stream )
     open-read <input-port> ;
@@ -101,7 +266,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
 +sparse-file+ +reparse-point+ +compressed+ +offline+
 +not-content-indexed+ +encrypted+ ;
 
-: win32-file-attribute ( n attr symbol -- )
+: win32-file-attribute ( n symbol attr -- )
     rot mask? [ , ] [ drop ] if ;
 
 : win32-file-attributes ( n -- seq )
@@ -130,3 +295,59 @@ SYMBOLS: +read-only+ +hidden+ +system+
 : (set-file-times) ( handle timestamp/f timestamp/f timestamp/f -- )
     [ timestamp>FILETIME ] tri@
     SetFileTime win32-error=0/f ;
+
+M: winnt cwd
+    MAX_UNICODE_PATH dup <ushort-array>
+    [ GetCurrentDirectory win32-error=0/f ] keep
+    utf16n alien>string ;
+
+M: winnt cd
+    SetCurrentDirectory win32-error=0/f ;
+
+CONSTANT: unicode-prefix "\\\\?\\"
+
+M: winnt root-directory? ( path -- ? )
+    {
+        { [ dup empty? ] [ drop f ] }
+        { [ dup [ path-separator? ] all? ] [ drop t ] }
+        { [ dup trim-tail-separators { [ length 2 = ]
+          [ second CHAR: : = ] } 1&& ] [ drop t ] }
+        { [ dup unicode-prefix head? ]
+          [ trim-tail-separators length unicode-prefix length 2 + = ] }
+        [ drop f ]
+    } cond ;
+
+: prepend-prefix ( string -- string' )
+    dup unicode-prefix head? [
+        unicode-prefix prepend
+    ] unless ;
+
+TR: normalize-separators "/" "\\" ;
+
+M: winnt normalize-path ( string -- string' )
+    absolute-path
+    normalize-separators
+    prepend-prefix ;
+
+M: winnt CreateFile-flags ( DWORD -- DWORD )
+    FILE_FLAG_OVERLAPPED bitor ;
+
+<PRIVATE
+
+: windows-file-size ( path -- size )
+    normalize-path 0 WIN32_FILE_ATTRIBUTE_DATA <struct>
+    [ GetFileAttributesEx win32-error=0/f ] keep
+    [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit ;
+
+PRIVATE>
+
+M: winnt open-append
+    [ dup windows-file-size ] [ drop 0 ] recover
+    [ (open-append) ] dip >>ptr ;
+
+M: winnt home
+    {
+        [ "HOMEDRIVE" os-env "HOMEPATH" os-env append-path ]
+        [ "USERPROFILE" os-env ]
+        [ my-documents ]
+    } 0|| ;

@@ -3,7 +3,7 @@ multiline io.streams.string io.encodings.utf8 io.encodings.8-bit
 io.encodings.binary io.encodings.string io.encodings.ascii kernel
 arrays splitting sequences assocs io.sockets db db.sqlite
 continuations urls hashtables accessors namespaces xml.data
-io.encodings.8-bit.latin1 ;
+io.encodings.8-bit.latin1 random combinators.short-circuit ;
 IN: http.tests
 
 [ "text/plain" "UTF-8" ] [ "text/plain" parse-content-type ] unit-test
@@ -16,6 +16,8 @@ IN: http.tests
 
 [ "localhost" f ] [ "localhost" parse-host ] unit-test
 [ "localhost" 8888 ] [ "localhost:8888" parse-host ] unit-test
+[ "::1" 8888 ] [ "::1:8888" parse-host ] unit-test
+[ "127.0.0.1" 8888 ] [ "127.0.0.1:8888" parse-host ] unit-test
 
 [ "localhost" ] [ T{ url { protocol "http" } { host "localhost" } } unparse-host ] unit-test
 [ "localhost" ] [ T{ url { protocol "http" } { host "localhost" } { port 80 } } unparse-host ] unit-test
@@ -205,7 +207,7 @@ Set-Cookie: oo="bar; a=b"; comment="your mom"; httponly=yes
 ! Live-fire exercise
 USING: http.server.static furnace.sessions furnace.alloy
 furnace.actions furnace.auth furnace.auth.login furnace.db
-io.servers.connection io.files io.files.temp io.directories io
+io.servers io.files io.files.temp io.directories io
 threads
 http.server.responses http.server.redirection furnace.redirection
 http.server.dispatchers db.tuples ;
@@ -219,21 +221,31 @@ http.server.dispatchers db.tuples ;
 
 : test-db ( -- db ) test-db-file <sqlite-db> ;
 
-[ test-db-file delete-file ] ignore-errors
-
-test-db [
-    init-furnace-tables
-] with-db
-
 : test-httpd ( responder -- )
     [
         main-responder set
         <http-server>
             0 >>insecure
             f >>secure
-        dup start-server*
-        sockets>> first addr>> port>>
-    ] with-scope "port" set ;
+        start-server
+        threaded-server set
+        server-addrs random
+    ] with-scope "addr" set ;
+
+: add-addr ( url -- url' )
+    >url clone "addr" get set-url-addr ;
+
+: stop-test-httpd ( -- )
+    "http://localhost/quit" add-addr http-get nip
+    "Goodbye" assert= ;
+
+[ ] [
+    [ test-db-file delete-file ] ignore-errors
+
+    test-db [
+        init-furnace-tables
+    ] with-db
+] unit-test
 
 [ ] [
     <dispatcher>
@@ -248,19 +260,16 @@ test-db [
     test-httpd
 ] unit-test
 
-: add-port ( url -- url' )
-    >url clone "port" get >>port ;
-
 [ t ] [
     "vocab:http/test/foo.html" ascii file-contents
-    "http://localhost/nested/foo.html" add-port http-get nip =
+    "http://localhost/nested/foo.html" add-addr http-get nip =
 ] unit-test
 
-[ "http://localhost/redirect-loop" add-port http-get nip ]
+[ "http://localhost/redirect-loop" add-addr http-get nip ]
 [ too-many-redirects? ] must-fail-with
 
 [ "Goodbye" ] [
-    "http://localhost/quit" add-port http-get nip
+    "http://localhost/quit" add-addr http-get nip
 ] unit-test
 
 ! HTTP client redirect bug
@@ -274,12 +283,12 @@ test-db [
 ] unit-test
 
 [ "Goodbye" ] [
-    "http://localhost/redirect" add-port http-get nip
+    "http://localhost/redirect" add-addr http-get nip
 ] unit-test
 
 
 [ ] [
-    [ "http://localhost/quit" add-port http-get 2drop ] ignore-errors
+    [ stop-test-httpd ] ignore-errors
 ] unit-test
 
 ! Dispatcher bugs
@@ -298,15 +307,20 @@ test-db [
     test-httpd
 ] unit-test
 
-: 404? ( response -- ? ) [ download-failed? ] [ response>> code>> 404 = ] bi and ;
+: 404? ( response -- ? )
+    {
+        [ download-failed? ]
+        [ response>> response? ]
+        [ response>> code>> 404 = ]
+    } 1&& ;
 
 ! This should give a 404 not an infinite redirect loop
-[ "http://localhost/d/blah" add-port http-get nip ] [ 404? ] must-fail-with
+[ "http://localhost/d/blah" add-addr http-get nip ] [ 404? ] must-fail-with
 
 ! This should give a 404 not an infinite redirect loop
-[ "http://localhost/blah/" add-port http-get nip ] [ 404? ] must-fail-with
+[ "http://localhost/blah/" add-addr http-get nip ] [ 404? ] must-fail-with
 
-[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
 
 [ ] [
     <dispatcher>
@@ -320,9 +334,9 @@ test-db [
     test-httpd
 ] unit-test
 
-[ "Hi" ] [ "http://localhost/" add-port http-get nip ] unit-test
+[ "Hi" ] [ "http://localhost/" add-addr http-get nip ] unit-test
 
-[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
 
 USING: html.components html.forms
 xml xml.traversal validators
@@ -352,7 +366,7 @@ SYMBOL: a
     string>xml body>> "input" deep-tag-named "value" attr ;
 
 [ "3" ] [
-    "http://localhost/" add-port http-get
+    "http://localhost/" add-addr http-get
     swap dup cookies>> "cookies" set session-id-key get-cookie
     value>> "session-id" set test-a
 ] unit-test
@@ -360,10 +374,10 @@ SYMBOL: a
 [ "4" ] [
     [
         "4" "a" set
-        "http://localhost" add-port "__u" set
+        "http://localhost" add-addr "__u" set
         "session-id" get session-id-key set
     ] H{ } make-assoc
-    "http://localhost/" add-port <post-request> "cookies" get >>cookies http-request nip test-a
+    "http://localhost/" add-addr <post-request> "cookies" get >>cookies http-request nip test-a
 ] unit-test
 
 [ 4 ] [ a get-global ] unit-test
@@ -372,15 +386,15 @@ SYMBOL: a
 [ "xyz" ] [
     [
         "xyz" "a" set
-        "http://localhost" add-port "__u" set
+        "http://localhost" add-addr "__u" set
         "session-id" get session-id-key set
     ] H{ } make-assoc
-    "http://localhost/" add-port <post-request> "cookies" get >>cookies http-request nip test-a
+    "http://localhost/" add-addr <post-request> "cookies" get >>cookies http-request nip test-a
 ] unit-test
 
 [ 4 ] [ a get-global ] unit-test
 
-[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
 
 ! Test cloning
 [ f ] [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test
@@ -398,11 +412,11 @@ SYMBOL: a
 ] unit-test
 
 [ t ] [
-    "http://localhost/" add-port http-get nip
+    "http://localhost/" add-addr http-get nip
     "vocab:http/test/foo.html" ascii file-contents =
 ] unit-test
 
-[ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
+[ ] [ stop-test-httpd ] unit-test
 
 ! Check behavior of 307 redirect (reported by Chris Double)
 [ ] [
@@ -420,13 +434,25 @@ SYMBOL: a
     test-httpd
 ] unit-test
 
-[ "OK" ] [ "data" "http://localhost/a" add-port http-post nip ] unit-test
+[ "OK" ] [ "data" "http://localhost/a" add-addr http-post nip ] unit-test
 
 ! Check that download throws errors (reported by Chris Double)
 [
     "resource:temp" [
-        "http://localhost/tweet_my_twat" add-port download
+        "http://localhost/tweet_my_twat" add-addr download
     ] with-directory
 ] must-fail
 
-[ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
+[ ] [ stop-test-httpd ] unit-test
+
+! Check that index.fhtml works
+[ ] [
+    <dispatcher>
+        "resource:basis/http/test/" <static> enable-fhtml >>default
+        add-quit-action
+    test-httpd
+] unit-test
+
+[ "OK\n\n" ] [ "http://localhost/" add-addr http-get nip ] unit-test
+
+[ ] [ stop-test-httpd ] unit-test
