@@ -24,20 +24,26 @@ HELP: HINTS:
 { $description "Defines specialization hints for a word or a method."
 $nl
 "Each sequence in the list will cause a specialized version of the word to be compiled. Classes are tested for using their predicate, and literals are tested using " { $link eq? } "." }
-{ $examples "The " { $link append } " word has a specializer for the very common case where two strings or two arrays are appended:"
-{ $code "HINTS: append { string string } { array array } ;" }
-"Specializers can also be defined on methods:"
-{ $code
-    "GENERIC: count-occurrences ( elt obj -- n )"
-    ""
-    "M: sequence count-occurrences [ = ] with count ;"
-    ""
-    "M: assoc count-occurrences"
-    "    swap [ = nip ] curry assoc-filter assoc-size ;"
-    ""
-    "HINTS: M\ sequence count-occurrences { object array } ;"
-    "HINTS: M\ assoc count-occurrences { object hashtable } ;"
-}
+{ $examples
+    "The " { $link append } " word has a specializer for the very common case where two strings or two arrays are appended:"
+    { $code
+        "USING: arrays hints sequences strings syntax ;"
+        "HINTS: append { string string } { array array } ;"
+    }
+    "Specializers can also be defined on methods:"
+    { $code
+        "USING: assocs hashtables hints kernel sequences"
+        "syntax ;"
+        "GENERIC: count-occurrences ( elt obj -- n )"
+        ""
+        "M: sequence count-occurrences [ = ] with count ;"
+        ""
+        "M: assoc count-occurrences"
+        "    swap [ = nip ] curry assoc-filter assoc-size ;"
+        ""
+        "HINTS: M\\ sequence count-occurrences { object array } ;"
+        "HINTS: M\\ assoc count-occurrences { object hashtable } ;"
+    }
 } ;
 
 ABOUT: "hints"
