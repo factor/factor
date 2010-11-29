@@ -28,7 +28,7 @@ HELP: uses
 { $notes "The sequence might include the definition itself, if it is a recursive word." }
 { $examples
     "We can ask the " { $link sq } " word to produce a list of words it calls:"
-    { $unchecked-example "\ sq uses ." "{ dup * }" }
+    { $unchecked-example "\\ sq uses ." "{ dup * }" }
 } ;
 
 HELP: crossref
