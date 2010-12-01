@@ -427,8 +427,10 @@ MACRO: fortran-invoke ( return library function parameters -- )
     { [ 2drop nip set-fortran-abi ] [ (fortran-invoke) ] } 4 ncleave ;
 
 : parse-arglist ( parameters return -- types effect )
-    [ 2 group unzip [ "," ?tail drop ] map ]
-    [ [ { } ] [ 1array ] if-void ]
+    [ 2 group
+        [ unzip [ "," ?tail drop ] map ]
+        [ [ first "!" head? ] filter [ second "," ?tail drop "'" append ] map ] bi
+    ] [ [ { } ] [ 1array ] if-void swap append ]
     bi* <effect> ;
 
 :: define-fortran-function ( return library function parameters -- )
