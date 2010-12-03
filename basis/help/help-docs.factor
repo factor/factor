@@ -476,7 +476,7 @@ HELP: HELP:
 { $description "Defines documentation for a word." }
 { $examples
     { $code
-        "USING: help help.markup help.syntax math syntax ;"
+        "USING: help help.markup help.syntax math ;"
         ": foo ( m -- n ) 2 + ;"
         "HELP: foo"
         "{ $values { \"m\" \"an integer\" } { \"n\" \"an integer\" } }"
