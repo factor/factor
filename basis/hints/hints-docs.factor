@@ -27,13 +27,12 @@ $nl
 { $examples
     "The " { $link append } " word has a specializer for the very common case where two strings or two arrays are appended:"
     { $code
-        "USING: arrays hints sequences strings syntax ;"
+        "USING: arrays hints sequences strings ;"
         "HINTS: append { string string } { array array } ;"
     }
     "Specializers can also be defined on methods:"
     { $code
-        "USING: assocs hashtables hints kernel sequences"
-        "syntax ;"
+        "USING: assocs hashtables hints kernel sequences ;"
         "GENERIC: count-occurrences ( elt obj -- n )"
         ""
         "M: sequence count-occurrences [ = ] with count ;"
