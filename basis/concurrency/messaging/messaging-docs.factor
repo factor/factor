@@ -1,35 +1,35 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup 
+USING: help.syntax help.markup
 threads kernel arrays quotations strings ;
 IN: concurrency.messaging
 
 HELP: send
-{ $values { "message" object } 
-          { "thread" thread } 
+{ $values { "message" object }
+          { "thread" thread }
 }
-{ $description "Send the message to the thread by placing it in the threads mailbox. This is an asynchronous operation and will return immediately. The receving thread will act on the message the next time it retrieves that item from its mailbox (usually using the " { $link receive } " word. The message can be any Factor object. For destinations that are instances of remote-thread the message must be a serializable Factor type." } 
+{ $description "Send the message to the thread by placing it in the threads mailbox. This is an asynchronous operation and will return immediately. The receiving thread will act on the message the next time it retrieves that item from its mailbox (usually using the " { $link receive } " word. The message can be any Factor object. For destinations that are instances of remote-thread the message must be a serializable Factor type." }
 { $see-also receive receive-if } ;
 
 HELP: receive
-{ $values { "message" object } 
+{ $values { "message" object }
 }
-{ $description "Return a message from the current threads mailbox. If the box is empty, suspend the thread until another thread places an item in the mailbox (usually via the " { $link send } " word." } 
+{ $description "Return a message from the current threads mailbox. If the box is empty, suspend the thread until another thread places an item in the mailbox (usually via the " { $link send } " word." }
 { $see-also send receive-if } ;
 
 HELP: receive-if
-{ $values { "pred" "a predicate with stack effect " { $snippet "( obj -- ? )" } }  
-          { "message" object } 
+{ $values { "pred" "a predicate with stack effect " { $snippet "( obj -- ? )" } }
+          { "message" object }
 }
-{ $description "Return the first message from the current threads mailbox that satisfies the predicate. To satisfy the predicate, " { $snippet "pred" } " is called with the item on the stack and the predicate should leave a boolean indicating whether it was satisfied or not. If nothing in the mailbox satisfies the predicate then the thread will block until something does." } 
+{ $description "Return the first message from the current threads mailbox that satisfies the predicate. To satisfy the predicate, " { $snippet "pred" } " is called with the item on the stack and the predicate should leave a boolean indicating whether it was satisfied or not. If nothing in the mailbox satisfies the predicate then the thread will block until something does." }
 { $see-also send receive } ;
 
 HELP: spawn-linked
 { $values { "quot" quotation }
           { "name" string }
-          { "thread" thread } 
+          { "thread" thread }
 }
-{ $description "Start a thread which runs the given quotation. If that quotation throws an error which is not caught then the error will get propagated to the thread that spawned it. This can be used to set up 'supervisor' threads that restart child threads that crash due to uncaught errors.\n" } 
+{ $description "Start a thread which runs the given quotation. If that quotation throws an error which is not caught then the error will get propagated to the thread that spawned it. This can be used to set up 'supervisor' threads that restart child threads that crash due to uncaught errors.\n" }
 { $see-also spawn } ;
 
 ARTICLE: { "concurrency" "messaging" } "Sending and receiving messages"
@@ -65,15 +65,15 @@ ARTICLE: { "concurrency" "synchronous-sends" } "Synchronous sends"
 } ;
 
 ARTICLE: { "concurrency" "exceptions" } "Linked exceptions"
-"A thread can handle exceptions using the standard Factor exception handling mechanism. If an exception is uncaught the thread will terminate. For example:" 
-{ $code "[ 1 0 / \"This will not print\" print ] \"division-by-zero\" spawn" } 
+"A thread can handle exceptions using the standard Factor exception handling mechanism. If an exception is uncaught the thread will terminate. For example:"
+{ $code "[ 1 0 / \"This will not print\" print ] \"division-by-zero\" spawn" }
 "Processes can be linked so that a parent thread can receive the exception that caused the child thread to terminate. In this way 'supervisor' threads can be created that are notified when child threads terminate and possibly restart them."
 { $subsections spawn-linked }
 "This will create a unidirectional link, such that if an uncaught exception causes the child to terminate, the parent thread can catch it:"
 { $code "["
 "  [ 1 0 / \"This will not print\" print ] \"linked-division\" spawn-linked drop"
 "  receive"
-"] [ \"Exception caught.\" print ] recover" } 
+"] [ \"Exception caught.\" print ] recover" }
 "Exceptions are only raised in the parent when the parent does a " { $link receive } " or " { $link receive-if } ". This is because the exception is sent from the child to the parent as a message." ;
 
 ARTICLE: "concurrency.messaging" "Message-passing concurrency"
