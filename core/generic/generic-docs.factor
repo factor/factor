@@ -129,7 +129,7 @@ HELP: define-generic
 HELP: M\
 { $syntax "M\\ class generic" }
 { $class-description "Pushes a method on the stack." }
-{ $examples { $code "M\\ fixnum + see" } { $code "USING: ui.gadgets ui.gadgets.editors ;" "M\\ editor draw-gadget* edit" } } ;
+{ $examples { $code "M\\ fixnum + see" } { $code "USING: ui.gadgets.editors ui.render ;" "M\\ editor draw-gadget* edit" } } ;
 
 HELP: method
 { $values { "class" class } { "generic" generic } { "method/f" { $maybe method } } }
