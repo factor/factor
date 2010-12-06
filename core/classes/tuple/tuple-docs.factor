@@ -190,7 +190,7 @@ $nl
 { $subsections
     "tuple-inheritance-example"
     "tuple-inheritance-anti-example"
-} 
+}
 "Declaring a tuple class final prohibits other classes from subclassing it:"
 { $subsections POSTPONE: final }
 { $see-also "call-next-method" "parametrized-constructors" "unions" "mixins" } ;
@@ -215,12 +215,14 @@ ARTICLE: "tuple-examples" "Tuple examples"
 { $table
     { "Reader" "Writer" "Setter" "Changer" }
     { { $snippet "name>>" } { $snippet "name<<" } { $snippet ">>name" } { $snippet "change-name" } }
+    { { $snippet "position>>" } { $snippet "position<<" } { $snippet ">>position" } { $snippet "change-position" } }
     { { $snippet "salary>>" } { $snippet "salary<<" } { $snippet ">>salary" } { $snippet "change-salary" } }
-    { { $snippet "position>>" } { $snippet "position<<" } { $snippet ">>position" } { $snippet "change-position" }   }
 }
 "We can define a constructor which makes an empty employee:"
-{ $code ": <employee> ( -- employee )"
-    "    employee new ;" }
+{ $code
+    ": <employee> ( -- employee )"
+    "    employee new ;"
+}
 "Or we may wish the default constructor to always give employees a starting salary:"
 { $code
     ": <employee> ( -- employee )"
