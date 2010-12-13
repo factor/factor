@@ -61,6 +61,7 @@ $nl
 "The " { $snippet "style" } " hashtable holds table style information. See " { $link "table-styles" } "." }
 { $examples
     { $code
+        "USING: io.styles prettyprint sequences ;"
         "{ { 1 2 } { 3 4 } }"
         "H{ { table-gap { 10 10 } } } ["
         "    [ [ [ [ . ] with-cell ] each ] with-row ] each"
@@ -201,12 +202,13 @@ HELP: bold-italic
 { $description "A value for the " { $link font-style } " character style denoting boldface italicized text." } ;
 
 HELP: foreground
-{ $description "Character style. An instance of " { $link color } ". See " { $link "colors" } "." } 
+{ $description "Character style. An instance of " { $link color } ". See " { $link "colors" } "." }
 { $examples
     { $code
+        "USING: colors.gray io.styles hashtables sequences kernel math ;"
         "10 iota ["
-            "    \"Hello world\\n\""
-            "    swap 10 / 1 <gray> foreground associate format"
+        "    \"Hello world\\n\""
+        "    swap 10 / 1 <gray> foreground associate format"
         "] each"
     }
 } ;
@@ -215,10 +217,11 @@ HELP: background
 { $description "Character style. An instance of " { $link color } ". See " { $link "colors" } "." }
 { $examples
     { $code
+        "USING: colors hashtables io io.styles kernel math sequences ;"
         "10 iota ["
-            "    \"Hello world\\n\""
-            "    swap 10 / 1 over - over 1 <rgba>"
-            "    background associate format nl"
+        "    \"Hello world\\n\""
+        "    swap 10 / 1 over - over 1 <rgba>"
+        "    background associate format nl"
         "] each"
     }
 } ;
@@ -227,14 +230,20 @@ HELP: font-name
 { $description "Character style. Font family named by a string." }
 { $examples
     "This example outputs some different font sizes:"
-    { $code "{ \"monospace\" \"serif\" \"sans-serif\" }\n[ dup font-name associate format nl ] each" }
+    { $code
+        "USING: hashtables io io.styles kernel sequences ;"
+        "{ \"monospace\" \"serif\" \"sans-serif\" }"
+        "[ dup font-name associate format nl ] each"
+    }
 } ;
 
 HELP: font-size
 { $description "Character style. Font size, an integer." }
 { $examples
     "This example outputs some different font sizes:"
-    { $code "{ 12 18 24 72 }"
+    { $code
+        "USING: hashtables io io.styles kernel sequences ;"
+        "{ 12 18 24 72 }"
         "[ \"Bigger\" swap font-size associate format nl ] each"
     }
 }  ;
@@ -243,28 +252,44 @@ HELP: font-style
 { $description "Character style. Font style, one of " { $link plain } ", " { $link bold } ", " { $link italic } ", or " { $link bold-italic } "." }
 { $examples
     "This example outputs text in all three styles:"
-    { $code "{ plain bold italic bold-italic }\n[ [ name>> ] keep font-style associate format nl ] each" }
+    { $code
+        "USING: accessors hashtables io io.styles kernel sequences ;"
+        "{ plain bold italic bold-italic }"
+        "[ [ name>> ] keep font-style associate format nl ] each"
+    }
 }  ;
 
 HELP: presented
 { $description "Character and paragraph style. An object associated with the text. In the Factor UI, this is shown as a clickable presentation of the object; left-clicking invokes a default command, and right-clicking shows a menu of commands." } ;
 
 HELP: page-color
-{ $description "Paragraph style. An instance of " { $link color } ". See " { $link "colors" } "." } 
+{ $description "Paragraph style. An instance of " { $link color } ". See " { $link "colors" } "." }
 { $examples
-    { $code "H{ { page-color T{ rgba f 1 0.8 0.5 1 } } }\n[ \"A background\" write ] with-nesting nl" }
+    { $code
+        "USING: colors io io.styles ;"
+        "H{ { page-color T{ rgba f 1 0.8 0.5 1 } } }"
+        "[ \"A background\" write ] with-nesting nl"
+    }
 } ;
 
 HELP: border-color
 { $description "Paragraph style. An instance of " { $link color } ". See " { $link "colors" } "." }
 { $examples
-    { $code "H{ { border-color T{ rgba f 1 0 0 1 } } }\n[ \"A border\" write ] with-nesting nl" }
+    { $code
+        "USING: colors io io.styles ;"
+        "H{ { border-color T{ rgba f 1 0 0 1 } } }"
+        "[ \"A border\" write ] with-nesting nl"
+    }
 } ;
 
 HELP: inset
-{ $description "Paragraph style. A pair of integers representing the number of pixels that the content should be inset from the border. The first number is the horizontal inset, and the second is the vertical inset." } 
+{ $description "Paragraph style. A pair of integers representing the number of pixels that the content should be inset from the border. The first number is the horizontal inset, and the second is the vertical inset." }
 { $examples
-    { $code "H{ { inset { 10 10 } } }\n[ \"Some inset text\" write ] with-nesting nl" }
+    { $code
+        "USING: io io.styles ;"
+        "H{ { inset { 10 10 } } }"
+        "[ \"Some inset text\" write ] with-nesting nl"
+    }
 } ;
 
 HELP: wrap-margin
@@ -284,7 +309,10 @@ HELP: input
 { $class-description "Class of input text presentations. Instances can be used passed to " { $link write-object } " to output a clickable piece of input. Input text presentations are created by calling " { $link <input> } "." }
 { $examples
     "This presentation class is used for the code examples you see in the online help:"
-    { $code "\"2 3 + .\" dup <input> write-object nl" }
+    { $code
+        "USING: io io.styles kernel ;"
+        "\"2 3 + .\" dup <input> write-object nl"
+    }
 } ;
 
 HELP: <input>
