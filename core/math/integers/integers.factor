@@ -121,12 +121,16 @@ M: bignum (log2) bignum-log2 ; inline
     [ /mod ] dip ; inline
 
 ! Third step: post-scaling
-: scaled-float ( mantissa scale -- n )
-    [ 52 2^ 1 - bitand ] dip 1022 + 52 shift bitor bits>double ; inline
+: scale-float ( mantissa scale -- float' )
+    {
+        { [ dup 1024 > ] [ 2drop 1/0. ] }
+        { [ dup -1023 < ] [ 1021 + shift bits>double ] }
+        [ [ 52 2^ 1 - bitand ] dip 1022 + 52 shift bitor bits>double ]
+    } cond ; inline
 
 : post-scale ( mantissa scale -- n )
     [ 2/ ] dip over log2 52 > [ [ 2/ ] [ 1 + ] bi* ] when
-    scaled-float ; inline
+    scale-float ; inline
 
 : round-to-nearest ( fraction-and-guard rem -- fraction-and-guard' )
     over odd?
