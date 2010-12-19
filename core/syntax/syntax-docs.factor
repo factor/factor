@@ -533,13 +533,14 @@ HELP: QUALIFIED:
 { $examples { $example
     "USING: prettyprint ;"
     "QUALIFIED: math"
-    "1 2 math:+ ." "3"
+    "1 2 math:+ ."
+    "3"
 } } ;
 
 HELP: QUALIFIED-WITH:
 { $syntax "QUALIFIED-WITH: vocab word-prefix" }
 { $description "Like " { $link POSTPONE: QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
-{ $examples { $code
+{ $examples { $example
     "USING: prettyprint ;"
     "QUALIFIED-WITH: math m"
     "1 2 m:+ ."
