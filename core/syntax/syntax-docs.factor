@@ -195,7 +195,7 @@ ARTICLE: "syntax-hash-sets" "Hash set syntax"
 
 ARTICLE: "syntax-tuples" "Tuple syntax"
 { $subsections POSTPONE: T{ }
-"Tuples are documented in " { $link "tuples" } "."  ;
+"Tuples are documented in " { $link "tuples" } "." ;
 
 ARTICLE: "syntax-quots" "Quotation syntax"
 { $subsections
@@ -340,37 +340,37 @@ $nl
 HELP: {
 { $syntax "{ elements... }" }
 { $values { "elements" "a list of objects" } }
-{ $description "Marks the beginning of a literal array. Literal arrays are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal array. Literal arrays are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "{ 1 2 3 }" } } ;
 
 HELP: V{
 { $syntax "V{ elements... }" }
 { $values { "elements" "a list of objects" } }
-{ $description "Marks the beginning of a literal vector. Literal vectors are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal vector. Literal vectors are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "V{ 1 2 3 }" } } ;
 
 HELP: B{
 { $syntax "B{ elements... }" }
 { $values { "elements" "a list of integers" } }
-{ $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "B{ 1 2 3 }" } } ;
 
 HELP: H{
 { $syntax "H{ { key value }... }" }
 { $values { "key" "an object" } { "value" "an object" } }
-{ $description "Marks the beginning of a literal hashtable, given as a list of two-element arrays holding key/value pairs. Literal hashtables are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal hashtable, given as a list of two-element arrays holding key/value pairs. Literal hashtables are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
 
 HELP: HS{
 { $syntax "HS{ members ... }" }
 { $values { "members" "a list of objects" } }
-{ $description "Marks the beginning of a literal hash set, given as a list of its members. Literal hashtables are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal hash set, given as a list of its members. Literal hashtables are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "HS{ 3 \"foo\" }" } } ;
 
 HELP: C{
 { $syntax "C{ real-part imaginary-part }" }
 { $values { "real-part" "a real number" } { "imaginary-part" "a real number" } }
-{ $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." }  ;
+{ $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." } ;
 
 HELP: T{
 { $syntax "T{ class }" "T{ class f slot-values... }" "T{ class { slot-name slot-value } ... }" }
@@ -453,7 +453,7 @@ HELP: SINGLETON:
 { $examples
     { $example "USING: classes.singleton kernel io ;" "IN: singleton-demo" "USE: prettyprint SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
 } ;
-    
+
 HELP: SINGLETONS:
 { $syntax "SINGLETONS: words... ;" }
 { $values { "words" "a sequence of new words to define" } }
@@ -560,7 +560,7 @@ HELP: FROM:
 
 HELP: EXCLUDE:
 { $syntax "EXCLUDE: vocab => words ... ;" }
-{ $description "Adds all words except for " { $snippet "words" } " from " { $snippet "vocab" } "  to the search path." }
+{ $description "Adds all words except for " { $snippet "words" } " from " { $snippet "vocab" } " to the search path." }
 { $examples { $code
     "EXCLUDE: math.parser => bin> hex> ;" "! imports everything but bin> and hex>" } } ;
 
@@ -728,7 +728,7 @@ HELP: HOOK:
         "TUPLE: air-transport ;"
         "HOOK: deliver transport ( destination -- )"
         "M: land-transport deliver \"Land delivery to \" write print ;"
-        "M: air-transport deliver \"Air delivery to \"  write print ;"
+        "M: air-transport deliver \"Air delivery to \" write print ;"
         "T{ air-transport } transport set"
         "\"New York City\" deliver"
         "Air delivery to New York City"
