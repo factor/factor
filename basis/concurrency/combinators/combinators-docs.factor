@@ -43,6 +43,6 @@ $nl
     parallel-spread
     parallel-napply
 }
-"The " { $vocab-link "concurrency.semaphores" } " vocabulary can be used in conjuction with the above combinators to limit the maximum number of concurrent operations." ;
+"The " { $vocab-link "concurrency.semaphores" } " vocabulary can be used in conjunction with the above combinators to limit the maximum number of concurrent operations." ;
 
 ABOUT: "concurrency.combinators"
