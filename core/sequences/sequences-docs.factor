@@ -1343,10 +1343,9 @@ HELP: assert-sequence=
 { $description "Throws an error if all the elements of two sequences, taken pairwise, are not equal." }
 { $notes "The sequences need not be of the same type." }
 { $examples
-  { $example
+  { $code
     "USING: prettyprint sequences ;"
     "{ 1 2 3 } V{ 1 2 3 } assert-sequence="
-    ""
   }
 } ;
 
