@@ -1,7 +1,7 @@
 USING: alien alien.c-types help.syntax help.markup libc
 kernel.private byte-arrays math strings hashtables alien.syntax
 alien.strings sequences io.encodings.string debugger destructors
-vocabs.loader classes.struct quotations ;
+vocabs.loader classes.struct quotations kernel ;
 IN: alien.data
 
 HELP: <c-array>
@@ -189,14 +189,14 @@ $nl
 "For example, if a C function returns a " { $link c-string } " but stipulates that the caller must deallocate the memory afterward, you must define the function as returning " { $snippet "char*" } " and call " { $link (free) } " yourself." ;
 
 HELP: <ref>
-{ $values { "c-type" "a C type" } }
+{ $values { "value" object } { "c-type" "a C type" } { "c-ptr" c-ptr } }
 { $description "Creates a new byte array to store a Factor object as a C value." }
 { $examples
     { $example "USING: alien.c-types alien.data prettyprint sequences ;" "123 int <ref> length ." "4" }
 } ;
 
 HELP: deref
-{ $values { "c-type" "a C type" } }
+{ $values { "c-ptr" c-ptr } { "c-type" "a C type" } { "value" object } }
 { $description "Loads a C value from a byte array." }
 { $examples
     { $example "USING: alien.c-types alien.data prettyprint sequences ;" "321 int <ref> int deref ." "321" }

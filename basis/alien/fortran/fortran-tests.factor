@@ -239,7 +239,7 @@ intel-unix-abi fortran-abi [
 
     [ [
         ! [<fortran-result>]
-        [ complex-float <c-object> ] 1 ndip
+        [ complex-float heap-size <byte-array> ] 1 ndip
         ! [fortran-args>c-args]
         { [ { [ ] } spread ] [ { [ drop ] } spread ] } 1 ncleave
         ! [fortran-invoke]
