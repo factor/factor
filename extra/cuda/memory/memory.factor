@@ -8,9 +8,8 @@ QUALIFIED-WITH: alien.c-types c
 IN: cuda.memory
 
 : cuda-malloc ( n -- ptr )
-    [ CUdeviceptr <c-object> ] dip
-    '[ _ cuMemAlloc cuda-error ] keep
-    c:int c:deref ; inline
+    [ { CUdeviceptr } ] dip
+    '[ _ cuMemAlloc cuda-error ] with-out-parameters ; inline
 
 : cuda-malloc-type ( n type -- ptr )
     c:heap-size * cuda-malloc ; inline

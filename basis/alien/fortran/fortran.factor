@@ -310,7 +310,7 @@ M: misc-type (fortran-result>)
 GENERIC: (<fortran-result>) ( type -- quot )
 
 M: fortran-type (<fortran-result>) 
-    (fortran-type>c-type) \ <c-object> [ ] 2sequence ;
+    (fortran-type>c-type) \ heap-size \ <byte-array> [ ] 3sequence ;
 
 M: character-type (<fortran-result>)
     fix-character-type dims>> product dup

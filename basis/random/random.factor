@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs byte-arrays
-byte-vectors combinators fry io.backend io.binary kernel locals
-math math.bitwise math.constants math.functions math.order
-math.ranges namespaces sequences sets summary system
+USING: accessors alien.c-types alien.data arrays assocs
+byte-arrays byte-vectors combinators fry io.backend io.binary
+kernel locals math math.bitwise math.constants math.functions
+math.order math.ranges namespaces sequences sets summary system
 vocabs.loader ;
 IN: random
 

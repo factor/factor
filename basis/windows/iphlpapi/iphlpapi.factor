@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.syntax
+USING: accessors alien alien.c-types alien.data alien.syntax
 classes.struct io.encodings.string io.encodings.utf8 kernel
 make sequences windows.errors windows.types ;
 IN: windows.iphlpapi

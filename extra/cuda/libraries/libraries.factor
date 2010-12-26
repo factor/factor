@@ -74,8 +74,8 @@ M: sequence grid-dim
 PRIVATE>
 
 : load-module ( path -- module )
-    [ CUmodule <c-object> ] dip
-    [ cuModuleLoad cuda-error ] 2keep drop c:void* c:deref ;
+    [ { CUmodule } ] dip
+    '[ _ cuModuleLoad cuda-error ] with-out-parameters ;
 
 : unload-module ( module -- )
     cuModuleUnload cuda-error ;
@@ -151,8 +151,8 @@ MACRO: cuda-arguments ( c-types abi -- quot: ( args... function -- ) )
     [ [ 0 cuda-param-size ] ] swap '[ _ [cuda-arguments] ] if-empty ;
 
 : get-function-ptr ( module string -- function )
-    [ CUfunction <c-object> ] 2dip
-    [ cuModuleGetFunction cuda-error ] 3keep 2drop c:void* c:deref ;
+    [ { CUfunction } ] 2dip
+    '[ _ _ cuModuleGetFunction cuda-error ] with-out-parameters ;
 
 : cached-module ( module-name -- alien )
     lookup-cuda-library
@@ -170,9 +170,9 @@ MACRO: cuda-invoke ( module-name function-name arguments -- )
     ] ;
 
 : cuda-global* ( module-name symbol-name -- device-ptr size )
-    [ CUdeviceptr <c-object> c:uint <c-object> ] 2dip
+    [ { CUdeviceptr { c:uint initial: 0 } } ] 2dip
     [ cached-module ] dip 
-    '[ _ _ cuModuleGetGlobal cuda-error ] 2keep [ c:uint c:deref ] bi@ ; inline
+    '[ _ _ cuModuleGetGlobal cuda-error ] with-out-parameters ; inline
 
 : cuda-global ( module-name symbol-name -- device-ptr )
     cuda-global* drop ; inline

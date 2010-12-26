@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types namespaces io.binary fry
+USING: alien.c-types alien.data namespaces io.binary fry
 kernel math grouping sequences math.bitwise ;
 IN: endian
 

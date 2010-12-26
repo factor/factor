@@ -1,12 +1,12 @@
-USING: accessors alien alien.c-types alien.strings arrays assocs
-byte-arrays combinators combinators.short-circuit continuations
-game.input game.input.dinput.keys-array io.encodings.utf16
-io.encodings.utf16n kernel locals math math.bitwise
-math.rectangles namespaces parser sequences shuffle
+USING: accessors alien alien.c-types alien.data alien.strings
+arrays assocs byte-arrays combinators combinators.short-circuit
+continuations game.input game.input.dinput.keys-array
+io.encodings.utf16 io.encodings.utf16n kernel locals math
+math.bitwise math.rectangles namespaces parser sequences shuffle
 specialized-arrays ui.backend.windows vectors windows.com
 windows.directx.dinput windows.directx.dinput.constants
 windows.kernel32 windows.messages windows.ole32 windows.errors
-windows.user32 classes.struct alien.data ;
+windows.user32 classes.struct ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game.input.dinput
 
