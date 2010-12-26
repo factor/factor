@@ -86,7 +86,7 @@ $nl
 }
 "Finally, sometimes a C library returns a pointer to an array in unmanaged memory, together with a length. In this case, a specialized array can be constructed to view this memory using " { $snippet "<direct-T-array>" } ":"
 { $code
-    "USING: alien.c-types classes.struct ;"
+    "USING: alien.c-types alien.data classes.struct ;"
     ""
     "STRUCT: device_info"
     "    { id int }"

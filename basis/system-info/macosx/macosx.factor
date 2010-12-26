@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings alien.syntax
+USING: alien alien.c-types alien.data alien.strings alien.syntax
 byte-arrays kernel namespaces sequences unix
 system-info.backend system io.encodings.utf8 ;
 IN: system-info.macosx
