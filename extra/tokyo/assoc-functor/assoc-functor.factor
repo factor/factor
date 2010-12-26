@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs destructors fry functors
-kernel locals sequences serialize tokyo.alien.tcutil tokyo.utils vectors ;
+USING: accessors alien.c-types alien.data arrays assocs
+destructors fry functors kernel locals sequences serialize
+tokyo.alien.tcutil tokyo.utils vectors ;
 IN: tokyo.assoc-functor
 
 FUNCTOR: define-tokyo-assoc-api ( T N -- )

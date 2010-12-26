@@ -3,6 +3,28 @@ classes.struct kernel sequences specialized-arrays
 specialized-arrays.private tools.test compiler.units vocabs ;
 IN: alien.data.tests
 
+
+[ -1 ] [ -1 char <ref> char deref ] unit-test
+[ -1 ] [ -1 short <ref> short deref ] unit-test
+[ -1 ] [ -1 int <ref> int deref ] unit-test
+
+! I don't care if this throws an error or works, but at least
+! it should be consistent between platforms
+[ -1 ] [ -1.0 int <ref> int deref ] unit-test
+[ -1 ] [ -1.0 long <ref> long deref ] unit-test
+[ -1 ] [ -1.0 longlong <ref> longlong deref ] unit-test
+[ 1 ] [ 1.0 uint <ref> uint deref ] unit-test
+[ 1 ] [ 1.0 ulong <ref> ulong deref ] unit-test
+[ 1 ] [ 1.0 ulonglong <ref> ulonglong deref ] unit-test
+
+[
+    0 B{ 1 2 3 4 } <displaced-alien> void* <ref>
+] must-fail
+
+os windows? cpu x86.64? and [
+    [ -2147467259 ] [ 2147500037 long <ref> long deref ] unit-test
+] when
+
 STRUCT: foo { a int } { b void* } { c bool } ;
 
 SPECIALIZED-ARRAY: foo

@@ -123,3 +123,13 @@ HELP: C-GLOBAL:
 { $syntax "C-GLOBAL: type name" }
 { $values { "type" "a C type" } { "name" "a C global variable name" } }
 { $description "Defines a new word named " { $snippet "name" } " which accesses a global variable in the current library, set with " { $link POSTPONE: LIBRARY: } "." } ;
+
+ARTICLE: "alien.enums" "Enumeration types"
+"The " { $vocab-link "alien.enums" } " vocab contains the implementation for " { $link POSTPONE: ENUM: } " C types, and provides words for converting between enum singletons and integers. It is possible to dispatch off of members of an enum."
+$nl
+"Defining enums:"
+{ $subsection POSTPONE: ENUM: }
+"Defining enums at run-time:"
+{ $subsection define-enum }
+"Conversions between enums and integers:"
+{ $subsections enum>number number>enum } ;

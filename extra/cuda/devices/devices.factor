@@ -8,11 +8,10 @@ prettyprint sequences ;
 IN: cuda.devices
 
 : #cuda-devices ( -- n )
-    int <c-object> [ cuDeviceGetCount cuda-error ] keep int deref ;
+    { int } [ cuDeviceGetCount cuda-error ] with-out-parameters ;
 
 : n>cuda-device ( n -- device )
-    [ CUdevice <c-object> ] dip [ cuDeviceGet cuda-error ] 2keep
-    drop int deref ;
+    [ { CUdevice } ] dip '[ _ cuDeviceGet cuda-error ] with-out-parameters ;
 
 : enumerate-cuda-devices ( -- devices )
     #cuda-devices iota [ n>cuda-device ] map ;
@@ -33,19 +32,17 @@ IN: cuda.devices
     [ 2drop utf8 alien>string ] 3bi ;
 
 : cuda-device-capability ( n -- pair )
-    [ int <c-object> int <c-object> ] dip
-    [ cuDeviceComputeCapability cuda-error ]
-    [ drop [ int deref ] bi@ ] 3bi 2array ;
+    [ { int int } ] dip
+    '[ _ cuDeviceComputeCapability cuda-error ] with-out-parameters
+    2array ;
 
 : cuda-device-memory ( n -- bytes )
-    [ uint <c-object> ] dip
-    [ cuDeviceTotalMem cuda-error ]
-    [ drop uint deref ] 2bi ;
+    [ { uint } ] dip
+    '[ _ cuDeviceTotalMem cuda-error ] with-out-parameters ;
 
 : cuda-device-attribute ( attribute n -- n )
-    [ int <c-object> ] 2dip
-    [ cuDeviceGetAttribute cuda-error ]
-    [ 2drop int deref ] 3bi ;
+    [ { int } ] 2dip
+    '[ _ _ cuDeviceGetAttribute cuda-error ] with-out-parameters ;
 
 : cuda-device. ( n -- )
     {
