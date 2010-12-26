@@ -13,7 +13,7 @@ samDesired lpSecurityAttributes phkResult lpdwDisposition ;
 CONSTANT: registry-value-max-length 16384
 
 :: open-key ( key subkey mode -- hkey )
-    key subkey 0 mode HKEY <c-object>
+    key subkey 0 mode 0 HKEY <ref>
     [
         RegOpenKeyEx dup ERROR_SUCCESS = [
             drop
@@ -21,16 +21,16 @@ CONSTANT: registry-value-max-length 16384
             [ key subkey mode ] dip n>win32-error-string
             open-key-failed
         ] if
-    ] keep uint deref ;
+    ] keep HKEY deref ;
 
 :: create-key* ( hKey lpSubKey lpClass dwOptions samDesired lpSecurityAttributes -- hkey new? )
-    hKey lpSubKey 0 lpClass dwOptions samDesired lpSecurityAttributes
-    HKEY <c-object>
-    DWORD <c-object>
     f :> ret!
+    hKey lpSubKey 0 lpClass dwOptions samDesired lpSecurityAttributes
+    0 HKEY <ref>
+    0 DWORD <ref>
     [ RegCreateKeyEx ret! ] 2keep
-    [ uint deref ]
-    [ uint deref REG_CREATED_NEW_KEY = ] bi*
+    [ HKEY deref ]
+    [ DWORD deref REG_CREATED_NEW_KEY = ] bi*
     ret ERROR_SUCCESS = [
         [
             hKey lpSubKey 0 lpClass dwOptions samDesired
@@ -103,9 +103,9 @@ TUPLE: registry-enum-key ;
         registry-value-max-length TCHAR <c-array> dup :> registry-value
         registry-value length dup :> registry-value-length
         f
-        DWORD <c-object> dup :> type
-        f ! BYTE <c-object> dup :> data
-        f ! BYTE <c-object> dup :> buffer
+        0 DWORD <ref> dup :> type
+        f ! 0 BYTE <ref> dup :> data
+        f ! 0 BYTE <ref> dup :> buffer
         RegEnumKeyEx dup ERROR_SUCCESS = [
             
         ] [
@@ -118,13 +118,13 @@ TUPLE: registry-enum-key ;
     dup TCHAR <c-array> dup :> class-buffer
     swap int <ref> dup :> class-buffer-length
     f
-    DWORD <c-object> dup :> sub-keys
-    DWORD <c-object> dup :> longest-subkey
-    DWORD <c-object> dup :> longest-class-string
-    DWORD <c-object> dup :> #values
-    DWORD <c-object> dup :> max-value
-    DWORD <c-object> dup :> max-value-data
-    DWORD <c-object> dup :> security-descriptor
+    0 DWORD <ref> dup :> sub-keys
+    0 DWORD <ref> dup :> longest-subkey
+    0 DWORD <ref> dup :> longest-class-string
+    0 DWORD <ref> dup :> #values
+    0 DWORD <ref> dup :> max-value
+    0 DWORD <ref> dup :> max-value-data
+    0 DWORD <ref> dup :> security-descriptor
     FILETIME <struct> dup :> last-write-time
     RegQueryInfoKey :> ret
     ret ERROR_SUCCESS = [

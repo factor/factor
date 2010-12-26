@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax byte-arrays combinators
-kernel math math.functions sequences system accessors
-libc ;
+USING: alien alien.c-types alien.data alien.syntax byte-arrays
+combinators kernel math math.functions sequences system
+accessors libc ;
 QUALIFIED: compression.zlib.ffi
 IN: compression.zlib
 
