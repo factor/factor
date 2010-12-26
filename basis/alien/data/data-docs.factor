@@ -10,11 +10,6 @@ HELP: <c-array>
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. The vocabulary can be loaded with the " { $link require-c-array } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
 
-HELP: <c-object>
-{ $values { "type" "a C type" } { "array" byte-array } }
-{ $description "Creates a byte array suitable for holding a value with the given C type." }
-{ $errors "Throws an " { $link no-c-type } " error if the type does not exist." } ;
-
 HELP: memory>byte-array
 { $values { "alien" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new byte array." } ;
@@ -125,6 +120,10 @@ ARTICLE: "c-pointers" "Passing pointers to C functions"
 { $warning
 "The Factor garbage collector can move byte arrays around, and code passing byte arrays, or objects backed by byte arrays, must obey important guidelines. See " { $link "byte-arrays-gc" } "." } ;
 
+ARTICLE: "c-boxes" "C value boxes"
+"Sometimes it is useful to create a byte array storing a single C value, like a struct with a single field. A pair of utility macros exist to make this more convenient:"
+{ $subsections <ref> deref } ;
+
 ARTICLE: "c-data" "Passing data between Factor and C"
 "Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers."
 $nl
@@ -135,13 +134,12 @@ $nl
     "malloc"
     "c-strings"
     "c-out-params"
+    "c-boxes"
 }
 "Important guidelines for passing data in byte arrays:"
 { $subsections "byte-arrays-gc" }
 "C-style enumerated types are supported:"
-{ $subsections "alien.enums" POSTPONE: ENUM: }
-"C types can be aliased for convenience and consistency with native library documentation:"
-{ $subsections POSTPONE: TYPEDEF: }
+{ $subsections "alien.enums" }
 "A utility for defining " { $link "destructors" } " for deallocating memory:"
 { $subsections "alien.destructors" }
 "C struct and union types can be defined with " { $link POSTPONE: STRUCT: } " and " { $link POSTPONE: UNION: } ". See " { $link "classes.struct" } " for details. For passing arrays to and from C, use the " { $link "specialized-arrays" } " vocabulary." ;
@@ -190,3 +188,20 @@ $nl
 { $subsections alien>string }
 "For example, if a C function returns a " { $link c-string } " but stipulates that the caller must deallocate the memory afterward, you must define the function as returning " { $snippet "char*" } " and call " { $link (free) } " yourself." ;
 
+HELP: <ref>
+{ $values { "c-type" "a C type" } }
+{ $description "Creates a new byte array to store a Factor object as a C value." }
+{ $examples
+    { $example "USING: alien.c-types alien.data prettyprint sequences ;" "123 int <ref> length ." "4" }
+} ;
+
+HELP: deref
+{ $values { "c-type" "a C type" } }
+{ $description "Loads a C value from a byte array." }
+{ $examples
+    { $example "USING: alien.c-types alien.data prettyprint sequences ;" "321 int <ref> int deref ." "321" }
+} ;
+
+ARTICLE: "c-out-params" "Output parameters in C"
+"A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
+{ $subsection with-out-parameters } ;

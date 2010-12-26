@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.strings combinators
-grouping io.encodings.utf8 io.files kernel math sequences system
-unix io.files.unix arrays unix.statfs.macosx unix.statvfs.macosx
-unix.getfsstat.macosx io.files.info.unix io.files.info
-classes.struct specialized-arrays ;
+USING: accessors alien.c-types alien.data alien.strings
+combinators grouping io.encodings.utf8 io.files kernel math
+sequences system unix io.files.unix arrays unix.statfs.macosx
+unix.statvfs.macosx unix.getfsstat.macosx io.files.info.unix
+io.files.info classes.struct specialized-arrays ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: statfs64
 IN: io.files.info.unix.macosx

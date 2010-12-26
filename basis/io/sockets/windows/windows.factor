@@ -99,7 +99,7 @@ M: winnt WSASocket-flags ( -- DWORD )
     { void* }
     [
         void* heap-size
-        DWORD <c-object>
+        0 DWORD <ref>
         f
         f
         WSAIoctl SOCKET_ERROR = [

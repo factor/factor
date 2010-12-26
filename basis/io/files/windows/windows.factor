@@ -1,15 +1,15 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.strings
-alien.syntax arrays assocs classes.struct combinators
-combinators.short-circuit continuations destructors environment
-io io.backend io.binary io.buffers
+USING: accessors alien alien.data alien.c-types alien.data
+alien.strings alien.syntax arrays assocs classes.struct
+combinators combinators.short-circuit continuations destructors
+environment io io.backend io.binary io.buffers
 io.encodings.utf16n io.files io.files.private io.files.types
 io.pathnames io.ports io.streams.c io.streams.null io.timeouts
 kernel libc literals locals make math math.bitwise namespaces
-sequences specialized-arrays system
-threads tr windows windows.errors windows.handles
-windows.kernel32 windows.shell32 windows.time windows.types ;
+sequences specialized-arrays system threads tr windows
+windows.errors windows.handles windows.kernel32 windows.shell32
+windows.time windows.types ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
 
@@ -52,7 +52,7 @@ C: <FileArgs> FileArgs
         [ handle>> handle>> ]
         [ buffer>> ]
         [ buffer>> buffer-length ]
-        [ drop DWORD <c-object> ]
+        [ drop 0 DWORD <ref> ]
         [ FileArgs-overlapped ]
     } cleave <FileArgs> ;
     
