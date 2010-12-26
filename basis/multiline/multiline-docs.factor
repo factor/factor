@@ -17,7 +17,7 @@ HELP: /*
 HELP: HEREDOC:
 { $syntax "HEREDOC: marker\n...text...\nmarker" }
 { $values { "marker" "a word (token)" } { "text" "arbitrary text" } { "value" string } }
-{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after " { $link POSTPONE: HEREDOC: } " until the end of the line containing " { $link POSTPONE: HEREDOC: } ". Text is captured until a line is found conatining exactly this delimter string." }
+{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after " { $link POSTPONE: HEREDOC: } " until the end of the line containing " { $link POSTPONE: HEREDOC: } ". Text is captured until a line is found containing exactly this delimiter string." }
 { $warning "Whitespace is significant." }
 { $examples
     { $example "USING: multiline prettyprint ;"
