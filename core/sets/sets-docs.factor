@@ -184,3 +184,7 @@ HELP: without
 HELP: null?
 { $values { "set" set } { "?" "a boolean" } }
 { $description "Tests whether the given set is empty. This outputs " { $snippet "t" } " when given a null set of any type." } ;
+
+HELP: cardinality
+{ $values { "set" set } { "n" "a non-negative integer" } }
+{ $description "Returns the number of elements in the set.  All sets support this operation." } ;

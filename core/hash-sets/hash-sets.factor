@@ -19,6 +19,7 @@ M: hash-set members table>> keys ; inline
 M: hash-set set-like drop dup hash-set? [ members <hash-set> ] unless ;
 M: hash-set clone table>> clone hash-set boa ;
 M: hash-set null? table>> assoc-empty? ;
+M: hash-set cardinality table>> assoc-size ;
 
 M: sequence fast-set <hash-set> ;
 M: f fast-set drop H{ } clone hash-set boa ;
