@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences byte-arrays bit-arrays math hints sets ;
+USING: kernel accessors sequences byte-arrays bit-arrays math
+math.bitwise hints sets ;
 IN: bit-sets
 
 TUPLE: bit-set { table bit-array read-only } ;
@@ -84,3 +85,6 @@ M: bit-set set-like
 
 M: bit-set clone
     table>> clone bit-set boa ;
+
+M: bit-set cardinality
+    table>> bit-array>integer bit-count ;
