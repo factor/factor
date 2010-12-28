@@ -64,3 +64,7 @@ IN: sets.tests
 
 [ t ] [ f null? ] unit-test
 [ f ] [ { 4 } null? ] unit-test
+
+[ 0 ] [ f cardinality ] unit-test
+[ 0 ] [ { } cardinality ] unit-test
+[ 1 ] [ HS{ 1 } cardinality ] unit-test
