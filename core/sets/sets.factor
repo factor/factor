@@ -61,7 +61,7 @@ M: set subset?
     sequence/tester all? ;
 
 M: set set=
-    2dup subset? [ swap subset? ] [ 2drop f ] if ;
+    2dup [ cardinality ] bi@ = [ subset? ] [ 2drop f ] if ;
 
 M: set fast-set ;
 
