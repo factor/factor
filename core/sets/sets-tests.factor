@@ -5,10 +5,14 @@ IN: sets.tests
 
 [ { } ] [ { } { } intersect  ] unit-test
 [ { 2 3 } ] [ { 1 2 3 } { 2 3 4 } intersect ] unit-test
+[ { 2 3 } ] [ { 1 2 3 } { 2 3 4 5 } intersect ] unit-test
+[ { 2 3 4 } ] [ { 1 2 3 4 } { 2 3 4 } intersect ] unit-test
 [ { 2 3 } ] [ { 1 2 2 3 } { 2 3 3 4 } intersect ] unit-test
 
 [ { } ] [ { } { } diff ] unit-test
 [ { 1 } ] [ { 1 2 3 } { 2 3 4 } diff ] unit-test
+[ { 1 } ] [ { 1 2 3 } { 2 3 4 5 } diff ] unit-test
+[ { 1 } ] [ { 1 2 3 4 } { 2 3 4 } diff ] unit-test
 [ { 1 } ] [ { 1 1 2 3 } { 2 3 4 4 } diff ] unit-test
 
 [ { } ] [ { } { } within  ] unit-test
