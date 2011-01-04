@@ -12,7 +12,7 @@ ARTICLE: "stream-types" "Binary and text streams"
 $nl
 "Binary streams have an element type of " { $link +byte+ } ". Elements are integers in the range " { $snippet "[0,255]" } ", representing bytes. Reading a sequence of elements produces a " { $link byte-array } ". Any object implementing the " { $link >c-ptr } " and " { $link byte-length } " generic words can be written to a binary stream."
 $nl
-"Character streams have an element tye of " { $link +character+ } ". Elements are non-negative integers, representing Unicode code points. Only instances of the " { $link string } " class can be read or written on a character stream."
+"Character streams have an element type of " { $link +character+ } ". Elements are non-negative integers, representing Unicode code points. Only instances of the " { $link string } " class can be read or written on a character stream."
 $nl
 "Most external streams are binary streams, and can be wrapped in string streams once a suitable encoding has been provided; see " { $link "io.encodings" } "." ;
 
