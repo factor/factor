@@ -215,7 +215,7 @@ HELP: parse-fresh
 { $errors "Throws a parse error if the input is malformed." } ;
 
 HELP: filter-moved
-{ $values { "assoc1" assoc } { "assoc2" assoc } { "seq" "an seqence of definitions" } }
+{ $values { "assoc1" assoc } { "assoc2" assoc } { "seq" "an sequence of definitions" } }
 { $description "Removes all definitions from " { $snippet "assoc2" } " which are in " { $snippet "assoc1" } " or are are no longer present in the current " { $link file } "." } ;
 
 HELP: forget-smudged
