@@ -26,7 +26,7 @@ ARTICLE: "grouping" "Groups and clumps"
             "{ 1 2 3 4 } dup" "2 <groups> concat sequence= ." "t"
         }
     }
-    { "With clumps, collecting the first element of each subsequence but the last one, together with the last subseqence, yields the original sequence:"
+    { "With clumps, collecting the first element of each subsequence but the last one, together with the last subsequence, yields the original sequence:"
         { $unchecked-example
             "USING: grouping ;"
             "{ 1 2 3 4 } 2 clump ." "{ { 1 2 } { 2 3 } { 3 4 } }"
