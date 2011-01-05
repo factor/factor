@@ -12,7 +12,7 @@ HELP: mapped-file
 } ;
 
 HELP: <mapped-file>
-{ $values { "path" "a pathname string" }  { "mmap" mapped-file } }
+{ $values { "path" "a pathname string" } { "mmap" mapped-file } }
 { $contract "Opens a file and maps its contents into memory. The length is permitted to exceed the length of the file on disk, in which case the remaining space is padded with zero bytes." }
 { $notes "You must call " { $link dispose } " when you are finished working with the returned object, to reclaim resources. The " { $link with-mapped-file } " provides an abstraction which can close the mapped file for you." }
 { $errors "Throws an error if a memory mapping could not be established." } ;
@@ -35,7 +35,7 @@ HELP: close-mapped-file
 { $errors "Throws an error if a memory mapping could not be established." } ;
 
 HELP: <mapped-file-reader>
-{ $values { "path" "a pathname string" }  { "mmap" mapped-file } }
+{ $values { "path" "a pathname string" } { "mmap" mapped-file } }
 { $contract "Opens a file for reading only and maps its contents into memory. The length is permitted to exceed the length of the file on disk, in which case the remaining space is padded with zero bytes." }
 { $notes "You must call " { $link dispose } " when you are finished working with the returned object, to reclaim resources. The " { $link with-mapped-file } " provides an abstraction which can close the mapped file for you." }
 { $errors "Throws an error if a memory mapping could not be established." } ;
