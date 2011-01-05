@@ -253,7 +253,7 @@ HELP: execute-effect-unsafe
 { $values { "word" word } { "effect" effect } }
 { $description "Given a word and a stack effect, executes the word, blindly declaring at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary word which is not required at compile time." }
 { $warning "If the word being executed has an incorrect stack effect, undefined behavior will result. User code should use " { $link POSTPONE: execute( } " instead." } ;
-    
+
 { call-effect call-effect-unsafe execute-effect execute-effect-unsafe } related-words
 
 HELP: cleave
@@ -372,10 +372,10 @@ HELP: recursive-hashcode
 
 HELP: cond>quot
 { $values { "assoc" "a sequence of pairs of quotations" } { "quot" quotation } }
-{ $description  "Creates a quotation that when called, has the same effect as applying " { $link cond } " to " { $snippet "assoc" } "."
+{ $description "Creates a quotation that when called, has the same effect as applying " { $link cond } " to " { $snippet "assoc" } "."
 $nl
 "The generated quotation is more efficient than the naive implementation of " { $link cond } ", though, since it expands into a series of conditionals, and no iteration through " { $snippet "assoc" } " has to be performed." }
-{ $notes "This word is used behind the scenes to compile " { $link cond } " forms efficiently; it can also be called directly,  which is useful for meta-programming." } ;
+{ $notes "This word is used behind the scenes to compile " { $link cond } " forms efficiently; it can also be called directly, which is useful for meta-programming." } ;
 
 HELP: case>quot
 { $values { "default" quotation } { "assoc" "a sequence of pairs of quotations" } { "quot" quotation } }
