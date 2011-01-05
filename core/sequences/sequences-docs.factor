@@ -243,7 +243,7 @@ HELP: array-capacity
 { $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
 
 HELP: array-nth
-{ $values { "n" "a non-negative fixnum" } { "array" "an array" }  { "elt" object } }
+{ $values { "n" "a non-negative fixnum" } { "array" "an array" } { "elt" object } }
 { $description "Low-level array element accessor." }
 { $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory. User code must use " { $link nth } " instead." } ;
 
