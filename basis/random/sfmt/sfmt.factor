@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types kernel locals math math.ranges
-math.bitwise math.vectors math.vectors.simd random
+USING: accessors alien.c-types alien.data kernel locals math
+math.ranges math.bitwise math.vectors math.vectors.simd random
 sequences specialized-arrays sequences.private classes.struct
 combinators.short-circuit fry ;
 SPECIALIZED-ARRAY: uint

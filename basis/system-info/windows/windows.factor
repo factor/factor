@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings byte-arrays
-classes.struct combinators kernel math namespaces
-specialized-arrays system
-system-info.backend vocabs.loader windows windows.advapi32
-windows.errors windows.kernel32 words ;
+USING: accessors alien alien.c-types alien.data alien.strings
+byte-arrays classes.struct combinators kernel math namespaces
+specialized-arrays system system-info.backend vocabs.loader
+windows windows.advapi32 windows.errors windows.kernel32 words ;
 SPECIALIZED-ARRAY: ushort
 IN: system-info.windows
 

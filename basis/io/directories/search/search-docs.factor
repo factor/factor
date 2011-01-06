@@ -64,7 +64,7 @@ HELP: find-by-extension
 }
 { $description "Searches a directory for all files with the given extension. File extension and filenames are converted to lower-case and compared using the " { $link tail? } " word. The file extension should contain the period." }
 { $examples
-    { $unchecked-example
+    { $code
         "USING: io.directories.search ;"
         "\"/\" \".mp3\" find-by-extension"
     }
@@ -77,7 +77,7 @@ HELP: find-by-extensions
 }
 { $description "Searches a directory for all files in the given list of extensions. File extensions and filenames are converted to lower-case and compared using the " { $link tail? } " word. File extensions should contain the period." }
 { $examples
-    { $unchecked-example
+    { $code
         "USING: io.directories.search ;"
         "\"/\" { \".jpg\" \".gif\" \".tiff\" \".png\" \".bmp\" } find-by-extensions"
     }

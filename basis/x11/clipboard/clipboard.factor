@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.strings classes.struct
-io.encodings.utf8 kernel namespaces sequences
+USING: accessors alien.c-types alien.data alien.strings
+classes.struct io.encodings.utf8 kernel namespaces sequences
 specialized-arrays x11 x11.constants x11.xlib ;
 SPECIALIZED-ARRAY: int
 IN: x11.clipboard

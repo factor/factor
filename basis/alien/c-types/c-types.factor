@@ -468,12 +468,3 @@ M: double-2-rep rep-component-type drop double ;
 : c-type-clamp ( value c-type -- value' )
     dup { float double } member-eq?
     [ drop ] [ c-type-interval clamp ] if ; inline
-
-: <ref> ( value c-type -- c-ptr )
-    [ heap-size <byte-array> ] keep
-    '[ 0 _ set-alien-value ] keep ; inline
-
-: deref ( c-ptr c-type -- value )
-    [ 0 ] dip alien-value ; inline
-
-: little-endian? ( -- ? ) 1 int <ref> char deref 1 = ; foldable
