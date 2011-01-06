@@ -1,11 +1,11 @@
 USING: tools.test kernel.private kernel arrays sequences
 math.private math generic words quotations alien alien.c-types
-strings sbufs sequences.private slots.private combinators
-definitions system layouts vectors math.partial-dispatch
-math.order math.functions accessors hashtables classes assocs
-io.encodings.utf8 io.encodings.ascii io.encodings fry slots
-sorting.private combinators.short-circuit grouping prettyprint
-generalizations
+alien.data strings sbufs sequences.private slots.private
+combinators definitions system layouts vectors
+math.partial-dispatch math.order math.functions accessors
+hashtables classes assocs io.encodings.utf8 io.encodings.ascii
+io.encodings fry slots sorting.private combinators.short-circuit
+grouping prettyprint generalizations
 compiler.tree
 compiler.tree.combinators
 compiler.tree.cleanup
@@ -520,8 +520,6 @@ cell-bits 32 = [
         14 ndrop
     ] cleaned-up-tree nodes>quot
 ] unit-test
-
-USING: alien alien.c-types ;
 
 [ t ] [
     [ int { } cdecl [ 2 2 + ] alien-callback ]

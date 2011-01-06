@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.syntax destructors kernel
-llvm.core llvm.engine llvm.jit llvm.wrappers ;
+USING: accessors alien.c-types alien.data alien.syntax
+destructors kernel llvm.core llvm.engine llvm.jit llvm.wrappers
+;
 
 IN: llvm.reader
 

@@ -310,7 +310,7 @@ M: misc-type (fortran-result>)
 GENERIC: (<fortran-result>) ( type -- quot )
 
 M: fortran-type (<fortran-result>) 
-    (fortran-type>c-type) \ <c-object> [ ] 2sequence ;
+    (fortran-type>c-type) \ heap-size \ <byte-array> [ ] 3sequence ;
 
 M: character-type (<fortran-result>)
     fix-character-type dims>> product dup
@@ -427,8 +427,11 @@ MACRO: fortran-invoke ( return library function parameters -- )
     { [ 2drop nip set-fortran-abi ] [ (fortran-invoke) ] } 4 ncleave ;
 
 : parse-arglist ( parameters return -- types effect )
-    [ 2 group unzip [ "," ?tail drop ] map ]
-    [ [ { } ] [ 1array ] if-void ]
+    [
+        2 group
+        [ unzip [ "," ?tail drop ] map ]
+        [ [ first "!" head? ] filter [ second "," ?tail drop "'" append ] map ] bi
+    ] [ [ ] [ prefix ] if-void ]
     bi* <effect> ;
 
 :: define-fortran-function ( return library function parameters -- )

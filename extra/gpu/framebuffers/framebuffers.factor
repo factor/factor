@@ -1,8 +1,8 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien.c-types arrays byte-arrays combinators
-destructors gpu gpu.buffers gpu.private gpu.textures
-gpu.textures.private images kernel locals math math.rectangles opengl
-opengl.framebuffers opengl.gl opengl.textures sequences
+USING: accessors alien.c-types alien.data arrays byte-arrays
+combinators destructors gpu gpu.buffers gpu.private gpu.textures
+gpu.textures.private images kernel locals math math.rectangles
+opengl opengl.framebuffers opengl.gl opengl.textures sequences
 specialized-arrays typed ui.gadgets.worlds variants ;
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: uint

@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel bit-arrays sequences assocs math
+USING: alien.data kernel bit-arrays sequences assocs math
 namespaces accessors math.order locals fry io.ports
 io.backend.unix io.backend.unix.multiplexers unix unix.ffi
 unix.time ;

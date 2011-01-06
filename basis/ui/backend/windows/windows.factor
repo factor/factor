@@ -1,19 +1,19 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! Portions copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings arrays assocs ui
+USING: alien alien.data alien.strings arrays assocs ui
 ui.private ui.gadgets ui.gadgets.private ui.backend
 ui.clipboards ui.gadgets.worlds ui.gestures ui.event-loop io
 kernel math math.vectors namespaces make sequences strings
-vectors words windows.dwmapi system-info.windows windows.kernel32
-windows.gdi32 windows.user32 windows.opengl32 windows.messages
-windows.types windows.offscreen windows threads libc combinators
-fry combinators.short-circuit continuations command-line shuffle
-opengl ui.render math.bitwise locals accessors math.rectangles
-math.order calendar ascii sets io.encodings.utf16n
-windows.errors literals ui.pixel-formats
+vectors words windows.dwmapi system-info.windows
+windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
+windows.messages windows.types windows.offscreen windows threads
+libc combinators fry combinators.short-circuit continuations
+command-line shuffle opengl ui.render math.bitwise locals
+accessors math.rectangles math.order calendar ascii sets
+io.encodings.utf16n windows.errors literals ui.pixel-formats
 ui.pixel-formats.private memoize classes colors
-specialized-arrays classes.struct alien.data ;
+specialized-arrays classes.struct ;
 FROM: namespaces => set ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
@@ -60,14 +60,14 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
     drop f ;
 
 : arb-make-pixel-format ( world attributes -- pf )
-    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 { int int }
+    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 { c:int c:int }
     [ wglChoosePixelFormatARB win32-error=0/f ] with-out-parameters drop ;
 
 : arb-pixel-format-attribute ( pixel-format attribute -- value )
     >WGL_ARB
     [ drop f ] [
         [ [ world>> handle>> hDC>> ] [ handle>> ] bi 0 1 ] dip
-        first int <ref> { int }
+        first c:int <ref> { c:int }
         [ wglGetPixelFormatAttribivARB win32-error=0/f ]
         with-out-parameters
     ] if-empty ;
@@ -96,7 +96,7 @@ CONSTANT: pfd-flag-map H{
 : >pfd ( attributes -- pfd )
     [ PIXELFORMATDESCRIPTOR <struct> ] dip
     {
-        [ drop PIXELFORMATDESCRIPTOR heap-size >>nSize ]
+        [ drop PIXELFORMATDESCRIPTOR c:heap-size >>nSize ]
         [ drop 1 >>nVersion ]
         [ >pfd-flags >>dwFlags ]
         [ drop PFD_TYPE_RGBA >>iPixelType ]
@@ -122,12 +122,12 @@ CONSTANT: pfd-flag-map H{
 
 : get-pfd ( pixel-format -- pfd )
     [ world>> handle>> hDC>> ] [ handle>> ] bi
-    PIXELFORMATDESCRIPTOR heap-size
+    PIXELFORMATDESCRIPTOR c:heap-size
     PIXELFORMATDESCRIPTOR <struct>
     [ DescribePixelFormat win32-error=0/f ] keep ;
 
 : pfd-flag? ( pfd flag -- ? )
-    [ dwFlags>> ] dip bitand c-bool> ;
+    [ dwFlags>> ] dip bitand c:c-bool> ;
 
 : (pfd-pixel-format-attribute) ( pfd attribute -- value )
     {
@@ -525,7 +525,7 @@ SYMBOL: nc-buttons
 : make-TRACKMOUSEEVENT ( hWnd -- alien )
     TRACKMOUSEEVENT <struct>
         swap >>hwndTrack
-        TRACKMOUSEEVENT heap-size >>cbSize ;
+        TRACKMOUSEEVENT c:heap-size >>cbSize ;
 
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
     2nip
@@ -614,7 +614,7 @@ SYMBOL: trace-messages?
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
-    uint { void* uint long long } stdcall [
+    c:uint { c:void* c:uint c:long c:long } stdcall [
         pick
 
         trace-messages? get-global
@@ -636,7 +636,7 @@ M: windows-ui-backend do-events
 :: register-window-class ( class-name-ptr -- )
     WNDCLASSEX <struct> f GetModuleHandle
     class-name-ptr pick GetClassInfoEx 0 = [
-        WNDCLASSEX heap-size >>cbSize
+        WNDCLASSEX c:heap-size >>cbSize
         flags{ CS_HREDRAW CS_VREDRAW CS_OWNDC } >>style
         ui-wndproc >>lpfnWndProc
         0 >>cbClsExtra
@@ -799,7 +799,7 @@ M: windows-ui-backend system-alert
 : fullscreen-RECT ( hwnd -- RECT )
     MONITOR_DEFAULTTONEAREST MonitorFromWindow
     MONITORINFOEX <struct>
-        MONITORINFOEX heap-size >>cbSize
+        MONITORINFOEX c:heap-size >>cbSize
     [ GetMonitorInfo win32-error=0/f ] keep rcMonitor>> ;
 
 : client-area>RECT ( hwnd -- RECT )

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Joe Groff, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types arrays assocs combinators fry kernel locals
+USING: alien.data arrays assocs combinators fry kernel locals
 macros math math.vectors namespaces quotations sequences system
 compiler.cfg.comparisons compiler.cfg.intrinsics
 compiler.codegen.fixup cpu.architecture cpu.x86

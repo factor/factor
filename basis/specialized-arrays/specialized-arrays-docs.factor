@@ -41,7 +41,7 @@ ARTICLE: "specialized-array-words" "Specialized array words"
     { { $snippet "T-array" } { "The class of arrays with elements of type " { $snippet "T" } } }
     { { $snippet "<T-array>" } { "Constructor for arrays with elements of type " { $snippet "T" } "; stack effect " { $snippet "( len -- array )" } } }
     { { $snippet "(T-array)" } { "Constructor for arrays with elements of type " { $snippet "T" } ", where the initial contents are uninitialized; stack effect " { $snippet "( len -- array )" } } }
-    { { $snippet "malloc-T-array" } { "Constructor for arrays with elements of type " { $snippet "T" } " backed by newly-allocated unmanaged memory; stack effect " { $snippet "( alien len -- array )" } } }
+    { { $snippet "malloc-T-array" } { "Constructor for arrays with elements of type " { $snippet "T" } " backed by newly-allocated, zeroed out, unmanaged memory; stack effect " { $snippet "( len -- array )" } } }
     { { $snippet "<direct-T-array>" } { "Constructor for arrays with elements of type " { $snippet "T" } " backed by raw memory; stack effect " { $snippet "( alien len -- array )" } } }
     { { $snippet "T-array-cast" } { "Converts a byte array into a specialized array by interpreting the bytes in as machine-specific values. Code which uses this word is unportable" } }
     { { $snippet ">T-array" } { "Converts a sequence into a specialized array of type " { $snippet "T" } "; stack effect " { $snippet "( seq -- array )" } } }
@@ -86,7 +86,7 @@ $nl
 }
 "Finally, sometimes a C library returns a pointer to an array in unmanaged memory, together with a length. In this case, a specialized array can be constructed to view this memory using " { $snippet "<direct-T-array>" } ":"
 { $code
-    "USING: alien.c-types classes.struct ;"
+    "USING: alien.c-types alien.data classes.struct ;"
     ""
     "STRUCT: device_info"
     "    { id int }"
