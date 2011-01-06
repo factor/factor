@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Niklas Waern.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types combinators kernel namespaces x11
-x11.constants x11.xinput2.ffi ;
+USING: alien.c-types alien.data combinators kernel namespaces
+x11 x11.constants x11.xinput2.ffi ;
 IN: x11.xinput2
 
 : (xi2-available?) ( display -- ? )

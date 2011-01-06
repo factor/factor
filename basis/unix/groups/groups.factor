@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings assocs
-byte-arrays classes.struct combinators
+USING: accessors alien alien.c-types alien.data alien.strings
+assocs byte-arrays classes.struct combinators
 combinators.short-circuit continuations fry io.backend.unix
 io.encodings.utf8 kernel math math.parser namespaces sequences
 splitting strings unix unix.ffi unix.users unix.utilities ;

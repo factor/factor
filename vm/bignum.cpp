@@ -381,24 +381,10 @@ FOO_TO_BIGNUM(ulong_long,u64,s64,u64)
 		}							\
 	}
 
-BIGNUM_TO_FOO(cell,cell,fixnum,cell);
-BIGNUM_TO_FOO(fixnum,fixnum,fixnum,cell);
+BIGNUM_TO_FOO(cell,cell,fixnum,cell)
+BIGNUM_TO_FOO(fixnum,fixnum,fixnum,cell)
 BIGNUM_TO_FOO(long_long,s64,s64,u64)
 BIGNUM_TO_FOO(ulong_long,u64,s64,u64)
-
-double factor_vm::bignum_to_double(bignum * bignum)
-{
-	if (BIGNUM_ZERO_P (bignum))
-		return (0);
-	{
-		double accumulator = 0;
-		bignum_digit_type * start = (BIGNUM_START_PTR (bignum));
-		bignum_digit_type * scan = (start + (BIGNUM_LENGTH (bignum)));
-		while (start < scan)
-			accumulator = ((accumulator * BIGNUM_RADIX) + (*--scan));
-		return ((BIGNUM_NEGATIVE_P (bignum)) ? (-accumulator) : accumulator);
-	}
-}
 
 #define DTB_WRITE_DIGIT(factor)						\
 {									\

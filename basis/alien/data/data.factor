@@ -7,6 +7,15 @@ stack-checker.dependencies combinators.short-circuit ;
 QUALIFIED: math
 IN: alien.data
 
+: <ref> ( value c-type -- c-ptr )
+    [ heap-size <byte-array> ] keep
+    '[ 0 _ set-alien-value ] keep ; inline
+
+: deref ( c-ptr c-type -- value )
+    [ 0 ] dip alien-value ; inline
+
+: little-endian? ( -- ? ) 1 int <ref> char deref 1 = ; foldable
+
 GENERIC: require-c-array ( c-type -- )
 
 M: array require-c-array first require-c-array ;
@@ -43,15 +52,6 @@ M: pointer <c-direct-array>
 
 : malloc-array ( n type -- array )
     [ heap-size calloc ] [ <c-direct-array> ] 2bi ; inline
-
-: (malloc-array) ( n type -- alien )
-    [ heap-size * malloc ] [ <c-direct-array> ] 2bi ; inline
-
-: <c-object> ( type -- array )
-    heap-size <byte-array> ; inline
-
-: (c-object) ( type -- array )
-    heap-size (byte-array) ; inline
 
 : malloc-byte-array ( byte-array -- alien )
     binary-object [ nip malloc dup ] 2keep memcpy ;

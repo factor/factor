@@ -192,7 +192,6 @@ struct factor_vm
 	fixnum bignum_to_fixnum(bignum * bignum);
 	s64 bignum_to_long_long(bignum * bignum);
 	u64 bignum_to_ulong_long(bignum * bignum);
-	double bignum_to_double(bignum * bignum);
 	bignum *double_to_bignum(double x);
 	int bignum_equal_p_unsigned(bignum * x, bignum * y);
 	enum bignum_comparison bignum_compare_unsigned(bignum * x, bignum * y);
@@ -457,7 +456,6 @@ struct factor_vm
 	inline cell unbox_array_size();
 	cell unbox_array_size_slow();
 	void primitive_fixnum_to_float();
-	void primitive_bignum_to_float();
 	void primitive_format_float();
 	void primitive_float_eq();
 	void primitive_float_add();
@@ -487,7 +485,6 @@ struct factor_vm
 	inline cell from_unsigned_cell(cell x);
 	inline cell allot_float(double n);
 	inline bignum *float_to_bignum(cell tagged);
-	inline double bignum_to_float(cell tagged);
 	inline double untag_float(cell tagged);
 	inline double untag_float_check(cell tagged);
 	inline fixnum float_to_fixnum(cell tagged);

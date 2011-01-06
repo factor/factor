@@ -59,11 +59,7 @@ PRIVATE>
 ERROR: log2-expects-positive x ;
 
 : log2 ( x -- n )
-    dup 0 <= [
-        log2-expects-positive
-    ] [
-        (log2)
-    ] if ; inline
+    dup 0 <= [ log2-expects-positive ] [ (log2) ] if ; inline
 
 : zero? ( x -- ? ) 0 number= ; inline
 : 2/ ( x -- y ) -1 shift ; inline
@@ -74,8 +70,8 @@ ERROR: log2-expects-positive x ;
 : ?1+ ( x -- y ) [ 1 + ] [ 0 ] if* ; inline
 : rem ( x y -- z ) abs [ mod ] [ + ] [ mod ] tri ; foldable
 : 2^ ( n -- 2^n ) 1 swap shift ; inline
-: even? ( n -- ? ) 1 bitand zero? ;
-: odd? ( n -- ? ) 1 bitand 1 number= ;
+: even? ( n -- ? ) 1 bitand zero? ; inline
+: odd? ( n -- ? ) 1 bitand 1 number= ; inline
 
 : if-zero ( ..a n quot1: ( ..a -- ..b ) quot2: ( ..a n -- ..b ) -- ..b )
     [ dup zero? ] [ [ drop ] prepose ] [ ] tri* if ; inline
