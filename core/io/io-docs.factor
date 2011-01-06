@@ -12,7 +12,7 @@ ARTICLE: "stream-types" "Binary and text streams"
 $nl
 "Binary streams have an element type of " { $link +byte+ } ". Elements are integers in the range " { $snippet "[0,255]" } ", representing bytes. Reading a sequence of elements produces a " { $link byte-array } ". Any object implementing the " { $link >c-ptr } " and " { $link byte-length } " generic words can be written to a binary stream."
 $nl
-"Character streams have an element tye of " { $link +character+ } ". Elements are non-negative integers, representing Unicode code points. Only instances of the " { $link string } " class can be read or written on a character stream."
+"Character streams have an element type of " { $link +character+ } ". Elements are non-negative integers, representing Unicode code points. Only instances of the " { $link string } " class can be read or written on a character stream."
 $nl
 "Most external streams are binary streams, and can be wrapped in string streams once a suitable encoding has been provided; see " { $link "io.encodings" } "." ;
 
@@ -89,7 +89,7 @@ $io-error ;
 
 HELP: stream-copy
 { $values { "in" "an input stream" } { "out" "an output stream" } }
-{ $description "Copies the contents of one stream into another, closing both streams when done." } 
+{ $description "Copies the contents of one stream into another, closing both streams when done." }
 $io-error ;
 
 HELP: stream-tell
@@ -112,21 +112,21 @@ HELP: stream-seek
 
 HELP: seek-absolute
 { $values
-    
+
      { "value" "a seek singleton" }
 }
 { $description "Seeks to an offset from the beginning of the stream." } ;
 
 HELP: seek-end
 { $values
-    
+
      { "value" "a seek singleton" }
 }
 { $description "Seeks to an offset from the end of the stream. If the offset puts the stream pointer past the end of the data on an output stream, writing to it will pad the difference with zeros." } ;
 
 HELP: seek-relative
 { $values
-    
+
      { "value" "a seek singleton" }
 }
 { $description "Seeks to an offset from the current position of the stream pointer." } ;
@@ -203,19 +203,19 @@ $io-error ;
 
 HELP: with-input-stream
 { $values { "stream" "an input stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to  " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } ;
+{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } ;
 
 HELP: with-output-stream
 { $values { "stream" "an output stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link output-stream } " rebound to  " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } ;
+{ $description "Calls the quotation in a new dynamic scope, with " { $link output-stream } " rebound to " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } ;
 
 HELP: with-streams
 { $values { "input" "an input stream" } { "output" "an output stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to  " { $snippet "input" } " and " { $link output-stream } " rebound to  " { $snippet "output" } ". The stream is closed if the quotation returns or throws an error." } ;
+{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to " { $snippet "input" } " and " { $link output-stream } " rebound to " { $snippet "output" } ". The stream is closed if the quotation returns or throws an error." } ;
 
 HELP: with-streams*
 { $values { "input" "an input stream" } { "output" "an output stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to  " { $snippet "input" } " and " { $link output-stream } " rebound to  " { $snippet "output" } "." }
+{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to " { $snippet "input" } " and " { $link output-stream } " rebound to " { $snippet "output" } "." }
 { $notes "This word does not close the stream. Compare with " { $link with-streams } "." } ;
 
 { with-input-stream with-input-stream* } related-words
@@ -224,12 +224,12 @@ HELP: with-streams*
 
 HELP: with-input-stream*
 { $values { "stream" "an input stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to  " { $snippet "stream" } "." }
+{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to " { $snippet "stream" } "." }
 { $notes "This word does not close the stream. Compare with " { $link with-input-stream } "." } ;
 
 HELP: with-output-stream*
 { $values { "stream" "an output stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link output-stream } " rebound to  " { $snippet "stream" } "." }
+{ $description "Calls the quotation in a new dynamic scope, with " { $link output-stream } " rebound to " { $snippet "stream" } "." }
 { $notes "This word does not close the stream. Compare with " { $link with-output-stream } "." } ;
 
 HELP: bl

@@ -117,7 +117,7 @@ HELP: signal-error.
         { "8 - Arithmetic exception. Most likely a divide by zero in " { $link /i } "." }
         { "10, 11 - Memory protection fault. This error suggests invalid values are being passed to C functions by an " { $link alien-invoke } ". Factor also uses memory protection to trap stack underflows and overflows, but usually these are reported as their own errors. Sometimes they'll show up as a generic signal 11, though." }
     }
-    "The Windows equivalent of a signal 11 is a SEH fault. When one occurs, the runtime throws a singal error, even though it does not correspond to a Unix signal."
+    "The Windows equivalent of a signal 11 is a SEH fault. When one occurs, the runtime throws a signal error, even though it does not correspond to a Unix signal."
 } ;
 
 HELP: array-size-error.

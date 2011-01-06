@@ -5,10 +5,10 @@ math.order ;
 IN: calendar
 
 HELP: duration
-{ $description "A duration is a period of time years, months, days, hours, minutes, and seconds.  All duration slots can store " { $link real } " numbers. Compare two durations with the " { $link <=> } " word." } ;
+{ $description "A duration is a period of time years, months, days, hours, minutes, and seconds. All duration slots can store " { $link real } " numbers. Compare two durations with the " { $link <=> } " word." } ;
 
 HELP: timestamp
-{ $description "A timestamp is a date and a time with a timezone offset.  Timestamp slots must store integers except for " { $snippet "seconds" } ", which stores reals, and " { $snippet "gmt-offset" } ", which stores a " { $link duration } ". Compare two durations with the " { $link <=> } " word." } ;
+{ $description "A timestamp is a date and a time with a timezone offset. Timestamp slots must store integers except for " { $snippet "seconds" } ", which stores reals, and " { $snippet "gmt-offset" } ", which stores a " { $link duration } ". Compare two durations with the " { $link <=> } " word." } ;
 
 { timestamp duration } related-words
 
@@ -33,7 +33,7 @@ HELP: month-names
 
 HELP: month-name
 { $values { "obj" { $or integer timestamp } } { "string" string } }
-{ $description "Looks up the month name and returns it as a string.  January has an index of 1 instead of zero." } ;
+{ $description "Looks up the month name and returns it as a string. January has an index of 1 instead of zero." } ;
 
 HELP: month-abbreviations
 { $values { "value" array } }
@@ -42,7 +42,7 @@ HELP: month-abbreviations
 
 HELP: month-abbreviation
 { $values { "n" integer } { "string" string } }
-{ $description "Looks up the abbreviated month name and returns it as a string.  January has an index of 1 instead of zero." } ;
+{ $description "Looks up the abbreviated month name and returns it as a string. January has an index of 1 instead of zero." } ;
 
 
 HELP: day-names
@@ -55,7 +55,7 @@ HELP: day-name
 
 HELP: day-abbreviations2
 { $values { "value" array } }
-{ $description "Returns an array with the abbreviated English names of the days of the week.  This abbreviation is two characters long." } ;
+{ $description "Returns an array with the abbreviated English names of the days of the week. This abbreviation is two characters long." } ;
 
 HELP: day-abbreviation2
 { $values { "n" integer } { "string" string } }
@@ -63,7 +63,7 @@ HELP: day-abbreviation2
 
 HELP: day-abbreviations3
 { $values { "value" array } }
-{ $description "Returns an array with the abbreviated English names of the days of the week.  This abbreviation is three characters long." } ;
+{ $description "Returns an array with the abbreviated English names of the days of the week. This abbreviation is three characters long." } ;
 
 HELP: day-abbreviation3
 { $values { "n" integer } { "string" string } }
@@ -101,7 +101,7 @@ HELP: seconds-per-year
 
 HELP: julian-day-number
 { $values { "year" integer } { "month" integer } { "day" integer } { "n" integer } }
-{ $description "Calculates the Julian day number from a year, month, and day.  The difference between two Julian day numbers is the number of days that have elapsed between the two corresponding dates." }
+{ $description "Calculates the Julian day number from a year, month, and day. The difference between two Julian day numbers is the number of days that have elapsed between the two corresponding dates." }
 { $warning "Not valid before year -4800 BCE." } ;
 
 HELP: julian-day-number>date
@@ -340,7 +340,7 @@ HELP: >gmt
 
 HELP: time*
 { $values { "obj1" object } { "obj2" object } { "obj3" object } }
-{ $description "Multiplies each time slot of a timestamp or duration by a number and make a new duration from the result.  Used in the implementation of " { $link before } "." } ;
+{ $description "Multiplies each time slot of a timestamp or duration by a number and make a new duration from the result. Used in the implementation of " { $link before } "." } ;
 { time+ time- time* } related-words
 
 HELP: before
@@ -355,7 +355,7 @@ HELP: before
 
 HELP: <zero>
 { $values { "timestamp" timestamp } }
-{ $description "Returns a zero timestamp that consists of zeros for every slot.  Used to see if timestamps are valid." } ;
+{ $description "Returns a zero timestamp that consists of zeros for every slot. Used to see if timestamps are valid." } ;
 
 HELP: valid-timestamp?
 { $values { "timestamp" timestamp } { "?" "a boolean" } }
@@ -419,7 +419,7 @@ HELP: zeller-congruence
 { $notes "User code should use the " { $link day-of-week } " word, which takes a " { $snippet "timestamp" } " instead of integers." } ;
 
 HELP: days-in-year
-{ $values { "obj" "a timestamp or an integer" } { "n" integer } } 
+{ $values { "obj" "a timestamp or an integer" } { "n" integer } }
 { $description "Calculates the number of days in a given year." }
 { $examples
     { $example "USING: calendar prettyprint ;"

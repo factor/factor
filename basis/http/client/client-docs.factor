@@ -139,7 +139,7 @@ $nl
 }
 "Submission data for POST and PUT requests:"
 { $subsections "http.client.post-data" }
-"More esoteric use-cases, for example HTTP methods other than the above, are accomodated by constructing an empty request object with " { $link <request> } " and filling everything in by hand."
+"More esoteric use-cases, for example HTTP methods other than the above, are accommodated by constructing an empty request object with " { $link <request> } " and filling everything in by hand."
 { $subsections
     "http.client.encoding"
     "http.client.errors"
