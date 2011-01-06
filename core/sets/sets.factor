@@ -46,22 +46,25 @@ M: set union
 : sequence/tester ( set1 set2 -- set1' quot )
     [ members ] [ tester ] bi* ; inline
 
+: small/large ( set1 set2 -- set1' set2' )
+    2dup [ cardinality ] bi@ > [ swap ] when ;
+
 PRIVATE>
 
 M: set intersect
-    [ sequence/tester filter ] keep set-like ;
+    [ small/large sequence/tester filter ] keep set-like ;
 
 M: set diff
     [ sequence/tester [ not ] compose filter ] keep set-like ;
 
 M: set intersects?
-    sequence/tester any? ;
+    small/large sequence/tester any? ;
 
 M: set subset?
-    sequence/tester all? ;
+    small/large sequence/tester all? ;
 
 M: set set=
-    2dup subset? [ swap subset? ] [ 2drop f ] if ;
+    2dup [ cardinality ] bi@ eq? [ subset? ] [ 2drop f ] if ;
 
 M: set fast-set ;
 

@@ -151,10 +151,7 @@ M: hashtable clone
     (clone) [ clone ] change-array ; inline
 
 M: hashtable equal?
-    over hashtable? [
-        2dup [ assoc-size ] bi@ eq?
-        [ assoc= ] [ 2drop f ] if
-    ] [ 2drop f ] if ;
+    over hashtable? [ assoc= ] [ 2drop f ] if ;
 
 ! Default method
 M: assoc new-assoc drop <hashtable> ; inline
