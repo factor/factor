@@ -56,7 +56,7 @@ ARTICLE: "parsing-tokens" "Parsing raw tokens"
 "So far we have seen how to read individual tokens, or read a sequence of parsed objects until a delimiter. It is also possible to read raw tokens from the input and perform custom processing."
 $nl
 "One example is the " { $link POSTPONE: USING: } " parsing word."
-{ $see POSTPONE: USING: } 
+{ $see POSTPONE: USING: }
 "It reads a list of vocabularies terminated by " { $link POSTPONE: ; } ". However, the vocabulary names do not name words, except by coincidence; so " { $link parse-until } " cannot be used here. Instead, a set of lower-level combinators can be used:"
 { $subsections
     each-token
@@ -215,7 +215,7 @@ HELP: parse-fresh
 { $errors "Throws a parse error if the input is malformed." } ;
 
 HELP: filter-moved
-{ $values { "assoc1" assoc } { "assoc2" assoc } { "seq" "an seqence of definitions" } }
+{ $values { "assoc1" assoc } { "assoc2" assoc } { "seq" "an sequence of definitions" } }
 { $description "Removes all definitions from " { $snippet "assoc2" } " which are in " { $snippet "assoc1" } " or are are no longer present in the current " { $link file } "." } ;
 
 HELP: forget-smudged
