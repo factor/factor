@@ -124,9 +124,9 @@ HELP: mod
 { $values { "x" rational } { "y" rational } { "z" rational } }
 { $description
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
-    { $list 
+    { $list
         "Modulus of fixnums always yields a fixnum."
-        "Modulus of bignums always yields a bignum."    
+        "Modulus of bignums always yields a bignum."
         { "Modulus of rationals always yields a rational. In this case, the remainder is computed using the formula " { $snippet "x - (x mod y) * y" } "." }
     }
 }
@@ -136,9 +136,9 @@ HELP: /mod
 { $values { "x" integer } { "y" integer } { "z" integer } { "w" integer } }
 { $description
     "Computes the quotient " { $snippet "z" } " and remainder " { $snippet "w" } " of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
-    { $list 
+    { $list
         "The quotient of two fixnums may overflow and yield a bignum; the remainder is always a fixnum"
-        "The quotient and remainder of two bignums is always a bignum."            
+        "The quotient and remainder of two bignums is always a bignum."
     }
 }
 { $see-also "division-by-zero" } ;
@@ -213,10 +213,10 @@ HELP: rem
 { $values { "x" rational } { "y" rational } { "z" rational } }
 { $description
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive or zero."
-    { $list 
+    { $list
         "Given fixnums, always yields a fixnum."
         "Given bignums, always yields a bignum."
-        "Given rationals, always yields a rational."    
+        "Given rationals, always yields a rational."
     }
 }
 { $see-also "division-by-zero" mod } ;
@@ -244,7 +244,7 @@ HELP: 2/
 
 HELP: 2^
 { $values { "n" "a positive integer" } { "2^n" "a positive integer" } }
-{ $description "Computes two to the power of " { $snippet "n" } ". This word will only give correct results if " { $snippet "n" } " is greater than zero; for the general case, use " { $snippet  "2 swap ^" } "." } ;
+{ $description "Computes two to the power of " { $snippet "n" } ". This word will only give correct results if " { $snippet "n" } " is greater than zero; for the general case, use " { $snippet "2 swap ^" } "." } ;
 
 HELP: zero?
 { $values { "x" number } { "?" "a boolean" } }
@@ -421,7 +421,7 @@ HELP: all-integers?
 
 HELP: find-integer
 { $values { "n" integer } { "quot" { $quotation "( ... i -- ... ? )" } } { "i" "an integer or " { $link f } } }
-{ $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iterationi stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
+{ $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find } "." } ;
 
 HELP: find-last-integer
