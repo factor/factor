@@ -70,14 +70,13 @@ HELP: define-persistent
     { "the name of a database column that maps to the slot" }        { "a database type (see " { $link "db.types" } ")" }
 } "Throws an error if the slot name (column one from each row) is not a slot in the tuple or its superclases." }
 { $examples
-    { $unchecked-example "USING: db.tuples db.types ;"
+    { $code "USING: db.tuples db.types ;"
         "TUPLE: boat id year name ;"
         "boat \"BOAT\" {"
         "    { \"id\" \"ID\" +db-assigned-id+ }"
         "    { \"year\" \"YEAR\" INTEGER }"
         "    { \"name\" \"NAME\" TEXT }"
         "} define-persistent"
-        ""
     }
 } ;
 

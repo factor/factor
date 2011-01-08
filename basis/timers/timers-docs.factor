@@ -22,10 +22,9 @@ HELP: every
      { "timer" timer } }
 { $description "Creates a timer that calls the quotation repeatedly, using " { $snippet "duration" } " as the frequency. The first call of " { $snippet "quot" } " will happen immediately. If the quotation throws an exception, the timer will stop." }
 { $examples
-    { $unchecked-example
+    { $code
         "USING: timers io calendar ;"
         """[ "Hi Buddy." print flush ] 10 seconds every drop"""
-        ""
     }
 } ;
 
@@ -33,10 +32,9 @@ HELP: later
 { $values { "quot" quotation } { "delay-duration" duration } { "timer" timer } }
 { $description "Sleeps for " { $snippet "duration" } " and then calls a " { $snippet "quot" } ". The user may cancel the timer before " { $snippet "quot" } " runs. This timer is not repeated." }
 { $examples
-    { $unchecked-example
+    { $code
         "USING: timers io calendar ;"
         """[ "Break's over!" print flush ] 15 minutes later drop"""
-        ""
     }
 } ;
 
@@ -46,10 +44,9 @@ HELP: delayed-every
      { "timer" timer } }
 { $description "Creates a timer that calls " { $snippet "quot" } " repeatedly, waiting " { $snippet "duration" } " before calling " { $snippet "quot" } " the first time and then waiting " { $snippet "duration" } " between further calls. If the quotation throws an exception, the timer will stop." }
 { $examples
-    { $unchecked-example
+    { $code
         "USING: timers io calendar ;"
         """[ "Hi Buddy." print flush ] 10 seconds every drop"""
-        ""
     }
 } ;
 
