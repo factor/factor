@@ -131,7 +131,7 @@ HELP: >continuation<
 
 HELP: ifcc
 { $values { "capture" { $quotation "( continuation -- )" } } { "restore" quotation } }
-{ $description "Reifies a continuation from the point immediately after which this word returns, and passes it to " { $snippet "capture" } ". When the continuation is restored, execution resumes and "{ $snippet "restore" } " is called." } ;
+{ $description "Reifies a continuation from the point immediately after which this word returns, and passes it to " { $snippet "capture" } ". When the continuation is restored, execution resumes and " { $snippet "restore" } " is called." } ;
 
 { callcc0 continue callcc1 continue-with ifcc } related-words
 
