@@ -128,7 +128,7 @@ HELP: kill-process
 HELP: kill-process*
 { $values { "handle" "a process handle" } }
 { $contract "Kills a running process." }
-{ $notes "User code should call " { $link kill-process } " intead." } ;
+{ $notes "User code should call " { $link kill-process } " instead." } ;
 
 HELP: process
 { $class-description "A class representing a process. Instances are created by calling " { $link <process> } "." } ;
