@@ -42,7 +42,7 @@ ARTICLE: { "regexp" "construction" } "Constructing regular expressions"
 "Most of the time, regular expressions are literals and the parsing word should be used, to construct them at parse time. This ensures that they are only compiled once, and gives parse time syntax checking."
 { $subsections POSTPONE: R/ }
 "Sometimes, regular expressions need to be constructed at run time instead; for example, in a text editor, the user might input a regular expression to search for in a document."
-{ $subsections <regexp> <optioned-regexp> } 
+{ $subsections <regexp> <optioned-regexp> }
 "Another approach is to use " { $vocab-link "regexp.combinators" } "." ;
 
 ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
@@ -76,8 +76,8 @@ ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
     { { $snippet "\\p{cntrl}" } "Control character" }
     { { $snippet "\\p{space}" } "Whitespace" }
     { { $snippet "\\p{xdigit}" } "Hexadecimal digit" }
-    { { $snippet "\\p{Nd}" } "Character in Unicode category Nd" } 
-    { { $snippet "\\p{Z}" } "Character in Unicode category beginning with Z" } 
+    { { $snippet "\\p{Nd}" } "Character in Unicode category Nd" }
+    { { $snippet "\\p{Z}" } "Character in Unicode category beginning with Z" }
     { { $snippet "\\p{script=Cham}" } "Character in the Cham writing system" } }
 { $heading "Character class operations" }
 "Character classes can be composed using four binary operations: " { $snippet "|| && ~~ --" } ". These do the operations union, intersection, symmetric difference and difference, respectively. For example, characters which are lower-case but not Latin script could be matched as " { $snippet "[\\p{lower}--\\p{script=latin}]" } ". These operations are right-associative, and " { $snippet "^" } " binds tighter than them. There is no syntax for grouping."
@@ -101,7 +101,7 @@ ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
     { { $snippet "a{n,}" } "At least n occurrences of a" }
     { { $snippet "a{,m}" } "At most m occurrences of a" }
     { { $snippet "a{n,m}" } "Between n and m occurrences of a" } }
-"All of these quantifiers are " { $emphasis "greedy" } ", meaning that they take as many repetitions as possible within the larger regular expression. Reluctant and posessive quantifiers are not yet supported."
+"All of these quantifiers are " { $emphasis "greedy" } ", meaning that they take as many repetitions as possible within the larger regular expression. Reluctant and possessive quantifiers are not yet supported."
 { $heading "Lookaround" }
 "Operators are provided to look ahead and behind the current point in the regular expression. These can be used in any context, but they're the most useful at the beginning or end of a regular expression."
 { $table
@@ -141,7 +141,7 @@ $nl
 
 HELP: case-insensitive
 { $syntax "R/ .../i" }
-{ $description "On regexps, the " { $snippet "i" } " option makes the match case-insenstive. Currently, this is handled incorrectly with respect to Unicode, as characters like ß do not expand into SS in upper case. This should be fixed in a future version." } ;
+{ $description "On regexps, the " { $snippet "i" } " option makes the match case-insensitive. Currently, this is handled incorrectly with respect to Unicode, as characters like ß do not expand into SS in upper case. This should be fixed in a future version." } ;
 
 HELP: unix-lines
 { $syntax "R/ .../d" }
@@ -164,7 +164,7 @@ ARTICLE: { "regexp" "theory" } "The theory of regular expressions"
 "A regular language is a set of strings that is matched by a regular expression, which is defined to have characters and the empty string, along with the operations concatenation, disjunction and Kleene star. Another way to define the class of regular languages is as the class of languages which can be recognized with constant space overhead, ie with a DFA. These two definitions are provably equivalent." $nl
 "One basic result in the theory of regular language is that the complement of a regular language is regular. In other words, for any regular expression, there exists another regular expression which matches exactly the strings that the first one doesn't match." $nl
 "This implies, by DeMorgan's law, that, if you have two regular languages, their intersection is also regular. That is, for any two regular expressions, there exists a regular expression which matches strings that match both inputs." $nl
-"Traditionally, regular expressions on computer support an additional operation: backreferences. For example, the Perl regexp " { $snippet "/(.*)$1/" } " matches a string repated twice. If a backreference refers to a string with a predetermined maximum length, then the resulting language is still regular." $nl
+"Traditionally, regular expressions on computer support an additional operation: backreferences. For example, the Perl regexp " { $snippet "/(.*)$1/" } " matches a string repeated twice. If a backreference refers to a string with a predetermined maximum length, then the resulting language is still regular." $nl
 "But, if not, the language is not regular. There is strong evidence that there is no efficient way to parse with backreferences in the general case. Perl uses a naive backtracking algorithm which has pathological behavior in some cases, taking exponential time to match even if backreferences aren't used. Additionally, expressions with backreferences don't have the properties with negation and intersection described above." $nl
 "The Factor regular expression engine was built with the design decision to support negation and intersection at the expense of backreferences. This lets us have a guaranteed linear-time matching algorithm. Systems like Ragel and Lex use the same algorithm." ;
 
