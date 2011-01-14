@@ -51,7 +51,7 @@ HELP: append-path
 { $examples
     { $unchecked-example """USING: io.pathnames prettyprint ;
 "first" "second.txt" append-path ."""
-"first/second.txt"
+"\"first/second.txt\""
     }
 } ;
 
@@ -61,7 +61,7 @@ HELP: prepend-path
 { $examples
     { $unchecked-example """USING: io.pathnames prettyprint ;
 "second.txt" "first" prepend-path ."""
-"first/second.txt"
+"\"first/second.txt\""
     }
 } ;
 
@@ -124,7 +124,7 @@ HELP: home
 { $examples
     { $unchecked-example "USING: io.pathnames prettyprint ;"
                 "home ."
-                "/home/factor-user"
+                "\"/home/factor-user\""
     }
 } ;
 
@@ -142,7 +142,7 @@ ARTICLE: "io.pathnames.presentations" "Pathname presentations"
 "Literal pathname presentations:"
 { $subsections POSTPONE: P" }
 "Many words that accept pathname strings can also work on pathname presentations." ;
-    
+
 ARTICLE: "io.pathnames" "Pathnames"
 "Pathnames are strings that refer to a file on disk. Pathname semantics are platform-specific, and Factor makes no attempt to abstract away the differences. Note that on Windows, both forward and backward slashes are accepted as directory separators."
 $nl
