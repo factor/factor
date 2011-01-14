@@ -449,7 +449,7 @@ HELP: filter!
 HELP: interleave
 { $values { "seq" sequence } { "between" "a quotation" } { "quot" { $quotation "( ... elt -- ... )" } } }
 { $description "Applies " { $snippet "quot" } " to each element in turn, also invoking " { $snippet "between" } " in-between each pair of elements." }
-{ $example "USING: io sequences ;" "{ \"a\" \"b\" \"c\" } [ \"X\" write ] [ write ] interleave" "aXbXc" } ;
+{ $examples { $example "USING: io sequences ;" "{ \"a\" \"b\" \"c\" } [ \"X\" write ] [ write ] interleave" "aXbXc" } } ;
 
 HELP: index
 { $values { "obj" object } { "seq" sequence } { "n" "an index" } }
@@ -973,19 +973,23 @@ HELP: produce-as
 HELP: map-sum
 { $values { "seq" sequence } { "quot" quotation } { "n" number } }
 { $description "Like map sum, but without creating an intermediate sequence." }
-{ $example
-    "USING: math math.ranges sequences prettyprint ;"
-    "100 [1,b] [ sq ] map-sum ."
-    "338350"
+{ $examples
+    { $example
+        "USING: math math.ranges sequences prettyprint ;"
+        "100 [1,b] [ sq ] map-sum ."
+        "338350"
+    }
 } ;
 
 HELP: count
 { $values { "seq" sequence } { "quot" quotation } { "n" integer } }
 { $description "Efficiently returns the number of elements that the predicate quotation matches." }
-{ $example
-    "USING: math math.ranges sequences prettyprint ;"
-    "100 [1,b] [ even? ] count ."
-    "50"
+{ $examples
+    { $example
+        "USING: math math.ranges sequences prettyprint ;"
+        "100 [1,b] [ even? ] count ."
+        "50"
+    }
 } ;
 
 HELP: selector
@@ -993,9 +997,11 @@ HELP: selector
      { "quot" { $quotation "( ... elt -- ... ? )" } }
      { "selector" { $quotation "( ... elt -- ... )" } } { "accum" vector } }
 { $description "Creates a new vector to accumulate the values which return true for a predicate. Returns a new quotation which accepts an object to be tested and stored in the collector if the test yields true. The collector is left on the stack for convenience." }
-{ $example "! Find all the even numbers:" "USING: prettyprint sequences math kernel ;"
-           "10 iota [ even? ] selector [ each ] dip ."
-           "V{ 0 2 4 6 8 }"
+{ $examples
+    { $example "! Find all the even numbers:" "USING: prettyprint sequences math kernel ;"
+               "10 iota [ even? ] selector [ each ] dip ."
+               "V{ 0 2 4 6 8 }"
+    }
 }
 { $notes "Used to implement the " { $link filter } " word. Compare this word with " { $link collector } ", which is an unfiltering version." } ;
 
@@ -1004,9 +1010,11 @@ HELP: trim-head
      { "seq" sequence } { "quot" quotation }
      { "newseq" sequence } }
 { $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
-{ $example "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-head ."
-           "{ 1 2 3 0 0 }"
+{ $examples
+    { $example "USING: prettyprint math sequences ;"
+               "{ 0 0 1 2 3 0 0 } [ zero? ] trim-head ."
+               "{ 1 2 3 0 0 }"
+    }
 } ;
 
 HELP: trim-head-slice
@@ -1014,9 +1022,11 @@ HELP: trim-head-slice
      { "seq" sequence } { "quot" quotation }
      { "slice" slice } }
 { $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice" }
-{ $example "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-head-slice ."
-           "T{ slice { from 2 } { to 7 } { seq { 0 0 1 2 3 0 0 } } }"
+{ $examples
+    { $example "USING: prettyprint math sequences ;"
+               "{ 0 0 1 2 3 0 0 } [ zero? ] trim-head-slice ."
+               "T{ slice { from 2 } { to 7 } { seq { 0 0 1 2 3 0 0 } } }"
+    }
 } ;
 
 HELP: trim-tail
@@ -1024,9 +1034,11 @@ HELP: trim-tail
      { "seq" sequence } { "quot" quotation }
      { "newseq" sequence } }
 { $description "Removes elements starting from the right side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
-{ $example "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-tail ."
-           "{ 0 0 1 2 3 }"
+{ $examples
+    { $example "USING: prettyprint math sequences ;"
+               "{ 0 0 1 2 3 0 0 } [ zero? ] trim-tail ."
+               "{ 0 0 1 2 3 }"
+    }
 } ;
 
 HELP: trim-tail-slice
@@ -1034,9 +1046,11 @@ HELP: trim-tail-slice
      { "seq" sequence } { "quot" quotation }
      { "slice" slice } }
 { $description "Removes elements starting from the right side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice." }
-{ $example "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-tail-slice ."
-           "T{ slice { from 0 } { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
+{ $examples
+    { $example "USING: prettyprint math sequences ;"
+               "{ 0 0 1 2 3 0 0 } [ zero? ] trim-tail-slice ."
+               "T{ slice { from 0 } { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
+    }
 } ;
 
 HELP: trim
@@ -1044,9 +1058,11 @@ HELP: trim
      { "seq" sequence } { "quot" quotation }
      { "newseq" sequence } }
 { $description "Removes elements starting from the left and right sides of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
-{ $example "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim ."
-           "{ 1 2 3 }"
+{ $examples
+    { $example "USING: prettyprint math sequences ;"
+               "{ 0 0 1 2 3 0 0 } [ zero? ] trim ."
+               "{ 1 2 3 }"
+    }
 } ;
 
 HELP: trim-slice
@@ -1054,9 +1070,11 @@ HELP: trim-slice
      { "seq" sequence } { "quot" quotation }
      { "slice" slice } }
 { $description "Removes elements starting from the left and right sides of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice." }
-{ $example "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-slice ."
-           "T{ slice { from 2 } { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
+{ $examples
+    { $example "USING: prettyprint math sequences ;"
+               "{ 0 0 1 2 3 0 0 } [ zero? ] trim-slice ."
+               "T{ slice { from 2 } { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
+    }
 } ;
 
 { trim trim-slice trim-head trim-head-slice trim-tail trim-tail-slice } related-words
