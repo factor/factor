@@ -8,10 +8,9 @@ HELP: STRING:
 HELP: /*
 { $syntax "/* comment */" }
 { $description "Provides C-like comments that can span multiple lines. One caveat is that " { $snippet "/*" } " and " { $snippet "*/" } " are still tokens and must not abut the comment text itself." }
-{ $example "USING: multiline ;"
+{ $code "USING: multiline ;"
            "/* I think that I shall never see"
            "   A poem lovely as a tree. */"
-           ""
 } ;
 
 HELP: HEREDOC:
