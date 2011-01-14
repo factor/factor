@@ -479,7 +479,7 @@ HELP: HELP:
         "USING: help help.markup help.syntax math ;"
         ": foo ( m -- n ) 2 + ;"
         "HELP: foo"
-        "{ $values { \"m\" \"an integer\" } { \"n\" \"an integer\" } }"
+        "{ $values { \"m\" integer } { \"n\" integer } }"
         "{ $description \"Increments a value by 2.\" } ;"
         "\\ foo help"
     }
