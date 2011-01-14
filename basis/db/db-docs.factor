@@ -143,7 +143,7 @@ HELP: rollback-transaction
 HELP: sql-command
 { $values
      { "sql" string } }
-{ $description "Executes a SQL string using the databse in the " { $link db-connection } " symbol." } ;
+{ $description "Executes a SQL string using the database in the " { $link db-connection } " symbol." } ;
 
 HELP: sql-query
 { $values
@@ -290,7 +290,7 @@ ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 "In conclusion, this method of accessing a database is supported, but it is fairly low-level and generally specific to a single database. The " { $vocab-link "db.tuples" } " vocabulary is a good alternative to writing SQL by hand." ;
 
 ARTICLE: "db-custom-database-combinators" "Custom database combinators"
-"Every database library requires some effort on the programmer's part to initialize and open a database. SQLite uses files on your harddisk, so a simple pathname is all the setup required. With PostgreSQL, you log in to a networked server as a user on a specfic port." $nl
+"Every database library requires some effort on the programmer's part to initialize and open a database. SQLite uses files on your harddisk, so a simple pathname is all the setup required. With PostgreSQL, you log in to a networked server as a user on a specific port." $nl
 
 "Make a " { $snippet "with-" } " combinator to open and close a database so that resources are not leaked." $nl
 
