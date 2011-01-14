@@ -250,7 +250,7 @@ $nl
 { $subsection alien-assembly } ;
 
 ARTICLE: "dll.private" "DLL handles"
-"DLL handles are a built-in class of objects which represent loaded native libraries. DLL handles are instances of the " { $link dll } " class, and have a literal syntax used for debugging prinouts; see " { $link "syntax-aliens" } "."
+"DLL handles are a built-in class of objects which represent loaded native libraries. DLL handles are instances of the " { $link dll } " class, and have a literal syntax used for debugging printouts; see " { $link "syntax-aliens" } "."
 $nl
 "Usually one never has to deal with DLL handles directly; the C library interface creates them as required. However if direct access to these operating system facilities is required, the following primitives can be used:"
 { $subsections
@@ -297,7 +297,7 @@ $nl
     } }
 } ;
 
-ARTICLE: "embedding-restrictions" "Embedding API restrictions" 
+ARTICLE: "embedding-restrictions" "Embedding API restrictions"
 "The Factor VM is not thread safe, and does not support multiple instances. There must only be one Factor instance per process, and this instance must be consistently accessed from the same thread for its entire lifetime. Once initialized, a Factor instance cannot be destroyed other than by exiting the process." ;
 
 ARTICLE: "embedding-factor" "What embedding looks like from Factor"
@@ -307,7 +307,7 @@ $nl
 $nl
 "There is a word which can detect when Factor is embedded:"
 { $subsections embedded? }
-"No special support is provided for calling out from Factor into the owner process. The C library inteface works fine for this task - see " { $link "alien" } "." ;
+"No special support is provided for calling out from Factor into the owner process. The C library interface works fine for this task - see " { $link "alien" } "." ;
 
 ARTICLE: "embedding" "Embedding Factor into C applications"
 "The Factor " { $snippet "Makefile" } " builds the Factor VM both as an executable and a library. The library can be used by other applications. File names for the library on various operating systems:"
