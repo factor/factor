@@ -158,10 +158,9 @@ HELP: nullary
 }
 { $description "Infers the number of inputs to a quotation and drops them from the stack." }
 { $examples
-    { $example
+    { $code
         """USING: combinators.smart kernel math ;
 1 2 [ + ] nullary"""
-""
     }
 } ;
 
