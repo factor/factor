@@ -16,7 +16,7 @@ ARTICLE: "server-config-logging" "Logging connections"
 "The " { $snippet "name" } " slot of a threaded server instance should be set to a string naming the logging service name to use. See " { $link "logging" } " for details." ;
 
 ARTICLE: "server-config-listen" "Setting ports to listen on"
-"The " { $snippet "insecure" } " slot of a threaded server instance contains an integer, an address specifier, or a sequence of address specifiers. Integer port numbers are interpreted as an " { $link inet4 } "/" { $link inet6 } " pair listening on all interfaces for given port number. All other address specifiers are interpeted as per " { $link "network-addressing" } "."
+"The " { $snippet "insecure" } " slot of a threaded server instance contains an integer, an address specifier, or a sequence of address specifiers. Integer port numbers are interpreted as an " { $link inet4 } "/" { $link inet6 } " pair listening on all interfaces for given port number. All other address specifiers are interpreted as per " { $link "network-addressing" } "."
 $nl
 "The " { $snippet "secure" } " slot of a threaded server instance is interpreted in the same manner as the " { $snippet "insecure" } " slot, except that secure encrypted connections are then allowed. If this slot is set, the " { $snippet "secure-config" } " slot should also be set to a " { $link secure-config } " instance containing SSL server configuration. See " { $link "ssl-config" } " for details."
 $nl
@@ -63,7 +63,7 @@ ARTICLE: "io.servers" "Threaded servers"
     new-threaded-server
     handle-client*
 }
-"The server must be configured before it can be started." 
+"The server must be configured before it can be started."
 { $subsections "server-config" }
 "Starting the server:"
 { $subsections start-server }
@@ -105,7 +105,7 @@ HELP: handle-client*
 
 HELP: start-server
 { $values { "threaded-server" threaded-server } }
-{ $description "Starts a threaded server and returns after the server is fully running. Throws an error if any of the ports cannot be aquired." }
+{ $description "Starts a threaded server and returns after the server is fully running. Throws an error if any of the ports cannot be acquired." }
 { $notes "Use " { $link stop-server } " or " { $link stop-this-server } " to stop the server." } ;
 
 HELP: stop-server
@@ -121,7 +121,7 @@ HELP: stop-this-server
 
 HELP: with-threaded-server
 { $values
-    { "threaded-server" threaded-server } { "quot" quotation }    
+    { "threaded-server" threaded-server } { "quot" quotation }
 }
 { $description "Runs a server and calls a quotation, stopping the server once the quotation returns." } ;
 
