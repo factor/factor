@@ -60,7 +60,7 @@ $nl
 ARTICLE: "first-program-test" "Testing your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
 { $code
-    "! Copyright (C) 2009 <your name here>"
+    "! Copyright (C) 2011 <your name here>"
     "! See http://factorcode.org/license.txt for BSD license."
     "USING: kernel sequences ;"
     "IN: palindrome"
