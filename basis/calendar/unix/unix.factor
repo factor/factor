@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax arrays calendar
-kernel math unix unix.time unix.types namespaces system
+USING: alien alien.c-types alien.data alien.syntax arrays
+calendar kernel math unix unix.time unix.types namespaces system
 accessors classes.struct ;
 IN: calendar.unix
 
@@ -21,7 +21,7 @@ IN: calendar.unix
     timespec>duration since-1970 ;
 
 : get-time ( -- alien )
-    f time <time_t> localtime ;
+    f time time_t <ref> localtime ;
 
 : timezone-name ( -- string )
     get-time zone>> ;

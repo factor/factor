@@ -1,9 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors peg peg.parsers memoize kernel sequences
 logging arrays words strings vectors io io.files
 io.encodings.utf8 namespaces make combinators logging.server
-calendar calendar.format assocs ;
+calendar calendar.format assocs prettyprint ;
 IN: logging.parser
 
 TUPLE: log-entry date level word-name message ;
@@ -83,3 +83,20 @@ PEG: parse-log-line ( string -- entry ) 'log-line' ;
 : parse-log-file ( service -- entries )
     log-path 1 log# dup exists?
     [ utf8 file-lines parse-log ] [ drop f ] if ;
+
+GENERIC: log-timestamp. ( date -- )
+
+M: timestamp log-timestamp. (timestamp>string) ;
+M: word log-timestamp. drop "multiline" write ;
+
+: log-entry. ( entry -- )
+    "====== " write
+    {
+        [ date>> log-timestamp. bl ]
+        [ level>> pprint bl ]
+        [ word-name>> write nl ]
+        [ message>> "\n" join print ]
+    } cleave ;
+
+: log-entries. ( errors -- )
+    [ log-entry. ] each ;

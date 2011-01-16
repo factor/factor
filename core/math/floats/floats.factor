@@ -7,9 +7,6 @@ IN: math.floats.private
 : float-min ( x y -- z ) [ float< ] most ; foldable
 : float-max ( x y -- z ) [ float> ] most ; foldable
 
-M: fixnum >float fixnum>float ; inline
-M: bignum >float bignum>float ; inline
-
 M: float >fixnum float>fixnum ; inline
 M: float >bignum float>bignum ; inline
 M: float >float ; inline

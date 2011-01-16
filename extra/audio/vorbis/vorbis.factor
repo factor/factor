@@ -1,9 +1,9 @@
 ! (c)2007, 2010 Chris Double, Joe Groff bsd license
-USING: accessors alien alien.c-types audio.engine byte-arrays
-classes.struct combinators destructors fry io io.files
-io.encodings.binary kernel libc locals make math math.order
-math.parser ogg ogg.vorbis sequences specialized-arrays
-specialized-vectors ;
+USING: accessors alien alien.c-types alien.data audio.engine
+byte-arrays classes.struct combinators destructors fry io
+io.files io.encodings.binary kernel libc locals make math
+math.order math.parser ogg ogg.vorbis sequences
+specialized-arrays specialized-vectors ;
 FROM: alien.c-types => float short void* ;
 SPECIALIZED-ARRAYS: float void* ;
 SPECIALIZED-VECTOR: short
@@ -157,7 +157,7 @@ ERROR: no-vorbis-in-ogg ;
     [ init-vorbis-codec ] if ;
 
 : get-pending-decoded-audio ( vorbis-stream -- pcm len )
-    dsp-state>> f <void*> [ vorbis_synthesis_pcmout ] keep *void* swap ;
+    dsp-state>> f void* <ref> [ vorbis_synthesis_pcmout ] keep void* deref swap ;
 
 : float>short-sample ( float -- short )
     -32767.5 * 0.5 - >integer -32768 32767 clamp ; inline

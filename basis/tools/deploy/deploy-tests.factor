@@ -134,3 +134,5 @@ os macosx? [
 [ ] [ "resource:license.txt" "license.txt" temp-file copy-file ] unit-test
 
 [ ] [ "tools.deploy.test.19" shake-and-bake run-temp-image ] unit-test
+
+[ ] [ "benchmark.ui-panes" shake-and-bake run-temp-image ] unit-test

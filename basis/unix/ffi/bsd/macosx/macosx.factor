@@ -5,6 +5,9 @@ IN: unix.ffi
 
 CONSTANT: FD_SETSIZE 1024
 
+CONSTANT: AF_INET6 30
+ALIAS: PF_INET6 AF_INET6
+
 STRUCT: addrinfo
     { flags int }
     { family int } 

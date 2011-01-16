@@ -3,15 +3,19 @@
 USING: sets tools.test kernel prettyprint hash-sets sorting ;
 IN: sets.tests
 
-[ { } ] [ { } { } intersect  ] unit-test
+[ { } ] [ { } { } intersect ] unit-test
 [ { 2 3 } ] [ { 1 2 3 } { 2 3 4 } intersect ] unit-test
+[ { 2 3 } ] [ { 1 2 3 } { 2 3 4 5 } intersect ] unit-test
+[ { 2 3 4 } ] [ { 1 2 3 4 } { 2 3 4 } intersect ] unit-test
 [ { 2 3 } ] [ { 1 2 2 3 } { 2 3 3 4 } intersect ] unit-test
 
 [ { } ] [ { } { } diff ] unit-test
 [ { 1 } ] [ { 1 2 3 } { 2 3 4 } diff ] unit-test
+[ { 1 } ] [ { 1 2 3 } { 2 3 4 5 } diff ] unit-test
+[ { 1 } ] [ { 1 2 3 4 } { 2 3 4 } diff ] unit-test
 [ { 1 } ] [ { 1 1 2 3 } { 2 3 4 4 } diff ] unit-test
 
-[ { } ] [ { } { } within  ] unit-test
+[ { } ] [ { } { } within ] unit-test
 [ { 2 3 } ] [ { 1 2 3 } { 2 3 4 } within ] unit-test
 [ { 2 2 3 } ] [ { 1 2 2 3 } { 2 3 3 4 } within ] unit-test
 
@@ -64,3 +68,9 @@ IN: sets.tests
 
 [ t ] [ f null? ] unit-test
 [ f ] [ { 4 } null? ] unit-test
+
+[ 0 ] [ f cardinality ] unit-test
+[ 0 ] [ { } cardinality ] unit-test
+[ 1 ] [ { 1 } cardinality ] unit-test
+[ 1 ] [ HS{ 1 } cardinality ] unit-test
+[ 3 ] [ HS{ 1 2 3 } cardinality ] unit-test

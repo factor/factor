@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax assocs ;
 IN: path-finding
 
-{ <astar> <bfs> } related-words
+{ <astar> <bfs> <dijkstra> } related-words
 
 HELP: astar
 { $description "This tuple must be subclassed and its method " { $link cost } ", "
@@ -45,7 +45,7 @@ HELP: <astar>
   { "neighbours" "a quotation with stack effect ( node -- seq )" }
   { "cost" "a quotation with stack effect ( from to -- cost )" }
   { "heuristic" "a quotation with stack effect ( pos target -- cost )" }
-  { "astar" "a astar tuple" }
+  { "astar" astar }
 }
 { $description "Build an astar object from the given quotations. The "
   { $snippet "neighbours" } " one builds the list of neighbours. The "
@@ -57,19 +57,31 @@ HELP: <astar>
 
 HELP: <bfs>
 { $values
-  { "neighbours" "an assoc" }
-  { "astar" "a astar tuple" }
+  { "neighbours" assoc }
+  { "astar" astar }
 }
 { $description "Build an astar object from the " { $snippet "neighbours" } " assoc. "
   "When used with " { $link find-path } ", this astar tuple will use the breadth-first search (BFS) "
   "path finding algorithm which is a particular case of the general A* algorithm."
 } ;
 
+HELP: <dijkstra>
+{ $values
+  { "costs" assoc }
+  { "astar" astar }
+}
+{ $description "Build an astar object from the " { $snippet "costs" } " assoc. "
+  "The assoc keys are edges of the graph, while the corresponding values are assocs whose keys are "
+  "the edges that can be reached and whose values are the costs to reach those edges. When used with "
+  { $link find-path } ", this astar tuple will use the Dijkstra path finding algorithm which is "
+  "a particular case of the general A* algorithm."
+} ;
+
 HELP: find-path
 { $values
   { "start" "a node" }
   { "target" "a node" }
-  { "astar" "a astar tuple" }
+  { "astar" astar }
   { "path/f" "an optimal path from " { $snippet "start" } " to " { $snippet "target" }
     ", or f if no such path exists" }
 }
@@ -79,7 +91,7 @@ HELP: find-path
 
 HELP: considered
 { $values
-  { "astar" "a astar tuple" }
+  { "astar" astar }
   { "considered" "a sequence" }
 }
 { $description "When called after a call to " { $link find-path } ", return a list of nodes "

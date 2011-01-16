@@ -1,7 +1,8 @@
 USING: kernel windows.com windows.com.syntax windows.ole32
-windows.types alien alien.syntax tools.test libc alien.c-types
-namespaces arrays continuations accessors math windows.com.wrapper
-windows.com.wrapper.private destructors effects compiler.units ;
+windows.types alien alien.data alien.syntax tools.test libc
+alien.c-types namespaces arrays continuations accessors math
+windows.com.wrapper windows.com.wrapper.private destructors
+effects compiler.units ;
 IN: windows.com.tests
 
 COM-INTERFACE: ISimple IUnknown {216fb341-0eb2-44b1-8edb-60b76e353abc}
@@ -58,7 +59,7 @@ C: <test-implementation> test-implementation
         dup +guinea-pig-implementation+ set [ drop
 
             S_OK 1array [ +guinea-pig-implementation+ get ISimple::returnOK ] unit-test
-            E_FAIL <long> *long 1array [ +guinea-pig-implementation+ get ISimple::returnError ] unit-test
+            E_FAIL long <ref> long deref 1array [ +guinea-pig-implementation+ get ISimple::returnError ] unit-test
             20 1array [
                 +guinea-pig-implementation+ get
                 [ 20 IInherited::setX ]

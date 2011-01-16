@@ -1,6 +1,6 @@
-USING: alien alien.c-types alien.accessors alien.parser
-effects kernel windows.ole32 parser lexer splitting grouping
-sequences namespaces assocs quotations generalizations
+USING: alien alien.c-types alien.data alien.accessors
+alien.parser effects kernel windows.ole32 parser lexer splitting
+grouping sequences namespaces assocs quotations generalizations
 accessors words macros alien.syntax fry arrays layouts math
 classes.struct windows.kernel32 locals ;
 FROM: alien.parser.private => parse-pointers return-type-name ;
@@ -11,7 +11,7 @@ IN: windows.com.syntax
 MACRO: com-invoke ( n return parameters -- )
     [ 2nip length ] 3keep
     '[
-        _ npick *void* _ cell * alien-cell _ _
+        _ npick void* deref _ cell * alien-cell _ _
         stdcall alien-indirect
     ] ;
 

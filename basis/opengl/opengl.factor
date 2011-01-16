@@ -142,7 +142,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     [ 1 { uint } ] dip with-out-parameters ; inline
 
 : (delete-gl-object) ( id quot -- )
-    [ 1 swap <uint> ] dip call ; inline
+    [ 1 swap uint <ref> ] dip call ; inline
 
 : gen-gl-buffer ( -- id )
     [ glGenBuffers ] (gen-gl-object) ;

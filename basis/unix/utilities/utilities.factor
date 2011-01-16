@@ -8,14 +8,14 @@ IN: unix.utilities
 SPECIALIZED-ARRAY: void*
 
 : more? ( alien -- ? )
-    { [ ] [ *void* ] } 1&& ;
+    { [ ] [ void* deref ] } 1&& ;
 
 : advance ( void* -- void* )
     cell swap <displaced-alien> ;
 
 : alien>strings ( alien encoding -- strings )
     [ [ dup more? ] ] dip
-    '[ [ advance ] [ *void* _ alien>string ] bi ]
+    '[ [ advance ] [ void* deref _ alien>string ] bi ]
     produce nip ;
 
 : strings>alien ( strings encoding -- array )

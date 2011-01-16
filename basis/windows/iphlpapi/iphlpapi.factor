@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.syntax
+USING: accessors alien alien.c-types alien.data alien.syntax
 classes.struct io.encodings.string io.encodings.utf8 kernel
 make sequences windows.errors windows.types ;
 IN: windows.iphlpapi
@@ -63,7 +63,7 @@ TYPEDEF: FIXED_INFO* PFIXED_INFO
 FUNCTION: DWORD GetNetworkParams ( PFIXED_INFO pFixedInfo, PULONG pOutBufLen ) ;
 
 : get-fixed-info ( -- FIXED_INFO )
-    FIXED_INFO <struct> dup byte-length <ulong>
+    FIXED_INFO <struct> dup byte-length ulong <ref>
     [ GetNetworkParams n>win32-error-check ] 2keep drop ;
     
 : dns-server-ips ( -- sequence )

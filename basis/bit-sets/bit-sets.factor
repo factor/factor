@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences byte-arrays bit-arrays math hints sets ;
+USING: kernel accessors sequences byte-arrays bit-arrays math
+math.bitwise hints sets ;
 IN: bit-sets
 
 TUPLE: bit-set { table bit-array read-only } ;
@@ -14,19 +15,21 @@ M: bit-set in?
     over integer? [ table>> ?nth ] [ 2drop f ] if ; inline
 
 M: bit-set adjoin
-    ! This is allowed to crash when the elt couldn't go in the set
+    ! This is allowed to throw an error when the elt couldn't
+    ! go in the set
     [ t ] 2dip table>> set-nth ;
 
 M: bit-set delete
-    ! This isn't allowed to crash if the elt wasn't in the set
+    ! This isn't allowed to throw an error if the elt wasn't
+    ! in the set
     over integer? [
         table>> 2dup bounds-check? [
             [ f ] 2dip set-nth
         ] [ 2drop ] if
     ] [ 2drop ] if ;
 
-! If you do binary set operations with a bitset, it's expected
-! that the other thing can also be represented as a bitset
+! If you do binary set operations with a bit-set, it's expected
+! that the other thing can also be represented as a bit-set
 ! of the same length.
 <PRIVATE
 
@@ -70,7 +73,8 @@ M: bit-set members
 <PRIVATE
 
 : bit-set-like ( set bit-set -- bit-set' )
-    ! This crashes if there are keys that can't be put in the bit set
+    ! Throws an error if there are keys that can't be put
+    ! in the bit set
     over bit-set? [ 2dup [ table>> length ] bi@ = ] [ f ] if
     [ drop ] [
         [ members ] dip table>> length <bit-set>
@@ -84,3 +88,6 @@ M: bit-set set-like
 
 M: bit-set clone
     table>> clone bit-set boa ;
+
+M: bit-set cardinality
+    table>> bit-count ;

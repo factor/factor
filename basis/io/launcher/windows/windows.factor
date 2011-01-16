@@ -180,12 +180,12 @@ M: windows wait-for-processes ( -- ? )
     GetCurrentProcess ! source process
     swap handle>> ! handle
     GetCurrentProcess ! target process
-    f <void*> [ ! target handle
+    f void* <ref> [ ! target handle
         DUPLICATE_SAME_ACCESS ! desired access
         TRUE ! inherit handle
         0 ! options
         DuplicateHandle win32-error=0/f
-    ] keep *void* <win32-handle> &dispose ;
+    ] keep void* deref <win32-handle> &dispose ;
 
 ! /dev/null simulation
 : null-input ( -- pipe )
