@@ -37,8 +37,8 @@ SYMBOL: js-context
 
 : eval-js ( string -- result-string )
     [ js-context get dup ] dip
-    JSStringCreateWithUTF8CString f f 0 JSValueRef <c-object>
-    [ JSEvaluateScript ] keep *void*
+    JSStringCreateWithUTF8CString f f 0
+    { { void* initial: f } } [ JSEvaluateScript ] with-out-parameters
     dup [ nip JSValueRef>string javascriptcore-error ] [ drop JSValueRef>string ] if ;
 
 : eval-js-standalone ( string -- result-string )

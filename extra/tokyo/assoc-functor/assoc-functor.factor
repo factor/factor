@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs destructors fry functors
-kernel locals sequences serialize tokyo.alien.tcutil tokyo.utils vectors ;
+USING: accessors alien.c-types alien.data arrays assocs
+destructors fry functors kernel locals sequences serialize
+tokyo.alien.tcutil tokyo.utils vectors ;
 IN: tokyo.assoc-functor
 
 FUNCTOR: define-tokyo-assoc-api ( T N -- )
@@ -28,14 +29,14 @@ INSTANCE: TYPE assoc
 M: TYPE dispose* [ DBDEL f ] change-handle drop ;
 
 M: TYPE at* ( key db -- value/f ? )
-    handle>> swap object>bytes dup length 0 <int>
+    handle>> swap object>bytes dup length 0 int <ref>
     DBGET [ [ memory>object ] [ tcfree ] bi t ] [ f f ] if* ;
 
 M: TYPE assoc-size ( db -- size ) handle>> DBRNUM ;
 
 : DBKEYS ( db -- keys )
     [ assoc-size <vector> ] [ handle>> ] bi
-    dup DBITERINIT drop 0 <int>
+    dup DBITERINIT drop 0 int <ref>
     [ 2dup DBITERNEXT dup ] [
         [ memory>object ] [ tcfree ] bi
         [ pick ] dip swap push

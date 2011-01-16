@@ -13,7 +13,7 @@ PRIVATE>
 
 GENERIC: enum>number ( enum -- number ) foldable
 M: integer enum>number ;
-M: symbol enum>number "enum-value" word-prop ;
+M: word enum>number "enum-value" word-prop ;
 
 <PRIVATE
 : enum-boxer ( members -- quot )

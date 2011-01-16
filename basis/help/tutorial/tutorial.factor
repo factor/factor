@@ -24,7 +24,7 @@ $nl
 ARTICLE: "first-program-logic" "Writing some logic in your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
 { $code
-    "! Copyright (C) 2009 <your name here>"
+    "! Copyright (C) 2011 <your name here>"
     "! See http://factorcode.org/license.txt for BSD license."
     "USING: ;"
     "IN: palindrome"
@@ -127,7 +127,7 @@ $nl
 "Finally, pass the string and the quotation to the " { $link filter } " word:"
 { $code "filter" }
 "Now the stack should contain the following string:"
-{ "\"AmanaplanacanalPanama\"" }
+{ "\"AmanaplanacanalPanama\"" } ". "
 "This is almost what we want; we just need to convert the string to lower case now. This can be done by calling " { $link >lower } "; the " { $snippet ">" } " prefix is a naming convention for conversion operations, and should be read as “to”:"
 { $code ">lower" }
 "Finally, let's print the top of the stack and discard it:"

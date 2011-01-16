@@ -117,7 +117,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
 
 : assoc= ( assoc1 assoc2 -- ? )
-    [ assoc-subset? ] [ swap assoc-subset? ] 2bi and ;
+    2dup [ assoc-size ] bi@ eq? [ assoc-subset? ] [ 2drop f ] if ;
 
 : assoc-hashcode ( n assoc -- code )
     >alist hashcode* ;

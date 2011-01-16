@@ -18,6 +18,8 @@ ARTICLE: "set-operations" "Operations on sets"
 { $subsections in? }
 "All sets can be represented as a sequence, without duplicates, of their members:"
 { $subsections members }
+"To get the number of elements in a set:"
+{ $subsections cardinality }
 "Sets can have members added or removed destructively:"
 { $subsections
     adjoin
@@ -184,3 +186,7 @@ HELP: without
 HELP: null?
 { $values { "set" set } { "?" "a boolean" } }
 { $description "Tests whether the given set is empty. This outputs " { $snippet "t" } " when given a null set of any type." } ;
+
+HELP: cardinality
+{ $values { "set" set } { "n" "a non-negative integer" } }
+{ $description "Returns the number of elements in the set. All sets support this operation." } ;

@@ -16,6 +16,8 @@ IN: io.sockets
     { [ os unix? ] [ "unix.ffi" ] }
 } cond use-vocab >>
 
+GENERIC# with-port 1 ( addrspec port -- addrspec )
+
 ! Addressing
 <PRIVATE
 
@@ -36,8 +38,6 @@ GENERIC: address-size ( addrspec -- n )
 GENERIC: inet-ntop ( data addrspec -- str )
 
 GENERIC: inet-pton ( str addrspec -- data )
-
-GENERIC# with-port 1 ( addrspec port -- addrspec )
 
 : make-sockaddr/size ( addrspec -- sockaddr size )
     [ make-sockaddr ] [ sockaddr-size ] bi ;
@@ -106,10 +106,10 @@ M: ipv4 make-sockaddr ( inet -- sockaddr )
         swap
         [ port>> htons >>port ]
         [ host>> "0.0.0.0" or ]
-        [ inet-pton *uint >>addr ] tri ;
+        [ inet-pton uint deref >>addr ] tri ;
 
 M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
-    [ addr>> <uint> ] dip inet-ntop <ipv4> ;
+    [ addr>> uint <ref> ] dip inet-ntop <ipv4> ;
 
 TUPLE: inet4 < ipv4 { port integer read-only } ;
 
@@ -368,12 +368,17 @@ M: inet present
 C: <inet> inet
 
 M: string resolve-host
-    f prepare-addrinfo f <void*>
-    [ getaddrinfo addrinfo-error ] keep *void* addrinfo memory>struct
+    f prepare-addrinfo f void* <ref>
+    [ getaddrinfo addrinfo-error ] keep void* deref addrinfo memory>struct
     [ parse-addrinfo-list ] keep freeaddrinfo ;
+
+M: string with-port <inet> ;
 
 M: hostname resolve-host
     host>> resolve-host ;
+
+M: hostname with-port
+    [ host>> ] dip <inet> ;
 
 M: inet resolve-host
     [ call-next-method ] [ port>> ] bi '[ _ with-port ] map ;

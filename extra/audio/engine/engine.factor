@@ -1,8 +1,8 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien audio classes.struct fry calendar timers
-combinators combinators.short-circuit destructors generalizations
-kernel literals locals math openal sequences
-sequences.generalizations specialized-arrays strings ;
+USING: accessors alien alien.data audio classes.struct fry
+calendar timers combinators combinators.short-circuit
+destructors generalizations kernel literals locals math openal
+sequences sequences.generalizations specialized-arrays strings ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS: c:float c:uchar c:uint ;
 IN: audio.engine
@@ -122,7 +122,7 @@ ERROR: audio-context-not-available device-name ;
 
 :: flush-source ( al-source -- )
     al-source alSourceStop
-    0 c:<uint> :> dummy-buffer
+    0 c:uint <ref> :> dummy-buffer
     al-source AL_BUFFERS_PROCESSED get-source-param [
         al-source 1 dummy-buffer alSourceUnqueueBuffers
     ] times
@@ -161,7 +161,7 @@ ERROR: audio-context-not-available device-name ;
             audio-clip t >>done? drop
         ] [
             al-buffer audio-clip openal-format data size audio-clip sample-rate>> alBufferData
-            al-source 1 al-buffer c:<uint> alSourceQueueBuffers
+            al-source 1 al-buffer c:uint <ref> alSourceQueueBuffers
         ] if
     ] unless ;
 
@@ -190,10 +190,10 @@ M: static-audio-clip (update-audio-clip)
 
 M:: streaming-audio-clip (update-audio-clip) ( audio-clip -- )
     audio-clip al-source>> :> al-source
-    0 c:<uint> :> buffer
+    0 c:uint <ref> :> buffer
     al-source AL_BUFFERS_PROCESSED get-source-param [
         al-source 1 buffer alSourceUnqueueBuffers
-        audio-clip buffer c:*uint queue-clip-buffer
+        audio-clip buffer c:uint deref queue-clip-buffer
     ] times ;
 
 : update-audio-clip ( audio-clip -- )
@@ -256,7 +256,7 @@ M: audio-engine dispose*
     audio-engine get-available-source :> al-source
 
     al-source [
-        1 0 c:<uint> [ alGenBuffers ] keep c:*uint :> al-buffer
+        1 0 c:uint <ref> [ alGenBuffers ] keep c:uint deref :> al-buffer
         al-buffer audio { [ openal-format ] [ data>> ] [ size>> ] [ sample-rate>> ] } cleave
             alBufferData
 
@@ -301,7 +301,7 @@ M: audio-clip dispose*
 
 M: static-audio-clip dispose*
     [ call-next-method ]
-    [ [ 1 ] dip al-buffer>> c:<uint> alDeleteBuffers ] bi ;
+    [ [ 1 ] dip al-buffer>> c:uint <ref> alDeleteBuffers ] bi ;
 
 M: streaming-audio-clip dispose*
     [ call-next-method ]

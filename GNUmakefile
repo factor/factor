@@ -154,12 +154,12 @@ solaris-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.solaris.x86.64
 
 winnt-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.windows.nt.x86.32
-	$(MAKE) factor-console CONFIG=vm/Config.windows.nt.x86.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32
+	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.32
 
 winnt-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.windows.nt.x86.64
-	$(MAKE) factor-console CONFIG=vm/Config.windows.nt.x86.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.64
+	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.64
 
 ifdef CONFIG
 

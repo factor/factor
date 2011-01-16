@@ -118,10 +118,10 @@ HELP: inet
 
 HELP: <inet>
 { $values { "host" "a host name" } { "port" "a port number" } { "inet" inet } }
-{ $description "Creates a new " { $link inet } " address specifier." } ;
+{ $description "Creates a new " { $link inet } " address specifier. If the host is an IPv4 address, an " { $link inet4 } " tuple will be returned; likewise for " { $link inet6 } "." } ;
 
 HELP: inet4
-{ $class-description "IPv4 address/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the IPv4 address and port number, respectively. New instances are created by calling " { $link <inet4> } "." }
+{ $class-description "IPv4 address/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the IPv4 address and port number, respectively. New instances are created by calling " { $link <inet4> } ". A host of " { $link f } " refers to localhost, and a port of " { $link f } " defers the port choice until later." }
 { $notes "Most applications do not operate on IPv4 addresses directly, and instead should use the " { $link inet } " address specifier, or call " { $link resolve-host } "." }
 { $examples
     { $code "\"127.0.0.1\" 8080 <inet4>" }
@@ -129,10 +129,10 @@ HELP: inet4
 
 HELP: <inet4>
 { $values { "host" "an IPv4 address" } { "port" "a port number" } { "inet4" inet4 } }
-{ $description "Creates a new " { $link inet4 } " address specifier." } ;
+{ $description "Creates a new " { $link inet4 } " address specifier. A value of " { $link f } " as the host refers to localhost, while " { $link f } " as the port defers the port choice until a later time." } ;
 
 HELP: inet6
-{ $class-description "IPv6 address/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the IPv6 address and port number, respectively. New instances are created by calling " { $link <inet6> } "." }
+{ $class-description "IPv6 address/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the IPv6 address and port number, respectively. New instances are created by calling " { $link <inet6> } ". A host of " { $link f } " refers to localhost, and a port of " { $link f } " defers the port choice until later." }
 { $notes "Most applications do not operate on IPv6 addresses directly, and instead should use the " { $link inet } " address specifier, or call " { $link resolve-host } "." }
 { $examples
     { $code "\"::1\" 8080 <inet6>" }
@@ -140,7 +140,7 @@ HELP: inet6
 
 HELP: <inet6>
 { $values { "host" "an IPv6 address" } { "port" "a port number" } { "inet6" inet6 } }
-{ $description "Creates a new " { $link inet6 } " address specifier." } ;
+{ $description "Creates a new " { $link inet6 } " address specifier. A value of " { $link f } " as the host refers to localhost, while " { $link f } " as the port defers the port choice until a later time." } ;
 
 HELP: <client>
 { $values { "remote" "an address specifier" } { "encoding" "an encding descriptor" } { "stream" "a bidirectional stream" } { "local" "an address specifier" } }

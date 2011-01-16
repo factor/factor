@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.destructors alien.syntax accessors
-destructors fry kernel math math.bitwise sequences libc colors
-images images.memory core-graphics.types core-foundation.utilities
-opengl.gl literals ;
+USING: alien alien.c-types alien.data alien.destructors
+alien.syntax accessors destructors fry kernel math math.bitwise
+sequences libc colors images images.memory core-graphics.types
+core-foundation.utilities opengl.gl literals ;
 IN: core-graphics
 
 TYPEDEF: int CGImageAlphaInfo

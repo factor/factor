@@ -1,28 +1,15 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.enums alien.syntax arrays assocs
-byte-arrays calendar combinators combinators.smart constructors
-destructors fry grouping io io.binary io.buffers
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.files io.ports io.sockets io.streams.byte-array io.timeouts
-kernel make math math.bitwise math.parser math.ranges
-math.statistics memoize namespaces random sequences
-slots.syntax splitting strings system unicode.categories
-vectors nested-comments io.sockets.private ;
+USING: accessors alien.enums alien.syntax arrays calendar
+combinators combinators.smart constructors destructors grouping
+io io.binary io.encodings.binary io.encodings.string
+io.encodings.utf8 io.sockets io.sockets.private
+io.streams.byte-array io.timeouts kernel make math math.bitwise
+math.parser namespaces nested-comments random sequences
+slots.syntax splitting system vectors vocabs.loader ;
 IN: dns
 
-GENERIC: stream-peek1 ( stream -- byte/f )
-
-M: input-port stream-peek1
-    dup check-disposed dup wait-to-read
-    [ drop f ] [ buffer>> buffer-peek ] if ; inline
-
-M: byte-reader stream-peek1
-    [ i>> ] [ underlying>> ] bi ?nth ;
-
-: peek1 ( -- byte ) input-stream get stream-peek1 ;
-
-: with-temporary-input-seek ( n seek-type quot -- )
+: with-input-seek ( n seek-type quot -- )
     tell-input [
         [ seek-input ] dip call
     ] dip seek-absolute seek-input ; inline
@@ -58,17 +45,6 @@ SYMBOL: dns-servers
 
 : clear-dns-servers ( -- )
     V{ } clone dns-servers set-global ;
-
-! Google DNS servers
-CONSTANT: initial-dns-servers { "8.8.8.8" "8.8.4.4" }
-
-: load-resolve.conf ( -- seq )
-    "/etc/resolv.conf" utf8 file-lines
-    [ [ blank? ] trim ] map
-    [ "#" head? not ] filter
-    [ [ " " split1 swap ] dip push-at ] sequence>hashtable "nameserver" swap at ;
-
-dns-servers [ initial-dns-servers >vector ] initialize
 
 : >dotted ( domain -- domain' )
     dup "." tail? [ "." append ] unless ;
@@ -172,7 +148,8 @@ CONSTANT: ipv4-arpa-suffix ".in-addr.arpa"
 CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
 
 : ipv6>arpa ( string -- string )
-    ipv6>byte-array [ [ -4 shift 4 bits ] [ 4 bits ] bi 2array ] { } map-as
+    ipv6>byte-array
+    [ [ -4 shift 4 bits ] [ 4 bits ] bi 2array ] { } map-as
     B{ } concat-as reverse
     [ >hex ] { } map-as "." join ipv6-arpa-suffix append ;
 
@@ -190,21 +167,21 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
         first2 swap [ hex> ] bi@ [ 4 shift ] [ ] bi* bitor
     ] B{ } map-as byte-array>ipv6 ;
 
-: parse-length-bytes ( -- seq ) read1 read utf8 decode ;
+: parse-length-bytes ( byte -- sequence ) read utf8 decode ;
 
 : (parse-name) ( -- )
-    peek1 [
-        read1 drop
-    ] [
-        HEX: C0 mask? [
-            2 read be> HEX: 3fff bitand
-            seek-absolute [ parse-length-bytes , (parse-name) ] with-temporary-input-seek
+    read1 [
+        dup HEX: C0 mask? [
+            8 shift read1 bitor HEX: 3fff bitand
+            seek-absolute [
+                read1 parse-length-bytes , (parse-name)
+            ] with-input-seek
         ] [
             parse-length-bytes , (parse-name)
         ] if
-    ] if-zero ;
+    ] unless-zero ;
 
-: parse-name ( -- seq )
+: parse-name ( -- sequence )
     [ (parse-name) ] { } make "." join ;
 
 : parse-query ( -- query )
@@ -246,7 +223,7 @@ M: SOA parse-rdata 2drop parse-soa ;
         4 read be> >>ttl
         2 read be> over type>> parse-rdata >>rdata ;
 
-: parse-message ( ba -- message )
+: parse-message ( byte-array -- message )
     [ message new ] dip
     binary [
         2 read be> >>id
@@ -261,12 +238,12 @@ M: SOA parse-rdata 2drop parse-soa ;
         [ [ parse-rr ] replicate ] change-additional-section
     ] with-byte-reader ;
 
-: >n/label ( string -- ba )
+: >n/label ( string -- byte-array )
     [ length 1array ] [ utf8 encode ] bi B{ } append-as ;
 
-: >name ( dn -- ba ) "." split [ >n/label ] map concat ;
+: >name ( domain -- byte-array ) "." split [ >n/label ] map concat ;
 
-: query>byte-array ( query -- ba )
+: query>byte-array ( query -- byte-array )
     [
         {
             [ name>> >name ]
@@ -309,7 +286,7 @@ M: SOA rdata>byte-array
         } cleave
     ] B{ } append-outputs-as ;
 
-: rr>byte-array ( rr -- ba )
+: rr>byte-array ( rr -- byte-array )
     [
         {
             [ name>> >name ]
@@ -323,7 +300,7 @@ M: SOA rdata>byte-array
         } cleave
     ] B{ } append-outputs-as ;
 
-: message>byte-array ( message -- ba )
+: message>byte-array ( message -- byte-array )
     [
         {
             [ id>> 2 >be ]
@@ -341,7 +318,7 @@ M: SOA rdata>byte-array
 
 : udp-query ( bytes server -- bytes' )
     f 0 <inet4> <datagram>
-    5 seconds over set-timeout [
+    30 seconds over set-timeout [
         [ send ] [ receive drop ] bi
     ] with-disposal ;
 
@@ -369,6 +346,10 @@ M: SOA rdata>byte-array
 : message>names ( message -- names )
     answer-section>> [ rdata>> name>> ] map ;
 
+: message>a-names ( message -- names )
+    answer-section>>
+    [ rdata>> ] map [ a? ] filter [ name>> ] map ;
+
 : message>mxs ( message -- assoc )
     answer-section>> [ rdata>> [ preference>> ] [ exchange>> ] bi 2array ] map ;
 
@@ -387,22 +368,21 @@ M: SOA rdata>byte-array
 : message>query-name ( message -- string )
     query>> first name>> dotted> ;
 
-: a-line. ( host ip -- )
-    [ write " has address " write ] [ print ] bi* ;
+USE: nested-comments
+(*
+M: string resolve-host
+    dup >lower "localhost" = [
+        drop resolve-localhost
+    ] [
+        dns-A-query message>a-names [ <ipv4> ] map
+    ] if ;
+*)
+    
+HOOK: initial-dns-servers os ( -- sequence )
 
-: a-message. ( message -- )
-    [ message>query-name ] [ message>names ] bi
-    [ a-line. ] with each ;
-
-: mx-line. ( host pair -- )
-    [ write " mail is handled by " write ]
-    [ first2 [ number>string write bl ] [ print ] bi* ] bi* ;
-
-: mx-message. ( message -- )
-    [ message>query-name ] [ message>mxs ] bi
-    [ mx-line. ] with each ;
-
-: host ( domain -- )
-    [ dns-A-query a-message. ]
-    [ dns-AAAA-query a-message. ]
-    [ dns-MX-query mx-message. ] tri ;
+{
+    { [ os windows? ] [ "dns.windows" ] }
+    { [ os unix? ] [ "dns.unix" ] }
+} cond require
+    
+dns-servers [ initial-dns-servers >vector ] initialize

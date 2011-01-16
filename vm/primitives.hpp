@@ -27,7 +27,6 @@ namespace factor
 	_(bignum_shift) \
 	_(bignum_subtract) \
 	_(bignum_to_fixnum) \
-	_(bignum_to_float) \
 	_(bignum_xor) \
 	_(bits_double) \
 	_(bits_float) \

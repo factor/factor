@@ -48,11 +48,11 @@ M: win32-socket dispose* ( stream -- )
     opened-socket ;
 
 M: object (get-local-address) ( socket addrspec -- sockaddr )
-    [ handle>> ] dip empty-sockaddr/size <int>
+    [ handle>> ] dip empty-sockaddr/size int <ref>
     [ getsockname socket-error ] 2keep drop ;
 
 M: object (get-remote-address) ( socket addrspec -- sockaddr )
-    [ handle>> ] dip empty-sockaddr/size <int>
+    [ handle>> ] dip empty-sockaddr/size int <ref>
     [ getpeername socket-error ] 2keep drop ;
 
 : bind-socket ( win32-socket sockaddr len -- )
@@ -87,7 +87,7 @@ M: windows (raw) ( addrspec -- handle )
     [ SOCK_RAW server-socket ] with-destructors ;
 
 : malloc-int ( n -- alien )
-    <int> malloc-byte-array ; inline
+    int <ref> malloc-byte-array ; inline
 
 M: winnt WSASocket-flags ( -- DWORD )
     WSA_FLAG_OVERLAPPED ;
@@ -99,7 +99,7 @@ M: winnt WSASocket-flags ( -- DWORD )
     { void* }
     [
         void* heap-size
-        DWORD <c-object>
+        0 DWORD <ref>
         f
         f
         WSAIoctl SOCKET_ERROR = [
@@ -181,7 +181,8 @@ TUPLE: AcceptEx-args port
     } cleave AcceptEx drop winsock-error ; inline
 
 : (extract-remote-address) ( lpOutputBuffer dwReceiveDataLength dwLocalAddressLength dwRemoteAddressLength -- sockaddr )
-    f <void*> 0 <int> f <void*> [ 0 <int> GetAcceptExSockaddrs ] keep *void* ;
+    f void* <ref> 0 int <ref> f void* <ref>
+    [ 0 int <ref> GetAcceptExSockaddrs ] keep void* deref ;
 
 : extract-remote-address ( AcceptEx -- sockaddr )
     [
@@ -246,7 +247,7 @@ TUPLE: WSARecvFrom-args port
     [
         [ port>> addr>> empty-sockaddr dup ]
         [ lpFrom>> ]
-        [ lpFromLen>> *int ]
+        [ lpFromLen>> int deref ]
         tri memcpy
     ] bi ; inline
 
@@ -278,7 +279,7 @@ TUPLE: WSASendTo-args port
         swap make-send-buffer >>lpBuffers
         1 >>dwBufferCount
         0 >>dwFlags
-        0 <uint> >>lpNumberOfBytesSent
+        0 uint <ref> >>lpNumberOfBytesSent
         (make-overlapped) >>lpOverlapped ; inline
 
 : call-WSASendTo ( WSASendTo -- )

@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
@@ -24,14 +24,12 @@ TUPLE: url protocol username password host port path query anchor ;
         nip delete-query-param
     ] if ;
 
-: parse-host ( string -- host port )
+ERROR: malformed-port ;
+
+: parse-host ( string -- host/f port/f )
     [
-        ":" split1 [ url-decode ] [
-            dup [
-                string>number
-                dup [ "Invalid port" throw ] unless
-            ] when
-        ] bi*
+        ":" split1-last [ url-decode ]
+        [ dup [ string>number [ malformed-port ] unless* ] when ] bi*
     ] [ f f ] if* ;
 
 GENERIC: >url ( obj -- url )
@@ -68,22 +66,22 @@ url      = ((protocol "://")        => [[ first ]] auth hostname)?
 PRIVATE>
 
 M: string >url
+    [ <url> ] dip
     parse-url {
         [
             first [
-                [ first ] ! protocol
+                [ first >>protocol ]
                 [
                     second
-                    [ first [ first2 ] [ f f ] if* ] ! username, password
-                    [ second parse-host ] ! host, port
-                    bi
+                    [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
+                    [ second parse-host [ >>host ] [ >>port ] bi* ] bi
                 ] bi
-            ] [ f f f f f ] if*
+            ] when*
         ]
-        [ second ] ! pathname
-        [ third ] ! query
-        [ fourth ] ! anchor
-    } cleave url boa
+        [ second >>path ]
+        [ third >>query ]
+        [ fourth >>anchor ]
+    } cleave
     dup host>> [ [ "/" or ] change-path ] when ;
 
 : protocol-port ( protocol -- port )
@@ -177,6 +175,9 @@ PRIVATE>
     ] [ protocol>> ] bi
     secure-protocol? [ >secure-addr ] when ;
 
+: set-url-addr ( url addr -- url )
+    [ host>> >>host ] [ port>> >>port ] bi ;
+
 : ensure-port ( url -- url' )
     clone dup protocol>> '[ _ protocol-port or ] change-port ;
 
@@ -186,3 +187,4 @@ SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
 USE: vocabs.loader
 
 { "urls" "prettyprint" } "urls.prettyprint" require-when
+{ "urls" "io.sockets.secure" } "urls.secure" require-when

@@ -3,13 +3,13 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays assocs classes.struct combinators
 combinators.short-circuit continuations destructors environment
-io io.backend io.binary io.buffers
-io.encodings.utf16n io.files io.files.private io.files.types
-io.pathnames io.ports io.streams.c io.streams.null io.timeouts
-kernel libc literals locals make math math.bitwise namespaces
-sequences specialized-arrays system
-threads tr windows windows.errors windows.handles
-windows.kernel32 windows.shell32 windows.time windows.types ;
+io io.backend io.binary io.buffers io.encodings.utf16n io.files
+io.files.private io.files.types io.pathnames io.ports
+io.streams.c io.streams.null io.timeouts kernel libc literals
+locals make math math.bitwise namespaces sequences
+specialized-arrays system threads tr windows windows.errors
+windows.handles windows.kernel32 windows.shell32 windows.time
+windows.types ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
 
@@ -52,7 +52,7 @@ C: <FileArgs> FileArgs
         [ handle>> handle>> ]
         [ buffer>> ]
         [ buffer>> buffer-length ]
-        [ drop DWORD <c-object> ]
+        [ drop 0 DWORD <ref> ]
         [ FileArgs-overlapped ]
     } cleave <FileArgs> ;
     
@@ -131,7 +131,7 @@ M: winnt init-io ( -- )
 ERROR: invalid-file-size n ;
 
 : handle>file-size ( handle -- n )
-    0 <ulonglong> [ GetFileSizeEx win32-error=0/f ] keep *ulonglong ;
+    0 ulonglong <ref> [ GetFileSizeEx win32-error=0/f ] keep ulonglong deref ;
 
 ERROR: seek-before-start n ;
 
@@ -249,7 +249,7 @@ M: winnt init-stdio
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length method -- )
-    [ [ handle>> ] dip d>w/w <uint> ] dip SetFilePointer
+    [ [ handle>> ] dip d>w/w uint <ref> ] dip SetFilePointer
     INVALID_SET_FILE_POINTER = [ "SetFilePointer failed" throw ] when ;
 
 M: windows (file-reader) ( path -- stream )

@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings arrays byte-arrays
-hashtables io io.encodings.string kernel math namespaces
-sequences strings continuations x11 x11.xlib
+USING: alien alien.c-types alien.data alien.strings arrays
+byte-arrays hashtables io io.encodings.string kernel math
+namespaces sequences strings continuations x11 x11.xlib
 specialized-arrays accessors io.encodings.utf16n ;
 SPECIALIZED-ARRAY: uint
 IN: x11.xim
@@ -42,7 +42,7 @@ SYMBOL: keysym
 
 : prepare-lookup ( -- )
     buf-size <uint-array> keybuf set
-    0 <KeySym> keysym set ;
+    0 KeySym <ref> keysym set ;
 
 : finish-lookup ( len -- string keysym )
     keybuf get swap 2 * head utf16n decode
@@ -51,7 +51,7 @@ SYMBOL: keysym
 : lookup-string ( event xic -- string keysym )
     [
         prepare-lookup
-        swap keybuf get buf-size keysym get 0 <int>
+        swap keybuf get buf-size keysym get 0 int <ref>
         XwcLookupString
         finish-lookup
     ] with-scope ;

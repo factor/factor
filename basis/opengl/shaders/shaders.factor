@@ -1,14 +1,14 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl.gl alien.c-types continuations namespaces
-assocs alien alien.data alien.strings libc opengl math sequences combinators
-macros arrays io.encodings.ascii fry specialized-arrays
-destructors accessors ;
+assocs alien alien.data alien.strings libc opengl math sequences
+combinators macros arrays io.encodings.ascii fry
+specialized-arrays destructors accessors ;
 SPECIALIZED-ARRAY: uint
 IN: opengl.shaders
 
 : with-gl-shader-source-ptr ( string quot -- )
-    swap ascii malloc-string [ <void*> swap call ] keep free ; inline
+    swap ascii malloc-string [ void* <ref> swap call ] keep free ; inline
 
 : <gl-shader> ( source kind -- shader )
     glCreateShader dup rot
@@ -47,7 +47,7 @@ IN: opengl.shaders
 : gl-shader-info-log ( shader -- log )
     dup gl-shader-info-log-length dup [
         1 calloc &free
-        [ 0 <int> swap glGetShaderInfoLog ] keep
+        [ 0 int <ref> swap glGetShaderInfoLog ] keep
         ascii alien>string
     ] with-destructors ;
 
@@ -90,7 +90,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 : gl-program-info-log ( program -- log )
     dup gl-program-info-log-length dup [
         1 calloc &free
-        [ 0 <int> swap glGetProgramInfoLog ] keep
+        [ 0 int <ref> swap glGetProgramInfoLog ] keep
         ascii alien>string
     ] with-destructors ;
 
@@ -107,7 +107,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 
 : gl-program-shaders ( program -- shaders )
     dup gl-program-shaders-length 2 *
-    0 <int>
+    0 int <ref>
     over <uint-array>
     [ glGetAttachedShaders ] keep [ zero? not ] filter ;
 

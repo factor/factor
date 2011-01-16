@@ -40,13 +40,15 @@ HELP: deploy-c-types?
 $nl
 "Off by default."
 $nl
-"The optimizing compiler is able to fold away calls to various words which take a C type as an input if the C type is a literal string:"
+"The optimizing compiler is able to fold away calls to various words which take a C type as an input if the C type is a literal string, for example,"
 { $list
     { $link c-type }
     { $link heap-size }
-    { $link <c-object> }
     { $link <c-array> }
+    { $link <c-direct-array> }
     { $link malloc-array }
+    { $link <ref> }
+    { $link deref }
 }
 "If your program looks up C types dynamically or from words which do not have a stack effect, you must enable this flag, because in these situations the C type lookup code is not folded away and the word properties must be consulted at runtime." } ;
 

@@ -3,7 +3,7 @@ kernel.private math hashtables.private math.private namespaces
 sequences tools.test namespaces.private slots.private
 sequences.private byte-arrays alien alien.accessors layouts
 words definitions compiler.units io combinators vectors grouping
-make alien.c-types combinators.short-circuit math.order
+make alien.c-types alien.data combinators.short-circuit math.order
 math.libm math.parser math.functions alien.syntax memory
 stack-checker ;
 FROM: math => float ;
@@ -275,7 +275,8 @@ M: cucumber equal? "The cucumber has no equal" throw ;
 
 [ 4294967295 B{ 255 255 255 255 } -1 ]
 [
-    -1 <int> -1 <int>
+    -1 int <ref>
+    -1 int <ref>
     [ [ 0 alien-unsigned-4 swap ] [ 0 alien-signed-2 ] bi ]
     compile-call
 ] unit-test
