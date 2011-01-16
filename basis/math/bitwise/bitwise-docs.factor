@@ -32,7 +32,7 @@ HELP: bitfield
     }
 } ;
 
-HELP: bits 
+HELP: bits
 { $values { "m" integer } { "n" integer } { "m'" integer } }
 { $description "Keep only n bits from the integer m." }
 { $example "USING: math.bitwise prettyprint ;" "HEX: 123abcdef 16 bits .h" "cdef" } ;
@@ -52,12 +52,12 @@ HELP: bit-clear?
      { "?" "a boolean" }
 }
 { $description "Returns " { $link t } " if the nth bit is set to zero." }
-{ $examples 
+{ $examples
     { $example "USING: math.bitwise prettyprint ;"
                "HEX: ff 8 bit-clear? ."
                "t"
     }
-    { $example "" "USING: math.bitwise prettyprint ;"
+    { $example "USING: math.bitwise prettyprint ;"
                "HEX: ff 7 bit-clear? ."
                "f"
     }
@@ -71,7 +71,7 @@ HELP: bit-count
      { "n" integer }
 }
 { $description "Returns the number of set bits as an object. This word only works on non-negative integers or objects that can be represented as a byte-array." }
-{ $examples 
+{ $examples
     { $example "USING: math.bitwise prettyprint ;"
                "HEX: f0 bit-count ."
                "4"
@@ -90,9 +90,9 @@ HELP: bitroll-32
 { $values
      { "m" integer } { "s" integer }
      { "n" integer }
-}     
+}
 { $description "Rolls the number " { $snippet "m" } " by " { $snippet "s" } " bits to the left, wrapping around after 32 bits." }
-{ $examples 
+{ $examples
     { $example "USING: math.bitwise prettyprint ;"
                "HEX: 1 10 bitroll-32 .h"
                "400"
@@ -109,7 +109,7 @@ HELP: bitroll-64
      { "n" integer }
 }
 { $description "Rolls the number " { $snippet "m" } " by " { $snippet "s" } " bits to the left, wrapping around after 64 bits." }
-{ $examples 
+{ $examples
     { $example "USING: math.bitwise prettyprint ;"
                "HEX: 1 10 bitroll-64 .h"
                "400"
@@ -275,7 +275,7 @@ HELP: unmask
 { $description "Clears the bits in " { $snippet "x" } " if they are set in the mask " { $snippet "n" } "." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: ff  HEX: 0f unmask .h"
+        "HEX: ff HEX: 0f unmask .h"
         "f0"
     }
 } ;
@@ -288,7 +288,7 @@ HELP: unmask?
 { $description "Tests whether unmasking the bits in " { $snippet "x" } " would return an integer greater than zero." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: ff  HEX: 0f unmask? ."
+        "HEX: ff HEX: 0f unmask? ."
         "t"
     }
 } ;
@@ -339,7 +339,7 @@ HELP: wrap
 }
 { $description "Wraps an integer " { $snippet "m" } " by modding it by " { $snippet "n" } ". This word is uses bitwise arithmetic and does not actually call the modulus word, and as such can only mod by powers of two." }
 { $examples "Equivalent to modding by 8:"
-    { $example 
+    { $example
         "USING: math.bitwise prettyprint ;"
         "HEX: ffff 8 wrap .h"
         "7"

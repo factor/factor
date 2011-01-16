@@ -369,7 +369,7 @@ HELP: assoc-union
 
 HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
-{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." } 
+{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." }
 ;
 
 HELP: assoc-diff!
@@ -482,10 +482,10 @@ HELP: unzip
      { "assoc" assoc }
      { "keys" sequence } { "values" sequence } }
 { $description "Outputs an array of keys and an array of values of the input " { $snippet "assoc" } "." }
-{ $examples 
+{ $examples
     { $example "USING: prettyprint assocs kernel ;"
                "{ { 1 4 } { 2 5 } { 3 6 } } unzip [ . ] bi@"
-               "{ 1 2 3 }\n{ 4 5 6 }" 
+               "{ 1 2 3 }\n{ 4 5 6 }"
     }
 } ;
 
@@ -494,8 +494,8 @@ HELP: zip
      { "keys" sequence } { "values" sequence }
      { "alist" "an array of key/value pairs" } }
 { $description "Combines two sequences pairwise into a single sequence of key/value pairs." }
-{ $examples 
-    { $example "" "USING: prettyprint assocs ;"
+{ $examples
+    { $example "USING: prettyprint assocs ;"
                "{ 1 2 3 } { 4 5 6 } zip ."
                "{ { 1 4 } { 2 5 } { 3 6 } }"
     }
