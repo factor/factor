@@ -19,7 +19,7 @@ HELP: <status-bar>
 
 HELP: open-status-window
 { $values { "gadget" gadget } { "title/attributes" { "a " { $link string } " or a " { $link world-attributes } " tuple" } } }
-{ $description "Like " { $link open-window } ", with the additional feature that the new window iwll have a status bar displaying the value stored in the world's " { $slot "status" } " slot." }
+{ $description "Like " { $link open-window } ", with the additional feature that the new window will have a status bar displaying the value stored in the world's " { $slot "status" } " slot." }
 { $see-also show-status hide-status } ;
 
 ARTICLE: "ui.gadgets.status-bar" "Status bars and mouse-over help"
