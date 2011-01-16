@@ -1021,7 +1021,7 @@ HELP: trim-head-slice
 { $values
      { "seq" sequence } { "quot" quotation }
      { "slice" slice } }
-{ $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice" }
+{ $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice." }
 { $examples
     { $example "USING: prettyprint math sequences ;"
                "{ 0 0 1 2 3 0 0 } [ zero? ] trim-head-slice ."
