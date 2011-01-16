@@ -1,6 +1,6 @@
+USING: continuations help.markup help.syntax io quotations
+strings urls xml.data ;
 IN: html.templates
-USING: help.markup help.syntax io strings quotations xml.data
-continuations urls ;
 
 HELP: template
 { $class-description "The class of HTML templates." } ;
@@ -56,7 +56,7 @@ HELP: with-boilerplate
 
 HELP: template-convert
 { $values { "template" template } { "output" "a pathname string" } }
-{ $description "Calls the template and writes its output to a file with UTF8 encoding." } ;
+{ $description "Calls the template and writes its output to a file with UTF-8 encoding." } ;
 
 ARTICLE: "html.templates.boilerplate" "Boilerplate support"
 "The following words define the interface between a templating engine and the " { $vocab-link "furnace.boilerplate" } " vocabulary."
