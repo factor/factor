@@ -262,7 +262,7 @@ HELP: assoc-map
         "    [ - ] curry assoc-map ;"
         "H{ { \"bananas\" 5 } { \"apples\" 42 } { \"pears\" 17 } }"
         "2 discount ."
-        "H{ { \"bananas\" 3 } { \"apples\" 39 } { \"pears\" 15 } }"
+        "H{ { \"bananas\" 3 } { \"apples\" 40 } { \"pears\" 15 } }"
     }
 } ;
 
