@@ -542,8 +542,8 @@ M:: gtk-ui-backend system-alert ( caption text -- )
 
 M: gtk-ui-backend (with-ui)
     [
-        0 <int> f <void*> gtk_init
-        0 <int> f <void*> gtk_gl_init
+        0 gint <ref> f void* <ref> gtk_init
+        0 gint <ref> f void* <ref> gtk_gl_init
         init-clipboard
         start-ui
         stop-io-thread
