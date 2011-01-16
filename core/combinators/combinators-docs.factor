@@ -351,14 +351,16 @@ HELP: case
     { $code "dup X = [ drop Y ] [ dup Z = [ drop T ] [ no-case ] if ] if" }
 }
 { $examples
-    { $code
-        "SYMBOL: yes  SYMBOL: no  SYMBOL: maybe"
+    { $example
+        "USING: combinators io kernel ;"
+        "SYMBOLS: yes no maybe ;"
         "maybe {"
         "    { yes [ ] } ! Do nothing"
         "    { no [ \"No way!\" throw ] }"
         "    { maybe [ \"Make up your mind!\" print ] }"
         "    [ \"Invalid input; try again.\" print ]"
         "} case"
+        "Make up your mind!"
     }
 } ;
 
