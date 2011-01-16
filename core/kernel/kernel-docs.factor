@@ -717,7 +717,7 @@ HELP: set-special-object ( obj n -- )
 HELP: object
 { $class-description
     "The class of all objects. If a generic word defines a method specializing on this class, the method is used as a fallback, if no other applicable method is found. For instance:"
-    { $code "GENERIC: enclose" "M: number enclose 1array ;" "M: object enclose ;" }
+    { $code "GENERIC: enclose ( number -- array )" "M: number enclose 1array ;" "M: object enclose ;" }
 } ;
 
 HELP: null
