@@ -2,15 +2,12 @@ USING: alien alien.syntax alien.c-types alien.parser
 eval kernel tools.test sequences system libc alien.strings
 io.encodings.ascii io.encodings.utf8 math.constants classes.struct classes
 accessors compiler.units ;
+FROM: alien.c-types => short ;
 IN: alien.c-types.tests
 
 CONSTANT: xyz 123
 
 [ 492 ] [ { int xyz } heap-size ] unit-test
-
-[ -1 ] [ -1 <char> *char ] unit-test
-[ -1 ] [ -1 <short> *short ] unit-test
-[ -1 ] [ -1 <int> *int ] unit-test
 
 UNION-STRUCT: foo
     { a int }
@@ -51,14 +48,6 @@ TYPEDEF: c-string MyString
 TYPEDEF: int* MyIntArray
 
 [ t ] [ void* c-type MyIntArray c-type = ] unit-test
-
-[
-    0 B{ 1 2 3 4 } <displaced-alien> <void*>
-] must-fail
-
-os windows? cpu x86.64? and [
-    [ -2147467259 ] [ 2147500037 <long> *long ] unit-test
-] when
 
 [ 0 ] [ -10 uchar c-type-clamp ] unit-test
 [ 12 ] [ 12 uchar c-type-clamp ] unit-test

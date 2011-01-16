@@ -255,11 +255,6 @@ void factor_vm::primitive_fixnum_to_float()
 	ctx->replace(allot_float(fixnum_to_float(ctx->peek())));
 }
 
-void factor_vm::primitive_bignum_to_float()
-{
-	ctx->replace(allot_float(bignum_to_float(ctx->peek())));
-}
-
 void factor_vm::primitive_format_float()
 {
 	byte_array *array = allot_byte_array(100);

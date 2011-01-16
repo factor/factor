@@ -292,8 +292,8 @@ struct call_frame_slot_visitor {
 		gc_info *info = compiled->block_gc_info();
 
 		assert(return_address < compiled->size());
-		u32 callsite = info->return_address_index(return_address);
-		if(callsite == gc_info_missing_value)
+		cell callsite = info->return_address_index(return_address);
+		if(callsite == (cell)-1)
 			return;
 
 #ifdef DEBUG_GC_MAPS
@@ -305,8 +305,8 @@ struct call_frame_slot_visitor {
 		/* Subtract old value of base pointer from every derived pointer. */
 		for(cell spill_slot = 0; spill_slot < info->derived_root_count; spill_slot++)
 		{
-			cell base_pointer = info->lookup_base_pointer(callsite, spill_slot);
-			if(base_pointer != gc_info_missing_value)
+			u32 base_pointer = info->lookup_base_pointer(callsite, spill_slot);
+			if(base_pointer != (u32)-1)
 			{
 #ifdef DEBUG_GC_MAPS
 				std::cout << "visiting derived root " << spill_slot
@@ -334,8 +334,8 @@ struct call_frame_slot_visitor {
 		/* Add the base pointers to obtain new derived pointer values. */
 		for(cell spill_slot = 0; spill_slot < info->derived_root_count; spill_slot++)
 		{
-			cell base_pointer = info->lookup_base_pointer(callsite, spill_slot);
-			if(base_pointer != gc_info_missing_value)
+			u32 base_pointer = info->lookup_base_pointer(callsite, spill_slot);
+			if(base_pointer != (u32)-1)
 				stack_pointer[spill_slot] += stack_pointer[base_pointer];
 		}
 	}

@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings byte-arrays
-classes.struct combinators kernel math namespaces
-specialized-arrays system
-system-info.backend vocabs.loader windows windows.advapi32
-windows.errors windows.kernel32 words ;
+USING: accessors alien alien.c-types alien.data alien.strings
+byte-arrays classes.struct combinators kernel math namespaces
+specialized-arrays system system-info.backend vocabs.loader
+windows windows.advapi32 windows.errors windows.kernel32 words ;
 SPECIALIZED-ARRAY: ushort
 IN: system-info.windows
 
@@ -95,10 +94,10 @@ M: winnt available-virtual-mem ( -- n )
 
 : computer-name ( -- string )
     MAX_COMPUTERNAME_LENGTH 1 +
-    [ <byte-array> dup ] keep <uint>
+    [ <byte-array> dup ] keep uint <ref>
     GetComputerName win32-error=0/f alien>native-string ;
  
 : username ( -- string )
     UNLEN 1 +
-    [ <byte-array> dup ] keep <uint>
+    [ <byte-array> dup ] keep uint <ref>
     GetUserName win32-error=0/f alien>native-string ;

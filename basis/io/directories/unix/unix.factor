@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.strings combinators
-continuations destructors fry io io.backend io.backend.unix
-io.directories io.encodings.binary io.encodings.utf8 io.files
-io.pathnames io.files.types kernel math.bitwise sequences system
-unix unix.stat vocabs.loader classes.struct unix.ffi literals ;
+USING: accessors alien.c-types alien.data alien.strings
+combinators continuations destructors fry io io.backend
+io.backend.unix io.directories io.encodings.binary
+io.encodings.utf8 io.files io.pathnames io.files.types kernel
+math.bitwise sequences system unix unix.stat vocabs.loader
+classes.struct unix.ffi literals ;
 IN: io.directories.unix
 
 CONSTANT: touch-mode flags{ O_WRONLY O_APPEND O_CREAT O_EXCL }
@@ -37,9 +38,9 @@ HOOK: find-next-file os ( DIR* -- byte-array )
 
 M: unix find-next-file ( DIR* -- byte-array )
     dirent <struct>
-    f <void*>
+    f void* <ref>
     [ readdir_r 0 = [ (io-error) ] unless ] 2keep
-    *void* [ drop f ] unless ;
+    void* deref [ drop f ] unless ;
 
 : dirent-type>file-type ( ch -- type )
     {

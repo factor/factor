@@ -62,6 +62,21 @@ unit-test
 
 [ 5 ] [ 10.5 1.9 /i ] unit-test
 
+[ t ] [ 0   0   /f                 fp-nan? ] unit-test
+[ t ] [ 0.0 0.0 /f                 fp-nan? ] unit-test
+[ t ] [ 0.0 0.0 /                  fp-nan? ] unit-test
+[ t ] [ 0   0   [ >bignum ] bi@ /f fp-nan? ] unit-test
+
+[ 1/0. ] [ 1 0 /f ] unit-test
+[ 1/0. ] [ 1.0 0.0 /f ] unit-test
+[ 1/0. ] [ 1.0 0.0 / ] unit-test
+[ 1/0. ] [ 1 0 [ >bignum ] bi@ /f ] unit-test
+
+[ -1/0. ] [ -1 0 /f ] unit-test
+[ -1/0. ] [ -1.0 0.0 /f ] unit-test
+[ -1/0. ] [ -1.0 0.0 / ] unit-test
+[ -1/0. ] [ -1 0 [ >bignum ] bi@ /f ] unit-test
+
 [ t ] [ 0/0. 0/0. unordered? ] unit-test
 [ t ] [ 1.0 0/0. unordered? ] unit-test
 [ t ] [ 0/0. 1.0 unordered? ] unit-test

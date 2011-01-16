@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces continuations destructors io
 debugger io.sockets io.sockets.private sequences summary
@@ -10,6 +10,10 @@ SYMBOL: secure-socket-timeout
 1 minutes secure-socket-timeout set-global
 
 SYMBOL: secure-socket-backend
+
+HOOK: ssl-supported? secure-socket-backend ( -- ? )
+
+M: object ssl-supported? f ;
 
 SINGLETONS: SSLv2 SSLv23 SSLv3 TLSv1 ;
 

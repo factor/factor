@@ -1,12 +1,12 @@
-USING: accessors alien alien.c-types alien.strings arrays assocs
-byte-arrays combinators combinators.short-circuit continuations
-game.input game.input.dinput.keys-array io.encodings.utf16
-io.encodings.utf16n kernel locals math math.bitwise
-math.rectangles namespaces parser sequences shuffle
+USING: accessors alien alien.c-types alien.data alien.strings
+arrays assocs byte-arrays combinators combinators.short-circuit
+continuations game.input game.input.dinput.keys-array
+io.encodings.utf16 io.encodings.utf16n kernel locals math
+math.bitwise math.rectangles namespaces parser sequences shuffle
 specialized-arrays ui.backend.windows vectors windows.com
 windows.directx.dinput windows.directx.dinput.constants
 windows.kernel32 windows.messages windows.ole32 windows.errors
-windows.user32 classes.struct alien.data ;
+windows.user32 classes.struct ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game.input.dinput
 
@@ -23,15 +23,15 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : create-dinput ( -- )
     f GetModuleHandle DIRECTINPUT_VERSION IDirectInput8W-iid
-    f <void*> [ f DirectInput8Create ole32-error ] keep *void*
+    f void* <ref> [ f DirectInput8Create ole32-error ] keep void* deref
     +dinput+ set-global ;
 
 : delete-dinput ( -- )
     +dinput+ [ com-release f ] change-global ;
 
 : device-for-guid ( guid -- device )
-    +dinput+ get-global swap f <void*>
-    [ f IDirectInput8W::CreateDevice ole32-error ] keep *void* ;
+    +dinput+ get-global swap f void* <ref>
+    [ f IDirectInput8W::CreateDevice ole32-error ] keep void* deref ;
 
 : set-coop-level ( device -- )
     +device-change-window+ get-global DISCL_BACKGROUND DISCL_NONEXCLUSIVE bitor
@@ -303,8 +303,8 @@ CONSTANT: pov-values
     } 2cleave ;
 
 : read-device-buffer ( device buffer count -- buffer count' )
-    [ DIDEVICEOBJECTDATA heap-size ] 2dip <uint>
-    [ 0 IDirectInputDevice8W::GetDeviceData ole32-error ] 2keep *uint ;
+    [ DIDEVICEOBJECTDATA heap-size ] 2dip uint <ref>
+    [ 0 IDirectInputDevice8W::GetDeviceData ole32-error ] 2keep uint deref ;
 
 : (fill-mouse-state) ( state DIDEVICEOBJECTDATA -- state )
     [ dwData>> 32 >signed ] [ dwOfs>> ] bi {

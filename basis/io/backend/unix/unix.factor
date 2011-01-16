@@ -1,12 +1,12 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax generic assocs kernel
-kernel.private math io.ports sequences strings sbufs threads
-unix unix.ffi vectors io.buffers io.backend io.encodings math.parser
-continuations system libc namespaces make io.timeouts
-io.encodings.utf8 destructors destructors.private accessors
-summary combinators locals unix.time unix.types fry
-io.backend.unix.multiplexers ;
+USING: alien alien.c-types alien.data alien.syntax generic
+assocs kernel kernel.private math io.ports sequences strings
+sbufs threads unix unix.ffi vectors io.buffers io.backend
+io.encodings math.parser continuations system libc namespaces
+make io.timeouts io.encodings.utf8 destructors
+destructors.private accessors summary combinators locals
+unix.time unix.types fry io.backend.unix.multiplexers ;
 QUALIFIED: io
 IN: io.backend.unix
 
@@ -146,7 +146,7 @@ M: stdin dispose*
 
 : wait-for-stdin ( stdin -- size )
     [ control>> CHAR: X over io:stream-write1 io:stream-flush ]
-    [ size>> ssize_t heap-size swap io:stream-read *int ]
+    [ size>> ssize_t heap-size swap io:stream-read int deref ]
     bi ;
 
 :: refill-stdin ( buffer stdin size -- )
@@ -167,11 +167,11 @@ M: stdin refill
 M: stdin cancel-operation
     [ size>> ] [ control>> ] bi [ cancel-operation ] bi@ ;
 
-: control-write-fd ( -- fd ) &: control_write *uint ;
+: control-write-fd ( -- fd ) &: control_write uint deref ;
 
-: size-read-fd ( -- fd ) &: size_read *uint ;
+: size-read-fd ( -- fd ) &: size_read uint deref ;
 
-: data-read-fd ( -- fd ) &: stdin_read *uint ;
+: data-read-fd ( -- fd ) &: stdin_read uint deref ;
 
 : <stdin> ( -- stdin )
     stdin new-disposable

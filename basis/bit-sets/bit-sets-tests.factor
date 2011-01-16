@@ -64,3 +64,8 @@ IN: bit-sets.tests
 
 [ T{ bit-set f ?{ f } } T{ bit-set f ?{ t } } ]
 [ 1 <bit-set> dup clone 0 over adjoin ] unit-test
+
+[ 0 ] [ T{ bit-set f ?{ } } cardinality ] unit-test
+[ 0 ] [ T{ bit-set f ?{ f f f f } } cardinality ] unit-test
+[ 1 ] [ T{ bit-set f ?{ f t f f } } cardinality ] unit-test
+[ 2 ] [ T{ bit-set f ?{ f t f t } } cardinality ] unit-test

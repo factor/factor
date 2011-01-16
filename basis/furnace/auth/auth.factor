@@ -1,9 +1,9 @@
-! Copyright (c) 2008 Slava Pestov
+! Copyright (c) 2008, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs namespaces kernel sequences sets
-destructors combinators fry logging
-io.encodings.utf8 io.encodings.string io.binary random
-checksums checksums.sha urls
+destructors combinators fry logging io.encodings.utf8
+io.encodings.string io.binary io.sockets.secure random checksums
+checksums.sha urls
 html.forms
 http.server
 http.server.filters
@@ -79,7 +79,7 @@ GENERIC: logged-in-username ( realm -- username )
         swap >>default
         users-in-db >>users
         sha-256 >>checksum
-        t >>secure ; inline
+        ssl-supported? >>secure ; inline
 
 : users ( -- provider )
     realm get users>> ;

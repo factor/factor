@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax kernel math core-foundation ;
+USING: alien.c-types alien.data alien.syntax kernel math
+core-foundation ;
 FROM: math => float ;
 IN: core-foundation.numbers
 
@@ -30,14 +31,14 @@ FUNCTION: CFNumberRef CFNumberCreate ( CFAllocatorRef allocator, CFNumberType th
 GENERIC: <CFNumber> ( number -- alien )
 
 M: integer <CFNumber>
-    [ f kCFNumberLongLongType ] dip <longlong> CFNumberCreate ;
+    [ f kCFNumberLongLongType ] dip longlong <ref> CFNumberCreate ;
 
 M: float <CFNumber>
-    [ f kCFNumberDoubleType ] dip <double> CFNumberCreate ;
+    [ f kCFNumberDoubleType ] dip double <ref> CFNumberCreate ;
 
 M: t <CFNumber>
-    drop f kCFNumberIntType 1 <int> CFNumberCreate ;
+    drop f kCFNumberIntType 1 int <ref> CFNumberCreate ;
 
 M: f <CFNumber>
-    drop f kCFNumberIntType 0 <int> CFNumberCreate ;
+    drop f kCFNumberIntType 0 int <ref> CFNumberCreate ;
 

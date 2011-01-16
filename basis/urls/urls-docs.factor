@@ -76,7 +76,7 @@ HELP: ensure-port
 } ;
 
 HELP: parse-host
-{ $values { "string" string } { "host" string } { "port" { $maybe integer } } }
+{ $values { "string" string } { "host/f" { $maybe string } } { "port/f" { $maybe integer } } }
 { $description "Splits a string of the form " { $snippet "host:port" } " into a host and a port number. If the port number is not specified, outputs " { $link f } "." }
 { $notes "This word is used by " { $link >url } ". It can also be used directly to parse " { $snippet "host:port" } " strings which are not full URLs." }
 { $examples

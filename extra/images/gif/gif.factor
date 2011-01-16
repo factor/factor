@@ -3,7 +3,7 @@
 USING: accessors arrays combinators compression.lzw
 constructors destructors grouping images images.loader io
 io.binary io.buffers io.encodings.string io.encodings.utf8
-io.ports kernel make math math.bitwise namespaces sequences ;
+kernel make math math.bitwise namespaces sequences ;
 IN: images.gif
 
 SINGLETON: gif-image
@@ -73,14 +73,6 @@ CONSTANT: block-terminator HEX: 00
         V{ } clone >>plain-text-extensions
         V{ } clone >>comment-extensions
         t >>loading? ;
-
-GENERIC: stream-peek1 ( stream -- byte )
-
-M: input-port stream-peek1
-    dup check-disposed dup wait-to-read
-    [ drop f ] [ buffer>> buffer-peek ] if ; inline
-
-: peek1 ( -- byte ) input-stream get stream-peek1 ;
 
 : (read-sub-blocks) ( -- )
     read1 [ read , (read-sub-blocks) ] unless-zero ;

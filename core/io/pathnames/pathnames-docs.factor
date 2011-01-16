@@ -106,7 +106,7 @@ HELP: absolute-path
     { "path" "a pathname string" }
     { "path'" "a pathname string" }
 }
-{ $description "Prepends the " { $link current-directory } " to the pathname and resolves a " { $snippet "resource:" } " or " { $snippet "voacb:" } " prefix, if present (see " { $link "io.pathnames.special" } ")." }
+{ $description "Prepends the " { $link current-directory } " to the pathname and resolves a " { $snippet "resource:" } " or " { $snippet "vocab:" } " prefix, if present (see " { $link "io.pathnames.special" } ")." }
 { $notes "This word is exaclty the same as " { $link normalize-path } ", except on Windows NT platforms, where it does not prepend the Unicode path prefix. Most code should call " { $link normalize-path } " instead." } ;
 
 HELP: resolve-symlinks

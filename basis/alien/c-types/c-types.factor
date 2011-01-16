@@ -1,12 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays arrays assocs delegate kernel kernel.private math
-math.order math.parser namespaces make parser sequences strings
-words splitting cpu.architecture alien alien.accessors
-alien.strings quotations layouts system compiler.units io
-io.files io.encodings.binary io.streams.memory accessors
-combinators effects continuations fry classes vocabs
-vocabs.loader words.symbol macros ;
+USING: accessors alien alien.accessors arrays byte-arrays
+classes combinators compiler.units cpu.architecture delegate
+fry kernel layouts locals macros math math.order quotations
+sequences system words words.symbol ;
 QUALIFIED: math
 IN: alien.c-types
 
@@ -20,9 +17,6 @@ SYMBOLS:
     void* bool ;
 
 SINGLETON: void
-
-DEFER: <int>
-DEFER: *char
 
 TUPLE: abstract-c-type
 { class class initial: object }
@@ -111,8 +105,6 @@ M: c-type-name base-type c-type ;
 
 M: c-type base-type ;
 
-: little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
-
 GENERIC: heap-size ( name -- size )
 
 M: abstract-c-type heap-size size>> ;
@@ -169,19 +161,6 @@ TUPLE: long-long-type < c-type ;
 
 : <long-long-type> ( -- c-type )
     long-long-type new ;
-
-: define-deref ( c-type -- )
-    [ name>> CHAR: * prefix "alien.c-types" create ]
-    [ '[ 0 _ alien-value ] ]
-    bi (( c-ptr -- value )) define-inline ;
-
-: define-out ( c-type -- )
-    [ name>> "alien.c-types" constructor-word ]
-    [ dup '[ _ heap-size (byte-array) [ 0 _ set-alien-value ] keep ] ] bi
-    (( value -- c-ptr )) define-inline ;
-
-: define-primitive-type ( c-type name -- )
-    [ typedef ] [ define-deref ] [ define-out ] tri ;
 
 : if-void ( c-type true false -- )
     pick void? [ drop nip call ] [ nip call ] if ; inline
@@ -247,7 +226,7 @@ M: pointer c-type
         [ >c-ptr ] >>unboxer-quot
         "allot_alien" >>boxer
         "alien_offset" >>unboxer
-    \ void* define-primitive-type
+    \ void* typedef
 
     <c-type>
         fixnum >>class
@@ -260,7 +239,7 @@ M: pointer c-type
         "from_signed_2" >>boxer
         "to_signed_2" >>unboxer
         [ >fixnum ] >>unboxer-quot
-    \ short define-primitive-type
+    \ short typedef
 
     <c-type>
         fixnum >>class
@@ -273,7 +252,7 @@ M: pointer c-type
         "from_unsigned_2" >>boxer
         "to_unsigned_2" >>unboxer
         [ >fixnum ] >>unboxer-quot
-    \ ushort define-primitive-type
+    \ ushort typedef
 
     <c-type>
         fixnum >>class
@@ -286,7 +265,7 @@ M: pointer c-type
         "from_signed_1" >>boxer
         "to_signed_1" >>unboxer
         [ >fixnum ] >>unboxer-quot
-    \ char define-primitive-type
+    \ char typedef
 
     <c-type>
         fixnum >>class
@@ -299,7 +278,7 @@ M: pointer c-type
         "from_unsigned_1" >>boxer
         "to_unsigned_1" >>unboxer
         [ >fixnum ] >>unboxer-quot
-    \ uchar define-primitive-type
+    \ uchar typedef
 
     <c-type>
         math:float >>class
@@ -313,7 +292,7 @@ M: pointer c-type
         "to_float" >>unboxer
         float-rep >>rep
         [ >float ] >>unboxer-quot
-    \ float define-primitive-type
+    \ float typedef
 
     <c-type>
         math:float >>class
@@ -326,7 +305,7 @@ M: pointer c-type
         "to_double" >>unboxer
         double-rep >>rep
         [ >float ] >>unboxer-quot
-    \ double define-primitive-type
+    \ double typedef
 
     cell 8 = [
         <c-type>
@@ -340,7 +319,7 @@ M: pointer c-type
             "from_signed_4" >>boxer
             "to_signed_4" >>unboxer
             [ >fixnum ] >>unboxer-quot
-        \ int define-primitive-type
+        \ int typedef
     
         <c-type>
             fixnum >>class
@@ -353,7 +332,7 @@ M: pointer c-type
             "from_unsigned_4" >>boxer
             "to_unsigned_4" >>unboxer
             [ >fixnum ] >>unboxer-quot
-        \ uint define-primitive-type
+        \ uint typedef
 
         <c-type>
             integer >>class
@@ -365,7 +344,8 @@ M: pointer c-type
             8 >>align-first
             "from_signed_cell" >>boxer
             "to_fixnum" >>unboxer
-        \ longlong define-primitive-type
+            [ >integer ] >>unboxer-quot
+        \ longlong typedef
 
         <c-type>
             integer >>class
@@ -377,14 +357,15 @@ M: pointer c-type
             8 >>align-first
             "from_unsigned_cell" >>boxer
             "to_cell" >>unboxer
-        \ ulonglong define-primitive-type
+            [ >integer ] >>unboxer-quot
+        \ ulonglong typedef
 
         os windows? [
-            \ int c-type \ long define-primitive-type
-            \ uint c-type \ ulong define-primitive-type
+            \ int c-type \ long typedef
+            \ uint c-type \ ulong typedef
         ] [
-            \ longlong c-type \ long define-primitive-type
-            \ ulonglong c-type \ ulong define-primitive-type
+            \ longlong c-type \ long typedef
+            \ ulonglong c-type \ ulong typedef
         ] if
 
         \ longlong c-type \ ptrdiff_t typedef
@@ -403,7 +384,8 @@ M: pointer c-type
             4 >>align-first
             "from_signed_cell" >>boxer
             "to_fixnum" >>unboxer
-        \ int define-primitive-type
+            [ >integer ] >>unboxer-quot
+        \ int typedef
     
         <c-type>
             integer >>class
@@ -415,7 +397,8 @@ M: pointer c-type
             4 >>align-first
             "from_unsigned_cell" >>boxer
             "to_cell" >>unboxer
-        \ uint define-primitive-type
+            [ >integer ] >>unboxer-quot
+        \ uint typedef
 
         <long-long-type>
             integer >>class
@@ -426,7 +409,8 @@ M: pointer c-type
             8-byte-alignment
             "from_signed_8" >>boxer
             "to_signed_8" >>unboxer
-        \ longlong define-primitive-type
+            [ >integer ] >>unboxer-quot
+        \ longlong typedef
 
         <long-long-type>
             integer >>class
@@ -437,10 +421,11 @@ M: pointer c-type
             8-byte-alignment
             "from_unsigned_8" >>boxer
             "to_unsigned_8" >>unboxer
-        \ ulonglong define-primitive-type
+            [ >integer ] >>unboxer-quot
+        \ ulonglong typedef
 
-        \ int c-type \ long define-primitive-type
-        \ uint c-type \ ulong define-primitive-type
+        \ int c-type \ long typedef
+        \ uint c-type \ ulong typedef
 
         \ int c-type \ ptrdiff_t typedef
         \ int c-type \ intptr_t typedef
@@ -453,7 +438,7 @@ M: pointer c-type
         [ >c-bool ] >>unboxer-quot
         [ c-bool> ] >>boxer-quot
         object >>boxed-class
-    \ bool define-primitive-type
+    \ bool typedef
 
 ] with-compilation-unit
 

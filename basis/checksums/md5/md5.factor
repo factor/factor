@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel io io.binary io.files io.streams.byte-array math
-math.functions math.parser namespaces splitting grouping strings
-sequences byte-arrays locals sequences.private macros fry
-io.encodings.binary math.bitwise checksums accessors
-checksums.common checksums.stream combinators combinators.smart
-specialized-arrays literals hints ;
+USING: alien.c-types alien.data kernel io io.binary io.files
+io.streams.byte-array math math.functions math.parser namespaces
+splitting grouping strings sequences byte-arrays locals
+sequences.private macros fry io.encodings.binary math.bitwise
+checksums accessors checksums.common checksums.stream
+combinators combinators.smart specialized-arrays literals hints ;
 SPECIALIZED-ARRAY: uint
 IN: checksums.md5
 

@@ -55,7 +55,7 @@ PRIVATE>
 
 <PRIVATE
 
-: (split) ( n seq quot: ( elt -- ? ) -- )
+: (split) ( n seq quot: ( ... elt -- ... ? ) -- )
     [ find-from drop ]
     [ [ [ 3dup swapd subseq , ] dip [ drop 1 + ] 2dip (split) ] 3curry ]
     [ drop [ swap [ tail ] unless-zero , ] 2curry ]

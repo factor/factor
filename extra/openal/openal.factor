@@ -1,10 +1,11 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors arrays alien system combinators
-alien.syntax namespaces alien.c-types sequences vocabs.loader
+alien.syntax namespaces sequences vocabs.loader
 shuffle alien.libraries generalizations
-specialized-arrays alien.destructors ;
-FROM: alien.c-types => float short ;
+specialized-arrays alien.destructors alien.data ;
+FROM: alien.c-types => char double float int short uchar uint
+ushort void ;
 SPECIALIZED-ARRAY: uint
 IN: openal
 
@@ -264,13 +265,13 @@ DESTRUCTOR: alcDestroyContext
     alSourcei ;
 
 : get-source-param ( source param -- value )
-    0 <uint> dup [ alGetSourcei ] dip *uint ;
+    0 uint <ref> dup [ alGetSourcei ] dip uint deref ;
 
 : set-buffer-param ( source param value -- )
     alBufferi ;
 
 : get-buffer-param ( source param -- value )
-    0 <uint> dup [ alGetBufferi ] dip *uint ;
+    0 uint <ref> dup [ alGetBufferi ] dip uint deref ;
 
 : source-play ( source -- ) alSourcePlay ;
 

@@ -150,7 +150,7 @@ $nl
 { $example "USE: classes" "\\ f class ." "word" }
 "On the other hand, " { $link t } " is just a word, and there is no class which it is a unique instance of."
 { $example "t \\ t eq? ." "t" }
-"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
+"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is important, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
 
 ARTICLE: "conditionals-boolean-equivalence" "Expressing conditionals with boolean logic"
 "Certain simple conditional forms can be expressed in a simpler manner using boolean logic."
@@ -253,7 +253,7 @@ HELP: execute-effect-unsafe
 { $values { "word" word } { "effect" effect } }
 { $description "Given a word and a stack effect, executes the word, blindly declaring at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary word which is not required at compile time." }
 { $warning "If the word being executed has an incorrect stack effect, undefined behavior will result. User code should use " { $link POSTPONE: execute( } " instead." } ;
-    
+
 { call-effect call-effect-unsafe execute-effect execute-effect-unsafe } related-words
 
 HELP: cleave
@@ -344,7 +344,7 @@ HELP: case
 { $description
     "Compares " { $snippet "obj" } " against the first element of every pair, first evaluating the first element if it is a word. If some pair matches, removes " { $snippet "obj" } " from the stack and calls the second element of that pair, which must be a quotation."
     $nl
-    "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "cases" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-cond } " error is rasied."
+    "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "cases" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-cond } " error is raised."
     $nl
     "The following two phrases are equivalent:"
     { $code "{ { X [ Y ] } { Z [ T ] } } case" }
@@ -372,10 +372,10 @@ HELP: recursive-hashcode
 
 HELP: cond>quot
 { $values { "assoc" "a sequence of pairs of quotations" } { "quot" quotation } }
-{ $description  "Creates a quotation that when called, has the same effect as applying " { $link cond } " to " { $snippet "assoc" } "."
+{ $description "Creates a quotation that when called, has the same effect as applying " { $link cond } " to " { $snippet "assoc" } "."
 $nl
 "The generated quotation is more efficient than the naive implementation of " { $link cond } ", though, since it expands into a series of conditionals, and no iteration through " { $snippet "assoc" } " has to be performed." }
-{ $notes "This word is used behind the scenes to compile " { $link cond } " forms efficiently; it can also be called directly,  which is useful for meta-programming." } ;
+{ $notes "This word is used behind the scenes to compile " { $link cond } " forms efficiently; it can also be called directly, which is useful for meta-programming." } ;
 
 HELP: case>quot
 { $values { "default" quotation } { "assoc" "a sequence of pairs of quotations" } { "quot" quotation } }

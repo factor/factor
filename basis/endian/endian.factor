@@ -1,13 +1,13 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types namespaces io.binary fry
+USING: alien.c-types alien.data namespaces io.binary fry
 kernel math grouping sequences math.bitwise ;
 IN: endian
 
 SINGLETONS: big-endian little-endian ;
 
 : compute-native-endianness ( -- class )
-    1 <int> *char 0 = big-endian little-endian ? ;
+    1 int <ref> char deref 0 = big-endian little-endian ? ;
 
 SYMBOL: native-endianness
 native-endianness [ compute-native-endianness ] initialize

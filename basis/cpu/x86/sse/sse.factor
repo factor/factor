@@ -1,15 +1,16 @@
 ! Copyright (C) 2009, 2010 Joe Groff, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types arrays assocs combinators fry kernel locals
+USING: alien.data arrays assocs combinators fry kernel locals
 macros math math.vectors namespaces quotations sequences system
 compiler.cfg.comparisons compiler.cfg.intrinsics
 compiler.codegen.fixup cpu.architecture cpu.x86
 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86.features ;
+QUALIFIED-WITH: alien.c-types c
 IN: cpu.x86.sse
 
 ! Scalar floating point with SSE2
-M: x86 %load-float <float> float-rep %load-vector ;
-M: x86 %load-double <double> double-rep %load-vector ;
+M: x86 %load-float c:float <ref> float-rep %load-vector ;
+M: x86 %load-double c:double <ref> double-rep %load-vector ;
 
 M: float-rep copy-register* drop MOVAPS ;
 M: double-rep copy-register* drop MOVAPS ;

@@ -70,14 +70,13 @@ HELP: define-persistent
     { "the name of a database column that maps to the slot" }        { "a database type (see " { $link "db.types" } ")" }
 } "Throws an error if the slot name (column one from each row) is not a slot in the tuple or its superclases." }
 { $examples
-    { $unchecked-example "USING: db.tuples db.types ;"
+    { $code "USING: db.tuples db.types ;"
         "TUPLE: boat id year name ;"
         "boat \"BOAT\" {"
         "    { \"id\" \"ID\" +db-assigned-id+ }"
         "    { \"year\" \"YEAR\" INTEGER }"
         "    { \"name\" \"NAME\" TEXT }"
         "} define-persistent"
-        ""
     }
 } ;
 
@@ -233,8 +232,7 @@ T{ book
     { date-published T{ timestamp { year 2009 } { month 3 } { day 3 } } }
     { edition 1 }
     { cover-price 13.37 }
-} book set
-""" }
+} book set""" }
 "Now we've created a book. Let's save it to the database."
 { $code """USING: db db.sqlite fry io.files.temp ;
 : with-book-tutorial ( quot -- )
@@ -243,8 +241,7 @@ T{ book
 [
     book recreate-table
     book get insert-tuple
-] with-book-tutorial
-""" }
+] with-book-tutorial""" }
 "Is it really there?"
 { $code """[
     T{ book { title "Factor for Sheeple" } } select-tuples .

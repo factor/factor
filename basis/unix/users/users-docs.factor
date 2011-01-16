@@ -20,7 +20,7 @@ HELP: new-passwd
 { $description "Creates a new passwd tuple dependent on the operating system." } ;
 
 HELP: passwd
-{ $description "A platform-specific tuple correspding to every field from the Unix passwd struct. BSD passwd structures have four extra slots: " { $slot "change" } ", " { $slot "class" } "," { $slot "expire" } ", " { $slot "fields" } "." } ;
+{ $description "A platform-specific tuple corresponding to every field from the Unix passwd struct. BSD passwd structures have four extra slots: " { $slot "change" } ", " { $slot "class" } ", " { $slot "expire" } ", " { $slot "fields" } "." } ;
 
 HELP: user-cache
 { $description "A symbol storing passwd structures indexed by user-ids when within a " { $link with-user-cache } "." } ;
@@ -82,7 +82,7 @@ HELP: with-real-user
 
 {
     real-user-name real-user-id set-real-user
-    effective-user-name effective-user-id          
+    effective-user-name effective-user-id
     set-effective-user
 } related-words
 
@@ -95,7 +95,7 @@ HELP: ?user-id
 
 HELP: all-user-names
 { $values
-    
+
     { "seq" sequence }
 }
 { $description "Returns a sequence of group names as strings." } ;
