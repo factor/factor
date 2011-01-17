@@ -9,7 +9,7 @@ HELP: developer-name
 
 HELP: help.
 { $values
-     { "word" word } }
+    { "word" word } }
 { $description "Prints out scaffold help markup for a given word." } ;
 
 HELP: scaffold-help
@@ -18,8 +18,8 @@ HELP: scaffold-help
 
 HELP: scaffold-undocumented
 { $values
-     { "string" string } }
-{ $description "Prints scaffolding documenation for undocumented words in a vocabuary except for automatically generated class predicates." } ;
+    { "string" string } }
+{ $description "Prints scaffolding documentation for undocumented words in a vocabulary except for automatically generated class predicates." } ;
 
 { scaffold-help scaffold-undocumented } related-words
 
@@ -49,7 +49,7 @@ HELP: scaffold-tests
 
 HELP: scaffold-vocab
 { $values
-     { "vocab-root" "a vocabulary root string" } { "string" string } }
+    { "vocab-root" "a vocabulary root string" } { "string" string } }
 { $description "Creates a directory in the given root for a new vocabulary and adds a main .factor file and an authors.txt file." } ;
 
 HELP: scaffold-emacs
@@ -63,7 +63,7 @@ HELP: scaffold-factor-rc
 
 HELP: scaffold-rc
 { $values
-     { "path" "a pathname string" }
+    { "path" "a pathname string" }
 }
 { $description "Touches the given path in your home directory and provides a clickable link to open it in an editor." } ;
 
