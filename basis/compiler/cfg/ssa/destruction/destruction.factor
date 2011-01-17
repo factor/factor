@@ -1,7 +1,7 @@
-! Copyright (C) 2009, 2010 Slava Pestov.
+! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry locals kernel namespaces
-sequences sequences.deep
+USING: accessors arrays assocs fry locals kernel make
+namespaces sequences sequences.deep
 sets vectors
 cpu.architecture
 compiler.cfg.rpo
@@ -13,6 +13,7 @@ compiler.cfg.liveness
 compiler.cfg.ssa.cssa
 compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges
+compiler.cfg.parallel-copy
 compiler.cfg.utilities
 compiler.utilities ;
 FROM: namespaces => set ;
@@ -66,15 +67,6 @@ SYMBOL: copies
 : coalesce-vregs ( merged leader1 leader2 -- )
     [ coalesce-leaders ] [ coalesce-elements ] 2bi ;
 
-:: maybe-eliminate-copy ( vreg1 vreg2 -- )
-    ! Eliminate a copy of possible.
-    vreg1 leader :> vreg1
-    vreg2 leader :> vreg2
-    vreg1 vreg2 eq? [
-        vreg1 class-elements vreg2 class-elements sets-interfere?
-        [ drop ] [ vreg1 vreg2 coalesce-vregs ] if
-    ] unless ;
-
 GENERIC: prepare-insn ( insn -- )
 
 : maybe-eliminate-copy-later ( dst src -- )
@@ -96,35 +88,69 @@ M: vreg-insn prepare-insn
 M: ##copy prepare-insn
     [ dst>> ] [ src>> ] bi maybe-eliminate-copy-later ;
 
+M: ##parallel-copy prepare-insn
+    values>> [ first2 maybe-eliminate-copy-later ] each ;
+
+: leaders ( vreg1 vreg2 -- vreg1' vreg2' )
+    [ leader ] bi@ ;
+
+: vregs-interfere? ( vreg1 vreg2 -- merged/f ? )
+    [ class-elements ] bi@ sets-interfere? ;
+
+ERROR: vregs-shouldn't-interfere vreg1 vreg2 ;
+
+:: must-eliminate-copy ( vreg1 vreg2 -- )
+    ! Eliminate a copy.
+    vreg1 vreg2 eq? [
+        vreg1 vreg2 vregs-interfere?
+        [ vreg1 vreg2 vregs-shouldn't-interfere ]
+        [ vreg1 vreg2 coalesce-vregs ]
+        if
+    ] unless ;
+
 M: ##tagged>integer prepare-insn
-    [ dst>> ] [ src>> ] bi maybe-eliminate-copy ;
+    [ dst>> ] [ src>> ] bi leaders must-eliminate-copy ;
 
 M: ##phi prepare-insn
     [ dst>> ] [ inputs>> values ] bi
-    [ maybe-eliminate-copy ] with each ;
+    [ leaders must-eliminate-copy ] with each ;
 
 : prepare-coalescing ( cfg -- )
     init-coalescing
     [ [ prepare-insn ] each ] simple-analysis ;
 
-: process-copies ( -- )
-    copies get [ maybe-eliminate-copy ] assoc-each ;
+:: maybe-eliminate-copy ( vreg1 vreg2 -- )
+    ! Eliminate a copy if possible.
+    vreg1 vreg2 eq? [
+        vreg1 vreg2 vregs-interfere?
+        [ drop ] [ vreg1 vreg2 coalesce-vregs ] if
+    ] unless ;
 
-GENERIC: useful-insn? ( insn -- ? )
+: process-copies ( -- )
+    copies get [ leaders maybe-eliminate-copy ] assoc-each ;
+
+GENERIC: cleanup-insn ( insn -- )
 
 : useful-copy? ( insn -- ? )
-    [ dst>> leader ] [ src>> leader ] bi eq? not ; inline
+    [ dst>> ] [ src>> ] bi leaders eq? not ; inline
 
-M: ##copy useful-insn? useful-copy? ;
+M: ##copy cleanup-insn
+    dup useful-copy? [ , ] [ drop ] if ;
 
-M: ##tagged>integer useful-insn? useful-copy? ;
+M: ##parallel-copy cleanup-insn
+    values>>
+    [ first2 leaders 2array ] map [ first2 eq? not ] filter
+    [ parallel-copy-rep ] unless-empty ;
 
-M: ##phi useful-insn? drop f ;
+M: ##tagged>integer cleanup-insn
+    dup useful-copy? [ , ] [ drop ] if ;
 
-M: insn useful-insn? drop t ;
+M: ##phi cleanup-insn drop ;
+
+M: insn cleanup-insn , ;
 
 : cleanup-cfg ( cfg -- )
-    [ [ useful-insn? ] filter! ] simple-optimization ;
+    [ [ [ cleanup-insn ] each ] V{ } make ] simple-optimization ;
 
 PRIVATE>
 
@@ -138,4 +164,5 @@ PRIVATE>
     dup compute-live-ranges
     dup prepare-coalescing
     process-copies
-    dup cleanup-cfg ;
+    dup cleanup-cfg
+    dup compute-live-sets ;

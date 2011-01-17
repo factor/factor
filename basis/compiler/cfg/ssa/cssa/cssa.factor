@@ -1,34 +1,54 @@
-! Copyright (C) 2009, 2010 Slava Pestov.
+! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel locals fry sequences sets
-cpu.architecture
+USING: accessors assocs kernel locals fry make namespaces
+sequences cpu.architecture
+compiler.cfg
 compiler.cfg.rpo
-compiler.cfg.def-use
 compiler.cfg.utilities
+compiler.cfg.predecessors
 compiler.cfg.registers
 compiler.cfg.instructions ;
+FROM: assocs => change-at ;
 IN: compiler.cfg.ssa.cssa
 
 ! Convert SSA to conventional SSA. This pass runs after representation
 ! selection, so it must keep track of representations when introducing
 ! new values.
 
-: insert-copy? ( bb vreg -- ? )
-    ! If the last instruction defines a value (which means it is
-    ! ##fixnum-add, ##fixnum-sub or ##fixnum-mul) then we don't
-    ! need to insert a copy since in fact doing so will result
-    ! in incorrect code.
-    [ instructions>> last defs-vregs ] dip swap in? not ;
+SYMBOL: copies
 
-:: insert-copy ( bb src rep -- bb dst )
-    bb src insert-copy? [
-        rep next-vreg-rep :> dst
-        bb [ dst src rep ##copy, ] add-instructions
-        bb dst
-    ] [ bb src ] if ;
+: init-copies ( bb -- )
+    predecessors>> [ V{ } clone ] H{ } map>assoc copies set ;
 
-: convert-phi ( ##phi -- )
-    dup dst>> rep-of '[ [ _ insert-copy ] assoc-map ] change-inputs drop ;
+:: convert-operand ( src pred rep -- dst )
+    rep next-vreg-rep :> dst
+    { dst src } pred copies get at push
+    dst ;
+
+:: convert-phi ( insn preds -- )
+    insn dst>> rep-of :> rep
+    insn inputs>> :> inputs
+    preds [| pred |
+        pred inputs [ pred rep convert-operand ] change-at
+    ] each ;
+
+: insert-edge-copies ( from to copies -- )
+    [ ##parallel-copy ##branch ] { } make insert-basic-block ;
+
+: insert-copies ( bb -- )
+    [ copies get ] dip '[
+        [ drop ] [ [ _ ] dip insert-edge-copies ] if-empty
+    ] assoc-each ;
+
+: convert-phis ( bb -- )
+    [ init-copies ]
+    [ dup predecessors>> '[ _ convert-phi ] each-phi ]
+    [ insert-copies ]
+    tri ;
 
 : construct-cssa ( cfg -- )
-    [ [ convert-phi ] each-phi ] each-basic-block ;
+    needs-predecessors
+
+    dup [ convert-phis ] each-basic-block
+
+    cfg-changed drop ;
