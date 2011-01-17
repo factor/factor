@@ -303,7 +303,7 @@ HELP: assoc-refine
 { $description "Outputs the intersection of all the assocs of the assocs sequence " { $snippet "seq" } ", or " { $link f } " if " { $snippet "seq" } " is empty." } ;
 
 HELP: assoc-subset?
-{ $values { "assoc1" assoc } { "assoc2" assoc } { "?" "a new assoc" } }
+{ $values { "assoc1" assoc } { "assoc2" assoc } { "?" boolean } }
 { $description "Tests if " { $snippet "assoc2" } " contains all key/value pairs of " { $snippet "assoc1" } "." } ;
 
 HELP: assoc=
