@@ -9,17 +9,17 @@ HELP: deep-each
 HELP: deep-map
 { $values { "obj" object } { "quot" { $quotation "( ... elt -- ... elt' )" } } { "newobj" "the mapped object" } }
 { $description "Execute a quotation on each nested element of an object and its children, in preorder. That is, the result of the execution of the quotation on the outer is used to map the inner elements." }
-{ $see-also map }  ;
+{ $see-also map } ;
 
 HELP: deep-filter
 { $values { "obj" object } { "quot" { $quotation "( ... elt -- ... ? )" } } { "seq" "a sequence" } }
 { $description "Creates a sequence of sub-nodes in the object which satisfy the given quotation, in preorder. This includes the object itself, if it passes the quotation." }
-{ $see-also filter }  ;
+{ $see-also filter } ;
 
 HELP: deep-find
 { $values { "obj" object } { "quot" { $quotation "( ... elt -- ... ? )" } } { "elt" "an element" } }
-{ $description "Gets the first sub-node of the object, in preorder, which satisfies the quotation. If nothing satisifies it, it returns " { $link f } "." }
-{ $see-also find }  ;
+{ $description "Gets the first sub-node of the object, in preorder, which satisfies the quotation. If nothing satisfies it, it returns " { $link f } "." }
+{ $see-also find } ;
 
 HELP: deep-any?
 { $values { "obj" object } { "quot" { $quotation "( ... elt -- ... ? )" } } { "?" "a boolean" } }
