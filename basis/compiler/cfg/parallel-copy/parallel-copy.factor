@@ -11,7 +11,7 @@ IN: compiler.cfg.parallel-copy
 
 <PRIVATE
 
-SYMBOLS: temp locs preds to-do ready ;
+SYMBOLS: locs preds to-do ready ;
 
 : init-to-do ( bs -- )
     to-do get push-all-back ;
@@ -19,43 +19,59 @@ SYMBOLS: temp locs preds to-do ready ;
 : init-ready ( bs -- )
     locs get '[ _ key? not ] filter ready get push-all-front ;
 
-: init ( mapping temp -- )
-    temp set
+: init ( mapping -- )
     <dlist> to-do set
     <dlist> ready set
     [ preds set ]
     [ [ nip dup ] H{ } assoc-map-as locs set ]
     [ keys [ init-to-do ] [ init-ready ] bi ] tri ;
 
-:: process-ready ( b quot -- )
+:: process-ready ( b quot: ( dst src -- ) -- )
     b preds get at :> a
     a locs get at :> c
     b c quot call
     b a locs get set-at
     a c = a preds get at and [ a ready get push-front ] when ; inline
 
-:: process-to-do ( b quot -- )
+:: process-to-do ( b temp: ( src -- dst ) quot: ( dst src -- ) -- )
     ! Note that we check if b = loc(b), not b = loc(pred(b)) as the
     ! paper suggests. Confirmed by one of the authors at
     ! http://www.reddit.com/comments/93253/some_lecture_notes_on_ssa_form/c0bco4f
     b locs get at b = [
-        temp get b quot call
-        temp get b locs get set-at
+        b temp call :> temp
+        temp b quot call
+        temp b locs get set-at
         b ready get push-front
     ] when ; inline
 
 PRIVATE>
 
-:: parallel-mapping ( mapping temp quot -- )
+:: parallel-mapping ( mapping temp: ( src -- dst ) quot: ( dst src -- ) -- )
+    ! mapping is a list of { dst src } pairs
     [
-        mapping temp init
+        mapping init
         to-do get [
             ready get [
                 quot process-ready
             ] slurp-deque
-            quot process-to-do
+            temp quot process-to-do
         ] slurp-deque
     ] with-scope ; inline
 
 : parallel-copy ( mapping -- )
-    next-vreg [ any-rep ##copy, ] parallel-mapping ;
+    ! mapping is a list of { dst src } pairs
+    next-vreg '[ drop _ ] [ any-rep ##copy ] parallel-mapping ;
+
+<PRIVATE
+
+SYMBOL: temp-vregs
+
+: temp-vreg ( rep -- vreg )
+    temp-vregs get [ next-vreg-rep ] cache ;
+
+PRIVATE>
+
+: parallel-copy-rep ( mapping -- )
+    ! mapping is a list of { dst src } pairs
+    H{ } clone temp-vregs set
+    [ rep-of temp-vreg ] [ dup rep-of ##copy ] parallel-mapping ;
