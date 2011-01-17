@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2008, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs arrays classes combinators
 compiler.units fry generalizations sequences.generalizations
@@ -9,6 +9,9 @@ FROM: namespaces => set ;
 FROM: sets => members ;
 IN: compiler.cfg.def-use
 
+! Utilities for iterating over instruction operands
+
+! Def-use protocol
 GENERIC: defs-vregs ( insn -- seq )
 GENERIC: temp-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
@@ -17,6 +20,52 @@ M: insn defs-vregs drop { } ;
 M: insn temp-vregs drop { } ;
 M: insn uses-vregs drop { } ;
 
+! Instructions with unusual operands, also see these passes
+! for special behavior:
+! - compiler.cfg.renaming.functor
+! - compiler.cfg.representations.preferred
+CONSTANT: special-vreg-insns {
+    ##parallel-copy
+    ##phi
+    ##alien-invoke
+    ##alien-indirect
+    ##alien-assembly
+    ##callback-inputs
+    ##callback-outputs
+}
+
+! Special defs-vregs methods
+M: ##parallel-copy defs-vregs values>> [ first ] map ;
+
+M: ##phi defs-vregs dst>> 1array ;
+
+M: alien-call-insn defs-vregs
+    reg-outputs>> [ first ] map ;
+
+M: ##callback-inputs defs-vregs
+    [ reg-outputs>> ] [ stack-outputs>> ] bi append [ first ] map ;
+
+M: ##callback-outputs defs-vregs drop { } ;
+
+! Special uses-vregs methods
+M: ##parallel-copy uses-vregs values>> [ second ] map ;
+
+M: ##phi uses-vregs inputs>> values ;
+
+M: alien-call-insn uses-vregs
+    [ reg-inputs>> ] [ stack-inputs>> ] bi append [ first ] map ;
+
+M: ##alien-indirect uses-vregs
+    [ call-next-method ] [ src>> ] bi prefix ;
+
+M: ##callback-inputs uses-vregs
+    drop { } ;
+
+M: ##callback-outputs uses-vregs
+    reg-inputs>> [ first ] map ;
+
+! Generate defs-vregs, uses-vregs and temp-vregs for everything
+! else
 <PRIVATE
 
 : slot-array-quot ( slots -- quot )
@@ -45,33 +94,6 @@ M: insn uses-vregs drop { } ;
 
 PRIVATE>
 
-CONSTANT: special-vreg-insns
-{ ##phi ##alien-invoke ##alien-indirect ##alien-assembly ##callback-inputs ##callback-outputs }
-
-M: ##phi defs-vregs dst>> 1array ;
-
-M: alien-call-insn defs-vregs
-    reg-outputs>> [ first ] map ;
-
-M: ##callback-inputs defs-vregs
-    [ reg-outputs>> ] [ stack-outputs>> ] bi append [ first ] map ;
-
-M: ##callback-outputs defs-vregs drop { } ;
-
-M: ##phi uses-vregs inputs>> values ;
-
-M: alien-call-insn uses-vregs
-    [ reg-inputs>> ] [ stack-inputs>> ] bi append [ first ] map ;
-
-M: ##alien-indirect uses-vregs
-    [ call-next-method ] [ src>> ] bi prefix ;
-
-M: ##callback-inputs uses-vregs
-    drop { } ;
-
-M: ##callback-outputs uses-vregs
-    reg-inputs>> [ first ] map ;
-
 [
     insn-classes get
     [ special-vreg-insns diff [ define-defs-vregs-method ] each ]
@@ -80,6 +102,7 @@ M: ##callback-outputs uses-vregs
     tri
 ] with-compilation-unit
 
+! Computing vreg -> insn -> bb mapping
 SYMBOLS: defs insns ;
 
 : def-of ( vreg -- node ) defs get at ;

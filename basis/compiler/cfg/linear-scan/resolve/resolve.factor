@@ -1,4 +1,4 @@
-! Copyright (C) 2009, 2010 Slava Pestov.
+! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit fry kernel locals namespaces
@@ -33,10 +33,21 @@ M: location equal?
 M: location hashcode*
     reg>> hashcode* ;
 
-SYMBOL: spill-temps
+SYMBOL: temp-spills
 
-: spill-temp ( rep -- n )
-    rep-size spill-temps get [ next-spill-slot ] cache ;
+: temp-spill ( rep -- spill-slot )
+    rep-size temp-spills get
+    [ next-spill-slot ] cache ;
+
+SYMBOL: temp-locations
+
+: temp-location ( loc -- temp )
+    rep>> temp-locations get
+    [ [ temp-spill ] keep <location> ] cache ;
+
+: init-resolve ( -- )
+    H{ } clone temp-spills set
+    H{ } clone temp-locations set ;
 
 : add-mapping ( from to rep -- )
     '[ _ <location> ] bi@ 2array , ;
@@ -74,20 +85,18 @@ SYMBOL: spill-temps
 : register->register ( from to -- )
     swap [ reg>> ] [ [ reg>> ] [ rep>> ] bi ] bi* ##copy, ;
 
-SYMBOL: temp
-
 : >insn ( from to -- )
     {
-        { [ over temp eq? ] [ temp->register ] }
-        { [ dup temp eq? ] [ register->temp ] }
         { [ over reg>> spill-slot? ] [ memory->register ] }
         { [ dup reg>> spill-slot? ] [ register->memory ] }
         [ register->register ]
     } cond ;
 
 : mapping-instructions ( alist -- insns )
-    [ swap ] H{ } assoc-map-as
-    [ temp [ swap >insn ] parallel-mapping ##branch, ] { } make ;
+    [ swap ] H{ } assoc-map-as [
+        [ temp-location ] [ swap >insn ] parallel-mapping
+        ##branch
+    ] { } make ;
 
 : perform-mappings ( bb to mappings -- )
     dup empty? [ 3drop ] [
@@ -105,6 +114,5 @@ SYMBOL: temp
 
 : resolve-data-flow ( cfg -- )
     needs-predecessors
-
-    H{ } clone spill-temps set
+    init-resolve
     [ resolve-block-data-flow ] each-basic-block ;
