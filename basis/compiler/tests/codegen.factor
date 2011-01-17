@@ -524,3 +524,16 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
     231 over 1 set-alien-unsigned-1 ;
 
 [ B{ 123 231 } ] [ derived-pointer-test-1 ] unit-test
+
+: fib-count2 ( -- x y ) 0 1 [ dup 4000000 <= ] [ [ + ] keep swap ] while ;
+
+[ 3524578 5702887 ] [ fib-count2 ] unit-test
+
+! Stupid repro
+USE: compiler.cfg.registers
+
+0 vreg-counter set-global
+
+{ fib-count2 } compile
+
+[ 3524578 5702887 ] [ fib-count2 ] unit-test
