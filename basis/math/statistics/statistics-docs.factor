@@ -34,7 +34,7 @@ HELP: range
 { $description "Computes the difference of the maximum and minimum values in " { $snippet "seq" } "." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } range ." "2" }
-  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } range ." "3" } }  ;
+  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } range ." "3" } } ;
 
 HELP: minmax
 { $values { "seq" sequence } { "min" real } { "max" real } }
@@ -75,7 +75,7 @@ HELP: histogram
     { "seq" sequence }
     { "hashtable" hashtable }
 }
-{ $examples 
+{ $examples
     { $example "! Count the number of times an element appears in a sequence."
                "USING: prettyprint math.statistics ;"
                "\"aaabc\" histogram ."
@@ -88,21 +88,21 @@ HELP: histogram!
 { $values
     { "hashtable" hashtable } { "seq" sequence }
 }
-{ $examples 
+{ $examples
     { $example "! Count the number of times the elements of two sequences appear."
                "USING: prettyprint math.statistics ;"
                "\"aaabc\" histogram \"aaaaaabc\" histogram! ."
                "H{ { 97 9 } { 98 2 } { 99 2 } }"
     }
 }
-{ $description "Takes an existing hashtable and uses " { $link histogram } " to continue counting the number of occurences of each element." } ;
+{ $description "Takes an existing hashtable and uses " { $link histogram } " to continue counting the number of occurrences of each element." } ;
 
 HELP: sorted-histogram
 { $values
     { "seq" sequence }
     { "alist" "an array of key/value pairs" }
 }
-{ $description "Outputs a " { $link histogram } " of a sequence sorted by number of occurences from lowest to highest." }
+{ $description "Outputs a " { $link histogram } " of a sequence sorted by number of occurrences from lowest to highest." }
 { $examples
     { $example "USING: prettyprint math.statistics ;"
         """"abababbbbbbc" sorted-histogram ."""
@@ -115,7 +115,7 @@ HELP: sequence>assoc
     { "seq" sequence } { "quot" quotation } { "exemplar" "an exemplar assoc" }
     { "assoc" assoc }
 }
-{ $examples 
+{ $examples
     { $example "! Iterate over a sequence and increment the count at each element"
                "USING: assocs prettyprint math.statistics ;"
                "\"aaabc\" [ inc-at ] H{ } sequence>assoc ."
@@ -128,7 +128,7 @@ HELP: sequence>assoc!
 { $values
     { "assoc" assoc } { "seq" sequence } { "quot" quotation }
 }
-{ $examples 
+{ $examples
     { $example "! Iterate over a sequence and add the counts to an existing assoc"
                "USING: assocs prettyprint math.statistics kernel ;"
                "H{ { 97 2 } { 98 1 } } clone \"aaabc\" [ inc-at ] sequence>assoc! ."
@@ -142,7 +142,7 @@ HELP: sequence>hashtable
     { "seq" sequence } { "quot" quotation }
     { "hashtable" hashtable }
 }
-{ $examples 
+{ $examples
     { $example "! Count the number of times an element occurs in a sequence"
                "USING: assocs prettyprint math.statistics ;"
                "\"aaabc\" [ inc-at ] sequence>hashtable ."
