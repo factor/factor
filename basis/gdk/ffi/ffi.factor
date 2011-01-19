@@ -47,7 +47,7 @@ STRUCT: GdkEventButton
     { time guint32 }
     { x gdouble }
     { y gdouble }
-    { axes* gdouble }
+    { axes gdouble* }
     { state guint }
     { button guint }
     { device GdkDevice* }
