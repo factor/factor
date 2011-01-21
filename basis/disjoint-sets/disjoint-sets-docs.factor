@@ -23,7 +23,7 @@ HELP: equate
 
 HELP: assoc>disjoint-set
 { $values { "assoc" assoc } { "disjoint-set" disjoint-set } }
-{ $description "Given an assoc representation of a graph where the keys are vertices and key/value pairs are edges, creates a disjoint set whose elements are the keys of assoc, and two keys are equvalent if they belong to the same connected component of the graph." }
+{ $description "Given an assoc representation of a graph where the keys are vertices and key/value pairs are edges, creates a disjoint set whose elements are the keys of assoc, and two keys are equivalent if they belong to the same connected component of the graph." }
 { $examples
     { $example
         "USING: disjoint-sets kernel prettyprint ;"
