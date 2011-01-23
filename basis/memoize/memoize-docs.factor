@@ -22,7 +22,7 @@ HELP: define-memoized
 { $description "Defines the given word at run time as one which memoizes its outputs given a particular input." } ;
 
 HELP: MEMO:
-{ $syntax "MEMO: word ( stack -- effect ) definition ;" }
+{ $syntax "MEMO: word ( stack -- effect ) definition... ;" }
 { $description "Defines the given word at parse time as one which memoizes its output given a particular input. The stack effect is mandatory." } ;
 
 { define-memoized POSTPONE: MEMO: } related-words
