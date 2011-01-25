@@ -97,7 +97,7 @@ set_make() {
         dragonflybsd) MAKE='gmake';;
         *) MAKE='make';;
     esac
-    if ! [[ $MAKE = 'gmake' ]] ; then
+    if [[ $MAKE = 'gmake' ]] ; then
         ensure_program_installed gmake
     fi
 }
