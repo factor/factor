@@ -325,9 +325,14 @@ M: winnt root-directory? ( path -- ? )
 TR: normalize-separators "/" "\\" ;
 
 M: winnt normalize-path ( string -- string' )
-    absolute-path
-    normalize-separators
-    prepend-prefix ;
+    dup [ "//" head? ] [ "\\\\" head? ] bi
+    or [
+        normalize-separators
+    ] [
+        absolute-path
+        normalize-separators
+        prepend-prefix
+    ] if ;
 
 M: winnt CreateFile-flags ( DWORD -- DWORD )
     FILE_FLAG_OVERLAPPED bitor ;
