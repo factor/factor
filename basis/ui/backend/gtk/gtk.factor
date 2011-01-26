@@ -5,9 +5,9 @@ alien.strings arrays assocs classes.struct command-line destructors
 gdk.ffi gdk.gl.ffi glib.ffi gobject-introspection.standard-types
 gobject.ffi gtk.ffi gtk.gl.ffi io.encodings.utf8 kernel libc literals
 locals math math.bitwise math.order math.vectors namespaces sequences
-strings system threads ui ui.backend ui.backend.gtk.io ui.clipboards
-ui.event-loop ui.gadgets ui.gadgets.editors ui.gadgets.private
-ui.gadgets.worlds ui.gestures ui.pixel-formats
+strings system threads ui ui.backend ui.backend.gtk.input-methods
+ui.backend.gtk.io ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
 ui.pixel-formats.private ui.private vocabs.loader ;
 IN: ui.backend.gtk
 
@@ -240,27 +240,9 @@ CONSTANT: action-key-codes
 
 ! Input methods
 
-GENERIC: support-input-methods? ( gadget -- ? )
-GENERIC: get-cursor-surrounding ( gadget -- text cursor-pos )
-GENERIC: delete-cursor-surrounding ( offset count gadget -- )
-GENERIC: get-cursor-loc&dim ( gadget -- loc dim )
-
-M: gadget support-input-methods? drop f ;
-
-M: editor support-input-methods? drop t ;
-
-M: editor get-cursor-surrounding
-    dup editor-caret first2 [ swap editor-line ] dip ;
-
-M: editor delete-cursor-surrounding
-    3drop ;
-
-M: editor get-cursor-loc&dim
-    [ caret-loc ] [ caret-dim ] bi ;
-
 : on-retrieve-surrounding ( im-context win -- ? )
     window world-focus dup support-input-methods? [
-        get-cursor-surrounding [ utf8 string>alien -1 ] dip
+        cursor-surrounding [ utf8 string>alien -1 ] dip
         gtk_im_context_set_surrounding t
     ] [ 2drop f ] if ;
 
@@ -272,7 +254,7 @@ M: editor get-cursor-loc&dim
     [ drop ] [ utf8 alien>string ] [ window ] tri* user-input ;
 
 : gadget-cursor-location ( gadget -- rectangle )
-    [ screen-loc ] [ get-cursor-loc&dim ] bi [ v+ ] dip
+    [ screen-loc ] [ cursor-loc&dim ] bi [ v+ ] dip
     [ first2 [ >fixnum ] bi@ ] bi@
     cairo_rectangle_int_t <struct-boa> ;
 
@@ -517,5 +499,8 @@ gtk-ui-backend ui-backend set-global
 
 { "ui.backend.gtk" "io.backend.unix" }
 "ui.backend.gtk.io.unix" require-when
+
+{ "ui.backend.gtk" "ui.gadgets.editors" }
+"ui.backend.gtk.input-methods.editors" require-when
 
 [ "ui.tools" ] main-vocab-hook set-global
