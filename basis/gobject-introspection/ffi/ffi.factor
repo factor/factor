@@ -1,16 +1,10 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.parser arrays assocs
-classes.parser classes.struct combinators
-combinators.short-circuit definitions effects fry
-gobject-introspection.common gobject-introspection.types kernel
-math.parser namespaces parser quotations sequences
-
-gobject-introspection.standard-types
-prettyprint ascii gobject-introspection.repository locals
-compiler.units make splitting.monotonic
-
-sequences.generalizations words words.constant ;
+USING: accessors alien.c-types alien.parser arrays ascii
+classes.parser classes.struct combinators gobject-introspection.common
+gobject-introspection.repository gobject-introspection.types kernel
+locals make math.parser namespaces parser sequences
+splitting.monotonic words words.constant ;
 IN: gobject-introspection.ffi
 
 SYMBOL: constant-prefix
