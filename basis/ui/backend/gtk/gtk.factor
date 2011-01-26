@@ -3,12 +3,12 @@
 USING: accessors alien.accessors alien.c-types alien.data
 alien.strings arrays assocs classes.struct command-line destructors
 gdk.ffi gdk.gl.ffi glib.ffi gobject-introspection.standard-types
-gobject.ffi gtk.ffi gtk.gl.ffi io.backend io.backend.unix.multiplexers
-io.encodings.utf8 io.thread kernel libc literals locals math
-math.bitwise math.order math.vectors namespaces sequences strings
-system threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.editors ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.pixel-formats ui.pixel-formats.private ui.private ;
+gobject.ffi gtk.ffi gtk.gl.ffi io.encodings.utf8 kernel libc literals
+locals math math.bitwise math.order math.vectors namespaces sequences
+strings system threads ui ui.backend ui.backend.gtk.io ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.editors ui.gadgets.private
+ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.pixel-formats.private ui.private vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -51,48 +51,7 @@ M: gtk-clipboard set-clipboard-contents
         gtk_clipboard_get <gtk-clipboard> swap set-global
     ] 2bi@ ;
 
-! IO events
-
-: io-source-prepare ( source timeout -- ? )
-    2drop f ;
-
-: io-source-check ( source -- ? )
-    poll_fds>> 0 g_slist_nth_data GPollFD memory>struct
-    revents>> 0 = not ;
-
-: io-source-dispatch ( source callback user_data -- ? )
-     3drop
-     0 mx get wait-for-events
-     yield t ;
-
-CONSTANT: poll-fd-events
-    flags{
-        G_IO_IN
-        G_IO_OUT
-        G_IO_PRI
-        G_IO_ERR
-        G_IO_HUP
-        G_IO_NVAL
-    }
-
-: create-poll-fd ( -- poll-fd )
-    GPollFD malloc-struct &free
-        mx get fd>> >>fd
-        poll-fd-events >>events ;
-
-HOOK: init-io-event-source io-backend ( -- )
-
-M: f init-io-event-source ;
-M: c-io-backend init-io-event-source ;
-
-M: object init-io-event-source
-    GSourceFuncs malloc-struct &free
-        [ io-source-prepare ] GSourceFuncsPrepareFunc >>prepare
-        [ io-source-check ] GSourceFuncsCheckFunc >>check
-        [ io-source-dispatch ] GSourceFuncsDispatchFunc >>dispatch
-    GSource heap-size g_source_new &g_source_unref
-    [ create-poll-fd g_source_add_poll ]
-    [ f g_source_attach drop ] bi ;
+! Timeouts
 
 SYMBOL: next-timeout
 
@@ -546,7 +505,6 @@ M: gtk-ui-backend (with-ui)
         0 gint <ref> f void* <ref> gtk_gl_init
         init-clipboard
         start-ui
-        stop-io-thread
         [
             init-io-event-source
             init-timeout
@@ -556,5 +514,8 @@ M: gtk-ui-backend (with-ui)
 
 
 gtk-ui-backend ui-backend set-global
+
+{ "ui.backend.gtk" "io.backend.unix" }
+"ui.backend.gtk.io.unix" require-when
 
 [ "ui.tools" ] main-vocab-hook set-global
