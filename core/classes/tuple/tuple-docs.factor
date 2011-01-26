@@ -444,7 +444,7 @@ HELP: boa
 { $values { "slots..." "slot values" } { "class" tuple-class } { "tuple" tuple } }
 { $description "Creates a new instance of " { $snippet "class" } " and fill in the slots from the stack, with the top-most stack element being stored in the right-most slot." }
 { $notes "The name " { $snippet "boa" } " is shorthand for “by order of arguments”, and “BOA constructor” is a pun on “boa constrictor”." }
-{ $errors "Throws an error if the slot values do not match class declarations on slots (see" { $link "tuple-declarations" } ")." } ;
+{ $errors "Throws an error if the slot values do not match class declarations on slots (see " { $link "tuple-declarations" } ")." } ;
 
 HELP: bad-superclass
 { $error-description "Thrown if an attempt is made to subclass a class that is not a tuple class, or a tuple class declared " { $link POSTPONE: final } "." } ;
