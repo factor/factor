@@ -24,8 +24,8 @@ test_program_installed() {
 }
 
 exit_script() {
-    if [[ $FIND_MAKE_TARGET -eq true ]] ; then
-		# Must be echo not $ECHO
+    if [[ $FIND_MAKE_TARGET = true ]] ; then
+        # Must be echo not $ECHO
         echo $MAKE_TARGET;
     fi
     exit $1
@@ -39,7 +39,7 @@ ensure_program_installed() {
         test_program_installed $i
         if [[ $? -eq 0 ]]; then
             $ECHO -n "not "
-        else    
+        else
             installed=$(( $installed + 1 ))
         fi
         $ECHO "found!"
@@ -97,7 +97,7 @@ set_make() {
         dragonflybsd) MAKE='gmake';;
         *) MAKE='make';;
     esac
-    if ! [[ $MAKE -eq 'gmake' ]] ; then
+    if [[ $MAKE = 'gmake' ]] ; then
         ensure_program_installed gmake
     fi
 }
@@ -473,7 +473,7 @@ get_boot_image() {
 }
 
 get_url() {
-    if [[ $DOWNLOADER -eq "" ]] ; then
+    if [[ -z $DOWNLOADER ]] ; then
         set_downloader;
     fi
     $ECHO $DOWNLOADER $1 ;
