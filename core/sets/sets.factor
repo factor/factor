@@ -109,7 +109,7 @@ M: sequence null?
 M: sequence cardinality
     length ;
 
-: combine ( sets -- set )
+: combine ( sets -- set/f )
     [ f ]
     [ [ [ members ] map concat ] [ first ] bi set-like ]
     if-empty ;
