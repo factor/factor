@@ -13,9 +13,11 @@ ERROR: unknown-image-extension extension ;
 SYMBOL: types
 types [ H{ } clone ] initialize
 
+: (image-class) ( type -- class )
+    >lower types get ?at [ unknown-image-extension ] unless ;
+
 : image-class ( path -- class )
-    file-extension >lower types get ?at
-    [ unknown-image-extension ] unless ;
+    file-extension (image-class) ;
 
 : open-image-file ( path -- stream )
     binary <limited-file-reader> ;
