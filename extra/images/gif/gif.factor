@@ -140,7 +140,8 @@ ERROR: unimplemented message ;
 : sort? ( image -- ? ) flags>> 5 bit? ; inline
 : color-table-size ( image -- ? ) flags>> 3 bits 1 + 2^ 3 * ; inline
 : transparency? ( image -- ? )
-    graphic-control-extensions>> first flags>> 0 bit? ; inline
+    graphic-control-extensions>>
+    [ f ] [ first flags>> 0 bit? ] if-empty ; inline
 
 : color-resolution ( image -- ? ) flags>> -4 shift 3 bits ; inline
 
