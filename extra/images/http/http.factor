@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs http.client images.loader
 images.loader.private images.viewer io.pathnames kernel
-namespaces sequences ;
+namespaces present sequences ;
 IN: images.http
 
 <PRIVATE
@@ -14,7 +14,8 @@ IN: images.http
 PRIVATE>
 
 : load-http-image ( path -- image )
-    [ http-get swap content-type ] [ file-extension ] bi or
+    [ http-get swap content-type ]
+    [ present file-extension ] bi or
     (image-class) load-image* ;
 
 : http-image. ( path -- )
