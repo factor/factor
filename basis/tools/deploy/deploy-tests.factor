@@ -135,4 +135,11 @@ os macosx? [
 
 [ ] [ "tools.deploy.test.19" shake-and-bake run-temp-image ] unit-test
 
+[ ] [ "tools.deploy.test.20" shake-and-bake ] unit-test
+
+[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>Factor</foo>\n" ]
+[ deploy-test-command ascii [ contents ] with-process-reader ] unit-test
+
+[ ] [ 800000 small-enough? ] unit-test
+
 [ ] [ "benchmark.ui-panes" shake-and-bake run-temp-image ] unit-test

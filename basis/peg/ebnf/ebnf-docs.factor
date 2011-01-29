@@ -274,7 +274,7 @@ ARTICLE: "peg.ebnf.variable" "Variable"
 ;
 
 ARTICLE: "peg.ebnf.foreign-rules" "Foreign Rules"
-"Rules can call outto other peg.ebnf defined parsers. The result of "
+"Rules can call out to other peg.ebnf defined parsers. The result of "
 "the foreign call then becomes the AST of the successful parse. Foreign rules "
 "are invoked using '<foreign word-name>' or '<foreign word-name rule>'. The "
 "latter allows calling a specific rule in a previously designed peg.ebnf parser. "
