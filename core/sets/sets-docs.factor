@@ -190,3 +190,7 @@ HELP: null?
 HELP: cardinality
 { $values { "set" set } { "n" "a non-negative integer" } }
 { $description "Returns the number of elements in the set. All sets support this operation." } ;
+
+HELP: combine
+{ $values { "sets" "a sequence of sets" } { "set" set } }
+{ $description "Outputs the union of a sequence of sets, or " { $link f } " if the sequence is empty." } ;
