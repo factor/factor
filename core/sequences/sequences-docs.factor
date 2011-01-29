@@ -83,10 +83,12 @@ HELP: empty?
 HELP: if-empty
 { $values { "seq" sequence } { "quot1" quotation } { "quot2" quotation } }
 { $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped and " { $snippet "quot1" } " is called. Otherwise, if the sequence has any elements, " { $snippet "quot2" } " is called on it." }
-{ $example
-    "USING: kernel prettyprint sequences ;"
-    "{ 1 2 3 } [ \"empty sequence\" ] [ sum ] if-empty ."
-    "6"
+{ $examples
+    { $example
+        "USING: kernel prettyprint sequences ;"
+        "{ 1 2 3 } [ \"empty sequence\" ] [ sum ] if-empty ."
+        "6"
+    }
 } ;
 
 HELP: when-empty
