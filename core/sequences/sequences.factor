@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2010 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2005, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private slots.private math
 math.private math.order ;
@@ -559,7 +559,7 @@ PRIVATE>
     [ [ (indices) ] 2curry each-index ] keep ;
 
 : nths ( indices seq -- seq' )
-    [ nth ] curry map ;
+    [ [ nth ] curry ] keep map-as ;
 
 : any? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     find drop >boolean ; inline
