@@ -102,7 +102,7 @@ $nl
 "For example, we'd like it to identify the following as a palindrome:"
 { $code "\"A man, a plan, a canal: Panama.\"" }
 "However, right now, the simplistic algorithm we use says this is not a palindrome:"
-{ $unchecked-example "\"A man, a plan, a canal: Panama.\" palindrome?" "f" }
+{ $unchecked-example "\"A man, a plan, a canal: Panama.\" palindrome? ." "f" }
 "We would like it to output " { $link t } " there. We can encode this requirement with a unit test that we add to " { $snippet "palindrome-tests.factor" } ":"
 { $code "[ t ] [ \"A man, a plan, a canal: Panama.\" palindrome? ] unit-test" }
 "If you now run unit tests, you will see a unit test failure:"

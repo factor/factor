@@ -139,7 +139,7 @@ HELP: closer
 { $class-description "Describes a closing tag, like " { $snippet "</a>" } ". Contains one slot, " { $snippet "name" } ", containing the closer's name." } ;
 
 HELP: contained
-{ $class-description "Represents a self-closing tag, like " { $snippet "<a/>" } ". Contains two slots," { $snippet "name" } " and " { $snippet "attrs" } " containing, respectively, the name of the tag and its attributes." } ;
+{ $class-description "Represents a self-closing tag, like " { $snippet "<a/>" } ". Contains two slots, " { $snippet "name" } " and " { $snippet "attrs" } " containing, respectively, the name of the tag and its attributes." } ;
 
 { opener closer contained } related-words
 
