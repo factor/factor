@@ -205,6 +205,26 @@ urls [
     derive-url
 ] unit-test
 
+[
+    T{ url
+        { protocol "https" }
+        { host "www.apple.com" }
+    }
+] [
+    T{ url
+        { protocol "http" }
+        { host "www.apple.com" }
+        { port 80 }
+    }
+
+    T{ url
+        { protocol "https" }
+        { host "www.apple.com" }
+    }
+
+    derive-url
+] unit-test
+
 [ "a" ] [
     <url> "a" "b" set-query-param "b" query-param
 ] unit-test
