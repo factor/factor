@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
@@ -92,6 +92,14 @@ M: string >url
         [ drop f ]
     } case ;
 
+: relative-url ( url -- url' )
+    clone
+        f >>protocol
+        f >>host
+        f >>port ;
+
+: relative-url? ( url -- ? ) protocol>> not ;
+
 <PRIVATE
 
 : unparse-username-password ( url -- )
@@ -113,8 +121,6 @@ M: string >url
         [ path>> "/" head? [ "/" % ] unless ]
     } cleave ;
 
-PRIVATE>
-
 M: url present
     [
         {
@@ -125,6 +131,8 @@ M: url present
         } cleave
     ] "" make ;
 
+PRIVATE>
+
 : url-append-path ( path1 path2 -- path )
     {
         { [ dup "/" head? ] [ nip ] }
@@ -134,6 +142,14 @@ M: url present
         [ [ "/" split1-last drop "/" ] dip 3append ]
     } cond ;
 
+<PRIVATE
+
+: derive-port ( url base -- url' )
+    over relative-url? [ [ port>> ] either? ] [ drop port>> ] if ;
+
+: derive-path ( url base -- url' )
+    [ path>> ] bi@ swap url-append-path ;
+
 PRIVATE>
 
 : derive-url ( base url -- url' )
@@ -142,19 +158,11 @@ PRIVATE>
         [ [ username>>  ] either? >>username ]
         [ [ password>>  ] either? >>password ]
         [ [ host>>      ] either? >>host ]
-        [ [ port>>      ] either? >>port ]
-        [ [ path>>      ] bi@ swap url-append-path >>path ]
+        [ derive-port             >>port ]
+        [ derive-path             >>path ]
         [ [ query>>     ] either? >>query ]
         [ [ anchor>>    ] either? >>anchor ]
     } 2cleave ;
-
-: relative-url ( url -- url' )
-    clone
-        f >>protocol
-        f >>host
-        f >>port ;
-
-: relative-url? ( url -- ? ) protocol>> not ;
 
 ! Half-baked stuff follows
 : secure-protocol? ( protocol -- ? )
