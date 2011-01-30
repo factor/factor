@@ -30,7 +30,6 @@ ephemeral-key-bits ;
     secure-config new
         SSLv23 >>method
         1024 >>ephemeral-key-bits
-        "vocab:openssl/cacert.pem" >>ca-file
         t >>verify ;
 
 TUPLE: secure-context < disposable config handle ;
