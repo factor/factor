@@ -40,7 +40,7 @@ TUPLE: (astar) astar goal origin in-open-set open-set ;
 
 : ?set-g ( origin node astar -- )
     [ cost-through ] 3keep [ swap ] 2dip
-    3dup astar>> g>> at [ 1/0. ] unless* > [ 4drop ] [ set-g ] if ;
+    3dup astar>> g>> at [ 1/0. ] unless* >= [ 4drop ] [ set-g ] if ;
 
 : build-path ( target astar -- path )
     [ over ] [ over [ [ origin>> at ] keep ] dip ] produce 2nip reverse ;
