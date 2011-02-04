@@ -326,12 +326,14 @@ HELP: cond
 }
 { $errors "Throws a " { $link no-cond } " error if none of the test quotations yield a true value." }
 { $examples
-    { $code
-        "{"
-        "    { [ dup 0 > ] [ \"positive\" ] }"
-        "    { [ dup 0 < ] [ \"negative\" ] }"
-        "    [ \"zero\" ]"
-        "} cond"
+    { $example
+        "USING: combinators io kernel math ;"
+        "0 {"
+        "    { [ dup 0 > ] [ drop \"positive\" ] }"
+        "    { [ dup 0 < ] [ drop \"negative\" ] }"
+        "    [ drop \"zero\" ]"
+        "} cond print"
+        "zero"
     }
 } ;
 
