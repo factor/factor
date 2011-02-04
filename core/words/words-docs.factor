@@ -98,17 +98,17 @@ $nl
     { { { $snippet "\"inline\"" } ", " { $snippet "\"foldable\"" } ", " { $snippet "flushable" } } { $link "declarations" } }
 
     { { $snippet "\"loc\"" } { "Location information - " { $link where } } }
-    
+
     { { { $snippet "\"methods\"" } ", " { $snippet "\"combination\"" } } { "Set on generic words - " { $link "generic" } } }
-    
+
     { { { $snippet "\"reading\"" } ", " { $snippet "\"writing\"" } } { "Set on slot accessor words - " { $link "slots" } } }
 
     { { $snippet "\"declared-effect\"" } { $link "effects" } }
-    
+
     { { { $snippet "\"help\"" } ", " { $snippet "\"help-loc\"" } ", " { $snippet "\"help-parent\"" } } { "Where word help is stored - " { $link "writing-help" } } }
 
     { { $snippet "\"specializer\"" } { $link "hints" } }
-    
+
     { { $snippet "\"predicating\"" } " Set on class predicates, stores the corresponding class word" }
 }
 "Properties which are defined for classes only:"
@@ -117,13 +117,13 @@ $nl
     { { $snippet "\"class\"" } { "A boolean indicating whether this word is a class - " { $link "classes" } } }
 
     { { $snippet "\"coercer\"" } { "A quotation for converting the top of the stack to an instance of this class" } }
-    
+
     { { $snippet "\"constructor\"" } { $link "tuple-constructors" } }
-    
+
     { { $snippet "\"type\"" } { $link "builtin-classes" } }
-    
+
     { { { $snippet "\"superclass\"" } ", " { $snippet "\"predicate-definition\"" } } { $link "predicates" } }
-    
+
     { { $snippet "\"members\"" } { $link "unions" } }
 
     { { $snippet "\"slots\"" } { $link "slots" } }
@@ -165,7 +165,7 @@ ARTICLE: "words" "Words"
 $nl
 "There are two ways of creating word definitions:"
 { $list
-    "using parsing words at parse time,"
+    "using parsing words at parse time."
     "using defining words at run time."
 }
 "The latter is a more dynamic feature that can be used to implement code generation and such, and in fact parse time defining words are implemented in terms of run time defining words."
