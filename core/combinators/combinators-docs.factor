@@ -342,7 +342,7 @@ HELP: no-cond
 { $error-description "Thrown by " { $link cond } " if none of the test quotations yield a true value. Some uses of " { $link cond } " include a default case where the test quotation is " { $snippet "[ t ]" } "; such a " { $link cond } " form will never throw this error." } ;
 
 HELP: case
-{ $values { "obj" object } { "assoc" "a sequence of object/word,quotation pairs, with an optional quotation at the end" } }
+{ $values { "obj" object } { "assoc" "a sequence of object/word, quotation pairs, with an optional quotation at the end" } }
 { $description
     "Compares " { $snippet "obj" } " against the first element of every pair, first evaluating the first element if it is a word. If some pair matches, removes " { $snippet "obj" } " from the stack and calls the second element of that pair, which must be a quotation."
     $nl
