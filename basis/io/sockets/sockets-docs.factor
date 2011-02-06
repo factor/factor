@@ -110,7 +110,7 @@ HELP: local
 HELP: inet
 { $class-description "Host name/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the host name and port name or number, respectively. New instances are created by calling " { $link <inet> } "." }
 { $notes
-    "This address specifier is only supported by " { $link <client> } ", which calls " { $link resolve-host }  " to obtain a list of IP addresses associated with the host name, and attempts a connection to each one in turn until one succeeds. Other network words do not accept this address specifier, and " { $link resolve-host } " must be called directly; it is then up to the application to pick the correct address from the (possibly several) addresses associated to the host name."
+    "This address specifier is only supported by " { $link <client> } ", which calls " { $link resolve-host } " to obtain a list of IP addresses associated with the host name, and attempts a connection to each one in turn until one succeeds. Other network words do not accept this address specifier, and " { $link resolve-host } " must be called directly; it is then up to the application to pick the correct address from the (possibly several) addresses associated to the host name."
 }
 { $examples
     { $code "\"www.apple.com\" 80 <inet>" }
@@ -143,7 +143,7 @@ HELP: <inet6>
 { $description "Creates a new " { $link inet6 } " address specifier. A value of " { $link f } " as the host refers to localhost, while " { $link f } " as the port defers the port choice until a later time." } ;
 
 HELP: <client>
-{ $values { "remote" "an address specifier" } { "encoding" "an encding descriptor" } { "stream" "a bidirectional stream" } { "local" "an address specifier" } }
+{ $values { "remote" "an address specifier" } { "encoding" "an encoding descriptor" } { "stream" "a bidirectional stream" } { "local" "an address specifier" } }
 { $description "Opens a network connection and outputs a bidirectional stream using the given encoding, together with the local address the socket was bound to." }
 { $errors "Throws an error if the connection cannot be established." }
 { $notes "The " { $link with-client } " word is easier to use in most situations." }
@@ -157,7 +157,7 @@ HELP: with-client
 { $errors "Throws an error if the connection cannot be established." } ;
 
 HELP: <server>
-{ $values  { "addrspec" "an address specifier" } { "encoding" "an encoding descriptor" } { "server" "a handle" } }
+{ $values { "addrspec" "an address specifier" } { "encoding" "an encoding descriptor" } { "server" "a handle" } }
 { $description
     "Begins listening for network connections to a local address. Server objects respond to two words:"
     { $list
@@ -225,7 +225,7 @@ HELP: with-local-address
 { $description "Client sockets opened within the scope of the quotation passed to this combinator will have their local address bound to the given address." }
 { $examples
   { "Binds the local address of a newly created client socket within the quotation to 127.0.0.1."
-    "This ensures that all traffic originates from the given address (the port is choosen by the TCP stack)." }
+    "This ensures that all traffic originates from the given address (the port is chosen by the TCP stack)." }
   { $code "\"127.0.0.1\" 0 <inet4> [ ] with-local-address" }
   $nl
   { "Binds the local address of a newly created client socket within the quotation to the local address 192.168.0.1 and the local port 23000. "
