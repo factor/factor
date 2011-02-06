@@ -27,7 +27,7 @@ HELP: HEXCOLOR:
 
 ARTICLE: "colors.hex" "HEX colors"
 "The " { $vocab-link "colors.hex" } " vocabulary implements colors specified "
-"by their hexidecimal value."
+"by their hexadecimal value."
 { $subsections
     hex>rgba
     rgba>hex
