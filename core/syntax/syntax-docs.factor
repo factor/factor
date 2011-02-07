@@ -850,7 +850,7 @@ HELP: C:
     "The following two lines are equivalent:"
     { $code
         "C: <color> color"
-        ": <color> color boa ;"
+        ": <color> ( red green blue -- color ) color boa ;"
     }
     "In both cases, a word " { $snippet "<color>" } " is defined, which reads three values from the stack and creates a " { $snippet "color" } " instance having these values in the " { $snippet "red" } ", " { $snippet "green" } " and " { $snippet "blue" } " slots, respectively."
 } ;
