@@ -4,7 +4,7 @@ IN: concurrency.distributed
 ARTICLE: "concurrency.distributed.example" "Distributed Concurrency Example"
 "In this example the Factor instance associated with port 9000 will run "
 "a thread that receives and prints messages "
-"in the listener. The code to start the thread is: "
+"in the listener. The code to start the thread is:"
 { $examples
     { $unchecked-example
         ": log-message ( -- ) receive . flush log-message ;"
@@ -40,7 +40,7 @@ ARTICLE: "concurrency.distributed" "Distributed message passing"
 "The " { $vocab-link "concurrency.distributed" } " implements transparent distributed message passing, inspired by Erlang and Termite." $nl
 "Instances of " { $link thread } " can be sent to remote threads, at which point they are converted to objects holding the thread ID and the current node's host name:"
 { $subsections remote-thread }
-"The " { $vocab-link "serialize" } " vocabulary is used to convert Factor objects to byte arrays for transfer over a socket." 
+"The " { $vocab-link "serialize" } " vocabulary is used to convert Factor objects to byte arrays for transfer over a socket."
 { $subsections "concurrency.distributed.example" } ;
 
 ABOUT: "concurrency.distributed"
