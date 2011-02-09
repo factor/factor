@@ -48,7 +48,7 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
   ": perform ( value action -- result ) quot>> call( value -- result ) ;"
 }
 { $subheading "Passing an unknown quotation to an inline combinator" }
-"Suppose we want to write :"
+"Suppose we want to write:"
 { $code ": perform ( values action -- results ) quot>> map ;" }
 "However this fails to pass the stack checker since there is no guarantee the quotation has the right stack effect for " { $link map } ". It can be wrapped in a new quotation with a declaration:"
 { $code ": perform ( values action -- results )" "    quot>> [ call( value -- result ) ] curry map ;" }
