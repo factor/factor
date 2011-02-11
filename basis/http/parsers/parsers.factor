@@ -135,7 +135,7 @@ PEG: parse-header-line ( string -- pair )
     2choice case-sensitive ;
 
 : 'attr' ( -- parser )
-    'token' case-insensitive ;
+    'token' case-sensitive ;
 
 : 'av-pair' ( -- parser )
     [
