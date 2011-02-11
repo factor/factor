@@ -11,6 +11,10 @@ IN: http.parsers.tests
 [ "__s=12345567" parse-cookie ]
 unit-test
 
+[ { T{ cookie { name "CaseSensitive" } { value "aBc" } } } ]
+[ "CaseSensitive=aBc" parse-cookie ]
+unit-test
+
 [ { T{ cookie { name "__s" } { value "12345567" } } } ]
 [ "__s=12345567;" parse-cookie ]
 unit-test
