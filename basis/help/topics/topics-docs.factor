@@ -8,7 +8,7 @@ HELP: articles
 HELP: no-article
 { $values { "name" "an article name" } }
 { $description "Throws a " { $link no-article } " error." }
-{ $error-description "Thrown by " { $link help } " if the given help topic does not exist, or if the help topic being dispayed links to a help topic which does not exist." } ;
+{ $error-description "Thrown by " { $link help } " if the given help topic does not exist, or if the help topic being displayed links to a help topic which does not exist." } ;
 
 HELP: article
 { $values { "name" "an article name" } { "article" "an " { $link article } " object" } }

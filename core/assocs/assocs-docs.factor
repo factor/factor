@@ -323,7 +323,7 @@ HELP: assoc-stack
 
 HELP: value-at*
 { $values { "value" object } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } { "?" boolean } }
-{ $description "Looks up the key associated with a value. The boolean flag can decide beteen the case of a missing key, and a key of " { $link f } "." } ;
+{ $description "Looks up the key associated with a value. The boolean flag can decide between the case of a missing key, and a key of " { $link f } "." } ;
 
 HELP: value-at
 { $values { "value" object } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } }
@@ -438,7 +438,7 @@ HELP: assoc-map-as
 { $values
      { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... newkey newvalue )" } } { "exemplar" assoc }
      { "newassoc" assoc } }
-{ $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the stame type as the exemplar." }
+{ $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the same type as the exemplar." }
 { $examples { $example "USING: prettyprint assocs hashtables math ;" " H{ { 1 2 } { 3 4 } } [ sq ] { } assoc-map-as ." "{ { 1 4 } { 3 16 } }" } } ;
 
 HELP: extract-keys
@@ -457,7 +457,7 @@ HELP: push-at
 { $values
      { "value" object } { "key" object } { "assoc" assoc } }
 { $description "Pushes the " { $snippet "value" } " onto a " { $snippet "vector" } " stored at the " { $snippet "key" } " in the " { $snippet "assoc" } ". If the " { $snippet "key" } " does not yet exist, creates a new " { $snippet "vector" } " at that " { $snippet "key" } " and pushes the " { $snippet "value" } "." }
-{ $examples { $example  "USING: prettyprint assocs kernel ;"
+{ $examples { $example "USING: prettyprint assocs kernel ;"
 "H{ { \"cats\" V{ \"Mittens\" } } } \"Mew\" \"cats\" pick push-at ."
 "H{ { \"cats\" V{ \"Mittens\" \"Mew\" } } }"
 } } ;
@@ -467,7 +467,7 @@ HELP: search-alist
      { "key" object } { "alist" "an array of key/value pairs" }
      { "pair/f" "a key/value pair" } { "i/f" integer } }
 { $description "Iterates over " { $snippet "alist" } " and stops when the key is matched or the end of the " { $snippet "alist" } " has been reached. If there is no match, both outputs are " { $link f } "." }
-{ $notes "This word is used to implement " { $link at* } " and " { $link set-at } " on sequences, and should not be called direclty." }
+{ $notes "This word is used to implement " { $link at* } " and " { $link set-at } " on sequences, and should not be called directly." }
 { $examples { $example "USING: prettyprint assocs.private kernel ;"
                         "3 { { 1 2 } { 3 4 } } search-alist [ . ] bi@"
                        "{ 3 4 }\n1"

@@ -265,7 +265,7 @@ HELP: return
 HELP: with-return
 { $values
      { "quot" quotation } }
-{ $description "Captures a continuation that can be reified by calling the " { $link return } " word. If so, it will resume execution immediatly after the " { $link with-return } " word. If " { $link return } " is not called, then execution proceeds as if this word were simply " { $link call } "." }
+{ $description "Captures a continuation that can be reified by calling the " { $link return } " word. If so, it will resume execution immediately after the " { $link with-return } " word. If " { $link return } " is not called, then execution proceeds as if this word were simply " { $link call } "." }
 { $examples
     "Only \"Hi\" will print:"
     { $example
