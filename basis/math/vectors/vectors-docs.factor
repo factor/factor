@@ -150,7 +150,7 @@ int-4{ f f t f } ."""
 $nl
 "Providing a SIMD boolean vector with element values other than the proper true and false representations as an input to the vector logical or test operations is undefined. Do not count on operations such as " { $link vall? } " or " { $link v? } " using bitwise operations to construct their results."
 $nl
-"This applies to the output of the following element comparison words: "
+"This applies to the output of the following element comparison words:"
 { $list
 { $link v< }
 { $link v<= }
