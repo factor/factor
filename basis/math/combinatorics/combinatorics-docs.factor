@@ -4,7 +4,7 @@ IN: math.combinatorics
 HELP: factorial
 { $values { "n" "a non-negative integer" } { "n!" integer } }
 { $description "Outputs the product of all positive integers less than or equal to " { $snippet "n" } "." }
-{ $examples 
+{ $examples
     { $example "USING: math.combinatorics prettyprint ;"
         "4 factorial ." "24" }
 } ;
@@ -46,7 +46,7 @@ HELP: all-permutations
 
 HELP: each-permutation
 { $values { "seq" sequence } { "quot" { $quotation "( seq -- )" } } }
-{ $description "Applies the quotation to each permuation of " { $snippet "seq" } " in order." } ;
+{ $description "Applies the quotation to each permutation of " { $snippet "seq" } " in order." } ;
 
 HELP: inverse-permutation
 { $values { "seq" sequence } { "permutation" sequence } }
@@ -121,7 +121,7 @@ HELP: selections
 { $description
     "Returns all the ways to take n (possibly the same) items from the "
     "sequence of items."
-} 
+}
 { $examples
     { $example
         "USING: math.combinatorics prettyprint ;"
