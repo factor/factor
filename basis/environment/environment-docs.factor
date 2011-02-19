@@ -5,7 +5,7 @@ IN: environment
 
 HELP: (os-envs)
 { $values
-    
+
      { "seq" sequence } }
 { $description "Returns a sequence of key/value pairs from the operating system." }
 { $notes "In most cases, use " { $link os-envs } " instead." } ;
@@ -22,7 +22,11 @@ HELP: os-env
 { $description "Looks up the value of a shell environment variable." }
 { $examples
     "This is an operating system-specific feature. On Unix, you can do:"
-    { $unchecked-example "\"USER\" os-env print" "jane" }
+    { $unchecked-example
+        "USING: environment io ;"
+        "\"USER\" os-env print"
+        "jane"
+    }
 } ;
 
 HELP: os-envs
