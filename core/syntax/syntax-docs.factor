@@ -716,7 +716,7 @@ HELP: MATH:
 { $description "Defines a new generic word which uses the " { $link math-combination } " method combination." } ;
 
 HELP: HOOK:
-{ $syntax "HOOK: word variable ( stack -- effect ) " }
+{ $syntax "HOOK: word variable ( stack -- effect )" }
 { $values { "word" "a new word to define" } { "variable" word } }
 { $description "Defines a new hook word in the current vocabulary. Hook words are generic words which dispatch on the value of a variable, so methods are defined with " { $link POSTPONE: M: } ". Hook words differ from other generic words in that the dispatch value is removed from the stack before the chosen method is called." }
 { $examples
@@ -850,7 +850,7 @@ HELP: C:
     "The following two lines are equivalent:"
     { $code
         "C: <color> color"
-        ": <color> color boa ;"
+        ": <color> ( red green blue -- color ) color boa ;"
     }
     "In both cases, a word " { $snippet "<color>" } " is defined, which reads three values from the stack and creates a " { $snippet "color" } " instance having these values in the " { $snippet "red" } ", " { $snippet "green" } " and " { $snippet "blue" } " slots, respectively."
 } ;

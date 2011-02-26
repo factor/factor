@@ -5,7 +5,7 @@ classes.predicate quotations ;
 IN: classes
 
 ARTICLE: "class-predicates" "Class predicate words"
-"With a handful of exceptions, each class has a membership predicate word, named " { $snippet { $emphasis "class" } "?" } " . A quotation calling this predicate is stored in the " { $snippet "\"predicate\"" } " word property."
+"With a handful of exceptions, each class has a membership predicate word, named " { $snippet { $emphasis "class" } "?" } ". A quotation calling this predicate is stored in the " { $snippet "\"predicate\"" } " word property."
 $nl
 "When it comes to predicates, the exceptional classes are:"
 { $table
@@ -94,7 +94,7 @@ $low-level-note ;
 HELP: superclass
 { $values { "class" class } { "super" class } }
 { $description "Outputs the superclass of a class. All instances of this class are also instances of the superclass." }
-{ $examples 
+{ $examples
     { $example "USING: classes prettyprint ;"
                "t superclass ."
                "word"
@@ -106,7 +106,7 @@ HELP: superclasses
      { "class" class }
      { "supers" sequence } }
 { $description "Outputs a sequence of superclasses of a class along with the class itself." }
-{ $examples 
+{ $examples
     { $example "USING: classes prettyprint ;"
                "t superclasses ."
                "{ word t }"
@@ -120,7 +120,7 @@ HELP: subclass-of?
     { "?" boolean }
 }
 { $description "Outputs a boolean value indicating whether " { $snippet "class" } " is at any level a subclass of " { $snippet "superclass" } "." }
-{ $examples 
+{ $examples
     { $example "USING: classes classes.tuple prettyprint words ;"
                "tuple-class \\ class subclass-of? ."
                "t"

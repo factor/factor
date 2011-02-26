@@ -319,7 +319,7 @@ ARTICLE: "peg.ebnf.tokenizers" "Tokenizers"
 "This parser when run with the string \"++--\" or the array "
 "{ CHAR: + CHAR: + CHAR: - CHAR: - } will succeed with an AST of { \"++\" \"--\" }. "
 "If you want to add whitespace handling to the grammar you need to put it "
-"between the terminals: "
+"between the terminals:"
 { $examples
     { $code
         "EBNF: foo"
@@ -332,7 +332,7 @@ ARTICLE: "peg.ebnf.tokenizers" "Tokenizers"
 "In a large grammar this gets tedious and makes the grammar hard to read. "
 "Instead you can write a rule to split the input sequence into tokens, and "
 "have the grammar operate on these tokens. This is how the previous example "
-"might look: "
+"might look:"
 { $examples
     { $code
         "EBNF: foo"
@@ -355,7 +355,7 @@ ARTICLE: "peg.ebnf.tokenizers" "Tokenizers"
 $nl
 "In this example I split the tokenizer into a separate parser and use "
 "'foreign' to call it from the main one. This allows testing of the "
-"tokenizer separately: "
+"tokenizer separately:"
 { $examples
     { $example
         "USING: prettyprint peg peg.ebnf kernel math.parser strings"
@@ -397,7 +397,7 @@ $nl
 "working in one pass. There is no tokenization occurring over the whole string "
 "followed by the parse of that result. It tokenizes as it needs to. You can even "
 "switch tokenizers multiple times during a grammar. Rules use the tokenizer that "
-"was defined lexically before the rule. This is usefull in the JavaScript grammar: "
+"was defined lexically before the rule. This is usefull in the JavaScript grammar:"
 { $examples
     { $code
         "EBNF: javascript"
@@ -440,7 +440,7 @@ ARTICLE: "peg.ebnf" "EBNF"
     POSTPONE: [EBNF
     POSTPONE: EBNF:
 }
-"The EBNF syntax is composed of a series of rules of the form: "
+"The EBNF syntax is composed of a series of rules of the form:"
 { $code
   "rule1 = ..."
   "rule2 = ..."
@@ -448,7 +448,7 @@ ARTICLE: "peg.ebnf" "EBNF"
 "The last defined rule is the main rule for the EBNF. It is the first one run "
 "and it is expected that the remaining rules are used by that rule. Rules may be "
 "left recursive. "
-"Each rule can contain the following: "
+"Each rule can contain the following:"
 { $subsections "peg.ebnf.strings"
 "peg.ebnf.any"
 "peg.ebnf.sequence"
