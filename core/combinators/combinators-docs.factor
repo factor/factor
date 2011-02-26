@@ -355,6 +355,7 @@ HELP: case
 { $examples
     { $example
         "USING: combinators io kernel ;"
+        "IN: scratchpad"
         "SYMBOLS: yes no maybe ;"
         "maybe {"
         "    { yes [ ] } ! Do nothing"
