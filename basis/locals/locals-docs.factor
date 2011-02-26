@@ -55,7 +55,7 @@ $nl
 { $examples "See " { $link "locals-examples" } "." } ;
 
 { POSTPONE: MEMO: POSTPONE: MEMO:: } related-words
-                                          
+
 HELP: M::
 { $syntax "M:: class generic ( vars... -- outputs... ) body... ;" }
 { $description "Defines a new method on " { $snippet "generic" } " for " { $snippet "class" } " with named inputs. The method binds its input values to lexical variables from left to right, then executes the body with those bindings in scope."
@@ -127,7 +127,7 @@ TUPLE: counter adder subtractor ;
 <counter>
 [ adder>>      call . ]
 [ adder>>      call . ]
-[ subtractor>> call . ] tri """
+[ subtractor>> call . ] tri"""
 """1
 2
 1"""
@@ -149,7 +149,7 @@ mutable-example [ call . ] bi@"""
 6
 6
 6"""
-} 
+}
     "In " { $snippet "rebinding-example" } ", the binding of " { $snippet "a" } " to " { $snippet "5" } " is closed over in the first quotation, and the binding of " { $snippet "a" } " to " { $snippet "6" } " is closed over in the second, so calling both quotations results in " { $snippet "5" } " and " { $snippet "6" } " respectively. By contrast, in " { $snippet "mutable-example" } ", both quotations close over a single binding of " { $snippet "a" } ". Even though " { $snippet "a" } " is assigned to " { $snippet "6" } " after the first quotation is made, calling either quotation will output the new value of " { $snippet "a" } "."
 { $heading "Lexical variables in literals" }
 "Some kinds of literals can include references to lexical variables as described in " { $link "locals-literals" } ". For example, the " { $link 3array } " word could be implemented as follows:"
@@ -161,7 +161,7 @@ IN: scratchpad
 1 "two" 3.0 my-3array ."""
 """{ 1 "two" 3.0 }"""
 } ;
-                                                 
+
 ARTICLE: "locals-literals" "Lexical variables in literals"
 "Certain data type literals are permitted to contain lexical variables. Any such literals are rewritten into code which constructs an instance of the type with the values of the variables spliced in. Conceptually, this is similar to the transformation applied to quotations containing free variables."
 $nl

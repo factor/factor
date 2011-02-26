@@ -34,7 +34,7 @@ $nl
 $nl
 "Now, after some heavily editing and refactoring, the file looks like this:"
 { $code
-    "USING: namespaces ;"
+    "USING: make ;"
     "IN: a"
     ": hello ( -- ) \"Hello\" % ;"
     ": hello-world ( -- str ) [ hello \" \" % world ] \"\" make ;"

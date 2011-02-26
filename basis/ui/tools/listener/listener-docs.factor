@@ -32,7 +32,7 @@ $nl
 { $heading "Implementation" }
 "Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } ") and an input area (instance of " { $link interactor } "). Clickable presentations can also be printed to the listener; see " { $link "ui-presentations" } "." ;
 
-TIP: "You can read documentation by pressing F1." ;
+TIP: "You can read documentation by pressing " { $snippet "F1" } "." ;
 
 TIP: "The listener tool remembers previous lines of input. Press " { $command interactor "completion" recall-previous } " and " { $command interactor "completion" recall-next } " to cycle through them." ;
 
