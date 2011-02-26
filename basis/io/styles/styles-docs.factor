@@ -221,7 +221,7 @@ HELP: background
         "10 iota ["
         "    \"Hello world\\n\""
         "    swap 10 / 1 over - over 1 <rgba>"
-        "    background associate format nl"
+        "    background associate format"
         "] each"
     }
 } ;

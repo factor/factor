@@ -32,17 +32,21 @@ HELP: casep
 { $examples
     "The following two forms will output 1 with 0.2 probability, 2 with 0.3 probability and 3 with 0.5 probability"
     { $code
-        "USING: combinators.random ;"
-        "{ { 0.2 [ 1 ] }"
-        "  { 0.3 [ 2 ] }"
-        "  { 0.5 [ 3 ] } } casep ."
+        "USING: combinators.random prettyprint ;"
+        "{"
+        "    { 0.2 [ 1 ] }"
+        "    { 0.3 [ 2 ] }"
+        "    { 0.5 [ 3 ] }"
+        "} casep ."
     }
     $nl
     { $code
-        "USING: combinators.random ;"
-        "{ { 0.2 [ 1 ] }"
-        "  { 0.3 [ 2 ] }"
-        "  { [ 3 ] } } casep ."
+        "USING: combinators.random prettyprint ;"
+        "{"
+        "    { 0.2 [ 1 ] }"
+        "    { 0.3 [ 2 ] }"
+        "    [ 3 ]"
+        "} casep ."
     }
 
 }
@@ -62,17 +66,21 @@ HELP: casep*
 { $examples
     "The following two forms will output 1 with 0.5 probability, 2 with 0.25 probability and 3 with 0.25 probability"
     { $code
-        "USING: combinators.random ;"
-        "{ { 0.5 [ 1 ] }"
-        "  { 0.5 [ 2 ] }"
-        "  { 1 [ 3 ] } } casep* ."
+        "USING: combinators.random prettyprint ;"
+        "{"
+        "    { 0.5 [ 1 ] }"
+        "    { 0.5 [ 2 ] }"
+        "    { 1 [ 3 ] }"
+        "} casep* ."
     }
     $nl
     { $code
-        "USING: combinators.random ;"
-        "{ { 0.5 [ 1 ] }"
-        "  { 0.5 [ 2 ] }"
-        "  { [ 3 ] } } casep* ."
+        "USING: combinators.random prettyprint ;"
+        "{"
+        "    { 0.5 [ 1 ] }"
+        "    { 0.5 [ 2 ] }"
+        "    [ 3 ]"
+        "} casep* ."
     }
 
 }
