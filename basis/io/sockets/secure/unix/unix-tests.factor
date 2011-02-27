@@ -41,7 +41,11 @@ io.sockets.secure.unix.debug ;
     ] server-test
 ] unit-test
 
-[ client-test ] [ premature-close? ] must-fail-with
+! Actually, this should not be an error since many HTTPS servers
+! (eg, google.com) do this.
+
+! [ client-test ] [ premature-close? ] must-fail-with
+[ "hello" ] [ client-test ] unit-test
 
 ! Now, try validating the certificate. This should fail because its
 ! actually an invalid certificate

@@ -368,7 +368,6 @@ M: SOA rdata>byte-array
 : message>query-name ( message -- string )
     query>> first name>> dotted> ;
 
-USE: nested-comments
 (*
 M: string resolve-host
     dup >lower "localhost" = [

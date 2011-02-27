@@ -33,3 +33,9 @@ IN: math.polynomials.tests
 
 [ { 10 200 3000 } ] [ { 1 10 100 1000 } pdiff ] unit-test
 
+
+[ { -512 2304 -4608 5376 -4032 2016 -672 144 -18 1 } ]
+[ { -2 1 } 9 p^ ] unit-test
+
+[ 0 ]
+[ 2 { -2 1 } 9 p^ polyval ] unit-test
