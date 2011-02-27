@@ -62,11 +62,11 @@ ARTICLE: { "lists" "manipulation" } "Manipulating lists"
     lcut
 } ;
 
-HELP: cons 
+HELP: cons
 { $values { "car" "the head of the list cell" } { "cdr" "the tail of the list cell" } { "cons" list } }
 { $description "Constructs a cons cell." } ;
 
-HELP: swons 
+HELP: swons
 { $values { "cdr" "the tail of the list cell" } { "car" "the head of the list cell" } { "cons" list } }
 { $description "Constructs a cons cell." } ;
 
@@ -82,11 +82,11 @@ HELP: cdr
 
 { car cdr } related-words
 
-HELP: nil 
+HELP: nil
 { $values { "symbol" "The empty cons (+nil+)" } }
 { $description "Returns a symbol representing the empty list" } ;
 
-HELP: nil? 
+HELP: nil?
 { $values { "object" object } { "?" "a boolean" } }
 { $description "Return true if the cons object is the nil cons." } ;
 
@@ -108,12 +108,12 @@ HELP: 3list
 
 HELP: lnth
 { $values { "n" "an integer index" } { "list" list } { "elt" "the element at the nth index" } }
-{ $description "Outputs the nth element of the list." } 
+{ $description "Outputs the nth element of the list." }
 { $see-also llength cons car cdr } ;
 
 HELP: llength
 { $values { "list" list } { "n" "a non-negative integer" } }
-{ $description "Outputs the length of the list. This should not be called on an infinite list." } 
+{ $description "Outputs the length of the list. This should not be called on an infinite list." }
 { $see-also lnth cons car cdr } ;
 
 HELP: uncons
@@ -132,11 +132,11 @@ HELP: leach
 
 HELP: foldl
 { $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( ... prev elt -- ... next )" } } { "result" "the final result" } }
-{ $description "Combines successive elements of the list (in a left-assocative order) using a binary operation and outputs the final result." } ;
+{ $description "Combines successive elements of the list (in a left-associative order) using a binary operation and outputs the final result." } ;
 
 HELP: foldr
 { $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( ... prev elt -- ... next )" } } { "result" "the final result" } }
-{ $description "Combines successive elements of the list (in a right-assocative order) using a binary operation, and outputs the final result." } ;
+{ $description "Combines successive elements of the list (in a right-associative order) using a binary operation, and outputs the final result." } ;
 
 HELP: lmap
 { $values { "list" list } { "quot" { $quotation "( ... elt -- ... newelt )" } } { "result" "the final result" } }
@@ -144,9 +144,9 @@ HELP: lmap
 
 HELP: lreverse
 { $values { "list" list } { "newlist" list } }
-{ $description "Reverses the input list, outputing a new, reversed list. The output is a strict cons list." } ;
+{ $description "Reverses the input list, outputting a new, reversed list. The output is a strict cons list." } ;
 
-HELP: list>array    
+HELP: list>array
 { $values { "list" list } { "array" array } }
 { $description "Convert a list into an array." } ;
 

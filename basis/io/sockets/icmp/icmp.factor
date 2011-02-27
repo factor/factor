@@ -41,7 +41,7 @@ M: icmp4 resolve-host 1array ;
 
 TUPLE: icmp6 < ipv6 ;
 
-C: <icmp6> icmp6
+: <icmp6> ( host -- icmp6 ) 0 icmp6 boa ;
 
 M: ipv6 with-icmp host>> <icmp6> ;
 
