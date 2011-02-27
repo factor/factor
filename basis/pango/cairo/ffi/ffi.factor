@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.libraries alien.syntax cairo.ffi combinators
-gobject-introspection system vocabs.loader ;
+kernel gobject-introspection system vocabs.loader ;
 IN: pango.cairo.ffi
 
 <<
@@ -13,8 +13,8 @@ LIBRARY: pango.cairo
 << 
 "pango.cairo" {
     { [ os winnt? ] [ "libpangocairo-1.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "/opt/local/lib/libpangocairo-1.0.0.dylib" cdecl add-library ] }
-    { [ os unix? ] [ "libpangocairo-1.0.so" cdecl add-library ] }
+    { [ os macosx? ] [ drop ] }
+    { [ os unix? ] [ drop ] }
 } cond 
 >>
 
