@@ -1,10 +1,13 @@
 USING: io.sockets io.sockets.private sequences math tools.test
 namespaces accessors kernel destructors calendar io.timeouts
 io.encodings.utf8 io concurrency.promises threads
-io.streams.string present ;
+io.streams.string present system ;
 IN: io.sockets.tests
 
-[ T{ local f "/tmp/foo" } ] [ "/tmp/foo" <local> ] unit-test
+os unix? [
+    [ T{ local f "/tmp/foo" } ] [ "/tmp/foo" <local> ] unit-test
+] when
+
 [ T{ inet4 f f 0 } ] [ f 0 <inet4> ] unit-test
 [ T{ inet6 f f 0 1 } ] [ f 1 <inet6> ] unit-test
 
