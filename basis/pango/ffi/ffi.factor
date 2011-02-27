@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.syntax combinators gobject-introspection
+alien.syntax combinators kernel gobject-introspection
 gobject-introspection.standard-types system vocabs.loader ;
 IN: pango.ffi
 
@@ -14,8 +14,7 @@ LIBRARY: pango
 << 
 "pango" {
     { [ os winnt? ] [ "libpango-1.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "/opt/local/lib/libpango-1.0.0.dylib" cdecl add-library ] }
-    { [ os unix? ] [ "libpango-1.0.so" cdecl add-library ] }
+    { [ os unix? ] [ drop ] }
 } cond 
 >>
 

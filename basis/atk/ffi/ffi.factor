@@ -13,8 +13,7 @@ LIBRARY: atk
 <<
 "atk" {
     { [ os winnt? ] [ "libatk-1.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ drop ] }
-    { [ os unix? ] [ "libatk-1.0.so" cdecl add-library ] }
+    { [ os unix? ] [ drop ] }
 } cond
 >>
 
