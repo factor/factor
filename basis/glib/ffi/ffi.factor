@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.destructors alien.libraries alien.syntax
-combinators gobject-introspection gobject-introspection.standard-types
-system ;
+combinators kernel gobject-introspection
+gobject-introspection.standard-types system ;
 IN: glib.ffi
 
 LIBRARY: glib
@@ -11,7 +11,7 @@ LIBRARY: glib
 "glib" {
     { [ os winnt? ] [ "libglib-2.0-0.dll" cdecl add-library ] }
     { [ os macosx? ] [ "/opt/local/lib/libglib-2.0.0.dylib" cdecl add-library ] }
-    { [ os unix? ] [ "libglib-2.0.so" cdecl add-library ] }
+    { [ os unix? ] [ drop ] }
 } cond
 >>
 

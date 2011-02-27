@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.destructors alien.libraries alien.syntax
+USING: alien alien.destructors alien.libraries alien.syntax kernel
 combinators gobject-introspection literals math system vocabs.loader ;
 IN: gobject.ffi
 
@@ -13,8 +13,7 @@ LIBRARY: gobject
 <<
 "gobject" {
     { [ os winnt? ] [ "libobject-2.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "/opt/local/lib/libgobject-2.0.0.dylib" cdecl add-library ] }
-    { [ os unix? ] [ "libgobject-2.0.so" cdecl add-library ] }
+    { [ os unix? ] [ drop ] }
 } cond
 >>
 

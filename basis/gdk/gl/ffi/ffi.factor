@@ -10,12 +10,4 @@ IN: gdk.gl.ffi
 
 LIBRARY: gdk.gl
 
-<<
-"gdk.gl" {
-    { [ os winnt? ] [ drop ] }
-    { [ os macosx? ] [ drop ] }
-    { [ os unix? ] [ "libgdkglext-x11-1.0.so" cdecl add-library ] }
-} cond
->>
-
 GIR: vocab:gdk/gl/GdkGLExt-1.0.gir
