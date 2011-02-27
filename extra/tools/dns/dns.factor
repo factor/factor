@@ -7,7 +7,7 @@ IN: tools.dns
     [ write " has address " write ] [ print ] bi* ;
 
 : a-message. ( message -- )
-    [ message>query-name ] [ message>names ] bi
+    [ message>query-name ] [ message>a-names ] bi
     [ a-line. ] with each ;
 
 : mx-line. ( host pair -- )
