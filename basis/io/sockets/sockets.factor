@@ -1,10 +1,10 @@
-! Copyright (C) 2007, 2010 Slava Pestov, Doug Coleman,
+! Copyright (C) 2007, 2011 Slava Pestov, Doug Coleman,
 ! Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
 assocs byte-arrays classes classes.struct combinators
 combinators.short-circuit continuations destructors fry generic
-grouping init io.backend io.binary io.encodings
+grouping init io.backend io.pathnames io.binary io.encodings
 io.encodings.ascii io.encodings.binary io.ports
 io.streams.duplex kernel math math.parser memoize namespaces
 parser present sequences splitting strings summary system
@@ -55,10 +55,10 @@ HOOK: addrspec-of-family os ( af -- addrspec )
 
 PRIVATE>
 
-TUPLE: local { path read-only } ;
+TUPLE: local { path string read-only } ;
 
 : <local> ( path -- addrspec )
-    normalize-path local boa ;
+    absolute-path local boa ;
 
 M: local present path>> "Unix domain socket: " prepend ;
 
