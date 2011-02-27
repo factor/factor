@@ -10,6 +10,6 @@ H{
     { deploy-reflection 1 }
     { deploy-word-props? f }
     { deploy-math? t }
-    { deploy-threads? t }
+    { deploy-threads? f }
     { deploy-word-defs? f }
 }
