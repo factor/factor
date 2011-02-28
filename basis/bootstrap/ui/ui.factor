@@ -10,6 +10,6 @@ IN: bootstrap.ui
     {
         { [ os macosx? ] [ "cocoa" ] }
         { [ os windows? ] [ "windows" ] }
-        { [ os unix? ] [ "x11" ] }
+        { [ os unix? ] [ "gtk" ] }
     } cond
 ] unless* "ui.backend." prepend require

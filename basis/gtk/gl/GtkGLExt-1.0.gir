@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="Atk" version="1.0"/>
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gdk" version="3.0"/>
+  <include name="GdkGLExt" version="1.0"/>
+  <include name="GdkPixbuf" version="2.0"/>
+  <include name="Gio" version="2.0"/>
+  <include name="Gtk" version="3.0"/>
+  <include name="Pango" version="1.0"/>
+  <include name="cairo" version="1.0"/>
+  <package name="gtkglext-1.0"/>
+  <namespace name="GtkGL"
+             version="1.0"
+             shared-library="libgtkglext-x11-1.0.so.0"
+             c:identifier-prefixes="GtkGL,Gtk"
+             c:symbol-prefixes="gtk_gl,gtk">
+    <bitfield name="DebugFlag" c:type="GtkGLDebugFlag">
+      <member name="misc" value="1" c:identifier="GTK_GL_DEBUG_MISC"/>
+      <member name="func" value="2" c:identifier="GTK_GL_DEBUG_FUNC"/>
+    </bitfield>
+    <function name="init" c:identifier="gtk_gl_init">
+      <doc xml:whitespace="preserve">Call this function before using any other GtkGLExt functions in your
+applications.  It will initialize everything needed to operate the library
+and parses some standard command line options. @argc and
+never see those standard arguments.
+&lt;note&gt;&lt;para&gt;
+This function will terminate your program if it was unable to initialize
+the library for some reason. If you want your program to fall back to a
+textual interface you want to call gtk_gl_init_check() instead.
+&lt;/para&gt;&lt;/note&gt;</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="argc"
+                   direction="inout"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">Address of the &lt;parameter&gt;argc&lt;/parameter&gt; parameter of your &lt;function&gt;main()&lt;/function&gt; function. Changed if any arguments were handled.</doc>
+          <type name="gint" c:type="int*"/>
+        </parameter>
+        <parameter name="argv"
+                   direction="inout"
+                   caller-allocates="0"
+                   transfer-ownership="full"
+                   allow-none="1">
+          <doc xml:whitespace="preserve">Address of the &lt;parameter&gt;argv&lt;/parameter&gt; parameter of &lt;function&gt;main()&lt;/function&gt;. Any parameters understood by gtk_gl_init() are stripped before return.</doc>
+          <array length="0" c:type="char***">
+            <type name="utf8"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="init_check" c:identifier="gtk_gl_init_check">
+      <doc xml:whitespace="preserve">This function does the same work as gtk_gl_init() with only
+initialized. Instead it returns %FALSE on failure.
+This way the application can fall back to some other means of communication
+with the user - for example a curses or command line interface.
+%FALSE otherwise.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the GUI has been successfully initialized,</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="argc"
+                   direction="inout"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">Address of the &lt;parameter&gt;argc&lt;/parameter&gt; parameter of your &lt;function&gt;main()&lt;/function&gt; function. Changed if any arguments were handled.</doc>
+          <type name="gint" c:type="int*"/>
+        </parameter>
+        <parameter name="argv"
+                   direction="inout"
+                   caller-allocates="0"
+                   transfer-ownership="full"
+                   allow-none="1">
+          <doc xml:whitespace="preserve">Address of the &lt;parameter&gt;argv&lt;/parameter&gt; parameter of &lt;function&gt;main()&lt;/function&gt;. Any parameters understood by gtk_gl_init() are stripped before return.</doc>
+          <array length="0" c:type="char***">
+            <type name="utf8"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="widget_create_gl_context"
+              c:identifier="gtk_widget_create_gl_context">
+      <doc xml:whitespace="preserve">Creates a new #GdkGLContext with the appropriate #GdkGLDrawable
+for this widget. The GL context must be freed when you're
+finished with it. See also gtk_widget_get_gl_context().</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">the new #GdkGLContext.</doc>
+        <type name="GdkGL.Context" c:type="GdkGLContext*"/>
+      </return-value>
+      <parameters>
+        <parameter name="widget" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GtkWidget.</doc>
+          <type name="Gtk.Widget" c:type="GtkWidget*"/>
+        </parameter>
+        <parameter name="share_list" transfer-ownership="none" allow-none="1">
+          <doc xml:whitespace="preserve">the #GdkGLContext with which to share display lists and texture objects. NULL indicates that no sharing is to take place.</doc>
+          <type name="GdkGL.Context" c:type="GdkGLContext*"/>
+        </parameter>
+        <parameter name="direct" transfer-ownership="none">
+          <doc xml:whitespace="preserve">whether rendering is to be done with a direct connection to the graphics system.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </parameter>
+        <parameter name="render_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">GDK_GL_RGBA_TYPE or GDK_GL_COLOR_INDEX_TYPE (currently not used).</doc>
+          <type name="gint" c:type="int"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="widget_get_gl_config"
+              c:identifier="gtk_widget_get_gl_config">
+      <doc xml:whitespace="preserve">Returns the #GdkGLConfig referred by the @widget.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the #GdkGLConfig.</doc>
+        <type name="GdkGL.Config" c:type="GdkGLConfig*"/>
+      </return-value>
+      <parameters>
+        <parameter name="widget" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GtkWidget.</doc>
+          <type name="Gtk.Widget" c:type="GtkWidget*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="widget_get_gl_context"
+              c:identifier="gtk_widget_get_gl_context">
+      <doc xml:whitespace="preserve">Returns the #GdkGLContext with the appropriate #GdkGLDrawable
+for this widget. Unlike the GL context returned by
+gtk_widget_create_gl_context(),  this context is owned by the widget.
+#GdkGLContext is needed for the function gdk_gl_drawable_begin,
+or for sharing display lists (see gtk_widget_set_gl_capability()).</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the #GdkGLContext.</doc>
+        <type name="GdkGL.Context" c:type="GdkGLContext*"/>
+      </return-value>
+      <parameters>
+        <parameter name="widget" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GtkWidget.</doc>
+          <type name="Gtk.Widget" c:type="GtkWidget*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="widget_get_gl_window"
+              c:identifier="gtk_widget_get_gl_window">
+      <doc xml:whitespace="preserve">Returns the #GdkGLWindow owned by the @widget.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the #GdkGLWindow.</doc>
+        <type name="GdkGL.Window" c:type="GdkGLWindow*"/>
+      </return-value>
+      <parameters>
+        <parameter name="widget" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GtkWidget.</doc>
+          <type name="Gtk.Widget" c:type="GtkWidget*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="widget_is_gl_capable"
+              c:identifier="gtk_widget_is_gl_capable">
+      <doc xml:whitespace="preserve">Returns whether the @widget is OpenGL-capable.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if the @widget is OpenGL-capable, FALSE otherwise.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="widget" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GtkWidget.</doc>
+          <type name="Gtk.Widget" c:type="GtkWidget*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="widget_set_gl_capability"
+              c:identifier="gtk_widget_set_gl_capability">
+      <doc xml:whitespace="preserve">Set the OpenGL-capability to the @widget.
+This function prepares the widget for its use with OpenGL.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if it is successful, FALSE otherwise.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="widget" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GtkWidget to be used as the rendering area.</doc>
+          <type name="Gtk.Widget" c:type="GtkWidget*"/>
+        </parameter>
+        <parameter name="glconfig" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GdkGLConfig.</doc>
+          <type name="GdkGL.Config" c:type="GdkGLConfig*"/>
+        </parameter>
+        <parameter name="share_list" transfer-ownership="none" allow-none="1">
+          <doc xml:whitespace="preserve">the #GdkGLContext with which to share display lists and texture objects. NULL indicates that no sharing is to take place.</doc>
+          <type name="GdkGL.Context" c:type="GdkGLContext*"/>
+        </parameter>
+        <parameter name="direct" transfer-ownership="none">
+          <doc xml:whitespace="preserve">whether rendering is to be done with a direct connection to the graphics system.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </parameter>
+        <parameter name="render_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">GDK_GL_RGBA_TYPE or GDK_GL_COLOR_INDEX_TYPE (currently not used).</doc>
+          <type name="gint" c:type="int"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>
