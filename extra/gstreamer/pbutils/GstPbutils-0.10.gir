@@ -1,0 +1,665 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.0"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gst" version="0.10"/>
+  <include name="libxml2" version="2.0"/>
+  <package name="gstreamer-0.10"/>
+  <c:include name="gst/pbutils/descriptions.h"/>
+  <c:include name="gst/pbutils/install-plugins.h"/>
+  <c:include name="gst/pbutils/missing-plugins.h"/>
+  <c:include name="gst/pbutils/pbutils-enumtypes.h"/>
+  <c:include name="gst/pbutils/pbutils.h"/>
+  <namespace name="GstPbutils"
+             version="0.10"
+             shared-library="libgstpbutils-0.10.so.0"
+             c:prefix="Gst">
+    <record name="InstallPluginsContext"
+            c:type="GstInstallPluginsContext"
+            doc="Opaque context structure for the plugin installation. Use the provided
+API to set details on it."
+            version="0.10.12"
+            glib:type-name="GstInstallPluginsContext"
+            glib:get-type="gst_install_plugins_context_get_type">
+      <constructor name="new"
+                   c:identifier="gst_install_plugins_context_new"
+                   doc="Creates a new #GstInstallPluginsContext.
+gst_install_plugins_context_free() when no longer needed"
+                   version="0.10.12">
+        <return-value transfer-ownership="full">
+          <type name="InstallPluginsContext"
+                c:type="GstInstallPluginsContext*"/>
+        </return-value>
+      </constructor>
+      <method name="free"
+              c:identifier="gst_install_plugins_context_free"
+              doc="Frees a #GstInstallPluginsContext."
+              version="0.10.12">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="set_xid"
+              c:identifier="gst_install_plugins_context_set_xid"
+              doc="This function is for X11-based applications (such as most Gtk/Qt
+applications on linux/unix) only. You can use it to tell the external
+installer the XID of your main application window. That way the installer
+can make its own window transient to your application window during the
+installation.
+If set, the XID will be passed to the installer via a --transient-for=XID
+command line option.
+Gtk+/Gnome application should be able to obtain the XID of the top-level
+window like this:
+&lt;programlisting&gt;
+##include &amp;lt;gtk/gtk.h&amp;gt;
+##ifdef GDK_WINDOWING_X11
+##include &amp;lt;gdk/gdkx.h&amp;gt;
+##endif
+...
+##ifdef GDK_WINDOWING_X11
+xid = GDK_WINDOW_XWINDOW (GTK_WIDGET (application_window)-&amp;gt;window);
+##endif
+...
+&lt;/programlisting&gt;"
+              version="0.10.12">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="xid"
+                     transfer-ownership="none"
+                     doc="of the top-level application">
+            <type name="uint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <callback name="InstallPluginsResultFunc"
+              c:type="GstInstallPluginsResultFunc"
+              doc="The prototype of the callback function that will be called once the
+external plugin installer program has returned. You only need to provide
+a callback function if you are using the asynchronous interface."
+              version="0.10.12">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="result" transfer-ownership="none">
+          <type name="InstallPluginsReturn" c:type="GstInstallPluginsReturn"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" closure="1">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <enumeration name="InstallPluginsReturn"
+                 doc="installed
+any of the requested plugins could be found. Only return this if nothing
+has been installed. Return #GST_INSTALL_PLUGINS_PARTIAL_SUCCESS if
+some (but not all) of the requested plugins could be installed.
+this happens, the  user has already seen an error message and another
+one should not be displayed
+(ie. death by signal)
+be installed, but not all
+indicate that everything went fine so far and the provided callback
+will be called with the result of the installation later
+occured when trying to start the installer
+actual installer is not installed
+installation is still in progress, try again later
+Result codes returned by gst_install_plugins_async() and
+gst_install_plugins_sync(), and also the result code passed to the
+#GstInstallPluginsResultFunc specified with gst_install_plugin_async().
+These codes indicate success or failure of starting an external installer
+program and to what extent the requested plugins could be installed."
+                 version="0.10.12"
+                 glib:type-name="GstInstallPluginsReturn"
+                 glib:get-type="gst_install_plugins_return_get_type"
+                 c:type="GstInstallPluginsReturn">
+      <member name="success"
+              value="0"
+              c:identifier="GST_INSTALL_PLUGINS_SUCCESS"
+              glib:nick="success"/>
+      <member name="not_found"
+              value="1"
+              c:identifier="GST_INSTALL_PLUGINS_NOT_FOUND"
+              glib:nick="not-found"/>
+      <member name="error"
+              value="2"
+              c:identifier="GST_INSTALL_PLUGINS_ERROR"
+              glib:nick="error"/>
+      <member name="partial_success"
+              value="3"
+              c:identifier="GST_INSTALL_PLUGINS_PARTIAL_SUCCESS"
+              glib:nick="partial-success"/>
+      <member name="user_abort"
+              value="4"
+              c:identifier="GST_INSTALL_PLUGINS_USER_ABORT"
+              glib:nick="user-abort"/>
+      <member name="crashed"
+              value="100"
+              c:identifier="GST_INSTALL_PLUGINS_CRASHED"
+              glib:nick="crashed"/>
+      <member name="invalid"
+              value="101"
+              c:identifier="GST_INSTALL_PLUGINS_INVALID"
+              glib:nick="invalid"/>
+      <member name="started_ok"
+              value="200"
+              c:identifier="GST_INSTALL_PLUGINS_STARTED_OK"
+              glib:nick="started-ok"/>
+      <member name="internal_failure"
+              value="201"
+              c:identifier="GST_INSTALL_PLUGINS_INTERNAL_FAILURE"
+              glib:nick="internal-failure"/>
+      <member name="helper_missing"
+              value="202"
+              c:identifier="GST_INSTALL_PLUGINS_HELPER_MISSING"
+              glib:nick="helper-missing"/>
+      <member name="install_in_progress"
+              value="203"
+              c:identifier="GST_INSTALL_PLUGINS_INSTALL_IN_PROGRESS"
+              glib:nick="install-in-progress"/>
+    </enumeration>
+    <function name="install_plugins_async"
+              c:identifier="gst_install_plugins_async"
+              doc="Requests plugin installation without blocking. Once the plugins have been
+installed or installation has failed, @func will be called with the result
+of the installation and your provided @user_data pointer.
+This function requires a running GLib/Gtk main loop. If you are not
+running a GLib/Gtk main loop, make sure to regularly call
+g_main_context_iteration(NULL,FALSE).
+The installer strings that make up @detail are typically obtained by
+calling gst_missing_plugin_message_get_installer_detail() on missing-plugin
+messages that have been caught on a pipeline&apos;s bus or created by the
+application via the provided API, such as gst_missing_element_message_new().
+It is possible to request the installation of multiple missing plugins in
+one go (as might be required if there is a demuxer for a certain format
+installed but no suitable video decoder and no suitable audio decoder)."
+              version="0.10.12">
+      <return-value transfer-ownership="full">
+        <type name="InstallPluginsReturn" c:type="GstInstallPluginsReturn"/>
+      </return-value>
+      <parameters>
+        <parameter name="details" transfer-ownership="none">
+          <array c:type="gchar**">
+            <type name="utf8"/>
+          </array>
+        </parameter>
+        <parameter name="ctx" transfer-ownership="none">
+          <type name="InstallPluginsContext"
+                c:type="GstInstallPluginsContext*"/>
+        </parameter>
+        <parameter name="func"
+                   transfer-ownership="none"
+                   scope="call"
+                   closure="3">
+          <type name="InstallPluginsResultFunc"
+                c:type="GstInstallPluginsResultFunc"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none">
+          <type name="any" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="install_plugins_installation_in_progress"
+              c:identifier="gst_install_plugins_installation_in_progress"
+              doc="Checks whether plugin installation (initiated by this application only)
+is currently in progress."
+              version="0.10.12">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+    </function>
+    <function name="install_plugins_return_get_name"
+              c:identifier="gst_install_plugins_return_get_name"
+              doc="Convenience function to return the descriptive string associated
+with a status code.  This function returns English strings and
+should not be used for user messages. It is here only to assist
+in debugging."
+              version="0.10.12">
+      <return-value transfer-ownership="none">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="ret" transfer-ownership="none">
+          <type name="InstallPluginsReturn" c:type="GstInstallPluginsReturn"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="install_plugins_supported"
+              c:identifier="gst_install_plugins_supported"
+              doc="Checks whether plugin installation is likely to be supported by the
+current environment. This currently only checks whether the helper script
+that is to be provided by the distribution or operating system vendor
+exists."
+              version="0.10.15">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+    </function>
+    <function name="install_plugins_sync"
+              c:identifier="gst_install_plugins_sync"
+              doc="Requests plugin installation and block until the plugins have been
+installed or installation has failed.
+This function should almost never be used, it only exists for cases where
+a non-GLib main loop is running and the user wants to run it in a separate
+thread and marshal the result back asynchronously into the main thread
+using the other non-GLib main loop. You should almost always use
+gst_install_plugins_async() instead of this function."
+              version="0.10.12">
+      <return-value transfer-ownership="full">
+        <type name="InstallPluginsReturn" c:type="GstInstallPluginsReturn"/>
+      </return-value>
+      <parameters>
+        <parameter name="details" transfer-ownership="none">
+          <array c:type="gchar**">
+            <type name="utf8"/>
+          </array>
+        </parameter>
+        <parameter name="ctx" transfer-ownership="none">
+          <type name="InstallPluginsContext"
+                c:type="GstInstallPluginsContext*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="is_missing_plugin_message"
+              c:identifier="gst_is_missing_plugin_message"
+              doc="Checks whether @msg is a missing plugins message.">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="msg" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_decoder_installer_detail_new"
+              c:identifier="gst_missing_decoder_installer_detail_new"
+              doc="Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions in
+the case where the application knows exactly what kind of plugin it is
+missing.
+with g_free() when not needed any longer."
+              version="0.10.15">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="decode_caps"
+                   transfer-ownership="none"
+                   doc="caps for which a decoder element is needed">
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_decoder_message_new"
+              c:identifier="gst_missing_decoder_message_new"
+              doc="Creates a missing-plugin message for @element to notify the application
+that a decoder element for a particular set of (fixed) caps is missing.
+This function is mainly for use in plugins.">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="decode_caps"
+                   transfer-ownership="none"
+                   doc="caps for which a decoder element is needed">
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_element_installer_detail_new"
+              c:identifier="gst_missing_element_installer_detail_new"
+              doc="e.g. &quot;videoscale&quot; or &quot;cdparanoiasrc&quot;
+Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions in
+the case where the application knows exactly what kind of plugin it is
+missing.
+with g_free() when not needed any longer."
+              version="0.10.15">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="factory_name" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_element_message_new"
+              c:identifier="gst_missing_element_message_new"
+              doc="e.g. &quot;videoscale&quot; or &quot;cdparanoiasrc&quot;
+Creates a missing-plugin message for @element to notify the application
+that a certain required element is missing. This function is mainly for
+use in plugins.">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="factory_name" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_encoder_installer_detail_new"
+              c:identifier="gst_missing_encoder_installer_detail_new"
+              doc="Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions in
+the case where the application knows exactly what kind of plugin it is
+missing.
+with g_free() when not needed any longer."
+              version="0.10.15">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="encode_caps"
+                   transfer-ownership="none"
+                   doc="caps for which an encoder element is needed">
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_encoder_message_new"
+              c:identifier="gst_missing_encoder_message_new"
+              doc="Creates a missing-plugin message for @element to notify the application
+that an encoder element for a particular set of (fixed) caps is missing.
+This function is mainly for use in plugins.">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="encode_caps"
+                   transfer-ownership="none"
+                   doc="caps for which an encoder element is needed">
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_plugin_message_get_description"
+              c:identifier="gst_missing_plugin_message_get_description"
+              doc="Returns a localised string describing the missing feature, for use in
+error dialogs and the like. Should never return NULL unless @msg is not
+a valid missing-plugin message.
+This function is mainly for applications that need a human-readable string
+describing a missing plugin, given a previously collected missing-plugin
+message
+string with g_free() when not needed any longer.">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="msg" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_plugin_message_get_installer_detail"
+              c:identifier="gst_missing_plugin_message_get_installer_detail"
+              doc="Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions.
+with g_free() when not needed any longer.">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="msg" transfer-ownership="none">
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_uri_sink_installer_detail_new"
+              c:identifier="gst_missing_uri_sink_installer_detail_new"
+              doc="e.g. &quot;http&quot; or &quot;mms&quot;
+Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions in
+the case where the application knows exactly what kind of plugin it is
+missing.
+with g_free() when not needed any longer."
+              version="0.10.15">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="protocol" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_uri_sink_message_new"
+              c:identifier="gst_missing_uri_sink_message_new"
+              doc="e.g. &quot;http&quot; or &quot;smb&quot;
+Creates a missing-plugin message for @element to notify the application
+that a sink element for a particular URI protocol is missing. This
+function is mainly for use in plugins.">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="protocol" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_uri_source_installer_detail_new"
+              c:identifier="gst_missing_uri_source_installer_detail_new"
+              doc="e.g. &quot;http&quot; or &quot;mms&quot;
+Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions in
+the case where the application knows exactly what kind of plugin it is
+missing.
+with g_free() when not needed any longer."
+              version="0.10.15">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="protocol" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_uri_source_message_new"
+              c:identifier="gst_missing_uri_source_message_new"
+              doc="e.g. &quot;http&quot; or &quot;mms&quot;
+Creates a missing-plugin message for @element to notify the application
+that a source element for a particular URI protocol is missing. This
+function is mainly for use in plugins.">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="protocol" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_add_codec_description_to_tag_list"
+              c:identifier="gst_pb_utils_add_codec_description_to_tag_list"
+              doc="#GST_TAG_VIDEO_CODEC or #GST_TAG_CODEC
+Adds a codec tag describing the format specified by @caps to @taglist.">
+      <return-value transfer-ownership="none">
+        <type name="boolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="taglist" transfer-ownership="none">
+          <type name="Gst.TagList" c:type="GstTagList*"/>
+        </parameter>
+        <parameter name="codec_tag" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="caps"
+                   transfer-ownership="none"
+                   doc="#GstCaps for which a codec tag should be added.">
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_codec_description"
+              c:identifier="gst_pb_utils_get_codec_description"
+              doc="Returns a localised (as far as this is possible) string describing the
+media format specified in @caps, for use in error dialogs or other messages
+to be seen by the user. Should never return NULL unless @caps is invalid.
+Also see the convenience function
+gst_pb_utils_add_codec_description_to_tag_list().
+string with g_free() when not needed any longer.">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="caps"
+                   transfer-ownership="none"
+                   doc="#GstCaps for which an format description is needed">
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_decoder_description"
+              c:identifier="gst_pb_utils_get_decoder_description"
+              doc="Returns a localised string describing an decoder for the format specified
+in @caps, for use in error dialogs or other messages to be seen by the user.
+Should never return NULL unless @factory_name or @caps are invalid.
+This function is mainly for internal use, applications would typically
+use gst_missing_plugin_message_get_description() to get a description of
+a missing feature from a missing-plugin message.
+string with g_free() when not needed any longer.">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="caps"
+                   transfer-ownership="none"
+                   doc="#GstCaps for which an decoder description is needed">
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_element_description"
+              c:identifier="gst_pb_utils_get_element_description"
+              doc="Returns a localised string describing the given element, for use in
+error dialogs or other messages to be seen by the user. Should never
+return NULL unless @factory_name is invalid.
+This function is mainly for internal use, applications would typically
+use gst_missing_plugin_message_get_description() to get a description of
+a missing feature from a missing-plugin message.
+string with g_free() when not needed any longer.">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="factory_name" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_encoder_description"
+              c:identifier="gst_pb_utils_get_encoder_description"
+              doc="Returns a localised string describing an encoder for the format specified
+in @caps, for use in error dialogs or other messages to be seen by the user.
+Should never return NULL unless @factory_name or @caps are invalid.
+This function is mainly for internal use, applications would typically
+use gst_missing_plugin_message_get_description() to get a description of
+a missing feature from a missing-plugin message.
+string with g_free() when not needed any longer.">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="caps"
+                   transfer-ownership="none"
+                   doc="#GstCaps for which an encoder description is needed">
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_sink_description"
+              c:identifier="gst_pb_utils_get_sink_description"
+              doc="Returns a localised string describing a sink element handling the protocol
+specified in @protocol, for use in error dialogs or other messages to be
+seen by the user. Should never return NULL unless @protocol is invalid.
+This function is mainly for internal use, applications would typically
+use gst_missing_plugin_message_get_description() to get a description of
+a missing feature from a missing-plugin message.
+string with g_free() when not needed any longer.">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="protocol" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_source_description"
+              c:identifier="gst_pb_utils_get_source_description"
+              doc="Returns a localised string describing a source element handling the protocol
+specified in @protocol, for use in error dialogs or other messages to be
+seen by the user. Should never return NULL unless @protocol is invalid.
+This function is mainly for internal use, applications would typically
+use gst_missing_plugin_message_get_description() to get a description of
+a missing feature from a missing-plugin message.
+string with g_free() when not needed any longer.">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="protocol" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_init"
+              c:identifier="gst_pb_utils_init"
+              doc="Initialises the base utils support library. This function is not
+thread-safe. Applications should call it after calling gst_init(),
+plugins should call it from their plugin_init function.
+This function may be called multiple times. It will do nothing if the
+library has already been initialised."
+              version="0.10.12">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+    </function>
+  </namespace>
+</repository>
