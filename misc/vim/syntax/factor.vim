@@ -26,8 +26,8 @@ endif
 syn cluster factorCluster contains=factorComment,factorFryDirective,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorCompileDirective,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorTuple,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
-syn match factorComment /\<#!\>.*/ contains=factorTodo
-syn match factorComment /\<!\>.*/ contains=factorTodo
+syn match factorComment /\<#!\>\s.*/ contains=factorTodo
+syn match factorComment /\<!\>\s.*/ contains=factorTodo
 
 syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
 
@@ -140,7 +140,7 @@ syn match factorStackEffect /\<( .*--.* )\>/ contained
 syn match factorLiteralStackEffect /\<(( .*--.* ))\>/
 
 "adapted from lisp.vim
-if exists("g:factor_norainbow") 
+if exists("g:factor_norainbow")
     syn region factorQuotation matchgroup=factorDelimiter start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/ matchgroup=factorDelimiter end=/\<\]\>/ contains=ALL
 else
     syn region factorQuotation0           matchgroup=hlLevel0 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation1,factorArray1
@@ -155,7 +155,7 @@ else
     syn region factorQuotation9 contained matchgroup=hlLevel9 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation0,factorArray0
 endif
 
-if exists("g:factor_norainbow") 
+if exists("g:factor_norainbow")
     syn region factorArray    matchgroup=factorDelimiter start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/  matchgroup=factorDelimiter end=/\<}\>/ contains=ALL
 else
     syn region factorArray0           matchgroup=hlLevel0 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray1,factorQuotation1
