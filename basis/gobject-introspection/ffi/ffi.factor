@@ -1,10 +1,11 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.parser arrays ascii
-classes.parser classes.struct combinators gobject-introspection.common
-gobject-introspection.repository gobject-introspection.types kernel
-locals make math.parser namespaces parser sequences
-splitting.monotonic words words.constant ;
+classes.parser classes.struct combinators combinators.short-circuit
+gobject-introspection.common gobject-introspection.repository
+gobject-introspection.types kernel locals make math.parser namespaces
+parser sequences splitting.monotonic vocabs.parser words
+words.constant ;
 IN: gobject-introspection.ffi
 
 SYMBOL: constant-prefix
@@ -226,6 +227,14 @@ M: array-type field-type>c-type type>c-type ;
 : def-union-type ( union -- )
     c-type>> void def-c-type ;
 
+: private-record? ( record -- ? )
+    {
+        [ struct-for>> ]
+        [ name>> "Class" tail? ]
+        [ name>> "Private" tail? ]
+        [ name>> "Iface" tail? ]
+    } 1|| ;
+
 : def-union ( union -- )
     {
         [ def-union-type ]
@@ -286,21 +295,29 @@ M: array-type field-type>c-type type>c-type ;
 
 : defer-enums ( enums -- ) enum-info defer-types ;
 : defer-bitfields ( bitfields -- ) bitfield-info defer-types ;
-: defer-records ( records -- ) record-info defer-types ;
 : defer-unions ( unions -- ) union-info defer-types ;
 : defer-boxeds ( boxeds -- ) boxed-info defer-types ;
 : defer-callbacks ( callbacks -- ) callback-info defer-types ;
 : defer-interfaces ( interfaces -- ) interface-info defer-types ;
 : defer-classes ( class -- ) class-info defer-types ;
 
+: defer-records ( records -- )
+    [ private-record? ] partition
+    [ begin-private record-info defer-types end-private ]
+    [ record-info defer-types ] bi* ;
+
 : def-enums ( enums -- ) [ def-enum-type ] each ;
 : def-bitfields ( bitfields -- ) [ def-bitfield-type ] each ;
-: def-records ( records -- ) [ def-record ] each ;
 : def-unions ( unions -- ) [ def-union ] each ;
 : def-boxeds ( boxeds -- ) [ def-boxed-type ] each ;
 : def-callbacks ( callbacks -- ) [ def-callback-type ] each ;
 : def-interfaces ( interfaces -- ) [ def-interface ] each ;
 : def-classes ( classes -- ) [ def-class ] each ;
+
+: def-records ( records -- )
+    [ private-record? ] partition
+    [ begin-private [ def-record ] each end-private ]
+    [ [ def-record ] each ] bi* ;
 
 : def-namespace ( namespace -- )
     {

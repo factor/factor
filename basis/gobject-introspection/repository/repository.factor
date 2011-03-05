@@ -66,7 +66,8 @@ TUPLE: record < type
     constructors
     methods
     functions
-    disguised? ;
+    disguised?
+    struct-for ;
 
 TUPLE: field
     name
