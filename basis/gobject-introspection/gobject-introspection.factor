@@ -24,6 +24,9 @@ SYNTAX: IMPLEMENT-STRUCTS:
     ";" parse-tokens
     implement-structs [ swap append! ] change-global ;
 
+SYNTAX: FOREIGN-ATOMIC-TYPE:
+    scan-token scan-object swap register-atomic-type ;
+
 SYNTAX: FOREIGN-ENUM-TYPE:
     scan-token scan-object swap register-enum-type ;
 
