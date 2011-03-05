@@ -133,6 +133,7 @@ CONSTANT: type-tags
         [ "method" load-functions >>methods ]
         [ "function" load-functions >>functions ]
         [ "disguised" attr "1" = >>disguised? ]
+        [ "is-gtype-struct-for" attr >>struct-for ]
     } cleave ;
 
 : xml>union ( xml -- union )
