@@ -113,7 +113,7 @@ ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
 "To make it convenient to have a long string which uses regexp operators, a special syntax is provided. If a substring begins with " { $snippet "\\Q" } " then everything until " { $snippet "\\E" } " is quoted (escaped). For example, " { $snippet "R/ \\Qfoo\\bar|baz()\\E/" } " matches exactly the string " { $snippet "\"foo\\bar|baz()\"" } "."
 { $heading "Unsupported features" }
 { $subheading "Group capture" }
-{ $subheading "Reluctant and posessive quantifiers" }
+{ $subheading "Reluctant and possessive quantifiers" }
 { $subheading "Backreferences" }
 "Backreferences were omitted because of a design decision to allow only regular expressions following the formal theory of regular languages. For more information, see " { $link { "regexp" "theory" } } "."
 $nl
