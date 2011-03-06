@@ -2,13 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.parser arrays ascii
 classes.parser classes.struct combinators combinators.short-circuit
-gobject-introspection.common gobject-introspection.repository
-gobject-introspection.types kernel locals make math.parser namespaces
-parser sequences splitting.monotonic vocabs.parser words
-words.constant ;
+gobject-introspection.repository gobject-introspection.types kernel
+locals make math.parser namespaces parser sequences
+splitting.monotonic vocabs.parser words words.constant ;
 IN: gobject-introspection.ffi
-
-SYMBOL: constant-prefix
 
 : def-c-type ( c-type-name base-c-type -- )
     swap (CREATE-C-TYPE) typedef ;
@@ -81,11 +78,8 @@ M: utf8-type parse-const-value drop ;
 : const-value ( const -- value )
     [ value>> ] [ type>> ] bi parse-const-value ;
 
-: const-name ( const -- name )
-    name>> constant-prefix get swap "_" glue ;
-
 : def-const ( const -- )
-    [ const-name create-in dup reset-generic ]
+    [ c-identifier>> create-in dup reset-generic ]
     [ const-value ] bi define-constant ;
 
 : def-consts ( consts -- )
@@ -209,7 +203,7 @@ M: array-type field-type>c-type type>c-type ;
     ] tri <struct-slot-spec> ;
 
 : def-record-type ( record -- )
-    dup c-type>> implement-structs get-global member?
+    dup fields>>
     [
         [ c-type>> create-class-in ]
         [ fields>> [ field>struct-slot ] map ] bi
@@ -321,7 +315,6 @@ M: array-type field-type>c-type type>c-type ;
 
 : def-namespace ( namespace -- )
     {
-        [ symbol-prefixes>> first >upper constant-prefix set ]
         [ consts>> def-consts ]
 
         [ enums>> defer-enums ]
