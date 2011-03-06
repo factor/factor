@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators gobject-introspection.repository kernel
-literals math.parser sequences splitting xml.data xml.traversal ;
+USING: accessors ascii combinators gobject-introspection.common
+gobject-introspection.repository kernel literals math.parser
+sequences splitting xml.data xml.traversal ;
 IN: gobject-introspection.loader
 
 : xml>simple-type ( xml -- type )
@@ -128,7 +129,11 @@ CONSTANT: type-tags
 : xml>record ( xml -- record )
     [ record new ] dip {
         [ load-type ]
-        [ "field" tags-named [ xml>field ] map >>fields ]
+        [
+            over c-type>> implement-struct?
+            [ "field" tags-named [ xml>field ] map >>fields ]
+            [ drop ] if
+        ]
         [ "constructor" load-functions >>constructors ]
         [ "method" load-functions >>methods ]
         [ "function" load-functions >>functions ]
@@ -192,6 +197,13 @@ CONSTANT: type-tags
     [ boxed new ] dip
         load-type ;
 
+: fix-conts ( namespace -- )
+    [ symbol-prefixes>> first >upper "_" append ] [ consts>> ] bi
+    [ [ name>> append ] keep c-identifier<< ] with each ;
+
+: postprocess-namespace ( namespace -- )
+    fix-conts ;
+
 : xml>namespace ( xml -- namespace )
     [ namespace new ] dip {
         [ "name" attr >>name ]
@@ -208,7 +220,7 @@ CONSTANT: type-tags
         [ "class" tags-named [ xml>class ] map >>classes ]
         [ "interface" tags-named [ xml>interface ] map >>interfaces ]
         [ "function" load-functions >>functions ]
-    } cleave ;
+    } cleave [ postprocess-namespace ] keep ;
 
 : xml>repository ( xml -- repository )
     [ repository new ] dip
