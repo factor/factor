@@ -1,0 +1,3195 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gst" version="0.10"/>
+  <include name="GstBase" version="0.10"/>
+  <include name="libxml2" version="2.0"/>
+  <package name="gstreamer-rtp-0.10"/>
+  <c:include name="gst/rtp/gstbasertpaudiopayload.h"/>
+  <c:include name="gst/rtp/gstbasertpdepayload.h"/>
+  <c:include name="gst/rtp/gstbasertppayload.h"/>
+  <c:include name="gst/rtp/gstrtcpbuffer.h"/>
+  <c:include name="gst/rtp/gstrtpbuffer.h"/>
+  <c:include name="gst/rtp/gstrtppayloads.h"/>
+  <namespace name="GstRtp"
+             version="0.10"
+             shared-library="libgstrtp-0.10.so.0"
+             c:identifier-prefixes="Gst"
+             c:symbol-prefixes="gst">
+    <class name="BaseRTPAudioPayload"
+           c:symbol-prefix="base_rtp_audio_payload"
+           c:type="GstBaseRTPAudioPayload"
+           parent="BaseRTPPayload"
+           glib:type-name="GstBaseRTPAudioPayload"
+           glib:get-type="gst_base_rtp_audio_payload_get_type"
+           glib:type-struct="BaseRTPAudioPayloadClass">
+      <method name="flush"
+              c:identifier="gst_base_rtp_audio_payload_flush"
+              version="0.10.25">
+        <doc xml:whitespace="preserve">Create an RTP buffer and store @payload_len bytes of the adapter as the
+payload. Set the timestamp on the new buffer to @timestamp before pushing
+the buffer downstream.
+If @payload_len is -1, all pending bytes will be flushed. If @timestamp is
+-1, the timestamp will be calculated automatically.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstFlowReturn</doc>
+          <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+        </return-value>
+        <parameters>
+          <parameter name="payload_len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">length of payload</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstClockTime</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_adapter"
+              c:identifier="gst_base_rtp_audio_payload_get_adapter"
+              version="0.10.13"
+              introspectable="0">
+        <doc xml:whitespace="preserve">Gets the internal adapter used by the depayloader.</doc>
+        <return-value>
+          <doc xml:whitespace="preserve">a #GstAdapter.</doc>
+          <type name="GstBase.Adapter" c:type="GstAdapter*"/>
+        </return-value>
+      </method>
+      <method name="push"
+              c:identifier="gst_base_rtp_audio_payload_push"
+              version="0.10.13">
+        <doc xml:whitespace="preserve">Create an RTP buffer and store @payload_len bytes of @data as the
+payload. Set the timestamp on the new buffer to @timestamp before pushing
+the buffer downstream.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstFlowReturn</doc>
+          <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+        </return-value>
+        <parameters>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">data to set as payload</doc>
+            <type name="guint8" c:type="guint8*"/>
+          </parameter>
+          <parameter name="payload_len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">length of payload</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstClockTime</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_frame_based"
+              c:identifier="gst_base_rtp_audio_payload_set_frame_based">
+        <doc xml:whitespace="preserve">Tells #GstBaseRTPAudioPayload that the child element is for a frame based
+audio codec</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="set_frame_options"
+              c:identifier="gst_base_rtp_audio_payload_set_frame_options">
+        <doc xml:whitespace="preserve">Sets the options for frame based audio codecs.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="frame_duration" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The duraction of an audio frame in milliseconds.</doc>
+            <type name="gint" c:type="gint"/>
+          </parameter>
+          <parameter name="frame_size" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The size of an audio frame in bytes.</doc>
+            <type name="gint" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_sample_based"
+              c:identifier="gst_base_rtp_audio_payload_set_sample_based">
+        <doc xml:whitespace="preserve">Tells #GstBaseRTPAudioPayload that the child element is for a sample based
+audio codec</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="set_sample_options"
+              c:identifier="gst_base_rtp_audio_payload_set_sample_options">
+        <doc xml:whitespace="preserve">Sets the options for sample based audio codecs.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="sample_size" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Size per sample in bytes.</doc>
+            <type name="gint" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_samplebits_options"
+              c:identifier="gst_base_rtp_audio_payload_set_samplebits_options"
+              version="0.10.18">
+        <doc xml:whitespace="preserve">Sets the options for sample based audio codecs.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="sample_size" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Size per sample in bits.</doc>
+            <type name="gint" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <property name="buffer-list" writable="1" transfer-ownership="none">
+        <type name="gboolean"/>
+      </property>
+      <field name="payload">
+        <type name="BaseRTPPayload" c:type="GstBaseRTPPayload"/>
+      </field>
+      <field name="priv">
+        <type name="BaseRTPAudioPayloadPrivate"
+              c:type="GstBaseRTPAudioPayloadPrivate*"/>
+      </field>
+      <field name="base_ts">
+        <type name="Gst.ClockTime" c:type="GstClockTime"/>
+      </field>
+      <field name="frame_size">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="frame_duration">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="sample_size">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </class>
+    <record name="BaseRTPAudioPayloadClass"
+            c:type="GstBaseRTPAudioPayloadClass"
+            glib:is-gtype-struct-for="BaseRTPAudioPayload">
+      <field name="parent_class">
+        <type name="BaseRTPPayloadClass" c:type="GstBaseRTPPayloadClass"/>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="BaseRTPAudioPayloadPrivate"
+            c:type="GstBaseRTPAudioPayloadPrivate"
+            disguised="1">
+    </record>
+    <class name="BaseRTPDepayload"
+           c:symbol-prefix="base_rtp_depayload"
+           c:type="GstBaseRTPDepayload"
+           parent="Gst.Element"
+           glib:type-name="GstBaseRTPDepayload"
+           glib:get-type="gst_base_rtp_depayload_get_type"
+           glib:type-struct="BaseRTPDepayloadClass">
+      <virtual-method name="add_to_queue">
+        <return-value transfer-ownership="none">
+          <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+        </return-value>
+        <parameters>
+          <parameter name="in" transfer-ownership="none">
+            <type name="Gst.Buffer" c:type="GstBuffer*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="handle_event">
+        <return-value transfer-ownership="none">
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="event" transfer-ownership="none">
+            <type name="Gst.Event" c:type="GstEvent*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="packet_lost">
+        <return-value transfer-ownership="none">
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="event" transfer-ownership="none">
+            <type name="Gst.Event" c:type="GstEvent*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="process" introspectable="0">
+        <return-value>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </return-value>
+        <parameters>
+          <parameter name="in" transfer-ownership="none">
+            <type name="Gst.Buffer" c:type="GstBuffer*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="set_caps">
+        <return-value transfer-ownership="none">
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="caps" transfer-ownership="none">
+            <type name="Gst.Caps" c:type="GstCaps*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="set_gst_timestamp">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="timestamp" transfer-ownership="none">
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="buf" transfer-ownership="none">
+            <type name="Gst.Buffer" c:type="GstBuffer*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="push" c:identifier="gst_base_rtp_depayload_push">
+        <doc xml:whitespace="preserve">Push @out_buf to the peer of @filter. This function takes ownership of
+Unlike gst_base_rtp_depayload_push_ts(), this function will not apply
+any timestamp on the outgoing buffer. Subclasses should therefore timestamp
+outgoing buffers themselves.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstFlowReturn.</doc>
+          <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+        </return-value>
+        <parameters>
+          <parameter name="out_buf" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstBuffer</doc>
+            <type name="Gst.Buffer" c:type="GstBuffer*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="push_list"
+              c:identifier="gst_base_rtp_depayload_push_list"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Push @out_list to the peer of @filter. This function takes ownership of</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstFlowReturn.</doc>
+          <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+        </return-value>
+        <parameters>
+          <parameter name="out_list" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstBufferList</doc>
+            <type name="Gst.BufferList" c:type="GstBufferList*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="push_ts" c:identifier="gst_base_rtp_depayload_push_ts">
+        <doc xml:whitespace="preserve">Push @out_buf to the peer of @filter. This function takes ownership of
+Unlike gst_base_rtp_depayload_push(), this function will by default apply
+the last incomming timestamp on the outgoing buffer when it didn't have a
+timestamp already. The set_get_timestamp vmethod can be overwritten to change
+this behaviour (and take, for example, @timestamp into account).</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstFlowReturn.</doc>
+          <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+        </return-value>
+        <parameters>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an RTP timestamp to apply</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="out_buf" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstBuffer</doc>
+            <type name="Gst.Buffer" c:type="GstBuffer*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <property name="queue-delay" writable="1" transfer-ownership="none">
+        <type name="guint"/>
+      </property>
+      <field name="parent">
+        <type name="Gst.Element" c:type="GstElement"/>
+      </field>
+      <field name="sinkpad">
+        <type name="Gst.Pad" c:type="GstPad*"/>
+      </field>
+      <field name="srcpad">
+        <type name="Gst.Pad" c:type="GstPad*"/>
+      </field>
+      <field name="queuelock">
+        <type name="GLib.StaticRecMutex" c:type="GStaticRecMutex"/>
+      </field>
+      <field name="thread_running">
+        <type name="gboolean" c:type="gboolean"/>
+      </field>
+      <field name="thread">
+        <type name="GLib.Thread" c:type="GThread*"/>
+      </field>
+      <field name="clock_rate">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="queue_delay">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="queue">
+        <type name="GLib.Queue" c:type="GQueue*"/>
+      </field>
+      <field name="segment">
+        <type name="Gst.Segment" c:type="GstSegment"/>
+      </field>
+      <field name="need_newsegment">
+        <type name="gboolean" c:type="gboolean"/>
+      </field>
+      <field name="priv">
+        <type name="BaseRTPDepayloadPrivate"
+              c:type="GstBaseRTPDepayloadPrivate*"/>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="3">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </class>
+    <record name="BaseRTPDepayloadClass"
+            c:type="GstBaseRTPDepayloadClass"
+            glib:is-gtype-struct-for="BaseRTPDepayload">
+      <field name="parent_class">
+        <type name="Gst.ElementClass" c:type="GstElementClass"/>
+      </field>
+      <field name="set_caps">
+        <callback name="set_caps">
+          <return-value transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="filter" transfer-ownership="none">
+              <type name="BaseRTPDepayload" c:type="GstBaseRTPDepayload*"/>
+            </parameter>
+            <parameter name="caps" transfer-ownership="none">
+              <type name="Gst.Caps" c:type="GstCaps*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="add_to_queue">
+        <callback name="add_to_queue">
+          <return-value transfer-ownership="none">
+            <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+          </return-value>
+          <parameters>
+            <parameter name="filter" transfer-ownership="none">
+              <type name="BaseRTPDepayload" c:type="GstBaseRTPDepayload*"/>
+            </parameter>
+            <parameter name="in" transfer-ownership="none">
+              <type name="Gst.Buffer" c:type="GstBuffer*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="process" introspectable="0">
+        <callback name="process" introspectable="0">
+          <return-value>
+            <type name="Gst.Buffer" c:type="GstBuffer*"/>
+          </return-value>
+          <parameters>
+            <parameter name="base" transfer-ownership="none">
+              <type name="BaseRTPDepayload" c:type="GstBaseRTPDepayload*"/>
+            </parameter>
+            <parameter name="in" transfer-ownership="none">
+              <type name="Gst.Buffer" c:type="GstBuffer*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="set_gst_timestamp">
+        <callback name="set_gst_timestamp">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="filter" transfer-ownership="none">
+              <type name="BaseRTPDepayload" c:type="GstBaseRTPDepayload*"/>
+            </parameter>
+            <parameter name="timestamp" transfer-ownership="none">
+              <type name="guint32" c:type="guint32"/>
+            </parameter>
+            <parameter name="buf" transfer-ownership="none">
+              <type name="Gst.Buffer" c:type="GstBuffer*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="packet_lost">
+        <callback name="packet_lost">
+          <return-value transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="filter" transfer-ownership="none">
+              <type name="BaseRTPDepayload" c:type="GstBaseRTPDepayload*"/>
+            </parameter>
+            <parameter name="event" transfer-ownership="none">
+              <type name="Gst.Event" c:type="GstEvent*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="handle_event">
+        <callback name="handle_event">
+          <return-value transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="filter" transfer-ownership="none">
+              <type name="BaseRTPDepayload" c:type="GstBaseRTPDepayload*"/>
+            </parameter>
+            <parameter name="event" transfer-ownership="none">
+              <type name="Gst.Event" c:type="GstEvent*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="2">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="BaseRTPDepayloadPrivate"
+            c:type="GstBaseRTPDepayloadPrivate"
+            disguised="1">
+    </record>
+    <class name="BaseRTPPayload"
+           c:symbol-prefix="basertppayload"
+           c:type="GstBaseRTPPayload"
+           parent="Gst.Element"
+           abstract="1"
+           glib:type-name="GstBaseRTPPayload"
+           glib:get-type="gst_basertppayload_get_type"
+           glib:type-struct="BaseRTPPayloadClass">
+      <function name="is_filled" c:identifier="gst_basertppayload_is_filled">
+        <doc xml:whitespace="preserve">Check if the packet with @size and @duration would exceed the configured
+maximum size.
+configured MTU or max_ptime.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the packet of @size and @duration would exceed the</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="payload" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstBaseRTPPayload</doc>
+            <type name="BaseRTPPayload" c:type="GstBaseRTPPayload*"/>
+          </parameter>
+          <parameter name="size" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the size of the packet</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+          <parameter name="duration" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the duration of the packet</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="push" c:identifier="gst_basertppayload_push">
+        <doc xml:whitespace="preserve">Push @buffer to the peer element of the payloader. The SSRC, payload type,
+seqnum and timestamp of the RTP buffer will be updated first.
+This function takes ownership of @buffer.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstFlowReturn.</doc>
+          <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+        </return-value>
+        <parameters>
+          <parameter name="payload" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstBaseRTPPayload</doc>
+            <type name="BaseRTPPayload" c:type="GstBaseRTPPayload*"/>
+          </parameter>
+          <parameter name="buffer" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstBuffer</doc>
+            <type name="Gst.Buffer" c:type="GstBuffer*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="push_list"
+                c:identifier="gst_basertppayload_push_list"
+                version="0.10.24">
+        <doc xml:whitespace="preserve">Push @list to the peer element of the payloader. The SSRC, payload type,
+seqnum and timestamp of the RTP buffer will be updated first.
+This function takes ownership of @list.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstFlowReturn.</doc>
+          <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+        </return-value>
+        <parameters>
+          <parameter name="payload" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstBaseRTPPayload</doc>
+            <type name="BaseRTPPayload" c:type="GstBaseRTPPayload*"/>
+          </parameter>
+          <parameter name="list" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstBufferList</doc>
+            <type name="Gst.BufferList" c:type="GstBufferList*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="set_options"
+                c:identifier="gst_basertppayload_set_options">
+        <doc xml:whitespace="preserve">Set the rtp options of the payloader. These options will be set in the caps
+of the payloader. Subclasses must call this method before calling
+gst_basertppayload_push() or gst_basertppayload_set_outcaps().</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="payload" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstBaseRTPPayload</doc>
+            <type name="BaseRTPPayload" c:type="GstBaseRTPPayload*"/>
+          </parameter>
+          <parameter name="media" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the media type (typically "audio" or "video")</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="dynamic" transfer-ownership="none">
+            <doc xml:whitespace="preserve">if the payload type is dynamic</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+          <parameter name="encoding_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the encoding name</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="clock_rate" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the clock rate of the media</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="set_outcaps"
+                c:identifier="gst_basertppayload_set_outcaps"
+                introspectable="0">
+        <doc xml:whitespace="preserve">Configure the output caps with the optional parameters.
+Variable arguments should be in the form field name, field type
+(as a GType), value(s).  The last variable argument should be NULL.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the caps could be set.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="payload" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstBaseRTPPayload</doc>
+            <type name="BaseRTPPayload" c:type="GstBaseRTPPayload*"/>
+          </parameter>
+          <parameter name="fieldname" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the first field name or %NULL</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter transfer-ownership="none">
+            <varargs>
+            </varargs>
+          </parameter>
+        </parameters>
+      </function>
+      <virtual-method name="get_caps">
+        <return-value transfer-ownership="full">
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </return-value>
+        <parameters>
+          <parameter name="pad" transfer-ownership="none">
+            <type name="Gst.Pad" c:type="GstPad*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="handle_buffer">
+        <return-value transfer-ownership="none">
+          <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+        </return-value>
+        <parameters>
+          <parameter name="buffer" transfer-ownership="none">
+            <type name="Gst.Buffer" c:type="GstBuffer*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="set_caps">
+        <return-value transfer-ownership="none">
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="caps" transfer-ownership="none">
+            <type name="Gst.Caps" c:type="GstCaps*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <property name="max-ptime" writable="1" transfer-ownership="none">
+        <type name="gint64"/>
+      </property>
+      <property name="min-ptime" writable="1" transfer-ownership="none">
+        <type name="gint64"/>
+      </property>
+      <property name="mtu" writable="1" transfer-ownership="none">
+        <type name="guint"/>
+      </property>
+      <property name="perfect-rtptime" writable="1" transfer-ownership="none">
+        <type name="gboolean"/>
+      </property>
+      <property name="pt" writable="1" transfer-ownership="none">
+        <type name="guint"/>
+      </property>
+      <property name="ptime-multiple" writable="1" transfer-ownership="none">
+        <type name="gint64"/>
+      </property>
+      <property name="seqnum" transfer-ownership="none">
+        <type name="guint"/>
+      </property>
+      <property name="seqnum-offset" writable="1" transfer-ownership="none">
+        <type name="gint"/>
+      </property>
+      <property name="ssrc" writable="1" transfer-ownership="none">
+        <type name="guint"/>
+      </property>
+      <property name="timestamp" transfer-ownership="none">
+        <type name="guint"/>
+      </property>
+      <property name="timestamp-offset" writable="1" transfer-ownership="none">
+        <type name="guint"/>
+      </property>
+      <field name="element">
+        <type name="Gst.Element" c:type="GstElement"/>
+      </field>
+      <field name="sinkpad">
+        <type name="Gst.Pad" c:type="GstPad*"/>
+      </field>
+      <field name="srcpad">
+        <type name="Gst.Pad" c:type="GstPad*"/>
+      </field>
+      <field name="seq_rand">
+        <type name="GLib.Rand" c:type="GRand*"/>
+      </field>
+      <field name="ssrc_rand">
+        <type name="GLib.Rand" c:type="GRand*"/>
+      </field>
+      <field name="ts_rand">
+        <type name="GLib.Rand" c:type="GRand*"/>
+      </field>
+      <field name="ts_base">
+        <type name="guint32" c:type="guint32"/>
+      </field>
+      <field name="seqnum_base">
+        <type name="guint16" c:type="guint16"/>
+      </field>
+      <field name="media">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="encoding_name">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="dynamic">
+        <type name="gboolean" c:type="gboolean"/>
+      </field>
+      <field name="clock_rate">
+        <type name="guint32" c:type="guint32"/>
+      </field>
+      <field name="ts_offset">
+        <type name="gint32" c:type="gint32"/>
+      </field>
+      <field name="timestamp">
+        <type name="guint32" c:type="guint32"/>
+      </field>
+      <field name="seqnum_offset">
+        <type name="gint16" c:type="gint16"/>
+      </field>
+      <field name="seqnum">
+        <type name="guint16" c:type="guint16"/>
+      </field>
+      <field name="max_ptime">
+        <type name="gint64" c:type="gint64"/>
+      </field>
+      <field name="pt">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="ssrc">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="current_ssrc">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="mtu">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="segment">
+        <type name="Gst.Segment" c:type="GstSegment"/>
+      </field>
+      <field name="min_ptime">
+        <type name="guint64" c:type="guint64"/>
+      </field>
+      <field name="priv">
+        <type name="BaseRTPPayloadPrivate" c:type="GstBaseRTPPayloadPrivate*"/>
+      </field>
+      <union name="abidata" c:type="abidata">
+        <record name="ABI" c:type="ABI">
+          <field name="ptime" writable="1">
+            <type name="guint64" c:type="guint64"/>
+          </field>
+          <field name="ptime_multiple" writable="1">
+            <type name="guint64" c:type="guint64"/>
+          </field>
+        </record>
+        <field name="_gst_reserved" writable="1">
+          <array zero-terminated="0" c:type="gpointer" fixed-size="3">
+            <type name="gpointer" c:type="gpointer"/>
+          </array>
+        </field>
+      </union>
+    </class>
+    <record name="BaseRTPPayloadClass"
+            c:type="GstBaseRTPPayloadClass"
+            glib:is-gtype-struct-for="BaseRTPPayload">
+      <field name="parent_class">
+        <type name="Gst.ElementClass" c:type="GstElementClass"/>
+      </field>
+      <field name="set_caps">
+        <callback name="set_caps">
+          <return-value transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="payload" transfer-ownership="none">
+              <type name="BaseRTPPayload" c:type="GstBaseRTPPayload*"/>
+            </parameter>
+            <parameter name="caps" transfer-ownership="none">
+              <type name="Gst.Caps" c:type="GstCaps*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="handle_buffer">
+        <callback name="handle_buffer">
+          <return-value transfer-ownership="none">
+            <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+          </return-value>
+          <parameters>
+            <parameter name="payload" transfer-ownership="none">
+              <type name="BaseRTPPayload" c:type="GstBaseRTPPayload*"/>
+            </parameter>
+            <parameter name="buffer" transfer-ownership="none">
+              <type name="Gst.Buffer" c:type="GstBuffer*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="handle_event">
+        <callback name="handle_event">
+          <return-value transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="pad" transfer-ownership="none">
+              <type name="Gst.Pad" c:type="GstPad*"/>
+            </parameter>
+            <parameter name="event" transfer-ownership="none">
+              <type name="Gst.Event" c:type="GstEvent*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_caps">
+        <callback name="get_caps">
+          <return-value transfer-ownership="full">
+            <type name="Gst.Caps" c:type="GstCaps*"/>
+          </return-value>
+          <parameters>
+            <parameter name="payload" transfer-ownership="none">
+              <type name="BaseRTPPayload" c:type="GstBaseRTPPayload*"/>
+            </parameter>
+            <parameter name="pad" transfer-ownership="none">
+              <type name="Gst.Pad" c:type="GstPad*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="2">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="BaseRTPPayloadPrivate"
+            c:type="GstBaseRTPPayloadPrivate"
+            disguised="1">
+    </record>
+    <enumeration name="RTCPFBType" version="0.10.23" c:type="GstRTCPFBType">
+      <doc xml:whitespace="preserve">Different types of feedback messages.</doc>
+      <member name="fb_type_invalid"
+              value="0"
+              c:identifier="GST_RTCP_FB_TYPE_INVALID"/>
+      <member name="rtpfb_type_nack"
+              value="1"
+              c:identifier="GST_RTCP_RTPFB_TYPE_NACK"/>
+      <member name="psfb_type_pli"
+              value="1"
+              c:identifier="GST_RTCP_PSFB_TYPE_PLI"/>
+      <member name="psfb_type_sli"
+              value="2"
+              c:identifier="GST_RTCP_PSFB_TYPE_SLI"/>
+      <member name="psfb_type_rpsi"
+              value="3"
+              c:identifier="GST_RTCP_PSFB_TYPE_RPSI"/>
+      <member name="psfb_type_afb"
+              value="15"
+              c:identifier="GST_RTCP_PSFB_TYPE_AFB"/>
+    </enumeration>
+    <record name="RTCPPacket" c:type="GstRTCPPacket">
+      <doc xml:whitespace="preserve">Data structure that points to a packet at @offset in @buffer. 
+The size of the structure is made public to allow stack allocations.</doc>
+      <field name="buffer" writable="1">
+        <type name="Gst.Buffer" c:type="GstBuffer*"/>
+      </field>
+      <field name="offset" writable="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="padding" writable="1">
+        <type name="gboolean" c:type="gboolean"/>
+      </field>
+      <field name="count" writable="1">
+        <type name="guint8" c:type="guint8"/>
+      </field>
+      <field name="type" writable="1">
+        <type name="RTCPType" c:type="GstRTCPType"/>
+      </field>
+      <field name="length" writable="1">
+        <type name="guint16" c:type="guint16"/>
+      </field>
+      <field name="item_offset" writable="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="item_count" writable="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="entry_offset" writable="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <method name="add_rb" c:identifier="gst_rtcp_packet_add_rb">
+        <doc xml:whitespace="preserve">Add a new report block to @packet with the given values.
+the max MTU is exceeded or the number of report blocks is greater than
+#GST_RTCP_MAX_RB_COUNT.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the packet was created. This function can return %FALSE if</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="ssrc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">data source being reported</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="fractionlost" transfer-ownership="none">
+            <doc xml:whitespace="preserve">fraction lost since last SR/RR</doc>
+            <type name="guint8" c:type="guint8"/>
+          </parameter>
+          <parameter name="packetslost" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the cumululative number of packets lost</doc>
+            <type name="gint32" c:type="gint32"/>
+          </parameter>
+          <parameter name="exthighestseq" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the extended last sequence number received</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="jitter" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the interarrival jitter</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="lsr" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the last SR packet from this source</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="dlsr" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the delay since last SR packet</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="bye_add_ssrc" c:identifier="gst_rtcp_packet_bye_add_ssrc">
+        <doc xml:whitespace="preserve">Add @ssrc to the BYE @packet.
+the max MTU is exceeded or the number of sources blocks is greater than
+#GST_RTCP_MAX_BYE_SSRC_COUNT.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the ssrc was added. This function can return %FALSE if</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="ssrc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an SSRC to add</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="bye_add_ssrcs"
+              c:identifier="gst_rtcp_packet_bye_add_ssrcs">
+        <doc xml:whitespace="preserve">Adds @len SSRCs in @ssrc to BYE @packet.
+the max MTU is exceeded or the number of sources blocks is greater than
+#GST_RTCP_MAX_BYE_SSRC_COUNT.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the all the SSRCs were added. This function can return %FALSE if</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="ssrc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an array of SSRCs to add</doc>
+            <type name="guint32" c:type="guint32*"/>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">number of elements in @ssrc</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="bye_get_nth_ssrc"
+              c:identifier="gst_rtcp_packet_bye_get_nth_ssrc">
+        <doc xml:whitespace="preserve">Get the @nth SSRC of the BYE @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The @nth SSRC of @packet.</doc>
+          <type name="guint32" c:type="guint32"/>
+        </return-value>
+        <parameters>
+          <parameter name="nth" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the nth SSRC to get</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="bye_get_reason"
+              c:identifier="gst_rtcp_packet_bye_get_reason">
+        <doc xml:whitespace="preserve">Get the reason in @packet.
+a reason string. The string must be freed with g_free() after usage.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">The reason for the BYE @packet or NULL if the packet did not contain</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="bye_get_reason_len"
+              c:identifier="gst_rtcp_packet_bye_get_reason_len">
+        <doc xml:whitespace="preserve">Get the length of the reason string.
+present.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The length of the reason string or 0 when there is no reason string</doc>
+          <type name="guint8" c:type="guint8"/>
+        </return-value>
+      </method>
+      <method name="bye_get_ssrc_count"
+              c:identifier="gst_rtcp_packet_bye_get_ssrc_count">
+        <doc xml:whitespace="preserve">Get the number of SSRC fields in @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The number of SSRC fields in @packet.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="bye_set_reason"
+              c:identifier="gst_rtcp_packet_bye_set_reason">
+        <doc xml:whitespace="preserve">Set the reason string to @reason in @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the string could be set.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="reason" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a reason string</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="fb_get_fci"
+              c:identifier="gst_rtcp_packet_fb_get_fci"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">Get the Feedback Control Information attached to a RTPFB or PSFB @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer to the FCI</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </return-value>
+      </method>
+      <method name="fb_get_fci_length"
+              c:identifier="gst_rtcp_packet_fb_get_fci_length"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">Get the length of the Feedback Control Information attached to a
+RTPFB or PSFB @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The length of the FCI in 32-bit words.</doc>
+          <type name="guint16" c:type="guint16"/>
+        </return-value>
+      </method>
+      <method name="fb_get_media_ssrc"
+              c:identifier="gst_rtcp_packet_fb_get_media_ssrc"
+              version="0.10.23">
+        <doc xml:whitespace="preserve">Get the media SSRC field of the RTPFB or PSFB @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the media SSRC.</doc>
+          <type name="guint32" c:type="guint32"/>
+        </return-value>
+      </method>
+      <method name="fb_get_sender_ssrc"
+              c:identifier="gst_rtcp_packet_fb_get_sender_ssrc"
+              version="0.10.23">
+        <doc xml:whitespace="preserve">Get the sender SSRC field of the RTPFB or PSFB @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the sender SSRC.</doc>
+          <type name="guint32" c:type="guint32"/>
+        </return-value>
+      </method>
+      <method name="fb_set_fci_length"
+              c:identifier="gst_rtcp_packet_fb_set_fci_length"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">Set the length of the Feedback Control Information attached to a
+RTPFB or PSFB @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if there was enough space in the packet to add this much FCI</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="wordlen" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Length of the FCI in 32-bit words</doc>
+            <type name="guint16" c:type="guint16"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="fb_set_media_ssrc"
+              c:identifier="gst_rtcp_packet_fb_set_media_ssrc"
+              version="0.10.23">
+        <doc xml:whitespace="preserve">Set the media SSRC field of the RTPFB or PSFB @packet.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="ssrc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a media SSRC</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="fb_set_sender_ssrc"
+              c:identifier="gst_rtcp_packet_fb_set_sender_ssrc"
+              version="0.10.23">
+        <doc xml:whitespace="preserve">Set the sender SSRC field of the RTPFB or PSFB @packet.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="ssrc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a sender SSRC</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="fb_set_type"
+              c:identifier="gst_rtcp_packet_fb_set_type"
+              version="0.10.23">
+        <doc xml:whitespace="preserve">Set the feedback message type of the FB @packet.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="type" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GstRTCPFBType to set</doc>
+            <type name="RTCPFBType" c:type="GstRTCPFBType"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_count" c:identifier="gst_rtcp_packet_get_count">
+        <doc xml:whitespace="preserve">Get the count field in @packet.
+valid packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The count field in @packet or -1 if @packet does not point to a</doc>
+          <type name="guint8" c:type="guint8"/>
+        </return-value>
+      </method>
+      <method name="get_length" c:identifier="gst_rtcp_packet_get_length">
+        <doc xml:whitespace="preserve">Get the length field of @packet. This is the length of the packet in 
+32-bit words minus one.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The length field of @packet.</doc>
+          <type name="guint16" c:type="guint16"/>
+        </return-value>
+      </method>
+      <method name="get_padding" c:identifier="gst_rtcp_packet_get_padding">
+        <doc xml:whitespace="preserve">Get the packet padding of the packet pointed to by @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">If the packet has the padding bit set.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="get_rb" c:identifier="gst_rtcp_packet_get_rb">
+        <doc xml:whitespace="preserve">Parse the values of the @nth report block in @packet and store the result in
+the values.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="nth" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the nth report block in @packet</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+          <parameter name="ssrc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result for data source being reported</doc>
+            <type name="guint32" c:type="guint32*"/>
+          </parameter>
+          <parameter name="fractionlost" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result for fraction lost since last SR/RR</doc>
+            <type name="guint8" c:type="guint8*"/>
+          </parameter>
+          <parameter name="packetslost" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result for the cumululative number of packets lost</doc>
+            <type name="gint32" c:type="gint32*"/>
+          </parameter>
+          <parameter name="exthighestseq" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result for the extended last sequence number received</doc>
+            <type name="guint32" c:type="guint32*"/>
+          </parameter>
+          <parameter name="jitter" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result for the interarrival jitter</doc>
+            <type name="guint32" c:type="guint32*"/>
+          </parameter>
+          <parameter name="lsr" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result for the last SR packet from this source</doc>
+            <type name="guint32" c:type="guint32*"/>
+          </parameter>
+          <parameter name="dlsr" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result for the delay since last SR packet</doc>
+            <type name="guint32" c:type="guint32*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_rb_count" c:identifier="gst_rtcp_packet_get_rb_count">
+        <doc xml:whitespace="preserve">Get the number of report blocks in @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The number of report blocks in @packet.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="move_to_next" c:identifier="gst_rtcp_packet_move_to_next">
+        <doc xml:whitespace="preserve">Move the packet pointer @packet to the next packet in the payload.
+Use gst_rtcp_buffer_get_first_packet() to initialize @packet.
+function.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if @packet is pointing to a valid packet after calling this</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="remove" c:identifier="gst_rtcp_packet_remove">
+        <doc xml:whitespace="preserve">Removes the packet pointed to by @packet and moves pointer to the next one
+function.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if @packet is pointing to a valid packet after calling this</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="rr_get_ssrc" c:identifier="gst_rtcp_packet_rr_get_ssrc">
+        <doc xml:whitespace="preserve">Get the ssrc field of the RR @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the ssrc.</doc>
+          <type name="guint32" c:type="guint32"/>
+        </return-value>
+      </method>
+      <method name="rr_set_ssrc" c:identifier="gst_rtcp_packet_rr_set_ssrc">
+        <doc xml:whitespace="preserve">Set the ssrc field of the RR @packet.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="ssrc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the SSRC to set</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="sdes_add_entry"
+              c:identifier="gst_rtcp_packet_sdes_add_entry">
+        <doc xml:whitespace="preserve">Add a new SDES entry to the current item in @packet.
+reached.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the item could be added, %FALSE if the MTU has been</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="type" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GstRTCPSDESType of the SDES entry</doc>
+            <type name="RTCPSDESType" c:type="GstRTCPSDESType"/>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the data length</doc>
+            <type name="guint8" c:type="guint8"/>
+          </parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the data</doc>
+            <type name="guint8" c:type="guint8*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="sdes_add_item"
+              c:identifier="gst_rtcp_packet_sdes_add_item">
+        <doc xml:whitespace="preserve">Add a new SDES item for @ssrc to @packet.
+items has been exceeded for the SDES packet or the MTU has been reached.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the item could be added, %FALSE if the maximum amount of</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="ssrc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the SSRC of the new item to add</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="sdes_copy_entry"
+              c:identifier="gst_rtcp_packet_sdes_copy_entry">
+        <doc xml:whitespace="preserve">This function is like gst_rtcp_packet_sdes_get_entry() but it returns a
+null-terminated copy of the data instead. use g_free() after usage.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if there was valid data.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="type" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result of the entry type</doc>
+            <type name="RTCPSDESType" c:type="GstRTCPSDESType*"/>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result length of the entry data</doc>
+            <type name="guint8" c:type="guint8*"/>
+          </parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result entry data</doc>
+            <type name="guint8" c:type="guint8**"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="sdes_first_entry"
+              c:identifier="gst_rtcp_packet_sdes_first_entry">
+        <doc xml:whitespace="preserve">Move to the first SDES entry in the current item.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if there was a first entry.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="sdes_first_item"
+              c:identifier="gst_rtcp_packet_sdes_first_item">
+        <doc xml:whitespace="preserve">Move to the first SDES item in @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if there was a first item.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="sdes_get_entry"
+              c:identifier="gst_rtcp_packet_sdes_get_entry">
+        <doc xml:whitespace="preserve">Get the data of the current SDES item entry. @type (when not NULL) will
+contain the type of the entry. @data (when not NULL) will point to @len
+bytes.
+When @type refers to a text item, @data will point to a UTF8 string. Note
+that this UTF8 string is NOT null-terminated. Use
+gst_rtcp_packet_sdes_copy_entry() to get a null-termined copy of the entry.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if there was valid data.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="type" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result of the entry type</doc>
+            <type name="RTCPSDESType" c:type="GstRTCPSDESType*"/>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result length of the entry data</doc>
+            <type name="guint8" c:type="guint8*"/>
+          </parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result entry data</doc>
+            <type name="guint8" c:type="guint8**"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="sdes_get_item_count"
+              c:identifier="gst_rtcp_packet_sdes_get_item_count">
+        <doc xml:whitespace="preserve">Get the number of items in the SDES packet @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The number of items in @packet.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="sdes_get_ssrc"
+              c:identifier="gst_rtcp_packet_sdes_get_ssrc">
+        <doc xml:whitespace="preserve">Get the SSRC of the current SDES item.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the SSRC of the current item.</doc>
+          <type name="guint32" c:type="guint32"/>
+        </return-value>
+      </method>
+      <method name="sdes_next_entry"
+              c:identifier="gst_rtcp_packet_sdes_next_entry">
+        <doc xml:whitespace="preserve">Move to the next SDES entry in the current item.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if there was a next entry.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="sdes_next_item"
+              c:identifier="gst_rtcp_packet_sdes_next_item">
+        <doc xml:whitespace="preserve">Move to the next SDES item in @packet.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if there was a next item.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="set_rb" c:identifier="gst_rtcp_packet_set_rb">
+        <doc xml:whitespace="preserve">Set the @nth new report block in @packet with the given values.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="nth" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the nth report block to set</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+          <parameter name="ssrc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">data source being reported</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="fractionlost" transfer-ownership="none">
+            <doc xml:whitespace="preserve">fraction lost since last SR/RR</doc>
+            <type name="guint8" c:type="guint8"/>
+          </parameter>
+          <parameter name="packetslost" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the cumululative number of packets lost</doc>
+            <type name="gint32" c:type="gint32"/>
+          </parameter>
+          <parameter name="exthighestseq" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the extended last sequence number received</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="jitter" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the interarrival jitter</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="lsr" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the last SR packet from this source</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="dlsr" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the delay since last SR packet</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="sr_get_sender_info"
+              c:identifier="gst_rtcp_packet_sr_get_sender_info">
+        <doc xml:whitespace="preserve">Parse the SR sender info and store the values.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="ssrc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result SSRC</doc>
+            <type name="guint32" c:type="guint32*"/>
+          </parameter>
+          <parameter name="ntptime" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result NTP time</doc>
+            <type name="guint64" c:type="guint64*"/>
+          </parameter>
+          <parameter name="rtptime" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result RTP time</doc>
+            <type name="guint32" c:type="guint32*"/>
+          </parameter>
+          <parameter name="packet_count" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result packet count</doc>
+            <type name="guint32" c:type="guint32*"/>
+          </parameter>
+          <parameter name="octet_count" transfer-ownership="none">
+            <doc xml:whitespace="preserve">result octect count</doc>
+            <type name="guint32" c:type="guint32*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="sr_set_sender_info"
+              c:identifier="gst_rtcp_packet_sr_set_sender_info">
+        <doc xml:whitespace="preserve">Set the given values in the SR packet @packet.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="ssrc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the SSRC</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="ntptime" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the NTP time</doc>
+            <type name="guint64" c:type="guint64"/>
+          </parameter>
+          <parameter name="rtptime" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the RTP time</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="packet_count" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the packet count</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+          <parameter name="octet_count" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the octect count</doc>
+            <type name="guint32" c:type="guint32"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <enumeration name="RTCPSDESType" c:type="GstRTCPSDESType">
+      <member name="invalid" value="-1" c:identifier="GST_RTCP_SDES_INVALID"/>
+      <member name="end" value="0" c:identifier="GST_RTCP_SDES_END"/>
+      <member name="cname" value="1" c:identifier="GST_RTCP_SDES_CNAME"/>
+      <member name="name" value="2" c:identifier="GST_RTCP_SDES_NAME"/>
+      <member name="email" value="3" c:identifier="GST_RTCP_SDES_EMAIL"/>
+      <member name="phone" value="4" c:identifier="GST_RTCP_SDES_PHONE"/>
+      <member name="loc" value="5" c:identifier="GST_RTCP_SDES_LOC"/>
+      <member name="tool" value="6" c:identifier="GST_RTCP_SDES_TOOL"/>
+      <member name="note" value="7" c:identifier="GST_RTCP_SDES_NOTE"/>
+      <member name="priv" value="8" c:identifier="GST_RTCP_SDES_PRIV"/>
+    </enumeration>
+    <enumeration name="RTCPType" c:type="GstRTCPType">
+      <member name="invalid" value="0" c:identifier="GST_RTCP_TYPE_INVALID"/>
+      <member name="sr" value="200" c:identifier="GST_RTCP_TYPE_SR"/>
+      <member name="rr" value="201" c:identifier="GST_RTCP_TYPE_RR"/>
+      <member name="sdes" value="202" c:identifier="GST_RTCP_TYPE_SDES"/>
+      <member name="bye" value="203" c:identifier="GST_RTCP_TYPE_BYE"/>
+      <member name="app" value="204" c:identifier="GST_RTCP_TYPE_APP"/>
+      <member name="rtpfb" value="205" c:identifier="GST_RTCP_TYPE_RTPFB"/>
+      <member name="psfb" value="206" c:identifier="GST_RTCP_TYPE_PSFB"/>
+    </enumeration>
+    <constant name="RTCP_MAX_BYE_SSRC_COUNT" value="31">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RTCP_MAX_RB_COUNT" value="31">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RTCP_MAX_SDES" value="255">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RTCP_MAX_SDES_ITEM_COUNT" value="31">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RTCP_VALID_MASK" value="57598">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RTCP_VALID_VALUE" value="0">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RTCP_VERSION" value="2">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <enumeration name="RTPPayload" c:type="GstRTPPayload">
+      <member name="pcmu" value="0" c:identifier="GST_RTP_PAYLOAD_PCMU"/>
+      <member name="1016" value="1" c:identifier="GST_RTP_PAYLOAD_1016"/>
+      <member name="g721" value="2" c:identifier="GST_RTP_PAYLOAD_G721"/>
+      <member name="gsm" value="3" c:identifier="GST_RTP_PAYLOAD_GSM"/>
+      <member name="g723" value="4" c:identifier="GST_RTP_PAYLOAD_G723"/>
+      <member name="dvi4_8000"
+              value="5"
+              c:identifier="GST_RTP_PAYLOAD_DVI4_8000"/>
+      <member name="dvi4_16000"
+              value="6"
+              c:identifier="GST_RTP_PAYLOAD_DVI4_16000"/>
+      <member name="lpc" value="7" c:identifier="GST_RTP_PAYLOAD_LPC"/>
+      <member name="pcma" value="8" c:identifier="GST_RTP_PAYLOAD_PCMA"/>
+      <member name="g722" value="9" c:identifier="GST_RTP_PAYLOAD_G722"/>
+      <member name="l16_stereo"
+              value="10"
+              c:identifier="GST_RTP_PAYLOAD_L16_STEREO"/>
+      <member name="l16_mono"
+              value="11"
+              c:identifier="GST_RTP_PAYLOAD_L16_MONO"/>
+      <member name="qcelp" value="12" c:identifier="GST_RTP_PAYLOAD_QCELP"/>
+      <member name="cn" value="13" c:identifier="GST_RTP_PAYLOAD_CN"/>
+      <member name="mpa" value="14" c:identifier="GST_RTP_PAYLOAD_MPA"/>
+      <member name="g728" value="15" c:identifier="GST_RTP_PAYLOAD_G728"/>
+      <member name="dvi4_11025"
+              value="16"
+              c:identifier="GST_RTP_PAYLOAD_DVI4_11025"/>
+      <member name="dvi4_22050"
+              value="17"
+              c:identifier="GST_RTP_PAYLOAD_DVI4_22050"/>
+      <member name="g729" value="18" c:identifier="GST_RTP_PAYLOAD_G729"/>
+      <member name="cellb" value="25" c:identifier="GST_RTP_PAYLOAD_CELLB"/>
+      <member name="jpeg" value="26" c:identifier="GST_RTP_PAYLOAD_JPEG"/>
+      <member name="nv" value="28" c:identifier="GST_RTP_PAYLOAD_NV"/>
+      <member name="h261" value="31" c:identifier="GST_RTP_PAYLOAD_H261"/>
+      <member name="mpv" value="32" c:identifier="GST_RTP_PAYLOAD_MPV"/>
+      <member name="mp2t" value="33" c:identifier="GST_RTP_PAYLOAD_MP2T"/>
+      <member name="h263" value="34" c:identifier="GST_RTP_PAYLOAD_H263"/>
+    </enumeration>
+    <record name="RTPPayloadInfo" c:type="GstRTPPayloadInfo">
+      <doc xml:whitespace="preserve">Structure holding default payload type information.</doc>
+      <field name="payload_type" writable="1">
+        <type name="guint8" c:type="guint8"/>
+      </field>
+      <field name="media" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="encoding_name" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="clock_rate" writable="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="encoding_parameters" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="bitrate" writable="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+    </record>
+    <constant name="RTP_PAYLOAD_1016_STRING" value="1">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_CELLB_STRING" value="25">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_CN_STRING" value="13">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_DVI4_11025_STRING" value="16">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_DVI4_16000_STRING" value="6">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_DVI4_22050_STRING" value="17">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_DVI4_8000_STRING" value="5">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_DYNAMIC_STRING" value="[96, 127]">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_G721_STRING" value="2">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_G722_STRING" value="9">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_G723_53" value="17">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_G723_53_STRING" value="17">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_G723_63" value="16">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_G723_63_STRING" value="16">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_G723_STRING" value="4">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_G728_STRING" value="15">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_G729_STRING" value="18">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_GSM_STRING" value="3">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_H261_STRING" value="31">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_H263_STRING" value="34">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_JPEG_STRING" value="26">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_L16_MONO_STRING" value="11">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_L16_STEREO_STRING" value="10">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_LPC_STRING" value="7">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_MP2T_STRING" value="33">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_MPA_STRING" value="14">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_MPV_STRING" value="32">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_NV_STRING" value="28">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_PCMA_STRING" value="8">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_PCMU_STRING" value="0">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_QCELP_STRING" value="12">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_TS41" value="19">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_TS41_STRING" value="19">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_TS48" value="18">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RTP_PAYLOAD_TS48_STRING" value="18">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="RTP_VERSION" value="2">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <function name="rtcp_buffer_add_packet"
+              c:identifier="gst_rtcp_buffer_add_packet">
+      <doc xml:whitespace="preserve">Add a new packet of @type to @buffer. @packet will point to the newly created 
+packet.
+if the max mtu is exceeded for the buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the packet could be created. This function returns %FALSE</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a valid RTCP buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstRTCPType of the new packet</doc>
+          <type name="RTCPType" c:type="GstRTCPType"/>
+        </parameter>
+        <parameter name="packet" transfer-ownership="none">
+          <doc xml:whitespace="preserve">pointer to new packet</doc>
+          <type name="RTCPPacket" c:type="GstRTCPPacket*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_buffer_end" c:identifier="gst_rtcp_buffer_end">
+      <doc xml:whitespace="preserve">Finish @buffer after being constructured. This function is usually called
+after gst_rtcp_buffer_new() and after adding the RTCP items to the new buffer. 
+The function adjusts the size of @buffer with the total length of all the
+added packets.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a buffer with an RTCP packet</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_buffer_get_first_packet"
+              c:identifier="gst_rtcp_buffer_get_first_packet">
+      <doc xml:whitespace="preserve">Initialize a new #GstRTCPPacket pointer that points to the first packet in</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if the packet existed in @buffer.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a valid RTCP buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="packet" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstRTCPPacket</doc>
+          <type name="RTCPPacket" c:type="GstRTCPPacket*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_buffer_get_packet_count"
+              c:identifier="gst_rtcp_buffer_get_packet_count">
+      <doc xml:whitespace="preserve">Get the number of RTCP packets in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the number of RTCP packets in @buffer.</doc>
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a valid RTCP buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_buffer_new"
+              c:identifier="gst_rtcp_buffer_new"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Create a new buffer for constructing RTCP packets. The packet will have a
+maximum size of @mtu.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">A newly allocated buffer.</doc>
+        <type name="Gst.Buffer" c:type="GstBuffer*"/>
+      </return-value>
+      <parameters>
+        <parameter name="mtu" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the maximum mtu size.</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_buffer_new_copy_data"
+              c:identifier="gst_rtcp_buffer_new_copy_data"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Create a new buffer and set the data to a copy of @len
+bytes of @data and the size to @len. The data will be freed when the buffer
+is freed.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">A newly allocated buffer with a copy of @data and of size @len.</doc>
+        <type name="Gst.Buffer" c:type="GstBuffer*"/>
+      </return-value>
+      <parameters>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">data for the new buffer</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length of data</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_buffer_new_take_data"
+              c:identifier="gst_rtcp_buffer_new_take_data"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Create a new buffer and set the data and size of the buffer to @data and @len
+respectively. @data will be freed when the buffer is unreffed, so this
+function transfers ownership of @data to the new buffer.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">A newly allocated buffer with @data and of size @len.</doc>
+        <type name="Gst.Buffer" c:type="GstBuffer*"/>
+      </return-value>
+      <parameters>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">data for the new buffer</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length of data</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_buffer_validate"
+              c:identifier="gst_rtcp_buffer_validate">
+      <doc xml:whitespace="preserve">Check if the data pointed to by @buffer is a valid RTCP packet using
+gst_rtcp_buffer_validate_data().</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if @buffer is a valid RTCP packet.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer to validate</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_buffer_validate_data"
+              c:identifier="gst_rtcp_buffer_validate_data">
+      <doc xml:whitespace="preserve">Check if the @data and @size point to the data of a valid RTCP (compound)
+packet. 
+Use this function to validate a packet before using the other functions in
+this module.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if the data points to a valid RTCP packet.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the data to validate</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length of @data to validate</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_ntp_to_unix" c:identifier="gst_rtcp_ntp_to_unix">
+      <doc xml:whitespace="preserve">Converts an NTP time to UNIX nanoseconds. @ntptime can typically be
+the NTP time of an SR RTCP message and contains, in the upper 32 bits, the
+number of seconds since 1900 and, in the lower 32 bits, the fractional
+seconds. The resulting value will be the number of nanoseconds since 1970.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the UNIX time for @ntptime in nanoseconds.</doc>
+        <type name="guint64" c:type="guint64"/>
+      </return-value>
+      <parameters>
+        <parameter name="ntptime" transfer-ownership="none">
+          <doc xml:whitespace="preserve">an NTP timestamp</doc>
+          <type name="guint64" c:type="guint64"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_packet_fb_get_type"
+              c:identifier="gst_rtcp_packet_fb_get_type"
+              version="0.10.23">
+      <doc xml:whitespace="preserve">Get the feedback message type of the FB @packet.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The feedback message type.</doc>
+        <type name="RTCPFBType" c:type="GstRTCPFBType"/>
+      </return-value>
+      <parameters>
+        <parameter name="packet" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a valid RTPFB or PSFB #GstRTCPPacket</doc>
+          <type name="RTCPPacket" c:type="GstRTCPPacket*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_packet_get_type"
+              c:identifier="gst_rtcp_packet_get_type">
+      <doc xml:whitespace="preserve">Get the packet type of the packet pointed to by @packet.
+pointing to a valid packet.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The packet type or GST_RTCP_TYPE_INVALID when @packet is not</doc>
+        <type name="RTCPType" c:type="GstRTCPType"/>
+      </return-value>
+      <parameters>
+        <parameter name="packet" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a valid #GstRTCPPacket</doc>
+          <type name="RTCPPacket" c:type="GstRTCPPacket*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_sdes_name_to_type"
+              c:identifier="gst_rtcp_sdes_name_to_type"
+              version="0.10.26">
+      <doc xml:whitespace="preserve">Convert @name into a @GstRTCPSDESType. @name is typically a key in a
+#GstStructure containing SDES items.
+is a private sdes item.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the #GstRTCPSDESType for @name or #GST_RTCP_SDES_PRIV when @name</doc>
+        <type name="RTCPSDESType" c:type="GstRTCPSDESType"/>
+      </return-value>
+      <parameters>
+        <parameter name="name" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a SDES name</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_sdes_type_to_name"
+              c:identifier="gst_rtcp_sdes_type_to_name"
+              version="0.10.26">
+      <doc xml:whitespace="preserve">Converts @type to the string equivalent. The string is typically used as a
+key in a #GstStructure containing SDES items.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the string equivalent of @type</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstRTCPSDESType</doc>
+          <type name="RTCPSDESType" c:type="GstRTCPSDESType"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtcp_unix_to_ntp" c:identifier="gst_rtcp_unix_to_ntp">
+      <doc xml:whitespace="preserve">Converts a UNIX timestamp in nanoseconds to an NTP time. The caller should
+pass a value with nanoseconds since 1970. The NTP time will, in the upper
+32 bits, contain the number of seconds since 1900 and, in the lower 32
+bits, the fractional seconds. The resulting value can be used as an ntptime
+for constructing SR RTCP packets.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the NTP time for @unixtime.</doc>
+        <type name="guint64" c:type="guint64"/>
+      </return-value>
+      <parameters>
+        <parameter name="unixtime" transfer-ownership="none">
+          <doc xml:whitespace="preserve">an UNIX timestamp in nanoseconds</doc>
+          <type name="guint64" c:type="guint64"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_add_extension_onebyte_header"
+              c:identifier="gst_rtp_buffer_add_extension_onebyte_header"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Adds a RFC 5285 header extension with a one byte header to the end of the
+RTP header. If there is already a RFC 5285 header extension with a one byte
+header, the new extension will be appended.
+It will not work if there is already a header extension that does not follow
+the mecanism described in RFC 5285 or if there is a header extension with
+a two bytes header as described in RFC 5285. In that case, use
+gst_rtp_buffer_add_extension_twobytes_header()</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if header extension could be added</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="id" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The ID of the header extension (between 1 and 14).</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">location for data</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+        <parameter name="size" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the size of the data in bytes</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_add_extension_twobytes_header"
+              c:identifier="gst_rtp_buffer_add_extension_twobytes_header"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Adds a RFC 5285 header extension with a two bytes header to the end of the
+RTP header. If there is already a RFC 5285 header extension with a two bytes
+header, the new extension will be appended.
+It will not work if there is already a header extension that does not follow
+the mecanism described in RFC 5285 or if there is a header extension with
+a one byte header as described in RFC 5285. In that case, use
+gst_rtp_buffer_add_extension_onebyte_header()</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if header extension could be added</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="appbits" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Application specific bits</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="id" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The ID of the header extension</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">location for data</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+        <parameter name="size" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the size of the data in bytes</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_allocate_data"
+              c:identifier="gst_rtp_buffer_allocate_data">
+      <doc xml:whitespace="preserve">Allocate enough data in @buffer to hold an RTP packet with @csrc_count CSRCs,
+a payload length of @payload_len and padding of @pad_len.
+MALLOCDATA of @buffer will be overwritten and will not be freed. 
+All other RTP header fields will be set to 0/FALSE.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstBuffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="payload_len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length of the payload</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="pad_len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the amount of padding</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="csrc_count" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of CSRC entries</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_calc_header_len"
+              c:identifier="gst_rtp_buffer_calc_header_len">
+      <doc xml:whitespace="preserve">Calculate the header length of an RTP packet with @csrc_count CSRC entries.
+An RTP packet can have at most 15 CSRC entries.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The length of an RTP header with @csrc_count CSRC entries.</doc>
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="csrc_count" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of CSRC entries</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_calc_packet_len"
+              c:identifier="gst_rtp_buffer_calc_packet_len">
+      <doc xml:whitespace="preserve">Calculate the total length of an RTP packet with a payload size of @payload_len,
+a padding of @pad_len and a @csrc_count CSRC entries.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The total length of an RTP header with given parameters.</doc>
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="payload_len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length of the payload</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="pad_len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the amount of padding</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="csrc_count" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of CSRC entries</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_calc_payload_len"
+              c:identifier="gst_rtp_buffer_calc_payload_len">
+      <doc xml:whitespace="preserve">Calculate the length of the payload of an RTP packet with size @packet_len,
+a padding of @pad_len and a @csrc_count CSRC entries.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The length of the payload of an RTP packet  with given parameters.</doc>
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="packet_len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length of the total RTP packet</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="pad_len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the amount of padding</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="csrc_count" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of CSRC entries</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_compare_seqnum"
+              c:identifier="gst_rtp_buffer_compare_seqnum"
+              version="0.10.15">
+      <doc xml:whitespace="preserve">Compare two sequence numbers, taking care of wraparounds. This function
+returns the difference between @seqnum1 and @seqnum2.
+are equal or a positive value if @seqnum1 is smaller than @segnum2.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">a negative value if @seqnum1 is bigger than @seqnum2, 0 if they</doc>
+        <type name="gint" c:type="gint"/>
+      </return-value>
+      <parameters>
+        <parameter name="seqnum1" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a sequence number</doc>
+          <type name="guint16" c:type="guint16"/>
+        </parameter>
+        <parameter name="seqnum2" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a sequence number</doc>
+          <type name="guint16" c:type="guint16"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_default_clock_rate"
+              c:identifier="gst_rtp_buffer_default_clock_rate"
+              version="0.10.13">
+      <doc xml:whitespace="preserve">Get the default clock-rate for the static payload type @payload_type.
+the clock-rate is undefined.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the default clock rate or -1 if the payload type is not static or</doc>
+        <type name="guint32" c:type="guint32"/>
+      </return-value>
+      <parameters>
+        <parameter name="payload_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the static payload type</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_ext_timestamp"
+              c:identifier="gst_rtp_buffer_ext_timestamp"
+              version="0.10.15">
+      <doc xml:whitespace="preserve">Update the @exttimestamp field with @timestamp. For the first call of the
+method, @exttimestamp should point to a location with a value of -1.
+This function makes sure that the returned value is a constantly increasing
+value even in the case where there is a timestamp wraparound.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The extended timestamp of @timestamp.</doc>
+        <type name="guint64" c:type="guint64"/>
+      </return-value>
+      <parameters>
+        <parameter name="exttimestamp" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a previous extended timestamp</doc>
+          <type name="guint64" c:type="guint64*"/>
+        </parameter>
+        <parameter name="timestamp" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a new timestamp</doc>
+          <type name="guint32" c:type="guint32"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_csrc"
+              c:identifier="gst_rtp_buffer_get_csrc">
+      <doc xml:whitespace="preserve">Get the CSRC at index @idx in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the CSRC at index @idx in host order.</doc>
+        <type name="guint32" c:type="guint32"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="idx" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the index of the CSRC to get</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_csrc_count"
+              c:identifier="gst_rtp_buffer_get_csrc_count">
+      <doc xml:whitespace="preserve">Get the CSRC count of the RTP packet in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the CSRC count of @buffer.</doc>
+        <type name="guint8" c:type="guint8"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_extension"
+              c:identifier="gst_rtp_buffer_get_extension">
+      <doc xml:whitespace="preserve">Check if the extension bit is set on the RTP packet in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if @buffer has the extension bit set.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_extension_data"
+              c:identifier="gst_rtp_buffer_get_extension_data"
+              version="0.10.15">
+      <doc xml:whitespace="preserve">Get the extension data. @bits will contain the extension 16 bits of custom
+data. @data will point to the data in the extension and @wordlen will contain
+the length of @data in 32 bits words.
+If @buffer did not contain an extension, this function will return %FALSE
+with @bits, @data and @wordlen unchanged.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if @buffer had the extension bit set.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="bits" transfer-ownership="none">
+          <doc xml:whitespace="preserve">location for result bits</doc>
+          <type name="guint16" c:type="guint16*"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">location for data</doc>
+          <type name="gpointer" c:type="gpointer*"/>
+        </parameter>
+        <parameter name="wordlen" transfer-ownership="none">
+          <doc xml:whitespace="preserve">location for length of @data in 32 bits words</doc>
+          <type name="guint" c:type="guint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_extension_onebyte_header"
+              c:identifier="gst_rtp_buffer_get_extension_onebyte_header"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Parses RFC 5285 style header extensions with a one byte header. It will
+return the nth extension with the requested id.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if @buffer had the requested header extension</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="id" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The ID of the header extension to be read (between 1 and 14).</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="nth" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Read the nth extension packet with the requested ID</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">location for data</doc>
+          <type name="gpointer" c:type="gpointer*"/>
+        </parameter>
+        <parameter name="size" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the size of the data in bytes</doc>
+          <type name="guint" c:type="guint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_extension_twobytes_header"
+              c:identifier="gst_rtp_buffer_get_extension_twobytes_header"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Parses RFC 5285 style header extensions with a two bytes header. It will
+return the nth extension with the requested id.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if @buffer had the requested header extension</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="appbits" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Application specific bits</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="id" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The ID of the header extension to be read (between 1 and 14).</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="nth" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Read the nth extension packet with the requested ID</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">location for data</doc>
+          <type name="gpointer" c:type="gpointer*"/>
+        </parameter>
+        <parameter name="size" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the size of the data in bytes</doc>
+          <type name="guint" c:type="guint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_header_len"
+              c:identifier="gst_rtp_buffer_get_header_len">
+      <doc xml:whitespace="preserve">Return the total length of the header in @buffer. This include the length of
+the fixed header, the CSRC list and the extension header.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The total length of the header in @buffer.</doc>
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_marker"
+              c:identifier="gst_rtp_buffer_get_marker">
+      <doc xml:whitespace="preserve">Check if the marker bit is set on the RTP packet in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if @buffer has the marker bit set.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_packet_len"
+              c:identifier="gst_rtp_buffer_get_packet_len">
+      <doc xml:whitespace="preserve">Return the total length of the packet in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The total length of the packet in @buffer.</doc>
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_padding"
+              c:identifier="gst_rtp_buffer_get_padding">
+      <doc xml:whitespace="preserve">Check if the padding bit is set on the RTP packet in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if @buffer has the padding bit set.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_payload"
+              c:identifier="gst_rtp_buffer_get_payload"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Get a pointer to the payload data in @buffer. This pointer is valid as long
+as a reference to @buffer is held.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">A pointer to the payload data in @buffer.</doc>
+        <type name="gpointer" c:type="gpointer"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_payload_buffer"
+              c:identifier="gst_rtp_buffer_get_payload_buffer"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Create a buffer of the payload of the RTP packet in @buffer. This function
+will internally create a subbuffer of @buffer so that a memcpy can be
+avoided.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">A new buffer with the data of the payload.</doc>
+        <type name="Gst.Buffer" c:type="GstBuffer*"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_payload_len"
+              c:identifier="gst_rtp_buffer_get_payload_len">
+      <doc xml:whitespace="preserve">Get the length of the payload of the RTP packet in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The length of the payload in @buffer.</doc>
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_payload_subbuffer"
+              c:identifier="gst_rtp_buffer_get_payload_subbuffer"
+              version="0.10.10"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Create a subbuffer of the payload of the RTP packet in @buffer. @offset bytes
+are skipped in the payload and the subbuffer will be of size @len.
+If @len is -1 the total payload starting from @offset if subbuffered.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">A new buffer with the specified data of the payload.</doc>
+        <type name="Gst.Buffer" c:type="GstBuffer*"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="offset" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the offset in the payload</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length in the payload</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_payload_type"
+              c:identifier="gst_rtp_buffer_get_payload_type">
+      <doc xml:whitespace="preserve">Get the payload type of the RTP packet in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The payload type.</doc>
+        <type name="guint8" c:type="guint8"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_seq" c:identifier="gst_rtp_buffer_get_seq">
+      <doc xml:whitespace="preserve">Get the sequence number of the RTP packet in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The sequence number in host order.</doc>
+        <type name="guint16" c:type="guint16"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_ssrc"
+              c:identifier="gst_rtp_buffer_get_ssrc">
+      <doc xml:whitespace="preserve">Get the SSRC of the RTP packet in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the SSRC of @buffer in host order.</doc>
+        <type name="guint32" c:type="guint32"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_timestamp"
+              c:identifier="gst_rtp_buffer_get_timestamp">
+      <doc xml:whitespace="preserve">Get the timestamp of the RTP packet in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The timestamp in host order.</doc>
+        <type name="guint32" c:type="guint32"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_get_version"
+              c:identifier="gst_rtp_buffer_get_version">
+      <doc xml:whitespace="preserve">Get the version number of the RTP packet in @buffer.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The version of @buffer.</doc>
+        <type name="guint8" c:type="guint8"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_add_extension_onebyte_header"
+              c:identifier="gst_rtp_buffer_list_add_extension_onebyte_header"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Adds a RFC 5285 header extension with a one byte header to the end of the
+RTP header. If there is already a RFC 5285 header extension with a one byte
+header, the new extension will be appended.
+It will not work if there is already a header extension that does not follow
+the mecanism described in RFC 5285 or if there is a header extension with
+a two bytes header as described in RFC 5285. In that case, use
+gst_rtp_buffer_list_add_extension_twobytes_header()
+This function will not modify the data section of the RTP buffer, only
+the header.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if header extension could be added</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="it" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstBufferListIterator pointing right after the #GstBuffer where the header extension should be added</doc>
+          <type name="Gst.BufferListIterator" c:type="GstBufferListIterator*"/>
+        </parameter>
+        <parameter name="id" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The ID of the header extension (between 1 and 14).</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">location for data</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+        <parameter name="size" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the size of the data in bytes</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_add_extension_twobytes_header"
+              c:identifier="gst_rtp_buffer_list_add_extension_twobytes_header"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Adds a RFC 5285 header extension with a two bytes header to the end of the
+RTP header. If there is already a RFC 5285 header extension with a two bytes
+header, the new extension will be appended.
+It will not work if there is already a header extension that does not follow
+the mecanism described in RFC 5285 or if there is a header extension with
+a one byte header as described in RFC 5285. In that case, use
+gst_rtp_buffer_add_extension_onebyte_header()
+This function will not modify the data section of the RTP buffer, only
+the header.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if header extension could be added</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="it" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstBufferListIterator pointing right after the #GstBuffer where the header extension should be added</doc>
+          <type name="Gst.BufferListIterator" c:type="GstBufferListIterator*"/>
+        </parameter>
+        <parameter name="appbits" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Application specific bits</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="id" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The ID of the header extension</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">location for data</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+        <parameter name="size" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the size of the data in bytes</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_from_buffer"
+              c:identifier="gst_rtp_buffer_list_from_buffer"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Splits a #GstBuffer into a #GstBufferList containing separate
+buffers for the header and data sections.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">a #GstBufferList</doc>
+        <type name="Gst.BufferList" c:type="GstBufferList*"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstBuffer containing a RTP packet</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_get_extension_onebyte_header"
+              c:identifier="gst_rtp_buffer_list_get_extension_onebyte_header"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Parses RFC 5285 style header extensions with a one byte header. It will
+return the nth extension with the requested id.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if @buffer had the requested header extension</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="bufferlist" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the bufferlist</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+        <parameter name="group_idx" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The index of the group in the #GstBufferList</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="id" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The ID of the header extension to be read (between 1 and 14).</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="nth" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Read the nth extension packet with the requested ID</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">location for data</doc>
+          <type name="gpointer" c:type="gpointer*"/>
+        </parameter>
+        <parameter name="size" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the size of the data in bytes</doc>
+          <type name="guint" c:type="guint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_get_extension_twobytes_header"
+              c:identifier="gst_rtp_buffer_list_get_extension_twobytes_header"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Parses RFC 5285 style header extensions with a two bytes header. It will
+return the nth extension with the requested id.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if @buffer had the requested header extension</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="bufferlist" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the bufferlist</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+        <parameter name="group_idx" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The index of the group in the #GstBufferList</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="appbits" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Application specific bits</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="id" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The ID of the header extension to be read (between 1 and 14).</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="nth" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Read the nth extension packet with the requested ID</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">location for data</doc>
+          <type name="gpointer" c:type="gpointer*"/>
+        </parameter>
+        <parameter name="size" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the size of the data in bytes</doc>
+          <type name="guint" c:type="guint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_get_payload_len"
+              c:identifier="gst_rtp_buffer_list_get_payload_len"
+              version="0.10.24">
+      <doc xml:whitespace="preserve">Get the length of the payload of the RTP packet in @list.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The length of the payload in @list.</doc>
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="list" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer list</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_get_payload_type"
+              c:identifier="gst_rtp_buffer_list_get_payload_type"
+              version="0.10.24">
+      <doc xml:whitespace="preserve">Get the payload type of the first RTP packet in @list.
+All packets in @list should have the same payload type.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The payload type.</doc>
+        <type name="guint8" c:type="guint8"/>
+      </return-value>
+      <parameters>
+        <parameter name="list" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer list</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_get_seq"
+              c:identifier="gst_rtp_buffer_list_get_seq"
+              version="0.10.24">
+      <doc xml:whitespace="preserve">Get the sequence number of the first RTP packet in @list.
+All packets within @list have the same sequence number.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The seq number</doc>
+        <type name="guint16" c:type="guint16"/>
+      </return-value>
+      <parameters>
+        <parameter name="list" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer list</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_get_ssrc"
+              c:identifier="gst_rtp_buffer_list_get_ssrc"
+              version="0.10.24">
+      <doc xml:whitespace="preserve">Get the SSRC of the first RTP packet in @list.
+All RTP packets within @list have the same SSRC.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the SSRC of @list in host order.</doc>
+        <type name="guint32" c:type="guint32"/>
+      </return-value>
+      <parameters>
+        <parameter name="list" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer list</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_get_timestamp"
+              c:identifier="gst_rtp_buffer_list_get_timestamp"
+              version="0.10.24">
+      <doc xml:whitespace="preserve">Get the timestamp of the first RTP packet in @list.
+All packets within @list have the same timestamp.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The timestamp in host order.</doc>
+        <type name="guint32" c:type="guint32"/>
+      </return-value>
+      <parameters>
+        <parameter name="list" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer list</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_set_payload_type"
+              c:identifier="gst_rtp_buffer_list_set_payload_type"
+              version="0.10.24">
+      <doc xml:whitespace="preserve">Set the payload type of each RTP packet in @list to @payload_type.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="list" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer list</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+        <parameter name="payload_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new type</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_set_seq"
+              c:identifier="gst_rtp_buffer_list_set_seq"
+              version="0.10.24">
+      <doc xml:whitespace="preserve">Set the sequence number of each RTP packet in @list to @seq.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The seq number of the last packet in the list + 1.</doc>
+        <type name="guint16" c:type="guint16"/>
+      </return-value>
+      <parameters>
+        <parameter name="list" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer list</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+        <parameter name="seq" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new sequence number</doc>
+          <type name="guint16" c:type="guint16"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_set_ssrc"
+              c:identifier="gst_rtp_buffer_list_set_ssrc"
+              version="0.10.24">
+      <doc xml:whitespace="preserve">Set the SSRC on each RTP packet in @list to @ssrc.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="list" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer list</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+        <parameter name="ssrc" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new SSRC</doc>
+          <type name="guint32" c:type="guint32"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_set_timestamp"
+              c:identifier="gst_rtp_buffer_list_set_timestamp"
+              version="0.10.24">
+      <doc xml:whitespace="preserve">Set the timestamp of each RTP packet in @list to @timestamp.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="list" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer list</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+        <parameter name="timestamp" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new timestamp</doc>
+          <type name="guint32" c:type="guint32"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_list_validate"
+              c:identifier="gst_rtp_buffer_list_validate"
+              version="0.10.24">
+      <doc xml:whitespace="preserve">Check if all RTP packets in the @list are valid using validate_data().
+Use this function to validate an list before using the other functions in
+this module.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if @list consists only of valid RTP packets.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="list" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer list to validate</doc>
+          <type name="Gst.BufferList" c:type="GstBufferList*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_new_allocate"
+              c:identifier="gst_rtp_buffer_new_allocate"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Allocate a new #GstBuffer with enough data to hold an RTP packet with
+All other RTP header fields will be set to 0/FALSE.
+parameters.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">A newly allocated buffer that can hold an RTP packet with given</doc>
+        <type name="Gst.Buffer" c:type="GstBuffer*"/>
+      </return-value>
+      <parameters>
+        <parameter name="payload_len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length of the payload</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="pad_len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the amount of padding</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="csrc_count" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of CSRC entries</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_new_allocate_len"
+              c:identifier="gst_rtp_buffer_new_allocate_len"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Create a new #GstBuffer that can hold an RTP packet that is exactly
+All RTP header fields will be set to 0/FALSE.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">A newly allocated buffer that can hold an RTP packet of @packet_len.</doc>
+        <type name="Gst.Buffer" c:type="GstBuffer*"/>
+      </return-value>
+      <parameters>
+        <parameter name="packet_len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the total length of the packet</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="pad_len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the amount of padding</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="csrc_count" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of CSRC entries</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_new_copy_data"
+              c:identifier="gst_rtp_buffer_new_copy_data"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Create a new buffer and set the data to a copy of @len
+bytes of @data and the size to @len. The data will be freed when the buffer
+is freed.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">A newly allocated buffer with a copy of @data and of size @len.</doc>
+        <type name="Gst.Buffer" c:type="GstBuffer*"/>
+      </return-value>
+      <parameters>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">data for the new buffer</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length of data</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_new_take_data"
+              c:identifier="gst_rtp_buffer_new_take_data"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Create a new buffer and set the data and size of the buffer to @data and @len
+respectively. @data will be freed when the buffer is unreffed, so this
+function transfers ownership of @data to the new buffer.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">A newly allocated buffer with @data and of size @len.</doc>
+        <type name="Gst.Buffer" c:type="GstBuffer*"/>
+      </return-value>
+      <parameters>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">data for the new buffer</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length of data</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_pad_to" c:identifier="gst_rtp_buffer_pad_to">
+      <doc xml:whitespace="preserve">Set the amount of padding in the RTP packet in @buffer to</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new amount of padding</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_set_csrc"
+              c:identifier="gst_rtp_buffer_set_csrc">
+      <doc xml:whitespace="preserve">Modify the CSRC at index @idx in @buffer to @csrc.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="idx" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the CSRC index to set</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="csrc" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the CSRC in host order to set at @idx</doc>
+          <type name="guint32" c:type="guint32"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_set_extension"
+              c:identifier="gst_rtp_buffer_set_extension">
+      <doc xml:whitespace="preserve">Set the extension bit on the RTP packet in @buffer to @extension.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="extension" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new extension</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_set_extension_data"
+              c:identifier="gst_rtp_buffer_set_extension_data"
+              version="0.10.18">
+      <doc xml:whitespace="preserve">Set the extension bit of the rtp buffer and fill in the @bits and @length of the
+extension header. It will refuse to set the extension data if the buffer is not
+large enough.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">True if done.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="bits" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the bits specific for the extension</doc>
+          <type name="guint16" c:type="guint16"/>
+        </parameter>
+        <parameter name="length" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length that counts the number of 32-bit words in the extension, excluding the extension header ( therefore zero is a valid length)</doc>
+          <type name="guint16" c:type="guint16"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_set_marker"
+              c:identifier="gst_rtp_buffer_set_marker">
+      <doc xml:whitespace="preserve">Set the marker bit on the RTP packet in @buffer to @marker.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="marker" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new marker</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_set_packet_len"
+              c:identifier="gst_rtp_buffer_set_packet_len">
+      <doc xml:whitespace="preserve">Set the total @buffer size to @len. The data in the buffer will be made
+larger if needed. Any padding will be removed from the packet.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new packet length</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_set_padding"
+              c:identifier="gst_rtp_buffer_set_padding">
+      <doc xml:whitespace="preserve">Set the padding bit on the RTP packet in @buffer to @padding.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="padding" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new padding</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_set_payload_type"
+              c:identifier="gst_rtp_buffer_set_payload_type">
+      <doc xml:whitespace="preserve">Set the payload type of the RTP packet in @buffer to @payload_type.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="payload_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new type</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_set_seq" c:identifier="gst_rtp_buffer_set_seq">
+      <doc xml:whitespace="preserve">Set the sequence number of the RTP packet in @buffer to @seq.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="seq" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new sequence number</doc>
+          <type name="guint16" c:type="guint16"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_set_ssrc"
+              c:identifier="gst_rtp_buffer_set_ssrc">
+      <doc xml:whitespace="preserve">Set the SSRC on the RTP packet in @buffer to @ssrc.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="ssrc" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new SSRC</doc>
+          <type name="guint32" c:type="guint32"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_set_timestamp"
+              c:identifier="gst_rtp_buffer_set_timestamp">
+      <doc xml:whitespace="preserve">Set the timestamp of the RTP packet in @buffer to @timestamp.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="timestamp" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new timestamp</doc>
+          <type name="guint32" c:type="guint32"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_set_version"
+              c:identifier="gst_rtp_buffer_set_version">
+      <doc xml:whitespace="preserve">Set the version of the RTP packet in @buffer to @version.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="version" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new version</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_validate"
+              c:identifier="gst_rtp_buffer_validate">
+      <doc xml:whitespace="preserve">Check if the data pointed to by @buffer is a valid RTP packet using
+validate_data().
+Use this function to validate a packet before using the other functions in
+this module.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if @buffer is a valid RTP packet.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the buffer to validate</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_buffer_validate_data"
+              c:identifier="gst_rtp_buffer_validate_data">
+      <doc xml:whitespace="preserve">Check if the @data and @size point to the data of a valid RTP packet.
+This function checks the length, version and padding of the packet data.
+Use this function to validate a packet before using the other functions in
+this module.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if the data points to a valid RTP packet.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the data to validate</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length of @data to validate</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_payload_info_for_name"
+              c:identifier="gst_rtp_payload_info_for_name">
+      <doc xml:whitespace="preserve">Get the #GstRTPPayloadInfo for @media and @encoding_name. This function is
+mostly used to get the default clock-rate and bandwidth for dynamic payload
+types specified with @media and @encoding name.
+The search for @encoding_name will be performed in a case insensitve way.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">a #GstRTPPayloadInfo or NULL when no info could be found.</doc>
+        <type name="RTPPayloadInfo" c:type="GstRTPPayloadInfo*"/>
+      </return-value>
+      <parameters>
+        <parameter name="media" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the media to find</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="encoding_name" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the encoding name to find</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="rtp_payload_info_for_pt"
+              c:identifier="gst_rtp_payload_info_for_pt">
+      <doc xml:whitespace="preserve">Get the #GstRTPPayloadInfo for @payload_type. This function is
+mostly used to get the default clock-rate and bandwidth for static payload
+types specified with @payload_type.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">a #GstRTPPayloadInfo or NULL when no info could be found.</doc>
+        <type name="RTPPayloadInfo" c:type="GstRTPPayloadInfo*"/>
+      </return-value>
+      <parameters>
+        <parameter name="payload_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the payload_type to find</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>
