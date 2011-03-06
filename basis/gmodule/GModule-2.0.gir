@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <package name="gmodule-2.0"/>
+  <c:include name="gmodule.h"/>
+  <namespace name="GModule"
+             version="2.0"
+             shared-library="libgmodule-2.0.so.0"
+             c:identifier-prefixes="G"
+             c:symbol-prefixes="g">
+    <record name="Module" c:type="GModule" disguised="1">
+      <method name="close" c:identifier="g_module_close">
+        <return-value transfer-ownership="none">
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="make_resident" c:identifier="g_module_make_resident">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="name" c:identifier="g_module_name">
+        <return-value transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="symbol" c:identifier="g_module_symbol">
+        <return-value transfer-ownership="none">
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="symbol_name" transfer-ownership="none">
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="symbol" transfer-ownership="none">
+            <type name="gpointer" c:type="gpointer*"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <callback name="ModuleCheckInit" c:type="GModuleCheckInit">
+      <return-value transfer-ownership="none">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="module" transfer-ownership="none">
+          <type name="Module" c:type="GModule*"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <bitfield name="ModuleFlags" c:type="GModuleFlags">
+      <member name="lazy" value="1" c:identifier="G_MODULE_BIND_LAZY"/>
+      <member name="local" value="2" c:identifier="G_MODULE_BIND_LOCAL"/>
+      <member name="mask" value="3" c:identifier="G_MODULE_BIND_MASK"/>
+    </bitfield>
+    <callback name="ModuleUnload" c:type="GModuleUnload">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="module" transfer-ownership="none">
+          <type name="Module" c:type="GModule*"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <function name="module_build_path" c:identifier="g_module_build_path">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="directory" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="module_name" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="module_error" c:identifier="g_module_error">
+      <return-value transfer-ownership="none">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+    </function>
+    <function name="module_open"
+              c:identifier="g_module_open"
+              introspectable="0">
+      <return-value>
+        <type name="Module" c:type="GModule*"/>
+      </return-value>
+      <parameters>
+        <parameter name="file_name" transfer-ownership="none">
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="flags" transfer-ownership="none">
+          <type name="ModuleFlags" c:type="GModuleFlags"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="module_supported" c:identifier="g_module_supported">
+      <return-value transfer-ownership="none">
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+    </function>
+  </namespace>
+</repository>
