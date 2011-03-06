@@ -140,13 +140,13 @@ os macosx? [
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>Factor</foo>" ]
 [ deploy-test-command ascii [ readln ] with-process-reader ] unit-test
 
-[ ] [ 800000 small-enough? ] unit-test
+[ ] [ 850000 small-enough? ] unit-test
 
 [ ] [ "tools.deploy.test.21" shake-and-bake ] unit-test
 
 [ "1 2 3" ]
 [ deploy-test-command ascii [ readln ] with-process-reader ] unit-test
 
-[ ] [ 600000 small-enough? ] unit-test
+[ ] [ 800000 small-enough? ] unit-test
 
 [ ] [ "benchmark.ui-panes" shake-and-bake run-temp-image ] unit-test

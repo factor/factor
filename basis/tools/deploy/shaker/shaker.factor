@@ -93,6 +93,13 @@ IN: tools.deploy.shaker
         run-file
     ] when ;
 
+: strip-gobject ( -- )
+    "gobject-introspection.types" vocab [
+        "Stripping GObject type info" show
+        "vocab:tools/deploy/shaker/strip-gobject.factor"
+        run-file
+    ] when ;
+
 : strip-specialized-arrays ( -- )
     strip-dictionary? "specialized-arrays" vocab and [
         "Stripping specialized arrays" show
@@ -534,6 +541,7 @@ SYMBOL: deploy-vocab
     strip-destructors
     strip-call
     strip-cocoa
+    strip-gobject
     strip-debugger
     strip-ui-error-hook
     strip-specialized-arrays
