@@ -5,8 +5,8 @@ combinators combinators.smart definitions definitions.icons effects
 fry generic hashtables help.stylesheet help.topics io io.styles
 kernel make math namespaces parser present prettyprint
 prettyprint.stylesheet quotations see sequences sets slots
-sorting splitting strings vectors vocabs vocabs.loader words
-words.symbol ;
+sorting splitting strings urls vectors vocabs vocabs.loader
+words words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
 FROM: namespaces => set ;
 IN: help.markup
@@ -76,9 +76,9 @@ ALIAS: $slot $snippet
     [ strong-style get print-element* ] ($span) ;
 
 : $url ( children -- )
-    [
-        dup first href associate url-style get assoc-union
-        print-element*
+    first dup >url [
+        dup present href associate url-style get assoc-union
+        [ write-object ] with-style
     ] ($span) ;
 
 : $nl ( children -- )
