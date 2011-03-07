@@ -126,7 +126,7 @@ M: sqlite-statement query-results ( query -- result-set )
     dup handle>> sqlite-result-set new-result-set
     dup advance-row ;
 
-M: sqlite-db-connection <insert-db-assigned-statement> ( tuple -- statement )
+M: sqlite-db-connection <insert-db-assigned-statement> ( class -- statement )
     [
         "insert into " 0% 0%
         "(" 0%
@@ -147,7 +147,7 @@ M: sqlite-db-connection <insert-db-assigned-statement> ( tuple -- statement )
         ");" 0%
     ] query-make ;
 
-M: sqlite-db-connection <insert-user-assigned-statement> ( tuple -- statement )
+M: sqlite-db-connection <insert-user-assigned-statement> ( class -- statement )
     <insert-db-assigned-statement> ;
 
 M: sqlite-db-connection bind# ( spec obj -- )
