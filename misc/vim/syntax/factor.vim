@@ -90,6 +90,7 @@ syn match   factorQualified     /\<QUALIFIED:\s\+\S\+\>/
 syn match   factorQualifiedWith /\<QUALIFIED-WITH:\s\+\S\+\s\+\S\+\>/
 syn region  factorExclude       start=/\<EXCLUDE:\>/     end=/;/
 syn region  factorFrom          start=/\<FROM:\>/        end=/;/
+syn region  factorRename        start=/\<RENAME:\>/      end=/;/
 syn region  factorSingletons    start=/\<SINGLETONS:\>/  end=/;/
 syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
 syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
@@ -227,6 +228,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorQualifiedWith          Include
     HiLink factorExclude                Include
     HiLink factorFrom                   Include
+    HiLink factorRename                 Include
     HiLink factorUse                    Include
     HiLink factorUnuse                  Include
     HiLink factorIn                     Define
