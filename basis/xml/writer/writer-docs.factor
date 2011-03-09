@@ -30,17 +30,17 @@ HELP: xml>string
 
 HELP: pprint-xml>string
 { $values { "xml" "an XML document" } { "string" "a string" } }
-{ $description "converts an XML document into a string in a prettyprinted form." }
+{ $description "Converts an XML document into a string in a prettyprinted form." }
 { $notes "This does not preserve what type of quotes were used or what data was omitted from version declaration, as that information isn't present in the XML data representation. The whitespace in the text nodes of the original document is preserved." } ;
 
 HELP: write-xml
 { $values { "xml" "an XML document" } }
-{ $description "prints the contents of an XML document to " { $link output-stream } "." }
+{ $description "Prints the contents of an XML document to " { $link output-stream } "." }
 { $notes "This does not preserve what type of quotes were used or what data was omitted from version declaration, as that information isn't present in the XML data representation. The whitespace in the text nodes of the original document is preserved." } ;
 
 HELP: pprint-xml
 { $values { "xml" "an XML document" } }
-{ $description "prints the contents of an XML document to " { $link output-stream } " in a prettyprinted form." }
+{ $description "Prints the contents of an XML document to " { $link output-stream } " in a prettyprinted form." }
 { $notes "This does not preserve what type of quotes were used or what data was omitted from version declaration, as that information isn't present in the XML data representation. Whitespace is also not preserved." } ;
 
 { xml>string write-xml pprint-xml pprint-xml>string } related-words
