@@ -1,8 +1,8 @@
 
 " Vim syntax file
-" Language: factor
+" Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2009 May 19
+" Last Change: 2011 Mar 09
 " To run: USE: html.templates.fhtml "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
