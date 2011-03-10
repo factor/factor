@@ -22,7 +22,7 @@ else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorTuple,factorStruct
+syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
 syn match factorComment /\<#!\>\s.*/ contains=factorTodo
@@ -112,6 +112,7 @@ syn match   factorHook          /\<HOOK:\s\+\S\+\s\+\S\+\>/
 syn match   factorMain          /\<MAIN:\s\+\S\+\>/
 syn match   factorConstructor   /\<C:\s\+\S\+\s\+\S\+\>/
 syn match   factorAlien         /\<ALIEN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
+syn match   factorSlot          /\<SLOT:\s\+\S\+\>/
 
 syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingleton,factorSingletons,factorSymbol,factorSymbols,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
 
@@ -255,6 +256,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorDefer                  Define
     HiLink factorForget                 Define
     HiLink factorAlien                  Define
+    HiLink factorSlot                   Define
     HiLink factorTuple                  Typedef
     HiLink factorUnion                  Typedef
     HiLink factorStruct                 Typedef
