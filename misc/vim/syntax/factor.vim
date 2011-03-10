@@ -239,6 +239,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorLiteralBlock           Special
     HiLink factorDeclaration            Typedef
     HiLink factorSymbol                 Define
+    HiLink factorSymbols                Define
     HiLink factorConstant               Define
     HiLink factorAlias                  Define
     HiLink factorSingleton              Define
