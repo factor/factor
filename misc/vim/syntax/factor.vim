@@ -96,6 +96,7 @@ syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
 syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
 syn region  factorConstructor2  start=/\<CONSTRUCTOR:\?/ end=/;/
 syn region  factorTuple         start=/\<TUPLE:\>/ end=/\<;\>/
+syn region  factorUnion         start=/\<UNION:\>/ end=/\<;\>/
 syn region  factorStruct        start=/\<\(UNION-STRUCT:\|STRUCT:\)\>/ end=/\<;\>/
 
 syn match   factorConstant      /\<CONSTANT:\s\+\S\+\>/
@@ -253,6 +254,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorForget                 Define
     HiLink factorAlien                  Define
     HiLink factorTuple                  Typedef
+    HiLink factorUnion                  Typedef
     HiLink factorStruct                 Typedef
 
     if &bg == "dark"
