@@ -13,7 +13,7 @@ IN: factor.vim.fgen
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
 " Last Change: 2011 Mar 10
-" To run: USE: html.templates.fhtml "resource:misc/factor.vim.fgen" <fhtml> call-template
+" To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
