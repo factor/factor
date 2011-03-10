@@ -22,7 +22,7 @@ else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorDeclaration,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorTuple,factorStruct
+syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorTuple,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
 syn match factorComment /\<#!\>\s.*/ contains=factorTodo
@@ -44,6 +44,7 @@ syn region None matchgroup=factorPrivate start=/\<<PRIVATE\>/ end=/\<PRIVATE>\>/
 
 
 syn keyword factorBoolean f t
+syn keyword factorBreakpoint B
 syn match factorFrySpecifier /\<\(@\|_\)\>/ contained
 syn keyword factorDeclaration delimiter deprecated final flushable foldable inline recursive
 
@@ -196,6 +197,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorOperator               Operator
     HiLink factorFrySpecifier           Operator
     HiLink factorBoolean                Boolean
+    HiLink factorBreakpoint             Debug
     HiLink factorDefnDelims             Typedef
     HiLink factorMethodDelims           Typedef
     HiLink factorGenericDelims          Typedef
