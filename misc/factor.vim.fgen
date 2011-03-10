@@ -142,7 +142,7 @@ syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingle
 
 syn region factorString start=/\<"/ skip=/\\"/ end=/"/
 syn region factorTriString start=/\<"""/ skip=/\\"/ end=/"""/
-syn region factorSbuf start=/\<SBUF"\>/ skip=/\\"/ end=/"/
+syn region factorSbuf start=/\<[-a-zA-Z0-9]\+"\>/ skip=/\\"/ end=/"/
 
 syn region factorMultiString matchgroup=factorMultiStringDelims start=/\<STRING:\s\+\S\+\>/ end=/^;$/ contains=factorMultiStringContents
 syn match factorMultiStringContents /.*/ contained
