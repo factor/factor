@@ -109,6 +109,7 @@ syn region  factorSingletons    start=/\<SINGLETONS:\>/  end=/;/
 syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
 syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
 syn region  factorConstructor2  start=/\<CONSTRUCTOR:\?/ end=/;/
+syn region  factorIntersection  start=/\<INTERSECTION:\>/ end=/\<;\>/
 syn region  factorTuple         start=/\<TUPLE:\>/ end=/\<;\>/
 syn region  factorUnion         start=/\<UNION:\>/ end=/\<;\>/
 syn region  factorStruct        start=/\<\(UNION-STRUCT:\|STRUCT:\)\>/ end=/\<;\>/
@@ -270,6 +271,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorForget                 Define
     HiLink factorAlien                  Define
     HiLink factorSlot                   Define
+    HiLink factorIntersection           Typedef
     HiLink factorTuple                  Typedef
     HiLink factorUnion                  Typedef
     HiLink factorStruct                 Typedef
