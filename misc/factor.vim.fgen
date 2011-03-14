@@ -56,7 +56,7 @@ syn region None matchgroup=factorPrivate start=/\<<PRIVATE\>/ end=/\<PRIVATE>\>/
 
 syn keyword factorBoolean f t
 syn keyword factorBreakpoint B
-syn match factorFrySpecifier /\<\(@\|_\)\>/ contained
+syn keyword factorFrySpecifier @ _ contained
 syn keyword factorDeclaration delimiter deprecated final flushable foldable inline recursive
 syn match factorCallQuotation /\<call(\s.*\s--\s.*\s)\>/
 syn keyword factorCallNextMethod call-next-method
