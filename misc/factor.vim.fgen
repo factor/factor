@@ -156,8 +156,8 @@ syn match factorMultiStringContents /.*/ contained
 "syn match factorStackEffectErr /\<)\>/
 "syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
 "syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
-syn match factorStackEffect /\<( .*--.* )\>/ contained
-syn match factorLiteralStackEffect /\<(( .*--.* ))\>/
+syn match factorStackEffect /\<(\s.*\s--\s.*\s)\>/ contained
+syn match factorLiteralStackEffect /\<((\s.*\s--\s.*\s))\>/
 
 "adapted from lisp.vim
 if exists("g:factor_norainbow")
