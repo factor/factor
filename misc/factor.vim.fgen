@@ -12,7 +12,7 @@ IN: factor.vim.fgen
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2011 Mar 10
+" Last Change: 2011 Mar 15
 " To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
@@ -33,7 +33,7 @@ else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct
+syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorCallNextMethod,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
 syn match factorComment /\<#!\>\s.*/ contains=factorTodo
@@ -58,6 +58,7 @@ syn keyword factorBoolean f t
 syn keyword factorBreakpoint B
 syn match factorFrySpecifier /\<\(@\|_\)\>/ contained
 syn keyword factorDeclaration delimiter deprecated final flushable foldable inline recursive
+syn keyword factorCallNextMethod call-next-method
 
 <%
 
@@ -209,6 +210,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorRepeat                 Repeat
     HiLink factorConditional            Conditional
     HiLink factorKeyword                Keyword
+    HiLink factorCallNextMethod         Keyword
     HiLink factorOperator               Operator
     HiLink factorFrySpecifier           Operator
     HiLink factorBoolean                Boolean
