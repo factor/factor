@@ -24,10 +24,13 @@ M: gir-not-found summary
 : custom-gir-dirs ( -- dirs )
     "GIR_DIRS" os-env ":" split ;
 
+: current-vocab-path ( -- path )
+    current-vocab vocab-name "." split "/" join vocab-path ;
+
 : current-vocab-dirs ( -- dirs )
     [
-        current-vocab vocab-name "." split "/" join dup ,
-        dup file-name "ffi" = [ parent-directory , ] [ drop ] if
+        current-vocab-path
+        [ , ] [ "/ffi" ?tail [ , ] [ drop ] if ] bi
     ] { } make ;
 
 :: resolve-gir-path ( path -- path )

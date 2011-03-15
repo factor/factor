@@ -19,5 +19,5 @@ LIBRARY: clutter.json
 } cond
 >>
 
-GIR: vocab:clutter/json/Json-1.0.gir
+GIR: Json-1.0.gir
 
