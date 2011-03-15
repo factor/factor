@@ -18,5 +18,5 @@ LIBRARY: gstreamer.base
 } cond
 >>
 
-GIR: vocab:gstreamer/base/GstBase-0.10.gir
+GIR: GstBase-0.10.gir
 
