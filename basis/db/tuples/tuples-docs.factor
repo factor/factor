@@ -139,7 +139,7 @@ HELP: select-tuples
 { $values
      { "query/tuple" tuple }
      { "tuples" "an array of tuples" } }
-{ $description "A SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns a multiple tuples from the database that match the query constructed from the exemplar tuple." } ;
+{ $description "A SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns an array of multiple tuples from the database that match the query constructed from the exemplar tuple." } ;
 
 HELP: count-tuples
 { $values
