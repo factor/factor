@@ -1,9 +1,8 @@
-
 " Vim syntax file
-" Language: factor
+" Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2009 May 19
-" To run: USE: html.templates.fhtml "resource:misc/factor.vim.fgen" <fhtml> call-template
+" Last Change: 2011 Mar 15
+" To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
@@ -23,11 +22,11 @@ else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorFryDirective,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorCompileDirective,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorTuple,factorStruct
+syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
-syn match factorComment /\<#!\>.*/ contains=factorTodo
-syn match factorComment /\<!\>.*/ contains=factorTodo
+syn match factorComment /\<#!\>\s.*/ contains=factorTodo
+syn match factorComment /\<!\>\s.*/ contains=factorTodo
 
 syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
 
@@ -45,8 +44,12 @@ syn region None matchgroup=factorPrivate start=/\<<PRIVATE\>/ end=/\<PRIVATE>\>/
 
 
 syn keyword factorBoolean f t
-syn match factorFryDirective /\<\(@\|_\)\>/ contained
-syn keyword factorCompileDirective inline foldable recursive
+syn keyword factorBreakpoint B
+syn keyword factorFrySpecifier @ _ contained
+syn keyword factorDeclaration delimiter deprecated final flushable foldable inline recursive
+syn match factorCallQuotation /\<call(\s.*\s--\s.*\s)\>/
+syn match factorExecute /\<execute(\s.*\s--\s.*\s)\>/
+syn keyword factorCallNextMethod call-next-method
 
 syn keyword factorKeyword or 2bi 2tri while wrapper nip 4dip wrapper? bi* callstack>array both? hashcode die dupd callstack callstack? 3dup tri@ pick curry build ?execute 3bi prepose >boolean ?if clone eq? tri* ? = swapd 2over 2keep 3keep clear 2dup when not tuple? dup 2bi* 2tri* call tri-curry object bi@ do unless* if* loop bi-curry* drop when* assert= retainstack assert? -rot execute 2bi@ 2tri@ boa with either? 3drop bi curry? datastack until 3dip over 3curry tri-curry* tri-curry@ swap and 2nip throw bi-curry (clone) hashcode* compose 2dip if 3tri unless compose? tuple keep 2curry equal? assert tri 2drop most <wrapper> boolean? identity-hashcode identity-tuple? null new dip bi-curry@ rot xor identity-tuple boolean
 syn keyword factorKeyword ?at assoc? assoc-clone-like assoc= delete-at* assoc-partition extract-keys new-assoc value? assoc-size map>assoc push-at assoc-like key? assoc-intersect assoc-refine update assoc-union assoc-combine at* assoc-empty? at+ set-at assoc-all? assoc-subset? assoc-hashcode change-at assoc-each assoc-diff zip values value-at rename-at inc-at enum? at cache assoc>map <enum> assoc assoc-map enum value-at* assoc-map-as >alist assoc-filter-as clear-assoc assoc-stack maybe-set-at substitute assoc-filter 2cache delete-at assoc-find keys assoc-any? unzip
@@ -89,16 +92,20 @@ syn region  factorLiteralBlock  start=/\<\$\[\>/ end=/\<\]\>/
 syn region  factorUsing         start=/\<USING:\>/       end=/;/
 syn match   factorQualified     /\<QUALIFIED:\s\+\S\+\>/
 syn match   factorQualifiedWith /\<QUALIFIED-WITH:\s\+\S\+\s\+\S\+\>/
+syn region  factorExclude       start=/\<EXCLUDE:\>/     end=/;/
 syn region  factorFrom          start=/\<FROM:\>/        end=/;/
+syn region  factorRename        start=/\<RENAME:\>/      end=/;/
 syn region  factorSingletons    start=/\<SINGLETONS:\>/  end=/;/
 syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
 syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
 syn region  factorConstructor2  start=/\<CONSTRUCTOR:\?/ end=/;/
+syn region  factorIntersection  start=/\<INTERSECTION:\>/ end=/\<;\>/
 syn region  factorTuple         start=/\<TUPLE:\>/ end=/\<;\>/
+syn region  factorUnion         start=/\<UNION:\>/ end=/\<;\>/
 syn region  factorStruct        start=/\<\(UNION-STRUCT:\|STRUCT:\)\>/ end=/\<;\>/
 
 syn match   factorConstant      /\<CONSTANT:\s\+\S\+\>/
-syn match   factorAlias         /\<ALIAS:\s\+\S\+\>/
+syn match   factorAlias         /\<ALIAS:\s\+\S\+\s\+\S\+\>/
 syn match   factorSingleton     /\<SINGLETON:\s\+\S\+\>/
 syn match   factorPostpone      /\<POSTPONE:\s\+\S\+\>/
 syn match   factorDefer         /\<DEFER:\s\+\S\+\>/
@@ -109,6 +116,7 @@ syn match   factorHook          /\<HOOK:\s\+\S\+\s\+\S\+\>/
 syn match   factorMain          /\<MAIN:\s\+\S\+\>/
 syn match   factorConstructor   /\<C:\s\+\S\+\s\+\S\+\>/
 syn match   factorAlien         /\<ALIEN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
+syn match   factorSlot          /\<SLOT:\s\+\S\+\>/
 
 syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingleton,factorSingletons,factorSymbol,factorSymbols,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
 
@@ -136,11 +144,11 @@ syn match factorMultiStringContents /.*/ contained
 "syn match factorStackEffectErr /\<)\>/
 "syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
 "syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
-syn match factorStackEffect /\<( .*--.* )\>/ contained
-syn match factorLiteralStackEffect /\<(( .*--.* ))\>/
+syn match factorStackEffect /\<(\s.*\s--\s.*\s)\>/ contained
+syn match factorLiteralStackEffect /\<((\s.*\s--\s.*\s))\>/
 
 "adapted from lisp.vim
-if exists("g:factor_norainbow") 
+if exists("g:factor_norainbow")
     syn region factorQuotation matchgroup=factorDelimiter start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/ matchgroup=factorDelimiter end=/\<\]\>/ contains=ALL
 else
     syn region factorQuotation0           matchgroup=hlLevel0 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation1,factorArray1
@@ -155,7 +163,7 @@ else
     syn region factorQuotation9 contained matchgroup=hlLevel9 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation0,factorArray0
 endif
 
-if exists("g:factor_norainbow") 
+if exists("g:factor_norainbow")
     syn region factorArray    matchgroup=factorDelimiter start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/  matchgroup=factorDelimiter end=/\<}\>/ contains=ALL
 else
     syn region factorArray0           matchgroup=hlLevel0 start=/\<\(\$\|[-a-zA-Z0-9]\+\)\?{\>/ end=/\<}\>/ contains=@factorCluster,factorArray1,factorQuotation1
@@ -191,9 +199,13 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorRepeat                 Repeat
     HiLink factorConditional            Conditional
     HiLink factorKeyword                Keyword
+    HiLink factorCallQuotation          Keyword
+    HiLink factorExecute                Keyword
+    HiLink factorCallNextMethod         Keyword
     HiLink factorOperator               Operator
-    HiLink factorFryDirective           Operator
+    HiLink factorFrySpecifier           Operator
     HiLink factorBoolean                Boolean
+    HiLink factorBreakpoint             Debug
     HiLink factorDefnDelims             Typedef
     HiLink factorMethodDelims           Typedef
     HiLink factorGenericDelims          Typedef
@@ -225,7 +237,9 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorUsing                  Include
     HiLink factorQualified              Include
     HiLink factorQualifiedWith          Include
+    HiLink factorExclude                Include
     HiLink factorFrom                   Include
+    HiLink factorRename                 Include
     HiLink factorUse                    Include
     HiLink factorUnuse                  Include
     HiLink factorIn                     Define
@@ -234,9 +248,11 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorBackslash              Special
     HiLink factorLiteral                Special
     HiLink factorLiteralBlock           Special
-    HiLink factorCompileDirective       Typedef
+    HiLink factorDeclaration            Typedef
     HiLink factorSymbol                 Define
+    HiLink factorSymbols                Define
     HiLink factorConstant               Define
+    HiLink factorAlias                  Define
     HiLink factorSingleton              Define
     HiLink factorSingletons             Define
     HiLink factorMixin                  Typedef
@@ -247,7 +263,10 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorDefer                  Define
     HiLink factorForget                 Define
     HiLink factorAlien                  Define
+    HiLink factorSlot                   Define
+    HiLink factorIntersection           Typedef
     HiLink factorTuple                  Typedef
+    HiLink factorUnion                  Typedef
     HiLink factorStruct                 Typedef
 
     if &bg == "dark"
