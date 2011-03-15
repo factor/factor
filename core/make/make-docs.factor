@@ -37,7 +37,7 @@ $nl
 { $code "'[ 2 _ + ]" } ;
 
 ARTICLE: "namespaces-make" "Making sequences with variables"
-"The " { $vocab-link "make" } " vocabulary implements a facility for constructing sequences by holding an collector sequence in a variable. Storing the collector sequence in a variable rather than the stack may allow code to be written with less stack manipulation."
+"The " { $vocab-link "make" } " vocabulary implements a facility for constructing sequences by holding a collector sequence in a variable. Storing the collector sequence in a variable rather than the stack may allow code to be written with less stack manipulation."
 $nl
 "Sequence construction is wrapped in a combinator:"
 { $subsections make }
