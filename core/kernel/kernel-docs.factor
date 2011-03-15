@@ -582,7 +582,8 @@ $nl
         "10 3 < [ \"Math is broken\" print ] [ \"Math is good\" print ] if"
         "Math is good"
     }
-} ;
+}
+{ $notes { $snippet "if" } " is executed as a primitive when preceded by two literal quotations. The below definition is not executed unless one of its arguments is a non-literal quotation, such as a quotation constructed with " { $link curry } " or " { $link compose } ", or for " { $link "fry" } " or quotations including " { $link "locals" } "." } ;
 
 HELP: when
 { $values { "?" "a generalized boolean" } { "true" quotation } }
@@ -795,7 +796,8 @@ HELP: dip
 { $description "Removes " { $snippet "x" } " from the datastack, calls " { $snippet "quot" } ", and restores " { $snippet "x" } " to the top of the datastack when " { $snippet "quot" } " is finished." }
 { $examples
     { $example "USING: arrays kernel math prettyprint ;" "10 20 30 [ / ] dip 2array ." "{ 1/2 30 }" }
-} ;
+}
+{ $notes { $snippet "dip" } " is executed as a primitive when preceded by a literal quotation. The below definition is not executed unless its argument is a non-literal quotation, such as a quotation constructed with " { $link curry } " or " { $link compose } ", or for " { $link "fry" } " or quotations including " { $link "locals" } "." } ;
 
 HELP: 2dip
 { $values { "x" object } { "y" object } { "quot" quotation } }
