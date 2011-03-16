@@ -12,7 +12,7 @@ IN: factor.vim.fgen
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2011 Mar 15
+" Last Change: 2011 Mar 16
 " To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
@@ -107,7 +107,7 @@ syn match   factorQualified     /\<QUALIFIED:\s\+\S\+\>/
 syn match   factorQualifiedWith /\<QUALIFIED-WITH:\s\+\S\+\s\+\S\+\>/
 syn region  factorExclude       start=/\<EXCLUDE:\>/     end=/;/
 syn region  factorFrom          start=/\<FROM:\>/        end=/;/
-syn region  factorRename        start=/\<RENAME:\>/      end=/;/
+syn match   factorRename        /\<RENAME:\s\+\S\+\s\+\S\+\s=>\s\+\S\+\>/
 syn region  factorSingletons    start=/\<SINGLETONS:\>/  end=/;/
 syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
 syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
