@@ -12,7 +12,7 @@ IN: factor.vim.fgen
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2011 Mar 16
+" Last Change: 2011 Mar 17
 " To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
@@ -58,8 +58,8 @@ syn keyword factorBoolean f t
 syn keyword factorBreakpoint B
 syn keyword factorFrySpecifier @ _ contained
 syn keyword factorDeclaration delimiter deprecated final flushable foldable inline recursive
-syn match factorCallQuotation /\<call(\s.*\s--\s.*\s)\>/
-syn match factorExecute /\<execute(\s.*\s--\s.*\s)\>/
+syn match factorCallQuotation /\<call(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/
+syn match factorExecute /\<execute(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/
 syn keyword factorCallNextMethod call-next-method
 
 <%
@@ -157,8 +157,8 @@ syn match factorMultiStringContents /.*/ contained
 "syn match factorStackEffectErr /\<)\>/
 "syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
 "syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
-syn match factorStackEffect /\<(\s.*\s--\s.*\s)\>/ contained
-syn match factorLiteralStackEffect /\<((\s.*\s--\s.*\s))\>/
+syn match factorStackEffect /\<(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/ contained
+syn match factorLiteralStackEffect /\<((\s\(.*\s\)\?--\(\s.*\)\?\s))\>/
 
 "adapted from lisp.vim
 if exists("g:factor_norainbow")
