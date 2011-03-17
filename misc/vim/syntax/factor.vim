@@ -27,7 +27,7 @@ syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeywor
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
 syn match factorComment /\<!\>\s.*/ contains=factorTodo,@Spell
 syn match factorComment /\<#!\>\s.*/ contains=factorTodo,@Spell
-syn match factorShebang /\%\^#!\s.*/
+syn match factorShebang /\%\^#!\s.*/ display
 syn match factorShebangErr /\%\^#!\S\+/
 
 syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
@@ -194,7 +194,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     endif
 
     HiLink factorComment                Comment
-    HiLink factorShebang                Special
+    HiLink factorShebang                PreProc
     HiLink factorShebangErr             Error
     HiLink factorStackEffect            Typedef
     HiLink factorLiteralStackEffect     Typedef
