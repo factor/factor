@@ -302,10 +302,4 @@ endif
 
 let b:current_syntax = "factor"
 
-set sw=4
-set sts=4
-set expandtab
-set autoindent " annoying?
-
 " vim: syntax=vim
-
