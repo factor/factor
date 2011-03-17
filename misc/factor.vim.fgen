@@ -12,7 +12,7 @@ IN: factor.vim.fgen
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2011 Mar 17
+" Last Change: 2011 Mar 18
 " To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
@@ -33,7 +33,7 @@ else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct
+syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorError,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
 syn match factorComment /\<!\>\s.*/ contains=factorTodo,@Spell
@@ -116,6 +116,7 @@ syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
 syn region  factorConstructor2  start=/\<CONSTRUCTOR:\?/ end=/;/
 syn region  factorIntersection  start=/\<INTERSECTION:\>/ end=/\<;\>/
 syn region  factorTuple         start=/\<TUPLE:\>/ end=/\<;\>/
+syn region  factorError         start=/\<ERROR:\>/ end=/\<;\>/
 syn region  factorUnion         start=/\<UNION:\>/ end=/\<;\>/
 syn region  factorStruct        start=/\<\(UNION-STRUCT:\|STRUCT:\)\>/ end=/\<;\>/
 
@@ -283,6 +284,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorSlot                   Define
     HiLink factorIntersection           Typedef
     HiLink factorTuple                  Typedef
+    HiLink factorError                  Typedef
     HiLink factorUnion                  Typedef
     HiLink factorStruct                 Typedef
 
