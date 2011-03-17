@@ -17,7 +17,7 @@ IN: openal
         { [ os unix?  ]  [ "libopenal.so" ] }
     } cond cdecl add-library >>
 
-<< os macosx? [ "openal" deploy-library ] unless >>
+<< os unix? [ "openal" deploy-library ] unless >>
 
 LIBRARY: openal
 
