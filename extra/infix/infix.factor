@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-effects fry infix.parser infix.ast kernel locals.parser
-locals.types math multiline namespaces parser quotations
-sequences summary words vocabs.parser ;
+effects fry infix.parser infix.ast kernel locals locals.parser
+locals.types math math.order multiline namespaces parser
+quotations sequences summary words vocabs.parser ;
+
 IN: infix
 
 <PRIVATE
@@ -33,9 +34,23 @@ M: ast-number infix-codegen value>> ;
 M: ast-local infix-codegen
     name>> >local-word ;
 
+:: infix-nth ( n seq -- elt )
+    n dup 0 < [ seq length + ] when seq nth ;
+
 M: ast-array infix-codegen
     [ index>> infix-codegen prepare-operand ]
-    [ name>> >local-word ] bi '[ @ _ nth ] ;
+    [ name>> >local-word ] bi '[ @ _ infix-nth ] ;
+
+:: infix-subseq ( from to seq -- subseq )
+    seq length :> len
+    from 0 or dup 0 < [ len + ] when
+    to [ dup 0 < [ len + ] when ] [ len ] if*
+    [ 0 len clamp ] bi@ dupd max seq subseq ;
+
+M: ast-slice infix-codegen
+    [ from>> [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
+    [ to>> [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
+    [ name>> >local-word ] tri '[ @ @ _ infix-subseq ] ;
 
 M: ast-op infix-codegen
     [ left>> infix-codegen ] [ right>> infix-codegen ]
