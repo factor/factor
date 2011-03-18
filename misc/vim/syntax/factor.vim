@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2011 Mar 15
+" Last Change: 2011 Mar 18
 " To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
@@ -22,11 +22,13 @@ else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct
+syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorError,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
-syn match factorComment /\<#!\>\s.*/ contains=factorTodo
-syn match factorComment /\<!\>\s.*/ contains=factorTodo
+syn match factorComment /\<!\>\s.*/ contains=factorTodo,@Spell
+syn match factorComment /\<#!\>\s.*/ contains=factorTodo,@Spell
+syn match factorShebang /\%\^#!\s.*/ display
+syn match factorShebangErr /\%\^#!\S\+/
 
 syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
 
@@ -47,8 +49,8 @@ syn keyword factorBoolean f t
 syn keyword factorBreakpoint B
 syn keyword factorFrySpecifier @ _ contained
 syn keyword factorDeclaration delimiter deprecated final flushable foldable inline recursive
-syn match factorCallQuotation /\<call(\s.*\s--\s.*\s)\>/
-syn match factorExecute /\<execute(\s.*\s--\s.*\s)\>/
+syn match factorCallQuotation /\<call(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/
+syn match factorExecute /\<execute(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/
 syn keyword factorCallNextMethod call-next-method
 
 syn keyword factorKeyword or 2bi 2tri while wrapper nip 4dip wrapper? bi* callstack>array both? hashcode die dupd callstack callstack? 3dup tri@ pick curry build ?execute 3bi prepose >boolean ?if clone eq? tri* ? = swapd 2over 2keep 3keep clear 2dup when not tuple? dup 2bi* 2tri* call tri-curry object bi@ do unless* if* loop bi-curry* drop when* assert= retainstack assert? -rot execute 2bi@ 2tri@ boa with either? 3drop bi curry? datastack until 3dip over 3curry tri-curry* tri-curry@ swap and 2nip throw bi-curry (clone) hashcode* compose 2dip if 3tri unless compose? tuple keep 2curry equal? assert tri 2drop most <wrapper> boolean? identity-hashcode identity-tuple? null new dip bi-curry@ rot xor identity-tuple boolean
@@ -94,13 +96,14 @@ syn match   factorQualified     /\<QUALIFIED:\s\+\S\+\>/
 syn match   factorQualifiedWith /\<QUALIFIED-WITH:\s\+\S\+\s\+\S\+\>/
 syn region  factorExclude       start=/\<EXCLUDE:\>/     end=/;/
 syn region  factorFrom          start=/\<FROM:\>/        end=/;/
-syn region  factorRename        start=/\<RENAME:\>/      end=/;/
+syn match   factorRename        /\<RENAME:\s\+\S\+\s\+\S\+\s=>\s\+\S\+\>/
 syn region  factorSingletons    start=/\<SINGLETONS:\>/  end=/;/
 syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
 syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
 syn region  factorConstructor2  start=/\<CONSTRUCTOR:\?/ end=/;/
 syn region  factorIntersection  start=/\<INTERSECTION:\>/ end=/\<;\>/
 syn region  factorTuple         start=/\<TUPLE:\>/ end=/\<;\>/
+syn region  factorError         start=/\<ERROR:\>/ end=/\<;\>/
 syn region  factorUnion         start=/\<UNION:\>/ end=/\<;\>/
 syn region  factorStruct        start=/\<\(UNION-STRUCT:\|STRUCT:\)\>/ end=/\<;\>/
 
@@ -144,14 +147,14 @@ syn match factorMultiStringContents /.*/ contained
 "syn match factorStackEffectErr /\<)\>/
 "syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
 "syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
-syn match factorStackEffect /\<(\s.*\s--\s.*\s)\>/ contained
-syn match factorLiteralStackEffect /\<((\s.*\s--\s.*\s))\>/
+syn match factorStackEffect /\<(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/ contained
+syn match factorLiteralStackEffect /\<((\s\(.*\s\)\?--\(\s.*\)\?\s))\>/
 
 "adapted from lisp.vim
 if exists("g:factor_norainbow")
     syn region factorQuotation matchgroup=factorDelimiter start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/ matchgroup=factorDelimiter end=/\<\]\>/ contains=ALL
 else
-    syn region factorQuotation0           matchgroup=hlLevel0 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/ end=/\<\]\>/ contains=@factorCluster,factorQuotation1,factorArray1
+    syn region factorQuotation0           matchgroup=hlLevel0 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation1,factorArray1
     syn region factorQuotation1 contained matchgroup=hlLevel1 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation2,factorArray2
     syn region factorQuotation2 contained matchgroup=hlLevel2 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation3,factorArray3
     syn region factorQuotation3 contained matchgroup=hlLevel3 start=/\<\(\(\('\|\$\|\)\[\)\|\[\(let\||\)\)\>/  end=/\<\]\>/ contains=@factorCluster,factorQuotation4,factorArray4
@@ -192,6 +195,8 @@ if version >= 508 || !exists("did_factor_syn_inits")
     endif
 
     HiLink factorComment                Comment
+    HiLink factorShebang                PreProc
+    HiLink factorShebangErr             Error
     HiLink factorStackEffect            Typedef
     HiLink factorLiteralStackEffect     Typedef
     HiLink factorTodo                   Todo
@@ -266,6 +271,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorSlot                   Define
     HiLink factorIntersection           Typedef
     HiLink factorTuple                  Typedef
+    HiLink factorError                  Typedef
     HiLink factorUnion                  Typedef
     HiLink factorStruct                 Typedef
 
@@ -298,10 +304,4 @@ endif
 
 let b:current_syntax = "factor"
 
-set sw=4
-set sts=4
-set expandtab
-set autoindent " annoying?
-
 " vim: syntax=vim
-
