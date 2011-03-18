@@ -59,7 +59,7 @@ endfunction
 function! FactorVocabFile(root, vocab, mustexist)
     let vocabpath = substitute(a:vocab, "\\.", "/", "g")
     let vocabfile = FactorVocabRoot(a:root) . vocabpath . "/" . fnamemodify(vocabpath, ":t") . ".factor"
-    
+
     if !a:mustexist || getftype(vocabfile) != ""
         return vocabfile
     else
