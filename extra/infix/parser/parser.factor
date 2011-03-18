@@ -8,6 +8,7 @@ EBNF: parse-infix
 Number      = . ?[ ast-number? ]?
 Identifier  = . ?[ string? ]?
 Array       = Identifier:i "[" Sum:s "]" => [[ i s ast-array boa ]]
+Slice       = Identifier:i "[" Sum?:s ":" Sum?:t "]" => [[ i s t ast-slice boa ]]
 Function    = Identifier:i "(" FunArgs?:a ")" => [[ i a [ V{ } ] unless* ast-function boa ]]
 
 FunArgs     =   FunArgs:a "," Sum:s => [[ s a push a ]]
@@ -15,7 +16,7 @@ FunArgs     =   FunArgs:a "," Sum:s => [[ s a push a ]]
 
 Terminal    =   ("-"|"+"):op Terminal:term => [[ term op "-" = [ ast-negation boa ] when ]]
               | "(" Sum:s ")" => [[ s ]]
-              | Number | Array | Function
+              | Number | Array | Slice | Function
               | Identifier => [[ ast-local boa ]]
 
 Product     =   Product:p ("*"|"/"|"%"):op Terminal:term  => [[ p term op ast-op boa ]]
