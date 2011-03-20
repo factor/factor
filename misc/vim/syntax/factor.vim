@@ -304,4 +304,4 @@ endif
 
 let b:current_syntax = "factor"
 
-" vim: syntax=vim
+" vim:set ft=vim sw=4:
