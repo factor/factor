@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2011 Mar 20
+" Last Change: 2011 Mar 21
 " To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
@@ -137,7 +137,7 @@ syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingle
 " LIBRARY:
 "#\ "
 
-syn match factorEscape /\\\(\\\|s\|t\|n\|r\|0\|e\|\"\|u\x\{6\}\|u{\S\+}\)/ contained
+syn match factorEscape /\\\([\\stnr0e\"]\|u\x\{6\}\|u{\S\+}\)/ contained
 syn region factorString start=/\<"/ skip=/\\"/ end=/"/ contains=factorEscape
 syn region factorTriString start=/\<"""/ skip=/\\"/ end=/"""/ contains=factorEscape
 syn region factorSbuf start=/\<[-a-zA-Z0-9]\+"\>/ skip=/\\"/ end=/"/
