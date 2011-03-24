@@ -22,7 +22,7 @@ The current set of files is as follows:
 
 ## Commands
 
-The `plugin/factor.vim` file implements the following commands for navigating Factor source:
+The `plugin/factor.vim` file implements the following commands for navigating Factor source.
 
 ### :FactorVocab factor.vocab.name
 
@@ -76,6 +76,6 @@ run the following code in the listener:
 
     "editors.vim.generate-syntax" run
 
-...or run it from the command line:
+or run it from the command line:
 
     factor -run=editors.vim.generate-syntax
