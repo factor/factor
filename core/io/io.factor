@@ -90,10 +90,10 @@ SYMBOL: error-stream
 
 PRIVATE>
 
-: each-stream-line ( stream quot -- )
+: each-stream-line ( stream quot: ( ... line -- ... ) -- )
     swap [ stream-readln ] curry each-morsel ; inline
 
-: each-line ( quot -- )
+: each-line ( quot: ( ... line -- ... ) -- )
     input-stream get swap each-stream-line ; inline
 
 : stream-lines ( stream -- seq )
@@ -111,10 +111,10 @@ PRIVATE>
 : contents ( -- seq )
     input-stream get stream-contents ; inline
 
-: each-stream-block ( stream quot: ( block -- ) -- )
+: each-stream-block ( stream quot: ( ... block -- ... ) -- )
     swap [ 8192 swap stream-read-partial ] curry each-morsel ; inline
 
-: each-block ( quot: ( block -- ) -- )
+: each-block ( quot: ( ... block -- ... ) -- )
     input-stream get swap each-stream-block ; inline
 
 : stream-copy ( in out -- )
