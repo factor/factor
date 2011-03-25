@@ -102,20 +102,20 @@ PRIVATE>
 : lines ( -- seq )
     input-stream get stream-lines ; inline
 
+: each-stream-block ( stream quot: ( ... block -- ... ) -- )
+    swap 65536 swap [ stream-read-partial ] 2curry each-morsel ; inline
+
+: each-block ( quot: ( ... block -- ... ) -- )
+    input-stream get swap each-stream-block ; inline
+
 : stream-contents ( stream -- seq )
     [
-        [ [ 65536 swap stream-read-partial dup ] curry [ ] produce nip ]
+        [ [ ] collector [ each-stream-block ] dip { } like ]
         [ stream-element-exemplar concat-as ] bi
     ] with-disposal ;
 
 : contents ( -- seq )
     input-stream get stream-contents ; inline
-
-: each-stream-block ( stream quot: ( ... block -- ... ) -- )
-    swap [ 8192 swap stream-read-partial ] curry each-morsel ; inline
-
-: each-block ( quot: ( ... block -- ... ) -- )
-    input-stream get swap each-stream-block ; inline
 
 : stream-copy ( in out -- )
     [ [ [ write ] each-block ] with-output-stream ]
