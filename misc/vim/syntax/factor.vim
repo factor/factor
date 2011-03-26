@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2011 Mar 18
+" Last Change: 2011 Mar 21
 " To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
@@ -137,8 +137,9 @@ syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingle
 " LIBRARY:
 "#\ "
 
-syn region factorString start=/\<"/ skip=/\\"/ end=/"/
-syn region factorTriString start=/\<"""/ skip=/\\"/ end=/"""/
+syn match factorEscape /\\\([\\stnr0e\"]\|u\x\{6}\|u{\S\+}\)/ contained display
+syn region factorString start=/\<"/ skip=/\\"/ end=/"/ contains=factorEscape
+syn region factorTriString start=/\<"""/ skip=/\\"/ end=/"""/ contains=factorEscape
 syn region factorSbuf start=/\<[-a-zA-Z0-9]\+"\>/ skip=/\\"/ end=/"/
 
 syn region factorMultiString matchgroup=factorMultiStringDelims start=/\<STRING:\s\+\S\+\>/ end=/^;$/ contains=factorMultiStringContents
@@ -222,6 +223,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorPrivateMethodDelims    Special
     HiLink factorPGenericDelims         Special
     HiLink factorPGenericNDelims        Special
+    HiLink factorEscape                 SpecialChar
     HiLink factorString                 String
     HiLink factorTriString              String
     HiLink factorSbuf                   String
@@ -304,4 +306,4 @@ endif
 
 let b:current_syntax = "factor"
 
-" vim: syntax=vim
+" vim:set ft=vim sw=4:
