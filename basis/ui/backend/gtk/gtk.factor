@@ -1,13 +1,14 @@
-! Copyright (C) 2010 Anton Gorenko, Philipp Brüschweiler.
+! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Brüschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct command-line destructors
-gdk.ffi gdk.gl.ffi glib.ffi gobject-introspection.standard-types
-gobject.ffi gtk.ffi gtk.gl.ffi io.encodings.utf8 kernel libc literals
-locals math math.bitwise math.order math.vectors namespaces sequences
-strings system threads ui ui.backend ui.backend.gtk.input-methods
-ui.backend.gtk.io ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
+alien.strings arrays assocs classes.struct command-line continuations
+destructors gdk.ffi gdk.gl.ffi glib.ffi
+gobject-introspection.standard-types gobject.ffi gtk.ffi gtk.gl.ffi
+io.encodings.utf8 kernel libc literals locals math math.bitwise
+math.order math.vectors namespaces sequences strings system threads ui
+ui.backend ui.backend.gtk.input-methods ui.backend.gtk.io
+ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
+ui.gadgets.worlds ui.gestures ui.pixel-formats
 ui.pixel-formats.private ui.private vocabs.loader ;
 IN: ui.backend.gtk
 
@@ -51,33 +52,38 @@ M: gtk-clipboard set-clipboard-contents
         gtk_clipboard_get <gtk-clipboard> swap set-global
     ] 2bi@ ;
 
-! Timeouts
+! Timer
 
-SYMBOL: next-timeout
+SYMBOL: next-fire-time
 
 : set-timeout*-value ( alien value -- )
     swap 0 set-alien-signed-4 ; inline
 
-: timeout-prepare ( source timeout* -- ? )
-    nip next-timeout get-global nano-count [-]
+: timer-prepare ( source timeout* -- ? )
+    nip next-fire-time get-global nano-count [-]
     [ 1,000,000 /i set-timeout*-value ] keep 0 = ;
 
-: timeout-check ( source -- ? )
-    drop next-timeout get-global nano-count [-] 0 = ;
+: timer-check ( source -- ? )
+    drop next-fire-time get-global nano-count [-] 0 = ;
 
-: timeout-dispatch ( source callback user_data -- ? )
+: timer-dispatch ( source callback user_data -- ? )
     3drop sleep-time [ 1,000,000,000 ] unless* nano-count +
-    next-timeout set-global
+    next-fire-time set-global
     yield t ;
 
-: init-timeout ( -- )
-    GSourceFuncs malloc-struct &free
-        [ timeout-prepare ] GSourceFuncsPrepareFunc >>prepare
-        [ timeout-check ] GSourceFuncsCheckFunc >>check
-        [ timeout-dispatch ] GSourceFuncsDispatchFunc >>dispatch
-    GSource heap-size g_source_new &g_source_unref
-    f g_source_attach drop
-    nano-count next-timeout set-global ;
+: <timer-funcs> ( -- timer-funcs )
+    GSourceFuncs malloc-struct
+        [ timer-prepare ] GSourceFuncsPrepareFunc >>prepare
+        [ timer-check ] GSourceFuncsCheckFunc >>check
+        [ timer-dispatch ] GSourceFuncsDispatchFunc >>dispatch ;
+
+:: with-timer ( quot -- )
+    nano-count next-fire-time set-global
+    <timer-funcs> &free
+    GSource heap-size g_source_new &g_source_unref :> source
+    source f g_source_attach drop
+    [ quot call( -- ) ]
+    [ source g_source_destroy ] [ ] cleanup ;
 
 ! User input
 
@@ -488,9 +494,7 @@ M: gtk-ui-backend (with-ui)
         init-clipboard
         start-ui
         [
-            init-io-event-source
-            init-timeout
-            gtk_main
+            [ [ gtk_main ] with-timer ] with-event-loop
         ] with-destructors
     ] ui-running ;
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types classes.struct glib.ffi
-io.backend.unix.multiplexers io.thread kernel libc literals namespaces
-system threads ui.backend.gtk.io ;
+USING: accessors alien.c-types classes.struct continuations
+glib.ffi io.backend.unix.multiplexers io.thread kernel libc
+literals locals namespaces system threads ui.backend.gtk.io ;
 IN: ui.backend.gtk.io.unix
 
 : prepare ( source timeout -- ? )
@@ -16,6 +16,12 @@ IN: ui.backend.gtk.io.unix
      3drop
      0 mx get wait-for-events
      yield t ;
+
+: <funcs> ( -- funcs )
+    GSourceFuncs malloc-struct
+        [ prepare ] GSourceFuncsPrepareFunc >>prepare
+        [ check ] GSourceFuncsCheckFunc >>check
+        [ dispatch ] GSourceFuncsDispatchFunc >>dispatch ;
 
 CONSTANT: poll-fd-events
     flags{
@@ -32,12 +38,14 @@ CONSTANT: poll-fd-events
         mx get fd>> >>fd
         poll-fd-events >>events ;
 
-M: unix init-io-event-source
+M:: unix with-event-loop ( quot -- )
     stop-io-thread
-    GSourceFuncs malloc-struct &free
-        [ prepare ] GSourceFuncsPrepareFunc >>prepare
-        [ check ] GSourceFuncsCheckFunc >>check
-        [ dispatch ] GSourceFuncsDispatchFunc >>dispatch
-    GSource heap-size g_source_new &g_source_unref
-    [ <poll-fd> g_source_add_poll ]
-    [ f g_source_attach drop ] bi ;
+    <funcs> &free
+    GSource heap-size g_source_new &g_source_unref :> source
+    source <poll-fd> g_source_add_poll
+    source f g_source_attach drop
+    [ quot call( -- ) ]
+    [
+        source g_source_destroy
+        start-io-thread
+    ] [ ] cleanup ;
