@@ -3,6 +3,6 @@
 USING: io.backend kernel ;
 IN: ui.backend.gtk.io
 
-HOOK: init-io-event-source io-backend ( -- )
+HOOK: with-event-loop io-backend ( quot -- )
 
-M: object init-io-event-source ;
+M: object with-event-loop call( -- ) ;
