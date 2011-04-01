@@ -493,7 +493,11 @@ copy_fresh_image() {
 }
 
 bootstrap() {
-    ./$FACTOR_BINARY -i=$BOOT_IMAGE
+    if [[ -z $NO_UI ]]; then
+        ./$FACTOR_BINARY -i=$BOOT_IMAGE
+    else
+        ./$FACTOR_BINARY -i=$BOOT_IMAGE -exclude="ui ui.tools"
+    fi
 	copy_fresh_image
 }
 
