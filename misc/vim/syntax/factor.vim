@@ -49,8 +49,8 @@ syn keyword factorBoolean f t
 syn keyword factorBreakpoint B
 syn keyword factorFrySpecifier @ _ contained
 syn keyword factorDeclaration delimiter deprecated final flushable foldable inline recursive
-syn match factorCallQuotation /\<call(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/
-syn match factorExecute /\<execute(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/
+syn match factorCallQuotation /\<call(\s\(\S*\s\)\?--\(\s\S*\)\?\s)\>/
+syn match factorExecute /\<execute(\s\(\S*\s\)\?--\(\s\S*\)\?\s)\>/
 syn keyword factorCallNextMethod call-next-method
 
 syn keyword factorKeyword or 2bi 2tri while wrapper nip 4dip wrapper? bi* callstack>array both? hashcode die dupd callstack callstack? 3dup tri@ pick curry build ?execute 3bi prepose >boolean ?if clone eq? tri* ? = swapd 2over 2keep 3keep clear 2dup when not tuple? dup 2bi* 2tri* call tri-curry object bi@ do unless* if* loop bi-curry* drop when* assert= retainstack assert? -rot execute 2bi@ 2tri@ boa with either? 3drop bi curry? datastack until 3dip over 3curry tri-curry* tri-curry@ swap and 2nip throw bi-curry (clone) hashcode* compose 2dip if 3tri unless compose? tuple keep 2curry equal? assert tri 2drop most <wrapper> boolean? identity-hashcode identity-tuple? null new dip bi-curry@ rot xor identity-tuple boolean
