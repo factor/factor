@@ -12,10 +12,10 @@ elseif exists("b:current_syntax")
     finish
 endif
 
-" factor is case sensitive.
+" Factor is case sensitive.
 syn case match
 
-" make all of these characters part of a word (useful for skipping over words with w, e, and b)
+" Make all of these characters part of a word (useful for skipping over words with w, e, and b)
 if version >= 600
     setlocal iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 else
