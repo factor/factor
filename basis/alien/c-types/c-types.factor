@@ -3,7 +3,7 @@
 USING: accessors alien alien.accessors arrays byte-arrays
 classes combinators compiler.units cpu.architecture delegate
 fry kernel layouts locals macros math math.order quotations
-sequences system words words.symbol ;
+sequences system words words.symbol summary ;
 QUALIFIED: math
 IN: alien.c-types
 
@@ -37,7 +37,9 @@ unboxer
 : <c-type> ( -- c-type )
     \ c-type new ; inline
 
-ERROR: no-c-type name ;
+ERROR: no-c-type word ;
+
+M: no-c-type summary drop "Not a C type" ;
 
 ! C type protocol
 GENERIC: c-type ( name -- c-type ) foldable
