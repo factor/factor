@@ -21,7 +21,7 @@ HELP: <c-type>
 HELP: no-c-type
 { $values { "name" c-type-name } }
 { $description "Throws a " { $link no-c-type } " error." }
-{ $error-description "Thrown by " { $link c-type } " if a given string does not name a C type. When thrown during compile time, indicates a typo in an " { $link alien-invoke } " or " { $link alien-callback } " form." } ;
+{ $error-description "Thrown by " { $link c-type } " if a given word is not a C type." } ;
 
 HELP: c-type
 { $values { "name" c-type-name } { "c-type" c-type } }
