@@ -115,7 +115,7 @@ syn match   factorDefer         /\<DEFER:\s\+\S\+\>/
 syn match   factorForget        /\<FORGET:\s\+\S\+\>/
 syn match   factorMixin         /\<MIXIN:\s\+\S\+\>/
 syn match   factorInstance      /\<INSTANCE:\s\+\S\+\s\+\S\+\>/
-syn match   factorHook          /\<HOOK:\s\+\S\+\s\+\S\+\>/
+syn match   factorHook          /\<HOOK:\s\+\S\+\s\+\S\+\>/ nextgroup=factorStackEffect skipwhite skipempty
 syn match   factorMain          /\<MAIN:\s\+\S\+\>/
 syn match   factorConstructor   /\<C:\s\+\S\+\s\+\S\+\>/
 syn match   factorAlien         /\<ALIEN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
