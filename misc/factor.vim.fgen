@@ -60,8 +60,8 @@ syn keyword factorBoolean f t
 syn keyword factorBreakpoint B
 syn keyword factorFrySpecifier @ _ contained
 syn keyword factorDeclaration delimiter deprecated final flushable foldable inline recursive
-syn match factorCallQuotation /\<call(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/
-syn match factorExecute /\<execute(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/
+syn match factorCallQuotation /\<call(\s\(\S*\s\)\?--\(\s\S*\)\?\s)\>/
+syn match factorExecute /\<execute(\s\(\S*\s\)\?--\(\s\S*\)\?\s)\>/
 syn keyword factorCallNextMethod call-next-method
 
 <%
