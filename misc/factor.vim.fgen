@@ -33,7 +33,7 @@ else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorError,factorStruct
+syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorMBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorError,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
 syn match factorComment /\<!\>\s.*/ contains=factorTodo,@Spell
@@ -101,6 +101,7 @@ syn match   factorUnuse         /\<UNUSE:\s\+\S\+\>/
 syn match   factorChar          /\<CHAR:\s\+\S\+\>/
 
 syn match   factorBackslash     /\<\\\>\s\+\S\+\>/
+syn match   factorMBackslash    /\<M\\\>\s\+\S\+\s\+\S\+\>/
 syn match   factorLiteral       /\<\$\>\s\+\S\+\>/
 syn region  factorLiteralBlock  start=/\<\$\[\>/ end=/\<\]\>/
 
@@ -266,6 +267,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorChar                   Character
     HiLink factorDelimiter              Delimiter
     HiLink factorBackslash              Special
+    HiLink factorMBackslash             Special
     HiLink factorLiteral                Special
     HiLink factorLiteralBlock           Special
     HiLink factorDeclaration            Typedef
