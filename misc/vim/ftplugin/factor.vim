@@ -1,3 +1,8 @@
+" Vim filetype plugin file
+" Language: Factor
+" Maintainer: Tim Allen <screwtape@froup.com>
+" Last Change: 2011 Apr 05
+
 " Only do this when not done yet for this buffer
 if exists("b:did_ftplugin")
     finish
