@@ -119,18 +119,18 @@ check_library_exists() {
     GCC_OUT=factor-library-test.out
     $ECHO -n "Checking for library $1..."
     $ECHO "int main(){return 0;}" > $GCC_TEST
-    $CC $GCC_TEST -o $GCC_OUT -l $1
+    $CC $GCC_TEST -o $GCC_OUT -l $1 2>&-
     if [[ $? -ne 0 ]] ; then
         $ECHO "not found!"
-        $ECHO "Warning: library $1 not found."
         $ECHO "***Factor will compile NO_UI=1"
         NO_UI=1
+    else
+        $ECHO "found."
     fi
     $DELETE -f $GCC_TEST
     check_ret $DELETE
     $DELETE -f $GCC_OUT
     check_ret $DELETE
-    $ECHO "found."
 }
 
 check_X11_libraries() {
@@ -141,9 +141,26 @@ check_X11_libraries() {
     fi
 }
 
+check_gtk_libraries() {
+    if [ -z "$NO_UI" ]; then
+        check_library_exists gobject-2.0
+        check_library_exists gtk-x11-2.0
+        check_library_exists gdk-x11-2.0
+        check_library_exists gdk_pixbuf-2.0
+        check_library_exists gtkglext-x11-1.0
+        check_library_exists atk-1.0
+        check_library_exists gio-2.0
+        check_library_exists gdkglext-x11-1.0
+        check_library_exists pango-1.0
+    fi
+}
+
+
 check_libraries() {
     case $OS in
-            linux) check_X11_libraries;;
+            linux) check_X11_libraries
+                   check_gtk_libraries;;
+            unix) check_gtk_libraries;;
     esac
 }
 
