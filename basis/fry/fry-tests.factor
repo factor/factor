@@ -1,4 +1,5 @@
-! (c)2009 Slava Pestov, Eduardo Cavazos, Joe Groff bsd license
+! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: fry tools.test math prettyprint kernel io arrays
 sequences eval accessors ;
 IN: fry.tests
