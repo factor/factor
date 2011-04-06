@@ -1,4 +1,5 @@
-! (c)2009 Slava Pestov, Eduardo Cavazos, Joe Groff bsd license
+! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel locals.backend math parser
 quotations sequences sets splitting words ;
 IN: fry
@@ -78,7 +79,7 @@ INSTANCE: fried-callable fried
     ] if-empty ;
 
 : prune-curries ( seq -- seq' )
-    dup [ empty? not ] find 
+    dup [ empty? not ] find
     [ [ 1 + tail ] dip but-last prefix ]
     [ 2drop { } ] if* ;
 
