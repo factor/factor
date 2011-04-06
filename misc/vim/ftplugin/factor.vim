@@ -1,3 +1,14 @@
+" Vim filetype plugin file
+" Language: Factor
+" Maintainer: Tim Allen <screwtape@froup.com>
+" Last Change: 2011 Apr 05
+
+" Only do this when not done yet for this buffer
+if exists("b:did_ftplugin")
+    finish
+endif
+let b:did_ftplugin = 1
+
 " Code formatting settings loosely adapted from:
 " http://concatenative.org/wiki/view/Factor/Coding%20Style
 

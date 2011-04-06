@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2011 Mar 21
+" Last Change: 2011 Apr 06
 " To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
@@ -12,22 +12,21 @@ elseif exists("b:current_syntax")
     finish
 endif
 
-" factor is case sensitive.
+" Factor is case sensitive.
 syn case match
 
-" make all of these characters part of a word (useful for skipping over words with w, e, and b)
+" Make all of these characters part of a word (useful for skipping over words with w, e, and b)
 if version >= 600
     setlocal iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 else
     set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
 endif
 
-syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorError,factorStruct
+syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorMBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorError,factorStruct
 
 syn match factorTodo /\(TODO\|FIXME\|XXX\):\=/ contained
-syn match factorComment /\<!\>\s.*/ contains=factorTodo,@Spell
-syn match factorComment /\<#!\>\s.*/ contains=factorTodo,@Spell
-syn match factorShebang /\%\^#!\s.*/ display
+syn match factorComment /\<#\?!\>.*/ contains=factorTodo,@Spell
+syn match factorShebang /\%\^#!.*/ display
 syn match factorShebangErr /\%\^#!\S\+/
 
 syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
@@ -49,8 +48,8 @@ syn keyword factorBoolean f t
 syn keyword factorBreakpoint B
 syn keyword factorFrySpecifier @ _ contained
 syn keyword factorDeclaration delimiter deprecated final flushable foldable inline recursive
-syn match factorCallQuotation /\<call(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/
-syn match factorExecute /\<execute(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/
+syn match factorCallQuotation /\<call(\s\(\S*\s\)\?--\(\s\S*\)\?\s)\>/
+syn match factorExecute /\<execute(\s\(\S*\s\)\?--\(\s\S*\)\?\s)\>/
 syn keyword factorCallNextMethod call-next-method
 
 syn keyword factorKeyword or 2bi 2tri while wrapper nip 4dip wrapper? bi* callstack>array both? hashcode die dupd callstack callstack? 3dup tri@ pick curry build ?execute 3bi prepose >boolean ?if clone eq? tri* ? = swapd 2over 2keep 3keep clear 2dup when not tuple? dup 2bi* 2tri* call tri-curry object bi@ do unless* if* loop bi-curry* drop when* assert= retainstack assert? -rot execute 2bi@ 2tri@ boa with either? 3drop bi curry? datastack until 3dip over 3curry tri-curry* tri-curry@ swap and 2nip throw bi-curry (clone) hashcode* compose 2dip if 3tri unless compose? tuple keep 2curry equal? assert tri 2drop most <wrapper> boolean? identity-hashcode identity-tuple? null new dip bi-curry@ rot xor identity-tuple boolean
@@ -88,6 +87,7 @@ syn match   factorUnuse         /\<UNUSE:\s\+\S\+\>/
 syn match   factorChar          /\<CHAR:\s\+\S\+\>/
 
 syn match   factorBackslash     /\<\\\>\s\+\S\+\>/
+syn match   factorMBackslash    /\<M\\\>\s\+\S\+\s\+\S\+\>/
 syn match   factorLiteral       /\<\$\>\s\+\S\+\>/
 syn region  factorLiteralBlock  start=/\<\$\[\>/ end=/\<\]\>/
 
@@ -115,7 +115,7 @@ syn match   factorDefer         /\<DEFER:\s\+\S\+\>/
 syn match   factorForget        /\<FORGET:\s\+\S\+\>/
 syn match   factorMixin         /\<MIXIN:\s\+\S\+\>/
 syn match   factorInstance      /\<INSTANCE:\s\+\S\+\s\+\S\+\>/
-syn match   factorHook          /\<HOOK:\s\+\S\+\s\+\S\+\>/
+syn match   factorHook          /\<HOOK:\s\+\S\+\s\+\S\+\>/ nextgroup=factorStackEffect skipwhite skipempty
 syn match   factorMain          /\<MAIN:\s\+\S\+\>/
 syn match   factorConstructor   /\<C:\s\+\S\+\s\+\S\+\>/
 syn match   factorAlien         /\<ALIEN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
@@ -148,8 +148,8 @@ syn match factorMultiStringContents /.*/ contained
 "syn match factorStackEffectErr /\<)\>/
 "syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
 "syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
-syn match factorStackEffect /\<(\s\(.*\s\)\?--\(\s.*\)\?\s)\>/ contained
-syn match factorLiteralStackEffect /\<((\s\(.*\s\)\?--\(\s.*\)\?\s))\>/
+syn match factorStackEffect /\<(\s\(\S*\s\)\?--\(\s\S*\)\?\s)\>/ contained
+syn match factorLiteralStackEffect /\<((\s\(\S*\s\)\?--\(\s\S*\)\?\s))\>/
 
 "adapted from lisp.vim
 if exists("g:factor_norainbow")
@@ -253,6 +253,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorChar                   Character
     HiLink factorDelimiter              Delimiter
     HiLink factorBackslash              Special
+    HiLink factorMBackslash             Special
     HiLink factorLiteral                Special
     HiLink factorLiteralBlock           Special
     HiLink factorDeclaration            Typedef
