@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
 alien.strings arrays assocs classes.struct command-line destructors
-gdk.ffi gdk.gl.ffi glib.ffi gobject-introspection.standard-types
+environment gdk.ffi gdk.gl.ffi glib.ffi gobject-introspection.standard-types
 gobject.ffi gtk.ffi gtk.gl.ffi io.encodings.utf8 kernel libc literals
 locals math math.bitwise math.order math.vectors namespaces sequences
 strings system threads ui ui.backend ui.backend.gtk.input-methods
@@ -503,4 +503,4 @@ gtk-ui-backend ui-backend set-global
 { "ui.backend.gtk" "ui.gadgets.editors" }
 "ui.backend.gtk.input-methods.editors" require-when
 
-[ "ui.tools" ] main-vocab-hook set-global
+[ "DISPLAY" os-env "ui.tools" "listener" ? ] main-vocab-hook set-global
