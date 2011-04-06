@@ -23,5 +23,5 @@ LIBRARY: clutter
 
 FOREIGN-RECORD-TYPE: cairo.Path cairo_path_t
 
-GIR: vocab:clutter/Clutter-1.0.gir
+GIR: Clutter-1.0.gir
 

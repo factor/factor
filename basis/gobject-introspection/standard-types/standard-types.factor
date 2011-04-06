@@ -26,6 +26,9 @@ TYPEDEF: ulonglong guint64
 TYPEDEF: float gfloat
 TYPEDEF: double gdouble
 
+TYPEDEF: size_t gsize
+TYPEDEF: long gssize
+
 TYPEDEF: gulong GType
 TYPEDEF: void* gpointer
 TYPEDEF: guint32 gunichar
@@ -60,6 +63,9 @@ guint64 "guint64" register-standard-type
 
 gfloat "gfloat" register-standard-type
 gdouble "gdouble" register-standard-type
+
+gsize "gsize" register-standard-type
+gssize "gssize" register-standard-type
 
 GType "GType" register-standard-type
 gpointer "gpointer" register-standard-type

@@ -19,5 +19,5 @@ LIBRARY: clutter.gtk
 } cond
 >>
 
-GIR: vocab:clutter/gtk/GtkClutter-0.10.gir
+GIR: GtkClutter-0.10.gir
 

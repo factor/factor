@@ -18,5 +18,5 @@ LIBRARY: gstreamer.controller
 } cond
 >>
 
-GIR: vocab:gstreamer/controller/GstController-0.10.gir
+GIR: GstController-0.10.gir
 
