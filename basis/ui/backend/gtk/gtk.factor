@@ -1,15 +1,16 @@
-! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Brüschweiler.
+! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct command-line continuations
-destructors gdk.ffi gdk.gl.ffi glib.ffi
-gobject-introspection.standard-types gobject.ffi gtk.ffi gtk.gl.ffi
-io.encodings.utf8 kernel libc literals locals math math.bitwise
-math.order math.vectors namespaces sequences strings system threads ui
-ui.backend ui.backend.gtk.input-methods ui.backend.gtk.io
-ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
-ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.pixel-formats.private ui.private vocabs.loader ;
+alien.strings arrays assocs classes.struct command-line
+continuations destructors environment gdk.ffi gdk.gl.ffi
+glib.ffi gobject-introspection.standard-types gobject.ffi
+gtk.ffi gtk.gl.ffi io.encodings.utf8 kernel libc literals locals
+math math.bitwise math.order math.vectors namespaces sequences
+strings system threads ui ui.backend ui.backend.gtk.input-methods
+ui.backend.gtk.io ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.pixel-formats ui.pixel-formats.private ui.private
+vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -507,4 +508,4 @@ gtk-ui-backend ui-backend set-global
 { "ui.backend.gtk" "ui.gadgets.editors" }
 "ui.backend.gtk.input-methods.editors" require-when
 
-[ "ui.tools" ] main-vocab-hook set-global
+[ "DISPLAY" os-env "ui.tools" "listener" ? ] main-vocab-hook set-global
