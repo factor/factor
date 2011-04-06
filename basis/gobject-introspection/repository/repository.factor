@@ -46,7 +46,8 @@ TUPLE: alias
 TUPLE: const
     name
     value
-    type ;
+    type
+    c-identifier ;
 
 TUPLE: type
     name

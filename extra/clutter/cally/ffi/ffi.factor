@@ -1,22 +1,23 @@
-! Copyright (C) 2010 Anton Gorenko.
+! Copyright (C) 2011 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.libraries alien.syntax combinators
 gobject-introspection kernel system vocabs.loader ;
-IN: gstreamer.base.ffi
+IN: clutter.cally.ffi
 
 <<
-"gstreamer.ffi" require
+"atk.ffi" require
+"clutter.ffi" require
 >>
 
-LIBRARY: gstreamer.base
+LIBRARY: clutter.cally
 
 <<
-"gstreamer.base" {
+"clutter.cally" {
     { [ os winnt? ] [ drop ] }
     { [ os macosx? ] [ drop ] }
-    { [ os unix? ] [ "libgstbase-0.10.so" cdecl add-library ] }
+    { [ os unix? ] [ "libclutter-glx-1.0.so" cdecl add-library ] }
 } cond
 >>
 
-GIR: GstBase-0.10.gir
+GIR: Cally-1.0.gir
 

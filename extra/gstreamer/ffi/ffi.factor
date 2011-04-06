@@ -34,5 +34,5 @@ FOREIGN-ATOMIC-TYPE: libxml2.NsPtr xmlNsPtr
 
 PRIVATE>
 
-GIR: vocab:gstreamer/Gst-0.10.gir
+GIR: Gst-0.10.gir
 
