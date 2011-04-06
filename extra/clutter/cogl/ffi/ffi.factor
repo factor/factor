@@ -21,5 +21,5 @@ LIBRARY: clutter.cogl
 FOREIGN-ATOMIC-TYPE: GL.uint GLuint
 FOREIGN-ATOMIC-TYPE: GL.enum GLenum
 
-GIR: vocab:clutter/cogl/Cogl-1.0.gir
+GIR: Cogl-1.0.gir
 
