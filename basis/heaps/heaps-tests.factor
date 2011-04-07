@@ -36,7 +36,7 @@ IN: heaps.tests
     ] H{ } map>assoc ;
 
 : test-heap-sort ( n -- ? )
-    random-alist dup >alist sort-keys swap heap-sort = ;
+    random-alist dup sort-keys swap heap-sort = ;
 
 14 [
     [ t ] swap [ 2^ test-heap-sort ] curry unit-test

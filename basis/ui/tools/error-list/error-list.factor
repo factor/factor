@@ -59,7 +59,7 @@ M: source-file-renderer column-alignment drop { 0 0 1 } ;
 M: source-file-renderer filled-column drop 1 ;
 
 : <source-file-model> ( model -- model' )
-    [ group-by-source-file >alist sort-keys ] <arrow> ;
+    [ group-by-source-file sort-keys ] <arrow> ;
 
 :: <source-file-table> ( error-list -- table )
     error-list model>> <source-file-model>
