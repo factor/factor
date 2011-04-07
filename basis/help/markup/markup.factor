@@ -452,7 +452,7 @@ M: array elements*
 
 : $definition-icons ( element -- )
     drop
-    icons get >alist sort-keys
+    icons get sort-keys
     [ [ <$link> ] [ definition-icon-path <$image> ] bi* swap ] assoc-map
     { "" "Definition class" } prefix
     $table ;
