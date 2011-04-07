@@ -80,7 +80,7 @@ PRIVATE>
     [ inc-at ] sequence>hashtable ;
 
 : sorted-histogram ( seq -- alist )
-    histogram >alist sort-values ;
+    histogram sort-values ;
 
 : collect-values ( seq quot: ( obj hashtable -- ) -- hash )
     '[ [ dup @ ] dip push-at ] sequence>hashtable ; inline
