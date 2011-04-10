@@ -6,7 +6,7 @@ io io.binary io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
 math.parser namespaces nested-comments random sequences
-slots.syntax splitting system vectors vocabs.loader ;
+slots.syntax splitting system vectors vocabs.loader strings ;
 IN: dns
 
 : with-input-seek ( n seek-type quot -- )
@@ -286,6 +286,9 @@ M: SOA rdata>byte-array
         } cleave
     ] B{ } append-outputs-as ;
 
+M: TXT rdata>byte-array
+    drop ;
+
 : rr>byte-array ( rr -- byte-array )
     [
         {
@@ -333,6 +336,26 @@ M: SOA rdata>byte-array
 : dns-AAAA-query ( domain -- message ) AAAA IN <query> dns-query ;
 : dns-MX-query ( domain -- message ) MX IN <query> dns-query ;
 : dns-NS-query ( domain -- message ) NS IN <query> dns-query ;
+: dns-TXT-query ( domain -- message ) TXT IN <query> dns-query ;
+
+: TXT-message>strings ( message -- strings )
+    answer-section>>
+    [ rdata>>
+        [
+            binary <byte-reader> [
+                [
+                    read1 [
+                        read , t
+                    ] [
+                        f
+                    ] if*
+                ] loop
+            ] with-input-stream
+        ] { } make [ >string ] map
+    ] map ;
+
+: TXT. ( domain -- )
+    dns-TXT-query TXT-message>strings [ [ print ] each ] each ;
 
 : reverse-lookup ( reversed-ip -- message )
     PTR IN <query> dns-query ;
