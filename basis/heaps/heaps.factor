@@ -2,7 +2,7 @@
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences arrays assocs sequences.private
-growable accessors math.order summary vectors ;
+growable accessors math.order summary vectors fry combinators ;
 IN: heaps
 
 GENERIC: heap-push* ( value key heap -- entry )
@@ -58,30 +58,25 @@ M: heap heap-size ( heap -- n )
     [ right ] dip data-nth ; inline
 
 : data-set-nth ( entry n heap -- )
-    [ [ >>index drop ] 2keep ] dip
+    [ [ >>index drop ] [ ] 2bi ] dip
     data>> set-nth-unsafe ; inline
 
 : data-push ( entry heap -- n )
     dup heap-size [
         swap 2dup data>> ensure 2drop data-set-nth
-    ] keep ; inline
-
-: data-pop ( heap -- entry )
-    data>> pop ; inline
-
-: data-pop* ( heap -- )
-    data>> pop* ; inline
+    ] [
+    ] bi ; inline
 
 : data-first ( heap -- entry )
     data>> first ; inline
 
 : data-exchange ( m n heap -- )
-    [ [ data-nth ] curry bi@ ]
-    [ [ data-set-nth ] curry bi@ ] 3bi ; inline
+    [ '[ _ data-nth ] bi@ ]
+    [ '[ _ data-set-nth ] bi@ ] 3bi ; inline
 
-GENERIC: heap-compare ( pair1 pair2 heap -- ? )
+GENERIC: heap-compare ( entry1 entry2 heap -- ? )
 
-: (heap-compare) ( pair1 pair2 heap -- <=> )
+: (heap-compare) ( entry1 entry2 heap -- <=> )
     drop [ key>> ] compare ; inline
 
 M: min-heap heap-compare (heap-compare) +gt+ eq? ;
@@ -97,16 +92,17 @@ M: max-heap heap-compare (heap-compare) +lt+ eq? ;
 : right-bounds-check? ( m heap -- ? )
     [ right ] dip heap-bounds-check? ; inline
 
-: continue? ( m up[m] heap -- ? )
-    [ data-nth swap ] keep [ data-nth ] keep
-    heap-compare ; inline
+: continue? ( m n heap -- ? )
+    [ data-nth nip ]
+    [ nip data-nth ]
+    [ 2nip ] 3tri heap-compare ;
 
 DEFER: up-heap
 
 : (up-heap) ( n heap -- )
     [ dup up ] dip
     3dup continue? [
-        [ data-exchange ] 2keep up-heap
+        [ data-exchange ] [ up-heap ] 2bi
     ] [
         3drop
     ] if ; inline recursive
@@ -115,10 +111,8 @@ DEFER: up-heap
     over 0 > [ (up-heap) ] [ 2drop ] if ; inline recursive
 
 : (child) ( m heap -- n )
-    2dup right-value
-    [ 2dup left-value ] dip
-    rot heap-compare
-    [ right ] [ left ] if ;
+    { [ drop ] [ left-value ] [ right-value ] [ nip ] } 2cleave
+    heap-compare [ right ] [ left ] if ;
 
 : child ( m heap -- n )
     2dup right-bounds-check?
@@ -127,11 +121,11 @@ DEFER: up-heap
 DEFER: down-heap
 
 : (down-heap) ( m heap -- )
-    [ child ] 2keep swapd
+    [ drop ] [ child ] [ nip ] 2tri
     3dup continue? [
         3drop
     ] [
-        [ data-exchange ] 2keep down-heap
+        [ data-exchange ] [ down-heap ] 2bi
     ] if ; inline recursive
 
 : down-heap ( m heap -- )
@@ -140,14 +134,14 @@ DEFER: down-heap
 PRIVATE>
 
 M: heap heap-push* ( value key heap -- entry )
-    [ <entry> dup ] keep [ data-push ] keep up-heap ;
+    [ <entry> dup ] [ data-push ] [ ] tri up-heap ;
 
 : heap-push ( value key heap -- ) heap-push* drop ;
 
 : heap-push-all ( assoc heap -- )
-    [ swapd heap-push ] curry assoc-each ;
+    '[ swap _ heap-push ] assoc-each ;
 
-: >entry< ( entry -- key value )
+: >entry< ( entry -- value key )
     [ value>> ] [ key>> ] bi ; inline
 
 M: heap heap-peek ( heap -- value key )
@@ -163,28 +157,27 @@ M: bad-heap-delete summary
     index>> ;
 
 M: heap heap-delete ( entry heap -- )
-    [ entry>index ] keep
+    [ entry>index ] [ ] bi
     2dup heap-size 1 - = [
-        nip data-pop*
+        nip data>> pop*
     ] [
-        [ nip data-pop ] 2keep
-        [ data-set-nth ] 2keep
+        [ nip data>> pop ]
+        [ data-set-nth ]
+        [ ] 2tri
         down-heap
     ] if ;
 
 M: heap heap-pop* ( heap -- )
-    dup data-first swap heap-delete ;
+    [ data-first ] keep heap-delete ;
 
 M: heap heap-pop ( heap -- value key )
-    dup data-first [ swap heap-delete ] keep >entry< ;
+    [ data-first ] keep
+    [ heap-delete ] [ drop ] 2bi >entry< ;
 
 : heap-pop-all ( heap -- alist )
     [ dup heap-empty? not ]
     [ dup heap-pop swap 2array ]
     produce nip ;
-
-: heap-values ( heap -- alist )
-    data>> [ value>> ] { } map-as ;
 
 : slurp-heap ( heap quot: ( elt -- ) -- )
     over heap-empty? [ 2drop ] [
