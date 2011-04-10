@@ -112,41 +112,42 @@ HELP: sorted-histogram
 
 HELP: sequence>assoc
 { $values
-    { "seq" sequence } { "quot" quotation } { "exemplar" "an exemplar assoc" }
+    { "seq" sequence } { "quot1" quotation } { "quot2" quotation } { "exemplar" "an exemplar assoc" }
     { "assoc" assoc }
 }
-{ $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created " { $snippet "assoc" } " according to the passed quotation." }
+{ $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created " { $snippet "assoc" } ". The first quotation gets passed an element from the sequence and should output whatever the second quotation needs, e.g. ( element -- value key ) if the second quotation is inserting into an assoc." }
 { $examples
     { $example "! Iterate over a sequence and increment the count at each element"
+               "! The first quotation has stack effect ( key -- key ), a no-op"
                "USING: assocs prettyprint math.statistics ;"
-               "\"aaabc\" [ inc-at ] H{ } sequence>assoc ."
+               "\"aaabc\" [ ] [ inc-at ] H{ } sequence>assoc ."
                "H{ { 97 3 } { 98 1 } { 99 1 } }"
     }
 } ;
 
 HELP: sequence>assoc!
 { $values
-    { "assoc" assoc } { "seq" sequence } { "quot" quotation }
+    { "assoc" assoc } { "seq" sequence } { "quot1" quotation } { "quot2" quotation }
 }
-{ $description "Iterates over a sequence, allowing elements of the sequence to be added to an existing " { $snippet "assoc" } " according to the passed quotation." }
+{ $description "Iterates over a sequence, allowing elements of the sequence to be added to an existing " { $snippet "assoc" } ". The first quotation gets passed an element from the sequence and should output whatever the second quotation needs, e.g. ( element -- value key ) if the second quotation is inserting into an assoc." }
 { $examples
     { $example "! Iterate over a sequence and add the counts to an existing assoc"
                "USING: assocs prettyprint math.statistics kernel ;"
-               "H{ { 97 2 } { 98 1 } } clone \"aaabc\" [ inc-at ] sequence>assoc! ."
+               "H{ { 97 2 } { 98 1 } } clone \"aaabc\" [ ] [ inc-at ] sequence>assoc! ."
                "H{ { 97 5 } { 98 2 } { 99 1 } }"
     }
 } ;
 
 HELP: sequence>hashtable
 { $values
-    { "seq" sequence } { "quot" quotation }
+    { "seq" sequence } { "quot1" quotation } { "quot2" quotation }
     { "hashtable" hashtable }
 }
-{ $description "Iterates over a sequence, allowing elements of the sequence to be added to a hashtable according to the passed quotation." }
+{ $description "Iterates over a sequence, allowing elements of the sequence to be added to a hashtable according a combination of the first and second quotations. The quot1 is passed each element, and quot2 gets the hashtable on the top of the stack with quot1's results underneath for inserting into the hashtable." }
 { $examples
     { $example "! Count the number of times an element occurs in a sequence"
                "USING: assocs prettyprint math.statistics ;"
-               "\"aaabc\" [ inc-at ] sequence>hashtable ."
+               "\"aaabc\" [ ] [ inc-at ] sequence>hashtable ."
                "H{ { 97 3 } { 98 1 } { 99 1 } }"
     }
 } ;
