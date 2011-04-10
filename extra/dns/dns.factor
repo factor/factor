@@ -351,7 +351,7 @@ M: TXT rdata>byte-array
     ] map ;
 
 : TXT. ( domain -- )
-    dns-TXT-query TXT-message>strings [ [ write ] each ] each ;
+    dns-TXT-query TXT-message>strings [ [ write ] each nl ] each ;
 
 : reverse-lookup ( reversed-ip -- message )
     PTR IN <query> dns-query ;
