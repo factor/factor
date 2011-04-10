@@ -344,18 +344,14 @@ M: TXT rdata>byte-array
         [
             binary <byte-reader> [
                 [
-                    read1 [
-                        read , t
-                    ] [
-                        f
-                    ] if*
+                    read1 [ read , t ] [ f ] if*
                 ] loop
             ] with-input-stream
-        ] { } make [ >string ] map
+        ] { } make [ utf8 decode ] map
     ] map ;
 
 : TXT. ( domain -- )
-    dns-TXT-query TXT-message>strings [ [ print ] each ] each ;
+    dns-TXT-query TXT-message>strings [ [ write ] each ] each ;
 
 : reverse-lookup ( reversed-ip -- message )
     PTR IN <query> dns-query ;
