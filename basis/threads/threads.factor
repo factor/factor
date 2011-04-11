@@ -1,8 +1,8 @@
-! Copyright (C) 2004, 2010 Slava Pestov.
+! Copyright (C) 2004, 2011 Slava Pestov.
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables heaps kernel kernel.private math
-namespaces sequences vectors continuations continuations.private
+USING: alien.private arrays hashtables heaps kernel kernel.private
+math namespaces sequences vectors continuations continuations.private
 dlists assocs system combinators init boxes accessors math.order
 deques strings quotations fry ;
 IN: threads
@@ -101,6 +101,9 @@ PRIVATE>
 : sleep-queue ( -- heap )
     66 special-object { min-heap } declare ; inline
 
+: waiting-callbacks ( -- assoc )
+    68 special-object { hashtable } declare ; inline
+
 : new-thread ( quot name class -- thread )
     new
         swap >>name
@@ -123,6 +126,7 @@ PRIVATE>
 
 : sleep-time ( -- nanos/f )
     {
+        { [ current-callback waiting-callbacks key? ] [ 0 ] }
         { [ run-queue deque-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
         [ sleep-queue heap-peek nip nano-count [-] ]
@@ -176,8 +180,13 @@ M: thread (next)
     [ context>> box> set-context-and-delete ]
     [ t >>runnable drop [start] start-context-and-delete ] if ;
 
+: wake-up-callbacks ( -- )
+    current-callback waiting-callbacks delete-at*
+    [ resume-now ] [ drop ] if ;
+
 : next ( -- obj thread )
     expire-sleep-loop
+    wake-up-callbacks
     run-queue pop-back
     dup array? [ first2 ] [ [ f ] dip ] if
     f >>state
@@ -230,7 +239,8 @@ GENERIC: error-in-thread ( error thread -- )
 : init-thread-state ( -- )
     H{ } clone 64 set-special-object
     <dlist> 65 set-special-object
-    <min-heap> 66 set-special-object ;
+    <min-heap> 66 set-special-object
+    H{ } clone 68 set-special-object ;
 
 : init-initial-thread ( -- )
     [ ] "Initial" <thread>
@@ -243,6 +253,10 @@ GENERIC: error-in-thread ( error thread -- )
 : init-threads ( -- )
     init-thread-state
     init-initial-thread ;
+
+: wait-for-callback ( callback -- )
+    self swap waiting-callbacks set-at
+    "Callback return" suspend drop ;
 
 PRIVATE>
 
