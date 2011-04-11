@@ -4,6 +4,7 @@ USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs definitions math graphs generic
 generic.single combinators combinators.smart macros
 source-files.errors combinators.short-circuit classes.algebra
+vocabs.loader
 
 stack-checker stack-checker.dependencies stack-checker.inlining
 stack-checker.errors
@@ -181,3 +182,5 @@ M: optimizing-compiler process-forgotten-words
 
 : disable-optimizer ( -- )
     f compiler-impl set-global ;
+
+{ "threads" "compiler" } "compiler.threads" require-when
