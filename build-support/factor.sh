@@ -549,12 +549,12 @@ make_boot_image() {
 
 }
 
-install_build_system_apt() {
-    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev wget git-core git-doc rlwrap gcc make
+install_deps_linux() {
+    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev libgtkglext1-dev wget git-core git-doc rlwrap gcc make
     check_ret sudo
 }
 
-install_build_system_port() {
+install_deps_macosx() {
     test_program_installed git
     if [[ $? -ne 1 ]] ; then
         ensure_program_installed yes
@@ -588,8 +588,8 @@ set_delete
 
 case "$1" in
     install) install ;;
-    install-x11) install_build_system_apt; install ;;
-    install-macosx) install_build_system_port; install ;;
+    deps-linux) install_deps_linux ;;
+    deps-macosx) install_deps_macosx ;;
     self-update) update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
