@@ -41,14 +41,14 @@ IN: game.debug.tests
     COLOR: purple { 5 5 } world dim>> draw-text
     world [ 1 + ] change-frame# drop ;
 
-TUPLE: tests-world < wasd-world frame-number ;
+TUPLE: tests-world < wasd-world frame# ;
 M: tests-world draw-world* draw-debug-tests ;
 M: tests-world wasd-movement-speed drop 1/16. ;
 M: tests-world wasd-near-plane drop 1/32. ;
 M: tests-world wasd-far-plane drop 1024.0 ;
 M: tests-world begin-game-world
     init-gpu
-    0 >>frame-number
+    0 >>frame#
     { 0.0 0.0 2.0 } 0 0 set-wasd-view drop ;
 
 GAME: run-tests {

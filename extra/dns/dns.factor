@@ -6,7 +6,8 @@ io io.binary io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
 math.parser namespaces nested-comments random sequences
-slots.syntax splitting system vectors vocabs.loader strings ;
+slots.syntax splitting system vectors vocabs.loader strings
+ascii ;
 IN: dns
 
 : with-input-seek ( n seek-type quot -- )
@@ -238,10 +239,15 @@ M: SOA parse-rdata 2drop parse-soa ;
         [ [ parse-rr ] replicate ] change-additional-section
     ] with-byte-reader ;
 
-: >n/label ( string -- byte-array )
-    [ length 1array ] [ utf8 encode ] bi B{ } append-as ;
+ERROR: unsupported-domain-name string ;
 
-: >name ( domain -- byte-array ) "." split [ >n/label ] map concat ;
+: >n/label ( string -- byte-array )
+    dup [ ascii? ] all?
+    [ unsupported-domain-name ] unless
+    [ length 1array ] [ ] bi B{ } append-as ;
+
+: >name ( domain -- byte-array )
+    "." split [ >n/label ] map concat ;
 
 : query>byte-array ( query -- byte-array )
     [
@@ -321,7 +327,7 @@ M: TXT rdata>byte-array
 
 : udp-query ( bytes server -- bytes' )
     f 0 <inet4> <datagram>
-    30 seconds over set-timeout [
+    10 seconds over set-timeout [
         [ send ] [ receive drop ] bi
     ] with-disposal ;
 
