@@ -105,9 +105,9 @@ TUPLE: run-loop fds sources timers ;
     >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
 
 : reset-timer ( timer -- )
-    sleep-time dup
-    [ 1000 /f system-micros + (reset-timer) ]
-    [ 2drop ] if ;
+    sleep-time
+    [ 1000 /f ] [ 1,000,000 ] if* system-micros +
+    (reset-timer) ;
 
 PRIVATE>
 
