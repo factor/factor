@@ -101,21 +101,12 @@ SYMBOL: callbacks
 
 [ H{ } clone callbacks set-global ] "alien" add-startup-hook
 
-! Every callback invocation has a unique identifier in the VM.
-! We make sure that the current callback is the right one before
-! returning from it, to avoid a bad interaction between threads
-! and callbacks. See basis/compiler/tests/alien.factor for a
-! test case.
-: wait-to-return ( yield-quot: ( -- ) callback-id -- )
-    dup current-callback eq?
-    [ 2drop ] [ over call wait-to-return ] if ; inline recursive
-
 ! Used by compiler.codegen to wrap callback bodies
-: do-callback ( callback-quot yield-quot: ( -- ) -- )
+: do-callback ( callback-quot wait-quot: ( callback -- ) -- )
     init-namespaces
     init-catchstack
     current-callback
-    [ 2drop call ] [ wait-to-return drop ] 3bi ; inline
+    [ 2drop call ] [ swap call( callback -- ) drop ] 3bi ; inline
 
 ! A utility for defining global variables that are recompiled in
 ! every session
