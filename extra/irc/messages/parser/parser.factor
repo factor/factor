@@ -7,7 +7,7 @@ IN: irc.messages.parser
 
 <PRIVATE
 : split-at-first ( seq separators -- before after )
-    dupd '[ _ member? ] find [ cut 1 tail ] [ swap ] if ;
+    dupd '[ _ member? ] find [ cut rest ] [ swap ] if ;
 
 : split-trailing ( string -- string string/f ) ":" split1 ;
 : remove-heading-: ( seq -- seq ) ":" ?head drop ;
