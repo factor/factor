@@ -6,7 +6,8 @@ io io.binary io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
 math.parser namespaces nested-comments random sequences
-slots.syntax splitting system vectors vocabs.loader strings ;
+slots.syntax splitting system vectors vocabs.loader strings
+ascii ;
 IN: dns
 
 : with-input-seek ( n seek-type quot -- )
@@ -238,10 +239,15 @@ M: SOA parse-rdata 2drop parse-soa ;
         [ [ parse-rr ] replicate ] change-additional-section
     ] with-byte-reader ;
 
-: >n/label ( string -- byte-array )
-    [ length 1array ] [ utf8 encode ] bi B{ } append-as ;
+ERROR: unsupported-domain-name string ;
 
-: >name ( domain -- byte-array ) "." split [ >n/label ] map concat ;
+: >n/label ( string -- byte-array )
+    dup [ ascii? ] all?
+    [ unsupported-domain-name ] unless
+    [ length 1array ] [ ] bi B{ } append-as ;
+
+: >name ( domain -- byte-array )
+    "." split [ >n/label ] map concat ;
 
 : query>byte-array ( query -- byte-array )
     [
@@ -321,40 +327,41 @@ M: TXT rdata>byte-array
 
 : udp-query ( bytes server -- bytes' )
     f 0 <inet4> <datagram>
-    30 seconds over set-timeout [
+    10 seconds over set-timeout [
         [ send ] [ receive drop ] bi
     ] with-disposal ;
 
 : <dns-inet4> ( -- inet4 )
     dns-servers get random 53 <inet4> ;
 
-: dns-query ( query -- message )
-    <message> message>byte-array
+: dns-query ( name type class -- message )
+    <query> <message> message>byte-array
     <dns-inet4> udp-query parse-message ;
 
-: dns-A-query ( domain -- message ) A IN <query> dns-query ;
-: dns-AAAA-query ( domain -- message ) AAAA IN <query> dns-query ;
-: dns-MX-query ( domain -- message ) MX IN <query> dns-query ;
-: dns-NS-query ( domain -- message ) NS IN <query> dns-query ;
-: dns-TXT-query ( domain -- message ) TXT IN <query> dns-query ;
+: dns-A-query ( name -- message ) A IN dns-query ;
+: dns-AAAA-query ( name -- message ) AAAA IN dns-query ;
+: dns-MX-query ( name -- message ) MX IN dns-query ;
+: dns-NS-query ( name -- message ) NS IN dns-query ;
+: dns-TXT-query ( name -- message ) TXT IN dns-query ;
+
+: read-TXT-strings ( byte-array -- strings )
+    [
+        binary <byte-reader> [
+            [ read1 [ read , t ] [ f ] if* ] loop
+        ] with-input-stream
+    ] { } make ;
 
 : TXT-message>strings ( message -- strings )
     answer-section>>
     [ rdata>>
-        [
-            binary <byte-reader> [
-                [
-                    read1 [ read , t ] [ f ] if*
-                ] loop
-            ] with-input-stream
-        ] { } make [ utf8 decode ] map
+        read-TXT-strings [ utf8 decode ] map
     ] map ;
 
-: TXT. ( domain -- )
+: TXT. ( name -- )
     dns-TXT-query TXT-message>strings [ [ write ] each nl ] each ;
 
 : reverse-lookup ( reversed-ip -- message )
-    PTR IN <query> dns-query ;
+    PTR IN dns-query ;
 
 : reverse-ipv4-lookup ( ip -- message )
     ipv4>arpa reverse-lookup ;
