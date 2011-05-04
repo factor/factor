@@ -104,15 +104,10 @@ TUPLE: run-loop fds sources timers ;
 : (reset-timer) ( timer timestamp -- )
     >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
 
-: nano-count>micros ( x -- n )
-    nano-count - 1,000 /f system-micros + ;
-
 : reset-timer ( timer -- )
-    {
-        { [ run-queue deque-empty? not ] [ system-micros ] }
-        { [ sleep-queue heap-empty? not ] [ sleep-queue heap-peek nip nano-count>micros ] }
-        [ system-micros 1,000,000 + ]
-    } cond (reset-timer) ;
+    sleep-time
+    [ 1000 /f ] [ 1,000,000 ] if* system-micros +
+    (reset-timer) ;
 
 PRIVATE>
 
