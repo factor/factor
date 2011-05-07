@@ -59,7 +59,7 @@ PRIVATE>
     swapd each-permutation ; inline
 
 : inverse-permutation ( seq -- permutation )
-    <enum> >alist sort-values keys ;
+    <enum> sort-values keys ;
 
 
 ! Combinadic-based combination methodology
