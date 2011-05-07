@@ -260,11 +260,11 @@ ARTICLE: "io.launcher.examples" "Launcher examples"
 }
 "Running a command, appending error messages to a log file, and reading the output for further processing:"
 { $code
-    "\"log.txt\" <file-appender> ["
+    "\"log.txt\" ascii <file-appender> ["
     "    <process>"
     "        swap >>stderr"
     "        \"report\" >>command"
-    "    ascii <process-reader> lines sort reverse [ print ] each"
+    "    ascii <process-reader> stream-lines sort reverse [ print ] each"
     "] with-disposal"
 } ;
 
