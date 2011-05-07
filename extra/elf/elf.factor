@@ -536,7 +536,7 @@ TYPED:: elf-section-data-by-name ( elf: Elf32/64_Ehdr name: string -- header/f u
     elf elf-section-headers                      :> sections
     elf e_shstrndx>>                             :> ndx
     elf ndx sections nth elf-section-data >c-ptr :> section-names
-    sections 1 tail [
+    sections rest [
         sh_name>> section-names <displaced-alien> ascii alien>string name =
     ] find nip
     [ dup elf swap elf-section-data ]
