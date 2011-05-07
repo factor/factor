@@ -27,7 +27,7 @@ rectangle new 10 >>width 20 >>height area .
 ----
 USING: accessors smtp ;
 
-&lt;email>
+<email>
     "john@foobar.com" >>from
     { "jane@foobar.com" } >>to
     "Up for lunch?" >>subject
