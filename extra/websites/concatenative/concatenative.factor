@@ -84,7 +84,7 @@ SYMBOLS: key-password key-file dh-file ;
     "password" key-password set-global
     common-configuration
     <concatenative-website>
-        <wiki> <login-config> <factor-boilerplate> "wiki" add-responder
+        <wiki> <factor-recaptcha> <login-config> <factor-boilerplate> "wiki" add-responder
         <user-admin> <login-config> <factor-boilerplate> "user-admin" add-responder
         <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> "pastebin" add-responder
         <planet> <login-config> <factor-boilerplate> "planet" add-responder
