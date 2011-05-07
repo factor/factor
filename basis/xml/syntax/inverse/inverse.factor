@@ -67,7 +67,7 @@ M: interpolated [undo-xml]
 
 : >enum ( assoc -- enum )
     ! Assumes keys are 0..n
-    >alist sort-keys values <enum> ;
+    sort-keys values <enum> ;
 
 : undo-xml ( xml -- quot )
     [undo-xml] '[ H{ } clone [ _ bind ] keep >enum ] ;

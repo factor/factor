@@ -141,7 +141,7 @@ PRIVATE>
     2dup bounds-check? [ set-nth ] [ 3drop ] if ;
 
 :: fill-ranges ( table -- table )
-    name-map >alist sort-values keys
+    name-map sort-values keys
     [ { [ "first>" tail? ] [ "last>" tail? ] } 1|| ] filter
     2 group [
         [ name>char ] bi@ [ [a,b] ] [ table ?nth ] bi
