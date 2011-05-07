@@ -28,7 +28,7 @@ IN: tools.threads
             [ [ write ] with-cell ] each
         ] with-row
 
-        threads >alist sort-keys values [
+        threads sort-keys values [
             [ thread. ] with-row
         ] each
     ] tabular-output nl ;
