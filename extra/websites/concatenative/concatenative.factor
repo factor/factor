@@ -102,7 +102,7 @@ SYMBOLS: key-password key-file dh-file ;
     common-configuration
     <vhost-dispatcher>
         <concatenative-website>
-            <wiki> "wiki" add-responder
+            <wiki> <factor-recaptcha> "wiki" add-responder
             <user-admin> "user-admin" add-responder
         <login-config> <factor-boilerplate> website-db <alloy> "concatenative.org" add-responder
         <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> website-db <alloy> "paste.factorcode.org" add-responder
