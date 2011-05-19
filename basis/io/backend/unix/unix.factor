@@ -146,7 +146,7 @@ M: stdin dispose*
 
 : wait-for-stdin ( stdin -- size )
     [ control>> CHAR: X over io:stream-write1 io:stream-flush ]
-    [ size>> ssize_t heap-size swap io:stream-read int deref ]
+    [ size>> ssize_t heap-size swap io:stream-read ssize_t deref ]
     bi ;
 
 :: refill-stdin ( buffer stdin size -- )
