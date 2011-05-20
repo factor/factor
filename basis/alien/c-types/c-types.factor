@@ -436,7 +436,7 @@ M: pointer c-type
         \ uint c-type \ size_t typedef
     ] if
 
-    cpu ppc? \ uint \ uchar ? c-type clone
+    cpu ppc? os macosx? and \ uint \ uchar ? c-type clone
         [ >c-bool ] >>unboxer-quot
         [ c-bool> ] >>boxer-quot
         object >>boxed-class

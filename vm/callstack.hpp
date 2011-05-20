@@ -11,7 +11,7 @@ keep the callstack in a GC root and use relative offsets */
 template<typename Iterator> void factor_vm::iterate_callstack_object(callstack *stack_, Iterator &iterator)
 {
 	data_root<callstack> stack(stack_,this);
-	fixnum frame_offset = untag_fixnum(stack->length) - sizeof(stack_frame);
+	fixnum frame_offset = factor::untag_fixnum(stack->length) - sizeof(stack_frame);
 
 	while(frame_offset >= 0)
 	{
