@@ -1,4 +1,3 @@
 include vm/Config.unix
 PLAF_DLL_OBJS += vm/os-genunix.o vm/os-freebsd.o vm/mvm-unix.o
-CFLAGS += -export-dynamic
-LIBS = -L/usr/local/lib/ -lm -lrt $(X11_UI_LIBS)
+LIBS = -L/usr/local/lib/ -lm -lrt $(X11_UI_LIBS) -Wl,--export-dynamic

@@ -1,6 +1,7 @@
-USING: accessors alien.c-types alien.syntax arrays assocs
+USING: accessors alien alien.c-types alien.syntax arrays assocs
 biassocs classes.struct combinators kernel literals math
-math.bitwise math.floats.env math.floats.env.private system ;
+math.bitwise math.floats.env math.floats.env.private system
+cpu.ppc.assembler ;
 IN: math.floats.env.ppc
 
 STRUCT: ppc-fpu-env
@@ -10,12 +11,41 @@ STRUCT: ppc-fpu-env
 STRUCT: ppc-vmx-env
     { vscr uint } ;
 
-! defined in the vm, cpu-ppc*.S
-FUNCTION: void get_ppc_fpu_env ( ppc-fpu-env* env ) ;
-FUNCTION: void set_ppc_fpu_env ( ppc-fpu-env* env ) ;
+: get_ppc_fpu_env ( env -- )
+    void { void* } cdecl [
+        0 MFFS
+        0 3 0 STFD
+    ] alien-assembly ;
 
-FUNCTION: void get_ppc_vmx_env ( ppc-vmx-env* env ) ;
-FUNCTION: void set_ppc_vmx_env ( ppc-vmx-env* env ) ;
+: set_ppc_fpu_env ( env -- )
+    void { void* } cdecl [
+        0 3 0 LFD
+        HEX: ff 0 0 0 MTFSF
+    ] alien-assembly ;
+
+: get_ppc_vmx_env ( env -- )
+    void { void* } cdecl [
+        0 MFVSCR
+        4 1 16 SUBI
+        5 HEX: f LI
+        4 4 5 ANDC
+        0 0 4 STVXL
+        5 HEX: c LI
+        6 5 4 LWZX
+        6 3 0 STW
+    ] alien-assembly ;
+
+: set_ppc_vmx_env ( env -- )
+    void { void* } cdecl [
+        3 1 16 SUBI
+        5 HEX: f LI
+        4 4 5 ANDC
+        5 HEX: c LI
+        6 3 0 LWZ
+        6 5 4 STWX
+        0 0 4 LVXL
+        0 MTVSCR
+    ] alien-assembly ;
 
 : <ppc-fpu-env> ( -- ppc-fpu-env )
     ppc-fpu-env (struct)
@@ -32,7 +62,7 @@ M: ppc-vmx-env (set-fp-env-register)
     set_ppc_vmx_env ;
 
 M: ppc (fp-env-registers)
-    <ppc-fpu-env> <ppc-vmx-env> 2array ;
+    <ppc-fpu-env> 1array ;
 
 CONSTANT: ppc-exception-flag-bits HEX: fff8,0700
 CONSTANT: ppc-exception-flag>bit
