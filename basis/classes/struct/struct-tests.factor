@@ -460,8 +460,13 @@ cpu ppc? [
         { y int }
         { x longlong } ;
 
-    [ 12 ] [ ppc-align-test-2 heap-size ] unit-test
-    [ 4 ] [ "x" ppc-align-test-2 offset-of ] unit-test
+    cpu ppc? 4 cell = and os macosx? and [
+        [ 12 ] [ ppc-align-test-2 heap-size ] unit-test
+        [ 4 ] [ "x" ppc-align-test-2 offset-of ] unit-test
+    ] [
+        [ 16 ] [ ppc-align-test-2 heap-size ] unit-test
+        [ 8 ] [ "x" ppc-align-test-2 offset-of ] unit-test
+    ] if
 ] when
 
 STRUCT: struct-test-delegate

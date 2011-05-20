@@ -2,5 +2,5 @@ include vm/Config.unix
 PLAF_DLL_OBJS += vm/os-genunix.o vm/os-openbsd.o vm/mvm-unix.o
 CC = egcc
 CPP = eg++
-CFLAGS += -export-dynamic -fno-inline-functions
-LIBS = -L/usr/local/lib/ -lm $(X11_UI_LIBS) -lz -lssl -lcrypto -lpthread
+CFLAGS += -fno-inline-functions
+LIBS = -L/usr/local/lib/ -lm $(X11_UI_LIBS) -lz -lssl -lcrypto -lpthread -Wl,--export-dynamic
