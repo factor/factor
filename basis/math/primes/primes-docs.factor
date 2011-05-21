@@ -11,7 +11,11 @@ HELP: prime?
 { $values { "n" "an integer" } { "?" "a boolean" } }
 { $description "Test if an integer is a prime number." } ;
 
-{ primes-upto primes-between } related-words
+{ nprimes primes-upto primes-between } related-words
+
+HELP: nprimes
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } }
+{ $description "Return a sequence containing the " { $snippet "n" } " first primes numbers." } ;
 
 HELP: primes-upto
 { $values { "n" "an integer" } { "seq" "a sequence" } }
