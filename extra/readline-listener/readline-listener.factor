@@ -2,23 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data fry io io.encodings.utf8 kernel
 listener namespaces readline sequences threads vocabs
-command-line ;
+command-line vocabs.hierarchy sequences.deep locals
+splitting math ;
 QUALIFIED: readline.ffi
 IN: readline-listener
 
 <PRIVATE
 SYMBOL: completions
-
-: prefixed-words ( prefix -- words )
-    '[ name>> _ head? ] all-words swap filter [ name>> ] map ;
-
-: clear-completions ( -- )
-    f completions tset ;
-
-: get-completions ( prefix -- completions )
-    completions tget dup [ nip ] [ drop
-        prefixed-words dup completions tset
-    ] if ;
 
 TUPLE: readline-reader { prompt initial: f } ;
 M: readline-reader stream-readln
@@ -27,12 +17,37 @@ M: readline-reader stream-readln
 
 M: readline-reader prompt.
     >>prompt drop ;
+
+: word-names ( -- strs )
+    all-words [ name>> ] map ;
+
+: vocab-names ( -- strs )
+    all-vocabs-recursive no-roots no-prefixes [ name>> ] map ;
+
+: prefixed-words ( prefix -- words )
+    '[ _ head? ] word-names swap filter ;
+
+: prefixed-vocabs ( prefix -- words )
+    '[ _ head? ] vocab-names swap filter ;
+
+: clear-completions ( -- )
+    f completions tset ;
+
+: get-completions ( prefix -- completions )
+    completions tget dup [ nip ] [
+        drop current-line " " split first
+        "USING:" = [
+            prefixed-vocabs
+        ] [
+            prefixed-words
+        ] if dup completions tset
+    ] if ;
 PRIVATE>
 
 : readline-listener ( -- )
     [
-      swap get-completions ?nth
-      [ clear-completions f ] unless*
+        swap get-completions ?nth
+        [ clear-completions f ] unless*
     ] set-completion
     readline-reader new [ listener ] with-input-stream* ;
 
