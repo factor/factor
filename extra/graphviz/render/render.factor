@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators continuations destructors
-images.viewer io.files.unique kernel locals namespaces parser
-sequences summary unicode.case words
+images.viewer io.backend io.files.unique kernel locals
+namespaces parser sequences summary unicode.case words
 graphviz.ffi
 graphviz.builder
 ;
@@ -79,7 +79,7 @@ M: unsupported-engine summary
 
 :: (graphviz) ( graph -O -T -K -- -o )
     -T check-format
-    -O -T default-extension append :> -o
+    -O -T default-extension append normalize-path :> -o
     [
         gvContext &gvFreeContext :> gvc
         graph id>> graph kind agopen &agclose :> g
