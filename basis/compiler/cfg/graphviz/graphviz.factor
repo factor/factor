@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors fry io io.streams.string kernel math.parser
-namespaces prettyprint sequences splitting strings
-tools.annotations
+USING: accessors fry io io.directories io.pathnames
+io.streams.string kernel math math.parser namespaces
+prettyprint sequences splitting strings tools.annotations
 
 compiler.cfg
 compiler.cfg.builder
@@ -53,37 +53,58 @@ linearize? off
         add
     ] [ drop ] if ;
 
-SYMBOL: step
+: cfgviz ( cfg filename -- cfg )
+    over
+    <digraph>
+        graph[ "t" =labelloc ];
+        node[ "box" =shape "Courier" =fontname 10 =fontsize ];
+        swap
+        [ ?linearize ]
+        [ [ add-cfg-vertex ] each-basic-block ]
+        [ [ add-cfg-edges ] each-basic-block ]
+        tri
+    swap png ;
 
-: (cfgviz) ( cfg label filename -- )
+: perform-pass ( cfg pass -- cfg' )
+    def>> call( cfg -- cfg' ) ;
+
+: pass-file ( pass pass# -- path )
+    [ name>> ] [ number>string "-" append ] bi* prepend ;
+
+: watch-pass ( cfg pass pass# -- cfg' )
+    [ drop perform-pass ] 2keep
+    pass-file cfgviz ;
+
+: begin-watching-passes ( cfg -- cfg )
+    "0-build-cfg" cfgviz ;
+
+: watch-passes ( cfg -- cfg' )
+    \ optimize-cfg def>> [ 1 + watch-pass ] each-index ;
+
+: finish-watching-passes ( cfg -- )
+    \ finalize-cfg
+    \ optimize-cfg def>> length 1 +
+    watch-pass drop ;
+
+: watch-cfg ( path cfg -- )
+    over make-directories
     [
-        <digraph>
-            graph[ "t" =labelloc ];
-            node[ "box" =shape "Courier" =fontname 10 =fontsize ];
-            swap drop ! =label
-            swap
-            [ ?linearize ]
-            [ [ add-cfg-vertex ] each-basic-block ]
-            [ [ add-cfg-edges ] each-basic-block ]
-            tri
-    ] dip png ;
-
-: cfgviz ( cfg pass -- )
-    "After " prepend
-    step inc step get number>string
-    (cfgviz) ;
-
-: (watch-cfgs) ( cfg -- )
-    0 step [
         [
-            dup "build-cfg" cfgviz
-            dup \ optimize-cfg def>> [
-                [ def>> call( cfg -- cfg' ) ] keep
-                name>> cfgviz
-            ] with each
-            finalize-cfg "finalize-cfg" cfgviz
+            begin-watching-passes
+            watch-passes
+            finish-watching-passes
         ] with-cfg
-    ] with-variable ;
+    ] curry with-directory ;
 
-: watch-cfgs ( quot -- )
-    test-builder [ (watch-cfgs) ] each ;
+: watch-cfgs ( path cfgs -- )
+    [
+        number>string "cfg" prepend append-path
+        swap watch-cfg
+    ] with each-index ;
+
+: watch-optimizer* ( path quot -- )
+    test-builder
+    dup length 1 = [ first watch-cfg ] [ watch-cfgs ] if ;
+
+: watch-optimizer ( quot -- )
+    [ "" ] dip watch-optimizer* ;
