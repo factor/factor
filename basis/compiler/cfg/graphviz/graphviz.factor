@@ -42,41 +42,28 @@ IN: compiler.cfg.graphviz
         [ number>> ] bi@ ->
     ] with each ;
 
-SYMBOL: linearize?
-linearize? off
-
-: ?linearize ( graph cfg -- graph' )
-    linearize? get [
-        <anon>
-            edge[ "invis" =style ];
-            swap linearization-order [ number>> ] map ~->
-        add
-    ] [ drop ] if ;
-
-: cfgviz ( cfg filename -- cfg )
-    over
+: cfgviz ( cfg -- graph )
     <digraph>
         graph[ "t" =labelloc ];
         node[ "box" =shape "Courier" =fontname 10 =fontsize ];
-        swap
-        [ ?linearize ]
-        [ [ add-cfg-vertex ] each-basic-block ]
-        [ [ add-cfg-edges ] each-basic-block ]
-        tri
-    swap png ;
+        swap [
+            [ add-cfg-vertex ] [ add-cfg-edges ] bi
+        ] each-basic-block ;
 
-: perform-pass ( cfg pass -- cfg' )
-    def>> call( cfg -- cfg' ) ;
+: perform-pass ( cfg pass pass# -- cfg' )
+    drop def>> call( cfg -- cfg' ) ;
 
-: pass-file ( pass pass# -- path )
-    [ name>> ] [ number>string "-" append ] bi* prepend ;
+: draw-cfg ( cfg pass pass# -- cfg )
+    [ dup cfgviz ]
+    [ name>> "After " prepend =label ]
+    [ number>string png ]
+    tri* ;
 
 : watch-pass ( cfg pass pass# -- cfg' )
-    [ drop perform-pass ] 2keep
-    pass-file cfgviz ;
+    [ perform-pass ] 2keep draw-cfg ;
 
 : begin-watching-passes ( cfg -- cfg )
-    "0-build-cfg" cfgviz ;
+    \ build-cfg 0 draw-cfg ;
 
 : watch-passes ( cfg -- cfg' )
     \ optimize-cfg def>> [ 1 + watch-pass ] each-index ;
