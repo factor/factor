@@ -15,9 +15,9 @@ LIBRARY: clutter.gtk
 "clutter.gtk" {
     { [ os winnt? ] [ drop ] }
     { [ os macosx? ] [ drop ] }
-    { [ os unix? ] [ "libclutter-gtk-0.10.so" cdecl add-library ] }
+    { [ os unix? ] [ "libclutter-gtk-1.0.so" cdecl add-library ] }
 } cond
 >>
 
-GIR: GtkClutter-0.10.gir
+GIR: GtkClutter-1.0.gir
 
