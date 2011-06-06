@@ -267,7 +267,7 @@ HELP: nth-root
 
 HELP: 10^
 { $values { "x" number } { "y" number } }
-{ $description "Raises " { $snippet "x" } " to the power of 10. If " { $snippet "x" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." } ;
+{ $description "Raises 10 to the power of " { $snippet "x" } ". If " { $snippet "x" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." } ;
 
 HELP: gcd
 { $values { "x" integer } { "y" integer } { "a" integer } { "d" integer } }
