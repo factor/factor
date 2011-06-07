@@ -1,7 +1,7 @@
 <% USING: namespaces http.client kernel io.files splitting random io io.encodings.utf8 sequences
 webapps.mason.version.data webapps.mason.backend webapps.mason.grids webapps.mason.downloads 
-webapps.mason.utils html.elements accessors
-xml.writer ; %>
+webapps.mason.utils html.elements html.streams accessors
+xml.writer xmode.highlight ; %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -45,12 +45,12 @@ xml.writer ; %>
 
 <p>Factor belongs to the family of <em><a href="http://concatenative.org/wiki/view/Concatenative%20language">concatenative languages</a></em>: this means that, at the lowest level, a Factor program is a series of words (functions) that manipulate a stack of references to dynamically-typed values. This gives the language a powerful foundation which allows many abstractions and paradigms to be built on top. Reload this page to see a random code example below.</p>
 
-<pre>
-<%
+<pre><%
 "resource:extra/websites/factorcode/examples.txt" utf8 file-lines
-{ "----" } split random "\n" join write
-%>
-</pre>
+{ "----" } split random
+"factor" [ highlight-lines ] with-html-writer
+[ xml>string write-html ] each
+%></pre>
 
 <p>See the <a href="http://concatenative.org/wiki/view/Factor/Examples">example programs</a> page on the wiki for more.</p>
 

@@ -53,7 +53,7 @@ nonce ;
     ] H{ } make-assoc ; inline
 
 :: sign-params ( url request-method consumer-token request-token params -- signed-params )
-    params >alist sort-keys :> params
+    params sort-keys :> params
     url request-method params signature-base-string :> sbs
     consumer-token secret>> request-token dup [ secret>> ] when hmac-key :> key
     sbs key sha1 hmac-bytes >base64 >string :> signature

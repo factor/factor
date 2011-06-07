@@ -37,7 +37,7 @@ CONSTANT: max-redirects 10
     [ "Header injection attack" throw ] when ;
 
 : write-header ( assoc -- )
-    >alist sort-keys [
+    sort-keys [
         [ check-header-string write ": " write ]
         [ header-value>string check-header-string write crlf ] bi*
     ] assoc-each crlf ;

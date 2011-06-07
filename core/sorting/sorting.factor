@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel math vectors math.order
+USING: accessors arrays assocs kernel math vectors math.order
 sequences sequences.private ;
 IN: sorting
 
@@ -160,8 +160,16 @@ PRIVATE>
 : inv-sort-with ( seq quot -- sortedseq )
     [ compare invert-comparison ] curry sort ; inline
 
-: sort-keys ( seq -- sortedseq ) [ first ] sort-with ;
+GENERIC: sort-keys ( obj -- sortedseq )
 
-: sort-values ( seq -- sortedseq ) [ second ] sort-with ;
+M: object sort-keys >alist sort-keys ;
+
+M: sequence sort-keys [ first ] sort-with ;
+
+GENERIC: sort-values ( obj -- sortedseq )
+
+M: object sort-values >alist sort-values ;
+
+M: sequence sort-values [ second ] sort-with ;
 
 : sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;

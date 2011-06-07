@@ -334,33 +334,34 @@ M: TXT rdata>byte-array
 : <dns-inet4> ( -- inet4 )
     dns-servers get random 53 <inet4> ;
 
-: dns-query ( query -- message )
-    <message> message>byte-array
+: dns-query ( name type class -- message )
+    <query> <message> message>byte-array
     <dns-inet4> udp-query parse-message ;
 
-: dns-A-query ( domain -- message ) A IN <query> dns-query ;
-: dns-AAAA-query ( domain -- message ) AAAA IN <query> dns-query ;
-: dns-MX-query ( domain -- message ) MX IN <query> dns-query ;
-: dns-NS-query ( domain -- message ) NS IN <query> dns-query ;
-: dns-TXT-query ( domain -- message ) TXT IN <query> dns-query ;
+: dns-A-query ( name -- message ) A IN dns-query ;
+: dns-AAAA-query ( name -- message ) AAAA IN dns-query ;
+: dns-MX-query ( name -- message ) MX IN dns-query ;
+: dns-NS-query ( name -- message ) NS IN dns-query ;
+: dns-TXT-query ( name -- message ) TXT IN dns-query ;
+
+: read-TXT-strings ( byte-array -- strings )
+    [
+        binary <byte-reader> [
+            [ read1 [ read , t ] [ f ] if* ] loop
+        ] with-input-stream
+    ] { } make ;
 
 : TXT-message>strings ( message -- strings )
     answer-section>>
     [ rdata>>
-        [
-            binary <byte-reader> [
-                [
-                    read1 [ read , t ] [ f ] if*
-                ] loop
-            ] with-input-stream
-        ] { } make [ utf8 decode ] map
+        read-TXT-strings [ utf8 decode ] map
     ] map ;
 
-: TXT. ( domain -- )
+: TXT. ( name -- )
     dns-TXT-query TXT-message>strings [ [ write ] each nl ] each ;
 
 : reverse-lookup ( reversed-ip -- message )
-    PTR IN <query> dns-query ;
+    PTR IN dns-query ;
 
 : reverse-ipv4-lookup ( ip -- message )
     ipv4>arpa reverse-lookup ;

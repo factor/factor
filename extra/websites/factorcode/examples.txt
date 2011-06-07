@@ -46,8 +46,8 @@ set-file-lines
 USING: sequences xml.syntax xml.writer ;
 
 { "three" "blind" "mice" }
-[ [XML &lt;li>&lt;->&lt;/li> XML] ] map
-[XML &lt;ul>&lt;->&lt;/ul> XML]
+[ [XML <li><-></li> XML] ] map
+[XML <ul><-></ul> XML]
 pprint-xml
 ----
 USING: inspector io.files.info io.pathnames system tools.files ;

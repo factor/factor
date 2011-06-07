@@ -9,6 +9,7 @@ http.server
 http.server.dispatchers
 furnace.actions
 furnace.utilities
+furnace.recaptcha
 furnace.redirection
 furnace.auth
 furnace.auth.login
@@ -169,6 +170,8 @@ M: revision feed-entry-url id>> revision-url ;
 : <submit-article-action> ( -- action )
     <action>
         [
+            validate-recaptcha
+
             validate-title
 
             {
