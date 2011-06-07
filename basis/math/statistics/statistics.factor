@@ -79,7 +79,7 @@ PRIVATE>
     [ ] [ inc-at ] sequence>hashtable ;
 
 : sorted-histogram ( seq -- alist )
-    histogram >alist sort-values ;
+    histogram sort-values ;
 
 : collect-pairs ( seq quot -- hashtable )
     [ push-at ] sequence>hashtable ; inline
