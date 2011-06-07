@@ -1,0 +1,1249 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gst" version="0.10"/>
+  <include name="libxml2" version="2.0"/>
+  <package name="gstreamer-controller-0.10"/>
+  <c:include name="gst/controller/gstcontroller.h"/>
+  <c:include name="gst/controller/gstcontrolsource.h"/>
+  <c:include name="gst/controller/gstinterpolationcontrolsource.h"/>
+  <c:include name="gst/controller/gstlfocontrolsource.h"/>
+  <namespace name="GstController"
+             version="0.10"
+             shared-library="libgstreamer-0.10.so.0,libgstcontroller-0.10.so.0"
+             c:identifier-prefixes="Gst"
+             c:symbol-prefixes="gst">
+    <class name="ControlSource"
+           c:symbol-prefix="control_source"
+           c:type="GstControlSource"
+           parent="GObject.Object"
+           abstract="1"
+           glib:type-name="GstControlSource"
+           glib:get-type="gst_control_source_get_type"
+           glib:type-struct="ControlSourceClass">
+      <doc xml:whitespace="preserve">The #GstControlSource is a base class for control value sources that could
+be used by #GstController to get timestamp-value pairs.
+A #GstControlSource is used by first getting an instance, binding it to a
+#GParamSpec (for example by using gst_controller_set_control_source()) and
+then by having it used by the #GstController or calling
+gst_control_source_get_value() or gst_control_source_get_value_array().
+For implementing a new #GstControlSource one has to implement a
+#GstControlSourceBind method, which will depending on the #GParamSpec set up
+the control source for use and sets the #GstControlSourceGetValue and
+#GstControlSourceGetValueArray functions. These are then used by
+gst_control_source_get_value() or gst_control_source_get_value_array()
+to get values for specific timestamps.</doc>
+      <method name="bind" c:identifier="gst_control_source_bind">
+        <doc xml:whitespace="preserve">Binds a #GstControlSource to a specific property. This must be called only once for a
+#GstControlSource.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the #GstControlSource was bound correctly, %FALSE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="pspec" transfer-ownership="none">
+            <doc xml:whitespace="preserve">#GParamSpec for the property for which this #GstControlSource should generate values.</doc>
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_value" c:identifier="gst_control_source_get_value">
+        <doc xml:whitespace="preserve">Gets the value for this #GstControlSource at a given timestamp.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">FALSE if the value couldn't be returned, TRUE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time for which the value should be returned</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value</doc>
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_value_array"
+              c:identifier="gst_control_source_get_value_array">
+        <doc xml:whitespace="preserve">Gets an array of values for one element property.
+All fields of @value_array must be filled correctly. Especially the
+of values.
+The type of the values in the array is the same as the property's type.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the given array could be filled, %FALSE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time that should be processed</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+          <parameter name="value_array" transfer-ownership="none">
+            <doc xml:whitespace="preserve">array to put control-values in</doc>
+            <type name="ValueArray" c:type="GstValueArray*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="get_value">
+        <type name="ControlSourceGetValue" c:type="GstControlSourceGetValue"/>
+      </field>
+      <field name="get_value_array">
+        <type name="ControlSourceGetValueArray"
+              c:type="GstControlSourceGetValueArray"/>
+      </field>
+      <field name="bound" readable="0" private="1">
+        <type name="gboolean" c:type="gboolean"/>
+      </field>
+      <field name="_gst_reserved" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </class>
+    <callback name="ControlSourceBind" c:type="GstControlSourceBind">
+      <doc xml:whitespace="preserve">Function for binding a #GstControlSource to a #GParamSpec.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the property could be bound to the #GstControlSource, %FALSE otherwise.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="self" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstControlSource instance</doc>
+          <type name="ControlSource" c:type="GstControlSource*"/>
+        </parameter>
+        <parameter name="pspec" transfer-ownership="none">
+          <doc xml:whitespace="preserve">#GParamSpec that should be bound to</doc>
+          <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <record name="ControlSourceClass"
+            c:type="GstControlSourceClass"
+            glib:is-gtype-struct-for="ControlSource">
+      <doc xml:whitespace="preserve">The class structure of #GstControlSource.</doc>
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="bind">
+        <type name="ControlSourceBind" c:type="GstControlSourceBind"/>
+      </field>
+      <field name="_gst_reserved" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <callback name="ControlSourceGetValue" c:type="GstControlSourceGetValue">
+      <doc xml:whitespace="preserve">Function for returning a value for a given timestamp.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the value was successfully calculated.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="self" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstControlSource instance</doc>
+          <type name="ControlSource" c:type="GstControlSource*"/>
+        </parameter>
+        <parameter name="timestamp" transfer-ownership="none">
+          <doc xml:whitespace="preserve">timestamp for which a value should be calculated</doc>
+          <type name="Gst.ClockTime" c:type="GstClockTime"/>
+        </parameter>
+        <parameter name="value" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GValue which will be set to the result. It must be initialized to the correct type.</doc>
+          <type name="GObject.Value" c:type="GValue*"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <callback name="ControlSourceGetValueArray"
+              c:type="GstControlSourceGetValueArray">
+      <doc xml:whitespace="preserve">Function for returning a #GstValueArray for a given timestamp.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the values were successfully calculated.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="self" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstControlSource instance</doc>
+          <type name="ControlSource" c:type="GstControlSource*"/>
+        </parameter>
+        <parameter name="timestamp" transfer-ownership="none">
+          <doc xml:whitespace="preserve">timestamp for which a value should be calculated</doc>
+          <type name="Gst.ClockTime" c:type="GstClockTime"/>
+        </parameter>
+        <parameter name="value_array" transfer-ownership="none">
+          <doc xml:whitespace="preserve">array to put control-values in</doc>
+          <type name="ValueArray" c:type="GstValueArray*"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <class name="Controller"
+           c:symbol-prefix="controller"
+           c:type="GstController"
+           parent="GObject.Object"
+           glib:type-name="GstController"
+           glib:get-type="gst_controller_get_type"
+           glib:type-struct="ControllerClass">
+      <doc xml:whitespace="preserve">The controller subsystem offers a lightweight way to adjust gobject
+properties over stream-time. It works by using time-stamped value pairs that
+are queued for element-properties. At run-time the elements continously pull
+values changes for the current stream-time.
+What needs to be changed in a #GstElement?
+Very little - it is just two steps to make a plugin controllable!
+&lt;orderedlist&gt;
+&lt;listitem&gt;&lt;para&gt;
+mark gobject-properties paramspecs that make sense to be controlled,
+by GST_PARAM_CONTROLLABLE.
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+when processing data (get, chain, loop function) at the beginning call
+gst_object_sync_values(element,timestamp).
+This will made the controller to update all gobject properties that are under
+control with the current values based on timestamp.
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;/orderedlist&gt;
+What needs to be done in applications?
+Again its not a lot to change.
+&lt;orderedlist&gt;
+&lt;listitem&gt;&lt;para&gt;
+first put some properties under control, by calling
+controller = gst_object_control_properties (object, "prop1", "prop2",...);
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+Get a #GstControlSource for the property and set it up.
+csource = gst_interpolation_control_source_new ();
+gst_interpolation_control_source_set_interpolation_mode(csource, mode);
+gst_interpolation_control_source_set (csource,0 * GST_SECOND, value1);
+gst_interpolation_control_source_set (csource,1 * GST_SECOND, value2);
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+Set the #GstControlSource in the controller.
+gst_controller_set_control_source (controller, "prop1", csource);
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+start your pipeline
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;/orderedlist&gt;</doc>
+      <constructor name="new"
+                   c:identifier="gst_controller_new"
+                   introspectable="0">
+        <doc xml:whitespace="preserve">Creates a new GstController for the given object's properties</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the new controller.</doc>
+          <type name="Controller" c:type="GstController*"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the object of which some properties should be controlled</doc>
+            <type name="GObject.Object" c:type="GObject*"/>
+          </parameter>
+          <parameter transfer-ownership="none">
+            <varargs>
+            </varargs>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_list" c:identifier="gst_controller_new_list">
+        <doc xml:whitespace="preserve">Creates a new GstController for the given object's properties</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the new controller.</doc>
+          <type name="Controller" c:type="GstController*"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the object of which some properties should be controlled</doc>
+            <type name="GObject.Object" c:type="GObject*"/>
+          </parameter>
+          <parameter name="list" transfer-ownership="none">
+            <doc xml:whitespace="preserve">list of property names that should be controlled</doc>
+            <type name="GLib.List" c:type="GList*">
+              <type name="gpointer" c:type="gpointer"/>
+            </type>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_valist"
+                   c:identifier="gst_controller_new_valist"
+                   introspectable="0">
+        <doc xml:whitespace="preserve">Creates a new GstController for the given object's properties</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the new controller.</doc>
+          <type name="Controller" c:type="GstController*"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the object of which some properties should be controlled</doc>
+            <type name="GObject.Object" c:type="GObject*"/>
+          </parameter>
+          <parameter name="var_args" transfer-ownership="none">
+            <doc xml:whitespace="preserve">%NULL terminated list of property names that should be controlled</doc>
+            <type name="va_list" c:type="va_list"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <function name="init" c:identifier="gst_controller_init">
+        <doc xml:whitespace="preserve">Initializes the use of the controller library. Suggested to be called right
+after gst_init().</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the %TRUE for success.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="argc" transfer-ownership="none">
+            <doc xml:whitespace="preserve">pointer to the commandline argument count</doc>
+            <type name="gint" c:type="int*"/>
+          </parameter>
+          <parameter name="argv" transfer-ownership="none">
+            <doc xml:whitespace="preserve">pointer to the commandline argument values</doc>
+            <type name="utf8" c:type="char***"/>
+          </parameter>
+        </parameters>
+      </function>
+      <method name="get" c:identifier="gst_controller_get">
+        <doc xml:whitespace="preserve">Gets the value for the given controller-handled property at the requested
+time.
+property isn't handled by the controller</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the GValue of the property at the given time, or %NULL if the</doc>
+          <type name="GObject.Value" c:type="GValue*"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property to get</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time the control-change should be read from</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_all"
+              c:identifier="gst_controller_get_all"
+              deprecated="Use #GstControlSource, for example #GstInterpolationControlSource">
+        <doc xml:whitespace="preserve">Returns a read-only copy of the list of #GstTimedValue for the given property.
+Free the list after done with it.
+&lt;note&gt;&lt;para&gt;This doesn't modify the controlled GObject property!&lt;/para&gt;&lt;/note&gt;
+directly.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a copy of the list, or %NULL if the property isn't handled by the controller</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="gpointer" c:type="gpointer"/>
+          </type>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property to get the list for</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_control_source"
+              c:identifier="gst_controller_get_control_source"
+              version="0.10.14"
+              introspectable="0">
+        <doc xml:whitespace="preserve">Gets the corresponding #GstControlSource for the property. This should be unreferenced
+again after use.
+controlled by this controller or no #GstControlSource was assigned yet.</doc>
+        <return-value>
+          <doc xml:whitespace="preserve">the #GstControlSource for @property_name or NULL if the property is not</doc>
+          <type name="ControlSource" c:type="GstControlSource*"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">name of the property for which the #GstControlSource should be get</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_value_array"
+              c:identifier="gst_controller_get_value_array">
+        <doc xml:whitespace="preserve">Function to be able to get an array of values for one element property.
+All fields of @value_array must be filled correctly. Especially the
+of values (as indicated by the nbsamples field).
+The type of the values in the array is the same as the property's type.
+&lt;note&gt;&lt;para&gt;This doesn't modify the controlled GObject property!&lt;/para&gt;&lt;/note&gt;</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the given array could be filled, %FALSE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time that should be processed</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+          <parameter name="value_array" transfer-ownership="none">
+            <doc xml:whitespace="preserve">array to put control-values in</doc>
+            <type name="ValueArray" c:type="GstValueArray*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_value_arrays"
+              c:identifier="gst_controller_get_value_arrays">
+        <doc xml:whitespace="preserve">Function to be able to get an array of values for one or more given element
+properties.
+All fields of the %GstValueArray in the list must be filled correctly.
+Especially the GstValueArray-&gt;values arrays must be big enough to keep
+the requested amount of values.
+The types of the values in the array are the same as the property's type.
+&lt;note&gt;&lt;para&gt;This doesn't modify the controlled GObject properties!&lt;/para&gt;&lt;/note&gt;</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the given array(s) could be filled, %FALSE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time that should be processed</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+          <parameter name="value_arrays" transfer-ownership="none">
+            <doc xml:whitespace="preserve">list to return the control-values in</doc>
+            <type name="GLib.SList" c:type="GSList*">
+              <type name="gpointer" c:type="gpointer"/>
+            </type>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="remove_properties"
+              c:identifier="gst_controller_remove_properties"
+              introspectable="0">
+        <doc xml:whitespace="preserve">Removes the given object properties from the controller</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%FALSE if one of the given property isn't handled by the controller, %TRUE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter transfer-ownership="none">
+            <varargs>
+            </varargs>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="remove_properties_list"
+              c:identifier="gst_controller_remove_properties_list">
+        <doc xml:whitespace="preserve">Removes the given object properties from the controller</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%FALSE if one of the given property isn't handled by the controller, %TRUE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="list" transfer-ownership="none">
+            <doc xml:whitespace="preserve">#GList of property names that should be removed</doc>
+            <type name="GLib.List" c:type="GList*">
+              <type name="gpointer" c:type="gpointer"/>
+            </type>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="remove_properties_valist"
+              c:identifier="gst_controller_remove_properties_valist"
+              introspectable="0">
+        <doc xml:whitespace="preserve">Removes the given object properties from the controller</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%FALSE if one of the given property isn't handled by the controller, %TRUE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="var_args" transfer-ownership="none">
+            <doc xml:whitespace="preserve">%NULL terminated list of property names that should be removed</doc>
+            <type name="va_list" c:type="va_list"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set"
+              c:identifier="gst_controller_set"
+              deprecated="Use #GstControlSource, for example #GstInterpolationControlSource">
+        <doc xml:whitespace="preserve">Set the value of given controller-handled property at a certain time.
+directly.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">FALSE if the values couldn't be set (ex : properties not handled by controller), TRUE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property to set</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time the control-change is schedules for</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the control-value</doc>
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_control_source"
+              c:identifier="gst_controller_set_control_source"
+              version="0.10.14">
+        <doc xml:whitespace="preserve">Sets the #GstControlSource for @property_name. If there already was a #GstControlSource
+for this property it will be unreferenced.
+couldn't be bound to the property, %TRUE if everything worked as expected.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%FALSE if the given property isn't handled by the controller or the new #GstControlSource</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">name of the property for which the #GstControlSource should be set</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="csource" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GstControlSource that should be used for the property</doc>
+            <type name="ControlSource" c:type="GstControlSource*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_disabled"
+              c:identifier="gst_controller_set_disabled"
+              version="0.10.14">
+        <doc xml:whitespace="preserve">This function is used to disable all properties of the #GstController
+for some time, i.e. gst_controller_sync_values() will do nothing.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="disabled" transfer-ownership="none">
+            <doc xml:whitespace="preserve">boolean that specifies whether to disable the controller or not.</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_from_list"
+              c:identifier="gst_controller_set_from_list"
+              deprecated="Use #GstControlSource, for example #GstInterpolationControlSource">
+        <doc xml:whitespace="preserve">Sets multiple timed values at once.
+directly.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%FALSE if the values couldn't be set (ex : properties not handled by controller), %TRUE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property to set</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="timedvalues" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a list with #GstTimedValue items</doc>
+            <type name="GLib.SList" c:type="GSList*">
+              <type name="gpointer" c:type="gpointer"/>
+            </type>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_interpolation_mode"
+              c:identifier="gst_controller_set_interpolation_mode"
+              deprecated="Use #GstControlSource, for example #GstInterpolationControlSource">
+        <doc xml:whitespace="preserve">Sets the given interpolation mode on the given property.
+&lt;note&gt;&lt;para&gt;User interpolation is not yet available and quadratic interpolation
+is deprecated and maps to cubic interpolation.&lt;/para&gt;&lt;/note&gt;
+directly.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the property is handled by the controller, %FALSE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property for which to change the interpolation</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="mode" transfer-ownership="none">
+            <doc xml:whitespace="preserve">interpolation mode</doc>
+            <type name="InterpolateMode" c:type="GstInterpolateMode"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_property_disabled"
+              c:identifier="gst_controller_set_property_disabled"
+              version="0.10.14">
+        <doc xml:whitespace="preserve">This function is used to disable the #GstController on a property for
+some time, i.e. gst_controller_sync_values() will do nothing for the
+property.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">property to disable</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="disabled" transfer-ownership="none">
+            <doc xml:whitespace="preserve">boolean that specifies whether to disable the controller or not.</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="suggest_next_sync"
+              c:identifier="gst_controller_suggest_next_sync"
+              version="0.10.13">
+        <doc xml:whitespace="preserve">Returns a suggestion for timestamps where buffers should be split
+to get best controller results.
+if no control-rate was set.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">Returns the suggested timestamp or %GST_CLOCK_TIME_NONE</doc>
+          <type name="Gst.ClockTime" c:type="GstClockTime"/>
+        </return-value>
+      </method>
+      <method name="sync_values" c:identifier="gst_controller_sync_values">
+        <doc xml:whitespace="preserve">Sets the properties of the element, according to the controller that (maybe)
+handles them and for the given timestamp.
+If this function fails, it is most likely the application developers fault.
+Most probably the control sources are not setup correctly.
+properties, %FALSE otherwise</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the controller values could be applied to the object</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time that should be processed</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="unset"
+              c:identifier="gst_controller_unset"
+              deprecated="Use #GstControlSource, for example #GstInterpolationControlSource">
+        <doc xml:whitespace="preserve">Used to remove the value of given controller-handled property at a certain
+time.
+directly.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%FALSE if the values couldn't be unset (ex : properties not handled by controller), %TRUE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property to unset</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time the control-change should be removed from</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="unset_all"
+              c:identifier="gst_controller_unset_all"
+              version="0.10.5"
+              deprecated="Use #GstControlSource, for example #GstInterpolationControlSource">
+        <doc xml:whitespace="preserve">Used to remove all time-stamped values of given controller-handled property
+directly.
+by controller), %TRUE otherwise</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%FALSE if the values couldn't be unset (ex : properties not handled</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property to unset</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <property name="control-rate" writable="1" transfer-ownership="none">
+        <type name="guint64"/>
+      </property>
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="properties">
+        <type name="GLib.List" c:type="GList*">
+          <type name="gpointer" c:type="gpointer"/>
+        </type>
+      </field>
+      <field name="lock">
+        <type name="GLib.Mutex" c:type="GMutex*"/>
+      </field>
+      <field name="object">
+        <type name="GObject.Object" c:type="GObject*"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="ControllerPrivate" c:type="GstControllerPrivate*"/>
+      </field>
+      <field name="_gst_reserved" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="3">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </class>
+    <record name="ControllerClass"
+            c:type="GstControllerClass"
+            glib:is-gtype-struct-for="Controller">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="_gst_reserved" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="ControllerPrivate"
+            c:type="GstControllerPrivate"
+            disguised="1">
+    </record>
+    <enumeration name="InterpolateMode" c:type="GstInterpolateMode">
+      <doc xml:whitespace="preserve">The various interpolation modes available.</doc>
+      <member name="none" value="0" c:identifier="GST_INTERPOLATE_NONE"/>
+      <member name="trigger" value="1" c:identifier="GST_INTERPOLATE_TRIGGER"/>
+      <member name="linear" value="2" c:identifier="GST_INTERPOLATE_LINEAR"/>
+      <member name="quadratic"
+              value="3"
+              c:identifier="GST_INTERPOLATE_QUADRATIC"/>
+      <member name="cubic" value="4" c:identifier="GST_INTERPOLATE_CUBIC"/>
+      <member name="user" value="5" c:identifier="GST_INTERPOLATE_USER"/>
+    </enumeration>
+    <class name="InterpolationControlSource"
+           c:symbol-prefix="interpolation_control_source"
+           c:type="GstInterpolationControlSource"
+           parent="ControlSource"
+           glib:type-name="GstInterpolationControlSource"
+           glib:get-type="gst_interpolation_control_source_get_type"
+           glib:type-struct="InterpolationControlSourceClass">
+      <doc xml:whitespace="preserve">#GstInterpolationControlSource is a #GstControlSource, that interpolates values between user-given
+control points. It supports several interpolation modes and property types.
+To use #GstInterpolationControlSource get a new instance by calling
+gst_interpolation_control_source_new(), bind it to a #GParamSpec, select a interpolation mode with
+gst_interpolation_control_source_set_interpolation_mode() and set some control points by calling
+gst_interpolation_control_source_set().
+All functions are MT-safe.</doc>
+      <constructor name="new"
+                   c:identifier="gst_interpolation_control_source_new">
+        <doc xml:whitespace="preserve">This returns a new, unbound #GstInterpolationControlSource.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a new, unbound #GstInterpolationControlSource.</doc>
+          <type name="InterpolationControlSource"
+                c:type="GstInterpolationControlSource*"/>
+        </return-value>
+      </constructor>
+      <method name="get_all"
+              c:identifier="gst_interpolation_control_source_get_all"
+              introspectable="0">
+        <doc xml:whitespace="preserve">Returns a read-only copy of the list of #GstTimedValue for the given property.
+Free the list after done with it.</doc>
+        <return-value>
+          <doc xml:whitespace="preserve">a copy of the list, or %NULL if the property isn't handled by the controller</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="gpointer" c:type="gpointer"/>
+          </type>
+        </return-value>
+      </method>
+      <method name="get_count"
+              c:identifier="gst_interpolation_control_source_get_count">
+        <doc xml:whitespace="preserve">Returns the number of control points that are set.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of control points that are set.</doc>
+          <type name="gint" c:type="gint"/>
+        </return-value>
+      </method>
+      <method name="set" c:identifier="gst_interpolation_control_source_set">
+        <doc xml:whitespace="preserve">Set the value of given controller-handled property at a certain time.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">FALSE if the values couldn't be set, TRUE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time the control-change is scheduled for</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the control-value</doc>
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_from_list"
+              c:identifier="gst_interpolation_control_source_set_from_list">
+        <doc xml:whitespace="preserve">Sets multiple timed values at once.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">FALSE if the values couldn't be set, TRUE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="timedvalues" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a list with #GstTimedValue items</doc>
+            <type name="GLib.SList" c:type="GSList*">
+              <type name="gpointer" c:type="gpointer"/>
+            </type>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_interpolation_mode"
+              c:identifier="gst_interpolation_control_source_set_interpolation_mode">
+        <doc xml:whitespace="preserve">Sets the given interpolation mode.
+&lt;note&gt;&lt;para&gt;User interpolation is not yet available and quadratic interpolation
+is deprecated and maps to cubic interpolation.&lt;/para&gt;&lt;/note&gt;</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the interpolation mode could be set, %FALSE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="mode" transfer-ownership="none">
+            <doc xml:whitespace="preserve">interpolation mode</doc>
+            <type name="InterpolateMode" c:type="GstInterpolateMode"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="unset"
+              c:identifier="gst_interpolation_control_source_unset">
+        <doc xml:whitespace="preserve">Used to remove the value of given controller-handled property at a certain
+time.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">FALSE if the value couldn't be unset (i.e. not found, TRUE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="timestamp" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time the control-change should be removed from</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="unset_all"
+              c:identifier="gst_interpolation_control_source_unset_all">
+        <doc xml:whitespace="preserve">Used to remove all time-stamped values of given controller-handled property</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <field name="parent">
+        <type name="ControlSource" c:type="GstControlSource"/>
+      </field>
+      <field name="lock" readable="0" private="1">
+        <type name="GLib.Mutex" c:type="GMutex*"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="InterpolationControlSourcePrivate"
+              c:type="GstInterpolationControlSourcePrivate*"/>
+      </field>
+      <field name="_gst_reserved" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </class>
+    <record name="InterpolationControlSourceClass"
+            c:type="GstInterpolationControlSourceClass"
+            glib:is-gtype-struct-for="InterpolationControlSource">
+      <field name="parent_class">
+        <type name="ControlSourceClass" c:type="GstControlSourceClass"/>
+      </field>
+      <field name="_gst_reserved" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="InterpolationControlSourcePrivate"
+            c:type="GstInterpolationControlSourcePrivate"
+            disguised="1">
+    </record>
+    <class name="LFOControlSource"
+           c:symbol-prefix="lfo_control_source"
+           c:type="GstLFOControlSource"
+           parent="ControlSource"
+           glib:type-name="GstLFOControlSource"
+           glib:get-type="gst_lfo_control_source_get_type"
+           glib:type-struct="LFOControlSourceClass">
+      <doc xml:whitespace="preserve">#GstLFOControlSource is a #GstControlSource, that provides several periodic waveforms
+as control values. It supports all fundamental, numeric GValue types as property.
+To use #GstLFOControlSource get a new instance by calling gst_lfo_control_source_new(),
+bind it to a #GParamSpec and set the relevant properties or use
+gst_lfo_control_source_set_waveform.
+All functions are MT-safe.</doc>
+      <constructor name="new" c:identifier="gst_lfo_control_source_new">
+        <doc xml:whitespace="preserve">This returns a new, unbound #GstLFOControlSource.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a new, unbound #GstLFOControlSource.</doc>
+          <type name="LFOControlSource" c:type="GstLFOControlSource*"/>
+        </return-value>
+      </constructor>
+      <property name="amplitude" writable="1" transfer-ownership="none">
+        <doc xml:whitespace="preserve">Specifies the amplitude for the waveform of this #GstLFOControlSource.
+It should be given as a #GValue with a type that can be transformed
+to the type of the bound property.</doc>
+        <type name="GObject.Value"/>
+      </property>
+      <property name="frequency" writable="1" transfer-ownership="none">
+        <doc xml:whitespace="preserve">Specifies the frequency that should be used for the waveform
+of this #GstLFOControlSource. It should be large enough
+so that the period is longer than one nanosecond.</doc>
+        <type name="gdouble"/>
+      </property>
+      <property name="offset" writable="1" transfer-ownership="none">
+        <doc xml:whitespace="preserve">Specifies the offset for the waveform of this #GstLFOControlSource.
+It should be given as a #GValue with a type that can be transformed
+to the type of the bound property.</doc>
+        <type name="GObject.Value"/>
+      </property>
+      <property name="timeshift" writable="1" transfer-ownership="none">
+        <doc xml:whitespace="preserve">Specifies the timeshift to the right that should be used for the waveform
+of this #GstLFOControlSource in nanoseconds.
+To get a n nanosecond shift to the left use
+"(GST_SECOND / frequency) - n".</doc>
+        <type name="guint64"/>
+      </property>
+      <property name="waveform" writable="1" transfer-ownership="none">
+        <doc xml:whitespace="preserve">Specifies the waveform that should be used for this #GstLFOControlSource.</doc>
+        <type name="LFOWaveform"/>
+      </property>
+      <field name="parent">
+        <type name="ControlSource" c:type="GstControlSource"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="LFOControlSourcePrivate"
+              c:type="GstLFOControlSourcePrivate*"/>
+      </field>
+      <field name="lock" readable="0" private="1">
+        <type name="GLib.Mutex" c:type="GMutex*"/>
+      </field>
+      <field name="_gst_reserved" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </class>
+    <record name="LFOControlSourceClass"
+            c:type="GstLFOControlSourceClass"
+            glib:is-gtype-struct-for="LFOControlSource">
+      <field name="parent_class">
+        <type name="ControlSourceClass" c:type="GstControlSourceClass"/>
+      </field>
+      <field name="_gst_reserved" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="LFOControlSourcePrivate"
+            c:type="GstLFOControlSourcePrivate"
+            disguised="1">
+    </record>
+    <enumeration name="LFOWaveform"
+                 glib:type-name="GstLFOWaveform"
+                 glib:get-type="gst_lfo_waveform_get_type"
+                 c:type="GstLFOWaveform">
+      <doc xml:whitespace="preserve">The various waveform modes available.</doc>
+      <member name="sine"
+              value="0"
+              c:identifier="GST_LFO_WAVEFORM_SINE"
+              glib:nick="sine"/>
+      <member name="square"
+              value="1"
+              c:identifier="GST_LFO_WAVEFORM_SQUARE"
+              glib:nick="square"/>
+      <member name="saw"
+              value="2"
+              c:identifier="GST_LFO_WAVEFORM_SAW"
+              glib:nick="saw"/>
+      <member name="reverse_saw"
+              value="3"
+              c:identifier="GST_LFO_WAVEFORM_REVERSE_SAW"
+              glib:nick="reverse-saw"/>
+      <member name="triangle"
+              value="4"
+              c:identifier="GST_LFO_WAVEFORM_TRIANGLE"
+              glib:nick="triangle"/>
+    </enumeration>
+    <record name="TimedValue" c:type="GstTimedValue">
+      <doc xml:whitespace="preserve">Structure for saving a timestamp and a value.</doc>
+      <field name="timestamp" writable="1">
+        <type name="Gst.ClockTime" c:type="GstClockTime"/>
+      </field>
+      <field name="value" writable="1">
+        <type name="GObject.Value" c:type="GValue"/>
+      </field>
+    </record>
+    <record name="ValueArray" c:type="GstValueArray">
+      <doc xml:whitespace="preserve">Structure to receive multiple values at once.</doc>
+      <field name="property_name" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="nbsamples" writable="1">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="sample_interval" writable="1">
+        <type name="Gst.ClockTime" c:type="GstClockTime"/>
+      </field>
+      <field name="values" writable="1">
+        <type name="gpointer" c:type="gpointer*"/>
+      </field>
+    </record>
+    <function name="object_control_properties"
+              c:identifier="gst_object_control_properties"
+              version="0.9"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Convenience function for GObject
+Creates a GstController that allows you to dynamically control one, or more, GObject properties.
+If the given GObject already has a GstController, it adds the given properties to the existing
+controller and returns that controller.
+one or more of the given properties aren't available, or cannot be controlled, for the given element.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">The GstController with which the user can control the given properties dynamically or NULL if</doc>
+        <type name="Controller" c:type="GstController*"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object of which some properties should be controlled</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+        <parameter transfer-ownership="none">
+          <varargs>
+          </varargs>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="object_get_control_rate"
+              c:identifier="gst_object_get_control_rate"
+              version="0.10.10">
+      <doc xml:whitespace="preserve">Obtain the control-rate for this @object. Audio processing #GstElement
+objects will use this rate to sub-divide their processing loop and call
+gst_object_sync_values() inbetween. The length of the processing segment
+should be up to @control-rate nanoseconds.
+If the @object is not under property control, this will return
+%GST_CLOCK_TIME_NONE. This allows the element to avoid the sub-dividing.
+The control-rate is not expected to change if the element is in
+%GST_STATE_PAUSED or %GST_STATE_PLAYING.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the control rate in nanoseconds</doc>
+        <type name="Gst.ClockTime" c:type="GstClockTime"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object that has controlled properties</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="object_get_control_source"
+              c:identifier="gst_object_get_control_source"
+              version="0.10.14"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Gets the corresponding #GstControlSource for the property. This should be unreferenced
+again after use.
+controlled by this controller or no #GstControlSource was assigned yet.</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">the #GstControlSource for @property_name or NULL if the property is not</doc>
+        <type name="ControlSource" c:type="GstControlSource*"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+        <parameter name="property_name" transfer-ownership="none">
+          <doc xml:whitespace="preserve">name of the property for which the #GstControlSource should be get</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="object_get_controller"
+              c:identifier="gst_object_get_controller"
+              version="0.9"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Gets the controller for the given GObject</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">the controller handling some of the given element's properties, %NULL if no controller</doc>
+        <type name="Controller" c:type="GstController*"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object that has controlled properties</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="object_get_value_array"
+              c:identifier="gst_object_get_value_array"
+              version="0.9">
+      <doc xml:whitespace="preserve">Function to be able to get an array of values for one element properties
+If the GstValueArray-&gt;values array is NULL, it will be created by the function.
+The type of the values in the array are the same as the property's type.
+The g_object_* functions are just convenience functions for GObject</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the given array(s) could be filled, %FALSE otherwise</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object that has controlled properties</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+        <parameter name="timestamp" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the time that should be processed</doc>
+          <type name="Gst.ClockTime" c:type="GstClockTime"/>
+        </parameter>
+        <parameter name="value_array" transfer-ownership="none">
+          <doc xml:whitespace="preserve">array to put control-values in</doc>
+          <type name="ValueArray" c:type="GstValueArray*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="object_get_value_arrays"
+              c:identifier="gst_object_get_value_arrays"
+              version="0.9">
+      <doc xml:whitespace="preserve">Function to be able to get an array of values for one or more given element
+properties.
+If the GstValueArray-&gt;values array in list nodes is NULL, it will be created
+by the function.
+The type of the values in the array are the same as the property's type.
+The g_object_* functions are just convenience functions for GObject</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the given array(s) could be filled, %FALSE otherwise</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object that has controlled properties</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+        <parameter name="timestamp" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the time that should be processed</doc>
+          <type name="Gst.ClockTime" c:type="GstClockTime"/>
+        </parameter>
+        <parameter name="value_arrays" transfer-ownership="none">
+          <doc xml:whitespace="preserve">list to return the control-values in</doc>
+          <type name="GLib.SList" c:type="GSList*">
+            <type name="gpointer" c:type="gpointer"/>
+          </type>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="object_set_control_rate"
+              c:identifier="gst_object_set_control_rate"
+              version="0.10.10">
+      <doc xml:whitespace="preserve">Change the control-rate for this @object. Audio processing #GstElement
+objects will use this rate to sub-divide their processing loop and call
+gst_object_sync_values() inbetween. The length of the processing segment
+should be up to @control-rate nanoseconds.
+The control-rate should not change if the element is in %GST_STATE_PAUSED or
+%GST_STATE_PLAYING.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object that has controlled properties</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+        <parameter name="control_rate" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the new control-rate in nanoseconds.</doc>
+          <type name="Gst.ClockTime" c:type="GstClockTime"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="object_set_control_source"
+              c:identifier="gst_object_set_control_source"
+              version="0.10.14">
+      <doc xml:whitespace="preserve">Sets the #GstControlSource for @property_name. If there already was a #GstControlSource
+for this property it will be unreferenced.
+couldn't be bound to the property, %TRUE if everything worked as expected.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%FALSE if the given property isn't handled by the controller or the new #GstControlSource</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the controller object</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+        <parameter name="property_name" transfer-ownership="none">
+          <doc xml:whitespace="preserve">name of the property for which the #GstControlSource should be set</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="csource" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstControlSource that should be used for the property</doc>
+          <type name="ControlSource" c:type="GstControlSource*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="object_set_controller"
+              c:identifier="gst_object_set_controller"
+              version="0.9">
+      <doc xml:whitespace="preserve">Sets the controller on the given GObject</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%FALSE if the GObject already has an controller, %TRUE otherwise</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object that should get the controller</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+        <parameter name="controller" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the controller object to plug in</doc>
+          <type name="Controller" c:type="GstController*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="object_suggest_next_sync"
+              c:identifier="gst_object_suggest_next_sync"
+              version="0.10.13">
+      <doc xml:whitespace="preserve">Convenience function for GObject</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">same thing as gst_controller_suggest_next_sync()</doc>
+        <type name="Gst.ClockTime" c:type="GstClockTime"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object that has controlled properties</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="object_sync_values"
+              c:identifier="gst_object_sync_values"
+              version="0.9">
+      <doc xml:whitespace="preserve">Convenience function for GObject</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">same thing as gst_controller_sync_values()</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object that has controlled properties</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+        <parameter name="timestamp" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the time that should be processed</doc>
+          <type name="Gst.ClockTime" c:type="GstClockTime"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="object_uncontrol_properties"
+              c:identifier="gst_object_uncontrol_properties"
+              version="0.9"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Convenience function for GObject
+Removes the given element's properties from it's controller
+controller, %TRUE otherwise</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%FALSE if one of the given property names isn't handled by the</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object of which some properties should not be controlled anymore</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+        <parameter transfer-ownership="none">
+          <varargs>
+          </varargs>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>
