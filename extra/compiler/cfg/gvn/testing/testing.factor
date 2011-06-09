@@ -1,17 +1,11 @@
 ! Copyright (C) 2011 Alex Vondrak.  See
 ! http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg
-compiler.cfg.alias-analysis compiler.cfg.block-joining
-compiler.cfg.branch-splitting compiler.cfg.copy-prop
-compiler.cfg.dce compiler.cfg.debugger
-compiler.cfg.finalization compiler.cfg.graphviz
+USING: accessors assocs compiler.cfg compiler.cfg.graphviz
 compiler.cfg.gvn compiler.cfg.gvn.expressions
-compiler.cfg.gvn.graph compiler.cfg.height
-compiler.cfg.ssa.construction compiler.cfg.tco
-compiler.cfg.useless-conditionals formatting fry graphviz
-graphviz.notation graphviz.render io kernel math math.parser
-math.private namespaces prettyprint sequences sorting strings
-tools.annotations ;
+compiler.cfg.gvn.graph compiler.cfg.optimizer continuations
+formatting graphviz graphviz.notation graphviz.render
+io.directories kernel math.parser namespaces prettyprint
+sequences sorting splitting tools.annotations ;
 IN: compiler.cfg.gvn.testing
 
 GENERIC: expr>str ( expr -- str )
@@ -46,19 +40,6 @@ M: object expr>str [ unparse ] map " " join ;
         "<%d> : {%s}\\l" sprintf
     ] map "" concat-as ;
 
-SYMBOL: gvn-test
-
-[ 0 100 [ 1 fixnum+fast ] times ]
-test-builder first [
-    optimize-tail-calls
-    delete-useless-conditionals
-    split-branches
-    join-blocks
-    normalize-height
-    construct-ssa
-    alias-analysis
-] with-cfg gvn-test set-global
-
 : basic-block# ( -- n )
     basic-block get number>> ;
 
@@ -75,25 +56,41 @@ test-builder first [
         basic-block# add-node[ "bold" =style ];
     add ;
 
-: draw-annotated-cfg ( -- )
-    cfg get cfgviz add-gvns add-lvns
-    basic-block# number>string "bb" prepend png ;
+SYMBOL: iteration
 
-: watch-gvn ( -- )
+: iteration-dir ( -- path )
+    iteration get number>string "gvn-iter" prepend ;
+
+: new-iteration ( -- )
+    iteration inc iteration-dir make-directories ;
+
+: draw-annotated-cfg ( -- )
+    iteration-dir [
+        cfg get cfgviz add-gvns add-lvns
+        basic-block# number>string "bb" prepend png
+    ] with-directory ;
+
+: annotate-gvn ( -- )
+    \ value-numbering-iteration
+    [ [ new-iteration ] prepend ] annotate
     \ value-numbering-step
-    [ '[ _ call draw-annotated-cfg ] ] annotate ;
+    [ [ draw-annotated-cfg ] append ] annotate ;
 
 : reset-gvn ( -- )
+    \ value-numbering-iteration reset
     \ value-numbering-step reset ;
 
-: test-gvn ( -- )
-    watch-gvn
-    gvn-test get-global [
-        {
-            value-numbering
-            copy-propagation
-            eliminate-dead-code
-            finalize-cfg
-        } [ watch-pass ] each-index drop
-    ] with-cfg
-    reset-gvn ;
+! Replace compiler.cfg.value-numbering:value-numbering with
+! compiler.cfg.gvn:value-numbering
+
+: gvn-passes ( -- passes )
+    \ optimize-cfg def>> [
+        name>> "value-numbering" =
+    ] split-when [ value-numbering ] join ;
+
+: watch-gvn ( path quot -- )
+    annotate-gvn [
+        gvn-passes passes [
+            0 iteration [ watch-optimizer* ] with-variable
+        ] with-variable
+    ] [ reset-gvn ] [ ] cleanup ;
