@@ -59,6 +59,9 @@ IN: compiler.cfg.graphviz
     [ number>string png ]
     tri* ;
 
+SYMBOL: passes
+\ optimize-cfg def>> passes set
+
 : watch-pass ( cfg pass pass# -- cfg' )
     [ perform-pass ] 2keep draw-cfg ;
 
@@ -66,11 +69,11 @@ IN: compiler.cfg.graphviz
     \ build-cfg 0 draw-cfg ;
 
 : watch-passes ( cfg -- cfg' )
-    \ optimize-cfg def>> [ 1 + watch-pass ] each-index ;
+    passes get [ 1 + watch-pass ] each-index ;
 
 : finish-watching-passes ( cfg -- )
     \ finalize-cfg
-    \ optimize-cfg def>> length 1 +
+    passes get length 1 +
     watch-pass drop ;
 
 : watch-cfg ( path cfg -- )
