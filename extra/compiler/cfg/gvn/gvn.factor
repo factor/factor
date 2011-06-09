@@ -75,12 +75,15 @@ M: array process-instruction
     ! won't be sound
     dup [ process-instruction drop ] each ;
 
+: value-numbering-iteration ( cfg -- )
+    [ value-numbering-step ] simple-optimization ;
+
 : value-numbering ( cfg -- cfg )
     dup
     init-gvn
     '[
         changed? off
-        _ [ value-numbering-step ] simple-optimization
+        _ value-numbering-iteration
         changed? get
     ] loop
 
