@@ -98,8 +98,9 @@ UNION: general-compare-insn scalar-compare-insn ##test-vector ;
     } cond ;
 
 : fold-branch ( ? -- insn )
-    0 1 ?
-    basic-block get [ nth 1vector ] change-successors drop
+    drop
+    ! 0 1 ?
+    ! basic-block get [ nth 1vector ] change-successors drop
     \ ##branch new-insn ;
 
 : fold-compare-imm-branch ( insn -- insn/f )
