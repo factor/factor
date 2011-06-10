@@ -12,7 +12,7 @@ GENERIC: expr>str ( expr -- str )
 
 M: integer-expr expr>str value>> number>string ;
 
-M: reference-expr expr>str value>> number>string "&" prepend ;
+M: reference-expr expr>str value>> unparse ;
 
 M: object expr>str [ unparse ] map " " join ;
 
@@ -23,7 +23,7 @@ M: object expr>str [ unparse ] map " " join ;
         drop "%d -> <%d>\\l" sprintf
     ] if ;
 
-: lvns ( -- str )
+: optimistic ( -- str )
     vregs>vns get >alist natural-sort [
         first2 local-value-mapping
     ] map "" concat-as ;
@@ -33,8 +33,8 @@ M: object expr>str [ unparse ] map " " join ;
         [ push-at ] curry assoc-each
     ] keep ;
 
-: gvns ( -- str )
-    vregs>gvns get invert-assoc >alist natural-sort [
+: valid ( -- str )
+    valid-vns get invert-assoc >alist natural-sort [
         first2
         natural-sort [ number>string ] map ", " join
         "<%d> : {%s}\\l" sprintf
@@ -43,16 +43,16 @@ M: object expr>str [ unparse ] map " " join ;
 : basic-block# ( -- n )
     basic-block get number>> ;
 
-: add-gvns ( graph -- graph' )
+: add-valid-vns ( graph -- graph' )
     <anon>
-        "gvns" add-node[ gvns =label "plaintext" =shape ];
-        "gvns" 0 add-edge[ "invis" =style ];
+        "valid" add-node[ valid =label "plaintext" =shape ];
+        "valid" 0 add-edge[ "invis" =style ];
     add ;
 
-: add-lvns ( graph -- graph' )
-    "lvn" <cluster>
+: add-optimistic-vns ( graph -- graph' )
+    "opt" <cluster>
         "invis" =style
-        "lvns" add-node[ lvns =label "plaintext" =shape ];
+        "opt" add-node[ optimistic =label "plaintext" =shape ];
         basic-block# add-node[ "bold" =style ];
     add ;
 
@@ -66,7 +66,7 @@ SYMBOL: iteration
 
 : draw-annotated-cfg ( -- )
     iteration-dir [
-        cfg get cfgviz add-gvns add-lvns
+        cfg get cfgviz add-valid-vns add-optimistic-vns
         basic-block# number>string "bb" prepend png
     ] with-directory ;
 
