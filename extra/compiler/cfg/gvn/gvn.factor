@@ -73,7 +73,7 @@ M: array process-instruction
 ! comparisons.factor, alien.factor, and slots.factor
 
 : value-numbering-iteration ( cfg -- )
-    clear-optimistic-value-graph
+    clear-exprs
     [ value-numbering-step drop ] simple-analysis ;
 
 : identify-redundancies ( cfg -- )
@@ -85,7 +85,7 @@ M: array process-instruction
     ] loop ;
 
 : eliminate-redundancies ( cfg -- )
-    clear-optimistic-value-graph
+    clear-exprs
     [ value-numbering-step ] simple-optimization ;
 
 : value-numbering ( cfg -- cfg )
