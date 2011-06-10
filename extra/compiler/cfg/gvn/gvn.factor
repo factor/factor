@@ -49,7 +49,7 @@ M: ##copy process-instruction
 M: ##phi rewrite
     [ dst>> ] [ inputs>> values [ vreg>vn ] map ] bi
     dup sift
-    dup all-equal?  [
+    dup all-equal? [
         nip
         [ drop f ]
         [ first <copy> ] if-empty
@@ -66,26 +66,29 @@ M: array process-instruction
     [ process-instruction ] map ;
 
 : value-numbering-step ( insns -- insns' )
-    init-value-graph
-    ! [ process-instruction ] map flatten ;
+    [ process-instruction ] map flatten ;
 
-    ! idea: let rewrite do the constant/copy propagation (as
-    ! that eventually leads to better VNs), but don't actually
-    ! use them here, since changing the CFG mid-optimistic-GVN
-    ! won't be sound
-    dup [ process-instruction drop ] each ;
+! XXX there's going to be trouble with certain rewrites that
+! modify the cfg / instructions destructively; namely those in
+! comparisons.factor, alien.factor, and slots.factor
 
 : value-numbering-iteration ( cfg -- )
-    [ value-numbering-step ] simple-optimization ;
+    clear-optimistic-value-graph
+    [ value-numbering-step drop ] simple-analysis ;
 
-: value-numbering ( cfg -- cfg )
-    dup
-    init-gvn
+: identify-redundancies ( cfg -- )
+    init-value-graph
     '[
         changed? off
         _ value-numbering-iteration
         changed? get
-    ] loop
+    ] loop ;
 
-    dup [ init-value-graph [ process-instruction ] map flatten ] simple-optimization
+: eliminate-redundancies ( cfg -- )
+    clear-optimistic-value-graph
+    [ value-numbering-step ] simple-optimization ;
+
+: value-numbering ( cfg -- cfg )
+    dup identify-redundancies
+    dup eliminate-redundancies
     cfg-changed predecessors-changed ;
