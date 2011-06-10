@@ -16,16 +16,16 @@ M: reference-expr expr>str value>> unparse ;
 
 M: object expr>str [ unparse ] map " " join ;
 
-: local-value-mapping ( from to -- str )
+: value-mapping ( from to -- str )
     over exprs>vns get value-at* [
         expr>str "%d -> <%d> (%s)\\l" sprintf
     ] [
         drop "%d -> <%d>\\l" sprintf
     ] if ;
 
-: optimistic ( -- str )
+: gvns ( -- str )
     vregs>vns get >alist natural-sort [
-        first2 local-value-mapping
+        first2 value-mapping
     ] map "" concat-as ;
 
 : invert-assoc ( assoc -- inverted )
@@ -33,8 +33,8 @@ M: object expr>str [ unparse ] map " " join ;
         [ push-at ] curry assoc-each
     ] keep ;
 
-: valid ( -- str )
-    valid-vns get invert-assoc >alist natural-sort [
+: congruence-classes ( -- str )
+    vregs>vns get invert-assoc >alist natural-sort [
         first2
         natural-sort [ number>string ] map ", " join
         "<%d> : {%s}\\l" sprintf
@@ -43,18 +43,14 @@ M: object expr>str [ unparse ] map " " join ;
 : basic-block# ( -- n )
     basic-block get number>> ;
 
-: add-valid-vns ( graph -- graph' )
-    <anon>
-        "valid" add-node[ valid =label "plaintext" =shape ];
-        "valid" 0 add-edge[ "invis" =style ];
-    add ;
-
-: add-optimistic-vns ( graph -- graph' )
-    "opt" <cluster>
-        "invis" =style
-        "opt" add-node[ optimistic =label "plaintext" =shape ];
-        basic-block# add-node[ "bold" =style ];
-    add ;
+: add-gvns ( graph -- graph' )
+    "gvns" add-node[
+        gvns congruence-classes "\\l\\l" glue =label
+        "plaintext" =shape
+    ];
+    "gvns" 0 add-edge[ "invis" =style ];
+    basic-block# add-node[ "bold" =style ];
+    ;
 
 SYMBOL: iteration
 
@@ -66,7 +62,7 @@ SYMBOL: iteration
 
 : draw-annotated-cfg ( -- )
     iteration-dir [
-        cfg get cfgviz add-valid-vns add-optimistic-vns
+        cfg get cfgviz add-gvns
         basic-block# number>string "bb" prepend png
     ] with-directory ;
 
@@ -94,3 +90,10 @@ SYMBOL: iteration
             0 iteration [ watch-optimizer* ] with-variable
         ] with-variable
     ] [ reset-gvn ] [ ] cleanup ;
+
+USING: io.pathnames math math.private ;
+
+: test-gvn ( path -- )
+    "resource:work" prepend-path
+    [ 0 100 [ 1 fixnum+fast ] times ]
+    watch-gvn ;
