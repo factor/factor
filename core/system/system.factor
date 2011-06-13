@@ -4,9 +4,10 @@ USING: kernel kernel.private sequences math namespaces
 init splitting assocs system.private layouts words ;
 IN: system
 
-SINGLETONS: x86.32 x86.64 arm ppc ;
+SINGLETONS: x86.32 x86.64 arm ppc.32 ppc.64 ;
 
 UNION: x86 x86.32 x86.64 ;
+UNION: ppc ppc.32 ppc.64 ;
 
 : cpu ( -- class ) \ cpu get-global ; foldable
 
@@ -33,7 +34,8 @@ UNION: unix bsd solaris linux haiku ;
         { "x86.32" x86.32 }
         { "x86.64" x86.64 }
         { "arm" arm }
-        { "ppc" ppc }
+        { "ppc.32" ppc.32 }
+        { "ppc.64" ppc.64 }
     } at ;
 
 : string>os ( str -- class )

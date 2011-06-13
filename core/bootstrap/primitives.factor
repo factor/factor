@@ -19,9 +19,11 @@ H{ } clone sub-primitives set
 
 architecture get {
     { "winnt-x86.32" "x86/32/winnt" }
-    { "unix-x86.32" "x86/32/unix" }
+    { "unix-x86.32"  "x86/32/unix"  }
     { "winnt-x86.64" "x86/64/winnt" }
-    { "unix-x86.64" "x86/64/unix" }
+    { "unix-x86.64"  "x86/64/unix"  }
+    { "linux-ppc.32" "ppc/32/linux" }
+    { "linux-ppc.64" "ppc/64/linux" }
 } ?at [ "Bad architecture: " prepend throw ] unless
 "vocab:cpu/" "/bootstrap.factor" surround parse-file
 
@@ -419,6 +421,7 @@ tuple
     { "set-alien-unsigned-cell" "alien.accessors" "primitive_set_alien_unsigned_cell" (( value c-ptr n -- )) }
     { "(dlopen)" "alien.libraries" "primitive_dlopen" (( path -- dll )) }
     { "(dlsym)" "alien.libraries" "primitive_dlsym" (( name dll -- alien )) }
+    { "(dlsym-raw)" "alien.libraries" "primitive_dlsym_raw" (( name dll -- alien )) }
     { "dlclose" "alien.libraries" "primitive_dlclose" (( dll -- )) }
     { "dll-valid?" "alien.libraries" "primitive_dll_validp" (( dll -- ? )) }
     { "current-callback" "alien.private" "primitive_current_callback" (( -- n )) }
