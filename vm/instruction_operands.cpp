@@ -9,10 +9,22 @@ instruction_operand::instruction_operand(relocation_entry rel_, code_block *comp
 /* Load a 32-bit value from a PowerPC LIS/ORI sequence */
 fixnum instruction_operand::load_value_2_2()
 {
-	cell *ptr = (cell *)pointer;
+	u32 *ptr = (u32 *)pointer;
 	cell hi = (ptr[-2] & 0xffff);
 	cell lo = (ptr[-1] & 0xffff);
 	return hi << 16 | lo;
+}
+
+/* Load a 64-bit value from a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence */
+fixnum instruction_operand::load_value_2_2_2_2()
+{
+	u32 *ptr = (u32 *)pointer;
+	u64 hhi = (ptr[-5] & 0xffff);
+	u64 hlo = (ptr[-4] & 0xffff);
+	u64 lhi = (ptr[-2] & 0xffff);
+	u64 llo = (ptr[-1] & 0xffff);
+	u64 val = hhi << 48 | hlo << 32 | lhi << 16 | llo;
+	return (cell)val;
 }
 
 /* Load a value from a bitfield of a PowerPC instruction */
@@ -37,10 +49,10 @@ fixnum instruction_operand::load_value(cell relative_to)
 		return load_value_2_2();
 	case RC_ABSOLUTE_PPC_2:
 		return load_value_masked(rel_absolute_ppc_2_mask,16,0);
-	case RC_RELATIVE_PPC_2:
-		return load_value_masked(rel_relative_ppc_2_mask,16,0) + relative_to - sizeof(cell);
-	case RC_RELATIVE_PPC_3:
-		return load_value_masked(rel_relative_ppc_3_mask,6,0) + relative_to - sizeof(cell);
+	case RC_RELATIVE_PPC_2_PC:
+		return load_value_masked(rel_relative_ppc_2_mask,16,0) + relative_to - 4;
+	case RC_RELATIVE_PPC_3_PC:
+		return load_value_masked(rel_relative_ppc_3_mask,6,0) + relative_to - 4;
 	case RC_RELATIVE_ARM_3:
 		return load_value_masked(rel_relative_arm_3_mask,6,2) + relative_to + sizeof(cell);
 	case RC_INDIRECT_ARM:
@@ -51,6 +63,8 @@ fixnum instruction_operand::load_value(cell relative_to)
 		return *(u16 *)(pointer - sizeof(u16));
 	case RC_ABSOLUTE_1:
 		return *(u8 *)(pointer - sizeof(u8));
+	case RC_ABSOLUTE_PPC_2_2_2_2:
+		return load_value_2_2_2_2();
 	default:
 		critical_error("Bad rel class",rel.rel_class());
 		return 0;
@@ -75,9 +89,20 @@ code_block *instruction_operand::load_code_block()
 /* Store a 32-bit value into a PowerPC LIS/ORI sequence */
 void instruction_operand::store_value_2_2(fixnum value)
 {
-	cell *ptr = (cell *)pointer;
+	u32 *ptr = (u32 *)pointer;
 	ptr[-2] = ((ptr[-2] & ~0xffff) | ((value >> 16) & 0xffff));
 	ptr[-1] = ((ptr[-1] & ~0xffff) | (value & 0xffff));
+}
+
+/* Store a 64-bit value into a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence */
+void instruction_operand::store_value_2_2_2_2(fixnum value)
+{
+	u64 val = value;
+	u32 *ptr = (u32 *)pointer;
+	ptr[-5] = ((ptr[-5] & ~0xffff) | ((val >> 48) & 0xffff));
+	ptr[-4] = ((ptr[-4] & ~0xffff) | ((val >> 32) & 0xffff));
+	ptr[-2] = ((ptr[-2] & ~0xffff) | ((val >> 16) & 0xffff));
+	ptr[-1] = ((ptr[-1] & ~0xffff) | ((val >>  0) & 0xffff));
 }
 
 /* Store a value into a bitfield of a PowerPC instruction */
@@ -108,11 +133,11 @@ void instruction_operand::store_value(fixnum absolute_value)
 	case RC_ABSOLUTE_PPC_2:
 		store_value_masked(absolute_value,rel_absolute_ppc_2_mask,0);
 		break;
-	case RC_RELATIVE_PPC_2:
-		store_value_masked(relative_value + sizeof(cell),rel_relative_ppc_2_mask,0);
+	case RC_RELATIVE_PPC_2_PC:
+		store_value_masked(relative_value + 4,rel_relative_ppc_2_mask,0);
 		break;
-	case RC_RELATIVE_PPC_3:
-		store_value_masked(relative_value + sizeof(cell),rel_relative_ppc_3_mask,0);
+	case RC_RELATIVE_PPC_3_PC:
+		store_value_masked(relative_value + 4,rel_relative_ppc_3_mask,0);
 		break;
 	case RC_RELATIVE_ARM_3:
 		store_value_masked(relative_value - sizeof(cell),rel_relative_arm_3_mask,2);
@@ -128,6 +153,9 @@ void instruction_operand::store_value(fixnum absolute_value)
 		break;
 	case RC_ABSOLUTE_1:
 		*(u8 *)(pointer - sizeof(u8)) = (u8)absolute_value;
+		break;
+	case RC_ABSOLUTE_PPC_2_2_2_2:
+		store_value_2_2_2_2(absolute_value);
 		break;
 	default:
 		critical_error("Bad rel class",rel.rel_class());

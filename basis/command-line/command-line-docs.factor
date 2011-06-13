@@ -2,13 +2,13 @@ USING: help.markup help.syntax parser vocabs.loader strings ;
 IN: command-line
 
 HELP: run-bootstrap-init
-{ $description "Runs the bootstrap initialization file in the user's home directory, unless the " { $snippet "-no-user-init" } " command line switch was given. This file is named " { $snippet ".factor-boot-rc" } " on Unix and " { $snippet "factor-boot-rc" } " on Windows." } ;
+{ $description "Runs the bootstrap initialization file in the user's home directory, unless the " { $snippet "-no-user-init" } " command line switch was given. This file is named " { $snippet ".factor-boot-rc" } "." } ;
 
 HELP: run-user-init
-{ $description "Runs the startup initialization file in the user's home directory, unless the " { $snippet "-no-user-init" } " command line switch was given. This file is named " { $snippet ".factor-rc" } " on Unix and " { $snippet "factor-rc" } " on Windows." } ;
+{ $description "Runs the startup initialization file in the user's home directory, unless the " { $snippet "-no-user-init" } " command line switch was given. This file is named " { $snippet ".factor-rc" } "." } ;
 
 HELP: load-vocab-roots
-{ $description "Loads the newline-separated list of additional vocabulary roots from the file named " { $snippet ".factor-roots" } " on Unix and " { $snippet "factor-roots" } " on Windows." } ;
+{ $description "Loads the newline-separated list of additional vocabulary roots from the file named " { $snippet ".factor-roots" } "." } ;
 
 HELP: param
 { $values { "param" string } }
@@ -92,21 +92,21 @@ ARTICLE: "standard-cli-args" "Command line switches for general usage"
     { { $snippet "-quiet" } { "If set, " { $link run-file } " and " { $link require } " will not print load messages." } }
 } ;
 
-ARTICLE: "factor-boot-rc" "Bootstrap initialization file"
-"The bootstrap initialization file is named " { $snippet "factor-boot-rc" } " on Windows and " { $snippet ".factor-boot-rc" } " on Unix. This file can contain " { $link require } " calls for vocabularies you use frequently, and other such long-running tasks that you do not want to perform every time Factor starts."
+ARTICLE: ".factor-boot-rc" "Bootstrap initialization file"
+"The bootstrap initialization file is named " { $snippet ".factor-boot-rc" } ". This file can contain " { $link require } " calls for vocabularies you use frequently, and other such long-running tasks that you do not want to perform every time Factor starts."
 $nl
 "A word to run this file from an existing Factor session:"
 { $subsections run-bootstrap-init }
 "For example, if you changed " { $snippet ".factor-boot-rc" } " and do not want to bootstrap again, you can just invoke " { $link run-bootstrap-init } " in the listener." ;
 
-ARTICLE: "factor-rc" "Startup initialization file"
-"The startup initialization file is named " { $snippet "factor-rc" } " on Windows and " { $snippet ".factor-rc" } " on Unix. If it exists, it is run every time Factor starts."
+ARTICLE: ".factor-rc" "Startup initialization file"
+"The startup initialization file is named " { $snippet ".factor-rc" } ". If it exists, it is run every time Factor starts."
 $nl
 "A word to run this file from an existing Factor session:"
 { $subsections run-user-init } ;
 
-ARTICLE: "factor-roots" "Additional vocabulary roots file"
-"The vocabulary roots file is named " { $snippet "factor-roots" } " on Windows and " { $snippet ".factor-roots" } " on Unix. If it exists, it is loaded every time Factor starts. It contains a newline-separated list of " { $link "vocabs.roots" } "."
+ARTICLE: ".factor-roots" "Additional vocabulary roots file"
+"The vocabulary roots file is named " { $snippet ".factor-roots" } " on Windows and " { $snippet ".factor-roots" } " on Unix. If it exists, it is loaded every time Factor starts. It contains a newline-separated list of " { $link "vocabs.roots" } "."
 $nl
 "A word to run this file from an existing Factor session:"
 { $subsections load-vocab-roots } ;
@@ -114,17 +114,17 @@ $nl
 ARTICLE: "rc-files" "Running code on startup"
 "Factor looks for three optional files in your home directory."
 { $subsections
-    "factor-boot-rc"
-    "factor-rc"
-    "factor-roots"
+    ".factor-boot-rc"
+    ".factor-rc"
+    ".factor-roots"
 }
 "The " { $snippet "-no-user-init" } " command line switch will inhibit loading running of these files."
 $nl
 "If you are unsure where the files should be located, evaluate the following code:"
 { $code
     "USE: command-line"
-    "\"factor-rc\" rc-path print"
-    "\"factor-boot-rc\" rc-path print"
+    "\".factor-rc\" rc-path print"
+    "\".factor-boot-rc\" rc-path print"
 }
 "Here is an example " { $snippet ".factor-boot-rc" } " which sets up GVIM editor integration:"
 { $code

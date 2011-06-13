@@ -306,8 +306,8 @@ set_build_info() {
         MAKE_IMAGE_TARGET=macosx-ppc
         MAKE_TARGET=macosx-ppc
     elif [[ $OS == linux && $ARCH == ppc ]] ; then
-        MAKE_IMAGE_TARGET=linux-ppc
-        MAKE_TARGET=linux-ppc
+        MAKE_IMAGE_TARGET=linux-ppc.32
+        MAKE_TARGET=linux-ppc-32
     elif [[ $OS == winnt && $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=winnt-x86.64
         MAKE_TARGET=winnt-x86-64

@@ -228,7 +228,7 @@ M: x86.32 long-long-on-stack? t ;
 M: x86.32 float-on-stack? t ;
 
 M: x86.32 flatten-struct-type
-    call-next-method [ first t 2array ] map ;
+    call-next-method [ first t f 3array ] map ;
 
 M: x86.32 struct-return-on-stack? os linux? not ;
 

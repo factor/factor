@@ -15,10 +15,13 @@ generalizations ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
-    [ "winnt" = "winnt" "unix" ? ] dip "-" glue ;
+    2dup [ winnt? ] [ ppc? ] bi* or [
+      [ drop unix ] dip
+    ] unless
+    [ name>> ] [ name>> ] bi* "-" glue ;
 
 : my-arch ( -- arch )
-    os name>> cpu name>> arch ;
+    os cpu arch ;
 
 : boot-image-name ( arch -- string )
     "boot." ".image" surround ;
@@ -29,6 +32,7 @@ IN: bootstrap.image
 : images ( -- seq )
     {
         "winnt-x86.32" "unix-x86.32"
+        "linux-ppc.32" "linux-ppc.64"
         "winnt-x86.64" "unix-x86.64"
     } ;
 
@@ -126,6 +130,9 @@ SYMBOL: jit-literals
 
 : jit-dlsym ( name rc -- )
     rt-dlsym jit-rel string>symbol jit-parameter f jit-parameter ;
+
+: jit-dlsym-toc ( name rc -- )
+    rt-dlsym-toc jit-rel string>symbol jit-parameter f jit-parameter ;
 
 :: jit-conditional ( test-quot false-quot -- )
     [ 0 test-quot call ] B{ } make length :> len
