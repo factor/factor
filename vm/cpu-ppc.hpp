@@ -1,7 +1,11 @@
 namespace factor
 {
 
-#define FACTOR_CPU_STRING "ppc"
+#ifdef FACTOR_64
+#define FACTOR_CPU_STRING "ppc.64"
+#else
+#define FACTOR_CPU_STRING "ppc.32"
+#endif
 
 #define CALLSTACK_BOTTOM(ctx) (stack_frame *)(ctx->callstack_seg->end - 32)
 
@@ -16,36 +20,36 @@ static const fixnum xt_tail_pic_offset = 4;
 
 inline static void check_call_site(cell return_address)
 {
-	cell insn = *(cell *)return_address;
+	u32 insn = *(u32 *)return_address;
 	/* Check that absolute bit is 0 */
 	assert((insn & 0x2) == 0x0);
 	/* Check that instruction is branch */
 	assert((insn >> 26) == 0x12);
 }
 
-static const cell b_mask = 0x3fffffc;
+static const u32 b_mask = 0x3fffffc;
 
 inline static void *get_call_target(cell return_address)
 {
-	return_address -= sizeof(cell);
+	return_address -= 4;
 	check_call_site(return_address);
 
-	cell insn = *(cell *)return_address;
-	cell unsigned_addr = (insn & b_mask);
-	fixnum signed_addr = (fixnum)(unsigned_addr << 6) >> 6;
+	u32 insn = *(u32 *)return_address;
+	u32 unsigned_addr = (insn & b_mask);
+	s32 signed_addr = (s32)(unsigned_addr << 6) >> 6;
 	return (void *)(signed_addr + return_address);
 }
 
 inline static void set_call_target(cell return_address, void *target)
 {
-	return_address -= sizeof(cell);
+	return_address -= 4;
 	check_call_site(return_address);
 
-	cell insn = *(cell *)return_address;
+	u32 insn = *(u32 *)return_address;
 
 	fixnum relative_address = ((cell)target - return_address);
 	insn = ((insn & ~b_mask) | (relative_address & b_mask));
-	*(cell *)return_address = insn;
+	*(u32 *)return_address = insn;
 
 	/* Flush the cache line containing the call we just patched */
 	__asm__ __volatile__ ("icbi 0, %0\n" "sync\n"::"r" (return_address):);
@@ -53,8 +57,8 @@ inline static void set_call_target(cell return_address, void *target)
 
 inline static bool tail_call_site_p(cell return_address)
 {
-	return_address -= sizeof(cell);
-	cell insn = *(cell *)return_address;
+	return_address -= 4;
+	u32 insn = *(u32 *)return_address;
 	return (insn & 0x1) == 0;
 }
 

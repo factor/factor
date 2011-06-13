@@ -1,8 +1,6 @@
 ifdef CONFIG
 	CC = gcc
 	CPP = g++
-	AR = ar
-	LD = ld
 
 	VERSION = 0.94
 
@@ -85,7 +83,8 @@ help:
 	@echo "freebsd-x86-64"
 	@echo "linux-x86-32"
 	@echo "linux-x86-64"
-	@echo "linux-ppc"
+	@echo "linux-ppc-32"
+	@echo "linux-ppc-64"
 	@echo "linux-arm"
 	@echo "openbsd-x86-32"
 	@echo "openbsd-x86-64"
@@ -141,8 +140,11 @@ linux-x86-32:
 linux-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.64
 
-linux-ppc:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc
+linux-ppc-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.32
+
+linux-ppc-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.64
 
 linux-arm:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm
@@ -197,7 +199,7 @@ vm/ffi_test.o: vm/ffi_test.c
 	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
 
 .S.o:
-	$(TOOLCHAIN_PREFIX)$(CC) -x assembler-with-cpp -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) -o $@ $<
 
 .mm.o:
 	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<

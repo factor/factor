@@ -10,8 +10,8 @@ $nl
 "The first way is to use an environment variable. Factor looks at the " { $snippet "FACTOR_ROOTS" } " environment variable for a list of " { $snippet ":" } "-separated paths (on Unix) or a list of " { $snippet ";" } "-separated paths (on Windows)."
 $nl
 "The second way is to create a configuration file. You can list additional vocabulary roots in a file that Factor reads at startup:"
-{ $subsections "factor-roots" }
-"Finally, you can add vocabulary roots by calling a word from your " { $snippet "factor-rc" } " file (see " { $link "factor-rc" } "):"
+{ $subsections ".factor-roots" }
+"Finally, you can add vocabulary roots by calling a word from your " { $snippet ".factor-rc" } " file (see " { $link ".factor-rc" } "):"
 { $subsections add-vocab-root } ;
 
 ARTICLE: "vocabs.roots" "Vocabulary roots"
@@ -81,7 +81,7 @@ HELP: vocab-roots
 HELP: add-vocab-root
 { $values { "root" "a pathname string" } }
 { $description "Adds a directory pathname to the list of vocabulary roots." }
-{ $see-also "factor-roots" } ;
+{ $see-also ".factor-roots" } ;
 
 HELP: find-vocab-root
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string" } }

@@ -691,6 +691,10 @@ M:: x86 %save-context ( temp1 temp2 -- )
 
 M: x86 value-struct? drop t ;
 
+M: x86 long-long-odd-register? f ;
+
+M: x86 float-right-align-on-stack? f ;
+
 M: x86 immediate-arithmetic? ( n -- ? )
     HEX: -80000000 HEX: 7fffffff between? ;
 

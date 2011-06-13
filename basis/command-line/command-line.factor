@@ -12,22 +12,21 @@ SYMBOL: command-line
     10 special-object sift [ alien>native-string ] map ;
 
 : rc-path ( name -- path )
-    os windows? [ "." prepend ] unless
     home prepend-path ;
 
 : run-bootstrap-init ( -- )
     "user-init" get [
-        "factor-boot-rc" rc-path ?run-file
+        ".factor-boot-rc" rc-path ?run-file
     ] when ;
 
 : run-user-init ( -- )
     "user-init" get [
-        "factor-rc" rc-path ?run-file
+        ".factor-rc" rc-path ?run-file
     ] when ;
 
 : load-vocab-roots ( -- )
     "user-init" get [
-        "factor-roots" rc-path dup exists? [
+        ".factor-roots" rc-path dup exists? [
             utf8 file-lines harvest [ add-vocab-root ] each
         ] [ drop ] if
     ] when ;
