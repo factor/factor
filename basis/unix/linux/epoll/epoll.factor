@@ -1,14 +1,19 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: unix.linux.epoll
-USING: alien.c-types alien.syntax classes.struct math ;
+USING: alien.c-types alien.syntax classes.struct math unix.types ;
 
 FUNCTION: int epoll_create ( int size ) ;
 
+UNION-STRUCT: epoll-data
+    { ptr void*    }
+    { fd  int      }
+    { u32 uint32_t }
+    { u64 uint64_t } ;
+
 STRUCT: epoll-event
-{ events uint }
-{ fd uint }
-{ padding uint } ;
+    { events uint32_t   }
+    { data   epoll-data } ;
 
 FUNCTION: int epoll_ctl ( int epfd, int op, int fd, epoll-event* event ) ;
 
@@ -28,5 +33,6 @@ CONSTANT: EPOLLWRBAND  HEX: 200
 CONSTANT: EPOLLMSG     HEX: 400
 CONSTANT: EPOLLERR     HEX: 008
 CONSTANT: EPOLLHUP     HEX: 010
+CONSTANT: EPOLLRDHUP   HEX: 2000
 : EPOLLONESHOT ( -- n ) 30 2^ ; inline
 : EPOLLET      ( -- n ) 31 2^ ; inline

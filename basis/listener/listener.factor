@@ -8,6 +8,15 @@ sets vocabs.parser source-files.errors locals vocabs vocabs.loader ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
+GENERIC# prompt. 1 ( stream prompt -- )
+
+: prompt ( -- str )
+    current-vocab name>> auto-use? get [ " - auto" append ] when
+    "( " " )" surround ;
+
+M: object prompt.
+    nip H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl
+    flush ;
 
 : parse-lines-interactive ( lines -- quot/f )
     [ parse-lines ] with-compilation-unit ;
@@ -82,7 +91,7 @@ t error-summary? set-global
             ] each
         ] tabular-output nl
     ] unless-empty ;
-    
+
 : trimmed-stack. ( seq -- )
     dup length max-stack-items get > [
         max-stack-items get cut*
@@ -97,15 +106,11 @@ t error-summary? set-global
         [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
     ] [ drop ] if ;
 
-: prompt. ( -- )
-    current-vocab name>> auto-use? get [ " - auto" append ] when "( " " )" surround
-    H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl flush ;
-
 :: (listener) ( datastack -- )
     error-summary? get [ error-summary ] when
     visible-vars.
     datastack datastack.
-    prompt.
+    input-stream get prompt prompt.
 
     [
         read-quot [

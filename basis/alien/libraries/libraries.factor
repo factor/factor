@@ -9,6 +9,8 @@ IN: alien.libraries
 
 : dlsym ( name dll -- alien ) [ string>symbol ] dip (dlsym) ;
 
+: dlsym-raw ( name dll -- alien ) [ string>symbol ] dip (dlsym-raw) ;
+
 SYMBOL: libraries
 
 libraries [ H{ } clone ] initialize
@@ -48,7 +50,7 @@ M: library dispose dll>> [ dispose ] when* ;
 ERROR: no-such-symbol name library ;
 
 : address-of ( name library -- value )
-    2dup load-library dlsym [ 2nip ] [ no-such-symbol ] if* ;
+    2dup load-library dlsym-raw [ 2nip ] [ no-such-symbol ] if* ;
 
 SYMBOL: deploy-libraries
 

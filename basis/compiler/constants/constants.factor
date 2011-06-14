@@ -45,13 +45,14 @@ CONSTANT: rc-absolute 1
 CONSTANT: rc-relative 2
 CONSTANT: rc-absolute-ppc-2/2 3
 CONSTANT: rc-absolute-ppc-2 4
-CONSTANT: rc-relative-ppc-2 5
-CONSTANT: rc-relative-ppc-3 6
+CONSTANT: rc-relative-ppc-2-pc 5
+CONSTANT: rc-relative-ppc-3-pc 6
 CONSTANT: rc-relative-arm-3 7
 CONSTANT: rc-indirect-arm 8
 CONSTANT: rc-indirect-arm-pc 9
 CONSTANT: rc-absolute-2 10
 CONSTANT: rc-absolute-1 11
+CONSTANT: rc-absolute-ppc-2/2/2/2 12
 
 ! Relocation types
 CONSTANT: rt-dlsym 0
@@ -67,6 +68,7 @@ CONSTANT: rt-vm 9
 CONSTANT: rt-cards-offset 10
 CONSTANT: rt-decks-offset 11
 CONSTANT: rt-exception-handler 12
+CONSTANT: rt-dlsym-toc 13
 
 : rc-absolute? ( n -- ? )
     ${

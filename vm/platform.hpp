@@ -71,8 +71,10 @@
 
 			#if defined(FACTOR_X86)
 				#include "os-linux-x86.32.hpp"
-			#elif defined(FACTOR_PPC)
-				#include "os-linux-ppc.hpp"
+			#elif defined(FACTOR_PPC64)
+				#include "os-linux-ppc.64.hpp"
+			#elif defined(FACTOR_PPC32)
+				#include "os-linux-ppc.32.hpp"
 			#elif defined(FACTOR_ARM)
 				#include "os-linux-arm.hpp"
 			#elif defined(FACTOR_AMD64)
