@@ -190,6 +190,10 @@ void quotation_jit::iterate_quotation()
 #endif
 				parameter(obj.value());
 				parameter(false_object);
+#ifdef FACTOR_PPC_TOC
+				parameter(obj.value());
+				parameter(false_object);
+#endif
 				emit(parent->special_objects[JIT_PRIMITIVE]);
 
 				i++;

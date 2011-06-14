@@ -10,7 +10,7 @@ strings system threads ui ui.backend ui.backend.gtk.input-methods
 ui.backend.gtk.io ui.clipboards ui.event-loop ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures
 ui.pixel-formats ui.pixel-formats.private ui.private
-vocabs.loader ;
+vocabs.loader combinators prettyprint io ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -167,15 +167,25 @@ CONSTANT: action-key-codes
 : on-leave ( win event user-data -- ? )
     3drop forget-rollover t ;
 
-: on-button-press ( win event user-data -- ? )
-    drop swap [
-        mouse-event>gesture [ <button-down> ] dip
-    ] dip window send-button-down t ;
+:: on-button-press ( win event user-data -- ? )
+    win window :> world
+    event mouse-event>gesture :> ( modifiers button loc )
+    button {
+        { 8 [ ] }
+        { 9 [ ] }
+        [ modifiers swap <button-down> loc world
+          send-button-down ]
+    } case t ;
 
-: on-button-release ( win event user-data -- ? )
-    drop swap [
-        mouse-event>gesture [ <button-up> ] dip
-    ] dip window send-button-up t ;
+:: on-button-release ( win event user-data -- ? )
+    win window :> world
+    event mouse-event>gesture :> ( modifiers button loc )
+    button {
+        { 8 [ world left-action send-action ] }
+        { 9 [ world right-action send-action ] }
+        [ modifiers swap <button-up> loc world
+          send-button-up ]
+    } case t ;
 
 : on-scroll ( win event user-data -- ? )
     drop swap [

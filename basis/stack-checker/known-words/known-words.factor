@@ -282,6 +282,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ (code-blocks) { } { array } define-primitive \ (code-blocks)  make-flushable
 \ (dlopen) { byte-array } { dll } define-primitive
 \ (dlsym) { byte-array object } { c-ptr } define-primitive
+\ (dlsym-raw) { byte-array object } { c-ptr } define-primitive
 \ (exists?) { string } { object } define-primitive
 \ (exit) { integer } { } define-primitive
 \ (format-float) { float byte-array } { byte-array } define-primitive \ (format-float) make-foldable

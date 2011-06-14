@@ -76,7 +76,7 @@ HELP: send-email
 } ;
 
 ARTICLE: "smtp-gmail" "Setting up SMTP with gmail"
-"If you plan to send all email from the same address, then setting variables in the global namespace is the best option. The code example below does this approach and is meant to go in your " { $link "factor-boot-rc" } "." $nl
+"If you plan to send all email from the same address, then setting variables in the global namespace is the best option. The code example below does this approach and is meant to go in your " { $link ".factor-boot-rc" } "." $nl
 "Several variables need to be set for sending outgoing mail through gmail. First, we set the login and password to a " { $link <plain-auth> } " tuple with our login. Next, we set the gmail server address with an " { $link <inet> } " object. Finally, we tell the SMTP library to use a secure connection."
 { $code
     "USING: smtp namespaces io.sockets ;"

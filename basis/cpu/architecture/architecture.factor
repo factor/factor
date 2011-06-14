@@ -575,8 +575,17 @@ HOOK: dummy-fp-params? cpu ( -- ? )
 ! If t, long longs are never passed in param regs
 HOOK: long-long-on-stack? cpu ( -- ? )
 
+! If t, long longs are aligned on an odd register. On Linux
+! 32-bit PPC, long longs are 8-byte aligned but passed in
+! registers so they need to be aligned on an odd numbered
+! (r3, r5, etc) register.
+HOOK: long-long-odd-register? cpu ( -- ? )
+
 ! If t, floats are never passed in param regs
 HOOK: float-on-stack? cpu ( -- ? )
+
+! If t, put floats in the second word of a double word on the stack
+HOOK: float-right-align-on-stack? cpu ( -- ? )
 
 ! If t, the struct return pointer is never passed in a param reg
 HOOK: struct-return-on-stack? cpu ( -- ? )
