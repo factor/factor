@@ -179,5 +179,16 @@ PREDICATE: alien-callback-type-word < typedef-word
     swap [ name>> current-library get ] dip
     '[ _ _ address-of 0 _ alien-value ] ;
 
-: define-global ( type word -- )
+: set-global-quot ( type word -- quot )
+    swap [ name>> current-library get ] dip
+    '[ _ _ address-of 0 _ set-alien-value ] ;
+
+: define-global-getter ( type word -- )
     [ nip ] [ global-quot ] 2bi (( -- value )) define-declared ;
+
+: define-global-setter ( type word -- )
+    [ nip name>> "set-" prepend create-in ]
+    [ set-global-quot ] 2bi (( obj -- )) define-declared ;
+
+: define-global ( type word -- )
+    [ define-global-getter ] [ define-global-setter ] 2bi ;

@@ -1,8 +1,13 @@
 #ifndef __FACTOR_MASTER_H__
 #define __FACTOR_MASTER_H__
 
+#ifndef _THREAD_SAFE
 #define _THREAD_SAFE
+#endif
+
+#ifndef _REENTRANT
 #define _REENTRANT
+#endif
 
 #ifndef WINCE
 #include <errno.h>
@@ -21,6 +26,7 @@
 #include <string.h>
 #include <time.h>
 #include <wchar.h>
+#include <assert.h>
 
 /* C++ headers */
 #include <algorithm>
@@ -31,7 +37,8 @@
 #include <iostream>
 #include <iomanip>
 
-#define FACTOR_STRINGIZE(x) #x
+#define FACTOR_STRINGIZE_I(x) #x
+#define FACTOR_STRINGIZE(x) FACTOR_STRINGIZE_I(x)
 
 /* Record compiler version */
 #if defined(__clang__)
@@ -54,7 +61,12 @@
 	#define FACTOR_64
 #elif defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86)
 	#define FACTOR_X86
+#elif (defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)) && (defined(__PPC64__) || defined(__64BIT__))
+	#define FACTOR_PPC64
+	#define FACTOR_PPC
+	#define FACTOR_64
 #elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
+	#define FACTOR_PPC32
 	#define FACTOR_PPC
 #else
 	#error "Unsupported architecture"

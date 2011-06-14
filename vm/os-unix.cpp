@@ -47,11 +47,22 @@ void factor_vm::ffi_dlopen(dll *dll)
 	dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY);
 }
 
+void *factor_vm::ffi_dlsym_raw(dll *dll, symbol_char *symbol)
+{
+	return dlsym(dll ? dll->handle : null_dll, symbol);
+}
+
 void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 {
-	void *handle = (dll == NULL ? null_dll : dll->handle);
-	return dlsym(handle,symbol);
+	return FUNCTION_CODE_POINTER(ffi_dlsym_raw(dll, symbol));
 }
+
+#ifdef FACTOR_PPC
+void *factor_vm::ffi_dlsym_toc(dll *dll, symbol_char *symbol)
+{
+	return FUNCTION_TOC_POINTER(ffi_dlsym_raw(dll, symbol));
+}
+#endif
 
 void factor_vm::ffi_dlclose(dll *dll)
 {
@@ -116,8 +127,8 @@ segment::~segment()
 void factor_vm::dispatch_signal(void *uap, void (handler)())
 {
 	UAP_STACK_POINTER(uap) = (UAP_STACK_POINTER_TYPE)fix_callstack_top((stack_frame *)UAP_STACK_POINTER(uap));
-	UAP_PROGRAM_COUNTER(uap) = (cell)handler;
-
+	UAP_PROGRAM_COUNTER(uap) = (cell)FUNCTION_CODE_POINTER(handler);
+	UAP_SET_TOC_POINTER(uap, (cell)FUNCTION_TOC_POINTER(handler));
 	ctx->callstack_top = (stack_frame *)UAP_STACK_POINTER(uap);
 }
 
@@ -194,6 +205,7 @@ void factor_vm::unix_init_signals()
 
 	sigaction_safe(SIGBUS,&memory_sigaction,NULL);
 	sigaction_safe(SIGSEGV,&memory_sigaction,NULL);
+	sigaction_safe(SIGTRAP,&memory_sigaction,NULL);
 
 	memset(&fpe_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&fpe_sigaction.sa_mask);

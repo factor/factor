@@ -46,6 +46,9 @@ inline static void memset_cell(void *dst, cell pattern, size_t size)
 #endif
 }
 
+void *fill_function_descriptor(void *ptr, void *code);
+void *function_descriptor_field(void *ptr, size_t idx);
+
 vm_char *safe_strdup(const vm_char *str);
 cell read_cell_hex();
 VM_C_API void *factor_memcpy(void *dst, void *src, size_t len);
