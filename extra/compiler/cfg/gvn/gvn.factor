@@ -46,21 +46,9 @@ M: foldable-insn process-instruction
 M: ##copy process-instruction
     dup [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
 
-M: ##phi rewrite
-    [ dst>> ] [ inputs>> values [ vreg>vn ] map ] bi
-    dup sift
-    dup all-equal? [
-        nip
-        [ drop f ]
-        [ first <copy> ] if-empty
-    ] [ 3drop f ] if ;
-
 M: ##phi process-instruction
     dup rewrite
     [ process-instruction ] [ check-redundancy ] ?if ;
-
-M: ##phi >expr
-    inputs>> values [ vreg>vn ] map \ ##phi prefix ;
 
 M: array process-instruction
     [ process-instruction ] map ;
