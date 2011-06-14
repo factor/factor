@@ -1,7 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors cpu.architecture kernel
+USING: accessors assocs cpu.architecture grouping kernel
+sequences
 compiler.cfg.instructions
+compiler.cfg.utilities
 compiler.cfg.gvn.graph
 compiler.cfg.gvn.rewrite ;
 IN: compiler.cfg.gvn.misc
@@ -12,3 +14,12 @@ M: ##replace rewrite
         insn>literal dup immediate-store?
         [ swap \ ##replace-imm new-insn ] [ 2drop f ] if
     ] [ 2drop f ] if ;
+
+M: ##phi rewrite
+    [ dst>> ] [ inputs>> values [ vreg>vn ] map ] bi
+    dup sift
+    dup all-equal? [
+        nip
+        [ drop f ]
+        [ first <copy> ] if-empty
+    ] [ 3drop f ] if ;
