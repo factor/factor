@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes classes.algebra combinators fry
-generic.parser kernel math namespaces quotations sequences slots
-words make sets
+USING: assocs accessors arrays classes classes.algebra
+combinators fry generic.parser kernel math namespaces
+quotations sequences slots words make sets
 compiler.cfg.instructions
 compiler.cfg.instructions.syntax
 compiler.cfg.gvn.graph ;
@@ -83,3 +83,6 @@ M: ##copy >expr "Fail" throw ;
 M: ##load-integer >expr val>> <integer-expr> ;
 
 M: ##load-reference >expr obj>> <reference-expr> ;
+
+M: ##phi >expr
+    inputs>> values [ vreg>vn ] map \ ##phi prefix ;
