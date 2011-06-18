@@ -98,9 +98,10 @@ UNION: general-compare-insn scalar-compare-insn ##test-vector ;
     } cond ;
 
 : fold-branch ( ? -- insn )
-    drop
-    ! 0 1 ?
-    ! basic-block get [ nth 1vector ] change-successors drop
+    final-iteration? get [
+        0 1 ?
+        basic-block get [ nth 1vector ] change-successors drop
+    ] [ drop ] if
     \ ##branch new-insn ;
 
 : fold-compare-imm-branch ( insn -- insn/f )
@@ -257,10 +258,10 @@ M: ##compare-integer-imm rewrite
     [ src1>> vreg>insn [ src1>> ] [ src2>> ] bi ] [ cc>> ] bi ; inline
 
 : simplify-test ( insn -- insn )
-    dup (simplify-test) drop [ >>src1 ] [ >>src2 ] bi* ; inline
+    [ dst>> ] [ (simplify-test) ] [ temp>> ] tri \ ##test new-insn ; inline
 
 : simplify-test-branch ( insn -- insn )
-    dup (simplify-test) drop [ >>src1 ] [ >>src2 ] bi* ; inline
+    (simplify-test) \ ##test-branch new-insn ; inline
 
 : (simplify-test-imm) ( insn -- src1 src2 cc )
     [ src1>> vreg>insn [ src1>> ] [ src2>> ] bi ] [ cc>> ] bi ; inline
