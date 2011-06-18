@@ -36,9 +36,6 @@ GENERIC: process-instruction ( insn -- insn' )
     [ redundant-instruction ] [ useful-instruction ] ?if ;
 
 M: insn process-instruction
-    dup rewrite [ process-instruction ] [ ] ?if ;
-
-M: foldable-insn process-instruction
     dup rewrite
     [ process-instruction ]
     [ dup defs-vregs length 1 = [ check-redundancy ] when ] ?if ;
@@ -46,17 +43,13 @@ M: foldable-insn process-instruction
 M: ##copy process-instruction
     dup [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
 
-M: ##phi process-instruction
-    dup rewrite
-    [ process-instruction ] [ check-redundancy ] ?if ;
-
 M: array process-instruction
     [ process-instruction ] map ;
 
 : value-numbering-step ( insns -- insns' )
     [ process-instruction ] map flatten ;
 
-! XXX there's going to be trouble with certain rewrites that
+! FIXME there's going to be trouble with certain rewrites that
 ! modify the cfg / instructions destructively; namely those in
 ! comparisons.factor, alien.factor, and slots.factor
 
