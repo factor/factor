@@ -51,13 +51,14 @@ M: array process-instruction
 
 ! FIXME there's going to be trouble with certain rewrites that
 ! modify the cfg / instructions destructively; namely those in
-! comparisons.factor, alien.factor, and slots.factor
+! alien.factor and slots.factor
 
 : value-numbering-iteration ( cfg -- )
     clear-exprs
     [ value-numbering-step drop ] simple-analysis ;
 
 : identify-redundancies ( cfg -- )
+    final-iteration? off
     init-value-graph
     '[
         changed? off
@@ -66,6 +67,7 @@ M: array process-instruction
     ] loop ;
 
 : eliminate-redundancies ( cfg -- )
+    final-iteration? on
     clear-exprs
     [ value-numbering-step ] simple-optimization ;
 
