@@ -84,5 +84,8 @@ M: ##load-integer >expr val>> <integer-expr> ;
 
 M: ##load-reference >expr obj>> <reference-expr> ;
 
+! TODO experiment with sorting, in case that identifies more
+! phi equivalences
+
 M: ##phi >expr
     inputs>> values [ vreg>vn ] map \ ##phi prefix ;
