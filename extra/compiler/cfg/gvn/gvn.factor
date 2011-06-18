@@ -51,7 +51,7 @@ M: array process-instruction
 
 ! FIXME there's going to be trouble with certain rewrites that
 ! modify the cfg / instructions destructively; namely those in
-! alien.factor and slots.factor
+! alien.factor
 
 : value-numbering-iteration ( cfg -- )
     clear-exprs
