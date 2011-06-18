@@ -52,7 +52,7 @@ M: ##unbox-alien rewrite rewrite-unbox-any-c-ptr ;
     base>> vreg>insn ##add-imm? ;
 
 : fuse-base-offset ( insn -- insn' )
-    dup base>> vreg>insn
+    clone dup base>> vreg>insn
     [ src1>> ] [ src2>> ] bi
     [ >>base ] [ '[ _ + ] change-offset ] bi* ;
 
@@ -62,7 +62,7 @@ M: ##unbox-alien rewrite rewrite-unbox-any-c-ptr ;
     { [ scale>> 0 = ] [ displacement>> vreg>insn ##add-imm? ] } 1&& ;
 
 : fuse-displacement-offset ( insn -- insn' )
-    dup displacement>> vreg>insn
+    clone dup displacement>> vreg>insn
     [ src1>> ] [ src2>> ] bi
     [ >>displacement ] [ '[ _ + ] change-offset ] bi* ;
 
@@ -104,7 +104,7 @@ M: ##store-memory-imm new-alien-insn drop \ ##store-memory new-insn ;
     { [ scale>> 0 = ] [ displacement>> vreg>insn scale-insn? ] } 1&& ;
 
 : fuse-scale ( insn -- insn' )
-    dup displacement>> vreg>insn
+    clone dup displacement>> vreg>insn
     [ src1>> ] [ src2>> ] bi
     [ >>displacement ] [ >>scale ] bi* ;
 
