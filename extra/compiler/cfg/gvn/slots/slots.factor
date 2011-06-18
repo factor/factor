@@ -13,7 +13,7 @@ IN: compiler.cfg.gvn.slots
 
 : simplify-slot-addressing ( insn -- insn/f )
     dup simplify-slot-addressing? [
-        dup slot>> vreg>insn
+        clone dup slot>> vreg>insn
         [ src1>> >>slot ]
         [ src2>> over scale>> '[ _ _ shift - ] change-tag ]
         bi
