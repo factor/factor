@@ -148,8 +148,10 @@ syn match factorMultiStringContents /.*/ contained
 "syn match factorStackEffectErr /\<)\>/
 "syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
 "syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
-syn match factorStackEffect /\<(\s\(\S*\s\)\?--\(\s\S*\)\?\s)\>/ contained
-syn match factorLiteralStackEffect /\<((\s\(\S*\s\)\?--\(\s\S*\)\?\s))\>/
+syn match factorStackEffect /\<(\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+)\>/ contained contains=factorStackDelims,factorStackItems
+syn match factorLiteralStackEffect /\<((\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+))\>/ contained contains=factorStackDelims,factorStackItems
+syn keyword factorStackDelims contained ( ) (( )) --
+syn match factorStackItems contained "\<\S\+\>"
 
 "adapted from lisp.vim
 if exists("g:factor_norainbow")
@@ -199,6 +201,8 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorShebang                PreProc
     HiLink factorShebangErr             Error
     HiLink factorStackEffect            Typedef
+    HiLink factorStackDelims            Delimiter
+    HiLink factorStackItems             Identifier
     HiLink factorLiteralStackEffect     Typedef
     HiLink factorTodo                   Todo
     HiLink factorInclude                Include
