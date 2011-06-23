@@ -1,4 +1,4 @@
-USING: json.writer tools.test json.reader json ;
+USING: hashtables json.writer tools.test json.reader json namespaces ;
 IN: json.writer.tests
 
 { "false" } [ f >json ] unit-test
@@ -18,3 +18,9 @@ SYMBOL: testSymbol
 { """"testSymbol"""" } [ testSymbol >json ] unit-test
 
 [ { 0.5 } ] [ { 1/2 } >json json> ] unit-test
+
+[ "{\"b-b\":\"asdf\"}" ] 
+    [ "asdf" "b-b" associate f jsvar-encode? [ >json ] with-variable ] unit-test
+
+[ "{\"b_b\":\"asdf\"}" ]
+    [ "asdf" "b-b" associate >json ] unit-test 
