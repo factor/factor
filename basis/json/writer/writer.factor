@@ -33,7 +33,10 @@ M: real json-print ( num -- )
 M: sequence json-print ( array -- ) 
     CHAR: [ write1 [ >json ] map "," join write CHAR: ] write1 ;
 
-TR: jsvar-encode "-" "_" ;
+! if jsvar-encode? is true, then implement jsvar-encode
+SYMBOL: jsvar-encode?
+t jsvar-encode? set-global
+TR: jsvar-encode "-" "_" ; 
   
 : tuple>fields ( object -- seq )
     <mirror> [
@@ -45,7 +48,7 @@ M: tuple json-print ( tuple -- )
 
 M: hashtable json-print ( hashtable -- )
     CHAR: { write1 
-    [ [ swap jsvar-encode >json % CHAR: : , >json % ] "" make ]
+    [ [ swap jsvar-encode? get [ jsvar-encode ] when >json % CHAR: : , >json % ] "" make ] 
     { } assoc>map "," join write 
     CHAR: } write1 ;
 
