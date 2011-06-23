@@ -16,7 +16,7 @@ M: vim vim-command
     ] { } make ;
 
 : vim ( file line -- )
-    vim-command run-detached drop ;
+    vim-command run-process drop ;
 
 "vim" vim-path set-global
 [ vim ] edit-hook set-global
