@@ -60,7 +60,6 @@ IN: compiler.cfg.graphviz
     tri* ;
 
 SYMBOL: passes
-\ optimize-cfg def>> passes set
 
 : watch-pass ( cfg pass pass# -- cfg' )
     [ perform-pass ] 2keep draw-cfg ;
