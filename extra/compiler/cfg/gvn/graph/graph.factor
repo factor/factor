@@ -15,6 +15,10 @@ SYMBOL: exprs>vns
 ! assoc mapping value numbers to instructions
 SYMBOL: vns>insns
 
+! assoc mapping basic blocks to the set of value numbers that
+! are defined in the block
+SYMBOL: bbs>defns
+
 ! boolean to track whether vregs>vns changes
 SYMBOL: changed?
 
@@ -27,12 +31,16 @@ SYMBOL: changed?
 
 : vreg>insn ( vreg -- insn ) vreg>vn vn>insn ;
 
+: defined ( bb -- vns ) bbs>defns get at ;
+
 : clear-exprs ( -- )
     exprs>vns get clear-assoc
-    vns>insns get clear-assoc ;
+    vns>insns get clear-assoc
+    bbs>defns get clear-assoc ;
 
 : init-value-graph ( -- )
     0 input-expr-counter set
     H{ } clone vregs>vns set
     H{ } clone exprs>vns set
-    H{ } clone vns>insns set ;
+    H{ } clone vns>insns set
+    H{ } clone bbs>defns set ;
