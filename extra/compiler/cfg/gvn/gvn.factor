@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces arrays assocs kernel accessors fry grouping
-sorting sets sequences locals
+USING: namespaces arrays assocs hashtables kernel accessors fry
+grouping sorting sets sequences locals
 cpu.architecture
 sequences.deep
 compiler.cfg
@@ -29,6 +29,7 @@ GENERIC: process-instruction ( insn -- insn' )
     vn vn set-vn
     vn expr exprs>vns get set-at
     insn vn vns>insns get set-at
+    vn vn basic-block get bbs>defns get [ ?set-at ] change-at
     insn ;
 
 : check-redundancy ( insn -- insn' )
@@ -62,6 +63,10 @@ M: array process-instruction
         changed? get
     ] loop ;
 
+! FIXME can't just do a pass through the cfg to rewrite---not
+! all canonical leaders are necessarily available in a
+! particular rewrite
+
 : eliminate-redundancies ( cfg -- )
     final-iteration? on
     clear-exprs
@@ -69,5 +74,5 @@ M: array process-instruction
 
 : value-numbering ( cfg -- cfg )
     dup identify-redundancies
-    dup eliminate-redundancies
+    ! dup eliminate-redundancies
     cfg-changed predecessors-changed ;
