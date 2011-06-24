@@ -14,7 +14,9 @@ M: integer-expr expr>str value>> number>string ;
 
 M: reference-expr expr>str value>> unparse ;
 
-M: object expr>str [ unparse ] map " " join ;
+M: sequence expr>str [ unparse ] map " " join ;
+
+M: object expr>str unparse ;
 
 : value-mapping ( from to -- str )
     over exprs>vns get value-at* [
