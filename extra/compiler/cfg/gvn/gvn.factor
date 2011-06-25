@@ -9,14 +9,17 @@ compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.utilities
 compiler.cfg.instructions
+compiler.cfg.predecessors
 compiler.cfg.gvn.alien
+compiler.cfg.gvn.avail
 compiler.cfg.gvn.comparisons
 compiler.cfg.gvn.graph
 compiler.cfg.gvn.math
 compiler.cfg.gvn.rewrite
 compiler.cfg.gvn.slots
 compiler.cfg.gvn.misc
-compiler.cfg.gvn.expressions ;
+compiler.cfg.gvn.expressions
+compiler.cfg.gvn.redundancy-elimination ;
 IN: compiler.cfg.gvn
 
 GENERIC: process-instruction ( insn -- insn' )
@@ -63,16 +66,10 @@ M: array process-instruction
         changed? get
     ] loop ;
 
-! FIXME can't just do a pass through the cfg to rewrite---not
-! all canonical leaders are necessarily available in a
-! particular rewrite
-
-: eliminate-redundancies ( cfg -- )
-    final-iteration? on
-    clear-exprs
-    [ value-numbering-step ] simple-optimization ;
-
 : value-numbering ( cfg -- cfg )
+    needs-predecessors
+
     dup identify-redundancies
-    ! dup eliminate-redundancies
+    dup eliminate-redundancies
+
     cfg-changed predecessors-changed ;
