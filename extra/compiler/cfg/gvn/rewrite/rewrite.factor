@@ -11,10 +11,6 @@ GENERIC: rewrite ( insn -- insn/f )
 
 M: insn rewrite drop f ;
 
-! Boolean to track when it's safe to alter the CFG in a rewrite
-! method (i.e., after we've already iterated till fixpoint)
-SYMBOL: final-iteration?
-
 ! Utilities
 GENERIC: insn>integer ( insn -- n )
 
