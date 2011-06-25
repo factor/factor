@@ -1,60 +1,61 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ;
+USING: accessors arrays assocs combinators.short-circuit
+compiler.cfg.def-use compiler.cfg.gvn.avail
+compiler.cfg.gvn.expressions compiler.cfg.gvn.graph
+compiler.cfg.gvn.rewrite compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.renaming.functor
+compiler.cfg.rpo compiler.cfg.utilities kernel namespaces
+sequences sequences.deep ;
 IN: compiler.cfg.gvn.redundancy-elimination
 
-! ! ! Available expressions analysis
+RENAMING: copy-prop [ vreg>vn ] [ vreg>vn ] [ drop next-vreg ]
 
-FORWARD-ANALYSIS: avail
+: copy-prop ( insn -- insn' )
+    dup vreg-insn? [ dup copy-prop-insn-uses ] when ;
 
-M: avail-analysis transfer-set drop defined assoc-union ;
+GENERIC: update-insn ( insn -- insn/f )
 
-: available? ( vn -- ? )
-    basic-block get avail-ins get at key? ;
-
-! ! ! Copy propagation
-
-RENAMING: propagate [ vreg>avail-vn ] [ vreg>avail-vn ] [ drop next-vreg ]
-
-! ! ! Redundancy elimination
-
-! Returns f if insn should be removed
-GENERIC: process-instruction ( insn -- insn'/f )
-
-: redundant-instruction ( insn vn -- f ) 2drop f ; inline
-
-: make-available ( vn -- )
-    dup basic-block get avail-ins get [ ?set-at ] change-at ;
-
-:: useful-instruction ( insn expr -- insn' )
-    insn dst>> :> vn
-    vn make-available
-    insn propagate-insn-uses ! I think that's right?
-    insn ;
-
-: check-redundancy ( insn -- insn'/f )
-    dup >expr dup exrs>vns get at
-    [ redundant-instruction ] [ useful-instruction ] ?if ;
+: canonical-leader? ( vreg -- ? ) dup vreg>vn = ;
 
 : check-redundancy? ( insn -- ? )
     defs-vregs {
         [ length 1 = ]
-        [ first dup vreg>vn = not ] ! avoid ##copy x x
+        ! [ first canonical-leader? not ]
     } 1&& ;
 
-M: insn process-instruction
-    dup rewrite
-    [ process-instruction ]
-    [ dup check-redundancy? [ check-redundancy ] when ] ?if ;
+: redundant? ( insn -- ? )
+    ! [ dst>> ] [ >expr exprs>vns get at ] bi = not ;
+    >expr exprs>vns get key? ;
 
-M: ##copy process-instruction drop f ;
+: check-redundancy ( insn -- insn/f )
+    dup check-redundancy? [
+        dup redundant?
+        [ [ dst>> ] [ >expr exprs>vns get at ] bi <copy> ]
+        [ make-available ] if
+    ] when ;
 
-M: array process-instruction [ process-instruction ] map ;
+M: insn update-insn
+    dup rewrite [ update-insn ] [ check-redundancy ] ?if ;
 
-: redundancy-elimination-step ( insns -- insns' )
-    [ process-instruction ] map flatten sift ;
+M: ##copy update-insn ;
 
-: eliminate-redunancies ( cfg -- )
-    final-iteration? on ! if vreg>vn uses this to obey avail-ins
+M: array update-insn [ update-insn ] map ;
+
+: (eliminate-redundancies) ( insns -- insns' )
+    [ update-insn ] map flatten sift ;
+
+! USING: accessors io prettyprint compiler.cfg compiler.cfg.graphviz
+! graphviz.render ;
+
+: eliminate-redundancies ( cfg -- )
+    final-iteration? on
     dup compute-avail-sets
-    [ redundancy-elimination-step ] simple-optimization ;
+    [
+        ! "Before:" print
+        ! avail-ins get [ [ number>> ] [ keys ] bi* ] assoc-map .
+        (eliminate-redundancies)
+        ! "After:" print
+        ! avail-ins get [ [ number>> ] [ keys ] bi* ] assoc-map .
+        ! cfg get cfgviz preview
+    ] simple-optimization ;
