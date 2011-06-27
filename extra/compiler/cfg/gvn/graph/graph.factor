@@ -1,7 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors compiler.cfg.gvn.avail kernel math namespaces
-assocs ;
+USING: accessors kernel math namespaces assocs ;
 IN: compiler.cfg.gvn.graph
 
 SYMBOL: input-expr-counter
@@ -25,10 +24,7 @@ SYMBOL: final-iteration?
 
 : vn>insn ( vn -- insn ) vns>insns get at ;
 
-: vreg>leader ( vreg -- vn ) vregs>vns get at ;
-
-: vreg>vn ( vreg -- vn )
-    dup vreg>leader dup available? [ nip ] [ drop ] if ;
+: vreg>vn ( vreg -- vn ) vregs>vns get at ;
 
 : set-vn ( vn vreg -- )
     vregs>vns get maybe-set-at [ changed? on ] when ;
