@@ -16,7 +16,7 @@ M: ##replace rewrite
     ] [ 2drop f ] if ;
 
 M: ##phi rewrite
-    [ dst>> ] [ inputs>> values [ vreg>leader ] map sift ] bi
+    [ dst>> ] [ inputs>> values [ vreg>vn ] map sift ] bi
     dup all-equal? [
         [ drop f ]
         [ first <copy> ] if-empty
