@@ -86,16 +86,10 @@ SYMBOL: iteration
         name>> "value-numbering" =
     ] split-when [ value-numbering ] join ;
 
+: test-gvn ( path quot -- )
+    gvn-passes passes [
+        0 iteration [ watch-optimizer* ] with-variable
+    ] with-variable ;
+
 : watch-gvn ( path quot -- )
-    annotate-gvn [
-        gvn-passes passes [
-            0 iteration [ watch-optimizer* ] with-variable
-        ] with-variable
-    ] [ reset-gvn ] [ ] cleanup ;
-
-USING: io.pathnames math math.private ;
-
-: test-gvn ( path -- )
-    "resource:work" prepend-path
-    [ 0 100 [ 1 fixnum+fast ] times ]
-    watch-gvn ;
+    annotate-gvn [ test-gvn ] [ reset-gvn ] [ ] cleanup ;
