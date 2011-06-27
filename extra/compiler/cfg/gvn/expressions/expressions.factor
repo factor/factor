@@ -88,4 +88,4 @@ M: ##load-reference >expr obj>> <reference-expr> ;
 ! phi equivalences
 
 M: ##phi >expr
-    inputs>> values [ vreg>canon-vn ] map \ ##phi prefix ;
+    inputs>> values [ vreg>leader ] map \ ##phi prefix ;
