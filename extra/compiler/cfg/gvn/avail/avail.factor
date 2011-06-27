@@ -1,18 +1,18 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.cfg
-compiler.cfg.dataflow-analysis compiler.cfg.def-use hashtables
-kernel namespaces sequences ;
+compiler.cfg.dataflow-analysis
+compiler.cfg.def-use
+compiler.cfg.predecessors compiler.cfg.rpo deques dlists
+hashtables kernel locals namespaces sequences sets ;
+FROM: namespaces => set ;
 IN: compiler.cfg.gvn.avail
 
-! assoc mapping basic blocks to the set of value numbers that
-! are defined in the block
-SYMBOL: bbs>defns
-
-! : defined ( bb -- vns ) bbs>defns get at ;
-
 : defined ( bb -- vregs )
-    instructions>> [ defs-vregs ] map concat [ dup ] H{ } map>assoc ;
+    instructions>> [ defs-vregs ] map concat unique ;
+
+! This doesn't propagate across "kill blocks".  Not sure if
+! that's right, though I may as well assume as much.
 
 FORWARD-ANALYSIS: avail
 
