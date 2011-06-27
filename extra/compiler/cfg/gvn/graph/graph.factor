@@ -25,14 +25,10 @@ SYMBOL: final-iteration?
 
 : vn>insn ( vn -- insn ) vns>insns get at ;
 
-: vreg>canon-vn ( vreg -- vn )
-    vregs>vns get at ;
-
-: vreg>avail-vn ( vreg -- vn )
-    dup vreg>canon-vn dup available? [ nip ] [ drop ] if ;
+: vreg>leader ( vreg -- vn ) vregs>vns get at ;
 
 : vreg>vn ( vreg -- vn )
-    final-iteration? get [ vreg>avail-vn ] [ vreg>canon-vn ] if ;
+    dup vreg>leader dup available? [ nip ] [ drop ] if ;
 
 : set-vn ( vn vreg -- )
     vregs>vns get maybe-set-at [ changed? on ] when ;
@@ -41,12 +37,10 @@ SYMBOL: final-iteration?
 
 : clear-exprs ( -- )
     exprs>vns get clear-assoc
-    vns>insns get clear-assoc
-    bbs>defns get clear-assoc ;
+    vns>insns get clear-assoc ;
 
 : init-value-graph ( -- )
     0 input-expr-counter set
     H{ } clone vregs>vns set
     H{ } clone exprs>vns set
-    H{ } clone vns>insns set
-    H{ } clone bbs>defns set ;
+    H{ } clone vns>insns set ;

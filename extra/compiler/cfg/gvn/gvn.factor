@@ -18,8 +18,7 @@ compiler.cfg.gvn.math
 compiler.cfg.gvn.rewrite
 compiler.cfg.gvn.slots
 compiler.cfg.gvn.misc
-compiler.cfg.gvn.expressions
-compiler.cfg.gvn.redundancy-elimination ;
+compiler.cfg.gvn.expressions ;
 IN: compiler.cfg.gvn
 
 GENERIC: process-instruction ( insn -- insn' )
@@ -32,7 +31,6 @@ GENERIC: process-instruction ( insn -- insn' )
     vn vn set-vn
     vn expr exprs>vns get set-at
     insn vn vns>insns get set-at
-    vn vn basic-block get bbs>defns get [ ?set-at ] change-at
     insn ;
 
 : check-redundancy ( insn -- insn' )
@@ -43,6 +41,11 @@ M: insn process-instruction
     dup rewrite
     [ process-instruction ]
     [ dup defs-vregs length 1 = [ check-redundancy ] when ] ?if ;
+
+UNION: don't-check-redundancy alien-call-insn ##callback-inputs ;
+
+M: don't-check-redundancy process-instruction
+    dup rewrite [ process-instruction ] [ ] ?if ;
 
 M: ##copy process-instruction
     dup [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
@@ -59,6 +62,7 @@ M: array process-instruction
 
 : identify-redundancies ( cfg -- )
     final-iteration? off
+    ! dup compute-avail-sets
     init-value-graph
     '[
         changed? off
@@ -66,8 +70,20 @@ M: array process-instruction
         changed? get
     ] loop ;
 
+: eliminate-redundancies ( cfg -- )
+    final-iteration? on
+    ! dup compute-avail-sets
+    clear-exprs
+    [ value-numbering-step ] simple-optimization ;
+
+USE: prettyprint
+
 : value-numbering ( cfg -- cfg )
     needs-predecessors
+
+    dup compute-avail-sets
+
+    ! avail-ins get [ [ number>> ] [ keys ] bi* ] assoc-map .
 
     dup identify-redundancies
     dup eliminate-redundancies
