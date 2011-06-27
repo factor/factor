@@ -60,9 +60,8 @@ M: array process-instruction
     clear-exprs
     [ value-numbering-step drop ] simple-analysis ;
 
-: identify-redundancies ( cfg -- )
+: determine-value-numbers ( cfg -- )
     final-iteration? off
-    ! dup compute-avail-sets
     init-value-graph
     '[
         changed? off
@@ -70,22 +69,9 @@ M: array process-instruction
         changed? get
     ] loop ;
 
-: eliminate-redundancies ( cfg -- )
-    final-iteration? on
-    ! dup compute-avail-sets
-    clear-exprs
-    [ value-numbering-step ] simple-optimization ;
-
-USE: prettyprint
-
 : value-numbering ( cfg -- cfg )
     needs-predecessors
 
-    dup compute-avail-sets
-
-    ! avail-ins get [ [ number>> ] [ keys ] bi* ] assoc-map .
-
-    dup identify-redundancies
-    dup eliminate-redundancies
+    dup determine-value-numbers
 
     cfg-changed predecessors-changed ;
