@@ -26,10 +26,14 @@ IN: compiler.cfg.graphviz
 : left-justify ( str -- str' )
     string-lines "\\l" join ;
 
+: left-justified ( quot -- str )
+    with-string-writer left-justify ; inline
+
 : bb-label ( bb -- str )
+    [ number>> number>string ]
     [
-        instructions>> [ insn. ] each
-    ] with-string-writer left-justify ;
+        [ instructions>> [ insn. ] each ] left-justified
+    ] bi "\\n" glue ;
 
 : add-cfg-vertex ( graph bb -- graph' )
     [ number>> <node> ]
