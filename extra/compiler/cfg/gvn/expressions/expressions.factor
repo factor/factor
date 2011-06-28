@@ -3,6 +3,7 @@
 USING: assocs accessors arrays classes classes.algebra
 combinators fry generic.parser kernel math namespaces
 quotations sequences slots words make sets
+compiler.cfg
 compiler.cfg.instructions
 compiler.cfg.instructions.syntax
 compiler.cfg.gvn.graph ;
@@ -88,4 +89,6 @@ M: ##load-reference >expr obj>> <reference-expr> ;
 ! phi equivalences
 
 M: ##phi >expr
-    inputs>> values [ vreg>vn ] map \ ##phi prefix ;
+    inputs>> values [ vreg>vn ] map
+    basic-block get number>> prefix
+    \ ##phi prefix ;
