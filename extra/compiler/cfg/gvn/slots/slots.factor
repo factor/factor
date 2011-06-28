@@ -11,6 +11,7 @@ IN: compiler.cfg.gvn.slots
     complex-addressing?
     [ slot>> vreg>insn ##add-imm? ] [ drop f ] if ;
 
+! XXX the vregs that slot>> vreg>insn uses are not necessarily available
 : simplify-slot-addressing ( insn -- insn/f )
     dup simplify-slot-addressing? [
         clone dup slot>> vreg>insn

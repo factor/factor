@@ -217,6 +217,7 @@ M: ##compare-integer rewrite
         [ cc>> { cc= cc/= } member? ]
     } 1&& ; inline
 
+! XXX the vregs that src1>> vreg>insn uses are not necessarily available
 : rewrite-redundant-comparison ( insn -- insn' )
     [ cc>> ] [ dst>> ] [ src1>> vreg>insn ] tri {
         { [ dup ##compare? ] [ >compare< next-vreg \ ##compare new-insn ] }
@@ -254,6 +255,8 @@ M: ##compare-integer-imm rewrite
         [ drop f ]
     } cond ;
 
+! XXX the vregs (src1>> and src2>>) that src1>> vreg>insn uses
+!     are not necessarily available
 : (simplify-test) ( insn -- src1 src2 cc )
     [ src1>> vreg>insn [ src1>> ] [ src2>> ] bi ] [ cc>> ] bi ; inline
 
@@ -263,6 +266,8 @@ M: ##compare-integer-imm rewrite
 : simplify-test-branch ( insn -- insn )
     (simplify-test) \ ##test-branch new-insn ; inline
 
+! XXX the vregs (src1>> and src2>>) that src1>> vreg>insn uses
+!     are not necessarily available
 : (simplify-test-imm) ( insn -- src1 src2 cc )
     [ src1>> vreg>insn [ src1>> ] [ src2>> ] bi ] [ cc>> ] bi ; inline
 
