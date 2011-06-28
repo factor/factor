@@ -21,44 +21,38 @@ compiler.cfg.gvn.misc
 compiler.cfg.gvn.expressions ;
 IN: compiler.cfg.gvn
 
-GENERIC: process-instruction ( insn -- insn' )
+GENERIC: simplify ( insn -- insn' )
 
-: redundant-instruction ( insn vn -- insn' )
-    [ dst>> ] dip [ swap set-vn ] [ <copy> ] 2bi ;
+M: insn simplify dup rewrite [ simplify ] [ ] ?if ;
+M: array simplify [ simplify ] map ;
+M: ##copy simplify ;
 
-:: useful-instruction ( insn expr -- insn' )
+GENERIC: value-number ( insn -- )
+
+M: alien-call-insn value-number drop ;
+M: ##callback-inputs value-number drop ;
+M: ##copy value-number [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
+
+: redundant-instruction ( insn vn -- )
+    swap dst>> set-vn ;
+
+:: useful-instruction ( insn expr -- )
     insn dst>> :> vn
     vn vn set-vn
     vn expr exprs>vns get set-at
-    insn vn vns>insns get set-at
-    insn ;
+    insn vn vns>insns get set-at ;
 
-: check-redundancy ( insn -- insn' )
-    dup >expr dup exprs>vns get at
-    [ redundant-instruction ] [ useful-instruction ] ?if ;
+M: insn value-number
+    dup defs-vregs length 1 = [
+        dup >expr dup exprs>vns get at
+        [ redundant-instruction ] [ useful-instruction ] ?if
+    ] [ drop ] if ;
 
-M: insn process-instruction
-    dup rewrite
-    [ process-instruction ]
-    [ dup defs-vregs length 1 = [ check-redundancy ] when ] ?if ;
-
-UNION: don't-check-redundancy alien-call-insn ##callback-inputs ;
-
-M: don't-check-redundancy process-instruction
-    dup rewrite [ process-instruction ] [ ] ?if ;
-
-M: ##copy process-instruction
-    dup [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
-
-M: array process-instruction
-    [ process-instruction ] map ;
-
-: value-numbering-step ( insns -- insns' )
-    [ process-instruction ] map flatten ;
+: value-numbering-step ( insns -- )
+    [ simplify ] map flatten [ value-number ] each ;
 
 : value-numbering-iteration ( cfg -- )
-    clear-exprs
-    [ value-numbering-step drop ] simple-analysis ;
+    clear-exprs [ value-numbering-step ] simple-analysis ;
 
 : determine-value-numbers ( cfg -- )
     final-iteration? off
@@ -71,7 +65,6 @@ M: array process-instruction
 
 : value-numbering ( cfg -- cfg )
     needs-predecessors
-
     dup determine-value-numbers
 
     cfg-changed predecessors-changed ;
