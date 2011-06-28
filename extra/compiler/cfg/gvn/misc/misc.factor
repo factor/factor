@@ -15,6 +15,9 @@ M: ##replace rewrite
         [ swap \ ##replace-imm new-insn ] [ 2drop f ] if
     ] [ 2drop f ] if ;
 
+! XXX any particular input's vn isn't necessarily available, so
+!     can't just return a straight-up <copy>; might just do
+!     this with a set-vn in gvn.factor:value-number
 M: ##phi rewrite
     [ dst>> ] [ inputs>> values [ vreg>vn ] map sift ] bi
     dup all-equal? [
