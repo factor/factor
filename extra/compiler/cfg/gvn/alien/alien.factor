@@ -34,6 +34,7 @@ M: ##box-displaced-alien rewrite
         ##add
     ] { } make ;
 
+! XXX the vregs that src>> vreg>insn uses are not necessarily available
 : rewrite-unbox-any-c-ptr ( insn -- insn/f )
     dup src>> vreg>insn
     {
@@ -51,6 +52,7 @@ M: ##unbox-alien rewrite rewrite-unbox-any-c-ptr ;
 : fuse-base-offset? ( insn -- ? )
     base>> vreg>insn ##add-imm? ;
 
+! XXX base>> vreg>insn src1>> not necessarily available
 : fuse-base-offset ( insn -- insn' )
     clone dup base>> vreg>insn
     [ src1>> ] [ src2>> ] bi
@@ -61,6 +63,7 @@ M: ##unbox-alien rewrite rewrite-unbox-any-c-ptr ;
 : fuse-displacement-offset? ( insn -- ? )
     { [ scale>> 0 = ] [ displacement>> vreg>insn ##add-imm? ] } 1&& ;
 
+! XXX displacement>> vreg>insn src1>> not necessarily available
 : fuse-displacement-offset ( insn -- insn' )
     clone dup displacement>> vreg>insn
     [ src1>> ] [ src2>> ] bi
@@ -85,6 +88,8 @@ GENERIC: new-alien-insn ( value base displacement scale offset rep c-type insn -
 M: ##load-memory-imm new-alien-insn drop \ ##load-memory new-insn ;
 M: ##store-memory-imm new-alien-insn drop \ ##store-memory new-insn ;
 
+! XXX base>> vreg>insn src1>> & src2>> not necessarily
+!     available
 : fuse-displacement ( insn -- insn' )
     {
         [ alien-insn-value ]
@@ -103,6 +108,7 @@ M: ##store-memory-imm new-alien-insn drop \ ##store-memory new-insn ;
 : fuse-scale? ( insn -- ? )
     { [ scale>> 0 = ] [ displacement>> vreg>insn scale-insn? ] } 1&& ;
 
+! XXX displacement>> vreg>insn src1>> not necessarily available
 : fuse-scale ( insn -- insn' )
     clone dup displacement>> vreg>insn
     [ src1>> ] [ src2>> ] bi

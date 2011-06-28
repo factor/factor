@@ -23,6 +23,7 @@ M: ##tagged>integer rewrite
         [ 2drop f ]
     } cond ;
 
+! XXX src>> vreg>insn src>> not necessarily available
 : self-inverse ( insn -- insn' )
     [ dst>> ] [ src>> vreg>insn src>> ] bi <copy> ;
 
@@ -101,6 +102,7 @@ M: ##sub-imm rewrite sub-imm>add-imm ;
 : mul-to-shl ( insn -- insn' )
     [ [ dst>> ] [ src1>> ] bi ] [ src2>> log2 ] bi \ ##shl-imm new-insn ;
 
+! XXX not sure if availability is an issue
 ! Distribution converts
 ! ##+-imm 2 1 X
 ! ##*-imm 3 2 Y

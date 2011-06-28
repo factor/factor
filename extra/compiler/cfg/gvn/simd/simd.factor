@@ -18,6 +18,9 @@ IN: compiler.cfg.gvn.simd
 ! Some lame constant folding for SIMD intrinsics. Eventually this
 ! should be redone completely.
 
+! XXX pretty much all of these rely on the vregs used by some
+! vreg>insn, but they aren't necessarily available
+
 : useless-shuffle-vector-imm? ( insn -- ? )
     [ shuffle>> ] [ rep>> rep-length iota ] bi sequence= ;
 
