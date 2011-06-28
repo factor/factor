@@ -29,8 +29,11 @@ M: ##copy simplify ;
 
 GENERIC: value-number ( insn -- )
 
+M: array value-number [ value-number ] each ;
+
 M: alien-call-insn value-number drop ;
 M: ##callback-inputs value-number drop ;
+
 M: ##copy value-number [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
 
 : redundant-instruction ( insn vn -- )
@@ -42,14 +45,21 @@ M: ##copy value-number [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
     vn expr exprs>vns get set-at
     insn vn vns>insns get set-at ;
 
+: check-redundancy ( insn -- )
+    dup >expr dup exprs>vns get at
+    [ redundant-instruction ] [ useful-instruction ] ?if ;
+
+M: ##phi value-number
+    dup inputs>> values [ vreg>vn ] map sift
+    dup all-equal? [
+        [ drop ] [ first redundant-instruction ] if-empty
+    ] [ drop check-redundancy ] if ;
+
 M: insn value-number
-    dup defs-vregs length 1 = [
-        dup >expr dup exprs>vns get at
-        [ redundant-instruction ] [ useful-instruction ] ?if
-    ] [ drop ] if ;
+    dup defs-vregs length 1 = [ check-redundancy ] [ drop ] if ;
 
 : value-numbering-step ( insns -- )
-    [ simplify ] map flatten [ value-number ] each ;
+    [ simplify value-number ] each ;
 
 : value-numbering-iteration ( cfg -- )
     clear-exprs [ value-numbering-step ] simple-analysis ;
