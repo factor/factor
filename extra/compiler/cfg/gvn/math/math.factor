@@ -7,6 +7,7 @@ compiler.cfg.registers
 compiler.cfg.utilities
 compiler.cfg.gvn.folding
 compiler.cfg.gvn.graph
+compiler.cfg.gvn.avail
 compiler.cfg.gvn.rewrite ;
 IN: compiler.cfg.gvn.math
 
@@ -23,7 +24,9 @@ M: ##tagged>integer rewrite
         [ 2drop f ]
     } cond ;
 
-! XXX src>> vreg>insn src>> not necessarily available
+: self-inverse? ( insn quot -- ? )
+    [ src>> vreg>insn ] dip with-available-uses? ; inline
+
 : self-inverse ( insn -- insn' )
     [ dst>> ] [ src>> vreg>insn src>> ] bi <copy> ;
 
@@ -32,14 +35,14 @@ M: ##tagged>integer rewrite
 
 M: ##neg rewrite
     {
-        { [ dup src>> vreg>insn ##neg? ] [ self-inverse ] }
+        { [ dup [ ##neg? ] self-inverse? ] [ self-inverse ] }
         { [ dup unary-constant-fold? ] [ unary-constant-fold ] }
         [ drop f ]
     } cond ;
 
 M: ##not rewrite
     {
-        { [ dup src>> vreg>insn ##not? ] [ self-inverse ] }
+        { [ dup [ ##not? ] self-inverse? ] [ self-inverse ] }
         { [ dup unary-constant-fold? ] [ unary-constant-fold ] }
         [ drop f ]
     } cond ;
@@ -102,7 +105,6 @@ M: ##sub-imm rewrite sub-imm>add-imm ;
 : mul-to-shl ( insn -- insn' )
     [ [ dst>> ] [ src1>> ] bi ] [ src2>> log2 ] bi \ ##shl-imm new-insn ;
 
-! XXX not sure if availability is an issue
 ! Distribution converts
 ! ##+-imm 2 1 X
 ! ##*-imm 3 2 Y
@@ -120,10 +122,10 @@ M: ##sub-imm rewrite sub-imm>add-imm ;
     ] [ f ] if ; inline
 
 : distribute-over-add? ( insn -- ? )
-    src1>> vreg>insn ##add-imm? ;
+    src1>> vreg>insn [ ##add-imm? ] with-available-uses? ;
 
 : distribute-over-sub? ( insn -- ? )
-    src1>> vreg>insn ##sub-imm? ;
+    src1>> vreg>insn [ ##sub-imm? ] with-available-uses? ;
 
 : distribute ( insn add-op mul-op -- new-insns/f )
     [

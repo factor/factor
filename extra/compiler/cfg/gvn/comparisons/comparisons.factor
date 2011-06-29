@@ -9,6 +9,7 @@ compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.gvn.math
 compiler.cfg.gvn.graph
+compiler.cfg.gvn.avail
 compiler.cfg.gvn.rewrite ;
 IN: compiler.cfg.gvn.comparisons
 
@@ -212,12 +213,11 @@ M: ##compare-integer rewrite
 
 : rewrite-redundant-comparison? ( insn -- ? )
     {
-        [ src1>> vreg>insn scalar-compare-insn? ]
+        [ src1>> vreg>insn [ scalar-compare-insn? ] with-available-uses? ]
         [ src2>> not ]
         [ cc>> { cc= cc/= } member? ]
     } 1&& ; inline
 
-! XXX the vregs that src1>> vreg>insn uses are not necessarily available
 : rewrite-redundant-comparison ( insn -- insn' )
     [ cc>> ] [ dst>> ] [ src1>> vreg>insn ] tri {
         { [ dup ##compare? ] [ >compare< next-vreg \ ##compare new-insn ] }
@@ -255,8 +255,9 @@ M: ##compare-integer-imm rewrite
         [ drop f ]
     } cond ;
 
-! XXX the vregs (src1>> and src2>>) that src1>> vreg>insn uses
-!     are not necessarily available
+: simplify-test? ( insn -- ? )
+    src1>> vreg>insn [ ##and? ] with-available-uses? ;
+
 : (simplify-test) ( insn -- src1 src2 cc )
     [ src1>> vreg>insn [ src1>> ] [ src2>> ] bi ] [ cc>> ] bi ; inline
 
@@ -266,8 +267,9 @@ M: ##compare-integer-imm rewrite
 : simplify-test-branch ( insn -- insn )
     (simplify-test) \ ##test-branch new-insn ; inline
 
-! XXX the vregs (src1>> and src2>>) that src1>> vreg>insn uses
-!     are not necessarily available
+: simplify-test-imm? ( insn -- ? )
+    src1>> vreg>insn [ ##and-imm? ] with-available-uses? ;
+
 : (simplify-test-imm) ( insn -- src1 src2 cc )
     [ src1>> vreg>insn [ src1>> ] [ src2>> ] bi ] [ cc>> ] bi ; inline
 
@@ -291,8 +293,8 @@ M: ##test rewrite
         { [ dup src2>> vreg-immediate-comparand? ] [ f >test-imm ] }
         { [ dup diagonal? ] [
             {
-                { [ dup src1>> vreg>insn ##and? ] [ simplify-test ] }
-                { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm ] }
+                { [ dup simplify-test? ] [ simplify-test ] }
+                { [ dup simplify-test-imm? ] [ simplify-test-imm ] }
                 [ drop f ]
             } cond
         ] }
@@ -305,8 +307,8 @@ M: ##test-branch rewrite
         { [ dup src2>> vreg-immediate-comparand? ] [ f >test-imm-branch ] }
         { [ dup diagonal? ] [
             {
-                { [ dup src1>> vreg>insn ##and? ] [ simplify-test-branch ] }
-                { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm-branch ] }
+                { [ dup simplify-test? ] [ simplify-test-branch ] }
+                { [ dup simplify-test-imm? ] [ simplify-test-imm-branch ] }
                 [ drop f ]
             } cond
         ] }
