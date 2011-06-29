@@ -4,14 +4,15 @@ USING: accessors combinators.short-circuit cpu.architecture fry
 kernel math
 compiler.cfg.instructions
 compiler.cfg.gvn.graph
+compiler.cfg.gvn.avail
 compiler.cfg.gvn.rewrite ;
 IN: compiler.cfg.gvn.slots
 
 : simplify-slot-addressing? ( insn -- ? )
-    complex-addressing?
-    [ slot>> vreg>insn ##add-imm? ] [ drop f ] if ;
+    complex-addressing? [
+        slot>> vreg>insn [ ##add-imm? ] with-available-uses?
+    ] [ drop f ] if ;
 
-! XXX the vregs that slot>> vreg>insn uses are not necessarily available
 : simplify-slot-addressing ( insn -- insn/f )
     dup simplify-slot-addressing? [
         clone dup slot>> vreg>insn

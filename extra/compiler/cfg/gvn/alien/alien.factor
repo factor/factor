@@ -9,6 +9,7 @@ compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.gvn.math
 compiler.cfg.gvn.graph
+compiler.cfg.gvn.avail
 compiler.cfg.gvn.rewrite ;
 IN: compiler.cfg.gvn.alien
 
@@ -34,12 +35,17 @@ M: ##box-displaced-alien rewrite
         ##add
     ] { } make ;
 
-! XXX the vregs that src>> vreg>insn uses are not necessarily available
 : rewrite-unbox-any-c-ptr ( insn -- insn/f )
     dup src>> vreg>insn
     {
-        { [ dup ##box-alien? ] [ rewrite-unbox-alien ] }
-        { [ dup ##box-displaced-alien? ] [ rewrite-unbox-displaced-alien ] }
+        {
+            [ dup [ ##box-alien? ] with-available-uses? ]
+            [ rewrite-unbox-alien ]
+        }
+        {
+            [ dup [ ##box-displaced-alien? ] with-available-uses? ]
+            [ rewrite-unbox-displaced-alien ]
+        }
         [ 2drop f ]
     } cond ;
 
@@ -50,9 +56,8 @@ M: ##unbox-alien rewrite rewrite-unbox-any-c-ptr ;
 ! Fuse ##add-imm into ##load-memory(-imm) and ##store-memory(-imm)
 ! just update the offset in the instruction
 : fuse-base-offset? ( insn -- ? )
-    base>> vreg>insn ##add-imm? ;
+    base>> vreg>insn [ ##add-imm? ] with-available-uses? ;
 
-! XXX base>> vreg>insn src1>> not necessarily available
 : fuse-base-offset ( insn -- insn' )
     clone dup base>> vreg>insn
     [ src1>> ] [ src2>> ] bi
@@ -61,9 +66,11 @@ M: ##unbox-alien rewrite rewrite-unbox-any-c-ptr ;
 ! Fuse ##add-imm into ##load-memory and ##store-memory
 ! just update the offset in the instruction
 : fuse-displacement-offset? ( insn -- ? )
-    { [ scale>> 0 = ] [ displacement>> vreg>insn ##add-imm? ] } 1&& ;
+    {
+        [ scale>> 0 = ]
+        [ displacement>> vreg>insn [ ##add-imm? ] with-available-uses? ]
+    } 1&& ;
 
-! XXX displacement>> vreg>insn src1>> not necessarily available
 : fuse-displacement-offset ( insn -- insn' )
     clone dup displacement>> vreg>insn
     [ src1>> ] [ src2>> ] bi
@@ -75,7 +82,7 @@ M: ##unbox-alien rewrite rewrite-unbox-any-c-ptr ;
 : fuse-displacement? ( insn -- ? )
     {
         [ offset>> 0 = complex-addressing? or ]
-        [ base>> vreg>insn ##add? ]
+        [ base>> vreg>insn [ ##add? ] with-available-uses? ]
     } 1&& ;
 
 GENERIC: alien-insn-value ( insn -- value )
@@ -88,8 +95,6 @@ GENERIC: new-alien-insn ( value base displacement scale offset rep c-type insn -
 M: ##load-memory-imm new-alien-insn drop \ ##load-memory new-insn ;
 M: ##store-memory-imm new-alien-insn drop \ ##store-memory new-insn ;
 
-! XXX base>> vreg>insn src1>> & src2>> not necessarily
-!     available
 : fuse-displacement ( insn -- insn' )
     {
         [ alien-insn-value ]
@@ -106,9 +111,11 @@ M: ##store-memory-imm new-alien-insn drop \ ##store-memory new-insn ;
     { [ ##shl-imm? ] [ src2>> { 1 2 3 } member? ] } 1&& ;
 
 : fuse-scale? ( insn -- ? )
-    { [ scale>> 0 = ] [ displacement>> vreg>insn scale-insn? ] } 1&& ;
+    {
+        [ scale>> 0 = ]
+        [ displacement>> vreg>insn [ scale-insn? ] with-available-uses? ]
+    } 1&& ;
 
-! XXX displacement>> vreg>insn src1>> not necessarily available
 : fuse-scale ( insn -- insn' )
     clone dup displacement>> vreg>insn
     [ src1>> ] [ src2>> ] bi

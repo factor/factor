@@ -1,10 +1,13 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg
+USING: accessors assocs hashtables kernel namespaces sequences
+sets
+compiler.cfg
 compiler.cfg.dataflow-analysis
 compiler.cfg.def-use
-compiler.cfg.predecessors compiler.cfg.rpo deques dlists
-hashtables kernel locals namespaces sequences sets ;
+compiler.cfg.gvn.graph
+compiler.cfg.predecessors
+compiler.cfg.rpo ;
 FROM: namespaces => set ;
 IN: compiler.cfg.gvn.avail
 
@@ -18,8 +21,20 @@ FORWARD-ANALYSIS: avail
 
 M: avail-analysis transfer-set drop defined assoc-union ;
 
+! Strict idea of availability, for now.  Would like to see if
+! searching the VN congruence classes for the smallest
+! available vn would work at all / better.
+
 : available? ( vn -- ? )
-    basic-block get avail-ins get at key? ;
+    final-iteration? get [
+        basic-block get avail-ins get at key?
+    ] [ drop t ] if ;
+
+: available-uses? ( insn -- ? )
+    uses-vregs [ available? ] all? ;
+
+: with-available-uses? ( quot -- ? )
+    [ available-uses? ] bi and ; inline
 
 : make-available ( insn -- insn )
     dup dst>>
