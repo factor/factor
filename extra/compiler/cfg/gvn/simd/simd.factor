@@ -12,14 +12,12 @@ compiler.cfg.comparisons
 compiler.cfg.instructions
 compiler.cfg.gvn.math
 compiler.cfg.gvn.graph
+compiler.cfg.gvn.avail
 compiler.cfg.gvn.rewrite ;
 IN: compiler.cfg.gvn.simd
 
 ! Some lame constant folding for SIMD intrinsics. Eventually this
 ! should be redone completely.
-
-! XXX pretty much all of these rely on the vregs used by some
-! vreg>insn, but they aren't necessarily available
 
 : useless-shuffle-vector-imm? ( insn -- ? )
     [ shuffle>> ] [ rep>> rep-length iota ] bi sequence= ;
@@ -42,7 +40,7 @@ IN: compiler.cfg.gvn.simd
 M: ##shuffle-vector-imm rewrite
     dup src>> vreg>insn {
         { [ over useless-shuffle-vector-imm? ] [ drop [ dst>> ] [ src>> ] bi <copy> ] }
-        { [ dup ##shuffle-vector-imm? ] [ compose-shuffle-vector-imm ] }
+        { [ dup [ ##shuffle-vector-imm? ] with-available-uses? ] [ compose-shuffle-vector-imm ] }
         { [ dup ##load-reference? ] [ fold-shuffle-vector-imm ] }
         [ 2drop f ]
     } cond ;
@@ -64,7 +62,7 @@ M: ##shuffle-vector-imm rewrite
 M: ##scalar>vector rewrite
     dup src>> vreg>insn {
         { [ dup literal-insn? ] [ fold-scalar>vector ] }
-        { [ dup ##vector>scalar? ] [ [ dst>> ] [ src>> ] bi* <copy> ] }
+        { [ dup [ ##vector>scalar? ] with-available-uses? ] [ [ dst>> ] [ src>> ] bi* <copy> ] }
         [ 2drop f ]
     } cond ;
 
@@ -119,9 +117,9 @@ M: ##xor-vector rewrite
 
 : vector-not? ( insn -- ? )
     {
-        [ ##not-vector? ]
+        [ [ ##not-vector? ] with-available-uses? ]
         [ {
-            [ ##xor-vector? ]
+            [ [ ##xor-vector? ] with-available-uses? ]
             [ [ src1>> ] [ src2>> ] bi [ vreg>insn ##fill-vector? ] either? ]
         } 1&& ]
     } 1|| ;
