@@ -27,7 +27,7 @@ M: avail-analysis transfer-set drop defined assoc-union ;
 
 : available? ( vn -- ? )
     final-iteration? get [
-        basic-block get avail-ins get at key?
+        basic-block get avail-in key?
     ] [ drop t ] if ;
 
 : available-uses? ( insn -- ? )
@@ -38,4 +38,4 @@ M: avail-analysis transfer-set drop defined assoc-union ;
 
 : make-available ( insn -- insn )
     dup dst>>
-    basic-block get avail-ins get [ dupd ?set-at ] change-at ;
+    basic-block get avail-ins get [ dupd clone ?set-at ] change-at ;
