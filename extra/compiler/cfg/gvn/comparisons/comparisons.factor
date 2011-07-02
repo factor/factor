@@ -58,7 +58,6 @@ IN: compiler.cfg.gvn.comparisons
 : >compare< ( insn -- in1 in2 cc )
     [ src1>> ] [ src2>> ] [ cc>> ] tri ; inline
 
-! XXX next-vreg may make vregs>vns change on every iteration
 : >test-vector< ( insn -- src1 temp rep vcc )
     {
         [ src1>> ]
@@ -180,13 +179,11 @@ M: ##compare-integer-branch rewrite
     [ { [ dst>> ] [ src1>> ] [ src2>> ] [ cc>> ] } cleave ] dip
     swap-compare ; inline
 
-! XXX next-vreg may make vregs>vns change on every iteration
 : >compare-imm ( insn swap? -- insn' )
     (>compare-imm)
     [ vreg>literal ] dip
     next-vreg \ ##compare-imm new-insn ; inline
 
-! XXX next-vreg may make vregs>vns change on every iteration
 : >compare-integer-imm ( insn swap? -- insn' )
     (>compare-imm)
     [ vreg>integer ] dip
@@ -221,7 +218,6 @@ M: ##compare-integer rewrite
         [ cc>> { cc= cc/= } member? ]
     } 1&& ; inline
 
-! XXX next-vreg may make vregs>vns change on every iteration
 : rewrite-redundant-comparison ( insn -- insn' )
     [ cc>> ] [ dst>> ] [ src1>> vreg>insn ] tri {
         { [ dup ##compare? ] [ >compare< next-vreg \ ##compare new-insn ] }
@@ -283,7 +279,6 @@ M: ##compare-integer-imm rewrite
 : simplify-test-imm-branch ( insn -- insn )
     (simplify-test-imm) \ ##test-imm-branch new-insn ; inline
 
-! XXX next-vreg may make vregs>vns change on every iteration
 : >test-imm ( insn ? -- insn' )
     (>compare-imm) [ vreg>integer ] dip next-vreg
     \ ##test-imm new-insn ; inline
