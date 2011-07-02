@@ -27,6 +27,8 @@ M: insn simplify dup rewrite [ simplify ] [ ] ?if ;
 M: array simplify [ simplify ] map ;
 M: ##copy simplify ;
 
+! ! ! Global value numbering
+
 GENERIC: value-number ( insn -- )
 
 M: array value-number [ value-number ] each ;
@@ -49,11 +51,11 @@ M: ##copy value-number [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
     dup >expr dup exprs>vns get at
     [ redundant-instruction ] [ useful-instruction ] ?if ;
 
-M: ##phi value-number
-    dup inputs>> values [ vreg>vn ] map sift
-    dup all-equal? [
-        [ drop ] [ first redundant-instruction ] if-empty
-    ] [ drop check-redundancy ] if ;
+! M: ##phi value-number
+!     dup inputs>> values [ vreg>vn ] map sift
+!     dup all-equal? [
+!         [ drop ] [ first redundant-instruction ] if-empty
+!     ] [ drop check-redundancy ] if ;
 
 M: insn value-number
     dup defs-vregs length 1 = [ check-redundancy ] [ drop ] if ;
@@ -73,8 +75,46 @@ M: insn value-number
         changed? get
     ] loop ;
 
+! ! ! Global common subexpression elimination
+
+GENERIC: gcse ( insn -- insn' )
+
+M: array gcse [ gcse ] map ;
+
+M: alien-call-insn gcse ;
+M: ##callback-inputs gcse ;
+M: ##copy gcse ;
+
+: ?eliminate ( insn vn -- insn' )
+    dup available? [
+        [ dst>> ] dip <copy>
+    ] [ drop make-available ] if ;
+
+: eliminate-redundancy ( insn -- insn' )
+    dup >expr exprs>vns get at
+    [ ?eliminate ] [ make-available ] if* ;
+
+! M: ##phi gcse
+!     dup inputs>> values [ vreg>vn ] map sift
+!     dup all-equal? [
+!         [ first ?eliminate ] unless-empty
+!     ] [ drop eliminate-redundancy ] if ;
+
+M: insn gcse
+    dup defs-vregs length 1 = [ eliminate-redundancy ] when ;
+
+: gcse-step ( insns -- insns' )
+    ! [ simplify gcse ] map flatten ;
+    [ gcse ] map flatten ;
+
+: eliminate-common-subexpressions ( cfg -- )
+    final-iteration? on
+    dup compute-avail-sets
+    [ gcse-step ] simple-optimization ;
+
 : value-numbering ( cfg -- cfg )
     needs-predecessors
     dup determine-value-numbers
+    dup eliminate-common-subexpressions
 
     cfg-changed predecessors-changed ;
