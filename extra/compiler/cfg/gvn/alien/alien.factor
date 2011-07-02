@@ -27,6 +27,8 @@ M: ##box-displaced-alien rewrite
 : rewrite-unbox-alien ( insn box-insn -- insn )
     [ dst>> ] [ src>> ] bi* <copy> ;
 
+! XXX  next-vreg makes vregs>vns change on every iteration
+! (hidden in ^^unbox-c-ptr)
 : rewrite-unbox-displaced-alien ( insn box-insn -- insns )
     [
         [ dst>> ]
@@ -43,7 +45,8 @@ M: ##box-displaced-alien rewrite
             [ rewrite-unbox-alien ]
         }
         {
-            [ dup [ ##box-displaced-alien? ] with-available-uses? ]
+            ! [ dup [ ##box-displaced-alien? ] with-available-uses? ]
+            [ f ]
             [ rewrite-unbox-displaced-alien ]
         }
         [ 2drop f ]
