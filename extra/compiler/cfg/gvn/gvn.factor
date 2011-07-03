@@ -33,8 +33,10 @@ GENERIC: value-number ( insn -- )
 
 M: array value-number [ value-number ] each ;
 
-M: alien-call-insn value-number drop ;
-M: ##callback-inputs value-number drop ;
+: record-defs ( insn -- ) defs-vregs [ dup set-vn ] each ;
+
+M: alien-call-insn value-number record-defs ;
+M: ##callback-inputs value-number record-defs ;
 
 M: ##copy value-number [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
 
