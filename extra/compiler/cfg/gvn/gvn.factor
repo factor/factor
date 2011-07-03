@@ -51,11 +51,11 @@ M: ##copy value-number [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
     dup >expr dup exprs>vns get at
     [ redundant-instruction ] [ useful-instruction ] ?if ;
 
-! M: ##phi value-number
-!     dup inputs>> values [ vreg>vn ] map sift
-!     dup all-equal? [
-!         [ drop ] [ first redundant-instruction ] if-empty
-!     ] [ drop check-redundancy ] if ;
+M: ##phi value-number
+    dup inputs>> values [ vreg>vn ] map sift
+    dup all-equal? [
+        [ drop ] [ first redundant-instruction ] if-empty
+    ] [ drop check-redundancy ] if ;
 
 M: insn value-number
     dup defs-vregs length 1 = [ check-redundancy ] [ drop ] if ;
@@ -94,18 +94,17 @@ M: ##copy gcse ;
     dup >expr exprs>vns get at
     [ ?eliminate ] [ make-available ] if* ;
 
-! M: ##phi gcse
-!     dup inputs>> values [ vreg>vn ] map sift
-!     dup all-equal? [
-!         [ first ?eliminate ] unless-empty
-!     ] [ drop eliminate-redundancy ] if ;
+M: ##phi gcse
+    dup inputs>> values [ vreg>vn ] map sift
+    dup all-equal? [
+        [ first ?eliminate ] unless-empty
+    ] [ drop eliminate-redundancy ] if ;
 
 M: insn gcse
     dup defs-vregs length 1 = [ eliminate-redundancy ] when ;
 
 : gcse-step ( insns -- insns' )
-    ! [ simplify gcse ] map flatten ;
-    [ gcse ] map flatten ;
+    [ simplify gcse ] map flatten ;
 
 : eliminate-common-subexpressions ( cfg -- )
     final-iteration? on
