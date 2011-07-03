@@ -34,7 +34,7 @@ M: avail-analysis transfer-set drop defined assoc-union ;
     uses-vregs [ available? ] all? ;
 
 : with-available-uses? ( quot -- ? )
-    [ available-uses? ] bi and ; inline
+    keep swap [ available-uses? ] [ drop f ] if ; inline
 
 : make-available ( insn -- insn )
     dup dst>>
