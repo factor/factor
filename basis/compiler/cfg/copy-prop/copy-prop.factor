@@ -83,8 +83,40 @@ M: insn update-insn drop t ;
 
 PRIVATE>
 
+! Certain parts of the GVN pass may come together here and
+! sabotage the correctness of the CFG:
+!
+!   1) compiler.cfg.gvn.comparisons:fold-branch may remove some
+!   predecessors of a block (hence predecessors-changed at the
+!   end of compiler.cfg.gvn:value-numbering).
+!
+!   2) At the moment in compiler.cfg.gvn:value-numbering,
+!   ##phis with equivalent inputs (i.e., identical value
+!   numbers) will be converted into ##copy insns; thus, some
+!   ##copies may show up *before* ##phis within a basic block,
+!   even though ##phis should come at the very beginning of a
+!   block.
+!
+! Thus, the call to needs-predecessors in copy-propagation may
+! wind up failing to prune dead inputs to particular ##phis in
+! a block (if they're preceded by ##copies).  However,
+! copy-propagation will remove the ##copies that
+! value-numbering introduces.  So, a band-aid solution is to
+! suffix a predecessors-changed to copy-propagation, so that
+! future calls to needs-predecessors (particularly in
+! compiler.cfg.dce:eliminate-dead-code) will finally correct
+! the ##phi nodes left over after value-numbering.
+!
+! A better solution (and the eventual goal) would be to have
+! value-numbering subsume copy-propagation, thus eliminating
+! this pass altogether.
+
+USE: compiler.cfg
+
 : copy-propagation ( cfg -- cfg' )
     needs-predecessors
 
     dup collect-copies
-    dup rename-copies ;
+    dup rename-copies
+
+    predecessors-changed ;
