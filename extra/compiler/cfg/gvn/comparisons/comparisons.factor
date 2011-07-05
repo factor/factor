@@ -80,7 +80,7 @@ UNION: general-compare-insn scalar-compare-insn ##test-vector ;
 
 : rewrite-boolean-comparison? ( insn -- ? )
     {
-        [ src1>> vreg>insn general-compare-insn? ]
+        [ src1>> vreg>insn [ general-compare-insn? ] with-available-uses? ]
         [ src2>> not ]
         [ cc>> cc/= eq? ]
     } 1&& ; inline
