@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit fry
-kernel make math sequences
+kernel make math namespaces sequences
 cpu.architecture
 compiler.cfg.hats
 compiler.cfg.utilities
@@ -46,7 +46,11 @@ M: ##box-displaced-alien rewrite
         }
         {
             ! [ dup [ ##box-displaced-alien? ] with-available-uses? ]
-            [ f ]
+            [
+                final-iteration? get [
+                    dup [ ##box-displaced-alien? ] with-available-uses?
+                ] [ f ] if
+            ]
             [ rewrite-unbox-displaced-alien ]
         }
         [ 2drop f ]
