@@ -83,18 +83,21 @@ GENERIC: gcse ( insn -- insn' )
 
 M: array gcse [ gcse ] map ;
 
-M: alien-call-insn gcse ;
-M: ##callback-inputs gcse ;
-M: ##copy gcse ;
+: defs-available ( insn -- insn )
+    dup defs-vregs [ make-available ] each ;
+
+M: alien-call-insn gcse defs-available ;
+M: ##callback-inputs gcse defs-available ;
+M: ##copy gcse defs-available ;
 
 : ?eliminate ( insn vn -- insn' )
     dup available? [
-        [ dst>> ] dip <copy>
-    ] [ drop make-available ] if ;
+        [ dst>> dup make-available ] dip <copy>
+    ] [ drop defs-available ] if ;
 
 : eliminate-redundancy ( insn -- insn' )
     dup >expr exprs>vns get at
-    [ ?eliminate ] [ make-available ] if* ;
+    [ ?eliminate ] [ defs-available ] if* ;
 
 M: ##phi gcse
     dup inputs>> values [ vreg>vn ] map sift
