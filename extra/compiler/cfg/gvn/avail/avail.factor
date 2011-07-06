@@ -36,6 +36,5 @@ M: avail-analysis transfer-set drop defined assoc-union ;
 : with-available-uses? ( quot -- ? )
     keep swap [ available-uses? ] [ drop f ] if ; inline
 
-: make-available ( insn -- insn )
-    dup dst>>
+: make-available ( vreg -- )
     basic-block get avail-ins get [ dupd clone ?set-at ] change-at ;
