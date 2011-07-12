@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel io.streams.string io strings splitting
 sequences math math.parser assocs classes words namespaces make
-prettyprint hashtables mirrors tr json ;
+prettyprint hashtables mirrors tr json fry ;
 IN: json.writer
 
 #! Writes the object out to a stream in JSON format
@@ -33,20 +33,23 @@ M: real json-print ( num -- )
 M: sequence json-print ( array -- ) 
     CHAR: [ write1 [ >json ] map "," join write CHAR: ] write1 ;
 
-TR: jsvar-encode "-" "_" ;
+SYMBOL: jsvar-encode?
+t jsvar-encode? set-global
+TR: jsvar-encode "-" "_" ; 
   
 : tuple>fields ( object -- seq )
-    <mirror> [
-        [ swap jsvar-encode >json % " : " % >json % ] "" make
-    ] { } assoc>map ;
+    <mirror>
+    jsvar-encode? get
+    '[ [ swap _ [ jsvar-encode ] when >json % ":" % >json % ] "" make ] { } assoc>map ;
 
 M: tuple json-print ( tuple -- )
     CHAR: { write1 tuple>fields "," join write CHAR: } write1 ;
 
 M: hashtable json-print ( hashtable -- )
     CHAR: { write1 
-    [ [ swap jsvar-encode >json % CHAR: : , >json % ] "" make ]
-    { } assoc>map "," join write 
+    jsvar-encode? get
+    '[ [ swap _ [ jsvar-encode ] when >json % CHAR: : , >json % ] "" make ] { } assoc>map
+    "," join write 
     CHAR: } write1 ;
 
 M: word json-print name>> json-print ;
