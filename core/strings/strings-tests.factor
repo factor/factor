@@ -121,3 +121,5 @@ unit-test
         [ <string> clone resize-string first ] keep =
     ] all-integers?
 ] unit-test
+
+[ HEX: 7fffff ] [ { -1 } >string first ] unit-test
