@@ -67,6 +67,10 @@ unit-test
 [ ] [ HEX: 4321 3 "s" get set-nth ] unit-test
 [ ] [ HEX: 654321 5 "s" get set-nth ] unit-test
 
+[ ] [ HEX: -1 5 "s" get set-nth ] unit-test
+[ ] [ HEX: 80,0000 5 "s" get set-nth ] unit-test
+[ ] [ HEX: 100,0000 5 "s" get set-nth ] unit-test
+
 [
     {
         CHAR: h
@@ -121,5 +125,3 @@ unit-test
         [ <string> clone resize-string first ] keep =
     ] all-integers?
 ] unit-test
-
-[ HEX: 7fffff ] [ { -1 } >string first ] unit-test
