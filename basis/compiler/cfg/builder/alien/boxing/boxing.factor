@@ -15,17 +15,21 @@ SYMBOL: struct-return-area
 GENERIC: flatten-c-type ( c-type -- pairs )
 
 M: c-type flatten-c-type
-    rep>> f 2array 1array ;
+    rep>> f f 3array 1array ;
 
 M: long-long-type flatten-c-type
-    drop 2 [ int-rep long-long-on-stack? 2array ] replicate ;
+    drop 2 [ int-rep long-long-on-stack? f 3array ] replicate ;
 
 HOOK: flatten-struct-type cpu ( type -- pairs )
+HOOK: flatten-struct-type-return cpu ( type -- pairs )
 
 M: object flatten-struct-type
-    heap-size cell align cell /i { int-rep f } <repetition> ;
+    heap-size cell align cell /i { int-rep f f } <repetition> ;
 
 M: struct-c-type flatten-c-type
+    flatten-struct-type ;
+
+M: object flatten-struct-type-return
     flatten-struct-type ;
 
 : stack-size ( c-type -- n )
@@ -36,6 +40,12 @@ M: struct-c-type flatten-c-type
 
 :: explode-struct ( src c-type -- vregs reps )
     c-type flatten-struct-type :> reps
+    reps keys dup component-offsets
+    [| rep offset | src offset rep f ^^load-memory-imm ] 2map
+    reps ;
+
+:: explode-struct-return ( src c-type -- vregs reps )
+    c-type flatten-struct-type-return :> reps
     reps keys dup component-offsets
     [| rep offset | src offset rep f ^^load-memory-imm ] 2map
     reps ;
@@ -62,11 +72,12 @@ M: c-type unbox
             [ swap ^^unbox ]
         } case 1array
     ]
-    [ drop f 2array 1array ] 2bi ;
+    [ drop f f 3array 1array ] 2bi ;
 
 M: long-long-type unbox
     [ next-vreg next-vreg 2dup ] 2dip unboxer>> ##unbox-long-long 2array
-    int-rep long-long-on-stack? 2array dup 2array ;
+    int-rep long-long-on-stack? long-long-odd-register? 3array
+    int-rep long-long-on-stack? f 3array 2array ;
 
 M: struct-c-type unbox ( src c-type -- vregs reps )
     [ ^^unbox-any-c-ptr ] dip explode-struct ;
@@ -85,7 +96,7 @@ M: struct-c-type unbox-parameter
         [ nip heap-size cell f ^^local-allot dup ]
         [ [ ^^unbox-any-c-ptr ] dip explode-struct keys ] 2bi
         implode-struct
-        1array { { int-rep f } }
+        1array { { int-rep f f } }
     ] if ;
 
 : store-return ( vregs reps -- triples )
@@ -165,6 +176,6 @@ M: struct-c-type box-return
     [
         [
             [ [ { } assert-sequence= ] bi@ struct-return-area get ] dip
-            explode-struct keys
+            explode-struct-return keys
         ] keep box
     ] if ;

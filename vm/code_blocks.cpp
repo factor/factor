@@ -160,8 +160,10 @@ cell factor_vm::compute_dlsym_address(array *literals, cell index)
 
 	dll *d = (to_boolean(library) ? untag<dll>(library) : NULL);
 
+	void* undefined_symbol = (void*)factor::undefined_symbol;
+	undefined_symbol = FUNCTION_CODE_POINTER(undefined_symbol);
 	if(d != NULL && !d->handle)
-		return (cell)factor::undefined_symbol;
+		return (cell)undefined_symbol;
 
 	switch(tagged<object>(symbol).type())
 	{
@@ -173,7 +175,7 @@ cell factor_vm::compute_dlsym_address(array *literals, cell index)
 			if(sym)
 				return (cell)sym;
 			else
-				return (cell)factor::undefined_symbol;
+				return (cell)undefined_symbol;
 		}
 	case ARRAY_TYPE:
 		{
@@ -186,13 +188,58 @@ cell factor_vm::compute_dlsym_address(array *literals, cell index)
 				if(sym)
 					return (cell)sym;
 			}
-			return (cell)factor::undefined_symbol;
+			return (cell)undefined_symbol;
 		}
 	default:
 		critical_error("Bad symbol specifier",symbol);
-		return (cell)factor::undefined_symbol;
+		return (cell)undefined_symbol;
 	}
 }
+
+#ifdef FACTOR_PPC
+cell factor_vm::compute_dlsym_toc_address(array *literals, cell index)
+{
+	cell symbol = array_nth(literals,index);
+	cell library = array_nth(literals,index + 1);
+
+	dll *d = (to_boolean(library) ? untag<dll>(library) : NULL);
+
+	void* undefined_toc = (void*)factor::undefined_symbol;
+	undefined_toc = FUNCTION_TOC_POINTER(undefined_toc);
+	if(d != NULL && !d->handle)
+		return (cell)undefined_toc;
+
+	switch(tagged<object>(symbol).type())
+	{
+	case BYTE_ARRAY_TYPE:
+		{
+			symbol_char *name = alien_offset(symbol);
+			void* toc = ffi_dlsym_toc(d,name);
+			if(toc)
+				return (cell)toc;
+			else
+				return (cell)undefined_toc;
+		}
+	case ARRAY_TYPE:
+		{
+			array *names = untag<array>(symbol);
+			for(cell i = 0; i < array_capacity(names); i++)
+			{
+				symbol_char *name = alien_offset(array_nth(names,i));
+				void *toc = ffi_dlsym_toc(d,name);
+
+				if(toc)
+					return (cell)toc;
+			}
+			return (cell)undefined_toc;
+		}
+	default:
+		critical_error("Bad symbol specifier",symbol);
+		return (cell)undefined_toc;
+	}
+}
+#endif
+
 
 cell factor_vm::compute_vm_address(cell arg)
 {
@@ -228,6 +275,11 @@ void factor_vm::store_external_address(instruction_operand op)
 #ifdef WINDOWS
 	case RT_EXCEPTION_HANDLER:
 		op.store_value((cell)&factor::exception_handler);
+		break;
+#endif
+#ifdef FACTOR_PPC
+	case RT_DLSYM_TOC:
+		op.store_value(compute_dlsym_toc_address(parameters,index));
 		break;
 #endif
 	default:

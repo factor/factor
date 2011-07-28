@@ -57,6 +57,7 @@ namespace factor
 	_(dll_validp) \
 	_(dlopen) \
 	_(dlsym) \
+	_(dlsym_raw) \
 	_(double_bits) \
 	_(enable_gc_events) \
 	_(existsp) \

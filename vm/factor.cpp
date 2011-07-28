@@ -179,8 +179,9 @@ void factor_vm::stop_factor()
 
 char *factor_vm::factor_eval_string(char *string)
 {
-	char *(*callback)(char *) = (char *(*)(char *))alien_offset(special_objects[OBJ_EVAL_CALLBACK]);
-	return callback(string);
+	void *func = alien_offset(special_objects[OBJ_EVAL_CALLBACK]);
+	CODE_TO_FUNCTION_POINTER(func);
+	return ((char *(*)(char *))func)(string);
 }
 
 void factor_vm::factor_eval_free(char *result)
@@ -190,14 +191,16 @@ void factor_vm::factor_eval_free(char *result)
 
 void factor_vm::factor_yield()
 {
-	void (*callback)() = (void (*)())alien_offset(special_objects[OBJ_YIELD_CALLBACK]);
-	callback();
+	void *func = alien_offset(special_objects[OBJ_YIELD_CALLBACK]);
+	CODE_TO_FUNCTION_POINTER(func);
+	((void (*)())func)();
 }
 
 void factor_vm::factor_sleep(long us)
 {
-	void (*callback)(long) = (void (*)(long))alien_offset(special_objects[OBJ_SLEEP_CALLBACK]);
-	callback(us);
+	void *func = alien_offset(special_objects[OBJ_SLEEP_CALLBACK]);
+	CODE_TO_FUNCTION_POINTER(func);
+	((void (*)(long))func)(us);
 }
 
 void factor_vm::start_standalone_factor(int argc, vm_char **argv)

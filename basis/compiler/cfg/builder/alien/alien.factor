@@ -39,12 +39,12 @@ IN: compiler.cfg.builder.alien
     dup large-struct? [
         heap-size cell f ^^local-allot [
             '[ _ prefix ]
-            [ int-rep struct-return-on-stack? 2array prefix ] bi*
+            [ int-rep struct-return-on-stack? f 3array prefix ] bi*
         ] keep
     ] [ drop f ] if ;
 
 : (caller-parameters) ( vregs reps -- )
-    [ first2 next-parameter ] 2each ;
+    [ first3 next-parameter ] 2each ;
 
 : caller-parameters ( params -- reg-inputs stack-inputs )
     [ abi>> ] [ parameters>> ] [ return>> ] tri
@@ -136,16 +136,16 @@ M: #alien-assembly emit-node
     [ caller-return ]
     bi ;
 
-: callee-parameter ( rep on-stack? -- dst )
-    [ next-vreg dup ] 2dip next-parameter ;
+: callee-parameter ( rep on-stack? odd-register? -- dst )
+    [ next-vreg dup ] 3dip next-parameter ;
 
 : prepare-struct-callee ( c-type -- vreg )
     large-struct?
-    [ int-rep struct-return-on-stack? callee-parameter ] [ f ] if ;
+    [ int-rep struct-return-on-stack? f callee-parameter ] [ f ] if ;
 
 : (callee-parameters) ( params -- vregs reps )
     [ flatten-parameter-type ] map
-    [ [ [ first2 callee-parameter ] map ] map ]
+    [ [ [ first3 callee-parameter ] map ] map ]
     [ [ keys ] map ]
     bi ;
 
