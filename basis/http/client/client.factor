@@ -202,6 +202,24 @@ ERROR: download-failed response ;
 : http-delete ( url -- response data )
     <delete-request> http-request ;
 
+: <head-request> ( url -- request )
+    "HEAD" <client-request> ;
+
+: http-head ( url -- response data )
+    <head-request> http-request ;
+
+: <options-request> ( url -- request )
+    "OPTIONS" <client-request> ;
+
+: http-options ( url -- response data )
+    <options-request> http-request ;
+
+: <trace-request> ( url -- request )
+    "TRACE" <client-request> ;
+
+: http-trace ( url -- response data )
+    <trace-request> http-request ;
+
 USE: vocabs.loader
 
 { "http.client" "debugger" } "http.client.debugger" require-when

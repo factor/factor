@@ -67,6 +67,9 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-dlsym ( name dll class -- )
     [ add-dlsym-parameters ] dip rt-dlsym rel-fixup ;
 
+: rel-dlsym-toc ( name dll class -- )
+    [ add-dlsym-parameters ] dip rt-dlsym-toc rel-fixup ;
+
 : rel-word ( word class -- )
     [ add-literal ] dip rt-entry-point rel-fixup ;
 

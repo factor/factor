@@ -138,6 +138,29 @@ void factor_vm::primitive_dlsym()
 		ctx->push(allot_alien(ffi_dlsym(NULL,sym)));
 }
 
+/* look up a symbol in a native library */
+void factor_vm::primitive_dlsym_raw()
+{
+	data_root<object> library(ctx->pop(),this);
+	data_root<byte_array> name(ctx->pop(),this);
+	name.untag_check(this);
+
+	symbol_char *sym = name->data<symbol_char>();
+
+	if(to_boolean(library.value()))
+	{
+		dll *d = untag_check<dll>(library.value());
+
+		if(d->handle == NULL)
+			ctx->push(false_object);
+		else
+			ctx->push(allot_alien(ffi_dlsym_raw(d,sym)));
+	}
+	else
+		ctx->push(allot_alien(ffi_dlsym_raw(NULL,sym)));
+}
+
+
 /* close a native library handle */
 void factor_vm::primitive_dlclose()
 {

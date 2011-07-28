@@ -140,7 +140,10 @@ void factor_vm::primitive_callback()
 	tagged<word> w(ctx->pop());
 
 	w.untag_check(this);
-	ctx->push(allot_alien(callbacks->add(w.value(),return_rewind)->entry_point()));
+
+	void* func = callbacks->add(w.value(),return_rewind)->entry_point();
+	CODE_TO_FUNCTION_POINTER_CALLBACK(this, func);
+	ctx->push(allot_alien(func));
 }
 
 }

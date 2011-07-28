@@ -342,10 +342,10 @@ SYMBOL: examples-flag
     [ home ] dip append-path touch. ;
 
 : scaffold-factor-boot-rc ( -- )
-    os windows? "factor-boot-rc" ".factor-boot-rc" ? scaffold-rc ;
+    ".factor-boot-rc" scaffold-rc ;
 
 : scaffold-factor-rc ( -- )
-    os windows? "factor-rc" ".factor-rc" ? scaffold-rc ;
+    ".factor-rc" scaffold-rc ;
 
 
 HOOK: scaffold-emacs os ( -- )
