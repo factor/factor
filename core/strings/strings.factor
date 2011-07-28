@@ -19,7 +19,8 @@ IN: strings
 : (aux) ( n string -- byte-array m )
     aux>> { byte-array } declare swap 1 fixnum-shift-fast ; inline
 
-: small-char? ( ch -- ? ) HEX: 7f fixnum<= ; inline
+: small-char? ( ch -- ? )
+    dup 0 fixnum>= [ HEX: 7f fixnum<= ] [ drop f ] if ; inline
 
 : string-nth ( n string -- ch )
     2dup string-nth-fast dup small-char?
