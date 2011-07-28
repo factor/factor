@@ -29,12 +29,12 @@ M: x86.64 reserved-stack-space 0 ;
     struct-types&offset split-struct [
         [ c-type c-type-rep reg-class-of ] map
         int-regs swap member? int-rep double-rep ?
-        f 2array
+        f f 3array
     ] map ;
 
 M: x86.64 flatten-struct-type ( c-type -- seq )
     dup heap-size 16 <=
-    [ flatten-small-struct ] [ call-next-method [ first t 2array ] map ] if ;
+    [ flatten-small-struct ] [ call-next-method [ first t f 3array ] map ] if ;
 
 M: x86.64 return-struct-in-registers? ( c-type -- ? )
     heap-size 2 cells <= ;

@@ -1,4 +1,4 @@
-USING: http.client http.client.private http tools.test
+USING: accessors http.client http.client.private http tools.test
 namespaces urls ;
 IN: http.client.tests
 
@@ -37,3 +37,9 @@ IN: http.client.tests
     "https://www.amazon.com/index.html"
     <get-request>
 ] unit-test
+
+[ "HEAD" ] [ "http://google.com" <head-request> method>> ] unit-test
+[ "DELETE" ] [ "http://arc.com" <delete-request> method>> ] unit-test
+[ "TRACE" ] [ "http://concatenative.org" <trace-request> method>> ] unit-test
+[ "OPTIONS" ] [ "http://factorcode.org" <options-request> method>> ] unit-test
+

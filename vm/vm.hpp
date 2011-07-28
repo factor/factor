@@ -34,6 +34,9 @@ struct factor_vm
 	/* Next callback ID */
 	int callback_id;
 
+	/* List of callback function descriptors for PPC */
+	std::list<void **> function_descriptors;
+
 	/* Pooling unused contexts to make context allocation cheaper */
 	std::list<context *> unused_contexts;
 
@@ -525,6 +528,9 @@ struct factor_vm
 	void update_word_references(code_block *compiled, bool reset_inline_caches);
 	void undefined_symbol();
 	cell compute_dlsym_address(array *literals, cell index);
+#ifdef FACTOR_PPC
+	cell compute_dlsym_toc_address(array *literals, cell index);
+#endif
 	cell compute_vm_address(cell arg);
 	void store_external_address(instruction_operand op);
 	cell compute_here_address(cell arg, cell offset, code_block *compiled);
@@ -603,6 +609,7 @@ struct factor_vm
 	void *alien_pointer();
 	void primitive_dlopen();
 	void primitive_dlsym();
+	void primitive_dlsym_raw();
 	void primitive_dlclose();
 	void primitive_dll_validp();
 	char *alien_offset(cell obj);
@@ -678,6 +685,10 @@ struct factor_vm
 	void init_ffi();
 	void ffi_dlopen(dll *dll);
 	void *ffi_dlsym(dll *dll, symbol_char *symbol);
+	void *ffi_dlsym_raw(dll *dll, symbol_char *symbol);
+ #ifdef FACTOR_PPC
+	void *ffi_dlsym_toc(dll *dll, symbol_char *symbol);
+ #endif
 	void ffi_dlclose(dll *dll);
 	void c_to_factor_toplevel(cell quot);
 	void init_signals();

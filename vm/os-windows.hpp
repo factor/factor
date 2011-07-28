@@ -75,4 +75,8 @@ VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, vo
 THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
 inline static THREADHANDLE thread_id() { return GetCurrentThread(); }
 
+#define CODE_TO_FUNCTION_POINTER(code) (void)0
+#define CODE_TO_FUNCTION_POINTER_CALLBACK(vm, code) (void)0
+#define FUNCTION_CODE_POINTER(ptr) ptr
+#define FUNCTION_TOC_POINTER(ptr) ptr
 }
