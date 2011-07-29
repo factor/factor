@@ -1,26 +1,27 @@
 IN: mason.child.tests
-USING: mason.child mason.config tools.test namespaces io kernel sequences ;
+USING: mason.child mason.config tools.test namespaces io kernel
+sequences system ;
 
 [ { "nmake" "/f" "nmakefile" "x86-32" } ] [
     [
-        "winnt" target-os set
-        "x86.32" target-cpu set
+        winnt target-os set
+        x86.32 target-cpu set
         make-cmd
     ] with-scope
 ] unit-test
 
 [ { "make" "macosx-x86-32" } ] [
     [
-        "macosx" target-os set
-        "x86.32" target-cpu set
+        macosx target-os set
+        x86.32 target-cpu set
         make-cmd
     ] with-scope
 ] unit-test
 
 [ { "./factor.com" "-i=boot.winnt-x86.32.image" "-no-user-init" } ] [
     [
-        "winnt" target-os set
-        "x86.32" target-cpu set
+        winnt target-os set
+        x86.32 target-cpu set
         boot-cmd
     ] with-scope
 ] unit-test
