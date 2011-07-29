@@ -50,6 +50,6 @@ reset-gl-function-number-counter
 SYNTAX: GL-FUNCTION:
     gl-function-calling-convention
     scan-function-name
-    "{" expect "}" parse-tokens over prefix
+    "{" expect "}" parse-tokens over suffix
     gl-function-counter '[ _ _ gl-function-pointer ]
     ";" scan-c-args define-indirect ;
