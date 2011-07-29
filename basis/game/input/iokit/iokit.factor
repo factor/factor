@@ -1,5 +1,6 @@
 USING: cocoa cocoa.plists core-foundation iokit iokit.hid
 kernel cocoa.enumeration destructors math.parser cocoa.application 
+core-foundation.data core-foundation.strings
 sequences locals combinators.short-circuit threads
 namespaces assocs arrays combinators hints alien
 core-foundation.run-loop accessors sequences.private
@@ -270,11 +271,26 @@ M: iokit-game-input-backend reset-mouse
 : device-removed-callback ( -- alien )
     [ (device-removed-callback) ] IOHIDDeviceCallback ;
 
+! Lion sends the input callback an IOHIDQueue as the "sender".
+! Leopard and Snow Leopard send an IOHIDDevice.
+! This function gets the IOHIDDevice regardless of which is received
+: get-input-device ( sender -- device )
+    dup CFGetTypeID {
+        { [ dup IOHIDDeviceGetTypeID = ] [ drop ] }
+        { [ dup IOHIDQueueGetTypeID = ] [ drop IOHIDQueueGetDevice ] }
+        [
+            drop
+            "input callback doesn't know how to deal with "
+            swap CF>description append throw
+        ]
+    } cond ;
+
 :: (device-input-callback) ( context result sender value -- )
+    sender get-input-device :> device
     {
-        { [ sender mouse-device? ] [ +mouse-state+ get-global value record-mouse ] }
-        { [ sender controller-device? ] [
-            sender +controller-states+ get-global at value record-controller
+        { [ device mouse-device? ] [ +mouse-state+ get-global value record-mouse ] }
+        { [ device controller-device? ] [
+            device +controller-states+ get-global at value record-controller
         ] }
         [ +keyboard-state+ get-global value record-keyboard ]
     } cond ;
