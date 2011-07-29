@@ -3,7 +3,7 @@
 USING: alien.c-types alien.data alien.syntax alien.strings
 io.encodings.string kernel sequences byte-arrays
 io.encodings.utf8 math core-foundation core-foundation.arrays
-destructors parser fry alien words ;
+core-foundation.data destructors parser fry alien words ;
 IN: core-foundation.strings
 
 TYPEDEF: void* CFStringRef
@@ -60,6 +60,9 @@ FUNCTION: CFStringRef CFStringCreateWithCString (
     CFStringEncoding encoding
 ) ;
 
+FUNCTION: CFStringRef CFCopyDescription ( CFTypeRef cf ) ;
+FUNCTION: CFStringRef CFCopyTypeIDDescription ( CFTypeID type_id ) ;
+
 : prepare-CFString ( string -- byte-array )
     [
         dup HEX: 10ffff >
@@ -87,6 +90,11 @@ FUNCTION: CFStringRef CFStringCreateWithCString (
 
 : <CFStringArray> ( seq -- alien )
     [ [ <CFString> &CFRelease ] map <CFArray> ] with-destructors ;
+
+: CF>description ( cf -- description )
+    [ CFCopyDescription &CFRelease CF>string ] with-destructors ;
+: CFType>description ( cf -- description )
+    CFGetTypeID [ CFCopyTypeIDDescription &CFRelease CF>string ] with-destructors ;
 
 SYNTAX: CFSTRING: 
     CREATE scan-object 
