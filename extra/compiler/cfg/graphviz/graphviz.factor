@@ -60,7 +60,7 @@ IN: compiler.cfg.graphviz
 : draw-cfg ( cfg pass pass# -- cfg )
     [ dup cfgviz ]
     [ name>> "After " prepend =label ]
-    [ number>string png ]
+    [ number>string svg ]
     tri* ;
 
 SYMBOL: passes
