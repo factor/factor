@@ -65,7 +65,7 @@ SYMBOL: iteration
 : draw-annotated-cfg ( -- )
     iteration-dir [
         cfg get cfgviz add-gvns
-        basic-block# number>string "bb" prepend png
+        basic-block# number>string "bb" prepend svg
     ] with-directory ;
 
 : annotate-gvn ( -- )
