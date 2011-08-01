@@ -136,7 +136,7 @@ GENERIC: avl-delete ( key node -- node shorter? deleted? )
 M: f avl-delete ( key f -- f f f ) nip f f ;
 
 : (avl-delete) ( key node -- node shorter? deleted? )
-    tuck node-link avl-delete [
+    swap over node-link avl-delete [
         [ over set-node-link ] dip [ balance-delete ] [ f ] if
     ] dip ;
 

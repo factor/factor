@@ -539,7 +539,7 @@ update_bootstrap() {
 }
 
 refresh_image() {
-    ./$FACTOR_BINARY -script -e="USING: vocabs.loader system memory ; refresh-all USE: memory save 0 exit"
+    ./$FACTOR_BINARY -script -e="USING: vocabs.loader vocabs.refresh system memory ; refresh-all save 0 exit"
     check_ret factor
 }
 

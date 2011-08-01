@@ -5,13 +5,14 @@ mason.config bootstrap.image assocs ;
 IN: mason.platform
 
 : (platform) ( os cpu -- string )
+    [ name>> ] bi@
     { { CHAR: . CHAR: - } } substitute "-" glue ;
 
 : platform ( -- string )
     target-os get target-cpu get (platform) ;
 
 : gnu-make ( -- string )
-    target-os get { "freebsd" "openbsd" "netbsd" } member? "gmake" "make" ? ;
+    target-os get { freebsd openbsd netbsd } member? "gmake" "make" ? ;
 
 : boot-image-arch ( -- string )
     target-os get target-cpu get arch ;
