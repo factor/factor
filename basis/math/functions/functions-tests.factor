@@ -32,6 +32,7 @@ IN: math.functions.tests
 [ 0.0 ] [ 0.0 1.0 ^ ] unit-test
 [ 1/0. ] [ 0 -2 ^ ] unit-test
 [ t ] [ 0 0.0 ^ fp-nan? ] unit-test
+[ t ] [ 0.0 0.0 ^ fp-nan? ] unit-test
 [ 1/0. ] [ 0 -2.0 ^ ] unit-test
 [ 0 ] [ 0 3.0 ^ ] unit-test
 [ 0 ] [ 0 3 ^ ] unit-test
