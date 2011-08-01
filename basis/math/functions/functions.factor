@@ -82,8 +82,8 @@ M: complex exp >rect [ exp ] dip polar> ; inline
 : real^? ( x y -- ? )
     2dup [ real? ] both? [ drop 0 >= ] [ 2drop f ] if ; inline
 
-: 0^ ( x -- z )
-    [ 0/0. ] [ 0 < 1/0. 0 ? ] if-zero ; inline
+: 0^ ( zero x -- z )
+    swap [ 0/0. ] swap '[ 0 < 1/0. _ ? ] if-zero ; inline
 
 : (^mod) ( x y n -- z )
     [ make-bits 1 ] dip dup
@@ -100,7 +100,7 @@ PRIVATE>
 
 : ^ ( x y -- z )
     {
-        { [ over 0 = ] [ nip 0^ ] }
+        { [ over zero? ] [ 0^ ] }
         { [ dup integer? ] [ integer^ ] }
         { [ 2dup real^? ] [ [ >float ] bi@ fpow ] }
         [ ^complex ]
