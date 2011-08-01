@@ -125,6 +125,7 @@ TYPEDEF: uint IOHIDQueueOptionsType
 TYPEDEF: uint IOHIDElementFlags
 TYPEDEF: void* IOHIDDeviceRef
 TYPEDEF: void* IOHIDElementRef
+TYPEDEF: void* IOHIDQueueRef
 TYPEDEF: void* IOHIDValueRef
 TYPEDEF: void* IOHIDManagerRef
 TYPEDEF: void* IOHIDTransactionRef
@@ -253,3 +254,7 @@ FUNCTION: IOReturn IOHIDTransactionCommit ( IOHIDTransactionRef transaction ) ;
 FUNCTION: IOReturn IOHIDTransactionCommitWithCallback ( IOHIDTransactionRef transaction, CFTimeInterval timeout, IOHIDCallback callback, void* context ) ;
 FUNCTION: void IOHIDTransactionClear ( IOHIDTransactionRef transaction ) ;
 
+! IOHIDQueue
+
+FUNCTION: CFTypeID IOHIDQueueGetTypeID ( ) ;
+FUNCTION: IOHIDDeviceRef IOHIDQueueGetDevice ( IOHIDQueueRef queue ) ;

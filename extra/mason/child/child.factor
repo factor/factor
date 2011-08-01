@@ -9,14 +9,14 @@ IN: mason.child
 
 : nmake-cmd ( -- args )
     { "nmake" "/f" "nmakefile" }
-    target-cpu get "." split "-" join suffix ;
+    target-cpu get name>> "." split "-" join suffix ;
 
 : gnu-make-cmd ( -- args )
     gnu-make platform 2array ;
 
 : make-cmd ( -- args )
     {
-        { [ target-os get "winnt" = ] [ nmake-cmd ] }
+        { [ target-os get winnt = ] [ nmake-cmd ] }
         [ gnu-make-cmd ]
     } cond ;
 
@@ -30,7 +30,7 @@ IN: mason.child
     ] with-directory ;
 
 : factor-vm ( -- string )
-    target-os get "winnt" = "./factor.com" "./factor" ? ;
+    target-os get winnt = "./factor.com" "./factor" ? ;
 
 : boot-cmd ( -- cmd )
     [
