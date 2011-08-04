@@ -53,6 +53,7 @@ ERROR: can't-deploy-library-file library ;
         deploy-math? get [ "math" , ] when
         deploy-threads? get [ "threads" , ] when
         "compiler" ,
+        deploy-help? get [ "help" , ] when
         deploy-ui? get [ "ui" , ] when
         deploy-unicode? get [ "unicode" , ] when
         native-io? [ "io" , ] when
