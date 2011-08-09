@@ -32,20 +32,20 @@ DEFER: if
 : if ( ..a ? true: ( ..a -- ..b ) false: ( ..a -- ..b ) -- ..b ) ? call ;
 
 ! Single branch
-: unless ( ? false -- )
+: unless ( ..a ? false: ( ..a -- ..a ) -- ..a )
     swap [ drop ] [ call ] if ; inline
 
-: when ( ? true -- )
+: when ( ..a ? true: ( ..a -- ..a ) -- ..a )
     swap [ call ] [ drop ] if ; inline
 
 ! Anaphoric
 : if* ( ..a ? true: ( ..a ? -- ..b ) false: ( ..a -- ..b ) -- ..b )
     pick [ drop call ] [ 2nip call ] if ; inline
 
-: when* ( ? true -- )
+: when* ( ..a ? true: ( ..a ? -- ..a ) -- ..a )
     over [ call ] [ 2drop ] if ; inline
 
-: unless* ( ? false -- )
+: unless* ( ..a ? false: ( ..a -- ..a x ) -- ..a x )
     over [ drop ] [ nip call ] if ; inline
 
 ! Default
