@@ -37,7 +37,8 @@ TUPLE: deploy-gadget < pack vocab settings ;
     deploy-unicode? get "Unicode character literal support" <checkbox> add-gadget
     deploy-word-props? get "Retain all word properties" <checkbox> add-gadget
     deploy-word-defs? get "Retain all word definitions" <checkbox> add-gadget
-    deploy-c-types? get "Retain all C types" <checkbox> add-gadget ;
+    deploy-c-types? get "Retain all C types" <checkbox> add-gadget
+    deploy-help? get "Retain documentation" <checkbox> add-gadget ;
 
 : deploy-settings-theme ( gadget -- gadget )
     { 10 10 } >>gap
