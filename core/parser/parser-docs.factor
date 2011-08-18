@@ -238,8 +238,8 @@ HELP: parse-file
 
 HELP: run-file
 { $values { "file" "a pathname string" } }
-{ $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used. If the source file contains a " { $link POSTPONE: MAIN: } " declaration, the main entry point of the file will be also be executed." }
-{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation or executing the main entry point." } ;
+{ $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used." }
+{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation." }  ;
 
 HELP: ?run-file
 { $values { "path" "a pathname string" } }
