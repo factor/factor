@@ -1,7 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes classes.tuple generic.math generic.single arrays
 io.pathnames vocabs.loader io sequences assocs words.symbol
-words.alias words.constant combinators vocabs.parser ;
+words.alias words.constant combinators vocabs.parser command-line ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -858,7 +858,7 @@ HELP: C:
 HELP: MAIN:
 { $syntax "MAIN: word" }
 { $values { "word" word } }
-{ $description "Defines the main entry point for the current vocabulary. This word will be executed when this vocabulary is passed to " { $link run } "." } ;
+{ $description "Defines the main entry point for the current vocabulary and source file. This word will be executed when this vocabulary is passed to " { $link run } " or the source file is passed to " { $link run-script } "." } ;
 
 HELP: <PRIVATE
 { $syntax "<PRIVATE ... PRIVATE>" }
