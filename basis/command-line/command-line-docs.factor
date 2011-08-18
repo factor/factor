@@ -135,7 +135,7 @@ $nl
 ARTICLE: "cli" "Command line arguments"
 "Factor command line usage:"
 { $code "factor [VM args...] [script] [args...]" }
-"Zero or more VM arguments can be passed in, followed by an optional script file name. If the script file is specified, it will be run on startup, any arguments after the script file are stored in the following variable, with no further processing by Factor itself:"
+"Zero or more VM arguments can be passed in, followed by an optional script file name. If the script file is specified, it will be run on startup using " { $link run-file } ". Any arguments after the script file are stored in the following variable, with no further processing by Factor itself:"
 { $subsections command-line }
 "Instead of running a script, it is also possible to run a vocabulary; this invokes the vocabulary's " { $link POSTPONE: MAIN: } " word:"
 { $code "factor [system switches...] -run=<vocab name>" }

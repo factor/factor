@@ -13,7 +13,8 @@ TUPLE: source-file
 path
 top-level-form
 checksum
-definitions ;
+definitions
+main ;
 
 : record-top-level-form ( quot file -- )
     top-level-form<<
