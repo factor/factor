@@ -203,8 +203,7 @@ print-use-hook [ [ ] ] initialize
     ] recover ;
 
 : run-file ( file -- )
-    [ parse-file call( -- ) ]
-    [ source-file main>> [ execute( -- ) ] when* ] bi ;
+    parse-file call( -- ) ;
 
 : ?run-file ( path -- )
     dup exists? [ run-file ] [ drop ] if ;
