@@ -8,7 +8,7 @@ generic.standard generic.hook generic.math generic.parser classes
 io.pathnames vocabs vocabs.parser classes.parser classes.union
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple.parser compiler.units
-combinators effects.parser slots hash-sets ;
+combinators effects.parser slots hash-sets source-files ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -233,7 +233,11 @@ IN: bootstrap.syntax
         "))" parse-effect suffix!
     ] define-core-syntax
 
-    "MAIN:" [ scan-word current-vocab main<< ] define-core-syntax
+    "MAIN:" [
+        scan-word
+        [ current-vocab main<< ]
+        [ file get [ main<< ] [ drop ] if* ] bi
+    ] define-core-syntax
 
     "<<" [
         [
