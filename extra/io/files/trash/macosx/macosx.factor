@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: alien.c-types alien.strings alien.syntax classes.struct
-core-foundation io.encodings.utf8 io.trash kernel system ;
+core-foundation io.encodings.utf8 io.files.trash kernel system ;
 
-IN: io.trash.macosx
+IN: io.files.trash.macosx
 
 <PRIVATE
 

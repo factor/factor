@@ -3,13 +3,13 @@
 
 USING: combinators system vocabs.loader ;
 
-IN: io.trash
+IN: io.files.trash
 
 HOOK: send-to-trash os ( path -- )
 
 {
-    { [ os macosx? ] [ "io.trash.macosx"  ] }
-    { [ os unix?   ] [ "io.trash.unix"    ] }
-    { [ os winnt?  ] [ "io.trash.windows" ] }
+    { [ os macosx? ] [ "io.files.trash.macosx"  ] }
+    { [ os unix?   ] [ "io.files.trash.unix"    ] }
+    { [ os winnt?  ] [ "io.files.trash.windows" ] }
 } cond require
 

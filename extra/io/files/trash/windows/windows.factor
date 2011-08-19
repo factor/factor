@@ -3,10 +3,10 @@
 
 USING: accessors alien.c-types alien.data alien.strings
 alien.syntax classes.struct classes.struct.packed destructors
-kernel io.encodings.utf16n io.trash libc math sequences system
+kernel io.encodings.utf16n io.files.trash libc math sequences system
 windows.types ;
 
-IN: io.trash.windows
+IN: io.files.trash.windows
 
 <PRIVATE
 
