@@ -68,26 +68,31 @@ SLOT: port
 
 TUPLE: ipv4 { host ?string read-only } ;
 
-C: <ipv4> ipv4
-
-M: ipv4 inet-ntop ( data addrspec -- str )
-    drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
-
 <PRIVATE
+
+ERROR: invalid-ipv4 string reason ;
+
+M: invalid-ipv4 summary drop "Invalid IPv4 address" ;
 
 ERROR: malformed-ipv4 sequence ;
 
 ERROR: bad-ipv4-component string ;
 
 : parse-ipv4 ( string -- seq )
-    "." split dup length 4 = [ malformed-ipv4 ] unless
-    [ dup string>number [ ] [ bad-ipv4-component ] ?if ] B{ } map-as ;
+    [ f ] [
+        "." split dup length 4 = [ malformed-ipv4 ] unless
+        [ dup string>number [ ] [ bad-ipv4-component ] ?if ] B{ } map-as
+    ] if-empty ;
 
-ERROR: invalid-ipv4 string reason ;
-
-M: invalid-ipv4 summary drop "Invalid IPv4 address" ;
+: check-ipv4 ( string -- )
+    [ parse-ipv4 drop ] [ invalid-ipv4 ] recover ;
 
 PRIVATE>
+
+: <ipv4> ( host -- ipv4 ) dup check-ipv4 ipv4 boa ;
+
+M: ipv4 inet-ntop ( data addrspec -- str )
+    drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
 
 M: ipv4 inet-pton ( str addrspec -- data )
     drop [ parse-ipv4 ] [ invalid-ipv4 ] recover ;
@@ -113,7 +118,8 @@ M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
 
 TUPLE: inet4 < ipv4 { port integer read-only } ;
 
-C: <inet4> inet4
+: <inet4> ( host port -- inet4 )
+    over check-ipv4 inet4 boa ;
 
 M: ipv4 with-port [ host>> ] dip <inet4> ;
 
@@ -129,14 +135,11 @@ TUPLE: ipv6
 { host ?string read-only }
 { scope-id integer read-only } ;
 
-: <ipv6> ( host -- ipv6 ) 0 ipv6 boa ;
-
-M: ipv6 inet-ntop ( data addrspec -- str )
-    drop 16 memory>byte-array 2 <groups> [ be> >hex ] map ":" join ;
-
-ERROR: invalid-ipv6 string reason ;
-
 <PRIVATE
+
+ERROR: invalid-ipv6 host reason ;
+
+M: invalid-ipv6 summary drop "Invalid IPv6 address" ;
 
 ERROR: bad-ipv6-component obj ;
 
@@ -156,6 +159,18 @@ ERROR: more-than-8-components ;
             parse-ipv6-component
         ] if
     ] if-empty ;
+
+: check-ipv6 ( string -- )
+    [ "::" split1 [ parse-ipv6 ] bi@ 2drop ] [ invalid-ipv6 ] recover ;
+
+PRIVATE>
+
+: <ipv6> ( host -- ipv6 ) dup check-ipv6 0 ipv6 boa ;
+
+M: ipv6 inet-ntop ( data addrspec -- str )
+    drop 16 memory>byte-array 2 <groups> [ be> >hex ] map ":" join ;
+
+<PRIVATE
 
 : pad-ipv6 ( string1 string2 -- seq )
     2dup [ length ] bi@ + 8 swap -
@@ -200,7 +215,8 @@ M: ipv6 present
 
 TUPLE: inet6 < ipv6 { port integer read-only } ;
 
-: <inet6> ( host port -- inet6 ) [ 0 ] dip inet6 boa ;
+: <inet6> ( host port -- inet6 )
+    [ dup check-ipv6 0 ] dip inet6 boa ;
 
 M: ipv6 with-port
     [ [ host>> ] [ scope-id>> ] bi ] dip
