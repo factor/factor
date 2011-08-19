@@ -61,7 +61,7 @@ M: set intersects?
     small/large sequence/tester any? ;
 
 M: set subset?
-    small/large sequence/tester all? ;
+    sequence/tester all? ;
 
 M: set set=
     2dup [ cardinality ] bi@ eq? [ subset? ] [ 2drop f ] if ;

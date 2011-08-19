@@ -74,3 +74,9 @@ IN: sets.tests
 [ 1 ] [ { 1 } cardinality ] unit-test
 [ 1 ] [ HS{ 1 } cardinality ] unit-test
 [ 3 ] [ HS{ 1 2 3 } cardinality ] unit-test
+
+
+[ f ] [ { 1 2 3 4 } { 1 2 } subset? ] unit-test
+[ t ] [ { 1 2 3 4 } { 1 2 } swap subset? ] unit-test
+[ t ] [ { 1 2 } { 1 2 } subset? ] unit-test
+[ t ] [ { 1 2 } { 1 2 } swap subset? ] unit-test

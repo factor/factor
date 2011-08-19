@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: init continuations hashtables io io.encodings.utf8
 io.files io.pathnames kernel kernel.private namespaces parser
-sequences strings system splitting vocabs.loader alien.strings ;
+sequences source-files strings system splitting vocabs.loader
+alien.strings accessors ;
 IN: command-line
 
 SYMBOL: script
@@ -39,7 +40,10 @@ SYMBOL: command-line
     "=" split1 [ var-param ] [ bool-param ] if* ;
 
 : run-script ( file -- )
-    t "quiet" set-global run-file ;
+    t "quiet" [
+        [ run-file ]
+        [ source-file main>> [ execute( -- ) ] when* ] bi
+    ] with-variable ;
 
 : parse-command-line ( args -- )
     [ command-line off script off ] [
