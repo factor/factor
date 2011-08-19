@@ -3,11 +3,11 @@
 
 USING: accessors calendar combinators.short-circuit environment
 formatting io io.directories io.encodings.utf8 io.files
-io.files.info io.files.info.unix io.files.types io.pathnames
-io.trash kernel math math.parser sequences system unix.stat
+io.files.info io.files.info.unix io.files.trash io.files.types
+io.pathnames kernel math math.parser sequences system unix.stat
 unix.users ;
 
-IN: io.trash.unix
+IN: io.files.trash.unix
 
 ! Implements the FreeDesktop.org Trash Specification 0.7
 
