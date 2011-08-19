@@ -29,6 +29,12 @@ os unix? [
 
 [ T{ inet f "google.com" 80 } ] [ "google.com" 80 with-port ] unit-test
 
+! Test bad hostnames
+[ "google.com" f <inet4> ] must-fail
+[ "a.b.c.d" f <inet4> ] must-fail
+[ "google.com" f <inet6> ] must-fail
+[ "a.b.c.d" f <inet6> ] must-fail
+
 ! Test present on addrspecs
 [ "4.4.4.4:12" ] [ "4.4.4.4" 12 <inet4> present ] unit-test
 [ "::1:12" ] [ "::1" 12 <inet6> present ] unit-test
