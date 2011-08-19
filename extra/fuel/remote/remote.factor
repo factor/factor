@@ -1,20 +1,12 @@
 ! Copyright (C) 2009, 2010 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors debugger io io.encodings.utf8 io.servers
-kernel listener math namespaces ;
+
+USING: accessors io io.encodings.utf8 io.servers kernel math
+namespaces tty-server ;
+
 IN: fuel.remote
 
 <PRIVATE
-
-: start-listener ( -- )
-    [ [ drop print-error-and-restarts ] error-hook set listener ] with-scope ;
-
-: server ( port -- server )
-    utf8 <threaded-server>
-        "tty-server" >>name
-        swap local-server >>insecure
-        [ start-listener ] >>handler
-        f >>timeout ;
 
 : print-banner ( -- )
     "Starting server. Connect with 'M-x connect-to-factor' in Emacs"
@@ -23,7 +15,7 @@ IN: fuel.remote
 PRIVATE>
 
 : fuel-start-remote-listener ( port/f -- )
-    print-banner integer? [ 9000 ] unless* server start-server drop ;
+    print-banner integer? [ 9000 ] unless* <tty-server> start-server drop ;
 
 : fuel-start-remote-listener* ( -- ) f fuel-start-remote-listener ;
 
