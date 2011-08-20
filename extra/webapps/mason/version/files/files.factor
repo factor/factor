@@ -16,6 +16,8 @@ SLOT: cpu
 : platform ( builder -- string )
     [ os>> ] [ cpu>> ] bi (platform) ;
 
+SLOT: last-release
+
 : binary-package-name ( builder -- string )
     [ [ platform % "/" % ] [ last-release>> % ] bi ] "" make
     remote-directory ;
