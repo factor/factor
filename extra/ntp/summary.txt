@@ -1,0 +1,1 @@
+Client for NTP protocol
