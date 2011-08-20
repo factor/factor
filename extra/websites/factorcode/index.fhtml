@@ -49,7 +49,7 @@ xml.writer xmode.highlight ; %>
 "resource:extra/websites/factorcode/examples.txt" utf8 file-lines
 { "----" } split random
 "factor" [ highlight-lines ] with-html-writer
-[ xml>string write-html ] each
+xml>string write-html
 %></pre>
 
 <p>See the <a href="http://concatenative.org/wiki/view/Factor/Examples">example programs</a> page on the wiki for more.</p>
