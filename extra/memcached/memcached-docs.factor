@@ -65,30 +65,31 @@ HELP: m/prepend
 } ;
 
 HELP: m/incr
-{ $values { "key" string } }
+{ $values { "key" string } { "val" string } }
 { $description
     "Increments the value of the specified item by 1."
 } ;
 
 HELP: m/incr-val
-{ $values { "amt" "key" string } }
+{ $values { "amt" string } { "key" string } { "val" string } }
 { $description
     "Increments the value of the specified item by the specified amount."
 } ;
 
 HELP: m/decr
-{ $values { "key" string } }
+{ $values { "key" string } { "val" string } }
 { $description
     "Decrements the value of the specified item by 1."
 } ;
 
 HELP: m/decr-val
-{ $values { "amt" "key" string } }
+{ $values { "amt" string } { "key" string } { "val" string } }
 { $description
     "Decrements the value of the specified item by the specified amount."
 } ;
 
 HELP: m/version
+{ $values { "version" string } }
 { $description
     "Retrieves the version of the " { $link memcached-server } "."
 } ;
