@@ -20,16 +20,12 @@ SYMBOL: builder-recipients
 ! (Optional) CPU architecture to build for.
 SYMBOL: target-cpu
 
-target-cpu get-global [
-    cpu name>> target-cpu set-global
-] unless
+target-cpu get-global [ cpu target-cpu set-global ] unless
 
 ! (Optional) OS to build for.
 SYMBOL: target-os
 
-target-os get-global [
-    os name>> target-os set-global
-] unless
+target-os get-global [ os target-os set-global ] unless
 
 ! Keep test-log around?
 SYMBOL: builder-debug
