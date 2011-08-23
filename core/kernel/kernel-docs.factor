@@ -656,14 +656,14 @@ $nl
 } ;
 
 HELP: when*
-{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } }
+{ $values { "?" "a generalized boolean" } { "true" { $quotation "( ..a ? -- ..a )" } } }
 { $description "Variant of " { $link if* } " with no false quotation."
 $nl
 "The following two lines are equivalent:"
 { $code "X [ Y ] when*" "X dup [ Y ] [ drop ] if" } } ;
 
 HELP: unless*
-{ $values { "?" "a generalized boolean" } { "false" "a quotation " } }
+{ $values { "?" "a generalized boolean" } { "false" { $quotation "( ..a -- ..a x )" } } { "x" object } }
 { $description "Variant of " { $link if* } " with no true quotation." }
 { $notes
 "The following two lines are equivalent:"
