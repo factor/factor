@@ -144,6 +144,6 @@ PRIVATE>
 : string>ini ( str -- assoc )
     [ read-ini ] with-string-reader ;
 
-: ini>string ( str -- assoc )
+: ini>string ( assoc -- str )
     [ write-ini ] with-string-writer ;
 
