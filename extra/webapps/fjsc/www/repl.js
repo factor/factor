@@ -8,11 +8,11 @@ function fjsc_repl_handler() {
   this.newLine();
   if(this.lineBuffer != '') {
     factor.server_eval(
-      this.lineBuffer, 
-      function(text, result) { 
+      this.lineBuffer,
+      function(text, result) {
         document.getElementById("compiled").value = result;
-        display_datastack();        
-      }, 
+        display_datastack();
+      },
       function() { my_term.prompt(); });
   }
   else
@@ -28,7 +28,7 @@ function fjsc_init_handler() {
       TermGlobals.center('*                                                      *'),
       TermGlobals.center('********************************************************')
     ]);
-  
+
   this.prompt();
 }
 
@@ -40,7 +40,7 @@ function startup() {
     rows: 18,
     termDiv: "repl",
     crsrBlinkMode: true,
-    ps: "scratchpad ",
+    ps: "( scratchpad )",
     initHandler: fjsc_init_handler,
     handler: fjsc_repl_handler
   };
@@ -65,7 +65,7 @@ jQuery(function() {
   display_datastack();
 });
 
-factor.add_word("kernel", ".s", "primitive", function(next) {   
+factor.add_word("kernel", ".s", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   var term = fjsc_repl;
   for(var i=0; i<stack.length; ++i) {
@@ -75,7 +75,7 @@ factor.add_word("kernel", ".s", "primitive", function(next) {
   factor.call_next(next);
 });
 
-factor.add_word("io", "print", "primitive", function(next) {   
+factor.add_word("io", "print", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   var term = fjsc_repl;
   term.type(""+stack.pop());
@@ -83,14 +83,14 @@ factor.add_word("io", "print", "primitive", function(next) {
   factor.call_next(next);
 });
 
-factor.add_word("io", "write", "primitive", function(next) {   
+factor.add_word("io", "write", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   var term = fjsc_repl;
   term.type(""+stack.pop());
   factor.call_next(next);
 });
 
-factor.add_word("io", ".", "primitive", function(next) {   
+factor.add_word("io", ".", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   var term = fjsc_repl;
   term.type(""+stack.pop());
