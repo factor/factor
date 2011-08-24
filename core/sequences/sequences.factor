@@ -403,7 +403,7 @@ PRIVATE>
     [ 2drop f f ]
     if ; inline
 
-: (accumulate) ( seq identity quot -- seq identity quot )
+: (accumulate) ( seq identity quot -- identity seq quot )
     [ swap ] dip [ curry keep ] curry ; inline
 
 PRIVATE>
