@@ -132,4 +132,4 @@ unit-test
 [ 0 ] [ 0 "s" get nth ] unit-test
 
 [ ] [ -1 0 "s" get set-nth ] unit-test
-[ HEX: 7f ] [ 0 "s" get nth ] unit-test
+[ HEX: 7fffff ] [ 0 "s" get nth ] unit-test
