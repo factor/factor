@@ -64,12 +64,13 @@ unit-test
 "hello world" "s" set
 
 [ ] [ HEX: 1234 1 "s" get set-nth ] unit-test
-[ ] [ HEX: 4321 3 "s" get set-nth ] unit-test
-[ ] [ HEX: 654321 5 "s" get set-nth ] unit-test
+[ HEX: 1234 ] [ 1 "s" get nth ] unit-test
 
-[ ] [ HEX: -1 5 "s" get set-nth ] unit-test
-[ ] [ HEX: 80,0000 5 "s" get set-nth ] unit-test
-[ ] [ HEX: 100,0000 5 "s" get set-nth ] unit-test
+[ ] [ HEX: 4321 3 "s" get set-nth ] unit-test
+[ HEX: 4321 ] [ 3 "s" get nth ] unit-test
+
+[ ] [ HEX: 654321 5 "s" get set-nth ] unit-test
+[ HEX: 654321 ] [ 5 "s" get nth ] unit-test
 
 [
     {
@@ -125,3 +126,10 @@ unit-test
         [ <string> clone resize-string first ] keep =
     ] all-integers?
 ] unit-test
+
+"X" "s" set
+[ ] [ HEX: 100,0000 0 "s" get set-nth ] unit-test
+[ 0 ] [ 0 "s" get nth ] unit-test
+
+[ ] [ -1 0 "s" get set-nth ] unit-test
+[ HEX: 7f ] [ 0 "s" get nth ] unit-test
