@@ -7,13 +7,22 @@ IN: io.thread
 ! over completely.
 SYMBOL: io-thread-running?
 
-: io-thread ( -- )
-    sleep-time io-multiplex yield ;
+TUPLE: io-thread < thread ;
+
+: <io-thread> ( -- thread )
+    [
+        [ io-thread-running? get-global ]
+        [ sleep-time io-multiplex yield ]
+        while
+    ]
+    "I/O wait"
+    io-thread new-thread ;
+
+M: io-thread error-in-thread [ die ] call( error thread -- ) ;
 
 : start-io-thread ( -- )
     t io-thread-running? set-global
-    [ [ io-thread-running? get-global ] [ io-thread ] while ]
-    "I/O wait" spawn drop ;
+    <io-thread> (spawn) ;
 
 : stop-io-thread ( -- )
     f io-thread-running? set-global ;
