@@ -1,11 +1,13 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.data alien.syntax ascii
-assocs byte-arrays classes.struct classes.tuple.parser
-classes.tuple.private classes.tuple combinators compiler.tree.debugger
-compiler.units delegate destructors io.encodings.utf8 io.pathnames
-io.streams.string kernel libc literals math mirrors namespaces
-prettyprint prettyprint.config see sequences specialized-arrays
-system tools.test parser lexer eval layouts generic.single classes
+USING: accessors alien alien.c-types alien.data alien.syntax
+ascii assocs byte-arrays classes.struct
+classes.struct.prettyprint classes.struct.prettyprint.private
+classes.tuple.parser classes.tuple.private classes.tuple
+combinators compiler.tree.debugger compiler.units delegate
+destructors io.encodings.utf8 io.pathnames io.streams.string
+kernel libc literals math mirrors namespaces prettyprint
+prettyprint.config see sequences specialized-arrays system
+tools.test parser lexer eval layouts generic.single classes
 vocabs ;
 FROM: math => float ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
@@ -131,6 +133,9 @@ STRUCT: struct-test-bar
     [ make-mirror clear-assoc ] keep
 ] unit-test
 
+[ POSTPONE: STRUCT: ]
+[ struct-test-foo struct-definer-word ] unit-test
+
 UNION-STRUCT: struct-test-float-and-bits
     { f c:float }
     { bits uint } ;
@@ -139,6 +144,9 @@ UNION-STRUCT: struct-test-float-and-bits
 [ 4 ] [ struct-test-float-and-bits heap-size ] unit-test
 
 [ 123 ] [ [ struct-test-foo malloc-struct &free y>> ] with-destructors ] unit-test
+
+[ POSTPONE: UNION-STRUCT: ]
+[ struct-test-float-and-bits struct-definer-word ] unit-test
 
 STRUCT: struct-test-string-ptr
     { x c-string } ;
@@ -487,3 +495,22 @@ SPECIALIZED-ARRAY: void*
 STRUCT: silly-array-field-test { x int*[3] } ;
 
 [ t ] [ silly-array-field-test <struct> x>> void*-array? ] unit-test
+
+! Packed structs
+PACKED-STRUCT: packed-struct-test
+    { d c:int }
+    { e c:short }
+    { f c:int }
+    { g c:char }
+    { h c:int } ;
+
+[ 15 ] [ packed-struct-test heap-size ] unit-test
+
+[ 0 ] [ "d" packed-struct-test offset-of ] unit-test
+[ 4 ] [ "e" packed-struct-test offset-of ] unit-test
+[ 6 ] [ "f" packed-struct-test offset-of ] unit-test
+[ 10 ] [ "g" packed-struct-test offset-of ] unit-test
+[ 11 ] [ "h" packed-struct-test offset-of ] unit-test
+
+[ POSTPONE: PACKED-STRUCT: ]
+[ packed-struct-test struct-definer-word ] unit-test

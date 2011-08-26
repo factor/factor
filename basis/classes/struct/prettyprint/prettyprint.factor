@@ -1,17 +1,22 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.data alien.prettyprint arrays
-assocs classes classes.struct combinators combinators.short-circuit
-continuations fry kernel libc make math math.parser mirrors
-prettyprint.backend prettyprint.custom prettyprint.sections
-see.private sequences slots strings summary words ;
+USING: accessors alien alien.c-types alien.data
+alien.prettyprint arrays assocs classes classes.struct
+combinators combinators.short-circuit continuations fry kernel
+libc make math math.parser mirrors prettyprint.backend
+prettyprint.custom prettyprint.sections see.private sequences
+slots strings summary words ;
 IN: classes.struct.prettyprint
 
 <PRIVATE
 
 : struct-definer-word ( class -- word )
-    struct-slots dup length 2 >=
-    [ second offset>> 0 = \ UNION-STRUCT: \ STRUCT: ? ]
-    [ drop \ STRUCT: ] if ;
+    struct-slots
+    {
+        { [ dup length 1 <= ] [ drop \ STRUCT: ] }
+        { [ dup [ offset>> 0 = ] all? ] [ drop \ UNION-STRUCT: ] }
+        { [ dup [ packed?>> ] all? ] [ drop \ PACKED-STRUCT: ] }
+        [ drop \ STRUCT: ]
+    } cond ;
 
 : struct>assoc ( struct -- assoc )
     [ class struct-slots ] [ struct-slot-values ] bi zip ;
