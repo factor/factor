@@ -1,4 +1,6 @@
-! (c)Joe Groff, Daniel Ehrenberg bsd license
+! Copyright (C) 2010, 2011 Joe Groff, Daniel Ehrenberg,
+! John Benediktsson, Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license
 USING: accessors alien alien.c-types alien.data alien.parser
 arrays byte-arrays classes classes.private classes.parser
 classes.tuple classes.tuple.parser classes.tuple.private
@@ -24,8 +26,11 @@ M: struct-must-have-slots summary
 TUPLE: struct
     { (underlying) c-ptr read-only } ;
 
+! We hijack the core slots vocab's slot-spec type for struct
+! fields. Note that 'offset' is in bits, not bytes, to support
+! bitfields.
 TUPLE: struct-slot-spec < slot-spec
-    type ;
+    type packed? ;
 
 ! For a struct-bit-slot-spec, offset is in bits, not bytes
 TUPLE: struct-bit-slot-spec < struct-slot-spec
@@ -213,11 +218,14 @@ M: struct-c-type base-type ;
 
 GENERIC: compute-slot-offset ( offset class -- offset' )
 
-: c-type-align-at ( class offset -- n )
-    0 = [ c-type-align-first ] [ c-type-align ] if ;
+: c-type-align-at ( slot-spec offset -- n )
+    over packed?>> [ 2drop 1 ] [
+        [ type>> ] dip
+        0 = [ c-type-align-first ] [ c-type-align ] if
+    ] if ;
 
 M: struct-slot-spec compute-slot-offset
-    [ type>> over c-type-align-at 8 * align ] keep
+    [ over c-type-align-at 8 * align ] keep
     [ [ 8 /i ] dip offset<< ] [ type>> heap-size 8 * + ] 2bi ;
 
 M: struct-bit-slot-spec compute-slot-offset
@@ -231,7 +239,7 @@ M: struct-bit-slot-spec compute-slot-offset
 
 : struct-alignment ( slots -- align )
     [ struct-bit-slot-spec? not ] filter
-    1 [ [ type>> ] [ offset>> ] bi c-type-align-at max ] reduce ;
+    1 [ dup offset>> c-type-align-at max ] reduce ;
 
 PRIVATE>
 
@@ -267,28 +275,41 @@ M: struct binary-zero? binary-object <direct-uchar-array> [ 0 = ] all? ; inline
 : redefine-struct-tuple-class ( class -- )
     [ struct f define-tuple-class ] [ make-final ] bi ;
 
-:: (define-struct-class) ( class slots offsets-quot -- )
-    slots empty? [ struct-must-have-slots ] when
+:: (define-struct-class) ( class slot-specs offsets-quot alignment-quot -- )
+    slot-specs check-struct-slots
+    slot-specs empty? [ struct-must-have-slots ] when
     class redefine-struct-tuple-class
-    slots make-slots dup check-struct-slots :> slot-specs
     slot-specs offsets-quot call :> unaligned-size
-    slot-specs struct-alignment :> alignment
+    slot-specs alignment-quot call :> alignment
     unaligned-size alignment align :> size
 
-    class  slot-specs  size  alignment  c-type-for-class :> c-type
+    class slot-specs size alignment c-type-for-class :> c-type
 
     c-type class typedef
     class slot-specs define-accessors
     class size "struct-size" set-word-prop
     class dup make-struct-prototype "prototype" set-word-prop
     class (struct-methods) ; inline
+
+: make-packed-slots ( slots -- slot-specs )
+    make-slots [ t >>packed? ] map! ;
+
 PRIVATE>
 
 : define-struct-class ( class slots -- )
-    [ compute-struct-offsets ] (define-struct-class) ;
+    make-slots
+    [ compute-struct-offsets ] [ struct-alignment ]
+    (define-struct-class) ;
+
+: define-packed-struct-class ( class slots -- )
+    make-packed-slots
+    [ compute-struct-offsets ] [ drop 1 ]
+    (define-struct-class) ;
 
 : define-union-struct-class ( class slots -- )
-    [ compute-union-offsets ] (define-struct-class) ;
+    make-slots
+    [ compute-union-offsets ] [ struct-alignment ]
+    (define-struct-class) ;
 
 ERROR: invalid-struct-slot token ;
 
@@ -352,6 +373,10 @@ PRIVATE>
 
 SYNTAX: STRUCT:
     parse-struct-definition define-struct-class ;
+
+SYNTAX: PACKED-STRUCT:
+    parse-struct-definition define-packed-struct-class ;
+
 SYNTAX: UNION-STRUCT:
     parse-struct-definition define-union-struct-class ;
 
@@ -377,6 +402,7 @@ SYNTAX: S@
         { "{" [ parse-struct-slot` t ] }
         [ invalid-struct-slot ]
     } case ;
+
 PRIVATE>
 
 FUNCTOR-SYNTAX: STRUCT:
