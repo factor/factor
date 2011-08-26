@@ -1,7 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: unix.linux.epoll
-USING: alien.c-types alien.syntax classes.struct math unix.types ;
+USING: alien.c-types alien.syntax classes.struct math
+unix.types ;
 
 FUNCTION: int epoll_create ( int size ) ;
 
@@ -11,7 +12,7 @@ UNION-STRUCT: epoll-data
     { u32 uint32_t }
     { u64 uint64_t } ;
 
-STRUCT: epoll-event
+PACKED-STRUCT: epoll-event
     { events uint32_t   }
     { data   epoll-data } ;
 
