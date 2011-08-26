@@ -4,7 +4,7 @@ USING: accessors kernel math sorting words parser io summary
 quotations sequences sequences.generalizations prettyprint
 continuations effects definitions compiler.units namespaces
 assocs tools.time generic inspector fry locals generalizations
-macros ;
+macros sequences.deep ;
 IN: tools.annotations
 
 <PRIVATE
@@ -46,10 +46,23 @@ M: word (annotate)
     [ dup def>> 2dup "unannotated-def" set-word-prop ] dip
     call( old -- new ) define ;
 
+GENERIC# (deep-annotate) 1 ( word quot -- )
+
+M: generic (deep-annotate)
+    [ "methods" word-prop values ] dip '[ _ (deep-annotate) ] each ;
+
+M: word (deep-annotate)
+    [ check-annotate-twice ] dip
+    [ dup def>> 2dup "unannotated-def" set-word-prop ] dip
+    '[ dup callable? [ _ call( old -- new ) ] when ] deep-map define ;
+
 PRIVATE>
 
 : annotate ( word quot -- )
     [ (annotate) ] with-compilation-unit ;
+
+: deep-annotate ( word quot -- )
+    [ (deep-annotate) ] with-compilation-unit ;
 
 <PRIVATE
 
