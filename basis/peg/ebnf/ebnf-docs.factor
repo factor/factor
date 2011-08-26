@@ -279,7 +279,7 @@ ARTICLE: "peg.ebnf.semantic-action" "Semantic Action"
 "matched rule that returns success or failure. The result of the parse is decided by "
 "the result of the semantic action. The stack effect for the quotation is "
 { $snippet ( ast -- ? ) } ". "
-"A semantic action follows the rule it applies to and is delimeted by '?[' and ']?'."
+"A semantic action follows the rule it applies to and is delimited by '?[' and ']?'."
 { $examples
     { $example
        "USING: prettyprint peg.ebnf math math.parser ;"
@@ -431,7 +431,7 @@ $nl
 "working in one pass. There is no tokenization occurring over the whole string "
 "followed by the parse of that result. It tokenizes as it needs to. You can even "
 "switch tokenizers multiple times during a grammar. Rules use the tokenizer that "
-"was defined lexically before the rule. This is usefull in the JavaScript grammar:"
+"was defined lexically before the rule. This is useful in the JavaScript grammar:"
 { $examples
     { $code
         "EBNF: javascript"

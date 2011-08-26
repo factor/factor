@@ -199,7 +199,7 @@ $nl
 }
 "Creating " { $link "network-addressing" } " from URLs:"
 { $subsections url-addr }
-"The URL implemention encodes and decodes components of " { $link url } " instances automatically, but sometimes this functionality is needed for non-URL strings."
+"The URL implementation encodes and decodes components of " { $link url } " instances automatically, but sometimes this functionality is needed for non-URL strings."
 { $subsections "url-encoding" }
 "Utility words used by the URL implementation:"
 { $subsections "url-utilities" } ;

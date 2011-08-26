@@ -31,7 +31,7 @@ $nl
 $nl
 "On PowerPC, or older x86 chips without SSE, software fallbacks are used for all high-level vector operations. SIMD code can run with no loss in functionality, just decreased performance."
 $nl
-"The primities in the " { $vocab-link "math.vectors.simd.intrinsics" } " vocabulary do not have software fallbacks, but they should not be called directly in any case." ;
+"The primitives in the " { $vocab-link "math.vectors.simd.intrinsics" } " vocabulary do not have software fallbacks, but they should not be called directly in any case." ;
 
 ARTICLE: "math.vectors.simd.types" "SIMD vector types"
 "Each SIMD vector type is named " { $snippet "scalar-count" } ", where " { $snippet "scalar" } " is a scalar C type and " { $snippet "count" } " is a vector dimension."

@@ -49,7 +49,7 @@ $nl
     "objc-calling"
     "objc-subclassing"
 }
-"A utility library is built to faciliate the development of Cocoa applications in Factor:"
+"A utility library is built to facilitate the development of Cocoa applications in Factor:"
 { $subsections
     "cocoa-application-utils"
     "cocoa-dialogs"

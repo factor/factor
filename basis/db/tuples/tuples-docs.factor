@@ -158,7 +158,7 @@ ARTICLE: "db-tuples" "High-level tuple/database integration"
 { $subsections "db.types" }
 "Useful words:"
 { $subsections "db-tuples-words" }
-"For porting db.tuples to other databases:"
+"For porting " { $vocab-link "db.tuples" } " to other databases:"
 { $subsections "db-tuples-protocol" }
 ;
 

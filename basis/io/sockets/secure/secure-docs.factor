@@ -57,7 +57,7 @@ $nl
 "This slot is required for secure server sockets." ;
 
 ARTICLE: "ssl-ephemeral-rsa" "Ephemeral RSA key bits"
-"The " { $snippet "ephemeral-key-bits" } " slot of a " { $link secure-config } " contains the length of the empheral RSA key, in bits."
+"The " { $snippet "ephemeral-key-bits" } " slot of a " { $link secure-config } " contains the length of the ephemeral RSA key, in bits."
 $nl
 "The default value is 1024, and anything less than that is considered insecure. This slot is required for secure server sockets." ;
 
@@ -113,7 +113,7 @@ HELP: accept-secure-handshake
 { $errors "Throws " { $link upgrade-on-non-socket } " or " { $link upgrade-buffers-full } " if used improperly." } ;
 
 ARTICLE: "ssl-upgrade" "Upgrading existing connections"
-"Some protocols, such as HTTPS, require that the connection be established as an SSL/TLS connection. Others, such as secure SMTP and POP3 require that the client and server initiate an SSL/TLS handshake upon the client sending a plain-text request. The latter use-case is accomodated by a pair of words."
+"Some protocols, such as HTTPS, require that the connection be established as an SSL/TLS connection. Others, such as secure SMTP and POP3 require that the client and server initiate an SSL/TLS handshake upon the client sending a plain-text request. The latter use-case is accommodated by a pair of words."
 $nl
 "Upgrading a connection to a secure socket by initiating an SSL/TLS handshake with the server:"
 { $subsections send-secure-handshake }
