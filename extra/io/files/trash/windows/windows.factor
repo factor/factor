@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.data alien.strings
-alien.syntax classes.struct classes.struct.packed destructors
-kernel io.encodings.utf16n io.files.trash libc math sequences system
+alien.syntax classes.struct destructors kernel
+io.encodings.utf16n io.files.trash libc math sequences system
 windows.types ;
 
 IN: io.files.trash.windows
