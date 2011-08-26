@@ -61,7 +61,7 @@ $nl
     "errors-post-mortem"
     "errors-anti-examples"
 }
-"When Factor encouters a critical error, it calls the following word:"
+"When Factor encounters a critical error, it calls the following word:"
 { $subsections die } ;
 
 ARTICLE: "continuations.private" "Continuation implementation details"

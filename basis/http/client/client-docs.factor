@@ -173,7 +173,7 @@ ARTICLE: "http.client.options" "OPTIONS requests with the HTTP client"
 { $subsections
     <options-request>
 }
-"RFC2616 does not define any use for an entity body, yet allows for the inclusion of one as part of the OPTIONS method. This is not supported with this version of the http.client. The current implementation of http-options only supports a " { $link url } " request with no corresponding post-data, as per the stack effect." ;
+"RFC2616 does not define any use for an entity body, yet allows for the inclusion of one as part of the OPTIONS method. This is not supported with this version of the " { $vocab-link "http.client" } ". The current implementation of " { $link http-options } " only supports a " { $link url } " request with no corresponding post-data, as per the stack effect." ;
 
 ARTICLE: "http.client.trace" "TRACE requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"

@@ -16,7 +16,7 @@ ARTICLE: "xml.writer" "Writing XML"
     pprint-xml>string
     pprint-xml
 }
-"Certain variables can be changed to mainpulate prettyprinting"
+"Certain variables can be changed to manipulate prettyprinting"
 { $subsections
     sensitive-tags
     indenter

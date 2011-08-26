@@ -94,25 +94,25 @@ M: circle area radius>> sq pi * ;
 [ 12 ] [ 4 3 2 <parallelogram> area ] unit-test
 [ t ] [ 2 <circle> area 4 pi * = ] unit-test
 
-GENERIC: perimiter ( shape -- n )
+GENERIC: perimeter ( shape -- n )
 
-: rectangle-perimiter ( l w -- n ) + 2 * ;
+: rectangle-perimeter ( l w -- n ) + 2 * ;
 
-M: rectangle perimiter
+M: rectangle perimeter
     [ width>> ] [ height>> ] bi
-    rectangle-perimiter ;
+    rectangle-perimeter ;
 
 : hypotenuse ( a b -- c ) [ sq ] bi@ + sqrt ;
 
-M: parallelogram perimiter
+M: parallelogram perimeter
     [ width>> ]
     [ [ height>> ] [ skew>> ] bi hypotenuse ] bi
-    rectangle-perimiter ;
+    rectangle-perimeter ;
 
-M: circle perimiter 2 * pi * ;
+M: circle perimeter 2 * pi * ;
 
-[ 14 ] [ 4 3 <rectangle> perimiter ] unit-test
-[ 30.0 ] [ 10 4 3 <parallelogram> perimiter ] unit-test
+[ 14 ] [ 4 3 <rectangle> perimeter ] unit-test
+[ 30.0 ] [ 10 4 3 <parallelogram> perimeter ] unit-test
 
 PREDICATE: very-funny < funnies number? ;
 
