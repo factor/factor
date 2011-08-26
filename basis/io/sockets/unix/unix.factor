@@ -50,7 +50,7 @@ M: object (get-remote-address) ( handle local -- sockaddr )
     SOL_SOCKET SO_OOBINLINE set-socket-option ;
 
 : wait-to-connect ( port -- )
-    dup handle>> handle-fd f 0 write
+    dup handle>> handle-fd f 0 read
     {
         { [ 0 = ] [ drop ] }
         { [ errno EAGAIN = ] [ dup +output+ wait-for-port wait-to-connect ] }
