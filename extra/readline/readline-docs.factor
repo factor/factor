@@ -25,8 +25,11 @@ HELP: set-completion
 } ;
 
 ARTICLE: "readline" "Readline"
-{ $vocab-link "readline" }
-;
+"The " { $vocab-link "readline" } " vocabulary binds to the C readline library and provides Emacs-style key bindings for editing text. Currently, it only works from the non-graphical UI." $nl
 
+"To read a line:"
+{ $subsections readline }
+"To set a completion hook:"
+{ $subsections set-completion } ;
 
 ABOUT: "readline"
