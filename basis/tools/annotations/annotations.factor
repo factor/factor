@@ -36,24 +36,29 @@ M: cannot-annotate-twice summary drop "Cannot annotate a word twice" ;
         cannot-annotate-twice
     ] when ;
 
+: annotate-generic ( word quot -- )
+    [ "methods" word-prop values ] dip each ; inline
+
+: prepare-annotate ( word quot -- word quot quot )
+    [ check-annotate-twice ] dip
+    [ dup def>> 2dup "unannotated-def" set-word-prop ] dip ;
+
 GENERIC# (annotate) 1 ( word quot -- )
 
 M: generic (annotate)
-    [ "methods" word-prop values ] dip '[ _ (annotate) ] each ;
+    '[ _ (annotate) ] annotate-generic ;
 
 M: word (annotate)
-    [ check-annotate-twice ] dip
-    [ dup def>> 2dup "unannotated-def" set-word-prop ] dip
+    prepare-annotate
     call( old -- new ) define ;
 
 GENERIC# (deep-annotate) 1 ( word quot -- )
 
 M: generic (deep-annotate)
-    [ "methods" word-prop values ] dip '[ _ (deep-annotate) ] each ;
+    '[ _ (deep-annotate) ] annotate-generic ;
 
 M: word (deep-annotate)
-    [ check-annotate-twice ] dip
-    [ dup def>> 2dup "unannotated-def" set-word-prop ] dip
+    prepare-annotate
     '[ dup callable? [ _ call( old -- new ) ] when ] deep-map define ;
 
 PRIVATE>
