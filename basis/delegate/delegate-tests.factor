@@ -135,7 +135,7 @@ PROTOCOL: silly-protocol do-me ;
 ! Method should be there
 [ ] [ T{ a-tuple } do-me ] unit-test
 
-! Now try removing the consulation
+! Now try removing the consultation
 [ [ ] ] [
     "IN: delegate.tests" <string-reader> "delegate-test" parse-stream
 ] unit-test

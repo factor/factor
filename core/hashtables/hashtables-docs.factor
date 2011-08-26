@@ -4,7 +4,7 @@ namespaces assocs ;
 IN: hashtables
 
 ARTICLE: "hashtables.private" "Hashtable implementation details"
-"This hashtable implementation uses only one auxilliary array in addition to the hashtable tuple itself. The array stores keys in even slots and values in odd slots. Values are looked up with a hashing strategy that uses linear probing to resolve collisions."
+"This hashtable implementation uses only one auxiliary array in addition to the hashtable tuple itself. The array stores keys in even slots and values in odd slots. Values are looked up with a hashing strategy that uses linear probing to resolve collisions."
 $nl
 "There are two special objects: the " { $link ((tombstone)) } " marker and the " { $link ((empty)) } " marker. Neither of these markers can be used as hashtable keys."
 $nl

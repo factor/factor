@@ -242,7 +242,7 @@ CONSTANT: google-slides
     { $slide "Unicode strings"
         "Strings are sequences of 21-bit Unicode code points"
         "Efficient implementation: ASCII byte string unless it has chars > 127"
-        "If a byte char has high bit set, the remaining 14 bits come from auxilliary vector"
+        "If a byte char has high bit set, the remaining 14 bits come from auxiliary vector"
     }
     { $slide "Unicode strings"
         "Unicode-aware case conversion, char classes, collation, word breaks, and so on..."
