@@ -1,0 +1,34 @@
+! Copyright (C) 2011 John Benediktsson
+! See http://factorcode.org/license.txt for BSD license
+
+USING: accessors furnace.actions http.server
+http.server.dispatchers http.server.responses http.server.static
+kernel namespaces ;
+
+IN: webapps.benchmark
+
+: <hello-action> ( -- action )
+    <page-action>
+        [ "Hello, world!" "text/plain" <content> ] >>display ;
+
+TUPLE: benchmark < dispatcher ;
+
+: <benchmark> ( -- dispatcher )
+    benchmark new-dispatcher
+        <hello-action> "hello" add-responder
+        "resource:" <static> "static" add-responder ;
+
+: run-benchmark ( -- )
+    <benchmark>
+        main-responder set-global
+    8080 httpd drop ;
+
+! Use this with apachebench:
+!
+!   * dynamic content
+!     http://localhost:8080/hello
+!
+!   * static content
+!     http://localhost:8080/static/readme.html
+
+MAIN: run-benchmark
