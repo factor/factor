@@ -10,12 +10,12 @@ IN: images.tesselation
 [
     {
         {
-            T{ image f { 2 2 } L ubyte-components f B{ 1 2 5 6 } }
-            T{ image f { 2 2 } L ubyte-components f B{ 3 4 7 8 } }
+            T{ image f { 2 2 } L ubyte-components f f B{ 1 2 5 6 } }
+            T{ image f { 2 2 } L ubyte-components f f B{ 3 4 7 8 } }
         }
         {
-            T{ image f { 2 2 } L ubyte-components f B{ 9 10 13 14 } }
-            T{ image f { 2 2 } L ubyte-components f B{ 11 12 15 16 } }
+            T{ image f { 2 2 } L ubyte-components f f B{ 9 10 13 14 } }
+            T{ image f { 2 2 } L ubyte-components f f B{ 11 12 15 16 } }
         }
     }
 ] [
@@ -30,12 +30,12 @@ IN: images.tesselation
 [
     {
         {
-            T{ image f { 2 2 } L ubyte-components f B{ 1 2 4 5 } }
-            T{ image f { 1 2 } L ubyte-components f B{ 3 6 } }
+            T{ image f { 2 2 } L ubyte-components f f B{ 1 2 4 5 } }
+            T{ image f { 1 2 } L ubyte-components f f B{ 3 6 } }
         }
         {
-            T{ image f { 2 1 } L ubyte-components f B{ 7 8 } }
-            T{ image f { 1 1 } L ubyte-components f B{ 9 } }
+            T{ image f { 2 1 } L ubyte-components f f B{ 7 8 } }
+            T{ image f { 1 1 } L ubyte-components f f B{ 9 } }
         }
     }
 ] [
