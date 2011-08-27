@@ -35,7 +35,7 @@ HELP: coverage.
 }
 { $description "Calls the coverage word on all the words in a vocabalary or on a single word and prints out a report." } ;
 
-ARTICLE: "tools.coverage" "tools.coverage"
+ARTICLE: "tools.coverage" "Coverage tool"
 "The " { $vocab-link "tools.coverage" } " vocabulary is a tool for testing code coverage. The implementation uses " { $vocab-link "tools.annotations" } " to place a coverage object at the beginning of every quotation. When the quotation executes, a slot on the coverage object is set to true. By examining the coverage objects after running the code for some time, one can see which of the quotations did not execute and write more tests or refactor the code." $nl
 "Enabling/disabling coverage:"
 { $subsections coverage-on coverage-off }
