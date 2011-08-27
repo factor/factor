@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.strings classes.struct
-combinators continuations destructors fry io.encodings.utf8
-kernel libc locals math memoize multiline namespaces sequences
-unix.ffi ;
+
+USING: accessors alien.c-types alien.data alien.strings
+classes.struct combinators continuations destructors fry
+io.encodings.utf8 kernel libc locals math memoize multiline
+namespaces sequences unix.ffi ;
 
 QUALIFIED-WITH: curses.ffi ffi
 
@@ -449,7 +450,7 @@ PRIVATE>
     ] with-destructors ;
 
 : mousemask ( mask -- newmask oldmask )
-    0 <ulong> [ ffi:mousemask ] keep *ulong ;
+    0 ulong <ref> [ ffi:mousemask ] keep ulong deref ;
 
 : wget-yx ( window -- y x )
     ptr>> [ _cury>> ] [ _curx>> ] bi ;
