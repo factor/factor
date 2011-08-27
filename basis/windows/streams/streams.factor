@@ -94,7 +94,7 @@ SPECIALIZED-ARRAY: uchar
         S_OK
     ] with-hresult ;
 
-:: IStream-clone ( out-clone-stream -- hresult )
+:: IStream-clone ( stream out-clone-stream -- hresult )
     f out-clone-stream 0 void* set-alien-value
     STG_E_INVALIDFUNCTION ;
 

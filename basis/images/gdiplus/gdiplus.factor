@@ -23,17 +23,17 @@ SINGLETON: gdi+-image
 : stream>gdi+-bitmap ( stream -- bitmap )
     stream>IStream &com-release
     { void* } [ GdipCreateBitmapFromStream check-gdi+-status ]
-    [ ] with-out-parameters &GdipFree ;
+    with-out-parameters &GdipFree ;
 
 : gdi+-bitmap-width ( bitmap -- w )
     { UINT } [ GdipGetImageWidth check-gdi+-status ]
-    [ ] with-out-parameters ;
+    with-out-parameters ;
 : gdi+-bitmap-height ( bitmap -- w )
     { UINT } [ GdipGetImageHeight check-gdi+-status ]
-    [ ] with-out-parameters ;
+    with-out-parameters ;
 : gdi+-lock-bitmap ( bitmap rect mode format -- data )
     { BitmapData } [ GdipBitmapLockBits check-gdi+-status ]
-    [ clone ] with-out-parameters ;
+    with-out-parameters ;
 
 :: gdi+-bitmap>data ( bitmap -- w h pixels )
     bitmap [ gdi+-bitmap-width ] [ gdi+-bitmap-height ] bi :> ( w h )
