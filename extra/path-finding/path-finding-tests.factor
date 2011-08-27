@@ -138,3 +138,13 @@ MEMO: costs ( -- costs )
 
 ! No path from D to B -- all nodes reachable from D must have been examined
 [ f "CDEF" ] [ "DB" test3 ] unit-test
+
+[ { 1 3 } ] [
+    1 3 H{
+        { 1 H{ { 2 0 } { 3 0 } } }
+        { 2 H{ { 3 0 } { 1 0 } { 4 0 } } }
+        { 3 H{ { 4 0 } } }
+        { 4 H{ } }
+    } <dijkstra> find-path
+] unit-test
+
