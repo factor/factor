@@ -1640,7 +1640,7 @@ CONSTANT: standard-gdi+-startup-input
 
 : (start-gdi+) ( startup-input -- token startup-output )
     { ULONG_PTR GdiplusStartupOutput }
-    [ swapd GdiplusStartup check-gdi+-status ] [ ] with-out-parameters ;
+    [ swapd GdiplusStartup check-gdi+-status ] with-out-parameters ;
 : start-gdi+ ( -- token )
     standard-gdi+-startup-input (start-gdi+) drop ; inline
 : stop-gdi+ ( token -- )
