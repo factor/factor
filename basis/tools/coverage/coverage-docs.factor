@@ -21,13 +21,19 @@ HELP: coverage-off
 { $values
     { "object" object }    
 }
-{ $description "Deactivates the coverage tool on a word or vocabulary." } ;
+{ $description "Deactivates the coverage tool on a word or vocabulary and its private vocabulary." } ;
 
 HELP: coverage-on
 { $values
     { "object" object }    
 }
-{ $description "Activates the coverage tool on a word or vocabulary." } ;
+{ $description "Activates the coverage tool on a word or vocabulary and its private vocabulary." } ;
+
+HELP: toggle-coverage
+{ $values
+    { "object" object }
+}
+{ $description "Toggles whether the coverage tool is active on a word or vocabulary and its private vocabulary." } ;
 
 HELP: coverage.
 { $values
@@ -38,7 +44,7 @@ HELP: coverage.
 ARTICLE: "tools.coverage" "Coverage tool"
 "The " { $vocab-link "tools.coverage" } " vocabulary is a tool for testing code coverage. The implementation uses " { $vocab-link "tools.annotations" } " to place a coverage object at the beginning of every quotation. When the quotation executes, a slot on the coverage object is set to true. By examining the coverage objects after running the code for some time, one can see which of the quotations did not execute and write more tests or refactor the code." $nl
 "Enabling/disabling coverage:"
-{ $subsections coverage-on coverage-off }
+{ $subsections coverage-on coverage-off toggle-coverage }
 "Examining coverage data:"
 { $subsections coverage coverage. } ;
 
