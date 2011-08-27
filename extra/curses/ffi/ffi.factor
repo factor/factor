@@ -1,16 +1,15 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.syntax combinators kernel system
-alien.c-types alien.libraries classes.struct unix.types ;
+USING: accessors alien alien.c-types alien.libraries
+alien.syntax classes.struct combinators kernel math system unix.types ;
 IN: curses.ffi
 
 << "curses" {
     { [ os winnt? ]  [ "libcurses.dll" ] }
     { [ os macosx? ] [ "libcurses.dylib" ] }
-    { [ os unix?  ]  [ "libcurses.so" ] }
+    { [ os unix?  ]  [ "libncursesw.so" ] }
 } cond cdecl add-library >>
 
-C-TYPE: WINDOW
 C-TYPE: SCREEN
 TYPEDEF: void* va_list
 
@@ -18,59 +17,69 @@ TYPEDEF: uint chtype
 TYPEDEF: chtype attr_t
 TYPEDEF: short NCURSES_SIZE_T
 TYPEDEF: ushort wchar_t
+TYPEDEF: ulong mmask_t
 
 CONSTANT: CCHARW_MAX  5
 
+CONSTANT: ERR -1
+CONSTANT: FALSE 0
+CONSTANT: TRUE 1
+
 STRUCT: cchar_t
-    { attr attr_t }
-    { chars { wchar_t CCHARW_MAX } } ;
+{ attr attr_t }
+{ chars { wchar_t CCHARW_MAX } } ;
 
 STRUCT: pdat
-    { _pad_y NCURSES_SIZE_T }
-    { _pad_x NCURSES_SIZE_T }
-    { _pad_top NCURSES_SIZE_T }
-    { _pad_left NCURSES_SIZE_T }
-    { _pad_bottom NCURSES_SIZE_T }
-    { _pad_right NCURSES_SIZE_T } ;
+{ _pad_y NCURSES_SIZE_T }
+{ _pad_x NCURSES_SIZE_T }
+{ _pad_top NCURSES_SIZE_T }
+{ _pad_left NCURSES_SIZE_T }
+{ _pad_bottom NCURSES_SIZE_T }
+{ _pad_right NCURSES_SIZE_T } ;
 
-STRUCT: c-window
-    { _cury NCURSES_SIZE_T }
-    { _curx NCURSES_SIZE_T }
+STRUCT: WINDOW
+{ _cury NCURSES_SIZE_T }
+{ _curx NCURSES_SIZE_T }
 
-    { _maxy NCURSES_SIZE_T }
-    { _maxx NCURSES_SIZE_T }
-    { _begy NCURSES_SIZE_T }
-    { _begx NCURSES_SIZE_T }
+{ _maxy NCURSES_SIZE_T }
+{ _maxx NCURSES_SIZE_T }
+{ _begy NCURSES_SIZE_T }
+{ _begx NCURSES_SIZE_T }
 
-    { _flags short  }
+{ _flags short }
 
-    { _attrs attr_t  }
-    { _bkgd chtype  }
+{ _attrs attr_t }
+{ _bkgd chtype }
 
-    { _notimeout bool    }
-    { _clear bool    }
-    { _leaveok bool    }
-    { _scroll bool    }
-    { _idlok bool    }
-    { _idcok bool    }
-    { _immed bool    }
-    { _sync bool    }
-    { _use_keypad bool    }
-    { _delay int     }
+{ _notimeout bool }
+{ _clear bool }
+{ _leaveok bool }
+{ _scroll bool }
+{ _idlok bool }
+{ _idcok bool }
+{ _immed bool }
+{ _sync bool }
+{ _use_keypad bool }
+{ _delay int }
 
-    { _line c-string }
-    { _regtop NCURSES_SIZE_T }
-    { _regbottom NCURSES_SIZE_T }
+{ _line c-string }
+{ _regtop NCURSES_SIZE_T }
+{ _regbottom NCURSES_SIZE_T }
 
-    { _parx int }
-    { _pary int }
-    { _parent WINDOW* }
+{ _parx int }
+{ _pary int }
+{ _parent WINDOW* }
 
-    { _pad pdat }
+{ _pad pdat }
 
-    { _yoffset NCURSES_SIZE_T }
+{ _yoffset NCURSES_SIZE_T }
 
-    { _bkgrnd cchar_t  } ;
+{ _bkgrnd cchar_t } ;
+
+STRUCT: MEVENT
+    { id short }
+    { x int } { y int } { z int }
+    { bstate mmask_t } ;
 
 LIBRARY: curses
 
@@ -134,13 +143,13 @@ FUNCTION: int scrollok ( WINDOW* win, bool bf ) ;
 FUNCTION: int nl ( ) ;
 FUNCTION: int nonl ( ) ;
 
-FUNCTION: int erase (  ) ;
+FUNCTION: int erase ( ) ;
 FUNCTION: int werase ( WINDOW* win ) ;
-FUNCTION: int clear (  ) ;
+FUNCTION: int clear ( ) ;
 FUNCTION: int wclear ( WINDOW* win ) ;
-FUNCTION: int clrtobot (  ) ;
+FUNCTION: int clrtobot ( ) ;
 FUNCTION: int wclrtobot ( WINDOW* win ) ;
-FUNCTION: int clrtoeol (  ) ;
+FUNCTION: int clrtoeol ( ) ;
 FUNCTION: int wclrtoeol ( WINDOW* win ) ;
 
 FUNCTION: int refresh ( ) ;
@@ -176,27 +185,26 @@ FUNCTION: int vw_printw ( WINDOW* win, c-string fmt, va_list varglist ) ;
 FUNCTION: int move ( int y, int x ) ;
 FUNCTION: int wmove ( WINDOW* win, int y, int x ) ;
 
-
 FUNCTION: int scroll ( WINDOW* win ) ;
 FUNCTION: int scrl ( int n ) ;
 FUNCTION: int wscrl ( WINDOW* win, int n ) ;
 
-       ! int setupterm(char *term, int fildes, int *errret);
-       ! int setterm(char *term);
-       ! TERMINAL *set_curterm(TERMINAL *nterm);
-       ! int del_curterm(TERMINAL *oterm);
-       ! int restartterm(const char *term, int fildes, int *errret);
-       ! char *tparm(char *str, ...);
-       ! int tputs(const char *str, int affcnt, int (*putc)(int));
-       ! int putp(const char *str);
-       ! int vidputs(chtype attrs, int (*putc)(int));
-       ! int vidattr(chtype attrs);
-       ! int vid_puts(attr_t attrs, short pair, void *opts, int (*putc)(char));
-       ! int vid_attr(attr_t attrs, short pair, void *opts);
+! int setupterm(char *term, int fildes, int *errret);
+! int setterm(char *term);
+! TERMINAL *set_curterm(TERMINAL *nterm);
+! int del_curterm(TERMINAL *oterm);
+! int restartterm(const char *term, int fildes, int *errret);
+! char *tparm(char *str, ...);
+! int tputs(const char *str, int affcnt, int (*putc)(int));
+! int putp(const char *str);
+! int vidputs(chtype attrs, int (*putc)(int));
+! int vidattr(chtype attrs);
+! int vid_puts(attr_t attrs, short pair, void *opts, int (*putc)(char));
+! int vid_attr(attr_t attrs, short pair, void *opts);
 FUNCTION: int mvcur ( int oldrow, int oldcol, int newrow, int newcol ) ;
-       ! int tigetflag(char *capname);
-       ! int tigetnum(char *capname);
-       ! char *tigetstr(char *capname);
+! int tigetflag(char *capname);
+! int tigetnum(char *capname);
+! char *tigetstr(char *capname);
 
 FUNCTION: int touchwin ( WINDOW* win ) ;
 FUNCTION: int touchline ( WINDOW* win, int start, int count ) ;
@@ -229,3 +237,46 @@ FUNCTION: int mvaddstr ( int y, int x, c-string str ) ;
 FUNCTION: int mvaddnstr ( int y, int x, c-string str, int n ) ;
 FUNCTION: int mvwaddstr ( WINDOW* win, int y, int x, c-string str ) ;
 FUNCTION: int mvwaddnstr ( WINDOW* win, int y, int x, c-string str, int n ) ;
+
+FUNCTION: int waddch ( WINDOW* win, chtype ch ) ;
+
+FUNCTION: int start_color ( ) ;
+FUNCTION: int init_pair ( short pair, short f, short b ) ;
+FUNCTION: int init_color ( short color, short r, short g, short b ) ;
+FUNCTION: bool has_colors ( ) ;
+FUNCTION: bool can_change_color ( ) ;
+FUNCTION: int color_content ( short color, short* r, short* g, short* b ) ;
+FUNCTION: int pair_content ( short pair, short* f, short* b ) ;
+
+C-GLOBAL: int COLORS
+C-GLOBAL: int COLOR_PAIRS
+
+: COLOR_PAIR ( n -- n' ) 8 shift ; inline foldable
+
+FUNCTION: int wcolor_set ( WINDOW* win, short color_pair_number, void* opts ) ;
+
+FUNCTION: int wattron ( WINDOW* win, int attrs ) ;
+FUNCTION: int wattroff ( WINDOW* win, int attrs ) ;
+FUNCTION: int wattrset ( WINDOW* win, int attrs ) ;
+
+: NCURSES_MOUSE_MASK ( b m -- mask ) swap 1 - 6 * shift ; inline
+
+CONSTANT: NCURSES_BUTTON_RELEASED OCT: 01
+CONSTANT: NCURSES_BUTTON_PRESSED  OCT: 02
+CONSTANT: NCURSES_BUTTON_CLICKED  OCT: 04
+CONSTANT: NCURSES_DOUBLE_CLICKED  OCT: 10
+CONSTANT: NCURSES_TRIPLE_CLICKED  OCT: 20
+CONSTANT: NCURSES_RESERVED_EVENT  OCT: 40
+
+FUNCTION: int getmouse ( MEVENT* event ) ;
+FUNCTION: int ungetmouse ( MEVENT* event ) ;
+FUNCTION: mmask_t mousemask ( mmask_t newmask, mmask_t* oldmask ) ;
+FUNCTION: bool wenclose ( WINDOW* win, int y, int x ) ;
+FUNCTION: bool mouse_trafo ( int* pY, int* pX, bool to_screen ) ;
+FUNCTION: bool wmouse_trafo ( WINDOW* win, int* pY, int* pX, bool to_screen ) ;
+FUNCTION: int mouseinterval ( int erval ) ;
+
+FUNCTION: int wborder ( WINDOW* win, chtype ls, chtype rs, chtype ts, chtype bs, chtype tl, chtype tr, chtype bl, chtype br ) ;
+FUNCTION: int box ( WINDOW* win, chtype verch, chtype horch ) ;
+FUNCTION: int whline ( WINDOW* win, chtype ch, int n ) ;
+FUNCTION: int wvline ( WINDOW* win, chtype ch, int n ) ;
