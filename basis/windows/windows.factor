@@ -17,6 +17,7 @@ CONSTANT: MAX_UNICODE_PATH 32768
     { "iphlpapi"    "iphlpapi.dll"       stdcall }
     { "libc"        "msvcrt.dll"         cdecl   }
     { "libm"        "msvcrt.dll"         cdecl   }
+    { "gdiplus"     "gdiplus.dll"        stdcall }
     { "gl"          "opengl32.dll"       stdcall }
     { "glu"         "glu32.dll"          stdcall }
     { "ole32"       "ole32.dll"          stdcall }
