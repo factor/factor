@@ -17,10 +17,10 @@ HELP: each-word
 }
 { $description "Calls a quotation on every word in the vocabulary and its private vocabulary, if there is one." } ;
 
-HELP: map-word
+HELP: map-words
 { $values
     { "string" string } { "quot" quotation }
-    { "seq" sequence }
+    { "sequence" sequence }
 }
 { $description "Calls a quotation on every word in the vocabulary and its private vocabulary, if there is one, and collects the results." } ;
 
@@ -57,7 +57,7 @@ HELP: coverage.
 
 HELP: %coverage
 { $values
-    { "object" object }
+    { "string" string }
     { "x" double }
 }
 { $description "Returns a fraction representing the number of quotations called compared to the number of quotations that exist in a vocabulary or word." } ;
@@ -69,6 +69,6 @@ ARTICLE: "tools.coverage" "Coverage tool"
 "Examining coverage data:"
 { $subsections coverage coverage. %coverage }
 "Combinators for iterating over words in a vocabulary:"
-{ $subsections each-word map-word } ;
+{ $subsections each-word map-words } ;
 
 ABOUT: "tools.coverage"
