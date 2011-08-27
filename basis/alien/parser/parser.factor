@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.libraries arrays
 assocs classes combinators combinators.short-circuit
 compiler.units effects grouping kernel parser sequences
 splitting words fry locals lexer namespaces summary math
-vocabs.parser words.constant classes.parser ;
+vocabs.parser words.constant classes.parser alien.enums ;
 IN: alien.parser
 
 SYMBOL: current-library
@@ -84,7 +84,8 @@ M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
     [ [ <pointer> ] dip parse-pointers ] when ;
 
 : next-enum-member ( members name value -- members value' )
-    [ 2array suffix! ] [ 1 + ] bi ;
+    [ define-enum-value ]
+    [ [ 2array suffix! ] [ enum>number 1 + ] bi ] 2bi ;
 
 : parse-enum-name ( -- name )
     scan (CREATE-C-TYPE) dup save-location ;
