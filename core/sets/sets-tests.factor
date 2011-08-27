@@ -1,6 +1,7 @@
-! Copyright (C) 2010 Daniel Ehrenberg
+! Copyright (C) 2010 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sets tools.test kernel prettyprint hash-sets sorting ;
+USING: sets tools.test kernel prettyprint hash-sets sorting
+math sequences bit-sets bit-arrays ;
 IN: sets.tests
 
 [ V{ 1 2 3 } ] [ 3 V{ 1 2 } clone [ adjoin ] keep ] unit-test
@@ -8,16 +9,26 @@ IN: sets.tests
 
 [ t ] [ 4 { 2 4 5 } in? ] unit-test
 [ f ] [ 1 { 2 4 5 } in? ] unit-test
+[ f ] [ f 5 <bit-set> in? ] unit-test
 
 [ V{ 1 2 } ] [ 3 V{ 1 2 } clone [ delete ] keep ] unit-test
 [ V{ 2 } ] [ 1 V{ 1 2 } clone [ delete ] keep ] unit-test
+[ 0 ] [ 5 <bit-set> 0 over delete cardinality ] unit-test
+[ 0 ] [ 5 <bit-set> f over delete cardinality ] unit-test
+[ 0 ] [ 5 <bit-set> 3 over adjoin 3 over delete cardinality ] unit-test
+[ 0 ] [ 5 <bit-set> 10 over delete cardinality ] unit-test
+[ HS{ 1 } ] [ HS{ 1 2 } 2 over delete ] unit-test
 
 [ { 1 2 3 } ] [ { 1 1 1 2 2 3 3 3 3 3 } dup set-like natural-sort ] unit-test
 [ { 1 2 3 } ] [ HS{ 1 2 3 } { } set-like natural-sort ] unit-test
 [ { 1 2 3 } ] [ { 1 2 2 3 3 } { } set-like ] unit-test
 [ { 3 2 1 } ] [ { 3 3 2 2 1 } { } set-like ] unit-test
+[ t ] [ 4 <bit-set> 1 <bit-set> set-like 4 <bit-set> = ] unit-test
+[ t ] [ { 1 2 3 } HS{ } set-like HS{ 1 2 3 } = ] unit-test
 
 [ HS{ 1 2 3 } ] [ { 1 2 3 } fast-set ] unit-test
+[ T{ bit-set { table ?{ f } } } ]
+[ 1 <bit-set> fast-set ] unit-test
 
 [ { 1 } ] [ { 1 } members ] unit-test
 
@@ -42,6 +53,9 @@ IN: sets.tests
 [ { 1 } ] [ { 1 2 3 4 } { 2 3 4 } diff ] unit-test
 [ { 1 } ] [ { 1 1 2 3 } { 2 3 4 4 } diff ] unit-test
 
+[ T{ bit-set { table ?{ f f f } } } ]
+[ 3 <bit-set> 0 over adjoin dup diff ] unit-test
+
 [ f ] [ { 1 2 3 4 } { 1 2 } subset? ] unit-test
 [ t ] [ { 1 2 3 4 } { 1 2 } swap subset? ] unit-test
 [ t ] [ { 1 2 } { 1 2 } subset? ] unit-test
@@ -58,15 +72,24 @@ IN: sets.tests
 
 [ f ] [ { 0 1 1 2 3 5 } all-unique? ] unit-test
 [ t ] [ { 0 1 2 3 4 5 } all-unique? ] unit-test
+[ t ] [ HS{ 0 1 2 3 4 5 } all-unique? ] unit-test
 
 [ t ] [ f null? ] unit-test
 [ f ] [ { 4 } null? ] unit-test
+[ t ] [ HS{ } null? ] unit-test
+[ f ] [ HS{ 3 } null? ] unit-test
+[ t ] [ 2 <bit-set> null? ] unit-test
+[ f ] [ 3 <bit-set> 0 over adjoin null? ] unit-test
 
 [ 0 ] [ f cardinality ] unit-test
 [ 0 ] [ { } cardinality ] unit-test
 [ 1 ] [ { 1 } cardinality ] unit-test
 [ 1 ] [ HS{ 1 } cardinality ] unit-test
 [ 3 ] [ HS{ 1 2 3 } cardinality ] unit-test
+[ 0 ] [ 0 <bit-set> cardinality ] unit-test
+[ 0 ] [ 5 <bit-set> cardinality ] unit-test
+[ 2 ] [ 5 <bit-set> 0 over adjoin 1 over adjoin cardinality ] unit-test
+[ 1 ] [ 5 <bit-set> 1 over adjoin cardinality ] unit-test
 
 [ { } ] [ { } { } within ] unit-test
 [ { 2 3 } ] [ { 1 2 3 } { 2 3 4 } within ] unit-test
@@ -77,8 +100,25 @@ IN: sets.tests
 [ { 1 1 } ] [ { 1 1 2 3 3 } { 2 3 4 4 } without ] unit-test
 
 [ { 1 2 3 } ] [ { { 1 } { 2 } { 1 3 } } combine ] unit-test
+[ f ] [ { } combine ] unit-test
+
+[ { 1 4 9 16 25 36 } ]
+[ { { 1 2 3 } { 4 5 6 } } [ [ sq ] map ] gather ] unit-test
 
 [ H{ { 3 HS{ 1 2 } } } ] [ H{ } clone 1 3 pick adjoin-at 2 3 pick adjoin-at ] unit-test
 
 [ H{ { 3 H{ { 1 1 } { 2 2 } } } } ] [ H{ } clone 1 3 pick conjoin-at 2 3 pick conjoin-at ] unit-test
 
+TUPLE: null-set ;
+INSTANCE: null-set set
+M: null-set members drop f ;
+
+[ 0 ] [ T{ null-set } cardinality ] unit-test
+[ f ] [ T{ null-set } members ] unit-test
+[ t ] [ T{ null-set } T{ null-set } set-like T{ null-set } = ] unit-test
+
+[ t ] [ T{ null-set } set? ] unit-test
+[ t ] [ HS{ } set? ] unit-test
+[ t ] [ { } set? ] unit-test
+[ t ] [ 5 <bit-set> set? ] unit-test
+[ f ] [ H{ } set? ] unit-test
