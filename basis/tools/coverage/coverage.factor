@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry io kernel math prettyprint
 quotations sequences sequences.deep splitting strings
-tools.annotations vocabs words ;
+tools.annotations vocabs words arrays ;
 IN: tools.coverage
 
 TUPLE: coverage < identity-tuple executed? ;
@@ -28,7 +28,7 @@ PRIVATE>
         [ [ words ] dip each ] 2bi
     ] if ; inline
 
-: map-word ( string quot -- seq )
+: map-words ( string quot -- sequence )
     over ".private" tail? [
         [ words ] dip map
     ] [
@@ -67,7 +67,7 @@ M: word toggle-coverage
 GENERIC: coverage ( object -- seq )
 
 M: string coverage
-    words [ dup coverage ] { } map>assoc ;
+    [ dup coverage 2array ] map-words ;
 
 M: word coverage ( word -- seq )
     "coverage" word-prop >alist
@@ -83,7 +83,7 @@ M: word coverage.
         drop
     ] [
         [ name>> ":" append print ]
-        [ [ bl bl bl bl . ] each ] bi*
+        [ [ "    " write . ] each ] bi*
     ] if-empty ;
 
 <PRIVATE
@@ -91,20 +91,13 @@ M: word coverage.
 GENERIC: count-callables ( object -- n )
 
 M: string count-callables
-    [ count-callables ] map-word sum ;
+    [ count-callables ] map-words sum ;
 
 M: word count-callables
-    def>> [ callable? ] deep-filter length ;
-
-: calculate-%coverage ( object quot -- x )
-    [ count-callables ] bi [ swap - ] keep /f ; inline
+    "coverage" word-prop assoc-size ;
 
 PRIVATE>
 
-GENERIC: %coverage ( object -- x )
-
-M: string %coverage
-    [ coverage values concat length ] calculate-%coverage ;
-
-M: word %coverage
-    [ coverage length ] calculate-%coverage ;
+: %coverage ( string -- x )
+    [ coverage values concat length ]
+    [ count-callables ] bi [ swap - ] keep /f ; inline
