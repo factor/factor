@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry io kernel math prettyprint
 quotations sequences sequences.deep splitting strings
-tools.annotations vocabs words arrays ;
+tools.annotations vocabs words arrays words.symbol
+combinators.short-circuit ;
 IN: tools.coverage
 
 TUPLE: coverage < identity-tuple executed? ;
@@ -18,22 +19,25 @@ GENERIC: coverage-off ( object -- )
 : private-vocab-name ( string -- string' )
     ".private" ?tail drop ".private" append ;
 
+: coverage-words ( string -- words )
+    words [ { [ primitive? not ] [ symbol? not ] } 1&& ] filter ;
+
 PRIVATE>
 
 : each-word ( string quot -- )
     over ".private" tail? [
-        [ words ] dip each
+        [ coverage-words ] dip each
     ] [
-        [ [ private-vocab-name words ] dip each ]
-        [ [ words ] dip each ] 2bi
+        [ [ private-vocab-name coverage-words ] dip each ]
+        [ [ coverage-words ] dip each ] 2bi
     ] if ; inline
 
 : map-words ( string quot -- sequence )
     over ".private" tail? [
-        [ words ] dip map
+        [ coverage-words ] dip map
     ] [
-        [ [ private-vocab-name words ] dip map ]
-        [ [ words ] dip map ] 2bi append
+        [ [ private-vocab-name coverage-words ] dip map ]
+        [ [ coverage-words ] dip map ] 2bi append
     ] if ; inline
 
 M: string coverage-on
@@ -76,7 +80,7 @@ M: word coverage ( word -- seq )
 GENERIC: coverage. ( object -- )
 
 M: string coverage.
-    words [ coverage. ] each ;
+    [ coverage. ] each-word ;
 
 M: word coverage.
     dup coverage [
