@@ -1,7 +1,8 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry kernel quotations sequences strings
-tools.annotations vocabs words prettyprint io splitting ;
+USING: accessors assocs fry io kernel math prettyprint
+quotations sequences sequences.deep splitting strings
+tools.annotations vocabs words ;
 IN: tools.coverage
 
 TUPLE: coverage < identity-tuple executed? ;
@@ -16,6 +17,8 @@ GENERIC: coverage-off ( object -- )
 
 : private-vocab-name ( string -- string' )
     ".private" ?tail drop ".private" append ;
+
+PRIVATE>
 
 : each-word ( string quot -- )
     over ".private" tail? [
@@ -32,8 +35,6 @@ GENERIC: coverage-off ( object -- )
         [ [ private-vocab-name words ] dip map ]
         [ [ words ] dip map ] 2bi append
     ] if ; inline
-
-PRIVATE>
 
 M: string coverage-on
     [ coverage-on ] each-word ;
@@ -85,6 +86,8 @@ M: word coverage.
         [ [ bl bl bl bl . ] each ] bi*
     ] if-empty ;
 
+<PRIVATE
+
 GENERIC: count-callables ( object -- n )
 
 M: string count-callables
@@ -93,10 +96,12 @@ M: string count-callables
 M: word count-callables
     def>> [ callable? ] deep-filter length ;
 
-GENERIC: %coverage ( object -- x )
-
 : calculate-%coverage ( object quot -- x )
     [ count-callables ] bi [ swap - ] keep /f ; inline
+
+PRIVATE>
+
+GENERIC: %coverage ( object -- x )
 
 M: string %coverage
     [ coverage values concat length ] calculate-%coverage ;
