@@ -17,7 +17,7 @@ GENERIC: coverage-off ( object -- )
 : private-vocab-name ( string -- string' )
     ".private" ?tail drop ".private" append ;
 
-: change-vocabulary-coverage ( string quot -- )
+: each-word ( string quot -- )
     over ".private" tail? [
         [ words ] dip each
     ] [
@@ -25,19 +25,27 @@ GENERIC: coverage-off ( object -- )
         [ [ words ] dip each ] 2bi
     ] if ; inline
 
+: map-word ( string quot -- seq )
+    over ".private" tail? [
+        [ words ] dip map
+    ] [
+        [ [ private-vocab-name words ] dip map ]
+        [ [ words ] dip map ] 2bi append
+    ] if ; inline
+
 PRIVATE>
 
 M: string coverage-on
-    [ coverage-on ] change-vocabulary-coverage ;
+    [ coverage-on ] each-word ;
 
 M: string coverage-off ( vocabulary -- )
-    [ coverage-off ] change-vocabulary-coverage ;
+    [ coverage-off ] each-word ;
 
 M: word coverage-on ( word -- )
     H{ } clone [ "coverage" set-word-prop ] 2keep
     '[
         \ coverage new [ _ set-at ] 2keep
-        '[ _ t >>executed? drop ] [ ] surround
+        '[ _ t >>executed? drop ] prepend
     ] deep-annotate ;
 
 M: word coverage-off ( word -- )
@@ -46,7 +54,7 @@ M: word coverage-off ( word -- )
 GENERIC: toggle-coverage ( object -- )
 
 M: string toggle-coverage
-    [ toggle-coverage ] change-vocabulary-coverage ;
+    [ toggle-coverage ] each-word ;
 
 M: word toggle-coverage
     dup "coverage" word-prop [
@@ -76,3 +84,22 @@ M: word coverage.
         [ name>> ":" append print ]
         [ [ bl bl bl bl . ] each ] bi*
     ] if-empty ;
+
+GENERIC: count-callables ( object -- n )
+
+M: string count-callables
+    [ count-callables ] map-word sum ;
+
+M: word count-callables
+    def>> [ callable? ] deep-filter length ;
+
+GENERIC: %coverage ( object -- x )
+
+: calculate-%coverage ( object quot -- x )
+    [ count-callables ] bi [ swap - ] keep /f ; inline
+
+M: string %coverage
+    [ coverage values concat length ] calculate-%coverage ;
+
+M: word %coverage
+    [ coverage length ] calculate-%coverage ;
