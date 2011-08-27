@@ -8,14 +8,16 @@ TUPLE: coverage < identity-tuple executed? ;
 
 C: <coverage> coverage
 
-: private-vocab-name ( string -- string' )
-    ".private" ?tail drop ".private" append ;
-
 GENERIC: coverage-on ( object -- )
 
 GENERIC: coverage-off ( object -- )
 
-: change-coverage ( string quot -- )
+<PRIVATE
+
+: private-vocab-name ( string -- string' )
+    ".private" ?tail drop ".private" append ;
+
+: change-vocabulary-coverage ( string quot -- )
     over ".private" tail? [
         [ words ] dip each
     ] [
@@ -23,11 +25,13 @@ GENERIC: coverage-off ( object -- )
         [ [ words ] dip each ] 2bi
     ] if ; inline
 
+PRIVATE>
+
 M: string coverage-on
-    [ coverage-on ] change-coverage ;
+    [ coverage-on ] change-vocabulary-coverage ;
 
 M: string coverage-off ( vocabulary -- )
-    [ coverage-off ] change-coverage ;
+    [ coverage-off ] change-vocabulary-coverage ;
 
 M: word coverage-on ( word -- )
     H{ } clone [ "coverage" set-word-prop ] 2keep
@@ -42,7 +46,7 @@ M: word coverage-off ( word -- )
 GENERIC: toggle-coverage ( object -- )
 
 M: string toggle-coverage
-    words [ toggle-coverage ] each ;
+    [ toggle-coverage ] change-vocabulary-coverage ;
 
 M: word toggle-coverage
     dup "coverage" word-prop [
