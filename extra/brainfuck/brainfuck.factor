@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs fry io io.streams.string kernel macros math 
-peg.ebnf prettyprint quotations sequences strings ;
+USING: accessors assocs fry io io.streams.string kernel macros
+math peg.ebnf prettyprint sequences strings ;
 
 IN: brainfuck
 
@@ -10,7 +10,7 @@ IN: brainfuck
 
 TUPLE: brainfuck pointer memory ;
 
-: <brainfuck> ( -- brainfuck ) 
+: <brainfuck> ( -- brainfuck )
     0 H{ } clone brainfuck boa ;
 
 : get-memory ( brainfuck -- brainfuck value )
@@ -37,31 +37,31 @@ TUPLE: brainfuck pointer memory ;
 : (>) ( brainfuck n -- brainfuck )
     [ dup pointer>> ] dip + >>pointer ;
 
-: (<) ( brainfuck n -- brainfuck ) 
+: (<) ( brainfuck n -- brainfuck )
     [ dup pointer>> ] dip - >>pointer ;
 
-: (#) ( brainfuck -- brainfuck ) 
-    dup 
-    [ "ptr=" write pointer>> pprint ] 
+: (#) ( brainfuck -- brainfuck )
+    dup
+    [ "ptr=" write pointer>> pprint ]
     [ ",mem=" write memory>> pprint nl ] bi ;
 
-: compose-all ( seq -- quot ) 
+: compose-all ( seq -- quot )
     [ ] [ compose ] reduce ;
 
 EBNF: parse-brainfuck
 
-inc-ptr  = (">")+  => [[ length 1quotation [ (>) ] append ]]
-dec-ptr  = ("<")+  => [[ length 1quotation [ (<) ] append ]]
-inc-mem  = ("+")+  => [[ length 1quotation [ (+) ] append ]]
-dec-mem  = ("-")+  => [[ length 1quotation [ (-) ] append ]]
+inc-ptr  = (">")+  => [[ length [ (>) ] curry ]]
+dec-ptr  = ("<")+  => [[ length [ (<) ] curry ]]
+inc-mem  = ("+")+  => [[ length [ (+) ] curry ]]
+dec-mem  = ("-")+  => [[ length [ (-) ] curry ]]
 output   = "."  => [[ [ (.) ] ]]
 input    = ","  => [[ [ (,) ] ]]
 debug    = "#"  => [[ [ (#) ] ]]
-space    = (" "|"\t"|"\r\n"|"\n")+ => [[ [ ] ]] 
+space    = (" "|"\t"|"\r\n"|"\n")+ => [[ [ ] ]]
 unknown  = (.)  => [[ "Invalid input" throw ]]
 
 ops   = inc-ptr|dec-ptr|inc-mem|dec-mem|output|input|debug|space
-loop  = "[" {loop|ops}+ "]" => [[ second compose-all 1quotation [ [ (?) ] ] prepend [ while ] append ]]
+loop  = "[" {loop|ops}+ "]" => [[ second compose-all [ while ] curry [ (?) ] prefix ]]
 
 code  = (loop|ops|unknown)*  => [[ compose-all ]]
 
@@ -72,6 +72,6 @@ PRIVATE>
 MACRO: run-brainfuck ( code -- )
     [ <brainfuck> ] swap parse-brainfuck [ drop flush ] 3append ;
 
-: get-brainfuck ( code -- result ) 
-    [ run-brainfuck ] with-string-writer ; inline 
+: get-brainfuck ( code -- result )
+    [ run-brainfuck ] with-string-writer ; inline
 
