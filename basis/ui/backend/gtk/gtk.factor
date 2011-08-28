@@ -160,9 +160,6 @@ CONSTANT: action-key-codes
         { $ GDK_SCROLL_RIGHT { 1 0 } }
     } at ;
 
-: mouse-event>gesture ( event -- modifiers button loc )
-    [ event-modifiers ] [ button>> ] [ event-loc ] tri ;
-
 : on-motion ( win event user-data -- ? )
     drop swap
     [ event-loc ] dip window
@@ -173,23 +170,33 @@ CONSTANT: action-key-codes
 
 :: on-button-press ( win event user-data -- ? )
     win window :> world
-    event mouse-event>gesture :> ( modifiers button loc )
-    button {
-        { 8 [ ] }
-        { 9 [ ] }
-        [ modifiers swap <button-down> loc world
-          send-button-down ]
-    } case t ;
+    event type>> GDK_BUTTON_PRESS = [
+        event button>> {
+            { 8 [ ] }
+            { 9 [ ] }
+            [
+                event event-modifiers swap <button-down>
+                event event-loc
+                world
+                send-button-down
+            ]
+        } case
+    ] when t ;
 
 :: on-button-release ( win event user-data -- ? )
     win window :> world
-    event mouse-event>gesture :> ( modifiers button loc )
-    button {
-        { 8 [ world left-action send-action ] }
-        { 9 [ world right-action send-action ] }
-        [ modifiers swap <button-up> loc world
-          send-button-up ]
-    } case t ;
+    event type>> GDK_BUTTON_RELEASE = [
+        event button>> {
+            { 8 [ world left-action send-action ] }
+            { 9 [ world right-action send-action ] }
+            [
+                event event-modifiers swap <button-up>
+                event event-loc
+                world
+                send-button-up
+            ]
+        } case
+    ] when t ;
 
 : on-scroll ( win event user-data -- ? )
     drop swap [
@@ -202,7 +209,7 @@ CONSTANT: action-key-codes
 
 : key-event>gesture ( event -- mods sym/f action? )
     [ event-modifiers ] [ key-sym ] bi ;
-  
+
 : on-key-press ( win event user-data -- ? )
     drop swap [ key-event>gesture <key-down> ] [ window ] bi*
     propagate-key-gesture t ;
@@ -318,7 +325,7 @@ CONSTANT: action-key-codes
 :: configure-im ( win im -- )
     im win gtk_widget_get_window gtk_im_context_set_client_window
     im f gtk_im_context_set_use_preedit
-    
+
     im "commit" [ on-commit yield ]
     GtkIMContext:commit win connect-signal-with-data
     im "retrieve-surrounding" [ on-retrieve-surrounding yield ]
@@ -349,7 +356,7 @@ CONSTANT: window-controls>decor-flags
         { normal-title-bar $ GDK_DECOR_TITLE }
         { textured-background 0 }
     }
-    
+
 CONSTANT: window-controls>func-flags
     H{
         { close-button $ GDK_FUNC_CLOSE }
@@ -444,18 +451,18 @@ M:: gtk-ui-backend (open-window) ( world -- )
     win im <window-handle> world handle<<
 
     world win register-window
-    
+
     win world [ window-loc>> auto-position ]
     [ dim>> first2 gtk_window_set_default_size ] 2bi
 
     win "factor" "Factor" [ utf8 string>alien ] bi@
     gtk_window_set_wmclass
-    
+
     world configure-gl
 
     win gtk_widget_realize
     win world window-controls>> configure-window-controls
-    
+
     win im configure-im
     win connect-user-input-signals
     win connect-win-state-signals
@@ -478,7 +485,7 @@ M: gtk-ui-backend (set-fullscreen)
 
 M: gtk-ui-backend (fullscreen?)
     handle>> fullscreen?>> ;
-    
+
 M: gtk-ui-backend raise-window*
     handle>> window>> gtk_window_present ;
 
