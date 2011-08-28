@@ -47,10 +47,10 @@ ERROR: not-a-string object ;
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
-TUPLE: line < disposable line metrics image loc dim render-info ;
+TUPLE: line < disposable line metrics image loc dim rendered-line ;
 
-TUPLE: render-info font string loc dim ;
-C: <render-info> render-info
+TUPLE: rendered-line font string loc dim ;
+C: <rendered-line> rendered-line
 
 : typographic-bounds ( line -- width ascent descent leading )
     { CGFloat CGFloat CGFloat }
@@ -129,7 +129,7 @@ C: <render-info> render-info
 
         line >>line
 
-        font string loc dim <render-info> >>render-info
+        font string loc dim <rendered-line> >>rendered-line
 
         metrics >>metrics
 
@@ -140,10 +140,10 @@ C: <render-info> render-info
 
 :: render ( line -- line image )
     line line>> :> ctline
-    line render-info>> string>> :> string
-    line render-info>> font>> :> font
-    line render-info>> loc>> :> loc
-    line render-info>> dim>> :> dim
+    line rendered-line>> string>> :> string
+    line rendered-line>> font>> :> font
+    line rendered-line>> loc>> :> loc
+    line rendered-line>> dim>> :> dim
 
     line dim [
         {
