@@ -29,7 +29,7 @@ SYNTAX: TYPEDEF:
     scan-c-type CREATE-C-TYPE dup save-location typedef ;
 
 SYNTAX: ENUM:
-    parse-enum define-enum ;
+    parse-enum (define-enum) ;
 
 SYNTAX: C-TYPE:
     void CREATE-C-TYPE typedef ;

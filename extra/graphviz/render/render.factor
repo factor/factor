@@ -1,11 +1,9 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators continuations destructors
-images.viewer io.backend io.files.unique kernel locals
-namespaces parser sequences summary unicode.case words
-graphviz.ffi
-graphviz.builder
-;
+USING: accessors combinators compiler.units continuations
+destructors images.viewer io.backend io.files.unique kernel
+locals namespaces parser sequences summary unicode.case words
+graphviz.ffi graphviz.builder ;
 IN: graphviz.render
 
 SYMBOL: default-layout
@@ -109,8 +107,6 @@ PRIVATE>
 : preview-window ( graph -- )
     (preview) image-window ; inline
 
-<<
-
 <PRIVATE
 
 : define-graphviz-by-engine ( -K -- )
@@ -130,7 +126,7 @@ PRIVATE>
 
 PRIVATE>
 
-supported-engines [ define-graphviz-by-engine ] each
-supported-formats [ define-graphviz-by-format ] each
-
->>
+[
+    supported-engines [ define-graphviz-by-engine ] each
+    supported-formats [ define-graphviz-by-format ] each
+] with-compilation-unit

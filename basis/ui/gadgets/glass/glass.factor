@@ -45,7 +45,7 @@ PRIVATE>
 
 : show-glass ( owner child visible-rect -- )
     <glass>
-    dup gadget-child hand-clicked set
+    dup gadget-child hand-clicked set-global
     dup owner>> find-world add-glass ;
 
 \ glass H{
