@@ -3,12 +3,9 @@
 USING: accessors alien alien.c-types alien.destructors
 alien.libraries alien.syntax combinators debugger destructors
 fry io kernel literals math prettyprint sequences splitting
-system words.constant
-graphviz
-;
+system memoize graphviz ;
 IN: graphviz.ffi
 
-<<
 "libgraph" {
     { [ os macosx? ] [ "libgraph.dylib" ] }
     { [ os unix?   ] [ "libgraph.so"    ] }
@@ -21,7 +18,6 @@ IN: graphviz.ffi
     { [ os unix?   ] [ "libgvc.so"    ] }
     { [ os winnt?  ] [ "gvc.dll"      ] }
 } cond cdecl add-library
->>
 
 LIBRARY: libgraph
 
@@ -85,11 +81,7 @@ FUNCTION: int agsafeset ( void* obj,
 LIBRARY: libgvc
 
 ! Graphviz contexts
-! This must be wrapped in << >> so that GVC_t*, gvContext, and
-! &gvFreeContext can be used to compute the supported-engines
-! and supported-formats constants below.
 
-<<
 C-TYPE: GVC_t
 
 FUNCTION: GVC_t* gvContext ( ) ;
@@ -112,7 +104,6 @@ M: ffi-errors error.
     int-gvFreeContext dup zero? [ drop ] [ ffi-errors ] if ;
 
 DESTRUCTOR: gvFreeContext
->>
 
 ! Layout
 
@@ -130,8 +121,6 @@ FUNCTION: int gvRenderFilename ( GVC_t* gvc,
 
 ! Supported layout engines (dot, neato, etc.) and output
 ! formats (png, jpg, etc.)
-
-<<
 <PRIVATE
 
 ENUM: api_t
@@ -152,7 +141,6 @@ FUNCTION: c-string
     ] with-destructors ;
 
 PRIVATE>
->>
 
-CONSTANT: supported-engines $[ API_layout plugin-list ]
-CONSTANT: supported-formats $[ API_device plugin-list ]
+MEMO: supported-engines ( -- seq ) API_layout plugin-list ;
+MEMO: supported-formats ( -- seq ) API_device plugin-list ;
