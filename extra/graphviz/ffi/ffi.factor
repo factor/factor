@@ -6,6 +6,7 @@ fry io kernel literals math prettyprint sequences splitting
 system memoize graphviz ;
 IN: graphviz.ffi
 
+<<
 "libgraph" {
     { [ os macosx? ] [ "libgraph.dylib" ] }
     { [ os unix?   ] [ "libgraph.so"    ] }
@@ -18,6 +19,7 @@ IN: graphviz.ffi
     { [ os unix?   ] [ "libgvc.so"    ] }
     { [ os winnt?  ] [ "gvc.dll"      ] }
 } cond cdecl add-library
+>>
 
 LIBRARY: libgraph
 
