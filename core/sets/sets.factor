@@ -60,11 +60,18 @@ M: set diff
 M: set intersects?
     small/large sequence/tester any? ;
 
+<PRIVATE
+
+: (subset?) ( set1 set2 -- ? )
+    sequence/tester all? ; inline
+
+PRIVATE>
+
 M: set subset?
-    sequence/tester all? ;
+    2dup [ cardinality ] bi@ > [ 2drop f ] [ (subset?) ] if ;
 
 M: set set=
-    2dup [ cardinality ] bi@ eq? [ subset? ] [ 2drop f ] if ;
+    2dup [ cardinality ] bi@ eq? [ (subset?) ] [ 2drop f ] if ;
 
 M: set fast-set ;
 
@@ -107,7 +114,7 @@ M: sequence null?
     empty? ; inline
 
 M: sequence cardinality
-    length ;
+    pruned length ;
 
 : combine ( sets -- set )
     [ f ]
