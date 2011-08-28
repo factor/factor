@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.destructors
-alien.libraries alien.strings alien.syntax combinators
+USING: accessors alien alien.destructors alien.libraries
+alien.strings alien.syntax combinators io.encodings.utf8 kernel
 gobject-introspection gobject-introspection.standard-types
-io.encodings.utf8 kernel system vocabs.parser words ;
+system ;
 IN: glib.ffi
 
 LIBRARY: glib
@@ -15,61 +15,6 @@ LIBRARY: glib
     { [ os unix? ] [ drop ] }
 } cond
 >>
-
-
-TYPEDEF: char gchar
-TYPEDEF: uchar guchar
-TYPEDEF: short gshort
-TYPEDEF: ushort gushort
-TYPEDEF: long glong
-TYPEDEF: ulong gulong
-TYPEDEF: int gint
-TYPEDEF: uint guint
-
-<<
-int c-type clone
-    [ >c-bool ] >>unboxer-quot
-    [ c-bool> ] >>boxer-quot
-    object >>boxed-class
-"gboolean" current-vocab create typedef
->>
-
-TYPEDEF: char gint8
-TYPEDEF: uchar guint8
-TYPEDEF: short gint16
-TYPEDEF: ushort guint16
-TYPEDEF: int gint32
-TYPEDEF: uint guint32
-TYPEDEF: longlong gint64
-TYPEDEF: ulonglong guint64
-
-TYPEDEF: float gfloat
-TYPEDEF: double gdouble
-
-TYPEDEF: long ssize_t
-TYPEDEF: long time_t
-TYPEDEF: size_t gsize
-TYPEDEF: ssize_t gssize
-TYPEDEF: size_t GType
-
-TYPEDEF: void* gpointer
-TYPEDEF: void* gconstpointer
-
-TYPEDEF: guint8 GDateDay
-TYPEDEF: guint16 GDateYear
-TYPEDEF: gint GPid
-TYPEDEF: guint32 GQuark
-TYPEDEF: gint32 GTime
-TYPEDEF: glong gintptr
-TYPEDEF: gint64 goffset
-TYPEDEF: gulong guintptr
-TYPEDEF: guint32 gunichar
-TYPEDEF: guint16 gunichar2
-
-TYPEDEF: gpointer pointer
-
-REPLACE-C-TYPE: long\sdouble double
-REPLACE-C-TYPE: any gpointer
 
 IMPLEMENT-STRUCTS: GError GPollFD GSource GSourceFuncs ;
 
