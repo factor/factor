@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.data alien.libraries alien.syntax
 combinators gio.ffi glib.ffi gmodule.ffi gobject-introspection
-gobject.ffi kernel libc sequences system ;
+gobject.ffi kernel libc sequences system vocabs.loader ;
 EXCLUDE: alien.c-types => pointer ;
 IN: gdk.pixbuf.ffi
 

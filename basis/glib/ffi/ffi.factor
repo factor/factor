@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.destructors alien.libraries alien.syntax
-combinators io.encodings.utf8 kernel gobject-introspection
-gobject-introspection.standard-types system ;
+USING: accessors alien alien.destructors alien.libraries
+alien.strings alien.syntax combinators io.encodings.utf8 kernel
+gobject-introspection gobject-introspection.standard-types
+system ;
 IN: glib.ffi
 
 LIBRARY: glib
