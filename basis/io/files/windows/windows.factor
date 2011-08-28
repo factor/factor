@@ -324,9 +324,15 @@ M: winnt root-directory? ( path -- ? )
 
 TR: normalize-separators "/" "\\" ;
 
+<PRIVATE
+
+: unc-path? ( string -- ? )
+    [ "//" head? ] [ "\\\\" head? ] bi or ;
+
+PRIVATE>
+
 M: winnt normalize-path ( string -- string' )
-    dup [ "//" head? ] [ "\\\\" head? ] bi
-    or [
+    dup unc-path? [
         normalize-separators
     ] [
         absolute-path
