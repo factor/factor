@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data assocs cache colors.constants
 destructors kernel opengl opengl.gl opengl.capabilities
-combinators images images.tesselation grouping sequences math
+combinators images images.tessellation grouping sequences math
 math.vectors generalizations fry arrays namespaces system locals
 literals specialized-arrays ;
 FROM: alien.c-types => int float ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel math grouping fry columns locals accessors
 images math.vectors arrays ;
-IN: images.tesselation
+IN: images.tessellation
 
 : group-rows ( bitmap bitmap-dim -- rows )
     first <sliced-groups> ; inline
