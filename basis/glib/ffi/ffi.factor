@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.destructors alien.libraries
 alien.strings alien.syntax combinators io.encodings.utf8 kernel
-gobject-introspection gobject-introspection.standard-types
+gobject.ffi gobject-introspection gobject-introspection.standard-types
 system ;
 IN: glib.ffi
 
@@ -16,7 +16,7 @@ LIBRARY: glib
 } cond
 >>
 
-IMPLEMENT-STRUCTS: GError GPollFD GSource GSourceFuncs ;
+IMPLEMENT-STRUCTS: GPollFD GSource GSourceFuncs ;
 
 CONSTANT: G_MININT8   HEX: -80
 CONSTANT: G_MAXINT8   HEX:  7f

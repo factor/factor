@@ -17,7 +17,7 @@ LIBRARY: gobject
 } cond
 >>
 
-IMPLEMENT-STRUCTS: GValue GParamSpecVariant ;
+IMPLEMENT-STRUCTS: GError GValue GParamSpecVariant ;
 
 GIR: vocab:gobject/GObject-2.0.gir
 
