@@ -36,6 +36,9 @@ IN: io.files.windows.tests
 [ t ] [ "\\\\?\\c:" root-directory? ] unit-test
 [ f ] [ "\\\\?\\c:\\bar" root-directory? ] unit-test
 
+[ "\\\\a\\b\\c\\foo.xls" ] [ "//a/b/c/foo.xls" normalize-path ] unit-test
+[ "\\\\a\\b\\c\\foo.xls" ] [ "\\\\a\\b\\c\\foo.xls" normalize-path ] unit-test
+
 [ "\\foo\\bar" ] [ "/foo/bar" normalize-path ":" split1 nip ] unit-test
 
 [ "\\\\?\\C:\\builds\\factor\\log.txt" ] [
