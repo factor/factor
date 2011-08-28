@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2010 Slava Pestov.
+! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.data accessors io.binary math math.bitwise
 alien.accessors kernel kernel.private sequences
@@ -41,8 +41,12 @@ TUPLE: bit-array
 
 PRIVATE>
 
+ERROR: bad-array-length n ;
+
 : <bit-array> ( n -- bit-array )
-    dup bits>bytes <byte-array> bit-array boa ; inline
+    dup 0 < [ bad-array-length ] when
+    dup bits>bytes <byte-array>
+    bit-array boa ; inline
 
 M: bit-array length length>> ; inline
 
