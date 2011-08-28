@@ -13,7 +13,7 @@ HELP: ffi-errors
 
 HELP: supported-engines
 { $values
-    { "value" array }
+    { "seq" array }
 }
 { $description "An " { $link array } " of " { $link string } "s representing all valid " { $emphasis "layout engines" } ". For example, the " { $emphasis "dot" } " engine is typically included in a Graphviz installation, so " { $snippet "\"dot\"" } " will be an element of " { $link supported-engines } ". See " { $url "http://graphviz.org/Documentation.php" } " for more details." }
 { $notes "This constant's definition is determined at parse-time by asking the system's Graphviz installation what engines are supported." }
@@ -21,7 +21,7 @@ HELP: supported-engines
 
 HELP: supported-formats
 { $values
-    { "value" array }
+    { "seq" array }
 }
 { $description "An " { $link array } " of " { $link string } "s representing all valid " { $emphasis "layout formats" } ". For example, Graphviz can typically render using the Postscript format, in which case " { $snippet "\"ps\"" } " will be an element of " { $link supported-formats } ". See " { $url "http://graphviz.org/Documentation.php" } " for more details." }
 { $notes "This constant's definition is determined at parse-time by asking the system's Graphviz installation what formats are supported."
