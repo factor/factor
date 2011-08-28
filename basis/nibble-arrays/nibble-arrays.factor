@@ -30,7 +30,10 @@ CONSTANT: nibble BIN: 1111
 
 PRIVATE>
 
+ERROR: bad-array-length n ;
+
 : <nibble-array> ( n -- nibble-array )
+    dup 0 < [ bad-array-length ] when
     dup nibbles>bytes <byte-array> nibble-array boa ; inline
 
 M: nibble-array length length>> ;
