@@ -110,7 +110,7 @@ PRIVATE>
 <PRIVATE
 
 : define-graphviz-by-engine ( -K -- )
-    [ create-in dup make-inline ]
+    [ "graphviz.render" create dup make-inline ]
     [ [ graphviz ] curry ] bi
     (( graph -O -T -- ))
     define-declared ;
@@ -118,7 +118,7 @@ PRIVATE>
 : define-graphviz-by-format ( -T -- )
     [
         dup supported-engines member? [ "-file" append ] when
-        create-in dup make-inline
+        "graphviz.render" create dup make-inline
     ]
     [ [ graphviz* ] curry ] bi
     (( graph -O -- ))
