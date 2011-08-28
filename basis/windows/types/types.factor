@@ -16,6 +16,8 @@ TYPEDEF: wchar_t             WCHAR
 
 TYPEDEF: short               SHORT
 TYPEDEF: ushort              USHORT
+TYPEDEF: short               INT16
+TYPEDEF: ushort              UINT16
 
 TYPEDEF: ushort              WORD
 TYPEDEF: ulong               DWORD
@@ -94,7 +96,7 @@ TYPEDEF: HANDLE              HDDEDATA
 TYPEDEF: HANDLE              HDESK
 TYPEDEF: HANDLE              HDROP
 TYPEDEF: HANDLE              HDWP
-TYPEDEF: HANDLE              HENMETAFILE
+TYPEDEF: HANDLE              HENHMETAFILE
 TYPEDEF: HANDLE              HFONT
 TYPEDEF: HANDLE              HGDIOBJ
 TYPEDEF: HANDLE              HGLOBAL
@@ -398,3 +400,5 @@ STRUCT: TEXTMETRICW
     { tmCharSet BYTE } ;
 
 TYPEDEF: TEXTMETRICW* LPTEXTMETRIC
+
+TYPEDEF: ULONG PROPID

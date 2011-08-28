@@ -100,6 +100,13 @@ IN: tools.deploy.shaker
         run-file
     ] when ;
 
+: strip-gtk-icon ( -- )
+    "ui.backend.gtk" vocab [
+        "Stripping GTK icon loading code" show
+        "vocab:tools/deploy/shaker/strip-gtk-icon.factor"
+        run-file
+    ] when ;
+
 : strip-specialized-arrays ( -- )
     strip-dictionary? "specialized-arrays" vocab and [
         "Stripping specialized arrays" show
@@ -542,6 +549,7 @@ SYMBOL: deploy-vocab
     strip-call
     strip-cocoa
     strip-gobject
+    strip-gtk-icon
     strip-debugger
     strip-ui-error-hook
     strip-specialized-arrays

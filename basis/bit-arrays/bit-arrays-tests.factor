@@ -2,6 +2,8 @@ USING: alien sequences sequences.private arrays bit-arrays kernel
 tools.test math random ;
 IN: bit-arrays.tests
 
+[ -1 <bit-array> ] [ T{ bad-array-length f -1 } = ] must-fail-with
+
 [ 100 ] [ 100 <bit-array> length ] unit-test
 
 [
