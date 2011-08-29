@@ -1,9 +1,9 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words sequences quotations namespaces io vectors
 arrays hashtables classes.tuple math accessors prettyprint
 prettyprint.config assocs prettyprint.backend prettyprint.custom
-prettyprint.sections parser compiler.tree.builder
+prettyprint.sections parser random compiler.tree.builder
 compiler.tree.optimizer cpu.architecture compiler.cfg.builder
 compiler.cfg.linearization compiler.cfg.registers
 compiler.cfg.stack-frame compiler.cfg.linear-scan
@@ -12,7 +12,8 @@ compiler.cfg.instructions compiler.cfg.utilities
 compiler.cfg.def-use compiler.cfg.rpo
 compiler.cfg.representations compiler.cfg.gc-checks
 compiler.cfg.save-contexts compiler.cfg
-compiler.cfg.representations.preferred ;
+compiler.cfg.representations.preferred
+compiler.cfg.scheduling compiler.units ;
 FROM: compiler.cfg.linearization => number-blocks ;
 IN: compiler.cfg.debugger
 
@@ -132,3 +133,8 @@ M: rs-loc pprint* \ R pprint-loc ;
 
 : contains-insn? ( quot insn-check -- ? )
     count-insns 0 > ; inline
+
+! Random instruction scheduling exposes bugs in
+! compiler.cfg.dependencies
+: random-scheduling ( -- )
+    [ \ score [ drop 100 random ] define ] with-compilation-unit ;
