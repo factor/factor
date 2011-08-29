@@ -4,8 +4,9 @@
 USING: strings arrays hashtables assocs sequences fry macros
 cocoa.messages cocoa.classes cocoa.application cocoa kernel
 namespaces io.backend math cocoa.enumeration byte-arrays
-combinators alien.c-types alien.data words core-foundation
-quotations core-foundation.data core-foundation.utilities ;
+combinators alien.c-types alien.data words quotations
+core-foundation core-foundation.data core-foundation.strings
+core-foundation.utilities ;
 IN: cocoa.plists
 
 : >plist ( value -- plist ) >cf -> autorelease ;
@@ -17,9 +18,6 @@ IN: cocoa.plists
 DEFER: plist>
 
 <PRIVATE
-
-: (plist-NSString>) ( NSString -- string )
-    -> UTF8String ;
 
 : (plist-NSNumber>) ( NSNumber -- number )
     dup -> doubleValue dup >integer =
@@ -55,7 +53,7 @@ ERROR: invalid-plist-object object ;
 
 : plist> ( plist -- value )
     {
-        { NSString [ (plist-NSString>) ] }
+        { NSString [ CF>string ] }
         { NSNumber [ (plist-NSNumber>) ] }
         { NSData [ (plist-NSData>) ] }
         { NSArray [ (plist-NSArray>) ] }
