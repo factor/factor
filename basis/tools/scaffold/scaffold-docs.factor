@@ -61,6 +61,9 @@ HELP: scaffold-factor-boot-rc
 HELP: scaffold-factor-rc
 { $description "Touches the .factor-rc file in your home directory and provides a clickable link to open it in an editor." } ;
 
+HELP: scaffold-factor-roots
+{ $description "Touches the .factor-roots file in your home directory and provides a clickable link to open it in an editor." } ;
+
 HELP: scaffold-rc
 { $values
     { "path" "a pathname string" }
@@ -87,6 +90,7 @@ ARTICLE: "tools.scaffold" "Scaffold tool"
     scaffold-rc
     scaffold-factor-boot-rc
     scaffold-factor-rc
+    scaffold-factor-roots
     scaffold-emacs
 }
 ;
