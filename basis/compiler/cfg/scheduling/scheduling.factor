@@ -80,40 +80,6 @@ conditional-branch-insn
         [ (reorder) ] V{ } make reverse
     ] dip 3append ;
 
-ERROR: not-all-instructions-were-scheduled old-bb new-bb ;
-
-SYMBOL: check-scheduling?
-f check-scheduling? set-global
-
-:: check-instructions ( new-bb old-bb -- )
-    new-bb old-bb [ instructions>> ] bi@
-    [ [ length ] bi@ = ] [ [ unique ] bi@ = ] 2bi and
-    [ old-bb new-bb not-all-instructions-were-scheduled ] unless ;
-
-ERROR: definition-after-usage vregs old-bb new-bb ;
-
-:: check-usages ( new-bb old-bb -- )
-    HS{ } clone :> useds
-    new-bb instructions>> split-3-ways drop nip
-    [| insn |
-        insn uses-vregs [ useds adjoin ] each
-        insn defs-vregs :> defs-vregs
-        defs-vregs useds intersects?
-        [ defs-vregs old-bb new-bb definition-after-usage ] when
-    ] each ;
-
-: check-scheduling ( new-bb old-bb -- )
-    [ check-instructions ] [ check-usages ] 2bi ;
-
-: with-scheduling-check ( bb quot: ( bb -- ) -- )
-    check-scheduling? get [
-        over dup clone
-        [ call( bb -- ) ] 2dip
-        check-scheduling
-    ] [
-        call( bb -- )
-    ] if ; inline
-
 : number-insns ( insns -- )
     [ >>insn# drop ] each-index ;
 
@@ -122,12 +88,10 @@ ERROR: definition-after-usage vregs old-bb new-bb ;
 
 : schedule-block ( bb -- )
     [
-        [
-            [ number-insns ]
-            [ reorder ]
-            [ clear-numbers ] tri
-        ] change-instructions drop
-    ] with-scheduling-check ;
+        [ number-insns ]
+        [ reorder ]
+        [ clear-numbers ] tri
+    ] change-instructions drop ;
 
 : schedule-instructions ( cfg -- cfg' )
     dup [
