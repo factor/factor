@@ -55,6 +55,7 @@ UNION: slot-insn
     ##read ##write ;
 
 UNION: memory-insn
+    ##allot
     ##load-memory ##load-memory-imm
     ##store-memory ##store-memory-imm
     ##write-barrier ##write-barrier-imm
