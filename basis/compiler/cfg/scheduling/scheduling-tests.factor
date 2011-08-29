@@ -1,16 +1,9 @@
 USING: compiler.cfg.scheduling compiler.cfg.instructions
-vocabs.loader namespaces tools.test arrays kernel ;
+vocabs.loader namespaces tools.test arrays kernel random
+words compiler.units ;
 IN: compiler.cfg.scheduling.tests
 
-! Recompile compiler.cfg.scheduling with extra tests,
-! and see if any errors come up. Back when there were
-! errors of this kind, they always surfaced this way.
-
-t check-scheduling? [
-    [ ] [ "compiler.cfg.scheduling" reload ] unit-test
-    [ ] [ "compiler.cfg.dependence" reload ] unit-test
-] with-variable
-
+! Test split-3-ways
 [
     { }
     { }
