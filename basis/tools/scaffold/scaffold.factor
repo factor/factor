@@ -347,6 +347,8 @@ SYMBOL: examples-flag
 : scaffold-factor-rc ( -- )
     ".factor-rc" scaffold-rc ;
 
+: scaffold-factor-roots ( -- )
+    ".factor-roots" scaffold-rc ;
 
 HOOK: scaffold-emacs os ( -- )
 
