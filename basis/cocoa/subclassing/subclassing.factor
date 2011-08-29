@@ -48,7 +48,7 @@ IN: cocoa.subclassing
 : prepare-methods ( methods -- methods )
     [
         [ first4 prepare-method 3array ] map
-    ] with-compilation-unit ;
+    ] with-nested-compilation-unit ;
 
 :: (redefine-objc-method) ( class method -- )
     method init-method :> ( sel imp types )
