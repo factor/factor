@@ -43,7 +43,7 @@ M: gir-not-found summary
     ] if ;
 
 : define-gir-vocab ( path -- )
-    resolve-gir-path dup "  loading " write print
+    resolve-gir-path dup "Loading " write print
     file>xml xml>repository
     {
         [ namespace>> name>> current-namespace-name set-global ]
