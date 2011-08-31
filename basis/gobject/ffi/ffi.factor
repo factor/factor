@@ -4,9 +4,12 @@ USING: alien alien.destructors alien.libraries alien.syntax kernel
 combinators gobject-introspection literals math system vocabs.loader ;
 IN: gobject.ffi
 
+! these two are needed for the definition of GError and others.
+! otherwise we generate GError and some others in this vocab as well.
 <<
 "glib.ffi" require
 >>
+USE: glib.ffi
 
 LIBRARY: gobject
 
@@ -17,7 +20,7 @@ LIBRARY: gobject
 } cond
 >>
 
-IMPLEMENT-STRUCTS: GError GValue GParamSpecVariant ;
+IMPLEMENT-STRUCTS: GValue GParamSpecVariant ;
 
 GIR: vocab:gobject/GObject-2.0.gir
 
