@@ -237,6 +237,12 @@ M: array-type field-type>c-type type>c-type ;
         [ [ methods>> ] keep def-methods ]
     } cleave ;
 
+: find-existing-boxed-type ( boxed -- type/f )
+    c-type>> search [
+        dup [ c-type? ] [ "c-type" word-prop ] bi or
+        [ drop f ] unless
+    ] [ f ] if* ;
+
 : def-boxed-type ( boxed -- )
     c-type>> void def-c-type ;
 
@@ -290,10 +296,19 @@ M: array-type field-type>c-type type>c-type ;
 : defer-enums ( enums -- ) enum-info defer-types ;
 : defer-bitfields ( bitfields -- ) bitfield-info defer-types ;
 : defer-unions ( unions -- ) union-info defer-types ;
-: defer-boxeds ( boxeds -- ) boxed-info defer-types ;
 : defer-callbacks ( callbacks -- ) callback-info defer-types ;
 : defer-interfaces ( interfaces -- ) interface-info defer-types ;
 : defer-classes ( class -- ) class-info defer-types ;
+
+: defer-boxeds ( boxeds -- )
+    [
+        [
+            dup find-existing-boxed-type
+            [ nip ] [ c-type>> defer-c-type ] if*
+        ]
+        [ name>> qualified-name ] bi
+        boxed-info new swap register-type
+    ] each ;
 
 : defer-records ( records -- )
     [ private-record? ] partition
@@ -303,10 +318,13 @@ M: array-type field-type>c-type type>c-type ;
 : def-enums ( enums -- ) [ def-enum-type ] each ;
 : def-bitfields ( bitfields -- ) [ def-bitfield-type ] each ;
 : def-unions ( unions -- ) [ def-union ] each ;
-: def-boxeds ( boxeds -- ) [ def-boxed-type ] each ;
 : def-callbacks ( callbacks -- ) [ def-callback-type ] each ;
 : def-interfaces ( interfaces -- ) [ def-interface ] each ;
 : def-classes ( classes -- ) [ def-class ] each ;
+
+: def-boxeds ( boxeds -- )
+    [ find-existing-boxed-type not ] filter
+    [ def-boxed-type ] each ;
 
 : def-records ( records -- )
     [ private-record? ] partition
