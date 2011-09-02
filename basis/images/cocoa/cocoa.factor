@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors alien.data cocoa cocoa.classes cocoa.messages
 combinators core-foundation.data core-graphics.types fry images
-images.loader io kernel literals math sequences ;
+images.loader io kernel math sequences ;
 IN: images.cocoa
 
 SINGLETON: ns-image
@@ -36,9 +36,9 @@ ERROR: ns-image-planar-images-not-supported ;
 
 : check-return ( n -- )
     {
-        { $ NSImageRepLoadStatusUnknownType   [ ns-image-unknown-type   ] }
-        { $ NSImageRepLoadStatusInvalidData   [ ns-image-invalid-data   ] }
-        { $ NSImageRepLoadStatusUnexpectedEOF [ ns-image-unexpected-eof ] }
+        { NSImageRepLoadStatusUnknownType   [ ns-image-unknown-type   ] }
+        { NSImageRepLoadStatusInvalidData   [ ns-image-invalid-data   ] }
+        { NSImageRepLoadStatusUnexpectedEOF [ ns-image-unexpected-eof ] }
         [ drop ]
     } case ;
 
