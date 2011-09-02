@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces sequences words io assocs
-quotations strings parser lexer arrays xml.data xml.writer
+quotations strings parser lexer arrays xml.data
 splitting vectors sequences.deep combinators fry memoize ;
 IN: xml.traversal
 
