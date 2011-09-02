@@ -2,11 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
 combinators continuations destructors fry io io.backend
-io.backend.unix io.directories io.encodings.binary
+io.directories io.encodings.binary
 io.encodings.utf8 io.files io.pathnames io.files.types kernel
 math.bitwise sequences system unix unix.stat vocabs.loader
 classes.struct unix.ffi literals libc ;
 IN: io.directories.unix
+
+CONSTANT: file-mode OCT: 0666
 
 CONSTANT: touch-mode flags{ O_WRONLY O_APPEND O_CREAT O_EXCL }
 

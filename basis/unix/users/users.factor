@@ -1,11 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings assocs
-byte-arrays classes.struct combinators
-combinators.short-circuit continuations fry grouping
-io.backend.unix io.encodings.utf8 kernel math math.parser
-namespaces sequences splitting strings system unix unix.ffi
-vocabs.loader ;
+byte-arrays classes.struct combinators combinators.short-circuit
+continuations fry grouping io.encodings.utf8 kernel math
+math.parser namespaces sequences splitting strings system unix
+unix.ffi vocabs.loader ;
 QUALIFIED: unix.ffi
 IN: unix.users
 
