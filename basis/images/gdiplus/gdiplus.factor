@@ -1,9 +1,8 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors alien.c-types alien.data alien.enums
-classes.struct destructors images images.loader
-io.streams.limited kernel locals math windows.com
-windows.gdiplus windows.streams windows.types typed
-byte-arrays grouping sequences ;
+classes.struct destructors images images.loader kernel locals
+math windows.com windows.gdiplus windows.streams windows.types
+typed byte-arrays grouping sequences ;
 IN: images.gdiplus
 
 SINGLETON: gdi+-image
