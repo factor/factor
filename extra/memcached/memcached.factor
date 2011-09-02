@@ -21,6 +21,15 @@ SYMBOL: memcached-server
     memcached-server get-global
     binary [ call ] with-client ; inline
 
+ERROR: key-not-found ;
+ERROR: key-exists ;
+ERROR: value-too-large ;
+ERROR: invalid-arguments ;
+ERROR: item-not-stored ;
+ERROR: value-not-numeric ;
+ERROR: unknown-command ;
+ERROR: out-of-memory ;
+
 <PRIVATE
 
 ! Commands
@@ -103,14 +112,14 @@ TUPLE: request cmd key val extra opaque cas ;
 
 : check-status ( header -- )
     [ 5 ] dip nth {
-        { NOT_FOUND    [ "key not found" throw     ] }
-        { EXISTS       [ "key exists" throw        ] }
-        { TOO_LARGE    [ "value too large" throw   ] }
-        { INVALID_ARGS [ "invalid arguments" throw ] }
-        { NOT_STORED   [ "item not stored" throw   ] }
-        { NOT_NUMERIC  [ "value not numeric" throw ] }
-        { UNKNOWN_CMD  [ "unknown command" throw   ] }
-        { MEMORY       [ "out of memory" throw     ] }
+        { NOT_FOUND    [ key-not-found     ] }
+        { EXISTS       [ key-exists        ] }
+        { TOO_LARGE    [ value-too-large   ] }
+        { INVALID_ARGS [ invalid-arguments ] }
+        { NOT_STORED   [ item-not-stored   ] }
+        { NOT_NUMERIC  [ value-not-numeric ] }
+        { UNKNOWN_CMD  [ unknown-command   ] }
+        { MEMORY       [ out-of-memory     ] }
         [ drop ]
     } case ;
 
