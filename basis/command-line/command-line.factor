@@ -3,7 +3,7 @@
 USING: init continuations hashtables io io.encodings.utf8
 io.files io.pathnames kernel kernel.private namespaces parser
 sequences source-files strings system splitting vocabs.loader
-alien.strings accessors eval ;
+alien.strings accessors ;
 IN: command-line
 
 SYMBOL: script
@@ -71,41 +71,3 @@ SYMBOL: main-vocab-hook
     ] bind ;
 
 [ default-cli-args ] "command-line" add-startup-hook
-
-: cli-usage ( -- )
-"""
-Usage: """ write vm file-name write """ [Factor arguments] [script] [script arguments]
-
-Common arguments:
-    -help            print this message and exit
-    -i=<image>       load Factor image file <image> (default """ write vm file-name write """.image)
-    -run=<vocab>     run the MAIN: entry point of <vocab>
-    -e=<code>        evaluate <code>
-    -quiet           suppress "Loading vocab.factor" messages
-    -no-user-init    suppress loading of .factor-rc
-
-Enter
-    "command-line" help
-from within Factor for more information.
-
-""" write ;
-
-: command-line-startup ( -- )
-    (command-line) parse-command-line
-    "help" get "-help" get or "h" get or [ cli-usage ] [
-        "e" get script get or "quiet" [
-            load-vocab-roots
-            run-user-init
-
-            "e" get script get or [
-                "e" get [ eval( -- ) ] when*
-                script get [ run-script ] when*
-            ] [
-                "run" get run
-            ] if
-        ] with-variable
-    ] if
-
-    output-stream get [ stream-flush ] when*
-    0 exit ;
-
