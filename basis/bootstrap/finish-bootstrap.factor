@@ -1,5 +1,4 @@
-USING: init command-line debugger system continuations
-namespaces eval kernel vocabs.loader io ;
+USING: init command-line.startup debugger system continuations ;
 
 [
     boot
