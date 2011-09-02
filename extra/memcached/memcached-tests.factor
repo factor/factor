@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: arrays assocs calendar math math.functions memcached
-memcached.private kernel present sequences system threads
-tools.test ;
+memcached.private kernel present sequences sorting system
+threads tools.test ;
 
 IN: memcached.tests
 
@@ -95,7 +95,7 @@ PRIVATE>
 [ "5" x m/set ] with-memcached
 [ "valuex" y m/set ] with-memcached
 [ { "5" "valuex" } ] [
-    [ x y z 3array m/getseq values ] with-memcached
+    [ x y z 3array m/getseq values natural-sort ] with-memcached
 ] unit-test
 
 
