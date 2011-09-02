@@ -9,8 +9,7 @@ io.encodings.utf8 io.files kernel libc literals locals math
 math.bitwise math.order math.vectors namespaces sequences
 strings system threads ui ui.backend
 ui.backend.gtk.input-methods ui.backend.gtk.io ui.clipboards
-ui.commands ui.event-loop ui.gadgets ui.gadgets.editors
-ui.gadgets.menus ui.gadgets.private ui.gadgets.worlds
+ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
 vocabs.loader combinators ;
 IN: ui.backend.gtk
