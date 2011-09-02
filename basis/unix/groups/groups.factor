@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 assocs byte-arrays classes.struct combinators
-combinators.short-circuit continuations fry io.backend.unix
-io.encodings.utf8 kernel math math.parser namespaces sequences
-splitting strings unix unix.ffi unix.users unix.utilities ;
+combinators.short-circuit continuations fry io.encodings.utf8
+kernel math math.parser namespaces sequences splitting strings
+unix unix.ffi unix.users unix.utilities ;
 QUALIFIED: unix.ffi
 QUALIFIED: grouping
 IN: unix.groups
