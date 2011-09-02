@@ -106,7 +106,7 @@ $nl
 { $subsections run-user-init } ;
 
 ARTICLE: ".factor-roots" "Additional vocabulary roots file"
-"The vocabulary roots file is named " { $snippet ".factor-roots" } " on Windows and " { $snippet ".factor-roots" } " on Unix. If it exists, it is loaded every time Factor starts. It contains a newline-separated list of " { $link "vocabs.roots" } "."
+"The vocabulary roots file is named " { $snippet ".factor-roots" } ". If it exists, it is loaded every time Factor starts. It contains a newline-separated list of " { $link "vocabs.roots" } "."
 $nl
 "A word to run this file from an existing Factor session:"
 { $subsections load-vocab-roots } ;
