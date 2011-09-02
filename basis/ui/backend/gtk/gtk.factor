@@ -3,18 +3,16 @@
 USING: accessors alien.accessors alien.c-types alien.data
 alien.strings arrays assocs classes.struct command-line
 continuations destructors environment gdk.ffi gdk.gl.ffi
-gdk.pixbuf.ffi glib.ffi
-gobject-introspection.standard-types
-gobject.ffi gtk.ffi gtk.gl.ffi io.backend
-io.backend.unix.multiplexers io.encodings.binary
-io.encodings.utf8 io.files io.thread kernel libc literals
-locals math math.bitwise math.order math.vectors namespaces
-sequences strings system threads ui ui.backend ui.backend.gtk.input-methods
-ui.backend.gtk.io ui.clipboards
+gdk.pixbuf.ffi glib.ffi gobject-introspection.standard-types
+gobject.ffi gtk.ffi gtk.gl.ffi io io.encodings.binary
+io.encodings.utf8 io.files kernel libc literals locals math
+math.bitwise math.order math.vectors namespaces sequences
+strings system threads ui ui.backend
+ui.backend.gtk.input-methods ui.backend.gtk.io ui.clipboards
 ui.commands ui.event-loop ui.gadgets ui.gadgets.editors
 ui.gadgets.menus ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.pixel-formats ui.pixel-formats.private
-ui.private vocabs.loader combinators io ;
+ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
+vocabs.loader combinators ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
