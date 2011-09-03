@@ -7,6 +7,10 @@ IN: multiline
 ERROR: bad-heredoc identifier ;
 
 <PRIVATE
+
+: rest-of-line ( -- seq )
+    lexer get [ line-text>> ] [ column>> ] bi tail ;
+
 : next-line-text ( -- str )
     lexer get dup next-line line-text>> ;
 
@@ -16,11 +20,16 @@ ERROR: bad-heredoc identifier ;
         [ drop lexer get next-line ]
         [ % "\n" % (parse-here) ] if
     ] [ ";" unexpected-eof ] if* ;
+
 PRIVATE>
 
+ERROR: text-found-before-eol string ;
+
 : parse-here ( -- str )
-    [ (parse-here) ] "" make but-last
-    lexer get next-line ;
+    [
+        rest-of-line dup [ drop ] [ text-found-before-eol ] if-empty
+        (parse-here)
+    ] "" make but-last ;
 
 SYNTAX: STRING:
     CREATE-WORD
@@ -47,9 +56,6 @@ SYNTAX: STRING:
         [ skip-n-chars + end-text (scan-multiline-string) ]
         change-column drop
     ] "" make ;
-
-: rest-of-line ( -- seq )
-    lexer get [ line-text>> ] [ column>> ] bi tail ;
 
 :: advance-same-line ( text -- )
     lexer get [ text length + ] change-column drop ;
