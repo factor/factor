@@ -84,6 +84,7 @@ IN: sets.tests
 [ 0 ] [ f cardinality ] unit-test
 [ 0 ] [ { } cardinality ] unit-test
 [ 1 ] [ { 1 } cardinality ] unit-test
+[ 1 ] [ { 1 1 } cardinality ] unit-test
 [ 1 ] [ HS{ 1 } cardinality ] unit-test
 [ 3 ] [ HS{ 1 2 3 } cardinality ] unit-test
 [ 0 ] [ 0 <bit-set> cardinality ] unit-test
