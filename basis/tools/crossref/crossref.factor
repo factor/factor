@@ -119,7 +119,7 @@ M: f smart-usage drop \ f smart-usage ;
     smart-usage
     [ "No usages." print ] [ sorted-definitions. ] if-empty ;
 
-: vocab-xref ( vocab quot -- vocabs )
+: vocab-xref ( vocab quot: ( defspec -- seq ) -- vocabs )
     [ [ vocab-name ] [ words [ generic? not ] filter ] bi ] dip map
     [
         [ [ word? ] [ generic? not ] bi and ] filter [
