@@ -1,7 +1,9 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010, 2011 Joe Groff, Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data cocoa cocoa.classes cocoa.messages
-combinators core-foundation.data core-graphics.types fry images
-images.loader io kernel math sequences ;
+combinators core-foundation.data core-graphics
+core-graphics.types fry locals images images.loader io kernel
+math sequences ;
 IN: images.cocoa
 
 SINGLETON: ns-image
@@ -44,23 +46,18 @@ ERROR: ns-image-planar-images-not-supported ;
 
 PRIVATE>
 
-: load-image-rep ( -- image-rep )
-    NSBitmapImageRep contents <CFData> -> autorelease -> imageRepWithData:
-    NSColorSpace -> genericRGBColorSpace
-    NSColorRenderingIntentDefault
-    -> bitmapImageRepByConvertingToColorSpace:renderingIntent: ;
+: <CGImage> ( byte-array -- image-rep )
+    [ NSBitmapImageRep ] dip
+    <CFData> -> autorelease
+    -> imageRepWithData:
+    -> CGImage ;
 
-: image-rep>image ( image-rep -- image )
-    image new swap {
-        [ -> size CGSize>dim [ >integer ] map >>dim ]
-        [ -> bitmapData ]
-        [ -> bytesPerPlane memory>byte-array >>bitmap ]
-    } cleave
-        RGBA >>component-order
-        ubyte-components >>component-type
-        t >>premultiplied-alpha?
-        f >>upside-down? ;
+:: CGImage>image ( image -- image )
+    image CGImageGetWidth :> w
+    image CGImageGetHeight :> h
+    { w h } [
+        0 0 w h <CGRect> image CGContextDrawImage
+    ] make-bitmap-image ;
 
 M: ns-image stream>image
-    drop
-    [ load-image-rep ] with-input-stream image-rep>image ;
+    drop stream-contents <CGImage> CGImage>image ;
