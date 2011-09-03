@@ -99,6 +99,20 @@ FUNCTION: void CGContextSetShouldSmoothFonts (
    bool shouldSmoothFonts
 ) ;
 
+FUNCTION: void CGContextDrawImage (
+   CGContextRef c,
+   CGRect rect,
+   CGImageRef image
+) ;
+
+FUNCTION: size_t CGImageGetWidth (
+   CGImageRef image
+) ;
+
+FUNCTION: size_t CGImageGetHeight (
+   CGImageRef image
+) ;
+
 FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
 
 CONSTANT: kCGLRendererGenericFloatID HEX: 00020400
