@@ -148,9 +148,10 @@ syn match factorMultiStringContents /.*/ contained
 "syn match factorStackEffectErr /\<)\>/
 "syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
 "syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
-syn match factorStackEffect /(\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+)\>/ contained contains=factorStackDelims,factorStackItems,factorCallExecuteDelim
-syn match factorLiteralStackEffect /((\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+))\>/ contained contains=factorStackDelims,factorStackItems
-syn match factorStackItems contained "\<\S\+\>"
+syn match factorStackEffect /(\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+)\>/ contained contains=factorStackDelims,factorStackItems,factorStackVariables,factorCallExecuteDelim
+syn match factorLiteralStackEffect /((\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+))\>/ contained contains=factorStackDelims,factorStackItems,factorStackVariables,factorCallExecuteDelim
+syn match factorStackVariables contained "\<\.\.\S\+\>"
+syn match factorStackItems contained "\<\(\.\.\)\@!\S\+\>"
 syn keyword factorStackDelims contained ( ) (( )) --
 syn match factorCallExecuteDelim contained /(\s/
 
@@ -204,6 +205,7 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorStackEffect            Typedef
     HiLink factorStackDelims            Delimiter
     HiLink factorCallExecuteDelim       Delimiter
+    HiLink factorStackVariables         Special
     HiLink factorStackItems             Identifier
     HiLink factorLiteralStackEffect     Typedef
     HiLink factorTodo                   Todo
