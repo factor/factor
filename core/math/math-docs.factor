@@ -262,7 +262,7 @@ HELP: if-zero
 HELP: when-zero
 { $values
      { "n" number } { "quot" "the first quotation of an " { $link if-zero } } }
-{ $description "Makes an implicit check if the sequence is empty. A zero is dropped and the " { $snippet "quot" } " is called." }
+{ $description "Makes an implicit check if the number is zero. A zero is dropped and the " { $snippet "quot" } " is called." }
 { $examples "This word is equivalent to " { $link if-zero } " with an empty second quotation:"
     { $example
     "USING: math prettyprint ;"
