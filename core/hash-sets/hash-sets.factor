@@ -9,7 +9,9 @@ IN: hash-sets
 TUPLE: hash-set { table hashtable read-only } ;
 
 : <hash-set> ( members -- hash-set )
-    H{ } clone [ [ dupd set-at ] curry each ] keep hash-set boa ;
+    dup length <hashtable> [
+        [ dupd set-at ] curry each
+    ] keep hash-set boa ;
 
 INSTANCE: hash-set set
 M: hash-set in? table>> key? ; inline
