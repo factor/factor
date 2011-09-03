@@ -3,7 +3,7 @@
 ! A copy of the license is available at http://factorcode.org/license.txt
 USING: arrays formatting fry grouping io kernel locals math math.functions
     math.matrices math.parser math.primes.factors math.vectors prettyprint
-    sequences sequences.deep sets ;
+    sequences sequences.deep ;
 IN: benchmark.pidigits
 
 : extract ( z x -- n )
