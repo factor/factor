@@ -164,7 +164,7 @@ TUPLE: long-long-type < c-type ;
 : <long-long-type> ( -- c-type )
     long-long-type new ;
 
-: if-void ( c-type true false -- )
+: if-void ( ..a c-type true: ( ..a -- ..b ) false: ( ..a c-type -- ..b ) -- ..b )
     pick void? [ drop nip call ] [ nip call ] if ; inline
 
 SYMBOLS:
