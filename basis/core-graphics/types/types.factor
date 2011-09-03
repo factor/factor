@@ -76,6 +76,8 @@ STRUCT: CGAffineTransform
 TYPEDEF: void* CGColorRef
 TYPEDEF: void* CGColorSpaceRef
 TYPEDEF: void* CGContextRef
+TYPEDEF: void* CGImageRef
+
 TYPEDEF: uint CGBitmapInfo
 
 TYPEDEF: int CGLError
