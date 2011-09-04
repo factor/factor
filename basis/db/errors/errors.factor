@@ -38,6 +38,11 @@ TUPLE: sql-function-missing < sql-error message ;
     \ sql-function-missing new
         swap >>message ;
 
+TUPLE: sql-database-exists < sql-error message ;
+: <sql-database-exists> ( message -- error )
+    \ sql-database-exists new
+        swap >>message ;
+
 : ignore-error ( quot word -- )
     '[ dup _ execute [ drop ] [ rethrow ] if ] recover ; inline
 
@@ -52,3 +57,6 @@ TUPLE: sql-function-missing < sql-error message ;
 
 : ignore-function-missing ( quot -- )
     \ sql-function-missing? ignore-error ; inline
+
+: ignore-database-exists ( quot -- )
+    \ sql-database-exists? ignore-error ; inline

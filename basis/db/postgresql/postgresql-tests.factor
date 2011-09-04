@@ -3,7 +3,9 @@ prettyprint sequences namespaces tools.test db db.private
 db.tuples db.types unicode.case accessors system db.tester ;
 IN: db.postgresql.tests
 
+
 os windows? cpu x86.64? and [
+    ! Ensure the table exists
     [ ] [ postgresql-test-db [ ] with-db ] unit-test
 
     [ ] [

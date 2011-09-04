@@ -3,19 +3,29 @@
 USING: concurrency.combinators db.pools db.sqlite db.tuples
 db.types kernel math random threads tools.test db sequences
 io prettyprint db.postgresql accessors io.files.temp
-namespaces fry system math.parser ;
+namespaces fry system math.parser db.queries assocs ;
 IN: db.tester
+
+: postgresql-test-db-name ( -- string )
+    cpu name>> "-" "factor-test" 3append
+    H{ { CHAR: - CHAR: _ } { CHAR: . CHAR: _ } } substitute ;
 
 : postgresql-test-db ( -- postgresql-db )
     <postgresql-db>
         "localhost" >>host
         "postgres" >>username
         "thepasswordistrust" >>password
-        "factor-test" >>database ;
+        postgresql-test-db-name >>database ;
+
+: postgresql-template1-db ( -- postgresql-db )
+    <postgresql-db>
+        "localhost" >>host
+        "postgres" >>username
+        "thepasswordistrust" >>password
+        "template1" >>database ;
 
 : sqlite-test-db ( -- sqlite-db )
     "tuples-test.db" temp-file <sqlite-db> ;
-
 
 ! These words leak resources, but are useful for interactivel testing
 : set-sqlite-db ( -- )
@@ -31,6 +41,10 @@ IN: db.tester
     ] call ; inline
 
 : test-postgresql ( quot -- )
+    postgresql-template1-db [
+        postgresql-test-db-name ensure-database
+    ] with-db
+
     '[
         os windows? cpu x86.64? and [
             [ ] [ postgresql-test-db _ with-db ] unit-test

@@ -15,6 +15,10 @@ TableError =
     | Error ("relation "|"table ")(!(" does not exist").)+:table " does not exist"
         => [[ table >string unquote <sql-table-missing> ]]
 
+DatabaseError =
+    Error ("database")(!(" already exists").)+:database " already exists"
+        => [[ database >string <sql-database-exists> ]]
+
 FunctionError =
     Error "function" (!(" already exists").)+:table " already exists"
         => [[ table >string <sql-function-exists> ]]
@@ -29,7 +33,7 @@ SyntaxError =
 
 UnknownError = .* => [[ >string <sql-unknown-error> ]]
 
-PostgresqlSqlError = (TableError | FunctionError | SyntaxError | UnknownError) 
+PostgresqlSqlError = (TableError | DatabaseError | FunctionError | SyntaxError | UnknownError) 
 
 ;EBNF
 
