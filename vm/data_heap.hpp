@@ -32,6 +32,9 @@ struct data_heap {
 	bool high_fragmentation_p();
 	bool low_memory_p();
 	void mark_all_cards();
+	cell high_water_mark() {
+		return nursery->size + aging->size;
+	}
 };
 
 struct data_heap_room {
