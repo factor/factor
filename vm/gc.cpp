@@ -116,19 +116,19 @@ void factor_vm::start_gc_again()
 	switch(current_gc->op)
 	{
 	case collect_nursery_op:
+		/* Nursery collection can fail if aging does not have enough
+		free space to fit all live objects from nursery. */
 		current_gc->op = collect_aging_op;
 		break;
 	case collect_aging_op:
+		/* Aging collection can fail if the aging semispace cannot fit
+		all the live objects from the other aging semispace and the
+		nursery. */
 		current_gc->op = collect_to_tenured_op;
 		break;
-	case collect_to_tenured_op:
-		current_gc->op = collect_full_op;
-		break;
-	case collect_full_op:
-	case collect_compact_op:
-		current_gc->op = collect_growing_heap_op;
-		break;
 	default:
+		/* Nothing else should fail mid-collection due to insufficient
+		space in the target generation. */
 		critical_error("Bad GC op",current_gc->op);
 		break;
 	}
@@ -148,10 +148,16 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 	assert(!gc_off);
 	assert(!current_gc);
 
+	/* Important invariant: tenured space must have enough contiguous free
+	space to fit the entire contents of the aging space and nursery. This is
+	because when doing a full collection, objects from younger generations
+	are promoted before any unreachable tenured objects are freed. */
+	assert(!data->high_fragmentation_p());
+
 	current_gc = new gc_state(op,this);
 
-	/* Keep trying to GC higher and higher generations until we don't run out
-	of space */
+	/* Keep trying to GC higher and higher generations until we don't run
+	out of space in the target generation. */
 	for(;;)
 	{
 		try
@@ -164,17 +170,23 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 				collect_nursery();
 				break;
 			case collect_aging_op:
+				/* We end up here if the above fails. */
 				collect_aging();
 				if(data->high_fragmentation_p())
 				{
+					/* Change GC op so that if we fail again,
+					we crash. */
 					set_current_gc_op(collect_full_op);
 					collect_full(trace_contexts_p);
 				}
 				break;
 			case collect_to_tenured_op:
+				/* We end up here if the above fails. */
 				collect_to_tenured();
 				if(data->high_fragmentation_p())
 				{
+					/* Change GC op so that if we fail again,
+					we crash. */
 					set_current_gc_op(collect_full_op);
 					collect_full(trace_contexts_p);
 				}
@@ -197,7 +209,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 		}
 		catch(const must_start_gc_again &)
 		{
-			/* We come back here if a generation is full */
+			/* We come back here if the target generation is full. */
 			start_gc_again();
 			continue;
 		}
@@ -207,6 +219,9 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 
 	delete current_gc;
 	current_gc = NULL;
+
+	/* Check the invariant again, just in case. */
+	assert(!data->high_fragmentation_p());
 }
 
 /* primitive_minor_gc() is invoked by inline GC checks, and it needs to fill in
@@ -283,7 +298,7 @@ void factor_vm::primitive_compact_gc()
 object *factor_vm::allot_large_object(cell type, cell size)
 {
 	/* If tenured space does not have enough room, collect and compact */
-	if(!data->tenured->can_allot_p(size))
+	if(!data->tenured->can_allot_p(size + data->high_water_mark()))
 	{
 		primitive_compact_gc();
 
