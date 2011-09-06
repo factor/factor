@@ -6,14 +6,14 @@ io.timeouts kernel math math.functions memcached
 memcached.private namespaces present sequences sorting system
 threads tools.test ;
 
+QUALIFIED: memcached
+
 IN: memcached.tests
 
 ! Use a version of with-memcached that sets a timeout
 : with-memcached ( quot -- )
-    memcached-server get-global binary [
-        5 seconds input-stream get set-timeout
-        call
-    ] with-client ; inline
+    [ 5 seconds input-stream get set-timeout ] prepose
+    memcached:with-memcached ; inline
 
 <PRIVATE
 
