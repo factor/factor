@@ -1,9 +1,8 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors timers alien.c-types calendar classes.struct
 continuations destructors fry kernel math math.order memory
-namespaces sequences specialized-vectors system
-ui ui.gadgets.worlds vm vocabs.loader arrays
-tools.time.struct locals ;
+namespaces sequences system ui ui.gadgets.worlds vm
+vocabs.loader arrays locals ;
 IN: game.loop
 
 TUPLE: game-loop
@@ -16,19 +15,6 @@ TUPLE: game-loop
     tick-timer
     draw-timer
     benchmark-data ;
-
-STRUCT: game-loop-benchmark
-    { benchmark-data-pair benchmark-data-pair }
-    { tick# ulonglong }
-    { frame# ulonglong } ;
-
-SPECIALIZED-VECTOR: game-loop-benchmark
-
-: <game-loop-benchmark> ( benchmark-data-pair tick frame -- obj )
-    \ game-loop-benchmark <struct>
-        swap >>frame#
-        swap >>tick#
-        swap >>benchmark-data-pair ; inline
 
 GENERIC: tick* ( delegate -- )
 GENERIC: draw* ( tick-slice delegate -- )
@@ -48,26 +34,24 @@ TUPLE: game-loop-error game-loop error ;
 
 <PRIVATE
 
-: record-benchmarking ( benchark-data-pair loop -- )
-    [ tick#>> ]
-    [ frame#>> <game-loop-benchmark> ]
-    [ benchmark-data>> ] tri push ;
-
 : last-tick-percent-offset ( loop -- float )
     [ draw-timer>> iteration-start-nanos>> nano-count swap - ]
     [ tick-interval-nanos>> ] bi /f 1.0 min ;
+
+GENERIC# record-benchmarking 1 ( loop quot -- )
+
+M: object record-benchmarking
+    call( loop -- ) ;
 
 : redraw ( loop -- )
     [ 1 + ] change-frame#
     [
         [ last-tick-percent-offset ] [ draw-delegate>> ] bi
-        [ draw* ] with-benchmarking
-    ] keep record-benchmarking ;
+        draw*
+    ] record-benchmarking ;
 
 : tick ( loop -- )
-    [
-        [ tick-delegate>> tick* ] with-benchmarking
-    ] keep record-benchmarking ;
+    [ tick-delegate>> tick* ] record-benchmarking ;
 
 : increment-tick ( loop -- )
     [ 1 + ] change-tick#
@@ -105,9 +89,7 @@ PRIVATE>
     [ tick-timer>> ] [ draw-timer>> ] bi [ stop-timer ] bi@ ;
 
 : <game-loop*> ( tick-interval-nanos tick-delegate draw-delegate -- loop )
-    f 0 0 f f
-    game-loop-benchmark-vector{ } clone
-    game-loop boa ;
+    f 0 0 f f f game-loop boa ;
 
 : <game-loop> ( tick-interval-nanos delegate -- loop )
     dup <game-loop*> ; inline
@@ -116,3 +98,5 @@ M: game-loop dispose
     stop-loop ;
 
 { "game.loop" "prettyprint" } "game.loop.prettyprint" require-when
+! { "game.loop" "tools.memory" } "game.loop.benchmark" require-when
+"game.loop.benchmark" require
