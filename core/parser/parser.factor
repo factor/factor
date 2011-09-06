@@ -5,7 +5,7 @@ sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
 io.files vocabs io.encodings.utf8 source-files classes
 hashtables compiler.units accessors sets lexer vocabs.parser
- slots parser.notes ;
+slots parser.notes ;
 IN: parser
 
 : location ( -- loc )
@@ -135,7 +135,7 @@ print-use-hook [ [ ] ] initialize
     ] with-file-vocabs ;
 
 : parsing-file ( file -- )
-    "quiet" get [ drop ] [ "Loading " write print flush ] if ;
+    parser-quiet? get [ drop ] [ "Loading " write print flush ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
     swap assoc-diff keys [

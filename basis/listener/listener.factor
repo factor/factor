@@ -4,7 +4,8 @@ USING: arrays hashtables io kernel math math.parser memory
 namespaces parser lexer sequences strings io.styles
 vectors words generic system combinators continuations debugger
 definitions compiler.units accessors colors prettyprint fry
-sets vocabs.parser source-files.errors locals vocabs vocabs.loader ;
+sets vocabs.parser source-files.errors locals vocabs vocabs.loader
+parser.notes ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -107,6 +108,7 @@ t error-summary? set-global
     ] [ drop ] if ;
 
 :: (listener) ( datastack -- )
+    parser-quiet? off
     error-summary? get [ error-summary ] when
     visible-vars.
     datastack datastack.
