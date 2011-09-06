@@ -341,11 +341,11 @@ void factor_vm::collect_compact(bool trace_contexts_p)
 	code->flush_icache();
 }
 
-void factor_vm::collect_growing_heap(cell requested_bytes, bool trace_contexts_p)
+void factor_vm::collect_growing_heap(cell requested_size, bool trace_contexts_p)
 {
 	/* Grow the data heap and copy all live objects to the new heap. */
 	data_heap *old = data;
-	set_data_heap(data->grow(requested_bytes));
+	set_data_heap(data->grow(requested_size));
 	collect_mark_impl(trace_contexts_p);
 	collect_compact_code_impl(trace_contexts_p);
 	code->flush_icache();

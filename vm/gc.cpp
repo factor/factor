@@ -143,7 +143,7 @@ void factor_vm::set_current_gc_op(gc_op op)
 	if(gc_events) current_gc->event->op = op;
 }
 
-void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
+void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p)
 {
 	assert(!gc_off);
 	assert(!current_gc);
@@ -198,7 +198,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 				collect_compact(trace_contexts_p);
 				break;
 			case collect_growing_heap_op:
-				collect_growing_heap(requested_bytes,trace_contexts_p);
+				collect_growing_heap(requested_size,trace_contexts_p);
 				break;
 			default:
 				critical_error("Bad GC op",current_gc->op);
@@ -298,12 +298,13 @@ void factor_vm::primitive_compact_gc()
 object *factor_vm::allot_large_object(cell type, cell size)
 {
 	/* If tenured space does not have enough room, collect and compact */
-	if(!data->tenured->can_allot_p(size + data->high_water_mark()))
+	cell requested_size = size + data->high_water_mark();
+	if(!data->tenured->can_allot_p(requested_size))
 	{
 		primitive_compact_gc();
 
 		/* If it still won't fit, grow the heap */
-		if(!data->tenured->can_allot_p(size))
+		if(!data->tenured->can_allot_p(requested_size))
 		{
 			gc(collect_growing_heap_op,
 				size, /* requested size */
