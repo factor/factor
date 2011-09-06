@@ -11,7 +11,7 @@ source-files definitions debugger quotations.private combinators
 combinators.short-circuit math.order math.private accessors
 slots.private generic.single.private compiler.units
 compiler.constants fry locals bootstrap.image.syntax
-generalizations ;
+generalizations parser.notes ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -606,6 +606,7 @@ PRIVATE>
 
 : make-image ( arch -- )
     [
+        f parser-quiet? set
         architecture set
         "resource:/core/bootstrap/stage1.factor" run-file
         build-image

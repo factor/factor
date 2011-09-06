@@ -5,7 +5,7 @@ kernel.private math memory continuations kernel io.files
 io.pathnames io.backend system parser vocabs sequences
 vocabs.loader combinators splitting source-files strings
 definitions assocs compiler.units math.parser
-generic sets command-line ;
+generic sets command-line parser.notes ;
 IN: bootstrap.stage2
 
 SYMBOL: core-bootstrap-time
@@ -61,6 +61,8 @@ SYMBOL: bootstrap-time
 [
     ! We time bootstrap
     nano-count
+
+    parser-quiet? off
 
     default-image-name "output-image" set-global
 
