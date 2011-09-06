@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables kernel sets
 sequences parser ;
-QUALIFIED: sets
+
 IN: hash-sets
 
 ! In a better implementation, less memory would be used
