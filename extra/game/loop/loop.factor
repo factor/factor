@@ -98,5 +98,4 @@ M: game-loop dispose
     stop-loop ;
 
 { "game.loop" "prettyprint" } "game.loop.prettyprint" require-when
-! { "game.loop" "tools.memory" } "game.loop.benchmark" require-when
-"game.loop.benchmark" require
+{ "game.loop" "tools.memory" } "game.loop.benchmark" require-when
