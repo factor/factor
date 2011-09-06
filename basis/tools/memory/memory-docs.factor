@@ -48,3 +48,11 @@ HELP: gc-summary.
 
 HELP: gc-events
 { $var-description "A sequence of " { $link gc-event } " instances, set by " { $link collect-gc-events } ". Can be inspected directly, or with the " { $link gc-events. } ", " { $link gc-stats. } " and " { $link gc-summary. } " words." } ;
+
+HELP: data-room
+{ $values { "data-heap-room" data-heap-room } }
+{ $description "Queries the VM for memory usage information." } ;
+
+HELP: code-room
+{ $values { "mark-sweep-sizes" mark-sweep-sizes } }
+{ $description "Queries the VM for memory usage information." } ;
