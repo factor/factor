@@ -3,7 +3,7 @@
 USING: init continuations hashtables io io.encodings.utf8
 io.files io.pathnames kernel kernel.private namespaces parser
 sequences source-files strings system splitting vocabs.loader
-alien.strings accessors ;
+alien.strings accessors parser.notes ;
 IN: command-line
 
 SYMBOL: script
@@ -40,7 +40,7 @@ SYMBOL: command-line
     "=" split1 [ var-param ] [ bool-param ] if* ;
 
 : run-script ( file -- )
-    t "quiet" [
+    t parser-quiet? [
         [ run-file ]
         [ source-file main>> [ execute( -- ) ] when* ] bi
     ] with-variable ;
@@ -63,10 +63,8 @@ SYMBOL: main-vocab-hook
 
 : default-cli-args ( -- )
     global [
-        "quiet" off
         "e" off
         "user-init" on
-        embedded? "quiet" set
         main-vocab "run" set
     ] bind ;
 

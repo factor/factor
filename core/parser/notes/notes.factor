@@ -3,16 +3,13 @@
 USING: namespaces kernel source-files lexer accessors io math.parser ;
 IN: parser.notes
 
-SYMBOL: parser-notes
+SYMBOL: parser-quiet?
 
-t parser-notes set-global
-
-: parser-notes? ( -- ? )
-    parser-notes get "quiet" get not and ;
+t parser-quiet? set-global
 
 : note. ( str -- )
-    parser-notes? [
+    parser-quiet? get [
         file get [ path>> write ":" write ] when* 
         lexer get [ line>> number>string write ": " write ] when*
         "Note:" print dup print
-    ] when drop ;
+    ] unless drop ;
