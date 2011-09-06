@@ -314,8 +314,8 @@ struct factor_vm
 	void collect_compact_impl(bool trace_contexts_p);
 	void collect_compact_code_impl(bool trace_contexts_p);
 	void collect_compact(bool trace_contexts_p);
-	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
-	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p);
+	void collect_growing_heap(cell requested_size, bool trace_contexts_p);
+	void gc(gc_op op, cell requested_size, bool trace_contexts_p);
 	void scrub_context(context *ctx);
 	void scrub_contexts();
 	void primitive_minor_gc();

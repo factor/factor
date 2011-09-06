@@ -103,6 +103,7 @@ call( -- )
     "system.private"
     "threads.private"
     "tools.dispatch.private"
+    "tools.memory.private"
     "tools.profiler.private"
     "words"
     "words.private"
@@ -515,12 +516,12 @@ tuple
     { "float>bignum" "math.private" "primitive_float_to_bignum" (( x -- y )) }
     { "float>fixnum" "math.private" "primitive_float_to_fixnum" (( x -- y )) }
     { "all-instances" "memory" "primitive_all_instances" (( -- array )) }
-    { "(code-blocks)" "memory.private" "primitive_code_blocks" (( -- array )) }
-    { "code-room" "memory" "primitive_code_room" (( -- code-room )) }
+    { "(code-blocks)" "tools.memory.private" "primitive_code_blocks" (( -- array )) }
+    { "(code-room)" "tools.memory.private" "primitive_code_room" (( -- code-room )) }
     { "compact-gc" "memory" "primitive_compact_gc" (( -- )) }
-    { "data-room" "memory" "primitive_data_room" (( -- data-room )) }
-    { "disable-gc-events" "memory" "primitive_disable_gc_events" (( -- events )) }
-    { "enable-gc-events" "memory" "primitive_enable_gc_events" (( -- )) }
+    { "(data-room)" "tools.memory.private" "primitive_data_room" (( -- data-room )) }
+    { "disable-gc-events" "tools.memory.private" "primitive_disable_gc_events" (( -- events )) }
+    { "enable-gc-events" "tools.memory.private" "primitive_enable_gc_events" (( -- )) }
     { "gc" "memory" "primitive_full_gc" (( -- )) }
     { "minor-gc" "memory" "primitive_minor_gc" (( -- )) }
     { "size" "memory" "primitive_size" (( obj -- n )) }

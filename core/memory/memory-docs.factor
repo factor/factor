@@ -9,14 +9,6 @@ HELP: instances
 HELP: gc ( -- )
 { $description "Performs a full garbage collection." } ;
 
-HELP: data-room ( -- data-room )
-{ $values { "data-room" data-room } }
-{ $description "Queries the VM for memory usage information." } ;
-
-HELP: code-room ( -- code-room )
-{ $values { "code-room" code-room } }
-{ $description "Queries the VM for memory usage information." } ;
-
 HELP: size ( obj -- n )
 { $values { "obj" "an object" } { "n" "a size in bytes" } }
 { $description "Outputs the size of the object in memory, in bytes. Tagged immediate objects such as fixnums and " { $link f } " will yield a size of 0." } ;

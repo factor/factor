@@ -112,11 +112,14 @@ void factor_vm::collect_full(bool trace_contexts_p)
 
 	if(data->low_memory_p())
 	{
+		/* Full GC did not free up enough memory. Grow the heap. */
 		set_current_gc_op(collect_growing_heap_op);
 		collect_growing_heap(0,trace_contexts_p);
 	}
 	else if(data->high_fragmentation_p())
 	{
+		/* Enough free memory, but it is not contiguous. Perform a
+		compaction. */
 		set_current_gc_op(collect_compact_op);
 		collect_compact_impl(trace_contexts_p);
 	}
