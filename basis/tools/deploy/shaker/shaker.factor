@@ -481,7 +481,7 @@ SYMBOL: deploy-vocab
     set-startup-quot ;
 
 : startup-stripper ( -- )
-    t "quiet" set-global
+    t parser-quiet? set-global
     f output-stream set-global
     [ V{ "resource:" } clone vocab-roots set-global ]
     "vocabs.loader" startup-hooks get-global set-at ;

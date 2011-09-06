@@ -13,7 +13,6 @@ Common arguments:
     -i=<image>       load Factor image file <image> (default """ write vm file-name write """.image)
     -run=<vocab>     run the MAIN: entry point of <vocab>
     -e=<code>        evaluate <code>
-    -quiet           suppress "Loading vocab.factor" messages
     -no-user-init    suppress loading of .factor-rc
 
 Enter
@@ -25,17 +24,15 @@ from within Factor for more information.
 : command-line-startup ( -- )
     (command-line) parse-command-line
     "help" get "-help" get or "h" get or [ cli-usage ] [
-        "e" get script get or "quiet" [
-            load-vocab-roots
-            run-user-init
-
-            "e" get script get or [
-                "e" get [ eval( -- ) ] when*
-                script get [ run-script ] when*
-            ] [
-                "run" get run
-            ] if
-        ] with-variable
+        load-vocab-roots
+        run-user-init
+    
+        "e" get script get or [
+            "e" get [ eval( -- ) ] when*
+            script get [ run-script ] when*
+        ] [
+            "run" get run
+        ] if
     ] if
 
     output-stream get [ stream-flush ] when*
