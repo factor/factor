@@ -1,11 +1,19 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs calendar math math.functions memcached
-memcached.private kernel present sequences sorting system
+USING: arrays assocs calendar io io.encodings.binary io.sockets
+io.timeouts kernel math math.functions memcached
+memcached.private namespaces present sequences sorting system
 threads tools.test ;
 
 IN: memcached.tests
+
+! Use a version of with-memcached that sets a timeout
+: with-memcached ( quot -- )
+    memcached-server get-global binary [
+        5 seconds input-stream get set-timeout
+        call
+    ] with-client ; inline
 
 <PRIVATE
 
