@@ -14,10 +14,8 @@ void factor_vm::collect_aging()
 	/* Promote objects referenced from tenured space to tenured space, copy
 	everything else to the aging semi-space, and reset the nursery pointer. */
 	{
-		/* Change the op so that if we fail here, we proceed to a full
-		tenured collection. We are collecting to tenured space, and
-		cards were unmarked, so we can't proceed with a to_tenured
-		collection. */
+		/* Change the op so that if we fail here, an assertion will be
+		raised. */
 		current_gc->op = collect_to_tenured_op;
 
 		to_tenured_collector collector(this);

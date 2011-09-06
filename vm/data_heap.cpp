@@ -100,12 +100,12 @@ void data_heap::reset_generation(tenured_space *gen)
 
 bool data_heap::high_fragmentation_p()
 {
-	return (tenured->largest_free_block() <= nursery->size + aging->size);
+	return (tenured->largest_free_block() <= high_water_mark());
 }
 
 bool data_heap::low_memory_p()
 {
-	return (tenured->free_space() <= nursery->size + aging->size);
+	return (tenured->free_space() <= high_water_mark());
 }
 
 void data_heap::mark_all_cards()

@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2010 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2004, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors alien alien.accessors alien.private arrays
 byte-arrays classes continuations.private effects generic
@@ -10,7 +10,7 @@ quotations.private sbufs sbufs.private sequences
 sequences.private slots.private strings strings.private system
 threads.private classes.tuple classes.tuple.private vectors
 vectors.private words words.private definitions assocs summary
-compiler.units system.private combinators
+compiler.units system.private combinators tools.memory.private
 combinators.short-circuit locals locals.backend locals.types
 combinators.private stack-checker.values generic.single
 generic.single.private alien.libraries tools.dispatch.private
@@ -348,13 +348,13 @@ M: object infer-call* \ call bad-macro-input ;
 \ callstack-for { c-ptr } { callstack } define-primitive \ callstack make-flushable
 \ callstack>array { callstack } { array } define-primitive \ callstack>array make-flushable
 \ check-datastack { array integer integer } { object } define-primitive \ check-datastack make-flushable
-\ code-room { } { byte-array } define-primitive \ code-room  make-flushable
+\ (code-room) { } { byte-array } define-primitive \ (code-room)  make-flushable
 \ compact-gc { } { } define-primitive
 \ compute-identity-hashcode { object } { } define-primitive
 \ context-object { fixnum } { object } define-primitive \ context-object make-flushable
 \ context-object-for { fixnum c-ptr } { object } define-primitive \ context-object-for make-flushable
 \ current-callback { } { fixnum } define-primitive \ current-callback make-flushable
-\ data-room { } { byte-array } define-primitive \ data-room make-flushable
+\ (data-room) { } { byte-array } define-primitive \ (data-room) make-flushable
 \ datastack { } { array } define-primitive \ datastack make-flushable
 \ datastack-for { c-ptr } { array } define-primitive \ datastack-for make-flushable
 \ die { } { } define-primitive
