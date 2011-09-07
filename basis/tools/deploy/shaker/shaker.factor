@@ -375,7 +375,7 @@ IN: tools.deploy.shaker
                 vocabs:vocab-observers
                 vocabs.loader:add-vocab-root-hook
                 word
-                parser-notes
+                parser-quiet?
             } %
 
             { } { "layouts" } strip-vocab-globals %
