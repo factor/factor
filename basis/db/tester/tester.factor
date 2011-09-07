@@ -41,12 +41,12 @@ IN: db.tester
     ] call ; inline
 
 : test-postgresql ( quot -- )
-    postgresql-template1-db [
-        postgresql-test-db-name ensure-database
-    ] with-db
 
     '[
         os windows? cpu x86.64? and [
+            postgresql-template1-db [
+                postgresql-test-db-name ensure-database
+            ] with-db
             [ ] [ postgresql-test-db _ with-db ] unit-test
         ] unless
     ] call ; inline
