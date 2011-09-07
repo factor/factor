@@ -507,7 +507,7 @@ TUPLE: another-forget-accessors-test ;
 
 ! Shadowing test
 [ f ] [
-    t parser-notes? [
+    f parser-quiet? [
         [
             "IN: classes.tuple.tests TUPLE: shadow-1 a b ; TUPLE: shadow-2 < shadow-1 a b ;" eval( -- )
         ] with-string-writer empty?
