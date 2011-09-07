@@ -62,7 +62,9 @@ SYMBOL: bootstrap-time
     ! We time bootstrap
     nano-count
 
-    parser-quiet? off
+    ! parser.notes sets this to t in the global namespace.
+    ! We have to change it back in finish-bootstrap.factor
+    f parser-quiet? set-global
 
     default-image-name "output-image" set-global
 
