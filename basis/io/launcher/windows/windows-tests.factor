@@ -51,7 +51,7 @@ IN: io.launcher.windows.tests
 
 [ ] [
     <process>
-        console-vm "-run=hello-world" 3array >>command
+        console-vm "-run=hello-world" 2array >>command
         "out.txt" temp-file >>stdout
     try-process
 ] unit-test
