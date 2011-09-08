@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data alien.strings
 arrays byte-arrays classes.struct combinators kernel math
 namespaces specialized-arrays system
 vocabs.loader windows windows.advapi32
-windows.errors windows.kernel32 words ;
+windows.errors windows.kernel32 words system-info ;
 SPECIALIZED-ARRAY: ushort
 IN: system-info.windows
 
