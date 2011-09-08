@@ -1,5 +1,5 @@
-! Copyright (C) 2011 Alex Vondrak.  See
-! http://factorcode.org/license.txt for BSD license.
+! Copyright (C) 2011 Alex Vondrak.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.cfg compiler.cfg.graphviz
 compiler.cfg.gvn compiler.cfg.gvn.expressions
 compiler.cfg.gvn.graph compiler.cfg.optimizer continuations
