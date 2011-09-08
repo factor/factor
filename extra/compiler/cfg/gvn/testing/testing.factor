@@ -39,7 +39,8 @@ M: object expr>str unparse ;
     vregs>vns get invert-assoc >alist natural-sort [
         first2
         natural-sort [ number>string ] map ", " join
-        "<%d> : {%s}\\l" sprintf
+        over exprs>vns get value-at expr>str
+        "<%d> : {%s} (%s)\\l" sprintf
     ] map "" concat-as ;
 
 : basic-block# ( -- n )
@@ -47,7 +48,7 @@ M: object expr>str unparse ;
 
 : add-gvns ( graph -- graph' )
     "gvns" add-node[
-        gvns congruence-classes "\\l\\l" glue =label
+        congruence-classes =label
         "plaintext" =shape
     ];
     "gvns" 0 add-edge[ "invis" =style ];

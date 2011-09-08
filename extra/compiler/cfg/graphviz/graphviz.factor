@@ -59,8 +59,8 @@ IN: compiler.cfg.graphviz
 
 : draw-cfg ( cfg pass pass# -- cfg )
     [ dup cfgviz ]
-    [ name>> "After " prepend =label ]
-    [ number>string svg ]
+    [ name>> "-" prepend ]
+    [ number>string prepend svg ]
     tri* ;
 
 SYMBOL: passes
