@@ -123,12 +123,14 @@ M: ##sub-imm rewrite sub-imm>add-imm ;
     ] [ f ] if ; inline
 
 : distribute-over-add? ( insn -- ? )
-    drop f ;
-    ! src1>> vreg>insn [ ##add-imm? ] with-available-uses? ;
+    final-iteration? get [
+        src1>> vreg>insn [ ##add-imm? ] with-available-uses?
+    ] [ drop f ] if ;
 
 : distribute-over-sub? ( insn -- ? )
-    drop f ;
-    ! src1>> vreg>insn [ ##sub-imm? ] with-available-uses? ;
+    final-iteration? get [
+        src1>> vreg>insn [ ##sub-imm? ] with-available-uses?
+    ] [ drop f ] if ;
 
 ! XXX next-vreg makes vregs>vns change on every iteration
 : distribute ( insn add-op mul-op -- new-insns/f )
