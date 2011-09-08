@@ -12,8 +12,8 @@ IN: benchmark.echo
 : udp-echo ( -- )
     [
         10000 iota [ 4 >be ] map
-        f 0 <inet4> <datagram>
-        f 0 <inet4> <datagram>
+        "127.0.0.1" 0 <inet4> <datagram>
+        "127.0.0.1" 0 <inet4> <datagram>
         [ send/recv ] 2curry each
     ] with-destructors ;
 
