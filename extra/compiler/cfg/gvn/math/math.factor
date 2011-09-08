@@ -1,7 +1,8 @@
-! Copyright (C) 2010 Slava Pestov.
+! Copyright (C) 2010 Slava Pestov, 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit
-cpu.architecture fry kernel layouts locals make math sequences
+cpu.architecture fry kernel layouts locals make math namespaces
+sequences
 compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.utilities
