@@ -223,3 +223,5 @@ FUNCTION: HRESULT SHGetDesktopFolder ( IShellFolder** ppshf ) ;
 
 FUNCTION: UINT DragQueryFileW ( HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch ) ;
 ALIAS: DragQueryFile DragQueryFileW
+
+FUNCTION: BOOL IsUserAnAdmin ( ) ;
