@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unix alien alien.c-types kernel math sequences strings
 io.backend.unix splitting io.encodings.utf8 io.encodings.string
-specialized-arrays alien.syntax ;
+specialized-arrays alien.syntax system-info ;
 SPECIALIZED-ARRAY: char
 IN: system-info.linux
 
@@ -23,3 +23,5 @@ FUNCTION-ALIAS: (uname)
 
 : kernel-version ( -- seq )
     release ".-" split harvest 5 "" pad-tail ;
+
+M: linux os-version f ;
