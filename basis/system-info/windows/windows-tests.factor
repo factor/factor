@@ -1,6 +1,6 @@
-USING: math.order strings system-info.backend
-system-info.windows tools.test ;
+USING: math math.order strings system-info.windows tools.test
+system-info ;
 IN: system-info.windows.tests
 
-[ t ] [ cpus 0 1024 between? ] unit-test
+[ t ] [ cpus integer? ] unit-test
 [ t ] [ username string? ] unit-test
