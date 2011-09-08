@@ -1,7 +1,6 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cpu.architecture grouping kernel
-sequences
+USING: accessors cpu.architecture kernel
 compiler.cfg.instructions
 compiler.cfg.utilities
 compiler.cfg.gvn.graph

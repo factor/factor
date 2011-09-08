@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov, 2011 Alex Vondrak
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces arrays assocs hashtables kernel accessors fry
 grouping sorting sets sequences locals
