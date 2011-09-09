@@ -39,11 +39,13 @@ SYMBOL: article-xref
 article-xref [ H{ } clone ] initialize
 
 GENERIC: valid-article? ( topic -- ? )
-GENERIC: article-name ( topic -- string )
 GENERIC: article-title ( topic -- string )
+GENERIC: article-name ( topic -- string )
 GENERIC: article-content ( topic -- content )
 GENERIC: article-parent ( topic -- parent )
 GENERIC: set-article-parent ( parent topic -- )
+
+M: object article-name article-title ;
 
 TUPLE: article title content loc ;
 
@@ -51,7 +53,6 @@ TUPLE: article title content loc ;
     f \ article boa ;
 
 M: article valid-article? drop t ;
-M: article article-name title>> ;
 M: article article-title title>> ;
 M: article article-content content>> ;
 
@@ -64,14 +65,12 @@ M: no-article summary
     articles get ?at [ no-article ] unless ;
 
 M: object valid-article? articles get key? ;
-M: object article-name article article-name ;
 M: object article-title article article-title ;
 M: object article-content article article-content ;
 M: object article-parent article-xref get at ;
 M: object set-article-parent article-xref get set-at ;
 
 M: link valid-article? name>> valid-article? ;
-M: link article-name name>> article-name ;
 M: link article-title name>> article-title ;
 M: link article-content name>> article-content ;
 M: link article-parent name>> article-parent ;
@@ -79,7 +78,6 @@ M: link set-article-parent name>> set-article-parent ;
 
 ! Special case: f help
 M: f valid-article? drop t ;
-M: f article-name drop \ f article-name ;
 M: f article-title drop \ f article-title ;
 M: f article-content drop \ f article-content ;
 M: f article-parent drop \ f article-parent ;
