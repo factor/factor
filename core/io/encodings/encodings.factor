@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2010 Daniel Ehrenberg, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel sequences sbufs vectors namespaces growable
-strings io classes continuations destructors combinators
-io.streams.plain splitting byte-arrays
-sequences.private accessors ;
+USING: accessors combinators destructors io io.streams.plain
+kernel math namespaces sbufs sequences sequences.private
+splitting strings ;
 IN: io.encodings
 
 ! The encoding descriptor protocol
@@ -69,14 +68,16 @@ M: decoder stream-read1
         ] when
     ] when nip ; inline
 
-: (read) ( n quot -- n string )
+! If we read the entire buffer, chars-read is f
+! If we hit EOF while reading, chars-read indicates how many chars were read
+: (read) ( chars-requested quot -- chars-read/f string )
     over 0 <string> [
         [
             over [ swapd set-nth-unsafe f ] [ 3drop t ] if
         ] curry compose find-integer
     ] keep ; inline
 
-: finish-read ( n string -- string/f )
+: finish-read ( n/f string -- string/f )
     {
         { [ over 0 = ] [ 2drop f ] }
         { [ over not ] [ nip ] }
@@ -84,8 +85,13 @@ M: decoder stream-read1
     } cond ; inline
 
 M: decoder stream-read
-    [ nip ] [ >decoder< [ decode-char ] 2curry (read) finish-read ] 2bi
-    fix-read ;
+    over 0 = [
+        2drop f
+    ] [
+        [ nip ]
+        [ >decoder< [ decode-char ] 2curry (read) finish-read ] 2bi
+        fix-read
+    ] if ;
 
 M: decoder stream-read-partial stream-read ;
 
@@ -104,13 +110,16 @@ M: decoder stream-read-partial stream-read ;
         { CHAR: \n [ line-ends\n ] }
     } case ; inline
 
-: ((read-until)) ( buf quot: ( -- char stop? ) -- string/f sep/f )
+! If the stop? branch is taken convert the sbuf to a string
+! If sep is present, returns ``string sep'' (string can be "")
+! If sep is f, returns ``string f'' or ``f f''
+: read-until-loop ( buf quot: ( -- char stop? ) -- string/f sep/f )
     dup call
-    [ [ drop "" like ] dip ]
-    [ pick push ((read-until)) ] if ; inline recursive
+    [ nip [ "" like ] dip [ f like f ] unless* ]
+    [ pick push read-until-loop ] if ; inline recursive
 
 : (read-until) ( quot -- string/f sep/f )
-    100 <sbuf> swap ((read-until)) ; inline
+    [ 100 <sbuf> ] dip read-until-loop ; inline
 
 : decoder-read-until ( seps stream encoding -- string/f sep/f )
     [ decode-char dup [ dup rot member? ] [ 2drop f t ] if ] 3curry
