@@ -1,10 +1,20 @@
 USING: tools.test io.streams.byte-array io.encodings.binary
 io.encodings.utf8 io kernel arrays strings namespaces math
-specialized-arrays alien.c-types ;
+specialized-arrays alien.c-types io.encodings.ascii ;
 SPECIALIZED-ARRAY: int
 IN: io.streams.byte-array.tests
 
 [ B{ } ] [ B{ } binary [ contents ] with-byte-reader ] unit-test
+
+! Issue #70 github
+[ f ] [ B{ } binary [ 0 read ] with-byte-reader ] unit-test
+[ f ] [ B{ } binary [ 1 read ] with-byte-reader ] unit-test
+[ f ] [ B{ } ascii [ 0 read ] with-byte-reader ] unit-test
+[ f ] [ B{ } ascii [ readln ] with-byte-reader ] unit-test
+[ f f ] [ B{ } ascii [ "a" read-until ] with-byte-reader ] unit-test
+[ f f ] [ B{ } binary [ { 2 } read-until ] with-byte-reader ] unit-test
+
+
 [ B{ 1 2 3 } ] [ binary [ B{ 1 2 3 } write ] with-byte-writer ] unit-test
 [ B{ 1 2 3 4 5 6 } ] [ binary [ B{ 1 2 3 } write B{ 4 5 6 } write ] with-byte-writer ] unit-test
 [ B{ 1 2 3 } ] [ { 1 2 3 } binary [ 3 read ] with-byte-reader ] unit-test
