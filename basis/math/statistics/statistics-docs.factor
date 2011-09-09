@@ -84,6 +84,22 @@ HELP: histogram
     }
 } ;
 
+
+HELP: histogram-by
+{ $values
+    { "seq" sequence }
+    { "quot" { $quotation "( x -- bin )" } }
+    { "hashtable" hashtable }
+}
+{ $description "Returns a hashtable where the keys are the elements of the sequence binned by being passed through " { $snippet "quot" } ", and the values are the number of times members of each bin appeared in that sequence." }
+{ $examples
+    { $example "! Count the number of times letters and non-letters appear in a sequence."
+               "USING: prettyprint math.statistics unicode.categories ;"
+               "\"aaa123bc\" [ letter? ] histogram-by ."
+               "H{ { f 3 } { t 5 } }"
+    }
+} ;
+
 HELP: histogram!
 { $values
     { "hashtable" hashtable } { "seq" sequence }
@@ -112,10 +128,10 @@ HELP: sorted-histogram
 
 HELP: sequence>assoc
 { $values
-    { "seq" sequence } { "quot1" quotation } { "quot2" quotation } { "exemplar" "an exemplar assoc" }
+    { "seq" sequence } { "map-quot" { $quotation "( x -- x' )" } } { "insert-quot" { $quotation "( x' assoc -- )" } } { "exemplar" "an exemplar assoc" }
     { "assoc" assoc }
 }
-{ $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created " { $snippet "assoc" } ". The first quotation gets passed an element from the sequence and should output whatever the second quotation needs, e.g. ( element -- value key ) if the second quotation is inserting into an assoc." }
+{ $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created " { $snippet "assoc" } ". The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
 { $examples
     { $example "! Iterate over a sequence and increment the count at each element"
                "! The first quotation has stack effect ( key -- key ), a no-op"
@@ -127,9 +143,9 @@ HELP: sequence>assoc
 
 HELP: sequence>assoc!
 { $values
-    { "assoc" assoc } { "seq" sequence } { "quot1" quotation } { "quot2" quotation }
+    { "assoc" assoc } { "seq" sequence } { "map-quot" { $quotation "( x -- x' )" } } { "insert-quot" { $quotation "( x' assoc -- )" } }
 }
-{ $description "Iterates over a sequence, allowing elements of the sequence to be added to an existing " { $snippet "assoc" } ". The first quotation gets passed an element from the sequence and should output whatever the second quotation needs, e.g. ( element -- value key ) if the second quotation is inserting into an assoc." }
+{ $description "Iterates over a sequence, allowing elements of the sequence to be added to an existing " { $snippet "assoc" } ". The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
 { $examples
     { $example "! Iterate over a sequence and add the counts to an existing assoc"
                "USING: assocs prettyprint math.statistics kernel ;"
@@ -140,10 +156,10 @@ HELP: sequence>assoc!
 
 HELP: sequence>hashtable
 { $values
-    { "seq" sequence } { "quot1" quotation } { "quot2" quotation }
+    { "seq" sequence } { "map-quot" { $quotation "( x -- x' )" } } { "insert-quot" { $quotation "( x' assoc -- )" } }
     { "hashtable" hashtable }
 }
-{ $description "Iterates over a sequence, allowing elements of the sequence to be added to a hashtable according a combination of the first and second quotations. The quot1 is passed each element, and quot2 gets the hashtable on the top of the stack with quot1's results underneath for inserting into the hashtable." }
+{ $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created hashtable. The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
 { $examples
     { $example "! Count the number of times an element occurs in a sequence"
                "USING: assocs prettyprint math.statistics ;"
@@ -156,6 +172,7 @@ ARTICLE: "histogram" "Computing histograms"
 "Counting elements in a sequence:"
 { $subsections
     histogram
+    histogram-by
     histogram!
     sorted-histogram
 }
