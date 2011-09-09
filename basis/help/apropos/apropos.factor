@@ -3,7 +3,8 @@
 USING: accessors arrays assocs fry help.markup help.topics io
 kernel make math math.parser namespaces sequences sorting
 summary tools.completion vocabs.hierarchy help.vocabs
-vocabs words unicode.case help unicode.categories ;
+vocabs words unicode.case help unicode.categories
+combinators locals ;
 IN: help.apropos
 
 : $completions ( seq -- )
@@ -15,28 +16,48 @@ IN: help.apropos
         ] if
     ] if ;
 
-TUPLE: more-completions seq ;
+SYMBOLS: word-result vocabulary-result article-result ;
+
+: category>title ( category -- name )
+    {
+        { word-result [ "Words" ] }
+        { vocabulary-result [ "Vocabularies" ] }
+        { article-result [ "Help articles" ] }
+    } case ;
+    
+: category>name ( category -- name )
+    {
+        { word-result [ "word" ] }
+        { vocabulary-result [ "vocabulary" ] }
+        { article-result [ "help article" ] }
+    } case ;
+
+TUPLE: more-completions seq search category ;
 
 CONSTANT: max-completions 5
 
 M: more-completions valid-article? drop t ;
 
 M: more-completions article-title
-    seq>> length number>string " results" append ;
-
-M: more-completions article-name
-    seq>> length max-completions - number>string " more results" append ;
-
+    [
+        "All " %
+        [ seq>> length # " " % ]
+        [ category>> category>name % ]
+        [ " results for “" % search>> % "”" % ] tri    
+    ] "" make ;
+    
 M: more-completions article-content
     seq>> [ second >lower ] sort-with keys \ $completions prefix ;
 
-: (apropos) ( completions title -- element )
-    [
-        '[
-            _ 1array \ $heading prefix ,
+:: (apropos) ( search completions category -- element )
+    completions [
+        [
+            { $heading search } ,
             [ max-completions short head keys \ $completions prefix , ]
-            [ dup length max-completions > [ more-completions boa <$link> , ] [ drop ] if ]
-            bi
+            [
+                length max-completions >
+                [ { $link T{ more-completions f completions search category } } , ] when
+            ] bi
         ] unless-empty
     ] { } make ;
 
@@ -47,9 +68,9 @@ M: more-completions article-content
 
 : $apropos ( str -- )
     first
-    [ words-matching "Words" (apropos) ]
-    [ vocabs-matching "Vocabularies" (apropos) ]
-    [ articles-matching "Help articles" (apropos) ]
+    [ dup words-matching word-result (apropos) ]
+    [ dup vocabs-matching vocabulary-result (apropos) ]
+    [ dup articles-matching article-result (apropos) ]
     tri 3array print-element ;
 
 TUPLE: apropos search ;
@@ -60,8 +81,6 @@ M: apropos valid-article? drop t ;
 
 M: apropos article-title
     search>> "Search results for “" "”" surround ;
-
-M: apropos article-name article-title ;
 
 M: apropos article-content
     search>> 1array \ $apropos prefix ;
