@@ -1,5 +1,5 @@
 USING: system-info.linux strings splitting sequences
-tools.test ;
+tools.test kernel ;
 IN: system-info.linux.tests
 
 [ 6 ] [ uname length ] unit-test
