@@ -96,12 +96,14 @@ ERROR: too-many-samples seq n ;
     [ over - 2.0 -64 ^ * ] dip
     * + ; inline
 
+: (cos-random-float) ( -- n )
+    0. 2. pi * uniform-random-float cos ;
+
+: (log-sqrt-random-float) ( -- n )
+    0. 1. uniform-random-float log -2. * sqrt ;
+
 : normal-random-float ( mean sigma -- n )
-    0.0 1.0 uniform-random-float
-    0.0 1.0 uniform-random-float
-    [ 2 pi * * cos ]
-    [ 1.0 swap - log -2.0 * sqrt ]
-    bi* * * + ;
+    (cos-random-float) (log-sqrt-random-float) * * + ;
 
 {
     { [ os windows? ] [ "random.windows" require ] }
