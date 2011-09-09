@@ -57,8 +57,7 @@ PRIVATE>
     image CGImageGetHeight :> h
     { w h } [
         0 0 w h <CGRect> image CGContextDrawImage
-    ] make-bitmap-image
-    t >>premultiplied-alpha? ;
+    ] make-bitmap-image ;
 
 M: ns-image stream>image
     drop stream-contents <CGImage> CGImage>image ;

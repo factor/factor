@@ -155,4 +155,5 @@ PRIVATE>
 : make-bitmap-image ( dim quot -- image )
     '[ <CGBitmapContext> &CGContextRelease @ ] make-memory-bitmap
     ARGB >>component-order
-    ubyte-components >>component-type ; inline
+    ubyte-components >>component-type
+    t >>premultiplied-alpha? ; inline
