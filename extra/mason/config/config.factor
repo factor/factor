@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar system io.files io.pathnames namespaces kernel
 accessors assocs ;
@@ -26,6 +26,12 @@ target-cpu get-global [ cpu target-cpu set-global ] unless
 SYMBOL: target-os
 
 target-os get-global [ os target-os set-global ] unless
+
+! (Optional) Architecture variant suffix.
+SYMBOL: target-variant
+
+! (Optional) Additional bootstrap flags.
+SYMBOL: boot-flags
 
 ! Keep test-log around?
 SYMBOL: builder-debug
@@ -61,10 +67,22 @@ SYMBOL: docs-update-url
 
 docs-update-url [ "http://builds.factorcode.org/docs-update" ] initialize
 
-! Boolean. Do we release binaries and update the clean branch?
-SYMBOL: upload-to-factorcode?
+! Boolean. Do we upload package binaries?
+SYMBOL: upload-package?
 
-! The below are only needed if upload-to-factorcode? is true.
+! Host to upload binary package to.
+SYMBOL: package-host
+
+! Username to log in.
+SYMBOL: package-username
+
+! Directory with binary packages.
+SYMBOL: package-directory
+
+! Boolean. Do we update the clean branch?
+SYMBOL: update-clean-branch?
+
+! The below are only needed if update-clean-branch? is true.
 
 ! Host with clean git repo.
 SYMBOL: branch-host
@@ -83,15 +101,6 @@ SYMBOL: image-username
 
 ! Directory with clean images.
 SYMBOL: image-directory
-
-! Host to upload binary package to.
-SYMBOL: upload-host
-
-! Username to log in.
-SYMBOL: upload-username
-
-! Directory with binary packages.
-SYMBOL: upload-directory
 
 ! Upload timeout
 SYMBOL: upload-timeout
