@@ -501,3 +501,30 @@ USING: alien.c-types alien ;
     void { } cdecl [ recursive-callback-2 drop ] alien-callback ; inline recursive
 
 [ recursive-callback-2 ] must-infer
+
+! test one-sided row polymorphism
+
+: poly-output ( x a: ( x -- ..a ) -- ..a ) call ; inline
+
+[ [ ] poly-output ] must-infer
+[ [ f f f ] poly-output ] must-infer
+
+: poly-input ( ..a a: ( ..a -- x ) -- x ) call ; inline
+
+[ [ ] poly-input ] must-infer
+[ [ drop drop drop ] poly-input ] must-infer
+
+: poly-output-input ( x a: ( x -- ..a ) b: ( ..a -- y ) -- y ) [ call ] bi@ ; inline
+
+[ [ ] [ ] poly-output-input ] must-infer
+[ [ f f f ] [ drop drop drop ] poly-output-input ] must-infer
+[ [ [ f f ] [ drop drop drop ] poly-output-input ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ f f f ] [ drop drop ] poly-output-input ] infer ] [ unbalanced-branches-error? ] must-fail-with
+
+: poly-input-output ( ..a a: ( ..a -- x ) b: ( x -- ..b ) -- ..b ) [ call ] bi@ ; inline
+
+[ [ ] [ ] poly-input-output ] must-infer
+[ [ drop drop drop ] [ f f f ] poly-input-output ] must-infer
+[ [ drop drop ] [ f f f ] poly-input-output ] must-infer
+[ [ drop drop drop ] [ f f ] poly-input-output ] must-infer
+
