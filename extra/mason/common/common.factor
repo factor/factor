@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences splitting system accessors
 math.functions make io io.files io.pathnames io.directories
@@ -7,6 +7,9 @@ combinators.short-circuit parser combinators math calendar
 calendar.format arrays mason.config locals debugger fry
 continuations strings io.sockets ;
 IN: mason.common
+
+: print-timestamp ( string -- )
+    now timestamp>string write bl print flush ;
 
 ERROR: no-host-name ;
 
