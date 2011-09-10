@@ -58,18 +58,18 @@ IN: math.statistics
 
 <PRIVATE
 
-: (sequence>assoc) ( seq map-quot: ( x -- x' ) insert-quot: ( x' assoc -- ) assoc -- assoc )
+: (sequence>assoc) ( seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) assoc -- assoc )
     [ swap curry compose each ] keep ; inline
 
 PRIVATE>
 
-: sequence>assoc! ( assoc seq map-quot: ( x -- x' ) insert-quot: ( x' assoc -- ) -- assoc )
+: sequence>assoc! ( assoc seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) -- assoc )
     4 nrot (sequence>assoc) ; inline
 
-: sequence>assoc ( seq map-quot: ( x -- x' ) insert-quot: ( x' assoc -- ) exemplar -- assoc )
+: sequence>assoc ( seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) exemplar -- assoc )
     clone (sequence>assoc) ; inline
 
-: sequence>hashtable ( seq map-quot: ( x -- x' ) insert-quot: ( x' assoc -- ) -- hashtable )
+: sequence>hashtable ( seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) -- hashtable )
     H{ } sequence>assoc ; inline
 
 : histogram! ( hashtable seq -- hashtable )
