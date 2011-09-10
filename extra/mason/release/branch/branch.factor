@@ -38,11 +38,10 @@ IN: mason.release.branch
 : upload-clean-image ( -- )
     5 [ upload-clean-image-cmd short-running-process ] retry ;
 
-: (update-clean-branch) ( -- )
-    "factor" [
-        push-to-clean-branch
-        upload-clean-image
-    ] with-directory ;
-
 : update-clean-branch ( -- )
-    upload-to-factorcode? get [ (update-clean-branch) ] when ;
+    update-clean-branch? get [
+        "factor" [
+            push-to-clean-branch
+            upload-clean-image
+        ] with-directory
+    ] when ;

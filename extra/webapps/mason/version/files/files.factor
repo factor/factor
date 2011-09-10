@@ -8,7 +8,7 @@ IN: webapps.mason.version.files
     [ "releases/" % % "/" % % ] "" make ;
 
 : remote-directory ( string -- string' )
-    [ upload-directory get ] dip "/" glue ;
+    [ package-directory get ] dip "/" glue ;
 
 SLOT: os
 SLOT: cpu

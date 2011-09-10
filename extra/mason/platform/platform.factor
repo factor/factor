@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel system accessors namespaces splitting sequences
 mason.config bootstrap.image assocs ;
@@ -8,7 +8,8 @@ IN: mason.platform
     { { CHAR: . CHAR: - } } substitute "-" glue ;
 
 : platform ( -- string )
-    target-os get name>> target-cpu get name>> (platform) ;
+    target-os get name>> target-cpu get name>> (platform)
+    target-variant get [ "-" glue ] when* ;
 
 : gnu-make ( -- string )
     target-os get { freebsd openbsd netbsd } member? "gmake" "make" ? ;
