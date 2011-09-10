@@ -21,6 +21,7 @@ IN: mason.git
 
 : git-clone ( -- )
     #! Must be run from builds-dir
+    "Cloning initial repository" print-timestamp
     git-clone-cmd try-output-process ;
 
 : git-pull-cmd ( -- cmd )

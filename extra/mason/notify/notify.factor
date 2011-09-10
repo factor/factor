@@ -28,7 +28,7 @@ IN: mason.notify
                 http-post 2drop
             ] retry
         ] [
-            "STATUS NOTIFY FAILED:" print
+            "STATUS NOTIFY FAILED:" print-timestamp
             error. flush
         ] recover
     ] [ 3drop ] if ;
@@ -40,24 +40,24 @@ IN: mason.notify
     f f "idle" status-notify ;
 
 : notify-begin-build ( git-id -- )
-    [ "Starting build of GIT ID " write print flush ]
+    [ "Starting build of GIT ID " prepend print-timestamp ]
     [ f swap "git-id" status-notify ]
     bi ;
 
 : notify-make-vm ( -- )
-    "Compiling VM" print flush
+    "Compiling VM" print-timestamp
     f f "make-vm" status-notify ;
 
 : notify-boot ( -- )
-    "Bootstrapping" print flush
+    "Bootstrapping" print-timestamp
     f f "boot" status-notify ;
 
 : notify-test ( -- )
-    "Running tests" print flush
+    "Running tests" print-timestamp
     f f "test" status-notify ;
 
 : notify-report ( status -- )
-    [ "Build finished with status: " write . flush ]
+    [ name>> "Build finished with status: " prepend print-timestamp ]
     [
         [ "report" utf8 file-contents ] dip
         [ name>> "report" status-notify ] [ email-report ] 2bi
@@ -70,6 +70,6 @@ IN: mason.notify
     f f "finish" status-notify ;
 
 : notify-release ( archive-name -- )
-    [ "Uploaded " prepend [ print flush ] [ mason-tweet ] bi ]
+    [ "Uploaded " prepend [ print-timestamp ] [ mason-tweet ] bi ]
     [ f swap "release" status-notify ]
     bi ;
