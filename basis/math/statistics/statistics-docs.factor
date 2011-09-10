@@ -128,7 +128,7 @@ HELP: sorted-histogram
 
 HELP: sequence>assoc
 { $values
-    { "seq" sequence } { "map-quot" { $quotation "( x -- x' )" } } { "insert-quot" { $quotation "( x' assoc -- )" } } { "exemplar" "an exemplar assoc" }
+    { "seq" sequence } { "map-quot" { $quotation "( x -- ..y )" } } { "insert-quot" { $quotation "( ..y assoc -- )" } } { "exemplar" "an exemplar assoc" }
     { "assoc" assoc }
 }
 { $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created " { $snippet "assoc" } ". The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
@@ -143,7 +143,7 @@ HELP: sequence>assoc
 
 HELP: sequence>assoc!
 { $values
-    { "assoc" assoc } { "seq" sequence } { "map-quot" { $quotation "( x -- x' )" } } { "insert-quot" { $quotation "( x' assoc -- )" } }
+    { "assoc" assoc } { "seq" sequence } { "map-quot" { $quotation "( x -- ..y )" } } { "insert-quot" { $quotation "( ..y assoc -- )" } }
 }
 { $description "Iterates over a sequence, allowing elements of the sequence to be added to an existing " { $snippet "assoc" } ". The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
 { $examples
@@ -156,7 +156,7 @@ HELP: sequence>assoc!
 
 HELP: sequence>hashtable
 { $values
-    { "seq" sequence } { "map-quot" { $quotation "( x -- x' )" } } { "insert-quot" { $quotation "( x' assoc -- )" } }
+    { "seq" sequence } { "map-quot" { $quotation "( x -- ..y )" } } { "insert-quot" { $quotation "( ..y assoc -- )" } }
     { "hashtable" hashtable }
 }
 { $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created hashtable. The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
