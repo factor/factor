@@ -5,7 +5,7 @@ kernel make mason.config namespaces ;
 IN: webapps.mason.version.common
 
 : execute-on-server ( string -- )
-    [ "ssh" , upload-host get , "-l" , upload-username get , ] { } make
+    [ "ssh" , package-host get , "-l" , package-username get , ] { } make
     <process>
         swap >>command
         5 minutes >>timeout

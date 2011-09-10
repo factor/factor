@@ -44,7 +44,7 @@ IN: webapps.mason.version.source
 
 : upload-source-release ( package version -- )
     "Uploading source release..." print flush
-    [ upload-username get upload-host get ] dip
+    [ package-username get package-host get ] dip
     remote-source-release-name
     upload-safely ;
 
