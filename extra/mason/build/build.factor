@@ -1,8 +1,8 @@
-! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel calendar io.directories io.encodings.utf8
 io.files io.launcher io.pathnames namespaces prettyprint
-combinators mason.child mason.cleanup mason.common mason.config
+combinators sequences mason.child mason.cleanup mason.common mason.config
 mason.docs mason.release mason.report mason.email mason.git
 mason.notify mason.platform mason.updates ;
 QUALIFIED: continuations
@@ -13,9 +13,11 @@ IN: mason.build
     build-dir make-directory ;
 
 : enter-build-dir  ( -- )
+    "Building in directory " build-dir append print-timestamp
     build-dir set-current-directory ;
 
 : clone-source ( -- )
+    "Cloning GIT repository" print-timestamp
     "git" "clone" builds-dir get "factor" append-path 3array
     short-running-process ;
 
