@@ -1,11 +1,48 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2008 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: alien alien.c-types alien.data alien.strings alien.syntax
-byte-arrays kernel namespaces sequences unix
-system io.encodings.utf8 system-info ;
+arrays assocs byte-arrays combinators core-foundation io.binary
+io.encodings.utf8 kernel math namespaces sequences system
+system-info unix ;
+
 IN: system-info.macosx
 
-M: macosx os-version f ;
+<PRIVATE
+
+TYPEDEF: SInt16 OSErr
+TYPEDEF: UInt32 OSType
+FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response ) ;
+
+: gestalt ( selector -- response )
+    0 SInt32 <ref> [ Gestalt ] keep
+    swap [ throw ] unless-zero le> ;
+
+: system-version ( -- n ) "sysv" be> gestalt ;
+: system-version-major ( -- n ) "sys1" be> gestalt ;
+: system-version-minor ( -- n ) "sys2" be> gestalt ;
+: system-version-bugfix ( -- n ) "sys3" be> gestalt ;
+
+CONSTANT: system-code-names H{
+    { HEX: 1070 "Lion" }
+    { HEX: 1060 "Snow Leopard" }
+    { HEX: 1050 "Leopard" }
+    { HEX: 1040 "Tiger" }
+    { HEX: 1030 "Panther" }
+    { HEX: 1020 "Jaguar" }
+    { HEX: 1010 "Puma" }
+    { HEX: 1000 "Cheetah" }
+}
+
+: system-code-name ( -- str/f )
+    system-version HEX: FFF0 bitand system-code-names at ;
+
+PRIVATE>
+
+M: macosx os-version
+    system-version-major
+    system-version-minor
+    system-version-bugfix 3array ;
 
 ! See /usr/include/sys/sysctl.h for constants
 
