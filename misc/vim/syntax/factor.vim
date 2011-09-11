@@ -65,12 +65,13 @@ syn keyword factorKeyword vector? <vector> ?push vector >vector 1vector
 syn keyword factorKeyword with-return restarts return-continuation with-datastack recover rethrow-restarts <restart> ifcc set-catchstack >continuation< cleanup ignore-errors restart? compute-restarts attempt-all-error error-thread continue <continuation> attempt-all-error? condition? <condition> throw-restarts error catchstack continue-with thread-error-hook continuation rethrow callcc1 error-continuation callcc0 attempt-all condition continuation? restart return
 
 
-syn cluster factorReal          contains=factorInt,factorFloat,factorRatio,factorBinary,factorHex,factorOctal
+syn cluster factorReal          contains=factorInt,factorFloat,factorPosRatio,factorNegRatio,factorBinary,factorHex,factorOctal
 syn cluster factorNumber        contains=@factorReal,factorComplex
 syn cluster factorNumErr        contains=factorBinErr,factorHexErr,factorOctErr
 syn match   factorInt           /\<-\=[0-9]\([0-9,]*[0-9]\)\?\>/
 syn match   factorFloat         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\.[0-9,]*[0-9]\+\>/
-syn match   factorRatio         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\(+[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
+syn match   factorPosRatio      /\<+\=[0-9]\([0-9,]*[0-9]\)\?\(+[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
+syn match   factorNegRatio      /\<\-[0-9]\([0-9,]*[0-9]\)\?\(\-[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
 syn region  factorComplex       start=/\<C{\>/ end=/\<}\>/ contains=@factorReal
 syn match   factorBinErr        /\<BIN:\s\+-\=[01,]*[^01 ]\S*\>/
 syn match   factorBinary        /\<BIN:\s\+-\=[01,]\+\>/
@@ -239,7 +240,8 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorMultiStringDelims      Typedef
     HiLink factorBracketErr             Error
     HiLink factorComplex                Number
-    HiLink factorRatio                  Number
+    HiLink factorPosRatio               Number
+    HiLink factorNegRatio               Number
     HiLink factorBinary                 Number
     HiLink factorBinErr                 Error
     HiLink factorHex                    Number
