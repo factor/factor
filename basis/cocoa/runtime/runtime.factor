@@ -62,10 +62,6 @@ FUNCTION: char class_addProtocol ( Class class, Protocol protocol ) ;
 
 FUNCTION: uint method_getNumberOfArguments ( Method method ) ;
 
-FUNCTION: uint method_getSizeOfArguments ( Method method ) ;
-
-FUNCTION: uint method_getArgumentInfo ( Method method, int argIndex, c-string* type, int* offset ) ;
-
 FUNCTION: void* method_copyReturnType ( Method method ) ;
 
 FUNCTION: void* method_copyArgumentType ( Method method, uint index ) ;
