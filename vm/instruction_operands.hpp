@@ -143,16 +143,6 @@ struct instruction_operand {
 		return rel.rel_offset();
 	}
 
-	cell parameter_index()
-	{
-		return index;
-	}
-
-	code_block *parent_code_block()
-	{
-		return compiled;
-	}
-
 	fixnum load_value_2_2();
 	fixnum load_value_2_2_2_2();
 	fixnum load_value_masked(cell mask, cell bits, cell shift);

@@ -129,13 +129,8 @@ void factor_vm::set_frame_offset(stack_frame *frame, cell offset)
 
 void factor_vm::scrub_return_address()
 {
-	stack_frame *top = ctx->callstack_top;
-	stack_frame *bottom = ctx->callstack_bottom;
-	stack_frame *frame = bottom - 1;
-
-	while(frame >= top && frame_successor(frame) >= top)
-		frame = frame_successor(frame);
-
+	stack_frame *frame = innermost_stack_frame(ctx->callstack_top,
+		ctx->callstack_bottom);
 	set_frame_offset(frame,0);
 }
 
@@ -191,10 +186,8 @@ void factor_vm::primitive_callstack_to_array()
 	ctx->push(accum.frames.elements.value());
 }
 
-stack_frame *factor_vm::innermost_stack_frame(callstack *stack)
+stack_frame *factor_vm::innermost_stack_frame(stack_frame *bottom, stack_frame *top)
 {
-	stack_frame *top = stack->top();
-	stack_frame *bottom = stack->bottom();
 	stack_frame *frame = bottom - 1;
 
 	while(frame >= top && frame_successor(frame) >= top)
@@ -207,13 +200,15 @@ stack_frame *factor_vm::innermost_stack_frame(callstack *stack)
 Used by the single stepper. */
 void factor_vm::primitive_innermost_stack_frame_executing()
 {
-	stack_frame *frame = innermost_stack_frame(untag_check<callstack>(ctx->pop()));
+	callstack *stack = untag_check<callstack>(ctx->pop());
+	stack_frame *frame = innermost_stack_frame(stack->bottom(), stack->top());
 	ctx->push(frame_executing_quot(frame));
 }
 
 void factor_vm::primitive_innermost_stack_frame_scan()
 {
-	stack_frame *frame = innermost_stack_frame(untag_check<callstack>(ctx->pop()));
+	callstack *stack = untag_check<callstack>(ctx->pop());
+	stack_frame *frame = innermost_stack_frame(stack->bottom(), stack->top());
 	ctx->push(frame_scan(frame));
 }
 
@@ -227,7 +222,7 @@ void factor_vm::primitive_set_innermost_stack_frame_quot()
 
 	jit_compile_quot(quot.value(),true);
 
-	stack_frame *inner = innermost_stack_frame(callstack.untagged());
+	stack_frame *inner = innermost_stack_frame(callstack->bottom(), callstack->top());
 	cell offset = frame_offset(inner);
 	inner->entry_point = quot->entry_point;
 	set_frame_offset(inner,offset);

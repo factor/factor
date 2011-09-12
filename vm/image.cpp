@@ -160,7 +160,7 @@ struct startup_code_block_relocation_visitor {
 
 	void operator()(instruction_operand op)
 	{
-		code_block *compiled = op.parent_code_block();
+		code_block *compiled = op.compiled;
 		cell old_offset = op.rel_offset() + (cell)compiled->entry_point() - fixup.code_offset;
 
 		switch(op.rel_type())

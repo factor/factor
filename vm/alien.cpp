@@ -160,7 +160,6 @@ void factor_vm::primitive_dlsym_raw()
 		ctx->push(allot_alien(ffi_dlsym_raw(NULL,sym)));
 }
 
-
 /* close a native library handle */
 void factor_vm::primitive_dlclose()
 {
