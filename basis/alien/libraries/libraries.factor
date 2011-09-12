@@ -5,11 +5,20 @@ kernel namespaces destructors sequences strings
 system io.pathnames fry ;
 IN: alien.libraries
 
+ERROR: unknown-dlsym-platform ;
+<< {
+    { [ os windows? ] [ "alien.libraries.windows" ] }
+    { [ os unix? ] [ "alien.libraries.unix" ] }
+    [ unknown-dlsym-platform ]
+} cond use-vocab >>
+
 : dlopen ( path -- dll ) native-string>alien (dlopen) ;
 
 : dlsym ( name dll -- alien ) [ string>symbol ] dip (dlsym) ;
 
 : dlsym-raw ( name dll -- alien ) [ string>symbol ] dip (dlsym-raw) ;
+
+: dlerror ( -- message/f ) (dlerror) ;
 
 SYMBOL: libraries
 
