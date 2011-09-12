@@ -27,7 +27,7 @@ HELP: safe-prime?
 
 
 ARTICLE: "math.primes.safe" "Safe prime numbers"
-"The " { $vocab-link "math.primes.safe" } " vocabulary implements words to calculate safe prime numbers. Safe primes are of the form p = 2q + 1, where p,q are prime. Safe primes have desirable qualities for cryptographic applications." $nl
+"The " { $vocab-link "math.primes.safe" } " vocabulary implements words to calculate safe prime numbers. Safe primes are of the form " { $snippet "p = 2q + 1" } ", where " { $snippet "p" } ", " { $snippet "q" } " are prime. Safe primes have desirable qualities for cryptographic applications." $nl
 
 "Testing if a number is a safe prime:"
 { $subsections safe-prime? }
