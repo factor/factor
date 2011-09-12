@@ -44,7 +44,7 @@ T{ error-type
 : <linkage-error> ( error word -- linkage-error )
     \ linkage-error <definition-error> ;
 
-: linkage-error ( error word class -- )
+: linkage-error ( name message word class -- )
     '[ _ boa ] dip <linkage-error> dup asset>> linkage-errors get set-at ; inline
 
 T{ error-type
@@ -57,16 +57,16 @@ T{ error-type
    { fatal? f }
 } define-error-type
 
-TUPLE: no-such-library name ;
+TUPLE: no-such-library name message ;
 
 M: no-such-library summary drop "Library not found" ;
 
-: no-such-library ( name word -- ) \ no-such-library linkage-error ;
+: no-such-library ( name message word -- ) \ no-such-library linkage-error ;
 
-TUPLE: no-such-symbol name ;
+TUPLE: no-such-symbol name message ;
 
 M: no-such-symbol summary drop "Symbol not found" ;
 
-: no-such-symbol ( name word -- ) \ no-such-symbol linkage-error ;
+: no-such-symbol ( name message word -- ) \ no-such-symbol linkage-error ;
 
 ERROR: not-compiled word error ;
