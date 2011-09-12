@@ -1,4 +1,4 @@
-USING: init command-line.startup debugger system
+USING: init io command-line.startup debugger system
 continuations parser.notes namespaces ;
 
 [
@@ -6,6 +6,7 @@ continuations parser.notes namespaces ;
     t parser-quiet? set-global
     
     boot
-    do-startup-hooks
-    [ command-line-startup ] [ print-error 1 exit ] recover
+    [ do-startup-hooks command-line-startup ]
+    [ print-error :c flush 1 exit ]
+    recover
 ] set-startup-quot
