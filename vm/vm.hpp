@@ -593,7 +593,7 @@ struct factor_vm
 	void set_frame_offset(stack_frame *frame, cell offset);
 	void scrub_return_address();
 	void primitive_callstack_to_array();
-	stack_frame *innermost_stack_frame(callstack *stack);
+	stack_frame *innermost_stack_frame(stack_frame *bottom, stack_frame *top);
 	void primitive_innermost_stack_frame_executing();
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
