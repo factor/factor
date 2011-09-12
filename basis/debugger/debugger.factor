@@ -1,15 +1,16 @@
-! Copyright (C) 2004, 2010 Slava Pestov.
+! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: slots arrays definitions generic hashtables summary io
-kernel math namespaces make prettyprint prettyprint.config
-sequences assocs sequences.private strings io.styles
-io.pathnames vectors words system splitting math.parser
-classes.mixin classes.tuple continuations continuations.private
-combinators generic.math classes.builtin classes compiler.units
-generic.standard generic.single vocabs init kernel.private
-io.encodings accessors math.order destructors source-files
-parser classes.tuple.parser effects.parser lexer generic.parser
-strings.parser vocabs.loader vocabs.parser source-files.errors ;
+USING: alien.strings slots arrays definitions generic hashtables
+summary io kernel math namespaces make prettyprint
+prettyprint.config sequences assocs sequences.private strings
+io.styles io.pathnames vectors words system splitting
+math.parser classes.mixin classes.tuple continuations
+continuations.private combinators generic.math classes.builtin
+classes compiler.units generic.standard generic.single vocabs
+init kernel.private io.encodings accessors math.order
+destructors source-files parser classes.tuple.parser
+effects.parser lexer generic.parser strings.parser vocabs.loader
+vocabs.parser source-files.errors ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -107,8 +108,9 @@ HOOK: signal-error. os ( obj -- )
     "FFI error" print drop ;
 
 : undefined-symbol-error. ( obj -- )
-    "The image refers to a library or symbol that was not found at load time"
-    print drop ;
+    "Cannot resolve C library function" print
+    "Symbol: " write dup third symbol>string print
+    "Library: " write fourth . ;
 
 : stack-underflow. ( obj name -- )
     write " stack underflow" print drop ;

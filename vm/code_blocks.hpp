@@ -83,4 +83,5 @@ struct code_block
 	}
 };
 
+VM_C_API void undefined_symbol(void);
 }
