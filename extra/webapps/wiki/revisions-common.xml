@@ -17,7 +17,7 @@
 			<t:bind-each t:name="revisions">
 				<tr>
 					<td> <t:a t:href="$wiki/view" t:rest="title"><t:label t:name="title" /></t:a> </td>
-					<td> <t:a t:href="$wiki/revision" t:rest="id"><t:label t:name="date" /></t:a> </td>
+					<td> <t:a t:href="$wiki/revision" t:rest="id" rel="nofollow"><t:label t:name="date" /></t:a> </td>
 					<td> <t:a t:href="$wiki/user-edits" t:rest="author"><t:label t:name="author" /> </t:a></td>
 					<td> <t:label t:name="description" /> </td>
 					<td> <t:button class="link link-button" t:action="$wiki/rollback" t:for="id">Rollback</t:button> </td>
