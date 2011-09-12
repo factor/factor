@@ -70,8 +70,8 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
 : check-dlsym ( symbols dll -- )
     dup dll-valid? [
         dupd dlsym-valid?
-        [ drop ] [ cfg get word>> no-such-symbol ] if
-    ] [ dll-path cfg get word>> no-such-library drop ] if ;
+        [ drop ] [ dlerror cfg get word>> no-such-symbol ] if
+    ] [ dll-path "" cfg get word>> no-such-library drop ] if ;
 
 : decorated-symbol ( params -- symbols )
     [ function>> ] [ parameters>> [ stack-size ] map-sum number>string ] bi
