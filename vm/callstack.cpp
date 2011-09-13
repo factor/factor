@@ -129,8 +129,8 @@ void factor_vm::set_frame_offset(stack_frame *frame, cell offset)
 
 void factor_vm::scrub_return_address()
 {
-	stack_frame *frame = innermost_stack_frame(ctx->callstack_top,
-		ctx->callstack_bottom);
+	stack_frame *frame = innermost_stack_frame(ctx->callstack_bottom,
+		ctx->callstack_top);
 	set_frame_offset(frame,0);
 }
 
@@ -214,15 +214,15 @@ void factor_vm::primitive_innermost_stack_frame_scan()
 
 void factor_vm::primitive_set_innermost_stack_frame_quot()
 {
-	data_root<callstack> callstack(ctx->pop(),this);
+	data_root<callstack> stack(ctx->pop(),this);
 	data_root<quotation> quot(ctx->pop(),this);
 
-	callstack.untag_check(this);
+	stack.untag_check(this);
 	quot.untag_check(this);
 
 	jit_compile_quot(quot.value(),true);
 
-	stack_frame *inner = innermost_stack_frame(callstack->bottom(), callstack->top());
+	stack_frame *inner = innermost_stack_frame(stack->bottom(), stack->top());
 	cell offset = frame_offset(inner);
 	inner->entry_point = quot->entry_point;
 	set_frame_offset(inner,offset);
