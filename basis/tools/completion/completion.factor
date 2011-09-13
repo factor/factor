@@ -14,6 +14,8 @@ IN: tools.completion
     rot [ ch>lower ] [ ch>upper ] bi
     [ eq? ] bi-curry@ [ bi or ] 2curry find-from drop ;
 
+PRIVATE>
+
 :: (fuzzy) ( accum i full ch -- accum i full ? )
     ch i full smart-index-from [
         :> i i accum push
@@ -74,8 +76,6 @@ IN: tools.completion
 
 : completion, ( short candidate -- )
     completion dup first 0 > [ , ] [ drop ] if ;
-
-PRIVATE>
 
 : completions ( short candidates -- seq )
     [ ] [
