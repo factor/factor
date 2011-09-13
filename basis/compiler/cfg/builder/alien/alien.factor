@@ -67,11 +67,17 @@ M: string dlsym-valid? dlsym ;
 
 M: array dlsym-valid? '[ _ dlsym ] any? ;
 
-: check-dlsym ( symbols dll -- )
-    dup dll-valid? [
-        dupd dlsym-valid?
-        [ drop ] [ dlerror cfg get word>> no-such-symbol ] if
-    ] [ dll-path "" cfg get word>> no-such-library drop ] if ;
+: check-dlsym ( symbols library -- )
+    {
+        { [ dup library-dll dll-valid? not ] [
+            [ library-dll dll-path ] [ dlerror>> ] bi
+            cfg get word>> no-such-library drop 
+        ] }
+        { [ 2dup library-dll dlsym-valid? not ] [
+            drop dlerror cfg get word>> no-such-symbol
+        ] }
+        [ 2drop ]
+    } cond ;
 
 : decorated-symbol ( params -- symbols )
     [ function>> ] [ parameters>> [ stack-size ] map-sum number>string ] bi
@@ -85,7 +91,7 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
 
 : caller-linkage ( params -- symbols dll )
     [ dup abi>> callee-cleanup? [ decorated-symbol ] [ function>> ] if ]
-    [ library>> load-library ]
+    [ library>> library ]
     bi 2dup check-dlsym ;
 
 : caller-return ( params -- )

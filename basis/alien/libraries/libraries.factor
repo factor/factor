@@ -2,15 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.strings assocs io.backend
 kernel namespaces destructors sequences strings
-system io.pathnames fry ;
+system io.pathnames fry combinators vocabs.loader ;
 IN: alien.libraries
-
-ERROR: unknown-dlsym-platform ;
-<< {
-    { [ os windows? ] [ "alien.libraries.windows" ] }
-    { [ os unix? ] [ "alien.libraries.unix" ] }
-    [ unknown-dlsym-platform ]
-} cond use-vocab >>
 
 : dlopen ( path -- dll ) native-string>alien (dlopen) ;
 
@@ -18,23 +11,28 @@ ERROR: unknown-dlsym-platform ;
 
 : dlsym-raw ( name dll -- alien ) [ string>symbol ] dip (dlsym-raw) ;
 
-: dlerror ( -- message/f ) (dlerror) ;
+HOOK: dlerror os ( -- message/f )
 
 SYMBOL: libraries
 
 libraries [ H{ } clone ] initialize
 
-TUPLE: library { path string } { abi abi initial: cdecl } dll ;
+TUPLE: library { path string } { abi abi initial: cdecl } dll dlerror ;
 
 ERROR: no-library name ;
 
 : library ( name -- library ) libraries get at ;
 
 : <library> ( path abi -- library )
-    over dup [ dlopen ] when \ library boa ;
+    over dup
+    [ dlopen dup dll-valid? [ f ] [ dlerror ] if ] [ f ] if
+    \ library boa ;
+
+: library-dll ( library -- dll )
+    dup [ dll>> ] when ;
 
 : load-library ( name -- dll )
-    library dup [ dll>> ] when ;
+    library library-dll ;
 
 M: dll dispose dlclose ;
 
@@ -70,17 +68,9 @@ deploy-libraries [ V{ } clone ] initialize
     [ deploy-libraries get 2dup member? [ 2drop ] [ push ] if ]
     [ no-library ] if ;
 
-<PRIVATE
-
 HOOK: >deployed-library-path os ( path -- path' )
 
-M: windows >deployed-library-path
-    file-name ;
-
-M: unix >deployed-library-path
-    file-name "$ORIGIN" prepend-path ;
-
-M: macosx >deployed-library-path
-    file-name "@executable_path/../Frameworks" prepend-path ;
-
-PRIVATE>
+<< {
+    { [ os windows? ] [ "alien.libraries.windows" ] }
+    { [ os unix? ] [ "alien.libraries.unix" ] }
+} cond require >>
