@@ -57,8 +57,12 @@ M: string string>symbol utf8 string>alien ;
 
 M: sequence string>symbol [ utf8 string>alien ] map ;
 
-: symbol>string ( alien -- str )
+: (symbol>string) ( alien -- str )
     utf8 alien>string ;
+
+GENERIC: symbol>string ( symbol(s) -- string(s) )
+M: byte-array symbol>string (symbol>string) ;
+M: array symbol>string [ (symbol>string) ] map ;
 
 [
      8 special-object utf8 alien>string string>cpu \ cpu set-global
