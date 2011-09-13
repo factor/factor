@@ -1,9 +1,9 @@
-USING: alien.c-types alien.libraries alien.syntax io.encodings.utf8
+USING: alien.c-types alien.libraries alien io.encodings.utf8
 io.pathnames system ;
 IN: alien.libraries.unix
 
-FUNCTION-ALIAS: (dlerror)
-    c-string dlerror ( ) ;
+: (dlerror) ( -- string )
+    \ c-string f "dlerror" { } alien-invoke ; inline
 
 M: unix dlerror (dlerror) ;
 
