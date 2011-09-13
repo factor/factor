@@ -111,6 +111,12 @@ gc
         malloc calloc free memcpy
     } compile-unoptimized
 
+    os windows? [
+        "GetLastError" "windows.kernel32" lookup
+        "FormatMessageW" "windows.kernel32" lookup
+        2array compile-unoptimized
+    ] when
+
     "." write flush
 
     vocabs [ words compile-unoptimized "." write flush ] each
