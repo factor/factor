@@ -61,3 +61,6 @@ PRIVATE>
 
 : randomize-image ( image -- image )
     dup bytes-per-image random-bytes >>bitmap ;
+
+: image-load-must-fail ( path -- )
+    '[ _ load-image ] must-fail ;

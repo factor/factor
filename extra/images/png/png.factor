@@ -1,10 +1,11 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays checksums checksums.crc32 combinators
-compression.inflate fry grouping images images.loader io
-io.binary io.encodings.ascii io.encodings.string kernel locals
-math math.bitwise math.ranges sequences sorting assocs
-math.functions math.order byte-arrays io.streams.throwing ;
+USING: accessors arrays assocs byte-arrays checksums
+checksums.crc32 combinators compression.inflate fry grouping
+images images.loader io io.binary io.encodings.ascii
+io.encodings.binary io.encodings.string io.streams.byte-array
+io.streams.throwing kernel locals math math.bitwise
+math.functions math.order math.ranges sequences sorting ;
 QUALIFIED-WITH: bitstreams bs
 IN: images.png
 
@@ -115,6 +116,8 @@ ERROR: unimplemented-color-type image ;
     a b + c - { a b c } [ [ - abs ] keep 2array ] with map
     sort-keys first second ;
 
+ERROR: bad-filter n ;
+
 :: png-unfilter-line ( width prev curr filter -- curr' )
     prev :> c
     prev width tail-slice :> b
@@ -127,6 +130,7 @@ ERROR: unimplemented-color-type image ;
         { filter-up [ [| n | n x nth n b nth + 256 wrap n x set-nth ] each ] }
         { filter-average [ [| n | n x nth n a nth n b nth + 2/ + 256 wrap n x set-nth ] each ] }
         { filter-paeth [ [| n | n x nth n a nth n b nth n c nth paeth + 256 wrap n x set-nth ] each ] }
+        [ bad-filter ]
     } case
     curr width tail ;
 
@@ -145,13 +149,18 @@ ERROR: unimplemented-color-type image ;
     row image nth :> irow
     pixel col irow set-nth ;
 
-ERROR: bad-filter n ;
-
-:: read-scanlines ( bit-reader loading-png width height -- array )
+:: read-scanlines ( byte-reader loading-png width height -- array )
     loading-png png-components-per-pixel :> #components
     loading-png bit-depth>> :> bit-depth
     bit-depth :> depth!
     #components width * :> count!
+
+    #components bit-depth * width * 8 math:align 8 /i :> stride
+
+    height [
+        stride 1 + byte-reader stream-read
+    ] replicate
+    #components bit-depth 16 = [ 2 * ] when reverse-png-filter
 
     ! Only read up to 8 bits at a time
     bit-depth 16 = [
@@ -159,18 +168,17 @@ ERROR: bad-filter n ;
         count 2 * count!
     ] when
 
+    bs:<msb0-bit-reader> :> br
     height [
-        8 bit-reader bs:read dup 0 4 between? [ bad-filter ] unless
-        count [ depth bit-reader bs:read ] replicate swap prefix
-        8 bit-reader bs:align
-    ] replicate
-    #components bit-depth 16 = [ 2 * ] when reverse-png-filter ;
+        count [ depth br bs:read ] B{ } replicate-as
+        8 br bs:align
+    ] replicate concat ;
 
-:: reverse-interlace-none ( byte-array loading-png -- array )
-    byte-array bs:<msb0-bit-reader> :> bs
+:: reverse-interlace-none ( bytes loading-png -- array )
+    bytes binary <byte-reader> :> br
     loading-png width>> :> width
     loading-png height>> :> height
-    bs loading-png width height read-scanlines ;
+    br loading-png width height read-scanlines ;
 
 :: adam7-subimage-height ( png-height pass -- subimage-height )
     pass starting-row nth png-height >= [
@@ -190,18 +198,18 @@ ERROR: bad-filter n ;
         pass col-increment nth /i
     ] if ;
 
-:: read-adam7-subimage ( bit-reader loading-png pass -- lines )
+:: read-adam7-subimage ( byte-reader loading-png pass -- lines )
     loading-png height>> pass adam7-subimage-height :> height
     loading-png width>> pass adam7-subimage-width :> width
 
     height width * zero? [
         B{ } clone
     ] [
-        bit-reader loading-png width height read-scanlines
+        byte-reader loading-png width height read-scanlines
     ] if ;
 
 :: reverse-interlace-adam7 ( byte-array loading-png -- byte-array )
-    byte-array bs:<msb0-bit-reader> :> bs
+    byte-array binary <byte-reader> :> ba
     loading-png height>> :> height
     loading-png width>> :> width
     loading-png bit-depth>> :> bit-depth
@@ -217,7 +225,7 @@ ERROR: bad-filter n ;
 
     0 :> pass!
     [ pass 7 < ] [
-      bs loading-png pass read-adam7-subimage
+      ba loading-png pass read-adam7-subimage
 
       #bytes <sliced-groups>
 
