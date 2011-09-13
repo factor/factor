@@ -8,8 +8,14 @@ vocabs.hierarchy words ;
 
 IN: tools.completion
 
+<PRIVATE
+
+: smart-index-from ( obj i seq -- n/f )
+    rot [ ch>lower ] [ ch>upper ] bi
+    [ eq? ] bi-curry@ [ bi or ] 2curry find-from drop ;
+
 :: (fuzzy) ( accum i full ch -- accum i full ? )
-    ch i full index-from [
+    ch i full smart-index-from [
         :> i i accum push
         accum i 1 + full t
     ] [
@@ -64,14 +70,16 @@ IN: tools.completion
     dupd fuzzy score max ;
 
 : completion ( short candidate -- result )
-    [ second >lower swap complete ] keep 2array ;
+    [ second swap complete ] keep 2array ;
 
 : completion, ( short candidate -- )
     completion dup first 0 > [ , ] [ drop ] if ;
 
+PRIVATE>
+
 : completions ( short candidates -- seq )
     [ ] [
-        [ >lower ] dip [ [ completion, ] with each ] { } make
+        [ [ completion, ] with each ] { } make
         rank-completions
     ] bi-curry if-empty ;
 
