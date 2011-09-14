@@ -22,7 +22,6 @@ QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
 QUALIFIED: vocabs.loader
-FROM: alien.libraries.private => >deployed-library-path ;
 FROM: namespaces => set ;
 FROM: sets => members ;
 IN: tools.deploy.shaker
