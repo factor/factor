@@ -1,5 +1,5 @@
 USING: alien.c-types alien.syntax classes.struct
-windows.com.syntax windows.directx.d3d10
+windows.com.syntax windows.directx windows.directx.d3d10
 windows.directx.d3d10misc windows.directx.dxgi
 windows.directx.dxgiformat windows.types ;
 IN: windows.directx.d3d10_1

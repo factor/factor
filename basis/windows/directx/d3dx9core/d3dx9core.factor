@@ -1,6 +1,6 @@
 USING: alien.syntax windows.types windows.directx.d3d9 windows.com.syntax
-windows.com windows.directx.d3dx9math windows.directx.d3d9types classes.struct
-windows.gdi32 ;
+windows.com windows.directx windows.directx.d3dx9math windows.directx.d3d9types
+classes.struct windows.gdi32 ;
 IN: windows.directx.d3dx9core
 
 LIBRARY: d3dx9

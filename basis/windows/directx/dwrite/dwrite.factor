@@ -1,6 +1,6 @@
 USING: alien.c-types alien.syntax classes.struct windows.com
 windows.com.syntax windows.directx.dcommon windows.kernel32
-windows.ole32 windows.types ;
+windows.ole32 windows.types windows.directx ;
 IN: windows.directx.dwrite
 
 LIBRARY: dwrite

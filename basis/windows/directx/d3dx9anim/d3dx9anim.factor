@@ -1,5 +1,5 @@
 USING: alien.c-types alien.syntax classes.struct windows.com
-windows.com.syntax windows.directx.d3d9
+windows.com.syntax windows.directx windows.directx.d3d9
 windows.directx.d3dx9core windows.directx.d3dx9math
 windows.directx.d3dx9mesh windows.directx.d3dx9xof
 windows.types ;
