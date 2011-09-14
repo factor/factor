@@ -32,6 +32,9 @@ enum relocation_type {
 	RT_EXCEPTION_HANDLER,
 	/* arg is a literal table index, holding a pair (symbol/dll) */
 	RT_DLSYM_TOC,
+	/* address of inline_cache_miss function. This is a separate
+	relocation to reduce compile time and size for PICs. */
+	RT_INLINE_CACHE_MISS
 };
 
 enum relocation_class {
@@ -117,6 +120,7 @@ struct relocation_entry {
 		case RT_CARDS_OFFSET:
 		case RT_DECKS_OFFSET:
 		case RT_EXCEPTION_HANDLER:
+		case RT_INLINE_CACHE_MISS:
 			return 0;
 		default:
 			critical_error("Bad rel type in number_of_parameters()",rel_type());

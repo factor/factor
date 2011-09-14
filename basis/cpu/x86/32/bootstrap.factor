@@ -192,7 +192,7 @@ IN: bootstrap.x86
     jit-save-context
     ESP 4 [+] vm-reg MOV
     ESP [] pic-tail-reg MOV
-    "inline_cache_miss" jit-call
+    0 CALL rc-relative rel-inline-cache-miss
     jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]

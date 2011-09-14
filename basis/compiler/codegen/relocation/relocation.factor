@@ -99,6 +99,9 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-exception-handler ( class -- )
     rt-exception-handler add-relocation ;
 
+: rel-inline-cache-miss ( class -- )
+    rt-inline-cache-miss add-relocation ;
+
 : init-relocation ( -- )
     V{ } clone parameter-table set
     V{ } clone literal-table set
