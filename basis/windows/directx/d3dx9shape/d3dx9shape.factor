@@ -1,6 +1,6 @@
-USING: alien.c-types alien.syntax windows.directx.d3d9
-windows.directx.d3dx9core windows.directx.d3dx9mesh
-windows.types ;
+USING: alien.c-types alien.syntax windows.directx
+windows.directx.d3d9 windows.directx.d3dx9core
+windows.directx.d3dx9mesh windows.types ;
 IN: windows.directx.d3dx9shape
 
 LIBRARY: d3dx9
