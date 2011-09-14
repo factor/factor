@@ -3,8 +3,9 @@
 USING: alien.data arrays assocs combinators fry kernel locals
 macros math math.vectors namespaces quotations sequences system
 compiler.cfg.comparisons compiler.cfg.intrinsics
-compiler.codegen.fixup cpu.architecture cpu.x86
-cpu.x86.assembler cpu.x86.assembler.operands cpu.x86.features ;
+compiler.codegen.labels compiler.codegen.relocation
+cpu.architecture cpu.x86 cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86.features ;
 QUALIFIED-WITH: alien.c-types c
 IN: cpu.x86.sse
 

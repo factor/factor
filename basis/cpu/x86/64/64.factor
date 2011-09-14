@@ -1,13 +1,14 @@
-! Copyright (C) 2005, 2010 Slava Pestov.
+! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math namespaces make sequences
-system layouts alien alien.c-types alien.accessors alien.libraries
-slots splitting assocs combinators fry locals compiler.constants
-classes.struct compiler.codegen compiler.codegen.fixup
-compiler.cfg.instructions compiler.cfg.builder
-compiler.cfg.intrinsics compiler.cfg.stack-frame
-cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
-cpu.architecture vm ;
+system layouts alien alien.c-types alien.accessors
+alien.libraries slots splitting assocs combinators fry locals
+compiler.constants classes.struct compiler.codegen
+compiler.codegen.gc-maps compiler.codegen.labels
+compiler.codegen.relocation compiler.cfg.instructions
+compiler.cfg.builder compiler.cfg.intrinsics
+compiler.cfg.stack-frame cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86 cpu.architecture vm ;
 FROM: layouts => cell cells ;
 IN: cpu.x86.64
 
