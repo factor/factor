@@ -1,10 +1,10 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make math math.order math.parser sequences
-accessors kernel layouts assocs words summary arrays combinators
-classes.algebra sets continuations.private fry cpu.architecture
-classes classes.struct locals slots parser generic.parser
-strings quotations hashtables
+USING: byte-arrays namespaces make math math.order math.parser
+sequences accessors kernel layouts assocs words summary arrays
+combinators combinators.smart sets continuations.private fry
+cpu.architecture classes classes.struct locals slots parser
+generic.parser strings quotations hashtables
 compiler.constants
 compiler.cfg
 compiler.cfg.linearization
@@ -13,7 +13,9 @@ compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.cfg.registers
 compiler.cfg.builder
-compiler.codegen.fixup
+compiler.codegen.gc-maps
+compiler.codegen.labels
+compiler.codegen.relocation
 compiler.utilities ;
 FROM: namespaces => set ;
 IN: compiler.codegen
@@ -80,6 +82,31 @@ M: ##dispatch generate-insn
             bi
         ] each
     ] tri ;
+
+: init-fixup ( -- )
+    V{ } clone label-table set
+    V{ } clone binary-literal-table set ;
+
+: check-fixup ( seq -- )
+    length data-alignment get mod 0 assert= ;
+
+: with-fixup ( quot -- code )
+    '[
+        init-relocation
+        init-gc-maps
+        init-fixup
+        [
+            @
+            emit-binary-literals
+            emit-gc-maps
+            label-table [ compute-labels ] change
+            parameter-table get >array
+            literal-table get >array
+            relocation-table get >byte-array
+            label-table get
+        ] B{ } make
+        dup check-fixup
+    ] output>array ; inline
 
 : generate ( cfg -- code )
     [

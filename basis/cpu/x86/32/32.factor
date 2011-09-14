@@ -1,9 +1,10 @@
-! Copyright (C) 2005, 2010 Slava Pestov.
+! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: locals alien alien.c-types alien.libraries alien.syntax
 arrays kernel fry math namespaces sequences system layouts io
 vocabs.loader accessors init classes.struct combinators make
-words compiler.constants compiler.codegen.fixup
+words compiler.constants compiler.codegen.gc-maps
+compiler.codegen.labels compiler.codegen.relocation
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.builder.alien.boxing compiler.cfg.intrinsics
 compiler.cfg.stack-frame cpu.x86.assembler

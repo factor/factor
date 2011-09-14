@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences alien alien.c-types
-combinators compiler compiler.codegen.fixup compiler.units
+combinators compiler compiler.codegen.labels compiler.units
 cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
 init io kernel locals math math.order math.parser memoize
 namespaces system ;
