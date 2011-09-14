@@ -1,9 +1,10 @@
-! Copyright (C) 2007, 2010 Slava Pestov.
+! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
-system layouts vocabs parser compiler.constants math
-math.private cpu.x86.assembler cpu.x86.assembler.operands
-sequences generic.single.private threads.private ;
+system layouts vocabs parser compiler.constants
+compiler.codegen.relocation math math.private cpu.x86.assembler
+cpu.x86.assembler.operands sequences generic.single.private
+threads.private ;
 IN: bootstrap.x86
 
 8 \ cell set
@@ -29,12 +30,12 @@ IN: bootstrap.x86
 : rex-length ( -- n ) 1 ;
 
 : jit-call ( name -- )
-    RAX 0 MOV rc-absolute-cell jit-dlsym
+    RAX 0 MOV f rc-absolute-cell rel-dlsym
     RAX CALL ;
 
 [
     ! load entry point
-    RAX 0 MOV rc-absolute-cell rt-this jit-rel
+    RAX 0 MOV rc-absolute-cell rel-this
     ! save stack frame size
     stack-frame-size PUSH
     ! push entry point
@@ -45,7 +46,7 @@ IN: bootstrap.x86
 
 [
     pic-tail-reg 5 [RIP+] LEA
-    0 JMP rc-relative rt-entry-point-pic-tail jit-rel
+    0 JMP f rc-relative rel-word-pic-tail
 ] jit-word-jump jit-define
 
 : jit-load-context ( -- )
@@ -68,7 +69,7 @@ IN: bootstrap.x86
     jit-save-context
     ! call the primitive
     arg1 vm-reg MOV
-    RAX 0 MOV rc-absolute-cell rt-dlsym jit-rel
+    RAX 0 MOV f f rc-absolute-cell rel-dlsym
     RAX CALL
     jit-restore-context
 ] jit-primitive jit-define
@@ -104,7 +105,7 @@ IN: bootstrap.x86
 
     ! Load VM pointer into vm-reg, since we're entering from
     ! C code
-    vm-reg 0 MOV 0 rc-absolute-cell jit-vm
+    vm-reg 0 MOV 0 rc-absolute-cell rel-vm
 
     ! Load ds and rs registers
     jit-load-context
@@ -166,7 +167,7 @@ IN: bootstrap.x86
 \ lazy-jit-compile define-combinator-primitive
 
 [
-    temp2 HEX: ffffffff MOV rc-absolute-cell rt-literal jit-rel
+    temp2 HEX: ffffffff MOV f rc-absolute-cell rel-literal
     temp1 temp2 CMP
 ] pic-check-tuple jit-define
 

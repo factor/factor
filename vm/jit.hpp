@@ -16,7 +16,7 @@ struct jit {
 	explicit jit(code_block_type type, cell owner, factor_vm *parent);
 	void compute_position(cell offset);
 
-	void emit_relocation(cell code_template);
+	void emit_relocation(cell relocation_template);
 	void emit(cell code_template);
 
 	void parameter(cell parameter) { parameters.add(parameter); }

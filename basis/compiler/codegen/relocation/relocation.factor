@@ -11,7 +11,10 @@ IN: compiler.codegen.relocation
 
 ! Code is compiled into the 'make' vector.
 
-: compiled-offset ( -- n ) building get length ;
+SYMBOL: extra-offset  ! Only used by non-optimizing compiler
+
+: compiled-offset ( -- n )
+    building get length extra-offset get + ;
 
 : alignment ( align -- n )
     [ compiled-offset dup ] dip align swap - ;
@@ -36,6 +39,9 @@ SYMBOL: literal-table
 SYMBOL: relocation-table
 
 : push-uint ( value vector -- )
+    ! If we ever revive PowerPC support again, this needs to be
+    ! changed to reverse the byte order when bootstrapping from
+    ! x86 to PowerPC or vice versa
     [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying>> ] tri
     swap set-alien-unsigned-4 ;
 
@@ -69,6 +75,9 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-literal ( literal class -- )
     [ add-literal ] dip rt-literal add-relocation ;
 
+: rel-untagged ( literal class -- )
+    [ add-literal ] dip rt-untagged add-relocation ;
+
 : rel-this ( class -- )
     rt-this add-relocation ;
 
@@ -84,7 +93,14 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-decks-offset ( class -- )
     rt-decks-offset add-relocation ;
 
+: rel-megamorphic-cache-hits ( class -- )
+    rt-megamorphic-cache-hits add-relocation ;
+
+: rel-exception-handler ( class -- )
+    rt-exception-handler add-relocation ;
+
 : init-relocation ( -- )
     V{ } clone parameter-table set
     V{ } clone literal-table set
-    BV{ } clone relocation-table set ;
+    BV{ } clone relocation-table set
+    0 extra-offset set ;

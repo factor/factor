@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private compiler.constants
-cpu.x86.assembler cpu.x86.assembler.operands kernel layouts
-locals parser sequences ;
+compiler.codegen.relocation cpu.x86.assembler
+cpu.x86.assembler.operands kernel layouts locals parser
+sequences ;
 IN: bootstrap.x86
 
 : tib-segment ( -- ) FS ;
@@ -16,7 +17,7 @@ IN: bootstrap.x86
     ! Align stack
     ESP 3 bootstrap-cells ADD
     ! Exception handler address filled in by callback.cpp
-    tib-temp 0 MOV rc-absolute-cell rt-exception-handler jit-rel
+    tib-temp 0 MOV rc-absolute-cell rel-exception-handler
     tib-temp PUSH
     ! No next handler
     0 PUSH
