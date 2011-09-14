@@ -12,7 +12,9 @@ compiler.cfg.instructions
 compiler.cfg.intrinsics
 compiler.cfg.comparisons
 compiler.cfg.stack-frame
-compiler.codegen.fixup ;
+compiler.codegen.gc-maps
+compiler.codegen.labels
+compiler.codegen.relocation ;
 QUALIFIED-WITH: alien.c-types c
 FROM: layouts => cell ;
 FROM: math => float ;

@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data combinators kernel locals system
-namespaces compiler.codegen.fixup compiler.constants
-compiler.cfg.comparisons compiler.cfg.intrinsics
-cpu.architecture cpu.x86 cpu.x86.assembler
-cpu.x86.assembler.operands ;
+namespaces compiler.codegen.labels compiler.codegen.relocation
+compiler.constants compiler.cfg.comparisons
+compiler.cfg.intrinsics cpu.architecture cpu.x86
+cpu.x86.assembler cpu.x86.assembler.operands ;
 IN: cpu.x86.x87
 
 ! x87 unit is only used if SSE2 is not available.
