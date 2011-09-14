@@ -181,7 +181,8 @@ IN: bootstrap.x86
     jit-save-context
     arg1 RBX MOV
     arg2 vm-reg MOV
-    "inline_cache_miss" jit-call
+    RAX 0 MOV rc-absolute-cell rel-inline-cache-miss
+    RAX CALL
     jit-load-context
     jit-restore-context ;
 

@@ -269,6 +269,9 @@ void factor_vm::store_external_address(instruction_operand op)
 		op.store_value(compute_dlsym_toc_address(parameters,index));
 		break;
 #endif
+	case RT_INLINE_CACHE_MISS:
+		op.store_value((cell)&factor::inline_cache_miss);
+		break;
 	default:
 		critical_error("Bad rel type in store_external_address()",op.rel_type());
 		break;
