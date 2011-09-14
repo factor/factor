@@ -1,10 +1,10 @@
-! Copyright (C) 2007, 2010 Slava Pestov.
+! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private compiler.constants
-compiler.units cpu.x86.assembler cpu.x86.assembler.operands
-kernel kernel.private layouts locals.backend make math
-math.private namespaces sequences slots.private strings.private
-vocabs ;
+compiler.codegen.relocation compiler.units cpu.x86.assembler
+cpu.x86.assembler.operands kernel kernel.private layouts
+locals.backend make math math.private namespaces sequences
+slots.private strings.private vocabs ;
 IN: bootstrap.x86
 
 big-endian off
@@ -25,7 +25,7 @@ big-endian off
     jit-save-tib
 
     ! Load VM into vm-reg
-    vm-reg 0 MOV rc-absolute-cell rt-vm jit-rel
+    vm-reg 0 MOV 0 rc-absolute-cell rel-vm
 
     ! Save old context
     nv-reg vm-reg vm-context-offset [+] MOV
@@ -47,12 +47,12 @@ big-endian off
     ds-reg nv-reg context-datastack-offset [+] MOV
 
     ! Call into Factor code
-    link-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
+    link-reg 0 MOV f rc-absolute-cell rel-word
     link-reg CALL
 
     ! Load VM into vm-reg; only needed on x86-32, but doesn't
     ! hurt on x86-64
-    vm-reg 0 MOV rc-absolute-cell rt-vm jit-rel
+    vm-reg 0 MOV 0 rc-absolute-cell rel-vm
 
     ! Load C callstack pointer
     nv-reg vm-reg vm-context-offset [+] MOV
@@ -73,12 +73,12 @@ big-endian off
     ! need a parameter here.
 
     ! See the comment for M\ x86.32 stack-cleanup in cpu.x86.32
-    HEX: ffff RET rc-absolute-2 rt-untagged jit-rel
+    HEX: ffff RET f rc-absolute-2 rel-untagged
 ] callback-stub jit-define
 
 [
     ! Load word
-    temp0 0 MOV rc-absolute-cell rt-literal jit-rel
+    temp0 0 MOV f rc-absolute-cell rel-literal
     ! Bump profiling counter
     temp0 profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
@@ -91,7 +91,7 @@ big-endian off
 
 [
     ! load literal
-    temp0 0 MOV rc-absolute-cell rt-literal jit-rel
+    temp0 0 MOV f rc-absolute-cell rel-literal
     ! increment datastack pointer
     ds-reg bootstrap-cell ADD
     ! store literal on datastack
@@ -99,7 +99,7 @@ big-endian off
 ] jit-push jit-define
 
 [
-    0 CALL rc-relative rt-entry-point-pic jit-rel
+    0 CALL f rc-relative rel-word-pic
 ] jit-word-call jit-define
 
 [
@@ -110,9 +110,9 @@ big-endian off
     ! compare boolean with f
     temp0 \ f type-number CMP
     ! jump to true branch if not equal
-    0 JNE rc-relative rt-entry-point jit-rel
+    0 JNE f rc-relative rel-word
     ! jump to false branch if equal
-    0 JMP rc-relative rt-entry-point jit-rel
+    0 JMP f rc-relative rel-word
 ] jit-if jit-define
 
 : jit->r ( -- )
@@ -165,19 +165,19 @@ big-endian off
 
 [
     jit->r
-    0 CALL rc-relative rt-entry-point jit-rel
+    0 CALL f rc-relative rel-word
     jit-r>
 ] jit-dip jit-define
 
 [
     jit-2>r
-    0 CALL rc-relative rt-entry-point jit-rel
+    0 CALL f rc-relative rel-word
     jit-2r>
 ] jit-2dip jit-define
 
 [
     jit-3>r
-    0 CALL rc-relative rt-entry-point jit-rel
+    0 CALL f rc-relative rel-word
     jit-3r>
 ] jit-3dip jit-define
 
@@ -209,7 +209,7 @@ big-endian off
 
 ! Load a value from a stack position
 [
-    temp1 ds-reg HEX: 7f [+] MOV rc-absolute-1 rt-untagged jit-rel
+    temp1 ds-reg HEX: 7f [+] MOV f rc-absolute-1 rel-untagged
 ] pic-load jit-define
 
 [ temp1 tag-mask get AND ] pic-tag jit-define
@@ -224,10 +224,10 @@ big-endian off
 ] pic-tuple jit-define
 
 [
-    temp1 HEX: 7f CMP rc-absolute-1 rt-untagged jit-rel
+    temp1 HEX: 7f CMP f rc-absolute-1 rel-untagged
 ] pic-check-tag jit-define
 
-[ 0 JE rc-relative rt-entry-point jit-rel ] pic-hit jit-define
+[ 0 JE f rc-relative rel-word ] pic-hit jit-define
 
 ! ! ! Megamorphic caches
 
@@ -241,7 +241,7 @@ big-endian off
     [ temp1 temp0 tuple-class-offset [+] MOV ]
     jit-conditional
     ! cache = ...
-    temp0 0 MOV rc-absolute-cell rt-literal jit-rel
+    temp0 0 MOV f rc-absolute-cell rel-literal
     ! key = hashcode(class)
     temp2 temp1 MOV
     bootstrap-cell 4 = [ temp2 1 SHR ] when
@@ -256,7 +256,7 @@ big-endian off
     [ JNE ]
     [
         ! megamorphic_cache_hits++
-        temp1 0 MOV rc-absolute-cell rt-megamorphic-cache-hits jit-rel
+        temp1 0 MOV rc-absolute-cell rel-megamorphic-cache-hits
         temp1 [] 1 ADD
         ! goto get(cache + bootstrap-cell)
         temp0 temp0 bootstrap-cell [+] MOV
@@ -418,8 +418,7 @@ big-endian off
 ! Comparisons
 : jit-compare ( insn -- )
     ! load t
-    t jit-literal
-    temp3 0 MOV rc-absolute-cell rt-literal jit-rel
+    temp3 0 MOV t rc-absolute-cell rel-literal
     ! load f
     temp1 \ f type-number MOV
     ! load first value
