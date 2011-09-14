@@ -451,7 +451,7 @@ struct find_symbol_at_address_visitor {
 
 	void operator()(instruction_operand op)
 	{
-		if(op.rel_type() == RT_DLSYM && op.pointer < return_address)
+		if(op.rel_type() == RT_DLSYM && op.pointer <= return_address)
 		{
 			code_block *compiled = op.compiled;
 			array *parameters = untag<array>(compiled->parameters);
