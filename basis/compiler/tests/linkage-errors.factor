@@ -19,7 +19,7 @@ FUNCTION: void this_does_not_exist ( ) ;
     \ this_does_not_exist linkage-errors get at error>>
     ! We don't care about the error message from dlerror, just
     ! wipe it out
-    f >>message
+    clone f >>message
 ] unit-test
 
 << "no_such_library" "no_such_library" cdecl add-library >>
