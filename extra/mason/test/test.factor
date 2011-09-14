@@ -5,7 +5,7 @@ compiler.errors generic help.html help.lint io io.directories
 io.encodings.utf8 io.files kernel locals mason.common
 namespaces sequences sets sorting source-files.errors system
 tools.errors tools.test tools.time vocabs.errors
-vocabs.hierarchy vocabs.refresh words ;
+vocabs.hierarchy vocabs.refresh words parser.notes ;
 IN: mason.test
 
 : do-load ( -- )
@@ -64,6 +64,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
     outdated-core-vocabs [ outdated-boot-image. t ] [ 2drop f ] if ;
 
 : do-all ( -- )
+    f parser-quiet? set-global
     ".." [
         bootstrap-time get boot-time-file to-file
         check-boot-image [ 1 exit ] when
