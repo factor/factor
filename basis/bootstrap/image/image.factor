@@ -1,17 +1,17 @@
-! Copyright (C) 2004, 2010 Slava Pestov.
+! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.strings arrays byte-arrays generic hashtables
 hashtables.private io io.binary io.files io.encodings.binary
 io.pathnames kernel kernel.private math namespaces make parser
-prettyprint sequences sequences.generalizations strings sbufs
-vectors words quotations assocs system layouts splitting
-grouping growable classes classes.private classes.builtin
-classes.tuple classes.tuple.private vocabs vocabs.loader
-source-files definitions debugger quotations.private combinators
+prettyprint sequences combinators.smart strings sbufs vectors
+words quotations assocs system layouts splitting grouping
+growable classes classes.private classes.builtin classes.tuple
+classes.tuple.private vocabs vocabs.loader source-files
+definitions debugger quotations.private combinators
 combinators.short-circuit math.order math.private accessors
 slots.private generic.single.private compiler.units
-compiler.constants fry locals bootstrap.image.syntax
-generalizations parser.notes ;
+compiler.constants compiler.codegen.relocation fry locals
+bootstrap.image.syntax parser.notes ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -32,7 +32,6 @@ IN: bootstrap.image
 : images ( -- seq )
     {
         "windows-x86.32" "unix-x86.32"
-        "linux-ppc.32" "linux-ppc.64"
         "windows-x86.64" "unix-x86.64"
     } ;
 
@@ -105,65 +104,40 @@ CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
 
-SYMBOL: jit-relocations
-
-SYMBOL: jit-offset
-
-: compute-offset ( -- offset )
-    building get length jit-offset get + ;
-
-: jit-rel ( rc rt -- )
-    compute-offset 3array jit-relocations get push-all ;
-
-SYMBOL: jit-parameters
-
-: jit-parameter ( parameter -- )
-    jit-parameters get push ;
-
-SYMBOL: jit-literals
-
-: jit-literal ( literal -- )
-    jit-literals get push ;
-
-: jit-vm ( offset rc -- )
-    [ jit-parameter ] dip rt-vm jit-rel ;
-
-: jit-dlsym ( name rc -- )
-    rt-dlsym jit-rel string>symbol jit-parameter f jit-parameter ;
-
-: jit-dlsym-toc ( name rc -- )
-    rt-dlsym-toc jit-rel string>symbol jit-parameter f jit-parameter ;
-
 :: jit-conditional ( test-quot false-quot -- )
     [ 0 test-quot call ] B{ } make length :> len
-    building get length jit-offset get + len +
-    [ jit-offset set false-quot call ] B{ } make
+    building get length extra-offset get + len +
+    [ extra-offset set false-quot call ] B{ } make
     [ length test-quot call ] [ % ] bi ; inline
 
-: make-jit ( quot -- jit-parameters jit-literals jit-code )
+: make-jit ( quot -- parameters literals code )
+    #! code is a { relocation insns } pair
     [
-        0 jit-offset set
-        V{ } clone jit-parameters set
-        V{ } clone jit-literals set
-        V{ } clone jit-relocations set
+        0 extra-offset set
+        init-relocation
         call( -- )
-        jit-parameters get >array
-        jit-literals get >array
-        jit-relocations get >array
-    ] B{ } make prefix ;
+        parameter-table get >array
+        literal-table get >array
+        relocation-table get >byte-array
+    ] B{ } make 2array ;
+
+: make-jit-no-params ( quot -- code )
+    make-jit 2nip ;
 
 : jit-define ( quot name -- )
-    [ make-jit 2nip ] dip set ;
+    [ make-jit-no-params ] dip set ;
 
 : define-sub-primitive ( quot word -- )
     [ make-jit 3array ] dip sub-primitives get set-at ;
 
 : define-combinator-primitive ( quot non-tail-quot tail-quot word -- )
     [
-        [ make-jit ]
-        [ make-jit 2nip ]
-        [ make-jit 2nip ]
-        tri* 5 narray
+        [
+            [ make-jit ]
+            [ make-jit-no-params ]
+            [ make-jit-no-params ]
+            tri*
+        ] output>array
     ] dip
     sub-primitives get set-at ;
 

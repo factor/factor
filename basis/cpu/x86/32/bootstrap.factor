@@ -1,9 +1,10 @@
-! Copyright (C) 2007, 2010 Slava Pestov.
+! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler cpu.x86.assembler.operands layouts
-vocabs parser compiler.constants sequences math math.private
-generic.single.private threads.private ;
+vocabs parser compiler.constants compiler.codegen.relocation
+sequences math math.private generic.single.private
+threads.private ;
 IN: bootstrap.x86
 
 4 \ cell set
@@ -30,24 +31,24 @@ IN: bootstrap.x86
 : rex-length ( -- n ) 0 ;
 
 : jit-call ( name -- )
-    0 CALL rc-relative jit-dlsym ;
+    0 CALL f rc-relative rel-dlsym ;
 
 [
     ! save stack frame size
     stack-frame-size PUSH
     ! push entry point
-    0 PUSH rc-absolute-cell rt-this jit-rel
+    0 PUSH rc-absolute-cell rel-this
     ! alignment
     ESP stack-frame-size 3 bootstrap-cells - SUB
 ] jit-prolog jit-define
 
 [
-    pic-tail-reg 0 MOV rc-absolute-cell rt-here jit-rel
-    0 JMP rc-relative rt-entry-point-pic-tail jit-rel
+    pic-tail-reg 0 MOV 0 rc-absolute-cell rel-here
+    0 JMP f rc-relative rel-word-pic-tail
 ] jit-word-jump jit-define
 
 : jit-load-vm ( -- )
-    vm-reg 0 MOV 0 rc-absolute-cell jit-vm ;
+    vm-reg 0 MOV 0 rc-absolute-cell rel-vm ;
 
 : jit-load-context ( -- )
     ! VM pointer must be in vm-reg already
@@ -65,13 +66,13 @@ IN: bootstrap.x86
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
-    ! ctx-reg is preserved across the call because it is non-volatile
-    ! in the C ABI
+    ! ctx-reg is preserved across the call because it is
+    ! non-volatile in the C ABI
     jit-load-vm
     jit-save-context
     ! call the primitive
     ESP [] vm-reg MOV
-    0 CALL rc-relative rt-dlsym jit-rel
+    0 CALL f f rc-relative rel-dlsym
     jit-restore-context
 ] jit-primitive jit-define
 
@@ -177,7 +178,7 @@ IN: bootstrap.x86
 \ lazy-jit-compile define-combinator-primitive
 
 [
-    temp1 HEX: ffffffff CMP rc-absolute-cell rt-literal jit-rel
+    temp1 HEX: ffffffff CMP f rc-absolute-cell rel-literal
 ] pic-check-tuple jit-define
 
 ! Inline cache miss entry points

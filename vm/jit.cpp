@@ -23,17 +23,17 @@ jit::jit(code_block_type type_, cell owner_, factor_vm *vm)
 	  parent(vm)
 {}
 
-void jit::emit_relocation(cell code_template_)
+void jit::emit_relocation(cell relocation_template_)
 {
-	data_root<array> code_template(code_template_,parent);
-	cell capacity = array_capacity(code_template.untagged());
-	for(cell i = 1; i < capacity; i += 3)
+	data_root<byte_array> relocation_template(relocation_template_,parent);
+	cell capacity = array_capacity(relocation_template.untagged())
+		/ sizeof(relocation_entry);
+	relocation_entry *relocations = relocation_template->data<relocation_entry>();
+	for(cell i = 0; i < capacity; i++)
 	{
-		relocation_class rel_class = (relocation_class)untag_fixnum(array_nth(code_template.untagged(),i));
-		relocation_type rel_type = (relocation_type)untag_fixnum(array_nth(code_template.untagged(),i + 1));
-		cell offset = array_nth(code_template.untagged(),i + 2);
-
-		relocation_entry new_entry(rel_type,rel_class,code.count + untag_fixnum(offset));
+		relocation_entry entry = relocations[i];
+		relocation_entry new_entry(entry.rel_type(), entry.rel_class(),
+			entry.rel_offset() + code.count);
 		relocation.append_bytes(&new_entry,sizeof(relocation_entry));
 	}
 }
@@ -43,9 +43,9 @@ void jit::emit(cell code_template_)
 {
 	data_root<array> code_template(code_template_,parent);
 
-	emit_relocation(code_template.value());
+	emit_relocation(array_nth(code_template.untagged(),0));
 
-	data_root<byte_array> insns(array_nth(code_template.untagged(),0),parent);
+	data_root<byte_array> insns(array_nth(code_template.untagged(),1),parent);
 
 	if(computing_offset_p)
 	{

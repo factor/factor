@@ -40,19 +40,10 @@ bool callback_heap::return_takes_param_p()
 instruction_operand callback_heap::callback_operand(code_block *stub, cell index)
 {
 	tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
+	tagged<byte_array> relocation_template(array_nth(code_template.untagged(),0));
 
-	cell rel_class = untag_fixnum(array_nth(code_template.untagged(),3 * index + 1));
-	cell rel_type  = untag_fixnum(array_nth(code_template.untagged(),3 * index + 2));
-	cell offset    = untag_fixnum(array_nth(code_template.untagged(),3 * index + 3));
-
-	relocation_entry rel(
-		(relocation_type)rel_type,
-		(relocation_class)rel_class,
-		offset);
-
-	instruction_operand op(rel,stub,0);
-
-	return op;
+	relocation_entry entry(relocation_template->data<relocation_entry>()[index]);
+	return instruction_operand(entry,stub,0);
 }
 
 void callback_heap::store_callback_operand(code_block *stub, cell index)
@@ -74,7 +65,7 @@ void callback_heap::update(code_block *stub)
 code_block *callback_heap::add(cell owner, cell return_rewind)
 {
 	tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
-	tagged<byte_array> insns(array_nth(code_template.untagged(),0));
+	tagged<byte_array> insns(array_nth(code_template.untagged(),1));
 	cell size = array_capacity(insns.untagged());
 
 	cell bump = align(size + sizeof(code_block),data_alignment);
