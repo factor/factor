@@ -15,7 +15,12 @@ FUNCTION: void this_does_not_exist ( ) ;
 ] must-fail-with
 
 [ T{ no-such-symbol { name "this_does_not_exist" } } ]
-[ \ this_does_not_exist linkage-errors get at error>> ] unit-test
+[
+    \ this_does_not_exist linkage-errors get at error>>
+    ! We don't care about the error message from dlerror, just
+    ! wipe it out
+    f >>message
+] unit-test
 
 << "no_such_library" "no_such_library" cdecl add-library >>
 
@@ -35,4 +40,9 @@ FUNCTION: void no_such_function ( ) ;
 ] must-fail-with
 
 [ T{ no-such-library { name "no_such_library" } } ]
-[ \ no_such_function linkage-errors get at error>> ] unit-test
+[
+    \ no_such_function linkage-errors get at error>>
+    ! We don't care about the error message from dlerror, just
+    ! wipe it out
+    clone f >>message
+] unit-test
