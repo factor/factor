@@ -1,6 +1,6 @@
 IN: tools.errors
 USING: help.markup help.syntax source-files.errors words io
-compiler.errors classes ;
+compiler.errors classes strings ;
 
 ARTICLE: "compiler-errors" "Compiler errors"
 "After loading a vocabulary, you might see a message like:"
@@ -21,7 +21,7 @@ HELP: compiler-error
 { $description "Saves the error for viewing with " { $link :errors } "." } ;
 
 HELP: linkage-error
-{ $values { "error" linkage-error } { "word" word } { "class" class } }
+{ $values { "name" string } { "message" string } { "word" word } { "class" class } }
 { $description "Saves the error for viewing with " { $link :linkage } "." } ;
 
 HELP: :errors
