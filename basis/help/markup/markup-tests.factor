@@ -1,6 +1,7 @@
-USING: accessors assocs definitions fry generic help
+USING: accessors arrays assocs definitions fry generic help
 help.markup io.streams.string kernel math namespaces parser
-sequences strings tools.test words ;
+sequences sets strings tools.test words ;
+FROM: namespaces => set ;
 IN: help.markup.tests
 
 : with-markup-test ( quot -- )
@@ -72,3 +73,32 @@ TUPLE: blahblah quux ;
 
 [ "span\n\nHeading" ]
 [ [ { "span" { $nl } { $heading "Heading" } } print-content ] with-markup-test ] unit-test
+
+: word-related-words ( word -- word related-words )
+    dup [ "related" word-prop ] [ 1array ] bi diff ;
+
+SYMBOLS:
+    1foo 2foo 3foo
+    1bar 2bar 3bar ;
+
+{
+    1foo { 2foo 3foo }
+    1bar { 2bar 3bar }
+
+    1foo { 1bar }
+    2foo { 3foo }
+    2bar { 3bar }
+} [
+    { 1foo 2foo 3foo } related-words
+    { 1bar 2bar 3bar } related-words
+
+    1foo word-related-words
+    1bar word-related-words
+
+    { 2foo 3foo } related-words
+    { 1foo 1bar } related-words
+
+    1foo word-related-words
+    2foo word-related-words
+    2bar word-related-words
+] unit-test
