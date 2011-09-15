@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces opengl opengl.gl fry ;
+USING: command-line kernel namespaces opengl opengl.gl fry ;
 IN: ui.backend
 
 SYMBOL: ui-backend
@@ -32,3 +32,10 @@ HOOK: (with-ui) ui-backend ( quot -- )
 HOOK: (grab-input) ui-backend ( handle -- )
 
 HOOK: (ungrab-input) ui-backend ( handle -- )
+
+HOOK: ui-backend-available? ui-backend ( -- ? )
+
+M: object ui-backend-available?
+    f ;
+
+[ ui-backend-available? "ui.tools" "listener" ? ] main-vocab-hook set-global

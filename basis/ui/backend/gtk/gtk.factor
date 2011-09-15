@@ -539,4 +539,6 @@ os unix? os macosx? not and [
 { "ui.backend.gtk" "ui.gadgets.editors" }
 "ui.backend.gtk.input-methods.editors" require-when
 
-[ "DISPLAY" os-env "ui.tools" "listener" ? ] main-vocab-hook set-global
+M: gtk-ui-backend ui-backend-available?
+    "DISPLAY" os-env >boolean ;
+
