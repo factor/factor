@@ -414,5 +414,5 @@ M: x11-ui-backend (ungrab-input)
 
 x11-ui-backend ui-backend set-global
 
-[ "DISPLAY" os-env "ui.tools" "listener" ? ]
-main-vocab-hook set-global
+M: x11-ui-backend ui-backend-available?
+    "DISPLAY" os-env >boolean ;
