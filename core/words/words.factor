@@ -30,6 +30,9 @@ M: word definition def>> ;
     [ pick props>> ?set-at >>props drop ]
     [ nip remove-word-prop ] if ;
 
+: change-word-prop ( word prop quot -- )
+    [ swap props>> ] dip change-at ; inline
+
 : reset-props ( word seq -- ) [ remove-word-prop ] with each ;
 
 <PRIVATE

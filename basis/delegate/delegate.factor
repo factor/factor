@@ -76,9 +76,6 @@ M: broadcast (consult-method-quot)
     [ swap consult-method-quot ] 2bi
     define ;
 
-: change-word-prop ( word prop quot -- )
-    [ swap props>> ] dip change-at ; inline
-
 : each-generic ( consultation quot -- )
     [ [ group>> group-words ] keep ] dip curry each ; inline
 
