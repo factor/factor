@@ -1,12 +1,12 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes colors colors.constants
-combinators combinators.smart definitions definitions.icons effects
-fry generic hashtables help.stylesheet help.topics io io.styles
-kernel make math namespaces parser present prettyprint
-prettyprint.stylesheet quotations see sequences sets slots
-sorting splitting strings urls vectors vocabs vocabs.loader
-words words.symbol ;
+combinators combinators.smart compiler.units definitions
+definitions.icons effects fry generic hashtables help.stylesheet
+help.topics io io.styles kernel locals make math namespaces
+parser present prettyprint prettyprint.stylesheet quotations
+see sequences sets slots sorting splitting strings urls vectors
+vocabs vocabs.loader words words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
 FROM: namespaces => set ;
 IN: help.markup
@@ -277,8 +277,23 @@ PRIVATE>
 : $see-also ( topics -- )
     "See also" $heading $links ;
 
+<PRIVATE
+:: update-related-words ( words -- affected-words )
+    words words [| affected word |
+        word "related" [ affected union words ] change-word-prop
+    ] reduce ;
+
+:: clear-unrelated-words ( words affected-words -- )
+    affected-words words diff
+    [ "related" [ words diff ] change-word-prop ] each ;
+
+: notify-related-words ( affected-words -- )
+    [ dup associate notify-definition-observers ] each ;
+PRIVATE>
+
 : related-words ( seq -- )
-    dup '[ _ "related" set-word-prop ] each ;
+    dup update-related-words
+    [ clear-unrelated-words ] [ notify-related-words ] bi ;
 
 : $related ( element -- )
     first dup "related" word-prop remove
