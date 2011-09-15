@@ -1,7 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: documents namespaces tools.test io.styles
-ui.tools.listener.history kernel ;
+
+USING: accessors documents io.styles kernel namespaces
+sequences tools.test ui.tools.listener.history ;
+
 IN: ui.tools.listener.history.tests
 
 [ ] [ <document> "d" set ] unit-test
@@ -65,3 +67,9 @@ IN: ui.tools.listener.history.tests
 [ ] [ "   " "d" get set-doc-string ] unit-test
 [ ] [ "h" get history-recall-previous ] unit-test
 
+[ 1 ] [
+    "abc" <document> [ set-doc-string ] [ <history> ] bi
+    [ history-add drop ]
+    [ history-add drop ]
+    [ elements>> length ] tri
+] unit-test
