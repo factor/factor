@@ -16,7 +16,7 @@ TUPLE: deploy-gadget < pack vocab settings ;
 
 : deploy-console ( parent -- parent )
     deploy-console? get
-    "Deploy as Windows console application" <checkbox> add-gadget ;
+    "Deploy as console application on Windows" <checkbox> add-gadget ;
 
 : deploy-ui ( parent -- parent )
     deploy-ui? get
