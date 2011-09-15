@@ -256,4 +256,6 @@ M: cocoa-ui-backend (with-ui)
 
 cocoa-ui-backend ui-backend set-global
 
-[ running.app? "ui.tools" "listener" ? ] main-vocab-hook set-global
+M: cocoa-ui-backend ui-backend-available?
+    running.app? ;
+

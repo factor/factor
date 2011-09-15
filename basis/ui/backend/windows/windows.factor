@@ -861,6 +861,8 @@ M: windows-ui-backend (fullscreen?) ( world -- ? )
     [ hwnd>RECT ] [ fullscreen-RECT ] bi
     [ get-RECT-dimensions 2array 2nip ] bi@ = ;
 
+M: windows-ui-backend ui-backend-available?
+    t ;
+
 windows-ui-backend ui-backend set-global
 
-[ "ui.tools" ] main-vocab-hook set-global
