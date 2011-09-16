@@ -1,9 +1,11 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.destructors
-alien.libraries alien.syntax combinators debugger destructors
-fry io kernel literals math prettyprint sequences splitting
-system memoize graphviz ;
+USING: accessors alien alien.c-types alien.data
+alien.destructors alien.libraries alien.strings alien.syntax
+combinators debugger destructors fry graphviz io
+io.encodings.ascii kernel libc literals locals math memoize
+prettyprint sequences specialized-arrays splitting system ;
+SPECIALIZED-ARRAY: void*
 IN: graphviz.ffi
 
 <<
@@ -132,17 +134,25 @@ API_textlayout
 API_device
 API_loadimage ;
 
-FUNCTION: c-string
-          gvplugin_list
-          ( GVC_t* gvc, api_t api, c-string str ) ;
+FUNCTION: char**
+          gvPluginList
+          ( GVC_t* gvc, c-string kind, int* size, c-string str ) ;
 
-: plugin-list ( API_t -- seq )
-    '[
-        gvContext &gvFreeContext _ "" gvplugin_list
-        " " split harvest
+:: plugin-list ( kind-string -- seq )
+    [
+        gvContext &gvFreeContext
+        kind-string
+        0 int <ref> dup :> size*
+        f
+        gvPluginList &(free) :> ret
+        size* int deref :> size
+        ret size <direct-void*-array> [
+            &(free) ascii alien>string
+        ] { } map-as
     ] with-destructors ;
 
 PRIVATE>
 
-MEMO: supported-engines ( -- seq ) API_layout plugin-list ;
-MEMO: supported-formats ( -- seq ) API_device plugin-list ;
+MEMO: supported-engines ( -- seq ) "layout" plugin-list ;
+MEMO: supported-formats ( -- seq ) "device" plugin-list ;
+
