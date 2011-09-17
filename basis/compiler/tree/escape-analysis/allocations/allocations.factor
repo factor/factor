@@ -19,7 +19,7 @@ SYMBOL: value-classes
 ! - t -- not allocated in this procedure, can never be unboxed
 SYMBOL: allocations
 
-: (allocation) ( value -- value' allocations )
+: (allocation) ( -- allocations )
     allocations get ; inline
 
 : allocation ( value -- allocation )
