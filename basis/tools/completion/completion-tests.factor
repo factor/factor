@@ -12,3 +12,7 @@ IN: tools.completion
 [ { "nth" "?nth" "set-nth" } ] [
     "nth" { "set-nth" "nth" "?nth" } dup zip completions keys
 ] unit-test
+
+[ { "a" "b" "c" "d" "e" "f" "g" } ] [
+    "" { "a" "b" "c" "d" "e" "f" "g" } dup zip completions keys
+] unit-test
