@@ -35,7 +35,7 @@ GENERIC: completion-quot ( interactor completion-mode -- quot )
 M: word-completion completion-quot [ words-matching ] (completion-quot) ;
 M: vocab-completion completion-quot [ vocabs-matching ] (completion-quot) ;
 M: char-completion completion-quot [ chars-matching ] (completion-quot) ;
-M: history-completion completion-quot drop '[ drop _ history-list ] ;
+M: history-completion completion-quot drop history-list [ completions ] curry ;
 
 GENERIC: completion-element ( completion-mode -- element )
 
