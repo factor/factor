@@ -20,6 +20,9 @@ SLOT: history
     [ dup string>> { { CHAR: \n CHAR: \s } } substitute ] { } map>assoc
     <reversed> ;
 
+: history-completions ( short interactor -- seq )
+    history-list over empty? [ nip ] [ members completions ] if ;
+
 TUPLE: word-completion manifest ;
 C: <word-completion> word-completion
 
@@ -35,7 +38,7 @@ GENERIC: completion-quot ( interactor completion-mode -- quot )
 M: word-completion completion-quot [ words-matching ] (completion-quot) ;
 M: vocab-completion completion-quot [ vocabs-matching ] (completion-quot) ;
 M: char-completion completion-quot [ chars-matching ] (completion-quot) ;
-M: history-completion completion-quot drop '[ _ history-list completions ] ;
+M: history-completion completion-quot drop '[ _ history-completions ] ;
 
 GENERIC: completion-element ( completion-mode -- element )
 
