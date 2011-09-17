@@ -10,8 +10,8 @@ TUPLE: lexer text line line-text line-length column parsing-words ;
 TUPLE: lexer-parsing-word word line line-text column ;
 
 : next-line ( lexer -- )
-    dup [ line>> ] [ text>> ] bi ?nth >>line-text
-    dup line-text>> length >>line-length
+    dup [ line>> ] [ text>> ] bi ?nth
+    [ >>line-text ] [ length >>line-length ] bi
     [ 1 + ] change-line
     0 >>column
     drop ;
