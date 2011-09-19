@@ -66,7 +66,7 @@ SLOT: terminated?
 
 ! spread
 : spread>quot ( seq -- quot )
-    [ ] [ [ [ dip ] curry ] dip append ] reduce ;
+    [ ] [ [ dup empty? [ [ dip ] curry ] unless ] dip append ] reduce ;
 
 : spread ( objs... seq -- )
     spread>quot call ;

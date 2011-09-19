@@ -1,6 +1,6 @@
 USING: alien strings kernel math tools.test io prettyprint
 namespaces combinators words classes sequences accessors
-math.functions arrays combinators.private stack-checker ;
+math.functions arrays combinators.private ;
 IN: combinators.tests
 
 [ 3 ] [ 1 2 [ + ] call( x y -- z ) ] unit-test
@@ -320,7 +320,3 @@ DEFER: corner-case-1
 
 [ "nachos" ] [ 33 test-case-12 ] unit-test
 [ "nachos" ] [ 33 \ test-case-12 def>> call ] unit-test
-
-! Fixes #138
-[ { 3 3 } ]
-[ [ { [ ] [ ] [ ] } spread ] [ inputs ] [ outputs ] bi 2array ] unit-test
