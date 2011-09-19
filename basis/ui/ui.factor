@@ -7,6 +7,7 @@ destructors dlists fry init kernel lexer make math namespaces
 parser sequences sets strings threads ui.backend ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures vocabs.parser
 words ;
+FROM: namespaces => change-global ;
 IN: ui
 
 <PRIVATE

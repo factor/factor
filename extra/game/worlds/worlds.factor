@@ -3,6 +3,7 @@ USING: accessors audio.engine combinators concurrency.promises
 destructors fry game.input game.loop generic kernel math parser
 sequences threads ui ui.gadgets ui.gadgets.worlds ui.gestures
 words words.constant ;
+FROM: namespaces => change-global ;
 IN: game.worlds
 
 TUPLE: game-world < world

@@ -5,6 +5,7 @@ combinators definitions generic hashtables kernel
 kernel.private layouts math namespaces quotations
 sequences words generic.single.private effects make
 combinators.private ;
+FROM: assocs => change-at ;
 IN: generic.single
 
 ERROR: no-method object generic ;

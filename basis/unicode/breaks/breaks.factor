@@ -7,6 +7,7 @@ unicode.normalize.private values io.encodings.ascii
 unicode.data compiler.units fry unicode.categories.syntax
 alien.syntax sets accessors interval-maps memoize locals words
 simple-flat-file ;
+FROM: sequences => change-nth ;
 IN: unicode.breaks
 
 <PRIVATE

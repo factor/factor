@@ -8,6 +8,7 @@ ui.gestures ui.render ui.pens.solid ui.text ui.commands ui.images
 ui.gadgets.menus ui.gadgets.line-support models combinators
 combinators.short-circuit fonts locals splitting strings sets
 sorting ;
+FROM: sequences => change-nth ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol

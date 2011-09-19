@@ -5,6 +5,7 @@ USING: accessors arrays ascii assocs binary-search combinators
 fry kernel locals math math.bitwise math.combinatorics
 math.order math.statistics poker.arrays random sequences
 sequences.product splitting grouping lexer strings ;
+FROM: sequences => change-nth ;
 IN: poker
 
 ! The algorithm used is based on Cactus Kev's Poker Hand Evaluator with

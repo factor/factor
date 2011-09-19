@@ -3,6 +3,7 @@
 USING: math accessors kernel sequences.private sequences arrays
 combinators combinators.short-circuit parser prettyprint.custom
 persistent.sequences ;
+FROM: sequences => change-nth ;
 IN: persistent.vectors
 
 <PRIVATE

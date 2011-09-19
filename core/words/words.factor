@@ -4,6 +4,7 @@ USING: accessors arrays definitions kernel kernel.private
 slots.private math namespaces sequences strings vectors sbufs
 quotations assocs hashtables sorting vocabs math.order sets
 words.private ;
+FROM: assocs => change-at ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
