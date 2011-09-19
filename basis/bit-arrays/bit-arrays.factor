@@ -4,6 +4,7 @@ USING: alien alien.data accessors io.binary math math.bitwise
 alien.accessors kernel kernel.private sequences
 sequences.private byte-arrays parser prettyprint.custom fry
 locals ;
+FROM: sequences.private => change-nth-unsafe ;
 IN: bit-arrays
 
 TUPLE: bit-array

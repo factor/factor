@@ -11,6 +11,7 @@ compiler.cfg.instructions
 compiler.cfg.renaming
 compiler.cfg.renaming.functor
 compiler.cfg.ssa.construction.tdmsc ;
+FROM: assocs => change-at ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.construction
 

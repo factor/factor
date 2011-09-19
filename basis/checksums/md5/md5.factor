@@ -6,6 +6,7 @@ splitting grouping strings sequences byte-arrays locals
 sequences.private macros fry io.encodings.binary math.bitwise
 checksums accessors checksums.common checksums.stream
 combinators combinators.smart specialized-arrays literals hints ;
+FROM: sequences.private => change-nth-unsafe ;
 SPECIALIZED-ARRAY: uint
 IN: checksums.md5
 

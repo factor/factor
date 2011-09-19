@@ -4,6 +4,7 @@ USING: accessors arrays assocs bit-arrays bit-sets fry
 hashtables hints kernel locals math namespaces sequences sets
 compiler.cfg compiler.cfg.dominance compiler.cfg.rpo ;
 FROM: namespaces => set ;
+FROM: assocs => change-at ;
 IN: compiler.cfg.ssa.construction.tdmsc
 
 ! TDMSC-I algorithm from "A Practical and Fast Iterative Algorithm for

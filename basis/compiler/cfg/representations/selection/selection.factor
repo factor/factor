@@ -12,6 +12,7 @@ compiler.cfg.rpo
 compiler.cfg.utilities
 compiler.utilities
 cpu.architecture ;
+FROM: assocs => change-at ;
 FROM: namespaces => set ;
 IN: compiler.cfg.representations.selection
 

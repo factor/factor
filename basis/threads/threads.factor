@@ -5,6 +5,7 @@ USING: alien.private arrays hashtables heaps kernel kernel.private
 math namespaces sequences vectors continuations continuations.private
 dlists assocs system combinators init boxes accessors math.order
 deques strings quotations fry ;
+FROM: assocs => change-at ;
 IN: threads
 
 <PRIVATE
