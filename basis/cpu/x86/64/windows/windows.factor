@@ -3,7 +3,7 @@
 USING: kernel layouts system math alien.c-types sequences
 compiler.cfg.registers cpu.architecture cpu.x86.assembler
 cpu.x86 cpu.x86.64 cpu.x86.assembler.operands ;
-IN: cpu.x86.64.winnt
+IN: cpu.x86.64.windows
 
 M: x86.64 param-regs
     drop {

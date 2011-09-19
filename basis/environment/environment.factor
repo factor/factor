@@ -22,8 +22,7 @@ HOOK: (set-os-envs) os ( seq -- )
 
 {
     { [ os unix? ] [ "environment.unix" require ] }
-    { [ os winnt? ] [ "environment.winnt" require ] }
-    { [ os wince? ] [ ] }
+    { [ os windows? ] [ "environment.windows" require ] }
 } cond
 
 [

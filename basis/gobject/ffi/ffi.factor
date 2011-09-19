@@ -15,7 +15,7 @@ LIBRARY: gobject
 
 <<
 "gobject" {
-    { [ os winnt? ] [ "libobject-2.0-0.dll" cdecl add-library ] }
+    { [ os windows? ] [ "libobject-2.0-0.dll" cdecl add-library ] }
     { [ os unix? ] [ drop ] }
 } cond
 >>

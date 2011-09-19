@@ -70,7 +70,7 @@ C: <io-callback> io-callback
     [ (make-overlapped) ] dip
     handle>> ptr>> [ >>offset ] when* ;
 
-M: winnt FileArgs-overlapped ( port -- overlapped )
+M: windows FileArgs-overlapped ( port -- overlapped )
     make-overlapped ;
 
 : <completion-port> ( handle existing -- handle )
@@ -81,7 +81,7 @@ SYMBOL: master-completion-port
 : <master-completion-port> ( -- handle )
     INVALID_HANDLE_VALUE f <completion-port> ;
 
-M: winnt add-completion ( win32-handle -- win32-handle )
+M: windows add-completion ( win32-handle -- win32-handle )
     dup handle>> master-completion-port get-global <completion-port> drop ;
 
 : eof? ( error -- ? )
@@ -121,10 +121,10 @@ M: winnt add-completion ( win32-handle -- win32-handle )
 M: win32-handle cancel-operation
     [ handle>> CancelIo win32-error=0/f ] unless-disposed ;
 
-M: winnt io-multiplex ( nanos -- )
+M: windows io-multiplex ( nanos -- )
     handle-overlapped [ 0 io-multiplex ] when ;
 
-M: winnt init-io ( -- )
+M: windows init-io ( -- )
     <master-completion-port> master-completion-port set-global
     H{ } clone pending-overlapped set-global ;
 
@@ -138,9 +138,9 @@ ERROR: seek-before-start n ;
 : set-seek-ptr ( n handle -- )
     [ dup 0 < [ seek-before-start ] when ] dip ptr<< ;
 
-M: winnt tell-handle ( handle -- n ) ptr>> ;
+M: windows tell-handle ( handle -- n ) ptr>> ;
 
-M: winnt seek-handle ( n seek-type handle -- )
+M: windows seek-handle ( n seek-type handle -- )
     swap {
         { seek-absolute [ set-seek-ptr ] }
         { seek-relative [ [ ptr>> + ] keep set-seek-ptr ] }
@@ -185,7 +185,7 @@ M: winnt seek-handle ( n seek-type handle -- )
         [ lpOverlapped>> ]
     } cleave ;
     
-M: winnt (wait-to-write)
+M: windows (wait-to-write)
     [
         [ make-FileArgs dup setup-write WriteFile ]
         [ wait-for-file ]
@@ -196,7 +196,7 @@ M: winnt (wait-to-write)
 : finish-read ( n port -- )
     [ update-file-ptr ] [ buffer>> n>buffer ] 2bi ;
 
-M: winnt (wait-to-read) ( port -- )
+M: windows (wait-to-read) ( port -- )
     [
         [ make-FileArgs dup setup-read ReadFile ]
         [ wait-for-file ]
@@ -206,7 +206,7 @@ M: winnt (wait-to-read) ( port -- )
 
 : console-app? ( -- ? ) GetConsoleWindow >boolean ;
 
-M: winnt init-stdio
+M: windows init-stdio
     console-app?
     [ init-c-stdio ]
     [ null-reader null-writer null-writer set-stdio ] if ;
@@ -296,17 +296,17 @@ SYMBOLS: +read-only+ +hidden+ +system+
     [ timestamp>FILETIME ] tri@
     SetFileTime win32-error=0/f ;
 
-M: winnt cwd
+M: windows cwd
     MAX_UNICODE_PATH dup <ushort-array>
     [ GetCurrentDirectory win32-error=0/f ] keep
     utf16n alien>string ;
 
-M: winnt cd
+M: windows cd
     SetCurrentDirectory win32-error=0/f ;
 
 CONSTANT: unicode-prefix "\\\\?\\"
 
-M: winnt root-directory? ( path -- ? )
+M: windows root-directory? ( path -- ? )
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup [ path-separator? ] all? ] [ drop t ] }
@@ -331,7 +331,7 @@ TR: normalize-separators "/" "\\" ;
 
 PRIVATE>
 
-M: winnt normalize-path ( string -- string' )
+M: windows normalize-path ( string -- string' )
     dup unc-path? [
         normalize-separators
     ] [
@@ -340,7 +340,7 @@ M: winnt normalize-path ( string -- string' )
         prepend-prefix
     ] if ;
 
-M: winnt CreateFile-flags ( DWORD -- DWORD )
+M: windows CreateFile-flags ( DWORD -- DWORD )
     FILE_FLAG_OVERLAPPED bitor ;
 
 <PRIVATE
@@ -352,11 +352,11 @@ M: winnt CreateFile-flags ( DWORD -- DWORD )
 
 PRIVATE>
 
-M: winnt open-append
+M: windows open-append
     [ dup windows-file-size ] [ drop 0 ] recover
     [ (open-append) ] dip >>ptr ;
 
-M: winnt home
+M: windows home
     {
         [ "HOMEDRIVE" os-env "HOMEPATH" os-env append-path ]
         [ "USERPROFILE" os-env ]

@@ -12,14 +12,14 @@ IN: graphviz.ffi
 "libgraph" {
     { [ os macosx? ] [ "libgraph.dylib" ] }
     { [ os unix?   ] [ "libgraph.so"    ] }
-    { [ os winnt?  ] [ "graph.dll"      ] }
+    { [ os windows?  ] [ "graph.dll"      ] }
 } cond cdecl add-library
 
 "libgvc"
 {
     { [ os macosx? ] [ "libgvc.dylib" ] }
     { [ os unix?   ] [ "libgvc.so"    ] }
-    { [ os winnt?  ] [ "gvc.dll"      ] }
+    { [ os windows?  ] [ "gvc.dll"      ] }
 } cond cdecl add-library
 >>
 

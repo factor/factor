@@ -4,7 +4,7 @@ sequences system ;
 
 [ { "nmake" "/f" "nmakefile" "x86-32" } ] [
     [
-        winnt target-os set
+        windows target-os set
         x86.32 target-cpu set
         make-cmd
     ] with-scope
@@ -18,9 +18,9 @@ sequences system ;
     ] with-scope
 ] unit-test
 
-[ { "./factor.com" "-i=boot.winnt-x86.32.image" "-no-user-init" } ] [
+[ { "./factor.com" "-i=boot.windows-x86.32.image" "-no-user-init" } ] [
     [
-        winnt target-os set
+        windows target-os set
         x86.32 target-cpu set
         boot-cmd
     ] with-scope

@@ -18,9 +18,9 @@ H{ } clone sub-primitives set
 "vocab:bootstrap/syntax.factor" parse-file
 
 architecture get {
-    { "winnt-x86.32" "x86/32/winnt" }
+    { "windows-x86.32" "x86/32/windows" }
+    { "windows-x86.64" "x86/64/windows" }
     { "unix-x86.32"  "x86/32/unix"  }
-    { "winnt-x86.64" "x86/64/winnt" }
     { "unix-x86.64"  "x86/64/unix"  }
     { "linux-ppc.32" "ppc/32/linux" }
     { "linux-ppc.64" "ppc/64/linux" }

@@ -5,7 +5,7 @@ alien.syntax classes.struct combinators kernel math system unix.types ;
 IN: curses.ffi
 
 << "curses" {
-    { [ os winnt? ]  [ "libcurses.dll" ] }
+    { [ os windows? ]  [ "libcurses.dll" ] }
     { [ os macosx? ] [ "libcurses.dylib" ] }
     { [ os unix?  ]  [ "libncursesw.so" ] }
 } cond cdecl add-library >>

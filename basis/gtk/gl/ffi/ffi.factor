@@ -13,7 +13,7 @@ LIBRARY: gtk.gl
 
 <<
 "gtk.gl" {
-    { [ os winnt? ] [ drop ] }
+    { [ os windows? ] [ drop ] }
     { [ os macosx? ] [ drop ] }
     { [ os unix? ] [ "libgtkglext-x11-1.0.so" cdecl add-library ] }
 } cond

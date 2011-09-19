@@ -18,7 +18,7 @@ IN: mason.child
 
 : make-cmd ( -- args )
     {
-        { [ target-os get winnt = ] [ nmake-cmd ] }
+        { [ target-os get windows = ] [ nmake-cmd ] }
         [ gnu-make-cmd ]
     } cond ;
 
@@ -32,7 +32,7 @@ IN: mason.child
     ] with-directory ;
 
 : factor-vm ( -- string )
-    target-os get winnt = "./factor.com" "./factor" ? ;
+    target-os get windows = "./factor.com" "./factor" ? ;
 
 : boot-cmd ( -- cmd )
     [

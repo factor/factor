@@ -95,8 +95,8 @@ help:
 	@echo "macosx-ppc"
 	@echo "solaris-x86-32"
 	@echo "solaris-x86-64"
-	@echo "winnt-x86-32"
-	@echo "winnt-x86-64"
+	@echo "windows-x86-32"
+	@echo "windows-x86-64"
 	@echo ""
 	@echo "Additional modifiers:"
 	@echo ""
@@ -155,11 +155,11 @@ solaris-x86-32:
 solaris-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.solaris.x86.64
 
-winnt-x86-32:
+windows-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32
 	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.32
 
-winnt-x86-64:
+windows-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.64
 	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.64
 

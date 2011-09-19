@@ -91,8 +91,7 @@ $nl
 "Factor uses " { $snippet "kqueue" } " to implement monitors on BSD."
 $nl
 "The " { $snippet "kqueue" } " system is limited to monitoring individual files and directories. Monitoring a directory only notifies of files being added and removed to the directory itself, not of changes to file contents."
-{ $heading "Windows CE" }
-"Windows CE does not support monitors." ;
+;
 
 ARTICLE: "io.monitors" "File system change monitors"
 "File system change monitors listen for changes to file names, attributes and contents under a specified directory. They can optionally be recursive, in which case subdirectories are also monitored."

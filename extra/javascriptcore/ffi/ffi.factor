@@ -10,7 +10,7 @@ IN: javascriptcore.ffi
     { [ os macosx? ] [
         "/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/JavaScriptCore" cdecl add-library
     ] }
-    ! { [ os winnt? ]  [ "javascriptcore.dll" ] }
+    ! { [ os windows? ]  [ "javascriptcore.dll" ] }
     ! { [ os unix? ]  [ "libsqlite3.so" ] }
     [ drop ]
 } cond

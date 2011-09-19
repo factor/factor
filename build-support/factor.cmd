@@ -17,19 +17,19 @@ call cl 2>&1 | find "x86" >nul
 if not errorlevel 1 (
     echo x86-32 cl.exe detected.
     set _target=x86-32
-    set _bootimage=boot.winnt-x86.32.image
+    set _bootimage=boot.windows-x86.32.image
 ) else (
     call cl 2>&1 | find "x64" >nul
     if not errorlevel 1 (
         echo x86-64 cl.exe detected.
         set _target=x86-64
-        set _bootimage=boot.winnt-x86.64.image
+        set _bootimage=boot.windows-x86.64.image
     ) else goto nocl
 )
 
 if %_bootimage_version%==clean (
-    set _git_branch=clean-winnt-%_target%
-    set _bootimage_path=clean/winnt-%_target%
+    set _git_branch=clean-windows-%_target%
+    set _bootimage_path=clean/windows-%_target%
 ) else (
     set _git_branch=master
     set _bootimage_path=latest
@@ -81,7 +81,7 @@ echo     If latest is specified, then the working copy is updated to the
 echo     upstream "master" branch and the boot image corresponding to the
 echo     most recent factor build is downloaded. This is the default.
 echo     If clean is specified, then the working copy is updated to the
-echo     upstream "clean-winnt-*" branch corresponding to the current
+echo     upstream "clean-windows-*" branch corresponding to the current
 echo     platform and the corresponding boot image is downloaded.
 goto :EOF
 

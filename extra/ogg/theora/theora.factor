@@ -16,13 +16,13 @@ IN: ogg.theora
 
 <<
 "theoradec" {
-    { [ os winnt? ]  [ "theoradec.dll" ] }
+    { [ os windows? ]  [ "theoradec.dll" ] }
     { [ os macosx? ] [ "libtheoradec.0.dylib" ] }
     { [ os unix? ]   [ "libtheoradec.so" ] }
 } cond cdecl add-library
 
 "theoraenc" {
-    { [ os winnt? ]  [ "theoraenc.dll" ] }
+    { [ os windows? ]  [ "theoraenc.dll" ] }
     { [ os macosx? ] [ "libtheoraenc.0.dylib" ] }
     { [ os unix? ]   [ "libtheoraenc.so" ] }
 } cond cdecl add-library

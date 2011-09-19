@@ -15,7 +15,7 @@ LIBRARY: gdk
 
 <<
 "gdk" {
-    { [ os winnt? ] [ "libgdk-win32-2.0-0.dll" cdecl add-library ] }
+    { [ os windows? ] [ "libgdk-win32-2.0-0.dll" cdecl add-library ] }
     { [ os unix? ] [ drop ] }
 } cond
 >>

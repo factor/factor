@@ -39,7 +39,7 @@ IN: io.pipes.windows
         nano-count #
     ] "" make ;
 
-M: winnt (pipe) ( -- pipe )
+M: windows (pipe) ( -- pipe )
     [
         unique-pipe-name
         [ create-named-pipe ] [ open-other-end ] bi

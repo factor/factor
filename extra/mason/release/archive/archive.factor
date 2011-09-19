@@ -11,7 +11,7 @@ IN: mason.release.archive
 
 : extension ( os -- extension )
     {
-        { "winnt" [ ".zip" ] }
+        { "windows" [ ".zip" ] }
         { "macosx" [ ".dmg" ] }
         [ drop ".tar.gz" ]
     } case ;
@@ -35,7 +35,7 @@ IN: mason.release.archive
 
 : make-archive ( archive-name -- )
     target-os get {
-        { "winnt" [ make-windows-archive ] }
+        { "windows" [ make-windows-archive ] }
         { "macosx" [ make-macosx-archive ] }
         [ drop make-unix-archive ]
     } case ;

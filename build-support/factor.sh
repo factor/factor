@@ -178,10 +178,10 @@ find_os() {
     uname_s=`uname -s`
     check_ret uname
     case $uname_s in
-        CYGWIN_NT-5.2-WOW64) OS=winnt;;
-        *CYGWIN_NT*) OS=winnt;;
-        *CYGWIN*) OS=winnt;;
-        MINGW32*) OS=winnt;;
+        CYGWIN_NT-5.2-WOW64) OS=windows;;
+        *CYGWIN_NT*) OS=windows;;
+        *CYGWIN*) OS=windows;;
+        MINGW32*) OS=windows;;
         *darwin*) OS=macosx;;
         *Darwin*) OS=macosx;;
         *linux*) OS=linux;;
@@ -251,14 +251,14 @@ find_word_size() {
 
 set_factor_binary() {
     case $OS in
-        winnt) FACTOR_BINARY=factor.com;;
+        windows) FACTOR_BINARY=factor.com;;
         *) FACTOR_BINARY=factor;;
     esac
 }
 
 set_factor_library() {
     case $OS in
-        winnt) FACTOR_LIBRARY=factor.dll;;
+        windows) FACTOR_LIBRARY=factor.dll;;
         macosx) FACTOR_LIBRARY=libfactor.dylib;;
         *) FACTOR_LIBRARY=libfactor.a;;
     esac
@@ -308,12 +308,12 @@ set_build_info() {
     elif [[ $OS == linux && $ARCH == ppc ]] ; then
         MAKE_IMAGE_TARGET=linux-ppc.32
         MAKE_TARGET=linux-ppc-32
-    elif [[ $OS == winnt && $ARCH == x86 && $WORD == 64 ]] ; then
-        MAKE_IMAGE_TARGET=winnt-x86.64
-        MAKE_TARGET=winnt-x86-64
-    elif [[ $OS == winnt && $ARCH == x86 && $WORD == 32 ]] ; then
-        MAKE_IMAGE_TARGET=winnt-x86.32
-        MAKE_TARGET=winnt-x86-32
+    elif [[ $OS == windows && $ARCH == x86 && $WORD == 64 ]] ; then
+        MAKE_IMAGE_TARGET=windows-x86.64
+        MAKE_TARGET=windows-x86-64
+    elif [[ $OS == windows && $ARCH == x86 && $WORD == 32 ]] ; then
+        MAKE_IMAGE_TARGET=windows-x86.32
+        MAKE_TARGET=windows-x86-32
     elif [[ $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=unix-x86.64
         MAKE_TARGET=$OS-x86-64
@@ -337,7 +337,6 @@ parse_build_info() {
     if [[ $OS == linux && $ARCH == ppc ]] ; then WORD=32; fi
     if [[ $OS == linux && $ARCH == arm ]] ; then WORD=32; fi
     if [[ $OS == macosx && $ARCH == ppc ]] ; then WORD=32; fi
-    if [[ $OS == wince && $ARCH == arm ]] ; then WORD=32; fi
     
     $ECHO "OS=$OS"
     $ECHO "ARCH=$ARCH"
@@ -411,14 +410,14 @@ cd_factor() {
 
 set_copy() {
     case $OS in
-        winnt) COPY=cp;;
+        windows) COPY=cp;;
         *) COPY=cp;;
     esac
 }
 
 set_delete() {
     case $OS in
-        winnt) DELETE=rm;;
+        windows) DELETE=rm;;
         *) DELETE=rm;;
     esac
 }

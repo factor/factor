@@ -5,4 +5,4 @@ IN: io.backend.windows
 
 "io.files.windows" require
 
-winnt set-io-backend
+windows set-io-backend

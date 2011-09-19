@@ -8,7 +8,7 @@ IN: bootstrap.x86
 : tib-segment ( -- ) FS ;
 : tib-temp ( -- reg ) EAX ;
 
-<< "vocab:cpu/x86/winnt/bootstrap.factor" parse-file suffix! >> call
+<< "vocab:cpu/x86/windows/bootstrap.factor" parse-file suffix! >> call
 
 : jit-install-seh ( -- )
     ! Create a new exception record and store it in the TIB.

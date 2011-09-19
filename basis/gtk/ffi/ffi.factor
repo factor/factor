@@ -15,7 +15,7 @@ LIBRARY: gtk
 
 <<
 "gtk" {
-    { [ os winnt? ] [ "libgtk-win32-2.0-0.dll" cdecl add-library ] }
+    { [ os windows? ] [ "libgtk-win32-2.0-0.dll" cdecl add-library ] }
     { [ os unix? ] [ drop ] }
 } cond
 >>

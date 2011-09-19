@@ -7,7 +7,7 @@ IN: gdbm.ffi
 << "libgdbm" {
     { [ os macosx? ] [ "libgdbm.dylib" ] }
     { [ os unix?   ] [ "libgdbm.so"    ] }
-    { [ os winnt?  ] [ "gdbm3.dll"     ] }
+    { [ os windows?  ] [ "gdbm3.dll"     ] }
 } cond cdecl add-library >>
 
 LIBRARY: libgdbm

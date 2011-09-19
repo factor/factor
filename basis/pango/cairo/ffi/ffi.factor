@@ -12,7 +12,7 @@ LIBRARY: pango.cairo
 
 << 
 "pango.cairo" {
-    { [ os winnt? ] [ "libpangocairo-1.0-0.dll" cdecl add-library ] }
+    { [ os windows? ] [ "libpangocairo-1.0-0.dll" cdecl add-library ] }
     { [ os macosx? ] [ drop ] }
     { [ os unix? ] [ drop ] }
 } cond 
