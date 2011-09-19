@@ -11,7 +11,7 @@ IN: tools.disassembler.udis
 "libudis86" {
     { [ os macosx? ] [ "libudis86.0.dylib" ] }
     { [ os unix? ] [ "libudis86.so.0" ] }
-    { [ os winnt? ] [ "libudis86.dll" ] }
+    { [ os windows? ] [ "libudis86.dll" ] }
 } cond cdecl add-library
 >>
 

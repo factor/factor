@@ -12,7 +12,7 @@ LIBRARY: gstreamer.controller
 
 <<
 "gstreamer.controller" {
-    { [ os winnt? ] [ drop ] }
+    { [ os windows? ] [ drop ] }
     { [ os macosx? ] [ drop ] }
     { [ os unix? ] [ "libgstcontroller-0.10.so" cdecl add-library ] }
 } cond

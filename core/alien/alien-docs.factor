@@ -314,7 +314,6 @@ ARTICLE: "embedding" "Embedding Factor into C applications"
 { $table
     { "OS" "Library name" "Shared?" }
     { "Windows XP/Vista" { $snippet "factor.dll" } "Yes" }
-    ! { "Windows CE" { $snippet "factor-ce.dll" } "Yes" }
     { "Mac OS X" { $snippet "libfactor.dylib" } "Yes" }
     { "Other Unix" { $snippet "libfactor.a" } "No" }
 }

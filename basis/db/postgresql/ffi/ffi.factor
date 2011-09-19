@@ -6,7 +6,7 @@ alien.libraries ;
 IN: db.postgresql.ffi
 
 << "postgresql" {
-    { [ os winnt? ]  [ "libpq.dll" ] }
+    { [ os windows? ]  [ "libpq.dll" ] }
     { [ os macosx? ] [ "libpq.dylib" ] }
     { [ os unix?  ]  [ "libpq.so" ] }
 } cond cdecl add-library >>

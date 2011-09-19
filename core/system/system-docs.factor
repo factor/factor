@@ -43,8 +43,7 @@ ARTICLE: "os" "Operating system detection"
     openbsd
     netbsd
     solaris
-    wince
-    winnt
+    windows
 }
 "Operating system families:"
 { $subsections

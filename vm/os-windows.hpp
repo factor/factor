@@ -49,7 +49,7 @@ typedef HANDLE THREADHANDLE;
 	#define SNPRINTF snprintf
 #endif
 
-#define FACTOR_OS_STRING "winnt"
+#define FACTOR_OS_STRING "windows"
 
 #define FACTOR_DLL NULL
 

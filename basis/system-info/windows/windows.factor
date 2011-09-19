@@ -33,7 +33,7 @@ IN: system-info.windows
 : windows-minor ( -- n )
     os-version-struct dwMinorVersion>> ;
 
-M: winnt os-version ( -- obj )
+M: windows os-version ( -- obj )
     os-version-struct [ dwMajorVersion>> ] [ dwMinorVersion>> ] bi 2array ;
     
 : windows-build# ( -- n )
@@ -67,7 +67,7 @@ M: winnt os-version ( -- obj )
 : system-windows-directory ( -- str )
     \ GetSystemWindowsDirectory get-directory ;
 
-M: winnt cpus ( -- n )
+M: windows cpus ( -- n )
     system-info dwNumberOfProcessors>> ;
 
 : memory-status ( -- MEMORYSTATUSEX )
@@ -75,25 +75,25 @@ M: winnt cpus ( -- n )
     MEMORYSTATUSEX heap-size >>dwLength
     dup GlobalMemoryStatusEx win32-error=0/f ;
 
-M: winnt memory-load ( -- n )
+M: windows memory-load ( -- n )
     memory-status dwMemoryLoad>> ;
 
-M: winnt physical-mem ( -- n )
+M: windows physical-mem ( -- n )
     memory-status ullTotalPhys>> ;
 
-M: winnt available-mem ( -- n )
+M: windows available-mem ( -- n )
     memory-status ullAvailPhys>> ;
 
-M: winnt total-page-file ( -- n )
+M: windows total-page-file ( -- n )
     memory-status ullTotalPageFile>> ;
 
-M: winnt available-page-file ( -- n )
+M: windows available-page-file ( -- n )
     memory-status ullAvailPageFile>> ;
 
-M: winnt total-virtual-mem ( -- n )
+M: windows total-virtual-mem ( -- n )
     memory-status ullTotalVirtual>> ;
 
-M: winnt available-virtual-mem ( -- n )
+M: windows available-virtual-mem ( -- n )
     memory-status ullAvailVirtual>> ;
 
 : computer-name ( -- string )

@@ -9,7 +9,7 @@ IN: cairo.ffi
 ! Adapted from cairo.h, version 1.8.10
 
 << {
-    { [ os winnt? ] [ "cairo" "libcairo-2.dll" cdecl add-library ] }
+    { [ os windows? ] [ "cairo" "libcairo-2.dll" cdecl add-library ] }
     { [ os macosx? ] [ "cairo" "/opt/local/lib/libcairo.dylib" cdecl add-library ] }
     { [ os unix? ] [ ] }
 } cond >>

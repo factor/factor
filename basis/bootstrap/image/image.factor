@@ -15,7 +15,7 @@ generalizations parser.notes ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
-    2dup [ winnt? ] [ ppc? ] bi* or [
+    2dup [ windows? ] [ ppc? ] bi* or [
       [ drop unix ] dip
     ] unless
     [ name>> ] [ name>> ] bi* "-" glue ;
@@ -31,9 +31,9 @@ IN: bootstrap.image
 
 : images ( -- seq )
     {
-        "winnt-x86.32" "unix-x86.32"
+        "windows-x86.32" "unix-x86.32"
         "linux-ppc.32" "linux-ppc.64"
-        "winnt-x86.64" "unix-x86.64"
+        "windows-x86.64" "unix-x86.64"
     } ;
 
 <PRIVATE

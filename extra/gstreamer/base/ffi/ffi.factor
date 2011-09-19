@@ -12,7 +12,7 @@ LIBRARY: gstreamer.base
 
 <<
 "gstreamer.base" {
-    { [ os winnt? ] [ drop ] }
+    { [ os windows? ] [ drop ] }
     { [ os macosx? ] [ drop ] }
     { [ os unix? ] [ "libgstbase-0.10.so" cdecl add-library ] }
 } cond

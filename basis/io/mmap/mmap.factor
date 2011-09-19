@@ -60,5 +60,5 @@ PRIVATE>
 
 {
     { [ os unix? ] [ "io.mmap.unix" require ] }
-    { [ os winnt? ] [ "io.mmap.windows" require ] }
+    { [ os windows? ] [ "io.mmap.windows" require ] }
 } cond

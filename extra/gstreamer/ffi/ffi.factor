@@ -14,7 +14,7 @@ LIBRARY: gstreamer
 
 <<
 "gstreamer" {
-    { [ os winnt? ] [ drop ] }
+    { [ os windows? ] [ drop ] }
     { [ os macosx? ] [ drop ] }
     { [ os unix? ] [ "libgstreamer-0.10.so" cdecl add-library ] }
 } cond

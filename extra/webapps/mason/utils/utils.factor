@@ -24,7 +24,7 @@ IN: webapps.mason.utils
 : requirements ( builder -- xml )
     [
         os>> {
-            { "winnt" "Windows XP, Windows Vista or Windows 7" }
+            { "windows" "Windows XP, Windows Vista or Windows 7" }
             { "macosx" "Mac OS X 10.5 Leopard" }
             { "linux" "Ubuntu Linux 9.04 (other distributions may also work)" }
             { "freebsd" "FreeBSD 7.1" }

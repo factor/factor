@@ -28,7 +28,7 @@ CONSTANT: app-icon-resource-id "APPICON"
     [ binary file-contents app-icon-resource-id embed-icon-resource ]
     [ 2drop ] if ;
 
-M: winnt deploy*
+M: windows deploy*
     "resource:" [
         dup deploy-config [
             deploy-name get

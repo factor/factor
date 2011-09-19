@@ -62,7 +62,6 @@ HELP: unset-os-env
 
 ARTICLE: "environment" "Environment variables"
 "The " { $vocab-link "environment" } " vocabulary interfaces to the platform-dependent mechanism for setting environment variables." $nl
-"Windows CE has no concept of environment variables, so these words are undefined on that platform." $nl
 "Reading environment variables:"
 { $subsections
     os-env

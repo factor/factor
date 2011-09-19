@@ -34,7 +34,7 @@ PRIVATE>
 <<
 {
     { [ os macosx? ] [ "images.cocoa"   require ] }
-    { [ os winnt?  ] [ "images.gdiplus" require ] }
+    { [ os windows?  ] [ "images.gdiplus" require ] }
     [ "images.gtk" require ]
 } cond
 >>
