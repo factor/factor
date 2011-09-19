@@ -11,6 +11,9 @@ TUPLE: fuel-status manifest restarts ;
 SYMBOL: fuel-status-stack
 V{ } clone fuel-status-stack set-global
 
+SYMBOL: fuel-eval-error
+f fuel-eval-error set-global
+
 SYMBOL: fuel-eval-result
 f fuel-eval-result set-global
 
@@ -39,15 +42,17 @@ t fuel-eval-res-flag set-global
         bi
     ] unless ;
 
-: fuel-forget-error ( -- ) f error set-global ;
+: fuel-forget-error ( -- ) f fuel-eval-error set-global ;
 : fuel-forget-result ( -- ) f fuel-eval-result set-global ;
 : fuel-forget-output ( -- ) f fuel-eval-output set-global ;
 : fuel-forget-status ( -- )
     fuel-forget-error fuel-forget-result fuel-forget-output ;
 
 : fuel-send-retort ( -- )
-    error get fuel-eval-result get-global fuel-eval-output get-global
-    3array fuel-pprint flush nl "<~FUEL~>" write nl flush ;
+    fuel-eval-error get-global
+    fuel-eval-result get-global
+    fuel-eval-output get-global 3array
+    fuel-pprint flush nl "<~FUEL~>" write nl flush ;
 
 : (fuel-begin-eval) ( -- )
     fuel-push-status fuel-forget-status ;
@@ -57,7 +62,7 @@ t fuel-eval-res-flag set-global
 
 : (fuel-eval) ( lines -- )
     [ [ parse-lines ] with-compilation-unit call( -- ) ] curry
-    [ print-error ] recover ;
+    [ [ fuel-eval-error set-global ] [ print-error ] bi ] recover ;
 
 : (fuel-eval-usings) ( usings -- )
     [ [ use-vocab ] curry [ drop ] recover ] each
