@@ -22,7 +22,9 @@ QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
 QUALIFIED: vocabs.loader
+FROM: assocs => change-at ;
 FROM: namespaces => set ;
+FROM: sequences => change-nth ;
 FROM: sets => members ;
 IN: tools.deploy.shaker
 

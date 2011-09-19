@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hints kernel locals math hashtables
 assocs fry sequences ;
+FROM: assocs => change-at ;
 IN: disjoint-sets
 
 TUPLE: disjoint-set

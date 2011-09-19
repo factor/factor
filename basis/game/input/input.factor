@@ -1,5 +1,6 @@
 USING: arrays accessors continuations kernel math system
 sequences namespaces init vocabs vocabs.loader combinators ;
+FROM: namespaces => change-global ;
 IN: game.input
 
 SYMBOLS: game-input-backend game-input-opened ;

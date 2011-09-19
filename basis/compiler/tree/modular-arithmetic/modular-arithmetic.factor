@@ -10,6 +10,7 @@ compiler.tree.def-use
 compiler.tree.def-use.simplified
 compiler.tree.late-optimizations ;
 FROM: namespaces => set ;
+FROM: assocs => change-at ;
 IN: compiler.tree.modular-arithmetic
 
 ! This is a late-stage optimization.

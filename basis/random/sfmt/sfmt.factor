@@ -4,6 +4,7 @@ USING: accessors alien.c-types alien.data kernel locals math
 math.ranges math.bitwise math.vectors math.vectors.simd random
 sequences specialized-arrays sequences.private classes.struct
 combinators.short-circuit fry ;
+FROM: sequences => change-nth ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: uint-4
 IN: random.sfmt

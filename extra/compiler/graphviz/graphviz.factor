@@ -7,6 +7,7 @@ compiler.cfg.utilities compiler.tree.recursive images.viewer
 images.png io io.encodings.ascii io.files io.files.unique io.launcher
 kernel math.parser sequences assocs arrays make math namespaces
 quotations combinators locals words ;
+FROM: assocs => change-at ;
 IN: compiler.graphviz
 
 : quotes ( str -- str' ) "\"" "\"" surround ;

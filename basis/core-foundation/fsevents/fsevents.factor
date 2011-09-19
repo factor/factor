@@ -6,6 +6,7 @@ continuations combinators io.encodings.utf8 destructors locals
 arrays specialized-arrays classes.struct core-foundation
 core-foundation.arrays core-foundation.run-loop
 core-foundation.strings core-foundation.time unix.types ;
+FROM: namespaces => change-global ;
 IN: core-foundation.fsevents
 
 SPECIALIZED-ARRAY: void*
