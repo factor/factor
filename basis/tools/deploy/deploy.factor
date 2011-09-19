@@ -13,6 +13,6 @@ IN: tools.deploy
 
 {
     { [ os macosx? ] [ "tools.deploy.macosx" ] }
-    { [ os winnt? ] [ "tools.deploy.windows" ] }
+    { [ os windows? ] [ "tools.deploy.windows" ] }
     { [ os unix? ] [ "tools.deploy.unix" ] }
 } cond require

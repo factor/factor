@@ -143,7 +143,7 @@ USE: vocabs.loader
 
 {
     { [ os unix? ] [ "cpu.x86.64.unix" require ] }
-    { [ os winnt? ] [ "cpu.x86.64.winnt" require ] }
+    { [ os windows? ] [ "cpu.x86.64.windows" require ] }
 } cond
 
 check-sse

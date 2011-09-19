@@ -5,9 +5,9 @@ splitting windows windows.kernel32 windows.types system
 environment alien.data sequences windows.errors
 io.streams.memory io.encodings io specialized-arrays ;
 SPECIALIZED-ARRAY: TCHAR
-IN: environment.winnt
+IN: environment.windows
 
-M: winnt os-env ( key -- value )
+M: windows os-env ( key -- value )
     MAX_UNICODE_PATH TCHAR <c-array>
     [ dup length GetEnvironmentVariable ] keep over 0 = [
         2drop f
@@ -15,16 +15,16 @@ M: winnt os-env ( key -- value )
         nip utf16n alien>string
     ] if ;
 
-M: winnt set-os-env ( value key -- )
+M: windows set-os-env ( value key -- )
     swap SetEnvironmentVariable win32-error=0/f ;
 
-M: winnt unset-os-env ( key -- )
+M: windows unset-os-env ( key -- )
     f SetEnvironmentVariable 0 = [
         GetLastError ERROR_ENVVAR_NOT_FOUND =
         [ win32-error ] unless
     ] when ;
 
-M: winnt (os-envs) ( -- seq )
+M: windows (os-envs) ( -- seq )
     GetEnvironmentStrings [
         <memory-stream> [
             utf16n decode-input

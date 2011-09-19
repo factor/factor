@@ -13,7 +13,7 @@ LIBRARY: clutter.gtk
 
 <<
 "clutter.gtk" {
-    { [ os winnt? ] [ drop ] }
+    { [ os windows? ] [ drop ] }
     { [ os macosx? ] [ drop ] }
     { [ os unix? ] [ "libclutter-gtk-1.0.so" cdecl add-library ] }
 } cond

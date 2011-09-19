@@ -89,7 +89,7 @@ M: windows (raw) ( addrspec -- handle )
 : malloc-int ( n -- alien )
     int <ref> malloc-byte-array ; inline
 
-M: winnt WSASocket-flags ( -- DWORD )
+M: windows WSASocket-flags ( -- DWORD )
     WSA_FLAG_OVERLAPPED ;
 
 : get-ConnectEx-ptr ( socket -- void* )
@@ -251,7 +251,7 @@ TUPLE: WSARecvFrom-args port
         tri memcpy
     ] bi ; inline
 
-M: winnt (receive) ( datagram -- packet addrspec )
+M: windows (receive) ( datagram -- packet addrspec )
     [
         <WSARecvFrom-args>
         [ call-WSARecvFrom ]
@@ -295,7 +295,7 @@ TUPLE: WSASendTo-args port
         [ lpCompletionRoutine>> ]
     } cleave WSASendTo socket-error* ; inline
 
-M: winnt (send) ( packet addrspec datagram -- )
+M: windows (send) ( packet addrspec datagram -- )
     [
         <WSASendTo-args>
         [ call-WSASendTo ]

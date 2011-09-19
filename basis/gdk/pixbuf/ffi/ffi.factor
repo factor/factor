@@ -14,7 +14,7 @@ LIBRARY: gdk.pixbuf
 
 <<
 "gdk.pixbuf" {
-    { [ os winnt? ] [ "libgdk_pixbuf-2.0-0.dll" cdecl add-library ] }
+    { [ os windows? ] [ "libgdk_pixbuf-2.0-0.dll" cdecl add-library ] }
     { [ os unix? ] [ drop ] }
 } cond
 >>

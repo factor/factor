@@ -11,9 +11,7 @@ UNION: ppc ppc.32 ppc.64 ;
 
 : cpu ( -- class ) \ cpu get-global ; foldable
 
-SINGLETONS: winnt wince ;
-
-UNION: windows winnt wince ;
+SINGLETON: windows
 
 SINGLETONS: freebsd netbsd openbsd solaris macosx linux ;
 
@@ -40,8 +38,7 @@ UNION: unix bsd solaris linux haiku ;
 
 : string>os ( str -- class )
     H{
-        { "winnt" winnt }
-        { "wince" wince }
+        { "windows" windows }
         { "freebsd" freebsd }
         { "netbsd" netbsd }
         { "openbsd" openbsd }

@@ -13,7 +13,7 @@ LIBRARY: pango
 
 << 
 "pango" {
-    { [ os winnt? ] [ "libpango-1.0-0.dll" cdecl add-library ] }
+    { [ os windows? ] [ "libpango-1.0-0.dll" cdecl add-library ] }
     { [ os unix? ] [ drop ] }
 } cond 
 >>

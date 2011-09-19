@@ -89,7 +89,7 @@ TUPLE: win32-monitor < monitor port ;
     [ dup fill-queue (fill-queue-thread) ]
     [ dup already-disposed? [ 2drop ] [ rethrow ] if ] recover ;
 
-M:: winnt (monitor) ( path recursive? mailbox -- monitor )
+M:: windows (monitor) ( path recursive? mailbox -- monitor )
     [
         path normalize-path mailbox win32-monitor new-monitor
             path open-directory \ win32-monitor-port <buffered-port>

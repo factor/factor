@@ -23,7 +23,7 @@ $nl
 "The default value is " { $link +append-environment+ } "." ;
 
 ARTICLE: "io.launcher.redirection" "Input/output redirection"
-"On all operating systems except for Windows CE, the default input/output/error streams can be redirected."
+"On all operating systems, the default input/output/error streams can be redirected."
 $nl
 "To specify redirection, set the " { $snippet "stdin" } ", " { $snippet "stdout" } " and " { $snippet "stderr" } " slots of a " { $link process } " to one of the following values:"
 { $list

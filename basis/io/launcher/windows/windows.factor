@@ -77,19 +77,8 @@ TUPLE: CreateProcess-args
         [ drop f ]
     } case ;
 
-: app-name/cmd-line ( process -- app-name cmd-line )
-    command>> dup string? [
-        " " split1
-    ] [
-        unclip swap join-arguments
-    ] if ;
-
 : cmd-line ( process -- cmd-line )
     command>> dup string? [ join-arguments ] unless ;
-
-: fill-lpApplicationName ( process args -- process args )
-    over app-name/cmd-line
-    [ >>lpApplicationName ] [ >>lpCommandLine ] bi* ;
 
 : fill-lpCommandLine ( process args -- process args )
     over cmd-line >>lpCommandLine ;
@@ -97,7 +86,7 @@ TUPLE: CreateProcess-args
 : fill-dwCreateFlags ( process args -- process args )
     0
     pick pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
-    pick detached>> os winnt? and [ DETACHED_PROCESS bitor ] when
+    pick detached>> os windows? and [ DETACHED_PROCESS bitor ] when
     pick lookup-priority [ bitor ] when*
     >>dwCreateFlags ;
 
@@ -114,13 +103,9 @@ TUPLE: CreateProcess-args
 : fill-startup-info ( process args -- process args )
     dup lpStartupInfo>> STARTF_USESTDHANDLES >>dwFlags drop ;
 
-HOOK: fill-redirection io-backend ( process args -- )
-
-M: wince fill-redirection 2drop ;
-
 : make-CreateProcess-args ( process -- args )
     default-CreateProcess-args
-    os wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
+    fill-lpCommandLine
     fill-dwCreateFlags
     fill-lpEnvironment
     fill-startup-info
@@ -136,18 +121,6 @@ M: launch-error error.
     dup error>> error. nl
     "Launch descriptor:" print nl
     process>> . ;
-
-M: windows run-process* ( process -- handle )
-    [
-        [
-            current-directory get absolute-path cd
-    
-            dup make-CreateProcess-args
-            [ fill-redirection ] keep
-            dup call-CreateProcess
-            lpProcessInformation>>
-        ] with-destructors
-    ] [ launch-error ] recover ;
 
 M: windows kill-process* ( handle -- )
     hProcess>> 255 TerminateProcess win32-error=0/f ;
@@ -270,9 +243,21 @@ M: windows wait-for-processes ( -- ? )
     OPEN_EXISTING
     redirect
     STD_INPUT_HANDLE GetStdHandle or ;
-
-M: winnt fill-redirection ( process args -- )
+    
+: fill-redirection ( process args -- )
     dup lpStartupInfo>>
     [ [ redirect-stdout ] dip hStdOutput<< ]
     [ [ redirect-stderr ] dip hStdError<< ]
     [ [ redirect-stdin ] dip hStdInput<< ] 3tri ;
+
+M: windows run-process* ( process -- handle )
+    [
+        [
+            current-directory get absolute-path cd
+    
+            dup make-CreateProcess-args
+            [ fill-redirection ] keep
+            dup call-CreateProcess
+            lpProcessInformation>>
+        ] with-destructors
+    ] [ launch-error ] recover ;    

@@ -12,7 +12,7 @@ LIBRARY: clutter.cogl
 
 <<
 "clutter.cogl" {
-    { [ os winnt? ] [ drop ] }
+    { [ os windows? ] [ drop ] }
     { [ os macosx? ] [ drop ] }
     { [ os unix? ] [ "libclutter-glx-1.0.so" cdecl add-library ] }
 } cond

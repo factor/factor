@@ -379,7 +379,7 @@ CONSTANT: google-slides
     { $slide "Example: environment variables"
         { $vocab-link "environment" }
         "Hooks are generic words which dispatch on dynamically-scoped variables"
-        { "Implemented in an OS-specific way: " { $vocab-link "environment.unix" } ", " { $vocab-link "environment.winnt" } }
+        { "Implemented in an OS-specific way: " { $vocab-link "environment.unix" } ", " { $vocab-link "environment.windows" } }
     }
     { $slide "Example: environment variables"
         "Implementations use C FFI"

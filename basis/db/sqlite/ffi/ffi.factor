@@ -7,7 +7,7 @@ system combinators alien.c-types alien.libraries ;
 IN: db.sqlite.ffi
 
 << "sqlite" {
-        { [ os winnt? ]  [ "sqlite3.dll" ] }
+        { [ os windows? ]  [ "sqlite3.dll" ] }
         { [ os macosx? ] [ "/usr/lib/libsqlite3.dylib" ] }
         { [ os unix? ]  [ "libsqlite3.so" ] }
     } cond cdecl add-library >>
