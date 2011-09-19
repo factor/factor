@@ -37,7 +37,7 @@ GENERIC: print-stack-effect? ( word -- ? )
 M: parsing-word print-stack-effect? drop f ;
 M: symbol print-stack-effect? drop f ;
 M: constant print-stack-effect? drop f ;
-M: alias print-stack-effect? drop t ;
+M: alias print-stack-effect? drop f ;
 M: word print-stack-effect? drop t ;
 
 : stack-effect. ( word -- )
