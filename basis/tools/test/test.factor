@@ -111,6 +111,14 @@ SYNTAX: TEST:
 
 >>
 
+: fake-unit-test ( quot -- test-failures )
+    [
+        "fake" file set
+        V{ } clone test-failures set
+        call
+        test-failures get
+    ] with-scope ; inline
+
 PRIVATE>
 
 : run-test-file ( path -- )
@@ -160,3 +168,4 @@ M: test-failure error. ( error -- )
 : test ( prefix -- ) child-vocabs test-vocabs ;
 
 : test-all ( -- ) vocabs filter-don't-test test-vocabs ;
+
