@@ -18,6 +18,8 @@ M: mixin-class reset-class
 
 M: mixin-class rank-class drop 8 ;
 
+M: mixin-class definer drop \ MIXIN: f ;
+
 TUPLE: check-mixin-class class ;
 
 : check-mixin-class ( mixin -- mixin )
