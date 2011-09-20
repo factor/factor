@@ -346,7 +346,7 @@ PRIVATE>
 
 : glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
 
-: change-nth ( i seq quot -- )
+: change-nth ( ..a i seq quot: ( ..a elt -- ..b newelt ) -- ..b )
     [ [ nth ] dip call ] 3keep drop set-nth ; inline
 
 : min-length ( seq1 seq2 -- n ) [ length ] bi@ min ; inline
@@ -414,7 +414,7 @@ PRIVATE>
 : reduce ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each ; inline
 
-: map-integers ( len quot exemplar -- newseq )
+: map-integers ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
     [ over ] dip [ [ collect ] keep ] new-like ; inline
 
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
@@ -522,7 +522,7 @@ PRIVATE>
 : each-index ( ... seq quot: ( ... elt index -- ... ) -- ... )
     (each-index) each-integer ; inline
 
-: interleave ( seq between quot -- )
+: interleave ( ... seq between quot: ( ... elt -- ... ) -- ... )
     pick empty? [ 3drop ] [
         [ [ drop first-unsafe ] dip call ]
         [ [ rest-slice ] 2dip [ bi* ] 2curry each ]
