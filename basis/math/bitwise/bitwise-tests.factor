@@ -1,6 +1,6 @@
 USING: accessors math math.bitwise tools.test kernel words
 specialized-arrays alien.c-types math.vectors.simd
-sequences destructors libc literals ;
+sequences destructors libc literals classes.struct ;
 SPECIALIZED-ARRAY: int
 IN: math.bitwise.tests
 
@@ -29,6 +29,13 @@ IN: math.bitwise.tests
 [ 4 ] [ BIN: 1010101 bit-count ] unit-test
 [ 0 ] [ BIN: 0 bit-count ] unit-test
 [ 1 ] [ BIN: 1 bit-count ] unit-test
+[ 2 ] [ B{ 1 1 } bit-count ] unit-test
+[ 64 ] [ HEX: ffffffffffffffff bit-count ] unit-test
+
+STRUCT: bit-count-struct { a uint } ;
+
+[ 2 ] [ S{ bit-count-struct { a 3 } } bit-count ] unit-test
+
 
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: uint-4
@@ -48,3 +55,25 @@ SPECIALIZED-ARRAY: uint-4
 [ f ] [ BIN: 1 even-parity? ] unit-test
 [ f ] [ BIN: 0 odd-parity? ] unit-test
 [ t ] [ BIN: 1 odd-parity? ] unit-test
+
+[ -1 ] [ HEX: ff 4 >signed ] unit-test
+[ -1 ] [ HEX: ff 8 >signed ] unit-test
+[ 255 ] [ HEX: ff 16 >signed ] unit-test
+
+[ 2 ] [ 3 >even ] unit-test
+[ 3 ] [ 3 >odd ] unit-test
+[ 5 ] [ 4 >odd ] unit-test
+
+[ t ] [ HEX: ff 1 mask? ] unit-test
+[ f ] [ HEX: 0 1 mask? ] unit-test
+
+[ 7 ] [ 5 next-odd ] unit-test
+[ 7 ] [ 6 next-odd ] unit-test
+
+[ 6 ] [ 5 next-even ] unit-test
+[ 8 ] [ 6 next-even ] unit-test
+
+[ f ] [ HEX: 1 0 bit-clear? ] unit-test
+[ t ] [ HEX: 0 1 bit-clear? ] unit-test
+
+[ -1 bit-count ] [ invalid-bit-count-target? ] must-fail-with

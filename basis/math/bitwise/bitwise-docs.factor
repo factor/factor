@@ -154,6 +154,45 @@ HELP: symbols>flags
     }
 } ;
 
+HELP: >even
+{ $values
+    { "m" integer }
+    { "n" integer }
+}
+{ $examples
+    { $example "USING: math.bitwise prettyprint ;"
+        "7 >even ."
+        "6"
+    }
+}
+{ $description "Sets the lowest bit in the integer to 0, which either does nothing or outputs 1 less than the input integer." } ;
+
+HELP: >odd
+{ $values
+    { "m" integer }
+    { "n" integer }
+}
+{ $examples
+    { $example "USING: math.bitwise prettyprint ;"
+        "4 >odd ."
+        "5"
+    }
+}
+{ $description "Sets the lowest bit in the integer to 1, which either does nothing or outputs 1 more than the input integer." } ;
+
+HELP: >signed
+{ $values
+    { "x" integer } { "n" integer }
+    { "y" integer }
+}
+{ $examples
+    { $example "USING: math.bitwise prettyprint ;"
+        "HEX: ff 8 >signed ."
+        "-1"
+    }
+}
+{ $description "Interprets a number " { $snippet "x" } " as an " { $snippet "n" } "-bit number and converts it to a negative number " { $snippet "n" } "-bit number if the topmost bit is set." } ;
+
 HELP: mask
 { $values
      { "x" integer } { "n" integer }
@@ -298,7 +337,7 @@ HELP: w*
      { "x" integer } { "y" integer }
      { "z" integer }
 }
-{ $description "Multiplies two integers and wraps the result to 32 bits." }
+{ $description "Multiplies two integers and wraps the result to a 32-bit unsigned integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "HEX: ffffffff HEX: 2 w* ."
@@ -311,7 +350,7 @@ HELP: w+
      { "x" integer } { "y" integer }
      { "z" integer }
 }
-{ $description "Adds two integers and wraps the result to 32 bits." }
+{ $description "Adds two integers and wraps the result to a 32-bit unsigned integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "HEX: ffffffff HEX: 2 w+ ."
@@ -324,11 +363,50 @@ HELP: w-
      { "x" integer } { "y" integer }
      { "z" integer }
 }
-{ $description "Subtracts two integers and wraps the result to 32 bits." }
+{ $description "Subtracts two integers and wraps the result to a 32-bit unsigned integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "HEX: 0 HEX: ff w- ."
         "4294967041"
+    }
+} ;
+
+HELP: W*
+{ $values
+     { "x" integer } { "y" integer }
+     { "z" integer }
+}
+{ $description "Multiplies two integers and wraps the result to a 64-bit unsigned integer." }
+{ $examples
+    { $example "USING: math.bitwise kernel prettyprint ;"
+        "HEX: ffffffffffffffff HEX: 2 W* ."
+        "18446744073709551614"
+    }
+} ;
+
+HELP: W+
+{ $values
+     { "x" integer } { "y" integer }
+     { "z" integer }
+}
+{ $description "Adds two integers and wraps the result to 64-bit unsigned integer." }
+{ $examples
+    { $example "USING: math.bitwise kernel prettyprint ;"
+        "HEX: ffffffffffffffff HEX: 2 W+ ."
+        "1"
+    }
+} ;
+
+HELP: W-
+{ $values
+     { "x" integer } { "y" integer }
+     { "z" integer }
+}
+{ $description "Subtracts two integers and wraps the result to a 64-bit unsigned integer." }
+{ $examples
+    { $example "USING: math.bitwise kernel prettyprint ;"
+        "HEX: 0 HEX: ff W- ."
+        "18446744073709551361"
     }
 } ;
 
@@ -393,6 +471,17 @@ $nl
     w+
     w-
     w*
+}
+"64-bit arithmetic:"
+{ $subsections
+    W+
+    W-
+    W*
+}
+"Converting a number to the nearest even/odd:"
+{ $subsections
+    >even
+    >odd
 }
 "Bitfields:"
 { $subsections

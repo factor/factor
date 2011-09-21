@@ -19,7 +19,8 @@ IN: math.bitwise
 : mask-bit ( m n -- m' ) 2^ mask ; inline
 : on-bits ( m -- n ) 2^ 1 - ; inline
 : toggle-bit ( m n -- m' ) 2^ bitxor ; inline
-: >signed ( x n -- y ) 2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
+: >signed ( x n -- y )
+    [ bits ] keep 2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
 : >odd ( m -- n ) 0 set-bit ; foldable
 : >even ( m -- n ) 0 clear-bit ; foldable
 : next-even ( m -- n ) >even 2 + ; foldable
