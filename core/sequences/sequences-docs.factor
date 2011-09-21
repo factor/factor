@@ -340,7 +340,7 @@ HELP: map-index
 } } ;
 
 HELP: change-nth
-{ $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" { $quotation "( ... elt -- ... newelt )" } } }
+{ $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" { $quotation "( ..a elt -- ..b newelt )" } } }
 { $description "Applies the quotation to the " { $snippet "i" } "th element of the sequence, storing the result back into the sequence." }
 { $errors "Throws an error if the sequence is immutable, if the index is out of bounds, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
 { $side-effects "seq" } ;
@@ -1440,7 +1440,7 @@ ARTICLE: "sequences-integers" "Counted loops"
 "A virtual sequence is defined for iterating over integers from zero."
 { $subsection iota }
 "For example, calling " { $link iota } " on the integer 3 produces a sequence containing the elements 0, 1, and 2. This is very useful for performing counted loops using words such as " { $link each } ":"
-{ $example "3 iota [ . ] each" "0\n1\n2" }
+{ $example "USING: sequences prettyprint ; 3 iota [ . ] each" "0\n1\n2" }
 "A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link each-index } ", " { $link map-index } " and " { $link reduce-index } "."
 $nl
 "Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an instance of " { $link iota } "."
