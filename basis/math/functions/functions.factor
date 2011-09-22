@@ -191,18 +191,18 @@ M: complex log >polar [ flog ] dip rect> ; inline
 CONSTANT: most-negative-finite-float $[ -1/0. next-float >integer ]
 CONSTANT: most-positive-finite-float $[ 1/0. prev-float >integer ]
 
-MACRO: bignum-loghelper ( quot: ( x -- y ) -- quot )
-    dup 2 over call( x -- y ) '[
+MACRO: bignum-log ( quot: ( x -- y ) -- quot )
+    dup dup '[
         dup
         most-negative-finite-float
         most-positive-finite-float
         between?
-        [ >float @ ] [ frexp [ @ ] [ _ * ] bi* + ] if
+        [ >float @ ] [ frexp [ @ ] [ 2 @ * ] bi* + ] if
     ] ;
 
 PRIVATE>
 
-M: bignum log [ log ] bignum-loghelper ;
+M: bignum log [ log ] bignum-log ;
 
 GENERIC: log1+ ( x -- y )
 
@@ -218,7 +218,7 @@ M: real log10 >float flog10 ; inline
 
 M: complex log10 log 10 log / ; inline
 
-M: bignum log10 [ log10 ] bignum-loghelper ;
+M: bignum log10 [ log10 ] bignum-log ;
 
 GENERIC: cos ( x -- y ) foldable
 
