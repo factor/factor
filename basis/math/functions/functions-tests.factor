@@ -1,4 +1,4 @@
-USING: kernel math math.constants math.functions math.libm
+USING: kernel literals math math.constants math.functions math.libm
 math.order math.ranges math.private sequences tools.test ;
 
 IN: math.functions.tests
@@ -45,27 +45,32 @@ IN: math.functions.tests
 [ -0.5 1 ] [ -1 frexp ] unit-test
 [ 0.5 2 ] [ 2 frexp ] unit-test
 [ -0.5 2 ] [ -2 frexp ] unit-test
-[ 0.64 -6 ] [ 0.01 frexp ] unit-test
-[ -0.64 -6 ] [ -0.01 frexp ] unit-test
+[ 0.75 2 ] [ 3 frexp ] unit-test
+[ -0.75 2 ] [ -3 frexp ] unit-test
 [ 0.75 0 ] [ 0.75 frexp ] unit-test
 [ -0.75 0 ] [ -0.75 frexp ] unit-test
-[ 1/0. 0 ] [ 1/0. frexp ] unit-test
-[ -1/0. 0 ] [ -1/0. frexp ] unit-test
-[ 0.6588418960767314 8530 t ] [ 1000 factorial [ frexp ] [ bignum? ] bi ] unit-test
-[ -0.6588418960767314 8530 t ] [ 1000 factorial neg [ frexp ] [ bignum? ] bi ] unit-test
+[ 1/0. ] [ 1/0. frexp drop ] unit-test
+[ -1/0. ] [ -1/0. frexp drop ] unit-test
+[ t ] [ 0/0. frexp drop fp-nan? ] unit-test
+[  0.75 10,002 t ] [  3 10,000 2^ * [ frexp ] [ bignum? ] bi ] unit-test
+[ -0.75 10,002 t ] [ -3 10,000 2^ * [ frexp ] [ bignum? ] bi ] unit-test
 
 [ 0.0 ] [ 1 log ] unit-test
 [ 0.0 ] [ 1.0 log ] unit-test
 [ 1.0 ] [ e log ] unit-test
-[ 5912.128178488163 t ] [ 1000 factorial [ log ] [ bignum? ] bi ] unit-test
-[ C{ 5912.128178488163 3.141592653589793 } t ] [ 1000 factorial neg [ log ] [ bignum? ] bi ] unit-test
+
+CONSTANT: log-factorial-1000 HEX: 1.71820d04e2eb6p12
+CONSTANT: log10-factorial-1000 HEX: 1.40f3593ed6f8ep11
+
+[ $ log-factorial-1000 t ] [ 1000 factorial [ log ] [ bignum? ] bi ] unit-test
+[ C{ $ log-factorial-1000 $ pi } t ] [ 1000 factorial neg [ log ] [ bignum? ] bi ] unit-test
 
 [ 0.0 ] [ 1.0 log10 ] unit-test
 [ 1.0 ] [ 10.0 log10 ] unit-test
 [ 2.0 ] [ 100.0 log10 ] unit-test
 [ 3.0 ] [ 1000.0 log10 ] unit-test
 [ 4.0 ] [ 10000.0 log10 ] unit-test
-[ 2567.604644222133 t ] [ 1000 factorial [ log10 ] [ bignum? ] bi ] unit-test
+[ $ log10-factorial-1000 t ] [ 1000 factorial [ log10 ] [ bignum? ] bi ] unit-test
 
 [ t ] [ 1 exp e 1.e-10 ~ ] unit-test
 [ f ] [ 1 exp 0/0. 1.e-10 ~ ] unit-test
