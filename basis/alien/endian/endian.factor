@@ -1,8 +1,9 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types combinators
-compiler.units endian fry generalizations kernel macros math
-namespaces sequences words alien.data ;
+USING: accessors alien alien.accessors alien.c-types alien.data
+classes.struct.private combinators compiler.units endian fry
+generalizations kernel macros math namespaces sequences words
+arrays slots ;
 QUALIFIED-WITH: alien.c-types ac
 IN: alien.endian
 
@@ -34,6 +35,12 @@ MACRO: byte-reverse ( n signed? -- quot )
 SYMBOLS: le8 be8 ule8 ube8
 ule16 ule32 ule64 ube16 ube32 ube64
 le16 le32 le64 be16 be32 be64 ;
+
+: endian-c-type? ( symbol -- ? )
+    {
+        le8 be8 ule8 ube8 ule16 ule32 ule64
+        ube16 ube32 ube64 le16 le32 le64 be16 be32 be64
+    } member? ;
 
 ERROR: unknown-endian-c-type symbol ;
 
@@ -82,3 +89,62 @@ ERROR: unknown-endian-c-type symbol ;
     8 t \ le64 typedef-le
     8 t \ be64 typedef-be
 ] with-compilation-unit
+
+! pair: { le be }
+: pair>c-type ( pair -- c-type )
+    [ native-endianness get big-endian = ] dip first2 ? ;
+
+! endian is desired endian type. if we match endianness, return the c type
+! otherwise return the opposite of our endianness
+: endian-slot ( endian c-type pair -- endian-slot )
+    [ native-endianness get = ] 2dip rot [ drop ] [ nip pair>c-type ] if ;
+    
+ERROR: unsupported-endian-type endian slot ;
+
+: slot>endian-slot ( endian slot -- endian-slot )
+    dup array? [
+        first2 [ slot>endian-slot ] dip 2array
+    ] [
+        {
+            { [ dup char = ] [ 2drop char ] }
+            { [ dup uchar = ] [ 2drop uchar ] }
+            { [ dup ac:short = ] [ { le16 be16 } endian-slot ] }
+            { [ dup ushort = ] [ { ule16 ube16 } endian-slot ] }
+            { [ dup int = ] [ { le32 be32 } endian-slot ] }
+            { [ dup uint = ] [ { ule32 ube32 } endian-slot ] }
+            { [ dup longlong = ] [ { le64 be64 } endian-slot ] }
+            { [ dup ulonglong = ] [ { ule64 ube64 } endian-slot ] }
+            { [ dup endian-c-type? ] [ nip ] }
+            [ unsupported-endian-type ]
+        } cond
+    ] if ;
+
+: set-endian-slots ( endian slots -- slot-specs )
+    [ [ slot>endian-slot ] change-type ] with map ;
+
+: define-endian-struct-class ( class slots endian -- )
+    swap make-slots set-endian-slots
+    [ compute-struct-offsets ] [ struct-alignment ]
+    (define-struct-class) ;
+
+: define-endian-packed-struct-class ( class slots endian -- )
+    swap make-packed-slots set-endian-slots
+    [ compute-struct-offsets ] [ drop 1 ]
+    (define-struct-class) ;
+
+SYNTAX: LE-STRUCT:
+    parse-struct-definition
+    little-endian define-endian-struct-class ;
+
+SYNTAX: BE-STRUCT:
+    parse-struct-definition
+    big-endian define-endian-struct-class ;
+
+SYNTAX: LE-PACKED-STRUCT:
+    parse-struct-definition
+    little-endian define-endian-packed-struct-class ;
+
+SYNTAX: BE-PACKED-STRUCT:
+    parse-struct-definition
+    big-endian define-endian-packed-struct-class ;
+
