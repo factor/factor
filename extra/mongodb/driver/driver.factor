@@ -242,7 +242,7 @@ M: mdb-cursor find
 : find-one ( mdb-query-msg -- result/f )
     fix-query-collection 
     1 >>return# send-query-plain objects>>
-    dup empty? [ drop f ] [ first ] if ;
+    [ f ] [ first ] if-empty ;
 
 : count ( mdb-query-msg -- result )
     [ count-cmd make-cmd ] dip
