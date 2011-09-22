@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel math.constants math.private math.bits
 math.libm combinators fry math.order sequences
-combinators.short-circuit macros literals math.bitwise ;
+combinators.short-circuit macros literals ;
 IN: math.functions
 
 : >fraction ( a/b -- a b )
@@ -155,6 +155,11 @@ M: real absq sq ; inline
 
 : >=1? ( x -- ? )
     dup complex? [ drop f ] [ 1 >= ] if ; inline
+
+<PRIVATE
+! to avoid circular dependency on math.bitwise
+: on-bits ( m -- n ) 2^ 1 - ; inline
+PRIVATE>
 
 GENERIC: frexp ( x -- y exp )
 
