@@ -58,6 +58,7 @@ IN: math.functions.tests
 [ 0.0 ] [ 1.0 log ] unit-test
 [ 1.0 ] [ e log ] unit-test
 [ 5912.128178488163 t ] [ 1000 factorial [ log ] [ bignum? ] bi ] unit-test
+[ C{ 5912.128178488163 3.141592653589793 } t ] [ 1000 factorial neg [ log ] [ bignum? ] bi ] unit-test
 
 [ 0.0 ] [ 1.0 log10 ] unit-test
 [ 1.0 ] [ 10.0 log10 ] unit-test
