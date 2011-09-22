@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel math.constants math.private math.bits
-math.libm combinators fry math.order sequences
-combinators.short-circuit macros literals ;
+math.libm combinators fry math.order sequences ;
 IN: math.functions
 
 : >fraction ( a/b -- a b )
@@ -159,7 +158,7 @@ M: real absq sq ; inline
 GENERIC: frexp ( x -- y exp )
 
 M: float frexp
-    dup { [ fp-special? ] [ zero? ] } 1|| [ 0 ] [
+    dup fp-special? [ dup zero? ] unless* [ 0 ] [
         double>bits
         [ HEX: 800f,ffff,ffff,ffff bitand 0.5 double>bits bitor bits>double ]
         [ -52 shift HEX: 7ff bitand 1022 - ] bi
@@ -183,21 +182,26 @@ M: complex log >polar [ flog ] dip rect> ; inline
 
 <PRIVATE
 
-CONSTANT: most-negative-finite-float $[ -1/0. next-float >integer ]
-CONSTANT: most-positive-finite-float $[ 1/0. prev-float >integer ]
+: most-negative-finite-float ( -- x )
+    HEX: -1.ffff,ffff,ffff,fp1023 >integer ; inline
+: most-positive-finite-float ( -- x )
+    HEX:  1.ffff,ffff,ffff,fp1023 >integer ; inline
+CONSTANT: log-2   HEX: 1.62e42fefa39efp-1
+CONSTANT: log10-2 HEX: 1.34413509f79ffp-2
 
-MACRO: bignum-log ( quot: ( x -- y ) -- quot )
-    dup dup '[
-        dup
-        most-negative-finite-float
-        most-positive-finite-float
-        between?
-        [ >float @ ] [ frexp [ @ ] [ 2 @ * ] bi* + ] if
-    ] ;
+: (representable-as-float?) ( x -- ? )
+    most-negative-finite-float
+    most-positive-finite-float between? ; inline
+
+: (bignum-log) ( n log-quot: ( x -- y ) log-2 -- log )
+    [ dup ] dip '[
+        dup (representable-as-float?)
+        [ >float @ ] [ frexp [ @ ] [ _ * ] bi* + ] if
+    ] call ; inline
 
 PRIVATE>
 
-M: bignum log [ log ] bignum-log ;
+M: bignum log [ log ] log-2 (bignum-log) ;
 
 GENERIC: log1+ ( x -- y )
 
@@ -213,7 +217,7 @@ M: real log10 >float flog10 ; inline
 
 M: complex log10 log 10 log / ; inline
 
-M: bignum log10 [ log10 ] bignum-log ;
+M: bignum log10 [ log10 ] log10-2 (bignum-log) ;
 
 GENERIC: cos ( x -- y ) foldable
 
