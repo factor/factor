@@ -86,7 +86,7 @@ HELP: pointer:
 { $description "Constructs a " { $link pointer } " C type." } ;
 
 HELP: pointer
-{ $class-description "Represents a pointer C type. The " { $snippet "to" } " slot contains the C type being pointed to." { $link byte-array } " and " { $link alien } " values can be provided as pointer function inputs, but see " { $link "byte-arrays-gc" } " for notes about passing byte arrays into C functions. Objects with methods on " { $link >c-ptr } ", such as structs and specialized arrays, may also be used as pointer inputs."
+{ $class-description "Represents a pointer C type. The " { $snippet "to" } " slot contains the C type being pointed to. Both " { $link byte-array } " and " { $link alien } " values can be provided as pointer function inputs, but see " { $link "byte-arrays-gc" } " for notes about passing byte arrays into C functions. Objects with methods on " { $link >c-ptr } ", such as structs and specialized arrays, may also be used as pointer inputs."
 $nl
 "Pointer output values are represented in Factor as " { $link alien } "s. If the pointed-to type is a struct, the alien will automatically be wrapped in a struct object if it is not null."
 $nl
