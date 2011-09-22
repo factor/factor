@@ -269,7 +269,7 @@ M: gridfs-input-stream stream-element-type drop +byte+ ;
 
 M: gridfs-input-stream stream-read ( n stream -- seq/f )
     over <byte-vector> [ (stream-read) ] [ ] bi
-    dup empty? [ drop f ] [ >byte-array ] if ;
+    [ f ] [ >byte-array ] if-empty ;
 
 M: gridfs-input-stream stream-read-partial ( n stream -- seq/f )
     (stream-read-partial) ;
