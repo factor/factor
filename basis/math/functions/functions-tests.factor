@@ -1,5 +1,6 @@
-USING: kernel math math.constants math.functions math.order
-math.private math.libm tools.test ;
+USING: kernel math math.constants math.functions math.libm
+math.order math.ranges math.private sequences tools.test ;
+
 IN: math.functions.tests
 
 [ t ] [ 4 4 .00000001 ~ ] unit-test
@@ -37,15 +38,33 @@ IN: math.functions.tests
 [ 0 ] [ 0 3.0 ^ ] unit-test
 [ 0 ] [ 0 3 ^ ] unit-test
 
+: factorial ( n -- n! ) [ 1 ] [ [1,b] 1 [ * ] reduce ] if-zero ;
+
+[ 0.0 0 ] [ 0 frexp ] unit-test
+[ 0.5 1 ] [ 1 frexp ] unit-test
+[ -0.5 1 ] [ -1 frexp ] unit-test
+[ 0.5 2 ] [ 2 frexp ] unit-test
+[ -0.5 2 ] [ -2 frexp ] unit-test
+[ 0.64 -6 ] [ 0.01 frexp ] unit-test
+[ -0.64 -6 ] [ -0.01 frexp ] unit-test
+[ 0.75 0 ] [ 0.75 frexp ] unit-test
+[ -0.75 0 ] [ -0.75 frexp ] unit-test
+[ 1/0. 0 ] [ 1/0. frexp ] unit-test
+[ -1/0. 0 ] [ -1/0. frexp ] unit-test
+[ 0.6588418960767314 8530 t ] [ 1000 factorial [ frexp ] [ bignum? ] bi ] unit-test
+[ -0.6588418960767314 8530 t ] [ 1000 factorial neg [ frexp ] [ bignum? ] bi ] unit-test
+
 [ 0.0 ] [ 1 log ] unit-test
 [ 0.0 ] [ 1.0 log ] unit-test
 [ 1.0 ] [ e log ] unit-test
+[ 5912.128178488163 t ] [ 1000 factorial [ log ] [ bignum? ] bi ] unit-test
 
 [ 0.0 ] [ 1.0 log10 ] unit-test
 [ 1.0 ] [ 10.0 log10 ] unit-test
 [ 2.0 ] [ 100.0 log10 ] unit-test
 [ 3.0 ] [ 1000.0 log10 ] unit-test
 [ 4.0 ] [ 10000.0 log10 ] unit-test
+[ 2567.604644222133 t ] [ 1000 factorial [ log10 ] [ bignum? ] bi ] unit-test
 
 [ t ] [ 1 exp e 1.e-10 ~ ] unit-test
 [ f ] [ 1 exp 0/0. 1.e-10 ~ ] unit-test

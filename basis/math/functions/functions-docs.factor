@@ -110,6 +110,10 @@ HELP: exp
 { $values { "x" number } { "y" number } }
 { $description "Exponential function, " { $snippet "y=e^x" } "." } ;
 
+HELP: frexp
+{ $values { "x" number } { "y" float } { "exp" integer } }
+{ $description "Break the number " { $snippet "x" } " into a normalized fraction " { $snippet "y" } " and an integral power of 2 " { $snippet "exp" } "." $nl "The function returns a number " { $snippet "y" } " in the interval [1/2, 1) or 0, and a number " { $snippet "exp" } " such that " { $snippet "x = y*(2**exp)" } "." } ;
+
 HELP: log
 { $values { "x" number } { "y" number } }
 { $description "Natural logarithm function. Outputs negative infinity if " { $snippet "x" } " is 0." } ;
