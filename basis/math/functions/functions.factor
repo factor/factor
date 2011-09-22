@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel math.constants math.private math.bits
-math.libm combinators fry math.order sequences ;
+math.libm combinators fry math.order sequences
+combinators.short-circuit math.bitwise ;
 IN: math.functions
 
 : >fraction ( a/b -- a b )
@@ -155,6 +156,23 @@ M: real absq sq ; inline
 : >=1? ( x -- ? )
     dup complex? [ drop f ] [ 1 >= ] if ; inline
 
+GENERIC: frexp ( x -- y exp )
+
+M: float frexp
+    dup { [ fp-special? ] [ zero? ] } 1|| [ 0 ] [
+        double>bits
+        [ HEX: 800f,ffff,ffff,ffff bitand 0.5 double>bits bitor bits>double ]
+        [ -52 shift 11 on-bits bitand 1022 - ] bi
+    ] if ; inline
+
+M: integer frexp
+    [ 0.0 0 ] [
+        dup 0 > [ 1 ] [ abs -1 ] if swap dup log2 [
+            52 swap - shift 52 on-bits bitand
+            0.5 double>bits bitor bits>double
+        ] [ 1 + ] bi [ * ] dip
+    ] if-zero ; inline
+
 GENERIC: log ( x -- y )
 
 M: float log dup 0.0 >= [ flog ] [ 0.0 rect> log ] if ; inline
@@ -162,6 +180,24 @@ M: float log dup 0.0 >= [ flog ] [ 0.0 rect> log ] if ; inline
 M: real log >float log ; inline
 
 M: complex log >polar [ flog ] dip rect> ; inline
+
+<PRIVATE
+
+CONSTANT: most-positive-finite-float $[ 1/0. prev-float >integer ]
+CONSTANT: most-negative-finite-float $[ -1/0. next-float >integer ]
+
+MACRO: bignum-loghelper ( quot: ( x -- y ) -- quot )
+    dup 2 over call( x -- y ) '[
+        dup
+        most-positive-finite-float
+        most-negative-finite-float
+        between?
+        [ >float @ ] [ frexp [ @ ] [ _ * ] bi* + ] if
+    ] ;
+
+PRIVATE>
+
+M: bignum log [ log ] bignum-loghelper ;
 
 GENERIC: log1+ ( x -- y )
 
@@ -176,6 +212,8 @@ GENERIC: log10 ( x -- y ) foldable
 M: real log10 >float flog10 ; inline
 
 M: complex log10 log 10 log / ; inline
+
+M: bignum log10 [ log10 ] bignum-loghelper ;
 
 GENERIC: cos ( x -- y ) foldable
 
