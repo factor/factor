@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel math.constants math.private math.bits
 math.libm combinators fry math.order sequences
-combinators.short-circuit math.bitwise ;
+combinators.short-circuit macros literals math.bitwise ;
 IN: math.functions
 
 : >fraction ( a/b -- a b )
@@ -183,14 +183,14 @@ M: complex log >polar [ flog ] dip rect> ; inline
 
 <PRIVATE
 
-CONSTANT: most-positive-finite-float $[ 1/0. prev-float >integer ]
 CONSTANT: most-negative-finite-float $[ -1/0. next-float >integer ]
+CONSTANT: most-positive-finite-float $[ 1/0. prev-float >integer ]
 
 MACRO: bignum-loghelper ( quot: ( x -- y ) -- quot )
     dup 2 over call( x -- y ) '[
         dup
-        most-positive-finite-float
         most-negative-finite-float
+        most-positive-finite-float
         between?
         [ >float @ ] [ frexp [ @ ] [ _ * ] bi* + ] if
     ] ;
