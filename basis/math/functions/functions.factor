@@ -156,24 +156,19 @@ M: real absq sq ; inline
 : >=1? ( x -- ? )
     dup complex? [ drop f ] [ 1 >= ] if ; inline
 
-<PRIVATE
-! to avoid circular dependency on math.bitwise
-: on-bits ( m -- n ) 2^ 1 - ; inline
-PRIVATE>
-
 GENERIC: frexp ( x -- y exp )
 
 M: float frexp
     dup { [ fp-special? ] [ zero? ] } 1|| [ 0 ] [
         double>bits
         [ HEX: 800f,ffff,ffff,ffff bitand 0.5 double>bits bitor bits>double ]
-        [ -52 shift 11 on-bits bitand 1022 - ] bi
+        [ -52 shift HEX: 7ff bitand 1022 - ] bi
     ] if ; inline
 
 M: integer frexp
     [ 0.0 0 ] [
         dup 0 > [ 1 ] [ abs -1 ] if swap dup log2 [
-            52 swap - shift 52 on-bits bitand
+            52 swap - shift HEX: 000f,ffff,ffff,ffff bitand
             0.5 double>bits bitor bits>double
         ] [ 1 + ] bi [ * ] dip
     ] if-zero ; inline
