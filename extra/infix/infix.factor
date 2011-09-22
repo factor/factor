@@ -82,10 +82,10 @@ M: bad-stack-effect summary
     [ 1quotation compose ] [ bad-stack-effect ] if ;
 
 : arguments-codegen ( seq -- quot )
-    dup empty? [ drop [ ] ] [
+    [ [ ] ] [
         [ infix-codegen prepare-operand ]
         [ compose ] map-reduce
-    ] if ;
+    ] if-empty ;
 
 M: ast-function infix-codegen
     [ arguments>> [ arguments-codegen ] [ length ] bi ]
