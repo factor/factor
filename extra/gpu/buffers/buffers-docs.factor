@@ -216,7 +216,7 @@ HELP: with-mapped-buffer-array
     { "buffer" buffer } { "access" buffer-access-mode } { "c-type" "a C type" } { "quot" { $quotation "( ..a array -- ..b )" } }
 }
 { $description "Maps " { $snippet "buffer" } " into CPU address space with " { $snippet "access" } " for the dynamic extent of " { $snippet "quot" } ". " { $snippet "quot" } " is called with the pointer to the mapped memory wrapped in a specialized array of " { $snippet "c-type" } "." }
-{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. The vocabulary can be loaded with the " { $link require-c-array } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." } ;
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." } ;
 
 { allocate-buffer allocate-byte-array buffer-size update-buffer read-buffer copy-buffer with-mapped-buffer } related-words
 
