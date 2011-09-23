@@ -31,7 +31,7 @@ M: word definition def>> ;
     [ pick props>> ?set-at >>props drop ]
     [ nip remove-word-prop ] if ;
 
-: change-word-prop ( word prop quot -- )
+: change-word-prop ( ..a word prop quot: ( ..a value -- ..b newvalue ) -- ..b )
     [ swap props>> ] dip change-at ; inline
 
 : reset-props ( word seq -- ) [ remove-word-prop ] with each ;

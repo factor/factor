@@ -45,4 +45,4 @@ M: object max [ after? ] most ; inline
 
 : [-] ( x y -- z ) - 0 max ; inline
 
-: compare ( obj1 obj2 quot -- <=> ) bi@ <=> ; inline
+: compare ( obj1 obj2 quot: ( obj -- newobj ) -- <=> ) bi@ <=> ; inline
