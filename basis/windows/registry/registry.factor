@@ -100,7 +100,7 @@ TUPLE: registry-enum-key ;
 :: reg-enum-keys ( registry-info -- seq )
     registry-info sub-keys>> iota [
         [ registry-info key>> ] dip
-        registry-value-max-length TCHAR <c-array> dup :> registry-value
+        registry-value-max-length <TCHAR-array> dup :> registry-value
         registry-value length dup :> registry-value-length
         f
         0 DWORD <ref> dup :> type
@@ -115,7 +115,7 @@ TUPLE: registry-enum-key ;
 :: reg-query-info-key ( key -- n )
     key
     MAX_PATH
-    dup TCHAR <c-array> dup :> class-buffer
+    dup <TCHAR-array> dup :> class-buffer
     swap int <ref> dup :> class-buffer-length
     f
     0 DWORD <ref> dup :> sub-keys

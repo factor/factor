@@ -37,7 +37,7 @@ CONSTANT: game-width 224
 CONSTANT: game-height 256
 
 : make-opengl-bitmap ( -- array )
-  game-height game-width 3 * * uchar <c-array> ;
+  game-height game-width 3 * * <uchar-array> ;
 
 : bitmap-index ( point -- index )
   #! Point is a {x y}.

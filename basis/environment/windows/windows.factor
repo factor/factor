@@ -8,7 +8,7 @@ SPECIALIZED-ARRAY: TCHAR
 IN: environment.windows
 
 M: windows os-env ( key -- value )
-    MAX_UNICODE_PATH TCHAR <c-array>
+    MAX_UNICODE_PATH <TCHAR-array>
     [ dup length GetEnvironmentVariable ] keep over 0 = [
         2drop f
     ] [

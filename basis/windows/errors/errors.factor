@@ -712,7 +712,7 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   HEX: 000000FF
     f
     id
     LANG_NEUTRAL SUBLANG_DEFAULT make-lang-id
-    32768 [ TCHAR <c-array> ] [ ] bi
+    32768 [ <TCHAR-array> ] [ ] bi
     f pick [ FormatMessage ] dip
     swap zero?
     [ drop "Unknown error 0x" id HEX: ffff,ffff bitand >hex append ]
