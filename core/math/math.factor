@@ -76,9 +76,9 @@ ERROR: log2-expects-positive x ;
 : if-zero ( ..a n quot1: ( ..a -- ..b ) quot2: ( ..a n -- ..b ) -- ..b )
     [ dup zero? ] [ [ drop ] prepose ] [ ] tri* if ; inline
 
-: when-zero ( n quot -- ) [ ] if-zero ; inline
+: when-zero ( ..a n quot: ( ..a -- ..b ) -- ..b ) [ ] if-zero ; inline
 
-: unless-zero ( n quot -- ) [ ] swap if-zero ; inline
+: unless-zero ( ..a n quot: ( ..a -- ..b ) -- ..b ) [ ] swap if-zero ; inline
 
 UNION: integer fixnum bignum ;
 

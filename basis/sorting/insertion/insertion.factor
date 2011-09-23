@@ -11,6 +11,6 @@ IN: sorting.insertion
     ] unless ; inline recursive
 PRIVATE>
 
-: insertion-sort ( seq quot -- )
+: insertion-sort ( ... seq quot: ( ... elt -- ... elt' ) -- ... )
     ! quot is a transformation on elements
     over length [ insert ] with with each-integer ; inline

@@ -121,7 +121,7 @@ M: sequence cardinality
     [ [ [ members ] map concat ] [ first ] bi set-like ]
     if-empty ;
 
-: gather ( seq quot -- newseq )
+: gather ( ... seq quot: ( ... elt -- ... elt' ) -- ... newseq )
     map concat members ; inline
 
 : adjoin-at ( value key assoc -- )
