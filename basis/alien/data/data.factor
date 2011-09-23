@@ -16,10 +16,6 @@ IN: alien.data
 
 : little-endian? ( -- ? ) 1 int <ref> char deref 1 = ; foldable
 
-GENERIC: require-c-array ( c-type -- )
-
-M: array require-c-array first require-c-array ;
-
 GENERIC: c-array-constructor ( c-type -- word ) foldable
 
 GENERIC: c-(array)-constructor ( c-type -- word ) foldable
