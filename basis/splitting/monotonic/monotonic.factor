@@ -18,7 +18,7 @@ IN: splitting.monotonic
 
 PRIVATE>
 
-: monotonic-split ( seq quot -- newseq )
+: monotonic-split ( seq quot: ( obj1 obj2 -- ? ) -- newseq )
     over empty? [ 2drop { } ] [ (monotonic-split) ] if ; inline
 
 <PRIVATE
@@ -36,7 +36,7 @@ PRIVATE>
 
 PRIVATE>
 
-: monotonic-slice ( seq quot class -- slices )
+: monotonic-slice ( seq quot: ( obj1 obj2 -- ? ) class -- slices )
     pick length {
         { 0 [ 2drop ] }
         { 1 [ nip [ 0 1 rot ] dip boa 1array ] }

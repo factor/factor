@@ -75,7 +75,7 @@ sleep-entry ;
 : tset ( value key -- )
     tnamespace set-at ;
 
-: tchange ( key quot -- )
+: tchange ( ..a key quot: ( ..a value -- ..b newvalue ) -- ..b )
     [ tnamespace ] dip change-at ; inline
 
 : threads ( -- assoc )
