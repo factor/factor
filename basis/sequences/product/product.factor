@@ -49,14 +49,14 @@ PRIVATE>
 M: product-sequence nth
     product@ nths ;
 
-:: product-each ( sequences quot: ( seq -- ) -- )
+:: product-each ( ... sequences quot: ( ... seq -- ... ) -- ... )
     sequences start-product-iter :> ( ns lengths )
     lengths [ 0 = ] any? [
         [ ns lengths end-product-iter? ]
         [ ns sequences nths quot call ns lengths product-iter ] until
     ] unless ; inline
 
-:: product-map-as ( sequences quot: ( seq -- value ) exemplar -- sequence )
+:: product-map-as ( ... sequences quot: ( ... seq -- ... value ) exemplar -- ... sequence )
     0 :> i!
     sequences [ length ] [ * ] map-reduce exemplar
     [| result |
@@ -64,10 +64,10 @@ M: product-sequence nth
         result
     ] new-like ; inline
 
-: product-map ( sequences quot: ( seq -- value ) -- sequence )
+: product-map ( ... sequences quot: ( ... seq -- ... value ) -- ... sequence )
     over product-map-as ; inline
 
-:: product-map>assoc ( sequences quot: ( seq -- key value ) exemplar -- assoc )
+:: product-map>assoc ( ... sequences quot: ( ... seq -- ... key value ) exemplar -- ... assoc )
     0 :> i!
     sequences [ length ] [ * ] map-reduce { }
     [| result |
