@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays assocs compiler.units effects
-io.backend io.pathnames kernel llvm.core llvm.jit llvm.reader
-llvm.types make namespaces sequences specialized-arrays
-vocabs words ;
+USING: accessors alien alien.data arrays assocs compiler.units
+effects io.backend io.pathnames kernel llvm.core llvm.jit
+llvm.reader llvm.types make namespaces sequences
+specialized-arrays vocabs words ;
 SPECIALIZED-ARRAY: void*
 IN: llvm.invoker
 
@@ -15,7 +15,7 @@ IN: llvm.invoker
 TUPLE: function name alien return params ;
 
 : params ( llvm-function -- param-list )
-    dup LLVMCountParams <void*-array>
+    dup LLVMCountParams void* <c-array>
     [ LLVMGetParams ] keep >array
     [ [ LLVMGetValueName ] [ LLVMTypeOf tref> ] bi 2array ] map ;
 

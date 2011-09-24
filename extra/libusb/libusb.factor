@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.libraries
+USING: accessors alien alien.c-types alien.data alien.libraries
 alien.syntax classes.struct combinators endian io.binary
 kernel locals math sequences specialized-arrays
 system unix.time unix.types ;
@@ -341,7 +341,7 @@ FUNCTION: void libusb_free_transfer ( libusb_transfer* transfer ) ;
 : libusb_set_iso_packet_lengths ( transfer length -- )
     [ [ iso_packet_desc>> >c-ptr ]
       [ num_iso_packets>> ] bi
-      <direct-libusb_iso_packet_descriptor-array>
+      libusb_iso_packet_descriptor <c-direct-array>
     ] dip [ >>length drop ] curry each ; inline
     
 :: libusb_get_iso_packet_buffer ( transfer packet -- data )
@@ -351,7 +351,7 @@ FUNCTION: void libusb_free_transfer ( libusb_transfer* transfer ) ;
         transfer
         [ iso_packet_desc>> >c-ptr ] 
         [ num_iso_packets>> ] bi
-        <direct-libusb_iso_packet_descriptor-array> 0
+        libusb_iso_packet_descriptor <c-direct-array> 0
         [ length>> + ] reduce
         transfer buffer>> <displaced-alien>
     ] if ;
@@ -363,7 +363,7 @@ FUNCTION: void libusb_free_transfer ( libusb_transfer* transfer ) ;
         0 transfer
         [ iso_packet_desc>> >c-ptr ] 
         [ num_iso_packets>> ] bi
-        <direct-libusb_iso_packet_descriptor-array> nth
+        libusb_iso_packet_descriptor <c-direct-array> nth
         length>> packet *
         transfer buffer>> <displaced-alien>
     ] if ;

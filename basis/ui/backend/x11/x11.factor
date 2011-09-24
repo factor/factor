@@ -41,7 +41,7 @@ SINGLETON: x11-ui-backend
     ]
     with-out-parameters
     [| type format n-atoms bytes-after atoms |
-        atoms n-atoms <direct-ulong-array> >array
+        atoms n-atoms ulong <c-direct-array> >array
         atoms XFree
     ] call ;
 

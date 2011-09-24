@@ -248,10 +248,10 @@ DESTRUCTOR: alcCloseDevice*
 DESTRUCTOR: alcDestroyContext
 
 : gen-sources ( size -- seq )
-    dup <uint-array> [ alGenSources ] keep ;
+    dup uint <c-array> [ alGenSources ] keep ;
 
 : gen-buffers ( size -- seq )
-    dup <uint-array> [ alGenBuffers ] keep ;
+    dup uint <c-array> [ alGenBuffers ] keep ;
 
 : gen-buffer ( -- buffer ) 1 gen-buffers first ;
 

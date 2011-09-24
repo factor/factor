@@ -47,13 +47,13 @@ GENERIC: normalize-component-type* ( image component-type -- image )
     [ 255.0 * >integer ] B{ } map-as ;
 
 M: float-components normalize-component-type*
-    drop float-array-cast normalize-floats ;
+    drop float cast-array normalize-floats ;
 
 M: half-components normalize-component-type*
-    drop half-array-cast normalize-floats ;
+    drop half cast-array normalize-floats ;
 
 : ushorts>ubytes ( bitmap -- bitmap' )
-    ushort-array-cast [ -8 shift ] B{ } map-as ; inline
+    ushort cast-array [ -8 shift ] B{ } map-as ; inline
 
 M: ushort-components normalize-component-type*
     drop ushorts>ubytes ;

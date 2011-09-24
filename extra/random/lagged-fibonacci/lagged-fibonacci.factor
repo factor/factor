@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types fry kernel literals locals math
-random sequences specialized-arrays namespaces sequences.private ;
+USING: accessors alien.c-types alien.data fry kernel literals
+locals math random sequences specialized-arrays namespaces
+sequences.private ;
 SPECIALIZED-ARRAY: double
 IN: random.lagged-fibonacci
 
@@ -54,7 +55,7 @@ M:: lagged-fibonacci seed-random ( lagged-fibonacci seed! -- lagged-fibonacci )
 
 : <lagged-fibonacci> ( seed -- lagged-fibonacci )
     lagged-fibonacci new
-        p-r 1 + <double-array> >>u
+        p-r 1 + double <c-array> >>u
         swap seed-random ; inline
 
 GENERIC: random-float* ( tuple -- r )

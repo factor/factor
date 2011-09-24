@@ -44,7 +44,7 @@ SPECIALIZED-ARRAY: uint-4
 
 [ 1 ] [
     [
-        2 malloc-int-array &free 1 0 pick set-nth bit-count
+        2 int malloc-array &free 1 0 pick set-nth bit-count
     ] with-destructors
 ] unit-test
 

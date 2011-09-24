@@ -41,7 +41,7 @@ SYMBOL: keybuf
 SYMBOL: keysym
 
 : prepare-lookup ( -- )
-    buf-size <uint-array> keybuf set
+    buf-size uint <c-array> keybuf set
     0 KeySym <ref> keysym set ;
 
 : finish-lookup ( len -- string keysym )
