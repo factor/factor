@@ -14,16 +14,6 @@ INSTANCE: specialized-array sequence
 
 GENERIC: direct-array-syntax ( obj -- word )
 
-ERROR: bad-byte-array-length byte-array type ;
-
-M: bad-byte-array-length summary
-    drop "Byte array length doesn't divide type width" ;
-
-ERROR: not-a-byte-array alien ;
-
-M: not-a-byte-array summary
-    drop "Not a byte array" ;
-
 : (underlying) ( n c-type -- array )
     heap-size * (byte-array) ; inline
 
@@ -62,13 +52,6 @@ M: A direct-like drop <direct-A> ; inline
 
 : (A) ( n -- specialized-array )
     [ \ T (underlying) ] keep <direct-A> ; inline
-
-: malloc-A ( len -- specialized-array )
-    [ \ T heap-size calloc ] keep <direct-A> ; inline
-
-: A-cast ( byte-array -- specialized-array )
-    binary-object \ T heap-size /mod 0 =
-    [ <direct-A> ] [ drop \ T bad-byte-array-length ] if ; inline
 
 M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
 
@@ -179,6 +162,14 @@ M: c-type-word c-direct-array-constructor
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
 M: pointer c-direct-array-constructor drop void* c-direct-array-constructor ;
+
+M: c-type-word c-convert-array
+    underlying-type
+    dup [ name>> ">" "-array" surround ] [ specialized-array-vocab ] bi lookup
+    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
+
+M: pointer c-convert-array drop void* c-convert-array ;
+
 
 SYNTAX: SPECIALIZED-ARRAYS:
     ";" [ parse-c-type define-array-vocab use-vocab ] each-token ;

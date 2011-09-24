@@ -28,13 +28,13 @@ SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
 ] unit-test
 
 [ ushort-array{ 1234 } ] [
-    little-endian? B{ 210 4 } B{ 4 210 } ? ushort-array-cast
+    little-endian? B{ 210 4 } B{ 4 210 } ? ushort cast-array
 ] unit-test
 
-[ B{ 210 4 1 } ushort-array-cast ] must-fail
+[ B{ 210 4 1 } ushort cast-array ] must-fail
 
 [ { 3 1 3 3 7 } ] [
-    int-array{ 3 1 3 3 7 } malloc-byte-array 5 <direct-int-array> >array
+    int-array{ 3 1 3 3 7 } malloc-byte-array 5 int <c-direct-array> >array
 ] unit-test
 
 [ float-array{ HEX: 1.222,222   HEX: 1.111,112   } ]
