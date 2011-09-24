@@ -71,7 +71,7 @@ M: pointer <c-direct-array>
 SYNTAX: c-array{ \ } [ unclip >c-array ] parse-literal ;
 
 SYNTAX: c-array@
-    unclip-last [ scan-object scan-object ] dip
+    scan-object [ scan-object scan-object ] dip
     <c-direct-array> suffix! ;
 
 ERROR: bad-byte-array-length byte-array type ;
