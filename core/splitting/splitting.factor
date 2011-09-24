@@ -68,7 +68,7 @@ PRIVATE>
 : split ( seq separators -- pieces )
     [ [ member? ] curry split, ] { } make ;
 
-: split-when ( seq quot -- pieces )
+: split-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
     [ split, ] { } make ; inline
 
 GENERIC: string-lines ( str -- seq )

@@ -148,16 +148,17 @@ TUPLE: merge
 
 PRIVATE>
 
-: sort ( seq quot -- sortedseq )
+: sort ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )
     [ <merge> ] dip
     [ sort-pairs ] [ sort-loop ] [ drop accum>> underlying>> ] 2tri ;
     inline
 
 : natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
 
-: sort-with ( seq quot -- sortedseq )
+: sort-with ( seq quot: ( elt -- key ) -- sortedseq )
     [ compare ] curry sort ; inline
-: inv-sort-with ( seq quot -- sortedseq )
+
+: inv-sort-with ( seq quot: ( elt -- key ) -- sortedseq )
     [ compare invert-comparison ] curry sort ; inline
 
 GENERIC: sort-keys ( obj -- sortedseq )
