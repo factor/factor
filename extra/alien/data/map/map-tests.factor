@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: alien.data.map fry generalizations kernel locals math.vectors
+USING: alien.data alien.data.map fry generalizations kernel locals math.vectors
 math.vectors.conversion math math.vectors.simd math.ranges sequences
 specialized-arrays tools.test ;
 FROM: alien.c-types => uchar short int float ;

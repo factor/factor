@@ -1,6 +1,6 @@
 USING: tools.test io.files io.files.temp io io.streams.c
 io.encodings.ascii strings destructors kernel specialized-arrays
-alien.c-types math ;
+alien.c-types math alien.data ;
 SPECIALIZED-ARRAY: int
 IN: io.streams.c.tests
 
