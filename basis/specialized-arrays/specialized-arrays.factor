@@ -170,6 +170,19 @@ M: c-type-word c-convert-array
 
 M: pointer c-convert-array drop void* c-convert-array ;
 
+M: c-type-word c-array-type
+    underlying-type
+    dup [ name>> "-array" append ] [ specialized-array-vocab ] bi lookup
+    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
+
+M: pointer c-array-type drop void* c-array-type ;
+
+M: c-type-word c-array-type?
+    underlying-type
+    dup [ name>> "-array?" append ] [ specialized-array-vocab ] bi lookup
+    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
+
+M: pointer c-array-type? drop void* c-array-type? ;
 
 SYNTAX: SPECIALIZED-ARRAYS:
     ";" [ parse-c-type define-array-vocab use-vocab ] each-token ;

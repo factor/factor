@@ -2,7 +2,7 @@
 USING: accessors alien alien.arrays alien.c-types alien.strings
 arrays byte-arrays combinators combinators.short-circuit
 cpu.architecture fry generalizations io io.streams.memory kernel
-libc macros math math.functions sequences
+libc macros math math.functions parser sequences
 stack-checker.dependencies summary words ;
 QUALIFIED: math
 IN: alien.data
@@ -23,6 +23,18 @@ GENERIC: c-(array)-constructor ( c-type -- word ) foldable
 GENERIC: c-direct-array-constructor ( c-type -- word ) foldable
 
 GENERIC: c-convert-array ( c-type -- word ) foldable
+
+GENERIC: c-array-type ( c-type -- word ) foldable
+
+GENERIC: c-array-type? ( c-type -- word ) foldable
+
+GENERIC: c-array? ( obj c-type -- ? ) foldable
+
+M: word c-array?
+    c-array-type? execute( seq -- array ) ; inline
+
+M: pointer c-array?
+    drop void* c-array? ;
 
 GENERIC: >c-array ( seq c-type -- array )
 
@@ -55,6 +67,8 @@ M: word <c-direct-array>
 
 M: pointer <c-direct-array>
     drop void* <c-direct-array> ;
+
+SYNTAX: c-array{ \ } [ unclip >c-array ] parse-literal ;
 
 ERROR: bad-byte-array-length byte-array type ;
 
