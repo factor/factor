@@ -12,13 +12,24 @@ MIXIN: specialized-array
 
 INSTANCE: specialized-array sequence
 
-GENERIC: direct-array-syntax ( obj -- word )
-
 : (underlying) ( n c-type -- array )
     heap-size * (byte-array) ; inline
 
 : <underlying> ( n type -- array )
     heap-size * <byte-array> ; inline
+
+GENERIC: underlying-type ( c-type -- c-type' )
+
+M: c-type-word underlying-type
+    dup "c-type" word-prop {
+        { [ dup not ] [ drop no-c-type ] }
+        { [ dup pointer? ] [ 2drop void* ] }
+        { [ dup c-type-word? ] [ nip underlying-type ] }
+        [ drop ]
+    } cond ;
+
+M: pointer underlying-type
+    drop void* ;
 
 <PRIVATE
 
@@ -80,14 +91,13 @@ M: A resize
 
 M: A element-size drop \ T heap-size ; inline
 
-M: A direct-array-syntax drop \ A@ ;
+M: A underlying-type drop \ T ;
 
 M: A pprint-delims drop \ A{ \ } ;
 
 M: A >pprint-sequence ;
 
 SYNTAX: A{ \ } [ >A ] parse-literal ;
-SYNTAX: A@ scan-object scan-object <direct-A> suffix! ;
 
 INSTANCE: A specialized-array
 
@@ -98,19 +108,6 @@ M: A vs* [ * \ T c-type-clamp ] 2map ; inline
 M: A v*high [ * \ T heap-size neg shift ] 2map ; inline
 
 ;FUNCTOR
-
-GENERIC: underlying-type ( c-type -- c-type' )
-
-M: c-type-word underlying-type
-    dup "c-type" word-prop {
-        { [ dup not ] [ drop no-c-type ] }
-        { [ dup pointer? ] [ 2drop void* ] }
-        { [ dup c-type-word? ] [ nip underlying-type ] }
-        [ drop ]
-    } cond ;
-
-M: pointer underlying-type
-    drop void* ;
 
 : specialized-array-vocab ( c-type -- vocab )
     [
