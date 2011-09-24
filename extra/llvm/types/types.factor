@@ -119,7 +119,7 @@ TUPLE: struct < enclosing types packed? ;
     swap >>packed? swap >>types ;
 
 M: struct (>tref)*
-    [ types>> [ (>tref) ] map >void*-array ]
+    [ types>> [ (>tref) ] map void* >c-array ]
     [ types>> length ]
     [ packed?>> 1 0 ? ] tri LLVMStructType ;
 M: struct clean* types>> [ clean ] each ;
@@ -148,7 +148,7 @@ TUPLE: function < enclosing return params vararg? ;
 
 M: function (>tref)* {
     [ return>> (>tref) ]
-    [ params>> [ (>tref) ] map >void*-array ]
+    [ params>> [ (>tref) ] map void* >c-array ]
     [ params>> length ]
     [ vararg?>> 1 0 ? ]
 } cleave LLVMFunctionType ;

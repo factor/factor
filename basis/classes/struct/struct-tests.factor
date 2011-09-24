@@ -328,7 +328,7 @@ STRUCT: clone-test-struct { x int } { y char[3] } ;
     clone-test-struct <struct>
     1 >>x char-array{ 9 1 1 } >>y
     clone
-    [ x>> ] [ y>> >char-array ] bi
+    [ x>> ] [ y>> char >c-array ] bi
 ] unit-test
 
 [ t 1 char-array{ 9 1 1 } ] [

@@ -74,16 +74,16 @@ SYNTAX: SIMD-INTRINSIC::
 
 : [>rep-array] ( rep -- class )
     {
-        { char-16-rep      [ [ >char-array      ] ] }
-        { uchar-16-rep     [ [ >uchar-array     ] ] }
-        { short-8-rep      [ [ >short-array     ] ] }
-        { ushort-8-rep     [ [ >ushort-array    ] ] }
-        { int-4-rep        [ [ >int-array       ] ] }
-        { uint-4-rep       [ [ >uint-array      ] ] }
-        { longlong-2-rep   [ [ >longlong-array  ] ] }
-        { ulonglong-2-rep  [ [ >ulonglong-array ] ] }
-        { float-4-rep      [ [ >float-array     ] ] }
-        { double-2-rep     [ [ >double-array    ] ] }
+        { char-16-rep      [ [ c:char >c-array      ] ] }
+        { uchar-16-rep     [ [ c:uchar >c-array     ] ] }
+        { short-8-rep      [ [ c:short >c-array     ] ] }
+        { ushort-8-rep     [ [ c:ushort >c-array    ] ] }
+        { int-4-rep        [ [ c:int >c-array       ] ] }
+        { uint-4-rep       [ [ c:uint >c-array      ] ] }
+        { longlong-2-rep   [ [ c:longlong >c-array  ] ] }
+        { ulonglong-2-rep  [ [ c:ulonglong >c-array ] ] }
+        { float-4-rep      [ [ c:float >c-array     ] ] }
+        { double-2-rep     [ [ c:double >c-array    ] ] }
     } case ; foldable
 
 : [<rep-array>] ( rep -- class )

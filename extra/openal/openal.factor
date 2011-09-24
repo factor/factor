@@ -256,7 +256,7 @@ DESTRUCTOR: alcDestroyContext
 : gen-buffer ( -- buffer ) 1 gen-buffers first ;
 
 : queue-buffers ( source buffers -- )
-    [ length ] [ >uint-array ] bi alSourceQueueBuffers ;
+    [ length ] [ uint >c-array ] bi alSourceQueueBuffers ;
 
 : queue-buffer ( source buffer -- )
     1array queue-buffers ;
