@@ -16,6 +16,11 @@ HELP: <c-array>
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
 
+HELP: c-array{
+{ $description "Literal syntax, consists of a C-type followed by a series of values terminated by " { $snippet "}" } }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
+{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
+
 HELP: memory>byte-array
 { $values { "alien" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new byte array." } ;
