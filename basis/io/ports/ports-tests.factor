@@ -1,4 +1,4 @@
-USING: alien.data destructors io io.directories
+USING: alien.c-types alien.data destructors io io.directories
 io.encodings.binary io.files io.files.temp kernel libc math
 sequences tools.test ;
 IN: io.ports.tests

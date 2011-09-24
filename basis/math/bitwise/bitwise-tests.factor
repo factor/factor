@@ -1,5 +1,5 @@
 USING: accessors math math.bitwise tools.test kernel words
-specialized-arrays alien.c-types math.vectors.simd
+specialized-arrays alien.c-types alien.data math.vectors.simd
 sequences destructors libc literals classes.struct ;
 SPECIALIZED-ARRAY: int
 IN: math.bitwise.tests
