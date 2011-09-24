@@ -1,9 +1,9 @@
 ! (c)2009, 2010 Slava Pestov, Joe Groff bsd license
-USING: accessors alien alien.c-types alien.arrays alien.strings
-arrays byte-arrays cpu.architecture fry io io.encodings.binary
-io.files io.streams.memory kernel libc math math.functions 
-sequences words macros combinators generalizations
-stack-checker.dependencies combinators.short-circuit ;
+USING: accessors alien alien.arrays alien.c-types alien.strings
+arrays byte-arrays combinators combinators.short-circuit
+cpu.architecture fry generalizations io io.streams.memory kernel
+libc macros math math.functions sequences
+stack-checker.dependencies summary words ;
 QUALIFIED: math
 IN: alien.data
 
@@ -21,6 +21,16 @@ GENERIC: c-array-constructor ( c-type -- word ) foldable
 GENERIC: c-(array)-constructor ( c-type -- word ) foldable
 
 GENERIC: c-direct-array-constructor ( c-type -- word ) foldable
+
+GENERIC: c-convert-array ( c-type -- word ) foldable
+
+GENERIC: >c-array ( seq c-type -- array )
+
+M: word >c-array
+    c-convert-array execute( seq -- array ) ; inline
+
+M: pointer >c-array
+    drop void* >c-array ;
 
 GENERIC: <c-array> ( len c-type -- array )
 
@@ -45,6 +55,15 @@ M: word <c-direct-array>
 
 M: pointer <c-direct-array>
     drop void* <c-direct-array> ;
+
+ERROR: bad-byte-array-length byte-array type ;
+
+M: bad-byte-array-length summary
+    drop "Byte array length doesn't divide type width" ;
+
+: cast-array ( byte-array c-type -- array )
+    [ binary-object ] dip [ heap-size /mod 0 = ] keep swap
+    [ <c-direct-array> ] [ bad-byte-array-length ] if ; inline
 
 : malloc-array ( n type -- array )
     [ heap-size calloc ] [ <c-direct-array> ] 2bi ; inline
