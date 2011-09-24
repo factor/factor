@@ -79,7 +79,7 @@ M: bad-byte-array-length summary
     [ binary-object ] dip [ heap-size /mod 0 = ] keep swap
     [ <c-direct-array> ] [ bad-byte-array-length ] if ; inline
 
-: malloc-array ( n type -- array )
+: malloc-array ( n c-type -- array )
     [ heap-size calloc ] [ <c-direct-array> ] 2bi ; inline
 
 : malloc-byte-array ( byte-array -- alien )

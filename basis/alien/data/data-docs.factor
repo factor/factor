@@ -27,7 +27,7 @@ HELP: cast-array
 { $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
 
 HELP: malloc-array
-{ $values { "n" "a non-negative integer" } { "type" "a C type" } { "array" "a specialized array" } }
+{ $values { "n" "a non-negative integer" } { "c-type" "a C type" } { "array" "a specialized array" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type, then wraps the memory in a sequence object using " { $link <c-direct-array> } "." }
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
