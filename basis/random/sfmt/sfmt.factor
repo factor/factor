@@ -112,14 +112,14 @@ M:: sfmt generate ( sfmt -- )
 
 : <sfmt-array> ( sfmt -- uint-array uint-4-array )
     state>>
-    [ n>> 4 * [1,b] >uint-array ] [ seed>> ] bi
+    [ n>> 4 * [1,b] uint >c-array ] [ seed>> ] bi
     [
         [
             [ -30 shift ] [ ] bi bitxor
             state-multiplier * 32 bits
         ] dip + 32 bits
     ] uint-array{ } accumulate-as nip
-    dup uint-4-array-cast ;
+    dup uint-4 cast-array ;
 
 : <sfmt-state> ( seed n m mask parity -- sfmt )
     sfmt-state <struct>

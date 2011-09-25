@@ -60,7 +60,7 @@ ERROR: cl-error err ;
     [ ascii decode 1 head* ] 2info ; inline
 
 : info-size_t-array ( handle name quot -- size_t-array )
-    [ [ length size_t heap-size / ] keep swap <direct-size_t-array> ] info ; inline
+    [ [ length size_t heap-size / ] keep swap size_t <c-direct-array> ] info ; inline
 
 TUPLE: cl-handle < disposable handle ;
 PRIVATE>
@@ -314,7 +314,7 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     CL_DEVICE_TYPE_ALL [
         0 f 0 uint <ref> [ clGetDeviceIDs cl-success ] keep uint deref
     ] [
-        rot dup <void*-array> [ f clGetDeviceIDs cl-success ] keep
+        rot dup void* <c-array> [ f clGetDeviceIDs cl-success ] keep
     ] 2bi ; inline
 
 : command-queue-info-ulong ( handle name -- ulong )
@@ -427,7 +427,7 @@ PRIVATE>
 
 : cl-platforms ( -- platforms )
     0 f 0 uint <ref> [ clGetPlatformIDs cl-success ] keep uint deref
-    dup <void*-array> [ f clGetPlatformIDs cl-success ] keep
+    dup void* <c-array> [ f clGetPlatformIDs cl-success ] keep
     [
         dup
         [ platform-info ]

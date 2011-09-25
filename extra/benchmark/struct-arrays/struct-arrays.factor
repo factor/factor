@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.struct combinators.smart fry kernel
-math math.functions math.order math.parser sequences
+USING: accessors alien.data classes.struct combinators.smart
+fry kernel math math.functions math.order math.parser sequences
 specialized-arrays io ;
 FROM: alien.c-types => float ;
 IN: benchmark.struct-arrays
@@ -22,7 +22,7 @@ SPECIALIZED-ARRAY: point
     1 + ; inline
 
 : make-points ( len -- points )
-    <point-array> dup 0 [ init-point ] reduce drop ; inline
+    point <c-array> dup 0 [ init-point ] reduce drop ; inline
 
 : point-norm ( point -- norm )
     [ xyz [ absq ] tri@ ] sum-outputs sqrt ; inline

@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types specialized-arrays kernel math
+USING: alien.c-types alien.data specialized-arrays kernel math
 math.functions math.vectors sequences sequences.private
 prettyprint words typed locals math.vectors.simd
 math.vectors.simd.cords ;
@@ -43,10 +43,10 @@ IN: benchmark.spectral-norm-simd
     [ swap nth-unsafe ] [ eval4-A' ] bi-curry bi* n*v ; inline
 
 : eval-At-times-u ( u n -- seq )
-    [ double-array-cast ] dip [ (eval-At-times-u) ] inner-loop ; inline
+    [ double cast-array ] dip [ (eval-At-times-u) ] inner-loop ; inline
 
 : eval-AtA-times-u ( u n -- seq )
-    [ double-array-cast ] dip [ eval-A-times-u ] [ eval-At-times-u ] bi ; inline
+    [ double cast-array ] dip [ eval-A-times-u ] [ eval-At-times-u ] bi ; inline
 
 : ones ( n -- seq )
     4 /i [ double-4{ 1.0 1.0 1.0 1.0 } ] double-4-array{ } replicate-as ; inline
@@ -60,7 +60,7 @@ IN: benchmark.spectral-norm-simd
     ] times ; inline
 
 TYPED: spectral-norm ( n: fixnum -- norm )
-    u/v [ double-array-cast ] bi@ [ v. ] [ norm-sq ] bi /f sqrt ;
+    u/v [ double cast-array ] bi@ [ v. ] [ norm-sq ] bi /f sqrt ;
 
 : spectral-norm-main ( -- )
     2000 spectral-norm . ;

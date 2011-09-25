@@ -1,8 +1,8 @@
-USING: accessors alien alien.c-types alien.complex arrays ascii
-byte-arrays combinators combinators.short-circuit fry kernel
-math math.blas.ffi math.complex math.functions math.order
-sequences sequences.private functors words locals parser
-prettyprint.backend prettyprint.custom specialized-arrays ;
+USING: accessors alien alien.c-types alien.complex alien.data
+arrays ascii byte-arrays combinators combinators.short-circuit
+fry kernel math math.blas.ffi math.complex math.functions
+math.order sequences sequences.private functors words locals
+parser prettyprint.backend prettyprint.custom specialized-arrays ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: double
@@ -132,7 +132,6 @@ M: blas-vector-base virtual@
 FUNCTOR: (define-blas-vector) ( TYPE T -- )
 
 <DIRECT-ARRAY> IS <direct-${TYPE}-array>
->ARRAY         IS >${TYPE}-array
 XCOPY          IS ${T}COPY
 XSWAP          IS ${T}SWAP
 IXAMAX         IS I${T}AMAX
@@ -154,7 +153,7 @@ TUPLE: VECTOR < blas-vector-base ;
 : <VECTOR> ( underlying length inc -- vector ) VECTOR boa ; inline
 
 : >VECTOR ( seq -- v )
-    [ >ARRAY underlying>> ] [ length ] bi 1 <VECTOR> ;
+    [ TYPE >c-array underlying>> ] [ length ] bi 1 <VECTOR> ;
 
 M: VECTOR clone
     TYPE heap-size (prepare-copy)

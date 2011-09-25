@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types chipmunk.ffi classes.struct
-game.loop game.worlds kernel literals locals math method-chains
-opengl.gl random sequences specialized-arrays ui
-ui.gadgets.worlds ui.pixel-formats ;
+USING: accessors alien alien.c-types alien.data chipmunk.ffi
+classes.struct game.loop game.worlds kernel literals locals
+math method-chains opengl.gl random sequences specialized-arrays
+ui ui.gadgets.worlds ui.pixel-formats ;
 SPECIALIZED-ARRAY: void*
 IN: chipmunk.demo
 
@@ -81,7 +81,7 @@ M:: chipmunk-world draw-world* ( world -- )
     0 0 0 glColor3f
     GL_POINTS glBegin
     space bodies>>
-    [ num>> ] [ arr>> swap <direct-void*-array> ] bi [
+    [ num>> ] [ arr>> swap void* <c-direct-array> ] bi [
         cpBody memory>struct p>> [ x>> ] [ y>> ] bi glVertex2f
     ] each
     glEnd
@@ -90,9 +90,9 @@ M:: chipmunk-world draw-world* ( world -- )
     1 0 0 glColor3f
     GL_POINTS glBegin
     space arbiters>>
-    [ num>> ] [ arr>> swap <direct-void*-array> ] bi [
+    [ num>> ] [ arr>> swap void* <c-direct-array> ] bi [
         cpArbiter memory>struct
-        [ numContacts>> ] [ contacts>> >c-ptr swap <direct-cpContact-array> ] bi [
+        [ numContacts>> ] [ contacts>> >c-ptr swap cpContact <c-direct-array> ] bi [
             p>> [ x>> ] [ y>> ] bi glVertex2f
         ] each
     ] each

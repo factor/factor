@@ -55,7 +55,7 @@ M: windows os-version ( -- obj )
     PF_SSE3_INSTRUCTIONS_AVAILABLE feature-present? ;
 
 : get-directory ( word -- str )
-    [ MAX_UNICODE_PATH [ <ushort-array> ] keep dupd ] dip
+    [ MAX_UNICODE_PATH [ ushort <c-array> ] keep dupd ] dip
     execute win32-error=0/f alien>native-string ; inline
 
 : windows-directory ( -- str )

@@ -1,4 +1,4 @@
-USING: alien alien.c-types arrays classes.struct
+USING: alien alien.c-types alien.data arrays classes.struct
 debugger.threads destructors generic.single io io.directories
 io.encodings.8-bit.latin1 io.encodings.ascii
 io.encodings.binary io.encodings.string io.files
@@ -80,7 +80,7 @@ IN: io.files.tests
     "test.txt" temp-file binary [
         3 4 * read
     ] with-file-reader
-    int-array-cast
+    int cast-array
 ] unit-test
 
 [ ] [
@@ -117,7 +117,7 @@ CONSTANT: pt-array-1
 
 [ t ] [
     "test.txt" temp-file binary file-contents
-    pt-array-cast
+    pt cast-array
     pt-array-1 rest-slice sequence=
 ] unit-test
 

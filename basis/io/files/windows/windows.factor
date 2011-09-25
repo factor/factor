@@ -297,7 +297,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
     SetFileTime win32-error=0/f ;
 
 M: windows cwd
-    MAX_UNICODE_PATH dup <ushort-array>
+    MAX_UNICODE_PATH dup ushort <c-array>
     [ GetCurrentDirectory win32-error=0/f ] keep
     utf16n alien>string ;
 

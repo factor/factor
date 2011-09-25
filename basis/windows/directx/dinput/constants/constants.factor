@@ -62,7 +62,7 @@ M: array array-base-type first ;
 
 : make-DIOBJECTDATAFORMAT-array-quot ( struct arr -- quot )
     [ nip length ] [ make-DIOBJECTDATAFORMAT-arrays ] 2bi '[
-        _ malloc-DIOBJECTDATAFORMAT-array
+        _ DIOBJECTDATAFORMAT malloc-array
         [ _ dup byte-length memcpy ]
         [ _ [ get >>pguid drop ] 2each ]
         [ ] tri

@@ -64,7 +64,7 @@ M: struct equal?
 
 M: struct hashcode*
     binary-object over
-    [ <direct-uchar-array> hashcode* ] [ 3drop 0 ] if ; inline
+    [ uchar <c-direct-array> hashcode* ] [ 3drop 0 ] if ; inline
 
 : struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
 
@@ -244,7 +244,7 @@ M: struct-bit-slot-spec compute-slot-offset
 PRIVATE>
 
 M: struct byte-length class "struct-size" word-prop ; foldable
-M: struct binary-zero? binary-object <direct-uchar-array> [ 0 = ] all? ; inline
+M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inline
 
 ! class definition
 

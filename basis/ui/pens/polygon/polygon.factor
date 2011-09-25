@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types colors help.markup help.syntax
-kernel opengl opengl.gl sequences math.vectors ui.gadgets
-ui.pens specialized-arrays ;
+USING: accessors alien.c-types alien.data colors help.markup
+help.syntax kernel opengl opengl.gl sequences math.vectors
+ui.gadgets ui.pens specialized-arrays ;
 SPECIALIZED-ARRAY: float
 IN: ui.pens.polygon
 
@@ -17,7 +17,7 @@ boundary-count ;
     dup first suffix ;
 
 : <polygon> ( color points -- polygon )
-    dup close-path [ [ concat >float-array ] [ length ] bi ] bi@
+    dup close-path [ [ concat float >c-array ] [ length ] bi ] bi@
     polygon boa ;
 
 M: polygon draw-boundary
