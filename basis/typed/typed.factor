@@ -72,9 +72,6 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 
 ! typed outputs
 
-: output-mismatch-quot ( word types -- quot )
-    [ output-mismatch-error ] 2curry ;
-
 :: typed-outputs ( quot word types -- quot' )
     [ output-mismatch-error ] word types make-unboxer
     quot prepose ;

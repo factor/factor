@@ -25,8 +25,6 @@ SYMBOL: locale ! Just casing locale, or overall?
 
 : lithuanian? ( -- ? ) locale get "lt" = ;
 
-: dot-over ( -- ch ) HEX: 307 ;
-
 : lithuanian>upper ( string -- lower )
     "i\u000307" "i" replace
     "j\u000307" "j" replace ;
