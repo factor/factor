@@ -28,11 +28,11 @@ HELP: sort
 { $notes "The algorithm used is the merge sort." } ;
 
 HELP: sort-with
-{ $values { "seq" "a sequence" } { "quot" { $quotation "( object -- key )" } } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation "( elt -- key )" } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "seq" } " by applying " { $link compare } " with " { $snippet "quot" } " to each pair of elements in the sequence." } ;
 
 HELP: inv-sort-with
-{ $values { "seq" "a sequence" } { "quot" { $quotation "( object -- key )" } } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation "( elt -- key )" } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "seq" } " by applying " { $link compare } " with " { $snippet "quot" } " to each pair of elements in the sequence and inverting the results." } ;
 
 HELP: sort-keys

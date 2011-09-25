@@ -181,7 +181,7 @@ HELP: <sliced-circular-clumps>
 { <sliced-clumps> <sliced-circular-clumps> <sliced-groups> } related-words
 
 HELP: monotonic?
-{ $values { "seq" sequence } { "quot" { $quotation "( elt elt -- ? )" } } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "quot" { $quotation "( elt1 elt2 -- ? )" } } { "?" "a boolean" } }
 { $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
 { $examples
     "Testing if a sequence is non-decreasing:"
