@@ -290,16 +290,21 @@ M: tuple-class (define-tuple-class)
     3dup tuple-class-unchanged?
     [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
 
+PREDICATE: error-class < tuple-class
+    "error-class" word-prop ;
+
 : define-error-class ( class superclass slots -- )
-    error-slots
-    [ define-tuple-class ]
-    [ 2drop reset-generic ]
-    [
-        2drop
-        [ dup [ boa throw ] curry ]
-        [ all-slots thrower-effect ]
-        bi define-declared
-    ] 3tri ;
+    error-slots {
+        [ define-tuple-class ]
+        [ 2drop reset-generic ]
+        [ 2drop t "error-class" set-word-prop ]
+        [
+            2drop
+            [ dup [ boa throw ] curry ]
+            [ all-slots thrower-effect ]
+            bi define-declared
+        ]
+    } 3cleave ;
 
 : boa-effect ( class -- effect )
     [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
