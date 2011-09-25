@@ -1,5 +1,5 @@
 USING: accessors math math.bitwise tools.test kernel words
-specialized-arrays alien.c-types math.vectors.simd
+specialized-arrays alien.c-types alien.data math.vectors.simd
 sequences destructors libc literals classes.struct ;
 SPECIALIZED-ARRAY: int
 IN: math.bitwise.tests
@@ -44,7 +44,7 @@ SPECIALIZED-ARRAY: uint-4
 
 [ 1 ] [
     [
-        2 malloc-int-array &free 1 0 pick set-nth bit-count
+        2 int malloc-array &free 1 0 pick set-nth bit-count
     ] with-destructors
 ] unit-test
 

@@ -4,7 +4,7 @@ USING: alien alien.syntax kernel unix.stat math unix
 combinators system io.backend accessors alien.c-types
 io.encodings.utf8 alien.strings unix.types io.files.unix
 io.files io.files.info unix.statvfs.netbsd unix.getfsstat.netbsd arrays
-grouping sequences io.encodings.utf8 classes.struct
+grouping sequences io.encodings.utf8 classes.struct alien.data
 specialized-arrays io.files.info.unix ;
 SPECIALIZED-ARRAY: statvfs
 IN: io.files.info.unix.netbsd
@@ -48,6 +48,6 @@ M: netbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-inf
 
 M: netbsd file-systems ( -- array )
     f 0 0 getvfsstat dup io-error
-    <statvfs-array>
+    \ statvfs <c-array>
     [ dup byte-length 0 getvfsstat io-error ]
     [ [ f_mntonname>> utf8 alien>string file-system-info ] { } map-as ] bi ;

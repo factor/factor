@@ -158,5 +158,5 @@ M: com-wrapper dispose*
 
 : com-wrap ( object wrapper -- wrapped-object )
     [ vtbls>> ] [ (malloc-wrapped-object) ] bi
-    [ over length <direct-void*-array> 0 swap copy ] keep
+    [ over length void* <c-direct-array> 0 swap copy ] keep
     [ +wrapped-objects+ get-global set-at ] keep ;

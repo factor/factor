@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings alien.syntax
+USING: alien alien.c-types alien.data alien.strings alien.syntax
 classes.struct combinators io.encodings.utf16n io.files
 io.pathnames kernel windows.errors windows.com
 windows.com.syntax windows.types windows.user32
@@ -89,7 +89,7 @@ ALIAS: ShellExecute ShellExecuteW
 
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
-    MAX_UNICODE_PATH <ushort-array>
+    MAX_UNICODE_PATH ushort <c-array>
     [ SHGetFolderPath drop ] keep utf16n alien>string ;
 
 : desktop ( -- str )

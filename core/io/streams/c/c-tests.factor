@@ -1,6 +1,6 @@
 USING: tools.test io.files io.files.temp io io.streams.c
 io.encodings.ascii strings destructors kernel specialized-arrays
-alien.c-types math ;
+alien.c-types math alien.data ;
 SPECIALIZED-ARRAY: int
 IN: io.streams.c.tests
 
@@ -31,7 +31,7 @@ IN: io.streams.c.tests
     "test.txt" temp-file "rb" fopen <c-reader> [
         3 4 * read
     ] with-input-stream
-    int-array-cast
+    int cast-array
 ] unit-test
 
 ! Writing strings to binary streams should fail

@@ -45,5 +45,5 @@ STRUCT: halves
 ] unit-test
 
 [ half-array{ 1.0 2.0 3.0 1/0. -1/0. } ]
-[ { 1.0 2.0 3.0 1/0. -1/0. } >half-array ] unit-test
+[ { 1.0 2.0 3.0 1/0. -1/0. } half >c-array ] unit-test
 

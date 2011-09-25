@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays combinators kernel
-llvm.core locals math.parser math multiline namespaces parser
-peg.ebnf sequences sequences.deep specialized-arrays strings
-vocabs words ;
+USING: accessors alien.c-types alien.data arrays combinators
+kernel llvm.core locals math.parser math multiline namespaces
+parser peg.ebnf sequences sequences.deep specialized-arrays
+strings vocabs words ;
 SPECIALIZED-ARRAY: void*
 IN: llvm.types
 
@@ -119,13 +119,13 @@ TUPLE: struct < enclosing types packed? ;
     swap >>packed? swap >>types ;
 
 M: struct (>tref)*
-    [ types>> [ (>tref) ] map >void*-array ]
+    [ types>> [ (>tref) ] map void* >c-array ]
     [ types>> length ]
     [ packed?>> 1 0 ? ] tri LLVMStructType ;
 M: struct clean* types>> [ clean ] each ;
 M: struct (tref>)*
     over LLVMIsPackedStruct 0 = not >>packed?
-    swap dup LLVMCountStructElementTypes <void*-array>
+    swap dup LLVMCountStructElementTypes void* <c-array>
     [ LLVMGetStructElementTypes ] keep >array
     [ (tref>) ] map >>types ;
 
@@ -148,7 +148,7 @@ TUPLE: function < enclosing return params vararg? ;
 
 M: function (>tref)* {
     [ return>> (>tref) ]
-    [ params>> [ (>tref) ] map >void*-array ]
+    [ params>> [ (>tref) ] map void* >c-array ]
     [ params>> length ]
     [ vararg?>> 1 0 ? ]
 } cleave LLVMFunctionType ;
@@ -156,7 +156,7 @@ M: function clean* [ return>> clean ] [ params>> [ clean ] each ] bi ;
 M: function (tref>)*
     over LLVMIsFunctionVarArg 0 = not >>vararg?
     over LLVMGetReturnType (tref>) >>return
-    swap dup LLVMCountParamTypes <void*-array>
+    swap dup LLVMCountParamTypes void* <c-array>
     [ LLVMGetParamTypes ] keep >array
     [ (tref>) ] map >>params ;
 

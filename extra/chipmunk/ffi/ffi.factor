@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.libraries
+USING: accessors alien alien.c-types alien.data alien.libraries
 alien.syntax classes.struct combinators combinators.short-circuit
 kernel math math.order sequences typed specialized-arrays locals
 system ;
@@ -442,17 +442,17 @@ FUNCTION: int cpPolyShapeGetNumVerts ( cpShape* shape ) ;
 FUNCTION: cpVect cpPolyShapeGetVert ( cpShape* shape, int idx ) ;
 
 TYPED: cpPolyShapeValueOnAxis ( poly: cpPolyShape n: cpVect d -- min-dist )
-    swap rot [ numVerts>> ] [ tVerts>> swap <direct-cpVect-array> ] bi swap
+    swap rot [ numVerts>> ] [ tVerts>> swap cpVect <c-direct-array> ] bi swap
     [ cpvdot ] curry [ min ] reduce swap - ; inline
 
 TYPED: cpPolyShapeContainsVert ( poly: cpPolyShape v: cpVect -- ? )
-    swap [ numVerts>> ] [ tAxes>> swap <direct-cpPolyShapeAxis-array> ] bi swap
+    swap [ numVerts>> ] [ tAxes>> swap cpPolyShapeAxis <c-direct-array> ] bi swap
     [
         [ [ n>> ] dip cpvdot ] [ drop d>> ] 2bi -
     ] curry [ max ] reduce 0.0 <= ; inline
 
 TYPED: cpPolyShapeContainsVertPartial ( poly: cpPolyShape v: cpVect n: cpVect -- ? )
-    rot [ numVerts>> ] [ tAxes>> swap <direct-cpPolyShapeAxis-array> ] bi -rot
+    rot [ numVerts>> ] [ tAxes>> swap cpPolyShapeAxis <c-direct-array> ] bi -rot
     [| axis v n |
         axis n>> n cpvdot 0.0 < 0
         [ 0.0 ]
@@ -527,7 +527,7 @@ TYPED: cpArbiterGetNormal ( arb: cpArbiter i -- n: cpVect )
     [
         swap
         [ numContacts>> ]
-        [ contacts>> swap <direct-void*-array> ] bi nth cpContact memory>struct n>>
+        [ contacts>> swap void* <c-direct-array> ] bi nth cpContact memory>struct n>>
     ]
     [
         drop swappedColl>> 0 = [ ] [ cpvneg ] if
@@ -536,7 +536,7 @@ TYPED: cpArbiterGetNormal ( arb: cpArbiter i -- n: cpVect )
 TYPED: cpArbiterGetPoint ( arb: cpArbiter i -- p: cpVect )
     swap
     [ numContacts>> ]
-    [ contacts>> swap <direct-void*-array> ] bi
+    [ contacts>> swap void* <c-direct-array> ] bi
     nth cpContact memory>struct p>> ; inline
 
 ! cpCollision.h
