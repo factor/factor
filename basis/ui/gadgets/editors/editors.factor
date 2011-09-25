@@ -610,9 +610,7 @@ TUPLE: field < border editor min-cols max-cols ;
     COLOR: gray <solid> >>boundary ; inline
 
 : <field-border> ( gadget -- border )
-    { 2 2 } <border>
-        { 1 0 } >>fill
-        field-theme ;
+    border new-border field-theme ;
 
 PRIVATE>
 
