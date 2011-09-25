@@ -20,36 +20,6 @@ os macosx? [
     "ico" ns-image register-image-class
 ] when
 
-CONSTANT: NSImageRepLoadStatusUnknownType     -1
-CONSTANT: NSImageRepLoadStatusReadingHeader   -2
-CONSTANT: NSImageRepLoadStatusWillNeedAllData -3
-CONSTANT: NSImageRepLoadStatusInvalidData     -4
-CONSTANT: NSImageRepLoadStatusUnexpectedEOF   -5
-CONSTANT: NSImageRepLoadStatusCompleted       -6
-
-CONSTANT: NSColorRenderingIntentDefault                 0
-CONSTANT: NSColorRenderingIntentAbsoluteColorimetric    1
-CONSTANT: NSColorRenderingIntentRelativeColorimetric    2
-CONSTANT: NSColorRenderingIntentPerceptual              3
-CONSTANT: NSColorRenderingIntentSaturation              4
-
-ERROR: ns-image-unknown-type ;
-ERROR: ns-image-invalid-data ;
-ERROR: ns-image-unexpected-eof ;
-ERROR: ns-image-planar-images-not-supported ;
-
-<PRIVATE
-
-: check-return ( n -- )
-    {
-        { NSImageRepLoadStatusUnknownType   [ ns-image-unknown-type   ] }
-        { NSImageRepLoadStatusInvalidData   [ ns-image-invalid-data   ] }
-        { NSImageRepLoadStatusUnexpectedEOF [ ns-image-unexpected-eof ] }
-        [ drop ]
-    } case ;
-
-PRIVATE>
-
 : <CGImage> ( byte-array -- image-rep )
     [ NSBitmapImageRep ] dip
     <CFData> -> autorelease
