@@ -39,7 +39,7 @@ HELP: split1-last-slice
 { split1 split1-slice split1-last split1-last-slice } related-words
 
 HELP: split-when
-{ $values { "seq" "a sequence" } { "quot" { $quotation "( elt -- ? )" } } { "pieces" "a new array" } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation "( ... elt -- ... ? )" } } { "pieces" "a new array" } }
 { $description "Splits " { $snippet "seq" } " at each occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs an array of pieces. The pieces do not include the elements along which the sequence was split." }
 { $examples { $example "USING: ascii kernel prettyprint splitting ;" "\"hello,world-how.are:you\" [ letter? not ] split-when ." "{ \"hello\" \"world\" \"how\" \"are\" \"you\" }" } } ;
 

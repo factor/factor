@@ -99,7 +99,7 @@ INSTANCE: sliced-clumps abstract-clumps
 
 : clump ( seq n -- array ) <clumps> { } like ;
 
-: monotonic? ( seq quot: ( obj1 obj2 -- ? ) -- ? )
+: monotonic? ( seq quot: ( elt1 elt2 -- ? ) -- ? )
     over length 2 < [ 2drop t ] [
         over length 2 = [
             [ first2-unsafe ] dip call
