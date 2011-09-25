@@ -118,7 +118,7 @@ ERROR: audio-context-not-available device-name ;
     al-context>> alcMakeContextCurrent drop ; inline
 
 : allocate-sources ( audio-engine -- sources )
-    voice-count>> dup (uint-array) [ alGenSources ] keep ; inline
+    voice-count>> dup c:uint (c-array) [ alGenSources ] keep ; inline
 
 :: flush-source ( al-source -- )
     al-source alSourceStop
@@ -277,7 +277,7 @@ M: audio-engine dispose*
     audio-engine get-available-source :> al-source
 
     al-source [
-        buffer-count dup (uint-array) [ alGenBuffers ] keep :> al-buffers
+        buffer-count dup c:uint (c-array) [ alGenBuffers ] keep :> al-buffers
         generator generator-audio-format :> ( channels sample-bits sample-rate )
 
         streaming-audio-clip new-disposable

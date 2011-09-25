@@ -227,8 +227,8 @@ FUNCTION: int ffi_test_12 int a int b RECT c int d int e int f ;
 FUNCTION: float ffi_test_23 ( float[3] x, float[3] y ) ;
 
 [ 32.0 ] [
-    { 1.0 2.0 3.0 } >float-array
-    { 4.0 5.0 6.0 } >float-array
+    { 1.0 2.0 3.0 } float >c-array
+    { 4.0 5.0 6.0 } float >c-array
     ffi_test_23
 ] unit-test
 

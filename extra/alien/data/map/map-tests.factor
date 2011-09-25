@@ -1,5 +1,5 @@
 ! (c)Joe Groff bsd license
-USING: alien.data.map fry generalizations kernel locals math.vectors
+USING: alien.data alien.data.map fry generalizations kernel locals math.vectors
 math.vectors.conversion math math.vectors.simd math.ranges sequences
 specialized-arrays tools.test ;
 FROM: alien.c-types => uchar short int float ;
@@ -9,7 +9,7 @@ IN: alien.data.map.tests
 [ float-array{ 1.0 1.0 3.0 3.0 5.0 5.0 } ]
 [
     int-array{ 1 3 5 } [ dup ] data-map( int -- float[2] )
-    float-array-cast
+    float cast-array
 ] unit-test
 
 [
@@ -20,7 +20,7 @@ IN: alien.data.map.tests
     }
 ] [
     3 iota [ float-4-with ] data-map( object -- float-4 )
-    float-4-array-cast
+    float-4 cast-array
 ] unit-test
 
 [
@@ -31,7 +31,7 @@ IN: alien.data.map.tests
     }
 ] [
     12 iota [ float-4-boa ] data-map( object[4] -- float-4 )
-    float-4-array-cast
+    float-4 cast-array
 ] unit-test
 
 [ float-array{ 1.0 1.0 3.0 3.0 5.0 5.0 0.0 0.0 } ]
@@ -151,5 +151,5 @@ CONSTANT: plane-count 4
     [ ] data-map( object -- float ) ;
 
 [ float-array{ 0.0 0.5 1.0 } ]
-[ 2 data-map-compiler-bug-test float-array-cast ]
+[ 2 data-map-compiler-bug-test float cast-array ]
 unit-test

@@ -4,8 +4,7 @@ USING: accessors alien alien.c-types alien.syntax combinators
 io.backend io.files io.files.info io.files.unix kernel math system unix
 unix.statfs.freebsd unix.statvfs.freebsd unix.getfsstat.freebsd
 sequences grouping alien.strings io.encodings.utf8 unix.types
-arrays io.files.info.unix classes.struct
-specialized-arrays ;
+arrays io.files.info.unix classes.struct specialized-arrays ;
 SPECIALIZED-ARRAY: statfs
 IN: io.files.info.unix.freebsd
 

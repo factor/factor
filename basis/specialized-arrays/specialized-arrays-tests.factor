@@ -13,28 +13,28 @@ IN: specialized-arrays.tests
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
 
-[ t ] [ { 1 2 3 } >int-array int-array? ] unit-test
+[ t ] [ { 1 2 3 } int >c-array int-array? ] unit-test
 
 [ t ] [ int-array{ 1 2 3 } int-array? ] unit-test
 
 [ 2 ] [ int-array{ 1 2 3 } second ] unit-test
 
 [ t ] [
-    { t f t } >bool-array underlying>>
+    { t f t } bool >c-array underlying>>
     { 1 0 1 } bool heap-size {
-        { 1 [ >char-array ] }
-        { 4 [ >uint-array ] }
+        { 1 [ char >c-array ] }
+        { 4 [ uint >c-array ] }
     } case underlying>> =
 ] unit-test
 
 [ ushort-array{ 1234 } ] [
-    little-endian? B{ 210 4 } B{ 4 210 } ? ushort-array-cast
+    little-endian? B{ 210 4 } B{ 4 210 } ? ushort cast-array
 ] unit-test
 
-[ B{ 210 4 1 } ushort-array-cast ] must-fail
+[ B{ 210 4 1 } ushort cast-array ] must-fail
 
 [ { 3 1 3 3 7 } ] [
-    int-array{ 3 1 3 3 7 } malloc-byte-array 5 <direct-int-array> >array
+    int-array{ 3 1 3 3 7 } malloc-byte-array 5 int <c-direct-array> >array
 ] unit-test
 
 [ float-array{ HEX: 1.222,222   HEX: 1.111,112   } ]
@@ -130,7 +130,7 @@ SPECIALIZED-ARRAY: fixed-string
 
 ! Test prettyprinting
 [ "int-array{ 1 2 3 }" ] [ int-array{ 1 2 3 } unparse ] unit-test
-[ "int-array@ f 100" ] [ f 100 <direct-int-array> unparse ] unit-test
+[ "c-array@ int f 100" ] [ f 100 <direct-int-array> unparse ] unit-test
 
 ! If the C type doesn't exist, don't generate a vocab
 SYMBOL: __does_not_exist__

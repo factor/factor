@@ -1,6 +1,6 @@
-USING: alien.c-types accessors assocs classes destructors
-functors kernel lexer math parser sequences specialized-arrays
-ui.backend words ;
+USING: alien.c-types alien.data accessors assocs classes
+destructors functors kernel lexer math parser sequences
+specialized-arrays ui.backend words ;
 SPECIALIZED-ARRAY: int
 IN: ui.pixel-formats
 
@@ -82,7 +82,7 @@ M: pixel-format-attribute >PFA
     [ drop { } ] if* ;
 
 : >PFA-int-array ( attribute -- int-array )
-    [ >PFA ] map concat PERM prepend 0 suffix >int-array ;
+    [ >PFA ] map concat PERM prepend 0 suffix int >c-array ;
 
 ;FUNCTOR
 

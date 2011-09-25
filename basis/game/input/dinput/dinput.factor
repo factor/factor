@@ -75,7 +75,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     GUID_SysMouse device-for-guid
     [ configure-mouse ] [ +mouse-device+ set-global ] bi
     0 0 0 0 8 f <array> mouse-state boa +mouse-state+ set-global
-    MOUSE-BUFFER-SIZE <DIDEVICEOBJECTDATA-array> +mouse-buffer+ set-global ;
+    MOUSE-BUFFER-SIZE DIDEVICEOBJECTDATA <c-array> +mouse-buffer+ set-global ;
 
 : device-info ( device -- DIDEVICEIMAGEINFOW )
     DIDEVICEINSTANCEW <struct>

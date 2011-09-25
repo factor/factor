@@ -147,7 +147,7 @@ FUNCTION: char**
         f
         gvPluginList &(free) :> ret
         size* int deref :> size
-        ret size <direct-void*-array> [
+        ret size void* <c-direct-array> [
             &(free) ascii alien>string
         ] { } map-as
     ] with-destructors ;

@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings alien.syntax arrays
-classes.struct fry io.encodings.ascii io.mmap kernel locals math
-math.intervals sequences specialized-arrays strings typed assocs ;
+USING: accessors alien alien.c-types alien.data alien.strings
+alien.syntax arrays classes.struct fry io.encodings.ascii
+io.mmap kernel locals math math.intervals sequences
+specialized-arrays strings typed assocs ;
 IN: elf
 
 ! FFI data
@@ -482,15 +483,15 @@ TYPED:: elf-section-headers ( elf: Elf32/64_Ehdr -- headers: Elf32/64_Shdr-array
     elf [ e_shoff>> ] [ e_shnum>> ] bi :> ( off num )
     off elf >c-ptr <displaced-alien> num
     elf 64-bit?
-    [ <direct-Elf64_Shdr-array> ]
-    [ <direct-Elf32_Shdr-array> ] if ;
+    [ Elf64_Shdr <c-direct-array> ]
+    [ Elf32_Shdr <c-direct-array> ] if ;
 
 TYPED:: elf-program-headers ( elf: Elf32/64_Ehdr -- headers: Elf32/64_Phdr-array )
     elf [ e_phoff>> ] [ e_phnum>> ] bi :> ( off num )
     off elf >c-ptr <displaced-alien> num
     elf 64-bit?
-    [ <direct-Elf64_Phdr-array> ]
-    [ <direct-Elf32_Phdr-array> ] if ;
+    [ Elf64_Phdr <c-direct-array> ]
+    [ Elf32_Phdr <c-direct-array> ] if ;
 
 TYPED: elf-loadable-segments ( headers: Elf32/64_Phdr-array -- headers: Elf32/64_Phdr-array )
     [ p_type>> PT_LOAD = ] filter ;
@@ -517,10 +518,10 @@ TYPED:: virtual-address-section ( elf: Elf32/64_Ehdr address -- section-header/f
     ] filter [ f ] [ first ] if-empty ;
 
 TYPED:: elf-segment-data ( elf: Elf32/64_Ehdr header: Elf32/64_Phdr -- uchar-array/f )
-    header [ p_offset>> elf >c-ptr <displaced-alien> ] [ p_filesz>> ] bi <direct-uchar-array> ;
+    header [ p_offset>> elf >c-ptr <displaced-alien> ] [ p_filesz>> ] bi uchar <c-direct-array> ;
 
 TYPED:: elf-section-data ( elf: Elf32/64_Ehdr header: Elf32/64_Shdr -- uchar-array/f )
-    header [ sh_offset>> elf >c-ptr <displaced-alien> ] [ sh_size>> ] bi <direct-uchar-array> ;
+    header [ sh_offset>> elf >c-ptr <displaced-alien> ] [ sh_size>> ] bi uchar <c-direct-array> ;
 
 TYPED:: elf-section-data-by-index ( elf: Elf32/64_Ehdr index -- header/f uchar-array/f )
     elf elf-section-headers     :> sections
@@ -554,8 +555,8 @@ TYPED:: elf-symbols ( elf: Elf32/64_Ehdr section-data: uchar-array -- symbols )
     elf ".strtab" elf-section-data-by-name nip >c-ptr :> strings
     section-data [ >c-ptr ] [ length ] bi
     elf 64-bit?
-    [ Elf64_Sym heap-size / <direct-Elf64_Sym-array> ]
-    [ Elf32_Sym heap-size / <direct-Elf32_Sym-array> ] if
+    [ Elf64_Sym heap-size / Elf64_Sym <c-direct-array> ]
+    [ Elf32_Sym heap-size / Elf32_Sym <c-direct-array> ] if
     [ [ st_name>> strings <displaced-alien> ascii alien>string ] keep 2array ] { } map-as ;
 
 ! High level interface
@@ -608,7 +609,7 @@ M:: segment sections ( segment -- sections )
     symbol [ elf-header>> ] [ sym>> st_value>> ] bi virtual-address-segment :> segment
     symbol sym>> st_value>> segment p_vaddr>> - segment p_offset>> + :> faddress
     faddress symbol elf-header>> >c-ptr <displaced-alien>
-    symbol sym>> st_size>> <direct-uchar-array> ;
+    symbol sym>> st_size>> uchar <c-direct-array> ;
 
 : find-section ( sections name -- section/f )
     '[ name>> _ = ] find nip ; inline

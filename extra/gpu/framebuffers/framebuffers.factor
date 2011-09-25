@@ -281,8 +281,8 @@ M: opengl-2 (clear-integer-color-attachment)
 M: opengl-3 (clear-integer-color-attachment)
     [ GL_COLOR 0 ] dip 4 0 pad-tail
     swap {
-        { int-type  [ >int-array  glClearBufferiv  ] }
-        { uint-type [ >uint-array glClearBufferuiv ] }
+        { int-type  [ int >c-array  glClearBufferiv  ] }
+        { uint-type [ uint >c-array glClearBufferuiv ] }
     } case ;
 
 :: (clear-color-attachment) ( type attachment value -- )

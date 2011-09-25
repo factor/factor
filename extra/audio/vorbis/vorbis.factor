@@ -166,15 +166,15 @@ ERROR: no-vorbis-in-ogg ;
     vorbis-stream buffer>> :> buffer
     buffer length -1 shift :> buffer-length
     offset -1 shift :> sample-offset
-    buffer buffer-length <direct-short-array> sample-offset short-vector boa :> short-buffer
+    buffer buffer-length short <c-direct-array> sample-offset short-vector boa :> short-buffer
     vorbis-stream info>> channels>> :> #channels
     buffer-length sample-offset - #channels /i :> max-len
     len max-len min :> len'
-    pcm #channels <direct-void*-array> :> channel*s
+    pcm #channels void* <c-direct-array> :> channel*s
 
     len' iota [| sample |
         #channels iota [| channel |
-            channel channel*s nth len <direct-float-array>
+            channel channel*s nth len float <c-direct-array>
             sample swap nth
             float>short-sample short-buffer push
         ] each

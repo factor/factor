@@ -1,10 +1,11 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays assocs compiler.units effects
-io.backend io.pathnames kernel llvm.core llvm.jit llvm.reader
-llvm.types make namespaces sequences specialized-arrays
-vocabs words ;
-SPECIALIZED-ARRAY: void*
+USING: accessors alien alien.data arrays assocs compiler.units
+effects io.backend io.pathnames kernel llvm.core llvm.jit
+llvm.reader llvm.types make namespaces sequences
+specialized-arrays vocabs words ;
+QUALIFIED-WITH: alien.c-types c
+SPECIALIZED-ARRAY: c:void*
 IN: llvm.invoker
 
 ! get function name, ret type, param types and names
@@ -15,7 +16,7 @@ IN: llvm.invoker
 TUPLE: function name alien return params ;
 
 : params ( llvm-function -- param-list )
-    dup LLVMCountParams <void*-array>
+    dup LLVMCountParams c:void* <c-array>
     [ LLVMGetParams ] keep >array
     [ [ LLVMGetValueName ] [ LLVMTypeOf tref> ] bi 2array ] map ;
 
@@ -52,5 +53,5 @@ TUPLE: function name alien return params ;
 : install-bc ( path -- )
     [ normalize-path ] [ file-name ] bi
     [ load-into-jit ] keep install-module ;
-    
+
 << "alien.llvm" create-vocab drop >>
