@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! mersenne twister based on 
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
-USING: alien.c-types kernel math namespaces sequences
+USING: alien.c-types alien.data kernel math namespaces sequences
 sequences.private system init accessors math.ranges random
 math.bitwise combinators specialized-arrays fry ;
 SPECIALIZED-ARRAY: uint
@@ -44,7 +44,7 @@ CONSTANT: a uint-array{ 0 HEX: 9908b0df }
     ] each-integer ; inline
 
 : init-mt-seq ( seed -- seq )
-    32 bits n <uint-array>
+    32 bits n uint <c-array>
     [ set-first ] [ init-mt-rest ] [ ] tri ; inline
 
 : mt-temper ( y -- yt )

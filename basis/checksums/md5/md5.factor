@@ -184,7 +184,7 @@ HINTS: (process-md5-block-I) { uint-array md5-state } ;
     ] unless ;
 
 : uint-array-cast-le ( byte-array -- uint-array )
-    byte-array>le uint-array-cast ;
+    byte-array>le uint cast-array ;
 
 HINTS: uint-array-cast-le byte-array ;
 

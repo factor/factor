@@ -1,12 +1,12 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs grouping hashtables kernel locals
-math math.parser sequences sequences.deep
-specialized-arrays.instances.alien.c-types.float
-specialized-arrays.instances.alien.c-types.uint splitting xml
-xml.data xml.traversal math.order namespaces combinators images
-gpu.shaders io make game.models game.models.util
-io.encodings.ascii game.models.loader ;
+USING: accessors alien.c-types alien.data arrays assocs grouping
+hashtables kernel locals math math.parser sequences sequences.deep
+splitting xml xml.data xml.traversal math.order namespaces
+combinators images gpu.shaders io make game.models game.models.util
+io.encodings.ascii game.models.loader specialized-arrays ;
+QUALIFIED-WITH: alien.c-types c
+SPECIALIZED-ARRAYS: c:float c:uint ;
 IN: game.models.collada
 
 SINGLETON: collada-models
@@ -150,8 +150,8 @@ VERTEX-FORMAT: collada-vertex-format
     ]
     [
         soa>aos 
-        [ flatten >float-array ]
-        [ flatten >uint-array ]
+        [ flatten c:float >c-array ]
+        [ flatten c:uint >c-array ]
         bi* collada-vertex-format f model boa
     ] bi ;
     

@@ -183,7 +183,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     glActiveTexture swap glBindTexture gl-error ;
 
 : (set-draw-buffers) ( buffers -- )
-    [ length ] [ >uint-array ] bi glDrawBuffers ;
+    [ length ] [ uint >c-array ] bi glDrawBuffers ;
 
 MACRO: set-draw-buffers ( buffers -- )
     words>values '[ _ (set-draw-buffers) ] ;

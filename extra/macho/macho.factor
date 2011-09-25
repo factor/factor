@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings alien.syntax
-classes classes.struct combinators combinators.short-circuit
-io.encodings.ascii io.encodings.string kernel literals make
-math sequences specialized-arrays typed fry io.mmap formatting
-locals splitting io.binary arrays ;
+USING: accessors alien alien.c-types alien.data alien.strings
+alien.syntax classes classes.struct combinators
+combinators.short-circuit io.encodings.ascii io.encodings.string
+kernel literals make math sequences specialized-arrays typed
+fry io.mmap formatting locals splitting io.binary arrays ;
 FROM: alien.c-types => short ;
 IN: macho
 
@@ -837,12 +837,12 @@ TYPED: fat-binary-members ( >c-ptr -- fat-binary-members )
     } case dup
     [ >c-ptr fat_header heap-size swap <displaced-alien> ]
     [ nfat_arch>> 4 >be le> ] bi
-    <direct-fat_arch-array> [
+    fat_arch <c-direct-array> [
         {
             [ nip cputype>> 4 >be le> ]
             [ nip cpusubtype>> 4 >be le> ]
             [ offset>> 4 >be le> swap >c-ptr <displaced-alien> ]
-            [ nip size>> 4 >be le> <direct-uchar-array> ]
+            [ nip size>> 4 >be le> uchar <c-direct-array> ]
         } 2cleave fat-binary-member boa
     ] with { } map-as ;
 
@@ -913,8 +913,8 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
         [ nsects>> ]
         [ segment_command_64? ]
     } cleave
-    [ <direct-section_64-array> ]
-    [ <direct-section-array> ] if ;
+    [ section_64 <c-direct-array> ]
+    [ section <c-direct-array> ] if ;
 
 : sections-array ( segment-commands -- sections-array )
     [
@@ -926,8 +926,8 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
 : symbols ( mach-header symtab-command -- symbols string-table )
     [ symoff>> swap >c-ptr <displaced-alien> ]
     [ nsyms>> swap 64-bit?
-      [ <direct-nlist_64-array> ]
-      [ <direct-nlist-array> ] if ]
+      [ nlist_64 <c-direct-array> ]
+      [ nlist <c-direct-array> ] if ]
     [ stroff>> swap >c-ptr <displaced-alien> ] 2tri ;
     
 : symbol-name ( symbol string-table -- name )

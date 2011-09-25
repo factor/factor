@@ -36,7 +36,8 @@ __kernel void square(
             { num-floats } [ ] cl-queue-kernel &dispose drop
             
             cl-finish
-            out-buffer 0 num-bytes <cl-buffer-range> cl-read-buffer num-floats <direct-float-array>
+            out-buffer 0 num-bytes <cl-buffer-range>
+            cl-read-buffer num-floats flloat <c-direct-array>
         ] with-cl-state
     ] with-destructors ;
 
