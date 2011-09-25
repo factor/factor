@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs combinators fry hashtables
+USING: accessors assocs combinators hashtables
 hashtables.wrapped kernel parser sequences vocabs.loader ;
 
 IN: hashtables.sequences
@@ -29,7 +29,7 @@ M: sequence-hashtable clone
     underlying>> clone sequence-hashtable boa ; inline
 
 : >sequence-hashtable ( assoc -- shashtable )
-    dup assoc-size <sequence-hashtable> [ '[ swap _ set-at ] assoc-each ] keep ;
+    [ assoc-size <sequence-hashtable> ] keep assoc-union! ;
 
 SYNTAX: SH{ \ } [ >sequence-hashtable ] parse-literal ;
 

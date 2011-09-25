@@ -1,6 +1,6 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors arrays assocs fry hashtables hashtables.wrapped kernel parser
-sequences vocabs.loader ;
+USING: accessors arrays assocs hashtables hashtables.wrapped
+kernel parser sequences vocabs.loader ;
 IN: hashtables.identity
 
 TUPLE: identity-wrapper < wrapped-key ;
@@ -29,7 +29,7 @@ M: identity-hashtable clone
     2 <identity-hashtable> [ set-at ] keep ; inline
 
 : >identity-hashtable ( assoc -- ihashtable )
-    dup assoc-size <identity-hashtable> [ '[ swap _ set-at ] assoc-each ] keep ;
+    [ assoc-size <identity-hashtable> ] keep assoc-union! ;
 
 SYNTAX: IH{ \ } [ >identity-hashtable ] parse-literal ;
 
