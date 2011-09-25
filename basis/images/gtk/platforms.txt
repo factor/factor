@@ -1,2 +1,4 @@
 linux
-bsd
+freebsd
+netbsd
+openbsd
