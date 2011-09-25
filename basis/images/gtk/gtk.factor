@@ -4,18 +4,22 @@ USING: accessors alien.c-types alien.data arrays combinators
 destructors gdk.pixbuf.ffi gobject.ffi grouping images
 images.loader io kernel locals math sequences
 specialized-arrays ;
+FROM: system => os linux freebsd netbsd openbsd ;
 IN: images.gtk
 SPECIALIZED-ARRAY: uchar
 
 SINGLETON: gtk-image
-"png"  gtk-image register-image-class
-"tif"  gtk-image register-image-class
-"tiff" gtk-image register-image-class
-"gif"  gtk-image register-image-class
-"jpg"  gtk-image register-image-class
-"jpeg" gtk-image register-image-class
-"bmp"  gtk-image register-image-class
-"ico"  gtk-image register-image-class
+
+os { linux freebsd netbsd openbsd } member? [
+    "png"  gtk-image register-image-class
+    "tif"  gtk-image register-image-class
+    "tiff" gtk-image register-image-class
+    "gif"  gtk-image register-image-class
+    "jpg"  gtk-image register-image-class
+    "jpeg" gtk-image register-image-class
+    "bmp"  gtk-image register-image-class
+    "ico"  gtk-image register-image-class
+] when
 
 <PRIVATE
 
