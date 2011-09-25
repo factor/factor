@@ -3,17 +3,21 @@ USING: accessors alien.c-types alien.data alien.enums
 classes.struct destructors images images.loader kernel locals
 math windows.com windows.gdiplus windows.streams windows.types
 typed byte-arrays grouping sequences ;
+FROM: system => os windows? ;
 IN: images.gdiplus
 
 SINGLETON: gdi+-image
-"png" gdi+-image register-image-class
-"tif" gdi+-image register-image-class
-"tiff" gdi+-image register-image-class
-"gif" gdi+-image register-image-class
-"jpg" gdi+-image register-image-class
-"jpeg" gdi+-image register-image-class
-"bmp" gdi+-image register-image-class
-"ico" gdi+-image register-image-class
+
+os windows? [
+    "png" gdi+-image register-image-class
+    "tif" gdi+-image register-image-class
+    "tiff" gdi+-image register-image-class
+    "gif" gdi+-image register-image-class
+    "jpg" gdi+-image register-image-class
+    "jpeg" gdi+-image register-image-class
+    "bmp" gdi+-image register-image-class
+    "ico" gdi+-image register-image-class
+] when
 
 <PRIVATE
 : <GpRect> ( x y w h -- rect )
