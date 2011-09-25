@@ -21,19 +21,16 @@ M: object quot-uses 2drop ;
 
 M: word quot-uses over crossref? [ conjoin ] [ 2drop ] if ;
 
-: (seq-uses) ( seq assoc -- )
-    [ quot-uses ] curry each ;
-
 : seq-uses ( seq assoc -- )
     over visited get member-eq? [ 2drop ] [
         over visited get push
-        (seq-uses)
+        [ quot-uses ] curry each
     ] if ;
 
 : assoc-uses ( assoc' assoc -- )
     over visited get member-eq? [ 2drop ] [
         over visited get push
-        [ >alist ] dip (seq-uses)
+        [ quot-uses ] curry [ bi@ ] curry assoc-each
     ] if ;
 
 M: array quot-uses seq-uses ;
@@ -62,7 +59,7 @@ M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
 M: vocab uses drop f ;
 
 : crossref-def ( defspec -- )
-    dup uses crossref get add-vertex ;
+    dup uses crossref get-global add-vertex ;
 
 : defs-to-crossref ( -- seq )
     [
