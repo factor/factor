@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays byte-arrays combinators
-compression.run-length fry grouping images images.loader
-images.normalization io io.binary io.encodings.8-bit.latin1
-io.encodings.string kernel math math.bitwise sequences
-specialized-arrays summary io.streams.throwing ;
+USING: accessors alien.c-types alien.data arrays byte-arrays
+combinators compression.run-length fry grouping images
+images.loader images.normalization io io.binary
+io.encodings.8-bit.latin1 io.encodings.string kernel math
+math.bitwise sequences specialized-arrays summary
+io.streams.throwing ;
 QUALIFIED-WITH: bitstreams b
 SPECIALIZED-ARRAYS: uint ushort ;
 IN: images.bitmap
@@ -279,7 +280,7 @@ ERROR: bmp-not-supported n ;
         { 24 [ color-index>> ] }
         { 16 [
             [
-                ! ushort-array-cast
+                ! ushort cast-array
                 2 group [ le> ] map
                 ! 5 6 5
                 ! { HEX: f800 HEX: 7e0 HEX: 1f } uncompress-bitfield
@@ -310,7 +311,7 @@ M: unsupported-bitfield-widths summary
     dup header>> bit-count>> {
         { 16 [
             dup bitfields>> '[
-                ushort-array-cast _ uncompress-bitfield
+                ushort cast-array _ uncompress-bitfield
             ] change-color-index
         ] }
         { 32 [ ] }

@@ -1,6 +1,6 @@
 USING: tools.test io.streams.byte-array io.encodings.binary
 io.encodings.utf8 io kernel arrays strings namespaces math
-specialized-arrays alien.c-types io.encodings.ascii ;
+specialized-arrays alien.c-types alien.data io.encodings.ascii ;
 SPECIALIZED-ARRAY: int
 IN: io.streams.byte-array.tests
 
@@ -55,5 +55,5 @@ IN: io.streams.byte-array.tests
 ! Writing specialized arrays to byte writers
 [ int-array{ 1 2 3 } ] [
     binary [ int-array{ 1 2 3 } write ] with-byte-writer
-    int-array-cast
+    int cast-array
 ] unit-test

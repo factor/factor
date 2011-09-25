@@ -4,9 +4,20 @@ alien.strings sequences io.encodings.string debugger destructors
 vocabs.loader classes.struct quotations kernel ;
 IN: alien.data
 
+HELP: >c-array
+{ $values { "seq" sequence } { "c-type" "a C type" } { "array" byte-array } }
+{ $description "Outputs a freshly allocated byte-array whose elements are C type values from the given sequence." }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
+{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
+
 HELP: <c-array>
 { $values { "len" "a non-negative integer" } { "c-type" "a C type" } { "array" byte-array } }
 { $description "Creates a byte array large enough to hold " { $snippet "n" } " values of a C type." }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
+{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
+
+HELP: c-array{
+{ $description "Literal syntax, consists of a C-type followed by a series of values terminated by " { $snippet "}" } }
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
 
@@ -14,8 +25,14 @@ HELP: memory>byte-array
 { $values { "alien" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new byte array." } ;
 
+HELP: cast-array
+{ $values { "byte-array" byte-array } { "c-type" "a C type" } { "array" "a specialized array" } }
+{ $description "Converts a byte array into a specialized array by interpreting the bytes in as machine-specific values. Code which uses this word is unportable" }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
+{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
+
 HELP: malloc-array
-{ $values { "n" "a non-negative integer" } { "type" "a C type" } { "array" "a specialized array" } }
+{ $values { "n" "a non-negative integer" } { "c-type" "a C type" } { "array" "a specialized array" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type, then wraps the memory in a sequence object using " { $link <c-direct-array> } "." }
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }

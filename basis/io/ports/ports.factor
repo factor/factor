@@ -3,8 +3,8 @@
 USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.encodings math.order io.backend
 continuations classes byte-arrays namespaces splitting grouping
-dlists alien alien.c-types assocs io.encodings.binary summary
-accessors destructors combinators fry specialized-arrays
+dlists alien alien.c-types alien.data assocs io.encodings.binary
+summary accessors destructors combinators fry specialized-arrays
 locals ;
 SPECIALIZED-ARRAY: uchar
 IN: io.ports
@@ -120,7 +120,7 @@ M: output-port stream-write1
     buffer>> byte>buffer ; inline
 
 : write-in-groups ( byte-array port -- )
-    [ binary-object <direct-uchar-array> ] dip
+    [ binary-object uchar <c-direct-array> ] dip
     [ buffer>> size>> <sliced-groups> ] [ '[ _ stream-write ] ] bi
     each ;
 

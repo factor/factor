@@ -1,6 +1,6 @@
-USING: accessors alien.c-types classes.struct combinators
-continuations io kernel libc literals locals sequences
-specialized-arrays windows.com memoize
+USING: accessors alien.c-types alien.data classes.struct
+combinators continuations io kernel libc literals locals
+sequences specialized-arrays windows.com memoize
 windows.com.wrapper windows.kernel32 windows.ole32
 windows.types ;
 IN: windows.streams
@@ -24,7 +24,7 @@ SPECIALIZED-ARRAY: uchar
 
 :: IStream-write ( stream pv cb out-written -- hresult )
     [
-        pv cb <direct-uchar-array> stream stream-write
+        pv cb uchar <c-direct-array> stream stream-write
         out-written [ cb out-written 0 ULONG set-alien-value ] when
         S_OK
     ] with-hresult ; inline
