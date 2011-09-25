@@ -13,17 +13,17 @@ IN: specialized-arrays.tests
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
 
-[ t ] [ { 1 2 3 } >int-array int-array? ] unit-test
+[ t ] [ { 1 2 3 } int >c-array int-array? ] unit-test
 
 [ t ] [ int-array{ 1 2 3 } int-array? ] unit-test
 
 [ 2 ] [ int-array{ 1 2 3 } second ] unit-test
 
 [ t ] [
-    { t f t } >bool-array underlying>>
+    { t f t } bool >c-array underlying>>
     { 1 0 1 } bool heap-size {
-        { 1 [ >char-array ] }
-        { 4 [ >uint-array ] }
+        { 1 [ char >c-array ] }
+        { 4 [ uint >c-array ] }
     } case underlying>> =
 ] unit-test
 

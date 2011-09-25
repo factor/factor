@@ -43,7 +43,6 @@ A          DEFINES-CLASS ${T}-array
 (A)        DEFINES (${A})
 <direct-A> DEFINES <direct-${A}>
 malloc-A   DEFINES malloc-${A}
->A         DEFINES >${A}
 A-cast     DEFINES ${A}-cast
 A{         DEFINES ${A}{
 A@         DEFINES ${A}@
@@ -74,9 +73,7 @@ M: A nth-c-ptr underlying>> \ T array-accessor drop swap <displaced-alien> ; inl
 
 M: A set-nth-unsafe underlying>> \ T set-alien-element ; inline
 
-: >A ( seq -- specialized-array ) A new clone-like ;
-
-M: A like drop dup A instance? [ >A ] unless ; inline
+M: A like drop dup A instance? [ \ T >c-array ] unless ; inline
 
 M: A new-sequence drop (A) ; inline
 
@@ -97,7 +94,7 @@ M: A pprint-delims drop \ A{ \ } ;
 
 M: A >pprint-sequence ;
 
-SYNTAX: A{ \ } [ >A ] parse-literal ;
+SYNTAX: A{ \ } [ \ T >c-array ] parse-literal ;
 
 INSTANCE: A specialized-array
 
@@ -159,13 +156,6 @@ M: c-type-word c-direct-array-constructor
     [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
 M: pointer c-direct-array-constructor drop void* c-direct-array-constructor ;
-
-M: c-type-word c-convert-array
-    underlying-type
-    dup [ name>> ">" "-array" surround ] [ specialized-array-vocab ] bi lookup
-    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
-
-M: pointer c-convert-array drop void* c-convert-array ;
 
 M: c-type-word c-array-type
     underlying-type

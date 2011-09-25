@@ -22,8 +22,6 @@ GENERIC: c-(array)-constructor ( c-type -- word ) foldable
 
 GENERIC: c-direct-array-constructor ( c-type -- word ) foldable
 
-GENERIC: c-convert-array ( c-type -- word ) foldable
-
 GENERIC: c-array-type ( c-type -- word ) foldable
 
 GENERIC: c-array-type? ( c-type -- word ) foldable
@@ -39,7 +37,7 @@ M: pointer c-array?
 GENERIC: >c-array ( seq c-type -- array )
 
 M: word >c-array
-    c-convert-array execute( seq -- array ) ; inline
+    c-array-type new clone-like ;
 
 M: pointer >c-array
     drop void* >c-array ;

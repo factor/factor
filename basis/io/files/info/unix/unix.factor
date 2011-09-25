@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays calendar calendar.unix
-classes.struct combinators combinators.short-circuit io.backend
-io.directories io.files.info io.files.types kernel literals
-math math.bitwise sequences specialized-arrays strings system
-unix unix.ffi unix.groups unix.stat unix.time unix.users
-vocabs.loader ;
+USING: accessors alien.c-types alien.data arrays calendar
+calendar.unix classes.struct combinators
+combinators.short-circuit io.backend io.directories
+io.files.info io.files.types kernel literals math math.bitwise
+sequences specialized-arrays strings system unix unix.ffi
+unix.groups unix.stat unix.time unix.users vocabs.loader ;
 IN: io.files.info.unix
 SPECIALIZED-ARRAY: timeval
 
@@ -195,7 +195,7 @@ M: unix copy-file-and-info ( from to -- )
 
 : timestamps>byte-array ( timestamps -- byte-array )
     [ [ timestamp>timeval ] [ \ timeval <struct> ] if* ] map
-    >timeval-array ;
+    timeval >c-array ;
 
 PRIVATE>
 

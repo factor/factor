@@ -121,11 +121,11 @@ ARTICLE: "classes.struct.examples" "Struct class examples"
 { $code "test-struct <struct> ." }
 "Creating a new instance with slots initialized from the stack:"
 { $code
-    "USING: libc specialized-arrays ;"
+    "USING: libc specialized-arrays alien.data ;"
     "SPECIALIZED-ARRAY: char"
     ""
     "42"
-    "\"Hello, chicken.\" >char-array"
+    "\"Hello, chicken.\" char >c-array"
     "1024 malloc"
     "test-struct <struct-boa> ."
 } ;

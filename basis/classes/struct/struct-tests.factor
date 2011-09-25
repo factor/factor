@@ -336,7 +336,7 @@ STRUCT: clone-test-struct { x int } { y char[3] } ;
         clone-test-struct malloc-struct &free
         1 >>x char-array{ 9 1 1 } >>y
         clone
-        [ >c-ptr byte-array? ] [ x>> ] [ y>> >char-array ] tri
+        [ >c-ptr byte-array? ] [ x>> ] [ y>> char >c-array ] tri
     ] with-destructors
 ] unit-test
 
