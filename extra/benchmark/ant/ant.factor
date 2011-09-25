@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors combinators fry hash-sets hashtables kernel
-locals math math.parser sequences sets utils vectors ;
+locals math math.parser sequences sets vectors ;
 
-IN: ant
+IN: benchmark.ant
 
 ! There is an ant which can walk around on a planar grid. The ant
 ! can move one space at a time left, right, up or down. That is,
