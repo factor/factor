@@ -425,9 +425,9 @@ M: mask-state set-gpu-state*
 : get-gl-bools ( enum count -- value )
     <byte-array> [ glGetBooleanv ] keep [ c-bool> ] { } map-as ;
 : get-gl-ints ( enum count -- value )
-    <int-array> [ glGetIntegerv ] keep ;
+    int <c-array> [ glGetIntegerv ] keep ;
 : get-gl-floats ( enum count -- value )
-    <float-array> [ glGetFloatv ] keep ;
+    c:float <c-array> [ glGetFloatv ] keep ;
 
 : get-gl-rect ( enum -- value )
     4 get-gl-ints first4 [ 2array ] 2bi@ <rect> ;

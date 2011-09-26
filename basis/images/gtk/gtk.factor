@@ -38,7 +38,7 @@ os { linux freebsd netbsd openbsd } member? [
         bytes-per-row rowstride =
         [ pixels h rowstride * memory>byte-array ]
         [
-            pixels rowstride h * <direct-uchar-array>
+            pixels rowstride h * uchar <c-direct-array>
             rowstride <sliced-groups>
             [ bytes-per-row head-slice ] map concat
         ] if

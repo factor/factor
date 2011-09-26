@@ -305,7 +305,7 @@ SPECIALIZED-ARRAY: struct-test-optimization
 
 [ t ] [
     [ struct-test-optimization memory>struct x>> second ]
-    { memory>struct x>> <direct-int-array> <tuple> <tuple-boa> } inlined?
+    { memory>struct x>> int <c-direct-array> <tuple> <tuple-boa> } inlined?
 ] unit-test
 
 [ f ] [ [ memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
@@ -328,7 +328,7 @@ STRUCT: clone-test-struct { x int } { y char[3] } ;
     clone-test-struct <struct>
     1 >>x char-array{ 9 1 1 } >>y
     clone
-    [ x>> ] [ y>> >char-array ] bi
+    [ x>> ] [ y>> char >c-array ] bi
 ] unit-test
 
 [ t 1 char-array{ 9 1 1 } ] [
@@ -336,7 +336,7 @@ STRUCT: clone-test-struct { x int } { y char[3] } ;
         clone-test-struct malloc-struct &free
         1 >>x char-array{ 9 1 1 } >>y
         clone
-        [ >c-ptr byte-array? ] [ x>> ] [ y>> >char-array ] tri
+        [ >c-ptr byte-array? ] [ x>> ] [ y>> char >c-array ] tri
     ] with-destructors
 ] unit-test
 

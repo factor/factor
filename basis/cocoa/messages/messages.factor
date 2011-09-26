@@ -218,7 +218,7 @@ ERROR: no-objc-type name ;
 : each-method-in-class ( class quot -- )
     [ { uint } [ class_copyMethodList ] with-out-parameters ] dip
     over 0 = [ 3drop ] [
-        [ <direct-void*-array> ] dip
+        [ void* <c-direct-array> ] dip
         [ each ] [ drop (free) ] 2bi
     ] if ; inline
 

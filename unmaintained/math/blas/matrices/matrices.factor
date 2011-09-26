@@ -251,7 +251,6 @@ FUNCTOR: (define-blas-matrix) ( TYPE T U C -- )
 
 VECTOR      IS ${TYPE}-blas-vector
 <VECTOR>    IS <${TYPE}-blas-vector>
->ARRAY      IS >${TYPE}-array
 XGEMV       IS ${T}GEMV
 XGEMM       IS ${T}GEMM
 XGERU       IS ${T}GER${U}
@@ -281,7 +280,7 @@ M: MATRIX (blas-vector-like)
     drop <VECTOR> ;
 
 : >MATRIX ( arrays -- matrix )
-    [ >ARRAY underlying>> ] (>matrix) <MATRIX> ;
+    [ TYPE >c-array underlying>> ] (>matrix) <MATRIX> ;
 
 M: VECTOR n*M.V+n*V!
     (prepare-gemv) [ XGEMV ] dip ;

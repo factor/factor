@@ -30,7 +30,7 @@ ERROR: cl-error err ;
     
 :: opencl-square ( in -- out )
     0 f 0 uint <ref> [ clGetPlatformIDs cl-success ] keep uint deref
-    dup <void*-array> [ f clGetPlatformIDs cl-success ] keep first
+    dup void* <c-array> [ f clGetPlatformIDs cl-success ] keep first
     CL_DEVICE_TYPE_DEFAULT 1 f void* <ref> [ f clGetDeviceIDs cl-success ] keep void* deref :> device-id
     f 1 device-id void* <ref> f f 0 int <ref> [ clCreateContext ] keep int deref cl-success   :> context
     context device-id 0 0 int <ref> [ clCreateCommandQueue ] keep int deref cl-success    :> queue
@@ -60,7 +60,7 @@ ERROR: cl-error err ;
  
     queue clFinish cl-success
 
-    queue output CL_TRUE 0 in byte-length in length <float-array>
+    queue output CL_TRUE 0 in byte-length in length float <c-array>
     [ 0 f f clEnqueueReadBuffer cl-success ] keep
 
     input clReleaseMemObject cl-success
