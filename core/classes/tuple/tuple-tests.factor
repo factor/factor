@@ -631,11 +631,15 @@ DEFER: error-y
 
 [ f ] [ \ error-y tuple-class? ] unit-test
 
+[ f ] [ \ error-y error-class? ] unit-test
+
 [ t ] [ \ error-y generic? ] unit-test
 
 [ ] [ "IN: classes.tuple.tests ERROR: error-y ;" eval( -- ) ] unit-test
 
 [ t ] [ \ error-y tuple-class? ] unit-test
+
+[ t ] [ \ error-y error-class? ] unit-test
 
 [ f ] [ \ error-y generic? ] unit-test
 
