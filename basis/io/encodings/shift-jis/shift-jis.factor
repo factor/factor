@@ -36,10 +36,10 @@ TUPLE: jis assoc ;
     flat-file>biassoc [ nip ] assoc-filter jis boa ;
 
 "vocab:io/encodings/shift-jis/CP932.txt"
-make-jis to: windows-31j-table
+make-jis \ windows-31j-table set-value
 
 "vocab:io/encodings/shift-jis/sjis-0208-1997-std.txt"
-make-jis to: shift-jis-table
+make-jis \ shift-jis-table set-value
 
 : small? ( char -- ? )
     ! ASCII range or single-byte halfwidth katakana
