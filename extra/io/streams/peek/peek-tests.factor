@@ -1,6 +1,10 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io io.streams.peek io.streams.string tools.test ;
+USING: accessors byte-arrays combinators
+combinators.short-circuit destructors io io.encodings.ascii
+io.encodings.binary io.private io.streams.byte-array
+io.streams.peek io.streams.string kernel locals make math
+sequences tools.test vectors ;
 IN: io.streams.peek.tests
 
 [ CHAR: a ]
