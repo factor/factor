@@ -191,8 +191,8 @@ M: array pprint-slot-name
 : superclass. ( class -- )
     superclass dup tuple eq? [ drop ] [ "<" text pprint-word ] if ;
 
-: pprint-tuple-class ( class definer -- )
-    <colon pprint-word
+M: tuple-class see-class*
+    <colon \ TUPLE: pprint-word
     {
         [ pprint-word ]
         [ superclass. ]
@@ -200,12 +200,6 @@ M: array pprint-slot-name
         [ tuple-declarations. ]
     } cleave
     block> ;
-
-M: tuple-class see-class*
-    \ TUPLE: pprint-tuple-class ;
-
-M: error-class see-class* ( class -- )
-    \ ERROR: pprint-tuple-class ;
 
 M: word see-class* drop ;
 
