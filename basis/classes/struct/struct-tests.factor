@@ -514,3 +514,23 @@ PACKED-STRUCT: packed-struct-test
 
 [ POSTPONE: PACKED-STRUCT: ]
 [ packed-struct-test struct-definer-word ] unit-test
+
+STRUCT: struct-1 { a c:int } ;
+PACKED-STRUCT: struct-1-packed { a c:int } ;
+UNION-STRUCT: struct-1-union { a c:int } ;
+
+[ "USING: alien.c-types classes.struct ;
+IN: classes.struct.tests
+STRUCT: struct-1 { a int initial: 0 } ;
+" ]
+[ \ struct-1 [ see ] with-string-writer ] unit-test
+[ "USING: alien.c-types classes.struct ;
+IN: classes.struct.tests
+PACKED-STRUCT: struct-1-packed { a int initial: 0 } ;
+" ]
+[ \ struct-1-packed [ see ] with-string-writer ] unit-test
+[ "USING: alien.c-types classes.struct ;
+IN: classes.struct.tests
+STRUCT: struct-1-union { a int initial: 0 } ;
+" ]
+[ \ struct-1-union [ see ] with-string-writer ] unit-test

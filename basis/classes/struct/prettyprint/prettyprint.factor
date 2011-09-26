@@ -12,8 +12,9 @@ IN: classes.struct.prettyprint
 : struct-definer-word ( class -- word )
     struct-slots
     {
-        { [ dup [ offset>> 0 = ] all? ] [ drop \ UNION-STRUCT: ] }
         { [ dup [ packed?>> ] all? ] [ drop \ PACKED-STRUCT: ] }
+        { [ dup length 1 <= ] [ drop \ STRUCT: ] }
+        { [ dup [ offset>> 0 = ] all? ] [ drop \ UNION-STRUCT: ] }
         [ drop \ STRUCT: ]
     } cond ;
 
