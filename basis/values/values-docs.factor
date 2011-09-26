@@ -22,7 +22,7 @@ HELP: VALUE:
     "USING: values math prettyprint ;"
     "IN: scratchpad"
     "VALUE: x"
-    "2 2 + \ x set-value"
+    "2 2 + \\ x set-value"
     "x ."
     "4"
   }
