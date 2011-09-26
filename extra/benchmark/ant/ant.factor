@@ -35,7 +35,7 @@ STRUCT: point { x uint } { y uint } ;
 : walkable? ( point -- ? )
     [ x>> ] [ y>> ] bi [ sum-digits ] bi@ + 25 <= ; inline
 
-:: ant ( -- total )
+:: ant ( -- )
     200000 <hashtable> hash-set boa :> seen
     100000 <vector> :> stack
     0 :> total!
@@ -54,4 +54,6 @@ STRUCT: point { x uint } { y uint } ;
                 p clone [ 1 - ] change-y stack push
             ] when
         ] unless
-    ] until total ;
+    ] until total 148848 assert= ;
+
+MAIN: ant
