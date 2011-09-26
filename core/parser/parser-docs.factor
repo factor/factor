@@ -15,6 +15,7 @@ ARTICLE: "reading-ahead" "Reading ahead"
 { $subsections
     scan
     scan-word
+    scan-identifier
 }
 "For example, the " { $link POSTPONE: HEX: } " word uses this feature to read hexadecimal literals:"
 { $see POSTPONE: HEX: }

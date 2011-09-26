@@ -151,6 +151,12 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
 : with-lexer ( lexer quot -- newquot )
     [ lexer set ] dip [ <lexer-error> rethrow ] recover ; inline
 
+: scan-identifier ( -- str/f )
+    scan
+    dup string>number [
+        "Identifiers cannot be numbers" throw
+    ] when ;
+
 SYMBOL: lexer-factory
 
 [ <lexer> ] lexer-factory set-global
