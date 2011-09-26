@@ -293,6 +293,10 @@ M: tuple-class (define-tuple-class)
 PREDICATE: error-class < tuple-class
     "error-class" word-prop ;
 
+M: error-class reset-class
+    [ "error-class" remove-word-prop ]
+    [ call-next-method ] bi ;
+
 : define-error-class ( class superclass slots -- )
     error-slots {
         [ define-tuple-class ]
