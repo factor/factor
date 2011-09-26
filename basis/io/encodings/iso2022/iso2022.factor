@@ -13,12 +13,12 @@ VALUE: jis201
 VALUE: jis208
 VALUE: jis212
 
-"vocab:io/encodings/iso2022/201.txt" flat-file>biassoc to: jis201
-"vocab:io/encodings/iso2022/208.txt" flat-file>biassoc to: jis208
-"vocab:io/encodings/iso2022/212.txt" flat-file>biassoc to: jis212
+"vocab:io/encodings/iso2022/201.txt" flat-file>biassoc \ jis201 set-value
+"vocab:io/encodings/iso2022/208.txt" flat-file>biassoc \ jis208 set-value
+"vocab:io/encodings/iso2022/212.txt" flat-file>biassoc \ jis212 set-value
 
 VALUE: ascii
-128 iota unique >biassoc to: ascii
+128 iota unique >biassoc \ ascii set-value
 
 TUPLE: iso2022-state type ;
 

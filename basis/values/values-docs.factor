@@ -8,7 +8,6 @@ ARTICLE: "values" "Global values"
 { $subsections
     get-value
     set-value
-    POSTPONE: to:
     change-value
 } ;
 
@@ -17,13 +16,13 @@ ABOUT: "values"
 HELP: VALUE:
 { $syntax "VALUE: word" }
 { $values { "word" "a word to be created" } }
-{ $description "Creates a value on the given word, initializing it to hold " { $snippet "f" } ". To get the value, just run the word. To set it, use " { $link POSTPONE: to: } "." }
+{ $description "Creates a value on the given word, initializing it to hold " { $snippet "f" } ". To get the value, just run the word. To set it, use " { $link set-value } "." }
 { $examples
   { $example
     "USING: values math prettyprint ;"
     "IN: scratchpad"
     "VALUE: x"
-    "2 2 + to: x"
+    "2 2 + \ x set-value"
     "x ."
     "4"
   }
@@ -36,17 +35,6 @@ HELP: get-value
 HELP: set-value
 { $values { "value" "a new value" } { "word" "a value word" } }
 { $description "Sets a value word." } ;
-
-HELP: to:
-{ $syntax "... to: value" }
-{ $values { "word" "a value word" } }
-{ $description "Sets a value word." }
-{ $notes
-    "Note that"
-    { $code "foo to: value" }
-    "is just sugar for"
-    { $code "foo \\ value set-value" }
-} ;
 
 HELP: change-value
 { $values { "word" "a value word" } { "quot" { $quotation "( oldvalue -- newvalue )" } } }
