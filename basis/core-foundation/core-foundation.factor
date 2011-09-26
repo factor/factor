@@ -1,6 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien.c-types alien.destructors accessors classes.struct kernel ;
+USING: alien.c-types alien.destructors alien.syntax
+classes.struct ;
 IN: core-foundation
 
 TYPEDEF: void* CFTypeRef
