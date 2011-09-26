@@ -75,7 +75,7 @@ SPECIALIZED-ARRAY: test-struct
 
 [ 5/4 ] [
     [
-        2 malloc-test-struct-array
+        2 \ test-struct malloc-array
         dup &free drop
         1 2 make-point over set-first
         3 4 make-point over set-second
@@ -87,7 +87,7 @@ SPECIALIZED-ARRAY: test-struct
 
 [ ] [
     [
-        10 malloc-test-struct-array
+        10 \ test-struct malloc-array
         &free drop
     ] with-destructors
 ] unit-test
@@ -175,7 +175,7 @@ SPECIALIZED-ARRAY: struct-resize-test
 
 : struct-resize-test-usage ( seq -- seq )
     [ struct-resize-test <struct> swap >>x ] map
-    >struct-resize-test-array
+    \ struct-resize-test >c-array
     [ x>> ] { } map-as ;
     
 [ { 10 20 30 } ] [ { 10 20 30 } struct-resize-test-usage ] unit-test
