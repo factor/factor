@@ -2,16 +2,14 @@
 ! John Benediktsson, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors alien alien.c-types alien.data alien.parser
-arrays byte-arrays classes classes.private classes.parser
-classes.tuple classes.tuple.parser classes.tuple.private
-combinators combinators.short-circuit combinators.smart
-cpu.architecture definitions functors.backend fry
-generalizations generic.parser kernel kernel.private lexer libc
-locals macros make math math.order parser quotations sequences
-slots slots.private specialized-arrays vectors words summary
-namespaces assocs vocabs.parser math.functions
-classes.struct.bit-accessors bit-arrays
-stack-checker.dependencies system layouts ;
+arrays byte-arrays classes classes.parser
+classes.struct.bit-accessors classes.tuple classes.tuple.parser
+combinators combinators.smart cpu.architecture fry
+functors.backend generalizations generic.parser kernel
+kernel.private lexer libc locals macros math math.order parser
+quotations sequences slots slots.private specialized-arrays
+stack-checker.dependencies summary vectors vocabs vocabs.loader
+vocabs.parser words ;
 FROM: delegate.private => group-words slot-group-words ;
 QUALIFIED: math
 IN: classes.struct
