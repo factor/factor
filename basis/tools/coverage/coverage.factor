@@ -3,16 +3,28 @@
 USING: accessors assocs fry io kernel math prettyprint
 quotations sequences sequences.deep splitting strings
 tools.annotations vocabs words arrays words.symbol
-combinators.short-circuit ;
+combinators.short-circuit values tools.test
+combinators continuations ;
 IN: tools.coverage
 
 TUPLE: coverage < identity-tuple executed? ;
 
 C: <coverage> coverage
 
-GENERIC: coverage-on ( object -- )
+VALUE: covered
 
-GENERIC: coverage-off ( object -- )
+: flag-covered ( coverage -- )
+    covered [ t >>executed? ] when drop ;
+
+: coverage-on ( -- ) t \ covered set-value ;
+
+: coverage-off ( -- ) f \ covered set-value ;
+
+GENERIC: add-coverage ( object -- )
+
+GENERIC: remove-coverage ( object -- )
+
+GENERIC: reset-coverage ( object -- )
 
 <PRIVATE
 
@@ -40,33 +52,27 @@ PRIVATE>
         [ [ coverage-words ] dip map ] 2bi append
     ] if ; inline
 
-M: string coverage-on
-    [ coverage-on ] each-word ;
+M: string add-coverage
+    [ add-coverage ] each-word ;
 
-M: string coverage-off ( vocabulary -- )
-    [ coverage-off ] each-word ;
+M: string remove-coverage
+    [ remove-coverage ] each-word ;
 
-M: word coverage-on ( word -- )
+M: word add-coverage 
     H{ } clone [ "coverage" set-word-prop ] 2keep
     '[
         \ coverage new [ _ set-at ] 2keep
-        '[ _ t >>executed? drop ] prepend
+        '[ _ flag-covered ] prepend
     ] deep-annotate ;
 
-M: word coverage-off ( word -- )
+M: word remove-coverage
     [ reset ] [ f "coverage" set-word-prop ] bi ;
 
-GENERIC: toggle-coverage ( object -- )
+M: string reset-coverage
+    [ reset-coverage ] each-word ;
 
-M: string toggle-coverage
-    [ toggle-coverage ] each-word ;
-
-M: word toggle-coverage
-    dup "coverage" word-prop [
-        coverage-off
-    ] [
-        coverage-on
-    ] if ;
+M: word reset-coverage
+    [ dup coverage? [ f >>executed? ] when drop ] each-word ;
 
 GENERIC: coverage ( object -- seq )
 
@@ -82,13 +88,19 @@ GENERIC: coverage. ( object -- )
 M: string coverage.
     [ coverage. ] each-word ;
 
-M: word coverage.
-    dup coverage [
-        drop
+: pair-coverage. ( word quots -- )
+    dup empty? [
+        2drop
     ] [
         [ name>> ":" append print ]
         [ [ "    " write . ] each ] bi*
-    ] if-empty ;
+    ] if ;
+
+M: word coverage.
+    dup coverage pair-coverage. ;
+
+M: sequence coverage.
+    [ first2 pair-coverage. ] each ;
 
 <PRIVATE
 
@@ -101,6 +113,19 @@ M: word count-callables
     "coverage" word-prop assoc-size ;
 
 PRIVATE>
+
+: test-coverage ( vocab -- coverage )
+    [
+        add-coverage
+    ] [
+        dup '[
+            [
+                _
+                [ coverage-on test coverage-off ]
+                [ coverage ] bi
+            ] [ _ remove-coverage ] [ ] cleanup
+        ] call
+    ] bi ;
 
 : %coverage ( string -- x )
     [ coverage values concat length ]
