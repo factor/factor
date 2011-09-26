@@ -48,10 +48,10 @@ VALUE: VERY-SMALL-NUM
 VALUE: ZERO-VALUE
 VALUE: MAX-FACE-PER-CORNER
 
-t to: remove-hidden-solids?
-0.0000001 to: VERY-SMALL-NUM
-0.0000001 to: ZERO-VALUE
-4 to: MAX-FACE-PER-CORNER
+t \ remove-hidden-solids? set-value
+0.0000001 \ VERY-SMALL-NUM set-value
+0.0000001 \ ZERO-VALUE set-value
+4 \ MAX-FACE-PER-CORNER set-value
 ! -------------------------------------------------------------
 ! sequence complement
 

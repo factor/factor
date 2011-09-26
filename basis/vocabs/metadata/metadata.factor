@@ -127,6 +127,8 @@ M: unsupported-platform summary
     drop "Current operating system not supported by this vocabulary" ;
 
 [
-    dup vocab-platforms dup supported-platform?
-    [ 2drop ] [ [ vocab-name ] dip unsupported-platform ] if
+    parent-vocabs [
+        dup vocab-platforms dup supported-platform?
+        [ 2drop ] [ [ vocab-name ] dip unsupported-platform ] if
+    ] each
 ] check-vocab-hook set-global

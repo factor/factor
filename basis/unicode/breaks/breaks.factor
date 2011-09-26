@@ -134,14 +134,14 @@ PRIVATE>
 
 graphemes init-table table
 [ make-grapheme-table finish-table ] with-variable
-to: grapheme-table
+\ grapheme-table set-value
 
 ! Word breaks
 
 VALUE: word-break-table
 
 "vocab:unicode/data/WordBreakProperty.txt" load-interval-file
-to: word-break-table
+\ word-break-table set-value
 
 CONSTANT: wOther 0
 CONSTANT: wCR 1
@@ -198,7 +198,7 @@ VALUE: word-table
 
 words init-table table
 [ make-word-table finish-word-table ] with-variable
-to: word-table
+\ word-table set-value
 
 : word-table-nth ( class1 class2 -- ? )
     word-table nth nth ;

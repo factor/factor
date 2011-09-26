@@ -6,8 +6,8 @@ VALUE: x
 VALUE: y
 
 : deploy-test-6 ( -- )
-    1 to: x
-    2 to: y
+    1 \ x set-value
+    2 \ y set-value
     x y + 3 assert= ;
 
 MAIN: deploy-test-6
