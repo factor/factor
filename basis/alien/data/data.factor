@@ -37,7 +37,7 @@ M: pointer c-array?
 GENERIC: >c-array ( seq c-type -- array )
 
 M: word >c-array
-    c-array-type new clone-like ;
+    c-array-type new clone-like ; inline
 
 M: pointer >c-array
     drop void* >c-array ;
