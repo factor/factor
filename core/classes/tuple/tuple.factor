@@ -294,8 +294,7 @@ PREDICATE: error-class < tuple-class
     "error-class" word-prop ;
 
 M: error-class reset-class
-    [ "error-class" remove-word-prop ]
-    [ call-next-method ] bi ;
+    [ call-next-method ] [ "error-class" remove-word-prop ] bi ;
 
 : define-error-class ( class superclass slots -- )
     error-slots {
