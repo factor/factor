@@ -84,8 +84,8 @@ VALUE: mapping
 
 "vocab:io/encodings/gb18030/gb-18030-2000.xml"
 ascii <file-reader> xml>gb-data
-[ ranges-u>gb to: u>gb ] [ ranges-gb>u to: gb>u ] bi
->biassoc to: mapping
+[ ranges-u>gb \ u>gb set-value ] [ ranges-gb>u \ gb>u set-value ] bi
+>biassoc \ mapping set-value
 
 : lookup-range ( char -- byte-array )
     dup u>gb interval-at [

@@ -8,7 +8,7 @@ IN: unicode.script
 VALUE: script-table
 
 "vocab:unicode/script/Scripts.txt" load-interval-file
-to: script-table
+\ script-table set-value
 
 PRIVATE>
 
