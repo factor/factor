@@ -189,7 +189,7 @@ HELP: assoc
 } ;
 
 HELP: at*
-{ $values { "key" "an object to look up in the assoc" } { "assoc" assoc } { "value/f" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } { "?" "a boolean indicating if the key was present" } }
+{ $values { "key" "an object to look up in the assoc" } { "assoc" assoc } { "value/f" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } { "?" "a " { $link boolean } " indicating if the key was present" } }
 { $contract "Looks up the value associated with a key. The boolean flag can decide between the case of a missing value, and a value of " { $link f } "." } ;
 
 HELP: set-at
@@ -238,7 +238,7 @@ HELP: at
 { $description "Looks up the value associated with a key. This word makes no distinction between a missing value and a value set to " { $link f } "; if the difference is important, use " { $link at* } "." } ;
 
 HELP: ?at
-{ $values { "key" object } { "assoc" assoc } { "value/key" "the value associated to the key, or the key if the key is not present in the assoc" } { "?" boolean } }
+{ $values { "key" object } { "assoc" assoc } { "value/key" "the value associated to the key, or the key if the key is not present in the assoc" } { "?" "a " { $link boolean } " indicating if the key was present" } }
 { $description "Looks up the value associated with a key. If the key was not present, an error can be thrown without extra stack shuffling. This word handles assocs that store " { $link f } "." } ;
 
 HELP: assoc-each
