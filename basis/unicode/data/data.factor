@@ -198,14 +198,14 @@ C: <code-point> code-point
     [ [ set-code-point ] each ] H{ } make-assoc ;
 
 load-data {
-    [ process-names to: name-map ]
-    [ 13 swap process-data to: simple-lower ]
-    [ 12 swap process-data to: simple-upper ]
-    [ 14 swap process-data simple-upper assoc-union to: simple-title ]
-    [ process-combining to: class-map ]
-    [ process-canonical to: canonical-map to: combine-map ]
-    [ process-compatibility to: compatibility-map ]
-    [ process-category to: category-map ]
+    [ process-names \ name-map set-value ]
+    [ 13 swap process-data \ simple-lower set-value ]
+    [ 12 swap process-data \ simple-upper set-value ]
+    [ 14 swap process-data simple-upper assoc-union \ simple-title set-value ]
+    [ process-combining \ class-map set-value ]
+    [ process-canonical \ canonical-map set-value \ combine-map set-value ]
+    [ process-compatibility \ compatibility-map set-value ]
+    [ process-category \ category-map set-value ]
 } cleave
 
 : postprocess-class ( -- )
@@ -215,9 +215,9 @@ load-data {
 
 postprocess-class
 
-load-special-casing to: special-casing
+load-special-casing \ special-casing set-value
 
-load-properties to: properties
+load-properties \ properties set-value
 
 [ name>char [ "Invalid character" throw ] unless* ]
 name>char-hook set-global

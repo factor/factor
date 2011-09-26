@@ -15,7 +15,7 @@ VALUE: html-entities
         read-entities-file
     ] map first3 assoc-union assoc-union ;
 
-get-html to: html-entities
+get-html \ html-entities set-value
 
 : with-html-entities ( quot -- )
     html-entities swap with-entities ; inline
