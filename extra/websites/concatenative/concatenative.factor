@@ -108,7 +108,7 @@ SYMBOLS: key-password key-file dh-file ;
         <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> website-db <alloy> "paste.factorcode.org" add-responder
         <planet> <login-config> <factor-boilerplate> website-db <alloy> "planet.factorcode.org" add-responder
         <mason-app> <login-config> <factor-boilerplate> website-db <alloy> "builds.factorcode.org" add-responder
-        home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
+        home "docs" append-path <help-webapp> website-db <alloy> "docs.factorcode.org" add-responder
         home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
     main-responder set-global ;
 
