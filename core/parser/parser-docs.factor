@@ -9,12 +9,13 @@ ARTICLE: "reading-ahead" "Reading ahead"
 "Parsing words can consume input:"
 { $subsections
     scan-token
+    scan-word
     scan-object
 }
 "Lower-level words:"
 { $subsections
-    scan
-    scan-word
+    (scan-token)
+    (scan-word)
 }
 "For example, the " { $link POSTPONE: HEX: } " word uses this feature to read hexadecimal literals:"
 { $see POSTPONE: HEX: }
@@ -39,14 +40,14 @@ $nl
 ARTICLE: "defining-words" "Defining words"
 "Defining words add definitions to the dictionary without modifying the parse tree. The simplest example is the " { $link POSTPONE: SYMBOL: } " word."
 { $see POSTPONE: SYMBOL: }
-"The key factor in the definition of " { $link POSTPONE: SYMBOL: } " is " { $link CREATE } ", which reads a token from the input and creates a word with that name. This word is then passed to " { $link define-symbol } "."
+"The key factor in the definition of " { $link POSTPONE: SYMBOL: } " is " { $link scan-new } ", which reads a token from the input and creates a word with that name. This word is then passed to " { $link define-symbol } "."
 { $subsections
-    CREATE
-    CREATE-WORD
+    scan-new
+    scan-new-word
 }
 "Colon definitions are defined in a more elaborate way:"
 { $subsections POSTPONE: : }
-"The " { $link POSTPONE: : } " word first calls " { $link CREATE } ", and then reads input until reaching " { $link POSTPONE: ; } " using a utility word:"
+"The " { $link POSTPONE: : } " word first calls " { $link scan-new } ", and then reads input until reaching " { $link POSTPONE: ; } " using a utility word:"
 { $subsections parse-definition }
 "The " { $link POSTPONE: ; } " word is just a delimiter; an unpaired occurrence throws a parse error:"
 { $see POSTPONE: ; }
@@ -129,7 +130,7 @@ HELP: create-in
 { $description "Creates a word in the current vocabulary. Until re-defined, the word throws an error when invoked." }
 $parsing-note ;
 
-HELP: CREATE
+HELP: scan-new
 { $values { "word" word } }
 { $description "Reads the next token from the line currently being parsed, and creates a word with that name in the current vocabulary." }
 { $errors "Throws an error if the end of the line is reached." }
@@ -144,13 +145,19 @@ HELP: no-word
 { $description "Throws a " { $link no-word-error } "." } ;
 
 HELP: parse-word
-{ $values { "string" string } { "word/number" "a word or number" } }
+{ $values { "string" string } { "word" "a number" } }
 { $description "If " { $snippet "string" } " is a valid number literal, it is converted to a number, otherwise the current vocabulary search path is searched for a word named by the string." }
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 { $notes "This word is used to implement " { $link scan-word } "." } ;
 
+HELP: parse-word/number
+{ $values { "string" string } { "word/number" "a word or number" } }
+{ $description "If " { $snippet "string" } " is a valid number literal, it is converted to a number, otherwise the current vocabulary search path is searched for a word named by the string." }
+{ $errors "Throws an error if the token does not name a word, and does not parse as a number." }
+{ $notes "This word is used to implement " { $link (scan-word) } "." } ;
+
 HELP: scan-word
-{ $values { "word/number/f" "a word, number or " { $link f } } }
+{ $values { "word/number" "a word or a number" } }
 { $description "Reads the next token from parser input. If the token is a valid number literal, it is converted to a number, otherwise the vocabulary search path is searched for a word named by the token. Outputs " { $link f } " if the end of the input has been reached." }
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 $parsing-note ;

@@ -82,7 +82,7 @@ M: game-world apply-world-attributes
     [ name>> "-attributes" append create-in ] dip define-constant ;
 
 SYNTAX: GAME:
-    CREATE
+    scan-new-word
     game-attributes parse-main-window-attributes
     2dup define-attributes-word
     parse-definition

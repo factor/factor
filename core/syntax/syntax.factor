@@ -117,11 +117,11 @@ IN: bootstrap.syntax
     "deprecated" [ word make-deprecated ] define-core-syntax
 
     "SYNTAX:" [
-        CREATE-WORD parse-definition define-syntax
+        scan-new-word parse-definition define-syntax
     ] define-core-syntax
 
     "SYMBOL:" [
-        CREATE-WORD define-symbol
+        scan-new-word define-symbol
     ] define-core-syntax
 
     "SYMBOLS:" [
@@ -138,11 +138,11 @@ IN: bootstrap.syntax
     ] define-core-syntax
     
     "ALIAS:" [
-        CREATE-WORD scan-word define-alias
+        scan-new-word scan-word define-alias
     ] define-core-syntax
 
     "CONSTANT:" [
-        CREATE-WORD scan-object define-constant
+        scan-new-word scan-object define-constant
     ] define-core-syntax
 
     ":" [
@@ -170,15 +170,15 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "UNION:" [
-        CREATE-CLASS parse-definition define-union-class
+        scan-new-class parse-definition define-union-class
     ] define-core-syntax
 
     "INTERSECTION:" [
-        CREATE-CLASS parse-definition define-intersection-class
+        scan-new-class parse-definition define-intersection-class
     ] define-core-syntax
 
     "MIXIN:" [
-        CREATE-CLASS define-mixin-class
+        scan-new-class define-mixin-class
     ] define-core-syntax
 
     "INSTANCE:" [
@@ -189,14 +189,14 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "PREDICATE:" [
-        CREATE-CLASS
+        scan-new-class
         "<" expect
         scan-word
         parse-definition define-predicate-class
     ] define-core-syntax
 
     "SINGLETON:" [
-        CREATE-CLASS define-singleton-class
+        scan-new-class define-singleton-class
     ] define-core-syntax
 
     "TUPLE:" [
@@ -212,7 +212,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "C:" [
-        CREATE-WORD scan-word define-boa-word
+        scan-new-word scan-word define-boa-word
     ] define-core-syntax
 
     "ERROR:" [

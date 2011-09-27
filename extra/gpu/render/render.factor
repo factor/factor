@@ -507,7 +507,7 @@ DEFER: [bind-uniform-tuple]
     ] 3bi ;
 
 : parse-uniform-tuple-definition ( -- class superclass uniforms )
-    CREATE-CLASS scan {
+    scan-new-class scan-token {
         { ";" [ uniform-tuple f ] }
         { "<" [ scan-word parse-definition [ first3 uniform boa ] map ] }
         { "{" [

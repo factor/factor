@@ -28,16 +28,16 @@ M: no-tag summary
 PRIVATE>
 
 SYNTAX: TAGS:
-    CREATE-WORD complete-effect
+    scan-new-word complete-effect
     [ drop H{ } clone "xtable" set-word-prop ]
     [ define-tags ]
     2bi ;
 
 SYNTAX: TAG:
-    scan scan-word parse-definition define-tag ;
+    scan-token scan-word parse-definition define-tag ;
 
 SYNTAX: XML-NS:
-    CREATE-WORD scan '[ f swap _ <name> ] (( string -- name )) define-memoized ;
+    scan-new-word scan-token '[ f swap _ <name> ] (( string -- name )) define-memoized ;
 
 <PRIVATE
 

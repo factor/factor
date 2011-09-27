@@ -55,4 +55,4 @@ ERROR: bad-storage-string string reason ;
 : n>money ( n -- string )
     3 10 { "" "K" "M" "B" "T" } reduce-magnitude ;
 
-SYNTAX: STORAGE: scan storage>n suffix! ;
+SYNTAX: STORAGE: scan-token storage>n suffix! ;

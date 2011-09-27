@@ -1397,10 +1397,10 @@ SYNTAX: INSTRUCTION:  ";" parse-tokens parse-instructions ;
 
 SYNTAX: cycles 
   #! Set the number of cycles for the last instruction that was defined. 
-  scan string>number last-opcode global at instruction-cycles set-nth ; 
+  scan-token string>number last-opcode global at instruction-cycles set-nth ; 
 
 SYNTAX: opcode ( -- )
   #! Set the opcode number for the last instruction that was defined.
-  last-instruction global at 1quotation scan 16 base>
+  last-instruction global at 1quotation scan-token 16 base>
   dup last-opcode global set-at set-instruction ; 
 

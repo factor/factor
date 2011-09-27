@@ -41,7 +41,7 @@ M: bad-tr summary
 PRIVATE>
 
 SYNTAX: TR:
-    scan parse-definition
+    scan-token parse-definition
     unclip-last [ unclip-last ] dip compute-tr
     [ check-tr ]
     [ [ create-tr ] dip define-tr ]

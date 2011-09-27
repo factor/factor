@@ -5,4 +5,4 @@ sequences ;
 IN: opencl.syntax
 
 SYNTAX: SINGLETONS-UNION:
-    CREATE-CLASS ";" parse-tokens [ create-class-in [ define-singleton-class ] keep ] map define-union-class ;
+    scan-new-class ";" parse-tokens [ create-class-in [ define-singleton-class ] keep ] map define-union-class ;

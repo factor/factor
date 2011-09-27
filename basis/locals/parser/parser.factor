@@ -76,12 +76,12 @@ M: lambda-parser parse-quotation ( -- quotation )
     [ drop nip ] 3tri ; inline
 
 : (::) ( -- word def effect )
-    CREATE-WORD
+    scan-new-word
     [ parse-definition ]
     parse-locals-definition ;
 
 : (M::) ( -- word def )
-    CREATE-METHOD
+    scan-new-method
     [
         [ parse-definition ] 
         parse-locals-definition drop
