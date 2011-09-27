@@ -67,6 +67,11 @@ HELP: scan-token
 { $description "Reads the next token from the lexer. Tokens are delimited by whitespace, with the exception that " { $snippet "\"" } " is treated like a single token even when not followed by whitespace. This word throws " { $link unexpected-eof } " on end of input. To output " { $link f } " on end of input, use " { $link scan } " instead." }
 $parsing-note ;
 
+HELP: scan-identifier
+{ $values { "str" string } }
+{ $description "Reads the next token from the lexer. Tokens are delimited by whitespace, with the exception that " { $snippet "\"" } " is treated like a single token even when not followed by whitespace. This word outputs " { $link f } " on end of input. This word also checks that the token it scans cannot be interpreted as a number, and throws an error on scanning a number." }
+$parsing-note ;
+
 HELP: still-parsing?
 { $values { "lexer" lexer } { "?" "a boolean" } }
 { $description "Outputs " { $link f } " if end of input has been reached, " { $link t } " otherwise." } ;

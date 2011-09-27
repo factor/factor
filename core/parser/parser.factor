@@ -20,7 +20,7 @@ M: parsing-word stack-effect drop (( parsed -- parsed )) ;
 : create-in ( str -- word )
     current-vocab create dup set-word dup save-location ;
 
-: CREATE ( -- word ) scan create-in ;
+: CREATE ( -- word ) scan-identifier create-in ;
 
 : CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 

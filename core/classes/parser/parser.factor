@@ -13,4 +13,4 @@ IN: classes.parser
     dup create-predicate-word save-location ;
 
 : CREATE-CLASS ( -- word )
-    scan create-class-in ;
+    scan-identifier create-class-in ;
