@@ -6,7 +6,7 @@ locals.errors ;
 IN: locals
 
 SYNTAX: :>
-    scan locals get [ :>-outside-lambda-error ] unless*
+    scan-token locals get [ :>-outside-lambda-error ] unless*
     parse-def suffix! ;
 
 SYNTAX: [| parse-lambda append! ;

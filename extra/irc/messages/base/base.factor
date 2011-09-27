@@ -110,7 +110,7 @@ PRIVATE>
 #! IRC: type "COMMAND" slot1 ...;
 #! IRC: type "COMMAND" slot1 ... : trailing-slot;
 SYNTAX: IRC: ( name string parameters -- )
-    CREATE-CLASS
+    scan-new-class
     [ scan-object register-irc-message-type ] keep
     ";" parse-tokens
     [ define-irc-class ] [ define-irc-parameter-slots ] 2bi ;

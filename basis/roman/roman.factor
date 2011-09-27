@@ -69,4 +69,4 @@ ROMAN-OP: * ( x y -- z )
 ROMAN-OP: /i ( x y -- z )
 ROMAN-OP: /mod ( x y -- z w )
 
-SYNTAX: ROMAN: scan roman> suffix! ;
+SYNTAX: ROMAN: scan-token roman> suffix! ;

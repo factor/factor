@@ -20,10 +20,6 @@ M: parsing-word stack-effect drop (( parsed -- parsed )) ;
 : create-in ( str -- word )
     current-vocab create dup set-word dup save-location ;
 
-: CREATE ( -- word ) scan create-in ;
-
-: CREATE-WORD ( -- word ) CREATE dup reset-generic ;
-
 SYMBOL: auto-use?
 
 : no-word-restarted ( restart-value -- word )
@@ -48,13 +44,31 @@ SYMBOL: auto-use?
     [ drop <no-word-error> throw-restarts no-word-restarted ]
     if ;
 
-: parse-word ( string -- word/number )
+: parse-word ( string -- word )
+    dup search [ ] [ no-word ] ?if ;
+
+: parse-word/number ( string -- word/number )
     dup search [ ] [
         dup string>number [ ] [ no-word ] ?if
     ] ?if ;
 
-: scan-word ( -- word/number/f )
-    scan dup [ parse-word ] when ;
+: (scan-word) ( -- word/number/f )
+    (scan-token) dup [ parse-word/number ] when ;
+
+: scan-word ( -- word/number )
+    (scan-word) [ \ word unexpected-eof ] unless* ;
+
+: scan-word-name ( -- string )
+    scan-token
+    dup string>number [
+        "Word names cannot be numbers" throw
+    ] when ;
+
+: scan-new ( -- word )
+    scan-word-name create-in ;
+
+: scan-new-word ( -- word )
+    scan-new dup reset-generic ;
 
 ERROR: staging-violation word ;
 
@@ -68,14 +82,13 @@ ERROR: staging-violation word ;
     (execute-parsing) ;
 
 : scan-object ( -- object )
-    scan-word {
-        { [ dup not ] [ unexpected-eof ] }
-        { [ dup parsing-word? ] [ V{ } clone swap execute-parsing first ] }
-        [ ]
-    } cond  ;
+    scan-word
+    dup parsing-word? [
+        V{ } clone swap execute-parsing first
+    ] when ;
 
 : parse-step ( accum end -- accum ? )
-    scan-word {
+    (scan-word) {
         { [ 2dup eq? ] [ 2drop f ] }
         { [ dup not ] [ drop unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
@@ -110,7 +123,7 @@ M: f parse-quotation \ ] parse-until >quotation ;
 ERROR: bad-number ;
 
 : scan-base ( base -- n )
-    scan swap base> [ bad-number ] unless* ;
+    scan-token swap base> [ bad-number ] unless* ;
 
 : parse-base ( parsed base -- parsed )
     scan-base suffix! ;

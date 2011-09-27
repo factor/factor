@@ -74,4 +74,4 @@ insn-classes get [ insn-temp-slots empty? not ] filter [
 
 ;FUNCTOR
 
-SYNTAX: RENAMING: scan scan-object scan-object scan-object define-renaming ;
+SYNTAX: RENAMING: scan-token scan-object scan-object scan-object define-renaming ;

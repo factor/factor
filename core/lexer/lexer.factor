@@ -84,13 +84,13 @@ M: lexer skip-word ( lexer -- )
         [ (parse-token) ] [ dup next-line parse-token ] if
     ] [ drop f ] if ;
 
-: scan ( -- str/f ) lexer get parse-token ;
+: (scan-token) ( -- str/f ) lexer get parse-token ;
 
 PREDICATE: unexpected-eof < unexpected got>> not ;
 
 : unexpected-eof ( word -- * ) f unexpected ;
 
-: scan-token ( -- str ) scan [ "token" unexpected-eof ] unless* ;
+: scan-token ( -- str ) (scan-token) [ "token" unexpected-eof ] unless* ;
 
 : expect ( token -- )
     scan-token 2dup = [ 2drop ] [ unexpected ] if ;

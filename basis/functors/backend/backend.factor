@@ -23,7 +23,7 @@ SYNTAX: FUNCTOR-SYNTAX:
     scan-token >string-param ;
 
 : scan-c-type-param ( -- c-type/param )
-    scan dup "{" = [ drop \ } parse-until >array ] [ >string-param ] if ;
+    (scan-token) dup "{" = [ drop \ } parse-until >array ] [ >string-param ] if ;
 
 : define* ( word def -- ) over set-word define ;
 

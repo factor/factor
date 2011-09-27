@@ -49,7 +49,7 @@ M: no-tokenizer summary
     drop "Tokenizer not found" ;
 
 SYNTAX: TOKENIZER: 
-  scan dup search [ nip ] [ no-tokenizer ] if*
+  scan-word-name dup search [ nip ] [ no-tokenizer ] if*
   execute( -- tokenizer ) \ tokenizer set-global ;
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -570,7 +570,7 @@ SYNTAX: [EBNF
   suffix! \ call suffix! reset-tokenizer ;
 
 SYNTAX: EBNF: 
-  reset-tokenizer CREATE-WORD dup ";EBNF" parse-multiline-string  
+  reset-tokenizer scan-new-word dup ";EBNF" parse-multiline-string  
   ebnf>quot swapd
   (( input -- ast )) define-declared "ebnf-parser" set-word-prop 
   reset-tokenizer ;

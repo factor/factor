@@ -31,7 +31,7 @@ PREDICATE: value-word < word
     } 1&& ;
 
 SYNTAX: VALUE:
-    CREATE-WORD
+    scan-new-word
     dup t "no-def-strip" set-word-prop
     T{ value-holder } clone [ obj>> ] curry
     (( -- value )) define-declared ;

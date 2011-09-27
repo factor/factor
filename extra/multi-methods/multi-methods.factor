@@ -224,7 +224,7 @@ M: no-method error.
     ] if ;
 
 ! Syntax
-SYNTAX: GENERIC: CREATE-WORD complete-effect define-generic ;
+SYNTAX: GENERIC: scan-new-word complete-effect define-generic ;
 
 : parse-method ( -- quot classes generic )
     parse-definition [ 2 tail ] [ second ] [ first ] tri ;
@@ -232,10 +232,10 @@ SYNTAX: GENERIC: CREATE-WORD complete-effect define-generic ;
 : create-method-in ( specializer generic -- method )
     create-method dup save-location f set-word ;
 
-: CREATE-METHOD ( -- method )
+: scan-new-method ( -- method )
     scan-word scan-object swap create-method-in ;
 
-: (METHOD:) ( -- method def ) CREATE-METHOD parse-definition ;
+: (METHOD:) ( -- method def ) scan-new-method parse-definition ;
 
 SYNTAX: METHOD: (METHOD:) define ;
 
