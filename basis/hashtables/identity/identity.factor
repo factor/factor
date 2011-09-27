@@ -1,10 +1,10 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors arrays assocs fry hashtables kernel parser
-sequences vocabs.loader ;
+USING: accessors arrays assocs hashtables hashtables.wrapped
+kernel parser sequences vocabs.loader ;
 IN: hashtables.identity
 
-TUPLE: identity-wrapper
-    { underlying read-only } ;
+TUPLE: identity-wrapper < wrapped-key ;
+
 C: <identity-wrapper> identity-wrapper
 
 M: identity-wrapper equal?
@@ -15,46 +15,21 @@ M: identity-wrapper equal?
 M: identity-wrapper hashcode*
     nip underlying>> identity-hashcode ; inline
 
-TUPLE: identity-hashtable
-    { underlying hashtable read-only } ;
+TUPLE: identity-hashtable < wrapped-hashtable ;
 
 : <identity-hashtable> ( n -- ihash )
     <hashtable> identity-hashtable boa ; inline
 
-<PRIVATE
-: identity@ ( key ihash -- ikey hash )
-    [ <identity-wrapper> ] [ underlying>> ] bi* ; inline
-PRIVATE>
+M: identity-hashtable wrap-key drop <identity-wrapper> ;
 
-M: identity-hashtable at*
-    identity@ at* ; inline
-
-M: identity-hashtable clear-assoc
-    underlying>> clear-assoc ; inline
-
-M: identity-hashtable delete-at
-    identity@ delete-at ; inline
-
-M: identity-hashtable assoc-size
-    underlying>> assoc-size ; inline
-
-M: identity-hashtable set-at
-    identity@ set-at ; inline
+M: identity-hashtable clone
+    underlying>> clone identity-hashtable boa ; inline
 
 : identity-associate ( value key -- hash )
     2 <identity-hashtable> [ set-at ] keep ; inline
 
-M: identity-hashtable >alist
-    underlying>> >alist [ [ first underlying>> ] [ second ] bi 2array ] map ;
-    
-M: identity-hashtable clone
-    underlying>> clone identity-hashtable boa ; inline
-
-M: identity-hashtable equal?
-    over identity-hashtable? [ [ underlying>> ] bi@ = ] [ 2drop f ] if ;
-
 : >identity-hashtable ( assoc -- ihashtable )
-    dup assoc-size <identity-hashtable> [ '[ swap _ set-at ] assoc-each ] keep ;
+    [ assoc-size <identity-hashtable> ] keep assoc-union! ;
 
 SYNTAX: IH{ \ } [ >identity-hashtable ] parse-literal ;
 
