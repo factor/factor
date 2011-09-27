@@ -8,8 +8,7 @@ combinators combinators.smart cpu.architecture fry
 functors.backend generalizations generic.parser kernel
 kernel.private lexer libc locals macros math math.order parser
 quotations sequences slots slots.private specialized-arrays
-stack-checker.dependencies summary vectors vocabs vocabs.loader
-vocabs.parser words ;
+stack-checker.dependencies summary vectors vocabs.parser words ;
 FROM: delegate.private => group-words slot-group-words ;
 QUALIFIED: math
 IN: classes.struct
