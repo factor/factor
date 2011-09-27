@@ -32,7 +32,7 @@ ERROR: text-found-before-eol string ;
     ] "" make but-last ;
 
 SYNTAX: STRING:
-    CREATE-WORD
+    scan-new-word
     parse-here 1quotation
     (( -- string )) define-inline ;
 

@@ -12,7 +12,7 @@ SYMBOL: registers
 V{ } registers set-global
 
 SYNTAX: REGISTER:
-    CREATE-WORD
+    scan-new-word
     [ define-symbol ]
     [ registers get length "register" set-word-prop ]
     [ registers get push ]

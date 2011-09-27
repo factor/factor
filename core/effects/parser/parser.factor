@@ -34,7 +34,7 @@ SYMBOL: effect-var
 PRIVATE>
 
 : parse-effect-token ( first? var end -- var more? )
-    scan {
+    (scan-token) {
         { [ end-token? ] [ drop nip f ] }
         { [ effect-opener? ] [ bad-effect ] }
         { [ effect-closer? ] [ stack-effect-omits-dashes ] }
@@ -58,6 +58,6 @@ PRIVATE>
     [ ")" parse-effect ] dip 2array append! ;
 
 : (:) ( -- word def effect )
-    CREATE-WORD
+    scan-new-word
     complete-effect
     parse-definition swap ;

@@ -14,14 +14,14 @@ SYMBOL: sent-messages
 : remember-send ( selector -- )
     sent-messages (remember-send) ;
 
-SYNTAX: -> scan dup remember-send suffix! \ send suffix! ;
+SYNTAX: -> scan-token dup remember-send suffix! \ send suffix! ;
 
 SYMBOL: super-sent-messages
 
 : remember-super-send ( selector -- )
     super-sent-messages (remember-send) ;
 
-SYNTAX: SUPER-> scan dup remember-super-send suffix! \ super-send suffix! ;
+SYNTAX: SUPER-> scan-token dup remember-super-send suffix! \ super-send suffix! ;
 
 SYMBOL: frameworks
 
@@ -29,9 +29,9 @@ frameworks [ V{ } clone ] initialize
 
 [ frameworks get [ load-framework ] each ] "cocoa" add-startup-hook
 
-SYNTAX: FRAMEWORK: scan [ load-framework ] [ frameworks get push ] bi ;
+SYNTAX: FRAMEWORK: scan-token [ load-framework ] [ frameworks get push ] bi ;
 
-SYNTAX: IMPORT: scan [ ] import-objc-class ;
+SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
 
 "Importing Cocoa classes..." print
 

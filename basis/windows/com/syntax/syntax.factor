@@ -43,8 +43,8 @@ ERROR: no-com-interface interface ;
     <com-function-definition> ;
 
 :: (parse-com-functions) ( functions -- )
-    scan dup ";" = [ drop ] [
-        parse-c-type scan parse-pointers
+    (scan-token) dup ";" = [ drop ] [
+        parse-c-type (scan-token) parse-pointers
         (parse-com-function) functions push
         functions (parse-com-functions)
     ] if ;
@@ -86,13 +86,13 @@ SYNTAX: COM-INTERFACE:
     CREATE-C-TYPE
     void* over typedef
     scan-object find-com-interface-definition
-    scan string>guid
+    scan-token string>guid
     parse-com-functions
     <com-interface-definition>
     dup save-com-interface-definition
     define-words-for-com-interface ;
 
-SYNTAX: GUID: scan string>guid suffix! ;
+SYNTAX: GUID: scan-token string>guid suffix! ;
 
 USE: vocabs.loader
 

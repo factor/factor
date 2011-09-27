@@ -5,10 +5,10 @@ IN: generic.parser
 
 ERROR: not-in-a-method-error ;
 
-: CREATE-GENERIC ( -- word ) CREATE dup reset-word ;
+: scan-new-generic ( -- word ) scan-new dup reset-word ;
 
 : (GENERIC:) ( quot -- )
-    [ CREATE-GENERIC ] dip call complete-effect define-generic ; inline
+    [ scan-new-generic ] dip call complete-effect define-generic ; inline
 
 : create-method-in ( class generic -- method )
     create-method dup set-word dup save-location ;
@@ -16,7 +16,7 @@ ERROR: not-in-a-method-error ;
 : define-inline-method ( class generic quot -- )
     [ create-method-in ] dip [ define ] [ drop make-inline ] 2bi ;
 
-: CREATE-METHOD ( -- method )
+: scan-new-method ( -- method )
     scan-word bootstrap-word scan-word create-method-in ;
 
 SYMBOL: current-method
@@ -25,5 +25,5 @@ SYMBOL: current-method
     over current-method set call current-method off ; inline
 
 : (M:) ( -- method def )
-    CREATE-METHOD [ parse-definition ] with-method-definition ;
+    scan-new-method [ parse-definition ] with-method-definition ;
 

@@ -12,7 +12,7 @@ PREDICATE: role < mixin-class
     "role-slots" word-prop >boolean ;
 
 : parse-role-definition ( -- class superroles slots )
-    CREATE-CLASS scan {
+    scan-new-class scan-token {
         { ";" [ { } { } ] }
         { "<" [ scan-word 1array [ parse-tuple-slots ] { } make ] }
         { "<{" [ \ } parse-until >array [ parse-tuple-slots ] { } make ] }

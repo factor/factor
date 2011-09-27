@@ -13,7 +13,7 @@ SYNTAX: ALIEN: 16 scan-base <alien> suffix! ;
 
 SYNTAX: BAD-ALIEN <bad-alien> suffix! ;
 
-SYNTAX: LIBRARY: scan current-library set ;
+SYNTAX: LIBRARY: scan-token current-library set ;
 
 SYNTAX: FUNCTION:
     (FUNCTION:) make-function define-inline ;
@@ -35,9 +35,9 @@ SYNTAX: C-TYPE:
     void CREATE-C-TYPE typedef ;
 
 SYNTAX: &:
-    scan current-library get '[ _ _ address-of ] append! ;
+    scan-token current-library get '[ _ _ address-of ] append! ;
 
-SYNTAX: C-GLOBAL: scan-c-type CREATE-WORD define-global ;
+SYNTAX: C-GLOBAL: scan-c-type scan-new-word define-global ;
 
 SYNTAX: pointer:
     scan-c-type <pointer> suffix! ;

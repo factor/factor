@@ -35,7 +35,7 @@ SYNTAX: set:
     dup [ [variable-getter] ] [ [variable-setter] ] bi (define-variable) ;
 
 SYNTAX: VAR:
-    CREATE-WORD define-variable ;    
+    scan-new-word define-variable ;    
 
 M: variable definer drop \ VAR: f ;
 M: variable definition drop f ;
@@ -59,7 +59,7 @@ PREDICATE: typed-variable < variable
     } 2cleave (define-variable) ;
 
 SYNTAX: TYPED-VAR:
-    CREATE-WORD scan-object define-typed-variable ;    
+    scan-new-word scan-object define-typed-variable ;    
 
 M: typed-variable definer drop \ TYPED-VAR: f ;
 M: typed-variable definition "variable-type" word-prop 1quotation ;
@@ -78,7 +78,7 @@ PREDICATE: global-variable < variable
     global-box new [ [global-getter] ] [ [global-setter] ] bi (define-variable) ;
 
 SYNTAX: GLOBAL:
-    CREATE-WORD define-global ;
+    scan-new-word define-global ;
 
 M: global-variable definer drop \ GLOBAL: f ;
 
@@ -92,7 +92,7 @@ INTERSECTION: typed-global-variable
     [ [ [global-setter] ] dip [typed-setter] ] 2bi (define-variable) ;
 
 SYNTAX: TYPED-GLOBAL:
-    CREATE-WORD scan-object define-typed-global ;
+    scan-new-word scan-object define-typed-global ;
 
 M: typed-global-variable definer drop \ TYPED-GLOBAL: f ;
 

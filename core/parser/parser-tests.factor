@@ -624,3 +624,13 @@ EXCLUDE: qualified.tests.bar => x ;
     [ ] [ "vocabs.loader.test.l" unuse-vocab ] unit-test
     [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> key? ] unit-test    
 ] with-file-vocabs
+
+! Test cases for #183
+[ "SINGLETON: 33" <string-reader> "class identifier test" parse-stream ]
+[ error>> lexer-error? ] must-fail-with
+
+[ ": 44 ( -- ) ;" <string-reader> "word identifier test" parse-stream ]
+[ error>> lexer-error? ] must-fail-with
+
+[ "GENERIC: 33 ( -- )" <string-reader> "generic identifier test" parse-stream ]
+[ error>> lexer-error? ] must-fail-with

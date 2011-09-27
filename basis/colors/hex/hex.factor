@@ -13,4 +13,4 @@ IN: colors.hex
     [ red>> ] [ green>> ] [ blue>> ] tri
     [ 255 * >integer ] tri@ "%02X%02X%02X" sprintf ;
 
-SYNTAX: HEXCOLOR: scan hex>rgba suffix! ;
+SYNTAX: HEXCOLOR: scan-token hex>rgba suffix! ;

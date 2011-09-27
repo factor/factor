@@ -309,7 +309,7 @@ c:<c-type>
 ;FUNCTOR
 
 SYNTAX: SIMD-128:
-    scan define-simd-128 ;
+    scan-token define-simd-128 ;
 
 PRIVATE>
 
