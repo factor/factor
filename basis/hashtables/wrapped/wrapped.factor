@@ -42,3 +42,4 @@ M: wrapped-hashtable >alist
 M: wrapped-hashtable equal?
     over wrapped-hashtable? [ [ underlying>> ] bi@ = ] [ 2drop f ] if ;
 
+{ "hashtables.wrapped" "prettyprint" } "hashtables.wrapped.prettyprint" require-when
