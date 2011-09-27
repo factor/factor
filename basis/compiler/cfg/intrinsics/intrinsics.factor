@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel combinators cpu.architecture assocs
+math.bitwise
 compiler.cfg.hats
 compiler.cfg.stacks
 compiler.cfg.instructions
