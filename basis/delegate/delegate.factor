@@ -166,7 +166,7 @@ PRIVATE>
     ] 2bi ;
 
 SYNTAX: PROTOCOL:
-    CREATE-WORD parse-definition define-protocol ;
+    scan-new-word parse-definition define-protocol ;
 
 PREDICATE: protocol < word protocol-words ; ! Subclass of symbol?
 
@@ -181,6 +181,6 @@ M: protocol definer drop \ PROTOCOL: \ ; ;
 M: protocol group-words protocol-words ;
 
 SYNTAX: SLOT-PROTOCOL:
-    CREATE-WORD ";"
+    scan-new-word ";"
     [ [ reader-word ] [ writer-word ] bi 2array ]
     map-tokens concat define-protocol ;

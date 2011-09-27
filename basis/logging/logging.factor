@@ -138,7 +138,7 @@ PRIVATE>
 
 SYNTAX: LOG:
     #! Syntax: name level
-    CREATE-WORD dup scan-word
+    scan-new-word dup scan-word
     '[ 1array stack>message _ _ log-message ]
     (( message -- )) define-declared ;
 

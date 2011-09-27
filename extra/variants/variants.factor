@@ -38,17 +38,17 @@ M: variant-class initial-value*
     ":" ?tail [ parse-variant-tuple-member ] [ create-class-in ] if ;
 
 : parse-variant-members ( -- members )
-    [ scan dup ";" = not ]
+    [ scan-token dup ";" = not ]
     [ parse-variant-member ] produce nip ;
 
 SYNTAX: VARIANT:
-    CREATE-CLASS
+    scan-new-class
     parse-variant-members
     define-variant-class-members ;
 
 SYNTAX: VARIANT-MEMBER:
     scan-word
-    scan parse-variant-member
+    scan-token parse-variant-member
     define-variant-class-member ;
 
 MACRO: unboa ( class -- )

@@ -8,7 +8,7 @@ SINGLETONS: all world commonwealth-of-nations ;
 
 <<
 SYNTAX: HOLIDAY:
-    CREATE-WORD
+    scan-new-word
     dup "holiday" word-prop [
         dup H{ } clone "holiday" set-word-prop
     ] unless

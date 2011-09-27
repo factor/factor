@@ -54,7 +54,7 @@ M: gir-not-found summary
 
 PRIVATE>
 
-SYNTAX: GIR: scan define-gir-vocab ;
+SYNTAX: GIR: scan-token define-gir-vocab ;
 
 SYNTAX: IMPLEMENT-STRUCTS:
     ";" parse-tokens

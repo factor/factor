@@ -226,7 +226,7 @@ HOOK: system-alert ui-backend ( caption text -- )
     ] [ 2drop current-vocab main<< ] 3bi ;
 
 SYNTAX: MAIN-WINDOW:
-    CREATE
+    scan-new-word
     world-attributes parse-main-window-attributes
     parse-definition
     define-main-window ;

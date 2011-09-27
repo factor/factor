@@ -356,7 +356,7 @@ PRIVATE>
     [ "vertex-format-attributes" set-word-prop ] 2bi ;
 
 SYNTAX: VERTEX-FORMAT:
-    CREATE-CLASS parse-definition
+    scan-new-class parse-definition
     [ first4 vertex-attribute boa ] map
     define-vertex-format ;
 
@@ -365,7 +365,7 @@ SYNTAX: VERTEX-FORMAT:
     define-struct-class ;
 
 SYNTAX: VERTEX-STRUCT:
-    CREATE-CLASS scan-word define-vertex-struct ;
+    scan-new-class scan-word define-vertex-struct ;
 
 TUPLE: vertex-array-object < gpu-object
     { program-instance program-instance read-only }
@@ -589,7 +589,7 @@ TYPED: <program-instance> ( program: program -- instance: program-instance )
 PRIVATE>
 
 SYNTAX: GLSL-SHADER:
-    CREATE dup
+    scan-new dup
     dup old-instances [
         scan-word
         f
@@ -601,7 +601,7 @@ SYNTAX: GLSL-SHADER:
     define-constant ;
 
 SYNTAX: GLSL-SHADER-FILE:
-    CREATE dup
+    scan-new dup
     dup old-instances [
         scan-word execute( -- kind )
         scan-object in-word's-path
@@ -613,7 +613,7 @@ SYNTAX: GLSL-SHADER-FILE:
     define-constant ;
 
 SYNTAX: GLSL-PROGRAM:
-    CREATE dup
+    scan-new dup
     dup old-instances [
         f
         lexer get line>>

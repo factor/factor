@@ -37,7 +37,7 @@ ERROR: no-pair-method a b generic ;
     [ drop make-pair-generic ] 2tri ;
 
 : (PAIR-GENERIC:) ( -- )
-    CREATE-GENERIC complete-effect define-pair-generic ;
+    scan-new-generic complete-effect define-pair-generic ;
 
 SYNTAX: PAIR-GENERIC: (PAIR-GENERIC:) ;
 

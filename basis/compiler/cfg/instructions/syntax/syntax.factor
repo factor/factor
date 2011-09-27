@@ -86,13 +86,13 @@ TUPLE: insn-slot-spec type name rep ;
     } 3cleave ;
 
 SYNTAX: INSN:
-    CREATE-CLASS insn-word ";" parse-tokens define-insn ;
+    scan-new-class insn-word ";" parse-tokens define-insn ;
 
 SYNTAX: VREG-INSN:
-    CREATE-CLASS vreg-insn-word ";" parse-tokens define-insn ;
+    scan-new-class vreg-insn-word ";" parse-tokens define-insn ;
 
 SYNTAX: FLUSHABLE-INSN:
-    CREATE-CLASS flushable-insn-word ";" parse-tokens define-insn ;
+    scan-new-class flushable-insn-word ";" parse-tokens define-insn ;
 
 SYNTAX: FOLDABLE-INSN:
-    CREATE-CLASS foldable-insn-word ";" parse-tokens define-insn ;
+    scan-new-class foldable-insn-word ";" parse-tokens define-insn ;

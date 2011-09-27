@@ -52,7 +52,7 @@ M: lex-hash at*
     define-syntax word make-inline ;
     
 SYNTAX: ON-BNF:
-    CREATE-WORD reset-tokenizer ";ON-BNF" parse-multiline-string parse-ebnf
+    scan-new-word reset-tokenizer ";ON-BNF" parse-multiline-string parse-ebnf
     main swap at create-bnf ;
 
 ! Tokenizer like standard factor lexer

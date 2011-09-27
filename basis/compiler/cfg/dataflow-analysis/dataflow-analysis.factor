@@ -133,7 +133,7 @@ INSTANCE: name-analysis backward-analysis
 PRIVATE>
 
 SYNTAX: FORWARD-ANALYSIS:
-    scan [ define-analysis ] [ define-forward-analysis ] bi ;
+    scan-token [ define-analysis ] [ define-forward-analysis ] bi ;
 
 SYNTAX: BACKWARD-ANALYSIS:
-    scan [ define-analysis ] [ define-backward-analysis ] bi ;
+    scan-token [ define-analysis ] [ define-backward-analysis ] bi ;
