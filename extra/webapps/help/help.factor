@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors http.server.dispatchers
-http.server.static furnace.actions furnace.redirection urls
-validators locals io.files io.directories html.forms
-html.components help.html ;
+USING: accessors db.sqlite furnace.actions furnace.alloy kernel
+http.server.dispatchers http.server.static furnace.redirection
+urls validators locals io.files io.directories help.html
+html.forms html.components http.server namespaces ;
 IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;
@@ -41,4 +41,10 @@ M: result link-href href>> ;
         swap <static> "content" add-responder
         "resource:basis/definitions/icons/" <static> "icons" add-responder ;
 
+: run-help-webapp ( -- )
+    "resource:temp/docs" <help-webapp>
+    "resource:help.db" <sqlite-db> <alloy>
+        main-responder set-global
+    8080 httpd drop ;
 
+MAIN: run-help-webapp
