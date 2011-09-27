@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs fry hashtables kernel parser
-sequences ;
+sequences vocabs.loader ;
 
 IN: hashtables.wrapped
 
@@ -42,3 +42,4 @@ M: wrapped-hashtable >alist
 M: wrapped-hashtable equal?
     over wrapped-hashtable? [ [ underlying>> ] bi@ = ] [ 2drop f ] if ;
 
+{ "hashtables.wrapped" "prettyprint" } "hashtables.wrapped.prettyprint" require-when
