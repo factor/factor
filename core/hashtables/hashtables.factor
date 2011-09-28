@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel kernel.private slots.private math
 assocs math.private sequences sequences.private vectors ;
-FROM: sequences => change-nth ;
 IN: hashtables
 
 TUPLE: hashtable
@@ -18,7 +17,6 @@ TUPLE: hashtable
 : hash@ ( key array -- i )
     [ hashcode >fixnum dup fixnum+fast ] dip wrap ; inline
 
-
 ! Use a quadratic probing strategy
 ! h(k) + c1*i + c2*i^2 (where c1, c2 = 1/2)
 : (probe) ( probe# -- i' )
@@ -26,7 +24,9 @@ TUPLE: hashtable
     -1 fixnum-shift-fast dup fixnum+fast ; inline
 
 : probe ( array i probe# -- array i' probe# )
-    [ (probe) fixnum+fast over wrap ] keep ; inline
+    1 fixnum+fast [
+        (probe) fixnum+fast over wrap
+    ] keep ; inline
 
 : no-key ( key array -- array n ? ) nip f f ; inline
 
@@ -35,7 +35,7 @@ TUPLE: hashtable
     [ 3drop drop no-key ] [
         [ = ] dip swap
         [ drop rot drop t ]
-        [ 1 + probe (key@) ]
+        [ probe (key@) ]
         if
     ] if ; inline recursive
 
@@ -53,18 +53,18 @@ TUPLE: hashtable
     swap <hash-array> >>array init-hash ; inline
 
 : (new-key@) ( key array i probe# -- array i empty? )
-    [ 3dup swap array-nth ] dip over ((empty)) eq?
+    [ 3dup swap array-nth ] dip over tombstone?
     [ 3drop rot drop t ] [
         [ = ] dip swap
         [ drop rot drop f ]
-        [ 1 + probe (new-key@) ]
+        [ probe (new-key@) ]
         if
     ] if ; inline recursive
 
 : new-key@ ( key hash -- array n empty? )
     array>> 2dup hash@ 0 (new-key@) ; inline
 
-: set-nth-pair ( value key seq n -- )
+: set-nth-pair ( value key array n -- )
     2 fixnum+fast [ set-slot ] 2keep
     1 fixnum+fast set-slot ; inline
 
