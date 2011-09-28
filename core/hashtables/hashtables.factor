@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel kernel.private slots.private math
 assocs math.private sequences sequences.private vectors ;
+FROM: sequences => change-nth ;
 IN: hashtables
 
 TUPLE: hashtable
@@ -17,21 +18,30 @@ TUPLE: hashtable
 : hash@ ( key array -- i )
     [ hashcode >fixnum dup fixnum+fast ] dip wrap ; inline
 
-: probe ( array i -- array i )
-    2 fixnum+fast over wrap ; inline
+
+! Use a quadratic probing strategy
+! h(k) + c1*i + c2*i^2 (where c1, c2 = 1/2)
+: (probe) ( probe# -- i' )
+    dup 1 fixnum-shift-fast fixnum+fast
+    -1 fixnum-shift-fast dup fixnum+fast ; inline
+
+: probe ( array i probe# -- array i' probe# )
+    [ (probe) fixnum+fast over wrap ] keep ; inline
 
 : no-key ( key array -- array n ? ) nip f f ; inline
 
-: (key@) ( key array i -- array n ? )
-    3dup swap array-nth
-    dup ((empty)) eq?
-    [ 3drop no-key ] [
-        = [ rot drop t ] [ probe (key@) ] if
+: (key@) ( key array i probe# -- array n ? )
+    [ 3dup swap array-nth ] dip over ((empty)) eq?
+    [ 3drop drop no-key ] [
+        [ = ] dip swap
+        [ drop rot drop t ]
+        [ 1 + probe (key@) ]
+        if
     ] if ; inline recursive
 
 : key@ ( key hash -- array n ? )
     array>> dup length>> 0 eq?
-    [ no-key ] [ 2dup hash@ (key@) ] if ; inline
+    [ no-key ] [ 2dup hash@ 0 (key@) ] if ; inline
 
 : <hash-array> ( n -- array )
     1 + next-power-of-2 4 * ((empty)) <array> ; inline
@@ -42,19 +52,17 @@ TUPLE: hashtable
 : reset-hash ( n hash -- )
     swap <hash-array> >>array init-hash ; inline
 
-: (new-key@) ( key keys i -- keys n empty? )
-    3dup swap array-nth dup ((empty)) eq? [
-        2drop rot drop t
-    ] [
-        = [
-            rot drop f
-        ] [
-            probe (new-key@)
-        ] if
+: (new-key@) ( key array i probe# -- array i empty? )
+    [ 3dup swap array-nth ] dip over ((empty)) eq?
+    [ 3drop rot drop t ] [
+        [ = ] dip swap
+        [ drop rot drop f ]
+        [ 1 + probe (new-key@) ]
+        if
     ] if ; inline recursive
 
 : new-key@ ( key hash -- array n empty? )
-    array>> 2dup hash@ (new-key@) ; inline
+    array>> 2dup hash@ 0 (new-key@) ; inline
 
 : set-nth-pair ( value key seq n -- )
     2 fixnum+fast [ set-slot ] 2keep
