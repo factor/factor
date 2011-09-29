@@ -37,6 +37,9 @@ SYMBOL: selection
         [ 2drop ]
     if ;
 
+: gadget-copy-all ( gadget clipboard -- )
+    [ [ gadget-text ] keep ] dip copy-clipboard ;
+
 : com-copy ( gadget -- ) clipboard get gadget-copy ;
 
 : com-copy-selection ( gadget -- ) selection get gadget-copy ;
