@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings.utf8 io.encodings.binary
-io.files io.files.temp io.directories html.streams help kernel
+USING: io.encodings.utf8 io.encodings.binary io.files
+io.files.temp io.directories html.streams help help.home kernel
 assocs sequences make words accessors arrays help.topics vocabs
 vocabs.hierarchy help.vocabs namespaces prettyprint io
 vocabs.loader serialize fry memoize unicode.case math.order
@@ -69,7 +69,7 @@ M: topic url-of topic>filename ;
     [ drop help-stylesheet ]
     [ [ print-topic ] with-html-writer ]
     tri simple-page ;
-          
+
 : generate-help-file ( topic -- )
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
@@ -95,8 +95,11 @@ M: topic url-of topic>filename ;
     all-words [ dup name>> ] { } map>assoc "words.idx" serialize-index
     all-vocabs-really [ dup vocab-name ] { } map>assoc "vocabs.idx" serialize-index ;
 
-: generate-help-files ( -- )
+: (generate-help-files) ( -- )
     all-topics [ '[ _ generate-help-file ] try ] each ;
+
+: generate-help-files ( -- )
+    f recent-searches [ (generate-help-files) ] with-variable ;
 
 : generate-help ( -- )
     "docs" temp-file
