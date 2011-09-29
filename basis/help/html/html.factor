@@ -99,7 +99,13 @@ M: topic url-of topic>filename ;
     all-topics [ '[ _ generate-help-file ] try ] each ;
 
 : generate-help-files ( -- )
-    f recent-searches [ (generate-help-files) ] with-variable ;
+    [
+        recent-searches off
+        recent-words off
+        recent-articles off
+        recent-vocabs off
+        (generate-help-files)
+    ] with-scope ;
 
 : generate-help ( -- )
     "docs" temp-file
