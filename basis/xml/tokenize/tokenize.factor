@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces xml.state kernel sequences accessors
 xml.char-classes xml.errors math io sbufs fry strings ascii
-circular xml.entities assocs splitting math.parser
+xml.entities assocs splitting math.parser
 locals combinators arrays hints ;
 IN: xml.tokenize
 
@@ -10,19 +10,20 @@ IN: xml.tokenize
 
 : assure-good-char ( spot ch -- )
     [
-        swap
+        over
         [ version-1.0?>> over text? not ]
-        [ check>> ] bi and [
-            spot get [ 1 + ] change-column drop
+        [ check>> ] bi and
+        [
+            [ [ 1 + ] change-column drop ] dip
             disallowed-char
-        ] [ drop ] if
+        ] [ 2drop ] if
     ] [ drop ] if* ;
 
 HINTS: assure-good-char { spot fixnum } ;
 
 : record ( spot char -- spot )
     over char>> [
-        CHAR: \n =
+        CHAR: \n eq?
         [ [ 1 + ] change-line -1 ] [ dup column>> 1 + ] if
         >>column
     ] [ drop ] if ;
@@ -32,9 +33,9 @@ HINTS: record { spot fixnum } ;
 :: (next) ( spot -- spot char )
     spot next>> :> old-next
     spot stream>> stream-read1 :> new-next
-    old-next CHAR: \r = [
+    old-next CHAR: \r eq? [
         spot CHAR: \n >>char
-        new-next CHAR: \n =
+        new-next CHAR: \n eq?
         [ spot stream>> stream-read1 >>next ]
         [ new-next >>next ] if
     ] [ spot old-next >>char new-next >>next ] if
@@ -52,46 +53,46 @@ HINTS: next* { spot } ;
 : init-parser ( -- )
     0 1 0 0 f t f <spot>
         input-stream get >>stream
-    spot set
-    read1 set-next next ;
+        read1 >>next
+    spot set next ;
 
 : with-state ( stream quot -- )
     ! with-input-stream implicitly creates a new scope which we use
     swap [ init-parser call ] with-input-stream ; inline
 
-:: (skip-until) ( ... quot: ( ... -- ... ? ) spot -- ... )
+:: (skip-until) ( ... quot: ( ... char -- ... ? ) spot -- ... )
     spot char>> [
         quot call [
             spot next* quot spot (skip-until)
         ] unless
-    ] when ; inline recursive
+    ] when* ; inline recursive
 
-: skip-until ( ... quot: ( ... -- ... ? ) -- ... )
+: skip-until ( ... quot: ( ... char -- ... ? ) -- ... )
     spot get (skip-until) ; inline
 
-: take-until ( quot -- string )
+: take-until ( ... quot: ( ... char -- ... ? ) -- ... string )
     #! Take the substring of a string starting at spot
     #! from code until the quotation given is true and
     #! advance spot to after the substring.
-    10 <sbuf> [
-        spot get swap
-        '[ @ [ t ] [ _ char>> _ push f ] if ] skip-until
-    ] keep >string ; inline
+   10 <sbuf> [
+       '[ _ keep over [ drop ] [ _ push ] if ] skip-until
+   ] keep >string ; inline
 
 : take-to ( seq -- string )
-    spot get swap '[ _ char>> _ member? ] take-until ;
+    '[ _ member? ] take-until ;
 
 : pass-blank ( -- )
     #! Advance code past any whitespace, including newlines
-    spot get '[ _ char>> blank? not ] skip-until ;
+    [ blank? not ] skip-until ;
 
-: string-matches? ( string circular spot -- ? )
-    char>> over circular-push sequence= ;
+: string-matcher ( str -- quot: ( pos char -- pos ? ) )
+    dup length 1 - '[
+        over _ nth eq? [ 1 + ] [ drop 0 ] if dup _ >
+    ] ; inline
 
 : take-string ( match -- string )
-    dup length <circular-string>
-    spot get '[ 2dup _ string-matches? ] take-until nip
-    dup length rot length 1 - - head
+    [ 0 swap string-matcher take-until nip ] keep
+    dupd [ length ] bi@ 1 - - head
     get-char [ missing-close ] unless next ;
 
 : expect ( string -- )
@@ -123,11 +124,11 @@ HINTS: next* { spot } ;
     {
         { [ char not ] [ ] }
         { [ char quot call ] [ spot next* ] }
-        { [ char CHAR: & = ] [
+        { [ char CHAR: & eq? ] [
             accum parse-entity
             quot accum spot (parse-char)
         ] }
-        { [ in-dtd? get char CHAR: % = and ] [
+        { [ char CHAR: % eq? in-dtd? get and ] [
             accum parse-pe
             quot accum spot (parse-char)
         ] }
@@ -141,18 +142,21 @@ HINTS: next* { spot } ;
 : parse-char ( quot: ( ch -- ? ) -- seq )
     1024 <sbuf> [ spot get (parse-char) ] keep >string ; inline
 
-: assure-no-]]> ( circular -- )
-    "]]>" sequence= [ text-w/]]> ] when ;
+: assure-no-]]> ( pos char -- pos' )
+    over "]]>" nth eq? [ 1 + ] [ drop 0 ] if
+    dup 2 > [ text-w/]]> ] when ;
 
 :: parse-text ( -- string )
-    3 f <array> <circular> :> circ
-    depth get zero? :> no-text [| char |
-        char circ circular-push
-        circ assure-no-]]>
-        no-text [ char blank? char CHAR: < = or [
-            char 1string t pre/post-content
-        ] unless ] when
-        char CHAR: < =
+    0 :> pos!
+    depth get zero? :> no-text
+    [| char |
+        pos char assure-no-]]> pos!
+        no-text [
+            char blank? char CHAR: < eq? or [
+                char 1string t pre/post-content
+            ] unless
+        ] when
+        char CHAR: < eq?
     ] parse-char ;
 
 : close ( -- )
@@ -163,8 +167,8 @@ HINTS: next* { spot } ;
 
 : (parse-quote) ( <-disallowed? ch -- string )
     swap '[
-        dup _ = [ drop t ]
-        [ CHAR: < = _ and [ attr-w/< ] [ f ] if ] if
+        dup _ eq? [ drop t ]
+        [ CHAR: < eq? _ and [ attr-w/< ] [ f ] if ] if
     ] parse-char normalize-quote get-char
     [ unclosed-quote ] unless ; inline
 

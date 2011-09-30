@@ -66,7 +66,7 @@ SYMBOL: ns-stack
     ] ?if ;
 
 : take-name ( -- string )
-    version-1.0? '[ _ get-char name-char? not ] take-until ;
+    version-1.0? '[ _ swap name-char? not ] take-until ;
 
 : parse-name ( -- name )
     take-name interpret-name ;
@@ -88,7 +88,7 @@ SYMBOL: ns-stack
     } case ;
 
 : take-word ( -- string )
-    [ get-char blank? ] take-until ;
+    [ blank? ] take-until ;
 
 : take-external-id ( -- external-id )
     take-word (take-external-id) ;
