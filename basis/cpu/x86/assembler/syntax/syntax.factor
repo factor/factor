@@ -23,7 +23,7 @@ registers [ H{ } clone ] initialize
     [ [ 0 ] dip (define-registers) ] keep registers get set-at ;
 
 SYNTAX: REGISTERS:
-    scan-word [ ";" parse-tokens ] dip define-registers ;
+    scan-number [ ";" parse-tokens ] dip define-registers ;
 
 SYNTAX: HI-REGISTERS:
-    scan-word [ ";" parse-tokens 4 ] dip (define-registers) drop ;
+    scan-number [ ";" parse-tokens 4 ] dip (define-registers) drop ;

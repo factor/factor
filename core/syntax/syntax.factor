@@ -154,7 +154,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "GENERIC#" [
-        [ scan-word <standard-combination> ] (GENERIC:)
+        [ scan-number <standard-combination> ] (GENERIC:)
     ] define-core-syntax
 
     "MATH:" [

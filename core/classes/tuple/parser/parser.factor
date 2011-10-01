@@ -31,7 +31,7 @@ ERROR: duplicate-slot-names names ;
 ERROR: invalid-slot-name name ;
 
 : parse-long-slot-name ( -- spec )
-    [ (scan-token) , \ } parse-until % ] { } make ;
+    [ scan-token , \ } parse-until % ] { } make ;
 
 : parse-slot-name-delim ( end-delim string/f -- ? )
     ! Check for mistakes of this form:
@@ -72,7 +72,7 @@ ERROR: bad-slot-name class slot ;
     2dup swap slot-named* nip [ 2nip ] [ nip bad-slot-name ] if ;
 
 : parse-slot-value ( class slots -- )
-    (scan-token) check-slot-name scan-object 2array , scan-token {
+    scan-token check-slot-name scan-object 2array , scan-token {
         { "}" [ ] }
         [ bad-literal-tuple ]
     } case ;

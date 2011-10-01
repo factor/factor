@@ -8,7 +8,7 @@ SYMBOL: special-objects
 SYNTAX: RESET H{ } clone special-objects set-global ;
 
 SYNTAX: SPECIAL-OBJECT:
-    scan-new-word scan-word
+    scan-new-word scan-number
     [ swap special-objects get set-at ]
     [ drop define-symbol ]
     2bi ;
