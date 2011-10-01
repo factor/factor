@@ -52,7 +52,7 @@ M: object (fake-quotations>) , ;
 
 FUNCTOR-SYNTAX: TUPLE:
     scan-param suffix!
-    (scan-token) {
+    scan-token {
         { ";" [ tuple suffix! f suffix! ] }
         { "<" [ scan-param suffix! [ parse-tuple-slots ] { } make suffix! ] }
         [
@@ -122,7 +122,7 @@ FUNCTOR-SYNTAX: inline [ word make-inline ] append! ;
 FUNCTOR-SYNTAX: call-next-method T{ fake-call-next-method } suffix! ;
 
 : (INTERPOLATE) ( accum quot -- accum )
-    [ (scan-token) interpolate-locals ] dip
+    [ scan-token interpolate-locals ] dip
     '[ _ with-string-writer @ ] suffix! ;
 
 PRIVATE>
