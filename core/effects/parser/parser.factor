@@ -34,7 +34,7 @@ SYMBOL: effect-var
 PRIVATE>
 
 : parse-effect-token ( first? var end -- var more? )
-    (scan-token) {
+    scan-token {
         { [ end-token? ] [ drop nip f ] }
         { [ effect-opener? ] [ bad-effect ] }
         { [ effect-closer? ] [ stack-effect-omits-dashes ] }

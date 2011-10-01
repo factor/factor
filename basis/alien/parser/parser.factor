@@ -18,7 +18,7 @@ ERROR: bad-array-type ;
 
 : parse-array-type ( name -- c-type )
     "[" split unclip
-    [ [ "]" ?tail [ bad-array-type ] unless parse-word/number ] map ]
+    [ [ "]" ?tail [ bad-array-type ] unless parse-datum ] map ]
     [ (parse-c-type) ]
     bi* prefix ;
 
@@ -70,7 +70,7 @@ ERROR: *-in-c-type-name name ;
     } cleave ;
 
 : CREATE-C-TYPE ( -- word )
-    (scan-token) (CREATE-C-TYPE) ;
+    scan-token (CREATE-C-TYPE) ;
 
 <PRIVATE
 GENERIC: return-type-name ( type -- name )
@@ -88,21 +88,21 @@ M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
     [ [ 2array suffix! ] [ enum>number 1 + ] bi ] 2bi ;
 
 : parse-enum-name ( -- name )
-    (scan-token) (CREATE-C-TYPE) dup save-location ;
+    scan-token (CREATE-C-TYPE) dup save-location ;
 
 : parse-enum-base-type ( -- base-type token )
-    (scan-token) dup "<" =
-    [ drop scan-object (scan-token) ]
+    scan-token dup "<" =
+    [ drop scan-object scan-token ]
     [ [ int ] dip ] if ;
 
 : parse-enum-member ( members name value -- members value' )
     over "{" =
-    [ 2drop (scan-token) create-class-in scan-object next-enum-member "}" expect ]
+    [ 2drop scan-token create-class-in scan-object next-enum-member "}" expect ]
     [ [ create-class-in ] dip next-enum-member ] if ;
 
 : parse-enum-members ( members counter token -- members )
     dup ";" = not
-    [ swap parse-enum-member (scan-token) parse-enum-members ] [ 2drop ] if ;
+    [ swap parse-enum-member scan-token parse-enum-members ] [ 2drop ] if ;
 
 PRIVATE>
 
@@ -112,14 +112,14 @@ PRIVATE>
     [ V{ } clone 0 ] dip parse-enum-members ;
 
 : scan-function-name ( -- return function )
-    scan-c-type (scan-token) parse-pointers ;
+    scan-c-type scan-token parse-pointers ;
 
 :: (scan-c-args) ( end-marker types names -- )
-    (scan-token) :> type-str
+    scan-token :> type-str
     type-str end-marker = [
         type-str { "(" ")" } member? [
             type-str parse-c-type :> type
-            (scan-token) "," ?tail drop :> name
+            scan-token "," ?tail drop :> name
             type name parse-pointers :> ( type' name' )
             type' types push name' names push
         ] unless

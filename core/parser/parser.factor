@@ -47,16 +47,27 @@ SYMBOL: auto-use?
 : parse-word ( string -- word )
     dup search [ ] [ no-word ] ?if ;
 
-: parse-word/number ( string -- word/number )
+ERROR: number-expected ;
+
+: parse-number ( string -- number )
+    string>number [ number-expected ] unless* ;
+
+: parse-datum ( string -- word/number )
     dup search [ ] [
         dup string>number [ ] [ no-word ] ?if
     ] ?if ;
 
-: (scan-word) ( -- word/number/f )
-    (scan-token) dup [ parse-word/number ] when ;
+: (scan-datum) ( -- word/number/f )
+    (scan-token) dup [ parse-datum ] when ;
 
-: scan-word ( -- word/number )
-    (scan-word) [ \ word unexpected-eof ] unless* ;
+: scan-datum ( -- word/number )
+    (scan-datum) [ \ word unexpected-eof ] unless* ;
+
+: scan-word ( -- word )
+    (scan-token) parse-word ;
+
+: scan-number ( -- number )
+    (scan-token) parse-number ;
 
 : scan-word-name ( -- string )
     scan-token
@@ -82,13 +93,13 @@ ERROR: staging-violation word ;
     (execute-parsing) ;
 
 : scan-object ( -- object )
-    scan-word
+    scan-datum
     dup parsing-word? [
         V{ } clone swap execute-parsing first
     ] when ;
 
 : parse-step ( accum end -- accum ? )
-    (scan-word) {
+    (scan-datum) {
         { [ 2dup eq? ] [ 2drop f ] }
         { [ dup not ] [ drop unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }

@@ -43,8 +43,8 @@ ERROR: no-com-interface interface ;
     <com-function-definition> ;
 
 :: (parse-com-functions) ( functions -- )
-    (scan-token) dup ";" = [ drop ] [
-        parse-c-type (scan-token) parse-pointers
+    scan-token dup ";" = [ drop ] [
+        parse-c-type scan-token parse-pointers
         (parse-com-function) functions push
         functions (parse-com-functions)
     ] if ;
