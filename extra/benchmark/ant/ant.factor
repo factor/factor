@@ -23,19 +23,18 @@ IN: benchmark.ant
 : sum-digits ( n -- x )
     0 swap [ dup zero? ] [ 10 /mod swap [ + ] dip ] until drop ;
 
-! FIXME: Find out why this makes it 430 times slower
-! TUPLE: point x y ;
-! C: <point> point
+TUPLE: point x y ;
+C: <point> point
 
-USE: alien.c-types
-USE: classes.struct
-STRUCT: point { x uint } { y uint } ;
-: <point> ( x y -- point ) point <struct-boa> ; inline
+! USE: alien.c-types
+! USE: classes.struct
+! STRUCT: point { x uint } { y uint } ;
+! : <point> ( x y -- point ) point <struct-boa> ; inline
 
 : walkable? ( point -- ? )
     [ x>> ] [ y>> ] bi [ sum-digits ] bi@ + 25 <= ; inline
 
-:: ant ( -- )
+:: ant-benchmark ( -- )
     200000 <hashtable> hash-set boa :> seen
     100000 <vector> :> stack
     0 :> total!
@@ -56,4 +55,4 @@ STRUCT: point { x uint } { y uint } ;
         ] unless
     ] until total 148848 assert= ;
 
-MAIN: ant
+MAIN: ant-benchmark
