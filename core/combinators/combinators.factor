@@ -65,8 +65,11 @@ SLOT: terminated?
     [ [ 3keep ] curry ] map concat [ 3drop ] append [ ] like ;
 
 ! spread
-: spread>quot ( seq -- quot )
+: spread>quot-shallow ( seq -- quot )
     [ ] [ [ dup empty? [ [ dip ] curry ] unless ] dip append ] reduce ;
+
+: spread>quot ( seq -- quot )
+    [ ] [ [ [ dip ] curry ] dip append ] reduce ;
 
 : spread ( objs... seq -- )
     spread>quot call ;
