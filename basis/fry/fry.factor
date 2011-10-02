@@ -95,7 +95,7 @@ INSTANCE: fried-callable fried
     check-fry mark-composes
     { _ } split convert-curries
     [ [ [ ] ] [ [ ] (make-curry) but-last ] if-zero ]
-    [ spread>quot swap [ [ ] (make-curry) compose ] unless-zero ] if-empty ;
+    [ spread>quot-shallow swap [ [ ] (make-curry) compose ] unless-zero ] if-empty ;
 
 DEFER: dredge-fry
 
