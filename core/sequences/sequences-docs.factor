@@ -1220,16 +1220,6 @@ HELP: 2selector
      { "selector" quotation } { "accum1" vector } { "accum2" vector } }
 { $description "Creates two new vectors to accumulate values based on a predicate. The first vector accumulates values for which the predicate yields true; the second for false." } ;
 
-HELP: 2unclip-slice
-{ $values
-     { "seq1" sequence } { "seq2" sequence }
-     { "rest-slice1" sequence } { "rest-slice2" sequence } { "first1" object } { "first2" object } }
-{ $description "Unclips the first element of each sequence and leaves two slice elements and the two unclipped objects on the stack." }
-{ $examples { $example "USING: sequences prettyprint kernel arrays ;"
-    "{ 1 2 } { 3 4 } 2unclip-slice 4array [ . ] each"
-    "T{ slice { from 1 } { to 2 } { seq { 1 2 } } }\nT{ slice { from 1 } { to 2 } { seq { 3 4 } } }\n1\n3"
-} } ;
-
 HELP: collector
 { $values
      { "quot" quotation }
