@@ -350,17 +350,17 @@ M: tuple clone (clone) ; inline
 
 M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
 
-GENERIC: tuple-hashcode ( n tuple -- x )
-
-M: tuple tuple-hashcode
+: tuple-hashcode ( depth obj -- hash )
     [
-        [ class hashcode ] [ tuple-size iota ] [ ] tri
-        [ rot ] dip [
-            swapd array-nth hashcode* sequence-hashcode-step
-        ] 2curry each
-    ] recursive-hashcode ;
+        [ drop 1000003 ] dip
+        [ class hashcode ] [ tuple-size ] bi
+        [ dup fixnum+fast 82520 fixnum+fast ] [ iota ] bi
+    ] 2keep [
+        swapd array-nth hashcode* rot fixnum-bitxor
+        pick fixnum*fast [ [ fixnum+fast ] keep ] dip swap
+    ] 2curry each drop nip 97531 fixnum+fast ; inline
 
-M: tuple hashcode* tuple-hashcode ;
+M: tuple hashcode* [ tuple-hashcode ] recursive-hashcode ;
 
 M: tuple-class new
     dup "prototype" word-prop [ (clone) ] [ tuple-layout <tuple> ] ?if ;
