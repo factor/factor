@@ -25,17 +25,17 @@ IN: sorting.human
     [ digit? ] [ string>number ] find-sequences ;
 
 ! For comparing integers or sequences
-TUPLE: hybrid obj ;
+TUPLE: alphanum obj ;
 
-: <hybrid> ( obj -- hybrid )
-    hybrid new
+: <alphanum> ( obj -- hybrid )
+    alphanum new
         swap >>obj ; inline
 
-: <hybrid-insensitive> ( obj -- hybrid )
-    hybrid new
+: <alphanum-insensitive> ( obj -- hybrid )
+    alphanum new
         swap dup string? [ w/collation-key ] when >>obj ; inline
 
-M: hybrid <=>
+M: alphanum <=>
     [ obj>> ] bi@
     2dup [ integer? ] bi@ xor [
         drop integer? +lt+ +gt+ ?
@@ -43,5 +43,5 @@ M: hybrid <=>
         <=>
     ] if ;
 
-<< "human" [ find-numbers [ <hybrid> ] map ] define-sorting >>
-<< "humani" [ find-numbers [ <hybrid-insensitive> ] map ] define-sorting >>
+<< "human" [ find-numbers [ <alphanum> ] map ] define-sorting >>
+<< "humani" [ find-numbers [ <alphanum-insensitive> ] map ] define-sorting >>
