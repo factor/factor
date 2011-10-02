@@ -40,7 +40,7 @@ HINTS: name-char? { object fixnum } ;
         [ HEX: 20 HEX: D7FF between? ]
         [ "\t\r\n" member? ]
         [ HEX: E000 HEX: FFFD between? ]
-        [ HEX: 10000 HEX: 10FFFFF between? ]
+        [ HEX: 10000 HEX: 10FFFF between? ]
     } 1|| ; inline
 
 : 1.1-text? ( char -- ? )
