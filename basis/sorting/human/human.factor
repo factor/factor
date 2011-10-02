@@ -27,11 +27,11 @@ IN: sorting.human
 ! For comparing integers or sequences
 TUPLE: alphanum obj ;
 
-: <alphanum> ( obj -- hybrid )
+: <alphanum> ( obj -- alphanum )
     alphanum new
         swap >>obj ; inline
 
-: <alphanum-insensitive> ( obj -- hybrid )
+: <alphanum-insensitive> ( obj -- alphanum )
     alphanum new
         swap dup string? [ w/collation-key ] when >>obj ; inline
 
