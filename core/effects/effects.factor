@@ -100,9 +100,6 @@ M: effect clone
 : stack-height ( word -- n )
     stack-effect effect-height ;
 
-: split-shuffle ( stack shuffle -- stack1 stack2 )
-    in>> length cut* ;
-
 : shuffle-mapping ( effect -- mapping )
     [ out>> ] [ in>> ] bi [ index ] curry map ;
 
