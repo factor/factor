@@ -541,6 +541,6 @@ STRUCT: going-to-forget { a uint } ;
 [ ] [
     "IN: classes.struct.tests TUPLE: going-to-forget b ;" eval( -- )
 ] unit-test
-[ f ] [ "USE: classes.struct.tests M\\ going-to-forget clone" eval( -- obj ) ] unit-test
-[ f ] [ "USE: classes.struct.tests M\\ going-to-forget struct-slot-values" eval( -- obj ) ] unit-test
+[ f ] [ "USING: classes.struct.tests kernel ; M\\ going-to-forget clone" eval( -- obj ) ] unit-test
+[ f ] [ "USING: classes.struct.tests classes.struct kernel ; M\\ going-to-forget struct-slot-values" eval( -- obj ) ] unit-test
 
