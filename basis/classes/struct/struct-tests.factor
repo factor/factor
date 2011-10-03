@@ -535,12 +535,11 @@ STRUCT: struct-1-union { a int initial: 0 } ;
 " ]
 [ \ struct-1-union [ see ] with-string-writer ] unit-test
 
-
 ! Bug #206
-STRUCT: going-to-forget { a uint } ;
+STRUCT: going-to-redefine { a uint } ;
 [ ] [
-    "IN: classes.struct.tests TUPLE: going-to-forget b ;" eval( -- )
+    "IN: classes.struct.tests TUPLE: going-to-redefine b ;" eval( -- )
 ] unit-test
-[ f ] [ "USING: classes.struct.tests kernel ; M\\ going-to-forget clone" eval( -- obj ) ] unit-test
-[ f ] [ "USING: classes.struct.tests classes.struct kernel ; M\\ going-to-forget struct-slot-values" eval( -- obj ) ] unit-test
+[ f ] [ \ going-to-redefine \ clone method ] unit-test
+[ f ] [ \ going-to-redefine \ struct-slot-values method ] unit-test
 
