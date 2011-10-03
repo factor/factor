@@ -96,7 +96,7 @@ HELP: histogram-by
     { $example "! Count the number of times letters and non-letters appear in a sequence."
                "USING: prettyprint math.statistics unicode.categories ;"
                "\"aaa123bc\" [ letter? ] histogram-by ."
-               "H{ { f 3 } { t 5 } }"
+               "H{ { t 5 } { f 3 } }"
     }
 } ;
 
