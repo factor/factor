@@ -182,6 +182,9 @@ M: #alien-assembly emit-node
 : emit-callback-body ( nodes -- )
     [ last #return? t assert= ] [ but-last emit-nodes ] bi ;
 
+: emit-callback-return ( params -- )
+    basic-block get [ callee-return ##callback-outputs ] [ drop ] if ;
+
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
@@ -193,9 +196,9 @@ M: #alien-callback emit-node
             [ params>> callee-parameters ##callback-inputs ]
             [ params>> box-parameters ]
             [ child>> emit-callback-body ]
-            [ params>> callee-return ##callback-outputs ]
+            [ params>> emit-callback-return ]
             [ params>> callback-stack-cleanup ]
         } cleave
 
-        end-word
+        basic-block get [ end-word ] when
     ] with-cfg-builder ;

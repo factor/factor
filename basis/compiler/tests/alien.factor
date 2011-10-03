@@ -334,6 +334,10 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 [ t ] [ 31 2^ 32 2^ ffi_test_38 63 2^ = ] unit-test
 
 ! Test callbacks
+: callback-throws ( -- x )
+    int { } cdecl [ "Hi" throw ] alien-callback ;
+
+[ t ] [ callback-throws alien? ] unit-test
 
 : callback-1 ( -- callback ) void { } cdecl [ ] alien-callback ;
 
