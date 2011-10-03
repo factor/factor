@@ -275,7 +275,7 @@ MEMO: array-capacity-interval ( -- interval )
 : interval/-safe ( i1 i2 -- i3 )
     #! Just a hack to make the compiler work if bootstrap.math
     #! is not loaded.
-    \ integer \ / method [ interval/ ] [ 2drop f ] if ;
+    \ integer \ / ?lookup-method [ interval/ ] [ 2drop f ] if ;
 
 : interval/i ( i1 i2 -- i3 )
     [

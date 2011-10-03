@@ -236,7 +236,7 @@ GENERIC: generic-forget-test ( a -- b )
 
 M: f generic-forget-test ;
 
-[ ] [ \ f \ generic-forget-test method "m" set ] unit-test
+[ ] [ \ f \ generic-forget-test lookup-method "m" set ] unit-test
 
 [ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
 

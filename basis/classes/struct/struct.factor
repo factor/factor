@@ -196,7 +196,7 @@ M: struct-c-type base-type ;
     define-inline-method ;
 
 : forget-struct-slot-values-method ( class -- )
-    \ struct-slot-values method forget ;
+    \ struct-slot-values ?lookup-method forget ;
 
 : clone-underlying ( struct -- byte-array )
     binary-object memory>byte-array ; inline
@@ -207,7 +207,7 @@ M: struct-c-type base-type ;
     define-inline-method ;
 
 : forget-clone-method ( class -- )
-    \ clone method forget ;
+    \ clone ?lookup-method forget ;
 
 :: c-type-for-class ( class slots size align -- c-type )
     struct-c-type new

@@ -127,7 +127,7 @@ M: word integer-op-input-classes
 
 : define-math-ops ( op -- )
     { fixnum bignum float }
-    [ [ dup 3array ] [ swap method ] 2bi ] with { } map>assoc
+    [ [ dup 3array ] [ swap ?lookup-method ] 2bi ] with { } map>assoc
     [ nip ] assoc-filter
     [ def>> ] assoc-map
     [ nip length 1 = ] assoc-filter

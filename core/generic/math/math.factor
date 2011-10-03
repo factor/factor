@@ -51,7 +51,7 @@ ERROR: no-math-method left right generic ;
 <PRIVATE
 
 : (math-method) ( generic class -- quot )
-    over method
+    over ?lookup-method
     [ 1quotation ]
     [ default-math-method ] ?if ;
 
