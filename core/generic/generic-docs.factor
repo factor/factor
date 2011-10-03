@@ -39,7 +39,7 @@ $nl
 "Methods can be added to existing generic words:"
 { $subsections create-method }
 "Method definitions can be looked up:"
-{ $subsections method }
+{ $subsections lookup-method ?lookup-method }
 "Finding the most specific method for an object:"
 { $subsections effective-method }
 "A generic word contains methods; the list of methods specializing on a class can also be obtained:"
@@ -131,12 +131,18 @@ HELP: M\
 { $class-description "Pushes a method on the stack." }
 { $examples { $code "M\\ fixnum + see" } { $code "USING: ui.gadgets.editors ui.render ;" "M\\ editor draw-gadget* edit" } } ;
 
-HELP: method
+HELP: lookup-method
+{ $values { "class" class } { "generic" generic } { "method" method } }
+{ $description "Looks up a method definition." }
+{ $class-description "The class of method bodies, which are words with special word properties set." }
+{ $errors "Throws an error if the method does not exist." } ;
+
+HELP: ?lookup-method
 { $values { "class" class } { "generic" generic } { "method/f" { $maybe method } } }
 { $description "Looks up a method definition." }
 { $class-description "The class of method bodies, which are words with special word properties set." } ;
 
-{ method create-method POSTPONE: M: } related-words
+{ lookup-method ?lookup-method create-method POSTPONE: M: } related-words
 
 HELP: <method>
 { $values { "class" class } { "generic" generic } { "method" "a new method definition" } }
