@@ -1,16 +1,20 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors debugger io kernel namespaces prettyprint
-ui.gadgets.panes ui.gadgets.worlds ui ;
+USING: accessors continuations debugger io io.streams.string
+kernel namespaces prettyprint ui ui.gadgets.worlds ;
 IN: ui.debugger
 
-: <error-pane> ( error -- pane )
-    <pane> [ [ print-error ] with-pane ] keep ; inline
+: error-alert ( error -- )
+    [ "Error" ] dip [ print-error ] with-string-writer
+    system-alert ;
 
-: error-window ( error -- )
-    <error-pane> "Error" open-window ;
+! ( error -- )
+[ error-alert ] ui-error-hook set-global
 
-[ error-window ] ui-error-hook set-global
+! ( error -- )
+[
+    ui-running? [ dup error-alert ] [ dup print-error ] if die
+] callback-error-hook set-global
 
 M: world-error error.
     "An error occurred while drawing the world " write
