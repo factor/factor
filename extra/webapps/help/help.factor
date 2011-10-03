@@ -34,16 +34,17 @@ M: result link-href href>> ;
     <page-action>
         { help-webapp "help" } >>template ;
 
-: <help-webapp> ( help-dir -- webapp )
+:: <help-webapp> ( help-dir help-db -- webapp )
     help-webapp new-dispatcher
         <main-action> "" add-responder
-        over <search-action> "search" add-responder
-        swap <static> "content" add-responder
+        help-dir <search-action> help-db [ <alloy> ] when* "search" add-responder
+        help-dir <static> "content" add-responder
         "resource:basis/definitions/icons/" <static> "icons" add-responder ;
 
 : run-help-webapp ( -- )
-    "resource:temp/docs" <help-webapp>
-    "resource:help.db" <sqlite-db> <alloy>
+    "resource:temp/docs"
+    "resource:help.db" <sqlite-db>
+    <help-webapp>
         main-responder set-global
     8080 httpd drop ;
 
