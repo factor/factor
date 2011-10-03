@@ -124,7 +124,7 @@ PRIVATE>
     dup '[ _ execute break ] "step-into" set-word-prop ;
 
 {
-    >n ndrop >c c>
+    >n ndrop recover
     continue continue-with
     stop suspend (spawn)
     set-context start-context
