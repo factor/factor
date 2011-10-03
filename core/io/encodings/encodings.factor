@@ -78,10 +78,10 @@ M: decoder stream-read1
     ] keep ; inline
 
 : finish-read ( n/f string -- string/f )
-    {
-        { [ over 0 = ] [ 2drop f ] }
-        { [ over not ] [ nip ] }
-        [ swap head ]
+    swap {
+        { [ dup zero? ] [ 2drop f ] }
+        { [ dup not   ] [ drop ] }
+        [ head ]
     } cond ; inline
 
 M: decoder stream-read
