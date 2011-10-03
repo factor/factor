@@ -319,8 +319,8 @@ M: tuple-class reset-class
     [
         dup "slots" word-prop [
             name>>
-            [ reader-word method forget ]
-            [ writer-word method forget ] 2bi
+            [ reader-word ?lookup-method forget ]
+            [ writer-word ?lookup-method forget ] 2bi
         ] with each
     ] [
         [ call-next-method ]

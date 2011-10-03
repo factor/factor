@@ -476,7 +476,7 @@ must-fail-with
 
 : accessor-exists? ( name -- ? )
     [ "forget-accessors-test" "classes.tuple.tests" lookup ] dip
-    ">>" append "accessors" lookup method >boolean ;
+    ">>" append "accessors" lookup ?lookup-method >boolean ;
 
 [ t ] [ "x" accessor-exists? ] unit-test
 [ t ] [ "y" accessor-exists? ] unit-test
@@ -594,7 +594,7 @@ T{ reshape-test f "hi" } "tuple" set
 
 [ ] [ "IN: classes.tuple.tests TUPLE: reshape-test { x read-only } ;" eval( -- ) ] unit-test
 
-[ f ] [ \ reshape-test \ x<< method ] unit-test
+[ f ] [ \ reshape-test \ x<< ?lookup-method ] unit-test
 
 [ "tuple" get 5 >>x ] must-fail
 
@@ -678,7 +678,7 @@ SLOT: kex
     drop
 ] unit-test
 
-[ t ] [ \ change-slot-test \ kex>> method >boolean ] unit-test
+[ t ] [ \ change-slot-test \ kex>> ?lookup-method >boolean ] unit-test
 
 [ ] [
     "IN: classes.tuple.tests USING: kernel accessors ; TUPLE: change-slot-test kex ;"
@@ -686,7 +686,7 @@ SLOT: kex
     drop
 ] unit-test
 
-[ t ] [ \ change-slot-test \ kex>> method >boolean ] unit-test
+[ t ] [ \ change-slot-test \ kex>> ?lookup-method >boolean ] unit-test
 
 [ ] [
     "IN: classes.tuple.tests USING: kernel accessors ; TUPLE: change-slot-test ; SLOT: kex M: change-slot-test kex>> drop 3 ;"
@@ -694,8 +694,8 @@ SLOT: kex
     drop
 ] unit-test
 
-[ t ] [ \ change-slot-test \ kex>> method >boolean ] unit-test
-[ f ] [ \ change-slot-test \ kex>> method "reading" word-prop ] unit-test
+[ t ] [ \ change-slot-test \ kex>> ?lookup-method >boolean ] unit-test
+[ f ] [ \ change-slot-test \ kex>> ?lookup-method "reading" word-prop ] unit-test
 
 DEFER: redefine-tuple-twice
 

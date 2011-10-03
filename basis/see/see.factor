@@ -224,7 +224,7 @@ M: word see*
 : seeing-implementors ( class -- seq )
     dup implementors
     [ [ reader? ] [ writer? ] bi or not ] filter
-    [ method ] with map
+    [ ?lookup-method ] with map
     natural-sort ;
 
 : seeing-methods ( generic -- seq )

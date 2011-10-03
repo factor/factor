@@ -30,7 +30,7 @@ IN: tools.profiler
     all-words [ subwords ] cumulative-counters ;
 
 : methods-on ( class -- methods )
-    dup implementors [ method ] with map ;
+    dup implementors [ lookup-method ] with map ;
 
 : class-counters ( -- alist )
     classes [ methods-on ] cumulative-counters ;
