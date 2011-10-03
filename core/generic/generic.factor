@@ -30,7 +30,7 @@ ERROR: method-lookup-failed class generic ;
 : ?lookup-method ( class generic -- method/f )
     "methods" word-prop at ;
 
-: lookup-method ( class generic -- method/* )
+: lookup-method ( class generic -- method )
     2dup ?lookup-method [ 2nip ] [ method-lookup-failed ] if* ;
 
 <PRIVATE
