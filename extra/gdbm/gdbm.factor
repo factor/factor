@@ -76,7 +76,8 @@ DESTRUCTOR: gdbm-close
 
 : gdbm-store ( key content flag -- )
     [
-        { [ dbf ] [ object>datum ] [ object>datum ] [ ] } spread
+        [ dbf ] 3dip
+        [ object>datum ] [ object>datum ] [ ] tri*
         gdbm_store check-error
     ] with-destructors ;
 
