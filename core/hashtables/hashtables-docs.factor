@@ -66,7 +66,7 @@ HELP: hash@
 { $description "Computes the index to begin searching from the hashcode of the key. Always outputs an even value since keys are stored at even indices of the underlying array." } ;
 
 HELP: probe
-{ $values { "array" "the underlying array of a hashtable" } { "i" "a search index" } }
+{ $values { "array" "the underlying array of a hashtable" } { "i" "a search index" } { "probe#" "an incrementing counter" } }
 { $description "Outputs the next hashtable search index." } ;
 
 HELP: key@

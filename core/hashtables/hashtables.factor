@@ -17,7 +17,7 @@ TUPLE: hashtable
 : hash@ ( key array -- i )
     [ hashcode >fixnum dup fixnum+fast ] dip wrap ; inline
 
-: probe ( array i probe# -- array i' probe# )
+: probe ( array i probe# -- array i probe# )
     2 fixnum+fast [ fixnum+fast over wrap ] keep ; inline
 
 : no-key ( key array -- array n ? ) nip f f ; inline
