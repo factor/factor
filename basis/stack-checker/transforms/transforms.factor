@@ -87,7 +87,7 @@ IN: stack-checker.transforms
 
 \ 3cleave t "no-compile" set-word-prop
 
-\ spread [ spread>quot ] 1 define-transform
+\ spread [ deep-spread>quot ] 1 define-transform
 
 \ spread t "no-compile" set-word-prop
 
