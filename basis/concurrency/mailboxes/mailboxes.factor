@@ -84,7 +84,7 @@ C: <linked-error> linked-error
 TUPLE: linked-thread < thread supervisor ;
 
 M: linked-thread error-in-thread
-    [ <linked-error> ] [ supervisor>> ] bi mailbox-put ;
+    [ <linked-error> ] [ supervisor>> ] bi mailbox-put stop ;
 
 : <linked-thread> ( quot name mailbox -- thread' )
     [ linked-thread new-thread ] dip >>supervisor ;

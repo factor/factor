@@ -163,14 +163,6 @@ HELP: restarts
 { $var-description "Global variable holding the set of possible restarts for the most recently thrown error." }
 { $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;
 
-HELP: >c
-{ $values { "continuation" continuation } }
-{ $description "Pushes an exception handler continuation on the catch stack. The continuation must have been reified by " { $link callcc1 } "." } ;
-
-HELP: c>
-{ $values { "continuation" continuation } }
-{ $description "Pops an exception handler continuation from the catch stack." } ;
-
 HELP: throw
 { $values { "error" object } }
 { $description "Saves the current continuation in the " { $link error-continuation } " global variable and throws an error. Execution does not continue at the point after the " { $link throw } " call. Rather, the innermost catch block is invoked, and execution continues at that point." } ;
