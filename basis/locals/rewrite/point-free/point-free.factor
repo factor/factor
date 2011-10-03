@@ -40,7 +40,7 @@ M: object localize 1quotation ;
     [ [ ] ] [
         dup [ local-reader? ] any? [
             dup [ local-reader? [ 1array ] [ ] ? ] map
-            spread>quot
+            deep-spread>quot
         ] [ [ ] ] if swap length [ load-locals ] curry append
     ] if-empty ;
 

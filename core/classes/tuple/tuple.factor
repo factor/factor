@@ -134,7 +134,7 @@ M: class final-class? drop t ;
     superclasses [ "slots" word-prop length ] map-sum ;
 
 : boa-check-quot ( class -- quot )
-    all-slots [ class>> instance-check-quot ] map spread>quot-shallow
+    all-slots [ class>> instance-check-quot ] map shallow-spread>quot
     f like ;
 
 : define-boa-check ( class -- )
