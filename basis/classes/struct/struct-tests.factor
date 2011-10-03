@@ -8,7 +8,7 @@ destructors io.encodings.utf8 io.pathnames io.streams.string
 kernel libc literals math mirrors namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
 tools.test parser lexer eval layouts generic.single classes
-vocabs ;
+vocabs generic ;
 FROM: math => float ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
 QUALIFIED-WITH: alien.c-types c
@@ -534,3 +534,13 @@ IN: classes.struct.tests
 STRUCT: struct-1-union { a int initial: 0 } ;
 " ]
 [ \ struct-1-union [ see ] with-string-writer ] unit-test
+
+
+! Bug #206
+STRUCT: going-to-forget { a uint } ;
+[ ] [
+    "IN: classes.struct.tests TUPLE: going-to-forget b ;" eval( -- )
+] unit-test
+[ f ] [ "USE: classes.struct.tests M\\ going-to-forget clone" eval( -- obj ) ] unit-test
+[ f ] [ "USE: classes.struct.tests M\\ going-to-forget struct-slot-values" eval( -- obj ) ] unit-test
+

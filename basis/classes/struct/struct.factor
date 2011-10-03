@@ -8,7 +8,8 @@ combinators combinators.smart cpu.architecture fry
 functors.backend generalizations generic.parser kernel
 kernel.private lexer libc locals macros math math.order parser
 quotations sequences slots slots.private specialized-arrays
-stack-checker.dependencies summary vectors vocabs.parser words ;
+stack-checker.dependencies summary vectors vocabs.parser words
+classes.private generic definitions ;
 FROM: delegate.private => group-words slot-group-words ;
 QUALIFIED: math
 IN: classes.struct
@@ -194,6 +195,9 @@ M: struct-c-type base-type ;
     [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
     define-inline-method ;
 
+: forget-struct-slot-values-method ( class -- )
+    \ struct-slot-values method forget ;
+
 : clone-underlying ( struct -- byte-array )
     binary-object memory>byte-array ; inline
 
@@ -201,6 +205,9 @@ M: struct-c-type base-type ;
     [ \ clone ]
     [ \ clone-underlying swap literalize \ memory>struct [ ] 3sequence ] bi
     define-inline-method ;
+
+: forget-clone-method ( class -- )
+    \ clone method forget ;
 
 :: c-type-for-class ( class slots size align -- c-type )
     struct-c-type new
@@ -313,6 +320,14 @@ ERROR: invalid-struct-slot token ;
 : struct-slot-class ( c-type -- class' )
     c-type c-type-boxed-class
     dup \ byte-array = [ drop \ c-ptr ] when ;
+
+M: struct-class reset-class
+    [ call-next-method ]
+    [
+        [ forget-struct-slot-values-method ]
+        [ forget-clone-method ] bi
+    ]
+    [ { "c-type" "layout" "struct-size" } reset-props ] tri ;
 
 SYMBOL: bits:
 
