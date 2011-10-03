@@ -46,8 +46,10 @@ M: single-combination next-method-quot* ( class generic combination -- quot )
     ] with-combination ;
 
 : method-for-object ( obj word -- method )
-    [ [ method-classes [ instance? ] with filter smallest-class ] keep method ]
-    [ "default-method" word-prop ]
+    [
+        [ method-classes [ instance? ] with filter smallest-class ] keep
+        ?lookup-method
+    ] [ "default-method" word-prop ]
     bi or ;
 
 M: single-combination make-default-method

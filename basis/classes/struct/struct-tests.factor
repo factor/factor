@@ -540,6 +540,6 @@ STRUCT: going-to-redefine { a uint } ;
 [ ] [
     "IN: classes.struct.tests TUPLE: going-to-redefine b ;" eval( -- )
 ] unit-test
-[ f ] [ \ going-to-redefine \ clone method ] unit-test
-[ f ] [ \ going-to-redefine \ struct-slot-values method ] unit-test
+[ f ] [ \ going-to-redefine \ clone ?lookup-method ] unit-test
+[ f ] [ \ going-to-redefine \ struct-slot-values ?lookup-method ] unit-test
 

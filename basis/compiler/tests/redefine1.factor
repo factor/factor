@@ -15,7 +15,7 @@ M: integer method-redefine-generic-1 3 + ;
 
 [ 7 ] [ method-redefine-test-1 ] unit-test
 
-[ ] [ [ fixnum \ method-redefine-generic-1 method forget ] with-compilation-unit ] unit-test
+[ ] [ [ fixnum \ method-redefine-generic-1 lookup-method forget ] with-compilation-unit ] unit-test
 
 [ 6 ] [ method-redefine-test-1 ] unit-test
 
@@ -33,6 +33,6 @@ M: integer method-redefine-generic-2 3 + ;
 
 [ ] [
     [
-        fixnum string [ \ method-redefine-generic-2 method forget ] bi@
+        fixnum string [ \ method-redefine-generic-2 lookup-method forget ] bi@
     ] with-compilation-unit
 ] unit-test

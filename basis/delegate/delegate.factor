@@ -91,7 +91,7 @@ M: broadcast (consult-method-quot)
     \ protocol-consult word-prop delete-at ;
 
 : unconsult-method ( word consultation -- )
-    [ class>> swap first method ] keep
+    [ class>> swap first lookup-method ] keep
     over [
         over "consultation" word-prop eq?
         [ forget ] [ drop ] if
@@ -124,7 +124,7 @@ M: consultation forget*
 <PRIVATE
 
 : forget-all-methods ( classes words -- )
-    [ first method forget ] cartesian-each ;
+    [ first lookup-method forget ] cartesian-each ;
 
 : protocol-users ( protocol -- users )
     protocol-consult keys ;

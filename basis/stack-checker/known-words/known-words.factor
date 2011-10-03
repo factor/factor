@@ -25,6 +25,7 @@ stack-checker.transforms
 stack-checker.dependencies
 stack-checker.recursive-state
 stack-checker.row-polymorphism ;
+QUALIFIED-WITH: generic.single.private gsp
 IN: stack-checker.known-words
 
 : infer-special ( word -- )
@@ -417,7 +418,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ innermost-frame-executing { callstack } { object } define-primitive
 \ innermost-frame-scan { callstack } { fixnum } define-primitive
 \ jit-compile { quotation } { } define-primitive
-\ lookup-method { object array } { word } define-primitive
+\ gsp:lookup-method { object array } { word } define-primitive
 \ minor-gc { } { } define-primitive
 \ modify-code-heap { array object object } { } define-primitive
 \ nano-count { } { integer } define-primitive \ nano-count make-flushable

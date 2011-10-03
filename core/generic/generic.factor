@@ -25,8 +25,13 @@ M: generic definition drop f ;
 PREDICATE: method < word
     "method-generic" word-prop >boolean ;
 
-: method ( class generic -- method/f )
+ERROR: method-lookup-failed class generic ;
+
+: ?lookup-method ( class generic -- method/f )
     "methods" word-prop at ;
+
+: lookup-method ( class generic -- method/* )
+    2dup ?lookup-method [ 2nip ] [ method-lookup-failed ] if* ;
 
 <PRIVATE
 
@@ -56,7 +61,7 @@ PRIVATE>
     method-classes interesting-classes smallest-class ;
 
 : method-for-class ( class generic -- method/f )
-    [ nip ] [ nearest-class ] 2bi dup [ swap method ] [ 2drop f ] if ;
+    [ nip ] [ nearest-class ] 2bi dup [ swap ?lookup-method ] [ 2drop f ] if ;
 
 GENERIC: effective-method ( generic -- method )
 
@@ -66,7 +71,7 @@ GENERIC: effective-method ( generic -- method )
     method-classes [ class< ] with filter smallest-class ;
 
 : next-method ( class generic -- method/f )
-    [ next-method-class ] keep method ;
+    [ next-method-class ] keep ?lookup-method ;
 
 GENERIC: next-method-quot* ( class generic combination -- quot )
 
@@ -131,7 +136,7 @@ M: method crossref?
     2bi ;
 
 : create-method ( class generic -- method )
-    2dup method dup [ 2nip dup reset-generic ] [
+    2dup ?lookup-method dup [ 2nip dup reset-generic ] [
         drop
         [ <method> dup ] 2keep
         reveal-method
@@ -158,7 +163,7 @@ M: method forget*
                 [
                     [ "method-class" word-prop ]
                     [ "method-generic" word-prop ] bi
-                    2dup method
+                    2dup ?lookup-method
                 ] keep eq?
                 [
                     [ [ delete-at ] with-methods ]
@@ -195,4 +200,4 @@ M: generic subwords
     ] { } make ;
 
 M: class forget-methods
-    [ implementors ] [ [ swap method ] curry ] bi map forget-all ;
+    [ implementors ] [ [ swap ?lookup-method ] curry ] bi map forget-all ;
