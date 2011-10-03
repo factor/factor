@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2010 Slava Pestov.
+! Copyright (C) 2003, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
 namespaces make math splitting sorting quotations assocs
@@ -23,13 +23,9 @@ SYMBOL: restarts
 : catchstack* ( -- catchstack )
     1 context-object { vector } declare ; inline
 
-: >c ( continuation -- ) catchstack* push ;
-
-: c> ( -- continuation ) catchstack* pop ;
-
 ! We have to defeat some optimizations to make continuations work
 : dummy-1 ( -- obj ) f ;
-: dummy-2 ( obj -- obj ) dup drop ;
+: dummy-2 ( obj -- obj ) ;
 
 : catchstack ( -- catchstack ) catchstack* clone ; inline
 
@@ -108,19 +104,38 @@ GENERIC: compute-restarts ( error -- seq )
 
 PRIVATE>
 
-SYMBOL: thread-error-hook
+GENERIC: error-in-thread ( error thread -- * )
+
+SYMBOL: thread-error-hook ! ( error thread -- )
+
+thread-error-hook [ [ die ] ] initialize
+
+M: object error-in-thread ( error thread -- )
+    thread-error-hook get-global call( error thread -- * ) ;
+
+: in-callback? ( -- ? ) 3 context-object ;
+
+SYMBOL: callback-error-hook ! ( error -- * )
+
+callback-error-hook [ [ die ] ] initialize
 
 : rethrow ( error -- * )
     dup save-error
-    catchstack* empty? [
-        thread-error-hook get-global
-        [ original-error get-global die ] or
-        (( error -- * )) call-effect-unsafe
-    ] when
-    c> continue-with ;
+    catchstack* [
+        in-callback?
+        [ callback-error-hook get-global call( error -- * ) ]
+        [ 63 special-object error-in-thread ]
+        if
+    ] [ pop continue-with ] if-empty ;
 
 : recover ( ..a try: ( ..a -- ..b ) recovery: ( ..a error -- ..b ) -- ..b )
-    [ [ swap >c call c> drop ] curry ] dip ifcc ; inline
+    [
+        [
+            [ catchstack* push ] dip
+            call
+            catchstack* pop*
+        ] curry
+    ] dip ifcc ; inline
 
 : ignore-errors ( quot -- )
     [ drop ] recover ; inline

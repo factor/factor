@@ -233,8 +233,6 @@ M: real sleep
     '[ _ set-datastack @ ]
     "Thread" spawn drop ;
 
-GENERIC: error-in-thread ( error thread -- )
-
 <PRIVATE
 
 : init-thread-state ( -- )

@@ -118,8 +118,6 @@ TUPLE: expiry-check object alien ;
 
 PRIVATE>
 
-: in-callback? ( -- ? ) 3 context-object ;
-
 : initialize-alien ( symbol quot -- )
     swap dup get-global dup recompute-value?
     [ drop [ call dup 31337 <alien> expiry-check boa ] dip set-global ]
