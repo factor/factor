@@ -393,10 +393,7 @@ IN: tools.deploy.shaker
         ] when
 
         strip-debugger? [
-            {
-                compiler.errors:compiler-errors
-                continuations:thread-error-hook
-            } %
+            \ compiler.errors:compiler-errors ,
         ] when
 
         "windows-messages" "windows.messages" lookup [ , ] when*

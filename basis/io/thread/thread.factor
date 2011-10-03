@@ -1,6 +1,6 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: init io.backend kernel namespaces threads ;
+USING: continuations init io.backend kernel namespaces threads ;
 IN: io.thread
 
 ! The Cocoa and Gtk UI backend stops the I/O thread and takes
@@ -18,7 +18,7 @@ TUPLE: io-thread < thread ;
     "I/O wait"
     io-thread new-thread ;
 
-M: io-thread error-in-thread [ die ] call( error thread -- ) ;
+M: io-thread error-in-thread [ die ] call( error thread -- * ) ;
 
 : start-io-thread ( -- )
     t io-thread-running? set-global
