@@ -155,7 +155,8 @@ M: #push optimize-modular-arithmetic*
 MEMO: fixnum-coercion ( flags -- nodes )
     ! flags indicate which input parameters are already known to be fixnums,
     ! and don't need a coercion as a result.
-    [ [ ] [ >fixnum ] ? ] map '[ _ spread ] splice-quot ;
+    [ [ ] [ >fixnum ] ? ] map shallow-spread>quot
+    '[ _ call ] splice-quot ;
 
 : modular-value-info ( #call -- alist )
     [ in-d>> ] [ out-d>> ] bi append
