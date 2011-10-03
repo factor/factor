@@ -167,4 +167,11 @@ M: hashtable assoc-like
 : ?set-at ( value key assoc/f -- assoc )
     [ [ set-at ] keep ] [ associate ] if* ;
 
+! borrowed from boost::hash_combine, but the
+! magic number is 2^29/phi instead of 2^32/phi
+! due to max fixnum value on 32-bit machines
+: hash-combine ( obj oldhash -- newhash )
+    [ hashcode HEX: 13c6ef37 + ] dip
+    [ 6 shift ] [ -2 shift ] bi + + ;
+
 INSTANCE: hashtable assoc
