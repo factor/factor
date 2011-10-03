@@ -103,6 +103,7 @@ SYMBOL: callbacks
 
 ! Used by compiler.codegen to wrap callback bodies
 : do-callback ( callback-quot wait-quot: ( callback -- ) -- )
+    t 3 set-context-object
     init-namespaces
     init-catchstack
     current-callback
@@ -116,6 +117,8 @@ TUPLE: expiry-check object alien ;
     dup [ alien>> expired? ] [ drop t ] if ;
 
 PRIVATE>
+
+: in-callback? ( -- ? ) 3 context-object ;
 
 : initialize-alien ( symbol quot -- )
     swap dup get-global dup recompute-value?
