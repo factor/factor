@@ -168,21 +168,8 @@ M: word reset-word
         } reset-props
     ] tri ;
 
-<PRIVATE
-
-! borrowed from boost::hash_combine, but the
-! magic number is 2^29/phi instead of 2^32/phi
-! due to max fixnum value on 32-bit machines
-: hash-combine ( hash seed -- newhash )
-    [ HEX: 13c6ef37 + ] dip [ 6 shift ] [ -2 shift ] bi + + ;
-
-: 2hash ( obj1 obj2 -- hash )
-    [ hashcode ] bi@ 0 hash-combine hash-combine ;
-
-PRIVATE>
-
 : <word> ( name vocab -- word )
-    2dup 2hash >fixnum (word) dup new-word ;
+    2dup 0 hash-combine hash-combine >fixnum (word) dup new-word ;
 
 : <uninterned-word> ( name -- word )
     f \ <uninterned-word> counter >fixnum (word)
