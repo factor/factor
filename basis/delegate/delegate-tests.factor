@@ -64,8 +64,8 @@ CONSULT: beta hey value>> 1 - ;
 [ { hey } ] [ alpha protocol-users ] unit-test
 [ { hey } ] [ beta protocol-users ] unit-test
 [ ] [ "USE: delegate IN: delegate.tests PROTOCOL: alpha one ;" eval( -- ) ] unit-test
-[ f ] [ hey \ two method ] unit-test
-[ f ] [ hey \ four method ] unit-test
+[ f ] [ hey \ two ?lookup-method ] unit-test
+[ f ] [ hey \ four ?lookup-method ] unit-test
 [ ] [ "USE: delegate IN: delegate.tests PROTOCOL: beta two three four ;" eval( -- ) ] unit-test
 [ { hey } ] [ alpha protocol-users ] unit-test
 [ { hey } ] [ beta protocol-users ] unit-test
@@ -79,7 +79,7 @@ CONSULT: beta hey value>> 1 - ;
 [ -1 ] [ 1 <hey> three ] unit-test
 [ -1 ] [ 1 <hey> four ] unit-test
 [ ] [ "IN: delegate.tests FORGET: alpha" eval( -- ) ] unit-test
-[ f ] [ hey \ one method ] unit-test
+[ f ] [ hey \ one ?lookup-method ] unit-test
 
 TUPLE: slot-protocol-test-1 a b ;
 TUPLE: slot-protocol-test-2 < slot-protocol-test-1 { c integer } ;
@@ -147,7 +147,7 @@ PROTOCOL: silly-protocol do-me ;
 DEFER: slot-protocol-test-3
 SLOT: y
 
-[ f ] [ \ slot-protocol-test-3 \ y>> method >boolean ] unit-test
+[ f ] [ \ slot-protocol-test-3 \ y>> ?lookup-method >boolean ] unit-test
 
 [ [ ] ] [
     "IN: delegate.tests
@@ -157,7 +157,7 @@ CONSULT: y>> slot-protocol-test-3 x>> ;"
     <string-reader> "delegate-test-1" parse-stream
 ] unit-test
 
-[ t ] [ \ slot-protocol-test-3 \ y>> method >boolean ] unit-test
+[ t ] [ \ slot-protocol-test-3 \ y>> ?lookup-method >boolean ] unit-test
 
 [ [ ] ] [
     "IN: delegate.tests
@@ -167,7 +167,7 @@ TUPLE: slot-protocol-test-3 x y ;"
 
 ! We now have a real accessor for the y slot; we don't want it to
 ! get lost
-[ t ] [ \ slot-protocol-test-3 \ y>> method >boolean ] unit-test
+[ t ] [ \ slot-protocol-test-3 \ y>> ?lookup-method >boolean ] unit-test
 
 ! We want to be able to override methods after consultation
 [ [ ] ] [
