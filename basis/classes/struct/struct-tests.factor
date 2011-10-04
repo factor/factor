@@ -8,7 +8,7 @@ destructors io.encodings.utf8 io.pathnames io.streams.string
 kernel libc literals math mirrors namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
 tools.test parser lexer eval layouts generic.single classes
-vocabs generic ;
+vocabs generic classes.private ;
 FROM: math => float ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
 QUALIFIED-WITH: alien.c-types c
@@ -542,4 +542,14 @@ STRUCT: going-to-redefine { a uint } ;
 ] unit-test
 [ f ] [ \ going-to-redefine \ clone ?lookup-method ] unit-test
 [ f ] [ \ going-to-redefine \ struct-slot-values ?lookup-method ] unit-test
+
+! Test reset-class on structs, which should forget all the accessors, clone, and struct-slot-values
+STRUCT: some-accessors { aaa uint } { bbb int } ;
+[ ] [ [ \ some-accessors reset-class ] with-compilation-unit ] unit-test
+[ f ] [ \ some-accessors \ a>> ?lookup-method ] unit-test
+[ f ] [ \ some-accessors \ a<< ?lookup-method ] unit-test
+[ f ] [ \ some-accessors \ b>> ?lookup-method ] unit-test
+[ f ] [ \ some-accessors \ b<< ?lookup-method ] unit-test
+[ f ] [ \ some-accessors \ clone ?lookup-method ] unit-test
+[ f ] [ \ some-accessors \ struct-slot-values ?lookup-method ] unit-test
 

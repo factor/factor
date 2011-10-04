@@ -807,3 +807,13 @@ TUPLE: final-subclass < final-superclass ;
 [ ] [ "IN: classes.tuple.tests TUPLE: final-superclass x ;" eval( -- ) ] unit-test
 
 [ t ] [ \ final-subclass final-class? ] unit-test
+
+! Test reset-class on tuples
+! Should forget all accessors on rclasstest
+TUPLE: rclasstest a b ;
+[ ] [ [ \ rclasstest reset-class ] with-compilation-unit ] unit-test
+[ f ] [ \ rclasstest \ a>> ?lookup-method ] unit-test
+[ f ] [ \ rclasstest \ a<< ?lookup-method ] unit-test
+[ f ] [ \ rclasstest \ b>> ?lookup-method ] unit-test
+[ f ] [ \ rclasstest \ b<< ?lookup-method ] unit-test
+
