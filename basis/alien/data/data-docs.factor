@@ -66,10 +66,10 @@ classes.struct kernel math math.functions
 prettyprint ;
 IN: scratchpad
 
-STRUCT: point { x int } { y int } ;
+STRUCT: test-point { x int } { y int } ;
 
 : scoped-allocation-test ( -- x )
-    { point } [
+    { test-point } [
         3 >>x 4 >>y
         [ x>> sq ] [ y>> sq ] bi + sqrt
     ] with-scoped-allocation ;
