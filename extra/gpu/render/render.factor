@@ -491,7 +491,7 @@ DEFER: [bind-uniform-tuple]
 
 :: [bind-uniforms] ( superclass uniforms -- quot )
     superclass "uniform-tuple-texture-units" word-prop 0 or :> first-texture-unit
-    superclass \ (bind-uniforms) method :> next-method
+    superclass \ (bind-uniforms) lookup-method :> next-method
     first-texture-unit uniforms "" [bind-uniform-tuple] nip :> bind-quot
 
     { 2dup next-method } bind-quot [ ] append-as ;

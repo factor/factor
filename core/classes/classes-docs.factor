@@ -19,7 +19,9 @@ $nl
     predicate
     predicate?
 }
-"A predicate word holds a reference to the class it is predicating over in the " { $snippet "\"predicating\"" } " word property." ;
+"A predicate word holds a reference to the class it is predicating over in the " { $snippet "\"predicating\"" } " word property." $nl
+"Implementation of class reloading:"
+{ $subsections reset-class forget-class forget-methods } ;
 
 ARTICLE: "classes" "Classes"
 "Conceptually, a " { $snippet "class" } " is a set of objects whose members can be identified with a predicate, and on which generic words can specialize methods. Classes are organized into a general partial order, and an object may be an instance of more than one class."
@@ -151,3 +153,16 @@ HELP: instance?
      { "object" object } { "class" class }
      { "?" "a boolean" } }
 { $description "Tests whether the input object is a member of the class." } ;
+
+HELP: reset-class
+{ $values { "class" class } }
+{ $description "Forgets all of words that the class defines, but not words that are defined on the class. For instance, on a tuple class, this word should reset all of the tuple accessors but not things like " { $link nth } " that may be defined on the class elsewhere." } ;
+
+HELP: forget-class
+{ $values { "class" class } }
+{ $description "Removes a class by forgetting all of the methods defined on that class and all of the methods generated when that class was defined. Also resets any caches that may contain that class." } ;
+
+HELP: forget-methods
+{ $values { "class" class } }
+{ $description "Forgets all methods defined on a class. In contrast to " { $link reset-class } ", this not only forgets accessors but also any methods at all on the class." } ;
+

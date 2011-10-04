@@ -315,13 +315,16 @@ M: error-class reset-class
 : define-boa-word ( word class -- )
     [ [ boa ] curry ] [ boa-effect ] bi define-inline ;
 
+: forget-struct-slot-accessors ( class slots -- )
+    [
+        name>>
+        [ reader-word ?lookup-method forget ]
+        [ writer-word ?lookup-method forget ] 2bi
+    ] with each ;
+
 M: tuple-class reset-class
     [
-        dup "slots" word-prop [
-            name>>
-            [ reader-word ?lookup-method forget ]
-            [ writer-word ?lookup-method forget ] 2bi
-        ] with each
+        dup "slots" word-prop forget-struct-slot-accessors
     ] [
         [ call-next-method ]
         [ { "layout" "slots" "boa-check" "prototype" "final" } reset-props ]
