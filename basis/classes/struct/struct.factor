@@ -321,13 +321,23 @@ ERROR: invalid-struct-slot token ;
     c-type c-type-boxed-class
     dup \ byte-array = [ drop \ c-ptr ] when ;
 
+: forget-struct-accessors ( class -- )
+    dup "c-type" word-prop fields>> [
+        name>>
+        [ reader-word ?lookup-method forget ]
+        [ writer-word ?lookup-method forget ] 2bi
+    ] with each ;
+
 M: struct-class reset-class
-    [ call-next-method ]
-    [
-        [ forget-struct-slot-values-method ]
-        [ forget-clone-method ] bi
-    ]
-    [ { "c-type" "layout" "struct-size" } reset-props ] tri ;
+    {
+        [ forget-struct-accessors ]
+        [
+            [ forget-struct-slot-values-method ]
+            [ forget-clone-method ] bi
+        ]
+        [ { "c-type" "layout" "struct-size" } reset-props ]
+        [ call-next-method ]
+    } cleave ;
 
 SYMBOL: bits:
 
