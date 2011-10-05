@@ -200,7 +200,7 @@ GENERIC: method-with-locals ( x -- y )
 M:: sequence method-with-locals ( a -- y ) a reverse ;
 
 [ t ] [
-    [ \ sequence \ method-with-locals method see ] with-string-writer
+    [ \ sequence \ method-with-locals lookup-method see ] with-string-writer
     method-definition =
 ] unit-test
 
