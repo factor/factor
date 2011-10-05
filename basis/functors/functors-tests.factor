@@ -120,7 +120,7 @@ M: integer W 1 + ;
     [ t ] [ "some-generic" "functors.tests" lookup >boolean ] unit-test
     [ t ] [
         "some-tuple" "functors.tests" lookup
-        "some-generic" "functors.tests" lookup method >boolean
+        "some-generic" "functors.tests" lookup lookup-method >boolean
     ] unit-test ;
     [ t ] [ "some-symbol" "functors.tests" lookup >boolean ] unit-test
 
