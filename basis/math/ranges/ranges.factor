@@ -5,9 +5,9 @@ sequences.private accessors classes.tuple arrays ;
 IN: math.ranges
 
 TUPLE: range
-{ from read-only }
-{ length read-only }
-{ step read-only } ;
+{ from number read-only }
+{ length integer read-only }
+{ step number read-only } ;
 
 : <range> ( a b step -- range )
     [ over - ] dip [ /i 1 + 0 max ] keep range boa ; inline

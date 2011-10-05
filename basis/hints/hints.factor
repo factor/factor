@@ -4,8 +4,8 @@ USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions effects fry generic generic.single
 generic.standard hashtables io.binary io.encodings
 io.streams.string kernel kernel.private math math.parser
-namespaces parser sbufs sequences splitting splitting.private
-strings vectors words ;
+namespaces parser sbufs sequences sequences.private splitting
+splitting.private strings vectors words ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
@@ -131,3 +131,11 @@ M\ hashtable at* { { fixnum object } { word object } } "specializer" set-word-pr
 M\ hashtable set-at { { object fixnum object } { object word object } } "specializer" set-word-prop
 
 \ encode-string { string object object } "specializer" set-word-prop
+
+\ nth { fixnum object } "specializer" set-word-prop
+
+\ nth-unsafe { fixnum object } "specializer" set-word-prop
+
+\ set-nth { fixnum object } "specializer" set-word-prop
+
+\ set-nth-unsafe { fixnum object } "specializer" set-word-prop
