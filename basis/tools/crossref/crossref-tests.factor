@@ -9,7 +9,7 @@ M: integer foo + ;
 
 "vocab:tools/crossref/test/foo.factor" run-file
 
-[ t ] [ integer \ foo method \ + usage member? ] unit-test
+[ t ] [ integer \ foo lookup-method \ + usage member? ] unit-test
 [ t ] [ \ foo usage [ pathname? ] any? ] unit-test
 
 ! Issues with forget
