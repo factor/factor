@@ -13,14 +13,8 @@ IN: strings
 : reset-string-hashcode ( str -- )
     f swap set-string-hashcode ; inline
 
-: string-hashcode-step ( oldhash newpart -- newhash )
-    >fixnum swap [
-        [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi
-        fixnum+fast fixnum+fast
-    ] keep fixnum-bitxor ; inline
-
 : rehash-string ( str -- )
-    [ 0 [ string-hashcode-step ] reduce ] keep set-string-hashcode ; inline
+    1 over sequence-hashcode swap set-string-hashcode ; inline
 
 : (aux) ( n string -- byte-array m )
     aux>> { byte-array } declare swap 1 fixnum-shift-fast ; inline
