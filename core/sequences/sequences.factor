@@ -600,18 +600,14 @@ ERROR: assert-sequence got expected ;
 : assert-sequence= ( a b -- )
     2dup sequence= [ 2drop ] [ assert-sequence ] if ;
 
-<PRIVATE
-
-: sequence-hashcode-step ( oldhash newpart -- newhash )
-    >fixnum swap [
-        [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi
-        fixnum+fast fixnum+fast
-    ] keep fixnum-bitxor ; inline
-
-PRIVATE>
-
-: sequence-hashcode ( n seq -- x )
-    [ 0 ] 2dip [ hashcode* sequence-hashcode-step ] with each ; inline
+: sequence-hashcode ( depth seq -- hash )
+    [
+        [ drop 1000003 HEX: 345678 ] dip length
+        [ dup fixnum+fast 82520 fixnum+fast ] [ iota ] bi
+    ] 2keep [
+        swapd nth-unsafe hashcode* rot fixnum-bitxor
+        pick fixnum*fast [ [ fixnum+fast ] keep ] dip swap
+    ] 2curry each drop nip 97531 fixnum+fast ; inline
 
 M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
 
