@@ -323,7 +323,7 @@ ERROR: invalid-struct-slot token ;
 
 M: struct-class reset-class
     {
-        [ dup "c-type" word-prop fields>> forget-struct-slot-accessors ]
+        [ dup "c-type" word-prop fields>> forget-slot-accessors ]
         [
             [ forget-struct-slot-values-method ]
             [ forget-clone-method ] bi
