@@ -359,7 +359,7 @@ M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
         [ class hashcode ] [ tuple-size ] bi
         [ dup fixnum+fast 82520 fixnum+fast ] [ iota ] bi
     ] 2keep [
-        swapd array-nth hashcode* rot fixnum-bitxor
+        swapd array-nth hashcode* >fixnum rot fixnum-bitxor
         pick fixnum*fast [ [ fixnum+fast ] keep ] dip swap
     ] 2curry each drop nip 97531 fixnum+fast ; inline
 
