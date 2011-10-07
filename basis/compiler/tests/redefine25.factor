@@ -30,5 +30,7 @@ TUPLE: empty-mixin-member < a-superclass ;
     [
         \ empty-mixin forget
         \ empty-mixin-member forget
+        \ empty-mixin-test-1 forget
+        \ empty-mixin-test-2 forget
     ] with-compilation-unit
 ] unit-test
