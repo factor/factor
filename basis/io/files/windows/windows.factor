@@ -68,7 +68,10 @@ C: <io-callback> io-callback
 
 : make-overlapped ( port -- overlapped-ext )
     [ (make-overlapped) ] dip
-    handle>> ptr>> [ >>offset ] when* ;
+    handle>> ptr>> [
+        [ 32 bits >>offset ]
+        [ -32 shift >>offset-high ] bi
+    ] when* ;
 
 M: windows FileArgs-overlapped ( port -- overlapped )
     make-overlapped ;
