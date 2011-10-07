@@ -35,6 +35,10 @@ if %_bootimage_version%==clean (
     set _bootimage_path=latest
 )
 
+echo Deleting staging images from temp/...
+del temp\staging.*.image
+if errorlevel 1 goto fail
+
 echo Updating working copy from %_git_branch%...
 call git pull http://factorcode.org/git/factor.git %_git_branch%
 if errorlevel 1 goto fail
