@@ -30,19 +30,23 @@ FUNCTION: int cfsetspeed ( termios* t, speed_t s ) ;
     [ <input-port> ] [ <output-port> ] bi <duplex-stream> ;
 
 : open-rw ( path -- fd ) O_RDWR file-mode open-file  ;
+
 : <file-rw> ( path -- stream ) open-rw fd>duplex-stream ;
 
-M: unix open-serial ( serial -- serial' )
-    dup
-    path>> flags{ O_RDWR O_NOCTTY O_NDELAY } file-mode open-file
-    fd>duplex-stream >>stream ;
+: open-unix-serial-port ( serial-port -- )
+    [
+        path>> flags{ O_RDWR O_NOCTTY O_NDELAY } file-mode open-file
+        fd>duplex-stream
+    ] keep stream<< ;
 
 : serial-fd ( serial -- fd )
     stream>> in>> handle>> fd>> ;
 
-: get-termios ( serial -- termios )
-    serial-fd
-    termios <struct> [ tcgetattr io-error ] keep ;
+: set-termios ( serial -- )
+    [
+        serial-fd
+        termios <struct> [ tcgetattr io-error ] keep
+    ] keep termios<< ;
 
 : configure-termios ( serial -- )
     dup termios>>
@@ -63,3 +67,19 @@ M: unix open-serial ( serial -- serial' )
 : apply-termios ( serial -- )
     [ serial-fd TCSANOW ]
     [ termios>> ] bi tcsetattr io-error ;
+
+M: unix open-serial ( serial -- serial' )
+    {
+        [ open-unix-serial-port ]
+        [ set-termios ]
+        [ configure-termios ]
+        [ tciflush ]
+        [ apply-termios ]
+        [ ]
+    } cleave ;
+
+M: unix default-serial-flags
+    flags{ IGNPAR ICRNL } >>iflag
+    flags{ } >>oflag
+    flags{ CS8 CLOCAL CREAD } >>cflag
+    flags{ ICANON } >>lflag ;

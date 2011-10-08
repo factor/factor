@@ -1,25 +1,20 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math.bitwise io.serial io.serial.unix
-literals ;
+USING: accessors io io.serial io.serial.unix kernel literals
+math.bitwise tools.test ;
 IN: io.serial.unix
 
-: serial-obj ( -- obj )
-    serial new
-    "/dev/ttyS0" >>path ! linux
-    ! "/dev/dty00" >>path ! netbsd
-    ! "/dev/ttyd0" >>path ! freebsd
-    ! "/dev/ttyU0" >>path ! openbsd
-    19200 >>baud
-    flags{ IGNPAR ICRNL } >>iflag
-    flags{ } >>oflag
-    flags{ CS8 CLOCAL CREAD } >>cflag
-    flags{ ICANON } >>lflag ;
+! "/dev/ttyS0" ! netbsd
+! "/dev/dty00" ! netbsd
+! "/dev/ttyd0" ! freebsd
+! "/dev/ttyU0" ! openbsd
 
-: serial-test ( -- serial )
-    serial-obj
-    open-serial
-    dup get-termios >>termios
-    dup configure-termios
-    dup tciflush
-    dup apply-termios ;
+: <serial-port-test> ( -- serial-port )
+    "/dev/ttyS0" 19200 <serial-port> ;
+
+: with-serial-port-test ( quot -- )
+    [ <serial-port-test> ] dip with-serial-port ; inline
+
+! [ ] [
+    ! [ "hello" over stream-write stream-flush ] with-serial-port-test
+! ] unit-test
