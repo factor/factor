@@ -155,6 +155,8 @@ GENERIC: void-generic ( obj -- * )
 
 [ 0 ] [ 5 [ 1 mod ] compile-call ] unit-test
 [ 0 ] [ 5 [ 1 rem ] compile-call ] unit-test
+[ 0.5 ] [ 5.5 [ 1 mod ] compile-call ] unit-test
+[ 0.5 ] [ 5.5 [ 1 rem ] compile-call ] unit-test
 
 [ 5 ] [ 5 [ -1 bitand ] compile-call ] unit-test
 [ 0 ] [ 5 [ 0 bitand ] compile-call ] unit-test

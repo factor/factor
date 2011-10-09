@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2008, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel sequences words fry generic
 generic.single accessors classes.tuple classes classes.algebra
@@ -23,9 +23,11 @@ IN: compiler.tree.propagation.transforms
     ] [ drop f ] if
 ] "custom-inlining" set-word-prop
 
-: rem-custom-inlining ( #call -- quot/f )
-    second value-info literal>> dup integer?
-    [ power-of-2? [ 1 - bitand ] f ? ] [ drop f ] if ;
+: rem-custom-inlining ( inputs -- quot/f )
+    dup first value-info class integer class<= [
+        second value-info literal>> dup integer?
+        [ power-of-2? [ 1 - bitand ] f ? ] [ drop f ] if
+    ] [ drop f ] if ;
 
 {
     mod-integer-integer
