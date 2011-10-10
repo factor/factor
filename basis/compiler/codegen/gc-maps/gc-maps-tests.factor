@@ -1,7 +1,8 @@
 USING: namespaces byte-arrays make compiler.codegen.gc-maps
-bit-arrays accessors classes.struct tools.test kernel math
-sequences alien.c-types specialized-arrays boxes
-compiler.cfg.instructions system cpu.architecture ;
+compiler.codegen.relocation bit-arrays accessors classes.struct
+tools.test kernel math sequences alien.c-types
+specialized-arrays boxes compiler.cfg.instructions system
+cpu.architecture ;
 SPECIALIZED-ARRAY: uint
 IN: compiler.codegen.gc-maps.tests
 
@@ -20,6 +21,7 @@ M: fake-cpu gc-root-offset ;
 
 [ ] [
     [
+        init-relocation
         init-gc-maps
 
         50 <byte-array> %
