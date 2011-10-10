@@ -740,13 +740,13 @@ cpu x86.64? [
 
 [
     V{
-        T{ ##peek f 5 D 0 }
-        T{ ##sar-imm f 0 5 $[ tag-bits get ] }
-        T{ ##peek f 6 D 1 }
-        T{ ##sar-imm f 1 6 $[ tag-bits get ] }
-        T{ ##mul f 2 0 1 }
-        T{ ##mul-imm f 3 2 -16 }
-        T{ ##replace f 3 D 0 }
+        T{ ##peek { dst 0 } { loc D 0 } }
+        T{ ##peek { dst 1 } { loc D 1 } }
+        T{ ##sar-imm { dst 5 } { src1 0 } { src2 4 } }
+        T{ ##sar-imm { dst 6 } { src1 1 } { src2 4 } }
+        T{ ##mul { dst 2 } { src1 5 } { src2 6 } }
+        T{ ##mul-imm { dst 3 } { src1 2 } { src2 -16 } }
+        T{ ##replace { src 3 } { loc D 0 } }
     }
 ] [
     V{
