@@ -24,7 +24,7 @@ IN: compiler.tree.propagation.transforms
 ] "custom-inlining" set-word-prop
 
 : rem-custom-inlining ( inputs -- quot/f )
-    dup first value-info class integer class<= [
+    dup first value-info class>> integer class<= [
         second value-info literal>> dup integer?
         [ power-of-2? [ 1 - bitand ] f ? ] [ drop f ] if
     ] [ drop f ] if ;
