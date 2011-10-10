@@ -29,10 +29,6 @@ SYMBOL: X
     { { 0 X } drop }
 } define-identities
 
-\ mod {
-    { { X 1 } 0 }
-} define-identities
-
 \ bitand {
     { { X -1 } drop }
     { { -1 X } nip }
