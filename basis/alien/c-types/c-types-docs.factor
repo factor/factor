@@ -1,6 +1,6 @@
-USING: alien alien.complex help.syntax help.markup libc kernel.private
-byte-arrays strings hashtables alien.syntax alien.strings sequences
-io.encodings.string debugger destructors vocabs.loader
+USING: alien help.syntax help.markup libc kernel.private
+byte-arrays strings hashtables alien.syntax alien.strings
+sequences io.encodings.string debugger destructors vocabs.loader
 classes.struct math kernel ;
 QUALIFIED: math
 QUALIFIED: sequences
@@ -76,10 +76,6 @@ HELP: float
 { $description "This C type represents a single-precision IEEE 754 floating-point type. Input values will be converted to Factor " { $link math:float } "s and demoted to single-precision; output values will be returned as Factor " { $link math:float } "s." } ;
 HELP: double
 { $description "This C type represents a double-precision IEEE 754 floating-point type. Input values will be converted to Factor " { $link math:float } "s; output values will be returned as Factor " { $link math:float } "s." } ;
-HELP: complex-float
-{ $description "This C type represents a single-precision IEEE 754 floating-point complex type. Input values will be converted from Factor " { $link math:complex } " objects into a single-precision complex float type; output values will be returned as Factor " { $link math:complex } " objects." } ;
-HELP: complex-double
-{ $description "This C type represents a double-precision IEEE 754 floating-point complex type. Input values will be converted from Factor " { $link math:complex } " objects into a double-precision complex float type; output values will be returned as Factor " { $link math:complex } " objects." } ;
 
 HELP: pointer:
 { $syntax "pointer: c-type" }
@@ -125,11 +121,8 @@ ARTICLE: "c-types.primitives" "Primitive C types"
     { { $link float } { "single-precision float (not the same as Factor's " { $link math:float } " class!)" } }
     { { $link double } { "double-precision float (the same format as Factor's " { $link math:float } " objects)" } }
 }
-"The following C99 complex number types are defined in the " { $vocab-link "alien.complex" } " vocabulary:"
-{ $table
-    { { $link complex-float } { "C99 or Fortran " { $snippet "complex float" } " type, converted to and from Factor " { $link math:complex } " values" } }
-    { { $link complex-double } { "C99 or Fortran " { $snippet "complex double" } " type, converted to and from Factor " { $link math:complex } " values" } }
-}
+"C99 complex number types are defined in the " { $vocab-link "alien.complex" } " vocabulary."
+$nl
 "When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision." ;
 
 ARTICLE: "c-types.pointers" "Pointer and array types"
