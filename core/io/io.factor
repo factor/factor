@@ -9,8 +9,10 @@ SYMBOLS: +byte+ +character+ ;
 GENERIC: stream-element-type ( stream -- type )
 
 GENERIC: stream-read1 ( stream -- elt )
+GENERIC: stream-read-unsafe ( n buf stream -- n' )
 GENERIC: stream-read ( n stream -- seq )
 GENERIC: stream-read-until ( seps stream -- seq sep/f )
+GENERIC: stream-read-partial-unsafe ( n buf stream -- n' )
 GENERIC: stream-read-partial ( n stream -- seq )
 GENERIC: stream-readln ( stream -- str/f )
 
