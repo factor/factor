@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators continuations destructors kernel
-math namespaces sequences ;
+USING: accessors byte-arrays combinators continuations destructors
+kernel math namespaces sequences sequences.private ;
 IN: io
 
 SYMBOLS: +byte+ +character+ ;
@@ -122,3 +122,20 @@ PRIVATE>
 : stream-copy ( in out -- )
     [ [ [ write ] each-block ] with-output-stream ]
     curry with-input-stream ;
+
+! Implement stream-read and stream-read-partial in terms of -unsafe
+
+MIXIN: noncopying-reader
+
+: (new-sequence-for-stream) ( n stream -- seq )
+    stream-element-exemplar new-sequence ; inline
+
+: (read-into-new) ( n stream quot -- byte-array/f )
+    [ 2dup (new-sequence-for-stream) swap ] dip curry keep
+    over 0 = [ 2drop f ] [ resize ] if ; inline
+
+M: noncopying-reader stream-read
+    [ stream-read-unsafe ] (read-into-new) ; inline
+
+M: noncopying-reader stream-read-partial
+    [ stream-read-partial-unsafe ] (read-into-new) ; inline
