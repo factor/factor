@@ -20,7 +20,7 @@ M: c-stream stream-seek
         {
             { seek-absolute [ 0 ] }
             { seek-relative [ 1 ] }
-            { seek-end [ 2 ] }
+            { seek-end      [ 2 ] }
             [ bad-seek-type ]
         } case
     ] [ handle>> ] bi* fseek ;
@@ -45,8 +45,13 @@ TUPLE: c-reader < c-stream ;
 
 M: c-reader stream-element-type drop +byte+ ;
 
-M: c-reader stream-read dup check-disposed handle>> fread ;
+M: c-reader stream-read-unsafe dup check-disposed handle>> fread-unsafe ;
+M: c-reader stream-read
+    [ dup <byte-array> ] dip
+    [ stream-read-unsafe ] curry keep
+    over 0 = [ 2drop f ] [ resize-byte-array ] if ;
 
+M: c-reader stream-read-partial-unsafe stream-read-unsafe ;
 M: c-reader stream-read-partial stream-read ;
 
 M: c-reader stream-read1 dup check-disposed handle>> fgetc ;
