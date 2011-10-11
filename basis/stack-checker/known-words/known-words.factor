@@ -409,7 +409,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ float>fixnum { float } { fixnum } define-primitive \ bignum>fixnum make-foldable
 \ fpu-state { } { } define-primitive
 \ fputc { object alien } { } define-primitive
-\ fread { integer alien } { object } define-primitive
+\ fread-unsafe { integer c-ptr alien } { integer } define-primitive
 \ fseek { integer integer alien } { } define-primitive
 \ ftell { alien } { integer } define-primitive
 \ fwrite { c-ptr integer alien } { } define-primitive
