@@ -6,9 +6,9 @@ continuations debugger destructors init io io.backend
 io.backend.windows io.files io.files.private io.files.windows
 io.launcher io.pathnames io.pipes io.pipes.windows io.ports
 kernel libc locals make math namespaces prettyprint sequences
-specialized-arrays splitting
+specialized-arrays splitting splitting.monotonic
 strings system threads windows windows.errors windows.handles
-windows.kernel32 windows.types ;
+windows.kernel32 windows.types combinators.short-circuit ;
 SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: void*
 IN: io.launcher.windows
