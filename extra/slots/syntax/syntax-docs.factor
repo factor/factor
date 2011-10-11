@@ -47,7 +47,7 @@ HELP: copy-slots{
            "TUPLE: thing1 a b ;"
            "TUPLE: thing2 a b c ;"
            "1 2 thing1 boa 11 22 33 thing2 boa copy-slots{ a b } ."
-           "T{ thing2 f 1 2 33 }"
+           "T{ thing2 { a 1 } { b 2 } { c 33 } }"
 } ;
 
 ARTICLE: "slots.syntax" "Slots syntax sugar"
