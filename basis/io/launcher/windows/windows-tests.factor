@@ -13,6 +13,12 @@ IN: io.launcher.windows.tests
 
 [ "bob \"mac arthur\\\\\"" ] [ { "bob" "mac arthur\\" } join-arguments ] unit-test
 
+! Bug #245
+[ "\\\"hi\\\"" ] [ { "\"hi\"" } join-arguments ] unit-test
+
+[ "\"\\\"hi you\\\"\"" ] [ { "\"hi you\"" } join-arguments ] unit-test
+
+
 [ ] [
     <process>
         "notepad" >>command
