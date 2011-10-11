@@ -40,15 +40,25 @@ HELP: set-slots[
            "T{ rectangle { width 3 } { height 5 } }"
 } ;
 
+HELP: copy-slots{
+{ $description "Copy slots from the first object to the second and return the second object." }
+{ $example "USING: prettyprint slots.syntax kernel ;"
+           "IN: slots.syntax.example"
+           "TUPLE: thing1 a b ;"
+           "TUPLE: thing2 a b c ;"
+           "1 2 thing1 boa 11 22 33 thing2 boa copy-slots{ a b } ."
+           "T{ thing2 f 1 2 33 }"
+} ;
+
 ARTICLE: "slots.syntax" "Slots syntax sugar"
 "The " { $vocab-link "slots.syntax" } " vocabulary provides an alternative syntax for getting and setting multiple values of a tuple." $nl
 "Syntax sugar for cleaving slots to the stack:"
-{ $subsections POSTPONE: slots[ }
+{ $subsections POSTPONE: slots[ POSTPONE: get[ }
 "Cleaving slots to an array:"
-{ $subsections POSTPONE: slots{ }
+{ $subsections POSTPONE: slots{ POSTPONE: get{ }
 "Setting slots from the stack:"
-{ $subsections POSTPONE: set-slots[ }
+{ $subsections POSTPONE: set-slots[ POSTPONE: set[ }
 "Setting slots from an array:"
-{ $subsections POSTPONE: set-slots{ } ;
+{ $subsections POSTPONE: set-slots{ POSTPONE: set{ } ;
 
 ABOUT: "slots.syntax"
