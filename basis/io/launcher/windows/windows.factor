@@ -58,7 +58,11 @@ TUPLE: CreateProcess-args
     0 count-trailing-backslashes
     2 * CHAR: \\ <repetition> append ;
 
+: escape-double-quote ( str -- newstr )
+    "\"" split "\\\"" join ;
+
 : escape-argument ( str -- newstr )
+    escape-double-quote
     CHAR: \s over member? [
         fix-trailing-backslashes "\"" dup surround
     ] when ;
