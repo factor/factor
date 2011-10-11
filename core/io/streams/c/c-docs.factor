@@ -14,6 +14,7 @@ ARTICLE: "io.streams.c" "ANSI C streams"
     fwrite
     fflush
     fclose
+    fputc
     fgetc
     fread-unsafe
 }
@@ -56,15 +57,15 @@ HELP: fclose ( alien -- )
 { $values { "alien" "a C FILE* handle" } }
 { $description "Closes a C FILE* handle." } ;
 
-HELP: fgetc ( alien -- ch/f )
-{ $values { "alien" "a C FILE* handle" } { "ch/f" "a character or " { $link f } } }
+HELP: fgetc ( alien -- byte/f )
+{ $values { "alien" "a C FILE* handle" } { "byte/f" "an integer from 0 to 255 or " { $link f } } }
 { $description "Reads a single byte from a C FILE* handle, and outputs " { $link f } " on end of file." } 
 { $errors "Throws an error if the input operation failed." } ;
 
-HELP: fputc ( alien -- ch/f )
-{ $values { "alien" "a C FILE* handle" } { "ch/f" "a character or " { $link f } } }
-{ $description "Reads a single byte from a C FILE* handle, and outputs " { $link f } " on end of file." } 
-{ $errors "Throws an error if the input operation failed." } ;
+HELP: fputc ( byte alien -- ch/f )
+{ $values { "byte" "an integer from 0 to 255" } { "alien" "a C FILE* handle" } }
+{ $description "Writes a single byte to a C FILE* handle." }
+{ $errors "Throws an error if the output operation failed." } ;
 
 HELP: fread-unsafe ( n buf alien -- str/f )
 { $values { "n" "a positive integer" } { "buf" c-ptr } { "alien" "a C FILE* handle" } { "count" integer } }
