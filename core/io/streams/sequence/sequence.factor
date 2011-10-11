@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences io io.streams.plain kernel accessors math math.order
-growable destructors combinators ;
+growable destructors combinators sequences.private ;
 IN: io.streams.sequence
 
 ! Readers
@@ -17,26 +17,29 @@ SLOT: i
 : sequence-read1 ( stream -- elt/f )
     [ >sequence-stream< ?nth ] [ next ] bi ; inline
 
-: add-length ( n stream -- i+n )
-    [ i>> + ] [ underlying>> length ] bi min ; inline
+: (sequence-read-length) ( n buf stream -- buf count )
+    [ underlying>> length ] [ i>> ] bi - rot min ; inline
 
-: (sequence-read) ( n stream -- seq/f )
-    [ add-length ] keep
-    [ [ swap dup ] change-i drop ]
-    [ underlying>> ] bi
-    subseq ; inline
+: <sequence-copy> ( dest n i src -- n copy )
+    [ 0 ] 3curry dip <copy> ; inline
 
-: sequence-read ( n stream -- seq/f )
+: (sequence-read) ( n buf stream -- count )
+    [ (sequence-read-length) ]
+    [ [ dup pick + ] change-i underlying>> ] bi
+    [ <sequence-copy> (copy) drop ] 2curry keep ; inline
+
+: sequence-read-unsafe ( n buf stream -- count )
     dup >sequence-stream< bounds-check?
-    [ (sequence-read) ] [ 2drop f ] if ; inline
+    [ (sequence-read) ] [ 3drop 0 ] if ; inline
 
 : find-sep ( seps stream -- sep/f n )
     swap [ >sequence-stream< swap tail-slice ] dip
-    [ member-eq? ] curry find swap ; inline
+    [ member-eq? ] curry [ find swap ] curry keep
+    over [ drop ] [ nip length ] if ; inline
 
 : sequence-read-until ( separators stream -- seq sep/f )
     [ find-sep ] keep
-    [ sequence-read ] [ next ] bi swap ; inline
+    [ [ sequence-read-unsafe ] (read-into-new) ] [ next ] bi swap ; inline
 
 ! Writers
 M: growable dispose drop ;

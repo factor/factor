@@ -15,11 +15,12 @@ M: byte-vector stream-element-type drop +byte+ ;
     dup encoder? [ stream>> ] when >byte-array ; inline
 
 TUPLE: byte-reader { underlying byte-array read-only } { i array-capacity } ;
+INSTANCE: byte-reader noncopying-reader
 
 M: byte-reader stream-element-type drop +byte+ ;
 
-M: byte-reader stream-read-partial stream-read ;
-M: byte-reader stream-read sequence-read ;
+M: byte-reader stream-read-partial-unsafe sequence-read-unsafe ;
+M: byte-reader stream-read-unsafe sequence-read-unsafe ;
 M: byte-reader stream-read1 sequence-read1 ;
 M: byte-reader stream-read-until sequence-read-until ;
 M: byte-reader dispose drop ;
