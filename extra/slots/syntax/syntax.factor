@@ -12,14 +12,29 @@ SYNTAX: slots{
     "}" [ reader-word 1quotation ] map-tokens
     '[ [ _ cleave ] output>array ] append! ;
 
-: writer-word* ( name -- word )
+: >>writer-word ( name -- word )
+    ">>" prepend "accessors" lookup ;
+    
+: writer-word<< ( name -- word )
     ">>" prepend "accessors" lookup ;
 
 SYNTAX: set-slots[
-    "]" [ writer-word* 1quotation ] map-tokens
+    "]" [ >>writer-word 1quotation ] map-tokens
     '[ _ spread ] append! ;
 
 SYNTAX: set-slots{
-    "}" [ writer-word* 1quotation ] map-tokens
+    "}" [ >>writer-word 1quotation ] map-tokens
     [ length ] [ ] bi
     '[ _ firstn _ spread ] append! ;
+
+SYNTAX: copy-slots{
+    "}" [
+        [ reader-word 1quotation ]
+        [ writer-word<< 1quotation ] bi append
+    ] map-tokens
+    '[ swap _ cleave ] append! ;
+    
+SYNTAX: get[ POSTPONE: slots[ ;
+SYNTAX: get{ POSTPONE: slots{ ;
+SYNTAX: set[ POSTPONE: set-slots[ ;
+SYNTAX: set{ POSTPONE: set-slots{ ;
