@@ -58,9 +58,26 @@ TUPLE: CreateProcess-args
     0 count-trailing-backslashes
     2 * CHAR: \\ <repetition> append ;
 
+! Find groups of \, groups of \ followed by ", or naked "
 : escape-double-quote ( str -- newstr )
-    "\"" split "\\\"" join ;
+    [
+        { [ drop CHAR: \ = ] [ nip "\\\"" member? ] } 2&&
+    ] monotonic-split [
+        dup last CHAR: " = [
+            dup length 1 > [
+                ! String of backslashes + double-quote
+                length 1 - 2 * CHAR: \ <repetition> "\\\"" append
+            ] [
+                ! Single double-quote
+                drop "\\\""
+            ] if
+        ] when
+    ] map "" concat-as ;
 
+! Naked double-quotes get a backslash before them
+! Backslashes before a double-quote get doubled in the output
+! If there's a space, double trailing backslashes and surround by quotes
+! See http://msdn.microsoft.com/en-us/library/ms647232.aspx
 : escape-argument ( str -- newstr )
     escape-double-quote
     CHAR: \s over member? [

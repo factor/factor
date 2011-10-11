@@ -18,6 +18,27 @@ IN: io.launcher.windows.tests
 
 [ "\"\\\"hi you\\\"\"" ] [ { "\"hi you\"" } join-arguments ] unit-test
 
+! Commented line -- what should appear on the command line
+! \foo\\bar\\\bas\ -> \foo\\bar\\\bas\
+[ "\\foo\\\\bar\\\\\\bas\\" ]
+[ { "\\foo\\\\bar\\\\\\bas\\" } join-arguments ] unit-test
+
+! \"foo"\\bar\\\bas\ -> \\\"foo\"\\bar\\\bas\
+[ "\\\\\\\"foo\\\"\\\\bar\\\\\\bas\\" ]
+[ { "\\\"foo\"\\\\bar\\\\\\bas\\" } join-arguments ] unit-test
+
+! \foo\\"bar"\\\bas\ -> \foo\\\\\"bar\"\\\bas\
+[ "\\foo\\\\\\\\\\\"bar\\\"\\\\\\bas\\" ]
+[ { "\\foo\\\\\"bar\"\\\\\\bas\\" } join-arguments ] unit-test
+
+! \foo\\bar\\\"bas"\ -> \foo\\bar\\\\\\\"bas\"\
+[ "\\foo\\\\bar\\\\\\\\\\\\\\\"bas\\\"\\" ]
+[ { "\\foo\\\\bar\\\\\\\"bas\"\\" } join-arguments ] unit-test
+
+! \foo\\bar bar\\\bas\ -> "\foo\\bar bar\\\bas\\"
+[ "\"\\foo\\\\bar bar\\\\\\bas\\\\\"" ]
+[ { "\\foo\\\\bar bar\\\\\\bas\\" } join-arguments ] unit-test
+
 
 [ ] [
     <process>
