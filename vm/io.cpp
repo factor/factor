@@ -201,34 +201,19 @@ void factor_vm::primitive_fgetc()
 void factor_vm::primitive_fread()
 {
 	FILE *file = pop_file_handle();
+	void *buf = (void*)alien_offset(ctx->pop());
 	fixnum size = unbox_array_size();
 
 	if(size == 0)
 	{
-		ctx->push(tag<string>(allot_string(0,0)));
+		ctx->push(from_unsigned_cell(0));
 		return;
 	}
 
-	data_root<byte_array> buf(allot_uninitialized_array<byte_array>(size),this);
-
-	size_t c = safe_fread(buf.untagged() + 1,1,size,file);
-	if(c == 0)
-	{
+	size_t c = safe_fread(buf,1,size,file);
+	if(c == 0 || feof(file))
 		clearerr(file);
-		ctx->push(false_object);
-	}
-	else
-	{
-		if(feof(file))
-		{
-			clearerr(file);
-			byte_array *new_buf = allot_byte_array(c);
-			memcpy(new_buf->data<char>(), buf->data<char>(),c);
-			buf = new_buf;
-		}
-
-		ctx->push(buf.value());
-	}
+	ctx->push(from_unsigned_cell(c));
 }
 
 void factor_vm::primitive_fputc()
