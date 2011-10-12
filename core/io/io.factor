@@ -81,14 +81,17 @@ SYMBOL: error-stream
 
 <PRIVATE
 
-: (stream-element-exemplar) ( type -- exemplar )
-    {
+: stream-exemplar ( stream -- exemplar )
+    stream-element-type {
         { +byte+ [ B{ } ] }
         { +character+ [ "" ] }
     } case ; inline
 
-: stream-element-exemplar ( stream -- exemplar )
-    stream-element-type (stream-element-exemplar) ; inline
+: stream-exemplar-growable ( stream -- exemplar )
+    stream-element-type {
+        { +byte+ [ BV{ } ] }
+        { +character+ [ SBUF" " ] }
+    } case ; inline
 
 PRIVATE>
 
@@ -120,7 +123,7 @@ PRIVATE>
 : stream-contents ( stream -- seq )
     [
         [ [ ] collector [ each-stream-block ] dip { } like ]
-        [ stream-element-exemplar concat-as ] bi
+        [ stream-exemplar concat-as ] bi
     ] with-disposal ;
 
 : stream-contents-length ( stream -- n )
@@ -147,7 +150,7 @@ PRIVATE>
 MIXIN: noncopying-reader
 
 : (new-sequence-for-stream) ( n stream -- seq )
-    stream-element-exemplar new-sequence ; inline
+    stream-exemplar new-sequence ; inline
 
 : (read-into-new) ( n stream quot -- byte-array/f )
     [ 2dup (new-sequence-for-stream) swap ] dip curry keep

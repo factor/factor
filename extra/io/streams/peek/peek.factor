@@ -9,17 +9,11 @@ TUPLE: peek-stream stream peeked ;
 
 M: peek-stream dispose stream>> dispose ;
 
-: stream-exemplar-growable ( stream -- exemplar )
-    stream-element-type {
-        { +byte+ [ BV{ } ] }
-        { +character+ [ SBUF" " ] }
-    } case ; inline
-
 : stream-new-resizable ( n stream -- exemplar )
-    stream-element-exemplar new-resizable ; inline
+    stream-exemplar new-resizable ; inline
 
 : stream-like ( sequence stream -- sequence' )
-    stream-element-exemplar like ; inline
+    stream-exemplar like ; inline
 
 : stream-clone-resizable ( sequence stream -- sequence' )
     stream-exemplar-growable clone-like ; inline
@@ -52,7 +46,7 @@ M:: peek-stream stream-read ( n stream -- sequence )
         ] [
             peeked <reversed>
             n #peeked - stream stream>> stream-read
-            stream stream-element-exemplar append-as
+            stream stream-exemplar append-as
 
             stream stream-exemplar-growable clone stream peeked<<
         ] if
@@ -83,7 +77,7 @@ M: peek-stream stream-flush stream>> stream-flush ;
 
 : stream-peek ( n stream -- seq )
     2dup peeked>> { [ length <= ] [ length 0 > ] } 1&& [
-        [ peeked>> <reversed> swap head ] [ stream-element-exemplar like ] bi
+        [ peeked>> <reversed> swap head ] [ stream-exemplar like ] bi
     ] [
         [ nip ]
         [ stream-read ] 2bi
