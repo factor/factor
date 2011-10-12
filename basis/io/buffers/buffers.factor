@@ -44,12 +44,15 @@ M: buffer dispose* ptr>> free ;
 : buffer@ ( buffer -- alien )
     [ pos>> ] [ ptr>> ] bi <displaced-alien> ; inline
 
-: buffer-read ( n buffer -- byte-array )
+: buffer-read-unsafe ( n buffer -- n ptr )
     [ buffer-length min ] keep
-    [ buffer@ ] [ buffer-consume ] 2bi
-    swap memory>byte-array ;
+    [ buffer@ ] [ buffer-consume ] 2bi ; inline
+
+: buffer-read ( n buffer -- byte-array )
+    buffer-read-unsafe swap memory>byte-array ;
 
 HINTS: buffer-read fixnum buffer ;
+
 
 : buffer-end ( buffer -- alien )
     [ fill>> ] [ ptr>> ] bi <displaced-alien> ; inline
