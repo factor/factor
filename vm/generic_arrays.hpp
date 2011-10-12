@@ -35,7 +35,7 @@ template<typename Array> Array *factor_vm::reallot_array(Array *array_, cell cap
 {
 	data_root<Array> array(array_,this);
 
-	if (array_capacity(array) == capacity)
+	if (array_capacity(array.untagged()) == capacity)
 		return array.untagged();
 
 	if(reallot_array_in_place_p(array.untagged(),capacity))
