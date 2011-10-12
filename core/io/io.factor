@@ -110,14 +110,14 @@ PRIVATE>
 : each-stream-block ( ... stream quot: ( ... block -- ... ) -- ... )
     swap [ 65536 swap stream-read-partial ] curry each-morsel ; inline
 
-: each-stream-block* ( ... buffer stream quot: ( ... n ptr -- ... ) -- ... )
-    -rot [ [ byte-length ] [ >c-ptr ] bi ] dip
+: each-stream-block* ( ... buffer stream quot: ( ... n buffer -- ... ) -- ... )
+    -rot [ [ length ] keep ] dip
     [ [ stream-read-partial-unsafe ] curry keep ] 3curry each-morsel ; inline
 
 : each-block ( ... quot: ( ... block -- ... ) -- ... )
     input-stream get swap each-stream-block ; inline
 
-: each-block* ( ... quot: ( ... block -- ... ) -- ... )
+: each-block* ( ... buffer quot: ( ... n ptr -- ... ) -- ... )
     input-stream get swap each-stream-block* ; inline
 
 : stream-contents ( stream -- seq )
