@@ -1,6 +1,6 @@
-USING: alien.c-types alien.data destructors io io.directories
-io.encodings.binary io.files io.files.temp kernel libc math
-sequences tools.test ;
+USING: accessors alien.c-types alien.data destructors io
+io.directories io.encodings.ascii io.encodings.binary io.files
+io.files.temp io.pipes kernel libc math sequences tools.test ;
 IN: io.ports.tests
 
 ! Make sure that writing malloced storage to a file works, and
@@ -23,3 +23,9 @@ IN: io.ports.tests
 ] unit-test
 
 [ ] [ "test.txt" temp-file delete-file ] unit-test
+
+! Getting the stream-element-type of an output-port was broken
+[ +byte+ ] [ binary <pipe> [ stream-element-type ] [ dispose ] bi ] unit-test
+[ +byte+ ] [ binary <pipe> [ out>> stream-element-type ] [ dispose ] bi ] unit-test
+[ +character+ ] [ ascii <pipe> [ stream-element-type ] [ dispose ] bi ] unit-test
+[ +character+ ] [ ascii <pipe> [ out>> stream-element-type ] [ dispose ] bi ] unit-test
