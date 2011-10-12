@@ -3,7 +3,7 @@
 USING: arrays combinators locals io.directories
 io.directories.hierarchy io.files io.launcher io.pathnames
 kernel make mason.common mason.config mason.platform namespaces
-prettyprint sequences ;
+prettyprint sequences system ;
 IN: mason.release.archive
 
 : base-name ( -- string )
@@ -11,8 +11,8 @@ IN: mason.release.archive
 
 : extension ( os -- extension )
     {
-        { "windows" [ ".zip" ] }
-        { "macosx" [ ".dmg" ] }
+        { windows [ ".zip" ] }
+        { macosx [ ".dmg" ] }
         [ drop ".tar.gz" ]
     } case ;
 
@@ -35,8 +35,8 @@ IN: mason.release.archive
 
 : make-archive ( archive-name -- )
     target-os get {
-        { "windows" [ make-windows-archive ] }
-        { "macosx" [ make-macosx-archive ] }
+        { windows [ make-windows-archive ] }
+        { macosx [ make-macosx-archive ] }
         [ drop make-unix-archive ]
     } case ;
 
