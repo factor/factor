@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors destructors io kernel locals namespaces
-sequences fry ;
+sequences fry math ;
 IN: io.streams.throwing
 
 ERROR: stream-exhausted n stream word ;
@@ -27,6 +27,14 @@ M:: throws-on-eof-stream stream-read ( n stream -- seq )
 M:: throws-on-eof-stream stream-read-partial ( n stream -- seq )
     n stream stream>> stream-read-partial
     [ n stream \ read-partial stream-exhausted ] unless* ;
+
+M:: throws-on-eof-stream stream-read-unsafe ( n buf stream -- count )
+    n buf stream stream>> stream-read-unsafe
+    dup n = [ n stream \ stream-read-unsafe stream-exhausted ] unless ;
+
+M:: throws-on-eof-stream stream-read-partial-unsafe ( n buf stream -- count )
+    n buf stream stream>> stream-read-partial-unsafe
+    [ n stream \ stream-read-partial-unsafe stream-exhausted ] when-zero ;
 
 M: throws-on-eof-stream stream-tell
     stream>> stream-tell ;
