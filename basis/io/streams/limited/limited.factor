@@ -77,6 +77,9 @@ ERROR: limit-exceeded n stream ;
     [ adjust-limited-read ] dip
     pick 0 <= [ 3drop f ] [ [ stream>> ] dip call ] if ; inline
 
+:: maybe-read-unsafe ( n buf limited-stream quot: ( n buf stream -- count ) -- count )
+    n limited-stream [| n' stream | n' buf stream quot call ] maybe-read ; inline
+
 PRIVATE>
 
 M: limited-stream stream-read1
@@ -88,6 +91,12 @@ M: limited-stream stream-read
 
 M: limited-stream stream-read-partial
     [ stream-read-partial ] maybe-read ;
+
+M: limited-stream stream-read-unsafe
+    [ stream-read-unsafe ] maybe-read-unsafe ;
+
+M: limited-stream stream-read-partial-unsafe
+    [ stream-read-partial-unsafe ] maybe-read-unsafe ;
 
 <PRIVATE
 
