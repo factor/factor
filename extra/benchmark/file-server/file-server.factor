@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays io io.encodings.binary io.servers
 io.sockets kernel math memoize namespaces sequences ;
-IN: benchmarks.file-server
+IN: benchmark.file-server
 
 : test-file-size ( -- n ) 26 2^ ;
 
