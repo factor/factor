@@ -18,13 +18,21 @@ ERROR: invalid-signed-conversion n ;
         [ invalid-signed-conversion ]
     } case ; inline
 
+<PRIVATE
+
+: byte-mask ( #bits-shift -- mask )
+    [ HEX: ff ] dip shift ; foldable
+
+PRIVATE>
+
 MACRO: byte-reverse ( n signed? -- quot )
     [
         drop
         [
             dup iota [
                 [ 1 + - -8 * ] [ nip 8 * ] 2bi
-                '[ _ shift HEX: ff bitand _ shift ]
+                [ + ] [ nip byte-mask ] 2bi
+                '[ _ shift _ bitand ]
             ] with map
         ] [ 1 - [ bitor ] n*quot ] bi
     ] [
