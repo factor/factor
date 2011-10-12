@@ -343,7 +343,6 @@ M: object infer-call* \ call bad-macro-input ;
 \ bits>double { integer } { float } define-primitive \ bits>double make-foldable
 \ bits>float { integer } { float } define-primitive \ bits>float make-foldable
 \ both-fixnums? { object object } { object } define-primitive
-\ byte-array>bignum { byte-array } { bignum } define-primitive \ byte-array>bignum make-foldable
 \ callstack { } { callstack } define-primitive \ callstack make-flushable
 \ callstack-bounds { } { alien alien } define-primitive \ callstack-bounds make-flushable
 \ callstack-for { c-ptr } { callstack } define-primitive \ callstack make-flushable

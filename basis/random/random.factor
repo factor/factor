@@ -41,7 +41,7 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 
 : random-integer ( n -- n' )
     dup log2 7 + 8 /i 1 +
-    [ random-bytes >byte-array byte-array>bignum ]
+    [ random-bytes le> ]
     [ 3 shift 2^ ] bi / * >integer ;
 
 PRIVATE>
