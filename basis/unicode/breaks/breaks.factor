@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit unicode.categories kernel math
-combinators splitting sequences math.parser io.files io assocs
-arrays namespaces make math.ranges unicode.normalize
-unicode.normalize.private values io.encodings.ascii
-unicode.data compiler.units fry unicode.categories.syntax
-alien.syntax sets accessors interval-maps memoize locals words
-simple-flat-file ;
+USING: accessors alien.syntax arrays assocs combinators
+combinators.short-circuit compiler.units fry interval-maps io
+io.encodings.ascii io.files kernel literals locals make math
+math.parser math.ranges memoize namespaces sequences
+sequences.private sets simple-flat-file splitting
+unicode.categories unicode.categories.syntax unicode.data
+unicode.normalize unicode.normalize.private values words ;
 FROM: sequences => change-nth ;
 IN: unicode.breaks
 
@@ -209,8 +209,11 @@ words init-table table
         [ f ] if*
     ] [ t ] if ;
 
+: (format/extended?) ( class -- ? )
+    ${ wExtend wFormat } member? ; inline
+
 : format/extended? ( ch -- ? )
-    word-break-prop { 4 5 } member? ;
+    word-break-prop (format/extended?) ;
 
 : (walk-up) ( str i -- j )
     swap [ format/extended? not ] find-from drop ;
@@ -239,17 +242,24 @@ words init-table table
     } case ;
 
 :: word-break-next ( old-class new-char i str -- next-class ? )
-    new-char format/extended?
-    [ old-class dup { 1 2 3 } member? ] [
-        new-char word-break-prop old-class over word-table-nth
+    new-char word-break-prop :> new-class
+    new-class (format/extended?)
+    [ old-class dup ${ wCR wLF wNewline } member? ] [
+        new-class old-class over word-table-nth
         [ str i ] dip word-break?
     ] if ;
+
+: (find-index) ( seq quot quot' -- i elt )
+    pick [ [ (each-index) ] dip call ] dip finish-find ; inline
+
+: find-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
+    [ find-integer ] (find-index) ; inline
 
 PRIVATE>
 
 : first-word ( str -- i )
-    [ unclip-slice word-break-prop over <enum> ] keep
-    '[ swap _ word-break-next ] assoc-find 2drop
+    [ unclip-slice word-break-prop over ] keep
+    '[ _ word-break-next ] find-index drop
     nip swap length or 1 + ;
 
 : >words ( str -- words )
