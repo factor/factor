@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit assocs math kernel sequences
 io.files hashtables quotations splitting grouping arrays io
-math.parser hash2 math.order byte-arrays namespaces
+math.parser math.order byte-arrays namespaces math.bitwise
 compiler.units parser io.encodings.ascii values interval-maps
 ascii sets combinators locals math.ranges sorting make
 strings.parser io.encodings.utf8 memoize simple-flat-file ;
@@ -22,12 +22,15 @@ VALUE: category-map
 VALUE: special-casing
 VALUE: properties
 
+: >2ch ( a b -- c ) [ 21 shift ] dip + ;
+: 2ch> ( c -- a b ) [ -21 shift ] [ 21 on-bits mask ] bi ;
+
 PRIVATE>
 
 VALUE: name-map
 
 : canonical-entry ( char -- seq ) canonical-map at ; inline
-: combine-chars ( a b -- char/f ) combine-map hash2 ; inline
+: combine-chars ( a b -- char/f ) >2ch combine-map at ; inline
 : compatibility-entry ( char -- seq ) compatibility-map at ; inline
 : combining-class ( char -- n ) class-map at ; inline
 : non-starter? ( char -- ? ) combining-class { 0 f } member? not ; inline
@@ -115,12 +118,11 @@ PRIVATE>
 : remove-exclusions ( alist -- alist )
     exclusions [ dup ] H{ } map>assoc assoc-diff ;
 
-: process-canonical ( data -- hash2 hash )
+: process-canonical ( data -- hash hash )
     (process-decomposed) [ first* ] filter
     [
         [ second length 2 = ] filter remove-exclusions
-        ! using 1009 as the size, the maximum load is 4
-        [ first2 first2 rot 3array ] map 1009 alist>hash2
+        [ first2 >2ch swap ] H{ } assoc-map-as
     ] [ >hashtable chain-decomposed ] bi ;
 
 : process-compatibility ( data -- hash )
@@ -209,7 +211,7 @@ load-data {
 } cleave
 
 : postprocess-class ( -- )
-    combine-map [ values ] map concat
+    combine-map keys [ 2ch> nip ] map
     [ combining-class not ] filter
     [ 0 swap class-map set-at ] each ;
 
