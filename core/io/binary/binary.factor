@@ -3,8 +3,8 @@
 USING: kernel math sequences ;
 IN: io.binary
 
-: le> ( seq -- x ) B{ } like byte-array>bignum >integer ;
-: be> ( seq -- x ) <reversed> le> ;
+: le> ( seq -- x ) dup length iota 0 [ 8 * shift + ] 2reduce ;
+: be> ( seq -- x ) 0 [ [ 8 shift ] dip + ] reduce ;
 
 : mask-byte ( x -- y ) HEX: ff bitand ; inline
 

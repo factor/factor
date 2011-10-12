@@ -181,18 +181,6 @@ unit-test
 [ 14 ] [ 13 2 align ] unit-test
 [ 11 ] [ 11 1 align ] unit-test
 
-[ HEX: 332211 ] [
-    B{ HEX: 11 HEX: 22 HEX: 33 } byte-array>bignum
-] unit-test
-
-[ HEX: 7a2c793b2ff08554 ] [
-    B{ HEX: 54 HEX: 85 HEX: f0 HEX: 2f HEX: 3b HEX: 79 HEX: 2c HEX: 7a } byte-array>bignum
-] unit-test
-
-[ HEX: 988a259c3433f237 ] [
-    B{ HEX: 37 HEX: f2 HEX: 33 HEX: 34 HEX: 9c HEX: 25 HEX: 8a HEX: 98 } byte-array>bignum
-] unit-test
-
 [ t ] [ 256 power-of-2? ] unit-test
 [ f ] [ 123 power-of-2? ] unit-test
 
