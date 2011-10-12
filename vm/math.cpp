@@ -213,24 +213,6 @@ void factor_vm::primitive_bignum_log2()
 	ctx->replace(tag<bignum>(bignum_integer_length(untag<bignum>(ctx->peek()))));
 }
 
-unsigned int factor_vm::bignum_producer(unsigned int digit)
-{
-	unsigned char *ptr = (unsigned char *)alien_offset(ctx->peek());
-	return *(ptr + digit);
-}
-
-unsigned int bignum_producer(unsigned int digit, factor_vm *parent)
-{
-	return parent->bignum_producer(digit);
-}
-
-void factor_vm::primitive_byte_array_to_bignum()
-{
-	unsigned int n_digits = (unsigned int)array_capacity(untag_check<byte_array>(ctx->peek()));
-	bignum * result = digit_stream_to_bignum(n_digits,factor::bignum_producer,0x100,0);
-	ctx->replace(tag<bignum>(result));
-}
-
 cell factor_vm::unbox_array_size_slow()
 {
 	if(tagged<object>(ctx->peek()).type() == BIGNUM_TYPE)

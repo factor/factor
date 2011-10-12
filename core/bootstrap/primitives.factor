@@ -472,7 +472,6 @@ tuple
     { "load-locals" "locals.backend" "primitive_load_locals" (( ... n -- )) }
     { "bits>double" "math" "primitive_bits_double" (( n -- x )) }
     { "bits>float" "math" "primitive_bits_float" (( n -- x )) }
-    { "byte-array>bignum" "math" "primitive_byte_array_to_bignum" (( x -- y )) }
     { "double>bits" "math" "primitive_double_bits" (( x -- n )) }
     { "float>bits" "math" "primitive_float_bits" (( x -- n )) }
     { "(format-float)" "math.parser.private" "primitive_format_float" (( n format -- byte-array )) }

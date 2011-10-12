@@ -23,7 +23,7 @@ M: object random-bytes* ( n tuple -- byte-array )
         [ 2drop ] [ random-32* 4 >le swap head append! ] if
     ] bi-curry bi* ;
 
-M: object random-32* ( tuple -- r ) 4 swap random-bytes* le> ;
+M: object random-32* ( tuple -- r ) 4 swap random-bytes* be> ;
 
 ERROR: no-random-number-generator ;
 
@@ -41,7 +41,7 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 
 : random-integer ( n -- n' )
     dup log2 7 + 8 /i 1 +
-    [ random-bytes >byte-array byte-array>bignum ]
+    [ random-bytes be> ]
     [ 3 shift 2^ ] bi / * >integer ;
 
 PRIVATE>
