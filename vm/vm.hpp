@@ -453,7 +453,6 @@ struct factor_vm
 	void primitive_bignum_not();
 	void primitive_bignum_bitp();
 	void primitive_bignum_log2();
-	unsigned int bignum_producer(unsigned int digit);
 	inline cell unbox_array_size();
 	cell unbox_array_size_slow();
 	void primitive_fixnum_to_float();
