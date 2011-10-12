@@ -27,9 +27,6 @@ IN: webapps.mason.utils
             { "windows" "Windows XP, Windows Vista or Windows 7" }
             { "macosx" "Mac OS X 10.5 Leopard" }
             { "linux" "Ubuntu Linux 9.04 (other distributions may also work)" }
-            { "freebsd" "FreeBSD 7.1" }
-            { "netbsd" "NetBSD 5.0" }
-            { "openbsd" "OpenBSD 4.5" }
         } at
     ] [
         dup cpu>> "x86.32" = [

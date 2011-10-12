@@ -18,8 +18,6 @@ CONSTANT: oses
     { "windows" "Windows" }
     { "macosx" "Mac OS X" }
     { "linux" "Linux" }
-    { "freebsd" "FreeBSD" }
-    { "openbsd" "OpenBSD" }
 }
 
 CONSTANT: cpus
