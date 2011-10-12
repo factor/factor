@@ -1,5 +1,6 @@
-USING: http http.server math sequences continuations tools.test
-io.encodings.utf8 io.encodings.binary accessors ;
+USING: accessors continuations http http.server
+io.encodings.utf8 io.encodings.binary io.streams.string kernel
+math sequences tools.test ;
 IN: http.server.tests
 
 [ t ] [ [ \ + first ] [ <500> ] recover response? ] unit-test
@@ -26,4 +27,14 @@ IN: http.server.tests
 [ "application/octet-stream" ] [
     <response>
     unparse-content-type
+] unit-test
+
+[ t ] [
+    {
+        "GET / HTTP/1.1"
+        "connection: close"
+        "host: 127.0.0.1:55532"
+        "user-agent: Factor http.client"
+    } [ "\n" join ] [ "\r\n" join ] bi
+    [ [ read-request ] with-string-reader ] bi@ =
 ] unit-test
