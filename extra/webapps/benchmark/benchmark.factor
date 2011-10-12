@@ -18,7 +18,7 @@ TUPLE: benchmark < dispatcher ;
         <hello-action> "hello" add-responder
         "resource:" <static> "static" add-responder ;
 
-: run-benchmark ( -- )
+: run-benchmark-webapp ( -- )
     <benchmark>
         main-responder set-global
     8080 httpd drop ;
@@ -31,4 +31,4 @@ TUPLE: benchmark < dispatcher ;
 !   * static content
 !     http://localhost:8080/static/readme.html
 
-MAIN: run-benchmark
+MAIN: run-benchmark-webapp
