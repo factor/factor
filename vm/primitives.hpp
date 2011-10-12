@@ -31,7 +31,6 @@ namespace factor
 	_(bits_double) \
 	_(bits_float) \
 	_(byte_array) \
-	_(byte_array_to_bignum) \
 	_(callback) \
 	_(callstack) \
 	_(callstack_bounds) \

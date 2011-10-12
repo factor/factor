@@ -1714,41 +1714,4 @@ int factor_vm::bignum_unsigned_logbitp(int shift, bignum * bignum)
 	return (digit & mask) ? 1 : 0;
 }
 
-/* Allocates memory */
-bignum *factor_vm::digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factor_vm*), unsigned int radix, int negative_p)
-{
-	BIGNUM_ASSERT ((radix > 1) && (radix <= BIGNUM_RADIX_ROOT));
-	if (n_digits == 0)
-		return (BIGNUM_ZERO ());
-	if (n_digits == 1)
-	{
-		fixnum digit = ((fixnum) ((*producer) (0,this)));
-		return (fixnum_to_bignum (negative_p ? (- digit) : digit));
-	}
-	{
-		bignum_length_type length;
-		{
-			unsigned int radix_copy = radix;
-			unsigned int log_radix = 0;
-			while (radix_copy > 0)
-			{
-				radix_copy >>= 1;
-				log_radix += 1;
-			}
-			/* This length will be at least as large as needed. */
-			length = (BIGNUM_BITS_TO_DIGITS (n_digits * log_radix));
-		}
-		{
-			bignum * result = (allot_bignum_zeroed (length, negative_p));
-			while ((n_digits--) > 0)
-			{
-				bignum_destructive_scale_up (result, ((bignum_digit_type) radix));
-				bignum_destructive_add
-					(result, ((bignum_digit_type) ((*producer) (n_digits,this))));
-			}
-			return (bignum_trim (result));
-		}
-	}
-}
-
 }
