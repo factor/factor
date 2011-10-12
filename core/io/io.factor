@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays combinators continuations destructors
+USING: accessors alien byte-arrays combinators continuations destructors
 kernel math namespaces sequences sequences.private ;
 IN: io
 
@@ -105,10 +105,17 @@ PRIVATE>
     input-stream get stream-lines ; inline
 
 : each-stream-block ( ... stream quot: ( ... block -- ... ) -- ... )
-    swap 65536 swap [ stream-read-partial ] 2curry each-morsel ; inline
+    swap [ 65536 swap stream-read-partial ] curry each-morsel ; inline
+
+: each-stream-block* ( ... buffer stream quot: ( ... n ptr -- ... ) -- ... )
+    -rot [ [ byte-length ] [ >c-ptr ] bi ] dip
+    [ [ stream-read-partial-unsafe ] curry keep ] 3curry each-morsel ; inline
 
 : each-block ( ... quot: ( ... block -- ... ) -- ... )
     input-stream get swap each-stream-block ; inline
+
+: each-block* ( ... quot: ( ... block -- ... ) -- ... )
+    input-stream get swap each-stream-block* ; inline
 
 : stream-contents ( stream -- seq )
     [
@@ -116,8 +123,20 @@ PRIVATE>
         [ stream-element-exemplar concat-as ] bi
     ] with-disposal ;
 
+: stream-contents-length ( stream -- n )
+    [ stream-tell ]
+    [ [ 0 seek-end ] dip [ stream-seek ] [ stream-tell ] bi ]
+    [ [ swap seek-absolute ] dip stream-seek ] tri ;
+
+: stream-contents* ( stream -- seq )
+    [ stream-contents-length dup (byte-array) ]
+    [ [ stream-read-unsafe drop ] curry keep ] bi ;
+
 : contents ( -- seq )
     input-stream get stream-contents ; inline
+
+: contents* ( -- seq )
+    input-stream get stream-contents* ; inline
 
 : stream-copy ( in out -- )
     [ [ [ write ] each-block ] with-output-stream ]
