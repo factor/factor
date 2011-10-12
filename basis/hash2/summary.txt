@@ -1,1 +1,0 @@
-Special-purpose fixed-size hashtable where keys are pairs of integers
