@@ -429,10 +429,6 @@ HELP: find-last-integer
 { $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find-last } "." } ;
 
-HELP: byte-array>bignum
-{ $values { "x" byte-array } { "y" bignum } }
-{ $description "Converts a byte-array, interpreted as little-endian, into a bignum integer. User code should call " { $link le> } " or " { $link be> } " instead." } ;
-
 ARTICLE: "division-by-zero" "Division by zero"
 "Behavior of division operations when a denominator of zero is used depends on the data types in question, as well as the platform being used."
 $nl

@@ -242,7 +242,6 @@ struct factor_vm
 	bignum *bignum_integer_length(bignum * x);
 	int bignum_logbitp(int shift, bignum * arg);
 	int bignum_unsigned_logbitp(int shift, bignum * bignum);
-	bignum *digit_stream_to_bignum(unsigned int n_digits, unsigned int (*producer)(unsigned int, factor_vm *), unsigned int radix, int negative_p);
 
 	//data heap
 	void init_card_decks();
@@ -454,8 +453,6 @@ struct factor_vm
 	void primitive_bignum_not();
 	void primitive_bignum_bitp();
 	void primitive_bignum_log2();
-	unsigned int bignum_producer(unsigned int digit);
-	void primitive_byte_array_to_bignum();
 	inline cell unbox_array_size();
 	cell unbox_array_size_slow();
 	void primitive_fixnum_to_float();
