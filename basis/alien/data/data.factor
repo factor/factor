@@ -2,7 +2,7 @@
 USING: accessors alien alien.arrays alien.c-types alien.strings
 arrays byte-arrays combinators combinators.short-circuit
 cpu.architecture fry generalizations io io.streams.memory kernel
-libc macros math math.functions parser sequences
+libc locals macros math math.functions parser sequences
 stack-checker.dependencies summary words ;
 QUALIFIED: math
 IN: alien.data
@@ -93,11 +93,13 @@ M: bad-byte-array-length summary
 : malloc-string ( string encoding -- alien )
     string>alien malloc-byte-array ;
 
-M: memory-stream stream-read
-    [
-        [ index>> ] [ alien>> ] bi <displaced-alien>
-        swap memory>byte-array
-    ] [ [ + ] change-index drop ] 2bi ;
+INSTANCE: memory-stream noncopying-reader
+M:: memory-stream stream-read-unsafe ( n buf stream -- count )
+    stream alien>> :> src
+    buf src n memcpy
+    n src <displaced-alien> stream alien<<
+    n ; inline
+M: memory-stream stream-read-partial-unsafe stream-read-unsafe ; inline
 
 M: value-type c-type-rep drop int-rep ;
 
