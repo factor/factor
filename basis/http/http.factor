@@ -11,7 +11,7 @@ IN: http
 CONSTANT: max-redirects 10
 
 : (read-header) ( -- alist )
-    [ read-crlf dup f like ] [ parse-header-line ] produce nip ;
+    [ read-?crlf dup f like ] [ parse-header-line ] produce nip ;
 
 : collect-headers ( assoc -- assoc' )
     H{ } clone [ '[ _ push-at ] assoc-each ] keep ;
