@@ -281,7 +281,7 @@ ERROR: no-tag class ;
 ERROR: unknown-ifd-type n ;
 
 : bytes>bits ( n/byte-array -- n )
-    dup byte-array? [ byte-array>bignum ] when ;
+    dup byte-array? [ le> ] when ;
 
 : value-length ( ifd-entry -- n )
     [ count>> ] [ type>> ] bi {
