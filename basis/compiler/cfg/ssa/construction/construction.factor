@@ -92,7 +92,7 @@ SYMBOLS: stacks pushed ;
     if ;
 
 : (top-name) ( vreg -- vreg' )
-    stacks get at [ f ] [ last ] if-empty ;
+    stacks get at ?last ;
 
 : top-name ( vreg -- vreg' )
     (top-name)
