@@ -150,9 +150,6 @@ DEFER: (parse-paragraph)
     rest
     dup last empty? [ but-last ] when ;
 
-: ?last ( seq -- elt/f )
-    [ f ] [ last ] if-empty ;
-
 : coalesce ( rows -- rows' )
     V{ } clone [
         '[

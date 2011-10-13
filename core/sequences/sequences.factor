@@ -177,6 +177,7 @@ PRIVATE>
 
 : ?first ( seq -- elt/f ) 0 swap ?nth ; inline
 : ?second ( seq -- elt/f ) 1 swap ?nth ; inline
+: ?last ( seq -- elt/f ) [ length 1 - ] [ ?nth ] bi ; inline
 
 MIXIN: virtual-sequence
 GENERIC: virtual-exemplar ( seq -- seq' )
