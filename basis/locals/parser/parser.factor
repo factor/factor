@@ -68,12 +68,18 @@ M: lambda-parser parse-quotation ( -- quotation )
     dup
     in>> [ dup pair? [ first ] when ] map make-locals ;
 
-: parse-locals-definition ( word reader -- word quot effect )
-    [ parse-locals ] dip
+: (parse-locals-definition) ( effect vars assoc reader -- word quot effect )
     ((parse-lambda)) <lambda>
     [ nip "lambda" set-word-prop ]
     [ nip rewrite-closures dup length 1 = [ first ] [ bad-rewrite ] if ]
     [ drop nip ] 3tri ; inline
+
+: parse-locals-definition ( word reader -- word quot effect )
+    [ parse-locals ] dip (parse-locals-definition) ; inline
+
+: parse-locals-method-definition ( word reader -- word quot effect )
+    [ parse-locals pick check-method-effect ] dip
+    (parse-locals-definition) ; inline
 
 : (::) ( -- word def effect )
     scan-new-word
@@ -83,6 +89,6 @@ M: lambda-parser parse-quotation ( -- quotation )
 : (M::) ( -- word def )
     scan-new-method
     [
-        [ parse-definition ] 
-        parse-locals-definition drop
+        [ parse-definition ]
+        parse-locals-method-definition drop
     ] with-method-definition ;
