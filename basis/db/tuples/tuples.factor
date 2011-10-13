@@ -152,7 +152,7 @@ ERROR: no-defined-persistent object ;
 
 : select-tuple ( query/tuple -- tuple/f )
     >query 1 >>limit [ tuple>> ] [ query>statement ] bi
-    do-select [ f ] [ first ] if-empty ;
+    do-select ?first ;
 
 : count-tuples ( query/tuple -- n )
     >query [ tuple>> ] [ <count-statement> ] bi do-count

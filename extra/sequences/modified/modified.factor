@@ -72,7 +72,7 @@ M: summed set-length ( n seq -- )
     seqs>> [ set-length ] with each ;
 
 M: summed virtual-exemplar ( summed -- seq )
-    seqs>> [ f ] [ first ] if-empty ;
+    seqs>> ?first ;
 
 : <2summed> ( seq seq -- summed-seq ) 2array <summed> ;
 : <3summed> ( seq seq seq -- summed-seq ) 3array <summed> ;
