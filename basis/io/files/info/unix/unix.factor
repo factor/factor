@@ -17,7 +17,7 @@ name-max flags id ;
 
 HOOK: new-file-system-info os ( --  file-system-info )
 
-M: unix new-file-system-info ( -- ) unix-file-system-info new ;
+M: unix new-file-system-info unix-file-system-info new ;
 
 HOOK: file-system-statfs os ( path -- statfs )
 

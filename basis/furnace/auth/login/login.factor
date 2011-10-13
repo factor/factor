@@ -30,7 +30,7 @@ M: login-realm init-realm
 M: login-realm logged-in-username
     drop permit-id get dup [ get-permit-uid ] when ;
 
-M: login-realm modify-form ( responder -- )
+M: login-realm modify-form ( responder -- xml/f )
     drop permit-id get realm get name>> permit-id-key hidden-form-field ;
 
 : <permit-cookie> ( -- cookie )
@@ -107,7 +107,7 @@ M: login-realm login-required* ( description capabilities login -- response )
         URL" $realm/login" <continue-conversation>
     ] if ;
 
-M: login-realm user-registered ( user realm -- )
+M: login-realm user-registered ( user realm -- response )
     drop successful-login ;
 
 : <login-realm> ( responder name -- realm )

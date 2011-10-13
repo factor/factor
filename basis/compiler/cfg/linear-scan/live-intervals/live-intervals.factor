@@ -138,7 +138,7 @@ M: vreg-insn compute-live-intervals* ( insn -- )
 
 GENERIC: uses-vregs* ( insn -- seq )
 
-M: gc-map-insn uses-vregs* ( insn -- )
+M: gc-map-insn uses-vregs*
     [ uses-vregs ] [ gc-map>> derived-roots>> values ] bi append ;
 
 M: vreg-insn uses-vregs* uses-vregs ;

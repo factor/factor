@@ -80,7 +80,7 @@ DEFER: avl-set
 : avl-set ( value key node -- node taller? )
     [ (avl-set) ] [ swap <avl-node> t ] if* ;
 
-M: avl set-at ( value key node -- node )
+M: avl set-at ( value key node -- )
     [ avl-set drop ] change-root drop ;
 
 : delete-select-rotate ( node -- node shorter? )

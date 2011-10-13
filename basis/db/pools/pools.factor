@@ -13,7 +13,7 @@ TUPLE: db-pool < pool db ;
 : with-db-pool ( db quot -- )
     [ <db-pool> ] dip with-pool ; inline
 
-M: db-pool make-connection ( pool -- )
+M: db-pool make-connection ( pool -- conn )
     db>> db-open ;
 
 : with-pooled-db ( pool quot -- )

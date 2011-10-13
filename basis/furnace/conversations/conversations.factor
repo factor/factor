@@ -107,7 +107,7 @@ M: conversations call-responder*
         bi
     ] [ 2drop ] if ;
 
-M: conversations modify-form ( conversations -- )
+M: conversations modify-form ( conversations -- xml/f )
     drop
     conversation-id get
     conversation-id-key

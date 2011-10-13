@@ -124,7 +124,7 @@ CONSTANT: pre-css "white-space: pre; font-family: monospace;"
 
 TUPLE: html-block-stream < html-sub-stream ;
 
-M: html-block-stream dispose ( quot style stream -- )
+M: html-block-stream dispose
     end-sub-stream format-html-div ;
 
 : border-spacing-css, ( pair -- )
