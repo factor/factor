@@ -403,6 +403,9 @@ PRIVATE>
     [ 2drop f f ]
     if ; inline
 
+: (find-index) ( seq quot quot' -- i elt )
+    pick [ [ (each-index) ] dip call ] dip finish-find ; inline
+
 : (accumulate) ( seq identity quot -- identity seq quot )
     [ swap ] dip [ curry keep ] curry ; inline
 
@@ -476,6 +479,9 @@ PRIVATE>
 
 : find-last ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ [ 1 - ] dip find-last-integer ] (find) ; inline
+
+: find-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
+    [ find-integer ] (find-index) ; inline
 
 : all? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     (each) all-integers? ; inline
