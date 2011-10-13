@@ -4,9 +4,9 @@ USING: accessors alien.syntax arrays assocs combinators
 combinators.short-circuit compiler.units fry interval-maps io
 io.encodings.ascii io.files kernel literals locals make math
 math.parser math.ranges memoize namespaces sequences
-sequences.private sets simple-flat-file splitting
-unicode.categories unicode.categories.syntax unicode.data
-unicode.normalize unicode.normalize.private values words ;
+sets simple-flat-file splitting unicode.categories
+unicode.categories.syntax unicode.data unicode.normalize
+unicode.normalize.private values words ;
 FROM: sequences => change-nth ;
 IN: unicode.breaks
 
@@ -248,12 +248,6 @@ words init-table table
         new-class old-class over word-table-nth
         [ str i ] dip word-break?
     ] if ;
-
-: (find-index) ( seq quot quot' -- i elt )
-    pick [ [ (each-index) ] dip call ] dip finish-find ; inline
-
-: find-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
-    [ find-integer ] (find-index) ; inline
 
 PRIVATE>
 
