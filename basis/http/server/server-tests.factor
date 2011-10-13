@@ -1,6 +1,6 @@
 USING: accessors continuations http http.server
 io.encodings.utf8 io.encodings.binary io.streams.string kernel
-math sequences tools.test ;
+math sequences tools.test urls ;
 IN: http.server.tests
 
 [ t ] [ [ \ + first ] [ <500> ] recover response? ] unit-test
