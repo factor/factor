@@ -77,5 +77,5 @@ FORWARD-ANALYSIS: uninitialized
 M: uninitialized-analysis transfer-set ( pair bb analysis -- pair' )
     drop [ prepare ] dip visit-block finish ;
 
-M: uninitialized-analysis join-sets ( sets analysis -- pair )
+M: uninitialized-analysis join-sets ( sets bb dfa -- set )
     2drop sift [ f ] [ [ ] [ [ (join-sets) ] 2map ] map-reduce ] if-empty ;

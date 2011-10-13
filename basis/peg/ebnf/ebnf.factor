@@ -476,7 +476,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
     ] if
   ] if ;
 
-M: ebnf-var build-locals ( code ast -- )
+M: ebnf-var build-locals ( code ast -- code )
   [
     "FROM: locals => [let :> ; FROM: kernel => dup nip ; [let " %
     " dup :> " % name>> %
@@ -485,9 +485,9 @@ M: ebnf-var build-locals ( code ast -- )
     " nip ]" %     
   ] "" make ;
 
-M: object build-locals ( code ast -- )
+M: object build-locals ( code ast -- code )
   drop ;
-   
+
 ERROR: bad-effect quot effect ;
 
 : check-action-effect ( quot -- quot )
