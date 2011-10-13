@@ -3,6 +3,8 @@
 USING: accessors combinators destructors io io.streams.plain
 kernel math namespaces sbufs sequences sequences.private
 splitting strings ;
+USING: locals ; ! XXX
+
 IN: io.encodings
 
 ! The encoding descriptor protocol
@@ -25,13 +27,14 @@ GENERIC: <decoder> ( stream encoding -- newstream )
 
 CONSTANT: replacement-char HEX: fffd
 
-TUPLE: decoder stream code cr ;
+TUPLE: decoder { stream read-only } { code read-only } { cr boolean } ;
+INSTANCE: decoder noncopying-reader
 
 ERROR: decode-error ;
 
 GENERIC: <encoder> ( stream encoding -- newstream )
 
-TUPLE: encoder stream code ;
+TUPLE: encoder { stream read-only } { code read-only } ;
 
 ERROR: encode-error ;
 
@@ -57,49 +60,44 @@ M: object <decoder> f decoder boa ; inline
     ] when nip ; inline
 
 M: decoder stream-element-type
-    drop +character+ ;
+    drop +character+ ; inline
 
-M: decoder stream-tell stream>> stream-tell ;
+M: decoder stream-tell stream>> stream-tell ; inline
 
-M: decoder stream-seek stream>> stream-seek ;
+M: decoder stream-seek stream>> stream-seek ; inline
 
-M: decoder stream-read1
-    dup >decoder< decode-char fix-read1 ;
+: (read1) ( decoder -- ch )
+    >decoder< decode-char ; inline
 
-: fix-read ( stream string -- string )
-    over cr>> [
-        over cr-
-        "\n" ?head [
-            over stream-read1 [ suffix ] when*
-        ] when
-    ] when nip ; inline
+:: fix-cr ( decoder c -- c' )
+    decoder cr>> [
+        decoder cr-
+        c CHAR: \n eq? [ decoder (read1) ] [ c ] if
+    ] [ c ] if ; inline
 
-! If we read the entire buffer, chars-read is f
-! If we hit EOF while reading, chars-read indicates how many chars were read
-: (read) ( chars-requested quot -- chars-read/f string )
-    over 0 <string> [
-        [
-            over [ swapd set-nth-unsafe f ] [ 3drop t ] if
-        ] curry compose find-integer
-    ] keep ; inline
+M: decoder stream-read1 ( decoder -- ch )
+    dup (read1) fix-cr ; inline
 
-: finish-read ( n/f string -- string/f )
-    swap {
-        { [ dup zero? ] [ 2drop f ] }
-        { [ dup not   ] [ drop ] }
-        [ head ]
-    } cond ; inline
+:: (read) ( count n buf stream encoding -- count )
+    count n = [ count ] [
+        stream encoding decode-char [
+            count buf set-nth-unsafe
+            count 1 + n buf stream encoding (read)
+        ] [ count ] if*
+    ] if ; inline recursive
 
-M: decoder stream-read
-    over 0 = [
-        2drop f
-    ] [
-        [ nip ]
-        [ >decoder< [ decode-char ] 2curry (read) finish-read ] 2bi
-        fix-read
-    ] if ;
+M:: decoder stream-read-unsafe ( n buf decoder -- count )
+    n 0 = [ 0 ] [
+        decoder >decoder< :> ( stream encoding )
+        stream encoding decode-char :> c1
+        decoder c1 fix-cr :> c1'
+        c1' [
+            c1' 0 buf set-nth-unsafe
+            1 n buf stream encoding (read)
+        ] [ 0 ] if
+    ] if ; inline
 
-M: decoder stream-read-partial stream-read ;
+M: decoder stream-read-partial-unsafe stream-read-unsafe ; inline
 
 : line-ends/eof ( stream str -- str ) f like swap cr- ; inline
 
