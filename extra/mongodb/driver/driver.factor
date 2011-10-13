@@ -240,9 +240,8 @@ M: mdb-cursor find
     t >>explain find nip . ;
 
 : find-one ( mdb-query-msg -- result/f )
-    fix-query-collection 
-    1 >>return# send-query-plain objects>>
-    [ f ] [ first ] if-empty ;
+    fix-query-collection 1 >>return#
+    send-query-plain objects>> ?first ;
 
 : count ( mdb-query-msg -- result )
     [ count-cmd make-cmd ] dip

@@ -82,8 +82,6 @@ DEFER: (parse-paragraph)
         [ [ parse-paragraph ] or-simple-title link boa ] if
     ] dip [ (parse-paragraph) cons ] [ 1list ] if* ;
 
-: ?first ( seq -- elt ) 0 swap ?nth ;
-
 : parse-big-link ( before after -- link rest )
     dup ?first CHAR: [ =
     [ parse-link ]

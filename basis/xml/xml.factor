@@ -83,8 +83,6 @@ M: closer process
     ! this does *not* affect the contents of the stack
     [ notags ] unless* ;
 
-: ?first ( seq -- elt/f ) 0 swap ?nth ;
-
 : get-prolog ( seq -- prolog )
     { "" } ?head drop
     ?first dup prolog?

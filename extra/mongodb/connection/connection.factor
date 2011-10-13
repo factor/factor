@@ -65,7 +65,7 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
 
 : send-query-1result ( collection assoc -- result )
     <mdb-query-msg> -1 >>return# send-query-plain
-    objects>> [ f ] [ first ] if-empty ;
+    objects>> ?first ;
 
 : send-cmd ( cmd -- result )
     [ cmd-collection ] [ assoc>> ] bi send-query-1result ; inline
