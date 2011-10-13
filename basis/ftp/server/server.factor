@@ -277,7 +277,7 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
     229 server-response ;
 
 : handle-MDTM ( obj -- )
-    tokenized>> 1 swap ?nth [
+    tokenized>> ?second [
         fixup-relative-path
         dup file-info dup directory? [
             drop not-a-plain-file
@@ -300,7 +300,7 @@ ERROR: no-directory-permissions ;
     "Failed to change directory." 553 server-response ;
 
 : handle-CWD ( obj -- )
-    tokenized>> 1 swap ?nth [
+    tokenized>> ?second [
         fixup-relative-path
         dup can-serve-directory? [
             set-current-directory

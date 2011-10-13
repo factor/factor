@@ -506,7 +506,7 @@ TYPED:: virtual-address-segment ( elf: Elf32/64_Ehdr address -- program-header/f
     elf elf-program-headers elf-loadable-segments [
         [ p_vaddr>> dup ] [ p_memsz>> + ] bi [a,b)
         address swap interval-contains?
-    ] filter [ f ] [ first ] if-empty ;
+    ] find nip ;
 
 TYPED:: virtual-address-section ( elf: Elf32/64_Ehdr address -- section-header/f )
     elf address virtual-address-segment :> segment
@@ -515,7 +515,7 @@ TYPED:: virtual-address-section ( elf: Elf32/64_Ehdr address -- section-header/f
     sections [
         [ sh_offset>> dup ] [ sh_size>> + ] bi [a,b)
         faddress swap interval-contains?
-    ] filter [ f ] [ first ] if-empty ;
+    ] find nip ;
 
 TYPED:: elf-segment-data ( elf: Elf32/64_Ehdr header: Elf32/64_Phdr -- uchar-array/f )
     header [ p_offset>> elf >c-ptr <displaced-alien> ] [ p_filesz>> ] bi uchar <c-direct-array> ;

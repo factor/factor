@@ -15,8 +15,7 @@ C: <word> word
     [ append ] [ [ words-length ] bi@ ] 2bi <element> ;
  
 : ?first2 ( seq -- first/f second/f )
-    [ 0 swap ?nth ]
-    [ 1 swap ?nth ] bi ;
+    [ ?first ] [ ?second ] bi ;
 
 : split-words ( seq -- half-elements )
     [ [ break?>> ] bi@ = ] monotonic-split ;

@@ -26,6 +26,6 @@ M: merged virtual@ ( n seq -- n' seq' )
     seqs>> [ length /mod ] [ nth-unsafe ] bi ; inline
 
 M: merged virtual-exemplar ( merged -- seq )
-    seqs>> [ f ] [ first ] if-empty ; inline
+    seqs>> ?first ; inline
 
 INSTANCE: merged virtual-sequence

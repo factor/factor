@@ -70,7 +70,7 @@ CONSTANT: hat-switch-matching-hash
     buttons-matching-hash device-elements-matching length ;
 
 : ?axis ( device hash -- axis/f )
-    device-elements-matching [ f ] [ first ] if-empty ;
+    device-elements-matching ?first ;
 
 : ?x-axis ( device -- ? )
     x-axis-matching-hash ?axis ;

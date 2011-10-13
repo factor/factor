@@ -241,6 +241,10 @@ unit-test
 [ -3 10 iota nth ] must-fail
 [ 11 10 iota nth ] must-fail
 
+[ f ] [ f ?first ] unit-test
+[ f ] [ { } ?first ] unit-test
+[ 0 ] [ 10 iota ?first ] unit-test
+
 [ -1/0. 0 remove-nth! ] must-fail
 [ "" ] [ "" [ CHAR: \s = ] trim ] unit-test
 [ "" ] [ "" [ CHAR: \s = ] trim-head ] unit-test
