@@ -4,7 +4,6 @@ USING: accessors alien.data fry io io.encodings.utf8 kernel
 listener namespaces readline sequences threads vocabs
 command-line vocabs.hierarchy sequences.deep locals
 splitting math ;
-QUALIFIED: readline.ffi
 IN: readline-listener
 
 <PRIVATE
