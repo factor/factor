@@ -13,7 +13,8 @@ at* assoc-size >alist set-at assoc-clone-like
 delete-at clear-assoc new-assoc assoc-like ;
 
 PROTOCOL: input-stream-protocol
-stream-read1 stream-read stream-read-partial stream-readln
+stream-read1 stream-read stream-read-partial 
+stream-read-unsafe stream-read-partial-unsafe stream-readln
 stream-read-until ;
 
 PROTOCOL: output-stream-protocol
