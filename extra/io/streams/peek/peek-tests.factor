@@ -99,3 +99,33 @@ IN: io.streams.peek.tests
         10 swap stream-read ,
     ] { } make
 ] unit-test
+
+[
+    {
+        B{ 0 1 2 3 }
+        B{ 0 1 2 3 4 5 }
+        B{ 0 1 }
+        B{ 2 3 }
+        B{ 4 5 }
+        B{ 6 7 }
+        B{ 8 9 10 11 }
+        B{ 8 9 10 11 12 13 14 15 }
+        B{ 8 9 10 11 12 13 14 15 16 17 }
+    }
+]
+[
+    [
+        [
+            26 iota >byte-array <memory-stream> <peek-stream>
+            4 over stream-peek ,
+            6 over stream-peek ,
+            2 over stream-read ,
+            2 over stream-read ,
+            2 over stream-read ,
+            2 over stream-read ,
+            4 over stream-peek ,
+            8 over stream-peek ,
+            10 swap stream-read ,
+        ] { } make
+    ] with-destructors
+] unit-test
