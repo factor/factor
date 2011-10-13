@@ -6,6 +6,7 @@ vectors ;
 IN: io.streams.peek
 
 TUPLE: peek-stream stream peeked ;
+INSTANCE: peek-stream noncopying-reader
 
 M: peek-stream dispose stream>> dispose ;
 
@@ -33,24 +34,26 @@ M: peek-stream stream-read1
         pop nip
     ] if-empty ;
 
-M:: peek-stream stream-read ( n stream -- sequence )
+M:: peek-stream stream-read-unsafe ( n buf stream -- count )
     stream peeked>> :> peeked
     peeked length :> #peeked
     #peeked 0 = [
-        n stream stream>> stream-read
+        n buf stream stream>> stream-read-unsafe
     ] [
-        ! Have we already peeked enough?
-        #peeked n > [
-            peeked <reversed> n cut [ stream stream-like ]
-            [ <reversed> stream stream-clone-resizable stream peeked<< ] bi*
+        #peeked n >= [
+            peeked <reversed> n head-slice 0 buf copy
+            peeked [ length n - ] keep shorten
+            n
         ] [
-            peeked <reversed>
-            n #peeked - stream stream>> stream-read
-            stream stream-exemplar append-as
-
-            stream stream-exemplar-growable clone stream peeked<<
+            peeked <reversed> 0 buf copy
+            0 peeked shorten
+            n #peeked - :> n'
+            buf #peeked tail-slice :> buf'
+            n' buf' stream stream-read-unsafe #peeked +
         ] if
     ] if ;
+
+M: peek-stream stream-read-partial-unsafe stream-read-unsafe ;
 
 : peek-stream-read-until ( stream seps buf -- stream seps buf sep/f )
     3dup [ [ stream-read1 dup ] dip member-eq? ] dip swap
