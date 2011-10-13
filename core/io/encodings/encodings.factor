@@ -7,6 +7,12 @@ IN: io.encodings
 
 ! The encoding descriptor protocol
 
+GENERIC: guess-encoded-length ( string-length encoding -- byte-length )
+GENERIC: guess-decoded-length ( byte-length encoding -- string-length )
+
+M: object guess-decoded-length drop ; inline
+M: object guess-encoded-length drop ; inline
+
 GENERIC: decode-char ( stream encoding -- char/f )
 
 GENERIC: encode-char ( char stream encoding -- )
@@ -31,7 +37,7 @@ ERROR: encode-error ;
 
 ! Decoding
 
-M: object <decoder> f decoder boa ;
+M: object <decoder> f decoder boa ; inline
 
 <PRIVATE
 
@@ -136,23 +142,23 @@ M: decoder stream-readln dup >decoder< decoder-readln handle-readln ;
 M: decoder dispose stream>> dispose ;
 
 ! Encoding
-M: object <encoder> encoder boa ;
+M: object <encoder> encoder boa ; inline
 
 : >encoder< ( encoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ; inline
 
 M: encoder stream-element-type
-    drop +character+ ;
+    drop +character+ ; inline
 
 M: encoder stream-write1
-    >encoder< encode-char ;
+    >encoder< encode-char ; inline
 
 M: encoder stream-write
-    >encoder< encode-string ;
+    >encoder< encode-string ; inline
 
-M: encoder dispose stream>> dispose ;
+M: encoder dispose stream>> dispose ; inline
 
-M: encoder stream-flush stream>> stream-flush ;
+M: encoder stream-flush stream>> stream-flush ; inline
 
 INSTANCE: encoder plain-writer
 PRIVATE>
