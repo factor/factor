@@ -187,6 +187,10 @@ HELP: ?second
 { $values { "seq" sequence } { "elt/f" "an object or " { $link f } } }
 { $description "A forgiving version of " { $link second } ". If the sequence has less than two elements, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
 
+HELP: ?last
+{ $values { "seq" sequence } { "elt/f" "an object or " { $link f } } }
+{ $description "A forgiving version of " { $link last } ". If the sequence is empty, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
+
 HELP: nth-unsafe
 { $values { "n" "an integer" } { "seq" sequence } { "elt" object } }
 { $contract "Unsafe variant of " { $link nth } " that does not perform bounds checks." } ;
