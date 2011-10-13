@@ -181,7 +181,20 @@ HELP: ?nth
 
 HELP: ?first
 { $values { "seq" sequence } { "elt/f" "an object or " { $link f } } }
-{ $description "A forgiving version of " { $link first } ". If the sequence is empty, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
+{ $description "A forgiving version of " { $link first } ". If the sequence is empty, or if the sequence is " { $link f } ", simply outputs " { $link f } "." }
+{ $examples
+    "On an empty sequence:"
+    { $example "USING: sequences prettyprint ;"
+               "{ } ?first ."
+               "f"
+    }
+    "Works like first on sequences with elements:"
+    { $example "USING: sequences prettyprint ;"
+               "{ 1 2 3 } ?first ."
+               "1"
+    }
+} ;
+
 
 HELP: ?second
 { $values { "seq" sequence } { "elt/f" "an object or " { $link f } } }
@@ -1466,9 +1479,9 @@ ARTICLE: "sequences-access" "Accessing sequence elements"
 "Element access by index, without raising exceptions:"
 { $subsections ?nth }
 "Concise way of extracting one of the first four elements:"
-{ $subsections first second third fourth }
+{ $subsections first second third fourth ?first ?second }
 "Extracting the last element:"
-{ $subsections last }
+{ $subsections last ?last }
 "Unpacking sequences:"
 { $subsections first2 first3 first4 }
 { $see-also nth } ;
