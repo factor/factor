@@ -18,13 +18,14 @@ IN: readline
 : current-line ( -- str )
     readline.ffi:rl_line_buffer ;
 
-: has-readline ( -- ? )
+: has-readline? ( -- ? )
     "readline" dup load-library dlsym-raw >boolean ;
 
-MACRO: set-completion ( quot -- )
+: set-completion ( quot -- )
     [
-       '[ @ [ utf8 malloc-string ] [ f ] if* ]
-       '[ _ readline.ffi:rl_compentry_func_t ]
-        (( -- alien )) define-temp
-    ] with-compilation-unit execute
-    '[ _ readline.ffi:set-rl_completion_entry_function ] ;
+       '[
+            [ @ [ utf8 malloc-string ] [ f ] if* ]
+            readline.ffi:rl_compentry_func_t
+        ] (( -- alien )) define-temp
+    ] with-compilation-unit execute( -- alien )
+    readline.ffi:set-rl_completion_entry_function ;
