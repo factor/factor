@@ -98,14 +98,14 @@ SYMBOL: redirects
     ] [ too-many-redirects ] if ; inline recursive
 
 : read-chunk-size ( -- n )
-    read-?crlf ";" split1 drop [ blank? ] trim-tail
+    read-crlf ";" split1 drop [ blank? ] trim-tail
     hex> [ "Bad chunk size" throw ] unless* ;
 
 : read-chunked ( quot: ( chunk -- ) -- )
     read-chunk-size dup zero?
     [ 2drop ] [
         read [ swap call ] [ drop ] 2bi
-        read-?crlf B{ } assert= read-chunked
+        read-crlf B{ } assert= read-chunked
     ] if ; inline recursive
 
 : read-response-body ( quot response -- )
