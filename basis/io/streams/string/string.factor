@@ -8,7 +8,6 @@ IN: io.streams.string
 
 ! Readers
 TUPLE: string-reader { underlying string read-only } { i array-capacity } ;
-INSTANCE: string-reader noncopying-reader
 
 M: string-reader stream-element-type drop +character+ ;
 M: string-reader stream-read-partial-unsafe sequence-read-unsafe ;
