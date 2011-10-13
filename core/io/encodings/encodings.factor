@@ -60,10 +60,6 @@ M: object <decoder> f decoder boa ; inline
 M: decoder stream-element-type
     drop +character+ ; inline
 
-M: decoder stream-tell stream>> stream-tell ; inline
-
-M: decoder stream-seek stream>> stream-seek ; inline
-
 : (read1) ( decoder -- ch )
     >decoder< decode-char ; inline
 
