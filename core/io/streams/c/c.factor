@@ -40,7 +40,6 @@ M: c-writer stream-write
 M: c-writer stream-flush dup check-disposed handle>> fflush ;
 
 TUPLE: c-reader < c-stream ;
-INSTANCE: c-reader noncopying-reader
 
 : <c-reader> ( handle -- stream ) c-reader new-c-stream ;
 
@@ -49,7 +48,6 @@ M: c-reader stream-element-type drop +byte+ ;
 M: c-reader stream-read-unsafe dup check-disposed handle>> fread-unsafe ;
 
 M: c-reader stream-read-partial-unsafe stream-read-unsafe ;
-M: c-reader stream-read-partial stream-read ;
 
 M: c-reader stream-read1 dup check-disposed handle>> fgetc ;
 

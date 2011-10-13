@@ -26,7 +26,6 @@ GENERIC: <decoder> ( stream encoding -- newstream )
 CONSTANT: replacement-char HEX: fffd
 
 TUPLE: decoder { stream read-only } { code read-only } { cr boolean } ;
-INSTANCE: decoder noncopying-reader
 
 ERROR: decode-error ;
 

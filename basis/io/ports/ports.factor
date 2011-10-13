@@ -29,7 +29,6 @@ TUPLE: buffered-port < port { buffer buffer } ;
         default-buffer-size get <buffer> >>buffer ; inline
 
 TUPLE: input-port < buffered-port ;
-INSTANCE: input-port noncopying-reader
 
 M: input-port stream-element-type drop +byte+ ; inline
 

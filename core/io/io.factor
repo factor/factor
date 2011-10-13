@@ -9,11 +9,9 @@ SYMBOLS: +byte+ +character+ ;
 GENERIC: stream-element-type ( stream -- type )
 
 GENERIC: stream-read1 ( stream -- elt )
-GENERIC: stream-read-unsafe ( n buf stream -- n' )
-GENERIC: stream-read ( n stream -- seq )
+GENERIC: stream-read-unsafe ( n buf stream -- count )
 GENERIC: stream-read-until ( seps stream -- seq sep/f )
-GENERIC: stream-read-partial-unsafe ( n buf stream -- n' )
-GENERIC: stream-read-partial ( n stream -- seq )
+GENERIC: stream-read-partial-unsafe ( n buf stream -- count )
 GENERIC: stream-readln ( stream -- str/f )
 
 GENERIC: stream-write1 ( elt stream -- )
@@ -37,9 +35,7 @@ SYMBOL: error-stream
 
 : readln ( -- str/f ) input-stream get stream-readln ;
 : read1 ( -- elt ) input-stream get stream-read1 ;
-: read ( n -- seq ) input-stream get stream-read ;
 : read-until ( seps -- seq sep/f ) input-stream get stream-read-until ;
-: read-partial ( n -- seq ) input-stream get stream-read-partial ;
 : tell-input ( -- n ) input-stream get stream-tell ;
 : tell-output ( -- n ) output-stream get stream-tell ;
 : seek-input ( n seek-type -- ) input-stream get stream-seek ;
@@ -93,7 +89,23 @@ SYMBOL: error-stream
         { +character+ [ SBUF" " ] }
     } case ; inline
 
+: (new-sequence-for-stream) ( n stream -- seq )
+    stream-exemplar new-sequence ; inline
+
+: (read-into-new) ( n stream quot -- byte-array/f )
+    [ 2dup (new-sequence-for-stream) swap ] dip curry keep
+    over 0 = [ 2drop f ] [ resize ] if ; inline
+
 PRIVATE>
+
+: stream-read ( n stream -- seq/f )
+    [ stream-read-unsafe ] (read-into-new) ; inline
+
+: stream-read-partial ( n stream -- seq/f )
+    [ stream-read-partial-unsafe ] (read-into-new) ; inline
+
+: read ( n -- seq ) input-stream get stream-read ;
+: read-partial ( n -- seq ) input-stream get stream-read-partial ;
 
 : each-stream-line ( ... stream quot: ( ... line -- ... ) -- ... )
     swap [ stream-readln ] curry each-morsel ; inline
@@ -137,20 +149,3 @@ PRIVATE>
 : stream-copy ( in out -- )
     [ [ [ write ] each-block ] with-output-stream ]
     curry with-input-stream ;
-
-! Implement stream-read and stream-read-partial in terms of -unsafe
-
-MIXIN: noncopying-reader
-
-: (new-sequence-for-stream) ( n stream -- seq )
-    stream-exemplar new-sequence ; inline
-
-: (read-into-new) ( n stream quot -- byte-array/f )
-    [ 2dup (new-sequence-for-stream) swap ] dip curry keep
-    over 0 = [ 2drop f ] [ resize ] if ; inline
-
-M: noncopying-reader stream-read
-    [ stream-read-unsafe ] (read-into-new) ; inline
-
-M: noncopying-reader stream-read-partial
-    [ stream-read-partial-unsafe ] (read-into-new) ; inline
