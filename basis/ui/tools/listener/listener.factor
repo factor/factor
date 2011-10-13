@@ -23,6 +23,7 @@ IN: ui.tools.listener
 ! evaluate-input resumes the thread.
 TUPLE: interactor < source-editor
 output history flag mailbox thread waiting token-model word-model popup ;
+INSTANCE: interactor noncopying-reader
 
 : register-self ( interactor -- )
     <mailbox> >>mailbox
@@ -150,15 +151,14 @@ M: interactor stream-readln
         3bi
     ] if ;
 
-M: interactor stream-read
-    swap [
-        drop ""
-    ] [
-        [ interactor-read dup [ "\n" join ] when ] dip short head
+M:: interactor stream-read-unsafe ( n buf interactor -- count )
+    n [ 0 ] [
+        interactor interactor-read dup [ "\n" join ] when
+        n short head-slice 0 buf copy
     ] if-zero ;
 
-M: interactor stream-read-partial
-    stream-read ;
+M: interactor stream-read-partial-unsafe
+    stream-read-unsafe ; inline
 
 M: interactor stream-read1
     dup interactor-read {
