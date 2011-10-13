@@ -3,8 +3,6 @@
 USING: accessors combinators destructors io io.streams.plain
 kernel math namespaces sbufs sequences sequences.private
 splitting strings ;
-USING: locals ; ! XXX
-
 IN: io.encodings
 
 ! The encoding descriptor protocol
@@ -69,32 +67,41 @@ M: decoder stream-seek stream>> stream-seek ; inline
 : (read1) ( decoder -- ch )
     >decoder< decode-char ; inline
 
-:: fix-cr ( decoder c -- c' )
-    decoder cr>> [
-        decoder cr-
-        c CHAR: \n eq? [ decoder (read1) ] [ c ] if
-    ] [ c ] if ; inline
+: fix-cr ( decoder c -- c' )
+    over cr>> [
+        over cr-
+        dup CHAR: \n eq? [ drop (read1) ] [ nip ] if
+    ] [ nip ] if ; inline
 
 M: decoder stream-read1 ( decoder -- ch )
     dup (read1) fix-cr ; inline
 
-:: (read) ( count n buf stream encoding -- count )
-    count n = [ count ] [
-        stream encoding decode-char [
-            count buf set-nth-unsafe
-            count 1 + n buf stream encoding (read)
-        ] [ count ] if*
+: (read-first) ( n buf decoder -- buf stream encoding n c )
+    [ rot [ >decoder< ] dip 2over decode-char ]
+    [ swap fix-cr ] bi ; inline
+
+: (store-read) ( buf stream encoding n c i -- buf stream encoding n )
+    [ rot [ set-nth-unsafe ] keep ] 2curry 3dip ; inline
+
+: (finish-read) ( buf stream encoding n i -- i )
+    2nip 2nip ; inline
+
+: (read-next) ( stream encoding n i -- stream encoding n i c )
+    [ 2dup decode-char ] 2dip rot ; inline
+
+: (read-rest) ( buf stream encoding n i -- count )
+    2dup = [ (finish-read) ] [
+        (read-next) [
+            swap [ (store-read) ] [ 1 + ] bi (read-rest)
+        ] [ (finish-read) ] if*
     ] if ; inline recursive
 
-M:: decoder stream-read-unsafe ( n buf decoder -- count )
-    n 0 = [ 0 ] [
-        decoder >decoder< :> ( stream encoding )
-        stream encoding decode-char :> c1
-        decoder c1 fix-cr :> c1'
-        c1' [
-            c1' 0 buf set-nth-unsafe
-            1 n buf stream encoding (read)
-        ] [ 0 ] if
+M: decoder stream-read-unsafe ( n buf decoder -- count )
+    pick 0 = [ 3drop 0 ] [
+        (read-first) [
+            0 (store-read)
+            1 (read-rest)
+        ] [ 2drop 2drop 0 ] if*
     ] if ; inline
 
 M: decoder stream-read-partial-unsafe stream-read-unsafe ; inline
