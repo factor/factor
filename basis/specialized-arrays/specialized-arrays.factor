@@ -36,6 +36,9 @@ M: pointer underlying-type
 GENERIC: nth-c-ptr ( n seq -- displaced-alien )
 GENERIC: direct-like ( alien len exemplar -- seq )
 
+M: byte-array nth-c-ptr <displaced-alien> ; inline
+M: byte-array direct-like drop uchar <c-direct-array> ; inline
+
 FUNCTOR: define-array ( T -- )
 
 A          DEFINES-CLASS ${T}-array
@@ -179,3 +182,5 @@ SYNTAX: SPECIALIZED-ARRAY:
 { "specialized-arrays" "prettyprint" } "specialized-arrays.prettyprint" require-when
 
 { "specialized-arrays" "mirrors" } "specialized-arrays.mirrors" require-when
+
+uchar define-array-vocab drop
