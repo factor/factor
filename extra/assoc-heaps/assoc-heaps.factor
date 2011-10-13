@@ -26,5 +26,5 @@ M: assoc-heap heap-pop ( assoc-heap -- value key )
 M: assoc-heap heap-peek ( assoc-heap -- value key )
     heap>> heap-peek ;
 
-M: assoc-heap heap-empty? ( assoc-heap -- value key )
+M: assoc-heap heap-empty? ( assoc-heap -- ? )
     heap>> heap-empty? ;

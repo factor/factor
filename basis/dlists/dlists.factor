@@ -85,7 +85,7 @@ M: dlist push-back* ( obj dlist -- dlist-node )
 
 ERROR: empty-dlist ;
 
-M: empty-dlist summary ( dlist -- )
+M: empty-dlist summary ( dlist -- string )
     drop "Empty dlist" ;
 
 M: dlist peek-front ( dlist -- obj )

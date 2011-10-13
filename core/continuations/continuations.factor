@@ -110,7 +110,7 @@ SYMBOL: thread-error-hook ! ( error thread -- )
 
 thread-error-hook [ [ die ] ] initialize
 
-M: object error-in-thread ( error thread -- )
+M: object error-in-thread ( error thread -- * )
     thread-error-hook get-global call( error thread -- * ) ;
 
 : in-callback? ( -- ? ) 3 context-object ;
