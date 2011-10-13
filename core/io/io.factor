@@ -33,19 +33,22 @@ SYMBOL: input-stream
 SYMBOL: output-stream
 SYMBOL: error-stream
 
-: readln ( -- str/f ) input-stream get stream-readln ;
-: read1 ( -- elt ) input-stream get stream-read1 ;
-: read-until ( seps -- seq sep/f ) input-stream get stream-read-until ;
-: tell-input ( -- n ) input-stream get stream-tell ;
-: tell-output ( -- n ) output-stream get stream-tell ;
-: seek-input ( n seek-type -- ) input-stream get stream-seek ;
-: seek-output ( n seek-type -- ) output-stream get stream-seek ;
+: readln ( -- str/f ) input-stream get stream-readln ; inline
+: read1 ( -- elt ) input-stream get stream-read1 ; inline
+: read-unsafe ( n buf -- count ) input-stream get stream-read-unsafe ; inline
+: read-partial-unsafe ( n buf -- count )
+    input-stream get stream-read-partial-unsafe ; inline
+: read-until ( seps -- seq sep/f ) input-stream get stream-read-until ; inline
+: tell-input ( -- n ) input-stream get stream-tell ; inline
+: tell-output ( -- n ) output-stream get stream-tell ; inline
+: seek-input ( n seek-type -- ) input-stream get stream-seek ; inline
+: seek-output ( n seek-type -- ) output-stream get stream-seek ; inline
 
-: write1 ( elt -- ) output-stream get stream-write1 ;
-: write ( seq -- ) output-stream get stream-write ;
-: flush ( -- ) output-stream get stream-flush ;
+: write1 ( elt -- ) output-stream get stream-write1 ; inline
+: write ( seq -- ) output-stream get stream-write ; inline
+: flush ( -- ) output-stream get stream-flush ; inline
 
-: nl ( -- ) output-stream get stream-nl ;
+: nl ( -- ) output-stream get stream-nl ; inline
 
 : with-input-stream* ( stream quot -- )
     input-stream swap with-variable ; inline
@@ -68,7 +71,7 @@ SYMBOL: error-stream
     #! buffer before closing the FD.
     swapd [ with-output-stream ] curry with-input-stream ; inline
 
-: print ( str -- ) output-stream get stream-print ;
+: print ( str -- ) output-stream get stream-print ; inline
 
 : bl ( -- ) " " write ;
 
@@ -104,8 +107,8 @@ PRIVATE>
 : stream-read-partial ( n stream -- seq/f )
     [ stream-read-partial-unsafe ] (read-into-new) ; inline
 
-: read ( n -- seq ) input-stream get stream-read ;
-: read-partial ( n -- seq ) input-stream get stream-read-partial ;
+: read ( n -- seq ) input-stream get stream-read ; inline
+: read-partial ( n -- seq ) input-stream get stream-read-partial ; inline
 
 : each-stream-line ( ... stream quot: ( ... line -- ... ) -- ... )
     swap [ stream-readln ] curry each-morsel ; inline
