@@ -86,12 +86,6 @@ M: limited-stream stream-read1
     1 swap 
     [ nip stream-read1 ] maybe-read ;
 
-M: limited-stream stream-read
-    [ stream-read ] maybe-read ;
-
-M: limited-stream stream-read-partial
-    [ stream-read-partial ] maybe-read ;
-
 M: limited-stream stream-read-unsafe
     [ stream-read-unsafe ] maybe-read-unsafe ;
 

@@ -23,7 +23,6 @@ IN: ui.tools.listener
 ! evaluate-input resumes the thread.
 TUPLE: interactor < source-editor
 output history flag mailbox thread waiting token-model word-model popup ;
-INSTANCE: interactor noncopying-reader
 
 : register-self ( interactor -- )
     <mailbox> >>mailbox

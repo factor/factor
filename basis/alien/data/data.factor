@@ -93,7 +93,6 @@ M: bad-byte-array-length summary
 : malloc-string ( string encoding -- alien )
     string>alien malloc-byte-array ;
 
-INSTANCE: memory-stream noncopying-reader
 M:: memory-stream stream-read-unsafe ( n buf stream -- count )
     stream alien>> :> src
     buf src n memcpy

@@ -20,14 +20,6 @@ M:: throws-on-eof-stream stream-read1 ( stream -- obj )
     stream stream>> stream-read1
     [ 1 stream \ read1 stream-exhausted ] unless* ;
 
-M:: throws-on-eof-stream stream-read ( n stream -- seq )
-    n stream stream>> stream-read
-    dup length n = [ n stream \ read stream-exhausted ] unless ;
-
-M:: throws-on-eof-stream stream-read-partial ( n stream -- seq )
-    n stream stream>> stream-read-partial
-    [ n stream \ read-partial stream-exhausted ] unless* ;
-
 M:: throws-on-eof-stream stream-read-unsafe ( n buf stream -- count )
     n buf stream stream>> stream-read-unsafe
     dup n = [ n stream \ stream-read-unsafe stream-exhausted ] unless ;
