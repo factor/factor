@@ -60,14 +60,28 @@ M: f topic>filename* drop \ f topic>filename* ;
 
 M: topic url-of topic>filename ;
 
-: help-stylesheet ( -- string )
+: help-stylesheet ( -- xml )
     "vocab:help/html/stylesheet.css" ascii file-contents
     [XML <style><-></style> XML] ;
 
+: help-navbar ( -- xml )
+    [XML
+        <div class="navbar">
+        <b> Factor Documentation </b> |
+        <a href="/">Home</a> |
+        <a href="article-conventions.html">Glossary</a> |
+        <form method="post" action="/search" style="display:inline;">
+            <input name="search" type="text"/>
+            <button type="submit">Search</button>
+        </form>
+        <a href="http://factorcode.org" style="float:right; padding: 4px;">factorcode.org</a>
+        </div>
+     XML] ;
+
 : help>html ( topic -- xml )
-    [ article-title ]
+    [ article-title " - Factor Documentation" append ]
     [ drop help-stylesheet ]
-    [ [ print-topic ] with-html-writer ]
+    [ [ print-topic ] with-html-writer help-navbar prepend ]
     tri simple-page ;
 
 : generate-help-file ( topic -- )
