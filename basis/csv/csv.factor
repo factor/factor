@@ -12,24 +12,21 @@ CHAR: , delimiter set-global
 <PRIVATE
 
 : delimiter> ( -- delimiter ) delimiter get ; inline
-    
+
 DEFER: quoted-field ( -- endchar )
-    
-: trim-whitespace ( str -- str )
-    [ blank? ] trim ; inline
 
 : skip-to-field-end ( -- endchar )
   "\n" delimiter> suffix read-until nip ; inline
-  
+
 : not-quoted-field ( -- endchar )
     "\"\n" delimiter> suffix read-until
     dup {
         { CHAR: "    [ 2drop quoted-field ] }
-        { delimiter> [ swap trim-whitespace % ] }
-        { CHAR: \n   [ swap trim-whitespace % ] }
-        { f          [ swap trim-whitespace % ] }
+        { delimiter> [ swap [ blank? ] trim % ] }
+        { CHAR: \n   [ swap [ blank? ] trim % ] }
+        { f          [ swap [ blank? ] trim % ] }
     } case ;
-  
+
 : maybe-escaped-quote ( -- endchar )
     read1 dup {
         { CHAR: "    [ , quoted-field ] }
@@ -37,7 +34,7 @@ DEFER: quoted-field ( -- endchar )
         { CHAR: \n   [ ] }
         [ 2drop skip-to-field-end ]
     } case ;
-  
+
 : quoted-field ( -- endchar )
     "\"" read-until
     drop % maybe-escaped-quote ;
@@ -46,7 +43,7 @@ DEFER: quoted-field ( -- endchar )
     [ not-quoted-field ] "" make  ;
 
 : (row) ( -- sep )
-    field , 
+    field ,
     dup delimiter> = [ drop (row) ] when ;
 
 : row ( -- eof? array[string] )
@@ -56,7 +53,7 @@ DEFER: quoted-field ( -- endchar )
     row
     dup [ empty? ] all? [ drop ] [ , ] if
     [ (csv) ] when ;
-  
+
 PRIVATE>
 
 : csv-row ( stream -- row )
@@ -78,7 +75,7 @@ PRIVATE>
 <PRIVATE
 
 : needs-escaping? ( cell -- ? )
-    [ { [ "\n\"" member? ] [ delimiter get = ] } 1|| ] any? ; inline
+    [ { [ "\n\"" member? ] [ delimiter> = ] } 1|| ] any? ; inline
 
 : escape-quotes ( cell -- cell' )
     [
@@ -90,22 +87,22 @@ PRIVATE>
 
 : enclose-in-quotes ( cell -- cell' )
     "\"" dup surround ; inline
-    
+
 : escape-if-required ( cell -- cell' )
     dup needs-escaping?
     [ escape-quotes enclose-in-quotes ] when ; inline
 
 PRIVATE>
-    
+
 : write-row ( row -- )
-    [ delimiter get write1 ]
+    [ delimiter> write1 ]
     [ escape-if-required write ] interleave nl ; inline
 
 <PRIVATE
 
 : (write-csv) ( rows -- )
     [ write-row ] each ;
-    
+
 PRIVATE>
 
 : write-csv ( rows stream -- )
@@ -113,5 +110,5 @@ PRIVATE>
 
 : csv>string ( csv -- string )
     [ (write-csv) ] with-string-writer ;
-    
+
 : csv>file ( rows path encoding -- ) <file-writer> write-csv ;
