@@ -28,8 +28,7 @@ TUPLE: entry title url description date ;
     [ rfc822>timestamp ] [ drop rfc3339>timestamp ] recover ;
 
 : rss1.0-entry ( tag -- entry )
-    entry new
-    swap {
+    <entry> swap {
         [ "title" tag-named children>string >>title ]
         [ "link" tag-named children>string >url >>url ]
         [ "description" tag-named children>string >>description ]
@@ -41,16 +40,14 @@ TUPLE: entry title url description date ;
     } cleave ;
 
 : rss1.0 ( xml -- feed )
-    feed new
-    swap [
+    <feed> swap [
         "channel" tag-named
         [ "title" tag-named children>string >>title ]
         [ "link" tag-named children>string >url >>url ] bi
     ] [ "item" tags-named [ rss1.0-entry ] map set-entries ] bi ;
 
 : rss2.0-entry ( tag -- entry )
-    entry new
-    swap {
+    <entry> swap {
         [ "title" tag-named children>string >>title ]
         [ { "link" "guid" } any-tag-named children>string >url >>url ]
         [ { "description" "encoded" } any-tag-named children>string >>description ]
@@ -61,9 +58,8 @@ TUPLE: entry title url description date ;
     } cleave ;
 
 : rss2.0 ( xml -- feed )
-    feed new
-    swap
-    "channel" tag-named 
+    <feed> swap
+    "channel" tag-named
     [ "title" tag-named children>string >>title ]
     [ "link" tag-named children>string >url >>url ]
     [ "item" tags-named [ rss2.0-entry ] map set-entries ]
@@ -75,8 +71,7 @@ TUPLE: entry title url description date ;
     dup [ "href" attr >url ] when ;
 
 : atom1.0-entry ( tag -- entry )
-    entry new
-    swap {
+    <entry> swap {
         [ "title" tag-named children>string >>title ]
         [ atom-entry-link >>url ]
         [

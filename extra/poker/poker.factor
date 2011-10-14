@@ -215,7 +215,7 @@ ERROR: no-card card deck ;
         sampled 2 cut :> ( hole2 community2 )
         hole1 community community2 3append :> hand1
         hole2 community community2 3append :> hand2
-        hand1 hand2 [ best-holdem-hand 2array ] bi@ <=> +lt+ =
+        hand1 hand2 [ best-holdem-hand 2array ] compare +lt+ =
     ] count ;
 
 :: compare-holdem-hands ( holes deck n -- seq )

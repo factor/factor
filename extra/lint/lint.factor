@@ -36,6 +36,7 @@ CONSTANT: trivial-defs
         [ . ]
         [ new ]
         [ get ]
+        [ "" ]
         [ t ] [ f ]
         [ { } ]
         [ drop t ] [ drop f ] [ 2drop t ] [ 2drop f ]

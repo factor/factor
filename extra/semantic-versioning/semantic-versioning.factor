@@ -13,7 +13,7 @@ IN: semantic-versioning
 : version<=> ( version1 version2 -- <=> )
     [ split-version ] bi@ drop-prefix
     2dup [ length 0 = ] either?
-    [ [ length ] bi@ >=< ] [ [ first ] bi@ <=> ] if ;
+    [ [ length ] bi@ >=< ] [ [ first ] compare ] if ;
 
 : version< ( version1 version2 -- ? )
     version<=> +lt+ = ;
