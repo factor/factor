@@ -31,13 +31,14 @@ SYMBOL: lint-definitions-keys
 
 CONSTANT: trivial-defs
     {
-        [ drop ] [ 2array ]
+        [ drop ] [ 2drop ] [ 2array ]
         [ bitand ]
         [ . ]
+        [ new ]
         [ get ]
         [ t ] [ f ]
         [ { } ]
-        [ drop f ] [ 2drop ] [ 2drop t ]
+        [ drop t ] [ drop f ] [ 2drop t ] [ 2drop f ]
         [ cdecl ]
         [ first ] [ second ] [ third ] [ fourth ]
         [ ">" write ] [ "/>" write ]
@@ -164,5 +165,8 @@ M: word run-lint ( word -- seq ) 1array run-lint ;
 : lint-all ( -- seq ) all-words run-lint dup lint. ;
 
 : lint-vocab ( vocab -- seq ) words run-lint dup lint. ;
+
+: lint-vocabs ( prefix -- seq )
+    [ vocabs ] dip [ head? ] curry filter [ lint-vocab ] map ;
 
 : lint-word ( word -- seq ) 1array run-lint dup lint. ;

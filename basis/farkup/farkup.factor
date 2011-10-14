@@ -104,7 +104,6 @@ DEFER: (parse-paragraph)
 
 : <farkup-state> ( string -- state ) string-lines ;
 : look ( state i -- char ) swap first ?nth ;
-: done? ( state -- ? ) empty? ;
 : take-line ( state -- state' line ) unclip-slice ;
 
 : take-lines ( state char -- state' lines )
@@ -207,7 +206,7 @@ DEFER: (parse-paragraph)
     } case ;
 
 : parse-farkup ( string -- farkup )
-    <farkup-state> [ dup done? not ] [ parse-item ] produce nip sift ;
+    <farkup-state> [ dup empty? not ] [ parse-item ] produce nip sift ;
 
 CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
 

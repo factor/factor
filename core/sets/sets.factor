@@ -128,10 +128,10 @@ M: sequence cardinality
     [ [ f fast-set ] unless* [ adjoin ] keep ] change-at ;
 
 : within ( seq set -- subseq )
-    fast-set [ in? ] curry filter ;
+    tester filter ;
 
 : without ( seq set -- subseq )
-    fast-set [ in? not ] curry filter ;
+    tester [ not ] compose filter ;
 
 ! Temporarily for compatibility
 

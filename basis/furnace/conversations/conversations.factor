@@ -62,8 +62,7 @@ SYMBOL: conversation-id
 
 : init-conversations ( conversations -- )
     conversations set
-    request get request-conversation-id
-    get-conversation
+    request get request-conversation
     set-conversation ;
 
 M: conversations call-responder*

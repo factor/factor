@@ -68,7 +68,7 @@ M: insn visit-insn drop ;
 : finish ( -- pair ) ds-loc get rs-loc get 2array ;
 
 : (join-sets) ( seq1 seq2 -- seq )
-    2dup [ length ] bi@ max '[ _ 1 pad-tail ] bi@ [ bitand ] 2map ;
+    2dup max-length '[ _ 1 pad-tail ] bi@ [ bitand ] 2map ;
 
 PRIVATE>
 

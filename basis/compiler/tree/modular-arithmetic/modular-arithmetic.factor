@@ -109,7 +109,7 @@ M: node compute-modular-candidates*
 GENERIC: only-reads-low-order? ( node -- ? )
 
 : output-modular? ( #call -- ? )
-    out-d>> first modular-values get key? ;
+    out-d>> first modular-value? ;
 
 M: #call only-reads-low-order?
     {
