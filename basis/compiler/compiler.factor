@@ -33,7 +33,7 @@ SYMBOL: compiled
     } 1|| not ;
 
 : compiler-message ( string -- )
-    "trace-compilation" get [ global [ print flush ] bind ] [ drop ] if ;
+    "trace-compilation" get [ [ print flush ] with-global ] [ drop ] if ;
 
 : start ( word -- )
     dup name>> compiler-message

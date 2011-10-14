@@ -21,11 +21,11 @@ PRIVATE>
 : set ( value variable -- ) namespace set-at ;
 : on ( variable -- ) t swap set ; inline
 : off ( variable -- ) f swap set ; inline
-: get-global ( variable -- value ) global at ;
-: set-global ( value variable -- ) global set-at ;
+: get-global ( variable -- value ) global at ; inline
+: set-global ( value variable -- ) global set-at ; inline
 : change ( variable quot -- ) [ [ get ] keep ] dip dip set ; inline
 : change-global ( variable quot -- ) [ global ] dip change-at ; inline
-: +@ ( n variable -- ) [ 0 or + ] change ;
+: +@ ( n variable -- ) [ 0 or + ] change ; inline
 : inc ( variable -- ) 1 swap +@ ; inline
 : dec ( variable -- ) -1 swap +@ ; inline
 : bind ( ns quot -- ) swap >n call ndrop ; inline
@@ -33,4 +33,5 @@ PRIVATE>
 : make-assoc ( quot exemplar -- hash ) 20 swap new-assoc [ swap bind ] keep ; inline
 : with-scope ( quot -- ) 5 <hashtable> swap bind ; inline
 : with-variable ( value key quot -- ) [ associate ] dip bind ; inline
+: with-global ( quot -- ) global swap bind ; inline
 : initialize ( variable quot -- ) [ unless* ] curry change-global ; inline

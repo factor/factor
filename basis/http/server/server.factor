@@ -272,7 +272,7 @@ SYMBOL: params
     ] [ [ \ do-request log-error ] [ <500> ] bi ] recover ;
 
 : ?refresh-all ( -- )
-    development? get-global [ global [ refresh-all ] bind ] when ;
+    development? get-global [ [ refresh-all ] with-global ] when ;
 
 LOG: httpd-benchmark DEBUG
 
