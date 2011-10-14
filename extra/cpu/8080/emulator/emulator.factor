@@ -1390,17 +1390,17 @@ SYMBOL: last-opcode
   #! that would implement that instruction.
   dup " " join instruction-quotations
   [
-     "_" join [ "emulate-" % % ] "" make create-in dup last-instruction global set-at  
+     "_" join [ "emulate-" % % ] "" make create-in dup last-instruction set-global
   ] dip (( cpu -- )) define-declared ;
 
 SYNTAX: INSTRUCTION:  ";" parse-tokens parse-instructions ;
 
 SYNTAX: cycles 
   #! Set the number of cycles for the last instruction that was defined. 
-  scan-token string>number last-opcode global at instruction-cycles set-nth ; 
+  scan-token string>number last-opcode get-global instruction-cycles set-nth ; 
 
 SYNTAX: opcode ( -- )
   #! Set the opcode number for the last instruction that was defined.
-  last-instruction global at 1quotation scan-token 16 base>
-  dup last-opcode global set-at set-instruction ; 
+  last-instruction get-global 1quotation scan-token 16 base>
+  dup last-opcode set-global set-instruction ; 
 
