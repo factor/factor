@@ -170,7 +170,7 @@ HELP: throw
 { cleanup recover } related-words
 
 HELP: cleanup
-{ $values { "try" quotation } { "cleanup-always" quotation } { "cleanup-error" quotation } }
+{ $values { "try" { $quotation "( ..a -- ..a )" } } { "cleanup-always" { $quotation "( ..a -- ..b )" } } { "cleanup-error" { $quotation "( ..b -- ..b )" } } }
 { $description "Calls the " { $snippet "try" } " quotation. If no error is thrown, calls " { $snippet "cleanup-always" } " without restoring the data stack. If an error is thrown, restores the data stack, calls " { $snippet "cleanup-always" } " followed by " { $snippet "cleanup-error" } ", and rethrows the error." } ;
 
 HELP: recover
