@@ -1,19 +1,18 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors arrays assocs
-combinators.short-circuit fry hashtables io
-kernel math namespaces prettyprint quotations sequences
-sequences.deep sets slots.private vectors vocabs words
-kernel.private ;
+USING: accessors alien arrays assocs combinators.short-circuit
+fry hashtables io kernel math namespaces prettyprint quotations
+sequences sequences.deep shuffle slots.private vectors vocabs
+words xml.data ;
 IN: lint
 
-SYMBOL: def-hash
-SYMBOL: def-hash-keys
+SYMBOL: lint-definitions
+SYMBOL: lint-definitions-keys
 
 : set-hash-vector ( val key hash -- )
     2dup at -rot [ ?push ] 2dip set-at ;
 
-: more-defs ( hash -- )
+: manual-substitutions ( hash -- )
     {
         { -rot [ swap [ swap ] dip ] }
         { -rot [ swap swapd ] }
@@ -30,45 +29,32 @@ SYMBOL: def-hash-keys
         { >boolean [ f = not ] }
     } swap '[ first2 _ set-hash-vector ] each ;
 
-: accessor-words ( -- seq )
-{
-    alien-signed-1 alien-signed-2 alien-signed-4 alien-signed-8
-    alien-unsigned-1 alien-unsigned-2 alien-unsigned-4 alien-unsigned-8
-    <displaced-alien> alien-unsigned-cell set-alien-signed-cell
-    set-alien-unsigned-1 set-alien-signed-1 set-alien-unsigned-2
-    set-alien-signed-2 set-alien-unsigned-4 set-alien-signed-4
-    set-alien-unsigned-8 set-alien-signed-8
-    alien-cell alien-signed-cell set-alien-cell set-alien-unsigned-cell
-    set-alien-float alien-float
-} ;
-
-: trivial-defs ( -- seq )
+CONSTANT: trivial-defs
     {
         [ drop ] [ 2array ]
         [ bitand ]
-
         [ . ]
         [ get ]
         [ t ] [ f ]
         [ { } ]
-        [ drop f ]
+        [ drop f ] [ 2drop ] [ 2drop t ]
         [ cdecl ]
         [ first ] [ second ] [ third ] [ fourth ]
         [ ">" write ] [ "/>" write ]
-    } ;
+    }
 
 ! ! Add definitions
-H{ } clone def-hash set-global
+H{ } clone lint-definitions set-global
 
 all-words [
     dup def>> dup callable?
-    [ def-hash get-global set-hash-vector ] [ drop ] if
+    [ lint-definitions get-global set-hash-vector ] [ drop ] if
 ] each
 
 ! ! Remove definitions
 
 ! Remove empty word defs
-def-hash get-global [ drop empty? not ] assoc-filter
+lint-definitions get-global [ drop empty? not ] assoc-filter
 
 ! Remove constants [ 1 ]
 [ drop { [ length 1 = ] [ first number? ] } 1&& not ] assoc-filter
@@ -76,8 +62,10 @@ def-hash get-global [ drop empty? not ] assoc-filter
 ! Remove words that are their own definition
 [ [ [ def>> ] [ 1quotation ] bi = not ] filter ] assoc-map
 
-! Remove set-alien-cell, etc.
-[ drop [ accessor-words diff ] keep [ length ] bi@ = ] assoc-filter
+! Remove specialized*
+ [ nip [ vocabulary>> "specialized-" head? ] any? not ] assoc-filter
+
+ [ nip [ vocabulary>> "windows.messages" = ] any? not ] assoc-filter
 
 ! Remove trivial defs
 [ drop trivial-defs member? not ] assoc-filter
@@ -117,13 +105,12 @@ def-hash get-global [ drop empty? not ] assoc-filter
     [ first2 [ number? ] [ \ slot = ] bi* and not ] [ drop t ] if
 ] assoc-filter
 
+dup manual-substitutions
 
-dup more-defs
-
-[ def-hash set-global ] [ keys def-hash-keys set-global ] bi
+[ lint-definitions set-global ] [ keys lint-definitions-keys set-global ] bi
 
 : find-duplicates ( -- seq )
-    def-hash get-global [ nip length 1 > ] assoc-filter ;
+    lint-definitions get-global [ nip length 1 > ] assoc-filter ;
 
 GENERIC: lint ( obj -- seq )
 
@@ -133,20 +120,20 @@ M: object lint ( obj -- seq ) drop f ;
     { [ start ] [ member? ] } 2|| ;
 
 M: callable lint ( quot -- seq )
-    [ def-hash-keys get-global ] dip '[ _ subseq/member? ] filter ;
+    [ lint-definitions-keys get-global ] dip '[ _ subseq/member? ] filter ;
 
 M: word lint ( word -- seq )
     def>> dup callable? [ lint ] [ drop f ] if ;
 
 : word-path. ( word -- )
-    [ vocabulary>> ] [ unparse ] bi ":" glue print ;
+    [ vocabulary>> ] [ name>> ] bi ":" glue print ;
 
 : 4bl ( -- ) bl bl bl bl ;
 
 : (lint.) ( pair -- )
     first2 [ word-path. ] dip [
         [ 4bl .  "-----------------------------------" print ]
-        [ def-hash get-global at [ 4bl word-path. ] each nl ] bi
+        [ lint-definitions get-global at [ 4bl word-path. ] each nl ] bi
     ] each nl nl ;
 
 : lint. ( alist -- ) [ (lint.) ] each ;
@@ -154,7 +141,7 @@ M: word lint ( word -- seq )
 GENERIC: run-lint ( obj -- obj )
 
 : (trim-self) ( val key -- obj ? )
-    def-hash get-global at*
+    lint-definitions get-global at*
     [ dupd remove empty? not ] [ drop f ] if ;
 
 : trim-self ( seq -- newseq )
@@ -162,7 +149,7 @@ GENERIC: run-lint ( obj -- obj )
 
 : filter-symbols ( alist -- alist )
     [
-        nip first dup def-hash get-global at
+        nip first dup lint-definitions get-global at
         [ first ] bi@ literalize = not
     ] assoc-filter ;
 
