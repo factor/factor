@@ -98,7 +98,6 @@ M:: memory-stream stream-read-unsafe ( n buf stream -- count )
     buf src n memcpy
     n src <displaced-alien> stream alien<<
     n ; inline
-M: memory-stream stream-read-partial-unsafe stream-read-unsafe ; inline
 
 M: value-type c-type-rep drop int-rep ;
 
