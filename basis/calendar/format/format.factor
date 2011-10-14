@@ -205,7 +205,7 @@ ERROR: invalid-timestamp-format ;
         read-sp checked-number >>year
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute
-        " " read-token checked-number >>second
+        read-sp checked-number >>second
         readln parse-rfc822-gmt-offset >>gmt-offset ;
 
 : rfc822>timestamp ( str -- timestamp )
@@ -224,7 +224,7 @@ ERROR: invalid-timestamp-format ;
         read-sp checked-number >>year
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute
-        " " read-token checked-number >>second
+        read-sp checked-number >>second
         readln parse-rfc822-gmt-offset >>gmt-offset ;
 
 : cookie-string>timestamp-1 ( str -- timestamp )
@@ -237,7 +237,7 @@ ERROR: invalid-timestamp-format ;
         read-sp checked-number >>day
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute
-        " " read-token checked-number >>second
+        read-sp checked-number >>second
         read-sp checked-number >>year
         readln parse-rfc822-gmt-offset >>gmt-offset ;
 
