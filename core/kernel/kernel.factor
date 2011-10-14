@@ -64,11 +64,14 @@ DEFER: if
 : 4dip ( w x y z quot -- w x y z ) swap [ 3dip ] dip ; inline
 
 ! Keepers
-: keep ( x quot -- x ) over [ call ] dip ; inline
+: keep ( ..a x quot: ( ..a x -- ..b ) -- ..b x )
+    over [ call ] dip ; inline
 
-: 2keep ( x y quot -- x y ) [ 2dup ] dip 2dip ; inline
+: 2keep ( ..a x y quot: ( ..a x y -- ..b ) -- ..b x y )
+    [ 2dup ] dip 2dip ; inline
 
-: 3keep ( x y z quot -- x y z ) [ 3dup ] dip 3dip ; inline
+: 3keep ( ..a x y z quot: ( ..a x y z -- ..b ) -- ..b x y z )
+    [ 3dup ] dip 3dip ; inline
 
 ! Cleavers
 : bi ( x p q -- )
