@@ -52,8 +52,6 @@ M:: peek-stream stream-read-unsafe ( n buf stream -- count )
         ] if
     ] if ;
 
-M: peek-stream stream-read-partial-unsafe stream-read-unsafe ;
-
 : peek-stream-read-until ( stream seps buf -- stream seps buf sep/f )
     3dup [ [ stream-read1 dup ] dip member-eq? ] dip swap
     [ drop ] [ over [ push peek-stream-read-until ] [ drop ] if ] if ;

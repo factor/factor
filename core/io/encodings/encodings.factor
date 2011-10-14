@@ -99,8 +99,6 @@ M: decoder stream-read-unsafe ( n buf decoder -- count )
         ] [ 2drop 2drop 0 ] if*
     ] if ; inline
 
-M: decoder stream-read-partial-unsafe stream-read-unsafe ; inline
-
 : line-ends/eof ( stream str -- str ) f like swap cr- ; inline
 
 : line-ends\r ( stream str -- str ) swap cr+ ; inline
