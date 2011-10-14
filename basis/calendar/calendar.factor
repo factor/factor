@@ -33,19 +33,19 @@ TUPLE: timestamp
 C: <timestamp> timestamp
 
 : gmt-offset-duration ( -- duration )
-    0 0 0 gmt-offset <duration> ;
+    0 0 0 gmt-offset <duration> ; inline
 
 : <date> ( year month day -- timestamp )
-    0 0 0 gmt-offset-duration <timestamp> ;
+    0 0 0 gmt-offset-duration <timestamp> ; inline
 
 : <date-gmt> ( year month day -- timestamp )
-    0 0 0 instant <timestamp> ;
+    0 0 0 instant <timestamp> ; inline
 
 : <year> ( year -- timestamp )
-    1 1 <date> ;
+    1 1 <date> ; inline
 
 : <year-gmt> ( year -- timestamp )
-    1 1 <date-gmt> ;
+    1 1 <date-gmt> ; inline
 
 ERROR: not-a-month ;
 M: not-a-month summary
@@ -352,14 +352,14 @@ M: duration time-
     before time+ ;
 
 : <zero> ( -- timestamp )
-    0 0 0 0 0 0 instant <timestamp> ;
+    0 0 0 <date-gmt> ; inline
 
 : valid-timestamp? ( timestamp -- ? )
     clone instant >>gmt-offset
     dup <zero> time- <zero> time+ = ;
 
 : unix-1970 ( -- timestamp )
-    1970 1 1 0 0 0 instant <timestamp> ;
+    1970 <year-gmt> ; inline
 
 : millis>timestamp ( x -- timestamp )
     [ unix-1970 ] dip milliseconds time+ ;
@@ -529,16 +529,16 @@ M: timestamp end-of-year 12 >>month 31 >>day ;
 M: integer end-of-year 12 31 <date> ;
 
 : time-since-midnight ( timestamp -- duration )
-    dup midnight time- ;
+    dup midnight time- ; inline
 
 : since-1970 ( duration -- timestamp )
-    unix-1970 time+ ;
+    unix-1970 time+ ; inline
 
 : timestamp>unix-time ( timestamp -- seconds )
-    unix-1970 time- second>> ;
+    unix-1970 time- second>> ; inline
 
 : unix-time>timestamp ( seconds -- timestamp )
-    seconds unix-1970 time+ ;
+    seconds since-1970 ; inline
 
 {
     { [ os unix? ] [ "calendar.unix" ] }
