@@ -330,7 +330,7 @@ M: f ' drop \ f type-number ;
 ! Words
 
 : word-sub-primitive ( word -- obj )
-    global [ target-word ] bind sub-primitives get at ;
+    [ target-word ] with-global sub-primitives get at ;
 
 : emit-word ( word -- )
     [

@@ -254,7 +254,7 @@ This is the body of the second test.
                     1 minutes timeouts
                     "+OK POP3 server ready\r\n" write flush
                     process
-                    global [ flush ] bind
+                    [ flush ] with-global
                 ] with-stream
             ] with-disposal
         ] with-test-context

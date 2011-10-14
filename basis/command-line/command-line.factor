@@ -62,10 +62,10 @@ SYMBOL: main-vocab-hook
     ] if ;
 
 : default-cli-args ( -- )
-    global [
+    [
         "e" off
         "user-init" on
         main-vocab "run" set
-    ] bind ;
+    ] with-global ;
 
 [ default-cli-args ] "command-line" add-startup-hook

@@ -10,7 +10,7 @@ classes compiler.units generic.standard generic.single vocabs
 init kernel.private io.encodings accessors math.order
 destructors source-files parser classes.tuple.parser
 effects.parser lexer generic.parser strings.parser vocabs.loader
-vocabs.parser source-files.errors ;
+vocabs.parser source-files.errors namespaces ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -65,7 +65,7 @@ M: string error. print ;
 
 : print-error ( error -- )
     [ error. flush ] curry
-    [ global [ "Error in print-error!" print drop ] bind ]
+    [ [ "Error in print-error!" print drop ] with-global ]
     recover ;
 
 : :error ( -- )

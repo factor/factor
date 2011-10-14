@@ -15,12 +15,12 @@ IN: debugger.threads
 ! ( error thread -- )
 [
     dup initial-thread get-global eq? [ die ] [
-        global [
+        [
             error-in-thread. nl
             print-error nl
             :c
             flush
-        ] bind
+        ] with-global
         stop
     ] if
 ] thread-error-hook set-global
