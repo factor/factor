@@ -33,10 +33,10 @@ MACRO: set-firstn ( n -- )
         bi-curry '[ _ _ bi ]
     ] if ;
 
-: nappend-as ( n exemplar -- seq )
-    [ narray concat ] dip like ; inline
-
 : nappend ( n -- seq ) narray concat ; inline
+
+: nappend-as ( n exemplar -- seq )
+    [ nappend ] dip like ; inline
 
 MACRO: nmin-length ( n -- )
     dup 1 - [ min ] n*quot
