@@ -127,7 +127,7 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 
 : ip->ba ( ip -- ba ) "." split [ string>number ] map >byte-array ;
 
-: ipv6->ba ( ip -- ba ) ":" split [ 16 base> ] map [ 2 >be ] map concat ;
+: ipv6->ba ( ip -- ba ) ":" split [ hex> ] map [ 2 >be ] map concat ;
 
 : label->ba ( label -- ba ) [ >byte-array ] [ length ] bi prefix ;
 
@@ -341,7 +341,7 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : get-ipv6 ( ba i -- ip )
-  dup 16 + subseq 2 group [ be> 16 >base ] map ":" join ;
+  dup 16 + subseq 2 group [ be> >hex ] map ":" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -400,7 +400,7 @@ CONSTANT: sign-flag         HEX: 80
  
 : interrupt ( number cpu -- )
   #! Perform a hardware interrupt
-!  "***Interrupt: " write over 16 >base print 
+!  "***Interrupt: " write over >hex print
   dup f>> interrupt-flag bitand 0 = not [
     dup push-pc
     pc<<
@@ -528,32 +528,32 @@ SYMBOL: rom-root
   [ pc>> ] keep read-byte instructions nth first ;
 
 : cpu. ( cpu -- )
-  [ " PC: " write pc>> 16 >base 4 CHAR: \s pad-head write ] keep 
-  [ " B: " write b>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " C: " write c>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " D: " write d>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " E: " write e>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " F: " write f>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " H: " write h>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " L: " write l>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " A: " write a>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " SP: " write sp>> 16 >base 4 CHAR: \s pad-head write ] keep 
-  [ " cycles: " write cycles>> number>string 5 CHAR: \s pad-head write ] keep 
+  [ " PC: " write pc>> >hex 4 CHAR: \s pad-head write ] keep
+  [ " B: " write b>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " C: " write c>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " D: " write d>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " E: " write e>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " F: " write f>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " H: " write h>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " L: " write l>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " A: " write a>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " SP: " write sp>> >hex 4 CHAR: \s pad-head write ] keep
+  [ " cycles: " write cycles>> number>string 5 CHAR: \s pad-head write ] keep
   [ " " write peek-instruction name>> write " " write ] keep
   nl drop ;
 
 : cpu*. ( cpu -- )
-  [ " PC: " write pc>> 16 >base 4 CHAR: \s pad-head write ] keep 
-  [ " B: " write b>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " C: " write c>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " D: " write d>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " E: " write e>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " F: " write f>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " H: " write h>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " L: " write l>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " A: " write a>> 16 >base 2 CHAR: \s pad-head write ] keep 
-  [ " SP: " write sp>> 16 >base 4 CHAR: \s pad-head write ] keep 
-  [ " cycles: " write cycles>> number>string 5 CHAR: \s pad-head write ] keep 
+  [ " PC: " write pc>> >hex 4 CHAR: \s pad-head write ] keep
+  [ " B: " write b>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " C: " write c>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " D: " write d>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " E: " write e>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " F: " write f>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " H: " write h>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " L: " write l>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " A: " write a>> >hex 2 CHAR: \s pad-head write ] keep
+  [ " SP: " write sp>> >hex 4 CHAR: \s pad-head write ] keep
+  [ " cycles: " write cycles>> number>string 5 CHAR: \s pad-head write ] keep
   nl drop ;
 
 : register-lookup ( string -- vector )
@@ -1396,11 +1396,11 @@ SYMBOL: last-opcode
 SYNTAX: INSTRUCTION:  ";" parse-tokens parse-instructions ;
 
 SYNTAX: cycles 
-  #! Set the number of cycles for the last instruction that was defined. 
-  scan-token string>number last-opcode get-global instruction-cycles set-nth ; 
+  #! Set the number of cycles for the last instruction that was defined.
+  scan-token string>number last-opcode get-global instruction-cycles set-nth ;
 
 SYNTAX: opcode ( -- )
   #! Set the opcode number for the last instruction that was defined.
-  last-instruction get-global 1quotation scan-token 16 base>
-  dup last-opcode set-global set-instruction ; 
+  last-instruction get-global 1quotation scan-token hex>
+  dup last-opcode set-global set-instruction ;
 

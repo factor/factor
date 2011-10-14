@@ -279,6 +279,11 @@ PRIVATE>
 
 GENERIC# >base 1 ( n radix -- str )
 
+: number>string ( n -- str ) 10 >base ; inline
+: >bin ( n -- str ) 2 >base ; inline
+: >oct ( n -- str ) 8 >base ; inline
+: >hex ( n -- str ) 16 >base ; inline
+
 <PRIVATE
 
 SYMBOL: radix
@@ -345,7 +350,7 @@ M: ratio >base
     -0.0 double>bits bitand zero? "" "-" ? ;
 
 : float>hex-value ( mantissa -- str )
-    16 >base 13 CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
+    >hex 13 CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
     [ "0" ] [ ] if-empty "1." prepend ;
 
 : float>hex-expt ( mantissa -- str )
@@ -382,10 +387,5 @@ M: float >base
         { [ over -0.0 fp-bitwise= ] [ 2drop "-0.0" ] }
         [ float>base ]
     } cond ;
-
-: number>string ( n -- str ) 10 >base ; inline
-: >bin ( n -- str ) 2 >base ; inline
-: >oct ( n -- str ) 8 >base ; inline
-: >hex ( n -- str ) 16 >base ; inline
 
 : # ( n -- ) number>string % ; inline
