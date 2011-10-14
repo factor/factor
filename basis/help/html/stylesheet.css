@@ -2,3 +2,11 @@ a:link { text-decoration: none; color: #104e8b; }
 a:visited { text-decoration: none; color: #104e8b; }
 a:active { text-decoration: none; color: #104e8b; }
 a:hover { text-decoration: underline; color: #104e8b; }
+
+.navbar {
+    background-color: #eeeee0;
+    padding: 5px;
+    border: 1px solid #ccc;
+    font:9pt "Lucida Grande", "Lucida Sans Unicode", verdana, geneva, sans-serif;
+    margin-bottom: 10px;
+}
