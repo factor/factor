@@ -36,15 +36,15 @@ M: object nil? drop f ;
 
 : 1list? ( list -- ? ) { [ nil? not ] [ cdr nil? ] } 1&& ; inline
 
-: 2list ( a b -- cons ) nil cons cons ; inline
+: 2list ( a b -- cons ) 1list cons ; inline
 
-: 3list ( a b c -- cons ) nil cons cons cons ; inline
+: 3list ( a b c -- cons ) 2list cons ; inline
 
 : cadr ( list -- elt ) cdr car ; inline
  
-: 2car ( list -- car caar ) [ car ] [ cdr car ] bi ; inline
+: 2car ( list -- car caar ) [ car ] [ cadr ] bi ; inline
  
-: 3car ( list -- car cadr caddr ) [ car ] [ cdr car ] [ cdr cdr car ] tri ; inline
+: 3car ( list -- car cadr caddr ) [ car ] [ cadr ] [ cdr cadr ] tri ; inline
 
 : lnth ( n list -- elt ) swap [ cdr ] times car ; inline
 
@@ -74,10 +74,10 @@ PRIVATE>
     0 [ drop 1 + ] foldl ;
 
 : lreverse ( list -- newlist )    
-    nil [ swap cons ] foldl ;
+    nil [ swons ] foldl ;
 
 : lappend ( list1 list2 -- newlist )    
-    [ lreverse ] dip [ swap cons ] foldl ;
+    [ lreverse ] dip [ swons ] foldl ;
 
 : lcut ( list index -- before after )
     [ nil ] dip
