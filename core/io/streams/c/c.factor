@@ -47,8 +47,6 @@ M: c-reader stream-element-type drop +byte+ ;
 
 M: c-reader stream-read-unsafe dup check-disposed handle>> fread-unsafe ;
 
-M: c-reader stream-read-partial-unsafe stream-read-unsafe ;
-
 M: c-reader stream-read1 dup check-disposed handle>> fgetc ;
 
 : read-until-loop ( stream delim -- ch )
