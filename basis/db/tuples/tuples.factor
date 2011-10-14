@@ -131,8 +131,7 @@ ERROR: no-defined-persistent object ;
 : ensure-tables ( classes -- ) [ ensure-table ] each ;
 
 : insert-tuple ( tuple -- )
-    dup class ensure-defined-persistent
-    db-columns find-primary-key db-assigned-id-spec?
+    dup class ensure-defined-persistent db-assigned?
     [ insert-db-assigned-statement ] [ insert-user-assigned-statement ] if ;
 
 : update-tuple ( tuple -- )

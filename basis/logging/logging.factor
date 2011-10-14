@@ -26,7 +26,7 @@ log-level [ DEBUG ] initialize
 ERROR: undefined-log-level ;
 
 : log-level<=> ( log-level log-level -- ? )
-    [ log-levels at* [ undefined-log-level ] unless ] bi@ <=> ;
+    [ log-levels at* [ undefined-log-level ] unless ] compare ;
 
 : log? ( log-level -- ? )
     log-level get log-level<=> +lt+ = not ;

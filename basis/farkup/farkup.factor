@@ -102,9 +102,7 @@ DEFER: (parse-paragraph)
         ] [ drop "" like 1list ] if*
     ] if-empty ;
 
-: <farkup-state> ( string -- state ) string-lines ;
 : look ( state i -- char ) swap first ?nth ;
-: take-line ( state -- state' line ) unclip-slice ;
 
 : take-lines ( state char -- state' lines )
     dupd '[ ?first _ = not ] find drop
@@ -136,7 +134,7 @@ DEFER: (parse-paragraph)
     [ trim= parse-paragraph ] dip boa ; inline
 
 : parse-heading ( state -- state' heading )
-    take-line dup count= {
+    unclip-slice dup count= {
         { 0 [ make-paragraph ] }
         { 1 [ heading1 make-heading ] }
         { 2 [ heading2 make-heading ] }
@@ -168,7 +166,7 @@ DEFER: (parse-paragraph)
     ] map table boa ;
 
 : parse-line ( state -- state' item )
-    take-line dup "___" =
+    unclip-slice dup "___" =
     [ drop line new ] [ make-paragraph ] if ;
 
 : parse-list ( state char class -- state' list )
@@ -185,12 +183,12 @@ DEFER: (parse-paragraph)
 
 : parse-code ( state -- state' item )
     dup 1 look CHAR: [ =
-    [ take-line make-paragraph ] [
+    [ unclip-slice make-paragraph ] [
         dup "{" take-until [
             [ nip rest ] dip
             "}]" take-until
             [ code boa ] dip swap
-        ] [ drop take-line make-paragraph ] if*
+        ] [ drop unclip-slice make-paragraph ] if*
     ] if ;
 
 : parse-item ( state -- state' item )
@@ -202,11 +200,11 @@ DEFER: (parse-paragraph)
         { CHAR: # [ parse-ol ] } 
         { CHAR: [ [ parse-code ] }
         { f [ rest-slice f ] }
-        [ drop take-line make-paragraph ]
+        [ drop unclip-slice make-paragraph ]
     } case ;
 
 : parse-farkup ( string -- farkup )
-    <farkup-state> [ dup empty? not ] [ parse-item ] produce nip sift ;
+    string-lines [ dup empty? not ] [ parse-item ] produce nip sift ;
 
 CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
 

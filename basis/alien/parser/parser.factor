@@ -9,9 +9,6 @@ IN: alien.parser
 
 SYMBOL: current-library
 
-: parse-c-type-name ( name -- word )
-    dup search [ ] [ no-word ] ?if ;
-
 DEFER: (parse-c-type)
 
 ERROR: bad-array-type ;
@@ -26,8 +23,8 @@ ERROR: bad-array-type ;
     {
         { [ "*" ?tail ] [ (parse-c-type) <pointer> ] }
         { [ CHAR: ] over member? ] [ parse-array-type ] }
-        { [ dup search ] [ parse-c-type-name ] }
-        [ dup search [ ] [ no-word ] ?if ]
+        { [ dup search ] [ parse-word ] }
+        [ parse-word ]
     } cond ;
 
 : c-array? ( c-type -- ? )

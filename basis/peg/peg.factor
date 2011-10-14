@@ -22,9 +22,9 @@ SYMBOL: error-stack
 
 : (merge-errors) ( a b -- c )
   {
-    { [ over position>> not ] [ nip ] } 
-    { [ dup  position>> not ] [ drop ] } 
-    [ 2dup [ position>> ] bi@ <=> {
+    { [ over position>> not ] [ nip ] }
+    { [ dup  position>> not ] [ drop ] }
+    [ 2dup [ position>> ] compare {
         { +lt+ [ nip ] }
         { +gt+ [ drop ] }
         { +eq+ [ messages>> over messages>> union [ position>> ] dip <parse-error> ] }

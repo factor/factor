@@ -49,7 +49,7 @@ TUPLE: lsb0-bit-writer < bit-writer ;
 : new-bit-writer ( class -- bs )
     new
         BV{ } clone >>bytes
-        0 0 <widthed> >>widthed ; inline
+        zero-widthed >>widthed ; inline
 
 : <msb0-bit-writer> ( -- bs )
     msb0-bit-writer new-bit-writer ;
