@@ -85,7 +85,7 @@ M: linux file-systems
 
 ERROR: file-system-not-found ;
 
-M: linux file-system-info ( path -- )
+M: linux file-system-info ( path -- file-system-info )
     normalize-path
     [
         [ new-file-system-info ] dip
