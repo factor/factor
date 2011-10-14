@@ -149,9 +149,11 @@ PRIVATE>
 : contents* ( -- seq )
     input-stream get stream-contents* ; inline
 
+: stream-copy* ( in out -- )
+    [ stream-write ] curry each-stream-block ; inline
+
 : stream-copy ( in out -- )
-    [ [ [ write ] each-block ] with-output-stream ]
-    curry with-input-stream ;
+    [ [ stream-copy* ] with-disposal ] curry with-disposal ;
 
 ! Default implementations of stream operations in terms of read1/write1
 

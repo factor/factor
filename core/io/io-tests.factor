@@ -1,4 +1,5 @@
-USING: accessors io kernel math parser tools.test words ;
+USING: accessors io io.streams.string kernel math parser sbufs
+sequences tools.test words ;
 IN: io.tests
 
 { f } [
@@ -62,3 +63,6 @@ M: dumb-writer stream-write1 vector>> push ; inline
     [ stream-nl ]
     [ vector>> ] tri
 ] unit-test
+
+{ SBUF" asdf" }
+[ "asdf" <string-reader> 4 <sbuf> [ stream-copy ] keep ] unit-test
