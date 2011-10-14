@@ -16,7 +16,7 @@ M: no-edit-hook summary
 SYMBOL: edit-hook
 
 : available-editors ( -- seq )
-    "editors" child-vocabs no-roots no-prefixes [ vocab-name ] map ;
+    "editors" child-vocab-names ;
 
 : editor-restarts ( -- alist )
     available-editors

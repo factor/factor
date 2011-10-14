@@ -127,7 +127,7 @@ FUNCTOR-SYNTAX: call-next-method T{ fake-call-next-method } suffix! ;
 
 PRIVATE>
 
-SYNTAX: IS [ dup search [ ] [ no-word ] ?if ] (INTERPOLATE) ;
+SYNTAX: IS [ parse-word ] (INTERPOLATE) ;
 
 SYNTAX: DEFERS [ current-vocab create ] (INTERPOLATE) ;
 

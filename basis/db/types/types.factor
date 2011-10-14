@@ -38,8 +38,7 @@ SYMBOL: IGNORE
 ERROR: no-slot ;
 
 : offset-of-slot ( string tuple -- n )
-    class superclasses [ "slots" word-prop ] map concat
-    slot-named dup [ no-slot ] unless offset>> ;
+    class all-slots slot-named dup [ no-slot ] unless offset>> ;
 
 : get-slot-named ( name tuple -- value )
     [ nip ] [ offset-of-slot ] 2bi slot ;

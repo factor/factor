@@ -26,7 +26,7 @@ TUPLE: lexer-parsing-word word line line-text column ;
     ] [ parsing-words>> push ] bi ;
 
 : pop-parsing-word ( -- )
-    lexer get parsing-words>> pop drop ;
+    lexer get parsing-words>> pop* ;
 
 : new-lexer ( text class -- lexer )
     new

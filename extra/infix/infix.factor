@@ -77,8 +77,7 @@ M: bad-stack-effect summary
     [ = ] dip 1 = and ;
 
 : find-and-check ( args argcount string -- quot )
-    dup search [ ] [ no-word ] ?if
-    [ nip ] [ check-word ] 2bi
+    parse-word [ nip ] [ check-word ] 2bi
     [ 1quotation compose ] [ bad-stack-effect ] if ;
 
 : arguments-codegen ( seq -- quot )
