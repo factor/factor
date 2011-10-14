@@ -15,9 +15,9 @@ IN: math.bitwise
 : mask ( x n -- ? ) bitand ; inline
 : mask? ( x n -- ? ) mask 0 > ; inline
 : wrap ( m n -- m' ) 1 - bitand ; inline
-: bits ( m n -- m' ) 2^ wrap ; inline
-: mask-bit ( m n -- m' ) 2^ mask ; inline
 : on-bits ( m -- n ) 2^ 1 - ; inline
+: bits ( m n -- m' ) on-bits mask ; inline
+: mask-bit ( m n -- m' ) 2^ mask ; inline
 : toggle-bit ( m n -- m' ) 2^ bitxor ; inline
 : >signed ( x n -- y )
     [ bits ] keep 2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
