@@ -152,3 +152,32 @@ PRIVATE>
 : stream-copy ( in out -- )
     [ [ [ write ] each-block ] with-output-stream ]
     curry with-input-stream ;
+
+! Default implementations of stream operations in terms of read1/write1
+
+<PRIVATE
+: read-loop ( buf stream n i -- count )
+     2dup = [ nip nip nip ] [
+        pick stream-read1 [
+            over [ pick set-nth-unsafe ] 2curry 3dip
+            1 + read-loop
+        ] [ nip nip nip ] if*
+     ] if ; inline recursive
+
+: finalize-read-until ( seq sep/f -- seq/f sep/f )
+    2dup [ empty? ] [ not ] bi* and [ 2drop f f ] when ; inline
+
+: read-until-loop ( seps stream -- seq sep/f )
+    [ [ stream-read1 dup [ rot member? not ] [ nip f ] if* ] 2curry [ ] ]
+    [ stream-exemplar ] bi produce-as swap finalize-read-until ; inline
+PRIVATE>
+
+M: object stream-read-unsafe rot 0 read-loop ;
+M: object stream-read-partial-unsafe stream-read-unsafe ; inline
+M: object stream-read-until read-until-loop ;
+M: object stream-readln
+    "\n" swap stream-read-until drop ; inline
+
+M: object stream-write [ stream-write1 ] curry each ; inline
+M: object stream-flush drop ; inline
+M: object stream-nl CHAR: \n swap stream-write1 ; inline
