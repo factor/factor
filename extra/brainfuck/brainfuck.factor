@@ -35,10 +35,10 @@ TUPLE: brainfuck pointer memory ;
     read1 set-memory ;
 
 : (>) ( brainfuck n -- brainfuck )
-    [ dup pointer>> ] dip + >>pointer ;
+    [ + ] curry change-pointer ;
 
 : (<) ( brainfuck n -- brainfuck )
-    [ dup pointer>> ] dip - >>pointer ;
+    [ - ] curry change-pointer ;
 
 : (#) ( brainfuck -- brainfuck )
     dup
