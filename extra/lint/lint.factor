@@ -3,7 +3,7 @@
 USING: accessors alien arrays assocs combinators.short-circuit
 fry hashtables io kernel math namespaces prettyprint quotations
 sequences sequences.deep shuffle slots.private vectors vocabs
-words xml.data ;
+words xml.data words.alias ;
 IN: lint
 
 SYMBOL: lint-definitions
@@ -66,6 +66,8 @@ lint-definitions get-global [ drop empty? not ] assoc-filter
  [ nip [ vocabulary>> "specialized-" head? ] any? not ] assoc-filter
 
  [ nip [ vocabulary>> "windows.messages" = ] any? not ] assoc-filter
+
+ [ nip [ alias? ] any? not ] assoc-filter
 
 ! Remove trivial defs
 [ drop trivial-defs member? not ] assoc-filter
