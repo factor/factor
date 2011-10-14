@@ -48,9 +48,9 @@ M: method pprint*
 
 M: real pprint*
     number-base get {
-        { 16 [ \ HEX: [ 16 >base text ] pprint-prefix ] }
-        {  8 [ \ OCT: [  8 >base text ] pprint-prefix ] }
-        {  2 [ \ BIN: [  2 >base text ] pprint-prefix ] }
+        { 16 [ \ HEX: [ >hex text ] pprint-prefix ] }
+        {  8 [ \ OCT: [ >oct text ] pprint-prefix ] }
+        {  2 [ \ BIN: [ >bin text ] pprint-prefix ] }
         [ drop number>string text ]
     } case ;
 
@@ -59,7 +59,7 @@ M: float pprint*
         \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
     ] [
         number-base get {
-            { 16 [ \ HEX: [ 16 >base text ] pprint-prefix ] }
+            { 16 [ \ HEX: [ >hex text ] pprint-prefix ] }
             [ drop number>string text ]
         } case
     ] if ;
