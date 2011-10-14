@@ -59,6 +59,6 @@ INSTANCE: curses-listener-stream plain-writer
     ] with-curses ;
 
 : test-listener ( -- )
-    global [ run-listener ] bind ;
+    [ run-listener ] with-global ;
 
 MAIN: run-listener
