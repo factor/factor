@@ -25,11 +25,8 @@ M: growable contract ( len seq -- )
     [ [ 0 ] 2dip set-nth-unsafe ] curry
     (each-integer) ; inline
 
-: growable-check ( n seq -- n seq )
-    over 0 < [ bounds-error ] when ; inline
-
 M: growable set-length ( n seq -- )
-    growable-check
+    bounds-check-head
     2dup length < [
         2dup contract
     ] [
@@ -40,7 +37,7 @@ M: growable set-length ( n seq -- )
 : new-size ( old -- new ) 1 + 3 * ; inline
 
 : ensure ( n seq -- n seq )
-    growable-check
+    bounds-check-head
     2dup length >= [
         2dup capacity >= [ over new-size over expand ] when
         [ >fixnum ] dip
@@ -60,7 +57,7 @@ M: growable lengthen ( n seq -- )
     ] when 2drop ; inline
 
 M: growable shorten ( n seq -- )
-    growable-check
+    bounds-check-head
     2dup length < [
         2dup contract
         2dup length<<

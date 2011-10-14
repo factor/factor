@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs definitions fry help.topics kernel
+USING: accessors arrays assocs definitions fry help kernel
 colors.constants math.rectangles models.arrow namespaces sequences
 sorting definitions.icons tools.crossref ui.gadgets ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
@@ -18,14 +18,11 @@ M: link-renderer row-value drop first ;
 
 TUPLE: links-popup < wrapper ;
 
-: sorted-links ( links -- alist )
-    [ dup article-title ] { } map>assoc sort-values ;
-
 : match? ( value str -- ? )
     swap second subseq? ;
 
 : <links-table> ( model quot -- table )
-    '[ @ sorted-links ] <arrow>
+    '[ @ sort-articles ] <arrow>
     link-renderer [ second ] <search-table>
         [ invoke-primary-operation ] >>action
         [ hide-glass ] >>hook

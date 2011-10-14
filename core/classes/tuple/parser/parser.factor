@@ -69,7 +69,7 @@ ERROR: bad-literal-tuple ;
 ERROR: bad-slot-name class slot ;
 
 : check-slot-name ( class slots name -- name )
-    2dup swap slot-named* nip [ 2nip ] [ nip bad-slot-name ] if ;
+    2dup swap slot-named [ 2nip ] [ nip bad-slot-name ] if ;
 
 : parse-slot-value ( class slots -- )
     scan-token check-slot-name scan-object 2array , scan-token {

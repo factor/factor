@@ -105,7 +105,7 @@ SYMBOL: history
     "custom-inlining" word-prop ;
 
 : inline-custom ( #call word -- ? )
-    [ dup ] [ "custom-inlining" word-prop ] bi*
+    [ dup ] [ custom-inlining? ] bi*
     call( #call -- word/quot/f )
     object swap eliminate-dispatch ;
 
