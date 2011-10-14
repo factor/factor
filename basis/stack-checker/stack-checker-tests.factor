@@ -384,7 +384,8 @@ DEFER: eee'
 [ forget-test ] must-infer
 
 [ [ cond ] infer ] [ T{ unknown-macro-input f cond } = ] must-fail-with
-[ [ bi ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
+[ [ call ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
+[ [ dip ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
 
 [ [ each ] infer ] [ T{ unknown-macro-input f each } = ] must-fail-with
 [ [ if* ] infer ] [ T{ unknown-macro-input f if* } = ] must-fail-with
