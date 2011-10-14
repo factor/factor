@@ -57,7 +57,7 @@ SYMBOL: possibilities
 : possible-reps ( vreg reps -- vreg reps )
     { tagged-rep } union
     2dup [ tagged-vregs get in? not ] [ { tagged-rep } = ] bi* and
-    [ drop { tagged-rep int-rep } ] [ ] if ;
+    [ drop { tagged-rep int-rep } ] when ;
 
 : compute-possibilities ( cfg -- )
     collect-vreg-reps

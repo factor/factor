@@ -46,8 +46,7 @@ SYMBOL: aside-id
 
 : init-asides ( asides -- )
     asides set
-    request get request-aside-id
-    get-aside
+    request get request-aside
     set-aside ;
 
 M: asides call-responder*

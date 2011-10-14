@@ -88,7 +88,7 @@ M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
     [ [ 2array suffix! ] [ enum>number 1 + ] bi ] 2bi ;
 
 : parse-enum-name ( -- name )
-    scan-token (CREATE-C-TYPE) dup save-location ;
+    CREATE-C-TYPE dup save-location ;
 
 : parse-enum-base-type ( -- base-type token )
     scan-token dup "<" =

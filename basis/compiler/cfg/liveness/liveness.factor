@@ -122,7 +122,7 @@ M: insn visit-insn drop ;
 SYMBOL: work-list
 
 : add-to-work-list ( basic-blocks -- )
-    work-list get '[ _ push-front ] each ;
+    work-list get push-all-front ;
 
 : compute-live-in ( basic-block -- live-in )
     [ live-out ] keep instructions>> transfer-liveness ;

@@ -11,14 +11,11 @@ IN: http.parsers
 : except-these ( quots -- parser )
     [ 1|| ] curry except ; inline
 
-: ctl? ( ch -- ? )
-    { [ 0 31 between? ] [ 127 = ] } 1|| ;
-
 : tspecial? ( ch -- ? )
     "()<>@,;:\\\"/[]?={} \t" member? ;
 
 : 'token' ( -- parser )
-    { [ ctl? ] [ tspecial? ] } except-these repeat1 ;
+    { [ control? ] [ tspecial? ] } except-these repeat1 ;
 
 : case-insensitive ( parser -- parser' )
     [ flatten >string >lower ] action ;
@@ -62,7 +59,7 @@ PEG: parse-request-line ( string -- triple )
     ] seq* just ;
 
 : 'text' ( -- parser )
-    [ ctl? ] except ;
+    [ control? ] except ;
 
 : 'response-code' ( -- parser )
     [ digit? ] satisfy 3 exactly-n [ string>number ] action ;
@@ -88,7 +85,7 @@ PEG: parse-response-line ( string -- triple )
     [ " \t" member? ] satisfy repeat1 ;
 
 : 'qdtext' ( -- parser )
-    { [ CHAR: " = ] [ ctl? ] } except-these ;
+    { [ CHAR: " = ] [ control? ] } except-these ;
 
 : 'quoted-char' ( -- parser )
     "\\" token hide any-char 2seq ;
@@ -97,7 +94,7 @@ PEG: parse-response-line ( string -- triple )
     'quoted-char' 'qdtext' 2choice repeat0 "\"" "\"" surrounded-by ;
 
 : 'ctext' ( -- parser )
-    { [ ctl? ] [ "()" member? ] } except-these ;
+    { [ control? ] [ "()" member? ] } except-these ;
 
 : 'comment' ( -- parser )
     'ctext' 'comment' 2choice repeat0 "(" ")" surrounded-by ;

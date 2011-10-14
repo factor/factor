@@ -288,8 +288,11 @@ C: <copy> copy-state
     [ over - check-length swap ] dip
     3dup nip new-sequence 0 swap <copy> ; inline
 
+: bounds-check-head ( n seq -- n seq )
+    over 0 < [ bounds-error ] when ; inline
+
 : check-copy ( src n dst -- src n dst )
-    3dup over 0 < [ bounds-error ] when
+    3dup bounds-check-head
     [ swap length + ] dip lengthen ; inline
 
 PRIVATE>
@@ -411,7 +414,7 @@ PRIVATE>
     pick [ [ (each-index) ] dip call ] dip finish-find ; inline
 
 : (accumulate) ( seq identity quot -- identity seq quot )
-    [ swap ] dip [ curry keep ] curry ; inline
+    swapd [ curry keep ] curry ; inline
 
 PRIVATE>
 
