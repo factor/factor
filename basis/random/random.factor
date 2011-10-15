@@ -3,8 +3,8 @@
 USING: accessors alien.c-types alien.data arrays assocs
 byte-arrays byte-vectors combinators fry io.backend io.binary
 kernel locals math math.bitwise math.constants math.functions
-math.order math.ranges namespaces sequences sets summary system
-vocabs.loader ;
+math.order math.ranges namespaces sequences sequences.private
+sets summary system vocabs.loader ;
 IN: random
 
 SYMBOL: system-random-generator
@@ -34,15 +34,21 @@ M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
 
 M: f random-32* ( obj -- * ) no-random-number-generator ;
 
+: random-32 ( -- n ) random-generator get random-32* ;
+
 : random-bytes ( n -- byte-array )
     random-generator get random-bytes* ;
 
 <PRIVATE
 
+: (random-integer) ( bits -- n required-bits )
+    [ random-32 32 ] dip 32 - [ dup 0 > ] [
+        [ 32 shift random-32 + ] [ 32 + ] [ 32 - ] tri*
+    ] while drop ;
+
 : random-integer ( n -- n' )
-    dup log2 7 + 8 /i 1 +
-    [ random-bytes be> ]
-    [ 3 shift 2^ ] bi / * >integer ;
+    dup next-power-of-2 log2 (random-integer)
+    [ * ] [ 2^ /i ] bi* ;
 
 PRIVATE>
 
@@ -60,11 +66,9 @@ M: sequence random
         [ length random-integer ] keep nth
     ] if-empty ;
 
-: random-32 ( -- n ) random-generator get random-32* ;
-
-: randomize-n-last ( seq n -- seq ) 
-    [ dup length dup ] dip - 1 max '[ dup _ > ] 
-    [ [ random ] [ 1 - ] bi [ pick exchange ] keep ]
+: randomize-n-last ( seq n -- seq )
+    [ dup length dup ] dip - 1 max '[ dup _ > ]
+    [ [ random ] [ 1 - ] bi [ pick exchange-unsafe ] keep ]
     while drop ;
 
 : randomize ( seq -- randomized )
