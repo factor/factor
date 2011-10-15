@@ -31,3 +31,8 @@ IN: trees.splay.tests
     { 1 "a" } { 2 "b" } { 3 "c" }
 } >splay >alist
 ] unit-test
+
+[ 0 ] [
+    100 iota [ dup zip >splay ] keep
+    [ over delete-at ] each assoc-size
+] unit-test
