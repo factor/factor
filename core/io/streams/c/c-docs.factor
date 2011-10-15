@@ -62,7 +62,7 @@ HELP: fgetc ( alien -- byte/f )
 { $description "Reads a single byte from a C FILE* handle, and outputs " { $link f } " on end of file." } 
 { $errors "Throws an error if the input operation failed." } ;
 
-HELP: fputc ( byte alien -- ch/f )
+HELP: fputc ( byte alien -- )
 { $values { "byte" "an integer from 0 to 255" } { "alien" "a C FILE* handle" } }
 { $description "Writes a single byte to a C FILE* handle." }
 { $errors "Throws an error if the output operation failed." } ;
