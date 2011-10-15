@@ -25,6 +25,8 @@ STRUCT: stat
 
 FUNCTION: int __stat30  ( c-string pathname, stat* buf ) ;
 FUNCTION: int __lstat30 ( c-string pathname, stat* buf ) ;
+FUNCTION: int __fstat30 ( int fd, stat* buf ) ;
 
 : stat ( pathname buf -- n ) __stat30 ;
 : lstat ( pathname buf -- n ) __lstat30 ;
+: fstat ( fd buf -- n ) __fstat30 ;
