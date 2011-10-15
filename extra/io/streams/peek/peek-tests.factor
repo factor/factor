@@ -4,7 +4,7 @@ USING: accessors byte-arrays combinators
 combinators.short-circuit destructors io io.encodings.ascii
 io.encodings.binary io.private io.streams.byte-array
 io.streams.peek io.streams.string kernel locals make math
-sequences tools.test vectors ;
+sequences tools.test vectors io.streams.memory ;
 IN: io.streams.peek.tests
 
 [ CHAR: a ]
