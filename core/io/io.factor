@@ -13,6 +13,7 @@ GENERIC: stream-read-unsafe ( n buf stream -- count )
 GENERIC: stream-read-until ( seps stream -- seq sep/f )
 GENERIC: stream-read-partial-unsafe ( n buf stream -- count )
 GENERIC: stream-readln ( stream -- str/f )
+GENERIC: stream-contents ( stream -- seq )
 
 GENERIC: stream-write1 ( elt stream -- )
 GENERIC: stream-write ( data stream -- )
@@ -25,6 +26,8 @@ SINGLETONS: seek-absolute seek-relative seek-end ;
 
 GENERIC: stream-tell ( stream -- n )
 GENERIC: stream-seek ( n seek-type stream -- )
+GENERIC: stream-seekable? ( stream -- ? )
+GENERIC: stream-length ( stream -- n/f )
 
 : stream-print ( str stream -- ) [ stream-write ] [ stream-nl ] bi ;
 
@@ -128,26 +131,28 @@ PRIVATE>
 : each-block ( ... quot: ( ... block -- ... ) -- ... )
     input-stream get swap each-stream-block ; inline
 
-: stream-contents ( stream -- seq )
+: (stream-contents-by-length) ( stream len -- seq )
+    dup rot [
+        [ (new-sequence-for-stream) ]
+        [ [ stream-read-unsafe ] curry keep resize ] bi
+    ] with-disposal ;
+: (stream-contents-by-block) ( stream -- seq )
     [
         [ [ ] collector [ each-stream-block ] dip { } like ]
         [ stream-exemplar concat-as ] bi
     ] with-disposal ;
-
-: stream-contents-length ( stream -- n )
-    [ stream-tell ]
-    [ [ 0 seek-end ] dip [ stream-seek ] [ stream-tell ] bi ]
-    [ [ swap seek-absolute ] dip stream-seek ] tri ;
-
-: stream-contents* ( stream -- seq )
-    [ stream-contents-length dup (byte-array) ]
-    [ [ stream-read-unsafe drop ] curry keep ] bi ;
+: (stream-contents-by-length-or-block) ( stream -- seq )
+    dup stream-length
+    [ (stream-contents-by-length) ] 
+    [ (stream-contents-by-block)  ] if* ; inline
+: (stream-contents-by-element) ( stream -- seq )
+    [
+        [ [ stream-read1 dup ] curry [ ] ]
+        [ stream-exemplar produce-as nip ] bi
+    ] with-disposal ;
 
 : contents ( -- seq )
     input-stream get stream-contents ; inline
-
-: contents* ( -- seq )
-    input-stream get stream-contents* ; inline
 
 : stream-copy* ( in out -- )
     [ stream-write ] curry each-stream-block ; inline
@@ -179,7 +184,11 @@ M: object stream-read-partial-unsafe stream-read-unsafe ; inline
 M: object stream-read-until read-until-loop ;
 M: object stream-readln
     "\n" swap stream-read-until drop ; inline
+M: object stream-contents (stream-contents-by-length-or-block) ; inline
+M: object stream-seekable? drop f ; inline
+M: object stream-length drop f ; inline
 
 M: object stream-write [ stream-write1 ] curry each ; inline
 M: object stream-flush drop ; inline
 M: object stream-nl CHAR: \n swap stream-write1 ; inline
+
