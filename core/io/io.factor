@@ -38,9 +38,6 @@ SYMBOL: error-stream
 
 : readln ( -- str/f ) input-stream get stream-readln ; inline
 : read1 ( -- elt ) input-stream get stream-read1 ; inline
-: read-unsafe ( n buf -- count ) input-stream get stream-read-unsafe ; inline
-: read-partial-unsafe ( n buf -- count )
-    input-stream get stream-read-partial-unsafe ; inline
 : read-until ( seps -- seq sep/f ) input-stream get stream-read-until ; inline
 : tell-input ( -- n ) input-stream get stream-tell ; inline
 : tell-output ( -- n ) output-stream get stream-tell ; inline
@@ -124,9 +121,9 @@ ERROR: invalid-read-buffer buf stream ;
 
 : read ( n -- seq ) input-stream get stream-read ; inline
 : read-partial ( n -- seq ) input-stream get stream-read-partial ; inline
-: read-into ( buf -- buf-slice )
+: read-into ( buf -- buf-slice/f )
     input-stream get stream-read-into ; inline
-: read-partial-into ( buf -- buf-slice )
+: read-partial-into ( buf -- buf-slice/f )
     input-stream get stream-read-partial-into ; inline
 
 : each-stream-line ( ... stream quot: ( ... line -- ... ) -- ... )
