@@ -98,9 +98,13 @@ SYMBOL: error-stream
 : (new-sequence-for-stream) ( n stream -- seq )
     stream-exemplar new-sequence ; inline
 
-: (read-into-new) ( n stream quot -- byte-array/f )
+: (read-into-new) ( n stream quot: ( n buf stream -- count ) -- seq/f )
     [ 2dup (new-sequence-for-stream) swap ] dip curry keep
     over 0 = [ 2drop f ] [ resize ] if ; inline
+
+: (read-into) ( buf stream quot: ( n buf stream -- count ) -- buf-slice/f )
+    [ dup length over ] 2dip call
+    [ drop f ] [ head-slice ] if-zero ; inline
 
 PRIVATE>
 
@@ -110,8 +114,20 @@ PRIVATE>
 : stream-read-partial ( n stream -- seq/f )
     [ stream-read-partial-unsafe ] (read-into-new) ; inline
 
+ERROR: invalid-read-buffer buf stream ;
+
+
+: stream-read-into ( buf stream -- buf-slice/f )
+    [ stream-read-unsafe ] (read-into) ; inline
+: stream-read-partial-into ( buf stream -- buf-slice/f )
+    [ stream-read-partial-unsafe ] (read-into) ; inline
+
 : read ( n -- seq ) input-stream get stream-read ; inline
 : read-partial ( n -- seq ) input-stream get stream-read-partial ; inline
+: read-into ( buf -- buf-slice )
+    input-stream get stream-read-into ; inline
+: read-partial-into ( buf -- buf-slice )
+    input-stream get stream-read-partial-into ; inline
 
 : each-stream-line ( ... stream quot: ( ... line -- ... ) -- ... )
     swap [ stream-readln ] curry each-morsel ; inline
