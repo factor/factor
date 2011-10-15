@@ -68,34 +68,61 @@ M: utf16le decode-char
 
 : encode-first ( char -- byte1 byte2 )
     -10 shift
-    [ -8 shift BIN: 11011000 bitor ] [ HEX: FF bitand ] bi ;
+    [ -8 shift BIN: 11011000 bitor ] [ HEX: FF bitand ] bi ; inline
 
 : encode-second ( char -- byte3 byte4 )
     BIN: 1111111111 bitand
-    [ -8 shift BIN: 11011100 bitor ] [ BIN: 11111111 bitand ] bi ;
+    [ -8 shift BIN: 11011100 bitor ] [ BIN: 11111111 bitand ] bi ; inline
 
 : stream-write2 ( char1 char2 stream -- )
-    [ stream-write1 ] curry bi@ ;
+    [ B{ } 2sequence ] dip stream-write ; inline
+    ! [ stream-write1 ] curry bi@ ; inline
 
 : char>utf16be ( char stream -- )
     over HEX: FFFF > [
         [ HEX: 10000 - ] dip
         [ [ encode-first ] dip stream-write2 ]
         [ [ encode-second ] dip stream-write2 ] 2bi
-    ] [ [ h>b/b swap ] dip stream-write2 ] if ;
+    ] [ [ h>b/b swap ] dip stream-write2 ] if ; inline
 
 M: utf16be encode-char ( char stream encoding -- )
     drop char>utf16be ;
 
-: char>utf16le ( stream char -- )
+: char>utf16le ( char stream -- )
     over HEX: FFFF > [
         [ HEX: 10000 - ] dip
         [ [ encode-first swap ] dip stream-write2 ]
         [ [ encode-second swap ] dip stream-write2 ] 2bi
-    ] [ [ h>b/b ] dip stream-write2 ] if ; 
+    ] [ [ h>b/b ] dip stream-write2 ] if ; inline
 
 M: utf16le encode-char ( char stream encoding -- )
     drop char>utf16le ;
+
+: ascii-char>utf16-byte-array ( off n byte-array string -- )
+    [ over ] dip string-nth-fast -rot
+    [ 2 fixnum*fast rot fixnum+fast ] dip
+    set-nth-unsafe ; inline
+
+: ascii-string>utf16-byte-array ( off string -- byte-array )
+    [ length >fixnum [ iota ] [ 2 fixnum*fast <byte-array> ] bi ] keep
+    [ [ ascii-char>utf16-byte-array ] 2curry with each ] 2keep drop ; inline
+
+: ascii-string>utf16le ( string stream -- )
+    [ 0 swap ascii-string>utf16-byte-array ] dip stream-write ; inline
+: ascii-string>utf16be ( string stream -- )
+    [ 1 swap ascii-string>utf16-byte-array ] dip stream-write ; inline
+
+M: utf16le encode-string
+    drop
+    over aux>>
+    [ [ char>utf16le ] curry each ]
+    [ ascii-string>utf16le ] if ;
+
+M: utf16be encode-string
+    drop
+    over aux>>
+    [ [ char>utf16be ] curry each ]
+    [ ascii-string>utf16be ] if ;
 
 ! UTF-16
 
