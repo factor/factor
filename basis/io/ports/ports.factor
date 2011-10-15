@@ -143,18 +143,21 @@ HOOK: (wait-to-write) io-backend ( port -- )
     dup buffer>> buffer-empty?
     [ drop ] [ dup (wait-to-write) port-flush ] if ;
 
-M: output-port stream-flush ( port -- )
+M: output-port stream-flush
     [ check-disposed ] [ port-flush ] bi ;
 
 HOOK: tell-handle os ( handle -- n )
 
 HOOK: seek-handle os ( n seek-type handle -- )
 
-M: input-port stream-tell ( stream -- n )
+HOOK: can-seek-handle? os ( handle -- ? )
+HOOK: handle-length os ( handle -- n/f )
+
+M: input-port stream-tell
     [ check-disposed ]
     [ [ handle>> tell-handle ] [ buffer>> buffer-length ] bi - ] bi ;
 
-M: output-port stream-tell ( stream -- n )
+M: output-port stream-tell
     [ check-disposed ]
     [ [ handle>> tell-handle ] [ buffer>> buffer-length ] bi + ] bi ;
 
@@ -165,17 +168,27 @@ M: output-port stream-tell ( stream -- n )
     [ n stream stream-tell + seek-absolute ] [ n seek-type ] if
     stream ;
 
-M: input-port stream-seek ( n seek-type stream -- )
+M: input-port stream-seek
     do-seek-relative
     [ check-disposed ]
     [ buffer>> 0 swap buffer-reset ]
     [ handle>> seek-handle ] tri ;
 
-M: output-port stream-seek ( n seek-type stream -- )
+M: output-port stream-seek
     do-seek-relative
     [ check-disposed ]
     [ stream-flush ]
     [ handle>> seek-handle ] tri ;
+
+M: input-port stream-seekable?
+    handle>> can-seek-handle? ;
+M: output-port stream-seekable?
+    handle>> can-seek-handle? ;
+
+M: input-port stream-length
+    handle>> handle-length ;
+M: output-port stream-length
+    handle>> handle-length ;
 
 GENERIC: shutdown ( handle -- )
 
