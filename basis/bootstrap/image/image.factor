@@ -581,6 +581,7 @@ PRIVATE>
 : make-image ( arch -- )
     [
         parser-quiet? off
+        auto-use? off
         architecture set
         "resource:/core/bootstrap/stage1.factor" run-file
         build-image
