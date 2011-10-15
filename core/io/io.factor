@@ -95,11 +95,11 @@ SYMBOL: error-stream
 : (new-sequence-for-stream) ( n stream -- seq )
     stream-exemplar new-sequence ; inline
 
-: (read-into-new) ( n stream quot: ( n buf stream -- count ) -- seq/f )
+: (read-into-new) ( n stream quot -- seq/f )
     [ 2dup (new-sequence-for-stream) swap ] dip curry keep
     over 0 = [ 2drop f ] [ resize ] if ; inline
 
-: (read-into) ( buf stream quot: ( n buf stream -- count ) -- buf-slice/f )
+: (read-into) ( buf stream quot -- buf-slice/f )
     [ dup length over ] 2dip call
     [ drop f ] [ head-slice ] if-zero ; inline
 
