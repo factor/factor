@@ -15,6 +15,8 @@ M: string-reader stream-read1 sequence-read1 ;
 M: string-reader stream-read-until sequence-read-until ;
 M: string-reader stream-tell i>> ;
 M: string-reader stream-seek (stream-seek) ;
+M: string-reader stream-seekable? drop t ; inline
+M: string-reader stream-length underlying>> length ;
 M: string-reader dispose drop ;
 
 <PRIVATE
