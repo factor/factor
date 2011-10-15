@@ -188,3 +188,12 @@ forget-junk
 [
     "mno" [ "vocabs.loader.test." swap suffix forget-vocab ] each
 ] with-compilation-unit
+
+[ "resource:core/alien/alien.factor" ]
+[ "resource:core.alien" ".factor" vocab-dir+ ] unit-test
+
+[ "resource:core/alien/alien.factor" ]
+[ "resource:core/alien" ".factor" vocab-dir+ ] unit-test
+
+[ "resource:core/compiler" ]
+[ "resource:core" "compiler" vocab-dir+ ] unit-test

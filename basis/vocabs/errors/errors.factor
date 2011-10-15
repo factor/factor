@@ -28,7 +28,7 @@ PRIVATE>
         V{ } clone failures set
         [
             [ require ]
-            [ swap vocab-name failures get set-at ]
+            [ swap normalized-vocab-name failures get set-at ]
             recover
         ] each
         failures get

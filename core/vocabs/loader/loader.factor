@@ -6,8 +6,6 @@ sorting source-files arrays combinators strings system
 math.parser splitting init accessors sets ;
 IN: vocabs.loader
 
-SYMBOL: vocab-roots
-
 SYMBOL: add-vocab-root-hook
 
 [
@@ -46,9 +44,9 @@ PRIVATE>
     vocab-name { { CHAR: . CHAR: / } } substitute ;
 
 : vocab-dir+ ( vocab str/f -- path )
-    [ vocab-name "." split ] dip
+    [ vocab-name strip-vocab-root [ "." split ] dip [ prefix ] when* ] dip
     [ [ dup last ] dip append suffix ] when*
-    "/" join ;
+    harvest "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
     vocab-name dup root-cache get at
@@ -168,3 +166,4 @@ PRIVATE>
 ] load-vocab-hook set-global
 
 M: vocab-spec where vocab-source-path dup [ 1 2array ] when ;
+

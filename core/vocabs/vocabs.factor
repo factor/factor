@@ -1,8 +1,10 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs strings kernel sorting namespaces
-sequences definitions sets combinators ;
+sequences definitions sets combinators splitting ;
 IN: vocabs
+
+SYMBOL: vocab-roots
 
 SYMBOL: dictionary
 
@@ -34,6 +36,14 @@ M: vocab vocab-name name>> ;
 M: vocab-link vocab-name name>> ;
 
 M: string vocab-name ;
+
+: strip-vocab-root ( string -- string vocab-root/f )
+    vocab-roots get [
+        ?head [ [ [ "" ] [ rest ] if-empty ] when ] keep
+    ] find nip ;
+
+: normalized-vocab-name ( obj -- obj )
+    vocab-name dup string? [ strip-vocab-root drop ] when ;
 
 GENERIC: vocab ( vocab-spec -- vocab )
 
