@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.syntax generic
 assocs kernel kernel.private math io.ports sequences strings
-sbufs threads unix unix.ffi vectors io.buffers io.backend
+sbufs threads unix unix.ffi unix.stat vectors io.buffers io.backend
 io.encodings math.parser continuations system libc namespaces
 make io.timeouts io.encodings.utf8 destructors
 destructors.private accessors summary combinators locals
-unix.time unix.types fry io.backend.unix.multiplexers ;
+unix.time unix.types fry io.backend.unix.multiplexers
+classes.struct ;
 QUALIFIED: io
 IN: io.backend.unix
 
@@ -56,6 +57,12 @@ M: unix seek-handle ( n seek-type handle -- )
         [ io:bad-seek-type ]
     } case
     [ fd>> swap ] dip [ lseek ] unix-system-call drop ;
+
+M: unix can-seek-handle? ( handle -- ? )
+    fd>> SEEK_CUR 0 lseek -1 = not ;
+M: unix handle-length ( handle -- n/f )
+    fd>> \ stat <struct> [ fstat -1 = not ] keep
+    swap [ st_size>> ] [ drop f ] if ;
 
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+
