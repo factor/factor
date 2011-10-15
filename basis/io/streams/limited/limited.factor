@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-vectors combinators destructors fry io
 io.encodings io.files io.files.info kernel locals math
-namespaces sequences ;
+namespaces sequences math.order ;
 IN: io.streams.limited
 
 TUPLE: limited-stream stream count limit current start stop ;
@@ -22,7 +22,8 @@ TUPLE: limited-stream stream count limit current start stop ;
 GENERIC# limit-stream 1 ( stream limit -- stream' )
 
 M: decoder limit-stream ( stream limit -- stream' )
-    [ clone ] dip '[ _ limit-stream ] change-stream ;
+    '[ stream>> _ limit-stream ] [ code>> ] [ cr>> ] tri
+    decoder boa ; inline
 
 M: object limit-stream ( stream limit -- stream' )
     <limited-stream> ;
@@ -78,7 +79,8 @@ ERROR: limit-exceeded n stream ;
     pick 0 <= [ 3drop f ] [ [ stream>> ] dip call ] if ; inline
 
 :: maybe-read-unsafe ( n buf limited-stream quot: ( n buf stream -- count ) -- count )
-    n limited-stream [| n' stream | n' buf stream quot call ] maybe-read ; inline
+    n limited-stream adjust-limited-read :> ( n' lstream' )
+    n' 0 <= [ 0 ] [ n' buf lstream' stream>> quot call ] if ; inline
 
 PRIVATE>
 
@@ -130,6 +132,13 @@ M: limited-stream stream-seek
     [ stream>> stream-seek ]
     [ limited-stream-seek ] 3bi ;
 
+M: limited-stream stream-seekable?
+    stream>> stream-seekable? ; inline
+
+M: limited-stream stream-length
+    dup stream>> stream-length
+    [ swap limit>> min ] [ drop f ] if* ; inline
+
 M: limited-stream dispose stream>> dispose ;
 
 M: limited-stream stream-element-type
@@ -138,7 +147,7 @@ M: limited-stream stream-element-type
 GENERIC: unlimit-stream ( stream -- stream' )
 
 M: decoder unlimit-stream ( stream -- stream' )
-    [ stream>> ] change-stream ;
+    [ stream>> stream>> ] [ code>> ] [ cr>> ] tri decoder boa ;
 
 M: limited-stream unlimit-stream ( stream -- stream' ) stream>> ;
 

@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.encodings.utf8 io.files io.streams.string
-io.streams.throwing kernel tools.test destructors ;
+USING: destructors io io.encodings.binary io.encodings.utf8
+io.files io.streams.byte-array io.streams.string
+io.streams.throwing kernel namespaces tools.test ;
 IN: io.streams.throwing.tests
 
 [ "asdf" ]
@@ -39,14 +40,16 @@ IN: io.streams.throwing.tests
     ] with-file-reader
 ] unit-test
 
-[ "asdf" "asdf" ] [
-    "asdf" [
+[ B{ 0 1 2 3 } B{ 0 1 2 3 } ] [
+    B{ 0 1 2 3 } binary [
         [ 4 read 0 seek-absolute seek-input 4 read ] throw-on-eof
-    ] with-string-reader
+    ] with-byte-reader
 ] unit-test
 
 [
-    "asdf" [ [ 1 seek-absolute seek-input 4 read drop ] throw-on-eof ] with-string-reader
+    B{ 0 1 2 3 } binary [
+        [ 1 seek-absolute seek-input 4 read drop ] throw-on-eof
+    ] with-byte-reader
 ] [ stream-exhausted? ] must-fail-with
 
 [ "asd" CHAR: f ] [
@@ -57,6 +60,14 @@ IN: io.streams.throwing.tests
     "asdf" [ [ "g" read-until ] throw-on-eof ] with-string-reader
 ] [ stream-exhausted? ] must-fail-with
 
-[ 1 ] [
-    "asdf" [ [ 1 seek-absolute seek-input tell-input ] throw-on-eof ] with-string-reader
+{ 1 } [
+    B{ 0 1 2 3 } binary [
+        [ 1 seek-absolute seek-input tell-input ] throw-on-eof
+    ] with-byte-reader
+] unit-test
+
+{ t 4 } [
+    B{ 0 1 2 3 } binary [ [
+        input-stream get [ stream-seekable? ] [ stream-length ] bi
+    ] throw-on-eof ] with-byte-reader
 ] unit-test

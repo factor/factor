@@ -25,6 +25,8 @@ M: byte-reader dispose drop ;
 
 M: byte-reader stream-tell i>> ;
 M: byte-reader stream-seek (stream-seek) ;
+M: byte-reader stream-seekable? drop t ; inline
+M: byte-reader stream-length underlying>> length ; inline
 
 : <byte-reader> ( byte-array encoding -- stream )
     [ B{ } like 0 byte-reader boa ] dip <decoder> ;
