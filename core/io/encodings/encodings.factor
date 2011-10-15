@@ -91,13 +91,16 @@ M: decoder stream-read1 ( decoder -- ch )
         ] [ (finish-read) ] if*
     ] if ; inline recursive
 
-M: decoder stream-read-unsafe ( n buf decoder -- count )
+M: decoder stream-read-unsafe
     pick 0 = [ 3drop 0 ] [
         (read-first) [
             0 (store-read)
             1 (read-rest)
         ] [ 2drop 2drop 0 ] if*
     ] if ; inline
+
+M: decoder stream-contents
+    (stream-contents-by-element) ;
 
 : line-ends/eof ( stream str -- str ) f like swap cr- ; inline
 
