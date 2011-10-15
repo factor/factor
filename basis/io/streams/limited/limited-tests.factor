@@ -122,3 +122,7 @@ IN: io.streams.limited.tests
         [ contents ] with-unlimited-input
     ] with-input-stream
 ] unit-test
+
+{ 4 } [ B{ 0 1 2 3 4 5 } binary <byte-reader> 4 <limited-stream> stream-length ] unit-test
+{ 6 } [ B{ 0 1 2 3 4 5 } binary <byte-reader> 8 <limited-stream> stream-length ] unit-test
+
