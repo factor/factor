@@ -75,7 +75,7 @@ IN: compiler.tree.dead-code.tests
 
 [ [ drop 1 ] ] [ [ [ 1 ] dip drop ] optimize-quot ] unit-test
 
-[ [ read drop 1 2 ] ] [ [ read [ 1 2 ] dip drop ] optimize-quot ] unit-test
+[ [ stream-read1 drop 1 2 ] ] [ [ stream-read1 [ 1 2 ] dip drop ] optimize-quot ] unit-test
 
 [ [ over >R + R> ] ] [ [ [ + ] [ drop ] 2bi ] optimize-quot ] unit-test
 
