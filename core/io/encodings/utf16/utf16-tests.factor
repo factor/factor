@@ -23,3 +23,8 @@ IN: io.encodings.utf16.tests
 [ { CHAR: x } ] [ B{ HEX: fe HEX: ff 0 CHAR: x } utf16 decode >array ] unit-test
 
 [ { HEX: ff HEX: fe 120 0 52 216 30 221 } ] [ { CHAR: x HEX: 1d11e } >string utf16 encode >array ] unit-test
+
+! test ascii encoding path
+
+[ B{ CHAR: a 0 CHAR: b 0 CHAR: c 0 } ] [ "abc" utf16le encode ] unit-test
+[ B{ 0 CHAR: a 0 CHAR: b 0 CHAR: c } ] [ "abc" utf16be encode ] unit-test

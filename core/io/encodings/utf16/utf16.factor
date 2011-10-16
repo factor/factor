@@ -124,6 +124,12 @@ M: utf16be encode-string
     [ [ char>utf16be ] curry each ]
     [ ascii-string>utf16be ] if ;
 
+M: utf16le guess-encoded-length drop 2 * ; inline
+M: utf16le guess-decoded-length drop 2 /i ; inline
+
+M: utf16be guess-encoded-length drop 2 * ; inline
+M: utf16be guess-decoded-length drop 2 /i ; inline
+
 ! UTF-16
 
 CONSTANT: bom-le B{ HEX: ff HEX: fe }
