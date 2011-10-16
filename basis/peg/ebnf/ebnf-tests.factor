@@ -519,7 +519,7 @@ SingleLineComment = "//" (!("\n") .)* "\n" => [[ ignore ]]
 MultiLineComment  = "/*" (!("*/") .)* "*/" => [[ ignore ]]
 Space             = " " | "\t" | "\r" | "\n" | SingleLineComment | MultiLineComment
 Spaces            = Space* => [[ ignore ]]
-Number            = Digits:ws '.' Digits:fs => [[ ws "." fs 3array concat >string string>number ast-number boa ]]
+Number            = Digits:ws '.' Digits:fs => [[ ws "." fs 3array "" concat-as string>number ast-number boa ]]
                     | Digits => [[ >string string>number ast-number boa ]]  
 Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
                      | "?"   | ":"   | "!==" | "~="  | "===" | "=="  | "="   | ">="

@@ -89,7 +89,7 @@ PRIVATE>
     [ [ hex> ] dip ] assoc-map ;
 
 : process-data ( index data -- hash )
-    (process-data) [ hex> ] assoc-map [ nip ] assoc-filter >hashtable ;
+    (process-data) [ hex> ] assoc-map [ nip ] H{ } assoc-filter-as ;
 
 : (chain-decomposed) ( hash value -- newvalue )
     [

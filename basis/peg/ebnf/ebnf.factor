@@ -283,7 +283,7 @@ DEFER: 'choice'
     "]]" token ensure-not ,
     "]?" token ensure-not ,
     [ drop t ] satisfy ,
-  ] seq* repeat0 [ concat >string ] action ;
+  ] seq* repeat0 [ "" concat-as ] action ;
 
 : 'ensure-not' ( -- parser )
   #! Parses the '!' syntax to ensure that 
