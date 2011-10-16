@@ -42,7 +42,7 @@ reset-gl-function-number-counter
     '[ @  _ _ _ alien-indirect ] ;
 
 :: define-indirect ( abi return function-name function-ptr-quot types names -- )
-    function-name create-in dup reset-generic
+    function-name create-function
     function-ptr-quot return types abi indirect-quot
     names return function-effect
     define-declared ;

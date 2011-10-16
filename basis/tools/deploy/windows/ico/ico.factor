@@ -43,8 +43,8 @@ STRUCT: group-directory-entry
 :: ico-group-and-icons ( bytes -- group-bytes icon-bytes )
     bytes ico-header memory>struct :> header
 
-    ico-header heap-size bytes <displaced-alien> 
-    header ImageCount>> <direct-ico-directory-entry-array> :> directory
+    ico-header heap-size bytes <displaced-alien>
+    header ImageCount>> ioc-directory-entry <c-direct-array> :> directory
 
     directory dup length iota [ ico>group-directory-entry ] { } 2map-as
         :> group-directory

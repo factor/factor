@@ -92,7 +92,7 @@ PRIVATE>
 
 : mode ( seq -- x )
     histogram >alist
-    [ ] [ [ [ second ] bi@ > ] 2keep ? ] map-reduce first ;
+    [ ] [ [ [ second ] bi@ > ] most ] map-reduce first ;
 
 ERROR: empty-sequence ;
 

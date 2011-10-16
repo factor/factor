@@ -32,7 +32,7 @@ IN: project-euler.044
     dup 3 * 1 - * 2 /i ; inline
 
 : sum-and-diff? ( m n -- ? )
-    [ + ] [ - ] 2bi [ pentagonal? ] bi@ and ; inline
+    [ + ] [ - ] 2bi [ pentagonal? ] both? ; inline
 
 : euler044-step ( min m n -- min' )
     [ nth-pentagonal ] bi@

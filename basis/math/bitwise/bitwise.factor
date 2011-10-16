@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.smart fry kernel
 macros math math.bits sequences sequences.private words
-byte-arrays alien alien.c-types specialized-arrays ;
+byte-arrays alien alien.c-types alien.data specialized-arrays ;
 SPECIALIZED-ARRAY: uchar
 IN: math.bitwise
 
@@ -117,7 +117,7 @@ M: byte-array bit-count
     byte-array-bit-count ;
 
 M: object bit-count
-    binary-object <direct-uchar-array> byte-array-bit-count ;
+    binary-object uchar <c-direct-array> byte-array-bit-count ;
 
 : even-parity? ( obj -- ? ) bit-count even? ;
 

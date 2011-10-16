@@ -318,7 +318,7 @@ M: object accept-completion-hook 2drop ;
 
 : quot-action ( interactor -- lines )
     [ history>> history-add drop ] [ control-value ] [ select-all ] tri
-    [ parse-lines ] with-compilation-unit ;
+    parse-lines-interactive ;
 
 : <debugger-popup> ( error continuation -- popup )
     over compute-restarts [ hide-glass ] <debugger> "Error" <labeled-gadget> ;

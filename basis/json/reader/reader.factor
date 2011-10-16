@@ -52,29 +52,29 @@ ERROR: json-error ;
     dup last V{ } = not [ v-over-push ] when ;
 
 : (close-array) ( accum -- accum' )
-    (close) dup pop >array over push ;
+    (close) dup pop >array suffix! ;
 
 : (close-hash) ( accum -- accum' )
-    (close) dup dup [ pop ] bi@ swap zip >hashtable over push ;
+    (close) dup dup [ pop ] bi@ swap zip >hashtable suffix! ;
 
 : scan ( accum char -- accum )
     ! 2dup 1string swap . . ! Great for debug...
     {
-        { CHAR: \" [ j-string over push ] }
-        { CHAR: [  [ V{ } clone over push ] }
+        { CHAR: \" [ j-string suffix! ] }
+        { CHAR: [  [ V{ } clone suffix! ] }
         { CHAR: ,  [ v-over-push ] }
         { CHAR: ]  [ (close-array) ] }
-        { CHAR: {  [ 2 [ V{ } clone over push ] times ] }
+        { CHAR: {  [ 2 [ V{ } clone suffix! ] times ] }
         { CHAR: :  [ v-pick-push ] }
         { CHAR: }  [ (close-hash) ] }
         { CHAR: \s [ ] }
         { CHAR: \t [ ] }
         { CHAR: \r [ ] }
         { CHAR: \n [ ] }
-        { CHAR: t  [ 3 read drop t over push ] }
-        { CHAR: f  [ 4 read drop f over push ] }
-        { CHAR: n  [ 3 read drop json-null over push ] }
-        [ value [ over push ] dip [ scan ] when*  ]
+        { CHAR: t  [ 3 read drop t suffix! ] }
+        { CHAR: f  [ 4 read drop f suffix! ] }
+        { CHAR: n  [ 3 read drop json-null suffix! ] }
+        [ value [ suffix! ] dip [ scan ] when*  ]
     } case ;
 
 PRIVATE>
