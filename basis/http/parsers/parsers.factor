@@ -44,7 +44,7 @@ IN: http.parsers
         "1" token ,
         "." token ,
         { "0" "1" } one-of ,
-    ] seq* [ concat >string ] action ;
+    ] seq* [ "" concat-as ] action ;
 
 PEG: parse-request-line ( string -- triple )
     #! Triple is { method url version }

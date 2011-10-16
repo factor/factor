@@ -46,7 +46,7 @@ TUPLE: ast-hashtable elements ;
     'identifier-middle' ,
     'identifier-ends' ,
   ] seq* [
-    concat >string f ast-identifier boa
+    "" concat-as f ast-identifier boa
   ] action ;
 
 

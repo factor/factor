@@ -10,7 +10,7 @@ IN: memoize
 ! We can't use n*quot, narray and firstn from generalizations because
 ! they're macros, and macros use memoize!
 : (n*quot) ( n quot -- quotquot )
-    <repetition> concat >quotation ;
+    <repetition> [ ] concat-as ;
 
 : [nsequence] ( length exemplar -- quot )
     [ [ [ 1 - ] keep ] dip '[ _ _ _ new-sequence ] ]

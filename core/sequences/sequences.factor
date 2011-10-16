@@ -740,9 +740,11 @@ PRIVATE>
     [ exchange-unsafe ]
     3tri ;
 
+: midpoint@ ( seq -- n ) length 2/ ; inline
+
 : reverse! ( seq -- seq )
     [
-        [ length 2/ iota ] [ length ] [ ] tri
+        [ midpoint@ iota ] [ length ] [ ] tri
         [ [ over - 1 - ] dip exchange-unsafe ] 2curry each
     ] keep ;
 
@@ -814,8 +816,6 @@ PRIVATE>
 
 : insert-nth ( elt n seq -- seq' )
     swap cut-slice [ swap suffix ] dip append ;
-
-: midpoint@ ( seq -- n ) length 2/ ; inline
 
 : halves ( seq -- first-slice second-slice )
     dup midpoint@ cut-slice ;

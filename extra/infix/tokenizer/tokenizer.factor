@@ -8,7 +8,7 @@ EBNF: tokenize-infix
 Letter            = [a-zA-Z]
 Digit             = [0-9]
 Digits            = Digit+
-Number            =   Digits '.' Digits => [[ concat >string string>number ast-number boa ]]
+Number            =   Digits '.' Digits => [[ "" concat-as string>number ast-number boa ]]
                     | Digits => [[ >string string>number ast-number boa ]]
 Space             = " " | "\n" | "\r" | "\t"
 Spaces            = Space* => [[ ignore ]]

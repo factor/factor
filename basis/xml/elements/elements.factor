@@ -35,7 +35,7 @@ IN: xml.elements
 
 : assure-no-duplicates ( attrs-alist -- attrs-alist )
     H{ } clone 2dup '[ swap _ push-at ] assoc-each
-    [ nip length 2 >= ] assoc-filter >alist
+    [ nip length 2 >= ] { } assoc-filter-as
     [ first first2 duplicate-attr ] unless-empty ;
 
 : middle-tag ( -- attrs-alist )
