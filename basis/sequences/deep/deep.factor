@@ -27,7 +27,7 @@ M: object branch? drop f ;
 : (deep-find) ( ... obj quot: ( ... elt -- ... ? ) -- ... elt ? )
     [ call ] 2keep rot [ drop t ] [
         over branch? [
-            [ f ] 2dip '[ nip _ (deep-find) ] find drop >boolean
+            [ f ] 2dip '[ nip _ (deep-find) ] any?
         ] [ 2drop f f ] if  
     ] if ; inline recursive
 
