@@ -128,7 +128,7 @@ GENERIC: write-full-response ( request response -- )
     over unparse-content-type "content-type" pick set-at
     over cookies>> [
         ensure-domain unparse-set-cookie
-        "set-cookie" swap 2array over push
+        "set-cookie" swap 2array suffix!
     ] each
     write-header ;
 

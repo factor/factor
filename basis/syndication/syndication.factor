@@ -88,8 +88,7 @@ TUPLE: entry title url description date ;
     } cleave ;
 
 : atom1.0 ( xml -- feed )
-    feed new
-    swap
+    <feed> swap
     [ "title" tag-named children>string >>title ]
     [ "link" tag-named "href" attr >url >>url ]
     [ "entry" tags-named [ atom1.0-entry ] map set-entries ]

@@ -8,8 +8,8 @@ IN: math.polynomials
 
 : 2pad-head ( p q n -- p q ) [ 0 pad-head ] curry bi@ ;
 : 2pad-tail ( p q n -- p q ) [ 0 pad-tail ] curry bi@ ;
-: pextend ( p q -- p q ) 2dup [ length ] bi@ max 2pad-tail ;
-: pextend-left ( p q -- p q ) 2dup [ length ] bi@ max 2pad-head ;
+: pextend ( p q -- p q ) 2dup max-length 2pad-tail ;
+: pextend-left ( p q -- p q ) 2dup max-length 2pad-head ;
 : unempty ( seq -- seq ) [ { 0 } ] when-empty ;
 : 2unempty ( seq seq -- seq seq ) [ unempty ] bi@ ;
 

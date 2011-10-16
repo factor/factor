@@ -142,12 +142,11 @@ elevator H{
     [ slider>screen elevator-padding + ] tri ;
 
 : layout-thumb-loc ( thumb slider -- )
-    [ thumb-loc ] [ orientation>> ] bi n*v
-    [ floor ] map >>loc drop ;
+    [ thumb-loc ] [ orientation>> ] bi n*v vfloor >>loc drop ;
 
 : layout-thumb-dim ( thumb slider -- )
     [ dim>> ] [ thumb-dim ] [ orientation>> ] tri [ n*v ] keep set-axis
-    [ ceiling ] map >>dim drop ;
+    vceiling >>dim drop ;
 
 : slider-enabled? ( slider -- ? )
     visible-portion 1 = not ;

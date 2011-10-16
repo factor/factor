@@ -250,7 +250,7 @@ M: mark-previous-rule handle-rule-start
 
 : rule-set-empty? ( ruleset -- ? )
     [ rules>> ] [ keywords>> ] bi
-    [ assoc-empty? ] bi@ and ;
+    [ assoc-empty? ] both? ;
 
 : check-word-break ( -- ? )
     current-char dup blank? [

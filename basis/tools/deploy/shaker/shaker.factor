@@ -415,7 +415,7 @@ IN: tools.deploy.shaker
     ! On Windows, even if deploy-io is 3, C streams are still used
     ! for the console, so don't strip it there.
     strip-io?
-    deploy-io get 3 = os windows? not and
+    native-io? os windows? not and
     or [
         "Stripping C I/O" show
         "vocab:tools/deploy/shaker/strip-c-io.factor" run-file

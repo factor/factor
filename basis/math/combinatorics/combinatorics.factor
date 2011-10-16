@@ -124,7 +124,7 @@ PRIVATE>
     <combo> apply-combination ;
 
 : all-combinations ( seq k -- seq' )
-    [ ] combinations-quot map ;
+    [ ] map-combinations ;
 
 : reduce-combinations ( seq k identity quot -- result )
     [ -rot ] dip each-combination ; inline

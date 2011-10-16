@@ -137,8 +137,8 @@ M: LETTER-class modify-class modify-letter-class ;
 
 : cased-range? ( range -- ? )
     [ from>> ] [ to>> ] bi {
-        [ [ letter? ] bi@ and ]
-        [ [ LETTER? ] bi@ and ]
+        [ [ letter? ] both? ]
+        [ [ LETTER? ] both? ]
     } 2|| ;
 
 M: range-class modify-class

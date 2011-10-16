@@ -12,7 +12,7 @@ SINGLETON: openssl
     ERR_clear_error f ERR_error_string ;
 
 : ssl-error-string ( -- string )
-    ERR_get_error ERR_clear_error f ERR_error_string ;
+    ERR_get_error (ssl-error-string) ;
 
 : (ssl-error) ( -- * )
     ssl-error-string throw ;
