@@ -342,7 +342,7 @@ M: object accept-completion-hook 2drop ;
 : handle-interactive ( lines interactor -- quot/f ? )
     [ nip ] [ try-parse ] 2bi {
         { [ dup quotation? ] [ nip t ] }
-        { [ dup not ] [ drop "\n" swap user-input* drop f f ] }
+        { [ dup not ] [ drop insert-newline f f ] }
         [ handle-parse-error f f ]
     } cond ;
 
