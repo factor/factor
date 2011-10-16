@@ -1,19 +1,16 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays assocs combinators.short-circuit
-fry hashtables io kernel math namespaces prettyprint quotations
+USING: accessors alien arrays assocs classes.tuple.private
+combinators.short-circuit fry hashtables io kernel
+locals.backend make math namespaces prettyprint quotations
 sequences sequences.deep shuffle slots.private vectors vocabs
 words xml.data words.alias ;
 IN: lint
 
-SYMBOL: lint-definitions
-SYMBOL: lint-definitions-keys
+<PRIVATE
 
-: set-hash-vector ( val key hash -- )
-    2dup at -rot [ ?push ] 2dip set-at ;
-
-: manual-substitutions ( hash -- )
-    {
+CONSTANT: manual-substitutions
+    H{
         { -rot [ swap [ swap ] dip ] }
         { -rot [ swap swapd ] }
         { rot [ [ swap ] dip swap ] }
@@ -27,91 +24,107 @@ SYMBOL: lint-definitions-keys
         { pop* [ pop drop ] }
         { when [ [ ] if ] }
         { >boolean [ f = not ] }
-    } swap '[ first2 _ set-hash-vector ] each ;
+    }
 
 CONSTANT: trivial-defs
     {
-        [ drop ] [ 2drop ] [ 2array ]
-        [ bitand ]
-        [ . ]
-        [ new ]
-        [ get ]
-        [ "" ]
-        [ t ] [ f ]
-        [ { } ]
-        [ drop t ] [ drop f ] [ 2drop t ] [ 2drop f ]
-        [ cdecl ]
-        [ first ] [ second ] [ third ] [ fourth ]
+        [ drop t ] [ drop f ]
+        [ 2drop t ] [ 2drop f ]
+        [ 3drop t ] [ 3drop f ]
         [ ">" write ] [ "/>" write ]
+        [ length 1 - ] [ length 1 = ] [ length 1 > ]
+        [ drop f f ] [ 2drop f f ]
+        [ drop f f f ]
+        [ nip f f ]
+        [ 0 or + ]
+        [ dup 0 > ] [ dup 0 <= ]
+        [ dup length iota ]
+        [ 0 swap copy ]
+        [ dup 1 + ]
     }
 
-! ! Add definitions
-H{ } clone lint-definitions set-global
+: lintable-word? ( word -- ? )
+    {
+        [ vocabulary>> "specialized-" head? ]
+        [ vocabulary>> "windows-messages" = ]
+        [ alias? ]
+    } 1|| not ;
 
-all-words [
-    dup def>> dup callable?
-    [ lint-definitions get-global set-hash-vector ] [ drop ] if
-] each
+: lintable-words ( -- words )
+    all-words [ lintable-word? ] filter ;
 
-! ! Remove definitions
+: ignore-def? ( def -- ? )
+    {
+        ! Remove small defs
+        [ length 2 <= ]
 
-! Remove empty word defs
-lint-definitions get-global [ drop empty? not ] assoc-filter
+        ! Remove trivial defs
+        [ trivial-defs member? ]
 
-! Remove constants [ 1 ]
-[ drop { [ length 1 = ] [ first number? ] } 1&& not ] assoc-filter
+        ! Remove curry only defs
+        [ [ \ curry = ] all? ]
 
-! Remove words that are their own definition
-[ [ [ def>> ] [ 1quotation ] bi = not ] filter ] assoc-map
+        ! Remove words with locals
+        [ [ \ load-locals = ] any? ]
 
-! Remove specialized*
- [ nip [ vocabulary>> "specialized-" head? ] any? not ] assoc-filter
+        ! Remove numbers/t/f only defs
+        [
+            [ { [ number? ] [ t? ] [ f eq? ] } 1|| ] all?
+        ]
 
- [ nip [ vocabulary>> "windows.messages" = ] any? not ] assoc-filter
+        ! Remove tag defs
+        [
+            {
+                [ length 3 = ]
+                [ first \ tag = ] [ second number? ] [ third \ eq? = ]
+            } 1&&
+        ]
 
- [ nip [ alias? ] any? not ] assoc-filter
+        ! Remove [ m n shift ]
+        [
+            {
+                [ length 3 = ]
+                [ first2 [ number? ] both? ] [ third \ shift = ]
+            } 1&&
+        ]
 
-! Remove trivial defs
-[ drop trivial-defs member? not ] assoc-filter
+        ! Remove [ layout-of n slot ]
+        [
+            {
+                [ length 3 = ]
+                [ first \ layout-of = ]
+                [ second number? ]
+                [ third \ slot = ]
+            } 1&&
+        ]
+    } 1|| ;
 
-! Remove numbers only defs
-[ drop [ number? ] all? not ] assoc-filter
+: all-callables ( def -- seq )
+    [ callable? ] deep-filter ;
 
-! Remove curry only defs
-[ drop [ \ curry = ] all? not ] assoc-filter
+: (load-definitions) ( word def hash -- )
+    [ all-callables ] dip '[ _ push-at ] with each ;
 
-! Remove tag defs
-[
-    drop {
-            [ length 3 = ]
-            [ first \ tag = ] [ second number? ] [ third \ eq? = ]
-    } 1&& not
-] assoc-filter
+: load-definitions ( words -- hash )
+    H{ } clone [ '[ dup def>> _ (load-definitions) ] each ] keep ;
 
-[
-    drop {
-        [ [ wrapper? ] deep-any? ]
-        [ [ hashtable? ] deep-any? ]
-    } 1|| not
-] assoc-filter
+SYMBOL: lint-definitions
+SYMBOL: lint-definitions-keys
 
-! Remove n m shift defs
-[
-    drop dup length 3 = [
-        [ first2 [ number? ] both? ]
-        [ third \ shift = ] bi and not
-    ] [ drop t ] if
-] assoc-filter 
+: reload-definitions ( -- )
+    ! Load lintable and non-ignored definitions
+    lintable-words load-definitions
+    [ drop ignore-def? not ] assoc-filter
 
-! Remove [ n slot ]
-[
-    drop dup length 2 =
-    [ first2 [ number? ] [ \ slot = ] bi* and not ] [ drop t ] if
-] assoc-filter
+    ! Remove words that are their own definition
+    [ [ [ def>> ] [ 1quotation ] bi = not ] filter ] assoc-map
 
-dup manual-substitutions
+    ! Add manual definitions
+    manual-substitutions over '[ _ push-at ] assoc-each
 
-[ lint-definitions set-global ] [ keys lint-definitions-keys set-global ] bi
+    ! Set globals to new values
+    [ lint-definitions set-global ]
+    [ keys lint-definitions-keys set-global ] bi ;
 
 : find-duplicates ( -- seq )
     lint-definitions get-global [ nip length 1 > ] assoc-filter ;
@@ -120,17 +133,14 @@ GENERIC: lint ( obj -- seq )
 
 M: object lint ( obj -- seq ) drop f ;
 
-: subseq/member? ( subseq/member seq -- ? )
-    { [ start ] [ member? ] } 2|| ;
-
 M: callable lint ( quot -- seq )
-    [ lint-definitions-keys get-global ] dip '[ _ subseq/member? ] filter ;
+    [ lint-definitions-keys get-global ] dip '[ _ subseq? ] filter ;
 
-M: word lint ( word -- seq )
-    def>> dup callable? [ lint ] [ drop f ] if ;
+M: word lint ( word -- seq/f )
+    def>> all-callables [ lint ] map concat ;
 
 : word-path. ( word -- )
-    [ vocabulary>> ] [ name>> ] bi ":" glue print ;
+    [ vocabulary>> write ":" write ] [ . ] bi ;
 
 : 4bl ( -- ) bl bl bl bl ;
 
@@ -138,7 +148,7 @@ M: word lint ( word -- seq )
     first2 [ word-path. ] dip [
         [ 4bl .  "-----------------------------------" print ]
         [ lint-definitions get-global at [ 4bl word-path. ] each nl ] bi
-    ] each nl nl ;
+    ] each nl ;
 
 : lint. ( alist -- ) [ (lint.) ] each ;
 
@@ -163,11 +173,18 @@ M: sequence run-lint ( seq -- seq )
 
 M: word run-lint ( word -- seq ) 1array run-lint ;
 
-: lint-all ( -- seq ) all-words run-lint dup lint. ;
+PRIVATE>
 
-: lint-vocab ( vocab -- seq ) words run-lint dup lint. ;
+: lint-all ( -- seq )
+    all-words run-lint dup lint. ;
+
+: lint-vocab ( vocab -- seq )
+    words run-lint dup lint. ;
 
 : lint-vocabs ( prefix -- seq )
     [ vocabs ] dip [ head? ] curry filter [ lint-vocab ] map ;
 
-: lint-word ( word -- seq ) 1array run-lint dup lint. ;
+: lint-word ( word -- seq )
+    1array run-lint dup lint. ;
+
+reload-definitions
