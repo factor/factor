@@ -4,10 +4,10 @@ USING: math math.order kernel ;
 IN: math.compare
 
 : absmin ( a b -- x )
-    [ [ abs ] bi@ < ] 2keep ? ;
+    [ [ abs ] bi@ < ] most ;
 
 : absmax ( a b -- x )
-    [ [ abs ] bi@ > ] 2keep ? ;
+    [ [ abs ] bi@ > ] most ;
 
 : posmax ( a b -- x )
     0 max max ;

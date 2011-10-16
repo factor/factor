@@ -3,7 +3,7 @@
 USING: kernel math math.private math.order ;
 IN: math.floats.private
 
-: float-unordered? ( x y -- ? ) [ fp-nan? ] bi@ or ;
+: float-unordered? ( x y -- ? ) [ fp-nan? ] either? ;
 : float-min ( x y -- z ) [ float< ] most ; foldable
 : float-max ( x y -- z ) [ float> ] most ; foldable
 

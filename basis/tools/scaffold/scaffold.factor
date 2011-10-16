@@ -167,7 +167,7 @@ ERROR: vocab-name-contains-dot path ;
 : $values. ( word -- )
     "declared-effect" word-prop [
         [ in>> ] [ out>> ] bi
-        2dup [ empty? ] bi@ and [
+        2dup [ empty? ] both? [
             2drop
         ] [
             [ members ] dip over diff

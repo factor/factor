@@ -297,7 +297,7 @@ SPECIALIZED-ARRAY: struct-test-optimization
 
 [ t ] [ [ struct-test-optimization memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
 [ t ] [
-    [ 3 <direct-struct-test-optimization-array> third y>> ]
+    [ 3 struct-test-optimization <c-direct-array> third y>> ]
     { <tuple> <tuple-boa> memory>struct y>> } inlined?
 ] unit-test
 

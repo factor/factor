@@ -351,7 +351,7 @@ M: ratio >base
 
 : float>hex-value ( mantissa -- str )
     >hex 13 CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
-    [ "0" ] [ ] if-empty "1." prepend ;
+    [ "0" ] when-empty "1." prepend ;
 
 : float>hex-expt ( mantissa -- str )
     10 >base "p" prepend ;
