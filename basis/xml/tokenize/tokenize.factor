@@ -85,10 +85,11 @@ HINTS: next* { spot } ;
     #! Advance code past any whitespace, including newlines
     [ blank? not ] skip-until ;
 
+: next-matching ( pos ch str -- pos' )
+    [ over ] dip nth eq? [ 1 + ] [ drop 0 ] if ;
+
 : string-matcher ( str -- quot: ( pos char -- pos ? ) )
-    dup length 1 - '[
-        over _ nth eq? [ 1 + ] [ drop 0 ] if dup _ >
-    ] ; inline
+    dup length 1 - '[ _ next-matching dup _ > ] ; inline
 
 : take-string ( match -- string )
     [ 0 swap string-matcher take-until nip ] keep
@@ -143,8 +144,7 @@ HINTS: next* { spot } ;
     1024 <sbuf> [ spot get (parse-char) ] keep >string ; inline
 
 : assure-no-]]> ( pos char -- pos' )
-    over "]]>" nth eq? [ 1 + ] [ drop 0 ] if
-    dup 2 > [ text-w/]]> ] when ;
+    "]]>" next-matching dup 2 > [ text-w/]]> ] when ;
 
 :: parse-text ( -- string )
     0 :> pos!
