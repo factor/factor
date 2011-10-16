@@ -7,7 +7,7 @@ ifdef CONFIG
 	BUNDLE = Factor.app
 	LIBPATH = -L/usr/X11R6/lib
 
-	CFLAGS = -Wall $(SITE_CFLAGS)
+	CFLAGS = -Wall -Wl,--no-as-needed $(SITE_CFLAGS)
 
 	ifdef DEBUG
 		CFLAGS += -g -DFACTOR_DEBUG
