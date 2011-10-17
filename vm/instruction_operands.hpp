@@ -34,7 +34,9 @@ enum relocation_type {
 	RT_DLSYM_TOC,
 	/* address of inline_cache_miss function. This is a separate
 	relocation to reduce compile time and size for PICs. */
-	RT_INLINE_CACHE_MISS
+	RT_INLINE_CACHE_MISS,
+	/* address of safepoint page in code heap */
+	RT_SAFEPOINT
 };
 
 enum relocation_class {
