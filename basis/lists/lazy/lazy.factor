@@ -281,7 +281,7 @@ M: lazy-concat nil? ( lazy-concat -- ? )
     dup nil? [
         drop nil
     ] [
-        [ car ] [ cdr ] bi
+        uncons
         [ car lcartesian-product ] [ cdr ] bi
         list>array swap [
             swap [ swap [ suffix ] with lazy-map  ] with lazy-map  lconcat

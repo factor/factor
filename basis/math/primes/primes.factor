@@ -28,7 +28,7 @@ IN: math.primes
     108 max 10000 min <vector> ] keep
     3 < [ [ 2 swap push ] keep ] when ;
 
-: simple? ( n -- ? ) { [ even? ] [ 3 mod 0 = ] [ 5 mod 0 = ] } 1|| ;
+: simple? ( n -- ? ) { [ even? ] [ 3 divisor? ] [ 5 divisor? ] } 1|| ;
 
 PRIVATE>
 

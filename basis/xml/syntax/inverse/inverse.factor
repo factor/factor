@@ -49,8 +49,7 @@ M: tag [undo-xml] ( tag -- quot: ( tag -- ) )
     } cleave '[ _ _ _ tri ] ;
 
 : firstn-strong ( seq n -- ... )
-    [ swap length =/fail ]
-    [ firstn ] 2bi ; inline
+    [ assure-length ] [ firstn ] 2bi ; inline
 
 M: sequence [undo-xml] ( sequence -- quot: ( seq -- ) )
     remove-blanks [ length ] [ [ [undo-xml] ] { } map-as ] bi
