@@ -64,7 +64,7 @@ M: lambda-parser parse-quotation ( -- quotation )
     H{ } clone (parse-lambda) <let> ?rewrite-closures ;
 
 : parse-locals ( -- effect vars assoc )
-    complete-effect
+    scan-effect
     dup
     in>> [ dup pair? [ first ] when ] map make-locals ;
 

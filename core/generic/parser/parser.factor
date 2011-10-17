@@ -9,7 +9,7 @@ ERROR: not-in-a-method-error ;
 : scan-new-generic ( -- word ) scan-new dup reset-word ;
 
 : (GENERIC:) ( quot -- )
-    [ scan-new-generic ] dip call complete-effect define-generic ; inline
+    [ scan-new-generic ] dip call scan-effect define-generic ; inline
 
 : create-method-in ( class generic -- method )
     create-method dup set-word dup save-location ;

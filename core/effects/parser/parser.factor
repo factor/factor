@@ -51,7 +51,7 @@ PRIVATE>
     [ "--" parse-effect-tokens ] dip parse-effect-tokens
     <variable-effect> ;
 
-: complete-effect ( -- effect )
+: scan-effect ( -- effect )
     "(" expect ")" parse-effect ;
 
 : parse-call( ( accum word -- accum )
@@ -59,5 +59,5 @@ PRIVATE>
 
 : (:) ( -- word def effect )
     scan-new-word
-    complete-effect
+    scan-effect
     parse-definition swap ;

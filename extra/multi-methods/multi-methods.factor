@@ -224,7 +224,7 @@ M: no-method error.
     ] if ;
 
 ! Syntax
-SYNTAX: GENERIC: scan-new-word complete-effect define-generic ;
+SYNTAX: GENERIC: scan-new-word scan-effect define-generic ;
 
 : parse-method ( -- quot classes generic )
     parse-definition [ 2 tail ] [ second ] [ first ] tri ;
