@@ -530,7 +530,7 @@ TYPED: cpArbiterGetNormal ( arb: cpArbiter i -- n: cpVect )
         [ contacts>> swap void* <c-direct-array> ] bi nth cpContact memory>struct n>>
     ]
     [
-        drop swappedColl>> 0 = [ ] [ cpvneg ] if
+        drop swappedColl>> 0 = [ cpvneg ] unless
     ] 2bi ; inline
 
 TYPED: cpArbiterGetPoint ( arb: cpArbiter i -- p: cpVect )
