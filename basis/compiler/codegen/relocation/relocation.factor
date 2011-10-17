@@ -102,6 +102,9 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-inline-cache-miss ( class -- )
     rt-inline-cache-miss add-relocation ;
 
+: rel-safepoint ( class -- )
+    rt-safepoint add-relocation ;
+
 : init-relocation ( -- )
     V{ } clone parameter-table set
     V{ } clone literal-table set
