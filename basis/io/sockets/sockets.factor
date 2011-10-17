@@ -4,11 +4,11 @@
 USING: accessors alien.c-types alien.data alien.strings arrays
 assocs byte-arrays classes classes.struct combinators
 combinators.short-circuit continuations destructors fry generic
-grouping init io.backend io.pathnames io.binary io.encodings
-io.encodings.ascii io.encodings.binary io.ports
-io.streams.duplex kernel math math.parser memoize namespaces
-parser present sequences splitting strings summary system
-vocabs.loader vocabs.parser ;
+grouping init io.backend io.binary io.encodings
+io.encodings.ascii io.encodings.binary io.pathnames io.ports
+io.streams.duplex kernel libc locals math math.parser memoize
+namespaces parser present sequences splitting strings summary
+system unix.ffi values vocabs.loader vocabs.parser ;
 IN: io.sockets
 
 << {
@@ -286,7 +286,7 @@ TUPLE: raw-port < port addr ;
 
 HOOK: (raw) io-backend ( addr -- raw )
 
-HOOK: (receive) io-backend ( datagram -- packet addrspec )
+HOOK: (receive) io-backend ( n buf datagram -- size addrspec )
 
 ERROR: invalid-port object ;
 
@@ -368,17 +368,37 @@ SYMBOL: remote-address
         >>addr
     ] with-destructors ;
 
-: receive ( datagram -- packet addrspec )
+: receive-unsafe ( n buf datagram -- count addrspec )
     check-receive
-    [ (receive) ] [ addr>> ] bi parse-sockaddr ;
+    [ (receive) ] [ addr>> ] bi parse-sockaddr ; inline
+
+CONSTANT: datagram-size 65536
+STRUCT: datagram-buf { buf uchar[datagram-size] } ;
+
+:: receive ( datagram -- packet addrspec )
+    { datagram-buf } [| buf |
+        datagram-size buf datagram
+        receive-unsafe :> ( count addrspec )
+        count [ f f ] [
+            buf swap memory>byte-array addrspec
+        ] if-zero
+    ] with-scoped-allocation ; inline
+
+:: receive-into ( buf datagram -- buf-slice addrspec )
+    buf length :> n
+    n buf datagram receive-unsafe :> ( count addrspec )
+    count [ f f ] [ drop
+        buf count head-slice addrspec
+    ] if-zero ; inline
 
 : send ( packet addrspec datagram -- )
-    check-send (send) ;
+    check-send (send) ; inline
 
 MEMO: ipv6-supported? ( -- ? )
     [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;
 
-[ \ ipv6-supported? reset-memoized ] "io.sockets" add-startup-hook
+[ \ ipv6-supported? reset-memoized ]
+"io.sockets:ipv6-supported?" add-startup-hook
 
 GENERIC: resolve-host ( addrspec -- seq )
 

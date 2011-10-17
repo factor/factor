@@ -211,19 +211,19 @@ TUPLE: WSARecvFrom-args port
        s lpBuffers dwBufferCount lpNumberOfBytesRecvd
        lpFlags lpFrom lpFromLen lpOverlapped lpCompletionRoutine ;
 
-: make-receive-buffer ( -- WSABUF )
+: make-receive-buffer ( n buf -- WSABUF )
     WSABUF malloc-struct &free
-        default-buffer-size get
-        [ >>len ] [ malloc &free >>buf ] bi ; inline
+        n >>len
+        buf >>buf ; inline
 
-: <WSARecvFrom-args> ( datagram -- WSARecvFrom )
+:: <WSARecvFrom-args> ( n buf datagram -- WSARecvFrom )
     WSARecvFrom-args new
-        swap >>port
-        dup port>> handle>> handle>> >>s
-        dup port>> addr>> sockaddr-size
+        datagram >>port
+        datagram handle>> handle>> >>s
+        datagram addr>> sockaddr-size
             [ malloc &free >>lpFrom ]
             [ malloc-int &free >>lpFromLen ] bi
-        make-receive-buffer >>lpBuffers
+        n buf make-receive-buffer >>lpBuffers
         1 >>dwBufferCount
         0 malloc-int &free >>lpFlags
         0 malloc-int &free >>lpNumberOfBytesRecvd
@@ -251,7 +251,7 @@ TUPLE: WSARecvFrom-args port
         tri memcpy
     ] bi ; inline
 
-M: windows (receive) ( datagram -- packet addrspec )
+M: windows (receive) ( n buf datagram -- packet addrspec )
     [
         <WSARecvFrom-args>
         [ call-WSARecvFrom ]
