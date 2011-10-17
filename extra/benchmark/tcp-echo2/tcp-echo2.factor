@@ -4,6 +4,6 @@ USING: benchmark.tcp-echo0 io ;
 IN: benchmark.tcp-echo2
 
 : tcp-echo-benchmark2 ( -- )
-    20,000,000 20 tcp-echo-benchmark ;
+    20,000 20 tcp-echo-benchmark ;
 
 MAIN: tcp-echo-benchmark2
