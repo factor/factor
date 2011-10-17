@@ -8,7 +8,8 @@ grouping init io.backend io.binary io.encodings
 io.encodings.ascii io.encodings.binary io.pathnames io.ports
 io.streams.duplex kernel libc locals math math.parser memoize
 namespaces parser present sequences splitting strings summary
-system unix.ffi values vocabs.loader vocabs.parser ;
+system unix.ffi values vocabs.loader vocabs.parser
+sequences.private ;
 IN: io.sockets
 
 << {
@@ -373,23 +374,17 @@ SYMBOL: remote-address
     [ (receive) ] [ addr>> ] bi parse-sockaddr ; inline
 
 CONSTANT: datagram-size 65536
-STRUCT: datagram-buf { buf uchar[datagram-size] } ;
 
 :: receive ( datagram -- packet addrspec )
-    { datagram-buf } [| buf |
-        datagram-size buf datagram
-        receive-unsafe :> ( count addrspec )
-        count [ f f ] [
-            buf swap memory>byte-array addrspec
-        ] if-zero
-    ] with-scoped-allocation ; inline
+    datagram-size (byte-array) :> buf
+    datagram-size buf datagram
+    receive-unsafe :> ( count addrspec )
+    count buf resize addrspec ; inline
 
 :: receive-into ( buf datagram -- buf-slice addrspec )
     buf length :> n
     n buf datagram receive-unsafe :> ( count addrspec )
-    count [ f f ] [ drop
-        buf count head-slice addrspec
-    ] if-zero ; inline
+    buf count head-slice addrspec ; inline
 
 : send ( packet addrspec datagram -- )
     check-send (send) ; inline
