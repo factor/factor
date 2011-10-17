@@ -148,6 +148,20 @@ long getpagesize()
 	return g_pagesize;
 }
 
+void code_heap::guard_safepoint()
+{
+	DWORD ignore;
+	if (!VirtualProtect(safepoint_page, getpagesize(), PAGE_NOACCESS, &ignore))
+		fatal_error("Cannot protect safepoint guard page", (cell)safepoint_page);
+}
+
+void code_heap::unguard_safepoint()
+{
+	DWORD ignore;
+	if (!VirtualProtect(safepoint_page, getpagesize(), PAGE_READWRITE, &ignore))
+		fatal_error("Cannot unprotect safepoint guard page", (cell)safepoint_page);
+}
+
 void factor_vm::move_file(const vm_char *path1, const vm_char *path2)
 {
 	if(MoveFileEx((path1),(path2),MOVEFILE_REPLACE_EXISTING) == false)
