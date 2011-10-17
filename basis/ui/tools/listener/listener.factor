@@ -150,15 +150,15 @@ M: interactor stream-readln
         3bi
     ] if ;
 
-M: interactor stream-read
-    swap [
-        drop ""
-    ] [
-        [ interactor-read dup [ "\n" join ] when ] dip short head
+M:: interactor stream-read-unsafe ( n buf interactor -- count )
+    n [ 0 ] [
+        drop
+        interactor interactor-read dup [ "\n" join ] when
+        n short [ head-slice 0 buf copy ] keep
     ] if-zero ;
 
-M: interactor stream-read-partial
-    stream-read ;
+M: interactor stream-read-partial-unsafe
+    stream-read-unsafe ; inline
 
 M: interactor stream-read1
     dup interactor-read {

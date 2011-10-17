@@ -27,3 +27,4 @@ STRUCT: stat
 
 FUNCTION: int stat  ( c-string pathname, stat* buf ) ;
 FUNCTION: int lstat ( c-string pathname, stat* buf ) ;
+FUNCTION: int fstat ( int fd, stat* buf ) ;

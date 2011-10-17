@@ -440,9 +440,9 @@ tuple
     { "(fopen)" "io.streams.c" "primitive_fopen" (( path mode -- alien )) }
     { "fclose" "io.streams.c" "primitive_fclose" (( alien -- )) }
     { "fflush" "io.streams.c" "primitive_fflush" (( alien -- )) }
-    { "fgetc" "io.streams.c" "primitive_fgetc" (( alien -- ch/f )) }
-    { "fputc" "io.streams.c" "primitive_fputc" (( ch alien -- )) }
-    { "fread" "io.streams.c" "primitive_fread" (( n alien -- str/f )) }
+    { "fgetc" "io.streams.c" "primitive_fgetc" (( alien -- byte/f )) }
+    { "fputc" "io.streams.c" "primitive_fputc" (( byte alien -- )) }
+    { "fread-unsafe" "io.streams.c" "primitive_fread" (( n buf alien -- count )) }
     { "fseek" "io.streams.c" "primitive_fseek" (( alien offset whence -- )) }
     { "ftell" "io.streams.c" "primitive_ftell" (( alien -- n )) }
     { "fwrite" "io.streams.c" "primitive_fwrite" (( data length alien -- )) }

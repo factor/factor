@@ -28,6 +28,8 @@ STRUCT: stat
 
 FUNCTION: int stat64  ( c-string pathname, stat* buf ) ;
 FUNCTION: int lstat64 ( c-string pathname, stat* buf ) ;
+FUNCTION: int fstat64 ( int fd, stat* buf ) ;
 
 : stat ( path buf -- n ) stat64 ;
 : lstat ( path buf -- n ) lstat64 ;
+: fstat ( fd buf -- n ) fstat64 ;

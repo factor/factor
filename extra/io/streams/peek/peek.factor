@@ -9,17 +9,11 @@ TUPLE: peek-stream stream peeked ;
 
 M: peek-stream dispose stream>> dispose ;
 
-: stream-exemplar-growable ( stream -- exemplar )
-    stream-element-type {
-        { +byte+ [ BV{ } ] }
-        { +character+ [ SBUF" " ] }
-    } case ; inline
-
 : stream-new-resizable ( n stream -- exemplar )
-    stream-element-exemplar new-resizable ; inline
+    stream-exemplar new-resizable ; inline
 
 : stream-like ( sequence stream -- sequence' )
-    stream-element-exemplar like ; inline
+    stream-exemplar like ; inline
 
 : stream-clone-resizable ( sequence stream -- sequence' )
     stream-exemplar-growable clone-like ; inline
@@ -39,22 +33,22 @@ M: peek-stream stream-read1
         pop nip
     ] if-empty ;
 
-M:: peek-stream stream-read ( n stream -- sequence )
+M:: peek-stream stream-read-unsafe ( n buf stream -- count )
     stream peeked>> :> peeked
     peeked length :> #peeked
     #peeked 0 = [
-        n stream stream>> stream-read
+        n buf stream stream>> stream-read-unsafe
     ] [
-        ! Have we already peeked enough?
-        #peeked n > [
-            peeked <reversed> n cut [ stream stream-like ]
-            [ <reversed> stream stream-clone-resizable stream peeked<< ] bi*
+        #peeked n >= [
+            peeked <reversed> n head-slice 0 buf copy
+            peeked [ length n - ] keep shorten
+            n
         ] [
-            peeked <reversed>
-            n #peeked - stream stream>> stream-read
-            stream stream-element-exemplar append-as
-
-            stream stream-exemplar-growable clone stream peeked<<
+            peeked <reversed> 0 buf copy
+            0 peeked shorten
+            n #peeked - :> n'
+            buf #peeked tail-slice :> buf'
+            n' buf' stream stream-read-unsafe #peeked +
         ] if
     ] if ;
 
@@ -83,7 +77,7 @@ M: peek-stream stream-flush stream>> stream-flush ;
 
 : stream-peek ( n stream -- seq )
     2dup peeked>> { [ length <= ] [ length 0 > ] } 1&& [
-        [ peeked>> <reversed> swap head ] [ stream-element-exemplar like ] bi
+        [ peeked>> <reversed> swap head ] [ stream-exemplar like ] bi
     ] [
         [ nip ]
         [ stream-read ] 2bi

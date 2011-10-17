@@ -5,13 +5,13 @@ compiler.tree.debugger math libc destructors sequences.private
 multiline eval words vocabs namespaces assocs prettyprint
 alien.data math.vectors definitions compiler.test ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
-FROM: alien.c-types => int float bool char float ulonglong ushort uint
+FROM: alien.c-types => int float bool uchar char float ulonglong ushort uint
 heap-size ;
 FROM: alien.data => little-endian? ;
 IN: specialized-arrays.tests
 
 SPECIALIZED-ARRAY: int
-SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
+SPECIALIZED-ARRAYS: bool uchar ushort char uint float ulonglong ;
 
 [ t ] [ { 1 2 3 } int >c-array int-array? ] unit-test
 
@@ -199,6 +199,7 @@ SPECIALIZED-ARRAY: struct-resize-test
 [ int-array{ 4 5 6 7 8 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-tail ] unit-test
 [ int-array{ 6 7 8 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-tail* ] unit-test
 
+[ uchar-array{ 0 1 255 } ] [ 3 6 B{ 1 1 1 0 1 255 2 2 2 } direct-slice ] unit-test
 
 [ int-array{ 1 2 3 4 55555 6 7 8 } ] [
     int-array{ 1 2 3 4 5 6 7 8 }

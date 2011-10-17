@@ -13,18 +13,6 @@ TUPLE: c-stream < disposable handle ;
 
 M: c-stream dispose* handle>> fclose ;
 
-M: c-stream stream-tell handle>> ftell ;
-
-M: c-stream stream-seek
-    [
-        {
-            { seek-absolute [ 0 ] }
-            { seek-relative [ 1 ] }
-            { seek-end [ 2 ] }
-            [ bad-seek-type ]
-        } case
-    ] [ handle>> ] bi* fseek ;
-
 TUPLE: c-writer < c-stream ;
 
 : <c-writer> ( handle -- stream ) c-writer new-c-stream ;
@@ -45,9 +33,7 @@ TUPLE: c-reader < c-stream ;
 
 M: c-reader stream-element-type drop +byte+ ;
 
-M: c-reader stream-read dup check-disposed handle>> fread ;
-
-M: c-reader stream-read-partial stream-read ;
+M: c-reader stream-read-unsafe dup check-disposed handle>> fread-unsafe ;
 
 M: c-reader stream-read1 dup check-disposed handle>> fgetc ;
 
