@@ -198,6 +198,7 @@ big-endian off
 ] jit-execute jit-define
 
 [
+    jit-safepoint
     stack-reg stack-frame-size bootstrap-cell - ADD
 ] jit-epilog jit-define
 
