@@ -10,7 +10,7 @@ IN: readline
     [
         readline.ffi:readline [
             |free utf8 alien>string [
-                [ ] [ readline.ffi:add_history ] if-empty
+                [ readline.ffi:add_history ] unless-empty
             ] keep
         ] [ f ] if*
     ] with-destructors ;
