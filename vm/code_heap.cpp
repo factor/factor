@@ -9,12 +9,13 @@ code_heap::code_heap(cell size)
 	seg = new segment(align_page(size),true);
 	if(!seg) fatal_error("Out of memory in code_heap constructor",size);
 
-	cell start = seg->start + seh_area_size;
+	cell start = seg->start + getpagesize() + seh_area_size;
 
 	allocator = new free_list_allocator<code_block>(seg->end - start,start);
 
 	/* See os-windows-x86.64.cpp for seh_area usage */
-	seh_area = (char *)seg->start;
+	safepoint_page = (void *)seg->start;
+	seh_area = (char *)seg->start + getpagesize();
 }
 
 code_heap::~code_heap()

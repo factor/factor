@@ -11,6 +11,9 @@ struct code_heap {
 	/* The actual memory area */
 	segment *seg;
 
+	/* Memory area reserved for safepoint guard page */
+	void *safepoint_page;
+
 	/* Memory area reserved for SEH. Only used on Windows */
 	char *seh_area;
 
