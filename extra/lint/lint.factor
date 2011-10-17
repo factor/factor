@@ -71,6 +71,9 @@ CONSTANT: trivial-defs
         ! Remove words with locals
         [ [ \ load-locals = ] any? ]
 
+        ! Remove stuff with wrappers
+        [ [ wrapper? ] any? ]
+
         ! Remove numbers/t/f only defs
         [
             [ { [ number? ] [ t? ] [ f eq? ] } 1|| ] all?
@@ -111,11 +114,6 @@ CONSTANT: trivial-defs
                 [ third \ slot = ]
             } 1&&
         ]
-
-        ! Remove [ ... \ cdecl ]
-        [
-            { [ length 3 = ] [ last \ cdecl = ] } 1&&
-        ]
     } 1|| ;
 
 : all-callables ( def -- seq )
@@ -155,7 +153,7 @@ M: callable lint ( quot -- seq )
     [ lint-definitions-keys get-global ] dip '[ _ subseq? ] filter ;
 
 M: word lint ( word -- seq/f )
-    def>> all-callables [ lint ] map concat ;
+    def>> [ callable? ] deep-filter [ lint ] map concat ;
 
 : word-path. ( word -- )
     [ vocabulary>> write ":" write ] [ . ] bi ;
