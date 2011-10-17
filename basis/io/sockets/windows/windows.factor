@@ -111,7 +111,7 @@ TUPLE: ConnectEx-args port
     s name namelen lpSendBuffer dwSendDataLength
     lpdwBytesSent lpOverlapped ptr ;
 
-: wait-for-socket ( args -- n )
+: wait-for-socket ( args -- count )
     [ lpOverlapped>> ] [ port>> ] bi twiddle-thumbs ; inline
 
 : <ConnectEx-args> ( sockaddr size -- ConnectEx )
@@ -211,19 +211,24 @@ TUPLE: WSARecvFrom-args port
        s lpBuffers dwBufferCount lpNumberOfBytesRecvd
        lpFlags lpFrom lpFromLen lpOverlapped lpCompletionRoutine ;
 
-: make-receive-buffer ( n buf -- WSABUF )
+:: make-receive-buffer ( n buf -- buf' WSABUF )
+    buf >c-ptr pinned-alien?
+    [ buf ] [ n malloc [ buf n memcpy ] keep ] if :> buf'
+    buf'
     WSABUF malloc-struct &free
         n >>len
-        buf >>buf ; inline
+        buf' >>buf ; inline
 
-:: <WSARecvFrom-args> ( n buf datagram -- WSARecvFrom )
+:: <WSARecvFrom-args> ( n buf datagram -- buf buf' WSARecvFrom )
+    n buf make-receive-buffer :> ( buf' wsaBuf )
+    buf buf'
     WSARecvFrom-args new
         datagram >>port
         datagram handle>> handle>> >>s
         datagram addr>> sockaddr-size
             [ malloc &free >>lpFrom ]
             [ malloc-int &free >>lpFromLen ] bi
-        n buf make-receive-buffer >>lpBuffers
+        wsaBuf >>lpBuffers
         1 >>dwBufferCount
         0 malloc-int &free >>lpFlags
         0 malloc-int &free >>lpNumberOfBytesRecvd
@@ -242,16 +247,18 @@ TUPLE: WSARecvFrom-args port
         [ lpCompletionRoutine>> ]
     } cleave WSARecvFrom socket-error* ; inline
 
-: parse-WSARecvFrom ( n WSARecvFrom -- packet sockaddr )
-    [ lpBuffers>> buf>> swap memory>byte-array ]
-    [
-        [ port>> addr>> empty-sockaddr dup ]
-        [ lpFrom>> ]
-        [ lpFromLen>> int deref ]
-        tri memcpy
-    ] bi ; inline
+:: finalize-buf ( buf buf' count -- )
+    buf buf' eq? [ buf buf' count memcpy ] unless ; inline
 
-M: windows (receive) ( n buf datagram -- packet addrspec )
+:: parse-WSARecvFrom ( buf buf' count wsaRecvFrom -- count sockaddr )
+    buf buf' count finalize-buf
+    wsaRecvFrom
+    [ port>> addr>> empty-sockaddr dup ]
+    [ lpFrom>> ]
+    [ lpFromLen>> int deref ]
+    tri memcpy ; inline
+
+M: windows (receive) ( n buf datagram -- count addrspec )
     [
         <WSARecvFrom-args>
         [ call-WSARecvFrom ]
