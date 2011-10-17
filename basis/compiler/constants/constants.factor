@@ -70,6 +70,7 @@ CONSTANT: rt-decks-offset 11
 CONSTANT: rt-exception-handler 12
 CONSTANT: rt-dlsym-toc 13
 CONSTANT: rt-inline-cache-miss 14
+CONSTANT: rt-safepoint 15
 
 : rc-absolute? ( n -- ? )
     ${
