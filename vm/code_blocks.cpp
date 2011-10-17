@@ -272,6 +272,9 @@ void factor_vm::store_external_address(instruction_operand op)
 	case RT_INLINE_CACHE_MISS:
 		op.store_value((cell)&factor::inline_cache_miss);
 		break;
+	case RT_SAFEPOINT:
+		op.store_value((cell)code->safepoint_page);
+		break;
 	default:
 		critical_error("Bad rel type in store_external_address()",op.rel_type());
 		break;
