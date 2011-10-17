@@ -1,10 +1,12 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays assocs classes.tuple.private
-combinators.short-circuit fry hashtables io kernel
-locals.backend make math namespaces prettyprint quotations
-sequences sequences.deep shuffle slots.private vectors vocabs
-words xml.data words.alias ;
+
+USING: accessors alien arrays assocs classes
+classes.tuple.private combinators.short-circuit fry hashtables
+io kernel kernel.private locals.backend make math namespaces
+prettyprint quotations sequences sequences.deep shuffle
+slots.private vectors vocabs words words.alias ;
+
 IN: lint
 
 <PRIVATE
@@ -33,14 +35,16 @@ CONSTANT: trivial-defs
         [ 3drop t ] [ 3drop f ]
         [ ">" write ] [ "/>" write ]
         [ length 1 - ] [ length 1 = ] [ length 1 > ]
-        [ drop f f ] [ 2drop f f ]
+        [ drop f f ] [ drop f t ] [ drop t f ] [ drop t t ]
+        [ 2drop f f ] [ 2drop f t ] [ 2drop t f ] [ 2drop t t ]
         [ drop f f f ]
         [ nip f f ]
         [ 0 or + ]
-        [ dup 0 > ] [ dup 0 <= ]
+        [ dup 0 > ] [ dup 0 <= ] [ dup 0 < ]
+        [ over 0 > ] [ over 0 <= ] [ over 0 < ]
         [ dup length iota ]
         [ 0 swap copy ]
-        [ dup 1 + ]
+        [ dup 1 + ] [ drop 1 + ]
     }
 
 : lintable-word? ( word -- ? )
@@ -72,11 +76,21 @@ CONSTANT: trivial-defs
             [ { [ number? ] [ t? ] [ f eq? ] } 1|| ] all?
         ]
 
-        ! Remove tag defs
+        ! Remove [ tag n eq? ]
         [
             {
                 [ length 3 = ]
                 [ first \ tag = ] [ second number? ] [ third \ eq? = ]
+            } 1&&
+        ]
+
+        ! Remove [ { foo } declare class ]
+        [
+            {
+                [ length 3 = ]
+                [ first { [ array? ] [ length 1 = ] } 1&& ]
+                [ second \ declare = ]
+                [ third \ class = ]
             } 1&&
         ]
 
@@ -97,10 +111,15 @@ CONSTANT: trivial-defs
                 [ third \ slot = ]
             } 1&&
         ]
+
+        ! Remove [ ... \ cdecl ]
+        [
+            { [ length 3 = ] [ last \ cdecl = ] } 1&&
+        ]
     } 1|| ;
 
 : all-callables ( def -- seq )
-    [ callable? ] deep-filter ;
+    [ { [ callable? ] [ ignore-def? not ] } 1&& ] deep-filter ;
 
 : (load-definitions) ( word def hash -- )
     [ all-callables ] dip '[ _ push-at ] with each ;
@@ -114,7 +133,6 @@ SYMBOL: lint-definitions-keys
 : reload-definitions ( -- )
     ! Load lintable and non-ignored definitions
     lintable-words load-definitions
-    [ drop ignore-def? not ] assoc-filter
 
     ! Remove words that are their own definition
     [ [ [ def>> ] [ 1quotation ] bi = not ] filter ] assoc-map
