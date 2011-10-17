@@ -41,6 +41,8 @@ struct code_heap {
 	void clear_mark_bits();
 	void free(code_block *compiled);
 	void flush_icache();
+	void guard_safepoint();
+	void unguard_safepoint();
 };
 
 struct code_heap_room {
