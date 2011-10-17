@@ -125,29 +125,23 @@ M: unix (datagram)
 M: unix (raw)
     [ SOCK_RAW server-socket-fd ] with-destructors ;
 
-SYMBOL: receive-buffer
-
-CONSTANT: packet-size 65536
-
-[ packet-size malloc &free receive-buffer set-global ] "io.sockets.unix" add-startup-hook
-
-:: do-receive ( port -- packet sockaddr )
+:: do-receive ( n buf port -- count sockaddr )
     port addr>> empty-sockaddr/size :> ( sockaddr len )
     port handle>> handle-fd ! s
-    receive-buffer get-global ! buf
-    packet-size ! nbytes
+    buf ! buf
+    n ! nbytes
     0 ! flags
     sockaddr ! from
     len int <ref> ! fromlen
-    recvfrom dup 0 >=
-    [ receive-buffer get-global swap memory>byte-array sockaddr ]
-    [ drop f f ]
-    if ;
+    recvfrom sockaddr ; inline
 
-M: unix (receive) ( datagram -- packet sockaddr )
-    dup do-receive dup [ [ drop ] 2dip ] [
-        2drop [ +input+ wait-for-port ] [ (receive) ] bi
-    ] if ;
+: (receive-loop) ( n buf datagram -- count sockaddr )
+    3dup do-receive over 0 > [ [ 3drop ] 2dip ] [
+        2drop [ +input+ wait-for-port ] [ (receive-loop) ] bi
+    ] if ; inline recursive
+
+M: unix (receive) ( n buf datagram -- count sockaddr )
+    (receive-loop) ;
 
 :: do-send ( packet sockaddr len socket datagram -- )
     socket handle-fd packet dup length 0 sockaddr len sendto
@@ -162,7 +156,7 @@ M: unix (receive) ( datagram -- packet sockaddr )
                 (io-error)
             ] if
         ] if
-    ] when ;
+    ] when ; inline recursive
 
 M: unix (send) ( packet addrspec datagram -- )
     [ make-sockaddr/size ] [ [ handle>> ] keep ] bi* do-send ;
