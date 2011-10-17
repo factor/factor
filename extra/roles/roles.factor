@@ -20,7 +20,8 @@ PREDICATE: role < mixin-class
     } case ;
 
 : slot-name ( name/array -- name )
-    dup string? [ ] [ first ] if ;
+    dup string? [ first ] unless ;
+
 : slot-names ( array -- names )
     [ slot-name ] map ;
 
