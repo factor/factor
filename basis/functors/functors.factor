@@ -46,7 +46,7 @@ M: object (fake-quotations>) , ;
     [ fake-quotations> first ] append! ;
 
 : parse-declared* ( accum -- accum )
-    complete-effect
+    scan-effect
     [ parse-definition* ] dip
     suffix! ;
 
@@ -84,7 +84,7 @@ FUNCTOR-SYNTAX: M:
 FUNCTOR-SYNTAX: C:
     scan-param suffix!
     scan-param suffix!
-    complete-effect
+    scan-effect
     [ [ [ boa ] curry ] append! ] dip suffix!
     \ define-declared* suffix! ;
 
@@ -109,7 +109,7 @@ FUNCTOR-SYNTAX: INSTANCE:
 
 FUNCTOR-SYNTAX: GENERIC:
     scan-param suffix!
-    complete-effect suffix!
+    scan-effect suffix!
     \ define-simple-generic* suffix! ;
 
 FUNCTOR-SYNTAX: MACRO:
