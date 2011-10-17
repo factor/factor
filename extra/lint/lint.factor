@@ -30,21 +30,20 @@ CONSTANT: manual-substitutions
 
 CONSTANT: trivial-defs
     {
-        [ drop t ] [ drop f ]
-        [ 2drop t ] [ 2drop f ]
-        [ 3drop t ] [ 3drop f ]
-        [ ">" write ] [ "/>" write ]
-        [ length 1 - ] [ length 1 = ] [ length 1 > ]
-        [ drop f f ] [ drop f t ] [ drop t f ] [ drop t t ]
-        [ 2drop f f ] [ 2drop f t ] [ 2drop t f ] [ 2drop t t ]
-        [ drop f f f ]
-        [ nip f f ]
+        [ ">" write ] [ "/>" write ] [ " " write ]
         [ 0 or + ]
-        [ dup 0 > ] [ dup 0 <= ] [ dup 0 < ]
-        [ over 0 > ] [ over 0 <= ] [ over 0 < ]
         [ dup length iota ]
         [ 0 swap copy ]
-        [ dup 1 + ] [ drop 1 + ]
+        [ dup length ]
+        [ 0 swap ]
+        [ 2dup = ] [ 2dup eq? ]
+        [ = not ] [ eq? not ]
+        [ boa throw ]
+        [ with each ] [ with map ]
+        [ curry filter ]
+        [ compose compose ]
+        [ empty? ] [ empty? not ]
+        [ dup empty? ] [ dup empty? not ]
     }
 
 : lintable-word? ( word -- ? )
@@ -60,7 +59,7 @@ CONSTANT: trivial-defs
 : ignore-def? ( def -- ? )
     {
         ! Remove small defs
-        [ length 2 <= ]
+        [ length 1 <= ]
 
         ! Remove trivial defs
         [ trivial-defs member? ]
@@ -74,9 +73,106 @@ CONSTANT: trivial-defs
         ! Remove stuff with wrappers
         [ [ wrapper? ] any? ]
 
+        ! Remove trivial math
+        [ [ { [ number? ] [ { + - / * /i /f >integer } member? ] } 1|| ] all? ]
+
+        ! Remove more trival defs
+        [
+            {
+                [ length 2 = ]
+                [ first2 [ word? ] either? ]
+                [ first2 [ { dip dup over swap drop } member? ] either? ]
+            } 1&&
+        ]
+
+        ! Remove [ V{ } clone ] and related
+        [
+            {
+                [ length 2 = ]
+                [ first { [ sequence? ] [ assoc? ] } 1|| ]
+                [ second { clone clone-like like assoc-like make make-assoc } member? ]
+            } 1&&
+        ]
+
+        ! Remove [ foo get ] and related
+        [
+            {
+                [ length 2 = ]
+                [ first word? ]
+                [ second { get get-global , % } member? ]
+            } 1&&
+        ]
+
+        ! Remove [ first second ] and related
+        [
+            {
+                [ length 2 = ]
+                [ first { first second third } member? ]
+                [ second { first second third } member? ]
+            } 1&&
+        ]
+
+        ! Remove [ [ trivial ] if ] and related
+        [
+            {
+                [ length 2 = ]
+                [ first { [ quotation? ] [ ignore-def? ] } 1&& ]
+                [ second { if if* unless unless* when when* curry } member? ]
+            } 1&&
+        ]
+
+        ! Remove [ n - ] and related
+        [
+            {
+                [ length 2 = ]
+                [ first { [ number? ] [ boolean? ] } 1|| ]
+                [ second { + - / * < <= = >= > shift bitand bitor bitxor eq? } member? ]
+            } 1&&
+        ]
+
+        ! Remove [ dup 0 > ] and related
+        [
+            {
+                [ length 3 = ]
+                [ first { dup over } member? ]
+                [ second number? ]
+                [ third { + - / * < <= = >= > } member? ]
+            } 1&&
+        ]
+
+        ! Remove [ drop f f ] and related
+        [
+            {
+                [ length 4 <= ]
+                [ first { drop 2drop 3drop nip 2nip } member? ]
+                [ rest-slice [ boolean? ] all? ]
+            } 1&&
+        ]
+
+        ! Remove [ length 1 = ] and related
+        [
+            {
+                [ length 3 = ]
+                [ first \ length = ]
+                [ second number? ]
+                [ third { + - / * < <= = >= > } member? ]
+            } 1&&
+        ]
+
+        ! Remove [ dup length 1 = ] and related
+        [
+            {
+                [ length 4 = ]
+                [ first { dup over } member? ]
+                [ second \ length = ]
+                [ third number? ]
+                [ fourth { + - / * < <= = >= > } member? ]
+            } 1&&
+        ]
+
         ! Remove numbers/t/f only defs
         [
-            [ { [ number? ] [ t? ] [ f eq? ] } 1|| ] all?
+            [ { [ number? ] [ boolean? ] } 1|| ] all?
         ]
 
         ! Remove [ tag n eq? ]
