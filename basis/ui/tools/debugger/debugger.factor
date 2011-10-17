@@ -91,5 +91,5 @@ debugger "toolbar" f {
     { T{ key-down f { C+ } "i" } com-inspect }
     { T{ key-down f { C+ } "t" } com-traceback }
     { T{ key-down f { C+ } "h" } com-help }
-    { T{ key-down f { C+ } "e" } com-edit }
+    { T{ key-down f { C+ } "b" } com-edit }
 } define-command-map
