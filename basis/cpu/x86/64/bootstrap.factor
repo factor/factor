@@ -313,6 +313,9 @@ IN: bootstrap.x86
     jit-push-param
     jit-jump-quot ;
 
+: jit-safepoint ( -- )
+    0 [RIP+] EAX MOV rc-relative rel-safepoint ;
+
 [
     jit-start-context-and-delete
 ] \ (start-context-and-delete) define-sub-primitive
