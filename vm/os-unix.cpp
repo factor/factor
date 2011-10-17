@@ -124,6 +124,18 @@ segment::~segment()
 		fatal_error("Segment deallocation failed",0);
 }
 
+void code_heap::guard_safepoint()
+{
+	if(mprotect(safepoint_page,getpagesize(),PROT_NONE) == -1)
+		fatal_error("Cannot protect safepoint guard page",(cell)safepoint_page);
+}
+
+void code_heap::unguard_safepoint()
+{
+	if(mprotect(safepoint_page,getpagesize(),PROT_WRITE) == -1)
+		fatal_error("Cannot unprotect safepoint guard page",(cell)safepoint_page);
+}
+
 void factor_vm::dispatch_signal(void *uap, void (handler)())
 {
 	UAP_STACK_POINTER(uap) = (UAP_STACK_POINTER_TYPE)fix_callstack_top((stack_frame *)UAP_STACK_POINTER(uap));
