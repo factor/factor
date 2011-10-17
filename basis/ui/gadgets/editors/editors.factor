@@ -543,20 +543,14 @@ PRIVATE>
     [ last-line# ] dip = ;
 
 : prev-line-and-this ( document line -- start end )
-    swap
-    [ drop 1 - 0 2array ]
-    [ [ drop ] [ doc-line length ] 2bi 2array ]
-    2bi ;
+    swap [ drop 1 - 0 2array ] [ line-end ] 2bi ;
 
 : join-with-prev ( document line -- )
     [ prev-line-and-this ] [ drop ] 2bi
     [ join-lines ] change-doc-range ;
 
 : this-line-and-next ( document line -- start end )
-    swap
-    [ drop 0 2array ]
-    [ [ 1 + ] dip [ drop ] [ doc-line length ] 2bi 2array ]
-    2bi ;
+    swap [ drop 0 2array ] [ [ 1 + ] dip line-end ] 2bi ;
 
 : join-with-next ( document line -- )
     [ this-line-and-next ] [ drop ] 2bi

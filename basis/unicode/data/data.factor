@@ -116,7 +116,7 @@ PRIVATE>
     [ 0 = not ] filter ;
 
 : remove-exclusions ( alist -- alist )
-    exclusions [ dup ] H{ } map>assoc assoc-diff ;
+    exclusions unique assoc-diff ;
 
 : process-canonical ( data -- hash hash )
     (process-decomposed) [ first* ] filter

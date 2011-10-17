@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs byte-arrays combinators compiler.cfg.builder
 continuations fry sequences compiler.tree.propagation.info
-cpu.architecture kernel words make math math.intervals
-math.vectors.simd.intrinsics namespaces ;
+compiler.tree.propagation.nodes cpu.architecture kernel words
+make math math.intervals math.vectors.simd.intrinsics namespaces ;
 IN: compiler.tree.propagation.simd
 
 CONSTANT: vector>vector-intrinsics
@@ -105,7 +105,7 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
 ] "outputs" set-word-prop
 
 : clone-with-value-infos ( node -- node' )
-    clone dup in-d>> [ dup value-info ] H{ } map>assoc >>info ;
+    clone dup in-d>> extract-value-info >>info ;
 
 : try-intrinsic ( node intrinsic-quot -- ? )
     '[

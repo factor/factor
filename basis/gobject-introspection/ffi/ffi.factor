@@ -79,16 +79,16 @@ M: utf8-type parse-const-value drop ;
     [ value>> ] [ type>> ] bi parse-const-value ;
 
 : def-const ( const -- )
-    [ c-identifier>> create-in dup reset-generic ]
-    [ const-value ] bi define-constant ;
+    [ c-identifier>> create-function ] [ const-value ] bi
+    define-constant ;
 
 : def-consts ( consts -- )
     [ def-const ] each ;
 
 : define-enum-member ( member -- )
-    [ c-identifier>> create-in dup reset-generic ]
-    [ value>> ] bi define-constant ;
-           
+    [ c-identifier>> create-function ] [ value>> ] bi
+    define-constant ;
+
 : def-enum-type ( enum -- )
     [ members>> [ define-enum-member ] each ]
     [ c-type>> int def-c-type ] bi ;

@@ -103,9 +103,7 @@ ERROR: escaped-char-expected ;
     ] if ;
 
 : lexer-head? ( string -- ? )
-    [
-        lexer get [ line-text>> ] [ column>> ] bi tail-slice
-    ] dip head? ;
+    [ lexer get rest-of-line ] dip head? ;
 
 : advance-lexer ( n -- )
     [ lexer get ] dip [ + ] curry change-column drop ; inline

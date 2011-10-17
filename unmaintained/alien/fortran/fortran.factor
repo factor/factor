@@ -435,7 +435,7 @@ MACRO: fortran-invoke ( return library function parameters -- )
     bi* <effect> ;
 
 :: define-fortran-function ( return library function parameters -- )
-    function create-in dup reset-generic 
+    function create-function
     return library function parameters return [ c:void ] unless* parse-arglist
     [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
