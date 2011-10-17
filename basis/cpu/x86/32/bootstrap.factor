@@ -359,6 +359,9 @@ IN: bootstrap.x86
     EAX EDX [] MOV
     jit-jump-quot ;
 
+: jit-safepoint ( -- )
+    0 [] EAX MOV rc-absolute rel-safepoint ;
+
 [
     jit-start-context-and-delete
 ] \ (start-context-and-delete) define-sub-primitive
