@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces sequences math.parser
-calendar validators urls logging html.forms
+calendar checksums validators urls logging html.forms
 http http.server http.server.dispatchers
 furnace.auth
 furnace.asides
@@ -16,8 +16,7 @@ IN: furnace.auth.login
 SYMBOL: permit-id
 
 : permit-id-key ( realm -- string )
-    [ >hex 2 CHAR: 0 pad-head ] { } map-as concat
-    "__p_" prepend ;
+    hex-string "__p_" prepend ;
 
 : client-permit-id ( realm -- id/f )
     permit-id-key client-state dup [ string>number ] when ;

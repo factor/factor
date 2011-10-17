@@ -47,9 +47,7 @@ SYMBOL: binary-literal-table
     [ add-binary-literal ] dip label-fixup ;
 
 : emit-data ( obj label -- )
-    over length align-code
-    resolve-label
-    building get push-all ;
+    over length align-code resolve-label % ;
 
 : emit-binary-literals ( -- )
     binary-literal-table get [ emit-data ] assoc-each ;

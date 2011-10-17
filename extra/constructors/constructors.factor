@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.tuple
+USING: accessors alien.parser arrays assocs classes classes.tuple
 effects.parser fry generalizations sequences.generalizations
 generic.standard kernel lexer locals macros parser sequences
 sets slots vocabs words ;
@@ -60,7 +60,7 @@ ERROR: unknown-constructor-parameters class effect unknown ;
     '[ @ _ [ execute( obj -- obj ) ] each ] effect define-declared ;
 
 : scan-constructor ( -- word class )
-    scan-word [ name>> "<" ">" surround create-in dup reset-generic ] keep ;
+    scan-word [ name>> "<" ">" surround create-function ] keep ;
 
 : parse-constructor ( -- class word effect def )
     scan-constructor complete-effect ensure-constructor-parameters
