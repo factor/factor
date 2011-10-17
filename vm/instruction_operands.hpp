@@ -123,6 +123,7 @@ struct relocation_entry {
 		case RT_DECKS_OFFSET:
 		case RT_EXCEPTION_HANDLER:
 		case RT_INLINE_CACHE_MISS:
+		case RT_SAFEPOINT:
 			return 0;
 		default:
 			critical_error("Bad rel type in number_of_parameters()",rel_type());
