@@ -1,35 +1,17 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.parser arrays assocs classes classes.tuple
-effects.parser fry generalizations sequences.generalizations
-generic.standard kernel lexer locals macros parser sequences
-sets slots vocabs words ;
+USING: accessors assocs classes classes.tuple effects
+effects.parser fry kernel lexer locals macros parser
+sequences sequences.generalizations sets vocabs vocabs.parser
+words alien.parser ;
 IN: constructors
 
-! An experiment
-
-: initializer-name ( class -- word )
-    name>> "initialize-" prepend ;
-
-: lookup-initializer ( class -- word/f )
-    initializer-name "initializers" lookup ;
-
-: initializer-word ( class -- word )
-    initializer-name
-    "initializers" create-vocab create
-    [ t "initializer" set-word-prop ] [ ] bi ;
-
-: define-initializer-generic ( name -- )
-    initializer-word (( object -- object )) define-simple-generic ;
-
-: define-initializer ( class def -- )
-    [ drop define-initializer-generic ]
-    [ [ dup lookup-initializer ] dip H{ } clone define-typecheck ] 2bi ;
-
 : all-slots-assoc ( class -- slots )
-    superclasses [ [ "slots" word-prop ] keep '[ _ ] { } map>assoc ] map concat ;
+    superclasses [
+        [ "slots" word-prop ] keep '[ _ ] { } map>assoc
+    ] map concat ;
 
-MACRO:: slots>constructor ( class slots -- quot )
+MACRO:: slots>boa ( slots class -- quot )
     class all-slots-assoc slots [ '[ first name>> _ = ] find-last nip ] with map :> slot-assoc
     class all-slots-assoc [ [ ] [ first initial>> ] bi ] { } map>assoc :> default-params
     slots length
@@ -48,24 +30,42 @@ ERROR: unknown-constructor-parameters class effect unknown ;
     2dup [ all-slots [ name>> ] map ] [ in>> ] bi* swap diff
     [ unknown-constructor-parameters ] unless-empty ;
 
-:: (define-constructor) ( constructor-word class effect def -- word quot )
-    constructor-word
-    class def define-initializer
-    class effect in>> '[ _ _ slots>constructor ] ;
+: constructor-boa-quot ( constructor-word class effect -- word quot )
+    in>> swap '[ _ _ slots>boa ] ; inline
 
-:: define-constructor ( constructor-word class effect def reverse? -- )
-    constructor-word class effect def (define-constructor)
-    class superclasses [ lookup-initializer ] map sift
-    reverse? [ reverse ] when
-    '[ @ _ [ execute( obj -- obj ) ] each ] effect define-declared ;
+: define-constructor ( constructor-word class effect -- )
+    ensure-constructor-parameters
+    [ constructor-boa-quot ] keep define-declared ;
+
+: create-reset ( string -- word )
+    create-in dup reset-generic ;
 
 : scan-constructor ( -- word class )
     scan-word [ name>> "<" ">" surround create-function ] keep ;
 
-: parse-constructor ( -- class word effect def )
-    scan-constructor complete-effect ensure-constructor-parameters
+: parse-constructor ( -- word class effect def )
+    scan-constructor scan-effect ensure-constructor-parameters
     parse-definition ;
 
-SYNTAX: CONSTRUCTOR: parse-constructor f define-constructor ;
+SYNTAX: CONSTRUCTOR:
+    parse-constructor
+    [ [ constructor-boa-quot ] dip compose ]
+    [ drop ] 2bi define-declared ;
 
-"initializers" create-vocab drop
+: scan-rest-input-effect ( -- effect )
+    ")" parse-effect-tokens nip
+    { "obj" } <effect> ;
+
+: scan-full-input-effect ( -- effect )
+    "(" expect scan-rest-input-effect ;
+
+SYNTAX: NAMED-CONSTRUCTOR:
+    scan-new-word scan-word scan-effect define-constructor ;
+    
+SYNTAX: DEFAULT-CONSTRUCTOR:
+    scan-constructor scan-effect define-constructor ;
+
+SYNTAX: CONSTRUCTOR-SYNTAX:
+    scan-word [ name>> "(" append create-reset ] keep
+    '[ scan-rest-input-effect in>> _ '[ _ _ slots>boa ] append! ] define-syntax ;
+
