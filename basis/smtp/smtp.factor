@@ -28,7 +28,7 @@ C: <plain-auth> plain-auth
 SYMBOL: smtp-auth
 no-auth smtp-auth set-global
 
-LOG: log-smtp-connection NOTICE ( addrspec -- )
+LOG: log-smtp-connection NOTICE
 
 : with-smtp-connection ( quot -- )
     smtp-server get
