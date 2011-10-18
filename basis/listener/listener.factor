@@ -12,8 +12,8 @@ GENERIC: stream-read-quot ( stream -- quot/f )
 GENERIC# prompt. 1 ( stream prompt -- )
 
 : prompt ( -- str )
-    current-vocab name>> auto-use? get [ " - auto" append ] when
-    "( " " )" surround ;
+    manifest get current-vocab>> [ name>> ] [ "" ] if*
+    auto-use? get [ " - auto" append ] when "( " " )" surround ;
 
 M: object prompt.
     nip H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl
