@@ -17,8 +17,11 @@ M: windows touch-file ( path -- )
 M: windows move-file ( from to -- )
     [ normalize-path ] bi@ MoveFile win32-error=0/f ;
 
+ERROR: file-delete-failed path error ;
+
 M: windows delete-file ( path -- )
-    normalize-path DeleteFile win32-error=0/f ;
+    [ normalize-path DeleteFile win32-error=0/f ]
+    [ \ file-delete-failed boa rethrow ] recover ;
 
 M: windows copy-file ( from to -- )
     dup parent-directory make-directories
