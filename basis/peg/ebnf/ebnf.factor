@@ -492,8 +492,8 @@ ERROR: bad-effect quot effect ;
 
 : check-action-effect ( quot -- quot )
   dup infer {
-    { [ dup (( a -- b )) effect<= ] [ drop ] }
-    { [ dup (( -- b )) effect<= ] [ drop [ drop ] prepose ] }
+    { [ dup ( a -- b ) effect<= ] [ drop ] }
+    { [ dup ( -- b ) effect<= ] [ drop [ drop ] prepose ] }
     [ bad-effect ]
   } cond ;
 
@@ -572,5 +572,5 @@ SYNTAX: [EBNF
 SYNTAX: EBNF: 
   reset-tokenizer scan-new-word dup ";EBNF" parse-multiline-string  
   ebnf>quot swapd
-  (( input -- ast )) define-declared "ebnf-parser" set-word-prop 
+  ( input -- ast ) define-declared "ebnf-parser" set-word-prop 
   reset-tokenizer ;

@@ -5,7 +5,7 @@ DEFER: word-1
 
 : word-2 ( a -- b ) word-1 ;
 
-[ \ word-1 [ ] (( a -- b )) define-declared ] with-compilation-unit 
+[ \ word-1 [ ] ( a -- b ) define-declared ] with-compilation-unit 
 
 [ "a" ] [ "a" word-2 ] unit-test
 
@@ -15,6 +15,6 @@ DEFER: word-1
 
 [ 1 1 ] [ 0 word-4 ] unit-test
 
-[ \ word-3 [ [ 2 + ] bi@ ] (( a b -- c d )) define-declared ] with-compilation-unit
+[ \ word-3 [ [ 2 + ] bi@ ] ( a b -- c d ) define-declared ] with-compilation-unit
 
 [ 2 3 ] [ 0 word-4 ] unit-test

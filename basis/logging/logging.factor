@@ -140,7 +140,7 @@ SYNTAX: LOG:
     #! Syntax: name level
     scan-new-word dup scan-word
     '[ 1array stack>message _ _ log-message ]
-    (( message -- )) define-declared ;
+    ( message -- ) define-declared ;
 
 USE: vocabs.loader
 

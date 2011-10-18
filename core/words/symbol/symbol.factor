@@ -3,7 +3,7 @@
 USING: kernel sequences accessors definitions words ;
 IN: words.symbol
 
-PREDICATE: symbol < word ( obj -- ? )
+PREDICATE: symbol < word
     [ def>> ] [ [ ] curry ] bi sequence= ;
 
 M: symbol definer drop \ SYMBOL: f ;
@@ -11,4 +11,4 @@ M: symbol definer drop \ SYMBOL: f ;
 M: symbol definition drop f ;
 
 : define-symbol ( word -- )
-    dup [ ] curry (( -- value )) define-inline ;
+    dup [ ] curry ( -- value ) define-inline ;

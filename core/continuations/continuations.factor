@@ -10,7 +10,7 @@ IN: continuations
         [ [ datastack ] dip swap [ { } like set-datastack ] dip ] dip
         swap [ call datastack ] dip
         swap [ set-datastack ] dip
-    ] (( stack quot -- new-stack )) call-effect-unsafe ;
+    ] ( stack quot -- new-stack ) call-effect-unsafe ;
 
 SYMBOL: original-error
 SYMBOL: error
@@ -68,7 +68,7 @@ PRIVATE>
         set-retainstack
         [ set-datastack ] dip
         set-callstack
-    ] (( continuation -- * )) call-effect-unsafe ;
+    ] ( continuation -- * ) call-effect-unsafe ;
 
 PRIVATE>
 
@@ -81,7 +81,7 @@ PRIVATE>
         set-retainstack
         [ set-datastack drop 4 special-object f 4 set-special-object f ] dip
         set-callstack
-    ] (( obj continuation -- * )) call-effect-unsafe ;
+    ] ( obj continuation -- * ) call-effect-unsafe ;
 
 : continue ( continuation -- * )
     f swap continue-with ;

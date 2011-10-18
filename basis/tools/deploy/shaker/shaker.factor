@@ -285,7 +285,7 @@ IN: tools.deploy.shaker
     recursive-subst ;
 
 : new-default-method ( -- gensym )
-    [ [ "No method" throw ] (( -- * )) define-temp ] with-compilation-unit ;
+    [ [ "No method" throw ] ( -- * ) define-temp ] with-compilation-unit ;
 
 : strip-default-methods ( -- )
     ! In a development image, each generic has its own default method.
@@ -569,11 +569,11 @@ SYMBOL: deploy-vocab
 
 : die-with ( error original-error -- * )
     #! We don't want DCE to drop the error before the die call!
-    [ die 1 exit ] (( a -- * )) call-effect-unsafe ;
+    [ die 1 exit ] ( a -- * ) call-effect-unsafe ;
 
 : die-with2 ( error original-error -- * )
     #! We don't want DCE to drop the error before the die call!
-    [ die 1 exit ] (( a b -- * )) call-effect-unsafe ;
+    [ die 1 exit ] ( a b -- * ) call-effect-unsafe ;
 
 : deploy-error-handler ( quot -- )
     [

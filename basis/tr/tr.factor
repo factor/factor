@@ -30,13 +30,13 @@ M: bad-tr summary
     '[ [ dup ascii? [ _ tr-nth ] when ] map ] ;
 
 : define-tr ( word mapping -- )
-    tr-quot (( seq -- translated )) define-declared ;
+    tr-quot ( seq -- translated ) define-declared ;
 
 : fast-tr-quot ( mapping -- quot )
     '[ [ _ tr-nth ] map! drop ] ;
 
 : define-fast-tr ( word mapping -- )
-    fast-tr-quot (( seq -- )) define-declared ;
+    fast-tr-quot ( seq -- ) define-declared ;
 
 PRIVATE>
 

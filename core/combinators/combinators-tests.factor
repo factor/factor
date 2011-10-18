@@ -253,7 +253,7 @@ CONSTANT: case-const-2 2
 
 DEFER: corner-case-1
 
-<< \ corner-case-1 2 [ + ] curry 1array [ case ] curry (( a -- b )) define-declared >>
+<< \ corner-case-1 2 [ + ] curry 1array [ case ] curry ( a -- b ) define-declared >>
 
 [ t ] [ \ corner-case-1 optimized? ] unit-test
 
@@ -321,6 +321,6 @@ DEFER: corner-case-1
 [ "nachos" ] [ 33 test-case-12 ] unit-test
 [ "nachos" ] [ 33 \ test-case-12 def>> call ] unit-test
 
-[ (( x x -- x x )) ] [
+[ ( x x -- x x ) ] [
     [ { [ ] [ ] } spread ] infer
 ] unit-test

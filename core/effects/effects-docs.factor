@@ -50,13 +50,13 @@ HELP: <effect>
 { $notes "This word cannot construct effects with " { $link "effects-variables" } ". Use " { $link <variable-effect> } " to construct variable stack effects." }
 { $examples
 { $example """USING: effects prettyprint ;
-{ "a" "b" } { "c" } <effect> .""" """(( a b -- c ))""" }
+{ "a" "b" } { "c" } <effect> .""" """( a b -- c )""" }
 { $example """USING: arrays effects prettyprint ;
-{ "a" { "b" array } } { "c" } <effect> .""" """(( a b: array -- c ))""" }
+{ "a" { "b" array } } { "c" } <effect> .""" """( a b: array -- c )""" }
 { $example """USING: effects prettyprint ;
-{ "a" { "b" (( x y -- z )) } } { "c" } <effect> .""" """(( a b: ( x y -- z ) -- c ))""" }
+{ "a" { "b" ( x y -- z ) } } { "c" } <effect> .""" """( a b: ( x y -- z ) -- c )""" }
 { $example """USING: effects prettyprint ;
-{ "a" { "b" (( x y -- z )) } } { "*" } <effect> .""" """(( a b: ( x y -- z ) -- * ))""" }
+{ "a" { "b" ( x y -- z ) } } { "*" } <effect> .""" """( a b: ( x y -- z ) -- * )""" }
 } ;
 
 HELP: <terminated-effect>
@@ -70,9 +70,9 @@ HELP: <terminated-effect>
 { $notes "This word cannot construct effects with " { $link "effects-variables" } ". Use " { $link <variable-effect> } " to construct variable stack effects." }
 { $examples
 { $example """USING: effects prettyprint ;
-{ "a" { "b" (( x y -- z )) } } { "c" } f <terminated-effect> .""" """(( a b: ( x y -- z ) -- c ))""" }
+{ "a" { "b" ( x y -- z ) } } { "c" } f <terminated-effect> .""" """( a b: ( x y -- z ) -- c )""" }
 { $example """USING: effects prettyprint ;
-{ "a" { "b" (( x y -- z )) } } { } t <terminated-effect> .""" """(( a b: ( x y -- z ) -- * ))""" }
+{ "a" { "b" ( x y -- z ) } } { } t <terminated-effect> .""" """( a b: ( x y -- z ) -- * )""" }
 } ;
 
 HELP: <variable-effect>
@@ -86,13 +86,13 @@ HELP: <variable-effect>
 { $description "Constructs an " { $link effect } " object like " { $link <effect> } ". If " { $snippet "in-var" } " or " { $snippet "out-var" } " are not " { $link f } ", they are used as the names of the " { $link "effects-variables" } " for the inputs and outputs of the effect object." }
 { $examples
 { $example """USING: effects prettyprint ;
-f { "a" "b" } f { "c" } <variable-effect> .""" """(( a b -- c ))""" }
+f { "a" "b" } f { "c" } <variable-effect> .""" """( a b -- c )""" }
 { $example """USING: effects prettyprint ;
-"x" { "a" "b" } "y" { "c" } <variable-effect> .""" """(( ..x a b -- ..y c ))""" }
+"x" { "a" "b" } "y" { "c" } <variable-effect> .""" """( ..x a b -- ..y c )""" }
 { $example """USING: arrays effects prettyprint ;
-"y" { "a" { "b" (( ..x -- ..y )) } } "x" { "c" } <variable-effect> .""" """(( ..y a b: ( ..x -- ..y ) -- ..x c ))""" }
+"y" { "a" { "b" ( ..x -- ..y ) } } "x" { "c" } <variable-effect> .""" """( ..y a b: ( ..x -- ..y ) -- ..x c )""" }
 { $example """USING: effects prettyprint ;
-"." { "a" "b" } f { "*" } <variable-effect> .""" """(( ... a b -- * ))""" }
+"." { "a" "b" } f { "*" } <variable-effect> .""" """( ... a b -- * )""" }
 } ;
 
 
@@ -131,7 +131,7 @@ HELP: effect=
 { $values { "effect1" effect } { "effect2" effect } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "effect1" } " and " { $snippet "effect2" } " represent the same stack transformation, without looking parameter names." }
 { $examples
-  { $example "USING: effects prettyprint ;" "(( a -- b )) (( x -- y )) effect= ." "t" }
+  { $example "USING: effects prettyprint ;" "( a -- b ) ( x -- y ) effect= ." "t" }
 } ;
 
 HELP: effect>string

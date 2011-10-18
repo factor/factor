@@ -6,7 +6,7 @@ IN: words.tests
 
 [ 4 ] [
     [
-        "poo" "words.tests" create [ 2 2 + ] (( -- n )) define-declared
+        "poo" "words.tests" create [ 2 2 + ] ( -- n ) define-declared
     ] with-compilation-unit
     "poo" "words.tests" lookup execute
 ] unit-test

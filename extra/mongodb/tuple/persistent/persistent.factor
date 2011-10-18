@@ -62,7 +62,7 @@ CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
       { [ dup value>> mdb-persistent? ]
         [ [ value>> ] [ quot>> ] bi write-mdb-persistent ] }
       { [ dup value>> data-tuple? ]
-        [ [ value>> ] [ quot>> ] bi (( tuple -- assoc )) call-effect ]  }
+        [ [ value>> ] [ quot>> ] bi ( tuple -- assoc ) call-effect ]  }
       { [ dup value>> [ hashtable? ] [ linked-assoc? ] bi or ]
         [ [ value>> ] [ quot>> ] bi '[ _ write-field ] assoc-map ] }
       [ value>> ]

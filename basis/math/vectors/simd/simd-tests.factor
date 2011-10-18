@@ -334,11 +334,11 @@ simd-classes&reps [
 
 ! Invalid inputs should not cause the compiler to throw errors
 [ ] [
-    [ [ { int-4 } declare t hrshift ] (( a -- b )) define-temp drop ] with-compilation-unit
+    [ [ { int-4 } declare t hrshift ] ( a -- b ) define-temp drop ] with-compilation-unit
 ] unit-test
 
 [ ] [
-    [ [ { int-4 } declare { 3 2 1 } vshuffle ] (( a -- b )) define-temp drop ] with-compilation-unit
+    [ [ { int-4 } declare { 3 2 1 } vshuffle ] ( a -- b ) define-temp drop ] with-compilation-unit
 ] unit-test
 
 ! Shuffles

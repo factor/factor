@@ -183,7 +183,7 @@ MACRO: cuda-invoke ( module-name function-name arguments -- )
     3bi define-inline ;
 
 : define-cuda-global ( word module-name symbol-name -- )
-    '[ _ _ cuda-global ] (( -- device-ptr )) define-inline ;
+    '[ _ _ cuda-global ] ( -- device-ptr ) define-inline ;
 
 TUPLE: cuda-library name abi path handle ;
 ERROR: bad-cuda-abi abi ;

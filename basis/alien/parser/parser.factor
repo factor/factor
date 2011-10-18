@@ -155,7 +155,7 @@ PRIVATE>
     void* type-word typedef
     type-word names return function-effect "callback-effect" set-word-prop
     type-word lib "callback-library" set-word-prop
-    type-word return types lib library-abi callback-quot (( quot -- alien )) ;
+    type-word return types lib library-abi callback-quot ( quot -- alien ) ;
 
 : (CALLBACK:) ( -- word quot effect )
     current-library get
@@ -182,11 +182,11 @@ PREDICATE: alien-callback-type-word < typedef-word
     '[ _ _ address-of 0 _ set-alien-value ] ;
 
 : define-global-getter ( type word -- )
-    [ nip ] [ global-quot ] 2bi (( -- value )) define-declared ;
+    [ nip ] [ global-quot ] 2bi ( -- value ) define-declared ;
 
 : define-global-setter ( type word -- )
     [ nip name>> "set-" prepend create-in ]
-    [ set-global-quot ] 2bi (( obj -- )) define-declared ;
+    [ set-global-quot ] 2bi ( obj -- ) define-declared ;
 
 : define-global ( type word -- )
     [ define-global-getter ] [ define-global-setter ] 2bi ;

@@ -122,7 +122,7 @@ M: math-combination perform-combination
         define
     ] with-variable ;
 
-PREDICATE: math-generic < generic ( word -- ? )
+PREDICATE: math-generic < generic
     "combination" word-prop math-combination? ;
 
 M: math-generic definer drop \ MATH: f ;

@@ -15,7 +15,7 @@ IN: parser
 : save-location ( definition -- )
     location remember-definition ;
 
-M: parsing-word stack-effect drop (( parsed -- parsed )) ;
+M: parsing-word stack-effect drop ( parsed -- parsed ) ;
 
 : create-in ( str -- word )
     current-vocab create dup set-word dup save-location ;

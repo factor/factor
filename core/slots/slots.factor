@@ -45,7 +45,7 @@ M: object reader-quot
     "reading" associate ;
 
 : define-reader-generic ( name -- )
-    reader-word (( object -- value )) define-simple-generic ;
+    reader-word ( object -- value ) define-simple-generic ;
 
 : define-reader ( class slot-spec -- )
     [ nip name>> define-reader-generic ]
@@ -92,7 +92,7 @@ M: object writer-quot
     "writing" associate ;
 
 : define-writer-generic ( name -- )
-    writer-word (( value object -- )) define-simple-generic ;
+    writer-word ( value object -- ) define-simple-generic ;
 
 : define-writer ( class slot-spec -- )
     [ nip name>> define-writer-generic ] [
@@ -110,7 +110,7 @@ M: object writer-quot
 : define-setter ( name -- )
     dup setter-word dup deferred? [
         [ \ over , swap writer-word , ] [ ] make
-        (( object value -- object )) define-inline
+        ( object value -- object ) define-inline
     ] [ 2drop ] if ;
 
 : changer-word ( name -- word )
@@ -123,7 +123,7 @@ M: object writer-quot
             over reader-word 1quotation
             [ dip call ] curry [ ] like [ dip swap ] curry %
             swap setter-word ,
-        ] [ ] make (( object quot -- object )) define-inline
+        ] [ ] make ( object quot -- object ) define-inline
     ] [ 2drop ] if ;
 
 : define-slot-methods ( class slot-spec -- )

@@ -214,7 +214,7 @@ ARTICLE: "syntax-pathnames" "Pathname syntax"
 
 ARTICLE: "syntax-effects" "Stack effect syntax"
 "Note that this is " { $emphasis "not" } " syntax to declare stack effects of words. This pushes an " { $link effect } " instance on the stack for reflection, for use with words such as " { $link define-declared } ", " { $link call-effect } " and " { $link execute-effect } "."
-{ $subsections POSTPONE: (( }
+{ $subsections POSTPONE: ( }
 { $see-also "effects" "inference" "tools.inference" } ;
 
 ARTICLE: "syntax-literals" "Literals"
@@ -625,13 +625,7 @@ HELP: P"
 HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
-{ $description "A stack effect declaration. This is treated as a comment unless it appears inside a word definition." }
-{ $see-also "effects" } ;
-
-HELP: ((
-{ $syntax "(( inputs -- outputs ))" }
-{ $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
-{ $description "Literal stack effect syntax." }
+{ $description "Literal stack effect syntax.  Also used by syntax words (such as " { $link POSTPONE: : } "), typically declaring the stack effect of the word definition which follows." }
 { $notes "Useful for meta-programming with " { $link define-declared } "." }
 { $examples
     { $example
@@ -642,13 +636,15 @@ HELP: ((
         ""
         "["
         "    my-dynamic-word 2 { [ + ] [ * ] } random curry"
-        "    (( x -- y )) define-declared"
+        "    ( x -- y ) define-declared"
         "] with-compilation-unit"
         ""
         "2 my-dynamic-word ."
         "4"
     }
-} ;
+}
+{ $see-also "effects" }
+;
 
 HELP: !
 { $syntax "! comment..." }

@@ -231,7 +231,7 @@ ERROR: no-objc-type name ;
     [ class-init-hooks get set-at ]
     [
         [ "cocoa.classes" create ] [ '[ _ objc-class ] ] bi
-        (( -- class )) define-declared
+        ( -- class ) define-declared
     ] bi ;
 
 : import-objc-class ( name quot -- )

@@ -41,10 +41,10 @@ IN: stack-checker.known-words
     "shuffle" word-prop infer-shuffle ;
 
 : infer-local-reader ( word -- )
-    (( -- value )) apply-word/effect ;
+    ( -- value ) apply-word/effect ;
 
 : infer-local-writer ( word -- )
-    (( value -- )) apply-word/effect ;
+    ( value -- ) apply-word/effect ;
 
 : non-inline-word ( word -- )
     dup depends-on-effect
@@ -61,21 +61,21 @@ IN: stack-checker.known-words
     } cond ;
 
 {
-    { drop  (( x     --             )) }
-    { 2drop (( x y   --             )) }
-    { 3drop (( x y z --             )) }
-    { dup   (( x     -- x x         )) }
-    { 2dup  (( x y   -- x y x y     )) }
-    { 3dup  (( x y z -- x y z x y z )) }
-    { rot   (( x y z -- y z x       )) }
-    { -rot  (( x y z -- z x y       )) }
-    { dupd  (( x y   -- x x y       )) }
-    { swapd (( x y z -- y x z       )) }
-    { nip   (( x y   -- y           )) }
-    { 2nip  (( x y z -- z           )) }
-    { over  (( x y   -- x y x       )) }
-    { pick  (( x y z -- x y z x     )) }
-    { swap  (( x y   -- y x         )) }
+    { drop  ( x     --             ) }
+    { 2drop ( x y   --             ) }
+    { 3drop ( x y z --             ) }
+    { dup   ( x     -- x x         ) }
+    { 2dup  ( x y   -- x y x y     ) }
+    { 3dup  ( x y z -- x y z x y z ) }
+    { rot   ( x y z -- y z x       ) }
+    { -rot  ( x y z -- z x y       ) }
+    { dupd  ( x y   -- x x y       ) }
+    { swapd ( x y z -- y x z       ) }
+    { nip   ( x y   -- y           ) }
+    { 2nip  ( x y z -- z           ) }
+    { over  ( x y   -- x y x       ) }
+    { pick  ( x y z -- x y z x     ) }
+    { swap  ( x y   -- y x         ) }
 } [ "shuffle" set-word-prop ] assoc-each
 
 : check-declaration ( declaration -- declaration )

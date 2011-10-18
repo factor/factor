@@ -40,7 +40,7 @@ M: enum-c-type c-type-setter
 
 : define-enum-constructor ( word -- )
     [ name>> "<" ">" surround create-in ] keep
-    [ number>enum ] curry (( number -- enum )) define-inline ;
+    [ number>enum ] curry ( number -- enum ) define-inline ;
 
 PRIVATE>
 
