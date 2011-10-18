@@ -152,10 +152,10 @@ M: windows seek-handle ( n seek-type handle -- )
     } case ;
 
 M: windows can-seek-handle? ( handle -- ? )
-    handle>file-size zero? not ;
+    handle>> handle>file-size zero? not ;
 
 M: windows handle-length ( handle -- n/f )
-    handle>file-size [ f ] when-zero ;
+    handle>> handle>file-size [ f ] when-zero ;
 
 : file-error? ( n -- eof? )
     zero? [
