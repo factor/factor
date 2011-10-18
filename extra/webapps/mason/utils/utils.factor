@@ -40,17 +40,22 @@ IN: webapps.mason.utils
 : download-url ( string -- string' )
     "http://downloads.factorcode.org/" prepend ;
 
-: package-url ( builder -- url )
-    [ URL" http://builds.factorcode.org/package" ] dip
+: platform-url ( url builder -- url )
     [ os>> "os" set-query-param ]
     [ cpu>> "cpu" set-query-param ] bi
     adjust-url ;
 
+: package-url ( builder -- url )
+    [ URL" http://builds.factorcode.org/package" ] dip
+    platform-url ;
+
+: report-url ( builder -- url )
+    [ URL" http://builds.factorcode.org/report" ] dip
+    platform-url ;
+
 : release-url ( builder -- url )
     [ URL" http://builds.factorcode.org/release" ] dip
-    [ os>> "os" set-query-param ]
-    [ cpu>> "cpu" set-query-param ] bi
-    adjust-url ;
+    platform-url ;
 
 : validate-secret ( -- )
     { { "secret" [ v-one-line ] } } validate-params
