@@ -495,6 +495,8 @@ HOOK: %call-gc cpu ( gc-map -- )
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
 
+HOOK: %safepoint cpu ( -- )
+
 HOOK: test-instruction? cpu ( -- ? )
 
 M: object test-instruction? f ;
