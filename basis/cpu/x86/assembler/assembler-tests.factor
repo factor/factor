@@ -235,9 +235,57 @@ cell 4 = [
 
 bootstrap-cell 4 = [
     [ { 100 199 5 0 0 0 0 123 0 0 0 } ] [ [ 0 [] FS 123 MOV ] { } make ] unit-test
+
+    [ { HEX: a0 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ AL HEX: 0123,4567 MOVABS ] { } make ] unit-test
+
+    [ { HEX: 66 HEX: a1 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ AX HEX: 0123,4567 MOVABS ] { } make ] unit-test
+
+    [ { HEX: a1 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ EAX HEX: 0123,4567 MOVABS ] { } make ] unit-test
+
+    [ { HEX: 48 HEX: a1 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ RAX HEX: 0123,4567 MOVABS ] { } make ] unit-test
+
+    [ { HEX: a2 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ HEX: 0123,4567 AL MOVABS ] { } make ] unit-test
+
+    [ { HEX: 66 HEX: a3 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ HEX: 0123,4567 AX MOVABS ] { } make ] unit-test
+
+    [ { HEX: a3 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ HEX: 0123,4567 EAX MOVABS ] { } make ] unit-test
+
+    [ { HEX: 48 HEX: a3 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ HEX: 0123,4567 RAX MOVABS ] { } make ] unit-test
 ] when
 
 bootstrap-cell 8 = [
     [ { 72 137 13 123 0 0 0 } ] [ [ 123 [RIP+] RCX MOV ] { } make ] unit-test
     [ { 101 72 137 12 37 123 0 0 0 } ] [ [ 123 [] GS RCX MOV ] { } make ] unit-test
+
+    [ { HEX: a0 HEX: ef HEX: cd HEX: ab HEX: 89 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ AL HEX: 0123,4567,89ab,cdef MOVABS ] { } make ] unit-test
+
+    [ { HEX: 66 HEX: a1 HEX: ef HEX: cd HEX: ab HEX: 89 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ AX HEX: 0123,4567,89ab,cdef MOVABS ] { } make ] unit-test
+
+    [ { HEX: a1 HEX: ef HEX: cd HEX: ab HEX: 89 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ EAX HEX: 0123,4567,89ab,cdef MOVABS ] { } make ] unit-test
+
+    [ { HEX: 48 HEX: a1 HEX: ef HEX: cd HEX: ab HEX: 89 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ RAX HEX: 0123,4567,89ab,cdef MOVABS ] { } make ] unit-test
+
+    [ { HEX: a2 HEX: ef HEX: cd HEX: ab HEX: 89 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ HEX: 0123,4567,89ab,cdef AL MOVABS ] { } make ] unit-test
+
+    [ { HEX: 66 HEX: a3 HEX: ef HEX: cd HEX: ab HEX: 89 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ HEX: 0123,4567,89ab,cdef AX MOVABS ] { } make ] unit-test
+
+    [ { HEX: a3 HEX: ef HEX: cd HEX: ab HEX: 89 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ HEX: 0123,4567,89ab,cdef EAX MOVABS ] { } make ] unit-test
+
+    [ { HEX: 48 HEX: a3 HEX: ef HEX: cd HEX: ab HEX: 89 HEX: 67 HEX: 45 HEX: 23 HEX: 01 } ]
+    [ [ HEX: 0123,4567,89ab,cdef RAX MOVABS ] { } make ] unit-test
 ] when

@@ -231,6 +231,27 @@ GENERIC: MOV ( dst src -- )
 M: immediate MOV (MOV-I) ;
 M: operand MOV HEX: 88 2-operand ;
 
+ERROR: bad-movabs-operands dst src ;
+
+GENERIC: MOVABS ( dst src -- )
+M: object MOVABS bad-movabs-operands ;
+M: register MOVABS
+    {
+        { AL [ HEX: a2 , cell, ] }
+        { AX [ HEX: 66 , HEX: a3 , cell, ] }
+        { EAX [ HEX: a3 , cell, ] }
+        { RAX [ HEX: 48 , HEX: a3 , cell, ] }
+        [ swap bad-movabs-operands ]
+    } case ;
+M: integer MOVABS
+    swap {
+        { AL [ HEX: a0 , cell, ] }
+        { AX [ HEX: 66 , HEX: a1 , cell, ] }
+        { EAX [ HEX: a1 , cell, ] }
+        { RAX [ HEX: 48 , HEX: a1 , cell, ] }
+        [ swap bad-movabs-operands ]
+    } case ;
+
 : LEA ( dst src -- ) swap HEX: 8d 2-operand ;
 
 ! Control flow
