@@ -68,7 +68,7 @@ PRIVATE>
 
 : nprimes ( n -- seq ) [ 2 swap [ dup , next-prime ] times ] { } make nip ;
 
-: coprime? ( a b -- ? ) gcd nip 1 = ; foldable
+: coprime? ( a b -- ? ) gcd* 1 = ; foldable
 
 : random-prime ( numbits -- p )
     [ ] [ 2^ ] [ random-bits* next-prime ] tri

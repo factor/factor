@@ -117,46 +117,49 @@ CONSTANT: log10-factorial-1000 HEX: 1.40f3593ed6f8ep11
 [ t ] [ 10 atanh tanh 10 1.e-10 ~ ] unit-test
 [ t ] [ 0.5 atanh tanh 0.5 1.e-10 ~ ] unit-test
 
-[ 100 ] [ 100 100 gcd nip ] unit-test
-[ 100 ] [ 1000 100 gcd nip ] unit-test
-[ 100 ] [ 100 1000 gcd nip ] unit-test
-[ 4 ] [ 132 64 gcd nip ] unit-test
-[ 4 ] [ -132 64 gcd nip ] unit-test
-[ 4 ] [ -132 -64 gcd nip ] unit-test
-[ 4 ] [ 132 -64 gcd nip ] unit-test
-[ 4 ] [ -132 -64 gcd nip ] unit-test
+: test-gcd ( x y -- z )
+    [ gcd nip ] [ gcd* ] 2bi [ assert= ] keep ;
 
-[ 100 ] [ 100 >bignum 100 >bignum gcd nip ] unit-test
-[ 100 ] [ 1000 >bignum 100 >bignum gcd nip ] unit-test
-[ 100 ] [ 100 >bignum 1000 >bignum gcd nip ] unit-test
-[ 4 ] [ 132 >bignum 64 >bignum gcd nip ] unit-test
-[ 4 ] [ -132 >bignum 64 >bignum gcd nip ] unit-test
-[ 4 ] [ -132 >bignum -64 >bignum gcd nip ] unit-test
-[ 4 ] [ 132 >bignum -64 >bignum gcd nip ] unit-test
-[ 4 ] [ -132 >bignum -64 >bignum gcd nip ] unit-test
+[ 100 ] [ 100 100 test-gcd ] unit-test
+[ 100 ] [ 1000 100 test-gcd ] unit-test
+[ 100 ] [ 100 1000 test-gcd ] unit-test
+[ 4 ] [ 132 64 test-gcd ] unit-test
+[ 4 ] [ -132 64 test-gcd ] unit-test
+[ 4 ] [ -132 -64 test-gcd ] unit-test
+[ 4 ] [ 132 -64 test-gcd ] unit-test
+[ 4 ] [ -132 -64 test-gcd ] unit-test
+
+[ 100 ] [ 100 >bignum 100 >bignum test-gcd ] unit-test
+[ 100 ] [ 1000 >bignum 100 >bignum test-gcd ] unit-test
+[ 100 ] [ 100 >bignum 1000 >bignum test-gcd ] unit-test
+[ 4 ] [ 132 >bignum 64 >bignum test-gcd ] unit-test
+[ 4 ] [ -132 >bignum 64 >bignum test-gcd ] unit-test
+[ 4 ] [ -132 >bignum -64 >bignum test-gcd ] unit-test
+[ 4 ] [ 132 >bignum -64 >bignum test-gcd ] unit-test
+[ 4 ] [ -132 >bignum -64 >bignum test-gcd ] unit-test
 
 [ 6 ] [
     1326264299060955293181542400000006
     1591517158873146351817850880000000
-    gcd nip
+    test-gcd
 ] unit-test
 
 [ 11 ] [
     13262642990609552931815424
     159151715887314635181785
-    gcd nip
+    test-gcd
 ] unit-test
 
 [ 3 ] [
     13262642990609552931
     1591517158873146351
-    gcd nip
+    test-gcd
 ] unit-test
 
 [ 26525285981219 ] [
     132626429906095
     159151715887314
-    gcd nip
+    test-gcd
 ] unit-test
 
 
