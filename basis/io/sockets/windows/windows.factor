@@ -258,7 +258,7 @@ TUPLE: WSARecvFrom-args port
     [ lpFromLen>> int deref ]
     tri memcpy ; inline
 
-M: windows (receive) ( n buf datagram -- count addrspec )
+M: windows (receive-unsafe) ( n buf datagram -- count addrspec )
     [
         <WSARecvFrom-args>
         [ call-WSARecvFrom ]

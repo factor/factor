@@ -140,7 +140,7 @@ M: unix (raw)
         2drop [ +input+ wait-for-port ] [ (receive-loop) ] bi
     ] if ; inline recursive
 
-M: unix (receive) ( n buf datagram -- count sockaddr )
+M: unix (receive-unsafe) ( n buf datagram -- count sockaddr )
     (receive-loop) ;
 
 :: do-send ( packet sockaddr len socket datagram -- )
