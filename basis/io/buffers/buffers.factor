@@ -53,7 +53,6 @@ M: buffer dispose* ptr>> free ;
 
 HINTS: buffer-read fixnum buffer ;
 
-
 : buffer-end ( buffer -- alien )
     [ fill>> ] [ ptr>> ] bi <displaced-alien> ; inline
 

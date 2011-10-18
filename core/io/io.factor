@@ -113,16 +113,19 @@ PRIVATE>
 
 ERROR: invalid-read-buffer buf stream ;
 
-
 : stream-read-into ( buf stream -- buf-slice/f )
     [ stream-read-unsafe ] (read-into) ; inline
+
 : stream-read-partial-into ( buf stream -- buf-slice/f )
     [ stream-read-partial-unsafe ] (read-into) ; inline
 
 : read ( n -- seq ) input-stream get stream-read ; inline
+
 : read-partial ( n -- seq ) input-stream get stream-read-partial ; inline
+
 : read-into ( buf -- buf-slice/f )
     input-stream get stream-read-into ; inline
+
 : read-partial-into ( buf -- buf-slice/f )
     input-stream get stream-read-partial-into ; inline
 
