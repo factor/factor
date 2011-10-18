@@ -29,6 +29,7 @@ TUPLE: buffered-port < port { buffer buffer } ;
         default-buffer-size get <buffer> >>buffer ; inline
 
 TUPLE: input-port < buffered-port ;
+INSTANCE: input-port input-stream
 
 M: input-port stream-element-type drop +byte+ ; inline
 
@@ -108,6 +109,7 @@ M: input-port stream-read-until ( seps port -- str/f sep/f )
     ] if ;
 
 TUPLE: output-port < buffered-port ;
+INSTANCE: output-port output-stream
 
 : <output-port> ( handle -- output-port )
     output-port <buffered-port> ;

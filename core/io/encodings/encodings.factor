@@ -26,12 +26,14 @@ GENERIC: <decoder> ( stream encoding -- newstream )
 CONSTANT: replacement-char HEX: fffd
 
 TUPLE: decoder { stream read-only } { code read-only } { cr boolean } ;
+INSTANCE: decoder input-stream
 
 ERROR: decode-error ;
 
 GENERIC: <encoder> ( stream encoding -- newstream )
 
 TUPLE: encoder { stream read-only } { code read-only } ;
+INSTANCE: encoder output-stream
 
 ERROR: encode-error ;
 

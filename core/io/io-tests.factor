@@ -13,6 +13,7 @@ IN: io.tests
 ! Test default input stream protocol methods
 
 TUPLE: up-to-13-reader { i fixnum initial: 0 } ;
+INSTANCE: up-to-13-reader input-stream
 
 M: up-to-13-reader stream-element-type drop +byte+ ; inline
 M: up-to-13-reader stream-read1
@@ -55,6 +56,7 @@ M: up-to-13-reader stream-read1
 ! Test default output stream protocol methods
 
 TUPLE: dumb-writer vector ;
+INSTANCE: dumb-writer output-stream
 
 : <dumb-writer> ( -- x ) BV{ } clone dumb-writer boa ; inline
 

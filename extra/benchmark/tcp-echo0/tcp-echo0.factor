@@ -6,7 +6,7 @@ locals formatting ;
 IN: benchmark.tcp-echo0
 
 ! Max size here is 26 2^ 1 - because array-capacity limits on 32bit platforms
-CONSTANT: test-size0 $[ 26 2^ 1 - ]
+CONSTANT: test-size0 $[ 25 2^ 1 - ]
 
 MEMO: test-bytes ( n -- byte-array ) iota >byte-array ;
 

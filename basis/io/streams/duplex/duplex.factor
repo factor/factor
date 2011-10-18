@@ -13,6 +13,9 @@ CONSULT: input-stream-protocol duplex-stream in>> ;
 CONSULT: output-stream-protocol duplex-stream out>> ;
 CONSULT: formatted-output-stream-protocol duplex-stream out>> ;
 
+INSTANCE: duplex-stream input-stream
+INSTANCE: duplex-stream output-stream
+
 : >duplex-stream< ( stream -- in out ) [ in>> ] [ out>> ] bi ; inline
 
 M: duplex-stream stream-element-type

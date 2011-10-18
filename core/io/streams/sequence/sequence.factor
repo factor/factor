@@ -48,6 +48,7 @@ M: growable stream-write1 push ;
 M: growable stream-write push-all ;
 M: growable stream-flush drop ;
 
+INSTANCE: growable output-stream
 INSTANCE: growable plain-writer
 
 ! Seeking

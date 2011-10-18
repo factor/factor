@@ -6,6 +6,8 @@ vectors ;
 IN: io.streams.peek
 
 TUPLE: peek-stream stream peeked ;
+INSTANCE: peek-stream input-stream
+INSTANCE: peek-stream output-stream
 
 M: peek-stream dispose stream>> dispose ;
 
