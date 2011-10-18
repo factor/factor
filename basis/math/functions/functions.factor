@@ -114,7 +114,7 @@ PRIVATE>
 : gcd ( x y -- a d )
     [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; foldable
 
-: gcd* ( a b -- c )
+: gcd* ( x y -- d )
     (gcd*) dup 0 < [ neg ] when ; foldable
 
 : lcm ( a b -- c )
