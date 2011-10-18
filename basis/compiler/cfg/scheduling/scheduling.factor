@@ -57,6 +57,7 @@ UNION: final-insn
 ##branch
 ##dispatch
 conditional-branch-insn
+##safepoint
 ##epilogue ##return
 ##callback-outputs ;
 
