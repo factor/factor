@@ -10,7 +10,7 @@ sequences strings vectors words words.symbol hash-sets ;
 FROM: sets => members ;
 IN: prettyprint.backend
 
-M: effect pprint* effect>string "(" ")" surround text ;
+M: effect pprint* effect>string text ;
 
 : ?effect-height ( word -- n )
     stack-effect [ effect-height ] [ 0 ] if* ;
