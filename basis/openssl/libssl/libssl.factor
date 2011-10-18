@@ -282,7 +282,7 @@ H{ } clone verify-messages set-global
 SYNTAX: X509_V_:
     scan-token "X509_V_" prepend create-in
     scan-number
-    [ 1quotation (( -- value )) define-inline ]
+    [ 1quotation ( -- value ) define-inline ]
     [ verify-messages get set-at ]
     2bi ;
 

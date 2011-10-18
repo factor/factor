@@ -77,7 +77,7 @@ DEFER: byte-bit-count
 256 iota [
     8 <bits> 0 [ [ 1 + ] when ] reduce
 ] B{ } map-as '[ HEX: ff bitand _ nth-unsafe ]
-(( byte -- table )) define-declared
+( byte -- table ) define-declared
 
 \ byte-bit-count make-inline
 

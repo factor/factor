@@ -17,7 +17,7 @@ IN: combinators
 
 M: object throw
     5 special-object [ die ] or
-    (( error -- * )) call-effect-unsafe ;
+    ( error -- * ) call-effect-unsafe ;
 
 PRIVATE>
 

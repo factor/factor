@@ -167,7 +167,7 @@ DEFER: compile-next-match
         dup \ next-initial-word = [
             drop _ [ compile-regexp dfa>> def>> ] [ reverse-regexp? ] bi
             '[ { array-capacity string regexp } declare _ _ next-match ]
-            (( i string regexp -- start end string )) define-temp
+            ( i string regexp -- start end string ) define-temp
         ] when
     ] change-next-match ;
 

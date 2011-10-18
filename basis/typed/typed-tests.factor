@@ -52,7 +52,7 @@ TUPLE: unboxable2
 TYPED: unboxy ( in: unboxable -- out: unboxable2 )
     dup [ x>> ] [ y>> ] bi - unboxable2 boa ;
 
-[ (( in: fixnum in: fixnum -- out: fixnum out: fixnum out: fixnum )) ]
+[ ( in: fixnum in: fixnum -- out: fixnum out: fixnum out: fixnum ) ]
 [ \ unboxy "typed-word" word-prop stack-effect ] unit-test
 
 [ T{ unboxable2 { u T{ unboxable { x 12 } { y 3 } } } { xy 9 } } ]

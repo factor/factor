@@ -43,7 +43,7 @@ IN: cocoa.subclassing
 : prepare-method ( ret types quot -- type imp )
     [ [ encode-types ] 2keep ] dip
     '[ _ _ cdecl _ alien-callback ]
-    (( -- callback )) define-temp ;
+    ( -- callback ) define-temp ;
 
 : prepare-methods ( methods -- methods )
     [

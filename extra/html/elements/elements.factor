@@ -29,7 +29,7 @@ SYMBOL: html
     #! Return the name and code for the <foo> patterned
     #! word.
     dup <foo> swap '[ _ <foo> write-html ]
-    (( -- )) html-word ;
+    ( -- ) html-word ;
 
 : <foo ( str -- <str ) "<" prepend ;
 
@@ -37,21 +37,21 @@ SYMBOL: html
     #! Return the name and code for the <foo patterned
     #! word.
     <foo dup '[ _ write-html ]
-    (( -- )) html-word ;
+    ( -- ) html-word ;
 
 : foo> ( str -- foo> ) ">" append ;
 
 : def-for-html-word-foo> ( name -- )
     #! Return the name and code for the foo> patterned
     #! word.
-    foo> [ ">" write-html ] (( -- )) html-word ;
+    foo> [ ">" write-html ] ( -- ) html-word ;
 
 : </foo> ( str -- </str> ) "</" ">" surround ;
 
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.
-    </foo> dup '[ _ write-html ] (( -- )) html-word ;
+    </foo> dup '[ _ write-html ] ( -- ) html-word ;
 
 : <foo/> ( str -- <str/> ) "<" "/>" surround ;
 
@@ -59,14 +59,14 @@ SYMBOL: html
     #! Return the name and code for the <foo/> patterned
     #! word.
     dup <foo/> swap '[ _ <foo/> write-html ]
-    (( -- )) html-word ;
+    ( -- ) html-word ;
 
 : foo/> ( str -- str/> ) "/>" append ;
 
 : def-for-html-word-foo/> ( name -- )
     #! Return the name and code for the foo/> patterned
     #! word.
-    foo/> [ "/>" write-html ] (( -- )) html-word ;
+    foo/> [ "/>" write-html ] ( -- ) html-word ;
 
 : define-closed-html-word ( name -- )
     #! Given an HTML tag name, define the words for
@@ -92,7 +92,7 @@ SYMBOL: html
 
 : define-attribute-word ( name -- )
     dup "=" prepend swap
-    '[ _ write-attr ] (( string -- )) html-word ;
+    '[ _ write-attr ] ( string -- ) html-word ;
 
 ! Define some closed HTML tags
 [

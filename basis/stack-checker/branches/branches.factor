@@ -47,7 +47,7 @@ SYMBOLS: +bottom+ +top+ ;
 SYMBOLS: combinator quotations ;
 
 : simple-unbalanced-branches-error ( word quots branches -- * )
-    [ length [ (( ..a -- ..b )) ] replicate ]
+    [ length [ ( ..a -- ..b ) ] replicate ]
     [ [ length [ "x" <array> ] bi@ <effect> ] { } assoc>map ] bi
     unbalanced-branches-error ;
 
@@ -128,8 +128,8 @@ M: declared-effect curried/composed? known>> curried/composed? ;
 
 : declare-if-effects ( -- )
     H{ } clone V{ } clone
-    [ [ \ if (( ..a -- ..b )) ] 2dip 0 declare-effect-d ]
-    [ [ \ if (( ..a -- ..b )) ] 2dip 1 declare-effect-d ] 2bi ;
+    [ [ \ if ( ..a -- ..b ) ] 2dip 0 declare-effect-d ]
+    [ [ \ if ( ..a -- ..b ) ] 2dip 1 declare-effect-d ] 2bi ;
 
 : infer-if ( -- )
     \ if combinator set

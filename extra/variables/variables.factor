@@ -23,12 +23,12 @@ SYNTAX: set:
     '[ _ set ] ;
 
 : (define-variable) ( word getter setter -- )
-    [ (( -- value )) define-inline ]
+    [ ( -- value ) define-inline ]
     [
         [
             [ name>> "set: " prepend <uninterned-word> ]
             [ over "variable-setter" set-word-prop ] bi
-        ] dip (( value -- )) define-inline
+        ] dip ( value -- ) define-inline
     ] bi-curry* bi ;
 
 : define-variable ( word -- )

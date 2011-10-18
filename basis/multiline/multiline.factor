@@ -34,7 +34,7 @@ ERROR: text-found-before-eol string ;
 SYNTAX: STRING:
     scan-new-word
     parse-here 1quotation
-    (( -- string )) define-inline ;
+    ( -- string ) define-inline ;
 
 <PRIVATE
 

@@ -26,6 +26,6 @@ IN: readline
        '[
             [ @ [ utf8 malloc-string ] [ f ] if* ]
             readline.ffi:rl_compentry_func_t
-        ] (( -- alien )) define-temp
+        ] ( -- alien ) define-temp
     ] with-compilation-unit execute( -- alien )
     readline.ffi:set-rl_completion_entry_function ;

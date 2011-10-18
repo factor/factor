@@ -92,7 +92,7 @@ M: word stack-effect
     [ "declared-effect" word-prop ]
     [ parent-word dup [ stack-effect ] when ] bi or ;
 
-M: deferred stack-effect call-next-method (( -- * )) or ;
+M: deferred stack-effect call-next-method ( -- * ) or ;
 
 M: effect clone
     [ in>> clone ] [ out>> clone ] bi <effect> ;

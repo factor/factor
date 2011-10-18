@@ -34,7 +34,7 @@ SYNTAX: VALUE:
     scan-new-word
     dup t "no-def-strip" set-word-prop
     T{ value-holder } clone [ obj>> ] curry
-    (( -- value )) define-declared ;
+    ( -- value ) define-declared ;
 
 M: value-word definer drop \ VALUE: f ;
 

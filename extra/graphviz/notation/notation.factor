@@ -24,7 +24,7 @@ IN: graphviz.notation
     [ 2nip ] [
         create dup
         1 <standard-combination>
-        (( graphviz-obj val -- graphviz-obj' ))
+        ( graphviz-obj val -- graphviz-obj' )
         define-generic
     ] if* ;
 
