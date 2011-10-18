@@ -96,9 +96,6 @@ M: complex exp >rect [ exp ] dip polar> ; inline
         swap [ /mod [ over * swapd - ] dip ] keep (gcd)
     ] if ; inline recursive
 
-: (gcd*) ( a b -- c )
-    [ [ mod ] keep swap (gcd*) ] unless-zero ; inline recursive
-
 PRIVATE>
 
 : ^ ( x y -- z )
@@ -112,16 +109,13 @@ PRIVATE>
 : nth-root ( n x -- y ) swap recip ^ ; inline
 
 : gcd ( x y -- a d )
-    [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; foldable
-
-: gcd* ( x y -- d )
-    (gcd*) dup 0 < [ neg ] when ; foldable
+    [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; foldable inline
 
 : lcm ( a b -- c )
-    [ * ] 2keep gcd* /i ; foldable
+    [ * ] 2keep gcd nip /i ; foldable
 
 : divisor? ( m n -- ? )
-    mod 0 = ;
+    mod 0 = ; inline
 
 ERROR: non-trivial-divisor n ;
 
