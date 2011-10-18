@@ -53,9 +53,9 @@ IN: dlists.tests
 [ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-empty? ] unit-test
 [ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-empty? ] unit-test
 
-[ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 4 = ] dlist-find-node drop class dlist-node = ] unit-test
-[ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 5 = ] dlist-find-node drop class dlist-node = ] unit-test
-[ t ] [ <dlist> 4 over push-back 5 over push-back* [ = ] curry dlist-find-node drop class dlist-node = ] unit-test
+[ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 4 = ] dlist-find-node class dlist-node = ] unit-test
+[ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 5 = ] dlist-find-node class dlist-node = ] unit-test
+[ t ] [ <dlist> 4 over push-back 5 over push-back* [ = ] curry dlist-find-node class dlist-node = ] unit-test
 [ ] [ <dlist> 4 over push-back 5 over push-back [ drop ] dlist-each ] unit-test
 
 [ <dlist> peek-front ] [ empty-dlist? ] must-fail-with
@@ -84,3 +84,4 @@ IN: dlists.tests
 [ V{ 2 4 } ] [ <dlist> { 1 2 3 4 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
 [ V{ 2 4 } ] [ <dlist> { 1 2 3 4 5 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
 [ V{ 0 2 4 } ] [ <dlist> { 0 1 2 3 4 5 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
+

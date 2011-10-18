@@ -2,7 +2,7 @@
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel math sequences accessors deques
-search-deques summary hashtables fry ;
+search-deques summary hashtables fry math.order ;
 IN: dlists
 
 <PRIVATE
@@ -54,17 +54,20 @@ M: dlist-node node-value obj>> ;
 : set-front-to-back ( dlist -- )
     dup front>> [ dup back>> >>front ] unless drop ; inline
 
-: (dlist-find-node) ( ... dlist-node quot: ( ... node -- ... ? ) -- ... node/f ? )
+: (dlist-find-node) ( ... dlist-node quot: ( ... node -- ... ? ) -- ... node/f )
     over [
         [ call ] 2keep rot
-        [ drop t ] [ [ next>> ] dip (dlist-find-node) ] if
-    ] [ 2drop f f ] if ; inline recursive
+        [ drop ] [ [ next>> ] dip (dlist-find-node) ] if
+    ] [ 2drop f ] if ; inline recursive
 
-: dlist-find-node ( ... dlist quot: ( ... node -- ... ? ) -- ... node/f ? )
+: dlist-find-node ( ... dlist quot: ( ... node -- ... ? ) -- ... node/f )
     [ front>> ] dip (dlist-find-node) ; inline
 
+: dlist-find-node-prev ( ... dlist quot: ( ... value -- ... ? ) -- ... obj/f ? )
+    dlist-find-node [ prev>> ] [ f ] if* ; inline
+
 : dlist-each-node ( ... dlist quot: ( ... node -- ... ) -- ... )
-    '[ @ f ] dlist-find-node 2drop ; inline
+    '[ @ f ] dlist-find-node drop ; inline
 
 : unlink-node ( dlist-node -- )
     dup prev>> over next>> set-prev-when
@@ -115,7 +118,7 @@ M: dlist pop-back* ( dlist -- )
     normalize-front ;
 
 : dlist-find ( ... dlist quot: ( ... value -- ... ? ) -- ... obj/f ? )
-    '[ obj>> @ ] dlist-find-node [ obj>> t ] [ drop f f ] if ; inline
+    '[ obj>> @ ] dlist-find-node [ obj>> t ] [ f f ] if* ; inline
 
 : dlist-any? ( ... dlist quot: ( ... value -- ... ? ) -- ... ? )
     dlist-find nip ; inline
@@ -138,8 +141,8 @@ M: dlist delete-node ( dlist-node dlist -- )
             2drop f f
         ] if
     ] [
-        2drop f f
-    ] if ; inline
+        drop f f
+    ] if* ; inline
 
 : delete-node-if ( ... dlist quot: ( ... value -- ... ? ) -- ... obj/f )
     '[ obj>> @ ] delete-node-if* drop ; inline
