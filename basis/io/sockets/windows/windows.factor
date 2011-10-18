@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data classes.struct
 combinators destructors io.backend io.files.windows io.ports
 io.sockets io.sockets.icmp io.sockets.private kernel libc math
 sequences system windows.handles windows.kernel32 windows.types
-windows.winsock ;
+windows.winsock locals ;
 FROM: namespaces => get ;
 IN: io.sockets.windows
 
@@ -252,7 +252,7 @@ TUPLE: WSARecvFrom-args port
 
 :: parse-WSARecvFrom ( buf buf' count wsaRecvFrom -- count sockaddr )
     buf buf' count finalize-buf
-    wsaRecvFrom
+    count wsaRecvFrom
     [ port>> addr>> empty-sockaddr dup ]
     [ lpFrom>> ]
     [ lpFromLen>> int deref ]
