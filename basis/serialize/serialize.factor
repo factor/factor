@@ -162,7 +162,7 @@ M: wrapper (serialize) ( obj -- )
     CHAR: W write1
     wrapped>> (serialize) ;
 
-DEFER: (deserialize) ( -- obj )
+DEFER: (deserialize)
 
 SYMBOL: deserialized
 
