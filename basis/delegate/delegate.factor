@@ -155,9 +155,15 @@ M: consultation forget*
 : show-words ( wordlist' -- wordlist )
     [ dup second zero? [ first ] when ] map ;
 
+ERROR: not-a-generic word ;
+
+: check-generic ( generic -- )
+    dup generic? [ drop ] [ not-a-generic ] if ;
+
 PRIVATE>
 
 : define-protocol ( protocol wordlist -- )
+    dup [ check-generic ] each
     [ drop define-symbol ] [
         fill-in-depth
         [ forget-old-definitions ]
