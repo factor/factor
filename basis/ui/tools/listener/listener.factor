@@ -157,9 +157,6 @@ M:: interactor stream-read-unsafe ( n buf interactor -- count )
         n short [ head-slice 0 buf copy ] keep
     ] if-zero ;
 
-M: interactor stream-read-partial-unsafe
-    stream-read-unsafe ; inline
-
 M: interactor stream-read1
     dup interactor-read {
         { [ dup not ] [ 2drop f ] }
