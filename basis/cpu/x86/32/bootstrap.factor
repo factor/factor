@@ -360,7 +360,7 @@ IN: bootstrap.x86
     jit-jump-quot ;
 
 : jit-safepoint ( -- )
-    0 [] EAX MOV rc-absolute rel-safepoint ;
+    0 EAX MOVABS rc-absolute rel-safepoint ;
 
 [
     jit-start-context-and-delete
