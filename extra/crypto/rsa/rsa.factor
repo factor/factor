@@ -27,7 +27,7 @@ CONSTANT: public-key 65537
     #! Loop until phi is not divisible by the public key.
     dup rsa-primes [ * ] 2keep
     [ 1 - ] bi@ *
-    dup public-key gcd nip 1 = [
+    dup public-key gcd* 1 = [
         rot drop
     ] [
         2drop modulus-phi

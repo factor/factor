@@ -94,7 +94,10 @@ M: complex exp >rect [ exp ] dip polar> ; inline
         2nip
     ] [
         swap [ /mod [ over * swapd - ] dip ] keep (gcd)
-    ] if ;
+    ] if ; inline recursive
+
+: (gcd*) ( a b -- c )
+    [ [ mod ] keep swap (gcd*) ] unless-zero ; inline recursive
 
 PRIVATE>
 
@@ -111,8 +114,11 @@ PRIVATE>
 : gcd ( x y -- a d )
     [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; foldable
 
+: gcd* ( a b -- c )
+    (gcd*) dup 0 < [ neg ] when ; foldable
+
 : lcm ( a b -- c )
-    [ * ] 2keep gcd nip /i ; foldable
+    [ * ] 2keep gcd* /i ; foldable
 
 : divisor? ( m n -- ? )
     mod 0 = ;

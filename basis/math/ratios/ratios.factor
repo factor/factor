@@ -30,7 +30,7 @@ M: integer /
         division-by-zero
     ] [
         dup 0 < [ [ neg ] bi@ ] when
-        2dup gcd nip [ /i ] curry bi@ fraction>
+        2dup gcd* [ /i ] curry bi@ fraction>
     ] if-zero ;
 
 M: ratio hashcode*
