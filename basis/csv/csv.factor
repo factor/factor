@@ -13,7 +13,7 @@ CHAR: , delimiter set-global
 
 : delimiter> ( -- delimiter ) delimiter get ; inline
 
-DEFER: quoted-field ( -- endchar )
+DEFER: quoted-field
 
 : skip-to-field-end ( -- endchar )
   "\n" delimiter> suffix read-until nip ; inline
