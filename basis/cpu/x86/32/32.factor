@@ -218,6 +218,9 @@ M:: x86.32 stack-cleanup ( stack-size return abi -- n )
 M: x86.32 %cleanup ( n -- )
     [ ESP swap SUB ] unless-zero ;
 
+M: x86.32 %safepoint
+    0 EAX MOVABS rc-absolute rel-safepoint ;
+
 M: x86.32 dummy-stack-params? f ;
 
 M: x86.32 dummy-int-params? f ;
