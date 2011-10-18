@@ -60,6 +60,7 @@ M: unix seek-handle ( n seek-type handle -- )
 
 M: unix can-seek-handle? ( handle -- ? )
     fd>> SEEK_CUR 0 lseek -1 = not ;
+
 M: unix handle-length ( handle -- n/f )
     fd>> \ stat <struct> [ fstat -1 = not ] keep
     swap [ st_size>> ] [ drop f ] if ;
