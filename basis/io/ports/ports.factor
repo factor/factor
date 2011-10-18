@@ -180,14 +180,10 @@ M: output-port stream-seek
     [ stream-flush ]
     [ handle>> seek-handle ] tri ;
 
-M: input-port stream-seekable?
-    handle>> can-seek-handle? ;
-M: output-port stream-seekable?
+M: buffered-port stream-seekable?
     handle>> can-seek-handle? ;
 
-M: input-port stream-length
-    handle>> handle-length ;
-M: output-port stream-length
+M: buffered-port stream-length
     handle>> handle-length ;
 
 GENERIC: shutdown ( handle -- )
