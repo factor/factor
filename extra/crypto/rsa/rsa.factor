@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.primes kernel math math.functions namespaces
-sequences accessors ;
+USING: math.primes kernel math math.functions math.primes
+namespaces sequences accessors ;
 IN: crypto.rsa
 
 ! The private key is the only secret.
@@ -27,7 +27,7 @@ CONSTANT: public-key 65537
     #! Loop until phi is not divisible by the public key.
     dup rsa-primes [ * ] 2keep
     [ 1 - ] bi@ *
-    dup public-key gcd* 1 = [
+    dup public-key coprime? [
         rot drop
     ] [
         2drop modulus-phi
