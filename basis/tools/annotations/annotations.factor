@@ -75,9 +75,11 @@ PRIVATE>
     effect quot call :> values
     values length :> n
     [
-        "--- " write str write bl word .
-        n ndup n narray values swap zip simple-table.
-        flush
+        [
+            "--- " write str write bl word .
+            n ndup n narray values swap zip simple-table.
+            flush
+        ] with-output>error
     ] ; inline
 
 MACRO: entering ( word -- quot )
@@ -98,9 +100,11 @@ PRIVATE>
 
 : (watch-vars) ( word vars quot -- newquot )
    '[
-        "--- Entering: " write _ .
-        "--- Variable values:" print _ [ dup get ] H{ } map>assoc describe
-        @
+        [
+            "--- Entering: " write _ .
+            "--- Variable values:" print _ [ dup get ] H{ } map>assoc describe
+            @
+        ] with-output>error
     ] ;
 
 PRIVATE>
