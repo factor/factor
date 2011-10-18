@@ -73,14 +73,14 @@ IN: ui.tools.operations
 : edit-file ( pathname -- ) edit ;
 
 [ pathname? ] \ edit-file H{
-    { +keyboard+ T{ key-down f { C+ } "e" } }
+    { +keyboard+ T{ key-down f { C+ } "b" } }
     { +primary+ t }
     { +secondary+ t }
     { +listener+ t }
 } define-operation
 
 [ definition? ] \ edit H{
-    { +keyboard+ T{ key-down f { C+ } "e" } }
+    { +keyboard+ T{ key-down f { C+ } "b" } }
     { +listener+ t }
 } define-operation
 
