@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser lexer kernel namespaces sequences definitions
-io.files io.backend io.pathnames io summary continuations
-tools.crossref vocabs.hierarchy prettyprint source-files
-source-files.errors assocs vocabs.loader splitting
-accessors debugger help.topics ;
+USING: accessors assocs continuations debugger definitions
+help.topics io io.backend io.files io.pathnames kernel lexer
+namespaces parser prettyprint sequences source-files
+source-files.errors splitting strings summary tools.crossref
+vocabs vocabs.files vocabs.hierarchy vocabs.loader
+vocabs.metadata ;
 FROM: vocabs => vocab-name >vocab-link ;
 IN: editors
 
@@ -38,14 +39,15 @@ M: cannot-find-source error.
     definition>> pprint-short
     "''" print ;
 
-: edit ( defspec -- )
-    dup where
-    [ first2 edit-location ]
-    [ dup word-link? [ name>> edit ] [ cannot-find-source ] if ]
-    ?if ;
+GENERIC: edit ( object -- )
 
-: edit-vocab ( name -- )
-    >vocab-link edit ;
+M: object edit
+    dup where [ first2 edit-location ] [ cannot-find-source ] ?if ;
+
+M: link edit name>> edit ;
+
+M: string edit
+    dup vocab [ edit ] [ cannot-find-source ] ?if ;
 
 : edit-error ( error -- )
     [ error-file ] [ error-line ] bi
@@ -69,3 +71,22 @@ M: cannot-find-source error.
     [ "Fixing " write pprint " and all usages..." print nl ]
     [ [ smart-usage ] keep prefix ] bi
     edit-each ;
+
+: edit-docs ( vocab -- )
+    vocab-docs-path 1 edit-location ;
+
+: edit-tests ( vocab -- )
+    vocab-tests-file 1 edit-location ;
+
+: edit-platforms ( vocab -- )
+    dup vocab-platforms-path vocab-append-path 1 edit-location ;
+
+: edit-authors ( vocab -- )
+    dup vocab-authors-path vocab-append-path 1 edit-location ;
+
+: edit-tags ( vocab -- )
+    dup vocab-tags-path vocab-append-path 1 edit-location ;
+
+: edit-summary ( vocab -- )
+    dup vocab-summary-path vocab-append-path 1 edit-location ;
+
