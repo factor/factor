@@ -78,7 +78,7 @@ M: predicate reset-word
     [ call-next-method ] [ f "predicating" set-word-prop ] bi ;
 
 : define-predicate ( class quot -- )
-    [ predicate-word ] dip (( object -- ? )) define-declared ;
+    [ predicate-word ] dip ( object -- ? ) define-declared ;
 
 : superclass ( class -- super )
     #! Output f for non-classes to work with algebra code

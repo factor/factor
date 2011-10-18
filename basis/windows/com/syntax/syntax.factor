@@ -74,7 +74,7 @@ ERROR: no-com-interface interface ;
     define-declared ;
 
 : define-words-for-com-interface ( definition -- )
-    [ [ (iid-word) ] [ iid>> 1quotation ] bi (( -- iid )) define-declared ]
+    [ [ (iid-word) ] [ iid>> 1quotation ] bi ( -- iid ) define-declared ]
     [
         dup family-tree-functions
         [ (define-word-for-function) ] with each-index

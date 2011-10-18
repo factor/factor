@@ -12,7 +12,7 @@ SYNTAX: HOLIDAY:
     dup "holiday" word-prop [
         dup H{ } clone "holiday" set-word-prop
     ] unless
-    parse-definition (( timestamp/n -- timestamp )) define-declared ;
+    parse-definition ( timestamp/n -- timestamp ) define-declared ;
 
 SYNTAX: HOLIDAY-NAME:
     [let scan-word "holiday" word-prop :> holidays scan-word :> name scan-object :> value

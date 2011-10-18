@@ -16,7 +16,7 @@ ERROR: not-a-tuple object ;
 : all-slots ( class -- slots )
     superclasses [ "slots" word-prop ] map concat ;
 
-PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
+PREDICATE: immutable-tuple-class < tuple-class
     all-slots [ read-only>> ] all? ;
 
 <PRIVATE

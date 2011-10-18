@@ -337,7 +337,7 @@ DEFER: foo
 ] must-fail
 
 [ ] [
-    "IN: parser.tests USE: kernel PREDICATE: foo < object ( x -- y ) ;" eval( -- )
+    "IN: parser.tests USE: kernel PREDICATE: foo < object ;" eval( -- )
 ] unit-test
 
 [ t ] [
@@ -543,7 +543,7 @@ EXCLUDE: qualified.tests.bar => x ;
 [ t ] [ "was-once-a-word-bug" "parser.tests" lookup >boolean ] unit-test
 
 [ [ ] ] [
-    "IN: parser.tests USE: words << \"was-once-a-word-bug\" \"parser.tests\" create [ ] (( -- )) define-declared >>"
+    "IN: parser.tests USE: words << \"was-once-a-word-bug\" \"parser.tests\" create [ ] ( -- ) define-declared >>"
     <string-reader> "was-once-a-word-test" parse-stream
 ] unit-test
 

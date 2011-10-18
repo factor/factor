@@ -330,7 +330,7 @@ HELP: define-temp
 { $notes
     "The following phrases are equivalent:"
     { $code "[ 2 2 + . ] call" }
-    { $code "[ 2 2 + . ] (( -- )) define-temp execute" }
+    { $code "[ 2 2 + . ] ( -- ) define-temp execute" }
     "This word must be called from inside " { $link with-compilation-unit } "."
 } ;
 

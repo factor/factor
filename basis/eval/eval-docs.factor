@@ -21,7 +21,7 @@ HELP: eval(
     "This parsing word is just a slightly nicer syntax for " { $link eval } ". The following are equivalent:"
     { $code
         "eval( inputs -- outputs )"
-        "(( inputs -- outputs )) eval"
+        "( inputs -- outputs ) eval"
     }
 }
 { $errors "Throws an error if the input is malformed, or if the evaluation itself throws an error." } ;
@@ -51,7 +51,7 @@ $nl
     """USING: eval listener vocabs.parser ;
 [
     "cad.objects" use-vocab
-    (( -- seq )) (eval)
+    ( -- seq ) (eval)
 ] with-interactive-vocabs"""
 }
 "Note that the search path in the outer code (set by the " { $link POSTPONE: USING: } " form) has no relation to the search path used when parsing the string parameter (this is determined by " { $link with-interactive-vocabs } " and " { $link use-vocab } ")." ;

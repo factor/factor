@@ -1391,7 +1391,7 @@ SYMBOL: last-opcode
   dup " " join instruction-quotations
   [
      "_" join [ "emulate-" % % ] "" make create-in dup last-instruction set-global
-  ] dip (( cpu -- )) define-declared ;
+  ] dip ( cpu -- ) define-declared ;
 
 SYNTAX: INSTRUCTION:  ";" parse-tokens parse-instructions ;
 

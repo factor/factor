@@ -226,11 +226,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "(" [
-        ")" parse-effect drop
-    ] define-core-syntax
-
-    "((" [
-        "))" parse-effect suffix!
+        ")" parse-effect suffix!
     ] define-core-syntax
 
     "MAIN:" [

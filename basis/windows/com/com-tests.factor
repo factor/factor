@@ -25,11 +25,11 @@ COM-INTERFACE: ISelfReferential IUnknown {d4f45bf8-f720-4701-a09d-e8e341981121}
 { GUID: {00000000-0000-0000-C000-000000000046} } [ IUnknown-iid ] unit-test
 { GUID: {b06ac3f4-30e4-406b-a7cd-c29cead4552c} } [ IUnrelated-iid ] unit-test
 
-{ (( -- iid )) } [ \ ISimple-iid stack-effect ] unit-test
-{ (( this -- HRESULT )) } [ \ ISimple::returnOK stack-effect ] unit-test
-{ (( this -- int )) } [ \ IInherited::getX stack-effect ] unit-test
-{ (( this newX -- )) } [ \ IInherited::setX stack-effect ] unit-test
-{ (( this mul add -- int )) } [ \ IUnrelated::xMulAdd stack-effect ] unit-test
+{ ( -- iid ) } [ \ ISimple-iid stack-effect ] unit-test
+{ ( this -- HRESULT ) } [ \ ISimple::returnOK stack-effect ] unit-test
+{ ( this -- int ) } [ \ IInherited::getX stack-effect ] unit-test
+{ ( this newX -- ) } [ \ IInherited::setX stack-effect ] unit-test
+{ ( this mul add -- int ) } [ \ IUnrelated::xMulAdd stack-effect ] unit-test
 
 SYMBOL: +test-wrapper+
 SYMBOL: +guinea-pig-implementation+

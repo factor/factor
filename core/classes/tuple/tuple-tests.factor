@@ -714,7 +714,7 @@ DEFER: redefine-tuple-twice
 ERROR: base-error x y ;
 ERROR: derived-error < base-error z ;
 
-[ (( x y z -- * )) ] [ \ derived-error stack-effect ] unit-test
+[ ( x y z -- * ) ] [ \ derived-error stack-effect ] unit-test
 
 ! Make sure that tuple reshaping updates code heap roots
 TUPLE: code-heap-ref ;

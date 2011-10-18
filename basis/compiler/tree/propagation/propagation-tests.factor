@@ -899,7 +899,7 @@ SYMBOL: not-an-assoc
 [ f ] [ [ 5 instance? ] { instance? } inlined? ] unit-test
 [ t ] [ [ array instance? ] { instance? } inlined? ] unit-test
 
-[ t ] [ [ (( a b c -- c b a )) shuffle ] { shuffle } inlined? ] unit-test
+[ t ] [ [ ( a b c -- c b a ) shuffle ] { shuffle } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap shuffle ] { shuffle } inlined? ] unit-test
 
 ! Type function for 'clone' had a subtle issue

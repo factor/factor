@@ -167,7 +167,7 @@ M: quotation add-quot-to-history add-to-history ;
 ERROR: uninferable ;
 
 : remove-effect-input ( effect -- effect' )
-    (( -- object )) swap compose-effects ;
+    ( -- object ) swap compose-effects ;
 
 : (infer-value) ( value-info -- effect )
     dup literal?>> [

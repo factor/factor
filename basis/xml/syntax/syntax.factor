@@ -37,7 +37,7 @@ SYNTAX: TAG:
     scan-token scan-word parse-definition define-tag ;
 
 SYNTAX: XML-NS:
-    scan-new-word scan-token '[ f swap _ <name> ] (( string -- name )) define-memoized ;
+    scan-new-word scan-token '[ f swap _ <name> ] ( string -- name ) define-memoized ;
 
 <PRIVATE
 

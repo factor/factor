@@ -51,11 +51,11 @@ TUPLE: undefined word ;
     #! above.
     [ undefined f ] ;
 
-PREDICATE: deferred < word ( obj -- ? ) def>> undefined-def = ;
+PREDICATE: deferred < word def>> undefined-def = ;
 M: deferred definer drop \ DEFER: f ;
 M: deferred definition drop f ;
 
-PREDICATE: primitive < word ( obj -- ? ) "primitive" word-prop ;
+PREDICATE: primitive < word "primitive" word-prop ;
 M: primitive definer drop \ PRIMITIVE: f ;
 M: primitive definition drop f ;
 

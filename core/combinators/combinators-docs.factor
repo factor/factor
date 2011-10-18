@@ -234,7 +234,7 @@ HELP: call-effect
   "The following two lines are equivalent:"
   { $code
     "call( a b -- c )"
-    "(( a b -- c )) call-effect"
+    "( a b -- c ) call-effect"
   }
 } ;
 
@@ -245,7 +245,7 @@ HELP: execute-effect
   "The following two lines are equivalent:"
   { $code
     "execute( a b -- c )"
-    "(( a b -- c )) execute-effect"
+    "( a b -- c ) execute-effect"
   }
 } ;
 

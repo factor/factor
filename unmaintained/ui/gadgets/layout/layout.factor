@@ -55,7 +55,7 @@ M: model -> dup , ;
 
 ERROR: not-in-template word ;
 SYNTAX: $ scan-new-word dup
-    [ [ dup templates get at [ nip , ] [ not-in-template ] if* ] curry (( -- )) define-declared "$" expect ]
+    [ [ dup templates get at [ nip , ] [ not-in-template ] if* ] curry ( -- ) define-declared "$" expect ]
     [ [ <placeholder> [ swap templates get set-at ] keep , ] curry ] bi append! ;
 
 : insert-gadget ( number parent gadget -- ) -rot [ but-last insert-nth ] change-children drop ;

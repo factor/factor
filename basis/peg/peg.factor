@@ -270,7 +270,7 @@ GENERIC: (compile) ( peg -- quot )
 : define-parser-word ( parser word -- )
   #! Return the body of the word that is the compiled version
   #! of the parser.
-  2dup swap peg>> (compile) (( -- result )) define-declared
+  2dup swap peg>> (compile) ( -- result ) define-declared
   swap id>> "peg-id" set-word-prop ;
 
 : compile-parser ( parser -- word )
@@ -295,13 +295,13 @@ SYMBOL: delayed
   #! Work through all delayed parsers and recompile their
   #! words to have the correct bodies.
   delayed get [
-    call( -- parser ) compile-parser-quot (( -- result )) define-declared
+    call( -- parser ) compile-parser-quot ( -- result ) define-declared
   ] assoc-each ;
 
 : compile ( parser -- word )
   [
     H{ } clone delayed [ 
-      compile-parser-quot (( -- result )) define-temp fixup-delayed 
+      compile-parser-quot ( -- result ) define-temp fixup-delayed 
     ] with-variable
   ] with-compilation-unit ;
 

@@ -67,7 +67,7 @@ IN: tools.profiler.tests
 
 [ 1 ] [
     [
-        [ [ ] (( -- )) define-temp ] with-compilation-unit
+        [ [ ] ( -- ) define-temp ] with-compilation-unit
         dup execute( -- )
     ] profile
     counter>>

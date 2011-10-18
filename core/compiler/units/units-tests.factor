@@ -40,7 +40,7 @@ SYMBOL: counter
 
 M: observer definitions-changed 2drop global [ counter inc ] bind ;
 
-[ gensym [ ] (( -- )) define-declared ] with-compilation-unit
+[ gensym [ ] ( -- ) define-declared ] with-compilation-unit
 
 [ 1 ] [ counter get-global ] unit-test
 
