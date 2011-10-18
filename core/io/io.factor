@@ -62,6 +62,21 @@ SYMBOL: error-stream
 : with-output-stream ( stream quot -- )
     [ with-output-stream* ] curry with-disposal ; inline
 
+: with-error-stream* ( stream quot -- )
+    error-stream swap with-variable ; inline
+
+: with-error-stream ( stream quot -- )
+    [ with-error-stream* ] curry with-disposal ; inline
+
+: with-output+error-stream* ( stream quot -- )
+    [ dup ] dip [ with-error-stream* ] curry with-output-stream* ; inline
+
+: with-output+error-stream ( stream quot -- )
+    [ with-output+error-stream* ] curry with-disposal ; inline
+
+: with-output>error ( quot -- )
+    error-stream get swap with-output-stream* ; inline
+
 : with-streams* ( input output quot -- )
     swapd [ with-output-stream* ] curry with-input-stream* ; inline
 
@@ -70,6 +85,12 @@ SYMBOL: error-stream
     #! if both streams point to the same FD, we get to flush the
     #! buffer before closing the FD.
     swapd [ with-output-stream ] curry with-input-stream ; inline
+
+: with-input-output+error-streams* ( input output+error quot -- )
+    swapd [ with-output+error-stream* ] curry with-input-stream* ; inline
+
+: with-input-output+error-streams ( input output+error quot -- )
+    swapd [ with-output+error-stream ] curry with-input-stream ; inline
 
 : print ( str -- ) output-stream get stream-print ; inline
 
