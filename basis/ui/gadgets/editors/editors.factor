@@ -5,7 +5,7 @@ combinators combinators.short-circuit documents
 documents.elements fry grouping kernel locals make math
 math.functions math.order math.ranges math.rectangles
 math.vectors models models.arrow namespaces opengl sequences
-sorting splitting ui.baseline-alignment ui.clipboards
+sorting splitting system ui.baseline-alignment ui.clipboards
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
 ui.gestures ui.pens.solid ui.render ui.text unicode.categories ;
@@ -413,17 +413,34 @@ editor "clipboard" f {
 
 : end-of-line ( editor -- ) one-line-elt editor-next ;
 
-editor "caret-motion" f {
-    { T{ button-down } position-caret }
-    { T{ key-down f f "LEFT" } previous-character }
-    { T{ key-down f f "RIGHT" } next-character }
-    { T{ key-down f { C+ } "LEFT" } previous-word }
-    { T{ key-down f { C+ } "RIGHT" } next-word }
-    { T{ key-down f f "HOME" } start-of-line }
-    { T{ key-down f f "END" } end-of-line }
-    { T{ key-down f { C+ } "HOME" } start-of-document }
-    { T{ key-down f { C+ } "END" } end-of-document }
-} define-command-map
+os macosx? [
+    editor "caret-motion" f {
+        { T{ button-down } position-caret }
+        { T{ key-down f f "LEFT" } previous-character }
+        { T{ key-down f f "RIGHT" } next-character }
+        { T{ key-down f { C+ } "LEFT" } previous-word }
+        { T{ key-down f { C+ } "RIGHT" } next-word }
+        { T{ key-down f f "HOME" } start-of-line }
+        { T{ key-down f f "END" } end-of-line }
+        { T{ key-down f { C+ } "a" } start-of-line }
+        { T{ key-down f { C+ } "e" } end-of-line }
+        { T{ key-down f { C+ } "HOME" } start-of-document }
+        { T{ key-down f { C+ } "END" } end-of-document }
+    } define-command-map
+]
+[
+    editor "caret-motion" f {
+        { T{ button-down } position-caret }
+        { T{ key-down f f "LEFT" } previous-character }
+        { T{ key-down f f "RIGHT" } next-character }
+        { T{ key-down f { C+ } "LEFT" } previous-word }
+        { T{ key-down f { C+ } "RIGHT" } next-word }
+        { T{ key-down f f "HOME" } start-of-line }
+        { T{ key-down f f "END" } end-of-line }
+        { T{ key-down f { C+ } "HOME" } start-of-document }
+        { T{ key-down f { C+ } "END" } end-of-document }
+    } define-command-map
+] if
 
 : clear-editor ( editor -- )
     model>> clear-doc ;
