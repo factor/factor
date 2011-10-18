@@ -8,6 +8,8 @@ TUPLE: memory-stream alien ;
 : <memory-stream> ( alien -- stream )
     memory-stream boa ;
 
+INSTANCE: memory-stream input-stream
+
 M: memory-stream stream-element-type drop +byte+ ;
 
 M: memory-stream stream-read1

@@ -24,6 +24,8 @@ IN: ui.tools.listener
 TUPLE: interactor < source-editor
 output history flag mailbox thread waiting token-model word-model popup ;
 
+INSTANCE: interactor input-stream
+
 : register-self ( interactor -- )
     <mailbox> >>mailbox
     self >>thread

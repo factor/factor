@@ -11,6 +11,7 @@ GENERIC: url-of ( object -- url )
 M: object url-of drop f ;
 
 TUPLE: html-writer data ;
+INSTANCE: html-writer output-stream
 
 <PRIVATE
 
