@@ -287,7 +287,7 @@ TUPLE: raw-port < port addr ;
 
 HOOK: (raw) io-backend ( addr -- raw )
 
-HOOK: (receive) io-backend ( n buf datagram -- size addrspec )
+HOOK: (receive-unsafe) io-backend ( n buf datagram -- size addrspec )
 
 ERROR: invalid-port object ;
 
@@ -371,7 +371,7 @@ SYMBOL: remote-address
 
 : receive-unsafe ( n buf datagram -- count addrspec )
     check-receive
-    [ (receive) ] [ addr>> ] bi parse-sockaddr ; inline
+    [ (receive-unsafe) ] [ addr>> ] bi parse-sockaddr ; inline
 
 CONSTANT: datagram-size 65536
 
