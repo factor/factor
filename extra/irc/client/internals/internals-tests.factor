@@ -11,7 +11,11 @@ IN: irc.client.internals.tests
 
 ! Streams for testing
 TUPLE: mb-writer lines last-line disposed ;
+INSTANCE: mb-writer output-stream
+
 TUPLE: mb-reader lines disposed ;
+INSTANCE: mb-reader input-stream
+
 : <mb-writer> ( -- mb-writer ) V{ } clone V{ } clone f mb-writer boa ;
 : <mb-reader> ( -- mb-reader ) <mailbox> f mb-reader boa ;
 : push-line ( line test-reader-stream -- ) lines>> mailbox-put ;

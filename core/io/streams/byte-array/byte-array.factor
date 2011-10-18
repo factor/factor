@@ -5,6 +5,7 @@ io.encodings io.private io.streams.sequence kernel namespaces
 sequences sequences.private ;
 IN: io.streams.byte-array
 
+INSTANCE: byte-vector output-stream
 M: byte-vector stream-element-type drop +byte+ ;
 
 : <byte-writer> ( encoding -- stream )
@@ -15,6 +16,7 @@ M: byte-vector stream-element-type drop +byte+ ;
     dup encoder? [ stream>> ] when >byte-array ; inline
 
 TUPLE: byte-reader { underlying byte-array read-only } { i array-capacity } ;
+INSTANCE: byte-reader input-stream
 
 M: byte-reader stream-element-type drop +byte+ ;
 

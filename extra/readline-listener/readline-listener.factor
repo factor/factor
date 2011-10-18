@@ -10,6 +10,8 @@ IN: readline-listener
 SYMBOL: completions
 
 TUPLE: readline-reader { prompt initial: f } ;
+INSTANCE: readline-reader input-stream
+
 M: readline-reader stream-readln
     flush [ prompt>> dup [ " " append ] [ ] if readline ]
     keep f >>prompt drop ;

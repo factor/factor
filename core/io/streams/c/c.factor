@@ -14,6 +14,7 @@ TUPLE: c-stream < disposable handle ;
 M: c-stream dispose* handle>> fclose ;
 
 TUPLE: c-writer < c-stream ;
+INSTANCE: c-writer output-stream
 
 : <c-writer> ( handle -- stream ) c-writer new-c-stream ;
 
@@ -28,6 +29,7 @@ M: c-writer stream-write
 M: c-writer stream-flush dup check-disposed handle>> fflush ;
 
 TUPLE: c-reader < c-stream ;
+INSTANCE: c-reader input-stream
 
 : <c-reader> ( handle -- stream ) c-reader new-c-stream ;
 

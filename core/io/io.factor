@@ -32,8 +32,8 @@ GENERIC: stream-length ( stream -- n/f )
 : stream-print ( str stream -- ) [ stream-write ] [ stream-nl ] bi ;
 
 ! Default streams
-SYMBOL: input-stream
-SYMBOL: output-stream
+MIXIN: input-stream
+MIXIN: output-stream
 SYMBOL: error-stream
 
 : readln ( -- str/f ) input-stream get stream-readln ; inline
@@ -216,16 +216,18 @@ ERROR: invalid-read-buffer buf stream ;
     [ stream-exemplar ] bi produce-as swap finalize-read-until ; inline
 PRIVATE>
 
-M: object stream-read-unsafe rot 0 read-loop ;
-M: object stream-read-partial-unsafe stream-read-unsafe ; inline
-M: object stream-read-until read-until-loop ;
-M: object stream-readln
+M: input-stream stream-read-unsafe rot 0 read-loop ;
+M: input-stream stream-read-partial-unsafe stream-read-unsafe ; inline
+M: input-stream stream-read-until read-until-loop ;
+M: input-stream stream-readln
     "\n" swap stream-read-until drop ; inline
-M: object stream-contents (stream-contents-by-length-or-block) ; inline
-M: object stream-seekable? drop f ; inline
-M: object stream-length drop f ; inline
+M: input-stream stream-contents (stream-contents-by-length-or-block) ; inline
+M: input-stream stream-seekable? drop f ; inline
+M: input-stream stream-length drop f ; inline
 
-M: object stream-write [ stream-write1 ] curry each ; inline
-M: object stream-flush drop ; inline
-M: object stream-nl CHAR: \n swap stream-write1 ; inline
+M: output-stream stream-write [ stream-write1 ] curry each ; inline
+M: output-stream stream-flush drop ; inline
+M: output-stream stream-nl CHAR: \n swap stream-write1 ; inline
+M: output-stream stream-seekable? drop f ; inline
+M: output-stream stream-length drop f ; inline
 
