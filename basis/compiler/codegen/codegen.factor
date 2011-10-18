@@ -160,6 +160,7 @@ CODEGEN: ##inc-r %inc-r
 CODEGEN: ##call %call
 CODEGEN: ##jump %jump
 CODEGEN: ##return %return
+CODEGEN: ##safepoint %safepoint
 CODEGEN: ##slot %slot
 CODEGEN: ##slot-imm %slot-imm
 CODEGEN: ##set-slot %set-slot
