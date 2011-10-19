@@ -281,6 +281,8 @@ SYMBOLS: +read-only+ +hidden+ +system+
 +sparse-file+ +reparse-point+ +compressed+ +offline+
 +not-content-indexed+ +encrypted+ ;
 
+SLOT: attributes
+
 : read-only? ( file-info -- ? )
     attributes>> +read-only+ swap member? ;
     
