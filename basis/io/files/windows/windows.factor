@@ -9,7 +9,7 @@ io.streams.c io.streams.null io.timeouts kernel libc literals
 locals make math math.bitwise namespaces sequences
 specialized-arrays system threads tr windows windows.errors
 windows.handles windows.kernel32 windows.shell32 windows.time
-windows.types ;
+windows.types fry ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
 
@@ -133,8 +133,13 @@ M: windows init-io ( -- )
 
 ERROR: invalid-file-size n ;
 
-: handle>file-size ( handle -- n )
+: (handle>file-size) ( handle -- n )
     0 ulonglong <ref> [ GetFileSizeEx win32-error=0/f ] keep ulonglong deref ;
+
+! Returns T{ windows-error f 1 "Incorrect function." } if stream is not seekable
+: handle>file-size ( handle -- n/f )
+    '[ _ (handle>file-size) ]
+     [ dup n>> 1 = [ drop f ] [ rethrow ] if ] recover ;
 
 ERROR: seek-before-start n ;
 
@@ -152,10 +157,11 @@ M: windows seek-handle ( n seek-type handle -- )
     } case ;
 
 M: windows can-seek-handle? ( handle -- ? )
-    handle>> handle>file-size zero? not ;
+    handle>> handle>file-size >boolean ;
 
 M: windows handle-length ( handle -- n/f )
-    handle>> handle>file-size [ f ] when-zero ;
+    handle>> handle>file-size
+    dup { 0 f } member? [ drop f ] when ;
 
 : file-error? ( n -- eof? )
     zero? [
