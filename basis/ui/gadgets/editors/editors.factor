@@ -5,7 +5,7 @@ combinators combinators.short-circuit documents
 documents.elements fry grouping kernel locals make math
 math.functions math.order math.ranges math.rectangles
 math.vectors models models.arrow namespaces opengl sequences
-sorting splitting ui.baseline-alignment ui.clipboards
+sorting splitting system ui.baseline-alignment ui.clipboards
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
 ui.gestures ui.pens.solid ui.render ui.text unicode.categories ;
@@ -429,10 +429,13 @@ editor "caret-motion" f {
     { T{ key-down f f "END" } end-of-line }
     { T{ key-down f { C+ } "HOME" } start-of-document }
     { T{ key-down f { C+ } "END" } end-of-document }
-    { T{ key-down f { C+ } "k" } delete-to-start-of-line }
-    { T{ key-down f { C+ } "a" } start-of-line }
-    { T{ key-down f { C+ } "e" } end-of-line }
-} define-command-map
+} os macosx? [
+    {
+        { T{ key-down f { C+ } "k" } delete-to-start-of-line }
+        { T{ key-down f { C+ } "a" } start-of-line }
+        { T{ key-down f { C+ } "e" } end-of-line }
+    } append
+] when define-command-map
 
 : clear-editor ( editor -- )
     model>> clear-doc ;
