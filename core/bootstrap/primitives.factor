@@ -114,7 +114,7 @@ call( -- )
 
 ! Builtin classes
 : lookup-type-number ( word -- n )
-    global [ target-word ] bind type-number ;
+    [ target-word ] with-global type-number ;
 
 : register-builtin ( class -- )
     [ dup lookup-type-number "type" set-word-prop ]

@@ -245,13 +245,13 @@ M: dinput-game-input-backend (close-game-input)
     delete-dinput ;
 
 M: dinput-game-input-backend (reset-game-input)
-    global [
+    [
         {
             +dinput+ +keyboard-device+ +keyboard-state+
             +controller-devices+ +controller-guids+
             +device-change-window+ +device-change-handle+
         } [ off ] each
-    ] bind ;
+    ] with-global ;
 
 M: dinput-game-input-backend get-controllers
     +controller-devices+ get-global
