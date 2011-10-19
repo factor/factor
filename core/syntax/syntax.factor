@@ -104,7 +104,7 @@ IN: bootstrap.syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal suffix! ] define-core-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
-    "HS{" [ \ } [ <hash-set> ] parse-literal ] define-core-syntax
+    "HS{" [ \ } [ >hash-set ] parse-literal ] define-core-syntax
 
     "POSTPONE:" [ scan-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax

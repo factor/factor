@@ -58,7 +58,7 @@ TUPLE: (astar) astar goal origin in-open-set open-set ;
 : (init) ( from to astar -- )
     swap >>goal
     H{ } clone over astar>> g<<
-    { } <hash-set> over astar>> in-closed-set<<
+    HS{ } clone over astar>> in-closed-set<<
     H{ } clone >>origin
     H{ } clone >>in-open-set
     <min-heap> >>open-set
