@@ -22,7 +22,7 @@
 
 	<h1>Build machine information</h1>
 
-	<table border="1">
+	<table border="0">
 		<tr><td>Host name:</td><td><t:xml t:name="host-name" /></td></tr>
 		<tr><td>Last heartbeat:</td><td><t:label t:name="heartbeat-timestamp" /></td></tr>
 		<tr><td>Current status:</td><td><t:xml t:name="status" /></td></tr>
