@@ -17,11 +17,9 @@ void register_vm_with_thread(factor_vm *vm)
 		fatal_error("TlsSetValue() failed",0);
 }
 
-factor_vm *current_vm()
+factor_vm *current_vm_p()
 {
-	factor_vm *vm = (factor_vm *)TlsGetValue(current_vm_tls_key);
-	assert(vm != NULL);
-	return vm;
+	return (factor_vm *)TlsGetValue(current_vm_tls_key);
 }
 
 }
