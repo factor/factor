@@ -281,6 +281,15 @@ SYMBOLS: +read-only+ +hidden+ +system+
 +sparse-file+ +reparse-point+ +compressed+ +offline+
 +not-content-indexed+ +encrypted+ ;
 
+: read-only? ( file-info -- ? )
+    attributes>> +read-only+ swap member? ;
+    
+: set-file-attributes ( path flags -- )
+    SetFileAttributes win32-error=0/f ;
+    
+: set-file-normal-attribute ( path -- )
+    FILE_ATTRIBUTE_NORMAL set-file-attributes ;
+
 : win32-file-attribute ( n symbol attr -- )
     rot mask? [ , ] [ drop ] if ;
 
