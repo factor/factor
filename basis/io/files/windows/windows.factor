@@ -133,14 +133,17 @@ M: windows init-io ( -- )
 
 ERROR: invalid-file-size n ;
 
-: (handle>file-size) ( handle -- n )
-    0 ulonglong <ref> [ GetFileSizeEx win32-error=0/f ] keep ulonglong deref ;
+: (handle>file-size) ( handle -- n/f )
+    0 ulonglong <ref> [ GetFileSizeEx ] keep swap
+    [ drop f ] [ drop ulonglong deref ] if-zero ;
 
-! Returns T{ windows-error f 1 "Incorrect function." } if stream is not seekable
+! GetFileSizeEx errors with ERROR_INVALID_FUNCTION if handle is not seekable
 : handle>file-size ( handle -- n/f )
-    '[ _ (handle>file-size) ]
-     [ dup n>> 1 = [ drop f ] [ rethrow ] if ] recover ;
-
+    (handle>file-size) [
+        GetLastError ERROR_INVALID_FUNCTION =
+        [ f ] [ throw-win32-error ] if
+    ] unless* ;
+    
 ERROR: seek-before-start n ;
 
 : set-seek-ptr ( n handle -- )
