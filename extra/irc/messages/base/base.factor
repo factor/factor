@@ -106,10 +106,10 @@ M: irc-message set-irc-command
     [ ?define-irc-parameters ] [ ?define-irc-trailing ] 2bi* ;
 PRIVATE>
 
-#! SYNTAX:
+#! SYNTAX: name string parameters ;
 #! IRC: type "COMMAND" slot1 ...;
 #! IRC: type "COMMAND" slot1 ... : trailing-slot;
-SYNTAX: IRC: ( name string parameters -- )
+SYNTAX: IRC:
     scan-new-class
     [ scan-object register-irc-message-type ] keep
     ";" parse-tokens
