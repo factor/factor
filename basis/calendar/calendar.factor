@@ -64,12 +64,6 @@ CONSTANT: month-names
         "July" "August" "September" "October" "November" "December"
     }
 
-<PRIVATE
-
-: (month-name) ( n -- string ) 1 - month-names nth ;
-
-PRIVATE>
-
 GENERIC: month-name ( obj -- string )
 
 M: integer month-name check-month 1 - month-names nth ;
