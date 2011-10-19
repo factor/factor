@@ -69,7 +69,7 @@ M:: token-parser parse ( input parser -- list )
 
 TUPLE: satisfy-parser quot ;
 
-C: satisfy satisfy-parser ( quot -- parser )
+C: satisfy satisfy-parser
 
 M: satisfy-parser parse ( input parser -- list )
     #! A parser that succeeds if the predicate,
@@ -87,7 +87,7 @@ LAZY: any-char-parser ( -- parser )
 
 TUPLE: epsilon-parser ;
 
-C: epsilon epsilon-parser ( -- parser )
+C: epsilon epsilon-parser
 
 M: epsilon-parser parse ( input parser -- list )
     #! A parser that parses the empty string. It
@@ -98,7 +98,7 @@ M: epsilon-parser parse ( input parser -- list )
 
 TUPLE: succeed-parser result ;
 
-C: succeed succeed-parser ( result -- parser )
+C: succeed succeed-parser
 
 M: succeed-parser parse ( input parser -- list )
     #! A parser that always returns 'result' as a
@@ -107,7 +107,7 @@ M: succeed-parser parse ( input parser -- list )
 
 TUPLE: fail-parser ;
 
-C: fail fail-parser ( -- parser )
+C: fail fail-parser
 
 M: fail-parser parse ( input parser -- list )
     #! A parser that always fails and returns
@@ -188,7 +188,7 @@ TUPLE: sp-parser p1 ;
 
 #! Return a parser that first skips all whitespace before
 #! calling the original parser.
-C: sp sp-parser ( p1 -- parser )
+C: sp sp-parser
 
 M: sp-parser parse ( input parser -- list )
     #! Skip all leading whitespace from the input then call
@@ -197,7 +197,7 @@ M: sp-parser parse ( input parser -- list )
 
 TUPLE: just-parser p1 ;
 
-C: just just-parser ( p1 -- parser )
+C: just just-parser
 
 M: just-parser parse ( input parser -- result )
     #! Calls the given parser on the input removes
@@ -208,7 +208,7 @@ M: just-parser parse ( input parser -- result )
 
 TUPLE: apply-parser p1 quot ;
 
-C: <@ apply-parser ( parser quot -- parser )
+C: <@ apply-parser
 
 M: apply-parser parse ( input parser -- result )
     #! Calls the parser on the input. For each successful
@@ -224,7 +224,7 @@ M: apply-parser parse ( input parser -- result )
 
 TUPLE: some-parser p1 ;
 
-C: some some-parser ( p1 -- parser )
+C: some some-parser
 
 M: some-parser parse ( input parser -- result )
     #! Calls the parser on the input, guarantees
