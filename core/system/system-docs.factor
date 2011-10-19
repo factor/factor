@@ -69,7 +69,7 @@ HELP: embedded?
 { $values { "?" "a boolean" } }
 { $description "Tests if this Factor instance is embedded in another application." } ;
 
-HELP: exit ( n -- )
+HELP: exit ( n -- * )
 { $values { "n" "an integer exit code" } }
 { $description "Exits the Factor process." } ;
 
