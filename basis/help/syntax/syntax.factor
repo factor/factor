@@ -1,13 +1,19 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel parser sequences words help
-help.topics namespaces vocabs definitions compiler.units
-vocabs.parser ;
+USING: accessors arrays compiler.units definitions effects help
+help.topics kernel namespaces parser sequences vocabs
+vocabs.parser words ;
 IN: help.syntax
 
 SYNTAX: HELP:
     scan-word bootstrap-word
-    [ >link save-location ] [ [ \ ; parse-until >array ] dip set-word-help ] bi ;
+    [ >link save-location ]
+    [
+        [
+            \ ; parse-until
+            dup ?first effect? [ rest ] when >array
+        ] dip set-word-help
+    ] bi ;
 
 SYNTAX: ARTICLE:
     location [
