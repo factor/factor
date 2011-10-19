@@ -121,7 +121,7 @@ PRIVATE>
     [ 2drop reset-run-loop yield ] alien-callback ;
 
 : init-thread-timer ( -- )
-    timer-callback <CFTimer> add-timer-to-run-loop ;
+    60 timer-callback <CFTimer> add-timer-to-run-loop ;
 
 : run-one-iteration ( nanos -- handled? )
     reset-run-loop
