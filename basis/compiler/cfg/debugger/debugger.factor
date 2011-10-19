@@ -27,9 +27,6 @@ M: word test-builder
     0 vreg-counter set-global
     [ build-tree optimize-tree ] keep build-cfg ;
 
-: test-optimizer ( quot -- cfgs )
-    test-builder [ [ optimize-cfg ] with-cfg ] map ;
-
 : test-ssa ( quot -- cfgs )
     test-builder [
         [
