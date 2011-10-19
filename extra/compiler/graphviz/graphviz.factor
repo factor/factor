@@ -79,8 +79,8 @@ IN: compiler.graphviz
 : optimized-cfg ( quot -- cfgs )
     {
         { [ dup cfg? ] [ 1array ] }
-        { [ dup quotation? ] [ test-optimizer ] }
-        { [ dup word? ] [ test-optimizer ] }
+        { [ dup quotation? ] [ test-ssa ] }
+        { [ dup word? ] [ test-ssa ] }
         [ ]
     } cond ;
 

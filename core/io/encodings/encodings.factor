@@ -50,14 +50,6 @@ M: object <decoder> f decoder boa ; inline
 : >decoder< ( decoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ; inline
 
-: fix-read1 ( stream char -- char )
-    over cr>> [
-        over cr-
-        dup CHAR: \n = [
-            drop dup stream-read1
-        ] when
-    ] when nip ; inline
-
 M: decoder stream-element-type
     drop +character+ ; inline
 

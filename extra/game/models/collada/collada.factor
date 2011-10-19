@@ -22,9 +22,6 @@ SYMBOLS: up-axis unit-ratio ;
 : string>numbers ( string -- number-seq )
     " \t\n" split harvest [ string>number ] map ;
 
-: string>floats ( string -- float-seq )
-    " \t\n" split harvest [ string>number ] map ;
-
 : x/ ( tag child-name -- child-tag )
     [ tag-named ]
     [ rot dup [ drop missing-child ] unless 2nip ]
@@ -72,7 +69,7 @@ M: z-up >y-up-axis!
 
 : source>seq ( source-tag up-axis scale -- sequence )
     rot
-    [ "float_array" x/ xt string>floats [ * ] with map ]
+    [ "float_array" x/ xt string>numbers [ * ] with map ]
     [ nip "technique_common" x/ "accessor" x/ "stride" x@ string>number ] 2bi
     group
     [ swap over length 2 > [ >y-up-axis! ] [ drop ] if ] with map ;
@@ -142,7 +139,7 @@ VERTEX-FORMAT: collada-vertex-format
 
 : triangles>model ( sources vertices triangles-tag -- model )
     [ "input" tags-named collect-sources ] keep swap
-    
+
     [
         largest-offset+1 swap
         [ "count" x@ string>number ] [ triangles>numbers ] bi
