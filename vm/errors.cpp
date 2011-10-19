@@ -84,9 +84,9 @@ void factor_vm::not_implemented_error()
 
 void factor_vm::memory_protection_error(cell addr)
 {
-	/* Retain and call stack underflows are not supposed to happen */
-
-	if(ctx->datastack_seg->underflow_p(addr))
+	if(code->safepoint_p(addr))
+		handle_safepoint();
+	else if(ctx->datastack_seg->underflow_p(addr))
 		general_error(ERROR_DATASTACK_UNDERFLOW,false_object,false_object);
 	else if(ctx->datastack_seg->overflow_p(addr))
 		general_error(ERROR_DATASTACK_OVERFLOW,false_object,false_object);
@@ -134,15 +134,17 @@ void memory_signal_handler_impl()
 	current_vm()->memory_signal_handler_impl();
 }
 
-void factor_vm::misc_signal_handler_impl()
+void factor_vm::synchronous_signal_handler_impl()
 {
 	scrub_return_address();
 	signal_error(signal_number);
 }
 
-void misc_signal_handler_impl()
+void synchronous_signal_handler_impl()
 {
-	current_vm()->misc_signal_handler_impl();
+	factor_vm *vm = current_vm_p();
+	if (vm)
+		vm->synchronous_signal_handler_impl();
 }
 
 void factor_vm::fp_signal_handler_impl()
@@ -157,6 +159,26 @@ void factor_vm::fp_signal_handler_impl()
 void fp_signal_handler_impl()
 {
 	current_vm()->fp_signal_handler_impl();
+}
+
+void factor_vm::enqueue_safepoint_signal(cell signal)
+{
+	safepoint_signal_number = signal;
+	code->guard_safepoint();
+}
+
+void factor_vm::handle_safepoint()
+{
+	assert(safepoint_signal_number != 0);
+	code->unguard_safepoint();
+	cell signal = safepoint_signal_number;
+	safepoint_signal_number = 0;
+	general_error(ERROR_SIGNAL,from_unsigned_cell(signal),false_object);
+}
+
+void factor_vm::primitive_guard_safepoint()
+{
+	code->guard_safepoint();
 }
 
 }

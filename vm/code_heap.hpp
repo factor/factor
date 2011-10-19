@@ -43,6 +43,12 @@ struct code_heap {
 	void flush_icache();
 	void guard_safepoint();
 	void unguard_safepoint();
+
+	bool safepoint_p(cell addr)
+	{
+		cell page_mask = ~(getpagesize() - 1);
+		return (addr & page_mask) == (cell)safepoint_page;
+	}
 };
 
 struct code_heap_room {
