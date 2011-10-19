@@ -11,3 +11,10 @@ IN: vocabs.tests
 
 [ t ] [ "io.files" "io" parent-vocab? ] unit-test
 [ f ] [ "io" "io.files" parent-vocab? ] unit-test
+
+[ "math" ] [ "resource:core/math" normalized-vocab-name ] unit-test
+[ "math" ] [ "resource:core.math" normalized-vocab-name ] unit-test
+[ "math" ] [ "math" normalized-vocab-name ] unit-test
+
+[ "" ] [ "resource:core" normalized-vocab-name ] unit-test
+

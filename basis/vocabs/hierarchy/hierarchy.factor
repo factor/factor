@@ -3,7 +3,8 @@
 USING: accessors arrays assocs combinators.short-circuit fry
 io.directories io.files io.files.info io.pathnames kernel make
 memoize namespaces sequences sorting splitting vocabs sets
-vocabs.loader vocabs.metadata vocabs.errors ;
+vocabs.loader vocabs.metadata vocabs.errors continuations
+strings ;
 RENAME: child-vocabs vocabs => vocabs:child-vocabs
 IN: vocabs.hierarchy
 
@@ -54,6 +55,9 @@ M: vocab-prefix vocab-name name>> ;
 : unrooted-child-vocabs-recursive ( prefix -- seq )
     vocabs:child-vocabs no-rooted ;
 
+: trim-prefix ( prefix -- prefix' )
+    [ ".\\/" member? ] trim-tail ;
+
 PRIVATE>
 
 : no-prefixes ( seq -- seq' ) [ vocab-prefix? not ] filter ;
@@ -74,6 +78,7 @@ PRIVATE>
 : no-roots ( assoc -- seq ) values concat ;
 
 : child-vocabs ( prefix -- assoc )
+    trim-prefix
     [ [ vocab-roots get ] dip '[ dup _ (child-vocabs) ] { } map>assoc ]
     [ unrooted-child-vocabs [ vocab ] map f swap 2array ]
     bi suffix ;
@@ -82,6 +87,7 @@ PRIVATE>
     "" child-vocabs ;
 
 : child-vocabs-recursive ( prefix -- assoc )
+    trim-prefix
     [ [ vocab-roots get ] dip '[ dup _ (child-vocabs-recursive) ] { } map>assoc ]
     [ unrooted-child-vocabs-recursive [ vocab ] map f swap 2array ]
     bi suffix ;
@@ -89,31 +95,47 @@ PRIVATE>
 MEMO: all-vocabs-recursive ( -- assoc )
     "" child-vocabs-recursive ;
 
-: all-vocab-names ( -- seq )
-    all-vocabs-recursive no-roots no-prefixes [ vocab-name ] map ;
-
-: child-vocab-names ( prefix -- seq )
-    child-vocabs no-roots no-prefixes [ vocab-name ] map ;
-
 <PRIVATE
 
+: fixup-vocab-links ( seq -- seq' )
+    no-roots no-prefixes members ;
+
 : collect-vocabs ( quot -- seq )
-    [ all-vocabs-recursive no-roots no-prefixes ] dip
+    [ all-vocabs-recursive fixup-vocab-links ] dip
     gather natural-sort ; inline
 
 PRIVATE>
 
-: (load) ( prefix -- failures )
-    [ child-vocabs-recursive no-roots no-prefixes ]
+: all-vocab-names ( -- seq )
+    all-vocabs-recursive fixup-vocab-links
+    [ normalized-vocab-name ] map ;
+
+: child-vocab-names ( prefix -- seq )
+    child-vocabs fixup-vocab-links
+    [ normalized-vocab-name ] map ;
+
+: vocabs-from ( prefix -- seq )
+    [ child-vocabs-recursive fixup-vocab-links ]
     [ dup find-vocab-root [ >vocab-link prefix ] [ drop ] if ] bi
     filter-don't-load
-    require-all ;
+    [ normalized-vocab-name ] map ;
+
+: (load) ( prefix -- failures )
+    vocabs-from require-all ;
 
 : load ( prefix -- )
     (load) load-failures. ;
 
 : load-all ( -- )
     "" load ;
+
+: loaded-vocabs-from ( vocabulary-root -- seq )
+    vocabs [
+        swap '[ _ find-vocab-root _ head? ] [ drop f ] recover
+    ] with filter sift ;
+
+: unloaded-vocabs-from ( vocabulary-root -- seq )
+    [ vocabs-from ] [ loaded-vocabs-from ] bi diff ;
 
 MEMO: all-tags ( -- seq ) [ vocab-tags ] collect-vocabs ;
 
