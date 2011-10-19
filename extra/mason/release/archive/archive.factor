@@ -28,7 +28,7 @@ IN: mason.release.archive
     "dmg-root" make-directory
     "factor" "dmg-root" copy-tree-into
     "factor" "dmg-root" make-disk-image
-    "dmg-root" really-delete-tree ;
+    "dmg-root" delete-tree ;
 
 :: make-unix-archive ( archive-name -- )
     { "tar" "-cvzf" archive-name "factor" } short-running-process ;
