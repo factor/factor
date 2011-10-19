@@ -1,5 +1,6 @@
-USING: tools.test tools.annotations tools.time math parser eval
-io.streams.string kernel strings sequences memory ;
+USING: destructors eval io io.streams.string kernel math memory
+namespaces parser sequences strings tools.annotations
+tools.test tools.time ;
 IN: tools.annotations.tests
 
 : foo ( -- ) ;
@@ -62,8 +63,9 @@ M: object my-generic ;
 [ ] [ some-code ] unit-test
 
 ! Make sure annotations work on primitives
+\ gc reset
 \ gc watch
-
-[ f ] [ [ gc ] with-string-writer empty? ] unit-test
+   
+[ f ] [ [ [ gc ] with-error>output ] with-string-writer empty? ] unit-test
 
 \ gc reset
