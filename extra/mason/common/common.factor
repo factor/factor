@@ -23,20 +23,6 @@ SYMBOL: current-git-id
     #! 30 minutes to complete, to catch hangs.
     >process 30 minutes >>timeout try-output-process ;
 
-HOOK: (really-delete-tree) os ( path -- )
-
-M: windows (really-delete-tree)
-    #! Workaround: Cygwin GIT creates read-only files for
-    #! some reason.
-    [ { "chmod" "ug+rw" "-R" } swap absolute-path suffix short-running-process ]
-    [ delete-tree ]
-    bi ;
-
-M: unix (really-delete-tree) delete-tree ;
-
-: really-delete-tree ( path -- )
-    dup exists? [ (really-delete-tree) ] [ drop ] if ;
-
 : retry ( n quot -- )
     [ iota ] dip
     '[ drop @ f ] attempt-all drop ; inline
