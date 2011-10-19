@@ -79,15 +79,6 @@ ERROR: bad-email-address email ;
 : data ( -- )
     "DATA" command ;
 
-ERROR: message-contains-dot message ;
-
-M: message-contains-dot summary ( obj -- string )
-    drop "Message cannot contain . on a line by itself" ;
-
-: validate-message ( msg -- msg' )
-    "." over member?
-    [ message-contains-dot ] when ;
-
 : send-body ( email -- )
     binary encode-output
     [ body>> ] [ encoding>> ] bi encode >base64-lines write
