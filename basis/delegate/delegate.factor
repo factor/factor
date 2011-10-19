@@ -158,6 +158,7 @@ M: consultation forget*
 ERROR: not-a-generic word ;
 
 : check-generic ( generic -- )
+    dup array? [ first ] when
     dup generic? [ drop ] [ not-a-generic ] if ;
 
 PRIVATE>
