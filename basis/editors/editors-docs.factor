@@ -1,5 +1,5 @@
 USING: help.markup help.syntax parser source-files
-source-files.errors vocabs.loader ;
+source-files.errors vocabs.loader kernel ;
 IN: editors
 
 ARTICLE: "editor" "Editor integration"
@@ -20,7 +20,7 @@ HELP: edit-hook
 { $var-description "A quotation with stack effect " { $snippet "( file line -- )" } ". If not set, the " { $link edit } " word throws a condition with restarts for loading one of the sub-vocabularies of the " { $vocab-link "editors" } " vocabulary." } ;
 
 HELP: edit
-{ $values { "defspec" "a definition specifier" } }
+{ $values { "object" object } }
 { $description "Opens the source file containing the definition using the current " { $link edit-hook } ". See " { $link "editor" } "." }
 { $examples
     "Editing a word definition:"

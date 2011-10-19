@@ -278,7 +278,7 @@ ARTICLE: "peg.ebnf.semantic-action" "Semantic Action"
 "Semantic actions allow providing a quotation that gets run on the AST of a "
 "matched rule that returns success or failure. The result of the parse is decided by "
 "the result of the semantic action. The stack effect for the quotation is "
-{ $snippet ( ast -- ? ) } ". "
+{ $snippet "( ast -- ? )" } ". "
 "A semantic action follows the rule it applies to and is delimited by '?[' and ']?'."
 { $examples
     { $example
