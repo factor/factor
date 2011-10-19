@@ -1770,7 +1770,8 @@ ALIAS: SetEnvironmentVariable SetEnvironmentVariableW
 ! FUNCTION: SetFileApisToANSI
 ! FUNCTION: SetFileApisToOEM
 ! FUNCTION: SetFileAttributesA
-! FUNCTION: SetFileAttributesW
+FUNCTION: BOOL SetFileAttributesW ( LPCTSTR lpFileName, DWORD dwFileAttributes ) ;
+ALIAS: SetFileAttributes SetFileAttributesW
 FUNCTION: DWORD SetFilePointer ( HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod ) ;
 FUNCTION: DWORD SetFilePointerEx ( HANDLE hFile, LARGE_INTEGER lDistanceToMove, PLARGE_INTEGER lpDistanceToMoveHigh, DWORD dwMoveMethod ) ;
 ! FUNCTION: SetFileShortNameA

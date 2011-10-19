@@ -19,8 +19,21 @@ M: windows move-file ( from to -- )
 
 ERROR: file-delete-failed path error ;
 
+: delete-file-throws ( path -- )
+    DeleteFile win32-error=0/f ;
+
+: delete-read-only-file ( path -- )
+    [ set-file-normal-attribute ] [ delete-file-throws ] bi ;
+
+: (delete-file) ( path -- )
+    dup DeleteFile 0 = [
+        GetLastError ERROR_ACCESS_DENIED =
+        [ delete-read-only-file ] [ win32-error ] if
+    ] [ drop ] if ;
+
 M: windows delete-file ( path -- )
-    [ normalize-path DeleteFile win32-error=0/f ]
+    normalize-path
+    [ (delete-file) ]
     [ \ file-delete-failed boa rethrow ] recover ;
 
 M: windows copy-file ( from to -- )
