@@ -45,20 +45,18 @@ TUPLE: deploy-gadget < pack vocab settings ;
     1 >>fill ;
 
 : <deploy-settings> ( vocab -- control )
-    default-config [ <model> ] assoc-map
-        [
-            <pile>
-            bundle-name
-            deploy-ui
-            deploy-console
-            io-settings
-            reflection-settings
-            advanced-settings
+    default-config [ <model> ] assoc-map [
+        <pile>
+        bundle-name
+        deploy-ui
+        deploy-console
+        io-settings
+        reflection-settings
+        advanced-settings
 
-            deploy-settings-theme
-            namespace <mapping> >>model
-        ]
-    bind ;
+        deploy-settings-theme
+        namespace <mapping> >>model
+    ] bind ;
 
 : find-deploy-gadget ( gadget -- deploy-gadget )
     [ deploy-gadget? ] find-parent ;

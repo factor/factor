@@ -84,13 +84,13 @@ M: xinput-game-input-backend (close-game-input)
     FALSE XInputEnable ;
 
 M: xinput-game-input-backend (reset-game-input)
-    global [
+    [
         {
             +dinput+ +keyboard-device+ +keyboard-state+
             +controller-devices+ +controller-guids+
             +device-change-window+ +device-change-handle+
         } [ off ] each
-    ] bind ;
+    ] with-global ;
 
 M: xinput-game-input-backend get-controllers
     { 0 1 2 3 } ;
