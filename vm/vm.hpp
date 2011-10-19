@@ -57,6 +57,7 @@ struct factor_vm
 	cell signal_number;
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
+	cell safepoint_signal_number;
 
 	/* GC is off during heap walking */
 	bool gc_off;
@@ -179,8 +180,11 @@ struct factor_vm
 	void fp_trap_error(unsigned int fpu_status);
 	void primitive_unimplemented();
 	void memory_signal_handler_impl();
-	void misc_signal_handler_impl();
+	void synchronous_signal_handler_impl();
 	void fp_signal_handler_impl();
+	void enqueue_safepoint_signal(cell signal);
+	void handle_safepoint();
+	void primitive_guard_safepoint();
 
 	// bignum
 	int bignum_equal_p(bignum * x, bignum * y);

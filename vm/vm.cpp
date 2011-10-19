@@ -8,6 +8,7 @@ factor_vm::factor_vm() :
 	callback_id(0),
 	c_to_factor_func(NULL),
 	profiling_p(false),
+	safepoint_signal_number(0),
 	gc_off(false),
 	current_gc(NULL),
 	gc_events(NULL),
