@@ -567,7 +567,7 @@ install_deps_macosx() {
 }
 
 usage() {
-    $ECHO "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|net-bootstrap|make-target|report [optional-target]"
+    $ECHO "usage: $0 install|deps-linux|deps-macosx|self-update|quick-update|update|bootstrap|net-bootstrap|make-target|report [optional-target]"
     $ECHO "If you are behind a firewall, invoke as:"
     $ECHO "env GIT_PROTOCOL=http $0 <command>"
     $ECHO ""
@@ -593,8 +593,8 @@ case "$1" in
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
-    report) find_build_info ;;
     net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
+    report) find_build_info ;;
     *) usage ;;
 esac
