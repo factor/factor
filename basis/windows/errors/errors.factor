@@ -740,9 +740,12 @@ ERROR: windows-error n string ;
     ] [
         dup n>win32-error-string windows-error
     ] if ;
+    
+: throw-win32-error ( -- * )
+    win32-error-string throw ;
 
 : check-invalid-handle ( handle -- handle )
-    dup INVALID_HANDLE_VALUE = [ win32-error-string throw ] when ;
+    dup INVALID_HANDLE_VALUE = [ throw-win32-error ] when ;
 
 CONSTANT: expected-io-errors
     ${
@@ -759,7 +762,7 @@ CONSTANT: expected-io-errors
     dup expected-io-error? [
         drop
     ] [
-        win32-error-string throw
+        throw-win32-error
     ] if ;
 
 : io-error ( return-value -- )
