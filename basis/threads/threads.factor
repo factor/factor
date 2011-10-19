@@ -167,8 +167,6 @@ CONSTANT: [start]
         stop
     ]
 
-: no-runnable-threads ( -- ) die ;
-
 GENERIC: (next) ( obj thread -- obj' )
 
 M: thread (next)
