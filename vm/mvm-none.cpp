@@ -19,9 +19,8 @@ void register_vm_with_thread(factor_vm *vm)
 	global_vm = vm;
 }
 
-factor_vm *current_vm()
+factor_vm *current_vm_p()
 {
-	assert(global_vm != NULL);
 	return global_vm;
 }
 

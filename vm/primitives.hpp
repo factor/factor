@@ -89,6 +89,7 @@ namespace factor
 	_(ftell) \
 	_(full_gc) \
 	_(fwrite) \
+	_(guard_safepoint) \
 	_(identity_hashcode) \
 	_(innermost_stack_frame_executing) \
 	_(innermost_stack_frame_scan) \

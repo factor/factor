@@ -151,11 +151,18 @@ void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 	vm->dispatch_signal(uap,factor::memory_signal_handler_impl);
 }
 
-void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+void synchronous_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm();
 	vm->signal_number = signal;
-	vm->dispatch_signal(uap,factor::misc_signal_handler_impl);
+	vm->dispatch_signal(uap,factor::synchronous_signal_handler_impl);
+}
+
+void next_safepoint_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	factor_vm *vm = current_vm_p();
+	if (vm)
+		vm->enqueue_safepoint_signal(signal);
 }
 
 void ignore_signal_handler(int signal, siginfo_t *siginfo, void *uap)
@@ -171,7 +178,7 @@ void fpe_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 
 	vm->dispatch_signal(uap,
 		(siginfo->si_code == FPE_INTDIV || siginfo->si_code == FPE_INTOVF)
-		? factor::misc_signal_handler_impl
+		? factor::synchronous_signal_handler_impl
 		: factor::fp_signal_handler_impl);
 }
 
@@ -206,7 +213,8 @@ void factor_vm::unix_init_signals()
 #endif
 
 	struct sigaction memory_sigaction;
-	struct sigaction misc_sigaction;
+	struct sigaction synchronous_sigaction;
+	struct sigaction next_safepoint_sigaction;
 	struct sigaction fpe_sigaction;
 	struct sigaction ignore_sigaction;
 
@@ -226,13 +234,25 @@ void factor_vm::unix_init_signals()
 
 	sigaction_safe(SIGFPE,&fpe_sigaction,NULL);
 
-	memset(&misc_sigaction,0,sizeof(struct sigaction));
-	sigemptyset(&misc_sigaction.sa_mask);
-	misc_sigaction.sa_sigaction = misc_signal_handler;
-	misc_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
+	memset(&synchronous_sigaction,0,sizeof(struct sigaction));
+	sigemptyset(&synchronous_sigaction.sa_mask);
+	synchronous_sigaction.sa_sigaction = synchronous_signal_handler;
+	synchronous_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
 
-	sigaction_safe(SIGQUIT,&misc_sigaction,NULL);
-	sigaction_safe(SIGILL,&misc_sigaction,NULL);
+	sigaction_safe(SIGILL,&synchronous_sigaction,NULL);
+	sigaction_safe(SIGABRT,&synchronous_sigaction,NULL);
+
+	memset(&next_safepoint_sigaction,0,sizeof(struct sigaction));
+	sigemptyset(&next_safepoint_sigaction.sa_mask);
+	next_safepoint_sigaction.sa_sigaction = next_safepoint_signal_handler;
+	next_safepoint_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
+	sigaction_safe(SIGALRM,&next_safepoint_sigaction,NULL);
+	sigaction_safe(SIGVTALRM,&next_safepoint_sigaction,NULL);
+	sigaction_safe(SIGPROF,&next_safepoint_sigaction,NULL);
+	sigaction_safe(SIGQUIT,&next_safepoint_sigaction,NULL);
+	sigaction_safe(SIGINT,&next_safepoint_sigaction,NULL);
+	sigaction_safe(SIGUSR1,&next_safepoint_sigaction,NULL);
+	sigaction_safe(SIGUSR2,&next_safepoint_sigaction,NULL);
 
 	/* We don't use SA_IGN here because then the ignore action is inherited
 	by subprocesses, which we don't want. There is a unit test in

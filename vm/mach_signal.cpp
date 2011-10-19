@@ -60,7 +60,7 @@ void factor_vm::call_fault_handler(
 		default: signal_number = SIGABRT; break;
 		}
 
-		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::misc_signal_handler_impl;
+		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::synchronous_signal_handler_impl;
 	}
 }
 
