@@ -271,10 +271,6 @@ M: object (client) ( remote -- client-in client-out local )
 
 TUPLE: server-port < port addr encoding ;
 
-: check-server-port ( port -- port )
-    dup check-disposed
-    dup server-port? [ "Not a server port" throw ] unless ; inline
-
 GENERIC: (server) ( addrspec -- handle )
 
 GENERIC: (accept) ( server addrspec -- handle sockaddr )
@@ -297,13 +293,13 @@ ERROR: invalid-port object ;
 
 : check-connectionless-port ( port -- port )
     dup { [ datagram-port? ] [ raw-port? ] } 1|| [ invalid-port ] unless ;
-    
+
 : check-send ( packet addrspec port -- packet addrspec port )
     check-connectionless-port dup check-disposed check-port ;
-    
+
 : check-receive ( port -- port )
     check-connectionless-port dup check-disposed ;
-    
+
 HOOK: (send) io-backend ( packet addrspec datagram -- )
 
 : addrinfo>addrspec ( addrinfo -- addrspec )

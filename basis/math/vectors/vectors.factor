@@ -49,7 +49,6 @@ GENERIC: v*high ( u v -- w )
 
 <PRIVATE
 : (h+) ( u -- w ) 2 <groups> [ first2 + ] map ;
-: (h-) ( u -- w ) 2 <groups> [ first2 - ] map ;
 PRIVATE>
 
 GENERIC: v*hs+ ( u v -- w )
