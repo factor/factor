@@ -1,5 +1,5 @@
 USING: accessors io io.streams.string kernel math parser sbufs
-sequences tools.test words ;
+sequences tools.test words namespaces ;
 IN: io.tests
 
 { f } [
@@ -78,3 +78,19 @@ M: dumb-writer stream-write1 vector>> push ; inline
 
 { SBUF" asdf" }
 [ "asdf" <string-reader> 4 <sbuf> [ stream-copy ] keep ] unit-test
+
+[ "asdf" ]
+[
+    [
+        [ "asdf" error-stream get stream-write ] with-error>output
+    ] with-string-writer
+] unit-test
+
+[ "asdf" ]
+[
+    <string-writer> [
+        [
+            [ "asdf" output-stream get stream-write ] with-output>error
+        ] with-error-stream
+    ] keep >string
+] unit-test

@@ -77,6 +77,9 @@ SYMBOL: error-stream
 : with-output>error ( quot -- )
     error-stream get swap with-output-stream* ; inline
 
+: with-error>output ( quot -- )
+    output-stream get swap with-error-stream* ; inline
+
 : with-streams* ( input output quot -- )
     swapd [ with-output-stream* ] curry with-input-stream* ; inline
 
