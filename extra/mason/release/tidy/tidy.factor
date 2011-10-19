@@ -15,5 +15,5 @@ IN: mason.release.tidy
     "factor" [
         useless-files
         [ exists? ] filter
-        [ really-delete-tree ] each
+        [ delete-tree ] each
     ] with-directory ;
