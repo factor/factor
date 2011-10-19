@@ -88,7 +88,7 @@ M: mdb-getmore-msg verify-query-result
 
 PRIVATE>
 
-SYNTAX: r/ ( token -- mdbregexp )
+SYNTAX: r/
     \ / [ >mdbregexp ] parse-literal ; 
 
 : with-db ( mdb quot -- )
