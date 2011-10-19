@@ -75,6 +75,7 @@ GENERIC: emit-node ( node -- )
     ] keep ;
 
 : emit-loop-call ( basic-block -- )
+    ##safepoint
     ##branch
     basic-block get successors>> push
     end-basic-block ;
@@ -101,6 +102,7 @@ GENERIC: emit-node ( node -- )
     basic-block get swap loops get set-at ;
 
 : emit-loop ( node -- )
+    ##safepoint
     ##branch
     begin-basic-block
     [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi ;
@@ -202,6 +204,7 @@ M: #shuffle emit-node
     ##branch
     begin-basic-block
     make-kill-block
+    ##safepoint
     ##epilogue
     ##return ;
 
