@@ -19,10 +19,6 @@ IN: compiler.cfg.tco
         [ first ##safepoint? ]
         [ second ##epilogue? ]
         [ third ##return? ]
-
-        ! [ length 2 = ]
-        ! [ first ##epilogue? ]
-        ! [ second ##return? ]
     } 1&& ;
 
 : tail-call? ( bb -- ? )
