@@ -248,7 +248,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, 
 		break;
 	default:
 		signal_number = e->ExceptionCode;
-		c->EIP = (cell)factor::misc_signal_handler_impl;
+		c->EIP = (cell)factor::synchronous_signal_handler_impl;
 		break;
 	}
 
@@ -260,6 +260,28 @@ VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, vo
 	return current_vm()->exception_handler(e,frame,c,dispatch);
 }
 
-void factor_vm::open_console() {}
+BOOL factor_vm::ctrl_handler(DWORD dwCtrlType)
+{
+	switch (dwCtrlType) {
+	case CTRL_C_EVENT:
+	case CTRL_BREAK_EVENT:
+		enqueue_safepoint_signal((cell)-1);
+		return TRUE;
+	default:
+		return FALSE;
+	}
+}
+
+VM_C_API BOOL ctrl_handler(DWORD dwCtrlType)
+{
+	factor_vm *vm = current_vm_p();
+	if (vm != NULL)
+		return vm->ctrl_handler(dwCtrlType);
+}
+
+void factor_vm::open_console()
+{
+	SetConsoleCtrlHandler(ctrl_handler, TRUE);
+}
 
 }
