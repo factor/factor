@@ -142,9 +142,7 @@ void factor_vm::synchronous_signal_handler_impl()
 
 void synchronous_signal_handler_impl()
 {
-	factor_vm *vm = current_vm_p();
-	if (vm)
-		vm->synchronous_signal_handler_impl();
+	current_vm()->synchronous_signal_handler_impl();
 }
 
 void factor_vm::fp_signal_handler_impl()
