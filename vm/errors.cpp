@@ -176,9 +176,4 @@ void factor_vm::handle_safepoint()
 	general_error(ERROR_SIGNAL,from_unsigned_cell(signal),false_object);
 }
 
-void factor_vm::primitive_guard_safepoint()
-{
-	code->guard_safepoint();
-}
-
 }
