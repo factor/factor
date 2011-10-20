@@ -277,11 +277,13 @@ VM_C_API BOOL ctrl_handler(DWORD dwCtrlType)
 	factor_vm *vm = current_vm_p();
 	if (vm != NULL)
 		return vm->ctrl_handler(dwCtrlType);
+	else
+		return FALSE;
 }
 
 void factor_vm::open_console()
 {
-	SetConsoleCtrlHandler(ctrl_handler, TRUE);
+	SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
 }
 
 }
