@@ -102,7 +102,6 @@ GENERIC: emit-node ( node -- )
     basic-block get swap loops get set-at ;
 
 : emit-loop ( node -- )
-    ##safepoint
     ##branch
     begin-basic-block
     [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi ;
