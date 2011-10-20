@@ -704,6 +704,7 @@ struct factor_vm
   #if defined(WINNT)
 	void open_console();
 	LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch);
+	BOOL ctrl_handler(DWORD dwCtrlType);
   #endif
 
   #else  // UNIX
