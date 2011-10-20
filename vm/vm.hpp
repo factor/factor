@@ -211,7 +211,7 @@ struct factor_vm
 							bignum * * quotient, bignum * * remainder, int q_negative_p, int r_negative_p);
 	void bignum_divide_unsigned_normalized(bignum * u, bignum * v, bignum * q);
 	bignum_digit_type bignum_divide_subtract(bignum_digit_type * v_start, bignum_digit_type * v_end,
-						 	bignum_digit_type guess, bignum_digit_type * u_start);
+							bignum_digit_type guess, bignum_digit_type * u_start);
 	void bignum_divide_unsigned_medium_denominator(bignum * numerator,bignum_digit_type denominator,
 							bignum * * quotient, bignum * * remainder,int q_negative_p, int r_negative_p);
 	void bignum_destructive_normalization(bignum * source, bignum * target, int shift_left);
