@@ -84,15 +84,14 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 /* Compile code in boot image so that we can execute the startup quotation */
 void factor_vm::prepare_boot_image()
 {
-	std::cout << "*** Stage 2 early init... ";
-	fflush(stdout);
+	std::cout << "*** Stage 2 early init... " << std::flush;
 
 	compile_all_words();
 	update_code_heap_words(true);
 	initialize_all_quotations();
 	special_objects[OBJ_STAGE2] = true_object;
 
-	std::cout << "done\n";
+	std::cout << "done" << std::endl;
 }
 
 void factor_vm::init_factor(vm_parameters *p)
