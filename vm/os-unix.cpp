@@ -330,6 +330,10 @@ void *stdin_loop(void *arg)
 	unsigned char buf[4096];
 	bool loop_running = true;
 
+	sigset_t mask;
+	sigfillset(&mask);
+	pthread_sigmask(SIG_BLOCK, &mask, NULL);
+
 	while(loop_running)
 	{
 		if(!safe_read(control_read,buf,1))
