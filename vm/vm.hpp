@@ -184,7 +184,6 @@ struct factor_vm
 	void fp_signal_handler_impl();
 	void enqueue_safepoint_signal(cell signal);
 	void handle_safepoint();
-	void primitive_guard_safepoint();
 
 	// bignum
 	int bignum_equal_p(bignum * x, bignum * y);
