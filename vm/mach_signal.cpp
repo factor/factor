@@ -35,7 +35,11 @@ void factor_vm::call_fault_handler(
 	MACH_THREAD_STATE_TYPE *thread_state,
 	MACH_FLOAT_STATE_TYPE *float_state)
 {
-	MACH_STACK_POINTER(thread_state) = (cell)fix_callstack_top((stack_frame *)MACH_STACK_POINTER(thread_state));
+	cell offset = MACH_STACK_POINTER(thread_state) % 16;
+	if (offset != 0)
+		fatal_error("fault in unaligned frame with offset", offset);
+	MACH_STACK_POINTER(thread_state) -= sizeof(cell);
+	*(cell*)MACH_STACK_POINTER(thread_state) = MACH_PROGRAM_COUNTER(thread_state);
 
 	ctx->callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
 
