@@ -106,27 +106,25 @@ void factor_vm::primitive_existsp()
 	ctx->push(tag_boolean(windows_stat(path)));
 }
 
-segment::segment(cell size_, bool executable_p, bool canary_page_p)
+segment::segment(cell size_, bool executable_p)
 {
 	size = size_;
 
 	char *mem;
 	DWORD ignore;
 
-	cell pagesize = getpagesize();
-	cell startsize = canary_page_p ? 2*pagesize : pagesize;
-	if((mem = (char *)VirtualAlloc(NULL, startsize + size + pagesize,
+	if((mem = (char *)VirtualAlloc(NULL, getpagesize() * 2 + size,
 		MEM_COMMIT, executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) == 0)
 		out_of_memory();
 
-	if (!VirtualProtect(mem, startsize, PAGE_NOACCESS, &ignore))
+	if (!VirtualProtect(mem, getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate low guard page", (cell)mem);
 
-	if (!VirtualProtect(mem + size + startsize,
-		pagesize, PAGE_NOACCESS, &ignore))
+	if (!VirtualProtect(mem + size + getpagesize(),
+		getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate high guard page", (cell)mem);
 
-	start = (cell)mem + startsize;
+	start = (cell)mem + getpagesize();
 	end = start + size;
 }
 
