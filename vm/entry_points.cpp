@@ -7,7 +7,7 @@ void factor_vm::c_to_factor(cell quot)
 {
 	/* First time this is called, wrap the c-to-factor sub-primitive inside
 	of a callback stub, which saves and restores non-volatile registers
-	as per platform ABI conventions, so that the Factor compiler can treat
+	per platform ABI conventions, so that the Factor compiler can treat
 	all registers as volatile */
 	if(!c_to_factor_func)
 	{
