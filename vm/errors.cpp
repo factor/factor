@@ -98,8 +98,6 @@ void factor_vm::memory_protection_error(cell addr)
 		general_error(ERROR_CALLSTACK_OVERFLOW,false_object,false_object);
 	else if(ctx->callstack_seg->overflow_p(addr))
 		general_error(ERROR_CALLSTACK_UNDERFLOW,false_object,false_object);
-	else if(ctx->callstack_seg->canary_p(addr))
-		fatal_error("Call stack overflow in your call stack overflow", addr);
 	else
 		general_error(ERROR_MEMORY,from_unsigned_cell(addr),false_object);
 }
