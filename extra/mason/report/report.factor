@@ -4,7 +4,7 @@ USING: benchmark combinators.smart debugger fry io assocs
 io.encodings.utf8 io.files io.sockets io.streams.string kernel
 locals mason.common mason.config mason.disk mason.platform math
 namespaces prettyprint sequences xml.syntax xml.writer
-combinators.short-circuit literals splitting prettyprint.config ;
+combinators.short-circuit literals splitting ;
 IN: mason.report
 
 : git-link ( id -- link )
@@ -31,12 +31,10 @@ IN: mason.report
 : with-report ( quot -- )
     [ "report" utf8 ] dip
     '[
-        [
-            common-report
-            _ call( -- xml )
-            [XML <html><body><-><-></body></html> XML]
-            write-xml
-        ] without-limits
+        common-report
+        _ call( -- xml )
+        [XML <html><body><-><-></body></html> XML]
+        write-xml
     ] with-file-writer ; inline
 
 : file-tail ( file encoding lines -- seq )
