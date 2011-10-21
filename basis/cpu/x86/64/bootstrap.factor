@@ -36,12 +36,12 @@ IN: bootstrap.x86
 [
     ! load entry point
     RAX 0 MOV rc-absolute-cell rel-this
-    ! save stack frame size
-    stack-frame-size PUSH
-    ! push entry point
-    RAX PUSH
+    ! store entry point
+    RSP bootstrap-cell 2 * neg [+] RAX MOV
+    ! store stack frame size
+    RSP bootstrap-cell neg [+] stack-frame-size MOV
     ! alignment
-    RSP stack-frame-size 3 bootstrap-cells - SUB
+    RSP stack-frame-size bootstrap-cell - SUB
 ] jit-prolog jit-define
 
 [
