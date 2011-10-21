@@ -34,12 +34,12 @@ IN: bootstrap.x86
     0 CALL f rc-relative rel-dlsym ;
 
 [
-    ! save stack frame size
-    stack-frame-size PUSH
-    ! push entry point
-    0 PUSH rc-absolute-cell rel-this
+    ! store entry point
+    ESP bootstrap-cell 2 * neg [+] 0 MOV rc-absolute-cell rel-this
+    ! store stack frame size
+    ESP bootstrap-cell neg [+] stack-frame-size MOV
     ! alignment
-    ESP stack-frame-size 3 bootstrap-cells - SUB
+    ESP stack-frame-size bootstrap-cell - SUB
 ] jit-prolog jit-define
 
 [
