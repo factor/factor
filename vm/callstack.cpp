@@ -18,6 +18,26 @@ callstack *factor_vm::allot_callstack(cell size)
 	return stack;
 }
 
+void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell newpc)
+{
+	/* True stack frames are always 16-byte aligned. Leaf procedures
+	that don't create a stack frame will be out of alignment by sizeof(cell)
+	bytes. */
+	cell offset = *sp % 16;
+	if (offset != 0)
+		fatal_error("fault in unaligned frame at", *pc);
+
+	/* Nonleaf procedure */
+	cell newsp = *sp - sizeof(cell);
+	*sp = newsp;
+	*(cell*)newsp = *pc;
+	*pc = newpc;
+	ctx->callstack_top = (stack_frame*)newsp;
+
+	/* XXX handle leaf procedure */
+}
+
+
 /* We ignore the two topmost frames, the 'callstack' primitive
 frame itself, and the frame calling the 'callstack' primitive,
 so that set-callstack doesn't get stuck in an infinite loop.
