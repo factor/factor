@@ -125,7 +125,6 @@ void factor_vm::primitive_unimplemented()
 
 void factor_vm::memory_signal_handler_impl()
 {
-	scrub_return_address();
 	memory_protection_error(signal_fault_addr);
 }
 
@@ -136,7 +135,6 @@ void memory_signal_handler_impl()
 
 void factor_vm::synchronous_signal_handler_impl()
 {
-	scrub_return_address();
 	signal_error(signal_number);
 }
 
@@ -150,7 +148,6 @@ void factor_vm::fp_signal_handler_impl()
 	/* Clear pending exceptions to avoid getting stuck in a loop */
 	set_fpu_state(get_fpu_state());
 
-	scrub_return_address();
 	fp_trap_error(signal_fpu_status);
 }
 
