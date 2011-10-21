@@ -6,7 +6,7 @@ namespace factor
 code_heap::code_heap(cell size)
 {
 	if(size > ((u64)1 << (sizeof(cell) * 8 - 6))) fatal_error("Heap too large",size);
-	seg = new segment(align_page(size),true);
+	seg = new segment(align_page(size),true,false);
 	if(!seg) fatal_error("Out of memory in code_heap constructor",size);
 
 	cell start = seg->start + getpagesize() + seh_area_size;
