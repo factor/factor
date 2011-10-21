@@ -10,7 +10,7 @@ ARTICLE: "etags" "Etags file"
     etag-header
 }
 
-HELP: etags ( path -- )
+HELP: etags
 { $values { "path" string } }
 { $description "Generates a index file in etags format and stores in " { $snippet "path" } "." }
 { $examples
@@ -21,7 +21,7 @@ HELP: etags ( path -- )
   }
 } ;
 
-HELP: etags-write ( alist path -- )
+HELP: etags-write
 { $values { "alist" sequence }
           { "path" string } }
 { $description "Stores a " { $snippet "alist" } " in " { $snippet "path" } ". " { $snippet "alist" } " must be an association list with etags format: its key must be a resource path and its value a vector, containing pairs of words and lines" }
@@ -33,7 +33,7 @@ HELP: etags-write ( alist path -- )
   }
 } ;
 
-HELP: etag-strings ( alist -- seq )
+HELP: etag-strings
 { $values { "alist" sequence }
           { "seq" sequence } }
 { $description "Converts an " { $snippet "alist" } " with etag format (a path as key and a vector containing word/line pairs) in a " { $snippet "seq" } " of strings." } ;

@@ -415,15 +415,15 @@ $nl
     }
 } ;
 
-HELP: tuple>array ( tuple -- array )
+HELP: tuple>array
 { $values { "tuple" tuple } { "array" array } }
 { $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and remainder are declared slots." } ;
 
-HELP: <tuple> ( layout -- tuple )
+HELP: <tuple>
 { $values { "layout" "a tuple layout array" } { "tuple" tuple } }
 { $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link new } "." } ;
 
-HELP: <tuple-boa> ( slots... layout -- tuple )
+HELP: <tuple-boa>
 { $values { "slots..." "values" } { "layout" "a tuple layout array" } { "tuple" tuple } }
 { $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link boa } "." } ;
 

@@ -398,7 +398,7 @@ HELP: distribute-buckets
 { $description "Sorts the entries of " { $snippet "assoc" } " into buckets, using the quotation to yield a set of keys for each entry. The hashcode of each key is computed, and the entry is placed in all corresponding buckets. Each bucket is initially cloned from " { $snippet "initial" } "; this should either be an empty vector or a one-element vector containing a pair." }
 { $notes "This word is used in the implementation of " { $link hash-case-quot } " and " { $link standard-combination } "." } ;
 
-HELP: dispatch ( n array -- )
+HELP: dispatch
 { $values { "n" "a fixnum" } { "array" "an array of quotations" } }
 { $description "Calls the " { $snippet "n" } "th quotation in the array." }
 { $warning "This word is in the " { $vocab-link "kernel.private" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;

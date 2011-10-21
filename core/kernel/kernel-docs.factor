@@ -4,49 +4,49 @@ vectors combinators quotations strings words
 assocs arrays math.order ;
 IN: kernel
 
-HELP: eq? ( obj1 obj2 -- ? )
+HELP: eq?
 { $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
 { $description "Tests if two references point at the same object." } ;
 
-HELP: drop  ( x -- )                 $shuffle ;
-HELP: 2drop ( x y -- )               $shuffle ;
-HELP: 3drop ( x y z -- )             $shuffle ;
-HELP: dup   ( x -- x x )             $shuffle ;
-HELP: 2dup  ( x y -- x y x y )       $shuffle ;
-HELP: 3dup  ( x y z -- x y z x y z ) $shuffle ;
-HELP: nip   ( x y -- y )             $shuffle ;
-HELP: 2nip  ( x y z -- z )           $shuffle ;
-HELP: over  ( x y -- x y x )         $shuffle ;
-HELP: 2over                          $shuffle ;
-HELP: pick  ( x y z -- x y z x )     $shuffle ;
-HELP: swap  ( x y -- y x )           $shuffle ;
+HELP: drop  $shuffle ;
+HELP: 2drop $shuffle ;
+HELP: 3drop $shuffle ;
+HELP: dup   $shuffle ;
+HELP: 2dup  $shuffle ;
+HELP: 3dup  $shuffle ;
+HELP: nip   $shuffle ;
+HELP: 2nip  $shuffle ;
+HELP: over  $shuffle ;
+HELP: 2over $shuffle ;
+HELP: pick  $shuffle ;
+HELP: swap  $shuffle ;
 
-HELP: rot   ( x y z -- y z x ) $complex-shuffle ;
-HELP: -rot  ( x y z -- z x y ) $complex-shuffle ;
-HELP: dupd  ( x y -- x x y )   $complex-shuffle ;
-HELP: swapd ( x y z -- y x z ) $complex-shuffle ;
+HELP: rot   $complex-shuffle ;
+HELP: -rot  $complex-shuffle ;
+HELP: dupd  $complex-shuffle ;
+HELP: swapd $complex-shuffle ;
 
-HELP: datastack ( -- array )
+HELP: datastack
 { $values { "array" array } }
 { $description "Outputs an array containing a copy of the data stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
-HELP: set-datastack ( array -- )
+HELP: set-datastack
 { $values { "array" array } }
 { $description "Replaces the data stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
-HELP: retainstack ( -- array )
+HELP: retainstack
 { $values { "array" array } }
 { $description "Outputs an array containing a copy of the retain stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
-HELP: set-retainstack ( array -- )
+HELP: set-retainstack
 { $values { "array" array } }
 { $description "Replaces the retain stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
-HELP: callstack ( -- callstack )
+HELP: callstack
 { $values { "callstack" callstack } }
 { $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included." } ;
 
-HELP: set-callstack ( callstack -- * )
+HELP: set-callstack
 { $values { "callstack" callstack } }
 { $description "Replaces the call stack contents. Control flow is transferred immediately to the innermost frame of the new call stack." } ;
 
@@ -688,7 +688,7 @@ HELP: die
     { $url "http://www.jargon.net/jargonfile/f/feppedout.html" }
 } ;
 
-HELP: (clone) ( obj -- newobj )
+HELP: (clone)
 { $values { "obj" object } { "newobj" "a shallow copy" } }
 { $description "Outputs a byte-by-byte copy of the given object. User code should call " { $link clone } " instead." } ;
 
@@ -703,15 +703,15 @@ HELP: declare
     { $code "{ float } declare 2 + 10 *" }
 } ;
 
-HELP: tag ( object -- n )
+HELP: tag
 { $values { "object" object } { "n" "a tag number" } }
 { $description "Outputs an object's tag number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
 
-HELP: special-object ( n -- obj )
+HELP: special-object
 { $values { "n" "a non-negative integer" } { "obj" object } }
 { $description "Reads an object from the Factor VM's special object table. User code never has to read the special object table directly; instead, use one of the callers of this word." } ;
 
-HELP: set-special-object ( obj n -- )
+HELP: set-special-object
 { $values { "obj" object } { "n" "a non-negative integer" } }
 { $description "Writes an object to the Factor VM's special object table. User code never has to write to the special object table directly; instead, use one of the callers of this word." } ;
 
