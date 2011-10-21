@@ -18,22 +18,6 @@ callstack *factor_vm::allot_callstack(cell size)
 	return stack;
 }
 
-/* If 'stack' points into the middle of the frame, find the nearest valid stack
-pointer where we can resume execution and hope to capture the call trace without
-crashing. Also, make sure we have at least 'stack_reserved' bytes available so
-that we don't run out of callstack space while handling the error. */
-stack_frame *factor_vm::fix_callstack_top(stack_frame *stack)
-{
-	stack_frame *frame = ctx->callstack_bottom - 1;
-
-	while(frame >= stack
-		&& frame >= ctx->callstack_top
-		&& (cell)frame >= ctx->callstack_seg->start + stack_reserved)
-		frame = frame_successor(frame);
-
-	return frame + 1;
-}
-
 /* We ignore the two topmost frames, the 'callstack' primitive
 frame itself, and the frame calling the 'callstack' primitive,
 so that set-callstack doesn't get stuck in an infinite loop.
@@ -125,13 +109,6 @@ void factor_vm::set_frame_offset(stack_frame *frame, cell offset)
 		FRAME_RETURN_ADDRESS(frame,this) = NULL;
 	else
 		FRAME_RETURN_ADDRESS(frame,this) = entry_point + offset;
-}
-
-void factor_vm::scrub_return_address()
-{
-	stack_frame *frame = innermost_stack_frame(ctx->callstack_bottom,
-		ctx->callstack_top);
-	set_frame_offset(frame,0);
 }
 
 cell factor_vm::frame_scan(stack_frame *frame)
