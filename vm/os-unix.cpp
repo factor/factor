@@ -138,7 +138,12 @@ void code_heap::unguard_safepoint()
 
 void factor_vm::dispatch_signal(void *uap, void (handler)())
 {
-	UAP_STACK_POINTER(uap) = (UAP_STACK_POINTER_TYPE)fix_callstack_top((stack_frame *)UAP_STACK_POINTER(uap));
+	cell sp = (cell)UAP_STACK_POINTER(uap);
+	cell offset = sp % 16;
+	if (offset != 0)
+		fatal_error("fault in unaligned frame with offset", offset);
+	UAP_STACK_POINTER(uap) = (UAP_STACK_POINTER_TYPE)(sp - sizeof(cell));
+	*(cell*)(UAP_STACK_POINTER(uap)) = (cell)UAP_PROGRAM_COUNTER(uap);
 	UAP_PROGRAM_COUNTER(uap) = (cell)FUNCTION_CODE_POINTER(handler);
 	UAP_SET_TOC_POINTER(uap, (cell)FUNCTION_TOC_POINTER(handler));
 	ctx->callstack_top = (stack_frame *)UAP_STACK_POINTER(uap);
