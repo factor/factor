@@ -13,13 +13,8 @@ struct segment {
 	cell size;
 	cell end;
 
-	explicit segment(cell size, bool executable_p, bool canary_page_p);
+	explicit segment(cell size, bool executable_p);
 	~segment();
-
-	bool canary_p(cell addr)
-	{
-		return (addr >= start - 2*getpagesize() && addr < start - getpagesize());
-	}
 
 	bool underflow_p(cell addr)
 	{
