@@ -218,7 +218,7 @@ HELP: remove-word-prop
 { $description "Removes a word property, so future lookups will output " { $link f } " until it is set again. Word property names are conventionally strings." }
 { $side-effects "word" } ;
 
-HELP: word-code ( word -- start end )
+HELP: word-code
 { $values { "word" word } { "start" "the word's start address" } { "end" "the word's end address" } }
 { $description "Outputs the memory range containing the word's machine code." } ;
 
@@ -245,12 +245,12 @@ HELP: reset-generic
 $low-level-note
 { $side-effects "word" } ;
 
-HELP: <word> ( name vocab -- word )
+HELP: <word>
 { $values { "name" string } { "vocab" string } { "word" word } }
 { $description "Allocates a word with the specified name and vocabulary. User code should call " { $link <uninterned-word> } " to create uninterned words and " { $link create } " to create interned words, instead of calling this constructor directly." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
-HELP: <uninterned-word> ( name -- word )
+HELP: <uninterned-word>
 { $values { "name" string } { "word" word } }
 { $description "Creates an uninterned word with the specified name,  that is not equal to any other word in the system." }
 { $notes "Unlike " { $link create } ", this word does not have to be called from inside " { $link with-compilation-unit } "." } ;

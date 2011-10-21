@@ -64,7 +64,7 @@ HELP: 1quotation
 HELP: wrapper
 { $description "The class of wrappers. Wrappers are created by calling " { $link literalize } ". See " { $link "syntax-words" } " for syntax." } ;
 
-HELP: <wrapper> ( obj -- wrapper )
+HELP: <wrapper>
 { $values { "obj" object } { "wrapper" wrapper } }
 { $description "Creates an object which pushes " { $snippet "obj" } " on the stack when evaluated. User code should call " { $link literalize } " instead, since it avoids wrapping self-evaluating objects (which is redundant)." } ;
 

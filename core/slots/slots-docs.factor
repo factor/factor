@@ -162,12 +162,12 @@ HELP: define-accessors
 { $description "Defines slot methods." }
 $low-level-note ;
 
-HELP: slot ( obj m -- value )
+HELP: slot
 { $values { "obj" object } { "m" "a non-negative fixnum" } { "value" object } }
 { $description "Reads the object stored at the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
 { $warning "This word is in the " { $vocab-link "slots.private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
-HELP: set-slot ( value obj n -- )
+HELP: set-slot
 { $values { "value" object } { "obj" object } { "n" "a non-negative fixnum" } }
 { $description "Writes " { $snippet "value" } " to the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
 { $warning "This word is in the " { $vocab-link "slots.private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;

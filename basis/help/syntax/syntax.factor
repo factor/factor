@@ -5,19 +5,10 @@ effects.parser help help.topics kernel namespaces parser
 sequences vocabs vocabs.parser words ;
 IN: help.syntax
 
-<PRIVATE
-
-: check-effect ( word seq -- word seq' )
-    dup ?first effect? [
-        unclip pick stack-effect effect= [ bad-effect ] unless
-    ] when ;
-
-PRIVATE>
-
 SYNTAX: HELP:
     scan-word bootstrap-word
     [ >link save-location ]
-    [ \ ; parse-until check-effect >array swap set-word-help ]
+    [ [ \ ; parse-until >array ] dip set-word-help ]
     bi ;
 
 SYNTAX: ARTICLE:

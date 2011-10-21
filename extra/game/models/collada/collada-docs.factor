@@ -20,7 +20,7 @@ HELP: up-axis
 HELP: unit-ratio
 { $description "Scaling ratio for the coordinates of the tags being read." } ;
 
-HELP: string>numbers ( string -- number-seq )
+HELP: string>numbers
 { $values { "string" string } { "number-seq" sequence } }
 { $description "Splits a string on whitespace and converts the elements to a number sequence." } ;
 

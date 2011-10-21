@@ -48,26 +48,26 @@ HELP: fwrite
 { $description "Writes some bytes to a C FILE* handle." }
 { $errors "Throws an error if the output operation failed." } ;
 
-HELP: fflush ( alien -- )
+HELP: fflush
 { $values { "alien" "a C FILE* handle" } }
 { $description "Forces pending output on a C FILE* handle to complete." }
 { $errors "Throws an error if the output operation failed." } ;
 
-HELP: fclose ( alien -- )
+HELP: fclose
 { $values { "alien" "a C FILE* handle" } }
 { $description "Closes a C FILE* handle." } ;
 
-HELP: fgetc ( alien -- byte/f )
+HELP: fgetc
 { $values { "alien" "a C FILE* handle" } { "byte/f" "an integer from 0 to 255 or " { $link f } } }
 { $description "Reads a single byte from a C FILE* handle, and outputs " { $link f } " on end of file." } 
 { $errors "Throws an error if the input operation failed." } ;
 
-HELP: fputc ( byte alien -- )
+HELP: fputc
 { $values { "byte" "an integer from 0 to 255" } { "alien" "a C FILE* handle" } }
 { $description "Writes a single byte to a C FILE* handle." }
 { $errors "Throws an error if the output operation failed." } ;
 
-HELP: fread-unsafe ( n buf alien -- str/f )
+HELP: fread-unsafe
 { $values { "n" "a positive integer" } { "buf" c-ptr } { "alien" "a C FILE* handle" } { "count" integer } }
 { $description "Reads " { $snippet "n" } " bytes from a C FILE* handle into the memory referenced by " { $snippet "buf" } ", and outputs the number of characters read. Zero is output on end of file." }
 { $warning "This word does not check whether " { $snippet "buf" } " is large enough to accommodate the requested number of bytes. Memory corruption will occur if this is not the case." }
