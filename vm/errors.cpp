@@ -182,10 +182,10 @@ void factor_vm::handle_safepoint()
 	if (signal_from_leaf)
 		std::cout << "XXX SIGNALED FROM LEAF\n";
 
+	code->unguard_safepoint();
 	if (safepoint_fep) {
 		std::cout << "Interrupted\n";
 		factorbug();
-		code->unguard_safepoint();
 		safepoint_fep = false;
 		return;
 	}
