@@ -4,7 +4,7 @@ namespace factor
 {
 
 callback_heap::callback_heap(cell size, factor_vm *parent_) :
-	seg(new segment(size,true)),
+	seg(new segment(size,true,false)),
 	here(seg->start),
 	parent(parent_) {}
 
