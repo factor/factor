@@ -56,6 +56,7 @@ struct factor_vm
 
 	/* Global variables used to pass fault handler state from signal handler
 	to VM */
+	bool signal_from_leaf;
 	cell signal_number;
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
@@ -605,6 +606,7 @@ struct factor_vm
 	void primitive_callstack_bounds();
 	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
 	void dispatch_signal_handler(cell *sp, cell *pc, cell newpc);
+	void dispatch_signal_handler_from_leaf(cell *sp, cell *pc, cell newpc);
 
 	template<typename CellA, typename CellB, typename CellC>
 	void dispatch_signal_handler(CellA *sp, CellB *pc, CellC newpc)

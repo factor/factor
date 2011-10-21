@@ -179,9 +179,11 @@ void factor_vm::enqueue_safepoint_sample()
 
 void factor_vm::handle_safepoint()
 {
+	if (signal_from_leaf)
+		std::cout << "XXX SIGNALED FROM LEAF\n";
+
 	if (safepoint_fep) {
-		std::cout << "Interrupted. Entering low-level debugger...\n";
-		std::cout << "\n";
+		std::cout << "Interrupted\n";
 		factorbug();
 		code->unguard_safepoint();
 		safepoint_fep = false;
