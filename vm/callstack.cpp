@@ -24,19 +24,30 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell newpc)
 	that don't create a stack frame will be out of alignment by sizeof(cell)
 	bytes. */
 	cell offset = *sp % 16;
-	if (offset != 0)
-		fatal_error("fault in unaligned frame at", *pc);
-
-	/* Nonleaf procedure */
-	cell newsp = *sp - sizeof(cell);
-	*sp = newsp;
-	*(cell*)newsp = *pc;
-	*pc = newpc;
-	ctx->callstack_top = (stack_frame*)newsp;
-
-	/* XXX handle leaf procedure */
+	if (offset == 0) {
+		signal_from_leaf = false;
+		cell newsp = *sp - sizeof(cell);
+		*sp = newsp;
+		*(cell*)newsp = *pc;
+		*pc = newpc;
+		ctx->callstack_top = (stack_frame*)newsp;
+	} else if (offset == 16 - sizeof(cell)) {
+		dispatch_signal_handler_from_leaf(sp, pc, newpc);
+	} else {
+		fatal_error("Invalid stack frame during signal handler", *sp);
+	}
 }
 
+void factor_vm::dispatch_signal_handler_from_leaf(cell *sp, cell *pc, cell newpc)
+{
+	/* We should try to conjure a stack frame here, but we may need to deal
+	with callstack overflows or the GC moving code around.
+	For now leave the stack untouched so the signal handler returns into
+	the parent procedure. This will cause things to blow up if the stack
+	is left unbalanced. */
+	signal_from_leaf = true;
+	*pc = newpc;
+}
 
 /* We ignore the two topmost frames, the 'callstack' primitive
 frame itself, and the frame calling the 'callstack' primitive,
