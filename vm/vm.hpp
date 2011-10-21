@@ -51,13 +51,17 @@ struct factor_vm
 
 	/* Is call counting enabled? */
 	bool profiling_p;
+	/* Is sampling profiler enabled? */
+	bool sampling_p;
 
 	/* Global variables used to pass fault handler state from signal handler
 	to VM */
 	cell signal_number;
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
-	cell safepoint_signal_number;
+	bool safepoint_fep;
+	cell safepoint_sample_count;
+	sigset_t safepoint_signals;
 
 	/* GC is off during heap walking */
 	bool gc_off;
@@ -89,6 +93,7 @@ struct factor_vm
 	std::vector<code_root *> code_roots;
 
 	/* Debugger */
+	bool fep_p;
 	bool fep_disabled;
 	bool full_output;
 
@@ -182,6 +187,8 @@ struct factor_vm
 	void memory_signal_handler_impl();
 	void synchronous_signal_handler_impl();
 	void fp_signal_handler_impl();
+	void enqueue_safepoint_fep();
+	void enqueue_safepoint_sample();
 	void enqueue_safepoint_signal(cell signal);
 	void handle_safepoint();
 
@@ -578,7 +585,6 @@ struct factor_vm
 	template<typename Iterator> void iterate_callstack_object(callstack *stack_, Iterator &iterator);
 	void check_frame(stack_frame *frame);
 	callstack *allot_callstack(cell size);
-	stack_frame *fix_callstack_top(stack_frame *top);
 	stack_frame *second_from_top_stack_frame(context *ctx);
 	cell capture_callstack(context *ctx);
 	void primitive_callstack();
@@ -591,7 +597,6 @@ struct factor_vm
 	cell frame_scan(stack_frame *frame);
 	cell frame_offset(stack_frame *frame);
 	void set_frame_offset(stack_frame *frame, cell offset);
-	void scrub_return_address();
 	void primitive_callstack_to_array();
 	stack_frame *innermost_stack_frame(stack_frame *bottom, stack_frame *top);
 	void primitive_innermost_stack_frame_executing();

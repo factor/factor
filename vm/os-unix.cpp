@@ -167,11 +167,29 @@ void synchronous_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 		fatal_error("Foreign thread received signal ", signal);
 }
 
-void next_safepoint_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+void enqueue_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
 	if (vm)
 		vm->enqueue_safepoint_signal(signal);
+	else
+		fatal_error("Foreign thread received signal ", signal);
+}
+
+void fep_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	factor_vm *vm = current_vm_p();
+	if (vm)
+		vm->enqueue_safepoint_fep();
+	else
+		fatal_error("Foreign thread received signal ", signal);
+}
+
+void sample_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	factor_vm *vm = current_vm_p();
+	if (vm)
+		vm->enqueue_safepoint_sample();
 	else
 		fatal_error("Foreign thread received signal ", signal);
 }
@@ -206,6 +224,15 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 		fatal_error("sigaction failed", 0);
 }
 
+static void init_sigaction_with_handler(struct sigaction *act,
+	void (*handler)(int, siginfo_t*, void*))
+{
+	memset(act, 0, sizeof(struct sigaction));
+	sigemptyset(&act->sa_mask);
+	act->sa_sigaction = handler;
+	act->sa_flags = SA_SIGINFO | SA_ONSTACK;
+}
+
 void factor_vm::unix_init_signals()
 {
 	/* OpenBSD doesn't support sigaltstack() if we link against
@@ -225,53 +252,43 @@ void factor_vm::unix_init_signals()
 
 	struct sigaction memory_sigaction;
 	struct sigaction synchronous_sigaction;
-	struct sigaction next_safepoint_sigaction;
+	struct sigaction enqueue_sigaction;
+	struct sigaction fep_sigaction;
+	struct sigaction sample_sigaction;
 	struct sigaction fpe_sigaction;
 	struct sigaction ignore_sigaction;
 
-	memset(&memory_sigaction,0,sizeof(struct sigaction));
-	sigemptyset(&memory_sigaction.sa_mask);
-	memory_sigaction.sa_sigaction = memory_signal_handler;
-	memory_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
-
+	init_sigaction_with_handler(&memory_sigaction, memory_signal_handler);
 	sigaction_safe(SIGBUS,&memory_sigaction,NULL);
 	sigaction_safe(SIGSEGV,&memory_sigaction,NULL);
 	sigaction_safe(SIGTRAP,&memory_sigaction,NULL);
 
-	memset(&fpe_sigaction,0,sizeof(struct sigaction));
-	sigemptyset(&fpe_sigaction.sa_mask);
-	fpe_sigaction.sa_sigaction = fpe_signal_handler;
-	fpe_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
-
+	init_sigaction_with_handler(&fpe_sigaction, fpe_signal_handler);
 	sigaction_safe(SIGFPE,&fpe_sigaction,NULL);
 
-	memset(&synchronous_sigaction,0,sizeof(struct sigaction));
-	sigemptyset(&synchronous_sigaction.sa_mask);
-	synchronous_sigaction.sa_sigaction = synchronous_signal_handler;
-	synchronous_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
-
+	init_sigaction_with_handler(&synchronous_sigaction, synchronous_signal_handler);
 	sigaction_safe(SIGILL,&synchronous_sigaction,NULL);
 	sigaction_safe(SIGABRT,&synchronous_sigaction,NULL);
 
-	memset(&next_safepoint_sigaction,0,sizeof(struct sigaction));
-	sigemptyset(&next_safepoint_sigaction.sa_mask);
-	next_safepoint_sigaction.sa_sigaction = next_safepoint_signal_handler;
-	next_safepoint_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
-	sigaction_safe(SIGALRM,&next_safepoint_sigaction,NULL);
-	sigaction_safe(SIGVTALRM,&next_safepoint_sigaction,NULL);
-	sigaction_safe(SIGPROF,&next_safepoint_sigaction,NULL);
-	sigaction_safe(SIGQUIT,&next_safepoint_sigaction,NULL);
-	sigaction_safe(SIGINT,&next_safepoint_sigaction,NULL);
-	sigaction_safe(SIGUSR1,&next_safepoint_sigaction,NULL);
-	sigaction_safe(SIGUSR2,&next_safepoint_sigaction,NULL);
+	init_sigaction_with_handler(&enqueue_sigaction, enqueue_signal_handler);
+	sigaction_safe(SIGUSR1,&enqueue_sigaction,NULL);
+	sigaction_safe(SIGUSR2,&enqueue_sigaction,NULL);
+	sigaction_safe(SIGWINCH,&enqueue_sigaction,NULL);
+#ifdef SIGINFO
+	sigaction_safe(SIGINFO,&enqueue_sigaction,NULL);
+#endif
+
+	init_sigaction_with_handler(&fep_sigaction, fep_signal_handler);
+	sigaction_safe(SIGQUIT,&fep_sigaction,NULL);
+	sigaction_safe(SIGINT,&fep_sigaction,NULL);
+
+	init_sigaction_with_handler(&sample_sigaction, sample_signal_handler);
+	sigaction_safe(SIGALRM,&sample_sigaction,NULL);
 
 	/* We don't use SA_IGN here because then the ignore action is inherited
 	by subprocesses, which we don't want. There is a unit test in
 	io.launcher.unix for this. */
-	memset(&ignore_sigaction,0,sizeof(struct sigaction));
-	sigemptyset(&ignore_sigaction.sa_mask);
-	ignore_sigaction.sa_sigaction = ignore_signal_handler;
-	ignore_sigaction.sa_flags = SA_SIGINFO | SA_ONSTACK;
+	init_sigaction_with_handler(&ignore_sigaction, ignore_signal_handler);
 	sigaction_safe(SIGPIPE,&ignore_sigaction,NULL);
 }
 
