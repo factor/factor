@@ -35,25 +35,18 @@ void factor_vm::call_fault_handler(
 	MACH_THREAD_STATE_TYPE *thread_state,
 	MACH_FLOAT_STATE_TYPE *float_state)
 {
-	cell offset = MACH_STACK_POINTER(thread_state) % 16;
-	if (offset != 0)
-		fatal_error("fault in unaligned frame with offset", offset);
-	MACH_STACK_POINTER(thread_state) -= sizeof(cell);
-	*(cell*)MACH_STACK_POINTER(thread_state) = MACH_PROGRAM_COUNTER(thread_state);
+	cell handler = 0;
 
-	ctx->callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
-
-	/* Now we point the program counter at the right handler function. */
 	if(exception == EXC_BAD_ACCESS)
 	{
 		signal_fault_addr = MACH_EXC_STATE_FAULT(exc_state);
-		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::memory_signal_handler_impl;
+		handler = (cell)factor::memory_signal_handler_impl;
 	}
 	else if(exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV)
 	{
 		signal_fpu_status = fpu_status(mach_fpu_status(float_state));
 		mach_clear_fpu_status(float_state);
-		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::fp_signal_handler_impl;
+		handler = (cell)factor::fp_signal_handler_impl;
 	}
 	else
 	{
@@ -64,8 +57,16 @@ void factor_vm::call_fault_handler(
 		default: signal_number = SIGABRT; break;
 		}
 
-		MACH_PROGRAM_COUNTER(thread_state) = (cell)factor::synchronous_signal_handler_impl;
+		handler = (cell)factor::synchronous_signal_handler_impl;
 	}
+
+	assert(handler != 0);
+
+	dispatch_signal_handler(
+		&MACH_STACK_POINTER(thread_state),
+		&MACH_PROGRAM_COUNTER(thread_state),
+		handler
+	);
 }
 
 static void call_fault_handler(
