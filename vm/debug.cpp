@@ -351,23 +351,22 @@ void factor_vm::factorbug()
 		exit(1);
 	}
 
-	/* open_console(); */
 	fep_p = true;
 
 	std::cout << "Starting low level debugger...\n";
 	std::cout << "  Basic commands:\n";
-	std::cout << "q                -- continue executing Factor - NOT SAFE\n";
-	std::cout << "im               -- save image to fep.image\n";
+	std::cout << "c                -- continue executing Factor - NOT SAFE\n";
+	std::cout << "t                -- throw exception in Factor - NOT SAFE\n";
 	std::cout << "x                -- exit Factor\n";
 	std::cout << "  Advanced commands:\n";
 	std::cout << "d <addr> <count> -- dump memory\n";
 	std::cout << "u <addr>         -- dump object at tagged <addr>\n";
 	std::cout << ". <addr>         -- print object at tagged <addr>\n";
-	std::cout << "t                -- toggle output trimming\n";
 	std::cout << "s r              -- dump data, retain stacks\n";
 	std::cout << ".s .r .c         -- print data, retain, call stacks\n";
 	std::cout << "e                -- dump environment\n";
 	std::cout << "g                -- dump generations\n";
+	std::cout << "trim             -- toggle output trimming\n";
 	std::cout << "data             -- data heap dump\n";
 	std::cout << "words            -- words dump\n";
 	std::cout << "tuples           -- tuples dump\n";
@@ -427,7 +426,7 @@ void factor_vm::factorbug()
 			print_obj(addr);
 			std::cout << std::endl;
 		}
-		else if(strcmp(cmd,"t") == 0)
+		else if(strcmp(cmd,"trim") == 0)
 			full_output = !full_output;
 		else if(strcmp(cmd,"s") == 0)
 			dump_memory(ctx->datastack_seg->start,ctx->datastack);
@@ -446,15 +445,19 @@ void factor_vm::factorbug()
 		}
 		else if(strcmp(cmd,"g") == 0)
 			dump_generations();
-		else if(strcmp(cmd,"q") == 0)
+		else if(strcmp(cmd,"q") == 0 || strcmp(cmd,"c") == 0)
 		{
 			fep_p = false;
 			return;
 		}
+		else if(strcmp(cmd,"t") == 0)
+		{
+			fep_p = false;
+			general_error(ERROR_INTERRUPT,false_object,false_object);
+			assert(false);
+		}
 		else if(strcmp(cmd,"x") == 0)
 			exit(1);
-		else if(strcmp(cmd,"im") == 0)
-			save_image(STRING_LITERAL("fep.image.saving"),STRING_LITERAL("fep.image"));
 		else if(strcmp(cmd,"data") == 0)
 			dump_objects(TYPE_COUNT);
 		else if(strcmp(cmd,"refs") == 0)
