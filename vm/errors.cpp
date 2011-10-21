@@ -156,19 +156,39 @@ void fp_signal_handler_impl()
 	current_vm()->fp_signal_handler_impl();
 }
 
+void factor_vm::enqueue_safepoint_fep()
+{
+	if (fep_p)
+		fatal_error("Low-level debugger interrupted", 0);
+	safepoint_fep = true;
+	code->guard_safepoint();
+}
+
 void factor_vm::enqueue_safepoint_signal(cell signal)
 {
-	safepoint_signal_number = signal;
+	sigaddset(&safepoint_signals, signal);
 	code->guard_safepoint();
+}
+
+void factor_vm::enqueue_safepoint_sample()
+{
+	if (!sampling_p)
+		fatal_error("Received sampling signal while not sampling!", 0);
+	++safepoint_sample_count;
 }
 
 void factor_vm::handle_safepoint()
 {
-	assert(safepoint_signal_number != 0);
-	code->unguard_safepoint();
-	cell signal = safepoint_signal_number;
-	safepoint_signal_number = 0;
-	general_error(ERROR_SIGNAL,from_unsigned_cell(signal),false_object);
+	if (safepoint_fep) {
+		std::cout << "Interrupted. Entering low-level debugger...\n";
+		std::cout << "\n";
+		factorbug();
+		code->unguard_safepoint();
+		safepoint_fep = false;
+		return;
+	}
+	// XXX handle sample count
+	// XXX handle queued signals
 }
 
 }

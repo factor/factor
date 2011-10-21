@@ -352,6 +352,7 @@ void factor_vm::factorbug()
 	}
 
 	/* open_console(); */
+	fep_p = true;
 
 	std::cout << "Starting low level debugger...\n";
 	std::cout << "  Basic commands:\n";
@@ -446,7 +447,10 @@ void factor_vm::factorbug()
 		else if(strcmp(cmd,"g") == 0)
 			dump_generations();
 		else if(strcmp(cmd,"q") == 0)
+		{
+			fep_p = false;
 			return;
+		}
 		else if(strcmp(cmd,"x") == 0)
 			exit(1);
 		else if(strcmp(cmd,"im") == 0)
