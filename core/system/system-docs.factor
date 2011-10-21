@@ -69,11 +69,11 @@ HELP: embedded?
 { $values { "?" "a boolean" } }
 { $description "Tests if this Factor instance is embedded in another application." } ;
 
-HELP: exit ( n -- * )
+HELP: exit
 { $values { "n" "an integer exit code" } }
 { $description "Exits the Factor process." } ;
 
-HELP: nano-count ( -- ns )
+HELP: nano-count
 { $values { "ns" integer } }
 { $description "Outputs a monotonically increasing count of nanoseconds elapsed since an arbitrary starting time. The difference of two calls to this word allows timing. This word is unaffected by system clock changes." }
 { $notes "This is a low-level word. The " { $vocab-link "tools.time" } " vocabulary defines words to time code execution time." } ;

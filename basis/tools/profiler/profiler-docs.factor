@@ -61,7 +61,7 @@ HELP: vocabs-profile.
 HELP: method-profile.
 { $description "Print a table of cumilative call counts for each method. Methods which were not called are supressed from the output." } ;
 
-HELP: profiling ( ? -- )
+HELP: profiling
 { $values { "?" "a boolean" } }
 { $description "Internal primitive to switch on call counting. This word should not be used; instead use " { $link profile } "." } ;
 

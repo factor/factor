@@ -41,7 +41,7 @@ HELP: alien
 HELP: dll
 { $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information." } ;
 
-HELP: dll-valid? ( dll -- ? )
+HELP: dll-valid?
 { $values { "dll" dll } { "?" "a boolean" } }
 { $description "Returns true if the library exists and is loaded." } ;
 
@@ -53,7 +53,7 @@ HELP: <bad-alien>
 { $values  { "alien" c-ptr } }
 { $description "Constructs an invalid alien pointer that has expired." } ;
 
-HELP: <displaced-alien> ( displacement c-ptr -- alien )
+HELP: <displaced-alien>
 { $values { "displacement" "an integer" } { "c-ptr" c-ptr } { "alien" "a new alien" } }
 { $description "Creates a new alien address object, wrapping a raw memory address. The alien points to a location in memory which is offset by " { $snippet "displacement" } " from the address of " { $snippet "c-ptr" } "." }
 { $notes "Passing a value of " { $link f } " for " { $snippet "c-ptr" } " creates an alien with an absolute address; this is how " { $link <alien> } " is implemented."
@@ -62,7 +62,7 @@ $nl
 
 { <alien> <displaced-alien> alien-address } related-words
 
-HELP: alien-address ( c-ptr -- addr )
+HELP: alien-address
 { $values { "c-ptr" c-ptr } { "addr" "a non-negative integer" } }
 { $description "Outputs the address of an alien." }
 { $notes "Taking the address of a " { $link byte-array } " is explicitly prohibited since byte arrays can be moved by the garbage collector between the time the address is taken, and when it is accessed. If you need to pass pointers to C functions which will persist across alien calls, you must allocate unmanaged memory instead. See " { $link "malloc" } "." } ;

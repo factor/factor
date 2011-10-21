@@ -1,7 +1,7 @@
 USING: help.markup help.syntax math kernel ;
 IN: 24-game
 
-HELP: play-game ( -- )
+HELP: play-game
 { $description "Starts the game!" }
 { $examples
     { $unchecked-example
@@ -23,7 +23,7 @@ HELP: play-game ( -- )
     }
 } ;
 
-HELP: 24-able ( -- vector )
+HELP: 24-able
 { $values { "vector" "vector of 4 integers" } }
 { $description
     "Produces a vector with 4 integers. With the following condition: "
@@ -42,7 +42,7 @@ HELP: 24-able ( -- vector )
     { $notes { $link 24-able? } " is used in " { $link 24-able } "." }
 } ;
 
-HELP: 24-able? ( quad -- t/f )
+HELP: 24-able?
 { $values
     { "quad" "vector of 4 integers" }
     { "t/f" "a boolean" }
@@ -52,7 +52,7 @@ HELP: 24-able? ( quad -- t/f )
     "with this sequence."
 } ;
 
-HELP: build-quad ( -- array )
+HELP: build-quad
 { $values
     { "array" "an array of 4 numbers" }
 }
