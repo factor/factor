@@ -9,9 +9,9 @@ context::context(cell datastack_size, cell retainstack_size, cell callstack_size
 	datastack(0),
 	retainstack(0),
 	callstack_save(0),
-	datastack_seg(new segment(datastack_size,false,false)),
-	retainstack_seg(new segment(retainstack_size,false,false)),
-	callstack_seg(new segment(callstack_size,false,true))
+	datastack_seg(new segment(datastack_size,false)),
+	retainstack_seg(new segment(retainstack_size,false)),
+	callstack_seg(new segment(callstack_size,false))
 {
 	reset();
 }

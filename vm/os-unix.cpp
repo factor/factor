@@ -91,11 +91,11 @@ void factor_vm::move_file(const vm_char *path1, const vm_char *path2)
 		general_error(ERROR_IO,tag_fixnum(errno),false_object);
 }
 
-segment::segment(cell size_, bool executable_p, bool canary_page_p)
+segment::segment(cell size_, bool executable_p)
 {
 	size = size_;
 
-	cell pagesize = getpagesize();
+	int pagesize = getpagesize();
 
 	int prot;
 	if(executable_p)
@@ -103,18 +103,16 @@ segment::segment(cell size_, bool executable_p, bool canary_page_p)
 	else
 		prot = (PROT_READ | PROT_WRITE);
 
-	cell startsize = canary_page_p ? 2*pagesize : pagesize;
-
-	char *array = (char *)mmap(NULL,startsize + size + pagesize,prot,MAP_ANON | MAP_PRIVATE,-1,0);
+	char *array = (char *)mmap(NULL,pagesize + size + pagesize,prot,MAP_ANON | MAP_PRIVATE,-1,0);
 	if(array == (char*)-1) out_of_memory();
 
-	if(mprotect(array,startsize,PROT_NONE) == -1)
+	if(mprotect(array,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect low guard page",(cell)array);
 
-	if(mprotect(array + startsize + size,pagesize,PROT_NONE) == -1)
+	if(mprotect(array + pagesize + size,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect high guard page",(cell)array);
 
-	start = (cell)(array + startsize);
+	start = (cell)(array + pagesize);
 	end = start + size;
 }
 
@@ -238,7 +236,7 @@ void factor_vm::unix_init_signals()
 	libpthread. See http://redmine.ruby-lang.org/issues/show/1239 */
 
 #ifndef __OpenBSD__
-	signal_callstack_seg = new segment(callstack_size,false,false);
+	signal_callstack_seg = new segment(callstack_size,false);
 
 	stack_t signal_callstack;
 	signal_callstack.ss_sp = (char *)signal_callstack_seg->start;
