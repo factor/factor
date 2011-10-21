@@ -134,11 +134,14 @@ HOOK: signal-error. os ( obj -- )
 : fp-trap-error. ( error -- )
     "Floating point trap" print drop ;
 
+: interrupt-error. ( error -- )
+    "Interrupt" print drop ;
+
 PREDICATE: vm-error < array
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }
-        [ second 0 17 between? ]
+        [ second 0 18 between? ]
     } cond ;
 
 : vm-errors ( error -- n errors )
@@ -161,6 +164,7 @@ PREDICATE: vm-error < array
         { 15 [ callstack-overflow.     ] }
         { 16 [ memory-error.           ] }
         { 17 [ fp-trap-error.          ] }
+        { 18 [ interrupt-error.        ] }
     } ; inline
 
 M: vm-error summary drop "VM error" ;
