@@ -8,7 +8,7 @@ destructors io.encodings.utf8 io.pathnames io.streams.string
 kernel libc literals math mirrors namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
 tools.test parser lexer eval layouts generic.single classes
-vocabs generic classes.private ;
+vocabs generic classes.private definitions ;
 FROM: math => float ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
 QUALIFIED-WITH: alien.c-types c
@@ -553,3 +553,4 @@ STRUCT: some-accessors { aaa uint } { bbb int } ;
 [ f ] [ \ some-accessors \ clone ?lookup-method ] unit-test
 [ f ] [ \ some-accessors \ struct-slot-values ?lookup-method ] unit-test
 
+<< \ some-accessors forget >>
