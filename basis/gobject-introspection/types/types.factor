@@ -85,7 +85,7 @@ ERROR: unknown-type-error type ;
     qualified-type-name type-infos get-global at ;
 
 :: register-type ( c-type type-info name -- )
-    type-info c-type >>c-type name
+    type-info lookup-c-type >>c-type name
     type-infos get-global set-at ;
 
 : register-standard-type ( c-type name -- )
@@ -104,7 +104,7 @@ ERROR: unknown-type-error type ;
 ERROR: deferred-type-error ;
 
 <<
-void* c-type clone
+void* lookup-c-type clone
     [ drop deferred-type-error ] >>unboxer-quot
     [ drop deferred-type-error ] >>boxer-quot
     object >>boxed-class
