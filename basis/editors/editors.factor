@@ -47,7 +47,7 @@ M: object edit
 M: link edit name>> edit ;
 
 M: string edit
-    dup vocab [ edit ] [ cannot-find-source ] ?if ;
+    dup lookup-vocab [ edit ] [ cannot-find-source ] ?if ;
 
 : edit-error ( error -- )
     [ error-file ] [ error-line ] bi

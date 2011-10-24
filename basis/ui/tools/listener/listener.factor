@@ -50,7 +50,7 @@ M: interactor manifest>>
     ] if ;
 
 : vocab-exists? ( name -- ? )
-    '[ _ { [ vocab ] [ find-vocab-root ] } 1|| ] [ drop f ] recover ;
+    '[ _ { [ lookup-vocab ] [ find-vocab-root ] } 1|| ] [ drop f ] recover ;
 
 GENERIC: (word-at-caret) ( token completion-mode -- obj )
 

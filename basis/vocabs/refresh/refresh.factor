@@ -22,7 +22,7 @@ IN: vocabs.refresh
 SYMBOL: changed-vocabs
 
 : changed-vocab ( vocab -- )
-    dup vocab changed-vocabs get and
+    dup lookup-vocab changed-vocabs get and
     [ dup changed-vocabs get set-at ] [ drop ] if ;
 
 : unchanged-vocab ( vocab -- )
@@ -58,12 +58,12 @@ SYMBOL: modified-docs
             [
                 [
                     [ modified-sources ]
-                    [ vocab source-loaded?>> ]
+                    [ lookup-vocab source-loaded?>> ]
                     [ vocab-source-path ]
                     tri (to-refresh)
                 ] [
                     [ modified-docs ]
-                    [ vocab docs-loaded?>> ]
+                    [ lookup-vocab docs-loaded?>> ]
                     [ vocab-docs-path ]
                     tri (to-refresh)
                 ] bi
@@ -78,8 +78,8 @@ SYMBOL: modified-docs
 : do-refresh ( modified-sources modified-docs unchanged -- )
     unchanged-vocabs
     [
-        [ [ vocab f >>source-loaded? drop ] each ]
-        [ [ vocab f >>docs-loaded? drop ] each ] bi*
+        [ [ lookup-vocab f >>source-loaded? drop ] each ]
+        [ [ lookup-vocab f >>docs-loaded? drop ] each ] bi*
     ]
     [
         union

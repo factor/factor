@@ -26,7 +26,7 @@ $nl
 }
 "Looking up existing vocabularies and creating new vocabularies:"
 { $subsections
-    vocab
+    lookup-vocab
     child-vocabs
     create-vocab
 }
@@ -50,7 +50,7 @@ HELP: vocabs
 { $values { "seq" "a sequence of strings" } }
 { $description "Outputs a sequence of all defined vocabulary names." } ;
 
-HELP: vocab
+HELP: lookup-vocab
 { $values { "vocab-spec" "a vocabulary specifier" } { "vocab" vocab } }
 { $description "Outputs a named vocabulary, or " { $link f } " if no vocabulary with this name exists." }
 { $class-description "Instances represent vocabularies." } ;

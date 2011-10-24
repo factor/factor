@@ -116,7 +116,7 @@ M: object always-bump-effect-counter? drop f ;
 
 : changed-vocabs ( assoc -- vocabs )
     [ drop word? ] assoc-filter
-    [ drop vocabulary>> dup [ vocab ] when dup ] assoc-map ;
+    [ drop vocabulary>> dup [ lookup-vocab ] when dup ] assoc-map ;
 
 : updated-definitions ( -- assoc )
     H{ } clone

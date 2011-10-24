@@ -8,7 +8,7 @@ FROM: io.styles => inset ;
 IN: vocabs.prettyprint
 
 : pprint-vocab ( vocab -- )
-    [ vocab-name ] [ vocab vocab-style ] bi styled-text ;
+    [ vocab-name ] [ lookup-vocab vocab-style ] bi styled-text ;
 
 : pprint-in ( vocab -- )
     [ \ IN: pprint-word pprint-vocab ] with-pprint ;
@@ -19,7 +19,7 @@ IN: vocabs.prettyprint
     [ vocab-name ] sort-with ;
 
 : pprint-using ( seq -- )
-    [ "syntax" vocab = not ] filter
+    [ "syntax" lookup-vocab = not ] filter
     sort-vocabs [
         \ USING: pprint-word
         [ pprint-vocab ] each

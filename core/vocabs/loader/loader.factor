@@ -88,7 +88,7 @@ require-when-table [ V{ } clone ] initialize
 : load-conditional-requires ( vocab -- )
     vocab-name require-when-vocabs get in? [
         require-when-table get [
-            [ [ vocab dup [ source-loaded?>> +done+ = ] when ] all? ] dip
+            [ [ lookup-vocab dup [ source-loaded?>> +done+ = ] when ] all? ] dip
             [ require ] curry when
         ] assoc-each
     ] when ;
@@ -119,7 +119,7 @@ PRIVATE>
     load-vocab drop ;
 
 : require-when ( if then -- )
-    over [ vocab ] all? [
+    over [ lookup-vocab ] all? [
         require drop
     ] [
         [ drop [ require-when-vocabs get adjoin ] each ]
@@ -127,7 +127,7 @@ PRIVATE>
     ] if ;
 
 : reload ( name -- )
-    dup vocab
+    dup lookup-vocab
     [ [ load-source ] [ load-docs ] bi ]
     [ require ]
     ?if ;
@@ -168,7 +168,7 @@ PRIVATE>
 [
     dup vocab-name blacklist get at* [ rethrow ] [
         drop dup find-vocab-root
-        [ (load-vocab) ] [ dup vocab [ ] [ no-vocab ] ?if ] if
+        [ (load-vocab) ] [ dup lookup-vocab [ ] [ no-vocab ] ?if ] if
     ] if
 ] load-vocab-hook set-global
 
