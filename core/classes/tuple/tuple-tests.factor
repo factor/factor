@@ -817,3 +817,4 @@ TUPLE: rclasstest a b ;
 [ f ] [ \ rclasstest \ b>> ?lookup-method ] unit-test
 [ f ] [ \ rclasstest \ b<< ?lookup-method ] unit-test
 
+<< \ rclasstest forget >>
