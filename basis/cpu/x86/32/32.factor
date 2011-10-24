@@ -13,7 +13,7 @@ FROM: layouts => cell ;
 IN: cpu.x86.32
 
 : x86-float-regs ( -- seq )
-    "cpu.x86.sse" vocab
+    "cpu.x86.sse" lookup-vocab
     { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 }
     { ST0 ST1 ST2 ST3 ST4 ST5 ST6 }
     ? ;
@@ -67,7 +67,7 @@ M: x86.32 vm-stack-space 16 ;
     stack@ 0 MOV 0 rc-absolute-cell rel-vm ;
 
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
-    c-type
+    lookup-c-type
     [ return-in-registers?>> ]
     [ heap-size { 1 2 4 8 } member? ] bi
     os { linux netbsd solaris } member? not
