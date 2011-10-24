@@ -136,7 +136,7 @@ SYMBOL: forget-tests?
     [ [ [ forget-source ] each ] with-compilation-unit ] [ drop ] if ;
 
 : test-vocab ( vocab -- )
-    vocab dup [
+    lookup-vocab dup [
         dup source-loaded?>> [
             vocab-tests
             [ [ run-test-file ] each ]

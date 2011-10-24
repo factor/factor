@@ -190,9 +190,9 @@ SYMBOL: interactive-vocabs
 
 : only-use-vocabs ( vocabs -- )
     clear-manifest
-    [ vocab ] filter
+    [ lookup-vocab ] filter
     [
-        vocab
+        lookup-vocab
         [ find-vocab-root not ]
         [ source-loaded?>> +done+ eq? ] bi or
     ] filter

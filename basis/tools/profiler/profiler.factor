@@ -56,7 +56,7 @@ IN: tools.profiler
 
 : vocab-profile. ( vocab -- )
     "Call counts for words in the " write
-    dup dup vocab write-object
+    dup dup lookup-vocab write-object
     " vocabulary:" print
     words counters counters. ;
 
