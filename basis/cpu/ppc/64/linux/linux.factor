@@ -35,18 +35,18 @@ M: ppc float-right-align-on-stack? t ;
 
 M: ppc flatten-struct-type ( type -- seq )
     {
-        { [ dup c-type complex-double c-type = ]
+        { [ dup lookup-c-type complex-double lookup-c-type = ]
           [ drop { { double-rep f f } { double-rep f f } } ] }
-        { [ dup c-type complex-float c-type = ]
+        { [ dup lookup-c-type complex-float lookup-c-type = ]
           [ drop { { float-rep f f } { float-rep f f } } ] }
         [ heap-size cell align cell /i { int-rep f f } <repetition> ]
     } cond ;
 
 M: ppc flatten-struct-type-return ( type -- seq )
     {
-        { [ dup c-type complex-double c-type = ]
+        { [ dup lookup-c-type complex-double lookup-c-type = ]
           [ drop { { double-rep f f } { double-rep f f } } ] }
-        { [ dup c-type complex-float c-type = ]
+        { [ dup lookup-c-type complex-float lookup-c-type = ]
           [ drop { { float-rep f f } { float-rep f f } } ] }
         [ heap-size cell align cell /i { int-rep t f } <repetition> ]
     } cond ;

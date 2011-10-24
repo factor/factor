@@ -173,7 +173,6 @@ TUPLE: struct-c-type < abstract-c-type
 
 INSTANCE: struct-c-type value-type
 
-! M: struct-c-type c-type ;
 M: struct-c-type lookup-c-type ;
 
 M: struct-c-type base-type ;

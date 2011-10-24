@@ -360,7 +360,7 @@ M: ppc return-regs ( -- regs )
 
 ! Is this structure small enough to be returned in registers?
 M: ppc return-struct-in-registers? ( c-type -- ? )
-    c-type return-in-registers?>> ;
+    lookup-c-type return-in-registers?>> ;
 
 ! If t, floats are never passed in param regs
 M: ppc float-on-stack? ( -- ? ) f ;
@@ -1081,4 +1081,4 @@ USE: vocabs.loader
     [ ]
 } cond
 
-complex-double c-type t >>return-in-registers? drop
+complex-double lookup-c-type t >>return-in-registers? drop
