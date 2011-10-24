@@ -55,7 +55,7 @@ M: c-io-backend init-io ;
 
 : stdin-handle ( -- alien ) 11 special-object ;
 : stdout-handle ( -- alien ) 12 special-object ;
-: stderr-handle ( -- alien ) 61 special-object ;
+: stderr-handle ( -- alien ) 63 special-object ;
 
 : init-c-stdio ( -- )
     stdin-handle <c-reader>

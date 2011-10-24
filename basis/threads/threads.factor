@@ -60,7 +60,7 @@ mailbox
 sleep-entry ;
 
 : self ( -- thread )
-    63 special-object { thread } declare ; inline
+    65 special-object { thread } declare ; inline
 
 : thread-continuation ( thread -- continuation )
     context>> check-box value>> continuation-for ;
@@ -79,7 +79,7 @@ sleep-entry ;
     [ tnamespace ] dip change-at ; inline
 
 : threads ( -- assoc )
-    64 special-object { hashtable } declare ; inline
+    66 special-object { hashtable } declare ; inline
 
 : thread-registered? ( thread -- ? )
     id>> threads key? ;
@@ -92,18 +92,18 @@ sleep-entry ;
 : unregister-thread ( thread -- )
     id>> threads delete-at ;
 
-: set-self ( thread -- ) 63 set-special-object ; inline
+: set-self ( thread -- ) 65 set-special-object ; inline
 
 PRIVATE>
 
 : run-queue ( -- dlist )
-    65 special-object { dlist } declare ; inline
+    67 special-object { dlist } declare ; inline
 
 : sleep-queue ( -- heap )
-    66 special-object { min-heap } declare ; inline
+    68 special-object { min-heap } declare ; inline
 
 : waiting-callbacks ( -- assoc )
-    68 special-object { hashtable } declare ; inline
+    70 special-object { hashtable } declare ; inline
 
 : new-thread ( quot name class -- thread )
     new
@@ -234,10 +234,10 @@ M: real sleep
 <PRIVATE
 
 : init-thread-state ( -- )
-    H{ } clone 64 set-special-object
-    <dlist> 65 set-special-object
-    <min-heap> 66 set-special-object
-    H{ } clone 68 set-special-object ;
+    H{ } clone 66 set-special-object
+    <dlist> 67 set-special-object
+    <min-heap> 68 set-special-object
+    H{ } clone 70 set-special-object ;
 
 : init-initial-thread ( -- )
     [ ] "Initial" <thread>

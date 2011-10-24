@@ -36,12 +36,12 @@ IN: bootstrap.x86
 [
     ! load entry point
     RAX 0 MOV rc-absolute-cell rel-this
-    ! store entry point
-    RSP bootstrap-cell 2 * neg [+] RAX MOV
-    ! store stack frame size
-    RSP bootstrap-cell neg [+] stack-frame-size MOV
     ! alignment
     RSP stack-frame-size bootstrap-cell - SUB
+    ! store entry point
+    RSP stack-frame-size bootstrap-cell 3 * - [+] RAX MOV
+    ! store stack frame size
+    RSP stack-frame-size bootstrap-cell 2 * - [+] stack-frame-size MOV
 ] jit-prolog jit-define
 
 [
@@ -90,6 +90,61 @@ IN: bootstrap.x86
     arg1 vm-reg MOV
     "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
+
+USE: locals
+
+: jit-save-volatile-regs ( -- )
+    ! do we also need to save XMM?
+    RSP volatile-regs length bootstrap-cell * SUB
+    volatile-regs
+    [| r i | RSP i bootstrap-cell * [+] r MOV ] each-index ;
+
+:: jit-restore-volatile-regs ( additional-pop -- )
+    volatile-regs
+    [| r i | r RSP i bootstrap-cell * [+] MOV ] each-index
+    RSP volatile-regs length bootstrap-cell * additional-pop + ADD ;
+
+[
+    ! Stack at this point has the signal handler pointer followed by
+    ! the return address back into normal execution, then the 24 bytes
+    ! of stack frame + alignment inserted by the prolog.
+    ! After registers are saved, the stack looks like:
+    ! RSP  saved volatile regs (`volatile-regs length` cells)
+    !  +   subprimitive stack frame alignment (3 cells)
+    !  .   signal handler address (1 cell)
+    !  .   resume address (1 cell)
+    jit-save-volatile-regs
+    jit-save-context
+    RAX RSP volatile-regs length 3 + bootstrap-cell * [+] MOV
+    RAX CALL
+    bootstrap-cell jit-restore-volatile-regs
+] \ signal-handler define-sub-primitive
+
+! :: jit-push-leaf-stack-frame ( -- )
+!     ;
+! 
+! :: jit-pop-leaf-stack-frame ( -- )
+!     ;
+! 
+! [
+!     ! Stack at this point has the signal handler pointer followed by
+!     ! the word pointer and the return address back into normal execution,
+!     ! then the 24 bytes of stack frame + alignment inserted by the prolog
+!     ! After registers are saved and the leaf stack frame is constructed,
+!     ! the stack looks like:
+!     ! RSP  fake leaf stack frame (4 cells)
+!     !  +   saved volatile regs (`volatile-regs length` cells)
+!     !  .   subprimitive stack frame alignment (3 cells)
+!     !  .   leaf word (1 cell)
+!     !  .   signal handler address (1 cell)
+!     !      resume address (1 cell)
+!     jit-save-volatile-regs
+!     jit-push-leaf-stack-frame
+!     jit-save-context
+!     "memory_signal_handler_impl" jit-call
+!     jit-pop-leaf-stack-frame
+!     bootstrap-cell jit-restore-volatile-regs
+! ] \ leaf-signal-handler define-sub-primitive
 
 [
     arg1 ds-reg [] MOV
