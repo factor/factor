@@ -77,7 +77,7 @@ M: ##dispatch generate-insn
     [ lookup-label resolve-label ]
     [
         instructions>> [
-            [ class insn-counts get inc-at ]
+            [ class-of insn-counts get inc-at ]
             [ generate-insn ]
             bi
         ] each

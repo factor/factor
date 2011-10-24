@@ -18,7 +18,7 @@ GENERIC: specializer-declaration ( spec -- class )
 
 M: class specializer-declaration ;
 
-M: object specializer-declaration class ;
+M: object specializer-declaration class-of ;
 
 : specializer ( word -- specializer )
     "specializer" word-prop ;

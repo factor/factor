@@ -52,7 +52,7 @@ M: struct >c-ptr
 
 M: struct equal?
     over struct? [
-        2dup [ class ] bi@ = [
+        2dup [ class-of ] bi@ = [
             2dup [ >c-ptr ] both?
             [ [ >c-ptr ] [ binary-object ] bi* memory= ]
             [ [ >c-ptr not ] both? ]
@@ -247,7 +247,7 @@ M: struct-bit-slot-spec compute-slot-offset
 
 PRIVATE>
 
-M: struct byte-length class "struct-size" word-prop ; foldable
+M: struct byte-length class-of "struct-size" word-prop ; foldable
 M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inline
 
 ! class definition

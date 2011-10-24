@@ -8,7 +8,7 @@ IN: tools.destructors
 <PRIVATE
 
 : class-tally ( assoc -- assoc' )
-    H{ } clone [ [ keys ] dip '[ dup class _ push-at ] each ] keep ;
+    H{ } clone [ [ keys ] dip '[ dup class-of _ push-at ] each ] keep ;
 
 : (disposables.) ( assoc -- )
     class-tally >alist [ first2 [ length ] keep 3array ] map [ second ] sort-with

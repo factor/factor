@@ -77,7 +77,7 @@ M: object >PFA
 M: word >PFA
     TABLE at [ { } ] unless* ;
 M: pixel-format-attribute >PFA
-    dup class TABLE at
+    dup class-of TABLE at
     [ swap value>> suffix ]
     [ drop { } ] if* ;
 

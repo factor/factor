@@ -18,7 +18,7 @@ GENERIC: run-escape-analysis* ( node -- ? )
     { [ unbox-inputs? ] [ [ run-escape-analysis* ] any? ] } 1|| ;
 
 M: #push run-escape-analysis*
-    literal>> class immutable-tuple-class? ;
+    literal>> class-of immutable-tuple-class? ;
 
 M: #call run-escape-analysis*
     immutable-tuple-boa? ;

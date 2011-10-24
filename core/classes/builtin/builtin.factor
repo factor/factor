@@ -16,7 +16,7 @@ PREDICATE: builtin-class < class
 
 : bootstrap-type>class ( n -- class ) builtins get nth ;
 
-M: object class tag type>class ; inline
+M: object class-of tag type>class ; inline
 
 M: builtin-class rank-class drop 0 ;
 
