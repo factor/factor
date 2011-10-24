@@ -19,7 +19,7 @@ IN: classes.struct.prettyprint
     } cond ;
 
 : struct>assoc ( struct -- assoc )
-    [ class struct-slots ] [ struct-slot-values ] bi zip ;
+    [ class-of struct-slots ] [ struct-slot-values ] bi zip ;
 
 : pprint-struct-slot ( slot -- )
     <flow \ { pprint-word
@@ -39,13 +39,13 @@ IN: classes.struct.prettyprint
 : pprint-struct ( struct -- )
     [
         [ \ S{ ] dip
-        [ class ]
+        [ class-of ]
         [ struct>assoc [ [ name>> ] dip ] assoc-map ] bi
         \ } (pprint-tuple)
     ] ?pprint-tuple ;
 
 : pprint-struct-pointer ( struct -- )
-    \ S@ [ [ class pprint-word ] [ >c-ptr pprint* ] bi ] pprint-prefix ;
+    \ S@ [ [ class-of pprint-word ] [ >c-ptr pprint* ] bi ] pprint-prefix ;
 
 PRIVATE>
 
@@ -58,7 +58,7 @@ M: struct pprint-delims
     drop \ S{ \ } ;
 
 M: struct >pprint-sequence
-    [ class ] [ struct-slot-values ] bi class-slot-sequence ;
+    [ class-of ] [ struct-slot-values ] bi class-slot-sequence ;
 
 M: struct pprint*
     [ pprint-struct ]
@@ -66,7 +66,7 @@ M: struct pprint*
 
 M: struct summary
     [
-        dup class name>> %
+        dup class-of name>> %
         " struct of " %
         byte-length #
         " bytes " %
@@ -76,19 +76,19 @@ TUPLE: struct-mirror { object read-only } ;
 C: <struct-mirror> struct-mirror
 
 : get-struct-slot ( struct slot -- value present? )
-    over class struct-slots slot-named
+    over class-of struct-slots slot-named
     [ name>> reader-word execute( struct -- value ) t ]
     [ drop f f ] if* ;
 : set-struct-slot ( value struct slot -- )
-    over class struct-slots slot-named
+    over class-of struct-slots slot-named
     [ name>> writer-word execute( value struct -- ) ]
     [ 2drop ] if* ;
 : reset-struct-slot ( struct slot -- )
-    over class struct-slots slot-named
+    over class-of struct-slots slot-named
     [ [ initial>> swap ] [ name>> writer-word ] bi execute( value struct -- ) ]
     [ drop ] if* ;
 : reset-struct-slots ( struct -- )
-    dup class struct-prototype
+    dup class-of struct-prototype
     dup byte-length memcpy ;
 
 M: struct-mirror at*

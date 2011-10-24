@@ -88,7 +88,7 @@ SYMBOL: generic-word
     swap [ [ tag-dispatch-entry ] curry dip ] curry assoc-map math-alist>quot ;
 
 : tuple-dispatch-entry ( class picker -- quot )
-    [ 1quotation [ { tuple } declare class ] [ eq? ] surround ] dip prepend ;
+    [ 1quotation [ { tuple } declare class-of ] [ eq? ] surround ] dip prepend ;
 
 : tuple-dispatch ( picker alist -- alist' )
     swap [ [ tuple-dispatch-entry ] curry dip ] curry assoc-map math-alist>quot ;

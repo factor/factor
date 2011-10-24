@@ -117,7 +117,7 @@ M: pathname pprint*
 : check-recursion ( obj quot -- )
     nesting-limit? [
         drop
-        [ class name>> "~" dup surround ] keep present-text 
+        [ class-of name>> "~" dup surround ] keep present-text 
     ] [
         over recursion-check get member-eq? [
             drop "~circularity~" swap present-text
@@ -133,7 +133,7 @@ M: pathname pprint*
     [ [ name>> ] dip ] assoc-map ;
 
 : tuple>assoc ( tuple -- assoc )
-    [ class all-slots ] [ tuple-slots ] bi zip filter-tuple-assoc ;
+    [ class-of all-slots ] [ tuple-slots ] bi zip filter-tuple-assoc ;
 
 : pprint-slot-value ( name value -- )
     <flow \ { pprint-word
@@ -152,7 +152,7 @@ M: pathname pprint*
     [ boa-tuples? get [ pprint-object ] ] dip [ check-recursion ] curry if ; inline
 
 : pprint-tuple ( tuple -- )
-    [ [ \ T{ ] dip [ class ] [ tuple>assoc ] bi \ } (pprint-tuple) ] ?pprint-tuple ;
+    [ [ \ T{ ] dip [ class-of ] [ tuple>assoc ] bi \ } (pprint-tuple) ] ?pprint-tuple ;
 
 M: tuple pprint*
     pprint-tuple ;
@@ -203,7 +203,7 @@ M: hash-set >pprint-sequence members ;
     [ 1array ] [ [ f 2array ] dip append ] if-empty ;
 
 M: tuple >pprint-sequence
-    [ class ] [ tuple-slots ] bi class-slot-sequence ;
+    [ class-of ] [ tuple-slots ] bi class-slot-sequence ;
 
 M: object pprint-narrow? drop f ;
 M: byte-vector pprint-narrow? drop f ;

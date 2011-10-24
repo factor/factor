@@ -288,8 +288,8 @@ HOOK: (receive-unsafe) io-backend ( n buf datagram -- size addrspec )
 ERROR: invalid-port object ;
 
 : check-port ( packet addrspec port -- packet addrspec port )
-    2dup addr>> [ class ] bi@ assert=
-    pick class byte-array assert= ;
+    2dup addr>> [ class-of ] bi@ assert=
+    pick class-of byte-array assert= ;
 
 : check-connectionless-port ( port -- port )
     dup { [ datagram-port? ] [ raw-port? ] } 1|| [ invalid-port ] unless ;

@@ -67,7 +67,7 @@ C: <predicate-test> predicate-test
 [ t ] [ <predicate-test> predicate-test? ] unit-test
 
 PREDICATE: silly-pred < tuple
-    class \ rect = ;
+    class-of \ rect = ;
 
 GENERIC: area ( obj -- n )
 M: silly-pred area dup w>> swap h>> * ;
@@ -218,7 +218,7 @@ C: <laptop> laptop
 [ t ] [ "laptop" get tuple? ] unit-test
 
 : test-laptop-slot-values ( -- )
-    [ laptop ] [ "laptop" get class ] unit-test
+    [ laptop ] [ "laptop" get class-of ] unit-test
     [ "Pentium" ] [ "laptop" get cpu>> ] unit-test
     [ 128 ] [ "laptop" get ram>> ] unit-test
     [ t ] [ "laptop" get battery>> 3 hours = ] unit-test ;
@@ -245,7 +245,7 @@ C: <server> server
 [ t ] [ "server" get tuple? ] unit-test
 
 : test-server-slot-values ( -- )
-    [ server ] [ "server" get class ] unit-test
+    [ server ] [ "server" get class-of ] unit-test
     [ "PowerPC" ] [ "server" get cpu>> ] unit-test
     [ 64 ] [ "server" get ram>> ] unit-test
     [ "1U" ] [ "server" get rackmount>> ] unit-test ;
@@ -539,23 +539,23 @@ must-fail-with
 ! Check bignum coercer
 TUPLE: bignum-coercer { n bignum initial: $[ 0 >bignum ] } ;
 
-[ 13 bignum ] [ 13.5 bignum-coercer boa n>> dup class ] unit-test
+[ 13 bignum ] [ 13.5 bignum-coercer boa n>> dup class-of ] unit-test
 
-[ 13 bignum ] [ bignum-coercer new 13.5 >>n n>> dup class ] unit-test
+[ 13 bignum ] [ bignum-coercer new 13.5 >>n n>> dup class-of ] unit-test
 
 ! Check float coercer
 TUPLE: float-coercer { n float } ;
 
-[ 13.0 float ] [ 13 float-coercer boa n>> dup class ] unit-test
+[ 13.0 float ] [ 13 float-coercer boa n>> dup class-of ] unit-test
 
-[ 13.0 float ] [ float-coercer new 13 >>n n>> dup class ] unit-test
+[ 13.0 float ] [ float-coercer new 13 >>n n>> dup class-of ] unit-test
 
 ! Check integer coercer
 TUPLE: integer-coercer { n integer } ;
 
-[ 13 fixnum ] [ 13.5 integer-coercer boa n>> dup class ] unit-test
+[ 13 fixnum ] [ 13.5 integer-coercer boa n>> dup class-of ] unit-test
 
-[ 13 fixnum ] [ integer-coercer new 13.5 >>n n>> dup class ] unit-test
+[ 13 fixnum ] [ integer-coercer new 13.5 >>n n>> dup class-of ] unit-test
 
 : foo ( a b -- c ) declared-types boa ;
 
@@ -610,7 +610,7 @@ T{ reshape-test f "hi" } "tuple" set
 
 TUPLE: boa-coercer-test { x array-capacity } ;
 
-[ fixnum ] [ 0 >bignum boa-coercer-test boa x>> class ] unit-test
+[ fixnum ] [ 0 >bignum boa-coercer-test boa x>> class-of ] unit-test
 
 [ T{ boa-coercer-test f 0 } ] [ T{ boa-coercer-test } ] unit-test
 

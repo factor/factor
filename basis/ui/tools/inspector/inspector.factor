@@ -33,7 +33,7 @@ M: inspector-renderer column-titles
             [
                 [
                     [ "Class:" write ] with-cell
-                    [ class pprint ] with-cell
+                    [ class-of pprint ] with-cell
                 ] with-row
             ]
             [
