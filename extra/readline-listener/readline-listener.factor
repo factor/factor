@@ -23,7 +23,7 @@ M: readline-reader prompt.
     all-words [ name>> ] map ;
 
 : vocab-names ( -- strs )
-    all-vocabs-recursive no-roots no-prefixes [ name>> ] map ;
+    all-vocabs-recursive filter-vocabs [ name>> ] map ;
 
 : prefixed-words ( prefix -- words )
     '[ _ head? ] word-names swap filter ;

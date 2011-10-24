@@ -90,7 +90,7 @@ PRIVATE>
     all-words name-completions ;
 
 : vocabs-matching ( str -- seq )
-    all-vocabs-recursive no-roots no-prefixes name-completions ;
+    all-vocabs-recursive filter-vocabs name-completions ;
 
 : chars-matching ( str -- seq )
     name-map keys dup zip completions ;

@@ -45,23 +45,28 @@ PRIVATE>
 : vocab-dir ( vocab -- dir )
     vocab-name { { CHAR: . CHAR: / } } substitute ;
 
-: vocab-dir+ ( vocab str/f -- path )
-    [ vocab-name "." split ] dip
+ERROR: absolute-path-forbidden path ;
+
+: forbid-absolute-path ( str -- str )
+    dup absolute-path? [ absolute-path-forbidden ] when ;
+
+: append-vocab-dir ( vocab str/f -- path )
+    [ vocab-name forbid-absolute-path "." split ] dip
     [ [ dup last ] dip append suffix ] when*
     "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
     vocab-name dup root-cache get at
-    [ ] [ ".factor" vocab-dir+ find-root-for ] ?if ;
+    [ ] [ ".factor" append-vocab-dir find-root-for ] ?if ;
 
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
 
 : vocab-source-path ( vocab -- path/f )
-    dup ".factor" vocab-dir+ vocab-append-path ;
+    dup ".factor" append-vocab-dir vocab-append-path ;
 
 : vocab-docs-path ( vocab -- path/f )
-    dup "-docs.factor" vocab-dir+ vocab-append-path ;
+    dup "-docs.factor" append-vocab-dir vocab-append-path ;
 
 SYMBOL: load-help?
 
