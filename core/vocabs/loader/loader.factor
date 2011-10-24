@@ -56,8 +56,8 @@ ERROR: absolute-path-forbidden path ;
     "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
-    vocab-name dup root-cache get at
-    [ ] [ ".factor" append-vocab-dir find-root-for ] ?if ;
+    vocab-name root-cache get
+    [ ".factor" append-vocab-dir find-root-for ] cache ;
 
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
