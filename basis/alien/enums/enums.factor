@@ -22,7 +22,7 @@ M: word enum>number "enum-value" word-prop ;
 PRIVATE>
 
 MACRO: number>enum ( enum-c-type -- )
-    c-type members>> enum-boxer ;
+    lookup-c-type members>> enum-boxer ;
 
 M: enum-c-type c-type-boxed-class drop object ;
 M: enum-c-type c-type-boxer-quot members>> enum-boxer ;
