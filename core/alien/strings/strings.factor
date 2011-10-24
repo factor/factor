@@ -67,5 +67,5 @@ M: array symbol>string [ (symbol>string) ] map ;
 [
      8 special-object utf8 alien>string string>cpu \ cpu set-global
      9 special-object utf8 alien>string string>os \ os set-global
-    67 special-object utf8 alien>string \ vm-compiler set-global
+    69 special-object utf8 alien>string \ vm-compiler set-global
 ] "alien.strings" add-startup-hook

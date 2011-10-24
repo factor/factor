@@ -92,7 +92,7 @@ CONSTANT: image-version 4
 
 CONSTANT: data-base 1024
 
-CONSTANT: special-objects-size 70
+CONSTANT: special-objects-size 80
 
 CONSTANT: header-size 10
 
@@ -184,26 +184,28 @@ SPECIAL-OBJECT: lazy-jit-compile-word 43
 SPECIAL-OBJECT: unwind-native-frames-word 44
 SPECIAL-OBJECT: fpu-state-word 45
 SPECIAL-OBJECT: set-fpu-state-word 46
+SPECIAL-OBJECT: signal-handler-word 47
+SPECIAL-OBJECT: leaf-signal-handler-word 48
 
-SPECIAL-OBJECT: callback-stub 48
+SPECIAL-OBJECT: callback-stub 50
 
 ! PIC stubs
-SPECIAL-OBJECT: pic-load 49
-SPECIAL-OBJECT: pic-tag 50
-SPECIAL-OBJECT: pic-tuple 51
-SPECIAL-OBJECT: pic-check-tag 52
-SPECIAL-OBJECT: pic-check-tuple 53
-SPECIAL-OBJECT: pic-hit 54
-SPECIAL-OBJECT: pic-miss-word 55
-SPECIAL-OBJECT: pic-miss-tail-word 56
+SPECIAL-OBJECT: pic-load 51
+SPECIAL-OBJECT: pic-tag 52
+SPECIAL-OBJECT: pic-tuple 53
+SPECIAL-OBJECT: pic-check-tag 54
+SPECIAL-OBJECT: pic-check-tuple 55
+SPECIAL-OBJECT: pic-hit 56
+SPECIAL-OBJECT: pic-miss-word 57
+SPECIAL-OBJECT: pic-miss-tail-word 58
 
 ! Megamorphic dispatch
-SPECIAL-OBJECT: mega-lookup 57
-SPECIAL-OBJECT: mega-lookup-word 58
-SPECIAL-OBJECT: mega-miss-word 59
+SPECIAL-OBJECT: mega-lookup 59
+SPECIAL-OBJECT: mega-lookup-word 60
+SPECIAL-OBJECT: mega-miss-word 61
 
 ! Default definition for undefined words
-SPECIAL-OBJECT: undefined-quot 60
+SPECIAL-OBJECT: undefined-quot 62
 
 : special-object-offset ( symbol -- n )
     special-objects get at header-size + ;
@@ -525,6 +527,8 @@ M: quotation '
     \ unwind-native-frames unwind-native-frames-word set
     \ fpu-state fpu-state-word set
     \ set-fpu-state set-fpu-state-word set
+    \ signal-handler signal-handler-word set
+    \ leaf-signal-handler leaf-signal-handler-word set
     undefined-def undefined-quot set ;
 
 : emit-special-objects ( -- )

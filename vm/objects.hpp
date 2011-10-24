@@ -1,7 +1,7 @@
 namespace factor
 {
 
-static const cell special_object_count = 70;
+static const cell special_object_count = 80;
 
 enum special_object {
 	OBJ_WALKER_HOOK = 3,       /* non-local exit hook, used by library only */
@@ -57,16 +57,18 @@ enum special_object {
 	UNWIND_NATIVE_FRAMES_WORD,
 	GET_FPU_STATE_WORD,
 	SET_FPU_STATE_WORD,
+	SIGNAL_HANDLER_WORD,
+	LEAF_SIGNAL_HANDLER_WORD,
 
 	/* Incremented on every modify-code-heap call; invalidates call( inline
 	caching */
-	REDEFINITION_COUNTER = 47,
+	REDEFINITION_COUNTER = 49,
 
 	/* Callback stub generation in callbacks.c */
-	CALLBACK_STUB = 48,
+	CALLBACK_STUB = 50,
 	
 	/* Polymorphic inline cache generation in inline_cache.c */
-	PIC_LOAD = 49,
+	PIC_LOAD = 51,
 	PIC_TAG,
 	PIC_TUPLE,
 	PIC_CHECK_TAG,
@@ -76,25 +78,25 @@ enum special_object {
 	PIC_MISS_TAIL_WORD,
 
 	/* Megamorphic cache generation in dispatch.c */
-	MEGA_LOOKUP = 57,
+	MEGA_LOOKUP = 59,
 	MEGA_LOOKUP_WORD,
 	MEGA_MISS_WORD,
 
-	OBJ_UNDEFINED = 60,       /* default quotation for undefined words */
+	OBJ_UNDEFINED = 62,       /* default quotation for undefined words */
 
-	OBJ_STDERR = 61,          /* stderr FILE* handle */
+	OBJ_STDERR = 63,          /* stderr FILE* handle */
 
-	OBJ_STAGE2 = 62,          /* have we bootstrapped? */
+	OBJ_STAGE2 = 64,          /* have we bootstrapped? */
 
-	OBJ_CURRENT_THREAD = 63,
+	OBJ_CURRENT_THREAD = 65,
 
-	OBJ_THREADS = 64,
-	OBJ_RUN_QUEUE = 65,
-	OBJ_SLEEP_QUEUE = 66,
+	OBJ_THREADS = 66,
+	OBJ_RUN_QUEUE = 67,
+	OBJ_SLEEP_QUEUE = 68,
 
-	OBJ_VM_COMPILER = 67,     /* version string of the compiler we were built with */
+	OBJ_VM_COMPILER = 69,     /* version string of the compiler we were built with */
 
-	OBJ_WAITING_CALLBACKS = 68,
+	OBJ_WAITING_CALLBACKS = 70,
 };
 
 /* save-image-and-exit discards special objects that are filled in on startup

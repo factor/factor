@@ -954,3 +954,7 @@ PRIVATE>
 
 : HWNT ( -- ) HEX: 2e , ; ! Hint branch Weakly Not Taken
 : HST  ( -- ) HEX: 3e , ; ! Hint branch Strongly Taken
+
+! interrupt instructions
+
+: INT ( n -- ) dup 3 = [ drop HEX: cc , ] [ HEX: cd , 1, ] if ;
