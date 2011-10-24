@@ -224,6 +224,6 @@ M: class metaclass-changed
 M: class forget* ( class -- )
     [ call-next-method ] [ forget-class ] bi ;
 
-GENERIC: class ( object -- class )
+GENERIC: class-of ( object -- class )
 
 GENERIC: instance? ( object class -- ? ) flushable

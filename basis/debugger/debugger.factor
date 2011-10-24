@@ -17,7 +17,7 @@ GENERIC: error-help ( error -- topic )
 
 M: object error-help drop f ;
 
-M: tuple error-help class ;
+M: tuple error-help class-of ;
 
 M: source-file-error error-help error>> error-help ;
 
@@ -89,7 +89,7 @@ M: string error. print ;
 : type-check-error. ( obj -- )
     "Type check error" print
     "Object: " write dup fourth short.
-    "Object type: " write dup fourth class .
+    "Object type: " write dup fourth class-of .
     "Expected type: " write third type>class . ;
 
 : divide-by-zero-error. ( obj -- )
@@ -176,7 +176,7 @@ M: no-method error.
     "Generic word " write
     dup generic>> pprint
     " does not define a method for the " write
-    dup object>> class pprint
+    dup object>> class-of pprint
     " class." print
     "Dispatching on object: " write object>> short. ;
 

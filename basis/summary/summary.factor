@@ -7,13 +7,13 @@ IN: summary
 GENERIC: summary ( object -- string )
 
 : object-summary ( object -- string )
-    class name>> ;
+    class-of name>> ;
 
 M: object summary object-summary ;
 
 M: sequence summary
     [
-        dup class name>> %
+        dup class-of name>> %
         " with " %
         length #
         " elements" %
@@ -21,7 +21,7 @@ M: sequence summary
 
 M: assoc summary
     [
-        dup class name>> %
+        dup class-of name>> %
         " with " %
         assoc-size #
         " entries" %

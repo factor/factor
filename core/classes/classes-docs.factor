@@ -33,7 +33,7 @@ $nl
 "Classes themselves form a class:"
 { $subsections class? }
 "You can ask an object for its class:"
-{ $subsections class }
+{ $subsections class-of }
 "Testing if an object is an instance of a class:"
 { $subsections instance? }
 "You can ask a class for its superclass:"
@@ -71,11 +71,11 @@ $nl
 
 ABOUT: "classes"
 
-HELP: class
+HELP: class-of
 { $values { "object" object } { "class" class } }
 { $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either its built-in class, or if the object is a tuple, its tuple class." }
 { $class-description "The class of all class words." }
-{ $examples { $example "USING: classes prettyprint ;" "1.0 class ." "float" } { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class ." "point" } } ;
+{ $examples { $example "USING: classes prettyprint ;" "1.0 class-of ." "float" } { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class-of ." "point" } } ;
 
 HELP: classes
 { $values { "seq" "a sequence of class words" } }

@@ -72,8 +72,8 @@ PRIVATE>
 <PRIVATE
 
 : heap-stat-step ( obj counts sizes -- )
-    [ [ class ] dip inc-at ]
-    [ [ [ size ] [ class ] bi ] dip at+ ] bi-curry* bi ;
+    [ [ class-of ] dip inc-at ]
+    [ [ [ size ] [ class-of ] bi ] dip at+ ] bi-curry* bi ;
 
 PRIVATE>
 

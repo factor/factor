@@ -57,7 +57,7 @@ CONSTANT: object-info T{ value-info f object full-interval }
 DEFER: <literal-info>
 
 : tuple-slot-infos ( tuple -- slots )
-    [ tuple-slots ] [ class all-slots ] bi
+    [ tuple-slots ] [ class-of all-slots ] bi
     [ read-only>> [ <literal-info> ] [ drop f ] if ] 2map
     f prefix ;
 
@@ -66,7 +66,7 @@ UNION: fixed-length array byte-array string ;
 : literal-class ( obj -- class )
     #! Handle forgotten tuples and singleton classes properly
     dup singleton-class? [
-        class dup class? [
+        class-of dup class? [
             drop tuple
         ] unless
     ] unless ;
@@ -75,7 +75,7 @@ UNION: fixed-length array byte-array string ;
     "slots" word-prop length 1 - f <array> swap prefix ;
 
 : slots-with-length ( seq -- slots )
-    [ length <literal-info> ] [ class ] bi (slots-with-length) ;
+    [ length <literal-info> ] [ class-of ] bi (slots-with-length) ;
 
 : init-literal-info ( info -- info )
     empty-interval >>interval

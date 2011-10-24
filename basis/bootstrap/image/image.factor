@@ -48,7 +48,7 @@ M: eql-wrapper hashcode* obj>> hashcode* ;
 GENERIC: (eql?) ( obj1 obj2 -- ? )
 
 : eql? ( obj1 obj2 -- ? )
-    { [ [ class ] bi@ = ] [ (eql?) ] } 2&& ;
+    { [ [ class-of ] bi@ = ] [ (eql?) ] } 2&& ;
 
 M: fixnum (eql?) eq? ;
 
@@ -440,11 +440,11 @@ ERROR: tuple-removed class ;
 
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]
-    [ class transfer-word require-tuple-layout ] bi prefix [ ' ] map
+    [ class-of transfer-word require-tuple-layout ] bi prefix [ ' ] map
     tuple [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
-    dup class name>> "tombstone" =
+    dup class-of name>> "tombstone" =
     [ [ (emit-tuple) ] cache-eql-object ]
     [ [ (emit-tuple) ] cache-eq-object ]
     if ;

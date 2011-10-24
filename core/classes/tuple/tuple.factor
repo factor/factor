@@ -27,14 +27,14 @@ PREDICATE: immutable-tuple-class < tuple-class
 : layout-of ( tuple -- layout )
     1 slot { array } declare ; inline
 
-M: tuple class layout-of 2 slot { word } declare ; inline
+M: tuple class-of layout-of 2 slot { word } declare ; inline
 
 : tuple-size ( tuple -- size )
     layout-of 3 slot { fixnum } declare ; inline
 
 : layout-up-to-date? ( object -- ? )
     dup tuple?
-    [ [ layout-of ] [ class tuple-layout ] bi eq? ] [ drop t ] if ;
+    [ [ layout-of ] [ class-of tuple-layout ] bi eq? ] [ drop t ] if ;
 
 : check-tuple ( object -- tuple )
     dup tuple? [ not-a-tuple ] unless ; inline
@@ -196,7 +196,7 @@ SYMBOL: outdated-tuples
 
 : outdated-tuple? ( tuple assoc -- ? )
     [ [ layout-of ] dip key? ]
-    [ drop class "forgotten" word-prop not ]
+    [ drop class-of "forgotten" word-prop not ]
     2bi and ;
 
 : update-tuples ( -- )
@@ -356,7 +356,7 @@ M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
 : tuple-hashcode ( depth obj -- hash )
     [
         [ drop 1000003 ] dip
-        [ class hashcode ] [ tuple-size ] bi
+        [ class-of hashcode ] [ tuple-size ] bi
         [ dup fixnum+fast 82520 fixnum+fast ] [ iota ] bi
     ] 2keep [
         swapd array-nth hashcode* >fixnum rot fixnum-bitxor
