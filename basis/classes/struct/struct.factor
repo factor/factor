@@ -173,7 +173,8 @@ TUPLE: struct-c-type < abstract-c-type
 
 INSTANCE: struct-c-type value-type
 
-M: struct-c-type c-type ;
+! M: struct-c-type c-type ;
+M: struct-c-type lookup-c-type ;
 
 M: struct-c-type base-type ;
 
@@ -274,7 +275,7 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
     bi ;
 
 : check-struct-slots ( slots -- )
-    [ type>> c-type drop ] each ;
+    [ type>> lookup-c-type drop ] each ;
 
 : redefine-struct-tuple-class ( class -- )
     [ struct f define-tuple-class ] [ make-final ] bi ;
@@ -318,7 +319,7 @@ PRIVATE>
 ERROR: invalid-struct-slot token ;
 
 : struct-slot-class ( c-type -- class' )
-    c-type c-type-boxed-class
+    lookup-c-type c-type-boxed-class
     dup \ byte-array = [ drop \ c-ptr ] when ;
 
 M: struct-class reset-class

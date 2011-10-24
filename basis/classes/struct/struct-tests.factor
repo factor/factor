@@ -229,7 +229,7 @@ UNION-STRUCT: struct-test-float-and-bits
         { type bool }
         { class object }
     }
-} ] [ struct-test-foo c-type fields>> ] unit-test
+} ] [ struct-test-foo lookup-c-type fields>> ] unit-test
 
 [ {
     T{ struct-slot-spec
@@ -246,7 +246,7 @@ UNION-STRUCT: struct-test-float-and-bits
         { class $[ cell 4 = integer fixnum ? ] }
         { initial 0 }
     }
-} ] [ struct-test-float-and-bits c-type fields>> ] unit-test
+} ] [ struct-test-float-and-bits lookup-c-type fields>> ] unit-test
 
 STRUCT: struct-test-equality-1
     { x int } ;
