@@ -28,7 +28,6 @@ $nl
 { $subsections
     vocab
     child-vocabs
-    parent-vocabs
     create-vocab
 }
 "Getting words from a vocabulary:"
@@ -95,16 +94,6 @@ HELP: child-vocabs
     { $unchecked-example
         "\"io.streams\" child-vocabs ."
         "{ \"io.streams.c\" \"io.streams.duplex\" \"io.streams.lines\" \"io.streams.nested\" \"io.streams.plain\" \"io.streams.string\" }"
-    }
-} ;
-
-HELP: parent-vocabs
-{ $values { "vocab" "a vocabulary specifier" } { "seq" "a sequence of strings" } }
-{ $description "Outputs all vocabularies which are conceptually above " { $snippet "vocab" } " in the hierarchy." }
-{ $examples
-    { $unchecked-example
-        "\"io.files.info\" parent-vocabs ."
-        "{ \"io\" \"io.files\" \"io.files.info\" }"
     }
 } ;
 
