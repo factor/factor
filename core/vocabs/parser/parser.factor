@@ -221,17 +221,17 @@ M: extra-words update trim-forgotten ;
 M: exclude update trim-forgotten ;
 
 M: qualified update
-    dup vocab>> vocab [
+    dup vocab>> lookup-vocab [
         dup [ prefix>> ] [ vocab>> load-vocab ] bi qualified-words
         >>words
     ] [ drop f ] if ;
 
-M: vocab update dup name>> vocab eq? ;
+M: vocab update dup name>> lookup-vocab eq? ;
 
 : update-manifest ( manifest -- )
-    [ dup [ name>> vocab ] when ] change-current-vocab
-    [ [ drop vocab ] assoc-filter ] change-search-vocab-names
-    dup search-vocab-names>> keys [ vocab ] V{ } map-as >>search-vocabs
+    [ dup [ name>> lookup-vocab ] when ] change-current-vocab
+    [ [ drop lookup-vocab ] assoc-filter ] change-search-vocab-names
+    dup search-vocab-names>> keys [ lookup-vocab ] V{ } map-as >>search-vocabs
     qualified-vocabs>> [ update ] filter! drop ;
 
 M: manifest definitions-changed ( assoc manifest -- )

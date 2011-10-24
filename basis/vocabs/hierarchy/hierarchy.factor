@@ -87,7 +87,7 @@ PRIVATE>
 
 : child-vocabs ( prefix -- assoc )
     [ [ vocab-roots get ] dip '[ dup _ (child-vocabs) ] { } map>assoc ]
-    [ unrooted-child-vocabs [ vocab ] map f swap 2array ]
+    [ unrooted-child-vocabs [ lookup-vocab ] map f swap 2array ]
     bi suffix ;
 
 : all-vocabs ( -- assoc )
@@ -95,7 +95,7 @@ PRIVATE>
 
 : child-vocabs-recursive ( prefix -- assoc )
     [ [ vocab-roots get ] dip '[ dup _ (child-vocabs-recursive) ] { } map>assoc ]
-    [ unrooted-child-vocabs-recursive [ vocab ] map f swap 2array ]
+    [ unrooted-child-vocabs-recursive [ lookup-vocab ] map f swap 2array ]
     bi suffix ;
 
 MEMO: all-vocabs-recursive ( -- assoc )

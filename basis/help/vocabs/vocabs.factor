@@ -12,7 +12,7 @@ FROM: vocabs.hierarchy => child-vocabs ;
 IN: help.vocabs
 
 : about ( vocab -- )
-    [ require ] [ vocab help ] bi ;
+    [ require ] [ lookup-vocab help ] bi ;
 
 : vocab-row ( vocab -- row )
     [ <$pretty-link> ] [ vocab-summary ] bi 2array ;
@@ -226,7 +226,7 @@ C: <vocab-author> vocab-author
 
 : describe-words ( vocab -- )
     {
-        { [ dup vocab ] [ words $words ] }
+        { [ dup lookup-vocab ] [ words $words ] }
         { [ dup find-vocab-root ] [ vocab-is-not-loaded ] }
         [ drop ]
     } cond ;

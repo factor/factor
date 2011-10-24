@@ -35,17 +35,17 @@ M: vocab-link vocab-name name>> ;
 
 M: string vocab-name ;
 
-GENERIC: vocab ( vocab-spec -- vocab )
+GENERIC: lookup-vocab ( vocab-spec -- vocab )
 
-M: vocab vocab ;
+M: vocab lookup-vocab ;
 
-M: object vocab ( name -- vocab ) vocab-name dictionary get at ;
+M: object lookup-vocab ( name -- vocab ) vocab-name dictionary get at ;
 
 GENERIC: vocab-words ( vocab-spec -- words )
 
 M: vocab vocab-words words>> ;
 
-M: object vocab-words vocab vocab-words ;
+M: object vocab-words lookup-vocab vocab-words ;
 
 M: f vocab-words ;
 
@@ -53,7 +53,7 @@ GENERIC: vocab-help ( vocab-spec -- help )
 
 M: vocab vocab-help help>> ;
 
-M: object vocab-help vocab vocab-help ;
+M: object vocab-help lookup-vocab vocab-help ;
 
 M: f vocab-help ;
 
@@ -61,7 +61,7 @@ GENERIC: vocab-main ( vocab-spec -- main )
 
 M: vocab vocab-main main>> ;
 
-M: object vocab-main vocab vocab-main ;
+M: object vocab-main lookup-vocab vocab-main ;
 
 M: f vocab-main ;
 
@@ -115,7 +115,7 @@ GENERIC: >vocab-link ( name -- vocab )
 
 M: vocab-spec >vocab-link ;
 
-M: string >vocab-link dup vocab [ ] [ <vocab-link> ] ?if ;
+M: string >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
 
 : forget-vocab ( vocab -- )
     [ words forget-all ]

@@ -108,7 +108,7 @@ SYMBOL: vocab-articles
     ] each ;
 
 : vocab-exists? ( name -- ? )
-    [ vocab ] [ all-vocabs get member? ] bi or ;
+    [ lookup-vocab ] [ all-vocabs get member? ] bi or ;
 
 : check-modules ( element -- )
     \ $vocab-link swap elements [

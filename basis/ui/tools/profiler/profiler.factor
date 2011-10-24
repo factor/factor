@@ -95,7 +95,7 @@ M: method-renderer column-titles drop { "" "Method" "Count" } ;
     [ <model> ] dip <profiler-model> [ f prefix ] <arrow> ;
 
 : <vocabs-model> ( profiler -- model )
-    [ vocab-counters [ [ vocab ] dip ] assoc-map ] dip
+    [ vocab-counters [ [ lookup-vocab ] dip ] assoc-map ] dip
     <profiler-filter-model> ;
 
 : <generic-model> ( profiler -- model )

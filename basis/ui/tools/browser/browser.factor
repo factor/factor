@@ -79,7 +79,7 @@ M: browser-gadget handle-gesture
     {
         [ key? ]
         [ [ dup word-link? [ name>> ] when ] dip key? ]
-        [ [ dup vocab-link? [ vocab ] when ] dip key? ]
+        [ [ dup vocab-link? [ lookup-vocab ] when ] dip key? ]
     } 2|| ;
 
 M: browser-gadget definitions-changed ( assoc browser -- )

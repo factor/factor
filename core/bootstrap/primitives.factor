@@ -32,7 +32,7 @@ architecture get {
 ! Now we have ( syntax-quot arch-quot layouts-quot ) on the stack
 
 ! Bring up a bare cross-compiling vocabulary.
-"syntax" vocab vocab-words bootstrap-syntax set
+"syntax" lookup-vocab vocab-words bootstrap-syntax set
 
 H{ } clone dictionary set
 H{ } clone root-cache set

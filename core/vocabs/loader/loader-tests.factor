@@ -16,7 +16,7 @@ IN: vocabs.loader.tests
 [ "vocabs.loader.test" >vocab-link ] unit-test
 
 [ t ]
-[ "kernel" >vocab-link "kernel" vocab = ] unit-test
+[ "kernel" >vocab-link "kernel" lookup-vocab = ] unit-test
 
 IN: vocabs.loader.test.2
 
@@ -28,7 +28,7 @@ IN: vocabs.loader.tests
 
 [ ] [
     "vocabs.loader.test.2" run
-    "vocabs.loader.test.2" vocab run
+    "vocabs.loader.test.2" lookup-vocab run
     "vocabs.loader.test.2" <vocab-link> run
 ] unit-test
 
@@ -42,7 +42,7 @@ IN: vocabs.loader.tests
 2 [
     [ "vocabs.loader.test.a" require ] must-fail
     
-    [ f ] [ "vocabs.loader.test.a" vocab source-loaded?>> ] unit-test
+    [ f ] [ "vocabs.loader.test.a" lookup-vocab source-loaded?>> ] unit-test
     
     [ t ] [
         "resource:core/vocabs/loader/test/a/a.factor"
@@ -111,7 +111,7 @@ IN: vocabs.loader.tests
 [ "kernel" <vocab-link> where ] unit-test
 
 [ { "resource:core/kernel/kernel.factor" 1 } ]
-[ "kernel" vocab where ] unit-test
+[ "kernel" lookup-vocab where ] unit-test
 
 [ ] [
     [
@@ -122,7 +122,7 @@ IN: vocabs.loader.tests
 
 [ +done+ ] [
     [ "vocabs.loader.test.d" require ] [ :1 ] recover
-    "vocabs.loader.test.d" vocab source-loaded?>>
+    "vocabs.loader.test.d" lookup-vocab source-loaded?>>
 ] unit-test
 
 : forget-junk ( -- )
@@ -172,18 +172,18 @@ forget-junk
 [ ] [ [ "vocabs.loader.test.j" require ] [ drop :1 ] recover ] unit-test
 
 [ ] [ "vocabs.loader.test.m" require ] unit-test
-[ f ] [ "vocabs.loader.test.n" vocab ] unit-test
+[ f ] [ "vocabs.loader.test.n" lookup-vocab ] unit-test
 [ ] [ "vocabs.loader.test.o" require ] unit-test
-[ t ] [ "vocabs.loader.test.n" vocab >boolean ] unit-test
+[ t ] [ "vocabs.loader.test.n" lookup-vocab >boolean ] unit-test
 
 [
     "mno" [ "vocabs.loader.test." swap suffix forget-vocab ] each
 ] with-compilation-unit
 
 [ ] [ "vocabs.loader.test.o" require ] unit-test
-[ f ] [ "vocabs.loader.test.n" vocab ] unit-test
+[ f ] [ "vocabs.loader.test.n" lookup-vocab ] unit-test
 [ ] [ "vocabs.loader.test.m" require ] unit-test
-[ t ] [ "vocabs.loader.test.n" vocab >boolean ] unit-test
+[ t ] [ "vocabs.loader.test.n" lookup-vocab >boolean ] unit-test
 
 [
     "mno" [ "vocabs.loader.test." swap suffix forget-vocab ] each

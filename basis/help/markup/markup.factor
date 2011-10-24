@@ -269,7 +269,7 @@ PRIVATE>
     [ [ ($link) ] textual-list ] ($span) ;
 
 : $vocab-links ( vocabs -- )
-    [ vocab ] map $links ;
+    [ lookup-vocab ] map $links ;
 
 : $breadcrumbs ( topics -- )
     [ [ ($link) ] " > " (textual-list) ] ($span) ;
