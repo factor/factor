@@ -124,7 +124,7 @@ callback-error-hook [ [ die ] ] initialize
     catchstack* [
         in-callback?
         [ callback-error-hook get-global call( error -- * ) ]
-        [ 63 special-object error-in-thread ]
+        [ 65 special-object error-in-thread ]
         if
     ] [ pop continue-with ] if-empty ;
 
@@ -190,8 +190,8 @@ M: condition compute-restarts
     init-catchstack
     ! VM calls on error
     [
-        ! 63 = self
-        63 special-object error-thread set-global
+        ! 65 = self
+        65 special-object error-thread set-global
         continuation error-continuation set-global
         [ original-error set-global ] [ rethrow ] bi
     ] 5 set-special-object

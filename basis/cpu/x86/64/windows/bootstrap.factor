@@ -9,6 +9,7 @@ DEFER: stack-reg
 
 : stack-frame-size ( -- n ) 8 bootstrap-cells ;
 : nv-regs ( -- seq ) { RBX RSI RDI R12 R13 R14 R15 } ;
+: volatile-regs ( -- seq ) { RAX RCX RDX R8 R9 R10 R11 } ;
 : arg1 ( -- reg ) RCX ;
 : arg2 ( -- reg ) RDX ;
 : arg3 ( -- reg ) R8 ;

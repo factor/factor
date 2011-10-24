@@ -7,6 +7,7 @@ IN: bootstrap.x86
 
 : stack-frame-size ( -- n ) 4 bootstrap-cells ;
 : nv-regs ( -- seq ) { RBX R12 R13 R14 R15 } ;
+: volatile-regs ( -- seq ) { RAX RCX RDX RSI RDI R8 R9 R10 R11 } ;
 : arg1 ( -- reg ) RDI ;
 : arg2 ( -- reg ) RSI ;
 : arg3 ( -- reg ) RDX ;
