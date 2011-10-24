@@ -23,7 +23,7 @@ HELP: no-c-type
 { $description "Throws a " { $link no-c-type } " error." }
 { $error-description "Thrown by " { $link c-type } " if a given word is not a C type." } ;
 
-HELP: c-type
+HELP: lookup-c-type
 { $values { "name" c-type-name } { "c-type" c-type } }
 { $description "Looks up a C type by name." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist, or the word is not a C type." } ;
@@ -172,6 +172,8 @@ $nl
     POSTPONE: CALLBACK:
     POSTPONE: TYPEDEF:
 }
+"Getting the c-type of a class:"
+{ $subsections lookup-c-type }
 { $heading "Related articles" }
 { $subsections
     "c-types.primitives"

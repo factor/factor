@@ -7,7 +7,7 @@ IN: alien.arrays
 
 INSTANCE: array value-type
 
-M: array c-type ;
+M: array lookup-c-type ;
 
 M: array c-type-class drop object ;
 
@@ -27,7 +27,7 @@ M: array base-type drop void* base-type ;
 PREDICATE: string-type < pair
     first2 [ c-string = ] [ word? ] bi* and ;
 
-M: string-type c-type ;
+M: string-type lookup-c-type ;
 
 M: string-type c-type-class drop object ;
 

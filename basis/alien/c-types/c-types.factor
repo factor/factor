@@ -42,7 +42,7 @@ ERROR: no-c-type word ;
 M: no-c-type summary drop "Not a C type" ;
 
 ! C type protocol
-GENERIC: c-type ( name -- c-type ) foldable
+GENERIC: lookup-c-type ( name -- c-type ) foldable
 
 PREDICATE: c-type-word < word
     "c-type" word-prop ;
@@ -55,11 +55,12 @@ UNION: c-type-name
 
 : resolve-typedef ( name -- c-type )
     dup void? [ no-c-type ] when
-    dup c-type-name? [ c-type ] when ;
+    dup c-type-name? [ lookup-c-type ] when ;
 
-M: word c-type
+M: word lookup-c-type
     dup "c-type" word-prop resolve-typedef
     [ ] [ no-c-type ] ?if ;
+
 
 GENERIC: c-type-class ( name -- class )
 
@@ -103,7 +104,7 @@ M: abstract-c-type c-type-align-first align-first>> ;
 
 GENERIC: base-type ( c-type -- c-type )
 
-M: c-type-name base-type c-type ;
+M: c-type-name base-type lookup-c-type ;
 
 M: c-type base-type ;
 
@@ -148,7 +149,7 @@ PROTOCOL: c-type-protocol
     heap-size ;
 
 CONSULT: c-type-protocol c-type-name
-    c-type ;
+    lookup-c-type ;
 
 PREDICATE: typedef-word < c-type-word
     "c-type" word-prop [ c-type-name? ] [ array? ] bi or ;
@@ -212,8 +213,8 @@ CONSTANT: primitive-types
 
 PRIVATE>
 
-M: pointer c-type
-    [ \ void* c-type ] dip
+M: pointer lookup-c-type
+    [ \ void* lookup-c-type ] dip
     to>> dup primitive-pointer-type? [ drop ] [ (pointer-c-type) ] if ;
 
 [
@@ -363,18 +364,18 @@ M: pointer c-type
         \ ulonglong typedef
 
         os windows? [
-            \ int c-type \ long typedef
-            \ uint c-type \ ulong typedef
+            \ int lookup-c-type \ long typedef
+            \ uint lookup-c-type \ ulong typedef
         ] [
-            \ longlong c-type \ long typedef
-            \ ulonglong c-type \ ulong typedef
+            \ longlong lookup-c-type \ long typedef
+            \ ulonglong lookup-c-type \ ulong typedef
         ] if
 
-        \ longlong c-type \ ptrdiff_t typedef
-        \ longlong c-type \ intptr_t typedef
+        \ longlong lookup-c-type \ ptrdiff_t typedef
+        \ longlong lookup-c-type \ intptr_t typedef
 
-        \ ulonglong c-type \ uintptr_t typedef
-        \ ulonglong c-type \ size_t typedef
+        \ ulonglong lookup-c-type \ uintptr_t typedef
+        \ ulonglong lookup-c-type \ size_t typedef
     ] [
         <c-type>
             integer >>class
@@ -426,17 +427,17 @@ M: pointer c-type
             [ >integer ] >>unboxer-quot
         \ ulonglong typedef
 
-        \ int c-type \ long typedef
-        \ uint c-type \ ulong typedef
+        \ int lookup-c-type \ long typedef
+        \ uint lookup-c-type \ ulong typedef
 
-        \ int c-type \ ptrdiff_t typedef
-        \ int c-type \ intptr_t typedef
+        \ int lookup-c-type \ ptrdiff_t typedef
+        \ int lookup-c-type \ intptr_t typedef
 
-        \ uint c-type \ uintptr_t typedef
-        \ uint c-type \ size_t typedef
+        \ uint lookup-c-type \ uintptr_t typedef
+        \ uint lookup-c-type \ size_t typedef
     ] if
 
-    cpu ppc? os macosx? and \ uint \ uchar ? c-type clone
+    cpu ppc? os macosx? and \ uint \ uchar ? lookup-c-type clone
         [ >c-bool ] >>unboxer-quot
         [ c-bool> ] >>boxer-quot
         object >>boxed-class

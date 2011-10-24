@@ -24,7 +24,7 @@ TUPLE: alien-assembly-params < alien-node-params { quot callable } ;
 TUPLE: alien-callback-params < alien-node-params xt ;
 
 : param-prep-quot ( params -- quot )
-    parameters>> [ c-type c-type-unboxer-quot ] map deep-spread>quot ;
+    parameters>> [ lookup-c-type c-type-unboxer-quot ] map deep-spread>quot ;
 
 : alien-stack ( params extra -- )
     over parameters>> length + consume-d >>in-d
@@ -32,7 +32,7 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     drop ;
 
 : return-prep-quot ( params -- quot )
-    return>> [ [ ] ] [ c-type c-type-boxer-quot ] if-void ;
+    return>> [ [ ] ] [ lookup-c-type c-type-boxer-quot ] if-void ;
 
 : infer-return ( params -- )
     return-prep-quot infer-quot-here ;
@@ -112,10 +112,10 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     xt>> '[ _ callback-xt { alien } declare ] infer-quot-here ;
 
 : callback-return-quot ( ctype -- quot )
-    return>> [ [ ] ] [ c-type c-type-unboxer-quot ] if-void ;
+    return>> [ [ ] ] [ lookup-c-type c-type-unboxer-quot ] if-void ;
 
 : callback-parameter-quot ( params -- quot )
-    parameters>> [ c-type ] map
+    parameters>> [ lookup-c-type ] map
     [ [ c-type-class ] map '[ _ declare ] ]
     [ [ c-type-boxer-quot ] map deep-spread>quot ]
     bi append ;
