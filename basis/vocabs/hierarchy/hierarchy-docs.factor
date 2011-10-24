@@ -1,13 +1,16 @@
-USING: help.markup help.syntax strings vocabs.loader ;
+USING: help.markup help.syntax strings vocabs.loader
+sequences ;
 IN: vocabs.hierarchy
 
 ARTICLE: "vocabs.hierarchy" "Vocabulary hierarchy tools"
-"These tools operate on all vocabularies found in the current set of " { $link vocab-roots } ", loaded or not."
+"These tools operate on all vocabularies found in the current set of " { $link vocab-roots } ", loaded or not. A prefix is the first part of a vocabulary name."
 $nl
 "Loading vocabulary hierarchies:"
 { $subsections
     load
     load-all
+    load-root
+    load-from-root
 }
 "Getting all vocabularies from disk:"
 { $subsections
@@ -23,6 +26,7 @@ $nl
 { $subsections
     no-roots
     no-prefixes
+    filter-vocabs
 }
 "Getting " { $link "vocabs.metadata" } " for all vocabularies from disk:"
 { $subsections
@@ -40,3 +44,14 @@ HELP: load
 HELP: load-all
 { $description "Load all vocabularies in the source tree." } ;
 
+HELP: load-from-root
+{ $values
+    { "root" "a vocaulary root" } { "prefix" string }
+}
+{ $description "Attempts to load all of the vocabularies with a certain prefix from a vocabulary root." } ;
+
+HELP: load-root
+{ $values
+    { "root" "a vocabulary root" }
+}
+{ $description "Attempts to load all of the vocabularies in a vocabulary root." } ;

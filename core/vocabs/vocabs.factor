@@ -111,12 +111,6 @@ ERROR: no-vocab name ;
 : child-vocabs ( vocab -- seq )
     vocab-name vocabs [ child-vocab? ] with filter ;
 
-: parent-vocab? ( suffix name -- ? )
-    swap child-vocab? ;
-
-: parent-vocabs ( vocab -- seq )
-    vocab-name vocabs [ parent-vocab? ] with filter ;
-
 GENERIC: >vocab-link ( name -- vocab )
 
 M: vocab-spec >vocab-link ;

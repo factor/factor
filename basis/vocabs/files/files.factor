@@ -5,7 +5,7 @@ sequences vocabs.loader ;
 IN: vocabs.files
 
 : vocab-tests-file ( vocab -- path )
-    dup "-tests.factor" vocab-dir+ vocab-append-path dup
+    dup "-tests.factor" append-vocab-dir vocab-append-path dup
     [ dup exists? [ drop f ] unless ] [ drop f ] if ;
 
 : vocab-tests-dir ( vocab -- paths )

@@ -8,6 +8,3 @@ IN: vocabs.tests
 [ t ] [ "" "io.files" child-vocab? ] unit-test
 [ t ] [ "io" "io.files" child-vocab? ] unit-test
 [ f ] [ "io.files" "io" child-vocab? ] unit-test
-
-[ t ] [ "io.files" "io" parent-vocab? ] unit-test
-[ f ] [ "io" "io.files" parent-vocab? ] unit-test
