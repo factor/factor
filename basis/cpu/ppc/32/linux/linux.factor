@@ -20,8 +20,8 @@ M: ppc param-regs
     } ;
 
 M: ppc value-struct?
-    c-type [ complex-double c-type = ]
-    [ complex-float c-type = ] bi or ;
+    lookup-c-type [ complex-double lookup-c-type = ]
+    [ complex-float lookup-c-type = ] bi or ;
 
 M: ppc dummy-stack-params? f ;
 
@@ -37,10 +37,10 @@ M: ppc float-right-align-on-stack? f ;
 
 M: ppc flatten-struct-type ( type -- seq )
     {
-        { [ dup c-type complex-double c-type = ]
+        { [ dup lookup-c-type complex-double lookup-c-type = ]
           [ drop { { int-rep f f } { int-rep f f }
                    { int-rep f f } { int-rep f f } } ] }
-        { [ dup c-type complex-float c-type = ]
+        { [ dup lookup-c-type complex-float lookup-c-type = ]
           [ drop { { int-rep f f } { int-rep f f } } ] }
         [ call-next-method [ first t f 3array ] map ]
     } cond ;

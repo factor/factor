@@ -32,9 +32,9 @@ SYMBOLS: CUdouble CUlonglong CUulonglong ;
 : always-8-byte-align ( c-type -- c-type )
     8 >>align 8 >>align-first ;
 
-longlong  c-type clone always-8-byte-align \ CUlonglong  typedef
-ulonglong c-type clone always-8-byte-align \ CUulonglong typedef
-double    c-type clone always-8-byte-align \ CUdouble    typedef
+longlong  lookup-c-type clone always-8-byte-align \ CUlonglong  typedef
+ulonglong lookup-c-type clone always-8-byte-align \ CUulonglong typedef
+double    lookup-c-type clone always-8-byte-align \ CUdouble    typedef
 >>
 
 STRUCT: CUuuid
