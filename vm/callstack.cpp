@@ -18,35 +18,37 @@ callstack *factor_vm::allot_callstack(cell size)
 	return stack;
 }
 
-void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell newpc)
+void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 {
 	/* True stack frames are always 16-byte aligned. Leaf procedures
 	that don't create a stack frame will be out of alignment by sizeof(cell)
 	bytes. */
+	/* XXX horribly x86-centric */
+
 	cell offset = *sp % 16;
-	if (offset == 0) {
+
+	tagged<word> handler_word = tagged<word>(special_objects[SIGNAL_HANDLER_WORD]);
+	if (offset == 0)
+	{
 		signal_from_leaf = false;
-		cell newsp = *sp - sizeof(cell);
-		*sp = newsp;
-		*(cell*)newsp = *pc;
-		*pc = newpc;
-		ctx->callstack_top = (stack_frame*)newsp;
-	} else if (offset == 16 - sizeof(cell)) {
-		dispatch_signal_handler_from_leaf(sp, pc, newpc);
-	} else {
+	}
+	else if (offset == 16 - sizeof(cell))
+	{
+		signal_from_leaf = true;
+		handler_word = tagged<word>(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
+	}
+	else
+	{
 		fatal_error("Invalid stack frame during signal handler", *sp);
 	}
-}
 
-void factor_vm::dispatch_signal_handler_from_leaf(cell *sp, cell *pc, cell newpc)
-{
-	/* We should try to conjure a stack frame here, but we may need to deal
-	with callstack overflows or the GC moving code around.
-	For now leave the stack untouched so the signal handler returns into
-	the parent procedure. This will cause things to blow up if the stack
-	is left unbalanced. */
-	signal_from_leaf = true;
-	*pc = newpc;
+	/* Push the original PC as a return address and the C handler function
+	* pointer as an argument to the signal handler stub. */
+	cell newsp = *sp - 2*sizeof(cell);
+	*sp = newsp;
+	*(cell*)(newsp + sizeof(cell)) = *pc;
+	*(cell*)newsp = handler;
+	*pc = (cell)handler_word->code->entry_point();
 }
 
 /* We ignore the two topmost frames, the 'callstack' primitive
