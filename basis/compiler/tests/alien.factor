@@ -466,7 +466,7 @@ STRUCT: double-rect
 [
     1.0 2.0 3.0 4.0 <double-rect>
     double-rect-callback double-rect-test
-    [ >c-ptr class ] [ >double-rect< ] bi
+    [ >c-ptr class-of ] [ >double-rect< ] bi
 ] unit-test
 
 STRUCT: test_struct_14

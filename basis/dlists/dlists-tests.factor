@@ -53,9 +53,9 @@ IN: dlists.tests
 [ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-empty? ] unit-test
 [ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-empty? ] unit-test
 
-[ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 4 = ] dlist-find-node class dlist-node = ] unit-test
-[ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 5 = ] dlist-find-node class dlist-node = ] unit-test
-[ t ] [ <dlist> 4 over push-back 5 over push-back* [ = ] curry dlist-find-node class dlist-node = ] unit-test
+[ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 4 = ] dlist-find-node class-of dlist-node = ] unit-test
+[ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 5 = ] dlist-find-node class-of dlist-node = ] unit-test
+[ t ] [ <dlist> 4 over push-back 5 over push-back* [ = ] curry dlist-find-node class-of dlist-node = ] unit-test
 [ ] [ <dlist> 4 over push-back 5 over push-back [ drop ] dlist-each ] unit-test
 
 [ <dlist> peek-front ] [ empty-dlist? ] must-fail-with

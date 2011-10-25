@@ -608,7 +608,7 @@ literal: offset rep c-type ;
 ! Memory allocation
 FLUSHABLE-INSN: ##allot
 def: dst/tagged-rep
-literal: size class
+literal: size class-of
 temp: temp/int-rep ;
 
 VREG-INSN: ##write-barrier

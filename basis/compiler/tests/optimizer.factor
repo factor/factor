@@ -431,7 +431,7 @@ M: object bad-dispatch-position-test* ;
 [ -1 ] [ 3 4 0 dispatch-branch-problem ] unit-test
 [ 12 ] [ 3 4 1 dispatch-branch-problem ] unit-test
 
-[ 1024 bignum ] [ 10 [ 1 >bignum swap >fixnum shift ] compile-call dup class ] unit-test
+[ 1024 bignum ] [ 10 [ 1 >bignum swap >fixnum shift ] compile-call dup class-of ] unit-test
 
 TUPLE: grid-mesh-tuple { length read-only } { step read-only } ;
 

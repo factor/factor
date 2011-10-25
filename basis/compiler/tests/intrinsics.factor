@@ -325,7 +325,7 @@ ERROR: bug-in-fixnum* x y a b ;
 
 : compiled-fixnum>bignum ( a -- b ) fixnum>bignum ;
 
-[ bignum ] [ 0 compiled-fixnum>bignum class ] unit-test
+[ bignum ] [ 0 compiled-fixnum>bignum class-of ] unit-test
 
 [ ] [
     10000 [
