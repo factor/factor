@@ -18,6 +18,7 @@ callstack *factor_vm::allot_callstack(cell size)
 	return stack;
 }
 
+// XXX move somewhere more appropriate
 struct word_finder {
 	cell address;
 	cell found_word;
@@ -49,47 +50,72 @@ static cell find_word_for_address(factor_vm *vm, cell pc)
 
 void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 {
-	/* True stack frames are always 16-byte aligned. Leaf procedures
-	that don't create a stack frame will be out of alignment by sizeof(cell)
-	bytes. */
-	/* XXX horribly x86-centric */
-	/* XXX check if exception came from C code */
-	/* XXX handle callstack overflow */
-
-	cell offset = *sp % 16;
-
-	signal_handler_addr = handler;
-	tagged<word> handler_word = tagged<word>(special_objects[SIGNAL_HANDLER_WORD]);
-	if (offset == 0)
+	if (!code->seg->in_segment_p(*pc) || *sp < ctx->callstack_seg->start + stack_reserved)
 	{
-		// should use FRAME_RETURN_ADDRESS here to be platform-agnostic
-		signal_from_leaf = false;
-		cell newsp = *sp - sizeof(cell);
+		/* Fault came from foreign code, a callstack overflow, or we would probably
+		overflow if we tried the resumable handler. We can't resume, so cut the
+		callstack down to the shallowest Factor stack frame that leaves room for
+		the signal handler to do its thing and launch the handler without going
+		through the resumable subprimitive. */
+		signal_resumable = false;
+		stack_frame *frame = ctx->callstack_bottom - 1;
+
+		while((cell)frame >= *sp
+			&& frame >= ctx->callstack_top
+			&& (cell)frame >= ctx->callstack_seg->start + stack_reserved)
+		{
+			frame = frame_successor(frame);
+		}
+
+		// XXX FRAME_RETURN_ADDRESS
+		cell newsp = (cell)(frame+1);
 		*sp = newsp;
-		*(cell*)newsp = *pc;
-	}
-	// should check the PC since leaf procs on RISC architectures won't touch the
-	// stack at all
-	else if (offset == 16 - sizeof(cell))
-	{
-		signal_from_leaf = true;
+		ctx->callstack_top = (stack_frame*)newsp;
+		*pc = handler;
+	} else {
+		signal_resumable = true;
+		// Fault came from Factor, and we've got a good callstack. Route the signal
+		// handler through the resumable signal handler subprimitive.
+		cell offset = *sp % 16;
 
-		// Make a fake frame for the leaf procedure
-		cell leaf_word = find_word_for_address(this, *pc);
+		signal_handler_addr = handler;
+		tagged<word> handler_word = tagged<word>(special_objects[SIGNAL_HANDLER_WORD]);
 
-		cell newsp = *sp + 4 * sizeof(cell); // XXX platform-appropriate stack size
-		*(cell*)(newsp + 3*sizeof(cell)) = 4*sizeof(cell);
-		*(cell*)(newsp + 2*sizeof(cell)) = leaf_word;
-		*(cell*) newsp                   = *pc;
-		*sp = newsp;
-		handler_word = tagged<word>(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
-	}
-	else
-	{
-		fatal_error("Invalid stack frame during signal handler", *sp);
-	}
+		/* XXX horribly x86-centric */
+		/* True stack frames are always 16-byte aligned. Leaf procedures
+		that don't create a stack frame will be out of alignment by sizeof(cell)
+		bytes. */
+		/* On architectures with a link register we would have to check for leafness
+		by matching the PC to a word. We should also use FRAME_RETURN_ADDRESS instead
+		of assuming the stack pointer is the right place to put the resume address. */
+		if (offset == 0)
+		{
+			signal_from_leaf = false; // XXX remove this once we're sure leaf works
+			cell newsp = *sp - sizeof(cell);
+			*sp = newsp;
+			*(cell*)newsp = *pc;
+		}
+		else if (offset == 16 - sizeof(cell))
+		{
+			signal_from_leaf = true; // XXX remove this once we're sure leaf works
 
-	*pc = (cell)handler_word->code->entry_point();
+			// Make a fake frame for the leaf procedure
+			cell leaf_word = find_word_for_address(this, *pc);
+
+			cell newsp = *sp + 4 * sizeof(cell);
+			*(cell*)(newsp + 3*sizeof(cell)) = 4*sizeof(cell);
+			*(cell*)(newsp + 2*sizeof(cell)) = leaf_word;
+			*(cell*) newsp                   = *pc;
+			*sp = newsp;
+			handler_word = tagged<word>(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
+		}
+		else
+		{
+			fatal_error("Invalid stack frame during signal handler", *sp);
+		}
+
+		*pc = (cell)handler_word->code->entry_point();
+	}
 }
 
 /* We ignore the two topmost frames, the 'callstack' primitive
