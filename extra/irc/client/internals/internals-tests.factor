@@ -67,7 +67,7 @@ M: mb-writer dispose drop ;
 
 { privmsg "#channel" "hello" } [
     "#channel" "hello" strings>privmsg
-    [ class ] [ target>> ] [ trailing>> ] tri
+    [ class-of ] [ target>> ] [ trailing>> ] tri
 ] unit-test
 
 ! Test login and nickname set
@@ -121,7 +121,7 @@ M: mb-writer dispose drop ;
         ":ircserver.net 477 factorbot #factortest :[ircserver-info] blah blah"
       } %push-lines
       [ join? ] read-matching-message
-      [ class ] [ channel>> ] bi
+      [ class-of ] [ channel>> ] bi
   ] unit-test
 ] spawning-irc
 
@@ -129,7 +129,7 @@ M: mb-writer dispose drop ;
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
       ":somebody!n=somebody@some.where PRIVMSG #factortest :hello" %push-line
       [ privmsg? ] read-matching-message
-      [ class ] [ target>> ] [ trailing>> ] tri
+      [ class-of ] [ target>> ] [ trailing>> ] tri
   ] unit-test
 ] spawning-irc
 
@@ -137,7 +137,7 @@ M: mb-writer dispose drop ;
       "ircuser" <irc-nick-chat>  [ %add-named-chat ] keep
       ":ircuser!n=user@isp.net PRIVMSG factorbot :hello" %push-line
       [ privmsg? ] read-matching-message
-      [ class ] [ target>> ] [ trailing>> ] tri
+      [ class-of ] [ target>> ] [ trailing>> ] tri
   ] unit-test
 ] spawning-irc
 
@@ -145,7 +145,7 @@ M: mb-writer dispose drop ;
       "#factortest" <irc-channel-chat>  [ %add-named-chat ] keep
       ":ircserver.net MODE #factortest +ns" %push-line
       [ mode? ] read-matching-message
-      [ class ] [ name>> ] [ mode>> ] tri
+      [ class-of ] [ name>> ] [ mode>> ] tri
   ] unit-test
 ] spawning-irc
 
@@ -215,7 +215,7 @@ M: mb-writer dispose drop ;
       "ircuser" over join-participant
       ":ircserver.net MODE #factortest +o ircuser" %push-line
       [ mode? ] read-matching-message
-      { [ class ] [ name>> ] [ mode>> ] [ parameter>> ] } cleave
+      { [ class-of ] [ name>> ] [ mode>> ] [ parameter>> ] } cleave
   ] unit-test
 ] spawning-irc
 

@@ -11,7 +11,7 @@ TUPLE: zim < thang ;
 TUPLE: zang < zim ;
 
 : class-names ( a b prefix -- string )
-    [ [ class name>> ] bi@ "-" glue ] dip prepend ;
+    [ [ class-of name>> ] bi@ "-" glue ] dip prepend ;
 
 PAIR-GENERIC: blibble ( a b -- c )
 

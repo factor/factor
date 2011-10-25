@@ -22,7 +22,7 @@ IN: compiler.cfg.intrinsics.simd.tests
     } ;
 
 :: test-node-literal ( lit rep -- node )
-    lit class :> lit-class
+    lit class-of :> lit-class
     T{ #call
         { in-d  { 1 2 3 4 } }
         { out-d { 5 } }
@@ -63,7 +63,7 @@ IN: compiler.cfg.intrinsics.simd.tests
         H{ } clone \ kill-sets pick set-at ;
 
 : make-classes ( quot -- seq )
-    { } make [ class ] map ; inline
+    { } make [ class-of ] map ; inline
 
 : test-emit ( cpu rep quot -- node )
     [
