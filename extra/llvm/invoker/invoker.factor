@@ -40,8 +40,8 @@ TUPLE: function name alien return params ;
     "alien.llvm" create swap
     [
         dup name>> function-pointer ,
-        dup return>> lookup-c-type ,
-        dup params>> [ second lookup-c-type ] map ,
+        dup return>> c:lookup-c-type ,
+        dup params>> [ second c:lookup-c-type ] map ,
         cdecl , \ alien-indirect ,
     ] [ ] make swap function-effect [ define-declared ] with-compilation-unit ;
 

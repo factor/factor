@@ -190,13 +190,13 @@ M: db-connection <select-by-slots-statement> ( tuple class -- statement )
     } 2cleave ;
 
 M: db-connection query>statement ( query -- tuple )
-    [ tuple>> dup class ] keep
+    [ tuple>> dup class-of ] keep
     [ <select-by-slots-statement> ] dip make-query* ;
 
 ! select ID, NAME, SCORE from EXAM limit 1 offset 3
 
 M: db-connection <count-statement> ( query -- statement )
-    [ tuple>> dup class ] keep
+    [ tuple>> dup class-of ] keep
     [ [ "select count(*) from " 0% 0% where-clause ] query-make ]
     dip make-query* ;
 

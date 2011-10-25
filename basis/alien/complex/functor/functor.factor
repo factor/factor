@@ -24,7 +24,7 @@ STRUCT: T-class { real N-type } { imaginary N-type } ;
 : *T ( alien -- z )
     T-class memory>struct [ real>> ] [ imaginary>> ] bi rect> ; inline
 
-T-class c-type
+T-class lookup-c-type
 <T> 1quotation >>unboxer-quot
 *T 1quotation >>boxer-quot
 complex >>boxed-class

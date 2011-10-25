@@ -47,7 +47,7 @@ PRIVATE>
     class-pool pool-new ;
 
 : free-to-pool ( object -- )
-    dup class class-pool pool-free ;
+    dup class-of class-pool pool-free ;
 
 SYNTAX: POOL:
     scan-word scan-word '[ _ swap <pool> ] [ swap set-class-pool ] bi ;

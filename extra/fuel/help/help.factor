@@ -96,7 +96,7 @@ PRIVATE>
 
 : (fuel-word-synopsis) ( word usings -- str/f )
     [
-        [ vocab ] filter interactive-vocabs [ append ] change
+        [ lookup-vocab ] filter interactive-vocabs [ append ] change
         fuel-find-word [ synopsis ] [ f ] if*
     ] with-scope ;
 

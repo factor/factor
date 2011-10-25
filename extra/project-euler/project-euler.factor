@@ -40,7 +40,7 @@ IN: project-euler
 
 : solution-path ( n -- str/f )
     number>euler "project-euler." prepend
-    vocab where dup [ first <pathname> ] when ;
+    lookup-vocab where dup [ first <pathname> ] when ;
 
 PRIVATE>
 

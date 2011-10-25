@@ -18,7 +18,7 @@ SYNTAX: STORED-TUPLE: parse-tuple-definition [ drop persistent ] dip [ remove-ty
 : define-db ( database class -- ) swap [ [ ensure-table ] with-db ] [ "database" set-word-prop ] 2bi ;
 
 : query>tuple ( tuple/query -- tuple ) dup query? [ tuple>> ] when ;
-: w/db ( query quot -- ) [ dup query>tuple class "database" word-prop ] dip with-db ; inline
+: w/db ( query quot -- ) [ dup query>tuple class-of "database" word-prop ] dip with-db ; inline
 : get-tuples ( query -- tuples ) [ select-tuples ] w/db ;
 : get-tuple ( query -- tuple ) [ select-tuple ] w/db ;
 : store-tuple ( tuple -- ) [ insert-tuple ] w/db ;
