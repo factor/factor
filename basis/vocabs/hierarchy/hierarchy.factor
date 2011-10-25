@@ -144,7 +144,7 @@ PRIVATE>
     [ vocab-roots get ] dip '[ _ (load-from-root) ] map concat ;
 
 : load ( prefix -- )
-    (load) [ load-failures. ] each ;
+    (load) load-failures. ;
 
 : load-all ( -- )
     "" load ;
