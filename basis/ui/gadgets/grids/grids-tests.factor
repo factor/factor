@@ -98,7 +98,7 @@ IN: ui.gadgets.grids.tests
 [ { 0 250 } ] [ "b" get loc>> ] unit-test
 
 [ gadget { 200 200 } ]
-[ { 120 20 } "g" get pick-up [ class ] [ dim>> ] bi ] unit-test
+[ { 120 20 } "g" get pick-up [ class-of ] [ dim>> ] bi ] unit-test
 
 [ gadget { 200 200 } ]
-[ { 120 220 } "g" get pick-up [ class ] [ dim>> ] bi ] unit-test
+[ { 120 220 } "g" get pick-up [ class-of ] [ dim>> ] bi ] unit-test

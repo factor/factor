@@ -46,7 +46,7 @@ unit-test
 ! Test EOL comments in multiline strings.
 [ "Hello" ] [ "#! This calls until-eol.\n\"Hello\"" eval( -- string ) ] unit-test
 
-[ word ] [ \ f class ] unit-test
+[ word ] [ \ f class-of ] unit-test
 
 ! Test stack effect parsing
 

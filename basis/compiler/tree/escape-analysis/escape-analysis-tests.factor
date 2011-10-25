@@ -21,7 +21,7 @@ M: #call count-unboxed-allocations*
     [ (count-unboxed-allocations) ] [ drop ] if ;
 
 M: #push count-unboxed-allocations*
-    dup literal>> class immutable-tuple-class?
+    dup literal>> class-of immutable-tuple-class?
     [ (count-unboxed-allocations) ] [ drop ] if ;
 
 M: #introduce count-unboxed-allocations*

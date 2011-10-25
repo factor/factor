@@ -127,7 +127,7 @@ CONSTANT: vector-words
 : check-optimizer ( seq quot eq-quot -- failures )
     dup '[
         @
-        [ dup [ class ] { } map-as ] dip '[ _ declare @ ]
+        [ dup [ class-of ] { } map-as ] dip '[ _ declare @ ]
         {
             [ "print-mr" get [ nip regs. ] [ 2drop ] if ]
             [ "print-checks" get [ [ . ] bi@ ] [ 2drop ] if ]

@@ -4,7 +4,7 @@ IN: growable.tests
 
 ! erg found this one
 [ fixnum ] [
-    2 >bignum V{ } [ set-length ] keep length class
+    2 >bignum V{ } [ set-length ] keep length class-of
 ] unit-test
 
 ! overflow bugs
