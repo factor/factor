@@ -93,58 +93,47 @@ IN: bootstrap.x86
 
 USE: locals
 
-: jit-save-volatile-regs ( -- )
+:: jit-save-volatile-regs ( -- save-size )
     ! do we also need to save XMM?
-    RSP volatile-regs length bootstrap-cell * SUB
+    volatile-regs length bootstrap-cell * 16 align :> save-size
+    RSP 2 bootstrap-cells [+] save-size ADD ! bump up stack frame size
+    RSP save-size SUB
     volatile-regs
-    [| r i | RSP i bootstrap-cell * [+] r MOV ] each-index ;
+    [| r i | RSP i bootstrap-cell * [+] r MOV ] each-index
+    save-size ;
 
-:: jit-restore-volatile-regs ( additional-pop -- )
+:: jit-restore-volatile-regs ( save-size -- )
     volatile-regs
     [| r i | r RSP i bootstrap-cell * [+] MOV ] each-index
-    RSP volatile-regs length bootstrap-cell * additional-pop + ADD ;
+    RSP save-size ADD ;
 
-[
-    ! Stack at this point has the signal handler pointer followed by
-    ! the return address back into normal execution, then the 24 bytes
-    ! of stack frame + alignment inserted by the prolog.
-    ! After registers are saved, the stack looks like:
-    ! RSP  saved volatile regs (`volatile-regs length` cells)
-    !  +   subprimitive stack frame alignment (3 cells)
-    !  .   signal handler address (1 cell)
-    !  .   resume address (1 cell)
-    jit-save-volatile-regs
+[| |
+    jit-save-volatile-regs :> save-size
     jit-save-context
-    RAX RSP volatile-regs length 3 + bootstrap-cell * [+] MOV
+    RAX vm-reg vm-signal-handler-addr-offset [+] MOV
     RAX CALL
-    bootstrap-cell jit-restore-volatile-regs
+    save-size jit-restore-volatile-regs
 ] \ signal-handler define-sub-primitive
 
-! :: jit-push-leaf-stack-frame ( -- )
-!     ;
-! 
-! :: jit-pop-leaf-stack-frame ( -- )
-!     ;
-! 
-! [
-!     ! Stack at this point has the signal handler pointer followed by
-!     ! the word pointer and the return address back into normal execution,
-!     ! then the 24 bytes of stack frame + alignment inserted by the prolog
-!     ! After registers are saved and the leaf stack frame is constructed,
-!     ! the stack looks like:
-!     ! RSP  fake leaf stack frame (4 cells)
-!     !  +   saved volatile regs (`volatile-regs length` cells)
-!     !  .   subprimitive stack frame alignment (3 cells)
-!     !  .   leaf word (1 cell)
-!     !  .   signal handler address (1 cell)
-!     !      resume address (1 cell)
-!     jit-save-volatile-regs
-!     jit-push-leaf-stack-frame
-!     jit-save-context
-!     "memory_signal_handler_impl" jit-call
-!     jit-pop-leaf-stack-frame
-!     bootstrap-cell jit-restore-volatile-regs
-! ] \ leaf-signal-handler define-sub-primitive
+[| |
+    jit-save-volatile-regs :> save-size
+    jit-save-context
+    RAX vm-reg vm-signal-handler-addr-offset [+] MOV
+    RAX CALL
+    ! Stack at this point has a fake stack frame set up to represent the
+    ! leaf procedure we interrupted. We must tear down that frame in
+    ! addition to our own before resuming.
+    ! Grab our resume address and place it just underneath the leaf proc's
+    ! return address, since we can't touch any registers once they've been
+    ! restored. If we got this far there should be no faults here and we
+    ! can get away with corrupting the stack frame.
+    RAX RSP save-size 3 bootstrap-cells + [+] MOV
+    RSP save-size 6 bootstrap-cells + [+] RAX MOV
+
+    ! Popping 3 extra cells here plus the 3 cells the epilogue pops leaves
+    ! the resume address at the top of the stack for when the epilogue RETs.
+    save-size 3 bootstrap-cells + jit-restore-volatile-regs
+] \ leaf-signal-handler define-sub-primitive
 
 [
     arg1 ds-reg [] MOV

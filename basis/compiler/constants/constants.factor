@@ -29,6 +29,7 @@ CONSTANT: deck-bits 18
 : callstack-top-offset ( -- n ) 2 \ callstack type-number slot-offset ; inline
 : vm-context-offset ( -- n ) 0 bootstrap-cells ; inline
 : vm-spare-context-offset ( -- n ) 1 bootstrap-cells ; inline
+: vm-signal-handler-addr-offset ( -- n ) 8 bootstrap-cells ; inline
 : context-callstack-top-offset ( -- n ) 0 bootstrap-cells ; inline
 : context-callstack-bottom-offset ( -- n ) 1 bootstrap-cells ; inline
 : context-datastack-offset ( -- n ) 2 bootstrap-cells ; inline

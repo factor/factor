@@ -30,6 +30,7 @@ STRUCT: vm
 { nursery zone }
 { cards-offset cell }
 { decks-offset cell }
+{ signal-handler-addr cell }
 { special-objects cell[80] } ;
 
 : vm-field-offset ( field -- offset ) vm offset-of ; inline
