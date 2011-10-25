@@ -126,6 +126,12 @@ void factor_vm::primitive_unimplemented()
 void factor_vm::memory_signal_handler_impl()
 {
 	memory_protection_error(signal_fault_addr);
+	if (!signal_resumable)
+	{
+		/* In theory we should only get here if the callstack overflowed during a
+		safepoint */
+		general_error(ERROR_CALLSTACK_OVERFLOW,false_object,false_object);
+	}
 }
 
 void memory_signal_handler_impl()
