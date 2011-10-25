@@ -29,7 +29,7 @@ SYMBOL: sql-counter
 GENERIC: eval-generator ( singleton -- object )
 
 : resulting-tuple ( exemplar-tuple row out-params -- tuple )
-    rot class new [
+    rot class-of new [
         '[ slot-name>> _ set-slot-named ] 2each
     ] keep ;
 
@@ -52,13 +52,13 @@ GENERIC: eval-generator ( singleton -- object )
     ] if ; inline
 
 : insert-db-assigned-statement ( tuple -- )
-    dup class
+    dup class-of
     db-connection get insert-statements>>
     [ <insert-db-assigned-statement> ] cache
     [ bind-tuple ] 2keep insert-tuple-set-key ;
 
 : insert-user-assigned-statement ( tuple -- )
-    dup class
+    dup class-of
     db-connection get insert-statements>>
     [ <insert-user-assigned-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
@@ -131,17 +131,17 @@ ERROR: no-defined-persistent object ;
 : ensure-tables ( classes -- ) [ ensure-table ] each ;
 
 : insert-tuple ( tuple -- )
-    dup class ensure-defined-persistent db-assigned?
+    dup class-of ensure-defined-persistent db-assigned?
     [ insert-db-assigned-statement ] [ insert-user-assigned-statement ] if ;
 
 : update-tuple ( tuple -- )
-    dup class ensure-defined-persistent
+    dup class-of ensure-defined-persistent
     db-connection get update-statements>> [ <update-tuple-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : delete-tuples ( tuple -- )
     dup
-    dup class ensure-defined-persistent
+    dup class-of ensure-defined-persistent
     <delete-tuples-statement> [
         [ bind-tuple ] keep execute-statement
     ] with-disposal ;

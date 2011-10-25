@@ -38,7 +38,7 @@ SYMBOL: IGNORE
 ERROR: no-slot ;
 
 : offset-of-slot ( string tuple -- n )
-    class all-slots slot-named dup [ no-slot ] unless offset>> ;
+    class-of all-slots slot-named dup [ no-slot ] unless offset>> ;
 
 : get-slot-named ( name tuple -- value )
     [ nip ] [ offset-of-slot ] 2bi slot ;
@@ -62,7 +62,7 @@ ERROR: not-persistent class ;
 
 : set-primary-key ( value tuple -- )
     [
-        class db-columns
+        class-of db-columns
         find-primary-key first slot-name>>
     ] keep set-slot-named ;
 

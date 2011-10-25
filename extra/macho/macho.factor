@@ -890,7 +890,7 @@ TYPED: macho-header ( c-ptr -- macho: mach_header_32/64 )
 
 TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
     [
-        [ class heap-size ]
+        [ class-of heap-size ]
         [ >c-ptr <displaced-alien> ]
         [ ncmds>> ] tri iota [
             drop read-command
@@ -908,7 +908,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
 
 : segment-sections ( segment-command -- sections )
     {
-        [ class heap-size ]
+        [ class-of heap-size ]
         [ >c-ptr <displaced-alien> ]
         [ nsects>> ]
         [ segment_command_64? ]

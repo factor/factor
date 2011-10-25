@@ -38,7 +38,7 @@ M: object (build-alien) improper-statement-error ;
     if ; inline
 
 : build-alien-attrs ( alien attrs -- )
-    [ class "slots" word-prop ] [ tuple>array rest ] bi
+    [ class-of "slots" word-prop ] [ tuple>array rest ] bi
     [ [ name>> ] dip build-alien-attr ] 2each drop ;
 
 M: graph-attributes (build-alien)

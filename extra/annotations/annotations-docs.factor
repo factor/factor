@@ -56,7 +56,7 @@ annotation-tags natural-sort
 ] bi
 <article> "annotations" add-article
 
-"annotations" vocab "annotations" >>help drop
+"annotations" lookup-vocab "annotations" >>help drop
 
 annotation-tags [
     {

@@ -62,7 +62,7 @@ M: object (match-branch)
     over \ unboa [ ] 2sequence prepend ;
 
 : ?class ( object -- class )
-    dup word? [ class ] unless ;
+    dup word? [ class-of ] unless ;
 
 MACRO: match ( branches -- )
     [ dup callable? [ first2 (match-branch) 2array ] unless ] map

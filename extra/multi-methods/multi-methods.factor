@@ -202,7 +202,7 @@ M: no-method error.
     dup arguments>> short.
     nl
     "Inputs have signature:" print
-    dup arguments>> [ class ] map niceify-method .
+    dup arguments>> [ class-of ] map niceify-method .
     nl
     "Available methods: " print
     generic>> methods canonicalize-specializers drop sort-methods
