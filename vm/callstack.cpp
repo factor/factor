@@ -18,23 +18,70 @@ callstack *factor_vm::allot_callstack(cell size)
 	return stack;
 }
 
+struct word_finder {
+	cell address;
+	cell found_word;
+
+	word_finder(cell address) : address(address), found_word(0) {}
+
+	// XXX keep a map of word names in the code heap so we don't need this
+	void operator()(object *obj)
+	{
+		if (obj->type() == WORD_TYPE)
+		{
+			word *w = static_cast<word*>(obj);
+			if ((cell)w->code->entry_point() <= address 
+				&& address - (cell)w->code->entry_point() < w->code->size()) {
+				assert(found_word == 0);
+				found_word = (cell)w->code->entry_point();
+			}
+		}
+	}
+};
+
+static cell find_word_for_address(factor_vm *vm, cell pc)
+{
+	word_finder finder(pc);
+	vm->each_object(finder);
+	assert(finder.found_word != 0);
+	return finder.found_word;
+}
+
 void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 {
 	/* True stack frames are always 16-byte aligned. Leaf procedures
 	that don't create a stack frame will be out of alignment by sizeof(cell)
 	bytes. */
 	/* XXX horribly x86-centric */
+	/* XXX check if exception came from C code */
+	/* XXX handle callstack overflow */
 
 	cell offset = *sp % 16;
 
+	signal_handler_addr = handler;
 	tagged<word> handler_word = tagged<word>(special_objects[SIGNAL_HANDLER_WORD]);
 	if (offset == 0)
 	{
+		// should use FRAME_RETURN_ADDRESS here to be platform-agnostic
 		signal_from_leaf = false;
+		cell newsp = *sp - sizeof(cell);
+		*sp = newsp;
+		*(cell*)newsp = *pc;
 	}
+	// should check the PC since leaf procs on RISC architectures won't touch the
+	// stack at all
 	else if (offset == 16 - sizeof(cell))
 	{
 		signal_from_leaf = true;
+
+		// Make a fake frame for the leaf procedure
+		cell leaf_word = find_word_for_address(this, *pc);
+
+		cell newsp = *sp + 4 * sizeof(cell); // XXX platform-appropriate stack size
+		*(cell*)(newsp + 3*sizeof(cell)) = 4*sizeof(cell);
+		*(cell*)(newsp + 2*sizeof(cell)) = leaf_word;
+		*(cell*) newsp                   = *pc;
+		*sp = newsp;
 		handler_word = tagged<word>(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
 	}
 	else
@@ -42,12 +89,6 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 		fatal_error("Invalid stack frame during signal handler", *sp);
 	}
 
-	/* Push the original PC as a return address and the C handler function
-	* pointer as an argument to the signal handler stub. */
-	cell newsp = *sp - 2*sizeof(cell);
-	*sp = newsp;
-	*(cell*)(newsp + sizeof(cell)) = *pc;
-	*(cell*)newsp = handler;
 	*pc = (cell)handler_word->code->entry_point();
 }
 
