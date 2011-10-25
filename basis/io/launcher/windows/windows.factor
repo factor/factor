@@ -28,7 +28,7 @@ TUPLE: CreateProcess-args
 : default-CreateProcess-args ( -- obj )
     CreateProcess-args new
         STARTUPINFO <struct>
-        dup class heap-size >>cb
+        dup class-of heap-size >>cb
     >>lpStartupInfo
     PROCESS_INFORMATION <struct> >>lpProcessInformation
     TRUE >>bInheritHandles
