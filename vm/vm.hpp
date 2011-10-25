@@ -6,7 +6,11 @@ struct code_root;
 
 struct factor_vm
 {
-	// First 5 fields accessed directly by compiler. See basis/vm/vm.factor
+	//
+	// vvvvvv
+	// THESE FIELDS ARE ACCESSED DIRECTLY FROM FACTOR. See:
+	//   basis/vm/vm.factor
+	//   basis/compiler/constants/constants.factor
 
 	/* Current context */
 	context *ctx;
@@ -21,9 +25,16 @@ struct factor_vm
 	cell cards_offset;
 	cell decks_offset;
 
+	/* cdecl signal handler address, used by signal handler subprimitives */
+	cell signal_handler_addr;
+
 	/* Various special objects, accessed by special-object and
 	set-special-object primitives */
 	cell special_objects[special_object_count];
+
+	// THESE FIELDS ARE ACCESSED DIRECTLY FROM FACTOR.
+	// ^^^^^^
+	//
 
 	/* Data stack and retain stack sizes */
 	cell datastack_size, retainstack_size, callstack_size;
