@@ -4,10 +4,10 @@ IN: math.integers
 ARTICLE: "integers" "Integers"
 { $subsections integer }
 "Integers come in two varieties -- fixnums and bignums. Fixnums fit in a machine word and are faster to manipulate; if the result of a fixnum operation is too large to fit in a fixnum, the result is upgraded to a bignum. Here is an example where two fixnums are multiplied yielding a bignum:"
-{ $example "USE: classes" "67108864 class ." "fixnum" }
-{ $example "USE: classes" "128 class ." "fixnum" }
+{ $example "USE: classes" "67108864 class-of ." "fixnum" }
+{ $example "USE: classes" "128 class-of ." "fixnum" }
 { $example "134217728 128 * ." "17179869184" }
-{ $example "USE: classes" "1 128 shift class ." "bignum" }
+{ $example "USE: classes" "1 128 shift class-of ." "bignum" }
 "Integers can be entered using a different base; see " { $link "syntax-numbers" } "."
 $nl
 "Integers can be tested for, and real numbers can be converted to integers:"
