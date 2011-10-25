@@ -17,7 +17,7 @@ M: input-mismatch-error summary
         "” expected input value of type " %
         dup expected-type>> name>> %
         " but got " %
-        dup value>> class name>> %
+        dup value>> class-of name>> %
         drop
     ] "" make ;
 
@@ -28,6 +28,6 @@ M: output-mismatch-error summary
         "” expected to output value of type " %
         dup expected-type>> name>> %
         " but gave " %
-        dup value>> class name>> %
+        dup value>> class-of name>> %
         drop
     ] "" make ;

@@ -93,7 +93,7 @@ M: float (serialize) ( obj -- )
 M: tuple (serialize) ( obj -- )
     [
         CHAR: T write1
-        [ class (serialize) ]
+        [ class-of (serialize) ]
         [ add-object ]
         [ tuple>array rest (serialize) ]
         tri

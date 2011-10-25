@@ -39,13 +39,13 @@ MEMO: id-slot ( class -- slot )
 PRIVATE>
 
 : >toid ( object -- toid )
-   [ id>> ] [ class id-slot ] bi <toid> ;
+   [ id>> ] [ class-of id-slot ] bi <toid> ;
 
 M: mdb-persistent id>> ( object -- id )
-   dup class id-slot reader-word execute( object -- id ) ;
+   dup class-of id-slot reader-word execute( object -- id ) ;
 
 M: mdb-persistent id<< ( object value -- )
-   over class id-slot writer-word execute( object value -- ) ;
+   over class-of id-slot writer-word execute( object value -- ) ;
 
 
  
@@ -125,10 +125,10 @@ M: tuple-class tuple-collection ( tuple -- mdb-collection )
     (mdb-collection) ;
  
 M: mdb-persistent tuple-collection ( tuple -- mdb-collection )
-    class (mdb-collection) ;
+    class-of (mdb-collection) ;
  
 M: mdb-persistent mdb-slot-map ( tuple -- string )
-    class (mdb-slot-map) ;
+    class-of (mdb-slot-map) ;
 
 M: tuple-class mdb-slot-map ( class -- assoc )
     (mdb-slot-map) ;
@@ -137,7 +137,7 @@ M: mdb-collection mdb-slot-map ( collection -- assoc )
     classes>> [ mdb-slot-map ] map assoc-combine ;
 
 M: mdb-persistent mdb-index-map
-    class (mdb-index-map) ;
+    class-of (mdb-index-map) ;
 M: tuple-class mdb-index-map
     (mdb-index-map) ;
 M: mdb-collection mdb-index-map

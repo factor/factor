@@ -34,7 +34,7 @@ TYPEDEF: void* gpointer
 TYPEDEF: guint32 gunichar
 TYPEDEF: void* va_list
 
-int c-type clone
+int lookup-c-type clone
     [ >c-bool ] >>unboxer-quot
     [ c-bool> ] >>boxer-quot
     object >>boxed-class

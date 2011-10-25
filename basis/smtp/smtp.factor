@@ -111,7 +111,7 @@ TUPLE: response code messages ;
 ERROR: smtp-error response ;
 
 M: smtp-error error.
-    "SMTP error (" write dup class pprint ")" print
+    "SMTP error (" write dup class-of pprint ")" print
     response>> messages>> [ print ] each ;
 
 ERROR: smtp-server-busy < smtp-error ;

@@ -93,7 +93,7 @@ M: range-observer model-changed
     dup [ deg>rad cos behavior angle-cos<< ] connect
     horizontal <slider> { 1 2 } grid-add
 
-    behavior class name>> <labeled-gadget> ;
+    behavior class-of name>> <labeled-gadget> ;
 
 :: set-population ( n boids-gadget -- )
     boids-gadget [

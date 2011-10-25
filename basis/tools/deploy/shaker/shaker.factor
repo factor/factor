@@ -58,21 +58,21 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-debugger ( -- )
-    strip-debugger? "debugger" vocab and [
+    strip-debugger? "debugger" lookup-vocab and [
         "Stripping debugger" show
         "vocab:tools/deploy/shaker/strip-debugger.factor"
         run-file
     ] when ;
 
 : strip-ui-error-hook ( -- )
-    strip-debugger? deploy-ui? get and "ui" vocab and [
+    strip-debugger? deploy-ui? get and "ui" lookup-vocab and [
         "Installing generic UI error hook" show
         "vocab:tools/deploy/shaker/strip-ui-error-hook.factor"
         run-file
     ] when ;
 
 : strip-libc ( -- )
-    "libc" vocab [
+    "libc" lookup-vocab [
         "Stripping manual memory management debug code" show
         "vocab:tools/deploy/shaker/strip-libc.factor"
         run-file
@@ -88,28 +88,28 @@ IN: tools.deploy.shaker
     "vocab:tools/deploy/shaker/strip-call.factor" run-file ;
 
 : strip-cocoa ( -- )
-    "cocoa" vocab [
+    "cocoa" lookup-vocab [
         "Stripping unused Cocoa methods" show
         "vocab:tools/deploy/shaker/strip-cocoa.factor"
         run-file
     ] when ;
 
 : strip-gobject ( -- )
-    "gobject-introspection.types" vocab [
+    "gobject-introspection.types" lookup-vocab [
         "Stripping GObject type info" show
         "vocab:tools/deploy/shaker/strip-gobject.factor"
         run-file
     ] when ;
 
 : strip-gtk-icon ( -- )
-    "ui.backend.gtk" vocab [
+    "ui.backend.gtk" lookup-vocab [
         "Stripping GTK icon loading code" show
         "vocab:tools/deploy/shaker/strip-gtk-icon.factor"
         run-file
     ] when ;
 
 : strip-specialized-arrays ( -- )
-    strip-dictionary? "specialized-arrays" vocab and [
+    strip-dictionary? "specialized-arrays" lookup-vocab and [
         "Stripping specialized arrays" show
         "vocab:tools/deploy/shaker/strip-specialized-arrays.factor"
         run-file
