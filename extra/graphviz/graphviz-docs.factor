@@ -121,7 +121,7 @@ HELP: <edge>
   { $example
     "USING: accessors classes graphviz kernel prettyprint strings ;"
     "1 { 2 3 4 } <edge>"
-    "[ tail>> class . ] [ head>> class . ] bi"
+    "[ tail>> class-of . ] [ head>> class-of . ] bi"
     "string\nsubgraph"
   }
   $nl
@@ -319,7 +319,7 @@ HELP: add
     "    1 <node> add"
     "    2 <node> add"
     "    1 2 <edge> add"
-    "statements>> [ class . ] each"
+    "statements>> [ class-of . ] each"
     "node\nnode\nedge"
   }
 }
