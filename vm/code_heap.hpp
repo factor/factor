@@ -44,6 +44,8 @@ struct code_heap {
 	void guard_safepoint();
 	void unguard_safepoint();
 
+	code_block *code_block_for_address(cell address);
+
 	bool safepoint_p(cell addr)
 	{
 		cell page_mask = ~(getpagesize() - 1);
