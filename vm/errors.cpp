@@ -195,8 +195,6 @@ void factor_vm::handle_safepoint()
 		safepoint_fep = false;
 		return;
 	}
-	// XXX handle sample count
-	// XXX handle queued signals
 }
 
 }
