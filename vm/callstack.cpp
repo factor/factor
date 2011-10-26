@@ -102,10 +102,11 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 			// Make a fake frame for the leaf procedure
 			cell leaf_word = find_word_for_address(this, *pc);
 
-			cell newsp = *sp - 4 * sizeof(cell);
-			*(cell*)(newsp + 3*sizeof(cell)) = 4*sizeof(cell);
-			*(cell*)(newsp + 2*sizeof(cell)) = leaf_word;
-			*(cell*) newsp                   = *pc;
+			// XXX get platform-appropriate stack frame size
+			cell newsp = *sp - 32;
+			*(cell*)(newsp + 32 -   sizeof(cell)) = 32;
+			*(cell*)(newsp + 32 - 2*sizeof(cell)) = leaf_word;
+			*(cell*) newsp                        = *pc;
 			*sp = newsp;
 			handler_word = tagged<word>(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
 		}

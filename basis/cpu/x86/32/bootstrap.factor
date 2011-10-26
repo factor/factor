@@ -4,7 +4,7 @@ USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler cpu.x86.assembler.operands layouts
 vocabs parser compiler.constants compiler.codegen.relocation
 sequences math math.private generic.single.private
-threads.private ;
+threads.private locals ;
 IN: bootstrap.x86
 
 4 \ cell set
@@ -23,6 +23,7 @@ IN: bootstrap.x86
 : vm-reg ( -- reg ) EBX ;
 : ctx-reg ( -- reg ) EBP ;
 : nv-regs ( -- seq ) { ESI EDI EBX } ;
+: volatile-regs ( -- seq ) { EAX ECX EDX } ;
 : nv-reg ( -- reg ) ESI ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;
@@ -34,12 +35,12 @@ IN: bootstrap.x86
     0 CALL f rc-relative rel-dlsym ;
 
 [
-    ! store entry point
-    ESP bootstrap-cell 2 * neg [+] 0 MOV rc-absolute-cell rel-this
-    ! store stack frame size
-    ESP bootstrap-cell neg [+] stack-frame-size MOV
     ! alignment
     ESP stack-frame-size bootstrap-cell - SUB
+    ! store entry point
+    ESP stack-frame-size 3 bootstrap-cells - [+] 0 MOV rc-absolute-cell rel-this
+    ! store stack frame size
+    ESP stack-frame-size 2 bootstrap-cells - [+] stack-frame-size MOV
 ] jit-prolog jit-define
 
 [
@@ -95,6 +96,36 @@ IN: bootstrap.x86
     ESP [] vm-reg MOV
     "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
+
+! The signal-handler and leaf-signal-handler subprimitives are special-cased
+! in vm/quotations.cpp not to trigger generation of a stack frame, so they can
+! peform their own prolog/epilog preserving registers.
+
+:: jit-signal-handler-prolog ( -- frame-size )
+    stack-frame-size 8 bootstrap-cells + :> frame-size
+    ESP frame-size bootstrap-cell - SUB ! minus a cell for return address
+    ESP []                    EAX MOV
+    ESP 1 bootstrap-cells [+] ECX MOV
+    ESP 2 bootstrap-cells [+] EDX MOV
+    ESP 3 bootstrap-cells [+] EBX MOV
+    ESP 4 bootstrap-cells [+] EBP MOV
+    ESP 5 bootstrap-cells [+] ESI MOV
+    ESP 6 bootstrap-cells [+] EDI MOV
+    ESP frame-size 3 bootstrap-cells - [+] 0 MOV rc-absolute-cell rel-this
+    ESP frame-size 2 bootstrap-cells - [+] frame-size MOV
+    ! subprimitive definition assumes vm's been loaded
+    jit-load-vm
+    frame-size ;
+
+:: jit-signal-handler-epilog ( frame-size -- )
+    EAX ESP []                    MOV
+    ECX ESP 1 bootstrap-cells [+] MOV
+    EDX ESP 2 bootstrap-cells [+] MOV
+    EBX ESP 3 bootstrap-cells [+] MOV
+    EBP ESP 4 bootstrap-cells [+] MOV
+    ESI ESP 5 bootstrap-cells [+] MOV
+    EDI ESP 6 bootstrap-cells [+] MOV
+    ESP frame-size bootstrap-cell - ADD ;
 
 [
     EAX ds-reg [] MOV
