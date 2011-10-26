@@ -4,7 +4,7 @@ USING: bootstrap.image.private kernel kernel.private namespaces
 system layouts vocabs parser compiler.constants
 compiler.codegen.relocation math math.private cpu.x86.assembler
 cpu.x86.assembler.operands sequences generic.single.private
-threads.private ;
+threads.private locals ;
 IN: bootstrap.x86
 
 8 \ cell set
@@ -91,9 +91,7 @@ IN: bootstrap.x86
     "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
 
-USE: locals
-
-:: jit-save-volatile-regs ( -- frame-size )
+:: jit-signal-handler-prolog ( -- frame-size )
     ! do we also need to save XMM?
     volatile-regs length bootstrap-cells 16 align stack-frame-size + :> frame-size
     RSP frame-size bootstrap-cell - SUB ! minus a cell for return address
@@ -105,42 +103,10 @@ USE: locals
     RSP frame-size 2 bootstrap-cells - [+] frame-size MOV
     frame-size ;
 
-:: jit-restore-volatile-regs ( frame-size -- )
+:: jit-signal-handler-epilog ( frame-size -- )
     volatile-regs
     [| r i | r RSP i bootstrap-cells [+] MOV ] each-index
     RSP frame-size bootstrap-cell - ADD ;
-
-! The signal-handler and leaf-signal-handler subprimitives are special-cased
-! in vm/quotations.cpp not to trigger generation of a stack frame, so they can
-! peform their own prolog/epilog preserving registers.
-
-[| |
-    jit-save-volatile-regs :> frame-size
-    jit-save-context
-    RAX vm-reg vm-signal-handler-addr-offset [+] MOV
-    RAX CALL
-    frame-size jit-restore-volatile-regs
-] \ signal-handler define-sub-primitive
-
-[| |
-    jit-save-volatile-regs :> frame-size
-    jit-save-context
-    RAX vm-reg vm-signal-handler-addr-offset [+] MOV
-    RAX CALL
-    ! Stack at this point has a fake stack frame set up to represent the
-    ! leaf procedure we interrupted. We must tear down that frame in
-    ! addition to our own before resuming.
-    ! Grab our frame's return address and place it just underneath the leaf proc's
-    ! return address, since we can't touch any registers once they've been
-    ! restored. If we got this far there should be no faults here and we
-    ! can get away with corrupting the stack frame.
-    RAX RSP frame-size bootstrap-cell - [+] MOV
-    RSP frame-size 2 bootstrap-cells + [+] RAX MOV
-
-    ! Popping 3 extra cells here leaves the resume address at the top of the stack
-    ! when we RET.
-    frame-size 3 bootstrap-cells + jit-restore-volatile-regs
-] \ leaf-signal-handler define-sub-primitive
 
 [
     arg1 ds-reg [] MOV
