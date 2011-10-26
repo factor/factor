@@ -16,7 +16,7 @@ SINGLETON: utf8
 
 : append-nums ( stream byte -- stream char )
     over stream-read1 dup starts-2?
-    [ swap 6 shift swap BIN: 111111 bitand bitor ]
+    [ [ 6 shift ] dip BIN: 111111 bitand bitor ]
     [ 2drop replacement-char ] if ; inline
 
 : minimum-code-point ( char minimum -- char )
