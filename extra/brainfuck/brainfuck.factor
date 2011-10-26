@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs fry io io.streams.string kernel macros
+USING: accessors assocs io io.streams.string kernel macros
 math peg.ebnf prettyprint sequences strings ;
 
 IN: brainfuck
@@ -26,10 +26,10 @@ TUPLE: brainfuck pointer memory ;
     [ get-memory ] dip - 255 bitand set-memory ;
 
 : (?) ( brainfuck -- brainfuck t/f )
-    get-memory 0 = not ;
+    get-memory zero? not ;
 
 : (.) ( brainfuck -- brainfuck )
-    get-memory 1string write ;
+    get-memory write1 ;
 
 : (,) ( brainfuck -- brainfuck )
     read1 set-memory ;
