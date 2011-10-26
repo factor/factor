@@ -12,13 +12,13 @@ HOOK: (file-writer) io-backend ( path -- stream )
 HOOK: (file-appender) io-backend ( path -- stream )
 
 : <file-reader> ( path encoding -- stream )
-    swap normalize-path (file-reader) swap <decoder> ;
+    [ normalize-path (file-reader) ] dip <decoder> ;
 
 : <file-writer> ( path encoding -- stream )
-    swap normalize-path (file-writer) swap <encoder> ;
+    [ normalize-path (file-writer) ] dip <encoder> ;
 
 : <file-appender> ( path encoding -- stream )
-    swap normalize-path (file-appender) swap <encoder> ;
+    [ normalize-path (file-appender) ] dip <encoder> ;
 
 : file-lines ( path encoding -- seq )
     <file-reader> stream-lines ;
