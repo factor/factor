@@ -63,9 +63,9 @@ void factor_vm::call_fault_handler(
 	assert(handler != 0);
 
 	dispatch_signal_handler(
-		&MACH_STACK_POINTER(thread_state),
-		&MACH_PROGRAM_COUNTER(thread_state),
-		handler
+		(cell*)&MACH_STACK_POINTER(thread_state),
+		(cell*)&MACH_PROGRAM_COUNTER(thread_state),
+		(cell)handler
 	);
 }
 
