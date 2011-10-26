@@ -18,35 +18,6 @@ callstack *factor_vm::allot_callstack(cell size)
 	return stack;
 }
 
-// XXX move somewhere more appropriate
-struct entry_point_finder {
-	cell address;
-	cell found_entry_point;
-
-	entry_point_finder(cell address)
-		: address(address), found_entry_point(0) {}
-
-	// XXX keep a map of code blocks in the code heap so we don't need this
-	void operator()(code_block *block, cell size)
-	{
-		if ((cell)block->entry_point() <= address
-			&& address - (cell)block->entry_point() < block->size())
-		{
-			assert(found_entry_point == 0);
-			found_entry_point = (cell)block->entry_point();
-		}
-	}
-};
-
-static cell find_entry_point_for_address(factor_vm *vm, cell pc)
-{
-	std::cout << "seeking " << std::hex << pc << std::endl;
-	entry_point_finder finder(pc);
-	vm->code->allocator->iterate(finder);
-	assert(finder.found_entry_point != 0);
-	return finder.found_entry_point;
-}
-
 void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 {
 	if (!code->seg->in_segment_p(*pc) || *sp < ctx->callstack_seg->start + stack_reserved)
@@ -96,12 +67,13 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 		else if (offset == 16 - sizeof(cell))
 		{
 			// Make a fake frame for the leaf procedure
-			cell leaf_word = find_entry_point_for_address(this, *pc);
+			code_block *leaf_block = code->code_block_for_address(*pc);
+			assert(leaf_block != NULL);
 
 			// XXX get platform-appropriate stack frame size
 			cell newsp = *sp - 32;
 			*(cell*)(newsp + 32 -   sizeof(cell)) = 32;
-			*(cell*)(newsp + 32 - 2*sizeof(cell)) = leaf_word;
+			*(cell*)(newsp + 32 - 2*sizeof(cell)) = (cell)leaf_block->entry_point();
 			*(cell*) newsp                        = *pc;
 			*sp = newsp;
 			handler_word = tagged<word>(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
