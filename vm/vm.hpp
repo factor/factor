@@ -616,18 +616,9 @@ struct factor_vm
 	void primitive_set_innermost_stack_frame_quot();
 	void primitive_callstack_bounds();
 	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
-	void dispatch_signal_handler(cell *sp, cell *pc, cell newpc);
-	void dispatch_signal_handler_from_leaf(cell *sp, cell *pc, cell newpc);
 
-	template<typename CellA, typename CellB, typename CellC>
-	void dispatch_signal_handler(CellA *sp, CellB *pc, CellC newpc)
-	{
-		dispatch_signal_handler(
-			reinterpret_cast<cell*>(sp),
-			reinterpret_cast<cell*>(pc),
-			(cell)newpc
-		);
-	}
+	// cpu-*
+	void dispatch_signal_handler(cell *sp, cell *pc, cell newpc);
 
 	// alien
 	char *pinned_alien_offset(cell obj);

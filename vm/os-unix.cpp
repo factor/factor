@@ -139,9 +139,9 @@ void code_heap::unguard_safepoint()
 void factor_vm::dispatch_signal(void *uap, void (handler)())
 {
 	dispatch_signal_handler(
-		&UAP_STACK_POINTER(uap),
-		&UAP_PROGRAM_COUNTER(uap),
-		FUNCTION_CODE_POINTER(handler)
+		(cell*)&UAP_STACK_POINTER(uap),
+		(cell*)&UAP_PROGRAM_COUNTER(uap),
+		(cell)FUNCTION_CODE_POINTER(handler)
 	);
 	UAP_SET_TOC_POINTER(uap, (cell)FUNCTION_TOC_POINTER(handler));
 }
