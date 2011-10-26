@@ -25,17 +25,34 @@ struct word_finder {
 
 	word_finder(cell address) : address(address), found_word(0) {}
 
-	// XXX keep a map of word names in the code heap so we don't need this
+	bool in_code_block_p(code_block *code, cell address)
+	{
+		return ((cell)code->entry_point() <= address 
+				&& address - (cell)code->entry_point() < code->size());
+	}
+
+	void save_found_word(cell entry_point)
+	{
+		assert(found_word == 0);
+		found_word = entry_point;
+	}
+
+	// XXX keep a map of code blocks in the code heap so we don't need this
 	void operator()(object *obj)
 	{
 		if (obj->type() == WORD_TYPE)
 		{
 			word *w = static_cast<word*>(obj);
-			if ((cell)w->code->entry_point() <= address 
-				&& address - (cell)w->code->entry_point() < w->code->size()) {
-				assert(found_word == 0);
-				found_word = (cell)w->code->entry_point();
-			}
+			if (in_code_block_p(w->code, address))
+				save_found_word((cell)w->code->entry_point());
+			if (w->profiling && in_code_block_p(w->profiling, address))
+				save_found_word((cell)w->profiling->entry_point());
+		}
+		else if (obj->type() == QUOTATION_TYPE)
+		{
+			quotation *q = static_cast<quotation*>(obj);
+			if (in_code_block_p(q->code, address))
+				save_found_word((cell)q->code->entry_point());
 		}
 	}
 };
