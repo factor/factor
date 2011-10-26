@@ -68,7 +68,6 @@ struct factor_vm
 	/* Global variables used to pass fault handler state from signal handler
 	to VM */
 	bool signal_resumable;
-	bool signal_from_leaf; // XXX remove this once we're sure leaf works
 	cell signal_number;
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
