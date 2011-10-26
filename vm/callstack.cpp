@@ -89,15 +89,12 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 		of assuming the stack pointer is the right place to put the resume address. */
 		if (offset == 0)
 		{
-			signal_from_leaf = false; // XXX remove this once we're sure leaf works
 			cell newsp = *sp - sizeof(cell);
 			*sp = newsp;
 			*(cell*)newsp = *pc;
 		}
 		else if (offset == 16 - sizeof(cell))
 		{
-			signal_from_leaf = true; // XXX remove this once we're sure leaf works
-
 			// Make a fake frame for the leaf procedure
 			cell leaf_word = find_entry_point_for_address(this, *pc);
 
