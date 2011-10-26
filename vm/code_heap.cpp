@@ -71,6 +71,31 @@ void code_heap::flush_icache()
 	factor::flush_icache(seg->start,seg->size);
 }
 
+struct address_finder {
+	cell address;
+	code_block *found_code_block;
+
+	address_finder(cell address)
+		: address(address), found_code_block(NULL) {}
+
+	void operator()(code_block *block, cell size)
+	{
+		if ((cell)block->entry_point() <= address
+			&& address - (cell)block->entry_point() < block->size())
+		{
+			assert(found_code_block == NULL);
+			found_code_block = block;
+		}
+	}
+};
+
+code_block *code_heap::code_block_for_address(cell address)
+{
+	address_finder finder(address);
+	allocator->iterate(finder);
+	return finder.found_code_block;
+}
+
 /* Allocate a code heap during startup */
 void factor_vm::init_code_heap(cell size)
 {
