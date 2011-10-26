@@ -3,7 +3,7 @@
 USING: bootstrap.image.private compiler.constants
 compiler.codegen.relocation compiler.units cpu.x86.assembler
 cpu.x86.assembler.operands kernel kernel.private layouts
-locals.backend make math math.private namespaces sequences
+locals locals.backend make math math.private namespaces sequences
 slots.private strings.private vocabs ;
 IN: bootstrap.x86
 
@@ -101,6 +101,38 @@ big-endian off
 [
     0 CALL f rc-relative rel-word-pic
 ] jit-word-call jit-define
+
+! The signal-handler and leaf-signal-handler subprimitives are special-cased
+! in vm/quotations.cpp not to trigger generation of a stack frame, so they can
+! peform their own prolog/epilog preserving registers.
+
+[| |
+    jit-signal-handler-prolog :> frame-size
+    jit-save-context
+    temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
+    temp0 CALL
+    frame-size jit-signal-handler-epilog
+] \ signal-handler define-sub-primitive
+
+[| |
+    jit-signal-handler-prolog :> frame-size
+    jit-save-context
+    temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
+    temp0 CALL
+    ! Stack at this point has a fake stack frame set up to represent the
+    ! leaf procedure we interrupted. We must tear down that frame in
+    ! addition to our own before resuming.
+    ! Grab our frame's return address and place it just underneath the leaf proc's
+    ! return address, since we can't touch any registers once they've been
+    ! restored. If we got this far there should be no faults here and we
+    ! can get away with corrupting the stack frame.
+    temp0 stack-reg frame-size bootstrap-cell - [+] MOV
+    stack-reg frame-size stack-frame-size + 2 bootstrap-cells - [+] temp0 MOV
+
+    ! Pop enough of the fake frame to leave the resume address at the top of the
+    ! stack when we RET.
+    frame-size stack-frame-size + bootstrap-cell - jit-signal-handler-epilog
+] \ leaf-signal-handler define-sub-primitive
 
 [
     ! load boolean
