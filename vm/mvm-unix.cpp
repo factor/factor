@@ -18,8 +18,7 @@ void register_vm_with_thread(factor_vm *vm)
 
 factor_vm *current_vm_p()
 {
-	factor_vm *vm = (factor_vm*)pthread_getspecific(current_vm_tls_key);
-	return vm;
+	return (factor_vm*)pthread_getspecific(current_vm_tls_key);
 }
 
 }
