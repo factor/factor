@@ -84,7 +84,11 @@ bool quotation_jit::declare_p(cell i, cell length)
 
 bool quotation_jit::word_stack_frame_p(cell obj)
 {
-	return to_boolean(untag<word>(obj)->subprimitive)
+	// Subprimitives should be flagged with whether they require a stack frame.
+	// See #295.
+	return (to_boolean(untag<word>(obj)->subprimitive)
+			&& obj != parent->special_objects[SIGNAL_HANDLER_WORD]
+			&& obj != parent->special_objects[LEAF_SIGNAL_HANDLER_WORD])
 		|| obj == parent->special_objects[JIT_PRIMITIVE_WORD];
 }
 
