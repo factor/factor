@@ -25,8 +25,8 @@ TUPLE: presentation < button object hook ;
     [ [ object>> ] keep show-summary ] [ button-update ] bi ;
 
 : <presentation> ( label object -- button )
-    swap [ invoke-primary ] presentation new-button
-        swap >>object
+    [ [ invoke-primary ] presentation new-button ] dip
+        >>object
         [ drop ] >>hook
         roll-button-theme ;
 

@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien arrays assocs classes
-classes.tuple.private combinators.short-circuit fry hashtables
-io kernel kernel.private locals.backend make math namespaces
-prettyprint quotations sequences sequences.deep shuffle
-slots.private vectors vocabs words words.alias ;
+classes.tuple.private combinators.short-circuit continuations
+fry hashtables io kernel kernel.private locals.backend make
+math namespaces prettyprint quotations sequences sequences.deep
+shuffle slots.private splitting stack-checker vectors vocabs
+words words.alias ;
 
 IN: lint
 
@@ -286,6 +287,18 @@ M: sequence run-lint ( seq -- seq )
 M: word run-lint ( word -- seq ) 1array run-lint ;
 
 PRIVATE>
+
+: find-swap/swap ( word -- ? )
+    def>> [ callable? ] deep-filter
+    [
+        {
+            [ [ \ swap = ] count 2 >= ]
+            [
+                { swap } split rest but-last
+                [ [ infer ] [ 2drop ( -- ) ] recover ( x -- x ) = ] any?
+            ]
+        } 1&&
+    ] any? ;
 
 : lint-all ( -- seq )
     all-words run-lint dup lint. ;
