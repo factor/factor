@@ -19,50 +19,32 @@ callstack *factor_vm::allot_callstack(cell size)
 }
 
 // XXX move somewhere more appropriate
-struct word_finder {
+struct entry_point_finder {
 	cell address;
-	cell found_word;
+	cell found_entry_point;
 
-	word_finder(cell address) : address(address), found_word(0) {}
-
-	bool in_code_block_p(code_block *code, cell address)
-	{
-		return ((cell)code->entry_point() <= address 
-				&& address - (cell)code->entry_point() < code->size());
-	}
-
-	void save_found_word(cell entry_point)
-	{
-		assert(found_word == 0);
-		found_word = entry_point;
-	}
+	entry_point_finder(cell address)
+		: address(address), found_entry_point(0) {}
 
 	// XXX keep a map of code blocks in the code heap so we don't need this
-	void operator()(object *obj)
+	void operator()(code_block *block, cell size)
 	{
-		if (obj->type() == WORD_TYPE)
+		if ((cell)block->entry_point() <= address
+			&& address - (cell)block->entry_point() < block->size())
 		{
-			word *w = static_cast<word*>(obj);
-			if (in_code_block_p(w->code, address))
-				save_found_word((cell)w->code->entry_point());
-			if (w->profiling && in_code_block_p(w->profiling, address))
-				save_found_word((cell)w->profiling->entry_point());
-		}
-		else if (obj->type() == QUOTATION_TYPE)
-		{
-			quotation *q = static_cast<quotation*>(obj);
-			if (in_code_block_p(q->code, address))
-				save_found_word((cell)q->code->entry_point());
+			assert(found_entry_point == 0);
+			found_entry_point = (cell)block->entry_point();
 		}
 	}
 };
 
-static cell find_word_for_address(factor_vm *vm, cell pc)
+static cell find_entry_point_for_address(factor_vm *vm, cell pc)
 {
-	word_finder finder(pc);
-	vm->each_object(finder);
-	assert(finder.found_word != 0);
-	return finder.found_word;
+	std::cout << "seeking " << std::hex << pc << std::endl;
+	entry_point_finder finder(pc);
+	vm->code->allocator->iterate(finder);
+	assert(finder.found_entry_point != 0);
+	return finder.found_entry_point;
 }
 
 void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
@@ -117,7 +99,7 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 			signal_from_leaf = true; // XXX remove this once we're sure leaf works
 
 			// Make a fake frame for the leaf procedure
-			cell leaf_word = find_word_for_address(this, *pc);
+			cell leaf_word = find_entry_point_for_address(this, *pc);
 
 			// XXX get platform-appropriate stack frame size
 			cell newsp = *sp - 32;
