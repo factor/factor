@@ -298,7 +298,6 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
 
 void factor_vm::open_console()
 {
-	std::cout << "setting ctrl handler\n";
 	SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
 }
 
