@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2009 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math sequences accessors deques
-search-deques summary hashtables fry math.order ;
+USING: accessors combinators deques fry hashtables kernel math
+math.order parser search-deques sequences summary vocabs.loader ;
 IN: dlists
 
 <PRIVATE
@@ -158,6 +158,9 @@ M: dlist clear-deque ( dlist -- )
 : dlist>seq ( dlist -- seq )
     [ ] collector [ dlist-each ] dip ;
 
+: seq>dlist ( seq -- dlist )
+    <dlist> [ '[ _ push-back ] each ] keep ;
+
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
 
 : dlist-filter ( ... dlist quot: ( ... value -- ... ? ) -- ... dlist' )
@@ -167,3 +170,8 @@ M: dlist clone
     <dlist> [ '[ _ push-back ] dlist-each ] keep ;
 
 INSTANCE: dlist deque
+
+SYNTAX: DL{ \ } [ seq>dlist ] parse-literal ;
+
+{ "dlists" "prettyprint" } "dlists.prettyprint" require-when
+
