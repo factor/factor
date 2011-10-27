@@ -725,7 +725,6 @@ struct factor_vm
 	void dispatch_signal(void *uap, void (handler)());
 	void enqueue_safepoint_signal(cell signal);
 	void unix_init_signals();
-	sigset_t safepoint_signals;
   #endif
 
   #ifdef __APPLE__
