@@ -73,7 +73,6 @@ struct factor_vm
 	unsigned int signal_fpu_status;
 	bool safepoint_fep;
 	cell safepoint_sample_count;
-	sigset_t safepoint_signals;
 
 	/* GC is off during heap walking */
 	bool gc_off;
@@ -201,7 +200,6 @@ struct factor_vm
 	void fp_signal_handler_impl();
 	void enqueue_safepoint_fep();
 	void enqueue_safepoint_sample();
-	void enqueue_safepoint_signal(cell signal);
 	void handle_safepoint();
 
 	// bignum
@@ -720,15 +718,15 @@ struct factor_vm
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
 	BOOL windows_stat(vm_char *path);
 
-  #if defined(WINNT)
 	void open_console();
 	LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch);
 	BOOL ctrl_handler(DWORD dwCtrlType);
-  #endif
 
   #else  // UNIX
 	void dispatch_signal(void *uap, void (handler)());
+	void enqueue_safepoint_signal(cell signal);
 	void unix_init_signals();
+	sigset_t safepoint_signals;
   #endif
 
   #ifdef __APPLE__
