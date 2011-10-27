@@ -91,11 +91,16 @@ IN: bootstrap.x86
     "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
 
+! In addition to the C ABI volatile regs, we also whack R12
+! when we save context before calling the signal handler.
+: signal-handler-save-regs ( -- regs ) volatile-regs R12 suffix ;
+
 :: jit-signal-handler-prolog ( -- frame-size )
     ! do we also need to save XMM?
-    volatile-regs length bootstrap-cells 16 align stack-frame-size + :> frame-size
+    signal-handler-save-regs :> save-regs
+    save-regs length bootstrap-cells 16 align stack-frame-size + :> frame-size
     RSP frame-size bootstrap-cell - SUB ! minus a cell for return address
-    volatile-regs
+    save-regs
     [| r i | RSP i bootstrap-cells [+] r MOV ] each-index
     ! Now that the registers are saved, we can make the stack frame
     RAX 0 MOV rc-absolute-cell rel-this
@@ -104,7 +109,7 @@ IN: bootstrap.x86
     frame-size ;
 
 :: jit-signal-handler-epilog ( frame-size -- )
-    volatile-regs
+    signal-handler-save-regs
     [| r i | r RSP i bootstrap-cells [+] MOV ] each-index
     RSP frame-size bootstrap-cell - ADD ;
 
