@@ -372,6 +372,7 @@ void factor_vm::factorbug()
 	std::cout << "  tuples           -- tuples dump\n";
 	std::cout << "  refs <addr>      -- find data heap references to object\n";
 	std::cout << "  push <addr>      -- push object on data stack - NOT SAFE\n";
+	std::cout << "  gc               -- trigger full GC - NOT SAFE\n";
 	std::cout << "  code             -- code heap dump\n";
 
 	bool seen_command = false;
@@ -478,6 +479,8 @@ void factor_vm::factorbug()
 		}
 		else if(strcmp(cmd,"code") == 0)
 			dump_code_heap();
+		else if(strcmp(cmd,"gc") == 0)
+			primitive_full_gc();
 		else
 			std::cout << "unknown command\n";
 	}
