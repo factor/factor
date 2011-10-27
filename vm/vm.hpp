@@ -720,7 +720,6 @@ struct factor_vm
 
 	void open_console();
 	LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch);
-	BOOL ctrl_handler(DWORD dwCtrlType);
 
   #else  // UNIX
 	void dispatch_signal(void *uap, void (handler)());
