@@ -73,7 +73,18 @@ long getpagesize();
 void move_file(const vm_char *path1, const vm_char *path2);
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch);
 THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
-inline static THREADHANDLE thread_id() { return GetCurrentThread(); }
+
+inline static THREADHANDLE thread_id()
+{
+	DWORD id = GetCurrentThreadId();
+	HANDLE threadHandle = OpenThread(
+		THREAD_GET_CONTEXT | THREAD_SET_CONTEXT | THREAD_SUSPEND_RESUME,
+		FALSE,
+		id
+	);
+	assert(threadHandle != NULL);
+	return threadHandle;
+}
 
 #define CODE_TO_FUNCTION_POINTER(code) (void)0
 #define CODE_TO_FUNCTION_POINTER_CALLBACK(vm, code) (void)0
