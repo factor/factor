@@ -354,25 +354,26 @@ void factor_vm::factorbug()
 	fep_p = true;
 
 	std::cout << "Starting low level debugger...\n";
-	std::cout << "  Basic commands:\n";
-	std::cout << "c                -- continue executing Factor - NOT SAFE\n";
-	std::cout << "t                -- throw exception in Factor - NOT SAFE\n";
-	std::cout << "x                -- exit Factor\n";
-	std::cout << "  Advanced commands:\n";
-	std::cout << "d <addr> <count> -- dump memory\n";
-	std::cout << "u <addr>         -- dump object at tagged <addr>\n";
-	std::cout << ". <addr>         -- print object at tagged <addr>\n";
-	std::cout << "s r              -- dump data, retain stacks\n";
-	std::cout << ".s .r .c         -- print data, retain, call stacks\n";
-	std::cout << "e                -- dump environment\n";
-	std::cout << "g                -- dump generations\n";
-	std::cout << "trim             -- toggle output trimming\n";
-	std::cout << "data             -- data heap dump\n";
-	std::cout << "words            -- words dump\n";
-	std::cout << "tuples           -- tuples dump\n";
-	std::cout << "refs <addr>      -- find data heap references to object\n";
-	std::cout << "push <addr>      -- push object on data stack - NOT SAFE\n";
-	std::cout << "code             -- code heap dump\n";
+	std::cout << "Basic commands:\n";
+	std::cout << "  q ^D             -- quit Factor\n";
+	std::cout << "  a                -- abort\n";
+	std::cout << "  c                -- continue executing Factor - NOT SAFE\n";
+	std::cout << "  t                -- throw exception in Factor - NOT SAFE\n";
+	std::cout << "  .s .r .c         -- print data, retain, call stacks\n";
+	std::cout << "Advanced commands:\n";
+	std::cout << "  e                -- dump environment\n";
+	std::cout << "  d <addr> <count> -- dump memory\n";
+	std::cout << "  u <addr>         -- dump object at tagged <addr>\n";
+	std::cout << "  . <addr>         -- print object at tagged <addr>\n";
+	std::cout << "  g                -- dump generations\n";
+	std::cout << "  ds dr            -- dump data, retain stacks\n";
+	std::cout << "  trim             -- toggle output trimming\n";
+	std::cout << "  data             -- data heap dump\n";
+	std::cout << "  words            -- words dump\n";
+	std::cout << "  tuples           -- tuples dump\n";
+	std::cout << "  refs <addr>      -- find data heap references to object\n";
+	std::cout << "  push <addr>      -- push object on data stack - NOT SAFE\n";
+	std::cout << "  code             -- code heap dump\n";
 
 	bool seen_command = false;
 
@@ -384,7 +385,7 @@ void factor_vm::factorbug()
 		std::cout.flush();
 
 		std::cin >> std::setw(1024) >> cmd >> std::setw(0); 
-		if(!std::cin.good())
+		if(!std::cin.good() || strcmp(cmd,"q") == 0)
 		{
 			if(!seen_command)
 			{
@@ -404,6 +405,8 @@ void factor_vm::factorbug()
 
 		seen_command = true;
 
+		if(strcmp(cmd,"q") == 0)
+			exit(1);
 		if(strcmp(cmd,"d") == 0)
 		{
 			cell addr = read_cell_hex();
@@ -428,9 +431,9 @@ void factor_vm::factorbug()
 		}
 		else if(strcmp(cmd,"trim") == 0)
 			full_output = !full_output;
-		else if(strcmp(cmd,"s") == 0)
+		else if(strcmp(cmd,"ds") == 0)
 			dump_memory(ctx->datastack_seg->start,ctx->datastack);
-		else if(strcmp(cmd,"r") == 0)
+		else if(strcmp(cmd,"dr") == 0)
 			dump_memory(ctx->retainstack_seg->start,ctx->retainstack);
 		else if(strcmp(cmd,".s") == 0)
 			print_datastack();
@@ -445,7 +448,7 @@ void factor_vm::factorbug()
 		}
 		else if(strcmp(cmd,"g") == 0)
 			dump_generations();
-		else if(strcmp(cmd,"q") == 0 || strcmp(cmd,"c") == 0)
+		else if(strcmp(cmd,"c") == 0)
 		{
 			fep_p = false;
 			return;
@@ -456,8 +459,6 @@ void factor_vm::factorbug()
 			general_error(ERROR_INTERRUPT,false_object,false_object);
 			assert(false);
 		}
-		else if(strcmp(cmd,"x") == 0)
-			exit(1);
 		else if(strcmp(cmd,"data") == 0)
 			dump_objects(TYPE_COUNT);
 		else if(strcmp(cmd,"refs") == 0)
