@@ -287,15 +287,8 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
 		VM we can get. This will not be a good idea when we actually support native
 		threads. */
 		assert(thread_vms.size() == 1);
-		THREADHANDLE vm_thread = thread_vms.begin()->first;
 		factor_vm *vm = thread_vms.begin()->second;
-
-		assert(SuspendThread(vm_thread) == 0);
-		std::cout << "handling ctrl-c" << std::endl;
-
 		vm->enqueue_safepoint_fep();
-		MemoryBarrier();
-		assert(ResumeThread(vm_thread) == 1);
 		return TRUE;
 		}
 	default:
