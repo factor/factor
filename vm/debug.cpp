@@ -356,7 +356,6 @@ void factor_vm::factorbug()
 	std::cout << "Starting low level debugger...\n";
 	std::cout << "Basic commands:\n";
 	std::cout << "  q ^D             -- quit Factor\n";
-	std::cout << "  a                -- abort\n";
 	std::cout << "  c                -- continue executing Factor - NOT SAFE\n";
 	std::cout << "  t                -- throw exception in Factor - NOT SAFE\n";
 	std::cout << "  .s .r .c         -- print data, retain, call stacks\n";
@@ -385,7 +384,7 @@ void factor_vm::factorbug()
 		std::cout.flush();
 
 		std::cin >> std::setw(1024) >> cmd >> std::setw(0); 
-		if(!std::cin.good() || strcmp(cmd,"q") == 0)
+		if(!std::cin.good())
 		{
 			if(!seen_command)
 			{
