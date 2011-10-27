@@ -146,6 +146,12 @@ void factor_vm::dispatch_signal(void *uap, void (handler)())
 	UAP_SET_TOC_POINTER(uap, (cell)FUNCTION_TOC_POINTER(handler));
 }
 
+void factor_vm::enqueue_safepoint_signal(cell signal)
+{
+	sigaddset(&safepoint_signals, signal);
+	code->guard_safepoint();
+}
+
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm();

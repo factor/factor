@@ -170,12 +170,6 @@ void factor_vm::enqueue_safepoint_fep()
 	code->guard_safepoint();
 }
 
-void factor_vm::enqueue_safepoint_signal(cell signal)
-{
-	sigaddset(&safepoint_signals, signal);
-	code->guard_safepoint();
-}
-
 void factor_vm::enqueue_safepoint_sample()
 {
 	if (!sampling_p)

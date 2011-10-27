@@ -20,7 +20,9 @@ factor_vm::factor_vm() :
 	last_nano_count(0),
 	signal_callstack_seg(NULL)
 {
+#ifndef WINDOWS
 	sigemptyset(&safepoint_signals);
+#endif
 	primitive_reset_dispatch_stats();
 }
 
