@@ -216,14 +216,15 @@ void sleep_nanos(u64 nsec)
 
 LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
 {
-	c->ESP = (cell)fix_callstack_top((stack_frame *)c->ESP);
-	ctx->callstack_top = (stack_frame *)c->ESP;
-
 	switch (e->ExceptionCode)
 	{
 	case EXCEPTION_ACCESS_VIOLATION:
 		signal_fault_addr = e->ExceptionInformation[1];
-		c->EIP = (cell)factor::memory_signal_handler_impl;
+		dispatch_signal_handler(
+			(cell*)&c->ESP,
+			(cell*)&c->EIP,
+			(cell)factor::memory_signal_handler_impl
+		);
 		break;
 
 	case STATUS_FLOAT_DENORMAL_OPERAND:
@@ -244,11 +245,19 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, 
 		X87SW(c) = 0;
 #endif
 		MXCSR(c) &= 0xffffffc0;
-		c->EIP = (cell)factor::fp_signal_handler_impl;
+		dispatch_signal_handler(
+			(cell*)&c->ESP,
+			(cell*)&c->EIP,
+			(cell)factor::fp_signal_handler_impl
+		);
 		break;
 	default:
 		signal_number = e->ExceptionCode;
-		c->EIP = (cell)factor::synchronous_signal_handler_impl;
+		dispatch_signal_handler(
+			(cell*)&c->ESP,
+			(cell*)&c->EIP,
+			(cell)factor::synchronous_signal_handler_impl
+		);
 		break;
 	}
 
@@ -265,7 +274,7 @@ BOOL factor_vm::ctrl_handler(DWORD dwCtrlType)
 	switch (dwCtrlType) {
 	case CTRL_C_EVENT:
 	case CTRL_BREAK_EVENT:
-		enqueue_safepoint_signal((cell)-1);
+		enqueue_safepoint_fep();
 		return TRUE;
 	default:
 		return FALSE;
