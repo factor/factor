@@ -34,7 +34,7 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->signals = true;
 
 #ifdef WINDOWS
-	p->console = false;
+	p->console = GetConsoleWindow() != NULL;
 #else
 	p->console = true;
 #endif
