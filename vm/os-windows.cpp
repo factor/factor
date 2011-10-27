@@ -266,32 +266,46 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, 
 
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
 {
-	return current_vm()->exception_handler(e,frame,c,dispatch);
+	factor_vm *vm = current_vm_p();
+	if (vm)
+		return vm->exception_handler(e,frame,c,dispatch);
+	else
+	{
+		fatal_error("Foreign thread received exception ", e->ExceptionCode);
+		return 0; // to placate MSVC
+	}
 }
 
-BOOL factor_vm::ctrl_handler(DWORD dwCtrlType)
+static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
 {
 	switch (dwCtrlType) {
 	case CTRL_C_EVENT:
 	case CTRL_BREAK_EVENT:
-		enqueue_safepoint_fep();
+		{
+		/* The CtrlHandler runs in its own thread without stopping the main thread.
+		Since in practice nobody uses the multi-VM stuff yet, we just grab the first
+		VM we can get. This will not be a good idea when we actually support native
+		threads. */
+		assert(thread_vms.size() == 1);
+		THREADHANDLE vm_thread = thread_vms.begin()->first;
+		factor_vm *vm = thread_vms.begin()->second;
+
+		assert(SuspendThread(vm_thread) == 0);
+		std::cout << "handling ctrl-c" << std::endl;
+
+		vm->enqueue_safepoint_fep();
+		MemoryBarrier();
+		assert(ResumeThread(vm_thread) == 1);
 		return TRUE;
+		}
 	default:
 		return FALSE;
 	}
 }
 
-VM_C_API BOOL ctrl_handler(DWORD dwCtrlType)
-{
-	factor_vm *vm = current_vm_p();
-	if (vm != NULL)
-		return vm->ctrl_handler(dwCtrlType);
-	else
-		return FALSE;
-}
-
 void factor_vm::open_console()
 {
+	std::cout << "setting ctrl handler\n";
 	SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
 }
 
