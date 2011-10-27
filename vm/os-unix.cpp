@@ -148,8 +148,9 @@ void factor_vm::dispatch_signal(void *uap, void (handler)())
 
 void factor_vm::enqueue_safepoint_signal(cell signal)
 {
-	sigaddset(&safepoint_signals, signal);
+	/* to be implemented, see #297
 	code->guard_safepoint();
+	*/
 }
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
