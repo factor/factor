@@ -62,7 +62,7 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 	new_word->code = NULL;
 
 	jit_compile_word(new_word.value(),new_word->def,true);
-	if(profiling_p)
+	if(counting_profiler_p)
 	{
 		code_block *profiling_block = compile_profiling_stub(new_word.value());
 		new_word->profiling = profiling_block;
@@ -89,7 +89,7 @@ void factor_vm::primitive_word_code()
 	data_root<word> w(ctx->pop(),this);
 	w.untag_check(this);
 
-	if(profiling_p)
+	if(counting_profiler_p)
 	{
 		ctx->push(from_unsigned_cell((cell)w->profiling->entry_point()));
 		ctx->push(from_unsigned_cell((cell)w->profiling + w->profiling->size()));
@@ -103,7 +103,7 @@ void factor_vm::primitive_word_code()
 
 void factor_vm::update_word_entry_point(word *w)
 {
-	if(profiling_p && w->profiling)
+	if(counting_profiler_p && w->profiling)
 		w->entry_point = w->profiling->entry_point();
 	else
 		w->entry_point = w->code->entry_point();

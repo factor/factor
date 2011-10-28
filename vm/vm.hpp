@@ -61,9 +61,9 @@ struct factor_vm
 	c_to_factor_func_type c_to_factor_func;
 
 	/* Is call counting enabled? */
-	bool profiling_p;
+	bool counting_profiler_p;
 	/* Is sampling profiler enabled? */
-	bool sampling_p;
+	bool sampling_profiler_p;
 
 	/* Global variables used to pass fault handler state from signal handler
 	to VM */
@@ -350,16 +350,11 @@ struct factor_vm
 		return (Type *)allot_object(Type::type_number,size);
 	}
 
-	inline bool in_data_heap_p(cell pointer)
-	{
-		return (pointer >= data->seg->start && pointer < data->seg->end);
-	}
-
 	inline void check_data_pointer(object *pointer)
 	{
 	#ifdef FACTOR_DEBUG
 		if(!(current_gc && current_gc->op == collect_growing_heap_op))
-			assert(in_data_heap_p((cell)pointer));
+			assert(data->seg->in_segment_p((cell)pointer));
 	#endif
 	}
 
@@ -566,7 +561,6 @@ struct factor_vm
 	}
 
 	void init_code_heap(cell size);
-	bool in_code_heap_p(cell ptr);
 	void update_code_heap_words(bool reset_inline_caches);
 	void initialize_code_blocks();
 	void primitive_modify_code_heap();

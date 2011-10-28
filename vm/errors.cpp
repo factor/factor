@@ -172,15 +172,15 @@ void factor_vm::enqueue_safepoint_fep()
 
 void factor_vm::enqueue_safepoint_sample()
 {
-	if (!sampling_p)
-		fatal_error("Received sampling signal while not sampling!", 0);
-	++safepoint_sample_count;
+	if (sampling_profiler_p)
+		++safepoint_sample_count;
 }
 
 void factor_vm::handle_safepoint()
 {
 	code->unguard_safepoint();
-	if (safepoint_fep) {
+	if (safepoint_fep)
+	{
 		std::cout << "Interrupted\n";
 		factorbug();
 		safepoint_fep = false;
