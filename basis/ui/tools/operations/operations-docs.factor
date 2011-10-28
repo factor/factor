@@ -1,5 +1,5 @@
 USING: help.tips help.markup help.syntax ui.operations
-tools.walker tools.time tools.profiler ui.tools.operations ;
+tools.walker tools.time tools.counting-profiler ui.tools.operations ;
 
 TIP: "Press " { $operation com-stack-effect } " to print the stack effect of the code in the input field without executing it (" { $link "inference" } ")." ;
 
