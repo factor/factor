@@ -383,6 +383,7 @@ struct factor_vm
 	void find_data_references_step(cell *scan);
 	void find_data_references(cell look_for_);
 	void dump_code_heap();
+	void factorbug_usage();
 	void factorbug();
 	void primitive_die();
 
