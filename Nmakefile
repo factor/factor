@@ -21,7 +21,7 @@ PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
 
 ML_FLAGS = /nologo /safeseh
 
-EXE_OBJS = vm/main-windows.obj vm\factor.res
+EXE_OBJS = vm\main-windows.obj vm\factor.res
 
 DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\os-windows.obj \
@@ -37,6 +37,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\code_heap.obj \
 	vm\compaction.obj \
 	vm\contexts.obj \
+	vm\counting_profiler.obj \
 	vm\data_heap.obj \
 	vm\data_heap_checker.obj \
 	vm\debug.obj \
@@ -60,9 +61,9 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\object_start_map.obj \
 	vm\objects.obj \
 	vm\primitives.obj \
-	vm\counting_profiler.obj \
 	vm\quotations.obj \
 	vm\run.obj \
+	vm\sampling_profiler.obj \
 	vm\strings.obj \
 	vm\to_tenured_collector.obj \
 	vm\tuples.obj \

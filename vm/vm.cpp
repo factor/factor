@@ -11,6 +11,7 @@ factor_vm::factor_vm() :
 	sampling_profiler_p(false),
 	safepoint_fep(false),
 	safepoint_sample_count(0),
+	safepoint_gc_sample_count(0),
 	gc_off(false),
 	current_gc(NULL),
 	gc_events(NULL),
