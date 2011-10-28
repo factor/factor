@@ -23,8 +23,8 @@ void factor_vm::c_to_factor(cell quot)
 template<typename Func> Func factor_vm::get_entry_point(cell n)
 {
 	/* We return word->code->entry_point() and not word->entry_point,
-	because if profiling is enabled, we don't want to go through the
-	entry point's profiling stub. This clobbers registers, since entry
+	because if counting_profiler is enabled, we don't want to go through the
+	entry point's counting_profiler stub. This clobbers registers, since entry
 	points use the C ABI and not the Factor ABI. */
 	tagged<word> entry_point_word(special_objects[n]);
 	return (Func)entry_point_word->code->entry_point();

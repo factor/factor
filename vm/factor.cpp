@@ -135,7 +135,7 @@ void factor_vm::init_factor(vm_parameters *p)
 	if(p->console)
 		open_console();
 
-	init_profiler();
+	init_counting_profiler();
 
 	special_objects[OBJ_CPU] = allot_alien(false_object,(cell)FACTOR_CPU_STRING);
 	special_objects[OBJ_OS] = allot_alien(false_object,(cell)FACTOR_OS_STRING);

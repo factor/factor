@@ -100,7 +100,7 @@ namespace factor
 	_(modify_code_heap) \
 	_(nano_count) \
 	_(optimized_p) \
-	_(profiling) \
+	_(counting_profiler) \
 	_(quot_compiled_p) \
 	_(quotation_code) \
 	_(reset_dispatch_stats) \
