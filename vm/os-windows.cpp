@@ -271,7 +271,7 @@ VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, vo
 		return vm->exception_handler(e,frame,c,dispatch);
 	else
 	{
-		fatal_error("Foreign thread received exception ", e->ExceptionCode);
+		fatal_error("Foreign thread received exception", e->ExceptionCode);
 		return 0; // to placate MSVC
 	}
 }
@@ -281,7 +281,7 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
 	switch (dwCtrlType) {
 	case CTRL_C_EVENT:
 	case CTRL_BREAK_EVENT:
-		{
+	{
 		/* The CtrlHandler runs in its own thread without stopping the main thread.
 		Since in practice nobody uses the multi-VM stuff yet, we just grab the first
 		VM we can get. This will not be a good idea when we actually support native
@@ -290,7 +290,7 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
 		factor_vm *vm = thread_vms.begin()->second;
 		vm->enqueue_safepoint_fep();
 		return TRUE;
-		}
+	}
 	default:
 		return FALSE;
 	}

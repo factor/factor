@@ -102,11 +102,6 @@ void factor_vm::init_code_heap(cell size)
 	code = new code_heap(size);
 }
 
-bool factor_vm::in_code_heap_p(cell ptr)
-{
-	return (ptr >= code->seg->start && ptr <= code->seg->end);
-}
-
 struct word_updater {
 	factor_vm *parent;
 	bool reset_inline_caches;

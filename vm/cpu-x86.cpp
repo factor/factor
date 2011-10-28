@@ -7,10 +7,10 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 {
 	if (!code->seg->in_segment_p(*pc) || *sp < ctx->callstack_seg->start + stack_reserved)
 	{
-		/* Fault came from foreign code, a callstack overflow, or we would probably
-		overflow if we tried the resumable handler. We can't resume, so cut the
+		/* Fault came from foreign code or a callstack overflow, or we don't
+		have enough callstack room to try the resumable handler. Cut the
 		callstack down to the shallowest Factor stack frame that leaves room for
-		the signal handler to do its thing and launch the handler without going
+		the signal handler to do its thing, and launch the handler without going
 		through the resumable subprimitive. */
 		signal_resumable = false;
 		stack_frame *frame = ctx->callstack_bottom - 1;
@@ -61,9 +61,7 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 			handler_word = tagged<word>(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
 		}
 		else
-		{
-			fatal_error("Invalid stack frame during signal handler", *sp);
-		}
+			assert(false);
 
 		*pc = (cell)handler_word->code->entry_point();
 	}
