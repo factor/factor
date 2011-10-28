@@ -60,7 +60,7 @@ enum code_block_type
 {
 	code_block_unoptimized,
 	code_block_optimized,
-	code_block_profiling,
+	code_block_counting_profiler,
 	code_block_pic
 };
 
@@ -232,7 +232,7 @@ struct word : public object {
 	cell pic_def;
 	/* TAGGED alternative entry point for direct tail calls. Used for inline caching */
 	cell pic_tail_def;
-	/* TAGGED call count for profiling */
+	/* TAGGED call count for counting_profiler */
 	cell counter;
 	/* TAGGED machine code for sub-primitive */
 	cell subprimitive;
@@ -240,8 +240,8 @@ struct word : public object {
 	void *entry_point;
 	/* UNTAGGED compiled code block */
 	code_block *code;
-	/* UNTAGGED profiler stub */
-	code_block *profiling;
+	/* UNTAGGED counting_profiler stub */
+	code_block *counting_profiler;
 };
 
 /* Assembly code makes assumptions about the layout of this struct */

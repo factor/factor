@@ -94,7 +94,7 @@ namespace factor
 #include "contexts.hpp"
 #include "run.hpp"
 #include "objects.hpp"
-#include "profiler.hpp"
+#include "counting_profiler.hpp"
 #include "errors.hpp"
 #include "bignumint.hpp"
 #include "bignum.hpp"

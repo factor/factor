@@ -180,11 +180,11 @@ struct factor_vm
 	void primitive_clone();
 	void primitive_become();
 
-	// profiler
-	void init_profiler();
-	code_block *compile_profiling_stub(cell word_);
-	void set_profiling(bool profiling);
-	void primitive_profiling();
+	// counting_profiler
+	void init_counting_profiler();
+	code_block *compile_counting_profiler_stub(cell word_);
+	void set_counting_profiler(bool counting_profiler);
+	void primitive_counting_profiler();
 
 	// errors
 	void general_error(vm_error_type error, cell arg1, cell arg2);
