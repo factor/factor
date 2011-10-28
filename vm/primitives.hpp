@@ -45,6 +45,7 @@ namespace factor
 	_(context_object) \
 	_(context_object_for) \
 	_(current_callback) \
+	_(counting_profiler) \
 	_(data_room) \
 	_(datastack) \
 	_(datastack_for) \
@@ -100,7 +101,6 @@ namespace factor
 	_(modify_code_heap) \
 	_(nano_count) \
 	_(optimized_p) \
-	_(counting_profiler) \
 	_(quot_compiled_p) \
 	_(quotation_code) \
 	_(reset_dispatch_stats) \
@@ -109,6 +109,7 @@ namespace factor
 	_(resize_string) \
 	_(retainstack) \
 	_(retainstack_for) \
+	_(sampling_profiler) \
 	_(save_image) \
 	_(save_image_and_exit) \
 	_(set_context_object) \
