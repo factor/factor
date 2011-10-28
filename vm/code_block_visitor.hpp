@@ -59,8 +59,8 @@ void code_block_visitor<Fixup>::visit_object_code_block(object *obj)
 			word *w = (word *)obj;
 			if(w->code)
 				w->code = visit_code_block(w->code);
-			if(w->profiling)
-				w->profiling = visit_code_block(w->profiling);
+			if(w->counting_profiler)
+				w->counting_profiler = visit_code_block(w->counting_profiler);
 
 			parent->update_word_entry_point(w);
 			break;
