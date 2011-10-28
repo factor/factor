@@ -144,13 +144,13 @@ void factor_vm::print_objects(cell *start, cell *end)
 
 void factor_vm::print_datastack()
 {
-	std::cout << "==== DATA STACK:\n";
+	std::cout << "==== DATA STACK:" << std::endl;
 	print_objects((cell *)ctx->datastack_seg->start,(cell *)ctx->datastack);
 }
 
 void factor_vm::print_retainstack()
 {
-	std::cout << "==== RETAIN STACK:\n";
+	std::cout << "==== RETAIN STACK:" << std::endl;
 	print_objects((cell *)ctx->retainstack_seg->start,(cell *)ctx->retainstack);
 }
 
@@ -181,7 +181,7 @@ struct stack_frame_printer {
 
 void factor_vm::print_callstack()
 {
-	std::cout << "==== CALL STACK:\n";
+	std::cout << "==== CALL STACK:" << std::endl;
 	stack_frame_printer printer(this);
 	iterate_callstack(ctx,printer);
 }
@@ -339,41 +339,41 @@ void factor_vm::dump_code_heap()
 {
 	code_block_printer printer(this);
 	code->allocator->iterate(printer);
-	std::cout << printer.reloc_size << " bytes used by relocation tables\n";
-	std::cout << printer.parameter_size << " bytes used by parameter tables\n";
+	std::cout << printer.reloc_size << " bytes used by relocation tables" << std::endl;
+	std::cout << printer.parameter_size << " bytes used by parameter tables" << std::endl;
 }
 
 void factor_vm::factorbug()
 {
 	if(fep_disabled)
 	{
-		std::cout << "Low level debugger disabled\n";
+		std::cout << "Low level debugger disabled" << std::endl;
 		exit(1);
 	}
 
 	fep_p = true;
 
-	std::cout << "Starting low level debugger...\n";
-	std::cout << "Basic commands:\n";
-	std::cout << "  q ^D             -- quit Factor\n";
-	std::cout << "  c                -- continue executing Factor - NOT SAFE\n";
-	std::cout << "  t                -- throw exception in Factor - NOT SAFE\n";
-	std::cout << "  .s .r .c         -- print data, retain, call stacks\n";
-	std::cout << "Advanced commands:\n";
-	std::cout << "  e                -- dump environment\n";
-	std::cout << "  d <addr> <count> -- dump memory\n";
-	std::cout << "  u <addr>         -- dump object at tagged <addr>\n";
-	std::cout << "  . <addr>         -- print object at tagged <addr>\n";
-	std::cout << "  g                -- dump generations\n";
-	std::cout << "  ds dr            -- dump data, retain stacks\n";
-	std::cout << "  trim             -- toggle output trimming\n";
-	std::cout << "  data             -- data heap dump\n";
-	std::cout << "  words            -- words dump\n";
-	std::cout << "  tuples           -- tuples dump\n";
-	std::cout << "  refs <addr>      -- find data heap references to object\n";
-	std::cout << "  push <addr>      -- push object on data stack - NOT SAFE\n";
-	std::cout << "  gc               -- trigger full GC - NOT SAFE\n";
-	std::cout << "  code             -- code heap dump\n";
+	std::cout << "Starting low level debugger..." << std::endl;
+	std::cout << "Basic commands:" << std::endl;
+	std::cout << "  q ^D             -- quit Factor" << std::endl;
+	std::cout << "  c                -- continue executing Factor - NOT SAFE" << std::endl;
+	std::cout << "  t                -- throw exception in Factor - NOT SAFE" << std::endl;
+	std::cout << "  .s .r .c         -- print data, retain, call stacks" << std::endl;
+	std::cout << "Advanced commands:" << std::endl;
+	std::cout << "  e                -- dump environment" << std::endl;
+	std::cout << "  d <addr> <count> -- dump memory" << std::endl;
+	std::cout << "  u <addr>         -- dump object at tagged <addr>" << std::endl;
+	std::cout << "  . <addr>         -- print object at tagged <addr>" << std::endl;
+	std::cout << "  g                -- dump generations" << std::endl;
+	std::cout << "  ds dr            -- dump data, retain stacks" << std::endl;
+	std::cout << "  trim             -- toggle output trimming" << std::endl;
+	std::cout << "  data             -- data heap dump" << std::endl;
+	std::cout << "  words            -- words dump" << std::endl;
+	std::cout << "  tuples           -- tuples dump" << std::endl;
+	std::cout << "  refs <addr>      -- find data heap references to object" << std::endl;
+	std::cout << "  push <addr>      -- push object on data stack - NOT SAFE" << std::endl;
+	std::cout << "  gc               -- trigger full GC - NOT SAFE" << std::endl;
+	std::cout << "  code             -- code heap dump" << std::endl;
 
 	bool seen_command = false;
 
@@ -381,7 +381,7 @@ void factor_vm::factorbug()
 	{
 		char cmd[1024];
 
-		std::cout << "READY\n";
+		std::cout << "READY" << std::endl;
 		std::cout.flush();
 
 		std::cin >> std::setw(1024) >> cmd >> std::setw(0); 
@@ -464,7 +464,7 @@ void factor_vm::factorbug()
 		else if(strcmp(cmd,"refs") == 0)
 		{
 			cell addr = read_cell_hex();
-			std::cout << "Data heap references:\n";
+			std::cout << "Data heap references:" << std::endl;
 			find_data_references(addr);
 			std::cout << std::endl;
 		}
@@ -482,14 +482,14 @@ void factor_vm::factorbug()
 		else if(strcmp(cmd,"gc") == 0)
 			primitive_full_gc();
 		else
-			std::cout << "unknown command\n";
+			std::cout << "unknown command" << std::endl;
 	}
 }
 
 void factor_vm::primitive_die()
 {
-	std::cout << "The die word was called by the library. Unless you called it yourself,\n";
-	std::cout << "you have triggered a bug in Factor. Please report.\n";
+	std::cout << "The die word was called by the library. Unless you called it yourself," << std::endl;
+	std::cout << "you have triggered a bug in Factor. Please report." << std::endl;
 	factorbug();
 }
 

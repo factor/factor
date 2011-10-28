@@ -168,7 +168,7 @@ void synchronous_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 		vm->signal_number = signal;
 		vm->dispatch_signal(uap,factor::synchronous_signal_handler_impl);
 	} else
-		fatal_error("Foreign thread received signal ", signal);
+		fatal_error("Foreign thread received signal", signal);
 }
 
 void enqueue_signal_handler(int signal, siginfo_t *siginfo, void *uap)
@@ -177,7 +177,7 @@ void enqueue_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 	if (vm)
 		vm->enqueue_safepoint_signal(signal);
 	else
-		fatal_error("Foreign thread received signal ", signal);
+		fatal_error("Foreign thread received signal", signal);
 }
 
 void fep_signal_handler(int signal, siginfo_t *siginfo, void *uap)
@@ -186,7 +186,7 @@ void fep_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 	if (vm)
 		vm->enqueue_safepoint_fep();
 	else
-		fatal_error("Foreign thread received signal ", signal);
+		fatal_error("Foreign thread received signal", signal);
 }
 
 void sample_signal_handler(int signal, siginfo_t *siginfo, void *uap)
@@ -195,7 +195,7 @@ void sample_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 	if (vm)
 		vm->enqueue_safepoint_sample();
 	else
-		fatal_error("Foreign thread received signal ", signal);
+		fatal_error("Foreign thread received signal", signal);
 }
 
 void ignore_signal_handler(int signal, siginfo_t *siginfo, void *uap)
