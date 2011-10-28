@@ -343,22 +343,18 @@ void factor_vm::dump_code_heap()
 	std::cout << printer.parameter_size << " bytes used by parameter tables" << std::endl;
 }
 
-void factor_vm::factorbug()
+void factor_vm::factorbug_usage()
 {
-	if(fep_disabled)
-	{
-		std::cout << "Low level debugger disabled" << std::endl;
-		exit(1);
-	}
-
-	fep_p = true;
-
-	std::cout << "Starting low level debugger..." << std::endl;
 	std::cout << "Basic commands:" << std::endl;
+#ifdef WINDOWS
+	std::cout << "  q ^Z             -- quit Factor" << std::endl;
+#else
 	std::cout << "  q ^D             -- quit Factor" << std::endl;
+#endif
 	std::cout << "  c                -- continue executing Factor - NOT SAFE" << std::endl;
 	std::cout << "  t                -- throw exception in Factor - NOT SAFE" << std::endl;
 	std::cout << "  .s .r .c         -- print data, retain, call stacks" << std::endl;
+	std::cout << "  help             -- reprint this message" << std::endl;
 	std::cout << "Advanced commands:" << std::endl;
 	std::cout << "  e                -- dump environment" << std::endl;
 	std::cout << "  d <addr> <count> -- dump memory" << std::endl;
@@ -374,15 +370,29 @@ void factor_vm::factorbug()
 	std::cout << "  push <addr>      -- push object on data stack - NOT SAFE" << std::endl;
 	std::cout << "  gc               -- trigger full GC - NOT SAFE" << std::endl;
 	std::cout << "  code             -- code heap dump" << std::endl;
+	std::cout << std::endl;
 
+}
+
+void factor_vm::factorbug()
+{
+	if(fep_disabled)
+	{
+		std::cout << "Low level debugger disabled" << std::endl;
+		exit(1);
+	}
+
+	fep_p = true;
+
+	std::cout << "Starting low level debugger..." << std::endl;
+	factorbug_usage();
 	bool seen_command = false;
 
 	for(;;)
 	{
 		char cmd[1024];
 
-		std::cout << "READY" << std::endl;
-		std::cout.flush();
+		std::cout << "> " << std::flush;
 
 		std::cin >> std::setw(1024) >> cmd >> std::setw(0); 
 		if(!std::cin.good())
@@ -481,6 +491,8 @@ void factor_vm::factorbug()
 			dump_code_heap();
 		else if(strcmp(cmd,"gc") == 0)
 			primitive_full_gc();
+		else if(strcmp(cmd,"help") == 0)
+			factorbug_usage();
 		else
 			std::cout << "unknown command" << std::endl;
 	}
