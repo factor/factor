@@ -343,7 +343,7 @@ void factor_vm::dump_code_heap()
 	std::cout << printer.parameter_size << " bytes used by parameter tables" << std::endl;
 }
 
-void factor_vm::factorbug_usage()
+void factor_vm::factorbug_usage(bool advanced_p)
 {
 	std::cout << "Basic commands:" << std::endl;
 #ifdef WINDOWS
@@ -354,22 +354,30 @@ void factor_vm::factorbug_usage()
 	std::cout << "  c                -- continue executing Factor - NOT SAFE" << std::endl;
 	std::cout << "  t                -- throw exception in Factor - NOT SAFE" << std::endl;
 	std::cout << "  .s .r .c         -- print data, retain, call stacks" << std::endl;
-	std::cout << "  help             -- reprint this message" << std::endl;
-	std::cout << "Advanced commands:" << std::endl;
-	std::cout << "  e                -- dump environment" << std::endl;
-	std::cout << "  d <addr> <count> -- dump memory" << std::endl;
-	std::cout << "  u <addr>         -- dump object at tagged <addr>" << std::endl;
-	std::cout << "  . <addr>         -- print object at tagged <addr>" << std::endl;
-	std::cout << "  g                -- dump generations" << std::endl;
-	std::cout << "  ds dr            -- dump data, retain stacks" << std::endl;
-	std::cout << "  trim             -- toggle output trimming" << std::endl;
-	std::cout << "  data             -- data heap dump" << std::endl;
-	std::cout << "  words            -- words dump" << std::endl;
-	std::cout << "  tuples           -- tuples dump" << std::endl;
-	std::cout << "  refs <addr>      -- find data heap references to object" << std::endl;
-	std::cout << "  push <addr>      -- push object on data stack - NOT SAFE" << std::endl;
-	std::cout << "  gc               -- trigger full GC - NOT SAFE" << std::endl;
-	std::cout << "  code             -- code heap dump" << std::endl;
+	if (advanced_p)
+	{
+		std::cout << "  help             -- reprint this message" << std::endl;
+		std::cout << "Advanced commands:" << std::endl;
+		std::cout << "  e                -- dump environment" << std::endl;
+		std::cout << "  d <addr> <count> -- dump memory" << std::endl;
+		std::cout << "  u <addr>         -- dump object at tagged <addr>" << std::endl;
+		std::cout << "  . <addr>         -- print object at tagged <addr>" << std::endl;
+		std::cout << "  g                -- dump generations" << std::endl;
+		std::cout << "  ds dr            -- dump data, retain stacks" << std::endl;
+		std::cout << "  trim             -- toggle output trimming" << std::endl;
+		std::cout << "  data             -- data heap dump" << std::endl;
+		std::cout << "  words            -- words dump" << std::endl;
+		std::cout << "  tuples           -- tuples dump" << std::endl;
+		std::cout << "  refs <addr>      -- find data heap references to object" << std::endl;
+		std::cout << "  push <addr>      -- push object on data stack - NOT SAFE" << std::endl;
+		std::cout << "  gc               -- trigger full GC - NOT SAFE" << std::endl;
+		std::cout << "  code             -- code heap dump" << std::endl;
+	}
+	else
+	{
+		std::cout << "  help             -- full help, including advanced commands" << std::endl;
+	}
+
 	std::cout << std::endl;
 
 }
@@ -385,7 +393,7 @@ void factor_vm::factorbug()
 	fep_p = true;
 
 	std::cout << "Starting low level debugger..." << std::endl;
-	factorbug_usage();
+	factorbug_usage(false);
 	bool seen_command = false;
 
 	for(;;)
@@ -492,7 +500,7 @@ void factor_vm::factorbug()
 		else if(strcmp(cmd,"gc") == 0)
 			primitive_full_gc();
 		else if(strcmp(cmd,"help") == 0)
-			factorbug_usage();
+			factorbug_usage(true);
 		else
 			std::cout << "unknown command" << std::endl;
 	}
