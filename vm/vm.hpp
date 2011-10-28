@@ -60,9 +60,8 @@ struct factor_vm
 	/* External entry points */
 	c_to_factor_func_type c_to_factor_func;
 
-	/* Is call counting enabled? */
+	/* Is profiling enabled? */
 	bool counting_profiler_p;
-	/* Is sampling profiler enabled? */
 	bool sampling_profiler_p;
 
 	/* Global variables used to pass fault handler state from signal handler
@@ -71,8 +70,12 @@ struct factor_vm
 	cell signal_number;
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
-	bool safepoint_fep;
-	cell safepoint_sample_count;
+	volatile bool safepoint_fep;
+
+	/* State kept by the sampling profiler */
+	std::vector<profiling_sample> samples;
+	volatile cell safepoint_sample_count;
+	volatile cell safepoint_gc_sample_count;
 
 	/* GC is off during heap walking */
 	bool gc_off;
@@ -185,6 +188,13 @@ struct factor_vm
 	code_block *compile_counting_profiler_stub(cell word_);
 	void set_counting_profiler(bool counting_profiler);
 	void primitive_counting_profiler();
+
+	/* Sampling profiler */
+	void record_sample();
+	void start_sampling_profiler();
+	void end_sampling_profiler();
+	void set_sampling_profiler(bool sampling);
+	void primitive_sampling_profiler();
 
 	// errors
 	void general_error(vm_error_type error, cell arg1, cell arg2);
@@ -383,7 +393,7 @@ struct factor_vm
 	void find_data_references_step(cell *scan);
 	void find_data_references(cell look_for_);
 	void dump_code_heap();
-	void factorbug_usage();
+	void factorbug_usage(bool advanced_p);
 	void factorbug();
 	void primitive_die();
 
@@ -705,6 +715,8 @@ struct factor_vm
 	void ffi_dlclose(dll *dll);
 	void c_to_factor_toplevel(cell quot);
 	void init_signals();
+	void start_sampling_profiler_timer();
+	void end_sampling_profiler_timer();
 
 	// os-windows
   #if defined(WINDOWS)
