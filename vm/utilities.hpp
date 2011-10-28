@@ -53,4 +53,45 @@ vm_char *safe_strdup(const vm_char *str);
 cell read_cell_hex();
 VM_C_API void *factor_memcpy(void *dst, void *src, size_t len);
 
+#if defined(WINDOWS)
+
+	#if defined(FACTOR_64)
+
+		#define FACTOR_ATOMIC_CAS(ptr, old_val, new_val) \
+			(InterlockedCompareExchange64(ptr, new_val, old_val) == old_val)
+
+		#define FACTOR_ATOMIC_ADD(ptr, val) \
+			InterlockedAdd64(ptr, val)
+
+		#define FACTOR_ATOMIC_SUB(ptr, val) \
+			InterlockedSub64(ptr, val)
+
+	#else
+
+		#define FACTOR_ATOMIC_CAS(ptr, old_val, new_val) \
+			(InterlockedCompareExchange(ptr, new_val, old_val) == old_val)
+
+		#define FACTOR_ATOMIC_ADD(ptr, val) \
+			InterlockedAdd(ptr, val)
+
+		#define FACTOR_ATOMIC_SUB(ptr, val) \
+			InterlockedSub(ptr, val)
+
+	#endif
+
+#elif defined(__GNUC__) || defined(__clang__)
+
+	#define FACTOR_ATOMIC_CAS(ptr, old_val, new_val) \
+		__sync_bool_compare_and_swap(ptr, old_val, new_val)
+
+	#define FACTOR_ATOMIC_ADD(ptr, val) \
+		__sync_add_and_fetch(ptr, val)
+
+	#define FACTOR_ATOMIC_SUB(ptr, val) \
+		__sync_sub_and_fetch(ptr, val)
+
+#else
+	#error "Unsupported compiler"
+#endif
+
 }

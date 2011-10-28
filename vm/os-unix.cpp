@@ -153,6 +153,22 @@ void factor_vm::enqueue_safepoint_signal(cell signal)
 	*/
 }
 
+void factor_vm::start_sampling_profiler_timer()
+{
+	struct itimerval timer;
+	memset((void*)&timer, 0, sizeof(struct itimerval));
+	timer.it_value.tv_usec = 1000000/FACTOR_PROFILE_SAMPLES_PER_SECOND;
+	timer.it_interval.tv_usec = 1000000/FACTOR_PROFILE_SAMPLES_PER_SECOND;
+	setitimer(ITIMER_REAL, &timer, NULL);
+}
+
+void factor_vm::end_sampling_profiler_timer()
+{
+	struct itimerval timer;
+	memset((void*)&timer, 0, sizeof(struct itimerval));
+	setitimer(ITIMER_REAL, &timer, NULL);
+}
+
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm();
@@ -239,21 +255,6 @@ static void init_sigaction_with_handler(struct sigaction *act,
 
 void factor_vm::unix_init_signals()
 {
-	/* OpenBSD doesn't support sigaltstack() if we link against
-	libpthread. See http://redmine.ruby-lang.org/issues/show/1239 */
-
-#ifndef __OpenBSD__
-	signal_callstack_seg = new segment(callstack_size,false);
-
-	stack_t signal_callstack;
-	signal_callstack.ss_sp = (char *)signal_callstack_seg->start;
-	signal_callstack.ss_size = signal_callstack_seg->size;
-	signal_callstack.ss_flags = 0;
-
-	if(sigaltstack(&signal_callstack,(stack_t *)NULL) < 0)
-		fatal_error("sigaltstack() failed",0);
-#endif
-
 	struct sigaction memory_sigaction;
 	struct sigaction synchronous_sigaction;
 	struct sigaction enqueue_sigaction;

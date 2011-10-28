@@ -173,7 +173,11 @@ void factor_vm::enqueue_safepoint_fep()
 void factor_vm::enqueue_safepoint_sample()
 {
 	if (sampling_profiler_p)
-		++safepoint_sample_count;
+	{
+		FACTOR_ATOMIC_ADD(&safepoint_sample_count, 1);
+		if (current_gc)
+			FACTOR_ATOMIC_ADD(&safepoint_gc_sample_count, 1);
+	}
 }
 
 void factor_vm::handle_safepoint()
@@ -181,10 +185,15 @@ void factor_vm::handle_safepoint()
 	code->unguard_safepoint();
 	if (safepoint_fep)
 	{
+		if (sampling_profiler_p)
+			end_sampling_profiler();
 		std::cout << "Interrupted\n";
 		factorbug();
 		safepoint_fep = false;
-		return;
+	}
+	else if (sampling_profiler_p)
+	{
+		record_sample();
 	}
 }
 
