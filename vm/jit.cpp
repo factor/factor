@@ -4,7 +4,7 @@ namespace factor
 {
 
 /* Simple code generator used by:
-- profiler (profiler.cpp),
+- counting_profiler (counting_profiler.cpp),
 - quotation compiler (quotations.cpp),
 - megamorphic caches (dispatch.cpp),
 - polymorphic inline caches (inline_cache.cpp) */

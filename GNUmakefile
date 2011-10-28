@@ -56,14 +56,14 @@ ifdef CONFIG
 		vm/object_start_map.o \
 		vm/objects.o \
 		vm/primitives.o \
-		vm/profiler.o \
+		vm/counting_profiler.o \
 		vm/quotations.o \
 		vm/run.o \
 		vm/strings.o \
 		vm/to_tenured_collector.o \
 		vm/tuples.o \
 		vm/utilities.o \
-	        vm/vm.o \
+		vm/vm.o \
 		vm/words.o
 
 	EXE_OBJS = $(PLAF_EXE_OBJS)

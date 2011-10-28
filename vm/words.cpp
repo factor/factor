@@ -58,15 +58,15 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 	new_word->pic_def = false_object;
 	new_word->pic_tail_def = false_object;
 	new_word->subprimitive = false_object;
-	new_word->profiling = NULL;
+	new_word->counting_profiler = NULL;
 	new_word->code = NULL;
 
 	jit_compile_word(new_word.value(),new_word->def,true);
 	if(counting_profiler_p)
 	{
-		code_block *profiling_block = compile_profiling_stub(new_word.value());
-		new_word->profiling = profiling_block;
-		initialize_code_block(new_word->profiling);
+		code_block *counting_profiler_block = compile_counting_profiler_stub(new_word.value());
+		new_word->counting_profiler = counting_profiler_block;
+		initialize_code_block(new_word->counting_profiler);
 	}
 
 	update_word_entry_point(new_word.untagged());
@@ -91,8 +91,8 @@ void factor_vm::primitive_word_code()
 
 	if(counting_profiler_p)
 	{
-		ctx->push(from_unsigned_cell((cell)w->profiling->entry_point()));
-		ctx->push(from_unsigned_cell((cell)w->profiling + w->profiling->size()));
+		ctx->push(from_unsigned_cell((cell)w->counting_profiler->entry_point()));
+		ctx->push(from_unsigned_cell((cell)w->counting_profiler + w->counting_profiler->size()));
 	}
 	else
 	{
@@ -103,8 +103,8 @@ void factor_vm::primitive_word_code()
 
 void factor_vm::update_word_entry_point(word *w)
 {
-	if(counting_profiler_p && w->profiling)
-		w->entry_point = w->profiling->entry_point();
+	if(counting_profiler_p && w->counting_profiler)
+		w->entry_point = w->counting_profiler->entry_point();
 	else
 		w->entry_point = w->code->entry_point();
 }
