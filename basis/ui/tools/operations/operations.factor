@@ -3,7 +3,7 @@
 USING: continuations definitions generic help.topics threads
 stack-checker summary io.pathnames io.styles kernel namespaces
 parser prettyprint quotations tools.crossref tools.annotations
-editors tools.profiler tools.test tools.time tools.walker vocabs
+editors tools.counting-profiler tools.test tools.time tools.walker vocabs
 vocabs.loader words sequences classes compiler.errors
 compiler.units accessors vocabs.parser macros.expander ui
 ui.tools.browser ui.tools.listener ui.tools.listener.completion
