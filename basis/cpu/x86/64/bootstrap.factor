@@ -96,7 +96,6 @@ IN: bootstrap.x86
 : signal-handler-save-regs ( -- regs ) volatile-regs R12 suffix ;
 
 :: jit-signal-handler-prolog ( -- frame-size )
-    ! do we also need to save XMM?
     signal-handler-save-regs :> save-regs
     save-regs length bootstrap-cells 16 align stack-frame-size + :> frame-size
     RSP frame-size bootstrap-cell - SUB ! minus a cell for return address

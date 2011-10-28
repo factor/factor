@@ -5,7 +5,7 @@ namespace factor
 
 void factor_vm::init_profiler()
 {
-	profiling_p = false;
+	counting_profiler_p = false;
 }
 
 /* Allocates memory */
@@ -22,7 +22,7 @@ code_block *factor_vm::compile_profiling_stub(cell word_)
 /* Allocates memory */
 void factor_vm::set_profiling(bool profiling)
 {
-	if(profiling == profiling_p)
+	if(profiling == counting_profiler_p)
 		return;
 
 	/* Push everything to tenured space so that we can heap scan
@@ -31,7 +31,7 @@ void factor_vm::set_profiling(bool profiling)
 
 	data_root<array> words(find_all_words(),this);
 
-	profiling_p = profiling;
+	counting_profiler_p = profiling;
 
 	cell length = array_capacity(words.untagged());
 	for(cell i = 0; i < length; i++)
