@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2009 Slava Pestov
+! Copyright (C) 2006, 2011 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors timers arrays assocs calendar colors.constants
 combinators combinators.short-circuit documents
@@ -341,23 +341,23 @@ M: editor gadget-text* editor-string % ;
     [ drop dup extend-selection dup mark>> click-loc ]
     [ select-elt ] if ;
 
-: delete-next-character ( editor -- ) 
-    char-elt editor-delete ;
-
 : delete-previous-character ( editor -- ) 
     char-elt editor-backspace ;
 
-: delete-previous-word ( editor -- ) 
-    word-elt editor-delete ;
+: delete-next-character ( editor -- ) 
+    char-elt editor-delete ;
 
-: delete-next-word ( editor -- ) 
+: delete-previous-word ( editor -- ) 
     word-elt editor-backspace ;
 
+: delete-next-word ( editor -- ) 
+    word-elt editor-delete ;
+
 : delete-to-start-of-line ( editor -- ) 
-    one-line-elt editor-delete ;
+    one-line-elt editor-backspace ;
 
 : delete-to-end-of-line ( editor -- ) 
-    one-line-elt editor-backspace ;
+    one-line-elt editor-delete ;
 
 : com-undo ( editor -- ) model>> undo ;
 
@@ -369,10 +369,10 @@ editor "editing" f {
     { T{ key-down f f "DELETE" } delete-next-character }
     { T{ key-down f f "BACKSPACE" } delete-previous-character }
     { T{ key-down f { S+ } "BACKSPACE" } delete-previous-character }
-    { T{ key-down f { C+ } "DELETE" } delete-previous-word }
-    { T{ key-down f { C+ } "BACKSPACE" } delete-next-word }
-    { T{ key-down f { A+ } "DELETE" } delete-to-start-of-line }
-    { T{ key-down f { A+ } "BACKSPACE" } delete-to-end-of-line }
+    { T{ key-down f { C+ } "DELETE" } delete-next-word }
+    { T{ key-down f { C+ } "BACKSPACE" } delete-previous-word }
+    { T{ key-down f { A+ } "DELETE" } delete-to-end-of-line }
+    { T{ key-down f { A+ } "BACKSPACE" } delete-to-start-of-line }
 } define-command-map
 
 : com-paste ( editor -- ) clipboard get paste-clipboard ;
