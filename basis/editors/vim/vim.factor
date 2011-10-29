@@ -11,7 +11,9 @@ SYMBOL: vim-path
 
 HOOK: find-vim-path vim-editor ( -- path )
 HOOK: vim-detached? vim-editor ( -- detached? )
+HOOK: vim-open-line? vim-editor ( -- ? )
 
+M: object vim-open-line? t ;
 
 M: vim find-vim-path "vim" ;
 M: vim vim-detached? f ;
@@ -22,7 +24,7 @@ M: vim vim-detached? f ;
 : vim-command ( file line -- command )
     [
         actual-vim-path dup string? [ , ] [ % ] if
-        [ , ] [ number>string "+" prepend , ] bi*
+        [ , ] [ vim-open-line? [ number>string "+" prepend , ] [ drop ] if ] bi*
     ] { } make ;
 
 : vim ( file line -- )
