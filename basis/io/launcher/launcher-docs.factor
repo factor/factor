@@ -291,8 +291,8 @@ ARTICLE: "io.launcher" "Operating system processes"
     "io.launcher.detached"
     "io.launcher.environment"
     "io.launcher.redirection"
-    "io.launcher.group"
     "io.launcher.priority"
+    "io.launcher.group"
     "io.launcher.timeouts"
 } ;
 
