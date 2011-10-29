@@ -22,6 +22,8 @@ M: parsing-word stack-effect drop ( parsed -- parsed ) ;
 
 SYMBOL: auto-use?
 
+: auto-use ( -- ) auto-use? on ;
+
 : no-word-restarted ( restart-value -- word )
     dup word? [
         dup vocabulary>>
