@@ -21,6 +21,12 @@ SYMBOL: +done+
         swap >>name
         H{ } clone >>words ;
 
+ERROR: bad-vocab-name name ;
+
+: check-vocab-name ( name -- name )
+    dup string? [ bad-vocab-name ] unless
+    dup ":/\\ " intersects? [ bad-vocab-name ] when ;
+
 TUPLE: vocab-link name ;
 
 C: <vocab-link> vocab-link
@@ -33,7 +39,7 @@ M: vocab vocab-name name>> ;
 
 M: vocab-link vocab-name name>> ;
 
-M: string vocab-name ;
+M: object vocab-name check-vocab-name ;
 
 GENERIC: lookup-vocab ( vocab-spec -- vocab )
 
@@ -78,11 +84,6 @@ GENERIC: vocabs-changed ( obj -- )
 : notify-vocab-observers ( -- )
     vocab-observers get [ vocabs-changed ] each ;
 
-ERROR: bad-vocab-name name ;
-
-: check-vocab-name ( name -- name )
-    dup string? [ bad-vocab-name ] unless ;
-
 : create-vocab ( name -- vocab )
     check-vocab-name
     dictionary get [ <vocab> ] cache
@@ -115,7 +116,7 @@ GENERIC: >vocab-link ( name -- vocab )
 
 M: vocab-spec >vocab-link ;
 
-M: string >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
+M: object >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
 
 : forget-vocab ( vocab -- )
     [ words forget-all ]

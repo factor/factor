@@ -45,13 +45,8 @@ PRIVATE>
 : vocab-dir ( vocab -- dir )
     vocab-name { { CHAR: . CHAR: / } } substitute ;
 
-ERROR: absolute-path-forbidden path ;
-
-: forbid-absolute-path ( str -- str )
-    dup absolute-path? [ absolute-path-forbidden ] when ;
-
 : append-vocab-dir ( vocab str/f -- path )
-    [ vocab-name forbid-absolute-path "." split ] dip
+    [ vocab-name "." split ] dip
     [ [ dup last ] dip append suffix ] when*
     "/" join ;
 
