@@ -39,6 +39,14 @@ M: cannot-find-source error.
     definition>> pprint-short
     "''" print ;
 
+: edit-file ( path -- )
+    0 edit-location ;
+
+DEFER: edit
+
+: edit-vocab ( vocab -- )
+    dup lookup-vocab [ edit ] [ cannot-find-source ] ?if ;
+
 GENERIC: edit ( object -- )
 
 M: object edit
@@ -46,8 +54,7 @@ M: object edit
 
 M: link edit name>> edit ;
 
-M: string edit
-    dup lookup-vocab [ edit ] [ cannot-find-source ] ?if ;
+M: string edit edit-vocab ;
 
 : edit-error ( error -- )
     [ error-file ] [ error-line ] bi
