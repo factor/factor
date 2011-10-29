@@ -417,7 +417,7 @@ interactor "completion" f {
 \ com-help H{ { +nullary+ t } } define-command
 
 : com-auto-use ( -- )
-    auto-use? [ not ] change ;
+    auto-use? toggle ;
 
 \ com-auto-use H{ { +nullary+ t } { +listener+ t } } define-command
 

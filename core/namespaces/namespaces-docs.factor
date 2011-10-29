@@ -19,6 +19,7 @@ ARTICLE: "namespaces-change" "Changing variable values"
     dec
     change
     change-global
+    toggle
 } ;
 
 ARTICLE: "namespaces-global" "Global variables"
@@ -28,6 +29,7 @@ ARTICLE: "namespaces-global" "Global variables"
     get-global
     set-global
     initialize
+    with-global
 } ;
 
 ARTICLE: "namespaces.private" "Namespace implementation details"
@@ -92,6 +94,18 @@ HELP: change-global
 { $values { "variable" "a variable, by convention a symbol" } { "quot" { $quotation "( old -- new )" } } }
 { $description "Applies the quotation to the old value of the global variable, and assigns the resulting value to the global variable." }
 { $side-effects "variable" } ;
+
+HELP: toggle
+{ $values
+    { "variable" "a variable, by convention a symbol" }    
+}
+{ $description "Changes the boolean value of a variable to its opposite." } ;
+
+HELP: with-global
+{ $values
+    { "quot" quotation }    
+}
+{ $description "Runs the quotation in the global namespace." } ;
 
 HELP: +@
 { $values { "n" "a number" } { "variable" "a variable, by convention a symbol" } }
