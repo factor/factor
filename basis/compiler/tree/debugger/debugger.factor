@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
-prettyprint prettyprint.backend prettyprint.custom
-prettyprint.sections math words combinators
+prettyprint prettyprint.backend prettyprint.config
+prettyprint.custom prettyprint.sections math words combinators
 combinators.short-circuit io sorting hints sets
 compiler.tree
 compiler.tree.recursive
@@ -141,7 +141,9 @@ GENERIC: optimized. ( quot/word -- )
 
 M: word optimized. specialized-def optimized. ;
 
-M: callable optimized. build-tree optimize-tree nodes>quot . ;
+M: callable optimized.
+    build-tree optimize-tree nodes>quot
+    [ length-limit off . ] with-scope ;
 
 SYMBOL: words-called
 SYMBOL: generics-called
