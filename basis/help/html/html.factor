@@ -1,37 +1,15 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings.utf8 io.encodings.binary io.files
-io.files.temp io.directories html.streams help help.home kernel
-assocs sequences make words accessors arrays help.topics vocabs
-vocabs.hierarchy help.vocabs namespaces prettyprint io
-vocabs.loader serialize fry memoize unicode.case math.order
-sorting debugger html xml.syntax xml.writer math.parser
-sets hashtables ;
+USING: checksums checksums.sha io.encodings.utf8
+io.encodings.binary io.encodings.string io.files io.files.temp
+io.directories html.streams help help.home kernel assocs
+sequences make words accessors arrays help.topics vocabs
+vocabs.hierarchy help.vocabs namespaces io vocabs.loader
+serialize fry memoize unicode.case math.order sorting debugger
+html xml.syntax xml.writer math.parser sets hashtables ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
-
-: escape-char ( ch -- )
-    dup ascii? [
-        dup H{
-            { CHAR: " "__quo__" }
-            { CHAR: * "__star__" }
-            { CHAR: : "__colon__" }
-            { CHAR: < "__lt__" }
-            { CHAR: > "__gt__" }
-            { CHAR: ? "__que__" }
-            { CHAR: \\ "__back__" }
-            { CHAR: | "__pipe__" }
-            { CHAR: / "__slash__" }
-            { CHAR: , "__comma__" }
-            { CHAR: @ "__at__" }
-            { CHAR: # "__hash__" }
-            { CHAR: % "__percent__" }
-        } at [ % ] [ , ] ?if
-    ] [ number>string "__" "__" surround % ] if ;
-
-: escape-filename ( string -- filename )
-    [ [ escape-char ] each ] "" make ;
 
 GENERIC: topic>filename* ( topic -- name prefix )
 
@@ -51,10 +29,9 @@ M: f topic>filename* drop \ f topic>filename* ;
     topic>filename* dup [
         [
             % "-" %
-            dup array?
-            [ [ escape-filename ] map "," join ]
-            [ escape-filename ]
-            if % ".html" %
+            dup array? [ "," join ] when
+            utf8 encode sha1 checksum-bytes hex-string
+            % ".html" %
         ] "" make
     ] [ 2drop f ] if ;
 
