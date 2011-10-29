@@ -364,7 +364,6 @@ IN: tools.deploy.shaker
                 compiler.crossref:generic-call-site-crossref
                 compiler-impl
                 compiler.errors:compiler-errors
-                lexer-factory
                 print-use-hook
                 root-cache
                 require-when-vocabs
