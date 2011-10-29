@@ -25,6 +25,7 @@ PRIVATE>
 : set-global ( value variable -- ) global set-at ; inline
 : change ( variable quot -- ) [ [ get ] keep ] dip dip set ; inline
 : change-global ( variable quot -- ) [ global ] dip change-at ; inline
+: toggle ( variable -- ) [ not ] change ; inline
 : +@ ( n variable -- ) [ 0 or + ] change ; inline
 : inc ( variable -- ) 1 swap +@ ; inline
 : dec ( variable -- ) -1 swap +@ ; inline
