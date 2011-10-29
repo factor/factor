@@ -70,14 +70,14 @@ IN: ui.tools.operations
 } define-operation
 
 [ pathname? ] \ edit-file H{
-    { +keyboard+ T{ key-down f { C+ } "b" } }
+    { +keyboard+ T{ key-down f { C+ } "e" } }
     { +primary+ t }
     { +secondary+ t }
     { +listener+ t }
 } define-operation
 
 [ definition? ] \ edit H{
-    { +keyboard+ T{ key-down f { C+ } "b" } }
+    { +keyboard+ T{ key-down f { C+ } "e" } }
     { +listener+ t }
 } define-operation
 

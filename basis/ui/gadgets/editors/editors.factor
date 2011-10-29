@@ -359,12 +359,6 @@ M: editor gadget-text* editor-string % ;
 : delete-to-end-of-line ( editor -- ) 
     one-line-elt editor-backspace ;
 
-: delete-to-start-of-document ( editor -- )
-    doc-elt editor-delete ;
-
-: delete-to-end-of-document ( editor -- )
-    doc-elt editor-delete ;
-
 : com-undo ( editor -- ) model>> undo ;
 
 : com-redo ( editor -- ) model>> redo ;
@@ -429,9 +423,6 @@ editor "caret-motion" f {
     { T{ key-down f f "END" } end-of-line }
     { T{ key-down f { C+ } "HOME" } start-of-document }
     { T{ key-down f { C+ } "END" } end-of-document }
-    { T{ key-down f { C+ } "k" } delete-to-start-of-line }
-    { T{ key-down f { C+ } "a" } start-of-line }
-    { T{ key-down f { C+ } "e" } end-of-line }
 } define-command-map
 
 : clear-editor ( editor -- )
