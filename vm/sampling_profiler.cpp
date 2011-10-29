@@ -40,10 +40,10 @@ void factor_vm::record_sample()
 void factor_vm::record_callstack_sample(cell *begin, cell *end)
 {
 	*begin = sample_callstacks.size();
-	stack_frame *frame = ctx->callstack_bottom - 1;
+	stack_frame *frame = ctx->bottom_frame();
 
 	while (frame >= ctx->callstack_top) {
-		sample_callstacks.push_back((code_block*)frame->entry_point - 1);
+		sample_callstacks.push_back(frame_code(frame));
 		frame = frame_successor(frame);
 	}
 
