@@ -456,6 +456,11 @@ make_factor() {
     invoke_make NO_UI=$NO_UI $MAKE_TARGET -j5
 }
 
+make_clean_factor() {
+    make_clean
+    make_factor
+}
+
 update_boot_images() {
     $ECHO "Deleting old images..."
     $DELETE checksums.txt* > /dev/null 2>&1
@@ -510,7 +515,7 @@ copy_fresh_image() {
 
 bootstrap() {
     ./$FACTOR_BINARY -i=$BOOT_IMAGE
-	copy_fresh_image
+    copy_fresh_image
 }
 
 install() {
@@ -523,18 +528,22 @@ install() {
     bootstrap
 }
 
-
 update() {
     get_config_info
     git_fetch_factorcode
     backup_factor
-    make_clean
-    make_factor
+    make_clean_factor
 }
 
 update_bootstrap() {
     update_boot_images
     bootstrap
+}
+
+net_bootstrap_no_pull() {
+    get_config_info
+    make_clean_factor
+    update_bootstrap
 }
 
 refresh_image() {
@@ -545,7 +554,6 @@ refresh_image() {
 make_boot_image() {
     ./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
     check_ret factor
-
 }
 
 install_deps_linux() {
@@ -593,7 +601,7 @@ case "$1" in
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
-    net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
+    net-bootstrap) net_bootstrap_no_pull ;;
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
     report) find_build_info ;;
     *) usage ;;
