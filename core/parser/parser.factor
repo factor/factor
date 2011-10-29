@@ -125,7 +125,7 @@ M: f parse-quotation \ ] parse-until >quotation ;
     [ f parse-until >quotation ] with-lexer ;
 
 : parse-lines ( lines -- quot )
-    lexer-factory get call( lines -- lexer ) (parse-lines) ;
+    <lexer> (parse-lines) ;
 
 : parse-literal ( accum end quot -- accum )
     [ parse-until ] dip call suffix! ; inline

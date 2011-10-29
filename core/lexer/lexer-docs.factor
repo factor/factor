@@ -104,10 +104,6 @@ HELP: with-lexer
 { $values { "lexer" lexer } { "quot" quotation } { "newquot" quotation } }
 { $description "Calls the quotation with the " { $link lexer } " variable set to the given lexer. The quotation can make use of words such as " { $link scan-token } ". Any errors thrown by the quotation are wrapped in " { $link lexer-error } " instances." } ;
 
-HELP: lexer-factory
-{ $var-description "A variable holding a quotation with stack effect " { $snippet "( lines -- lexer )" } ". This quotation is called by the parser to create " { $link lexer } " instances. This variable can be rebound to a quotation which outputs a custom tuple delegating to " { $link lexer } " to customize syntax." } ;
-
-
 ARTICLE: "parser-lexer" "The lexer"
 "A variable that encapsulate internal parser state:"
 { $subsections lexer }
