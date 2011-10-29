@@ -34,7 +34,7 @@ ERROR: vocab-root-required root ;
     dup vocab-roots get member? [ vocab-root-required ] unless ;
 
 : ensure-vocab-root/prefix ( root prefix -- root prefix )
-    [ ensure-vocab-root ] [ forbid-absolute-path ] bi* ;
+    [ ensure-vocab-root ] [ check-vocab-name ] bi* ;
 
 : (child-vocabs) ( root prefix -- vocabs )
     ensure-vocab-root/prefix
