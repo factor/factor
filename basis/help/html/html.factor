@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings.utf8 io.encodings.binary io.files
 io.files.temp io.directories html.streams help help.home kernel
@@ -70,7 +70,7 @@ M: topic url-of topic>filename ;
         <b> Factor Documentation </b> |
         <a href="/">Home</a> |
         <a href="article-conventions.html">Glossary</a> |
-        <form method="post" action="/search" style="display:inline;">
+        <form method="get" action="/search" style="display:inline;">
             <input name="search" type="text"/>
             <button type="submit">Search</button>
         </form>
@@ -81,8 +81,12 @@ M: topic url-of topic>filename ;
 : help>html ( topic -- xml )
     [ article-title " - Factor Documentation" append ]
     [ drop help-stylesheet ]
-    [ [ print-topic ] with-html-writer help-navbar prepend ]
-    tri simple-page ;
+    [
+        [ help-navbar ]
+        [ [ print-topic ] with-html-writer ]
+        bi* append
+    ] tri
+    simple-page ;
 
 : generate-help-file ( topic -- )
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
