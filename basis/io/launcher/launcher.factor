@@ -1,11 +1,11 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system kernel namespaces strings hashtables sequences assocs
-combinators vocabs.loader init threads continuations math accessors
-concurrency.flags destructors environment io io.encodings.ascii
-io.backend io.timeouts io.pipes io.pipes.private io.encodings
-io.encodings.utf8 io.streams.duplex io.ports debugger prettyprint
-summary calendar ;
+USING: system kernel namespaces strings hashtables sequences
+assocs combinators vocabs.loader init threads continuations math
+accessors concurrency.flags destructors environment fry io
+io.encodings.ascii io.backend io.timeouts io.pipes
+io.pipes.private io.encodings io.encodings.utf8
+io.streams.duplex io.ports debugger prettyprint summary calendar ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -25,7 +25,9 @@ priority
 timeout
 
 handle status
-killed ;
+killed
+
+pipe ;
 
 SYMBOL: +closed+
 SYMBOL: +stdout+
@@ -136,9 +138,7 @@ M: process-was-killed error.
     [ (wait-for-process) ] with-timeout ;
 
 : run-detached ( desc -- process )
-    >process
-    dup dup run-process* process-started
-    dup timeout>> [ over set-timeout ] when* ;
+    >process [ dup run-process* process-started ] keep ;
 
 : run-process ( desc -- process )
     run-detached
@@ -162,11 +162,12 @@ HOOK: kill-process* io-backend ( handle -- )
 
 : kill-process ( process -- )
     t >>killed
-    handle>> [ kill-process* ] when* ;
+    [ pipe>> [ dispose ] when* ]
+    [ handle>> [ kill-process* ] when* ] bi ;
 
 M: process timeout timeout>> ;
 
-M: process set-timeout swap >>timeout drop ;
+M: process set-timeout timeout<< ;
 
 M: process cancel-operation kill-process ;
 
@@ -176,16 +177,19 @@ M: object run-pipeline-element
     3bi
     wait-for-process ;
 
+<PRIVATE
+
+: <process-with-pipe> ( desc -- process pipe )
+    >process (pipe) |dispose [ >>pipe ] keep ;
+
+PRIVATE>
+
 : <process-reader*> ( desc encoding -- stream process )
     [
         [
-            (pipe) {
-                [ |dispose drop ]
-                [
-                    swap >process
-                        [ swap out>> or ] change-stdout
-                    run-detached
-                ]
+            <process-with-pipe> {
+                [ '[ _ out>> or ] change-stdout ]
+                [ drop run-detached ]
                 [ out>> dispose ]
                 [ in>> <input-port> ]
             } cleave
@@ -203,13 +207,9 @@ M: object run-pipeline-element
 : <process-writer*> ( desc encoding -- stream process )
     [
         [
-            (pipe) {
-                [ |dispose drop ]
-                [
-                    swap >process
-                        [ swap in>> or ] change-stdin
-                    run-detached
-                ]
+            <process-with-pipe> {
+                [ '[ _ in>> or ] change-stdin ]
+                [ drop run-detached ]
                 [ in>> dispose ]
                 [ out>> <output-port> ]
             } cleave
