@@ -37,7 +37,7 @@ IN: http.server
     dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
 
 : read-request-line ( request -- request )
-    read-?crlf [ dup empty? ] [ drop read-?crlf ] while
+    read-?crlf [ dup "" = ] [ drop read-?crlf ] while
     parse-request-line first3
     [ >>method ] [ >url check-absolute >>url ] [ >>version ] tri* ;
 
