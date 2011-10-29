@@ -143,8 +143,8 @@ M: launch-error error.
     "Launch descriptor:" print nl
     process>> . ;
 
-M: windows kill-process* ( handle -- )
-    hProcess>> 255 TerminateProcess win32-error=0/f ;
+M: windows kill-process* ( process -- )
+    handle>> hProcess>> 255 TerminateProcess win32-error=0/f ;
 
 : dispose-process ( process-information -- )
     #! From MSDN: "Handles in PROCESS_INFORMATION must be closed
