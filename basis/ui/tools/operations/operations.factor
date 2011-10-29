@@ -69,9 +69,6 @@ IN: ui.tools.operations
     { +secondary+ t }
 } define-operation
 
-! Pathnames
-: edit-file ( pathname -- ) edit ;
-
 [ pathname? ] \ edit-file H{
     { +keyboard+ T{ key-down f { C+ } "b" } }
     { +primary+ t }
