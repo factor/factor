@@ -26,3 +26,12 @@ f test-initialize set-global
 test-initialize [ 5 ] initialize
 
 [ 5 ] [ test-initialize get-global ] unit-test
+
+SYMBOL: toggle-test
+[ f ] [ toggle-test get ] unit-test
+[ t ] [ toggle-test [ toggle ] [ get ] bi ] unit-test
+[ f ] [ toggle-test [ toggle ] [ get ] bi ] unit-test
+
+[ t ] [ toggle-test [ on ] [ get ] bi ] unit-test
+[ f ] [ toggle-test [ off ] [ get ] bi ] unit-test
+
