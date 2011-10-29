@@ -21,6 +21,7 @@ stdout
 stderr
 
 priority
+group
 
 timeout
 
@@ -47,10 +48,15 @@ SYMBOL: +high-priority+
 SYMBOL: +highest-priority+
 SYMBOL: +realtime-priority+
 
+SYMBOL: +same-group+
+SYMBOL: +new-group+
+SYMBOL: +new-session+
+
 : <process> ( -- process )
     process new
     H{ } clone >>environment
-    +append-environment+ >>environment-mode ;
+    +append-environment+ >>environment-mode
+    +same-group+ >>group ;
 
 : process-started? ( process -- ? )
     dup handle>> swap status>> or ;
@@ -158,12 +164,12 @@ M: process-failed error.
 : try-process ( desc -- )
     run-process wait-for-success ;
 
-HOOK: kill-process* io-backend ( handle -- )
+HOOK: kill-process* io-backend ( process -- )
 
 : kill-process ( process -- )
     t >>killed
     [ pipe>> [ dispose ] when* ]
-    [ handle>> [ kill-process* ] when* ] bi ;
+    [ dup handle>> [ kill-process* ] [ drop ] if ] bi ;
 
 M: process timeout timeout>> ;
 

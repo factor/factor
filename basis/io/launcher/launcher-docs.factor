@@ -35,6 +35,15 @@ $nl
     { "a file stream or a socket - the stream is connected to the given Factor stream, which cannot be used again from within Factor and must be closed after the process has been started" }
 } ;
 
+ARTICLE: "io.launcher.group" "Setting process groups"
+"The process group of a child process can be controlled by setting the " { $snippet "group" } " slot of a " { $link process } " tuple:"
+{ $list
+    { $link +same-group+ }
+    { $link +new-group+ }
+    { $link +new-session+ }
+}
+"The default value is " { $link +same-group+ } ", which denotes that the child process should be part of the process group of the parent process. The " { $link +new-group+ } " option creates a new process group, while the " { $link +new-session+ } " creates a new session." ;
+
 ARTICLE: "io.launcher.priority" "Setting process priority"
 "The priority of the child process can be set by storing one of the below symbols in the " { $snippet "priority" } " slot of a " { $link process } " tuple:"
 { $list
@@ -126,7 +135,7 @@ HELP: kill-process
 { $description "Kills a running process. Does nothing if the process has already exited." } ;
 
 HELP: kill-process*
-{ $values { "handle" "a process handle" } }
+{ $values { "process" "process" } }
 { $contract "Kills a running process." }
 { $notes "User code should call " { $link kill-process } " instead." } ;
 
@@ -282,6 +291,7 @@ ARTICLE: "io.launcher" "Operating system processes"
     "io.launcher.detached"
     "io.launcher.environment"
     "io.launcher.redirection"
+    "io.launcher.group"
     "io.launcher.priority"
     "io.launcher.timeouts"
 } ;
