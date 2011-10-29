@@ -13,7 +13,7 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 		the signal handler to do its thing, and launch the handler without going
 		through the resumable subprimitive. */
 		signal_resumable = false;
-		stack_frame *frame = ctx->callstack_bottom - 1;
+		stack_frame *frame = ctx->bottom_frame();
 
 		while((cell)frame >= *sp
 			&& frame >= ctx->callstack_top
