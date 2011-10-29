@@ -3,6 +3,18 @@
 namespace factor
 {
 
+profiling_sample::profiling_sample(factor_vm *vm,
+	cell sample_count,
+	cell gc_sample_count,
+	context *ctx)
+	:
+	sample_count(sample_count),
+	gc_sample_count(gc_sample_count),
+	ctx(ctx)
+{
+	vm->record_callstack_sample(&callstack_begin, &callstack_end);
+}
+
 void factor_vm::record_sample()
 {
 	cell recorded_sample_count;
@@ -18,11 +30,24 @@ void factor_vm::record_sample()
 	FACTOR_ATOMIC_SUB(&safepoint_gc_sample_count, recorded_gc_sample_count);
 
 	samples.push_back(profiling_sample(
+		this,
 		recorded_sample_count,
 		recorded_gc_sample_count,
-		ctx,
-		capture_callstack(ctx)
+		ctx
 	));
+}
+
+void factor_vm::record_callstack_sample(cell *begin, cell *end)
+{
+	*begin = sample_callstacks.size();
+	stack_frame *frame = ctx->callstack_bottom - 1;
+
+	while (frame >= ctx->callstack_top) {
+		sample_callstacks.push_back((code_block*)frame->entry_point - 1);
+		frame = frame_successor(frame);
+	}
+
+	*end = sample_callstacks.size();
 }
 
 void factor_vm::set_sampling_profiler(bool sampling_p)
@@ -42,6 +67,7 @@ void factor_vm::start_sampling_profiler()
 	safepoint_gc_sample_count = 0;
 	samples.clear();
 	samples.reserve(10*FACTOR_PROFILE_SAMPLES_PER_SECOND);
+	sample_callstacks.reserve(100*FACTOR_PROFILE_SAMPLES_PER_SECOND);
 	sampling_profiler_p = true;
 	start_sampling_profiler_timer();
 }
