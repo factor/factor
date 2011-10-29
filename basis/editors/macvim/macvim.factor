@@ -1,10 +1,8 @@
-USING: definitions io.launcher kernel math math.parser parser
-namespaces prettyprint editors make ;
+USING: editors.vim kernel namespaces ;
 IN: editors.macvim
 
-: macvim ( file line -- )
-    drop
-    [ "open" , "-a" , "MacVim", , ] { } make
-    run-detached drop ;
+SINGLETON: macvim
+macvim \ vim-editor set-global
 
-[ macvim ] edit-hook set-global
+M: macvim vim-path \ vim-path get-global "mvim" or ;
+M: macvim vim-detached? t ;
