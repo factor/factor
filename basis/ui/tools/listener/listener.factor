@@ -370,6 +370,7 @@ M: interactor handle-gesture
 
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }
+    { T{ key-down f { C+ } "k" } clear-editor }
 } define-command-map
 
 interactor "completion" f {
