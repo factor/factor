@@ -74,6 +74,7 @@ struct factor_vm
 
 	/* State kept by the sampling profiler */
 	std::vector<profiling_sample> samples;
+	std::vector<code_block*> sample_callstacks;
 	volatile cell safepoint_sample_count;
 	volatile cell safepoint_gc_sample_count;
 
@@ -191,6 +192,7 @@ struct factor_vm
 
 	/* Sampling profiler */
 	void record_sample();
+	void record_callstack_sample(cell *begin, cell *end);
 	void start_sampling_profiler();
 	void end_sampling_profiler();
 	void set_sampling_profiler(bool sampling);
