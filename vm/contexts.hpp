@@ -73,6 +73,11 @@ struct context {
 		datastack += sizeof(cell);
 		replace(tagged);
 	}
+
+	stack_frame *bottom_frame()
+	{
+		return callstack_bottom - 1;
+	}
 };
 
 VM_C_API context *new_context(factor_vm *parent);

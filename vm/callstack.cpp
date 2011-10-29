@@ -28,7 +28,7 @@ called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
 stack_frame *factor_vm::second_from_top_stack_frame(context *ctx)
 {
-	stack_frame *frame = ctx->callstack_bottom - 1;
+	stack_frame *frame = ctx->bottom_frame();
 	while(frame >= ctx->callstack_top
 		&& frame_successor(frame) >= ctx->callstack_top
 		&& frame_successor(frame_successor(frame)) >= ctx->callstack_top)
