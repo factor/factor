@@ -456,3 +456,14 @@ SYMBOL: a
 [ "OK\n\n" ] [ "http://localhost/" add-addr http-get nip ] unit-test
 
 [ ] [ stop-test-httpd ] unit-test
+
+! Check that just closing the socket without sending anything works
+[ ] [
+    <dispatcher>
+        add-quit-action
+    test-httpd
+] unit-test
+
+[ ] [ "addr" get binary [ ] with-client ] unit-test
+
+[ ] [ stop-test-httpd ] unit-test
