@@ -1,13 +1,19 @@
-USING: editors.vim environment fry io.files io.pathnames kernel
-namespaces sequences splitting ;
+USING: core-foundation.launch-services editors.vim io.pathnames
+io.standard-paths kernel namespaces ;
 IN: editors.macvim
 
 SINGLETON: macvim
 macvim \ vim-editor set-global
 
-: find-binary-path ( string -- path/f )
-    [ "PATH" os-env ":" split ] dip '[ _ append-path exists? ] find nip ;
+: find-macvim-bundle-path ( -- path/f )
+    "org.vim.MacVim" find-native-bundle [
+        "Contents/MacOS/Vim" append-path
+    ] [
+        f
+    ] if* ;
+    
+M: macvim find-vim-path
+    find-macvim-bundle-path "mvim" or ;
 
-M: macvim find-vim-path "mvim" find-binary-path { "open" "-a" "MacVim" } or ;
 M: macvim vim-detached? t ;
-M: macvim vim-open-line? f ;
+M: macvim vim-ui? t ;
