@@ -119,19 +119,9 @@ big-endian off
     jit-save-context
     temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
     temp0 CALL
-    ! Stack at this point has a fake stack frame set up to represent the
-    ! leaf procedure we interrupted. We must tear down that frame in
-    ! addition to our own before resuming.
-    ! Grab our frame's return address and place it just underneath the leaf proc's
-    ! return address, since we can't touch any registers once they've been
-    ! restored. If we got this far there should be no faults here and we
-    ! can get away with corrupting the stack frame.
-    temp0 stack-reg frame-size bootstrap-cell - [+] MOV
-    stack-reg frame-size stack-frame-size + 2 bootstrap-cells - [+] temp0 MOV
-
-    ! Pop enough of the fake frame to leave the resume address at the top of the
-    ! stack when we RET.
-    frame-size stack-frame-size + bootstrap-cell - jit-signal-handler-epilog
+    frame-size jit-signal-handler-epilog
+    ! Pop the fake leaf frame along with our return address
+    stack-frame-size cell - RET
 ] \ leaf-signal-handler define-sub-primitive
 
 [
