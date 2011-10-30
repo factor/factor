@@ -13,5 +13,6 @@ M: object find-gvim-path f ;
 
 M: gvim find-vim-path find-gvim-path "gvim" or ;
 M: gvim vim-detached? t ;
+M: gvim vim-ui? t ;
 
 os windows? [ "editors.gvim.windows" require ] when
