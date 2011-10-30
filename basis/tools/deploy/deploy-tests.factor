@@ -6,7 +6,9 @@ urls math.parser io.directories tools.deploy tools.deploy.test
 vocabs ;
 IN: tools.deploy.tests
 
-[ "no such vocab, fool!" deploy ] [ no-vocab? ] must-fail-with
+[ "nosuchvocab" deploy ] [ no-vocab? ] must-fail-with
+
+[ "no such vocab, fool!" deploy ] [ bad-vocab-name? ] must-fail-with
 
 [ ] [ "hello-world" shake-and-bake 500000 small-enough? ] unit-test
 
