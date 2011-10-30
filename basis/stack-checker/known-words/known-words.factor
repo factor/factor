@@ -417,6 +417,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ innermost-frame-executing { callstack } { object } define-primitive
 \ innermost-frame-scan { callstack } { fixnum } define-primitive
 \ jit-compile { quotation } { } define-primitive
+\ leaf-signal-handler { } { } define-primitive
 \ gsp:lookup-method { object array } { word } define-primitive
 \ minor-gc { } { } define-primitive
 \ modify-code-heap { array object object } { } define-primitive
@@ -450,6 +451,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ set-slot { object object fixnum } { } define-primitive
 \ set-special-object { object fixnum } { } define-primitive
 \ set-string-nth-fast { fixnum fixnum string } { } define-primitive
+\ signal-handler { } { } define-primitive
 \ size { object } { fixnum } define-primitive \ size make-flushable
 \ slot { object fixnum } { object } define-primitive \ slot make-flushable
 \ special-object { fixnum } { object } define-primitive \ special-object make-flushable
