@@ -1,13 +1,14 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel effects accessors math math.private
-math.integers.private math.floats.private math.partial-dispatch
-math.intervals math.parser math.order math.functions math.libm
-layouts words sequences sequences.private arrays assocs classes
-classes.algebra combinators generic.math splitting fry locals
-classes.tuple alien.accessors classes.tuple.private
-slots.private definitions strings.private vectors hashtables
-generic quotations alien alien.data alien.data.private
+USING: effects accessors kernel kernel.private layouts math
+math.private math.integers.private math.floats.private
+math.partial-dispatch math.intervals math.parser math.order
+math.functions math.libm namespaces words sequences
+sequences.private arrays assocs classes classes.algebra
+combinators generic.math splitting fry locals classes.tuple
+alien.accessors classes.tuple.private slots.private definitions
+strings.private vectors hashtables generic quotations alien
+alien.data alien.data.private
 stack-checker.dependencies
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -337,3 +338,7 @@ generic-comparison-ops [
 \ fixnum-max [ interval-max ] [ fixnum-valued ] binary-op
 
 \ (local-allot) { alien } "default-output-classes" set-word-prop
+
+\ tag [
+    drop fixnum 0 num-types get [a,b) <class/interval-info>
+] "outputs" set-word-prop
