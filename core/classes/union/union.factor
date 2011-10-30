@@ -1,8 +1,9 @@
-! Copyright (C) 2004, 2010 Slava Pestov.
+! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel assocs combinators classes
 classes.private classes.algebra classes.algebra.private
-namespaces arrays math quotations definitions ;
+classes.builtin kernel.private math.private namespaces arrays
+math quotations definitions ;
 IN: classes.union
 
 PREDICATE: union-class < class
@@ -10,18 +11,42 @@ PREDICATE: union-class < class
 
 <PRIVATE
 
-: union-predicate-quot ( members -- quot )
-    [
-        [ drop f ]
-    ] [
-        unclip "predicate" word-prop swap [
-            "predicate" word-prop [ dup ] prepend
-            [ drop t ]
-        ] { } map>assoc alist>quot
-    ] if-empty ;
+GENERIC: union-of-builtins? ( class -- ? )
+
+M: builtin-class union-of-builtins? drop t ;
+
+M: union-class union-of-builtins?
+    members [ union-of-builtins? ] all? ;
+
+M: class union-of-builtins?
+    drop f ;
+
+: fast-union-mask ( class -- n )
+    [ 0 ] dip flatten-class
+    [ drop class>type 2^ bitor ] assoc-each ;
+
+: empty-union-predicate-quot ( class -- quot )
+    drop [ drop f ] ;
+
+: fast-union-predicate-quot ( class -- quot )
+    fast-union-mask 1quotation
+    [ tag 1 swap fixnum-shift-fast ]
+    [ fixnum-bitand 0 eq? not ]
+    surround ;
+
+: slow-union-predicate-quot ( class -- quot )
+    members [ "predicate" word-prop ] map unclip swap
+    [ [ dup ] prepend [ drop t ] ] { } map>assoc alist>quot ;
+
+: union-predicate-quot ( class -- quot )
+    {
+        { [ dup members empty? ] [ empty-union-predicate-quot ] }
+        { [ dup union-of-builtins? ] [ fast-union-predicate-quot ] }
+        [ slow-union-predicate-quot ]
+    } cond ;
 
 : define-union-predicate ( class -- )
-    dup members union-predicate-quot define-predicate ;
+    dup union-predicate-quot define-predicate ;
 
 M: union-class update-class define-union-predicate ;
 
