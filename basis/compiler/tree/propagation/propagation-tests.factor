@@ -1001,3 +1001,8 @@ M: tuple-with-read-only-slot clone
 [ V{ alien } ] [
     [ { byte-array } declare [ 10 bitand 2 + ] dip <displaced-alien> ] final-classes
 ] unit-test
+
+! 'tag' should have a declared output interval
+[ V{ t } ] [
+    [ tag 0 15 between? ] final-literals
+] unit-test
