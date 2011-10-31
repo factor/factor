@@ -53,10 +53,10 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 			code_block *leaf_block = code->code_block_for_address(*pc);
 			assert(leaf_block != NULL);
 
-			cell newsp = *sp - 32;
-			*(cell*)(newsp + 32 -   sizeof(cell)) = 32;
-			*(cell*)(newsp + 32 - 2*sizeof(cell)) = (cell)leaf_block->entry_point();
-			*(cell*) newsp                        = *pc;
+			cell newsp = *sp - 4*sizeof(cell);
+			*(cell*)(newsp + 3*sizeof(cell)) = 4*sizeof(cell);
+			*(cell*)(newsp + 2*sizeof(cell)) = (cell)leaf_block->entry_point();
+			*(cell*) newsp                   = *pc;
 			*sp = newsp;
 			handler_word = tagged<word>(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
 		}
