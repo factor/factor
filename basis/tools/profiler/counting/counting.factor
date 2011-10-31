@@ -3,10 +3,10 @@
 USING: accessors words sequences math prettyprint kernel arrays
 io io.styles namespaces assocs kernel.private strings
 combinators sorting math.parser vocabs definitions
-tools.counting-profiler.private tools.crossref continuations generic
+tools.profiler.counting.private tools.crossref continuations generic
 compiler.units compiler.crossref sets classes fry ;
 FROM: sets => members ;
-IN: tools.counting-profiler
+IN: tools.profiler.counting
 
 : profile ( quot -- )
     [ t profiling call ] [ f profiling ] [ ] cleanup ; inline

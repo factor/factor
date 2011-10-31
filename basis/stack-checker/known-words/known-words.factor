@@ -14,7 +14,7 @@ compiler.units system.private combinators tools.memory.private
 combinators.short-circuit locals locals.backend locals.types
 combinators.private stack-checker.values generic.single
 generic.single.private alien.libraries tools.dispatch.private
-tools.counting-profiler.private macros
+tools.profiler.counting.private macros
 stack-checker.alien
 stack-checker.state
 stack-checker.errors

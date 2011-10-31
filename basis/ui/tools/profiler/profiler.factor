@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators.short-circuit
 combinators.smart definitions.icons fry kernel locals
 math.order models models.search models.sort present see
-sequences tools.counting-profiler ui.baseline-alignment ui.commands
+sequences tools.profiler.counting ui.baseline-alignment ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labeled ui.gadgets.labels ui.gadgets.packs
 ui.gadgets.search-tables ui.gadgets.status-bar
