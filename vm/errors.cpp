@@ -177,6 +177,7 @@ void factor_vm::enqueue_safepoint_sample()
 		FACTOR_ATOMIC_ADD(&safepoint_sample_count, 1);
 		if (current_gc)
 			FACTOR_ATOMIC_ADD(&safepoint_gc_sample_count, 1);
+		code->guard_safepoint();
 	}
 }
 
