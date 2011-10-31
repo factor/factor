@@ -62,7 +62,7 @@ struct factor_vm
 
 	/* Is profiling enabled? */
 	bool counting_profiler_p;
-	bool sampling_profiler_p;
+	volatile bool sampling_profiler_p;
 
 	/* Global variables used to pass fault handler state from signal handler
 	to VM */
@@ -93,7 +93,7 @@ struct factor_vm
 	callback_heap *callbacks;
 
 	/* Only set if we're performing a GC */
-	gc_state *current_gc;
+	volatile gc_state *current_gc;
 
 	/* Mark stack */
 	std::vector<cell> mark_stack;
@@ -216,7 +216,7 @@ struct factor_vm
 	void synchronous_signal_handler_impl();
 	void fp_signal_handler_impl();
 	void enqueue_safepoint_fep();
-	void enqueue_safepoint_sample(cell pc, bool foreign_thread_p);
+	void enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thread_p);
 	void handle_safepoint();
 
 	// bignum
@@ -727,6 +727,9 @@ struct factor_vm
 
 	// os-windows
   #if defined(WINDOWS)
+	HANDLE sampler_thread;
+	void sampler_thread_loop();
+
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
