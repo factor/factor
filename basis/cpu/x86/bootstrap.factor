@@ -114,6 +114,8 @@ big-endian off
     frame-size jit-signal-handler-epilog
 ] \ signal-handler define-sub-primitive
 
+: leaf-frame-size ( -- n ) 4 bootstrap-cells ;
+
 [| |
     jit-signal-handler-prolog :> frame-size
     jit-save-context
@@ -121,7 +123,7 @@ big-endian off
     temp0 CALL
     frame-size jit-signal-handler-epilog
     ! Pop the fake leaf frame along with our return address
-    stack-frame-size cell - RET
+    leaf-frame-size cell - RET
 ] \ leaf-signal-handler define-sub-primitive
 
 [
