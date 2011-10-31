@@ -77,6 +77,8 @@ struct factor_vm
 	std::vector<code_block*> sample_callstacks;
 	volatile cell safepoint_sample_count;
 	volatile cell safepoint_gc_sample_count;
+	volatile cell safepoint_foreign_sample_count;
+	volatile cell safepoint_foreign_thread_sample_count;
 
 	/* GC is off during heap walking */
 	bool gc_off;
@@ -214,7 +216,7 @@ struct factor_vm
 	void synchronous_signal_handler_impl();
 	void fp_signal_handler_impl();
 	void enqueue_safepoint_fep();
-	void enqueue_safepoint_sample();
+	void enqueue_safepoint_sample(cell pc, bool foreign_thread_p);
 	void handle_safepoint();
 
 	// bignum
