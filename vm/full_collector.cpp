@@ -19,9 +19,9 @@ void full_collector::trace_context_code_blocks()
 	code_visitor.visit_context_code_blocks();
 }
 
-void full_collector::trace_uninitialized_code_blocks()
+void full_collector::trace_code_roots()
 {
-	code_visitor.visit_uninitialized_code_blocks();
+	code_visitor.visit_code_roots();
 }
 
 void full_collector::trace_object_code_block(object *obj)
@@ -63,7 +63,7 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p)
 	{
 		collector.trace_contexts();
 		collector.trace_context_code_blocks();
-		collector.trace_uninitialized_code_blocks();
+		collector.trace_code_roots();
 	}
 
 	while(!mark_stack.empty())
