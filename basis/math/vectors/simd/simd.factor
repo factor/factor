@@ -75,35 +75,40 @@ DEFER: simd-construct-op
 : v->v-op ( a rep quot: ( (a) rep -- (c) ) fallback-quot -- c )
     drop [ simd-unbox ] 2dip 2curry make-underlying ; inline
 
-: vn->v-op ( a n rep quot: ( (a) n rep -- (c) ) fallback-quot -- c )
+: vx->v-op ( a obj rep quot: ( (a) obj rep -- (c) ) fallback-quot -- c )
     drop [ simd-unbox ] 3dip 3curry make-underlying ; inline
 
-: vn->n-op ( a n rep quot: ( (a) n rep -- n ) fallback-quot -- n )
+: vn->v-op ( a n rep quot: ( (a) n rep -- (c) ) fallback-quot -- c )
+    drop [ [ simd-unbox ] [ >fixnum ] bi* ] 2dip 3curry make-underlying ; inline
+
+: vx->x-op ( a obj rep quot: ( (a) obj rep -- obj ) fallback-quot -- obj )
     drop [ underlying>> ] 3dip call ; inline
 
-: v->n-op ( a rep quot: ( (a) rep -- n ) fallback-quot -- n )
+: v->x-op ( a rep quot: ( (a) rep -- obj ) fallback-quot -- obj )
     drop [ underlying>> ] 2dip call ; inline
 
 : (vv->v-op) ( a b rep quot: ( (a) (b) rep -- (c) ) -- c )
     [ [ simd-unbox ] [ underlying>> ] bi* ] 2dip 3curry make-underlying ; inline
-: (vv->n-op) ( a b rep quot: ( (a) (b) rep -- n ) -- n )
+
+: (vv->x-op) ( a b rep quot: ( (a) (b) rep -- n ) -- n )
     [ [ underlying>> ] bi@ ] 2dip 3curry call ; inline
-: (vvn->v-op) ( a b n rep quot: ( (a) (b) n rep -- (c) ) -- c )
+
+: (vvx->v-op) ( a b obj rep quot: ( (a) (b) obj rep -- (c) ) -- c )
     [ [ simd-unbox ] [ underlying>> ] bi* ] 3dip 2curry 2curry make-underlying ; inline
     
 : vv->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
     [ '[ _ (vv->v-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
 
-:: vvn->v-op ( a b n rep quot: ( (a) (b) n rep -- (c) ) fallback-quot -- c )
+:: vvx->v-op ( a b obj rep quot: ( (a) (b) obj rep -- (c) ) fallback-quot -- c )
     a b rep
-    [ n swap quot (vvn->v-op) ]
-    [ drop n fallback-quot call ] if-both-vectors-match ; inline
+    [ obj swap quot (vvx->v-op) ]
+    [ drop obj fallback-quot call ] if-both-vectors-match ; inline
 
 : vv'->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
     [ '[ _ (vv->v-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors ; inline
 
-: vv->n-op ( a b rep quot: ( (a) (b) rep -- n ) fallback-quot -- n )
-    [ '[ _ (vv->n-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
+: vv->x-op ( a b rep quot: ( (a) (b) rep -- obj ) fallback-quot -- obj )
+    [ '[ _ (vv->x-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
 
 PRIVATE>
 >>
@@ -153,13 +158,13 @@ M: simd-128 vmin
 M: simd-128 vmax
     dup simd-rep [ (simd-vmax)              ] [ call-next-method ] vv->v-op ; inline
 M: simd-128 v.
-    dup simd-rep [ (simd-v.)                ] [ call-next-method ] vv->n-op ; inline
+    dup simd-rep [ (simd-v.)                ] [ call-next-method ] vv->x-op ; inline
 M: simd-128 vsad
-    dup simd-rep [ (simd-vsad)              ] [ call-next-method ] vv->n-op ; inline
+    dup simd-rep [ (simd-vsad)              ] [ call-next-method ] vv->x-op ; inline
 M: simd-128 vsqrt
     dup simd-rep [ (simd-vsqrt)             ] [ call-next-method ] v->v-op  ; inline
 M: simd-128 sum
-    dup simd-rep [ (simd-sum)               ] [ call-next-method ] v->n-op  ; inline
+    dup simd-rep [ (simd-sum)               ] [ call-next-method ] v->x-op  ; inline
 M: simd-128 vabs
     dup simd-rep [ (simd-vabs)              ] [ call-next-method ] v->v-op  ; inline
 M: simd-128 vbitand
@@ -191,9 +196,9 @@ M: simd-128 hlshift
 M: simd-128 hrshift
     over simd-rep [ (simd-hrshift)           ] [ call-next-method ] vn->v-op ; inline
 M: simd-128 vshuffle-elements
-    over simd-rep [ (simd-vshuffle-elements) ] [ call-next-method ] vn->v-op ; inline
+    over simd-rep [ (simd-vshuffle-elements) ] [ call-next-method ] vx->v-op ; inline
 M: simd-128 vshuffle2-elements
-    over simd-rep [ (simd-vshuffle2-elements) ] [ call-next-method ] vvn->v-op ; inline
+    over simd-rep [ (simd-vshuffle2-elements) ] [ call-next-method ] vvx->v-op ; inline
 M: simd-128 vshuffle-bytes
     dup simd-rep [ (simd-vshuffle-bytes)    ] [ call-next-method ] vv'->v-op ; inline
 M: simd-128 (vmerge-head)
@@ -213,11 +218,11 @@ M: simd-128 v>=
 M: simd-128 vunordered?
     dup simd-rep [ (simd-vunordered?)       ] [ call-next-method ] vv->v-op ; inline
 M: simd-128 vany?
-    dup simd-rep [ (simd-vany?)             ] [ call-next-method ] v->n-op  ; inline
+    dup simd-rep [ (simd-vany?)             ] [ call-next-method ] v->x-op  ; inline
 M: simd-128 vall?
-    dup simd-rep [ (simd-vall?)             ] [ call-next-method ] v->n-op  ; inline
+    dup simd-rep [ (simd-vall?)             ] [ call-next-method ] v->x-op  ; inline
 M: simd-128 vnone?
-    dup simd-rep [ (simd-vnone?)            ] [ call-next-method ] v->n-op  ; inline
+    dup simd-rep [ (simd-vnone?)            ] [ call-next-method ] v->x-op  ; inline
 
 ! SIMD high-level specializations
 
@@ -266,7 +271,7 @@ M: A simd-element-type drop ELT ; inline
 M: A simd-with         drop A-with ; inline
 
 M: A nth-unsafe
-    swap \ A-rep [ (simd-select) ] [ call-next-method ] vn->n-op ; inline
+    swap \ A-rep [ (simd-select) ] [ call-next-method ] vx->x-op ; inline
 M: A set-nth-unsafe
     [ ELT boolean>element ] 2dip
     underlying>> ELT c:set-alien-element ; inline
