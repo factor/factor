@@ -79,6 +79,9 @@ VM_C_API void *factor_memcpy(void *dst, void *src, size_t len);
 
 	#endif
 
+	#define FACTOR_MEMORY_BARRIER() \
+		MemoryBarrier()
+
 #elif defined(__GNUC__) || defined(__clang__)
 
 	#define FACTOR_ATOMIC_CAS(ptr, old_val, new_val) \
@@ -89,6 +92,9 @@ VM_C_API void *factor_memcpy(void *dst, void *src, size_t len);
 
 	#define FACTOR_ATOMIC_SUB(ptr, val) \
 		__sync_sub_and_fetch(ptr, val)
+
+	#define FACTOR_MEMORY_BARRIER() \
+		__sync_synchronize()
 
 #else
 	#error "Unsupported compiler"
