@@ -312,7 +312,7 @@ void factor_vm::sampler_thread_loop()
 	assert(QueryPerformanceCounter(&counter));
 	while (FACTOR_MEMORY_BARRIER(), sampling_profiler_p)
 	{
-		Sleep(0);
+		SwitchToThread();
 		assert(QueryPerformanceCounter(&new_counter));
 		cell samples = 0;
 		while (new_counter.QuadPart - counter.QuadPart > units_per_sample) {
@@ -320,7 +320,8 @@ void factor_vm::sampler_thread_loop()
 			++samples;
 			counter.QuadPart += units_per_sample;
 		}
-		enqueue_safepoint_sample(samples, 0, false);
+		if (samples > 0)
+			enqueue_safepoint_sample(samples, 0, false);
 	}
 }
 
@@ -344,6 +345,8 @@ void factor_vm::start_sampling_profiler_timer()
 
 void factor_vm::end_sampling_profiler_timer()
 {
+	sampling_profiler_p = false;
+	FACTOR_MEMORY_BARRIER();
 	DWORD wait_result = WaitForSingleObject(sampler_thread,
 		3000/FACTOR_PROFILE_SAMPLES_PER_SECOND);
 	if (wait_result != WAIT_OBJECT_0)

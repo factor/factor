@@ -92,6 +92,8 @@ void factor_vm::start_sampling_profiler()
 {
 	safepoint_sample_count = 0;
 	safepoint_gc_sample_count = 0;
+	safepoint_foreign_sample_count = 0;
+	safepoint_foreign_thread_sample_count = 0;
 	clear_samples();
 	samples.reserve(10*FACTOR_PROFILE_SAMPLES_PER_SECOND);
 	sample_callstacks.reserve(100*FACTOR_PROFILE_SAMPLES_PER_SECOND);

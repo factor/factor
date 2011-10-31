@@ -390,6 +390,9 @@ void factor_vm::factorbug()
 		exit(1);
 	}
 
+	if (sampling_profiler_p)
+		end_sampling_profiler();
+
 	fep_p = true;
 
 	std::cout << "Starting low level debugger..." << std::endl;
