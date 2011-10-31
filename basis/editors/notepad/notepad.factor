@@ -5,14 +5,14 @@ math.parser namespaces sequences io.files arrays windows.shell32
 io.directories.search ;
 IN: editors.notepad
 
+SINGLETON: notepad
+notepad editor-class set-global
+
 : notepad-path ( -- path )
     \ notepad-path get [
         windows-directory t
         [ "notepad.exe" tail? ] find-file
     ] unless* ;
 
-: notepad ( file line -- )
-    drop notepad-path swap 2array run-detached drop ;
-
-[ notepad ] edit-hook set-global
-
+M: notepad editor-command ( file line -- command )
+    drop [ notepad-path ] dip 2array ;

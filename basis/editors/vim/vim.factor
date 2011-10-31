@@ -1,33 +1,26 @@
 USING: editors io.backend io.launcher kernel make math.parser
-namespaces sequences strings system vocabs.loader ;
+namespaces sequences strings system vocabs.loader math ;
 IN: editors.vim
 
-SYMBOL: vim-editor
-
-SINGLETON: vim
-\ vim vim-editor set-global
+TUPLE: vim ;
+T{ vim } editor-class set-global
 
 SYMBOL: vim-path
 
-HOOK: find-vim-path vim-editor ( -- path )
-HOOK: vim-detached? vim-editor ( -- detached? )
-HOOK: vim-ui? vim-editor ( -- ui? )
-
-M: vim find-vim-path "vim" ;
-M: vim vim-detached? f ;
+HOOK: find-vim-path editor-class ( -- path )
+HOOK: vim-ui? editor-class ( -- ? )
 M: vim vim-ui? f ;
+M: vim find-vim-path "vim" ;
 
 : actual-vim-path ( -- path )
     \ vim-path get-global [ find-vim-path ] unless* ;
 
-: vim-command ( file line -- command )
+M: vim editor-command ( file line -- command )
     [
         actual-vim-path dup string? [ , ] [ % ] if
         vim-ui? [ "-g" , ] when
         [ , ] [ number>string "+" prepend , ] bi*
     ] { } make ;
 
-: vim ( file line -- )
-    vim-command vim-detached? [ run-detached ] [ run-process ] if drop ;
+M: vim editor-detached? f ;
 
-[ vim ] edit-hook set-global
