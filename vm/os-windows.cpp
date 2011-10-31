@@ -301,4 +301,14 @@ void factor_vm::open_console()
 	SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
 }
 
+void factor_vm::start_sampling_profiler_timer()
+{
+	general_error(ERROR_NOT_IMPLEMENTED, false_object, false_object);
+}
+
+void factor_vm::end_sampling_profiler_timer()
+{
+	general_error(ERROR_NOT_IMPLEMENTED, false_object, false_object);
+}
+
 }
