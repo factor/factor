@@ -301,14 +301,54 @@ void factor_vm::open_console()
 	SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
 }
 
+void factor_vm::sampler_thread_loop()
+{
+	LARGE_INTEGER counter, new_counter, units_per_second;
+
+	assert(QueryPerformanceFrequency(&units_per_second));
+	long long units_per_sample =
+		units_per_second.QuadPart / FACTOR_PROFILE_SAMPLES_PER_SECOND;
+
+	assert(QueryPerformanceCounter(&counter));
+	while (FACTOR_MEMORY_BARRIER(), sampling_profiler_p)
+	{
+		Sleep(0);
+		assert(QueryPerformanceCounter(&new_counter));
+		cell samples = 0;
+		while (new_counter.QuadPart - counter.QuadPart > units_per_sample) {
+			// We would have to suspend the thread to sample the PC
+			++samples;
+			counter.QuadPart += units_per_sample;
+		}
+		enqueue_safepoint_sample(samples, 0, false);
+	}
+}
+
+static DWORD WINAPI sampler_thread_entry(LPVOID parent_vm)
+{
+	static_cast<factor_vm*>(parent_vm)->sampler_thread_loop();
+	return 0;
+}
+
 void factor_vm::start_sampling_profiler_timer()
 {
-	general_error(ERROR_NOT_IMPLEMENTED, false_object, false_object);
+	sampler_thread = CreateThread(
+		NULL,
+		0,
+		&sampler_thread_entry,
+		static_cast<LPVOID>(this),
+		0,
+		NULL
+	);
 }
 
 void factor_vm::end_sampling_profiler_timer()
 {
-	general_error(ERROR_NOT_IMPLEMENTED, false_object, false_object);
+	DWORD wait_result = WaitForSingleObject(sampler_thread,
+		3000/FACTOR_PROFILE_SAMPLES_PER_SECOND);
+	if (wait_result != WAIT_OBJECT_0)
+		TerminateThread(sampler_thread);
+	sampler_thread = NULL;
 }
 
 }
