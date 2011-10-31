@@ -28,6 +28,7 @@ IN: mason.child
             make-cmd >>command
             "../compile-log" >>stdout
             +stdout+ >>stderr
+            +new-group+ >>group
         try-process
     ] with-directory ;
 
@@ -50,6 +51,7 @@ IN: mason.child
             "../boot-log" >>stdout
             +stdout+ >>stderr
             1 hours >>timeout
+            +new-group+ >>group
         try-process
     ] with-directory ;
 
@@ -63,6 +65,7 @@ IN: mason.child
             "../test-log" >>stdout
             +stdout+ >>stderr
             4 hours >>timeout
+            +new-group+ >>group
         try-process
     ] with-directory ;
 

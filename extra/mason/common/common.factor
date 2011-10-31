@@ -21,7 +21,10 @@ SYMBOL: current-git-id
 : short-running-process ( command -- )
     #! Give network operations and shell commands at most
     #! 30 minutes to complete, to catch hangs.
-    >process 30 minutes >>timeout try-output-process ;
+    >process
+        30 minutes >>timeout
+        +new-group+ >>group
+    try-output-process ;
 
 : retry ( n quot -- )
     [ iota ] dip
@@ -30,7 +33,10 @@ SYMBOL: current-git-id
 : upload-process ( process -- )
     #! Give network operations and shell commands at most
     #! 30 minutes to complete, to catch hangs.
-    >process upload-timeout get >>timeout try-output-process ;
+    >process
+        upload-timeout get >>timeout
+        +new-group+ >>group
+    try-output-process ;
 
 :: upload-safely ( local username host remote -- )
     remote ".incomplete" append :> temp
