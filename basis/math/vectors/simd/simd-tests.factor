@@ -124,7 +124,14 @@ CONSTANT: vector-words
 : boa-ctors ( -- seq )
     simd-classes [ [ name>> "-boa" append ] [ vocabulary>> ] bi lookup ] map ;
 
-: check-optimizer ( seq quot eq-quot -- failures )
+: check-optimizer ( seq test-quot eq-quot -- failures )
+    #! Use test-quot to generate a bunch of test cases from the
+    #! given inputs. Run each test case optimized and
+    #! unoptimized. Compare results with eq-quot.
+    #!
+    #! seq: sequence of inputs
+    #! test-quot: ( input -- input-quot: ( -- values ) code-quot: ( values -- result ) )
+    #! eq-quot: ( result1 result2 -- ? )
     dup '[
         @
         [ dup [ class-of ] { } map-as ] dip '[ _ declare @ ]
@@ -321,6 +328,9 @@ simd-classes&reps [
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 hlshift ] compile-call ] unit-test
 
 [ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 >bignum hlshift ] compile-call ] unit-test
+
+[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 [ { char-16 fixnum } declare hlshift ] compile-call ] unit-test
 
 [ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
@@ -330,7 +340,19 @@ simd-classes&reps [
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 hrshift ] compile-call ] unit-test
 
 [ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 >bignum hrshift ] compile-call ] unit-test
+
+[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 [ { char-16 fixnum } declare hrshift ] compile-call ] unit-test
+
+[ int-4{ 4 8 12 16 } ]
+[ int-4{ 1 2 3 4 } 2 vlshift ] unit-test
+
+[ int-4{ 4 8 12 16 } ]
+[ int-4{ 1 2 3 4 } 2 [ { int-4 fixnum } declare vlshift ] compile-call ] unit-test
+
+[ int-4{ 4 8 12 16 } ]
+[ int-4{ 1 2 3 4 } 2 >bignum [ { int-4 bignum } declare vlshift ] compile-call ] unit-test
 
 ! Invalid inputs should not cause the compiler to throw errors
 [ ] [
@@ -510,7 +532,7 @@ TUPLE: inconsistent-vector-test bool branch ;
 
 ! Test element access -- it should box bignums for int-4 on x86
 : test-accesses ( seq -- failures )
-    [ length iota >array ] keep
+    [ length iota dup [ >bignum ] map append ] keep
     '[ [ _ 1quotation ] dip '[ _ swap nth ] ] [ = ] check-optimizer ; inline
 
 [ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
