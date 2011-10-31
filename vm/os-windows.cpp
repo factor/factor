@@ -347,7 +347,7 @@ void factor_vm::end_sampling_profiler_timer()
 	DWORD wait_result = WaitForSingleObject(sampler_thread,
 		3000/FACTOR_PROFILE_SAMPLES_PER_SECOND);
 	if (wait_result != WAIT_OBJECT_0)
-		TerminateThread(sampler_thread);
+		TerminateThread(sampler_thread, 0);
 	sampler_thread = NULL;
 }
 
