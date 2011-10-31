@@ -1,7 +1,7 @@
-USING: accessors tools.counting-profiler tools.test kernel memory math
-threads alien alien.c-types tools.counting-profiler.private sequences
+USING: accessors tools.profiler.counting tools.test kernel memory math
+threads alien alien.c-types tools.profiler.counting.private sequences
 compiler.test compiler.units words arrays ;
-IN: tools.counting-profiler.tests
+IN: tools.profiler.counting.tests
 
 [ t ] [
     \ length counter>>

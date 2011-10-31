@@ -1,6 +1,6 @@
-USING: tools.counting-profiler.private tools.time tools.crossref
+USING: tools.profiler.counting.private tools.time tools.crossref
 help.markup help.syntax quotations io strings words definitions ;
-IN: tools.counting-profiler
+IN: tools.profiler.counting
 
 ARTICLE: "profiler-limitations" "Profiler limitations"
 "Certain optimizations performed by the compiler can inhibit accurate call counting:"
@@ -12,7 +12,7 @@ ARTICLE: "profiler-limitations" "Profiler limitations"
 } ;
 
 ARTICLE: "profiling" "Profiling code" 
-"The " { $vocab-link "tools.counting-profiler" } " vocabulary implements a simple call counting profiler."
+"The " { $vocab-link "tools.profiler.counting" } " vocabulary implements a simple call counting profiler."
 $nl
 "Quotations can be passed to a combinator which calls them with the profiler enabled:"
 { $subsections profile }
