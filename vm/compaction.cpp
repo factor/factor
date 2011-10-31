@@ -209,7 +209,7 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 	slot_visitor<compaction_fixup> data_forwarder(this,fixup);
 	code_block_visitor<compaction_fixup> code_forwarder(this,fixup);
 
-	code_forwarder.visit_uninitialized_code_blocks();
+	code_forwarder.visit_code_roots();
 
 	/* Object start offsets get recomputed by the object_compaction_updater */
 	data->tenured->starts.clear_object_start_offsets();
@@ -308,7 +308,7 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p)
 	slot_visitor<code_compaction_fixup> data_forwarder(this,fixup);
 	code_block_visitor<code_compaction_fixup> code_forwarder(this,fixup);
 
-	code_forwarder.visit_uninitialized_code_blocks();
+	code_forwarder.visit_code_roots();
 
 	if(trace_contexts_p)
 		code_forwarder.visit_context_code_blocks();
