@@ -94,5 +94,46 @@ void factor_vm::primitive_sampling_profiler()
 	set_sampling_profiler(to_boolean(ctx->pop()));
 }
 
+void factor_vm::primitive_get_samples()
+{
+	if (sampling_profiler_p || samples.empty()) {
+		ctx->push(false_object);
+	} else {
+		data_root<array> samples_array(allot_array(samples.size(), false_object),this);
+		std::vector<profiling_sample>::const_iterator from_iter = samples.begin();
+		cell to_i = 0;
+
+		for (; from_iter != samples.end(); ++from_iter, ++to_i)
+		{
+			data_root<array> sample(allot_array(4, false_object),this);
+
+			set_array_nth(sample.untagged(),0,from_unsigned_cell(from_iter->sample_count));
+			set_array_nth(sample.untagged(),1,from_unsigned_cell(from_iter->gc_sample_count));
+			set_array_nth(sample.untagged(),2,allot_alien((void*)from_iter->ctx));
+
+			cell callstack_size = from_iter->callstack_end - from_iter->callstack_begin;
+			data_root<array> callstack(allot_array(callstack_size,false_object),this);
+
+			std::vector<code_block*>::const_iterator
+				callstacks_begin = sample_callstacks.begin(),
+				c_from_iter = callstacks_begin + from_iter->callstack_begin,
+				c_from_iter_end = callstacks_begin + from_iter->callstack_end;
+			cell c_to_i = 0;
+
+			for (; c_from_iter != c_from_iter_end; ++c_from_iter, ++c_to_i)
+				set_array_nth(callstack.untagged(),c_to_i,(*c_from_iter)->owner);
+
+			set_array_nth(sample.untagged(),3,callstack.value());
+
+			set_array_nth(samples_array.untagged(),to_i,sample.value());
+		}
+		ctx->push(samples_array.value());
+	}
+}
+
+void factor_vm::primitive_clear_samples()
+{
+	clear_samples();
+}
 
 }
