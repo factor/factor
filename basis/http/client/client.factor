@@ -162,7 +162,8 @@ ERROR: download-failed response ;
 
 : http-request ( request -- response data )
     [ [ % ] with-http-request ] B{ } make
-    over content-encoding>> decode check-response-with-body ;
+    over content-encoding>> dup binary = [ drop ] [ decode ] if
+    check-response-with-body ;
 
 : <get-request> ( url -- request )
     "GET" <client-request> ;
