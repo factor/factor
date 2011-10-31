@@ -554,7 +554,7 @@ tuple
     { "(word)" "words.private" "primitive_word" ( name vocab hashcode -- word ) }
     { "profiling" "tools.profiler.sampling.private" "primitive_sampling_profiler" ( ? -- ) }
     { "(get-samples)" "tools.profiler.sampling.private" "primitive_get_samples" ( -- samples/f ) }
-    { "(clear-samples)" "tools.profiler.sampling.private" "primitive_clear_samples" ( -- samples/f ) }
+    { "(clear-samples)" "tools.profiler.sampling.private" "primitive_clear_samples" ( -- ) }
 } [ first4 make-primitive ] each
 
 ! Bump build number
