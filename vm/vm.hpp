@@ -191,6 +191,7 @@ struct factor_vm
 	void primitive_counting_profiler();
 
 	/* Sampling profiler */
+	void clear_samples();
 	void record_sample();
 	void record_callstack_sample(cell *begin, cell *end);
 	void start_sampling_profiler();
