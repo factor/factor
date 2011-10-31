@@ -76,7 +76,6 @@ IN: bootstrap.syntax
     "NAN:" [ 16 scan-base <fp-nan> suffix! ] define-core-syntax
 
     "f" [ f suffix! ] define-core-syntax
-    "t" "syntax" lookup define-singleton-class
 
     "CHAR:" [
         scan-token {
