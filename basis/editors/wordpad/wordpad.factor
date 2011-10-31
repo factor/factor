@@ -1,14 +1,13 @@
-USING: editors io.launcher kernel io.directories.search.windows
-math.parser namespaces sequences io.files arrays ;
+USING: arrays editors io.standard-paths kernel namespaces ;
 IN: editors.wordpad
+
+SINGLETON: wordpad
+wordpad editor-class set-global
 
 : wordpad-path ( -- path )
     \ wordpad-path get [
-        "Windows NT\\Accessories"
-        [ "wordpad.exe" tail? ] find-in-program-files
+        { "Windows NT\\Accessories" } "wordpad.exe" find-in-applications
     ] unless* ;
 
-: wordpad ( file line -- )
-    drop wordpad-path swap 2array run-detached drop ;
-
-[ wordpad ] edit-hook set-global
+M: wordpad editor-command ( file line -- command )
+    drop [ wordpad-path ] dip 2array ;

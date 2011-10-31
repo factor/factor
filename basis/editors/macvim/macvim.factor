@@ -1,9 +1,9 @@
-USING: core-foundation.launch-services editors.vim io.pathnames
-io.standard-paths kernel namespaces ;
+USING: core-foundation.launch-services editors editors.vim
+io.pathnames io.standard-paths kernel namespaces ;
 IN: editors.macvim
 
-SINGLETON: macvim
-macvim \ vim-editor set-global
+TUPLE: macvim < vim ;
+T{ macvim } \ editor-class set-global
 
 : find-macvim-bundle-path ( -- path/f )
     "org.vim.MacVim" find-native-bundle [
@@ -12,8 +12,7 @@ macvim \ vim-editor set-global
         f
     ] if* ;
     
-M: macvim find-vim-path
-    find-macvim-bundle-path "mvim" or ;
+M: macvim find-vim-path find-macvim-bundle-path ;
 
-M: macvim vim-detached? t ;
 M: macvim vim-ui? t ;
+M: macvim editor-detached? t ;

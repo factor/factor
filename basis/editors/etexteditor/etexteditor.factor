@@ -4,16 +4,18 @@ USING: editors io.files io.launcher kernel math.parser make
 namespaces sequences windows.shell32 io.directories.search.windows ;
 IN: editors.etexteditor
 
+SINGLETON: etexteditor
+etexteditor editor-class set-global
+
 : etexteditor-path ( -- str )
     \ etexteditor-path get-global [
         "e" [ "e.exe" tail? ] find-in-program-files
         [ "e" ] unless*
     ] unless* ;
 
-: etexteditor ( file line -- )
+M: etexteditor editor-command ( file line -- command )
     [
         etexteditor-path ,
         [ , ] [ "--line" , number>string , ] bi*
-    ] { } make run-detached drop ;
+    ] { } make ;
 
-[ etexteditor ] edit-hook set-global

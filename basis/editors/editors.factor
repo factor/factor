@@ -1,20 +1,15 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations debugger definitions
-help.topics io io.backend io.files io.pathnames kernel lexer
-namespaces parser prettyprint sequences source-files
-source-files.errors splitting strings summary tools.crossref
-vocabs vocabs.files vocabs.hierarchy vocabs.loader
-vocabs.metadata ;
+help.topics io io.backend io.files io.launcher io.pathnames
+kernel lexer math namespaces parser prettyprint sequences
+source-files source-files.errors splitting strings summary
+tools.crossref vocabs vocabs.files vocabs.hierarchy
+vocabs.loader vocabs.metadata ;
 FROM: vocabs => vocab-name >vocab-link ;
 IN: editors
 
-TUPLE: no-edit-hook ;
-
-M: no-edit-hook summary
-    drop "You must load one of the below vocabularies before using editor integration:" ;
-
-SYMBOL: edit-hook
+SYMBOL: editor-class
 
 : available-editors ( -- seq )
     "editors" child-vocab-names ;
@@ -23,14 +18,20 @@ SYMBOL: edit-hook
     available-editors
     [ [ "Load " prepend ] keep ] { } map>assoc ;
 
-: no-edit-hook ( -- )
-    \ no-edit-hook new
-    editor-restarts throw-restarts
-    require ;
+HOOK: editor-command editor-class ( file line -- command )
+HOOK: editor-detached? editor-class ( -- ? )
+M: object editor-detached? t ;
+
+: run-and-wait-for-editor ( command -- )
+    <process>
+        swap >>command 
+        editor-detached? >>detached
+    run-process dup status>> { 0 f } member?
+    [ drop ] [ process-failed ] if ;
 
 : edit-location ( file line -- )
-    [ absolute-path ] dip edit-hook get-global
-    [ call( file line -- ) ] [ no-edit-hook edit-location ] if* ;
+    [ absolute-path ] dip
+    editor-command [ run-and-wait-for-editor ] when* ;
 
 ERROR: cannot-find-source definition ;
 
@@ -96,4 +97,3 @@ M: string edit edit-vocab ;
 
 : edit-summary ( vocab -- )
     dup vocab-summary-path vocab-append-path 1 edit-location ;
-
