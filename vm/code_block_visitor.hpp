@@ -139,11 +139,11 @@ void code_block_visitor<Fixup>::visit_uninitialized_code_blocks()
 template<typename Fixup>
 void code_block_visitor<Fixup>::visit_sample_callstacks()
 {
-	for (std::vector<code_block *>::const_iterator iter = parent->sample_callstacks.begin();
+	for (std::vector<code_block *>::iterator iter = parent->sample_callstacks.begin();
 		iter != parent->sample_callstacks.end();
 		++iter)
 	{
-		fixup.fixup_code(*iter);
+		*iter = fixup.fixup_code(*iter);
 	}
 }
 
