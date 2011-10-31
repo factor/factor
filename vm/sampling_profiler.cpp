@@ -61,11 +61,21 @@ void factor_vm::set_sampling_profiler(bool sampling_p)
 		end_sampling_profiler();
 }
 
+void factor_vm::clear_samples()
+{
+	// Swapping into temporaries releases the vector's allocated storage,
+	// whereas clear() would leave the allocation as-is
+	std::vector<profiling_sample> sample_graveyard;
+	std::vector<code_block*> sample_callstack_graveyard;
+	samples.swap(sample_graveyard);
+	sample_callstacks.swap(sample_callstack_graveyard);
+}
+
 void factor_vm::start_sampling_profiler()
 {
 	safepoint_sample_count = 0;
 	safepoint_gc_sample_count = 0;
-	samples.clear();
+	clear_samples();
 	samples.reserve(10*FACTOR_PROFILE_SAMPLES_PER_SECOND);
 	sample_callstacks.reserve(100*FACTOR_PROFILE_SAMPLES_PER_SECOND);
 	sampling_profiler_p = true;
