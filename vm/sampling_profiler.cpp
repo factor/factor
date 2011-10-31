@@ -101,9 +101,10 @@ void factor_vm::start_sampling_profiler()
 
 void factor_vm::end_sampling_profiler()
 {
+	sampling_profiler_p = false;
+	FACTOR_MEMORY_BARRIER();
 	end_sampling_profiler_timer();
 	record_sample();
-	sampling_profiler_p = false;
 }
 
 void factor_vm::primitive_sampling_profiler()
