@@ -306,19 +306,19 @@ void factor_vm::sampler_thread_loop()
 	LARGE_INTEGER counter, new_counter, units_per_second;
 
 	assert(QueryPerformanceFrequency(&units_per_second));
-	long long units_per_sample =
-		units_per_second.QuadPart / FACTOR_PROFILE_SAMPLES_PER_SECOND;
 
 	assert(QueryPerformanceCounter(&counter));
+	counter.QuadPart *= FACTOR_PROFILE_SAMPLES_PER_SECOND;
 	while (FACTOR_MEMORY_BARRIER(), sampling_profiler_p)
 	{
 		SwitchToThread();
 		assert(QueryPerformanceCounter(&new_counter));
+		new_counter.QuadPart *= FACTOR_PROFILE_SAMPLES_PER_SECOND;
 		cell samples = 0;
-		while (new_counter.QuadPart - counter.QuadPart > units_per_sample) {
+		while (new_counter.QuadPart - counter.QuadPart > units_per_second.QuadPart) {
 			// We would have to suspend the thread to sample the PC
 			++samples;
-			counter.QuadPart += units_per_sample;
+			counter.QuadPart += units_per_second.QuadPart;
 		}
 		if (samples > 0)
 			enqueue_safepoint_sample(samples, 0, false);
