@@ -4,10 +4,10 @@ namespace factor
 {
 
 profiling_sample::profiling_sample(factor_vm *vm,
-	cell sample_count,
-	cell gc_sample_count,
-	cell foreign_sample_count,
-	cell foreign_thread_sample_count,
+	fixnum sample_count,
+	fixnum gc_sample_count,
+	fixnum foreign_sample_count,
+	fixnum foreign_thread_sample_count,
 	context *ctx)
 	:
 	sample_count(sample_count),
@@ -21,10 +21,10 @@ profiling_sample::profiling_sample(factor_vm *vm,
 
 void factor_vm::record_sample()
 {
-	cell recorded_sample_count;
-	cell recorded_gc_sample_count;
-	cell recorded_foreign_sample_count;
-	cell recorded_foreign_thread_sample_count;
+	fixnum recorded_sample_count;
+	fixnum recorded_gc_sample_count;
+	fixnum recorded_foreign_sample_count;
+	fixnum recorded_foreign_thread_sample_count;
 
 	FACTOR_MEMORY_BARRIER();
 	recorded_sample_count = safepoint_sample_count;
