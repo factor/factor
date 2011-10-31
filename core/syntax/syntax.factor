@@ -8,7 +8,7 @@ generic.standard generic.hook generic.math generic.parser classes
 io.pathnames vocabs vocabs.parser classes.parser classes.union
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple.parser compiler.units
-combinators effects.parser slots hash-sets source-files ;
+combinators effects effects.parser slots hash-sets source-files ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -26,11 +26,15 @@ IN: bootstrap.syntax
     [ dup "syntax" lookup [ ] [ no-word-error ] ?if ] dip
     define-syntax ;
 
+: verify-primitive ( word vocab effect -- )
+    [ lookup ] dip [ swap stack-effect effect= ] curry [ f ] if*
+    [ "Primitive definition is not correct" throw ] unless ;
+
 [
     { "]" "}" ";" ">>" } [ define-delimiter ] each
 
     "PRIMITIVE:" [
-        "Primitive definition is not supported" throw
+        scan-token current-vocab scan-object verify-primitive
     ] define-core-syntax
 
     "CS{" [
