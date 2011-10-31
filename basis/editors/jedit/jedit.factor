@@ -1,46 +1,33 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays editors io io.binary io.encodings.ascii
-io.encodings.binary io.encodings.utf8 io.files io.files.private
-io.pathnames io.sockets io.streams.byte-array kernel locals
-math.parser namespaces prettyprint sequences ;
+USING: combinators.short-circuit editors io.pathnames
+io.standard-paths kernel make math.parser namespaces sequences
+system ;
 IN: editors.jedit
 
-: jedit-server-file ( -- server-files )
-    home ".jedit/server" append-path
-    home "Library/jEdit/server" append-path 2array
-    [ exists? ] find nip ;
+SINGLETON: jedit
+jedit editor-class set-global
 
-: jedit-server-info ( server-file -- port auth )
-    ascii [
-        readln drop
-        readln string>number
-        readln string>number
-    ] with-file-reader ;
+ERROR: jedit-not-found ;
 
-: make-jedit-request ( files -- code )
-    utf8 [
-        "EditServer.handleClient(false,false,false," write
-        cwd pprint
-        "," write
-        "new String[] {" write
-        [ pprint "," write ] each
-        "null});\n" write
-    ] with-byte-writer ;
+HOOK: find-jedit-path os ( -- path )
 
-:: send-jedit-request ( request -- )
-    jedit-server-file jedit-server-info :> ( port auth )
-    "localhost" port <inet> binary [
-        auth 4 >be write
-        request length 2 >be write
-        request write
-    ] with-client ;
+M: object find-jedit-path f ;
 
-: jedit-location ( file line -- )
-    number>string "+line:" prepend 2array
-    make-jedit-request send-jedit-request ;
+M: macosx find-jedit-path
+    "org.gjt.sp.jedit" find-native-bundle
+    dup [ "Contents/MacOS/jedit" append-path ] when ;
 
-: jedit-file ( file -- )
-    1array make-jedit-request send-jedit-request ;
+M: windows find-jedit-path
+    { "jedit" } "jedit.exe" find-in-applications ;
+    
+: jedit-path ( -- path )
+    \ jedit-path get-global [
+        find-jedit-path "jedit" or
+    ] unless* ;
 
-[ jedit-location ] edit-hook set-global
+M: jedit editor-command ( file line -- command/f )
+    [
+        find-jedit-path ,
+        [ , ] [ number>string "+line:" prepend , ] bi*
+    ] { } make ;

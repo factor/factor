@@ -3,13 +3,16 @@ math.parser namespaces editors make system combinators.short-circuit
 fry threads vocabs.loader ;
 IN: editors.emacs
 
+SINGLETON: emacsclient
+emacsclient editor-class set-global
+
 SYMBOL: emacsclient-path
 
 HOOK: default-emacsclient os ( -- path )
 
 M: object default-emacsclient ( -- path ) "emacsclient" ;
 
-: emacsclient ( file line -- )
+M: emacsclient editor-command ( file line -- command )
     [
         {
             [ emacsclient-path get-global ]
@@ -23,7 +26,5 @@ M: object default-emacsclient ( -- path ) "emacsclient" ;
 
 : emacs ( word -- )
     where first2 emacsclient ;
-
-[ emacsclient ] edit-hook set-global
 
 os windows? [ "editors.emacs.windows" require ] when

@@ -1,18 +1,18 @@
 USING: editors.vim io.backend kernel namespaces system
-vocabs.loader ;
+vocabs.loader editors ;
 IN: editors.gvim
 
 ! This code builds on the code in editors.vim; see there for
 ! more information.
 
-SINGLETON: gvim
-gvim vim-editor set-global
+TUPLE: gvim < vim ;
+T{ gvim } editor-class set-global
 
 HOOK: find-gvim-path io-backend ( -- path )
 M: object find-gvim-path f ;
 
 M: gvim find-vim-path find-gvim-path "gvim" or ;
-M: gvim vim-detached? t ;
 M: gvim vim-ui? t ;
+M: gvim editor-detached? t ;
 
 os windows? [ "editors.gvim.windows" require ] when

@@ -150,16 +150,17 @@ M: process-was-killed error.
     run-detached
     dup detached>> [ dup wait-for-process drop ] unless ;
 
-ERROR: process-failed process code ;
+ERROR: process-failed process ;
 
 M: process-failed error.
-    dup "Process exited with error code " write code>> . nl
-    "Launch descriptor:" print nl
-    process>> . ;
+    [
+        "Process exited with error code " write process>> status>> . nl
+        "Launch descriptor:" print nl
+    ] [ process>> . ] bi ;
 
 : wait-for-success ( process -- )
-    dup wait-for-process dup 0 =
-    [ 2drop ] [ process-failed ] if ;
+    dup wait-for-process 0 =
+    [ drop ] [ process-failed ] if ;
 
 : try-process ( desc -- )
     run-process wait-for-success ;
