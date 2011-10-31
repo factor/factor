@@ -198,6 +198,8 @@ struct factor_vm
 	void end_sampling_profiler();
 	void set_sampling_profiler(bool sampling);
 	void primitive_sampling_profiler();
+	void primitive_get_samples();
+	void primitive_clear_samples();
 
 	// errors
 	void general_error(vm_error_type error, cell arg1, cell arg2);
