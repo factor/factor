@@ -170,13 +170,19 @@ void factor_vm::enqueue_safepoint_fep()
 	code->guard_safepoint();
 }
 
-void factor_vm::enqueue_safepoint_sample()
+void factor_vm::enqueue_safepoint_sample(cell pc, bool foreign_thread_p)
 {
 	if (sampling_profiler_p)
 	{
 		FACTOR_ATOMIC_ADD(&safepoint_sample_count, 1);
-		if (current_gc)
-			FACTOR_ATOMIC_ADD(&safepoint_gc_sample_count, 1);
+		if (foreign_thread_p)
+			FACTOR_ATOMIC_ADD(&safepoint_foreign_thread_sample_count, 1);
+		else {
+			if (current_gc)
+				FACTOR_ATOMIC_ADD(&safepoint_gc_sample_count, 1);
+			if (!code->seg->in_segment_p(pc))
+				FACTOR_ATOMIC_ADD(&safepoint_foreign_sample_count, 1);
+		}
 		code->guard_safepoint();
 	}
 }

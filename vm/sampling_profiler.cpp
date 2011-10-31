@@ -6,10 +6,14 @@ namespace factor
 profiling_sample::profiling_sample(factor_vm *vm,
 	cell sample_count,
 	cell gc_sample_count,
+	cell foreign_sample_count,
+	cell foreign_thread_sample_count,
 	context *ctx)
 	:
 	sample_count(sample_count),
 	gc_sample_count(gc_sample_count),
+	foreign_sample_count(foreign_sample_count),
+	foreign_thread_sample_count(foreign_thread_sample_count),
 	ctx(ctx)
 {
 	vm->record_callstack_sample(&callstack_begin, &callstack_end);
@@ -19,20 +23,33 @@ void factor_vm::record_sample()
 {
 	cell recorded_sample_count;
 	cell recorded_gc_sample_count;
+	cell recorded_foreign_sample_count;
+	cell recorded_foreign_thread_sample_count;
 
+	FACTOR_MEMORY_BARRIER();
 	recorded_sample_count = safepoint_sample_count;
 	recorded_gc_sample_count = safepoint_gc_sample_count;
-	if (recorded_sample_count == 0 && recorded_gc_sample_count == 0)
+	recorded_foreign_sample_count = safepoint_foreign_sample_count;
+	recorded_foreign_thread_sample_count = safepoint_foreign_thread_sample_count;
+	if (recorded_sample_count
+		+ recorded_gc_sample_count
+		+ recorded_foreign_sample_count
+		+ recorded_foreign_thread_sample_count
+		== 0)
 		return;
 
 	/* Another sample signal could be raised while we record these counts */
 	FACTOR_ATOMIC_SUB(&safepoint_sample_count, recorded_sample_count);
 	FACTOR_ATOMIC_SUB(&safepoint_gc_sample_count, recorded_gc_sample_count);
+	FACTOR_ATOMIC_SUB(&safepoint_foreign_sample_count, recorded_foreign_sample_count);
+	FACTOR_ATOMIC_SUB(&safepoint_foreign_thread_sample_count, recorded_foreign_thread_sample_count);
 
 	samples.push_back(profiling_sample(
 		this,
 		recorded_sample_count,
 		recorded_gc_sample_count,
+		recorded_foreign_sample_count,
+		recorded_foreign_thread_sample_count,
 		ctx
 	));
 }
@@ -105,11 +122,13 @@ void factor_vm::primitive_get_samples()
 
 		for (; from_iter != samples.end(); ++from_iter, ++to_i)
 		{
-			data_root<array> sample(allot_array(4, false_object),this);
+			data_root<array> sample(allot_array(6, false_object),this);
 
 			set_array_nth(sample.untagged(),0,from_unsigned_cell(from_iter->sample_count));
 			set_array_nth(sample.untagged(),1,from_unsigned_cell(from_iter->gc_sample_count));
-			set_array_nth(sample.untagged(),2,allot_alien((void*)from_iter->ctx));
+			set_array_nth(sample.untagged(),2,from_unsigned_cell(from_iter->foreign_sample_count));
+			set_array_nth(sample.untagged(),3,from_unsigned_cell(from_iter->foreign_thread_sample_count));
+			set_array_nth(sample.untagged(),4,allot_alien((void*)from_iter->ctx));
 
 			cell callstack_size = from_iter->callstack_end - from_iter->callstack_begin;
 			data_root<array> callstack(allot_array(callstack_size,false_object),this);
@@ -123,7 +142,7 @@ void factor_vm::primitive_get_samples()
 			for (; c_from_iter != c_from_iter_end; ++c_from_iter, ++c_to_i)
 				set_array_nth(callstack.untagged(),c_to_i,(*c_from_iter)->owner);
 
-			set_array_nth(sample.untagged(),3,callstack.value());
+			set_array_nth(sample.untagged(),5,callstack.value());
 
 			set_array_nth(samples_array.untagged(),to_i,sample.value());
 		}
