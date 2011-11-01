@@ -75,10 +75,7 @@ struct factor_vm
 	/* State kept by the sampling profiler */
 	std::vector<profiling_sample> samples;
 	std::vector<code_block*> sample_callstacks;
-	volatile fixnum safepoint_sample_count;
-	volatile fixnum safepoint_gc_sample_count;
-	volatile fixnum safepoint_foreign_sample_count;
-	volatile fixnum safepoint_foreign_thread_sample_count;
+	volatile profiling_sample_count safepoint_sample_counts;
 
 	/* GC is off during heap walking */
 	bool gc_off;
