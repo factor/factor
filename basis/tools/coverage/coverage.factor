@@ -4,7 +4,7 @@ USING: accessors assocs fry io kernel math prettyprint
 quotations sequences sequences.deep splitting strings
 tools.annotations vocabs words arrays words.symbol
 combinators.short-circuit values tools.test
-combinators continuations ;
+combinators continuations classes ;
 IN: tools.coverage
 
 TUPLE: coverage < identity-tuple executed? ;
@@ -32,7 +32,7 @@ GENERIC: reset-coverage ( object -- )
     ".private" ?tail drop ".private" append ;
 
 : coverage-words ( string -- words )
-    words [ { [ primitive? not ] [ symbol? not ] } 1&& ] filter ;
+    words [ { [ primitive? not ] [ symbol? not ] [ predicate? not ] } 1&& ] filter ;
 
 PRIVATE>
 
@@ -110,7 +110,7 @@ M: string count-callables
     [ count-callables ] map-words sum ;
 
 M: word count-callables
-    "coverage" word-prop assoc-size ;
+    def>> [ callable? ] deep-filter length ;
 
 PRIVATE>
 
@@ -128,5 +128,5 @@ PRIVATE>
     ] bi ;
 
 : %coverage ( string -- x )
-    [ coverage values concat length ]
+    [ test-coverage values concat length ]
     [ count-callables ] bi [ swap - ] keep /f ; inline
