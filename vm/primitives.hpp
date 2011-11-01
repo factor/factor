@@ -37,7 +37,7 @@ namespace factor
 	_(callstack_for) \
 	_(callstack_to_array) \
 	_(check_datastack) \
-        _(clear_samples) \
+	_(clear_samples) \
 	_(clone) \
 	_(code_blocks) \
 	_(code_room) \
@@ -91,7 +91,7 @@ namespace factor
 	_(ftell) \
 	_(full_gc) \
 	_(fwrite) \
-        _(get_samples) \
+	_(get_samples) \
 	_(identity_hashcode) \
 	_(innermost_stack_frame_executing) \
 	_(innermost_stack_frame_scan) \
