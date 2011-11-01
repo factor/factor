@@ -5,16 +5,16 @@ namespace factor
 
 profiling_sample_count profiling_sample_count::record_counts() volatile
 {
-	FACTOR_MEMORY_BARRIER();
+	atomic::fence();
 	profiling_sample_count returned(
 		sample_count,
 		gc_sample_count,
 		foreign_sample_count,
 		foreign_thread_sample_count);
-	FACTOR_ATOMIC_SUB(&sample_count, returned.sample_count);
-	FACTOR_ATOMIC_SUB(&gc_sample_count, returned.gc_sample_count);
-	FACTOR_ATOMIC_SUB(&foreign_sample_count, returned.foreign_sample_count);
-	FACTOR_ATOMIC_SUB(&foreign_thread_sample_count, returned.foreign_thread_sample_count);
+	atomic::subtract(&sample_count, returned.sample_count);
+	atomic::subtract(&gc_sample_count, returned.gc_sample_count);
+	atomic::subtract(&foreign_sample_count, returned.foreign_sample_count);
+	atomic::subtract(&foreign_thread_sample_count, returned.foreign_thread_sample_count);
 	return returned;
 }
 
@@ -24,7 +24,7 @@ void profiling_sample_count::clear() volatile
 	gc_sample_count = 0;
 	foreign_sample_count = 0;
 	foreign_thread_sample_count = 0;
-	FACTOR_MEMORY_BARRIER();
+	atomic::fence();
 }
 
 profiling_sample::profiling_sample(factor_vm *vm,
@@ -91,7 +91,7 @@ void factor_vm::start_sampling_profiler()
 void factor_vm::end_sampling_profiler()
 {
 	sampling_profiler_p = false;
-	FACTOR_MEMORY_BARRIER();
+	atomic::fence();
 	end_sampling_profiler_timer();
 	record_sample();
 }
@@ -143,6 +143,23 @@ void factor_vm::primitive_get_samples()
 void factor_vm::primitive_clear_samples()
 {
 	clear_samples();
+}
+
+void factor_vm::enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thread_p)
+{
+	if (atomic::fence(), sampling_profiler_p)
+	{
+		atomic::add(&safepoint_sample_counts.sample_count, samples);
+		if (foreign_thread_p)
+			atomic::add(&safepoint_sample_counts.foreign_thread_sample_count, samples);
+		else {
+			if (atomic::fence(), current_gc)
+				atomic::add(&safepoint_sample_counts.gc_sample_count, samples);
+			if (pc != 0 && !code->seg->in_segment_p(pc))
+				atomic::add(&safepoint_sample_counts.foreign_sample_count, samples);
+		}
+		code->guard_safepoint();
+	}
 }
 
 }
