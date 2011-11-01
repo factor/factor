@@ -1,8 +1,6 @@
 namespace factor
 {
 
-#define FACTOR_PROFILE_SAMPLES_PER_SECOND 1000
-
 struct profiling_sample_count
 {
 	// Number of samples taken before the safepoint that recorded the sample
