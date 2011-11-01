@@ -352,7 +352,7 @@ ARTICLE: "handbook-tools-reference" "Developer tools"
 { $heading "Performance" }
 { $subsections
     "timing"
-    "profiling"
+    "tools.profiler.counting"
     "tools.memory"
     "tools.threads"
     "tools.destructors"
