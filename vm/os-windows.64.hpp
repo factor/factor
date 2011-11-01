@@ -1,3 +1,5 @@
+#include "atomic-cl-64.hpp"
+
 namespace factor
 {
 

@@ -197,6 +197,7 @@ struct factor_vm
 	void start_sampling_profiler();
 	void end_sampling_profiler();
 	void set_sampling_profiler(bool sampling);
+	void enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thread_p);
 	void primitive_sampling_profiler();
 	void primitive_get_samples();
 	void primitive_clear_samples();
@@ -214,7 +215,6 @@ struct factor_vm
 	void synchronous_signal_handler_impl();
 	void fp_signal_handler_impl();
 	void enqueue_safepoint_fep();
-	void enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thread_p);
 	void handle_safepoint();
 
 	// bignum
