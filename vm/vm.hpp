@@ -63,7 +63,7 @@ struct factor_vm
 	/* Is profiling enabled? */
 	bool counting_profiler_p;
 	volatile bool sampling_profiler_p;
-	int samples_per_second;
+	fixnum samples_per_second;
 
 	/* Global variables used to pass fault handler state from signal handler
 	to VM */
@@ -195,9 +195,9 @@ struct factor_vm
 	void clear_samples();
 	void record_sample();
 	void record_callstack_sample(cell *begin, cell *end);
-	void start_sampling_profiler(int rate);
+	void start_sampling_profiler(fixnum rate);
 	void end_sampling_profiler();
-	void set_sampling_profiler(int rate);
+	void set_sampling_profiler(fixnum rate);
 	void enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thread_p);
 	void primitive_sampling_profiler();
 	void primitive_get_samples();
