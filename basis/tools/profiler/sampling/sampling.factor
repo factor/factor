@@ -1,18 +1,22 @@
 ! (c)2011 Joe Groff bsd license
 USING: assocs calendar continuations kernel math.statistics
-namespaces sequences tools.profiler.sampling.private ;
+math namespaces sequences tools.profiler.sampling.private ;
 IN: tools.profiler.sampling
 
-: TIME-PER-SAMPLE ( -- n ) 1 milliseconds ; inline
-
 SYMBOL: raw-profile-data
+SYMBOL: samples-per-second
+
+CONSTANT: default-samples-per-second 1000
 
 : get-raw-profile-data ( -- data )
     raw-profile-data get-global [ "No profile data" throw ] unless* ;
 
-: profile ( quot -- )
-    t profiling [ f profiling ] [ ] cleanup
+: profile* ( rate quot -- )
+    [ [ samples-per-second set-global ] [ profiling ] bi ] dip
+    [ 0 profiling ] [ ] cleanup
     (get-samples) raw-profile-data set-global ; inline
+
+: profile ( quot -- ) default-samples-per-second swap profile* ; inline
 
 : total-sample-count ( sample -- count ) first ;
 : gc-sample-count ( sample -- count ) second ;
@@ -22,7 +26,7 @@ SYMBOL: raw-profile-data
 : sample-callstack ( sample -- array ) 5 swap nth ;
 
 : samples>time ( samples -- time )
-    TIME-PER-SAMPLE time* ;
+    samples-per-second get-global / seconds ;
 
 : (total-time) ( samples -- n )
     [ total-sample-count ] map-sum samples>time ;

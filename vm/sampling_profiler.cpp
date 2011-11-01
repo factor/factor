@@ -57,13 +57,14 @@ void factor_vm::record_callstack_sample(cell *begin, cell *end)
 	*end = sample_callstacks.size();
 }
 
-void factor_vm::set_sampling_profiler(bool sampling_p)
+void factor_vm::set_sampling_profiler(int rate)
 {
+	bool sampling_p = !!rate;
 	if (sampling_p == sampling_profiler_p)
 		return;
 	
 	if (sampling_p)
-		start_sampling_profiler();
+		start_sampling_profiler(rate);
 	else
 		end_sampling_profiler();
 }
@@ -78,12 +79,13 @@ void factor_vm::clear_samples()
 	sample_callstacks.swap(sample_callstack_graveyard);
 }
 
-void factor_vm::start_sampling_profiler()
+void factor_vm::start_sampling_profiler(int rate)
 {
+	samples_per_second = rate;
 	safepoint_sample_counts.clear();
 	clear_samples();
-	samples.reserve(10*FACTOR_PROFILE_SAMPLES_PER_SECOND);
-	sample_callstacks.reserve(100*FACTOR_PROFILE_SAMPLES_PER_SECOND);
+	samples.reserve(10*rate);
+	sample_callstacks.reserve(100*rate);
 	sampling_profiler_p = true;
 	start_sampling_profiler_timer();
 }
@@ -98,7 +100,7 @@ void factor_vm::end_sampling_profiler()
 
 void factor_vm::primitive_sampling_profiler()
 {
-	set_sampling_profiler(to_boolean(ctx->pop()));
+	set_sampling_profiler(to_fixnum(ctx->pop()));
 }
 
 void factor_vm::primitive_get_samples()
