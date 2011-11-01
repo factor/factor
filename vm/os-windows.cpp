@@ -308,12 +308,12 @@ void factor_vm::sampler_thread_loop()
 	assert(QueryPerformanceFrequency(&units_per_second));
 
 	assert(QueryPerformanceCounter(&counter));
-	counter.QuadPart *= FACTOR_PROFILE_SAMPLES_PER_SECOND;
+	counter.QuadPart *= samples_per_second;
 	while (atomic::fence(), sampling_profiler_p)
 	{
 		SwitchToThread();
 		assert(QueryPerformanceCounter(&new_counter));
-		new_counter.QuadPart *= FACTOR_PROFILE_SAMPLES_PER_SECOND;
+		new_counter.QuadPart *= samples_per_second;
 		cell samples = 0;
 		while (new_counter.QuadPart - counter.QuadPart > units_per_second.QuadPart) {
 			// We would have to suspend the thread to sample the PC
@@ -348,7 +348,7 @@ void factor_vm::end_sampling_profiler_timer()
 	sampling_profiler_p = false;
 	atomic::fence();
 	DWORD wait_result = WaitForSingleObject(sampler_thread,
-		3000/FACTOR_PROFILE_SAMPLES_PER_SECOND);
+		3000/samples_per_second);
 	if (wait_result != WAIT_OBJECT_0)
 		TerminateThread(sampler_thread, 0);
 	sampler_thread = NULL;
