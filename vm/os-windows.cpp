@@ -348,7 +348,7 @@ void factor_vm::end_sampling_profiler_timer()
 	sampling_profiler_p = false;
 	atomic::fence();
 	DWORD wait_result = WaitForSingleObject(sampler_thread,
-		3000/samples_per_second);
+		3000*(DWORD)samples_per_second);
 	if (wait_result != WAIT_OBJECT_0)
 		TerminateThread(sampler_thread, 0);
 	sampler_thread = NULL;
