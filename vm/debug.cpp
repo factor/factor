@@ -396,7 +396,10 @@ void factor_vm::factorbug()
 	fep_p = true;
 
 	std::cout << "Starting low level debugger..." << std::endl;
-	factorbug_usage(false);
+	if (!fep_help_was_shown) {
+		factorbug_usage(false);
+		fep_help_was_shown = true;
+	}
 	bool seen_command = false;
 
 	for(;;)

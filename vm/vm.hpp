@@ -111,6 +111,7 @@ struct factor_vm
 
 	/* Debugger */
 	bool fep_p;
+	bool fep_help_was_shown;
 	bool fep_disabled;
 	bool full_output;
 
