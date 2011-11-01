@@ -157,8 +157,8 @@ void factor_vm::start_sampling_profiler_timer()
 {
 	struct itimerval timer;
 	memset((void*)&timer, 0, sizeof(struct itimerval));
-	timer.it_value.tv_usec = 1000000/FACTOR_PROFILE_SAMPLES_PER_SECOND;
-	timer.it_interval.tv_usec = 1000000/FACTOR_PROFILE_SAMPLES_PER_SECOND;
+	timer.it_value.tv_usec = 1000000/samples_per_second;
+	timer.it_interval.tv_usec = 1000000/samples_per_second;
 	setitimer(ITIMER_REAL, &timer, NULL);
 }
 
