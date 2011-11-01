@@ -57,7 +57,7 @@ void factor_vm::record_callstack_sample(cell *begin, cell *end)
 	*end = sample_callstacks.size();
 }
 
-void factor_vm::set_sampling_profiler(int rate)
+void factor_vm::set_sampling_profiler(fixnum rate)
 {
 	bool sampling_p = !!rate;
 	if (sampling_p == sampling_profiler_p)
@@ -79,7 +79,7 @@ void factor_vm::clear_samples()
 	sample_callstacks.swap(sample_callstack_graveyard);
 }
 
-void factor_vm::start_sampling_profiler(int rate)
+void factor_vm::start_sampling_profiler(fixnum rate)
 {
 	samples_per_second = rate;
 	safepoint_sample_counts.clear();
