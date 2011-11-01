@@ -174,14 +174,14 @@ void factor_vm::enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thr
 {
 	if (FACTOR_MEMORY_BARRIER(), sampling_profiler_p)
 	{
-		FACTOR_ATOMIC_ADD(&safepoint_sample_count, samples);
+		FACTOR_ATOMIC_ADD(&safepoint_sample_counts.sample_count, samples);
 		if (foreign_thread_p)
-			FACTOR_ATOMIC_ADD(&safepoint_foreign_thread_sample_count, samples);
+			FACTOR_ATOMIC_ADD(&safepoint_sample_counts.foreign_thread_sample_count, samples);
 		else {
 			if (FACTOR_MEMORY_BARRIER(), current_gc)
-				FACTOR_ATOMIC_ADD(&safepoint_gc_sample_count, samples);
+				FACTOR_ATOMIC_ADD(&safepoint_sample_counts.gc_sample_count, samples);
 			if (pc != 0 && !code->seg->in_segment_p(pc))
-				FACTOR_ATOMIC_ADD(&safepoint_foreign_sample_count, samples);
+				FACTOR_ATOMIC_ADD(&safepoint_sample_counts.foreign_sample_count, samples);
 		}
 		code->guard_safepoint();
 	}
