@@ -1,4 +1,4 @@
-USING: kernel math math.functions math.statistics tools.test ;
+USING: assocs kernel math math.functions math.statistics sequences tools.test ;
 IN: math.statistics.tests
 
 [ 1 ] [ { 1 } mean ] unit-test
@@ -52,4 +52,13 @@ IN: math.statistics.tests
     }
 ] [
     "aabbcc" histogram
+] unit-test
+
+{
+    V{ 0 3 6 9 }
+    V{ 1 4 7 }
+    V{ 2 5 8 }
+} [
+    10 iota [ 3 mod ] collect-by
+    [ 0 swap at ] [ 1 swap at ] [ 2 swap at ] tri
 ] unit-test
