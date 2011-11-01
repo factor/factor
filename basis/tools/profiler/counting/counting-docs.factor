@@ -11,7 +11,7 @@ ARTICLE: "profiler-limitations" "Profiler limitations"
     "Tail-recursive loops will only count the initial invocation of the word, not every tail call."
 } ;
 
-ARTICLE: "profiling" "Profiling code" 
+ARTICLE: "tools.profiler.counting" "Call-counting profiler" 
 "The " { $vocab-link "tools.profiler.counting" } " vocabulary implements a simple call counting profiler."
 $nl
 "Quotations can be passed to a combinator which calls them with the profiler enabled:"
@@ -27,7 +27,7 @@ $nl
 }
 { $see-also "ui.tools.profiler" "tools.annotations" "timing" } ;
 
-ABOUT: "profiling"
+ABOUT: "tools.profiler.counting"
 
 HELP: counters
 { $values { "words" "a sequence of words" } { "alist" "an association list mapping words to integers" } }
