@@ -59,7 +59,7 @@ VM_C_API void *factor_memcpy(void *dst, void *src, size_t len);
 
 		#define FACTOR_ATOMIC_CAS(ptr, old_val, new_val) \
 			(InterlockedCompareExchange64( \
-                            reinterpret_cast<volatile LONG64 *>(ptr), new_val, old_val) == old_val)
+				reinterpret_cast<volatile LONG64 *>(ptr), new_val, old_val) == old_val)
 
 		#define FACTOR_ATOMIC_ADD(ptr, val) \
 			InterlockedAdd64(reinterpret_cast<volatile LONG64 *>(ptr), val)
@@ -71,7 +71,7 @@ VM_C_API void *factor_memcpy(void *dst, void *src, size_t len);
 
 		#define FACTOR_ATOMIC_CAS(ptr, old_val, new_val) \
 			(InterlockedCompareExchange( \
-                            reinterpret_cast<volatile LONG *>(ptr), new_val, old_val) == old_val)
+				reinterpret_cast<volatile LONG *>(ptr), new_val, old_val) == old_val)
 
 		#define FACTOR_ATOMIC_ADD(ptr, val) \
 			InterlockedAdd(reinterpret_cast<volatile LONG *>(ptr), val)
