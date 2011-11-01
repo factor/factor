@@ -1,3 +1,4 @@
+! (c)2011 Joe Groff bsd license
 USING: assocs calendar continuations kernel math.statistics
 namespaces sequences tools.profiler.sampling.private ;
 IN: tools.profiler.sampling
