@@ -309,7 +309,7 @@ void factor_vm::sampler_thread_loop()
 
 	assert(QueryPerformanceCounter(&counter));
 	counter.QuadPart *= FACTOR_PROFILE_SAMPLES_PER_SECOND;
-	while (FACTOR_MEMORY_BARRIER(), sampling_profiler_p)
+	while (atomic::fence(), sampling_profiler_p)
 	{
 		SwitchToThread();
 		assert(QueryPerformanceCounter(&new_counter));
@@ -346,7 +346,7 @@ void factor_vm::start_sampling_profiler_timer()
 void factor_vm::end_sampling_profiler_timer()
 {
 	sampling_profiler_p = false;
-	FACTOR_MEMORY_BARRIER();
+	atomic::fence();
 	DWORD wait_result = WaitForSingleObject(sampler_thread,
 		3000/FACTOR_PROFILE_SAMPLES_PER_SECOND);
 	if (wait_result != WAIT_OBJECT_0)
