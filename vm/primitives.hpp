@@ -37,6 +37,7 @@ namespace factor
 	_(callstack_for) \
 	_(callstack_to_array) \
 	_(check_datastack) \
+	_(clear_samples) \
 	_(clone) \
 	_(code_blocks) \
 	_(code_room) \
@@ -45,6 +46,7 @@ namespace factor
 	_(context_object) \
 	_(context_object_for) \
 	_(current_callback) \
+	_(counting_profiler) \
 	_(data_room) \
 	_(datastack) \
 	_(datastack_for) \
@@ -89,6 +91,7 @@ namespace factor
 	_(ftell) \
 	_(full_gc) \
 	_(fwrite) \
+	_(get_samples) \
 	_(identity_hashcode) \
 	_(innermost_stack_frame_executing) \
 	_(innermost_stack_frame_scan) \
@@ -100,7 +103,6 @@ namespace factor
 	_(modify_code_heap) \
 	_(nano_count) \
 	_(optimized_p) \
-	_(profiling) \
 	_(quot_compiled_p) \
 	_(quotation_code) \
 	_(reset_dispatch_stats) \
@@ -109,6 +111,7 @@ namespace factor
 	_(resize_string) \
 	_(retainstack) \
 	_(retainstack_for) \
+	_(sampling_profiler) \
 	_(save_image) \
 	_(save_image_and_exit) \
 	_(set_context_object) \

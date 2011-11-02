@@ -1,6 +1,6 @@
-USING: tools.profiler.private tools.time tools.crossref
+USING: tools.profiler.counting.private tools.time tools.crossref
 help.markup help.syntax quotations io strings words definitions ;
-IN: tools.profiler
+IN: tools.profiler.counting
 
 ARTICLE: "profiler-limitations" "Profiler limitations"
 "Certain optimizations performed by the compiler can inhibit accurate call counting:"
@@ -11,8 +11,8 @@ ARTICLE: "profiler-limitations" "Profiler limitations"
     "Tail-recursive loops will only count the initial invocation of the word, not every tail call."
 } ;
 
-ARTICLE: "profiling" "Profiling code" 
-"The " { $vocab-link "tools.profiler" } " vocabulary implements a simple call counting profiler."
+ARTICLE: "tools.profiler.counting" "Call-counting profiler" 
+"The " { $vocab-link "tools.profiler.counting" } " vocabulary implements a simple call counting profiler."
 $nl
 "Quotations can be passed to a combinator which calls them with the profiler enabled:"
 { $subsections profile }
@@ -27,7 +27,7 @@ $nl
 }
 { $see-also "ui.tools.profiler" "tools.annotations" "timing" } ;
 
-ABOUT: "profiling"
+ABOUT: "tools.profiler.counting"
 
 HELP: counters
 { $values { "words" "a sequence of words" } { "alist" "an association list mapping words to integers" } }

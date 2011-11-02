@@ -60,10 +60,10 @@ struct factor_vm
 	/* External entry points */
 	c_to_factor_func_type c_to_factor_func;
 
-	/* Is call counting enabled? */
+	/* Is profiling enabled? */
 	bool counting_profiler_p;
-	/* Is sampling profiler enabled? */
-	bool sampling_profiler_p;
+	volatile cell sampling_profiler_p;
+	fixnum samples_per_second;
 
 	/* Global variables used to pass fault handler state from signal handler
 	to VM */
@@ -71,8 +71,12 @@ struct factor_vm
 	cell signal_number;
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
-	bool safepoint_fep;
-	cell safepoint_sample_count;
+	volatile cell safepoint_fep_p;
+
+	/* State kept by the sampling profiler */
+	std::vector<profiling_sample> samples;
+	std::vector<cell> sample_callstacks;
+	volatile profiling_sample_count safepoint_sample_counts;
 
 	/* GC is off during heap walking */
 	bool gc_off;
@@ -88,6 +92,10 @@ struct factor_vm
 
 	/* Only set if we're performing a GC */
 	gc_state *current_gc;
+	volatile cell current_gc_p;
+
+	/* Set if we're in the jit */
+	volatile fixnum current_jit_count;
 
 	/* Mark stack */
 	std::vector<cell> mark_stack;
@@ -105,6 +113,7 @@ struct factor_vm
 
 	/* Debugger */
 	bool fep_p;
+	bool fep_help_was_shown;
 	bool fep_disabled;
 	bool full_output;
 
@@ -128,6 +137,9 @@ struct factor_vm
 
 	/* Stack for signal handlers, only used on Unix */
 	segment *signal_callstack_seg;
+
+	/* Are we already handling a fault? Used to catch double memory faults */
+	bool faulting_p;
 
 	// contexts
 	context *new_context();
@@ -180,11 +192,23 @@ struct factor_vm
 	void primitive_clone();
 	void primitive_become();
 
-	// profiler
-	void init_profiler();
-	code_block *compile_profiling_stub(cell word_);
-	void set_profiling(bool profiling);
-	void primitive_profiling();
+	// counting_profiler
+	void init_counting_profiler();
+	code_block *compile_counting_profiler_stub(cell word_);
+	void set_counting_profiler(bool counting_profiler);
+	void primitive_counting_profiler();
+
+	/* Sampling profiler */
+	void clear_samples();
+	void record_sample();
+	void record_callstack_sample(cell *begin, cell *end);
+	void start_sampling_profiler(fixnum rate);
+	void end_sampling_profiler();
+	void set_sampling_profiler(fixnum rate);
+	void enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thread_p);
+	void primitive_sampling_profiler();
+	void primitive_get_samples();
+	void primitive_clear_samples();
 
 	// errors
 	void general_error(vm_error_type error, cell arg1, cell arg2);
@@ -199,7 +223,6 @@ struct factor_vm
 	void synchronous_signal_handler_impl();
 	void fp_signal_handler_impl();
 	void enqueue_safepoint_fep();
-	void enqueue_safepoint_sample();
 	void handle_safepoint();
 
 	// bignum
@@ -383,7 +406,7 @@ struct factor_vm
 	void find_data_references_step(cell *scan);
 	void find_data_references(cell look_for_);
 	void dump_code_heap();
-	void factorbug_usage();
+	void factorbug_usage(bool advanced_p);
 	void factorbug();
 	void primitive_die();
 
@@ -705,9 +728,14 @@ struct factor_vm
 	void ffi_dlclose(dll *dll);
 	void c_to_factor_toplevel(cell quot);
 	void init_signals();
+	void start_sampling_profiler_timer();
+	void end_sampling_profiler_timer();
 
 	// os-windows
   #if defined(WINDOWS)
+	HANDLE sampler_thread;
+	void sampler_thread_loop();
+
 	const vm_char *vm_executable_path();
 	const vm_char *default_image_path();
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);

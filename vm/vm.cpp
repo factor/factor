@@ -9,16 +9,19 @@ factor_vm::factor_vm() :
 	c_to_factor_func(NULL),
 	counting_profiler_p(false),
 	sampling_profiler_p(false),
-	safepoint_fep(false),
-	safepoint_sample_count(0),
+	safepoint_fep_p(false),
 	gc_off(false),
 	current_gc(NULL),
+	current_gc_p(false),
+	current_jit_count(0),
 	gc_events(NULL),
 	fep_p(false),
+	fep_help_was_shown(false),
 	fep_disabled(false),
 	full_output(false),
 	last_nano_count(0),
-	signal_callstack_seg(NULL)
+	signal_callstack_seg(NULL),
+	faulting_p(false)
 {
 	primitive_reset_dispatch_stats();
 }

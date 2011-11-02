@@ -49,7 +49,7 @@ HELP: watch-vars
 HELP: add-timing
 { $values { "word" word } }
 { $description "Adds timing code to a word, which records its total running time, including that of words it calls, on every invocation." }
-{ $see-also "timing" "profiling" } ;
+{ $see-also "timing" "tools.profiler.counting" } ;
 
 HELP: reset-word-timing
 { $description "Resets the word timing table." } ;

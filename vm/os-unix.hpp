@@ -10,6 +10,8 @@
 #include <signal.h>
 #include <pthread.h>
 
+#include "atomic-gcc.hpp"
+
 namespace factor
 {
 

@@ -104,7 +104,8 @@ call( -- )
     "threads.private"
     "tools.dispatch.private"
     "tools.memory.private"
-    "tools.profiler.private"
+    "tools.profiler.counting.private"
+    "tools.profiler.sampling.private"
     "words"
     "words.private"
     "vectors"
@@ -547,10 +548,13 @@ tuple
     { "retainstack-for" "threads.private" "primitive_retainstack_for" ( context -- array ) }
     { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" ( -- stats ) }
     { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" ( -- ) }
-    { "profiling" "tools.profiler.private" "primitive_profiling" ( ? -- ) }
+    { "profiling" "tools.profiler.counting.private" "primitive_counting_profiler" ( ? -- ) }
     { "optimized?" "words" "primitive_optimized_p" ( word -- ? ) }
     { "word-code" "words" "primitive_word_code" ( word -- start end ) }
     { "(word)" "words.private" "primitive_word" ( name vocab hashcode -- word ) }
+    { "profiling" "tools.profiler.sampling.private" "primitive_sampling_profiler" ( ? -- ) }
+    { "(get-samples)" "tools.profiler.sampling.private" "primitive_get_samples" ( -- samples/f ) }
+    { "(clear-samples)" "tools.profiler.sampling.private" "primitive_clear_samples" ( -- ) }
 } [ first4 make-primitive ] each
 
 ! Bump build number

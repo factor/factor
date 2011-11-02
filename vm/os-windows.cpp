@@ -301,4 +301,61 @@ void factor_vm::open_console()
 	SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
 }
 
+void factor_vm::sampler_thread_loop()
+{
+	LARGE_INTEGER counter, new_counter, units_per_second;
+	bool ok;
+
+	ok = QueryPerformanceFrequency(&units_per_second);
+	assert(ok);
+
+	ok = QueryPerformanceCounter(&counter);
+	assert(ok);
+
+	counter.QuadPart *= samples_per_second;
+	while (atomic::load(&sampling_profiler_p))
+	{
+		SwitchToThread();
+		ok = QueryPerformanceCounter(&new_counter);
+		assert(ok);
+		new_counter.QuadPart *= samples_per_second;
+		cell samples = 0;
+		while (new_counter.QuadPart - counter.QuadPart > units_per_second.QuadPart) {
+			// We would have to suspend the thread to sample the PC
+			++samples;
+			counter.QuadPart += units_per_second.QuadPart;
+		}
+		if (samples > 0)
+			enqueue_safepoint_sample(samples, 0, false);
+	}
+}
+
+static DWORD WINAPI sampler_thread_entry(LPVOID parent_vm)
+{
+	static_cast<factor_vm*>(parent_vm)->sampler_thread_loop();
+	return 0;
+}
+
+void factor_vm::start_sampling_profiler_timer()
+{
+	sampler_thread = CreateThread(
+		NULL,
+		0,
+		&sampler_thread_entry,
+		static_cast<LPVOID>(this),
+		0,
+		NULL
+	);
+}
+
+void factor_vm::end_sampling_profiler_timer()
+{
+	atomic::store(&sampling_profiler_p, false);
+	DWORD wait_result = WaitForSingleObject(sampler_thread,
+		3000*(DWORD)samples_per_second);
+	if (wait_result != WAIT_OBJECT_0)
+		TerminateThread(sampler_thread, 0);
+	sampler_thread = NULL;
+}
+
 }

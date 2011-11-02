@@ -84,10 +84,10 @@ PRIVATE>
 : sorted-histogram ( seq -- alist )
     histogram sort-values ;
 
-: collect-pairs ( seq quot: ( x -- x' ) -- hashtable )
+: collect-pairs ( seq quot: ( x -- v k ) -- hashtable )
     [ push-at ] sequence>hashtable ; inline
 
-: collect-by ( seq quot -- hashtable )
+: collect-by ( seq quot: ( x -- x' ) -- hashtable )
     [ dup ] prepose collect-pairs ; inline
 
 : mode ( seq -- x )

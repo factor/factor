@@ -34,6 +34,7 @@ ifdef CONFIG
 		vm/code_heap.o \
 		vm/compaction.o \
 		vm/contexts.o \
+		vm/counting_profiler.o \
 		vm/data_heap.o \
 		vm/data_heap_checker.o \
 		vm/debug.o \
@@ -56,14 +57,14 @@ ifdef CONFIG
 		vm/object_start_map.o \
 		vm/objects.o \
 		vm/primitives.o \
-		vm/profiler.o \
 		vm/quotations.o \
 		vm/run.o \
+		vm/sampling_profiler.o \
 		vm/strings.o \
 		vm/to_tenured_collector.o \
 		vm/tuples.o \
 		vm/utilities.o \
-	        vm/vm.o \
+		vm/vm.o \
 		vm/words.o
 
 	EXE_OBJS = $(PLAF_EXE_OBJS)
