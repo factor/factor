@@ -29,5 +29,6 @@ M: windows find-jedit-path
 M: jedit editor-command ( file line -- command/f )
     [
         find-jedit-path ,
+        "-reuseview" ,
         [ , ] [ number>string "+line:" prepend , ] bi*
     ] { } make ;
