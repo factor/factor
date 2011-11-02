@@ -304,15 +304,20 @@ void factor_vm::open_console()
 void factor_vm::sampler_thread_loop()
 {
 	LARGE_INTEGER counter, new_counter, units_per_second;
+	bool ok;
 
-	assert(QueryPerformanceFrequency(&units_per_second));
+	ok = QueryPerformanceFrequency(&units_per_second);
+	assert(ok);
 
-	assert(QueryPerformanceCounter(&counter));
+	ok = QueryPerformanceCounter(&counter);
+	assert(ok);
+
 	counter.QuadPart *= samples_per_second;
 	while (atomic::load(&sampling_profiler_p))
 	{
 		SwitchToThread();
-		assert(QueryPerformanceCounter(&new_counter));
+		ok = QueryPerformanceCounter(&new_counter);
+		assert(ok);
 		new_counter.QuadPart *= samples_per_second;
 		cell samples = 0;
 		while (new_counter.QuadPart - counter.QuadPart > units_per_second.QuadPart) {
