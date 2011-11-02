@@ -70,8 +70,6 @@ SYMBOL: check-vocab-hook
 
 check-vocab-hook [ [ drop ] ] initialize
 
-DEFER: require
-
 <PRIVATE
 
 SYMBOL: require-when-vocabs
@@ -109,9 +107,6 @@ require-when-table [ V{ } clone ] initialize
     ] when drop ;
 
 PRIVATE>
-
-: require ( vocab -- )
-    load-vocab drop ;
 
 : require-when ( if then -- )
     over [ lookup-vocab ] all? [

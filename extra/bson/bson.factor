@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: vocabs.loader ;
+USING: vocabs ;
 
 IN: bson
 

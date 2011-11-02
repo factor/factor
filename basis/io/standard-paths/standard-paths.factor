@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators io.pathnames kernel sequences system
-vocabs.loader ;
+vocabs ;
 IN: io.standard-paths
 
 HOOK: find-native-bundle os ( string -- path )

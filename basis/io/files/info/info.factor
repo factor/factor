@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel system sequences combinators
-vocabs.loader io.files.types io.directories math ;
+vocabs vocabs.loader io.files.types io.directories math ;
 IN: io.files.info
 
 ! File info

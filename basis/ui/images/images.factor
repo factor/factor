@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache combinators images images.loader
 kernel memoize namespaces opengl opengl.gl opengl.textures system
-ui.gadgets.worlds vocabs.loader ;
+ui.gadgets.worlds vocabs.loader vocabs ;
 IN: ui.images
 
 TUPLE: image-name path ;
@@ -33,7 +33,7 @@ PRIVATE>
 
 <<
 {
-    { [ os macosx? ] [ "images.loader.cocoa"   require ] }
+    { [ os macosx? ] [ "images.loader.cocoa" require ] }
     { [ os windows?  ] [ "images.loader.gdiplus" require ] }
     [ "images.loader.gtk" require ]
 } cond

@@ -87,7 +87,7 @@ M: array draw-text
         ] with each
     ] do-matrix ;
 
-USING: vocabs.loader system combinators ;
+USING: vocabs system combinators ;
 
 {
     { [ os macosx? ] [ "core-text" ] }

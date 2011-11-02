@@ -12,7 +12,7 @@ vectors byte-arrays quotations hashtables hashtables.identity
 assocs help.syntax help.markup splitting io.streams.byte-array
 io.encodings.string io.encodings.utf8 io.encodings.binary
 combinators accessors locals prettyprint compiler.units
-sequences.private classes.tuple.private vocabs.loader ;
+sequences.private classes.tuple.private vocabs ;
 IN: serialize
 
 GENERIC: (serialize) ( obj -- )

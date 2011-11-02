@@ -143,7 +143,7 @@ M: x86.64 struct-return-on-stack? f ;
 ! x86-64.
 enable-alien-4-intrinsics
 
-USE: vocabs.loader
+USE: vocabs
 
 {
     { [ os unix? ] [ "cpu.x86.64.unix" require ] }

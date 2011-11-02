@@ -1,6 +1,6 @@
 USING: definitions io.launcher kernel parser words sequences math
 math.parser namespaces editors make system combinators.short-circuit
-fry threads vocabs.loader ;
+fry threads vocabs ;
 IN: editors.emacs
 
 SINGLETON: emacsclient

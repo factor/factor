@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: furnace
 
-USE: vocabs.loader
+USE: vocabs
 "furnace.actions" require
 "furnace.alloy" require
 "furnace.asides" require

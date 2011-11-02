@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs strings kernel sorting namespaces
-sequences definitions sets combinators ;
+sequences definitions sets combinators splitting ;
 IN: vocabs
 
 SYMBOL: dictionary
@@ -127,9 +127,33 @@ M: vocab-spec forget* forget-vocab ;
 
 SYMBOL: load-vocab-hook ! ( name -- vocab )
 
-: load-vocab ( name -- vocab ) load-vocab-hook get call( name -- vocab ) ;
-
 PREDICATE: runnable-vocab < vocab
     vocab-main >boolean ;
 
 INSTANCE: vocab-spec definition
+
+: call-load-vocab-hook ( name -- )
+    load-vocab-hook get call( name -- vocab ) drop ;
+
+GENERIC: require ( object -- )
+
+M: vocab require name>> require ;
+
+! When calling "foo.private" require, load "foo" instead,
+! but only when "foo.private" does not exist.
+! The reason for this is that stage1 bootstrap starts out with some .private
+! vocabs that contain primitives, and loading the public vocabs would cause
+! circularity issues.
+M: string require ( vocab -- )
+    dup ".private" ?tail [
+        over lookup-vocab [
+            2drop
+        ] [
+            nip call-load-vocab-hook
+        ] if
+    ] [
+        nip call-load-vocab-hook
+    ] if ;
+
+: load-vocab ( name -- vocab )
+    [ require ] [ lookup-vocab ] bi ;

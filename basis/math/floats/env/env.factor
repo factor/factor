@@ -2,7 +2,7 @@
 USING: alien.syntax arrays assocs biassocs combinators
 combinators.short-circuit continuations generalizations kernel
 literals locals math math.bitwise sequences sets system
-vocabs.loader ;
+vocabs ;
 IN: math.floats.env
 
 SINGLETONS:

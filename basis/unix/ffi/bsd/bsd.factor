@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct combinators
-system unix.types vocabs.loader ;
+system unix.types vocabs ;
 IN: unix.ffi
 
 CONSTANT: MAXPATHLEN 1024

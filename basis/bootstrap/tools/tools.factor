@@ -1,4 +1,4 @@
-USING: vocabs.loader sequences system combinators ;
+USING: vocabs sequences system combinators ;
 IN: bootstrap.tools
 
 {

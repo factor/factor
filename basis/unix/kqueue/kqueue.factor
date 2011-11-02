@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax system sequences vocabs.loader words
-accessors ;
+accessors vocabs ;
 IN: unix.kqueue
 
 << "unix.kqueue." os name>> append require >>
