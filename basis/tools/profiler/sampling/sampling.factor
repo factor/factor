@@ -3,8 +3,9 @@ USING: accessors assocs calendar combinators
 combinators.short-circuit continuations fry io kernel
 kernel.private locals math math.statistics math.vectors memory
 namespaces prettyprint sequences sorting
-tools.profiler.sampling.private ;
+tools.profiler.sampling.private hashtables.identity generalizations ;
 FROM: sequences => change-nth ;
+FROM: assocs => change-at ;
 IN: tools.profiler.sampling
 
 SYMBOL: raw-profile-data
@@ -29,7 +30,7 @@ CONSTANT: ignore-words
 : gc-sample-count ( sample -- count ) second ;
 : foreign-sample-count ( sample -- count ) third ;
 : foreign-thread-sample-count ( sample -- count ) fourth ;
-: sample-context ( sample -- alien ) 4 swap nth ;
+: sample-thread ( sample -- alien ) 4 swap nth ;
 : sample-callstack ( sample -- array ) 5 swap nth ;
 
 : samples>time ( samples -- time )
@@ -56,11 +57,11 @@ CONSTANT: ignore-words
 : foreign-thread-time ( -- n )
     get-raw-profile-data (foreign-thread-time) ;
 
-: collect-contexts ( samples -- by-top )
-    [ sample-context ] collect-by ;
+: collect-threads ( samples -- by-top )
+    [ sample-thread ] collect-by ;
 
-: time-per-context ( -- n )
-    get-raw-profile-data collect-contexts [ (total-time) ] assoc-map ;
+: time-per-thread ( -- n )
+    get-raw-profile-data collect-threads [ (total-time) ] assoc-map ;
 
 : unclip-callstack ( sample -- sample' callstack-top )
     clone 5 over [ unclip swap ] change-nth ;
@@ -69,13 +70,13 @@ TUPLE: profile-node
     total-time gc-time foreign-time foreign-thread-time children ;
 
 : <profile-node> ( times children -- node )
-    [ first4 ] dip profile-node boa ;
+    [ first4 [ samples>time ] 4 napply ] dip profile-node boa ;
 
 : leaf-callstack? ( callstack -- ? )
     [ ignore-words member? ] all? ;
 
 : sum-times ( samples -- times )
-    { 0 0 0 0 } [ 4 head-slice v+ ] reduce [ samples>time ] map! ;
+    { 0 0 0 0 } [ 4 head-slice v+ ] reduce ;
 
 :: (collect-subtrees) ( samples child-quot -- children )
     samples [ sample-callstack leaf-callstack? not ] filter
@@ -98,12 +99,29 @@ TUPLE: profile-node
     dup redundant-root-node? [ children>> values first trim-root ] when ;
 
 : (top-down) ( samples -- tree )
-    collect-contexts [
+    collect-threads [
         [ sum-times ] [ collect-tops ] bi <profile-node> trim-root
     ] assoc-map ;
 
 : top-down ( -- tree )
     get-raw-profile-data (top-down) ;
+
+:: collect-flat ( samples -- flat )
+    IH{ } clone :> per-word-samples
+    samples [| sample |
+        sample sample-callstack unique keys [
+            per-word-samples [ { 0 0 0 0 } or sample 4 head-slice v+ ] change-at
+        ] each
+    ] each
+    per-word-samples [ f <profile-node> ] assoc-map ;
+
+: (flat) ( samples -- flat )
+    collect-threads [
+        [ sum-times ] [ collect-flat ] bi <profile-node>
+    ] assoc-map ;
+
+: flat ( -- tree )
+    get-raw-profile-data (flat) ;
 
 : depth. ( depth -- )
     [ "  " write ] times ;
@@ -125,7 +143,7 @@ DEFER: (profile.)
     } cleave ;
 
 :: (profile-node.) ( word node depth -- )
-    depth depth. node times. ": " write word pprint nl
+    depth depth. node times. ": " write word pprint-short nl
     node children>> depth 1 + (profile.) ;
 
 : (profile.) ( nodes depth -- )
