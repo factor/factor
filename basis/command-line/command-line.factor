@@ -10,7 +10,7 @@ SYMBOL: script
 SYMBOL: command-line
 
 : (command-line) ( -- args )
-    10 special-object sift [ alien>native-string ] map ;
+    OBJ-ARGS special-object sift [ alien>native-string ] map ;
 
 : rc-path ( name -- path )
     home prepend-path ;

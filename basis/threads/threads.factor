@@ -13,7 +13,7 @@ IN: threads
 ! Wrap sub-primitives; we don't want them inlined into callers
 ! since their behavior depends on what frames are on the callstack
 : context ( -- context )
-    2 context-object ; inline
+    CONTEXT-OBJ-CONTEXT context-object ; inline
 
 : set-context ( obj context -- obj' )
     (set-context) ; inline
@@ -29,10 +29,10 @@ IN: threads
 
 ! Context introspection
 : namestack-for ( context -- namestack )
-    [ 0 ] dip context-object-for ;
+    [ CONTEXT-OBJ-NAMESTACK ] dip context-object-for ;
 
 : catchstack-for ( context -- catchstack )
-    [ 1 ] dip context-object-for ;
+    [ CONTEXT-OBJ-CATCHSTACK ] dip context-object-for ;
 
 : continuation-for ( context -- continuation )
     {
@@ -60,7 +60,7 @@ mailbox
 sleep-entry ;
 
 : self ( -- thread )
-    65 special-object { thread } declare ; inline
+    OBJ-CURRENT-THREAD special-object { thread } declare ; inline
 
 : thread-continuation ( thread -- continuation )
     context>> check-box value>> continuation-for ;
@@ -79,7 +79,7 @@ sleep-entry ;
     [ tnamespace ] dip change-at ; inline
 
 : threads ( -- assoc )
-    66 special-object { hashtable } declare ; inline
+    OBJ-THREADS special-object { hashtable } declare ; inline
 
 : thread-registered? ( thread -- ? )
     id>> threads key? ;
@@ -92,18 +92,18 @@ sleep-entry ;
 : unregister-thread ( thread -- )
     id>> threads delete-at ;
 
-: set-self ( thread -- ) 65 set-special-object ; inline
+: set-self ( thread -- ) OBJ-CURRENT-THREAD set-special-object ; inline
 
 PRIVATE>
 
 : run-queue ( -- dlist )
-    67 special-object { dlist } declare ; inline
+    OBJ-RUN-QUEUE special-object { dlist } declare ; inline
 
 : sleep-queue ( -- heap )
-    68 special-object { min-heap } declare ; inline
+    OBJ-SLEEP-QUEUE special-object { min-heap } declare ; inline
 
 : waiting-callbacks ( -- assoc )
-    70 special-object { hashtable } declare ; inline
+    OBJ-WAITING-CALLBACKS special-object { hashtable } declare ; inline
 
 : new-thread ( quot name class -- thread )
     new
@@ -234,10 +234,10 @@ M: real sleep
 <PRIVATE
 
 : init-thread-state ( -- )
-    H{ } clone 66 set-special-object
-    <dlist> 67 set-special-object
-    <min-heap> 68 set-special-object
-    H{ } clone 70 set-special-object ;
+    H{ } clone OBJ-THREADS set-special-object
+    <dlist> OBJ-RUN-QUEUE set-special-object
+    <min-heap> OBJ-SLEEP-QUEUE set-special-object
+    H{ } clone OBJ-WAITING-CALLBACKS set-special-object ;
 
 : init-initial-thread ( -- )
     [ ] "Initial" <thread>

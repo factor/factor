@@ -53,9 +53,9 @@ M: c-reader stream-read-until
 
 M: c-io-backend init-io ;
 
-: stdin-handle ( -- alien ) 11 special-object ;
-: stdout-handle ( -- alien ) 12 special-object ;
-: stderr-handle ( -- alien ) 63 special-object ;
+: stdin-handle ( -- alien ) OBJ-STDIN special-object ;
+: stdout-handle ( -- alien ) OBJ-STDOUT special-object ;
+: stderr-handle ( -- alien ) OBJ-STDERR special-object ;
 
 : init-c-stdio ( -- )
     stdin-handle <c-reader>

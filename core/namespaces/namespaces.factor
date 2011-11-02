@@ -6,7 +6,8 @@ IN: namespaces
 
 <PRIVATE
 
-: namestack* ( -- namestack ) 0 context-object { vector } declare ; inline
+: namestack* ( -- namestack )
+    CONTEXT-OBJ-NAMESTACK context-object { vector } declare ; inline
 : >n ( namespace -- ) namestack* push ;
 : ndrop ( -- ) namestack* pop* ;
 
@@ -14,8 +15,9 @@ PRIVATE>
 
 : namespace ( -- namespace ) namestack* last ; inline
 : namestack ( -- namestack ) namestack* clone ;
-: set-namestack ( namestack -- ) >vector 0 set-context-object ;
-: global ( -- g ) 21 special-object { hashtable } declare ; inline
+: set-namestack ( namestack -- )
+    >vector CONTEXT-OBJ-NAMESTACK set-context-object ;
+: global ( -- g ) OBJ-GLOBAL special-object { hashtable } declare ; inline
 : init-namespaces ( -- ) global 1array set-namestack ;
 : get ( variable -- value ) namestack* assoc-stack ; inline
 : set ( value variable -- ) namespace set-at ;
