@@ -5,7 +5,7 @@ destructors gdk.pixbuf.ffi gobject.ffi grouping images
 images.loader io kernel locals math sequences
 specialized-arrays ;
 FROM: system => os linux freebsd netbsd openbsd ;
-IN: images.gtk
+IN: images.loader.gtk
 SPECIALIZED-ARRAY: uchar
 
 SINGLETON: gtk-image
