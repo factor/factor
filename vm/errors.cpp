@@ -172,20 +172,20 @@ void factor_vm::enqueue_safepoint_fep()
 {
 	if (fep_p)
 		fatal_error("Low-level debugger interrupted", 0);
-	safepoint_fep = true;
+	atomic::store(&safepoint_fep_p, true);
 	code->guard_safepoint();
 }
 
 void factor_vm::handle_safepoint()
 {
 	code->unguard_safepoint();
-	if (safepoint_fep)
+	if (atomic::load(&safepoint_fep_p))
 	{
-		if (sampling_profiler_p)
+		if (atomic::load(&sampling_profiler_p))
 			end_sampling_profiler();
 		std::cout << "Interrupted\n";
 		factorbug();
-		safepoint_fep = false;
+		atomic::store(&safepoint_fep_p, false);
 	}
 	else if (sampling_profiler_p)
 		record_sample();

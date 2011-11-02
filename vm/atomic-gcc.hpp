@@ -1,3 +1,4 @@
+#define FACTOR_FORCE_INLINE __attribute__((always_inline)) inline
 namespace factor {
 	namespace atomic {
 		__attribute__((always_inline))
@@ -40,3 +41,5 @@ namespace factor {
 		}
 	}
 }
+
+#include "atomic.hpp"
