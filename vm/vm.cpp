@@ -12,6 +12,8 @@ factor_vm::factor_vm() :
 	safepoint_fep_p(false),
 	gc_off(false),
 	current_gc(NULL),
+	current_gc_p(false),
+	current_jit_p(false),
 	gc_events(NULL),
 	fep_p(false),
 	fep_help_was_shown(false),
