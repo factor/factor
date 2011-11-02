@@ -8,6 +8,7 @@ TUPLE: boom ;
 { } [ 10 [ [ ] profile ] times ] unit-test
 [ 10 [ [ boom new throw ] profile ] times ] [ boom? ] must-fail-with
 { } [ 10 [ [ 100 [ 1000 random (byte-array) drop ] times gc ] profile ] times ] unit-test
+{ } [ 10 [ [ 100 [ 1000 random (byte-array) drop ] times compact-gc ] profile ] times ] unit-test
 { } [ 2 [ [ 1 seconds sleep ] profile ] times ] unit-test
 
 (clear-samples)
