@@ -19,6 +19,11 @@ SYMBOL: editor-class
     [ [ "Load " prepend ] keep ] { } map>assoc ;
 
 HOOK: editor-command editor-class ( file line -- command )
+
+M: f editor-command
+    "Select an editor" editor-restarts throw-restarts require
+    editor-command ;
+
 HOOK: editor-detached? editor-class ( -- ? )
 M: object editor-detached? t ;
 
