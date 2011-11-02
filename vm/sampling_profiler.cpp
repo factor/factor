@@ -116,11 +116,13 @@ void factor_vm::primitive_get_samples()
 		{
 			data_root<array> sample(allot_array(6, false_object),this);
 
-			set_array_nth(sample.untagged(),0,from_unsigned_cell(from_iter->counts.sample_count));
-			set_array_nth(sample.untagged(),1,from_unsigned_cell(from_iter->counts.gc_sample_count));
-			set_array_nth(sample.untagged(),2,from_unsigned_cell(from_iter->counts.foreign_sample_count));
-			set_array_nth(sample.untagged(),3,from_unsigned_cell(from_iter->counts.foreign_thread_sample_count));
-			set_array_nth(sample.untagged(),4,allot_alien((void*)from_iter->ctx));
+			set_array_nth(sample.untagged(),0,tag_fixnum(from_iter->counts.sample_count));
+			set_array_nth(sample.untagged(),1,tag_fixnum(from_iter->counts.gc_sample_count));
+			set_array_nth(sample.untagged(),2,tag_fixnum(from_iter->counts.foreign_sample_count));
+			set_array_nth(sample.untagged(),3,tag_fixnum(from_iter->counts.foreign_thread_sample_count));
+
+			cell ctx = allot_alien((void*)from_iter->ctx);
+			set_array_nth(sample.untagged(),4,ctx);
 
 			cell callstack_size = from_iter->callstack_end - from_iter->callstack_begin;
 			data_root<array> callstack(allot_array(callstack_size,false_object),this);
