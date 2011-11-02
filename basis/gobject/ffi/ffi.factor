@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.destructors alien.libraries alien.syntax kernel
-combinators gobject-introspection literals math system vocabs.loader ;
+combinators gobject-introspection literals math system vocabs ;
 IN: gobject.ffi
 
 ! these two are needed for the definition of GError and others.

@@ -4,7 +4,7 @@ sequences.cords cpu.architecture fry generalizations grouping
 kernel libc locals macros math math.libm math.order
 math.ranges math.vectors sequences sequences.generalizations
 sequences.private sequences.unrolled sequences.unrolled.private
-specialized-arrays vocabs.loader words effects.parser locals.parser ;
+specialized-arrays vocabs words effects.parser locals.parser ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS:
     c:char c:short c:int c:longlong

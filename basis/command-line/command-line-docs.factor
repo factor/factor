@@ -1,4 +1,5 @@
-USING: help.markup help.syntax parser vocabs.loader strings ;
+USING: help.markup help.syntax parser vocabs.loader strings
+vocabs ;
 IN: command-line
 
 HELP: run-bootstrap-init

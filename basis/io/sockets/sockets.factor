@@ -8,7 +8,7 @@ grouping init io.backend io.binary io.encodings
 io.encodings.ascii io.encodings.binary io.pathnames io.ports
 io.streams.duplex kernel libc locals math math.parser memoize
 namespaces parser present sequences splitting strings summary
-system values vocabs.loader vocabs.parser
+system values vocabs.loader vocabs.parser vocabs
 sequences.private ;
 IN: io.sockets
 

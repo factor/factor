@@ -1,4 +1,4 @@
-USING: layouts combinators vocabs.loader alien.syntax ;
+USING: layouts combinators vocabs alien.syntax ;
 IN: unix.stat
 
 cell-bits {

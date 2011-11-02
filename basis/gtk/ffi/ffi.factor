@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.syntax combinators gobject-introspection
 gobject-introspection.standard-types kernel pango.ffi system
-vocabs.loader ;
+vocabs ;
 IN: gtk.ffi
 
 <<

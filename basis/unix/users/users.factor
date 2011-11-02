@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.strings assocs
 byte-arrays classes.struct combinators combinators.short-circuit
 continuations fry grouping io.encodings.utf8 kernel math
 math.parser namespaces sequences splitting strings system unix
-unix.ffi vocabs.loader ;
+unix.ffi vocabs ;
 QUALIFIED: unix.ffi
 IN: unix.users
 

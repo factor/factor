@@ -1,5 +1,5 @@
 USING: editors.vim io.backend kernel namespaces system
-vocabs.loader editors ;
+vocabs editors ;
 IN: editors.gvim
 
 ! This code builds on the code in editors.vim; see there for

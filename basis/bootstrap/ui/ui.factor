@@ -1,5 +1,5 @@
 USING: alien namespaces system combinators kernel sequences
-vocabs vocabs.loader ;
+vocabs ;
 IN: bootstrap.ui
 
 "bootstrap.math" require

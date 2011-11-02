@@ -1,4 +1,4 @@
-USING: alien.syntax alien.c-types combinators layouts vocabs.loader ;
+USING: alien.syntax alien.c-types combinators layouts vocabs ;
 IN: unix.types
 
 ! NetBSD 4.0

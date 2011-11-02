@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.strings assocs io.backend
 kernel namespaces destructors sequences strings
-system io.pathnames fry combinators vocabs.loader ;
+system io.pathnames fry combinators vocabs ;
 IN: alien.libraries
 
 : dlopen ( path -- dll ) native-string>alien (dlopen) ;

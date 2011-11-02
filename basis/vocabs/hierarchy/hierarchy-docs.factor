@@ -1,5 +1,5 @@
 USING: help.markup help.syntax strings vocabs.loader
-sequences ;
+sequences vocabs ;
 IN: vocabs.hierarchy
 
 ARTICLE: "vocabs.hierarchy" "Vocabulary hierarchy tools"

@@ -29,7 +29,8 @@ html.streams
 html
 mime.types
 math.order
-xml.writer ;
+xml.writer
+vocabs ;
 FROM: mime.multipart => parse-multipart ;
 IN: http.server
 

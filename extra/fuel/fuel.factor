@@ -4,7 +4,7 @@
 USING: accessors assocs compiler.units continuations fuel.eval fuel.help
 fuel.remote fuel.xref help.topics io.pathnames kernel namespaces parser
 sequences tools.scaffold vocabs.loader vocabs.parser words vocabs.files
-vocabs.metadata ;
+vocabs.metadata vocabs ;
 
 IN: fuel
 

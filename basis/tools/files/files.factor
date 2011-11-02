@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators fry io io.directories
 io.files.info kernel math math.parser prettyprint sequences system
-vocabs.loader sorting.slots calendar.format ;
+vocabs sorting.slots calendar.format ;
 IN: tools.files
 
 <PRIVATE

@@ -1,5 +1,5 @@
 USING: kernel system combinators alien.syntax alien.c-types
-math vocabs.loader unix classes.struct ;
+math vocabs vocabs.loader unix classes.struct ;
 IN: unix.stat
 
 ! File Types

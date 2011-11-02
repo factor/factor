@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators system vocabs.loader ;
+USING: combinators system vocabs ;
 
 IN: io.files.trash
 
