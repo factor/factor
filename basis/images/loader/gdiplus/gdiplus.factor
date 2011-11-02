@@ -4,7 +4,7 @@ classes.struct destructors images images.loader kernel locals
 math windows.com windows.gdiplus windows.streams windows.types
 typed byte-arrays grouping sequences ;
 FROM: system => os windows? ;
-IN: images.gdiplus
+IN: images.loader.gdiplus
 
 SINGLETON: gdi+-image
 

@@ -5,7 +5,7 @@ combinators core-foundation.data core-graphics
 core-graphics.types fry locals images images.loader io kernel
 math sequences ;
 FROM: system => os macosx? ;
-IN: images.cocoa
+IN: images.loader.cocoa
 
 SINGLETON: ns-image
 
