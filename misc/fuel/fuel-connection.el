@@ -128,7 +128,7 @@
     (fuel-con--setup-comint)
     (fuel-con--establish-connection conn buffer)))
 
-(defconst fuel-con--prompt-regex "( .+ ) ")
+(defconst fuel-con--prompt-regex "IN: [^ ]+ ")
 (defconst fuel-con--eot-marker "<~FUEL~>")
 (defconst fuel-con--init-stanza "USE: fuel fuel-retort")
 
