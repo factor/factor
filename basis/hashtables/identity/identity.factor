@@ -31,6 +31,9 @@ M: identity-hashtable clone
 : >identity-hashtable ( assoc -- ihashtable )
     [ assoc-size <identity-hashtable> ] keep assoc-union! ;
 
+M: identity-hashtable assoc-like
+    drop dup identity-hashtable? [ >identity-hashtable ] unless ; inline
+
 SYNTAX: IH{ \ } [ >identity-hashtable ] parse-literal ;
 
 { "hashtables.identity" "prettyprint" } "hashtables.identity.prettyprint" require-when
