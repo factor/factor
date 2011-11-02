@@ -989,6 +989,8 @@ HELP: supremum
 { $description "Outputs the greatest element of " { $snippet "seq" } "." }
 { $errors "Throws an error if the sequence is empty." } ;
 
+{ min max supremum infimum } related-words
+
 HELP: produce
 { $values { "pred" { $quotation "( ..a -- ..b ? )" } } { "quot" { $quotation "( ..b -- ..a obj )" } } { "seq" "a sequence" } }
 { $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence at the end." }
