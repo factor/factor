@@ -2,7 +2,7 @@
 USING: accessors assocs calendar combinators
 combinators.short-circuit continuations fry io kernel
 kernel.private locals math math.statistics math.vectors memory
-namespaces prettyprint sequences sorting
+namespaces prettyprint sequences sets sorting
 tools.profiler.sampling.private hashtables.identity generalizations ;
 FROM: sequences => change-nth ;
 FROM: assocs => change-at ;
@@ -15,6 +15,8 @@ CONSTANT: default-samples-per-second 1000
 
 CONSTANT: ignore-words
     { signal-handler leaf-signal-handler profiling minor-gc }
+
+: ignore-word? ( word -- ? ) ignore-words member? ; inline
 
 : get-raw-profile-data ( -- data )
     raw-profile-data get-global [ "No profile data" throw ] unless* ;
@@ -66,17 +68,20 @@ CONSTANT: ignore-words
 : unclip-callstack ( sample -- sample' callstack-top )
     clone 5 over [ unclip swap ] change-nth ;
 
+: leaf-callstack? ( callstack -- ? )
+    [ ignore-word? ] all? ;
+
+: sum-times ( samples -- times )
+    { 0 0 0 0 } [ 4 head-slice v+ ] reduce ;
+
 TUPLE: profile-node
     total-time gc-time foreign-time foreign-thread-time children ;
 
 : <profile-node> ( times children -- node )
     [ first4 [ samples>time ] 4 napply ] dip profile-node boa ;
 
-: leaf-callstack? ( callstack -- ? )
-    [ ignore-words member? ] all? ;
-
-: sum-times ( samples -- times )
-    { 0 0 0 0 } [ 4 head-slice v+ ] reduce ;
+: <profile-root-node> ( samples collector-quot -- node )
+    [ sum-times ] swap bi <profile-node> ; inline
 
 :: (collect-subtrees) ( samples child-quot -- children )
     samples [ sample-callstack leaf-callstack? not ] filter
@@ -99,9 +104,8 @@ TUPLE: profile-node
     dup redundant-root-node? [ children>> values first trim-root ] when ;
 
 : (top-down) ( samples -- tree )
-    collect-threads [
-        [ sum-times ] [ collect-tops ] bi <profile-node> trim-root
-    ] assoc-map ;
+    collect-threads
+    [ [ collect-tops ] <profile-root-node> trim-root ] assoc-map ;
 
 : top-down ( -- tree )
     get-raw-profile-data (top-down) ;
@@ -109,16 +113,21 @@ TUPLE: profile-node
 :: collect-flat ( samples -- flat )
     IH{ } clone :> per-word-samples
     samples [| sample |
-        sample sample-callstack unique keys [
+        sample sample-callstack unique keys [ ignore-word? not ] filter [
             per-word-samples [ { 0 0 0 0 } or sample 4 head-slice v+ ] change-at
         ] each
     ] each
     per-word-samples [ f <profile-node> ] assoc-map ;
 
+: redundant-flat-node? ( child-node root-node -- ? )
+    [ total-time>> ] bi@ = ;
+
+: trim-flat ( root-node -- root-node' )
+    dup '[ [ nip _ redundant-flat-node? not ] assoc-filter ] change-children ;
+
 : (flat) ( samples -- flat )
-    collect-threads [
-        [ sum-times ] [ collect-flat ] bi <profile-node>
-    ] assoc-map ;
+    collect-threads
+    [ [ collect-flat ] <profile-root-node> trim-flat ] assoc-map ;
 
 : flat ( -- tree )
     get-raw-profile-data (flat) ;
