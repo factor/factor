@@ -103,7 +103,7 @@ SYMBOL: callbacks
 
 ! Used by compiler.codegen to wrap callback bodies
 : do-callback ( callback-quot wait-quot: ( callback -- ) -- )
-    t 3 set-context-object
+    t CONTEXT-OBJ-IN-CALLBACK-P set-context-object
     init-namespaces
     init-catchstack
     current-callback

@@ -1,6 +1,10 @@
 namespace factor
 {
 
+// Special object count and identifiers must be kept in sync with:
+//   core/kernel/kernel.factor
+//   core/bootstrap/image/image.factor
+
 static const cell special_object_count = 80;
 
 enum special_object {

@@ -19,8 +19,8 @@ IN: alien.remote-control
     dup optimized? [ execute ] [ drop f ] if ; inline
 
 : init-remote-control ( -- )
-    \ eval-callback ?callback 16 set-special-object
-    \ yield-callback ?callback 17 set-special-object
-    \ sleep-callback ?callback 18 set-special-object ;
+    \ eval-callback ?callback OBJ-EVAL-CALLBACK set-special-object
+    \ yield-callback ?callback OBJ-YIELD-CALLBACK set-special-object
+    \ sleep-callback ?callback OBJ-SLEEP-CALLBACK set-special-object ;
 
 MAIN: init-remote-control
