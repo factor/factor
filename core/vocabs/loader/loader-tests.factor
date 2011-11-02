@@ -185,6 +185,9 @@ forget-junk
 [ ] [ "vocabs.loader.test.m" require ] unit-test
 [ t ] [ "vocabs.loader.test.n" lookup-vocab >boolean ] unit-test
 
+[ ] [ "vocabs.loader.test.p.private" require ] unit-test
+[ { "foo" } ] [ "vocabs.loader.test.p" words [ name>> ] map ] unit-test
+
 [
-    "mno" [ "vocabs.loader.test." swap suffix forget-vocab ] each
+    "mnop" [ "vocabs.loader.test." swap suffix forget-vocab ] each
 ] with-compilation-unit
