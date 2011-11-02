@@ -1,9 +1,10 @@
 ! (c)2011 Joe Groff bsd license
 USING: accessors assocs calendar combinators
-combinators.short-circuit continuations fry io kernel
-kernel.private locals math math.statistics math.vectors memory
-namespaces prettyprint sequences sets sorting
-tools.profiler.sampling.private hashtables.identity generalizations ;
+combinators.short-circuit continuations fry generalizations
+hashtables.identity io kernel kernel.private locals math
+math.statistics math.vectors memory namespaces prettyprint
+sequences sequences.generalizations sets sorting
+tools.profiler.sampling.private ;
 FROM: sequences => change-nth ;
 FROM: assocs => change-at ;
 IN: tools.profiler.sampling
@@ -26,12 +27,17 @@ CONSTANT: ignore-words
     [ 0 profiling ] [ ] cleanup
     (get-samples) raw-profile-data set-global ; inline
 
-: total-sample-count ( sample -- count ) first ;
-: gc-sample-count ( sample -- count ) second ;
-: foreign-sample-count ( sample -- count ) third ;
-: foreign-thread-sample-count ( sample -- count ) fourth ;
-: sample-thread ( sample -- alien ) 4 swap nth ;
-: sample-callstack ( sample -- array ) 5 swap nth ;
+: total-sample-count ( sample -- count ) 0 swap nth ;
+: gc-sample-count ( sample -- count ) 1 swap nth ;
+: jit-sample-count ( sample -- count ) 2 swap nth ;
+: foreign-sample-count ( sample -- count ) 3 swap nth ;
+: foreign-thread-sample-count ( sample -- count ) 4 swap nth ;
+: sample-counts-slice ( sample -- counts ) 5 head-slice ;
+
+: sample-thread ( sample -- alien ) 5 swap nth ;
+: sample-callstack ( sample -- array ) 6 swap nth ;
+: unclip-callstack ( sample -- sample' callstack-top )
+    clone 6 over [ unclip swap ] change-nth ;
 
 : samples>time ( samples -- time )
     samples-per-second get-global / seconds ;
@@ -63,23 +69,22 @@ CONSTANT: ignore-words
 : time-per-thread ( -- n )
     get-raw-profile-data collect-threads [ (total-time) ] assoc-map ;
 
-: unclip-callstack ( sample -- sample' callstack-top )
-    clone 5 over [ unclip swap ] change-nth ;
-
 : leaf-callstack? ( callstack -- ? )
     [ ignore-word? ] all? ;
 
-: sum-times ( samples -- times )
-    { 0 0 0 0 } [ 4 head-slice v+ ] reduce ;
+CONSTANT: zero-counts { 0 0 0 0 0 }
+
+: sum-counts ( samples -- times )
+    zero-counts [ sample-counts-slice v+ ] reduce ;
 
 TUPLE: profile-node
-    total-time gc-time foreign-time foreign-thread-time children ;
+    total-time gc-time jit-time foreign-time foreign-thread-time children ;
 
 : <profile-node> ( times children -- node )
-    [ first4 [ samples>time ] 4 napply ] dip profile-node boa ;
+    [ 5 firstn [ samples>time ] 5 napply ] dip profile-node boa ;
 
 : <profile-root-node> ( samples collector-quot -- node )
-    [ sum-times ] swap bi <profile-node> ; inline
+    [ sum-counts ] swap bi <profile-node> ; inline
 
 :: (collect-subtrees) ( samples child-quot -- children )
     samples [ sample-callstack leaf-callstack? not ] filter
@@ -87,7 +92,7 @@ TUPLE: profile-node
 
 : collect-tops ( samples -- node )
     [ unclip-callstack ] collect-pairs [
-        [ sum-times ]
+        [ sum-counts ]
         [ [ collect-tops ] (collect-subtrees) ] bi <profile-node>
     ] assoc-map ;
 
@@ -112,7 +117,7 @@ TUPLE: profile-node
     IH{ } clone :> per-word-samples
     samples [| sample |
         sample sample-callstack unique keys [ ignore-word? not ] filter [
-            per-word-samples [ { 0 0 0 0 } or sample 4 head-slice v+ ] change-at
+            per-word-samples [ zero-counts or sample sample-counts-slice v+ ] change-at
         ] each
     ] each
     per-word-samples [ f <profile-node> ] assoc-map ;
@@ -137,16 +142,21 @@ TUPLE: profile-node
     >alist [ second total-time>> ] inv-sort-with ;
 
 : duration. ( duration -- )
-    duration>milliseconds >integer pprint "ms" write ;
+    samples-per-second get-global {
+        { [ dup 1000 <= ] [ drop duration>milliseconds >integer pprint "ms" write ] }
+        { [ dup 1,000,000 <= ] [ drop duration>microseconds >integer pprint "µs" write ] }
+        [ drop duration>nanoseconds >integer pprint "ns" write ]
+    } cond ;
 
 DEFER: (profile.)
 
 : times. ( node -- )
     {
-        [ total-time>> duration. " (" write ]
-        [ gc-time>> duration. " gc, " write ]
-        [ foreign-time>> duration. " foreign, " write ]
-        [ foreign-thread-time>> duration. " foreign threads)" write ]
+        [ total-time>> duration. ]
+        [ " (GC:" write gc-time>> duration. ]
+        [ ", JIT:" write jit-time>> duration. ]
+        [ ", FFI:" write foreign-time>> duration. ]
+        [ ", FT:" write foreign-thread-time>> duration. ")" write ]
     } cleave ;
 
 :: (profile-node.) ( word node depth -- )
