@@ -50,7 +50,7 @@ void factor_vm::record_callstack_sample(cell *begin, cell *end)
 	stack_frame *frame = ctx->bottom_frame();
 
 	while (frame >= ctx->callstack_top) {
-		sample_callstacks.push_back(frame_code(frame));
+		sample_callstacks.push_back(frame_code(frame)->owner);
 		frame = frame_successor(frame);
 	}
 
@@ -74,7 +74,7 @@ void factor_vm::clear_samples()
 	// Swapping into temporaries releases the vector's allocated storage,
 	// whereas clear() would leave the allocation as-is
 	std::vector<profiling_sample> sample_graveyard;
-	std::vector<code_block*> sample_callstack_graveyard;
+	std::vector<cell> sample_callstack_graveyard;
 	samples.swap(sample_graveyard);
 	sample_callstacks.swap(sample_callstack_graveyard);
 }
@@ -127,14 +127,14 @@ void factor_vm::primitive_get_samples()
 			cell callstack_size = from_iter->callstack_end - from_iter->callstack_begin;
 			data_root<array> callstack(allot_array(callstack_size,false_object),this);
 
-			std::vector<code_block*>::const_iterator
+			std::vector<cell>::const_iterator
 				callstacks_begin = sample_callstacks.begin(),
 				c_from_iter = callstacks_begin + from_iter->callstack_begin,
 				c_from_iter_end = callstacks_begin + from_iter->callstack_end;
 			cell c_to_i = 0;
 
 			for (; c_from_iter != c_from_iter_end; ++c_from_iter, ++c_to_i)
-				set_array_nth(callstack.untagged(),c_to_i,(*c_from_iter)->owner);
+				set_array_nth(callstack.untagged(),c_to_i,*c_from_iter);
 
 			set_array_nth(sample.untagged(),5,callstack.value());
 
