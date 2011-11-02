@@ -3,6 +3,6 @@
 USING: io.standard-paths io.standard-paths.unix tools.test ;
 IN: io.standard-paths.unix.tests
 
-[ f ] [ "" find-path ] unit-test
-[ "/bin/ls" ] [ "ls" find-path ] unit-test
-[ "/sbin/ifconfig" ] [ "ifconfig" find-path ] unit-test
+[ f ] [ "" find-in-path ] unit-test
+[ "/bin/ls" ] [ "ls" find-in-path ] unit-test
+[ "/sbin/ifconfig" ] [ "ifconfig" find-in-path ] unit-test
