@@ -29,10 +29,10 @@ void profiling_sample_count::clear() volatile
 
 profiling_sample::profiling_sample(factor_vm *vm,
 	profiling_sample_count const &counts,
-	context *ctx)
+	cell thread)
 	:
 	counts(counts),
-	ctx(ctx)
+	thread(thread)
 {
 	vm->record_callstack_sample(&callstack_begin, &callstack_end);
 }
@@ -41,7 +41,8 @@ void factor_vm::record_sample()
 {
 	profiling_sample_count counts = safepoint_sample_counts.record_counts();
 	if (!counts.empty())
-		samples.push_back(profiling_sample(this, counts, ctx));
+		samples.push_back(profiling_sample(this,
+			counts, special_objects[OBJ_CURRENT_THREAD]));
 }
 
 void factor_vm::record_callstack_sample(cell *begin, cell *end)
@@ -121,8 +122,7 @@ void factor_vm::primitive_get_samples()
 			set_array_nth(sample.untagged(),2,tag_fixnum(from_iter->counts.foreign_sample_count));
 			set_array_nth(sample.untagged(),3,tag_fixnum(from_iter->counts.foreign_thread_sample_count));
 
-			cell ctx = allot_alien((void*)from_iter->ctx);
-			set_array_nth(sample.untagged(),4,ctx);
+			set_array_nth(sample.untagged(),4,from_iter->thread);
 
 			cell callstack_size = from_iter->callstack_end - from_iter->callstack_begin;
 			data_root<array> callstack(allot_array(callstack_size,false_object),this);

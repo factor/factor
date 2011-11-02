@@ -43,15 +43,15 @@ struct profiling_sample
 {
 	// Sample counts
 	profiling_sample_count counts;
-	// Active context during sample
-	context *ctx;
+	// Active thread during sample
+	cell thread;
 	/* The callstack at safepoint time. Indexes to the beginning and ending
 	code_block entries in the vm sample_callstacks array. */
 	cell callstack_begin, callstack_end;
 
 	profiling_sample(factor_vm *vm,
 		profiling_sample_count const &counts,
-		context *ctx);
+		cell thread);
 };
 
 }
