@@ -1,7 +1,8 @@
 ! (c)2011 Joe Groff bsd license
-USING: accessors assocs calendar continuations fry io
-kernel kernel.private locals math math.statistics
-math.vectors namespaces prettyprint sequences sorting
+USING: accessors assocs calendar combinators
+combinators.short-circuit continuations fry io kernel
+kernel.private locals math math.statistics math.vectors memory
+namespaces prettyprint sequences sorting
 tools.profiler.sampling.private ;
 FROM: sequences => change-nth ;
 IN: tools.profiler.sampling
@@ -12,7 +13,7 @@ SYMBOL: samples-per-second
 CONSTANT: default-samples-per-second 1000
 
 CONSTANT: ignore-words
-    { signal-handler leaf-signal-handler profiling }
+    { signal-handler leaf-signal-handler profiling minor-gc }
 
 : get-raw-profile-data ( -- data )
     raw-profile-data get-global [ "No profile data" throw ] unless* ;
@@ -67,24 +68,39 @@ CONSTANT: ignore-words
 TUPLE: profile-node
     total-time gc-time foreign-time foreign-thread-time children ;
 
-:: (collect-subtrees) ( samples child-quot -- node )
-    samples { 0 0 0 0 } [ 4 head-slice v+ ] reduce [ samples>time ] map! :> times
-    samples [ sample-callstack [ ignore-words member? not ] filter empty? not ] filter
-    [ f ] [ child-quot call ] if-empty :> subtree
-    times first4 subtree profile-node boa ; inline
+: <profile-node> ( times children -- node )
+    [ first4 ] dip profile-node boa ;
+
+: leaf-callstack? ( callstack -- ? )
+    [ ignore-words member? ] all? ;
+
+: sum-times ( samples -- times )
+    { 0 0 0 0 } [ 4 head-slice v+ ] reduce [ samples>time ] map! ;
+
+:: (collect-subtrees) ( samples child-quot -- children )
+    samples [ sample-callstack leaf-callstack? not ] filter
+    [ f ] [ child-quot call ] if-empty ; inline
 
 : collect-tops ( samples -- node )
-    [ unclip-callstack ] collect-pairs
-    [ [ collect-tops ] (collect-subtrees) ] assoc-map ;
+    [ unclip-callstack ] collect-pairs [
+        [ sum-times ]
+        [ [ collect-tops ] (collect-subtrees) ] bi <profile-node>
+    ] assoc-map ;
 
-: trim-tree ( assoc -- assoc' )
-    dup assoc-size 1 = [
-        dup values first children>> dup assoc-size 1 =
-        [ nip trim-tree ] [ drop ] if
-    ] when ;
+: redundant-root-node? ( assoc -- ? )
+    {
+        [ children>> assoc-size 1 = ]
+        [ children>> values first children>> ]
+        [ [ total-time>> ] [ children>> values first total-time>> ] bi = ]
+    } 1&& ;
+
+: trim-root ( root -- root' )
+    dup redundant-root-node? [ children>> values first trim-root ] when ;
 
 : (top-down) ( samples -- tree )
-    collect-contexts [ collect-tops trim-tree ] assoc-map ;
+    collect-contexts [
+        [ sum-times ] [ collect-tops ] bi <profile-node> trim-root
+    ] assoc-map ;
 
 : top-down ( -- tree )
     get-raw-profile-data (top-down) ;
@@ -96,16 +112,24 @@ TUPLE: profile-node
     >alist [ second total-time>> ] inv-sort-with ;
 
 : duration. ( duration -- )
-    duration>seconds >float pprint " " write \ seconds pprint ;
+    duration>milliseconds >integer pprint "ms" write ;
 
 DEFER: (profile.)
 
+: times. ( node -- )
+    {
+        [ total-time>> duration. " (" write ]
+        [ gc-time>> duration. " gc, " write ]
+        [ foreign-time>> duration. " foreign, " write ]
+        [ foreign-thread-time>> duration. " foreign threads)" write ]
+    } cleave ;
+
 :: (profile-node.) ( word node depth -- )
-    depth depth. node total-time>> duration. ": " write word pprint nl
+    depth depth. node times. ": " write word pprint nl
     node children>> depth 1 + (profile.) ;
 
 : (profile.) ( nodes depth -- )
     [ by-total-time ] dip '[ _ (profile-node.) ] assoc-each ;
 
 : profile. ( tree -- )
-    [ [ "Context: " write pprint nl ] [ 1 (profile.) ] bi* ] assoc-each ;
+    [ 0 (profile-node.) ] assoc-each ;
