@@ -24,7 +24,6 @@ template<typename Fixup> struct code_block_visitor {
 	void visit_embedded_code_pointers(code_block *compiled);
 	void visit_context_code_blocks();
 	void visit_uninitialized_code_blocks();
-	void visit_sample_callstacks();
 
 	void visit_code_roots();
 };
@@ -137,21 +136,9 @@ void code_block_visitor<Fixup>::visit_uninitialized_code_blocks()
 }
 
 template<typename Fixup>
-void code_block_visitor<Fixup>::visit_sample_callstacks()
-{
-	for (std::vector<code_block *>::iterator iter = parent->sample_callstacks.begin();
-		iter != parent->sample_callstacks.end();
-		++iter)
-	{
-		*iter = fixup.fixup_code(*iter);
-	}
-}
-
-template<typename Fixup>
 void code_block_visitor<Fixup>::visit_code_roots()
 {
 	visit_uninitialized_code_blocks();
-	visit_sample_callstacks();
 }
 
 }
