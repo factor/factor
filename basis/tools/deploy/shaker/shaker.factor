@@ -371,7 +371,7 @@ IN: tools.deploy.shaker
                 source-files.errors:error-types
                 source-files.errors:error-observers
                 vocabs:dictionary
-                vocabs:load-vocab-hook
+                vocabs:require-hook
                 vocabs:vocab-observers
                 vocabs.loader:add-vocab-root-hook
                 word
