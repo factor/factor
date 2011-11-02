@@ -54,6 +54,6 @@ PRIVATE>
 
 : vm ( -- path ) \ vm get-global ;
 
-: embedded? ( -- ? ) 15 special-object ;
+: embedded? ( -- ? ) OBJ-EMBEDDED special-object ;
 
 : exit ( n -- * ) do-shutdown-hooks (exit) ;

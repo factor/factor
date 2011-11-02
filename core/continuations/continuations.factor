@@ -21,7 +21,7 @@ SYMBOL: restarts
 <PRIVATE
 
 : catchstack* ( -- catchstack )
-    1 context-object { vector } declare ; inline
+    CONTEXT-OBJ-CATCHSTACK context-object { vector } declare ; inline
 
 ! We have to defeat some optimizations to make continuations work
 : dummy-1 ( -- obj ) f ;
@@ -30,7 +30,7 @@ SYMBOL: restarts
 : catchstack ( -- catchstack ) catchstack* clone ; inline
 
 : set-catchstack ( catchstack -- )
-    >vector 1 set-context-object ; inline
+    >vector CONTEXT-OBJ-CATCHSTACK set-context-object ; inline
 
 : init-catchstack ( -- ) f set-catchstack ;
 
@@ -74,12 +74,17 @@ PRIVATE>
 
 : continue-with ( obj continuation -- * )
     [
-        swap 4 set-special-object
+        swap OBJ-CALLCC-1 set-special-object
         >continuation<
         set-catchstack
         set-namestack
         set-retainstack
-        [ set-datastack drop 4 special-object f 4 set-special-object f ] dip
+        [
+            set-datastack drop
+            OBJ-CALLCC-1 special-object
+            f OBJ-CALLCC-1 set-special-object
+            f
+        ] dip
         set-callstack
     ] ( obj continuation -- * ) call-effect-unsafe ;
 
@@ -113,7 +118,7 @@ thread-error-hook [ [ die ] ] initialize
 M: object error-in-thread ( error thread -- * )
     thread-error-hook get-global call( error thread -- * ) ;
 
-: in-callback? ( -- ? ) 3 context-object ;
+: in-callback? ( -- ? ) CONTEXT-OBJ-IN-CALLBACK-P context-object ;
 
 SYMBOL: callback-error-hook ! ( error -- * )
 
@@ -124,7 +129,7 @@ callback-error-hook [ [ die ] ] initialize
     catchstack* [
         in-callback?
         [ callback-error-hook get-global call( error -- * ) ]
-        [ 65 special-object error-in-thread ]
+        [ OBJ-CURRENT-THREAD special-object error-in-thread ]
         if
     ] [ pop continue-with ] if-empty ;
 
@@ -191,12 +196,12 @@ M: condition compute-restarts
     ! VM calls on error
     [
         ! 65 = self
-        65 special-object error-thread set-global
+        OBJ-CURRENT-THREAD special-object error-thread set-global
         continuation error-continuation set-global
         [ original-error set-global ] [ rethrow ] bi
-    ] 5 set-special-object
+    ] ERROR-HANDLER-QUOT set-special-object
     ! VM adds this to kernel errors, so that user-space
     ! can identify them
-    "kernel-error" 6 set-special-object ;
+    "kernel-error" OBJ-ERROR set-special-object ;
 
 PRIVATE>

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Phil Dawes, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes.struct alien.c-types alien.syntax ;
+USING: classes.struct alien.c-types alien.syntax kernel.private ;
 IN: vm
 
 TYPEDEF: uintptr_t cell
@@ -14,7 +14,7 @@ STRUCT: context
 { datastack-region void* }
 { retainstack-region void* }
 { callstack-region void* }
-{ context-objects cell[10] } ;
+{ context-objects cell[context-object-count] } ;
 
 : context-field-offset ( field -- offset ) context offset-of ; inline
 
@@ -31,7 +31,7 @@ STRUCT: vm
 { cards-offset cell }
 { decks-offset cell }
 { signal-handler-addr cell }
-{ special-objects cell[80] } ;
+{ special-objects cell[special-object-count] } ;
 
 : vm-field-offset ( field -- offset ) vm offset-of ; inline
 
