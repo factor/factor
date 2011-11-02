@@ -1,3 +1,5 @@
+#define FACTOR_FORCE_INLINE __forceinline
+
 namespace factor {
 	namespace atomic {
 		__forceinline static bool cas(volatile cell *ptr, cell old_val, cell new_val)
@@ -44,3 +46,4 @@ namespace factor {
 	}
 }
 
+#include "atomic.hpp"

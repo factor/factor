@@ -9,7 +9,7 @@ factor_vm::factor_vm() :
 	c_to_factor_func(NULL),
 	counting_profiler_p(false),
 	sampling_profiler_p(false),
-	safepoint_fep(false),
+	safepoint_fep_p(false),
 	gc_off(false),
 	current_gc(NULL),
 	gc_events(NULL),
