@@ -93,8 +93,7 @@ void factor_vm::start_sampling_profiler(fixnum rate)
 
 void factor_vm::end_sampling_profiler()
 {
-	sampling_profiler_p = false;
-	atomic::fence();
+	atomic::store(&sampling_profiler_p, false);
 	end_sampling_profiler_timer();
 	record_sample();
 }
@@ -151,13 +150,13 @@ void factor_vm::primitive_clear_samples()
 
 void factor_vm::enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thread_p)
 {
-	if (atomic::fence(), sampling_profiler_p)
+	if (atomic::load(&sampling_profiler_p))
 	{
 		atomic::add(&safepoint_sample_counts.sample_count, samples);
 		if (foreign_thread_p)
 			atomic::add(&safepoint_sample_counts.foreign_thread_sample_count, samples);
 		else {
-			if (atomic::fence(), current_gc)
+			if (atomic::load(&current_gc_p))
 				atomic::add(&safepoint_sample_counts.gc_sample_count, samples);
 			if (pc != 0 && !code->seg->in_segment_p(pc))
 				atomic::add(&safepoint_sample_counts.foreign_sample_count, samples);

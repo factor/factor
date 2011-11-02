@@ -62,7 +62,7 @@ struct factor_vm
 
 	/* Is profiling enabled? */
 	bool counting_profiler_p;
-	volatile bool sampling_profiler_p;
+	volatile cell sampling_profiler_p;
 	fixnum samples_per_second;
 
 	/* Global variables used to pass fault handler state from signal handler
@@ -71,7 +71,7 @@ struct factor_vm
 	cell signal_number;
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
-	volatile bool safepoint_fep;
+	volatile cell safepoint_fep_p;
 
 	/* State kept by the sampling profiler */
 	std::vector<profiling_sample> samples;
