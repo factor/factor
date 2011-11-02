@@ -57,7 +57,7 @@ CONSTANT: ignore-words
 : foreign-thread-time ( -- n )
     get-raw-profile-data (foreign-thread-time) ;
 
-: collect-threads ( samples -- by-top )
+: collect-threads ( samples -- by-thread )
     [ sample-thread ] collect-by ;
 
 : time-per-thread ( -- n )
