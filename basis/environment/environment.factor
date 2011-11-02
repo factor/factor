@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators kernel sequences splitting system
-vocabs.loader init ;
+vocabs init vocabs.loader ;
 IN: environment
 
 HOOK: os-env os ( key -- value )

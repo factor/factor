@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax alien.data 
 classes.struct combinators io.ports io.streams.duplex
-system kernel math math.bitwise vocabs.loader io.serial
+system kernel math math.bitwise vocabs io.serial
 io.serial.unix.termios io.backend.unix unix unix.ffi
 literals ;
 IN: io.serial.unix

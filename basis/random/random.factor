@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.data arrays assocs
 byte-arrays byte-vectors combinators fry io.backend io.binary
 kernel locals math math.bitwise math.constants math.functions
 math.order math.ranges namespaces sequences sequences.private
-sets summary system vocabs.loader ;
+sets summary system vocabs ;
 IN: random
 
 SYMBOL: system-random-generator

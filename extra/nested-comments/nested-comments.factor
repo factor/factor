@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 blei, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences math locals make multiline ;
+USING: kernel sequences math locals make ;
 IN: nested-comments
 
 : (count-subsequences) ( count substring string n -- count' )

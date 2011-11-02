@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel io system prettyprint
-continuations quotations vocabs.loader parser ;
+continuations quotations vocabs parser vocabs.loader ;
 IN: listener
 
 ARTICLE: "listener-watch" "Watching variables in the listener"

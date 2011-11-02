@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types assocs combinators destructors
 kernel math math.bitwise math.parser sequences summary system
-vocabs.loader io ;
+vocabs io ;
 IN: io.serial
 
 TUPLE: serial-port < disposable stream path baud 

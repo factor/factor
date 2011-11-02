@@ -1,5 +1,5 @@
 USING: arrays accessors continuations kernel math system
-sequences namespaces init vocabs vocabs.loader combinators ;
+sequences namespaces init vocabs combinators ;
 FROM: namespaces => change-global ;
 IN: game.input
 

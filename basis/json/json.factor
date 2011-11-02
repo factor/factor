@@ -1,4 +1,4 @@
-USING: kernel vocabs.loader ;
+USING: kernel vocabs ;
 IN: json
 
 SINGLETON: json-null

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators io kernel math math.parser system
-vocabs.loader ;
+vocabs ;
 IN: system-info
 
 HOOK: os-version os ( -- version )    

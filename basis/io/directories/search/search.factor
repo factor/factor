@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations deques dlists fry
 io.backend io.directories io.files.info io.pathnames kernel
-locals math sequences sorting system unicode.case vocabs.loader ;
+locals math sequences sorting system unicode.case vocabs
+vocabs.loader ;
 IN: io.directories.search
 
 : qualified-directory-entries ( path -- seq )

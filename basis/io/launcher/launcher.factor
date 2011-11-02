@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: system kernel namespaces strings hashtables sequences
-assocs combinators vocabs.loader init threads continuations math
+assocs combinators vocabs init threads continuations math
 accessors concurrency.flags destructors environment fry io
 io.encodings.ascii io.backend io.timeouts io.pipes
 io.pipes.private io.encodings io.encodings.utf8

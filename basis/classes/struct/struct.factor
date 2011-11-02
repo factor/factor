@@ -9,7 +9,7 @@ functors.backend generalizations generic.parser kernel
 kernel.private lexer libc locals macros math math.order parser
 quotations sequences slots slots.private specialized-arrays
 stack-checker.dependencies summary vectors vocabs.parser words
-classes.private generic definitions ;
+classes.private generic definitions vocabs ;
 FROM: delegate.private => group-words slot-group-words ;
 QUALIFIED: math
 IN: classes.struct
@@ -426,6 +426,6 @@ FUNCTOR-SYNTAX: STRUCT:
     [ parse-struct-slots` ] [ ] while
     [ >array define-struct-class ] append! ;
 
-USING: vocabs vocabs.loader ;
+USING: vocabs.loader ;
 
 { "classes.struct" "prettyprint" } "classes.struct.prettyprint" require-when

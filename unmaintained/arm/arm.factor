@@ -3,7 +3,7 @@
 USING: alien alien.c-types kernel math namespaces
 cpu.architecture cpu.arm.architecture cpu.arm.assembler
 cpu.arm.intrinsics generator generator.registers continuations
-compiler io vocabs.loader sequences system ;
+compiler io vocabs sequences system ;
 
 ! EABI passes floats in integer registers.
 [ alien-float ]

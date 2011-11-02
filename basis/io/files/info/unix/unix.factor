@@ -5,7 +5,7 @@ calendar.unix classes.struct combinators
 combinators.short-circuit io.backend io.directories
 io.files.info io.files.types kernel literals math math.bitwise
 sequences specialized-arrays strings system unix unix.ffi
-unix.groups unix.stat unix.time unix.users vocabs.loader ;
+unix.groups unix.stat unix.time unix.users vocabs ;
 IN: io.files.info.unix
 SPECIALIZED-ARRAY: timeval
 

@@ -3,7 +3,7 @@
 USING: arrays combinators continuations fry io io.backend
 io.directories io.directories.hierarchy io.files io.pathnames
 kernel locals math math.bitwise math.parser namespaces random
-sequences system vocabs.loader random.data ;
+sequences system vocabs random.data ;
 IN: io.files.unique
 
 HOOK: (touch-unique-file) io-backend ( path -- )

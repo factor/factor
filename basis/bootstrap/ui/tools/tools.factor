@@ -1,4 +1,4 @@
-USING: kernel vocabs vocabs.loader sequences system ;
+USING: kernel vocabs sequences system vocabs.loader ;
 
 { "ui" "help" "tools" }
 [ "bootstrap." prepend lookup-vocab ] all? [
