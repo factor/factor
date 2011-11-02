@@ -11,7 +11,7 @@ IN: tools.profiler.sampling
 SYMBOL: raw-profile-data
 SYMBOL: samples-per-second
 
-CONSTANT: default-samples-per-second 1000
+samples-per-second [ 1,000 ] initialize
 
 CONSTANT: ignore-words
     { signal-handler leaf-signal-handler profiling minor-gc }
@@ -21,12 +21,10 @@ CONSTANT: ignore-words
 : get-raw-profile-data ( -- data )
     raw-profile-data get-global [ "No profile data" throw ] unless* ;
 
-: profile* ( rate quot -- )
-    [ [ samples-per-second set-global ] [ profiling ] bi ] dip
+: profile ( quot -- )
+    samples-per-second get-global profiling
     [ 0 profiling ] [ ] cleanup
     (get-samples) raw-profile-data set-global ; inline
-
-: profile ( quot -- ) default-samples-per-second swap profile* ; inline
 
 : total-sample-count ( sample -- count ) first ;
 : gc-sample-count ( sample -- count ) second ;
