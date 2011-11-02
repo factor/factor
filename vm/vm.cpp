@@ -18,7 +18,8 @@ factor_vm::factor_vm() :
 	fep_disabled(false),
 	full_output(false),
 	last_nano_count(0),
-	signal_callstack_seg(NULL)
+	signal_callstack_seg(NULL),
+	faulting_p(false)
 {
 	primitive_reset_dispatch_stats();
 }

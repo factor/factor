@@ -29,6 +29,8 @@ void out_of_memory()
 
 void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
 {
+	faulting_p = true;
+
 	/* Reset local roots before allocating anything */
 	data_roots.clear();
 	bignum_roots.clear();
@@ -57,6 +59,7 @@ void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
 
 		ctx->push(error_object);
 
+		faulting_p = false;
 		unwind_native_frames(special_objects[ERROR_HANDLER_QUOT],
 			ctx->callstack_top);
 	}
@@ -68,6 +71,7 @@ void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
 		std::cout << "error: " << error << std::endl;
 		std::cout << "arg 1: "; print_obj(arg1); std::cout << std::endl;
 		std::cout << "arg 2: "; print_obj(arg2); std::cout << std::endl;
+		faulting_p = false;
 		factorbug();
 	}
 }
@@ -86,6 +90,8 @@ void factor_vm::memory_protection_error(cell addr)
 {
 	if(code->safepoint_p(addr))
 		handle_safepoint();
+	else if(faulting_p)
+		fatal_error("Double fault", 0);
 	else if(ctx->datastack_seg->underflow_p(addr))
 		general_error(ERROR_DATASTACK_UNDERFLOW,false_object,false_object);
 	else if(ctx->datastack_seg->overflow_p(addr))

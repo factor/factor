@@ -134,6 +134,9 @@ struct factor_vm
 	/* Stack for signal handlers, only used on Unix */
 	segment *signal_callstack_seg;
 
+	/* Are we already handling a fault? Used to catch double memory faults */
+	bool faulting_p;
+
 	// contexts
 	context *new_context();
 	void init_context(context *ctx);
