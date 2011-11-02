@@ -135,6 +135,7 @@ template<typename Fixup> struct slot_visitor {
 	void visit_code_block_objects(code_block *compiled);
 	void visit_embedded_literals(code_block *compiled);
 	void visit_sample_callstacks();
+	void visit_sample_threads();
 };
 
 template<typename Fixup>
@@ -262,6 +263,17 @@ void slot_visitor<Fixup>::visit_sample_callstacks()
 }
 
 template<typename Fixup>
+void slot_visitor<Fixup>::visit_sample_threads()
+{
+	for (std::vector<profiling_sample>::iterator iter = parent->samples.begin();
+		iter != parent->samples.end();
+		++iter)
+	{
+		visit_handle(&iter->thread);
+	}
+}
+
+template<typename Fixup>
 void slot_visitor<Fixup>::visit_roots()
 {
 	visit_handle(&parent->true_object);
@@ -274,6 +286,7 @@ void slot_visitor<Fixup>::visit_roots()
 	visit_callback_roots();
 	visit_literal_table_roots();
 	visit_sample_callstacks();
+	visit_sample_threads();
 
 	visit_object_array(parent->special_objects,parent->special_objects + special_object_count);
 }
