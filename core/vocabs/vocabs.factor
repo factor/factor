@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs strings kernel sorting namespaces
-sequences definitions sets combinators ;
+sequences definitions sets combinators splitting ;
 IN: vocabs
 
 SYMBOL: dictionary
@@ -125,9 +125,32 @@ M: object >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
 
 M: vocab-spec forget* forget-vocab ;
 
+! Load foo when we load foo.private unless foo.private already exists.
+! foo.private could already exist because bootstrap defines primitives
+! in that vocabulary or because it has already been loaded elsewhere.
+! Either way, it is safe to not load it.
+: lookup-vocab ( name -- name'/vocab load? )
+    dup ".private" tail? [
+        dup vocab [
+            nip f
+        ] [
+            ".private" ?tail drop t
+        ] if*
+    ] [ t ] if ;
+
 SYMBOL: load-vocab-hook ! ( name -- vocab )
 
-: load-vocab ( name -- vocab ) load-vocab-hook get call( name -- vocab ) ;
+: call-load-vocab-hook ( name -- vocab )
+    load-vocab-hook get call( name -- vocab ) ;
+
+GENERIC: load-vocab ( name -- vocab )
+
+M: string load-vocab ( name -- vocab )
+    lookup-vocab [ call-load-vocab-hook ] when ;
+
+M: vocab load-vocab call-load-vocab-hook ;
+
+M: vocab-link load-vocab call-load-vocab-hook ;
 
 PREDICATE: runnable-vocab < vocab
     vocab-main >boolean ;
