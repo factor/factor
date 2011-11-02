@@ -13,7 +13,7 @@ factor_vm::factor_vm() :
 	gc_off(false),
 	current_gc(NULL),
 	current_gc_p(false),
-	current_jit_p(false),
+	current_jit_count(0),
 	gc_events(NULL),
 	fep_p(false),
 	fep_help_was_shown(false),

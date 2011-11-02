@@ -9,10 +9,12 @@ profiling_sample_count profiling_sample_count::record_counts() volatile
 	profiling_sample_count returned(
 		sample_count,
 		gc_sample_count,
+		jit_sample_count,
 		foreign_sample_count,
 		foreign_thread_sample_count);
 	atomic::subtract(&sample_count, returned.sample_count);
 	atomic::subtract(&gc_sample_count, returned.gc_sample_count);
+	atomic::subtract(&jit_sample_count, returned.jit_sample_count);
 	atomic::subtract(&foreign_sample_count, returned.foreign_sample_count);
 	atomic::subtract(&foreign_thread_sample_count, returned.foreign_thread_sample_count);
 	return returned;
@@ -22,6 +24,7 @@ void profiling_sample_count::clear() volatile
 {
 	sample_count = 0;
 	gc_sample_count = 0;
+	jit_sample_count = 0;
 	foreign_sample_count = 0;
 	foreign_thread_sample_count = 0;
 	atomic::fence();
@@ -114,14 +117,15 @@ void factor_vm::primitive_get_samples()
 
 		for (; from_iter != samples.end(); ++from_iter, ++to_i)
 		{
-			data_root<array> sample(allot_array(6, false_object),this);
+			data_root<array> sample(allot_array(7, false_object),this);
 
 			set_array_nth(sample.untagged(),0,tag_fixnum(from_iter->counts.sample_count));
 			set_array_nth(sample.untagged(),1,tag_fixnum(from_iter->counts.gc_sample_count));
-			set_array_nth(sample.untagged(),2,tag_fixnum(from_iter->counts.foreign_sample_count));
-			set_array_nth(sample.untagged(),3,tag_fixnum(from_iter->counts.foreign_thread_sample_count));
+			set_array_nth(sample.untagged(),2,tag_fixnum(from_iter->counts.jit_sample_count));
+			set_array_nth(sample.untagged(),3,tag_fixnum(from_iter->counts.foreign_sample_count));
+			set_array_nth(sample.untagged(),4,tag_fixnum(from_iter->counts.foreign_thread_sample_count));
 
-			set_array_nth(sample.untagged(),4,from_iter->thread);
+			set_array_nth(sample.untagged(),5,from_iter->thread);
 
 			cell callstack_size = from_iter->callstack_end - from_iter->callstack_begin;
 			data_root<array> callstack(allot_array(callstack_size,false_object),this);
@@ -135,7 +139,7 @@ void factor_vm::primitive_get_samples()
 			for (; c_from_iter != c_from_iter_end; ++c_from_iter, ++c_to_i)
 				set_array_nth(callstack.untagged(),c_to_i,*c_from_iter);
 
-			set_array_nth(sample.untagged(),5,callstack.value());
+			set_array_nth(sample.untagged(),6,callstack.value());
 
 			set_array_nth(samples_array.untagged(),to_i,sample.value());
 		}
@@ -158,6 +162,8 @@ void factor_vm::enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thr
 		else {
 			if (atomic::load(&current_gc_p))
 				atomic::add(&safepoint_sample_counts.gc_sample_count, samples);
+			if (atomic::load(&current_jit_count) > 0)
+				atomic::add(&safepoint_sample_counts.jit_sample_count, samples);
 			if (pc != 0 && !code->seg->in_segment_p(pc))
 				atomic::add(&safepoint_sample_counts.foreign_sample_count, samples);
 		}

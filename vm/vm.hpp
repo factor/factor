@@ -95,7 +95,7 @@ struct factor_vm
 	volatile cell current_gc_p;
 
 	/* Set if we're in the jit */
-	volatile cell current_jit_p;
+	volatile fixnum current_jit_count;
 
 	/* Mark stack */
 	std::vector<cell> mark_stack;
