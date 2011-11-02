@@ -91,7 +91,11 @@ struct factor_vm
 	callback_heap *callbacks;
 
 	/* Only set if we're performing a GC */
-	volatile gc_state *current_gc;
+	gc_state *current_gc;
+	volatile cell current_gc_p;
+
+	/* Set if we're in the jit */
+	volatile cell current_jit_p;
 
 	/* Mark stack */
 	std::vector<cell> mark_stack;

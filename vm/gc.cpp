@@ -155,6 +155,7 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p)
 	assert(!data->high_fragmentation_p());
 
 	current_gc = new gc_state(op,this);
+	atomic::store(&current_gc_p, true);
 
 	/* Keep trying to GC higher and higher generations until we don't run
 	out of space in the target generation. */
@@ -217,6 +218,7 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p)
 
 	end_gc();
 
+	atomic::store(&current_gc_p, false);
 	delete current_gc;
 	current_gc = NULL;
 
