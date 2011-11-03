@@ -1,7 +1,37 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs alien.syntax kernel io.serial system unix ;
-IN: io.serial.unix
+USING: alien.c-types alien.syntax assocs classes.struct
+io.serial kernel system ;
+IN: io.serial.linux.ffi
+
+CONSTANT: NCCS 32
+
+TYPEDEF: uchar cc_t
+TYPEDEF: uint speed_t
+TYPEDEF: uint tcflag_t
+
+STRUCT: termios
+    { iflag tcflag_t }
+    { oflag tcflag_t }
+    { cflag tcflag_t }
+    { lflag tcflag_t }
+    { line cc_t }
+    { cc { cc_t NCCS } }
+    { ispeed speed_t }
+    { ospeed speed_t } ;
+
+FUNCTION: speed_t cfgetispeed ( termios* t ) ;
+FUNCTION: speed_t cfgetospeed ( termios* t ) ;
+FUNCTION: int cfsetispeed ( termios* t, speed_t s ) ;
+FUNCTION: int cfsetospeed ( termios* t, speed_t s ) ;
+FUNCTION: int tcgetattr ( int i1, termios* t ) ;
+FUNCTION: int tcsetattr ( int i1, int i2, termios* t ) ;
+FUNCTION: int tcdrain ( int i1 ) ;
+FUNCTION: int tcflow ( int i1, int i2 ) ;
+FUNCTION: int tcflush ( int i1, int i2 ) ;
+FUNCTION: int tcsendbreak ( int i1, int i2 ) ;
+FUNCTION: void cfmakeraw ( termios* t ) ;
+FUNCTION: int cfsetspeed ( termios* t, speed_t s ) ;
 
 CONSTANT: TCSANOW     0
 CONSTANT: TCSADRAIN   1
@@ -128,3 +158,4 @@ M: linux lookup-baud ( n -- n )
         { 3500000 OCT: 0010016 }
         { 4000000 OCT: 0010017 }
     } ?at [ invalid-baud ] unless ;
+
