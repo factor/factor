@@ -142,7 +142,7 @@ GENERIC: (require) ( name -- )
 
 M: vocab (require)
     [
-        dup source-loaded?>> +parsing+ eq?  [ drop ] [
+        dup source-loaded?>> +parsing+ eq? [ drop ] [
             dup source-loaded?>> [ dup load-source ] unless
             dup docs-loaded?>> [ dup load-docs ] unless
             drop
