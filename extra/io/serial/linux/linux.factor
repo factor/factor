@@ -1,28 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.syntax alien.data 
-classes.struct combinators io.ports io.streams.duplex
-system kernel math math.bitwise vocabs io.serial
-io.serial.unix.termios io.backend.unix unix unix.ffi
-literals ;
-IN: io.serial.unix
-
-<< {
-    { [ os linux? ] [ "io.serial.unix.linux" ] }
-} cond require >>
-
-FUNCTION: speed_t cfgetispeed ( termios* t ) ;
-FUNCTION: speed_t cfgetospeed ( termios* t ) ;
-FUNCTION: int cfsetispeed ( termios* t, speed_t s ) ;
-FUNCTION: int cfsetospeed ( termios* t, speed_t s ) ;
-FUNCTION: int tcgetattr ( int i1, termios* t ) ;
-FUNCTION: int tcsetattr ( int i1, int i2, termios* t ) ;
-FUNCTION: int tcdrain ( int i1 ) ;
-FUNCTION: int tcflow ( int i1, int i2 ) ;
-FUNCTION: int tcflush ( int i1, int i2 ) ;
-FUNCTION: int tcsendbreak ( int i1, int i2 ) ;
-FUNCTION: void cfmakeraw ( termios* t ) ;
-FUNCTION: int cfsetspeed ( termios* t, speed_t s ) ;
+USING: accessors classes.struct combinators io.backend.unix
+io.ports io.serial io.streams.duplex kernel literals math
+system unix unix.ffi ;
+IN: io.serial.linux
 
 : fd>duplex-stream ( fd -- duplex-stream )
     <fd> init-fd
