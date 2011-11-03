@@ -320,13 +320,28 @@ void factor_vm::sampler_thread_loop()
 		assert(ok);
 		new_counter.QuadPart *= samples_per_second;
 		cell samples = 0;
-		while (new_counter.QuadPart - counter.QuadPart > units_per_second.QuadPart) {
-			// We would have to suspend the thread to sample the PC
+		while (new_counter.QuadPart - counter.QuadPart > units_per_second.QuadPart)
+		{
 			++samples;
 			counter.QuadPart += units_per_second.QuadPart;
 		}
+
 		if (samples > 0)
-			enqueue_safepoint_sample(samples, 0, false);
+		{
+			DWORD suscount = SuspendThread(thread);
+			assert(suscount == 0);
+
+			CONTEXT context;
+			memset((void*)&context, 0, sizeof(CONTEXT));
+			context.ContextFlags = CONTEXT_CONTROL;
+			BOOL context_ok = GetThreadContext(thread, &context);
+			assert(context_ok);
+
+			suscount = ResumeThread(thread);
+			assert(suscount == 1);
+
+			enqueue_safepoint_sample(samples, context.EIP, false);
+		}
 	}
 }
 

@@ -164,7 +164,7 @@ void factor_vm::enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thr
 				atomic::add(&safepoint_sample_counts.gc_sample_count, samples);
 			if (atomic::load(&current_jit_count) > 0)
 				atomic::add(&safepoint_sample_counts.jit_sample_count, samples);
-			if (pc != 0 && !code->seg->in_segment_p(pc))
+			if (!code->seg->in_segment_p(pc))
 				atomic::add(&safepoint_sample_counts.foreign_sample_count, samples);
 		}
 		code->guard_safepoint();
