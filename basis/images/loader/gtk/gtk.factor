@@ -10,7 +10,7 @@ SPECIALIZED-ARRAY: uchar
 
 SINGLETON: gtk-image
 
-os linux ? [
+os linux? [
     "png"  gtk-image register-image-class
     "tif"  gtk-image register-image-class
     "tiff" gtk-image register-image-class
