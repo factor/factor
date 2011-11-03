@@ -257,6 +257,16 @@ static void init_sigaction_with_handler(struct sigaction *act,
 
 void factor_vm::unix_init_signals()
 {
+	signal_callstack_seg = new segment(callstack_size,false);
+
+	stack_t signal_callstack;
+	signal_callstack.ss_sp = (char *)signal_callstack_seg->start;
+	signal_callstack.ss_size = signal_callstack_seg->size;
+	signal_callstack.ss_flags = 0;
+
+	if(sigaltstack(&signal_callstack,(stack_t *)NULL) < 0)
+		fatal_error("sigaltstack() failed",0);
+
 	struct sigaction memory_sigaction;
 	struct sigaction synchronous_sigaction;
 	struct sigaction enqueue_sigaction;
