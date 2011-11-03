@@ -73,8 +73,7 @@ ABOUT: "vocabs.loader"
 
 HELP: load-vocab
 { $values { "name" "a string" } { "vocab" "a hashtable or " { $link f } } }
-{ $description "Outputs a named vocabulary. If the vocabulary does not exist, throws a restartable " { $link no-vocab } " error. If the user invokes the restart, this word outputs " { $link f } "." }
-{ $error-description "Thrown by " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " when a given vocabulary does not exist. Vocabularies must be created by " { $link POSTPONE: IN: } " before being used." } ;
+{ $description "Attempts to load a vocabulary from disk, or looks up the vocabulary in the dictionary, and then outputs that vocabulary object." } ;
 
 HELP: vocab-main
 { $values { "vocab-spec" "a vocabulary specifier" } { "main" word } }
@@ -112,11 +111,6 @@ HELP: reload
 { $values { "name" "a vocabulary name" } }
 { $description "Reloads the source code and documentation for a vocabulary." }
 { $errors "Throws a " { $link no-vocab } " error if the vocabulary does not exist on disk." } ;
-
-HELP: require
-{ $values { "vocab" "a vocabulary specifier" } }
-{ $description "Loads a vocabulary if it has not already been loaded." }
-{ $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files only, use the words in " { $link "vocabs.refresh" } "." } ;
 
 HELP: require-when
 { $values { "if" "a sequence of vocabulary specifiers" } { "then" "a vocabulary specifier" } }

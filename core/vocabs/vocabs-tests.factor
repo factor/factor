@@ -29,3 +29,9 @@ IN: vocabs.tests
 [ 3 >vocab-link lookup-vocab ] [ bad-vocab-name? ] must-fail-with
 [ f >vocab-link lookup-vocab ] [ bad-vocab-name? ] must-fail-with
 [ "a b" >vocab-link lookup-vocab ] [ bad-vocab-name? ] must-fail-with
+
+[ "sojoijsaoifjsthisdoesntexistomgomgomgplznodontexist" require ]
+[ no-vocab? ] must-fail-with
+
+[ "letstrythisagainnooooooyoucantexistnoooooo" load-vocab ]
+[ no-vocab? ] must-fail-with

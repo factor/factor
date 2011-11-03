@@ -159,8 +159,12 @@ PRIVATE>
 [
     dup vocab-name blacklist get at*
     [ rethrow ]
-    [ drop dup find-vocab-root [ (require) ] [ drop ] if ]
-    if
+    [
+        drop dup find-vocab-root
+        [ (require) ]
+        [ dup lookup-vocab [ drop ] [ no-vocab ] if ]
+        if
+    ] if
 ] require-hook set-global
 
 M: vocab-spec where vocab-source-path dup [ 1 2array ] when ;
