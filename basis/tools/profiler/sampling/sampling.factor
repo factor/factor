@@ -4,7 +4,8 @@ combinators.short-circuit continuations fry generalizations
 hashtables.identity io kernel kernel.private locals math
 math.statistics math.vectors memory namespaces prettyprint
 sequences sequences.generalizations sets sorting
-tools.profiler.sampling.private math.parser.private ;
+tools.profiler.sampling.private math.parser.private
+math.parser ;
 FROM: sequences => change-nth ;
 FROM: assocs => change-at ;
 IN: tools.profiler.sampling
@@ -78,22 +79,23 @@ CONSTANT: zero-counts { 0 0 0 0 0 }
     zero-counts [ sample-counts-slice v+ ] reduce ;
 
 TUPLE: profile-node
-    total-time gc-time jit-time foreign-time foreign-thread-time children ;
+    total-time gc-time jit-time foreign-time foreign-thread-time children
+    depth ;
 
-: <profile-node> ( times children -- node )
-    [ 5 firstn [ samples>time ] 5 napply ] dip profile-node boa ;
+: <profile-node> ( times children depth -- node )
+    [ 5 firstn [ samples>time ] 5 napply ] 2dip profile-node boa ;
 
 : <profile-root-node> ( samples collector-quot -- node )
-    [ sum-counts ] swap bi <profile-node> ; inline
+    [ sum-counts ] swap bi 0 <profile-node> ; inline
 
 :: (collect-subtrees) ( samples child-quot -- children )
     samples [ sample-callstack leaf-callstack? not ] filter
     [ f ] [ child-quot call ] if-empty ; inline
 
-: collect-tops ( samples -- node )
-    [ unclip-callstack ] collect-pairs [
+:: collect-tops ( samples depth -- node )
+    samples [ unclip-callstack ] collect-pairs [
         [ sum-counts ]
-        [ [ collect-tops ] (collect-subtrees) ] bi <profile-node>
+        [ [ depth 1 + collect-tops ] (collect-subtrees) ] bi depth <profile-node>
     ] assoc-map ;
 
 : redundant-root-node? ( assoc -- ? )
@@ -106,21 +108,24 @@ TUPLE: profile-node
 : trim-root ( root -- root' )
     dup redundant-root-node? [ children>> values first trim-root ] when ;
 
-: (top-down) ( samples -- tree )
-    collect-threads
-    [ [ collect-tops ] <profile-root-node> trim-root ] assoc-map ;
+:: (top-down) ( samples depth -- tree )
+    samples collect-threads
+    [ [ depth collect-tops ] <profile-root-node> trim-root ] assoc-map ;
 
 : top-down ( -- tree )
-    get-raw-profile-data (top-down) ;
+    get-raw-profile-data 0 (top-down) ;
+
+:: counts+at ( key assoc sample -- )
+    key assoc [ zero-counts or sample sample-counts-slice v+ ] change-at ;
 
 :: collect-flat ( samples -- flat )
     IH{ } clone :> per-word-samples
     samples [| sample |
         sample sample-callstack unique keys [ ignore-word? not ] filter [
-            per-word-samples [ zero-counts or sample sample-counts-slice v+ ] change-at
+            per-word-samples sample counts+at
         ] each
     ] each
-    per-word-samples [ f <profile-node> ] assoc-map ;
+    per-word-samples [ f 0 <profile-node> ] assoc-map ;
 
 : redundant-flat-node? ( child-node root-node -- ? )
     [ total-time>> ] bi@ = ;
@@ -134,6 +139,28 @@ TUPLE: profile-node
 
 : flat ( -- tree )
     get-raw-profile-data (flat) ;
+
+: nth-or-last ( n seq -- elt )
+    [ drop f ] [
+        2dup bounds-check? [ nth ] [ nip last ] if
+    ] if-empty ;
+
+:: collect-cross-section ( samples depth -- cross-section )
+    IH{ } clone :> per-word-samples
+    samples [| sample |
+        depth sample sample-callstack [ ignore-word? ] trim-tail nth-or-last :> word
+        word [
+            word per-word-samples sample counts+at
+        ] when
+    ] each
+    per-word-samples [ f depth <profile-node> ] assoc-map ;
+
+:: (cross-section) ( depth samples -- flat )
+    samples collect-threads
+    [ [ depth collect-cross-section ] <profile-root-node> ] assoc-map ;
+
+: cross-section ( depth -- tree )
+    get-raw-profile-data (cross-section) ;
 
 : depth. ( depth -- )
     [ "| " write ] times ;
@@ -149,8 +176,9 @@ TUPLE: profile-node
 
 DEFER: (profile.)
 
-: times. ( node -- )
-    {
+:: times. ( node depth -- )
+    node {
+        [ depth>> number>string 3 CHAR: \s pad-head write " " write depth depth. ]
         [ total-time>> duration. ]
         [ " (GC:" write [ gc-time>> ] [ total-time>> ] bi percentage. ]
         [ ", JIT:" write [ jit-time>> ] [ total-time>> ] bi percentage. ]
@@ -159,7 +187,7 @@ DEFER: (profile.)
     } cleave ;
 
 :: (profile-node.) ( word node depth -- )
-    depth depth. node times. ": " write word pprint-short nl
+    node depth times. ": " write word pprint-short nl
     node children>> depth 1 + (profile.) ;
 
 : (profile.) ( nodes depth -- )
