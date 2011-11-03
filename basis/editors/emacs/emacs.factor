@@ -1,6 +1,5 @@
-USING: definitions io.launcher kernel parser words sequences math
-math.parser namespaces editors make system combinators.short-circuit
-fry threads vocabs ;
+USING: combinators.short-circuit editors kernel make
+math.parser namespaces sequences system vocabs ;
 IN: editors.emacs
 
 SINGLETON: emacsclient
@@ -21,10 +20,7 @@ M: emacsclient editor-command ( file line -- command )
         "--no-wait" ,
         number>string "+" prepend ,
         ,
-    ] { } make
-    os windows? [ run-detached drop ] [ try-process ] if ;
-
-: emacs ( word -- )
-    where first2 emacsclient ;
+    ] { } make ;
 
 os windows? [ "editors.emacs.windows" require ] when
+
