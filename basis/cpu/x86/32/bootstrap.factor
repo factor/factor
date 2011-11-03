@@ -392,7 +392,7 @@ IN: bootstrap.x86
     jit-jump-quot ;
 
 [
-    0 EAX MOVABS rc-absolute rel-safepoint ;
+    0 EAX MOVABS rc-absolute rel-safepoint
 ] \ jit-safepoint jit-define
 
 [
