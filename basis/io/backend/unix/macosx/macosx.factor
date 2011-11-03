@@ -3,7 +3,6 @@
 USING: io.backend system namespaces
 io.backend.unix.multiplexers io.backend.unix.multiplexers.run-loop
 kernel accessors assocs continuations unix io.backend.unix
-io.backend.unix.multiplexers
 io.backend.unix.multiplexers.kqueue io.files.unix ;
 IN: io.backend.unix.macosx
 
