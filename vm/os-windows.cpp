@@ -304,7 +304,7 @@ void factor_vm::open_console()
 void factor_vm::sampler_thread_loop()
 {
 	LARGE_INTEGER counter, new_counter, units_per_second;
-	bool ok;
+	DWORD ok;
 
 	ok = QueryPerformanceFrequency(&units_per_second);
 	assert(ok);
