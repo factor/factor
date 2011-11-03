@@ -1,8 +1,5 @@
 #include "master.hpp"
 
-/* Multi-VM threading is not supported on NetBSD due to
-http://gnats.netbsd.org/25563 */
-
 namespace factor
 {
 

@@ -84,22 +84,19 @@ set_md5sum() {
 
 set_gcc() {
     case $OS in
-        openbsd) ensure_program_installed egcc; CC=egcc;;
+        macosx)
+            if xcodebuild -version | grep 'Xcode 4' >/dev/null; then
+                CC=clang
+            else
+                CC=gcc
+            fi
+        ;;
         *) CC=gcc;;
     esac
 }
 
 set_make() {
-    case $OS in
-        netbsd) MAKE='gmake';;
-        freebsd) MAKE='gmake';;
-        openbsd) MAKE='gmake';;
-        dragonflybsd) MAKE='gmake';;
-        *) MAKE='make';;
-    esac
-    if [[ $MAKE = 'gmake' ]] ; then
-        ensure_program_installed gmake
-    fi
+    MAKE='make'
 }
 
 check_installed_programs() {
@@ -186,11 +183,46 @@ find_os() {
         *Darwin*) OS=macosx;;
         *linux*) OS=linux;;
         *Linux*) OS=linux;;
-        *NetBSD*) OS=netbsd;;
-        *FreeBSD*) OS=freebsd;;
-        *OpenBSD*) OS=openbsd;;
-        *DragonFly*) OS=dragonflybsd;;
-        SunOS) OS=solaris;;
+        *BSD*)
+            echo "Here's a nickel, kid:"
+            echo "                                  ..;;iiiittttjjttttii;;........                                    "
+            echo "                              ..ttLLGGGGffttjjjjttttttjjjjtt;;....                                  "
+            echo "                          ..iiLLLLjjffffiiiiffttLLjjiiiiiiiiffjjii....                              "
+            echo "                        ;;LLttii;;iiiittttiiiittttffLLGGiiii;;iiLLLL;;..                            "
+            echo "                    ..iiGGii..ii;;iiiittiittiiiiiittffffGGtt;;;;;;ffDDii..                          "
+            echo "                    iiDD;;;;..;;ttttiittiittttiiiittttffDDEE;;,,;;;;ffKKtt..                        "
+            echo "                  iiKKii..,,..iiii;;ii;;iittttttttttjjjjffGGLL::....;;LLWWtt..                      "
+            echo "                ..DDff..;;ii;;ii::,,;;;;iiiittttttjjffttjjLLDDtt..iiii;;KKWWii..                    "
+            echo "                LLLL;;;;ii;;;;;;,,;;;;;;ii;;ttttffffttttttLLGGKK..iiiiiiiiWWDD;;                    "
+            echo "              ;;DD;;;;ii;;;;;;;;,,;;;;iiiiiiiijjffffffttttLLGGWWii..iiiiiiGG##jj..                  "
+            echo "              LLtt::ii;;....ii::;;,,;;;;iiiittttLLLLLLttttttGGKKGG;;;;iiiiii##KK;;                  "
+            echo "            ..LL..iiii;;::::;;;;,,,,;;;;ii;;ttiiDDLLtttt;;iittLL##ii;;iiii;;WW##tt..                "
+            echo "            ii;;;;iiff  ..;;..ii..;;;;;;ii;;iiiiDDLLiiii;;ttLLEE##tt;;;;ii;;DD##GG..                "
+            echo "            tt..iiGG::....ii..;;;;;;;;;;;;;;iiiiDDLLiiiiiiffGGWWKKiiii;;ii..tt##KK;;                "
+            echo "            ff;;GGtt..,,  tt..;;;;,,;;iiii;;iittGGLLttffLLGGKKDDjjLLii;;;;,,ii##WWii                "
+            echo "            GGttii..;;..  ff::;;..;;iiiitt..iiiittGGffLLEEffEE;;;;EEtt;;::..;;WW##tt                "
+            echo "            GGjjii..ii..,,ff..::;;iiiiiitt..;;iiffttttffGGWWKKiiiiLLDD..;;....WW##tt                "
+            echo "            GGff,,..ii..iiii,,..::iiiiii;;..;;jjjjiiiiffGG##DDttiiffKK;;..  ..WW##jj                "
+            echo "            GGff..;;;;..LL..;;;;..;;iiii..;;ttLLiiiiiiffGGKKEE..jjLLKKjj..  ..WW##tt                "
+            echo "            LLff..ii..iiGG..::......;;;;;;;;LL;;iittttttLLKKLLffKKLLKKff..  ;;####ii                "
+            echo "            LLjj..;;  LLii;;..;;......;;;;iitt;;ttLLttiiGGGGGGffDDKKii::..  tt##WW;;                "
+            echo "            jjtt....;;GGttjj  ......;;ii;;iitt;;ttffttttLLDDGGttDDKK;;..    LL##KK..                "
+            echo "            ;;ii;;..LLtt;;;;  ....;;ii....iiGG;;iijjffLLGGKKjjGGKKGG....    KK##LL                  "
+            echo "            ..ffiittttiiii;;  ....;;ii,,;;ttLLttiittjjLLGGttjjGGKKtt      iiWW##ii                  "
+            echo "              ttLLii;;iiii;;  ....,,;;  ..;;ttDDiiiiffffffffGGGGGG..      GG##KK..                  "
+            echo "              ..LLjjii;;;;....::;;,,;;;;..;;ttDDttttjjttffLLLLDDff      ;;WW##tt                    "
+            echo "                iiGGii,,....,,iiiiii,,ii  ::ttEEttffDDttLLttLLKKii      GG##KK..                    "
+            echo "                  LLtt......,,;;;;;;iiiiii;;;;KKffLLKK;;;;tttttt      tt##WWii                      "
+            echo "                  ..ii;;;;..;;iiii;;tt,,jj  iiGGffLLKK....;;....    ;;WW##ff..                      "
+            echo "                    ..;;..::;;iiiiii;;..jj;;..GGttffEE........    iiKK##LL..                        "
+            echo "                      ..,,..;;;;;;;;..;;iitt,,ttttjjLL          iiKK##LL..                          "
+            echo "                        ............  ,,;;;;..;;;;LLii      ..ttKKKKtt..                            "
+            echo "                            ..::........;;......;;;;;;  ..iiDDWWLL,,                                "
+            echo "                              ....;;................iittGGDDff;;                                    "
+            echo "                                    ....;;;;;;;;;;iiiiii::..                                        "
+            echo "Get yourself a real OS."
+            echo "http://www.microsoft.com/"
+            exit_script 1
     esac
 }
 
@@ -471,10 +503,7 @@ update_boot_images() {
         get_url http://downloads.factorcode.org/images/latest/checksums.txt
         factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`;
         set_md5sum
-        case $OS in
-             netbsd) disk_md5=`md5 $BOOT_IMAGE | cut -f4 -d' '`;;
-             *) disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '` ;;
-        esac
+        disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '` ;;
         $ECHO "Factorcode md5: $factorcode_md5";
         $ECHO "Disk md5: $disk_md5";
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then

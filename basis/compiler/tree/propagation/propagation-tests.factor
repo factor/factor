@@ -755,7 +755,7 @@ MIXIN: empty-mixin
 
 [ V{ double-array } ] [ [| | double-array{ } ] final-classes ] unit-test
 
-[ V{ t } ] [ [ netbsd unix? ] final-literals ] unit-test
+[ V{ t } ] [ [ macosx unix? ] final-literals ] unit-test
 
 [ V{ array } ] [ [ [ <=> ] sort [ <=> ] sort ] final-classes ] unit-test
 

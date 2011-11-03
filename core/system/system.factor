@@ -11,15 +11,9 @@ UNION: ppc ppc.32 ppc.64 ;
 
 : cpu ( -- class ) \ cpu get-global ; foldable
 
-SINGLETON: windows
+SINGLETONS: windows macosx linux ;
 
-SINGLETONS: freebsd netbsd openbsd solaris macosx linux ;
-
-SINGLETON: haiku
-
-UNION: bsd freebsd netbsd openbsd macosx ;
-
-UNION: unix bsd solaris linux haiku ;
+UNION: unix macosx linux ;
 
 : os ( -- class ) \ os get-global ; foldable
 
@@ -39,13 +33,8 @@ UNION: unix bsd solaris linux haiku ;
 : string>os ( str -- class )
     H{
         { "windows" windows }
-        { "freebsd" freebsd }
-        { "netbsd" netbsd }
-        { "openbsd" openbsd }
-        { "solaris" solaris }
         { "macosx" macosx }
         { "linux" linux }
-        { "haiku" haiku }
     } at ;
 
 PRIVATE>

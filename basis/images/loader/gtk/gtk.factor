@@ -4,13 +4,13 @@ USING: accessors alien.c-types alien.data arrays combinators
 destructors gdk.pixbuf.ffi gobject.ffi grouping images
 images.loader io kernel locals math sequences
 specialized-arrays ;
-FROM: system => os linux freebsd netbsd openbsd ;
+FROM: system => os linux? ;
 IN: images.loader.gtk
 SPECIALIZED-ARRAY: uchar
 
 SINGLETON: gtk-image
 
-os { linux freebsd netbsd openbsd } member? [
+os linux ? [
     "png"  gtk-image register-image-class
     "tif"  gtk-image register-image-class
     "tiff" gtk-image register-image-class

@@ -1,4 +1,1 @@
 linux
-freebsd
-netbsd
-openbsd

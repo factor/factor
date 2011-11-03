@@ -31,41 +31,7 @@
 	#else
 		#include "os-genunix.hpp"
 
-		#ifdef __FreeBSD__
-			#define FACTOR_OS_STRING "freebsd"
-			#include "os-freebsd.hpp"
-			
-			#if defined(FACTOR_X86)
-				#include "os-freebsd-x86.32.hpp"
-			#elif defined(FACTOR_AMD64)
-				#include "os-freebsd-x86.64.hpp"
-			#else
-				#error "Unsupported FreeBSD flavor"
-			#endif
-		#elif defined(__OpenBSD__)
-			#define FACTOR_OS_STRING "openbsd"
-			#include "os-openbsd.hpp"
-
-			#if defined(FACTOR_X86)
-				#include "os-openbsd-x86.32.hpp"
-			#elif defined(FACTOR_AMD64)
-				#include "os-openbsd-x86.64.hpp"
-			#else
-				#error "Unsupported OpenBSD flavor"
-			#endif
-		#elif defined(__NetBSD__)
-			#define FACTOR_OS_STRING "netbsd"
-			#include "os-netbsd.hpp"
-
-			#if defined(FACTOR_X86)
-				#include "os-netbsd-x86.32.hpp"
-			#elif defined(FACTOR_AMD64)
-				#include "os-netbsd-x86.64.hpp"
-			#else
-				#error "Unsupported NetBSD flavor"
-			#endif
-
-		#elif defined(linux)
+		#if defined(linux)
 			#define FACTOR_OS_STRING "linux"
 			#include "os-linux.hpp"
 
@@ -82,17 +48,6 @@
 			#else
 				#error "Unsupported Linux flavor"
 			#endif
-		#elif defined(__SVR4) && defined(sun)
-			#define FACTOR_OS_STRING "solaris"
-
-			#if defined(FACTOR_X86)
-				#include "os-solaris-x86.32.hpp"
-			#elif defined(FACTOR_AMD64)
-				#include "os-solaris-x86.64.hpp"
-			#else
-				#error "Unsupported Solaris flavor"
-			#endif
-
 		#else
 			#error "Unsupported OS"
 		#endif
