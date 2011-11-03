@@ -501,9 +501,9 @@ update_boot_images() {
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
         get_url http://downloads.factorcode.org/images/latest/checksums.txt
-        factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`;
+        factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`
         set_md5sum
-        disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '` ;;
+        disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '`
         $ECHO "Factorcode md5: $factorcode_md5";
         $ECHO "Disk md5: $disk_md5";
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
