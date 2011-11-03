@@ -334,8 +334,9 @@ IN: bootstrap.x86
     jit-push-param
     jit-jump-quot ;
 
-: jit-safepoint ( -- )
-    0 [RIP+] EAX MOV rc-relative rel-safepoint ;
+[
+    0 [RIP+] EAX MOV rc-relative rel-safepoint
+] \ jit-safepoint jit-define
 
 [
     jit-start-context-and-delete

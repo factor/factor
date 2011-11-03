@@ -102,8 +102,8 @@ big-endian off
     0 CALL f rc-relative rel-word-pic
 ] jit-word-call jit-define
 
-! The signal-handler and leaf-signal-handler subprimitives are special-cased
-! in vm/quotations.cpp not to trigger generation of a stack frame, so they can
+! The *-signal-handler subprimitives are special-cased in vm/quotations.cpp
+! not to trigger generation of a stack frame, so they can
 ! peform their own prolog/epilog preserving registers.
 
 [| |
@@ -125,6 +125,22 @@ big-endian off
     ! Pop the fake leaf frame along with our return address
     leaf-frame-size cell - RET
 ] \ leaf-signal-handler define-sub-primitive
+
+[| |
+    jit-signal-handler-prolog :> frame-size
+    temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
+    temp0 CALL
+    frame-size jit-signal-handler-epilog
+    red-zone-size RET
+] \ ffi-signal-handler define-sub-primitive
+
+[| |
+    jit-signal-handler-prolog :> frame-size
+    temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
+    temp0 CALL
+    frame-size jit-signal-handler-epilog
+    red-zone-size 16 bootstrap-cell - + RET
+] \ ffi-leaf-signal-handler define-sub-primitive
 
 [
     ! load boolean
@@ -222,7 +238,6 @@ big-endian off
 ] jit-execute jit-define
 
 [
-    jit-safepoint
     stack-reg stack-frame-size bootstrap-cell - ADD
 ] jit-epilog jit-define
 

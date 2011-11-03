@@ -21,6 +21,8 @@ DEFER: stack-reg
 : jit-install-seh ( -- ) stack-reg bootstrap-cell ADD ;
 : jit-update-seh ( ctx-reg -- ) drop ;
 
+: red-zone-size ( -- n ) 0 ;
+
 << "vocab:cpu/x86/windows/bootstrap.factor" parse-file suffix! >> call
 << "vocab:cpu/x86/64/bootstrap.factor" parse-file suffix! >> call
 << "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >> call

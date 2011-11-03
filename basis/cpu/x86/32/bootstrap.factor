@@ -30,6 +30,7 @@ IN: bootstrap.x86
 : link-reg ( -- reg ) EBX ;
 : fixnum>slot@ ( -- ) temp0 2 SAR ;
 : rex-length ( -- n ) 0 ;
+: red-zone-size ( -- n ) 0 ;
 
 : jit-call ( name -- )
     0 CALL f rc-relative rel-dlsym ;
@@ -390,8 +391,9 @@ IN: bootstrap.x86
     EAX EDX [] MOV
     jit-jump-quot ;
 
-: jit-safepoint ( -- )
+[
     0 EAX MOVABS rc-absolute rel-safepoint ;
+] \ jit-safepoint jit-define
 
 [
     jit-start-context-and-delete
