@@ -79,9 +79,9 @@ ARTICLE: "bootstrap-cli-args" "Command line switches for bootstrap"
 "By default, all optional components are loaded. To load all optional components except for a given list, use the " { $snippet "-exclude=" } " switch; to only load specified optional components, use the " { $snippet "-include=" } "."
 $nl
 "For example, to build an image with the compiler but no other components, you could do:"
-{ $code "./factor -i=boot.macosx-ppc.image -include=compiler" }
+{ $code "./factor -i=boot.unix-x86.64.image -include=compiler" }
 "To build an image with everything except for the user interface and graphical tools,"
-{ $code "./factor -i=boot.macosx-ppc.image -exclude=\"ui ui.tools\"" }
+{ $code "./factor -i=boot.unix-x86.64.image -exclude=\"ui ui.tools\"" }
 "To generate a bootstrap image in the first place, see " { $link "bootstrap.image" } "." ;
 
 ARTICLE: "standard-cli-args" "Command line switches for general usage"
