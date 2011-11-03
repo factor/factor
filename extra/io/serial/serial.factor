@@ -31,6 +31,6 @@ M: serial-port dispose* ( serial -- ) stream>> dispose ;
     [ open-serial ] dip with-duplex-stream ; inline
 
 {
-    { [ os unix? ] [ "io.serial.unix" ] } 
+    { [ os linux? ] [ "io.serial.linux" ] } 
     { [ os windows? ] [ "io.serial.windows" ] }
 } cond require
