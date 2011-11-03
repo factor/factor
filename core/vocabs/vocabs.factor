@@ -140,7 +140,7 @@ GENERIC: require ( object -- )
 M: vocab require name>> require ;
 M: vocab-link require name>> require ;
 
-! When calling "foo.private" require, load "foo" instead, ! but only when
+! When calling "foo.private" require, load "foo" instead, but only when
 ! "foo.private" does not exist. The reason for this is that stage1 bootstrap
 ! starts out with some .private vocabs that contain primitives, and
 ! loading the public vocabs would cause circularity issues.

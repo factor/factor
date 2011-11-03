@@ -9,7 +9,7 @@ IN: bootstrap.help
 
     t load-help? set-global
 
-    [ dup lookup-vocab [ ] [ no-vocab ] ?if drop ] require-hook [
+    [ dup lookup-vocab [ drop ] [ no-vocab ] if ] require-hook [
         dictionary get values
         [ docs-loaded?>> not ] filter
         [ load-docs ] each
