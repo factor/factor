@@ -64,7 +64,7 @@ void factor_vm::record_callstack_sample(cell *begin, cell *end)
 void factor_vm::set_sampling_profiler(fixnum rate)
 {
 	bool sampling_p = !!rate;
-	if (sampling_p == sampling_profiler_p)
+	if (sampling_p == !!atomic::load(&sampling_profiler_p))
 		return;
 	
 	if (sampling_p)
@@ -90,7 +90,7 @@ void factor_vm::start_sampling_profiler(fixnum rate)
 	clear_samples();
 	samples.reserve(10*rate);
 	sample_callstacks.reserve(100*rate);
-	sampling_profiler_p = true;
+	atomic::store(&sampling_profiler_p, true);
 	start_sampling_profiler_timer();
 }
 
@@ -108,7 +108,7 @@ void factor_vm::primitive_sampling_profiler()
 
 void factor_vm::primitive_get_samples()
 {
-	if (sampling_profiler_p || samples.empty()) {
+	if (atomic::load(&sampling_profiler_p) || samples.empty()) {
 		ctx->push(false_object);
 	} else {
 		data_root<array> samples_array(allot_array(samples.size(), false_object),this);
