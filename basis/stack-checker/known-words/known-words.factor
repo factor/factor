@@ -368,6 +368,8 @@ M: object infer-call* \ call bad-macro-input ;
 \ enable-gc-events { } { } define-primitive
 \ eq? { object object } { object } define-primitive \ eq? make-foldable
 \ fclose { alien } { } define-primitive
+\ ffi-signal-handler { } { } define-primitive
+\ ffi-leaf-signal-handler { } { } define-primitive
 \ fflush { alien } { } define-primitive
 \ fgetc { alien } { object } define-primitive
 \ fixnum* { fixnum fixnum } { integer } define-primitive \ fixnum* make-foldable
