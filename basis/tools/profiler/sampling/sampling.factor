@@ -163,35 +163,41 @@ TUPLE: profile-node
     get-raw-profile-data (cross-section) ;
 
 : depth. ( depth -- )
-    [ "| " write ] times ;
+    [ "  " write ] times ;
 
 : by-total-time ( nodes -- nodes' )
     >alist [ second total-time>> ] inv-sort-with ;
 
 : duration. ( duration -- )
-    duration>milliseconds >float "%9.1fms" format-float write ;
+    duration>milliseconds >float "%9.1f" format-float write ;
 
 : percentage. ( num denom -- )
-    [ duration>seconds ] bi@ [ 100 * ] dip /f "%6.2f%%" format-float write ;
+    [ duration>seconds ] bi@ [ 100 * ] dip /f "%6.2f" format-float write ;
 
 DEFER: (profile.)
 
-:: times. ( node depth -- )
+:: times. ( node -- )
     node {
-        [ depth>> number>string 3 CHAR: \s pad-head write " " write depth depth. ]
-        [ total-time>> duration. ]
-        [ " (GC:" write [ gc-time>> ] [ total-time>> ] bi percentage. ]
-        [ ", JIT:" write [ jit-time>> ] [ total-time>> ] bi percentage. ]
-        [ ", FFI:" write [ foreign-time>> ] [ total-time>> ] bi percentage. ]
-        [ ", FT:" write [ foreign-thread-time>> ] [ total-time>> ] bi percentage. ")" write ]
+        [ depth>> number>string 4 CHAR: \s pad-head write " " write ]
+        [ total-time>> duration. " " write ]
+        [ [ gc-time>> ] [ total-time>> ] bi percentage. " " write ]
+        [ [ jit-time>> ] [ total-time>> ] bi percentage. " " write ]
+        [ [ foreign-time>> ] [ total-time>> ] bi percentage. " " write ]
+        [ [ foreign-thread-time>> ] [ total-time>> ] bi percentage. " " write ]
     } cleave ;
 
 :: (profile-node.) ( word node depth -- )
-    node depth times. ": " write word pprint-short nl
+    node times.
+    depth depth.
+    word pprint-short nl
     node children>> depth 1 + (profile.) ;
 
 : (profile.) ( nodes depth -- )
     [ by-total-time ] dip '[ _ (profile-node.) ] assoc-each ;
 
+: profile-heading. ( -- )
+    "depth   time ms  GC %  JIT %  FFI %   FT %" print ;
+   ! NNNN XXXXXXX.X XXXX.X XXXX.X XXXX.X XXXX.X | | foo
 : profile. ( tree -- )
+    profile-heading.
     [ 0 (profile-node.) ] assoc-each ;
