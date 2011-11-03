@@ -4,7 +4,7 @@ combinators.short-circuit continuations fry generalizations
 hashtables.identity io kernel kernel.private locals math
 math.statistics math.vectors memory namespaces prettyprint
 sequences sequences.generalizations sets sorting
-tools.profiler.sampling.private ;
+tools.profiler.sampling.private math.parser.private ;
 FROM: sequences => change-nth ;
 FROM: assocs => change-at ;
 IN: tools.profiler.sampling
@@ -136,27 +136,26 @@ TUPLE: profile-node
     get-raw-profile-data (flat) ;
 
 : depth. ( depth -- )
-    [ "  " write ] times ;
+    [ "| " write ] times ;
 
 : by-total-time ( nodes -- nodes' )
     >alist [ second total-time>> ] inv-sort-with ;
 
 : duration. ( duration -- )
-    samples-per-second get-global {
-        { [ dup 1000 <= ] [ drop duration>milliseconds >integer pprint "ms" write ] }
-        { [ dup 1,000,000 <= ] [ drop duration>microseconds >integer pprint "µs" write ] }
-        [ drop duration>nanoseconds >integer pprint "ns" write ]
-    } cond ;
+    duration>milliseconds >float "%9.1fms" format-float write ;
+
+: percentage. ( num denom -- )
+    [ duration>seconds ] bi@ [ 100 * ] dip /f "%6.2f%%" format-float write ;
 
 DEFER: (profile.)
 
 : times. ( node -- )
     {
         [ total-time>> duration. ]
-        [ " (GC:" write gc-time>> duration. ]
-        [ ", JIT:" write jit-time>> duration. ]
-        [ ", FFI:" write foreign-time>> duration. ]
-        [ ", FT:" write foreign-thread-time>> duration. ")" write ]
+        [ " (GC:" write [ gc-time>> ] [ total-time>> ] bi percentage. ]
+        [ ", JIT:" write [ jit-time>> ] [ total-time>> ] bi percentage. ]
+        [ ", FFI:" write [ foreign-time>> ] [ total-time>> ] bi percentage. ]
+        [ ", FT:" write [ foreign-thread-time>> ] [ total-time>> ] bi percentage. ")" write ]
     } cleave ;
 
 :: (profile-node.) ( word node depth -- )
