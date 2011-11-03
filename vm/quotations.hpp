@@ -16,6 +16,7 @@ struct quotation_jit : public jit {
 	bool primitive_call_p(cell i, cell length);
 	bool trivial_quotation_p(array *elements);
 	void emit_quot(cell quot);
+	void emit_epilog(bool stack_frame);
 	bool fast_if_p(cell i, cell length);
 	bool fast_dip_p(cell i, cell length);
 	bool fast_2dip_p(cell i, cell length);

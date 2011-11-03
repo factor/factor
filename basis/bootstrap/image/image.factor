@@ -532,6 +532,8 @@ M: quotation '
     \ set-fpu-state set-fpu-state-word set
     \ signal-handler signal-handler-word set
     \ leaf-signal-handler leaf-signal-handler-word set
+    \ ffi-signal-handler ffi-signal-handler-word set
+    \ ffi-leaf-signal-handler ffi-leaf-signal-handler-word set
     undefined-def undefined-quot set ;
 
 : emit-special-objects ( -- )
