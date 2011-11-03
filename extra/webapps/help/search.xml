@@ -21,10 +21,10 @@
             }
 
             .navbar {
-                background-color: #eeeee0;
+                background-color: #f3f2ea;
                 padding: 5px;
                 border: 1px solid #ccc;
-                font:9pt "Lucida Grande", "Lucida Sans Unicode", verdana, geneva, sans-serif;
+                font: 9pt sans-serif;
                 margin-bottom: 10px;
             }
 
