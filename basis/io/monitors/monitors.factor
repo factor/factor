@@ -78,5 +78,4 @@ SYMBOL: +rename-file+
     { [ os macosx? ] [ "io.monitors.macosx" require ] }
     { [ os linux? ] [ "io.monitors.linux" require ] }
     { [ os windows? ] [ "io.monitors.windows" require ] }
-    { [ os bsd? ] [ ] }
 } cond

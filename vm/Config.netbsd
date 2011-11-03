@@ -1,4 +1,0 @@
-include vm/Config.unix
-PLAF_DLL_OBJS += vm/os-genunix.o vm/os-netbsd.o vm/mvm-none.o
-LIBPATH = -L/usr/X11R7/lib -Wl,-rpath,/usr/X11R7/lib -L/usr/pkg/lib -Wl,-rpath,/usr/pkg/lib
-LIBS = -lm -lrt -lssl -lcrypto $(X11_UI_LIBS) -Wl,--export-dynamic

@@ -1,1 +1,1 @@
-bsd
+macosx

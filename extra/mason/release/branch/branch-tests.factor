@@ -13,13 +13,13 @@ system ;
     ] with-scope
 ] unit-test
 
-[ { "scp" "boot.unix-x86.64.image" "joe@blah.com:/stuff/clean/netbsd-x86-64" } ] [
+[ { "scp" "boot.unix-x86.64.image" "joe@blah.com:/stuff/clean/windows-x86-64" } ] [
     [
         "scp" scp-command set
         "joe" image-username set
         "blah.com" image-host set
         "/stuff/clean" image-directory set
-        netbsd target-os set
+        windows target-os set
         x86.64 target-cpu set
         upload-clean-image-cmd
     ] with-scope

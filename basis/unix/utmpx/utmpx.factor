@@ -64,5 +64,4 @@ M: unix utmpx>utmpx-record ( utmpx -- utmpx-record )
     
 os {
     { macosx [ "unix.utmpx.macosx" require ] }
-    { netbsd [ "unix.utmpx.netbsd" require ] }
 } case

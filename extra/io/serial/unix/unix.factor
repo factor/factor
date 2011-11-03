@@ -9,7 +9,6 @@ IN: io.serial.unix
 
 << {
     { [ os linux? ] [ "io.serial.unix.linux" ] }
-    { [ os bsd? ] [ "io.serial.unix.bsd" ] }
 } cond require >>
 
 FUNCTION: speed_t cfgetispeed ( termios* t ) ;

@@ -22,7 +22,7 @@ HELP: realloc
 HELP: memcpy
 { $values { "dst" c-ptr } { "src" c-ptr } { "size" "a non-negative integer" } }
 { $description "Copies " { $snippet "size" } " bytes from " { $snippet "src" } " to " { $snippet "dst" } "." }
-{ $warning "As per the BSD C library documentation, the behavior is undefined if the source and destination overlap." } ;
+{ $warning "According to the BSD C library documentation, the behavior is undefined if the source and destination overlap." } ;
 
 HELP: check-ptr
 { $values { "c-ptr" "an alien address, byte array, or " { $link f } } }

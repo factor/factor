@@ -4,11 +4,6 @@ USING: accessors io io.serial io.serial.unix kernel literals
 math.bitwise tools.test ;
 IN: io.serial.unix
 
-! "/dev/ttyS0" ! netbsd
-! "/dev/dty00" ! netbsd
-! "/dev/ttyd0" ! freebsd
-! "/dev/ttyU0" ! openbsd
-
 : <serial-port-test> ( -- serial-port )
     "/dev/ttyS0" 19200 <serial-port> ;
 

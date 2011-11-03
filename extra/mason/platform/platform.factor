@@ -12,7 +12,7 @@ IN: mason.platform
     target-variant get [ "-" glue ] when* ;
 
 : gnu-make ( -- string )
-    target-os get { freebsd openbsd netbsd } member? "gmake" "make" ? ;
+    "make" ;
 
 : boot-image-arch ( -- string )
     target-os get target-cpu get arch ;
