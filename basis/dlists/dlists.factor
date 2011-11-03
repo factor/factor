@@ -49,7 +49,7 @@ M: dlist equal?
         [ front>> ] bi@
         [ 2dup dlist-nodes= ]
         [ [ next>> ] bi@ ] while 
-        2array or not
+        or not
     ] [
         2drop f
     ] if ;
