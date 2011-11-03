@@ -13,7 +13,7 @@ system ;
     ] with-scope
 ] unit-test
 
-[ { "scp" "boot.unix-x86.64.image" "joe@blah.com:/stuff/clean/windows-x86-64" } ] [
+[ { "scp" "boot.windows-x86.64.image" "joe@blah.com:/stuff/clean/windows-x86-64" } ] [
     [
         "scp" scp-command set
         "joe" image-username set
