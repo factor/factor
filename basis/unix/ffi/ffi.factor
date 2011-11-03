@@ -9,8 +9,7 @@ IN: unix.ffi
 
 {
     { [ os linux? ] [ "unix.ffi.linux" require ] }
-    { [ os bsd? ] [ "unix.ffi.bsd" require ] }
-    { [ os solaris? ] [ "unix.ffi.solaris" require ] }
+    { [ os macosx? ] [ "unix.ffi.macosx" require ] }
 } cond
 
 >>

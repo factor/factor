@@ -80,22 +80,13 @@ default:
 help:
 	@echo "Run '$(MAKE)' with one of the following parameters:"
 	@echo ""
-	@echo "freebsd-x86-32"
-	@echo "freebsd-x86-64"
 	@echo "linux-x86-32"
 	@echo "linux-x86-64"
 	@echo "linux-ppc-32"
 	@echo "linux-ppc-64"
 	@echo "linux-arm"
-	@echo "openbsd-x86-32"
-	@echo "openbsd-x86-64"
-	@echo "netbsd-x86-32"
-	@echo "netbsd-x86-64"
 	@echo "macosx-x86-32"
 	@echo "macosx-x86-64"
-	@echo "macosx-ppc"
-	@echo "solaris-x86-32"
-	@echo "solaris-x86-64"
 	@echo "windows-x86-32"
 	@echo "windows-x86-64"
 	@echo ""
@@ -107,27 +98,6 @@ help:
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
 ALL = factor factor-ffi-test factor-lib
-
-openbsd-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.x86.32
-
-openbsd-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.x86.64
-
-freebsd-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32
-
-freebsd-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64
-
-netbsd-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.x86.32
-
-netbsd-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.x86.64
-
-macosx-ppc:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.ppc
 
 macosx-x86-32:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.32
@@ -149,12 +119,6 @@ linux-ppc-64:
 
 linux-arm:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm
-
-solaris-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.solaris.x86.32
-
-solaris-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.solaris.x86.64
 
 windows-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32

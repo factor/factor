@@ -1,2 +1,2 @@
 linux
-bsd
+macosx

@@ -130,6 +130,6 @@ M: string set-effective-user ( string -- )
     ?user-id (set-effective-user) ;
 
 os {
-    { [ dup bsd? ] [ drop "unix.users.bsd" require ] }
+    { [ dup macosx? ] [ drop "unix.users.macosx" require ] }
     { [ dup linux? ] [ drop ] }
 } cond

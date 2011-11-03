@@ -37,17 +37,12 @@ ARTICLE: "os" "Operating system detection"
 { $subsections os }
 "Supported operating systems:"
 { $subsections
-    freebsd
     linux
     macosx
-    openbsd
-    netbsd
-    solaris
     windows
 }
 "Operating system families:"
 { $subsections
-    bsd
     unix
     windows
 } ;

@@ -1,3 +1,0 @@
-include vm/Config.macosx
-PLAF_DLL_OBJS += vm/cpu-ppc.macosx.o
-CFLAGS += -arch ppc -force_cpusubtype_ALL

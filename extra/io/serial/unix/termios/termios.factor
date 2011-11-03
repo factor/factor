@@ -5,5 +5,5 @@ IN: io.serial.unix.termios
 
 {
     { [ os linux? ] [ "io.serial.unix.termios.linux" ] }
-    { [ os bsd? ] [ "io.serial.unix.termios.bsd" ] }
+    { [ os macosx? ] [ "io.serial.unix.termios.macosx" ] }
 } cond require

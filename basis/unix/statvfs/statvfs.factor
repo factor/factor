@@ -6,7 +6,4 @@ IN: unix.statvfs
 os {
     { linux   [ "unix.statvfs.linux"   require ] }
     { macosx  [ "unix.statvfs.macosx"  require ] }
-    { freebsd [ "unix.statvfs.freebsd" require ] }
-    { netbsd  [ "unix.statvfs.netbsd"  require ] }
-    { openbsd [ "unix.statvfs.openbsd" require ] }
 } case

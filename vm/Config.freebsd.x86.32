@@ -1,2 +1,0 @@
-include vm/Config.freebsd
-include vm/Config.x86.32
