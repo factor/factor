@@ -192,7 +192,6 @@ CONSTANT: primitive-types
 
 : 8-byte-alignment ( c-type -- c-type )
     {
-        { [ cpu ppc? os macosx? and ] [ 4 >>align 8 >>align-first ] }
         { [ cpu x86.32? os windows? not and ] [ 4 >>align 4 >>align-first ] }
         [ 8 >>align 8 >>align-first ]
     } cond ;
@@ -437,7 +436,7 @@ M: pointer lookup-c-type
         \ uint lookup-c-type \ size_t typedef
     ] if
 
-    cpu ppc? os macosx? and \ uint \ uchar ? lookup-c-type clone
+    \ uchar lookup-c-type clone
         [ >c-bool ] >>unboxer-quot
         [ c-bool> ] >>boxer-quot
         object >>boxed-class
