@@ -24,9 +24,8 @@ CONSTANT: ignore-words
 
 : profile ( quot -- )
     samples-per-second get-global profiling
-    [ 0 profiling ] [
-        (get-samples) raw-profile-data set-global
-    ] cleanup ; inline
+    [ 0 profiling (get-samples) raw-profile-data set-global ]
+    [ ] cleanup ; inline
 
 : total-sample-count ( sample -- count ) 0 swap nth ;
 : gc-sample-count ( sample -- count ) 1 swap nth ;
