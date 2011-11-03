@@ -42,6 +42,7 @@ enum special_object {
 	JIT_WORD_CALL,
 	JIT_IF_WORD,
 	JIT_IF,
+	JIT_SAFEPOINT,
 	JIT_EPILOG,
 	JIT_RETURN,
 	JIT_PROFILING,
@@ -56,23 +57,25 @@ enum special_object {
 	JIT_DECLARE_WORD,
 
 	/* External entry points */
-	C_TO_FACTOR_WORD,
+	C_TO_FACTOR_WORD = 43,
 	LAZY_JIT_COMPILE_WORD,
 	UNWIND_NATIVE_FRAMES_WORD,
 	GET_FPU_STATE_WORD,
 	SET_FPU_STATE_WORD,
 	SIGNAL_HANDLER_WORD,
 	LEAF_SIGNAL_HANDLER_WORD,
+	FFI_SIGNAL_HANDLER_WORD,
+	FFI_LEAF_SIGNAL_HANDLER_WORD,
 
 	/* Incremented on every modify-code-heap call; invalidates call( inline
 	caching */
-	REDEFINITION_COUNTER = 49,
+	REDEFINITION_COUNTER = 52,
 
 	/* Callback stub generation in callbacks.c */
-	CALLBACK_STUB = 50,
-	
+	CALLBACK_STUB = 53,
+
 	/* Polymorphic inline cache generation in inline_cache.c */
-	PIC_LOAD = 51,
+	PIC_LOAD = 54,
 	PIC_TAG,
 	PIC_TUPLE,
 	PIC_CHECK_TAG,
@@ -82,25 +85,25 @@ enum special_object {
 	PIC_MISS_TAIL_WORD,
 
 	/* Megamorphic cache generation in dispatch.c */
-	MEGA_LOOKUP = 59,
+	MEGA_LOOKUP = 62,
 	MEGA_LOOKUP_WORD,
 	MEGA_MISS_WORD,
 
-	OBJ_UNDEFINED = 62,       /* default quotation for undefined words */
+	OBJ_UNDEFINED = 65,       /* default quotation for undefined words */
 
-	OBJ_STDERR = 63,          /* stderr FILE* handle */
+	OBJ_STDERR = 66,          /* stderr FILE* handle */
 
-	OBJ_STAGE2 = 64,          /* have we bootstrapped? */
+	OBJ_STAGE2 = 67,          /* have we bootstrapped? */
 
-	OBJ_CURRENT_THREAD = 65,
+	OBJ_CURRENT_THREAD = 68,
 
-	OBJ_THREADS = 66,
-	OBJ_RUN_QUEUE = 67,
-	OBJ_SLEEP_QUEUE = 68,
+	OBJ_THREADS = 69,
+	OBJ_RUN_QUEUE = 70,
+	OBJ_SLEEP_QUEUE = 71,
 
-	OBJ_VM_COMPILER = 69,     /* version string of the compiler we were built with */
+	OBJ_VM_COMPILER = 72,     /* version string of the compiler we were built with */
 
-	OBJ_WAITING_CALLBACKS = 70,
+	OBJ_WAITING_CALLBACKS = 73,
 };
 
 /* save-image-and-exit discards special objects that are filled in on startup

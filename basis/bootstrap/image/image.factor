@@ -166,46 +166,49 @@ SPECIAL-OBJECT: jit-word-jump 26
 SPECIAL-OBJECT: jit-word-call 27
 SPECIAL-OBJECT: jit-if-word 28
 SPECIAL-OBJECT: jit-if 29
-SPECIAL-OBJECT: jit-epilog 30
-SPECIAL-OBJECT: jit-return 31
-SPECIAL-OBJECT: jit-profiling 32
-SPECIAL-OBJECT: jit-push 33
-SPECIAL-OBJECT: jit-dip-word 34
-SPECIAL-OBJECT: jit-dip 35
-SPECIAL-OBJECT: jit-2dip-word 36
-SPECIAL-OBJECT: jit-2dip 37
-SPECIAL-OBJECT: jit-3dip-word 38
-SPECIAL-OBJECT: jit-3dip 39
-SPECIAL-OBJECT: jit-execute 40
-SPECIAL-OBJECT: jit-declare-word 41
+SPECIAL-OBJECT: jit-safepoint 30
+SPECIAL-OBJECT: jit-epilog 31
+SPECIAL-OBJECT: jit-return 32
+SPECIAL-OBJECT: jit-profiling 33
+SPECIAL-OBJECT: jit-push 34
+SPECIAL-OBJECT: jit-dip-word 35
+SPECIAL-OBJECT: jit-dip 36
+SPECIAL-OBJECT: jit-2dip-word 37
+SPECIAL-OBJECT: jit-2dip 38
+SPECIAL-OBJECT: jit-3dip-word 39
+SPECIAL-OBJECT: jit-3dip 40
+SPECIAL-OBJECT: jit-execute 41
+SPECIAL-OBJECT: jit-declare-word 42
 
-SPECIAL-OBJECT: c-to-factor-word 42
-SPECIAL-OBJECT: lazy-jit-compile-word 43
-SPECIAL-OBJECT: unwind-native-frames-word 44
-SPECIAL-OBJECT: fpu-state-word 45
-SPECIAL-OBJECT: set-fpu-state-word 46
-SPECIAL-OBJECT: signal-handler-word 47
-SPECIAL-OBJECT: leaf-signal-handler-word 48
+SPECIAL-OBJECT: c-to-factor-word 43
+SPECIAL-OBJECT: lazy-jit-compile-word 44
+SPECIAL-OBJECT: unwind-native-frames-word 45
+SPECIAL-OBJECT: fpu-state-word 46
+SPECIAL-OBJECT: set-fpu-state-word 47
+SPECIAL-OBJECT: signal-handler-word 48
+SPECIAL-OBJECT: leaf-signal-handler-word 49
+SPECIAL-OBJECT: ffi-signal-handler-word 50
+SPECIAL-OBJECT: ffi-leaf-signal-handler-word 51
 
-SPECIAL-OBJECT: callback-stub 50
+SPECIAL-OBJECT: callback-stub 53
 
 ! PIC stubs
-SPECIAL-OBJECT: pic-load 51
-SPECIAL-OBJECT: pic-tag 52
-SPECIAL-OBJECT: pic-tuple 53
-SPECIAL-OBJECT: pic-check-tag 54
-SPECIAL-OBJECT: pic-check-tuple 55
-SPECIAL-OBJECT: pic-hit 56
-SPECIAL-OBJECT: pic-miss-word 57
-SPECIAL-OBJECT: pic-miss-tail-word 58
+SPECIAL-OBJECT: pic-load 54
+SPECIAL-OBJECT: pic-tag 55
+SPECIAL-OBJECT: pic-tuple 56
+SPECIAL-OBJECT: pic-check-tag 57
+SPECIAL-OBJECT: pic-check-tuple 58
+SPECIAL-OBJECT: pic-hit 59
+SPECIAL-OBJECT: pic-miss-word 60
+SPECIAL-OBJECT: pic-miss-tail-word 61
 
 ! Megamorphic dispatch
-SPECIAL-OBJECT: mega-lookup 59
-SPECIAL-OBJECT: mega-lookup-word 60
-SPECIAL-OBJECT: mega-miss-word 61
+SPECIAL-OBJECT: mega-lookup 62
+SPECIAL-OBJECT: mega-lookup-word 63
+SPECIAL-OBJECT: mega-miss-word 64
 
 ! Default definition for undefined words
-SPECIAL-OBJECT: undefined-quot 62
+SPECIAL-OBJECT: undefined-quot 65
 
 : special-object-offset ( symbol -- n )
     special-objects get at header-size + ;
