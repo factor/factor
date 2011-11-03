@@ -212,9 +212,10 @@ void factor_vm::start_standalone_factor(int argc, vm_char **argv)
 
 factor_vm *new_factor_vm()
 {
-	factor_vm *newvm = new factor_vm();
+	THREADHANDLE thread = thread_id();
+	factor_vm *newvm = new factor_vm(thread);
 	register_vm_with_thread(newvm);
-	thread_vms[thread_id()] = newvm;
+	thread_vms[thread] = newvm;
 
 	return newvm;
 }

@@ -36,6 +36,9 @@ struct factor_vm
 	// ^^^^^^
 	//
 
+        /* Handle to the main thread we run in */
+        THREADHANDLE thread;
+
 	/* Data stack and retain stack sizes */
 	cell datastack_size, retainstack_size, callstack_size;
 
@@ -754,7 +757,7 @@ struct factor_vm
 	void call_fault_handler(exception_type_t exception, exception_data_type_t code, MACH_EXC_STATE_TYPE *exc_state, MACH_THREAD_STATE_TYPE *thread_state, MACH_FLOAT_STATE_TYPE *float_state);
   #endif
 
-	factor_vm();
+	factor_vm(THREADHANDLE thread_id);
 	~factor_vm();
 };
 

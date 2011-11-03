@@ -3,8 +3,9 @@
 namespace factor
 {
 
-factor_vm::factor_vm() :
+factor_vm::factor_vm(THREADHANDLE thread) :
 	nursery(0,0),
+        thread(thread),
 	callback_id(0),
 	c_to_factor_func(NULL),
 	counting_profiler_p(false),
