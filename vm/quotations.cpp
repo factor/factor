@@ -88,7 +88,9 @@ bool quotation_jit::word_stack_frame_p(cell obj)
 	// See #295.
 	return (to_boolean(untag<word>(obj)->subprimitive)
 			&& obj != parent->special_objects[SIGNAL_HANDLER_WORD]
-			&& obj != parent->special_objects[LEAF_SIGNAL_HANDLER_WORD])
+			&& obj != parent->special_objects[LEAF_SIGNAL_HANDLER_WORD]
+			&& obj != parent->special_objects[FFI_SIGNAL_HANDLER_WORD]
+			&& obj != parent->special_objects[FFI_LEAF_SIGNAL_HANDLER_WORD])
 		|| obj == parent->special_objects[JIT_PRIMITIVE_WORD];
 }
 
@@ -120,6 +122,12 @@ bool quotation_jit::stack_frame_p()
 bool quotation_jit::trivial_quotation_p(array *elements)
 {
 	return array_capacity(elements) == 1 && tagged<object>(array_nth(elements,0)).type_p(WORD_TYPE);
+}
+
+void quotation_jit::emit_epilog(bool stack_frame)
+{
+	emit(parent->special_objects[JIT_SAFEPOINT]);
+	if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
 }
 
 void quotation_jit::emit_quot(cell quot_)
@@ -172,7 +180,7 @@ void quotation_jit::iterate_quotation()
 			/* Everything else */
 			else if(i == length - 1)
 			{
-				if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
+				emit_epilog(stack_frame);
 				tail_call = true;
 				word_jump(obj.value());
 			}
@@ -210,7 +218,7 @@ void quotation_jit::iterate_quotation()
 			   mutually recursive in the library, but both still work) */
 			if(fast_if_p(i,length))
 			{
-				if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
+				emit_epilog(stack_frame);
 				tail_call = true;
 
 				emit_quot(array_nth(elements.untagged(),i));
@@ -247,7 +255,7 @@ void quotation_jit::iterate_quotation()
 			/* Method dispatch */
 			if(mega_lookup_p(i,length))
 			{
-				if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
+				emit_epilog(stack_frame);
 				tail_call = true;
 				emit_mega_cache_lookup(
 					array_nth(elements.untagged(),i),
@@ -271,7 +279,7 @@ void quotation_jit::iterate_quotation()
 	{
 		set_position(length);
 
-		if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
+		emit_epilog(stack_frame);
 		emit(parent->special_objects[JIT_RETURN]);
 	}
 }
