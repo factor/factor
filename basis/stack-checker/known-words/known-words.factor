@@ -14,7 +14,7 @@ compiler.units system.private combinators tools.memory.private
 combinators.short-circuit locals locals.backend locals.types
 combinators.private stack-checker.values generic.single
 generic.single.private alien.libraries tools.dispatch.private
-tools.profiler.counting.private macros
+macros
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -26,6 +26,8 @@ stack-checker.dependencies
 stack-checker.recursive-state
 stack-checker.row-polymorphism ;
 QUALIFIED-WITH: generic.single.private gsp
+QUALIFIED-WITH: tools.profiler.counting.private counting
+QUALIFIED-WITH: tools.profiler.sampling.private sampling
 IN: stack-checker.known-words
 
 : infer-special ( word -- )
@@ -423,7 +425,10 @@ M: object infer-call* \ call bad-macro-input ;
 \ modify-code-heap { array object object } { } define-primitive
 \ nano-count { } { integer } define-primitive \ nano-count make-flushable
 \ optimized? { word } { object } define-primitive
-\ profiling { object } { } define-primitive
+\ counting:profiling { object } { } define-primitive
+\ sampling:profiling { object } { } define-primitive
+\ sampling:(get-samples) { } { object } define-primitive
+\ sampling:(clear-samples) { } { } define-primitive
 \ quot-compiled? { quotation } { object } define-primitive
 \ quotation-code { quotation } { integer integer } define-primitive \ quotation-code make-flushable
 \ reset-dispatch-stats { } { } define-primitive
