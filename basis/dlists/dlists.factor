@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2009 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators deques fry hashtables kernel math
-math.order parser search-deques sequences summary vocabs.loader ;
+USING: accessors arrays combinators combinators.short-circuit
+deques fry hashtables kernel parser search-deques sequences
+summary vocabs.loader ;
 IN: dlists
 
 <PRIVATE
@@ -32,6 +33,26 @@ TUPLE: dlist
 M: dlist deque-empty? front>> not ; inline
 
 M: dlist-node node-value obj>> ;
+
+<PRIVATE
+
+: dlist-nodes= ( dlist-node/f dlist-node/f -- ? )
+    {
+        [ [ dlist-node? ] both? ]
+        [ [ obj>> ] bi@ = ] 
+    } 2&& ; inline
+
+PRIVATE>
+
+M: dlist equal?
+    over dlist? [
+        [ front>> ] bi@
+        [ 2dup dlist-nodes= ]
+        [ [ next>> ] bi@ ] while 
+        2array { f f } =
+    ] [
+        2drop f
+    ] if ;
 
 : set-prev-when ( dlist-node dlist-node/f -- )
     [ prev<< ] [ drop ] if* ; inline
