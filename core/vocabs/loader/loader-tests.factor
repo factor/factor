@@ -1,7 +1,7 @@
 USING: vocabs.loader tools.test continuations vocabs math
 kernel arrays sequences namespaces io.streams.string
 parser source-files words assocs classes.tuple definitions
-debugger compiler.units accessors eval
+debugger compiler.units accessors eval vocabs.hierarchy
 combinators vocabs.parser grouping vocabs.files vocabs.refresh ;
 IN: vocabs.loader.tests
 
@@ -185,6 +185,8 @@ forget-junk
 [ ] [ "vocabs.loader.test.m" require ] unit-test
 [ t ] [ "vocabs.loader.test.n" lookup-vocab >boolean ] unit-test
 
+[ ] [ "vocabs" load ] unit-test
+[ f ] [ "vocabs.loader.test.p" lookup-vocab ] unit-test
 [ ] [ "vocabs.loader.test.p.private" require ] unit-test
 [ { "foo" } ] [ "vocabs.loader.test.p" words [ name>> ] map ] unit-test
 

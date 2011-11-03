@@ -138,28 +138,29 @@ SYMBOL: blacklist
 : add-to-blacklist ( error vocab -- )
     vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
 
-GENERIC: (load-vocab) ( name -- vocab )
+GENERIC: (require) ( name -- )
 
-M: vocab (load-vocab)
+M: vocab (require)
     [
-        dup source-loaded?>> +parsing+ eq? [
+        dup source-loaded?>> +parsing+ eq?  [ drop ] [
             dup source-loaded?>> [ dup load-source ] unless
             dup docs-loaded?>> [ dup load-docs ] unless
-        ] unless
+            drop
+        ] if
     ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
-M: vocab-link (load-vocab)
-    vocab-name (load-vocab) ;
+M: vocab-link (require)
+    vocab-name (require) ;
 
-M: string (load-vocab) create-vocab (load-vocab) ;
+M: string (require) create-vocab (require) ;
 
 PRIVATE>
 
 [
-    dup vocab-name blacklist get at* [ rethrow ] [
-        drop dup find-vocab-root
-        [ (load-vocab) ] [ dup lookup-vocab [ ] [ no-vocab ] ?if ] if
-    ] if drop
+    dup vocab-name blacklist get at*
+    [ rethrow ]
+    [ drop dup find-vocab-root [ (require) ] [ drop ] if ]
+    if
 ] require-hook set-global
 
 M: vocab-spec where vocab-source-path dup [ 1 2array ] when ;
