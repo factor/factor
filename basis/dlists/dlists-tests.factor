@@ -85,3 +85,13 @@ IN: dlists.tests
 [ V{ 2 4 } ] [ <dlist> { 1 2 3 4 5 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
 [ V{ 0 2 4 } ] [ <dlist> { 0 1 2 3 4 5 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
 
+[ t ] [ DL{ } DL{ } = ] unit-test
+[ t ] [ DL{ 1 } DL{ 1 } = ] unit-test
+[ t ] [ DL{ 1 2 } DL{ 1 2 } = ] unit-test
+[ t ] [ DL{ 1 1 } DL{ 1 1 } = ] unit-test
+[ f ] [ DL{ 1 2 3 } DL{ 1 2 } = ] unit-test
+[ f ] [ DL{ 1 2 } DL{ 1 2 3 } = ] unit-test
+[ f ] [ DL{ } DL{ 1 } = ] unit-test
+[ f ] [ DL{ f } DL{ 1 } = ] unit-test
+[ f ] [ f DL{ } = ] unit-test
+[ f ] [ DL{ } f = ] unit-test
