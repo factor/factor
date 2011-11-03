@@ -21,8 +21,6 @@
 		
 		#ifdef FACTOR_X86
 			#include "os-macosx-x86.32.hpp"
-		#elif defined(FACTOR_PPC)
-			#include "os-macosx-ppc.hpp"
 		#elif defined(FACTOR_AMD64)
 			#include "os-macosx-x86.64.hpp"
 		#else

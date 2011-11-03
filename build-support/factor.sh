@@ -85,13 +85,19 @@ set_md5sum() {
 set_gcc() {
     case $OS in
         macosx)
-            if xcodebuild -version | grep 'Xcode 4' >/dev/null; then
+            xcode_major=`xcodebuild -version | sed -E -ne 's/^Xcode ([0-9]+).*$/\1/p'`
+            if [[ $xcode_major -ge 4 ]]; then
                 CC=clang
+                CPP=clang++
             else
                 CC=gcc
+                CPP=g++
             fi
         ;;
-        *) CC=gcc;;
+        *)
+            CC=gcc
+            CPP=g++
+        ;;
     esac
 }
 
@@ -183,46 +189,6 @@ find_os() {
         *Darwin*) OS=macosx;;
         *linux*) OS=linux;;
         *Linux*) OS=linux;;
-        *BSD*)
-            echo "Here's a nickel, kid:"
-            echo "                                  ..;;iiiittttjjttttii;;........                                    "
-            echo "                              ..ttLLGGGGffttjjjjttttttjjjjtt;;....                                  "
-            echo "                          ..iiLLLLjjffffiiiiffttLLjjiiiiiiiiffjjii....                              "
-            echo "                        ;;LLttii;;iiiittttiiiittttffLLGGiiii;;iiLLLL;;..                            "
-            echo "                    ..iiGGii..ii;;iiiittiittiiiiiittffffGGtt;;;;;;ffDDii..                          "
-            echo "                    iiDD;;;;..;;ttttiittiittttiiiittttffDDEE;;,,;;;;ffKKtt..                        "
-            echo "                  iiKKii..,,..iiii;;ii;;iittttttttttjjjjffGGLL::....;;LLWWtt..                      "
-            echo "                ..DDff..;;ii;;ii::,,;;;;iiiittttttjjffttjjLLDDtt..iiii;;KKWWii..                    "
-            echo "                LLLL;;;;ii;;;;;;,,;;;;;;ii;;ttttffffttttttLLGGKK..iiiiiiiiWWDD;;                    "
-            echo "              ;;DD;;;;ii;;;;;;;;,,;;;;iiiiiiiijjffffffttttLLGGWWii..iiiiiiGG##jj..                  "
-            echo "              LLtt::ii;;....ii::;;,,;;;;iiiittttLLLLLLttttttGGKKGG;;;;iiiiii##KK;;                  "
-            echo "            ..LL..iiii;;::::;;;;,,,,;;;;ii;;ttiiDDLLtttt;;iittLL##ii;;iiii;;WW##tt..                "
-            echo "            ii;;;;iiff  ..;;..ii..;;;;;;ii;;iiiiDDLLiiii;;ttLLEE##tt;;;;ii;;DD##GG..                "
-            echo "            tt..iiGG::....ii..;;;;;;;;;;;;;;iiiiDDLLiiiiiiffGGWWKKiiii;;ii..tt##KK;;                "
-            echo "            ff;;GGtt..,,  tt..;;;;,,;;iiii;;iittGGLLttffLLGGKKDDjjLLii;;;;,,ii##WWii                "
-            echo "            GGttii..;;..  ff::;;..;;iiiitt..iiiittGGffLLEEffEE;;;;EEtt;;::..;;WW##tt                "
-            echo "            GGjjii..ii..,,ff..::;;iiiiiitt..;;iiffttttffGGWWKKiiiiLLDD..;;....WW##tt                "
-            echo "            GGff,,..ii..iiii,,..::iiiiii;;..;;jjjjiiiiffGG##DDttiiffKK;;..  ..WW##jj                "
-            echo "            GGff..;;;;..LL..;;;;..;;iiii..;;ttLLiiiiiiffGGKKEE..jjLLKKjj..  ..WW##tt                "
-            echo "            LLff..ii..iiGG..::......;;;;;;;;LL;;iittttttLLKKLLffKKLLKKff..  ;;####ii                "
-            echo "            LLjj..;;  LLii;;..;;......;;;;iitt;;ttLLttiiGGGGGGffDDKKii::..  tt##WW;;                "
-            echo "            jjtt....;;GGttjj  ......;;ii;;iitt;;ttffttttLLDDGGttDDKK;;..    LL##KK..                "
-            echo "            ;;ii;;..LLtt;;;;  ....;;ii....iiGG;;iijjffLLGGKKjjGGKKGG....    KK##LL                  "
-            echo "            ..ffiittttiiii;;  ....;;ii,,;;ttLLttiittjjLLGGttjjGGKKtt      iiWW##ii                  "
-            echo "              ttLLii;;iiii;;  ....,,;;  ..;;ttDDiiiiffffffffGGGGGG..      GG##KK..                  "
-            echo "              ..LLjjii;;;;....::;;,,;;;;..;;ttDDttttjjttffLLLLDDff      ;;WW##tt                    "
-            echo "                iiGGii,,....,,iiiiii,,ii  ::ttEEttffDDttLLttLLKKii      GG##KK..                    "
-            echo "                  LLtt......,,;;;;;;iiiiii;;;;KKffLLKK;;;;tttttt      tt##WWii                      "
-            echo "                  ..ii;;;;..;;iiii;;tt,,jj  iiGGffLLKK....;;....    ;;WW##ff..                      "
-            echo "                    ..;;..::;;iiiiii;;..jj;;..GGttffEE........    iiKK##LL..                        "
-            echo "                      ..,,..;;;;;;;;..;;iitt,,ttttjjLL          iiKK##LL..                          "
-            echo "                        ............  ,,;;;;..;;;;LLii      ..ttKKKKtt..                            "
-            echo "                            ..::........;;......;;;;;;  ..iiDDWWLL,,                                "
-            echo "                              ....;;................iittGGDDff;;                                    "
-            echo "                                    ....;;;;;;;;;;iiiiii::..                                        "
-            echo "Get yourself a real OS."
-            echo "http://www.microsoft.com/"
-            exit_script 1
     esac
 }
 
@@ -334,10 +300,7 @@ check_os_arch_word() {
 
 set_build_info() {
     check_os_arch_word
-    if [[ $OS == macosx && $ARCH == ppc ]] ; then
-        MAKE_IMAGE_TARGET=macosx-ppc
-        MAKE_TARGET=macosx-ppc
-    elif [[ $OS == linux && $ARCH == ppc ]] ; then
+    if [[ $OS == linux && $ARCH == ppc ]] ; then
         MAKE_IMAGE_TARGET=linux-ppc.32
         MAKE_TARGET=linux-ppc-32
     elif [[ $OS == windows && $ARCH == x86 && $WORD == 64 ]] ; then
