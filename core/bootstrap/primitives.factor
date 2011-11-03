@@ -350,6 +350,8 @@ tuple
     { "set-fpu-state" "kernel.private" ( -- ) }
     { "signal-handler" "kernel.private" ( -- ) }
     { "leaf-signal-handler" "kernel.private" ( -- ) }
+    { "ffi-signal-handler" "kernel.private" ( -- ) }
+    { "ffi-leaf-signal-handler" "kernel.private" ( -- ) }
     { "unwind-native-frames" "kernel.private" ( -- ) }
     { "set-callstack" "kernel.private" ( callstack -- * ) }
     { "lazy-jit-compile" "kernel.private" ( -- ) }
