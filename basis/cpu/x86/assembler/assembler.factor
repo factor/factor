@@ -958,3 +958,8 @@ PRIVATE>
 ! interrupt instructions
 
 : INT ( n -- ) dup 3 = [ drop HEX: cc , ] [ HEX: cd , 1, ] if ;
+
+! push/pop flags
+
+: PUSHF ( -- ) HEX: 9c , ;
+: POPF  ( -- ) HEX: 9d , ;
