@@ -112,6 +112,7 @@ big-endian off
     temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
     temp0 CALL
     frame-size jit-signal-handler-epilog
+    0 RET
 ] \ signal-handler define-sub-primitive
 
 : leaf-frame-size ( -- n ) 4 bootstrap-cells ;
