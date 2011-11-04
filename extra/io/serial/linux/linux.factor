@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.struct combinators io.backend.unix
 io.ports io.serial io.streams.duplex kernel literals math
-system unix unix.ffi ;
+system unix unix.ffi io.serial.linux.ffi ;
 IN: io.serial.linux
 
 : fd>duplex-stream ( fd -- duplex-stream )

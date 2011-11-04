@@ -1,6 +1,7 @@
 USING: kernel alien.c-types alien.data alien.strings sequences
 math alien.syntax unix namespaces continuations threads assocs
-io.backend.unix io.encodings.utf8 unix.types unix.utilities fry ;
+io.backend.unix io.encodings.utf8 unix.types unix.utilities fry 
+unix.ffi ;
 IN: unix.process
 
 ! Low-level Unix process launching utilities. These are used
@@ -37,9 +38,6 @@ FUNCTION: int execve ( c-string path, c-string* argv, c-string* envp ) ;
 
 : with-fork ( child parent -- )
     [ fork-process ] 2dip if-zero ; inline
-
-CONSTANT: SIGKILL 9
-CONSTANT: SIGTERM 15
 
 FUNCTION: int kill ( pid_t pid, int sig ) ;
 
