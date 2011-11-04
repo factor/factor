@@ -30,8 +30,8 @@ ifeq ($(LEOPARD_P),0)
 	CPP = g++-4.2
 endif
 
-ifeq ($(XCODE_4_P),0)
-	CC = clang
-	CPP = clang++
-endif
+# ifeq ($(XCODE_4_P),0)
+# 	CC = clang
+# 	CPP = clang++
+# endif
 
