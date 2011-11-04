@@ -124,7 +124,7 @@ big-endian off
     temp0 CALL
     frame-size jit-signal-handler-epilog
     ! Pop the fake leaf frame along with our return address
-    leaf-frame-size cell - RET
+    leaf-frame-size bootstrap-cell - RET
 ] \ leaf-signal-handler define-sub-primitive
 
 [| |
