@@ -96,10 +96,12 @@ IN: bootstrap.x86
 
 :: jit-signal-handler-prolog ( -- frame-size )
     signal-handler-save-regs :> save-regs
-    save-regs length bootstrap-cells 16 align stack-frame-size + :> frame-size
-    RSP frame-size bootstrap-cell - SUB ! minus a cell for return address
-    save-regs
-    [| r i | RSP i bootstrap-cells [+] r MOV ] each-index
+    save-regs length 1 + bootstrap-cells 16 align stack-frame-size + :> frame-size
+    ! minus a cell each for flags, return address
+    ! use LEA so we don't dirty flags
+    RSP RSP frame-size 2 bootstrap-cells - neg [+] LEA
+    save-regs [| r i | RSP i bootstrap-cells [+] r MOV ] each-index
+    PUSHF
     ! Now that the registers are saved, we can make the stack frame
     RAX 0 MOV rc-absolute-cell rel-this
     RSP frame-size 3 bootstrap-cells - [+] RAX MOV
@@ -107,9 +109,10 @@ IN: bootstrap.x86
     frame-size ;
 
 :: jit-signal-handler-epilog ( frame-size -- )
+    POPF
     signal-handler-save-regs
     [| r i | r RSP i bootstrap-cells [+] MOV ] each-index
-    RSP frame-size bootstrap-cell - ADD ;
+    RSP RSP frame-size 2 bootstrap-cells - [+] LEA ;
 
 [
     arg1 ds-reg [] MOV
