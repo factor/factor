@@ -91,9 +91,8 @@ IN: bootstrap.x86
     "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
 
-! In addition to the C ABI volatile regs, we also whack R12
-! when we save context before calling the signal handler.
-: signal-handler-save-regs ( -- regs ) volatile-regs R12 suffix ;
+: signal-handler-save-regs ( -- regs )
+    { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 R13 R14 R15 } ;
 
 :: jit-signal-handler-prolog ( -- frame-size )
     signal-handler-save-regs :> save-regs
