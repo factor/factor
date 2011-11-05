@@ -42,11 +42,12 @@ M: topic url-of topic>filename ;
     [XML <style><-></style> XML] ;
 
 : help-navbar ( -- xml )
+    "conventions" >link topic>filename
     [XML
         <div class="navbar">
         <b> Factor Documentation </b> |
         <a href="/">Home</a> |
-        <a href="article-conventions.html">Glossary</a> |
+        <a href=<->>Glossary</a> |
         <form method="get" action="/search" style="display:inline;">
             <input name="search" type="text"/>
             <button type="submit">Search</button>
