@@ -51,7 +51,7 @@ M: cannot-find-source error.
 DEFER: edit
 
 : edit-vocab ( vocab -- )
-    dup lookup-vocab [ edit ] [ cannot-find-source ] ?if ;
+    >vocab-link edit ;
 
 GENERIC: edit ( object -- )
 
