@@ -27,7 +27,7 @@ M: result link-href href>> ;
             ] unless-empty
 
             { help-webapp "search" } <chloe-content>
-        ] >>submit ;
+        ] >>display ;
 
 : help-url ( topic -- url )
     topic>filename "$help-webapp/content/" prepend >url ;
