@@ -15,7 +15,7 @@ IN: furnace.utilities
 ERROR: no-such-word name vocab ;
 
 : string>word ( string -- word )
-    ":" split1 swap 2dup lookup dup
+    ":" split1 swap 2dup lookup-word dup
     [ 2nip ] [ drop no-such-word ] if ;
 
 : strings>words ( seq -- seq' )

@@ -8,7 +8,7 @@ IN: words.tests
     [
         "poo" "words.tests" create [ 2 2 + ] ( -- n ) define-declared
     ] with-compilation-unit
-    "poo" "words.tests" lookup execute
+    "poo" "words.tests" lookup-word execute
 ] unit-test
 
 [ t ] [ t vocabs [ words [ word? and ] each ] each ] unit-test
@@ -28,17 +28,17 @@ DEFER: plist-test
 [ ] [ [ "create-test" "scratchpad" create { 1 2 } "testing" set-word-prop ] with-compilation-unit ] unit-test
 
 [ { 1 2 } ] [
-    "create-test" "scratchpad" lookup "testing" word-prop
+    "create-test" "scratchpad" lookup-word "testing" word-prop
 ] unit-test
 
 [
-    [ t ] [ \ array? "array?" "arrays" lookup = ] unit-test
+    [ t ] [ \ array? "array?" "arrays" lookup-word = ] unit-test
 
     [ ] [ [ "test-scope" "scratchpad" create drop ] with-compilation-unit ] unit-test
 ] with-scope
 
 [ "test-scope" ] [
-    "test-scope" "scratchpad" lookup name>> 
+    "test-scope" "scratchpad" lookup-word name>>
 ] unit-test
 
 [ t ] [ vocabs array? ] unit-test
@@ -74,15 +74,15 @@ DEFER: deferred
 [ ] [ "IN: words.tests FORGET: not-compiled" eval( -- ) ] unit-test
 
 [ ] [ [ "no-loc" "words.tests" create drop ] with-compilation-unit ] unit-test
-[ f ] [ "no-loc" "words.tests" lookup where ] unit-test
+[ f ] [ "no-loc" "words.tests" lookup-word where ] unit-test
 
 [ ] [ "IN: words.tests : no-loc-2 ( -- ) ;" eval( -- ) ] unit-test
-[ f ] [ "no-loc-2" "words.tests" lookup where ] unit-test
+[ f ] [ "no-loc-2" "words.tests" lookup-word where ] unit-test
 
 [ ] [ "IN: words.tests : test-last ( -- ) ;" eval( -- ) ] unit-test
 [ "test-last" ] [ word name>> ] unit-test
 
-"undef-test" "words.tests" lookup [
+"undef-test" "words.tests" lookup-word [
     [ forget ] with-compilation-unit
 ] when*
 
@@ -97,8 +97,8 @@ DEFER: deferred
     "IN: words.tests SYMBOL: symbol-generic" eval( -- )
 ] unit-test
 
-[ t ] [ "symbol-generic" "words.tests" lookup symbol? ] unit-test
-[ f ] [ "symbol-generic" "words.tests" lookup generic? ] unit-test
+[ t ] [ "symbol-generic" "words.tests" lookup-word symbol? ] unit-test
+[ f ] [ "symbol-generic" "words.tests" lookup-word generic? ] unit-test
 
 [ ] [
     "IN: words.tests GENERIC: symbol-generic ( a -- b )" <string-reader>
@@ -110,19 +110,19 @@ DEFER: deferred
     "symbol-generic-test" parse-stream drop
 ] unit-test
 
-[ t ] [ "symbol-generic" "words.tests" lookup symbol? ] unit-test
-[ f ] [ "symbol-generic" "words.tests" lookup generic? ] unit-test
+[ t ] [ "symbol-generic" "words.tests" lookup-word symbol? ] unit-test
+[ f ] [ "symbol-generic" "words.tests" lookup-word generic? ] unit-test
 
 ! Regressions
 [ ] [ "IN: words.tests : decl-forget-test ( -- ) ; foldable" eval( -- ) ] unit-test
-[ t ] [ "decl-forget-test" "words.tests" lookup "foldable" word-prop ] unit-test
+[ t ] [ "decl-forget-test" "words.tests" lookup-word "foldable" word-prop ] unit-test
 [ ] [ "IN: words.tests : decl-forget-test ( -- ) ;" eval( -- ) ] unit-test
-[ f ] [ "decl-forget-test" "words.tests" lookup "foldable" word-prop ] unit-test
+[ f ] [ "decl-forget-test" "words.tests" lookup-word "foldable" word-prop ] unit-test
 
 [ ] [ "IN: words.tests : decl-forget-test ( -- ) ; flushable" eval( -- ) ] unit-test
-[ t ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
+[ t ] [ "decl-forget-test" "words.tests" lookup-word "flushable" word-prop ] unit-test
 [ ] [ "IN: words.tests : decl-forget-test ( -- ) ;" eval( -- ) ] unit-test
-[ f ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
+[ f ] [ "decl-forget-test" "words.tests" lookup-word "flushable" word-prop ] unit-test
 
 [ { } ]
 [

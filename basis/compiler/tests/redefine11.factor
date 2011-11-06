@@ -21,11 +21,11 @@ IN: compiler.tests.redefine11
 
 [ ] [
     [
-        array "my-mixin" "compiler.tests.redefine11" lookup
+        array "my-mixin" "compiler.tests.redefine11" lookup-word
         remove-mixin-instance
     ] with-compilation-unit
 ] unit-test
 
 [ 1 ] [
-    "my-inline" "compiler.tests.redefine11" lookup execute
+    "my-inline" "compiler.tests.redefine11" lookup-word execute
 ] unit-test

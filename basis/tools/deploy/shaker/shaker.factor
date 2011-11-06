@@ -299,11 +299,11 @@ IN: tools.deploy.shaker
 
 : strip-vocab-globals ( except names -- words )
     [ child-vocabs [ words ] map concat ] map concat
-    swap [ first2 lookup ] map sift diff ;
+    swap [ first2 lookup-word ] map sift diff ;
 
 : stripped-globals ( -- seq )
     [
-        "inspector-hook" "inspector" lookup ,
+        "inspector-hook" "inspector" lookup-word ,
 
         {
             continuations:error
@@ -320,14 +320,14 @@ IN: tools.deploy.shaker
             current-directory
         } %
 
-        "io-thread" "io.thread" lookup ,
+        "io-thread" "io.thread" lookup-word ,
 
-        "disposables" "destructors" lookup ,
+        "disposables" "destructors" lookup-word ,
 
-        "functor-words" "functors.backend" lookup ,
+        "functor-words" "functors.backend" lookup-word ,
         
         deploy-threads? [
-            "initial-thread" "threads" lookup ,
+            "initial-thread" "threads" lookup-word ,
         ] unless
 
         strip-io? [ io-backend , ] when
@@ -343,7 +343,7 @@ IN: tools.deploy.shaker
         } strip-vocab-globals %
 
         strip-dictionary? [
-            "libraries" "alien" lookup ,
+            "libraries" "alien" lookup-word ,
 
             { { "yield-hook" "compiler.utilities" } }
             { "cpu" "compiler" } strip-vocab-globals %
@@ -395,7 +395,7 @@ IN: tools.deploy.shaker
             \ compiler.errors:compiler-errors ,
         ] when
 
-        "windows-messages" "windows.messages" lookup [ , ] when*
+        "windows-messages" "windows.messages" lookup-word [ , ] when*
     ] { } make ;
 
 : strip-globals ( stripped-globals -- )
@@ -451,9 +451,9 @@ IN: tools.deploy.shaker
 
 SYMBOL: deploy-vocab
 
-: [:c] ( -- word ) ":c" "debugger" lookup ;
+: [:c] ( -- word ) ":c" "debugger" lookup-word ;
 
-: [print-error] ( -- word ) "print-error" "debugger" lookup ;
+: [print-error] ( -- word ) "print-error" "debugger" lookup-word ;
 
 : deploy-startup-quot ( word -- )
     [
@@ -532,9 +532,9 @@ SYMBOL: deploy-vocab
     ] each
     
     [
-        "deploy-libraries" "alien.libraries" lookup forget
-        "deploy-library" "alien.libraries" lookup forget
-        ">deployed-library-path" "alien.libraries.private" lookup forget
+        "deploy-libraries" "alien.libraries" lookup-word forget
+        "deploy-library" "alien.libraries" lookup-word forget
+        ">deployed-library-path" "alien.libraries.private" lookup-word forget
     ] with-compilation-unit ;
 
 : strip ( vocab-manifest-out -- )

@@ -15,7 +15,7 @@ TUPLE: insn-slot-spec type name rep ;
     {
         { [ dup not ] [ ] }
         { [ dup "scalar-rep" = ] [ drop scalar-rep ] }
-        [ "cpu.architecture" lookup ]
+        [ "cpu.architecture" lookup-word ]
     } cond ;
 
 : parse-insn-slot-spec ( type string -- spec )
@@ -48,19 +48,19 @@ TUPLE: insn-slot-spec type name rep ;
 ! We cannot reference words in compiler.cfg.instructions directly
 ! since that would create circularity.
 : insn-classes-word ( -- word )
-    "insn-classes" "compiler.cfg.instructions" lookup ;
+    "insn-classes" "compiler.cfg.instructions" lookup-word ;
 
 : insn-word ( -- word )
-    "insn" "compiler.cfg.instructions" lookup ;
+    "insn" "compiler.cfg.instructions" lookup-word ;
 
 : vreg-insn-word ( -- word )
-    "vreg-insn" "compiler.cfg.instructions" lookup ;
+    "vreg-insn" "compiler.cfg.instructions" lookup-word ;
 
 : flushable-insn-word ( -- word )
-    "flushable-insn" "compiler.cfg.instructions" lookup ;
+    "flushable-insn" "compiler.cfg.instructions" lookup-word ;
 
 : foldable-insn-word ( -- word )
-    "foldable-insn" "compiler.cfg.instructions" lookup ;
+    "foldable-insn" "compiler.cfg.instructions" lookup-word ;
 
 : insn-effect ( word -- effect )
     boa-effect in>> but-last { } <effect> ;

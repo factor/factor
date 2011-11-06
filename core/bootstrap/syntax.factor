@@ -97,5 +97,5 @@ IN: bootstrap.syntax
         ">>>>>>>"
     } [ "syntax" create drop ] each
 
-    "t" "syntax" lookup define-symbol
+    "t" "syntax" lookup-word define-symbol
 ] with-compilation-unit

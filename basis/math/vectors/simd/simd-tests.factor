@@ -119,10 +119,10 @@ CONSTANT: vector-words
 : vector-word-inputs ( schema -- seq ) { -> } split first ;
 
 : with-ctors ( -- seq )
-    simd-classes [ [ name>> "-with" append ] [ vocabulary>> ] bi lookup ] map ;
+    simd-classes [ [ name>> "-with" append ] [ vocabulary>> ] bi lookup-word ] map ;
 
 : boa-ctors ( -- seq )
-    simd-classes [ [ name>> "-boa" append ] [ vocabulary>> ] bi lookup ] map ;
+    simd-classes [ [ name>> "-boa" append ] [ vocabulary>> ] bi lookup-word ] map ;
 
 : check-optimizer ( seq test-quot eq-quot -- failures )
     #! Use test-quot to generate a bunch of test cases from the

@@ -65,8 +65,8 @@ USE: io.streams.string
         parse-stream drop
     ] unit-test
     
-    [ { } ] [ { } "mixin-forget-test-g" "classes.mixin.tests" lookup execute ] unit-test
-    [ H{ } "mixin-forget-test-g" "classes.mixin.tests" lookup execute ] must-fail
+    [ { } ] [ { } "mixin-forget-test-g" "classes.mixin.tests" lookup-word execute ] unit-test
+    [ H{ } "mixin-forget-test-g" "classes.mixin.tests" lookup-word execute ] must-fail
     
     [ ] [
         {
@@ -80,8 +80,8 @@ USE: io.streams.string
         parse-stream drop
     ] unit-test
     
-    [ { } "mixin-forget-test-g" "classes.mixin.tests" lookup execute ] must-fail
-    [ H{ } ] [ H{ } "mixin-forget-test-g" "classes.mixin.tests" lookup execute ] unit-test
+    [ { } "mixin-forget-test-g" "classes.mixin.tests" lookup-word execute ] must-fail
+    [ H{ } ] [ H{ } "mixin-forget-test-g" "classes.mixin.tests" lookup-word execute ] unit-test
 ] times
 
 ! Method flattening interfered with mixin update
@@ -99,11 +99,11 @@ TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
 
 [ ] [ "IN: classes.mixin.tests MIXIN: blah SINGLETON: boo INSTANCE: boo blah" <string-reader> "mixin-reset-test" parse-stream drop ] unit-test
 
-[ t ] [ "blah" "classes.mixin.tests" lookup mixin-class? ] unit-test
+[ t ] [ "blah" "classes.mixin.tests" lookup-word mixin-class? ] unit-test
 
 [ ] [ "IN: classes.mixin.tests MIXIN: blah" <string-reader> "mixin-reset-test" parse-stream drop ] unit-test
 
-[ t ] [ "blah" "classes.mixin.tests" lookup mixin-class? ] unit-test
+[ t ] [ "blah" "classes.mixin.tests" lookup-word mixin-class? ] unit-test
 
 MIXIN: empty-mixin
 
