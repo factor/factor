@@ -108,13 +108,13 @@ gc
     "." write flush
 
     os windows? [
-        "GetLastError" "windows.kernel32" lookup
-        "FormatMessageW" "windows.kernel32" lookup
+        "GetLastError" "windows.kernel32" lookup-word
+        "FormatMessageW" "windows.kernel32" lookup-word
         2array compile-unoptimized
     ] when
 
     os unix? [
-        "(dlerror)" "alien.libraries.unix" lookup
+        "(dlerror)" "alien.libraries.unix" lookup-word
         1array compile-unoptimized
     ] when
 

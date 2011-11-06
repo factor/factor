@@ -94,7 +94,7 @@ ERROR: bad-platform name ;
 
 : vocab-platforms ( vocab -- platforms )
     dup vocab-platforms-path vocab-file-contents
-    [ dup "system" lookup [ ] [ bad-platform ] ?if ] map ;
+    [ dup "system" lookup-word [ ] [ bad-platform ] ?if ] map ;
 
 : set-vocab-platforms ( platforms vocab -- )
     [ [ name>> ] map ] dip

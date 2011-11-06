@@ -12,7 +12,7 @@ $nl
 { $subsections
     create
     create-in
-    lookup
+    lookup-word
 } ;
 
 ARTICLE: "uninterned-words" "Uninterned words"
@@ -279,7 +279,7 @@ HELP: set-word
 { $values { "word" word } }
 { $description "Sets the recently defined word." } ;
 
-HELP: lookup
+HELP: lookup-word
 { $values { "name" string } { "vocab" string } { "word" { $maybe word } } }
 { $description "Looks up a word in the dictionary. If the vocabulary or the word is not defined, outputs " { $link f } "." } ;
 

@@ -42,13 +42,13 @@ TUPLE: point x y ;
 
 [ 100 ] [ "p" get x>> ] unit-test
 [ 200 ] [ "p" get y>> ] unit-test
-[ f ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
+[ f ] [ "p" get "z>>" "accessors" lookup-word execute ] unit-test
 
-[ ] [ "p" get 300 ">>z" "accessors" lookup execute drop ] unit-test
+[ ] [ "p" get 300 ">>z" "accessors" lookup-word execute drop ] unit-test
 
 [ 3 ] [ "p" get tuple-size ] unit-test
 
-[ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
+[ 300 ] [ "p" get "z>>" "accessors" lookup-word execute ] unit-test
 
 [ ] [ "IN: classes.tuple.tests TUPLE: point z y ;" eval( -- ) ] unit-test
 
@@ -56,7 +56,7 @@ TUPLE: point x y ;
 
 [ "p" get x>> ] must-fail
 [ 200 ] [ "p" get y>> ] unit-test
-[ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
+[ 300 ] [ "p" get "z>>" "accessors" lookup-word execute ] unit-test
 
 TUPLE: predicate-test ;
 
@@ -472,11 +472,11 @@ must-fail-with
     "forget-accessors-test" parse-stream
 ] unit-test
 
-[ t ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
+[ t ] [ "forget-accessors-test" "classes.tuple.tests" lookup-word class? ] unit-test
 
 : accessor-exists? ( name -- ? )
-    [ "forget-accessors-test" "classes.tuple.tests" lookup ] dip
-    ">>" append "accessors" lookup ?lookup-method >boolean ;
+    [ "forget-accessors-test" "classes.tuple.tests" lookup-word ] dip
+    ">>" append "accessors" lookup-word ?lookup-method >boolean ;
 
 [ t ] [ "x" accessor-exists? ] unit-test
 [ t ] [ "y" accessor-exists? ] unit-test
@@ -488,7 +488,7 @@ must-fail-with
     "forget-accessors-test" parse-stream
 ] unit-test
 
-[ f ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
+[ f ] [ "forget-accessors-test" "classes.tuple.tests" lookup-word class? ] unit-test
 
 [ f ] [ "x" accessor-exists? ] unit-test
 [ f ] [ "y" accessor-exists? ] unit-test
@@ -649,7 +649,7 @@ DEFER: error-y
     drop
 ] unit-test
 
-[ ] [ "forget-subclass-test'" "classes.tuple.tests" lookup new "bad-object" set ] unit-test
+[ ] [ "forget-subclass-test'" "classes.tuple.tests" lookup-word new "bad-object" set ] unit-test
 
 [ ] [
     "IN: classes.tuple.tests TUPLE: forget-subclass-test a ;"

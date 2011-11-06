@@ -218,8 +218,8 @@ WhiteNumberSpace = WhiteSpace Number:n WhiteSpace => [[ n ]]
 WhiteZeroSpace = WhiteSpace (Zero | Number):n WhiteSpace => [[ n ]]
 
 Integer = "i" Number:n => [[ n <integer> ]]
-FloatingPoint = ( "float" | "double" | "x86_fp80" | "fp128" | "ppc_fp128" ) => [[ "llvm.types" vocab lookup ]]
-LabelVoidMetadata = ( "label" | "void" | "metadata" | "opaque" ) => [[ "llvm.types" vocab lookup ]]
+FloatingPoint = ( "float" | "double" | "x86_fp80" | "fp128" | "ppc_fp128" ) => [[ "llvm.types" vocab lookup-word ]]
+LabelVoidMetadata = ( "label" | "void" | "metadata" | "opaque" ) => [[ "llvm.types" vocab lookup-word ]]
 Primitive = LabelVoidMetadata | FloatingPoint
 Pointer = T:t WhiteSpace "*" => [[ t <pointer> ]]
 Vector = "<" WhiteNumberSpace:n "x" Type:t ">" => [[ n t <vector> ]]

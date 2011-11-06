@@ -16,7 +16,7 @@ DEFER: assoc>tuple
 <PRIVATE
 
 : mdbinfo>tuple-class ( tuple-info -- class )
-   [ first ] keep second lookup ; inline
+   [ first ] keep second lookup-word ; inline
 
 : tuple-instance ( tuple-info -- instance )
     mdbinfo>tuple-class new ; inline 

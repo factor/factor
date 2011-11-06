@@ -458,7 +458,7 @@ M: tuple ' emit-tuple ;
 
 M: tombstone '
     state>> "((tombstone))" "((empty))" ?
-    "hashtables.private" lookup def>> first
+    "hashtables.private" lookup-word def>> first
     [ emit-tuple ] cache-eql-object ;
 
 ! Arrays

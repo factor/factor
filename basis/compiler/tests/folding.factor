@@ -22,7 +22,7 @@ IN: compiler.tests.folding
 ] unit-test
 
 [ t ] [
-    "fold-test" "compiler.tests.folding" lookup execute
-    "fold-test" "compiler.tests.folding" lookup execute
+    "fold-test" "compiler.tests.folding" lookup-word execute
+    "fold-test" "compiler.tests.folding" lookup-word execute
     eq?
 ] unit-test

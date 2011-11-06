@@ -140,7 +140,7 @@ call( -- )
 "bignum" "math" create register-builtin
 "tuple" "kernel" create register-builtin
 "float" "math" create register-builtin
-"f" "syntax" lookup register-builtin
+"f" "syntax" lookup-word register-builtin
 "array" "arrays" create register-builtin
 "wrapper" "kernel" create register-builtin
 "callstack" "kernel" create register-builtin
@@ -152,23 +152,23 @@ call( -- )
 "byte-array" "byte-arrays" create register-builtin
 
 ! We need this before defining c-ptr below
-"f" "syntax" lookup { } define-builtin
+"f" "syntax" lookup-word { } define-builtin
 
 "f" "syntax" create [ not ] "predicate" set-word-prop
 "f?" "syntax" vocab-words delete-at
 
-"t" "syntax" lookup define-singleton-class
+"t" "syntax" lookup-word define-singleton-class
 
 ! Some unions
 "c-ptr" "alien" create [
-    "alien" "alien" lookup ,
-    "f" "syntax" lookup ,
-    "byte-array" "byte-arrays" lookup ,
+    "alien" "alien" lookup-word ,
+    "f" "syntax" lookup-word ,
+    "byte-array" "byte-arrays" lookup-word ,
 ] { } make define-union-class
 
 ! A predicate class used for declarations
 "array-capacity" "sequences.private" create
-"fixnum" "math" lookup
+"fixnum" "math" lookup-word
 [
     [ dup 0 fixnum>= ] %
     bootstrap-max-array-capacity <fake-bignum> [ fixnum<= ] curry ,
@@ -176,7 +176,7 @@ call( -- )
 ] [ ] make
 define-predicate-class
 
-"array-capacity" "sequences.private" lookup
+"array-capacity" "sequences.private" lookup-word
 [ >fixnum ] bootstrap-max-array-capacity <fake-bignum> [ fixnum-bitand ] curry append
 "coercer" set-word-prop
 
@@ -262,11 +262,11 @@ tuple
 { "state" } define-tuple-class
 
 "((empty))" "hashtables.private" create
-"tombstone" "hashtables.private" lookup f
+"tombstone" "hashtables.private" lookup-word f
 2array >tuple 1quotation ( -- value ) define-inline
 
 "((tombstone))" "hashtables.private" create
-"tombstone" "hashtables.private" lookup t
+"tombstone" "hashtables.private" lookup-word t
 2array >tuple 1quotation ( -- value ) define-inline
 
 ! Some tuple classes
@@ -277,7 +277,7 @@ tuple
     { "quot" read-only }
 } prepare-slots define-tuple-class
 
-"curry" "kernel" lookup
+"curry" "kernel" lookup-word
 {
     [ f "inline" set-word-prop ]
     [ make-flushable ]
@@ -299,7 +299,7 @@ tuple
     { "second" read-only }
 } prepare-slots define-tuple-class
 
-"compose" "kernel" lookup
+"compose" "kernel" lookup-word
 {
     [ f "inline" set-word-prop ]
     [ make-flushable ]

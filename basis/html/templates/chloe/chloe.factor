@@ -70,7 +70,7 @@ CHLOE: validation-errors
     drop [ render-validation-errors ] [code] ;
 
 : attr>word ( value -- word/f )
-    ":" split1 swap lookup ;
+    ":" split1 swap lookup-word ;
 
 : if>quot ( tag -- quot )
     [
