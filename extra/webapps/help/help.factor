@@ -25,6 +25,7 @@ M: result link-href href>> ;
                     [ vocab-apropos "vocabs" set-value ] tri
                 ] with-directory
             ] unless-empty
+            help-navbar "navbar" set-value
 
             { help-webapp "search" } <chloe-content>
         ] >>display ;
