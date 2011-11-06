@@ -34,16 +34,7 @@
     </head>
 
     <body>
-        <div class="navbar">
-        <b> Factor Documentation </b> |
-        <a href="/">Home</a> |
-        <a href="article-conventions.html">Glossary</a> |
-        <t:form t:action="$help-webapp/search" style="display:inline;">
-            <t:field t:name="search" />
-            <button type="submit">Search</button>
-        </t:form>
-        <a href="http://factorcode.org" style="float:right; padding: 4px;" >factorcode.org</a>
-        </div>
+		<t:html t:name="navbar"/>
 
         <t:if t:value="articles">
             <h2>Articles</h2>
