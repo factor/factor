@@ -13,10 +13,10 @@ SYNTAX: slots{
     '[ [ _ cleave ] output>array ] append! ;
 
 : >>writer-word ( name -- word )
-    ">>" prepend "accessors" lookup ;
+    ">>" prepend "accessors" lookup-word ;
     
 : writer-word<< ( name -- word )
-    ">>" prepend "accessors" lookup ;
+    ">>" prepend "accessors" lookup-word ;
 
 SYNTAX: set-slots[
     "]" [ >>writer-word 1quotation ] map-tokens

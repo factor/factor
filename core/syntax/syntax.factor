@@ -20,10 +20,10 @@ IN: bootstrap.syntax
 ! in stage2.
 
 : define-delimiter ( name -- )
-    "syntax" lookup t "delimiter" set-word-prop ;
+    "syntax" lookup-word t "delimiter" set-word-prop ;
 
 : define-core-syntax ( name quot -- )
-    [ dup "syntax" lookup [ ] [ no-word-error ] ?if ] dip
+    [ dup "syntax" lookup-word [ ] [ no-word-error ] ?if ] dip
     define-syntax ;
 
 [
@@ -249,9 +249,9 @@ IN: bootstrap.syntax
         ] if*
     ] define-core-syntax
     
-    "initial:" "syntax" lookup define-symbol
+    "initial:" "syntax" lookup-word define-symbol
 
-    "read-only" "syntax" lookup define-symbol
+    "read-only" "syntax" lookup-word define-symbol
 
     "call(" [ \ call-effect parse-call( ] define-core-syntax
 

@@ -47,7 +47,7 @@ IN: vocabs.loader.tests
     [ t ] [
         "resource:core/vocabs/loader/test/a/a.factor"
         source-file definitions>> dup USE: prettyprint .
-        "v-l-t-a-hello" "vocabs.loader.test.a" lookup dup .
+        "v-l-t-a-hello" "vocabs.loader.test.a" lookup-word dup .
         swap first key?
     ] unit-test
 ] times
@@ -92,7 +92,7 @@ IN: vocabs.loader.tests
 
 [ 2 ] [ "count-me" get-global ] unit-test
 
-[ f ] [ "fred" "vocabs.loader.test.b" lookup undefined? ] unit-test
+[ f ] [ "fred" "vocabs.loader.test.b" lookup-word undefined? ] unit-test
 
 [ ] [
     [

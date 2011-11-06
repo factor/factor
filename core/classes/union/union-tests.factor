@@ -70,15 +70,15 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 
 [ ] [ "IN: classes.union.tests SINGLETON: foo UNION: blah foo ;" <string-reader> "union-reset-test" parse-stream drop ] unit-test
 
-[ t ] [ "blah" "classes.union.tests" lookup union-class? ] unit-test
+[ t ] [ "blah" "classes.union.tests" lookup-word union-class? ] unit-test
 
-[ t ] [ "foo?" "classes.union.tests" lookup predicate? ] unit-test
+[ t ] [ "foo?" "classes.union.tests" lookup-word predicate? ] unit-test
 
 [ ] [ "IN: classes.union.tests USE: math UNION: blah integer ;" <string-reader> "union-reset-test" parse-stream drop ] unit-test
 
-[ t ] [ "blah" "classes.union.tests" lookup union-class? ] unit-test
+[ t ] [ "blah" "classes.union.tests" lookup-word union-class? ] unit-test
 
-[ f ] [ "foo?" "classes.union.tests" lookup predicate? ] unit-test
+[ f ] [ "foo?" "classes.union.tests" lookup-word predicate? ] unit-test
 
 GENERIC: test-generic ( x -- y )
 
@@ -102,8 +102,8 @@ M: a-union test-generic ;
 
 [ ] [ "IN: classes.union.tests USE: math UNION: fast-union-1 fixnum ; UNION: fast-union-2 fast-union-1 bignum ;" eval( -- ) ] unit-test
 
-[ t ] [ "fast-union-2?" "classes.union.tests" lookup def>> \ fixnum-bitand swap member? ] unit-test
+[ t ] [ "fast-union-2?" "classes.union.tests" lookup-word def>> \ fixnum-bitand swap member? ] unit-test
 
 [ ] [ "IN: classes.union.tests USE: vectors UNION: fast-union-1 vector ;" eval( -- ) ] unit-test
 
-[ f ] [ "fast-union-2?" "classes.union.tests" lookup def>> \ fixnum-bitand swap member? ] unit-test
+[ f ] [ "fast-union-2?" "classes.union.tests" lookup-word def>> \ fixnum-bitand swap member? ] unit-test

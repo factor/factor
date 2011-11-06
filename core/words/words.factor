@@ -59,10 +59,10 @@ PREDICATE: primitive < word "primitive" word-prop ;
 M: primitive definer drop \ PRIMITIVE: f ;
 M: primitive definition drop f ;
 
-: lookup ( name vocab -- word ) vocab-words at ;
+: lookup-word ( name vocab -- word ) vocab-words at ;
 
 : target-word ( word -- target )
-    [ name>> ] [ vocabulary>> ] bi lookup ;
+    [ name>> ] [ vocabulary>> ] bi lookup-word ;
 
 SYMBOL: bootstrapping?
 
@@ -193,7 +193,7 @@ ERROR: bad-create name vocab ;
     [ bad-create ] unless ;
 
 : create ( name vocab -- word )
-    check-create 2dup lookup
+    check-create 2dup lookup-word
     dup [ 2nip ] [
         drop
         vocab-name <word>

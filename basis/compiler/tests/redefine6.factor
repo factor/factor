@@ -26,6 +26,6 @@ IN: compiler.tests.redefine6
 ] unit-test
 
 [ 1 ] [
-    "my-tuple" "compiler.tests.redefine6" lookup boa
-    "my-inline" "compiler.tests.redefine6" lookup execute
+    "my-tuple" "compiler.tests.redefine6" lookup-word boa
+    "my-inline" "compiler.tests.redefine6" lookup-word execute
 ] unit-test

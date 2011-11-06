@@ -115,14 +115,14 @@ M: integer W 1 + ;
 ] unit-test
 
 : test-redefinition ( -- )
-    [ t ] [ "some-word" "functors.tests" lookup >boolean ] unit-test
-    [ t ] [ "some-tuple" "functors.tests" lookup >boolean ] unit-test
-    [ t ] [ "some-generic" "functors.tests" lookup >boolean ] unit-test
+    [ t ] [ "some-word" "functors.tests" lookup-word >boolean ] unit-test
+    [ t ] [ "some-tuple" "functors.tests" lookup-word >boolean ] unit-test
+    [ t ] [ "some-generic" "functors.tests" lookup-word >boolean ] unit-test
     [ t ] [
-        "some-tuple" "functors.tests" lookup
-        "some-generic" "functors.tests" lookup lookup-method >boolean
+        "some-tuple" "functors.tests" lookup-word
+        "some-generic" "functors.tests" lookup-word lookup-method >boolean
     ] unit-test ;
-    [ t ] [ "some-symbol" "functors.tests" lookup >boolean ] unit-test
+    [ t ] [ "some-symbol" "functors.tests" lookup-word >boolean ] unit-test
 
 test-redefinition
 

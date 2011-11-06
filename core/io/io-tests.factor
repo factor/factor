@@ -4,7 +4,7 @@ IN: io.tests
 
 { f } [
     "vocab:io/test/no-trailing-eol.factor" run-file
-    "foo" "io.tests" lookup
+    "foo" "io.tests" lookup-word
 ] unit-test
 
 ! Make sure we use correct to_c_string form when writing

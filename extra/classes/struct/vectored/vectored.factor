@@ -7,11 +7,11 @@ IN: classes.struct.vectored
 <PRIVATE
 
 : array-class-of ( type -- array-type )
-    [ define-array-vocab ] [ name>> "-array" append swap lookup ] bi ;
+    [ define-array-vocab ] [ name>> "-array" append swap lookup-word ] bi ;
 : <array-class>-of ( type -- array-type )
-    [ define-array-vocab ] [ name>> "<" "-array>" surround swap lookup ] bi ;
+    [ define-array-vocab ] [ name>> "<" "-array>" surround swap lookup-word ] bi ;
 : (array-class)-of ( type -- array-type )
-    [ define-array-vocab ] [ name>> "(" "-array)" surround swap lookup ] bi ;
+    [ define-array-vocab ] [ name>> "(" "-array)" surround swap lookup-word ] bi ;
 
 : >vectored-slot ( struct-slot offset -- tuple-slot )
     {

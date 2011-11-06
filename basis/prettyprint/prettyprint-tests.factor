@@ -103,7 +103,7 @@ unit-test
         [
             [ parse-fresh drop ] with-compilation-unit
             [
-                "prettyprint.tests" lookup see
+                "prettyprint.tests" lookup-word see
             ] with-string-writer "\n" split but-last
         ] keep =
     ] with-interactive-vocabs ;
@@ -261,7 +261,7 @@ M: class-see-layout class-see-layout ;
 [ t ] [
     "IN: prettyprint.tests\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
     dup eval( -- )
-    "generic-decl-test" "prettyprint.tests" lookup
+    "generic-decl-test" "prettyprint.tests" lookup-word
     [ see ] with-string-writer =
 ] unit-test
 

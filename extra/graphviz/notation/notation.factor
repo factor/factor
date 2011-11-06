@@ -20,7 +20,7 @@ IN: graphviz.notation
 !   present >>attr ;
 
 : =attr-generic ( name -- generic )
-    "=" prepend "graphviz.notation" 2dup lookup
+    "=" prepend "graphviz.notation" 2dup lookup-word
     [ 2nip ] [
         create dup
         1 <standard-combination>

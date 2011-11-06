@@ -364,8 +364,8 @@ M: c funky* "c" , call-next-method ;
 [ ] [ "IN: generic.standard.tests GENERIC: xyz ( a -- b )" eval( -- ) ] unit-test
 [ ] [ "IN: generic.standard.tests MATH: xyz ( a b -- c )" eval( -- ) ] unit-test
 
-[ f ] [ "xyz" "generic.standard.tests" lookup pic-def>> ] unit-test
-[ f ] [ "xyz" "generic.standard.tests" lookup "decision-tree" word-prop ] unit-test
+[ f ] [ "xyz" "generic.standard.tests" lookup-word pic-def>> ] unit-test
+[ f ] [ "xyz" "generic.standard.tests" lookup-word "decision-tree" word-prop ] unit-test
 
 ! Corner case
 [ "IN: generic.standard.tests GENERIC# broken-generic# -1 ( a -- b )" eval( -- ) ]

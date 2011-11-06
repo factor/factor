@@ -156,7 +156,7 @@ SPECIALIZED-ARRAY: __does_not_exist__
 
 [ f ] [
     "__does_not_exist__-array{"
-    __does_not_exist__ specialized-array-vocab lookup
+    __does_not_exist__ specialized-array-vocab lookup-word
     deferred?
 ] unit-test
 

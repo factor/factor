@@ -194,7 +194,7 @@ SYMBOL: deserialized
     (deserialize-string) dup intern-object ;
 
 : deserialize-word ( -- word )
-    (deserialize) (deserialize) 2dup [ require ] keep lookup
+    (deserialize) (deserialize) 2dup [ require ] keep lookup-word
     dup [ 2nip ] [
         drop
         2array unparse "Unknown word: " prepend throw

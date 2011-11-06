@@ -53,7 +53,7 @@ unit-test
 : effect-parsing-test ( a b -- c ) + ;
 
 [ t ] [
-    "effect-parsing-test" "parser.tests" lookup
+    "effect-parsing-test" "parser.tests" lookup-word
     \ effect-parsing-test eq?
 ] unit-test
 
@@ -69,7 +69,7 @@ unit-test
 [ ] [ "IN: parser.tests USE: math : effect-parsing-test ( a b -- d ) - ;" eval( -- ) ] unit-test
 
 [ t ] [
-    "effect-parsing-test" "parser.tests" lookup
+    "effect-parsing-test" "parser.tests" lookup-word
     \ effect-parsing-test eq?
 ] unit-test
 
@@ -96,7 +96,7 @@ DEFER: foo
 
 [ t ] [
     "USE: parser.tests \\ foo" eval( -- word )
-    "foo" "parser.tests" lookup eq?
+    "foo" "parser.tests" lookup-word eq?
 ] unit-test
 
 ! parse-tokens should do the right thing on EOF
@@ -112,15 +112,15 @@ DEFER: foo
     "foo" source-file definitions>> first assoc-size
 ] unit-test
 
-[ t ] [ "smudge-me" "parser.tests" lookup >boolean ] unit-test
+[ t ] [ "smudge-me" "parser.tests" lookup-word >boolean ] unit-test
 
 [ ] [
     "IN: parser.tests : smudge-me-more ( -- ) ;" <string-reader> "foo"
     parse-stream drop
 ] unit-test
 
-[ t ] [ "smudge-me-more" "parser.tests" lookup >boolean ] unit-test
-[ f ] [ "smudge-me" "parser.tests" lookup >boolean ] unit-test
+[ t ] [ "smudge-me-more" "parser.tests" lookup-word >boolean ] unit-test
+[ f ] [ "smudge-me" "parser.tests" lookup-word >boolean ] unit-test
 
 [ 3 ] [
     "IN: parser.tests USING: math strings ; GENERIC: smudge-me ( a -- b ) M: integer smudge-me ; M: string smudge-me ;" <string-reader> "foo"
@@ -144,15 +144,15 @@ DEFER: foo
 ] unit-test
 
 [ t ] [
-    array "smudge-me" "parser.tests" lookup order member-eq?
+    array "smudge-me" "parser.tests" lookup-word order member-eq?
 ] unit-test
 
 [ t ] [
-    integer "smudge-me" "parser.tests" lookup order member-eq?
+    integer "smudge-me" "parser.tests" lookup-word order member-eq?
 ] unit-test
 
 [ f ] [
-    string "smudge-me" "parser.tests" lookup order member-eq?
+    string "smudge-me" "parser.tests" lookup-word order member-eq?
 ] unit-test
 
 [ ] [
@@ -189,14 +189,14 @@ DEFER: foo
 ] [ source-file-error? ] must-fail-with
 
 [ t ] [
-    "y" "parser.tests" lookup >boolean
+    "y" "parser.tests" lookup-word >boolean
 ] unit-test
 
 [ f ] [
     "IN: parser.tests : x ( -- ) ;"
     <string-reader> "a" parse-stream drop
     
-    "y" "parser.tests" lookup
+    "y" "parser.tests" lookup-word
 ] unit-test
 
 ! Test new forward definition logic
@@ -216,7 +216,7 @@ DEFER: foo
     <string-reader> "axx" parse-stream drop
 ] unit-test
 
-[ t ] [ "bxx" "axx" lookup >boolean ] unit-test
+[ t ] [ "bxx" "axx" lookup-word >boolean ] unit-test
 
 ! And reload the file that uses it...
 [ ] [
@@ -280,7 +280,7 @@ DEFER: foo
 ] unit-test
 
 [ t ] [
-    "killer?" "parser.tests" lookup >boolean
+    "killer?" "parser.tests" lookup-word >boolean
 ] unit-test
 
 [
@@ -341,7 +341,7 @@ DEFER: foo
 ] unit-test
 
 [ t ] [
-    "foo" "parser.tests" lookup word eq?
+    "foo" "parser.tests" lookup-word word eq?
 ] unit-test
 
 [ ] [
@@ -363,28 +363,28 @@ DEFER: foo
         <string-reader> "redefining-a-class-6" parse-stream drop
     ] unit-test
 
-    [ f ] [ f "foo" "parser.tests" lookup execute ] unit-test
+    [ f ] [ f "foo" "parser.tests" lookup-word execute ] unit-test
 
     [ ] [
         "IN: parser.tests TUPLE: foo ; GENERIC: foo ( a -- b )"
         <string-reader> "redefining-a-class-5" parse-stream drop
     ] unit-test
 
-    [ f ] [ f "foo" "parser.tests" lookup execute ] unit-test
+    [ f ] [ f "foo" "parser.tests" lookup-word execute ] unit-test
 
     [ ] [
         "IN: parser.tests TUPLE: foo ; GENERIC: foo ( a -- b )"
     <string-reader> "redefining-a-class-7" parse-stream drop
     ] unit-test
 
-    [ f ] [ f "foo" "parser.tests" lookup execute ] unit-test
+    [ f ] [ f "foo" "parser.tests" lookup-word execute ] unit-test
 
     [ ] [
         "IN: parser.tests TUPLE: foo ;"
         <string-reader> "redefining-a-class-7" parse-stream drop
     ] unit-test
 
-    [ t ] [ "foo" "parser.tests" lookup symbol? ] unit-test
+    [ t ] [ "foo" "parser.tests" lookup-word symbol? ] unit-test
 ] times
 
 [ "vocab:parser/test/assert-depth.factor" run-file ] must-fail
@@ -440,7 +440,7 @@ DEFER: foo
 ] unit-test
 
 [ 2 ] [
-    "change-combination" "parser.tests" lookup
+    "change-combination" "parser.tests" lookup-word
     "methods" word-prop assoc-size
 ] unit-test
 
@@ -456,18 +456,18 @@ DEFER: foo
     <string-reader> "staging-problem-test" parse-stream
 ] unit-test
 
-[ t ] [ "staging-problem-test-1" "parser.tests" lookup >boolean ] unit-test
+[ t ] [ "staging-problem-test-1" "parser.tests" lookup-word >boolean ] unit-test
 
-[ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
+[ t ] [ "staging-problem-test-2" "parser.tests" lookup-word >boolean ] unit-test
 
 [ [ ] ] [
     "IN: parser.tests << : staging-problem-test-1 ( -- a ) 1 ; >> : staging-problem-test-2 ( -- a ) staging-problem-test-1 ;"
     <string-reader> "staging-problem-test" parse-stream
 ] unit-test
 
-[ t ] [ "staging-problem-test-1" "parser.tests" lookup >boolean ] unit-test
+[ t ] [ "staging-problem-test-1" "parser.tests" lookup-word >boolean ] unit-test
 
-[ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
+[ t ] [ "staging-problem-test-2" "parser.tests" lookup-word >boolean ] unit-test
 
 [ "DEFER: blahy" eval( -- ) ] [ error>> error>> no-current-vocab? ] must-fail-with
 
@@ -540,14 +540,14 @@ EXCLUDE: qualified.tests.bar => x ;
     <string-reader> "was-once-a-word-test" parse-stream
 ] unit-test
 
-[ t ] [ "was-once-a-word-bug" "parser.tests" lookup >boolean ] unit-test
+[ t ] [ "was-once-a-word-bug" "parser.tests" lookup-word >boolean ] unit-test
 
 [ [ ] ] [
     "IN: parser.tests USE: words << \"was-once-a-word-bug\" \"parser.tests\" create [ ] ( -- ) define-declared >>"
     <string-reader> "was-once-a-word-test" parse-stream
 ] unit-test
 
-[ t ] [ "was-once-a-word-bug" "parser.tests" lookup >boolean ] unit-test */
+[ t ] [ "was-once-a-word-bug" "parser.tests" lookup-word >boolean ] unit-test */
 
 ! Replace : def with DEFER:
 [ [ ] ] [
@@ -555,16 +555,16 @@ EXCLUDE: qualified.tests.bar => x ;
     <string-reader> "is-not-deferred" parse-stream
 ] unit-test
 
-[ t ] [ "is-not-deferred" "parser.tests" lookup >boolean ] unit-test
-[ f ] [ "is-not-deferred" "parser.tests" lookup deferred? ] unit-test
+[ t ] [ "is-not-deferred" "parser.tests" lookup-word >boolean ] unit-test
+[ f ] [ "is-not-deferred" "parser.tests" lookup-word deferred? ] unit-test
 
 [ [ ] ] [
     "IN: parser.tests DEFER: is-not-deferred"
     <string-reader> "is-not-deferred" parse-stream
 ] unit-test
 
-[ t ] [ "is-not-deferred" "parser.tests" lookup >boolean ] unit-test
-[ t ] [ "is-not-deferred" "parser.tests" lookup deferred? ] unit-test
+[ t ] [ "is-not-deferred" "parser.tests" lookup-word >boolean ] unit-test
+[ t ] [ "is-not-deferred" "parser.tests" lookup-word deferred? ] unit-test
 
 ! Forward-reference resolution case iterated using list in the wrong direction
 [ [ ] ] [
@@ -583,7 +583,7 @@ EXCLUDE: qualified.tests.bar => x ;
 ] unit-test
 
 [ t ] [
-    "z" "parser.tests.forward-ref-3" lookup def>> [ vocabulary>> ] map all-equal?
+    "z" "parser.tests.forward-ref-3" lookup-word def>> [ vocabulary>> ] map all-equal?
 ] unit-test
 
 [ [ ] ] [
@@ -592,7 +592,7 @@ EXCLUDE: qualified.tests.bar => x ;
 ] unit-test
 
 [ f ] [
-    "z" "parser.tests.forward-ref-3" lookup def>> [ vocabulary>> ] map all-equal?
+    "z" "parser.tests.forward-ref-3" lookup-word def>> [ vocabulary>> ] map all-equal?
 ] unit-test
 
 [ [ ] ] [
@@ -601,7 +601,7 @@ EXCLUDE: qualified.tests.bar => x ;
 ] unit-test
 
 [ t ] [
-    "z" "parser.tests.forward-ref-3" lookup def>> [ vocabulary>> ] map all-equal?
+    "z" "parser.tests.forward-ref-3" lookup-word def>> [ vocabulary>> ] map all-equal?
 ] unit-test
 
 [ [ dup ] ] [

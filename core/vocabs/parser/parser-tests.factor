@@ -26,7 +26,7 @@ must-fail-with
 
     [ ] [ [ \ aaa forget ] with-compilation-unit ] unit-test
 
-    [ ] [ [ "bbb" "vocabs.parser.tests" lookup forget ] with-compilation-unit ] unit-test
+    [ ] [ [ "bbb" "vocabs.parser.tests" lookup-word forget ] with-compilation-unit ] unit-test
 
     [ f ] [ "uutt" search ] unit-test
 
