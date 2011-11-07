@@ -89,7 +89,7 @@ void factor_vm::not_implemented_error()
 void factor_vm::memory_protection_error(cell addr)
 {
 	if(code->safepoint_p(addr))
-		handle_safepoint();
+		safepoint.handle_safepoint();
 	else if(faulting_p)
 		fatal_error("Double fault", 0);
 	else if(ctx->datastack_seg->underflow_p(addr))
@@ -167,28 +167,4 @@ void fp_signal_handler_impl()
 {
 	current_vm()->fp_signal_handler_impl();
 }
-
-void factor_vm::enqueue_safepoint_fep()
-{
-	if (fep_p)
-		fatal_error("Low-level debugger interrupted", 0);
-	atomic::store(&safepoint_fep_p, true);
-	code->guard_safepoint();
-}
-
-void factor_vm::handle_safepoint()
-{
-	code->unguard_safepoint();
-	if (atomic::load(&safepoint_fep_p))
-	{
-		if (atomic::load(&sampling_profiler_p))
-			end_sampling_profiler();
-		std::cout << "Interrupted\n";
-		factorbug();
-		atomic::store(&safepoint_fep_p, false);
-	}
-	else if (sampling_profiler_p)
-		record_sample();
-}
-
 }

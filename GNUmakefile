@@ -59,6 +59,7 @@ ifdef CONFIG
 		vm/primitives.o \
 		vm/quotations.o \
 		vm/run.o \
+		vm/safepoints.o \
 		vm/sampling_profiler.o \
 		vm/strings.o \
 		vm/to_tenured_collector.o \

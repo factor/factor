@@ -36,8 +36,8 @@ struct factor_vm
 	// ^^^^^^
 	//
 
-        /* Handle to the main thread we run in */
-        THREADHANDLE thread;
+	/* Handle to the main thread we run in */
+	THREADHANDLE thread;
 
 	/* Data stack and retain stack sizes */
 	cell datastack_size, retainstack_size, callstack_size;
@@ -74,12 +74,13 @@ struct factor_vm
 	cell signal_number;
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
-	volatile cell safepoint_fep_p;
+
+	/* Pipe used to notify Factor multiplexer of signals */
+	int signal_pipe_input, signal_pipe_output;
 
 	/* State kept by the sampling profiler */
 	std::vector<profiling_sample> samples;
 	std::vector<cell> sample_callstacks;
-	volatile profiling_sample_count safepoint_sample_counts;
 
 	/* GC is off during heap walking */
 	bool gc_off;
@@ -143,6 +144,9 @@ struct factor_vm
 
 	/* Are we already handling a fault? Used to catch double memory faults */
 	bool faulting_p;
+
+	/* Safepoint state */
+	volatile safepoint_state safepoint;
 
 	// contexts
 	context *new_context();
@@ -208,7 +212,6 @@ struct factor_vm
 	void start_sampling_profiler(fixnum rate);
 	void end_sampling_profiler();
 	void set_sampling_profiler(fixnum rate);
-	void enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thread_p);
 	void primitive_sampling_profiler();
 	void primitive_get_samples();
 	void primitive_clear_samples();
@@ -225,8 +228,6 @@ struct factor_vm
 	void memory_signal_handler_impl();
 	void synchronous_signal_handler_impl();
 	void fp_signal_handler_impl();
-	void enqueue_safepoint_fep();
-	void handle_safepoint();
 
 	// bignum
 	int bignum_equal_p(bignum * x, bignum * y);
@@ -751,7 +752,6 @@ struct factor_vm
 
   #else  // UNIX
 	void dispatch_signal(void *uap, void (handler)());
-	void enqueue_safepoint_signal(cell signal);
 	void unix_init_signals();
   #endif
 
