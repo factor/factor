@@ -113,10 +113,11 @@ DEFER: ?make-staging-image
     ] bind ;
 
 : parse-vocab-manifest-file ( path -- vocab-manifest )
-    utf8 file-lines
-    dup first "VOCABS:" =
-    [ { "LIBRARIES:" } split1 vocab-manifest boa ]
-    [ "invalid vocab manifest!" throw ] if ;
+    utf8 file-lines [ "empty vocab manifest!" throw ] [
+        unclip-slice "VOCABS:" =
+        [ { "LIBRARIES:" } split1 vocab-manifest boa ]
+        [ "invalid vocab manifest!" throw ] if
+    ] if-empty ;
 
 : make-deploy-image ( vm image vocab config -- manifest )
     make-boot-image
