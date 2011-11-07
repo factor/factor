@@ -56,6 +56,44 @@ static const cell data_alignment = 16;
 
 #define TYPE_COUNT 14
 
+static inline const char *type_name(cell type)
+{
+	switch (type)
+	{
+	case FIXNUM_TYPE:
+		return "fixnum";
+	case F_TYPE:
+		return "f";
+	case ARRAY_TYPE:
+		return "array";
+	case FLOAT_TYPE:
+		return "float";
+	case QUOTATION_TYPE:
+		return "quotation";
+	case BIGNUM_TYPE:
+		return "bignum";
+	case ALIEN_TYPE:
+		return "alien";
+	case TUPLE_TYPE:
+		return "tuple";
+	case WRAPPER_TYPE:
+		return "wrapper";
+	case BYTE_ARRAY_TYPE:
+		return "byte-array";
+	case CALLSTACK_TYPE:
+		return "callstack";
+	case STRING_TYPE:
+		return "string";
+	case WORD_TYPE:
+		return "word";
+	case DLL_TYPE:
+		return "dll";
+	default:
+		assert(false);
+		return "";
+	}
+}
+
 enum code_block_type
 {
 	code_block_unoptimized,
