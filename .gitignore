@@ -1,5 +1,6 @@
 *~
 _darcs
+*.gch
 *.obj
 *.o
 *.s
