@@ -27,7 +27,7 @@ GENERIC: unbox-tuples* ( node -- node/nodes )
         [ object-slots ] [ drop ] [ ] tri*
         [ (expand-#push) ] 2map-flat
     ] [
-        drop #push
+        drop <#push>
     ] if ;
 
 : expand-#push ( #push -- nodes )
@@ -37,7 +37,7 @@ M: #push unbox-tuples* ( #push -- nodes )
     dup unbox-output? [ expand-#push ] when ;
 
 : unbox-<tuple-boa> ( #call -- nodes )
-    dup unbox-output? [ in-d>> 1 tail* #drop ] when ;
+    dup unbox-output? [ in-d>> 1 tail* <#drop> ] when ;
 
 : (flatten-values) ( values accum -- )
     dup '[
@@ -60,7 +60,7 @@ M: #push unbox-tuples* ( #push -- nodes )
     ] tri ;
 
 : slot-access-shuffle ( tuple-values outputs slot-values -- #shuffle )
-    [ drop ] [ zip ] 2bi #data-shuffle ;
+    [ drop ] [ zip ] 2bi <#data-shuffle> ;
 
 : unbox-slot-access ( #call -- nodes )
     dup out-d>> first unboxed-slot-access? [
