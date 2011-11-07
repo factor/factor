@@ -6,7 +6,8 @@ compiler.tree.tuple-unboxing compiler.tree.debugger
 compiler.tree.recursive compiler.tree.normalization
 compiler.tree.checker tools.test kernel math stack-checker.state
 accessors combinators io prettyprint words sequences.deep
-sequences.private arrays classes kernel.private shuffle ;
+sequences.private arrays classes kernel.private shuffle
+math.private ;
 IN: compiler.tree.dead-code.tests
 
 : count-live-values ( quot -- n )
@@ -187,3 +188,15 @@ IN: compiler.tree.dead-code.tests
     dup 5 = [ t ] [ dup [ call-recursive-dce-7 ] [ drop f f ] if ] if ; inline recursive
 
 [ ] [ [ call-recursive-dce-7 ] optimize-quot drop ] unit-test
+
+[ [ /i ] ] [ [ /mod drop ] optimize-quot ] unit-test
+
+[ [ mod ] ] [ [ /mod nip ] optimize-quot ] unit-test
+
+[ [ fixnum/i ] ] [ [ { fixnum fixnum } declare /mod drop ] optimize-quot ] unit-test
+
+[ [ fixnum-mod ] ] [ [ { fixnum fixnum } declare /mod nip ] optimize-quot ] unit-test
+
+[ [ bignum/i ] ] [ [ { bignum bignum } declare /mod drop ] optimize-quot ] unit-test
+
+[ [ bignum-mod ] ] [ [ { bignum bignum } declare /mod nip ] optimize-quot ] unit-test
