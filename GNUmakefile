@@ -68,6 +68,75 @@ ifdef CONFIG
 		vm/vm.o \
 		vm/words.o
 
+	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
+		vm/layouts.hpp \
+		vm/platform.hpp \
+		vm/primitives.hpp \
+		vm/segments.hpp \
+		vm/gc_info.hpp \
+		vm/contexts.hpp \
+		vm/run.hpp \
+		vm/objects.hpp \
+		vm/counting_profiler.hpp \
+		vm/sampling_profiler.hpp \
+		vm/errors.hpp \
+		vm/bignumint.hpp \
+		vm/bignum.hpp \
+		vm/booleans.hpp \
+		vm/instruction_operands.hpp \
+		vm/code_blocks.hpp \
+		vm/bump_allocator.hpp \
+		vm/bitwise_hacks.hpp \
+		vm/mark_bits.hpp \
+		vm/free_list.hpp \
+		vm/fixup.hpp \
+		vm/tuples.hpp \
+		vm/free_list_allocator.hpp \
+		vm/write_barrier.hpp \
+		vm/object_start_map.hpp \
+		vm/nursery_space.hpp \
+		vm/aging_space.hpp \
+		vm/tenured_space.hpp \
+		vm/data_heap.hpp \
+		vm/code_heap.hpp \
+		vm/gc.hpp \
+		vm/debug.hpp \
+		vm/strings.hpp \
+		vm/words.hpp \
+		vm/float_bits.hpp \
+		vm/io.hpp \
+		vm/image.hpp \
+		vm/alien.hpp \
+		vm/callbacks.hpp \
+		vm/dispatch.hpp \
+		vm/entry_points.hpp \
+		vm/safepoints.hpp \
+		vm/vm.hpp \
+		vm/allot.hpp \
+		vm/tagged.hpp \
+		vm/data_roots.hpp \
+		vm/code_roots.hpp \
+		vm/generic_arrays.hpp \
+		vm/callstack.hpp \
+		vm/slot_visitor.hpp \
+		vm/collector.hpp \
+		vm/copying_collector.hpp \
+		vm/nursery_collector.hpp \
+		vm/aging_collector.hpp \
+		vm/to_tenured_collector.hpp \
+		vm/code_block_visitor.hpp \
+		vm/compaction.hpp \
+		vm/full_collector.hpp \
+		vm/arrays.hpp \
+		vm/math.hpp \
+		vm/byte_arrays.hpp \
+		vm/jit.hpp \
+		vm/quotations.hpp \
+		vm/inline_cache.hpp \
+		vm/mvm.hpp \
+		vm/factor.hpp \
+		vm/utilities.hpp
+
 	EXE_OBJS = $(PLAF_EXE_OBJS)
 
 	FFI_TEST_LIBRARY = libfactor-ffi-test$(SHARED_DLL_EXTENSION)
@@ -165,13 +234,16 @@ vm/resources.o:
 vm/ffi_test.o: vm/ffi_test.c
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
 
-.cpp.o:
+vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
+	$(TOOLCHAIN_PREFIX)$(CPP) -c -x c++-header $(CFLAGS) -o $@ $<
+
+%.o: %.cpp vm/master.hpp.gch
 	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
 
-.S.o:
+%.o: %.S
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) -o $@ $<
 
-.mm.o:
+%.o: %.mm vm/master.hpp.gch
 	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
 
 .SUFFIXES: .mm
@@ -179,6 +251,7 @@ vm/ffi_test.o: vm/ffi_test.c
 endif
 
 clean:
+	rm -f vm/*.gch
 	rm -f vm/*.o
 	rm -f factor.dll
 	rm -f factor.lib
