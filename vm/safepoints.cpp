@@ -8,11 +8,13 @@ void safepoint_state::enqueue_safepoint() volatile
 	parent->code->guard_safepoint();
 }
 
-void safepoint_state::enqueue_fep() volatile
+void safepoint_state::enqueue_fep(cell signal) volatile
 {
 	if (parent->fep_p)
 		fatal_error("Low-level debugger interrupted", 0);
 	atomic::store(&fep_p, true);
+	if (signal != 0)
+		atomic::store(&queued_signal, signal);
 	enqueue_safepoint();
 }
 
