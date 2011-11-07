@@ -60,19 +60,19 @@ SYMBOL: spill-temps
     ] if ;
 
 : memory->register ( from to -- )
-    swap [ reg>> ] [ [ rep>> ] [ reg>> ] bi ] bi* ##reload ;
+    swap [ reg>> ] [ [ rep>> ] [ reg>> ] bi ] bi* <##reload> ;
 
 : register->memory ( from to -- )
-    [ [ reg>> ] [ rep>> ] bi ] [ reg>> ] bi* ##spill ;
+    [ [ reg>> ] [ rep>> ] bi ] [ reg>> ] bi* <##spill> ;
 
 : temp->register ( from to -- )
-    nip [ reg>> ] [ rep>> ] [ rep>> spill-temp ] tri ##reload ;
+    nip [ reg>> ] [ rep>> ] [ rep>> spill-temp ] tri <##reload> ;
 
 : register->temp ( from to -- )
-    drop [ [ reg>> ] [ rep>> ] bi ] [ rep>> spill-temp ] bi ##spill ;
+    drop [ [ reg>> ] [ rep>> ] bi ] [ rep>> spill-temp ] bi <##spill> ;
 
 : register->register ( from to -- )
-    swap [ reg>> ] [ [ reg>> ] [ rep>> ] bi ] bi* ##copy ;
+    swap [ reg>> ] [ [ reg>> ] [ rep>> ] bi ] bi* <##copy> ;
 
 SYMBOL: temp
 
@@ -87,7 +87,7 @@ SYMBOL: temp
 
 : mapping-instructions ( alist -- insns )
     [ swap ] H{ } assoc-map-as
-    [ temp [ swap >insn ] parallel-mapping ##branch ] { } make ;
+    [ temp [ swap >insn ] parallel-mapping <##branch> ] { } make ;
 
 : perform-mappings ( bb to mappings -- )
     dup empty? [ 3drop ] [
