@@ -146,13 +146,6 @@ void factor_vm::dispatch_signal(void *uap, void (handler)())
 	UAP_SET_TOC_POINTER(uap, (cell)FUNCTION_TOC_POINTER(handler));
 }
 
-void factor_vm::enqueue_safepoint_signal(cell signal)
-{
-	/* to be implemented, see #297
-	code->guard_safepoint();
-	*/
-}
-
 void factor_vm::start_sampling_profiler_timer()
 {
 	struct itimerval timer;
@@ -191,7 +184,7 @@ void enqueue_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
 	if (vm)
-		vm->enqueue_safepoint_signal(signal);
+		vm->safepoint.enqueue_signal(signal);
 	else
 		fatal_error("Foreign thread received signal", signal);
 }
@@ -200,7 +193,7 @@ void fep_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
 	if (vm)
-		vm->enqueue_safepoint_fep();
+		vm->safepoint.enqueue_fep();
 	else
 		fatal_error("Foreign thread received signal", signal);
 }
@@ -209,10 +202,10 @@ void sample_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
 	if (vm)
-		vm->enqueue_safepoint_sample(1, (cell)UAP_PROGRAM_COUNTER(uap), false);
+		vm->safepoint.enqueue_samples(1, (cell)UAP_PROGRAM_COUNTER(uap), false);
 	else if (thread_vms.size() == 1) {
 		factor_vm *the_only_vm = thread_vms.begin()->second;
-		the_only_vm->enqueue_safepoint_sample(1, (cell)UAP_PROGRAM_COUNTER(uap), true);
+		the_only_vm->safepoint.enqueue_samples(1, (cell)UAP_PROGRAM_COUNTER(uap), true);
 	}
 }
 
@@ -255,8 +248,33 @@ static void init_sigaction_with_handler(struct sigaction *act,
 	act->sa_flags = SA_SIGINFO | SA_ONSTACK;
 }
 
+static void safe_pipe(int *in, int *out)
+{
+	int filedes[2];
+
+	if(pipe(filedes) < 0)
+		fatal_error("Error opening pipe",errno);
+
+	*in = filedes[0];
+	*out = filedes[1];
+
+	if(fcntl(*in,F_SETFD,FD_CLOEXEC) < 0)
+		fatal_error("Error with fcntl",errno);
+
+	if(fcntl(*out,F_SETFD,FD_CLOEXEC) < 0)
+		fatal_error("Error with fcntl",errno);
+}
+
+static void init_signal_pipe(factor_vm *vm)
+{
+	safe_pipe(&vm->signal_pipe_input, &vm->signal_pipe_output);
+	vm->special_objects[OBJ_SIGNAL_PIPE] = tag_fixnum(vm->signal_pipe_output);
+}
+
 void factor_vm::unix_init_signals()
 {
+	init_signal_pipe(this);
+
 	signal_callstack_seg = new segment(callstack_size,false);
 
 	stack_t signal_callstack;
@@ -417,29 +435,22 @@ void *stdin_loop(void *arg)
 	return NULL;
 }
 
-void safe_pipe(int *in, int *out)
-{
-	int filedes[2];
-
-	if(pipe(filedes) < 0)
-		fatal_error("Error opening pipe",errno);
-
-	*in = filedes[0];
-	*out = filedes[1];
-
-	if(fcntl(*in,F_SETFD,FD_CLOEXEC) < 0)
-		fatal_error("Error with fcntl",errno);
-
-	if(fcntl(*out,F_SETFD,FD_CLOEXEC) < 0)
-		fatal_error("Error with fcntl",errno);
-}
-
 void open_console()
 {
 	safe_pipe(&control_read,&control_write);
 	safe_pipe(&size_read,&size_write);
 	safe_pipe(&stdin_read,&stdin_write);
 	start_thread(stdin_loop,NULL);
+}
+
+void safepoint_state::report_signal(int fd) volatile
+{
+	int signal = (int)atomic::load(&queued_signal);
+	if (signal != 0)
+	{
+		safe_write(fd, &signal, sizeof(int));
+		atomic::store(&queued_signal, 0);
+	}
 }
 
 }
