@@ -394,7 +394,9 @@ struct factor_vm
 	void print_word(word* word, cell nesting);
 	void print_factor_string(string* str);
 	void print_array(array* array, cell nesting);
+	void print_byte_array(byte_array *array, cell nesting);
 	void print_tuple(tuple *tuple, cell nesting);
+	void print_alien(alien *alien, cell nesting);
 	void print_nested_obj(cell obj, fixnum nesting);
 	void print_obj(cell obj);
 	void print_objects(cell *start, cell *end);
