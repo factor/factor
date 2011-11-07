@@ -37,7 +37,7 @@ M: ##load-integer optimize-insn
     {
         {
             [ dup dst>> rep-of tagged-rep? ]
-            [ [ dst>> ] [ val>> tag-fixnum ] bi ##load-tagged here ]
+            [ [ dst>> ] [ val>> tag-fixnum ] bi <##load-tagged> here ]
         }
         [ call-next-method ]
     } cond ;
@@ -84,23 +84,23 @@ M: ##load-reference optimize-insn
     {
         {
             [ dup convert-to-load-float? ]
-            [ [ dst>> ] [ obj>> ] bi ##load-float here ]
+            [ [ dst>> ] [ obj>> ] bi <##load-float> here ]
         }
         {
             [ dup convert-to-load-double? ]
-            [ [ dst>> ] [ obj>> ] bi ##load-double here ]
+            [ [ dst>> ] [ obj>> ] bi <##load-double> here ]
         }
         {
             [ dup convert-to-zero-vector? ]
-            [ dst>> dup rep-of ##zero-vector here ]
+            [ dst>> dup rep-of <##zero-vector> here ]
         }
         {
             [ dup convert-to-fill-vector? ]
-            [ dst>> dup rep-of ##fill-vector here ]
+            [ dst>> dup rep-of <##fill-vector> here ]
         }
         {
             [ dup convert-to-load-vector? ]
-            [ [ dst>> ] [ obj>> ] [ dst>> rep-of ] tri ##load-vector here ]
+            [ [ dst>> ] [ obj>> ] [ dst>> rep-of ] tri <##load-vector> here ]
         }
         [ call-next-method ]
     } cond ;
@@ -113,9 +113,9 @@ M: ##load-reference optimize-insn
 ! ##sar-imm by tag-bits - X.
 : combine-shl-imm-input ( insn -- )
     [ dst>> ] [ src1>> ] [ src2>> ] tri tag-bits get {
-        { [ 2dup < ] [ swap - ##sar-imm here ] }
-        { [ 2dup > ] [ - ##shl-imm here ] }
-        [ 2drop int-rep ##copy here ]
+        { [ 2dup < ] [ swap - <##sar-imm> here ] }
+        { [ 2dup > ] [ - <##shl-imm> here ] }
+        [ 2drop int-rep <##copy> here ]
     } cond ;
 
 : dst-tagged? ( insn -- ? ) dst>> rep-of tagged-rep? ;
@@ -260,7 +260,7 @@ M: ##test-branch optimize-insn
     [ dst>> ] [ src>> ] bi [ rep-of tagged-rep? ] both? ;
 
 : combine-neg-tag ( insn -- )
-    [ dst>> ] [ src>> ] bi tag-bits get 2^ neg ##mul-imm here ;
+    [ dst>> ] [ src>> ] bi tag-bits get 2^ neg <##mul-imm> here ;
 
 M: ##neg optimize-insn
     {
@@ -276,8 +276,8 @@ M: ##neg optimize-insn
 ! tag(not(untag(x))) = not(x) xor tag-mask
 :: emit-tagged-not ( insn -- )
     tagged-rep next-vreg-rep :> temp
-    temp insn src>> ##not
-    insn dst>> temp tag-mask get ##xor-imm here ;
+    temp insn src>> <##not>
+    insn dst>> temp tag-mask get <##xor-imm> here ;
 
 M: ##not optimize-insn
     {

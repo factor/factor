@@ -61,7 +61,7 @@ IN: compiler.cfg.intrinsics.alien
 
 :: (emit-store-memory) ( node rep c-type prepare-quot test-quot -- )
     node
-    [ prepare-quot call rep c-type ##store-memory-imm ]
+    [ prepare-quot call rep c-type <##store-memory-imm> ]
     [ test-quot call inline-store-memory? ]
     inline-accessor ; inline
 

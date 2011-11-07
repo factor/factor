@@ -52,10 +52,10 @@ IN: compiler.cfg.intrinsics.slots
     infos second value-tag :> tag
 
     slot tag slot-indexing :> ( slot scale tag )
-    src obj slot scale tag ##set-slot
+    src obj slot scale tag <##set-slot>
 
     infos emit-write-barrier?
-    [ obj slot scale tag next-vreg next-vreg ##write-barrier ] when ;
+    [ obj slot scale tag next-vreg next-vreg <##write-barrier> ] when ;
 
 :: (emit-set-slot-imm) ( infos -- )
     ds-drop
@@ -65,10 +65,10 @@ IN: compiler.cfg.intrinsics.slots
     infos third literal>> :> slot
     infos second value-tag :> tag
 
-    src obj slot tag ##set-slot-imm
+    src obj slot tag <##set-slot-imm>
 
     infos emit-write-barrier?
-    [ obj slot tag next-vreg next-vreg ##write-barrier-imm ] when ;
+    [ obj slot tag next-vreg next-vreg <##write-barrier-imm> ] when ;
 
 : emit-set-slot ( node -- )
     dup node-input-infos

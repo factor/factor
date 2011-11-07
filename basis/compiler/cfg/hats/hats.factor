@@ -23,7 +23,7 @@ IN: compiler.cfg.hats
                 [ drop [ ] ]
             } case swap [ dip ] curry compose
         ] reduce
-    ] keep suffix ;
+    ] keep insn-ctor-name "compiler.cfg.instructions" lookup-word suffix ;
 
 : hat-effect ( insn -- effect )
     "insn-slots" word-prop
