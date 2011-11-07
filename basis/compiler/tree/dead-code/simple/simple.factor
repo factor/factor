@@ -57,7 +57,7 @@ M: #alien-node compute-live-values* nip look-at-inputs ;
     outputs
     mapping-keys
     mapping-values
-    filter-corresponding zip #data-shuffle ; inline
+    filter-corresponding zip <#data-shuffle> ; inline
 
 :: drop-dead-values ( outputs -- #shuffle )
     outputs length make-values :> new-outputs
@@ -92,7 +92,7 @@ M: #push remove-dead-code*
 
 : remove-flushable-call ( #call -- node )
     [ word>> depends-on-flushable ]
-    [ in-d>> #drop remove-dead-code* ]
+    [ in-d>> <#drop> remove-dead-code* ]
     bi ;
 
 : define-simplifications ( word seq -- )
@@ -142,7 +142,7 @@ M: #shuffle remove-dead-code*
 
 M: #copy remove-dead-code*
     [ in-d>> ] [ out-d>> ] bi
-    2dup swap zip #data-shuffle
+    2dup swap zip <#data-shuffle>
     remove-dead-code* ;
 
 M: #terminate remove-dead-code*

@@ -46,9 +46,9 @@ GENERIC: cleanup* ( node -- node/nodes )
     #! inputs followed by #push nodes for the outputs.
     [
         [ node-output-infos ] [ out-d>> ] bi
-        [ [ literal>> ] dip #push ] 2map
+        [ [ literal>> ] dip <#push> ] 2map
     ]
-    [ in-d>> #drop ]
+    [ in-d>> <#drop> ]
     bi prefix ;
 
 : >predicate-folding< ( #call -- value-info class result )
@@ -125,8 +125,8 @@ M: #call cleanup*
     #! If only one branch is live we don't need to branch at
     #! all; just drop the condition value.
     dup live-children sift dup length {
-        { 0 [ drop in-d>> #drop ] }
-        { 1 [ first swap in-d>> #drop prefix ] }
+        { 0 [ drop in-d>> <#drop> ] }
+        { 1 [ first swap in-d>> <#drop> prefix ] }
         [ 2drop ]
     } case ;
 
@@ -144,12 +144,12 @@ M: #branch cleanup*
     } cleave ;
 
 : output-fs ( values -- nodes )
-    [ f swap #push ] map ;
+    [ f swap <#push> ] map ;
 
 : eliminate-single-phi ( #phi -- node )
     [ phi-in-d>> first ] [ out-d>> ] bi over [ +bottom+ eq? ] all?
     [ [ drop ] [ output-fs ] bi* ]
-    [ #copy ]
+    [ <#copy> ]
     if ;
 
 : eliminate-phi ( #phi -- node )
@@ -168,7 +168,7 @@ M: #phi cleanup*
     eliminate-phi
     live-branches off ;
 
-: >copy ( node -- #copy ) [ in-d>> ] [ out-d>> ] bi #copy ;
+: >copy ( node -- #copy ) [ in-d>> ] [ out-d>> ] bi <#copy> ;
 
 : flatten-recursive ( #recursive -- nodes )
     #! convert #enter-recursive and #return-recursive into
