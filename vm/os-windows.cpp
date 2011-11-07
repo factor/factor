@@ -289,7 +289,7 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
 		threads. */
 		assert(thread_vms.size() == 1);
 		factor_vm *vm = thread_vms.begin()->second;
-		vm->safepoint.enqueue_fep();
+		vm->safepoint.enqueue_fep(0);
 		return TRUE;
 	}
 	default:
