@@ -300,6 +300,14 @@ PRIVATE>
         } 1&&
     ] any? ;
 
+: find-redundant-word-props ( -- seq )
+    all-words [
+        {
+            [ { [ foldable? ] [ flushable? ] } 1|| ]
+            [ inline? ]
+        } 1&&
+    ] filter ;
+
 : lint-all ( -- seq )
     all-words run-lint dup lint. ;
 
