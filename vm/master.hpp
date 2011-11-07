@@ -127,6 +127,7 @@ namespace factor
 #include "callbacks.hpp"
 #include "dispatch.hpp"
 #include "entry_points.hpp"
+#include "safepoints.hpp"
 #include "vm.hpp"
 #include "allot.hpp"
 #include "tagged.hpp"
