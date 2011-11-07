@@ -122,8 +122,8 @@ void factor_vm::print_nested_obj(cell obj, fixnum nesting)
 		std::cout << " ]";
 		break;
 	default:
-		std::cout << "#<type " << tagged<object>(obj).type() << " @ ";
-		std::cout << std::hex << obj << std::dec << ">";
+		std::cout << "#<" << type_name(tagged<object>(obj).type()) << " ";
+		std::cout << (void*)obj << ">";
 		break;
 	}
 }
