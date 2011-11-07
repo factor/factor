@@ -54,6 +54,46 @@ void factor_vm::print_array(array *array, cell nesting)
 		std::cout << "...";
 }
 
+void factor_vm::print_alien(alien *alien, cell nesting)
+{
+	if (to_boolean(alien->expired))
+		std::cout << "#<expired alien>";
+	else if (to_boolean(alien->base))
+	{
+		std::cout << "#<displaced alien " << alien->displacement << "+";
+		print_nested_obj(alien->base, nesting);
+		std::cout << ">";
+	}
+	else
+	{
+		std::cout << "#<alien " << (void*)alien->address << ">";
+	}
+}
+
+void factor_vm::print_byte_array(byte_array *array, cell nesting)
+{
+	cell length = array->capacity;
+	cell i;
+	bool trimmed;
+	unsigned char *data = array->data<unsigned char>();
+
+	if(length > 16 && !full_output)
+	{
+		trimmed = true;
+		length = 16;
+	}
+	else
+		trimmed = false;
+
+	for(i = 0; i < length; i++)
+	{
+		std::cout << " " << (unsigned)data[i];
+	}
+
+	if(trimmed)
+		std::cout << "...";
+}
+
 void factor_vm::print_tuple(tuple *tuple, cell nesting)
 {
 	tuple_layout *layout = untag<tuple_layout>(tuple->layout);
@@ -96,6 +136,9 @@ void factor_vm::print_nested_obj(cell obj, fixnum nesting)
 	case FIXNUM_TYPE:
 		std::cout << untag_fixnum(obj);
 		break;
+	case FLOAT_TYPE:
+		std::cout << untag_float(obj);
+		break;
 	case WORD_TYPE:
 		print_word(untag<word>(obj),nesting - 1);
 		break;
@@ -110,6 +153,16 @@ void factor_vm::print_nested_obj(cell obj, fixnum nesting)
 		print_tuple(untag<tuple>(obj),nesting - 1);
 		std::cout << " }";
 		break;
+	case WRAPPER_TYPE:
+		std::cout << "W{ ";
+		print_nested_obj(untag<wrapper>(obj)->object,nesting - 1);
+		std::cout << " }";
+		break;
+	case BYTE_ARRAY_TYPE:
+		std::cout << "B{";
+		print_byte_array(untag<byte_array>(obj),nesting - 1);
+		std::cout << " }";
+		break;
 	case ARRAY_TYPE:
 		std::cout << "{";
 		print_array(untag<array>(obj),nesting - 1);
@@ -121,8 +174,11 @@ void factor_vm::print_nested_obj(cell obj, fixnum nesting)
 		print_array(untag<array>(quot->array),nesting - 1);
 		std::cout << " ]";
 		break;
+	case ALIEN_TYPE:
+		print_alien(untag<alien>(obj), nesting - 1);
+		break;
 	default:
-		std::cout << "#<" << type_name(tagged<object>(obj).type()) << " ";
+		std::cout << "#<" << type_name(tagged<object>(obj).type()) << " @ ";
 		std::cout << (void*)obj << ">";
 		break;
 	}
