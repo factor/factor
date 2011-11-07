@@ -109,7 +109,7 @@ PRIVATE>
 : nth-root ( n x -- y ) swap recip ^ ; inline
 
 : gcd ( x y -- a d )
-    [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; foldable inline
+    [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; inline
 
 : lcm ( a b -- c )
     [ * ] 2keep gcd nip /i ; foldable
