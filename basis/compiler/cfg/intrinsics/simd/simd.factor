@@ -632,7 +632,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
     dup [
         '[
             ds-drop prepare-store-memory
-            _ f ##store-memory-imm
+            _ f <##store-memory-imm>
         ]
         [ byte-array inline-store-memory? ]
         inline-accessor

@@ -32,7 +32,7 @@ IN: compiler.cfg.intrinsics.fixnum
     ] binary-op ;
 
 : emit-fixnum-shift-general ( -- )
-    ds-peek 0 cc> ##compare-integer-imm-branch
+    ds-peek 0 cc> <##compare-integer-imm-branch>
     [ emit-fixnum-left-shift ] with-branch
     [ emit-fixnum-right-shift ] with-branch
     2array emit-conditional ;
@@ -52,7 +52,7 @@ IN: compiler.cfg.intrinsics.fixnum
 
 : emit-overflow-case ( word -- final-bb )
     [
-        ##call
+        <##call>
         -1 adjust-d
         make-kill-block
     ] with-branch ;

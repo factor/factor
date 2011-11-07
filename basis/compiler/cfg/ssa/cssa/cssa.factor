@@ -23,7 +23,7 @@ IN: compiler.cfg.ssa.cssa
 :: insert-copy ( bb src rep -- bb dst )
     bb src insert-copy? [
         rep next-vreg-rep :> dst
-        bb [ dst src rep ##copy ] add-instructions
+        bb [ dst src rep <##copy> ] add-instructions
         bb dst
     ] [ bb src ] if ;
 

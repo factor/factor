@@ -136,8 +136,8 @@ M: ##mul-imm rewrite
         { [ dup mul-to-neg? ] [ mul-to-neg ] }
         { [ dup mul-to-shl? ] [ mul-to-shl ] }
         { [ dup src1>> vreg>insn ##mul-imm? ] [ \ ##mul-imm reassociate-arithmetic ] }
-        { [ dup distribute-over-add? ] [ \ ##add-imm \ ##mul-imm distribute ] }
-        { [ dup distribute-over-sub? ] [ \ ##sub-imm \ ##mul-imm distribute ] }
+        { [ dup distribute-over-add? ] [ \ <##add-imm> \ <##mul-imm> distribute ] }
+        { [ dup distribute-over-sub? ] [ \ <##sub-imm> \ <##mul-imm> distribute ] }
         [ drop f ]
     } cond ;
 
@@ -173,8 +173,8 @@ M: ##shl-imm rewrite
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
         { [ dup src1>> vreg>insn ##shl-imm? ] [ \ ##shl-imm reassociate-shift ] }
-        { [ dup distribute-over-add? ] [ \ ##add-imm \ ##shl-imm distribute ] }
-        { [ dup distribute-over-sub? ] [ \ ##sub-imm \ ##shl-imm distribute ] }
+        { [ dup distribute-over-add? ] [ \ <##add-imm> \ <##shl-imm> distribute ] }
+        { [ dup distribute-over-sub? ] [ \ <##sub-imm> \ <##shl-imm> distribute ] }
         [ drop f ]
     } cond ;
 

@@ -85,7 +85,7 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
 
 : <gc-call> ( -- bb )
     <basic-block>
-    [ <gc-map> ##call-gc ##branch ] V{ } make
+    [ <gc-map> <##call-gc> <##branch> ] V{ } make
     >>instructions t >>unlikely? ;
 
 :: connect-gc-checks ( bbs -- )
