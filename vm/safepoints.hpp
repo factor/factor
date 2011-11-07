@@ -21,7 +21,7 @@ struct safepoint_state
 
 	void enqueue_safepoint() volatile;
 	void enqueue_samples(cell samples, cell pc, bool foreign_thread_p) volatile;
-	void enqueue_fep() volatile;
+	void enqueue_fep(cell signal) volatile;
 
 	// os-*.cpp
 	void enqueue_signal(cell signal) volatile;

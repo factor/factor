@@ -193,7 +193,7 @@ void fep_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
 	if (vm)
-		vm->safepoint.enqueue_fep();
+		vm->safepoint.enqueue_fep(signal);
 	else
 		fatal_error("Foreign thread received signal", signal);
 }
