@@ -10,7 +10,8 @@ factor_vm::factor_vm(THREADHANDLE thread) :
 	c_to_factor_func(NULL),
 	counting_profiler_p(false),
 	sampling_profiler_p(false),
-	safepoint_fep_p(false),
+	signal_pipe_input(0),
+	signal_pipe_output(0),
 	gc_off(false),
 	current_gc(NULL),
 	current_gc_p(false),
@@ -22,7 +23,8 @@ factor_vm::factor_vm(THREADHANDLE thread) :
 	full_output(false),
 	last_nano_count(0),
 	signal_callstack_seg(NULL),
-	faulting_p(false)
+	faulting_p(false),
+	safepoint(this)
 {
 	primitive_reset_dispatch_stats();
 }
