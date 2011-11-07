@@ -113,7 +113,7 @@ M: node normalize* ;
         dup count-introductions make-values
         H{ } clone rename-map set
         [ (normalize) ] [ nip ] 2bi
-        [ #introduce prefix ] unless-empty
+        [ <#introduce> prefix ] unless-empty
         rename-node-values
     ] with-scope ;
 
