@@ -7,6 +7,10 @@ IN: lists.tests
     { 1 2 3 4 5 } sequence>list [ 2 + ] lmap list>array
 ] unit-test
 
+{ 2 { 3 4 5 6 7 } } [
+    2 { 1 2 3 4 5 } sequence>list [ dupd + ] lmap list>array
+] unit-test
+
 { { 3 4 5 6 } } [
     T{ cons f 1       
         T{ cons f 2 
