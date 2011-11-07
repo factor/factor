@@ -58,9 +58,6 @@ PRIVATE>
 : leach ( ... list quot: ( ... elt -- ... ) -- ... )
     over nil? [ 2drop ] [ (leach) leach ] if ; inline recursive
 
-: lmap ( ... list quot: ( ... elt -- ... newelt ) -- ... result )
-    over nil? [ drop ] [ (leach) lmap cons ] if ; inline recursive
-
 : foldl ( ... list identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd leach ; inline
 
@@ -73,10 +70,13 @@ PRIVATE>
 : llength ( list -- n )
     0 [ drop 1 + ] foldl ;
 
-: lreverse ( list -- newlist )    
+: lreverse ( list -- newlist )
     nil [ swons ] foldl ;
 
-: lappend ( list1 list2 -- newlist )    
+: lmap ( ... list quot: ( ... elt -- ... newelt ) -- ... result )
+    [ nil ] dip [ swapd dip cons ] curry foldl lreverse ; inline
+
+: lappend ( list1 list2 -- newlist )
     [ lreverse ] dip [ swons ] foldl ;
 
 : lcut ( list index -- before after )
