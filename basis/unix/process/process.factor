@@ -40,6 +40,8 @@ FUNCTION: int execve ( c-string path, c-string* argv, c-string* envp ) ;
     [ fork-process ] 2dip if-zero ; inline
 
 FUNCTION: int kill ( pid_t pid, int sig ) ;
+FUNCTION: int raise ( int sig ) ;
+
 
 CONSTANT: PRIO_PROCESS 0
 CONSTANT: PRIO_PGRP 1

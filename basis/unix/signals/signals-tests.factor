@@ -1,5 +1,5 @@
 USING: calendar continuations io kernel math namespaces threads
-tools.test unix.ffi unix.signals ;
+tools.test unix.ffi unix.process unix.signals ;
 IN: unix.signals.tests
 
 SYMBOL: sigusr1-count
