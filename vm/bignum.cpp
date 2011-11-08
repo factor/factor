@@ -50,11 +50,6 @@
 
 #include "master.hpp"
 
-#include <limits>
-
-#include <stdio.h>
-#include <math.h>
-
 namespace factor
 {
 
