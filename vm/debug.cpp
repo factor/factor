@@ -459,6 +459,9 @@ void factor_vm::factorbug()
 
 	std::cout << "Starting low level debugger..." << std::endl;
 
+	// Even though we've stopped the VM, the stdin_loop thread (see os-*.cpp)
+	// that pumps the console is still running concurrently. We lock a mutex so
+	// the thread will take a break and give us exclusive access to stdin.
 	lock_console();
 
 	if (!fep_help_was_shown) {
