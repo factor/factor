@@ -87,7 +87,7 @@ IN: io.launcher.windows.tests
     "out.txt" temp-file ascii file-lines first
 ] unit-test
 
-[ "( scratchpad ) " ] [
+[ "IN: scratchpad " ] [
     <process>
         console-vm "-run=listener" 2array >>command
         +closed+ >>stdin
@@ -214,7 +214,7 @@ IN: io.launcher.windows.tests
     "append-test" temp-file ascii file-contents
 ] unit-test
 
-[ "( scratchpad ) " ] [
+[ "IN: scratchpad " ] [
     console-vm "-run=listener" 2array
     ascii [ "USE: system 0 exit" print flush lines last ] with-process-stream
 ] unit-test
