@@ -146,13 +146,6 @@ void factor_vm::dispatch_signal(void *uap, void (handler)())
 	UAP_SET_TOC_POINTER(uap, (cell)FUNCTION_TOC_POINTER(handler));
 }
 
-void factor_vm::enqueue_safepoint_signal(cell signal)
-{
-	/* to be implemented, see #297
-	code->guard_safepoint();
-	*/
-}
-
 void factor_vm::start_sampling_profiler_timer()
 {
 	struct itimerval timer;
@@ -187,11 +180,19 @@ void synchronous_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 		fatal_error("Foreign thread received signal", signal);
 }
 
+void safe_write(int fd, void *data, ssize_t size);
+
+static void enqueue_signal(factor_vm *vm, int signal)
+{
+	if (vm->signal_pipe_output != 0)
+		safe_write(vm->signal_pipe_output, &signal, sizeof(int));
+}
+
 void enqueue_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
 	if (vm)
-		vm->enqueue_safepoint_signal(signal);
+		enqueue_signal(vm, signal);
 	else
 		fatal_error("Foreign thread received signal", signal);
 }
@@ -200,7 +201,10 @@ void fep_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
 	if (vm)
-		vm->enqueue_safepoint_fep();
+	{
+		vm->safepoint.enqueue_fep();
+		enqueue_signal(vm, signal);
+	}
 	else
 		fatal_error("Foreign thread received signal", signal);
 }
@@ -209,10 +213,10 @@ void sample_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
 	if (vm)
-		vm->enqueue_safepoint_sample(1, (cell)UAP_PROGRAM_COUNTER(uap), false);
+		vm->safepoint.enqueue_samples(1, (cell)UAP_PROGRAM_COUNTER(uap), false);
 	else if (thread_vms.size() == 1) {
 		factor_vm *the_only_vm = thread_vms.begin()->second;
-		the_only_vm->enqueue_safepoint_sample(1, (cell)UAP_PROGRAM_COUNTER(uap), true);
+		the_only_vm->safepoint.enqueue_samples(1, (cell)UAP_PROGRAM_COUNTER(uap), true);
 	}
 }
 
@@ -255,8 +259,33 @@ static void init_sigaction_with_handler(struct sigaction *act,
 	act->sa_flags = SA_SIGINFO | SA_ONSTACK;
 }
 
+static void safe_pipe(int *in, int *out)
+{
+	int filedes[2];
+
+	if(pipe(filedes) < 0)
+		fatal_error("Error opening pipe",errno);
+
+	*in = filedes[0];
+	*out = filedes[1];
+
+	if(fcntl(*in,F_SETFD,FD_CLOEXEC) < 0)
+		fatal_error("Error with fcntl",errno);
+
+	if(fcntl(*out,F_SETFD,FD_CLOEXEC) < 0)
+		fatal_error("Error with fcntl",errno);
+}
+
+static void init_signal_pipe(factor_vm *vm)
+{
+	safe_pipe(&vm->signal_pipe_input, &vm->signal_pipe_output);
+	vm->special_objects[OBJ_SIGNAL_PIPE] = tag_fixnum(vm->signal_pipe_input);
+}
+
 void factor_vm::unix_init_signals()
 {
+	init_signal_pipe(this);
+
 	signal_callstack_seg = new segment(callstack_size,false);
 
 	stack_t signal_callstack;
@@ -288,8 +317,6 @@ void factor_vm::unix_init_signals()
 	sigaction_safe(SIGABRT,&synchronous_sigaction,NULL);
 
 	init_sigaction_with_handler(&enqueue_sigaction, enqueue_signal_handler);
-	sigaction_safe(SIGUSR1,&enqueue_sigaction,NULL);
-	sigaction_safe(SIGUSR2,&enqueue_sigaction,NULL);
 	sigaction_safe(SIGWINCH,&enqueue_sigaction,NULL);
 #ifdef SIGINFO
 	sigaction_safe(SIGINFO,&enqueue_sigaction,NULL);
@@ -307,6 +334,8 @@ void factor_vm::unix_init_signals()
 	io.launcher.unix for this. */
 	init_sigaction_with_handler(&ignore_sigaction, ignore_signal_handler);
 	sigaction_safe(SIGPIPE,&ignore_sigaction,NULL);
+	/* We send SIGUSR2 to the stdin_loop thread to interrupt it on FEP */
+	sigaction_safe(SIGUSR2,&ignore_sigaction,NULL);
 }
 
 /* On Unix, shared fds such as stdin cannot be set to non-blocking mode
@@ -326,6 +355,9 @@ extern "C" {
 
 	int size_read;
 	int size_write;
+
+	THREADHANDLE stdin_thread;
+	pthread_mutex_t stdin_mutex;
 }
 
 void safe_close(int fd)
@@ -377,7 +409,9 @@ void *stdin_loop(void *arg)
 
 	sigset_t mask;
 	sigfillset(&mask);
-	pthread_sigmask(SIG_BLOCK, &mask, NULL);
+	sigdelset(&mask, SIGUSR2);
+	sigdelset(&mask, SIGTTIN);
+	pthread_sigmask(SIG_SETMASK, &mask, NULL);
 
 	while(loop_running)
 	{
@@ -389,6 +423,10 @@ void *stdin_loop(void *arg)
 
 		for(;;)
 		{
+			// If we fep, the parent thread will grab stdin_mutex and send us
+			// SIGUSR2 to interrupt the read() call.
+			pthread_mutex_lock(&stdin_mutex);
+			pthread_mutex_unlock(&stdin_mutex);
 			ssize_t bytes = read(0,buf,sizeof(buf));
 			if(bytes < 0)
 			{
@@ -417,29 +455,24 @@ void *stdin_loop(void *arg)
 	return NULL;
 }
 
-void safe_pipe(int *in, int *out)
-{
-	int filedes[2];
-
-	if(pipe(filedes) < 0)
-		fatal_error("Error opening pipe",errno);
-
-	*in = filedes[0];
-	*out = filedes[1];
-
-	if(fcntl(*in,F_SETFD,FD_CLOEXEC) < 0)
-		fatal_error("Error with fcntl",errno);
-
-	if(fcntl(*out,F_SETFD,FD_CLOEXEC) < 0)
-		fatal_error("Error with fcntl",errno);
-}
-
-void open_console()
+void factor_vm::open_console()
 {
 	safe_pipe(&control_read,&control_write);
 	safe_pipe(&size_read,&size_write);
 	safe_pipe(&stdin_read,&stdin_write);
-	start_thread(stdin_loop,NULL);
+	stdin_thread = start_thread(stdin_loop,NULL);
+	pthread_mutex_init(&stdin_mutex, NULL);
+}
+
+void factor_vm::lock_console()
+{
+	pthread_mutex_lock(&stdin_mutex);
+	pthread_kill(stdin_thread, SIGUSR2);
+}
+
+void factor_vm::unlock_console()
+{
+	pthread_mutex_unlock(&stdin_mutex);
 }
 
 }

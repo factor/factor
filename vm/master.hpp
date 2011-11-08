@@ -36,6 +36,8 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
+#include <limits>
+
 
 #define FACTOR_STRINGIZE_I(x) #x
 #define FACTOR_STRINGIZE(x) FACTOR_STRINGIZE_I(x)
@@ -127,6 +129,7 @@ namespace factor
 #include "callbacks.hpp"
 #include "dispatch.hpp"
 #include "entry_points.hpp"
+#include "safepoints.hpp"
 #include "vm.hpp"
 #include "allot.hpp"
 #include "tagged.hpp"

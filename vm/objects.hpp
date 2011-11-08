@@ -104,6 +104,9 @@ enum special_object {
 	OBJ_VM_COMPILER = 72,     /* version string of the compiler we were built with */
 
 	OBJ_WAITING_CALLBACKS = 73,
+
+	OBJ_SIGNAL_PIPE = 74,     /* file descriptor for pipe used to communicate signals
+	                          only used on unix */
 };
 
 /* save-image-and-exit discards special objects that are filled in on startup
