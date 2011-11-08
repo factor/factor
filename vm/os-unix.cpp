@@ -216,7 +216,7 @@ void sample_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 		vm->safepoint.enqueue_samples(vm, 1, (cell)UAP_PROGRAM_COUNTER(uap), false);
 	else if (thread_vms.size() == 1) {
 		factor_vm *the_only_vm = thread_vms.begin()->second;
-		the_only_vm->safepoint.enqueue_samples(vm, 1, (cell)UAP_PROGRAM_COUNTER(uap), true);
+		the_only_vm->safepoint.enqueue_samples(the_only_vm, 1, (cell)UAP_PROGRAM_COUNTER(uap), true);
 	}
 }
 
