@@ -5,7 +5,7 @@ hashtables.identity io kernel kernel.private locals math
 math.statistics math.vectors memory namespaces prettyprint
 sequences sequences.generalizations sets sorting
 tools.profiler.sampling.private math.parser.private
-math.parser ;
+math.parser layouts ;
 FROM: sequences => change-nth ;
 FROM: assocs => change-at ;
 IN: tools.profiler.sampling
@@ -64,6 +64,12 @@ CONSTANT: ignore-words
 : foreign-thread-time ( -- n )
     most-recent-profile-data foreign-thread-time* ;
 
+TUPLE: profile-node
+    total-time gc-time jit-time foreign-time foreign-thread-time children
+    depth ;
+
+<PRIVATE
+
 : collect-threads ( samples -- by-thread )
     [ sample-thread ] collect-by ;
 
@@ -78,24 +84,23 @@ CONSTANT: zero-counts { 0 0 0 0 0 }
 : sum-counts ( samples -- times )
     zero-counts [ sample-counts-slice v+ ] reduce ;
 
-TUPLE: profile-node
-    total-time gc-time jit-time foreign-time foreign-thread-time children
-    depth ;
-
 : <profile-node> ( times children depth -- node )
     [ 5 firstn [ samples>time ] 5 napply ] 2dip profile-node boa ;
 
 : <profile-root-node> ( samples collector-quot -- node )
     [ sum-counts ] swap bi 0 <profile-node> ; inline
 
-:: (collect-subtrees) ( samples child-quot -- children )
-    samples [ sample-callstack leaf-callstack? not ] filter
-    [ f ] [ child-quot call ] if-empty ; inline
+:: (collect-subtrees) ( samples max-depth depth child-quot: ( samples -- child ) -- children )
+    max-depth depth > [
+        samples [ sample-callstack leaf-callstack? not ] filter
+        [ f ] [ child-quot call ] if-empty
+    ] [ f ] if ; inline
 
-:: collect-tops ( samples depth -- node )
+:: collect-tops ( samples max-depth depth -- node )
     samples [ unclip-callstack ] collect-pairs [
         [ sum-counts ]
-        [ [ depth 1 + collect-tops ] (collect-subtrees) ] bi depth <profile-node>
+        [ max-depth depth [ max-depth depth 1 + collect-tops ] (collect-subtrees) ] bi
+        depth <profile-node>
     ] assoc-map ;
 
 : redundant-root-node? ( assoc -- ? )
@@ -108,15 +113,25 @@ TUPLE: profile-node
 : trim-root ( root -- root' )
     dup redundant-root-node? [ children>> values first trim-root ] when ;
 
-:: (top-down) ( profile-data depth -- tree )
+:: (top-down) ( profile-data max-depth depth -- tree )
     profile-data collect-threads
-    [ [ depth collect-tops ] <profile-root-node> trim-root ] assoc-map ;
+    [ [ max-depth depth collect-tops ] <profile-root-node> trim-root ] assoc-map ;
 
-: top-down* ( profile-data -- tree )
+PRIVATE>
+
+: top-down-max-depth* ( profile-data max-depth -- tree )
     0 (top-down) ;
 
+: top-down-max-depth ( max-depth -- tree )
+    most-recent-profile-data swap top-down-max-depth* ;
+
+: top-down* ( profile-data -- tree )
+    most-positive-fixnum top-down-max-depth* ;
+
 : top-down ( -- tree )
-    most-recent-profile-data top-down* ;
+    most-positive-fixnum top-down-max-depth ;
+
+<PRIVATE
 
 :: counts+at ( key assoc sample -- )
     key assoc [ zero-counts or sample sample-counts-slice v+ ] change-at ;
@@ -136,12 +151,16 @@ TUPLE: profile-node
 : trim-flat ( root-node -- root-node' )
     dup '[ [ nip _ redundant-flat-node? not ] assoc-filter ] change-children ;
 
+PRIVATE>
+
 : flat* ( profile-data -- flat )
     collect-threads
     [ [ collect-flat ] <profile-root-node> trim-flat ] assoc-map ;
 
 : flat ( -- tree )
     most-recent-profile-data flat* ;
+
+<PRIVATE
 
 : nth-or-last ( n seq -- elt )
     [ drop f ] [
@@ -158,12 +177,16 @@ TUPLE: profile-node
     ] each
     per-word-samples [ f depth <profile-node> ] assoc-map ;
 
+PRIVATE>
+
 :: cross-section* ( depth profile-data -- flat )
     profile-data collect-threads
     [ [ depth collect-cross-section ] <profile-root-node> ] assoc-map ;
 
 : cross-section ( depth -- tree )
     most-recent-profile-data cross-section* ;
+
+<PRIVATE
 
 : depth. ( depth -- )
     [ "  " write ] times ;
@@ -197,6 +220,8 @@ DEFER: (profile.)
 
 : (profile.) ( nodes depth -- )
     [ by-total-time ] dip '[ _ (profile-node.) ] assoc-each ;
+
+PRIVATE>
 
 : profile-heading. ( -- )
     "depth   time ms  GC %  JIT %  FFI %   FT %" print ;
