@@ -169,7 +169,6 @@ void factor_vm::move_file(const vm_char *path1, const vm_char *path2)
 }
 
 void factor_vm::init_signals() {}
-void safepoint_state::report_signal(int fd) volatile {}
 
 THREADHANDLE start_thread(void *(*start_routine)(void *), void *args)
 {
@@ -289,7 +288,7 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
 		threads. */
 		assert(thread_vms.size() == 1);
 		factor_vm *vm = thread_vms.begin()->second;
-		vm->safepoint.enqueue_fep(0);
+		vm->safepoint.enqueue_fep();
 		return TRUE;
 	}
 	default:
