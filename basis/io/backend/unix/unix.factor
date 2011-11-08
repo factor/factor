@@ -7,7 +7,7 @@ io.encodings math.parser continuations system libc namespaces
 make io.timeouts io.encodings.utf8 destructors
 destructors.private accessors summary combinators locals
 unix.time unix.types fry io.backend.unix.multiplexers
-classes.struct init ;
+classes.struct ;
 QUALIFIED: io
 IN: io.backend.unix
 
@@ -226,5 +226,3 @@ TUPLE: mx-port < port mx ;
 
 :: ?flag ( n mask symbol -- n )
     n mask bitand 0 > [ symbol , ] when n ;
-
-[ start-signal-pipe-thread ] "io.backend.unix:signal-pipe-thread" add-startup-hook
