@@ -180,11 +180,19 @@ void synchronous_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 		fatal_error("Foreign thread received signal", signal);
 }
 
+void safe_write(int fd, void *data, ssize_t size);
+
+static void enqueue_signal(factor_vm *vm, int signal)
+{
+	if (vm->signal_pipe_output != 0)
+		safe_write(vm->signal_pipe_output, &signal, sizeof(int));
+}
+
 void enqueue_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
 	if (vm)
-		vm->safepoint.enqueue_signal(signal);
+		enqueue_signal(vm, signal);
 	else
 		fatal_error("Foreign thread received signal", signal);
 }
@@ -193,7 +201,10 @@ void fep_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
 	if (vm)
-		vm->safepoint.enqueue_fep(signal);
+	{
+		vm->safepoint.enqueue_fep();
+		enqueue_signal(vm, signal);
+	}
 	else
 		fatal_error("Foreign thread received signal", signal);
 }
@@ -268,7 +279,7 @@ static void safe_pipe(int *in, int *out)
 static void init_signal_pipe(factor_vm *vm)
 {
 	safe_pipe(&vm->signal_pipe_input, &vm->signal_pipe_output);
-	vm->special_objects[OBJ_SIGNAL_PIPE] = tag_fixnum(vm->signal_pipe_output);
+	vm->special_objects[OBJ_SIGNAL_PIPE] = tag_fixnum(vm->signal_pipe_input);
 }
 
 void factor_vm::unix_init_signals()
@@ -441,16 +452,6 @@ void open_console()
 	safe_pipe(&size_read,&size_write);
 	safe_pipe(&stdin_read,&stdin_write);
 	start_thread(stdin_loop,NULL);
-}
-
-void safepoint_state::report_signal(int fd) volatile
-{
-	int signal = (int)atomic::load(&queued_signal);
-	if (signal != 0)
-	{
-		safe_write(fd, &signal, sizeof(int));
-		atomic::store(&queued_signal, 0);
-	}
 }
 
 }
