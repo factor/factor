@@ -12,11 +12,11 @@ profiling_sample_count profiling_sample_count::record_counts() volatile
 		jit_sample_count,
 		foreign_sample_count,
 		foreign_thread_sample_count);
-	atomic::subtract(&sample_count, returned.sample_count);
-	atomic::subtract(&gc_sample_count, returned.gc_sample_count);
-	atomic::subtract(&jit_sample_count, returned.jit_sample_count);
-	atomic::subtract(&foreign_sample_count, returned.foreign_sample_count);
-	atomic::subtract(&foreign_thread_sample_count, returned.foreign_thread_sample_count);
+	atomic::fetch_subtract(&sample_count, returned.sample_count);
+	atomic::fetch_subtract(&gc_sample_count, returned.gc_sample_count);
+	atomic::fetch_subtract(&jit_sample_count, returned.jit_sample_count);
+	atomic::fetch_subtract(&foreign_sample_count, returned.foreign_sample_count);
+	atomic::fetch_subtract(&foreign_thread_sample_count, returned.foreign_thread_sample_count);
 	return returned;
 }
 
@@ -156,16 +156,16 @@ void factor_vm::enqueue_safepoint_sample(cell samples, cell pc, bool foreign_thr
 {
 	if (atomic::load(&sampling_profiler_p))
 	{
-		atomic::add(&safepoint_sample_counts.sample_count, samples);
+		atomic::fetch_add(&safepoint_sample_counts.sample_count, samples);
 		if (foreign_thread_p)
-			atomic::add(&safepoint_sample_counts.foreign_thread_sample_count, samples);
+			atomic::fetch_add(&safepoint_sample_counts.foreign_thread_sample_count, samples);
 		else {
 			if (atomic::load(&current_gc_p))
-				atomic::add(&safepoint_sample_counts.gc_sample_count, samples);
+				atomic::fetch_add(&safepoint_sample_counts.gc_sample_count, samples);
 			if (atomic::load(&current_jit_count) > 0)
-				atomic::add(&safepoint_sample_counts.jit_sample_count, samples);
+				atomic::fetch_add(&safepoint_sample_counts.jit_sample_count, samples);
 			if (!code->seg->in_segment_p(pc))
-				atomic::add(&safepoint_sample_counts.foreign_sample_count, samples);
+				atomic::fetch_add(&safepoint_sample_counts.foreign_sample_count, samples);
 		}
 		code->guard_safepoint();
 	}

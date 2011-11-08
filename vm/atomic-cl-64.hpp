@@ -17,25 +17,25 @@ namespace factor {
 				(LONG64)new_val) == (LONG64)old_val;
 		}
 
-		__forceinline static cell add(volatile cell *ptr, cell val)
+		__forceinline static cell fetch_add(volatile cell *ptr, cell val)
 		{
-			return (cell)InterlockedAdd64(
+			return (cell)InterlockedExchangeAdd64(
 				reinterpret_cast<volatile LONG64 *>(ptr), (LONG64)val);
 		}
-		__forceinline static fixnum add(volatile fixnum *ptr, fixnum val)
+		__forceinline static fixnum fetch_add(volatile fixnum *ptr, fixnum val)
 		{
-			return (fixnum)InterlockedAdd64(
+			return (fixnum)InterlockedExchangeAdd64(
 				reinterpret_cast<volatile LONG64 *>(ptr), (LONG64)val);
 		}
 
-		__forceinline static cell subtract(volatile cell *ptr, cell val)
+		__forceinline static cell fetch_subtract(volatile cell *ptr, cell val)
 		{
-			return (cell)InterlockedAdd64(
+			return (cell)InterlockedExchangeAdd64(
 				reinterpret_cast<volatile LONG64 *>(ptr), -(LONG64)val);
 		}
-		__forceinline static fixnum subtract(volatile fixnum *ptr, fixnum val)
+		__forceinline static fixnum fetch_subtract(volatile fixnum *ptr, fixnum val)
 		{
-			return (fixnum)InterlockedAdd64(
+			return (fixnum)InterlockedExchangeAdd64(
 				reinterpret_cast<volatile LONG64 *>(ptr), -(LONG64)val);
 		}
 

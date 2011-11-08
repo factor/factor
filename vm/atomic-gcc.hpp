@@ -13,25 +13,25 @@ namespace factor {
 		}
 
 		__attribute__((always_inline))
-		inline static cell add(volatile cell *ptr, cell val)
+		inline static cell fetch_add(volatile cell *ptr, cell val)
 		{
-			return __sync_add_and_fetch(ptr, val);
+			return __sync_fetch_and_add(ptr, val);
 		}
 		__attribute__((always_inline))
-		inline static fixnum add(volatile fixnum *ptr, fixnum val)
+		inline static fixnum fetch_add(volatile fixnum *ptr, fixnum val)
 		{
-			return __sync_add_and_fetch(ptr, val);
+			return __sync_fetch_and_add(ptr, val);
 		}
 
 		__attribute__((always_inline))
-		inline static cell subtract(volatile cell *ptr, cell val)
+		inline static cell fetch_subtract(volatile cell *ptr, cell val)
 		{
-			return __sync_sub_and_fetch(ptr, val);
+			return __sync_fetch_and_sub(ptr, val);
 		}
 		__attribute__((always_inline))
-		inline static fixnum subtract(volatile fixnum *ptr, fixnum val)
+		inline static fixnum fetch_subtract(volatile fixnum *ptr, fixnum val)
 		{
-			return __sync_sub_and_fetch(ptr, val);
+			return __sync_fetch_and_sub(ptr, val);
 		}
 
 		__attribute__((always_inline))
