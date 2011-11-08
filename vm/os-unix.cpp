@@ -407,18 +407,15 @@ void *stdin_loop(void *arg)
 	unsigned char buf[4096];
 	bool loop_running = true;
 
-	// If we fep, the parent thread will grab a mutex and send us SIGUSR2 to make
-	// us relinquish our hold on stdin.
 	sigset_t mask;
 	sigfillset(&mask);
 	sigdelset(&mask, SIGUSR2);
+	sigdelset(&mask, SIGTTIN);
 	pthread_sigmask(SIG_SETMASK, &mask, NULL);
 
 	while(loop_running)
 	{
-		bool readp = safe_read(control_read,buf,1);
-
-		if(!readp)
+		if(!safe_read(control_read,buf,1))
 			break;
 
 		if(buf[0] != 'X')
@@ -426,6 +423,8 @@ void *stdin_loop(void *arg)
 
 		for(;;)
 		{
+			// If we fep, the parent thread will grab stdin_mutex and send us
+			// SIGUSR2 to interrupt the read() call.
 			pthread_mutex_lock(&stdin_mutex);
 			pthread_mutex_unlock(&stdin_mutex);
 			ssize_t bytes = read(0,buf,sizeof(buf));
