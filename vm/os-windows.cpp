@@ -288,7 +288,7 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
 		threads. */
 		assert(thread_vms.size() == 1);
 		factor_vm *vm = thread_vms.begin()->second;
-		vm->safepoint.enqueue_fep();
+		vm->safepoint.enqueue_fep(this);
 		return TRUE;
 	}
 	default:
@@ -348,7 +348,7 @@ void factor_vm::sampler_thread_loop()
 			suscount = ResumeThread(thread);
 			assert(suscount == 1);
 
-			safepoint.enqueue_samples(samples, context.EIP, false);
+			safepoint.enqueue_samples(this, samples, context.EIP, false);
 		}
 	}
 }

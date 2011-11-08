@@ -3,20 +3,20 @@
 namespace factor
 {
 
-void safepoint_state::enqueue_safepoint() volatile
+void safepoint_state::enqueue_safepoint(factor_vm *parent) volatile
 {
 	parent->code->guard_safepoint();
 }
 
-void safepoint_state::enqueue_fep() volatile
+void safepoint_state::enqueue_fep(factor_vm *parent) volatile
 {
 	if (parent->fep_p)
 		fatal_error("Low-level debugger interrupted", 0);
 	atomic::store(&fep_p, true);
-	enqueue_safepoint();
+	enqueue_safepoint(parent);
 }
 
-void safepoint_state::enqueue_samples(cell samples, cell pc, bool foreign_thread_p) volatile
+void safepoint_state::enqueue_samples(factor_vm *parent, cell samples, cell pc, bool foreign_thread_p) volatile
 {
 	if (atomic::load(&parent->sampling_profiler_p))
 	{
@@ -31,11 +31,11 @@ void safepoint_state::enqueue_samples(cell samples, cell pc, bool foreign_thread
 			if (!parent->code->seg->in_segment_p(pc))
 				atomic::fetch_add(&sample_counts.foreign_sample_count, samples);
 		}
-		enqueue_safepoint();
+		enqueue_safepoint(parent);
 	}
 }
 
-void safepoint_state::handle_safepoint() volatile
+void safepoint_state::handle_safepoint(factor_vm *parent) volatile
 {
 	parent->code->unguard_safepoint();
 
