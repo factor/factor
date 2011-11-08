@@ -24,7 +24,7 @@ factor_vm::factor_vm(THREADHANDLE thread) :
 	last_nano_count(0),
 	signal_callstack_seg(NULL),
 	faulting_p(false),
-	safepoint(this)
+	safepoint()
 {
 	primitive_reset_dispatch_stats();
 }

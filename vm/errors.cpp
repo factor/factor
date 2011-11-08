@@ -89,7 +89,7 @@ void factor_vm::not_implemented_error()
 void factor_vm::memory_protection_error(cell addr)
 {
 	if(code->safepoint_p(addr))
-		safepoint.handle_safepoint();
+		safepoint.handle_safepoint(this);
 	else if(faulting_p)
 		fatal_error("Double fault", 0);
 	else if(ctx->datastack_seg->underflow_p(addr))

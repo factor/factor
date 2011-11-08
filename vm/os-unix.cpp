@@ -202,7 +202,7 @@ void fep_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 	factor_vm *vm = current_vm_p();
 	if (vm)
 	{
-		vm->safepoint.enqueue_fep();
+		vm->safepoint.enqueue_fep(vm);
 		enqueue_signal(vm, signal);
 	}
 	else
@@ -213,10 +213,10 @@ void sample_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
 	if (vm)
-		vm->safepoint.enqueue_samples(1, (cell)UAP_PROGRAM_COUNTER(uap), false);
+		vm->safepoint.enqueue_samples(vm, 1, (cell)UAP_PROGRAM_COUNTER(uap), false);
 	else if (thread_vms.size() == 1) {
 		factor_vm *the_only_vm = thread_vms.begin()->second;
-		the_only_vm->safepoint.enqueue_samples(1, (cell)UAP_PROGRAM_COUNTER(uap), true);
+		the_only_vm->safepoint.enqueue_samples(vm, 1, (cell)UAP_PROGRAM_COUNTER(uap), true);
 	}
 }
 
