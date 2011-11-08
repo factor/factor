@@ -68,10 +68,10 @@ M: unrolled-list push-front*
     [ drop ] [ and ] 2bi
     [ push-front/existing ] [ drop push-front/new ] if f ;
 
-M: unrolled-list peek-front
+M: unrolled-list peek-front*
     dup front>>
-    [ [ front-pos>> ] dip data>> nth-unsafe ]
-    [ empty-unrolled-list ]
+    [ [ front-pos>> ] dip data>> nth-unsafe t ]
+    [ drop f f ]
     if* ;
 
 : pop-front/new ( list front -- )
@@ -114,10 +114,10 @@ M: unrolled-list push-back*
     [ drop ] [ and ] 2bi
     [ push-back/existing ] [ drop push-back/new ] if f ;
 
-M: unrolled-list peek-back
+M: unrolled-list peek-back*
     dup back>>
-    [ [ back-pos>> 1 - ] dip data>> nth-unsafe ]
-    [ empty-unrolled-list ]
+    [ [ back-pos>> 1 - ] dip data>> nth-unsafe t ]
+    [ drop f f ]
     if* ;
 
 : pop-back/new ( list back -- )

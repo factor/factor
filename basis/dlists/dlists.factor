@@ -107,31 +107,26 @@ M: dlist push-back* ( obj dlist -- dlist-node )
     [ back<< ] 2keep
     set-front-to-back ;
 
-ERROR: empty-dlist ;
+M: dlist peek-front* ( dlist -- obj/f ? )
+    front>> [ obj>> t ] [ f f ] if* ;
 
-M: empty-dlist summary ( dlist -- string )
-    drop "Empty dlist" ;
-
-M: dlist peek-front ( dlist -- obj )
-    front>> [ obj>> ] [ empty-dlist ] if* ;
+M: dlist peek-back* ( dlist -- obj/f ? )
+    back>> [ obj>> t ] [ f f ] if* ;
 
 M: dlist pop-front* ( dlist -- )
     [
         [
-            [ empty-dlist ] unless*
+            [ empty-deque ] unless*
             next>>
             f over set-prev-when
         ] change-front drop
     ] keep
     normalize-back ;
 
-M: dlist peek-back ( dlist -- obj )
-    back>> [ obj>> ] [ empty-dlist ] if* ;
-
 M: dlist pop-back* ( dlist -- )
     [
         [
-            [ empty-dlist ] unless*
+            [ empty-deque ] unless*
             prev>>
             f over set-next-when
         ] change-back drop

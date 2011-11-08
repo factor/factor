@@ -5,8 +5,8 @@ IN: deques
 
 GENERIC: push-front* ( obj deque -- node )
 GENERIC: push-back* ( obj deque -- node )
-GENERIC: peek-front ( deque -- obj )
-GENERIC: peek-back ( deque -- obj )
+GENERIC: peek-front* ( deque -- obj ? )
+GENERIC: peek-back* ( deque -- obj ? )
 GENERIC: pop-front* ( deque -- )
 GENERIC: pop-back* ( deque -- )
 GENERIC: delete-node ( node deque -- )
@@ -14,6 +14,20 @@ GENERIC: deque-member? ( value deque -- ? )
 GENERIC: clear-deque ( deque -- )
 GENERIC: node-value ( node -- value )
 GENERIC: deque-empty? ( deque -- ? )
+
+ERROR: empty-deque ;
+
+: peek-front ( dlist -- obj )
+    peek-front* [ drop empty-deque ] unless ;
+
+: ?peek-front ( dlist -- obj/f )
+    peek-front* [ drop f ] unless ;
+
+: peek-back ( dlist -- obj )
+    peek-back* [ drop empty-deque ] unless ;
+
+: ?peek-back ( dlist -- obj/f )
+    peek-back* [ drop f ] unless ;
 
 : push-front ( obj deque -- )
     push-front* drop ; inline

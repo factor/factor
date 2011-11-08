@@ -9,9 +9,9 @@ C: <search-deque> search-deque
 
 M: search-deque deque-empty? deque>> deque-empty? ;
 
-M: search-deque peek-front deque>> peek-front ;
+M: search-deque peek-front* deque>> peek-front* ;
 
-M: search-deque peek-back deque>> peek-back ;
+M: search-deque peek-back* deque>> peek-back* ;
 
 M: search-deque push-front*
     2dup assoc>> at* [ 2nip ] [
