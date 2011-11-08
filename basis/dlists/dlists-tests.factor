@@ -58,10 +58,15 @@ IN: dlists.tests
 [ t ] [ <dlist> 4 over push-back 5 over push-back* [ = ] curry dlist-find-node class-of dlist-node = ] unit-test
 [ ] [ <dlist> 4 over push-back 5 over push-back [ drop ] dlist-each ] unit-test
 
-[ <dlist> peek-front ] [ empty-dlist? ] must-fail-with
-[ <dlist> peek-back ] [ empty-dlist? ] must-fail-with
-[ <dlist> pop-front ] [ empty-dlist? ] must-fail-with
-[ <dlist> pop-back ] [ empty-dlist? ] must-fail-with
+[ f ] [ <dlist> ?peek-front ] unit-test
+[ 1 ] [ <dlist> 1 over push-front ?peek-front ] unit-test
+[ f ] [ <dlist> ?peek-back ] unit-test
+[ 1 ] [ <dlist> 1 over push-back ?peek-back ] unit-test
+
+[ <dlist> peek-front ] [ empty-deque? ] must-fail-with
+[ <dlist> peek-back ] [ empty-deque? ] must-fail-with
+[ <dlist> pop-front ] [ empty-deque? ] must-fail-with
+[ <dlist> pop-back ] [ empty-deque? ] must-fail-with
 
 [ t ] [ <dlist> 3 over push-front 4 over push-back 3 swap deque-member? ] unit-test
 
