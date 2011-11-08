@@ -438,6 +438,12 @@ void factor_vm::factorbug_usage(bool advanced_p)
 
 }
 
+static void exit_fep(factor_vm *vm)
+{
+	vm->unlock_console();
+	vm->fep_p = false;
+}
+
 void factor_vm::factorbug()
 {
 	if(fep_disabled)
@@ -452,6 +458,9 @@ void factor_vm::factorbug()
 	fep_p = true;
 
 	std::cout << "Starting low level debugger..." << std::endl;
+
+	lock_console();
+
 	if (!fep_help_was_shown) {
 		factorbug_usage(false);
 		fep_help_was_shown = true;
@@ -530,12 +539,12 @@ void factor_vm::factorbug()
 			dump_generations();
 		else if(strcmp(cmd,"c") == 0)
 		{
-			fep_p = false;
+			exit_fep(this);
 			return;
 		}
 		else if(strcmp(cmd,"t") == 0)
 		{
-			fep_p = false;
+			exit_fep(this);
 			general_error(ERROR_INTERRUPT,false_object,false_object);
 			assert(false);
 		}
