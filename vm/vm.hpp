@@ -736,6 +736,9 @@ struct factor_vm
 	void init_signals();
 	void start_sampling_profiler_timer();
 	void end_sampling_profiler_timer();
+	void open_console();
+	void lock_console();
+	void unlock_console();
 
 	// os-windows
   #if defined(WINDOWS)
@@ -747,7 +750,6 @@ struct factor_vm
 	void windows_image_path(vm_char *full_path, vm_char *temp_path, unsigned int length);
 	BOOL windows_stat(vm_char *path);
 
-	void open_console();
 	LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch);
 
   #else  // UNIX

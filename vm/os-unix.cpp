@@ -317,8 +317,6 @@ void factor_vm::unix_init_signals()
 	sigaction_safe(SIGABRT,&synchronous_sigaction,NULL);
 
 	init_sigaction_with_handler(&enqueue_sigaction, enqueue_signal_handler);
-	sigaction_safe(SIGUSR1,&enqueue_sigaction,NULL);
-	sigaction_safe(SIGUSR2,&enqueue_sigaction,NULL);
 	sigaction_safe(SIGWINCH,&enqueue_sigaction,NULL);
 #ifdef SIGINFO
 	sigaction_safe(SIGINFO,&enqueue_sigaction,NULL);
@@ -336,6 +334,8 @@ void factor_vm::unix_init_signals()
 	io.launcher.unix for this. */
 	init_sigaction_with_handler(&ignore_sigaction, ignore_signal_handler);
 	sigaction_safe(SIGPIPE,&ignore_sigaction,NULL);
+	/* We send SIGUSR2 to the stdin_loop thread to interrupt it on FEP */
+	sigaction_safe(SIGUSR2,&ignore_sigaction,NULL);
 }
 
 /* On Unix, shared fds such as stdin cannot be set to non-blocking mode
@@ -355,6 +355,9 @@ extern "C" {
 
 	int size_read;
 	int size_write;
+
+	THREADHANDLE stdin_thread;
+	pthread_mutex_t stdin_mutex;
 }
 
 void safe_close(int fd)
@@ -404,13 +407,18 @@ void *stdin_loop(void *arg)
 	unsigned char buf[4096];
 	bool loop_running = true;
 
+	// If we fep, the parent thread will grab a mutex and send us SIGUSR2 to make
+	// us relinquish our hold on stdin.
 	sigset_t mask;
 	sigfillset(&mask);
-	pthread_sigmask(SIG_BLOCK, &mask, NULL);
+	sigdelset(&mask, SIGUSR2);
+	pthread_sigmask(SIG_SETMASK, &mask, NULL);
 
 	while(loop_running)
 	{
-		if(!safe_read(control_read,buf,1))
+		bool readp = safe_read(control_read,buf,1);
+
+		if(!readp)
 			break;
 
 		if(buf[0] != 'X')
@@ -418,6 +426,8 @@ void *stdin_loop(void *arg)
 
 		for(;;)
 		{
+			pthread_mutex_lock(&stdin_mutex);
+			pthread_mutex_unlock(&stdin_mutex);
 			ssize_t bytes = read(0,buf,sizeof(buf));
 			if(bytes < 0)
 			{
@@ -446,12 +456,24 @@ void *stdin_loop(void *arg)
 	return NULL;
 }
 
-void open_console()
+void factor_vm::open_console()
 {
 	safe_pipe(&control_read,&control_write);
 	safe_pipe(&size_read,&size_write);
 	safe_pipe(&stdin_read,&stdin_write);
-	start_thread(stdin_loop,NULL);
+	stdin_thread = start_thread(stdin_loop,NULL);
+	pthread_mutex_init(&stdin_mutex, NULL);
+}
+
+void factor_vm::lock_console()
+{
+	pthread_mutex_lock(&stdin_mutex);
+	pthread_kill(stdin_thread, SIGUSR2);
+}
+
+void factor_vm::unlock_console()
+{
+	pthread_mutex_unlock(&stdin_mutex);
 }
 
 }
