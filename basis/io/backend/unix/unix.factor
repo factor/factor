@@ -7,7 +7,7 @@ io.encodings math.parser continuations system libc namespaces
 make io.timeouts io.encodings.utf8 destructors
 destructors.private accessors summary combinators locals
 unix.time unix.types fry io.backend.unix.multiplexers
-classes.struct ;
+classes.struct init ;
 QUALIFIED: io
 IN: io.backend.unix
 
@@ -188,11 +188,12 @@ M: stdin cancel-operation
         data-read-fd <fd> >>data ;
 
 : signal-pipe-fd ( -- n )
-    OBJ-SIGNAL-PIPE special-object { fixnum } declare ; inline
+    OBJ-SIGNAL-PIPE special-object ; inline
 
-: init-signal-pipe ( -- )
-    signal-pipe-fd <fd> init-fd <input-port>
-    '[ [ 4 _ io:stream-read ] loop ] "Signals" spawn drop ;
+: start-signal-pipe-thread ( -- )
+    signal-pipe-fd [ <fd> init-fd <input-port>
+        '[ [ 4 _ io:stream-read ] loop ] "Signals" spawn drop
+    ] when* ;
 
 M: unix init-stdio
     <stdin> <input-port>
@@ -214,3 +215,5 @@ TUPLE: mx-port < port mx ;
 
 :: ?flag ( n mask symbol -- n )
     n mask bitand 0 > [ symbol , ] when n ;
+
+[ start-signal-pipe-thread ] "io.backend.unix:signal-pipe-thread" add-startup-hook
