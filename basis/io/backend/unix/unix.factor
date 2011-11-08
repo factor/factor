@@ -187,12 +187,23 @@ M: stdin cancel-operation
         size-read-fd <fd> init-fd <input-port> >>size
         data-read-fd <fd> >>data ;
 
+SYMBOL: dispatch-signal-hook
+
+dispatch-signal-hook [ [ drop ] ] initialize
+
 : signal-pipe-fd ( -- n )
     OBJ-SIGNAL-PIPE special-object ; inline
 
+: signal-pipe-loop ( port -- )
+    '[
+        int heap-size _ io:stream-read
+        dup [ int deref dispatch-signal-hook get call( x -- ) ] when*
+    ] loop ;
+
 : start-signal-pipe-thread ( -- )
-    signal-pipe-fd [ <fd> init-fd <input-port>
-        '[ [ 4 _ io:stream-read ] loop ] "Signals" spawn drop
+    signal-pipe-fd [
+        <fd> init-fd <input-port>
+        '[ _ signal-pipe-loop ] "Signals" spawn drop
     ] when* ;
 
 M: unix init-stdio
