@@ -168,7 +168,4 @@ FUNCTION: int unlink ( c-string path ) ;
 FUNCTION: int utimes ( c-string path, timeval[2] times ) ;
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 
-FUNCTION: int kill ( pid_t pid, int signal ) ;
-FUNCTION: int raise ( int signal ) ;
-
 "librt" "librt.so" cdecl add-library
