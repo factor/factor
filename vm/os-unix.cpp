@@ -466,6 +466,9 @@ void factor_vm::open_console()
 
 void factor_vm::lock_console()
 {
+	// Lock the stdin_mutex and send the stdin_loop thread a signal to interrupt
+	// any read() it has in progress. When the stdin loop iterates again, it will
+	// try to lock the same mutex and wait until unlock_console() is called.
 	pthread_mutex_lock(&stdin_mutex);
 	pthread_kill(stdin_thread, SIGUSR2);
 }
