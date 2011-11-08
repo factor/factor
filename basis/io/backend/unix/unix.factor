@@ -187,6 +187,13 @@ M: stdin cancel-operation
         size-read-fd <fd> init-fd <input-port> >>size
         data-read-fd <fd> >>data ;
 
+: signal-pipe-fd ( -- n )
+    OBJ-SIGNAL-PIPE special-object { fixnum } declare ; inline
+
+: init-signal-pipe ( -- )
+    signal-pipe-fd <fd> init-fd <input-port>
+    '[ [ 4 _ io:stream-read ] loop ] "Signals" spawn drop ;
+
 M: unix init-stdio
     <stdin> <input-port>
     1 <fd> <output-port>

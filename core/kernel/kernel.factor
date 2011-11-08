@@ -342,6 +342,8 @@ CONSTANT: OBJ-VM-COMPILER 72
 
 CONSTANT: OBJ-WAITING-CALLBACKS 73
 
+CONSTANT: OBJ-SIGNAL-PIPE 74
+
 ! Context object count and identifiers must be kept in sync with:
 !   vm/contexts.hpp
 
