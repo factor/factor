@@ -301,6 +301,14 @@ void factor_vm::open_console()
 	SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
 }
 
+void factor_vm::lock_console()
+{
+}
+
+void factor_vm::unlock_console()
+{
+}
+
 void factor_vm::sampler_thread_loop()
 {
 	LARGE_INTEGER counter, new_counter, units_per_second;
