@@ -36,6 +36,8 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
+#include <limits>
+
 
 #define FACTOR_STRINGIZE_I(x) #x
 #define FACTOR_STRINGIZE(x) FACTOR_STRINGIZE_I(x)
