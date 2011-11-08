@@ -20,7 +20,7 @@ CONSTANT: ignore-words
 
 : ignore-word? ( word -- ? ) ignore-words member? ; inline
 
-: get-raw-profile-data ( -- data )
+: most-recent-profile-data ( -- profile-data )
     raw-profile-data get-global [ "No profile data" throw ] unless* ;
 
 : profile ( quot -- )
@@ -43,32 +43,32 @@ CONSTANT: ignore-words
 : samples>time ( samples -- time )
     samples-per-second get-global / seconds ;
 
-: (total-time) ( samples -- n )
+: total-time* ( profile-data -- n )
     [ total-sample-count ] map-sum samples>time ;
 
-: (gc-time) ( samples -- n )
+: gc-time* ( profile-data -- n )
     [ gc-sample-count ] map-sum samples>time ;
 
-: (foreign-time) ( samples -- n )
+: foreign-time* ( profile-data -- n )
     [ foreign-sample-count ] map-sum samples>time ;
 
-: (foreign-thread-time) ( samples -- n )
+: foreign-thread-time* ( profile-data -- n )
     [ foreign-thread-sample-count ] map-sum samples>time ;
 
 : total-time ( -- n )
-    get-raw-profile-data (total-time) ;
+    most-recent-profile-data total-time* ;
 : gc-time ( -- n )
-    get-raw-profile-data (gc-time) ;
+    most-recent-profile-data gc-time* ;
 : foreign-time ( -- n )
-    get-raw-profile-data (foreign-time) ;
+    most-recent-profile-data foreign-time* ;
 : foreign-thread-time ( -- n )
-    get-raw-profile-data (foreign-thread-time) ;
+    most-recent-profile-data foreign-thread-time* ;
 
 : collect-threads ( samples -- by-thread )
     [ sample-thread ] collect-by ;
 
 : time-per-thread ( -- n )
-    get-raw-profile-data collect-threads [ (total-time) ] assoc-map ;
+    most-recent-profile-data collect-threads [ total-time* ] assoc-map ;
 
 : leaf-callstack? ( callstack -- ? )
     [ ignore-word? ] all? ;
@@ -108,12 +108,15 @@ TUPLE: profile-node
 : trim-root ( root -- root' )
     dup redundant-root-node? [ children>> values first trim-root ] when ;
 
-:: (top-down) ( samples depth -- tree )
-    samples collect-threads
+:: (top-down) ( profile-data depth -- tree )
+    profile-data collect-threads
     [ [ depth collect-tops ] <profile-root-node> trim-root ] assoc-map ;
 
+: top-down* ( profile-data -- tree )
+    0 (top-down) ;
+
 : top-down ( -- tree )
-    get-raw-profile-data 0 (top-down) ;
+    most-recent-profile-data top-down* ;
 
 :: counts+at ( key assoc sample -- )
     key assoc [ zero-counts or sample sample-counts-slice v+ ] change-at ;
@@ -133,12 +136,12 @@ TUPLE: profile-node
 : trim-flat ( root-node -- root-node' )
     dup '[ [ nip _ redundant-flat-node? not ] assoc-filter ] change-children ;
 
-: (flat) ( samples -- flat )
+: flat* ( profile-data -- flat )
     collect-threads
     [ [ collect-flat ] <profile-root-node> trim-flat ] assoc-map ;
 
 : flat ( -- tree )
-    get-raw-profile-data (flat) ;
+    most-recent-profile-data flat* ;
 
 : nth-or-last ( n seq -- elt )
     [ drop f ] [
@@ -155,12 +158,12 @@ TUPLE: profile-node
     ] each
     per-word-samples [ f depth <profile-node> ] assoc-map ;
 
-:: (cross-section) ( depth samples -- flat )
-    samples collect-threads
+:: cross-section* ( depth profile-data -- flat )
+    profile-data collect-threads
     [ [ depth collect-cross-section ] <profile-root-node> ] assoc-map ;
 
 : cross-section ( depth -- tree )
-    get-raw-profile-data (cross-section) ;
+    most-recent-profile-data cross-section* ;
 
 : depth. ( depth -- )
     [ "  " write ] times ;
