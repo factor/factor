@@ -39,7 +39,7 @@ M: buffer dispose* ptr>> free ; inline
     [ buffer-peek ] [ 1 swap buffer-consume ] bi ; inline
 
 : buffer-length ( buffer -- n )
-    [ fill>> ] [ pos>> ] bi - ; inline
+    [ fill>> ] [ pos>> ] bi - >fixnum ; inline
 
 : buffer@ ( buffer -- alien )
     [ pos>> ] [ ptr>> ] bi <displaced-alien> ; inline
