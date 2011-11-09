@@ -212,12 +212,16 @@ void fep_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 void sample_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm_p();
-	if (vm)
-		vm->safepoint.enqueue_samples(vm, 1, (cell)UAP_PROGRAM_COUNTER(uap), false);
-	else if (thread_vms.size() == 1) {
-		factor_vm *the_only_vm = thread_vms.begin()->second;
-		the_only_vm->safepoint.enqueue_samples(the_only_vm, 1, (cell)UAP_PROGRAM_COUNTER(uap), true);
+	bool foreign_thread = false;
+	if (vm == NULL)
+	{
+		foreign_thread = true;
+		vm = thread_vms.begin()->second;
 	}
+	if (atomic::load(&vm->sampling_profiler_p))
+		vm->safepoint.enqueue_samples(vm, 1, (cell)UAP_PROGRAM_COUNTER(uap), foreign_thread);
+	else if (!foreign_thread)
+		enqueue_signal(vm, signal);
 }
 
 void ignore_signal_handler(int signal, siginfo_t *siginfo, void *uap)
