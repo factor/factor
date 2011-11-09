@@ -119,9 +119,13 @@ SYMBOL: error-stream
 : (new-sequence-for-stream) ( n stream -- seq )
     stream-exemplar new-sequence ; inline
 
+: resize-if-necessary ( wanted-n got-n seq -- seq' )
+    2over = [ [ 2drop ] dip ] [ resize nip ] if ; inline
+
 : (read-into-new) ( n stream quot -- seq/f )
+    [ dup ] 2dip
     [ 2dup (new-sequence-for-stream) swap ] dip curry keep
-    over 0 = [ 2drop f ] [ resize ] if ; inline
+    over 0 = [ 3drop f ] [ resize-if-necessary ] if ; inline
 
 : (read-into) ( buf stream quot -- buf-slice/f )
     [ dup length over ] 2dip call
