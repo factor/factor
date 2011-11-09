@@ -7,7 +7,7 @@ io.buffers io.encodings io.encodings.ascii io.encodings.binary
 io.encodings.private io.encodings.utf8 io.timeouts kernel libc
 locals math math.order namespaces sequences specialized-arrays
 specialized-arrays.instances.alien.c-types.uchar splitting
-strings summary system typed ;
+strings summary system typed io.files ;
 IN: io.ports
 
 SYMBOL: default-buffer-size
@@ -30,8 +30,7 @@ TUPLE: buffered-port < port { buffer buffer } ;
 
 TUPLE: input-port < buffered-port ;
 INSTANCE: input-port input-stream
-
-M: input-port stream-element-type drop +byte+ ; inline
+INSTANCE: input-port file-reader
 
 : <input-port> ( handle -- input-port )
     input-port <buffered-port> ; inline
@@ -118,6 +117,7 @@ M: input-port stream-read-until ( seps port -- str/f sep/f )
 
 TUPLE: output-port < buffered-port ;
 INSTANCE: output-port output-stream
+INSTANCE: output-port file-writer
 
 : <output-port> ( handle -- output-port )
     output-port <buffered-port> ;
@@ -125,8 +125,6 @@ INSTANCE: output-port output-stream
 : wait-to-write ( len port -- )
     [ nip ] [ buffer>> buffer-capacity <= ] 2bi
     [ drop ] [ stream-flush ] if ; inline
-
-M: output-port stream-element-type drop +byte+ ; inline
 
 M: output-port stream-write1
     dup check-disposed

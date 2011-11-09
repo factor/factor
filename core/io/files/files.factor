@@ -5,6 +5,12 @@ io.backend io.pathnames io.encodings io.files.private
 alien.strings ;
 IN: io.files
 
+MIXIN: file-reader
+MIXIN: file-writer
+
+M: file-reader stream-element-type drop +byte+ ; inline
+M: file-writer stream-element-type drop +byte+ ; inline
+
 HOOK: (file-reader) io-backend ( path -- stream )
 
 HOOK: (file-writer) io-backend ( path -- stream )
@@ -12,13 +18,13 @@ HOOK: (file-writer) io-backend ( path -- stream )
 HOOK: (file-appender) io-backend ( path -- stream )
 
 : <file-reader> ( path encoding -- stream )
-    [ normalize-path (file-reader) ] dip <decoder> ;
+    [ normalize-path (file-reader) { file-reader } declare ] dip <decoder> ; inline
 
 : <file-writer> ( path encoding -- stream )
-    [ normalize-path (file-writer) ] dip <encoder> ;
+    [ normalize-path (file-writer) { file-writer } declare ] dip <encoder> ; inline
 
 : <file-appender> ( path encoding -- stream )
-    [ normalize-path (file-appender) ] dip <encoder> ;
+    [ normalize-path (file-appender) { file-writer } declare ] dip <encoder> ; inline
 
 : file-lines ( path encoding -- seq )
     <file-reader> stream-lines ;
