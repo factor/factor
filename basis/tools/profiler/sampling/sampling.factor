@@ -10,15 +10,17 @@ FROM: sequences => change-nth ;
 FROM: assocs => change-at ;
 IN: tools.profiler.sampling
 
-SYMBOL: raw-profile-data
 SYMBOL: samples-per-second
 
 samples-per-second [ 1,000 ] initialize
 
+<PRIVATE
+SYMBOL: raw-profile-data
 CONSTANT: ignore-words
     { signal-handler leaf-signal-handler profiling minor-gc }
 
 : ignore-word? ( word -- ? ) ignore-words member? ; inline
+PRIVATE>
 
 : most-recent-profile-data ( -- profile-data )
     raw-profile-data get-global [ "No profile data" throw ] unless* ;
@@ -35,7 +37,7 @@ CONSTANT: ignore-words
 : foreign-thread-sample-count ( sample -- count ) 4 swap nth ;
 : sample-counts-slice ( sample -- counts ) 5 head-slice ;
 
-: sample-thread ( sample -- alien ) 5 swap nth ;
+: sample-thread ( sample -- thread ) 5 swap nth ;
 : sample-callstack ( sample -- array ) 6 swap nth ;
 : unclip-callstack ( sample -- sample' callstack-top )
     clone 6 over [ unclip swap ] change-nth ;
@@ -113,17 +115,17 @@ CONSTANT: zero-counts { 0 0 0 0 0 }
 : trim-root ( root -- root' )
     dup redundant-root-node? [ children>> values first trim-root ] when ;
 
-:: (top-down) ( profile-data max-depth depth -- tree )
+:: (top-down) ( max-depth profile-data depth -- tree )
     profile-data collect-threads
     [ [ max-depth depth collect-tops ] <profile-root-node> trim-root ] assoc-map ;
 
 PRIVATE>
 
-: top-down-max-depth* ( profile-data max-depth -- tree )
+: top-down-max-depth* ( max-depth profile-data -- tree )
     0 (top-down) ;
 
 : top-down-max-depth ( max-depth -- tree )
-    most-recent-profile-data swap top-down-max-depth* ;
+    most-recent-profile-data top-down-max-depth* ;
 
 : top-down* ( profile-data -- tree )
     most-positive-fixnum top-down-max-depth* ;
@@ -157,7 +159,7 @@ PRIVATE>
     collect-threads
     [ [ collect-flat ] <profile-root-node> trim-flat ] assoc-map ;
 
-: flat ( -- tree )
+: flat ( -- flat )
     most-recent-profile-data flat* ;
 
 <PRIVATE
@@ -179,7 +181,7 @@ PRIVATE>
 
 PRIVATE>
 
-:: cross-section* ( depth profile-data -- flat )
+:: cross-section* ( depth profile-data -- tree )
     profile-data collect-threads
     [ [ depth collect-cross-section ] <profile-root-node> ] assoc-map ;
 
@@ -221,11 +223,12 @@ DEFER: (profile.)
 : (profile.) ( nodes depth -- )
     [ by-total-time ] dip '[ _ (profile-node.) ] assoc-each ;
 
-PRIVATE>
-
 : profile-heading. ( -- )
     "depth   time ms  GC %  JIT %  FFI %   FT %" print ;
    ! NNNN XXXXXXX.X XXXX.X XXXX.X XXXX.X XXXX.X | | foo
+
+PRIVATE>
+
 : profile. ( tree -- )
     profile-heading.
     [ 0 (profile-node.) ] assoc-each ;
