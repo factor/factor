@@ -180,12 +180,12 @@ void synchronous_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 		fatal_error("Foreign thread received signal", signal);
 }
 
-void safe_write(int fd, void *data, ssize_t size);
+void safe_write_nonblock(int fd, void *data, ssize_t size);
 
 static void enqueue_signal(factor_vm *vm, int signal)
 {
 	if (vm->signal_pipe_output != 0)
-		safe_write(vm->signal_pipe_output, &signal, sizeof(int));
+		safe_write_nonblock(vm->signal_pipe_output, &signal, sizeof(int));
 }
 
 void enqueue_signal_handler(int signal, siginfo_t *siginfo, void *uap)
@@ -279,6 +279,10 @@ static void safe_pipe(int *in, int *out)
 static void init_signal_pipe(factor_vm *vm)
 {
 	safe_pipe(&vm->signal_pipe_input, &vm->signal_pipe_output);
+
+	if(fcntl(vm->signal_pipe_output,F_SETFL,O_NONBLOCK) < 0)
+		fatal_error("Error with fcntl",errno);
+
 	vm->special_objects[OBJ_SIGNAL_PIPE] = tag_fixnum(vm->signal_pipe_input);
 }
 
@@ -388,6 +392,12 @@ bool check_write(int fd, void *data, ssize_t size)
 void safe_write(int fd, void *data, ssize_t size)
 {
 	if(!check_write(fd,data,size))
+		fatal_error("error writing fd",errno);
+}
+
+void safe_write_nonblock(int fd, void *data, ssize_t size)
+{
+	if(!check_write(fd,data,size) && errno != EAGAIN)
 		fatal_error("error writing fd",errno);
 }
 
