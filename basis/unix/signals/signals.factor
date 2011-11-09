@@ -9,10 +9,10 @@ SYMBOL: signal-handlers
 
 signal-handlers [ H{ } ] initialize
 
-PRIVATE>
-
 : dispatch-signal ( sig -- )
     signal-handlers get-global at [ in-thread ] each ;
+
+PRIVATE>
 
 : add-signal-handler ( handler: ( -- ) sig -- )
     signal-handlers get-global push-at ;
