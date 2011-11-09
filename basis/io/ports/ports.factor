@@ -7,7 +7,7 @@ io.buffers io.encodings io.encodings.ascii io.encodings.binary
 io.encodings.private io.encodings.utf8 io.timeouts kernel libc
 locals math math.order namespaces sequences specialized-arrays
 specialized-arrays.instances.alien.c-types.uchar splitting
-strings summary system typed io.files ;
+strings summary system io.files kernel.private ;
 IN: io.ports
 
 SYMBOL: default-buffer-size
@@ -46,12 +46,15 @@ M: input-port stream-read1
     dup check-disposed
     dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ; inline
 
-TYPED: read-step ( count: fixnum port: input-port -- count: fixnum ptr/f: c-ptr )
+! TYPED: read-step ( count: fixnum port: input-port -- count: fixnum ptr/f: c-ptr )
+: (read-step) ( count: fixnum port: input-port -- count: fixnum ptr/f: c-ptr )
     {
         { [ over 0 = ] [ 2drop 0 f ] }
         { [ dup wait-to-read ] [ 2drop 0 f ] }
         [ buffer>> buffer-read-unsafe ]
     } cond ;
+: read-step ( count port -- count ptr/f )
+    (read-step) { fixnum c-ptr } declare ; inline
 
 : prepare-read ( count stream -- count stream )
     dup check-disposed [ 0 max >fixnum ] dip ; inline
@@ -59,10 +62,6 @@ TYPED: read-step ( count: fixnum port: input-port -- count: fixnum ptr/f: c-ptr 
 M: input-port stream-read-partial-unsafe ( n dst port -- count )
     [ swap ] dip prepare-read read-step
     [ swap [ memcpy ] keep ] [ 2drop 0 ] if* ;
-
-HINTS: M\ input-port stream-read-unsafe
-    { fixnum byte-array input-port }
-    { fixnum string input-port } ;
 
 :: read-loop ( n-remaining n-read port dst -- n-total )
     n-remaining 0 > [
@@ -88,10 +87,6 @@ M:: input-port stream-read-unsafe ( n dst port -- count )
             n-buffered
         ] if
     ] [ 0 ] if ;
-
-HINTS: M\ input-port stream-read-unsafe
-    { fixnum byte-array input-port }
-    { fixnum string input-port } ;
 
 : read-until-step ( separators port -- string/f separator/f )
     dup wait-to-read [ 2drop f f ] [ buffer>> buffer-until ] if ;
@@ -237,3 +232,12 @@ M: object underlying-handle underlying-port handle>> ;
 HINTS: decoder-read-until { string input-port utf8 } { string input-port ascii } ;
 
 HINTS: decoder-readln { input-port utf8 } { input-port ascii } ;
+
+HINTS: M\ input-port stream-read-partial-unsafe
+    { fixnum byte-array input-port }
+    { fixnum string input-port } ;
+
+HINTS: M\ input-port stream-read-unsafe
+    { fixnum byte-array input-port }
+    { fixnum string input-port } ;
+
