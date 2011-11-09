@@ -7,7 +7,7 @@ io.buffers io.encodings io.encodings.ascii io.encodings.binary
 io.encodings.private io.encodings.utf8 io.timeouts kernel libc
 locals math math.order namespaces sequences specialized-arrays
 specialized-arrays.instances.alien.c-types.uchar splitting
-strings summary system ;
+strings summary system typed ;
 IN: io.ports
 
 SYMBOL: default-buffer-size
@@ -47,14 +47,12 @@ M: input-port stream-read1
     dup check-disposed
     dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ; inline
 
-: read-step ( count port -- count/f ptr/f )
+TYPED: read-step ( count: fixnum port: input-port -- count: fixnum ptr/f: c-ptr )
     {
-        { [ over 0 = ] [ 2drop f f ] }
-        { [ dup wait-to-read ] [ 2drop f f ] }
+        { [ over 0 = ] [ 2drop 0 f ] }
+        { [ dup wait-to-read ] [ 2drop 0 f ] }
         [ buffer>> buffer-read-unsafe ]
     } cond ;
-
-HINTS: read-step { fixnum input-port } ;
 
 : prepare-read ( count stream -- count stream )
     dup check-disposed [ 0 max >fixnum ] dip ; inline
