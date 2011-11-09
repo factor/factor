@@ -1008,7 +1008,7 @@ HELP: produce-as
 
 HELP: map-sum
 { $values { "seq" sequence } { "quot" quotation } { "n" number } }
-{ $description "Like map sum, but without creating an intermediate sequence." }
+{ $description "Like " { $snippet "map sum" } ", but without creating an intermediate sequence." }
 { $examples
     { $example
         "USING: math math.ranges sequences prettyprint ;"
