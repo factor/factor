@@ -34,7 +34,7 @@ INSTANCE: input-port input-stream
 M: input-port stream-element-type drop +byte+ ; inline
 
 : <input-port> ( handle -- input-port )
-    input-port <buffered-port> ;
+    input-port <buffered-port> ; inline
 
 HOOK: (wait-to-read) io-backend ( port -- )
 
@@ -54,12 +54,18 @@ M: input-port stream-read1
         [ buffer>> buffer-read-unsafe ]
     } cond ;
 
+HINTS: read-step { fixnum input-port } ;
+
 : prepare-read ( count stream -- count stream )
     dup check-disposed [ 0 max >fixnum ] dip ; inline
 
 M: input-port stream-read-partial-unsafe ( n dst port -- count )
     [ swap ] dip prepare-read read-step
     [ swap [ memcpy ] keep ] [ 2drop 0 ] if* ;
+
+HINTS: M\ input-port stream-read-unsafe
+    { fixnum byte-array input-port }
+    { fixnum string input-port } ;
 
 :: read-loop ( n-remaining n-read port dst -- n-total )
     n-remaining 0 > [
@@ -85,6 +91,10 @@ M:: input-port stream-read-unsafe ( n dst port -- count )
             n-buffered
         ] if
     ] [ 0 ] if ;
+
+HINTS: M\ input-port stream-read-unsafe
+    { fixnum byte-array input-port }
+    { fixnum string input-port } ;
 
 : read-until-step ( separators port -- string/f separator/f )
     dup wait-to-read [ 2drop f f ] [ buffer>> buffer-until ] if ;

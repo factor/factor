@@ -14,12 +14,12 @@ TUPLE: buffer
 disposed ;
 
 : <buffer> ( n -- buffer )
-    dup malloc 0 0 f buffer boa ;
+    dup malloc 0 0 f buffer boa ; inline
 
-M: buffer dispose* ptr>> free ;
+M: buffer dispose* ptr>> free ; inline
 
 : buffer-reset ( n buffer -- )
-    swap >>fill 0 >>pos drop ;
+    swap >>fill 0 >>pos drop ; inline
 
 : buffer-capacity ( buffer -- n )
     [ size>> ] [ fill>> ] bi - >fixnum ; inline
