@@ -7,7 +7,7 @@ io.encodings math.parser continuations system libc namespaces
 make io.timeouts io.encodings.utf8 destructors
 destructors.private accessors summary combinators locals
 unix.time unix.types fry io.backend.unix.multiplexers
-classes.struct ;
+classes.struct hints ;
 QUALIFIED: io
 IN: io.backend.unix
 
@@ -106,6 +106,9 @@ M: fd refill
         { [ errno EAGAIN = ] [ 2drop +input+ ] }
         [ (io-error) ]
     } cond ;
+
+HINTS: M\ fd refill
+    { buffered-port fd } ;
 
 M: unix (wait-to-read) ( port -- )
     dup
