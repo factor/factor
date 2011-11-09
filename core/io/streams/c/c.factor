@@ -15,10 +15,9 @@ M: c-stream dispose* handle>> fclose ;
 
 TUPLE: c-writer < c-stream ;
 INSTANCE: c-writer output-stream
+INSTANCE: c-writer file-writer
 
 : <c-writer> ( handle -- stream ) c-writer new-c-stream ;
-
-M: c-writer stream-element-type drop +byte+ ;
 
 M: c-writer stream-write1 dup check-disposed handle>> fputc ;
 
@@ -30,10 +29,9 @@ M: c-writer stream-flush dup check-disposed handle>> fflush ;
 
 TUPLE: c-reader < c-stream ;
 INSTANCE: c-reader input-stream
+INSTANCE: c-reader file-reader
 
 : <c-reader> ( handle -- stream ) c-reader new-c-stream ;
-
-M: c-reader stream-element-type drop +byte+ ;
 
 M: c-reader stream-read-unsafe dup check-disposed handle>> fread-unsafe ;
 

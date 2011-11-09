@@ -4,5 +4,5 @@ USING: io.encodings kernel ;
 IN: io.encodings.binary
 
 SINGLETON: binary
-M: binary <encoder> drop ;
-M: binary <decoder> drop ;
+M: binary <encoder> drop ; inline
+M: binary <decoder> drop ; inline
