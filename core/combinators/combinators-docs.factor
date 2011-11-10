@@ -361,7 +361,7 @@ HELP: case
         "    { yes [ ] } ! Do nothing"
         "    { no [ \"No way!\" throw ] }"
         "    { maybe [ \"Make up your mind!\" print ] }"
-        "    [ \"Invalid input; try again.\" print ]"
+        "    [ drop \"Invalid input; try again.\" print ]"
         "} case"
         "Make up your mind!"
     }
