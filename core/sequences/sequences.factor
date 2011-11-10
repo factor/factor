@@ -234,7 +234,7 @@ PRIVATE>
 : <slice> ( from to seq -- slice )
     check-slice
     dup slice? [ collapse-slice ] when
-    slice boa ; inline
+    <slice-unsafe> ; inline
 
 M: slice virtual-exemplar seq>> ; inline
 

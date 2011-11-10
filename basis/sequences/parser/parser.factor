@@ -64,7 +64,7 @@ TUPLE: sequence-parser sequence n ;
         [ 2drop 0 < ]
         [ [ drop ] 2dip length > ]
         [ drop > ]
-    } 3|| [ 3drop f ] [ slice boa ] if ; inline
+    } 3|| [ 3drop f ] [ <slice-unsafe> ] if ; inline
 
 :: take-sequence ( sequence-parser sequence -- obj/f )
     sequence-parser [ n>> dup sequence length + ] [ sequence>> ] bi
