@@ -14,7 +14,7 @@ IN: bootstrap.tools
     "tools.disassembler"
     "tools.dispatch"
     "tools.memory"
-    "tools.profiler.counting"
+    "tools.profiler.sampling"
     "tools.test"
     "tools.time"
     "tools.threads"
