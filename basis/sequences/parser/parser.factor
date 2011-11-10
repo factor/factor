@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors circular combinators.short-circuit fry io
 kernel locals math math.order sequences sorting.functor
-sorting.slots unicode.categories ;
+sorting.slots unicode.categories sequences.private ;
 IN: sequences.parser
 
 TUPLE: sequence-parser sequence n ;
