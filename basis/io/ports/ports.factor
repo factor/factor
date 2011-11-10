@@ -51,7 +51,8 @@ M: input-port stream-read1
         { [ over 0 = ] [ 2drop 0 f ] }
         { [ dup wait-to-read ] [ 2drop 0 f ] }
         [ buffer>> buffer-read-unsafe ]
-    } cond ; inline
+    } cond
+    { fixnum c-ptr } declare ; inline
 
 : prepare-read ( count stream -- count stream )
     dup check-disposed [ 0 max >fixnum ] dip ; inline
