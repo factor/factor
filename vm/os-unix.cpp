@@ -337,7 +337,6 @@ void factor_vm::unix_init_signals()
 #endif
 
 	init_sigaction_with_handler(&fep_sigaction, fep_signal_handler);
-	sigaction_safe(SIGQUIT,&fep_sigaction,NULL);
 	sigaction_safe(SIGINT,&fep_sigaction,NULL);
 
 	init_sigaction_with_handler(&sample_sigaction, sample_signal_handler);
@@ -431,6 +430,8 @@ void *stdin_loop(void *arg)
 	sigfillset(&mask);
 	sigdelset(&mask, SIGUSR2);
 	sigdelset(&mask, SIGTTIN);
+	sigdelset(&mask, SIGTERM);
+	sigdelset(&mask, SIGQUIT);
 	pthread_sigmask(SIG_SETMASK, &mask, NULL);
 
 	while(loop_running)
