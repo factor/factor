@@ -182,7 +182,7 @@ USE: kernel.private
     swap [ 65536 swap stream-read-partial ] curry each-morsel ; inline
 
 : each-block-slice ( ... quot: ( ... block -- ... ) -- ... )
-    input-stream get swap each-stream-block ; inline
+    input-stream get swap each-stream-block-slice ; inline
 
 : each-block ( ... quot: ( ... block -- ... ) -- ... )
     input-stream get swap each-stream-block ; inline
@@ -214,7 +214,7 @@ USE: kernel.private
     [ stream-write ] curry each-stream-block ; inline
 
 : stream-copy ( in out -- )
-    [ [ stream-copy* ] with-disposal ] curry with-disposal ;
+    [ [ stream-copy* ] with-disposal ] curry with-disposal ; inline
 
 ! Default implementations of stream operations in terms of read1/write1
 
