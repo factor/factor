@@ -44,27 +44,39 @@ TUPLE: hashtable
 : reset-hash ( n hash -- )
     swap <hash-array> >>array init-hash ; inline
 
-: (new-key@) ( key array i probe# -- array i empty? )
-    [ 3dup swap array-nth ] dip over ((empty)) eq?
-    [ 3drop rot drop t ] [
-        [ = ] dip swap
-        [ drop rot drop f ]
-        [ probe (new-key@) ]
-        if
-    ] if ; inline recursive
-
-: new-key@ ( key hash -- array n empty? )
-    array>> 2dup hash@ 0 (new-key@) ; inline
-
-: set-nth-pair ( value key seq n -- )
-    2 fixnum+fast [ set-slot ] 2keep
-    1 fixnum+fast set-slot ; inline
-
 : hash-count+ ( hash -- )
     [ 1 + ] change-count drop ; inline
 
 : hash-deleted+ ( hash -- )
     [ 1 + ] change-deleted drop ; inline
+
+: hash-deleted- ( hash -- )
+    [ 1 - ] change-deleted drop ; inline
+
+! i = first-empty-or-found
+! j = first-deleted
+: (new-key@) ( key array i probe# j -- array i j empty? )
+    [ 2dup swap array-nth ] 2dip pick tombstone?
+    [
+        rot ((empty)) eq?
+        [ nip [ drop ] 3dip t ]
+        [ pick or [ probe ] dip (new-key@) ]
+        if
+    ] [
+        [ [ pick ] dip = ] 2dip rot
+        [ nip [ drop ] 3dip f ]
+        [ [ probe ] dip (new-key@) ]
+        if
+    ] if ; inline recursive
+
+: new-key@ ( key hash -- array n )
+    [ array>> 2dup hash@ 0 f (new-key@) ] keep
+    over [ pick [ hash-deleted- ] [ hash-count+ ] if ] [ drop ] if
+    [ swap or ] [ drop ] if ; inline
+
+: set-nth-pair ( value key seq n -- )
+    2 fixnum+fast [ set-slot ] 2keep
+    1 fixnum+fast set-slot ; inline
 
 : (rehash) ( hash alist -- )
     swap [ swapd set-at ] curry assoc-each ; inline
@@ -73,24 +85,13 @@ TUPLE: hashtable
     [ count>> 3 fixnum*fast 1 fixnum+fast ]
     [ array>> length>> ] bi fixnum> ; inline
 
-: hash-stale? ( hash -- ? )
-    [ deleted>> 10 fixnum*fast ] [ count>> ] bi fixnum> ; inline
-
 : grow-hash ( hash -- )
     [ [ >alist ] [ assoc-size 1 + ] bi ] keep
     [ reset-hash ] keep
     swap (rehash) ;
 
 : ?grow-hash ( hash -- )
-    dup hash-large? [
-        grow-hash
-    ] [
-        dup hash-stale? [
-            grow-hash
-        ] [
-            drop
-        ] if
-    ] if ; inline
+    dup hash-large? [ grow-hash ] [ drop ] if ; inline
 
 PRIVATE>
 
@@ -118,10 +119,7 @@ M: hashtable assoc-size ( hash -- n )
     dup >alist [ dup clear-assoc ] dip (rehash) ;
 
 M: hashtable set-at ( value key hash -- )
-    dup ?grow-hash
-    2dup new-key@
-    [ rot hash-count+ set-nth-pair ]
-    [ rot drop set-nth-pair ] if ;
+    dup ?grow-hash dupd new-key@ set-nth-pair ;
 
 : associate ( value key -- hash )
     2 <hashtable> [ set-at ] keep ;
