@@ -25,7 +25,7 @@ INSTANCE: slice-chunking chunking
 INSTANCE: slice-chunking sequence
 
 M: slice-chunking nth group@ <slice> ; inline
-M: slice-chunking nth-unsafe group@ slice boa ; inline
+M: slice-chunking nth-unsafe group@ <slice-unsafe> ; inline
 
 MIXIN: abstract-groups
 INSTANCE: abstract-groups sequence
