@@ -3,11 +3,11 @@
 USING: continuations definitions generic help.topics threads
 stack-checker summary io.pathnames io.styles kernel namespaces
 parser prettyprint quotations tools.crossref tools.annotations
-editors tools.profiler.counting tools.test tools.time tools.walker vocabs
+editors tools.test tools.time tools.walker vocabs
 vocabs.loader words sequences classes compiler.errors
 compiler.units accessors vocabs.parser macros.expander ui
 ui.tools.browser ui.tools.listener ui.tools.listener.completion
-ui.tools.profiler ui.tools.inspector ui.tools.traceback
+ui.tools.inspector ui.tools.traceback
 ui.commands ui.gadgets.editors ui.gestures ui.operations
 ui.tools.deploy models help.tips source-files.errors destructors
 libc libc.private ;
@@ -162,11 +162,6 @@ M: word com-stack-effect 1quotation com-stack-effect ;
 
 [ quotation? ] \ time H{
     { +keyboard+ T{ key-down f { C+ } "t" } }
-    { +listener+ t }
-} define-operation
-
-[ quotation? ] \ com-profile H{
-    { +keyboard+ T{ key-down f { C+ } "o" } }
     { +listener+ t }
 } define-operation
 

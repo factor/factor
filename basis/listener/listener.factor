@@ -175,7 +175,7 @@ SYMBOL: interactive-vocabs
     "tools.dispatch"
     "tools.errors"
     "tools.memory"
-    "tools.profiler.counting"
+    "tools.profiler.sampling"
     "tools.test"
     "tools.threads"
     "tools.time"
