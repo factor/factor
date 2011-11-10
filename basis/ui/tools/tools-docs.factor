@@ -1,7 +1,7 @@
 USING: editors help.markup help.syntax summary inspector io io.styles
-listener parser prettyprint tools.profiler.counting tools.walker ui.commands
+listener parser prettyprint tools.walker ui.commands
 ui.gadgets.panes ui.gadgets.presentations ui.operations
-ui.tools.operations ui.tools.profiler ui.tools.common vocabs see
+ui.tools.operations ui.tools.common vocabs see
 help.tips ;
 IN: ui.tools
 
@@ -61,7 +61,6 @@ $nl
     "ui-browser"
     "ui-inspector"
     "ui.tools.error-list"
-    "ui.tools.profiler"
     "ui-walker"
     "ui.tools.deploy"
 }
