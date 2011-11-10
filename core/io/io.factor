@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien byte-arrays combinators continuations destructors
-kernel math namespaces sequences sequences.private ;
+kernel math namespaces sequences sequences.private kernel.private ;
 IN: io
 
 SYMBOLS: +byte+ +character+ ;
@@ -131,9 +131,6 @@ SYMBOL: error-stream
     [ dup length over ] 2dip call
     [ (head) <slice-unsafe> ] [ zero? not ] bi ; inline
 
-: fast>fixnum ( n -- n' )
-    dup fixnum? [ >fixnum ] unless ; inline
-
 PRIVATE>
 
 : stream-read ( n stream -- seq/f )
@@ -144,7 +141,6 @@ PRIVATE>
 
 ERROR: invalid-read-buffer buf stream ;
 
-USE: kernel.private
 : stream-read-into ( buf stream -- buf-slice more? )
     [ stream-read-unsafe { fixnum } declare ] (read-into) ; inline
 
@@ -173,13 +169,15 @@ USE: kernel.private
 : lines ( -- seq )
     input-stream get stream-lines ; inline
 
+CONSTANT: each-block-size 65536
+
 : each-stream-block-slice ( ... stream quot: ( ... block-slice -- ... ) -- ... )
     [ drop ] prepose
-    swap [ 65536 swap (new-sequence-for-stream) ] keep
+    swap [ each-block-size swap (new-sequence-for-stream) ] keep
     [ stream-read-partial-into ] 2curry each-morsel drop ; inline
 
 : each-stream-block ( ... stream quot: ( ... block -- ... ) -- ... )
-    swap [ 65536 swap stream-read-partial ] curry each-morsel ; inline
+    swap [ each-block-size swap stream-read-partial ] curry each-morsel ; inline
 
 : each-block-slice ( ... quot: ( ... block -- ... ) -- ... )
     input-stream get swap each-stream-block-slice ; inline
