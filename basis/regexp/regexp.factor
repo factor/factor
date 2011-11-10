@@ -103,7 +103,7 @@ PRIVATE>
     collector [ each-match ] dip >array ; inline
 
 : all-matching-slices ( string regexp -- seq )
-    [ slice boa ] map-matches ;
+    [ <slice-unsafe> ] map-matches ;
 
 : all-matching-subseqs ( string regexp -- seq )
     [ subseq ] map-matches ;
@@ -126,14 +126,14 @@ PRIVATE>
 :: first-match ( string regexp -- slice/f )
     string regexp prepare-match-iterator do-next-match [
         regexp reverse-regexp? [ [ 1 + ] bi@ ] when
-        string slice boa
+        string <slice-unsafe>
     ] [ 2drop f ] if ;
 
 : re-contains? ( string regexp -- ? )
     prepare-match-iterator do-next-match [ 2drop ] dip >boolean ;
 
 : re-split ( string regexp -- seq )
-    [ slice boa ] (re-split) ;
+    [ <slice-unsafe> ] (re-split) ;
 
 : re-replace ( string regexp replacement -- result )
     [ [ subseq ] (re-split) ] dip join ;
