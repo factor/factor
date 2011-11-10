@@ -127,14 +127,6 @@ void factor_vm::init_factor(vm_parameters *p)
 	load_image(p);
 	init_c_io();
 	init_inline_caching((int)p->max_pic_size);
-	if(p->signals)
-		init_signals();
-
-	if(p->console)
-		open_console();
-
-	init_counting_profiler();
-
 	special_objects[OBJ_CPU] = allot_alien(false_object,(cell)FACTOR_CPU_STRING);
 	special_objects[OBJ_OS] = allot_alien(false_object,(cell)FACTOR_OS_STRING);
 	special_objects[OBJ_CELL_SIZE] = tag_fixnum(sizeof(cell));
@@ -148,6 +140,13 @@ void factor_vm::init_factor(vm_parameters *p)
 
 	if(!to_boolean(special_objects[OBJ_STAGE2]))
 		prepare_boot_image();
+
+	if(p->signals)
+		init_signals();
+
+	if(p->console)
+		open_console();
+
 }
 
 /* May allocate memory */
