@@ -568,6 +568,17 @@ install_deps_macosx() {
 
 usage() {
     $ECHO "usage: $0 install|deps-linux|deps-macosx|self-update|quick-update|update|bootstrap|net-bootstrap|make-target|report [optional-target]"
+    $ECHO "  install - git clone, compile, bootstrap"
+    $ECHO "  deps-linux - install required packages for Factor on Linux using apt-get"
+    $ECHO "  deps-macosx - install git on MacOSX using port"
+    $ECHO "  self-update - git pull, make local boot image, bootstrap"
+    $ECHO "  quick-update - git pull, refresh-all, save"
+    $ECHO "  update - git pull, download a boot image, recompile, bootstrap"
+    $ECHO "  bootstrap - bootstrap with an existing boot image"
+    $ECHO "  net-bootstrap - download a boot image, bootstrap"
+    $ECHO "  make-target - find and print the os-arch-cpu string"
+    $ECHO "  report - print the build variables"
+    $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
     $ECHO "env GIT_PROTOCOL=http $0 <command>"
     $ECHO ""
