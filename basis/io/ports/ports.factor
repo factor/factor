@@ -46,15 +46,12 @@ M: input-port stream-read1
     dup check-disposed
     dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ; inline
 
-! TYPED: read-step ( count: fixnum port: input-port -- count: fixnum ptr/f: c-ptr )
-: (read-step) ( count: fixnum port: input-port -- count: fixnum ptr/f: c-ptr )
+: read-step ( count port -- count ptr/f )
     {
         { [ over 0 = ] [ 2drop 0 f ] }
         { [ dup wait-to-read ] [ 2drop 0 f ] }
         [ buffer>> buffer-read-unsafe ]
-    } cond ;
-: read-step ( count port -- count ptr/f )
-    (read-step) { fixnum c-ptr } declare ; inline
+    } cond ; inline
 
 : prepare-read ( count stream -- count stream )
     dup check-disposed [ 0 max >fixnum ] dip ; inline
