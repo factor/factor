@@ -280,17 +280,16 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
 {
 	switch (dwCtrlType) {
 	case CTRL_C_EVENT:
-	case CTRL_BREAK_EVENT:
-	{
-		/* The CtrlHandler runs in its own thread without stopping the main thread.
-		Since in practice nobody uses the multi-VM stuff yet, we just grab the first
-		VM we can get. This will not be a good idea when we actually support native
-		threads. */
-		assert(thread_vms.size() == 1);
-		factor_vm *vm = thread_vms.begin()->second;
-		vm->safepoint.enqueue_fep(vm);
-		return TRUE;
-	}
+		{
+			/* The CtrlHandler runs in its own thread without stopping the main thread.
+			Since in practice nobody uses the multi-VM stuff yet, we just grab the first
+			VM we can get. This will not be a good idea when we actually support native
+			threads. */
+			assert(thread_vms.size() == 1);
+			factor_vm *vm = thread_vms.begin()->second;
+			vm->safepoint.enqueue_fep(vm);
+			return TRUE;
+		}
 	default:
 		return FALSE;
 	}
