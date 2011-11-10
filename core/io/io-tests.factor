@@ -27,9 +27,9 @@ M: up-to-13-reader stream-read1
 [ up-to-13-reader new [ 20 swap stream-read ] [ 20 swap stream-read ] bi ] unit-test
 
 {
-    T{ slice f 0 8 B{ 0 1 2 3 4 5 6 7 } }
-    T{ slice f 0 5 B{ 8 9 10 11 12 205 206 207 } }
-    f
+    T{ slice f 0 8 B{ 0 1 2 3 4 5 6 7 } } t
+    T{ slice f 0 5 B{ 8 9 10 11 12 205 206 207 } } t
+    T{ slice f 0 0 B{ 8 9 10 11 12 205 206 207 } } f
 } [
     up-to-13-reader new
     [ B{ 200 201 202 203 204 205 206 207 } swap stream-read-into ]

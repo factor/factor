@@ -51,13 +51,13 @@ HELP: stream-read-unsafe
 $io-error ;
 
 HELP: read-into
-{ $values { "buf" { $or byte-array specialized-array string } } { "buf-slice/f" { $or slice f } } }
-{ $contract "Reads from the current " { $link input-stream } " into the sequence " { $snippet "buf" } ", until either the length of " { $snippet "buf" } " is reached or the stream is exhausted. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, or " { $link f } " if the stream was exhausted." }
+{ $values { "buf" { $or byte-array specialized-array string } } { "buf-slice" slice } { "more?" boolean } }
+{ $contract "Reads from the current " { $link input-stream } " into the sequence " { $snippet "buf" } ", until either the length of " { $snippet "buf" } " is reached or the stream is exhausted. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, and a boolean value that will be " { $link f } " if the stream was exhausted." }
 $io-error ;
 
 HELP: stream-read-into
-{ $values { "buf" { $or byte-array specialized-array string } } { "stream" "an input stream" } { "buf-slice/f" { $or slice f } } }
-{ $contract "Reads from the stream into the sequence " { $snippet "buf" } ", until either the length of " { $snippet "buf" } " is reached or the stream is exhausted. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, or " { $link f } " if the stream was exhausted." }
+{ $values { "buf" { $or byte-array specialized-array string } } { "stream" "an input stream" } { "buf-slice" slice } { "more?" boolean } }
+{ $contract "Reads from the stream into the sequence " { $snippet "buf" } ", until either the length of " { $snippet "buf" } " is reached or the stream is exhausted. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, and a boolean value that will be " { $link f } " if the stream was exhausted." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link read-into } "; see " { $link "stdio" } "." }
 $io-error ;
 
@@ -80,13 +80,13 @@ HELP: stream-read-partial-unsafe
 $io-error ;
 
 HELP: read-partial-into
-{ $values { "buf" { $or byte-array specialized-array string } } { "buf-slice/f" { $or slice f } } }
-{ $contract "Reads available data from the current " { $link input-stream } " into the sequence " { $snippet "buf" } " without blocking until all immediately available data is read or the length of " { $snippet "buf" } " is reached. If no data is immediately available, blocks until data is available. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, or " { $link f } " if the stream was exhausted." }
+{ $values { "buf" { $or byte-array specialized-array string } } { "buf-slice" slice } { "more?" boolean } }
+{ $contract "Reads available data from the current " { $link input-stream } " into the sequence " { $snippet "buf" } " without blocking until all immediately available data is read or the length of " { $snippet "buf" } " is reached. If no data is immediately available, blocks until data is available. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, and a boolean that will be " { $link f } " if the stream was exhausted." }
 $io-error ;
 
 HELP: stream-read-partial-into
-{ $values { "buf" { $or byte-array specialized-array string } } { "stream" "an input stream" } { "buf-slice/f" { $or slice f } } }
-{ $contract "Reads available data from the stream into the sequence " { $snippet "buf" } " without blocking until all immediately available data is read or the length of " { $snippet "buf" } " is reached. If no data is immediately available, blocks until data is available. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, or " { $link f } " if the stream was exhausted." }
+{ $values { "buf" { $or byte-array specialized-array string } } { "stream" "an input stream" } { "buf-slice" slice } { "more?" boolean } }
+{ $contract "Reads available data from the stream into the sequence " { $snippet "buf" } " without blocking until all immediately available data is read or the length of " { $snippet "buf" } " is reached. If no data is immediately available, blocks until data is available. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, and a boolean that will be " { $link f } " if the stream was exhausted." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link read-partial-into } "; see " { $link "stdio" } "." }
 $io-error ;
 

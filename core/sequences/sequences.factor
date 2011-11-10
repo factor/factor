@@ -224,6 +224,13 @@ TUPLE: slice-error from to seq reason ;
     [ drop > "start > end" slice-error ]
     3tri ; inline
 
+<PRIVATE
+
+: <slice-unsafe> ( from to seq -- slice )
+    slice boa ; inline
+
+PRIVATE>
+
 : <slice> ( from to seq -- slice )
     check-slice
     dup slice? [ collapse-slice ] when

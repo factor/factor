@@ -129,7 +129,10 @@ SYMBOL: error-stream
 
 : (read-into) ( buf stream quot -- buf-slice/f )
     [ dup length over ] 2dip call
-    [ drop f ] [ head-slice ] if-zero ; inline
+    [ (head) <slice-unsafe> ] [ zero? not ] bi ; inline
+
+: fast>fixnum ( n -- n' )
+    dup fixnum? [ >fixnum ] unless ; inline
 
 PRIVATE>
 
@@ -141,20 +144,21 @@ PRIVATE>
 
 ERROR: invalid-read-buffer buf stream ;
 
-: stream-read-into ( buf stream -- buf-slice/f )
-    [ stream-read-unsafe ] (read-into) ; inline
+USE: kernel.private
+: stream-read-into ( buf stream -- buf-slice more? )
+    [ stream-read-unsafe { fixnum } declare ] (read-into) ; inline
 
-: stream-read-partial-into ( buf stream -- buf-slice/f )
-    [ stream-read-partial-unsafe ] (read-into) ; inline
+: stream-read-partial-into ( buf stream -- buf-slice more? )
+    [ stream-read-partial-unsafe { fixnum } declare ] (read-into) ; inline
 
 : read ( n -- seq ) input-stream get stream-read ; inline
 
 : read-partial ( n -- seq ) input-stream get stream-read-partial ; inline
 
-: read-into ( buf -- buf-slice/f )
+: read-into ( buf -- buf-slice more? )
     input-stream get stream-read-into ; inline
 
-: read-partial-into ( buf -- buf-slice/f )
+: read-partial-into ( buf -- buf-slice more? )
     input-stream get stream-read-partial-into ; inline
 
 : each-stream-line ( ... stream quot: ( ... line -- ... ) -- ... )
@@ -169,8 +173,16 @@ ERROR: invalid-read-buffer buf stream ;
 : lines ( -- seq )
     input-stream get stream-lines ; inline
 
+: each-stream-block-slice ( ... stream quot: ( ... block-slice -- ... ) -- ... )
+    [ drop ] prepose
+    swap [ 65536 swap (new-sequence-for-stream) ] keep
+    [ stream-read-partial-into ] 2curry each-morsel drop ; inline
+
 : each-stream-block ( ... stream quot: ( ... block -- ... ) -- ... )
     swap [ 65536 swap stream-read-partial ] curry each-morsel ; inline
+
+: each-block-slice ( ... quot: ( ... block -- ... ) -- ... )
+    input-stream get swap each-stream-block ; inline
 
 : each-block ( ... quot: ( ... block -- ... ) -- ... )
     input-stream get swap each-stream-block ; inline
