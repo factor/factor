@@ -84,4 +84,17 @@ struct code_block
 };
 
 VM_C_API void undefined_symbol(void);
+
+inline code_block *word::code() const {
+	assert(entry_point != NULL);
+	return (code_block*)entry_point - 1;
 }
+
+inline code_block *quotation::code() const {
+	assert(entry_point != NULL);
+	return (code_block*)entry_point - 1;
+}
+
+}
+
+

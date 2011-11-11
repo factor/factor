@@ -178,15 +178,13 @@ void factor_vm::primitive_modify_code_heap()
 					parameters,
 					literals);
 
-				word->code = compiled;
+				word->entry_point = compiled->entry_point();
 			}
 			break;
 		default:
 			critical_error("Expected a quotation or an array",data.value());
 			break;
 		}
-
-		update_word_entry_point(word.untagged());
 	}
 
 	if(update_existing_words)

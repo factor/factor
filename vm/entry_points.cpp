@@ -22,18 +22,14 @@ void factor_vm::c_to_factor(cell quot)
 
 template<typename Func> Func factor_vm::get_entry_point(cell n)
 {
-	/* We return word->code->entry_point() and not word->entry_point,
-	because if the counting profiler is enabled, we don't want to go through the
-	entry point's counting profiler stub. This clobbers registers, since entry
-	points use the C ABI and not the Factor ABI. */
 	tagged<word> entry_point_word(special_objects[n]);
-	return (Func)entry_point_word->code->entry_point();
+	return (Func)entry_point_word->entry_point;
 }
 
 void factor_vm::unwind_native_frames(cell quot, stack_frame *to)
 {
 	tagged<word> entry_point_word(special_objects[UNWIND_NATIVE_FRAMES_WORD]);
-	void *func = entry_point_word->code->entry_point();
+	void *func = entry_point_word->entry_point;
 	CODE_TO_FUNCTION_POINTER(func);
 	((unwind_native_frames_func_type)func)(quot,to);
 }
@@ -41,7 +37,7 @@ void factor_vm::unwind_native_frames(cell quot, stack_frame *to)
 cell factor_vm::get_fpu_state()
 {
 	tagged<word> entry_point_word(special_objects[GET_FPU_STATE_WORD]);
-	void *func = entry_point_word->code->entry_point();
+	void *func = entry_point_word->entry_point;
 	CODE_TO_FUNCTION_POINTER(func);
 	return ((get_fpu_state_func_type)func)();
 }
@@ -49,7 +45,7 @@ cell factor_vm::get_fpu_state()
 void factor_vm::set_fpu_state(cell state)
 {
 	tagged<word> entry_point_word(special_objects[SET_FPU_STATE_WORD]);
-	void *func = entry_point_word->code->entry_point();
+	void *func = entry_point_word->entry_point;
 	CODE_TO_FUNCTION_POINTER(func);
 	((set_fpu_state_func_type)func)(state);
 }

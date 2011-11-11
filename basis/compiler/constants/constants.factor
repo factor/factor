@@ -20,9 +20,9 @@ CONSTANT: deck-bits 18
 : alien-offset ( -- n ) 4 alien type-number slot-offset ; inline
 : underlying-alien-offset ( -- n ) 1 alien type-number slot-offset ; inline
 : tuple-class-offset ( -- n ) 1 tuple type-number slot-offset ; inline
-: word-entry-point-offset ( -- n ) 10 \ word type-number slot-offset ; inline
+: word-entry-point-offset ( -- n ) 9 \ word type-number slot-offset ; inline
 : quot-entry-point-offset ( -- n ) 4 quotation type-number slot-offset ; inline
-: word-code-offset ( -- n ) 11 \ word type-number slot-offset ; inline
+: code-block-entry-point-offset ( -- n ) 4 bootstrap-cells ; inline
 : array-start-offset ( -- n ) 2 array type-number slot-offset ; inline
 : compiled-header-size ( -- n ) 4 bootstrap-cells ; inline
 : callstack-length-offset ( -- n ) 1 \ callstack type-number slot-offset ; inline

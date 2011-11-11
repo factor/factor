@@ -350,11 +350,8 @@ M: f ' drop \ f type-number ;
                     [ props>> , ]
                     [ pic-def>> , ]
                     [ pic-tail-def>> , ]
-                    [ drop 0 , ] ! count
                     [ word-sub-primitive , ]
-                    [ drop 0 , ] ! xt
-                    [ drop 0 , ] ! code
-                    [ drop 0 , ] ! profiling
+                    [ drop 0 , ] ! entry point
                 } cleave
             ] { } make [ ' ] map
         ] bi
@@ -493,8 +490,7 @@ M: quotation '
             emit ! array
             f ' emit ! cached-effect
             f ' emit ! cache-counter
-            0 emit ! xt
-            0 emit ! code
+            0 emit ! entry point
         ] emit-object
     ] cache-eql-object ;
 

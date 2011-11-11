@@ -34,7 +34,6 @@ ifdef CONFIG
 		vm/code_heap.o \
 		vm/compaction.o \
 		vm/contexts.o \
-		vm/counting_profiler.o \
 		vm/data_heap.o \
 		vm/data_heap_checker.o \
 		vm/debug.o \
@@ -77,7 +76,6 @@ ifdef CONFIG
 		vm/contexts.hpp \
 		vm/run.hpp \
 		vm/objects.hpp \
-		vm/counting_profiler.hpp \
 		vm/sampling_profiler.hpp \
 		vm/errors.hpp \
 		vm/bignumint.hpp \
