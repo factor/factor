@@ -322,12 +322,12 @@ void factor_vm::dump_objects(cell type)
 	each_object(dumper);
 }
 
-struct data_reference_slot_visitor {
+struct find_data_reference_slot_visitor {
 	cell look_for;
 	object *obj;
 	factor_vm *parent;
 
-	explicit data_reference_slot_visitor(cell look_for_, object *obj_, factor_vm *parent_) :
+	explicit find_data_reference_slot_visitor(cell look_for_, object *obj_, factor_vm *parent_) :
 		look_for(look_for_), obj(obj_), parent(parent_) { }
 
 	void operator()(cell *scan)
@@ -341,6 +341,21 @@ struct data_reference_slot_visitor {
 	}
 };
 
+struct dump_edges_slot_visitor {
+	object *obj;
+	factor_vm *parent;
+
+	explicit dump_edges_slot_visitor(cell, object *obj_, factor_vm *parent_) :
+		obj(obj_), parent(parent_) { }
+
+	void operator()(cell *scan)
+	{
+		if (TAG(*scan) > F_TYPE)
+			std::cout << (void*)tag_dynamic(obj) << " ==> " << (void*)*scan << std::endl;
+	}
+};
+
+template <typename SlotVisitor>
 struct data_reference_object_visitor {
 	cell look_for;
 	factor_vm *parent;
@@ -350,14 +365,20 @@ struct data_reference_object_visitor {
 
 	void operator()(object *obj)
 	{
-		data_reference_slot_visitor visitor(look_for,obj,parent);
+		SlotVisitor visitor(look_for,obj,parent);
 		obj->each_slot(visitor);
 	}
 };
 
 void factor_vm::find_data_references(cell look_for)
 {
-	data_reference_object_visitor visitor(look_for,this);
+	data_reference_object_visitor<find_data_reference_slot_visitor> visitor(look_for,this);
+	each_object(visitor);
+}
+
+void factor_vm::dump_edges()
+{
+	data_reference_object_visitor<dump_edges_slot_visitor> visitor(0,this);
 	each_object(visitor);
 }
 
@@ -424,6 +445,7 @@ void factor_vm::factorbug_usage(bool advanced_p)
 		std::cout << "  data             -- data heap dump" << std::endl;
 		std::cout << "  words            -- words dump" << std::endl;
 		std::cout << "  tuples           -- tuples dump" << std::endl;
+		std::cout << "  edges            -- print all object-to-object references" << std::endl;
 		std::cout << "  refs <addr>      -- find data heap references to object" << std::endl;
 		std::cout << "  push <addr>      -- push object on data stack - NOT SAFE" << std::endl;
 		std::cout << "  gc               -- trigger full GC - NOT SAFE" << std::endl;
@@ -553,6 +575,8 @@ void factor_vm::factorbug()
 		}
 		else if(strcmp(cmd,"data") == 0)
 			dump_objects(TYPE_COUNT);
+		else if(strcmp(cmd,"edges") == 0)
+			dump_edges();
 		else if(strcmp(cmd,"refs") == 0)
 		{
 			cell addr = read_cell_hex();
