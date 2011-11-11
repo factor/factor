@@ -140,11 +140,16 @@ IN: bootstrap.x86
 [ jit-jump-quot ]
 \ (call) define-combinator-primitive
 
+: (jit-safepoint) ( -- )
+    0 EAX MOVABS rc-absolute rel-safepoint ;
 [
     ! Load ds and rs registers
     jit-load-vm
     jit-load-context
     jit-restore-context
+
+    ! Safepoint to clear the faulting flag in the VM
+     (jit-safepoint)
 
     ! Windows-specific setup
     ctx-reg jit-update-seh
@@ -395,9 +400,7 @@ IN: bootstrap.x86
     EAX EDX [] MOV
     jit-jump-quot ;
 
-[
-    0 EAX MOVABS rc-absolute rel-safepoint
-] \ jit-safepoint jit-define
+[ (jit-safepoint) ] \ jit-safepoint jit-define
 
 [
     jit-start-context-and-delete

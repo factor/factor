@@ -165,18 +165,23 @@ void factor_vm::end_sampling_profiler_timer()
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
 	factor_vm *vm = current_vm();
+	vm->verify_memory_protection_error((cell)siginfo->si_addr);
 	vm->signal_fault_addr = (cell)siginfo->si_addr;
 	vm->dispatch_signal(uap,factor::memory_signal_handler_impl);
 }
 
 void synchronous_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
+	if (factor_vm::fatal_erroring_p)
+		return;
+
 	factor_vm *vm = current_vm_p();
 	if (vm)
 	{
 		vm->signal_number = signal;
 		vm->dispatch_signal(uap,factor::synchronous_signal_handler_impl);
-	} else
+	}
+	else
 		fatal_error("Foreign thread received signal", signal);
 }
 
@@ -190,6 +195,9 @@ static void enqueue_signal(factor_vm *vm, int signal)
 
 void enqueue_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
+	if (factor_vm::fatal_erroring_p)
+		return;
+
 	factor_vm *vm = current_vm_p();
 	if (vm)
 		enqueue_signal(vm, signal);
@@ -199,6 +207,9 @@ void enqueue_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 
 void fep_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
+	if (factor_vm::fatal_erroring_p)
+		return;
+
 	factor_vm *vm = current_vm_p();
 	if (vm)
 	{
@@ -251,7 +262,7 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 	while(ret == -1 && errno == EINTR);
 
 	if(ret == -1)
-		fatal_error("sigaction failed", 0);
+		fatal_error("sigaction failed", errno);
 }
 
 static void init_sigaction_with_handler(struct sigaction *act,
@@ -497,6 +508,18 @@ void factor_vm::lock_console()
 void factor_vm::unlock_console()
 {
 	pthread_mutex_unlock(&stdin_mutex);
+}
+
+void factor_vm::abort()
+{
+	sig_t ret;
+	do
+	{
+		ret = signal(SIGABRT, SIG_DFL);
+	}
+	while(ret == SIG_ERR && errno == EINTR);
+	
+	::abort();
 }
 
 }
