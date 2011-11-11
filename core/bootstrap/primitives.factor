@@ -549,7 +549,6 @@ tuple
     { "retainstack-for" "threads.private" "primitive_retainstack_for" ( context -- array ) }
     { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" ( -- stats ) }
     { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" ( -- ) }
-    { "profiling" "tools.profiler.counting.private" "primitive_counting_profiler" ( ? -- ) }
     { "optimized?" "words" "primitive_optimized_p" ( word -- ? ) }
     { "word-code" "words" "primitive_word_code" ( word -- start end ) }
     { "(word)" "words.private" "primitive_word" ( name vocab hashcode -- word ) }
