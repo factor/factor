@@ -45,4 +45,9 @@ void sleep_nanos(u64 nsec);
 
 void move_file(const vm_char *path1, const vm_char *path2);
 
+static inline void breakpoint()
+{
+    __builtin_trap();
+}
+
 }

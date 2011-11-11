@@ -143,6 +143,7 @@ struct factor_vm
 
 	/* Are we already handling a fault? Used to catch double memory faults */
 	bool faulting_p;
+	static bool fatal_erroring_p;
 
 	/* Safepoint state */
 	volatile safepoint_state safepoint;
@@ -213,6 +214,7 @@ struct factor_vm
 	void general_error(vm_error_type error, cell arg1, cell arg2);
 	void type_error(cell type, cell tagged);
 	void not_implemented_error();
+	void verify_memory_protection_error(cell addr);
 	void memory_protection_error(cell addr);
 	void signal_error(cell signal);
 	void divide_by_zero_error();
@@ -730,6 +732,7 @@ struct factor_vm
 	void open_console();
 	void lock_console();
 	void unlock_console();
+	static void abort();
 
 	// os-windows
   #if defined(WINDOWS)
