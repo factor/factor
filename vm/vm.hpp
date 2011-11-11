@@ -64,7 +64,6 @@ struct factor_vm
 	c_to_factor_func_type c_to_factor_func;
 
 	/* Is profiling enabled? */
-	bool counting_profiler_p;
 	volatile cell sampling_profiler_p;
 	fixnum samples_per_second;
 
@@ -199,13 +198,7 @@ struct factor_vm
 	void primitive_clone();
 	void primitive_become();
 
-	// counting_profiler
-	void init_counting_profiler();
-	code_block *compile_counting_profiler_stub(cell word_);
-	void set_counting_profiler(bool counting_profiler);
-	void primitive_counting_profiler();
-
-	/* Sampling profiler */
+	// sampling_profiler
 	void clear_samples();
 	void record_sample();
 	void record_callstack_sample(cell *begin, cell *end);
@@ -458,7 +451,6 @@ struct factor_vm
 	word *allot_word(cell name_, cell vocab_, cell hashcode_);
 	void primitive_word();
 	void primitive_word_code();
-	void update_word_entry_point(word *w_);
 	void primitive_optimized_p();
 	void primitive_wrapper();
 	void jit_compile_word(cell word_, cell def_, bool relocating);
@@ -658,10 +650,9 @@ struct factor_vm
 
 	// quotations
 	void primitive_jit_compile();
-	code_block *lazy_jit_compile_block();
+	void *lazy_jit_compile_entry_point();
 	void primitive_array_to_quotation();
 	void primitive_quotation_code();
-	void set_quot_entry_point(quotation *quot, code_block *code);
 	code_block *jit_compile_quot(cell owner_, cell quot_, bool relocating);
 	void jit_compile_quot(cell quot_, bool relocating);
 	fixnum quot_code_offset_to_scan(cell quot_, cell offset);

@@ -65,13 +65,13 @@ cell object::binary_payload_start(Fixup fixup) const
 		return 0;
 	/* these objects have some binary data at the end */
 	case WORD_TYPE:
-		return sizeof(word) - sizeof(cell) * 3;
+		return sizeof(word) - sizeof(cell);
 	case ALIEN_TYPE:
 		return sizeof(cell) * 3;
 	case DLL_TYPE:
 		return sizeof(cell) * 2;
 	case QUOTATION_TYPE:
-		return sizeof(quotation) - sizeof(cell) * 2;
+		return sizeof(quotation) - sizeof(cell);
 	case STRING_TYPE:
 		return sizeof(string);
 	/* everything else consists entirely of pointers */

@@ -96,7 +96,6 @@ namespace factor
 #include "contexts.hpp"
 #include "run.hpp"
 #include "objects.hpp"
-#include "counting_profiler.hpp"
 #include "sampling_profiler.hpp"
 #include "errors.hpp"
 #include "bignumint.hpp"
