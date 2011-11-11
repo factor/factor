@@ -75,11 +75,12 @@ TUPLE: float-parse
     [ drop 2.0 swap exponent>> (pow) * ] 2tri ; inline
 
 : ?make-float ( float-parse n/f -- float/f )
+    { float-parse object } declare
     {
         { [ dup not ] [ 2drop f ] }
         { [ over radix>> 10 = ] [ make-float-dec-exponent ] }
         [ make-float-bin-exponent ]
-    } cond ; inline
+    } cond ;
 
 : ?neg ( n/f -- -n/f )
     [ neg ] [ f ] if* ; inline
@@ -176,7 +177,8 @@ DEFER: @neg-digit
     } case ; inline
 
 : ->denominator ( i number-parse n -- n/f )
-    @split [ @denom-first-digit ] require-next-digit ?make-ratio ; inline
+    { fixnum number-parse integer } declare
+    @split [ @denom-first-digit ] require-next-digit ?make-ratio ;
 
 : @num-digit-or-punc ( i number-parse n char -- n/f )
     {
@@ -190,7 +192,8 @@ DEFER: @neg-digit
     digit-in-radix [ [ @num-digit-or-punc ] add-digit ] [ @abort ] if ;
 
 : ->numerator ( i number-parse n -- n/f )
-    @split [ @num-digit ] require-next-digit ?add-ratio ; inline
+    { fixnum number-parse integer } declare
+    @split [ @num-digit ] require-next-digit ?add-ratio ;
 
 : @pos-digit-or-punc ( i number-parse n char -- n/f )
     {
