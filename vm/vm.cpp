@@ -8,7 +8,6 @@ factor_vm::factor_vm(THREADHANDLE thread) :
         thread(thread),
 	callback_id(0),
 	c_to_factor_func(NULL),
-	counting_profiler_p(false),
 	sampling_profiler_p(false),
 	signal_pipe_input(0),
 	signal_pipe_output(0),

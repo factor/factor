@@ -63,7 +63,7 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 		else
 			assert(false);
 
-		*pc = (cell)handler_word->code->entry_point();
+		*pc = (cell)handler_word->entry_point;
 	}
 }
 

@@ -98,7 +98,6 @@ enum code_block_type
 {
 	code_block_unoptimized,
 	code_block_optimized,
-	code_block_counting_profiler,
 	code_block_pic
 };
 
@@ -253,7 +252,11 @@ struct string : public object {
 
 struct code_block;
 
-/* Assembly code makes assumptions about the layout of this struct */
+/* Assembly code makes assumptions about the layout of this struct:
+	basis/bootstrap/images/images.factor
+	basis/compiler/constants/constants.factor
+	core/bootstrap/primitives.factor
+*/
 struct word : public object {
 	static const cell type_number = WORD_TYPE;
 	/* TAGGED hashcode */
@@ -270,16 +273,14 @@ struct word : public object {
 	cell pic_def;
 	/* TAGGED alternative entry point for direct tail calls. Used for inline caching */
 	cell pic_tail_def;
-	/* TAGGED call count for counting_profiler */
-	cell counter;
 	/* TAGGED machine code for sub-primitive */
 	cell subprimitive;
 	/* UNTAGGED entry point: jump here to execute word */
 	void *entry_point;
 	/* UNTAGGED compiled code block */
-	code_block *code;
-	/* UNTAGGED counting_profiler stub */
-	code_block *counting_profiler;
+
+	/* defined in code_blocks.hpp */
+	code_block *code() const;
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -299,7 +300,11 @@ struct boxed_float : object {
 	double n;
 };
 
-/* Assembly code makes assumptions about the layout of this struct */
+/* Assembly code makes assumptions about the layout of this struct:
+	basis/bootstrap/images/images.factor
+	basis/compiler/constants/constants.factor
+	core/bootstrap/primitives.factor
+*/
 struct quotation : public object {
 	static const cell type_number = QUOTATION_TYPE;
 	/* tagged */
@@ -310,8 +315,9 @@ struct quotation : public object {
 	cell cache_counter;
 	/* UNTAGGED entry point; jump here to call quotation */
 	void *entry_point;
-	/* UNTAGGED compiled code block */
-	code_block *code;
+
+	/* defined in code_blocks.hpp */
+	code_block *code() const;
 };
 
 /* Assembly code makes assumptions about the layout of this struct */

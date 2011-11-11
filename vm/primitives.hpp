@@ -46,7 +46,6 @@ namespace factor
 	_(context_object) \
 	_(context_object_for) \
 	_(current_callback) \
-	_(counting_profiler) \
 	_(data_room) \
 	_(datastack) \
 	_(datastack_for) \

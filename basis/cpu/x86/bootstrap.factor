@@ -77,19 +77,6 @@ big-endian off
 ] callback-stub jit-define
 
 [
-    ! Load word
-    temp0 0 MOV f rc-absolute-cell rel-literal
-    ! Bump profiling counter
-    temp0 profile-count-offset [+] 1 tag-fixnum ADD
-    ! Load word->code
-    temp0 temp0 word-code-offset [+] MOV
-    ! Compute word entry point
-    temp0 compiled-header-size ADD
-    ! Jump to entry point
-    temp0 JMP
-] jit-profiling jit-define
-
-[
     ! load literal
     temp0 0 MOV f rc-absolute-cell rel-literal
     ! increment datastack pointer

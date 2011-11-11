@@ -37,7 +37,6 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\code_heap.obj \
 	vm\compaction.obj \
 	vm\contexts.obj \
-	vm\counting_profiler.obj \
 	vm\data_heap.obj \
 	vm\data_heap_checker.obj \
 	vm\debug.obj \

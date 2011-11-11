@@ -59,19 +59,15 @@ void code_block_visitor<Fixup>::visit_object_code_block(object *obj)
 	case WORD_TYPE:
 		{
 			word *w = (word *)obj;
-			if(w->code)
-				w->code = visit_code_block(w->code);
-			if(w->counting_profiler)
-				w->counting_profiler = visit_code_block(w->counting_profiler);
-
-			parent->update_word_entry_point(w);
+			if(w->entry_point)
+				w->entry_point = visit_code_block(w->code())->entry_point();
 			break;
 		}
 	case QUOTATION_TYPE:
 		{
 			quotation *q = (quotation *)obj;
-			if(q->code)
-				parent->set_quot_entry_point(q,visit_code_block(q->code));
+			if(q->entry_point)
+				q->entry_point = visit_code_block(q->code())->entry_point();
 			break;
 		}
 	case CALLSTACK_TYPE:

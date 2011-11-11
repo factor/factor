@@ -241,7 +241,6 @@ bi
     "props"
     "pic-def"
     "pic-tail-def"
-    { "counter" { "fixnum" "math" } }
     { "sub-primitive" read-only }
 } define-builtin
 
