@@ -4,7 +4,7 @@ namespaces assocs ;
 IN: hashtables
 
 ARTICLE: "hashtables.private" "Hashtable implementation details"
-"This hashtable implementation uses only one auxiliary array in addition to the hashtable tuple itself. The array stores keys in even slots and values in odd slots. Values are looked up with a hashing strategy that uses linear probing to resolve collisions."
+"This hashtable implementation uses only one auxiliary array in addition to the hashtable tuple itself. The array stores keys in even slots and values in odd slots. Values are looked up with a hashing strategy that uses quadratic probing to resolve collisions."
 $nl
 "There are two special objects: the " { $link ((tombstone)) } " marker and the " { $link ((empty)) } " marker. Neither of these markers can be used as hashtable keys."
 $nl
@@ -71,13 +71,13 @@ HELP: probe
 
 HELP: key@
 { $values { "key" "a key" } { "hash" hashtable } { "array" "the underlying array of the hashtable" } { "n" "the index of the key" } { "?" "a boolean indicating whether the key was present" } }
-{ $description "Searches the hashtable for the key using a linear probing strategy. Searches stop if either the key or an " { $link ((empty)) } " sentinel is found. Searches skip the " { $link ((tombstone)) } " sentinel." } ;
+{ $description "Searches the hashtable for the key using a quadratic probing strategy. Searches stop if either the key or an " { $link ((empty)) } " sentinel is found. Searches skip the " { $link ((tombstone)) } " sentinel." } ;
 
 { key@ new-key@ } related-words
 
 HELP: new-key@
-{ $values { "key" "a key" } { "hash" hashtable } { "array" "the underlying array of the hashtable" } { "n" "the index where the key would be stored" } { "empty?" "a boolean indicating whether the location is currently empty" } }
-{ $description "Searches the hashtable for the key using a linear probing strategy. If the key is not present in the hashtable, outputs the index where it should be stored." } ;
+{ $values { "key" "a key" } { "hash" hashtable } { "array" "the underlying array of the hashtable" } { "n" "the index where the key would be stored" } }
+{ $description "Searches the hashtable for the key using a quadratic probing strategy. If the key is not present in the hashtable, outputs the index where it should be stored." } ;
 
 HELP: set-nth-pair
 { $values { "value" "the second element of the pair" } { "key" "the first element of the pair" } { "seq" "a sequence" } { "n" "an index in the sequence" } }
