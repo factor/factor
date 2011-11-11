@@ -402,7 +402,7 @@ struct factor_vm
 	template<typename Generation> void dump_generation(const char *name, Generation *gen);
 	void dump_generations();
 	void dump_objects(cell type);
-	void find_data_references_step(cell *scan);
+	void dump_edges();
 	void find_data_references(cell look_for_);
 	void dump_code_heap();
 	void factorbug_usage(bool advanced_p);
