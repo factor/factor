@@ -214,12 +214,21 @@ void sleep_nanos(u64 nsec)
 	Sleep((DWORD)(nsec/1000000));
 }
 
+typedef enum _EXCEPTION_DISPOSITION
+{
+	ExceptionContinueExecution = 0,
+	ExceptionContinueSearch = 1,
+	ExceptionNestedException = 2,
+	ExceptionCollidedUnwind = 3
+} EXCEPTION_DISPOSITION;
+
 LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
 {
 	switch (e->ExceptionCode)
 	{
 	case EXCEPTION_ACCESS_VIOLATION:
 		signal_fault_addr = e->ExceptionInformation[1];
+		verify_memory_protection_error(signal_fault_addr);
 		dispatch_signal_handler(
 			(cell*)&c->ESP,
 			(cell*)&c->EIP,
@@ -261,19 +270,19 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, 
 		break;
 	}
 
-	return 0;
+	return ExceptionContinueExecution;
 }
 
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
 {
+	if (factor_vm::fatal_erroring_p)
+		return ExceptionContinueSearch;
+
 	factor_vm *vm = current_vm_p();
 	if (vm)
 		return vm->exception_handler(e,frame,c,dispatch);
 	else
-	{
-		fatal_error("Foreign thread received exception", e->ExceptionCode);
-		return 0; // to placate MSVC
-	}
+		return ExceptionContinueSearch;
 }
 
 static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
@@ -378,6 +387,11 @@ void factor_vm::end_sampling_profiler_timer()
 	if (wait_result != WAIT_OBJECT_0)
 		TerminateThread(sampler_thread, 0);
 	sampler_thread = NULL;
+}
+
+void factor_vm::abort()
+{
+	::abort();
 }
 
 }

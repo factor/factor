@@ -3,12 +3,26 @@
 namespace factor
 {
 
+bool factor_vm::fatal_erroring_p;
+
+static inline void fa_diddly_atal_error()
+{
+	printf("fatal_error in fatal_error!\n");
+	breakpoint();
+	exit(86);
+}
+
 void fatal_error(const char *msg, cell tagged)
 {
+	if (factor_vm::fatal_erroring_p)
+		fa_diddly_atal_error();
+
+	factor_vm::fatal_erroring_p = true;
+
 	std::cout << "fatal_error: " << msg;
-	std::cout << ": " << std::hex << tagged << std::dec;
+	std::cout << ": " << (void*)tagged;
 	std::cout << std::endl;
-	exit(1);
+	abort();
 }
 
 void critical_error(const char *msg, cell tagged)
@@ -59,7 +73,9 @@ void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
 
 		ctx->push(error_object);
 
-		faulting_p = false;
+		/* Guard the safepoint, which will clear faulting_p if unwind-native-frames
+		succeeds */
+		code->guard_safepoint();
 		unwind_native_frames(special_objects[ERROR_HANDLER_QUOT],
 			ctx->callstack_top);
 	}
@@ -71,8 +87,8 @@ void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
 		std::cout << "error: " << error << std::endl;
 		std::cout << "arg 1: "; print_obj(arg1); std::cout << std::endl;
 		std::cout << "arg 2: "; print_obj(arg2); std::cout << std::endl;
-		faulting_p = false;
 		factorbug();
+		abort();
 	}
 }
 
@@ -86,12 +102,24 @@ void factor_vm::not_implemented_error()
 	general_error(ERROR_NOT_IMPLEMENTED,false_object,false_object);
 }
 
+void factor_vm::verify_memory_protection_error(cell addr)
+{
+	/* Called from the OS-specific top halves of the signal handlers to
+	make sure it's safe to dispatch to memory_protection_error */
+	if(fatal_erroring_p)
+		fa_diddly_atal_error();
+	if(faulting_p && !code->safepoint_p(addr))
+		fatal_error("Double fault", addr);
+	else if(fep_p)
+		fatal_error("Memory protection fault during low-level debugger", addr);
+	else if(atomic::load(&current_gc_p))
+		fatal_error("Memory protection fault during gc", addr);
+}
+
 void factor_vm::memory_protection_error(cell addr)
 {
 	if(code->safepoint_p(addr))
 		safepoint.handle_safepoint(this);
-	else if(faulting_p)
-		fatal_error("Double fault", 0);
 	else if(ctx->datastack_seg->underflow_p(addr))
 		general_error(ERROR_DATASTACK_UNDERFLOW,false_object,false_object);
 	else if(ctx->datastack_seg->overflow_p(addr))

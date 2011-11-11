@@ -201,13 +201,19 @@ void factor_vm::print_objects(cell *start, cell *end)
 void factor_vm::print_datastack()
 {
 	std::cout << "==== DATA STACK:" << std::endl;
-	print_objects((cell *)ctx->datastack_seg->start,(cell *)ctx->datastack);
+	if (ctx)
+		print_objects((cell *)ctx->datastack_seg->start,(cell *)ctx->datastack);
+	else
+		std::cout << "*** Context not initialized" << std::endl;
 }
 
 void factor_vm::print_retainstack()
 {
 	std::cout << "==== RETAIN STACK:" << std::endl;
-	print_objects((cell *)ctx->retainstack_seg->start,(cell *)ctx->retainstack);
+	if (ctx)
+		print_objects((cell *)ctx->retainstack_seg->start,(cell *)ctx->retainstack);
+	else
+		std::cout << "*** Context not initialized" << std::endl;
 }
 
 struct stack_frame_printer {
@@ -238,8 +244,13 @@ struct stack_frame_printer {
 void factor_vm::print_callstack()
 {
 	std::cout << "==== CALL STACK:" << std::endl;
-	stack_frame_printer printer(this);
-	iterate_callstack(ctx,printer);
+	if (ctx)
+	{
+		stack_frame_printer printer(this);
+		iterate_callstack(ctx,printer);
+	}
+	else
+		std::cout << "*** Context not initialized" << std::endl;
 }
 
 struct padded_address {
@@ -450,6 +461,8 @@ void factor_vm::factorbug_usage(bool advanced_p)
 		std::cout << "  push <addr>      -- push object on data stack - NOT SAFE" << std::endl;
 		std::cout << "  gc               -- trigger full GC - NOT SAFE" << std::endl;
 		std::cout << "  code             -- code heap dump" << std::endl;
+		std::cout << "  abort            -- call abort()" << std::endl;
+		std::cout << "  breakpoint       -- trigger system breakpoint" << std::endl;
 	}
 	else
 	{
@@ -599,6 +612,10 @@ void factor_vm::factorbug()
 			primitive_full_gc();
 		else if(strcmp(cmd,"help") == 0)
 			factorbug_usage(true);
+		else if(strcmp(cmd,"abort") == 0)
+			abort();
+		else if(strcmp(cmd,"breakpoint") == 0)
+			breakpoint();
 		else
 			std::cout << "unknown command" << std::endl;
 	}
