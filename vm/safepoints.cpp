@@ -38,6 +38,7 @@ void safepoint_state::enqueue_samples(factor_vm *parent, cell samples, cell pc, 
 void safepoint_state::handle_safepoint(factor_vm *parent) volatile
 {
 	parent->code->unguard_safepoint();
+	parent->faulting_p = false;
 
 	if (atomic::load(&fep_p))
 	{

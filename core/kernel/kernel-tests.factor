@@ -2,16 +2,16 @@ USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
 continuations prettyprint io.streams.string debugger assocs
 sequences.private accessors locals.backend grouping words
-system ;
+system alien alien.accessors ;
 IN: kernel.tests
 
 [ 0 ] [ f size ] unit-test
 [ t ] [ [ \ = \ = ] all-equal? ] unit-test
 
 ! Don't leak extra roots if error is thrown
-[ ] [ 10000 [ [ 3 throw ] ignore-errors ] times ] unit-test
+[ ] [ 1000 [ [ 3 throw ] ignore-errors ] times ] unit-test
 
-[ ] [ 10000 [ [ -1 f <array> ] ignore-errors ] times ] unit-test
+[ ] [ 1000 [ [ -1 f <array> ] ignore-errors ] times ] unit-test
 
 ! Make sure we report the correct error on stack underflow
 [ clear drop ] [ { "kernel-error" 10 f f } = ] must-fail-with
@@ -183,3 +183,7 @@ os windows? [
 [ t ] [ { } identity-hashcode fixnum? ] unit-test
 [ 123 ] [ 123 identity-hashcode ] unit-test
 [ t ] [ f identity-hashcode fixnum? ] unit-test
+
+! Make sure memory protection faults work
+[ f 0 alien-unsigned-1 ] [ vm-error? ] must-fail-with
+[ 1 <alien> 0 alien-unsigned-1 ] [ vm-error? ] must-fail-with

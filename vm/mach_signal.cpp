@@ -40,6 +40,7 @@ void factor_vm::call_fault_handler(
 	if(exception == EXC_BAD_ACCESS)
 	{
 		signal_fault_addr = MACH_EXC_STATE_FAULT(exc_state);
+		verify_memory_protection_error(signal_fault_addr);
 		handler = (cell)factor::memory_signal_handler_impl;
 	}
 	else if(exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV)
