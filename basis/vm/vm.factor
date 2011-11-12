@@ -31,6 +31,7 @@ STRUCT: vm
 { cards-offset cell }
 { decks-offset cell }
 { signal-handler-addr cell }
+{ faulting? cell }
 { special-objects cell[special-object-count] } ;
 
 : vm-field-offset ( field -- offset ) vm offset-of ; inline
