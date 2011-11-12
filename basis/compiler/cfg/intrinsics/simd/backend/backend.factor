@@ -37,6 +37,7 @@ M: ##tail>head-vector insn-available? rep>> %unpack-vector-head-reps member? ;
 M: ##integer>float-vector insn-available? rep>> %integer>float-vector-reps member? ;
 M: ##float>integer-vector insn-available? rep>> %float>integer-vector-reps member? ;
 M: ##compare-vector insn-available? [ rep>> ] [ cc>> ] bi %compare-vector-reps member? ;
+M: ##move-vector-mask insn-available? rep>> %move-vector-mask-reps member? ;
 M: ##test-vector insn-available? rep>> %test-vector-reps member? ;
 M: ##add-vector insn-available? rep>> %add-vector-reps member? ;
 M: ##saturated-add-vector insn-available? rep>> %saturated-add-vector-reps member? ;

@@ -380,6 +380,11 @@ def: dst
 use: src1 src2
 literal: rep cc ;
 
+FOLDABLE-INSN: ##move-vector-mask
+def: dst/int-rep
+use: src
+literal: rep ;
+
 FOLDABLE-INSN: ##test-vector
 def: dst/tagged-rep
 use: src1
