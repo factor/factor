@@ -73,9 +73,8 @@ void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
 
 		ctx->push(error_object);
 
-		/* Guard the safepoint, which will clear faulting_p if unwind-native-frames
-		succeeds */
-		code->guard_safepoint();
+		/* The unwind-native-frames subprimitive will clear faulting_p
+		if it was successfully reached. */
 		unwind_native_frames(special_objects[ERROR_HANDLER_QUOT],
 			ctx->callstack_top);
 	}
