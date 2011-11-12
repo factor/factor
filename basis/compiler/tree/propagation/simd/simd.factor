@@ -69,6 +69,7 @@ CONSTANT: vector-other-intrinsics
         (simd-vany?)
         (simd-vall?)
         (simd-vnone?)
+        (simd-vgetmask)
         (simd-select)
         set-alien-vector
     }
@@ -103,6 +104,8 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
 \ assert-positive [
     real [0,inf] <class/interval-info> value-info-intersect
 ] "outputs" set-word-prop
+
+\ (simd-vgetmask) { fixnum } "default-output-classes" set-word-prop
 
 : clone-with-value-infos ( node -- node' )
     clone dup in-d>> extract-value-info >>info ;

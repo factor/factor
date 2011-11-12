@@ -555,6 +555,10 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
     {
         [ vcc-none ^^test-vector ]
     } emit-v-vector-op ;
+: emit-simd-vgetmask ( node -- )
+    {
+        [ ^^move-vector-mask ]
+    } emit-v-vector-op ;
 
 : emit-simd-v>float ( node -- )
     {
@@ -700,6 +704,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { alien-vector              [ emit-alien-vector             ] }
         { set-alien-vector          [ emit-set-alien-vector         ] }
         { assert-positive           [ drop                          ] }
+        { (simd-vgetmask)           [ emit-simd-vgetmask            ] }
     } enable-intrinsics ;
 
 enable-simd

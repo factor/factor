@@ -4,7 +4,7 @@ generic.parser kernel lexer literals locals macros math math.functions
 math.vectors math.vectors.private math.vectors.simd.intrinsics
 namespaces parser prettyprint.custom quotations sequences
 sequences.generalizations sequences.private vocabs vocabs.loader
-words ;
+words math.bitwise ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
@@ -221,6 +221,8 @@ M: simd-128 vany?
     dup simd-rep [ (simd-vany?)             ] [ call-next-method ] v->x-op  ; inline
 M: simd-128 vall?
     dup simd-rep [ (simd-vall?)             ] [ call-next-method ] v->x-op  ; inline
+M: simd-128 vcount
+    dup simd-rep [ (simd-vgetmask) assert-positive ] [ call-next-method ] v->x-op bit-count ; inline
 M: simd-128 vnone?
     dup simd-rep [ (simd-vnone?)            ] [ call-next-method ] v->x-op  ; inline
 
