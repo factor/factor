@@ -5,6 +5,7 @@ namespace factor
 
 void factor_vm::primitive_exit()
 {
+	kill_stdin_loop();
 	exit((int)to_fixnum(ctx->pop()));
 }
 
