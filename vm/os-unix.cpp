@@ -446,6 +446,10 @@ void *stdin_loop(void *arg)
 	sigdelset(&mask, SIGQUIT);
 	pthread_sigmask(SIG_SETMASK, &mask, NULL);
 
+	int dontcare;
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &dontcare);
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &dontcare);
+
 	while(loop_running)
 	{
 		if(!safe_read(control_read,buf,1))
@@ -505,7 +509,7 @@ void factor_vm::open_console()
 void factor_vm::close_console()
 {
 	if (stdin_thread_initialized_p)
-		pthread_kill(stdin_thread, SIGTERM);
+		pthread_cancel(stdin_thread);
 }
 
 void factor_vm::lock_console()
