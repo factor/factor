@@ -112,7 +112,7 @@ M: #alien-invoke emit-node
             [ caller-stack-frame ]
             [ caller-linkage ]
         } cleave
-        <gc-map> <##alien-invoke>
+        <gc-map> ##alien-invoke,
     ]
     [ caller-return ]
     bi ;
@@ -124,7 +124,7 @@ M: #alien-indirect emit-node ( node -- )
         [ caller-parameters ]
         [ prepare-caller-return ]
         [ caller-stack-frame ] tri
-        <gc-map> <##alien-indirect>
+        <gc-map> ##alien-indirect,
     ]
     [ caller-return ]
     bi ;
@@ -137,7 +137,7 @@ M: #alien-assembly emit-node
             [ prepare-caller-return ]
             [ caller-stack-frame ]
             [ quot>> ]
-        } cleave <gc-map> <##alien-assembly>
+        } cleave <gc-map> ##alien-assembly,
     ]
     [ caller-return ]
     bi ;
@@ -183,7 +183,7 @@ M: #alien-assembly emit-node
     [ last #return? t assert= ] [ but-last emit-nodes ] bi ;
 
 : emit-callback-return ( params -- )
-    basic-block get [ callee-return <##callback-outputs> ] [ drop ] if ;
+    basic-block get [ callee-return ##callback-outputs, ] [ drop ] if ;
 
 M: #alien-callback emit-node
     dup params>> xt>> dup
@@ -193,7 +193,7 @@ M: #alien-callback emit-node
         begin-word
 
         {
-            [ params>> callee-parameters <##callback-inputs> ]
+            [ params>> callee-parameters ##callback-inputs, ]
             [ params>> box-parameters ]
             [ child>> emit-callback-body ]
             [ params>> emit-callback-return ]

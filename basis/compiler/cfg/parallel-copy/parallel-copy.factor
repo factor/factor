@@ -58,4 +58,4 @@ PRIVATE>
     ] with-scope ; inline
 
 : parallel-copy ( mapping -- )
-    next-vreg [ any-rep <##copy> ] parallel-mapping ;
+    next-vreg [ any-rep ##copy, ] parallel-mapping ;

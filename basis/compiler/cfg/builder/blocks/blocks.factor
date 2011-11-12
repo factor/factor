@@ -27,9 +27,9 @@ IN: compiler.cfg.builder.blocks
     (begin-basic-block) ;
 
 : emit-trivial-block ( quot -- )
-    <##branch> begin-basic-block
+    ##branch, begin-basic-block
     call
-    <##branch> begin-basic-block ; inline
+    ##branch, begin-basic-block ; inline
 
 : make-kill-block ( -- )
     basic-block get t >>kill-block? drop ;
@@ -39,7 +39,7 @@ IN: compiler.cfg.builder.blocks
 
 : emit-primitive ( node -- )
     [
-        [ word>> <##call> ]
+        [ word>> ##call, ]
         [ call-height adjust-d ] bi
         make-kill-block
     ] emit-trivial-block ;
@@ -49,7 +49,7 @@ IN: compiler.cfg.builder.blocks
 : end-branch ( -- pair/f )
     ! pair is { final-bb final-height }
     basic-block get dup [
-        <##branch>
+        ##branch,
         end-local-analysis
         current-height get clone 2array
     ] when ;

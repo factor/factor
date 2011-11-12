@@ -12,4 +12,4 @@ IN: compiler.cfg.intrinsics.strings
     2inputs (string-nth) ^^load-memory-imm ds-push ;
 
 : emit-set-string-nth-fast ( -- )
-    3inputs (string-nth) <##store-memory-imm> ;
+    3inputs (string-nth) ##store-memory-imm, ;
