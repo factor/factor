@@ -5,7 +5,7 @@ help.topics io io.backend io.files io.launcher io.pathnames
 kernel lexer math namespaces parser prettyprint sequences
 source-files source-files.errors splitting strings summary
 tools.crossref vocabs vocabs.files vocabs.hierarchy
-vocabs.loader vocabs.metadata ;
+vocabs.loader vocabs.metadata calendar threads ;
 FROM: vocabs => vocab-name >vocab-link ;
 IN: editors
 
@@ -31,7 +31,9 @@ M: object editor-detached? t ;
     <process>
         swap >>command 
         editor-detached? >>detached
-    run-process dup status>> { 0 f } member?
+    run-process
+    300 milliseconds sleep
+    dup status>> { 0 f } member?
     [ drop ] [ process-failed ] if ;
 
 : edit-location ( file line -- )
