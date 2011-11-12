@@ -52,7 +52,7 @@ M: object flatten-struct-type-return
 
 :: implode-struct ( src vregs reps -- )
     vregs reps dup component-offsets
-    [| vreg rep offset | vreg src offset rep f <##store-memory-imm> ] 3each ;
+    [| vreg rep offset | vreg src offset rep f ##store-memory-imm, ] 3each ;
 
 GENERIC: unbox ( src c-type -- vregs reps )
 
@@ -75,7 +75,7 @@ M: c-type unbox
     [ drop f f 3array 1array ] 2bi ;
 
 M: long-long-type unbox
-    [ next-vreg next-vreg 2dup ] 2dip unboxer>> <##unbox-long-long> 2array
+    [ next-vreg next-vreg 2dup ] 2dip unboxer>> ##unbox-long-long, 2array
     int-rep long-long-on-stack? long-long-odd-register? 3array
     int-rep long-long-on-stack? f 3array 2array ;
 
