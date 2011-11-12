@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2011 John Benediktsson, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel kernel.private slots.private math
 assocs math.private sequences sequences.private vectors ;
@@ -45,16 +45,26 @@ TUPLE: hashtable
     swap <hash-array> >>array init-hash ; inline
 
 : hash-count+ ( hash -- )
-    [ 1 + ] change-count drop ; inline
+    [ 1 fixnum+fast ] change-count drop ; inline
 
 : hash-deleted+ ( hash -- )
-    [ 1 + ] change-deleted drop ; inline
+    [ 1 fixnum+fast ] change-deleted drop ; inline
 
 : hash-deleted- ( hash -- )
-    [ 1 - ] change-deleted drop ; inline
+    [ 1 fixnum-fast ] change-deleted drop ; inline
 
 ! i = first-empty-or-found
 ! j = first-deleted
+! empty? = if true, key was not found
+!
+! if empty? is f:
+! - we want to store into i
+! 
+! if empty? is t:
+! - we want to store into j if j is not f
+! - otherwise we want to store into i
+! - ... and increment count
+
 : (new-key@) ( key array i probe# j -- array i j empty? )
     [ 2dup swap array-nth ] 2dip pick tombstone?
     [
@@ -70,9 +80,8 @@ TUPLE: hashtable
     ] if ; inline recursive
 
 : new-key@ ( key hash -- array n )
-    [ array>> 2dup hash@ 0 f (new-key@) ] keep
-    over [ pick [ hash-deleted- ] [ hash-count+ ] if ] [ drop ] if
-    [ swap or ] [ drop ] if ; inline
+    [ array>> 2dup hash@ 0 f (new-key@) ] keep swap
+    [ over [ hash-deleted- ] [ hash-count+ ] if swap or ] [ 2drop ] if ; inline
 
 : set-nth-pair ( value key seq n -- )
     2 fixnum+fast [ set-slot ] 2keep
