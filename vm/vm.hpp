@@ -730,6 +730,7 @@ struct factor_vm
 	void open_console();
 	void lock_console();
 	void unlock_console();
+	void close_console();
 
 	// os-windows
   #if defined(WINDOWS)

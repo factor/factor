@@ -499,4 +499,13 @@ void factor_vm::unlock_console()
 	pthread_mutex_unlock(&stdin_mutex);
 }
 
+// This method is used to kill the stdin_loop before exiting from factor.
+// A Nvidia driver bug on Linux is the reason this has to be done, see:
+// http://www.nvnews.net/vbulletin/showthread.php?t=164619
+void factor_vm::close_console()
+{
+	pthread_mutex_lock(&stdin_mutex);
+	pthread_kill(stdin_thread, SIGTERM);
+}
+
 }
