@@ -8,13 +8,13 @@ compiler.cfg.utilities compiler.cfg.builder.blocks
 compiler.constants cpu.architecture alien.c-types ;
 IN: compiler.cfg.intrinsics.allot
 
-: <##set-slots> ( regs obj class -- )
-    '[ _ swap 1 + _ type-number <##set-slot-imm> ] each-index ;
+: ##set-slots, ( regs obj class -- )
+    '[ _ swap 1 + _ type-number ##set-slot-imm, ] each-index ;
 
 : emit-simple-allot ( node -- )
     [ in-d>> length ] [ node-output-infos first class>> ] bi
     [ drop ds-load ] [ [ 1 + cells ] dip ^^allot ] [ nip ] 2tri
-    [ <##set-slots> ] [ [ drop ] [ ds-push ] [ drop ] tri* ] 3bi ;
+    [ ##set-slots, ] [ [ drop ] [ ds-push ] [ drop ] tri* ] 3bi ;
 
 : tuple-slot-regs ( layout -- vregs )
     [ second ds-load ] [ ^^load-literal ] bi prefix ;
@@ -28,14 +28,14 @@ IN: compiler.cfg.intrinsics.allot
         nip
         ds-drop
         [ tuple-slot-regs ] [ second ^^allot-tuple ] bi
-        [ tuple <##set-slots> ] [ ds-push drop ] 2bi
+        [ tuple ##set-slots, ] [ ds-push drop ] 2bi
     ] [ drop emit-primitive ] if ;
 
 : store-length ( len reg class -- )
-    [ [ ^^load-literal ] dip 1 ] dip type-number <##set-slot-imm> ;
+    [ [ ^^load-literal ] dip 1 ] dip type-number ##set-slot-imm, ;
 
 :: store-initial-element ( len reg elt class -- )
-    len [ [ elt reg ] dip 2 + class type-number <##set-slot-imm> ] each-integer ;
+    len [ [ elt reg ] dip 2 + class type-number ##set-slot-imm, ] each-integer ;
 
 : expand-<array>? ( obj -- ? )
     dup integer? [ 0 8 between? ] [ drop f ] if ;
@@ -76,7 +76,7 @@ IN: compiler.cfg.intrinsics.allot
     0 ^^load-literal :> elt
     reg ^^tagged>integer :> reg
     len cell align cell /i iota [
-        [ elt reg ] dip cells byte-array-offset + int-rep f <##store-memory-imm>
+        [ elt reg ] dip cells byte-array-offset + int-rep f ##store-memory-imm,
     ] each ;
 
 :: emit-<byte-array> ( node -- )

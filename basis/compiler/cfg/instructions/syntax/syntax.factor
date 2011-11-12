@@ -72,7 +72,7 @@ TUPLE: insn-slot-spec type name rep ;
     [ name>> ] map "insn#" suffix define-tuple-class ;
 
 : insn-ctor-name ( word -- name )
-    name>> "<" ">" surround ;
+    name>> "," append ;
 
 : define-insn-ctor ( class specs -- )
     [ [ insn-ctor-name create-in ] [ '[ _ ] [ f ] [ boa , ] surround ] bi ] dip

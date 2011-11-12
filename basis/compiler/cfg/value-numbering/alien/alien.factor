@@ -31,7 +31,7 @@ M: ##box-displaced-alien rewrite
         [ dst>> ]
         [ [ base>> ] [ base-class>> ] [ displacement>> ] tri ] bi*
         [ ^^unbox-c-ptr ] dip
-        <##add>
+        ##add,
     ] { } make ;
 
 : rewrite-unbox-any-c-ptr ( insn -- insn/f )

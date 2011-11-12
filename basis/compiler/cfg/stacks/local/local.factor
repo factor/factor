@@ -45,8 +45,8 @@ M: rs-loc translate-local-loc n>> current-height get r>> - <rs-loc> ;
 
 : emit-height-changes ( -- )
     current-height get
-    [ emit-d>> dup 0 = [ drop ] [ <##inc-d> ] if ]
-    [ emit-r>> dup 0 = [ drop ] [ <##inc-r> ] if ] bi ;
+    [ emit-d>> dup 0 = [ drop ] [ ##inc-d, ] if ]
+    [ emit-r>> dup 0 = [ drop ] [ ##inc-r, ] if ] bi ;
 
 : emit-changes ( -- )
     ! Insert height and stack changes prior to the last instruction

@@ -57,8 +57,8 @@ GENERIC: emit-node ( node -- )
 
 : begin-word ( -- )
     make-kill-block
-    <##prologue>
-    <##branch>
+    ##prologue,
+    ##branch,
     begin-basic-block ;
 
 : (build-cfg) ( nodes word label -- )
@@ -75,8 +75,8 @@ GENERIC: emit-node ( node -- )
     ] keep ;
 
 : emit-loop-call ( basic-block -- )
-    <##safepoint>
-    <##branch>
+    ##safepoint,
+    ##branch,
     basic-block get successors>> push
     end-basic-block ;
 
@@ -85,7 +85,7 @@ GENERIC: emit-node ( node -- )
     [ drop loops get at emit-loop-call ]
     [
         [
-            [ <##call> ] [ adjust-d ] bi*
+            [ ##call, ] [ adjust-d ] bi*
             make-kill-block
         ] emit-trivial-block
     ] if ;
@@ -102,7 +102,7 @@ GENERIC: emit-node ( node -- )
     basic-block get swap loops get set-at ;
 
 : emit-loop ( node -- )
-    <##branch>
+    ##branch,
     begin-basic-block
     [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi ;
 
@@ -142,7 +142,7 @@ M: #recursive emit-node
 : emit-actual-if ( #if -- )
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync
-    ds-pop any-rep ^^copy f cc/= <##compare-imm-branch> emit-if ;
+    ds-pop any-rep ^^copy f cc/= ##compare-imm-branch, emit-if ;
 
 M: #if emit-node
     {
@@ -156,7 +156,7 @@ M: #dispatch emit-node
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync. ^^offset>slot always returns a fresh vreg,
     ! though.
-    ds-pop ^^offset>slot next-vreg <##dispatch> emit-if ;
+    ds-pop ^^offset>slot next-vreg ##dispatch, emit-if ;
 
 ! #call
 M: #call emit-node
@@ -200,12 +200,12 @@ M: #shuffle emit-node
 
 ! #return
 : end-word ( -- )
-    <##branch>
+    ##branch,
     begin-basic-block
     make-kill-block
-    <##safepoint>
-    <##epilogue>
-    <##return> ;
+    ##safepoint,
+    ##epilogue,
+    ##return, ;
 
 M: #return emit-node drop end-word ;
 
@@ -213,7 +213,7 @@ M: #return-recursive emit-node
     label>> id>> loops get key? [ end-word ] unless ;
 
 ! #terminate
-M: #terminate emit-node drop <##no-tco> end-basic-block ;
+M: #terminate emit-node drop ##no-tco, end-basic-block ;
 
 ! No-op nodes
 M: #introduce emit-node drop ;
