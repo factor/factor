@@ -122,9 +122,6 @@ IN: bootstrap.x86
 [ jit-jump-quot ]
 \ (call) define-combinator-primitive
 
-: (jit-safepoint)
-    0 [RIP+] EAX MOV rc-relative rel-safepoint ;
-
 [
     ! Unwind stack frames
     RSP arg2 MOV
@@ -137,8 +134,8 @@ IN: bootstrap.x86
     jit-load-context
     jit-restore-context
 
-    ! Safepoint to clear the faulting flag in the VM
-    (jit-safepoint)
+    ! Clear the fault flag
+    vm-reg vm-fault-flag-offset [+] 0 MOV
 
     ! Call quotation
     jit-jump-quot
@@ -342,7 +339,9 @@ IN: bootstrap.x86
     jit-push-param
     jit-jump-quot ;
 
-[ (jit-safepoint) ] \ jit-safepoint jit-define
+[
+    0 [RIP+] EAX MOV rc-relative rel-safepoint
+] \ jit-safepoint jit-define
 
 [
     jit-start-context-and-delete

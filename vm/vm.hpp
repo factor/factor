@@ -28,6 +28,9 @@ struct factor_vm
 	/* cdecl signal handler address, used by signal handler subprimitives */
 	cell signal_handler_addr;
 
+	/* are we handling a memory error? used to detect double faults */
+	cell faulting_p;
+
 	/* Various special objects, accessed by special-object and
 	set-special-object primitives */
 	cell special_objects[special_object_count];
@@ -142,7 +145,6 @@ struct factor_vm
 	segment *signal_callstack_seg;
 
 	/* Are we already handling a fault? Used to catch double memory faults */
-	bool faulting_p;
 	static bool fatal_erroring_p;
 
 	/* Safepoint state */
