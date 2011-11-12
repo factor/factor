@@ -89,7 +89,7 @@ M: object irrelevant? drop f ;
 
 M: default-method irrelevant? drop t ;
 
-M: predicate-engine irrelevant? drop t ;
+M: predicate-engine-word irrelevant? drop t ;
 
 PRIVATE>
 
