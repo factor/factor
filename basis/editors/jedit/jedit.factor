@@ -12,7 +12,7 @@ ERROR: jedit-not-found ;
 
 HOOK: find-jedit-path os ( -- path )
 
-M: object find-jedit-path f ;
+M: object find-jedit-path "jedit" ;
 
 M: macosx find-jedit-path
     "org.gjt.sp.jedit" find-native-bundle
