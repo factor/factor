@@ -64,7 +64,7 @@ must-fail-with
 
 2 [
     [ "IN: classes.tuple.parser.tests USE: alien TUPLE: foo { slot dll } ;" eval( -- ) ]
-    [ error>> no-initial-value? ]
+    [ error>> bad-initial-value? ]
     must-fail-with
 
     [ f ] [ \ foo tuple-class? ] unit-test

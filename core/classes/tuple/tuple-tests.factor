@@ -818,3 +818,19 @@ TUPLE: rclasstest a b ;
 [ f ] [ \ rclasstest \ b<< ?lookup-method ] unit-test
 
 << \ rclasstest forget >>
+
+! initial: should type check
+TUPLE: initial-class ;
+
+DEFER: initial-slot
+
+[ ] [ "IN: classes.tuple.tests TUPLE: initial-slot { x initial-class } ;" eval( -- ) ] unit-test
+
+[ t ] [ initial-slot new x>> initial-class? ] unit-test
+
+[ "IN: classes.tuple.tests TUPLE: initial-slot { x initial-class initial: f } ;" eval( -- ) ]
+[ error>> T{ bad-initial-value f "x" } = ] must-fail-with
+
+[ "IN: classes.tuple.tests TUPLE: initial-slot { x initial-class initial: 3 } ;" eval( -- ) ]
+[ error>> T{ bad-initial-value f "x" } = ] must-fail-with
+

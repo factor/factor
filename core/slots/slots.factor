@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2010 Slava Pestov.
+! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays kernel kernel.private math namespaces
 make sequences strings effects generic generic.standard
@@ -148,25 +148,23 @@ M: object writer-quot
         [ define-changer ]
     } cleave ;
 
-ERROR: no-initial-value class ;
+GENERIC: initial-value* ( class -- object ? )
 
-GENERIC: initial-value* ( class -- object )
+M: class initial-value* drop f f ;
 
-M: class initial-value* no-initial-value ;
-
-: initial-value ( class -- object )
+: initial-value ( class -- object ? )
     {
-        { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop ] }
-        { [ \ f bootstrap-word over class<= ] [ f ] }
-        { [ \ array-capacity bootstrap-word over class<= ] [ 0 ] }
-        { [ float bootstrap-word over class<= ] [ 0.0 ] }
-        { [ string bootstrap-word over class<= ] [ "" ] }
-        { [ array bootstrap-word over class<= ] [ { } ] }
-        { [ byte-array bootstrap-word over class<= ] [ B{ } ] }
-        { [ pinned-alien bootstrap-word over class<= ] [ <bad-alien> ] }
-        { [ quotation bootstrap-word over class<= ] [ [ ] ] }
+        { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop t ] }
+        { [ \ f bootstrap-word over class<= ] [ f t ] }
+        { [ \ array-capacity bootstrap-word over class<= ] [ 0 t ] }
+        { [ float bootstrap-word over class<= ] [ 0.0 t ] }
+        { [ string bootstrap-word over class<= ] [ "" t ] }
+        { [ array bootstrap-word over class<= ] [ { } t ] }
+        { [ byte-array bootstrap-word over class<= ] [ B{ } t ] }
+        { [ pinned-alien bootstrap-word over class<= ] [ <bad-alien> t ] }
+        { [ quotation bootstrap-word over class<= ] [ [ ] t ] }
         [ dup initial-value* ]
-    } cond nip ;
+    } cond [ drop ] 2dip ;
 
 GENERIC: make-slot ( desc -- slot-spec )
 
@@ -177,10 +175,15 @@ M: string make-slot
 : peel-off-name ( slot-spec array -- slot-spec array )
     [ first >>name ] [ rest ] bi ; inline
 
+: init-slot-class ( slot-spec class -- slot-spec )
+    [ >>class ] [ initial-value [ >>initial ] [ drop ] if ] bi ;
+
 : peel-off-class ( slot-spec array -- slot-spec array )
     dup empty? [
         dup first class? [
-            [ first >>class ] [ rest ] bi
+            [ first init-slot-class ]
+            [ rest ]
+            bi
         ] when
     ] unless ;
 
@@ -198,14 +201,10 @@ ERROR: bad-slot-attribute key ;
 ERROR: bad-initial-value name ;
 
 : check-initial-value ( slot-spec -- slot-spec )
-    dup initial>> [
-        [ ] [
-            dup [ initial>> ] [ class>> ] bi instance?
-            [ name>> bad-initial-value ] unless
-        ] if-bootstrapping
-    ] [
-        dup class>> initial-value >>initial
-    ] if ;
+    [ ] [
+        dup [ initial>> ] [ class>> ] bi instance?
+        [ name>> bad-initial-value ] unless
+    ] if-bootstrapping ;
 
 M: array make-slot
     <slot-spec>
