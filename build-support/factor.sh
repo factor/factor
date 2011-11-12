@@ -567,7 +567,7 @@ install_deps_macosx() {
 }
 
 usage() {
-    $ECHO "usage: $0 install|deps-linux|deps-macosx|self-update|quick-update|update|bootstrap|net-bootstrap|make-target|report [optional-target]"
+    $ECHO "usage: $0 command [optional-target]"
     $ECHO "  install - git clone, compile, bootstrap"
     $ECHO "  deps-linux - install required packages for Factor on Linux using apt-get"
     $ECHO "  deps-macosx - install git on MacOSX using port"
