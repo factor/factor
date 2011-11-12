@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.smart fry kernel
 macros math math.bits sequences sequences.private words
-byte-arrays alien alien.c-types alien.data specialized-arrays ;
+byte-arrays alien alien.c-types alien.data specialized-arrays
+kernel.private layouts ;
 SPECIALIZED-ARRAY: uchar
 IN: math.bitwise
 
@@ -86,15 +87,20 @@ DEFER: byte-bit-count
 GENERIC: (bit-count) ( x -- n )
 
 : fixnum-bit-count ( x -- n )
-    0 swap [
-        dup 0 >
-    ] [
-        [ 8 bits byte-bit-count ] [ -8 shift ] bi
-        [ + ] dip
-    ] while drop ;
+    { fixnum } declare
+    [ byte-bit-count ] keep
+    [ -8 shift byte-bit-count + ] keep
+    [ -8 shift byte-bit-count + ] keep
+    [ -8 shift byte-bit-count + ] keep
+    cell 8 = [
+        [ -8 shift byte-bit-count + ] keep
+        [ -8 shift byte-bit-count + ] keep
+        [ -8 shift byte-bit-count + ] keep
+          -8 shift byte-bit-count + >fixnum
+    ] [ drop ] if ;
 
 M: fixnum (bit-count)
-    fixnum-bit-count ; inline
+    fixnum-bit-count { fixnum } declare ; inline
 
 M: bignum (bit-count)
     dup 0 = [ drop 0 ] [
