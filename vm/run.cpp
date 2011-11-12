@@ -5,8 +5,13 @@ namespace factor
 
 void factor_vm::primitive_exit()
 {
-	close_console();
 	exit((int)to_fixnum(ctx->pop()));
+}
+
+void factor_vm::exit(int status)
+{
+	close_console();
+	::exit(status);
 }
 
 void factor_vm::primitive_nano_count()

@@ -380,6 +380,7 @@ extern "C" {
 	int size_read;
 	int size_write;
 
+	bool stdin_thread_initialized_p = false;
 	THREADHANDLE stdin_thread;
 	pthread_mutex_t stdin_mutex;
 }
@@ -489,10 +490,12 @@ void *stdin_loop(void *arg)
 
 void factor_vm::open_console()
 {
+	assert(!stdin_thread_initialized_p);
 	safe_pipe(&control_read,&control_write);
 	safe_pipe(&size_read,&size_write);
 	safe_pipe(&stdin_read,&stdin_write);
 	stdin_thread = start_thread(stdin_loop,NULL);
+	stdin_thread_initialized_p = true;
 	pthread_mutex_init(&stdin_mutex, NULL);
 }
 
@@ -501,12 +504,13 @@ void factor_vm::open_console()
 // http://www.nvnews.net/vbulletin/showthread.php?t=164619
 void factor_vm::close_console()
 {
-	pthread_mutex_lock(&stdin_mutex);
-	pthread_kill(stdin_thread, SIGTERM);
+	if (stdin_thread_initialized_p)
+		pthread_kill(stdin_thread, SIGTERM);
 }
 
 void factor_vm::lock_console()
 {
+	assert(stdin_thread_initialized_p);
 	// Lock the stdin_mutex and send the stdin_loop thread a signal to interrupt
 	// any read() it has in progress. When the stdin loop iterates again, it will
 	// try to lock the same mutex and wait until unlock_console() is called.
@@ -516,6 +520,7 @@ void factor_vm::lock_console()
 
 void factor_vm::unlock_console()
 {
+	assert(stdin_thread_initialized_p);
 	pthread_mutex_unlock(&stdin_mutex);
 }
 
@@ -528,6 +533,7 @@ void factor_vm::abort()
 	}
 	while(ret == SIG_ERR && errno == EINTR);
 	
+	close_console();
 	::abort();
 }
 
