@@ -732,6 +732,7 @@ struct factor_vm
 	void start_sampling_profiler_timer();
 	void end_sampling_profiler_timer();
 	void open_console();
+	void close_console();
 	void lock_console();
 	void unlock_console();
 	static void abort();
