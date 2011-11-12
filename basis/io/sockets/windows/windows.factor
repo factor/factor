@@ -213,7 +213,7 @@ TUPLE: WSARecvFrom-args port
 
 :: make-receive-buffer ( n buf -- buf' WSABUF )
     buf >c-ptr pinned-alien?
-    [ buf ] [ n malloc [ buf n memcpy ] keep ] if :> buf'
+    [ buf ] [ n malloc &free [ buf n memcpy ] keep ] if :> buf'
     buf'
     WSABUF malloc-struct &free
         n >>len
