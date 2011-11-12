@@ -158,6 +158,9 @@ GENERIC: native/ ( x y -- x/y )
 M: integer native/ /i ; inline
 M: float native/ /f ; inline
 
+: ((vgetmask)) ( a rep -- b )
+    0 [ [ 1 shift ] [ zero? 0 1 ? ] bi* bitor ] bitwise-components-reduce* ; inline
+
 PRIVATE>
 
 SIMD-INTRINSIC: (simd-v+)                ( a b rep -- c ) [ + ] components-2map ;
@@ -262,7 +265,9 @@ SIMD-INTRINSIC: (simd-vunordered?)       ( a b rep -- c )
 SIMD-INTRINSIC: (simd-vany?)             ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero? not ;
 SIMD-INTRINSIC: (simd-vall?)             ( a   rep -- ? ) [ bitand ] bitwise-components-reduce zero? not ;
 SIMD-INTRINSIC: (simd-vnone?)            ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero?     ;
-SIMD-INTRINSIC: (simd-vgetmask)          ( a   rep -- n ) 0 [ [ 1 shift ] [ zero? 0 1 ? ] bi* bitor ] bitwise-components-reduce* ;
+SIMD-INTRINSIC: (simd-vgetmask)          ( a   rep -- n )
+    dup { float-4-rep double-2-rep } member?
+    [ ((vgetmask)) ] [ drop uchar-16-rep ((vgetmask)) ] if ;
 SIMD-INTRINSIC: (simd-v>float)           ( a   rep -- c )
     [ [ >rep-array ] [ rep-length ] bi [ >float ] ]
     [ >float-vector-rep <rep-array> ] bi unrolled-map-as-unsafe underlying>> ;
