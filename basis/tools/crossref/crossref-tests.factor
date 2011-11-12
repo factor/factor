@@ -1,7 +1,17 @@
 USING: math kernel sequences io.files io.pathnames
-tools.crossref tools.test parser namespaces source-files generic
-definitions words accessors compiler.units ;
+tools.crossref tools.crossref.private tools.test parser
+namespaces source-files generic definitions words accessors
+compiler.units classes ;
 IN: tools.crossref.tests
+
+GENERIC: predicate-test ( a -- b )
+
+M: class predicate-test ;
+
+M: generic predicate-test ;
+
+[ f ] [ \ + irrelevant? ] unit-test
+[ t ] [ \ predicate-test "engines" word-prop first irrelevant? ] unit-test
 
 GENERIC: foo ( a b -- c )
 
