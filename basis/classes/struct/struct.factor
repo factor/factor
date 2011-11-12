@@ -149,7 +149,7 @@ M: struct-class boa>object
     [ <struct> ] [ struct-slots ] bi
     [ [ (writer-quot) call( value struct -- ) ] with 2each ] curry keep ;
 
-M: struct-class initial-value* <struct> ; inline
+M: struct-class initial-value* <struct> t ; inline
 
 ! Struct slot accessors
 
