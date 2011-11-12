@@ -189,6 +189,7 @@ struct factor_vm
 	void primitive_nano_count();
 	void primitive_sleep();
 	void primitive_set_slot();
+	static void exit(int status);
 
 	// objects
 	void primitive_special_object();
@@ -731,11 +732,12 @@ struct factor_vm
 	void init_signals();
 	void start_sampling_profiler_timer();
 	void end_sampling_profiler_timer();
-	void open_console();
-	void close_console();
-	void lock_console();
-	void unlock_console();
+	static void open_console();
+	static void close_console();
+	static void lock_console();
+	static void unlock_console();
 	static void abort();
+	static void exit();
 
 	// os-windows
   #if defined(WINDOWS)

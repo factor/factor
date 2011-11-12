@@ -9,7 +9,7 @@ static inline void fa_diddly_atal_error()
 {
 	printf("fatal_error in fatal_error!\n");
 	breakpoint();
-	exit(86);
+	::_exit(86);
 }
 
 void fatal_error(const char *msg, cell tagged)
@@ -38,7 +38,7 @@ void out_of_memory()
 {
 	std::cout << "Out of memory\n\n";
 	current_vm()->dump_generations();
-	exit(1);
+	abort();
 }
 
 void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)

@@ -5,7 +5,8 @@ namespace factor
 
 factor_vm::factor_vm(THREADHANDLE thread) :
 	nursery(0,0),
-        thread(thread),
+	faulting_p(false),
+	thread(thread),
 	callback_id(0),
 	c_to_factor_func(NULL),
 	sampling_profiler_p(false),
@@ -22,7 +23,6 @@ factor_vm::factor_vm(THREADHANDLE thread) :
 	full_output(false),
 	last_nano_count(0),
 	signal_callstack_seg(NULL),
-	faulting_p(false),
 	safepoint()
 {
 	primitive_reset_dispatch_stats();
