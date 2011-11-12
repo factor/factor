@@ -4,7 +4,8 @@ sequences.cords cpu.architecture fry generalizations grouping
 kernel libc locals macros math math.libm math.order
 math.ranges math.vectors sequences sequences.generalizations
 sequences.private sequences.unrolled sequences.unrolled.private
-specialized-arrays vocabs words effects.parser locals.parser ;
+specialized-arrays vocabs words effects.parser locals.parser
+math.bitwise ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS:
     c:char c:short c:int c:longlong
@@ -127,6 +128,8 @@ SYNTAX: SIMD-INTRINSIC::
 ! XXX
 : bitwise-components-reduce ( a rep quot -- x )
     [ >bitwise-vector-rep >rep-array [ ] ] dip map-reduce ; inline
+: bitwise-components-reduce* ( a rep identity quot -- x )
+    [ >bitwise-vector-rep >rep-array ] 2dip reduce ; inline
 
 :: (vshuffle) ( a elts rep -- c )
     a rep >rep-array :> a'
@@ -259,6 +262,7 @@ SIMD-INTRINSIC: (simd-vunordered?)       ( a b rep -- c )
 SIMD-INTRINSIC: (simd-vany?)             ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero? not ;
 SIMD-INTRINSIC: (simd-vall?)             ( a   rep -- ? ) [ bitand ] bitwise-components-reduce zero? not ;
 SIMD-INTRINSIC: (simd-vnone?)            ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero?     ;
+SIMD-INTRINSIC: (simd-vgetmask)          ( a   rep -- n ) 0 [ [ 1 shift ] [ zero? 0 1 ? ] bi* bitor ] bitwise-components-reduce* ;
 SIMD-INTRINSIC: (simd-v>float)           ( a   rep -- c )
     [ [ >rep-array ] [ rep-length ] bi [ >float ] ]
     [ >float-vector-rep <rep-array> ] bi unrolled-map-as-unsafe underlying>> ;

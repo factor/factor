@@ -109,6 +109,7 @@ M: simple-ops-cpu %or-vector-reps    all-reps ;
 M: simple-ops-cpu %xor-vector-reps   all-reps ;
 M: simple-ops-cpu %merge-vector-reps all-reps ;
 M: simple-ops-cpu %sqrt-vector-reps  all-reps ;
+M: simple-ops-cpu %move-vector-mask-reps  all-reps ;
 M: simple-ops-cpu %test-vector-reps  all-reps ;
 M: simple-ops-cpu %signed-pack-vector-reps   all-reps ;
 M: simple-ops-cpu %unsigned-pack-vector-reps all-reps ;

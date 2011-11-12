@@ -223,6 +223,7 @@ CODEGEN: ##unpack-vector-tail %unpack-vector-tail
 CODEGEN: ##integer>float-vector %integer>float-vector
 CODEGEN: ##float>integer-vector %float>integer-vector
 CODEGEN: ##compare-vector %compare-vector
+CODEGEN: ##move-vector-mask %move-vector-mask
 CODEGEN: ##test-vector %test-vector
 CODEGEN: ##add-vector %add-vector
 CODEGEN: ##saturated-add-vector %saturated-add-vector
