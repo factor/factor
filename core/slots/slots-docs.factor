@@ -77,7 +77,7 @@ $nl
 { $list
     { "If the class is a union or mixin class which " { $emphasis "contains" } " one of the above known classes, then the initial value of the class is that of the known class, with preference given to classes earlier in the list. For example, if the slot is declared " { $link object } " (this is the default), the initial value is " { $link f } ". Similarly for " { $link sequence } " and " { $link assoc } "." }
     { "If the class is a tuple class, the initial value of the slot is a new, shared instance of the class created with " { $link new } "." }
-    { "Otherwise, a " { $link no-initial-value } " error is thrown. In this case, an initial value must be specified explicitly using " { $link initial: } "." }
+    { "Otherwise, a " { $link bad-initial-value } " error is thrown. In this case, an initial value must be specified explicitly using " { $link initial: } "." }
 }
 "A word can be used to check if a class has an initial value or not:"
 { $subsections initial-value } ;
