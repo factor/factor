@@ -367,7 +367,7 @@ PRIVATE>
 : <struct-slot-spec> ( name c-type attributes -- slot-spec )
     [ struct-slot-spec new ] 3dip
     [ >>name ]
-    [ [ >>type ] [ struct-slot-class >>class ] bi ]
+    [ [ >>type ] [ struct-slot-class init-slot-class ] bi ]
     [ [ dup empty? ] [ peel-off-struct-attributes ] until drop ] tri* ;
 
 <PRIVATE
