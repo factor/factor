@@ -17,7 +17,7 @@ IN: classes.struct.vectored
     {
         [ drop name>> ]
         [ nip ]
-        [ drop type>> array-class-of dup initial-value ]
+        [ drop type>> array-class-of dup initial-value drop ]
         [ 2drop t ]
     } 2cleave slot-spec boa ;
 
