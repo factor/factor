@@ -92,6 +92,7 @@ CONSTANT: vector-words
         { vneg { +vector+ -> +vector+ } }
         { vtruncate { +vector+ -> +vector+ } }
         { sum { +vector+ -> +scalar+ } }
+        { vcount { +vector+ -> +scalar+ } }
         { vabs { +vector+ -> +vector+ } }
         { vsqrt { +vector+ -> +vector+ } }
         { vbitand { +vector+ +vector+ -> +vector+ } }
@@ -213,7 +214,7 @@ CONSTANT: vector-words
     { vlshift vrshift v*high v*hs+ } unique assoc-diff ;
 
 : boolean-ops ( -- words )
-    { vand vandn vor vxor vnot } ;
+    { vand vandn vor vxor vnot vcount } ;
 
 : remove-boolean-words ( alist -- alist' )
     boolean-ops unique assoc-diff ;
@@ -235,6 +236,7 @@ CONSTANT: vector-words
         { [ 2dup [ fp-nan? ] either? ] [ 2drop f ] }
         { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
         { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
+        [ = ]
     } cond ;
 
 : approx= ( x y -- ? )
@@ -686,8 +688,6 @@ STRUCT: simd-struct
 
 [ float-4{ 0 0 0 0 } ]
 [ 5.0 float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-2 ] unit-test
-
-USE: alien
 
 : callback-1 ( -- c )
     c:int { c:int c:int c:int c:int c:int } cdecl [ + + + + ] alien-callback ;
