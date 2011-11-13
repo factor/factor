@@ -32,7 +32,7 @@ ERROR: file-delete-failed path error ;
     ] [ drop ] if ;
 
 M: windows delete-file ( path -- )
-    normalize-path
+    absolute-path
     [ (delete-file) ]
     [ \ file-delete-failed boa rethrow ] recover ;
 
