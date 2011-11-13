@@ -125,26 +125,53 @@ CONSTANT: vector-words
 : boa-ctors ( -- seq )
     simd-classes [ [ name>> "-boa" append ] [ vocabulary>> ] bi lookup-word ] map ;
 
-: check-optimizer ( seq test-quot eq-quot -- failures )
+TUPLE: simd-test-failure
+    input
+    input-quot
+    unoptimized-result
+    optimized-result
+    nonintrinsic-result ;
+
+:: check-optimizer (
+    seq
+    test-quot: ( input -- input-quot: ( -- ..v ) code-quot: ( ..v -- result ) )
+    eq-quot: ( resulta resultb -- ? )
+    --
+    failures
+)
     #! Use test-quot to generate a bunch of test cases from the
     #! given inputs. Run each test case optimized and
     #! unoptimized. Compare results with eq-quot.
     #!
     #! seq: sequence of inputs
-    #! test-quot: ( input -- input-quot: ( -- values ) code-quot: ( values -- result ) )
+    #! test-quot: ( input -- input-quot: ( -- ..v ) code-quot: ( ..v -- result ) )
     #! eq-quot: ( result1 result2 -- ? )
-    dup '[
-        @
-        [ dup [ class-of ] { } map-as ] dip '[ _ declare @ ]
-        {
-            [ "print-mr" get [ nip regs. ] [ 2drop ] if ]
-            [ "print-checks" get [ [ . ] bi@ ] [ 2drop ] if ]
-            [ [ [ call ] dip call ] call( quot quot -- result ) ]
-            [ [ [ call ] dip compile-call ] call( quot quot -- result ) ]
-            [ [ t "always-inline-simd-intrinsics" [ [ call ] dip compile-call ] with-variable ] call( quot quot -- result ) ]
-        } 2cleave
-        [ drop @ ] [ nip @ ] 3bi and not
-    ] filter ; inline
+    seq [| input |
+        input test-quot call :> ( input-quot code-quot )
+        input-quot [ class-of ] { } map-as :> input-classes
+        input-classes code-quot '[ _ declare @ ] :> code-quot'
+
+        "print-mr" get [ code-quot' regs. ] when
+        "print-checks" get [ input-quot . code-quot' . ] when
+
+        input-quot code-quot' [ [ call ] dip call ]
+        call( i c -- result ) :> unoptimized-result
+        input-quot code-quot' [ [ call ] dip compile-call ]
+        call( i c -- result ) :> optimized-result
+        input-quot code-quot' [
+            t "always-inline-simd-intrinsics"
+            [ [ call ] dip compile-call ]
+            with-variable
+        ] call( i c -- result ) :> nonintrinsic-result
+
+        unoptimized-result optimized-result eq-quot call
+        optimized-result nonintrinsic-result eq-quot call
+        and
+        [ f ] [
+            input input-quot unoptimized-result optimized-result nonintrinsic-result
+            simd-test-failure boa
+        ] if
+    ] map sift ; inline
 
 "== Checking -new constructors" print
 
@@ -224,7 +251,7 @@ CONSTANT: vector-words
     float = [ remove-integer-words ] [ remove-float-words ] if
     remove-boolean-words ;
 
-: check-vector-ops ( class elt-class compare-quot -- )
+: check-vector-ops ( class elt-class compare-quot -- failures )
     [
         [ nip ops-to-check ] 2keep
         '[ first2 vector-word-inputs _ _ check-vector-op ]
@@ -247,6 +274,7 @@ CONSTANT: vector-words
     {
         { [ 2dup [ float? ] both? ] [ fp-bitwise= ] }
         { [ 2dup [ sequence? ] both? ] [ [ fp-bitwise= ] 2all? ] }
+        [ = ]
     } cond ;
 
 : simd-classes&reps ( -- alist )
