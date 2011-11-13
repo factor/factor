@@ -110,6 +110,21 @@ DEFER: simd-construct-op
 : vv->x-op ( a b rep quot: ( (a) (b) rep -- obj ) fallback-quot -- obj )
     [ '[ _ (vv->x-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
 
+: mask>count ( n rep -- n' )
+    [ bit-count ] dip {
+        { float-4-rep     [ ] }
+        { double-2-rep    [ ] }
+        { uchar-16-rep    [ ] }
+        { char-16-rep     [ ] }
+        { ushort-8-rep    [ -1 shift ] }
+        { short-8-rep     [ -1 shift ] }
+        { ushort-8-rep    [ -1 shift ] }
+        { int-4-rep       [ -2 shift ] }
+        { uint-4-rep      [ -2 shift ] }
+        { longlong-2-rep  [ -3 shift ] }
+        { ulonglong-2-rep [ -3 shift ] }
+    } case ; inline
+
 PRIVATE>
 >>
 
@@ -222,7 +237,9 @@ M: simd-128 vany?
 M: simd-128 vall?
     dup simd-rep [ (simd-vall?)             ] [ call-next-method ] v->x-op  ; inline
 M: simd-128 vcount
-    dup simd-rep [ (simd-vgetmask) assert-positive ] [ call-next-method ] v->x-op bit-count ; inline
+    dup simd-rep
+    [ [ (simd-vgetmask) assert-positive ] [ call-next-method ] v->x-op ]
+    [ mask>count ] bi ; inline
 M: simd-128 vnone?
     dup simd-rep [ (simd-vnone?)            ] [ call-next-method ] v->x-op  ; inline
 
