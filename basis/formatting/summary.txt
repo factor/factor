@@ -1,1 +1,1 @@
-Format data according to a specified format string, and writes (or returns) the result string.  
+Format data according to a specified format string
