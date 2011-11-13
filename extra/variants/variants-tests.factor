@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: kernel math tools.test variants ;
+USING: kernel math tools.test variants slots ;
 IN: variants.tests
 
 VARIANT: list
@@ -20,6 +20,7 @@ VARIANT: list
 [ 4 ]
 [ 5 6 7 8 nil <cons> <cons> <cons> <cons> list-length ] unit-test
 
+[ nil t ] [ list initial-value ] unit-test
 
 VARIANT: list2 ;
 VARIANT-MEMBER: list2 nil2
