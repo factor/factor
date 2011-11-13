@@ -115,7 +115,6 @@ SYNTAX: SIMD-INTRINSIC::
     [ [ >rep-array ] [ rep-length ] bi ] dip unrolled-map-unsafe underlying>> ; inline
 : components-2map ( a b rep quot -- c )
     [ [ 2>rep-array ] [ rep-length ] bi ] dip unrolled-2map-unsafe underlying>> ; inline
-! XXX
 : components-reduce ( a rep quot -- x )
     [ >rep-array [ ] ] dip map-reduce ; inline
 
@@ -125,7 +124,6 @@ SYNTAX: SIMD-INTRINSIC::
 : bitwise-components-2map ( a b rep quot -- c )
     [ >bitwise-vector-rep [ 2>rep-array ] [ rep-length ] bi ] dip
     unrolled-2map-unsafe underlying>> ; inline
-! XXX
 : bitwise-components-reduce ( a rep quot -- x )
     [ >bitwise-vector-rep >rep-array [ ] ] dip map-reduce ; inline
 : bitwise-components-reduce* ( a rep identity quot -- x )
@@ -282,15 +280,12 @@ SIMD-INTRINSIC: (simd-vpack-unsigned)    ( a b rep -- c )
     [ [ 2>rep-array cord-append ] [ rep-length 2 * ] bi ]
     [ narrow-vector-rep >uint-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
     '[ _ c:c-type-clamp ] swap unrolled-map-as-unsafe underlying>> ;
-! XXX
 SIMD-INTRINSIC: (simd-vunpack-head)      ( a   rep -- c ) 
     [ >rep-array ] [ widen-vector-rep [ rep-length ] [ [>rep-array] ] bi ] bi
     [ head-slice ] dip call( a' -- c' ) underlying>> ;
-! XXX
 SIMD-INTRINSIC: (simd-vunpack-tail)      ( a   rep -- c )
     [ >rep-array ] [ widen-vector-rep [ rep-length ] [ [>rep-array] ] bi ] bi
     [ tail-slice ] dip call( a' -- c' ) underlying>> ;
-! XXX
 SIMD-INTRINSIC: (simd-with)              (   n rep -- v )
     [ rep-length swap '[ _ ] ] [ <rep-array> ] bi replicate-as 
     underlying>> ;

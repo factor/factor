@@ -88,16 +88,22 @@ GENERIC: (bit-count) ( x -- n )
 
 : fixnum-bit-count ( x -- n )
     { fixnum } declare
-    [ byte-bit-count ] keep
-    [ -8 shift byte-bit-count + ] keep
-    [ -16 shift byte-bit-count + ] keep
-    [ -24 shift byte-bit-count + ] keep
-    cell 8 = [
-        [ -32 shift byte-bit-count + ] keep
-        [ -40 shift byte-bit-count + ] keep
-        [ -48 shift byte-bit-count + ] keep
-          -56 shift byte-bit-count + >fixnum
-    ] [ drop ] if ;
+    {
+        [ byte-bit-count ]
+        [ -8 shift byte-bit-count + ]
+        [ -16 shift byte-bit-count + ]
+        [ -24 shift byte-bit-count + ]
+        [
+            cell 8 = [
+                {
+                    [ -32 shift byte-bit-count + ]
+                    [ -40 shift byte-bit-count + ]
+                    [ -48 shift byte-bit-count + ]
+                    [ -56 shift byte-bit-count + ]
+                } cleave >fixnum
+            ] [ drop ] if
+        ]
+    } cleave ;
 
 M: fixnum (bit-count)
     fixnum-bit-count { fixnum } declare ; inline
