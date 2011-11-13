@@ -187,3 +187,6 @@ IN: io.directories.tests
 [ ] [ "copy-destination" temp-file delete-tree ] unit-test
 
 [ ] [ "copy-tree-test" temp-file delete-tree ] unit-test
+
+[ ] [ "resource:deleteme" touch-file ] unit-test
+[ ] [ "resource:deleteme" delete-file ] unit-test
