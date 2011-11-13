@@ -6,6 +6,7 @@ math compiler.constants compiler.cfg.representations.conversion
 compiler.cfg.representations.rewrite
 compiler.cfg.comparisons
 make ;
+FROM: alien.c-types => char ;
 IN: compiler.cfg.representations
 
 [ { double-rep double-rep } ] [
@@ -496,7 +497,7 @@ cpu x86.32? [
 ] unit-test
 
 ! Peephole optimization if both input and output of ##shl-imm
-! needs to be tagged
+! need to be tagged
 [
     V{
         T{ ##peek f 0 D 0 }
@@ -508,6 +509,25 @@ cpu x86.32? [
         T{ ##peek f 0 D 0 }
         T{ ##shl-imm f 1 0 3 }
         T{ ##replace f 1 D 0 }
+    } test-peephole
+] unit-test
+
+! Peephole optimization if neither input nor output of ##shl-imm need to be tagged
+[
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##shl-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 2 3 4 0 0 int-rep char }
+    }
+] [
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##shl-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 2 3 4 0 0 int-rep char }
     } test-peephole
 ] unit-test
 
@@ -526,6 +546,110 @@ cpu x86.32? [
         T{ ##peek f 1 D 0 }
         T{ ##sar-imm f 2 1 3 }
         T{ ##replace f 2 D 0 }
+    } test-peephole
+] unit-test
+
+6 \ vreg-counter set-global
+
+! (Lack of) peephole optimization if output of ##sar-imm needs to be tagged
+[
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##sar-imm f 7 1 3 }
+        T{ ##shl-imm f 2 7 $[ tag-bits get ] }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##replace f 2 D 0 }
+    } test-peephole
+] unit-test
+
+! Peephole optimization if input of ##sar-imm is tagged but output is untagged
+! need to be tagged
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##sar-imm f 1 0 $[ 3 tag-bits get + ] }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 1 3 4 0 0 int-rep char }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##sar-imm f 1 0 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 1 3 4 0 0 int-rep char }
+    } test-peephole
+] unit-test
+
+! Peephole optimization if neither input nor output of ##sar-imm need to be tagged
+[
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 2 3 4 0 0 int-rep char }
+    }
+] [
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 2 3 4 0 0 int-rep char }
+    } test-peephole
+] unit-test
+
+[
+    V{
+        T{ ##load-vector f 0 B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } short-8-rep }
+        T{ ##select-vector f 1 0 0 short-8-rep }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##add f 4 2 3 }
+        T{ ##load-integer f 5 100 }
+        T{ ##load-integer f 6 100 }
+        T{ ##store-memory f 4 5 6 0 0 int-rep char }
+    }
+] [
+    V{
+        T{ ##load-vector f 0 B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } short-8-rep }
+        T{ ##select-vector f 1 0 0 short-8-rep }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##add f 4 2 3 }
+        T{ ##load-integer f 5 100 }
+        T{ ##load-integer f 6 100 }
+        T{ ##store-memory f 4 5 6 0 0 int-rep char }
+    } test-peephole
+] unit-test
+
+6 \ vreg-counter set-global
+
+[
+    V{
+        T{ ##load-vector f 0 B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } int-4-rep }
+        T{ ##select-vector f 1 0 0 int-4-rep }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##add f 7 2 3 }
+        T{ ##shl-imm f 4 7 $[ tag-bits get ] }
+        T{ ##replace f 4 D 0 }
+    }
+] [
+    V{
+        T{ ##load-vector f 0 B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } int-4-rep }
+        T{ ##select-vector f 1 0 0 int-4-rep }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##add f 4 2 3 }
+        T{ ##replace f 4 D 0 }
     } test-peephole
 ] unit-test
 
