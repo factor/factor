@@ -78,4 +78,4 @@ SYMBOL: visited
     predecessors>> first ; inline
 
 : <copy> ( dst src -- insn )
-    any-rep \ ##copy new-insn ;
+    any-rep ##copy new-insn ;

@@ -76,7 +76,7 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
     2 <clumps> [
         first2 allocation-size
         cc<= int-rep next-vreg-rep int-rep next-vreg-rep
-        \ ##check-nursery-branch new-insn
+        ##check-nursery-branch new-insn
         swap push
     ] each ;
 

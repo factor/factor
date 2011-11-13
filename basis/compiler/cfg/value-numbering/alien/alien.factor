@@ -82,8 +82,8 @@ M: ##store-memory-imm alien-insn-value src>> ;
 
 GENERIC: new-alien-insn ( value base displacement scale offset rep c-type insn -- insn )
 
-M: ##load-memory-imm new-alien-insn drop \ ##load-memory new-insn ;
-M: ##store-memory-imm new-alien-insn drop \ ##store-memory new-insn ;
+M: ##load-memory-imm new-alien-insn drop ##load-memory new-insn ;
+M: ##store-memory-imm new-alien-insn drop ##store-memory new-insn ;
 
 : fuse-displacement ( insn -- insn' )
     {
