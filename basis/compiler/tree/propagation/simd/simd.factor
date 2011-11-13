@@ -84,7 +84,11 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
         literal>> scalar-rep-of {
             { float-rep [ float ] }
             { double-rep [ float ] }
-            [ drop integer ]
+            { longlong-scalar-rep [ integer ] }
+            { ulonglong-scalar-rep [ integer ] }
+            { int-scalar-rep [ cell 8 = [ fixnum ] [ integer ] if ] }
+            { uint-scalar-rep [ cell 8 = [ fixnum ] [ integer ] if ] }
+            [ drop fixnum ]
         } case
     ] [ drop real ] if
     <class-info> ;
