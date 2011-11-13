@@ -58,10 +58,10 @@ PRIVATE>
     (assoc-each) each ; inline
 
 : assoc>map ( ... assoc quot: ( ... key value -- ... elt ) exemplar -- ... seq )
-    [ collector-for [ assoc-each ] dip ] [ like ] bi ; inline
+    [ >alist ] 2dip [ [ first2 ] prepose ] dip map-as ; inline
 
 : assoc-map-as ( ... assoc quot: ( ... key value -- ... newkey newvalue ) exemplar -- ... newassoc )
-    [ [ 2array ] compose V{ } assoc>map ] dip assoc-like ; inline
+    [ [ 2array ] compose { } assoc>map ] dip assoc-like ; inline
 
 : assoc-map ( ... assoc quot: ( ... key value -- ... newkey newvalue ) -- ... newassoc )
     over assoc-map-as ; inline
