@@ -266,8 +266,8 @@ SIMD-INTRINSIC: (simd-vany?)             ( a   rep -- ? ) [ bitor  ] bitwise-com
 SIMD-INTRINSIC: (simd-vall?)             ( a   rep -- ? ) [ bitand ] bitwise-components-reduce zero? not ;
 SIMD-INTRINSIC: (simd-vnone?)            ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero?     ;
 SIMD-INTRINSIC: (simd-vgetmask)          ( a   rep -- n )
-    dup { float-4-rep double-2-rep } member?
-    [ ((vgetmask)) ] [ drop uchar-16-rep ((vgetmask)) ] if ;
+    { float-4-rep double-2-rep } member?
+    [ uint-4-rep ((vgetmask)) ] [ uchar-16-rep ((vgetmask)) ] if ;
 SIMD-INTRINSIC: (simd-v>float)           ( a   rep -- c )
     [ [ >rep-array ] [ rep-length ] bi [ >float ] ]
     [ >float-vector-rep <rep-array> ] bi unrolled-map-as-unsafe underlying>> ;
