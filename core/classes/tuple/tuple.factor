@@ -373,4 +373,4 @@ M: tuple-class boa
     [ tuple-layout ]
     bi <tuple-boa> ;
 
-M: tuple-class initial-value* new ;
+M: tuple-class initial-value* new t ;
