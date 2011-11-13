@@ -113,7 +113,7 @@ DEFER: simd-construct-op
 : mask>count ( n rep -- n' )
     [ bit-count ] dip {
         { float-4-rep     [ ] }
-        { double-2-rep    [ ] }
+        { double-2-rep    [ -1 shift ] }
         { uchar-16-rep    [ ] }
         { char-16-rep     [ ] }
         { ushort-8-rep    [ -1 shift ] }
