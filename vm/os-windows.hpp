@@ -86,7 +86,7 @@ inline static THREADHANDLE thread_id()
 	return threadHandle;
 }
 
-inline static breakpoint()
+inline static void breakpoint()
 {
 	DebugBreak();
 }
