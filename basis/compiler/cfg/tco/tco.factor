@@ -34,15 +34,15 @@ IN: compiler.cfg.tco
     '[
         instructions>>
         [ pop* ] [ pop ] [ ] tri
-        [ [ \ ##safepoint new-insn ] dip push ]
-        [ [ \ ##epilogue new-insn ] dip push ]
+        [ [ ##safepoint new-insn ] dip push ]
+        [ [ ##epilogue new-insn ] dip push ]
         [ _ dip push ] tri
     ]
     [ successors>> delete-all ]
     bi ; inline
 
 : convert-word-tail-call ( bb -- )
-    [ word>> \ ##jump new-insn ] convert-tail-call ;
+    [ word>> ##jump new-insn ] convert-tail-call ;
 
 : loop-tail-call? ( bb -- ? )
     instructions>> penultimate
@@ -54,8 +54,8 @@ IN: compiler.cfg.tco
         instructions>> {
             [ pop* ]
             [ pop* ]
-            [ [ \ ##safepoint new-insn ] dip push ]
-            [ [ \ ##branch new-insn ] dip push ]
+            [ [ ##safepoint new-insn ] dip push ]
+            [ [ ##branch new-insn ] dip push ]
         } cleave
     ]
     [ successors>> delete-all ]

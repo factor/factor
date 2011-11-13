@@ -60,7 +60,7 @@ M: vreg-insn compute-insn-defs
 SYMBOL: inserting-phis
 
 : insert-phi-later ( vreg bb -- )
-    [ predecessors>> over '[ _ ] H{ } map>assoc \ ##phi new-insn ] keep
+    [ predecessors>> over '[ _ ] H{ } map>assoc ##phi new-insn ] keep
     inserting-phis get push-at ;
 
 : compute-phis-for ( vreg bbs -- )
