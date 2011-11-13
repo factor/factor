@@ -209,9 +209,9 @@ M: ##slot insn-object obj>> resolve ;
 M: ##slot-imm insn-object obj>> resolve ;
 M: ##set-slot insn-object obj>> resolve ;
 M: ##set-slot-imm insn-object obj>> resolve ;
-M: ##alien-global insn-object drop \ ##alien-global ;
-M: ##vm-field insn-object drop \ ##vm-field ;
-M: ##set-vm-field insn-object drop \ ##vm-field ;
+M: ##alien-global insn-object drop ##alien-global ;
+M: ##vm-field insn-object drop ##vm-field ;
+M: ##set-vm-field insn-object drop ##vm-field ;
 
 GENERIC: analyze-aliases ( insn -- insn' )
 
@@ -281,7 +281,7 @@ M: ##copy analyze-aliases
 M: ##compare analyze-aliases
     call-next-method
     dup useless-compare? [
-        dst>> f \ ##load-reference new-insn
+        dst>> f ##load-reference new-insn
         analyze-aliases
     ] when ;
 
@@ -317,8 +317,8 @@ M: insn eliminate-dead-stores drop t ;
     dead-stores get table>> clear-assoc
 
     next-ac heap-ac set
-    \ ##vm-field set-new-ac
-    \ ##alien-global set-new-ac ;
+    ##vm-field set-new-ac
+    ##alien-global set-new-ac ;
 
 : alias-analysis-step ( insns -- insns' )
     reset-alias-analysis

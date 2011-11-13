@@ -123,14 +123,14 @@ M: #if node>quot
 M: #dispatch node>quot
     children>> [ nodes>quot ] map , \ dispatch , ;
 
-M: #alien-invoke node>quot params>> , \ #alien-invoke , ;
+M: #alien-invoke node>quot params>> , #alien-invoke , ;
 
-M: #alien-indirect node>quot params>> , \ #alien-indirect , ;
+M: #alien-indirect node>quot params>> , #alien-indirect , ;
 
-M: #alien-assembly node>quot params>> , \ #alien-assembly , ;
+M: #alien-assembly node>quot params>> , #alien-assembly , ;
 
 M: #alien-callback node>quot
-    [ params>> , ] [ child>> nodes>quot , ] bi \ #alien-callback , ;
+    [ params>> , ] [ child>> nodes>quot , ] bi #alien-callback , ;
 
 M: node node>quot drop ;
 
