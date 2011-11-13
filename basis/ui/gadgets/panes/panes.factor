@@ -144,6 +144,9 @@ PRIVATE>
 
 GENERIC: write-gadget ( gadget stream -- )
 
+M: filter-writer write-gadget
+    stream>> write-gadget ;
+
 M: pane-stream write-gadget ( gadget pane-stream -- )
     pane>> current>> swap add-gadget drop ;
 
