@@ -476,15 +476,24 @@ M: x86 %compare-vector-ccs
         { vcc-notall [ dst mask CMP dst temp \ CMOVNE (%boolean) ] }
     } case ;
 
-: %move-vector-mask ( dst src rep -- mask )
+: %move-vector-mask* ( dst src rep -- mask )
     {
         { double-2-rep [ MOVMSKPS HEX: f ] }
         { float-4-rep  [ MOVMSKPS HEX: f ] }
         [ drop PMOVMSKB HEX: ffff ]
     } case ;
 
+M: x86 %move-vector-mask ( dst src rep -- )
+    %move-vector-mask* drop ;
+
+M: x86 %move-vector-mask-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 M:: x86 %test-vector ( dst src temp rep vcc -- )
-    dst src rep %move-vector-mask :> mask
+    dst src rep %move-vector-mask* :> mask
     dst temp mask vcc %test-vector-mask ;
 
 :: %test-vector-mask-branch ( label temp mask vcc -- )
@@ -496,7 +505,7 @@ M:: x86 %test-vector ( dst src temp rep vcc -- )
     } case ;
 
 M:: x86 %test-vector-branch ( label src temp rep vcc -- )
-    temp src rep %move-vector-mask :> mask
+    temp src rep %move-vector-mask* :> mask
     label temp mask vcc %test-vector-mask-branch ;
 
 M: x86 %test-vector-reps

@@ -4,7 +4,7 @@ generic.parser kernel lexer literals locals macros math math.functions
 math.vectors math.vectors.private math.vectors.simd.intrinsics
 namespaces parser prettyprint.custom quotations sequences
 sequences.generalizations sequences.private vocabs vocabs.loader
-words ;
+words math.bitwise ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
@@ -109,6 +109,21 @@ DEFER: simd-construct-op
 
 : vv->x-op ( a b rep quot: ( (a) (b) rep -- obj ) fallback-quot -- obj )
     [ '[ _ (vv->x-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
+
+: mask>count ( n rep -- n' )
+    [ bit-count ] dip {
+        { float-4-rep     [ ] }
+        { double-2-rep    [ -1 shift ] }
+        { uchar-16-rep    [ ] }
+        { char-16-rep     [ ] }
+        { ushort-8-rep    [ -1 shift ] }
+        { short-8-rep     [ -1 shift ] }
+        { ushort-8-rep    [ -1 shift ] }
+        { int-4-rep       [ -2 shift ] }
+        { uint-4-rep      [ -2 shift ] }
+        { longlong-2-rep  [ -3 shift ] }
+        { ulonglong-2-rep [ -3 shift ] }
+    } case ; inline
 
 PRIVATE>
 >>
@@ -221,6 +236,10 @@ M: simd-128 vany?
     dup simd-rep [ (simd-vany?)             ] [ call-next-method ] v->x-op  ; inline
 M: simd-128 vall?
     dup simd-rep [ (simd-vall?)             ] [ call-next-method ] v->x-op  ; inline
+M: simd-128 vcount
+    dup simd-rep
+    [ [ (simd-vgetmask) assert-positive ] [ call-next-method ] v->x-op ]
+    [ mask>count ] bi ; inline
 M: simd-128 vnone?
     dup simd-rep [ (simd-vnone?)            ] [ call-next-method ] v->x-op  ; inline
 
