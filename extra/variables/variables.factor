@@ -55,7 +55,7 @@ PREDICATE: typed-variable < variable
         [ [ [variable-getter] ] dip [typed-getter] ]
         [ [ [variable-setter] ] dip [typed-setter] ]
         [ "variable-type" set-word-prop ]
-        [ initial-value swap set-global ]
+        [ initial-value drop swap set-global ]
     } 2cleave (define-variable) ;
 
 SYNTAX: TYPED-VAR:
@@ -87,7 +87,7 @@ INTERSECTION: typed-global-variable
 
 : define-typed-global ( word type -- )
     2dup "variable-type" set-word-prop
-    dup initial-value global-box boa swap
+    dup initial-value drop global-box boa swap
     [ [ [global-getter] ] dip [typed-getter] ]
     [ [ [global-setter] ] dip [typed-setter] ] 2bi (define-variable) ;
 
