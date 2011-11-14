@@ -1,13 +1,9 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: formatting io.launcher present system urls webbrowser ;
+USING: io.launcher kernel sequences system webbrowser ;
 
-IN: webbrowser.unix
+IN: webbrowser.linux
 
-M: unix open-file ( path -- )
-    "gnome-open \"%s\"" sprintf try-process ;
-
-M: unix open-url ( url -- )
-    >url present open-file ;
-
+M: linux open-file ( path -- )
+    { "gnome-open" } swap suffix try-process ;
