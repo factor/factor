@@ -6,4 +6,4 @@ USING: io.launcher kernel sequences system webbrowser ;
 IN: webbrowser.linux
 
 M: linux open-file ( path -- )
-    { "gnome-open" } swap suffix try-process ;
+    { "xdg-open" } swap suffix try-process ;
