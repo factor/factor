@@ -235,7 +235,7 @@ TUPLE: simd-test-failure
     word '[ _ execute ] ;
 
 : remove-float-words ( alist -- alist' )
-    { vsqrt n/v v/n v/ normalize } unique assoc-diff ;
+    { distance vsqrt n/v v/n v/ normalize } unique assoc-diff ;
 
 : remove-integer-words ( alist -- alist' )
     { vlshift vrshift v*high v*hs+ } unique assoc-diff ;
