@@ -37,5 +37,5 @@ UNION: comme-ci integer float ;
 UNION: comme-ca integer float ;
 comme-ca 25.5 "initial-value" set-word-prop
 
-[ 0 ]    [ comme-ci initial-value ] unit-test
-[ 25.5 ] [ comme-ca initial-value ] unit-test
+[ 0 t ]    [ comme-ci initial-value ] unit-test
+[ 25.5 t ] [ comme-ca initial-value ] unit-test
