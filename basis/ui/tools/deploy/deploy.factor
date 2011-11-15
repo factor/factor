@@ -22,19 +22,13 @@ TUPLE: deploy-gadget < pack vocab settings ;
     deploy-ui? get
     "Include user interface framework" <checkbox> add-gadget ;
 
-: io-settings ( parent -- parent )
-    "Input/output support:" <label> add-gadget
-    deploy-io get deploy-io-options <radio-buttons> add-gadget ;
-
 : reflection-settings ( parent -- parent )
-    "Reflection support:" <label> add-gadget
+    "Reflection level:" <label> add-gadget
     deploy-reflection get deploy-reflection-options <radio-buttons> add-gadget ;
 
 : advanced-settings ( parent -- parent )
-    "Advanced:" <label> add-gadget
-    deploy-math? get "Rational and complex number support" <checkbox> add-gadget
-    deploy-threads? get "Threading support" <checkbox> add-gadget
-    deploy-unicode? get "Unicode character literal support" <checkbox> add-gadget
+    "Additional reflection:" <label> add-gadget
+    deploy-unicode? get "Unicode character literal table" <checkbox> add-gadget
     deploy-word-props? get "Retain all word properties" <checkbox> add-gadget
     deploy-word-defs? get "Retain all word definitions" <checkbox> add-gadget
     deploy-c-types? get "Retain all C types" <checkbox> add-gadget
@@ -50,7 +44,6 @@ TUPLE: deploy-gadget < pack vocab settings ;
         bundle-name
         deploy-ui
         deploy-console
-        io-settings
         reflection-settings
         advanced-settings
 
