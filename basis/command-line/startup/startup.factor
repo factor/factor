@@ -10,7 +10,7 @@ Usage: """ write vm file-name write """ [Factor arguments] [script] [script argu
 
 Common arguments:
     -help            print this message and exit
-    -i=<image>       load Factor image file <image> (default """ write vm file-name write """.image)
+    -i=<image>       load Factor image file <image> (default """ write vm file-stem write """.image)
     -run=<vocab>     run the MAIN: entry point of <vocab>
         -run=listener    run terminal listener
         -run=ui.tools    run Factor development UI
@@ -23,12 +23,15 @@ from within Factor for more information.
 
 """ write ;
 
+: help? ( -- ? )
+    "help" get "-help" get or "h" get or
+    os windows? [ script get "/?" = ] [ f ] if or ;
+
 : command-line-startup ( -- )
     (command-line) parse-command-line
-    "help" get "-help" get or "h" get or [ cli-usage ] [
+    help? [ cli-usage ] [
         load-vocab-roots
         run-user-init
-    
         "e" get script get or [
             "e" get [ eval( -- ) ] when*
             script get [ run-script ] when*
