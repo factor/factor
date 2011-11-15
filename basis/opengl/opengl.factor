@@ -200,7 +200,7 @@ MACRO: set-draw-buffers ( buffers -- )
 : with-translation ( loc quot -- )
     [ [ gl-translate ] dip call ] do-matrix ; inline
 
-: fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
+: fix-coordinates ( point1 point2 -- x1 y1 x2 y2 )
     [ first2 [ >fixnum ] bi@ ] bi@ ;
 
 : gl-set-clip ( loc dim -- )
