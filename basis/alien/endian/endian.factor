@@ -3,7 +3,7 @@
 USING: accessors alien alien.accessors alien.c-types alien.data
 classes.struct.private combinators compiler.units endian fry
 generalizations kernel macros math namespaces sequences words
-arrays slots ;
+arrays slots math.bitwise ;
 QUALIFIED-WITH: alien.c-types ac
 IN: alien.endian
 
@@ -57,9 +57,22 @@ ERROR: unknown-endian-c-type symbol ;
 
 : change-c-type-accessors ( n ? c-type -- c-type' )
     endian-c-type>c-type-symbol "c-type" word-prop clone
-    -rot
-    [ '[ [ _ _ byte-reverse ] compose ] change-getter drop ]
-    [ '[ [ [ _ _ byte-reverse ] 2dip ] prepose ] change-setter ] 3bi ;
+    -rot over 8 = [
+        [
+            nip
+            [
+                [
+                    [ alien-unsigned-4 4 f byte-reverse 32 shift ]
+                    [ 4 + alien-unsigned-4 4 f byte-reverse ] 2bi bitor
+                ]
+            ] dip [ [ 64 >signed ] compose ] when 
+            >>getter drop
+        ]
+        [ '[ [ [ _ _ byte-reverse ] 2dip ] prepose ] change-setter ] 3bi
+    ] [
+        [ '[ [ _ _ byte-reverse ] compose ] change-getter drop ]
+        [ '[ [ [ _ _ byte-reverse ] 2dip ] prepose ] change-setter ] 3bi
+    ] if ;
 
 : typedef-endian ( n ? c-type endian -- )
     native-endianness get = [
