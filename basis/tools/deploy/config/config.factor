@@ -55,7 +55,7 @@ SYMBOL: deploy-image
     vocab-name deploy-name associate H{
         { deploy-ui?                f }
         { deploy-console?           t }
-        { deploy-io                 2 }
+        { deploy-io                 3 }
         { deploy-reflection         1 }
         { deploy-threads?           t }
         { deploy-help?              f }
