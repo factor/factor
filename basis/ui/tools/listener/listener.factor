@@ -270,7 +270,9 @@ M: string listener-input
     [ set-editor-string ] [ request-focus ] bi ;
 
 : call-listener ( quot command -- )
-    get-ready-listener dup wait-for-listener (call-listener) ;
+    get-ready-listener
+    '[ _ _ _ dup wait-for-listener (call-listener) ]
+    "Listener call" spawn drop ;
 
 M: listener-command invoke-command ( target command -- )
     [ command-quot ] [ nip ] 2bi call-listener ;
