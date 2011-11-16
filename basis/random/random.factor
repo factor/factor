@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.data arrays assocs
 byte-arrays byte-vectors combinators fry io.backend io.binary
 kernel locals math math.bitwise math.constants math.functions
 math.order math.ranges namespaces sequences sequences.private
-sets summary system vocabs ;
+sets summary system vocabs hints typed ;
 IN: random
 
 SYMBOL: system-random-generator
@@ -17,11 +17,13 @@ GENERIC: random-bytes* ( n tuple -- byte-array )
 
 M: object random-bytes* ( n tuple -- byte-array )
     [ [ <byte-vector> ] keep 4 /mod ] dip
-    [ pick '[ _ random-32* 4 >le _ push-all ] times ]
+    [ pick '[ _ random-32* int <ref> _ push-all ] times ]
     [
         over zero?
-        [ 2drop ] [ random-32* 4 >le swap head append! ] if
-    ] bi-curry bi* ;
+        [ 2drop ] [ random-32* int <ref> swap head append! ] if
+    ] bi-curry bi* B{ } like ;
+
+HINTS: M\ object random-bytes* { fixnum object } ;
 
 M: object random-32* ( tuple -- r ) 4 swap random-bytes* be> ;
 
@@ -36,8 +38,8 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 
 : random-32 ( -- n ) random-generator get random-32* ;
 
-: random-bytes ( n -- byte-array )
-    random-generator get random-bytes* ;
+TYPED: random-bytes ( n: fixnum -- byte-array: byte-array )
+    random-generator get random-bytes* ; inline
 
 <PRIVATE
 
