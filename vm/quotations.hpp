@@ -16,15 +16,19 @@ struct quotation_jit : public jit {
 	bool primitive_call_p(cell i, cell length);
 	bool trivial_quotation_p(array *elements);
 	void emit_quot(cell quot);
-	void emit_epilog(bool stack_frame);
+	void emit_prolog(bool safepoint, bool stack_frame);
+	void emit_epilog(bool safepoint, bool stack_frame);
 	bool fast_if_p(cell i, cell length);
 	bool fast_dip_p(cell i, cell length);
 	bool fast_2dip_p(cell i, cell length);
 	bool fast_3dip_p(cell i, cell length);
 	bool mega_lookup_p(cell i, cell length);
 	bool declare_p(cell i, cell length);
+	bool special_subprimitive_p(cell obj);
 	bool word_stack_frame_p(cell obj);
+	bool word_safepoint_p(cell obj);
 	bool stack_frame_p();
+	bool safepoint_p();
 	void iterate_quotation();
 };
 
