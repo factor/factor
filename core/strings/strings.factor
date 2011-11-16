@@ -74,9 +74,9 @@ M: string clone
 
 M: string resize resize-string ; inline
 
-: 1string ( ch -- str ) 1 swap <string> ;
+: 1string ( ch -- str ) 1 swap <string> ; inline
 
-: >string ( seq -- str ) "" clone-like ;
+: >string ( seq -- str ) "" clone-like ; inline
 
 M: string new-sequence drop 0 <string> ; inline
 
