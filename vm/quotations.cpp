@@ -82,19 +82,31 @@ bool quotation_jit::declare_p(cell i, cell length)
 		&& array_nth(elements.untagged(),i + 1) == parent->special_objects[JIT_DECLARE_WORD];
 }
 
-bool quotation_jit::word_stack_frame_p(cell obj)
+bool quotation_jit::special_subprimitive_p(cell obj)
 {
 	// Subprimitives should be flagged with whether they require a stack frame.
 	// See #295.
-	return (to_boolean(untag<word>(obj)->subprimitive)
-			&& obj != parent->special_objects[SIGNAL_HANDLER_WORD]
-			&& obj != parent->special_objects[LEAF_SIGNAL_HANDLER_WORD]
-			&& obj != parent->special_objects[FFI_SIGNAL_HANDLER_WORD]
-			&& obj != parent->special_objects[FFI_LEAF_SIGNAL_HANDLER_WORD])
+	return obj == parent->special_objects[SIGNAL_HANDLER_WORD]
+		|| obj == parent->special_objects[LEAF_SIGNAL_HANDLER_WORD]
+		|| obj == parent->special_objects[FFI_SIGNAL_HANDLER_WORD]
+		|| obj == parent->special_objects[FFI_LEAF_SIGNAL_HANDLER_WORD];
+}
+
+bool quotation_jit::word_stack_frame_p(cell obj)
+{
+	return (to_boolean(untag<word>(obj)->subprimitive) && !special_subprimitive_p(obj))
 		|| obj == parent->special_objects[JIT_PRIMITIVE_WORD];
 }
 
-bool quotation_jit::stack_frame_p()
+bool quotation_jit::word_safepoint_p(cell obj)
+{
+	if (to_boolean(untag<word>(obj)->subprimitive) && special_subprimitive_p(obj))
+		return false;
+	else
+		return true;
+}
+
+bool quotation_jit::safepoint_p()
 {
 	fixnum length = array_capacity(elements.untagged());
 
@@ -119,14 +131,34 @@ bool quotation_jit::stack_frame_p()
 	return false;
 }
 
+bool quotation_jit::stack_frame_p()
+{
+	fixnum length = array_capacity(elements.untagged());
+
+	for(fixnum i = 0; i < length; i++)
+	{
+		cell obj = array_nth(elements.untagged(),i);
+		if (tagged<object>(obj).type() == WORD_TYPE && !word_safepoint_p(obj))
+			return false;
+	}
+
+	return true;
+}
+
 bool quotation_jit::trivial_quotation_p(array *elements)
 {
 	return array_capacity(elements) == 1 && tagged<object>(array_nth(elements,0)).type_p(WORD_TYPE);
 }
 
-void quotation_jit::emit_epilog(bool stack_frame)
+void quotation_jit::emit_prolog(bool safepoint, bool stack_frame)
 {
-	emit(parent->special_objects[JIT_SAFEPOINT]);
+	if(safepoint) emit(parent->special_objects[JIT_SAFEPOINT]);
+	if(stack_frame) emit(parent->special_objects[JIT_PROLOG]);
+}
+
+void quotation_jit::emit_epilog(bool safepoint, bool stack_frame)
+{
+	if(safepoint) emit(parent->special_objects[JIT_SAFEPOINT]);
 	if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
 }
 
@@ -150,12 +182,12 @@ void quotation_jit::emit_quot(cell quot_)
 /* Allocates memory */
 void quotation_jit::iterate_quotation()
 {
+	bool safepoint = safepoint_p();
 	bool stack_frame = stack_frame_p();
 
 	set_position(0);
 
-	if(stack_frame)
-		emit(parent->special_objects[JIT_PROLOG]);
+	emit_prolog(safepoint, stack_frame);
 
 	cell i;
 	cell length = array_capacity(elements.untagged());
@@ -180,7 +212,7 @@ void quotation_jit::iterate_quotation()
 			/* Everything else */
 			else if(i == length - 1)
 			{
-				emit_epilog(stack_frame);
+				emit_epilog(safepoint, stack_frame);
 				tail_call = true;
 				word_jump(obj.value());
 			}
@@ -218,7 +250,7 @@ void quotation_jit::iterate_quotation()
 			   mutually recursive in the library, but both still work) */
 			if(fast_if_p(i,length))
 			{
-				emit_epilog(stack_frame);
+				emit_epilog(safepoint, stack_frame);
 				tail_call = true;
 
 				emit_quot(array_nth(elements.untagged(),i));
@@ -255,7 +287,7 @@ void quotation_jit::iterate_quotation()
 			/* Method dispatch */
 			if(mega_lookup_p(i,length))
 			{
-				emit_epilog(stack_frame);
+				emit_epilog(safepoint, stack_frame);
 				tail_call = true;
 				emit_mega_cache_lookup(
 					array_nth(elements.untagged(),i),
@@ -279,7 +311,7 @@ void quotation_jit::iterate_quotation()
 	{
 		set_position(length);
 
-		emit_epilog(stack_frame);
+		emit_epilog(safepoint, stack_frame);
 		emit(parent->special_objects[JIT_RETURN]);
 	}
 }
