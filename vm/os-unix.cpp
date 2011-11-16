@@ -318,7 +318,6 @@ void factor_vm::unix_init_signals()
 	struct sigaction memory_sigaction;
 	struct sigaction synchronous_sigaction;
 	struct sigaction enqueue_sigaction;
-	struct sigaction fep_sigaction;
 	struct sigaction sample_sigaction;
 	struct sigaction fpe_sigaction;
 	struct sigaction ignore_sigaction;
@@ -347,8 +346,7 @@ void factor_vm::unix_init_signals()
 	sigaction_safe(SIGINFO,&enqueue_sigaction,NULL);
 #endif
 
-	init_sigaction_with_handler(&fep_sigaction, fep_signal_handler);
-	sigaction_safe(SIGINT,&fep_sigaction,NULL);
+	handle_ctrl_c();
 
 	init_sigaction_with_handler(&sample_sigaction, sample_signal_handler);
 	sigaction_safe(SIGALRM,&sample_sigaction,NULL);
@@ -526,6 +524,23 @@ void factor_vm::unlock_console()
 {
 	assert(stdin_thread_initialized_p);
 	pthread_mutex_unlock(&stdin_mutex);
+}
+
+void factor_vm::ignore_ctrl_c()
+{
+	sig_t ret;
+	do
+	{
+		ret = signal(SIGINT, SIG_DFL);
+	}
+	while(ret == SIG_ERR && errno == EINTR);
+}
+
+void factor_vm::handle_ctrl_c()
+{
+	struct sigaction fep_sigaction;
+	init_sigaction_with_handler(&fep_sigaction, fep_signal_handler);
+	sigaction_safe(SIGINT,&fep_sigaction,NULL);
 }
 
 void factor_vm::abort()

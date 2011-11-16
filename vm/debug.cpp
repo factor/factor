@@ -476,6 +476,7 @@ void factor_vm::factorbug_usage(bool advanced_p)
 static void exit_fep(factor_vm *vm)
 {
 	vm->unlock_console();
+	vm->handle_ctrl_c();
 	vm->fep_p = false;
 }
 
@@ -498,6 +499,7 @@ void factor_vm::factorbug()
 	// that pumps the console is still running concurrently. We lock a mutex so
 	// the thread will take a break and give us exclusive access to stdin.
 	lock_console();
+	ignore_ctrl_c();
 
 	if (!fep_help_was_shown) {
 		factorbug_usage(false);
