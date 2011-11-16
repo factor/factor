@@ -1,11 +1,11 @@
 USING: deques dlists dlists.private kernel tools.test random
 assocs sets sequences namespaces sorting debugger io prettyprint
-math accessors classes ;
+math accessors classes locals arrays ;
 IN: dlists.tests
 
 [ t ] [ <dlist> deque-empty? ] unit-test
 
-[ T{ dlist f T{ dlist-node f 1 f f } T{ dlist-node f 1 f f } } ]
+[ T{ dlist f T{ dlist-node f f f 1 } T{ dlist-node f f f 1 } } ]
 [ <dlist> 1 over push-front ] unit-test
 
 ! Make sure empty lists are empty
@@ -100,3 +100,52 @@ IN: dlists.tests
 [ f ] [ DL{ f } DL{ 1 } = ] unit-test
 [ f ] [ f DL{ } = ] unit-test
 [ f ] [ DL{ } f = ] unit-test
+
+TUPLE: my-node < dlist-link { obj fixnum } ;
+
+: <my-node> ( obj -- node )
+    my-node new
+        swap >>obj ; inline
+
+[ V{ 1 } ] [ <dlist> 1 <my-node> over push-node-front dlist>seq ] unit-test
+[ V{ 2 1 } ] [ <dlist> 1 <my-node> over push-node-front 2 <my-node> over push-node-front dlist>seq ] unit-test
+
+[ V{ 1 } ] [ <dlist> 1 <my-node> over push-node-back dlist>seq ] unit-test
+[ V{ 1 2 } ] [ <dlist> 1 <my-node> over push-node-back 2 <my-node> over push-node-back dlist>seq ] unit-test
+[ V{ 1 2 3 } ] [ <dlist> 1 <my-node> over push-node-back 2 <my-node> over push-node-back 3 <my-node> over push-node-back dlist>seq ] unit-test
+
+: assert-links ( dlist-node -- )
+    [ prev>> ] [ next>> ] bi 2array { f f } assert= ;
+
+[ V{ } ] [ <dlist> 1 <my-node> over push-node-back [ [ back>> ] [ ] bi delete-node ] [ ] bi dlist>seq ] unit-test
+[ V{ 1 2 } ] [| |
+    <dlist> :> dl
+        1 <my-node> :> n1 n1 dl push-node-back
+        2 <my-node> :> n2 n2 dl push-node-back
+        3 <my-node> :> n3 n3 dl push-node-back
+
+    n3 dl delete-node n3 assert-links
+    dl dlist>seq
+] unit-test
+
+[ V{ 1 3 } ] [| |
+    <dlist> :> dl
+        1 <my-node> :> n1 n1 dl push-node-back
+        2 <my-node> :> n2 n2 dl push-node-back
+        3 <my-node> :> n3 n3 dl push-node-back
+
+    n2 dl delete-node n2 assert-links
+    dl dlist>seq
+] unit-test
+
+[ V{ 2 3 } ] [| |
+    <dlist> :> dl
+        1 <my-node> :> n1 n1 dl push-node-back
+        2 <my-node> :> n2 n2 dl push-node-back
+        3 <my-node> :> n3 n3 dl push-node-back
+
+    n1 dl delete-node n1 assert-links
+    dl dlist>seq
+] unit-test
+
+
