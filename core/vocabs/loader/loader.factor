@@ -168,3 +168,6 @@ PRIVATE>
 ] require-hook set-global
 
 M: vocab-spec where vocab-source-path dup [ 1 2array ] when ;
+
+! put here to avoid circularity between vocabs.loader and source-files.errors
+{ "source-files.errors" "debugger" } "source-files.errors.debugger" require-when
