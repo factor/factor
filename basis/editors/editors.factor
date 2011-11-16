@@ -60,8 +60,6 @@ GENERIC: edit ( object -- )
 M: object edit
     dup where [ first2 edit-location ] [ cannot-find-source ] ?if ;
 
-M: link edit name>> edit ;
-
 M: string edit edit-vocab ;
 
 : edit-error ( error -- )
