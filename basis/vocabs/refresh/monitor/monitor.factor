@@ -17,15 +17,11 @@ TR: convert-separators "/\\" ".." ;
 : path>vocab-name ( path -- vocab )
     dup ".factor" tail? [ parent-directory ] when ;
 
-: scrub-links-in-path ( path -- path' )
-    normalize-path path-components "/"
-    [ append-path follow-links ] reduce ;
-
 : chop-vocab-root ( path -- path' )
     "resource:" prepend-path normalize-path
     dup vocab-roots get
     [ [ normalize-path ] map ]
-    [ [ scrub-links-in-path ] map ] bi append
+    [ [ resolve-symlinks ] map ] bi append
     [ head? ] with find nip
     ?head drop ;
 
