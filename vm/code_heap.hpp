@@ -7,6 +7,8 @@ namespace factor
 	const cell seh_area_size = 0;
 #endif
 
+struct compaction_fixup;
+
 struct code_heap {
 	/* The actual memory area */
 	segment *seg;
@@ -19,6 +21,8 @@ struct code_heap {
 
 	/* Memory allocator */
 	free_list_allocator<code_block> *allocator;
+
+	std::set<code_block *> all_blocks;
 
 	/* Keys are blocks which need to be initialized by initialize_code_block().
 	Values are literal tables. Literal table arrays are GC roots until the
@@ -43,6 +47,7 @@ struct code_heap {
 	void flush_icache();
 	void guard_safepoint();
 	void unguard_safepoint();
+	void update_all_blocks_map(mark_bits<code_block> *code_forwarding_map);
 
 	code_block *code_block_for_address(cell address);
 
@@ -51,6 +56,7 @@ struct code_heap {
 		cell page_mask = ~(getpagesize() - 1);
 		return (addr & page_mask) == (cell)safepoint_page;
 	}
+
 };
 
 struct code_heap_room {
