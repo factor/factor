@@ -63,6 +63,7 @@ void code_heap::free(code_block *compiled)
 	assert(!uninitialized_p(compiled));
 	points_to_nursery.erase(compiled);
 	points_to_aging.erase(compiled);
+	all_blocks.erase(compiled);
 	allocator->free(compiled);
 }
 
@@ -71,29 +72,32 @@ void code_heap::flush_icache()
 	factor::flush_icache(seg->start,seg->size);
 }
 
-struct address_finder {
-	cell address;
-	code_block *found_code_block;
-
-	address_finder(cell address)
-		: address(address), found_code_block(NULL) {}
-
-	void operator()(code_block *block, cell size)
-	{
-		if ((cell)block->entry_point() <= address
-			&& address - (cell)block->entry_point() < block->size())
-		{
-			assert(found_code_block == NULL);
-			found_code_block = block;
-		}
-	}
-};
-
 code_block *code_heap::code_block_for_address(cell address)
 {
-	address_finder finder(address);
-	allocator->iterate(finder);
-	return finder.found_code_block;
+	std::set<code_block*>::const_iterator blocki =
+		all_blocks.upper_bound((code_block*)address);
+	assert(blocki != all_blocks.begin());
+	--blocki;
+	code_block* found_block = *blocki;
+	assert((cell)found_block->entry_point() <= address
+		&& address - (cell)found_block->entry_point() < found_block->size());
+	return found_block;
+}
+
+void code_heap::update_all_blocks_map(mark_bits<code_block> *code_forwarding_map)
+{
+	std::cout << "updating block map" << std::endl;
+	std::set<code_block *> new_all_blocks;
+	for (std::set<code_block *>::const_iterator oldi = all_blocks.begin();
+		oldi != all_blocks.end();
+		++oldi)
+	{
+		code_block *new_block = code_forwarding_map->forward_block(*oldi);
+		std::cout << "compact " << (void*)*oldi << " -> " << (void*)new_block << std::endl;
+		new_all_blocks.insert(new_block);
+	}
+	std::cout << "updated" << std::endl;
+	all_blocks.swap(new_all_blocks);
 }
 
 /* Allocate a code heap during startup */
