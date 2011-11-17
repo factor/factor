@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: system webbrowser windows.shell32 windows.user32 ;
+USING: system kernel webbrowser windows.shell32 windows.user32 ;
 
 IN: webbrowser.windows
 
