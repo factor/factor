@@ -57,6 +57,7 @@ GENERIC: emit-node ( node -- )
 
 : begin-word ( -- )
     make-kill-block
+    ##safepoint,
     ##prologue,
     ##branch,
     begin-basic-block ;
