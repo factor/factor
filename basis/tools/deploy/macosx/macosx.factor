@@ -17,7 +17,7 @@ IN: tools.deploy.macosx
 
 : copy-bundle-dir ( bundle-name dir -- )
     [ bundle-dir prepend-path swap ] keep
-    "Contents" prepend-path append-path copy-tree ;
+    append-path copy-tree ;
 
 : app-plist ( icon? executable bundle-name -- assoc )
     [
@@ -39,7 +39,7 @@ IN: tools.deploy.macosx
 
 : copy-nib ( bundle-name -- )
     deploy-ui? get [
-        "Resources/English.lproj/MiniFactor.nib" copy-bundle-dir
+        "Contents/Resources/English.lproj/MiniFactor.nib" copy-bundle-dir
     ] [ drop ] if ;
 
 : copy-icns ( vocab bundle-name -- icon? )
