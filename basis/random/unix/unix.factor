@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types io io.files kernel namespaces random
 io.encodings.binary init accessors system destructors
-io.ports hints math ;
+hints math ;
 IN: random.unix
 
-TUPLE: unix-random { reader input-port } ;
+TUPLE: unix-random reader ;
 
 : <unix-random> ( path -- random )
     binary <file-reader> unix-random boa ;
