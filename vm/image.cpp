@@ -53,6 +53,7 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 	}
 
 	code->allocator->initial_free_list(h->code_size);
+	code->initialize_all_blocks_set();
 }
 
 struct startup_fixup {
