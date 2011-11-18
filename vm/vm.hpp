@@ -75,6 +75,7 @@ struct factor_vm
 	bool signal_resumable;
 	cell signal_number;
 	cell signal_fault_addr;
+	cell signal_fault_pc;
 	unsigned int signal_fpu_status;
 
 	/* Pipe used to notify Factor multiplexer of signals */
@@ -204,8 +205,8 @@ struct factor_vm
 
 	// sampling_profiler
 	void clear_samples();
-	void record_sample();
-	void record_callstack_sample(cell *begin, cell *end);
+	void record_sample(bool prolog_p);
+	void record_callstack_sample(cell *begin, cell *end, bool prolog_p);
 	void start_sampling_profiler(fixnum rate);
 	void end_sampling_profiler();
 	void set_sampling_profiler(fixnum rate);
@@ -218,7 +219,7 @@ struct factor_vm
 	void type_error(cell type, cell tagged);
 	void not_implemented_error();
 	void verify_memory_protection_error(cell addr);
-	void memory_protection_error(cell addr);
+	void memory_protection_error(cell pc, cell addr);
 	void signal_error(cell signal);
 	void divide_by_zero_error();
 	void fp_trap_error(unsigned int fpu_status);

@@ -31,7 +31,7 @@ struct profiling_sample_count
 		jit_sample_count(jit_sample_count),
 		foreign_sample_count(foreign_sample_count),
 		foreign_thread_sample_count(foreign_thread_sample_count) {}
-	
+
 	bool empty() const
 	{
 		return sample_count
@@ -56,6 +56,7 @@ struct profiling_sample
 	cell callstack_begin, callstack_end;
 
 	profiling_sample(factor_vm *vm,
+		bool prolog_p,
 		profiling_sample_count const &counts,
 		cell thread);
 };
