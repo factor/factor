@@ -84,19 +84,34 @@ code_block *code_heap::code_block_for_address(cell address)
 	return found_block;
 }
 
-void code_heap::update_all_blocks_map(mark_bits<code_block> *code_forwarding_map)
+struct all_blocks_set_inserter {
+	code_heap *code;
+
+	all_blocks_set_inserter(code_heap *code) : code(code) {}
+
+	void operator()(code_block *block, cell size)
+	{
+		code->all_blocks.insert(block);
+	}
+};
+
+void code_heap::initialize_all_blocks_set()
 {
-	std::cout << "updating block map" << std::endl;
+	all_blocks.clear();
+	all_blocks_set_inserter inserter(this);
+	allocator->iterate(inserter);
+}
+
+void code_heap::update_all_blocks_set(mark_bits<code_block> *code_forwarding_map)
+{
 	std::set<code_block *> new_all_blocks;
 	for (std::set<code_block *>::const_iterator oldi = all_blocks.begin();
 		oldi != all_blocks.end();
 		++oldi)
 	{
 		code_block *new_block = code_forwarding_map->forward_block(*oldi);
-		std::cout << "compact " << (void*)*oldi << " -> " << (void*)new_block << std::endl;
 		new_all_blocks.insert(new_block);
 	}
-	std::cout << "updated" << std::endl;
 	all_blocks.swap(new_all_blocks);
 }
 

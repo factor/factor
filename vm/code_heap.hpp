@@ -47,7 +47,8 @@ struct code_heap {
 	void flush_icache();
 	void guard_safepoint();
 	void unguard_safepoint();
-	void update_all_blocks_map(mark_bits<code_block> *code_forwarding_map);
+	void initialize_all_blocks_set();
+	void update_all_blocks_set(mark_bits<code_block> *code_forwarding_map);
 
 	code_block *code_block_for_address(cell address);
 
