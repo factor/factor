@@ -12,7 +12,7 @@ struct safepoint_state
 	{
 	}
 
-	void handle_safepoint(factor_vm *parent) volatile;
+	void handle_safepoint(factor_vm *parent, cell pc) volatile;
 
 	void enqueue_safepoint(factor_vm *parent) volatile;
 	void enqueue_samples(factor_vm *parent, cell samples, cell pc, bool foreign_thread_p) volatile;

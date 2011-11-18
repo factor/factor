@@ -115,10 +115,10 @@ void factor_vm::verify_memory_protection_error(cell addr)
 		fatal_error("Memory protection fault during gc", addr);
 }
 
-void factor_vm::memory_protection_error(cell addr)
+void factor_vm::memory_protection_error(cell pc, cell addr)
 {
 	if(code->safepoint_p(addr))
-		safepoint.handle_safepoint(this);
+		safepoint.handle_safepoint(this, pc);
 	else if(ctx->datastack_seg->underflow_p(addr))
 		general_error(ERROR_DATASTACK_UNDERFLOW,false_object,false_object);
 	else if(ctx->datastack_seg->overflow_p(addr))
@@ -158,7 +158,7 @@ void factor_vm::primitive_unimplemented()
 
 void factor_vm::memory_signal_handler_impl()
 {
-	memory_protection_error(signal_fault_addr);
+	memory_protection_error(signal_fault_pc, signal_fault_addr);
 	if (!signal_resumable)
 	{
 		/* In theory we should only get here if the callstack overflowed during a

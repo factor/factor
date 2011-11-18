@@ -40,6 +40,7 @@ void factor_vm::call_fault_handler(
 	if(exception == EXC_BAD_ACCESS)
 	{
 		signal_fault_addr = MACH_EXC_STATE_FAULT(exc_state);
+		signal_fault_pc = (cell)MACH_PROGRAM_COUNTER(thread_state);
 		verify_memory_protection_error(signal_fault_addr);
 		handler = (cell)factor::memory_signal_handler_impl;
 	}
