@@ -17,7 +17,7 @@ struct free_heap_block
 	{
 		cell size = header & ~7;
 #ifdef FACTOR_DEBUG
-		assert(size > 0);
+		FACTOR_ASSERT(size > 0);
 #endif
 		return size;
 	}
@@ -25,7 +25,7 @@ struct free_heap_block
 	void make_free(cell size)
 	{
 #ifdef FACTOR_DEBUG
-		assert(size > 0);
+		FACTOR_ASSERT(size > 0);
 #endif
 		header = size | 1;
 	}

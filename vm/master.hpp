@@ -13,10 +13,6 @@
 #include <errno.h>
 #endif
 
-#ifdef FACTOR_DEBUG
-#include <assert.h>
-#endif
-
 /* C headers */
 #include <fcntl.h>
 #include <limits.h>
@@ -26,7 +22,6 @@
 #include <string.h>
 #include <time.h>
 #include <wchar.h>
-#include <assert.h>
 
 /* C++ headers */
 #include <algorithm>
@@ -88,6 +83,7 @@ namespace factor
 }
 
 /* Factor headers */
+#include "assert.hpp"
 #include "layouts.hpp"
 #include "platform.hpp"
 #include "primitives.hpp"

@@ -392,7 +392,7 @@ cell factor_vm::lazy_jit_compile(cell quot_)
 {
 	data_root<quotation> quot(quot_,this);
 
-	assert(!quot_compiled_p(quot.untagged()));
+	FACTOR_ASSERT(!quot_compiled_p(quot.untagged()));
 
 	code_block *compiled = jit_compile_quot(quot.value(),quot.value(),true);
 	quot.untagged()->entry_point = compiled->entry_point();

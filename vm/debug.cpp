@@ -586,7 +586,7 @@ void factor_vm::factorbug()
 		{
 			exit_fep(this);
 			general_error(ERROR_INTERRUPT,false_object,false_object);
-			assert(false);
+			FACTOR_ASSERT(false);
 		}
 		else if(strcmp(cmd,"data") == 0)
 			dump_objects(TYPE_COUNT);

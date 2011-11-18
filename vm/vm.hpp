@@ -190,7 +190,6 @@ struct factor_vm
 	void primitive_nano_count();
 	void primitive_sleep();
 	void primitive_set_slot();
-	static void exit(int status);
 
 	// objects
 	void primitive_special_object();
@@ -380,7 +379,7 @@ struct factor_vm
 	{
 	#ifdef FACTOR_DEBUG
 		if(!(current_gc && current_gc->op == collect_growing_heap_op))
-			assert(data->seg->in_segment_p((cell)pointer));
+			FACTOR_ASSERT(data->seg->in_segment_p((cell)pointer));
 	#endif
 	}
 
@@ -739,8 +738,6 @@ struct factor_vm
 	static void unlock_console();
 	static void ignore_ctrl_c();
 	static void handle_ctrl_c();
-	static void abort();
-	static void exit();
 
 	// os-windows
   #if defined(WINDOWS)

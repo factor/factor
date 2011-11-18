@@ -51,7 +51,7 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 		{
 			// Make a fake frame for the leaf procedure
 			code_block *leaf_block = code->code_block_for_address(*pc);
-			assert(leaf_block != NULL);
+			FACTOR_ASSERT(leaf_block != NULL);
 
 			cell newsp = *sp - 4*sizeof(cell);
 			*(cell*)(newsp + 3*sizeof(cell)) = 4*sizeof(cell);
@@ -61,7 +61,7 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 			handler_word = tagged<word>(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
 		}
 		else
-			assert(false);
+			FACTOR_ASSERT(false);
 
 		*pc = (cell)handler_word->entry_point;
 	}

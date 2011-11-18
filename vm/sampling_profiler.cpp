@@ -55,7 +55,7 @@ void factor_vm::record_callstack_sample(cell *begin, cell *end, bool prolog_p)
 	stack_frame *frame = ctx->bottom_frame();
 	if (prolog_p)
 	{
-		assert(frame >= ctx->callstack_top);
+		FACTOR_ASSERT(frame >= ctx->callstack_top);
 		stack_frame *next_frame = frame_successor(frame);
 		while (next_frame >= ctx->callstack_top)
 		{
