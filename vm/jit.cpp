@@ -22,13 +22,13 @@ jit::jit(code_block_type type_, cell owner_, factor_vm *vm)
 	  parent(vm)
 {
 	fixnum old_count = atomic::fetch_add(&parent->current_jit_count, 1);
-	assert(old_count >= 0);
+	FACTOR_ASSERT(old_count >= 0);
 }
 
 jit::~jit()
 {
 	fixnum old_count = atomic::fetch_subtract(&parent->current_jit_count, 1);
-	assert(old_count >= 1);
+	FACTOR_ASSERT(old_count >= 1);
 }
 
 void jit::emit_relocation(cell relocation_template_)

@@ -294,7 +294,7 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
 			Since in practice nobody uses the multi-VM stuff yet, we just grab the first
 			VM we can get. This will not be a good idea when we actually support native
 			threads. */
-			assert(thread_vms.size() == 1);
+			FACTOR_ASSERT(thread_vms.size() == 1);
 			factor_vm *vm = thread_vms.begin()->second;
 			vm->safepoint.enqueue_fep(vm);
 			return TRUE;
@@ -337,17 +337,17 @@ void factor_vm::sampler_thread_loop()
 	DWORD ok;
 
 	ok = QueryPerformanceFrequency(&units_per_second);
-	assert(ok);
+	FACTOR_ASSERT(ok);
 
 	ok = QueryPerformanceCounter(&counter);
-	assert(ok);
+	FACTOR_ASSERT(ok);
 
 	counter.QuadPart *= samples_per_second;
 	while (atomic::load(&sampling_profiler_p))
 	{
 		SwitchToThread();
 		ok = QueryPerformanceCounter(&new_counter);
-		assert(ok);
+		FACTOR_ASSERT(ok);
 		new_counter.QuadPart *= samples_per_second;
 		cell samples = 0;
 		while (new_counter.QuadPart - counter.QuadPart > units_per_second.QuadPart)
@@ -359,16 +359,16 @@ void factor_vm::sampler_thread_loop()
 		if (samples > 0)
 		{
 			DWORD suscount = SuspendThread(thread);
-			assert(suscount == 0);
+			FACTOR_ASSERT(suscount == 0);
 
 			CONTEXT context;
 			memset((void*)&context, 0, sizeof(CONTEXT));
 			context.ContextFlags = CONTEXT_CONTROL;
 			BOOL context_ok = GetThreadContext(thread, &context);
-			assert(context_ok);
+			FACTOR_ASSERT(context_ok);
 
 			suscount = ResumeThread(thread);
-			assert(suscount == 1);
+			FACTOR_ASSERT(suscount == 1);
 
 			safepoint.enqueue_samples(this, samples, context.EIP, false);
 		}
@@ -403,7 +403,7 @@ void factor_vm::end_sampling_profiler_timer()
 	sampler_thread = NULL;
 }
 
-void factor_vm::abort()
+void abort()
 {
 	::abort();
 }

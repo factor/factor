@@ -43,7 +43,7 @@ data_heap::data_heap(cell young_size_,
 
 	nursery = new nursery_space(young_size,aging_semispace->end);
 
-	assert(seg->end - nursery->end <= deck_size);
+	FACTOR_ASSERT(seg->end - nursery->end <= deck_size);
 }
 
 data_heap::~data_heap()

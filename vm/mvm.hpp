@@ -8,7 +8,7 @@ factor_vm *current_vm_p();
 inline factor_vm *current_vm()
 {
 	factor_vm *vm = current_vm_p();
-	assert(vm != NULL);
+	FACTOR_ASSERT(vm != NULL);
 	return vm;
 }
 

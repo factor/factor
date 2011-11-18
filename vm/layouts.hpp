@@ -89,7 +89,7 @@ static inline const char *type_name(cell type)
 	case DLL_TYPE:
 		return "dll";
 	default:
-		assert(false);
+		FACTOR_ASSERT(false);
 		return "";
 	}
 }
@@ -123,7 +123,7 @@ inline static bool immediate_p(cell obj)
 inline static fixnum untag_fixnum(cell tagged)
 {
 #ifdef FACTOR_DEBUG
-	assert(TAG(tagged) == FIXNUM_TYPE);
+	FACTOR_ASSERT(TAG(tagged) == FIXNUM_TYPE);
 #endif
 	return ((fixnum)tagged) >> TAG_BITS;
 }
