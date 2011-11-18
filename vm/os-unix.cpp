@@ -167,6 +167,7 @@ void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 	factor_vm *vm = current_vm();
 	vm->verify_memory_protection_error((cell)siginfo->si_addr);
 	vm->signal_fault_addr = (cell)siginfo->si_addr;
+	vm->signal_fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
 	vm->dispatch_signal(uap,factor::memory_signal_handler_impl);
 }
 

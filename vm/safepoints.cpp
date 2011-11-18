@@ -35,7 +35,7 @@ void safepoint_state::enqueue_samples(factor_vm *parent, cell samples, cell pc, 
 	}
 }
 
-void safepoint_state::handle_safepoint(factor_vm *parent) volatile
+void safepoint_state::handle_safepoint(factor_vm *parent, cell pc) volatile
 {
 	parent->code->unguard_safepoint();
 	parent->faulting_p = false;
@@ -49,7 +49,13 @@ void safepoint_state::handle_safepoint(factor_vm *parent) volatile
 		atomic::store(&fep_p, false);
 	}
 	else if (atomic::load(&parent->sampling_profiler_p))
-		parent->record_sample();
+	{
+		assert(parent->code->seg->in_segment_p(pc));
+		code_block *block = parent->code->code_block_for_address(pc);
+		bool prolog_p = (cell)block->entry_point() == pc;
+
+		parent->record_sample(prolog_p);
+	}
 }
 
 }
