@@ -7,7 +7,7 @@ void factor_vm::check_frame(stack_frame *frame)
 {
 #ifdef FACTOR_DEBUG
 	check_code_pointer((cell)frame->entry_point);
-	assert(frame->size != 0);
+	FACTOR_ASSERT(frame->size != 0);
 #endif
 }
 

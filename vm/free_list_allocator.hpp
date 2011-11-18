@@ -140,7 +140,7 @@ void free_list_allocator<Block>::sweep()
 		{
 			/* find size */
 			cell size = state.unmarked_block_size(start);
-			assert(size > 0);
+			FACTOR_ASSERT(size > 0);
 
 			free_heap_block *free_block = (free_heap_block *)start;
 			free_block->make_free(size);

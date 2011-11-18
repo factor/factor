@@ -317,7 +317,7 @@ struct call_frame_slot_visitor {
 		code_block *compiled = visitor->fixup.translate_code(parent->frame_code(frame));
 		gc_info *info = compiled->block_gc_info();
 
-		assert(return_address < compiled->size());
+		FACTOR_ASSERT(return_address < compiled->size());
 		cell callsite = info->return_address_index(return_address);
 		if(callsite == (cell)-1)
 			return;

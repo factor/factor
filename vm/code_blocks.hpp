@@ -38,7 +38,7 @@ struct code_block
 	{
 		cell size = header & ~7;
 #ifdef FACTOR_DEBUG
-		assert(size > 0);
+		FACTOR_ASSERT(size > 0);
 #endif
 		return size;
 	}
@@ -86,12 +86,12 @@ struct code_block
 VM_C_API void undefined_symbol(void);
 
 inline code_block *word::code() const {
-	assert(entry_point != NULL);
+	FACTOR_ASSERT(entry_point != NULL);
 	return (code_block*)entry_point - 1;
 }
 
 inline code_block *quotation::code() const {
-	assert(entry_point != NULL);
+	FACTOR_ASSERT(entry_point != NULL);
 	return (code_block*)entry_point - 1;
 }
 
