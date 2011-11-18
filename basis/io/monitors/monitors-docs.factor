@@ -87,10 +87,6 @@ $nl
 "Inside a single " { $link with-monitors } " scope, only one monitor may be created for any given directory."
 $nl
 "Both directories and files may be monitored. Unlike Mac OS X and Windows, changes to the immediate directory being monitored (permissions, modification time, and so on) are reported."
-{ $heading "BSD" }
-"Factor uses " { $snippet "kqueue" } " to implement monitors on BSD."
-$nl
-"The " { $snippet "kqueue" } " system is limited to monitoring individual files and directories. Monitoring a directory only notifies of files being added and removed to the directory itself, not of changes to file contents."
 ;
 
 ARTICLE: "io.monitors" "File system change monitors"
