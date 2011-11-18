@@ -68,6 +68,7 @@ ifdef CONFIG
 		vm/words.o
 
 	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
+		vm/assert.hpp \
 		vm/layouts.hpp \
 		vm/platform.hpp \
 		vm/primitives.hpp \

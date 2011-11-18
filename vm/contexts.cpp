@@ -110,7 +110,7 @@ void factor_vm::init_contexts(cell datastack_size_, cell retainstack_size_, cell
 
 void factor_vm::delete_contexts()
 {
-	assert(!ctx);
+	FACTOR_ASSERT(!ctx);
 	std::list<context *>::const_iterator iter = unused_contexts.begin();
 	std::list<context *>::const_iterator end = unused_contexts.end();
 	while(iter != end)

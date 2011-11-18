@@ -82,7 +82,7 @@ inline static THREADHANDLE thread_id()
 		FALSE,
 		id
 	);
-	assert(threadHandle != NULL);
+	FACTOR_ASSERT(threadHandle != NULL);
 	return threadHandle;
 }
 

@@ -12,7 +12,7 @@ void init_mvm()
 
 void register_vm_with_thread(factor_vm *vm)
 {
-	assert(!global_vm);
+	FACTOR_ASSERT(!global_vm);
 	global_vm = vm;
 }
 

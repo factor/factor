@@ -60,7 +60,7 @@ void code_heap::clear_mark_bits()
 
 void code_heap::free(code_block *compiled)
 {
-	assert(!uninitialized_p(compiled));
+	FACTOR_ASSERT(!uninitialized_p(compiled));
 	points_to_nursery.erase(compiled);
 	points_to_aging.erase(compiled);
 	all_blocks.erase(compiled);
@@ -76,10 +76,10 @@ code_block *code_heap::code_block_for_address(cell address)
 {
 	std::set<code_block*>::const_iterator blocki =
 		all_blocks.upper_bound((code_block*)address);
-	assert(blocki != all_blocks.begin());
+	FACTOR_ASSERT(blocki != all_blocks.begin());
 	--blocki;
 	code_block* found_block = *blocki;
-	assert((cell)found_block->entry_point() <= address
+	FACTOR_ASSERT((cell)found_block->entry_point() <= address
 		&& address - (cell)found_block->entry_point() < found_block->size());
 	return found_block;
 }
@@ -265,8 +265,8 @@ struct code_block_accumulator {
 		if it were a fixnum, and have library code shift it to the
 		left by 4. */
 		cell entry_point = (cell)compiled->entry_point();
-		assert((entry_point & (data_alignment - 1)) == 0);
-		assert((entry_point & TAG_MASK) == FIXNUM_TYPE);
+		FACTOR_ASSERT((entry_point & (data_alignment - 1)) == 0);
+		FACTOR_ASSERT((entry_point & TAG_MASK) == FIXNUM_TYPE);
 		objects.push_back(entry_point);
 	}
 };
