@@ -5,7 +5,8 @@ combinators continuations destructors fry io io.backend
 io.directories io.encodings.binary
 io.encodings.utf8 io.files io.pathnames io.files.types kernel
 math.bitwise sequences system unix unix.stat vocabs.loader
-classes.struct unix.ffi literals libc vocabs ;
+classes.struct unix.ffi literals libc vocabs
+io.files.info.unix ;
 IN: io.directories.unix
 
 CONSTANT: file-mode 0o0666
@@ -30,7 +31,9 @@ M: unix delete-directory ( path -- )
     normalize-path [ rmdir ] unix-system-call drop ;
 
 M: unix copy-file ( from to -- )
-    [ normalize-path ] bi@ call-next-method ;
+    [ normalize-path ] bi@
+    [ call-next-method ] 
+    [ [ file-permissions ] dip swap set-file-permissions ] 2bi ;
 
 : with-unix-directory ( path quot -- )
     [ opendir dup [ (io-error) ] unless ] dip
