@@ -219,11 +219,37 @@ void factor_vm::fixup_code(cell data_offset, cell code_offset)
 	code->allocator->iterate(updater,fixup);
 }
 
+FILE* factor_vm::open_image(vm_parameters *p)
+{
+	if (p->embedded_image)
+	{
+		FILE *file = OPEN_READ(p->executable_path);
+		if (file == NULL)
+		{
+			std::cout << "Cannot open embedded image" << std::endl;
+			std::cout << strerror(errno) << std::endl;
+			exit(1);
+		}
+		safe_fseek(file, -sizeof(embedded_image_footer), SEEK_END);
+		embedded_image_footer footer;
+		safe_fread(&footer, sizeof(embedded_image_footer), 1, file);
+		if (footer.magic != image_magic)
+		{
+			std::cout << "No embedded image" << std::endl;
+			exit(1);
+		}
+		safe_fseek(file, footer.image_offset, SEEK_SET);
+		return file;
+	}
+	else
+		return OPEN_READ(p->image_path);
+}
+
 /* Read an image file from disk, only done once during startup */
 /* This function also initializes the data and code heaps */
 void factor_vm::load_image(vm_parameters *p)
 {
-	FILE *file = OPEN_READ(p->image_path);
+	FILE *file = open_image(p);
 	if(file == NULL)
 	{
 		std::cout << "Cannot open image file: " << p->image_path << std::endl;
@@ -337,6 +363,21 @@ void factor_vm::primitive_save_image_and_exit()
 		exit(0);
 	else
 		exit(1);
+}
+
+bool factor_vm::embedded_image_p()
+{
+	const vm_char *vm_path = vm_executable_path();
+	if (!vm_path)
+		return false;
+	FILE *file = OPEN_READ(vm_path);
+	if (!file)
+		return false;
+	safe_fseek(file, -sizeof(embedded_image_footer), SEEK_END);
+	embedded_image_footer footer;
+	safe_fread(&footer, sizeof(embedded_image_footer), 1, file);
+	fclose(file);
+	return footer.magic == image_magic;
 }
 
 }
