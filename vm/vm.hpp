@@ -610,7 +610,9 @@ struct factor_vm
 	void primitive_save_image_and_exit();
 	void fixup_data(cell data_offset, cell code_offset);
 	void fixup_code(cell data_offset, cell code_offset);
+	FILE *open_image(vm_parameters *p);
 	void load_image(vm_parameters *p);
+	bool embedded_image_p();
 
 	// callstack
 	template<typename Iterator> void iterate_callstack_object(callstack *stack_, Iterator &iterator);
