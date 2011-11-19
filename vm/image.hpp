@@ -4,6 +4,11 @@ namespace factor
 static const cell image_magic = 0x0f0e0d0c;
 static const cell image_version = 4;
 
+struct embedded_image_footer {
+	cell magic;
+	cell image_offset;
+};
+
 struct image_header {
 	cell magic;
 	cell version;
@@ -28,6 +33,7 @@ struct image_header {
 };
 
 struct vm_parameters {
+	bool embedded_image;
 	const vm_char *image_path;
 	const vm_char *executable_path;
 	cell datastack_size, retainstack_size, callstack_size;
