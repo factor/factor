@@ -3,7 +3,7 @@ kernel math ;
 IN: tools.deploy.config
 
 ARTICLE: "deploy-flags" "Deployment flags"
-"There are two sets of deployment flags. The first set controls the major subsystems which are to be included in the deployment image:"
+"There are three sets of deployment flags. The first set controls the major subsystems which are to be included in the deployment image:"
 { $subsections
     deploy-math?
     deploy-unicode?
@@ -16,6 +16,10 @@ ARTICLE: "deploy-flags" "Deployment flags"
     deploy-reflection
     deploy-word-props?
     deploy-c-types?
+}
+"Finally, the third set controls the format of the generated product:"
+{ $subsections
+    deploy-console?
 } ;
 
 ABOUT: "deploy-flags"
@@ -72,6 +76,11 @@ HELP: deploy-ui?
 $nl
 "Off by default. Programs wishing to use the UI must be deployed with this flag on." } ;
 
+HELP: deploy-console?
+{ $description "Deploy flag. If set, the deployed executable will be configured as a console application. On Windows, this means the application will be deployed in the console subsystem and will have a console attached. On Mac OS X, this means the application will be deployed as a single executable instead of an application bundle directory. On other Unix platforms, the flag has no effect."
+$nl
+"On by default." } ;
+
 HELP: deploy-io
 { $description "The level of I/O support required by the deployed image:"
     { $table
@@ -80,7 +89,7 @@ HELP: deploy-io
         { "2" "Basic ANSI C streams" }
         { "3" "Non-blocking streams and networking" }
     }
-"The default value is 2, basic ANSI C streams. This enables basic console and file I/O, however more advanced features such as networking are not available." } ;
+"The default value is 3. The value should only be reduced if your application does not depend on asynchronous I/O functionality and does not use networking." } ;
 
 HELP: deploy-reflection
 { $description "The level of reflection support required by the deployed image."
