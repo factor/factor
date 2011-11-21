@@ -35,8 +35,8 @@ M: windows deploy*
             {
                 [ create-exe-dir dup ]
                 [ drop embed-ico ]
-                [ image-name ]
-                [ drop namespace make-deploy-image ]
+                [ drop deployed-image-name ]
+                [ drop namespace make-deploy-image-executable ]
                 [ nip "" [ copy-resources ] [ copy-libraries ] 3bi ]
                 [ nip open-in-explorer ]
             } 2cleave 
