@@ -84,11 +84,11 @@ IN: tools.deploy.macosx
         ] bind
     ] with-directory ;
 
-: deploy-app-bundle? ( -- ? )
-    deploy-console? get not deploy-ui? get or ;
+: deploy-app-bundle? ( vocab -- ? )
+    deploy-config [ deploy-console? get not deploy-ui? get or ] bind ;
 
 M: macosx deploy* ( vocab -- )
     ! pass off to M: unix deploy* if we're building a console app
-    deploy-app-bundle?
-    [ call-next-method ]
-    [ deploy-app-bundle ] if ;
+    dup deploy-app-bundle?
+    [ deploy-app-bundle ]
+    [ call-next-method ] if ;
