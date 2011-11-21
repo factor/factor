@@ -8,7 +8,8 @@ io.streams.c io.files io.files.temp io.pathnames io.directories
 io.directories.hierarchy io.backend quotations io.launcher
 tools.deploy.config tools.deploy.config.editor bootstrap.image
 io.encodings.utf8 destructors accessors hashtables
-tools.deploy.libraries vocabs.metadata.resources ;
+tools.deploy.libraries vocabs.metadata.resources
+tools.deploy.embed locals ;
 IN: tools.deploy.backend
 
 : copy-vm ( executable bundle-name -- vm )
@@ -29,8 +30,8 @@ ERROR: can't-deploy-library-file library ;
 : copy-libraries ( manifest name dir -- )
     append-path swap libraries>> [ copy-library ] with each ;
 
-: image-name ( vocab bundle-name -- str )
-    prepend-path ".image" append ;
+: deployed-image-name ( vocab -- str )
+    ".image" append temp-file ;
 
 : copy-lines ( -- )
     readln [ print flush copy-lines ] when* ;
@@ -119,10 +120,12 @@ DEFER: ?make-staging-image
         [ "invalid vocab manifest!" throw ] if
     ] if-empty ;
 
-: make-deploy-image ( vm image vocab config -- manifest )
+:: make-deploy-image-executable ( vm image vocab config -- manifest )
     make-boot-image
-    over "vocab-manifest-" prepend temp-file
-    [ swap deploy-command-line run-factor ]
-    [ parse-vocab-manifest-file ] bi ;
+    vocab "vocab-manifest-" prepend temp-file :> manifest-file
+    image vocab manifest-file config deploy-command-line :> flags
+    vm flags run-factor
+    image vm embed-image
+    manifest-file parse-vocab-manifest-file ;
 
 HOOK: deploy* os ( vocab -- )
