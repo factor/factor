@@ -4,14 +4,18 @@ bootstrap.image.private destructors io io.directories
 io.encodings.binary io.files locals system ;
 IN: tools.deploy.embed
 
-:: embed-image ( from-image to-executable -- )
-    vm to-executable copy-file
-    to-executable binary <file-appender> [| out |
+:: embed-image ( image executable -- )
+    executable binary <file-appender> [| out |
         out stream-tell :> offset
-        from-image binary <file-reader> [| in |
+        image binary <file-reader> [| in |
             in out stream-copy*
         ] with-disposal
         image-magic uintptr_t <ref> out stream-write
         offset uintptr_t <ref> out stream-write
     ] with-disposal ;
 
+: make-embedded-image* ( from-image from-executable to-executable -- )
+    swap [ copy-file ] keep embed-image ;
+
+: make-embedded-image ( from-image to-executable -- )
+    vm swap make-embedded-image* ;
