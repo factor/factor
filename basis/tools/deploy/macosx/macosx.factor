@@ -70,13 +70,16 @@ IN: tools.deploy.macosx
     [ normalize-path [ <NSString> ] [ parent-directory <NSString> ] bi ] bi*
     -> selectFile:inFileViewerRootedAtPath: drop ;
 
+: deploy.app-image-name ( vocab bundle-name -- str )
+    [ % "/Contents/Resources/" % % ".image" % ] "" make ;
+
 : deploy-app-bundle ( vocab -- )
     "resource:" [
         dup deploy-config [
             bundle-name dup exists? [ delete-tree ] [ drop ] if
             [ bundle-name create-app-dir ] keep
-            [ deployed-image-name ] keep
-            namespace make-deploy-image-executable
+            [ bundle-name deploy.app-image-name ] keep
+            namespace make-deploy-image
             bundle-name
             [ "Contents/Resources" copy-resources ]
             [ "Contents/Frameworks" copy-libraries ] 2bi
