@@ -120,12 +120,15 @@ DEFER: ?make-staging-image
         [ "invalid vocab manifest!" throw ] if
     ] if-empty ;
 
-:: make-deploy-image-executable ( vm image vocab config -- manifest )
+:: make-deploy-image ( vm image vocab config -- manifest )
     make-boot-image
     vocab "vocab-manifest-" prepend temp-file :> manifest-file
     image vocab manifest-file config deploy-command-line :> flags
     vm flags run-factor
-    image vm embed-image
     manifest-file parse-vocab-manifest-file ;
+
+:: make-deploy-image-executable ( vm image vocab config -- manifest )
+    vm image vocab config make-deploy-image
+    image vm embed-image ;
 
 HOOK: deploy* os ( vocab -- )
