@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff bsd license
 USING: alien.c-types alien.data bootstrap.image
 bootstrap.image.private destructors io io.directories
-io.encodings.binary io.files locals system ;
+io.encodings.binary io.files locals system kernel ;
 IN: tools.deploy.embed
 
 :: embed-image ( image executable -- )
