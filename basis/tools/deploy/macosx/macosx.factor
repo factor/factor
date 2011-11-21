@@ -7,11 +7,12 @@ tools.deploy.config.editor assocs hashtables prettyprint
 io.backend.unix cocoa io.encodings.utf8 io.backend
 cocoa.application cocoa.classes cocoa.plists
 combinators vocabs.metadata vocabs.loader ;
+QUALIFIED-WITH: tools.deploy.unix unix
 IN: tools.deploy.macosx
 
 : bundle-dir ( -- dir )
     running.app?
-    [ vm parent-directory parent-directory ]
+    [ vm parent-directory parent-directory parent-directory ]
     [ "resource:Factor.app" ]
     if ;
 
@@ -61,9 +62,6 @@ IN: tools.deploy.macosx
     } 2cleave
     dup 0o755 set-file-permissions ;
 
-: deploy.app-image ( vocab bundle-name -- str )
-    [ % "/Contents/Resources/" % % ".image" % ] "" make ;
-
 : bundle-name ( -- string )
     deploy-name get ".app" append ;
 
@@ -72,16 +70,22 @@ IN: tools.deploy.macosx
     [ normalize-path [ <NSString> ] [ parent-directory <NSString> ] bi ] bi*
     -> selectFile:inFileViewerRootedAtPath: drop ;
 
-M: macosx deploy* ( vocab -- )
+: deploy-app-bundle ( vocab -- )
     "resource:" [
         dup deploy-config [
             bundle-name dup exists? [ delete-tree ] [ drop ] if
             [ bundle-name create-app-dir ] keep
-            [ bundle-name deploy.app-image ] keep
-            namespace make-deploy-image
+            [ deployed-image-name ] keep
+            namespace make-deploy-image-executable
             bundle-name
             [ "Contents/Resources" copy-resources ]
             [ "Contents/Frameworks" copy-libraries ] 2bi
             bundle-name show-in-finder
         ] bind
     ] with-directory ;
+
+M: macosx deploy* ( vocab -- )
+    ! pass off to M: unix deploy* if we're building a console app
+    deploy-console? get
+    [ call-next-method ]
+    [ deploy-app-bundle ] if ;

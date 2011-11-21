@@ -3,6 +3,7 @@
 USING: io io.backend io.directories io.files.info.unix kernel
 namespaces sequences system tools.deploy.backend
 tools.deploy.config tools.deploy.config.editor ;
+QUALIFIED: webbrowser
 IN: tools.deploy.unix
 
 : create-app-dir ( vocab bundle-name -- vm )
@@ -16,9 +17,10 @@ M: unix deploy* ( vocab -- )
     "resource:" [
         dup deploy-config [
             [ bundle-name create-app-dir ] keep
-            [ bundle-name image-name ] keep
-            namespace make-deploy-image
+            [ deployed-image-name ] keep
+            namespace make-deploy-image-executable
             bundle-name "" [ copy-resources ] [ copy-libraries ] 3bi
             bundle-name normalize-path "Binary deployed to " "." surround print
+            bundle-name webbrowser:open-file
         ] bind
     ] with-directory ;
