@@ -40,7 +40,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
     do-step ;
 
 : do-benchmarks ( -- )
-    run-benchmarks
+    run-timing-benchmarks
     [ benchmarks-file to-file ] [
         [ keys benchmark-error-vocabs-file to-file ]
         [ benchmark-error-messages-file utf8 [ benchmark-errors. ] with-file-writer ] bi

@@ -1,41 +1,58 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel vocabs vocabs.loader tools.time vocabs.hierarchy
-arrays assocs io.styles io help.markup prettyprint sequences
-continuations debugger math namespaces memory fry ;
+USING: arrays assocs continuations debugger fry help.markup io
+io.styles kernel math memory namespaces prettyprint sequences
+tools.profiler.sampling tools.time vocabs vocabs.hierarchy
+vocabs.loader ;
 IN: benchmark
 
 <PRIVATE
 
-SYMBOL: timings
+SYMBOL: results
 SYMBOL: errors
 
 PRIVATE>
 
-: run-benchmark ( vocab -- time )
+: run-timing-benchmark ( vocab -- time )
     [ 5 ] dip '[ gc [ _ run ] benchmark ] replicate infimum ;
+
+: run-profile-benchmark ( vocab -- profile )
+    compact-gc '[ _ run ] profile most-recent-profile-data ;
+
+: find-benchmark-vocabs ( -- seq )
+    "benchmark" child-vocab-names
+    [ find-vocab-root ] filter randomize 2 head ;
 
 <PRIVATE
 
-: record-benchmark ( vocab -- )
-    [ "=== " write print flush ] [
-        [ [ require ] [ run-benchmark ] [ ] tri timings ]
-        [ swap errors ]
-        recover get set-at
-    ] bi ;
+: print-record-header ( vocab -- )
+    "=== " write print flush ;
+
+: run-benchmark ( vocab quot -- )
+    [ drop print-record-header ] [
+        '[
+            _ [ [ require ] _ [ ] tri results ]
+            [ swap errors ]
+            recover get set-at
+        ] call
+    ] 2bi ; inline
+
+: run-benchmarks ( quot -- results errors )
+    '[
+        results errors
+        [ [ V{ } clone swap set ] bi@ ]
+        [ 2drop find-benchmark-vocabs [ _ run-benchmark ] each ]
+        [ [ get ] bi@ ]
+        2tri
+    ] with-scope ; inline
 
 PRIVATE>
 
-: run-benchmarks ( -- timings errors )
-    [
-        V{ } clone timings set
-        V{ } clone errors set
-        "benchmark" child-vocab-names
-        [ find-vocab-root ] filter
-        [ record-benchmark ] each
-        timings get
-        errors get
-    ] with-scope ;
+: run-timing-benchmarks ( -- results errors )
+    [ run-timing-benchmark ] run-benchmarks ;
+
+: run-profile-benchmarks ( -- results errors )
+    [ run-profile-benchmark ] run-benchmarks ;
 
 : timings. ( assocs -- )
     standard-table-style [
@@ -59,8 +76,8 @@ PRIVATE>
         bi*
     ] assoc-each ;
 
-: benchmarks ( -- )
-    run-benchmarks [ timings. ] [ benchmark-errors. ] bi* ;
+: timing-benchmarks ( -- )
+    run-timing-benchmarks
+    [ timings. ] [ benchmark-errors. ] bi* ;
 
-MAIN: benchmarks
-
+MAIN: timing-benchmarks
