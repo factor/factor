@@ -81,7 +81,6 @@ UNION: texture-attachment
 M: texture-attachment dispose texture>> dispose ;
 
 UNION: framebuffer-attachment renderbuffer texture-attachment ;
-UNION: ?framebuffer-attachment framebuffer-attachment POSTPONE: f ;
 
 GENERIC: attachment-object ( attachment -- object )
 M: renderbuffer attachment-object ;
@@ -89,8 +88,8 @@ M: texture-attachment attachment-object texture>> texture-object ;
 
 TUPLE: framebuffer < gpu-object
     { color-attachments array read-only }
-    { depth-attachment ?framebuffer-attachment read-only initial: f }
-    { stencil-attachment ?framebuffer-attachment read-only initial: f } ;
+    { depth-attachment maybe: framebuffer-attachment read-only initial: f }
+    { stencil-attachment maybe: framebuffer-attachment read-only initial: f } ;
 
 UNION: any-framebuffer system-framebuffer framebuffer ;
 
@@ -100,14 +99,11 @@ VARIANT: framebuffer-attachment-side
 VARIANT: framebuffer-attachment-face
     back-face front-face ;
 
-UNION: ?framebuffer-attachment-side framebuffer-attachment-side POSTPONE: f ;
-UNION: ?framebuffer-attachment-face framebuffer-attachment-face POSTPONE: f ;
-
 VARIANT: color-attachment-ref
     default-attachment
     system-attachment: {
-        { side ?framebuffer-attachment-side initial: f }
-        { face ?framebuffer-attachment-face initial: back-face }
+        { side maybe: framebuffer-attachment-side initial: f }
+        { face maybe: framebuffer-attachment-face initial: back-face }
     }
     color-attachment: { { index integer } } ;
 

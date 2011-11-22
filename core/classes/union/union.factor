@@ -3,11 +3,30 @@
 USING: words sequences kernel assocs combinators classes
 classes.private classes.algebra classes.algebra.private
 classes.builtin kernel.private math.private namespaces arrays
-math quotations definitions ;
+math quotations definitions accessors parser effects ;
 IN: classes.union
 
 PREDICATE: union-class < class
     "metaclass" word-prop union-class eq? ;
+
+TUPLE: maybe { class word initial: object read-only } ;
+
+C: <maybe> maybe
+
+M: maybe instance?
+    over [ class>> instance? ] [ 2drop t ] if ;
+
+M: maybe normalize-class
+    class>> \ f class-or ;
+
+M: maybe classoid? drop t ;
+
+M: maybe rank-class drop 6 ;
+
+M: maybe (flatten-class)
+    class>> (flatten-class) ;
+
+M: maybe effect>type ;
 
 <PRIVATE
 
@@ -17,6 +36,9 @@ M: builtin-class union-of-builtins? drop t ;
 
 M: union-class union-of-builtins?
     members [ union-of-builtins? ] all? ;
+
+M: maybe union-of-builtins?
+    class>> union-of-builtins? ;
 
 M: class union-of-builtins?
     drop f ;
@@ -35,7 +57,7 @@ M: class union-of-builtins?
     surround ;
 
 : slow-union-predicate-quot ( class -- quot )
-    members [ "predicate" word-prop ] map unclip swap
+    members [ predicate-def ] map unclip swap
     [ [ dup ] prepend [ drop t ] ] { } map>assoc alist>quot ;
 
 : union-predicate-quot ( class -- quot )
@@ -66,8 +88,12 @@ M: union-class rank-class drop 7 ;
 M: union-class instance?
     "members" word-prop [ instance? ] with any? ;
 
+M: anonymous-union instance?
+    members>> [ instance? ] with any? ;
+
 M: union-class normalize-class
     members <anonymous-union> normalize-class ;
 
 M: union-class (flatten-class)
     members <anonymous-union> (flatten-class) ;
+

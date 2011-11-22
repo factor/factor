@@ -10,7 +10,7 @@ IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
 
-M: class specializer-predicate "predicate" word-prop ;
+M: class specializer-predicate predicate-def ;
 
 M: object specializer-predicate '[ _ eq? ] ;
 

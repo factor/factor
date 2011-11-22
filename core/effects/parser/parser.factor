@@ -25,12 +25,7 @@ SYMBOL: effect-var
     [ invalid-row-variable ] if ;
 
 : parse-effect-value ( token -- value )
-    ":" ?tail [
-        scan-token {
-            { [ dup "(" = ] [ drop ")" parse-effect ] }
-            [ parse-word dup class? [ bad-effect ] unless ]
-        } cond 2array
-    ] when ;
+    ":" ?tail [ scan-object 2array ] when ;
 PRIVATE>
 
 : parse-effect-token ( first? var end -- var more? )

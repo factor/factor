@@ -15,7 +15,7 @@ GENERIC: predicate-quot ( class -- quot )
 M: predicate-class predicate-quot
     [
         \ dup ,
-        [ superclass "predicate" word-prop % ]
+        [ superclass predicate-def % ]
         [ "predicate-definition" word-prop , ] bi
         [ drop f ] , \ if ,
     ] [ ] make ;

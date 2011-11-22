@@ -14,8 +14,6 @@ QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS: c:float c:int c:uchar c:ushort c:uint c:void* ;
 IN: gpu.render
 
-UNION: ?integer integer POSTPONE: f ;
-
 VARIANT: uniform-type
     bool-uniform
     bvec2-uniform
@@ -55,7 +53,7 @@ ALIAS: mat4x4-uniform mat4-uniform
 TUPLE: uniform
     { name         string   read-only initial: "" }
     { uniform-type class    read-only initial: float-uniform }
-    { dim          ?integer read-only initial: f } ;
+    { dim          maybe: integer read-only initial: f } ;
 
 VARIANT: index-type
     ubyte-indexes
@@ -81,10 +79,8 @@ TUPLE: index-elements
 
 C: <index-elements> index-elements
 
-UNION: ?buffer buffer POSTPONE: f ;
-
 TUPLE: multi-index-elements
-    { buffer ?buffer read-only }
+    { buffer maybe: buffer read-only }
     { ptrs   read-only }
     { counts uint-array read-only }
     { index-type index-type read-only } ;
@@ -584,7 +580,6 @@ M: buffer-ptr bind-transform-feedback-output
 
 PRIVATE>
 
-UNION: ?any-framebuffer any-framebuffer POSTPONE: f ;
 UNION: transform-feedback-output buffer buffer-range POSTPONE: f ;
 
 TUPLE: render-set
@@ -592,8 +587,8 @@ TUPLE: render-set
     { vertex-array vertex-array initial: T{ vertex-array-collection } read-only }
     { uniforms uniform-tuple read-only }
     { indexes vertex-indexes initial: T{ index-range } read-only } 
-    { instances ?integer initial: f read-only }
-    { framebuffer ?any-framebuffer initial: system-framebuffer read-only }
+    { instances maybe: integer initial: f read-only }
+    { framebuffer maybe: any-framebuffer initial: system-framebuffer read-only }
     { output-attachments sequence initial: { default-attachment } read-only }
     { transform-feedback-output transform-feedback-output initial: f read-only } ;
 

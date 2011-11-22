@@ -46,8 +46,6 @@ TUPLE: texture-data
     { component-type component-type read-only initial: ubyte-components } ;
 
 C: <texture-data> texture-data
-UNION: ?texture-data texture-data POSTPONE: f ;
-UNION: ?float-array float-array POSTPONE: f ;
 
 VARIANT: compressed-texture-format
     DXT1-RGB DXT1-RGBA DXT3 DXT5
@@ -60,7 +58,6 @@ TUPLE: compressed-texture-data
     { length integer read-only } ;
 
 C: <compressed-texture-data> compressed-texture-data
-UNION: ?compressed-texture-data compressed-texture-data POSTPONE: f ;
 
 VARIANT: texture-wrap
     clamp-texcoord-to-edge clamp-texcoord-to-border repeat-texcoord repeat-texcoord-mirrored ;
@@ -68,12 +65,11 @@ VARIANT: texture-filter
     filter-nearest filter-linear ;
 
 UNION: wrap-set texture-wrap sequence ;
-UNION: ?texture-filter texture-filter POSTPONE: f ;
 
 TUPLE: texture-parameters
     { wrap wrap-set initial: { repeat-texcoord repeat-texcoord repeat-texcoord } }
     { min-filter texture-filter initial: filter-nearest }
-    { min-mipmap-filter ?texture-filter initial: filter-linear }
+    { min-mipmap-filter maybe: texture-filter initial: filter-linear }
     { mag-filter texture-filter initial: filter-linear }
     { min-lod integer initial: -1000 }
     { max-lod integer initial:  1000 }

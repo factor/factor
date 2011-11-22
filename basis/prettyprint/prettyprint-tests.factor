@@ -4,7 +4,7 @@ prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
 continuations generic compiler.units tools.continuations
 tools.continuations.private eval accessors make vocabs.parser see
-listener ;
+listener classes.union ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -387,3 +387,7 @@ TUPLE: final-tuple ; final
     ] with-variable
 ] unit-test
 
+[ "maybe: integer\n" ] [ [  maybe: integer . ] with-string-writer ] unit-test
+TUPLE: bob a b ;
+[ "maybe: bob\n" ] [ [  maybe: bob . ] with-string-writer ] unit-test
+[ "maybe: word\n" ] [ [  maybe: word . ] with-string-writer ] unit-test

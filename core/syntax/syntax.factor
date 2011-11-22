@@ -190,7 +190,7 @@ IN: bootstrap.syntax
     "PREDICATE:" [
         scan-new-class
         "<" expect
-        scan-word
+        scan-class
         parse-definition define-predicate-class
     ] define-core-syntax
 
@@ -247,6 +247,10 @@ IN: bootstrap.syntax
         ] [
             not-in-a-method-error
         ] if*
+    ] define-core-syntax
+
+    "maybe:" [
+        scan-class <maybe> suffix!
     ] define-core-syntax
     
     "initial:" "syntax" lookup-word define-symbol
