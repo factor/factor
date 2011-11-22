@@ -7,7 +7,7 @@ words.alias quotations io assocs splitting classes.tuple
 generic.standard generic.hook generic.math generic.parser classes
 io.pathnames vocabs vocabs.parser classes.parser classes.union
 classes.intersection classes.mixin classes.predicate
-classes.singleton classes.tuple.parser compiler.units
+classes.singleton classes.tuple.parser compiler.units classes.maybe
 combinators effects.parser slots hash-sets source-files ;
 IN: bootstrap.syntax
 

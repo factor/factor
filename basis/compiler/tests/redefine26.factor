@@ -1,4 +1,4 @@
-USING: accessors classes.tuple classes.union compiler.units
+USING: accessors classes.tuple classes.maybe compiler.units
 kernel math slots tools.test ;
 IN: compiler.tests.redefine26
 

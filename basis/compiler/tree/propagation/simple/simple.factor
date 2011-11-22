@@ -5,7 +5,7 @@ words namespaces classes.algebra combinators
 combinators.short-circuit classes classes.tuple
 classes.tuple.private continuations arrays alien.c-types math
 math.private slots generic definitions stack-checker.dependencies
-classes.union classes.algebra.private
+classes.maybe classes.algebra.private
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
