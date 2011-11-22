@@ -161,3 +161,9 @@ TYPED: forget-fail ( a: forget-class -- ) drop ;
 [ ] [ [ \ forget-class forget ] with-compilation-unit ] unit-test
 
 [ ] [ [ \ forget-fail forget ] with-compilation-unit ] unit-test
+
+TYPED: typed-maybe ( x: maybe: integer -- ? ) >boolean ;
+
+[ f ] [ f typed-maybe ] unit-test
+[ t ] [ 30 typed-maybe ] unit-test
+[ 30.0 typed-maybe ] [ input-mismatch-error? ] must-fail-with

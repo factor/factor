@@ -3,7 +3,8 @@ USING: accessors arrays classes classes.tuple combinators
 combinators.short-circuit definitions effects fry hints
 math kernel kernel.private namespaces parser quotations
 sequences slots words locals effects.parser
-locals.parser macros stack-checker.dependencies ;
+locals.parser macros stack-checker.dependencies
+classes.union ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: typed
 
@@ -18,6 +19,7 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 
 : unboxable-tuple-class? ( type -- ? )
     {
+        [ maybe? not ]
         [ all-slots empty? not ]
         [ immutable-tuple-class? ]
         [ final-class? ]
@@ -43,7 +45,7 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
     ] [ drop [ ] ] if ;
 
 :: unboxer ( error-quot word types type -- quot )
-    type "coercer" word-prop [ ] or
+    type word? [ type "coercer" word-prop ] [ f ] if [ ] or
     type type word types error-quot '[ dup _ instance? [ _ _ _ @ ] unless ]
     type (unboxer)
     compose compose ;
