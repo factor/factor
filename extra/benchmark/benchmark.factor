@@ -21,7 +21,7 @@ PRIVATE>
 
 : find-benchmark-vocabs ( -- seq )
     "benchmark" child-vocab-names
-    [ find-vocab-root ] filter randomize 2 head ;
+    [ find-vocab-root ] filter ;
 
 <PRIVATE
 
