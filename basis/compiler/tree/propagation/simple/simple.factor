@@ -5,6 +5,7 @@ words namespaces classes.algebra combinators
 combinators.short-circuit classes classes.tuple
 classes.tuple.private continuations arrays alien.c-types math
 math.private slots generic definitions stack-checker.dependencies
+classes.union classes.algebra.private
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -31,12 +32,20 @@ M: #push propagate-before
 : set-value-infos ( infos values -- )
     [ set-value-info ] 2each ;
 
+GENERIC: depends-on-class ( obj -- )
+
+M: class depends-on-class
+    depends-on-conditionally ;
+
+M: maybe depends-on-class
+    class>> depends-on-class ;
+
 M: #declare propagate-before
     #! We need to force the caller word to recompile when the
     #! classes mentioned in the declaration are redefined, since
     #! now we're making assumptions but their definitions.
     declaration>> [
-        [ depends-on-conditionally ]
+        [ depends-on-class ]
         [ <class-info> swap refine-value-info ]
         bi
     ] assoc-each ;

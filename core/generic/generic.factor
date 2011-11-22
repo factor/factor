@@ -3,7 +3,7 @@
 USING: accessors words kernel sequences namespaces make assocs
 hashtables definitions kernel.private classes classes.private
 classes.algebra quotations arrays vocabs effects combinators
-sets ;
+sets classes.union ;
 FROM: namespaces => set ;
 IN: generic
 
@@ -91,8 +91,8 @@ ERROR: no-next-method method ;
 
 TUPLE: check-method class generic ;
 
-: check-method ( class generic -- class generic )
-    2dup [ class? ] [ generic? ] bi* and [
+: check-method ( classoid generic -- class generic )
+    2dup [ classoid? ] [ generic? ] bi* and [
         \ check-method boa throw
     ] unless ; inline
 
@@ -107,7 +107,12 @@ GENERIC: update-generic ( class generic -- )
 : with-methods ( class generic quot -- )
     [ "methods" word-prop ] prepose [ update-generic ] 2bi ; inline
 
-: method-word-name ( class generic -- string )
+GENERIC# method-word-name 1 ( class generic -- string )
+
+M: maybe method-word-name
+    [ class>> name>> ] [ name>> ] bi* "=>" glue ;
+
+M: class method-word-name ( class generic -- string )
     [ name>> ] bi@ "=>" glue ;
 
 M: method parent-word

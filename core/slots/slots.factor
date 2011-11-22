@@ -3,7 +3,8 @@
 USING: arrays byte-arrays kernel kernel.private math namespaces
 make sequences strings effects generic generic.standard
 classes classes.algebra slots.private combinators accessors
-words sequences.private assocs alien quotations hashtables ;
+words sequences.private assocs alien quotations hashtables
+classes.union ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial read-only ;
@@ -64,21 +65,23 @@ M: object reader-quot
 
 ERROR: bad-slot-value value class ;
 
-: (instance-check-quot) ( class -- quot )
-    [
-        \ dup ,
-        [ "predicate" word-prop % ]
-        [ [ bad-slot-value ] curry , ] bi
-        \ unless ,
-    ] [ ] make ;
+GENERIC: instance-check-quot ( obj -- quot )
 
-: instance-check-quot ( class -- quot )
+M: class instance-check-quot ( class -- quot )
     {
         { [ dup object bootstrap-word eq? ] [ drop [ ] ] }
         { [ dup "coercer" word-prop ] [ "coercer" word-prop ] }
         { [ dup integer bootstrap-word eq? ] [ drop [ >integer ] ] }
-        [ (instance-check-quot) ]
+        [ call-next-method ]
     } cond ;
+
+M: object instance-check-quot
+    [
+        \ dup ,
+        [ predicate-def % ]
+        [ [ bad-slot-value ] curry , ] bi
+        \ unless ,
+    ] [ ] make ;
 
 GENERIC# writer-quot 1 ( class slot-spec -- quot )
 
@@ -154,6 +157,7 @@ M: class initial-value* drop f f ;
 
 : initial-value ( class -- object ? )
     {
+        { [ dup maybe? ] [ f t ] }
         { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop t ] }
         { [ \ f bootstrap-word over class<= ] [ f t ] }
         { [ \ array-capacity bootstrap-word over class<= ] [ 0 t ] }
@@ -180,7 +184,7 @@ M: string make-slot
 
 : peel-off-class ( slot-spec array -- slot-spec array )
     dup empty? [
-        dup first class? [
+        dup first classoid? [
             [ first init-slot-class ]
             [ rest ]
             bi

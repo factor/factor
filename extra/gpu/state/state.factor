@@ -8,22 +8,19 @@ SPECIALIZED-ARRAY: c:int
 SPECIALIZED-ARRAY: c:float
 IN: gpu.state
 
-UNION: ?rect rect POSTPONE: f ;
-UNION: ?float float POSTPONE: f ;
-
 TUPLE: viewport-state
     { rect rect read-only } ;
 C: <viewport-state> viewport-state
 
 TUPLE: scissor-state
-    { rect ?rect read-only } ;
+    { rect maybe: rect read-only } ;
 C: <scissor-state> scissor-state
 
 TUPLE: multisample-state
     { multisample? boolean read-only }
     { sample-alpha-to-coverage? boolean read-only }
     { sample-alpha-to-one? boolean read-only }
-    { sample-coverage ?float read-only }
+    { sample-coverage maybe: float read-only }
     { invert-sample-coverage? boolean read-only } ;
 C: <multisample-state> multisample-state
 
@@ -37,8 +34,6 @@ VARIANT: stencil-op
     op-inc-sat op-dec-sat
     op-inc-wrap op-dec-wrap ;
 
-UNION: ?comparison comparison POSTPONE: f ;
-
 TUPLE: stencil-mode
     { value integer initial: 0 read-only }
     { mask integer initial: HEX: FFFFFFFF read-only }
@@ -48,11 +43,9 @@ TUPLE: stencil-mode
     { depth-pass-op stencil-op initial: op-keep read-only } ;
 C: <stencil-mode> stencil-mode
 
-UNION: ?stencil-mode stencil-mode POSTPONE: f ;
-
 TUPLE: stencil-state
-    { front-mode ?stencil-mode initial: f read-only }
-    { back-mode ?stencil-mode initial: f read-only } ;
+    { front-mode maybe: stencil-mode initial: f read-only }
+    { back-mode maybe: stencil-mode initial: f read-only } ;
 C: <stencil-state> stencil-state
 
 TUPLE: depth-range-state
@@ -61,7 +54,7 @@ TUPLE: depth-range-state
 C: <depth-range-state> depth-range-state
 
 TUPLE: depth-state
-    { comparison ?comparison initial: f read-only } ;
+    { comparison maybe: comparison initial: f read-only } ;
 C: <depth-state> depth-state
 
 VARIANT: blend-equation
@@ -86,12 +79,10 @@ TUPLE: blend-mode
     { dest-function blend-function initial: func-one-minus-source-alpha read-only } ;
 C: <blend-mode> blend-mode
 
-UNION: ?blend-mode blend-mode POSTPONE: f ;
-
 TUPLE: blend-state
     { constant-color sequence initial: f read-only }
-    { rgb-mode ?blend-mode read-only }
-    { alpha-mode ?blend-mode read-only } ;
+    { rgb-mode maybe: blend-mode read-only }
+    { alpha-mode maybe: blend-mode read-only } ;
 C: <blend-state> blend-state
 
 TUPLE: mask-state
@@ -108,11 +99,9 @@ VARIANT: triangle-cull
 VARIANT: triangle-mode
     triangle-points triangle-lines triangle-fill ;
 
-UNION: ?triangle-cull triangle-cull POSTPONE: f ;
-    
 TUPLE: triangle-cull-state
     { front-face triangle-face initial: face-ccw read-only }
-    { cull ?triangle-cull initial: f read-only } ;
+    { cull maybe: triangle-cull initial: f read-only } ;
 C: <triangle-cull-state> triangle-cull-state
 
 TUPLE: triangle-state
@@ -125,7 +114,7 @@ VARIANT: point-sprite-origin
     origin-upper-left origin-lower-left ;
 
 TUPLE: point-state
-    { size ?float initial: 1.0 read-only }
+    { size maybe: float initial: 1.0 read-only }
     { sprite-origin point-sprite-origin initial: origin-upper-left read-only }
     { fade-threshold float initial: 1.0 read-only } ;
 C: <point-state> point-state

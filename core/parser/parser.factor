@@ -5,7 +5,7 @@ sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
 io.files vocabs io.encodings.utf8 source-files classes
 hashtables compiler.units accessors sets lexer vocabs.parser
-slots parser.notes ;
+slots parser.notes classes.algebra ;
 IN: parser
 
 : location ( -- loc )
@@ -99,6 +99,12 @@ ERROR: staging-violation word ;
     dup parsing-word? [
         V{ } clone swap execute-parsing first
     ] when ;
+
+ERROR: classoid-expected word ;
+
+: scan-class ( -- class )
+    scan-object \ f or
+    dup classoid? [ classoid-expected ] unless ;
 
 : parse-step ( accum end -- accum ? )
     (scan-datum) {

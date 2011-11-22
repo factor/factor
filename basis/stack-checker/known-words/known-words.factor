@@ -14,7 +14,7 @@ compiler.units system.private combinators tools.memory.private
 combinators.short-circuit locals locals.backend locals.types
 combinators.private stack-checker.values generic.single
 generic.single.private alien.libraries tools.dispatch.private
-macros tools.profiler.sampling.private
+macros tools.profiler.sampling.private classes.algebra
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -79,7 +79,7 @@ IN: stack-checker.known-words
 } [ "shuffle" set-word-prop ] assoc-each
 
 : check-declaration ( declaration -- declaration )
-    dup { [ array? ] [ [ class? ] all? ] } 1&&
+    dup { [ array? ] [ [ classoid? ] all? ] } 1&&
     [ bad-declaration-error ] unless ;
 
 : infer-declare ( -- )

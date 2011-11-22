@@ -4,7 +4,7 @@ sequences strings tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
 classes.algebra classes.union.private source-files
 compiler.units kernel.private sorting vocabs io.streams.string
-eval see math.private ;
+eval see math.private slots ;
 IN: classes.union.tests
 
 ! DEFER: bah
@@ -107,3 +107,44 @@ M: a-union test-generic ;
 [ ] [ "IN: classes.union.tests USE: vectors UNION: fast-union-1 vector ;" eval( -- ) ] unit-test
 
 [ f ] [ "fast-union-2?" "classes.union.tests" lookup-word def>> \ fixnum-bitand swap member? ] unit-test
+
+! Test maybe
+
+[ t ] [ 3 maybe: integer instance? ] unit-test
+[ t ] [ f maybe: integer instance? ] unit-test
+[ f ] [ 3.0 maybe: integer instance? ] unit-test
+
+TUPLE: maybe-integer-container { something maybe: integer } ;
+
+[ f ] [ maybe-integer-container new something>> ] unit-test
+[ 3 ] [ maybe-integer-container new 3 >>something something>> ] unit-test
+[ maybe-integer-container new 3.0 >>something ] [ bad-slot-value? ] must-fail-with
+
+TUPLE: self-pointer { next maybe: self-pointer } ;
+
+[ T{ self-pointer { next T{ self-pointer } } } ]
+[ self-pointer new self-pointer new >>next ] unit-test
+
+[ t ] [ f maybe: f instance? ] unit-test
+
+PREDICATE: natural < maybe: integer
+    0 > ;
+
+[ f ] [ -1 natural? ] unit-test
+[ f ] [ 0 natural? ] unit-test
+[ t ] [ 1 natural? ] unit-test
+
+[ "USE: math maybe: maybe: integer" eval( -- obj ) ] [ error>> bad-slot-value? ] must-fail-with
+
+INTERSECTION: only-f maybe: integer POSTPONE: f ;
+
+[ t ] [ f only-f instance? ] unit-test
+[ f ] [ t only-f instance? ] unit-test
+[ f ] [ 30 only-f instance? ] unit-test
+
+UNION: ?integer-float maybe: integer maybe: float ;
+
+[ t ] [ 30 ?integer-float instance? ] unit-test
+[ t ] [ 30.0 ?integer-float instance? ] unit-test
+[ t ] [ f ?integer-float instance? ] unit-test
+[ f ] [ t ?integer-float instance? ] unit-test

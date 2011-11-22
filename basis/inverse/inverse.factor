@@ -244,7 +244,7 @@ DEFER: __
 
 ! Constructor inverse
 : deconstruct-pred ( class -- quot )
-    "predicate" word-prop [ dupd call assure ] curry ;
+    predicate-def [ dupd call assure ] curry ;
 
 : slot-readers ( class -- quot )
     all-slots [ name>> reader-word 1quotation ] map [ cleave ] curry ;
