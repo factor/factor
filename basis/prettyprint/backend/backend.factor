@@ -23,12 +23,22 @@ M: effect pprint* effect>string text ;
     ?effect-height 0 < [ end-group ] when ;
 
 ! Atoms
-: word-name* ( word -- str )
-    name>> "( no name )" or ;
+GENERIC: word-name* ( obj -- str )
+
+M: maybe word-name*
+    class>> word-name* "maybe: " prepend ;
+
+M: word word-name* ( word -- str )
+    [ name>> "( no name )" or ] [ record-vocab ] bi ;
 
 : pprint-word ( word -- )
-    [ record-vocab ]
-    [ [ word-name* ] [ word-style ] bi styled-text ] bi ;
+    [ word-name* ] [ word-style ] bi styled-text ;
+
+GENERIC: pprint-class ( obj -- )
+
+M: maybe pprint-class pprint* ;
+
+M: class pprint-class \ f or pprint-word ;
 
 : pprint-prefix ( word quot -- )
     <block swap pprint-word call block> ; inline
@@ -40,12 +50,10 @@ M: word pprint*
     [ pprint-word ] [ ?start-group ] [ ?end-group ] tri ;
 
 M: method pprint*
-    [
-        [
-            [ "M\\ " % "method-class" word-prop word-name* % ]
-            [ " " % "method-generic" word-prop word-name* % ] bi
-        ] "" make
-    ] [ word-style ] bi styled-text ;
+    <block
+    [ \ M\ pprint-word "method-class" word-prop pprint-class ]
+    [ "method-generic" word-prop pprint-word ] bi
+    block> ;
 
 M: real pprint*
     number-base get {

@@ -197,7 +197,7 @@ HELP: scan-number
 { $errors "Throws an error if the token is not a number or end of file is reached." }
 $parsing-note ;
 
-HELP: parse-step
+HELP: parse-until-step
 { $values { "accum" vector } { "end" word } { "?" "a boolean" } }
 { $description "Parses a token. If the token is a number or an ordinary word, it is added to the accumulator. If it is a parsing word, calls the parsing word with the accumulator on the stack. Outputs " { $link f } " if " { $snippet "end" } " is encountered, " { $link t } " otherwise." }
 $parsing-note ;

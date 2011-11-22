@@ -78,7 +78,7 @@ TUPLE: depends-on-class-predicate class1 class2 result ;
 
 M: depends-on-class-predicate satisfied?
     {
-        [ [ class1>> classoid? ] [ class2>> classoid? ] bi and ]
+        [ [ class1>> valid-classoid? ] [ class2>> valid-classoid? ] bi and ]
         [ [ [ class1>> ] [ class2>> ] bi evaluate-class-predicate ] [ result>> ] bi eq? ]
     } 1&& ;
 
@@ -89,7 +89,7 @@ TUPLE: depends-on-instance-predicate object class result ;
 
 M: depends-on-instance-predicate satisfied?
     {
-        [ class>> classoid? ]
+        [ class>> valid-classoid? ]
         [ [ [ object>> ] [ class>> ] bi instance? ] [ result>> ] bi eq? ]
     } 1&& ;
 
@@ -101,7 +101,7 @@ TUPLE: depends-on-next-method class generic next-method ;
 
 M: depends-on-next-method satisfied?
     {
-        [ class>> classoid? ]
+        [ class>> valid-classoid? ]
         [ [ [ class>> ] [ generic>> ] bi next-method ] [ next-method>> ] bi eq? ]
     } 1&& ;
 

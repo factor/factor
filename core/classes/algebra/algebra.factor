@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel classes classes.private combinators accessors
-sequences arrays vectors assocs namespaces words sorting layouts
-math hashtables kernel.private sets math.order ;
+USING: accessors arrays assocs classes classes.private
+combinators kernel math math.order namespaces sequences sorting
+vectors words ;
 FROM: classes => members ;
 RENAME: members sets => set-members
 IN: classes.algebra
@@ -55,9 +55,16 @@ PRIVATE>
 GENERIC: classoid? ( obj -- ? )
 
 M: word classoid? class? ;
-M: anonymous-union classoid? members>> [ classoid? ] all? ;
-M: anonymous-intersection classoid? participants>> [ classoid? ] all? ;
-M: anonymous-complement classoid? class>> classoid? ;
+M: anonymous-union classoid? drop t ;
+M: anonymous-intersection classoid? drop t ;
+M: anonymous-complement classoid? drop t ;
+
+GENERIC: valid-classoid? ( obj -- ? )
+
+M: word valid-classoid? class? ;
+M: anonymous-union valid-classoid? members>> [ valid-classoid? ] all? ;
+M: anonymous-intersection valid-classoid? participants>> [ valid-classoid? ] all? ;
+M: anonymous-complement valid-classoid? class>> valid-classoid? ;
 
 : class<= ( first second -- ? )
     class<=-cache get [ (class<=) ] 2cache ;
@@ -255,7 +262,7 @@ ERROR: topological-sort-failed ;
     [ topological-sort-failed ] unless* ;
 
 : sort-classes ( seq -- newseq )
-    [ name>> ] sort-with >vector
+    [ class-name ] sort-with >vector
     [ dup empty? not ]
     [ dup largest-class [ swap remove-nth! ] dip ]
     produce nip ;

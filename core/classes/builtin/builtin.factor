@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.private classes.algebra
-classes.algebra.private words kernel kernel.private namespaces
-sequences math math.private combinators assocs quotations ;
+USING: classes classes.algebra.private classes.private kernel
+kernel.private namespaces sequences words ;
 IN: classes.builtin
 
 SYMBOL: builtins

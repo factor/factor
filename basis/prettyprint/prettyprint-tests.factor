@@ -391,3 +391,18 @@ TUPLE: final-tuple ; final
 TUPLE: bob a b ;
 [ "maybe: bob\n" ] [ [  maybe: bob . ] with-string-writer ] unit-test
 [ "maybe: word\n" ] [ [  maybe: word . ] with-string-writer ] unit-test
+
+
+TUPLE: har a ;
+GENERIC: harhar ( obj -- obj )
+M: maybe: har harhar ;
+M: integer harhar M\ integer harhar drop ;
+[
+"""USING: prettyprint.tests ;
+M: maybe: har harhar ;
+
+USING: kernel math prettyprint.tests ;
+M: integer harhar M\\ integer harhar drop ;\n"""
+] [
+    [ \ harhar see-methods ] with-string-writer
+] unit-test
