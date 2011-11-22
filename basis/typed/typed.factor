@@ -4,7 +4,7 @@ combinators.short-circuit definitions effects fry hints
 math kernel kernel.private namespaces parser quotations
 sequences slots words locals effects.parser
 locals.parser macros stack-checker.dependencies
-classes.union ;
+classes.maybe ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: typed
 

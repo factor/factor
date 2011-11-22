@@ -4,7 +4,7 @@ USING: arrays byte-arrays kernel kernel.private math namespaces
 make sequences strings effects generic generic.standard
 classes classes.algebra slots.private combinators accessors
 words sequences.private assocs alien quotations hashtables
-classes.union ;
+classes.maybe ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial read-only ;
