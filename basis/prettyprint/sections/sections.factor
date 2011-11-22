@@ -3,7 +3,8 @@
 USING: arrays generic hashtables io kernel math assocs
 namespaces make sequences strings io.styles vectors words
 prettyprint.config splitting classes continuations
-accessors sets vocabs.parser combinators vocabs ;
+accessors sets vocabs.parser combinators vocabs
+classes.maybe ;
 FROM: namespaces => set ;
 IN: prettyprint.sections
 
@@ -24,8 +25,16 @@ TUPLE: pprinter last-newline line-count indent ;
     dup pprinter-in get dup [ vocab-name ] when =
     [ drop ] [ pprinter-use get conjoin ] if ;
 
+GENERIC: vocabulary-name ( obj -- string )
+
+M: word vocabulary-name
+    vocabulary>> ;
+
+M: maybe vocabulary-name
+    class>> vocabulary>> ;
+
 : record-vocab ( word -- )
-    vocabulary>> {
+    vocabulary-name {
         { f [ ] }
         { "syntax" [ ] }
         [ (record-vocab) ]

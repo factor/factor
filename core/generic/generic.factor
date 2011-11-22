@@ -3,7 +3,7 @@
 USING: accessors words kernel sequences namespaces make assocs
 hashtables definitions kernel.private classes classes.private
 classes.algebra quotations arrays vocabs effects combinators
-sets ;
+sets classes.maybe ;
 FROM: namespaces => set ;
 IN: generic
 
@@ -112,6 +112,9 @@ GENERIC# method-word-name 1 ( class generic -- string )
 M: class method-word-name ( class generic -- string )
     [ name>> ] bi@ "=>" glue ;
 
+M: maybe method-word-name
+    [ class>> name>> ] [ name>> ] bi* "=>" glue ;
+
 M: method parent-word
     "method-generic" word-prop ;
 
@@ -129,8 +132,14 @@ M: method crossref?
     [ method-word-name f <word> ] [ method-word-props ] 2bi
     >>props ;
 
+GENERIC: implementor-class ( obj -- class )
+
+M: maybe implementor-class class>> ;
+
+M: class implementor-class ;
+
 : with-implementors ( class generic quot -- )
-    [ swap implementors-map get at ] dip call ; inline
+    [ swap implementor-class implementors-map get at ] dip call ; inline
 
 : reveal-method ( method class generic -- )
     [ [ conjoin ] with-implementors ]

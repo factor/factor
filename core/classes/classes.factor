@@ -40,6 +40,10 @@ SYMBOL: update-map
 
 SYMBOL: implementors-map
 
+GENERIC: class-name ( class -- string )
+
+M: class class-name name>> ;
+
 GENERIC: rank-class ( class -- n )
 
 GENERIC: reset-class ( class -- )

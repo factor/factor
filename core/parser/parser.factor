@@ -100,13 +100,10 @@ ERROR: staging-violation word ;
         V{ } clone swap execute-parsing first
     ] when ;
 
-ERROR: classoid-expected word ;
-
 : scan-class ( -- class )
-    scan-object \ f or
-    dup classoid? [ classoid-expected ] unless ;
+    scan-object \ f or ;
 
-: parse-step ( accum end -- accum ? )
+: parse-until-step ( accum end -- accum ? )
     (scan-datum) {
         { [ 2dup eq? ] [ 2drop f ] }
         { [ dup not ] [ drop unexpected-eof t ] }
@@ -116,7 +113,7 @@ ERROR: classoid-expected word ;
     } cond ;
 
 : (parse-until) ( accum end -- accum )
-    [ parse-step ] keep swap [ (parse-until) ] [ drop ] if ;
+    [ parse-until-step ] keep swap [ (parse-until) ] [ drop ] if ;
 
 : parse-until ( end -- vec )
     100 <vector> swap (parse-until) ;
