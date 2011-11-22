@@ -5,17 +5,17 @@ arrays assocs classes.struct continuations combinators compiler
 core-graphics.types stack-checker kernel math namespaces make
 quotations sequences strings words cocoa.runtime cocoa.types io
 macros memoize io.encodings.utf8 effects layouts libc lexer init
-core-foundation fry generalizations specialized-arrays ;
+core-foundation fry generalizations specialized-arrays locals ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 
 SPECIALIZED-ARRAY: void*
 
-: make-sender ( method function -- quot )
+: make-sender ( signature function -- quot )
     [ over first , f , , second , \ alien-invoke , ] [ ] make ;
 
-: sender-stub ( method function -- word )
-    [ "( sender-stub )" f <word> dup ] 2dip
+: sender-stub ( name signature function -- word )
+    [ "( sender-stub:" ")" surround f <word> dup ] 2dip
     over first large-struct? [ "_stret" append ] when
     make-sender dup infer define-declared ;
 
@@ -25,13 +25,13 @@ SYMBOL: super-message-senders
 message-senders [ H{ } clone ] initialize
 super-message-senders [ H{ } clone ] initialize
 
-: cache-stub ( method assoc function -- )
-    '[ _ sender-stub ] cache drop ;
+:: cache-stub ( name signature function assoc -- )
+    signature assoc [ [ name ] dip function sender-stub ] cache drop ;
 
-: cache-stubs ( method -- )
-    [ super-message-senders get "objc_msgSendSuper" cache-stub ]
-    [ message-senders get "objc_msgSend" cache-stub ]
-    bi ;
+: cache-stubs ( name signature -- )
+    [ "objc_msgSendSuper" super-message-senders get cache-stub ]
+    [ "objc_msgSend" message-senders get cache-stub ]
+    2bi ;
 
 : <super> ( receiver -- super )
     [ ] [ object_getClass class_getSuperclass ] bi
@@ -209,11 +209,13 @@ ERROR: no-objc-type name ;
     [ utf8 alien>string parse-objc-type ] keep
     (free) ;
 
+: method-name ( method -- name )
+    method_getName sel_getName ;
+
 : register-objc-method ( method -- )
-    dup method-return-type over method-arg-types 2array
-    dup cache-stubs
-    swap method_getName sel_getName
-    objc-methods get set-at ;
+    [ method-name ]
+    [ [ method-return-type ] [ method-arg-types ] bi 2array ] bi
+    [ cache-stubs ] [ swap objc-methods get set-at ] 2bi ;
 
 : each-method-in-class ( class quot -- )
     [ { uint } [ class_copyMethodList ] with-out-parameters ] dip
