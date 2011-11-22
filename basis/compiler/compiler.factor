@@ -151,7 +151,7 @@ M: optimizing-compiler update-call-sites ( class generic -- words )
     #! Words containing call sites with inferred type 'class'
     #! which inlined a method on 'generic'
     generic-call-sites-of swap '[
-        nip _ 2dup [ classoid? ] both?
+        nip _ 2dup [ valid-classoid? ] both?
         [ classes-intersect? ] [ 2drop f ] if
     ] assoc-filter keys ;
 

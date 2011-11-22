@@ -81,7 +81,7 @@ M: hook-generic synopsis*
 
 M: method synopsis*
     [ definer. ]
-    [ "method-class" word-prop pprint-word ]
+    [ "method-class" word-prop pprint-class ]
     [ "method-generic" word-prop pprint-word ] tri ;
 
 M: mixin-instance synopsis*
