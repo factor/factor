@@ -37,7 +37,7 @@ M: single-combination next-method-quot* ( class generic combination -- quot )
     [
         2dup next-method dup [
             [
-                pick "predicate" word-prop %
+                pick predicate-def %
                 1quotation ,
                 [ inconsistent-next-method ] 2curry ,
                 \ if ,
@@ -217,7 +217,7 @@ ERROR: unreachable ;
     } cond ;
 
 : class-predicates ( assoc -- assoc )
-    [ [ "predicate" word-prop [ dup ] prepend ] dip ] assoc-map ;
+    [ [ predicate-def [ dup ] prepend ] dip ] assoc-map ;
 
 : <predicate-engine-word> ( -- word )
     generic-word get name>> "/predicate-engine" append f <word>

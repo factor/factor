@@ -109,7 +109,7 @@ SYMBOL: total
     } case ;
 
 : (multi-predicate) ( class picker -- quot )
-    swap "predicate" word-prop append ;
+    swap predicate-quot append ;
 
 : multi-predicate ( classes -- quot )
     dup length iota <reversed>

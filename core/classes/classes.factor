@@ -66,8 +66,20 @@ PREDICATE: predicate < word "predicating" word-prop >boolean ;
     [ name>> "?" append ] [ vocabulary>> ] bi create
     dup predicate? [ dup reset-generic ] unless ;
 
+GENERIC: class-of ( object -- class )
+
+GENERIC: instance? ( object class -- ? ) flushable
+
+GENERIC: predicate-def ( obj -- quot )
+
+M: word predicate-def
+    "predicate" word-prop ;
+
+M: object predicate-def
+    [ instance? ] curry ;
+
 : predicate-word ( word -- predicate )
-    "predicate" word-prop first ;
+    predicate-def first ;
 
 M: predicate flushable? drop t ;
 
@@ -196,7 +208,7 @@ GENERIC: update-methods ( class seq -- )
     make-class-props [ (define-class) ] [ drop changed-definition ] 2bi ;
 
 : forget-predicate ( class -- )
-    dup "predicate" word-prop
+    dup predicate-def
     dup length 1 = [
         first
         [ nip ] [ "predicating" word-prop = ] 2bi
@@ -223,7 +235,3 @@ M: class metaclass-changed
 
 M: class forget* ( class -- )
     [ call-next-method ] [ forget-class ] bi ;
-
-GENERIC: class-of ( object -- class )
-
-GENERIC: instance? ( object class -- ? ) flushable

@@ -85,6 +85,7 @@ IN: bootstrap.syntax
         "<<"
         ">>"
         "call-next-method"
+        "maybe:"
         "initial:"
         "read-only"
         "call("

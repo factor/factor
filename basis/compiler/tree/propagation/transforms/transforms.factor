@@ -178,7 +178,7 @@ ERROR: bad-partial-eval quot word ;
 
 \ instance? [
     dup class?
-    [ "predicate" word-prop ] [ drop f ] if
+    [ predicate-def ] [ drop f ] if
 ] 1 define-partial-eval
 
 ! Shuffling
