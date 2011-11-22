@@ -9,7 +9,7 @@ IN: compiler.cfg.finalization
 
 : finalize-cfg ( cfg -- cfg' )
     select-representations
-    ! schedule-instructions
+    schedule-instructions
     insert-gc-checks
     eliminate-write-barriers
     dup compute-uninitialized-sets
