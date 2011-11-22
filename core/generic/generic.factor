@@ -3,7 +3,7 @@
 USING: accessors words kernel sequences namespaces make assocs
 hashtables definitions kernel.private classes classes.private
 classes.algebra quotations arrays vocabs effects combinators
-sets classes.union ;
+sets ;
 FROM: namespaces => set ;
 IN: generic
 
@@ -108,9 +108,6 @@ GENERIC: update-generic ( class generic -- )
     [ "methods" word-prop ] prepose [ update-generic ] 2bi ; inline
 
 GENERIC# method-word-name 1 ( class generic -- string )
-
-M: maybe method-word-name
-    [ class>> name>> ] [ name>> ] bi* "=>" glue ;
 
 M: class method-word-name ( class generic -- string )
     [ name>> ] bi@ "=>" glue ;

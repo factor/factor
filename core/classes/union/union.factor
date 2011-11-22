@@ -1,32 +1,13 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words sequences kernel assocs combinators classes
-classes.private classes.algebra classes.algebra.private
-classes.builtin kernel.private math.private namespaces arrays
-math quotations definitions accessors parser effects ;
+USING: accessors assocs classes classes.algebra
+classes.algebra.private classes.builtin
+classes.private combinators definitions kernel kernel.private
+math math.private quotations sequences words vocabs ;
 IN: classes.union
 
 PREDICATE: union-class < class
     "metaclass" word-prop union-class eq? ;
-
-TUPLE: maybe { class word initial: object read-only } ;
-
-C: <maybe> maybe
-
-M: maybe instance?
-    over [ class>> instance? ] [ 2drop t ] if ;
-
-M: maybe normalize-class
-    class>> \ f class-or ;
-
-M: maybe classoid? drop t ;
-
-M: maybe rank-class drop 6 ;
-
-M: maybe (flatten-class)
-    class>> (flatten-class) ;
-
-M: maybe effect>type ;
 
 <PRIVATE
 
@@ -36,9 +17,6 @@ M: builtin-class union-of-builtins? drop t ;
 
 M: union-class union-of-builtins?
     members [ union-of-builtins? ] all? ;
-
-M: maybe union-of-builtins?
-    class>> union-of-builtins? ;
 
 M: class union-of-builtins?
     drop f ;
@@ -96,4 +74,3 @@ M: union-class normalize-class
 
 M: union-class (flatten-class)
     members <anonymous-union> (flatten-class) ;
-
