@@ -32,3 +32,6 @@ M: maybe union-of-builtins?
 
 M: maybe class-name
     class>> name>> ;
+
+M: maybe predicate-def
+    class>> predicate-def [ [ t ] if* ] curry ;
