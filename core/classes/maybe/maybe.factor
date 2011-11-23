@@ -5,7 +5,7 @@ classes.algebra.private classes.private classes.union.private
 effects kernel words ;
 IN: classes.maybe
 
-TUPLE: maybe { class word initial: object read-only } ;
+TUPLE: maybe { class classoid initial: object read-only } ;
 
 C: <maybe> maybe
 
