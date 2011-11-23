@@ -302,7 +302,7 @@ generic-comparison-ops [
 ] "outputs" set-word-prop
 
 \ instance? [
-    [ value-info ] dip over literal>> class? [
+    [ value-info ] dip over literal>> classoid? [
         [ literal>> ] dip predicate-constraints
     ] [ 3drop f ] if
 ] "constraints" set-word-prop
@@ -311,10 +311,10 @@ generic-comparison-ops [
     ! We need to force the caller word to recompile when the class
     ! is redefined, since now we're making assumptions but the
     ! class definition itself.
-    dup literal>> class?
+    dup literal>> classoid?
     [
         literal>>
-        [ depends-on-conditionally ]
+        [ depends-on-class ]
         [ predicate-output-infos ]
         bi
     ] [ 2drop object-info ] if
