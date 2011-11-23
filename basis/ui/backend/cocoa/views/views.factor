@@ -152,7 +152,7 @@ CLASS: FactorView < NSOpenGLView NSTextInput
     METHOD: void drawRect: NSRect rect [ self window [ draw-world ] when* ]
 
     ! Events
-    METHOD: char acceptsFirstMouse: id event [ 1 ]
+    METHOD: char acceptsFirstMouse: id event [ 0 ]
 
     METHOD: void mouseEntered: id event [ self event send-mouse-moved ]
 
