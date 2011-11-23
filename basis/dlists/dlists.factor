@@ -6,13 +6,7 @@ deques fry hashtables kernel parser search-deques sequences
 summary vocabs.loader ;
 IN: dlists
 
-MIXIN: ?dlist-node
-
-INSTANCE: f ?dlist-node
-
-TUPLE: dlist-link { prev ?dlist-node } { next ?dlist-node } ;
-
-INSTANCE: dlist-link ?dlist-node
+TUPLE: dlist-link { prev maybe: dlist-link } { next maybe: dlist-link } ;
 
 TUPLE: dlist-node < dlist-link obj ;
 
@@ -28,8 +22,8 @@ M: dlist-link obj>> ;
     \ dlist-node new-dlist-link ; inline
 
 TUPLE: dlist
-{ front ?dlist-node }
-{ back ?dlist-node } ;
+{ front maybe: dlist-link }
+{ back maybe: dlist-link } ;
 
 : <dlist> ( -- list )
     dlist new ; inline
