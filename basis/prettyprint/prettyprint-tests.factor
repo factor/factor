@@ -449,3 +449,9 @@ TUPLE: fo { a intersection{ fixnum integer } initial: 0 } ;
 ] [
     [ maybe: union{ float integer } . ] with-string-writer
 ] unit-test
+
+[
+"""maybe: maybe: integer\n"""
+] [
+    [ maybe: maybe: integer . ] with-string-writer
+] unit-test

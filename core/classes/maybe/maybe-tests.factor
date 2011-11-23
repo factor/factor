@@ -28,7 +28,9 @@ PREDICATE: natural < maybe: integer
 [ f ] [ 0 natural? ] unit-test
 [ t ] [ 1 natural? ] unit-test
 
-[ "USE: math maybe: maybe: integer" eval( -- obj ) ] [ error>> bad-slot-value? ] must-fail-with
+[ t ] [ f maybe: maybe: integer instance? ] unit-test
+[ t ] [ 3 maybe: maybe: integer instance? ] unit-test
+[ f ] [ 3.03 maybe: maybe: integer instance? ] unit-test
 
 INTERSECTION: only-f maybe: integer POSTPONE: f ;
 
