@@ -29,6 +29,7 @@ inline static void check_call_site(cell return_address)
 {
 	unsigned char opcode = call_site_opcode(return_address);
 	FACTOR_ASSERT(opcode == call_opcode || opcode == jmp_opcode);
+	(void)opcode; // suppress warning when compiling without assertions
 }
 
 inline static void *get_call_target(cell return_address)
