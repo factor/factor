@@ -11,6 +11,8 @@ IN: classes.algebra
 
 TUPLE: anonymous-union { members read-only } ;
 
+INSTANCE: anonymous-union classoid
+
 : <anonymous-union> ( members -- class )
     [ null eq? not ] filter set-members
     dup length 1 = [ first ] [ anonymous-union boa ] if ;
@@ -19,6 +21,8 @@ M: anonymous-union rank-class drop 6 ;
 
 TUPLE: anonymous-intersection { participants read-only } ;
 
+INSTANCE: anonymous-intersection classoid
+
 : <anonymous-intersection> ( participants -- class )
     set-members dup length 1 =
     [ first ] [ anonymous-intersection boa ] if ;
@@ -26,6 +30,8 @@ TUPLE: anonymous-intersection { participants read-only } ;
 M: anonymous-intersection rank-class drop 4 ;
 
 TUPLE: anonymous-complement { class read-only } ;
+
+INSTANCE: anonymous-complement classoid
 
 C: <anonymous-complement> anonymous-complement
 
@@ -52,19 +58,16 @@ M: object normalize-class ;
 
 PRIVATE>
 
-GENERIC: classoid? ( obj -- ? )
-
-M: word classoid? class? ;
-M: anonymous-union classoid? drop t ;
-M: anonymous-intersection classoid? drop t ;
-M: anonymous-complement classoid? drop t ;
-
 GENERIC: valid-classoid? ( obj -- ? )
 
 M: word valid-classoid? class? ;
 M: anonymous-union valid-classoid? members>> [ valid-classoid? ] all? ;
 M: anonymous-intersection valid-classoid? participants>> [ valid-classoid? ] all? ;
 M: anonymous-complement valid-classoid? class>> valid-classoid? ;
+M: object valid-classoid? drop f ;
+
+: only-classoid? ( obj -- ? )
+    [ classoid? ] [ class? not ] bi and ;
 
 : class<= ( first second -- ? )
     class<=-cache get [ (class<=) ] 2cache ;

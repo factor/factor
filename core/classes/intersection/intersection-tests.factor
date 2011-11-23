@@ -1,4 +1,5 @@
-USING: kernel tools.test generic generic.standard ;
+USING: kernel tools.test generic generic.standard classes math
+accessors classes.intersection slots math.order ;
 IN: classes.intersection.tests
 
 TUPLE: a ;
@@ -36,3 +37,23 @@ M: t4 g drop t4 ;
 
 [ t4 ] [ T{ t4 } g ] unit-test
 [ i ] [ T{ t5 } g ] unit-test
+
+PREDICATE: odd-integer < integer odd? ;
+
+! [ TUPLE: omg { a intersection{ fixnum odd-integer } initial: 2 } ;" eval( -- ) ]
+! [ bad-initial-value? ] must-fail-with
+
+TUPLE: omg { a intersection{ fixnum odd-integer } initial: 1 } ;
+
+[ 1 ] [ omg new a>> ] unit-test
+[ 3 ] [ omg new 3 >>a a>> ] unit-test
+[ omg new 1.2 >>a a>> ] [ bad-slot-value? ] must-fail-with
+
+PREDICATE: odd/float-between-10-20 < union{ odd-integer float }
+    10 20 between? ;
+
+[ t ] [ 17 odd/float-between-10-20? ] unit-test
+[ t ] [ 17.4 odd/float-between-10-20? ] unit-test
+[ f ] [ 18 odd/float-between-10-20? ] unit-test
+[ f ] [ 5 odd/float-between-10-20? ] unit-test
+[ f ] [ 5.75 odd/float-between-10-20? ] unit-test

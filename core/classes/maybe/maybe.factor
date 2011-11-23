@@ -9,6 +9,8 @@ TUPLE: maybe { class word initial: object read-only } ;
 
 C: <maybe> maybe
 
+INSTANCE: maybe classoid
+
 M: maybe instance?
     over [ class>> instance? ] [ 2drop t ] if ;
 
@@ -18,16 +20,12 @@ M: maybe instance?
 M: maybe normalize-class
     maybe-class-or ;
 
-M: maybe classoid? drop t ;
-
 M: maybe valid-classoid? class>> valid-classoid? ;
 
 M: maybe rank-class drop 6 ;
 
 M: maybe (flatten-class)
     maybe-class-or (flatten-class) ;
-
-M: maybe effect>type ;
 
 M: maybe union-of-builtins?
     class>> union-of-builtins? ;

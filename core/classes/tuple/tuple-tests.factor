@@ -829,8 +829,7 @@ DEFER: initial-slot
 [ t ] [ initial-slot new x>> initial-class? ] unit-test
 
 [ "IN: classes.tuple.tests TUPLE: initial-slot { x initial-class initial: f } ;" eval( -- ) ]
-[ error>> T{ bad-initial-value f "x" } = ] must-fail-with
+[ error>> T{ bad-initial-value f "x" f initial-class } = ] must-fail-with
 
 [ "IN: classes.tuple.tests TUPLE: initial-slot { x initial-class initial: 3 } ;" eval( -- ) ]
-[ error>> T{ bad-initial-value f "x" } = ] must-fail-with
-
+[ error>> T{ bad-initial-value f "x" 3 initial-class } = ] must-fail-with

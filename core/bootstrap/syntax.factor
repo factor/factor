@@ -86,6 +86,8 @@ IN: bootstrap.syntax
         ">>"
         "call-next-method"
         "maybe:"
+        "union{"
+        "intersection{"
         "initial:"
         "read-only"
         "call("

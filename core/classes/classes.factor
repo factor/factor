@@ -1,15 +1,16 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions assocs kernel kernel.private
-slots.private namespaces make sequences strings words words.symbol
-vectors math quotations combinators sorting effects graphs
-vocabs sets ;
+USING: accessors assocs combinators definitions graphs kernel
+make namespaces quotations sequences sets words words.symbol ;
 FROM: namespaces => set ;
 IN: classes
 
 ERROR: bad-inheritance class superclass ;
 
 PREDICATE: class < word "class" word-prop ;
+
+MIXIN: classoid
+INSTANCE: class classoid
 
 <PRIVATE
 
