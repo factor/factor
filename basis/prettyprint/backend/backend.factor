@@ -59,7 +59,7 @@ M: word pprint*
 
 M: method pprint*
     <block
-    [ \ M\ pprint-word "method-class" word-prop pprint-class ]
+    [ \ M\ pprint-word "method-class" word-prop pprint* ]
     [ "method-generic" word-prop pprint-word ] bi
     block> ;
 
@@ -206,6 +206,8 @@ M: tuple pprint-delims drop \ T{ \ } ;
 M: wrapper pprint-delims drop \ W{ \ } ;
 M: callstack pprint-delims drop \ CS{ \ } ;
 M: hash-set pprint-delims drop \ HS{ \ } ;
+M: anonymous-union pprint-delims drop \ union{ \ } ;
+M: anonymous-intersection pprint-delims drop \ intersection{ \ } ;
 
 M: object >pprint-sequence ;
 M: vector >pprint-sequence ;
@@ -215,6 +217,8 @@ M: hashtable >pprint-sequence >alist ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
 M: hash-set >pprint-sequence members ;
+M: anonymous-union >pprint-sequence members>> ;
+M: anonymous-intersection >pprint-sequence participants>> ;
 
 : class-slot-sequence ( class slots -- sequence )
     [ 1array ] [ [ f 2array ] dip append ] if-empty ;
@@ -253,6 +257,8 @@ M: hashtable pprint*
 M: curry pprint* pprint-object ;
 M: compose pprint* pprint-object ;
 M: hash-set pprint* pprint-object ;
+M: anonymous-union pprint* pprint-object ;
+M: anonymous-intersection pprint* pprint-object ;
 
 M: wrapper pprint*
     {
@@ -262,10 +268,4 @@ M: wrapper pprint*
     } cond ;
 
 M: maybe pprint*
-    <block \ maybe: pprint-word class>> pprint-word block> ;
-
-M: anonymous-union pprint*
-    <block \ union{ pprint-word members>> [ pprint-word ] each \ } pprint-word block> ;
-
-M: anonymous-intersection pprint*
-    <block \ intersection{ pprint-word participants>> [ pprint-word ] each \ } pprint-word block> ;
+    <block \ maybe: pprint-word class>> pprint-class block> ;

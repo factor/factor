@@ -1,11 +1,11 @@
 USING: accessors arrays classes.intersection classes.maybe
 classes.union compiler.units continuations definitions effects
-eval generic generic.standard io io.streams.duplex
+eval generic generic.standard hashtables io io.streams.duplex
 io.streams.string kernel listener make math namespaces parser
 prettyprint prettyprint.config prettyprint.private
 prettyprint.sections see sequences splitting
-tools.continuations tools.continuations.private tools.test
-vectors vocabs.parser words ;
+strings tools.continuations tools.continuations.private
+tools.test vectors vocabs.parser words ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -426,4 +426,26 @@ TUPLE: fo { a intersection{ fixnum integer } initial: 0 } ;
 """
 ] [
     [ \ fo see ] with-string-writer
+] unit-test
+
+[
+"""union{
+    union{ float integer }
+    intersection{ string hashtable }
+}
+"""
+] [ [ union{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
+
+[
+"""intersection{
+    union{ float integer }
+    intersection{ string hashtable }
+}
+"""
+] [ [ intersection{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
+
+[
+"""maybe: union{ float integer }\n"""
+] [
+    [ maybe: union{ float integer } . ] with-string-writer
 ] unit-test
