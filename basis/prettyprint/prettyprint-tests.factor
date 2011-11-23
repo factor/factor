@@ -393,7 +393,6 @@ TUPLE: bob a b ;
 [ "maybe: bob\n" ] [ [  maybe: bob . ] with-string-writer ] unit-test
 [ "maybe: word\n" ] [ [  maybe: word . ] with-string-writer ] unit-test
 
-
 TUPLE: har a ;
 GENERIC: harhar ( obj -- obj )
 M: maybe: har harhar ;
@@ -408,12 +407,11 @@ M: integer harhar M\\ integer harhar drop ;\n"""
     [ \ harhar see-methods ] with-string-writer
 ] unit-test
 
-
 TUPLE: mo { a union{ float integer } } ;
 TUPLE: fo { a intersection{ fixnum integer } } ;
 
 [
-"""USING: classes.union math ;
+"""USING: math ;
 IN: prettyprint.tests
 TUPLE: mo { a union{ float integer } initial: 0 } ;
 """
@@ -422,7 +420,7 @@ TUPLE: mo { a union{ float integer } initial: 0 } ;
 ] unit-test
 
 [
-"""USING: classes.intersection math ;
+"""USING: math ;
 IN: prettyprint.tests
 TUPLE: fo { a intersection{ fixnum integer } initial: 0 } ;
 """
