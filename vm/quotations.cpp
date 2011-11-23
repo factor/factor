@@ -100,10 +100,7 @@ bool quotation_jit::word_stack_frame_p(cell obj)
 
 bool quotation_jit::word_safepoint_p(cell obj)
 {
-	if (to_boolean(untag<word>(obj)->subprimitive) && special_subprimitive_p(obj))
-		return false;
-	else
-		return true;
+	return !special_subprimitive_p(obj);
 }
 
 bool quotation_jit::safepoint_p()
@@ -116,19 +113,15 @@ bool quotation_jit::safepoint_p()
 		switch(tagged<object>(obj).type())
 		{
 		case WORD_TYPE:
-			if(i != length - 1 || word_stack_frame_p(obj))
-				return true;
-			break;
-		case QUOTATION_TYPE:
-			if(fast_dip_p(i,length) || fast_2dip_p(i,length) || fast_3dip_p(i,length))
-				return true;
+			if(!word_safepoint_p(obj))
+				return false;
 			break;
 		default:
 			break;
 		}
 	}
 
-	return false;
+	return true;
 }
 
 bool quotation_jit::stack_frame_p()
