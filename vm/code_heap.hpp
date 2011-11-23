@@ -7,6 +7,8 @@ namespace factor
 	const cell seh_area_size = 0;
 #endif
 
+struct compaction_fixup;
+
 struct code_heap {
 	/* The actual memory area */
 	segment *seg;
@@ -56,6 +58,7 @@ struct code_heap {
 		cell page_mask = ~(getpagesize() - 1);
 		return (addr & page_mask) == (cell)safepoint_page;
 	}
+
 };
 
 struct code_heap_room {
