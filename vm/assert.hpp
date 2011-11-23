@@ -3,7 +3,7 @@ namespace factor
     void abort();
 }
 
-#ifndef NDEBUG
+#ifdef FACTOR_DEBUG
 #define FACTOR_ASSERT(condition) ((condition) \
     ? (void)0 \
     : ( \
