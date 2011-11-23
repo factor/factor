@@ -72,8 +72,31 @@ void code_heap::flush_icache()
 	factor::flush_icache(seg->start,seg->size);
 }
 
+struct all_blocks_set_verifier {
+	std::set<code_block*> *leftovers;
+
+	all_blocks_set_verifier(std::set<code_block*> *leftovers) : leftovers(leftovers) {}
+
+	void operator()(code_block *block, cell size)
+	{
+		FACTOR_ASSERT(leftovers->find(block) != leftovers->end());
+		leftovers->erase(block);
+	}
+};
+
+void code_heap::verify_all_blocks_set()
+{
+	std::set<code_block*> leftovers = all_blocks;
+	all_blocks_set_verifier verifier(&leftovers);
+	allocator->iterate(verifier);
+	FACTOR_ASSERT(leftovers.empty());
+}
+
 code_block *code_heap::code_block_for_address(cell address)
 {
+#ifdef FACTOR_DEBUG
+	verify_all_blocks_set();
+#endif
 	std::set<code_block*>::const_iterator blocki =
 		all_blocks.upper_bound((code_block*)address);
 	FACTOR_ASSERT(blocki != all_blocks.begin());
