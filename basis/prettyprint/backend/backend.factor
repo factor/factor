@@ -1,13 +1,13 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
-classes.tuple classes.tuple.private colors colors.constants
-combinators continuations effects generic hashtables io
-io.pathnames io.styles kernel make math math.order math.parser
-namespaces prettyprint.config prettyprint.custom
-prettyprint.sections prettyprint.stylesheet quotations sbufs
-sequences strings vectors words words.symbol hash-sets
-classes.maybe ;
+classes.algebra.private classes.intersection classes.maybe
+classes.tuple classes.tuple.private classes.union colors
+colors.constants combinators continuations effects generic
+hash-sets hashtables io io.pathnames io.styles kernel make math
+math.order math.parser namespaces prettyprint.config
+prettyprint.custom prettyprint.sections prettyprint.stylesheet
+quotations sbufs sequences strings vectors words words.symbol ;
 FROM: sets => members ;
 IN: prettyprint.backend
 
@@ -28,6 +28,12 @@ GENERIC: word-name* ( obj -- str )
 M: maybe word-name*
     class>> word-name* "maybe: " prepend ;
 
+M: anonymous-union word-name*
+    members>> [ word-name* ] map " " join "union{ " " }" surround ;
+
+M: anonymous-intersection word-name*
+    participants>> [ word-name* ] map " " join "intersection{ " " }" surround ;
+
 M: word word-name* ( word -- str )
     [ name>> "( no name )" or ] [ record-vocab ] bi ;
 
@@ -36,9 +42,11 @@ M: word word-name* ( word -- str )
 
 GENERIC: pprint-class ( obj -- )
 
-M: maybe pprint-class pprint* ;
+M: classoid pprint-class pprint* ;
 
 M: class pprint-class \ f or pprint-word ;
+
+M: word pprint-class pprint-word ;
 
 : pprint-prefix ( word quot -- )
     <block swap pprint-word call block> ; inline
@@ -255,3 +263,9 @@ M: wrapper pprint*
 
 M: maybe pprint*
     <block \ maybe: pprint-word class>> pprint-word block> ;
+
+M: anonymous-union pprint*
+    <block \ union{ pprint-word members>> [ pprint-word ] each \ } pprint-word block> ;
+
+M: anonymous-intersection pprint*
+    <block \ intersection{ pprint-word participants>> [ pprint-word ] each \ } pprint-word block> ;

@@ -1,10 +1,11 @@
-USING: arrays definitions io.streams.string io.streams.duplex
-kernel math namespaces parser prettyprint prettyprint.config
-prettyprint.sections sequences tools.test vectors words
-effects splitting generic.standard prettyprint.private
-continuations generic compiler.units tools.continuations
-tools.continuations.private eval accessors make vocabs.parser see
-listener classes.maybe ;
+USING: accessors arrays classes.intersection classes.maybe
+classes.union compiler.units continuations definitions effects
+eval generic generic.standard io io.streams.duplex
+io.streams.string kernel listener make math namespaces parser
+prettyprint prettyprint.config prettyprint.private
+prettyprint.sections see sequences splitting
+tools.continuations tools.continuations.private tools.test
+vectors vocabs.parser words ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -405,4 +406,26 @@ USING: kernel math prettyprint.tests ;
 M: integer harhar M\\ integer harhar drop ;\n"""
 ] [
     [ \ harhar see-methods ] with-string-writer
+] unit-test
+
+
+TUPLE: mo { a union{ float integer } } ;
+TUPLE: fo { a intersection{ fixnum integer } } ;
+
+[
+"""USING: classes.union math ;
+IN: prettyprint.tests
+TUPLE: mo { a union{ float integer } initial: 0 } ;
+"""
+] [
+    [ \ mo see ] with-string-writer
+] unit-test
+
+[
+"""USING: classes.intersection math ;
+IN: prettyprint.tests
+TUPLE: fo { a intersection{ fixnum integer } initial: 0 } ;
+"""
+] [
+    [ \ fo see ] with-string-writer
 ] unit-test

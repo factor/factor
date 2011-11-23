@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays kernel kernel.private math namespaces
-make sequences strings effects generic generic.standard
-classes classes.algebra slots.private combinators accessors
-words sequences.private assocs alien quotations hashtables
-classes.maybe ;
+USING: accessors alien arrays assocs byte-arrays classes
+classes.algebra classes.algebra.private classes.maybe
+combinators generic generic.standard hashtables kernel
+kernel.private make math quotations sequences sequences.private
+slots.private strings words ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial read-only ;
@@ -151,13 +151,52 @@ M: object writer-quot
         [ define-changer ]
     } cleave ;
 
+DEFER: initial-value
+
 GENERIC: initial-value* ( class -- object ? )
 
 M: class initial-value* drop f f ;
 
+M: maybe initial-value*
+    drop f t ;
+
+! Default initial value is f, 0, or the default inital value
+! of the smallest class. Special case 0 because float is ostensibly
+! smaller than integer in union{ integer float } because of
+! alphabetical sorting.
+M: anonymous-union initial-value*
+    {
+        { [ f over instance? ] [ drop f t ] }
+        { [ 0 over instance? ] [ drop 0 t ] }
+        [
+            members>> sort-classes [ initial-value ] { } map>assoc
+            ?last [ second t ] [ f f ] if*
+        ]
+    } cond ;
+
+! See if any of the initial values fit the intersection class,
+! or else return that none do, and leave it up to the user to provide
+! an initial: value.
+M: anonymous-intersection initial-value*
+    {
+        { [ f over instance? ] [ drop f t ] }
+        { [ 0 over instance? ] [ drop 0 t ] }
+        [
+            [ ]
+            [ participants>> sort-classes [ initial-value ] { } map>assoc ]
+            [ ] tri
+
+            [ [ first2 nip ] dip instance? ] curry find swap [
+                nip second t
+            ] [
+                2drop f f
+            ] if
+        ]
+    } cond ;
+
 : initial-value ( class -- object ? )
     {
-        { [ dup maybe? ] [ f t ] }
+        { [ dup only-classoid? ] [ dup initial-value* ] }
         { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop t ] }
         { [ \ f bootstrap-word over class<= ] [ f t ] }
         { [ \ array-capacity bootstrap-word over class<= ] [ 0 t ] }
@@ -202,12 +241,16 @@ ERROR: bad-slot-attribute key ;
         } case
     ] unless ;
 
-ERROR: bad-initial-value name ;
+ERROR: bad-initial-value name initial-value class ;
 
 : check-initial-value ( slot-spec -- slot-spec )
     [ ] [
-        dup [ initial>> ] [ class>> ] bi instance?
-        [ name>> bad-initial-value ] unless
+        [ ] [ initial>> ] [ class>> ] tri
+        2dup instance? [
+            2drop
+        ] [
+            [ name>> ] 2dip bad-initial-value
+        ] if
     ] if-bootstrapping ;
 
 M: array make-slot
