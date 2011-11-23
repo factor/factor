@@ -178,7 +178,13 @@ ERROR: bad-partial-eval quot word ;
 
 \ instance? [
     dup classoid?
-    [ predicate-def ] [ drop f ] if
+    [
+        predicate-def
+        ! union{ and intersection{ have useless expansions, and recurse infinitely
+        dup { [ length 2 >= ] [ second \ instance? = ] } 1&& [
+            drop f
+        ] when
+    ] [ drop f ] if
 ] 1 define-partial-eval
 
 ! Shuffling
