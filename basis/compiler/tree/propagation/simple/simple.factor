@@ -40,6 +40,12 @@ M: class depends-on-class
 M: maybe depends-on-class
     class>> depends-on-class ;
 
+M: anonymous-union depends-on-class
+    members>> [ depends-on-class ] each ;
+
+M: anonymous-intersection depends-on-class
+    participants>> [ depends-on-class ] each ;
+
 M: #declare propagate-before
     #! We need to force the caller word to recompile when the
     #! classes mentioned in the declaration are redefined, since

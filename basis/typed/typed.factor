@@ -4,7 +4,7 @@ combinators.short-circuit definitions effects fry hints
 math kernel kernel.private namespaces parser quotations
 sequences slots words locals effects.parser
 locals.parser macros stack-checker.dependencies
-classes.maybe ;
+classes.maybe classes.algebra ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: typed
 
@@ -19,7 +19,7 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 
 : unboxable-tuple-class? ( type -- ? )
     {
-        [ maybe? not ]
+        [ only-classoid? not ]
         [ all-slots empty? not ]
         [ immutable-tuple-class? ]
         [ final-class? ]

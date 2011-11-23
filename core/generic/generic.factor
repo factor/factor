@@ -3,7 +3,7 @@
 USING: accessors words kernel sequences namespaces make assocs
 hashtables definitions kernel.private classes classes.private
 classes.algebra quotations arrays vocabs effects combinators
-sets classes.maybe ;
+sets classes.maybe classes.algebra.private ;
 FROM: namespaces => set ;
 IN: generic
 
@@ -132,17 +132,21 @@ M: method crossref?
     [ method-word-name f <word> ] [ method-word-props ] 2bi
     >>props ;
 
-GENERIC: implementor-class ( obj -- class )
+GENERIC: implementor-classes ( obj -- class )
 
-M: maybe implementor-class class>> ;
+M: maybe implementor-classes class>> 1array ;
 
-M: class implementor-class ;
+M: class implementor-classes 1array ;
+
+M: anonymous-union implementor-classes members>> ;
+
+M: anonymous-intersection implementor-classes participants>> ;
 
 : with-implementors ( class generic quot -- )
-    [ swap implementor-class implementors-map get at ] dip call ; inline
+    [ swap implementor-classes [ implementors-map get at ] map ] dip call ; inline
 
-: reveal-method ( method class generic -- )
-    [ [ conjoin ] with-implementors ]
+: reveal-method ( method classes generic -- )
+    [ [ [ conjoin ] with each ] with-implementors ]
     [ [ set-at ] with-methods ]
     2bi ;
 
@@ -178,7 +182,7 @@ M: method forget*
                 ] keep eq?
                 [
                     [ [ delete-at ] with-methods ]
-                    [ [ delete-at ] with-implementors ] 2bi
+                    [ [ [ delete-at ] with each ] with-implementors ] 2bi
                     reset-caches
                 ] [ 2drop ] if
             ] if

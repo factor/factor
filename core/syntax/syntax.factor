@@ -8,7 +8,8 @@ generic.standard generic.hook generic.math generic.parser classes
 io.pathnames vocabs vocabs.parser classes.parser classes.union
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple.parser compiler.units classes.maybe
-combinators effects.parser slots hash-sets source-files ;
+combinators effects.parser slots hash-sets source-files
+classes.algebra.private ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -252,7 +253,15 @@ IN: bootstrap.syntax
     "maybe:" [
         scan-class <maybe> suffix!
     ] define-core-syntax
-    
+
+    "intersection{" [
+         \ } [ <anonymous-intersection> ] parse-literal
+    ] define-core-syntax
+
+    "union{" [
+        \ } [ <anonymous-union> ] parse-literal
+    ] define-core-syntax
+
     "initial:" "syntax" lookup-word define-symbol
 
     "read-only" "syntax" lookup-word define-symbol

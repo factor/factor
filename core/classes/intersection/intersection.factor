@@ -30,6 +30,9 @@ M: intersection-class rank-class drop 5 ;
 M: intersection-class instance?
     "participants" word-prop [ instance? ] with all? ;
 
+M: anonymous-intersection instance?
+    participants>> [ instance? ] with all? ;
+
 M: intersection-class normalize-class
     participants <anonymous-intersection> normalize-class ;
 
