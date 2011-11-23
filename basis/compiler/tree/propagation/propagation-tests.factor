@@ -1006,3 +1006,22 @@ M: tuple-with-read-only-slot clone
 [ V{ t } ] [
     [ tag 0 15 between? ] final-literals
 ] unit-test
+
+[ t ] [
+    [ maybe: integer instance? ] { instance? } inlined?
+] unit-test
+
+TUPLE: inline-please a ;
+[ t ] [
+    [ maybe: inline-please instance? ] { instance? } inlined?
+] unit-test
+
+GENERIC: derp ( obj -- obj' )
+
+M: integer derp 5 + ;
+M: f derp drop t ;
+
+[ t ]
+[
+    [ dup maybe: integer instance? [ derp ] when ] { instance? } inlined?
+] unit-test
