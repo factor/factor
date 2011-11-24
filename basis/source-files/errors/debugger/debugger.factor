@@ -1,5 +1,5 @@
 USING: accessors debugger io kernel make math.parser
-prettyprint source-files.errors summary ;
+prettyprint source-files.errors command-line summary ;
 IN: source-files.errors.debugger
 
 CONSTANT: +listener-input+ "<Listener input>"
@@ -18,3 +18,5 @@ M: source-file-error error.
     [ error>> error. ]
     tri ;
 
+M: user-init-error error.
+    error>> error. ;
