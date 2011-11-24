@@ -70,10 +70,6 @@ IN: bootstrap.syntax
         scan-token scan-token "=>" expect scan-token add-renamed-word
     ] define-core-syntax
 
-    "HEX:" [ 16 parse-base ] define-core-syntax
-    "OCT:" [ 8 parse-base ] define-core-syntax
-    "BIN:" [ 2 parse-base ] define-core-syntax
-
     "NAN:" [ 16 scan-base <fp-nan> suffix! ] define-core-syntax
 
     "f" [ f suffix! ] define-core-syntax
