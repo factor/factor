@@ -141,9 +141,6 @@ ERROR: bad-number ;
 : scan-base ( base -- n )
     scan-token swap base> [ bad-number ] unless* ;
 
-: parse-base ( parsed base -- parsed )
-    scan-base suffix! ;
-
 SYMBOL: bootstrap-syntax
 
 : with-file-vocabs ( quot -- )

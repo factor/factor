@@ -21,8 +21,6 @@ ARTICLE: "reading-ahead" "Reading ahead"
     (scan-token)
     (scan-datum)
 }
-"It is defined in terms of a lower-level word that takes the numerical base on the data stack, but reads the number from the parser and then adds it to the parse tree:"
-{ $see parse-base }
 "A simple example is the " { $link POSTPONE: \ } " word:"
 { $see POSTPONE: \ } ;
 
@@ -222,11 +220,6 @@ HELP: parse-lines
 { $values { "lines" "a sequence of strings" } { "quot" "a new " { $link quotation } } }
 { $description "Parses Factor source code which has been tokenized into lines. The vocabulary search path is taken from the current scope." }
 { $errors "Throws a " { $link lexer-error } " if the input is malformed." } ;
-
-HELP: parse-base
-{ $values { "parsed" integer } { "base" "an integer between 2 and 36" } }
-{ $description "Reads an integer in a specific numerical base from the parser input." }
-$parsing-note ;
 
 HELP: parse-literal
 { $values { "accum" vector } { "end" word } { "quot" { $quotation "( seq -- obj )" } } }
