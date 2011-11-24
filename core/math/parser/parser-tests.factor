@@ -237,3 +237,23 @@ unit-test
 [ 1/0. ] [ "1.0p1024" hex> ] unit-test
 [ -1/0. ] [ "-1.0p1024" hex> ] unit-test
 
+[ 0 ] [ "0" string>number ] unit-test
+[ 0 ] [ "00" string>number ] unit-test
+[ 0.0 ] [ "0." string>number ] unit-test
+[ 0.0 ] [ "0.0" string>number ] unit-test
+[ 0.0 ] [ "0x0.0p0" string>number ] unit-test
+[ 0 ] [ "0x0" string>number ] unit-test
+[ 0 ] [ "0o0" string>number ] unit-test
+[ 0 ] [ "0b0" string>number ] unit-test
+
+[ 10 ] [ "010" string>number ] unit-test
+[ 16 ] [ "0x10" string>number ] unit-test
+[  8 ] [ "0o10" string>number ] unit-test
+[  2 ] [ "0b10" string>number ] unit-test
+
+[ -10 ] [ "-010" string>number ] unit-test
+[ -16 ] [ "-0x10" string>number ] unit-test
+[  -8 ] [ "-0o10" string>number ] unit-test
+[  -2 ] [ "-0b10" string>number ] unit-test
+
+[ 1.0 ] [ "0x1.0p0" string>number ] unit-test
