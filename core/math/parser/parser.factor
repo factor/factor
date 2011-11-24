@@ -228,9 +228,9 @@ DEFER: @neg-digit
 : @pos-first-digit ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
-        { CHAR: 0 [ [ @pos-first-digit ] [ @pos-digit-or-punc ] with-radix-char ] }
+        { CHAR: 0 [ [ @pos-digit ] [ @pos-digit-or-punc ] with-radix-char ] }
         [ @pos-digit ]
-    } case ; inline recursive
+    } case ; inline
 
 : @neg-digit-or-punc ( i number-parse n char -- n/f )
     {
@@ -248,9 +248,9 @@ DEFER: @neg-digit
 : @neg-first-digit ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
-        { CHAR: 0 [ [ @neg-first-digit ] [ @neg-digit-or-punc ] with-radix-char ] }
+        { CHAR: 0 [ [ @neg-digit ] [ @neg-digit-or-punc ] with-radix-char ] }
         [ @neg-digit ]
-    } case ; inline recursive
+    } case ; inline
 
 : @first-char ( i number-parse n char -- n/f ) 
     {
