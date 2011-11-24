@@ -217,9 +217,9 @@ DEFER: @neg-digit
 : with-radix-char ( i number-parse n radix-quot nonradix-quot -- n/f )
     [
         rot {
-            { CHAR: b [ drop  2 ->radix next-digit ] }
-            { CHAR: o [ drop  8 ->radix next-digit ] }
-            { CHAR: x [ drop 16 ->radix next-digit ] }
+            { CHAR: b [ drop  2 ->radix require-next-digit ] }
+            { CHAR: o [ drop  8 ->radix require-next-digit ] }
+            { CHAR: x [ drop 16 ->radix require-next-digit ] }
             { f       [ 3drop 2drop 0 ] }
             [ [ drop ] 2dip swap call ]
         } case
@@ -228,9 +228,9 @@ DEFER: @neg-digit
 : @pos-first-digit ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
-        { CHAR: 0 [ [ @pos-digit ] [ @pos-digit-or-punc ] with-radix-char ] }
+        { CHAR: 0 [ [ @pos-first-digit ] [ @pos-digit-or-punc ] with-radix-char ] }
         [ @pos-digit ]
-    } case ; inline
+    } case ; inline recursive
 
 : @neg-digit-or-punc ( i number-parse n char -- n/f )
     {
@@ -248,9 +248,9 @@ DEFER: @neg-digit
 : @neg-first-digit ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
-        { CHAR: 0 [ [ @neg-digit ] [ @neg-digit-or-punc ] with-radix-char ] }
+        { CHAR: 0 [ [ @neg-first-digit ] [ @neg-digit-or-punc ] with-radix-char ] }
         [ @neg-digit ]
-    } case ; inline
+    } case ; inline recursive
 
 : @first-char ( i number-parse n char -- n/f ) 
     {
