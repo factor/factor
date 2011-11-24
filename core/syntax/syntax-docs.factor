@@ -45,11 +45,14 @@ ARTICLE: "syntax-integers" "Integer syntax"
     "-10"
     "2432902008176640000"
 }
-"Integers are entered in base 10 unless prefixed with a base change parsing word."
-{ $subsections
-    POSTPONE: BIN:
-    POSTPONE: OCT:
-    POSTPONE: HEX:
+"Integers are entered in base 10 unless prefixed with a base-changing prefix. " { $snippet "0x" } " begins a hexadecimal literal, " { $snippet "0o" } " an octal literal, and " { $snippet "0b" } " a binary literal. A sign, if any, goes before the base prefix."
+{ $example
+    "USE: prettyprint"
+    "10 ."
+    "0b10 ."
+    "-0o10 ."
+    "0x10 ."
+    "10\n2\n-8\n16"
 }
 "More information on integers can be found in " { $link "integers" } "." ;
 
@@ -109,14 +112,14 @@ ARTICLE: "syntax-floats" "Float syntax"
     "t"
 }
 { $example
-    "1024.0 0x1.0P10 = ."
+    "-1024.0 -0x1.0P10 = ."
     "t"
 }
 { $example
     "10.125 0x1.44p3 = ."
     "t"
 }
-"The normalized hex form " { $snippet "HEX: ±1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of IEEE 754 representation."
+"The normalized hex form " { $snippet "±0x1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of the binary IEEE 754 representation."
 $nl
 "More information on floats can be found in " { $link "floats" } "." ;
 
@@ -657,27 +660,6 @@ HELP: #!
 { $syntax "#! comment..." }
 { $values { "comment" "characters" } }
 { $description "Discards all input until the end of the line." } ;
-
-HELP: HEX:
-{ $syntax "HEX: NNN" "HEX: NNN.NNNpEEE" }
-{ $values { "N" "hexadecimal digit (0-9, a-f, A-F)" } { "pEEE" "decimal exponent value" } }
-{ $description "Adds an integer or floating-point value read from a hexadecimal literal to the parse tree." }
-{ $examples
-    { $example "USE: prettyprint" "0xff ." "255" }
-    { $example "USE: prettyprint" "0x1.8p5 ." "48.0" }
-} ;
-
-HELP: OCT:
-{ $syntax "OCT: integer" }
-{ $values { "integer" "octal digits (0-7)" } }
-{ $description "Adds an integer read from an octal literal to the parse tree." }
-{ $examples { $example "USE: prettyprint" "0o31337 ." "13023" } } ;
-
-HELP: BIN:
-{ $syntax "BIN: integer" }
-{ $values { "integer" "binary digits (0 and 1)" } }
-{ $description "Adds an integer read from an binary literal to the parse tree." }
-{ $examples { $example "USE: prettyprint" "0b100 ." "4" } } ;
 
 HELP: NAN:
 { $syntax "NAN: payload" }

@@ -100,8 +100,8 @@ HELP: set-file-ids
 HELP: set-file-permissions
 { $values
      { "path" "a pathname string" } { "n" "an integer, interepreted as a string of bits" } }
-{ $description "Sets the file permissions for a given file with the supplied Unix permissions integer. Supplying an octal number with " { $link POSTPONE: OCT: } " is recommended." }
-{ $examples "Using the tradidional octal value:"
+{ $description "Sets the file permissions for a given file with the supplied Unix permissions integer." }
+{ $examples "Using the traditional octal value:"
     { $code "USING: io.files.info.unix kernel ;"
         "\"resource:license.txt\" 0o755 set-file-permissions"
     }
