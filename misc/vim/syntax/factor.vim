@@ -73,12 +73,12 @@ syn match   factorFloat         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\.[0-9,]*[0-9]\+\([
 syn match   factorPosRatio      /\<+\=[0-9]\([0-9,]*[0-9]\)\?\(+[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
 syn match   factorNegRatio      /\<\-[0-9]\([0-9,]*[0-9]\)\?\(\-[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
 syn region  factorComplex       start=/\<C{\>/ end=/\<}\>/ contains=@factorReal
-syn match   factorBinErr        /\<BIN:\s\+-\=[01,]*[^01 ]\S*\>/
-syn match   factorBinary        /\<BIN:\s\+-\=[01,]\+\>/
-syn match   factorHexErr        /\<HEX:\s\+-\=\(,\S*\|\S*,\|[-0-9a-fA-Fp,]*[^-0-9a-fA-Fp, ]\S*\)\>/
-syn match   factorHex           /\<HEX:\s\+-\=[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\(\.[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\)\?\(p-\=[0-9]\([0-9,]*[0-9]\)\?\)\?\>/
-syn match   factorOctErr        /\<OCT:\s\+-\=\(,\S*\|\S*,\|[0-7,]*[^0-7, ]\S*\)\>/
-syn match   factorOctal         /\<OCT:\s\+-\=[0-7,]\+\>/
+syn match   factorBinErr        /\<-\=0b[01,]*[^01 ]\S*\>/
+syn match   factorBinary        /\<-\=0b[01,]\+\>/
+syn match   factorHexErr        /\<-\=0x\(,\S*\|\S*,\|[-0-9a-fA-Fp,]*[^-0-9a-fA-Fp, ]\S*\)\>/
+syn match   factorHex           /\<-\=0x[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\(\.[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\)\?\(p-\=[0-9]\([0-9,]*[0-9]\)\?\)\?\>/
+syn match   factorOctErr        /\<-\=0o\(,\S*\|\S*,\|[0-7,]*[^0-7, ]\S*\)\>/
+syn match   factorOctal         /\<\+-\=0o[0-7,]\+\>/
 syn match   factorNan           /\<NAN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
 
 syn match   factorIn            /\<IN:\s\+\S\+\>/

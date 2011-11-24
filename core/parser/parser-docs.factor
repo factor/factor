@@ -21,11 +21,9 @@ ARTICLE: "reading-ahead" "Reading ahead"
     (scan-token)
     (scan-datum)
 }
-"For example, the " { $link POSTPONE: HEX: } " word uses this feature to read hexadecimal literals:"
-{ $see POSTPONE: HEX: }
 "It is defined in terms of a lower-level word that takes the numerical base on the data stack, but reads the number from the parser and then adds it to the parse tree:"
 { $see parse-base }
-"Another simple example is the " { $link POSTPONE: \ } " word:"
+"A simple example is the " { $link POSTPONE: \ } " word:"
 { $see POSTPONE: \ } ;
 
 ARTICLE: "parsing-word-nest" "Nested structure"

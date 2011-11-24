@@ -81,11 +81,6 @@ unit-test
 ! Funny bug
 [ 2 ] [ "IN: parser.tests : \0. ( -- x ) 2 ; \0." eval( -- n ) ] unit-test
 
-! These should throw errors
-[ "HEX: zzz" eval( -- obj ) ] must-fail
-[ "OCT: 999" eval( -- obj ) ] must-fail
-[ "BIN: --0" eval( -- obj ) ] must-fail
-
 DEFER: foo
 
 "IN: parser.tests USING: math prettyprint ; SYNTAX: foo 2 2 + . ;" eval( -- )
