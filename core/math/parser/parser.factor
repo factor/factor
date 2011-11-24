@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors byte-arrays combinators kernel kernel.private
 math namespaces sequences sequences.private splitting strings
-make ;
+make generalizations ;
 IN: math.parser
 
 : digit> ( ch -- n )
@@ -208,9 +208,27 @@ DEFER: @neg-digit
     { fixnum number-parse integer fixnum } declare
     digit-in-radix [ [ @pos-digit-or-punc ] add-digit ] [ @abort ] if ;
 
+: (->radix) ( number-parse radix -- number-parse' )
+    [ [ str>> ] [ length>> ] bi ] dip number-parse boa ; inline
+
+: ->radix ( i number-parse n quot radix -- i number-parse n quot )
+    [ (->radix) ] curry 2dip ; inline
+
+: with-radix-char ( i number-parse n radix-quot nonradix-quot -- n/f )
+    [
+        rot {
+            { CHAR: b [ drop  2 ->radix next-digit ] }
+            { CHAR: o [ drop  8 ->radix next-digit ] }
+            { CHAR: x [ drop 16 ->radix next-digit ] }
+            { f       [ 3drop 2drop 0 ] }
+            [ [ drop ] 2dip swap call ]
+        } case
+    ] 2curry next-digit ; inline
+
 : @pos-first-digit ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
+        { CHAR: 0 [ [ @pos-digit ] [ @pos-digit-or-punc ] with-radix-char ] }
         [ @pos-digit ]
     } case ; inline
 
@@ -230,6 +248,7 @@ DEFER: @neg-digit
 : @neg-first-digit ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
+        { CHAR: 0 [ [ @neg-digit ] [ @neg-digit-or-punc ] with-radix-char ] }
         [ @neg-digit ]
     } case ; inline
 
