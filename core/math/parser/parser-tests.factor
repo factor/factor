@@ -262,6 +262,9 @@ unit-test
 [ f ] [ "0o18" string>number ] unit-test
 [ f ] [ "0b12" string>number ] unit-test
 
+[ 11 ] [ "0x0b" string>number ] unit-test
+[ f  ] [ "0x0o0" string>number ] unit-test
+
 [ 0x7FFF,ABCD ] [ "0x7FFF,ABCD" string>number ] unit-test
 
 [ 1.0 ] [ "0x1.0p0" string>number ] unit-test
