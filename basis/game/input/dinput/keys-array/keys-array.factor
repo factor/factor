@@ -8,7 +8,7 @@ TUPLE: keys-array
 C: <keys-array> keys-array
 
 : >key ( byte -- ? )
-    HEX: 80 bitand c-bool> ;
+    0x80 bitand c-bool> ;
 
 M: keys-array length length>> ;
 M: keys-array nth-unsafe underlying>> nth-unsafe >key ;

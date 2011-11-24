@@ -8,7 +8,7 @@ math.bitwise sequences system unix unix.stat vocabs.loader
 classes.struct unix.ffi literals libc vocabs ;
 IN: io.directories.unix
 
-CONSTANT: file-mode OCT: 0666
+CONSTANT: file-mode 0o0666
 
 CONSTANT: touch-mode flags{ O_WRONLY O_APPEND O_CREAT O_EXCL }
 
@@ -24,7 +24,7 @@ M: unix move-file ( from to -- )
 M: unix delete-file ( path -- ) normalize-path unlink-file ;
 
 M: unix make-directory ( path -- )
-    normalize-path OCT: 777 [ mkdir ] unix-system-call drop ;
+    normalize-path 0o777 [ mkdir ] unix-system-call drop ;
 
 M: unix delete-directory ( path -- )
     normalize-path [ rmdir ] unix-system-call drop ;

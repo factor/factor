@@ -19,7 +19,7 @@ IN: cpu.8080.test
   [ read-instruction ] keep ! n cpu
   over get-cycles over inc-cycles
   [ swap instructions nth call( cpu -- ) ] keep
-  [ pc>> HEX: FFFF bitand ] keep 
+  [ pc>> 0xFFFF bitand ] keep 
   [ pc<< ] keep 
   process-interrupts ;
 
@@ -28,10 +28,10 @@ IN: cpu.8080.test
 
 : invaders ( -- seq )
   {
-    { HEX: 0000 "invaders/invaders.h" }
-    { HEX: 0800 "invaders/invaders.g" }
-    { HEX: 1000 "invaders/invaders.f" }
-    { HEX: 1800 "invaders/invaders.e" }
+    { 0x0000 "invaders/invaders.h" }
+    { 0x0800 "invaders/invaders.g" }
+    { 0x1000 "invaders/invaders.f" }
+    { 0x1800 "invaders/invaders.e" }
   } ;
 
 : test-cpu ( -- cpu )
@@ -54,7 +54,7 @@ IN: cpu.8080.test
     "1" print
     224 [
       32 [
-        over 32 * over +  HEX: 2400 + ! cpu h w addr
+        over 32 * over +  0x2400 + ! cpu h w addr
         [ pick ] dip swap ram>> nth [
           [
             " 0 0 0" write

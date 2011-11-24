@@ -67,12 +67,12 @@ IN: bit-arrays.tests
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
 } ] [
-    HEX: ffffffffffffffffffffffffffffffff integer>bit-array
+    0xffffffffffffffffffffffffffffffff integer>bit-array
 ] unit-test
 
 [ 14 ] [ ?{ f t t t } bit-array>integer ] unit-test
 [ 0 ] [ ?{ } bit-array>integer ] unit-test
-[ HEX: ffffffffffffffffffffffffffffffff ] [ ?{
+[ 0xffffffffffffffffffffffffffffffff ] [ ?{
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
@@ -83,6 +83,6 @@ IN: bit-arrays.tests
 
 [ 1 ] [ ?{ f t f t } byte-length ] unit-test
 
-[ HEX: a ] [ ?{ f t f t } bit-array>integer ] unit-test
+[ 0xa ] [ ?{ f t f t } bit-array>integer ] unit-test
 
-[ HEX: 100 ] [ ?{ f f f f f f f f t } bit-array>integer ] unit-test
+[ 0x100 ] [ ?{ f f f f f f f f t } bit-array>integer ] unit-test

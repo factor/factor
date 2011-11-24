@@ -14,7 +14,7 @@ TUPLE: gdbm
     { role initial: wrcreat }
     { sync boolean }
     { nolock boolean }
-    { mode integer initial: OCT: 644 } ;
+    { mode integer initial: 0o644 } ;
 
 : <gdbm> ( -- gdbm ) gdbm new ;
 

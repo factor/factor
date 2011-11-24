@@ -44,7 +44,7 @@ SYMBOL: column
 
 : encode3 ( seq -- )
     be> 4 iota <reversed> [
-        -6 * shift HEX: 3f bitand ch>base64 write1-lines
+        -6 * shift 0x3f bitand ch>base64 write1-lines
     ] with each ; inline
 
 : encode-pad ( seq n -- )

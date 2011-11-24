@@ -63,23 +63,23 @@ unit-test
 ! Make sure 24-bit strings work
 "hello world" "s" set
 
-[ ] [ HEX: 1234 1 "s" get set-nth ] unit-test
-[ HEX: 1234 ] [ 1 "s" get nth ] unit-test
+[ ] [ 0x1234 1 "s" get set-nth ] unit-test
+[ 0x1234 ] [ 1 "s" get nth ] unit-test
 
-[ ] [ HEX: 4321 3 "s" get set-nth ] unit-test
-[ HEX: 4321 ] [ 3 "s" get nth ] unit-test
+[ ] [ 0x4321 3 "s" get set-nth ] unit-test
+[ 0x4321 ] [ 3 "s" get nth ] unit-test
 
-[ ] [ HEX: 654321 5 "s" get set-nth ] unit-test
-[ HEX: 654321 ] [ 5 "s" get nth ] unit-test
+[ ] [ 0x654321 5 "s" get set-nth ] unit-test
+[ 0x654321 ] [ 5 "s" get nth ] unit-test
 
 [
     {
         CHAR: h
-        HEX: 1234
+        0x1234
         CHAR: l
-        HEX: 4321
+        0x4321
         CHAR: o
-        HEX: 654321
+        0x654321
         CHAR: w
         CHAR: o
         CHAR: r
@@ -91,7 +91,7 @@ unit-test
 ] unit-test
 
 ! Make sure string initialization works
-[ HEX: 123456 ] [ 100 HEX: 123456 <string> first ] unit-test
+[ 0x123456 ] [ 100 0x123456 <string> first ] unit-test
 
 ! Make sure we clear aux vector when storing octets
 [ "\u123456hi" ] [ "ih\u123456" clone reverse! ] unit-test
@@ -128,8 +128,8 @@ unit-test
 ] unit-test
 
 "X" "s" set
-[ ] [ HEX: 100,0000 0 "s" get set-nth ] unit-test
+[ ] [ 0x100,0000 0 "s" get set-nth ] unit-test
 [ 0 ] [ 0 "s" get nth ] unit-test
 
 [ ] [ -1 0 "s" get set-nth ] unit-test
-[ HEX: 7fffff ] [ 0 "s" get nth ] unit-test
+[ 0x7fffff ] [ 0 "s" get nth ] unit-test

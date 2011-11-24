@@ -265,12 +265,12 @@ cell-bits 32 = [
 ] unit-test
 
 [ t ] [
-    [ HEX: ff bitand 0 HEX: ff between? ]
+    [ 0xff bitand 0 0xff between? ]
     \ >= inlined?
 ] unit-test
 
 [ t ] [
-    [ HEX: ff swap HEX: ff bitand >= ]
+    [ 0xff swap 0xff bitand >= ]
     \ >= inlined?
 ] unit-test
 

@@ -217,7 +217,7 @@ IN: bootstrap.x86
 \ lazy-jit-compile define-combinator-primitive
 
 [
-    temp1 HEX: ffffffff CMP f rc-absolute-cell rel-literal
+    temp1 0xffffffff CMP f rc-absolute-cell rel-literal
 ] pic-check-tuple jit-define
 
 ! Inline cache miss entry points

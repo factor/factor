@@ -103,7 +103,7 @@ HELP: set-file-permissions
 { $description "Sets the file permissions for a given file with the supplied Unix permissions integer. Supplying an octal number with " { $link POSTPONE: OCT: } " is recommended." }
 { $examples "Using the tradidional octal value:"
     { $code "USING: io.files.info.unix kernel ;"
-        "\"resource:license.txt\" OCT: 755 set-file-permissions"
+        "\"resource:license.txt\" 0o755 set-file-permissions"
     }
     "Higher-level, setting named bits:"
     { $code "USING: io.files.info.unix kernel literals ;"

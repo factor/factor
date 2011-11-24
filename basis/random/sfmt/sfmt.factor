@@ -160,8 +160,8 @@ M: sfmt seed-random ( sfmt seed -- sfmt )
 
 : <sfmt-19937> ( seed -- sfmt )
     156 122
-    uint-4{ HEX: dfffffef HEX: ddfecb7f HEX: bffaffff HEX: bffffff6 }
-    uint-4{ HEX: 1 HEX: 0 HEX: 0 HEX: 13c9e684 }
+    uint-4{ 0xdfffffef 0xddfecb7f 0xbffaffff 0xbffffff6 }
+    uint-4{ 0x1 0x0 0x0 0x13c9e684 }
     <sfmt> ; inline
 
 : default-sfmt ( -- sfmt )

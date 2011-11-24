@@ -23,7 +23,7 @@ M: object encode-string [ encode-char ] 2curry each ; inline
 
 GENERIC: <decoder> ( stream encoding -- newstream )
 
-CONSTANT: replacement-char HEX: fffd
+CONSTANT: replacement-char 0xfffd
 
 TUPLE: decoder { stream read-only } { code read-only } { cr boolean } ;
 INSTANCE: decoder input-stream

@@ -24,7 +24,7 @@ HELP: make-bits
 { $values { "number" integer } { "bits" bits } }
 { $description "Creates a " { $link bits } " object out of the given number, using its log base 2 as the length. This implies that the last element, corresponding to the most significant bit, will be 1." }
 { $examples
-    { $example "USING: math.bits prettyprint arrays ;" "BIN: 1101 make-bits >array ." "{ t f t t }" }
+    { $example "USING: math.bits prettyprint arrays ;" "0b1101 make-bits >array ." "{ t f t t }" }
     { $example "USING: math.bits prettyprint arrays ;" "-3 make-bits >array ." "{ t f }" }
 } ;
 

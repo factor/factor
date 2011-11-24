@@ -265,9 +265,9 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 
 : bit-test ( a b -- ? ) bitand 0 = not ;
 
-: pointer? ( ba i -- ? ) get-single BIN: 11000000 bit-test ;
+: pointer? ( ba i -- ? ) get-single 0b11000000 bit-test ;
 
-: pointer ( ba i -- val ) get-double BIN: 0011111111111111 bitand ;
+: pointer ( ba i -- val ) get-double 0b0011111111111111 bitand ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -392,14 +392,14 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 : get-header-bits ( ba i -- qr opcode aa tc rd ra z rcode )
     get-double
     {
-      [ 15 >> BIN:    1 bitand ]
-      [ 11 >> BIN:  111 bitand opcode-table value-at ]
-      [ 10 >> BIN:    1 bitand ]
-      [  9 >> BIN:    1 bitand ]
-      [  8 >> BIN:    1 bitand ]
-      [  7 >> BIN:    1 bitand ]
-      [  4 >> BIN:  111 bitand ]
-      [       BIN: 1111 bitand rcode-table value-at ]
+      [ 15 >> 0b1 bitand ]
+      [ 11 >> 0b111 bitand opcode-table value-at ]
+      [ 10 >> 0b1 bitand ]
+      [  9 >> 0b1 bitand ]
+      [  8 >> 0b1 bitand ]
+      [  7 >> 0b1 bitand ]
+      [  4 >> 0b111 bitand ]
+      [       0b1111 bitand rcode-table value-at ]
     }
   cleave ;
 

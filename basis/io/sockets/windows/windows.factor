@@ -72,7 +72,7 @@ M: object ((client)) ( addrspec -- handle )
 
 ! http://support.microsoft.com/kb/127144
 ! NOTE: Possibly tweak this because of SYN flood attacks
-: listen-backlog ( -- n ) HEX: 7fffffff ; inline
+: listen-backlog ( -- n ) 0x7fffffff ; inline
 
 M: object (server) ( addrspec -- handle )
     [

@@ -11,26 +11,26 @@ IN: io.encodings.euc.tests
 : unicode>euc-kr ( ch -- ch/f )
     euc-kr euc-table word-prop value-at ;
 
-[ f ] [ HEX: 80 euc-kr>unicode ] unit-test
-[ f ] [ HEX: ff euc-kr>unicode ] unit-test
-[ HEX: ac02 ] [ HEX: 8141 euc-kr>unicode ] unit-test
-[ HEX: 7f ] [ HEX: 7f euc-kr>unicode ] unit-test
-[ HEX: c724 ] [ HEX: c0b1 euc-kr>unicode ] unit-test
+[ f ] [ 0x80 euc-kr>unicode ] unit-test
+[ f ] [ 0xff euc-kr>unicode ] unit-test
+[ 0xac02 ] [ 0x8141 euc-kr>unicode ] unit-test
+[ 0x7f ] [ 0x7f euc-kr>unicode ] unit-test
+[ 0xc724 ] [ 0xc0b1 euc-kr>unicode ] unit-test
 
-[ HEX: 8141 ] [ HEX: ac02 unicode>euc-kr ] unit-test
-[ HEX: 7f ] [ HEX: 7f unicode>euc-kr ] unit-test
-[ HEX: c0b1 ] [ HEX: c724 unicode>euc-kr ] unit-test
+[ 0x8141 ] [ 0xac02 unicode>euc-kr ] unit-test
+[ 0x7f ] [ 0x7f unicode>euc-kr ] unit-test
+[ 0xc0b1 ] [ 0xc724 unicode>euc-kr ] unit-test
 
 : phrase-unicode ( -- s )
     "\u00b3d9\u00d574\u00bb3c\u00acfc \u00bc31\u00b450\u00c0b0\u00c774!" ;
 
 : phrase-euc-kr ( -- s )
     {
-        HEX: b5 HEX: bf HEX: c7 HEX: d8
-        HEX: b9 HEX: b0 HEX: b0 HEX: fa
-        HEX: 20 HEX: b9 HEX: e9 HEX: b5
-        HEX: ce HEX: bb HEX: ea HEX: c0
-        HEX: cc HEX: 21
+        0xb5 0xbf 0xc7 0xd8
+        0xb9 0xb0 0xb0 0xfa
+        0x20 0xb9 0xe9 0xb5
+        0xce 0xbb 0xea 0xc0
+        0xcc 0x21
     } ;
 
 : phrase-unicode>euc-kr ( -- s )

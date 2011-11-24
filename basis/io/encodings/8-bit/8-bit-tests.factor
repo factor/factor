@@ -9,7 +9,7 @@ IN: io.encodings.8-bit.tests
 
 [ "bar" ] [ "bar" latin1 decode ] unit-test
 [ { CHAR: b 233 CHAR: r } ] [ B{ CHAR: b 233 CHAR: r } latin1 decode >array ] unit-test
-[ { HEX: fffd HEX: 20AC } ] [ B{ HEX: 81 HEX: 80 } windows-1252 decode >array ] unit-test
+[ { 0xfffd 0x20AC } ] [ B{ 0x81 0x80 } windows-1252 decode >array ] unit-test
 
 [ t ] [ \ latin1 8-bit-encoding? ] unit-test
 [ "bar" ] [ "bar" \ latin1 decode ] unit-test

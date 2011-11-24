@@ -33,7 +33,7 @@ test         = <foreign parse-smalltalk Literal>
 
 [ nil ] [ "nil" test-Literal ] unit-test
 [ 123 ] [ "123" test-Literal ] unit-test
-[ HEX: deadbeef ] [ "16rdeadbeef" test-Literal ] unit-test
+[ 0xdeadbeef ] [ "16rdeadbeef" test-Literal ] unit-test
 [ -123 ] [ "-123" test-Literal ] unit-test
 [ 1.2 ] [ "1.2" test-Literal ] unit-test
 [ -1.24 ] [ "-1.24" test-Literal ] unit-test

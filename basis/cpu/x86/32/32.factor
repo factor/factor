@@ -46,13 +46,13 @@ M: x86.32 %vm-field-ptr ( dst field -- )
     [ 0 MOV ] dip rc-absolute-cell rel-vm ;
 
 M: x86.32 %mark-card
-    drop HEX: ffffffff [+] card-mark <byte> MOV
+    drop 0xffffffff [+] card-mark <byte> MOV
     building get pop
     rc-absolute-cell rel-cards-offset
     building get push ;
 
 M: x86.32 %mark-deck
-    drop HEX: ffffffff [+] card-mark <byte> MOV
+    drop 0xffffffff [+] card-mark <byte> MOV
     building get pop
     rc-absolute-cell rel-decks-offset
     building get push ;

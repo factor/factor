@@ -48,11 +48,11 @@ STRUCT: bio
     { crypto-ex-data-stack void* }
     { crypto-ex-data-dummy int } ;
 
-CONSTANT: BIO_NOCLOSE       HEX: 00
-CONSTANT: BIO_CLOSE         HEX: 01
+CONSTANT: BIO_NOCLOSE       0x00
+CONSTANT: BIO_CLOSE         0x01
 
-CONSTANT: RSA_3             HEX: 3
-CONSTANT: RSA_F4            HEX: 10001
+CONSTANT: RSA_3             0x3
+CONSTANT: RSA_F4            0x10001
 
 CONSTANT: BIO_C_SET_SSL     109
 CONSTANT: BIO_C_GET_SSL     110

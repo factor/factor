@@ -79,16 +79,16 @@ M: ppc gc-root-offset ( spill-slot -- n )
     n>> spill@ cell /i ;
 
 : LOAD32 ( r n -- )
-    [ -16 shift HEX: ffff bitand LIS ]
-    [ [ dup ] dip HEX: ffff bitand ORI ] 2bi ;
+    [ -16 shift 0xffff bitand LIS ]
+    [ [ dup ] dip 0xffff bitand ORI ] 2bi ;
 
 : LOAD64 ( r n -- )
     [ dup ] dip {
-        [ nip -48 shift HEX: ffff bitand LIS ]
-        [ -32 shift HEX: ffff bitand ORI ]
+        [ nip -48 shift 0xffff bitand LIS ]
+        [ -32 shift 0xffff bitand ORI ]
         [ drop 32 SLDI ]
-        [ -16 shift HEX: ffff bitand ORIS ]
-        [ HEX: ffff bitand ORI ]
+        [ -16 shift 0xffff bitand ORIS ]
+        [ 0xffff bitand ORI ]
     } 3cleave ;
 
 HOOK: %clear-tag-bits cpu ( dst src -- )
@@ -138,9 +138,9 @@ M: ppc.32 %load-cell-imm-rc rc-absolute-ppc-2/2 ;
 M: ppc.64 %load-cell-imm-rc rc-absolute-ppc-2/2/2/2  ;
 
 M: ppc.32 %load-immediate ( reg val -- )
-    dup HEX: -8000 HEX: 7fff between? [ LI ] [ LOAD32 ] if ;
+    dup -0x8000 0x7fff between? [ LI ] [ LOAD32 ] if ;
 M: ppc.64 %load-immediate ( reg val -- )
-    dup HEX: -8000 HEX: 7fff between? [ LI ] [ LOAD64 ] if ;
+    dup -0x8000 0x7fff between? [ LI ] [ LOAD64 ] if ;
 
 M: ppc %load-reference ( reg obj -- )
     [ [ 0 %load-cell-imm ] [ %load-cell-imm-rc rel-literal ] bi* ]

@@ -24,18 +24,18 @@ FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response ) ;
 : system-version-bugfix ( -- n ) "sys3" be> gestalt ;
 
 CONSTANT: system-code-names H{
-    { HEX: 1070 "Lion" }
-    { HEX: 1060 "Snow Leopard" }
-    { HEX: 1050 "Leopard" }
-    { HEX: 1040 "Tiger" }
-    { HEX: 1030 "Panther" }
-    { HEX: 1020 "Jaguar" }
-    { HEX: 1010 "Puma" }
-    { HEX: 1000 "Cheetah" }
+    { 0x1070 "Lion" }
+    { 0x1060 "Snow Leopard" }
+    { 0x1050 "Leopard" }
+    { 0x1040 "Tiger" }
+    { 0x1030 "Panther" }
+    { 0x1020 "Jaguar" }
+    { 0x1010 "Puma" }
+    { 0x1000 "Cheetah" }
 }
 
 : system-code-name ( -- str/f )
-    system-version HEX: FFF0 bitand system-code-names at ;
+    system-version 0xFFF0 bitand system-code-names at ;
 
 PRIVATE>
 

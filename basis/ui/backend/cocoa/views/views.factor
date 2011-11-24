@@ -20,10 +20,10 @@ IN: ui.backend.cocoa.views
 
 CONSTANT: modifiers
     {
-        { S+ HEX: 20000 }
-        { C+ HEX: 40000 }
-        { A+ HEX: 100000 }
-        { M+ HEX: 80000 }
+        { S+ 0x20000 }
+        { C+ 0x40000 }
+        { A+ 0x100000 }
+        { M+ 0x80000 }
     }
 
 CONSTANT: key-codes

@@ -167,7 +167,7 @@ M: windows wait-for-processes ( -- ? )
     [ handle>> hProcess>> ] void*-array{ } map-as
     [ length ] keep 0 0
     WaitForMultipleObjects
-    dup HEX: ffffffff = [ win32-error ] when
+    dup 0xffffffff = [ win32-error ] when
     dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth process-exited f ] if ;
 
 : duplicate-handle ( handle -- handle' )

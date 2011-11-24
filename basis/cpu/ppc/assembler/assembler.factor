@@ -23,10 +23,10 @@ IN: cpu.ppc.assembler
     [ { 0 1 2 16 21 } bitfield ] dip insn ;
 
 : d-insn ( rt ra d opcode -- )
-    [ HEX: ffff bitand { 0 16 21 } bitfield ] dip insn ;
+    [ 0xffff bitand { 0 16 21 } bitfield ] dip insn ;
 
 : ds-insn ( rt ra ds rc opcode -- )
-    [ [ HEX: 3fff bitand ] dip { 0 2 16 21 } bitfield ] dip insn ;
+    [ [ 0x3fff bitand ] dip { 0 2 16 21 } bitfield ] dip insn ;
 
 : evx-insn ( rt ra rb xo opcode -- )
     [ { 0 11 16 21 } bitfield ] dip insn ;
@@ -38,12 +38,12 @@ IN: cpu.ppc.assembler
     [ { 0 1 6 11 16 21 } bitfield ] dip insn ;
 
 :: md-insn ( rs ra sh mb xo sh5 rc opcode -- )
-    mb [ HEX: 1f bitand 1 shift ] [ -5 shift ] bi bitor :> mb
+    mb [ 0x1f bitand 1 shift ] [ -5 shift ] bi bitor :> mb
     rs ra sh mb xo sh5 rc opcode
     [ { 0 1 2 5 11 16 21 } bitfield ] dip insn ;
 
 :: mds-insn ( rs ra rb mb xo rc opcode -- )
-    mb [ HEX: 1f bitand 1 shift ] [ -5 shift ] bi bitor :> mb
+    mb [ 0x1f bitand 1 shift ] [ -5 shift ] bi bitor :> mb
     rs ra rb mb xo rc opcode
     [ { 0 1 5 11 16 21 } bitfield ] dip insn ;
 
@@ -78,32 +78,32 @@ IN: cpu.ppc.assembler
     [ { 0 1 2 11 16 21 } bitfield ] dip insn ;
 
 :: xx1-insn ( rt ra rb xo opcode -- )
-    rt HEX: 1f bitand ra rb xo rt -5 shift
+    rt 0x1f bitand ra rb xo rt -5 shift
     { 0 1 11 16 21 } bitfield opcode insn ;
 
 :: xx2-insn ( rt ra rb xo opcode -- )
-    rt HEX: 1f bitand ra rb HEX: 1f bitand xo
+    rt 0x1f bitand ra rb 0x1f bitand xo
     rb -5 shift rt -5 shift
     { 0 1 2 11 16 21 } bitfield opcode insn ;
 
 :: xx3-insn ( rt ra rb xo opcode -- )
-    rt HEX: 1f bitand ra HEX: 1f bitand rb HEX: 1f bitand
+    rt 0x1f bitand ra 0x1f bitand rb 0x1f bitand
     xo ra -5 shift rb -5 shift rt -5 shift
     { 0 1 2 3 11 16 21 } bitfield opcode insn ;
 
 :: xx3-rc-insn ( rt ra rb rc xo opcode -- )
-    rt HEX: 1f bitand ra HEX: 1f bitand rb HEX: 1f bitand
+    rt 0x1f bitand ra 0x1f bitand rb 0x1f bitand
     rc xo ra -5 shift rb -5 shift rt -5 shift
     { 0 1 2 3 10 11 16 21 } bitfield opcode insn ;
 
 :: xx3-rc-dm-insn ( rt ra rb rc dm xo opcode -- )
-    rt HEX: 1f bitand ra HEX: 1f bitand rb HEX: 1f bitand
+    rt 0x1f bitand ra 0x1f bitand rb 0x1f bitand
     rc dm xo ra -5 shift rb -5 shift rt -5 shift
     { 0 1 2 3 8 10 11 16 21 } bitfield opcode insn ;
 
 :: xx4-insn ( rt ra rb rc xo opcode -- )
-    rt HEX: 1f bitand ra HEX: 1f bitand rb HEX: 1f bitand
-    rc HEX: 1f bitand xo rc -5 shift ra -5 shift rb
+    rt 0x1f bitand ra 0x1f bitand rb 0x1f bitand
+    rc 0x1f bitand xo rc -5 shift ra -5 shift rb
     -5 shift rt -5 shift
     { 0 1 2 3 4 6 11 16 21 } bitfield opcode insn ;
 
@@ -388,32 +388,32 @@ M: integer BC ( bo bi target_addr -- ) -2 shift 0 0 16 b-insn ;
 
 ! 3.3.13.1 64-bit Fixed-Point Rotate Instructions
 : RLDICL  ( ra rs sh mb -- )
-    [ swap ] 2dip over [ HEX: 1f bitand ] [ ] [ -5 shift ]
+    [ swap ] 2dip over [ 0x1f bitand ] [ ] [ -5 shift ]
     tri* 0 swap 0 30 md-insn ;
 : RLDICL. ( ra rs sh mb -- )
-    [ swap ] 2dip over [ HEX: 1f bitand ] [ ] [ -5 shift ]
+    [ swap ] 2dip over [ 0x1f bitand ] [ ] [ -5 shift ]
     tri* 0 swap 1 30 md-insn ;
 : RLDICR  ( ra rs sh me -- )
-    [ swap ] 2dip over [ HEX: 1f bitand ] [ ] [ -5 shift ]
+    [ swap ] 2dip over [ 0x1f bitand ] [ ] [ -5 shift ]
     tri* 1 swap 0 30 md-insn ;
 : RLDICR. ( ra rs sh me -- )
-    [ swap ] 2dip over [ HEX: 1f bitand ] [ ] [ -5 shift ]
+    [ swap ] 2dip over [ 0x1f bitand ] [ ] [ -5 shift ]
     tri* 1 swap 1 30 md-insn ;
 : RLDIC   ( ra rs sh mb -- )
-    [ swap ] 2dip over [ HEX: 1f bitand ] [ ] [ -5 shift ]
+    [ swap ] 2dip over [ 0x1f bitand ] [ ] [ -5 shift ]
     tri* 2 swap 0 30 md-insn ;
 : RLDIC.  ( ra rs sh mb -- )
-    [ swap ] 2dip over [ HEX: 1f bitand ] [ ] [ -5 shift ]
+    [ swap ] 2dip over [ 0x1f bitand ] [ ] [ -5 shift ]
     tri* 2 swap 1 30 md-insn ;
 : RLDCL   ( ra rs rb mb -- ) [ swap ] 2dip 8 0 30 mds-insn ;
 : RLDCL.  ( ra rs rb mb -- ) [ swap ] 2dip 8 1 30 mds-insn ;
 : RLDCR   ( ra rs rb me -- ) [ swap ] 2dip 9 0 30 mds-insn ;
 : RLDCR.  ( ra rs rb me -- ) [ swap ] 2dip 9 1 30 mds-insn ;
 : RLDIMI  ( ra rs sh mb -- )
-    [ swap ] 2dip over [ HEX: 1f bitand ] [ ] [ -5 shift ]
+    [ swap ] 2dip over [ 0x1f bitand ] [ ] [ -5 shift ]
     tri* 3 swap 0 30 md-insn ;
 : RLDIMI. ( ra rs sh mb -- )
-    [ swap ] 2dip over [ HEX: 1f bitand ] [ ] [ -5 shift ]
+    [ swap ] 2dip over [ 0x1f bitand ] [ ] [ -5 shift ]
     tri* 3 swap 1 30 md-insn ;
 
 ! 3.3.13.2 Fixed-Point Shift Instructions
@@ -434,10 +434,10 @@ M: integer BC ( bo bi target_addr -- ) -2 shift 0 0 16 b-insn ;
 : SRAD   ( ra rs rb -- ) [ swap ] dip 794 0 31 x-insn ;
 : SRAD.  ( ra rs rb -- ) [ swap ] dip 794 1 31 x-insn ;
 : SRADI  ( ra rs sh -- )
-    [ swap ] dip [ HEX: 1f bitand ] [ -5 shift ] bi
+    [ swap ] dip [ 0x1f bitand ] [ -5 shift ] bi
     413 swap 0 31 xs-insn ;
 : SRADI. ( ra rs sh -- )
-    [ swap ] dip [ HEX: 1f bitand ] [ -5 shift ] bi
+    [ swap ] dip [ 0x1f bitand ] [ -5 shift ] bi
     413 swap 1 31 xs-insn ;
 
 ! 3.3.14 BCD Assist Instructions
@@ -448,12 +448,12 @@ M: integer BC ( bo bi target_addr -- ) -2 shift 0 0 16 b-insn ;
 ! 3.3.15 Move To/From System Register Instructions
 : MTSPR ( spr rs -- ) swap 467 0 31 xfx-insn ;
 : MFSPR ( rt spr -- ) 339 0 31 xfx-insn ;
-: MTCRF ( fxm rs -- ) swap HEX: ff bitand 1 shift 144 0 31 xfx-insn ;
+: MTCRF ( fxm rs -- ) swap 0xff bitand 1 shift 144 0 31 xfx-insn ;
 : MFCR ( rt -- ) 0 19 0 31 xfx-insn ;
 
 ! 3.3.15.1 Move To/From One Condition Register Field Instructions
-: MTOCRF ( fxm rs -- ) swap HEX: 100 bitor 1 shift 144 0 31 xfx-insn ;
-: MFOCRF ( rt fxm -- ) HEX: 100 bitor 1 shift 19 0 31 xfx-insn ;
+: MTOCRF ( fxm rs -- ) swap 0x100 bitor 1 shift 144 0 31 xfx-insn ;
+: MFOCRF ( rt fxm -- ) 0x100 bitor 1 shift 19 0 31 xfx-insn ;
 
 ! 3.3.15.2 Move To/From System Registers (Category: Embedded)
 : MCRXR ( bf -- ) 2 shift 0 0 512 0 31 x-insn ;
@@ -1426,62 +1426,62 @@ tri* 134 1 63 x-insn ;
 : NMACHLWSO. ( rt ra rb -- ) 1 494 1 4 xo-insn ; deprecated
 
 ! E.2.2 Simple Branch Mnemonics
-: BLR      ( -- ) HEX: 14 0 0 BCLR ;
-: BCTR     ( -- ) HEX: 14 0 0 BCCTR ;
-: BLRL     ( -- ) HEX: 14 0 0 BCLRL ;
-: BCTRL    ( -- ) HEX: 14 0 0 BCCTRL ;
-: BT       ( bi target_addr -- ) [ HEX:  C ] 2dip BC ;
-: BTA      ( bi target_addr -- ) [ HEX:  C ] 2dip BCA ;
-: BTLR     ( bi target_addr -- ) [ HEX:  C ] 2dip BCLR ;
-: BTCTR    ( bi target_addr -- ) [ HEX:  C ] 2dip BCCTR ;
-: BTL      ( bi target_addr -- ) [ HEX:  C ] 2dip BCL ;
-: BTLA     ( bi target_addr -- ) [ HEX:  C ] 2dip BCLA ;
-: BTLRL    ( bi target_addr -- ) [ HEX:  C ] 2dip BCLRL ;
-: BTCTRL   ( bi target_addr -- ) [ HEX:  C ] 2dip BCCTRL ;
-: BF       ( bi target_addr -- ) [ HEX:  4 ] 2dip BC ;
-: BFA      ( bi target_addr -- ) [ HEX:  4 ] 2dip BCA ;
-: BFLR     ( bi target_addr -- ) [ HEX:  4 ] 2dip BCLR ;
-: BFCTR    ( bi target_addr -- ) [ HEX:  4 ] 2dip BCCTR ;
-: BFL      ( bi target_addr -- ) [ HEX:  4 ] 2dip BCL ;
-: BFLA     ( bi target_addr -- ) [ HEX:  4 ] 2dip BCLA ;
-: BFLRL    ( bi target_addr -- ) [ HEX:  4 ] 2dip BCLRL ;
-: BFCTRL   ( bi target_addr -- ) [ HEX:  4 ] 2dip BCCTRL ;
-: BDNZ     ( target_addr -- ) [ HEX: 10 0 ] dip BC ;
-: BDNZA    ( target_addr -- ) [ HEX: 10 0 ] dip BCA ;
-: BDNZLR   ( target_addr -- ) [ HEX: 10 0 ] dip BCLR ;
-: BDNZL    ( target_addr -- ) [ HEX: 10 0 ] dip BCL ;
-: BDNZLA   ( target_addr -- ) [ HEX: 10 0 ] dip BCLA ;
-: BDNZLRL  ( target_addr -- ) [ HEX: 10 0 ] dip BCLRL ;
-: BDNZT    ( bi target_addr -- ) [ HEX:  8 ] 2dip BC ;
-: BDNZTA   ( bi target_addr -- ) [ HEX:  8 ] 2dip BCA ;
-: BDNZTLR  ( bi target_addr -- ) [ HEX:  8 ] 2dip BCLR ;
-: BDNZTL   ( bi target_addr -- ) [ HEX:  8 ] 2dip BCL ;
-: BDNZTLA  ( bi target_addr -- ) [ HEX:  8 ] 2dip BCLA ;
-: BDNZTLRL ( bi target_addr -- ) [ HEX:  8 ] 2dip BCLRL ;
-: BDNZF    ( bi target_addr -- ) [ HEX:  0 ] 2dip BC ;
-: BDNZFA   ( bi target_addr -- ) [ HEX:  0 ] 2dip BCA ;
-: BDNZFLR  ( bi target_addr -- ) [ HEX:  0 ] 2dip BCLR ;
-: BDNZFL   ( bi target_addr -- ) [ HEX:  0 ] 2dip BCL ;
-: BDNZFLA  ( bi target_addr -- ) [ HEX:  0 ] 2dip BCLA ;
-: BDNZFLRL ( bi target_addr -- ) [ HEX:  0 ] 2dip BCLRL ;
-: BDZ      ( target_addr -- ) [ HEX: 12 0 ] dip BC ;
-: BDZA     ( target_addr -- ) [ HEX: 12 0 ] dip BCA ;
-: BDZLR    ( target_addr -- ) [ HEX: 12 0 ] dip BCLR ;
-: BDZL     ( target_addr -- ) [ HEX: 12 0 ] dip BCL ;
-: BDZLA    ( target_addr -- ) [ HEX: 12 0 ] dip BCLA ;
-: BDZLRL   ( target_addr -- ) [ HEX: 12 0 ] dip BCLRL ;
-: BDZT     ( bi target_addr -- ) [ HEX:  A ] 2dip BC ;
-: BDZTA    ( bi target_addr -- ) [ HEX:  A ] 2dip BCA ;
-: BDZTLR   ( bi target_addr -- ) [ HEX:  A ] 2dip BCLR ;
-: BDZTL    ( bi target_addr -- ) [ HEX:  A ] 2dip BCL ;
-: BDZTLA   ( bi target_addr -- ) [ HEX:  A ] 2dip BCLA ;
-: BDZTLRL  ( bi target_addr -- ) [ HEX:  A ] 2dip BCLRL ;
-: BDZF     ( bi target_addr -- ) [ HEX:  2 ] 2dip BC ;
-: BDZFA    ( bi target_addr -- ) [ HEX:  2 ] 2dip BCA ;
-: BDZFLR   ( bi target_addr -- ) [ HEX:  2 ] 2dip BCLR ;
-: BDZFL    ( bi target_addr -- ) [ HEX:  2 ] 2dip BCL ;
-: BDZFLA   ( bi target_addr -- ) [ HEX:  2 ] 2dip BCLA ;
-: BDZFLRL  ( bi target_addr -- ) [ HEX:  2 ] 2dip BCLRL ;
+: BLR      ( -- ) 0x14 0 0 BCLR ;
+: BCTR     ( -- ) 0x14 0 0 BCCTR ;
+: BLRL     ( -- ) 0x14 0 0 BCLRL ;
+: BCTRL    ( -- ) 0x14 0 0 BCCTRL ;
+: BT       ( bi target_addr -- ) [ 0xC ] 2dip BC ;
+: BTA      ( bi target_addr -- ) [ 0xC ] 2dip BCA ;
+: BTLR     ( bi target_addr -- ) [ 0xC ] 2dip BCLR ;
+: BTCTR    ( bi target_addr -- ) [ 0xC ] 2dip BCCTR ;
+: BTL      ( bi target_addr -- ) [ 0xC ] 2dip BCL ;
+: BTLA     ( bi target_addr -- ) [ 0xC ] 2dip BCLA ;
+: BTLRL    ( bi target_addr -- ) [ 0xC ] 2dip BCLRL ;
+: BTCTRL   ( bi target_addr -- ) [ 0xC ] 2dip BCCTRL ;
+: BF       ( bi target_addr -- ) [ 0x4 ] 2dip BC ;
+: BFA      ( bi target_addr -- ) [ 0x4 ] 2dip BCA ;
+: BFLR     ( bi target_addr -- ) [ 0x4 ] 2dip BCLR ;
+: BFCTR    ( bi target_addr -- ) [ 0x4 ] 2dip BCCTR ;
+: BFL      ( bi target_addr -- ) [ 0x4 ] 2dip BCL ;
+: BFLA     ( bi target_addr -- ) [ 0x4 ] 2dip BCLA ;
+: BFLRL    ( bi target_addr -- ) [ 0x4 ] 2dip BCLRL ;
+: BFCTRL   ( bi target_addr -- ) [ 0x4 ] 2dip BCCTRL ;
+: BDNZ     ( target_addr -- ) [ 0x10 0 ] dip BC ;
+: BDNZA    ( target_addr -- ) [ 0x10 0 ] dip BCA ;
+: BDNZLR   ( target_addr -- ) [ 0x10 0 ] dip BCLR ;
+: BDNZL    ( target_addr -- ) [ 0x10 0 ] dip BCL ;
+: BDNZLA   ( target_addr -- ) [ 0x10 0 ] dip BCLA ;
+: BDNZLRL  ( target_addr -- ) [ 0x10 0 ] dip BCLRL ;
+: BDNZT    ( bi target_addr -- ) [ 0x8 ] 2dip BC ;
+: BDNZTA   ( bi target_addr -- ) [ 0x8 ] 2dip BCA ;
+: BDNZTLR  ( bi target_addr -- ) [ 0x8 ] 2dip BCLR ;
+: BDNZTL   ( bi target_addr -- ) [ 0x8 ] 2dip BCL ;
+: BDNZTLA  ( bi target_addr -- ) [ 0x8 ] 2dip BCLA ;
+: BDNZTLRL ( bi target_addr -- ) [ 0x8 ] 2dip BCLRL ;
+: BDNZF    ( bi target_addr -- ) [ 0x0 ] 2dip BC ;
+: BDNZFA   ( bi target_addr -- ) [ 0x0 ] 2dip BCA ;
+: BDNZFLR  ( bi target_addr -- ) [ 0x0 ] 2dip BCLR ;
+: BDNZFL   ( bi target_addr -- ) [ 0x0 ] 2dip BCL ;
+: BDNZFLA  ( bi target_addr -- ) [ 0x0 ] 2dip BCLA ;
+: BDNZFLRL ( bi target_addr -- ) [ 0x0 ] 2dip BCLRL ;
+: BDZ      ( target_addr -- ) [ 0x12 0 ] dip BC ;
+: BDZA     ( target_addr -- ) [ 0x12 0 ] dip BCA ;
+: BDZLR    ( target_addr -- ) [ 0x12 0 ] dip BCLR ;
+: BDZL     ( target_addr -- ) [ 0x12 0 ] dip BCL ;
+: BDZLA    ( target_addr -- ) [ 0x12 0 ] dip BCLA ;
+: BDZLRL   ( target_addr -- ) [ 0x12 0 ] dip BCLRL ;
+: BDZT     ( bi target_addr -- ) [ 0xA ] 2dip BC ;
+: BDZTA    ( bi target_addr -- ) [ 0xA ] 2dip BCA ;
+: BDZTLR   ( bi target_addr -- ) [ 0xA ] 2dip BCLR ;
+: BDZTL    ( bi target_addr -- ) [ 0xA ] 2dip BCL ;
+: BDZTLA   ( bi target_addr -- ) [ 0xA ] 2dip BCLA ;
+: BDZTLRL  ( bi target_addr -- ) [ 0xA ] 2dip BCLRL ;
+: BDZF     ( bi target_addr -- ) [ 0x2 ] 2dip BC ;
+: BDZFA    ( bi target_addr -- ) [ 0x2 ] 2dip BCA ;
+: BDZFLR   ( bi target_addr -- ) [ 0x2 ] 2dip BCLR ;
+: BDZFL    ( bi target_addr -- ) [ 0x2 ] 2dip BCL ;
+: BDZFLA   ( bi target_addr -- ) [ 0x2 ] 2dip BCLA ;
+: BDZFLRL  ( bi target_addr -- ) [ 0x2 ] 2dip BCLRL ;
 
 ! E.2.3 Branch Mnemonics Incorporating Conditions
 : BLT      ( cr target_addr -- ) [ 4 * 0 + ] dip [ 12 ] 2dip BC ;
@@ -1582,62 +1582,62 @@ tri* 134 1 63 x-insn ;
 : BGECTRL  ( cr target_addr -- ) BNLCTRL ;
 
 ! E.2.4 Branch Prediction
-: BT+       ( bi target_addr -- ) [ HEX:  F ] 2dip BC ;
-: BTA+      ( bi target_addr -- ) [ HEX:  F ] 2dip BCA ;
-: BTLR+     ( bi target_addr -- ) [ HEX:  F ] 2dip BCLR ;
-: BTCTR+    ( bi target_addr -- ) [ HEX:  F ] 2dip BCCTR ;
-: BTL+      ( bi target_addr -- ) [ HEX:  F ] 2dip BCL ;
-: BTLA+     ( bi target_addr -- ) [ HEX:  F ] 2dip BCLA ;
-: BTLRL+    ( bi target_addr -- ) [ HEX:  F ] 2dip BCLRL ;
-: BTCTRL+   ( bi target_addr -- ) [ HEX:  F ] 2dip BCCTRL ;
-: BF+       ( bi target_addr -- ) [ HEX:  7 ] 2dip BC ;
-: BFA+      ( bi target_addr -- ) [ HEX:  7 ] 2dip BCA ;
-: BFLR+     ( bi target_addr -- ) [ HEX:  7 ] 2dip BCLR ;
-: BFCTR+    ( bi target_addr -- ) [ HEX:  7 ] 2dip BCCTR ;
-: BFL+      ( bi target_addr -- ) [ HEX:  7 ] 2dip BCL ;
-: BFLA+     ( bi target_addr -- ) [ HEX:  7 ] 2dip BCLA ;
-: BFLRL+    ( bi target_addr -- ) [ HEX:  7 ] 2dip BCLRL ;
-: BFCTRL+   ( bi target_addr -- ) [ HEX:  7 ] 2dip BCCTRL ;
-: BDNZ+     ( target_addr -- ) [ HEX: 19 0 ] dip BC ;
-: BDNZA+    ( target_addr -- ) [ HEX: 19 0 ] dip BCA ;
-: BDNZLR+   ( target_addr -- ) [ HEX: 19 0 ] dip BCLR ;
-: BDNZL+    ( target_addr -- ) [ HEX: 19 0 ] dip BCL ;
-: BDNZLA+   ( target_addr -- ) [ HEX: 19 0 ] dip BCLA ;
-: BDNZLRL+  ( target_addr -- ) [ HEX: 19 0 ] dip BCLRL ;
-: BDZ+      ( target_addr -- ) [ HEX: 1B 0 ] dip BC ;
-: BDZA+     ( target_addr -- ) [ HEX: 1B 0 ] dip BCA ;
-: BDZLR+    ( target_addr -- ) [ HEX: 1B 0 ] dip BCLR ;
-: BDZL+     ( target_addr -- ) [ HEX: 1B 0 ] dip BCL ;
-: BDZLA+    ( target_addr -- ) [ HEX: 1B 0 ] dip BCLA ;
-: BDZLRL+   ( target_addr -- ) [ HEX: 1B 0 ] dip BCLRL ;
-: BT-       ( bi target_addr -- ) [ HEX:  E ] 2dip BC ;
-: BTA-      ( bi target_addr -- ) [ HEX:  E ] 2dip BCA ;
-: BTLR-     ( bi target_addr -- ) [ HEX:  E ] 2dip BCLR ;
-: BTCTR-    ( bi target_addr -- ) [ HEX:  E ] 2dip BCCTR ;
-: BTL-      ( bi target_addr -- ) [ HEX:  E ] 2dip BCL ;
-: BTLA-     ( bi target_addr -- ) [ HEX:  E ] 2dip BCLA ;
-: BTLRL-    ( bi target_addr -- ) [ HEX:  E ] 2dip BCLRL ;
-: BTCTRL-   ( bi target_addr -- ) [ HEX:  E ] 2dip BCCTRL ;
-: BF-       ( bi target_addr -- ) [ HEX:  6 ] 2dip BC ;
-: BFA-      ( bi target_addr -- ) [ HEX:  6 ] 2dip BCA ;
-: BFLR-     ( bi target_addr -- ) [ HEX:  6 ] 2dip BCLR ;
-: BFCTR-    ( bi target_addr -- ) [ HEX:  6 ] 2dip BCCTR ;
-: BFL-      ( bi target_addr -- ) [ HEX:  6 ] 2dip BCL ;
-: BFLA-     ( bi target_addr -- ) [ HEX:  6 ] 2dip BCLA ;
-: BFLRL-    ( bi target_addr -- ) [ HEX:  6 ] 2dip BCLRL ;
-: BFCTRL-   ( bi target_addr -- ) [ HEX:  6 ] 2dip BCCTRL ;
-: BDNZ-     ( target_addr -- ) [ HEX: 18 0 ] dip BC ;
-: BDNZA-    ( target_addr -- ) [ HEX: 18 0 ] dip BCA ;
-: BDNZLR-   ( target_addr -- ) [ HEX: 18 0 ] dip BCLR ;
-: BDNZL-    ( target_addr -- ) [ HEX: 18 0 ] dip BCL ;
-: BDNZLA-   ( target_addr -- ) [ HEX: 18 0 ] dip BCLA ;
-: BDNZLRL-  ( target_addr -- ) [ HEX: 18 0 ] dip BCLRL ;
-: BDZ-      ( target_addr -- ) [ HEX: 1A 0 ] dip BC ;
-: BDZA-     ( target_addr -- ) [ HEX: 1A 0 ] dip BCA ;
-: BDZLR-    ( target_addr -- ) [ HEX: 1A 0 ] dip BCLR ;
-: BDZL-     ( target_addr -- ) [ HEX: 1A 0 ] dip BCL ;
-: BDZLA-    ( target_addr -- ) [ HEX: 1A 0 ] dip BCLA ;
-: BDZLRL-   ( target_addr -- ) [ HEX: 1A 0 ] dip BCLRL ;
+: BT+       ( bi target_addr -- ) [ 0xF ] 2dip BC ;
+: BTA+      ( bi target_addr -- ) [ 0xF ] 2dip BCA ;
+: BTLR+     ( bi target_addr -- ) [ 0xF ] 2dip BCLR ;
+: BTCTR+    ( bi target_addr -- ) [ 0xF ] 2dip BCCTR ;
+: BTL+      ( bi target_addr -- ) [ 0xF ] 2dip BCL ;
+: BTLA+     ( bi target_addr -- ) [ 0xF ] 2dip BCLA ;
+: BTLRL+    ( bi target_addr -- ) [ 0xF ] 2dip BCLRL ;
+: BTCTRL+   ( bi target_addr -- ) [ 0xF ] 2dip BCCTRL ;
+: BF+       ( bi target_addr -- ) [ 0x7 ] 2dip BC ;
+: BFA+      ( bi target_addr -- ) [ 0x7 ] 2dip BCA ;
+: BFLR+     ( bi target_addr -- ) [ 0x7 ] 2dip BCLR ;
+: BFCTR+    ( bi target_addr -- ) [ 0x7 ] 2dip BCCTR ;
+: BFL+      ( bi target_addr -- ) [ 0x7 ] 2dip BCL ;
+: BFLA+     ( bi target_addr -- ) [ 0x7 ] 2dip BCLA ;
+: BFLRL+    ( bi target_addr -- ) [ 0x7 ] 2dip BCLRL ;
+: BFCTRL+   ( bi target_addr -- ) [ 0x7 ] 2dip BCCTRL ;
+: BDNZ+     ( target_addr -- ) [ 0x19 0 ] dip BC ;
+: BDNZA+    ( target_addr -- ) [ 0x19 0 ] dip BCA ;
+: BDNZLR+   ( target_addr -- ) [ 0x19 0 ] dip BCLR ;
+: BDNZL+    ( target_addr -- ) [ 0x19 0 ] dip BCL ;
+: BDNZLA+   ( target_addr -- ) [ 0x19 0 ] dip BCLA ;
+: BDNZLRL+  ( target_addr -- ) [ 0x19 0 ] dip BCLRL ;
+: BDZ+      ( target_addr -- ) [ 0x1B 0 ] dip BC ;
+: BDZA+     ( target_addr -- ) [ 0x1B 0 ] dip BCA ;
+: BDZLR+    ( target_addr -- ) [ 0x1B 0 ] dip BCLR ;
+: BDZL+     ( target_addr -- ) [ 0x1B 0 ] dip BCL ;
+: BDZLA+    ( target_addr -- ) [ 0x1B 0 ] dip BCLA ;
+: BDZLRL+   ( target_addr -- ) [ 0x1B 0 ] dip BCLRL ;
+: BT-       ( bi target_addr -- ) [ 0xE ] 2dip BC ;
+: BTA-      ( bi target_addr -- ) [ 0xE ] 2dip BCA ;
+: BTLR-     ( bi target_addr -- ) [ 0xE ] 2dip BCLR ;
+: BTCTR-    ( bi target_addr -- ) [ 0xE ] 2dip BCCTR ;
+: BTL-      ( bi target_addr -- ) [ 0xE ] 2dip BCL ;
+: BTLA-     ( bi target_addr -- ) [ 0xE ] 2dip BCLA ;
+: BTLRL-    ( bi target_addr -- ) [ 0xE ] 2dip BCLRL ;
+: BTCTRL-   ( bi target_addr -- ) [ 0xE ] 2dip BCCTRL ;
+: BF-       ( bi target_addr -- ) [ 0x6 ] 2dip BC ;
+: BFA-      ( bi target_addr -- ) [ 0x6 ] 2dip BCA ;
+: BFLR-     ( bi target_addr -- ) [ 0x6 ] 2dip BCLR ;
+: BFCTR-    ( bi target_addr -- ) [ 0x6 ] 2dip BCCTR ;
+: BFL-      ( bi target_addr -- ) [ 0x6 ] 2dip BCL ;
+: BFLA-     ( bi target_addr -- ) [ 0x6 ] 2dip BCLA ;
+: BFLRL-    ( bi target_addr -- ) [ 0x6 ] 2dip BCLRL ;
+: BFCTRL-   ( bi target_addr -- ) [ 0x6 ] 2dip BCCTRL ;
+: BDNZ-     ( target_addr -- ) [ 0x18 0 ] dip BC ;
+: BDNZA-    ( target_addr -- ) [ 0x18 0 ] dip BCA ;
+: BDNZLR-   ( target_addr -- ) [ 0x18 0 ] dip BCLR ;
+: BDNZL-    ( target_addr -- ) [ 0x18 0 ] dip BCL ;
+: BDNZLA-   ( target_addr -- ) [ 0x18 0 ] dip BCLA ;
+: BDNZLRL-  ( target_addr -- ) [ 0x18 0 ] dip BCLRL ;
+: BDZ-      ( target_addr -- ) [ 0x1A 0 ] dip BC ;
+: BDZA-     ( target_addr -- ) [ 0x1A 0 ] dip BCA ;
+: BDZLR-    ( target_addr -- ) [ 0x1A 0 ] dip BCLR ;
+: BDZL-     ( target_addr -- ) [ 0x1A 0 ] dip BCL ;
+: BDZLA-    ( target_addr -- ) [ 0x1A 0 ] dip BCLA ;
+: BDZLRL-   ( target_addr -- ) [ 0x1A 0 ] dip BCLRL ;
 : BLT+     ( cr target_addr -- ) [ 4 * 0 + ] dip [ 15 ] 2dip BC ;
 : BLTA+    ( cr target_addr -- ) [ 4 * 0 + ] dip [ 15 ] 2dip BCA ;
 : BLTLR+   ( cr target_addr -- ) [ 4 * 0 + ] dip [ 15 ] 2dip BCLR ;
@@ -2002,4 +2002,4 @@ tri* 134 1 63 x-insn ;
 : MR. ( dst src -- ) dup OR. ;
 : NOT ( dst src -- ) dup NOR ;
 : NOT. ( dst src -- ) dup NOR. ;
-: MTCR ( rx -- ) HEX: ff swap MTCRF ; deprecated
+: MTCR ( rx -- ) 0xff swap MTCRF ; deprecated

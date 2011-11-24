@@ -10,13 +10,13 @@ IN: ascii
 : LETTER? ( ch -- ? ) CHAR: A CHAR: Z between? ; inline
 : digit? ( ch -- ? ) CHAR: 0 CHAR: 9 between? ; inline
 : printable? ( ch -- ? ) CHAR: \s CHAR: ~ between? ; inline
-: control? ( ch -- ? ) { [ 0 HEX: 1F between? ] [ HEX: 7F = ] } 1|| ; inline
+: control? ( ch -- ? ) { [ 0 0x1F between? ] [ 0x7F = ] } 1|| ; inline
 : quotable? ( ch -- ? ) { [ printable? ] [ "\"\\" member? not ] } 1&& ; inline
 : Letter? ( ch -- ? ) { [ letter? ] [ LETTER? ] } 1|| ; inline
 : alpha? ( ch -- ? ) { [ Letter? ] [ digit? ] } 1|| ; inline
-: ch>lower ( ch -- lower ) dup LETTER? [ HEX: 20 + ] when ; inline
+: ch>lower ( ch -- lower ) dup LETTER? [ 0x20 + ] when ; inline
 : >lower ( str -- lower ) [ ch>lower ] map ;
-: ch>upper ( ch -- upper ) dup letter? [ HEX: 20 - ] when ; inline
+: ch>upper ( ch -- upper ) dup letter? [ 0x20 - ] when ; inline
 : >upper ( str -- upper ) [ ch>upper ] map ;
 
 HINTS: >lower string ;

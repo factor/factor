@@ -87,7 +87,7 @@ SYMBOL: objects
 
 ! Constants
 
-CONSTANT: image-magic HEX: 0f0e0d0c
+CONSTANT: image-magic 0x0f0e0d0c
 CONSTANT: image-version 4
 
 CONSTANT: data-base 1024

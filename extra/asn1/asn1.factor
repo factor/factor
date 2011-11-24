@@ -11,7 +11,7 @@ IN: asn1
 
 : (>128-ber) ( n -- )
     dup 0 > [
-        [ HEX: 7f bitand HEX: 80 bitor , ] keep -7 shift
+        [ 0x7f bitand 0x80 bitor , ] keep -7 shift
         (>128-ber)
     ] [
         drop
@@ -21,7 +21,7 @@ PRIVATE>
 
 : >128-ber ( n -- str )
     [
-        [ HEX: 7f bitand , ] keep -7 shift
+        [ 0x7f bitand , ] keep -7 shift
         (>128-ber)
     ] { } make reverse ;
 
@@ -84,7 +84,7 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
     elements get tagclass<< ;
 
 : set-encoding ( -- )
-    get-id HEX: 20 bitand
+    get-id 0x20 bitand
     zero? "primitive" "constructed" ?
     elements get encoding<< ;
 
@@ -164,7 +164,7 @@ M: fixnum >ber ( n -- byte-array )
         1array "C" pack-be
     ] [
         1array "I" pack-be 0 swap remove dup length
-        HEX: 80 + 1array "C" pack-be prepend
+        0x80 + 1array "C" pack-be prepend
     ] if ;
 
 ! =========================================================
@@ -207,10 +207,10 @@ M: string >ber ( str -- byte-array )
     >byte-array append ;
 
 : >ber-application-string ( n str -- byte-array )
-    [ HEX: 40 + set-tag ] dip >ber ;
+    [ 0x40 + set-tag ] dip >ber ;
 
 : >ber-contextspecific-string ( n str -- byte-array )
-    [ HEX: 80 + set-tag ] dip >ber ;
+    [ 0x80 + set-tag ] dip >ber ;
 
 ! =========================================================
 ! Array
@@ -221,16 +221,16 @@ M: string >ber ( str -- byte-array )
     swapd append swap [ number>string ] map "" join >array append ;
 
 M: array >ber ( array -- byte-array )
-    HEX: 30 >ber-seq-internal ;
+    0x30 >ber-seq-internal ;
 
 : >ber-set ( array -- byte-array )
-    HEX: 31 >ber-seq-internal ;
+    0x31 >ber-seq-internal ;
 
 : >ber-sequence ( array -- byte-array )
-    HEX: 30 >ber-seq-internal ;
+    0x30 >ber-seq-internal ;
 
 : >ber-appsequence ( array -- byte-array )
-    HEX: 60 >ber-seq-internal ;
+    0x60 >ber-seq-internal ;
 
 : >ber-contextspecific-array ( array -- byte-array )
-    HEX: A0 >ber-seq-internal ;
+    0xA0 >ber-seq-internal ;

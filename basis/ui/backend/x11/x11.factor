@@ -98,37 +98,37 @@ M: x11-ui-backend (pixel-format-attribute)
 
 CONSTANT: modifiers
     {
-        { S+ HEX: 1 }
-        { C+ HEX: 4 }
-        { A+ HEX: 8 }
+        { S+ 0x1 }
+        { C+ 0x4 }
+        { A+ 0x8 }
     }
 
 CONSTANT: key-codes
     H{
-        { HEX: FF08 "BACKSPACE" }
-        { HEX: FF09 "TAB"       }
-        { HEX: FF0D "RET"       }
-        { HEX: FF8D "ENTER"     }
-        { HEX: FF1B "ESC"       }
-        { HEX: FFFF "DELETE"    }
-        { HEX: FF50 "HOME"      }
-        { HEX: FF51 "LEFT"      }
-        { HEX: FF52 "UP"        }
-        { HEX: FF53 "RIGHT"     }
-        { HEX: FF54 "DOWN"      }
-        { HEX: FF55 "PAGE_UP"   }
-        { HEX: FF56 "PAGE_DOWN" }
-        { HEX: FF57 "END"       }
-        { HEX: FF58 "BEGIN"     }
-        { HEX: FFBE "F1"        }
-        { HEX: FFBF "F2"        }
-        { HEX: FFC0 "F3"        }
-        { HEX: FFC1 "F4"        }
-        { HEX: FFC2 "F5"        }
-        { HEX: FFC3 "F6"        }
-        { HEX: FFC4 "F7"        }
-        { HEX: FFC5 "F8"        }
-        { HEX: FFC6 "F9"        }
+        { 0xFF08 "BACKSPACE" }
+        { 0xFF09 "TAB"       }
+        { 0xFF0D "RET"       }
+        { 0xFF8D "ENTER"     }
+        { 0xFF1B "ESC"       }
+        { 0xFFFF "DELETE"    }
+        { 0xFF50 "HOME"      }
+        { 0xFF51 "LEFT"      }
+        { 0xFF52 "UP"        }
+        { 0xFF53 "RIGHT"     }
+        { 0xFF54 "DOWN"      }
+        { 0xFF55 "PAGE_UP"   }
+        { 0xFF56 "PAGE_DOWN" }
+        { 0xFF57 "END"       }
+        { 0xFF58 "BEGIN"     }
+        { 0xFFBE "F1"        }
+        { 0xFFBF "F2"        }
+        { 0xFFC0 "F3"        }
+        { 0xFFC1 "F4"        }
+        { 0xFFC2 "F5"        }
+        { 0xFFC3 "F6"        }
+        { 0xFFC4 "F7"        }
+        { 0xFFC5 "F8"        }
+        { 0xFFC6 "F9"        }
     }
 
 : key-code ( keysym -- keycode action? )

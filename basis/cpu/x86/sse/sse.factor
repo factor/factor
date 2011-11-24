@@ -478,9 +478,9 @@ M: x86 %compare-vector-ccs
 
 : (%move-vector-mask) ( dst src rep -- mask )
     {
-        { double-2-rep [ MOVMSKPS HEX: f ] }
-        { float-4-rep  [ MOVMSKPS HEX: f ] }
-        [ drop PMOVMSKB HEX: ffff ]
+        { double-2-rep [ MOVMSKPS 0xf ] }
+        { float-4-rep  [ MOVMSKPS 0xf ] }
+        [ drop PMOVMSKB 0xffff ]
     } case ;
 
 M: x86 %move-vector-mask ( dst src rep -- )
@@ -708,8 +708,8 @@ M: x86 %avg-vector-reps
 M: x86 %dot-vector
     [ two-operand ] keep
     {
-        { float-4-rep [ HEX: ff DPPS ] }
-        { double-2-rep [ HEX: ff DPPD ] }
+        { float-4-rep [ 0xff DPPS ] }
+        { double-2-rep [ 0xff DPPD ] }
     } case ;
 
 M: x86 %dot-vector-reps

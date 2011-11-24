@@ -19,7 +19,7 @@ TUPLE: md5-state < checksum-state state old-state ;
 : <md5-state> ( -- md5 )
     md5-state new-checksum-state
         64 >>block-size
-        uint-array{ HEX: 67452301 HEX: efcdab89 HEX: 98badcfe HEX: 10325476 }
+        uint-array{ 0x67452301 0xefcdab89 0x98badcfe 0x10325476 }
         [ clone >>state ] [ >>old-state ] bi ;
 
 M: md5 initialize-checksum-state drop <md5-state> ;

@@ -97,12 +97,12 @@ FUNCTION: CXDiagnostic clang_getDiagnostic ( CXTranslationUnit Unit,
 FUNCTION: void clang_disposeDiagnostic ( CXDiagnostic Diagnostic ) ;
 
 ENUM: CXDiagnosticDisplayOptions
-    { CXDiagnostic_DisplaySourceLocation HEX: 01 }
-    { CXDiagnostic_DisplayColumn         HEX: 02 }
-    { CXDiagnostic_DisplaySourceRanges   HEX: 04 }
-    { CXDiagnostic_DisplayOption         HEX: 08 }
-    { CXDiagnostic_DisplayCategoryId     HEX: 10 }
-    { CXDiagnostic_DisplayCategoryName   HEX: 20 } ;
+    { CXDiagnostic_DisplaySourceLocation 0x01 }
+    { CXDiagnostic_DisplayColumn         0x02 }
+    { CXDiagnostic_DisplaySourceRanges   0x04 }
+    { CXDiagnostic_DisplayOption         0x08 }
+    { CXDiagnostic_DisplayCategoryId     0x10 }
+    { CXDiagnostic_DisplayCategoryName   0x20 } ;
 
 FUNCTION: CXString clang_formatDiagnostic ( CXDiagnostic Diagnostic,
                                             uint         Options ) ;
@@ -130,14 +130,14 @@ FUNCTION: CXTranslationUnit clang_createTranslationUnitFromSourceFile ( CXIndex 
 FUNCTION: CXTranslationUnit clang_createTranslationUnit ( CXIndex CIdx, c-string ast_filename ) ;
 
 ENUM: CXTranslationUnit_Flags
-    { CXTranslationUnit_None                        HEX: 00 }
-    { CXTranslationUnit_DetailedPreprocessingRecord HEX: 01 }
-    { CXTranslationUnit_Incomplete                  HEX: 02 }
-    { CXTranslationUnit_PrecompiledPreamble         HEX: 04 }
-    { CXTranslationUnit_CacheCompletionResults      HEX: 08 }
-    { CXTranslationUnit_CXXPrecompiledPreamble      HEX: 10 }
-    { CXTranslationUnit_CXXChainedPCH               HEX: 20 }
-    { CXTranslationUnit_NestedMacroInstantiations   HEX: 40 } ;
+    { CXTranslationUnit_None                        0x00 }
+    { CXTranslationUnit_DetailedPreprocessingRecord 0x01 }
+    { CXTranslationUnit_Incomplete                  0x02 }
+    { CXTranslationUnit_PrecompiledPreamble         0x04 }
+    { CXTranslationUnit_CacheCompletionResults      0x08 }
+    { CXTranslationUnit_CXXPrecompiledPreamble      0x10 }
+    { CXTranslationUnit_CXXChainedPCH               0x20 }
+    { CXTranslationUnit_NestedMacroInstantiations   0x40 } ;
 
 FUNCTION: uint clang_defaultEditingTranslationUnitOptions ( ) ;
 FUNCTION: CXTranslationUnit clang_parseTranslationUnit ( CXIndex        CIdx,

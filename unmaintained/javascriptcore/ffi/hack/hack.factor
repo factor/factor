@@ -9,14 +9,14 @@ HOOK: set-callstack-bounds os ( -- )
 HOOK: macosx-callstack-start-offset cpu ( -- address )
 HOOK: macosx-callstack-size-offset cpu ( -- address )
 
-M: ppc macosx-callstack-start-offset HEX: 188 ;
-M: ppc macosx-callstack-size-offset HEX: 18c ;
+M: ppc macosx-callstack-start-offset 0x188 ;
+M: ppc macosx-callstack-size-offset 0x18c ;
 
-M: x86.32 macosx-callstack-start-offset HEX: c48 ;
-M: x86.32 macosx-callstack-size-offset HEX: c4c ;
+M: x86.32 macosx-callstack-start-offset 0xc48 ;
+M: x86.32 macosx-callstack-size-offset 0xc4c ;
 
-M: x86.64 macosx-callstack-start-offset HEX: 1860 ;
-M: x86.64 macosx-callstack-size-offset HEX: 1868 ;
+M: x86.64 macosx-callstack-start-offset 0x1860 ;
+M: x86.64 macosx-callstack-size-offset 0x1868 ;
 
 M: object set-callstack-bounds ;
 

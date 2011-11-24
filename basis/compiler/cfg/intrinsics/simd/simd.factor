@@ -22,22 +22,22 @@ IN: compiler.cfg.intrinsics.simd
 : sign-bit-mask ( rep -- byte-array )
     signed-rep {
         { char-16-rep [ uchar-array{
-            HEX: 80 HEX: 80 HEX: 80 HEX: 80
-            HEX: 80 HEX: 80 HEX: 80 HEX: 80
-            HEX: 80 HEX: 80 HEX: 80 HEX: 80
-            HEX: 80 HEX: 80 HEX: 80 HEX: 80
+            0x80 0x80 0x80 0x80
+            0x80 0x80 0x80 0x80
+            0x80 0x80 0x80 0x80
+            0x80 0x80 0x80 0x80
         } underlying>> ] }
         { short-8-rep [ ushort-array{
-            HEX: 8000 HEX: 8000 HEX: 8000 HEX: 8000
-            HEX: 8000 HEX: 8000 HEX: 8000 HEX: 8000
+            0x8000 0x8000 0x8000 0x8000
+            0x8000 0x8000 0x8000 0x8000
         } underlying>> ] }
         { int-4-rep [ uint-array{
-            HEX: 8000,0000 HEX: 8000,0000
-            HEX: 8000,0000 HEX: 8000,0000
+            0x8000,0000 0x8000,0000
+            0x8000,0000 0x8000,0000
         } underlying>> ] }
         { longlong-2-rep [ ulonglong-array{
-            HEX: 8000,0000,0000,0000
-            HEX: 8000,0000,0000,0000
+            0x8000,0000,0000,0000
+            0x8000,0000,0000,0000
         } underlying>> ] }
     } case ;
 
