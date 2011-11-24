@@ -239,6 +239,7 @@ unit-test
 
 [ 0 ] [ "0" string>number ] unit-test
 [ 0 ] [ "00" string>number ] unit-test
+[ 0 ] [ "0,000" string>number ] unit-test
 [ 0.0 ] [ "0." string>number ] unit-test
 [ 0.0 ] [ "0.0" string>number ] unit-test
 [ 0.0 ] [ "0x0.0p0" string>number ] unit-test
@@ -256,4 +257,19 @@ unit-test
 [  -8 ] [ "-0o10" string>number ] unit-test
 [  -2 ] [ "-0b10" string>number ] unit-test
 
+[ 0x7FFF,ABCD ] [ "0x7FFF,ABCD" string>number ] unit-test
+
 [ 1.0 ] [ "0x1.0p0" string>number ] unit-test
+
+[ f ] [ "0x" string>number ] unit-test
+[ f ] [ "0b" string>number ] unit-test
+[ f ] [ "0o" string>number ] unit-test
+[ f ] [ "0x," string>number ] unit-test
+[ f ] [ "0b," string>number ] unit-test
+[ f ] [ "0o," string>number ] unit-test
+[ f ] [ "0x,1" string>number ] unit-test
+[ f ] [ "0b,1" string>number ] unit-test
+[ f ] [ "0o,1" string>number ] unit-test
+[ f ] [ "0x1," string>number ] unit-test
+[ f ] [ "0b1," string>number ] unit-test
+[ f ] [ "0o1," string>number ] unit-test
