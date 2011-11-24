@@ -4,16 +4,16 @@ IN: unix.stat
 
 ! File Types
 
-CONSTANT: S_IFMT   OCT: 170000   ! These bits determine file type.
+CONSTANT: S_IFMT   0o170000   ! These bits determine file type.
 
-CONSTANT: S_IFDIR  OCT:  40000   ! Directory.
-CONSTANT: S_IFCHR  OCT:  20000   ! Character device.
-CONSTANT: S_IFBLK  OCT:  60000   ! Block device.
-CONSTANT: S_IFREG  OCT: 100000   ! Regular file.
-CONSTANT: S_IFIFO  OCT: 010000   ! FIFO.
-CONSTANT: S_IFLNK  OCT: 120000   ! Symbolic link.
-CONSTANT: S_IFSOCK OCT: 140000   ! Socket.
-CONSTANT: S_IFWHT  OCT: 160000   ! Whiteout.
+CONSTANT: S_IFDIR  0o40000   ! Directory.
+CONSTANT: S_IFCHR  0o20000   ! Character device.
+CONSTANT: S_IFBLK  0o60000   ! Block device.
+CONSTANT: S_IFREG  0o100000   ! Regular file.
+CONSTANT: S_IFIFO  0o010000   ! FIFO.
+CONSTANT: S_IFLNK  0o120000   ! Symbolic link.
+CONSTANT: S_IFSOCK 0o140000   ! Socket.
+CONSTANT: S_IFWHT  0o160000   ! Whiteout.
 
 STRUCT: fsid
     { __val int[2] } ;

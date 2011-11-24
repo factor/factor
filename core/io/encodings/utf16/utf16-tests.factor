@@ -6,23 +6,23 @@ io.encodings.string alien.c-types alien.strings accessors classes ;
 IN: io.encodings.utf16.tests
 
 [ { CHAR: x } ] [ B{ 0 CHAR: x } utf16be decode >array ] unit-test
-[ { HEX: 1D11E } ] [ B{ HEX: D8 HEX: 34 HEX: DD HEX: 1E } utf16be decode >array ] unit-test
-[ { CHAR: replacement-character } ] [ B{ BIN: 11011111 CHAR: q } utf16be decode >array ] unit-test
-[ { CHAR: replacement-character } ] [ B{ BIN: 11011011 CHAR: x BIN: 11011011 CHAR: x } utf16be decode >array ] unit-test
+[ { 0x1D11E } ] [ B{ 0xD8 0x34 0xDD 0x1E } utf16be decode >array ] unit-test
+[ { CHAR: replacement-character } ] [ B{ 0b11011111 CHAR: q } utf16be decode >array ] unit-test
+[ { CHAR: replacement-character } ] [ B{ 0b11011011 CHAR: x 0b11011011 CHAR: x } utf16be decode >array ] unit-test
 
-[ { 0 120 216 52 221 30 } ] [ { CHAR: x HEX: 1d11e } >string utf16be encode >array ] unit-test
+[ { 0 120 216 52 221 30 } ] [ { CHAR: x 0x1d11e } >string utf16be encode >array ] unit-test
 
 [ { CHAR: x } ] [ B{ CHAR: x 0 } utf16le decode >array ] unit-test
-[ { 119070 } ] [ B{ HEX: 34 HEX: D8 HEX: 1E HEX: DD } >string utf16le decode >array ] unit-test
-[ { CHAR: replacement-character } ] [ { 0 BIN: 11011111 } >string utf16le decode >array ] unit-test
-[ { CHAR: replacement-character } ] [ { 0 BIN: 11011011 0 0 } >string utf16le decode >array ] unit-test
+[ { 119070 } ] [ B{ 0x34 0xD8 0x1E 0xDD } >string utf16le decode >array ] unit-test
+[ { CHAR: replacement-character } ] [ { 0 0b11011111 } >string utf16le decode >array ] unit-test
+[ { CHAR: replacement-character } ] [ { 0 0b11011011 0 0 } >string utf16le decode >array ] unit-test
 
-[ { 120 0 52 216 30 221 } ] [ { CHAR: x HEX: 1d11e } >string utf16le encode >array ] unit-test
+[ { 120 0 52 216 30 221 } ] [ { CHAR: x 0x1d11e } >string utf16le encode >array ] unit-test
 
-[ { CHAR: x } ] [ B{ HEX: ff HEX: fe CHAR: x 0 } utf16 decode >array ] unit-test
-[ { CHAR: x } ] [ B{ HEX: fe HEX: ff 0 CHAR: x } utf16 decode >array ] unit-test
+[ { CHAR: x } ] [ B{ 0xff 0xfe CHAR: x 0 } utf16 decode >array ] unit-test
+[ { CHAR: x } ] [ B{ 0xfe 0xff 0 CHAR: x } utf16 decode >array ] unit-test
 
-[ { HEX: ff HEX: fe 120 0 52 216 30 221 } ] [ { CHAR: x HEX: 1d11e } >string utf16 encode >array ] unit-test
+[ { 0xff 0xfe 120 0 52 216 30 221 } ] [ { CHAR: x 0x1d11e } >string utf16 encode >array ] unit-test
 
 ! test ascii encoding path
 

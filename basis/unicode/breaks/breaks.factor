@@ -32,15 +32,15 @@ CONSTANT: graphemes 12
     [ dup medial? [ drop V ] [ final? T Any ? ] if ] if ;
 
 : hangul-class ( ch -- class )
-    hangul-base - HEX: 1C mod zero? LV LVT ? ;
+    hangul-base - 0x1C mod zero? LV LVT ? ;
 
 CATEGORY: grapheme-control Zl Zp Cc Cf ;
 : control-class ( ch -- class )
     {
         { CHAR: \r [ CR ] }
         { CHAR: \n [ LF ] }
-        { HEX: 200C [ Extend ] }
-        { HEX: 200D [ Extend ] }
+        { 0x200C [ Extend ] }
+        { 0x200D [ Extend ] }
         [ drop Control ]
     } case ;
 

@@ -10,7 +10,7 @@ TUPLE: euc { table biassoc } ;
 <PRIVATE
 
 : byte? ( ch -- ? )
-    HEX: 0 HEX: ff between? ;
+    0x0 0xff between? ;
 
 M: euc encode-char ( char stream encoding -- )
     swapd table>> value-at [
@@ -22,7 +22,7 @@ M: euc encode-char ( char stream encoding -- )
     ] [ encode-error ] if* ;
 
 : euc-multibyte? ( ch -- ? )
-    HEX: 81 HEX: fe between? ;
+    0x81 0xfe between? ;
 
 :: decode-multibyte ( ch stream encoding -- char )
     stream stream-read1

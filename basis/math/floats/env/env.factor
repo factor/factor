@@ -105,11 +105,11 @@ GENERIC# (set-denormal-mode) 1 ( fp-env mode -- fp-env )
 
 CONSTANT: vm-error-exception-flag>bit
     H{
-        { +fp-invalid-operation+ HEX: 01 }
-        { +fp-overflow+          HEX: 02 }
-        { +fp-underflow+         HEX: 04 }
-        { +fp-zero-divide+       HEX: 08 }
-        { +fp-inexact+           HEX: 10 }
+        { +fp-invalid-operation+ 0x01 }
+        { +fp-overflow+          0x02 }
+        { +fp-underflow+         0x04 }
+        { +fp-zero-divide+       0x08 }
+        { +fp-inexact+           0x10 }
     }
 
 PRIVATE>

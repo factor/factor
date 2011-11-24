@@ -14,10 +14,10 @@ MEMO: <test1> ( -- code-table )
 [ 3 ] [ 3 <test1> at ] unit-test
 [ 3 ] [ 3 <test1> value-at ] unit-test
 
-[ HEX: AD2A ] [ HEX: 8253 <test1> at ] unit-test
-[ HEX: 8253 ] [ HEX: AD2A <test1> value-at ] unit-test
+[ 0xAD2A ] [ 0x8253 <test1> at ] unit-test
+[ 0x8253 ] [ 0xAD2A <test1> value-at ] unit-test
 
-[ HEX: AD31 ] [ HEX: 8258 <test1> at ] unit-test
-[ HEX: 8258 ] [ HEX: AD31 <test1> value-at ] unit-test
+[ 0xAD31 ] [ 0x8258 <test1> at ] unit-test
+[ 0x8258 ] [ 0xAD31 <test1> value-at ] unit-test
 
 

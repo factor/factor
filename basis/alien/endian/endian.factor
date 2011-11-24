@@ -24,7 +24,7 @@ MACRO: byte-reverse ( n signed? -- quot )
         [
             dup iota [
                 [ 1 + - -8 * ] [ nip 8 * ] 2bi
-                '[ _ shift HEX: ff bitand _ shift ]
+                '[ _ shift 0xff bitand _ shift ]
             ] with map
         ] [ 1 - [ bitor ] n*quot ] bi
     ] [

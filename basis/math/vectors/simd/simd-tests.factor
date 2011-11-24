@@ -191,11 +191,11 @@ TUPLE: simd-test-failure
     ] [ = ] check-optimizer
 ] unit-test
 
-[ HEX: ffffffff ] [ HEX: ffffffff uint-4-with first ] unit-test
+[ 0xffffffff ] [ 0xffffffff uint-4-with first ] unit-test
 
-[ HEX: ffffffff ] [ HEX: ffffffff [ uint-4-with ] compile-call first ] unit-test
+[ 0xffffffff ] [ 0xffffffff [ uint-4-with ] compile-call first ] unit-test
 
-[ HEX: ffffffff ] [ [ HEX: ffffffff uint-4-with ] compile-call first ] unit-test
+[ 0xffffffff ] [ [ 0xffffffff uint-4-with ] compile-call first ] unit-test
 
 "== Checking -boa constructors" print
 
@@ -206,7 +206,7 @@ TUPLE: simd-test-failure
     ] [ = ] check-optimizer
 ] unit-test
 
-[ HEX: ffffffff ] [ HEX: ffffffff 2 3 4 [ uint-4-boa ] compile-call first ] unit-test
+[ 0xffffffff ] [ 0xffffffff 2 3 4 [ uint-4-boa ] compile-call first ] unit-test
 
 "== Checking vector operations" print
 
@@ -566,12 +566,12 @@ TUPLE: inconsistent-vector-test bool branch ;
     '[ [ _ 1quotation ] dip '[ _ swap nth ] ] [ = ] check-optimizer ; inline
 
 [ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
-[ { } ] [ int-4{ HEX: 7fffffff 3 4 -8 } test-accesses ] unit-test
-[ { } ] [ uint-4{ HEX: ffffffff 2 3 4 } test-accesses ] unit-test
+[ { } ] [ int-4{ 0x7fffffff 3 4 -8 } test-accesses ] unit-test
+[ { } ] [ uint-4{ 0xffffffff 2 3 4 } test-accesses ] unit-test
 
-[ HEX: 7fffffff ] [ int-4{ HEX: 7fffffff 3 4 -8 } first ] unit-test
-[ -8 ] [ int-4{ HEX: 7fffffff 3 4 -8 } last ] unit-test
-[ HEX: ffffffff ] [ uint-4{ HEX: ffffffff 2 3 4 } first ] unit-test
+[ 0x7fffffff ] [ int-4{ 0x7fffffff 3 4 -8 } first ] unit-test
+[ -8 ] [ int-4{ 0x7fffffff 3 4 -8 } last ] unit-test
+[ 0xffffffff ] [ uint-4{ 0xffffffff 2 3 4 } first ] unit-test
 
 [ { } ] [ double-2{ 1.0 2.0 } test-accesses ] unit-test
 [ { } ] [ longlong-2{ 1 2 } test-accesses ] unit-test
@@ -583,8 +583,8 @@ TUPLE: inconsistent-vector-test bool branch ;
     '[ [ _ 1quotation ] dip '[ _ vbroadcast ] ] [ = ] check-optimizer ;
 
 [ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test
-[ { } ] [ int-4{ HEX: 7fffffff 3 4 -8 } test-broadcast ] unit-test
-[ { } ] [ uint-4{ HEX: ffffffff 2 3 4 } test-broadcast ] unit-test
+[ { } ] [ int-4{ 0x7fffffff 3 4 -8 } test-broadcast ] unit-test
+[ { } ] [ uint-4{ 0xffffffff 2 3 4 } test-broadcast ] unit-test
 
 [ { } ] [ double-2{ 1.0 2.0 } test-broadcast ] unit-test
 [ { } ] [ longlong-2{ 1 2 } test-broadcast ] unit-test

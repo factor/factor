@@ -57,25 +57,25 @@ SYMBOL: cond-code
     cond-code set ;
 
 : CC> ( -- n )
-    #! Default value is BIN: 1110 AL (= always)
-    cond-code [ f ] change BIN: 1110 or ;
+    #! Default value is 0b1110 AL (= always)
+    cond-code [ f ] change 0b1110 or ;
 
-: EQ ( -- ) BIN: 0000 >CC ;
-: NE ( -- ) BIN: 0001 >CC ;
-: CS ( -- ) BIN: 0010 >CC ;
-: CC ( -- ) BIN: 0011 >CC ;
-: LO ( -- ) BIN: 0100 >CC ;
-: PL ( -- ) BIN: 0101 >CC ;
-: VS ( -- ) BIN: 0110 >CC ;
-: VC ( -- ) BIN: 0111 >CC ;
-: HI ( -- ) BIN: 1000 >CC ;
-: LS ( -- ) BIN: 1001 >CC ;
-: GE ( -- ) BIN: 1010 >CC ;
-: LT ( -- ) BIN: 1011 >CC ;
-: GT ( -- ) BIN: 1100 >CC ;
-: LE ( -- ) BIN: 1101 >CC ;
-: AL ( -- ) BIN: 1110 >CC ;
-: NV ( -- ) BIN: 1111 >CC ;
+: EQ ( -- ) 0b0000 >CC ;
+: NE ( -- ) 0b0001 >CC ;
+: CS ( -- ) 0b0010 >CC ;
+: CC ( -- ) 0b0011 >CC ;
+: LO ( -- ) 0b0100 >CC ;
+: PL ( -- ) 0b0101 >CC ;
+: VS ( -- ) 0b0110 >CC ;
+: VC ( -- ) 0b0111 >CC ;
+: HI ( -- ) 0b1000 >CC ;
+: LS ( -- ) 0b1001 >CC ;
+: GE ( -- ) 0b1010 >CC ;
+: LT ( -- ) 0b1011 >CC ;
+: GT ( -- ) 0b1100 >CC ;
+: LE ( -- ) 0b1101 >CC ;
+: AL ( -- ) 0b1110 >CC ;
+: NV ( -- ) 0b1111 >CC ;
 
 <PRIVATE
 
@@ -143,10 +143,10 @@ M: shifter shifter-op
 
 PRIVATE>
 
-: <LSL> ( Rm shift-imm/Rs -- shifter-op ) BIN: 00 <shifter> ;
-: <LSR> ( Rm shift-imm/Rs -- shifter-op ) BIN: 01 <shifter> ;
-: <ASR> ( Rm shift-imm/Rs -- shifter-op ) BIN: 10 <shifter> ;
-: <ROR> ( Rm shift-imm/Rs -- shifter-op ) BIN: 11 <shifter> ;
+: <LSL> ( Rm shift-imm/Rs -- shifter-op ) 0b00 <shifter> ;
+: <LSR> ( Rm shift-imm/Rs -- shifter-op ) 0b01 <shifter> ;
+: <ASR> ( Rm shift-imm/Rs -- shifter-op ) 0b10 <shifter> ;
+: <ROR> ( Rm shift-imm/Rs -- shifter-op ) 0b11 <shifter> ;
 : <RRX> ( Rm -- shifter-op ) 0 <ROR> ;
 
 M: register shifter-op 0 <LSL> shifter-op ;
@@ -164,19 +164,19 @@ M: integer shifter-op 0 <IMM> shifter-op ;
 
 PRIVATE>
 
-: AND ( Rd Rn shifter-op -- ) BIN: 0000 addr1 ;
-: EOR ( Rd Rn shifter-op -- ) BIN: 0001 addr1 ;
-: SUB ( Rd Rn shifter-op -- ) BIN: 0010 addr1 ;
-: RSB ( Rd Rn shifter-op -- ) BIN: 0011 addr1 ;
-: ADD ( Rd Rn shifter-op -- ) BIN: 0100 addr1 ;
-: ADC ( Rd Rn shifter-op -- ) BIN: 0101 addr1 ;
-: SBC ( Rd Rn shifter-op -- ) BIN: 0110 addr1 ;
-: RSC ( Rd Rn shifter-op -- ) BIN: 0111 addr1 ;
-: ORR ( Rd Rn shifter-op -- ) BIN: 1100 addr1 ;
-: BIC ( Rd Rn shifter-op -- ) BIN: 1110 addr1 ;
+: AND ( Rd Rn shifter-op -- ) 0b0000 addr1 ;
+: EOR ( Rd Rn shifter-op -- ) 0b0001 addr1 ;
+: SUB ( Rd Rn shifter-op -- ) 0b0010 addr1 ;
+: RSB ( Rd Rn shifter-op -- ) 0b0011 addr1 ;
+: ADD ( Rd Rn shifter-op -- ) 0b0100 addr1 ;
+: ADC ( Rd Rn shifter-op -- ) 0b0101 addr1 ;
+: SBC ( Rd Rn shifter-op -- ) 0b0110 addr1 ;
+: RSC ( Rd Rn shifter-op -- ) 0b0111 addr1 ;
+: ORR ( Rd Rn shifter-op -- ) 0b1100 addr1 ;
+: BIC ( Rd Rn shifter-op -- ) 0b1110 addr1 ;
 
-: MOV ( Rd shifter-op -- ) [ f ] dip BIN: 1101 addr1 ;
-: MVN ( Rd shifter-op -- ) [ f ] dip BIN: 1111 addr1 ;
+: MOV ( Rd shifter-op -- ) [ f ] dip 0b1101 addr1 ;
+: MVN ( Rd shifter-op -- ) [ f ] dip 0b1111 addr1 ;
 
 ! These always update the condition code flags
 <PRIVATE
@@ -185,10 +185,10 @@ PRIVATE>
 
 PRIVATE>
 
-: TST ( Rn shifter-op -- ) BIN: 1000 (CMP) ;
-: TEQ ( Rn shifter-op -- ) BIN: 1001 (CMP) ;
-: CMP ( Rn shifter-op -- ) BIN: 1010 (CMP) ;
-: CMN ( Rn shifter-op -- ) BIN: 1011 (CMP) ;
+: TST ( Rn shifter-op -- ) 0b1000 (CMP) ;
+: TEQ ( Rn shifter-op -- ) 0b1001 (CMP) ;
+: CMP ( Rn shifter-op -- ) 0b1010 (CMP) ;
+: CMN ( Rn shifter-op -- ) 0b1011 (CMP) ;
 
 ! Multiply instructions
 <PRIVATE
@@ -233,8 +233,8 @@ PRIVATE>
         { 1 24 }
         { 1 22 }
         { 1 21 }
-        { BIN: 111 16 }
-        { BIN: 1111 8 }
+        { 0b111 16 }
+        { 0b1111 8 }
         { 1 4 }
         { register 0 }
         { register 12 }
@@ -300,9 +300,9 @@ M: register (BX) ( Rm l -- )
     {
         { 1 24 }
         { 1 21 }
-        { BIN: 1111 16 }
-        { BIN: 1111 12 }
-        { BIN: 1111 8 }
+        { 0b1111 16 }
+        { 0b1111 12 }
+        { 0b1111 8 }
         5
         { 1 4 }
         { register 0 }
@@ -319,7 +319,7 @@ PRIVATE>
 
 GENERIC: addressing-mode-3 ( addressing-mode -- n )
 
-: b>n/n ( b -- n n ) [ -4 shift ] [ HEX: f bitand ] bi ;
+: b>n/n ( b -- n n ) [ -4 shift ] [ 0xf bitand ] bi ;
 
 M: addressing addressing-mode-3
     { [ p>> ] [ u>> ] [ w>> ] [ base>> addressing-mode-3 ] } cleave

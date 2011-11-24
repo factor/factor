@@ -7,7 +7,7 @@ IN: tools.deploy.unix
 
 : create-app-dir ( vocab bundle-name -- vm )
     copy-vm
-    dup OCT: 755 set-file-permissions ;
+    dup 0o755 set-file-permissions ;
 
 : bundle-name ( -- str )
     deploy-name get ;

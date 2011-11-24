@@ -624,17 +624,17 @@ TYPEDEF: int CRYPT_ATTRIBUTE_TYPE
 ! ===============================================
 
 ! Flags for the X.509 keyUsage extension
-: CRYPT_KEYUSAGE_NONE                            HEX: 000 ; inline
-: CRYPT_KEYUSAGE_DIGITALSIGNATURE                HEX: 001 ; inline
-: CRYPT_KEYUSAGE_NONREPUDIATION                  HEX: 002 ; inline
-: CRYPT_KEYUSAGE_KEYENCIPHERMENT                 HEX: 004 ; inline
-: CRYPT_KEYUSAGE_DATAENCIPHERMENT                HEX: 008 ; inline
-: CRYPT_KEYUSAGE_KEYAGREEMENT                    HEX: 010 ; inline
-: CRYPT_KEYUSAGE_KEYCERTSIGN                     HEX: 020 ; inline
-: CRYPT_KEYUSAGE_CRLSIGN                         HEX: 040 ; inline
-: CRYPT_KEYUSAGE_ENCIPHERONLY                    HEX: 080 ; inline
-: CRYPT_KEYUSAGE_DECIPHERONLY                    HEX: 100 ; inline
-: CRYPT_KEYUSAGE_LAST                            HEX: 200 ; inline ! Last possible value
+: CRYPT_KEYUSAGE_NONE                            0x000 ; inline
+: CRYPT_KEYUSAGE_DIGITALSIGNATURE                0x001 ; inline
+: CRYPT_KEYUSAGE_NONREPUDIATION                  0x002 ; inline
+: CRYPT_KEYUSAGE_KEYENCIPHERMENT                 0x004 ; inline
+: CRYPT_KEYUSAGE_DATAENCIPHERMENT                0x008 ; inline
+: CRYPT_KEYUSAGE_KEYAGREEMENT                    0x010 ; inline
+: CRYPT_KEYUSAGE_KEYCERTSIGN                     0x020 ; inline
+: CRYPT_KEYUSAGE_CRLSIGN                         0x040 ; inline
+: CRYPT_KEYUSAGE_ENCIPHERONLY                    0x080 ; inline
+: CRYPT_KEYUSAGE_DECIPHERONLY                    0x100 ; inline
+: CRYPT_KEYUSAGE_LAST                            0x200 ; inline ! Last possible value
 
 ! X.509 cRLReason and cryptlib cRLExtReason codes
 : CRYPT_CRLREASON_UNSPECIFIED             0  ; inline
@@ -655,14 +655,14 @@ TYPEDEF: int CRYPT_ATTRIBUTE_TYPE
 ! codes but allow for multiple reasons to be specified.  Note that these
 ! don't follow the X.509 naming since in that scheme the enumerated types
 ! and bitflags have the same names
-: CRYPT_CRLREASONFLAG_UNUSED                     HEX: 001 ; inline
-: CRYPT_CRLREASONFLAG_KEYCOMPROMISE              HEX: 002 ; inline
-: CRYPT_CRLREASONFLAG_CACOMPROMISE               HEX: 004 ; inline
-: CRYPT_CRLREASONFLAG_AFFILIATIONCHANGED         HEX: 008 ; inline
-: CRYPT_CRLREASONFLAG_SUPERSEDED                 HEX: 010 ; inline
-: CRYPT_CRLREASONFLAG_CESSATIONOFOPERATION       HEX: 020 ; inline
-: CRYPT_CRLREASONFLAG_CERTIFICATEHOLD            HEX: 040 ; inline
-: CRYPT_CRLREASONFLAG_LAST                       HEX: 080 ; inline ! Last poss.value
+: CRYPT_CRLREASONFLAG_UNUSED                     0x001 ; inline
+: CRYPT_CRLREASONFLAG_KEYCOMPROMISE              0x002 ; inline
+: CRYPT_CRLREASONFLAG_CACOMPROMISE               0x004 ; inline
+: CRYPT_CRLREASONFLAG_AFFILIATIONCHANGED         0x008 ; inline
+: CRYPT_CRLREASONFLAG_SUPERSEDED                 0x010 ; inline
+: CRYPT_CRLREASONFLAG_CESSATIONOFOPERATION       0x020 ; inline
+: CRYPT_CRLREASONFLAG_CERTIFICATEHOLD            0x040 ; inline
+: CRYPT_CRLREASONFLAG_LAST                       0x080 ; inline ! Last poss.value
 
 ! X.509 CRL holdInstruction codes
 : CRYPT_HOLDINSTRUCTION_NONE           0 ; inline
@@ -680,28 +680,28 @@ TYPEDEF: int CRYPT_ATTRIBUTE_TYPE
 : CRYPT_COMPLIANCELEVEL_LAST            5 ; inline
 
 ! Flags for the Netscape netscape-cert-type extension
-: CRYPT_NS_CERTTYPE_SSLCLIENT                    HEX: 001 ; inline
-: CRYPT_NS_CERTTYPE_SSLSERVER                    HEX: 002 ; inline
-: CRYPT_NS_CERTTYPE_SMIME                        HEX: 004 ; inline
-: CRYPT_NS_CERTTYPE_OBJECTSIGNING                HEX: 008 ; inline
-: CRYPT_NS_CERTTYPE_RESERVED                     HEX: 010 ; inline
-: CRYPT_NS_CERTTYPE_SSLCA                        HEX: 020 ; inline
-: CRYPT_NS_CERTTYPE_SMIMECA                      HEX: 040 ; inline
-: CRYPT_NS_CERTTYPE_OBJECTSIGNINGCA              HEX: 080 ; inline
-: CRYPT_NS_CERTTYPE_LAST                         HEX: 100 ; inline ! Last possible value
+: CRYPT_NS_CERTTYPE_SSLCLIENT                    0x001 ; inline
+: CRYPT_NS_CERTTYPE_SSLSERVER                    0x002 ; inline
+: CRYPT_NS_CERTTYPE_SMIME                        0x004 ; inline
+: CRYPT_NS_CERTTYPE_OBJECTSIGNING                0x008 ; inline
+: CRYPT_NS_CERTTYPE_RESERVED                     0x010 ; inline
+: CRYPT_NS_CERTTYPE_SSLCA                        0x020 ; inline
+: CRYPT_NS_CERTTYPE_SMIMECA                      0x040 ; inline
+: CRYPT_NS_CERTTYPE_OBJECTSIGNINGCA              0x080 ; inline
+: CRYPT_NS_CERTTYPE_LAST                         0x100 ; inline ! Last possible value
 
 ! Flags for the SET certificate-type extension
-: CRYPT_SET_CERTTYPE_CARD                        HEX: 001 ; inline
-: CRYPT_SET_CERTTYPE_MER                         HEX: 002 ; inline
-: CRYPT_SET_CERTTYPE_PGWY                        HEX: 004 ; inline
-: CRYPT_SET_CERTTYPE_CCA                         HEX: 008 ; inline
-: CRYPT_SET_CERTTYPE_MCA                         HEX: 010 ; inline
-: CRYPT_SET_CERTTYPE_PCA                         HEX: 020 ; inline
-: CRYPT_SET_CERTTYPE_GCA                         HEX: 040 ; inline
-: CRYPT_SET_CERTTYPE_BCA                         HEX: 080 ; inline
-: CRYPT_SET_CERTTYPE_RCA                         HEX: 100 ; inline
-: CRYPT_SET_CERTTYPE_ACQ                         HEX: 200 ; inline
-: CRYPT_SET_CERTTYPE_LAST                        HEX: 400 ; inline ! Last possible value
+: CRYPT_SET_CERTTYPE_CARD                        0x001 ; inline
+: CRYPT_SET_CERTTYPE_MER                         0x002 ; inline
+: CRYPT_SET_CERTTYPE_PGWY                        0x004 ; inline
+: CRYPT_SET_CERTTYPE_CCA                         0x008 ; inline
+: CRYPT_SET_CERTTYPE_MCA                         0x010 ; inline
+: CRYPT_SET_CERTTYPE_PCA                         0x020 ; inline
+: CRYPT_SET_CERTTYPE_GCA                         0x040 ; inline
+: CRYPT_SET_CERTTYPE_BCA                         0x080 ; inline
+: CRYPT_SET_CERTTYPE_RCA                         0x100 ; inline
+: CRYPT_SET_CERTTYPE_ACQ                         0x200 ; inline
+: CRYPT_SET_CERTTYPE_LAST                        0x400 ; inline ! Last possible value
 
 ! CMS contentType values
 ! CRYPT_CONTENT_TYPE

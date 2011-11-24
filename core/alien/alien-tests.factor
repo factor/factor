@@ -43,20 +43,20 @@ IN: alien.tests
 ] unit-test
 
 cell 8 = [
-    [ HEX: 123412341234 ] [
+    [ 0x123412341234 ] [
       8 <byte-array>
-      HEX: 123412341234 over 0 set-alien-signed-8
+      0x123412341234 over 0 set-alien-signed-8
       0 alien-signed-8
     ] unit-test
     
-    [ HEX: 123412341234 ] [
+    [ 0x123412341234 ] [
       8 <byte-array>
-      HEX: 123412341234 over 0 set-alien-signed-cell
+      0x123412341234 over 0 set-alien-signed-cell
       0 alien-signed-cell
     ] unit-test
 ] when
 
-[ "ALIEN: 1234" ] [ HEX: 1234 <alien> unparse ] unit-test
+[ "ALIEN: 1234" ] [ 0x1234 <alien> unparse ] unit-test
 
 [ ] [ 0 B{ 1 2 3 } <displaced-alien> drop ] unit-test
 

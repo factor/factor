@@ -11,7 +11,7 @@ HOOK: packet. io-backend ( string -- )
     "--Ethernet Header--" print
         dup etherneth.
     dup etherneth-type {
-        ! HEX: 800 [ ] ! IP
-        ! HEX: 806 [ ] ! ARP
+        ! 0x800 [ ] ! IP
+        ! 0x806 [ ] ! ARP
         [ "Unknown type: " write .h ]
     } case 2drop ;

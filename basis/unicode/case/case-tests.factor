@@ -20,8 +20,8 @@ IN: unicode.case.tests
     "lt" locale set
     [ f ] [ i-dot? ] unit-test
     [ t ] [ lithuanian? ] unit-test
-    [ "i\u000307\u000300" ] [ HEX: CC 1string nfd >lower ] unit-test
-    [ "\u00012f\u000307" ] [ HEX: 12E 1string nfd >lower nfc ] unit-test
+    [ "i\u000307\u000300" ] [ 0xCC 1string nfd >lower ] unit-test
+    [ "\u00012f\u000307" ] [ 0x12E 1string nfd >lower nfc ] unit-test
     [ "I\u000300" ] [ "i\u000307\u000300" >upper ] unit-test
 !    [ "I\u000300" ] [ "i\u000307\u000300" >title ] unit-test
 ] with-scope

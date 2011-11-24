@@ -19,8 +19,8 @@ CONSTANT: frame-reg 31
 : nv-int-regs ( -- seq ) 13 31 [a,b] ;
 
 : LOAD32 ( r n -- )
-    [ -16 shift HEX: ffff bitand LIS ]
-    [ [ dup ] dip HEX: ffff bitand ORI ] 2bi ;
+    [ -16 shift 0xffff bitand LIS ]
+    [ [ dup ] dip 0xffff bitand ORI ] 2bi ;
 
 : jit-trap-null ( src -- ) drop ;
 : jit-load-vm ( dst -- )

@@ -62,11 +62,11 @@ TUPLE: range ufirst ulast bfirst blast ;
     ] ;
 
 : unlinear ( num -- bytes )
-    B{ HEX: 81 HEX: 30 HEX: 81 HEX: 30 } linear -
-    10 /mod HEX: 30 + swap
-    126 /mod HEX: 81 + swap
-    10 /mod HEX: 30 + swap
-    HEX: 81 +
+    B{ 0x81 0x30 0x81 0x30 } linear -
+    10 /mod 0x30 + swap
+    126 /mod 0x81 + swap
+    10 /mod 0x30 + swap
+    0x81 +
     4byte-array reverse! ;
 
 : >interval-map-by ( start-quot end-quot value-quot seq -- interval-map )
@@ -99,11 +99,11 @@ M: gb18030 encode-char ( char stream encoding -- )
     ] dip stream-write ;
 
 : second-byte? ( ch -- ? ) ! of a double-byte character
-    { [ HEX: 40 HEX: 7E between? ] [ HEX: 80 HEX: fe between? ] } 1||  ;
+    { [ 0x40 0x7E between? ] [ 0x80 0xfe between? ] } 1||  ;
 
-: quad-1/3? ( ch -- ? ) HEX: 81 HEX: fe between? ;
+: quad-1/3? ( ch -- ? ) 0x81 0xfe between? ;
 
-: quad-2/4? ( ch -- ? ) HEX: 30 HEX: 39 between? ;
+: quad-2/4? ( ch -- ? ) 0x30 0x39 between? ;
 
 : last-bytes? ( byte-array -- ? )
     { [ length 2 = ] [ first quad-1/3? ] [ second quad-2/4? ] } 1&& ;

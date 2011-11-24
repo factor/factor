@@ -28,7 +28,7 @@ STRUCT: struct-test-foo
     { z bool } ;
 
 STRUCT: struct-test-bar
-    { w ushort initial: HEX: ffff }
+    { w ushort initial: 0xffff }
     { foo struct-test-foo } ;
 
 [ 12 ] [ struct-test-foo heap-size ] unit-test
@@ -53,7 +53,7 @@ STRUCT: struct-test-bar
 [ {
     { "underlying" B{ 98 0 0 98 127 0 0 127 0 0 0 0 } }
     { { "x" char } 98            }
-    { { "y" int  } HEX: 7F00007F }
+    { { "y" int  } 0x7F00007F }
     { { "z" bool } f             }
 } ] [
     B{ 98 0 0 98 127 0 0 127 0 0 0 0 } struct-test-foo memory>struct

@@ -6,7 +6,7 @@ IN: io.binary
 : le> ( seq -- x ) dup length iota 0 [ 8 * shift + ] 2reduce ;
 : be> ( seq -- x ) 0 [ [ 8 shift ] dip + ] reduce ;
 
-: mask-byte ( x -- y ) HEX: ff bitand ; inline
+: mask-byte ( x -- y ) 0xff bitand ; inline
 
 : nth-byte ( x n -- b ) -8 * shift mask-byte ; inline
 
@@ -14,12 +14,12 @@ IN: io.binary
 : >be ( x n -- byte-array ) >le reverse! ;
 
 : d>w/w ( d -- w1 w2 )
-    [ HEX: ffffffff bitand ]
-    [ -32 shift HEX: ffffffff bitand ] bi ;
+    [ 0xffffffff bitand ]
+    [ -32 shift 0xffffffff bitand ] bi ;
 
 : w>h/h ( w -- h1 h2 )
-    [ HEX: ffff bitand ]
-    [ -16 shift HEX: ffff bitand ] bi ;
+    [ 0xffff bitand ]
+    [ -16 shift 0xffff bitand ] bi ;
 
 : h>b/b ( h -- b1 b2 )
     [ mask-byte ]

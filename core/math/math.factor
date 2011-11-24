@@ -109,7 +109,7 @@ M: object fp-snan? drop f ; inline
 M: object fp-infinity? drop f ; inline
 
 : <fp-nan> ( payload -- nan )
-    HEX: 7ff0000000000000 bitor bits>double ; inline
+    0x7ff0000000000000 bitor bits>double ; inline
 
 GENERIC: next-float ( m -- n )
 GENERIC: prev-float ( m -- n )

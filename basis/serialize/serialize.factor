@@ -40,12 +40,12 @@ SYMBOL: serialized
 ! otherwise be confused with a small number.
 : serialize-cell ( n -- )
     [ 0 write1 ] [
-        dup HEX: 7e <= [
-            HEX: 80 bitor write1
+        dup 0x7e <= [
+            0x80 bitor write1
         ] [
             dup log2 8 /i 1 + 
-            dup HEX: 7f >= [
-                HEX: ff write1
+            dup 0x7f >= [
+                0xff write1
                 dup serialize-cell
             ] [
                 dup write1
@@ -56,8 +56,8 @@ SYMBOL: serialized
 
 : deserialize-cell ( -- n )
     read1 {
-        { [ dup HEX: ff = ] [ drop deserialize-cell read be> ] }
-        { [ dup HEX: 80 >= ] [ HEX: 80 bitxor ] }
+        { [ dup 0xff = ] [ drop deserialize-cell read be> ] }
+        { [ dup 0x80 >= ] [ 0x80 bitxor ] }
         [ read be> ]
     } cond ;
 

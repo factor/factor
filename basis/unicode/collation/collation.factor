@@ -43,17 +43,17 @@ ducet insert-helpers
 
 : base ( char -- base )
     {
-        { [ dup HEX: 3400 HEX:  4DB5 between? ] [ drop HEX: FB80 ] } ! Extension A
-        { [ dup HEX: 20000 HEX: 2A6D6 between? ] [ drop HEX: FB80 ] } ! Extension B
-        { [ dup HEX: 4E00 HEX: 9FC3 between? ] [ drop HEX: FB40 ] } ! CJK
-        [ drop HEX: FBC0 ] ! Other
+        { [ dup 0x3400 0x4DB5 between? ] [ drop 0xFB80 ] } ! Extension A
+        { [ dup 0x20000 0x2A6D6 between? ] [ drop 0xFB80 ] } ! Extension B
+        { [ dup 0x4E00 0x9FC3 between? ] [ drop 0xFB40 ] } ! CJK
+        [ drop 0xFBC0 ] ! Other
     } cond ;
 
 : AAAA ( char -- weight )
-    [ base ] [ -15 shift ] bi + HEX: 20 2 f weight boa ;
+    [ base ] [ -15 shift ] bi + 0x20 2 f weight boa ;
 
 : BBBB ( char -- weight )
-    HEX: 7FFF bitand HEX: 8000 bitor 0 0 f weight boa ;
+    0x7FFF bitand 0x8000 bitor 0 0 f weight boa ;
 
 : illegal? ( char -- ? )
     { [ "Noncharacter_Code_Point" property? ] [ category "Cs" = ] } 1|| ;
@@ -101,7 +101,7 @@ ducet insert-helpers
     map [ zero? not ] filter % 0 , ; inline
 
 : variable-weight ( weight -- )
-    dup ignorable?>> [ primary>> ] [ drop HEX: FFFF ] if , ;
+    dup ignorable?>> [ primary>> ] [ drop 0xFFFF ] if , ;
 
 : weights>bytes ( weights -- byte-array )
     [

@@ -193,7 +193,7 @@ IN: bootstrap.x86
 \ lazy-jit-compile define-combinator-primitive
 
 [
-    temp2 HEX: ffffffff MOV f rc-absolute-cell rel-literal
+    temp2 0xffffffff MOV f rc-absolute-cell rel-literal
     temp1 temp2 CMP
 ] pic-check-tuple jit-define
 

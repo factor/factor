@@ -79,34 +79,34 @@ CONSTANT: kIOHIDElementTypeOutput            129
 CONSTANT: kIOHIDElementTypeFeature           257
 CONSTANT: kIOHIDElementTypeCollection        513
 
-CONSTANT: kIOHIDElementCollectionTypePhysical     HEX: 00
-CONSTANT: kIOHIDElementCollectionTypeApplication    HEX: 01
-CONSTANT: kIOHIDElementCollectionTypeLogical        HEX: 02
-CONSTANT: kIOHIDElementCollectionTypeReport         HEX: 03
-CONSTANT: kIOHIDElementCollectionTypeNamedArray     HEX: 04
-CONSTANT: kIOHIDElementCollectionTypeUsageSwitch    HEX: 05
-CONSTANT: kIOHIDElementCollectionTypeUsageModifier  HEX: 06
+CONSTANT: kIOHIDElementCollectionTypePhysical     0x00
+CONSTANT: kIOHIDElementCollectionTypeApplication    0x01
+CONSTANT: kIOHIDElementCollectionTypeLogical        0x02
+CONSTANT: kIOHIDElementCollectionTypeReport         0x03
+CONSTANT: kIOHIDElementCollectionTypeNamedArray     0x04
+CONSTANT: kIOHIDElementCollectionTypeUsageSwitch    0x05
+CONSTANT: kIOHIDElementCollectionTypeUsageModifier  0x06
 
 CONSTANT: kIOHIDReportTypeInput    0
 CONSTANT: kIOHIDReportTypeOutput   1
 CONSTANT: kIOHIDReportTypeFeature  2
 CONSTANT: kIOHIDReportTypeCount    3
 
-CONSTANT: kIOHIDOptionsTypeNone        HEX: 00
-CONSTANT: kIOHIDOptionsTypeSeizeDevice HEX: 01
+CONSTANT: kIOHIDOptionsTypeNone        0x00
+CONSTANT: kIOHIDOptionsTypeSeizeDevice 0x01
 
-CONSTANT: kIOHIDQueueOptionsTypeNone    HEX: 00
-CONSTANT: kIOHIDQueueOptionsTypeEnqueueAll HEX: 01
+CONSTANT: kIOHIDQueueOptionsTypeNone    0x00
+CONSTANT: kIOHIDQueueOptionsTypeEnqueueAll 0x01
 
-CONSTANT: kIOHIDElementFlagsConstantMask        HEX: 0001
-CONSTANT: kIOHIDElementFlagsVariableMask        HEX: 0002
-CONSTANT: kIOHIDElementFlagsRelativeMask        HEX: 0004
-CONSTANT: kIOHIDElementFlagsWrapMask            HEX: 0008
-CONSTANT: kIOHIDElementFlagsNonLinearMask       HEX: 0010
-CONSTANT: kIOHIDElementFlagsNoPreferredMask     HEX: 0020
-CONSTANT: kIOHIDElementFlagsNullStateMask       HEX: 0040
-CONSTANT: kIOHIDElementFlagsVolativeMask        HEX: 0080
-CONSTANT: kIOHIDElementFlagsBufferedByteMask    HEX: 0100
+CONSTANT: kIOHIDElementFlagsConstantMask        0x0001
+CONSTANT: kIOHIDElementFlagsVariableMask        0x0002
+CONSTANT: kIOHIDElementFlagsRelativeMask        0x0004
+CONSTANT: kIOHIDElementFlagsWrapMask            0x0008
+CONSTANT: kIOHIDElementFlagsNonLinearMask       0x0010
+CONSTANT: kIOHIDElementFlagsNoPreferredMask     0x0020
+CONSTANT: kIOHIDElementFlagsNullStateMask       0x0040
+CONSTANT: kIOHIDElementFlagsVolativeMask        0x0080
+CONSTANT: kIOHIDElementFlagsBufferedByteMask    0x0100
 
 CONSTANT: kIOHIDValueScaleTypeCalibrated 0
 CONSTANT: kIOHIDValueScaleTypePhysical   1

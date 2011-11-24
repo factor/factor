@@ -120,7 +120,7 @@ M: integer >ckf ;
     " " split [ >ckf ] map ;
 
 : flush? ( cards -- ? )
-    HEX: F000 [ bitand ] reduce 0 = not ;
+    0xF000 [ bitand ] reduce 0 = not ;
 
 : rank-bits ( cards -- q )
     0 [ bitor ] reduce -16 shift ;
@@ -132,16 +132,16 @@ M: integer >ckf ;
     [ 1 ] 2dip [ dip * ] curry [ swap ] prepose each ; inline
 
 : prime-bits ( cards -- q )
-    [ HEX: FF bitand ] map-product ;
+    [ 0xFF bitand ] map-product ;
 
 : perfect-hash-find ( q -- value )
     #! magic to convert a hand's unique identifying bits to the
     #! proper index for fast lookup in a table of hand values
-    HEX: E91AAA35 +
+    0xE91AAA35 +
     dup -16 shift bitxor
     dup   8 shift w+
     dup  -4 shift bitxor
-    [ -8 shift HEX: 1FF bitand adjustments-table nth ]
+    [ -8 shift 0x1FF bitand adjustments-table nth ]
     [ dup 2 shift w+ -19 shift ] bi
     bitxor values-table nth ;
 
@@ -153,7 +153,7 @@ M: integer >ckf ;
     ] if ;
 
 : >card-rank ( card -- string )
-    -8 shift HEX: F bitand RANK_STR nth ;
+    -8 shift 0xF bitand RANK_STR nth ;
 
 : >card-suit ( card -- string )
     {

@@ -17,14 +17,14 @@ TYPEDEF: UInt32 OptionBits
 
 CONSTANT: noErr 0
 
-CONSTANT: kFSFileOperationDefaultOptions HEX: 00
-CONSTANT: kFSFileOperationOverwrite HEX: 01
-CONSTANT: kFSFileOperationSkipSourcePermissionErrors HEX: 02
-CONSTANT: kFSFileOperationDoNotMoveAcrossVolumes HEX: 04
-CONSTANT: kFSFileOperationSkipPreflight HEX: 08
+CONSTANT: kFSFileOperationDefaultOptions 0x00
+CONSTANT: kFSFileOperationOverwrite 0x01
+CONSTANT: kFSFileOperationSkipSourcePermissionErrors 0x02
+CONSTANT: kFSFileOperationDoNotMoveAcrossVolumes 0x04
+CONSTANT: kFSFileOperationSkipPreflight 0x08
 
-CONSTANT: kFSPathMakeRefDefaultOptions HEX: 00
-CONSTANT: kFSPathMakeRefDoNotFollowLeafSymlink HEX: 01
+CONSTANT: kFSPathMakeRefDefaultOptions 0x00
+CONSTANT: kFSPathMakeRefDoNotFollowLeafSymlink 0x01
 
 FUNCTION: OSStatus FSMoveObjectToTrashSync (
     FSRef* source,

@@ -12,12 +12,12 @@ IN: ini-file
 : escape ( ch -- ch' )
     H{
         { CHAR: a   CHAR: \a }
-        { CHAR: b   HEX: 08 } ! \b
-        { CHAR: f   HEX: 0c } ! \f
+        { CHAR: b   0x08 } ! \b
+        { CHAR: f   0x0c } ! \f
         { CHAR: n   CHAR: \n }
         { CHAR: r   CHAR: \r }
         { CHAR: t   CHAR: \t }
-        { CHAR: v   HEX: 0b } ! \v
+        { CHAR: v   0x0b } ! \v
         { CHAR: '   CHAR: ' }
         { CHAR: "   CHAR: " }
         { CHAR: \\  CHAR: \\ }
@@ -43,12 +43,12 @@ USE: xml.entities
 : escape-string ( str -- str' )
     H{
         { CHAR: \a   "\\a"  }
-        { HEX: 08    "\\b"  }
-        { HEX: 0c    "\\f"  }
+        { 0x08    "\\b"  }
+        { 0x0c    "\\f"  }
         { CHAR: \n   "\\n"  }
         { CHAR: \r   "\\r"  }
         { CHAR: \t   "\\t"  }
-        { HEX: 0b    "\\v"  }
+        { 0x0b    "\\v"  }
         { CHAR: '    "\\'"  }
         { CHAR: "    "\\\"" }
         { CHAR: \\   "\\\\" }
@@ -65,8 +65,8 @@ USE: xml.entities
         [ CHAR: \t = ]
         [ CHAR: \n = ]
         [ CHAR: \r = ]
-        [ HEX: 0c = ] ! \f
-        [ HEX: 0b = ] ! \v
+        [ 0x0c = ] ! \f
+        [ 0x0b = ] ! \v
     } 1|| ;
 
 : unspace ( str -- str' )

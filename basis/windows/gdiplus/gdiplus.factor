@@ -95,19 +95,19 @@ ENUM: GpFillMode
     { FillModeWinding     1 } ;
 
 ENUM: GpLineCap
-    { LineCapFlat             HEX: 00 }
-    { LineCapSquare           HEX: 01 }
-    { LineCapRound            HEX: 02 }
-    { LineCapTriangle         HEX: 03 }
+    { LineCapFlat             0x00 }
+    { LineCapSquare           0x01 }
+    { LineCapRound            0x02 }
+    { LineCapTriangle         0x03 }
 
-    { LineCapNoAnchor         HEX: 10 }
-    { LineCapSquareAnchor     HEX: 11 }
-    { LineCapRoundAnchor      HEX: 12 }
-    { LineCapDiamondAnchor    HEX: 13 }
-    { LineCapArrowAnchor      HEX: 14 }
+    { LineCapNoAnchor         0x10 }
+    { LineCapSquareAnchor     0x11 }
+    { LineCapRoundAnchor      0x12 }
+    { LineCapDiamondAnchor    0x13 }
+    { LineCapArrowAnchor      0x14 }
 
-    { LineCapCustom           HEX: ff }
-    { LineCapAnchorMask       HEX: f0 } ;
+    { LineCapCustom           0xff }
+    { LineCapAnchorMask       0xf0 } ;
 
 ENUM: PathPointType
     { PathPointTypeStart            0 }
@@ -254,15 +254,15 @@ ENUM:  StringDigitSubstitute
     { StringDigitSubstituteTraditional   3 } ;
 
 ENUM: StringFormatFlags
-    { StringFormatFlagsDirectionRightToLeft    HEX: 00000001 }
-    { StringFormatFlagsDirectionVertical       HEX: 00000002 }
-    { StringFormatFlagsNoFitBlackBox           HEX: 00000004 }
-    { StringFormatFlagsDisplayFormatControl    HEX: 00000020 }
-    { StringFormatFlagsNoFontFallback          HEX: 00000400 }
-    { StringFormatFlagsMeasureTrailingSpaces   HEX: 00000800 }
-    { StringFormatFlagsNoWrap                  HEX: 00001000 }
-    { StringFormatFlagsLineLimit               HEX: 00002000 }
-    { StringFormatFlagsNoClip                  HEX: 00004000 } ;
+    { StringFormatFlagsDirectionRightToLeft    0x00000001 }
+    { StringFormatFlagsDirectionVertical       0x00000002 }
+    { StringFormatFlagsNoFitBlackBox           0x00000004 }
+    { StringFormatFlagsDisplayFormatControl    0x00000020 }
+    { StringFormatFlagsNoFontFallback          0x00000400 }
+    { StringFormatFlagsMeasureTrailingSpaces   0x00000800 }
+    { StringFormatFlagsNoWrap                  0x00001000 }
+    { StringFormatFlagsLineLimit               0x00002000 }
+    { StringFormatFlagsNoClip                  0x00004000 } ;
 
 ENUM: StringTrimming
     { StringTrimmingNone                   0 }
@@ -303,19 +303,19 @@ ENUM: ImageCodecFlags
 
 ENUM: ImageFlags
     { ImageFlagsNone                0 }
-    { ImageFlagsScalable            HEX: 0001 }
-    { ImageFlagsHasAlpha            HEX: 0002 }
-    { ImageFlagsHasTranslucent      HEX: 0004 }
-    { ImageFlagsPartiallyScalable   HEX: 0008 }
-    { ImageFlagsColorSpaceRGB       HEX: 0010 }
-    { ImageFlagsColorSpaceCMYK      HEX: 0020 }
-    { ImageFlagsColorSpaceGRAY      HEX: 0040 }
-    { ImageFlagsColorSpaceYCBCR     HEX: 0080 }
-    { ImageFlagsColorSpaceYCCK      HEX: 0100 }
-    { ImageFlagsHasRealDPI          HEX: 1000 }
-    { ImageFlagsHasRealPixelSize    HEX: 2000 }
-    { ImageFlagsReadOnly            HEX: 00010000 }
-    { ImageFlagsCaching             HEX: 00020000 } ;
+    { ImageFlagsScalable            0x0001 }
+    { ImageFlagsHasAlpha            0x0002 }
+    { ImageFlagsHasTranslucent      0x0004 }
+    { ImageFlagsPartiallyScalable   0x0008 }
+    { ImageFlagsColorSpaceRGB       0x0010 }
+    { ImageFlagsColorSpaceCMYK      0x0020 }
+    { ImageFlagsColorSpaceGRAY      0x0040 }
+    { ImageFlagsColorSpaceYCBCR     0x0080 }
+    { ImageFlagsColorSpaceYCCK      0x0100 }
+    { ImageFlagsHasRealDPI          0x1000 }
+    { ImageFlagsHasRealPixelSize    0x2000 }
+    { ImageFlagsReadOnly            0x00010000 }
+    { ImageFlagsCaching             0x00020000 } ;
 
 ENUM: CombineMode
     CombineModeReplace
@@ -435,12 +435,12 @@ TYPEDEF: INT PixelFormat
     [ ] [ 8 shift ] [ ] tri* bitor bitor ; inline
 PRIVATE>
 
-CONSTANT: PixelFormatIndexed   HEX: 00010000
-CONSTANT: PixelFormatGDI       HEX: 00020000
-CONSTANT: PixelFormatAlpha     HEX: 00040000
-CONSTANT: PixelFormatPAlpha    HEX: 00080000
-CONSTANT: PixelFormatExtended  HEX: 00100000
-CONSTANT: PixelFormatCanonical HEX: 00200000
+CONSTANT: PixelFormatIndexed   0x00010000
+CONSTANT: PixelFormatGDI       0x00020000
+CONSTANT: PixelFormatAlpha     0x00040000
+CONSTANT: PixelFormatPAlpha    0x00080000
+CONSTANT: PixelFormatExtended  0x00100000
+CONSTANT: PixelFormatCanonical 0x00200000
 
 CONSTANT: PixelFormatUndefined 0
 CONSTANT: PixelFormatDontCare  0
@@ -651,238 +651,238 @@ CONSTANT: PropertyTagTypeUndefined  7
 CONSTANT: PropertyTagTypeSLONG      9
 CONSTANT: PropertyTagTypeSRational 10
 
-CONSTANT: PropertyTagExifIFD                HEX: 8769
-CONSTANT: PropertyTagGpsIFD                 HEX: 8825
+CONSTANT: PropertyTagExifIFD                0x8769
+CONSTANT: PropertyTagGpsIFD                 0x8825
 
-CONSTANT: PropertyTagNewSubfileType         HEX: 00FE
-CONSTANT: PropertyTagSubfileType            HEX: 00FF
-CONSTANT: PropertyTagImageWidth             HEX: 0100
-CONSTANT: PropertyTagImageHeight            HEX: 0101
-CONSTANT: PropertyTagBitsPerSample          HEX: 0102
-CONSTANT: PropertyTagCompression            HEX: 0103
-CONSTANT: PropertyTagPhotometricInterp      HEX: 0106
-CONSTANT: PropertyTagThreshHolding          HEX: 0107
-CONSTANT: PropertyTagCellWidth              HEX: 0108
-CONSTANT: PropertyTagCellHeight             HEX: 0109
-CONSTANT: PropertyTagFillOrder              HEX: 010A
-CONSTANT: PropertyTagDocumentName           HEX: 010D
-CONSTANT: PropertyTagImageDescription       HEX: 010E
-CONSTANT: PropertyTagEquipMake              HEX: 010F
-CONSTANT: PropertyTagEquipModel             HEX: 0110
-CONSTANT: PropertyTagStripOffsets           HEX: 0111
-CONSTANT: PropertyTagOrientation            HEX: 0112
-CONSTANT: PropertyTagSamplesPerPixel        HEX: 0115
-CONSTANT: PropertyTagRowsPerStrip           HEX: 0116
-CONSTANT: PropertyTagStripBytesCount        HEX: 0117
-CONSTANT: PropertyTagMinSampleValue         HEX: 0118
-CONSTANT: PropertyTagMaxSampleValue         HEX: 0119
-CONSTANT: PropertyTagXResolution            HEX: 011A
-CONSTANT: PropertyTagYResolution            HEX: 011B
-CONSTANT: PropertyTagPlanarConfig           HEX: 011C
-CONSTANT: PropertyTagPageName               HEX: 011D
-CONSTANT: PropertyTagXPosition              HEX: 011E
-CONSTANT: PropertyTagYPosition              HEX: 011F
-CONSTANT: PropertyTagFreeOffset             HEX: 0120
-CONSTANT: PropertyTagFreeByteCounts         HEX: 0121
-CONSTANT: PropertyTagGrayResponseUnit       HEX: 0122
-CONSTANT: PropertyTagGrayResponseCurve      HEX: 0123
-CONSTANT: PropertyTagT4Option               HEX: 0124
-CONSTANT: PropertyTagT6Option               HEX: 0125
-CONSTANT: PropertyTagResolutionUnit         HEX: 0128
-CONSTANT: PropertyTagPageNumber             HEX: 0129
-CONSTANT: PropertyTagTransferFuncition      HEX: 012D
-CONSTANT: PropertyTagSoftwareUsed           HEX: 0131
-CONSTANT: PropertyTagDateTime               HEX: 0132
-CONSTANT: PropertyTagArtist                 HEX: 013B
-CONSTANT: PropertyTagHostComputer           HEX: 013C
-CONSTANT: PropertyTagPredictor              HEX: 013D
-CONSTANT: PropertyTagWhitePoint             HEX: 013E
-CONSTANT: PropertyTagPrimaryChromaticities  HEX: 013F
-CONSTANT: PropertyTagColorMap               HEX: 0140
-CONSTANT: PropertyTagHalftoneHints          HEX: 0141
-CONSTANT: PropertyTagTileWidth              HEX: 0142
-CONSTANT: PropertyTagTileLength             HEX: 0143
-CONSTANT: PropertyTagTileOffset             HEX: 0144
-CONSTANT: PropertyTagTileByteCounts         HEX: 0145
-CONSTANT: PropertyTagInkSet                 HEX: 014C
-CONSTANT: PropertyTagInkNames               HEX: 014D
-CONSTANT: PropertyTagNumberOfInks           HEX: 014E
-CONSTANT: PropertyTagDotRange               HEX: 0150
-CONSTANT: PropertyTagTargetPrinter          HEX: 0151
-CONSTANT: PropertyTagExtraSamples           HEX: 0152
-CONSTANT: PropertyTagSampleFormat           HEX: 0153
-CONSTANT: PropertyTagSMinSampleValue        HEX: 0154
-CONSTANT: PropertyTagSMaxSampleValue        HEX: 0155
-CONSTANT: PropertyTagTransferRange          HEX: 0156
+CONSTANT: PropertyTagNewSubfileType         0x00FE
+CONSTANT: PropertyTagSubfileType            0x00FF
+CONSTANT: PropertyTagImageWidth             0x0100
+CONSTANT: PropertyTagImageHeight            0x0101
+CONSTANT: PropertyTagBitsPerSample          0x0102
+CONSTANT: PropertyTagCompression            0x0103
+CONSTANT: PropertyTagPhotometricInterp      0x0106
+CONSTANT: PropertyTagThreshHolding          0x0107
+CONSTANT: PropertyTagCellWidth              0x0108
+CONSTANT: PropertyTagCellHeight             0x0109
+CONSTANT: PropertyTagFillOrder              0x010A
+CONSTANT: PropertyTagDocumentName           0x010D
+CONSTANT: PropertyTagImageDescription       0x010E
+CONSTANT: PropertyTagEquipMake              0x010F
+CONSTANT: PropertyTagEquipModel             0x0110
+CONSTANT: PropertyTagStripOffsets           0x0111
+CONSTANT: PropertyTagOrientation            0x0112
+CONSTANT: PropertyTagSamplesPerPixel        0x0115
+CONSTANT: PropertyTagRowsPerStrip           0x0116
+CONSTANT: PropertyTagStripBytesCount        0x0117
+CONSTANT: PropertyTagMinSampleValue         0x0118
+CONSTANT: PropertyTagMaxSampleValue         0x0119
+CONSTANT: PropertyTagXResolution            0x011A
+CONSTANT: PropertyTagYResolution            0x011B
+CONSTANT: PropertyTagPlanarConfig           0x011C
+CONSTANT: PropertyTagPageName               0x011D
+CONSTANT: PropertyTagXPosition              0x011E
+CONSTANT: PropertyTagYPosition              0x011F
+CONSTANT: PropertyTagFreeOffset             0x0120
+CONSTANT: PropertyTagFreeByteCounts         0x0121
+CONSTANT: PropertyTagGrayResponseUnit       0x0122
+CONSTANT: PropertyTagGrayResponseCurve      0x0123
+CONSTANT: PropertyTagT4Option               0x0124
+CONSTANT: PropertyTagT6Option               0x0125
+CONSTANT: PropertyTagResolutionUnit         0x0128
+CONSTANT: PropertyTagPageNumber             0x0129
+CONSTANT: PropertyTagTransferFuncition      0x012D
+CONSTANT: PropertyTagSoftwareUsed           0x0131
+CONSTANT: PropertyTagDateTime               0x0132
+CONSTANT: PropertyTagArtist                 0x013B
+CONSTANT: PropertyTagHostComputer           0x013C
+CONSTANT: PropertyTagPredictor              0x013D
+CONSTANT: PropertyTagWhitePoint             0x013E
+CONSTANT: PropertyTagPrimaryChromaticities  0x013F
+CONSTANT: PropertyTagColorMap               0x0140
+CONSTANT: PropertyTagHalftoneHints          0x0141
+CONSTANT: PropertyTagTileWidth              0x0142
+CONSTANT: PropertyTagTileLength             0x0143
+CONSTANT: PropertyTagTileOffset             0x0144
+CONSTANT: PropertyTagTileByteCounts         0x0145
+CONSTANT: PropertyTagInkSet                 0x014C
+CONSTANT: PropertyTagInkNames               0x014D
+CONSTANT: PropertyTagNumberOfInks           0x014E
+CONSTANT: PropertyTagDotRange               0x0150
+CONSTANT: PropertyTagTargetPrinter          0x0151
+CONSTANT: PropertyTagExtraSamples           0x0152
+CONSTANT: PropertyTagSampleFormat           0x0153
+CONSTANT: PropertyTagSMinSampleValue        0x0154
+CONSTANT: PropertyTagSMaxSampleValue        0x0155
+CONSTANT: PropertyTagTransferRange          0x0156
 
-CONSTANT: PropertyTagJPEGProc               HEX: 0200
-CONSTANT: PropertyTagJPEGInterFormat        HEX: 0201
-CONSTANT: PropertyTagJPEGInterLength        HEX: 0202
-CONSTANT: PropertyTagJPEGRestartInterval    HEX: 0203
-CONSTANT: PropertyTagJPEGLosslessPredictors HEX: 0205
-CONSTANT: PropertyTagJPEGPointTransforms    HEX: 0206
-CONSTANT: PropertyTagJPEGQTables            HEX: 0207
-CONSTANT: PropertyTagJPEGDCTables           HEX: 0208
-CONSTANT: PropertyTagJPEGACTables           HEX: 0209
+CONSTANT: PropertyTagJPEGProc               0x0200
+CONSTANT: PropertyTagJPEGInterFormat        0x0201
+CONSTANT: PropertyTagJPEGInterLength        0x0202
+CONSTANT: PropertyTagJPEGRestartInterval    0x0203
+CONSTANT: PropertyTagJPEGLosslessPredictors 0x0205
+CONSTANT: PropertyTagJPEGPointTransforms    0x0206
+CONSTANT: PropertyTagJPEGQTables            0x0207
+CONSTANT: PropertyTagJPEGDCTables           0x0208
+CONSTANT: PropertyTagJPEGACTables           0x0209
 
-CONSTANT: PropertyTagYCbCrCoefficients      HEX: 0211
-CONSTANT: PropertyTagYCbCrSubsampling       HEX: 0212
-CONSTANT: PropertyTagYCbCrPositioning       HEX: 0213
-CONSTANT: PropertyTagREFBlackWhite          HEX: 0214
+CONSTANT: PropertyTagYCbCrCoefficients      0x0211
+CONSTANT: PropertyTagYCbCrSubsampling       0x0212
+CONSTANT: PropertyTagYCbCrPositioning       0x0213
+CONSTANT: PropertyTagREFBlackWhite          0x0214
 
-CONSTANT: PropertyTagICCProfile          HEX: 8773
+CONSTANT: PropertyTagICCProfile          0x8773
 
-CONSTANT: PropertyTagGamma                HEX: 0301
-CONSTANT: PropertyTagICCProfileDescriptor HEX: 0302
-CONSTANT: PropertyTagSRGBRenderingIntent  HEX: 0303
+CONSTANT: PropertyTagGamma                0x0301
+CONSTANT: PropertyTagICCProfileDescriptor 0x0302
+CONSTANT: PropertyTagSRGBRenderingIntent  0x0303
 
-CONSTANT: PropertyTagImageTitle          HEX: 0320
-CONSTANT: PropertyTagCopyright           HEX: 8298
+CONSTANT: PropertyTagImageTitle          0x0320
+CONSTANT: PropertyTagCopyright           0x8298
 
-CONSTANT: PropertyTagResolutionXUnit            HEX: 5001
-CONSTANT: PropertyTagResolutionYUnit            HEX: 5002
-CONSTANT: PropertyTagResolutionXLengthUnit      HEX: 5003
-CONSTANT: PropertyTagResolutionYLengthUnit      HEX: 5004
-CONSTANT: PropertyTagPrintFlags                 HEX: 5005
-CONSTANT: PropertyTagPrintFlagsVersion          HEX: 5006
-CONSTANT: PropertyTagPrintFlagsCrop             HEX: 5007
-CONSTANT: PropertyTagPrintFlagsBleedWidth       HEX: 5008
-CONSTANT: PropertyTagPrintFlagsBleedWidthScale  HEX: 5009
-CONSTANT: PropertyTagHalftoneLPI                HEX: 500A
-CONSTANT: PropertyTagHalftoneLPIUnit            HEX: 500B
-CONSTANT: PropertyTagHalftoneDegree             HEX: 500C
-CONSTANT: PropertyTagHalftoneShape              HEX: 500D
-CONSTANT: PropertyTagHalftoneMisc               HEX: 500E
-CONSTANT: PropertyTagHalftoneScreen             HEX: 500F
-CONSTANT: PropertyTagJPEGQuality                HEX: 5010
-CONSTANT: PropertyTagGridSize                   HEX: 5011
-CONSTANT: PropertyTagThumbnailFormat            HEX: 5012
-CONSTANT: PropertyTagThumbnailWidth             HEX: 5013
-CONSTANT: PropertyTagThumbnailHeight            HEX: 5014
-CONSTANT: PropertyTagThumbnailColorDepth        HEX: 5015
-CONSTANT: PropertyTagThumbnailPlanes            HEX: 5016
-CONSTANT: PropertyTagThumbnailRawBytes          HEX: 5017
-CONSTANT: PropertyTagThumbnailSize              HEX: 5018
-CONSTANT: PropertyTagThumbnailCompressedSize    HEX: 5019
-CONSTANT: PropertyTagColorTransferFunction      HEX: 501A
-CONSTANT: PropertyTagThumbnailData              HEX: 501B
+CONSTANT: PropertyTagResolutionXUnit            0x5001
+CONSTANT: PropertyTagResolutionYUnit            0x5002
+CONSTANT: PropertyTagResolutionXLengthUnit      0x5003
+CONSTANT: PropertyTagResolutionYLengthUnit      0x5004
+CONSTANT: PropertyTagPrintFlags                 0x5005
+CONSTANT: PropertyTagPrintFlagsVersion          0x5006
+CONSTANT: PropertyTagPrintFlagsCrop             0x5007
+CONSTANT: PropertyTagPrintFlagsBleedWidth       0x5008
+CONSTANT: PropertyTagPrintFlagsBleedWidthScale  0x5009
+CONSTANT: PropertyTagHalftoneLPI                0x500A
+CONSTANT: PropertyTagHalftoneLPIUnit            0x500B
+CONSTANT: PropertyTagHalftoneDegree             0x500C
+CONSTANT: PropertyTagHalftoneShape              0x500D
+CONSTANT: PropertyTagHalftoneMisc               0x500E
+CONSTANT: PropertyTagHalftoneScreen             0x500F
+CONSTANT: PropertyTagJPEGQuality                0x5010
+CONSTANT: PropertyTagGridSize                   0x5011
+CONSTANT: PropertyTagThumbnailFormat            0x5012
+CONSTANT: PropertyTagThumbnailWidth             0x5013
+CONSTANT: PropertyTagThumbnailHeight            0x5014
+CONSTANT: PropertyTagThumbnailColorDepth        0x5015
+CONSTANT: PropertyTagThumbnailPlanes            0x5016
+CONSTANT: PropertyTagThumbnailRawBytes          0x5017
+CONSTANT: PropertyTagThumbnailSize              0x5018
+CONSTANT: PropertyTagThumbnailCompressedSize    0x5019
+CONSTANT: PropertyTagColorTransferFunction      0x501A
+CONSTANT: PropertyTagThumbnailData              0x501B
 
-CONSTANT: PropertyTagThumbnailImageWidth        HEX: 5020
-CONSTANT: PropertyTagThumbnailImageHeight       HEX: 5021
-CONSTANT: PropertyTagThumbnailBitsPerSample     HEX: 5022
-CONSTANT: PropertyTagThumbnailCompression       HEX: 5023
-CONSTANT: PropertyTagThumbnailPhotometricInterp HEX: 5024
-CONSTANT: PropertyTagThumbnailImageDescription  HEX: 5025
-CONSTANT: PropertyTagThumbnailEquipMake         HEX: 5026
-CONSTANT: PropertyTagThumbnailEquipModel        HEX: 5027
-CONSTANT: PropertyTagThumbnailStripOffsets      HEX: 5028
-CONSTANT: PropertyTagThumbnailOrientation       HEX: 5029
-CONSTANT: PropertyTagThumbnailSamplesPerPixel   HEX: 502A
-CONSTANT: PropertyTagThumbnailRowsPerStrip      HEX: 502B
-CONSTANT: PropertyTagThumbnailStripBytesCount   HEX: 502C
-CONSTANT: PropertyTagThumbnailResolutionX       HEX: 502D
-CONSTANT: PropertyTagThumbnailResolutionY       HEX: 502E
-CONSTANT: PropertyTagThumbnailPlanarConfig      HEX: 502F
-CONSTANT: PropertyTagThumbnailResolutionUnit    HEX: 5030
-CONSTANT: PropertyTagThumbnailTransferFunction  HEX: 5031
-CONSTANT: PropertyTagThumbnailSoftwareUsed      HEX: 5032
-CONSTANT: PropertyTagThumbnailDateTime          HEX: 5033
-CONSTANT: PropertyTagThumbnailArtist            HEX: 5034
-CONSTANT: PropertyTagThumbnailWhitePoint        HEX: 5035
-CONSTANT: PropertyTagThumbnailPrimaryChromaticities HEX: 5036
-CONSTANT: PropertyTagThumbnailYCbCrCoefficients HEX: 5037
-CONSTANT: PropertyTagThumbnailYCbCrSubsampling  HEX: 5038
-CONSTANT: PropertyTagThumbnailYCbCrPositioning  HEX: 5039
-CONSTANT: PropertyTagThumbnailRefBlackWhite     HEX: 503A
-CONSTANT: PropertyTagThumbnailCopyRight         HEX: 503B
+CONSTANT: PropertyTagThumbnailImageWidth        0x5020
+CONSTANT: PropertyTagThumbnailImageHeight       0x5021
+CONSTANT: PropertyTagThumbnailBitsPerSample     0x5022
+CONSTANT: PropertyTagThumbnailCompression       0x5023
+CONSTANT: PropertyTagThumbnailPhotometricInterp 0x5024
+CONSTANT: PropertyTagThumbnailImageDescription  0x5025
+CONSTANT: PropertyTagThumbnailEquipMake         0x5026
+CONSTANT: PropertyTagThumbnailEquipModel        0x5027
+CONSTANT: PropertyTagThumbnailStripOffsets      0x5028
+CONSTANT: PropertyTagThumbnailOrientation       0x5029
+CONSTANT: PropertyTagThumbnailSamplesPerPixel   0x502A
+CONSTANT: PropertyTagThumbnailRowsPerStrip      0x502B
+CONSTANT: PropertyTagThumbnailStripBytesCount   0x502C
+CONSTANT: PropertyTagThumbnailResolutionX       0x502D
+CONSTANT: PropertyTagThumbnailResolutionY       0x502E
+CONSTANT: PropertyTagThumbnailPlanarConfig      0x502F
+CONSTANT: PropertyTagThumbnailResolutionUnit    0x5030
+CONSTANT: PropertyTagThumbnailTransferFunction  0x5031
+CONSTANT: PropertyTagThumbnailSoftwareUsed      0x5032
+CONSTANT: PropertyTagThumbnailDateTime          0x5033
+CONSTANT: PropertyTagThumbnailArtist            0x5034
+CONSTANT: PropertyTagThumbnailWhitePoint        0x5035
+CONSTANT: PropertyTagThumbnailPrimaryChromaticities 0x5036
+CONSTANT: PropertyTagThumbnailYCbCrCoefficients 0x5037
+CONSTANT: PropertyTagThumbnailYCbCrSubsampling  0x5038
+CONSTANT: PropertyTagThumbnailYCbCrPositioning  0x5039
+CONSTANT: PropertyTagThumbnailRefBlackWhite     0x503A
+CONSTANT: PropertyTagThumbnailCopyRight         0x503B
 
-CONSTANT: PropertyTagLuminanceTable    HEX: 5090
-CONSTANT: PropertyTagChrominanceTable  HEX: 5091
+CONSTANT: PropertyTagLuminanceTable    0x5090
+CONSTANT: PropertyTagChrominanceTable  0x5091
 
-CONSTANT: PropertyTagFrameDelay        HEX: 5100
-CONSTANT: PropertyTagLoopCount         HEX: 5101
+CONSTANT: PropertyTagFrameDelay        0x5100
+CONSTANT: PropertyTagLoopCount         0x5101
 
-CONSTANT: PropertyTagPixelUnit         HEX: 5110
-CONSTANT: PropertyTagPixelPerUnitX     HEX: 5111
-CONSTANT: PropertyTagPixelPerUnitY     HEX: 5112
-CONSTANT: PropertyTagPaletteHistogram  HEX: 5113
+CONSTANT: PropertyTagPixelUnit         0x5110
+CONSTANT: PropertyTagPixelPerUnitX     0x5111
+CONSTANT: PropertyTagPixelPerUnitY     0x5112
+CONSTANT: PropertyTagPaletteHistogram  0x5113
 
-CONSTANT: PropertyTagExifExposureTime  HEX: 829A
-CONSTANT: PropertyTagExifFNumber       HEX: 829D
+CONSTANT: PropertyTagExifExposureTime  0x829A
+CONSTANT: PropertyTagExifFNumber       0x829D
 
-CONSTANT: PropertyTagExifExposureProg  HEX: 8822
-CONSTANT: PropertyTagExifSpectralSense HEX: 8824
-CONSTANT: PropertyTagExifISOSpeed      HEX: 8827
-CONSTANT: PropertyTagExifOECF          HEX: 8828
+CONSTANT: PropertyTagExifExposureProg  0x8822
+CONSTANT: PropertyTagExifSpectralSense 0x8824
+CONSTANT: PropertyTagExifISOSpeed      0x8827
+CONSTANT: PropertyTagExifOECF          0x8828
 
-CONSTANT: PropertyTagExifVer           HEX: 9000
-CONSTANT: PropertyTagExifDTOrig        HEX: 9003
-CONSTANT: PropertyTagExifDTDigitized   HEX: 9004
+CONSTANT: PropertyTagExifVer           0x9000
+CONSTANT: PropertyTagExifDTOrig        0x9003
+CONSTANT: PropertyTagExifDTDigitized   0x9004
 
-CONSTANT: PropertyTagExifCompConfig    HEX: 9101
-CONSTANT: PropertyTagExifCompBPP       HEX: 9102
+CONSTANT: PropertyTagExifCompConfig    0x9101
+CONSTANT: PropertyTagExifCompBPP       0x9102
 
-CONSTANT: PropertyTagExifShutterSpeed  HEX: 9201
-CONSTANT: PropertyTagExifAperture      HEX: 9202
-CONSTANT: PropertyTagExifBrightness    HEX: 9203
-CONSTANT: PropertyTagExifExposureBias  HEX: 9204
-CONSTANT: PropertyTagExifMaxAperture   HEX: 9205
-CONSTANT: PropertyTagExifSubjectDist   HEX: 9206
-CONSTANT: PropertyTagExifMeteringMode  HEX: 9207
-CONSTANT: PropertyTagExifLightSource   HEX: 9208
-CONSTANT: PropertyTagExifFlash         HEX: 9209
-CONSTANT: PropertyTagExifFocalLength   HEX: 920A
-CONSTANT: PropertyTagExifMakerNote     HEX: 927C
-CONSTANT: PropertyTagExifUserComment   HEX: 9286
-CONSTANT: PropertyTagExifDTSubsec      HEX: 9290
-CONSTANT: PropertyTagExifDTOrigSS      HEX: 9291
-CONSTANT: PropertyTagExifDTDigSS       HEX: 9292
+CONSTANT: PropertyTagExifShutterSpeed  0x9201
+CONSTANT: PropertyTagExifAperture      0x9202
+CONSTANT: PropertyTagExifBrightness    0x9203
+CONSTANT: PropertyTagExifExposureBias  0x9204
+CONSTANT: PropertyTagExifMaxAperture   0x9205
+CONSTANT: PropertyTagExifSubjectDist   0x9206
+CONSTANT: PropertyTagExifMeteringMode  0x9207
+CONSTANT: PropertyTagExifLightSource   0x9208
+CONSTANT: PropertyTagExifFlash         0x9209
+CONSTANT: PropertyTagExifFocalLength   0x920A
+CONSTANT: PropertyTagExifMakerNote     0x927C
+CONSTANT: PropertyTagExifUserComment   0x9286
+CONSTANT: PropertyTagExifDTSubsec      0x9290
+CONSTANT: PropertyTagExifDTOrigSS      0x9291
+CONSTANT: PropertyTagExifDTDigSS       0x9292
 
-CONSTANT: PropertyTagExifFPXVer        HEX: A000
-CONSTANT: PropertyTagExifColorSpace    HEX: A001
-CONSTANT: PropertyTagExifPixXDim       HEX: A002
-CONSTANT: PropertyTagExifPixYDim       HEX: A003
-CONSTANT: PropertyTagExifRelatedWav    HEX: A004
-CONSTANT: PropertyTagExifInterop       HEX: A005
-CONSTANT: PropertyTagExifFlashEnergy   HEX: A20B
-CONSTANT: PropertyTagExifSpatialFR     HEX: A20C
-CONSTANT: PropertyTagExifFocalXRes     HEX: A20E
-CONSTANT: PropertyTagExifFocalYRes     HEX: A20F
-CONSTANT: PropertyTagExifFocalResUnit  HEX: A210
-CONSTANT: PropertyTagExifSubjectLoc    HEX: A214
-CONSTANT: PropertyTagExifExposureIndex HEX: A215
-CONSTANT: PropertyTagExifSensingMethod HEX: A217
-CONSTANT: PropertyTagExifFileSource    HEX: A300
-CONSTANT: PropertyTagExifSceneType     HEX: A301
-CONSTANT: PropertyTagExifCfaPattern    HEX: A302
+CONSTANT: PropertyTagExifFPXVer        0xA000
+CONSTANT: PropertyTagExifColorSpace    0xA001
+CONSTANT: PropertyTagExifPixXDim       0xA002
+CONSTANT: PropertyTagExifPixYDim       0xA003
+CONSTANT: PropertyTagExifRelatedWav    0xA004
+CONSTANT: PropertyTagExifInterop       0xA005
+CONSTANT: PropertyTagExifFlashEnergy   0xA20B
+CONSTANT: PropertyTagExifSpatialFR     0xA20C
+CONSTANT: PropertyTagExifFocalXRes     0xA20E
+CONSTANT: PropertyTagExifFocalYRes     0xA20F
+CONSTANT: PropertyTagExifFocalResUnit  0xA210
+CONSTANT: PropertyTagExifSubjectLoc    0xA214
+CONSTANT: PropertyTagExifExposureIndex 0xA215
+CONSTANT: PropertyTagExifSensingMethod 0xA217
+CONSTANT: PropertyTagExifFileSource    0xA300
+CONSTANT: PropertyTagExifSceneType     0xA301
+CONSTANT: PropertyTagExifCfaPattern    0xA302
 
-CONSTANT: PropertyTagGpsVer            HEX: 0000
-CONSTANT: PropertyTagGpsLatitudeRef    HEX: 0001
-CONSTANT: PropertyTagGpsLatitude       HEX: 0002
-CONSTANT: PropertyTagGpsLongitudeRef   HEX: 0003
-CONSTANT: PropertyTagGpsLongitude      HEX: 0004
-CONSTANT: PropertyTagGpsAltitudeRef    HEX: 0005
-CONSTANT: PropertyTagGpsAltitude       HEX: 0006
-CONSTANT: PropertyTagGpsGpsTime        HEX: 0007
-CONSTANT: PropertyTagGpsGpsSatellites  HEX: 0008
-CONSTANT: PropertyTagGpsGpsStatus      HEX: 0009
-CONSTANT: PropertyTagGpsGpsMeasureMode HEX: 000A
-CONSTANT: PropertyTagGpsGpsDop         HEX: 000B
-CONSTANT: PropertyTagGpsSpeedRef       HEX: 000C
-CONSTANT: PropertyTagGpsSpeed          HEX: 000D
-CONSTANT: PropertyTagGpsTrackRef       HEX: 000E
-CONSTANT: PropertyTagGpsTrack          HEX: 000F
-CONSTANT: PropertyTagGpsImgDirRef      HEX: 0010
-CONSTANT: PropertyTagGpsImgDir         HEX: 0011
-CONSTANT: PropertyTagGpsMapDatum       HEX: 0012
-CONSTANT: PropertyTagGpsDestLatRef     HEX: 0013
-CONSTANT: PropertyTagGpsDestLat        HEX: 0014
-CONSTANT: PropertyTagGpsDestLongRef    HEX: 0015
-CONSTANT: PropertyTagGpsDestLong       HEX: 0016
-CONSTANT: PropertyTagGpsDestBearRef    HEX: 0017
-CONSTANT: PropertyTagGpsDestBear       HEX: 0018
-CONSTANT: PropertyTagGpsDestDistRef    HEX: 0019
-CONSTANT: PropertyTagGpsDestDist       HEX: 001A
+CONSTANT: PropertyTagGpsVer            0x0000
+CONSTANT: PropertyTagGpsLatitudeRef    0x0001
+CONSTANT: PropertyTagGpsLatitude       0x0002
+CONSTANT: PropertyTagGpsLongitudeRef   0x0003
+CONSTANT: PropertyTagGpsLongitude      0x0004
+CONSTANT: PropertyTagGpsAltitudeRef    0x0005
+CONSTANT: PropertyTagGpsAltitude       0x0006
+CONSTANT: PropertyTagGpsGpsTime        0x0007
+CONSTANT: PropertyTagGpsGpsSatellites  0x0008
+CONSTANT: PropertyTagGpsGpsStatus      0x0009
+CONSTANT: PropertyTagGpsGpsMeasureMode 0x000A
+CONSTANT: PropertyTagGpsGpsDop         0x000B
+CONSTANT: PropertyTagGpsSpeedRef       0x000C
+CONSTANT: PropertyTagGpsSpeed          0x000D
+CONSTANT: PropertyTagGpsTrackRef       0x000E
+CONSTANT: PropertyTagGpsTrack          0x000F
+CONSTANT: PropertyTagGpsImgDirRef      0x0010
+CONSTANT: PropertyTagGpsImgDir         0x0011
+CONSTANT: PropertyTagGpsMapDatum       0x0012
+CONSTANT: PropertyTagGpsDestLatRef     0x0013
+CONSTANT: PropertyTagGpsDestLat        0x0014
+CONSTANT: PropertyTagGpsDestLongRef    0x0015
+CONSTANT: PropertyTagGpsDestLong       0x0016
+CONSTANT: PropertyTagGpsDestBearRef    0x0017
+CONSTANT: PropertyTagGpsDestBear       0x0018
+CONSTANT: PropertyTagGpsDestDistRef    0x0019
+CONSTANT: PropertyTagGpsDestDist       0x001A
 
 ENUM: ColorChannelFlags
     ColorChannelFlagsC

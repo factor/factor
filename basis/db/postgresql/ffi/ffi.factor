@@ -12,44 +12,44 @@ IN: db.postgresql.ffi
 } cond cdecl add-library >>
 
 ! ConnSatusType
-CONSTANT: CONNECTION_OK                     HEX: 0
-CONSTANT: CONNECTION_BAD                    HEX: 1
-CONSTANT: CONNECTION_STARTED                HEX: 2
-CONSTANT: CONNECTION_MADE                   HEX: 3
-CONSTANT: CONNECTION_AWAITING_RESPONSE      HEX: 4
-CONSTANT: CONNECTION_AUTH_OK                HEX: 5
-CONSTANT: CONNECTION_SETENV                 HEX: 6
-CONSTANT: CONNECTION_SSL_STARTUP            HEX: 7
-CONSTANT: CONNECTION_NEEDED                 HEX: 8
+CONSTANT: CONNECTION_OK                     0x0
+CONSTANT: CONNECTION_BAD                    0x1
+CONSTANT: CONNECTION_STARTED                0x2
+CONSTANT: CONNECTION_MADE                   0x3
+CONSTANT: CONNECTION_AWAITING_RESPONSE      0x4
+CONSTANT: CONNECTION_AUTH_OK                0x5
+CONSTANT: CONNECTION_SETENV                 0x6
+CONSTANT: CONNECTION_SSL_STARTUP            0x7
+CONSTANT: CONNECTION_NEEDED                 0x8
 
 ! PostgresPollingStatusType
-CONSTANT: PGRES_POLLING_FAILED              HEX: 0
-CONSTANT: PGRES_POLLING_READING             HEX: 1
-CONSTANT: PGRES_POLLING_WRITING             HEX: 2
-CONSTANT: PGRES_POLLING_OK                  HEX: 3
-CONSTANT: PGRES_POLLING_ACTIVE              HEX: 4
+CONSTANT: PGRES_POLLING_FAILED              0x0
+CONSTANT: PGRES_POLLING_READING             0x1
+CONSTANT: PGRES_POLLING_WRITING             0x2
+CONSTANT: PGRES_POLLING_OK                  0x3
+CONSTANT: PGRES_POLLING_ACTIVE              0x4
 
 ! ExecStatusType;
-CONSTANT: PGRES_EMPTY_QUERY                 HEX: 0
-CONSTANT: PGRES_COMMAND_OK                  HEX: 1
-CONSTANT: PGRES_TUPLES_OK                   HEX: 2
-CONSTANT: PGRES_COPY_OUT                    HEX: 3
-CONSTANT: PGRES_COPY_IN                     HEX: 4
-CONSTANT: PGRES_BAD_RESPONSE                HEX: 5
-CONSTANT: PGRES_NONFATAL_ERROR              HEX: 6
-CONSTANT: PGRES_FATAL_ERROR                 HEX: 7
+CONSTANT: PGRES_EMPTY_QUERY                 0x0
+CONSTANT: PGRES_COMMAND_OK                  0x1
+CONSTANT: PGRES_TUPLES_OK                   0x2
+CONSTANT: PGRES_COPY_OUT                    0x3
+CONSTANT: PGRES_COPY_IN                     0x4
+CONSTANT: PGRES_BAD_RESPONSE                0x5
+CONSTANT: PGRES_NONFATAL_ERROR              0x6
+CONSTANT: PGRES_FATAL_ERROR                 0x7
 
 ! PGTransactionStatusType;
-CONSTANT: PQTRANS_IDLE                      HEX: 0
-CONSTANT: PQTRANS_ACTIVE                    HEX: 1
-CONSTANT: PQTRANS_INTRANS                   HEX: 2
-CONSTANT: PQTRANS_INERROR                   HEX: 3
-CONSTANT: PQTRANS_UNKNOWN                   HEX: 4
+CONSTANT: PQTRANS_IDLE                      0x0
+CONSTANT: PQTRANS_ACTIVE                    0x1
+CONSTANT: PQTRANS_INTRANS                   0x2
+CONSTANT: PQTRANS_INERROR                   0x3
+CONSTANT: PQTRANS_UNKNOWN                   0x4
 
 ! PGVerbosity;
-CONSTANT: PQERRORS_TERSE                    HEX: 0
-CONSTANT: PQERRORS_DEFAULT                  HEX: 1
-CONSTANT: PQERRORS_VERBOSE                  HEX: 2
+CONSTANT: PQERRORS_TERSE                    0x0
+CONSTANT: PQERRORS_DEFAULT                  0x1
+CONSTANT: PQERRORS_VERBOSE                  0x2
 
 CONSTANT: InvalidOid 0
 

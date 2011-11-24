@@ -42,23 +42,23 @@ CONSTANT: buttons-matching-hash
 CONSTANT: keys-matching-hash
     H{ { "UsagePage" 7 } { "Type" 2 } }
 CONSTANT: x-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 30 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x30 } { "Type" 1 } }
 CONSTANT: y-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 31 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x31 } { "Type" 1 } }
 CONSTANT: z-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 32 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x32 } { "Type" 1 } }
 CONSTANT: rx-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 33 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x33 } { "Type" 1 } }
 CONSTANT: ry-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 34 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x34 } { "Type" 1 } }
 CONSTANT: rz-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 35 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x35 } { "Type" 1 } }
 CONSTANT: slider-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 36 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x36 } { "Type" 1 } }
 CONSTANT: wheel-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 38 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x38 } { "Type" 1 } }
 CONSTANT: hat-switch-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 39 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x39 } { "Type" 1 } }
 
 : device-elements-matching ( device matching-hash -- vector )
     [
@@ -121,23 +121,23 @@ CONSTANT: hat-switch-matching-hash
     IOHIDElementGetUsagePage 1 = ; inline
 
 : x-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 30 = ; inline
+    IOHIDElementGetUsage 0x30 = ; inline
 : y-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 31 = ; inline
+    IOHIDElementGetUsage 0x31 = ; inline
 : z-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 32 = ; inline
+    IOHIDElementGetUsage 0x32 = ; inline
 : rx-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 33 = ; inline
+    IOHIDElementGetUsage 0x33 = ; inline
 : ry-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 34 = ; inline
+    IOHIDElementGetUsage 0x34 = ; inline
 : rz-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 35 = ; inline
+    IOHIDElementGetUsage 0x35 = ; inline
 : slider? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 36 = ; inline
+    IOHIDElementGetUsage 0x36 = ; inline
 : wheel? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 38 = ; inline
+    IOHIDElementGetUsage 0x38 = ; inline
 : hat-switch? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 39 = ; inline
+    IOHIDElementGetUsage 0x39 = ; inline
 
 CONSTANT: pov-values
     {

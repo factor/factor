@@ -16,13 +16,13 @@ TUPLE: sniffer-spec path ifname ;
 
 C: <sniffer-spec> sniffer-spec
 
-: IOCPARM_MASK   HEX: 1fff ; inline
+: IOCPARM_MASK   0x1fff ; inline
 : IOCPARM_MAX    IOCPARM_MASK 1+ ; inline
-: IOC_VOID       HEX: 20000000 ; inline
-: IOC_OUT        HEX: 40000000 ; inline
-: IOC_IN         HEX: 80000000 ; inline
+: IOC_VOID       0x20000000 ; inline
+: IOC_OUT        0x40000000 ; inline
+: IOC_IN         0x80000000 ; inline
 : IOC_INOUT      IOC_IN IOC_OUT bitor ; inline
-: IOC_DIRMASK    HEX: e0000000 ; inline
+: IOC_DIRMASK    0xe0000000 ; inline
 
 :: ioc ( inout group num len -- n )
     group first 8 shift num bitor

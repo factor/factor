@@ -7,7 +7,7 @@ IN: compiler.constants
 ! These constants must match vm/memory.h
 CONSTANT: card-bits 8
 CONSTANT: deck-bits 18
-: card-mark ( -- n ) HEX: 40 HEX: 80 bitor ; inline
+: card-mark ( -- n ) 0x40 0x80 bitor ; inline
 
 ! These constants must match vm/layouts.h
 : slot-offset ( slot tag -- n ) [ bootstrap-cells ] dip - ; inline

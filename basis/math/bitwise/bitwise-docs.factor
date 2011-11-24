@@ -35,7 +35,7 @@ HELP: bitfield
 HELP: bits
 { $values { "m" integer } { "n" integer } { "m'" integer } }
 { $description "Keep only n bits from the integer m." }
-{ $example "USING: math.bitwise prettyprint ;" "HEX: 123abcdef 16 bits .h" "cdef" } ;
+{ $example "USING: math.bitwise prettyprint ;" "0x123abcdef 16 bits .h" "cdef" } ;
 
 HELP: bitroll
 { $values { "x" integer } { "s" "a shift integer" } { "w" "a wrap integer" } { "y" integer }
@@ -43,7 +43,7 @@ HELP: bitroll
 { $description "Roll n by s bits to the left, wrapping around after w bits." }
 { $examples
     { $example "USING: math.bitwise prettyprint ;" "1 -1 32 bitroll .b" "10000000000000000000000000000000" }
-    { $example "USING: math.bitwise prettyprint ;" "HEX: ffff0000 8 32 bitroll .h" "ff0000ff" }
+    { $example "USING: math.bitwise prettyprint ;" "0xffff0000 8 32 bitroll .h" "ff0000ff" }
 } ;
 
 HELP: bit-clear?
@@ -54,11 +54,11 @@ HELP: bit-clear?
 { $description "Returns " { $link t } " if the nth bit is set to zero." }
 { $examples
     { $example "USING: math.bitwise prettyprint ;"
-               "HEX: ff 8 bit-clear? ."
+               "0xff 8 bit-clear? ."
                "t"
     }
     { $example "USING: math.bitwise prettyprint ;"
-               "HEX: ff 7 bit-clear? ."
+               "0xff 7 bit-clear? ."
                "f"
     }
 } ;
@@ -73,7 +73,7 @@ HELP: bit-count
 { $description "Returns the number of set bits as an object. This word only works on non-negative integers or objects that can be represented as a byte-array." }
 { $examples
     { $example "USING: math.bitwise prettyprint ;"
-               "HEX: f0 bit-count ."
+               "0xf0 bit-count ."
                "4"
     }
     { $example "USING: math.bitwise prettyprint ;"
@@ -94,11 +94,11 @@ HELP: bitroll-32
 { $description "Rolls the number " { $snippet "m" } " by " { $snippet "s" } " bits to the left, wrapping around after 32 bits." }
 { $examples
     { $example "USING: math.bitwise prettyprint ;"
-               "HEX: 1 10 bitroll-32 .h"
+               "0x1 10 bitroll-32 .h"
                "400"
     }
     { $example "USING: math.bitwise prettyprint ;"
-               "HEX: 1 -10 bitroll-32 .h"
+               "0x1 -10 bitroll-32 .h"
                "400000"
     }
 } ;
@@ -111,11 +111,11 @@ HELP: bitroll-64
 { $description "Rolls the number " { $snippet "m" } " by " { $snippet "s" } " bits to the left, wrapping around after 64 bits." }
 { $examples
     { $example "USING: math.bitwise prettyprint ;"
-               "HEX: 1 10 bitroll-64 .h"
+               "0x1 10 bitroll-64 .h"
                "400"
     }
     { $example "USING: math.bitwise prettyprint ;"
-               "HEX: 1 -10 bitroll-64 .h"
+               "0x1 -10 bitroll-64 .h"
                "40000000000000"
     }
 } ;
@@ -130,7 +130,7 @@ HELP: clear-bit
 { $description "Sets the nth bit of " { $snippet "x" } " to zero." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: ff 7 clear-bit .h"
+        "0xff 7 clear-bit .h"
         "7f"
     }
 } ;
@@ -187,7 +187,7 @@ HELP: >signed
 }
 { $examples
     { $example "USING: math.bitwise prettyprint ;"
-        "HEX: ff 8 >signed ."
+        "0xff 8 >signed ."
         "-1"
     }
 }
@@ -201,7 +201,7 @@ HELP: mask
 { $description "After the operation, only the bits that were set in both the mask and the original number are set." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "BIN: 11111111 BIN: 101 mask .b"
+        "0b11111111 0b101 mask .b"
         "101"
     }
 } ;
@@ -214,7 +214,7 @@ HELP: mask-bit
 { $description "Turns off all bits besides the nth bit." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: ff 2 mask-bit .b"
+        "0xff 2 mask-bit .b"
         "100"
     }
 } ;
@@ -227,12 +227,12 @@ HELP: mask?
 { $description "Returns true if all of the bits in the mask " { $snippet "n" } " are set in the integer input " { $snippet "x" } "." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: ff HEX: f mask? ."
+        "0xff 0xf mask? ."
         "t"
     }
 
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: f0 HEX: 1 mask? ."
+        "0xf0 0x1 mask? ."
         "f"
     }
 } ;
@@ -281,7 +281,7 @@ HELP: toggle-bit
         "1000"
     }
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "BIN: 1000 3 toggle-bit .b"
+        "0b1000 3 toggle-bit .b"
         "0"
     }
 } ;
@@ -314,7 +314,7 @@ HELP: unmask
 { $description "Clears the bits in " { $snippet "x" } " if they are set in the mask " { $snippet "n" } "." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: ff HEX: 0f unmask .h"
+        "0xff 0x0f unmask .h"
         "f0"
     }
 } ;
@@ -327,7 +327,7 @@ HELP: unmask?
 { $description "Tests whether unmasking the bits in " { $snippet "x" } " would return an integer greater than zero." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: ff HEX: 0f unmask? ."
+        "0xff 0x0f unmask? ."
         "t"
     }
 } ;
@@ -340,7 +340,7 @@ HELP: w*
 { $description "Multiplies two integers and wraps the result to a 32-bit unsigned integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: ffffffff HEX: 2 w* ."
+        "0xffffffff 0x2 w* ."
         "4294967294"
     }
 } ;
@@ -353,7 +353,7 @@ HELP: w+
 { $description "Adds two integers and wraps the result to a 32-bit unsigned integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: ffffffff HEX: 2 w+ ."
+        "0xffffffff 0x2 w+ ."
         "1"
     }
 } ;
@@ -366,7 +366,7 @@ HELP: w-
 { $description "Subtracts two integers and wraps the result to a 32-bit unsigned integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: 0 HEX: ff w- ."
+        "0x0 0xff w- ."
         "4294967041"
     }
 } ;
@@ -379,7 +379,7 @@ HELP: W*
 { $description "Multiplies two integers and wraps the result to a 64-bit unsigned integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: ffffffffffffffff HEX: 2 W* ."
+        "0xffffffffffffffff 0x2 W* ."
         "18446744073709551614"
     }
 } ;
@@ -392,7 +392,7 @@ HELP: W+
 { $description "Adds two integers and wraps the result to 64-bit unsigned integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: ffffffffffffffff HEX: 2 W+ ."
+        "0xffffffffffffffff 0x2 W+ ."
         "1"
     }
 } ;
@@ -405,7 +405,7 @@ HELP: W-
 { $description "Subtracts two integers and wraps the result to a 64-bit unsigned integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
-        "HEX: 0 HEX: ff W- ."
+        "0x0 0xff W- ."
         "18446744073709551361"
     }
 } ;
@@ -419,7 +419,7 @@ HELP: wrap
 { $examples "Equivalent to modding by 8:"
     { $example
         "USING: math.bitwise prettyprint ;"
-        "HEX: ffff 8 wrap .h"
+        "0xffff 8 wrap .h"
         "7"
     }
 } ;

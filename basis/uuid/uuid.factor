@@ -11,16 +11,16 @@ IN: uuid
     ! 0x01b21dd213814000L is the number of 100-ns intervals
     ! between the UUID epoch 1582-10-15 00:00:00 and the 
     ! Unix epoch 1970-01-01 00:00:00.
-    gmt timestamp>micros 10 * HEX: 01b21dd213814000 +
-    [ -48 shift HEX: 0fff bitand ] 
-    [ -32 shift HEX: ffff bitand ]
-    [ HEX: ffffffff bitand ]
+    gmt timestamp>micros 10 * 0x01b21dd213814000 +
+    [ -48 shift 0x0fff bitand ] 
+    [ -32 shift 0xffff bitand ]
+    [ 0xffffffff bitand ]
     tri ;
 
 : (hardware) ( -- address ) 
     ! Choose a random 48-bit number with eighth bit 
     ! set to 1 (as recommended in RFC 4122)
-    48 random-bits HEX: 010000000000 bitor ;
+    48 random-bits 0x010000000000 bitor ;
 
 : (clock) ( -- clockseq ) 
     ! Choose a random 14-bit number
@@ -35,9 +35,9 @@ IN: uuid
 
 : (version) ( n version -- n' )
     [
-        HEX: c000 48 shift bitnot bitand 
-        HEX: 8000 48 shift bitor 
-        HEX: f000 64 shift bitnot bitand
+        0xc000 48 shift bitnot bitand 
+        0x8000 48 shift bitor 
+        0xf000 64 shift bitnot bitand
     ] dip 76 shift bitor ;
 
 : uuid>string ( n -- string )

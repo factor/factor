@@ -27,7 +27,7 @@ IN: math.functions.tests
 [ t ] [ e pi i* ^ imaginary-part -0.00001 0.00001 between? ] unit-test
 
 [ 1/0. ] [ 2.0 1024 ^ ] unit-test
-[ HEX: 1.0p-1024 ] [ 2.0 -1024 ^ ] unit-test
+[ 0x1.0p-1024 ] [ 2.0 -1024 ^ ] unit-test
 
 [ t ] [ 0 0 ^ fp-nan? ] unit-test
 [ 0.0 ] [ 0.0 1.0 ^ ] unit-test
@@ -59,8 +59,8 @@ IN: math.functions.tests
 [ 0.0 ] [ 1.0 log ] unit-test
 [ 1.0 ] [ e log ] unit-test
 
-CONSTANT: log-factorial-1000 HEX: 1.71820d04e2eb6p12
-CONSTANT: log10-factorial-1000 HEX: 1.40f3593ed6f8ep11
+CONSTANT: log-factorial-1000 0x1.71820d04e2eb6p12
+CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 
 [ $ log-factorial-1000 t ] [ 1000 factorial [ log ] [ bignum? ] bi ] unit-test
 [ C{ $ log-factorial-1000 $ pi } t ] [ 1000 factorial neg [ log ] [ bignum? ] bi ] unit-test

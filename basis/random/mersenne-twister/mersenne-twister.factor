@@ -14,7 +14,7 @@ TUPLE: mersenne-twister { seq uint-array } { i fixnum } ;
 
 CONSTANT: n 624
 CONSTANT: m 397
-CONSTANT: a uint-array{ 0 HEX: 9908b0df }
+CONSTANT: a uint-array{ 0 0x9908b0df }
 
 : y ( n seq -- y )
     [ nth-unsafe 31 mask-bit ]
@@ -49,8 +49,8 @@ CONSTANT: a uint-array{ 0 HEX: 9908b0df }
 
 : mt-temper ( y -- yt )
     dup -11 shift bitxor
-    dup 7 shift HEX: 9d2c5680 bitand bitxor
-    dup 15 shift HEX: efc60000 bitand bitxor
+    dup 7 shift 0x9d2c5680 bitand bitxor
+    dup 15 shift 0xefc60000 bitand bitxor
     dup -18 shift bitxor ; inline
 
 : next-index  ( mt -- i )
