@@ -34,22 +34,22 @@ IN: math.integers.tests
 
 [ -10000000001981284352 ] [
     -10000000000000000000
-    HEX: -100000000 bitand
+    -0x100000000 bitand
 ] unit-test
 
 [ 9999999997686317056 ] [
     10000000000000000000
-    HEX: -100000000 bitand
+    -0x100000000 bitand
 ] unit-test
 
 [ 4294967296 ] [
     -10000000000000000000
-    HEX: 100000000 bitand
+    0x100000000 bitand
 ] unit-test
 
 [ 0 ] [
     10000000000000000000
-    HEX: 100000000 bitand
+    0x100000000 bitand
 ] unit-test
 
 [ -1 ] [ -1 >bignum >fixnum ] unit-test
@@ -68,29 +68,29 @@ unit-test
 [ 8 ] [ 257 >bignum log2 ] unit-test
 [ 0 ] [ 1   >bignum log2 ] unit-test
 
-[ t ] [ BIN: 1101 0 bit? ] unit-test
-[ f ] [ BIN: 1101 1 bit? ] unit-test
-[ t ] [ BIN: 1101 2 bit? ] unit-test
-[ t ] [ BIN: 1101 3 bit? ] unit-test
-[ f ] [ BIN: 1101 4 bit? ] unit-test
+[ t ] [ 0b1101 0 bit? ] unit-test
+[ f ] [ 0b1101 1 bit? ] unit-test
+[ t ] [ 0b1101 2 bit? ] unit-test
+[ t ] [ 0b1101 3 bit? ] unit-test
+[ f ] [ 0b1101 4 bit? ] unit-test
 
-[ t ] [ BIN: 1101 >bignum 0 bit? ] unit-test
-[ f ] [ BIN: 1101 >bignum 1 bit? ] unit-test
-[ t ] [ BIN: 1101 >bignum 2 bit? ] unit-test
-[ t ] [ BIN: 1101 >bignum 3 bit? ] unit-test
-[ f ] [ BIN: 1101 >bignum 4 bit? ] unit-test
+[ t ] [ 0b1101 >bignum 0 bit? ] unit-test
+[ f ] [ 0b1101 >bignum 1 bit? ] unit-test
+[ t ] [ 0b1101 >bignum 2 bit? ] unit-test
+[ t ] [ 0b1101 >bignum 3 bit? ] unit-test
+[ f ] [ 0b1101 >bignum 4 bit? ] unit-test
 
-[ t ] [ BIN: -1101 0 bit? ] unit-test
-[ t ] [ BIN: -1101 1 bit? ] unit-test
-[ f ] [ BIN: -1101 2 bit? ] unit-test
-[ f ] [ BIN: -1101 3 bit? ] unit-test
-[ t ] [ BIN: -1101 4 bit? ] unit-test
+[ t ] [ -0b1101 0 bit? ] unit-test
+[ t ] [ -0b1101 1 bit? ] unit-test
+[ f ] [ -0b1101 2 bit? ] unit-test
+[ f ] [ -0b1101 3 bit? ] unit-test
+[ t ] [ -0b1101 4 bit? ] unit-test
 
-[ t ] [ BIN: -1101 >bignum 0 bit? ] unit-test
-[ t ] [ BIN: -1101 >bignum 1 bit? ] unit-test
-[ f ] [ BIN: -1101 >bignum 2 bit? ] unit-test
-[ f ] [ BIN: -1101 >bignum 3 bit? ] unit-test
-[ t ] [ BIN: -1101 >bignum 4 bit? ] unit-test
+[ t ] [ -0b1101 >bignum 0 bit? ] unit-test
+[ t ] [ -0b1101 >bignum 1 bit? ] unit-test
+[ f ] [ -0b1101 >bignum 2 bit? ] unit-test
+[ f ] [ -0b1101 >bignum 3 bit? ] unit-test
+[ t ] [ -0b1101 >bignum 4 bit? ] unit-test
 
 [ t ] [ 1067811677921310779 >bignum 59 bit? ] unit-test
 
@@ -199,7 +199,7 @@ unit-test
 [ -1. ] [ 2000 2^ neg 2000 2^ 1 + ratio>float ] unit-test
 [ 0.4 ] [ 6 15 ratio>float ] unit-test
 
-[ HEX: 3fe553522d230931 ]
+[ 0x3fe553522d230931 ]
 [ 61967020039 92984792073 ratio>float double>bits ] unit-test
 
 : random-integer ( -- n )
@@ -217,14 +217,14 @@ unit-test
 ] unit-test
 
 ! Ensure that /f is accurate for fixnums > 2^53 on 64-bit platforms
-[ HEX: 1.758bec11492f9p-54 ] [ 1 12345678901234567 /f ] unit-test
-[ HEX: -1.758bec11492f9p-54 ] [ 1 -12345678901234567 /f ] unit-test
+[ 0x1.758bec11492f9p-54 ] [ 1 12345678901234567 /f ] unit-test
+[ -0x1.758bec11492f9p-54 ] [ 1 -12345678901234567 /f ] unit-test
 
 ! Ensure that /f rounds to nearest and not to zero
-[ HEX: 1.0p55 ] [ HEX: 7f,ffff,ffff,ffff >bignum 1 /f ] unit-test
-[ HEX: 1.0p55 ] [ HEX: -7f,ffff,ffff,ffff >bignum -1 /f ] unit-test
-[ HEX: -1.0p55 ] [ HEX: -7f,ffff,ffff,ffff >bignum 1 /f ] unit-test
-[ HEX: -1.0p55 ] [ HEX: 7f,ffff,ffff,ffff >bignum -1 /f ] unit-test
+[ 0x1.0p55 ] [ 0x7f,ffff,ffff,ffff >bignum 1 /f ] unit-test
+[ 0x1.0p55 ] [ -0x7f,ffff,ffff,ffff >bignum -1 /f ] unit-test
+[ -0x1.0p55 ] [ -0x7f,ffff,ffff,ffff >bignum 1 /f ] unit-test
+[ -0x1.0p55 ] [ 0x7f,ffff,ffff,ffff >bignum -1 /f ] unit-test
 
 [ 17 ] [ 17 >bignum 5 max ] unit-test
 [ 5 ] [ 17 >bignum 5 min ] unit-test

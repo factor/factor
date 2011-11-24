@@ -14,8 +14,8 @@ SYMBOL: bytes-read
 
 : pad-last-block ( str big-endian? length -- str )
     [
-        [ % ] 2dip HEX: 80 ,
-        [ HEX: 3f bitand calculate-pad-length <byte-array> % ]
+        [ % ] 2dip 0x80 ,
+        [ 0x3f bitand calculate-pad-length <byte-array> % ]
         [ 3 shift 8 rot [ >be ] [ >le ] if % ] bi
     ] B{ } make 64 group ;
 

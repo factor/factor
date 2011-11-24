@@ -22,14 +22,14 @@ IN: opengl
 
 : error>string ( n -- string )
     H{
-        { HEX: 0 "No error" }
-        { HEX: 0501 "Invalid value" }
-        { HEX: 0500 "Invalid enumerant" }
-        { HEX: 0502 "Invalid operation" }
-        { HEX: 0503 "Stack overflow" }
-        { HEX: 0504 "Stack underflow" }
-        { HEX: 0505 "Out of memory" }
-        { HEX: 0506 "Invalid framebuffer operation" }
+        { 0x0 "No error" }
+        { 0x0501 "Invalid value" }
+        { 0x0500 "Invalid enumerant" }
+        { 0x0502 "Invalid operation" }
+        { 0x0503 "Stack overflow" }
+        { 0x0504 "Stack underflow" }
+        { 0x0505 "Out of memory" }
+        { 0x0506 "Invalid framebuffer operation" }
     } at "Unknown error" or ;
 
 TUPLE: gl-error function code string ;

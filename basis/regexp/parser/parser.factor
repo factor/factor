@@ -73,9 +73,9 @@ MEMO: simple-category-table ( -- table )
         { CHAR: t [ CHAR: \t ] }
         { CHAR: n [ CHAR: \n ] }
         { CHAR: r [ CHAR: \r ] }
-        { CHAR: f [ HEX: c ] }
-        { CHAR: a [ HEX: 7 ] }
-        { CHAR: e [ HEX: 1b ] }
+        { CHAR: f [ 0xc ] }
+        { CHAR: a [ 0x7 ] }
+        { CHAR: e [ 0x1b ] }
         { CHAR: \\ [ CHAR: \\ ] }
 
         { CHAR: w [ c-identifier-class <primitive-class> ] }

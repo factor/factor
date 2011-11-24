@@ -28,15 +28,15 @@ IN: oracle.liboci
 ! Various Modes
 ! ===============================================
 
-: OCI_DEFAULT   HEX: 00 ; inline ! default value for parameters and attributes
-: OCI_THREADED  HEX: 01 ; inline ! appl. in threaded environment
-: OCI_OBJECT    HEX: 02 ; inline ! application in object environment
+: OCI_DEFAULT   0x00 ; inline ! default value for parameters and attributes
+: OCI_THREADED  0x01 ; inline ! appl. in threaded environment
+: OCI_OBJECT    0x02 ; inline ! application in object environment
 
 ! ===============================================
 ! Execution Modes
 ! ===============================================
 
-: OCI_DESCRIBE_ONLY   HEX: 10 ; inline ! only describe the statement
+: OCI_DESCRIBE_ONLY   0x10 ; inline ! only describe the statement
 
 ! ===============================================
 ! Credential Types
@@ -73,14 +73,14 @@ IN: oracle.liboci
 ! (and default) orientation is OCI_FETCH_NEXT
 ! ===============================================
 
-: OCI_FETCH_CURRENT       HEX: 01 ; inline ! refetching current position
-: OCI_FETCH_NEXT          HEX: 02 ; inline ! next row
-: OCI_FETCH_FIRST         HEX: 04 ; inline ! first row of the result set
-: OCI_FETCH_LAST          HEX: 08 ; inline ! the last row of the result set
-: OCI_FETCH_PRIOR         HEX: 10 ; inline ! the previous row relative to current
-: OCI_FETCH_ABSOLUTE      HEX: 20 ; inline ! absolute offset from first
-: OCI_FETCH_RELATIVE      HEX: 40 ; inline ! offset relative to current
-: OCI_FETCH_RESERVED_1    HEX: 80 ; inline ! reserved
+: OCI_FETCH_CURRENT       0x01 ; inline ! refetching current position
+: OCI_FETCH_NEXT          0x02 ; inline ! next row
+: OCI_FETCH_FIRST         0x04 ; inline ! first row of the result set
+: OCI_FETCH_LAST          0x08 ; inline ! the last row of the result set
+: OCI_FETCH_PRIOR         0x10 ; inline ! the previous row relative to current
+: OCI_FETCH_ABSOLUTE      0x20 ; inline ! absolute offset from first
+: OCI_FETCH_RELATIVE      0x40 ; inline ! offset relative to current
+: OCI_FETCH_RESERVED_1    0x80 ; inline ! reserved
 
 ! ===============================================
 ! Handle Types

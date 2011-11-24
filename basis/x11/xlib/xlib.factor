@@ -333,22 +333,22 @@ X-FUNCTION: Colormap XCreateColormap ( Display* display, Window w, Visual* visua
 : GCDashList          ( -- n ) 21 2^ ; inline
 : GCArcMode           ( -- n ) 22 2^ ; inline
 
-CONSTANT: GXclear               HEX: 0
-CONSTANT: GXand                 HEX: 1
-CONSTANT: GXandReverse          HEX: 2
-CONSTANT: GXcopy                HEX: 3
-CONSTANT: GXandInverted         HEX: 4
-CONSTANT: GXnoop                HEX: 5
-CONSTANT: GXxor                 HEX: 6
-CONSTANT: GXor                  HEX: 7
-CONSTANT: GXnor                 HEX: 8
-CONSTANT: GXequiv               HEX: 9
-CONSTANT: GXinvert              HEX: a
-CONSTANT: GXorReverse           HEX: b
-CONSTANT: GXcopyInverted        HEX: c
-CONSTANT: GXorInverted          HEX: d
-CONSTANT: GXnand                HEX: e
-CONSTANT: GXset                 HEX: f
+CONSTANT: GXclear               0x0
+CONSTANT: GXand                 0x1
+CONSTANT: GXandReverse          0x2
+CONSTANT: GXcopy                0x3
+CONSTANT: GXandInverted         0x4
+CONSTANT: GXnoop                0x5
+CONSTANT: GXxor                 0x6
+CONSTANT: GXor                  0x7
+CONSTANT: GXnor                 0x8
+CONSTANT: GXequiv               0x9
+CONSTANT: GXinvert              0xa
+CONSTANT: GXorReverse           0xb
+CONSTANT: GXcopyInverted        0xc
+CONSTANT: GXorInverted          0xd
+CONSTANT: GXnand                0xe
+CONSTANT: GXset                 0xf
 
 STRUCT: XGCValues
 { function int }
@@ -1211,17 +1211,17 @@ X-FUNCTION: int XLookupString (
 
 ! 16.7 Determining the Appropriate Visual Type
 
-CONSTANT: VisualNoMask                  HEX: 0
-CONSTANT: VisualIDMask                  HEX: 1
-CONSTANT: VisualScreenMask              HEX: 2
-CONSTANT: VisualDepthMask               HEX: 4
-CONSTANT: VisualClassMask               HEX: 8
-CONSTANT: VisualRedMaskMask             HEX: 10
-CONSTANT: VisualGreenMaskMask           HEX: 20
-CONSTANT: VisualBlueMaskMask            HEX: 40
-CONSTANT: VisualColormapSizeMask        HEX: 80
-CONSTANT: VisualBitsPerRGBMask          HEX: 100
-CONSTANT: VisualAllMask                 HEX: 1FF
+CONSTANT: VisualNoMask                  0x0
+CONSTANT: VisualIDMask                  0x1
+CONSTANT: VisualScreenMask              0x2
+CONSTANT: VisualDepthMask               0x4
+CONSTANT: VisualClassMask               0x8
+CONSTANT: VisualRedMaskMask             0x10
+CONSTANT: VisualGreenMaskMask           0x20
+CONSTANT: VisualBlueMaskMask            0x40
+CONSTANT: VisualColormapSizeMask        0x80
+CONSTANT: VisualBitsPerRGBMask          0x100
+CONSTANT: VisualAllMask                 0x1FF
 
 STRUCT: XVisualInfo
         { visual Visual* }
@@ -1351,15 +1351,15 @@ X-FUNCTION: int XBell ( Display* display, int percent ) ;
 
 ! !!! INPUT METHODS
 
-CONSTANT: XIMPreeditArea      HEX: 0001
-CONSTANT: XIMPreeditCallbacks HEX: 0002
-CONSTANT: XIMPreeditPosition  HEX: 0004
-CONSTANT: XIMPreeditNothing   HEX: 0008
-CONSTANT: XIMPreeditNone      HEX: 0010
-CONSTANT: XIMStatusArea       HEX: 0100
-CONSTANT: XIMStatusCallbacks  HEX: 0200
-CONSTANT: XIMStatusNothing    HEX: 0400
-CONSTANT: XIMStatusNone       HEX: 0800
+CONSTANT: XIMPreeditArea      0x0001
+CONSTANT: XIMPreeditCallbacks 0x0002
+CONSTANT: XIMPreeditPosition  0x0004
+CONSTANT: XIMPreeditNothing   0x0008
+CONSTANT: XIMPreeditNone      0x0010
+CONSTANT: XIMStatusArea       0x0100
+CONSTANT: XIMStatusCallbacks  0x0200
+CONSTANT: XIMStatusNothing    0x0400
+CONSTANT: XIMStatusNone       0x0800
 
 CONSTANT: XNVaNestedList "XNVaNestedList"
 CONSTANT: XNQueryInputStyle "queryInputStyle"

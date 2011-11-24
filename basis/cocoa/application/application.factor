@@ -17,7 +17,7 @@ CONSTANT: NSApplicationDelegateReplyFailure 2
 
 : NSApp ( -- app ) NSApplication -> sharedApplication ;
 
-CONSTANT: NSAnyEventMask HEX: ffffffff
+CONSTANT: NSAnyEventMask 0xffffffff
 
 FUNCTION: void NSBeep ( ) ;
 

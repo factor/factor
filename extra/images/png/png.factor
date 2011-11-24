@@ -50,7 +50,7 @@ TUPLE: png-chunk length type data ;
     png-chunk new ; inline
 
 CONSTANT: png-header
-    B{ HEX: 89 HEX: 50 HEX: 4e HEX: 47 HEX: 0d HEX: 0a HEX: 1a HEX: 0a }
+    B{ 0x89 0x50 0x4e 0x47 0x0d 0x0a 0x1a 0x0a }
 
 ERROR: bad-png-header header ;
 

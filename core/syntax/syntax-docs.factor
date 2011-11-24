@@ -105,15 +105,15 @@ ARTICLE: "syntax-floats" "Float syntax"
 { $subsections POSTPONE: NAN: }
 "Hexadecimal float literals are also supported. These consist of a hexadecimal literal with a decimal point and an optional base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
 { $example
-    "8.0 HEX: 1.0p3 = ."
+    "8.0 0x1.0p3 = ."
     "t"
 }
 { $example
-    "1024.0 HEX: 1.0P10 = ."
+    "1024.0 0x1.0P10 = ."
     "t"
 }
 { $example
-    "10.125 HEX: 1.44p3 = ."
+    "10.125 0x1.44p3 = ."
     "t"
 }
 "The normalized hex form " { $snippet "HEX: ±1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of IEEE 754 representation."
@@ -478,7 +478,7 @@ HELP: CONSTANT:
 { $syntax "CONSTANT: word value" }
 { $values { "word" word } { "value" object } }
 { $description "Creates a word which pushes a value on the stack." }
-{ $examples { $code "CONSTANT: magic 1" "CONSTANT: science HEX: ff0f" } } ;
+{ $examples { $code "CONSTANT: magic 1" "CONSTANT: science 0xff0f" } } ;
 
 { define-constant POSTPONE: CONSTANT: } related-words
 
@@ -663,21 +663,21 @@ HELP: HEX:
 { $values { "N" "hexadecimal digit (0-9, a-f, A-F)" } { "pEEE" "decimal exponent value" } }
 { $description "Adds an integer or floating-point value read from a hexadecimal literal to the parse tree." }
 { $examples
-    { $example "USE: prettyprint" "HEX: ff ." "255" }
-    { $example "USE: prettyprint" "HEX: 1.8p5 ." "48.0" }
+    { $example "USE: prettyprint" "0xff ." "255" }
+    { $example "USE: prettyprint" "0x1.8p5 ." "48.0" }
 } ;
 
 HELP: OCT:
 { $syntax "OCT: integer" }
 { $values { "integer" "octal digits (0-7)" } }
 { $description "Adds an integer read from an octal literal to the parse tree." }
-{ $examples { $example "USE: prettyprint" "OCT: 31337 ." "13023" } } ;
+{ $examples { $example "USE: prettyprint" "0o31337 ." "13023" } } ;
 
 HELP: BIN:
 { $syntax "BIN: integer" }
 { $values { "integer" "binary digits (0 and 1)" } }
 { $description "Adds an integer read from an binary literal to the parse tree." }
-{ $examples { $example "USE: prettyprint" "BIN: 100 ." "4" } } ;
+{ $examples { $example "USE: prettyprint" "0b100 ." "4" } } ;
 
 HELP: NAN:
 { $syntax "NAN: payload" }

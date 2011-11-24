@@ -56,7 +56,7 @@ HELP: printf
         "00123" }
     { $example
         "USING: formatting ;"
-        "HEX: ff \"%04X\" printf"
+        "0xff \"%04X\" printf"
         "00FF" }
     { $example
         "USING: formatting ;"

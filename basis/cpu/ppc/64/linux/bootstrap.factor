@@ -20,11 +20,11 @@ CONSTANT: frame-reg 31
 
 : LOAD64 ( r n -- )
     [ dup ] dip {
-        [ nip -48 shift HEX: ffff bitand LIS ]
-        [ -32 shift HEX: ffff bitand ORI ]
+        [ nip -48 shift 0xffff bitand LIS ]
+        [ -32 shift 0xffff bitand ORI ]
         [ drop 32 SLDI ]
-        [ -16 shift HEX: ffff bitand ORIS ]
-        [ HEX: ffff bitand ORI ]
+        [ -16 shift 0xffff bitand ORIS ]
+        [ 0xffff bitand ORI ]
     } 3cleave ;
 
 : jit-trap-null ( src -- ) drop ;

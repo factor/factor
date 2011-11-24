@@ -283,9 +283,9 @@ ERROR: bmp-not-supported n ;
                 ! ushort cast-array
                 2 group [ le> ] map
                 ! 5 6 5
-                ! { HEX: f800 HEX: 7e0 HEX: 1f } uncompress-bitfield
+                ! { 0xf800 0x7e0 0x1f } uncompress-bitfield
                 ! 5 5 5
-                { HEX: 7c00 HEX: 3e0 HEX: 1f } uncompress-bitfield
+                { 0x7c00 0x3e0 0x1f } uncompress-bitfield
             ] change-color-index
             color-index>>
         ] }
@@ -298,7 +298,7 @@ ERROR: bmp-not-supported n ;
 : set-bitfield-widths ( loading-bitmap -- loading-bitmap' )
     dup header>> bit-count>> {
         { 16 [ dup color-palette>> 4 group [ le> ] map ] }
-        { 32 [ { HEX: ff0000 HEX: ff00 HEX: ff } ] }
+        { 32 [ { 0xff0000 0xff00 0xff } ] }
     } case reverse >>bitfields ;
 
 ERROR: unsupported-bitfield-widths n ;

@@ -9,7 +9,7 @@ IN: ntp
 
 <PRIVATE
 
-CONSTANT: REQUEST B{ HEX: 1b 0 0 0 0 0 0 0
+CONSTANT: REQUEST B{ 0x1b 0 0 0 0 0 0 0
                      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
                      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
                      0 0 0 0 0 0 0 0 }
@@ -54,10 +54,10 @@ CONSTANT: REQUEST B{ HEX: 1b 0 0 0 0 0 0 0
 : (ref-id) ( ref-id stratum -- string )
     [
         {
-            [ -24 shift HEX: ff bitand ]
-            [ -16 shift HEX: ff bitand ]
-            [ -8 shift HEX: ff bitand ]
-            [ HEX: ff bitand ]
+            [ -24 shift 0xff bitand ]
+            [ -16 shift 0xff bitand ]
+            [ -8 shift 0xff bitand ]
+            [ 0xff bitand ]
         } cleave
     ] dip {
         { 0 [ "%c%c%c%c" sprintf ] }
@@ -75,9 +75,9 @@ orig-timestamp recv-timestamp tx-timestamp ;
 
 : (ntp) ( payload -- ntp )
     "CCCcIIIIIIIIIII" unpack-be {
-        [ first -6 shift HEX: 3 bitand ]  ! leap
-        [ first -3 shift HEX: 7 bitand ]  ! version
-        [ first HEX: 7 bitand ]           ! mode
+        [ first -6 shift 0x3 bitand ]  ! leap
+        [ first -3 shift 0x7 bitand ]  ! version
+        [ first 0x7 bitand ]           ! mode
         [ second ]                        ! stratum
         [ third ]                         ! poll
         [ [ 3 ] dip nth ]                 ! precision

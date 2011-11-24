@@ -7,7 +7,7 @@ kernel.private ;
 
 16 data-alignment set
 
-BIN: 1111 tag-mask set
+0b1111 tag-mask set
 4 tag-bits set
 
 14 num-types set

@@ -114,14 +114,14 @@ CONSTRUCTOR: message ( query -- obj )
 
 : header>message-parts ( n -- qr opcode aa tc rd ra z rcode )
     {
-        [ -15 shift BIN: 1 bitand ]
-        [ -11 shift BIN: 111 bitand <dns-opcode> ]
-        [ -10 shift BIN: 1 bitand ]
-        [ -9 shift BIN: 1 bitand ]
-        [ -8 shift BIN: 1 bitand ]
-        [ -7 shift BIN: 1 bitand ]
-        [ -4 shift BIN: 111 bitand ]
-        [ BIN: 1111 bitand <dns-rcode> ]
+        [ -15 shift 0b1 bitand ]
+        [ -11 shift 0b111 bitand <dns-opcode> ]
+        [ -10 shift 0b1 bitand ]
+        [ -9 shift 0b1 bitand ]
+        [ -8 shift 0b1 bitand ]
+        [ -7 shift 0b1 bitand ]
+        [ -4 shift 0b111 bitand ]
+        [ 0b1111 bitand <dns-rcode> ]
     } cleave ;
 
 : byte-array>ipv4 ( byte-array -- string )
@@ -172,8 +172,8 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
 
 : (parse-name) ( -- )
     read1 [
-        dup HEX: C0 mask? [
-            8 shift read1 bitor HEX: 3fff bitand
+        dup 0xC0 mask? [
+            8 shift read1 bitor 0x3fff bitand
             seek-absolute [
                 read1 parse-length-bytes , (parse-name)
             ] with-input-seek

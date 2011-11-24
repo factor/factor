@@ -77,9 +77,9 @@ IN: xml.autoencoding
     get-char {
         { CHAR: < [ start< ] }
         { 0 [ start-utf16be ] }
-        { HEX: EF [ skip-utf8-bom ] }
-        { HEX: FF [ skip-utf16le-bom ] }
-        { HEX: FE [ skip-utf16be-bom ] }
+        { 0xEF [ skip-utf8-bom ] }
+        { 0xFF [ skip-utf16le-bom ] }
+        { 0xFE [ skip-utf16be-bom ] }
         [ drop utf8 decode-stream check f ]
     } case ;
 

@@ -33,43 +33,43 @@ ERROR: out-of-memory ;
 <PRIVATE
 
 ! Commands
-CONSTANT: GET      HEX: 00
-CONSTANT: SET      HEX: 01
-CONSTANT: ADD      HEX: 02
-CONSTANT: REPLACE  HEX: 03
-CONSTANT: DELETE   HEX: 04
-CONSTANT: INCR     HEX: 05
-CONSTANT: DECR     HEX: 06
-CONSTANT: QUIT     HEX: 07
-CONSTANT: FLUSH    HEX: 08
-CONSTANT: GETQ     HEX: 09
-CONSTANT: NOOP     HEX: 0A
-CONSTANT: VERSION  HEX: 0B
-CONSTANT: GETK     HEX: 0C
-CONSTANT: GETKQ    HEX: 0D
-CONSTANT: APPEND   HEX: 0E
-CONSTANT: PREPEND  HEX: 0F
-CONSTANT: STAT     HEX: 10
-CONSTANT: SETQ     HEX: 11
-CONSTANT: ADDQ     HEX: 12
-CONSTANT: REPLACEQ HEX: 13
-CONSTANT: DELETEQ  HEX: 14
-CONSTANT: INCRQ    HEX: 15
-CONSTANT: DECRQ    HEX: 16
-CONSTANT: QUITQ    HEX: 17
-CONSTANT: FLUSHQ   HEX: 18
-CONSTANT: APPENDQ  HEX: 19
-CONSTANT: PREPENDQ HEX: 1A
+CONSTANT: GET      0x00
+CONSTANT: SET      0x01
+CONSTANT: ADD      0x02
+CONSTANT: REPLACE  0x03
+CONSTANT: DELETE   0x04
+CONSTANT: INCR     0x05
+CONSTANT: DECR     0x06
+CONSTANT: QUIT     0x07
+CONSTANT: FLUSH    0x08
+CONSTANT: GETQ     0x09
+CONSTANT: NOOP     0x0A
+CONSTANT: VERSION  0x0B
+CONSTANT: GETK     0x0C
+CONSTANT: GETKQ    0x0D
+CONSTANT: APPEND   0x0E
+CONSTANT: PREPEND  0x0F
+CONSTANT: STAT     0x10
+CONSTANT: SETQ     0x11
+CONSTANT: ADDQ     0x12
+CONSTANT: REPLACEQ 0x13
+CONSTANT: DELETEQ  0x14
+CONSTANT: INCRQ    0x15
+CONSTANT: DECRQ    0x16
+CONSTANT: QUITQ    0x17
+CONSTANT: FLUSHQ   0x18
+CONSTANT: APPENDQ  0x19
+CONSTANT: PREPENDQ 0x1A
 
 ! Errors
-CONSTANT: NOT_FOUND    HEX: 01
-CONSTANT: EXISTS       HEX: 02
-CONSTANT: TOO_LARGE    HEX: 03
-CONSTANT: INVALID_ARGS HEX: 04
-CONSTANT: NOT_STORED   HEX: 05
-CONSTANT: NOT_NUMERIC  HEX: 06
-CONSTANT: UNKNOWN_CMD  HEX: 81
-CONSTANT: MEMORY       HEX: 82
+CONSTANT: NOT_FOUND    0x01
+CONSTANT: EXISTS       0x02
+CONSTANT: TOO_LARGE    0x03
+CONSTANT: INVALID_ARGS 0x04
+CONSTANT: NOT_STORED   0x05
+CONSTANT: NOT_NUMERIC  0x06
+CONSTANT: UNKNOWN_CMD  0x81
+CONSTANT: MEMORY       0x82
 
 TUPLE: request cmd key val extra opaque cas ;
 
@@ -91,7 +91,7 @@ TUPLE: request cmd key val extra opaque cas ;
     } cleave
     ! magic, opcode, keylen, extralen, datatype, status,
     ! bodylen, opaque, cas [ big-endian ]
-    '[ HEX: 80 _ _ _ 0 0 _ _ _ ] "CCSCCSIIQ" pack-be write ;
+    '[ 0x80 _ _ _ 0 0 _ _ _ ] "CCSCCSIIQ" pack-be write ;
 
 : (send) ( str -- )
     [ >byte-array write ] unless-empty ;
@@ -108,7 +108,7 @@ TUPLE: request cmd key val extra opaque cas ;
     "CCSCCSIIQ" [ packed-length read ] [ unpack-be ] bi ;
 
 : check-magic ( header -- )
-    first HEX: 81 = [ "bad magic" throw ] unless ;
+    first 0x81 = [ "bad magic" throw ] unless ;
 
 : check-status ( header -- )
     [ 5 ] dip nth {

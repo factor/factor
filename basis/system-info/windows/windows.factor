@@ -20,7 +20,7 @@ IN: system-info.windows
 
 ! 0 = x86, 6 = Intel Itanium, 9 = x64 (AMD or Intel), 10 = WOW64, 0xffff = Unk
 : processor-architecture ( -- n )
-    system-info dwOemId>> HEX: ffff0000 bitand ;
+    system-info dwOemId>> 0xffff0000 bitand ;
 
 : os-version-struct ( -- os-version )
     OSVERSIONINFO <struct>

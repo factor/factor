@@ -9,20 +9,20 @@ IN: core-foundation.strings
 TYPEDEF: void* CFStringRef
 
 TYPEDEF: int CFStringEncoding
-CONSTANT: kCFStringEncodingMacRoman HEX: 0
-CONSTANT: kCFStringEncodingWindowsLatin1 HEX: 0500
-CONSTANT: kCFStringEncodingISOLatin1 HEX: 0201
-CONSTANT: kCFStringEncodingNextStepLatin HEX: 0B01
-CONSTANT: kCFStringEncodingASCII HEX: 0600
-CONSTANT: kCFStringEncodingUnicode HEX: 0100
-CONSTANT: kCFStringEncodingUTF8 HEX: 08000100
-CONSTANT: kCFStringEncodingNonLossyASCII HEX: 0BFF
-CONSTANT: kCFStringEncodingUTF16 HEX: 0100
-CONSTANT: kCFStringEncodingUTF16BE HEX: 10000100
-CONSTANT: kCFStringEncodingUTF16LE HEX: 14000100
-CONSTANT: kCFStringEncodingUTF32 HEX: 0c000100
-CONSTANT: kCFStringEncodingUTF32BE HEX: 18000100
-CONSTANT: kCFStringEncodingUTF32LE HEX: 1c000100
+CONSTANT: kCFStringEncodingMacRoman 0x0
+CONSTANT: kCFStringEncodingWindowsLatin1 0x0500
+CONSTANT: kCFStringEncodingISOLatin1 0x0201
+CONSTANT: kCFStringEncodingNextStepLatin 0x0B01
+CONSTANT: kCFStringEncodingASCII 0x0600
+CONSTANT: kCFStringEncodingUnicode 0x0100
+CONSTANT: kCFStringEncodingUTF8 0x08000100
+CONSTANT: kCFStringEncodingNonLossyASCII 0x0BFF
+CONSTANT: kCFStringEncodingUTF16 0x0100
+CONSTANT: kCFStringEncodingUTF16BE 0x10000100
+CONSTANT: kCFStringEncodingUTF16LE 0x14000100
+CONSTANT: kCFStringEncodingUTF32 0x0c000100
+CONSTANT: kCFStringEncodingUTF32BE 0x18000100
+CONSTANT: kCFStringEncodingUTF32LE 0x1c000100
 
 FUNCTION: CFStringRef CFStringCreateWithBytes (
     CFAllocatorRef alloc,
@@ -65,8 +65,8 @@ FUNCTION: CFStringRef CFCopyTypeIDDescription ( CFTypeID type_id ) ;
 
 : prepare-CFString ( string -- byte-array )
     [
-        dup HEX: 10ffff >
-        [ drop HEX: fffd ] when
+        dup 0x10ffff >
+        [ drop 0xfffd ] when
     ] map utf8 encode ;
 
 : <CFString> ( string -- alien )

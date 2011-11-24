@@ -15,10 +15,10 @@ CONSTANT: kCGImageAlphaFirst 4
 CONSTANT: kCGImageAlphaNoneSkipLast 5
 CONSTANT: kCGImageAlphaNoneSkipFirst 6
 
-CONSTANT: kCGBitmapAlphaInfoMask HEX: 1f
+CONSTANT: kCGBitmapAlphaInfoMask 0x1f
 CONSTANT: kCGBitmapFloatComponents 256
 
-CONSTANT: kCGBitmapByteOrderMask HEX: 7000
+CONSTANT: kCGBitmapByteOrderMask 0x7000
 CONSTANT: kCGBitmapByteOrderDefault 0
 CONSTANT: kCGBitmapByteOrder16Little 4096
 CONSTANT: kCGBitmapByteOrder32Little 8192
@@ -115,7 +115,7 @@ FUNCTION: size_t CGImageGetHeight (
 
 FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
 
-CONSTANT: kCGLRendererGenericFloatID HEX: 00020400
+CONSTANT: kCGLRendererGenericFloatID 0x00020400
 
 FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
 

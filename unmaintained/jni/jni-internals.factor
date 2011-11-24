@@ -283,7 +283,7 @@ FUNCTION: jint JNI_GetDefaultJavaVMInitArgs ( jdk-init-args* args ) ;
 FUNCTION: jint JNI_CreateJavaVM ( void** pvm, void** penv, void* args ) ;
 
 : <jdk-init-args> ( -- jdk-init-args )
-  "jdk-init-args" <c-object>  HEX: 00010004 over set-jdk-init-args-version ;
+  "jdk-init-args" <c-object>  0x00010004 over set-jdk-init-args-version ;
 
 : jni1 ( -- init-args int )
   <jdk-init-args> dup JNI_GetDefaultJavaVMInitArgs ;

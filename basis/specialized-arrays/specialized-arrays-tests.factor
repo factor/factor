@@ -37,8 +37,8 @@ SPECIALIZED-ARRAYS: bool uchar ushort char uint float ulonglong ;
     int-array{ 3 1 3 3 7 } malloc-byte-array 5 int <c-direct-array> >array
 ] unit-test
 
-[ float-array{ HEX: 1.222,222   HEX: 1.111,112   } ]
-[ float-array{ HEX: 1.222,222,2 HEX: 1.111,111,1 } ] unit-test
+[ float-array{ 0x1.222,222   0x1.111,112   } ]
+[ float-array{ 0x1.222,222,2 0x1.111,111,1 } ] unit-test
 
 [ f ] [ float-array{ 4 3 2 1 } dup clone [ underlying>> ] bi@ eq? ] unit-test
 

@@ -66,8 +66,8 @@ HELP: flags{
     { $example
         "USING: literals kernel prettyprint ;"
         "IN: scratchpad"
-        "CONSTANT: x HEX: 1"
-        "flags{ HEX: 20 x BIN: 100 } .h"
+        "CONSTANT: x 0x1"
+        "flags{ 0x20 x 0b100 } .h"
         "25"
     }
 } ;

@@ -42,10 +42,10 @@ os linux? cpu x86.64? and [
 [ t ] +fp-invalid-operation+ [ -1.0 ] [ fsqrt ] test-fp-exception-compiled unit-test
 
 [
-    HEX: 3fd5,5555,5555,5555
-    HEX: 3fc9,9999,9999,999a
-    HEX: bfc9,9999,9999,999a
-    HEX: bfd5,5555,5555,5555
+    0x3fd5,5555,5555,5555
+    0x3fc9,9999,9999,999a
+    0xbfc9,9999,9999,999a
+    0xbfd5,5555,5555,5555
 ] [
     +round-nearest+ [
          1.0 3.0 /f double>bits
@@ -56,10 +56,10 @@ os linux? cpu x86.64? and [
 ] unit-test
 
 [
-    HEX: 3fd5,5555,5555,5555
-    HEX: 3fc9,9999,9999,9999
-    HEX: bfc9,9999,9999,999a
-    HEX: bfd5,5555,5555,5556
+    0x3fd5,5555,5555,5555
+    0x3fc9,9999,9999,9999
+    0xbfc9,9999,9999,999a
+    0xbfd5,5555,5555,5556
 ] [
     +round-down+ [
          1.0 3.0 /f double>bits
@@ -70,10 +70,10 @@ os linux? cpu x86.64? and [
 ] unit-test
 
 [
-    HEX: 3fd5,5555,5555,5556
-    HEX: 3fc9,9999,9999,999a
-    HEX: bfc9,9999,9999,9999
-    HEX: bfd5,5555,5555,5555
+    0x3fd5,5555,5555,5556
+    0x3fc9,9999,9999,999a
+    0xbfc9,9999,9999,9999
+    0xbfd5,5555,5555,5555
 ] [
     +round-up+ [
          1.0 3.0 /f double>bits
@@ -84,10 +84,10 @@ os linux? cpu x86.64? and [
 ] unit-test
 
 [
-    HEX: 3fd5,5555,5555,5555
-    HEX: 3fc9,9999,9999,9999
-    HEX: bfc9,9999,9999,9999
-    HEX: bfd5,5555,5555,5555
+    0x3fd5,5555,5555,5555
+    0x3fc9,9999,9999,9999
+    0xbfc9,9999,9999,9999
+    0xbfd5,5555,5555,5555
 ] [
     +round-zero+ [
          1.0 3.0 /f double>bits
@@ -99,10 +99,10 @@ os linux? cpu x86.64? and [
 
 ! ensure rounding mode is restored to +round-nearest+
 [
-    HEX: 3fd5,5555,5555,5555
-    HEX: 3fc9,9999,9999,999a
-    HEX: bfc9,9999,9999,999a
-    HEX: bfd5,5555,5555,5555
+    0x3fd5,5555,5555,5555
+    0x3fc9,9999,9999,999a
+    0xbfc9,9999,9999,999a
+    0xbfd5,5555,5555,5555
 ] [
      1.0 3.0 /f double>bits
      1.0 5.0 /f double>bits

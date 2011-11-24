@@ -153,7 +153,7 @@ M: bignum (log2) bignum-log2 ; inline
 
 M: bignum /f ( m n -- f ) { bignum bignum } declare bignum/f ;
 
-CONSTANT: bignum/f-threshold HEX: 20,0000,0000,0000
+CONSTANT: bignum/f-threshold 0x20,0000,0000,0000
 
 : fixnum/f ( m n -- m/n )
     [ >float ] bi@ float/f ; inline

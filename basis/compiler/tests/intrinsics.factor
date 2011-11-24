@@ -49,12 +49,12 @@ IN: compiler.tests.intrinsics
 [ CHAR: b ] [ 1 [ "abc" string-nth ] compile-call ] unit-test
 [ CHAR: b ] [ [ 1 "abc" string-nth ] compile-call ] unit-test
 
-[ HEX: 123456 ] [ 0 "\u123456bc" [ string-nth ] compile-call ] unit-test
-[ HEX: 123456 ] [ 0 [ "\u123456bc" string-nth ] compile-call ] unit-test
-[ HEX: 123456 ] [ [ 0 "\u123456bc" string-nth ] compile-call ] unit-test
-[ HEX: 123456 ] [ 1 "a\u123456c" [ string-nth ] compile-call ] unit-test
-[ HEX: 123456 ] [ 1 [ "a\u123456c" string-nth ] compile-call ] unit-test
-[ HEX: 123456 ] [ [ 1 "a\u123456c" string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ 0 "\u123456bc" [ string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ 0 [ "\u123456bc" string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ [ 0 "\u123456bc" string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ 1 "a\u123456c" [ string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ 1 [ "a\u123456c" string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ [ 1 "a\u123456c" string-nth ] compile-call ] unit-test
 
 [ ] [ [ 0 special-object ] compile-call drop ] unit-test
 [ ] [ 1 special-object [ 1 set-special-object ] compile-call ] unit-test
@@ -244,9 +244,9 @@ IN: compiler.tests.intrinsics
 [ -4294967296 ] [ -1 [ 32 fixnum-shift ] compile-call ] unit-test
 [ -4294967296 ] [ -1 [ 16 fixnum-shift 16 fixnum-shift ] compile-call ] unit-test
 
-[ HEX: 10000000 ] [ HEX: 1000000 HEX: 10 [ fixnum* ] compile-call ] unit-test
-[ HEX: 8000000 ] [ HEX: -8000000 >fixnum [ 0 swap fixnum- ] compile-call ] unit-test
-[ HEX: 8000000 ] [ HEX: -7ffffff >fixnum [ 1 swap fixnum- ] compile-call ] unit-test
+[ 0x10000000 ] [ 0x1000000 0x10 [ fixnum* ] compile-call ] unit-test
+[ 0x8000000 ] [ -0x8000000 >fixnum [ 0 swap fixnum- ] compile-call ] unit-test
+[ 0x8000000 ] [ -0x7ffffff >fixnum [ 1 swap fixnum- ] compile-call ] unit-test
 
 [ t ] [ 1 26 fixnum-shift dup [ fixnum+ ] compile-call 1 27 fixnum-shift = ] unit-test
 [ -134217729 ] [ 1 27 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
@@ -263,8 +263,8 @@ IN: compiler.tests.intrinsics
 [ t ] [ f [ f eq? ] compile-call ] unit-test
 
 cell 8 = [
-    [ HEX: 40400000 ] [
-        HEX: 4200 [ HEX: 7fff fixnum-bitand 13 fixnum-shift-fast 112 23 fixnum-shift-fast fixnum+fast ]
+    [ 0x40400000 ] [
+        0x4200 [ 0x7fff fixnum-bitand 13 fixnum-shift-fast 112 23 fixnum-shift-fast fixnum+fast ]
         compile-call
     ] unit-test
 ] when
@@ -479,15 +479,15 @@ ERROR: bug-in-fixnum* x y a b ;
 ] unit-test
 
 [ ALIEN: 123 ] [
-    HEX: 123 [ <alien> ] compile-call
+    0x123 [ <alien> ] compile-call
 ] unit-test
 
 [ ALIEN: 123 ] [
-    HEX: 123 [ { fixnum } declare <alien> ] compile-call
+    0x123 [ { fixnum } declare <alien> ] compile-call
 ] unit-test
 
 [ ALIEN: 123 ] [
-    [ HEX: 123 <alien> ] compile-call
+    [ 0x123 <alien> ] compile-call
 ] unit-test
 
 [ f ] [
@@ -529,8 +529,8 @@ ERROR: bug-in-fixnum* x y a b ;
 [ ALIEN: 1234 ALIEN: 2234 ] [
     ALIEN: 234 [
         { c-ptr } declare
-        [ HEX: 1000 swap <displaced-alien> ]
-        [ HEX: 2000 swap <displaced-alien> ] bi
+        [ 0x1000 swap <displaced-alien> ]
+        [ 0x2000 swap <displaced-alien> ] bi
     ] compile-call
 ] unit-test
 

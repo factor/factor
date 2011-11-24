@@ -59,7 +59,7 @@ IN: tools.deploy.macosx
         [ create-app-plist ]
         [ "Contents/MacOS/" append-path copy-vm ]
     } 2cleave
-    dup OCT: 755 set-file-permissions ;
+    dup 0o755 set-file-permissions ;
 
 : deploy.app-image ( vocab bundle-name -- str )
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;

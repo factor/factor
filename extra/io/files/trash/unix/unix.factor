@@ -21,7 +21,7 @@ IN: io.files.trash.unix
     [ dup top-directory? not ] [ ".." append-path ] while ;
 
 : make-user-directory ( path -- )
-    [ make-directories ] [ OCT: 700 set-file-permissions ] bi ;
+    [ make-directories ] [ 0o700 set-file-permissions ] bi ;
 
 : check-trash-path ( path -- )
     {

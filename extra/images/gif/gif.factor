@@ -55,16 +55,16 @@ introducer label comment-data ;
 TUPLE: trailer byte ;
 CONSTRUCTOR: trailer ( byte -- obj ) ;
 
-CONSTANT: image-descriptor HEX: 2c
+CONSTANT: image-descriptor 0x2c
 ! Extensions
-CONSTANT: extension-identifier HEX: 21
-CONSTANT: plain-text-extension HEX: 01
-CONSTANT: graphic-control-extension HEX: f9
-CONSTANT: comment-extension HEX: fe
-CONSTANT: application-extension HEX: ff
-CONSTANT: trailer HEX: 3b
-CONSTANT: graphic-control-extension-block-size HEX: 04
-CONSTANT: block-terminator HEX: 00
+CONSTANT: extension-identifier 0x21
+CONSTANT: plain-text-extension 0x01
+CONSTANT: graphic-control-extension 0xf9
+CONSTANT: comment-extension 0xfe
+CONSTANT: application-extension 0xff
+CONSTANT: trailer 0x3b
+CONSTANT: graphic-control-extension-block-size 0x04
+CONSTANT: block-terminator 0x00
 
 : <loading-gif> ( -- loading-gif )
     \ loading-gif new
