@@ -106,7 +106,7 @@ CONSTANT: id3v1+-length 227
 
 : synchsafe>seq ( n -- seq )
     dup 1 + log2 1 + 7 / ceiling
-    [ [ -7 shift ] keep HEX: 7f bitand  ] replicate nip reverse ;
+    [ [ -7 shift ] keep 0x7f bitand  ] replicate nip reverse ;
 
 : filter-text-data ( data -- filtered )
     [ printable? ] filter ;
@@ -119,7 +119,7 @@ CONSTANT: id3v1+-length 227
 
 : decode-text ( string -- string' )
     dup 2 short head
-    { { HEX: ff HEX: fe } { HEX: fe HEX: ff } } member?
+    { { 0xff 0xfe } { 0xfe 0xff } } member?
     utf16 ascii ? decode ;
 
 : (read-frame) ( seq -- frame )

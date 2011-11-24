@@ -8,6 +8,8 @@ IN: math.integers.private
 : fixnum-min ( x y -- z ) [ fixnum< ] most ; foldable
 : fixnum-max ( x y -- z ) [ fixnum> ] most ; foldable
 
+M: integer neg? 0 < ; inline
+
 M: integer numerator ; inline
 M: integer denominator drop 1 ; inline
 
@@ -153,7 +155,7 @@ M: bignum (log2) bignum-log2 ; inline
 
 M: bignum /f ( m n -- f ) { bignum bignum } declare bignum/f ;
 
-CONSTANT: bignum/f-threshold HEX: 20,0000,0000,0000
+CONSTANT: bignum/f-threshold 0x20,0000,0000,0000
 
 : fixnum/f ( m n -- m/n )
     [ >float ] bi@ float/f ; inline

@@ -119,12 +119,12 @@ cpu x86.64? [
     ! Boundary case
     [
         {
-            T{ ##load-integer f 0 HEX: 7fffffff }
+            T{ ##load-integer f 0 0x7fffffff }
             T{ ##replace f 0 D 0 }
         }
     ] [
         {
-            T{ ##load-integer f 0 HEX: 7fffffff }
+            T{ ##load-integer f 0 0x7fffffff }
             T{ ##replace f 0 D 0 }
         } value-numbering-step
     ] unit-test
@@ -2024,7 +2024,7 @@ cell 8 = [
         {
             T{ ##peek f 0 D 0 }
             T{ ##load-integer f 1 -1 }
-            T{ ##load-integer f 3 HEX: ffffffffffff }
+            T{ ##load-integer f 3 0xffffffffffff }
         }
     ] [
         {

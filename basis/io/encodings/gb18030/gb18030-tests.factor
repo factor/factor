@@ -5,22 +5,22 @@ IN: io.encodings.gb18030.tests
 
 [ "hello" ] [ "hello" gb18030 encode >string ] unit-test
 [ "hello" ] [ "hello" gb18030 decode ] unit-test
-[ B{ HEX: A1 HEX: A4 HEX: 81 HEX: 30 HEX: 86 HEX: 30 } ]
-[ B{ HEX: B7 HEX: B8 } >string gb18030 encode ] unit-test
-[ { HEX: B7 HEX: B8 } ]
-[ B{ HEX: A1 HEX: A4 HEX: 81 HEX: 30 HEX: 86 HEX: 30 } gb18030 decode >array ] unit-test
-[ { HEX: B7 CHAR: replacement-character } ]
-[ B{ HEX: A1 HEX: A4 HEX: 81 HEX: 30 HEX: 86 } gb18030 decode >array ] unit-test
-[ { HEX: B7 CHAR: replacement-character } ]
-[ B{ HEX: A1 HEX: A4 HEX: 81 HEX: 30 } gb18030 decode >array ] unit-test
-[ { HEX: B7 CHAR: replacement-character } ]
-[ B{ HEX: A1 HEX: A4 HEX: 81 } gb18030 decode >array ] unit-test
-[ { HEX: B7 } ]
-[ B{ HEX: A1 HEX: A4 } gb18030 decode >array ] unit-test
+[ B{ 0xA1 0xA4 0x81 0x30 0x86 0x30 } ]
+[ B{ 0xB7 0xB8 } >string gb18030 encode ] unit-test
+[ { 0xB7 0xB8 } ]
+[ B{ 0xA1 0xA4 0x81 0x30 0x86 0x30 } gb18030 decode >array ] unit-test
+[ { 0xB7 CHAR: replacement-character } ]
+[ B{ 0xA1 0xA4 0x81 0x30 0x86 } gb18030 decode >array ] unit-test
+[ { 0xB7 CHAR: replacement-character } ]
+[ B{ 0xA1 0xA4 0x81 0x30 } gb18030 decode >array ] unit-test
+[ { 0xB7 CHAR: replacement-character } ]
+[ B{ 0xA1 0xA4 0x81 } gb18030 decode >array ] unit-test
+[ { 0xB7 } ]
+[ B{ 0xA1 0xA4 } gb18030 decode >array ] unit-test
 [ { CHAR: replacement-character } ]
-[ B{ HEX: A1 } >string gb18030 decode >array ] unit-test
-[ { HEX: 44D7 HEX: 464B } ]
-[ B{ HEX: 82 HEX: 33 HEX: A3 HEX: 39 HEX: 82 HEX: 33 HEX: C9 HEX: 31 }
+[ B{ 0xA1 } >string gb18030 decode >array ] unit-test
+[ { 0x44D7 0x464B } ]
+[ B{ 0x82 0x33 0xA3 0x39 0x82 0x33 0xC9 0x31 }
   gb18030 decode >array ] unit-test
-[ { HEX: 82 HEX: 33 HEX: A3 HEX: 39 HEX: 82 HEX: 33 HEX: C9 HEX: 31 } ]
-[ { HEX: 44D7 HEX: 464B } >string gb18030 encode >array ] unit-test
+[ { 0x82 0x33 0xA3 0x39 0x82 0x33 0xC9 0x31 } ]
+[ { 0x44D7 0x464B } >string gb18030 encode >array ] unit-test

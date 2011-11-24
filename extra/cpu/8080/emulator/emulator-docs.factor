@@ -23,7 +23,7 @@ HELP: load-rom*
 " variable. An exception is thrown if this variable is not set."
 }
 { $examples
-  { $code "{ { HEX: 0000 \"invaders.rom\" } } <cpu> load-rom*" }
+  { $code "{ { 0x0000 \"invaders.rom\" } } <cpu> load-rom*" }
 }
 { $see-also load-rom } ;
 

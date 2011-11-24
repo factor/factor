@@ -7,21 +7,21 @@ IN: math.floats.half
 : half>bits ( float -- bits )
     float>bits
     [ -31 shift 15 shift ] [
-        HEX: 7fffffff bitand
+        0x7fffffff bitand
         dup zero? [
-            dup HEX: 7f800000 >= [ -13 shift HEX: 7fff bitand ] [
+            dup 0x7f800000 >= [ -13 shift 0x7fff bitand ] [
                 -13 shift
                 112 10 shift -
-                0 HEX: 7c00 clamp
+                0 0x7c00 clamp
             ] if
         ] unless
     ] bi bitor ;
 
 : bits>half ( bits -- float )
     [ -15 shift 31 shift ] [
-        HEX: 7fff bitand
+        0x7fff bitand
         dup zero? [
-            dup HEX: 7c00 >= [ 13 shift HEX: 7f800000 bitor ] [
+            dup 0x7c00 >= [ 13 shift 0x7f800000 bitor ] [
                 13 shift
                 112 23 shift + 
             ] if

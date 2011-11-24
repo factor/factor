@@ -13,8 +13,8 @@ TUPLE: oid { a initial: 0 } { b initial: 0 } ;
 : <oid> ( -- oid )
     oid new
     now timestamp>micros >>a
-    8 random-bits 16 shift HEX: FF0000 mask
-    16 random-bits HEX: FFFF mask
+    8 random-bits 16 shift 0xFF0000 mask
+    16 random-bits 0xFFFF mask
     bitor >>b ;
 
 TUPLE: dbref ref id db ;
@@ -58,31 +58,31 @@ CONSTANT: MDB_OID_FIELD "_id"
 CONSTANT: MDB_META_FIELD "_mfd"
 
 CONSTANT: T_EOO     0
-CONSTANT: T_Double  HEX: 1
-CONSTANT: T_String  HEX: 2
-CONSTANT: T_Object  HEX: 3
-CONSTANT: T_Array   HEX: 4
-CONSTANT: T_Binary  HEX: 5
-CONSTANT: T_Undefined  HEX: 6
-CONSTANT: T_OID     HEX: 7
-CONSTANT: T_Boolean HEX: 8
-CONSTANT: T_Date    HEX: 9
-CONSTANT: T_NULL    HEX: A
-CONSTANT: T_Regexp  HEX: B
-CONSTANT: T_DBRef   HEX: C
-CONSTANT: T_Code    HEX: D
-CONSTANT: T_Symbol  HEX: E
-CONSTANT: T_ScopedCode HEX: F
-CONSTANT: T_Integer HEX: 10
-CONSTANT: T_Timestamp HEX: 11
-CONSTANT: T_Integer64 HEX: 12
-CONSTANT: T_MinKey  HEX: FF
-CONSTANT: T_MaxKey  HEX: 7F
+CONSTANT: T_Double  0x1
+CONSTANT: T_String  0x2
+CONSTANT: T_Object  0x3
+CONSTANT: T_Array   0x4
+CONSTANT: T_Binary  0x5
+CONSTANT: T_Undefined  0x6
+CONSTANT: T_OID     0x7
+CONSTANT: T_Boolean 0x8
+CONSTANT: T_Date    0x9
+CONSTANT: T_NULL    0xA
+CONSTANT: T_Regexp  0xB
+CONSTANT: T_DBRef   0xC
+CONSTANT: T_Code    0xD
+CONSTANT: T_Symbol  0xE
+CONSTANT: T_ScopedCode 0xF
+CONSTANT: T_Integer 0x10
+CONSTANT: T_Timestamp 0x11
+CONSTANT: T_Integer64 0x12
+CONSTANT: T_MinKey  0xFF
+CONSTANT: T_MaxKey  0x7F
 
-CONSTANT: T_Binary_Default                  HEX: 0
-CONSTANT: T_Binary_Function                 HEX: 1
-CONSTANT: T_Binary_Bytes_Deprecated         HEX: 2
-CONSTANT: T_Binary_UUID                     HEX: 3
-CONSTANT: T_Binary_MD5                      HEX: 5
-CONSTANT: T_Binary_Custom                   HEX: 80
+CONSTANT: T_Binary_Default                  0x0
+CONSTANT: T_Binary_Function                 0x1
+CONSTANT: T_Binary_Bytes_Deprecated         0x2
+CONSTANT: T_Binary_UUID                     0x3
+CONSTANT: T_Binary_MD5                      0x5
+CONSTANT: T_Binary_Custom                   0x80
 

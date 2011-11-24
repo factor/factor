@@ -4,8 +4,8 @@ USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.intersection classes.maybe
 classes.tuple classes.tuple.private classes.union colors
 colors.constants combinators continuations effects generic
-hash-sets hashtables io io.pathnames io.styles kernel make math
-math.order math.parser namespaces prettyprint.config
+hash-sets hashtables io io.pathnames io.styles kernel
+make math math.order math.parser namespaces prettyprint.config
 prettyprint.custom prettyprint.sections prettyprint.stylesheet
 quotations sbufs sequences strings vectors words words.symbol ;
 FROM: sets => members ;
@@ -63,11 +63,16 @@ M: method pprint*
     [ "method-generic" word-prop pprint-word ] bi
     block> ;
 
+: pprint-prefixed-number ( n quot: ( n -- n' ) pre -- )
+    pick neg?
+    [ [ neg ] [ call ] [ prepend ] tri* "-" prepend text ]
+    [ [ call ] [ prepend ] bi* text ] if ; inline
+
 M: real pprint*
     number-base get {
-        { 16 [ \ HEX: [ >hex text ] pprint-prefix ] }
-        {  8 [ \ OCT: [ >oct text ] pprint-prefix ] }
-        {  2 [ \ BIN: [ >bin text ] pprint-prefix ] }
+        { 16 [ [ >hex ] "0x" pprint-prefixed-number ] }
+        {  8 [ [ >oct ] "0o" pprint-prefixed-number ] }
+        {  2 [ [ >bin ] "0b" pprint-prefixed-number ] }
         [ drop number>string text ]
     } case ;
 
@@ -76,7 +81,7 @@ M: float pprint*
         \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
     ] [
         number-base get {
-            { 16 [ \ HEX: [ >hex text ] pprint-prefix ] }
+            { 16 [ [ >hex ] "0x" pprint-prefixed-number ] }
             [ drop number>string text ]
         } case
     ] if ;

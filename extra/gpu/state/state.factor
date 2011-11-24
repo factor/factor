@@ -36,7 +36,7 @@ VARIANT: stencil-op
 
 TUPLE: stencil-mode
     { value integer initial: 0 read-only }
-    { mask integer initial: HEX: FFFFFFFF read-only }
+    { mask integer initial: 0xFFFFFFFF read-only }
     { comparison comparison initial: cmp-always read-only }
     { stencil-fail-op stencil-op initial: op-keep read-only }
     { depth-fail-op stencil-op initial: op-keep read-only }
@@ -88,8 +88,8 @@ C: <blend-state> blend-state
 TUPLE: mask-state
     { color sequence initial: { t t t t } read-only }
     { depth boolean initial: t read-only }
-    { stencil-front integer initial: HEX: FFFFFFFF read-only }
-    { stencil-back integer initial: HEX: FFFFFFFF read-only } ;
+    { stencil-front integer initial: 0xFFFFFFFF read-only }
+    { stencil-back integer initial: 0xFFFFFFFF read-only } ;
 C: <mask-state> mask-state
 
 VARIANT: triangle-face

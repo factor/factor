@@ -37,7 +37,7 @@ IN: ctags.etags
 : etag ( lines seq -- str )
   [
     dup first present %
-    1 HEX: 7f <string> %
+    1 0x7f <string> %
     second dup number>string %
     1 CHAR: , <string> %
     1 - lines>bytes number>string %
@@ -55,7 +55,7 @@ IN: ctags.etags
 
 : etag-header ( vec1 n resource -- vec2 )
   normalize-path (etag-header) prefix
-  1 HEX: 0c <string> prefix ;
+  1 0x0c <string> prefix ;
 
 : etag-strings ( alist -- seq )
   { } swap [

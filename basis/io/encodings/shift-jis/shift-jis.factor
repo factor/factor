@@ -43,7 +43,7 @@ make-jis \ shift-jis-table set-value
 
 : small? ( char -- ? )
     ! ASCII range or single-byte halfwidth katakana
-    { [ 0 HEX: 7F between? ] [ HEX: A1 HEX: DF between? ] } 1|| ;
+    { [ 0 0x7F between? ] [ 0xA1 0xDF between? ] } 1|| ;
 
 : write-halfword ( stream halfword -- )
     h>b/b swap 2byte-array swap stream-write ;

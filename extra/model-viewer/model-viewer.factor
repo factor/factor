@@ -168,7 +168,7 @@ TUPLE: vbo
 : clear-screen ( -- )
     0 0 0 0 glClearColor 
     1 glClearDepth
-    HEX: ffffffff glClearStencil
+    0xffffffff glClearStencil
     flags{ GL_COLOR_BUFFER_BIT
       GL_DEPTH_BUFFER_BIT
       GL_STENCIL_BUFFER_BIT } glClear ;

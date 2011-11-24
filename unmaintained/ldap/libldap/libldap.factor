@@ -26,13 +26,13 @@ IN: ldap.libldap
 : LDAP_PORT         389 ; inline ! ldap:///   default LDAP port
 : LDAPS_PORT        636 ; inline ! ldaps:///  default LDAP over TLS port
 
-: LDAP_SCOPE_BASE         HEX: 0000              ; inline
+: LDAP_SCOPE_BASE         0x0000              ; inline
 : LDAP_SCOPE_BASEOBJECT   LDAP_SCOPE_BASE        ; inline
-: LDAP_SCOPE_ONELEVEL     HEX: 0001              ; inline
+: LDAP_SCOPE_ONELEVEL     0x0001              ; inline
 : LDAP_SCOPE_ONE          LDAP_SCOPE_ONELEVEL    ; inline
-: LDAP_SCOPE_SUBTREE      HEX: 0002              ; inline
+: LDAP_SCOPE_SUBTREE      0x0002              ; inline
 : LDAP_SCOPE_SUB          LDAP_SCOPE_SUBTREE     ; inline
-: LDAP_SCOPE_SUBORDINATE  HEX: 0003              ; inline ! OpenLDAP extension
+: LDAP_SCOPE_SUBORDINATE  0x0003              ; inline ! OpenLDAP extension
 : LDAP_SCOPE_CHILDREN     LDAP_SCOPE_SUBORDINATE ; inline
 : LDAP_SCOPE_DEFAULT      -1                     ; inline ! OpenLDAP extension
 
@@ -40,38 +40,38 @@ IN: ldap.libldap
 : LDAP_RES_UNSOLICITED     0 ; inline
 
 ! how many messages to retrieve results for
-: LDAP_MSG_ONE             HEX: 00 ; inline
-: LDAP_MSG_ALL             HEX: 01 ; inline
-: LDAP_MSG_RECEIVED        HEX: 02 ; inline
+: LDAP_MSG_ONE             0x00 ; inline
+: LDAP_MSG_ALL             0x01 ; inline
+: LDAP_MSG_RECEIVED        0x02 ; inline
 
 ! the possible result types returned
-: LDAP_RES_BIND             HEX: 61 ; inline
-: LDAP_RES_SEARCH_ENTRY     HEX: 64 ; inline
-: LDAP_RES_SEARCH_REFERENCE HEX: 73 ; inline
-: LDAP_RES_SEARCH_RESULT    HEX: 65 ; inline
-: LDAP_RES_MODIFY           HEX: 67 ; inline
-: LDAP_RES_ADD              HEX: 69 ; inline
-: LDAP_RES_DELETE           HEX: 6b ; inline
-: LDAP_RES_MODDN            HEX: 6d ; inline
-: LDAP_RES_COMPARE          HEX: 6f ; inline
-: LDAP_RES_EXTENDED         HEX: 78 ; inline
-: LDAP_RES_EXTENDED_PARTIAL HEX: 79 ; inline
+: LDAP_RES_BIND             0x61 ; inline
+: LDAP_RES_SEARCH_ENTRY     0x64 ; inline
+: LDAP_RES_SEARCH_REFERENCE 0x73 ; inline
+: LDAP_RES_SEARCH_RESULT    0x65 ; inline
+: LDAP_RES_MODIFY           0x67 ; inline
+: LDAP_RES_ADD              0x69 ; inline
+: LDAP_RES_DELETE           0x6b ; inline
+: LDAP_RES_MODDN            0x6d ; inline
+: LDAP_RES_COMPARE          0x6f ; inline
+: LDAP_RES_EXTENDED         0x78 ; inline
+: LDAP_RES_EXTENDED_PARTIAL 0x79 ; inline
 
 : result-types ( -- seq ) {
-    { HEX: 61  "LDAP_RES_BIND" }
-    { HEX: 64  "LDAP_RES_SEARCH_ENTRY" }
-    { HEX: 73  "LDAP_RES_SEARCH_REFERENCE" }
-    { HEX: 65  "LDAP_RES_SEARCH_RESULT" }
-    { HEX: 67  "LDAP_RES_MODIFY" }
-    { HEX: 69  "LDAP_RES_ADD" }
-    { HEX: 6b  "LDAP_RES_DELETE" }
-    { HEX: 6d  "LDAP_RES_MODDN" }
-    { HEX: 6f  "LDAP_RES_COMPARE" }
-    { HEX: 78  "LDAP_RES_EXTENDED" }
-    { HEX: 79  "LDAP_RES_EXTENDED_PARTIAL" }
+    { 0x61  "LDAP_RES_BIND" }
+    { 0x64  "LDAP_RES_SEARCH_ENTRY" }
+    { 0x73  "LDAP_RES_SEARCH_REFERENCE" }
+    { 0x65  "LDAP_RES_SEARCH_RESULT" }
+    { 0x67  "LDAP_RES_MODIFY" }
+    { 0x69  "LDAP_RES_ADD" }
+    { 0x6b  "LDAP_RES_DELETE" }
+    { 0x6d  "LDAP_RES_MODDN" }
+    { 0x6f  "LDAP_RES_COMPARE" }
+    { 0x78  "LDAP_RES_EXTENDED" }
+    { 0x79  "LDAP_RES_EXTENDED_PARTIAL" }
 } ;
 
-: LDAP_OPT_PROTOCOL_VERSION HEX: 0011 ; inline
+: LDAP_OPT_PROTOCOL_VERSION 0x0011 ; inline
 
 C-STRUCT: ldap 
     { "char" "ld_lberoptions" }

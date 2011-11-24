@@ -7,7 +7,7 @@ SPECIALIZED-ARRAY: WCHAR
 IN: windows.dragdrop-listener
 
 : filenames-from-hdrop ( hdrop -- filenames )
-    dup HEX: FFFFFFFF f 0 DragQueryFile ! get count of files
+    dup 0xFFFFFFFF f 0 DragQueryFile ! get count of files
     [
         2dup f 0 DragQueryFile 1 + ! get size of filename buffer
         dup WCHAR <c-array>

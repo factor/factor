@@ -3,25 +3,25 @@ IN: checksums.fnv1.tests
 
 ! A few test vectors taken from http://www.isthe.com/chongo/src/fnv/test_fnv.c
 
-[ HEX: 811c9dc5 ] [ "" fnv1-32 checksum-bytes ] unit-test
-[ HEX: 811c9dc5 ] [ "" fnv1a-32 checksum-bytes ] unit-test
-[ HEX: cbf29ce484222325 ] [ "" fnv1-64 checksum-bytes ] unit-test
-[ HEX: cbf29ce484222325 ] [ "" fnv1a-64 checksum-bytes ] unit-test
+[ 0x811c9dc5 ] [ "" fnv1-32 checksum-bytes ] unit-test
+[ 0x811c9dc5 ] [ "" fnv1a-32 checksum-bytes ] unit-test
+[ 0xcbf29ce484222325 ] [ "" fnv1-64 checksum-bytes ] unit-test
+[ 0xcbf29ce484222325 ] [ "" fnv1a-64 checksum-bytes ] unit-test
 
-[ HEX: 050c5d7e ] [ "a" fnv1-32 checksum-bytes ] unit-test
-[ HEX: e40c292c ] [ "a" fnv1a-32 checksum-bytes ] unit-test
-[ HEX: af63bd4c8601b7be ] [ "a" fnv1-64 checksum-bytes ] unit-test
-[ HEX: af63dc4c8601ec8c ] [ "a" fnv1a-64 checksum-bytes ] unit-test
+[ 0x050c5d7e ] [ "a" fnv1-32 checksum-bytes ] unit-test
+[ 0xe40c292c ] [ "a" fnv1a-32 checksum-bytes ] unit-test
+[ 0xaf63bd4c8601b7be ] [ "a" fnv1-64 checksum-bytes ] unit-test
+[ 0xaf63dc4c8601ec8c ] [ "a" fnv1a-64 checksum-bytes ] unit-test
 
-[ HEX: 050c5d7d ] [ "b" fnv1-32 checksum-bytes ] unit-test
-[ HEX: e70c2de5 ] [ "b" fnv1a-32 checksum-bytes ] unit-test
-[ HEX: af63bd4c8601b7bd ] [ "b" fnv1-64 checksum-bytes ] unit-test
-[ HEX: af63df4c8601f1a5 ] [ "b" fnv1a-64 checksum-bytes ] unit-test
+[ 0x050c5d7d ] [ "b" fnv1-32 checksum-bytes ] unit-test
+[ 0xe70c2de5 ] [ "b" fnv1a-32 checksum-bytes ] unit-test
+[ 0xaf63bd4c8601b7bd ] [ "b" fnv1-64 checksum-bytes ] unit-test
+[ 0xaf63df4c8601f1a5 ] [ "b" fnv1a-64 checksum-bytes ] unit-test
 
-[ HEX: 31f0b262 ] [ "foobar" fnv1-32 checksum-bytes ] unit-test
-[ HEX: bf9cf968 ] [ "foobar" fnv1a-32 checksum-bytes ] unit-test
-[ HEX: 340d8765a4dda9c2 ] [ "foobar" fnv1-64 checksum-bytes ] unit-test
-[ HEX: 85944171f73967e8 ] [ "foobar" fnv1a-64 checksum-bytes ] unit-test
+[ 0x31f0b262 ] [ "foobar" fnv1-32 checksum-bytes ] unit-test
+[ 0xbf9cf968 ] [ "foobar" fnv1a-32 checksum-bytes ] unit-test
+[ 0x340d8765a4dda9c2 ] [ "foobar" fnv1-64 checksum-bytes ] unit-test
+[ 0x85944171f73967e8 ] [ "foobar" fnv1a-64 checksum-bytes ] unit-test
 
 ! I couldn't find any test vectors for 128, 256, 512, or 1024 versions of FNV1 hashes.
 ! So, just to check that your maths works the same as my maths, here's a few samples computed on my laptop.

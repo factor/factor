@@ -39,7 +39,7 @@ M: float /i float/f >integer ; inline
 M: real abs dup 0 < [ neg ] when ; inline
 
 M: float fp-special?
-    double>bits -52 shift HEX: 7ff [ bitand ] keep = ; inline
+    double>bits -52 shift 0x7ff [ bitand ] keep = ; inline
 
 M: float fp-nan-payload
     double>bits 52 2^ 1 - bitand ; inline
@@ -73,5 +73,7 @@ M: float prev-float
     ] if ; inline
 
 M: float fp-sign double>bits 63 bit? ; inline
+
+M: float neg? fp-sign ; inline
 
 M: float abs double>bits 63 2^ bitnot bitand bits>double ; inline

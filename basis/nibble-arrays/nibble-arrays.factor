@@ -10,7 +10,7 @@ TUPLE: nibble-array
 
 <PRIVATE
 
-CONSTANT: nibble BIN: 1111
+CONSTANT: nibble 0b1111
 
 : nibbles>bytes ( m -- n ) 1 + 2/ ; inline
 

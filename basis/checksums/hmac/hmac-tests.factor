@@ -15,8 +15,8 @@ IN: checksums.hmac.tests
     "V\u0000be4R\u00001d\u000014L\u000088\u0000db\u0000b8\u0000c73\u0000f0\u0000e8\u0000b3\u0000f6"
 ]
 [
-    50 HEX: dd <repetition>
-    16 HEX: aa <string> md5 hmac-bytes >string
+    50 0xdd <repetition>
+    16 0xaa <string> md5 hmac-bytes >string
 ] unit-test
 
 [
@@ -34,12 +34,12 @@ IN: checksums.hmac.tests
 [
     "\u0000d70YM\u000016~5\u0000d5\u000095o\u0000d8\0=\r\u0000b3\u0000d3\u0000f4m\u0000c7\u0000bb"
 ] [
-    50 HEX: dd <repetition>
-    16 HEX: aa <string> sha1 hmac-bytes >string
+    50 0xdd <repetition>
+    16 0xaa <string> sha1 hmac-bytes >string
 ] unit-test
 
 [ "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7" ]
-[ "Hi There" 20 HEX: b <string> sha-256 hmac-bytes hex-string ] unit-test
+[ "Hi There" 20 0xb <string> sha-256 hmac-bytes hex-string ] unit-test
 
 [ "167f928588c5cc2eef8e3093caa0e87c9ff566a14794aa61648d81621a2a40c6" ]
 [

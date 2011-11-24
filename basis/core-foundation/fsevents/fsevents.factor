@@ -39,7 +39,7 @@ STRUCT: FSEventStreamContext
 
 CALLBACK: void FSEventStreamCallback ( FSEventStreamRef streamRef, void* clientCallBackInfo, size_t numEvents, void* eventPaths, FSEventStreamEventFlags* eventFlags, FSEventStreamEventId* eventIds ) ;
 
-CONSTANT: FSEventStreamEventIdSinceNow HEX: FFFFFFFFFFFFFFFF
+CONSTANT: FSEventStreamEventIdSinceNow 0xFFFFFFFFFFFFFFFF
 
 FUNCTION: FSEventStreamRef FSEventStreamCreate (
     CFAllocatorRef           allocator,

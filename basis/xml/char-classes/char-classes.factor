@@ -6,7 +6,7 @@ IN: xml.char-classes
 
 CATEGORY: 1.0name-start
     Ll Lu Lo Lt Nl | {
-        [ HEX: 2BB HEX: 2C1 between? ]
+        [ 0x2BB 0x2C1 between? ]
         [ "\u000559\u0006E5\u0006E6_:" member? ]
     } 1|| ;
 
@@ -37,19 +37,19 @@ HINTS: name-char? { object fixnum } ;
     ! 1.0:
     ! #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
     {
-        [ HEX: 20 HEX: D7FF between? ]
+        [ 0x20 0xD7FF between? ]
         [ "\t\r\n" member? ]
-        [ HEX: E000 HEX: FFFD between? ]
-        [ HEX: 10000 HEX: 10FFFF between? ]
+        [ 0xE000 0xFFFD between? ]
+        [ 0x10000 0x10FFFF between? ]
     } 1|| ; inline
 
 : 1.1-text? ( char -- ? )
     ! 1.1:
     ! [#x1-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
     {
-        [ HEX: 1 HEX: D7FF between? ]
-        [ HEX: E000 HEX: FFFD between? ]
-        [ HEX: 10000 HEX: 10FFFF between? ]
+        [ 0x1 0xD7FF between? ]
+        [ 0xE000 0xFFFD between? ]
+        [ 0x10000 0x10FFFF between? ]
     } 1|| ; inline
 
 PRIVATE>

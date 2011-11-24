@@ -94,12 +94,12 @@ unit-test
 
 [ 100.0 ] [ "1e2" string>number ] unit-test
 [ 100.0 ] [ "1e+2" string>number ] unit-test
-[ HEX: 1e2 ] [ "1e2" hex> ] unit-test
+[ 0x1e2 ] [ "1e2" hex> ] unit-test
 
-[ HEX: 1.999999999999ap-3 ] [ "0.2" string>number ] unit-test
-[ HEX: 1.3333333333333p0  ] [ "1.2" string>number ] unit-test
-[ HEX: 1.5555555555555p0  ] [ "1.333,333,333,333,333,333" string>number ] unit-test
-[ HEX: 1.aaaaaaaaaaaabp0  ] [ "1.666,666,666,666,666,666" string>number ] unit-test
+[ 0x1.999999999999ap-3 ] [ "0.2" string>number ] unit-test
+[ 0x1.3333333333333p0  ] [ "1.2" string>number ] unit-test
+[ 0x1.5555555555555p0  ] [ "1.333,333,333,333,333,333" string>number ] unit-test
+[ 0x1.aaaaaaaaaaaabp0  ] [ "1.666,666,666,666,666,666" string>number ] unit-test
 
 [ "100.0" ]
 [ "1.0e2" string>number number>string ]
@@ -237,3 +237,51 @@ unit-test
 [ 1/0. ] [ "1.0p1024" hex> ] unit-test
 [ -1/0. ] [ "-1.0p1024" hex> ] unit-test
 
+[ 0 ] [ "0" string>number ] unit-test
+[ 0 ] [ "00" string>number ] unit-test
+[ 0 ] [ "0,000" string>number ] unit-test
+[ 0.0 ] [ "0." string>number ] unit-test
+[ 0.0 ] [ "0.0" string>number ] unit-test
+[ 0.0 ] [ "0x0.0p0" string>number ] unit-test
+[ 0 ] [ "0x0" string>number ] unit-test
+[ 0 ] [ "0o0" string>number ] unit-test
+[ 0 ] [ "0b0" string>number ] unit-test
+
+[ 10 ] [ "010" string>number ] unit-test
+[ 16 ] [ "0x10" string>number ] unit-test
+[  8 ] [ "0o10" string>number ] unit-test
+[  2 ] [ "0b10" string>number ] unit-test
+
+[ -10 ] [ "-010" string>number ] unit-test
+[ -16 ] [ "-0x10" string>number ] unit-test
+[  -8 ] [ "-0o10" string>number ] unit-test
+[  -2 ] [ "-0b10" string>number ] unit-test
+
+[ f ] [ "01a" string>number ] unit-test
+[ f ] [ "0x1g" string>number ] unit-test
+[ f ] [ "0o18" string>number ] unit-test
+[ f ] [ "0b12" string>number ] unit-test
+
+[ 11 ] [ "0x0b" string>number ] unit-test
+[ f  ] [ "0x0o0" string>number ] unit-test
+
+[ 0x7FFF,ABCD ] [ "0x7FFF,ABCD" string>number ] unit-test
+
+[ 1.0 ] [ "0x1.0p0" string>number ] unit-test
+[ 6.0 ] [ "0x1.8p2" string>number ] unit-test
+[ 0.375 ] [ "0x1.8p-2" string>number ] unit-test
+[ -6.0 ] [ "-0x1.8p2" string>number ] unit-test
+[ -0.375 ] [ "-0x1.8p-2" string>number ] unit-test
+
+[ f ] [ "0x" string>number ] unit-test
+[ f ] [ "0b" string>number ] unit-test
+[ f ] [ "0o" string>number ] unit-test
+[ f ] [ "0x," string>number ] unit-test
+[ f ] [ "0b," string>number ] unit-test
+[ f ] [ "0o," string>number ] unit-test
+[ f ] [ "0x,1" string>number ] unit-test
+[ f ] [ "0b,1" string>number ] unit-test
+[ f ] [ "0o,1" string>number ] unit-test
+[ f ] [ "0x1," string>number ] unit-test
+[ f ] [ "0b1," string>number ] unit-test
+[ f ] [ "0o1," string>number ] unit-test

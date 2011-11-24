@@ -13,7 +13,7 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
 ! byte order differences on big endian platforms
 : munge ( i -- i' )
     little-endian? [
-      cell 4 = [ BIN: 11000 ] [ BIN: 111000 ] if
+      cell 4 = [ 0b11000 ] [ 0b111000 ] if
       bitxor ] unless ; inline
 
 : <select-mx> ( -- mx )

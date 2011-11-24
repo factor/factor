@@ -48,16 +48,16 @@ M: cpu write-port ( value port cpu -- )
   #! an 8-bit value.
   3drop ;
 
-CONSTANT: carry-flag        HEX: 01
-CONSTANT: parity-flag       HEX: 04
-CONSTANT: half-carry-flag   HEX: 10
-CONSTANT: interrupt-flag    HEX: 20
-CONSTANT: zero-flag         HEX: 40
-CONSTANT: sign-flag         HEX: 80
+CONSTANT: carry-flag        0x01
+CONSTANT: parity-flag       0x04
+CONSTANT: half-carry-flag   0x10
+CONSTANT: interrupt-flag    0x20
+CONSTANT: zero-flag         0x40
+CONSTANT: sign-flag         0x80
 
 : >word< ( word -- byte byte )
   #! Explode a word into its two 8 bit values.
-  dup HEX: FF bitand swap -8 shift HEX: FF bitand swap ;
+  dup 0xFF bitand swap -8 shift 0xFF bitand swap ;
 
 : af>> ( cpu -- word )
   #! Return the 16-bit pseudo register AF.
@@ -133,10 +133,10 @@ CONSTANT: sign-flag         HEX: 80
   #! Read one byte from memory at the specified address.
   #! The address is 16-bit, but if a value greater than
   #! 0xFFFF is provided then return a default value.
-  over HEX: FFFF <= [
+  over 0xFFFF <= [
     ram>> nth
   ] [
-    2drop HEX: FF
+    2drop 0xFF
   ] if ;
 
 : read-word ( addr cpu -- word )  
@@ -162,7 +162,7 @@ CONSTANT: sign-flag         HEX: 80
 
 : write-byte ( value addr cpu -- )
   #! Write a byte to the specified memory address.
-  over dup HEX: 2000 < swap HEX: FFFF > or [
+  over dup 0x2000 < swap 0xFFFF > or [
     3drop
   ] [
     3dup ram>> set-nth
@@ -218,30 +218,30 @@ CONSTANT: sign-flag         HEX: 80
   swap cpu-f-bitor= ;
 
 : clear-flag ( cpu flag -- )
-   bitnot HEX: FF bitand swap cpu-f-bitand= ;
+   bitnot 0xFF bitand swap cpu-f-bitand= ;
 
 : update-zero-flag ( result cpu -- )
   #! If the result of an instruction has the value 0, this
   #! flag is set, otherwise it is reset.
-  swap HEX: FF bitand 0 = [ zero-flag set-flag ] [ zero-flag clear-flag ] if ;
+  swap 0xFF bitand 0 = [ zero-flag set-flag ] [ zero-flag clear-flag ] if ;
 
 : update-sign-flag ( result cpu -- )
   #! If the most significant bit of the result 
   #! has the value 1 then the flag is set, otherwise
   #! it is reset.
-  swap HEX: 80 bitand 0 = [ sign-flag clear-flag ] [ sign-flag set-flag ] if ;
+  swap 0x80 bitand 0 = [ sign-flag clear-flag ] [ sign-flag set-flag ] if ;
 
 : update-parity-flag ( result cpu -- )
   #! If the modulo 2 sum of the bits of the result
   #! is 0, (ie. if the result has even parity) this flag
   #! is set, otherwise it is reset.
-  swap HEX: FF bitand 2 mod 0 = [ parity-flag set-flag ] [ parity-flag clear-flag ] if ;
+  swap 0xFF bitand 2 mod 0 = [ parity-flag set-flag ] [ parity-flag clear-flag ] if ;
 
 : update-carry-flag ( result cpu -- )
   #! If the instruction resulted in a carry (from addition) 
   #! or a borrow (from subtraction or a comparison) out of the
   #! higher order bit, this flag is set, otherwise it is reset.
-  swap dup HEX: 100 >= swap 0 < or [ carry-flag set-flag ] [ carry-flag clear-flag ] if ;
+  swap dup 0x100 >= swap 0 < or [ carry-flag set-flag ] [ carry-flag clear-flag ] if ;
 
 : update-half-carry-flag ( original change-by result cpu -- )
   #! If the instruction caused a carry out of bit 3 and into bit 4 of the
@@ -249,7 +249,7 @@ CONSTANT: sign-flag         HEX: 80
   #! The 'original' is the original value of the register being changed.
   #! 'change-by' is the amount it is being added or decremented by.
   #! 'result' is the result of that change.
-  [ bitxor bitxor HEX: 10 bitand 0 = not ] dip
+  [ bitxor bitxor 0x10 bitand 0 = not ] dip
   swap [ half-carry-flag set-flag ] [ half-carry-flag clear-flag ] if ;
 
 : update-flags ( result cpu -- )
@@ -268,7 +268,7 @@ CONSTANT: sign-flag         HEX: 80
   [ 2dup + ] dip 
   [ update-flags ] 2keep 
   [ update-half-carry-flag ] 2keep
-  drop HEX: FF bitand ;
+  drop 0xFF bitand ;
 
 : add-carry ( change-by result cpu -- change-by result )
   #! Add the effect of the carry flag to the result
@@ -280,7 +280,7 @@ CONSTANT: sign-flag         HEX: 80
   [ add-carry ] keep
   [ update-flags ] 2keep 
   [ update-half-carry-flag ] 2keep
-  drop HEX: FF bitand ;
+  drop 0xFF bitand ;
 
 : sub-carry ( change-by result cpu -- change-by result ) 
   #! Subtract the effect of the carry flag from the result
@@ -291,7 +291,7 @@ CONSTANT: sign-flag         HEX: 80
   [ 2dup - ] dip
   [ update-flags ] 2keep 
   [ update-half-carry-flag ] 2keep
-  drop HEX: FF bitand ;
+  drop 0xFF bitand ;
 
 : sub-byte-with-carry ( lhs rhs cpu -- result )
   #! Subtract rhs from lhs and take carry into account
@@ -299,7 +299,7 @@ CONSTANT: sign-flag         HEX: 80
   [ sub-carry ] keep 
   [ update-flags ] 2keep 
   [ update-half-carry-flag ] 2keep
-  drop HEX: FF bitand ;
+  drop 0xFF bitand ;
  
 : inc-byte ( byte cpu -- result )
   #! Increment byte by one. Note that carry flag is not affected
@@ -307,7 +307,7 @@ CONSTANT: sign-flag         HEX: 80
   [ 1 2dup + ] dip
   [ update-flags-no-carry ] 2keep 
   [ update-half-carry-flag ] 2keep
-  drop HEX: FF bitand ;
+  drop 0xFF bitand ;
 
 : dec-byte ( byte cpu -- result )
   #! Decrement byte by one. Note that carry flag is not affected
@@ -315,25 +315,25 @@ CONSTANT: sign-flag         HEX: 80
   [ 1 2dup - ] dip
   [ update-flags-no-carry ] 2keep 
   [ update-half-carry-flag ] 2keep
-  drop HEX: FF bitand ;
+  drop 0xFF bitand ;
 
 : inc-word ( w cpu -- w )
   #! Increment word by one. Note that no flags are modified.
-  drop 1 + HEX: FFFF bitand ;
+  drop 1 + 0xFFFF bitand ;
 
 : dec-word ( w cpu -- w )
   #! Decrement word by one. Note that no flags are modified.
-  drop 1 - HEX: FFFF bitand ;
+  drop 1 - 0xFFFF bitand ;
 
 : add-word ( lhs rhs cpu -- result )
   #! Add rhs to lhs. Note that only the carry flag is modified
   #! and only if there is a carry out of the double precision add.
-  [ + ] dip over HEX: FFFF > [ carry-flag set-flag ] [ drop ] if HEX: FFFF bitand ;
+  [ + ] dip over 0xFFFF > [ carry-flag set-flag ] [ drop ] if 0xFFFF bitand ;
 
 : bit3or ( lhs rhs -- 0|1 )
   #! bitor bit 3 of the two numbers on the stack
-  BIN: 00001000 bitand -3 shift [
-    BIN: 00001000 bitand -3 shift 
+  0b00001000 bitand -3 shift [
+    0b00001000 bitand -3 shift 
   ] dip
   bitor ;
 
@@ -344,19 +344,19 @@ CONSTANT: sign-flag         HEX: 80
   [ bitand ] dip [ update-flags ] 2keep 
   [ carry-flag clear-flag ] keep
   rot 0 = [ half-carry-flag set-flag ] [ half-carry-flag clear-flag ] if
-  HEX: FF bitand ;
+  0xFF bitand ;
 
 : xor-byte ( lhs rhs cpu -- result )
   #! Logically xor rhs to lhs. The carry and half-carry flags are cleared.
   [ bitxor ] dip [ update-flags ] 2keep 
   [ half-carry-flag carry-flag bitor clear-flag ] keep
-  drop HEX: FF bitand ;
+  drop 0xFF bitand ;
 
 : or-byte ( lhs rhs cpu -- result )
   #! Logically or rhs to lhs. The carry and half-carry flags are cleared.
   [ bitor ] dip [ update-flags ] 2keep 
   [ half-carry-flag carry-flag bitor clear-flag ] keep
-  drop HEX: FF bitand ;
+  drop 0xFF bitand ;
 
 : decrement-sp ( n cpu -- )
   #! Decrement the stackpointer by n.  
@@ -393,7 +393,7 @@ CONSTANT: sign-flag         HEX: 80
 : call-sub ( addr cpu -- )
   #! Call the address as a subroutine.
   dup push-pc 
-  [ HEX: FFFF bitand ] dip pc<< ;
+  [ 0xFFFF bitand ] dip pc<< ;
 
 : ret-from-sub ( cpu -- )
   [ pop-pc ] keep pc<< ;
@@ -445,10 +445,10 @@ M: cpu reset ( cpu -- )
   0 >>a
   0 >>f
   0 >>pc
-  HEX: F000 >>sp
-  HEX: FFFF 0 <array> >>ram
+  0xF000 >>sp
+  0xFFFF 0 <array> >>ram
   f >>halted?
-  HEX: 10 >>last-interrupt
+  0x10 >>last-interrupt
   0 >>cycles 
   drop ;
 
@@ -515,10 +515,10 @@ SYMBOL: rom-root
     2drop
   ] [ 
     [ [ 16667 - ] dip cycles<< ] keep
-    dup last-interrupt>> HEX: 10 = [
-      HEX: 08 over last-interrupt<< HEX: 08 swap interrupt
+    dup last-interrupt>> 0x10 = [
+      0x08 over last-interrupt<< 0x08 swap interrupt
     ] [
-      HEX: 10 over last-interrupt<< HEX: 10 swap interrupt
+      0x10 over last-interrupt<< 0x10 swap interrupt
     ] if     
   ] if ;
 
@@ -613,7 +613,7 @@ SYMBOLS: $1 $2 $3 $4 ;
 
 : (emulate-CALL) ( cpu -- )
   #! 205 - CALL nn
-  [ next-word HEX: FFFF bitand ] keep ! addr cpu
+  [ next-word 0xFFFF bitand ] keep ! addr cpu
   [ sp>> 2 - dup ] keep ! addr sp sp cpu
   [ sp<< ] keep ! addr sp cpu
   [ pc>> ] keep ! addr sp pc cpu
@@ -627,7 +627,7 @@ SYMBOLS: $1 $2 $3 $4 ;
   #! order bit position. Only the carry flag is affected.
   [ a>> -7 shift ] keep 
   over 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
-  [ a>> 1 shift HEX: FF bitand ] keep 
+  [ a>> 1 shift 0xFF bitand ] keep 
   [ bitor ] dip a<< ;
 
 : (emulate-RRCA) ( cpu -- )
@@ -658,7 +658,7 @@ SYMBOLS: $1 $2 $3 $4 ;
   #! bit is set to the carry flag and the carry flag is
   #! set to the value shifd out of the low order bit. 
   #! Only the carry flag is affected.
-  [ carry-flag swap flag-set? [ BIN: 10000000 ] [ 0 ] if ] keep 
+  [ carry-flag swap flag-set? [ 0b10000000 ] [ 0 ] if ] keep 
   [ a>> 254 bitand -1 shift ] keep 
   dup a>> 1 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
   [ bitor ] dip a<< ;
@@ -667,7 +667,7 @@ SYMBOLS: $1 $2 $3 $4 ;
   #! The contents of the accumulator are complemented
   #! (zero bits become one, one bits becomes zero).
   #! No flags are affected.
-  HEX: FF swap cpu-a-bitxor= ;
+  0xFF swap cpu-a-bitxor= ;
 
 : (emulate-DAA) ( cpu -- )  
   #! The eight bit number in the accumulator is
@@ -675,18 +675,18 @@ SYMBOLS: $1 $2 $3 $4 ;
   #! digits.
   [
     dup half-carry-flag swap flag-set? swap 
-    a>> BIN: 1111 bitand 9 > or [ 6 ] [ 0 ] if 
+    a>> 0b1111 bitand 9 > or [ 6 ] [ 0 ] if 
   ] keep 
   [ a>> + ] keep
   [ update-flags ] 2keep  
-  [ swap HEX: FF bitand swap a<< ] keep 
+  [ swap 0xFF bitand swap a<< ] keep 
   [
     dup carry-flag swap flag-set? swap 
-    a>> -4 shift BIN: 1111 bitand 9 > or [ 96 ] [ 0 ] if 
+    a>> -4 shift 0b1111 bitand 9 > or [ 96 ] [ 0 ] if 
   ] keep 
   [ a>> + ] keep
   [ update-flags ] 2keep  
-  swap HEX: FF bitand swap a<< ;
+  swap 0xFF bitand swap a<< ;
   
 : patterns ( -- hashtable )
   #! table of code quotation patterns for each type of instruction.
@@ -695,12 +695,12 @@ SYMBOLS: $1 $2 $3 $4 ;
     { "RET-NN" [ ret-from-sub ] }
     { "RST-0" [ 0 swap (emulate-RST) ] }
     { "RST-8" [ 8 swap (emulate-RST) ] }
-    { "RST-10H" [ HEX: 10 swap (emulate-RST) ] }
-    { "RST-18H" [ HEX: 18 swap (emulate-RST) ] }
-    { "RST-20H" [ HEX: 20 swap (emulate-RST) ] }
-    { "RST-28H" [ HEX: 28 swap (emulate-RST) ] }
-    { "RST-30H" [ HEX: 30 swap (emulate-RST) ] }
-    { "RST-38H" [ HEX: 38 swap (emulate-RST) ] }
+    { "RST-10H" [ 0x10 swap (emulate-RST) ] }
+    { "RST-18H" [ 0x18 swap (emulate-RST) ] }
+    { "RST-20H" [ 0x20 swap (emulate-RST) ] }
+    { "RST-28H" [ 0x28 swap (emulate-RST) ] }
+    { "RST-30H" [ 0x30 swap (emulate-RST) ] }
+    { "RST-38H" [ 0x38 swap (emulate-RST) ] }
     { "RET-F|FF" [ dup $1 [ 6 over inc-cycles ret-from-sub ] [ drop ] if ] }
     { "CP-N" [ [ a>> ] keep [ next-byte ] keep sub-byte drop ] }
     { "CP-R" [ [ a>> ] keep [ $1 ] keep sub-byte drop ] }

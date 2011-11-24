@@ -306,7 +306,7 @@ M: arm-backend %callback-value ( ctype -- )
 
 M: arm-backend %cleanup ( alien-node -- ) drop ;
 
-: %untag ( dest src -- ) BIN: 111 BIC ;
+: %untag ( dest src -- ) 0b111 BIC ;
 
 : %untag-fixnum ( dest src -- ) tag-bits get <ASR> MOV ;
 

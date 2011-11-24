@@ -77,9 +77,9 @@ ENUM: cairo_status_t
     CAIRO_STATUS_INVALID_WEIGHT ;
 
 ENUM: cairo_content_t
-    { CAIRO_CONTENT_COLOR HEX: 1000 }
-    { CAIRO_CONTENT_ALPHA HEX: 2000 }
-    { CAIRO_CONTENT_COLOR_ALPHA HEX: 3000 } ;
+    { CAIRO_CONTENT_COLOR 0x1000 }
+    { CAIRO_CONTENT_ALPHA 0x2000 }
+    { CAIRO_CONTENT_COLOR_ALPHA 0x3000 } ;
 
 CALLBACK: cairo_status_t
 cairo_write_func_t ( void* closure, uchar* data, uint length ) ;
@@ -385,7 +385,7 @@ FUNCTION: void
 cairo_text_cluster_free ( cairo_text_cluster_t* clusters ) ;
 
 ENUM: cairo_text_cluster_flags_t
-    { CAIRO_TEXT_CLUSTER_FLAG_BACKWARD HEX: 00000001 } ;
+    { CAIRO_TEXT_CLUSTER_FLAG_BACKWARD 0x00000001 } ;
 
 STRUCT: cairo_text_extents_t
     { x_bearing double }

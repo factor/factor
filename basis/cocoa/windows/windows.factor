@@ -16,7 +16,7 @@ CONSTANT: NSTexturedBackgroundWindowMask 256
 CONSTANT: NSUtilityWindowMask       16
 CONSTANT: NSDocModalWindowMask      64
 CONSTANT: NSNonactivatingPanelMask 128
-CONSTANT: NSHUDWindowMask    HEX: 1000
+CONSTANT: NSHUDWindowMask    0x1000
 
 CONSTANT: NSBackingStoreRetained    0
 CONSTANT: NSBackingStoreNonretained 1
@@ -27,7 +27,7 @@ CONSTANT: NSBackingStoreBuffered    2
     -> initWithContentRect:styleMask:backing:defer: ;
 
 : class-for-style ( style -- NSWindow/NSPanel )
-    HEX: 1ef0 bitand zero? NSWindow NSPanel ? ;
+    0x1ef0 bitand zero? NSWindow NSPanel ? ;
 
 : <ViewWindow> ( view rect style -- window )
     dup class-for-style <NSWindow> [ swap -> setContentView: ] keep

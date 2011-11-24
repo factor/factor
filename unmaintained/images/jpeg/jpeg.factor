@@ -36,26 +36,26 @@ APP JPG COM TEM RES ;
 :: >marker ( byte -- marker )
     byte
     {
-      { [ dup HEX: CC = ] [ { DAC } ] }
-      { [ dup HEX: C4 = ] [ { DHT } ] }
-      { [ dup HEX: C9 = ] [ { JPG } ] }
-      { [ dup -4 shift HEX: C = ] [ SOF byte 4 bits 2array ] }
+      { [ dup 0xCC = ] [ { DAC } ] }
+      { [ dup 0xC4 = ] [ { DHT } ] }
+      { [ dup 0xC9 = ] [ { JPG } ] }
+      { [ dup -4 shift 0xC = ] [ SOF byte 4 bits 2array ] }
 
-      { [ dup HEX: D8 = ] [ { SOI } ] }
-      { [ dup HEX: D9 = ] [ { EOI } ] }
-      { [ dup HEX: DA = ] [ { SOS } ] }
-      { [ dup HEX: DB = ] [ { DQT } ] }
-      { [ dup HEX: DC = ] [ { DNL } ] }
-      { [ dup HEX: DD = ] [ { DRI } ] }
-      { [ dup HEX: DE = ] [ { DHP } ] }
-      { [ dup HEX: DF = ] [ { EXP } ] }
-      { [ dup -4 shift HEX: D = ] [ RST byte 4 bits 2array ] }
+      { [ dup 0xD8 = ] [ { SOI } ] }
+      { [ dup 0xD9 = ] [ { EOI } ] }
+      { [ dup 0xDA = ] [ { SOS } ] }
+      { [ dup 0xDB = ] [ { DQT } ] }
+      { [ dup 0xDC = ] [ { DNL } ] }
+      { [ dup 0xDD = ] [ { DRI } ] }
+      { [ dup 0xDE = ] [ { DHP } ] }
+      { [ dup 0xDF = ] [ { EXP } ] }
+      { [ dup -4 shift 0xD = ] [ RST byte 4 bits 2array ] }
 
-      { [ dup -4 shift HEX: E = ] [ APP byte 4 bits 2array ] }
-      { [ dup HEX: FE = ] [ { COM } ] }
-      { [ dup -4 shift HEX: F = ] [ JPG byte 4 bits 2array ] }
+      { [ dup -4 shift 0xE = ] [ APP byte 4 bits 2array ] }
+      { [ dup 0xFE = ] [ { COM } ] }
+      { [ dup -4 shift 0xF = ] [ JPG byte 4 bits 2array ] }
 
-      { [ dup HEX: 01 = ] [ { TEM } ] }
+      { [ dup 0x01 = ] [ { TEM } ] }
       [ { RES } ]
     }
     cond nip ;
@@ -161,7 +161,7 @@ ERROR: not-a-baseline-jpeg-image ;
     } cleave ;
 
 : parse-marker ( -- marker )
-    read1 HEX: FF assert=
+    read1 0xFF assert=
     read1 >marker ;
 
 : parse-headers ( -- chunks )
@@ -289,13 +289,13 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
 : cleanup-bitstream ( bytes -- bytes' )
     binary [
         [
-            { HEX: FF } read-until
-            read1 [ HEX: 00 = and ] keep swap
+            { 0xFF } read-until
+            read1 [ 0x00 = and ] keep swap
         ]
         [ drop ] produce
         swap >marker {  EOI } assert=
         swap suffix
-        { HEX: FF } join
+        { 0xFF } join
     ] with-byte-reader ;
 
 : setup-bitmap ( image -- )

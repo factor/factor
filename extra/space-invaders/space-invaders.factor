@@ -107,7 +107,7 @@ CONSTANT: SOUND-UFO-HIT      8
   #! Bit 4 = player one fire
   #! Bit 5 = player one left
   #! Bit 6 = player one right
-  [ port1>> dup HEX: FE bitand ] keep 
+  [ port1>> dup 0xFE bitand ] keep 
  port1<< ;
 
 : read-port2 ( cpu -- byte )
@@ -118,14 +118,14 @@ CONSTANT: SOUND-UFO-HIT      8
   #! Bit 5   = player two left
   #! Bit 6   = player two right
   #! Bit 7   = show or hide coin info
-  [ port2i>> HEX: 8F bitand ] keep 
-  port1>> HEX: 70 bitand bitor ;
+  [ port2i>> 0x8F bitand ] keep 
+  port1>> 0x70 bitand bitor ;
 
 : read-port3 ( cpu -- byte )
   #! Used to compute a special formula
   [ port4hi>> 8 shift ] keep 
   [ port4lo>> bitor ] keep 
-  port2o>> shift -8 shift HEX: FF bitand ;
+  port2o>> shift -8 shift 0xFF bitand ;
 
 M: space-invaders read-port ( port cpu -- byte )
   #! Read a byte from the hardware port. 'port' should
@@ -218,7 +218,7 @@ M: space-invaders reset ( cpu -- )
   [ read-instruction ] keep ! n cpu
   over get-cycles over inc-cycles
   [ swap instructions nth call( cpu -- ) ] keep  
-  [ pc>> HEX: FFFF bitand ] keep 
+  [ pc>> 0xFFFF bitand ] keep 
   pc<< ;
 
 : gui-frame/2 ( cpu -- )
@@ -228,10 +228,10 @@ M: space-invaders reset ( cpu -- )
     nip gui-frame/2
   ] [
     [ [ 16667 - ] dip cycles<< ] keep
-    dup last-interrupt>> HEX: 10 = [
-      HEX: 08 over last-interrupt<< HEX: 08 swap interrupt
+    dup last-interrupt>> 0x10 = [
+      0x08 over last-interrupt<< 0x08 swap interrupt
     ] [
-      HEX: 10 over last-interrupt<< HEX: 10 swap interrupt
+      0x10 over last-interrupt<< 0x10 swap interrupt
     ] if     
   ] if ;
 
@@ -257,22 +257,22 @@ M: space-invaders reset ( cpu -- )
   [ port1>> 255 2 - bitand ] keep port1<< ;
 
 : fire-down ( cpu -- )
-  [ port1>> HEX: 10 bitor ] keep port1<< ;
+  [ port1>> 0x10 bitor ] keep port1<< ;
 
 : fire-up ( cpu -- )
-  [ port1>> 255 HEX: 10 - bitand ] keep port1<< ;
+  [ port1>> 255 0x10 - bitand ] keep port1<< ;
 
 : left-down ( cpu -- )
-  [ port1>> HEX: 20 bitor ] keep port1<< ;
+  [ port1>> 0x20 bitor ] keep port1<< ;
 
 : left-up ( cpu -- )
-  [ port1>> 255 HEX: 20 - bitand ] keep port1<< ;
+  [ port1>> 255 0x20 - bitand ] keep port1<< ;
 
 : right-down ( cpu -- )
-  [ port1>> HEX: 40 bitor ] keep port1<< ;
+  [ port1>> 0x40 bitor ] keep port1<< ;
 
 : right-up ( cpu -- )
-  [ port1>> 255 HEX: 40 - bitand ] keep port1<< ;
+  [ port1>> 255 0x40 - bitand ] keep port1<< ;
 
 
 TUPLE: invaders-gadget < gadget cpu quit? windowed? ;
@@ -313,8 +313,8 @@ CONSTANT: red   { 255 0 0 }
 
 : addr>xy ( addr -- point )
   #! Convert video RAM address to base X Y value. point is a {x y}.
-  HEX: 2400 - ! n
-  dup HEX: 1f bitand 8 * 255 swap - ! n y
+  0x2400 - ! n
+  dup 0x1f bitand 8 * 255 swap - ! n y
   swap -5 shift swap 2array ;
 
 : plot-bitmap-pixel ( bitmap point color -- )
@@ -351,7 +351,7 @@ CONSTANT: red   { 255 0 0 }
   7 plot-bitmap-bits ;
 
 M: space-invaders update-video ( value addr cpu -- )  
-  over HEX: 2400 >= [
+  over 0x2400 >= [
     bitmap>> -rot do-bitmap-update
   ] [
     3drop
@@ -388,10 +388,10 @@ M: invaders-gadget ungraft* ( gadget -- )
   over load-rom* <invaders-gadget> t >>windowed? swap open-window ;
 
 CONSTANT: rom-info {
-      { HEX: 0000 "invaders/invaders.h" }
-      { HEX: 0800 "invaders/invaders.g" }
-      { HEX: 1000 "invaders/invaders.f" }
-      { HEX: 1800 "invaders/invaders.e" }
+      { 0x0000 "invaders/invaders.h" }
+      { 0x0800 "invaders/invaders.g" }
+      { 0x1000 "invaders/invaders.f" }
+      { 0x1800 "invaders/invaders.e" }
    }
 
 : run-invaders ( -- )  

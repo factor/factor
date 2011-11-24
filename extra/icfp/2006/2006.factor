@@ -21,26 +21,26 @@ SYMBOL: open-arrays
     arrays get nth set-nth ;
 
 : get-op ( num -- op )
-    -28 shift BIN: 1111 bitand ;
+    -28 shift 0b1111 bitand ;
 
 : get-value ( platter -- register )
-    HEX: 1ffffff bitand ;
+    0x1ffffff bitand ;
 
-: >32bit ( m -- n ) HEX: ffffffff bitand ; inline
+: >32bit ( m -- n ) 0xffffffff bitand ; inline
 
 : get-a ( platter -- register )
-    -6 shift BIN: 111 bitand ; inline
+    -6 shift 0b111 bitand ; inline
 
 : get-b ( platter -- register )
-    -3 shift BIN: 111 bitand ; inline
+    -3 shift 0b111 bitand ; inline
 
 : get-c ( platter -- register )
-    BIN: 111 bitand ; inline
+    0b111 bitand ; inline
 
 : get-cb ( platter -- b c ) [ get-c ] keep get-b ;
 : get-cba ( platter -- c b a ) [ get-cb ] keep get-a ;
 : get-special ( platter -- register )
-    -25 shift BIN: 111 bitand ; inline
+    -25 shift 0b111 bitand ; inline
 
 : op0 ( opcode -- ? )
     get-cba rot reg-val zero? [
@@ -70,7 +70,7 @@ SYMBOL: open-arrays
     [ /i ] binary-op ;
 
 : op6 ( opcode -- ? )
-    [ bitand HEX: ffffffff swap - ] binary-op ;
+    [ bitand 0xffffffff swap - ] binary-op ;
 
 : new-array ( size location -- )
     [ 0 <array> ] dip arrays get set-nth ;

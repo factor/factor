@@ -12,11 +12,11 @@ SINGLETON: utf8
 <PRIVATE 
 
 : starts-2? ( char -- ? )
-    dup [ -6 shift BIN: 10 number= ] when ; inline
+    dup [ -6 shift 0b10 number= ] when ; inline
 
 : append-nums ( stream byte -- stream char )
     over stream-read1 dup starts-2?
-    [ [ 6 shift ] dip BIN: 111111 bitand bitor ]
+    [ [ 6 shift ] dip 0b111111 bitand bitor ]
     [ 2drop replacement-char ] if ; inline
 
 : minimum-code-point ( char minimum -- char )
@@ -26,24 +26,24 @@ SINGLETON: utf8
     over < [ drop replacement-char ] when ; inline
 
 : double ( stream byte -- stream char )
-    BIN: 11111 bitand append-nums
-    HEX: 80 minimum-code-point ; inline
+    0b11111 bitand append-nums
+    0x80 minimum-code-point ; inline
 
 : triple ( stream byte -- stream char )
-    BIN: 1111 bitand append-nums append-nums
-    HEX: 800 minimum-code-point ; inline
+    0b1111 bitand append-nums append-nums
+    0x800 minimum-code-point ; inline
 
 : quadruple ( stream byte -- stream char )
-    BIN: 111 bitand append-nums append-nums append-nums
-    HEX: 10000 minimum-code-point
-    HEX: 10FFFF maximum-code-point ; inline
+    0b111 bitand append-nums append-nums append-nums
+    0x10000 minimum-code-point
+    0x10FFFF maximum-code-point ; inline
 
 : begin-utf8 ( stream byte -- stream char )
     dup 127 > [
         {
-            { [ dup -5 shift BIN: 110 = ] [ double ] }
-            { [ dup -4 shift BIN: 1110 = ] [ triple ] }
-            { [ dup -3 shift BIN: 11110 = ] [ quadruple ] }
+            { [ dup -5 shift 0b110 = ] [ double ] }
+            { [ dup -4 shift 0b1110 = ] [ triple ] }
+            { [ dup -3 shift 0b11110 = ] [ quadruple ] }
             [ drop replacement-char ]
         } cond
     ] when ; inline
@@ -57,22 +57,22 @@ M: utf8 decode-char
 ! Encoding UTF-8
 
 : encoded ( stream char -- )
-    BIN: 111111 bitand BIN: 10000000 bitor swap stream-write1 ; inline
+    0b111111 bitand 0b10000000 bitor swap stream-write1 ; inline
 
 : char>utf8 ( char stream -- )
     over 127 <= [ stream-write1 ] [
         swap {
             { [ dup -11 shift zero? ] [
-                2dup -6 shift BIN: 11000000 bitor swap stream-write1
+                2dup -6 shift 0b11000000 bitor swap stream-write1
                 encoded
             ] }
             { [ dup -16 shift zero? ] [
-                2dup -12 shift BIN: 11100000 bitor swap stream-write1
+                2dup -12 shift 0b11100000 bitor swap stream-write1
                 2dup -6 shift encoded
                 encoded
             ] }
             [
-                2dup -18 shift BIN: 11110000 bitor swap stream-write1
+                2dup -18 shift 0b11110000 bitor swap stream-write1
                 2dup -12 shift encoded
                 2dup -6 shift encoded
                 encoded

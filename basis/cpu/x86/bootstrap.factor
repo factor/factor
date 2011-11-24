@@ -73,7 +73,7 @@ big-endian off
     ! need a parameter here.
 
     ! See the comment for M\ x86.32 stack-cleanup in cpu.x86.32
-    HEX: ffff RET f rc-absolute-2 rel-untagged
+    0xffff RET f rc-absolute-2 rel-untagged
 ] callback-stub jit-define
 
 [
@@ -237,7 +237,7 @@ big-endian off
 
 ! Load a value from a stack position
 [
-    temp1 ds-reg HEX: 7f [+] MOV f rc-absolute-1 rel-untagged
+    temp1 ds-reg 0x7f [+] MOV f rc-absolute-1 rel-untagged
 ] pic-load jit-define
 
 [ temp1 tag-mask get AND ] pic-tag jit-define
@@ -252,7 +252,7 @@ big-endian off
 ] pic-tuple jit-define
 
 [
-    temp1 HEX: 7f CMP f rc-absolute-1 rel-untagged
+    temp1 0x7f CMP f rc-absolute-1 rel-untagged
 ] pic-check-tag jit-define
 
 [ 0 JE f rc-relative rel-word ] pic-hit jit-define

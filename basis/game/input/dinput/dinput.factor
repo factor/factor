@@ -283,7 +283,7 @@ CONSTANT: pov-values
 : >slider ( long -- float )
     65535.0 /f ; inline
 : >pov ( long -- symbol )
-    dup HEX: FFFF bitand HEX: FFFF =
+    dup 0xFFFF bitand 0xFFFF =
     [ drop pov-neutral ]
     [ 2750 + 4500 /i pov-values nth ] if ; inline
 

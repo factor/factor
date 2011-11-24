@@ -56,7 +56,7 @@ MACRO: map-index-compose ( seq quot -- seq )
 : fill-controller-state ( XINPUT_STATE -- controller-state )
     Gamepad>> controller-state new dup rot
     {
-        [ wButtons>> HEX: f bitand >pov swap pov<< ]
+        [ wButtons>> 0xf bitand >pov swap pov<< ]
         [ wButtons>> fill-buttons swap buttons<< ]
         [ sThumbLX>> >axis swap x<< ]
         [ sThumbLY>> >axis swap y<< ]

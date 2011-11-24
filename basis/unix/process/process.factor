@@ -65,30 +65,30 @@ CONSTANT: WUNTRACED 2
 CONSTANT: WSTOPPED   2
 CONSTANT: WEXITED    4
 CONSTANT: WCONTINUED 8
-CONSTANT: WNOWAIT    HEX: 1000000
+CONSTANT: WNOWAIT    0x1000000
 
 ! Examining status
 
 : WTERMSIG ( status -- value )
-    HEX: 7f bitand ; inline
+    0x7f bitand ; inline
 
 : WIFEXITED ( status -- ? )
     WTERMSIG 0 = ; inline
 
 : WEXITSTATUS ( status -- value )
-    HEX: ff00 bitand -8 shift ; inline
+    0xff00 bitand -8 shift ; inline
 
 : WIFSIGNALED ( status -- ? )
-    HEX: 7f bitand 1 + -1 shift 0 > ; inline
+    0x7f bitand 1 + -1 shift 0 > ; inline
 
 : WCOREFLAG ( -- value )
-    HEX: 80 ; inline
+    0x80 ; inline
 
 : WCOREDUMP ( status -- ? )
     WCOREFLAG bitand 0 = not ; inline
 
 : WIFSTOPPED ( status -- ? )
-    HEX: ff bitand HEX: 7f = ; inline
+    0xff bitand 0x7f = ; inline
 
 : WSTOPSIG ( status -- value )
     WEXITSTATUS ; inline

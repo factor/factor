@@ -73,6 +73,8 @@ ERROR: log2-expects-positive x ;
 : even? ( n -- ? ) 1 bitand zero? ; inline
 : odd? ( n -- ? ) 1 bitand 1 number= ; inline
 
+GENERIC: neg? ( x -- -x )
+
 : if-zero ( ..a n quot1: ( ..a -- ..b ) quot2: ( ..a n -- ..b ) -- ..b )
     [ dup zero? ] [ [ drop ] prepose ] [ ] tri* if ; inline
 
@@ -109,7 +111,7 @@ M: object fp-snan? drop f ; inline
 M: object fp-infinity? drop f ; inline
 
 : <fp-nan> ( payload -- nan )
-    HEX: 7ff0000000000000 bitor bits>double ; inline
+    0x7ff0000000000000 bitor bits>double ; inline
 
 GENERIC: next-float ( m -- n )
 GENERIC: prev-float ( m -- n )

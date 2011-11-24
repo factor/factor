@@ -15,9 +15,9 @@ IN: math.tests
 [ t ] [ 1 <fp-nan> fp-nan? ] unit-test
 ! [ t ] [ 1 <fp-nan> fp-snan? ] unit-test
 ! [ f ] [ 1 <fp-nan> fp-qnan? ] unit-test
-[ t ] [ HEX: 8000000000001 <fp-nan> fp-nan? ] unit-test
-[ f ] [ HEX: 8000000000001 <fp-nan> fp-snan? ] unit-test
-[ t ] [ HEX: 8000000000001 <fp-nan> fp-qnan? ] unit-test
+[ t ] [ 0x8000000000001 <fp-nan> fp-nan? ] unit-test
+[ f ] [ 0x8000000000001 <fp-nan> fp-snan? ] unit-test
+[ t ] [ 0x8000000000001 <fp-nan> fp-qnan? ] unit-test
 
 [ t ] [ 1/0. fp-infinity? ] unit-test
 [ t ] [ -1/0. fp-infinity? ] unit-test

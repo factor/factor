@@ -58,7 +58,7 @@ CONSTANT: categories
 MEMO: categories-map ( -- hashtable )
     categories <enum> [ swap ] H{ } assoc-map-as ;
 
-CONSTANT: num-chars HEX: 2FA1E
+CONSTANT: num-chars 0x2FA1E
 
 PRIVATE>
 
@@ -68,9 +68,9 @@ PRIVATE>
     ! Cf = 26; Mn = 5; Cn = 29
     ! Use a compressed array instead?
     dup category-map ?nth [ ] [
-        dup HEX: E0001 HEX: E007F between?
+        dup 0xE0001 0xE007F between?
         [ drop 26 ] [
-            HEX: E0100 HEX: E01EF between?  5 29 ?
+            0xE0100 0xE01EF between?  5 29 ?
         ] if
     ] ?if ;
 
