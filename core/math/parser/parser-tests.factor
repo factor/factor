@@ -257,9 +257,18 @@ unit-test
 [  -8 ] [ "-0o10" string>number ] unit-test
 [  -2 ] [ "-0b10" string>number ] unit-test
 
+[ f ] [ "01a" string>number ] unit-test
+[ f ] [ "0x1g" string>number ] unit-test
+[ f ] [ "0o18" string>number ] unit-test
+[ f ] [ "0b12" string>number ] unit-test
+
 [ 0x7FFF,ABCD ] [ "0x7FFF,ABCD" string>number ] unit-test
 
 [ 1.0 ] [ "0x1.0p0" string>number ] unit-test
+[ 6.0 ] [ "0x1.8p2" string>number ] unit-test
+[ 0.375 ] [ "0x1.8p-2" string>number ] unit-test
+[ -6.0 ] [ "-0x1.8p2" string>number ] unit-test
+[ -0.375 ] [ "-0x1.8p-2" string>number ] unit-test
 
 [ f ] [ "0x" string>number ] unit-test
 [ f ] [ "0b" string>number ] unit-test
