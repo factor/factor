@@ -74,4 +74,6 @@ M: float prev-float
 
 M: float fp-sign double>bits 63 bit? ; inline
 
+M: float neg? fp-sign ; inline
+
 M: float abs double>bits 63 2^ bitnot bitand bits>double ; inline

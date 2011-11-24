@@ -73,6 +73,8 @@ ERROR: log2-expects-positive x ;
 : even? ( n -- ? ) 1 bitand zero? ; inline
 : odd? ( n -- ? ) 1 bitand 1 number= ; inline
 
+GENERIC: neg? ( x -- -x )
+
 : if-zero ( ..a n quot1: ( ..a -- ..b ) quot2: ( ..a n -- ..b ) -- ..b )
     [ dup zero? ] [ [ drop ] prepose ] [ ] tri* if ; inline
 
