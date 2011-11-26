@@ -98,23 +98,21 @@ void code_heap::sweep()
 }
 
 struct all_blocks_set_verifier {
-	std::set<code_block*> *leftovers;
+	std::set<code_block*> *all_blocks;
 
-	all_blocks_set_verifier(std::set<code_block*> *leftovers) : leftovers(leftovers) {}
+	all_blocks_set_verifier(std::set<code_block*> *all_blocks) : all_blocks(all_blocks) {}
 
 	void operator()(code_block *block, cell size)
 	{
-		FACTOR_ASSERT(leftovers->find(block) != leftovers->end());
-		leftovers->erase(block);
+		FACTOR_ASSERT(all_blocks->find(block) != all_blocks->end());
+		all_blocks->erase(block);
 	}
 };
 
 void code_heap::verify_all_blocks_set()
 {
-	std::set<code_block*> leftovers = all_blocks;
-	all_blocks_set_verifier verifier(&leftovers);
+	all_blocks_set_verifier verifier(&all_blocks);
 	allocator->iterate(verifier);
-	FACTOR_ASSERT(leftovers.empty());
 }
 
 code_block *code_heap::code_block_for_address(cell address)
