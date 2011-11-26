@@ -53,7 +53,7 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 			code_block *leaf_block = code->code_block_for_address(*pc);
 			FACTOR_ASSERT(leaf_block != NULL);
 
-			cell newsp = *sp - 4*sizeof(cell);
+			cell newsp = *sp - LEAF_FRAME_SIZE;
 			*(cell*)(newsp + 3*sizeof(cell)) = 4*sizeof(cell);
 			*(cell*)(newsp + 2*sizeof(cell)) = (cell)leaf_block->entry_point();
 			*(cell*) newsp                   = *pc;
