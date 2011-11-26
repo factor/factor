@@ -74,8 +74,16 @@ TUPLE: float-parse
     [ nip swap /f ]
     [ drop 2.0 swap exponent>> (pow) * ] 2tri ; inline
 
+: ?default-exponent ( float-parse n/f -- float-parse' n/f' )
+    over exponent>> [
+        over radix>> 10 =
+        [ [ [ radix>> ] [ point>> ] bi 0 float-parse boa ] dip ]
+        [ drop f ] if
+    ] unless ; inline
+
 : ?make-float ( float-parse n/f -- float/f )
     { float-parse object } declare
+    ?default-exponent
     {
         { [ dup not ] [ 2drop f ] }
         { [ over radix>> 10 = ] [ make-float-dec-exponent ] }
@@ -98,7 +106,7 @@ TUPLE: float-parse
     -rot [ str>> ] [ length>> ] bi 10 number-parse boa 0 ; inline
 
 : <float-parse> ( i number-parse n -- float-parse i number-parse n )
-     [ drop nip radix>> 0 0 float-parse boa ] 3keep ; inline
+     [ drop nip radix>> 0 f float-parse boa ] 3keep ; inline
 
 DEFER: @exponent-digit
 DEFER: @mantissa-digit
