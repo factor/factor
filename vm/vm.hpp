@@ -577,7 +577,9 @@ struct factor_vm
 	void initialize_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size, code_block_type type);
-	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell parameters_, cell literals_);
+	code_block *add_code_block(code_block_type type, cell code_, cell labels_,
+		cell owner_, cell relocation_, cell parameters_, cell literals_,
+		cell frame_size_untagged);
 
 	//code heap
 	inline void check_code_pointer(cell ptr) { }
