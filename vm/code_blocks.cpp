@@ -399,7 +399,9 @@ code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 }
 
 /* Might GC */
-code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell parameters_, cell literals_)
+code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell labels_,
+	cell owner_, cell relocation_, cell parameters_, cell literals_,
+	cell frame_size_untagged)
 {
 	data_root<byte_array> code(code_,this);
 	data_root<object> labels(labels_,this);
@@ -430,6 +432,8 @@ code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell lab
 	/* fixup labels */
 	if(to_boolean(labels.value()))
 		fixup_labels(labels.as<array>().untagged(),compiled);
+
+	compiled->stack_frame_size = frame_size_untagged;
 
 	/* Once we are ready, fill in literal and word references in this code
 	block's instruction operands. In most cases this is done right after this
