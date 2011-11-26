@@ -88,6 +88,8 @@ TUPLE: ratio { numerator integer read-only } { denominator integer read-only } ;
 
 UNION: rational integer ratio ;
 
+M: rational neg? 0 < ; inline
+
 UNION: real rational float ;
 
 TUPLE: complex { real real read-only } { imaginary real read-only } ;

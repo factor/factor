@@ -67,4 +67,15 @@ IN: math.tests
 [ f ] [ -1/0. 0/0. >= ] unit-test
 [ f ] [  1/0. 0/0. >= ] unit-test
 
+[ f ] [ 0 neg? ] unit-test
+[ f ] [ 1/2 neg? ] unit-test
+[ f ] [ 1 neg? ] unit-test
+[ t ] [ -1/2 neg? ] unit-test
+[ t ] [ -1 neg? ] unit-test
 
+[ f ] [ 0.0 neg? ] unit-test
+[ f ] [ 1.0 neg? ] unit-test
+[ f ] [ 1/0. neg? ] unit-test
+[ t ] [ -0.0 neg? ] unit-test
+[ t ] [ -1.0 neg? ] unit-test
+[ t ] [ -1/0. neg? ] unit-test
