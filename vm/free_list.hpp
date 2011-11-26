@@ -16,17 +16,13 @@ struct free_heap_block
 	cell size() const
 	{
 		cell size = header & ~7;
-#ifdef FACTOR_DEBUG
 		FACTOR_ASSERT(size > 0);
-#endif
 		return size;
 	}
 
 	void make_free(cell size)
 	{
-#ifdef FACTOR_DEBUG
 		FACTOR_ASSERT(size > 0);
-#endif
 		header = size | 1;
 	}
 };

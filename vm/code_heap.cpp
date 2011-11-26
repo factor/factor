@@ -231,6 +231,7 @@ void factor_vm::primitive_modify_code_heap()
 				cell relocation = array_nth(compiled_data,2);
 				cell labels = array_nth(compiled_data,3);
 				cell code = array_nth(compiled_data,4);
+				cell frame_size = untag_fixnum(array_nth(compiled_data,5));
 
 				code_block *compiled = add_code_block(
 					code_block_optimized,
@@ -239,7 +240,8 @@ void factor_vm::primitive_modify_code_heap()
 					word.value(),
 					relocation,
 					parameters,
-					literals);
+					literals,
+					frame_size);
 
 				word->entry_point = compiled->entry_point();
 			}

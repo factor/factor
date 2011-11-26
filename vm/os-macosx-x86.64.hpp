@@ -73,4 +73,9 @@ inline static void uap_clear_fpu_status(void *uap)
 	mach_clear_fpu_status(UAP_FS(uap));
 }
 
+/* Must match the leaf-stack-frame-size and stack-frame-size constants
+in basis/cpu/x86/64/unix/bootstrap.factor */
+static const unsigned LEAF_FRAME_SIZE = 32;
+static const unsigned JIT_FRAME_SIZE = 32;
+
 }

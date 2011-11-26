@@ -4,10 +4,16 @@ namespace factor
 /* The compiled code heap is structured into blocks. */
 struct code_block
 {
+	// header format (bits indexed with least significant as zero):
+	// bit   0   : free?
+	// bits  1- 2: type (as a code_block_type)
+	// bits  4-  : code size / 16
 	cell header;
 	cell owner; /* tagged pointer to word, quotation or f */
 	cell parameters; /* tagged pointer to array or f */
 	cell relocation; /* tagged pointer to byte-array or f */
+	cell stack_frame_size;
+	cell pad;
 
 	bool free_p() const
 	{
@@ -37,9 +43,7 @@ struct code_block
 	cell size() const
 	{
 		cell size = header & ~7;
-#ifdef FACTOR_DEBUG
 		FACTOR_ASSERT(size > 0);
-#endif
 		return size;
 	}
 
