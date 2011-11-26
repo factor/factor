@@ -8,8 +8,6 @@ IN: math.integers.private
 : fixnum-min ( x y -- z ) [ fixnum< ] most ; foldable
 : fixnum-max ( x y -- z ) [ fixnum> ] most ; foldable
 
-M: integer neg? 0 < ; inline
-
 M: integer numerator ; inline
 M: integer denominator drop 1 ; inline
 
