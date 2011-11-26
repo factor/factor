@@ -220,14 +220,14 @@ unit-test
 [ "1.0p-1074" ] [ 1 bits>double >hex ] unit-test
 [ "-0.0" ] [ -0.0 >hex ] unit-test
 
-[ 1.0 ] [ "1.0" hex> ] unit-test
-[ 1.5 ] [ "1.8" hex> ] unit-test
-[ 1.875 ] [ "1.e" hex> ] unit-test
-[ 1.90625 ] [ "1.e8" hex> ] unit-test
-[ 1.03125 ] [ "1.08" hex> ] unit-test
-[ 15.5 ] [ "f.8" hex> ] unit-test
-[ 15.53125 ] [ "f.88" hex> ] unit-test
-[ -15.5 ] [ "-f.8" hex> ] unit-test
+[ 1.0 ] [ "1.0p0" hex> ] unit-test
+[ 1.5 ] [ "1.8p0" hex> ] unit-test
+[ 1.875 ] [ "1.ep0" hex> ] unit-test
+[ 1.90625 ] [ "1.e8p0" hex> ] unit-test
+[ 1.03125 ] [ "1.08p0" hex> ] unit-test
+[ 15.5 ] [ "f.8p0" hex> ] unit-test
+[ 15.53125 ] [ "f.88p0" hex> ] unit-test
+[ -15.5 ] [ "-f.8p0" hex> ] unit-test
 [ 15.5 ] [ "f.8p0" hex> ] unit-test
 [ -15.5 ] [ "-f.8p0" hex> ] unit-test
 [ 62.0 ] [ "f.8p2" hex> ] unit-test
@@ -285,3 +285,7 @@ unit-test
 [ f ] [ "0x1," string>number ] unit-test
 [ f ] [ "0b1," string>number ] unit-test
 [ f ] [ "0o1," string>number ] unit-test
+
+! #372
+! hex float requires exponent
+[ f ] [ "0x1.0" string>number ] unit-test
