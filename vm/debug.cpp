@@ -418,7 +418,7 @@ struct code_block_printer {
 			std::cout << std::hex << (cell)scan << std::dec << " ";
 			std::cout << std::hex << size << std::dec << " ";
 			std::cout << status << " ";
-			std::cout << "stack frame " << scan->stack_frame_size;
+			std::cout << "stack frame " << scan->stack_frame_size();
 			std::cout << std::endl;
 		}
 	}

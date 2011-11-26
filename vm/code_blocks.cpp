@@ -433,7 +433,7 @@ code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell lab
 	if(to_boolean(labels.value()))
 		fixup_labels(labels.as<array>().untagged(),compiled);
 
-	compiled->stack_frame_size = frame_size_untagged;
+	compiled->set_stack_frame_size(frame_size_untagged);
 
 	/* Once we are ready, fill in literal and word references in this code
 	block's instruction operands. In most cases this is done right after this
