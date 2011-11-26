@@ -27,4 +27,10 @@ inline static void uap_clear_fpu_status(void *uap)
 #define FUNCTION_TOC_POINTER(ptr) ptr
 
 #define UAP_STACK_POINTER_TYPE greg_t
+
+/* Must match the leaf-stack-frame-size and stack-frame-size constants
+in basis/cpu/x86/64/unix/bootstrap.factor */
+static const unsigned LEAF_FRAME_SIZE = 32;
+static const unsigned JIT_FRAME_SIZE = 32;
+
 }

@@ -143,7 +143,8 @@ code_block *jit::to_code_block()
 		owner.value(),
 		relocation.elements.value(),
 		parameters.elements.value(),
-		literals.elements.value());
+		literals.elements.value(),
+		JIT_FRAME_SIZE);
 }
 
 }

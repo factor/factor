@@ -9,6 +9,7 @@ IN: bootstrap.x86
 
 4 \ cell set
 
+: leaf-stack-frame-size ( -- n ) 4 bootstrap-cells ;
 : stack-frame-size ( -- n ) 8 bootstrap-cells ;
 : shift-arg ( -- reg ) ECX ;
 : div-arg ( -- reg ) EAX ;
