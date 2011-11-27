@@ -657,9 +657,16 @@ HELP: !
 { POSTPONE: ! POSTPONE: #! } related-words
 
 HELP: #!
-{ $syntax "#! comment..." }
+{ $syntax "#!comment..." }
 { $values { "comment" "characters" } }
-{ $description "Discards all input until the end of the line." } ;
+{ $description "Discards all input until the end of the line." }
+{ $notes "To allow Unix-style \"shebang\" scripts to work as expected, " { $snippet "#!" } " is parsed as a separate token regardless of following whitespace if it appears at the beginning of a line."
+{ $example
+    "#!/usr/bin/env/factor"
+    "USING: io ;"
+    "\"Hello world\" print"
+    "Hello world"
+} } ;
 
 HELP: NAN:
 { $syntax "NAN: payload" }
