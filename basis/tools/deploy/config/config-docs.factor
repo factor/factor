@@ -6,7 +6,7 @@ ARTICLE: "deploy-flags" "Deployment flags"
 "There are three sets of deployment flags. The first set controls the major subsystems which are to be included in the deployment image:"
 { $subsections
     deploy-unicode?
-    deploy-threads?
+    deploy-ui?
 }
 "The second set of flags controls the level of stripping to be performed on the deployment image; there is a trade-off between image size, and retaining functionality which is required by the application:"
 { $subsections
@@ -18,11 +18,11 @@ ARTICLE: "deploy-flags" "Deployment flags"
 { $subsections
     deploy-console?
 }
-{ $subheading "Advanced deploy options" }
+{ $heading "Advanced deploy options" }
 "There are some flags which may reduce deployed application size in trivial or specialized applications. These settings cannot usually be changed from their defaults and still produce a working application. These settings are not available from the deploy tool UI and must be set by manually editing a vocabulary's " { $snippet "deploy.factor" } " file."
 { $subsections
     deploy-math?
-    deploy-ui?
+    deploy-threads?
     deploy-io
 } ;
 
