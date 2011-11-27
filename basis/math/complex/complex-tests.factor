@@ -1,5 +1,5 @@
 USING: kernel math math.constants math.functions math.order
-tools.test prettyprint ;
+tools.test prettyprint prettyprint.config namespaces ;
 IN: math.complex.tests
 
 [ 1 C{ 0 1 } rect> ] must-fail
@@ -73,4 +73,6 @@ IN: math.complex.tests
 [ t ] [ 0.0 pi rect> exp C{ -1 0 } 1.0e-7 ~ ] unit-test
 [ t ] [ 0 pi rect> exp C{ -1 0 } 1.0e-7 ~ ] unit-test
 
-[ "C{ 1/2 2/3 }" ] [ C{ 1/2 2/3 } unparse ] unit-test
+10 number-base [
+    [ "C{ 1/2 2/3 }" ] [ C{ 1/2 2/3 } unparse ] unit-test
+] with-variable
