@@ -289,3 +289,47 @@ unit-test
 ! #372
 ! hex float requires exponent
 [ f ] [ "0x1.0" string>number ] unit-test
+
+! hex float rounds to even on half
+[ 0x1.0000,0000,0000,0p0 ] [ "0x1.0000,0000,0000,0,8p0" string>number ] unit-test
+[ 0x1.0000,0000,0000,2p0 ] [ "0x1.0000,0000,0000,1,8p0" string>number ] unit-test
+[ 0x1.0000,0000,0000,0p0 ] [ "0x8.0000,0000,0000,4p-3" string>number ] unit-test
+[ 0x1.0000,0000,0000,2p0 ] [ "0x8.0000,0000,0000,Cp-3" string>number ] unit-test
+
+[ -0x1.0000,0000,0000,0p0 ] [ "-0x1.0000,0000,0000,0,8p0" string>number ] unit-test
+[ -0x1.0000,0000,0000,2p0 ] [ "-0x1.0000,0000,0000,1,8p0" string>number ] unit-test
+[ -0x1.0000,0000,0000,0p0 ] [ "-0x8.0000,0000,0000,4p-3" string>number ] unit-test
+[ -0x1.0000,0000,0000,2p0 ] [ "-0x8.0000,0000,0000,Cp-3" string>number ] unit-test
+
+! hex float rounds to nearest with tiny epsilons
+[ 0x1.0000,0000,0000,0p0 ] [ "0x1.0000,0000,0000,0,4p0" string>number ] unit-test
+[ 0x1.0000,0000,0000,0p0 ] [ "0x1.0000,0000,0000,0,7Fp0" string>number ] unit-test
+[ 0x1.0000,0000,0000,0p0 ] [ "0x1.0000,0000,0000,0,7FFF,FFFF,FFFF,FFFFp0" string>number ] unit-test
+
+[ 0x1.0000,0000,0000,1p0 ] [ "0x1.0000,0000,0000,0,Cp0" string>number ] unit-test
+[ 0x1.0000,0000,0000,1p0 ] [ "0x1.0000,0000,0000,0,81p0" string>number ] unit-test
+[ 0x1.0000,0000,0000,1p0 ] [ "0x1.0000,0000,0000,0,8000,0000,0000,0001p0" string>number ] unit-test
+
+[ 0x1.0000,0000,0000,1p0 ] [ "0x1.0000,0000,0000,1,4p0" string>number ] unit-test
+[ 0x1.0000,0000,0000,1p0 ] [ "0x1.0000,0000,0000,1,7Fp0" string>number ] unit-test
+[ 0x1.0000,0000,0000,1p0 ] [ "0x1.0000,0000,0000,1,7FFF,FFFF,FFFF,FFFFp0" string>number ] unit-test
+
+[ 0x1.0000,0000,0000,2p0 ] [ "0x1.0000,0000,0000,1,Cp0" string>number ] unit-test
+[ 0x1.0000,0000,0000,2p0 ] [ "0x1.0000,0000,0000,1,81p0" string>number ] unit-test
+[ 0x1.0000,0000,0000,2p0 ] [ "0x1.0000,0000,0000,1,8000,0000,0000,0001p0" string>number ] unit-test
+
+[ -0x1.0000,0000,0000,0p0 ] [ "-0x1.0000,0000,0000,0,4p0" string>number ] unit-test
+[ -0x1.0000,0000,0000,0p0 ] [ "-0x1.0000,0000,0000,0,7Fp0" string>number ] unit-test
+[ -0x1.0000,0000,0000,0p0 ] [ "-0x1.0000,0000,0000,0,7FFF,FFFF,FFFF,FFFFp0" string>number ] unit-test
+
+[ -0x1.0000,0000,0000,1p0 ] [ "-0x1.0000,0000,0000,0,Cp0" string>number ] unit-test
+[ -0x1.0000,0000,0000,1p0 ] [ "-0x1.0000,0000,0000,0,81p0" string>number ] unit-test
+[ -0x1.0000,0000,0000,1p0 ] [ "-0x1.0000,0000,0000,0,8000,0000,0000,0001p0" string>number ] unit-test
+
+[ -0x1.0000,0000,0000,1p0 ] [ "-0x1.0000,0000,0000,1,4p0" string>number ] unit-test
+[ -0x1.0000,0000,0000,1p0 ] [ "-0x1.0000,0000,0000,1,7Fp0" string>number ] unit-test
+[ -0x1.0000,0000,0000,1p0 ] [ "-0x1.0000,0000,0000,1,7FFF,FFFF,FFFF,FFFFp0" string>number ] unit-test
+
+[ -0x1.0000,0000,0000,2p0 ] [ "-0x1.0000,0000,0000,1,Cp0" string>number ] unit-test
+[ -0x1.0000,0000,0000,2p0 ] [ "-0x1.0000,0000,0000,1,81p0" string>number ] unit-test
+[ -0x1.0000,0000,0000,2p0 ] [ "-0x1.0000,0000,0000,1,8000,0000,0000,0001p0" string>number ] unit-test
