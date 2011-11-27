@@ -219,6 +219,13 @@ void factor_vm::fixup_code(cell data_offset, cell code_offset)
 	code->allocator->iterate(updater,fixup);
 }
 
+bool factor_vm::read_embedded_image_footer(FILE *file, embedded_image_footer *footer)
+{
+	safe_fseek(file, -(off_t)sizeof(embedded_image_footer), SEEK_END);
+	safe_fread(footer, (off_t)sizeof(embedded_image_footer), 1, file);
+	return footer->magic == image_magic;
+}
+
 FILE* factor_vm::open_image(vm_parameters *p)
 {
 	if (p->embedded_image)
@@ -230,10 +237,8 @@ FILE* factor_vm::open_image(vm_parameters *p)
 			std::cout << strerror(errno) << std::endl;
 			exit(1);
 		}
-		safe_fseek(file, -sizeof(embedded_image_footer), SEEK_END);
 		embedded_image_footer footer;
-		safe_fread(&footer, sizeof(embedded_image_footer), 1, file);
-		if (footer.magic != image_magic)
+		if (!read_embedded_image_footer(file, &footer))
 		{
 			std::cout << "No embedded image" << std::endl;
 			exit(1);
@@ -373,11 +378,10 @@ bool factor_vm::embedded_image_p()
 	FILE *file = OPEN_READ(vm_path);
 	if (!file)
 		return false;
-	safe_fseek(file, -sizeof(embedded_image_footer), SEEK_END);
 	embedded_image_footer footer;
-	safe_fread(&footer, sizeof(embedded_image_footer), 1, file);
+	bool embedded_p = read_embedded_image_footer(file, &footer);
 	fclose(file);
-	return footer.magic == image_magic;
+	return embedded_p;
 }
 
 }
