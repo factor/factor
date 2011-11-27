@@ -612,6 +612,7 @@ struct factor_vm
 	void fixup_code(cell data_offset, cell code_offset);
 	FILE *open_image(vm_parameters *p);
 	void load_image(vm_parameters *p);
+	bool read_embedded_image_footer(FILE *file, embedded_image_footer *footer);
 	bool embedded_image_p();
 
 	// callstack
