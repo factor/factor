@@ -5,14 +5,11 @@ IN: tools.deploy.config
 ARTICLE: "deploy-flags" "Deployment flags"
 "There are three sets of deployment flags. The first set controls the major subsystems which are to be included in the deployment image:"
 { $subsections
-    deploy-math?
     deploy-unicode?
     deploy-threads?
-    deploy-ui?
 }
 "The second set of flags controls the level of stripping to be performed on the deployment image; there is a trade-off between image size, and retaining functionality which is required by the application:"
 { $subsections
-    deploy-io
     deploy-reflection
     deploy-word-props?
     deploy-c-types?
@@ -20,6 +17,13 @@ ARTICLE: "deploy-flags" "Deployment flags"
 "Finally, the third set controls the format of the generated product:"
 { $subsections
     deploy-console?
+}
+{ $subheading "Advanced deploy options" }
+"There are some flags which may reduce deployed application size in trivial or specialized applications. These settings cannot usually be changed from their defaults and still produce a working application. These settings are not available from the deploy tool UI and must be set by manually editing a vocabulary's " { $snippet "deploy.factor" } " file."
+{ $subsections
+    deploy-math?
+    deploy-ui?
+    deploy-io
 } ;
 
 ABOUT: "deploy-flags"
@@ -59,7 +63,8 @@ $nl
 HELP: deploy-math?
 { $description "Deploy flag. If set, the deployed image will contain support for " { $link ratio } " and " { $link complex } " types."
 $nl
-"On by default. Often the programmer will use rationals without realizing it. A small amount of space can be saved by stripping these features out, but some code may require changes to work properly." } ;
+"On by default."
+{ $warning "It is unlikely that math support can be safely removed in most nontrivial applications because the library makes extensive use of ratios." } } ;
 
 HELP: deploy-unicode?
 { $description "Deploy flag. If set, full Unicode " { $link POSTPONE: CHAR: } " syntax is included."
@@ -69,7 +74,8 @@ $nl
 HELP: deploy-threads?
 { $description "Deploy flag. If set, thread support will be included in the final image."
 $nl
-"On by default. Most programs depend on libraries which use threads even if they don't use threads directly; for example, timers, non-blocking I/O, and the UI are built on top of threads. If after testing your program still works without threads, you can disable this feature to save some space." } ;
+"On by default."
+{ $warning "It is unlikely that thread support can be safely removed in most nontrivial applications because thread support is required by the native IO library, the UI, and other fundamental libraries." } } ;
 
 HELP: deploy-ui?
 { $description "Deploy flag. If set, the Factor UI will be included in the deployed image."
@@ -77,9 +83,10 @@ $nl
 "Off by default. Programs wishing to use the UI must be deployed with this flag on." } ;
 
 HELP: deploy-console?
-{ $description "Deploy flag. If set, the deployed executable will be configured as a console application. On Windows, this means the application will be deployed in the console subsystem and will have a console attached. On Mac OS X, this means the application will be deployed as a single executable instead of an application bundle directory. On other Unix platforms, the flag has no effect."
+{ $description "Deploy flag. If set, the deployed executable will be configured as a console application. On Windows, this means the application will be deployed in the console subsystem and will be attached to a console window. On Mac OS X, this means the application will be deployed as a Unix executable instead of a Mac application bundle. On other Unix platforms, the flag has no effect."
 $nl
-"On by default." } ;
+"On by default."
+{ $notes "On Mac OS X, if " { $link deploy-ui? } " is set, the application will always be deployed as an application bundle regardless of the " { $snippet "deploy-console?" } " setting. The UI implementation on Mac OS X relies on the application being in a bundle." } } ;
 
 HELP: deploy-io
 { $description "The level of I/O support required by the deployed image:"
@@ -89,7 +96,8 @@ HELP: deploy-io
         { "2" "Basic ANSI C streams" }
         { "3" "Non-blocking streams and networking" }
     }
-"The default value is 3. The value should only be reduced if your application does not depend on asynchronous I/O functionality and does not use networking." } ;
+"The default value is 3."
+{ $warning "It is unlikely that the reflection level can be safely lowered in most nontrivial applications. Factor's networking libraries rely on level 3 support, and IO with ANSI C streams is blocking, which may cause unwanted behavior changes in applications that expect non-blocking IO behavior." } } ;
 
 HELP: deploy-reflection
 { $description "The level of reflection support required by the deployed image."
@@ -102,7 +110,7 @@ HELP: deploy-reflection
         { "5" "Parser" }
         { "6" "Full environment" }
     }
-"The defalut value is 1, no reflection. Programs which use the above features will need to be deployed with a higher level of reflection support." } ;
+"The default value is 1, no reflection. Programs which use the above features will need to be deployed with a higher level of reflection support." } ;
 
 HELP: default-config
 { $values { "vocab" "a vocabulary specifier" } { "assoc" assoc } }
