@@ -1,9 +1,11 @@
 USING: kernel math math.functions math.order namespaces
 prettyprint math.private continuations tools.test sequences
-random ;
+random prettyprint.config ;
 IN: math.integers.tests
 
-[ "-8" ] [ -8 unparse ] unit-test
+10 number-base [
+    [ "-8" ] [ -8 unparse ] unit-test
+] with-variable
 
 [ t ] [ 0 fixnum? ] unit-test
 [ t ] [ 31415 number? ] unit-test
@@ -54,9 +56,11 @@ IN: math.integers.tests
 
 [ -1 ] [ -1 >bignum >fixnum ] unit-test
 
-[ "8589934592" ]
-[ 134217728 dup + dup + dup + dup + dup + dup + unparse ]
-unit-test
+10 number-base [
+    [ "8589934592" ]
+    [ 134217728 dup + dup + dup + dup + dup + dup + unparse ]
+    unit-test
+] with-variable
 
 [ 7 ] [ 255 log2 ] unit-test
 [ 8 ] [ 256 log2 ] unit-test
