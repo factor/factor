@@ -1,4 +1,5 @@
-USING: kernel namespaces tools.test words ;
+USING: assocs compiler.tree.debugger kernel namespaces
+tools.test words ;
 IN: namespaces.tests
 
 H{ } clone "test-namespace" set
@@ -35,3 +36,5 @@ SYMBOL: toggle-test
 [ t ] [ toggle-test [ on ] [ get ] bi ] unit-test
 [ f ] [ toggle-test [ off ] [ get ] bi ] unit-test
 
+[ t ] [ [ test-initialize get-global ] { at* set-at } inlined? ] unit-test
+[ t ] [ [ test-initialize set-global ] { at* set-at } inlined? ] unit-test
