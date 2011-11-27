@@ -14,7 +14,7 @@ T{ error-type
     { type +user-init-error+ }
     { word ":user-init-errors" }
     { plural "rc file errors" }
-    { icon "vocab:ui/tools/error-list/icons/help-lint-error.tiff" }
+    { icon "vocab:ui/tools/error-list/icons/user-init-error.tiff" }
     { quot [ user-init-errors get-global values ] }
     { forget-quot [ user-init-errors get-global delete-at ] }
 } define-error-type
