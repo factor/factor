@@ -11,7 +11,7 @@ definitions debugger quotations.private combinators
 combinators.short-circuit math.order math.private accessors
 slots.private generic.single.private compiler.units
 compiler.constants compiler.codegen.relocation fry locals
-bootstrap.image.syntax parser.notes ;
+bootstrap.image.syntax parser.notes namespaces.private ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -503,11 +503,12 @@ M: quotation '
     {
         dictionary source-files builtins
         update-map implementors-map
-    } [ [ bootstrap-word ] [ get 1array ] bi ] H{ } map>assoc
+    } [ [ bootstrap-word ] [ get global-box boa ] bi ] H{ } map>assoc
     {
         class<=-cache class-not-cache classes-intersect-cache
         class-and-cache class-or-cache next-method-quot-cache
-    } [ H{ } clone 1array ] H{ } map>assoc assoc-union
+    } [ H{ } clone global-box boa ] H{ } map>assoc assoc-union
+    global-hashtable boa
     bootstrap-global set ;
 
 : emit-jit-data ( -- )

@@ -401,11 +401,9 @@ IN: tools.deploy.shaker
 : strip-globals ( stripped-globals -- )
     strip-globals? [
         "Stripping globals" show
-        global swap
-        '[ drop _ member? not ] assoc-filter
-        [ drop string? not ] assoc-filter ! strip CLI args
-        sift-assoc
-        OBJ-GLOBAL set-special-object
+        global boxes>> swap
+        '[ drop _ member? not ] assoc-filter!
+        [ drop string? not ] assoc-filter! drop ! strip CLI args
     ] [ drop ] if ;
 
 : strip-c-io ( -- )
