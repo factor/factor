@@ -226,6 +226,29 @@ unit-test
 [ -0x1.0p55 ] [ -0x7f,ffff,ffff,ffff >bignum 1 /f ] unit-test
 [ -0x1.0p55 ] [ 0x7f,ffff,ffff,ffff >bignum -1 /f ] unit-test
 
+[ 0x1.0000,0000,0000,0p56 ] [ 0x100,0000,0000,0007 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,0p56 ] [ -0x100,0000,0000,0007 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,0p120 ] [ 0x100,0000,0000,0007,FFFF,FFFF,FFFF,FFFF >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,0p120 ] [ -0x100,0000,0000,0007,FFFF,FFFF,FFFF,FFFF >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,0p56 ] [ 0x100,0000,0000,0008 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,0p56 ] [ -0x100,0000,0000,0008 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p56 ] [ 0x100,0000,0000,0009 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p56 ] [ -0x100,0000,0000,0009 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p120 ] [ 0x100,0000,0000,0008,0000,0000,0000,0001 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p120 ] [ -0x100,0000,0000,0008,0000,0000,0000,0001 >bignum -1 /f ] unit-test
+
+! Ensure that /f rounds to even on tie
+[ 0x1.0000,0000,0000,1p56 ] [ 0x100,0000,0000,0017 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p56 ] [ -0x100,0000,0000,0017 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p120 ] [ 0x100,0000,0000,0017,FFFF,FFFF,FFFF,FFFF >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p120 ] [ -0x100,0000,0000,0017,FFFF,FFFF,FFFF,FFFF >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p56 ] [ 0x100,0000,0000,0018 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p56 ] [ -0x100,0000,0000,0018 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p56 ] [ 0x100,0000,0000,0019 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p56 ] [ -0x100,0000,0000,0019 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p120 ] [ 0x100,0000,0000,0018,0000,0000,0000,0001 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p120 ] [ -0x100,0000,0000,0018,0000,0000,0000,0001 >bignum -1 /f ] unit-test
+
 [ 17 ] [ 17 >bignum 5 max ] unit-test
 [ 5 ] [ 17 >bignum 5 min ] unit-test
 
