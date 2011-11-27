@@ -10,6 +10,7 @@ void init_globals()
 
 void factor_vm::default_parameters(vm_parameters *p)
 {
+	p->embedded_image = false;
 	p->image_path = NULL;
 
 	p->datastack_size = 32 * sizeof(cell);
@@ -118,7 +119,15 @@ void factor_vm::init_factor(vm_parameters *p)
 		p->executable_path = executable_path;
 
 	if(p->image_path == NULL)
-		p->image_path = default_image_path();
+	{
+		if (embedded_image_p())
+		{
+			p->embedded_image = true;
+			p->image_path = p->executable_path;
+		}
+		else
+			p->image_path = default_image_path();
+	}
 
 	srand((unsigned int)nano_count());
 	init_ffi();
