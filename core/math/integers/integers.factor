@@ -110,14 +110,21 @@ M: bignum (log2) bignum-log2 ; inline
 : scale-denonimator ( den -- scaled-den scale' )
     dup twos neg [ shift ] keep ; inline
 
-: pre-scale ( num den -- mantissa den' scale )
+: (epsilon?) ( num shift -- ? )
+    dup neg? [ neg 2^ 1 - bitand zero? not ] [ 2drop f ] if ; inline
+
+: pre-scale ( num den -- epsilon? mantissa den' scale )
     2dup [ log2 ] bi@ -
-    [ neg 54 + shift ] [ [ scale-denonimator ] dip + ] bi-curry bi* ; inline
+    [ neg 54 + [ (epsilon?) ] [ shift ] 2bi ]
+    [ [ scale-denonimator ] dip + ] bi-curry bi* ; inline
 
 ! Second step: loop
-: /f-loop ( mantissa den scale -- fraction-and-guard rem scale' )
+: (2/-with-epsilon) ( epsilon? num -- epsilon?' num' )
+    [ 1 bitand zero? not or ] [ 2/ ] bi ; inline
+
+: /f-loop ( epsilon? mantissa den scale -- epsilon?' fraction-and-guard rem scale' )
     [ 2over /i log2 53 > ]
-    [ [ 2/ ] [ ] [ 1 + ] tri* ] while
+    [ [ (2/-with-epsilon) ] [ ] [ 1 + ] tri* ] while
     [ /mod ] dip ; inline
 
 ! Third step: post-scaling
@@ -132,9 +139,13 @@ M: bignum (log2) bignum-log2 ; inline
     [ 2/ ] dip over log2 52 > [ [ 2/ ] [ 1 + ] bi* ] when
     scale-float ; inline
 
-: round-to-nearest ( fraction-and-guard rem -- fraction-and-guard' )
+: round-to-nearest ( epsilon? fraction-and-guard rem -- fraction-and-guard' )
     over odd?
-    [ zero? [ dup zero? [ 1 + ] unless ] [ 1 + ] if ] [ drop ] if ;
+    [
+        zero? [
+            dup 2 bitand zero? not rot or [ 1 + ] when
+        ] [ nip 1 + ] if
+    ] [ drop nip ] if ;
     inline
 
 ! Main word
