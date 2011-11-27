@@ -58,9 +58,23 @@ M: lexer skip-blank ( lexer -- )
 
 GENERIC: skip-word ( lexer -- )
 
+<PRIVATE
+
+: quote? ( column text -- ? )
+    nth CHAR: " eq? ; inline
+
+: shebang? ( column text -- ? )
+    swap zero? [ "#!" head? ] [ drop f ] if ; inline
+
+PRIVATE>
+
 M: lexer skip-word ( lexer -- )
     [
-        2dup nth CHAR: " eq? [ drop 1 + ] [ f skip ] if
+        {
+            { [ 2dup quote? ] [ drop 1 + ] }
+            { [ 2dup shebang? ] [ drop 2 + ] }
+            [ f skip ]
+        } cond
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
