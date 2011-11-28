@@ -46,8 +46,11 @@ CONSTANT: fail-state -1
     [ final-states>> members first ]
     [ nfa-table get [ transitions>> ] bi@ swap assoc-union! drop ] tri ;
 
+: ast>nfa ( parse-tree -- minimal-dfa )
+    construct-nfa disambiguate ;
+
 : ast>dfa ( parse-tree -- minimal-dfa )
-    construct-nfa disambiguate construct-dfa minimize ;
+    ast>nfa construct-dfa minimize ;
 
 M: negation nfa-node ( node -- start end )
     term>> ast>dfa negate-table adjoin-dfa ;
