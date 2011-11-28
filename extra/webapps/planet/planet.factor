@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting math math.order
 calendar timers logging concurrency.combinators namespaces
-db.types db.tuples db fry locals hashtables
+db.types db.tuples db fry locals hashtables continuations
 syndication urls xml.writer validators
 html.forms
 html.components
@@ -15,7 +15,8 @@ furnace.redirection
 furnace.boilerplate
 furnace.auth.login
 furnace.auth
-furnace.syndication ;
+furnace.syndication
+syndication.pubsubhubbub ;
 IN: webapps.planet
 
 TUPLE: planet < dispatcher ;
@@ -51,6 +52,9 @@ posting "POSTINGS"
     { "date" "DATE" TIMESTAMP +not-null+ }
 } define-persistent
 
+CONSTANT: hubs { { URL" http://pubsubhubbub.appspot.com/"
+                   URL" http://pubsubhubbub.appspot.com/publish" } }
+
 : <blog> ( id -- todo )
     blog new
         swap >>id ;
@@ -59,9 +63,12 @@ posting "POSTINGS"
     f <blog> select-tuples
     [ name>> ] sort-with ;
 
+: sort-postings ( seq -- seq )
+    [ date>> ] inv-sort-with ;
+
 : postings ( -- seq )
     posting new select-tuples
-    [ date>> ] inv-sort-with ;
+    sort-postings ;
 
 : <edit-blogroll-action> ( -- action )
     <page-action>
@@ -77,10 +84,19 @@ posting "POSTINGS"
 
         { planet "planet" } >>template ;
 
+: hubs-urls ( -- seq )
+    hubs [ first ] map ;
+
+: ping-hubs ( -- )
+    { URL" http://planet.factorcode.org/feed.xml" }
+    hubs [ second ] map
+    [ [ ping ] [ 3drop ] recover ] with each ;
+
 : <planet-feed-action> ( -- action )
     <feed-action>
         [ "Planet Factor" ] >>title
         [ URL" $planet" ] >>url
+        [ hubs-urls ] >>hubs
         [ postings ] >>entries ;
 
 :: <posting> ( entry name -- entry' )
@@ -102,11 +118,15 @@ posting "POSTINGS"
 : sort-entries ( entries -- entries' )
     [ date>> ] inv-sort-with ;
 
-: update-cached-postings ( -- )
-    blogroll fetch-blogroll sort-entries 8 short head [
+: set-cached-postings ( seq -- )
+    [
         posting new delete-tuples
         [ insert-tuple ] each
     ] with-transaction ;
+
+: update-cached-postings ( -- )
+    blogroll fetch-blogroll sort-entries 8 short head sort-postings
+    dup postings = [ drop ] [ set-cached-postings ping-hubs ] if ;
 
 : <update-action> ( -- action )
     <action>
