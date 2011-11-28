@@ -2,7 +2,8 @@ USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
 accessors generic eval combinators combinators.short-circuit
 combinators.short-circuit.smart math.order math.functions
-definitions compiler.units fry lexer words.symbol see multiline ;
+definitions compiler.units fry lexer words.symbol see multiline
+combinators.smart ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -491,3 +492,8 @@ M: integer ed's-bug neg ;
 
 ! multiple bind
 [ 3 1 2 ] [ [let 1 2 3 :> ( a b c ) c a b ] ] unit-test
+
+! Test smart combinators and locals interaction
+:: smart-combinator-locals ( a b c -- seq ) [ a b c ] output>array ;
+
+[ { 1 2 3 } ] [ 1 2 3 smart-combinator-locals ] unit-test

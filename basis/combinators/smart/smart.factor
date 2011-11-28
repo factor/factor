@@ -1,41 +1,74 @@
-! Copyright (C) 2009 Doug Coleman.
+! Copyright (C) 2009, 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry generalizations sequences.generalizations
-kernel macros math.order stack-checker math sequences ;
+USING: accessors arrays effects fry generalizations kernel
+macros math math.order sequences sequences.generalizations
+stack-checker stack-checker.backend stack-checker.errors
+stack-checker.values stack-checker.visitor words ;
 IN: combinators.smart
 
-MACRO: drop-outputs ( quot -- quot' )
-    dup outputs '[ @ _ ndrop ] ;
+GENERIC: infer-known* ( known -- effect )
 
-MACRO: keep-inputs ( quot -- quot' )
-    dup inputs '[ _ _ nkeep ] ;
+: infer-known ( value -- effect )
+    known dup (literal-value?) [
+        (literal) [ infer-literal-quot ] with-infer drop
+    ] [ infer-known* ] if ;
 
-MACRO: output>sequence ( quot exemplar -- newquot )
-    [ dup outputs ] dip
-    '[ @ _ _ nsequence ] ;
+: inputs/outputs ( quot -- in out )
+    infer [ in>> ] [ out>> ] bi [ length ] bi@ ;
 
-MACRO: output>array ( quot -- newquot )
-    '[ _ { } output>sequence ] ;
+: inputs ( quot -- n ) inputs/outputs drop ; inline
 
-MACRO: input<sequence ( quot -- newquot )
-    [ inputs ] keep
-    '[ _ firstn @ ] ;
+: outputs ( quot -- n ) inputs/outputs nip ; inline
 
-MACRO: input<sequence-unsafe ( quot -- newquot )
-    [ inputs ] keep
-    '[ _ firstn-unsafe @ ] ;
+\ inputs/outputs [
+    pop-d
+    [ 1array #drop, ] [ infer-known ] bi
+    [ in>> ] [ out>> ] bi [ length apply-object ] bi@
+] "special" set-word-prop
+
+M: curried infer-known*
+    quot>> infer-known curry-effect ;
+
+M: composed infer-known*
+    [ quot1>> ] [ quot2>> ] bi
+    [ infer-known ] bi@ compose-effects ;
+
+M: declared-effect infer-known*
+    known>> infer-known* ;
+
+M: input-parameter infer-known* \ inputs/outputs unknown-macro-input ;
+
+M: object infer-known* \ inputs/outputs bad-macro-input ;
+
+: drop-outputs ( quot -- )
+    [ call ] [ outputs ndrop ] bi ; inline
+
+: keep-inputs ( quot -- )
+    [ ] [ inputs ] bi nkeep ; inline
+
+: output>sequence ( quot exemplar -- )
+    [ [ call ] [ outputs ] bi ] dip nsequence ; inline
+
+: output>array ( quot -- )
+    { } output>sequence ; inline
+
+: input<sequence ( seq quot -- )
+    [ inputs firstn ] [ call ] bi ; inline
+
+: input<sequence-unsafe ( seq quot -- )
+    [ inputs firstn-unsafe ] [ call ] bi ; inline
 
 MACRO: reduce-outputs ( quot operation -- newquot )
     [ dup outputs 1 [-] ] dip n*quot compose ;
 
-MACRO: sum-outputs ( quot -- n )
-    '[ _ [ + ] reduce-outputs ] ;
+: sum-outputs ( quot -- n )
+    [ + ] reduce-outputs ; inline
 
-MACRO: map-reduce-outputs ( quot mapper reducer -- newquot )
-    [ dup outputs ] 2dip
-    [ swap '[ _ _ napply ] ]
-    [ [ 1 [-] ] dip n*quot ] bi-curry* bi
-    '[ @ @ @ ] ;
+: map-outputs ( quot mapper -- )
+    [ drop call ] [ swap outputs ] 2bi napply ; inline
+
+: map-reduce-outputs ( quot mapper reducer -- )
+    [ '[ _ _ map-outputs ] ] dip reduce-outputs ; inline
 
 MACRO: append-outputs-as ( quot exemplar -- newquot )
     [ dup outputs ] dip '[ @ _ _ nappend-as ] ;
