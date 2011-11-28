@@ -10,6 +10,9 @@ IN: generalizations
 
 ALIAS: n*quot (n*quot)
 
+MACRO: quot*n ( n -- )
+    [ call ] <repetition> '[ _ cleave ] ;
+
 : repeat ( n obj quot -- ) swapd times ; inline
 
 >>
@@ -23,8 +26,8 @@ MACRO: npick ( n -- )
 MACRO: nover ( n -- )
     dup 1 + '[ _ npick ] n*quot ;
 
-MACRO: ndup ( n -- )
-    dup '[ _ npick ] n*quot ;
+: ndup ( n -- )
+    [ '[ _ npick ] ] keep quot*n ; inline
 
 MACRO: dupn ( n -- )
     [ [ drop ] ]
@@ -36,23 +39,23 @@ MACRO: nrot ( n -- )
 MACRO: -nrot ( n -- )
     1 - [ ] [ '[ swap _ dip ] ] repeat ;
 
-MACRO: ndrop ( n -- )
-    [ drop ] n*quot ;
+: ndrop ( n -- )
+    [ drop ] swap quot*n ; inline
 
-MACRO: nnip ( n -- )
-    '[ [ _ ndrop ] dip ] ;
+: nnip ( n -- )
+    '[ _ ndrop ] dip ; inline
 
-MACRO: ndip ( n -- )
-    [ [ dip ] curry ] n*quot [ call ] compose ;
+: ndip ( n -- )
+    [ [ dip ] curry ] swap quot*n call ; inline
 
-MACRO: nkeep ( n -- )
-    dup '[ [ _ ndup ] dip _ ndip ] ;
+: nkeep ( n -- )
+    dup '[ [ _ ndup ] dip _ ndip ] call ; inline
 
-MACRO: ncurry ( n -- )
-    [ curry ] n*quot ;
+: ncurry ( n -- )
+    [ curry ] swap quot*n ; inline
 
-MACRO: nwith ( n -- )
-    [ with ] n*quot ;
+: nwith ( n -- )
+    [ with ] swap quot*n ; inline
 
 MACRO: nbi ( n -- )
     '[ [ _ nkeep ] dip call ] ;

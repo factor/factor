@@ -529,3 +529,13 @@ USING: alien.c-types alien ;
 [ [ drop drop ] [ f f f ] poly-input-output ] must-infer
 [ [ drop drop drop ] [ f f ] poly-input-output ] must-infer
 
+! Check that 'inputs' and 'outputs' work at compile-time
+
+: inputs-test0 ( -- n )
+    [ 5 + ] inputs ;
+
+: inputs-test1 ( x -- n )
+    [ + ] curry inputs ;
+
+[ 1 ] [ inputs-test0 ] unit-test
+[ 1 ] [ 10 inputs-test1 ] unit-test

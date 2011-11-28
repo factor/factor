@@ -41,17 +41,14 @@ GENERIC: cached-effect ( quot -- effect )
 
 M: object cached-effect drop +unknown+ ;
 
-GENERIC: curry-effect ( effect -- effect' )
+GENERIC: curry-effect* ( effect -- effect' )
 
-M: +unknown+ curry-effect ;
+M: +unknown+ curry-effect* ;
 
-M: effect curry-effect
-    [ in>> length ] [ out>> length ] [ terminated?>> ] tri
-    pick 0 = [ [ 1 + ] dip ] [ [ 1 - ] 2dip ] if
-    [ [ "x" <array> ] bi@ ] dip <terminated-effect> ;
+M: effect curry-effect* curry-effect ;
 
 M: curry cached-effect
-    quot>> cached-effect curry-effect ;
+    quot>> cached-effect curry-effect* ;
 
 : compose-effects* ( effect1 effect2 -- effect' )
     {
