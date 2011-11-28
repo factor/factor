@@ -20,9 +20,6 @@ TUPLE: xml-test id uri sections description type ;
 
 CONSTANT: base "vocab:xml/tests/xmltest/"
 
-MACRO: drop-inputs ( quot -- newquot )
-    inputs '[ _ ndrop ] ;
-
 : fails? ( quot -- ? )
     [ drop-outputs f ] [ nip drop-inputs t ] bi-curry recover ; inline
 
