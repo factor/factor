@@ -6,11 +6,15 @@ combinators macros math.order math.ranges quotations fry effects
 memoize.private arrays ;
 IN: generalizations
 
+! These words can be inline combinators the word does no math on
+! the input parameters, e.g. n. 
+! If math is done, the word needs to be a macro so the math can
+! be done at compile-time.
 <<
 
 ALIAS: n*quot (n*quot)
 
-MACRO: quot*n ( n -- )
+MACRO: call-n ( n -- )
     [ call ] <repetition> '[ _ cleave ] ;
 
 : repeat ( n obj quot -- ) swapd times ; inline
@@ -27,7 +31,7 @@ MACRO: nover ( n -- )
     dup 1 + '[ _ npick ] n*quot ;
 
 : ndup ( n -- )
-    [ '[ _ npick ] ] keep quot*n ; inline
+    [ '[ _ npick ] ] keep call-n ; inline
 
 MACRO: dupn ( n -- )
     [ [ drop ] ]
@@ -40,25 +44,25 @@ MACRO: -nrot ( n -- )
     1 - [ ] [ '[ swap _ dip ] ] repeat ;
 
 : ndrop ( n -- )
-    [ drop ] swap quot*n ; inline
+    [ drop ] swap call-n ; inline
 
 : nnip ( n -- )
     '[ _ ndrop ] dip ; inline
 
 : ndip ( n -- )
-    [ [ dip ] curry ] swap quot*n call ; inline
+    [ [ dip ] curry ] swap call-n call ; inline
 
 : nkeep ( n -- )
     dup '[ [ _ ndup ] dip _ ndip ] call ; inline
 
 : ncurry ( n -- )
-    [ curry ] swap quot*n ; inline
+    [ curry ] swap call-n ; inline
 
 : nwith ( n -- )
-    [ with ] swap quot*n ; inline
+    [ with ] swap call-n ; inline
 
-MACRO: nbi ( n -- )
-    '[ [ _ nkeep ] dip call ] ;
+: nbi ( quot1 quot2 n -- )
+    [ nip nkeep ] [ drop nip call ] 3bi ; inline
 
 MACRO: ncleave ( quots n -- )
     [ '[ _ '[ _ _ nkeep ] ] map [ ] join ] [ '[ _ ndrop ] ] bi
@@ -115,5 +119,5 @@ MACRO: nweave ( n -- )
     [ dup iota <reversed> [ '[ _ _ mnswap ] ] with map ] keep
     '[ _ _ ncleave ] ;
 
-MACRO: nbi-curry ( n -- )
-    [ bi-curry ] n*quot ;
+: nbi-curry ( n -- )
+    [ bi-curry ] swap call-n ; inline

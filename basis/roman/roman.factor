@@ -1,10 +1,10 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs effects fry generalizations
-grouping kernel lexer macros math math.order math.vectors
-namespaces parser effects.parser quotations sequences
-sequences.private splitting.monotonic stack-checker strings
-unicode.case words ;
+USING: accessors arrays assocs combinators.smart effects
+effects.parser fry generalizations grouping kernel lexer macros
+math math.order math.vectors namespaces parser quotations
+sequences sequences.private splitting.monotonic stack-checker
+strings unicode.case words ;
 IN: roman
 
 <PRIVATE
