@@ -76,3 +76,5 @@ IN: combinators.smart.tests
 
 [ -1 ] [ 1 2 [ + odd? ] [ - ] smart-when* ] unit-test
 [ ] [ 2 2 [ + odd? ] [ ] smart-unless* ] unit-test
+
+! [ [ ] [ call ] curry output>array ] infer

@@ -49,3 +49,8 @@ IN: effects.tests
 
 [ "( ..a: integer b c -- d )" eval( -- effect ) ]
 [ error>> row-variable-can't-have-type? ] must-fail-with
+
+! test curry-effect
+[ ( -- x ) ] [ ( c -- d ) curry-effect ] unit-test
+[ ( -- x x ) ] [ ( -- d ) curry-effect ] unit-test
+[ ( x -- ) ] [ ( a b -- ) curry-effect ] unit-test

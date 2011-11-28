@@ -120,3 +120,8 @@ M: effect clone
         [ [ "x" <array> ] bi@ ] dip
         <terminated-effect>
     ] if ; inline
+
+: curry-effect ( effect -- effect' )
+    [ in>> length ] [ out>> length ] [ terminated?>> ] tri
+    pick 0 = [ [ 1 + ] dip ] [ [ 1 - ] 2dip ] if
+    [ [ "x" <array> ] bi@ ] dip <terminated-effect> ;
