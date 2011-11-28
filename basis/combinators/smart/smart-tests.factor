@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.smart kernel math
-tools.test ;
+stack-checker tools.test ;
 IN: combinators.smart.tests
 
 : test-bi ( -- 9 11 )
@@ -77,4 +77,4 @@ IN: combinators.smart.tests
 [ -1 ] [ 1 2 [ + odd? ] [ - ] smart-when* ] unit-test
 [ ] [ 2 2 [ + odd? ] [ ] smart-unless* ] unit-test
 
-! [ [ ] [ call ] curry output>array ] infer
+[ ( -- x ) ] [ [ [ ] [ call ] curry output>array ] infer ] unit-test

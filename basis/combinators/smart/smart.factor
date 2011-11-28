@@ -21,10 +21,16 @@ GENERIC: infer-known* ( known -- effect )
 : outputs ( quot -- n ) inputs/outputs nip ; inline
 
 \ inputs/outputs [
-    pop-d
-    [ 1array #drop, ] [ infer-known ] bi
-    [ in>> ] [ out>> ] bi [ length apply-object ] bi@
+    peek-d
+    infer-known [
+        [ pop-d 1array #drop, ]
+        [ [ in>> ] [ out>> ] bi [ length apply-object ] bi@ ] bi*
+    ] [
+        \ inputs/outputs dup required-stack-effect apply-word/effect
+    ] if*
 ] "special" set-word-prop
+
+! TODO: Handle the case where a nested call to infer-known returns f
 
 M: curried infer-known*
     quot>> infer-known curry-effect ;
@@ -38,7 +44,7 @@ M: declared-effect infer-known*
 
 M: input-parameter infer-known* \ inputs/outputs unknown-macro-input ;
 
-M: object infer-known* \ inputs/outputs bad-macro-input ;
+M: object infer-known* drop f ;
 
 : drop-inputs ( quot -- newquot )
     inputs ndrop ; inline
@@ -64,8 +70,8 @@ M: object infer-known* \ inputs/outputs bad-macro-input ;
 MACRO: reduce-outputs ( quot operation -- newquot )
     [ [ ] [ outputs 1 [-] ] bi ] dip swap '[ @ _ _ call-n ] ;
 
-: sum-outputs ( quot -- n )
-    [ + ] reduce-outputs ; inline
+MACRO: sum-outputs ( quot -- n )
+    '[ _ [ + ] reduce-outputs ] ;
 
 : map-outputs ( quot mapper -- )
     [ drop call ] [ swap outputs ] 2bi napply ; inline
