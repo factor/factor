@@ -40,6 +40,9 @@ M: input-parameter infer-known* \ inputs/outputs unknown-macro-input ;
 
 M: object infer-known* \ inputs/outputs bad-macro-input ;
 
+: drop-inputs ( quot -- newquot )
+    inputs ndrop ; inline
+
 : drop-outputs ( quot -- )
     [ call ] [ outputs ndrop ] bi ; inline
 
@@ -59,7 +62,7 @@ M: object infer-known* \ inputs/outputs bad-macro-input ;
     [ inputs firstn-unsafe ] [ call ] bi ; inline
 
 MACRO: reduce-outputs ( quot operation -- newquot )
-    [ dup outputs 1 [-] ] dip n*quot compose ;
+    [ [ ] [ outputs 1 [-] ] bi ] dip swap '[ @ _ _ call-n ] ;
 
 : sum-outputs ( quot -- n )
     [ + ] reduce-outputs ; inline
@@ -70,37 +73,38 @@ MACRO: reduce-outputs ( quot operation -- newquot )
 : map-reduce-outputs ( quot mapper reducer -- )
     [ '[ _ _ map-outputs ] ] dip reduce-outputs ; inline
 
-MACRO: append-outputs-as ( quot exemplar -- newquot )
-    [ dup outputs ] dip '[ @ _ _ nappend-as ] ;
+: append-outputs-as ( quot exemplar -- newquot )
+    [ [ call ] [ outputs ] bi ] dip nappend-as ; inline
 
-MACRO: append-outputs ( quot -- seq )
-    '[ _ { } append-outputs-as ] ;
+: append-outputs ( quot -- seq )
+    { } append-outputs-as ; inline
 
-MACRO: preserving ( quot -- )
-    [ inputs ] keep '[ _ ndup @ ] ;
+: preserving ( quot -- )
+    [ inputs ndup ] [ call ] bi ; inline
 
-MACRO: dropping ( quot -- quot' )
-    inputs '[ [ _ ndrop ] ] ;
+: dropping ( quot -- quot' )
+    inputs '[ _ ndrop ] ; inline
 
-MACRO: nullary ( quot -- quot' ) dropping ;
+: nullary ( quot -- quot' )
+    dropping call ; inline
 
-MACRO: smart-if ( pred true false -- quot )
-    '[ _ preserving _ _ if ] ;
+: smart-if ( pred true false -- quot )
+    [ preserving ] 2dip if ; inline
 
-MACRO: smart-when ( pred true -- quot )
-    '[ _ _ [ ] smart-if ] ;
+: smart-when ( pred true -- quot )
+    [ ] smart-if ; inline
 
-MACRO: smart-unless ( pred false -- quot )
-    '[ _ [ ] _ smart-if ] ;
+: smart-unless ( pred false -- quot )
+    [ [ ] ] dip smart-if ; inline
 
-MACRO: smart-if* ( pred true false -- quot )
-    '[ _ [ preserving ] [ dropping ] bi _ swap _ compose if ] ;
+: smart-if* ( pred true false -- quot )
+    [ [ [ preserving ] [ dropping ] bi ] dip swap ] dip compose if ; inline
 
-MACRO: smart-when* ( pred true -- quot )
-    '[ _ _ [ ] smart-if* ] ;
+: smart-when* ( pred true -- quot )
+    [ ] smart-if* ; inline
 
-MACRO: smart-unless* ( pred false -- quot )
-    '[ _ [ ] _ smart-if* ] ;
+: smart-unless* ( pred false -- quot )
+    [ [ ] ] dip smart-if* ; inline
 
-MACRO: smart-apply ( quot n -- quot )
-    [ dup inputs ] dip '[ _ _ _ mnapply ] ;
+: smart-apply ( quot n -- quot )
+    [ dup inputs ] dip mnapply ; inline
