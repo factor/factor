@@ -6,7 +6,7 @@ io.encodings.ascii io.files kernel literals locals make math
 math.parser math.ranges memoize namespaces sequences
 sets simple-flat-file splitting unicode.categories
 unicode.categories.syntax unicode.data unicode.normalize
-unicode.normalize.private values words ;
+unicode.normalize.private words ;
 FROM: sequences => change-nth ;
 IN: unicode.breaks
 
@@ -95,10 +95,10 @@ SYMBOL: table
     graphemes iota { SpacingMark } connect
     { Prepend } graphemes iota connect ;
 
-VALUE: grapheme-table
+SYMBOL: grapheme-table
 
 : grapheme-break? ( class1 class2 -- ? )
-    grapheme-table nth nth not ;
+    grapheme-table get-global nth nth not ;
 
 PRIVATE>
 
@@ -134,14 +134,14 @@ PRIVATE>
 
 graphemes init-table table
 [ make-grapheme-table finish-table ] with-variable
-\ grapheme-table set-value
+grapheme-table set-global
 
 ! Word breaks
 
-VALUE: word-break-table
+SYMBOL: word-break-table
 
 "vocab:unicode/data/WordBreakProperty.txt" load-interval-file
-\ word-break-table set-value
+word-break-table set-global
 
 CONSTANT: wOther 0
 CONSTANT: wCR 1
@@ -168,7 +168,7 @@ CONSTANT: words 13
     } ;
 
 : word-break-prop ( char -- word-break-prop )
-    word-break-table interval-at
+    word-break-table get-global interval-at
     word-break-classes at [ wOther ] unless* ;
 
 SYMBOL: check-letter-before
@@ -189,7 +189,7 @@ SYMBOL: check-number-after
     { wALetter wNumeric wKatakana wExtendNumLet } { wExtendNumLet }
     [ connect ] [ swap connect ] 2bi ;
 
-VALUE: word-table
+SYMBOL: word-table
 
 : finish-word-table ( -- table )
     table get [
@@ -198,10 +198,10 @@ VALUE: word-table
 
 words init-table table
 [ make-word-table finish-word-table ] with-variable
-\ word-table set-value
+word-table set-global
 
 : word-table-nth ( class1 class2 -- ? )
-    word-table nth nth ;
+    word-table get-global nth nth ;
 
 :: property-not= ( str i property -- ? )
     i [

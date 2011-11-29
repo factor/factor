@@ -4,7 +4,7 @@ USING: accessors arrays assocs classes combinators
 combinators.short-circuit definitions effects eval fry grouping
 help help.markup help.topics io.streams.string kernel macros
 namespaces sequences sequences.deep sets sorting splitting
-strings unicode.categories values vocabs vocabs.loader words
+strings unicode.categories vocabs vocabs.loader words
 words.symbol summary debugger io ;
 FROM: sets => members ;
 IN: help.lint.checks
@@ -72,7 +72,6 @@ SYMBOL: vocab-articles
     {
         [ macro? ]
         [ symbol? ]
-        [ value-word? ]
         [ parsing-word? ]
         [ "declared-effect" word-prop not ]
     } 1|| ;

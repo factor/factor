@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences io.files io.encodings.ascii kernel values splitting
+USING: sequences io.files io.encodings.ascii kernel splitting
 accessors math.parser ascii io assocs strings math namespaces make
 sorting combinators math.order arrays unicode.normalize unicode.data
 locals macros sequences.deep words unicode.breaks quotations
@@ -8,7 +8,7 @@ combinators.short-circuit simple-flat-file ;
 IN: unicode.collation
 
 <PRIVATE
-VALUE: ducet
+SYMBOL: ducet
 
 TUPLE: weight primary secondary tertiary ignorable? ;
 
@@ -25,7 +25,7 @@ TUPLE: weight primary secondary tertiary ignorable? ;
 : parse-ducet ( file -- ducet )
     data [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
 
-"vocab:unicode/collation/allkeys.txt" parse-ducet \ ducet set-value
+"vocab:unicode/collation/allkeys.txt" parse-ducet ducet set-global
 
 ! Fix up table for long contractions
 : help-one ( assoc key -- )
@@ -39,7 +39,7 @@ TUPLE: weight primary secondary tertiary ignorable? ;
     dup keys [ length 3 >= ] filter
     [ help-one ] with each ;
 
-ducet insert-helpers
+ducet get-global insert-helpers
 
 : base ( char -- base )
     {
@@ -77,7 +77,7 @@ ducet insert-helpers
 
 :: ?combine ( char slice i -- ? )
     i slice nth char suffix :> str
-    str ducet key? dup
+    str ducet get-global key? dup
     [ str i slice set-nth ] when ;
 
 : add ( char -- )
@@ -93,7 +93,7 @@ ducet insert-helpers
 : graphemes>weights ( graphemes -- weights )
     [
         dup weight? [ 1array ] ! From tailoring
-        [ dup ducet at [ ] [ derive-weight ] ?if ] if
+        [ dup ducet get-global at [ ] [ derive-weight ] ?if ] if
     ] { } map-as concat ;
 
 : append-weights ( weights quot -- )
