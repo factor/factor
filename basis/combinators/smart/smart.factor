@@ -46,7 +46,7 @@ M: input-parameter infer-known* \ inputs/outputs unknown-macro-input ;
 
 M: object infer-known* drop f ;
 
-: drop-inputs ( quot -- newquot )
+: drop-inputs ( quot -- )
     inputs ndrop ; inline
 
 : drop-outputs ( quot -- )
@@ -55,10 +55,10 @@ M: object infer-known* drop f ;
 : keep-inputs ( quot -- )
     [ ] [ inputs ] bi nkeep ; inline
 
-: output>sequence ( quot exemplar -- )
+: output>sequence ( quot exemplar -- seq )
     [ [ call ] [ outputs ] bi ] dip nsequence ; inline
 
-: output>array ( quot -- )
+: output>array ( quot -- array )
     { } output>sequence ; inline
 
 : input<sequence ( seq quot -- )
@@ -67,11 +67,11 @@ M: object infer-known* drop f ;
 : input<sequence-unsafe ( seq quot -- )
     [ inputs firstn-unsafe ] [ call ] bi ; inline
 
-MACRO: reduce-outputs ( quot operation -- newquot )
-    [ [ ] [ outputs 1 [-] ] bi ] dip swap '[ @ _ _ call-n ] ;
+: reduce-outputs ( quot operation -- )
+    [ [ call ] [ [ drop ] compose outputs ] bi ] dip swap call-n ; inline
 
-MACRO: sum-outputs ( quot -- n )
-    '[ _ [ + ] reduce-outputs ] ;
+: sum-outputs ( quot -- obj )
+    [ + ] reduce-outputs ; inline
 
 : map-outputs ( quot mapper -- )
     [ drop call ] [ swap outputs ] 2bi napply ; inline
@@ -79,7 +79,7 @@ MACRO: sum-outputs ( quot -- n )
 : map-reduce-outputs ( quot mapper reducer -- )
     [ '[ _ _ map-outputs ] ] dip reduce-outputs ; inline
 
-: append-outputs-as ( quot exemplar -- newquot )
+: append-outputs-as ( quot exemplar -- seq )
     [ [ call ] [ outputs ] bi ] dip nappend-as ; inline
 
 : append-outputs ( quot -- seq )
@@ -91,26 +91,26 @@ MACRO: sum-outputs ( quot -- n )
 : dropping ( quot -- quot' )
     inputs '[ _ ndrop ] ; inline
 
-: nullary ( quot -- quot' )
+: nullary ( quot -- )
     dropping call ; inline
 
-: smart-if ( pred true false -- quot )
+: smart-if ( pred true false -- )
     [ preserving ] 2dip if ; inline
 
-: smart-when ( pred true -- quot )
+: smart-when ( pred true -- )
     [ ] smart-if ; inline
 
-: smart-unless ( pred false -- quot )
+: smart-unless ( pred false -- )
     [ [ ] ] dip smart-if ; inline
 
-: smart-if* ( pred true false -- quot )
+: smart-if* ( pred true false -- )
     [ [ [ preserving ] [ dropping ] bi ] dip swap ] dip compose if ; inline
 
-: smart-when* ( pred true -- quot )
+: smart-when* ( pred true -- )
     [ ] smart-if* ; inline
 
-: smart-unless* ( pred false -- quot )
+: smart-unless* ( pred false -- )
     [ [ ] ] dip smart-if* ; inline
 
-: smart-apply ( quot n -- quot )
+: smart-apply ( quot n -- )
     [ dup inputs ] dip mnapply ; inline
