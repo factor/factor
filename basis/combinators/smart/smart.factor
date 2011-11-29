@@ -30,19 +30,22 @@ GENERIC: infer-known* ( known -- effect )
     ] if*
 ] "special" set-word-prop
 
-! TODO: Handle the case where a nested call to infer-known returns f
-
 M: curried infer-known*
-    quot>> infer-known curry-effect ;
+    quot>> infer-known dup [
+        curry-effect
+    ] [
+        drop f
+    ] if ;
 
 M: composed infer-known*
     [ quot1>> ] [ quot2>> ] bi
-    [ infer-known ] bi@ compose-effects ;
+    [ infer-known ] bi@
+    2dup and [ compose-effects ] [ 2drop f ] if ;
 
 M: declared-effect infer-known*
     known>> infer-known* ;
 
-M: input-parameter infer-known* \ inputs/outputs unknown-macro-input ;
+M: input-parameter infer-known* drop f ;
 
 M: object infer-known* drop f ;
 

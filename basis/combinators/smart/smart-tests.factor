@@ -82,3 +82,7 @@ IN: combinators.smart.tests
 :: map-reduce-test ( a b c -- d ) [ a b c ] [ a - ] [ b * + ] map-reduce-outputs ;
 
 [ ] [ 1 2 3 map-reduce-test ] unit-test
+
+[ ( x x -- x ) ] [ [ curry inputs ] infer ] unit-test
+
+[ ( x -- x ) ] [ [ [ curry ] curry inputs ] infer ] unit-test
