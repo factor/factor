@@ -5,8 +5,7 @@ combinators continuations destructors fry io io.backend
 io.directories io.encodings.binary io.files.info.unix
 io.encodings.utf8 io.files io.pathnames io.files.types kernel
 math.bitwise sequences system unix unix.stat vocabs.loader
-classes.struct unix.ffi literals libc vocabs
-io.files.info.unix ;
+classes.struct unix.ffi literals libc vocabs ;
 IN: io.directories.unix
 
 CONSTANT: file-mode 0o0666
