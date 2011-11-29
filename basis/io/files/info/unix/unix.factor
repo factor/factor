@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays calendar
 calendar.unix classes.struct combinators
-combinators.short-circuit io.backend io.directories
+combinators.short-circuit io.backend
 io.files.info io.files.types kernel literals math math.bitwise
 sequences specialized-arrays strings system unix unix.ffi
 unix.groups unix.stat unix.time unix.users vocabs ;
@@ -184,9 +184,6 @@ CONSTANT: ALL-EXECUTE   0o0000111
 
 : remove-file-permissions ( path n -- )
     over file-permissions [ bitnot ] dip bitand set-file-permissions ;
-
-M: unix copy-file-and-info ( from to -- )
-    [ copy-file ] [ swap file-permissions set-file-permissions ] 2bi ;
 
 <PRIVATE
 
