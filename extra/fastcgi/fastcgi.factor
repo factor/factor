@@ -16,7 +16,7 @@
 USING: accessors alien.enums alien.syntax assocs combinators
 combinators.smart formatting http http.server http.server.responses
 io io.binary io.directories
-io.encodings.binary io.files io.servers.connection io.sockets
+io.encodings.binary io.files io.servers io.sockets
 io.streams.byte-array kernel locals math namespaces pack prettyprint
 sequences sequences.deep strings threads urls.encoding unix.users ;
 IN: fastcgi
@@ -213,4 +213,4 @@ M: test-responder call-responder* 2drop test-output "text/html" <content> ;
     <test-responder> main-responder set
     socket-path [ delete-if-exists ] keep
     make-local-socket <fastcgi-server> dup fcgi-server set
-    start-server ;
+    start-server drop ;
