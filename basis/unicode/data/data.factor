@@ -3,7 +3,7 @@
 USING: combinators.short-circuit assocs math kernel sequences
 io.files hashtables quotations splitting grouping arrays io
 math.parser math.order byte-arrays namespaces math.bitwise
-compiler.units parser io.encodings.ascii values interval-maps
+compiler.units parser io.encodings.ascii interval-maps
 ascii sets combinators locals math.ranges sorting make
 strings.parser io.encodings.utf8 memoize simple-flat-file ;
 FROM: namespaces => set ;
@@ -11,36 +11,36 @@ IN: unicode.data
 
 <PRIVATE
 
-VALUE: simple-lower
-VALUE: simple-upper
-VALUE: simple-title
-VALUE: canonical-map
-VALUE: combine-map
-VALUE: class-map
-VALUE: compatibility-map
-VALUE: category-map
-VALUE: special-casing
-VALUE: properties
+SYMBOL: simple-lower
+SYMBOL: simple-upper
+SYMBOL: simple-title
+SYMBOL: canonical-map
+SYMBOL: combine-map
+SYMBOL: class-map
+SYMBOL: compatibility-map
+SYMBOL: category-map
+SYMBOL: special-casing
+SYMBOL: properties
 
 : >2ch ( a b -- c ) [ 21 shift ] dip + ;
 : 2ch> ( c -- a b ) [ -21 shift ] [ 21 on-bits mask ] bi ;
 
 PRIVATE>
 
-VALUE: name-map
+SYMBOL: name-map
 
-: canonical-entry ( char -- seq ) canonical-map at ; inline
-: combine-chars ( a b -- char/f ) >2ch combine-map at ; inline
-: compatibility-entry ( char -- seq ) compatibility-map at ; inline
-: combining-class ( char -- n ) class-map at ; inline
+: canonical-entry ( char -- seq ) canonical-map get-global at ; inline
+: combine-chars ( a b -- char/f ) >2ch combine-map get-global at ; inline
+: compatibility-entry ( char -- seq ) compatibility-map get-global at ; inline
+: combining-class ( char -- n ) class-map get-global at ; inline
 : non-starter? ( char -- ? ) combining-class { 0 f } member? not ; inline
-: name>char ( name -- char ) name-map at ; inline
-: char>name ( char -- name ) name-map value-at ; inline
-: property? ( char property -- ? ) properties at interval-key? ; inline
-: ch>lower ( ch -- lower ) simple-lower ?at drop ; inline
-: ch>upper ( ch -- upper ) simple-upper ?at drop ; inline
-: ch>title ( ch -- title ) simple-title ?at drop ; inline
-: special-case ( ch -- casing-tuple ) special-casing at ; inline
+: name>char ( name -- char ) name-map get-global at ; inline
+: char>name ( char -- name ) name-map get-global value-at ; inline
+: property? ( char property -- ? ) properties get-global at interval-key? ; inline
+: ch>lower ( ch -- lower ) simple-lower get-global ?at drop ; inline
+: ch>upper ( ch -- upper ) simple-upper get-global ?at drop ; inline
+: ch>title ( ch -- title ) simple-title get-global ?at drop ; inline
+: special-case ( ch -- casing-tuple ) special-casing get-global at ; inline
 
 ! For non-existent characters, use Cn
 CONSTANT: categories
@@ -67,7 +67,7 @@ PRIVATE>
     ! that this gives Cf or Mn
     ! Cf = 26; Mn = 5; Cn = 29
     ! Use a compressed array instead?
-    dup category-map ?nth [ ] [
+    dup category-map get-global ?nth [ ] [
         dup 0xE0001 0xE007F between?
         [ drop 26 ] [
             0xE0100 0xE01EF between?  5 29 ?
@@ -143,7 +143,7 @@ PRIVATE>
     2dup bounds-check? [ set-nth ] [ 3drop ] if ;
 
 :: fill-ranges ( table -- table )
-    name-map sort-values keys
+    name-map get-global sort-values keys
     [ { [ "first>" tail? ] [ "last>" tail? ] } 1|| ] filter
     2 group [
         [ name>char ] bi@ [ [a,b] ] [ table ?nth ] bi
@@ -200,26 +200,26 @@ C: <code-point> code-point
     [ [ set-code-point ] each ] H{ } make-assoc ;
 
 load-data {
-    [ process-names \ name-map set-value ]
-    [ 13 swap process-data \ simple-lower set-value ]
-    [ 12 swap process-data \ simple-upper set-value ]
-    [ 14 swap process-data simple-upper assoc-union \ simple-title set-value ]
-    [ process-combining \ class-map set-value ]
-    [ process-canonical \ canonical-map set-value \ combine-map set-value ]
-    [ process-compatibility \ compatibility-map set-value ]
-    [ process-category \ category-map set-value ]
+    [ process-names name-map set-global ]
+    [ 13 swap process-data simple-lower set-global ]
+    [ 12 swap process-data simple-upper set-global ]
+    [ 14 swap process-data simple-upper get-global assoc-union simple-title set-global ]
+    [ process-combining class-map set-global ]
+    [ process-canonical canonical-map set-global combine-map set-global ]
+    [ process-compatibility compatibility-map set-global ]
+    [ process-category category-map set-global ]
 } cleave
 
 : postprocess-class ( -- )
-    combine-map keys [ 2ch> nip ] map
+    combine-map get-global keys [ 2ch> nip ] map
     [ combining-class not ] filter
-    [ 0 swap class-map set-at ] each ;
+    [ 0 swap class-map get-global set-at ] each ;
 
 postprocess-class
 
-load-special-casing \ special-casing set-value
+load-special-casing special-casing set-global
 
-load-properties \ properties set-value
+load-properties properties set-global
 
 [ name>char [ "Invalid character" throw ] unless* ]
 name>char-hook set-global

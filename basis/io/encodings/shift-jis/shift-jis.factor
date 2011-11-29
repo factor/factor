@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel io io.files combinators.short-circuit
-math.order values assocs io.encodings io.binary fry strings math
+math.order assocs io.encodings io.binary fry strings math
 io.encodings.ascii arrays byte-arrays accessors splitting
-math.parser biassocs io.encodings.iana
+math.parser biassocs io.encodings.iana namespaces
 locals multiline combinators simple-flat-file ;
 IN: io.encodings.shift-jis
 
@@ -17,15 +17,15 @@ windows-31j "Windows-31J" register-encoding
 
 <PRIVATE
 
-VALUE: shift-jis-table
+SYMBOL: shift-jis-table
 
-M: shift-jis <encoder> drop shift-jis-table <encoder> ;
-M: shift-jis <decoder> drop shift-jis-table <decoder> ;
+M: shift-jis <encoder> drop shift-jis-table get-global <encoder> ;
+M: shift-jis <decoder> drop shift-jis-table get-global <decoder> ;
 
-VALUE: windows-31j-table
+SYMBOL: windows-31j-table
 
-M: windows-31j <encoder> drop windows-31j-table <encoder> ;
-M: windows-31j <decoder> drop windows-31j-table <decoder> ;
+M: windows-31j <encoder> drop windows-31j-table get-global <encoder> ;
+M: windows-31j <decoder> drop windows-31j-table get-global <decoder> ;
 
 TUPLE: jis assoc ;
 
@@ -36,10 +36,10 @@ TUPLE: jis assoc ;
     flat-file>biassoc [ nip ] assoc-filter jis boa ;
 
 "vocab:io/encodings/shift-jis/CP932.txt"
-make-jis \ windows-31j-table set-value
+make-jis windows-31j-table set-global
 
 "vocab:io/encodings/shift-jis/sjis-0208-1997-std.txt"
-make-jis \ shift-jis-table set-value
+make-jis shift-jis-table set-global
 
 : small? ( char -- ? )
     ! ASCII range or single-byte halfwidth katakana
