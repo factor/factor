@@ -243,7 +243,7 @@ FILE* factor_vm::open_image(vm_parameters *p)
 			std::cout << "No embedded image" << std::endl;
 			exit(1);
 		}
-		safe_fseek(file, footer.image_offset, SEEK_SET);
+		safe_fseek(file, (off_t)footer.image_offset, SEEK_SET);
 		return file;
 	}
 	else
