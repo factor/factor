@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make kernel assocs sequences fry values
+USING: namespaces make kernel assocs sequences fry
 io.files io.encodings.binary xml.state ;
 IN: xml.entities
 
