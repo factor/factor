@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml xml.data kernel io io.encodings interval-maps splitting fry
 math.parser sequences combinators assocs locals accessors math arrays
-byte-arrays values ascii io.files biassocs math.order
+byte-arrays ascii io.files biassocs math.order namespaces
 combinators.short-circuit io.binary io.encodings.iana ;
 FROM: io.encodings.ascii => ascii ;
 IN: io.encodings.gb18030
@@ -78,23 +78,23 @@ TUPLE: range ufirst ulast bfirst blast ;
 : ranges-gb>u ( ranges -- interval-map )
     [ bfirst>> ] [ blast>> ] [ ] >interval-map-by ;
 
-VALUE: gb>u
-VALUE: u>gb
-VALUE: mapping
+SYMBOL: gb>u
+SYMBOL: u>gb
+SYMBOL: mapping
 
 "vocab:io/encodings/gb18030/gb-18030-2000.xml"
 ascii <file-reader> xml>gb-data
-[ ranges-u>gb \ u>gb set-value ] [ ranges-gb>u \ gb>u set-value ] bi
->biassoc \ mapping set-value
+[ ranges-u>gb u>gb set-global ] [ ranges-gb>u gb>u set-global ] bi
+>biassoc mapping set-global
 
 : lookup-range ( char -- byte-array )
-    dup u>gb interval-at [
+    dup u>gb get-global interval-at [
         [ ufirst>> - ] [ bfirst>> ] bi + unlinear
     ] [ encode-error ] if* ;
 
 M: gb18030 encode-char ( char stream encoding -- )
     drop [
-        dup mapping at
+        dup mapping get-global at
         [ ] [ lookup-range ] ?if
     ] dip stream-write ;
 
@@ -109,8 +109,8 @@ M: gb18030 encode-char ( char stream encoding -- )
     { [ length 2 = ] [ first quad-1/3? ] [ second quad-2/4? ] } 1&& ;
 
 : decode-quad ( byte-array -- char )
-    dup mapping value-at [ ] [
-        linear dup gb>u interval-at [
+    dup mapping get-global value-at [ ] [
+        linear dup gb>u get-global interval-at [
             [ bfirst>> - ] [ ufirst>> ] bi +
         ] [ drop replacement-char ] if*
     ] ?if ;
@@ -123,7 +123,7 @@ M: gb18030 encode-char ( char stream encoding -- )
 : two-byte ( stream byte -- char )
     over stream-read1 {
         { [ dup not ] [ 3drop replacement-char ] }
-        { [ dup second-byte? ] [ 2byte-array mapping value-at nip ] }
+        { [ dup second-byte? ] [ 2byte-array mapping get-global value-at nip ] }
         { [ dup quad-2/4? ] [ four-byte ] }
         [ 3drop replacement-char ]
     } cond ;
@@ -131,7 +131,7 @@ M: gb18030 encode-char ( char stream encoding -- )
 M: gb18030 decode-char ( stream encoding -- char )
     drop dup stream-read1 {
         { [ dup not ] [ 2drop f ] }
-        { [ dup ascii? ] [ nip 1byte-array mapping value-at ] }
+        { [ dup ascii? ] [ nip 1byte-array mapping get-global value-at ] }
         { [ dup quad-1/3? ] [ two-byte ] }
         [ 2drop replacement-char ]
     } cond ;

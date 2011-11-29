@@ -3,7 +3,7 @@
 USING: accessors assocs fry io kernel math prettyprint
 quotations sequences sequences.deep splitting strings
 tools.annotations vocabs words arrays words.symbol
-combinators.short-circuit values tools.test
+combinators.short-circuit namespaces tools.test
 combinators continuations classes ;
 IN: tools.coverage
 
@@ -11,14 +11,14 @@ TUPLE: coverage < identity-tuple executed? ;
 
 C: <coverage> coverage
 
-VALUE: covered
+SYMBOL: covered
 
 : flag-covered ( coverage -- )
-    covered [ t >>executed? ] when drop ;
+    covered get-global [ t >>executed? ] when drop ;
 
-: coverage-on ( -- ) t \ covered set-value ;
+: coverage-on ( -- ) t covered set-global ;
 
-: coverage-off ( -- ) f \ covered set-value ;
+: coverage-off ( -- ) f covered set-global ;
 
 GENERIC: add-coverage ( object -- )
 
