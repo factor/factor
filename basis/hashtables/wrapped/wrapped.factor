@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs fry hashtables kernel parser
-sequences vocabs.loader ;
+USING: accessors arrays assocs hashtables kernel sequences
+vocabs.loader ;
 
 IN: hashtables.wrapped
 

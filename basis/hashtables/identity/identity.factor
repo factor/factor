@@ -1,6 +1,6 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors arrays assocs hashtables hashtables.wrapped
-kernel parser sequences vocabs.loader ;
+USING: accessors assocs hashtables hashtables.wrapped kernel
+parser vocabs.loader ;
 IN: hashtables.identity
 
 TUPLE: identity-wrapper < wrapped-key ;
