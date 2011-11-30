@@ -20,7 +20,7 @@ struct code_heap {
 	/* Memory allocator */
 	free_list_allocator<code_block> *allocator;
 
-	std::set<code_block *> all_blocks;
+	std::set<cell> all_blocks;
 
 	/* Keys are blocks which need to be initialized by initialize_code_block().
 	Values are literal tables. Literal table arrays are GC roots until the
