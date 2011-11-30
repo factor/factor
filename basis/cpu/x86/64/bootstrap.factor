@@ -97,6 +97,8 @@ IN: bootstrap.x86
 :: jit-signal-handler-prolog ( -- frame-size )
     signal-handler-save-regs :> save-regs
     save-regs length 1 + bootstrap-cells 16 align stack-frame-size + :> frame-size
+    frame-size signal-handler-stack-frame-size =
+    [ "unexpected signal handler frame size" throw ] unless
     ! minus a cell each for flags, return address
     ! use LEA so we don't dirty flags
     RSP RSP frame-size 2 bootstrap-cells - neg [+] LEA

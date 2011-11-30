@@ -10,6 +10,7 @@ IN: bootstrap.x86
 4 \ cell set
 
 : leaf-stack-frame-size ( -- n ) 4 bootstrap-cells ;
+: signal-handler-stack-frame-size ( -- n ) 12 bootstrap-cells ;
 : stack-frame-size ( -- n ) 8 bootstrap-cells ;
 : shift-arg ( -- reg ) ECX ;
 : div-arg ( -- reg ) EAX ;
@@ -104,7 +105,7 @@ IN: bootstrap.x86
 ! peform their own prolog/epilog preserving registers.
 
 :: jit-signal-handler-prolog ( -- frame-size )
-    stack-frame-size 8 bootstrap-cells + :> frame-size
+    signal-handler-stack-frame-size :> frame-size
     ! minus a cell each for flags and return address
     ! use LEA so we don't dirty flags
     ESP ESP frame-size 2 bootstrap-cells - neg [+] LEA

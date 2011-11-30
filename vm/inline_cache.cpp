@@ -141,7 +141,7 @@ code_block *factor_vm::compile_inline_cache(fixnum index,
 				 methods.value(),
 				 cache_entries.value(),
 				 tail_call_p);
-	code_block *code = jit.to_code_block();
+	code_block *code = jit.to_code_block(JIT_FRAME_SIZE);
 	initialize_code_block(code);
 	return code;
 }
