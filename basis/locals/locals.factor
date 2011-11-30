@@ -21,6 +21,8 @@ SYNTAX: MACRO:: (::) define-macro ;
 
 SYNTAX: MEMO:: (::) define-memoized ;
 
+SYNTAX: IDENTITY-MEMO:: (::) define-identity-memoized ;
+
 {
     "locals.macros"
     "locals.fry"
