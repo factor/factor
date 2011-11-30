@@ -61,6 +61,19 @@ struct code_block
 			return (header >> 20) & 0xFF0;
 	}
 
+	cell stack_frame_size_for_address(cell addr) const
+	{
+		cell natural_frame_size = stack_frame_size();
+		/* The first instruction in a code block is the prolog safepoint,
+		and a leaf procedure code block will record a frame size of zero.
+		If we're seeing a stack frame in either of these cases, it's a
+		fake "leaf frame" set up by the signal handler. */
+		if (natural_frame_size == 0 || (void*)addr == entry_point())
+			return LEAF_FRAME_SIZE;
+		else
+			return natural_frame_size;
+	}
+
 	void set_stack_frame_size(cell frame_size)
 	{
 		FACTOR_ASSERT(size() < 0xFFFFFF);
