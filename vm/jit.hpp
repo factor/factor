@@ -68,7 +68,7 @@ struct jit {
 	}
 
 	
-	code_block *to_code_block();
+	code_block *to_code_block(cell frame_size);
 
 private:
 	jit(const jit&);

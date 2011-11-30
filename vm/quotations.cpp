@@ -319,7 +319,11 @@ code_block *factor_vm::jit_compile_quot(cell owner_, cell quot_, bool relocating
 	compiler.init_quotation(quot.value());
 	compiler.iterate_quotation();
 
-	code_block *compiled = compiler.to_code_block();
+	cell frame_size = compiler.special_subprimitive_p(owner_)
+		? SIGNAL_HANDLER_STACK_FRAME_SIZE
+		: JIT_FRAME_SIZE;
+
+	code_block *compiled = compiler.to_code_block(frame_size);
 
 	if(relocating) initialize_code_block(compiled);
 

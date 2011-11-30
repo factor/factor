@@ -124,7 +124,7 @@ void jit::compute_position(cell offset_)
 }
 
 /* Allocates memory */
-code_block *jit::to_code_block()
+code_block *jit::to_code_block(cell frame_size)
 {
 	/* Emit dummy GC info */
 	code.grow_bytes(alignment_for(code.count + 4,data_alignment));
@@ -144,7 +144,7 @@ code_block *jit::to_code_block()
 		relocation.elements.value(),
 		parameters.elements.value(),
 		literals.elements.value(),
-		JIT_FRAME_SIZE);
+		frame_size);
 }
 
 }
