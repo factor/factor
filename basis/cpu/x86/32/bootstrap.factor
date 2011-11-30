@@ -294,9 +294,9 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
-    ! Reset return value since its bogus right now, to avoid
-    ! confusing the GC
-    ESP -4 [+] 0 MOV
+    ! Push a bogus return address so the GC can track this frame back
+    ! to the owner
+    0 CALL
 
     ! Make the new context the current one
     ctx-reg swap MOV
