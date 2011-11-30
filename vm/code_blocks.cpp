@@ -440,7 +440,7 @@ code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell lab
 	method returns, except when compiling words with the non-optimizing
 	compiler at the beginning of bootstrap */
 	this->code->uninitialized_blocks.insert(std::make_pair(compiled,literals.value()));
-	this->code->all_blocks.insert(compiled);
+	this->code->all_blocks.insert((cell)compiled);
 
 	/* next time we do a minor GC, we have to trace this code block, since
 	the fields of the code_block struct might point into nursery or aging */
