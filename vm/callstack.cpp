@@ -96,19 +96,14 @@ cell factor_vm::frame_offset(stack_frame *frame)
 {
 	char *entry_point = (char *)frame_code(frame)->entry_point();
 	char *return_address = (char *)FRAME_RETURN_ADDRESS(frame,this);
-	if(return_address)
-		return return_address - entry_point;
-	else
-		return (cell)-1;
+	FACTOR_ASSERT(return_address != 0);
+	return return_address - entry_point;
 }
 
 void factor_vm::set_frame_offset(stack_frame *frame, cell offset)
 {
 	char *entry_point = (char *)frame_code(frame)->entry_point();
-	if(offset == (cell)-1)
-		FRAME_RETURN_ADDRESS(frame,this) = NULL;
-	else
-		FRAME_RETURN_ADDRESS(frame,this) = entry_point + offset;
+	FRAME_RETURN_ADDRESS(frame,this) = entry_point + offset;
 }
 
 cell factor_vm::frame_scan(stack_frame *frame)
