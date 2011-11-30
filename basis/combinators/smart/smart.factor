@@ -3,7 +3,7 @@
 USING: accessors arrays effects fry generalizations kernel
 macros math math.order sequences sequences.generalizations
 stack-checker stack-checker.backend stack-checker.errors
-stack-checker.values stack-checker.visitor words ;
+stack-checker.values stack-checker.visitor words memoize ;
 IN: combinators.smart
 
 GENERIC: infer-known* ( known -- effect )
@@ -13,7 +13,7 @@ GENERIC: infer-known* ( known -- effect )
         (literal) [ infer-literal-quot ] with-infer drop
     ] [ infer-known* ] if ;
 
-: inputs/outputs ( quot -- in out )
+IDENTITY-MEMO: inputs/outputs ( quot -- in out )
     infer [ in>> ] [ out>> ] bi [ length ] bi@ ;
 
 : inputs ( quot -- n ) inputs/outputs drop ; inline
