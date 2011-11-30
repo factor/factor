@@ -63,7 +63,7 @@ void code_heap::free(code_block *compiled)
 	FACTOR_ASSERT(!uninitialized_p(compiled));
 	points_to_nursery.erase(compiled);
 	points_to_aging.erase(compiled);
-	all_blocks.erase(compiled);
+	all_blocks.erase((cell)compiled);
 	allocator->free(compiled);
 }
 
@@ -98,14 +98,13 @@ void code_heap::sweep()
 }
 
 struct all_blocks_set_verifier {
-	std::set<code_block*> *all_blocks;
+	std::set<cell> *all_blocks;
 
-	all_blocks_set_verifier(std::set<code_block*> *all_blocks) : all_blocks(all_blocks) {}
+	all_blocks_set_verifier(std::set<cell> *all_blocks) : all_blocks(all_blocks) {}
 
 	void operator()(code_block *block, cell size)
 	{
-		FACTOR_ASSERT(all_blocks->find(block) != all_blocks->end());
-		all_blocks->erase(block);
+		FACTOR_ASSERT(all_blocks->find((cell)block) != all_blocks->end());
 	}
 };
 
@@ -117,11 +116,11 @@ void code_heap::verify_all_blocks_set()
 
 code_block *code_heap::code_block_for_address(cell address)
 {
-	std::set<code_block*>::const_iterator blocki =
+	std::set<cell>::const_iterator blocki =
 		all_blocks.upper_bound((code_block*)address);
 	FACTOR_ASSERT(blocki != all_blocks.begin());
 	--blocki;
-	code_block* found_block = *blocki;
+	code_block* found_block = (code_block*)*blocki;
 #ifdef FACTOR_DEBUG
 	if (!((cell)found_block->entry_point() <= address
 		&& address - (cell)found_block->entry_point() < found_block->size()))
@@ -146,7 +145,7 @@ struct all_blocks_set_inserter {
 
 	void operator()(code_block *block, cell size)
 	{
-		code->all_blocks.insert(block);
+		code->all_blocks.insert((cell)block);
 	}
 };
 
