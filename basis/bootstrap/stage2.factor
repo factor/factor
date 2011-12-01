@@ -1,11 +1,9 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors init namespaces words words.symbol io
-kernel.private math memory continuations kernel io.files
-io.pathnames io.backend system parser vocabs sequences
-vocabs.loader combinators splitting source-files strings
-definitions assocs compiler.units math.parser
-generic sets command-line parser.notes ;
+USING: command-line compiler.units continuations definitions io
+io.pathnames kernel math math.parser memory namespaces parser
+parser.notes sequences sets splitting system
+vocabs vocabs.loader ;
 IN: bootstrap.stage2
 
 SYMBOL: core-bootstrap-time

@@ -1,10 +1,10 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.strings assocs continuations fry
-hashtables init io io.encodings.utf8 io.files io.pathnames
-kernel kernel.private namespaces parser parser.notes sequences
-source-files source-files.errors splitting strings system
-tools.errors vocabs.loader ;
+USING: accessors alien.strings assocs continuations fry init
+io.encodings.utf8 io.files io.pathnames kernel kernel.private
+namespaces parser parser.notes sequences source-files
+source-files.errors splitting system tools.errors
+vocabs.loader ;
 IN: command-line
 
 SYMBOL: user-init-errors

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators effects effects.parser
-generic kernel namespaces parser quotations sequences words ;
+USING: accessors arrays combinators effects.parser generic
+kernel namespaces parser quotations sequences words ;
 IN: generic.parser
 
 ERROR: not-in-a-method-error ;

@@ -1,7 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math make strings arrays vectors sequences
-sets math.order accessors ;
+USING: arrays kernel make math sequences sets strings ;
 IN: splitting
 
 <PRIVATE

@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors byte-arrays combinators kernel kernel.private
-math namespaces sequences sequences.private splitting strings
-make ;
+make math namespaces sequences sequences.private splitting
+strings ;
 IN: math.parser
 
 : digit> ( ch -- n )

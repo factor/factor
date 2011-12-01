@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences namespaces assocs math accessors ;
+USING: accessors assocs kernel namespaces sequences ;
 IN: definitions
 
 MIXIN: definition
