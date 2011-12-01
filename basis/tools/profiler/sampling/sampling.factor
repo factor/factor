@@ -1,5 +1,5 @@
 ! (c)2011 Joe Groff bsd license
-USING: accessors assocs calendar combinators
+USING: accessors assocs combinators
 combinators.short-circuit continuations fry generalizations
 hashtables.identity io kernel kernel.private layouts locals
 math math.parser math.parser.private math.statistics
@@ -41,8 +41,8 @@ PRIVATE>
 : unclip-callstack ( sample -- sample' callstack-top )
     clone 6 over [ unclip swap ] change-nth ;
 
-: samples>time ( samples -- time )
-    samples-per-second get-global / seconds ;
+: samples>time ( samples -- seconds )
+    samples-per-second get-global / ;
 
 : total-time* ( profile-data -- n )
     [ total-sample-count ] map-sum samples>time ;
@@ -196,10 +196,10 @@ PRIVATE>
     >alist [ second total-time>> ] inv-sort-with ;
 
 : duration. ( duration -- )
-    duration>milliseconds >float "%9.1f" format-float write ;
+    1000 * >float "%9.1f" format-float write ;
 
 : percentage. ( num denom -- )
-    [ duration>seconds ] bi@ [ 100 * ] dip /f "%6.2f" format-float write ;
+    [ 100 * ] dip /f "%6.2f" format-float write ;
 
 DEFER: (profile.)
 
