@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel kernel.private slots.private math
-math.private math.order ;
+USING: accessors kernel kernel.private math math.order
+math.private slots.private ;
 IN: sequences
 
 MIXIN: sequence

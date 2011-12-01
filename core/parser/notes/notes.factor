@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces kernel source-files lexer accessors io math.parser ;
+USING: accessors io kernel lexer math.parser namespaces
+source-files ;
 IN: parser.notes
 
 SYMBOL: parser-quiet?

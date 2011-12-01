@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel math namespaces sequences system
-kernel.private byte-arrays byte-vectors arrays init
-continuations.private ;
+USING: accessors byte-arrays byte-vectors continuations.private
+init kernel kernel.private math namespaces sequences ;
 IN: alien
 
 PREDICATE: pinned-alien < alien underlying>> not ;

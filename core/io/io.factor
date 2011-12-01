@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien byte-arrays combinators continuations destructors
-kernel math namespaces sequences sequences.private kernel.private ;
+USING: combinators destructors kernel kernel.private math
+namespaces sequences sequences.private ;
 IN: io
 
 SYMBOLS: +byte+ +character+ ;

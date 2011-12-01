@@ -1,7 +1,6 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel kernel.private math math.private
-sequences sequences.private ;
+USING: accessors kernel math sequences sequences.private ;
 IN: arrays
 
 M: array clone (clone) ; inline

@@ -1,9 +1,8 @@
 ! Copyright (C) 2007, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make sequences io io.files io.pathnames kernel
-assocs words vocabs definitions parser continuations hashtables
-sorting source-files arrays combinators strings system
-math.parser splitting init accessors sets ;
+USING: accessors arrays assocs continuations definitions init
+io io.files io.pathnames kernel make namespaces parser
+sequences sets splitting strings vocabs words ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
