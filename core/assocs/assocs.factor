@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences arrays math sequences.private vectors
-accessors ;
+USING: accessors arrays kernel math sequences sequences.private
+vectors ;
 IN: assocs
 
 MIXIN: assoc

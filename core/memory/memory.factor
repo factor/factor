@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings io.backend io.pathnames kernel
-memory.private sequences system ;
+USING: alien.strings io.backend kernel memory.private sequences
+system ;
 IN: memory
 
 : instances ( quot -- seq )

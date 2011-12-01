@@ -1,11 +1,10 @@
 ! (c)2011 Joe Groff bsd license
 USING: accessors assocs calendar combinators
 combinators.short-circuit continuations fry generalizations
-hashtables.identity io kernel kernel.private locals math
-math.statistics math.vectors memory namespaces prettyprint
-sequences sequences.generalizations sets sorting
-tools.profiler.sampling.private math.parser.private
-math.parser layouts ;
+hashtables.identity io kernel kernel.private layouts locals
+math math.parser math.parser.private math.statistics
+math.vectors memory namespaces prettyprint sequences
+sequences.generalizations sets sorting ;
 FROM: sequences => change-nth ;
 FROM: assocs => change-at ;
 IN: tools.profiler.sampling

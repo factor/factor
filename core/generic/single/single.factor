@@ -1,10 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
-combinators definitions generic hashtables kernel
-kernel.private layouts math namespaces quotations
-sequences words generic.single.private effects make
-combinators.private ;
+combinators combinators.private definitions effects generic
+hashtables kernel layouts make math namespaces quotations
+sequences words ;
 FROM: assocs => change-at ;
 IN: generic.single
 

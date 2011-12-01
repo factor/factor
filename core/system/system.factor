@@ -1,7 +1,6 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private sequences math namespaces
-init splitting assocs system.private layouts words ;
+USING: assocs init kernel.private namespaces ;
 IN: system
 
 SINGLETONS: x86.32 x86.64 arm ppc.32 ppc.64 ;

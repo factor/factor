@@ -1,7 +1,6 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs hashtables kernel vectors
-math sequences ;
+USING: assocs hashtables kernel math sequences vectors ;
 FROM: assocs => change-at ;
 IN: sets
 
