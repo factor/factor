@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.syntax arrays
-calendar kernel math unix unix.time unix.types namespaces system
-accessors classes.struct ;
+USING: accessors alien.data calendar classes.struct kernel math
+system unix unix.time unix.types ;
 IN: calendar.unix
 
 : timeval>duration ( timeval -- duration )
