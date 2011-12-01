@@ -72,7 +72,7 @@ M: memoized reset-word
     bi ;
 
 : memoize-quot ( quot effect -- memo-quot )
-    [ IH{ } clone ] 2dip make-memoizer ;
+    [ H{ } clone ] 2dip make-memoizer ;
 
 : reset-memoized ( word -- )
     "memoize" word-prop clear-assoc ;
