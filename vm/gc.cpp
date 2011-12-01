@@ -257,6 +257,7 @@ void factor_vm::scrub_context(context *ctx)
 {
 	call_frame_scrubber scrubber(this,ctx);
 	iterate_callstack(ctx,scrubber);
+	verify_callstack(ctx);
 }
 
 void factor_vm::scrub_contexts()
