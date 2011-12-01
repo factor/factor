@@ -27,6 +27,8 @@ IDENTITY-MEMO: inputs/outputs ( quot -- in out )
         [ [ in>> ] [ out>> ] bi [ length apply-object ] bi@ ] bi*
     ] [
         \ inputs/outputs dup required-stack-effect apply-word/effect
+        pop-d pop-d swap
+        [ [ input-parameter swap set-known ] [ push-d ] bi ] bi@
     ] if*
 ] "special" set-word-prop
 
