@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs continuations debugger generic hashtables
 init io io.files kernel kernel.private make math memory
-namespaces parser prettyprint sequences splitting system
-vectors vocabs vocabs.loader words destructors ;
+namespaces parser parser.notes prettyprint sequences splitting
+system vectors vocabs vocabs.loader words destructors ;
 QUALIFIED: bootstrap.image.private
 IN: bootstrap.stage1
 
@@ -35,6 +35,8 @@ load-help? off
     "bootstrap.layouts" require
 
     [
+        f parser-quiet? set-global
+
         "resource:basis/bootstrap/stage2.factor"
         dup exists? [
             run-file
