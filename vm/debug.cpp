@@ -247,6 +247,7 @@ void factor_vm::print_callstack()
 	if (ctx)
 	{
 		stack_frame_printer printer(this);
+		verify_callstack(ctx);
 		iterate_callstack(ctx,printer);
 	}
 	else
