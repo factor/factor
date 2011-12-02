@@ -108,25 +108,7 @@ void factor_vm::set_frame_offset(stack_frame *frame, cell offset)
 
 cell factor_vm::frame_scan(stack_frame *frame)
 {
-	switch(frame_type(frame))
-	{
-	case code_block_unoptimized:
-		{
-			tagged<object> obj(frame_executing(frame));
-			if(obj.type_p(WORD_TYPE))
-				obj = obj.as<word>()->def;
-
-			if(obj.type_p(QUOTATION_TYPE))
-				return tag_fixnum(quot_code_offset_to_scan(obj.value(),frame_offset(frame)));
-			else
-				return false_object;
-		}
-	case code_block_optimized:
-		return false_object;
-	default:
-		critical_error("Bad frame type",frame_type(frame));
-		return false_object;
-	}
+	return frame_code(frame)->scan(this, FRAME_RETURN_ADDRESS(frame,this));
 }
 
 struct stack_frame_accumulator {

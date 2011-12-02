@@ -8,6 +8,34 @@ inline static cell callstack_object_size(cell size)
 
 /* This is a little tricky. The iterator may allocate memory, so we
 keep the callstack in a GC root and use relative offsets */
+template<typename Iterator>
+void factor_vm::iterate_callstack_object_reversed(callstack *stack_, Iterator &iterator)
+{
+	data_root<callstack> stack(stack_,this);
+	fixnum frame_length = factor::untag_fixnum(stack->length);
+	fixnum frame_offset = 0;
+
+	while(frame_offset < frame_length)
+	{
+		void *frame_top = stack->frame_top_at(frame_offset);
+		void *addr = frame_return_address(frame_top);
+
+		code_block *owner = code->code_block_for_address(addr);
+		cell frame_size = owner->stack_frame_size_for_address(addr);
+
+#ifdef FACTOR_DEBUG
+		// check our derived owner and frame size against the ones stored in the frame
+		// by the function prolog
+		stack_frame *frame = (stack_frame*)((char*)frame_top + frame_size) - 1;
+		FACTOR_ASSERT(owner->entry_point() == frame->entry_point);
+		FACTOR_ASSERT(frame_size == frame->size);
+#endif
+
+		iterator(owner, addr);
+		frame_offset += frame_size;
+	}
+}
+
 template<typename Iterator> void factor_vm::iterate_callstack_object(callstack *stack_, Iterator &iterator)
 {
 	data_root<callstack> stack(stack_,this);
@@ -21,56 +49,37 @@ template<typename Iterator> void factor_vm::iterate_callstack_object(callstack *
 	}
 }
 
-inline void factor_vm::verify_callstack(context *ctx, cell pc)
+template<typename Iterator>
+void factor_vm::iterate_callstack_reversed(context *ctx, Iterator &iterator)
 {
-	if (pc == 0)
-	{
-		std::cout << "null return address" << std::endl;
+	if (ctx->callstack_top == ctx->callstack_bottom)
 		return;
-	}
 
-	unsigned char *frame_top = (unsigned char*)ctx->callstack_top;
-	cell addr = pc;
+	char *frame_top = (char*)ctx->callstack_top;
 
-	while(frame_top < (unsigned char*)ctx->callstack_bottom)
+	while (frame_top < (char*)ctx->callstack_bottom)
 	{
-		std::cout << std::endl;
-		std::cout << "address " << (void*)addr << std::endl;
-		code_block *owner = code->code_block_for_address(addr);
-		std::cout << "owner " << (void*)owner->entry_point() << " ";
-		print_obj(owner->owner);
-		std::cout << std::endl;
-		cell frame_size = owner->stack_frame_size_for_address(addr);
-		std::cout << "frame size " << (void*)frame_size << std::endl;
+		void *addr = frame_return_address((void*)frame_top);
+		FACTOR_ASSERT(addr != 0);
+
+		code_block *owner = code->code_block_for_address((cell)addr);
+		cell frame_size = owner->stack_frame_size_for_address((cell)addr);
+
+#ifdef FACTOR_DEBUG
+		// check our derived owner and frame size against the ones stored in the frame
+		// by the function prolog
+		stack_frame *frame = (stack_frame*)(frame_top + frame_size) - 1;
+		FACTOR_ASSERT(owner->entry_point() == frame->entry_point);
+		FACTOR_ASSERT(frame_size == frame->size);
+#endif
+
 		frame_top += frame_size;
-		stack_frame *frame = (stack_frame*)frame_top - 1;
-		if (owner->entry_point() != frame->entry_point)
-		{
-			std::cout << "unexpected frame owner " << (void*)frame->entry_point << " ";
-			print_obj(((code_block*)frame->entry_point - 1)->owner);
-			std::cout << std::endl;
-		}
-		if (frame_size != frame->size)
-			std::cout << "unexpected frame size " << frame->size << std::endl;
-		// XXX x86
-		addr = *(cell*)frame_top;
+		iterator(owner, addr);
 	}
 }
 
-inline void factor_vm::verify_callstack(context *ctx)
-{
-	/*
-	std::cout << std::endl << std::endl
-		<< "callstack " << (void*)ctx->callstack_top
-		<< " to " << (void*)ctx->callstack_bottom << std::endl;
-
-	// XXX x86-centric
-	cell return_address = *((cell*)ctx->callstack_top);
-	verify_callstack(ctx, return_address);
-	*/
-}
-
-template<typename Iterator> void factor_vm::iterate_callstack(context *ctx, Iterator &iterator)
+template<typename Iterator>
+void factor_vm::iterate_callstack(context *ctx, Iterator &iterator)
 {
 	stack_frame *frame = ctx->callstack_bottom - 1;
 

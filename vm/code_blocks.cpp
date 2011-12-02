@@ -3,6 +3,29 @@
 namespace factor
 {
 
+cell code_block::scan(factor_vm *vm, void *addr) const
+{
+	switch(type())
+	{
+	case code_block_unoptimized:
+		{
+			tagged<object> obj(owner);
+			if(obj.type_p(WORD_TYPE))
+				obj = obj.as<word>()->def;
+
+			if(obj.type_p(QUOTATION_TYPE))
+				return tag_fixnum(vm->quot_code_offset_to_scan(obj.value(),offset(addr)));
+			else
+				return false_object;
+		}
+	case code_block_optimized:
+		return false_object;
+	default:
+		critical_error("Bad frame type",type());
+		return false_object;
+	}
+}
+
 cell factor_vm::compute_entry_point_address(cell obj)
 {
 	switch(tagged<object>(obj).type())

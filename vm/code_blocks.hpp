@@ -121,6 +121,13 @@ struct code_block
 			}
 		}
 	}
+
+	cell offset(void *addr) const
+	{
+		return (char*)addr - (char*)entry_point();
+	}
+
+	cell scan(factor_vm *vm, void *addr) const;
 };
 
 VM_C_API void undefined_symbol(void);
