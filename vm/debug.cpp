@@ -220,23 +220,23 @@ struct stack_frame_printer {
 	factor_vm *parent;
 
 	explicit stack_frame_printer(factor_vm *parent_) : parent(parent_) {}
-	void operator()(stack_frame *frame)
+	void operator()(code_block *owner, void *addr)
 	{
-		std::cout << "frame: " << std::hex << (cell)frame << std::dec << std::endl;
+		std::cout << std::endl;
 		std::cout << "executing: ";
-		parent->print_obj(parent->frame_executing(frame));
+		parent->print_obj(owner->owner);
 		std::cout << std::endl;
 		std::cout << "scan: ";
-		parent->print_obj(parent->frame_scan(frame));
+		parent->print_obj(owner->scan(parent, addr));
 		std::cout << std::endl;
 		std::cout << "word/quot addr: ";
-		std::cout << std::hex << (cell)parent->frame_executing(frame) << std::dec;
+		std::cout << std::hex << (cell)owner->owner << std::dec;
 		std::cout << std::endl;
 		std::cout << "word/quot xt: ";
-		std::cout << std::hex << (cell)frame->entry_point << std::dec;
+		std::cout << std::hex << (cell)owner->entry_point() << std::dec;
 		std::cout << std::endl;
 		std::cout << "return address: ";
-		std::cout << std::hex << (cell)FRAME_RETURN_ADDRESS(frame,parent) << std::dec;
+		std::cout << std::hex << (cell)addr << std::dec;
 		std::cout << std::endl;
 	}
 };
@@ -247,8 +247,7 @@ void factor_vm::print_callstack()
 	if (ctx)
 	{
 		stack_frame_printer printer(this);
-		verify_callstack(ctx);
-		iterate_callstack(ctx,printer);
+		iterate_callstack_reversed(ctx,printer);
 	}
 	else
 		std::cout << "*** Context not initialized" << std::endl;
