@@ -366,6 +366,11 @@ struct callstack : public object {
 		return (stack_frame *)((char *)(this + 1) + offset);
 	}
 
+	void *frame_top_at(cell offset) const
+	{
+		return (void *)((char *)(this + 1) + offset);
+	}
+
 	stack_frame *top() const { return (stack_frame *)(this + 1); }
 	stack_frame *bottom() const { return (stack_frame *)((cell)(this + 1) + untag_fixnum(length)); }
 };
