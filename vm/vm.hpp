@@ -184,7 +184,6 @@ struct factor_vm
 		std::set<context *>::const_iterator end = active_contexts.end();
 		while(begin != end)
 		{
-			verify_callstack(*begin);
 			iterate_callstack(*begin++,iter);
 		}
 	}
@@ -623,6 +622,7 @@ struct factor_vm
 
 	// callstack
 	template<typename Iterator> void iterate_callstack_object(callstack *stack_, Iterator &iterator);
+	template<typename Iterator> void iterate_callstack_object_reversed(callstack *stack_, Iterator &iterator);
 	void check_frame(stack_frame *frame);
 	callstack *allot_callstack(cell size);
 	stack_frame *second_from_top_stack_frame(context *ctx);
@@ -643,8 +643,7 @@ struct factor_vm
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
 	void primitive_callstack_bounds();
-	void verify_callstack(context *ctx);
-	void verify_callstack(context *ctx, cell pc);
+	template<typename Iterator> void iterate_callstack_reversed(context *ctx, Iterator &iterator);
 	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
 
 	// cpu-*
