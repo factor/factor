@@ -224,6 +224,8 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 	code_block_compaction_updater<compaction_fixup> code_block_updater(this,fixup,data_forwarder,code_forwarder);
 	code->allocator->compact(code_block_updater,fixup,&code_finger);
 
+	code->update_all_blocks_set(code_forwarding_map);
+
 	data_forwarder.visit_roots();
 	if(trace_contexts_p)
 	{
