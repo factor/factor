@@ -614,6 +614,8 @@ void factor_vm::factorbug()
 		}
 		else if(strcmp(cmd,"code") == 0)
 			dump_code_heap();
+		else if(strcmp(cmd,"compact-gc") == 0)
+			primitive_compact_gc();
 		else if(strcmp(cmd,"gc") == 0)
 			primitive_full_gc();
 		else if(strcmp(cmd,"compact-gc") == 0)
