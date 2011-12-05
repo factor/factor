@@ -300,32 +300,27 @@ struct call_frame_slot_visitor {
 		parent(parent_), visitor(visitor_) {}
 
 	/*
-	next  -> [entry_point]
-	         [size]
-	         [return address] -- x86 only, backend adds 1 to each spill location
-	         [spill area]
-	         ...
-	frame -> [entry_point]
-	         [size]
+	frame top -> [return address]
+	             [spill area]
+	             ...
+	             [entry_point]
+	             [size]
 	*/
-	void operator()(stack_frame *frame)
+	void operator()(void *frame_top, code_block *owner, void *addr)
 	{
-		cell return_address = parent->frame_offset(frame);
-		if(return_address == (cell)-1)
-			return;
+		cell return_address = owner->offset(addr);
 
-		code_block *compiled = visitor->fixup.translate_code(parent->frame_code(frame));
-		gc_info *info = compiled->block_gc_info();
+		gc_info *info = owner->block_gc_info();
 
-		FACTOR_ASSERT(return_address < compiled->size());
+		FACTOR_ASSERT(return_address < owner->size());
 		cell callsite = info->return_address_index(return_address);
 		if(callsite == (cell)-1)
 			return;
 
 #ifdef DEBUG_GC_MAPS
-		std::cout << "call frame code block " << compiled << " with offset " << return_address << std::endl;
+		std::cout << "call frame code block " << owner << " with offset " << return_address << std::endl;
 #endif
-		cell *stack_pointer = (cell *)(parent->frame_successor(frame) + 1);
+		cell *stack_pointer = (cell *)frame_top;
 		u8 *bitmap = info->gc_info_bitmap();
 
 		/* Subtract old value of base pointer from every derived pointer. */
@@ -371,14 +366,14 @@ template<typename Fixup>
 void slot_visitor<Fixup>::visit_callstack_object(callstack *stack)
 {
 	call_frame_slot_visitor<Fixup> call_frame_visitor(parent,this);
-	parent->iterate_callstack_object(stack,call_frame_visitor);
+	parent->iterate_callstack_object_reversed(stack,call_frame_visitor,fixup);
 }
 
 template<typename Fixup>
 void slot_visitor<Fixup>::visit_callstack(context *ctx)
 {
 	call_frame_slot_visitor<Fixup> call_frame_visitor(parent,this);
-	parent->iterate_callstack(ctx,call_frame_visitor);
+	parent->iterate_callstack_reversed(ctx,call_frame_visitor);
 }
 
 template<typename Fixup>
