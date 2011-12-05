@@ -3,7 +3,7 @@
 USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
 math.bitwise math.order classes generalizations
-combinators.smart locals make alien.c-types io.binary grouping
+locals make alien.c-types io.binary grouping
 math.vectors.simd.intrinsics
 compiler.cfg
 compiler.cfg.registers
@@ -84,8 +84,8 @@ M: ##gather-int-vector-2 rewrite rewrite-gather-vector-2 ;
     insn dst>>
     [
         src1 src2 src3 src4
-        [ insn rep>> scalar-value ] 4 napply
-    ] B{ } append-outputs-as
+        [ insn rep>> scalar-value % ] 4 napply
+    ] B{ } make
     ##load-reference new-insn ;
 
 : rewrite-gather-vector-4 ( insn -- insn/f )
