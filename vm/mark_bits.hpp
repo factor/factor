@@ -130,12 +130,13 @@ template<typename Block> struct mark_bits {
 		//FACTOR_ASSERT(marked_p(original));
 #endif
 		std::pair<cell,cell> position = bitmap_deref(original);
+		cell offset = (cell)original & (data_alignment - 1);
 
 		cell approx_popcount = forwarding[position.first];
 		cell mask = ((cell)1 << position.second) - 1;
 
 		cell new_line_number = approx_popcount + popcount(marked[position.first] & mask);
-		Block *new_block = line_block(new_line_number);
+		Block *new_block = (Block*)((char*)line_block(new_line_number) + offset);
 #ifdef FACTOR_DEBUG
 		FACTOR_ASSERT(new_block <= original);
 #endif
