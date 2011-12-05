@@ -42,12 +42,13 @@ struct call_frame_code_block_visitor {
 	explicit call_frame_code_block_visitor(factor_vm *parent_, Fixup fixup_) :
 		parent(parent_), fixup(fixup_) {}
 
-	void operator()(stack_frame *frame)
+	void operator()(void *frame_top, code_block *owner, void *addr)
 	{
-		cell offset = parent->frame_offset(frame);
-		code_block *compiled = fixup.fixup_code(parent->frame_code(frame));
-		frame->entry_point = compiled->entry_point();
-		parent->set_frame_offset(frame,offset);
+		set_frame_return_address(frame_top, addr);
+		// XXX remove this when prolog data is removed
+		cell frame_size = owner->stack_frame_size_for_address((cell)addr);
+		stack_frame *frame = (stack_frame*)((char*)frame_top + frame_size) - 1;
+		frame->entry_point = owner->entry_point();
 	}
 };
 
@@ -74,7 +75,7 @@ void code_block_visitor<Fixup>::visit_object_code_block(object *obj)
 		{
 			callstack *stack = (callstack *)obj;
 			call_frame_code_block_visitor<Fixup> call_frame_visitor(parent,fixup);
-			parent->iterate_callstack_object(stack,call_frame_visitor);
+			parent->iterate_callstack_object_reversed(stack,call_frame_visitor,fixup);
 			break;
 		}
 	}
@@ -110,7 +111,7 @@ template<typename Fixup>
 void code_block_visitor<Fixup>::visit_context_code_blocks()
 {
 	call_frame_code_block_visitor<Fixup> call_frame_visitor(parent,fixup);
-	parent->iterate_active_callstacks(call_frame_visitor);
+	parent->iterate_active_callstacks_reversed(call_frame_visitor,fixup);
 }
 
 template<typename Fixup>
