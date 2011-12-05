@@ -40,7 +40,8 @@ void factor_vm::iterate_callstack_object_reversed(callstack *stack_,
 	}
 }
 
-template<typename Iterator> void factor_vm::iterate_callstack_object(callstack *stack_, Iterator &iterator)
+template<typename Iterator> void factor_vm::iterate_callstack_object(callstack *stack_,
+	Iterator &iterator)
 {
 	data_root<callstack> stack(stack_,this);
 	fixnum frame_offset = factor::untag_fixnum(stack->length) - sizeof(stack_frame);
@@ -50,6 +51,39 @@ template<typename Iterator> void factor_vm::iterate_callstack_object(callstack *
 		stack_frame *frame = stack->frame_at(frame_offset);
 		frame_offset -= frame->size;
 		iterator(frame);
+	}
+}
+
+template<typename Iterator, typename Fixup>
+void factor_vm::iterate_callstack_reversed(context *ctx, Iterator &iterator, Fixup &fixup)
+{
+	if (ctx->callstack_top == ctx->callstack_bottom)
+		return;
+
+	char *frame_top = (char*)ctx->callstack_top;
+
+	while (frame_top < (char*)ctx->callstack_bottom)
+	{
+		void *addr = frame_return_address((void*)frame_top);
+		FACTOR_ASSERT(addr != 0);
+
+		void *fixed_addr = (void*)fixup.translate_code((code_block*)addr);
+
+		code_block *owner = code->code_block_for_address((cell)fixed_addr);
+		cell frame_size = owner->stack_frame_size_for_address((cell)fixed_addr);
+
+#ifdef FACTOR_DEBUG
+		// check our derived owner and frame size against the ones stored in the frame
+		// by the function prolog
+		stack_frame *frame = (stack_frame*)(frame_top + frame_size) - 1;
+		void *fixed_entry_point =
+			(void*)fixup.translate_code((code_block*)frame->entry_point);
+		FACTOR_ASSERT(owner->entry_point() == fixed_entry_point);
+		FACTOR_ASSERT(frame_size == frame->size);
+#endif
+
+		iterator(frame_top, owner, fixed_addr);
+		frame_top += frame_size;
 	}
 }
 

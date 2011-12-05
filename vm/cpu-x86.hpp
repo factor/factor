@@ -8,9 +8,9 @@ inline static void* frame_return_address(void *frame_top)
 	return *(void**)frame_top;
 }
 
-inline static void set_frame_return_address(void *frame_top, cell return_address)
+inline static void set_frame_return_address(void *frame_top, void *return_address)
 {
-	*(cell*)frame_top = return_address;
+	*(void**)frame_top = return_address;
 }
 
 #define CALLSTACK_BOTTOM(ctx) (stack_frame *)(ctx->callstack_seg->end - sizeof(cell) * 5)
