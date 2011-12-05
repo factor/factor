@@ -53,6 +53,7 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 	}
 
 	code->allocator->initial_free_list(h->code_size);
+	code->initialize_all_blocks_set();
 }
 
 struct startup_fixup {
@@ -283,8 +284,6 @@ void factor_vm::load_image(vm_parameters *p)
 
 	fixup_data(data_offset,code_offset);
 	fixup_code(data_offset,code_offset);
-
-	code->initialize_all_blocks_set();
 
 	/* Store image path name */
 	special_objects[OBJ_IMAGE] = allot_alien(false_object,(cell)p->image_path);

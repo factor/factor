@@ -621,8 +621,13 @@ struct factor_vm
 	bool embedded_image_p();
 
 	// callstack
-	template<typename Iterator> void iterate_callstack_object(callstack *stack_, Iterator &iterator);
-	template<typename Iterator> void iterate_callstack_object_reversed(callstack *stack_, Iterator &iterator);
+	template<typename Iterator>
+	void iterate_callstack_object(callstack *stack_, Iterator &iterator);
+
+	template<typename Iterator, typename Fixup>
+	void iterate_callstack_object_reversed(callstack *stack_,
+		Iterator &iterator, Fixup &fixup);
+
 	void check_frame(stack_frame *frame);
 	callstack *allot_callstack(cell size);
 	stack_frame *second_from_top_stack_frame(context *ctx);

@@ -94,10 +94,9 @@ stack_frame *factor_vm::frame_successor(stack_frame *frame)
 
 cell factor_vm::frame_offset(stack_frame *frame)
 {
-	char *entry_point = (char *)frame_code(frame)->entry_point();
 	char *return_address = (char *)FRAME_RETURN_ADDRESS(frame,this);
 	FACTOR_ASSERT(return_address != 0);
-	return return_address - entry_point;
+	return frame_code(frame)->offset(return_address);
 }
 
 void factor_vm::set_frame_offset(stack_frame *frame, cell offset)
