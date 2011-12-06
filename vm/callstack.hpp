@@ -127,16 +127,4 @@ void factor_vm::iterate_callstack_reversed(context *ctx, Iterator &iterator)
 	}
 }
 
-template<typename Iterator>
-void factor_vm::iterate_callstack(context *ctx, Iterator &iterator)
-{
-	stack_frame *frame = ctx->callstack_bottom - 1;
-
-	while(frame >= ctx->callstack_top)
-	{
-		iterator(frame);
-		frame = frame_successor(frame);
-	}
-}
-
 }
