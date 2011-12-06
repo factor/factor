@@ -49,20 +49,6 @@ inline void factor_vm::iterate_callstack_object_reversed(callstack *stack_, Iter
 	iterate_callstack_object_reversed(stack_, iterator, none);
 }
 
-template<typename Iterator>
-inline void factor_vm::iterate_callstack_object(callstack *stack_, Iterator &iterator)
-{
-	data_root<callstack> stack(stack_,this);
-	fixnum frame_offset = factor::untag_fixnum(stack->length) - sizeof(stack_frame);
-
-	while(frame_offset >= 0)
-	{
-		stack_frame *frame = stack->frame_at(frame_offset);
-		frame_offset -= frame->size;
-		iterator(frame);
-	}
-}
-
 template<typename Iterator, typename Fixup>
 inline void factor_vm::iterate_callstack_reversed(context *ctx, Iterator &iterator, Fixup &fixup)
 {
