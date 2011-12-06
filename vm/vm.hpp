@@ -178,17 +178,6 @@ struct factor_vm
 	void primitive_check_datastack();
 	void primitive_load_locals();
 
-	template<typename Iterator>
-	void iterate_active_callstacks(Iterator &iter)
-	{
-		std::set<context *>::const_iterator begin = active_contexts.begin();
-		std::set<context *>::const_iterator end = active_contexts.end();
-		while(begin != end)
-		{
-			iterate_callstack(*begin++,iter);
-		}
-	}
-
 	template<typename Iterator, typename Fixup>
 	void iterate_active_callstacks_reversed(Iterator &iter, Fixup &fixup)
 	{
@@ -666,9 +655,6 @@ struct factor_vm
 
 	template<typename Iterator, typename Fixup>
 	void iterate_callstack_reversed(context *ctx, Iterator &iterator, Fixup &fixup);
-
-	template<typename Iterator>
-	void iterate_callstack(context *ctx, Iterator &iterator);
 
 	// cpu-*
 	void dispatch_signal_handler(cell *sp, cell *pc, cell newpc);
