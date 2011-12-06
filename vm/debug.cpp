@@ -248,7 +248,7 @@ void factor_vm::print_callstack()
 	if (ctx)
 	{
 		stack_frame_printer printer(this);
-		iterate_callstack_reversed(ctx,printer);
+		iterate_callstack(ctx,printer);
 	}
 	else
 		std::cout << "*** Context not initialized" << std::endl;

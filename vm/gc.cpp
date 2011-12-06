@@ -253,7 +253,7 @@ struct call_frame_scrubber {
 void factor_vm::scrub_context(context *ctx)
 {
 	call_frame_scrubber scrubber(this,ctx);
-	iterate_callstack_reversed(ctx,scrubber);
+	iterate_callstack(ctx,scrubber);
 }
 
 void factor_vm::scrub_contexts()
