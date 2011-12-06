@@ -223,14 +223,18 @@ CONSTANT: action-key-codes
 
 ! This word gets replaced when deploying. See 'Vocabulary icons'
 ! in the docs and tools.deploy.shaker.gtk-icon
-: get-icon-data ( -- byte-array )
-    "resource:misc/icons/Factor_48x48.png" binary file-contents ;
+: get-icon-data ( -- byte-array/f )
+    [
+        "resource:misc/icons/Factor_48x48.png" binary file-contents
+    ] [ drop f ] recover ;
 
 : load-icon ( -- )
     get-icon-data [
-        data>GInputStream &g_object_unref
-        GInputStream>GdkPixbuf gtk_window_set_default_icon
-    ] with-destructors ;
+        [
+            data>GInputStream &g_object_unref
+            GInputStream>GdkPixbuf gtk_window_set_default_icon
+        ] with-destructors
+    ] when* ;
 
 :: connect-user-input-signals ( win -- )
     win events-mask gtk_widget_add_events
