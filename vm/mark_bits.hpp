@@ -126,8 +126,7 @@ template<typename Block> struct mark_bits {
 	Block *forward_block(const Block *original)
 	{
 #ifdef FACTOR_DEBUG
-		// XXX this condition seems to be harmless--ask slava
-		//FACTOR_ASSERT(marked_p(original));
+		FACTOR_ASSERT(marked_p(original));
 #endif
 		std::pair<cell,cell> position = bitmap_deref(original);
 		cell offset = (cell)original & (data_alignment - 1);
