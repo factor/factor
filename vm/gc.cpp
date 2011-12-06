@@ -237,16 +237,13 @@ struct call_frame_scrubber {
 	explicit call_frame_scrubber(factor_vm *parent_, context *ctx_) :
 		parent(parent_), ctx(ctx_) {}
 
-	void operator()(stack_frame *frame)
+	void operator()(void *frame_top, cell frame_size, code_block *owner, void *addr)
 	{
-		cell return_address = parent->frame_offset(frame);
-		if(return_address == (cell)-1)
-			return;
+		cell return_address = owner->offset(addr);
 
-		code_block *compiled = parent->frame_code(frame);
-		gc_info *info = compiled->block_gc_info();
+		gc_info *info = owner->block_gc_info();
 
-		FACTOR_ASSERT(return_address < compiled->size());
+		FACTOR_ASSERT(return_address < owner->size());
 		cell index = info->return_address_index(return_address);
 		if(index != (cell)-1)
 			ctx->scrub_stacks(info,index);
@@ -256,7 +253,7 @@ struct call_frame_scrubber {
 void factor_vm::scrub_context(context *ctx)
 {
 	call_frame_scrubber scrubber(this,ctx);
-	iterate_callstack(ctx,scrubber);
+	iterate_callstack_reversed(ctx,scrubber);
 }
 
 void factor_vm::scrub_contexts()
