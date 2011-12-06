@@ -220,10 +220,10 @@ struct stack_frame_printer {
 	factor_vm *parent;
 
 	explicit stack_frame_printer(factor_vm *parent_) : parent(parent_) {}
-	void operator()(void *frame_top, code_block *owner, void *addr)
+	void operator()(void *frame_top, cell frame_size, code_block *owner, void *addr)
 	{
 		std::cout << std::endl;
-		std::cout << "frame: " << frame_top << std::endl;
+		std::cout << "frame: " << frame_top << " size " << frame_size << std::endl;
 		std::cout << "executing: ";
 		parent->print_obj(owner->owner);
 		std::cout << std::endl;

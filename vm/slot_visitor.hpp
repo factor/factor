@@ -306,19 +306,22 @@ struct call_frame_slot_visitor {
 	             [entry_point]
 	             [size]
 	*/
-	void operator()(void *frame_top, code_block *owner, void *addr)
+	void operator()(void *frame_top, cell frame_size, code_block *owner, void *addr)
 	{
 		cell return_address = owner->offset(addr);
 
-		gc_info *info = owner->block_gc_info();
+		code_block *compiled = Fixup::translated_code_block_map
+			? owner
+			: visitor->fixup.translate_code(owner);
+		gc_info *info = compiled->block_gc_info();
 
-		FACTOR_ASSERT(return_address < owner->size());
+		FACTOR_ASSERT(return_address < compiled->size());
 		cell callsite = info->return_address_index(return_address);
 		if(callsite == (cell)-1)
 			return;
 
 #ifdef DEBUG_GC_MAPS
-		std::cout << "call frame code block " << owner << " with offset " << return_address << std::endl;
+		std::cout << "call frame code block " << compiled << " with offset " << return_address << std::endl;
 #endif
 		cell *stack_pointer = (cell *)frame_top;
 		u8 *bitmap = info->gc_info_bitmap();

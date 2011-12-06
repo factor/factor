@@ -4,6 +4,8 @@ namespace factor
 struct must_start_gc_again {};
 
 template<typename TargetGeneration, typename Policy> struct gc_workhorse : no_fixup {
+	static const bool translated_code_block_map = false;
+
 	factor_vm *parent;
 	TargetGeneration *target;
 	Policy policy;
