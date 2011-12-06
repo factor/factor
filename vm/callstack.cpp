@@ -79,11 +79,7 @@ cell factor_vm::frame_executing(stack_frame *frame)
 
 cell factor_vm::frame_executing_quot(stack_frame *frame)
 {
-	tagged<object> executing(frame_executing(frame));
-	code_block *compiled = frame_code(frame);
-	if(!compiled->optimized_p() && executing->type() == WORD_TYPE)
-		executing = executing.as<word>()->def;
-	return executing.value();
+	return frame_code(frame)->owner_quot();
 }
 
 stack_frame *factor_vm::frame_successor(stack_frame *frame)
@@ -114,13 +110,14 @@ struct stack_frame_accumulator {
 	factor_vm *parent;
 	growable_array frames;
 
-	explicit stack_frame_accumulator(factor_vm *parent_) : parent(parent_), frames(parent_) {} 
+	explicit stack_frame_accumulator(factor_vm *parent_)
+		: parent(parent_), frames(parent_) {}
 
-	void operator()(stack_frame *frame)
+	void operator()(void *frame_top, cell frame_size, code_block *owner, void *addr)
 	{
-		data_root<object> executing_quot(parent->frame_executing_quot(frame),parent);
-		data_root<object> executing(parent->frame_executing(frame),parent);
-		data_root<object> scan(parent->frame_scan(frame),parent);
+		data_root<object> executing_quot(owner->owner_quot(),parent);
+		data_root<object> executing(owner->owner,parent);
+		data_root<object> scan(owner->scan(parent, addr),parent);
 
 		frames.add(executing.value());
 		frames.add(executing_quot.value());
@@ -128,15 +125,24 @@ struct stack_frame_accumulator {
 	}
 };
 
+struct stack_frame_in_array { cell cells[3]; };
+
 void factor_vm::primitive_callstack_to_array()
 {
 	data_root<callstack> callstack(ctx->pop(),this);
 
 	stack_frame_accumulator accum(this);
-	iterate_callstack_object(callstack.untagged(),accum);
+	iterate_callstack_object_reversed(callstack.untagged(),accum);
+
+	/* The callstack iterator visits frames in reverse order (top to bottom) */
+	std::reverse(
+		(stack_frame_in_array*)accum.frames.elements->data(),
+		(stack_frame_in_array*)(accum.frames.elements->data() + accum.frames.count));
+
 	accum.frames.trim();
 
 	ctx->push(accum.frames.elements.value());
+
 }
 
 stack_frame *factor_vm::innermost_stack_frame(stack_frame *bottom, stack_frame *top)
