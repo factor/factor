@@ -133,6 +133,7 @@ struct code_block
 	}
 
 	cell scan(factor_vm *vm, void *addr) const;
+	cell owner_quot() const;
 };
 
 VM_C_API void undefined_symbol(void);
