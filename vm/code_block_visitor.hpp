@@ -78,7 +78,7 @@ void code_block_visitor<Fixup>::visit_object_code_block(object *obj)
 		{
 			callstack *stack = (callstack *)obj;
 			call_frame_code_block_visitor<Fixup> call_frame_visitor(parent,fixup);
-			parent->iterate_callstack_object_reversed(stack,call_frame_visitor,fixup);
+			parent->iterate_callstack_object(stack,call_frame_visitor,fixup);
 			break;
 		}
 	}
@@ -114,7 +114,7 @@ template<typename Fixup>
 void code_block_visitor<Fixup>::visit_context_code_blocks()
 {
 	call_frame_code_block_visitor<Fixup> call_frame_visitor(parent,fixup);
-	parent->iterate_active_callstacks_reversed(call_frame_visitor,fixup);
+	parent->iterate_active_callstacks(call_frame_visitor,fixup);
 }
 
 template<typename Fixup>

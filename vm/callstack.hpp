@@ -9,7 +9,7 @@ inline static cell callstack_object_size(cell size)
 /* This is a little tricky. The iterator may allocate memory, so we
 keep the callstack in a GC root and use relative offsets */
 template<typename Iterator, typename Fixup>
-inline void factor_vm::iterate_callstack_object_reversed(callstack *stack_,
+inline void factor_vm::iterate_callstack_object(callstack *stack_,
 	Iterator &iterator, Fixup &fixup)
 {
 	data_root<callstack> stack(stack_,this);
@@ -43,14 +43,14 @@ inline void factor_vm::iterate_callstack_object_reversed(callstack *stack_,
 }
 
 template<typename Iterator>
-inline void factor_vm::iterate_callstack_object_reversed(callstack *stack_, Iterator &iterator)
+inline void factor_vm::iterate_callstack_object(callstack *stack_, Iterator &iterator)
 {
 	no_fixup none;
-	iterate_callstack_object_reversed(stack_, iterator, none);
+	iterate_callstack_object(stack_, iterator, none);
 }
 
 template<typename Iterator, typename Fixup>
-inline void factor_vm::iterate_callstack_reversed(context *ctx, Iterator &iterator, Fixup &fixup)
+inline void factor_vm::iterate_callstack(context *ctx, Iterator &iterator, Fixup &fixup)
 {
 	if (ctx->callstack_top == ctx->callstack_bottom)
 		return;
@@ -92,10 +92,10 @@ inline void factor_vm::iterate_callstack_reversed(context *ctx, Iterator &iterat
 }
 
 template<typename Iterator>
-inline void factor_vm::iterate_callstack_reversed(context *ctx, Iterator &iterator)
+inline void factor_vm::iterate_callstack(context *ctx, Iterator &iterator)
 {
 	no_fixup none;
-	iterate_callstack_reversed(ctx, iterator, none);
+	iterate_callstack(ctx, iterator, none);
 }
 
 

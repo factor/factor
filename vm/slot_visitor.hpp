@@ -369,14 +369,14 @@ template<typename Fixup>
 void slot_visitor<Fixup>::visit_callstack_object(callstack *stack)
 {
 	call_frame_slot_visitor<Fixup> call_frame_visitor(parent,this);
-	parent->iterate_callstack_object_reversed(stack,call_frame_visitor,fixup);
+	parent->iterate_callstack_object(stack,call_frame_visitor,fixup);
 }
 
 template<typename Fixup>
 void slot_visitor<Fixup>::visit_callstack(context *ctx)
 {
 	call_frame_slot_visitor<Fixup> call_frame_visitor(parent,this);
-	parent->iterate_callstack_reversed(ctx,call_frame_visitor,fixup);
+	parent->iterate_callstack(ctx,call_frame_visitor,fixup);
 }
 
 template<typename Fixup>

@@ -132,7 +132,7 @@ void factor_vm::primitive_callstack_to_array()
 	data_root<callstack> callstack(ctx->pop(),this);
 
 	stack_frame_accumulator accum(this);
-	iterate_callstack_object_reversed(callstack.untagged(),accum);
+	iterate_callstack_object(callstack.untagged(),accum);
 
 	/* The callstack iterator visits frames in reverse order (top to bottom) */
 	std::reverse(
