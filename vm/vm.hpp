@@ -179,13 +179,13 @@ struct factor_vm
 	void primitive_load_locals();
 
 	template<typename Iterator, typename Fixup>
-	void iterate_active_callstacks_reversed(Iterator &iter, Fixup &fixup)
+	void iterate_active_callstacks(Iterator &iter, Fixup &fixup)
 	{
 		std::set<context *>::const_iterator begin = active_contexts.begin();
 		std::set<context *>::const_iterator end = active_contexts.end();
 		while(begin != end)
 		{
-			iterate_callstack_reversed(*begin++,iter,fixup);
+			iterate_callstack(*begin++,iter,fixup);
 		}
 	}
 
@@ -622,10 +622,10 @@ struct factor_vm
 	bool embedded_image_p();
 
 	template<typename Iterator, typename Fixup>
-	void iterate_callstack_object_reversed(callstack *stack_, Iterator &iterator,
+	void iterate_callstack_object(callstack *stack_, Iterator &iterator,
 		Fixup &fixup);
 	template<typename Iterator>
-	void iterate_callstack_object_reversed(callstack *stack_, Iterator &iterator);
+	void iterate_callstack_object(callstack *stack_, Iterator &iterator);
 
 	void check_frame(stack_frame *frame);
 	callstack *allot_callstack(cell size);
@@ -649,9 +649,9 @@ struct factor_vm
 	void primitive_callstack_bounds();
 
 	template<typename Iterator, typename Fixup>
-	void iterate_callstack_reversed(context *ctx, Iterator &iterator, Fixup &fixup);
+	void iterate_callstack(context *ctx, Iterator &iterator, Fixup &fixup);
 	template<typename Iterator>
-	void iterate_callstack_reversed(context *ctx, Iterator &iterator);
+	void iterate_callstack(context *ctx, Iterator &iterator);
 
 	// cpu-*
 	void dispatch_signal_handler(cell *sp, cell *pc, cell newpc);
