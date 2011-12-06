@@ -42,13 +42,16 @@ struct call_frame_code_block_visitor {
 	explicit call_frame_code_block_visitor(factor_vm *parent_, Fixup fixup_) :
 		parent(parent_), fixup(fixup_) {}
 
-	void operator()(void *frame_top, code_block *owner, void *addr)
+	void operator()(void *frame_top, cell frame_size, code_block *owner, void *addr)
 	{
-		set_frame_return_address(frame_top, addr);
+		code_block *compiled = Fixup::translated_code_block_map
+			? owner
+			: fixup.fixup_code(owner);
+		void *fixed_addr = compiled->address_for_offset(owner->offset(addr));
+		set_frame_return_address(frame_top, fixed_addr);
 		// XXX remove this when prolog data is removed
-		cell frame_size = owner->stack_frame_size_for_address((cell)addr);
 		stack_frame *frame = (stack_frame*)((char*)frame_top + frame_size) - 1;
-		frame->entry_point = owner->entry_point();
+		frame->entry_point = compiled->entry_point();
 	}
 };
 

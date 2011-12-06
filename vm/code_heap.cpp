@@ -105,6 +105,7 @@ struct all_blocks_set_verifier {
 	void operator()(code_block *block, cell size)
 	{
 		FACTOR_ASSERT(all_blocks->find((cell)block) != all_blocks->end());
+		// XXX check block size
 	}
 };
 
@@ -121,20 +122,9 @@ code_block *code_heap::code_block_for_address(cell address)
 	FACTOR_ASSERT(blocki != all_blocks.begin());
 	--blocki;
 	code_block* found_block = (code_block*)*blocki;
-#ifdef FACTOR_DEBUG
-	if (!((cell)found_block->entry_point() <= address
-		&& address - (cell)found_block->entry_point() < found_block->size()))
-	{
-		std::cerr << "invalid block found in all_blocks set!" << std::endl;
-		std::cerr << "address " << (void*)address
-			<< " block " << (void*)found_block
-			<< " entry point " << (void*)found_block->entry_point()
-			<< " size " << found_block->size()
-			<< " free? " << found_block->free_p();
-		verify_all_blocks_set();
-		FACTOR_ASSERT(false);
-	}
-#endif
+	FACTOR_ASSERT((cell)found_block->entry_point() <= address
+		/* XXX this isn't valid during fixup. should store the size in the map
+		&& address - (cell)found_block->entry_point() < found_block->size()*/);
 	return found_block;
 }
 
@@ -154,6 +144,9 @@ void code_heap::initialize_all_blocks_set()
 	all_blocks.clear();
 	all_blocks_set_inserter inserter(this);
 	allocator->iterate(inserter);
+#if defined(FACTOR_DEBUG)
+	verify_all_blocks_set();
+#endif
 }
 
 /* Allocate a code heap during startup */
