@@ -28,6 +28,10 @@ IN: lists.lazy.tests
     3 { 1 2 3 } >list [ + ] with lazy-map list>array
 ] unit-test
 
+[ { 1 2 4 8 16 } ] [
+  5 1 [ 2 * ] lfrom-by ltake list>array
+] unit-test
+
 [ [ ] lmap ] must-infer
 [ [ ] lmap>array ] must-infer
 [ [ drop ] foldr ] must-infer
