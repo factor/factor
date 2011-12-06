@@ -3,6 +3,14 @@
 namespace factor
 {
 
+cell code_block::owner_quot() const
+{
+	tagged<object> executing(owner);
+	if (!optimized_p() && executing->type() == WORD_TYPE)
+		executing = executing.as<word>()->def;
+	return executing.value();
+}
+
 cell code_block::scan(factor_vm *vm, void *addr) const
 {
 	switch(type())
