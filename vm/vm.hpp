@@ -621,10 +621,6 @@ struct factor_vm
 	bool read_embedded_image_footer(FILE *file, embedded_image_footer *footer);
 	bool embedded_image_p();
 
-	// callstack
-	template<typename Iterator>
-	void iterate_callstack_object(callstack *stack_, Iterator &iterator);
-
 	template<typename Iterator, typename Fixup>
 	void iterate_callstack_object_reversed(callstack *stack_, Iterator &iterator,
 		Fixup &fixup);
