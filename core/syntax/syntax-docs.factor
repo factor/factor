@@ -1,7 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes classes.tuple generic.math generic.single arrays
 io.pathnames vocabs.loader io sequences assocs words.symbol
-words.alias words.constant combinators vocabs.parser command-line ;
+words.alias words.constant combinators vocabs.parser command-line multiline ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -27,8 +27,9 @@ $nl
 
 ARTICLE: "syntax-comments" "Comments"
 { $subsections
-    POSTPONE: !
-    POSTPONE: #!
+  POSTPONE: !
+  POSTPONE: #!
+  POSTPONE: /*
 } ;
 
 ARTICLE: "syntax-immediate" "Parse time evaluation"
@@ -654,7 +655,7 @@ HELP: !
 { $values { "comment" "characters" } }
 { $description "Discards all input until the end of the line." } ;
 
-{ POSTPONE: ! POSTPONE: #! } related-words
+{ POSTPONE: ! POSTPONE: #! POSTPONE: /* } related-words
 
 HELP: #!
 { $syntax "#!comment..." }
