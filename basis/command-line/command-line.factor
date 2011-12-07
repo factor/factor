@@ -3,24 +3,11 @@
 USING: accessors alien.strings assocs continuations fry init
 io.encodings.utf8 io.files io.pathnames kernel kernel.private
 namespaces parser parser.notes sequences source-files
-source-files.errors splitting system tools.errors
-vocabs.loader ;
+source-files.errors splitting system vocabs.loader ;
 IN: command-line
 
 SYMBOL: user-init-errors
 SYMBOL: +user-init-error+
-
-T{ error-type
-    { type +user-init-error+ }
-    { word ":user-init-errors" }
-    { plural "rc file errors" }
-    { icon "vocab:ui/tools/error-list/icons/user-init-error.tiff" }
-    { quot [ user-init-errors get-global values ] }
-    { forget-quot [ user-init-errors get-global delete-at ] }
-} define-error-type
-
-: :user-init-errors ( -- )
-    user-init-errors get-global values errors. ;
 
 TUPLE: user-init-error error file line# asset ;
 
