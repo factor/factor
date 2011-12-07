@@ -49,31 +49,32 @@ void factor_vm::record_sample(bool prolog_p)
 			counts, special_objects[OBJ_CURRENT_THREAD]));
 }
 
+struct record_callstack_sample_iterator {
+	std::vector<cell> *sample_callstacks;
+	bool skip_p;
+
+	record_callstack_sample_iterator(std::vector<cell> *sample_callstacks, bool prolog_p)
+		: sample_callstacks(sample_callstacks), skip_p(prolog_p) {}
+
+	void operator()(void *frame_top, cell frame_size, code_block *owner, void *addr)
+	{
+		if (skip_p)
+			skip_p = false;
+		else
+			sample_callstacks->push_back(owner->owner);
+	}
+};
+
 void factor_vm::record_callstack_sample(cell *begin, cell *end, bool prolog_p)
 {
 	*begin = sample_callstacks.size();
-	stack_frame *frame = ctx->bottom_frame();
-	if (prolog_p)
-	{
-		FACTOR_ASSERT(frame >= ctx->callstack_top);
-		stack_frame *next_frame = frame_successor(frame);
-		while (next_frame >= ctx->callstack_top)
-		{
-			sample_callstacks.push_back(frame_code(frame)->owner);
-			frame = next_frame;
-			next_frame = frame_successor(next_frame);
-		}
-	}
-	else
-	{
-		while (frame >= ctx->callstack_top)
-		{
-			sample_callstacks.push_back(frame_code(frame)->owner);
-			frame = frame_successor(frame);
-		}
-	}
+
+	record_callstack_sample_iterator recorder(&sample_callstacks, prolog_p);
+	iterate_callstack(ctx, recorder);
 
 	*end = sample_callstacks.size();
+
+	std::reverse(sample_callstacks.begin() + *begin, sample_callstacks.end());
 }
 
 void factor_vm::set_sampling_profiler(fixnum rate)
