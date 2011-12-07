@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors source-files.errors kernel namespaces assocs fry
-summary ;
+summary command-line ;
 IN: compiler.errors
 
 SYMBOL: +compiler-error+
@@ -70,3 +70,13 @@ M: no-such-symbol summary drop "Symbol not found" ;
 : no-such-symbol ( name message word -- ) \ no-such-symbol linkage-error ;
 
 ERROR: not-compiled word error ;
+
+T{ error-type
+    { type +user-init-error+ }
+    { word ":user-init-errors" }
+    { plural "rc file errors" }
+    { icon "vocab:ui/tools/error-list/icons/user-init-error.tiff" }
+    { quot [ user-init-errors get-global values ] }
+    { forget-quot [ user-init-errors get-global delete-at ] }
+} define-error-type
+
