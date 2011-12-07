@@ -3,7 +3,8 @@
 USING: peg.ebnf kernel math.parser sequences assocs arrays fry math
 combinators regexp.classes strings splitting peg locals accessors
 regexp.ast unicode.case unicode.script.private unicode.categories
-memoize interval-maps sets unicode.data combinators.short-circuit ;
+memoize interval-maps sets unicode.data combinators.short-circuit
+namespaces ;
 IN: regexp.parser
 
 : allowed-char? ( ch -- ? )
@@ -27,7 +28,7 @@ ERROR: bad-class name ;
     [ [ simple ] keep ] H{ } map>assoc ;
 
 MEMO: simple-script-table ( -- table )
-    script-table interval-values members simple-table ;
+    script-table get-global interval-values members simple-table ;
 
 MEMO: simple-category-table ( -- table )
     categories simple-table ;
