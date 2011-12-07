@@ -145,9 +145,9 @@ HELP: samples-per-second
 HELP: samples>time
 { $values
     { "samples" integer }
-    { "time" duration }
+    { "seconds" integer }
 }
-{ $description "Converts a sample interval count to a " { $link duration } " based on the value of " { $link samples-per-second } "." } ;
+{ $description "Converts a sample interval count to an integer based on the value of " { $link samples-per-second } "." } ;
 
 HELP: top-down
 { $values

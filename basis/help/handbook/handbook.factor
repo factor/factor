@@ -288,7 +288,6 @@ ARTICLE: "handbook-language-reference" "The language"
     "locals"
     "namespaces"
     "namespaces-global"
-    "values"
 }
 { $heading "Abstractions" }
 { $subsections
