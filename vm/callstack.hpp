@@ -27,16 +27,6 @@ inline void factor_vm::iterate_callstack_object(callstack *stack_,
 		code_block *owner = code->code_block_for_address((cell)fixed_addr);
 		cell frame_size = owner->stack_frame_size_for_address((cell)fixed_addr);
 
-#ifdef FACTOR_DEBUG
-		// check our derived owner and frame size against the ones stored in the frame
-		// by the function prolog
-		stack_frame *frame = (stack_frame*)((char*)frame_top + frame_size) - 1;
-		void *fixed_entry_point =
-			(void*)fixup.translate_code((code_block*)frame->entry_point);
-		FACTOR_ASSERT(owner->entry_point() == fixed_entry_point);
-		FACTOR_ASSERT(frame_size == frame->size);
-#endif
-
 		iterator(frame_top, frame_size, owner, fixed_addr);
 		frame_offset += frame_size;
 	}
@@ -72,16 +62,6 @@ inline void factor_vm::iterate_callstack(context *ctx, Iterator &iterator, Fixup
 
 		cell frame_size = fixed_owner->stack_frame_size_for_address((cell)fixed_addr);
 
-#ifdef FACTOR_DEBUG
-		// check our derived owner and frame size against the ones stored in the frame
-		// by the function prolog
-		stack_frame *frame = (stack_frame*)(frame_top + frame_size) - 1;
-		void *fixed_entry_point = Fixup::translated_code_block_map
-			? (void*)fixup.translate_code((code_block*)frame->entry_point)
-			: frame->entry_point;
-		FACTOR_ASSERT(owner->entry_point() == fixed_entry_point);
-		FACTOR_ASSERT(frame_size == frame->size);
-#endif
 		void *fixed_addr_for_iter = Fixup::translated_code_block_map
 			? fixed_addr
 			: addr;

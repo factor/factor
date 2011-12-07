@@ -7,7 +7,7 @@ namespace factor
 #define FACTOR_CPU_STRING "ppc.32"
 #endif
 
-#define CALLSTACK_BOTTOM(ctx) (stack_frame *)(ctx->callstack_seg->end - 32)
+#define CALLSTACK_BOTTOM(ctx) (void *)(ctx->callstack_seg->end - 32)
 
 /* In the instruction sequence:
 
