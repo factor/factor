@@ -75,7 +75,7 @@ M: object infer-known* drop f ;
 : reduce-outputs ( quot operation -- )
     [ [ call ] [ [ drop ] compose outputs ] bi ] dip swap call-n ; inline
 
-: sum-outputs ( quot -- obj )
+: sum-outputs ( quot -- n )
     [ + ] reduce-outputs ; inline
 
 : map-outputs ( quot mapper -- )
