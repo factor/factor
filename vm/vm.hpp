@@ -627,22 +627,14 @@ struct factor_vm
 	template<typename Iterator>
 	void iterate_callstack_object(callstack *stack_, Iterator &iterator);
 
-	void check_frame(stack_frame *frame);
 	callstack *allot_callstack(cell size);
-	stack_frame *second_from_top_stack_frame(context *ctx);
+	void *second_from_top_stack_frame(context *ctx);
 	cell capture_callstack(context *ctx);
 	void primitive_callstack();
 	void primitive_callstack_for();
-	code_block *frame_code(stack_frame *frame);
-	code_block_type frame_type(stack_frame *frame);
-	cell frame_executing(stack_frame *frame);
-	cell frame_executing_quot(stack_frame *frame);
-	stack_frame *frame_successor(stack_frame *frame);
-	cell frame_scan(stack_frame *frame);
-	cell frame_offset(stack_frame *frame);
-	void set_frame_offset(stack_frame *frame, cell offset);
+	void *frame_predecessor(void *frame);
 	void primitive_callstack_to_array();
-	stack_frame *innermost_stack_frame(stack_frame *bottom, stack_frame *top);
+	void *innermost_stack_frame(void *bottom, void *top);
 	void primitive_innermost_stack_frame_executing();
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
@@ -714,7 +706,7 @@ struct factor_vm
 	// entry points
 	void c_to_factor(cell quot);
 	template<typename Func> Func get_entry_point(cell n);
-	void unwind_native_frames(cell quot, stack_frame *to);
+	void unwind_native_frames(cell quot, void *to);
 	cell get_fpu_state();
 	void set_fpu_state(cell state);
 

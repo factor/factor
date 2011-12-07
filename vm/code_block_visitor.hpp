@@ -49,9 +49,6 @@ struct call_frame_code_block_visitor {
 			: fixup.fixup_code(owner);
 		void *fixed_addr = compiled->address_for_offset(owner->offset(addr));
 		set_frame_return_address(frame_top, fixed_addr);
-		// XXX remove this when prolog data is removed
-		stack_frame *frame = (stack_frame*)((char*)frame_top + frame_size) - 1;
-		frame->entry_point = compiled->entry_point();
 	}
 };
 
