@@ -20,8 +20,8 @@ struct context {
 	// First 4 fields accessed directly by compiler. See basis/vm/vm.factor
 
 	/* Factor callstack pointers */
-	stack_frame *callstack_top;
-	stack_frame *callstack_bottom;
+	void *callstack_top;
+	void *callstack_bottom;
 
 	/* current datastack top pointer */
 	cell datastack;
@@ -72,11 +72,6 @@ struct context {
 	{
 		datastack += sizeof(cell);
 		replace(tagged);
-	}
-
-	stack_frame *bottom_frame()
-	{
-		return callstack_bottom - 1;
 	}
 };
 
