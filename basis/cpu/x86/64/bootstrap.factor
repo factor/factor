@@ -34,17 +34,6 @@ IN: bootstrap.x86
     RAX CALL ;
 
 [
-    ! load entry point
-    RAX 0 MOV rc-absolute-cell rel-this
-    ! alignment
-    RSP stack-frame-size bootstrap-cell - SUB
-    ! store entry point
-    RSP stack-frame-size 3 bootstrap-cells - [+] RAX MOV
-    ! store stack frame size
-    RSP stack-frame-size 2 bootstrap-cells - [+] stack-frame-size MOV
-] jit-prolog jit-define
-
-[
     pic-tail-reg 5 [RIP+] LEA
     0 JMP f rc-relative rel-word-pic-tail
 ] jit-word-jump jit-define
@@ -96,18 +85,12 @@ IN: bootstrap.x86
 
 :: jit-signal-handler-prolog ( -- frame-size )
     signal-handler-save-regs :> save-regs
-    save-regs length 1 + bootstrap-cells 16 align stack-frame-size + :> frame-size
-    frame-size signal-handler-stack-frame-size =
-    [ "unexpected signal handler frame size" throw ] unless
+    signal-handler-stack-frame-size :> frame-size
     ! minus a cell each for flags, return address
     ! use LEA so we don't dirty flags
     RSP RSP frame-size 2 bootstrap-cells - neg [+] LEA
     save-regs [| r i | RSP i bootstrap-cells [+] r MOV ] each-index
     PUSHF
-    ! Now that the registers are saved, we can make the stack frame
-    RAX 0 MOV rc-absolute-cell rel-this
-    RSP frame-size 3 bootstrap-cells - [+] RAX MOV
-    RSP frame-size 2 bootstrap-cells - [+] frame-size MOV
     frame-size ;
 
 :: jit-signal-handler-epilog ( frame-size -- )
