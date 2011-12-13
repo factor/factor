@@ -48,7 +48,7 @@ HOOK: reserved-stack-space cpu ( -- n )
 M: x86 stack-frame-size ( stack-frame -- i )
     (stack-frame-size)
     reserved-stack-space +
-    3 cells +
+    cell +
     align-stack ;
 
 HOOK: pic-tail-reg cpu ( -- reg )
