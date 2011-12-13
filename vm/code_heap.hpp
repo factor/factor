@@ -48,6 +48,8 @@ struct code_heap {
 	void verify_all_blocks_set();
 	void initialize_all_blocks_set();
 
+	void sweep();
+
 	code_block *code_block_for_address(cell address);
 
 	bool safepoint_p(cell addr)
