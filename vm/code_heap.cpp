@@ -72,6 +72,31 @@ void code_heap::flush_icache()
 	factor::flush_icache(seg->start,seg->size);
 }
 
+struct clear_free_blocks_from_all_blocks_iterator
+{
+	code_heap *code;
+
+	clear_free_blocks_from_all_blocks_iterator(code_heap *code) : code(code) {}
+
+	void operator()(code_block *free_block, cell size) {
+		std::set<code_block*>::iterator erase_from =
+			code->all_blocks.lower_bound(free_block);
+		std::set<code_block*>::iterator erase_to =
+			code->all_blocks.lower_bound((code_block*)((char*)free_block + size));
+
+		code->all_blocks.erase(erase_from, erase_to);
+	}
+};
+
+void code_heap::sweep()
+{
+	clear_free_blocks_from_all_blocks_iterator clearer(this);
+	allocator->sweep(clearer);
+#ifdef FACTOR_DEBUG
+	verify_all_blocks_set();
+#endif
+}
+
 struct all_blocks_set_verifier {
 	std::set<code_block*> *leftovers;
 
@@ -104,6 +129,11 @@ code_block *code_heap::code_block_for_address(cell address)
 		&& address - (cell)found_block->entry_point() < found_block->size()))
 	{
 		std::cerr << "invalid block found in all_blocks set!" << std::endl;
+		std::cerr << "address " << (void*)address
+			<< " block " << (void*)found_block
+			<< " entry point " << (void*)found_block->entry_point()
+			<< " size " << found_block->size()
+			<< " free? " << found_block->free_p();
 		verify_all_blocks_set();
 		FACTOR_ASSERT(false);
 	}
