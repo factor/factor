@@ -47,7 +47,6 @@ struct code_heap {
 	void unguard_safepoint();
 	void verify_all_blocks_set();
 	void initialize_all_blocks_set();
-	void update_all_blocks_set(mark_bits<code_block> *code_forwarding_map);
 
 	code_block *code_block_for_address(cell address);
 
