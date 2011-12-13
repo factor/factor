@@ -79,10 +79,10 @@ struct clear_free_blocks_from_all_blocks_iterator
 	clear_free_blocks_from_all_blocks_iterator(code_heap *code) : code(code) {}
 
 	void operator()(code_block *free_block, cell size) {
-		std::set<code_block*>::iterator erase_from =
-			code->all_blocks.lower_bound(free_block);
-		std::set<code_block*>::iterator erase_to =
-			code->all_blocks.lower_bound((code_block*)((char*)free_block + size));
+		std::set<cell>::iterator erase_from =
+			code->all_blocks.lower_bound((cell)free_block);
+		std::set<cell>::iterator erase_to =
+			code->all_blocks.lower_bound((cell)free_block + size);
 
 		code->all_blocks.erase(erase_from, erase_to);
 	}
@@ -118,7 +118,7 @@ void code_heap::verify_all_blocks_set()
 code_block *code_heap::code_block_for_address(cell address)
 {
 	std::set<cell>::const_iterator blocki =
-		all_blocks.upper_bound((code_block*)address);
+		all_blocks.upper_bound(address);
 	FACTOR_ASSERT(blocki != all_blocks.begin());
 	--blocki;
 	code_block* found_block = (code_block*)*blocki;
