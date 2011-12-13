@@ -515,6 +515,8 @@ M: x86 %call-gc ( gc-map -- )
 M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
 
+M: x86 %prologue ( n -- ) cell - decr-stack-reg ;
+
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
 :: (%boolean) ( dst temp insn -- )
