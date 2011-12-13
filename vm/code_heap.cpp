@@ -94,16 +94,20 @@ void code_heap::verify_all_blocks_set()
 
 code_block *code_heap::code_block_for_address(cell address)
 {
-#ifdef FACTOR_DEBUG
-	verify_all_blocks_set();
-#endif
 	std::set<code_block*>::const_iterator blocki =
 		all_blocks.upper_bound((code_block*)address);
 	FACTOR_ASSERT(blocki != all_blocks.begin());
 	--blocki;
 	code_block* found_block = *blocki;
-	FACTOR_ASSERT((cell)found_block->entry_point() <= address
-		&& address - (cell)found_block->entry_point() < found_block->size());
+#ifdef FACTOR_DEBUG
+	if (!((cell)found_block->entry_point() <= address
+		&& address - (cell)found_block->entry_point() < found_block->size()))
+	{
+		std::cerr << "invalid block found in all_blocks set!" << std::endl;
+		verify_all_blocks_set();
+		FACTOR_ASSERT(false);
+	}
+#endif
 	return found_block;
 }
 
