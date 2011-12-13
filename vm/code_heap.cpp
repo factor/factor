@@ -129,19 +129,6 @@ void code_heap::initialize_all_blocks_set()
 	allocator->iterate(inserter);
 }
 
-void code_heap::update_all_blocks_set(mark_bits<code_block> *code_forwarding_map)
-{
-	std::set<code_block *> new_all_blocks;
-	for (std::set<code_block *>::const_iterator oldi = all_blocks.begin();
-		oldi != all_blocks.end();
-		++oldi)
-	{
-		code_block *new_block = code_forwarding_map->forward_block(*oldi);
-		new_all_blocks.insert(new_block);
-	}
-	all_blocks.swap(new_all_blocks);
-}
-
 /* Allocate a code heap during startup */
 void factor_vm::init_code_heap(cell size)
 {

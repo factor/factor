@@ -185,8 +185,6 @@ void factor_vm::update_code_roots_for_compaction()
 		else
 			root->valid = false;
 	}
-
-	code->update_all_blocks_set(state);
 }
 
 /* Compact data and code heaps */
@@ -235,6 +233,8 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p)
 
 	update_code_roots_for_compaction();
 	callbacks->update();
+
+	code->initialize_all_blocks_set();
 
 	if(event) event->ended_compaction();
 }
