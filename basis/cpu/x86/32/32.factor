@@ -236,4 +236,4 @@ M: x86.32 flatten-struct-type
 
 M: x86.32 struct-return-on-stack? os linux? not ;
 
-check-sse
+check-cpu-features
