@@ -460,6 +460,7 @@ void factor_vm::factorbug_usage(bool advanced_p)
 		std::cout << "  refs <addr>      -- find data heap references to object" << std::endl;
 		std::cout << "  push <addr>      -- push object on data stack - NOT SAFE" << std::endl;
 		std::cout << "  gc               -- trigger full GC - NOT SAFE" << std::endl;
+		std::cout << "  compact-gc       -- trigger compacting GC - NOT SAFE" << std::endl;
 		std::cout << "  code             -- code heap dump" << std::endl;
 		std::cout << "  abort            -- call abort()" << std::endl;
 		std::cout << "  breakpoint       -- trigger system breakpoint" << std::endl;
@@ -612,6 +613,8 @@ void factor_vm::factorbug()
 			dump_code_heap();
 		else if(strcmp(cmd,"gc") == 0)
 			primitive_full_gc();
+		else if(strcmp(cmd,"compact-gc") == 0)
+			primitive_compact_gc();
 		else if(strcmp(cmd,"help") == 0)
 			factorbug_usage(true);
 		else if(strcmp(cmd,"abort") == 0)
