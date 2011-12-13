@@ -150,4 +150,4 @@ USE: vocabs
     { [ os windows? ] [ "cpu.x86.64.windows" require ] }
 } cond
 
-check-sse
+check-cpu-features

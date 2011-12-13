@@ -776,7 +776,17 @@ enable-log2
 
 : check-sse ( -- )
     "Checking for multimedia extensions... " write flush
-    [ { (sse-version) } compile ] with-optimizer
     sse-version
     [ sse-string " detected" append print ]
     [ 20 < "cpu.x86.x87" "cpu.x86.sse" ? require ] bi ;
+
+: check-popcnt ( -- )
+    enable-popcnt? [
+        "Building with POPCNT support" print
+        enable-bit-count
+    ] when ;
+
+: check-cpu-features ( -- )
+    [ { (sse-version) popcnt? } compile ] with-optimizer
+    check-sse
+    check-popcnt ;
