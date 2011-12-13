@@ -224,6 +224,10 @@ big-endian off
 ] jit-execute jit-define
 
 [
+    stack-reg stack-frame-size bootstrap-cell - SUB
+] jit-prolog jit-define
+
+[
     stack-reg stack-frame-size bootstrap-cell - ADD
 ] jit-epilog jit-define
 

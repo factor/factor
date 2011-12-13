@@ -89,11 +89,6 @@ M: x86.32 return-regs
         { float-regs { ST0 } }
     } ;
 
-M: x86.32 %prologue ( n -- )
-    dup PUSH
-    0 PUSH rc-absolute-cell rel-this
-    3 cells - decr-stack-reg ;
-
 M: x86.32 %prepare-jump
     pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
 
