@@ -9,7 +9,7 @@ sets vectors quotations byte-arrays sorting compiler.units
 definitions generic generic.standard generic.single
 tools.deploy.config combinators combinators.private classes
 vocabs.loader.private classes.builtin slots.private grouping
-command-line io.pathnames ;
+command-line io.pathnames namespaces.private ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes.private
 QUALIFIED: compiler.crossref
@@ -398,12 +398,14 @@ IN: tools.deploy.shaker
         "windows-messages" "windows.messages" lookup-word [ , ] when*
     ] { } make ;
 
+: strip-global? ( name stripped-globals -- ? )
+    '[ _ member? ] [ string? ] bi or ;
+
 : strip-globals ( stripped-globals -- )
     strip-globals? [
         "Stripping globals" show
         global boxes>> swap
-        '[ drop _ member? not ] assoc-filter!
-        [ drop string? not ] assoc-filter! drop ! strip CLI args
+        '[ swap _ strip-global? [ f swap value<< ] [ drop ] if ] assoc-each
     ] [ drop ] if ;
 
 : strip-c-io ( -- )
