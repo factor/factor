@@ -101,7 +101,7 @@ void factor_vm::collect_sweep_impl()
 	update_code_roots_for_sweep();
 
 	if(event) event->started_code_sweep();
-	code->allocator->sweep();
+	code->sweep();
 	if(event) event->ended_code_sweep();
 }
 
