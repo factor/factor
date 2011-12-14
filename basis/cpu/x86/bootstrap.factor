@@ -104,9 +104,7 @@ big-endian off
 
     PUSHF
 
-    ! on x86-32 we need to load the vm register
-    ! on x86-64 it's already loaded whenever we're in a factor context
-    bootstrap-cell 4 = [ jit-load-vm ] when ;
+    jit-load-vm ;
 
 : jit-signal-handler-epilog ( -- )
     POPF
