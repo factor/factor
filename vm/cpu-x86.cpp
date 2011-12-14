@@ -48,13 +48,10 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 		else if (offset == 16 - sizeof(cell))
 		{
 			// Make a fake frame for the leaf procedure
-			code_block *leaf_block = code->code_block_for_address(*pc);
-			FACTOR_ASSERT(leaf_block != NULL);
+			FACTOR_ASSERT(code->code_block_for_address(*pc) != NULL);
 
 			cell newsp = *sp - LEAF_FRAME_SIZE;
-			*(cell*)(newsp + 3*sizeof(cell)) = 4*sizeof(cell);
-			*(cell*)(newsp + 2*sizeof(cell)) = (cell)leaf_block->entry_point();
-			*(cell*) newsp                   = *pc;
+			*(cell*)newsp = *pc;
 			*sp = newsp;
 			handler_word = tagged<word>(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
 		}
