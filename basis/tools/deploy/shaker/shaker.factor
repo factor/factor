@@ -9,7 +9,7 @@ sets vectors quotations byte-arrays sorting compiler.units
 definitions generic generic.standard generic.single
 tools.deploy.config combinators combinators.private classes
 vocabs.loader.private classes.builtin slots.private grouping
-command-line io.pathnames namespaces.private ;
+command-line io.pathnames memoize namespaces.private ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes.private
 QUALIFIED: compiler.crossref
@@ -236,6 +236,10 @@ IN: tools.deploy.shaker
     deploy-word-defs? get [ dup strip-word-defs ] unless
     strip-word-names? [ dup strip-word-names strip-stack-traces ] when
     2drop ;
+
+: strip-memoized ( -- )
+    "Clearing memoized word caches" show
+    [ memoized? ] instances [ reset-memoized ] each ;
 
 : compiler-classes ( -- seq )
     { "compiler" "stack-checker" }
@@ -565,6 +569,7 @@ SYMBOL: deploy-vocab
     compress-objects
     compress-quotations
     strip-words
+    strip-memoized
     clear-megamorphic-caches ;
 
 : die-with ( error original-error -- * )
