@@ -21,7 +21,7 @@ be calling it at all, so we leave it as it is for now. */
 void *factor_vm::second_from_top_stack_frame(context *ctx)
 {
 	void *frame_top = ctx->callstack_top;
-	for (unsigned i = 0; i < 2; ++i)
+	for (cell i = 0; i < 2; ++i)
 	{
 		void *pred = frame_predecessor(frame_top);
 		if (pred >= ctx->callstack_bottom)
