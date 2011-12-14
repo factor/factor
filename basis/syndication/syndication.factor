@@ -65,15 +65,14 @@ TUPLE: entry title url description date ;
     [ "item" tags-named [ rss2.0-entry ] map set-entries ]
     tri ;
 
-: atom-entry-link ( tag -- url/f )
-    "link" tags-named
-    [ "rel" attr { f "alternate" } member? ] find nip
-    dup [ "href" attr >url ] when ;
+: atom-link ( tag -- url/f )
+    "link" "alternate" "rel" tag-named-with-attr
+    [ "href" attr >url ] [ f ] if* ;
 
 : atom1.0-entry ( tag -- entry )
     <entry> swap {
         [ "title" tag-named children>string >>title ]
-        [ atom-entry-link >>url ]
+        [ atom-link >>url ]
         [
             { "content" "summary" } any-tag-named
             dup children>> [ string? not ] any?
@@ -90,7 +89,7 @@ TUPLE: entry title url description date ;
 : atom1.0 ( xml -- feed )
     <feed> swap
     [ "title" tag-named children>string >>title ]
-    [ "link" tag-named "href" attr >url >>url ]
+    [ atom-link >>url ]
     [ "entry" tags-named [ atom1.0-entry ] map set-entries ]
     tri ;
 
