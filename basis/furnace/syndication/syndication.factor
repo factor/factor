@@ -39,18 +39,16 @@ M: object >entry
     "UTF-8" >>content-charset
     utf8 >>content-encoding ;
 
-TUPLE: feed-action < action title url hubs entries ;
+TUPLE: feed-action < action title url entries ;
 
 : <feed-action> ( -- action )
     feed-action new-action
         dup '[
             feed new
                 _
-                {
-                    [ title>> call >>title ]
-                    [ url>> call adjust-url >>url ]
-                    [ hubs>> [ call [ adjust-url ] map >>hubs ] when* ]
-                    [ entries>> call process-entries >>entries ]
-                } cleave
+                [ title>> call >>title ]
+                [ url>> call adjust-url >>url ]
+                [ entries>> call process-entries >>entries ]
+                tri
             <feed-content>
         ] >>display ;
