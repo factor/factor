@@ -24,16 +24,16 @@ HELP: couchdb-auth-provider
 } ;
 
 ARTICLE: "furnace.auth.providers.couchdb" "CouchDB Authentication Provider"
-    { $nl } "The " { $vocab-link "furnace.auth.providers.couchdb" } " vocabulary implements an authentication provider "
+    "The " { $vocab-link "furnace.auth.providers.couchdb" } " vocabulary implements an authentication provider "
     "which looks up authentication requests in a CouchDB. It is necessary to create a view "
     "associating usernames with user documents before using this vocabulary; see documentation "
     "for " { $link couchdb-auth-provider } "."
-    { $nl }
+    $nl
     "Although this implementation guarantees that users with duplicate IDs/emails"
     " cannot be created in a single CouchDB database, it provides so such guarentee if you are clustering "
     "multiple DBs. In this case, you are responsible for ensuring the uniqueness of users across "
     "databases."
-    { $nl }
+    $nl
     "Password hashes are base64 encoded."
  ;
 
