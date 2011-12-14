@@ -68,12 +68,12 @@ yield
 ! The unit test asserts that the callstack is empty from the
 ! quotation passed to start-context-and-delete.
 
-[ { } ] [
+[ 3 ] [
     <promise> [
         '[
             _ [
-                callstack swap fulfill stop
+                [ callstack swap fulfill stop ] start-context-and-delete
             ] start-context-and-delete
         ] in-thread
-    ] [ ?promise callstack>array ] bi
+    ] [ ?promise callstack>array length ] bi
 ] unit-test
