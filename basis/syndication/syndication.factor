@@ -5,13 +5,13 @@ USING: xml.traversal kernel assocs math.order strings sequences
 xml.data xml.writer io.streams.string combinators xml
 xml.entities.html io.files io http.client namespaces make
 xml.syntax hashtables calendar.format accessors continuations
-urls present byte-arrays fry arrays ;
+urls present byte-arrays ;
 IN: syndication
 
 : any-tag-named ( tag names -- tag-inside )
     [ f ] 2dip [ tag-named nip dup ] with find 2drop ;
 
-TUPLE: feed title url entries hubs ;
+TUPLE: feed title url entries ;
 
 : <feed> ( -- feed ) feed new ;
 
@@ -65,19 +65,15 @@ TUPLE: entry title url description date ;
     [ "item" tags-named [ rss2.0-entry ] map set-entries ]
     tri ;
 
-: atom-links ( tag rel -- seq )
-    [ "links" tags-named ] dip
-    dup "alternate" = [ f 2array ] [ 1array ] if
-    '[ "rel" attr _ member? ] filter
-    [ "href" attr >url ] map ;
-
-: atom-link ( tag rel -- url/f )
-    atom-links [ f ] [ first ] if-empty ;
+: atom-entry-link ( tag -- url/f )
+    "link" tags-named
+    [ "rel" attr { f "alternate" } member? ] find nip
+    dup [ "href" attr >url ] when ;
 
 : atom1.0-entry ( tag -- entry )
     <entry> swap {
         [ "title" tag-named children>string >>title ]
-        [ "alternate" atom-link >>url ]
+        [ atom-entry-link >>url ]
         [
             { "content" "summary" } any-tag-named
             dup children>> [ string? not ] any?
@@ -92,12 +88,11 @@ TUPLE: entry title url description date ;
     } cleave ;
 
 : atom1.0 ( xml -- feed )
-    <feed> swap {
-        [ "title" tag-named children>string >>title ]
-        [ "alternate" atom-link >>url ]
-        [ "hub" atom-links >>hubs ]
-        [ "entry" tags-named [ atom1.0-entry ] map set-entries ]
-    } cleave ;
+    <feed> swap
+    [ "title" tag-named children>string >>title ]
+    [ "link" tag-named "href" attr >url >>url ]
+    [ "entry" tags-named [ atom1.0-entry ] map set-entries ]
+    tri ;
 
 : xml>feed ( xml -- feed )
     dup main>> {
@@ -134,21 +129,14 @@ M: byte-array parse-feed [ bytes>xml xml>feed ] with-html-entities ;
         </entry>
     XML] ;
 
-: hub>xml ( hub -- xml )
-    present [XML <link rel="hub" href=<-> /> XML] ;
-
 : feed>xml ( feed -- xml )
-    {
-        [ title>> ]
-        [ url>> present ]
-        [ hubs>> [ hub>xml ] map ]
-        [ entries>> [ entry>xml ] map ]
-    } cleave
+    [ title>> ]
+    [ url>> present ]
+    [ entries>> [ entry>xml ] map ] tri
     <XML
         <feed xmlns="http://www.w3.org/2005/Atom">
             <title><-></title>
             <link href=<-> />
-            <->
             <->
         </feed>
     XML> ;
