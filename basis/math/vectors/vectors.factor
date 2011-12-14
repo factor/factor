@@ -193,7 +193,7 @@ GENERIC: v? ( mask true false -- result )
 M: object v? 
     [ vand ] [ vandn ] bi-curry* bi vor ; inline
 
-:: vif ( mask true-quot false-quot -- result )
+:: vif ( mask true-quot: ( -- x ) false-quot: ( -- x ) -- result )
     {
         { [ mask vall?  ] [ true-quot  call ] }
         { [ mask vnone? ] [ false-quot call ] }
