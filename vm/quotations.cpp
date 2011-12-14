@@ -309,6 +309,14 @@ void quotation_jit::iterate_quotation()
 	}
 }
 
+cell quotation_jit::word_stack_frame_size(cell obj)
+{
+	if (special_subprimitive_p(obj))
+		return SIGNAL_HANDLER_STACK_FRAME_SIZE;
+	else
+		return JIT_FRAME_SIZE;
+}
+
 /* Allocates memory */
 code_block *factor_vm::jit_compile_quot(cell owner_, cell quot_, bool relocating)
 {
@@ -319,9 +327,7 @@ code_block *factor_vm::jit_compile_quot(cell owner_, cell quot_, bool relocating
 	compiler.init_quotation(quot.value());
 	compiler.iterate_quotation();
 
-	cell frame_size = compiler.special_subprimitive_p(owner_)
-		? SIGNAL_HANDLER_STACK_FRAME_SIZE
-		: JIT_FRAME_SIZE;
+	cell frame_size = compiler.word_stack_frame_size(owner_);
 
 	code_block *compiled = compiler.to_code_block(frame_size);
 
