@@ -102,26 +102,12 @@ void factor_vm::primitive_callstack_to_array()
 
 }
 
-void *factor_vm::innermost_stack_frame(void *bottom, void *top)
-{
-	/* if (top < bottom)
-	{
-		void *pred = frame_predecessor(top);
-		if (pred < bottom)
-			return pred;
-		else
-			return top;
-	}
-	else */
-		return top;
-}
-
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
 void factor_vm::primitive_innermost_stack_frame_executing()
 {
 	callstack *stack = untag_check<callstack>(ctx->pop());
-	void *frame = innermost_stack_frame(stack->bottom(), stack->top());
+	void *frame = stack->top();
 	void *addr = frame_return_address(frame);
 	ctx->push(code->code_block_for_address((cell)addr)->owner_quot());
 }
@@ -129,7 +115,7 @@ void factor_vm::primitive_innermost_stack_frame_executing()
 void factor_vm::primitive_innermost_stack_frame_scan()
 {
 	callstack *stack = untag_check<callstack>(ctx->pop());
-	void *frame = innermost_stack_frame(stack->bottom(), stack->top());
+	void *frame = stack->top();
 	void *addr = frame_return_address(frame);
 	ctx->push(code->code_block_for_address((cell)addr)->scan(this,addr));
 }
@@ -144,7 +130,7 @@ void factor_vm::primitive_set_innermost_stack_frame_quot()
 
 	jit_compile_quot(quot.value(),true);
 
-	void *inner = innermost_stack_frame(stack->bottom(), stack->top());
+	void *inner = stack->top();
 	void *addr = frame_return_address(inner);
 	code_block *block = code->code_block_for_address((cell)addr);
 	cell offset = block->offset(addr);
