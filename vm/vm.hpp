@@ -634,7 +634,6 @@ struct factor_vm
 	void primitive_callstack_for();
 	void *frame_predecessor(void *frame);
 	void primitive_callstack_to_array();
-	void *innermost_stack_frame(void *bottom, void *top);
 	void primitive_innermost_stack_frame_executing();
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
