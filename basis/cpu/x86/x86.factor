@@ -48,7 +48,7 @@ HOOK: reserved-stack-space cpu ( -- n )
 M: x86 stack-frame-size ( stack-frame -- i )
     (stack-frame-size)
     reserved-stack-space +
-    3 cells +
+    cell +
     align-stack ;
 
 HOOK: pic-tail-reg cpu ( -- reg )
@@ -514,6 +514,8 @@ M: x86 %call-gc ( gc-map -- )
 
 M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
+
+M: x86 %prologue ( n -- ) cell - decr-stack-reg ;
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 

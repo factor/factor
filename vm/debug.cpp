@@ -220,23 +220,24 @@ struct stack_frame_printer {
 	factor_vm *parent;
 
 	explicit stack_frame_printer(factor_vm *parent_) : parent(parent_) {}
-	void operator()(stack_frame *frame)
+	void operator()(void *frame_top, cell frame_size, code_block *owner, void *addr)
 	{
-		std::cout << "frame: " << std::hex << (cell)frame << std::dec << std::endl;
+		std::cout << std::endl;
+		std::cout << "frame: " << frame_top << " size " << frame_size << std::endl;
 		std::cout << "executing: ";
-		parent->print_obj(parent->frame_executing(frame));
+		parent->print_obj(owner->owner);
 		std::cout << std::endl;
 		std::cout << "scan: ";
-		parent->print_obj(parent->frame_scan(frame));
+		parent->print_obj(owner->scan(parent, addr));
 		std::cout << std::endl;
 		std::cout << "word/quot addr: ";
-		std::cout << std::hex << (cell)parent->frame_executing(frame) << std::dec;
+		std::cout << std::hex << (cell)owner->owner << std::dec;
 		std::cout << std::endl;
 		std::cout << "word/quot xt: ";
-		std::cout << std::hex << (cell)frame->entry_point << std::dec;
+		std::cout << std::hex << (cell)owner->entry_point() << std::dec;
 		std::cout << std::endl;
 		std::cout << "return address: ";
-		std::cout << std::hex << (cell)FRAME_RETURN_ADDRESS(frame,parent) << std::dec;
+		std::cout << std::hex << (cell)addr << std::dec;
 		std::cout << std::endl;
 	}
 };
@@ -417,7 +418,9 @@ struct code_block_printer {
 
 			std::cout << std::hex << (cell)scan << std::dec << " ";
 			std::cout << std::hex << size << std::dec << " ";
-			std::cout << status << std::endl;
+			std::cout << status << " ";
+			std::cout << "stack frame " << scan->stack_frame_size();
+			std::cout << std::endl;
 		}
 	}
 };
@@ -611,6 +614,8 @@ void factor_vm::factorbug()
 		}
 		else if(strcmp(cmd,"code") == 0)
 			dump_code_heap();
+		else if(strcmp(cmd,"compact-gc") == 0)
+			primitive_compact_gc();
 		else if(strcmp(cmd,"gc") == 0)
 			primitive_full_gc();
 		else if(strcmp(cmd,"compact-gc") == 0)

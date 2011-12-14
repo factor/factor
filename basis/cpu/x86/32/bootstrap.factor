@@ -9,6 +9,8 @@ IN: bootstrap.x86
 
 4 \ cell set
 
+: leaf-stack-frame-size ( -- n ) 4 bootstrap-cells ;
+: signal-handler-stack-frame-size ( -- n ) 12 bootstrap-cells ;
 : stack-frame-size ( -- n ) 8 bootstrap-cells ;
 : shift-arg ( -- reg ) ECX ;
 : div-arg ( -- reg ) EAX ;
@@ -34,15 +36,6 @@ IN: bootstrap.x86
 
 : jit-call ( name -- )
     0 CALL f rc-relative rel-dlsym ;
-
-[
-    ! alignment
-    ESP stack-frame-size bootstrap-cell - SUB
-    ! store entry point
-    ESP stack-frame-size 3 bootstrap-cells - [+] 0 MOV rc-absolute-cell rel-this
-    ! store stack frame size
-    ESP stack-frame-size 2 bootstrap-cells - [+] stack-frame-size MOV
-] jit-prolog jit-define
 
 [
     pic-tail-reg 0 MOV 0 rc-absolute-cell rel-here
@@ -98,39 +91,8 @@ IN: bootstrap.x86
     "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
 
-! The signal-handler and leaf-signal-handler subprimitives are special-cased
-! in vm/quotations.cpp not to trigger generation of a stack frame, so they can
-! peform their own prolog/epilog preserving registers.
-
-:: jit-signal-handler-prolog ( -- frame-size )
-    stack-frame-size 8 bootstrap-cells + :> frame-size
-    ! minus a cell each for flags and return address
-    ! use LEA so we don't dirty flags
-    ESP ESP frame-size 2 bootstrap-cells - neg [+] LEA
-    ESP []                    EAX MOV
-    ESP 1 bootstrap-cells [+] ECX MOV
-    ESP 2 bootstrap-cells [+] EDX MOV
-    ESP 3 bootstrap-cells [+] EBX MOV
-    ESP 4 bootstrap-cells [+] EBP MOV
-    ESP 5 bootstrap-cells [+] ESI MOV
-    ESP 6 bootstrap-cells [+] EDI MOV
-    PUSHF
-    ESP frame-size 3 bootstrap-cells - [+] 0 MOV rc-absolute-cell rel-this
-    ESP frame-size 2 bootstrap-cells - [+] frame-size MOV
-    ! subprimitive definition assumes vm's been loaded
-    jit-load-vm
-    frame-size ;
-
-:: jit-signal-handler-epilog ( frame-size -- )
-    POPF
-    EAX ESP []                    MOV
-    ECX ESP 1 bootstrap-cells [+] MOV
-    EDX ESP 2 bootstrap-cells [+] MOV
-    EBX ESP 3 bootstrap-cells [+] MOV
-    EBP ESP 4 bootstrap-cells [+] MOV
-    ESI ESP 5 bootstrap-cells [+] MOV
-    EDI ESP 6 bootstrap-cells [+] MOV
-    ESP ESP frame-size 2 bootstrap-cells - [+] LEA ;
+: signal-handler-save-regs ( -- regs )
+    { EAX ECX EDX EBX EBP ESI EDI } ;
 
 [
     EAX ds-reg [] MOV
@@ -292,9 +254,9 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
-    ! Reset return value since its bogus right now, to avoid
-    ! confusing the GC
-    ESP -4 [+] 0 MOV
+    ! Push a bogus return address so the GC can track this frame back
+    ! to the owner
+    0 CALL
 
     ! Make the new context the current one
     ctx-reg swap MOV

@@ -107,7 +107,8 @@ M: ##dispatch generate-insn
             label-table get
         ] B{ } make
         dup check-fixup
-    ] call 5 narray ; inline
+        cfg get stack-frame>> [ total-size>> ] [ 0 ] if*
+    ] call 6 narray ; inline
 
 : generate ( cfg -- code )
     [
