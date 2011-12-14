@@ -38,6 +38,11 @@ IN: bootstrap.x86
     0 JMP f rc-relative rel-word-pic-tail
 ] jit-word-jump jit-define
 
+: jit-load-vm ( -- )
+    ! no-op on x86-64. in factor contexts vm-reg always contains the
+    ! vm pointer.
+    ;
+
 : jit-load-context ( -- )
     ctx-reg vm-reg vm-context-offset [+] MOV ;
 
