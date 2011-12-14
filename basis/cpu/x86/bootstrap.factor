@@ -102,7 +102,11 @@ big-endian off
     signal-handler-save-regs
     [| r i | stack-reg i bootstrap-cells [+] r MOV ] each-index
 
-    PUSHF ;
+    PUSHF
+
+    ! on x86-32 we need to load the vm register
+    ! on x86-64 it's already loaded whenever we're in a factor context
+    bootstrap-cell 4 = [ jit-load-vm ] when ;
 
 : jit-signal-handler-epilog ( -- )
     POPF
