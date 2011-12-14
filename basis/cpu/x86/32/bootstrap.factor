@@ -91,39 +91,8 @@ IN: bootstrap.x86
     "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
 
-! The signal-handler and leaf-signal-handler subprimitives are special-cased
-! in vm/quotations.cpp not to trigger generation of a stack frame, so they can
-! peform their own prolog/epilog preserving registers.
-
-:: jit-signal-handler-prolog ( -- frame-size )
-    signal-handler-stack-frame-size :> frame-size
-    ! minus a cell each for flags and return address
-    ! use LEA so we don't dirty flags
-    ESP ESP frame-size 2 bootstrap-cells - neg [+] LEA
-    ESP []                    EAX MOV
-    ESP 1 bootstrap-cells [+] ECX MOV
-    ESP 2 bootstrap-cells [+] EDX MOV
-    ESP 3 bootstrap-cells [+] EBX MOV
-    ESP 4 bootstrap-cells [+] EBP MOV
-    ESP 5 bootstrap-cells [+] ESI MOV
-    ESP 6 bootstrap-cells [+] EDI MOV
-    PUSHF
-    ESP frame-size 3 bootstrap-cells - [+] 0 MOV rc-absolute-cell rel-this
-    ESP frame-size 2 bootstrap-cells - [+] frame-size MOV
-    ! subprimitive definition assumes vm's been loaded
-    jit-load-vm
-    frame-size ;
-
-:: jit-signal-handler-epilog ( frame-size -- )
-    POPF
-    EAX ESP []                    MOV
-    ECX ESP 1 bootstrap-cells [+] MOV
-    EDX ESP 2 bootstrap-cells [+] MOV
-    EBX ESP 3 bootstrap-cells [+] MOV
-    EBP ESP 4 bootstrap-cells [+] MOV
-    ESI ESP 5 bootstrap-cells [+] MOV
-    EDI ESP 6 bootstrap-cells [+] MOV
-    ESP ESP frame-size 2 bootstrap-cells - [+] LEA ;
+: signal-handler-save-regs ( -- regs )
+    { EAX ECX EDX EBX EBP ESI EDI } ;
 
 [
     EAX ds-reg [] MOV

@@ -93,38 +93,58 @@ big-endian off
 ! not to trigger generation of a stack frame, so they can
 ! peform their own prolog/epilog preserving registers.
 
+: jit-signal-handler-prolog ( -- )
+    ! minus a cell each for flags, return address
+    ! use LEA so we don't dirty flags
+    stack-reg stack-reg signal-handler-stack-frame-size
+    2 bootstrap-cells - neg [+] LEA
+
+    signal-handler-save-regs
+    [| r i | stack-reg i bootstrap-cells [+] r MOV ] each-index
+
+    PUSHF ;
+
+: jit-signal-handler-epilog ( -- )
+    POPF
+
+    signal-handler-save-regs
+    [| r i | r stack-reg i bootstrap-cells [+] MOV ] each-index
+
+    stack-reg stack-reg signal-handler-stack-frame-size
+    2 bootstrap-cells - [+] LEA ;
+
 [| |
-    jit-signal-handler-prolog :> frame-size
+    jit-signal-handler-prolog
     jit-save-context
     temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
     temp0 CALL
-    frame-size jit-signal-handler-epilog
+    jit-signal-handler-epilog
     0 RET
 ] \ signal-handler define-sub-primitive
 
 [| |
-    jit-signal-handler-prolog :> frame-size
+    jit-signal-handler-prolog
     jit-save-context
     temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
     temp0 CALL
-    frame-size jit-signal-handler-epilog
+    jit-signal-handler-epilog
     ! Pop the fake leaf frame along with our return address
     leaf-stack-frame-size bootstrap-cell - RET
 ] \ leaf-signal-handler define-sub-primitive
 
 [| |
-    jit-signal-handler-prolog :> frame-size
+    jit-signal-handler-prolog
     temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
     temp0 CALL
-    frame-size jit-signal-handler-epilog
+    jit-signal-handler-epilog
     red-zone-size RET
 ] \ ffi-signal-handler define-sub-primitive
 
 [| |
-    jit-signal-handler-prolog :> frame-size
+    jit-signal-handler-prolog
     temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
     temp0 CALL
-    frame-size jit-signal-handler-epilog
+    jit-signal-handler-epilog
     red-zone-size 16 bootstrap-cell - + RET
 ] \ ffi-leaf-signal-handler define-sub-primitive
 
