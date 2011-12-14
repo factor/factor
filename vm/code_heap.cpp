@@ -105,7 +105,6 @@ struct all_blocks_set_verifier {
 	void operator()(code_block *block, cell size)
 	{
 		FACTOR_ASSERT(all_blocks->find((cell)block) != all_blocks->end());
-		// XXX check block size
 	}
 };
 
