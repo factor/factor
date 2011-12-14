@@ -83,22 +83,6 @@ IN: bootstrap.x86
 : signal-handler-save-regs ( -- regs )
     { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 R13 R14 R15 } ;
 
-:: jit-signal-handler-prolog ( -- frame-size )
-    signal-handler-save-regs :> save-regs
-    signal-handler-stack-frame-size :> frame-size
-    ! minus a cell each for flags, return address
-    ! use LEA so we don't dirty flags
-    RSP RSP frame-size 2 bootstrap-cells - neg [+] LEA
-    save-regs [| r i | RSP i bootstrap-cells [+] r MOV ] each-index
-    PUSHF
-    frame-size ;
-
-:: jit-signal-handler-epilog ( frame-size -- )
-    POPF
-    signal-handler-save-regs
-    [| r i | r RSP i bootstrap-cells [+] MOV ] each-index
-    RSP RSP frame-size 2 bootstrap-cells - [+] LEA ;
-
 [
     arg1 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
