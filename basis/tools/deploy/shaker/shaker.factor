@@ -9,7 +9,8 @@ sets vectors quotations byte-arrays sorting compiler.units
 definitions generic generic.standard generic.single
 tools.deploy.config combinators combinators.private classes
 vocabs.loader.private classes.builtin slots.private grouping
-command-line io.pathnames memoize namespaces.private ;
+command-line io.pathnames memoize namespaces.private
+hashtables locals ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes.private
 QUALIFIED: compiler.crossref
@@ -301,56 +302,44 @@ IN: tools.deploy.shaker
         new-default-method '[ _ strip-default-method ] each
     ] when ;
 
-: strip-vocab-globals ( except names -- words )
+: vocab-tree-globals ( except names -- words )
     [ child-vocabs [ words ] map concat ] map concat
     swap [ first2 lookup-word ] map sift diff ;
 
 : stripped-globals ( -- seq )
     [
         "inspector-hook" "inspector" lookup-word ,
-
         {
+            source-files:source-files
             continuations:error
             continuations:error-continuation
             continuations:error-thread
             continuations:restarts
-            init:startup-hooks
-            source-files:source-files
-            input-stream
-            output-stream
-            error-stream
-            vm
-            image
-            current-directory
         } %
-
-        "io-thread" "io.thread" lookup-word ,
 
         "disposables" "destructors" lookup-word ,
 
         "functor-words" "functors.backend" lookup-word ,
-        
-        deploy-threads? [
-            "initial-thread" "threads" lookup-word ,
-        ] unless
-
-        strip-io? [ io-backend , ] when
 
         { } {
-            "timers"
-            "tools"
-            "io.launcher"
-            "random"
             "stack-checker"
-            "bootstrap"
             "listener"
-        } strip-vocab-globals %
+            "bootstrap"
+        } vocab-tree-globals %
+
+        ! Don't want to strip globals from test programs
+        { } { "tools" } vocab-tree-globals
+        { } { "tools.deploy.test" } vocab-tree-globals diff %
+
+        deploy-unicode? get [
+            { } { "unicode" } vocab-tree-globals %
+        ] unless
 
         strip-dictionary? [
             "libraries" "alien" lookup-word ,
 
             { { "yield-hook" "compiler.utilities" } }
-            { "cpu" "compiler" } strip-vocab-globals %
+            { "cpu" "compiler" } vocab-tree-globals %
 
             {
                 gensym
@@ -382,35 +371,74 @@ IN: tools.deploy.shaker
                 parser-quiet?
             } %
 
-            { } { "layouts" } strip-vocab-globals %
+            { } { "layouts" } vocab-tree-globals %
 
-            { } { "math.partial-dispatch" } strip-vocab-globals %
+            { } { "math.partial-dispatch" } vocab-tree-globals %
 
-            { } { "math.vectors.simd" } strip-vocab-globals %
+            { } { "math.vectors.simd" } vocab-tree-globals %
 
-            { } { "peg" } strip-vocab-globals %
+            { } { "peg" } vocab-tree-globals %
         ] when
 
         strip-prettyprint? [
-            { } { "prettyprint.config" } strip-vocab-globals %
+            { } { "prettyprint.config" } vocab-tree-globals %
         ] when
 
         strip-debugger? [
             \ compiler.errors:compiler-errors ,
         ] when
+    ] { } make ;
+
+: cleared-globals ( -- seq )
+    [
+
+        {
+            init:startup-hooks
+            input-stream
+            output-stream
+            error-stream
+            vm
+            image
+            current-directory
+        } %
+
+        "io-thread" "io.thread" lookup-word ,
+
+        deploy-threads? [
+            "initial-thread" "threads" lookup-word ,
+        ] unless
+
+        strip-io? [ io-backend , ] when
+
+        { } {
+            "timers"
+            "io.launcher"
+            "random"
+        } vocab-tree-globals %
 
         "windows-messages" "windows.messages" lookup-word [ , ] when*
     ] { } make ;
 
 : strip-global? ( name stripped-globals -- ? )
+    '[ _ member? ] [ tuple? ] bi or ;
+
+: clear-global? ( name cleared-globals -- ? )
     '[ _ member? ] [ string? ] bi or ;
 
-: strip-globals ( stripped-globals -- )
-    strip-globals? [
+: strip-globals ( -- )
+    strip-globals? [| |
         "Stripping globals" show
-        global boxes>> swap
-        '[ swap _ strip-global? [ f swap value<< ] [ drop ] if ] assoc-each
-    ] [ drop ] if ;
+        stripped-globals :> to-strip
+        cleared-globals :> to-clear
+        global boxes>>
+        [ drop to-strip strip-global? not ] assoc-filter!
+        [
+            [
+                swap to-clear clear-global?
+                [ f swap value<< ] [ drop ] if
+            ] assoc-each
+        ] [ rehash ] bi
+    ] when ;
 
 : strip-c-io ( -- )
     ! On all platforms, if deploy-io is 1, we strip out C streams.
@@ -565,7 +593,7 @@ SYMBOL: deploy-vocab
     deploy-vocab get vocab-main deploy-startup-quot
     find-megamorphic-caches
     stripped-word-props
-    stripped-globals strip-globals
+    strip-globals
     compress-objects
     compress-quotations
     strip-words
