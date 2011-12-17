@@ -267,12 +267,20 @@ DEFER: @neg-digit
         [ @pos-first-digit ]
     } case ; inline
 
+: @first-char-no-radix ( i number-parse n char -- n/f ) 
+    {
+        { CHAR: - [ [ @neg-digit ] require-next-digit ?neg ] }
+        { CHAR: + [ [ @pos-digit ] require-next-digit ] }
+        [ @pos-digit ]
+    } case ; inline
+
 PRIVATE>
 
-: base> ( str radix -- n/f )
-    <number-parse> [ @first-char ] require-next-digit ;
+: string>number ( str -- n/f )
+    10 <number-parse> [ @first-char ] require-next-digit ;
 
-: string>number ( str -- n/f ) 10 base> ; inline
+: base> ( str radix -- n/f )
+    <number-parse> [ @first-char-no-radix ] require-next-digit ;
 
 : bin> ( str -- n/f )  2 base> ; inline
 : oct> ( str -- n/f )  8 base> ; inline

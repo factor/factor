@@ -333,3 +333,26 @@ unit-test
 [ -0x1.0000,0000,0000,2p0 ] [ "-0x1.0000,0000,0000,1,Cp0" string>number ] unit-test
 [ -0x1.0000,0000,0000,2p0 ] [ "-0x1.0000,0000,0000,1,81p0" string>number ] unit-test
 [ -0x1.0000,0000,0000,2p0 ] [ "-0x1.0000,0000,0000,1,8000,0000,0000,0001p0" string>number ] unit-test
+
+! #453
+! hex> dec> oct> bin> shouldn't admit radix prefixes
+
+[ 0x0b ] [ "0b" hex> ] unit-test
+[ 0x0b0 ] [ "0b0" hex> ] unit-test
+[ f ] [ "0o0" hex> ] unit-test
+[ f ] [ "0x0" hex> ] unit-test
+
+[ f ] [ "0b" dec> ] unit-test
+[ f ] [ "0b0" dec> ] unit-test
+[ f ] [ "0o0" dec> ] unit-test
+[ f ] [ "0x0" dec> ] unit-test
+
+[ f ] [ "0b" oct> ] unit-test
+[ f ] [ "0b0" oct> ] unit-test
+[ f ] [ "0o0" oct> ] unit-test
+[ f ] [ "0x0" oct> ] unit-test
+
+[ f ] [ "0b" bin> ] unit-test
+[ f ] [ "0b0" bin> ] unit-test
+[ f ] [ "0o0" bin> ] unit-test
+[ f ] [ "0x0" bin> ] unit-test
