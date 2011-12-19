@@ -81,8 +81,8 @@ M: object infer-known* drop f ;
 : map-outputs ( quot mapper -- )
     [ drop call ] [ swap outputs ] 2bi napply ; inline
 
-: map-reduce-outputs ( quot mapper reducer -- )
-    [ '[ _ _ map-outputs ] ] dip reduce-outputs ; inline
+MACRO: map-reduce-outputs ( quot mapper reducer -- quot )
+    [ '[ _ _ map-outputs ] ] dip '[ _ _ reduce-outputs ] ;
 
 : append-outputs-as ( quot exemplar -- seq )
     [ [ call ] [ outputs ] bi ] dip nappend-as ; inline
