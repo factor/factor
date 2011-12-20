@@ -254,6 +254,12 @@ void factor_vm::print_callstack()
 		std::cout << "*** Context not initialized" << std::endl;
 }
 
+void factor_vm::print_callstack_object(callstack *obj)
+{
+	stack_frame_printer printer(this);
+	iterate_callstack_object(obj,printer);
+}
+
 struct padded_address {
 	cell value;
 
