@@ -102,6 +102,8 @@ IN: bootstrap.x86
 [ jit-jump-quot ]
 \ (call) define-combinator-primitive
 
+! unwind-native-frames is marked as "special" in vm/quotations.cpp
+! so it does not have a standard prolog
 [
     ! Load ds and rs registers
     jit-load-vm
@@ -115,8 +117,8 @@ IN: bootstrap.x86
     ctx-reg jit-update-seh
 
     ! Load arguments
-    EAX ESP stack-frame-size [+] MOV
-    EDX ESP stack-frame-size 4 + [+] MOV
+    EAX ESP cell [+] MOV
+    EDX ESP 2 cells [+] MOV
 
     ! Unwind stack frames
     ESP EDX MOV
