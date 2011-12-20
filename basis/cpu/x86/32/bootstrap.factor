@@ -117,8 +117,8 @@ IN: bootstrap.x86
     ctx-reg jit-update-seh
 
     ! Load arguments
-    EAX ESP cell [+] MOV
-    EDX ESP 2 cells [+] MOV
+    EAX ESP bootstrap-cell [+] MOV
+    EDX ESP 2 bootstrap-cells [+] MOV
 
     ! Unwind stack frames
     ESP EDX MOV
