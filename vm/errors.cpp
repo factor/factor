@@ -78,7 +78,7 @@ void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
 		unwind_native_frames(special_objects[ERROR_HANDLER_QUOT],
 			ctx->callstack_top);
 	}
-	/* Error was thrown in early startup before error handler is set, just
+	/* Error was thrown in early startup before error handler is set, so just
 	crash. */
 	else
 	{
