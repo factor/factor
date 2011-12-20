@@ -406,6 +406,7 @@ struct factor_vm
 	void print_datastack();
 	void print_retainstack();
 	void print_callstack();
+	void print_callstack_object(callstack *obj);
 	void dump_cell(cell x);
 	void dump_memory(cell from, cell to);
 	template<typename Generation> void dump_generation(const char *name, Generation *gen);
