@@ -182,6 +182,7 @@ void factor_vm::print_nested_obj(cell obj, fixnum nesting)
 		std::cout << (void*)obj << ">";
 		break;
 	}
+	std::cout << std::flush;
 }
 
 void factor_vm::print_obj(cell obj)
