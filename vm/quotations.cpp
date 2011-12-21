@@ -240,7 +240,7 @@ void quotation_jit::iterate_quotation()
 				push(obj.value());
 			break;
 		case QUOTATION_TYPE:
-			/* 'if' preceeded by two literal quotations (this is why if and ? are
+			/* 'if' preceded by two literal quotations (this is why if and ? are
 			   mutually recursive in the library, but both still work) */
 			if(fast_if_p(i,length))
 			{
