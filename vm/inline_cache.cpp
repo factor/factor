@@ -197,6 +197,7 @@ void *factor_vm::inline_cache_miss(cell return_address_)
 		<< (tail_call_site ? "tail" : "non-tail")
 		<< " call site 0x" << std::hex << return_address.value << std::dec
 		<< std::endl;
+	print_callstack();
 #endif
 
 	data_root<array> cache_entries(ctx->pop(),this);
