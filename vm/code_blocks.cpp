@@ -27,6 +27,7 @@ cell code_block::scan(factor_vm *vm, void *addr) const
 				return false_object;
 		}
 	case code_block_optimized:
+	case code_block_pic:
 		return false_object;
 	default:
 		critical_error("Bad frame type",type());
