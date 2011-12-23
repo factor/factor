@@ -1,0 +1,283 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7593B1DF14A5298800034C96 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7593B1DE14A5298800034C96 /* CoreServices.framework */; };
+		7593B1E114A5298800034C96 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7593B1E014A5298800034C96 /* CoreFoundation.framework */; };
+		7593B1E314A5298800034C96 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7593B1E214A5298800034C96 /* CoreData.framework */; };
+		7593B1E514A5298800034C96 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7593B1E414A5298800034C96 /* Foundation.framework */; };
+		7593B1EB14A5298800034C96 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7593B1E914A5298800034C96 /* InfoPlist.strings */; };
+		7593B1ED14A5298800034C96 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 7593B1EC14A5298800034C96 /* main.c */; };
+		7593B1EF14A5298800034C96 /* GetMetadataForFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 7593B1EE14A5298800034C96 /* GetMetadataForFile.m */; };
+		7593B1F214A5298800034C96 /* MySpotlightImporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7593B1F114A5298800034C96 /* MySpotlightImporter.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		7593B1DB14A5298800034C96 /* FactorFinder.mdimporter */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FactorFinder.mdimporter; sourceTree = BUILT_PRODUCTS_DIR; };
+		7593B1DE14A5298800034C96 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
+		7593B1E014A5298800034C96 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		7593B1E214A5298800034C96 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		7593B1E414A5298800034C96 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		7593B1E814A5298800034C96 /* FactorFinder-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FactorFinder-Info.plist"; sourceTree = "<group>"; };
+		7593B1EA14A5298800034C96 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		7593B1EC14A5298800034C96 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		7593B1EE14A5298800034C96 /* GetMetadataForFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GetMetadataForFile.m; sourceTree = "<group>"; };
+		7593B1F014A5298800034C96 /* MySpotlightImporter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MySpotlightImporter.h; sourceTree = "<group>"; };
+		7593B1F114A5298800034C96 /* MySpotlightImporter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MySpotlightImporter.m; sourceTree = "<group>"; };
+		7593B1F314A5298800034C96 /* Importer Read Me.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Importer Read Me.txt"; sourceTree = "<group>"; };
+		7593B1F414A5298800034C96 /* FactorFinder-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FactorFinder-Prefix.pch"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7593B1D814A5298800034C96 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7593B1DF14A5298800034C96 /* CoreServices.framework in Frameworks */,
+				7593B1E114A5298800034C96 /* CoreFoundation.framework in Frameworks */,
+				7593B1E314A5298800034C96 /* CoreData.framework in Frameworks */,
+				7593B1E514A5298800034C96 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7593B1D014A5298800034C96 = {
+			isa = PBXGroup;
+			children = (
+				7593B1E614A5298800034C96 /* FactorFinder */,
+				7593B1DD14A5298800034C96 /* Frameworks */,
+				7593B1DC14A5298800034C96 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7593B1DC14A5298800034C96 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7593B1DB14A5298800034C96 /* FactorFinder.mdimporter */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7593B1DD14A5298800034C96 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7593B1DE14A5298800034C96 /* CoreServices.framework */,
+				7593B1E014A5298800034C96 /* CoreFoundation.framework */,
+				7593B1E214A5298800034C96 /* CoreData.framework */,
+				7593B1E414A5298800034C96 /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7593B1E614A5298800034C96 /* FactorFinder */ = {
+			isa = PBXGroup;
+			children = (
+				7593B1EE14A5298800034C96 /* GetMetadataForFile.m */,
+				7593B1F014A5298800034C96 /* MySpotlightImporter.h */,
+				7593B1F114A5298800034C96 /* MySpotlightImporter.m */,
+				7593B1F314A5298800034C96 /* Importer Read Me.txt */,
+				7593B1E714A5298800034C96 /* Supporting Files */,
+			);
+			path = FactorFinder;
+			sourceTree = "<group>";
+		};
+		7593B1E714A5298800034C96 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				7593B1E814A5298800034C96 /* FactorFinder-Info.plist */,
+				7593B1E914A5298800034C96 /* InfoPlist.strings */,
+				7593B1EC14A5298800034C96 /* main.c */,
+				7593B1F414A5298800034C96 /* FactorFinder-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7593B1DA14A5298800034C96 /* FactorFinder */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7593B1F714A5298800034C96 /* Build configuration list for PBXNativeTarget "FactorFinder" */;
+			buildPhases = (
+				7593B1D714A5298800034C96 /* Sources */,
+				7593B1D814A5298800034C96 /* Frameworks */,
+				7593B1D914A5298800034C96 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FactorFinder;
+			productName = FactorFinder;
+			productReference = 7593B1DB14A5298800034C96 /* FactorFinder.mdimporter */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7593B1D214A5298800034C96 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
+			buildConfigurationList = 7593B1D514A5298800034C96 /* Build configuration list for PBXProject "FactorFinder" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 7593B1D014A5298800034C96;
+			productRefGroup = 7593B1DC14A5298800034C96 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7593B1DA14A5298800034C96 /* FactorFinder */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7593B1D914A5298800034C96 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7593B1EB14A5298800034C96 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7593B1D714A5298800034C96 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7593B1ED14A5298800034C96 /* main.c in Sources */,
+				7593B1EF14A5298800034C96 /* GetMetadataForFile.m in Sources */,
+				7593B1F214A5298800034C96 /* MySpotlightImporter.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		7593B1E914A5298800034C96 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7593B1EA14A5298800034C96 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		7593B1F514A5298800034C96 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		7593B1F614A5298800034C96 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		7593B1F814A5298800034C96 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FactorFinder/FactorFinder-Prefix.pch";
+				INFOPLIST_FILE = "FactorFinder/FactorFinder-Info.plist";
+				INSTALL_PATH = "@executable_path/../Contents/Library/Spotlight";
+				LIBRARY_STYLE = BUNDLE;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = mdimporter;
+			};
+			name = Debug;
+		};
+		7593B1F914A5298800034C96 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FactorFinder/FactorFinder-Prefix.pch";
+				INFOPLIST_FILE = "FactorFinder/FactorFinder-Info.plist";
+				INSTALL_PATH = "@executable_path/../Contents/Library/Spotlight";
+				LIBRARY_STYLE = BUNDLE;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = mdimporter;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7593B1D514A5298800034C96 /* Build configuration list for PBXProject "FactorFinder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7593B1F514A5298800034C96 /* Debug */,
+				7593B1F614A5298800034C96 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7593B1F714A5298800034C96 /* Build configuration list for PBXNativeTarget "FactorFinder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7593B1F814A5298800034C96 /* Debug */,
+				7593B1F914A5298800034C96 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7593B1D214A5298800034C96 /* Project object */;
+}
