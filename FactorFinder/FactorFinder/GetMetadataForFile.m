@@ -35,7 +35,7 @@ Boolean GetMetadataForFile(void *thisInterface, CFMutableDictionaryRef attribute
     @autoreleasepool {
         NSError *error = nil;
         
-        if ([(__bridge NSString *)contentTypeUTI isEqualToString:@"public.factor-source"]) {
+        if ([(__bridge NSString *)contentTypeUTI isEqualToString:@"public.factor-coredata"]) {
             // import from store file metadata
             
             // Create the URL, then attempt to get the meta-data from the store
@@ -47,7 +47,7 @@ Boolean GetMetadataForFile(void *thisInterface, CFMutableDictionaryRef attribute
                 // Get the information you are interested in from the dictionary
                 // "YOUR_INFO" should be replaced by key(s) you are interested in
                 
-                NSObject *contentToIndex = [metadata objectForKey:@"YOUR_INFO"];
+                NSObject *contentToIndex = [metadata objectForKey:@"public.factor-source-definitions"];
                 if (contentToIndex != nil) {
                     // Add the metadata to the text content for indexing
                     [(__bridge NSMutableDictionary *)attributes setObject:contentToIndex forKey:(NSString *)kMDItemTextContent];
@@ -55,7 +55,7 @@ Boolean GetMetadataForFile(void *thisInterface, CFMutableDictionaryRef attribute
                 }
             }
             
-        } else if ([(__bridge NSString *)contentTypeUTI isEqualToString:@"YOUR_EXTERNAL_RECORD_UTI"]) {
+        } else if ([(__bridge NSString *)contentTypeUTI isEqualToString:@"public.factor-source"]) {
             // import from an external record file
             
             MySpotlightImporter *importer = [[MySpotlightImporter alloc] init];
