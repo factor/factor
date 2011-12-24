@@ -3,10 +3,11 @@
 //  FactorFinder
 //
 //  Created by Dave Carlton on 12/23/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 PolyMicro Systems. All rights reserved.
 //
 
 #import "MySpotlightImporter.h"
+//#import "extract.h"
 
 #define YOUR_STORE_TYPE NSXMLStoreType
 
@@ -64,6 +65,8 @@
 
          */
 
+//        Boolean result = extract(NULL, attributes, (CFStringRef)@"", (CFStringRef)path);
+//        return result;
     }
 
     return YES;
