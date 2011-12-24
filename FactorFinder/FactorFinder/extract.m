@@ -75,6 +75,8 @@ extract(void * thisInterface,
 	NSMutableArray    * definitions = [NSMutableArray arrayWithCapacity: 128];
 	NSMutableString   * sourceContent = [NSMutableString stringWithCapacity: 4096];
 
+    NSLog(@"FactorSpotlight: %@", pathToFile);
+
 	// Grab our plist for file extensions
 	NSBundle     * myBundle = [NSBundle bundleWithIdentifier: @"org.factorcode.FactorFinder"];
 	NSDictionary * bundleDictionary = [myBundle infoDictionary];
@@ -98,8 +100,6 @@ extract(void * thisInterface,
 
 	if (!extensionOK)
         return success;
-
-    NSLog(@"FactorSpotlight: %@", pathToFile);
     
 	// setup for the file
 //	char * pathPtr = (char *)CFStringGetCStringPtr((CFStringRef)pathToFile, kCFStringEncodingUTF8);
