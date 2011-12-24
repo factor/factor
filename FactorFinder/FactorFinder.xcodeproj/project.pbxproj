@@ -16,7 +16,6 @@
 		7593B1EB14A5298800034C96 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7593B1E914A5298800034C96 /* InfoPlist.strings */; };
 		7593B1ED14A5298800034C96 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 7593B1EC14A5298800034C96 /* main.c */; };
 		7593B1EF14A5298800034C96 /* GetMetadataForFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 7593B1EE14A5298800034C96 /* GetMetadataForFile.m */; };
-		7593B1F214A5298800034C96 /* MySpotlightImporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7593B1F114A5298800034C96 /* MySpotlightImporter.m */; };
 		75D65F0514A66C1800B623E3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75D65F0414A66C1800B623E3 /* Cocoa.framework */; };
 		75D65F0F14A66C1800B623E3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 75D65F0D14A66C1800B623E3 /* InfoPlist.strings */; };
 		75D65F1514A66C1800B623E3 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 75D65F1314A66C1800B623E3 /* Credits.rtf */; };
@@ -26,7 +25,6 @@
 		75D65F2014A66C4400B623E3 /* test.m in Sources */ = {isa = PBXBuildFile; fileRef = 7566556F14A547D100555953 /* test.m */; };
 		75D65F2114A66C4900B623E3 /* GetMetadataForFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 7593B1EE14A5298800034C96 /* GetMetadataForFile.m */; };
 		75D65F2214A66C4C00B623E3 /* pms.m in Sources */ = {isa = PBXBuildFile; fileRef = 7566558614A54A0400555953 /* pms.m */; };
-		75D65F2314A66D3E00B623E3 /* MySpotlightImporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7593B1F114A5298800034C96 /* MySpotlightImporter.m */; };
 		75D65F2514A672BE00B623E3 /* schema.xml in Resources */ = {isa = PBXBuildFile; fileRef = 75D65F2414A672BE00B623E3 /* schema.xml */; };
 /* End PBXBuildFile section */
 
@@ -289,7 +287,6 @@
 			files = (
 				7593B1ED14A5298800034C96 /* main.c in Sources */,
 				7593B1EF14A5298800034C96 /* GetMetadataForFile.m in Sources */,
-				7593B1F214A5298800034C96 /* MySpotlightImporter.m in Sources */,
 				7566557314A547E000555953 /* extract.m in Sources */,
 				7566558714A54A0400555953 /* pms.m in Sources */,
 			);
@@ -303,7 +300,6 @@
 				75D65F2014A66C4400B623E3 /* test.m in Sources */,
 				75D65F2214A66C4C00B623E3 /* pms.m in Sources */,
 				75D65F2114A66C4900B623E3 /* GetMetadataForFile.m in Sources */,
-				75D65F2314A66D3E00B623E3 /* MySpotlightImporter.m in Sources */,
 				75D65F1F14A66C3E00B623E3 /* extract.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -350,7 +346,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -378,7 +374,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -399,11 +395,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = "FactorFinder/FactorFinder-Info.plist";
 				INSTALL_PATH = "@executable_path/../Contents/Library/Spotlight";
 				LIBRARY_STYLE = BUNDLE;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.6;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = mdimporter;
 			};
@@ -413,11 +412,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = "FactorFinder/FactorFinder-Info.plist";
 				INSTALL_PATH = "@executable_path/../Contents/Library/Spotlight";
 				LIBRARY_STYLE = BUNDLE;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.6;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = mdimporter;
 			};
