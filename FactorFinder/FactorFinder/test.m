@@ -5,15 +5,10 @@
 #import "test.h"
 
 Boolean processFile(NSString *path) {
-	
-    MySpotlightImporter *importer = [[MySpotlightImporter alloc] init];
+    NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithCapacity: 1];
     
-    NSMutableDictionary *testDict = [NSMutableDictionary dictionaryWithCapacity: 1];
-    NSError *error;
-    
-    Boolean ok = [importer importFileAtPath:path attributes:testDict error:&error];
+    return extract(NULL, attributes, @"", path);
 
-    return ok;
 }
 
 void processFolder(NSString * path) {
@@ -25,8 +20,10 @@ void processFolder(NSString * path) {
 		NSDirectoryEnumerator *dirEnumerator = [fileManager enumeratorAtPath:path];
 		while ((file = [dirEnumerator nextObject])) {
 			file = [path stringByAppendingPathComponent:file];
-			//NSLog(@"LibSpotlight testing: %@", file);
-			processFolder(file);
+            if ([file hasSuffix:@".factor"]) {
+                NSLog(@"LibSpotlight testing: %@", file);
+                processFolder(file);
+            }
 		}
 	} else
 		processFile(path);

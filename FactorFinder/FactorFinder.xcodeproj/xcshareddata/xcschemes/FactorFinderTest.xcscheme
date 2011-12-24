@@ -16,7 +16,7 @@
                BlueprintIdentifier = "7566557714A5486500555953"
                BuildableName = "FactorFinderTest"
                BlueprintName = "FactorFinderTest"
-               ReferencedContainer = "container:FactorFinder.xcodeproj">
+               ReferencedContainer = "container:../../../../../../Sources/Projects/factor/FactorFinder/FactorFinder.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -34,7 +34,7 @@
             BlueprintIdentifier = "7566557714A5486500555953"
             BuildableName = "FactorFinderTest"
             BlueprintName = "FactorFinderTest"
-            ReferencedContainer = "container:FactorFinder.xcodeproj">
+            ReferencedContainer = "container:../../../../../../Sources/Projects/factor/FactorFinder/FactorFinder.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -52,12 +52,12 @@
             BlueprintIdentifier = "7566557714A5486500555953"
             BuildableName = "FactorFinderTest"
             BlueprintName = "FactorFinderTest"
-            ReferencedContainer = "container:FactorFinder.xcodeproj">
+            ReferencedContainer = "container:../../../../../../Sources/Projects/factor/FactorFinder/FactorFinder.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "~/factor/work"
+            argument = "/Users/davec/factor/work"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
@@ -76,7 +76,7 @@
             BlueprintIdentifier = "7566557714A5486500555953"
             BuildableName = "FactorFinderTest"
             BlueprintName = "FactorFinderTest"
-            ReferencedContainer = "container:FactorFinder.xcodeproj">
+            ReferencedContainer = "container:../../../../../../Sources/Projects/factor/FactorFinder/FactorFinder.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

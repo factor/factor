@@ -9,8 +9,25 @@
 #include <CoreFoundation/CoreFoundation.h>
 #import <CoreData/CoreData.h>
 #import "MySpotlightImporter.h"
+#import "extract.h"
 
-Boolean GetMetadataForFile(void *thisInterface, CFMutableDictionaryRef attributes, CFStringRef contentTypeUTI, CFStringRef pathToFile);
+Boolean GetMetadataForFile(void* thisInterface, 
+                           CFMutableDictionaryRef attributes, 
+                           CFStringRef contentTypeUTI,
+                           CFStringRef pathToFile);
+
+Boolean GetMetadataForFile(void* thisInterface, 
+                           CFMutableDictionaryRef attributes, 
+                           CFStringRef contentTypeUTI,
+                           CFStringRef pathToFile)
+{
+    @autoreleasepool {
+        return extract(thisInterface, attributes, contentTypeUTI, pathToFile);
+    }
+}
+
+
+Boolean GetMetadataForFileNEW(void *thisInterface, CFMutableDictionaryRef attributes, CFStringRef contentTypeUTI, CFStringRef pathToFile);
 
 //==============================================================================
 //
@@ -22,7 +39,7 @@ Boolean GetMetadataForFile(void *thisInterface, CFMutableDictionaryRef attribute
 //
 //==============================================================================
 
-Boolean GetMetadataForFile(void *thisInterface, CFMutableDictionaryRef attributes, CFStringRef contentTypeUTI, CFStringRef pathToFile)
+Boolean GetMetadataForFileNEW(void *thisInterface, CFMutableDictionaryRef attributes, CFStringRef contentTypeUTI, CFStringRef pathToFile)
 {
     /* Pull any available metadata from the file at the specified path */
     /* Return the attribute keys and attribute values in the dict */
