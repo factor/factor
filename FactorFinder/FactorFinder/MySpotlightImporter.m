@@ -7,7 +7,7 @@
 //
 
 #import "MySpotlightImporter.h"
-//#import "extract.h"
+#import "extract.h"
 
 #define YOUR_STORE_TYPE NSXMLStoreType
 
@@ -65,8 +65,8 @@
 
          */
 
-//        Boolean result = extract(NULL, attributes, (CFStringRef)@"", (CFStringRef)path);
-//        return result;
+        Boolean ok = extract(NULL, spotlightData, @"", filePath);
+        return ok;
     }
 
     return YES;

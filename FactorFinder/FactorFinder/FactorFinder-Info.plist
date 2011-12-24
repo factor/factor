@@ -18,7 +18,7 @@
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>public.source-code</string>
-				<string>public.source-code-factor</string>
+				<string>public.factor-source</string>
 			</array>
 		</dict>
 	</array>
@@ -27,7 +27,7 @@
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
-	<string>com.polymicrosystems.${PRODUCT_NAME:rfc1034identifier}</string>
+	<string>org.factorcode.FactorFinder</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -61,13 +61,17 @@
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>
+				<string>public.factor-source</string>
+				<string>public.source</string>
+				<string>public.plain-text</string>
+				<string>public.text</string>
 				<string>public.data</string>
 				<string>public.content</string>
 			</array>
 			<key>UTTypeDescription</key>
 			<string>Factor source code file</string>
 			<key>UTTypeIdentifier</key>
-			<string>public.source-code-factor</string>
+			<string>public.factor-source</string>
 			<key>UTTypeReferenceURL</key>
 			<string>http://www.polymicro.net/FactorFinder</string>
 			<key>UTTypeTagSpecification</key>

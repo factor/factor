@@ -76,7 +76,7 @@ extract(void * thisInterface,
 	NSMutableString   * sourceContent = [NSMutableString stringWithCapacity: 4096];
 
 	// Grab our plist for file extensions
-	NSBundle     * myBundle = [NSBundle bundleWithIdentifier: @"org.factorcode.spotlight.factor"];
+	NSBundle     * myBundle = [NSBundle bundleWithIdentifier: @"org.factorcode.FactorFinder"];
 	NSDictionary * bundleDictionary = [myBundle infoDictionary];
 	NSArray      * myDocuentTypes = [bundleDictionary objectForKey: @"CFBundleDocumentTypes"];
 	NSDictionary * myDocuentTypesDictionary = [myDocuentTypes objectAtIndex: 0];
@@ -98,6 +98,8 @@ extract(void * thisInterface,
 
 	if (!extensionOK)
         return success;
+
+    NSLog(@"FactorSpotlight: %@", pathToFile);
     
 	// setup for the file
 //	char * pathPtr = (char *)CFStringGetCStringPtr((CFStringRef)pathToFile, kCFStringEncodingUTF8);
@@ -137,7 +139,7 @@ extract(void * thisInterface,
 	}
 
 	for (NSString * aString in fileLines) {
-        PMLOG(1, @"Factor File line: %s", aString);
+//        PMLOG(1, @"Factor File line: %@", aString);
 
         NSString *fileLine = aString;
 		range.location = 0;
@@ -254,8 +256,7 @@ extract(void * thisInterface,
 		success = YES;
 	}
 
-	[attributes setObject: @"Factor Source File"
-	 forKey: (NSString *)kMDItemKind];
+	[attributes setObject: @"Factor Source File" forKey: (NSString *)kMDItemKind];
 	[attributes setObject: sourceContent forKey: (id)kMDItemTextContent];
 
 end:
