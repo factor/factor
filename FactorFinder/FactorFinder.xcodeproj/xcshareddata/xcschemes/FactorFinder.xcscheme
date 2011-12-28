@@ -14,8 +14,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7593B1DA14A5298800034C96"
-               BuildableName = "FactorFinder.mdimporter"
-               BlueprintName = "FactorFinder"
+               BuildableName = "FactorImporter.mdimporter"
+               BlueprintName = "FactorImporter"
                ReferencedContainer = "container:FactorFinder.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,6 +28,15 @@
       buildConfiguration = "Debug">
       <Testables>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "7593B1DA14A5298800034C96"
+            BuildableName = "FactorImporter.mdimporter"
+            BlueprintName = "FactorImporter"
+            ReferencedContainer = "container:FactorFinder.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.GDB"
@@ -37,7 +46,21 @@
       buildConfiguration = "Debug"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
+      <PathRunnable
+         FilePath = "/usr/bin/mdimport">
+      </PathRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-r /Users/davec/Library/Spotlight/FactorImporter.mdimporter"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
+         <AdditionalOption
+            key = "USERBREAK"
+            value = "1"
+            isEnabled = "YES">
+         </AdditionalOption>
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
