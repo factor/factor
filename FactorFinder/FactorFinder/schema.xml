@@ -9,7 +9,8 @@
 	are CFNumber, CFDate, CFBoolean and CFData.		      
     </note>
     <attributes>
-        <attribute name="public_factor_source_definitions" multivalued="true" type="CFString"/>
+        <attribute name="public_factor_definitions" multivalued="true" type="CFString"/>
+        <attribute name="public_factor_uses" multivalued="true" type="CFString"/>
     </attributes>
 
     <types>
@@ -18,10 +19,10 @@
 				The keys that this metadata importer handles.
             </note>
             <allattrs>
-				public_factor_source_definitions
+                kMDItemCopyright kMDItemDescription kMDItemVersion kMDItemAuthors kMDItemKind kMDItemTextContent public_factor_uses public_factor_definitions
             </allattrs>
             <displayattrs>
-				public_factor_source_definitions
+                kMDItemCopyright kMDItemDescription kMDItemVersion kMDItemAuthors kMDItemKind kMDItemTextContent public_factor_uses public_factor_definitions
             </displayattrs>
         </type>
     </types>

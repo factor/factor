@@ -65,20 +65,20 @@ extract(void * thisInterface,
 	/* Return the attribute keys and attribute values in the dict */
 	/* Return TRUE if successful, FALSE if there was no data provided */
 
-	Boolean    foundTagLine = NO;
 	NSRange    range, theRange;
-	NSString * version, * author, * contains;
-//	NSString *date, *time;
+	NSString    *version, *author, *description, *uses, *copyright;
 	NSArray           * lineComponents;
 	NSArray           * lineSubComponents;
-	Boolean             success = NO;
+	Boolean             success = NO; // found at least one attribute
 	NSMutableArray    * definitions = [NSMutableArray arrayWithCapacity: 128];
+	NSMutableArray    * usesArray = [NSMutableArray arrayWithCapacity: 128];
 	NSMutableString   * sourceContent = [NSMutableString stringWithCapacity: 4096];
 
+    Debugger();
     NSLog(@"FactorSpotlight: %@", pathToFile);
 
 	// Grab our plist for file extensions
-	NSBundle     * myBundle = [NSBundle bundleWithIdentifier: @"org.factorcode.FactorFinder"];
+	NSBundle     * myBundle = [NSBundle bundleWithIdentifier: @"org.factorcode.mdimporter"];
 	NSDictionary * bundleDictionary = [myBundle infoDictionary];
 	NSArray      * myDocuentTypes = [bundleDictionary objectForKey: @"CFBundleDocumentTypes"];
 	NSDictionary * myDocuentTypesDictionary = [myDocuentTypes objectAtIndex: 0];
@@ -101,33 +101,9 @@ extract(void * thisInterface,
 	if (!extensionOK)
         return success;
     
-	// setup for the file
-//	char * pathPtr = (char *)CFStringGetCStringPtr((CFStringRef)pathToFile, kCFStringEncodingUTF8);
-//	if (pathPtr == NULL) {
-//		if ( CFStringGetCString(pathToFile, path, 2048, kCFStringEncodingUTF8) ) {
-//			NSLog(@"ForthSpotlight: %s", path);
-//			fh = fopen(path, "r");
-//		}
-//	} else {
-//		NSLog(@"ForthSpotlight: %s", pathPtr);
-//		fh = fopen(pathPtr, "r");
-//	}
-//	if (!fh)
-//		return success;
-//	fclose(fh);
 	NSStringEncoding fileEncoding;
 	NSError        * fileError = nil;
-//	NSDictionary * fileAttributes;
-//	NSURL * fileURL = [NSURL fileURLWithPath: (NSString *)pathToFile];
-//	NSAttributedString * fileString = [[NSAttributedString alloc] initWithURL: fileURL options: NULL documentAttributes: &fileAttributes error: &fileError];
-//	NSInteger errorCode = [fileError code];
-//	NSString * errorDomain = [fileError domain];
 	NSString * fileContent = [NSString stringWithContentsOfFile: pathToFile usedEncoding: &fileEncoding error: &fileError];
-//	if (fileString) {
-//		NSString * uti = [fileAttributes objectForKey: @"UTI"];
-//		NSString * type = [fileAttributes objectForKey: @"DocumentType"];
-//		fileEncoding = [[fileAttributes objectForKey: @"CharacterEncoding"] integerValue];
-//	}
 	if (!fileContent)
 		return success;
 
@@ -146,63 +122,78 @@ extract(void * thisInterface,
 		range.length = [fileLine length];
 
 		// Look thu header lines to glean info
-		// syslog(LOG_ALERT, "foundInitial = %d", foundInitial);
-
-		// Look for 'File:` in the line
-		theRange = [fileLine rangeOfString: @"File:\t" options: NSLiteralSearch range: range];
-		// syslog(LOG_ALERT, "Forth File: theRange = %d %d", theRange.location, theRange.length);
+		// Look for '! Copyright` in the line
+		theRange = [fileLine rangeOfString: @"! Copyright" options: NSLiteralSearch range: range];
+		// syslog(LOG_ALERT, "Factor File: theRange = %d %d", theRange.location, theRange.length);
 		if (theRange.location != NSNotFound) {
 			// found it, now split line at the ',` to see if it is an old CVS style tagged file
-			lineComponents = [fileLine componentsSeparatedByString: @",v "];
+			lineComponents = [fileLine componentsSeparatedByString: @"! Copyright "];
 			if ([lineComponents count] == 2) {
-				lineSubComponents = [lineComponents objectAtIndex: 1];
-				lineComponents = [(NSString *)lineSubComponents componentsSeparatedByString: @" "];
-				if ([lineComponents count]) {
-					version = [lineComponents objectAtIndex: 0];
-//					date = [lineComponents objectAtIndex: 1];
-//					time = [lineComponents objectAtIndex: 2];
-					author = [lineComponents objectAtIndex: 3];
-					//// syslog(LOG_ALERT, "author[0]= %s %c", [author UTF8String], [author characterAtIndex: 0]);
-					if ([author characterAtIndex: 0] == '(') {
-						// syslog(LOG_ALERT, "Forth File: range = %d %d", range.location, range.length);
-						range.location = 1;
-						range.length = [author length] - 1;
-						// syslog(LOG_ALERT, "Forth File: range = %d %d", range.location, range.length);
-						author = [author substringWithRange: range];
-					}
-					//							// syslog(LOG_ALERT, "Forth File: %s %s %s %s",
-					//								[version cString]
-					//								[date cString],
-					//								[time cString],
-					//								[author cString]);
-					version = [version stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
-					author = [author stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
-					[attributes setObject: version
-					 forKey: (NSString *)kMDItemVersion];
-					// could walk the log and gather all authors but I don't see much point, will just take last checkin author
-					[attributes setObject: author
-					 forKey: (NSString *)kMDItemAuthors];
-					// return YES so that the attributes are imported
+				copyright = [lineComponents objectAtIndex: 1];
+                [attributes setObject: copyright
+                               forKey: (NSString *)kMDItemCopyright];
 					success = YES;
-					foundTagLine = YES;
-				}
-			}
-		}
-		// Look for other data after the initial header line
-		// Find the containing line describing the file content
-		theRange = [fileLine rangeOfString: @"Contains:" options: NSLiteralSearch range: range];
+            }
+        }
+        // Look for a description tag
+        theRange = [fileLine rangeOfString: @"! Description:" options: NSLiteralSearch range: range];
 		if (theRange.location != NSNotFound) {
-			// found it, now split line at Contains:
+			// found it, now split line
+			lineComponents = [fileLine componentsSeparatedByString: @"! Description: "];
+			if ([lineComponents count] == 2) {
+				description = [lineComponents objectAtIndex: 1];
+                [attributes setObject: description
+                               forKey: (NSString *)kMDItemDescription];
+                success = YES;
+            }
+        }
+
+		// Find the Version number, if any
+        theRange = [fileLine rangeOfString: @"Version:" options: NSLiteralSearch range: range];
+        if (theRange.location != NSNotFound) {
+            fileLine = [fileLine stringByReplacingOccurrencesOfString: @"\t" withString: @" "];
+            NSArray  * lineComponents = [fileLine componentsSeparatedByString: @" "];
+            NSString * version = [lineComponents objectAtIndex: 1];
+            version = [version stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
+            [attributes setObject: version
+                           forKey: (NSString *)kMDItemVersion];
+            success = YES;
+        }
+        // Find the Directly Responsible Individual (DRI), if any
+        theRange = [fileLine rangeOfString: @"DRI:" options: NSLiteralSearch range: range];
+        if (theRange.location != NSNotFound) {
+            fileLine = [fileLine stringByReplacingOccurrencesOfString: @"\t" withString: @" "];
+            NSArray  * lineComponents = [fileLine componentsSeparatedByString: @"DRI:"];
+            NSString * author = [lineComponents objectAtIndex: 1];
+            author = [author stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
+            [attributes setObject: author
+                           forKey: (NSString *)kMDItemAuthors];
+            success = YES;
+        }
+
+		// Look for other data after the initial header line
+		// Find the containing line describing the file uses array
+		theRange = [fileLine rangeOfString: @"USING:" options: NSLiteralSearch range: range];
+		if (theRange.location != NSNotFound) {
+			// found it, now split line at USING:
 			fileLine = [fileLine stringByReplacingOccurrencesOfString: @"\t" withString: @" "];
-			lineComponents = [fileLine componentsSeparatedByString: @"Contains:"];
-			if ([lineComponents count]) {
-				contains = [lineComponents objectAtIndex: 1];
-				contains = [contains stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
-				[attributes setObject: contains
-				 forKey: (NSString *)kMDItemDescription];
-				success = YES;
-			}
-		}
+			lineComponents = [fileLine componentsSeparatedByString: @"USING:"];
+            if ([lineComponents count] == 2) {
+                lineSubComponents = [lineComponents objectAtIndex: 1];
+                lineComponents = [(NSString *)lineSubComponents componentsSeparatedByString: @" "];
+                if ([lineComponents count]) {
+                    for (uses in lineComponents) {
+                        if ( ! [uses isEqualToString: @";"] &&
+                            [uses length] )
+                            [usesArray addObject: uses];
+                    }
+                    [attributes setObject: usesArray
+                                   forKey: (NSString *)@"public_factor_uses"];
+                    success = YES;
+                }
+            }
+        }
+
 		// Parse for defining words
 		if ( assertRegex(fileLine, @"^:\\s*(\\S+)\\s+.*") ||
             assertRegex(fileLine, @"^::\\s*(\\S+)\\s+.*") ||
@@ -217,30 +208,6 @@ extract(void * thisInterface,
 			definition = [definition stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
 			[definitions addObject: definition];
 		}
-		// Find the Version number, if any
-		if (!foundTagLine) {
-			theRange = [fileLine rangeOfString: @"Version:" options: NSLiteralSearch range: range];
-			if (theRange.location != NSNotFound) {
-				fileLine = [fileLine stringByReplacingOccurrencesOfString: @"\t" withString: @" "];
-				NSArray  * lineComponents = [fileLine componentsSeparatedByString: @" "];
-				NSString * version = [lineComponents objectAtIndex: 1];
-				version = [version stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
-				[attributes setObject: version
-				 forKey: (NSString *)kMDItemVersion];
-				success = YES;
-			}
-			// Find the Directly Responsible Individual (DRI), if any
-			theRange = [fileLine rangeOfString: @"DRI:" options: NSLiteralSearch range: range];
-			if (theRange.location != NSNotFound) {
-				fileLine = [fileLine stringByReplacingOccurrencesOfString: @"\t" withString: @" "];
-				NSArray  * lineComponents = [fileLine componentsSeparatedByString: @"DRI:"];
-				NSString * author = [lineComponents objectAtIndex: 1];
-				author = [author stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
-				[attributes setObject: author
-				 forKey: (NSString *)kMDItemVersion];
-				success = YES;
-			}
-		}
 		// accumulate line
 		fileLine = [fileLine stringByReplacingOccurrencesOfString: @"\t" withString: @" "];
 		[sourceContent appendString: fileLine];
@@ -248,15 +215,15 @@ extract(void * thisInterface,
 
 	// store definitions into metadata
 	if ([definitions count] > 0) {
-		[attributes setObject: definitions forKey: @"public_factor_source_definitions"];
-//		int i;
-//		for(i=0; i < [definitions count]; i++) {
-//			NSLog(@"Def %d = %@", i, [definitions objectAtIndex: i]);
-//		}
+		[attributes setObject: definitions forKey: @"public_factor_definitions"];
+		int i;
+		for(i=0; i < [definitions count]; i++) {
+			NSLog(@"Factor Def %d = %@", i, [definitions objectAtIndex: i]);
+		}
 		success = YES;
 	}
 
-	[attributes setObject: @"Factor Source File" forKey: (NSString *)kMDItemKind];
+	[attributes setObject: @"Factor Sourcecode File" forKey: (NSString *)kMDItemKind];
 	[attributes setObject: sourceContent forKey: (id)kMDItemTextContent];
 
 end:
