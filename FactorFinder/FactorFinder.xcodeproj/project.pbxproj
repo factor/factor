@@ -7,52 +7,31 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7521A65314AA4A0A00792321 /* schema.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7521A65214AA4A0A00792321 /* schema.strings */; };
-		7566557314A547E000555953 /* extract.m in Sources */ = {isa = PBXBuildFile; fileRef = 7566557114A547E000555953 /* extract.m */; };
-		7566558714A54A0400555953 /* pms.m in Sources */ = {isa = PBXBuildFile; fileRef = 7566558614A54A0400555953 /* pms.m */; };
 		7593B1DF14A5298800034C96 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7593B1DE14A5298800034C96 /* CoreServices.framework */; };
 		7593B1E114A5298800034C96 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7593B1E014A5298800034C96 /* CoreFoundation.framework */; };
 		7593B1E314A5298800034C96 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7593B1E214A5298800034C96 /* CoreData.framework */; };
 		7593B1E514A5298800034C96 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7593B1E414A5298800034C96 /* Foundation.framework */; };
-		7593B1EB14A5298800034C96 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7593B1E914A5298800034C96 /* InfoPlist.strings */; };
-		7593B1ED14A5298800034C96 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 7593B1EC14A5298800034C96 /* main.c */; };
-		7593B1EF14A5298800034C96 /* GetMetadataForFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 7593B1EE14A5298800034C96 /* GetMetadataForFile.m */; };
 		75D65F0514A66C1800B623E3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75D65F0414A66C1800B623E3 /* Cocoa.framework */; };
 		75D65F0F14A66C1800B623E3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 75D65F0D14A66C1800B623E3 /* InfoPlist.strings */; };
 		75D65F1514A66C1800B623E3 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 75D65F1314A66C1800B623E3 /* Credits.rtf */; };
 		75D65F1814A66C1800B623E3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 75D65F1714A66C1800B623E3 /* AppDelegate.m */; };
 		75D65F1B14A66C1800B623E3 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 75D65F1914A66C1800B623E3 /* MainMenu.xib */; };
-		75D65F1F14A66C3E00B623E3 /* extract.m in Sources */ = {isa = PBXBuildFile; fileRef = 7566557114A547E000555953 /* extract.m */; };
-		75D65F2014A66C4400B623E3 /* test.m in Sources */ = {isa = PBXBuildFile; fileRef = 7566556F14A547D100555953 /* test.m */; };
-		75D65F2114A66C4900B623E3 /* GetMetadataForFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 7593B1EE14A5298800034C96 /* GetMetadataForFile.m */; };
-		75D65F2214A66C4C00B623E3 /* pms.m in Sources */ = {isa = PBXBuildFile; fileRef = 7566558614A54A0400555953 /* pms.m */; };
-		75D65F2514A672BE00B623E3 /* schema.xml in Resources */ = {isa = PBXBuildFile; fileRef = 75D65F2414A672BE00B623E3 /* schema.xml */; };
+		75E02D3E14ABA19700EF652B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 75E02D2B14ABA19700EF652B /* InfoPlist.strings */; };
+		75E02D3F14ABA19700EF652B /* schema.strings in Resources */ = {isa = PBXBuildFile; fileRef = 75E02D2D14ABA19700EF652B /* schema.strings */; };
+		75E02D4014ABA19700EF652B /* extract.m in Sources */ = {isa = PBXBuildFile; fileRef = 75E02D3014ABA19700EF652B /* extract.m */; };
+		75E02D4214ABA19700EF652B /* GetMetadataForFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 75E02D3314ABA19700EF652B /* GetMetadataForFile.m */; };
+		75E02D4414ABA19700EF652B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 75E02D3514ABA19700EF652B /* main.c */; };
+		75E02D4614ABA19700EF652B /* pms.m in Sources */ = {isa = PBXBuildFile; fileRef = 75E02D3914ABA19700EF652B /* pms.m */; };
+		75E02D4714ABA19700EF652B /* schema.xml in Resources */ = {isa = PBXBuildFile; fileRef = 75E02D3A14ABA19700EF652B /* schema.xml */; };
+		75E02D4914ABA19700EF652B /* test.m in Sources */ = {isa = PBXBuildFile; fileRef = 75E02D3D14ABA19700EF652B /* test.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		7521A65214AA4A0A00792321 /* schema.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = schema.strings; sourceTree = "<group>"; };
-		7521A65414AA4BCD00792321 /* test.factor */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.factor; sourceTree = "<group>"; };
-		7566556E14A547D100555953 /* test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
-		7566556F14A547D100555953 /* test.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = test.m; sourceTree = "<group>"; };
-		7566557114A547E000555953 /* extract.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = extract.m; sourceTree = "<group>"; };
-		7566557214A547E000555953 /* extract.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = extract.h; sourceTree = "<group>"; };
-		7566557C14A5486500555953 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		7566557E14A5486500555953 /* FactorFinderTest.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = FactorFinderTest.1; sourceTree = "<group>"; };
-		7566558514A54A0400555953 /* pms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pms.h; sourceTree = "<group>"; };
-		7566558614A54A0400555953 /* pms.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = pms.m; sourceTree = "<group>"; };
-		7593B1DB14A5298800034C96 /* FactorImporter.mdimporter */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FactorImporter.mdimporter; sourceTree = BUILT_PRODUCTS_DIR; };
+		7593B1DB14A5298800034C96 /* FactorSpotlight.mdimporter */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FactorSpotlight.mdimporter; sourceTree = BUILT_PRODUCTS_DIR; };
 		7593B1DE14A5298800034C96 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		7593B1E014A5298800034C96 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		7593B1E214A5298800034C96 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		7593B1E414A5298800034C96 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		7593B1E814A5298800034C96 /* FactorImporter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FactorImporter-Info.plist"; sourceTree = "<group>"; };
-		7593B1EA14A5298800034C96 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		7593B1EC14A5298800034C96 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		7593B1EE14A5298800034C96 /* GetMetadataForFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GetMetadataForFile.m; sourceTree = "<group>"; };
-		7593B1F014A5298800034C96 /* MySpotlightImporter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MySpotlightImporter.h; sourceTree = "<group>"; };
-		7593B1F114A5298800034C96 /* MySpotlightImporter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MySpotlightImporter.m; sourceTree = "<group>"; };
-		7593B1F314A5298800034C96 /* Importer Read Me.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Importer Read Me.txt"; sourceTree = "<group>"; };
-		7593B1F414A5298800034C96 /* FactorImporter-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FactorImporter-Prefix.pch"; sourceTree = "<group>"; };
 		75D65F0214A66C1800B623E3 /* FactorFinder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FactorFinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		75D65F0414A66C1800B623E3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		75D65F0714A66C1800B623E3 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -66,7 +45,23 @@
 		75D65F1614A66C1800B623E3 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		75D65F1714A66C1800B623E3 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		75D65F1A14A66C1800B623E3 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		75D65F2414A672BE00B623E3 /* schema.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = schema.xml; sourceTree = "<group>"; };
+		75E02D2C14ABA19700EF652B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		75E02D2E14ABA19700EF652B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/schema.strings; sourceTree = "<group>"; };
+		75E02D2F14ABA19700EF652B /* extract.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = extract.h; sourceTree = "<group>"; };
+		75E02D3014ABA19700EF652B /* extract.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = extract.m; sourceTree = "<group>"; };
+		75E02D3114ABA19700EF652B /* FactorImporter-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "FactorImporter-Prefix.pch"; sourceTree = "<group>"; };
+		75E02D3214ABA19700EF652B /* FactorSpotlight-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "FactorSpotlight-Info.plist"; sourceTree = "<group>"; };
+		75E02D3314ABA19700EF652B /* GetMetadataForFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetMetadataForFile.m; sourceTree = "<group>"; };
+		75E02D3414ABA19700EF652B /* Importer Read Me.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Importer Read Me.txt"; sourceTree = "<group>"; };
+		75E02D3514ABA19700EF652B /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		75E02D3614ABA19700EF652B /* MySpotlightImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MySpotlightImporter.h; sourceTree = "<group>"; };
+		75E02D3714ABA19700EF652B /* MySpotlightImporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MySpotlightImporter.m; sourceTree = "<group>"; };
+		75E02D3814ABA19700EF652B /* pms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pms.h; sourceTree = "<group>"; };
+		75E02D3914ABA19700EF652B /* pms.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = pms.m; sourceTree = "<group>"; };
+		75E02D3A14ABA19700EF652B /* schema.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = schema.xml; sourceTree = "<group>"; };
+		75E02D3B14ABA19700EF652B /* test.factor */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.factor; sourceTree = "<group>"; };
+		75E02D3C14ABA19700EF652B /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
+		75E02D3D14ABA19700EF652B /* test.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = test.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,20 +87,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		7566557B14A5486500555953 /* FactorFinderTest */ = {
-			isa = PBXGroup;
-			children = (
-				7566557C14A5486500555953 /* main.c */,
-				7566557E14A5486500555953 /* FactorFinderTest.1 */,
-			);
-			path = FactorFinderTest;
-			sourceTree = "<group>";
-		};
 		7593B1D014A5298800034C96 = {
 			isa = PBXGroup;
 			children = (
-				7593B1E614A5298800034C96 /* FactorFinder */,
-				7566557B14A5486500555953 /* FactorFinderTest */,
+				75E02D2A14ABA19700EF652B /* FactorSpotlight */,
 				75D65F0A14A66C1800B623E3 /* FactorFinderApp */,
 				7593B1DD14A5298800034C96 /* Frameworks */,
 				7593B1DC14A5298800034C96 /* Products */,
@@ -115,7 +100,7 @@
 		7593B1DC14A5298800034C96 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7593B1DB14A5298800034C96 /* FactorImporter.mdimporter */,
+				7593B1DB14A5298800034C96 /* FactorSpotlight.mdimporter */,
 				75D65F0214A66C1800B623E3 /* FactorFinder.app */,
 			);
 			name = Products;
@@ -132,38 +117,6 @@
 				75D65F0614A66C1800B623E3 /* Other Frameworks */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		7593B1E614A5298800034C96 /* FactorFinder */ = {
-			isa = PBXGroup;
-			children = (
-				7566558514A54A0400555953 /* pms.h */,
-				7566558614A54A0400555953 /* pms.m */,
-				7593B1EE14A5298800034C96 /* GetMetadataForFile.m */,
-				7593B1F014A5298800034C96 /* MySpotlightImporter.h */,
-				7593B1F114A5298800034C96 /* MySpotlightImporter.m */,
-				7566557114A547E000555953 /* extract.m */,
-				7566557214A547E000555953 /* extract.h */,
-				7566556E14A547D100555953 /* test.h */,
-				7566556F14A547D100555953 /* test.m */,
-				7593B1F314A5298800034C96 /* Importer Read Me.txt */,
-				7593B1E714A5298800034C96 /* Supporting Files */,
-			);
-			path = FactorFinder;
-			sourceTree = "<group>";
-		};
-		7593B1E714A5298800034C96 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				7521A65414AA4BCD00792321 /* test.factor */,
-				7521A65214AA4A0A00792321 /* schema.strings */,
-				75D65F2414A672BE00B623E3 /* schema.xml */,
-				7593B1E814A5298800034C96 /* FactorImporter-Info.plist */,
-				7593B1E914A5298800034C96 /* InfoPlist.strings */,
-				7593B1EC14A5298800034C96 /* main.c */,
-				7593B1F414A5298800034C96 /* FactorImporter-Prefix.pch */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		75D65F0614A66C1800B623E3 /* Other Frameworks */ = {
@@ -200,12 +153,52 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		75E02D2A14ABA19700EF652B /* FactorSpotlight */ = {
+			isa = PBXGroup;
+			children = (
+				75E02D4A14ABA21E00EF652B /* Resources */,
+				75E02D4B14ABA23B00EF652B /* Support */,
+				75E02D2F14ABA19700EF652B /* extract.h */,
+				75E02D3014ABA19700EF652B /* extract.m */,
+				75E02D3314ABA19700EF652B /* GetMetadataForFile.m */,
+				75E02D3614ABA19700EF652B /* MySpotlightImporter.h */,
+				75E02D3714ABA19700EF652B /* MySpotlightImporter.m */,
+				75E02D3814ABA19700EF652B /* pms.h */,
+				75E02D3914ABA19700EF652B /* pms.m */,
+				75E02D3C14ABA19700EF652B /* test.h */,
+				75E02D3D14ABA19700EF652B /* test.m */,
+				75E02D3514ABA19700EF652B /* main.c */,
+			);
+			path = FactorSpotlight;
+			sourceTree = "<group>";
+		};
+		75E02D4A14ABA21E00EF652B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				75E02D2B14ABA19700EF652B /* InfoPlist.strings */,
+				75E02D2D14ABA19700EF652B /* schema.strings */,
+				75E02D3A14ABA19700EF652B /* schema.xml */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		75E02D4B14ABA23B00EF652B /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				75E02D3114ABA19700EF652B /* FactorImporter-Prefix.pch */,
+				75E02D3214ABA19700EF652B /* FactorSpotlight-Info.plist */,
+				75E02D3414ABA19700EF652B /* Importer Read Me.txt */,
+				75E02D3B14ABA19700EF652B /* test.factor */,
+			);
+			name = Support;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7593B1DA14A5298800034C96 /* FactorImporter */ = {
+		7593B1DA14A5298800034C96 /* FactorSpotlight */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7593B1F714A5298800034C96 /* Build configuration list for PBXNativeTarget "FactorImporter" */;
+			buildConfigurationList = 7593B1F714A5298800034C96 /* Build configuration list for PBXNativeTarget "FactorSpotlight" */;
 			buildPhases = (
 				7593B1D714A5298800034C96 /* Sources */,
 				7593B1D814A5298800034C96 /* Frameworks */,
@@ -216,9 +209,9 @@
 			);
 			dependencies = (
 			);
-			name = FactorImporter;
+			name = FactorSpotlight;
 			productName = FactorFinder;
-			productReference = 7593B1DB14A5298800034C96 /* FactorImporter.mdimporter */;
+			productReference = 7593B1DB14A5298800034C96 /* FactorSpotlight.mdimporter */;
 			productType = "com.apple.product-type.bundle";
 		};
 		75D65F0114A66C1800B623E3 /* FactorFinder */ = {
@@ -258,7 +251,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7593B1DA14A5298800034C96 /* FactorImporter */,
+				7593B1DA14A5298800034C96 /* FactorSpotlight */,
 				75D65F0114A66C1800B623E3 /* FactorFinder */,
 			);
 		};
@@ -269,9 +262,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7593B1EB14A5298800034C96 /* InfoPlist.strings in Resources */,
-				75D65F2514A672BE00B623E3 /* schema.xml in Resources */,
-				7521A65314AA4A0A00792321 /* schema.strings in Resources */,
+				75E02D3E14ABA19700EF652B /* InfoPlist.strings in Resources */,
+				75E02D3F14ABA19700EF652B /* schema.strings in Resources */,
+				75E02D4714ABA19700EF652B /* schema.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -299,8 +292,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/bin/bash ";
-			shellScript = "set -x\nrm -fr ${HOME}/Library/Spotlight/${FULL_PRODUCT_NAME}\nmv ${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME} ${HOME}/Library/Spotlight/\n~/bin/lsregister -f ${HOME}/Library/Spotlight/${FULL_PRODUCT_NAME}\nmdimport -r ${HOME}/Library/Spotlight/${FULL_PRODUCT_NAME}\nmdimport -d2 ${SRCROOT}/FactorFinder/test.factor\n";
-			showEnvVarsInLog = 0;
+			shellScript = "set -x\nrm -fr $INSTALL_PATH/$TARGET_NAME.mdimporter\ncp -r $TARGET_BUILD_DIR/$TARGET_NAME.mdimporter  $INSTALL_PATH/\nmdimport -d2 -g \"${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}\" \"${SRCROOT}/FactorSpotlight/test.factor\"\nmdimport -d2 ${SRCROOT}/FactorSpotlight/test.factor\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -309,10 +301,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7593B1ED14A5298800034C96 /* main.c in Sources */,
-				7593B1EF14A5298800034C96 /* GetMetadataForFile.m in Sources */,
-				7566557314A547E000555953 /* extract.m in Sources */,
-				7566558714A54A0400555953 /* pms.m in Sources */,
+				75E02D4014ABA19700EF652B /* extract.m in Sources */,
+				75E02D4214ABA19700EF652B /* GetMetadataForFile.m in Sources */,
+				75E02D4414ABA19700EF652B /* main.c in Sources */,
+				75E02D4614ABA19700EF652B /* pms.m in Sources */,
+				75E02D4914ABA19700EF652B /* test.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -321,24 +314,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				75D65F1814A66C1800B623E3 /* AppDelegate.m in Sources */,
-				75D65F2014A66C4400B623E3 /* test.m in Sources */,
-				75D65F2214A66C4C00B623E3 /* pms.m in Sources */,
-				75D65F2114A66C4900B623E3 /* GetMetadataForFile.m in Sources */,
-				75D65F1F14A66C3E00B623E3 /* extract.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		7593B1E914A5298800034C96 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7593B1EA14A5298800034C96 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		75D65F0D14A66C1800B623E3 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -363,6 +344,22 @@
 			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
+		75E02D2B14ABA19700EF652B /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				75E02D2C14ABA19700EF652B /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		75E02D2D14ABA19700EF652B /* schema.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				75E02D2E14ABA19700EF652B /* en */,
+			);
+			name = schema.strings;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -385,7 +382,6 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx10.6;
 			};
@@ -404,7 +400,6 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx10.6;
 			};
@@ -416,10 +411,9 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				INFOPLIST_FILE = "FactorFinder/FactorImporter-Info.plist";
+				INFOPLIST_FILE = "FactorSpotlight/FactorSpotlight-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Spotlight";
 				LIBRARY_STYLE = BUNDLE;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.6;
 				SKIP_INSTALL = YES;
@@ -433,10 +427,9 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				INFOPLIST_FILE = "FactorFinder/FactorImporter-Info.plist";
+				INFOPLIST_FILE = "FactorSpotlight/FactorSpotlight-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Spotlight";
 				LIBRARY_STYLE = BUNDLE;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.6;
 				SKIP_INSTALL = YES;
@@ -480,7 +473,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7593B1F714A5298800034C96 /* Build configuration list for PBXNativeTarget "FactorImporter" */ = {
+		7593B1F714A5298800034C96 /* Build configuration list for PBXNativeTarget "FactorSpotlight" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7593B1F814A5298800034C96 /* Debug */,
