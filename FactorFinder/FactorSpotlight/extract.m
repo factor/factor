@@ -74,11 +74,10 @@ extract(void * thisInterface,
 	NSMutableArray    * usesArray = [NSMutableArray arrayWithCapacity: 128];
 	NSMutableString   * sourceContent = [NSMutableString stringWithCapacity: 4096];
 
-    Debugger();
     NSLog(@"FactorSpotlight: %@", pathToFile);
 
 	// Grab our plist for file extensions
-	NSBundle     * myBundle = [NSBundle bundleWithIdentifier: @"org.factorcode.mdimporter"];
+	NSBundle     * myBundle = [NSBundle bundleWithIdentifier: @"org.factorcode.Factor.spotlight"];
 	NSDictionary * bundleDictionary = [myBundle infoDictionary];
 	NSArray      * myDocuentTypes = [bundleDictionary objectForKey: @"CFBundleDocumentTypes"];
 	NSDictionary * myDocuentTypesDictionary = [myDocuentTypes objectAtIndex: 0];

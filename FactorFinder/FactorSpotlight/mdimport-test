@@ -1,0 +1,8 @@
+exec-file /usr/bin/mdimport
+set args -d2 -g ~/Library/Spotlight/FactorSpotlight.mdimport ~/factor/FactorFinder/FactorSpotlight/test.factor
+break * 0x0000000100001bb0
+tbreak * 0x100001e83
+
+set args -d2 -g ~/Library/Spotlight/SymbolSpotlighter.mdimport /usr/lib/dylib1.o
+
+mdimport  -d2 -g ~/Library/Spotlight/SymbolSpotlighter.mdimport /usr/lib/dylib1.o

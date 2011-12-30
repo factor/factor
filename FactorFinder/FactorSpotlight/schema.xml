@@ -14,15 +14,29 @@
     </attributes>
 
     <types>
-        <type name="public.factor-source">
+        <type name="org.factorcode.factor-source">
             <note>
 				The keys that this metadata importer handles.
             </note>
             <allattrs>
-                kMDItemCopyright kMDItemDescription kMDItemVersion kMDItemAuthors kMDItemKind kMDItemTextContent public_factor_uses public_factor_definitions
+                kMDItemCopyright
+                kMDItemDescription
+                kMDItemVersion
+                kMDItemAuthors
+                kMDItemKind
+                kMDItemTextContent
+                public_factor_uses
+                public_factor_definitions
             </allattrs>
             <displayattrs>
-                kMDItemCopyright kMDItemDescription kMDItemVersion kMDItemAuthors kMDItemKind kMDItemTextContent public_factor_uses public_factor_definitions
+                kMDItemCopyright
+                kMDItemDescription
+                kMDItemVersion
+                kMDItemAuthors
+                kMDItemKind
+                kMDItemTextContent
+                public_factor_uses
+                public_factor_definitions
             </displayattrs>
         </type>
     </types>
