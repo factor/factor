@@ -1,4 +1,4 @@
-USING: help.markup help.syntax ui.gadgets models ;
+USING: help.markup help.markup.private help.syntax ui.gadgets models ;
 IN: ui.gadgets.books
 
 HELP: book
