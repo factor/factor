@@ -4,7 +4,7 @@ IN: unicode.breaks
 ABOUT: "unicode.breaks"
 
 ARTICLE: "unicode.breaks" "Word and grapheme breaks"
-"The " { $vocab-link "unicode.breaks" "unicode.breaks" } " vocabulary partially implements Unicode Standard Annex #29. This provides for segmentation of a string along grapheme and word boundaries. In Unicode, a grapheme, or a basic unit of display in text, may be more than one code point. For example, in the string \"e\\u000301\" (where U+0301 is a combining acute accent), there is only one grapheme, as the acute accent goes above the e, forming a single grapheme. Word breaks, in general, are more complicated than simply splitting by whitespace, and the Unicode algorithm provides for that."
+"The " { $vocab-link "unicode.breaks" } " vocabulary partially implements Unicode Standard Annex #29. This provides for segmentation of a string along grapheme and word boundaries. In Unicode, a grapheme, or a basic unit of display in text, may be more than one code point. For example, in the string \"e\\u000301\" (where U+0301 is a combining acute accent), there is only one grapheme, as the acute accent goes above the e, forming a single grapheme. Word breaks, in general, are more complicated than simply splitting by whitespace, and the Unicode algorithm provides for that."
 $nl "Operations for graphemes:"
 { $subsections
     first-grapheme

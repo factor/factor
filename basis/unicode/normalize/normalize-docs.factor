@@ -4,7 +4,7 @@ IN: unicode.normalize
 ABOUT: "unicode.normalize"
 
 ARTICLE: "unicode.normalize" "Unicode normalization"
-"The " { $vocab-link "unicode.normalize" "unicode.normalize" } " vocabulary defines words for normalizing Unicode strings."
+"The " { $vocab-link "unicode.normalize" } " vocabulary defines words for normalizing Unicode strings."
 $nl
 "In Unicode, it is often possible to have multiple sequences of characters which really represent exactly the same thing. For example, to represent e with an acute accent above, there are two possible strings: " { $snippet "\"e\\u000301\"" } " (the e character, followed by the combining acute accent character) and " { $snippet "\"\\u0000e9\"" } " (a single character, e with an acute accent)."
 $nl

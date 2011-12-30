@@ -6,7 +6,7 @@ IN: unicode.data
 ABOUT: "unicode.data"
 
 ARTICLE: "unicode.data" "Unicode data tables"
-"The " { $vocab-link "unicode.data" "unicode.data" } " vocabulary contains core Unicode data tables and code for parsing this from files. The following words access these data tables."
+"The " { $vocab-link "unicode.data" } " vocabulary contains core Unicode data tables and code for parsing this from files. The following words access these data tables."
 { $subsections
     canonical-entry
     combine-chars
