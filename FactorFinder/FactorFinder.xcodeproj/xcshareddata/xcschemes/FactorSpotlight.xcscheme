@@ -14,8 +14,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7593B1DA14A5298800034C96"
-               BuildableName = "FactorImporter.mdimporter"
-               BlueprintName = "FactorImporter"
+               BuildableName = "FactorSpotlight.mdimporter"
+               BlueprintName = "FactorSpotlight"
                ReferencedContainer = "container:FactorFinder.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,8 +32,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7593B1DA14A5298800034C96"
-            BuildableName = "FactorImporter.mdimporter"
-            BlueprintName = "FactorImporter"
+            BuildableName = "FactorSpotlight.mdimporter"
+            BlueprintName = "FactorSpotlight"
             ReferencedContainer = "container:FactorFinder.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -49,10 +49,31 @@
       <PathRunnable
          FilePath = "/usr/bin/mdimport">
       </PathRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "7593B1DA14A5298800034C96"
+            BuildableName = "FactorSpotlight.mdimporter"
+            BlueprintName = "FactorSpotlight"
+            ReferencedContainer = "container:FactorFinder.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-r /Users/davec/Library/Spotlight/FactorImporter.mdimporter"
+            argument = "-d4"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-g /Users/davec/factor/FactorFinder/build/Debug/FactorSpotlight.mdimporter"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/davec/Dropbox/Public/factor/FactorFinder/FactorSpotlight/test.factor"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-r ${HOME}/Library/Spotlight/FactorImporter.mdimporter"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
