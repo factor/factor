@@ -7,20 +7,20 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>factor</string>
-			</array>
 			<key>CFBundleTypeRole</key>
-			<string>None</string>
+			<string>MDImporter</string>
+			<key>CFBundleTypeName</key>
+			<string>Factor Source File</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>org.factorcode.factor-source</string>
+				<string>public.source-code</string>
+				<string>public-text</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>${EXECUTABLE_NAME}</string>
+	<string>FactorSpotlight</string>
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
@@ -49,11 +49,9 @@
 	</dict>
 	<key>CFPlugInUnloadFunction</key>
 	<string></string>
-	<key>LSMinimumSystemVersion</key>
-	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2011 PolyMicro Systems. All rights reserved.</string>
-	<key>UTImportedTypeDeclarations</key>
+	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
 			<key>UTTypeConformsTo</key>
@@ -63,6 +61,8 @@
 			</array>
 			<key>UTTypeIdentifier</key>
 			<string>org.factorcode.factor-source</string>
+			<key>UTTypeDescription</key>
+			<string>Factor Source Code File</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
