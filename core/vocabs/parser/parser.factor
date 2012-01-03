@@ -49,13 +49,6 @@ M: extra-words equal?
 
 C: <extra-words> extra-words
 
-: clear-manifest ( -- )
-    manifest get
-    [ search-vocab-names>> clear-assoc ]
-    [ search-vocabs>> delete-all ]
-    [ qualified-vocabs>> delete-all ]
-    tri ;
-
 ERROR: no-word-in-vocab word vocab ;
 
 <PRIVATE
