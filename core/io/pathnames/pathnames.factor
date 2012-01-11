@@ -152,7 +152,7 @@ M: string absolute-path
             trim-head-separators vocab-path
             absolute-path
         ] [
-            "~/" ?head [
+            "~" ?head [
                 trim-head-separators home prepend-path
                 absolute-path
         ] [    
