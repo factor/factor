@@ -106,7 +106,7 @@ HELP: absolute-path
     { "path" "a pathname string" }
     { "path'" "a pathname string" }
 }
-{ $description "Prepends the " { $link current-directory } " to the pathname and resolves a " { $snippet "resource:" } ", " { $snippet "~/" } " or " { $snippet "vocab:" } " prefix, if present (see " { $link "io.pathnames.special" } ")." }
+{ $description "Prepends the " { $link current-directory } " to the pathname and resolves a " { $snippet "resource:" } ", " { $snippet "~" } " or " { $snippet "vocab:" } " prefix, if present (see " { $link "io.pathnames.special" } ")." }
 { $notes "This word is exactly the same as " { $link normalize-path } ", except on Windows NT platforms, where it does not prepend the Unicode path prefix. Most code should call " { $link normalize-path } " instead." } ;
 
 HELP: resolve-symlinks
@@ -133,7 +133,7 @@ ARTICLE: "io.pathnames.special" "Special pathnames"
 $nl
 "If a pathname begins with " { $snippet "vocab:" } ", then it will be searched for in all current vocabulary roots (see " { $link "add-vocab-roots" } ")."
 $nl
-"If a pathname begins with " { $snippet "~/" } ", it will be searched for in the home directory. Subsequent tildes in the pathname will be construed as literal tilde path or filenames and will not be treated specially. It should be noted that the " { $snippet "~" } " symbol without a forward slash will be also be treated as a literal path or filename." ;
+"If a pathname begins with " { $snippet "~" } ", it will be searched for in the home directory. Subsequent tildes in the pathname will be construed as literal tilde path or filenames and will not be treated specially. To access a filename named " { $snippet "~" } ", you must construct a path to reference the filename, even if it's within the current directory such as " { $snippet "./~" } "." ;
 
 ARTICLE: "io.pathnames.presentations" "Pathname presentations"
 "Pathname presentations are objects that wrap a pathname string. Clicking a pathname presentation in the UI brings up the file in one of the supported editors. See " { $link "editor" } " for more details."
