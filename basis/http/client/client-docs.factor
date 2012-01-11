@@ -145,9 +145,9 @@ ARTICLE: "http.client.post" "POST requests with the HTTP client"
 
 ARTICLE: "http.client.put" "PUT requests with the HTTP client"
 "Basic usage involves passing post data and a " { $link url } ", and getting a " { $link response } " and data back:"
-{ $subsections http-post }
+{ $subsections http-put }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
-{ $subsections <post-request> }
+{ $subsections <put-request> }
 "Both words take a post data parameter; see " { $link "http.client.post-data" } "." ;
 
 ARTICLE: "http.client.head" "HEAD requests with the HTTP client"
