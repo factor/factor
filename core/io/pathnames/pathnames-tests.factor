@@ -1,6 +1,6 @@
 USING: io.pathnames io.files.temp io.directories
 continuations math io.files.private kernel
-namespaces sequences tools.test io.pathnames.private ;
+namespaces tools.test io.pathnames.private ;
 IN: io.pathnames.tests
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
@@ -70,9 +70,3 @@ IN: io.pathnames.tests
 ! Regression test for bug in file-extension
 [ f ] [ "/funny.directory/file-with-no-extension" file-extension ] unit-test
 [ "" ] [ "/funny.directory/file-with-no-extension." file-extension ] unit-test
-
-! Testing ~/ special pathname
-[ t ] [ "~/" absolute-path home = ] unit-test 
-[ f ] [ "~" absolute-path home = ] unit-test
-[ t ] [ "~/~" absolute-path "/~" home prepend = ] unit-test
-[ t ] [ "~/~/" absolute-path "/~/" home prepend = ] unit-test

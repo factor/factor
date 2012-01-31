@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators environment io.backend kernel math math.order
+USING: accessors combinators io.backend kernel math math.order
 namespaces sequences splitting strings system ;
 IN: io.pathnames
 
@@ -135,10 +135,6 @@ M: object resolve-symlinks normalize-path ;
 : resource-path ( path -- newpath )
     "resource-path" get prepend-path ;
 
-HOOK: home io-backend ( -- dir )
-
-M: object home "" resource-path ;
-
 GENERIC: vocab-path ( path -- newpath )
 
 GENERIC: absolute-path ( path -- path' )
@@ -152,12 +148,8 @@ M: string absolute-path
             trim-head-separators vocab-path
             absolute-path
         ] [
-            "~/" ?head [
-                trim-head-separators home prepend-path
-                absolute-path
-        ] [    
             current-directory get prepend-path
-        ] if ] if 
+        ] if
     ] if ;
 
 M: object normalize-path ( path -- path' )
@@ -171,3 +163,6 @@ M: pathname absolute-path string>> absolute-path ;
 
 M: pathname <=> [ string>> ] compare ;
 
+HOOK: home io-backend ( -- dir )
+
+M: object home "" resource-path ;
