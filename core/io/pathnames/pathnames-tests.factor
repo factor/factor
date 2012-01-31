@@ -1,7 +1,6 @@
 USING: io.pathnames io.files.temp io.directories
 continuations math io.files.private kernel
-namespaces sequences system tools.test 
-io.backend io.pathnames.private ;
+namespaces sequences tools.test io.pathnames.private ;
 IN: io.pathnames.tests
 
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
@@ -72,14 +71,8 @@ IN: io.pathnames.tests
 [ f ] [ "/funny.directory/file-with-no-extension" file-extension ] unit-test
 [ "" ] [ "/funny.directory/file-with-no-extension." file-extension ] unit-test
 
-! Testing ~ special pathname
-[ t ] [ os windows? "~\\" "~/" ? absolute-path home = ] unit-test 
-[ t ] [ "~/" home [ normalize-path ] bi@ = ] unit-test 
-
-[ t ] [ "~" absolute-path home = ] unit-test
-[ t ] [ "~" home [ normalize-path ] bi@ = ] unit-test 
-
-[ t ] [ "~" home [ "foo" append-path ] bi@ [ normalize-path ] bi@ = ] unit-test
-[ t ] [ os windows? "~\\~/" "~/~/" ? "~" "~" append-path [ path-components ] bi@ = ] unit-test
-
-
+! Testing ~/ special pathname
+[ t ] [ "~/" absolute-path home = ] unit-test 
+[ f ] [ "~" absolute-path home = ] unit-test
+[ t ] [ "~/~" absolute-path "/~" home prepend = ] unit-test
+[ t ] [ "~/~/" absolute-path "/~/" home prepend = ] unit-test
