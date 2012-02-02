@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators environment io.backend kernel math math.order
+USING: accessors combinators io.backend kernel math math.order
 namespaces sequences splitting strings system ;
 IN: io.pathnames
 
