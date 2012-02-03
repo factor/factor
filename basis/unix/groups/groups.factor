@@ -71,7 +71,7 @@ ERROR: no-group string ;
 
 : (user-groups) ( string -- seq )
     #! first group is -1337, legacy unix code
-    -1337 unix.ffi:NGROUPS_MAX [ 4 * <byte-array> ] keep
+    -1337 64 [ 4 * <byte-array> ] keep
     int <ref> [ [ unix.ffi:getgrouplist ] unix-system-call drop ] 2keep
     [ 4 tail-slice ] [ int deref 1 - ] bi* >groups ;
 
