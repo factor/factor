@@ -70,9 +70,13 @@ ERROR: no-group string ;
     [ 4 grouping:group ] dip head-slice [ uint deref group-name ] map ;
 
 : (user-groups) ( string -- seq )
-    dup user-passwd gid>> 64 [ 4 * <byte-array> ] keep
-    int <ref> [ [ unix.ffi:getgrouplist ] unix-system-call drop ] 2keep
-    int deref >groups ;
+    dup user-passwd [
+        gid>> 64 [ 4 * <byte-array> ] keep
+        int <ref> [ [ unix.ffi:getgrouplist ] unix-system-call drop ] 2keep
+        int deref >groups
+    ] [
+        drop { }
+    ] if* ;
 
 PRIVATE>
     
