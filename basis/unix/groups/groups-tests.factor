@@ -40,3 +40,6 @@ IN: unix.groups.tests
 
 { f }
 [ "root" user-groups empty? ] unit-test
+
+{ t }
+[ "29032039029302930290390329uafjklajsdfkasjflaskjflsadkjfroot" user-groups empty? ] unit-test
