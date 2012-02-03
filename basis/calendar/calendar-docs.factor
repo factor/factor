@@ -490,11 +490,15 @@ HELP: saturday
 
 HELP: midnight
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
-{ $description "Returns a new timestamp that represents today at midnight, or the beginning of the day." } ;
+{ $description "Returns a new timestamp that represents the day at midnight, or the beginning of the day." } ;
 
 HELP: noon
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
-{ $description "Returns a new timestamp that represents today at noon, or the middle of the day." } ;
+{ $description "Returns a new timestamp that represents the day at noon, or the middle of the day." } ;
+
+HELP: today
+{ $values { "timestamp" timestamp } }
+{ $description "Returns a timestamp that represents today at midnight." } ;
 
 HELP: beginning-of-month
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }

@@ -416,8 +416,11 @@ M: timestamp day-name day-of-week day-names nth ;
 : noon ( timestamp -- new-timestamp )
     midnight 12 >>hour ; inline
 
+: today ( -- timestamp )
+    now midnight ; inline
+
 : beginning-of-month ( timestamp -- new-timestamp )
-    midnight 1 >>day ;
+    midnight 1 >>day ; inline
 
 : end-of-month ( timestamp -- new-timestamp )
     [ midnight ] [ days-in-month ] bi >>day ;
