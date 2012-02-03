@@ -37,3 +37,6 @@ IN: unix.groups.tests
 
 [ f ]
 [ all-group-names drop all-group-names empty? ] unit-test
+
+{ f }
+[ "root" user-groups empty? ] unit-test
