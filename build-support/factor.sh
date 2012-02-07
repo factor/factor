@@ -549,7 +549,7 @@ make_boot_image() {
 }
 
 install_deps_linux() {
-    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git-core git-doc rlwrap gcc make
+    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap gcc make
     check_ret sudo
 }
 
