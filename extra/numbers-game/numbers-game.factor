@@ -22,6 +22,7 @@ IN: numbers-game
     dup guess-prompt read-number judge-guess
     [ numbers-game-loop ] [ drop ] if ;
 
-: numbers-game ( -- ) number-to-guess numbers-game-loop ;
+: numbers-game ( -- )
+    guess-banner number-to-guess numbers-game-loop ;
 
 MAIN: numbers-game
