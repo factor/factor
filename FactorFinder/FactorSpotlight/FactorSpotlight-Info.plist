@@ -9,14 +9,12 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>MDImporter</string>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>factor</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>Factor Source File</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>org.factorcode.factor-source</string>
-				<string>public.source-code</string>
-				<string>public-text</string>
-			</array>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
@@ -52,6 +50,27 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2011 PolyMicro Systems. All rights reserved.</string>
 	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.text</string>
+				<string>public.source-code</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>org.factorcode.factor-source</string>
+			<key>UTTypeDescription</key>
+			<string>Factor Source Code File</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>factor</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
 			<key>UTTypeConformsTo</key>
