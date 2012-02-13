@@ -63,7 +63,7 @@ void code_heap::free(code_block *compiled)
 	FACTOR_ASSERT(!uninitialized_p(compiled));
 	points_to_nursery.erase(compiled);
 	points_to_aging.erase(compiled);
-	all_blocks.erase(compiled);
+	all_blocks.erase((cell)compiled);
 	allocator->free(compiled);
 }
 
@@ -72,38 +72,58 @@ void code_heap::flush_icache()
 	factor::flush_icache(seg->start,seg->size);
 }
 
-struct all_blocks_set_verifier {
-	std::set<code_block*> *leftovers;
+struct clear_free_blocks_from_all_blocks_iterator
+{
+	code_heap *code;
 
-	all_blocks_set_verifier(std::set<code_block*> *leftovers) : leftovers(leftovers) {}
+	clear_free_blocks_from_all_blocks_iterator(code_heap *code) : code(code) {}
+
+	void operator()(code_block *free_block, cell size) {
+		std::set<cell>::iterator erase_from =
+			code->all_blocks.lower_bound((cell)free_block);
+		std::set<cell>::iterator erase_to =
+			code->all_blocks.lower_bound((cell)free_block + size);
+
+		code->all_blocks.erase(erase_from, erase_to);
+	}
+};
+
+void code_heap::sweep()
+{
+	clear_free_blocks_from_all_blocks_iterator clearer(this);
+	allocator->sweep(clearer);
+#ifdef FACTOR_DEBUG
+	verify_all_blocks_set();
+#endif
+}
+
+struct all_blocks_set_verifier {
+	std::set<cell> *all_blocks;
+
+	all_blocks_set_verifier(std::set<cell> *all_blocks) : all_blocks(all_blocks) {}
 
 	void operator()(code_block *block, cell size)
 	{
-		FACTOR_ASSERT(leftovers->find(block) != leftovers->end());
-		leftovers->erase(block);
+		FACTOR_ASSERT(all_blocks->find((cell)block) != all_blocks->end());
 	}
 };
 
 void code_heap::verify_all_blocks_set()
 {
-	std::set<code_block*> leftovers = all_blocks;
-	all_blocks_set_verifier verifier(&leftovers);
+	all_blocks_set_verifier verifier(&all_blocks);
 	allocator->iterate(verifier);
-	FACTOR_ASSERT(leftovers.empty());
 }
 
 code_block *code_heap::code_block_for_address(cell address)
 {
-#ifdef FACTOR_DEBUG
-	verify_all_blocks_set();
-#endif
-	std::set<code_block*>::const_iterator blocki =
-		all_blocks.upper_bound((code_block*)address);
+	std::set<cell>::const_iterator blocki =
+		all_blocks.upper_bound(address);
 	FACTOR_ASSERT(blocki != all_blocks.begin());
 	--blocki;
-	code_block* found_block = *blocki;
+	code_block* found_block = (code_block*)*blocki;
 	FACTOR_ASSERT((cell)found_block->entry_point() <= address
-		&& address - (cell)found_block->entry_point() < found_block->size());
+		/* XXX this isn't valid during fixup. should store the size in the map
+		&& address - (cell)found_block->entry_point() < found_block->size()*/);
 	return found_block;
 }
 
@@ -114,7 +134,7 @@ struct all_blocks_set_inserter {
 
 	void operator()(code_block *block, cell size)
 	{
-		code->all_blocks.insert(block);
+		code->all_blocks.insert((cell)block);
 	}
 };
 
@@ -123,19 +143,9 @@ void code_heap::initialize_all_blocks_set()
 	all_blocks.clear();
 	all_blocks_set_inserter inserter(this);
 	allocator->iterate(inserter);
-}
-
-void code_heap::update_all_blocks_set(mark_bits<code_block> *code_forwarding_map)
-{
-	std::set<code_block *> new_all_blocks;
-	for (std::set<code_block *>::const_iterator oldi = all_blocks.begin();
-		oldi != all_blocks.end();
-		++oldi)
-	{
-		code_block *new_block = code_forwarding_map->forward_block(*oldi);
-		new_all_blocks.insert(new_block);
-	}
-	all_blocks.swap(new_all_blocks);
+#if defined(FACTOR_DEBUG)
+	verify_all_blocks_set();
+#endif
 }
 
 /* Allocate a code heap during startup */
@@ -210,6 +220,7 @@ void factor_vm::primitive_modify_code_heap()
 				cell relocation = array_nth(compiled_data,2);
 				cell labels = array_nth(compiled_data,3);
 				cell code = array_nth(compiled_data,4);
+				cell frame_size = untag_fixnum(array_nth(compiled_data,5));
 
 				code_block *compiled = add_code_block(
 					code_block_optimized,
@@ -218,7 +229,8 @@ void factor_vm::primitive_modify_code_heap()
 					word.value(),
 					relocation,
 					parameters,
-					literals);
+					literals,
+					frame_size);
 
 				word->entry_point = compiled->entry_point();
 			}

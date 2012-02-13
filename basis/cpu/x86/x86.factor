@@ -48,7 +48,7 @@ HOOK: reserved-stack-space cpu ( -- n )
 M: x86 stack-frame-size ( stack-frame -- i )
     (stack-frame-size)
     reserved-stack-space +
-    3 cells +
+    cell +
     align-stack ;
 
 HOOK: pic-tail-reg cpu ( -- reg )
@@ -515,6 +515,8 @@ M: x86 %call-gc ( gc-map -- )
 M: x86 %alien-global ( dst symbol library -- )
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
 
+M: x86 %prologue ( n -- ) cell - decr-stack-reg ;
+
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
 :: (%boolean) ( dst temp insn -- )
@@ -776,7 +778,17 @@ enable-log2
 
 : check-sse ( -- )
     "Checking for multimedia extensions... " write flush
-    [ { (sse-version) } compile ] with-optimizer
     sse-version
     [ sse-string " detected" append print ]
     [ 20 < "cpu.x86.x87" "cpu.x86.sse" ? require ] bi ;
+
+: check-popcnt ( -- )
+    enable-popcnt? [
+        "Building with POPCNT support" print
+        enable-bit-count
+    ] when ;
+
+: check-cpu-features ( -- )
+    [ { (sse-version) popcnt? } compile ] with-optimizer
+    check-sse
+    check-popcnt ;

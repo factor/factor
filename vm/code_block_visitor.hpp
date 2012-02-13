@@ -42,12 +42,13 @@ struct call_frame_code_block_visitor {
 	explicit call_frame_code_block_visitor(factor_vm *parent_, Fixup fixup_) :
 		parent(parent_), fixup(fixup_) {}
 
-	void operator()(stack_frame *frame)
+	void operator()(void *frame_top, cell frame_size, code_block *owner, void *addr)
 	{
-		cell offset = parent->frame_offset(frame);
-		code_block *compiled = fixup.fixup_code(parent->frame_code(frame));
-		frame->entry_point = compiled->entry_point();
-		parent->set_frame_offset(frame,offset);
+		code_block *compiled = Fixup::translated_code_block_map
+			? owner
+			: fixup.fixup_code(owner);
+		void *fixed_addr = compiled->address_for_offset(owner->offset(addr));
+		set_frame_return_address(frame_top, fixed_addr);
 	}
 };
 
@@ -74,7 +75,7 @@ void code_block_visitor<Fixup>::visit_object_code_block(object *obj)
 		{
 			callstack *stack = (callstack *)obj;
 			call_frame_code_block_visitor<Fixup> call_frame_visitor(parent,fixup);
-			parent->iterate_callstack_object(stack,call_frame_visitor);
+			parent->iterate_callstack_object(stack,call_frame_visitor,fixup);
 			break;
 		}
 	}
@@ -110,7 +111,7 @@ template<typename Fixup>
 void code_block_visitor<Fixup>::visit_context_code_blocks()
 {
 	call_frame_code_block_visitor<Fixup> call_frame_visitor(parent,fixup);
-	parent->iterate_active_callstacks(call_frame_visitor);
+	parent->iterate_active_callstacks(call_frame_visitor,fixup);
 }
 
 template<typename Fixup>

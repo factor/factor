@@ -34,20 +34,14 @@ IN: bootstrap.x86
     RAX CALL ;
 
 [
-    ! load entry point
-    RAX 0 MOV rc-absolute-cell rel-this
-    ! alignment
-    RSP stack-frame-size bootstrap-cell - SUB
-    ! store entry point
-    RSP stack-frame-size 3 bootstrap-cells - [+] RAX MOV
-    ! store stack frame size
-    RSP stack-frame-size 2 bootstrap-cells - [+] stack-frame-size MOV
-] jit-prolog jit-define
-
-[
     pic-tail-reg 5 [RIP+] LEA
     0 JMP f rc-relative rel-word-pic-tail
 ] jit-word-jump jit-define
+
+: jit-load-vm ( -- )
+    ! no-op on x86-64. in factor contexts vm-reg always contains the
+    ! vm pointer.
+    ;
 
 : jit-load-context ( -- )
     ctx-reg vm-reg vm-context-offset [+] MOV ;
@@ -93,26 +87,6 @@ IN: bootstrap.x86
 
 : signal-handler-save-regs ( -- regs )
     { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 R13 R14 R15 } ;
-
-:: jit-signal-handler-prolog ( -- frame-size )
-    signal-handler-save-regs :> save-regs
-    save-regs length 1 + bootstrap-cells 16 align stack-frame-size + :> frame-size
-    ! minus a cell each for flags, return address
-    ! use LEA so we don't dirty flags
-    RSP RSP frame-size 2 bootstrap-cells - neg [+] LEA
-    save-regs [| r i | RSP i bootstrap-cells [+] r MOV ] each-index
-    PUSHF
-    ! Now that the registers are saved, we can make the stack frame
-    RAX 0 MOV rc-absolute-cell rel-this
-    RSP frame-size 3 bootstrap-cells - [+] RAX MOV
-    RSP frame-size 2 bootstrap-cells - [+] frame-size MOV
-    frame-size ;
-
-:: jit-signal-handler-epilog ( frame-size -- )
-    POPF
-    signal-handler-save-regs
-    [| r i | r RSP i bootstrap-cells [+] MOV ] each-index
-    RSP RSP frame-size 2 bootstrap-cells - [+] LEA ;
 
 [
     arg1 ds-reg [] MOV
@@ -261,9 +235,9 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
-    ! Reset return value since its bogus right now, to avoid
-    ! confusing the GC
-    RSP -8 [+] 0 MOV
+    ! Push a bogus return address so the GC can track this frame back
+    ! to the owner
+    0 CALL
 
     ! Make the new context the current one
     ctx-reg swap MOV

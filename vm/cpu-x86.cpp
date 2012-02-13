@@ -13,18 +13,16 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 		the signal handler to do its thing, and launch the handler without going
 		through the resumable subprimitive. */
 		signal_resumable = false;
-		stack_frame *frame = ctx->bottom_frame();
+		void *frame_top = (void*)ctx->callstack_top;
 
-		while((cell)frame >= *sp
-			&& frame >= ctx->callstack_top
-			&& (cell)frame >= ctx->callstack_seg->start + stack_reserved)
+		while(frame_top < ctx->callstack_bottom
+			&& (cell)frame_top < ctx->callstack_seg->start + stack_reserved)
 		{
-			frame = frame_successor(frame);
+			frame_top = frame_predecessor(frame_top);
 		}
 
-		cell newsp = (cell)(frame+1);
-		*sp = newsp;
-		ctx->callstack_top = (stack_frame*)newsp;
+		*sp = (cell)frame_top;
+		ctx->callstack_top = frame_top;
 		*pc = handler;
 	} else {
 		signal_resumable = true;
@@ -50,13 +48,10 @@ void factor_vm::dispatch_signal_handler(cell *sp, cell *pc, cell handler)
 		else if (offset == 16 - sizeof(cell))
 		{
 			// Make a fake frame for the leaf procedure
-			code_block *leaf_block = code->code_block_for_address(*pc);
-			FACTOR_ASSERT(leaf_block != NULL);
+			FACTOR_ASSERT(code->code_block_for_address(*pc) != NULL);
 
-			cell newsp = *sp - 4*sizeof(cell);
-			*(cell*)(newsp + 3*sizeof(cell)) = 4*sizeof(cell);
-			*(cell*)(newsp + 2*sizeof(cell)) = (cell)leaf_block->entry_point();
-			*(cell*) newsp                   = *pc;
+			cell newsp = *sp - LEAF_FRAME_SIZE;
+			*(cell*)newsp = *pc;
 			*sp = newsp;
 			handler_word = tagged<word>(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
 		}

@@ -178,11 +178,15 @@ struct factor_vm
 	void primitive_check_datastack();
 	void primitive_load_locals();
 
-	template<typename Iterator> void iterate_active_callstacks(Iterator &iter)
+	template<typename Iterator, typename Fixup>
+	void iterate_active_callstacks(Iterator &iter, Fixup &fixup)
 	{
 		std::set<context *>::const_iterator begin = active_contexts.begin();
 		std::set<context *>::const_iterator end = active_contexts.end();
-		while(begin != end) iterate_callstack(*begin++,iter);
+		while(begin != end)
+		{
+			iterate_callstack(*begin++,iter,fixup);
+		}
 	}
 
 	// run
@@ -577,7 +581,9 @@ struct factor_vm
 	void initialize_code_block(code_block *compiled);
 	void fixup_labels(array *labels, code_block *compiled);
 	code_block *allot_code_block(cell size, code_block_type type);
-	code_block *add_code_block(code_block_type type, cell code_, cell labels_, cell owner_, cell relocation_, cell parameters_, cell literals_);
+	code_block *add_code_block(code_block_type type, cell code_, cell labels_,
+		cell owner_, cell relocation_, cell parameters_, cell literals_,
+		cell frame_size_untagged);
 
 	//code heap
 	inline void check_code_pointer(cell ptr) { }
@@ -615,29 +621,28 @@ struct factor_vm
 	bool read_embedded_image_footer(FILE *file, embedded_image_footer *footer);
 	bool embedded_image_p();
 
-	// callstack
-	template<typename Iterator> void iterate_callstack_object(callstack *stack_, Iterator &iterator);
-	void check_frame(stack_frame *frame);
+	template<typename Iterator, typename Fixup>
+	void iterate_callstack_object(callstack *stack_, Iterator &iterator,
+		Fixup &fixup);
+	template<typename Iterator>
+	void iterate_callstack_object(callstack *stack_, Iterator &iterator);
+
 	callstack *allot_callstack(cell size);
-	stack_frame *second_from_top_stack_frame(context *ctx);
+	void *second_from_top_stack_frame(context *ctx);
 	cell capture_callstack(context *ctx);
 	void primitive_callstack();
 	void primitive_callstack_for();
-	code_block *frame_code(stack_frame *frame);
-	code_block_type frame_type(stack_frame *frame);
-	cell frame_executing(stack_frame *frame);
-	cell frame_executing_quot(stack_frame *frame);
-	stack_frame *frame_successor(stack_frame *frame);
-	cell frame_scan(stack_frame *frame);
-	cell frame_offset(stack_frame *frame);
-	void set_frame_offset(stack_frame *frame, cell offset);
+	void *frame_predecessor(void *frame);
 	void primitive_callstack_to_array();
-	stack_frame *innermost_stack_frame(stack_frame *bottom, stack_frame *top);
 	void primitive_innermost_stack_frame_executing();
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
 	void primitive_callstack_bounds();
-	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
+
+	template<typename Iterator, typename Fixup>
+	void iterate_callstack(context *ctx, Iterator &iterator, Fixup &fixup);
+	template<typename Iterator>
+	void iterate_callstack(context *ctx, Iterator &iterator);
 
 	// cpu-*
 	void dispatch_signal_handler(cell *sp, cell *pc, cell newpc);
@@ -700,7 +705,7 @@ struct factor_vm
 	// entry points
 	void c_to_factor(cell quot);
 	template<typename Func> Func get_entry_point(cell n);
-	void unwind_native_frames(cell quot, stack_frame *to);
+	void unwind_native_frames(cell quot, void *to);
 	cell get_fpu_state();
 	void set_fpu_state(cell state);
 

@@ -3,14 +3,6 @@
 namespace factor
 {
 
-void factor_vm::check_frame(stack_frame *frame)
-{
-#ifdef FACTOR_DEBUG
-	check_code_pointer((cell)frame->entry_point);
-	FACTOR_ASSERT(frame->size != 0);
-#endif
-}
-
 callstack *factor_vm::allot_callstack(cell size)
 {
 	callstack *stack = allot<callstack>(callstack_object_size(size));
@@ -26,22 +18,23 @@ This means that if 'callstack' is called in tail position, we
 will have popped a necessary frame... however this word is only
 called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
-stack_frame *factor_vm::second_from_top_stack_frame(context *ctx)
+void *factor_vm::second_from_top_stack_frame(context *ctx)
 {
-	stack_frame *frame = ctx->bottom_frame();
-	while(frame >= ctx->callstack_top
-		&& frame_successor(frame) >= ctx->callstack_top
-		&& frame_successor(frame_successor(frame)) >= ctx->callstack_top)
+	void *frame_top = ctx->callstack_top;
+	for (cell i = 0; i < 2; ++i)
 	{
-		frame = frame_successor(frame);
+		void *pred = frame_predecessor(frame_top);
+		if (pred >= ctx->callstack_bottom)
+			return frame_top;
+		frame_top = pred;
 	}
-	return frame + 1;
+	return frame_top;
 }
 
 cell factor_vm::capture_callstack(context *ctx)
 {
-	stack_frame *top = second_from_top_stack_frame(ctx);
-	stack_frame *bottom = ctx->callstack_bottom;
+	void *top = second_from_top_stack_frame(ctx);
+	void *bottom = ctx->callstack_bottom;
 
 	fixnum size = std::max((fixnum)0,(fixnum)bottom - (fixnum)top);
 
@@ -61,90 +54,27 @@ void factor_vm::primitive_callstack_for()
 	ctx->push(capture_callstack(other_ctx));
 }
 
-code_block *factor_vm::frame_code(stack_frame *frame)
+void *factor_vm::frame_predecessor(void *frame_top)
 {
-	check_frame(frame);
-	return (code_block *)frame->entry_point - 1;
-}
-
-code_block_type factor_vm::frame_type(stack_frame *frame)
-{
-	return frame_code(frame)->type();
-}
-
-cell factor_vm::frame_executing(stack_frame *frame)
-{
-	return frame_code(frame)->owner;
-}
-
-cell factor_vm::frame_executing_quot(stack_frame *frame)
-{
-	tagged<object> executing(frame_executing(frame));
-	code_block *compiled = frame_code(frame);
-	if(!compiled->optimized_p() && executing->type() == WORD_TYPE)
-		executing = executing.as<word>()->def;
-	return executing.value();
-}
-
-stack_frame *factor_vm::frame_successor(stack_frame *frame)
-{
-	check_frame(frame);
-	return (stack_frame *)((cell)frame - frame->size);
-}
-
-cell factor_vm::frame_offset(stack_frame *frame)
-{
-	char *entry_point = (char *)frame_code(frame)->entry_point();
-	char *return_address = (char *)FRAME_RETURN_ADDRESS(frame,this);
-	if(return_address)
-		return return_address - entry_point;
-	else
-		return (cell)-1;
-}
-
-void factor_vm::set_frame_offset(stack_frame *frame, cell offset)
-{
-	char *entry_point = (char *)frame_code(frame)->entry_point();
-	if(offset == (cell)-1)
-		FRAME_RETURN_ADDRESS(frame,this) = NULL;
-	else
-		FRAME_RETURN_ADDRESS(frame,this) = entry_point + offset;
-}
-
-cell factor_vm::frame_scan(stack_frame *frame)
-{
-	switch(frame_type(frame))
-	{
-	case code_block_unoptimized:
-		{
-			tagged<object> obj(frame_executing(frame));
-			if(obj.type_p(WORD_TYPE))
-				obj = obj.as<word>()->def;
-
-			if(obj.type_p(QUOTATION_TYPE))
-				return tag_fixnum(quot_code_offset_to_scan(obj.value(),frame_offset(frame)));
-			else
-				return false_object;
-		}
-	case code_block_optimized:
-		return false_object;
-	default:
-		critical_error("Bad frame type",frame_type(frame));
-		return false_object;
-	}
+	void *addr = frame_return_address((void*)frame_top);
+	FACTOR_ASSERT(addr != 0);
+	code_block *owner = code->code_block_for_address((cell)addr);
+	cell frame_size = owner->stack_frame_size_for_address((cell)addr);
+	return (void*)((char*)frame_top + frame_size);
 }
 
 struct stack_frame_accumulator {
 	factor_vm *parent;
 	growable_array frames;
 
-	explicit stack_frame_accumulator(factor_vm *parent_) : parent(parent_), frames(parent_) {} 
+	explicit stack_frame_accumulator(factor_vm *parent_)
+		: parent(parent_), frames(parent_) {}
 
-	void operator()(stack_frame *frame)
+	void operator()(void *frame_top, cell frame_size, code_block *owner, void *addr)
 	{
-		data_root<object> executing_quot(parent->frame_executing_quot(frame),parent);
-		data_root<object> executing(parent->frame_executing(frame),parent);
-		data_root<object> scan(parent->frame_scan(frame),parent);
+		data_root<object> executing_quot(owner->owner_quot(),parent);
+		data_root<object> executing(owner->owner,parent);
+		data_root<object> scan(owner->scan(parent, addr),parent);
 
 		frames.add(executing.value());
 		frames.add(executing_quot.value());
@@ -152,25 +82,24 @@ struct stack_frame_accumulator {
 	}
 };
 
+struct stack_frame_in_array { cell cells[3]; };
+
 void factor_vm::primitive_callstack_to_array()
 {
 	data_root<callstack> callstack(ctx->pop(),this);
 
 	stack_frame_accumulator accum(this);
 	iterate_callstack_object(callstack.untagged(),accum);
+
+	/* The callstack iterator visits frames in reverse order (top to bottom) */
+	std::reverse(
+		(stack_frame_in_array*)accum.frames.elements->data(),
+		(stack_frame_in_array*)(accum.frames.elements->data() + accum.frames.count));
+
 	accum.frames.trim();
 
 	ctx->push(accum.frames.elements.value());
-}
 
-stack_frame *factor_vm::innermost_stack_frame(stack_frame *bottom, stack_frame *top)
-{
-	stack_frame *frame = bottom - 1;
-
-	while(frame >= top && frame_successor(frame) >= top)
-		frame = frame_successor(frame);
-
-	return frame;
 }
 
 /* Some primitives implementing a limited form of callstack mutation.
@@ -178,15 +107,17 @@ Used by the single stepper. */
 void factor_vm::primitive_innermost_stack_frame_executing()
 {
 	callstack *stack = untag_check<callstack>(ctx->pop());
-	stack_frame *frame = innermost_stack_frame(stack->bottom(), stack->top());
-	ctx->push(frame_executing_quot(frame));
+	void *frame = stack->top();
+	void *addr = frame_return_address(frame);
+	ctx->push(code->code_block_for_address((cell)addr)->owner_quot());
 }
 
 void factor_vm::primitive_innermost_stack_frame_scan()
 {
 	callstack *stack = untag_check<callstack>(ctx->pop());
-	stack_frame *frame = innermost_stack_frame(stack->bottom(), stack->top());
-	ctx->push(frame_scan(frame));
+	void *frame = stack->top();
+	void *addr = frame_return_address(frame);
+	ctx->push(code->code_block_for_address((cell)addr)->scan(this,addr));
 }
 
 void factor_vm::primitive_set_innermost_stack_frame_quot()
@@ -199,10 +130,11 @@ void factor_vm::primitive_set_innermost_stack_frame_quot()
 
 	jit_compile_quot(quot.value(),true);
 
-	stack_frame *inner = innermost_stack_frame(stack->bottom(), stack->top());
-	cell offset = frame_offset(inner);
-	inner->entry_point = quot->entry_point;
-	set_frame_offset(inner,offset);
+	void *inner = stack->top();
+	void *addr = frame_return_address(inner);
+	code_block *block = code->code_block_for_address((cell)addr);
+	cell offset = block->offset(addr);
+	set_frame_return_address(inner, (char*)quot->entry_point + offset);
 }
 
 void factor_vm::primitive_callstack_bounds()

@@ -77,8 +77,6 @@ PRIVATE>
 MEMO: sse-version ( -- n )
     (sse-version) "sse-version" get string>number [ min ] when* ;
 
-[ \ sse-version reset-memoized ] "cpu.x86.features" add-startup-hook
-
 : sse? ( -- ? ) sse-version 10 >= ;
 : sse2? ( -- ? ) sse-version 20 >= ;
 : sse3? ( -- ? ) sse-version 30 >= ;
@@ -94,6 +92,12 @@ MEMO: sse-version ( -- n )
         return-reg dup XOR
         return-reg SETB
     ] alien-assembly ;
+
+MEMO: enable-popcnt? ( -- ? )
+    popcnt? "enable-popcnt" get and ;
+
+[ { sse-version enable-popcnt? } [ reset-memoized ] each ]
+"cpu.x86.features" add-startup-hook
 
 : sse-string ( version -- string )
     {

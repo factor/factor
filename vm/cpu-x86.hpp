@@ -1,9 +1,17 @@
 namespace factor
 {
 
-#define FRAME_RETURN_ADDRESS(frame,vm) *(void **)(vm->frame_successor(frame) + 1)
+inline static void* frame_return_address(void *frame_top)
+{
+	return *(void**)frame_top;
+}
 
-#define CALLSTACK_BOTTOM(ctx) (stack_frame *)(ctx->callstack_seg->end - sizeof(cell) * 5)
+inline static void set_frame_return_address(void *frame_top, void *return_address)
+{
+	*(void**)frame_top = return_address;
+}
+
+#define CALLSTACK_BOTTOM(ctx) (void *)(ctx->callstack_seg->end - sizeof(cell) * 5)
 
 inline static void flush_icache(cell start, cell len) {}
 

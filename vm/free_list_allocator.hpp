@@ -23,6 +23,7 @@ template<typename Block> struct free_list_allocator {
 	cell largest_free_block();
 	cell free_block_count();
 	void sweep();
+	template<typename Iterator> void sweep(Iterator &iter);
 	template<typename Iterator, typename Fixup> void compact(Iterator &iter, Fixup fixup, const Block **finger);
 	template<typename Iterator, typename Fixup> void iterate(Iterator &iter, Fixup fixup);
 	template<typename Iterator> void iterate(Iterator &iter);
@@ -124,7 +125,8 @@ template<typename Block> cell free_list_allocator<Block>::free_block_count()
 }
 
 template<typename Block>
-void free_list_allocator<Block>::sweep()
+template<typename Iterator>
+void free_list_allocator<Block>::sweep(Iterator &iter)
 {
 	free_blocks.clear_free_list();
 
@@ -145,10 +147,24 @@ void free_list_allocator<Block>::sweep()
 			free_heap_block *free_block = (free_heap_block *)start;
 			free_block->make_free(size);
 			free_blocks.add_to_free_list(free_block);
+			iter(start, size);
 
 			start = (Block *)((char *)start + size);
 		}
 	}
+}
+
+template<typename Block>
+struct null_sweep_iterator
+{
+	void operator()(Block *free_block, cell size) {}
+};
+
+template<typename Block>
+void free_list_allocator<Block>::sweep()
+{
+	null_sweep_iterator<Block> none;
+	sweep(none);
 }
 
 template<typename Block, typename Iterator> struct heap_compactor {

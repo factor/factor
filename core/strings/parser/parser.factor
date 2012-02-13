@@ -138,7 +138,7 @@ ERROR: escaped-char-expected ;
 
 DEFER: (parse-multiline-string)
 
-: parse-found-token ( i string token -- )
+: parse-found-token ( string i token -- )
     [ lexer-subseq % ] dip
     CHAR: \ = [
         lexer get [ next-char , ] [ next-char , ] bi (parse-multiline-string)

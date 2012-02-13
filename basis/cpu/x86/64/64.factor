@@ -59,12 +59,6 @@ M: x86.64 %set-vm-field ( src offset -- )
 M: x86.64 %vm-field-ptr ( dst offset -- )
     [ vm-reg ] dip [+] LEA ;
 
-M: x86.64 %prologue ( n -- )
-    RAX 0 MOV rc-absolute-cell rel-this
-    stack-reg over cell - SUB
-    stack-reg over 3 cells - [+] RAX MOV
-    stack-reg over 2 cells - [+] swap MOV ;
-
 M: x86.64 %prepare-jump
     pic-tail-reg xt-tail-pic-offset [RIP+] LEA ;
 
@@ -150,4 +144,4 @@ USE: vocabs
     { [ os windows? ] [ "cpu.x86.64.windows" require ] }
 } cond
 
-check-sse
+check-cpu-features
