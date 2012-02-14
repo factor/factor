@@ -318,9 +318,11 @@ With prefix, the current page is deleted from history."
     map))
 
 (fuel-menu--defmenu fuel-help fuel-help-mode-map
-  ("Help on word..." "h" fuel-help)
+  ("Help on word" ("\C-c\C-d\C-d" "\C-c\C-dd") fuel-help)
+  ;; ("Help on word..." "h" fuel-help)
   ("Help on vocab..." "v" fuel-help-vocab)
-  ("Apropos..." "a" fuel-apropos)
+  ("Apropos..." ("\C-c\C-d\C-p" "\C-c\C-dp") fuel-apropos)
+  ;; ("Apropos..." "a" fuel-apropos)
   --
   ("Bookmark this page" "ba" fuel-help-bookmark-page)
   ("Delete bookmark" "bd" fuel-help-delete-bookmark)
