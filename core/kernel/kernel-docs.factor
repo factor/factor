@@ -768,7 +768,8 @@ HELP: with
 }
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
-    { $example "USING: kernel math prettyprint sequences ;" "2 { 1 2 3 } [ - ] with map ." "{ 1 0 -1 }" }
+    { $example "USING: kernel math prettyprint sequences ;" "1 { 1 2 3 } [ / ] with map ." "{ 1 1/2 1/3 }" }
+    { $example "USING: kernel math prettyprint sequences ;" "1000 100 5 iota [ sq + + ] with with map ." "{ 1100 1101 1104 1109 1116 }" }
 } ;
 
 HELP: compose
