@@ -10,7 +10,7 @@ ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
 ui.gadgets.icons ui.gadgets.grid-lines ui.baseline-alignment
-colors io.styles ;
+colors io.styles classes ;
 FROM: io.styles => foreground background ;
 IN: ui.gadgets.panes
 
@@ -142,7 +142,15 @@ PRIVATE>
 
 : <pane> ( -- pane ) f pane new-pane ;
 
+GENERIC: gadget-alt-text ( gadget -- string )
+
+M: object gadget-alt-text
+    class-of name>> "( " " )" surround ;
+
 GENERIC: write-gadget ( gadget stream -- )
+
+M: object write-gadget
+    [ gadget-alt-text ] dip stream-write ;
 
 M: filter-writer write-gadget
     stream>> write-gadget ;
