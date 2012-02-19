@@ -52,6 +52,11 @@ ensure_program_installed() {
             $ECHO -n "any of [ $* ]"
         fi
         $ECHO " and try again."
+        if [[ $OS -eq macosx ]] ; then
+            $ECHO "If you have Xcode 4.3 or higher installed, you must install the"
+            $ECHO "Command Line Tools from Xcode Preferences > Downloads in order"
+            $ECHO "to build Factor."
+        fi
         exit_script 1;
     fi
 }
@@ -110,8 +115,8 @@ check_installed_programs() {
     ensure_program_installed uname
     ensure_program_installed git
     ensure_program_installed wget curl
-    ensure_program_installed gcc
-    ensure_program_installed g++ cl
+    ensure_program_installed clang gcc
+    ensure_program_installed clang++ g++ cl
     ensure_program_installed make gmake
     ensure_program_installed md5sum md5
     ensure_program_installed cut
