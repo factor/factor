@@ -72,3 +72,6 @@ PRIVATE>
 
 : audio. ( audio -- )
     <audio-gadget> gadget. ;
+
+M: audio content-gadget
+    <audio-gadget> ;

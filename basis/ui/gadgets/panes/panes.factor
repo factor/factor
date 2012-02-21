@@ -12,6 +12,7 @@ ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
 ui.gadgets.icons ui.gadgets.grid-lines ui.baseline-alignment
 colors io.styles classes ;
 FROM: io.styles => foreground background ;
+FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < track
@@ -436,3 +437,12 @@ pane H{
     { copy-action [ com-copy ] }
     { T{ button-down f f 3 } [ pane-menu ] }
 } set-gestures
+
+GENERIC: content-gadget ( object -- gadget/f )
+M: object content-gadget drop f ;
+
+M: string content-gadget
+    '[ _ write ] make-pane <scroller>
+        { 450 100 } >>pref-dim
+    <wrapper> ;
+
