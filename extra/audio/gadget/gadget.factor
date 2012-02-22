@@ -1,13 +1,13 @@
-USING: accessors audio audio.engine combinators images.loader
-images.viewer init kernel locals namespaces ui.gadgets
-ui.gadgets.buttons ui.gadgets.panes ;
+USING: accessors audio audio.engine combinators destructors
+images.loader images.viewer init kernel locals namespaces
+ui.gadgets ui.gadgets.buttons ui.gadgets.panes ;
 FROM: ui.gadgets.buttons.private => border-button-theme ;
 FROM: audio.engine.private => make-engine-current ;
 IN: audio.gadget
 
 TUPLE: audio-gadget < button
     play-label pause-label
-    audio-clip state ;
+    audio audio-clip state ;
 
 <PRIVATE
 
@@ -64,11 +64,23 @@ PRIVATE>
     pause-label-image get-global <image-gadget> :> pause-label
     play-label [ click-audio-gadget ] audio-gadget new-button
         border-button-theme
-        gadget-audio-engine get-global f audio t <static-audio-clip>
-           >>audio-clip
+        audio >>audio
         paused >>state
         play-label >>play-label
         pause-label >>pause-label ;
+
+M: audio-gadget graft*
+    [ call-next-method ] [
+        dup audio>>
+        [ gadget-audio-engine get-global f ] dip f <static-audio-clip>
+           >>audio-clip
+        drop
+    ] bi ;
+
+M: audio-gadget ungraft*
+    [ pause-audio-gadget ]
+    [ audio-clip>> dispose ]
+    [ call-next-method ] tri ;
 
 : audio. ( audio -- )
     <audio-gadget> gadget. ;
