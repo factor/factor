@@ -19,3 +19,18 @@ IN: units.imperial.tests
 [ 768 ] [ 1 gallons [ teaspoons ] undo ] unit-test
 [ 1 ] [ 768 teaspoons [ gallons ] undo ] unit-test
 
+{ 1 } [ 6 feet [ fathoms ] undo ] unit-test
+{ 1 } [ 8 furlongs [ miles ] undo ] unit-test
+{ 1 } [ 100 links [ chains ] undo ] unit-test
+{ 1 } [ 40 poles [ furlongs ] undo ] unit-test
+{ 1 } [ 100 feet [ ramsdens-chains ] undo ] unit-test
+
+{ 1 } [ 15 fathoms [ shackles ] undo ] unit-test
+{ 1 } [ 30 yards [ shackles ] undo ] unit-test
+{ 1 } [ 608 feet [ cables ] undo ] unit-test
+
+{ 1 } [ 4 inches [ hands ] undo ] unit-test
+{ 1 } [ 3 inches [ palms ] undo ] unit-test
+{ 1 } [ 16 nails [ yards ] undo ] unit-test
+{ 1 } [ 8 fingers [ yards ] undo ] unit-test
+
