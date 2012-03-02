@@ -1,4 +1,4 @@
-USING: math.combinatorics math.combinatorics.private tools.test sequences ;
+USING: kernel math math.combinatorics math.combinatorics.private tools.test sequences ;
 IN: math.combinatorics.tests
 
 [ 1 ] [ 0 factorial ] unit-test
@@ -49,7 +49,7 @@ IN: math.combinatorics.tests
 [ "21" ] [ "12" next-permutation ] unit-test
 [ "8344112666" ] [ "8342666411" next-permutation ] unit-test
 [ "ABC" "ACB" "BAC" "BCA" "CAB" "CBA" "ABC" ]
-[ "ABC" 6 [ dup >string next-permutation ] times ] unit-test
+[ "ABC" 6 [ dup dup clone-like next-permutation ] times ] unit-test
 
 [ 2598960 ] [ 52 iota 5 <combo> choose ] unit-test
 
