@@ -44,6 +44,12 @@ IN: math.combinatorics.tests
 [ { 2 1 0 } ] [ { "c" "b" "a" } inverse-permutation ] unit-test
 [ { 3 0 2 1 } ] [ { 12 45 34 2 } inverse-permutation ] unit-test
 
+[ "" ] [ "" next-permutation ] unit-test
+[ "1" ] [ "1" next-permutation ] unit-test
+[ "21" ] [ "12" next-permutation ] unit-test
+[ "8344112666" ] [ "8342666411" next-permutation ] unit-test
+[ "ABC" "ACB" "BAC" "BCA" "CAB" "CBA" "ABC" ]
+[ "ABC" 6 [ dup >string next-permutation ] times ] unit-test
 
 [ 2598960 ] [ 52 iota 5 <combo> choose ] unit-test
 
