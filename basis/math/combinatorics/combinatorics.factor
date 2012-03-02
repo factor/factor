@@ -61,6 +61,27 @@ PRIVATE>
 : inverse-permutation ( seq -- permutation )
     <enum> sort-values keys ;
 
+<PRIVATE
+
+: cut-point ( seq -- n )
+    [ last ] keep [ [ > ] keep swap ] find-last drop nip ;
+
+: greater-from-last ( n seq -- i )
+    [ nip ] [ nth ] 2bi [ > ] curry find-last drop ;
+
+: reverse-tail! ( n seq -- seq )
+    [ swap 1 + tail-slice reverse! drop ] keep ;
+
+: (next-permutation) ( seq -- seq )
+    dup cut-point [
+        swap [ greater-from-last ] 2keep
+        [ exchange ] [ reverse-tail! nip ] 3bi
+    ] [ reverse! ] if* ;
+
+PRIVATE>
+
+: next-permutation ( seq -- seq )
+    dup [ ] [ drop (next-permutation) ] if-empty ;
 
 ! Combinadic-based combination methodology
 
