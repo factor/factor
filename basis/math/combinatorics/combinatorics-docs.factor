@@ -105,7 +105,7 @@ HELP: >permutation
 
 HELP: next-permutation
 { $values { "seq" sequence } { "seq" sequence } }
-{ $description "Rearranges the elements in " { $snippet "seq" } " into the lexicographically next greater permutation of elements" }
+{ $description "Rearranges the elements in " { $snippet "seq" } " into the lexicographically next greater permutation of elements." }
 { $notes "Performs an in-place modification of " { $snippet "seq" } "." }
 { $examples { $example "USING: math.combinatorics prettyprint ;" "\"ABC\" next-permutation ." "\"ACB\"" } } ;
 
