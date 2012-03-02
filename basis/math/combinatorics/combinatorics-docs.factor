@@ -103,6 +103,12 @@ HELP: >permutation
 { $notes "For clarification, the following two statements are equivalent:" { $code "10 factoradic >permutation" "{ 1 2 0 0 } >permutation" } }
 { $examples { $example "USING: math.combinatorics.private prettyprint ;" "{ 0 0 0 0 } >permutation ." "{ 0 1 2 3 }" } } ;
 
+HELP: next-permutation
+{ $values { "seq" sequence } { "seq" sequence } }
+{ $description "Rearranges the elements in " { $snippet "seq" } " into the lexicographically next greater permutation of elements" }
+{ $notes "Performs an in-place modification of " { $snippet "seq" } "." }
+{ $examples { $example "USING: math.combinatorics prettyprint ;" "\"ABC\" next-permutation ." "\"ACB\"" } } ;
+
 HELP: all-subsets
 { $values { "seq" sequence } { "subsets" sequence } }
 { $description
