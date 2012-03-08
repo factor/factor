@@ -16,7 +16,10 @@ SYMBOL: wolfram-api-id
 : query ( query -- xml )
     url-encode wolfram-api-id get-global
     "http://api.wolframalpha.com/v2/query?input=%s&appid=%s"
-    sprintf http-get nip string>xml ;
+    sprintf http-get nip string>xml
+    dup "error" tag-named [
+        "msg" tag-named children>string throw
+    ] when* ;
 
 PRIVATE>
 
