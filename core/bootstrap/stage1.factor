@@ -3,7 +3,8 @@
 USING: arrays assocs continuations debugger generic hashtables
 init io io.files kernel kernel.private make math memory
 namespaces parser parser.notes prettyprint sequences splitting
-system vectors vocabs vocabs.loader words destructors ;
+system vectors vocabs vocabs.loader words destructors
+io.encodings.utf8 alien.strings ;
 QUALIFIED: bootstrap.image.private
 IN: bootstrap.stage1
 
@@ -36,6 +37,10 @@ load-help? off
 
     [
         f parser-quiet? set-global
+
+        OBJ-ARGS special-object
+        [ utf8 alien>string "-resource-path=" ?head [ drop f ] unless ] map-find drop
+        [ "resource-path" set-global ] when*
 
         "resource:basis/bootstrap/stage2.factor"
         dup exists? [
