@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private sequences init namespaces system io
-io.backend io.pathnames io.encodings io.files.private
-alien.strings ;
+io.encodings.utf8 io.backend io.pathnames io.encodings io.files.private
+alien.strings splitting ;
 IN: io.files
 
 MIXIN: file-reader
@@ -61,9 +61,14 @@ M: object cwd ( -- path ) "." ;
 
 PRIVATE>
 
+: init-resource-path ( -- )
+    OBJ-ARGS special-object
+    [ utf8 alien>string "-resource-path=" ?head [ drop f ] unless ] map-find drop
+    [ image parent-directory ] unless* "resource-path" set-global ;
+
 [
     cwd current-directory set-global
     OBJ-IMAGE special-object alien>native-string cwd prepend-path \ image set-global
     OBJ-EXECUTABLE special-object alien>native-string cwd prepend-path \ vm set-global
-    image parent-directory "resource-path" set-global
+    init-resource-path
 ] "io.files" add-startup-hook
