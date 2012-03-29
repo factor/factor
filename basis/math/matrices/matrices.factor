@@ -124,7 +124,7 @@ IN: math.matrices
     dupd proj v- ;
 
 : angle-between ( v u -- a )
-    [ normalize ] bi@ v. acos ;
+    [ normalize ] bi@ h. acos ;
 
 : (gram-schmidt) ( v seq -- newseq )
     [ dupd proj v- ] each ;
