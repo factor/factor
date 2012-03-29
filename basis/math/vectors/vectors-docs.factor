@@ -289,6 +289,10 @@ HELP: v.
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }
 { $description "Computes the dot product of two vectors." } ;
 
+HELP: h.
+{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }
+{ $description "Computes the Hermitian inner product of two vectors." } ;
+
 HELP: vs+
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Adds " { $snippet "u" } " and " { $snippet "v" } " component-wise with saturation." }
