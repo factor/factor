@@ -208,7 +208,10 @@ M: object v?
 : vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; inline
 
 GENERIC: v. ( u v -- x )
-M: object v. [ conjugate * ] [ + ] 2map-reduce ; inline
+M: object v. [ * ] [ + ] 2map-reduce ; inline
+
+GENERIC: h. ( u v -- x )
+M: object h. [ conjugate * ] [ + ] 2map-reduce ; inline
 
 GENERIC: norm-sq ( v -- x )
 M: object norm-sq [ absq ] [ + ] map-reduce ; inline
