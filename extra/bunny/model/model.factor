@@ -41,7 +41,7 @@ IN: bunny.model
     ascii [ parse-model ] with-file-reader
     [ normals ] 2keep 3array ;
 
-: model-path ( -- path ) "bun_zipper.ply" temp-file ;
+: model-path ( -- path ) "bun_zipper.ply" cache-file ;
 
 : model-url ( -- url ) "http://duriansoftware.com/joe/media/bun_zipper.ply" ;
 
