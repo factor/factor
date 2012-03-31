@@ -115,13 +115,13 @@ ERROR: too-many-samples seq n ;
     normal-random-float exp ;
 
 : exponential-random-float ( lambda -- n )
-    0. 1. uniform-random-float 1 swap - log neg swap / ;
+    0. 1. uniform-random-float log neg swap / ;
 
 : weibull-random-float ( lambda k -- n )
-    [ 0. 1. uniform-random-float 1 swap - log neg ] dip 1. swap / ^ * ;
+    [ 0. 1. uniform-random-float log neg ] dip 1. swap / ^ * ;
 
 : pareto-random-float ( alpha -- n )
-    [ 0. 1. uniform-random-float 1 swap - ] dip [ 1. swap / ] bi@ ^ ;
+    [ 0. 1. uniform-random-float ] dip [ 1. swap / ] bi@ ^ ;
 
 : beta-random-float ( alpha beta -- n )
     [ 1. normal-random-float ] dip over zero?
