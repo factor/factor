@@ -102,11 +102,14 @@ ERROR: too-many-samples seq n ;
     [ over - 2.0 -64 ^ * ] dip
     * + ; inline
 
+: random-unit ( -- n )
+    0.0 1.0 uniform-random-float ; inline
+
 : (cos-random-float) ( -- n )
-    0. 2. pi * uniform-random-float cos ;
+    0. 2pi uniform-random-float cos ;
 
 : (log-sqrt-random-float) ( -- n )
-    0. 1. uniform-random-float log -2. * sqrt ;
+    random-unit log -2. * sqrt ;
 
 : normal-random-float ( mean sigma -- n )
     (cos-random-float) (log-sqrt-random-float) * * + ;
@@ -115,13 +118,13 @@ ERROR: too-many-samples seq n ;
     normal-random-float exp ;
 
 : exponential-random-float ( lambda -- n )
-    0. 1. uniform-random-float log neg swap / ;
+    random-unit log neg swap / ;
 
 : weibull-random-float ( lambda k -- n )
-    [ 0. 1. uniform-random-float log neg ] dip 1. swap / ^ * ;
+    [ random-unit log neg ] dip 1. swap / ^ * ;
 
 : pareto-random-float ( alpha -- n )
-    [ 0. 1. uniform-random-float ] dip [ 1. swap / ] bi@ ^ ;
+    [ random-unit ] dip [ 1. swap / ] bi@ ^ ;
 
 : beta-random-float ( alpha beta -- n )
     [ 1. normal-random-float ] dip over zero?

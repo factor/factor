@@ -110,8 +110,8 @@ M:: chipmunk-world begin-game-world ( world -- )
     image-height iota [| y |
         image-width iota [| x |
             x y get-pixel [
-                x image-width 2 / - 0.05 0.0 1.0 uniform-random-float * + 2 *
-                image-height 2 / y - 0.05 0.0 1.0 uniform-random-float * + 2 *
+                x image-width 2 / - 0.05 random-unit * + 2 *
+                image-height 2 / y - 0.05 random-unit * + 2 *
                 make-ball :> shape
                 space shape shape>> body>> cpSpaceAddBody drop
                 space shape cpSpaceAddShape drop
