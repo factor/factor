@@ -111,11 +111,6 @@ ERROR: too-many-samples seq n ;
 : normal-random-float ( mean sigma -- n )
     (cos-random-float) (log-sqrt-random-float) * * + ;
 
-{
-    { [ os windows? ] [ "random.windows" require ] }
-    { [ os unix? ] [ "random.unix" require ] }
-} cond
-
 : lognormal-random-float ( mean sigma -- n )
     normal-random-float exp ;
 
@@ -128,12 +123,13 @@ ERROR: too-many-samples seq n ;
 : pareto-random-float ( alpha -- n )
     [ 0. 1. uniform-random-float 1 swap - ] dip [ 1. swap / ] bi@ ^ ;
 
-: gauss-random-float ( mean sigma -- n )
-    0. 1. uniform-random-float 1 swap - log -2 * sqrt
-    (cos-random-float) * * + ;
-
 : beta-random-float ( alpha beta -- n )
-    [ 1. gauss-random-float ] dip over zero?
-    [ 2drop 0 ] [ 1. gauss-random-float dupd + / ] if ;
+    [ 1. normal-random-float ] dip over zero?
+    [ 2drop 0 ] [ 1. normal-random-float dupd + / ] if ;
+
+{
+    { [ os windows? ] [ "random.windows" require ] }
+    { [ os unix? ] [ "random.unix" require ] }
+} cond
 
 "random.mersenne-twister" require
