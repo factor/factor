@@ -127,7 +127,7 @@ M: topic url-of topic>filename ;
     ] with-scope ;
 
 : generate-help ( -- )
-    "docs" temp-file
+    "docs" cache-file
     [ make-directories ]
     [
         [
