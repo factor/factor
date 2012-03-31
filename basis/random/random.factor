@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays assocs
-byte-arrays byte-vectors combinators fry io.backend io.binary
-kernel locals math math.bitwise math.constants math.functions
-math.order math.ranges namespaces sequences sequences.private
-sets summary system vocabs hints typed ;
+byte-arrays byte-vectors combinators combinators.short-circuit
+fry io.backend io.binary kernel locals math math.bitwise
+math.constants math.functions math.order math.ranges namespaces
+sequences sequences.private sets summary system vocabs hints
+typed ;
 IN: random
 
 SYMBOL: system-random-generator
@@ -129,9 +130,65 @@ ERROR: too-many-samples seq n ;
 : pareto-random-float ( alpha -- n )
     [ random-unit ] dip [ 1. swap / ] bi@ ^ ;
 
+:: (gamma-random-float>1) ( alpha beta -- n )
+    ! Uses R.C.H. Cheng, "The generation of Gamma
+    ! variables with non-integral shape parameters",
+    ! Applied Statistics, (1977), 26, No. 1, p71-74
+    2. alpha * 1 - sqrt :> ainv
+    alpha 4. log -      :> bbb
+    alpha ainv +        :> ccc
+
+    0 :> r! 0 :> z! 0 :> result! ! initialize locals
+    [
+        r {
+            [ 1. 4.5 log + + z 4.5 * - 0 >= ]
+            [ z log >= ]
+        } 1|| not
+    ] [
+        random-unit :> u1
+        random-unit :> u2
+
+        u1 1. u1 - / log ainv / :> v
+        alpha v exp *           :> x
+        u1 sq u2 *              z!
+        bbb ccc v * + x -       r!
+
+        x beta *                result!
+    ] do while result ;
+
+: (gamma-random-float=1) ( alpha beta -- n )
+    nip random-unit log neg * ;
+
+:: (gamma-random-float<1) ( alpha beta -- n )
+    ! Uses ALGORITHM GS of Statistical Computing - Kennedy & Gentle
+    alpha e + e / :> b
+
+    0 :> x! 0 :> p! ! initialize locals
+    [
+        p 1.0 > [
+            random-unit x alpha 1 - ^ >
+        ] [
+            random-unit x neg exp >
+        ] if
+    ] [
+        random-unit b * p!
+        p 1.0 <= [
+            p 1. alpha / ^
+        ] [
+            b p - alpha / log neg
+        ] if x!
+    ] do while x beta * ;
+
+: gamma-random-float ( alpha beta -- n )
+    {
+        { [ over 1 > ] [ (gamma-random-float>1) ] }
+        { [ over 1 = ] [ (gamma-random-float=1) ] }
+        [ (gamma-random-float<1) ]
+    } cond ;
+
 : beta-random-float ( alpha beta -- n )
-    [ 1. normal-random-float ] dip over zero?
-    [ 2drop 0 ] [ 1. normal-random-float dupd + / ] if ;
+    [ 1. gamma-random-float ] dip over zero?
+    [ 2drop 0 ] [ 1. gamma-random-float dupd + / ] if ;
 
 {
     { [ os windows? ] [ "random.windows" require ] }
