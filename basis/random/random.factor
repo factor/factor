@@ -120,8 +120,11 @@ ERROR: too-many-samples seq n ;
 : exponential-random-float ( lambda -- n )
     random-unit log neg swap / ;
 
-: weibull-random-float ( lambda k -- n )
-    [ random-unit log neg ] dip 1. swap / ^ * ;
+: weibull-random-float ( alpha beta -- n )
+    [
+        [ random-unit log neg ] dip
+        1. swap / ^
+    ] dip * ;
 
 : pareto-random-float ( alpha -- n )
     [ random-unit ] dip [ 1. swap / ] bi@ ^ ;
