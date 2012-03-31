@@ -190,6 +190,31 @@ ERROR: too-many-samples seq n ;
     [ 1. gamma-random-float ] dip over zero?
     [ 2drop 0 ] [ 1. gamma-random-float dupd + / ] if ;
 
+:: von-mises-random-float ( mu kappa -- n )
+    ! Based upon an algorithm published in: Fisher, N.I.,
+    ! "Statistical Analysis of Circular Data", Cambridge
+    ! University Press, 1993.
+    kappa 1e-6 <= [
+        2pi random-unit *
+    ] [
+        4. kappa sq * 1. + sqrt 1. + :> a
+        a 2. a * sqrt - 2. kappa * / :> b
+        b sq 1. + 2. b * /           :> r
+
+        0 :> c! 0 :> _f! ! initialize locals
+        [
+            random-unit {
+                [ 2. c - c * < ] [ 1. c - exp c * <= ]
+            } 1|| not
+        ] [
+            random-unit pi * cos :> z
+            r z * 1. + r z + /   _f!
+            r _f - kappa *       c!
+        ] do while
+
+        mu 2pi mod _f cos random-unit 0.5 > [ + ] [ - ] if
+    ] if ;
+
 {
     { [ os windows? ] [ "random.windows" require ] }
     { [ os unix? ] [ "random.unix" require ] }
