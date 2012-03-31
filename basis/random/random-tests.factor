@@ -1,5 +1,5 @@
 USING: random sequences tools.test kernel math math.functions
-sets grouping random.private ;
+sets grouping random.private math.statistics ;
 IN: random.tests
 
 [ 4 ] [ 4 random-bytes length ] unit-test
@@ -33,3 +33,15 @@ IN: random.tests
 
 [ ]
 [ [ 100 random-bytes ] with-system-random drop ] unit-test
+
+{ t }
+[ 50000 [ .15 exponential-random-float ] replicate [ mean ] [ std ] bi .2 ~ ] unit-test
+
+{ t }
+[ 50000 [ 1 exponential-random-float ] replicate [ mean ] [ std ] bi .2 ~ ] unit-test
+
+{ t t }
+[
+    50000 [ 1 3 pareto-random-float ] replicate [ mean ] [ std ] bi
+    [ 1.5 .3 ~ ] [ 3 sqrt 2 / .3 ~ ] bi*
+] unit-test

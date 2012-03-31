@@ -127,8 +127,8 @@ ERROR: too-many-samples seq n ;
         1. swap / ^
     ] dip * ;
 
-: pareto-random-float ( alpha -- n )
-    [ random-unit ] dip [ 1. swap / ] bi@ ^ ;
+: pareto-random-float ( k alpha -- n )
+    [ random-unit ] dip recip ^ /f ;
 
 :: (gamma-random-float>1) ( alpha beta -- n )
     ! Uses R.C.H. Cheng, "The generation of Gamma
