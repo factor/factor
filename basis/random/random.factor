@@ -215,6 +215,16 @@ ERROR: too-many-samples seq n ;
         mu 2pi mod _f cos random-unit 0.5 > [ + ] [ - ] if
     ] if ;
 
+:: (triangular-random-float) ( low high mode -- n )
+    mode low - high low - / :> c!
+    random-unit :> u!
+    high low
+    u c > [ 1. u - u! 1. c - c! swap ] when
+    [ - u c * sqrt * ] keep + ;
+
+: triangular-random-float ( low high -- n )
+    2dup + 2 /f (triangular-random-float) ;
+
 {
     { [ os windows? ] [ "random.windows" require ] }
     { [ os unix? ] [ "random.unix" require ] }
