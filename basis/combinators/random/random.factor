@@ -5,7 +5,7 @@ kernel macros math math.order quotations random sequences
 summary ;
 IN: combinators.random
 
-: ifp ( p true false -- ) [ 0 1 uniform-random-float > ] 2dip if ; inline
+: ifp ( p true false -- ) [ random-unit > ] 2dip if ; inline
 : whenp ( p true -- ) [ ] ifp ; inline
 : unlessp ( p false -- ) [ [ ] ] dip ifp ; inline
 
@@ -38,7 +38,7 @@ M: bad-probabilities summary
 MACRO: (casep) ( assoc -- ) (casep>quot) ;
 
 : casep>quot ( assoc -- quot )
-    (casep>quot) [ 0 1 uniform-random-float ] prepend ;
+    (casep>quot) [ random-unit ] prepend ;
     
 : (conditional-probabilities) ( seq i -- p )
     [ dup 0 > [ head [ 1 swap - ] [ * ] map-reduce ] [ 2drop 1 ] if ] [ swap nth ] 2bi * ;
