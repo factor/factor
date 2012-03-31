@@ -116,4 +116,24 @@ ERROR: too-many-samples seq n ;
     { [ os unix? ] [ "random.unix" require ] }
 } cond
 
+: lognormal-random-float ( mean sigma -- n )
+    normal-random-float exp ;
+
+: exponential-random-float ( lambda -- n )
+    0. 1. uniform-random-float 1 swap - log neg swap / ;
+
+: weibull-random-float ( lambda k -- n )
+    [ 0. 1. uniform-random-float 1 swap - log neg ] dip 1. swap / ^ * ;
+
+: pareto-random-float ( alpha -- n )
+    [ 0. 1. uniform-random-float 1 swap - ] dip [ 1. swap / ] bi@ ^ ;
+
+: gauss-random-float ( mean sigma -- n )
+    0. 1. uniform-random-float 1 swap - log -2 * sqrt
+    (cos-random-float) * * + ;
+
+: beta-random-float ( alpha beta -- n )
+    [ 1. gauss-random-float ] dip over zero?
+    [ 2drop 0 ] [ 1. gauss-random-float dupd + / ] if ;
+
 "random.mersenne-twister" require
