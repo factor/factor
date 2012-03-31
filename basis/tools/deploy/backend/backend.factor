@@ -61,7 +61,7 @@ ERROR: can't-deploy-library-file library ;
     ] { } make ;
 
 : staging-image-name ( profile -- name )
-    "-" join "staging." ".image" surround temp-file ;
+    "-" join "staging." ".image" surround cache-file ;
 
 DEFER: ?make-staging-image
 
