@@ -34,8 +34,11 @@ IN: math.statistics.tests
 [ 2 ] [ { 1 2 } upper-median ] unit-test
 [ 3/2 ] [ { 1 2 } median ] unit-test
 
-[ 1 ] [ { 1 2 3 } var ] unit-test
-[ 1.0 ] [ { 1 2 3 } std ] unit-test
+[ 1 ] [ { 1 2 3 } sample-var ] unit-test
+[ 16 ] [ { 4 6 8 10 10 12 14 16 } sample-var ] unit-test
+
+[ 16 ] [ { 4 6 8 10 12 14 16 } var ] unit-test
+[ 4.0 ] [ { 4 6 8 10 12 14 16 } std ] unit-test
 [ t ] [ { 1 2 3 4 } ste 0.6454972243679028 - .0001 < ] unit-test
 
 [ t ] [ { 23.2 33.4 22.5 66.3 44.5 } std 18.1906 - .0001 < ] unit-test
@@ -62,3 +65,9 @@ IN: math.statistics.tests
     10 iota [ 3 mod ] collect-by
     [ 0 swap at ] [ 1 swap at ] [ 2 swap at ] tri
 ] unit-test
+
+[ 0 ] [ { 1 } { 1 } cov ] unit-test
+[ 2/3 ] [ { 1 2 3 } { 4 5 6 } cov ] unit-test
+
+[ 1.0 ] [ { 1 2 3 } { 1 2 3 } corr ] unit-test
+[ -1.0 ] [ { 1 2 3 } { -4 -5 -6 } corr ] unit-test
