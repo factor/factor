@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators generalizations kernel locals math
-math.functions math.order sequences sequences.private sorting ;
+math.functions math.order math.vectors sequences
+sequences.private sorting ;
 IN: math.statistics
 
 : mean ( seq -- x )
@@ -106,13 +107,21 @@ ERROR: empty-sequence ;
 : range ( seq -- x )
     minmax swap - ;
 
-: var ( seq -- x )
+: sample-var ( seq -- x )
     #! normalize by N-1
     dup length 1 <= [
         drop 0
     ] [
         [ [ mean ] keep [ - sq ] with map-sum ]
         [ length 1 - ] bi /
+    ] if ;
+
+: var ( seq -- x )
+    dup length 1 <= [
+        drop 0
+    ] [
+        [ [ mean ] keep [ - sq ] with map-sum ]
+        [ length ] bi /
     ] if ;
 
 : std ( seq -- x ) var sqrt ;
@@ -141,3 +150,9 @@ ERROR: empty-sequence ;
     [ (r) ] 2keep ! stack is mean(x) mean(y) r sx sy
     swap / * ! stack is mean(x) mean(y) beta
     [ swapd * - ] keep ;
+
+: cov ( {x} {y} -- cov )
+    [ dup mean v-n ] bi@ v* mean ;
+
+: corr ( {x} {y} -- corr )
+     [ cov ] [ [ var ] bi@ * sqrt ] 2bi / ;

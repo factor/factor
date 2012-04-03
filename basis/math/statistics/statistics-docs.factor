@@ -69,6 +69,13 @@ HELP: var
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } var ." "1" }
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } var ." "1+2/3" } } ;
 
+HELP: cov
+{ $values { "{x}" sequence } { "{y}" sequence } { "x" "a real number" } }
+{ $description "Computes the covariance of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
+
+HELP: corr
+{ $values { "{x}" sequence } { "{y}" sequence } { "x" "a real number" } }
+{ $description "Computes the correlation of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
 
 HELP: histogram
 { $values
