@@ -113,7 +113,13 @@ PRIVATE>
 
 MATH: fast-gcd ( x y -- d ) foldable
 
-M: real fast-gcd gcd nip ; inline
+<PRIVATE
+
+: simple-gcd ( x y -- d ) gcd nip ; inline
+
+PRIVATE>
+
+M: real fast-gcd simple-gcd ; inline
 
 M: bignum fast-gcd bignum-gcd ; inline
 
