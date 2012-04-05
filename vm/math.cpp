@@ -147,6 +147,12 @@ void factor_vm::primitive_bignum_mod()
 	ctx->push(tag<bignum>(bignum_remainder(x,y)));
 }
 
+void factor_vm::primitive_bignum_gcd()
+{
+	POP_BIGNUMS(x,y);
+	ctx->push(tag<bignum>(bignum_gcd(x,y)));
+}
+
 void factor_vm::primitive_bignum_and()
 {
 	POP_BIGNUMS(x,y);

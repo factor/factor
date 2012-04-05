@@ -1709,4 +1709,151 @@ int factor_vm::bignum_unsigned_logbitp(int shift, bignum * bignum)
 	return (digit & mask) ? 1 : 0;
 }
 
+#
+
+/* Allocates memory */
+bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
+{
+    bignum * d;
+    bignum_digit_type x, y;
+    bignum_twodigit_type q, s, t, A, B, C, D;
+    int nbits, k;
+    bignum_length_type size_a, size_b;
+    bignum_digit_type * scan_a, * scan_b, * scan_c, * scan_d, * a_end, * b_end;
+
+    /* clone the bignums so we can modify them in-place */
+    scan_a = BIGNUM_START_PTR (a);
+    size_a = BIGNUM_LENGTH (a);
+    a_end = scan_a + size_a;
+    d = allot_bignum (size_a, 0);
+    scan_d = BIGNUM_START_PTR (d);
+    while (scan_a < a_end)
+        (*scan_d++) = (*scan_a++);
+    a = d;
+    scan_b = BIGNUM_START_PTR (b);
+    size_b = BIGNUM_LENGTH (b);
+    b_end = scan_b + size_b;
+    d = allot_bignum (size_b, 0);
+    scan_d = BIGNUM_START_PTR (d);
+    while (scan_b < b_end)
+        (*scan_d++) = (*scan_b++);
+    b = d;
+
+    /* Initial reduction: make sure that 0 <= b <= a. */
+    BIGNUM_SET_NEGATIVE_P (a, 0);
+    BIGNUM_SET_NEGATIVE_P (b, 0);
+    if (bignum_compare(a, b) == bignum_comparison_less) {
+        d = a;
+        a = b;
+        b = d;
+    }
+
+    while ((size_a = BIGNUM_LENGTH (a)) > 1) {
+        nbits = log2 (BIGNUM_REF (a, size_a-1));
+        size_b = BIGNUM_LENGTH (b);
+        x = ((BIGNUM_REF (a, size_a-1) << (BIGNUM_DIGIT_LENGTH - nbits)) |
+             (BIGNUM_REF (a, size_a-2) >> nbits));
+        y = ((size_b >= size_a - 1 ? BIGNUM_REF (b, size_a-2) >> nbits : 0) |
+             (size_b >= size_a ? BIGNUM_REF (b, size_a-1) << (BIGNUM_DIGIT_LENGTH - nbits) : 0));
+
+        /* inner loop of Lehmer's algorithm; */
+        A = 1; B = 0; C = 0; D = 1;
+        for (k=0 ;; k++) {
+            if (y - C == 0)
+                break;
+            q = (x + (A - 1)) / (y - C);
+            s = B + (q * D);
+            t = x - (q * y);
+            if (s > t)
+                break;
+            x = y;
+            y = t;
+            t = A + (q * C);
+            A = D; B = C; C = s; D = t;
+        }
+
+        if (k == 0) {
+            /* no progress; do a Euclidean step */
+            if (BIGNUM_LENGTH (b) == 0) {
+                return a;
+            }
+            d = bignum_remainder (a, b);
+            if (d == BIGNUM_OUT_OF_BAND) {
+                return d;
+            }
+            a = b;
+            b = d;
+            continue;
+        }
+
+        /*
+          a, b = A*b - B*a, D*a - C*b if k is odd
+          a, b = A*a - B*b, D*b - C*a if k is even
+        */
+        scan_a = BIGNUM_START_PTR (a);
+        scan_b = BIGNUM_START_PTR (b);
+        scan_c = BIGNUM_START_PTR (a);
+        scan_d = BIGNUM_START_PTR (b);
+        a_end = scan_a + size_a;
+        b_end = scan_b + size_b;
+        s = 0;
+        t = 0;
+        if (k & 1) {
+            while (scan_b < b_end) {
+                s += (A * *scan_b) - (B * *scan_a);
+                t += (D * *scan_a++) - (C * *scan_b++);
+                *scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
+                *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
+                s >>= BIGNUM_DIGIT_LENGTH;
+                t >>= BIGNUM_DIGIT_LENGTH;
+            }
+            while (scan_a < a_end) {
+                s -= (B * *scan_a);
+                t += (D * *scan_a++);
+                *scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
+                *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
+                s >>= BIGNUM_DIGIT_LENGTH;
+                t >>= BIGNUM_DIGIT_LENGTH;
+            }
+        }
+        else {
+            while (scan_b < b_end) {
+                s += (A * *scan_a) - (B * *scan_b);
+                t += (D * *scan_b++) - (C * *scan_a++);
+                *scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
+                *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
+                s >>= BIGNUM_DIGIT_LENGTH;
+                t >>= BIGNUM_DIGIT_LENGTH;
+            }
+            while (scan_a < a_end) {
+                s += (A * *scan_a);
+                t -= (C * *scan_a++);
+                *scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
+                *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
+                s >>= BIGNUM_DIGIT_LENGTH;
+                t >>= BIGNUM_DIGIT_LENGTH;
+            }
+        }
+        BIGNUM_ASSERT (s == 0);
+        BIGNUM_ASSERT (t == 0);
+
+        a = bignum_trim (a);
+        b = bignum_trim (b);
+    }
+
+    /* a fits into a fixnum, so b must too */
+    fixnum xx = bignum_to_fixnum (a);
+    fixnum yy = bignum_to_fixnum (b);
+    fixnum tt;
+
+    /* usual Euclidean algorithm for longs */
+    while (yy != 0) {
+        tt = yy;
+        yy = xx % yy;
+        xx = tt;
+    }
+
+    return fixnum_to_bignum (xx);
+}
+
 }
