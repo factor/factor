@@ -291,6 +291,7 @@ struct factor_vm
 	bignum *bignum_integer_length(bignum * x);
 	int bignum_logbitp(int shift, bignum * arg);
 	int bignum_unsigned_logbitp(int shift, bignum * bignum);
+	bignum *bignum_gcd(bignum * a, bignum * b);
 
 	//data heap
 	void init_card_decks();
@@ -489,6 +490,7 @@ struct factor_vm
 	void primitive_bignum_divint();
 	void primitive_bignum_divmod();
 	void primitive_bignum_mod();
+	void primitive_bignum_gcd();
 	void primitive_bignum_and();
 	void primitive_bignum_or();
 	void primitive_bignum_xor();
