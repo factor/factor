@@ -111,8 +111,20 @@ PRIVATE>
 : gcd ( x y -- a d )
     [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; inline
 
+MATH: fast-gcd ( x y -- d ) foldable
+
+<PRIVATE
+
+: simple-gcd ( x y -- d ) gcd nip ; inline
+
+PRIVATE>
+
+M: real fast-gcd simple-gcd ; inline
+
+M: bignum fast-gcd bignum-gcd ; inline
+
 : lcm ( a b -- c )
-    [ * ] 2keep gcd nip /i ; foldable
+    [ * ] 2keep fast-gcd /i ; foldable
 
 : divisor? ( m n -- ? )
     mod 0 = ; inline
