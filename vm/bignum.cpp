@@ -1709,8 +1709,55 @@ int factor_vm::bignum_unsigned_logbitp(int shift, bignum * bignum)
 	return (digit & mask) ? 1 : 0;
 }
 
-#
 
+#ifdef _WIN64
+/* Allocates memory */
+bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
+{
+    bignum * d;
+    bignum_length_type size_a, size_b;
+    bignum_digit_type * scan_a, * scan_b, * scan_d, * a_end, * b_end;
+
+    if (BIGNUM_NEGATIVE_P (a)) {
+        scan_a = BIGNUM_START_PTR (a);
+        size_a = BIGNUM_LENGTH (a);
+        a_end = scan_a + size_a;
+        d = allot_bignum (size_a, 0);
+        scan_d = BIGNUM_START_PTR (d);
+        while (scan_a < a_end)
+            (*scan_d++) = (*scan_a++);
+        a = d;
+    }
+
+    if (BIGNUM_NEGATIVE_P (b)) {
+        scan_b = BIGNUM_START_PTR (b);
+        size_b = BIGNUM_LENGTH (b);
+        b_end = scan_b + size_b;
+        d = allot_bignum (size_b, 0);
+        scan_d = BIGNUM_START_PTR (d);
+        while (scan_b < b_end)
+            (*scan_d++) = (*scan_b++);
+        b = d;
+    }
+
+    if (bignum_compare(a, b) == bignum_comparison_less) {
+        d = a;
+        a = b;
+        b = d;
+    }
+
+    while (BIGNUM_LENGTH (b) != 0) {
+        d = bignum_remainder (a, b);
+        if (d == BIGNUM_OUT_OF_BAND) {
+            return d;
+        }
+        a = b;
+        b = d;
+    }
+
+    return a;
+}
+#else
 /* Allocates memory */
 bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 {
@@ -1739,8 +1786,6 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
     b = d;
 
     /* Initial reduction: make sure that 0 <= b <= a. */
-    BIGNUM_SET_NEGATIVE_P (a, 0);
-    BIGNUM_SET_NEGATIVE_P (b, 0);
     if (bignum_compare(a, b) == bignum_comparison_less) {
         d = a;
         a = b;
@@ -1760,14 +1805,20 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
         for (k=0 ;; k++) {
             if (y - C == 0)
                 break;
+
             q = (x + (A - 1)) / (y - C);
+
             s = B + (q * D);
             t = x - (q * y);
+
             if (s > t)
                 break;
+
             x = y;
             y = t;
+
             t = A + (q * C);
+
             A = D; B = C; C = s; D = t;
         }
 
@@ -1854,5 +1905,6 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 
     return fixnum_to_bignum (xx);
 }
+#endif
 
 }
