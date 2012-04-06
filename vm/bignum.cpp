@@ -1715,8 +1715,7 @@ int factor_vm::bignum_unsigned_logbitp(int shift, bignum * bignum)
 bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 {
     bignum * d;
-    bignum_digit_type x, y;
-    bignum_twodigit_type q, s, t, A, B, C, D;
+    bignum_twodigit_type x, y, q, s, t, A, B, C, D;
     int nbits, k;
     bignum_length_type size_a, size_b;
     bignum_digit_type * scan_a, * scan_b, * scan_c, * scan_d, * a_end, * b_end;
