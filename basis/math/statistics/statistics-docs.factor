@@ -174,6 +174,46 @@ HELP: sequence>hashtable
     }
 } ;
 
+HELP: cum-sum
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative sum of " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 1 -1 2 -1 4 } cum-sum ."
+               "{ 1 0 2 1 5 }"
+    }
+} ;
+
+HELP: cum-product
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative product of " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 1 2 3 4 } cum-product ."
+               "{ 1 2 6 24 }"
+    }
+} ;
+
+HELP: cum-min
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative min of " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 5 3 4 1 } cum-min ."
+               "{ 5 3 3 1 }"
+    }
+} ;
+
+HELP: cum-max
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative max of " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 1 -1 3 5 } cum-max ."
+               "{ 1 1 3 5 }"
+    }
+} ;
+
 ARTICLE: "histogram" "Computing histograms"
 "Counting elements in a sequence:"
 { $subsections
