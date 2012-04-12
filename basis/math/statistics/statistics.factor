@@ -156,3 +156,15 @@ ERROR: empty-sequence ;
 
 : corr ( {x} {y} -- corr )
      [ cov ] [ [ var ] bi@ * sqrt ] 2bi / ;
+
+: cum-sum ( seq -- seq' )
+    0 swap [ + dup ] map nip ;
+
+: cum-product ( seq -- seq' )
+    1 swap [ * dup ] map nip ;
+
+: cum-min ( seq -- seq' )
+    [ ?first ] keep [ min dup ] map nip ;
+
+: cum-max ( seq -- seq' )
+    [ ?first ] keep [ max dup ] map nip ;
