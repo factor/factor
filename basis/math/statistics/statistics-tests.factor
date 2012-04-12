@@ -71,3 +71,8 @@ IN: math.statistics.tests
 
 [ 1.0 ] [ { 1 2 3 } { 1 2 3 } corr ] unit-test
 [ -1.0 ] [ { 1 2 3 } { -4 -5 -6 } corr ] unit-test
+
+[ { 1 2 4 7 } ] [ { 1 1 2 3 } cum-sum ] unit-test
+[ { 1 1 2 6 } ] [ { 1 1 2 3 } cum-product ] unit-test
+[ { 5 3 3 1 } ] [ { 5 3 4 1 } cum-min ] unit-test
+[ { 1 3 3 5 } ] [ { 1 3 1 5 } cum-max ] unit-test
