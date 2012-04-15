@@ -66,3 +66,5 @@ IN: sequences.extras
         ] each
     ] each end n - end seq1 subseq ;
 
+: pad-longest ( seq1 seq2 elt -- seq1 seq2 )
+    [ 2dup max-length ] dip [ pad-tail ] 2curry bi@ ;
