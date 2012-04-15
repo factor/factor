@@ -1,4 +1,4 @@
-USING: make sequences sequences.extras tools.test ;
+USING: kernel make math sequences sequences.extras tools.test ;
 
 IN: sequences.extras.tests
 
@@ -28,3 +28,6 @@ IN: sequences.extras.tests
 [ "abc" "   " ] [ "abc" "" CHAR: \s pad-longest ] unit-test
 [ "abc..." "foobar" ] [ "abc" "foobar" CHAR: . pad-longest ] unit-test
 
+[ { 0 1 0 1 } ] [
+    { 0 0 0 0 } { 1 3 } over [ 1 + ] change-nths
+] unit-test
