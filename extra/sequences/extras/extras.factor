@@ -68,3 +68,6 @@ IN: sequences.extras
 
 : pad-longest ( seq1 seq2 elt -- seq1 seq2 )
     [ 2dup max-length ] dip [ pad-tail ] 2curry bi@ ;
+
+: change-nths ( ... indices seq quot: ( ... elt -- ... elt' ) -- ... )
+    [ change-nth ] 2curry each ; inline
