@@ -225,6 +225,23 @@ ERROR: too-many-samples seq n ;
 : triangular-random-float ( low high -- n )
     2dup + 2 /f (triangular-random-float) ;
 
+: laplace-random-float ( mean scale -- n )
+    random-unit dup 0.5 <
+    [ 2 * log ] [ 1 swap - 2 * log neg ] if * + ;
+
+: cauchy-random-float ( median scale -- n )
+    random-unit 0.5 - pi * tan * + ;
+
+: chi-square-random-float ( dof -- n )
+    [ 0.5 ] dip 2 * gamma-random-float ;
+
+: student-t-random-float ( dof -- n )
+    [ 0 1 normal-random-float ] dip
+    [ chi-square-random-float ] [ / ] bi sqrt / ;
+
+: inv-gamma-random-float ( shape scale -- n )
+    recip gamma-random-float recip ;
+
 {
     { [ os windows? ] [ "random.windows" require ] }
     { [ os unix? ] [ "random.unix" require ] }
