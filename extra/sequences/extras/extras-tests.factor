@@ -21,3 +21,10 @@ IN: sequences.extras.tests
 [ "abcd" ] [ "abcd" "abcde" longest-subseq ] unit-test
 [ "foo" ] [ "foo" "foobar" longest-subseq ] unit-test
 [ "foo" ] [ "foobar" "foo" longest-subseq ] unit-test
+
+[ "" "" ] [ "" "" CHAR: ? pad-longest ] unit-test
+[ "abc" "def" ] [ "abc" "def" CHAR: ? pad-longest ] unit-test
+[ "   " "abc" ] [ "" "abc" CHAR: \s pad-longest ] unit-test
+[ "abc" "   " ] [ "abc" "" CHAR: \s pad-longest ] unit-test
+[ "abc..." "foobar" ] [ "abc" "foobar" CHAR: . pad-longest ] unit-test
+
