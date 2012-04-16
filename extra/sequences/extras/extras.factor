@@ -30,12 +30,10 @@ IN: sequences.extras
     [ bi@ [ min ] keep eq? not ] curry most ; inline
 
 : maximum ( seq quot: ( ... elt -- ... x ) -- elt )
-    [ keep 2array ] curry
-    [ [ first ] max-by ] map-reduce second ; inline
+    [ dup ?first ] dip [ max-by ] curry reduce ; inline
 
 : minimum ( seq quot: ( ... elt -- ... x ) -- elt )
-    [ keep 2array ] curry
-    [ [ first ] min-by ] map-reduce second ; inline
+    [ dup ?first ] dip [ min-by ] curry reduce ; inline
 
 : all-subseqs ( seq -- seqs )
     dup length [1,b] [ <clumps> ] with map concat ;
