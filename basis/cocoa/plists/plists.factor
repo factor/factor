@@ -2,8 +2,8 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: strings arrays hashtables assocs sequences fry macros
-cocoa.messages cocoa.classes cocoa.application cocoa kernel
-namespaces io.backend math cocoa.enumeration byte-arrays
+cocoa cocoa.messages cocoa.classes cocoa.application cocoa
+kernel namespaces io.backend math cocoa.enumeration byte-arrays
 combinators alien.c-types alien.data words quotations
 core-foundation core-foundation.data core-foundation.strings
 core-foundation.utilities ;
