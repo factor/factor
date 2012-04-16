@@ -143,7 +143,7 @@ UNIFORM-TUPLE: loading-uniforms
         [ length ] bi
     ] bi* ;
 
-: bunny-model-path ( -- path ) "bun_zipper.ply" temp-file ;
+: bunny-model-path ( -- path ) "bun_zipper.ply" cache-file ;
 
 CONSTANT: bunny-model-url "http://duriansoftware.com/joe/media/bun_zipper.ply"
 
