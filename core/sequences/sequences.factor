@@ -857,11 +857,17 @@ PRIVATE>
         [ 3dup ] dip [ + swap nth-unsafe ] keep rot nth-unsafe =
     ] all? nip ; inline
 
-: prepare-2map-reduce ( seq1 seq2 map-quot -- initial length seq1 seq2 )
-    [ drop min-length dup 1 < [ "Empty sequence" throw ] when 1 - ]
-    [ drop [ [ 1 + ] 2dip 2nth-unsafe ] 2curry ]
+: prepare-map-reduce ( seq map-quot -- initial i n quot )
+    [ drop length dup 1 < [ "Empty sequence" throw ] when ]
+    [ drop [ nth-unsafe ] curry ]
+    [ [ first-unsafe ] dip call ]
+    2tri -rot [ 1 ] 2dip ; inline
+
+: prepare-2map-reduce ( seq1 seq2 map-quot -- initial i n quot )
+    [ drop min-length dup 1 < [ "Empty sequence" throw ] when ]
+    [ drop [ 2nth-unsafe ] 2curry ]
     [ [ [ first-unsafe ] bi@ ] dip call ]
-    3tri -rot ; inline
+    3tri -rot [ 1 ] 2dip ; inline
 
 PRIVATE>
 
@@ -888,12 +894,12 @@ PRIVATE>
     [ rest-slice ] [ first-unsafe ] bi ; inline
 
 : map-reduce ( ..a seq map-quot: ( ..a x -- ..b elt ) reduce-quot: ( ..b prev elt -- ..a next ) -- ..a result )
-    [ [ unclip-slice ] dip [ call ] keep ] dip
-    compose reduce ; inline
+    [ [ prepare-map-reduce ] keep ] dip
+    compose compose (each-integer) ; inline
 
 : 2map-reduce ( ..a seq1 seq2 map-quot: ( ..a elt1 elt2 -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
     [ [ prepare-2map-reduce ] keep ] dip
-    compose compose each-integer ; inline
+    compose compose (each-integer) ; inline
 
 <PRIVATE
 
@@ -913,7 +919,7 @@ PRIVATE>
     [ but-last-slice ] [ last ] bi ; inline
 
 <PRIVATE
-    
+
 : (trim-head) ( seq quot -- seq n )
     over [ [ not ] compose find drop ] dip
     [ length or ] keep swap ; inline
