@@ -1,6 +1,6 @@
-USING: arrays kernel math math.order namespaces sequences kernel.private
-sequences.private strings sbufs tools.test vectors assocs
-generic vocabs.loader ;
+USING: arrays kernel math math.order math.parser namespaces
+sequences kernel.private sequences.private strings sbufs
+tools.test vectors assocs generic vocabs.loader ;
 IN: sequences.tests
 
 [ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
@@ -331,8 +331,10 @@ USE: make
 [ { { { 1 "a" } { 1 "b" } } { { 2 "a" } { 2 "b" } } } ]
 [ { 1 2 } { "a" "b" } cartesian-product ] unit-test
 
+[ { } [ string>digits sum ] [ + ] map-reduce ] must-infer
 [ { } [ ] [ + ] map-reduce ] must-fail
 [ 4 ] [ { 1 1 } [ 1 + ] [ + ] map-reduce ] unit-test
 
+[ { } { } [ [ string>digits product ] bi@ + ] [ + ] 2map-reduce ] must-infer
 [ { } { } [ + ] [ + ] 2map-reduce ] must-fail
 [ 24 ] [ { 1 2 } { 3 4 } [ + ] [ * ] 2map-reduce ] unit-test
