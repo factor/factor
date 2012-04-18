@@ -67,7 +67,7 @@ M: anonymous-complement valid-classoid? class>> valid-classoid? ;
 M: object valid-classoid? drop f ;
 
 : only-classoid? ( obj -- ? )
-    [ classoid? ] [ class? not ] bi and ;
+    dup classoid? [ class? not ] [ drop f ] if ;
 
 : class<= ( first second -- ? )
     class<=-cache get [ (class<=) ] 2cache ;
@@ -80,7 +80,7 @@ M: object valid-classoid? drop f ;
     } cond ;
 
 : class= ( first second -- ? )
-    [ class<= ] [ swap class<= ] 2bi and ;
+    2dup class<= [ swap class<= ] [ 2drop f ] if ;
 
 : class-not ( class -- complement )
     class-not-cache get [ (class-not) ] cache ;
