@@ -44,6 +44,9 @@ PRIVATE>
 : split1-slice ( seq subseq -- before-slice after-slice )
     [ snip-slice ] (split1) ;
 
+: split1-when ( ... seq quot: ( ... elt -- ... ? ) -- ... before after )
+    dupd find drop [ swap [ dup 1 + ] dip snip ] [ f ] if* ; inline
+
 : split1-last ( seq subseq -- before after )
     [ <reversed> ] bi@ split1 [ reverse ] bi@
     dup [ swap ] when ;
