@@ -55,6 +55,10 @@ PRIVATE>
     [ [ length factorial iota ] keep ] dip
     '[ _ permutation @ ] each ; inline
 
+: map-permutation ( seq quot -- )
+    [ [ length factorial iota ] keep ] dip
+    '[ _ permutation @ ] map ; inline
+
 : reduce-permutations ( seq identity quot -- result )
     swapd each-permutation ; inline
 
