@@ -60,3 +60,7 @@ unit-test
 
 [ { "hey" "world" "what's" "happening" } ]
 [ "heyAworldBwhat'sChappening" [ LETTER? ] split-when ] unit-test
+
+[ "" f ] [ "" [ blank? ] split1-when ] unit-test
+[ "" "ABC" ] [ " ABC" [ blank? ] split1-when ] unit-test
+[ "a" " bc" ] [ "a  bc" [ blank? ] split1-when ] unit-test
