@@ -99,6 +99,10 @@ HELP: memory>struct
 }
 { $description "Constructs a new " { $link struct } " of the specified " { $snippet "class" } " at the memory location referenced by " { $snippet "ptr" } ". The referenced memory is unchanged." } ;
 
+HELP: read-struct
+{ $values { "class" class } { "struct" struct } }
+{ $description "Reads a new " { $link struct } " of the specified " { $snippet "class" } "." } ;
+
 HELP: struct
 { $class-description "The parent class of all struct types." } ;
 
