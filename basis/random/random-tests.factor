@@ -1,5 +1,5 @@
-USING: random sequences tools.test kernel math math.functions
-sets grouping random.private math.statistics ;
+USING: random sequences tools.test kernel math math.constants
+math.functions sets grouping random.private math.statistics ;
 IN: random.tests
 
 [ 4 ] [ 4 random-bytes length ] unit-test
@@ -75,4 +75,17 @@ IN: random.tests
 [
     50000 [ 2 3 laplace-random-float ] replicate
     [ mean 2 .2 ~ ] [ std 2 sqrt 3 * .2 ~ ] bi
+] unit-test
+
+{ t t }
+[
+    50000 [ 12 rayleigh-random-float ] replicate
+    [ mean pi 2 / sqrt 12 * .2 ~ ]
+    [ std 2 pi 2 / - sqrt 12 * .2 ~ ] bi
+] unit-test
+
+{ t t }
+[
+    50000 [ 3 4 logistic-random-float ] replicate
+    [ mean 3 .2 ~ ] [ std pi 4 * 3 sqrt / .2 ~ ] bi
 ] unit-test
