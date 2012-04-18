@@ -1,5 +1,5 @@
 USING: arrays grouping kernel locals math math.order math.ranges
-sequences ;
+sequences splitting ;
 
 IN: sequences.extras
 
@@ -81,3 +81,17 @@ IN: sequences.extras
 
 : filter-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... seq' )
     over filter-index-as ; inline
+
+: even-indices ( seq -- seq' ) [ nip even? ] filter-index ;
+
+: odd-indices ( seq -- seq' ) [ nip odd? ] filter-index ;
+
+: compact ( seq quot elt -- seq' )
+    [ split-when harvest ] dip join ; inline
+
+: collapse ( seq quot elt -- seq' )
+    [ split-when ] dip
+    [ [ harvest ] dip join ]
+    [ [ first empty? ] dip [ prepend ] curry when ]
+    [ [ last empty? ] dip [ append ] curry when ]
+    2tri ; inline

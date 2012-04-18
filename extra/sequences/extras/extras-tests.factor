@@ -1,4 +1,4 @@
-USING: kernel make math sequences sequences.extras tools.test ;
+USING: ascii kernel make math sequences sequences.extras tools.test ;
 
 IN: sequences.extras.tests
 
@@ -33,3 +33,15 @@ IN: sequences.extras.tests
 ] unit-test
 
 [ { 1 3 5 } ] [ { 1 2 3 4 5 6 } [ nip even? ] filter-index ] unit-test
+
+[ V{ 1 3 5 } ] [ { 1 2 3 4 5 6 } [ nip even? ] V{ } filter-index-as ] unit-test
+
+[ { 1 3 5 } ] [ { 1 2 3 4 5 6 } even-indices ] unit-test
+
+[ { 2 4 6 } ] [ { 1 2 3 4 5 6 } odd-indices ] unit-test
+
+{ "a b c d e" }
+[ "a      b  \t \n \r  c   d \n    e   " [ blank? ] " " compact ] unit-test
+
+{ " a b c d e " }
+[ " a      b  c   d    e   " [ blank? ] " " collapse ] unit-test
