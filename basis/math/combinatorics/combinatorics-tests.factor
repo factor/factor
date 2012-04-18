@@ -94,3 +94,15 @@ IN: math.combinatorics.tests
     { 2 1 1 } { 2 1 2 } { 2 2 1 } { 2 2 2 } } ]
 [ { 1 2 } 3 selections ] unit-test
 
+
+{ V{ { 1 2 } { 1 3 } } }
+[ { 1 2 3 } 2 [ { 1 } head? ] filter-combinations ] unit-test
+
+{ { 3 4 5 } }
+[ { 1 2 3 } 2 [ sum ] map-combinations ] unit-test
+
+{ V{ { 1 2 3 } { 1 3 2 } } }
+[ { 1 2 3 } [ { 1 } head? ] filter-permutations ] unit-test
+
+{ { 6 6 6 6 6 6 } }
+[ { 1 2 3 } [ sum ] map-permutations ] unit-test
