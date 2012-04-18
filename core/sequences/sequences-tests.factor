@@ -331,4 +331,8 @@ USE: make
 [ { { { 1 "a" } { 1 "b" } } { { 2 "a" } { 2 "b" } } } ]
 [ { 1 2 } { "a" "b" } cartesian-product ] unit-test
 
+[ { } [ ] [ + ] map-reduce ] must-fail
 [ 4 ] [ { 1 1 } [ 1 + ] [ + ] map-reduce ] unit-test
+
+[ { } { } [ + ] [ + ] 2map-reduce ] must-fail
+[ 24 ] [ { 1 2 } { 3 4 } [ + ] [ * ] 2map-reduce ] unit-test
