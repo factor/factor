@@ -242,6 +242,18 @@ ERROR: too-many-samples seq n ;
 : inv-gamma-random-float ( shape scale -- n )
     recip gamma-random-float recip ;
 
+: rayleigh-random-float ( mode -- n )
+    random-unit log -2 * sqrt * ;
+
+: gumbel-random-float ( loc scale -- n )
+    random-unit log neg log * - ;
+
+: logistic-random-float ( loc scale -- n )
+    random-unit dup 1 swap - / log * + ;
+
+: power-random-float ( alpha -- n )
+    [ random-unit log exp 1 swap - ] dip recip ^ ;
+
 {
     { [ os windows? ] [ "random.windows" require ] }
     { [ os unix? ] [ "random.unix" require ] }
