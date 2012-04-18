@@ -30,7 +30,7 @@ HELP: split1-slice
 { $description "Splits " { $snippet "seq" } " at the first occurrence of " { $snippet "subseq" } ", and outputs the pieces before and after the split as slices. If " { $snippet "subseq" } " does not occur in " { $snippet "seq" } ", then " { $snippet "before" } " is just " { $snippet "seq" } " and " { $snippet "after" } " is " { $link f } "." } ;
 
 HELP: split1-when
-{ $values { "seq" "a sequence" } { "quot" { $quotation "( ... elt -- ... ? )" } } { "pieces" "a new array" } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation "( ... elt -- ... ? )" } } { "before" "a new sequence" } { "after" "a new sequence" } }
 { $description "Splits " { $snippet "seq" } " at the first occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs the pieces before and after the split." } ;
 
 HELP: split1-last
