@@ -31,3 +31,5 @@ IN: sequences.extras.tests
 [ { 0 1 0 1 } ] [
     { 0 0 0 0 } { 1 3 } over [ 1 + ] change-nths
 ] unit-test
+
+[ { 1 3 5 } ] [ { 1 2 3 4 5 6 } [ nip even? ] filter-index ] unit-test

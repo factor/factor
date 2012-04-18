@@ -69,3 +69,15 @@ IN: sequences.extras
 
 : change-nths ( ... indices seq quot: ( ... elt -- ... elt' ) -- ... )
     [ change-nth ] 2curry each ; inline
+
+: push-if-index ( ..a elt i quot: ( ..a elt i -- ..b ? ) accum -- ..b )
+    [ 2keep drop ] dip rot [ push ] [ 2drop ] if ; inline
+
+: index-selector-for ( quot exemplar -- selector accum )
+    [ length ] keep new-resizable [ [ push-if-index ] 2curry ] keep ; inline
+
+: filter-index-as ( ... seq quot: ( ... elt i -- ... ? ) exemplar -- ... seq' )
+    dup [ index-selector-for [ each-index ] dip ] curry dip like ; inline
+
+: filter-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... seq' )
+    over filter-index-as ; inline
