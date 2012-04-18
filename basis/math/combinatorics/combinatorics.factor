@@ -42,22 +42,28 @@ PRIVATE>
 : permutation-indices ( n seq -- permutation )
     length [ factoradic ] dip 0 pad-head >permutation ;
 
+: permutation-iota ( seq -- iota )
+    length factorial iota ; inline
+
 PRIVATE>
 
 : permutation ( n seq -- seq' )
     [ permutation-indices ] keep nths ;
 
 : all-permutations ( seq -- seq' )
-    [ length factorial iota ] keep
+    [ permutation-iota ] keep
     '[ _ permutation ] map ;
 
 : each-permutation ( seq quot -- )
-    [ [ length factorial iota ] keep ] dip
+    [ [ permutation-iota ] keep ] dip
     '[ _ permutation @ ] each ; inline
 
-: map-permutation ( seq quot -- )
-    [ [ length factorial iota ] keep ] dip
+: map-permutations ( seq quot -- seq' )
+    [ [ permutation-iota ] keep ] dip
     '[ _ permutation @ ] map ; inline
+
+: filter-permutations ( seq quot -- seq' )
+    selector [ each-permutation ] dip ; inline
 
 : reduce-permutations ( seq identity quot -- result )
     swapd each-permutation ; inline
@@ -142,6 +148,9 @@ PRIVATE>
 : map-combinations ( seq k quot -- )
     combinations-quot map ; inline
 
+: filter-combinations ( seq k quot -- seq' )
+    selector [ each-combination ] dip ; inline
+
 : map>assoc-combinations ( seq k quot exemplar -- )
     [ combinations-quot ] dip map>assoc ; inline
 
@@ -168,5 +177,4 @@ PRIVATE>
 
 : selections ( seq n -- selections )
     dup 0 > [ (selections) ] [ 2drop { } ] if ;
-
 
