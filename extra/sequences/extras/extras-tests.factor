@@ -1,4 +1,5 @@
-USING: ascii kernel make math sequences sequences.extras tools.test ;
+USING: ascii kernel make math sequences sequences.extras strings
+tools.test ;
 
 IN: sequences.extras.tests
 
@@ -45,3 +46,6 @@ IN: sequences.extras.tests
 
 { " a b c d e " }
 [ " a      b  c   d    e   " [ blank? ] " " collapse ] unit-test
+
+{ { "hello," " " "world!" " " " " } }
+[ "hello, world!  " [ blank? ] slice-when [ >string ] map ] unit-test
