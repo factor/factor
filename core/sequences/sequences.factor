@@ -664,8 +664,7 @@ PRIVATE>
 
 : prefix ( seq elt -- newseq )
     over [ over length 1 + ] dip [
-        [ 0 swap set-nth-unsafe ] keep
-        [ 1 swap copy ] keep
+        (1sequence) [ 1 swap copy ] keep
     ] new-like ;
 
 : suffix ( seq elt -- newseq )

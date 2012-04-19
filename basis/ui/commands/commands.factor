@@ -42,7 +42,7 @@ GENERIC: command-word ( command -- word )
     ] H{ } make-assoc ;
 
 : update-gestures ( class -- )
-    dup command-gestures "gestures" set-word-prop ;
+    dup command-gestures set-gestures ;
 
 : define-command-map ( class group blurb pairs -- )
     <command-map>

@@ -39,7 +39,7 @@ TUPLE: pack < gadget
 
 : round-dims ( seq -- newseq )
     [ { 0 0 } ] dip
-    [ swap v- dup [ ceiling ] map [ swap v- ] keep ] map
+    [ swap v- dup vceiling [ swap v- ] keep ] map
     nip ;
 
 PRIVATE>
