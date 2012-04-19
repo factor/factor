@@ -357,3 +357,8 @@ M: real atan >float atan ; inline
     [ [ / floor ] [ * ] bi ] unless-zero ;
 
 : lerp ( a b t -- a_t ) [ over - ] dip * + ; inline
+
+: roots ( x t -- seq )
+    [ [ log ] [ recip ] bi* * exp ]
+    [ recip 2pi * 0 swap complex boa exp ]
+    [ iota [ ^ * ] with with map ] tri ;
