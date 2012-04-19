@@ -65,7 +65,7 @@ SYMBOL: enter-out
 
 : check-return ( word label -- )
     2dup
-    [ stack-effect effect-height ]
+    [ stack-height ]
     [ entry-stack-height current-stack-height swap - ]
     bi*
     = [ 2drop ] [
