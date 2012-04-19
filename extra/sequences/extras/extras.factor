@@ -95,3 +95,11 @@ IN: sequences.extras
     [ [ first empty? ] dip [ prepend ] curry when ]
     [ [ last empty? ] dip [ append ] curry when ]
     2tri ; inline
+
+:: slice-when ( seq quot: ( elt -- ? ) -- seq' )
+    seq length :> len
+    0 [ len dupd < ] [
+        dup seq quot find-from drop
+        [ 2dup = [ 1 + ] when ] [ len ] if*
+        [ seq <slice> ] keep len or swap
+    ] produce nip ; inline
