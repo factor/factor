@@ -292,6 +292,10 @@ HELP: mod-inv
     { $example "USING: math prettyprint ;" "173 815 * 1119 mod ." "1" }
 } ;
 
+HELP: ^mod
+{ $values { "x" real } { "y" real } { "n" real } { "z" real } }
+{ $description "Outputs the result of computing " { $snippet "x^y mod n" } "." } ;
+
 HELP: ~
 { $values { "x" real } { "y" real } { "epsilon" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " and " { $snippet "y" } " are approximately equal to each other. There are three possible comparison tests, chosen based on the sign of " { $snippet "epsilon" } ":"
