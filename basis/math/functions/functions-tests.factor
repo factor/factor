@@ -178,6 +178,8 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 
 [ 2 10 mod-inv ] must-fail
 
+[ t ] [ 15 37 137 ^mod 15 37 ^ 137 mod = ] unit-test
+
 [ t ] [ 0 0 ^ fp-nan? ] unit-test
 [ 1 ] [ 10 0 ^ ] unit-test
 [ 1/8 ] [ 1/2 3 ^ ] unit-test
