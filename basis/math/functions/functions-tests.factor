@@ -238,3 +238,5 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
         C{ -0.7211247851537049 -1.249024766483406 }
     } [ .01 ~ ] 2map
 ] unit-test
+
+{ t } [ 3 15 roots [ 15 ^ 3 .01 ~ ] all? ] unit-test
