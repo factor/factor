@@ -306,7 +306,6 @@ HELP: ~
     }
 } ;
 
-
 HELP: truncate
 { $values { "x" real } { "y" "a whole real number" } }
 { $description "Outputs the number that results from subtracting the fractional component of " { $snippet "x" } "." }
@@ -326,3 +325,8 @@ HELP: round
 { $values { "x" real } { "y" "a whole real number" } }
 { $description "Outputs the whole number closest to " { $snippet "x" } "." }
 { $notes "The result is not necessarily an integer." } ;
+
+HELP: roots
+{ $values { "x" number } { "t" integer } { "seq" sequence } }
+{ $description "Outputs the " { $snippet "t" } " roots of a number " { $snippet "x" } "." }
+{ $notes "The results are not necessarily real." } ;
