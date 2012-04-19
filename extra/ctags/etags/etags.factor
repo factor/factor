@@ -43,9 +43,6 @@ IN: ctags.etags
     1 - lines>bytes number>string %
   ] "" make ;
 
-: etag-length ( vector -- n )
-  0 [ length + ] reduce ;
-
 : (etag-header) ( n path -- str )
   [
     %
@@ -63,8 +60,8 @@ IN: ctags.etags
       [ first file>lines ]
       [ second ] bi
       [ etag ] with map
-      dup etag-length
-    ] keep first 
+      dup sum-lengths
+    ] keep first
     etag-header append
   ] each ;
 
