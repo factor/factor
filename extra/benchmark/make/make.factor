@@ -9,10 +9,10 @@ IN: benchmark.make
     [ [ CHAR: a , ] times ] "" make ;
 
 : make-arrays ( n -- seq )
-    [ iota [ , ] each ] { } make ;
+    [ iota % ] { } make ;
 
 : make-vectors ( n -- seq )
-    [ iota [ , ] each ] V{ } make ;
+    [ iota % ] V{ } make ;
 
 : make-benchmark ( -- )
     5,000 iota [
