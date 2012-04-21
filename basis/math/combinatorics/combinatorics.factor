@@ -65,6 +65,10 @@ PRIVATE>
 : filter-permutations ( seq quot -- seq' )
     selector [ each-permutation ] dip ; inline
 
+: find-permutation ( seq quot -- elt )
+    [ dup [ permutation-iota ] keep ] dip
+    '[ _ permutation @ ] find drop swap permutation ; inline
+
 : reduce-permutations ( seq identity quot -- result )
     swapd each-permutation ; inline
 
@@ -145,7 +149,7 @@ PRIVATE>
 : each-combination ( seq k quot -- )
     combinations-quot each ; inline
 
-: map-combinations ( seq k quot -- )
+: map-combinations ( seq k quot -- seq' )
     combinations-quot map ; inline
 
 : filter-combinations ( seq k quot -- seq' )
@@ -159,6 +163,9 @@ PRIVATE>
 
 : all-combinations ( seq k -- seq' )
     [ ] map-combinations ;
+
+: find-combination ( seq k quot -- i elt )
+    [ combinations-quot find drop ] [ drop combination ] 3bi ; inline
 
 : reduce-combinations ( seq k identity quot -- result )
     [ -rot ] dip each-combination ; inline
