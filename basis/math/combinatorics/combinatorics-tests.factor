@@ -106,3 +106,7 @@ IN: math.combinatorics.tests
 
 { { 6 6 6 6 6 6 } }
 [ { 1 2 3 } [ sum ] map-permutations ] unit-test
+
+{ { 2 3 } } [ { 1 2 3 } 2 [ first 2 = ] find-combination ] unit-test
+
+{ { 2 1 3 } } [ { 1 2 3 } [ first 2 = ] find-permutation ] unit-test
