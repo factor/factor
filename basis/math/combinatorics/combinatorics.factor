@@ -1,8 +1,9 @@
 ! Copyright (c) 2007-2010 Slava Pestov, Doug Coleman, Aaron Schaefer, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs binary-search fry kernel locals
-math math.order math.ranges namespaces sequences sorting ;
+USING: accessors arrays assocs binary-search classes.tuple fry
+kernel locals math math.order math.ranges namespaces sequences
+sequences.private sorting ;
 
 IN: math.combinatorics
 
@@ -50,9 +51,16 @@ PRIVATE>
 : permutation ( n seq -- seq' )
     [ permutation-indices ] keep nths ;
 
-: all-permutations ( seq -- seq' )
-    [ permutation-iota ] keep
-    '[ _ permutation ] map ;
+TUPLE: permutations length seq ;
+
+: <permutations> ( seq -- permutations )
+    [ length factorial ] keep permutations boa ;
+
+M: permutations length length>> ; inline
+M: permutations nth-unsafe seq>> permutation ;
+M: permutations hashcode* tuple-hashcode ;
+
+INSTANCE: permutations immutable-sequence
 
 : each-permutation ( seq quot -- )
     [ [ permutation-iota ] keep ] dip
@@ -64,6 +72,9 @@ PRIVATE>
 
 : filter-permutations ( seq quot -- seq' )
     selector [ each-permutation ] dip ; inline
+
+: all-permutations ( seq -- seq' )
+    [ ] map-permutations ;
 
 : find-permutation ( seq quot -- elt )
     [ dup [ permutation-iota ] keep ] dip
@@ -149,6 +160,17 @@ PRIVATE>
 
 : combination ( m seq k -- seq' )
     <combo> apply-combination ;
+
+TUPLE: combinations combo length ;
+
+: <combinations> ( seq k -- combinations )
+    [ <combo> ] 2keep [ length ] [ nCk ] bi* combinations boa ;
+
+M: combinations length length>> ; inline
+M: combinations nth-unsafe combo>> apply-combination ;
+M: combinations hashcode* tuple-hashcode ;
+
+INSTANCE: combinations immutable-sequence
 
 : each-combination ( seq k quot -- )
     combinations-quot each ; inline
