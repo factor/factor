@@ -1,4 +1,5 @@
-USING: assocs kernel math math.functions math.statistics sequences tools.test ;
+USING: assocs kernel math math.functions math.statistics sequences
+math.order tools.test ;
 IN: math.statistics.tests
 
 [ 1 ] [ { 1 } mean ] unit-test
@@ -18,6 +19,10 @@ IN: math.statistics.tests
 
 { 4 } [ { 1 2 3 4 } 0 kth-largest ] unit-test
 { 2 } [ { 1 2 3 4 } 2 kth-largest ] unit-test
+
+[ { 1 2 3 4 } 30 kth-largest ] [ bounds-error? ] must-fail-with
+[ { 1 2 3 4 } 2 [ [ ] compare ] kth-object ] [ bounds-error? ] must-fail-with
+{ 3 } [ { 1 2 3 4 } 2 [ before? ] kth-object ] unit-test
 
 [ 1 ] [ { 1 } mode ] unit-test
 [ 3 ] [ { 1 2 3 3 3 4 5 6 76 7 2 21 1 3 3 3 } mode ] unit-test
