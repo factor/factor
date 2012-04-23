@@ -14,9 +14,12 @@ IN: math.statistics
 : harmonic-mean ( seq -- x )
     [ recip ] map-sum recip ;
 
-:: kth-object ( seq k quot: ( x y -- ? ) -- elt )
+<PRIVATE
+
+:: (kth-object) ( seq k quot: ( x y -- ? ) nth-quot exchange-quot -- elt )
     #! Wirth's method, Algorithm's + Data structues = Programs p. 84
     #! The algorithm modifiers seq, so we clone it
+    k seq bounds-check 2drop
     seq clone :> seq
     0 :> i!
     0 :> j!
@@ -30,10 +33,10 @@ IN: math.statistics
         m j!
         [ i j <= ]
         [
-            [ i seq nth-unsafe x quot call ] [ i 1 + i! ] while
-            [ x j seq nth-unsafe quot call ] [ j 1 - j! ] while
+            [ i seq nth-quot call x quot call ] [ i 1 + i! ] while
+            [ x j seq nth-quot call quot call ] [ j 1 - j! ] while
             i j <= [
-                i j seq exchange-unsafe
+                i j seq exchange-quot call
                 i 1 + i!
                 j 1 - j!
             ] when
@@ -44,9 +47,17 @@ IN: math.statistics
     ] while
     k seq nth ; inline
 
-: kth-smallest ( seq k -- elt ) [ < ] kth-object ;
+: kth-object-unsafe ( seq k quot: ( x y -- ? ) -- elt )
+    [ nth-unsafe ] [ exchange-unsafe ] (kth-object) ; inline
+
+PRIVATE>
+
+: kth-object ( seq k quot: ( x y -- ? ) -- elt )
+    [ nth ] [ exchange ] (kth-object) ; inline
+
+: kth-smallest ( seq k -- elt ) [ < ] kth-object-unsafe ;
     
-: kth-largest ( seq k -- elt ) [ > ] kth-object ;
+: kth-largest ( seq k -- elt ) [ > ] kth-object-unsafe ;
 
 : count-relative ( seq k -- lt eq gt )
     [ 0 0 0 ] 2dip '[
