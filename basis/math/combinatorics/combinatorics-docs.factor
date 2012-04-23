@@ -36,6 +36,10 @@ HELP: permutation
         "5 { \"apple\" \"banana\" \"orange\" } permutation ." "{ \"orange\" \"banana\" \"apple\" }" }
 } ;
 
+HELP: <permutations>
+{ $values { "seq" sequence } { "permutations" sequence } }
+{ $description "An efficient sequence containing the lexicographical permutations of " { $snippet "seq" } "." } ;
+
 HELP: all-permutations
 { $values { "seq" sequence } { "seq'" sequence } }
 { $description "Outputs a sequence containing all permutations of " { $snippet "seq" } " in lexicographical order." }
@@ -69,6 +73,10 @@ HELP: combination
     { $example "USING: math.combinatorics prettyprint ;"
         "0 { \"a\" \"b\" \"c\" \"d\" } 2 combination ." "{ \"a\" \"b\" }" }
 } ;
+
+HELP: <combinations>
+{ $values { "seq" sequence } { "k" "a non-negative integer" } { "combinations" sequence } }
+{ $description "An efficient sequence containing the combinations of " { $snippet "seq" } " choosing " { $snippet "k" } " elements." } ;
 
 HELP: all-combinations
 { $values { "seq" sequence } { "k" "a non-negative integer" } { "seq'" sequence } }
