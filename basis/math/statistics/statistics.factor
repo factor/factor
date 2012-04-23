@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators generalizations kernel locals math
 math.functions math.order math.vectors sequences
-sequences.private sorting ;
+sequences.private sorting fry ;
 IN: math.statistics
 
 : mean ( seq -- x )
@@ -14,7 +14,7 @@ IN: math.statistics
 : harmonic-mean ( seq -- x )
     [ recip ] map-sum recip ;
 
-:: kth-smallest ( seq k -- elt )
+:: kth-object ( seq k quot: ( x y -- ? ) -- elt )
     #! Wirth's method, Algorithm's + Data structues = Programs p. 84
     #! The algorithm modifiers seq, so we clone it
     seq clone :> seq
@@ -30,8 +30,8 @@ IN: math.statistics
         m j!
         [ i j <= ]
         [
-            [ i seq nth-unsafe x < ] [ i 1 + i! ] while
-            [ x j seq nth-unsafe < ] [ j 1 - j! ] while
+            [ i seq nth-unsafe x quot call ] [ i 1 + i! ] while
+            [ x j seq nth-unsafe quot call ] [ j 1 - j! ] while
             i j <= [
                 i j seq exchange-unsafe
                 i 1 + i!
@@ -44,6 +44,28 @@ IN: math.statistics
     ] while
     k seq nth ; inline
 
+: kth-smallest ( seq k -- elt ) [ < ] kth-object ;
+    
+: kth-largest ( seq k -- elt ) [ > ] kth-object ;
+
+: count-relative ( seq k -- lt eq gt )
+    [ 0 0 0 ] 2dip '[
+        _ <=> {
+            { +lt+ [ [ 1 + ] 2dip ] }
+            { +gt+ [ 1 + ] }
+            { +eq+ [ [ 1 + ] dip ] }
+        } case
+    ] each ;
+
+: minmax-relative ( seq k -- lt eq gt lt-max gt-min )
+    [ 0 0 0 -1/0. 1/0. ] 2dip '[
+        dup _ <=> {
+            { +lt+ [ [ 1 + ] 5 ndip '[ _ max ] dip ] }
+            { +gt+ [ [ 1 + ] 3dip min ] }
+            { +eq+ [ [ 1 + ] 4dip drop ] }
+        } case
+    ] each ;
+    
 : lower-median ( seq -- elt )
     [ ] [ ] [ length odd? ] tri
     [ midpoint@ ] [ midpoint@ 1 - ] if kth-smallest ;
