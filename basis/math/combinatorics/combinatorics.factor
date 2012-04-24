@@ -18,7 +18,7 @@ IN: math.combinatorics
 PRIVATE>
 
 : factorial ( n -- n! )
-    iota 1 [ 1 + * ] reduce ;
+    dup 1 > [ [1,b] product ] [ drop 1 ] if ;
 
 : nPk ( n k -- nPk )
     2dup possible? [ dupd - [a,b) product ] [ 2drop 0 ] if ;
