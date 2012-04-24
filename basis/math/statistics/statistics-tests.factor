@@ -1,5 +1,5 @@
 USING: assocs kernel math math.functions math.statistics sequences
-math.order tools.test ;
+math.order tools.test math.vectors ;
 IN: math.statistics.tests
 
 [ 1 ] [ { 1 } mean ] unit-test
@@ -87,3 +87,52 @@ IN: math.statistics.tests
 [ { 1 1 2 6 } ] [ { 1 1 2 3 } cum-product ] unit-test
 [ { 5 3 3 1 } ] [ { 5 3 4 1 } cum-min ] unit-test
 [ { 1 3 3 5 } ] [ { 1 3 1 5 } cum-max ] unit-test
+
+{ t }
+[
+    { 6 7 15 36 39 40 41 42 43 47 49 } { 1/4 1/2 3/4 } quantile1 [ >float ] map
+    { 15.0 40.0 43.0 } .00001 v~
+] unit-test
+
+{ t }
+[
+    { 6 7 15 36 39 40 41 42 43 47 49 } { 1/4 1/2 3/4 } quantile3 [ >float ] map
+    { 15.0 40.0 42.0 } .00001 v~
+] unit-test
+
+{ t }
+[
+    { 6 7 15 36 39 40 41 42 43 47 49 } { 1/4 1/2 3/4 } quantile4 [ >float ] map
+    { 13.0 39.5 42.25 } .00001 v~
+] unit-test
+
+{ t }
+[
+    { 6 7 15 36 39 40 41 42 43 47 49 } { 1/4 1/2 3/4 } quantile5 [ >float ] map
+    { 20+1/4 40 42+3/4 } .00001 v~
+] unit-test
+
+{ t }
+[
+    { 6 7 15 36 39 40 41 42 43 47 49 } { 1/4 1/2 3/4 } quantile6 [ >float ] map
+    { 15.0 40.0 43.0 } .00001 v~
+] unit-test
+
+{ t }
+[
+    { 6 7 15 36 39 40 41 42 43 47 49 } { 1/4 1/2 3/4 } quantile7 [ >float ] map
+    { 25.5 40.0 42.5 } .00001 v~
+] unit-test
+
+{ t }
+[
+    { 6 7 15 36 39 40 41 42 43 47 49 } { 1/4 1/2 3/4 } quantile8 [ >float ] map
+    { 18.5 40.0 42.83333333333334 } .00001 v~
+] unit-test
+
+{ t }
+[
+    { 6 7 15 36 39 40 41 42 43 47 49 } { 1/4 1/2 3/4 } quantile9 [ >float ] map
+    { 18.9375 40.0 42.8125 } .00001 v~
+] unit-test
+
