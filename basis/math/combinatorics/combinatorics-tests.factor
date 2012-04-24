@@ -1,6 +1,7 @@
 USING: kernel math math.combinatorics math.combinatorics.private tools.test sequences ;
 IN: math.combinatorics.tests
 
+[ 1 ] [ -1 factorial ] unit-test ! required by other math.combinatorics words
 [ 1 ] [ 0 factorial ] unit-test
 [ 1 ] [ 1 factorial ] unit-test
 [ 3628800 ] [ 10 factorial ] unit-test
