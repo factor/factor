@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators generalizations kernel locals math
 math.functions math.order math.vectors sequences
-sequences.private sorting fry ;
+sequences.private sorting fry arrays grouping ;
 IN: math.statistics
 
 : mean ( seq -- x )
@@ -16,11 +16,10 @@ IN: math.statistics
 
 <PRIVATE
 
-:: (kth-object) ( seq k quot: ( x y -- ? ) nth-quot exchange-quot -- elt )
+:: ((kth-object)) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
     #! Wirth's method, Algorithm's + Data structues = Programs p. 84
     #! The algorithm modifiers seq, so we clone it
     k seq bounds-check 2drop
-    seq clone :> seq
     0 :> i!
     0 :> j!
     0 :> l!
@@ -46,17 +45,32 @@ IN: math.statistics
         k i < [ j m! ] when
     ] while
     k seq nth ; inline
+    
+: (kth-object) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
+    [ clone ] 4dip ((kth-object)) ; inline
 
 : kth-object-unsafe ( seq k quot: ( x y -- ? ) -- elt )
-    [ nth-unsafe ] [ exchange-unsafe ] (kth-object) ; inline
+    [ [ nth-unsafe ] [ exchange-unsafe ] ] dip (kth-object) ; inline
+
+: kth-objects-unsafe ( seq kths quot: ( x y -- ? ) -- elts )
+    [ clone ] 2dip
+    '[ [ nth-unsafe ] [ exchange-unsafe ]  _ ((kth-object)) ] with map ; inline
 
 PRIVATE>
 
 : kth-object ( seq k quot: ( x y -- ? ) -- elt )
-    [ nth ] [ exchange ] (kth-object) ; inline
+    [ [ nth ] [ exchange ] ] dip (kth-object) ; inline    
 
+: kth-objects ( seq kths quot: ( x y -- ? ) -- elts )
+    [ clone ] 2dip
+    '[ [ nth ] [ exchange ]  _ ((kth-object)) ] with map ; inline
+
+: kth-smallests ( seq kths -- elts ) [ < ] kth-objects-unsafe ;
+    
 : kth-smallest ( seq k -- elt ) [ < ] kth-object-unsafe ;
     
+: kth-largests ( seq kths -- elts ) [ > ] kth-objects-unsafe ;
+
 : kth-largest ( seq k -- elt ) [ > ] kth-object-unsafe ;
 
 : count-relative ( seq k -- lt eq gt )
@@ -77,19 +91,79 @@ PRIVATE>
         } case
     ] each ;
     
+: lower-median-index ( seq -- n )    
+    [ midpoint@ ]
+    [ length odd? [ 1 - ] unless ] bi ;
+    
 : lower-median ( seq -- elt )
-    [ ] [ ] [ length odd? ] tri
-    [ midpoint@ ] [ midpoint@ 1 - ] if kth-smallest ;
+    [ ] [ lower-median-index ] bi kth-smallest ;
 
 : upper-median ( seq -- elt )
     dup midpoint@ kth-smallest ;
 
 : medians ( seq -- lower upper )
-    [ lower-median ] [ upper-median ] bi ;
+    [ ]
+    [ [ lower-median-index ] [ midpoint@ ] bi 2array ]
+    bi kth-smallests first2 ;
 
 : median ( seq -- x )
-    [ ] [ length odd? ] bi [ lower-median ] [ medians + 2 / ] if ;
+    dup length odd?
+    [ lower-median ] [ medians + 2 / ] if ;
 
+! quantile can be any n-tile. quartile is n = 4, percentile is n = 100
+! a,b,c,d parameters, N - number of samples, q is quantile (1/2 for median, 1/4 for 1st quartile)
+! http://mathworld.wolfram.com/Quantile.html
+! a + (N + b) q - 1
+! could subtract 1 from a
+
+: quantile-x ( a b N q -- x )
+    [ + ] dip * + 1 - ; inline
+
+! 2+1/4 frac is 1/4
+: frac ( x -- x' )
+    >fraction [ /mod nip ] keep / ; inline
+
+:: quantile-indices ( seq qs a b c d -- seq )
+    qs [ [ a b seq length ] dip quantile-x ] map ;
+    
+:: qabcd ( y-floor y-ceiling x c d -- qabcd )
+    y-floor y-ceiling y-floor - c d x frac * + * + ;
+    
+:: quantile-abcd ( seq qs a b c d -- quantile )
+    seq qs a b c d quantile-indices :> indices
+    indices [ [ floor ] [ ceiling ] bi 2array ] map
+    concat :> index-pairs
+    
+    seq index-pairs kth-smallests
+    2 group indices [ [ first2 ] dip c d qabcd ] 2map ;
+
+: quantile1 ( seq qs -- seq' )
+    0 0 1 0 quantile-abcd ;
+
+: quantile3 ( seq qs -- seq' )
+    1/2 0 0 0 quantile-abcd ;
+
+: quantile4 ( seq qs -- seq' )
+    0 0 0 1 quantile-abcd ;
+
+: quantile5 ( seq qs -- seq' )
+    1/2 0 0 1 quantile-abcd ;
+
+: quantile6 ( seq qs -- seq' )
+    0 1 0 1 quantile-abcd ;
+
+: quantile7 ( seq qs -- seq' )
+    1 -1 0 1 quantile-abcd ;
+
+: quantile8 ( seq qs -- seq' )
+    1/3 1/3 0 1 quantile-abcd ;
+
+: quantile9 ( seq qs -- seq' )
+    3/8 1/4 0 1 quantile-abcd ;
+    
+: quartile ( seq -- seq' )
+    { 1/4 1/2 3/4 } quantile5 ;
+    
 <PRIVATE
 
 : (sequence>assoc) ( seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) assoc -- assoc )
