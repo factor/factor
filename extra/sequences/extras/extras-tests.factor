@@ -49,3 +49,8 @@ IN: sequences.extras.tests
 
 { { "hello," " " "world!" " " " " } }
 [ "hello, world!  " [ blank? ] slice-when [ >string ] map ] unit-test
+
+{ "hello" } [ "hello" 0 rotate ] unit-test
+{ "llohe" } [ "hello" 2 rotate ] unit-test
+{ "hello" } [ "hello" dup 0 rotate! ] unit-test
+{ "lohel" } [ "hello" dup 3 rotate! ] unit-test
