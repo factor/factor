@@ -103,3 +103,14 @@ IN: sequences.extras
         [ 2dup = [ 1 + ] when ] [ len ] if*
         [ seq <slice> ] keep len or swap
     ] produce nip ; inline
+
+: rotate ( seq n -- seq' )
+    cut prepend ;
+
+:: rotate! ( seq n -- )
+    seq length :> end
+    n 0 n [ 2dup = ] [
+        [ seq exchange ] [ [ 1 + ] bi@ ] 2bi
+        dup end = [ drop over ] when
+        2over = [ -rot nip over ] when
+    ] until 3drop ;
