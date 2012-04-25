@@ -59,3 +59,7 @@ IN: sequences.extras.tests
 { V{ 0 0 1 0 1 2 } } [ 4 iota [ iota ] map-concat ] unit-test
 { "abc" } [ "abc" [ 1string ] map-concat ] unit-test
 { { 97 98 99 } } [ "abc" [ 1string ] { } map-concat-as ] unit-test
+
+{ { } } [ { } [ ] [ even? ] map-filter ] unit-test
+{ "bcde" } [ "abcd" [ 1 + ] [ drop t ] map-filter ] unit-test
+{ { 0 4 16 36 64 } } [ 10 iota [ sq ] [ even? ] { } map-filter-as ] unit-test
