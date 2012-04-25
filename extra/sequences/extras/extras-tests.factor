@@ -54,3 +54,8 @@ IN: sequences.extras.tests
 { "llohe" } [ "hello" 2 rotate ] unit-test
 { "hello" } [ "hello" dup 0 rotate! ] unit-test
 { "lohel" } [ "hello" dup 3 rotate! ] unit-test
+
+{ { } } [ { } [ ] map-concat ] unit-test
+{ V{ 0 0 1 0 1 2 } } [ 4 iota [ iota ] map-concat ] unit-test
+{ "abc" } [ "abc" [ 1string ] map-concat ] unit-test
+{ { 97 98 99 } } [ "abc" [ 1string ] { } map-concat-as ] unit-test
