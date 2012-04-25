@@ -1,12 +1,11 @@
 USING: arrays grouping kernel locals math math.order math.ranges
-sequences splitting ;
+sequences sequences.private splitting ;
 
 IN: sequences.extras
 
 : reduce1 ( seq quot -- result ) [ unclip ] dip reduce ; inline
 
-:: reduce-r
-    ( list identity quot: ( obj1 obj2 -- obj ) -- result )
+:: reduce-r ( list identity quot: ( obj1 obj2 -- obj ) -- result )
     list empty?
     [ identity ]
     [ list rest identity quot reduce-r list first quot call ] if ;
@@ -17,11 +16,16 @@ IN: sequences.extras
     [ id ]
     [ unclip id swap quot call( prev elt -- next ) quot reduce* ] if-empty ; inline recursive
 
-:: combos ( list1 list2 -- result ) list2 [ [ 2array ] curry list1 swap map ] map concat ;
-: find-all ( seq quot -- elts ) [ [ length iota ] keep ] dip
-    [ dupd call( a -- ? ) [ 2array ] [ 2drop f ] if ] curry 2map [ ] filter ; inline
+:: combos ( list1 list2 -- result )
+    list2 [ [ 2array ] curry list1 swap map ] map concat ;
 
-: insert-sorted ( elt seq -- seq ) 2dup [ < ] with find drop over length or swap insert-nth ;
+: find-all ( seq quot -- elts )
+    [ [ length iota ] keep ] dip
+    [ dupd call( a -- ? ) [ 2array ] [ 2drop f ] if ] curry
+    2map [ ] filter ; inline
+
+: insert-sorted ( elt seq -- seq )
+    2dup [ < ] with find drop over length or swap insert-nth ;
 
 : max-by ( obj1 obj2 quot: ( obj -- n ) -- obj1/obj2 )
     [ bi@ [ max ] keep eq? not ] curry most ; inline
@@ -39,9 +43,10 @@ IN: sequences.extras
     dup length [1,b] [ <clumps> ] with map concat ;
 
 :: each-subseq ( ... seq quot: ( ... x -- ... ) -- ... )
-    seq length [0,b] [
+    seq length :> len
+    len [0,b] [
         :> from
-        from seq length (a,b] [
+        from len (a,b] [
             :> to
             from to seq subseq quot call( x -- )
         ] each
@@ -55,12 +60,12 @@ IN: sequences.extras
     len1 1 + [ len2 1 + 0 <array> ] replicate :> table
     len1 [1,b] [| x |
         len2 [1,b] [| y |
-            x 1 - seq1 nth
-            y 1 - seq2 nth = [
-                y 1 - x 1 - table nth nth 1 + :> len
-                len y x table nth set-nth
+            x 1 - seq1 nth-unsafe
+            y 1 - seq2 nth-unsafe = [
+                y 1 - x 1 - table nth-unsafe nth-unsafe 1 + :> len
+                len y x table nth-unsafe set-nth-unsafe
                 len n > [ len n! x end! ] when
-            ] [ 0 y x table nth set-nth ] if
+            ] [ 0 y x table nth-unsafe set-nth-unsafe ] if
         ] each
     ] each end n - end seq1 subseq ;
 
