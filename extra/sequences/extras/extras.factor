@@ -114,3 +114,16 @@ IN: sequences.extras
         dup end = [ drop over ] when
         2over = [ -rot nip over ] when
     ] until 3drop ;
+
+: appender-for ( quot exemplar -- quot' vec )
+    [ length ] keep new-resizable
+    [ [ push-all ] curry compose ] keep ; inline
+
+: appender ( quot -- quot' vec )
+    V{ } appender-for ; inline
+
+: map-concat-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
+    dup [ appender-for [ each ] dip ] curry dip like ; inline
+
+: map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
+    over map-concat-as ; inline
