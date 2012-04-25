@@ -133,3 +133,9 @@ IN: sequences.extras
 
 : map-filter ( ... seq quot: ( ... elt -- ... newelt ) quot: ( ... newelt -- ... ? ) -- ... subseq )
     pick map-filter-as ; inline
+
+: map-sift ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
+    [ ] map-filter ; inline
+
+: map-harvest ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
+    [ empty? not ] map-filter ; inline
