@@ -127,3 +127,9 @@ IN: sequences.extras
 
 : map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over map-concat-as ; inline
+
+: map-filter-as ( ... seq quot: ( ... elt -- ... newelt ) quot: ( ... newelt -- ... ? ) exemplar -- ... subseq )
+    dup [ selector-for [ compose each ] dip ] curry dip like ; inline
+
+: map-filter ( ... seq quot: ( ... elt -- ... newelt ) quot: ( ... newelt -- ... ? ) -- ... subseq )
+    pick map-filter-as ; inline
