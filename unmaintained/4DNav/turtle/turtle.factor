@@ -119,7 +119,7 @@ TUPLE: observer < turtle projection-mode collision-mode ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : distance ( turtle turtle -- n ) 
-    pos>> swap pos>> v- [ sq ] map sum sqrt ;
+    pos>> swap pos>> v- [ sq ] map-sum sqrt ;
 
 : move-by ( point -- ) turtle-pos> v+ >turtle-pos ;
 
