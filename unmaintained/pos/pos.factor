@@ -16,7 +16,7 @@ C: <pos> pos
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: distance ( pos pos -- n ) val>> swap val>> v- [ sq ] map sum sqrt ;
+: distance ( pos pos -- n ) val>> swap val>> v- [ sq ] map-sum sqrt ;
 
 : move-by ( point -- ) pos> v+ >pos ;
 

@@ -25,7 +25,7 @@ M: lex-hash set-at
         [ swap hash>> set-at ]
     } case ;
 
-:: at-pos ( t l c -- p ) t l head-slice [ length ] map sum l 1 - + c + ;
+:: at-pos ( t l c -- p ) t l head-slice [ length ] map-sum l 1 - + c + ;
 
 M: lex-hash at*
     swap {
