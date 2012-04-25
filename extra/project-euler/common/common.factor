@@ -80,7 +80,7 @@ PRIVATE>
     ] if ;
 
 : number>digits ( n -- seq )
-    [ dup 0 = not ] [ 10 /mod ] produce reverse nip ;
+    [ dup 0 = not ] [ 10 /mod ] produce reverse! nip ;
 
 : number-length ( n -- m )
     abs [

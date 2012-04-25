@@ -32,13 +32,13 @@ PRIVATE>
 <PRIVATE
 
 : factoradic ( n -- factoradic )
-    0 [ over 0 > ] [ 1 + [ /mod ] keep swap ] produce reverse 2nip ;
+    0 [ over 0 > ] [ 1 + [ /mod ] keep swap ] produce reverse! 2nip ;
 
 : (>permutation) ( seq n -- seq )
-    [ '[ _ dupd >= [ 1 + ] when ] map ] keep prefix ;
+    [ '[ _ dupd >= [ 1 + ] when ] map! ] keep prefix ;
 
 : >permutation ( factoradic -- permutation )
-    reverse 1 cut [ (>permutation) ] each ;
+    reverse! 1 cut [ (>permutation) ] each ;
 
 : permutation-indices ( n seq -- permutation )
     length [ factoradic ] dip 0 pad-head >permutation ;
@@ -147,7 +147,7 @@ C: <combo> combo
 
 :: combination-indices ( m combo -- seq )
     combo m combo dual-index combinadic
-    combo seq>> length 1 - swap [ - ] with map ;
+    combo seq>> length 1 - swap [ - ] with map! ;
 
 : apply-combination ( m combo -- seq )
     [ combination-indices ] keep seq>> nths ;
