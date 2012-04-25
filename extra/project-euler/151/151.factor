@@ -62,7 +62,7 @@ DEFER: (euler151)
         { { 0 0 1 0 } [ { 0 0 0 1 } (euler151) 1 + ] }
         { { 0 1 0 0 } [ { 0 0 1 1 } (euler151) 1 + ] }
         { { 1 0 0 0 } [ { 0 1 1 1 } (euler151) 1 + ] }
-        [ [ dup length iota [ pick-sheet ] with map sum ] [ sum ] bi / ]
+        [ [ dup length iota [ pick-sheet ] with map-sum ] [ sum ] bi / ]
      } case ] cache ;
 
 : euler151 ( -- answer )

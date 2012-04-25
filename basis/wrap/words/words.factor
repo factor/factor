@@ -9,7 +9,7 @@ C: <word> word
 <PRIVATE
 
 : words-length ( words -- length )
-    [ width>> ] map sum ;
+    [ width>> ] map-sum ;
 
 : make-element ( whites blacks -- element )
     [ append ] [ [ words-length ] bi@ ] 2bi <element> ;
