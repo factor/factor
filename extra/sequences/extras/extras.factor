@@ -130,13 +130,21 @@ IN: sequences.extras
 : map-concat-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
     dup [ appender-for [ each ] dip ] curry dip like ; inline
 
-: map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
-    over map-concat-as ; inline
+: >resizable ( seq -- vec ) ! fixes map-concat "cannot apply call to run-time..."
+    [ length ] keep [ new-resizable ] [ over push-all ] bi ;
 
-: map-filter-as ( ... seq quot: ( ... elt -- ... newelt ) quot: ( ... newelt -- ... ? ) exemplar -- ... subseq )
+: map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
+    over [ 2drop { } ] [
+        first over call dup [
+            >resizable [ [ push-all ] curry compose ] keep
+            [ 1 ] 3dip [ (each) (each-integer) ] dip
+        ] curry dip like
+    ] if-empty ; inline
+
+: map-filter-as ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) exemplar -- ... subseq )
     dup [ selector-for [ compose each ] dip ] curry dip like ; inline
 
-: map-filter ( ... seq quot: ( ... elt -- ... newelt ) quot: ( ... newelt -- ... ? ) -- ... subseq )
+: map-filter ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) -- ... subseq )
     pick map-filter-as ; inline
 
 : map-sift ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
