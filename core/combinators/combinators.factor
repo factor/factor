@@ -87,7 +87,7 @@ ERROR: no-cond ;
 
 : cond>quot ( assoc -- quot )
     [ dup pair? [ [ t ] swap 2array ] unless ] map
-    reverse [ no-cond ] swap alist>quot ;
+    reverse! [ no-cond ] swap alist>quot ;
 
 ! case
 ERROR: no-case object ;

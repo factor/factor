@@ -102,7 +102,7 @@ M: predicate reset-word
     dup class? [ "superclass" word-prop ] [ drop f ] if ;
 
 : superclasses ( class -- supers )
-    [ superclass ] follow reverse ;
+    [ superclass ] follow reverse! ;
 
 : superclass-of? ( class superclass -- ? )
     superclasses member-eq? ;
