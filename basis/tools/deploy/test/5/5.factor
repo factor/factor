@@ -4,7 +4,7 @@ http.client kernel ;
 
 : deploy-test-5 ( -- )
     URL" http://localhost/foo.html" clone
-    "resource:port-number" ascii file-contents string>number >>port
+    "resource:temp/port-number" ascii file-contents string>number >>port
     http-get 2drop ;
 
 MAIN: deploy-test-5
