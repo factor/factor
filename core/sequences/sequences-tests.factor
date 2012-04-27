@@ -50,6 +50,10 @@ IN: sequences.tests
 [ 3 CHAR: d ] [ "abcdefg" [ 3 = nip ] find-index ] unit-test
 [ 3 CHAR: d ] [ "abcdefg" [ drop CHAR: d = ] find-index ] unit-test
 
+[ 0 CHAR: a ] [ 0 "abcdef" [ drop CHAR: a >= ] find-index-from ] unit-test
+[ 1 CHAR: b ] [ 0 "abcdef" [ drop CHAR: a > ] find-index-from ] unit-test
+[ 2 CHAR: c ] [ 1 "abcdef" [ drop CHAR: b > ] find-index-from ] unit-test
+
 [ f ] [ 3 [ ]     member? ] unit-test
 [ f ] [ 3 [ 1 2 ] member? ] unit-test
 [ t ] [ 1 [ 1 2 ] member? ] unit-test
