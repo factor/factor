@@ -136,3 +136,7 @@ IN: math.statistics.tests
     { 18.9375 40.0 42.8125 } .00001 v~
 ] unit-test
 
+{ 1.0986122886681096 } [ { 1 2 3 } entropy ] unit-test
+
+{ 1.0 } [ 0.5 binary-entropy ] unit-test
+
