@@ -450,6 +450,14 @@ HELP: find-index
           { "elt" "the first matching element, or " { $link f } } }
 { $description "A varient of " { $link find } " where the quotation takes both an element and its index." } ;
 
+HELP: find-index-from
+{ $values { "n" "a starting index" }
+          { "seq" sequence }
+          { "quot" { $quotation "( ... elt i -- ... ? )" } }
+          { "i" "the index of the first match, or " { $link f } }
+          { "elt" "the first matching element, or " { $link f } } }
+{ $description "A varient of " { $link find-from } " where the quotation takes both an element and its index." } ;
+
 HELP: map-find
 { $values { "seq" sequence } { "quot" { $quotation "( ... elt -- ... result/f )" } } { "result" "the first non-false result of the quotation" } { "elt" "the first matching element, or " { $link f } } }
 { $description "Applies the quotation to each element of the sequence, until the quotation outputs a true value. If the quotation ever yields a result which is not " { $link f } ", then the value is output, along with the element of the sequence which yielded this." } ;
