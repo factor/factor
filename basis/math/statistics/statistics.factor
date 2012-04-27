@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators generalizations kernel locals math
 math.functions math.order math.vectors sequences
-sequences.private sorting fry arrays grouping ;
+sequences.private sorting fry arrays grouping sets ;
 IN: math.statistics
 
 : mean ( seq -- x )
@@ -275,3 +275,10 @@ ERROR: empty-sequence ;
 
 : cum-max ( seq -- seq' )
     [ ?first ] keep [ max dup ] map nip ;
+
+: entropy ( seq -- n )
+    dup members [ [ = ] curry count ] with map
+    dup sum v/n dup [ log ] map v* sum neg ;
+
+: binary-entropy ( p -- h )
+    [ dup log * ] [ 1 swap - dup log * ] bi + neg 2 log / ;
