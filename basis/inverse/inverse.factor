@@ -156,7 +156,7 @@ MACRO: undo ( quot -- ) [undo] ;
 \ undo 1 [ ] define-pop-inverse
 \ map 1 [ [undo] '[ dup sequence? assure _ map ] ] define-pop-inverse
 
-\ exp \ log define-dual
+\ e^ \ log define-dual
 \ sq \ sqrt define-dual
 
 ERROR: missing-literal ;

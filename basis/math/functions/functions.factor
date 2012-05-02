@@ -57,20 +57,20 @@ PRIVATE>
 
 : polar> ( abs arg -- z ) cis * ; inline
 
-GENERIC: exp ( x -- y )
+GENERIC: e^ ( x -- y )
 
-M: float exp fexp ; inline
+M: float e^ fexp ; inline
 
-M: real exp >float exp ; inline
+M: real e^ >float e^ ; inline
 
-M: complex exp >rect [ exp ] dip polar> ; inline
+M: complex e^ >rect [ e^ ] dip polar> ; inline
 
 <PRIVATE
 
 : ^mag ( w abs arg -- magnitude )
     [ >float-rect swap ]
     [ >float swap >float fpow ]
-    [ rot * exp /f ]
+    [ rot * e^ /f ]
     tri* ; inline
 
 : ^theta ( w abs arg -- theta )
@@ -223,8 +223,6 @@ M: float log1+ dup -1.0 >= [ flog1+ ] [ 1.0 + 0.0 rect> log ] if ; inline
 
 : 10^ ( x -- y ) 10 swap ^ ; inline
 
-: e^ ( x -- y ) e swap ^ ; inline
-
 GENERIC: log10 ( x -- y ) foldable
 
 M: real log10 >float flog10 ; inline
@@ -361,8 +359,8 @@ M: real atan >float atan ; inline
 : lerp ( a b t -- a_t ) [ over - ] dip * + ; inline
 
 : roots ( x t -- seq )
-    [ [ log ] [ recip ] bi* * exp ]
-    [ recip 2pi * 0 swap complex boa exp ]
+    [ [ log ] [ recip ] bi* * e^ ]
+    [ recip 2pi * 0 swap complex boa e^ ]
     [ iota [ ^ * ] with with map ] tri ;
 
 : sigmoid ( x -- y ) neg e^ 1 + recip ; inline

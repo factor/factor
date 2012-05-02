@@ -49,7 +49,7 @@ ARTICLE: "power-functions" "Powers and logarithms"
 "Squares:"
 { $subsections sq sqrt }
 "Exponential and natural logarithm:"
-{ $subsections exp cis log }
+{ $subsections e^ cis log }
 "Other logarithms:"
 { $subsections log1+ log10 }
 "Raising a number to a power:"
@@ -108,13 +108,13 @@ HELP: align
 { $description "Outputs the least multiple of " { $snippet "w" } " greater than " { $snippet "m" } "." }
 { $notes "This word will give an incorrect result if " { $snippet "w" } " is not a power of 2." } ;
 
-HELP: exp
+HELP: e^
 { $values { "x" number } { "y" number } }
 { $description "Exponential function, " { $snippet "y=e^x" } "." } ;
 
 HELP: frexp
 { $values { "x" number } { "y" float } { "exp" integer } }
-{ $description "Break the number " { $snippet "x" } " into a normalized fraction " { $snippet "y" } " and an integral power of 2 " { $snippet "exp" } "." $nl "The function returns a number " { $snippet "y" } " in the interval [1/2, 1) or 0, and a number " { $snippet "exp" } " such that " { $snippet "x = y*(2**exp)" } "." } ;
+{ $description "Break the number " { $snippet "x" } " into a normalized fraction " { $snippet "y" } " and an integral power of 2 " { $snippet "e^" } "." $nl "The function returns a number " { $snippet "y" } " in the interval [1/2, 1) or 0, and a number " { $snippet "exp" } " such that " { $snippet "x = y*(2**exp)" } "." } ;
 
 HELP: log
 { $values { "x" number } { "y" number } }
@@ -242,9 +242,9 @@ HELP: >polar
 
 HELP: cis
 { $values { "arg" "a real number" } { "z" "a complex number on the unit circle" } }
-{ $description "Computes a point on the unit circle using Euler's formula for " { $snippet "exp(arg*i)" } "." } ;
+{ $description "Computes a point on the unit circle using Euler's formula for " { $snippet "e^(arg*i)" } "." } ;
 
-{ cis exp } related-words
+{ cis e^ } related-words
 
 HELP: polar>
 { $values { "abs" "a non-negative real number" } { "arg" real } { "z" number } }
@@ -274,10 +274,6 @@ HELP: nth-root
 HELP: 10^
 { $values { "x" number } { "y" number } }
 { $description "Raises 10 to the power of " { $snippet "x" } ". If " { $snippet "x" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." } ;
-
-HELP: e^
-{ $values { "x" number } { "y" number } }
-{ $description "Raises " { $link e } " to the power of " { $snippet "x" } "." } ;
 
 HELP: gcd
 { $values { "x" integer } { "y" integer } { "a" integer } { "d" integer } }
