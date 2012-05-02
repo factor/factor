@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel math math.order
-sequences quotations math.functions.private ;
+sequences quotations math.functions.private math.constants ;
 IN: math.functions
 
 ARTICLE: "integer-functions" "Integer functions"
@@ -53,7 +53,9 @@ ARTICLE: "power-functions" "Powers and logarithms"
 "Other logarithms:"
 { $subsections log1+ log10 }
 "Raising a number to a power:"
-{ $subsections ^ 10^ }
+{ $subsections ^ e^ 10^ }
+"Logistics functions:"
+{ $subsections sigmoid }
 "Finding the root of a number:"
 { $subsections nth-root }
 "Converting between rectangular and polar form:"
@@ -273,6 +275,10 @@ HELP: 10^
 { $values { "x" number } { "y" number } }
 { $description "Raises 10 to the power of " { $snippet "x" } ". If " { $snippet "x" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." } ;
 
+HELP: e^
+{ $values { "x" number } { "y" number } }
+{ $description "Raises " { $link e } " to the power of " { $snippet "x" } "." } ;
+
 HELP: gcd
 { $values { "x" integer } { "y" integer } { "a" integer } { "d" integer } }
 { $description "Computes the positive greatest common divisor " { $snippet "d" } " of " { $snippet "x" } " and " { $snippet "y" } ", and another value " { $snippet "a" } " satisfying:" { $code "a*y = d mod x" } }
@@ -330,3 +336,7 @@ HELP: roots
 { $values { "x" number } { "t" integer } { "seq" sequence } }
 { $description "Outputs the " { $snippet "t" } " roots of a number " { $snippet "x" } "." }
 { $notes "The results are not necessarily real." } ;
+
+HELP: sigmoid
+{ $values { "x" number } { "y" number } }
+{ $description "Outputs the sigmoid, an S-shaped \"logistic\" function, from 0 to 1, of the number " { $snippet "x" } "." } ;
