@@ -152,3 +152,22 @@ IN: sequences.extras
 
 : map-harvest ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     [ empty? not ] map-filter ; inline
+
+<PRIVATE
+
+: push-map-if ( ..a elt filter-quot: ( ..a elt -- ..b ? ) map-quot: ( ..a elt -- ..b newelt ) accum -- ..b )
+    [ keep over ] 2dip [ when ] dip rot [ push ] [ 2drop ] if ; inline
+
+: filter-mapper-for ( filter-quot map-quot exemplar -- quot' vec )
+    [ length ] keep new-resizable [ [ push-map-if ] 3curry ] keep ; inline
+
+: filter-mapper ( filter-quot map-quot -- quot' vec )
+    V{ } filter-mapper-for ; inline
+
+PRIVATE>
+
+: filter-map-as ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
+    dup [ filter-mapper-for [ each ] dip ] curry dip like ; inline
+
+: filter-map ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) -- ... newseq )
+    pick filter-map-as ; inline
