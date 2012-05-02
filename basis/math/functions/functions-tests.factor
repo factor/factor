@@ -240,3 +240,7 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 ] unit-test
 
 { t } [ 3 15 roots [ 15 ^ 3 .01 ~ ] all? ] unit-test
+
+{ t } [ 1 e^ e .0000000001 ~ ] unit-test
+{ 1 } [ 0 e^ ] unit-test
+{ 1/2 } [ 0 sigmoid ] unit-test

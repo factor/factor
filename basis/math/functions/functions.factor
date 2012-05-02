@@ -223,6 +223,8 @@ M: float log1+ dup -1.0 >= [ flog1+ ] [ 1.0 + 0.0 rect> log ] if ; inline
 
 : 10^ ( x -- y ) 10 swap ^ ; inline
 
+: e^ ( x -- y ) e swap ^ ; inline
+
 GENERIC: log10 ( x -- y ) foldable
 
 M: real log10 >float flog10 ; inline
@@ -362,3 +364,5 @@ M: real atan >float atan ; inline
     [ [ log ] [ recip ] bi* * exp ]
     [ recip 2pi * 0 swap complex boa exp ]
     [ iota [ ^ * ] with with map ] tri ;
+
+: sigmoid ( x -- y ) neg e^ 1 + recip ; inline
