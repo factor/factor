@@ -64,3 +64,6 @@ IN: sequences.extras.tests
 { { } } [ { } [ ] [ even? ] map-filter ] unit-test
 { "bcde" } [ "abcd" [ 1 + ] [ drop t ] map-filter ] unit-test
 { { 0 4 16 36 64 } } [ 10 iota [ sq ] [ even? ] { } map-filter-as ] unit-test
+
+{ V{ 0 4 16 36 64 } } [ 10 iota [ even? ] [ sq ] filter-map ] unit-test
+{ { 2 6 10 14 18 } } [ 10 iota [ odd? ] [ 2 * ] { } filter-map-as ] unit-test
