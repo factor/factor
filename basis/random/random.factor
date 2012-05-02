@@ -116,7 +116,7 @@ ERROR: too-many-samples seq n ;
     (cos-random-float) (log-sqrt-random-float) * * + ;
 
 : lognormal-random-float ( mean sigma -- n )
-    normal-random-float exp ;
+    normal-random-float e^ ;
 
 : exponential-random-float ( lambda -- n )
     random-unit log neg swap / ;
@@ -149,7 +149,7 @@ ERROR: too-many-samples seq n ;
         random-unit :> u2
 
         u1 1. u1 - / log ainv / :> v
-        alpha v exp *           :> x
+        alpha v e^ *           :> x
         u1 sq u2 *              z!
         bbb ccc v * + x -       r!
 
@@ -168,7 +168,7 @@ ERROR: too-many-samples seq n ;
         p 1.0 > [
             random-unit x alpha 1 - ^ >
         ] [
-            random-unit x neg exp >
+            random-unit x neg e^ >
         ] if
     ] [
         random-unit b * p!
@@ -204,7 +204,7 @@ ERROR: too-many-samples seq n ;
         0 :> c! 0 :> _f! ! initialize locals
         [
             random-unit {
-                [ 2. c - c * < ] [ 1. c - exp c * <= ]
+                [ 2. c - c * < ] [ 1. c - e^ c * <= ]
             } 1|| not
         ] [
             random-unit pi * cos :> z
@@ -252,7 +252,7 @@ ERROR: too-many-samples seq n ;
     random-unit dup 1 swap - / log * + ;
 
 : power-random-float ( alpha -- n )
-    [ random-unit log exp 1 swap - ] dip recip ^ ;
+    [ random-unit log e^ 1 swap - ] dip recip ^ ;
 
 {
     { [ os windows? ] [ "random.windows" require ] }

@@ -45,7 +45,7 @@ MEMO: bernoulli ( p -- n )
     even? [ "odd degrees of freedom" throw ] unless ;
 
 : (chi2P) ( chi/2 df/2 -- p )
-    [1,b) dupd n/v cum-product swap neg exp [ v*n sum ] keep + ;
+    [1,b) dupd n/v cum-product swap neg e^ [ v*n sum ] keep + ;
 
 PRIVATE>
 
