@@ -69,7 +69,7 @@ HELP: fsinh
 
 HELP: fexp
 { $values { "x" real } { "double" real } }
-{ $description "Calls the exponential function (" { $snippet "y=e^x" } ") from the C standard library. User code should call " { $link exp } " instead." } ;
+{ $description "Calls the exponential function (" { $snippet "y=e^x" } ") from the C standard library. User code should call " { $link e^ } " instead." } ;
 
 HELP: flog
 { $values { "x" real } { "double" real } }
