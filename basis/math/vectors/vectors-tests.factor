@@ -1,6 +1,6 @@
 IN: math.vectors.tests
 USING: math.vectors tools.test kernel specialized-arrays compiler
-kernel.private alien.c-types ;
+kernel.private alien.c-types math.functions ;
 SPECIALIZED-ARRAY: int
 
 [ { 1 2 3 } ] [ 1/2 { 2 4 6 } n*v ] unit-test
@@ -11,9 +11,12 @@ SPECIALIZED-ARRAY: int
 [ 5 ] [ { 1 2 } norm-sq ] unit-test
 [ 13 ] [ { 2 3 } norm-sq ] unit-test
 
-[ { 1.0  2.5  } ] [ { 1.0 2.5 } { 2.5 1.0 } 0.0 vnlerp ] unit-test 
-[ { 2.5  1.0  } ] [ { 1.0 2.5 } { 2.5 1.0 } 1.0 vnlerp ] unit-test 
-[ { 1.75 1.75 } ] [ { 1.0 2.5 } { 2.5 1.0 } 0.5 vnlerp ] unit-test 
+{ t } [ { 1 2 3 } [ norm ] [ 2 p-norm ] bi = ] unit-test
+{ t } [ { 1 2 3 } 3 p-norm 3.301927248894626 1e-10 ~ ] unit-test
+
+[ { 1.0  2.5  } ] [ { 1.0 2.5 } { 2.5 1.0 } 0.0 vnlerp ] unit-test
+[ { 2.5  1.0  } ] [ { 1.0 2.5 } { 2.5 1.0 } 1.0 vnlerp ] unit-test
+[ { 1.75 1.75 } ] [ { 1.0 2.5 } { 2.5 1.0 } 0.5 vnlerp ] unit-test
 
 [ { 1.75 2.125 } ] [ { 1.0 2.5 } { 2.5 1.0 } { 0.5 0.25 } vlerp ] unit-test 
 
