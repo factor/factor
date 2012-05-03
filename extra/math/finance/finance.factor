@@ -20,6 +20,17 @@ PRIVATE>
 : sma ( seq n -- newseq )
     clump [ mean ] map ;
 
+: dema ( seq n -- newseq )
+    [ ema ] keep [ drop 2 v*n ] [ ema ] 2bi v- ;
+
+: gdema ( seq n v -- newseq )
+    [ [ ema ] keep dupd ema ] dip
+    [ 1 + v*n ] [ v*n ] bi-curry bi* v- ;
+
+: tema ( seq n -- newseq )
+    [ ema ] keep dupd [ ema ] keep
+    [ drop [ 3 v*n ] bi@ v- ] [ ema nip ] 3bi v+ ;
+
 : macd ( seq n1 n2 -- newseq )
     rot dup ema [ swap ema ] dip v- ;
 
