@@ -364,3 +364,9 @@ M: real atan >float atan ; inline
     [ iota [ ^ * ] with with map ] tri ;
 
 : sigmoid ( x -- y ) neg e^ 1 + recip ; inline
+
+GENERIC: signum ( x -- y )
+
+M: real signum sgn ;
+
+M: complex signum dup abs / ;
