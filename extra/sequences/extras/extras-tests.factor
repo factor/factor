@@ -67,3 +67,6 @@ IN: sequences.extras.tests
 
 { V{ 0 4 16 36 64 } } [ 10 iota [ even? ] [ sq ] filter-map ] unit-test
 { { 2 6 10 14 18 } } [ 10 iota [ odd? ] [ 2 * ] { } filter-map-as ] unit-test
+
+{ 8 } [ 3 iota dup [ 1 + * ] 2map-sum ] unit-test
+{ 4 } [ "hello" "jello" [ = ] 2count ] unit-test
