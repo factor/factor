@@ -14,3 +14,7 @@ IN: math.distances.tests
 { 143/105 } [ { 1 2 3 } { 4 5 6 } canberra-distance ] unit-test
 
 { 3/7 } [ { 1 2 3 } { 4 5 6 } bray-curtis-distance ] unit-test
+
+{ t } [ { 1 2 3 } dup correlation-distance 0.0 1e-10 ~ ] unit-test
+{ t } [ { 1 2 3 } { 1 2 1 } correlation-distance 1.0 1e-10 ~ ] unit-test
+{ t } [ { 1 2 3 } { 3 2 1 } correlation-distance 2.0 1e-10 ~ ] unit-test
