@@ -218,6 +218,9 @@ M: object norm-sq [ absq ] [ + ] map-reduce ; inline
 
 : norm ( v -- x ) norm-sq sqrt ; inline
 
+: p-norm ( v p -- x )
+    [ [ [ abs ] dip ^ ] curry map-sum ] keep recip ^ ; inline
+
 : normalize ( u -- v ) dup norm v/n ; inline
 
 GENERIC: distance ( u v -- x )
