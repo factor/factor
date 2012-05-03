@@ -1,8 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: kernel math math.functions math.vectors sequences
-sequences.extras ;
+USING: kernel math math.functions math.statistics math.vectors
+sequences sequences.extras ;
 
 IN: math.distances
 
@@ -29,3 +29,6 @@ IN: math.distances
 
 : bray-curtis-distance ( a b -- n )
     [ v- ] [ v+ ] 2bi [ vabs sum ] bi@ / ;
+
+: correlation-distance ( a b -- n )
+    [ dup mean v-n ] bi@ [ v* sum ] [ [ norm ] bi@ * ] 2bi / 1 swap - ;
