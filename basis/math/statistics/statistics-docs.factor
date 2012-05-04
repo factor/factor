@@ -50,13 +50,13 @@ HELP: std
 { $values { "seq" sequence } { "x" "a non-negative real number"} }
 { $description "Computes the standard deviation of " { $snippet "seq" } ", which is the square root of the variance. It measures how widely spread the values in a sequence are about the mean." }
 { $examples
-  { $example "USING: math.statistics prettyprint ;" "{ 4 6 8 10 12 14 16 } std ." "4.0" } } ;
+  { $example "USING: math.statistics prettyprint ;" "{ 7 8 9 } std ." "1.0" } } ;
 
 HELP: ste
   { $values { "seq" sequence } { "x" "a non-negative real number"} }
   { $description "Computes the standard error of the mean for " { $snippet "seq" } ". It's defined as the standard deviation divided by the square root of the length of the sequence, and measures uncertainty associated with the estimate of the mean." }
   { $examples
-    { $example "USING: math.statistics prettyprint ;" "{ 4 6 6 8 10 12 14 14 16 } ste ." "1.333333333333333" }
+    { $example "USING: math.statistics prettyprint ;" "{ -2 2 } ste ." "2.0" }
   } ;
 
 HELP: var
@@ -65,8 +65,8 @@ HELP: var
 { $notes "If the number of elements in " { $snippet "seq" } " is 1 or less, it outputs 0." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 1 } var ." "0" }
-  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } var ." "2/3" }
-  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 5 } var ." "2" } } ;
+  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } var ." "1" }
+  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } var ." "1+2/3" } } ;
 
 HELP: cov
 { $values { "{x}" sequence } { "{y}" sequence } { "cov" "a real number" } }
@@ -258,3 +258,8 @@ ARTICLE: "math.statistics" "Statistics"
 { $subsection "histogram" } ;
 
 ABOUT: "math.statistics"
+
+{ var full-var sample-var } related-words
+{ std full-std sample-std } related-words
+{ ste full-ste sample-ste } related-words
+{ corr full-corr sample-corr } related-words

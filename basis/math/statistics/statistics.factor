@@ -223,7 +223,7 @@ ERROR: empty-sequence ;
         [ length 1 - ] bi /
     ] if ;
 
-: var ( seq -- x )
+: full-var ( seq -- x )
     dup length 1 <= [
         drop 0
     ] [
@@ -231,9 +231,19 @@ ERROR: empty-sequence ;
         [ length ] bi /
     ] if ;
 
-: std ( seq -- x ) var sqrt ;
+ALIAS: var sample-var
 
-: ste ( seq -- x ) [ std ] [ length ] bi sqrt / ;
+: sample-std ( seq -- x ) sample-var sqrt ;
+
+: full-std ( seq -- x ) full-var sqrt ;
+
+ALIAS: std sample-std
+
+: sample-ste ( seq -- x ) [ sample-std ] [ length ] bi sqrt / ;
+
+: full-ste ( seq -- x ) [ full-std ] [ length ] bi sqrt / ;
+
+ALIAS: ste sample-ste
 
 : ((r)) ( mean(x) mean(y) {x} {y} -- (r) )
     ! finds sigma((xi-mean(x))(yi-mean(y))
@@ -261,8 +271,13 @@ ERROR: empty-sequence ;
 : cov ( {x} {y} -- cov )
     [ dup mean v-n ] bi@ v* mean ;
 
-: corr ( {x} {y} -- corr )
-     [ cov ] [ [ var ] bi@ * sqrt ] 2bi / ;
+: sample-corr ( {x} {y} -- corr )
+     [ cov ] [ [ sample-var ] bi@ * sqrt ] 2bi / ;
+
+: full-corr ( {x} {y} -- corr )
+     [ cov ] [ [ full-var ] bi@ * sqrt ] 2bi / ;
+
+ALIAS: corr sample-corr
 
 : cum-sum ( seq -- seq' )
     0 swap [ + dup ] map nip ;
