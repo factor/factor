@@ -58,6 +58,9 @@ IN: math.statistics.tests
 [ 0.0 ] [ { 1 } std ] unit-test
 [ 0.0 ] [ { 1 } ste ] unit-test
 
+{ 2 } [ { 1 3 5 7 } mean-dev ] unit-test
+{ 4/5 } [ { 1 3 3 3 5 } median-dev ] unit-test
+
 [
     H{
         { 97 2 }
