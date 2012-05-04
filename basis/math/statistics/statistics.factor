@@ -14,6 +14,9 @@ IN: math.statistics
 : harmonic-mean ( seq -- x )
     [ recip ] map-sum recip ;
 
+: contraharmonic-mean ( seq -- x )
+    [ [ sq ] map-sum ] [ sum ] bi / ;
+
 <PRIVATE
 
 :: ((kth-object)) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
