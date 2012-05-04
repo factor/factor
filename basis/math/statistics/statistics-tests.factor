@@ -45,11 +45,11 @@ IN: math.statistics.tests
 [ 2 ] [ { 1 2 } upper-median ] unit-test
 [ 3/2 ] [ { 1 2 } median ] unit-test
 
-[ 1 ] [ { 1 2 3 } sample-var ] unit-test
-[ 16 ] [ { 4 6 8 10 10 12 14 16 } sample-var ] unit-test
+[ 1 ] [ { 1 2 3 } var ] unit-test
+[ 16 ] [ { 4 6 8 10 10 12 14 16 } var ] unit-test
 
-[ 16 ] [ { 4 6 8 10 12 14 16 } var ] unit-test
-[ 4.0 ] [ { 4 6 8 10 12 14 16 } std ] unit-test
+[ 16 ] [ { 4 6 8 10 12 14 16 } full-var ] unit-test
+[ 1.0 ] [ { 7 8 9 } std ] unit-test
 [ t ] [ { 1 2 3 4 } ste 0.6454972243679028 - .0001 < ] unit-test
 
 [ t ] [ { 23.2 33.4 22.5 66.3 44.5 } std 18.1906 - .0001 < ] unit-test
@@ -80,8 +80,8 @@ IN: math.statistics.tests
 [ 0 ] [ { 1 } { 1 } cov ] unit-test
 [ 2/3 ] [ { 1 2 3 } { 4 5 6 } cov ] unit-test
 
-[ 1.0 ] [ { 1 2 3 } { 1 2 3 } corr ] unit-test
-[ -1.0 ] [ { 1 2 3 } { -4 -5 -6 } corr ] unit-test
+[ 0.75 ] [ { 1 2 3 4 } dup corr ] unit-test
+[ -0.75 ] [ { 1 2 3 4 } { -4 -5 -6 -7 } corr ] unit-test
 
 [ { 1 2 4 7 } ] [ { 1 1 2 3 } cum-sum ] unit-test
 [ { 1 1 2 6 } ] [ { 1 1 2 3 } cum-product ] unit-test
