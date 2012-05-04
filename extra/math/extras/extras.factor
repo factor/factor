@@ -1,9 +1,9 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators.short-circuit kernel math math.combinatorics
-math.functions math.order math.primes math.ranges
-math.statistics math.vectors memoize sequences ;
+USING: combinators.short-circuit grouping kernel math
+math.combinatorics math.functions math.order math.primes
+math.ranges math.statistics math.vectors memoize sequences ;
 
 IN: math.extras
 
@@ -85,3 +85,9 @@ PRIVATE>
 
 : legendere ( a m -- n )
     check-legendere jacobi ;
+
+: moving-average ( seq n -- newseq )
+    clump [ mean ] map ;
+
+: exponential-moving-average ( seq a -- newseq )
+    [ 1 ] 2dip [ [ dupd swap - ] dip * + dup ] curry map nip ;
