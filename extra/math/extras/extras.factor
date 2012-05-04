@@ -87,7 +87,10 @@ PRIVATE>
     check-legendere jacobi ;
 
 : moving-average ( seq n -- newseq )
-    clump [ mean ] map ;
+    <clumps> [ mean ] map ;
 
 : exponential-moving-average ( seq a -- newseq )
     [ 1 ] 2dip [ [ dupd swap - ] dip * + dup ] curry map nip ;
+
+: moving-median ( u n -- v )
+    <clumps> [ median ] map ;
