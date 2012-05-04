@@ -7,12 +7,82 @@ USING: math.matrices math.vectors tools.test math ;
     3 1 zero-matrix
 ] unit-test
 
-[
+{
     { { 1 0 0 }
        { 0 1 0 }
        { 0 0 1 } }
-] [
+} [
     3 identity-matrix
+] unit-test
+
+{
+    { { 1 0 0 }
+       { 0 2 0 }
+       { 0 0 3 } }
+} [
+    { 1 2 3 } diagonal-matrix
+] unit-test
+
+{
+    {
+        { 1 0 0 }
+        { 0 1 0 }
+        { 0 0 1 }
+    }
+} [
+    3 3 0 eye
+] unit-test
+
+{
+    {
+        { 0 1 0 }
+        { 0 0 1 }
+        { 0 0 0 }
+    }
+} [
+    3 3 1 eye
+] unit-test
+
+{
+    {
+        { 0 0 0 }
+        { 1 0 0 }
+        { 0 1 0 }
+    }
+} [
+    3 3 -1 eye
+] unit-test
+
+{
+    {
+        { 1 0 0 0 }
+        { 0 1 0 0 }
+        { 0 0 1 0 }
+    }
+} [
+    3 4 0 eye
+] unit-test
+
+{
+    {
+        { 0 1 0 }
+        { 0 0 1 }
+        { 0 0 0 }
+        { 0 0 0 }
+    }
+} [
+    4 3 1 eye
+] unit-test
+
+{
+    {
+        { 0 0 0 }
+        { 1 0 0 }
+        { 0 1 0 }
+        { 0 0 1 }
+    }
+} [
+    4 3 -1 eye
 ] unit-test
 
 [
