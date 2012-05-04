@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: combinators.short-circuit kernel math math.combinatorics
-math.functions math.order math.ranges math.statistics
-math.vectors memoize sequences ;
+math.functions math.order math.primes math.ranges
+math.statistics math.vectors memoize sequences ;
 
 IN: math.extras
 
@@ -51,3 +51,37 @@ PRIVATE>
 
 : chi2P ( chi df -- p )
     dup df-check [ 2.0 / ] [ 2 /i ] bi* (chi2P) 1.0 min ;
+
+<PRIVATE
+
+: check-jacobi ( m -- m )
+    dup { [ integer? ] [ 0 > ] [ odd? ] } 1&&
+    [ "modulus must be odd positive integer" throw ] unless ;
+
+: mod' ( x y -- n )
+    [ mod ] keep over zero? [ drop ] [
+        2dup [ sgn ] bi@ = [ drop ] [ + ] if
+    ] if ;
+
+PRIVATE>
+
+: jacobi ( a m -- n )
+    check-jacobi [ mod' ] keep 1
+    [ pick zero? ] [
+        [ pick even? ] [
+            [ 2 / ] 2dip
+            over 8 mod' { 3 5 } member? [ neg ] when
+        ] while swapd
+        2over [ 4 mod' 3 = ] both? [ neg ] when
+        [ [ mod' ] keep ] dip
+    ] until [ nip 1 = ] dip 0 ? ;
+
+<PRIVATE
+
+: check-legendere ( m -- m )
+    dup prime? [ "modulus must be prime positive integer" throw ] unless ;
+
+PRIVATE>
+
+: legendere ( a m -- n )
+    check-legendere jacobi ;
