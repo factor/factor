@@ -10,7 +10,6 @@ prettyprint.custom prettyprint.sections prettyprint.stylesheet
 quotations sbufs sequences strings vectors words words.symbol
 classes.private ;
 FROM: sets => members ;
-! QUALIFIED-WITH: classes.not cn
 IN: prettyprint.backend
 
 M: effect pprint* effect>string text ;
