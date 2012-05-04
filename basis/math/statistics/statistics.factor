@@ -45,7 +45,7 @@ IN: math.statistics
         k i < [ j m! ] when
     ] while
     k seq nth ; inline
-    
+
 : (kth-object) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
     [ clone ] 4dip ((kth-object)) ; inline
 
@@ -66,9 +66,9 @@ PRIVATE>
     '[ [ nth ] [ exchange ]  _ ((kth-object)) ] with map ; inline
 
 : kth-smallests ( seq kths -- elts ) [ < ] kth-objects-unsafe ;
-    
+
 : kth-smallest ( seq k -- elt ) [ < ] kth-object-unsafe ;
-    
+
 : kth-largests ( seq kths -- elts ) [ > ] kth-objects-unsafe ;
 
 : kth-largest ( seq k -- elt ) [ > ] kth-object-unsafe ;
@@ -90,11 +90,11 @@ PRIVATE>
             { +eq+ [ [ 1 + ] 4dip drop ] }
         } case
     ] each ;
-    
+
 : lower-median-index ( seq -- n )    
     [ midpoint@ ]
     [ length odd? [ 1 - ] unless ] bi ;
-    
+
 : lower-median ( seq -- elt )
     [ ] [ lower-median-index ] bi kth-smallest ;
 
@@ -125,15 +125,15 @@ PRIVATE>
 
 :: quantile-indices ( seq qs a b c d -- seq )
     qs [ [ a b seq length ] dip quantile-x ] map ;
-    
+
 :: qabcd ( y-floor y-ceiling x c d -- qabcd )
     y-floor y-ceiling y-floor - c d x frac * + * + ;
-    
+
 :: quantile-abcd ( seq qs a b c d -- quantile )
     seq qs a b c d quantile-indices :> indices
     indices [ [ floor ] [ ceiling ] bi 2array ] map
     concat :> index-pairs
-    
+
     seq index-pairs kth-smallests
     2 group indices [ [ first2 ] dip c d qabcd ] 2map ;
 
@@ -160,10 +160,10 @@ PRIVATE>
 
 : quantile9 ( seq qs -- seq' )
     3/8 1/4 0 1 quantile-abcd ;
-    
+
 : quartile ( seq -- seq' )
     { 1/4 1/2 3/4 } quantile5 ;
-    
+
 <PRIVATE
 
 : (sequence>assoc) ( seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) assoc -- assoc )
@@ -238,6 +238,10 @@ ALIAS: var sample-var
 : full-std ( seq -- x ) full-var sqrt ;
 
 ALIAS: std sample-std
+
+: mean-dev ( seq -- x ) dup mean v-n vabs mean ;
+
+: median-dev ( seq -- x ) dup median v-n vabs mean ;
 
 : sample-ste ( seq -- x ) [ sample-std ] [ length ] bi sqrt / ;
 
