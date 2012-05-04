@@ -17,7 +17,7 @@ SINGLETONS: f2c-abi g95-abi gfortran-abi intel-unix-abi intel-windows-abi ;
     "I77" "libI77.so" cdecl add-library
     "F77" "libF77.so" cdecl add-library ;
 
-os netbsd? [ add-f2c-libraries ] when
+! os netbsd? [ add-f2c-libraries ] when
 >>
 
 : alien>nstring ( alien len encoding -- string )
@@ -440,15 +440,15 @@ MACRO: fortran-invoke ( return library function parameters -- )
     [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
 SYNTAX: SUBROUTINE: 
-    f current-library get scan ";" parse-tokens
+    f current-library get scan-token ";" parse-tokens
     [ "()" subseq? not ] filter define-fortran-function ;
 
 SYNTAX: FUNCTION:
-    scan current-library get scan ";" parse-tokens
+    scan-token current-library get scan-token ";" parse-tokens
     [ "()" subseq? not ] filter define-fortran-function ;
 
 SYNTAX: LIBRARY:
-    scan
+    scan-token
     [ current-library set ]
     [ set-fortran-abi ] bi ;
 
