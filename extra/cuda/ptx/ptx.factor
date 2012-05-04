@@ -26,7 +26,7 @@ VARIANT: ptx-texmode
 VARIANT: ptx-storage-space
     .reg
     .sreg
-    .const: { { bank maybe: integer } }
+    .const: { { bank maybe{ integer } } }
     .global
     .local
     .param
@@ -34,9 +34,9 @@ VARIANT: ptx-storage-space
     .tex ;
 
 TUPLE: ptx-target
-    { arch maybe: ptx-arch }
+    { arch maybe{ ptx-arch } }
     { map_f64_to_f32? boolean }
-    { texmode maybe: ptx-texmode } ;
+    { texmode maybe{ ptx-texmode } } ;
 
 TUPLE: ptx
     { version string }
@@ -50,13 +50,13 @@ TUPLE: ptx-struct-definition
 TUPLE: ptx-variable
     { extern? boolean }
     { visible? boolean }
-    { align maybe: integer }
+    { align maybe{ integer } }
     { storage-space ptx-storage-space }
     { type ptx-type }
     { name string }
-    { parameter maybe: integer }
+    { parameter maybe{ integer } }
     { dim dim }
-    { initializer maybe: string } ;
+    { initializer maybe{ string } } ;
 
 TUPLE: ptx-negation
     { var string } ; 
@@ -79,8 +79,8 @@ UNION: ptx-operand
     integer float ptx-var ptx-negation ptx-vector ptx-indirect ;
 
 TUPLE: ptx-instruction
-    { label maybe: string }
-    { predicate maybe: ptx-operand } ;
+    { label maybe{ string } }
+    { predicate maybe{ ptx-operand } } ;
 
 TUPLE: ptx-entry
     { name string }
@@ -89,7 +89,7 @@ TUPLE: ptx-entry
     body ;
 
 TUPLE: ptx-func < ptx-entry
-    { return maybe: ptx-variable } ;
+    { return maybe{ ptx-variable } } ;
 
 TUPLE: ptx-directive ;
 
@@ -146,10 +146,10 @@ VARIANT: ptx-mul-mode
     .wide ;
 
 TUPLE: ptx-mul-instruction < ptx-3op-instruction
-    { mode maybe: ptx-mul-mode } ;
+    { mode maybe{ ptx-mul-mode } } ;
 
 TUPLE: ptx-mad-instruction < ptx-4op-instruction
-    { mode maybe: ptx-mul-mode }
+    { mode maybe{ ptx-mul-mode } }
     { sat? boolean } ;
 
 VARIANT: ptx-prmt-mode
@@ -158,7 +158,7 @@ VARIANT: ptx-prmt-mode
 ROLE: ptx-float-ftz
     { ftz? boolean } ;
 ROLE: ptx-float-env < ptx-float-ftz
-    { round maybe: ptx-float-rounding-mode } ;
+    { round maybe{ ptx-float-rounding-mode } } ;
 
 VARIANT: ptx-testp-op
     .finite .infinite .number .notanumber .normal .subnormal ;
@@ -183,8 +183,8 @@ INSTANCE: .hi ptx-cmp-op
 
 TUPLE: ptx-set-instruction < ptx-3op-instruction
     { cmp-op ptx-cmp-op }
-    { bool-op maybe: ptx-op }
-    { c maybe: ptx-operand }
+    { bool-op maybe{ ptx-op } }
+    { c maybe{ ptx-operand } }
     { ftz? boolean } ;
 
 VARIANT: ptx-cache-op
@@ -193,8 +193,8 @@ VARIANT: ptx-cache-op
 
 TUPLE: ptx-ldst-instruction < ptx-2op-instruction
     { volatile? boolean }
-    { storage-space maybe: ptx-storage-space }
-    { cache-op maybe: ptx-cache-op } ;
+    { storage-space maybe{ ptx-storage-space } }
+    { cache-op maybe{ ptx-cache-op } } ;
 
 VARIANT: ptx-cache-level
     .L1 .L2 ;
@@ -216,19 +216,19 @@ TUPLE: add       <{ ptx-addsub-instruction ptx-float-env } ;
 TUPLE: addc      < ptx-addsub-instruction ;
 TUPLE: and       < ptx-3op-instruction ;
 TUPLE: atom      < ptx-3op-instruction
-    { storage-space maybe: ptx-storage-space }
+    { storage-space maybe{ ptx-storage-space } }
     { op ptx-op }
-    { c maybe: ptx-operand } ;
+    { c maybe{ ptx-operand } } ;
 TUPLE: bar.arrive < ptx-instruction
     { a ptx-operand }
     { b ptx-operand } ;
 TUPLE: bar.red   < ptx-2op-instruction
     { op ptx-op }
-    { b maybe: ptx-operand }
+    { b maybe{ ptx-operand } }
     { c ptx-operand } ;
 TUPLE: bar.sync  < ptx-instruction
     { a ptx-operand }
-    { b maybe: ptx-operand } ;
+    { b maybe{ ptx-operand } } ;
 TUPLE: bfe       < ptx-4op-instruction ;
 TUPLE: bfi       < ptx-5op-instruction ;
 TUPLE: bfind     < ptx-2op-instruction
@@ -237,20 +237,20 @@ TUPLE: bra       < ptx-branch-instruction ;
 TUPLE: brev      < ptx-2op-instruction ;
 TUPLE: brkpt     < ptx-instruction ;
 TUPLE: call      < ptx-branch-instruction
-    { return maybe: ptx-operand }
+    { return maybe{ ptx-operand } }
     params ;
 TUPLE: clz       < ptx-2op-instruction ;
 TUPLE: cnot      < ptx-2op-instruction ;
 TUPLE: copysign  < ptx-3op-instruction ;
 TUPLE: cos       <{ ptx-2op-instruction ptx-float-env } ;
 TUPLE: cvt       < ptx-2op-instruction
-    { round maybe: ptx-rounding-mode }
+    { round maybe{ ptx-rounding-mode } }
     { ftz? boolean }
     { sat? boolean }
     { dest-type ptx-type } ;
 TUPLE: cvta      < ptx-2op-instruction
     { to? boolean }
-    { storage-space maybe: ptx-storage-space } ;
+    { storage-space maybe{ ptx-storage-space } } ;
 TUPLE: div       <{ ptx-3op-instruction ptx-float-env } ;
 TUPLE: ex2       <{ ptx-2op-instruction ptx-float-env } ;
 TUPLE: exit      < ptx-instruction ;
@@ -279,16 +279,16 @@ TUPLE: pmevent   < ptx-instruction
 TUPLE: popc      < ptx-2op-instruction ;
 TUPLE: prefetch  < ptx-instruction
     { a ptx-operand }
-    { storage-space maybe: ptx-storage-space }
+    { storage-space maybe{ ptx-storage-space } }
     { level ptx-cache-level } ;
 TUPLE: prefetchu < ptx-instruction
     { a ptx-operand }
     { level ptx-cache-level } ;
 TUPLE: prmt      < ptx-4op-instruction
-    { mode maybe: ptx-prmt-mode } ;
+    { mode maybe{ ptx-prmt-mode } } ;
 TUPLE: rcp       <{ ptx-2op-instruction ptx-float-env } ;
 TUPLE: red       < ptx-2op-instruction
-    { storage-space maybe: ptx-storage-space }
+    { storage-space maybe{ ptx-storage-space } }
     { op ptx-op } ;
 TUPLE: rem       < ptx-3op-instruction ;
 TUPLE: ret       < ptx-instruction ;
@@ -298,7 +298,7 @@ TUPLE: selp      < ptx-4op-instruction ;
 TUPLE: set       < ptx-set-instruction
     { dest-type ptx-type } ;
 TUPLE: setp      < ptx-set-instruction
-    { |dest maybe: ptx-operand } ;
+    { |dest maybe{ ptx-operand } } ;
 TUPLE: shl       < ptx-3op-instruction ;
 TUPLE: shr       < ptx-3op-instruction ;
 TUPLE: sin       <{ ptx-2op-instruction ptx-float-env } ;

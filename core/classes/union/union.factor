@@ -69,6 +69,9 @@ M: union-class instance?
 M: anonymous-union instance?
     members>> [ instance? ] with any? ;
 
+M: anonymous-union class-name
+    members>> [ class-name ] map " " join ;
+
 M: union-class normalize-class
     members <anonymous-union> normalize-class ;
 
