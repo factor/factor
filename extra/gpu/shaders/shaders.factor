@@ -33,10 +33,10 @@ ERROR: invalid-link-feedback-format-error format ;
 ERROR: inaccurate-feedback-attribute-error attribute ;
 
 TUPLE: vertex-attribute
-    { name            maybe: string  read-only initial: f }
-    { component-type  component-type read-only initial: float-components }
-    { dim             integer        read-only initial: 4 }
-    { normalize?      boolean        read-only initial: f } ;
+    { name            maybe{ string } read-only initial: f }
+    { component-type  component-type  read-only initial: float-components }
+    { dim             integer         read-only initial: 4 }
+    { normalize?      boolean         read-only initial: f } ;
 
 MIXIN: vertex-format
 
@@ -54,7 +54,7 @@ TUPLE: program
     { line integer read-only }
     { shaders array read-only }
     { vertex-formats array read-only }
-    { feedback-format maybe: vertex-format read-only }
+    { feedback-format maybe{ vertex-format } read-only }
     { geometry-shader-parameters array read-only }
     { instances hashtable read-only } ;
 
@@ -524,7 +524,7 @@ DEFER: <shader-instance>
     [ nip ] [ drop link-program ] if ;
 
 TUPLE: feedback-format
-    { vertex-format maybe: vertex-format read-only } ;
+    { vertex-format maybe{ vertex-format } read-only } ;
 
 : validate-feedback-format ( sequence -- vertex-format/f )
     dup length 1 <=

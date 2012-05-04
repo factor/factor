@@ -53,7 +53,7 @@ ALIAS: mat4x4-uniform mat4-uniform
 TUPLE: uniform
     { name         string   read-only initial: "" }
     { uniform-type class    read-only initial: float-uniform }
-    { dim          maybe: integer read-only initial: f } ;
+    { dim          maybe{ integer } read-only initial: f } ;
 
 VARIANT: index-type
     ubyte-indexes
@@ -80,7 +80,7 @@ TUPLE: index-elements
 C: <index-elements> index-elements
 
 TUPLE: multi-index-elements
-    { buffer maybe: buffer read-only }
+    { buffer maybe{ buffer } read-only }
     { ptrs   read-only }
     { counts uint-array read-only }
     { index-type index-type read-only } ;
@@ -587,8 +587,8 @@ TUPLE: render-set
     { vertex-array vertex-array initial: T{ vertex-array-collection } read-only }
     { uniforms uniform-tuple read-only }
     { indexes vertex-indexes initial: T{ index-range } read-only } 
-    { instances maybe: integer initial: f read-only }
-    { framebuffer maybe: any-framebuffer initial: system-framebuffer read-only }
+    { instances maybe{ integer } initial: f read-only }
+    { framebuffer maybe{ any-framebuffer } initial: system-framebuffer read-only }
     { output-attachments sequence initial: { default-attachment } read-only }
     { transform-feedback-output transform-feedback-output initial: f read-only } ;
 

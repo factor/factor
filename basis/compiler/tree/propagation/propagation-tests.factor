@@ -1008,12 +1008,12 @@ M: tuple-with-read-only-slot clone
 ] unit-test
 
 [ t ] [
-    [ maybe: integer instance? ] { instance? } inlined?
+    [ maybe{ integer } instance? ] { instance? } inlined?
 ] unit-test
 
 TUPLE: inline-please a ;
 [ t ] [
-    [ maybe: inline-please instance? ] { instance? } inlined?
+    [ maybe{ inline-please } instance? ] { instance? } inlined?
 ] unit-test
 
 GENERIC: derp ( obj -- obj' )
@@ -1023,5 +1023,5 @@ M: f derp drop t ;
 
 [ t ]
 [
-    [ dup maybe: integer instance? [ derp ] when ] { instance? } inlined?
+    [ dup maybe{ integer } instance? [ derp ] when ] { instance? } inlined?
 ] unit-test

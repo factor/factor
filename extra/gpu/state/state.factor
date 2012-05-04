@@ -13,14 +13,14 @@ TUPLE: viewport-state
 C: <viewport-state> viewport-state
 
 TUPLE: scissor-state
-    { rect maybe: rect read-only } ;
+    { rect maybe{ rect } read-only } ;
 C: <scissor-state> scissor-state
 
 TUPLE: multisample-state
     { multisample? boolean read-only }
     { sample-alpha-to-coverage? boolean read-only }
     { sample-alpha-to-one? boolean read-only }
-    { sample-coverage maybe: float read-only }
+    { sample-coverage maybe{ float } read-only }
     { invert-sample-coverage? boolean read-only } ;
 C: <multisample-state> multisample-state
 
@@ -44,8 +44,8 @@ TUPLE: stencil-mode
 C: <stencil-mode> stencil-mode
 
 TUPLE: stencil-state
-    { front-mode maybe: stencil-mode initial: f read-only }
-    { back-mode maybe: stencil-mode initial: f read-only } ;
+    { front-mode maybe{ stencil-mode } initial: f read-only }
+    { back-mode maybe{ stencil-mode } initial: f read-only } ;
 C: <stencil-state> stencil-state
 
 TUPLE: depth-range-state
@@ -54,7 +54,7 @@ TUPLE: depth-range-state
 C: <depth-range-state> depth-range-state
 
 TUPLE: depth-state
-    { comparison maybe: comparison initial: f read-only } ;
+    { comparison maybe{ comparison } initial: f read-only } ;
 C: <depth-state> depth-state
 
 VARIANT: blend-equation
@@ -81,8 +81,8 @@ C: <blend-mode> blend-mode
 
 TUPLE: blend-state
     { constant-color sequence initial: f read-only }
-    { rgb-mode maybe: blend-mode read-only }
-    { alpha-mode maybe: blend-mode read-only } ;
+    { rgb-mode maybe{ blend-mode } read-only }
+    { alpha-mode maybe{ blend-mode } read-only } ;
 C: <blend-state> blend-state
 
 TUPLE: mask-state
@@ -101,7 +101,7 @@ VARIANT: triangle-mode
 
 TUPLE: triangle-cull-state
     { front-face triangle-face initial: face-ccw read-only }
-    { cull maybe: triangle-cull initial: f read-only } ;
+    { cull maybe{ triangle-cull } initial: f read-only } ;
 C: <triangle-cull-state> triangle-cull-state
 
 TUPLE: triangle-state
@@ -114,7 +114,7 @@ VARIANT: point-sprite-origin
     origin-upper-left origin-lower-left ;
 
 TUPLE: point-state
-    { size maybe: float initial: 1.0 read-only }
+    { size maybe{ float } initial: 1.0 read-only }
     { sprite-origin point-sprite-origin initial: origin-upper-left read-only }
     { fade-threshold float initial: 1.0 read-only } ;
 C: <point-state> point-state
