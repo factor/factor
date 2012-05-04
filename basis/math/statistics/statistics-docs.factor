@@ -214,6 +214,18 @@ HELP: cum-max
     }
 } ;
 
+HELP: standardize
+{ $values { "u" sequence } { "v" sequence } }
+{ $description "Shifts and rescales the elements of " { $snippet "u" } " to have zero mean and unit sample variance." } ;
+
+HELP: differences
+{ $values { "u" sequence } { "v" sequence } }
+{ $description "Returns the successive differences of elements in " { $snippet "u" } "." } ;
+
+HELP: rescale
+{ $values { "u" sequence } { "v" sequence } }
+{ $description "Returns " { $snippet "u" } " rescaled to run from 0 to 1 over the range min to max." } ;
+
 ARTICLE: "histogram" "Computing histograms"
 "Counting elements in a sequence:"
 { $subsections
