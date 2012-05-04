@@ -5,8 +5,14 @@ math.functions math.order math.vectors sequences
 sequences.private sorting fry arrays grouping sets ;
 IN: math.statistics
 
+: power-mean ( seq p -- x )
+    [ '[ _ ^ ] map-sum ] [ [ length / ] [ recip ^ ] bi* ] 2bi ;
+
 : mean ( seq -- x )
     [ sum ] [ length ] bi / ;
+
+: quadratic-mean ( seq -- x ) ! root-mean-square
+    [ [ sq ] map-sum ] [ length ] bi / sqrt ;
 
 : geometric-mean ( seq -- x )
     [ length ] [ product ] bi nth-root ;

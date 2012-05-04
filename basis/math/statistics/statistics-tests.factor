@@ -2,6 +2,8 @@ USING: assocs kernel math math.functions math.statistics sequences
 math.order tools.test math.vectors ;
 IN: math.statistics.tests
 
+[ 3 ] [ { 1 2 3 4 5 } 1 power-mean ] unit-test
+[ t ] [ { 1 2 3 4 5 } [ 2 power-mean ] [ quadratic-mean ] bi 1e-10 ~ ] unit-test
 [ 1 ] [ { 1 } mean ] unit-test
 [ 3/2 ] [ { 1 2 } mean ] unit-test
 [ 0 ] [ { 0 0 0 } geometric-mean ] unit-test
