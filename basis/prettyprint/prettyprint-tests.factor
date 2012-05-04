@@ -413,7 +413,7 @@ TUPLE: fo { a intersection{ fixnum integer } } ;
 [
 """USING: math ;
 IN: prettyprint.tests
-TUPLE: mo { a union{ float integer } initial: 0 } ;
+TUPLE: mo { a union{ integer float } initial: 0 } ;
 """
 ] [
     [ \ mo see ] with-string-writer
@@ -422,7 +422,7 @@ TUPLE: mo { a union{ float integer } initial: 0 } ;
 [
 """USING: math ;
 IN: prettyprint.tests
-TUPLE: fo { a intersection{ fixnum integer } initial: 0 } ;
+TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
 """
 ] [
     [ \ fo see ] with-string-writer
@@ -430,22 +430,22 @@ TUPLE: fo { a intersection{ fixnum integer } initial: 0 } ;
 
 [
 """union{
-    union{ float integer }
     intersection{ string hashtable }
+    union{ integer float }
 }
 """
 ] [ [ union{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
 
 [
 """intersection{
-    union{ float integer }
     intersection{ string hashtable }
+    union{ integer float }
 }
 """
 ] [ [ intersection{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
 
 [
-"""maybe{ union{ float integer } }\n"""
+"""maybe{ union{ integer float } }\n"""
 ] [
     [ maybe{ union{ float integer } } . ] with-string-writer
 ] unit-test
