@@ -9,9 +9,15 @@ IN: math.matrices
 : zero-matrix ( m n -- matrix )
     '[ _ 0 <array> ] replicate ;
 
+: diagonal-matrix ( diagonal-seq -- matrix )
+    dup length dup zero-matrix
+    [ '[ dup _ nth set-nth ] each-index ] keep ; inline
+
 : identity-matrix ( n -- matrix )
-    #! Make a nxn identity matrix.
-    iota dup [ = 1 0 ? ] cartesian-map ;
+    1 <repetition> diagonal-matrix ; inline
+
+: eye ( m n k -- matrix )
+    [ [ iota ] bi@ ] dip neg '[ _ + = 1 0 ? ] cartesian-map ;
 
 :: rotation-matrix3 ( axis theta -- matrix )
     theta cos :> c
