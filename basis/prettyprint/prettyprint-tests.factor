@@ -388,18 +388,18 @@ TUPLE: final-tuple ; final
     ] with-variable
 ] unit-test
 
-[ "maybe: integer\n" ] [ [  maybe: integer . ] with-string-writer ] unit-test
+[ "maybe{ integer }\n" ] [ [  maybe{ integer } . ] with-string-writer ] unit-test
 TUPLE: bob a b ;
-[ "maybe: bob\n" ] [ [  maybe: bob . ] with-string-writer ] unit-test
-[ "maybe: word\n" ] [ [  maybe: word . ] with-string-writer ] unit-test
+[ "maybe{ bob }\n" ] [ [ maybe{ bob } . ] with-string-writer ] unit-test
+[ "maybe{ word }\n" ] [ [ maybe{ word } . ] with-string-writer ] unit-test
 
 TUPLE: har a ;
 GENERIC: harhar ( obj -- obj )
-M: maybe: har harhar ;
+M: maybe{ har } harhar ;
 M: integer harhar M\ integer harhar drop ;
 [
 """USING: prettyprint.tests ;
-M: maybe: har harhar ;
+M: maybe{ har } harhar ;
 
 USING: kernel math prettyprint.tests ;
 M: integer harhar M\\ integer harhar drop ;\n"""
@@ -445,13 +445,13 @@ TUPLE: fo { a intersection{ fixnum integer } initial: 0 } ;
 ] [ [ intersection{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
 
 [
-"""maybe: union{ float integer }\n"""
+"""maybe{ union{ float integer } }\n"""
 ] [
-    [ maybe: union{ float integer } . ] with-string-writer
+    [ maybe{ union{ float integer } } . ] with-string-writer
 ] unit-test
 
 [
-"""maybe: maybe: integer\n"""
+"""maybe{ maybe{ integer } }\n"""
 ] [
-    [ maybe: maybe: integer . ] with-string-writer
+    [ maybe{ maybe{ integer } } . ] with-string-writer
 ] unit-test
