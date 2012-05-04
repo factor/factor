@@ -282,3 +282,13 @@ ERROR: empty-sequence ;
 
 : binary-entropy ( p -- h )
     [ dup log * ] [ 1 swap - dup log * ] bi + neg 2 log / ;
+
+: standardize ( u -- v )
+    [ dup mean v-n ] [ std ] bi v/n ;
+
+: differences ( u -- v )
+    [ 1 tail-slice ] keep [ - ] 2map ;
+
+: rescale ( u -- v )
+    [ ] [ infimum ] [ supremum over - ] tri
+    [ v-n ] [ v/n ] bi* ;

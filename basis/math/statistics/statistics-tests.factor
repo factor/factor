@@ -140,3 +140,11 @@ IN: math.statistics.tests
 
 { 1.0 } [ 0.5 binary-entropy ] unit-test
 
+{ { -4 13 -5 2 4 } } [ { 1 -3 10 5 7 11 } differences ] unit-test
+
+{ t t } [
+    { 6.5 3.8 6.6 5.7 6.0 6.4 5.3 } standardize
+    [ mean 0 1e-10 ~ ] [ var 1 1e-10 ~ ] bi
+] unit-test
+
+{ { 0 1/4 1/2 3/4 1 } } [ 5 iota rescale ] unit-test
