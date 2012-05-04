@@ -8,6 +8,7 @@ IN: math.statistics.tests
 [ t ] [ { 2 2 2 2 } geometric-mean 2.0 .0001 ~ ] unit-test
 [ 1.0 ] [ { 1 1 1 } geometric-mean ] unit-test
 [ 1/3 ] [ { 1 1 1 } harmonic-mean ] unit-test
+[ 5+1/4 ] [ { 1 3 5 7 } contraharmonic-mean ] unit-test
 
 [ 0 ] [ { 1 } range ] unit-test
 [ 89 ] [ { 1 2 30 90 } range ] unit-test
