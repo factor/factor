@@ -3,7 +3,7 @@
 USING: accessors arrays assocs classes classes.private
 classes.tuple classes.tuple.private continuations definitions
 generic init kernel kernel.private math namespaces sequences
-sets source-files.errors vocabs words classes.algebra ;
+sets source-files.errors vocabs words ;
 FROM: namespaces => set ;
 IN: compiler.units
 
@@ -18,7 +18,6 @@ TUPLE: redefine-error def ;
 <PRIVATE
 
 : add-once ( key assoc -- )
-    ! 2dup keys swap [ class= ] curry any? [ over redefine-error ] when conjoin ;
     2dup key? [ over redefine-error ] when conjoin ;
 
 : (remember-definition) ( definition loc assoc -- )
