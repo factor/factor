@@ -88,8 +88,8 @@ M: texture-attachment attachment-object texture>> texture-object ;
 
 TUPLE: framebuffer < gpu-object
     { color-attachments array read-only }
-    { depth-attachment maybe: framebuffer-attachment read-only initial: f }
-    { stencil-attachment maybe: framebuffer-attachment read-only initial: f } ;
+    { depth-attachment maybe{ framebuffer-attachment } read-only initial: f }
+    { stencil-attachment maybe{ framebuffer-attachment } read-only initial: f } ;
 
 UNION: any-framebuffer system-framebuffer framebuffer ;
 
@@ -102,8 +102,8 @@ VARIANT: framebuffer-attachment-face
 VARIANT: color-attachment-ref
     default-attachment
     system-attachment: {
-        { side maybe: framebuffer-attachment-side initial: f }
-        { face maybe: framebuffer-attachment-face initial: back-face }
+        { side maybe{ framebuffer-attachment-side } initial: f }
+        { face maybe{ framebuffer-attachment-face } initial: back-face }
     }
     color-attachment: { { index integer } } ;
 

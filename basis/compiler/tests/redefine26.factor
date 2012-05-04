@@ -7,7 +7,7 @@ TUPLE: hoo ;
 
 UNION: foo integer yoo ;
 
-TUPLE: redefine-test-26 { a maybe: foo } ;
+TUPLE: redefine-test-26 { a maybe{ foo } } ;
 
 : store-26 ( -- obj ) redefine-test-26 new 26 >>a ;
 : store-26. ( -- obj ) redefine-test-26 new 26. >>a ;

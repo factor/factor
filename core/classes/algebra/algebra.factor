@@ -7,6 +7,8 @@ FROM: classes => members ;
 RENAME: members sets => set-members
 IN: classes.algebra
 
+DEFER: sort-classes
+
 <PRIVATE
 
 TUPLE: anonymous-union { members read-only } ;
@@ -15,7 +17,7 @@ INSTANCE: anonymous-union classoid
 
 : <anonymous-union> ( members -- class )
     [ null eq? not ] filter set-members
-    dup length 1 = [ first ] [ anonymous-union boa ] if ;
+    dup length 1 = [ first ] [ sort-classes f like anonymous-union boa ] if ;
 
 M: anonymous-union rank-class drop 6 ;
 
@@ -25,7 +27,7 @@ INSTANCE: anonymous-intersection classoid
 
 : <anonymous-intersection> ( participants -- class )
     set-members dup length 1 =
-    [ first ] [ anonymous-intersection boa ] if ;
+    [ first ] [ sort-classes f like anonymous-intersection boa ] if ;
 
 M: anonymous-intersection rank-class drop 4 ;
 
@@ -36,6 +38,12 @@ INSTANCE: anonymous-complement classoid
 C: <anonymous-complement> anonymous-complement
 
 M: anonymous-complement rank-class drop 3 ;
+
+M: anonymous-complement instance?
+    over [ class>> instance? not ] [ 2drop t ] if ;
+
+M: anonymous-complement class-name
+    class>> class-name ;
 
 DEFER: (class<=)
 

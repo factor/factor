@@ -107,13 +107,8 @@ GENERIC: update-generic ( class generic -- )
 : with-methods ( class generic quot -- )
     [ "methods" word-prop ] prepose [ update-generic ] 2bi ; inline
 
-GENERIC# method-word-name 1 ( class generic -- string )
-
-M: class method-word-name ( class generic -- string )
-    [ name>> ] bi@ "=>" glue ;
-
-M: maybe method-word-name
-    [ class>> name>> ] [ name>> ] bi* "=>" glue ;
+: method-word-name ( class generic -- string )
+    [ class-name ] [ name>> ] bi* "=>" glue ;
 
 M: method parent-word
     "method-generic" word-prop ;
