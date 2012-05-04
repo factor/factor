@@ -312,5 +312,4 @@ ALIAS: corr sample-corr
     [ 1 tail-slice ] keep [ - ] 2map ;
 
 : rescale ( u -- v )
-    [ ] [ infimum ] [ supremum over - ] tri
-    [ v-n ] [ v/n ] bi* ;
+    dup minmax over - [ v-n ] [ v/n ] bi* ;
