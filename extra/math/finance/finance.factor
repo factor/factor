@@ -4,32 +4,36 @@ USING: arrays assocs kernel grouping sequences shuffle
 math math.functions math.statistics math.vectors ;
 IN: math.finance
 
+: sma ( seq n -- newseq )
+    clump [ mean ] map ;
+
 <PRIVATE
 
-: weighted ( x y a -- z )
-    [ * ] [ 1 - neg * ] bi-curry bi* + ;
+: weighted ( prev elt a -- newelt )
+    [ 1 swap - * ] [ * ] bi-curry bi* + ; inline
 
 : a ( n -- a )
-    1 + 2 swap / ;
+    1 + 2 swap / ; inline
 
 PRIVATE>
 
 : ema ( seq n -- newseq )
-    a swap unclip [ swap pick weighted ] accumulate 2nip ;
-
-: sma ( seq n -- newseq )
-    clump [ mean ] map ;
+    [ cut [ mean dup ] dip ] [ a ] bi
+    [ weighted dup ] curry map nip swap prefix ;
 
 : dema ( seq n -- newseq )
-    [ ema ] keep [ drop 2 v*n ] [ ema ] 2bi v- ;
+    [ ema ] keep [ drop 2 v*n ] [ ema ] 2bi
+    [ length tail* ] keep v- ;
 
 : gdema ( seq n v -- newseq )
     [ [ ema ] keep dupd ema ] dip
-    [ 1 + v*n ] [ v*n ] bi-curry bi* v- ;
+    [ 1 + v*n ] [ v*n ] bi-curry bi*
+    [ length tail* ] keep v- ;
 
 : tema ( seq n -- newseq )
     [ ema ] keep dupd [ ema ] keep
-    [ drop [ 3 v*n ] bi@ v- ] [ ema nip ] 3bi v+ ;
+    [ drop [ 3 v*n ] bi@ [ length tail* ] keep v- ] [ ema nip ] 3bi
+    [ length tail* ] keep v+ ;
 
 : macd ( seq n1 n2 -- newseq )
     rot dup ema [ swap ema ] dip v- ;
