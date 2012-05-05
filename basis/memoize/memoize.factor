@@ -83,4 +83,4 @@ M: memoized reset-word
 
 \ invalidate-memoized t "no-compile" set-word-prop
 
-SYNTAX: MEMO[ parse-quotation dup infer memoize-quot append ;
+SYNTAX: MEMO[ parse-quotation dup infer memoize-quot suffix! ;
