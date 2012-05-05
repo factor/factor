@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel memoize tools.test parser generalizations
-prettyprint io.streams.string sequences eval namespaces see ;
+USING: calendar math math.order kernel memoize tools.test parser
+generalizations prettyprint io.streams.string sequences eval
+namespaces see threads tools.time ;
 IN: memoize.tests
 
 MEMO: fib ( m -- n )
@@ -33,3 +34,11 @@ unit-test
 [ sq ] ( a -- b ) memoize-quot "q" set
 
 [ 9 ] [ 3 "q" get call ] unit-test
+
+: foo ( x -- ) MEMO[ seconds sleep ] ;
+
+[ t ] [
+    { 1/8 1/8 1/8 1/8 1/16 1/16 1/16 }
+    [ [ foo ] each ] benchmark
+    0.18e9 0.25e9 between?
+] unit-test
