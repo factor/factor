@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences binary-search accessors math.order
-specialized-arrays.uint make grouping math arrays
-sorting assocs locals combinators fry hints ;
+USING: accessors alien.c-types arrays assocs binary-search
+combinators fry grouping hints kernel locals make math
+math.order sequences sorting specialized-arrays ;
+SPECIALIZED-ARRAY: uint
 IN: interval-sets
 ! Sets of positive integers
 
@@ -21,7 +22,7 @@ PRIVATE>
 
 : in? ( key set -- ? )
     dupd find-interval
-    [ [ start ] [ end 1- ] bi between? ]
+    [ [ start ] [ end 1 - ] bi between? ]
     [ drop f ] if* ;
 
 HINTS: in? { integer interval-set } ;
@@ -56,7 +57,7 @@ HINTS: in? { integer interval-set } ;
     interval-set boa ;
 
 : >intervals ( seq -- seq' )
-    [ 1+ ] assoc-map concat ;
+    [ 1 + ] assoc-map concat ;
 
 PRIVATE>
 
@@ -97,7 +98,7 @@ PRIVATE>
     0 over ?nth zero? [ rest ] [ 0 prefix ] if ;
 
 : interval-max ( interval-set1 interval-set2 -- n )
-    [ array>> [ 0 ] [ peek ] if-empty ] bi@ max ;
+    [ array>> [ 0 ] [ last ] if-empty ] bi@ max ;
 
 PRIVATE>
 
