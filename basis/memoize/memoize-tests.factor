@@ -35,10 +35,8 @@ unit-test
 
 [ 9 ] [ 3 "q" get call ] unit-test
 
-: foo ( x -- ) MEMO[ seconds sleep ] ;
-
 [ t ] [
     { 1/8 1/8 1/8 1/8 1/16 1/16 1/16 }
-    [ [ foo ] each ] benchmark
+    [ [ MEMO[ seconds sleep ] ] each ] benchmark
     0.18e9 0.25e9 between?
 ] unit-test
