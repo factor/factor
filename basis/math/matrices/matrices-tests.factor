@@ -86,17 +86,38 @@ USING: math.matrices math.vectors tools.test math ;
 ] unit-test
 
 [
+    { { 1   1/2 1/3 1/4 }
+      { 1/2 1/3 1/4 1/5 }
+      { 1/3 1/4 1/5 1/6 }
+    }
+] [ 3 4 hilbert-matrix ] unit-test
+
+[
+    { { 1 2 3 4 }
+      { 2 1 2 3 }
+      { 3 2 1 2 }
+      { 4 3 2 1 } }
+] [ 4 toeplitz-matrix ] unit-test
+
+[
+    { { 1 2 3 4 }
+      { 2 3 4 0 }
+      { 3 4 0 0 }
+      { 4 0 0 0 } }
+] [ 4 hankel-matrix ] unit-test
+
+[
     { { 1 0 4 }
-       { 0 7 0 }
-       { 6 0 3 } }
+      { 0 7 0 }
+      { 6 0 3 } }
 ] [
     { { 1 0 0 }
-       { 0 2 0 }
-       { 0 0 3 } }
-       
+      { 0 2 0 }
+      { 0 0 3 } }
+
     { { 0 0 4 }
-       { 0 5 0 }
-       { 6 0 0 } }
+      { 0 5 0 }
+      { 6 0 0 } }
 
     m+
 ] unit-test
