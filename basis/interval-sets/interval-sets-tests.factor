@@ -1,14 +1,14 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test interval-sets math grouping sequences accessors
-combinators.short-circuit ;
+combinators.short-circuit literals ;
 IN: interval-sets.tests
 
 [ f ] [ 0 T{ interval-set } in? ] unit-test
 [ f ] [ 2 T{ interval-set } in? ] unit-test
 
-: i1 ( -- set )
-    { { 3 4 } } <interval-set> ;
+CONSTANT: i1 $[
+    { { 3 4 } } <interval-set> ]
 
 [ f ] [ 2 i1 in? ] unit-test
 [ t ] [ 3 i1 in? ] unit-test
@@ -17,19 +17,19 @@ IN: interval-sets.tests
 
 CONSTANT: unicode-max 0x10FFFF
 
-: i2 ( -- set )
+CONSTANT: i2 $[
     { { 3 4 } } <interval-set>
-    unicode-max <interval-not> ;
+    unicode-max <interval-not> ]
 
 [ t ] [ 2 i2 in? ] unit-test
 [ f ] [ 3 i2 in? ] unit-test
 [ f ] [ 4 i2 in? ] unit-test
 [ t ] [ 5 i2 in? ] unit-test
 
-: i3 ( -- set )
+CONSTANT: i3 $[
     { { 2 4 } } <interval-set>
     { { 6 8 } } <interval-set>
-    <interval-or> ;
+    <interval-or> ]
 
 [ f ] [ 1 i3 in? ] unit-test
 [ t ] [ 2 i3 in? ] unit-test
@@ -41,10 +41,10 @@ CONSTANT: unicode-max 0x10FFFF
 [ t ] [ 8 i3 in? ] unit-test
 [ f ] [ 9 i3 in? ] unit-test
 
-: i4 ( -- set )
+CONSTANT: i4 $[
     { { 2 4 } } <interval-set>
     { { 6 8 } } <interval-set>
-    <interval-and> ;
+    <interval-and> ]
 
 [ f ] [ 1 i4 in? ] unit-test
 [ f ] [ 2 i4 in? ] unit-test
@@ -56,10 +56,10 @@ CONSTANT: unicode-max 0x10FFFF
 [ f ] [ 8 i4 in? ] unit-test
 [ f ] [ 9 i4 in? ] unit-test
 
-: i5 ( -- set )
+CONSTANT: i5 $[
     { { 2 5 } } <interval-set>
     { { 4 8 } } <interval-set>
-    <interval-or> ;
+    <interval-or> ]
 
 [ f ] [ 1 i5 in? ] unit-test
 [ t ] [ 2 i5 in? ] unit-test
@@ -71,10 +71,10 @@ CONSTANT: unicode-max 0x10FFFF
 [ t ] [ 8 i5 in? ] unit-test
 [ f ] [ 9 i5 in? ] unit-test
 
-: i6 ( -- set )
+CONSTANT: i6 $[
     { { 2 5 } } <interval-set>
     { { 4 8 } } <interval-set>
-    <interval-and> ;
+    <interval-and> ]
 
 [ f ] [ 1 i6 in? ] unit-test
 [ f ] [ 2 i6 in? ] unit-test
