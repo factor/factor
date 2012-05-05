@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel hashtables sequences sequences.private arrays
 words namespaces make parser effects.parser math assocs effects
-definitions quotations summary accessors fry hashtables.identity ;
+definitions quotations summary accessors fry hashtables.identity
+stack-checker ;
 IN: memoize
 
 <PRIVATE
@@ -81,3 +82,5 @@ M: memoized reset-word
     [ stack-effect in>> packer call ] [ "memoize" word-prop delete-at ] bi ;
 
 \ invalidate-memoized t "no-compile" set-word-prop
+
+SYNTAX: MEMO[ parse-quotation dup infer memoize-quot append ;
