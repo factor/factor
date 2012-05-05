@@ -145,14 +145,12 @@ UnaryMessageSend = (UnaryMessageSend | Operand):lhs
               (OptionalWhiteSpace ";" Message:m => [[ m ]])*:t
               => [[ lhs t h prefix >array <ast-cascade> ]]
 
-BinaryMessageSendLHS = (BinaryMessageSend | UnaryMessageSend | Operand)
-
-BinaryMessageSend = BinaryMessageSendLHS:lhs
+BinaryMessageSend = (BinaryMessageSend | UnaryMessageSend | Operand):lhs
               BinaryMessage:h
               (OptionalWhiteSpace ";" Message:m => [[ m ]])*:t
               => [[ lhs t h prefix >array <ast-cascade> ]]
 
-KeywordMessageSend = BinaryMessageSendLHS:lhs
+KeywordMessageSend = (BinaryMessageSend | UnaryMessageSend | Operand):lhs
               KeywordMessage:h
               (OptionalWhiteSpace ";" Message:m => [[ m ]])*:t
               => [[ lhs t h prefix >array <ast-cascade> ]]
