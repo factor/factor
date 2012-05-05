@@ -20,7 +20,7 @@ HELP: interval-set
 
 HELP: <interval-set>
 { $values { "specification" "a sequence of numbers and pairs of numbers" } { "interval-set" interval-set } }
-{ $description "Creates an interval set based on the specification. Pairs of numers are interpreted as intervals which include their endpoints, and individual numbers are interpreted to be in the set, in a singleton range." } ;
+{ $description "Creates an interval set based on the specification. Pairs of numbers are interpreted as intervals which include their endpoints, and individual numbers are interpreted to be in the set, in a singleton range." } ;
 
 HELP: in?
 { $values { "key" integer } { "set" interval-set } { "?" { { $link t } " or " { $link f } } } }
