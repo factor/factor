@@ -19,6 +19,18 @@ IN: math.matrices
 : eye ( m n k -- matrix )
     [ [ iota ] bi@ ] dip neg '[ _ + = 1 0 ? ] cartesian-map ;
 
+: hilbert-matrix ( m n -- matrix )
+    [ iota ] bi@ [ + 1 + recip ] cartesian-map ;
+
+: toeplitz-matrix ( n -- matrix )
+    iota dup [ - abs 1 + ] cartesian-map ;
+
+: hankel-matrix ( n -- matrix )
+    [ iota dup ] keep '[ + abs 1 + dup _ > [ drop 0 ] when ] cartesian-map ;
+
+: box-matrix ( r -- matrix )
+    2 * 1 + dup '[ _ 1 <array> ] replicate ;
+
 :: rotation-matrix3 ( axis theta -- matrix )
     theta cos :> c
     theta sin :> s
