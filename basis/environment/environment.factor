@@ -31,9 +31,9 @@ HOOK: set-os-envs-pointer os ( malloc -- )
 } cond
 
 [
-    "FACTOR_ROOTS" os-env
-    [
-        os windows? ";" ":" ? split
-        [ add-vocab-root ] each
-    ] when*    
+    ! "FACTOR_ROOTS" os-env
+    ! [
+        ! os windows? ";" ":" ? split
+        ! [ add-vocab-root ] each
+    ! ] when*    
 ] "environment" add-startup-hook

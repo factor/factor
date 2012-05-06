@@ -33,7 +33,7 @@ SYMBOL: copies
     ] each ;
 
 : insert-edge-copies ( from to copies -- )
-    [ ##parallel-copy ##branch ] { } make insert-basic-block ;
+    [ ##parallel-copy, ##branch, ] { } make insert-basic-block ;
 
 : insert-copies ( bb -- )
     [ copies get ] dip '[
