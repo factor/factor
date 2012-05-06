@@ -60,7 +60,7 @@ PRIVATE>
 
 : parallel-copy ( mapping -- )
     ! mapping is a list of { dst src } pairs
-    next-vreg '[ drop _ ] [ any-rep ##copy ] parallel-mapping ;
+    next-vreg '[ drop _ ] [ any-rep ##copy, ] parallel-mapping ;
 
 <PRIVATE
 
@@ -74,4 +74,4 @@ PRIVATE>
 : parallel-copy-rep ( mapping -- )
     ! mapping is a list of { dst src } pairs
     H{ } clone temp-vregs set
-    [ rep-of temp-vreg ] [ dup rep-of ##copy ] parallel-mapping ;
+    [ rep-of temp-vreg ] [ dup rep-of ##copy, ] parallel-mapping ;
