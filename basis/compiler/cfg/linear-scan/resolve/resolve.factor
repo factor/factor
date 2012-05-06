@@ -76,12 +76,6 @@ SYMBOL: temp-locations
 : register->memory ( from to -- )
     [ [ reg>> ] [ rep>> ] bi ] [ reg>> ] bi* ##spill, ;
 
-: temp->register ( from to -- )
-    nip [ reg>> ] [ rep>> ] [ rep>> spill-temp ] tri ##reload, ;
-
-: register->temp ( from to -- )
-    drop [ [ reg>> ] [ rep>> ] bi ] [ rep>> spill-temp ] bi ##spill, ;
-
 : register->register ( from to -- )
     swap [ reg>> ] [ [ reg>> ] [ rep>> ] bi ] bi* ##copy, ;
 
@@ -95,7 +89,7 @@ SYMBOL: temp-locations
 : mapping-instructions ( alist -- insns )
     [ swap ] H{ } assoc-map-as [
         [ temp-location ] [ swap >insn ] parallel-mapping
-        ##branch
+        ##branch,
     ] { } make ;
 
 : perform-mappings ( bb to mappings -- )
