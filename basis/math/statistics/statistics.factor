@@ -6,28 +6,36 @@ sequences.private sorting fry arrays grouping sets ;
 IN: math.statistics
 
 : power-mean ( seq p -- x )
-    [ '[ _ ^ ] map-sum ] [ [ length / ] [ recip ^ ] bi* ] 2bi ;
+    [ '[ _ ^ ] map-sum ] [ [ length / ] [ recip ^ ] bi* ] 2bi ; inline
 
 : mean ( seq -- x )
-    [ sum ] [ length ] bi / ;
+    [ sum ] [ length ] bi / ; inline
+
+: sum-of-squares ( seq -- x )
+    [ sq ] map-sum ; inline
+
+: sum-of-squared-errors ( seq -- x )
+    [ mean ] keep [ - sq ] with map-sum ; inline
+
+: sum-of-absolute-errors ( seq -- x )
+    [ mean ] keep [ - ] with map-sum ; inline
 
 : quadratic-mean ( seq -- x ) ! root-mean-square
-    [ [ sq ] map-sum ] [ length ] bi / sqrt ;
+    [ sum-of-squares ] [ length ] bi / sqrt ; inline
 
 : geometric-mean ( seq -- x )
-    [ length ] [ product ] bi nth-root ;
+    [ length ] [ product ] bi nth-root ; inline
 
 : harmonic-mean ( seq -- x )
-    [ recip ] map-sum recip ;
+    [ recip ] map-sum recip ; inline
 
 : contraharmonic-mean ( seq -- x )
-    [ [ sq ] map-sum ] [ sum ] bi / ;
+    [ sum-of-squares ] [ sum ] bi / ; inline
 
 <PRIVATE
 
 :: ((kth-object)) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
     #! Wirth's method, Algorithm's + Data structues = Programs p. 84
-    #! The algorithm modifiers seq, so we clone it
     k seq bounds-check 2drop
     0 :> i!
     0 :> j!
@@ -56,6 +64,7 @@ IN: math.statistics
     k seq nth ; inline
 
 : (kth-object) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
+    #! The algorithm modifiers seq, so we clone it
     [ clone ] 4dip ((kth-object)) ; inline
 
 : kth-object-unsafe ( seq k quot: ( x y -- ? ) -- elt )
@@ -224,20 +233,18 @@ ERROR: empty-sequence ;
     minmax swap - ;
 
 : sample-var ( seq -- x )
-    #! normalize by N-1
+    #! normalize by N-1; unbiased
     dup length 1 <= [
         drop 0
     ] [
-        [ [ mean ] keep [ - sq ] with map-sum ]
-        [ length 1 - ] bi /
+        [ sum-of-squared-errors ] [ length 1 - ] bi /
     ] if ;
 
 : full-var ( seq -- x )
     dup length 1 <= [
         drop 0
     ] [
-        [ [ mean ] keep [ - sq ] with map-sum ]
-        [ length ] bi /
+        [ sum-of-squared-errors ] [ length ] bi /
     ] if ;
 
 ALIAS: var sample-var
