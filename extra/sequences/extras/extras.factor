@@ -28,10 +28,10 @@ IN: sequences.extras
     2dup [ < ] with find drop over length or swap insert-nth ;
 
 : max-by ( obj1 obj2 quot: ( obj -- n ) -- obj1/obj2 )
-    [ bi@ [ max ] keep eq? not ] curry most ; inline
+    [ bi@ dupd max = ] curry most ; inline
 
 : min-by ( obj1 obj2 quot: ( obj -- n ) -- obj1/obj2 )
-    [ bi@ [ min ] keep eq? not ] curry most ; inline
+    [ bi@ dupd min = ] curry most ; inline
 
 : maximum ( seq quot: ( ... elt -- ... x ) -- elt )
     [ dup ?first ] dip [ max-by ] curry reduce ; inline
