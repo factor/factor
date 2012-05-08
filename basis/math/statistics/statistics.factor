@@ -32,6 +32,9 @@ IN: math.statistics
 : contraharmonic-mean ( seq -- x )
     [ sum-of-squares ] [ sum ] bi / ; inline
 
+: trim-mean ( seq p -- x )
+    swap [ length [ * >integer ] keep over - ] keep <slice> mean ;
+
 <PRIVATE
 
 :: ((kth-object)) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
@@ -254,6 +257,8 @@ ALIAS: var sample-var
 : full-std ( seq -- x ) full-var sqrt ;
 
 ALIAS: std sample-std
+
+: signal-to-noise ( seq -- x ) [ mean ] [ std ] bi / ;
 
 : mean-dev ( seq -- x ) dup mean v-n vabs mean ;
 

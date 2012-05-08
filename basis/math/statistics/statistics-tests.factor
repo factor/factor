@@ -11,6 +11,8 @@ IN: math.statistics.tests
 [ 1.0 ] [ { 1 1 1 } geometric-mean ] unit-test
 [ 1/3 ] [ { 1 1 1 } harmonic-mean ] unit-test
 [ 5+1/4 ] [ { 1 3 5 7 } contraharmonic-mean ] unit-test
+[ 18 ] [ { 4 8 15 16 23 42 } 0 trim-mean ] unit-test
+[ 15+1/2 ] [ { 4 8 15 16 23 42 } 0.2 trim-mean ] unit-test
 
 [ 0 ] [ { 1 } range ] unit-test
 [ 89 ] [ { 1 2 30 90 } range ] unit-test
