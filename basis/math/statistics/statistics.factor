@@ -32,8 +32,22 @@ IN: math.statistics
 : contraharmonic-mean ( seq -- x )
     [ sum-of-squares ] [ sum ] bi / ; inline
 
-: trim-mean ( seq p -- x )
-    swap [ length [ * >integer ] keep over - ] keep <slice> mean ;
+<PRIVATE
+
+: trim-points ( p seq -- from to seq  )
+    [ length [ * >integer ] keep over - ] keep ;
+
+PRIVATE>
+
+: trimmed-mean ( seq p -- x )
+    swap natural-sort trim-points <slice> mean ;
+
+: winsorized-mean ( seq p -- x )
+    swap natural-sort trim-points
+    [ <slice> ]
+    [ nip dupd nth <array> ]
+    [ [ 1 - ] dip nth <array> ] 3tri
+    surround mean ;
 
 <PRIVATE
 
