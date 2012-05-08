@@ -15,11 +15,9 @@ CONSTANT: i1 $[
 [ t ] [ 4 i1 in? ] unit-test
 [ f ] [ 5 i1 in? ] unit-test
 
-CONSTANT: unicode-max 0x10FFFF
-
 CONSTANT: i2 $[
     { { 3 4 } } <interval-set>
-    unicode-max <interval-not> ]
+    0x10FFFF <interval-not> ] ! unicode-max
 
 [ t ] [ 2 i2 in? ] unit-test
 [ f ] [ 3 i2 in? ] unit-test
