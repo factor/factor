@@ -34,3 +34,7 @@ IN: hash-sets.tests
 
 [ t ] [ HS{ } null? ] unit-test
 [ f ] [ HS{ 1 } null? ] unit-test
+
+{ { } } [ { 1 2 3 } duplicates ] unit-test
+{ f } [ { 1 2 3 } >hash-set duplicates ] unit-test
+{ { 1 } } [ { 1 2 1 } duplicates ] unit-test
