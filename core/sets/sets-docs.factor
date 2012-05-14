@@ -87,6 +87,11 @@ HELP: adjoin
 }
 { $side-effects "set" } ;
 
+HELP: ?adjoin
+{ $values { "elt" object } { "set" set } { "?" "a boolean" } }
+{ $description "A version of " { $link adjoin } " which returns whether the element was added to the set." }
+{ $notes "This is slightly less efficient than " { $link adjoin } " due to the initial membership test." } ;
+
 HELP: delete
 { $values { "elt" object } { "set" set } }
 { $description "Destructively removes " { $snippet "elt" } " from " { $snippet "set" } ". If the element is not present, this does nothing." $nl "Each mutable set type is expected to implement a method on this generic word." }
