@@ -45,6 +45,18 @@ IN: sequences.extras
 : minimum ( seq quot: ( ... elt -- ... x ) -- elt )
     [ dup ?first ] dip [ min-by ] curry reduce ; inline
 
+: supremum-by ( seq quot: ( ... elt -- ... x ) -- elt )
+    [ [ first dup ] dip call ] 2keep [
+        dupd call pick dupd max over =
+        [ [ 2drop ] 2dip ] [ 2nip ] if
+    ] curry 1 each-from drop ; inline
+
+: infimum-by ( seq quot: ( ... elt -- ... x ) -- elt )
+    [ [ first dup ] dip call ] 2keep [
+        dupd call pick dupd min over =
+        [ [ 2drop ] 2dip ] [ 2nip ] if
+    ] curry 1 each-from drop ; inline
+
 : all-subseqs ( seq -- seqs )
     dup length [1,b] [ <clumps> ] with map concat ;
 
