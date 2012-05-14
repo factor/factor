@@ -132,6 +132,9 @@ M: sequence cardinality
 : without ( seq set -- subseq )
     tester [ not ] compose filter ;
 
+: ?adjoin ( elt set -- ? )
+    2dup in? [ 2drop f ] [ adjoin t ] if ; inline
+
 ! Temporarily for compatibility
 
 : unique ( seq -- assoc )
