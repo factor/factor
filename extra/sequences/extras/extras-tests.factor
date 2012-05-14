@@ -1,5 +1,5 @@
-USING: ascii kernel make math sequences sequences.extras strings
-tools.test ;
+USING: arrays ascii kernel make math random sequences
+sequences.extras strings tools.test ;
 
 IN: sequences.extras.tests
 
@@ -18,6 +18,12 @@ IN: sequences.extras.tests
 [ 0 ] [ 5 iota [ ] minimum ] unit-test
 [ { "foo" } ] [ { { "foo" } { "bar" } } [ first ] maximum ] unit-test
 [ { "bar" } ] [ { { "foo" } { "bar" } } [ first ] minimum ] unit-test
+
+{ V{ 0 1 2 3 4 5 6 7 8 9 } } [
+    V{ } clone
+    10 iota >array randomize
+    [ swap insert-sorted ] each
+] unit-test
 
 [ { "a" "b" "c" "d" "ab" "bc" "cd" "abc" "bcd" "abcd" } ] [ "abcd" all-subseqs ] unit-test
 
