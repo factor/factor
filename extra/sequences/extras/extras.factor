@@ -27,6 +27,12 @@ IN: sequences.extras
 : insert-sorted ( elt seq -- seq )
     2dup [ < ] with find drop over length or swap insert-nth ;
 
+: each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
+    -rot (each) (each-integer) ; inline
+
+: reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) i -- ... result )
+    [ swap ] 2dip each-from ; inline
+
 : max-by ( obj1 obj2 quot: ( obj -- n ) -- obj1/obj2 )
     [ bi@ dupd max = ] curry most ; inline
 
