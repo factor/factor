@@ -11,3 +11,5 @@ IN: assocs.extras
 : assoc-sift ( assoc -- assoc' )
     [ nip ] assoc-filter ; inline
 
+: deep-at ( assoc seq -- value/f )
+    [ swap at ] each ;
