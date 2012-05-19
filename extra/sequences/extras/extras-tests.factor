@@ -3,21 +3,10 @@ sequences.extras strings tools.test ;
 
 IN: sequences.extras.tests
 
-[ 1 ] [ 1 2 [ ] min-by ] unit-test
-[ 1 ] [ 2 1 [ ] min-by ] unit-test
-[ 42.0 ] [ 42.0 1/0. [ ] min-by ] unit-test
-[ 42.0 ] [ 1/0. 42.0 [ ] min-by ] unit-test
-[ 2 ] [ 1 2 [ ] max-by ] unit-test
-[ 2 ] [ 2 1 [ ] max-by ] unit-test
-[ 1/0. ] [ 42.0 1/0. [ ] max-by ] unit-test
-[ 1/0. ] [ 1/0. 42.0 [ ] max-by ] unit-test
-[ "12345" ] [ "123" "12345" [ length ] max-by ] unit-test
-[ "123" ] [ "123" "12345" [ length ] min-by ] unit-test
-
-[ 4 ] [ 5 iota [ ] maximum ] unit-test
-[ 0 ] [ 5 iota [ ] minimum ] unit-test
-[ { "foo" } ] [ { { "foo" } { "bar" } } [ first ] maximum ] unit-test
-[ { "bar" } ] [ { { "foo" } { "bar" } } [ first ] minimum ] unit-test
+[ 4 ] [ 5 iota [ ] supremum-by ] unit-test
+[ 0 ] [ 5 iota [ ] infimum-by ] unit-test
+[ { "foo" } ] [ { { "foo" } { "bar" } } [ first ] supremum-by ] unit-test
+[ { "bar" } ] [ { { "foo" } { "bar" } } [ first ] infimum-by ] unit-test
 
 { V{ 0 1 2 3 4 5 6 7 8 9 } } [
     V{ } clone

@@ -33,18 +33,6 @@ IN: sequences.extras
 : reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) i -- ... result )
     [ swap ] 2dip each-from ; inline
 
-: max-by ( obj1 obj2 quot: ( obj -- n ) -- obj1/obj2 )
-    [ bi@ dupd max = ] curry most ; inline
-
-: min-by ( obj1 obj2 quot: ( obj -- n ) -- obj1/obj2 )
-    [ bi@ dupd min = ] curry most ; inline
-
-: maximum ( seq quot: ( ... elt -- ... x ) -- elt )
-    [ dup ?first ] dip [ max-by ] curry reduce ; inline
-
-: minimum ( seq quot: ( ... elt -- ... x ) -- elt )
-    [ dup ?first ] dip [ min-by ] curry reduce ; inline
-
 : supremum-by ( seq quot: ( ... elt -- ... x ) -- elt )
     [ [ first dup ] dip call ] 2keep [
         dupd call pick dupd max over =
