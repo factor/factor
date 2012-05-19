@@ -6,7 +6,7 @@ words.symbol words.alias words.constant vocabs.parser ;
 IN: parser
 
 ARTICLE: "reading-ahead" "Reading ahead"
-"Parsing words can consume input from the input stream. Words come in two flavors: words that throw upon finding end of file, and words that return " { $link f } "upon the same." $nl
+"Parsing words can consume input from the input stream. Words come in two flavors: words that throw upon finding end of file, and words that return " { $link f } " upon the same." $nl
 "Parsing words that throw on end of file:"
 { $subsections
     scan-token
