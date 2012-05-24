@@ -1,5 +1,5 @@
+USING: math.matrices math.vectors tools.test math kernel ;
 IN: math.matrices.tests
-USING: math.matrices math.vectors tools.test math ;
 
 [
     { { 0 } { 0 } { 0 } }
@@ -199,3 +199,43 @@ USING: math.matrices math.vectors tools.test math ;
 
 [ { { 4181 6765 } { 6765 10946 } } ]
 [ { { 0 1 } { 1 1 } } 20 m^n ] unit-test
+
+{
+    { { 0 5 0 10 } { 6 7 12 14 } { 0 15 0 20 } { 18 21 24 28 } }
+}
+[ { { 1 2 } { 3 4 } } { { 0 5 } { 6 7 } } kron ] unit-test
+
+{
+    {
+        { 1 1 1 1 }
+        { 1 -1 1 -1 }
+        { 1 1 -1 -1 }
+        { 1 -1 -1 1 }
+    }
+} [ { { 1 1 } { 1 -1 } } dup kron ] unit-test
+
+{
+    {
+        { 1 1 1 1 1 1 1 1 }
+        { 1 -1 1 -1 1 -1 1 -1 }
+        { 1 1 -1 -1 1 1 -1 -1 }
+        { 1 -1 -1 1 1 -1 -1 1 }
+        { 1 1 1 1 -1 -1 -1 -1 }
+        { 1 -1 1 -1 -1 1 -1 1 }
+        { 1 1 -1 -1 -1 -1 1 1 }
+        { 1 -1 -1 1 -1 1 1 -1 }
+    }
+} [ { { 1 1 } { 1 -1 } } dup dup kron kron ] unit-test
+
+{
+    {
+        { 1 1 1 1 1 1 1 1 }
+        { 1 -1 1 -1 1 -1 1 -1 }
+        { 1 1 -1 -1 1 1 -1 -1 }
+        { 1 -1 -1 1 1 -1 -1 1 }
+        { 1 1 1 1 -1 -1 -1 -1 }
+        { 1 -1 1 -1 -1 1 -1 1 }
+        { 1 1 -1 -1 -1 -1 1 1 }
+        { 1 -1 -1 1 -1 1 1 -1 }
+    }
+} [ { { 1 1 } { 1 -1 } } dup dup kron swap kron ] unit-test
