@@ -156,3 +156,10 @@ IN: math.matrices
 : m^n ( m n -- n ) 
     make-bits over first length identity-matrix
     [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;
+
+
+: stitch ( m -- m' )
+    [ ] [ [ append ] 2map ] map-reduce ;
+
+: kron ( m1 m2 -- m )
+    '[ [ _ n*m  ] map ] map stitch stitch ;
