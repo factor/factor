@@ -239,3 +239,31 @@ IN: math.matrices.tests
         { 1 -1 -1 1 -1 1 1 -1 }
     }
 } [ { { 1 1 } { 1 -1 } } dup dup kron swap kron ] unit-test
+
+
+! kron is not generally commutative, make sure we have the right order
+{
+    {
+        { 1 2 3 4 5 1 2 3 4 5 }
+        { 6 7 8 9 10 6 7 8 9 10 }
+        { 1 2 3 4 5 -1 -2 -3 -4 -5 }
+        { 6 7 8 9 10 -6 -7 -8 -9 -10 }
+    }
+}
+[
+    { { 1 1 } { 1 -1 } }
+    { { 1 2 3 4 5 } { 6 7 8 9 10 } } kron
+] unit-test
+
+{
+    {
+        { 1 1 2 2 3 3 4 4 5 5 }
+        { 1 -1 2 -2 3 -3 4 -4 5 -5 }
+        { 6 6 7 7 8 8 9 9 10 10 }
+        { 6 -6 7 -7 8 -8 9 -9 10 -10 }
+    }
+}
+[
+    { { 1 1 } { 1 -1 } }
+    { { 1 2 3 4 5 } { 6 7 8 9 10 } } swap kron
+] unit-test
