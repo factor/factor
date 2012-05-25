@@ -157,7 +157,6 @@ IN: math.matrices
     make-bits over first length identity-matrix
     [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;
 
-
 : stitch ( m -- m' )
     [ ] [ [ append ] 2map ] map-reduce ;
 
