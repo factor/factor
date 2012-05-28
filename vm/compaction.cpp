@@ -334,6 +334,7 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p)
 
 	update_code_roots_for_compaction();
 	callbacks->update();
+	code->initialize_all_blocks_set();
 }
 
 void factor_vm::collect_compact(bool trace_contexts_p)
