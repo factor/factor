@@ -352,7 +352,9 @@ PRIVATE>
 
 : append ( seq1 seq2 -- newseq ) over append-as ;
 
-: prepend ( seq1 seq2 -- newseq ) swap append ; inline
+: prepend-as ( seq1 seq2 exemplar -- newseq ) swapd append-as ; inline
+
+: prepend ( seq1 seq2 -- newseq ) over prepend-as ; inline
 
 : 3append ( seq1 seq2 seq3 -- newseq ) pick 3append-as ;
 

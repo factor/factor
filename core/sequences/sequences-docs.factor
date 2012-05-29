@@ -785,17 +785,34 @@ HELP: append-as
 
 HELP: prepend
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
-{ $description "Outputs a new sequence of the same type as " { $snippet "seq2" } " consisting of the elements of " { $snippet "seq2" } " followed by " { $snippet "seq1" } "." }
-{ $errors "Throws an error if " { $snippet "seq1" } " contains elements not permitted in sequences of the same class as " { $snippet "seq2" } "." }
+{ $description "Outputs a new sequence of the same type as " { $snippet "seq1" } " consisting of the elements of " { $snippet "seq2" } " followed by " { $snippet "seq1" } "." }
+{ $errors "Throws an error if " { $snippet "seq2" } " contains elements not permitted in sequences of the same class as " { $snippet "seq1" } "." }
 { $examples { $example "USING: prettyprint sequences ;"
         "{ 1 2 } B{ 3 4 } prepend ."
-        "B{ 3 4 1 2 }"
+        "{ 3 4 1 2 }"
     }
     { $example "USING: prettyprint sequences strings ;"
         "\"go\" \"car\" prepend ."
         "\"cargo\""
     }
 } ;
+
+HELP: prepend-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence of the same type as " { $snippet "exemplar" } " consisting of the elements of " { $snippet "seq2" } " followed by " { $snippet "seq1" } "." }
+{ $errors "Throws an error if " { $snippet "seq1" } " or " { $snippet "seq2" } " contain elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." }
+{ $examples
+    { $example "USING: prettyprint sequences ;"
+        "{ 3 4 } B{ 1 2 } B{ } prepend-as ."
+        "B{ 1 2 3 4 }"
+    }
+    { $example "USING: prettyprint sequences strings ;"
+        "\"ing\" \"go\" SBUF\" \" prepend-as ."
+        "SBUF\" going\""
+    }
+} ;
+
+{ prepend prepend-as } related-words
 
 HELP: 3append
 { $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
