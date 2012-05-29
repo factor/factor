@@ -216,8 +216,8 @@ M: uniform-tuple (bind-uniforms)
     dup texture-uniform = [ drop 1 ] [ "uniform-tuple-texture-units" word-prop 0 or ] if ;
 
 : all-uniform-tuple-slots ( class -- slots )
-    dup "uniform-tuple-slots" word-prop 
-    [ swap superclass all-uniform-tuple-slots prepend ] [ drop { } ] if* ;
+    dup "uniform-tuple-slots" word-prop
+    [ [ superclass all-uniform-tuple-slots ] dip append ] [ drop { } ] if* ;
 
 DEFER: uniform-texture-accessors
 
@@ -464,7 +464,7 @@ DEFER: [bind-uniform-tuple]
         quot-prefix prepend
     ] 2map :> ( texture-unit' value-cleave )
 
-    texture-unit' 
+    texture-unit'
     value>>-quot { value-cleave 2cleave } append ;
 
 :: [bind-uniform] ( texture-unit uniform prefix -- texture-unit' quot )
