@@ -125,6 +125,9 @@ M: unix (datagram)
 M: unix (raw)
     [ SOCK_RAW server-socket-fd ] with-destructors ;
 
+M: unix (broadcast)
+    dup handle>> SOL_SOCKET SO_BROADCAST set-socket-option ;
+
 :: do-receive ( n buf port -- count sockaddr )
     port addr>> empty-sockaddr/size :> ( sockaddr len )
     port handle>> handle-fd ! s
