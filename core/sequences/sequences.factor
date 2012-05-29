@@ -341,7 +341,7 @@ M: immutable-sequence clone-like like ; inline
 PRIVATE>
 
 : append-as ( seq1 seq2 exemplar -- newseq )
-    [ over length over length + ] dip
+    [ 2dup [ length ] bi@ + ] dip
     [ (append) ] new-like ; inline
 
 : 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
@@ -352,9 +352,9 @@ PRIVATE>
 
 : append ( seq1 seq2 -- newseq ) over append-as ;
 
-: prepend-as ( seq1 seq2 exemplar -- newseq ) swapd append-as ; inline
+: prepend-as ( seq1 seq2 exemplar -- newseq ) swapd append-as ;
 
-: prepend ( seq1 seq2 -- newseq ) over prepend-as ; inline
+: prepend ( seq1 seq2 -- newseq ) over prepend-as ;
 
 : 3append ( seq1 seq2 seq3 -- newseq ) pick 3append-as ;
 
