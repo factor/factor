@@ -1,6 +1,6 @@
-USING: arrays kernel math math.order math.parser namespaces
-sequences kernel.private sequences.private strings sbufs
-tools.test vectors assocs generic vocabs.loader ;
+USING: arrays byte-arrays kernel math math.order math.parser
+namespaces sequences kernel.private sequences.private strings
+sbufs tools.test vectors assocs generic vocabs.loader ;
 IN: sequences.tests
 
 [ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
@@ -108,6 +108,9 @@ unit-test
 
 [ "a" -1 append ] must-fail
 [ -1 "a" append ] must-fail
+
+{ t } [ B{ 0 } { 1 } append byte-array? ] unit-test
+{ t } [ B{ 0 } { 1 } prepend byte-array? ] unit-test
 
 [ [ ]       ] [ 1 [ ]           remove ] unit-test
 [ [ ]       ] [ 1 [ 1 ]         remove ] unit-test
