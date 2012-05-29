@@ -365,7 +365,7 @@ SYMBOL: remote-address
         >>addr
     ] with-destructors ;
 
-: <broadcast> ( datagram -- datagram )
+: <broadcast> ( addrspec -- datagram )
     <datagram> (broadcast) ;
 
 : receive-unsafe ( n buf datagram -- count addrspec )
