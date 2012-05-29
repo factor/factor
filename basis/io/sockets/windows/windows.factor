@@ -9,7 +9,7 @@ FROM: namespaces => get ;
 IN: io.sockets.windows
 
 : set-socket-option ( handle level opt -- )
-    1 int <ref> dup byte-length setsockopt socket-error ;
+    [ handle>> ] 2dip 1 int <ref> dup byte-length setsockopt socket-error ;
 
 M: windows addrinfo-error ( n -- )
     winsock-return-check ;
