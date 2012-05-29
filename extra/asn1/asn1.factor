@@ -153,18 +153,18 @@ SYMBOL: end
 GENERIC: >ber ( obj -- byte-array )
 M: fixnum >ber ( n -- byte-array )
     >128-ber dup length 2 swap 2array
-    "cc" pack-native prepend ;
+    "cc" pack-native B{ } prepend-as ;
 
 : >ber-enumerated ( n -- byte-array )
-    >128-ber >byte-array dup length 10 swap 2array
-    "CC" pack-native prepend ;
+    >128-ber dup length 10 swap 2array
+    "CC" pack-native B{ } prepend-as ;
 
 : >ber-length-encoding ( n -- byte-array )
     dup 127 <= [
         1array "C" pack-be
     ] [
         1array "I" pack-be 0 swap remove dup length
-        0x80 + 1array "C" pack-be prepend
+        0x80 + 1array "C" pack-be B{ } prepend-as
     ] if ;
 
 ! =========================================================
@@ -172,11 +172,11 @@ M: fixnum >ber ( n -- byte-array )
 ! =========================================================
 
 M: bignum >ber ( n -- byte-array )
-    >128-ber >byte-array dup length
+    >128-ber dup length
     dup 126 > [
         "range error in bignum" throw
     ] [
-        2 swap 2array "CC" pack-native prepend
+        2 swap 2array "CC" pack-native B{ } prepend-as
     ] if ;
 
 ! =========================================================
