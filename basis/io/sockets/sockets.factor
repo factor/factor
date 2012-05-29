@@ -281,6 +281,8 @@ TUPLE: raw-port < port addr ;
 
 HOOK: (raw) io-backend ( addr -- raw )
 
+HOOK: (broadcast) io-backend ( datagram -- datagram )
+
 HOOK: (receive-unsafe) io-backend ( n buf datagram -- size addrspec )
 
 ERROR: invalid-port object ;
@@ -362,6 +364,9 @@ SYMBOL: remote-address
         [ drop raw-port <port> ] [ get-local-address ] 2bi
         >>addr
     ] with-destructors ;
+
+: <broadcast> ( datagram -- datagram )
+    <datagram> (broadcast) ;
 
 : receive-unsafe ( n buf datagram -- count addrspec )
     check-receive
