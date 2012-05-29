@@ -144,8 +144,8 @@ redirects ;
     pick header>> set-at ;
 
 : set-basic-auth ( request username password -- request )
-    ":" glue >base64 "Basic " prepend "Authorization" set-header ;
-    
+    ":" glue >base64 "Basic " "" prepend-as "Authorization" set-header ;
+
 : <request> ( -- request )
     request new
         "1.1" >>version
