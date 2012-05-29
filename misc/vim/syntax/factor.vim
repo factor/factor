@@ -68,8 +68,8 @@ syn keyword factorKeyword with-return restarts return-continuation with-datastac
 syn cluster factorReal          contains=factorInt,factorFloat,factorPosRatio,factorNegRatio,factorBinary,factorHex,factorOctal
 syn cluster factorNumber        contains=@factorReal,factorComplex
 syn cluster factorNumErr        contains=factorBinErr,factorHexErr,factorOctErr
-syn match   factorInt           /\<-\=[0-9]\([0-9,]*[0-9]\)\?\([eE][+-][0-9]\+\)\?\>/
-syn match   factorFloat         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\(\.\([0-9,]*[0-9]\+\([eE][+-][0-9]\+\)\?\)\?\)\?\>/
+syn match   factorInt           /\<-\=[0-9]\([0-9,]*[0-9]\)\?\([eE]\([+-]\)\?[0-9]\+\)\?\>/
+syn match   factorFloat         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\(\.\(\([0-9,]*[0-9]\+\)\?\([eE]\([+-]\)\?[0-9]\+\)\?\)\?\)\?\>/
 syn match   factorPosRatio      /\<+\=[0-9]\([0-9,]*[0-9]\)\?\(+[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
 syn match   factorNegRatio      /\<\-[0-9]\([0-9,]*[0-9]\)\?\(\-[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
 syn region  factorComplex       start=/\<C{\>/ end=/\<}\>/ contains=@factorReal
