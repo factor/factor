@@ -189,3 +189,9 @@ PRIVATE>
         [ [ length ] [ max ] map-reduce iota ] keep
         [ [ ?nth ] with map ] curry map concat sift
     ] if-empty ;
+
+: sift-as ( seq exemplar -- newseq )
+    [ ] swap filter-as ;
+
+: harvest-as ( seq exemplar -- newseq )
+    [ empty? not ] swap filter-as ;
