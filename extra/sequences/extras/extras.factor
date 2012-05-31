@@ -183,3 +183,16 @@ PRIVATE>
 
 : 2count ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... n )
     [ 1 0 ? ] compose 2map-sum ; inline
+
+:: round-robin-as ( seqs exemplar -- newseq )
+    seqs length :> len
+    0 0 seqs sum-lengths [
+        f [
+            drop dup len >= [ drop 1 + 0 ] when
+            2dup seqs nth-unsafe ?nth
+            [ 1 + ] [ dup not ] bi*
+        ] loop
+    ] exemplar replicate-as 2nip ;
+
+: round-robin ( seqs -- newseq )
+    [ { } ] [ dup first round-robin-as ] if-empty ;
