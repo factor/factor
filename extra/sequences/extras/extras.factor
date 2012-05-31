@@ -184,12 +184,8 @@ PRIVATE>
 : 2count ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... n )
     [ 1 0 ? ] compose 2map-sum ; inline
 
-: max-lengths ( seq -- n )
-    [ length ] [ max ] map-reduce ;
-
 : round-robin ( seq -- newseq )
     [ { } ] [
-        dup [ max-lengths ] [ length ] bi [ iota ] bi@
-        [ [ 2array ] with map ] curry map concat swap
-        [ [ first2 ] dip nth-unsafe ?nth ] curry map sift
+        [ [ length ] [ max ] map-reduce iota ] keep
+        [ [ ?nth ] with map ] curry map concat sift
     ] if-empty ;
