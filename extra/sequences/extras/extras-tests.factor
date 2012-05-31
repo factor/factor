@@ -72,4 +72,5 @@ IN: sequences.extras.tests
 { 8 } [ 3 iota dup [ 1 + * ] 2map-sum ] unit-test
 { 4 } [ "hello" "jello" [ = ] 2count ] unit-test
 
-{ "ADEBFC" } [ { "ABC" "D" "EF" } round-robin ] unit-test
+{ { } } [ { } round-robin ] unit-test
+{ "ADEBFC" } [ { "ABC" "D" "EF" } round-robin >string ] unit-test
