@@ -833,3 +833,7 @@ DEFER: initial-slot
 
 [ "IN: classes.tuple.tests TUPLE: initial-slot { x initial-class initial: 3 } ;" eval( -- ) ]
 [ error>> T{ bad-initial-value f "x" 3 initial-class } = ] must-fail-with
+
+[ "IN: classes.tuple.tests USE: math TUPLE: foo < foo ;" eval( -- ) ] [ error>> bad-superclass? ] must-fail-with
+
+[ "IN: classes.tuple.tests USE: math TUPLE: foo < + ;" eval( -- ) ] [ error>> bad-superclass? ] must-fail-with
