@@ -370,3 +370,12 @@ GENERIC: signum ( x -- y )
 M: real signum sgn ;
 
 M: complex signum dup abs / ;
+
+MATH: copysign ( x y -- x' )
+
+M: real copysign [ >float ] bi@ copysign ;
+
+M: float copysign
+    [ double>bits ] [ fp-sign ] bi*
+    [ 63 2^ bitor ] [ 63 2^ bitnot bitand ] if
+    bits>double ;
