@@ -248,3 +248,10 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { 0 } [ 0 signum ] unit-test
 { t } [ C{ 3.0 -1.5 } signum C{ 0.8944271909999157 -0.4472135954999579 } 1e-10 ~ ] unit-test
 
+{ 1.0 } [ 1 2 copysign ] unit-test
+{ -1.0 } [ 1 -2 copysign ] unit-test
+{ 1.0 } [ -1 0 copysign ] unit-test
+{ -0.0 } [ 0 -1.0 copysign ] unit-test
+{ -1.0 } [ -1 -0.0 copysign ] unit-test
+{ 1.5 } [ -1.5 2 copysign ] unit-test
+{ -1.5 } [ -1.5 -2 copysign ] unit-test
