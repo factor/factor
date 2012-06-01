@@ -340,3 +340,7 @@ HELP: sigmoid
 HELP: signum
 { $values { "x" number } { "y" number } }
 { $description "Calculates the signum value.  For a real number, " { $snippet "x" } ", this is its sign (-1, 0, or 1).  For a complex number, " { $snippet "x" } ", this is the point on the unit circle of the complex plane that is nearest to " { $snippet "x" } "." } ;
+
+HELP: copysign
+{ $values { "x" number } { "y" number } { "x'" number } }
+{ $description "Returns " { $snippet "x" } " with the sign of " { $snippet "y" } ", as a " { $link float } "." } ;
