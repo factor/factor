@@ -202,10 +202,10 @@ PRIVATE>
     timestamps>byte-array [ utimes ] unix-system-call drop ;
 
 : set-file-access-time ( path timestamp -- )
-    f 2array set-file-times ;
+    over file-info modified>> 2array set-file-times ;
 
 : set-file-modified-time ( path timestamp -- )
-    f swap 2array set-file-times ;
+    over file-info accessed>> swap 2array set-file-times ;
 
 : set-file-ids ( path uid gid -- )
     [ normalize-path ] 2dip [ -1 or ] bi@
