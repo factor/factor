@@ -4,7 +4,7 @@
 USING: accessors arrays assocs binary-search classes.tuple fry
 kernel locals math math.order math.ranges namespaces sequences
 sequences.private sorting ;
-
+FROM: sequences => change-nth ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -113,61 +113,43 @@ PRIVATE>
 
 <PRIVATE
 
-TUPLE: combo
-    { seq sequence }
-    { k integer } ;
+! "Algorithm 515: Generation of a Vector from the Lexicographical Index"
+! Buckles, B. P., and Lybanon, M. ACM
+! Transactions on Mathematical Software, Vol. 3, No. 2, June 1977.
 
-C: <combo> combo
+:: combination-indices ( x! p n -- seq )
+    x 1 + x!
+    p 0 <array> :> c 0 :> k! 0 :> r!
+    p 1 - [| i |
+        i [ 0 ] [ 1 - c nth ] if-zero i c set-nth
+        [ k x < ] [
+            i c [ 1 + ] change-nth
+            n i c nth - p i 1 + - nCk r!
+            k r + k!
+        ] do while k r - k!
+    ] each-integer
+    p 2 < [ 0 ] [ p 2 - c nth ] if
+    p 1 < [ drop ] [ x + k - p 1 - c set-nth ] if
+    c [ 1 - ] map! ;
 
-: choose ( combo -- nCk )
-    [ seq>> length ] [ k>> ] bi nCk ;
-
-: largest-value ( a b x -- v )
-    dup 0 = [
-        drop 1 - nip
-    ] [
-        [ iota ] 2dip '[ _ nCk _ >=< ] search nip
-    ] if ;
-
-:: next-values ( a b x -- a' b' x' v )
-    a b x largest-value dup :> v  ! a'
-    b 1 -                         ! b'
-    x v b nCk -                   ! x'
-    v ;                           ! v == a'
-
-: dual-index ( m combo -- m' )
-    choose 1 - swap - ;
-
-: initial-values ( combo m -- n k m )
-    [ [ seq>> length ] [ k>> ] bi ] dip ;
-
-: combinadic ( combo m -- combinadic )
-    initial-values [ over 0 > ] [ next-values ] produce
-    [ 3drop ] dip ;
-
-:: combination-indices ( m combo -- seq )
-    combo m combo dual-index combinadic
-    combo seq>> length 1 - swap [ - ] with map! ;
-
-: apply-combination ( m combo -- seq )
-    [ combination-indices ] keep seq>> nths ;
-
-: combinations-quot ( seq k quot -- seq quot )
-    [ <combo> [ choose iota ] keep ] dip
-    '[ _ apply-combination @ ] ; inline
+:: combinations-quot ( seq k quot -- seq quot )
+    seq length :> n
+    n k nCk iota [
+        k n combination-indices seq nths quot call
+    ] ; inline
 
 PRIVATE>
 
 : combination ( m seq k -- seq' )
-    <combo> apply-combination ;
+    swap [ length combination-indices ] [ nths ] bi ;
 
-TUPLE: combinations combo length ;
+TUPLE: combinations seq k length ;
 
 : <combinations> ( seq k -- combinations )
-    [ <combo> ] 2keep [ length ] [ nCk ] bi* combinations boa ;
+    2dup [ length ] [ nCk ] bi* combinations boa ;
 
 M: combinations length length>> ; inline
-M: combinations nth-unsafe combo>> apply-combination ;
+M: combinations nth-unsafe [ seq>> ] [ k>> ] bi combination ;
 M: combinations hashcode* tuple-hashcode ;
 
 INSTANCE: combinations immutable-sequence
