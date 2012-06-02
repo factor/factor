@@ -93,13 +93,6 @@ t error-summary? set-global
         ] tabular-output nl
     ] unless-empty ;
 
-: print-stack ( seq -- )
-    [
-        [ short. ]
-        [ drop "~pprint error~" swap write-object nl ]
-        recover
-    ] each ;
-
 : trimmed-stack. ( seq -- )
     dup length max-stack-items get > [
         max-stack-items get cut*
@@ -107,7 +100,7 @@ t error-summary? set-global
             [ length number>string "(" " more items)" surround ] keep
             write-object nl
         ] dip
-    ] when print-stack ;
+    ] when stack. ;
 
 : datastack. ( datastack -- )
     display-stacks? get [
