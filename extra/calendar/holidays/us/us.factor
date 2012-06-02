@@ -90,7 +90,7 @@ HOLIDAY: mothers-day may 2 sunday-of-month ;
 
 HOLIDAY: armed-forces-day may 3 saturday-of-month ;
 
-HOLIDAY: national-donut-day 1 friday-of-month ;
+HOLIDAY: national-donut-day june 1 friday-of-month ;
 
 HOLIDAY: flag-day june 14 >>day ;
 
