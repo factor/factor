@@ -408,7 +408,8 @@ M: ratio >base
 : float>base ( n base -- str )
     {
         { 16 [ float>hex ] }
-        [ drop "%.16g" format-float ]
+        { 10 [ "%.16g" format-float ] }
+        [ "Invalid base" throw ]
     } case ; inline
 
 PRIVATE>
