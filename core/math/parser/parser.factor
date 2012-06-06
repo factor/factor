@@ -11,6 +11,10 @@ IN: math.parser
                              [ CHAR: a 10 - - dup 10 < [ drop 255 ] when ]
     } cond ; inline
 
+ERROR: invalid-radix radix ;
+
+ERROR: invalid-base n base ;
+
 <PRIVATE
 
 TUPLE: number-parse 
@@ -309,7 +313,7 @@ PRIVATE>
 <PRIVATE
 
 : positive>base ( num radix -- str )
-    dup 1 <= [ "Invalid radix" throw ] when
+    dup 1 <= [ invalid-radix ] when
     [ dup 0 > ] swap [ /mod >digit ] curry "" produce-as nip
     reverse! ; inline
 
@@ -409,7 +413,7 @@ M: ratio >base
     {
         { 16 [ float>hex ] }
         { 10 [ "%.16g" format-float ] }
-        [ "Invalid base" throw ]
+        [ invalid-base ]
     } case ; inline
 
 PRIVATE>
