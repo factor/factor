@@ -190,6 +190,9 @@ unit-test
 [ 1 1 >base ] must-fail
 [ 1 0 >base ] must-fail
 [ 1 -1 >base ] must-fail
+[ 2+1/2 -1 >base ] [ invalid-radix? ] must-fail-with
+[ 123.456 8 >base ] [ invalid-base? ] must-fail-with
+[ 123.456 2 >base ] [ invalid-base? ] must-fail-with
 
 [ "0/0." ] [ 0.0 0.0 / number>string ] unit-test
 
