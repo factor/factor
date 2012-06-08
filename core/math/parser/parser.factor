@@ -13,11 +13,9 @@ IN: math.parser
 
 ERROR: invalid-radix radix ;
 
-ERROR: invalid-base n base ;
-
 <PRIVATE
 
-TUPLE: number-parse 
+TUPLE: number-parse
     { str read-only }
     { length fixnum read-only }
     { radix fixnum read-only } ;
@@ -409,11 +407,11 @@ M: ratio >base
     dup [ 0 = ] find drop head >string
     fix-float ;
 
-: float>base ( n base -- str )
+: float>base ( n radix -- str )
     {
         { 16 [ float>hex ] }
         { 10 [ "%.16g" format-float ] }
-        [ invalid-base ]
+        [ invalid-radix ]
     } case ; inline
 
 PRIVATE>
