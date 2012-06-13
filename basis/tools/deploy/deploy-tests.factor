@@ -72,7 +72,7 @@ M: quit-responder call-responder*
             f >>secure
         start-server
         servers>> first addr>> port>>
-        dup number>string "resource:temp/port-number" ascii set-file-contents
+        dup number>string "port-number" temp-file ascii set-file-contents
     ] with-scope
     "port" set ;
 
