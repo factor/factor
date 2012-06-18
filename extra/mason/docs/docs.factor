@@ -1,20 +1,23 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: arrays hashtables help.html http.client io.directories
-io.files io.launcher kernel make mason.common mason.config
-namespaces sequences ;
+io.files io.files.temp io.launcher io.pathnames kernel make
+mason.common mason.config namespaces sequences ;
+
 IN: mason.docs
 
 : make-docs-archive ( -- )
-    "factor/temp" [
-        { "tar" "cfz" "docs.tar.gz" "docs" } short-running-process
-    ] with-directory ;
+    { "tar" "cfz" }
+    "docs.tar.gz" temp-file suffix
+    "docs" cache-file suffix
+    short-running-process ;
 
 : upload-docs-archive ( -- )
-    "factor/temp/docs.tar.gz"
+    "docs.tar.gz" temp-file
     docs-username get
     docs-host get
-    docs-directory get "/docs.tar.gz" append
+    docs-directory get "docs.tar.gz" append-path
     upload-safely ;
 
 : notify-docs ( -- )
