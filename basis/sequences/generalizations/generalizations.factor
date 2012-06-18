@@ -15,11 +15,11 @@ MACRO: firstn-unsafe ( n -- )
     [firstn] ;
 
 MACRO: firstn ( n -- )
-    dup zero? [ drop [ drop ] ] [
+    [ [ drop ] ] [
         [ 1 - swap bounds-check 2drop ]
         [ firstn-unsafe ]
         bi-curry '[ _ _ bi ]
-    ] if ;
+    ] if-zero ;
 
 MACRO: set-firstn-unsafe ( n -- )
     [ 1 + ]
@@ -27,11 +27,11 @@ MACRO: set-firstn-unsafe ( n -- )
     '[ _ -nrot _ spread drop ] ;
 
 MACRO: set-firstn ( n -- )
-    dup zero? [ drop [ drop ] ] [
+    [ [ drop ] ] [
         [ 1 - swap bounds-check 2drop ]
         [ set-firstn-unsafe ]
         bi-curry '[ _ _ bi ]
-    ] if ;
+    ] if-zero ;
 
 : nappend ( n -- seq ) narray concat ; inline
 

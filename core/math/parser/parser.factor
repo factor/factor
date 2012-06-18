@@ -377,9 +377,8 @@ M: ratio >base
 <PRIVATE
 
 : mantissa-expt-normalize ( mantissa expt -- mantissa' expt' )
-    dup zero?
-    [ over log2 52 swap - [ shift 52 2^ 1 - bitand ] [ 1022 + - ] bi-curry bi* ]
-    [ 1023 - ] if ;
+    [ dup log2 52 swap - [ shift 52 2^ 1 - bitand ] [ 1022 + neg ] bi ]
+    [ 1023 - ] if-zero ;
 
 : mantissa-expt ( float -- mantissa expt )
     [ 52 2^ 1 - bitand ]

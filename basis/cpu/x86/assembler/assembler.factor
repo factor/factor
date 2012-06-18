@@ -309,8 +309,7 @@ PRIVATE>
 
 : LEAVE ( -- ) 0xc9 , ;
 
-: RET ( n -- )
-    dup zero? [ drop 0xc3 , ] [ 0xc2 , 2, ] if ;
+: RET ( n -- ) [ 0xc3 , ] [ 0xc2 , 2, ] if-zero ;
 
 ! Arithmetic
 
