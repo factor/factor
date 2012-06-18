@@ -141,11 +141,11 @@ M: f avl-delete ( key f -- f f f ) nip f f ;
     ] dip ;
 
 M: avl-node avl-delete ( key node -- node shorter? deleted? )
-    2dup key>> key-side dup zero? [
-        drop nip avl-delete-node t
+    2dup key>> key-side [
+        nip avl-delete-node t
     ] [
         [ (avl-delete) ] with-side
-    ] if ;
+    ] if-zero ;
 
 M: avl delete-at ( key node -- )
     [ avl-delete 2drop ] change-root drop ;
