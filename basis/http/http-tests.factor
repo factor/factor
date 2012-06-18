@@ -438,9 +438,9 @@ SYMBOL: a
 
 ! Check that download throws errors (reported by Chris Double)
 [
-    "resource:temp" [
+    [
         "http://localhost/tweet_my_twat" add-addr download
-    ] with-directory
+    ] with-temp-directory
 ] must-fail
 
 [ ] [ stop-test-httpd ] unit-test
