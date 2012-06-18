@@ -26,10 +26,10 @@ IN: classes.struct.bit-accessors
                     combine-quot: ( prev-quot shift-amount next-quot -- quot )
                     -- quot )
     offset bits step-quot manipulate-bits
-    dup zero? [ 3drop ] [
+    [ 2drop ] [
         step-quot combine-quot bit-manipulator
         combine-quot call( prev shift next -- quot )
-    ] if ; inline recursive
+    ] if-zero ; inline recursive
 
 : bit-reader ( offset bits -- quot: ( alien -- n ) )
     [ neg '[ _ alien-unsigned-1 _ bitand _ shift ] ]
