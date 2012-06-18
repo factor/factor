@@ -4,8 +4,8 @@ USING: accessors db.sqlite furnace.actions furnace.alloy
 furnace.redirection help.html help.topics html.components
 html.forms html.templates.chloe http.server
 http.server.dispatchers http.server.static io.directories
-io.files kernel locals namespaces sequences unicode.categories
-urls ;
+io.files io.files.temp kernel locals namespaces sequences
+unicode.categories urls ;
 IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;
@@ -45,7 +45,7 @@ M: result link-href href>> ;
         "resource:basis/definitions/icons/" <static> "icons" add-responder ;
 
 : run-help-webapp ( -- )
-    "resource:temp/docs" <help-webapp>
+    "docs" cache-file <help-webapp>
         main-responder set-global
     8080 httpd drop ;
 
