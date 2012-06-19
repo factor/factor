@@ -94,3 +94,6 @@ PRIVATE>
 
 : moving-median ( u n -- v )
     <clumps> [ median ] map ;
+
+: nonzero ( seq -- seq' )
+    [ zero? not ] filter ;
