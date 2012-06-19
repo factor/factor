@@ -12,21 +12,21 @@ IN: tools.completion
 
 : smart-index-from ( obj i seq -- n/f )
     rot [ ch>lower ] [ ch>upper ] bi
-    [ eq? ] bi-curry@ [ bi or ] 2curry find-from drop ;
+    '[ dup _ eq? [ drop t ] [ _ eq? ] if ] find-from drop ;
 
 PRIVATE>
 
-:: (fuzzy) ( accum i full ch -- accum i full ? )
+:: (fuzzy) ( accum i full ch -- accum i ? )
     ch i full smart-index-from [
-        :> i i accum push
-        accum i 1 + full t
+        [ accum push ]
+        [ accum swap 1 + t ] bi
     ] [
-        f -1 full f
+        f -1 f
     ] if* ;
 
 : fuzzy ( full short -- indices )
     dup [ length <vector> 0 ] curry 2dip
-    [ (fuzzy) ] all? 3drop ;
+    [ (fuzzy) ] with all? 2drop ;
 
 : (runs) ( runs n seq -- runs n )
     [
@@ -38,7 +38,7 @@ PRIVATE>
     ] each ;
 
 : runs ( seq -- newseq )
-    V{ V{ } } [ clone ] map over first rot (runs) drop ;
+    [ V{ } clone 1vector ] dip [ first ] keep (runs) drop ;
 
 : score-1 ( i full -- n )
     {
