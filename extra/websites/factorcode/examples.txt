@@ -55,3 +55,9 @@ USING: inspector io.files.info io.pathnames system tools.files ;
 home directory.
 home file-system-info free-space>> .
 image file-info describe
+----
+USING: io kernel sequences ;
+
+4 iota [
+    "Happy Birthday " write 2 = "dear NAME" "to You" ? print
+] each ;
