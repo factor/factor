@@ -26,8 +26,8 @@ M: windows unset-os-env ( key -- )
 
 M: windows (os-envs) ( -- seq )
     GetEnvironmentStrings [
-        <memory-stream> [
+        [
             utf16n decode-input
             [ "\0" read-until drop dup empty? not ] [ ] produce nip
-        ] with-input-stream*
+        ] with-memory-reader
     ] [ FreeEnvironmentStrings win32-error=0/f ] bi ;
