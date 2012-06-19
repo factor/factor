@@ -20,3 +20,6 @@ IN: math.extras.test
 [ 10 [1,b] 2 exponential-moving-average ] unit-test
 
 { { 2 5 5 4 3 } } [ { 1 2 5 6 1 4 3 } 3 moving-median ] unit-test
+
+{ { } } [ { 0 0 } nonzero ] unit-test
+{ { 1 2 3 } } [ { 0 1 0 2 0 3 0 } nonzero ] unit-test
