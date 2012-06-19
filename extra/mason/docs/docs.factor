@@ -8,10 +8,12 @@ mason.common mason.config namespaces sequences ;
 IN: mason.docs
 
 : make-docs-archive ( -- )
-    { "tar" "cfz" }
-    "docs.tar.gz" temp-file suffix
-    "docs" cache-file suffix
-    short-running-process ;
+    [
+        { "tar" "cfz" }
+        "docs.tar.gz" temp-file suffix
+        "docs" suffix
+        short-running-process
+    ] with-cache-directory ;
 
 : upload-docs-archive ( -- )
     "docs.tar.gz" temp-file
