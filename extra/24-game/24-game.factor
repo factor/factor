@@ -42,7 +42,7 @@ CONSTANT: (operators) { + - * / rot swap q }
     [ name>> = ] with find nip ;
 
 : get-operator ( operators -- word )
-    "Operators: " write dup pprint nl
+    "Operators: " write dup pprint nl flush
     readln over find-operator dup
     [ "Command not found..." print get-operator ] unless nip ;
 
