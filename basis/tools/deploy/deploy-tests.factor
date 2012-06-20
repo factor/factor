@@ -6,6 +6,15 @@ urls math.parser io.directories tools.deploy tools.deploy.test
 vocabs ;
 IN: tools.deploy.tests
 
+! Delete all cached staging images in case syntax or
+! other core vocabularies have changed and staging
+! images are stale.
+cache-directory [
+    [ "staging." head? ] filter
+    my-arch ".image" append [ tail? ] curry filter
+    [ delete-file ] each
+] with-directory-files
+
 [ "nosuchvocab" deploy ] [ no-vocab? ] must-fail-with
 
 [ "no such vocab, fool!" deploy ] [ bad-vocab-name? ] must-fail-with
