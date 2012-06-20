@@ -29,6 +29,21 @@ HELP: os-env
     }
 } ;
 
+HELP: change-os-env
+{ $values { "key" string } { "quot" { $quotation "( old -- new )" } } }
+{ $description "Applies a quotation to change the value stored in an environment variable." }
+{ $examples
+    "This is an operating system-specific feature. On Unix, you can do:"
+    { $unchecked-example
+        "USING: environment io ;"
+        "\"USER\" os-env print"
+        "\"USER\" [ \"-doe\" append ] change-os-env"
+        "\"USER\" os-env print"
+        "jane\njane-doe"
+    }
+}
+{ $side-effects "key" } ;
+
 HELP: os-envs
 { $values { "assoc" "an association mapping strings to strings" } }
 { $description "Outputs the current set of environment variables." }
@@ -57,7 +72,7 @@ HELP: unset-os-env
     "Names and values of environment variables are operating system-specific."
 } ;
 
-{ os-env os-envs set-os-env unset-os-env set-os-envs } related-words
+{ os-env os-envs set-os-env unset-os-env set-os-envs change-os-env } related-words
 
 
 ARTICLE: "environment" "Environment variables"
@@ -72,6 +87,7 @@ ARTICLE: "environment" "Environment variables"
     set-os-env
     unset-os-env
     set-os-envs
+    change-os-env
 } ;
 
 ABOUT: "environment"
