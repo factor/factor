@@ -26,9 +26,11 @@ cache-directory [
 
 [ ] [ "hello-ui" shake-and-bake 1300000 small-enough? ] unit-test
 
-[ "staging.math-threads-compiler-ui.image" ] [
-    "hello-ui" deploy-config
-    [ bootstrap-profile staging-image-name file-name ] bind
+[ "math-threads-compiler-ui" ] [
+    "hello-ui" deploy-config [
+        bootstrap-profile staging-image-name file-name
+        "." split second
+    ] bind
 ] unit-test
 
 [ ] [ "maze" shake-and-bake 1200000 small-enough? ] unit-test
