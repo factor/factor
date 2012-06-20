@@ -1,9 +1,10 @@
-USING: tools.test system io io.encodings.ascii io.pathnames
-io.files io.files.info io.files.temp kernel tools.deploy.config
-tools.deploy.config.editor tools.deploy.backend math sequences
-io.launcher arrays namespaces continuations layouts accessors
-urls math.parser io.directories tools.deploy tools.deploy.test
-vocabs ;
+USING: bootstrap.image tools.test system io io.encodings.ascii
+io.pathnames io.files io.files.info io.files.temp kernel
+tools.deploy.config tools.deploy.config.editor
+tools.deploy.backend math sequences io.launcher arrays
+namespaces continuations layouts accessors urls math.parser
+io.directories tools.deploy tools.deploy.test vocabs ;
+
 IN: tools.deploy.tests
 
 ! Delete all cached staging images in case syntax or
