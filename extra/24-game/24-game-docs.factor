@@ -1,12 +1,12 @@
-USING: help.markup help.syntax math kernel ;
+USING: help.markup help.syntax math kernel arrays ;
 IN: 24-game
 
-HELP: play-game
+HELP: 24-game
 { $description "Starts the game!" }
 { $examples
     { $unchecked-example
         "USE: 24-game"
-        "play-game"
+        "24-game"
         "{ 8 2 1 2 }\n"
         "Commands: { + - * / rot swap q }\n"
         "swap\n"
@@ -23,8 +23,8 @@ HELP: play-game
     }
 } ;
 
-HELP: 24-able
-{ $values { "vector" "vector of 4 integers" } }
+HELP: make-24
+{ $values { "array" array } }
 { $description
     "Produces a vector with 4 integers. With the following condition: "
     "If these integers were directly on the stack, one can process them into 24, "
@@ -36,34 +36,30 @@ HELP: 24-able
 { $examples
     { $example
         "USING: 24-game kernel sequences prettyprint ;"
-        "24-able length 4 = ."
+        "make-24 length 4 = ."
         "t"
     }
-    { $notes { $link 24-able? } " is used in " { $link 24-able } "." }
+    { $notes { $link makes-24? } " is used in " { $link makes-24? } "." }
 } ;
 
-HELP: 24-able?
+HELP: makes-24?
 { $values
-    { "quad" "vector of 4 integers" }
-    { "t/f" "a boolean" }
+    { "a" integer }
+    { "b" integer }
+    { "c" integer }
+    { "d" integer }
+    { "?" "a boolean" }
 }
 { $description
-    "Tells if it is possible to win 24-game if it was initiated "
-    "with this sequence."
+    "Tells if it is possible to win 24-game with these integers."
 } ;
 
-HELP: build-quad
-{ $values
-    { "array" "an array of 4 numbers" }
-}
-{ $description "Builds an array of 4 random numbers." } ;
 ARTICLE: "24-game" "The Game of 24"
 "A classic math game, where one attempts to create 24, by applying "
 "arithmetical operations and some shuffle words to a stack of 4 numbers. "
 { $subsections
-    play-game
-    24-able
-    24-able?
-    build-quad
+    24-game
+    make-24
+    makes-24?
 } ;
 ABOUT: "24-game"
