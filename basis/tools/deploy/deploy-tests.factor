@@ -3,7 +3,7 @@ io.pathnames io.files io.files.info io.files.temp kernel
 tools.deploy.config tools.deploy.config.editor
 tools.deploy.backend math sequences io.launcher arrays
 namespaces continuations layouts accessors urls math.parser
-io.directories tools.deploy tools.deploy.test vocabs ;
+io.directories splitting tools.deploy tools.deploy.test vocabs ;
 
 IN: tools.deploy.tests
 
