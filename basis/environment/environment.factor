@@ -14,6 +14,9 @@ HOOK: (os-envs) os ( -- seq )
 
 HOOK: (set-os-envs) os ( seq -- )
 
+: change-os-env ( key quot -- )
+    [ [ os-env ] keep ] dip dip set-os-env ; inline
+
 : os-envs ( -- assoc )
     (os-envs) [ "=" split1 ] H{ } map>assoc ;
 
