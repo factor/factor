@@ -1,64 +1,71 @@
 ! Copyright © 2008 Reginald Keith Ford II
 ! 24, the Factor game!
 
-USING: kernel random namespaces shuffle sequences
-parser io math prettyprint combinators continuations
-arrays words quotations accessors math.parser backtrack assocs ;
+USING: accessors backtrack continuations io kernel math
+math.parser prettyprint quotations random sequences shuffle ;
 
 IN: 24-game
-SYMBOL: commands
+
 : nop ( -- ) ;
-: do-something ( a b -- c ) { + - * } amb-execute ;
-: maybe-swap ( a b -- a b ) { nop swap } amb-execute ;
-: some-rots ( a b c -- a b c )
-    #! Try each permutation of 3 elements.
+
+: do-operation ( a b -- c )
+    { + - * } amb-execute ;
+
+: permute-2 ( a b -- a b )
+    { nop swap } amb-execute ;
+
+: permute-3 ( a b c -- a b c )
     { nop rot -rot swap spin swapd } amb-execute ;
+
 : makes-24? ( a b c d -- ? )
-        [
-            some-rots do-something
-            some-rots do-something
-            maybe-swap do-something
-            24 =
-        ]
-        [ 4drop ]
-    if-amb ;
+    [
+        permute-3 do-operation
+        permute-3 do-operation
+        permute-2 do-operation
+        24 =
+    ] [ 4drop ] if-amb ;
+
+: random-4 ( -- array )
+    4 [ 10 random ] replicate ;
+
+: make-24 ( -- array )
+    f [ dup first4 makes-24? ] [ drop random-4 ] do until ;
+
 : q ( -- obj ) "quit" ;
-: show-commands ( -- ) "Commands: " write commands get unparse print ;
-: report ( vector -- ) unparse print show-commands ;
-: give-help ( -- ) "Command not found..." print show-commands ;
-: find-word ( string choices -- word ) [ name>> = ] with find nip ;
-: obtain-word ( -- word )
-    readln commands get find-word dup
-    [ drop give-help obtain-word ] unless ;
-: done? ( vector -- t/f ) 1 swap length = ;
-: victory? ( vector -- t/f ) { 24 } = ;
-: apply-word ( vector word -- array ) 1quotation with-datastack >array ;
-: update-commands ( vector -- )
-    length 3 <
-        [ commands [ \ rot swap remove ] change ]
-        [ ]
-    if ;
-DEFER: check-status
-: quit-game ( vector -- ) drop "you're a quitter" print ;
-: quit? ( vector -- t/f ) last "quit" = ;
-: end-game ( vector -- )
-    dup victory? 
-        [ drop "You WON!" ]
-        [ pop number>string " is not 24... You lose." append ]
+
+CONSTANT: (operators) { + - * / rot swap q }
+
+: operators ( array -- operators )
+    length 3 < [ \ rot (operators) remove ] [ (operators) ] if ;
+
+: find-operator ( string operators -- word/f )
+    [ name>> = ] with find nip ;
+
+: get-operator ( operators -- word )
+    "Operators: " write dup pprint nl
+    readln over find-operator dup
+    [ "Command not found..." print get-operator ] unless nip ;
+
+: try-operator ( array -- array )
+    [ pprint nl ]
+    [ dup operators get-operator 1quotation with-datastack ]
+    bi ;
+
+: end-game ( array -- )
+    dup { 24 } =
+    [ drop "You WON!" ]
+    [ first number>string " is not 24... You lose." append ]
     if print ;
-    
-! The following two words are mutually recursive,
-! providing the repl loop of the game
-: repeat ( vector -- )
-    dup report obtain-word apply-word dup update-commands check-status  ;
-: check-status ( object -- )
-    dup done?
-        [ end-game ] 
-        [ dup quit? [ quit-game ] [ repeat ] if ]
-    if ;
-: build-quad ( -- array ) 4 [ 10 random ] replicate ;
-: 24-able? ( quad -- t/f ) [ makes-24? ] with-datastack first ;
-: 24-able ( -- vector ) build-quad dup 24-able? [ drop build-quad ] unless ;
-: set-commands ( -- ) { + - * / rot swap q } commands set ;
-: play-game ( -- ) set-commands 24-able repeat ;
-MAIN: play-game
+
+: (24-game) ( array -- )
+    dup length 1 =
+    [ end-game ] [
+        dup last "quit" =
+        [ drop "you're a quitter" print ]
+        [ try-operator (24-game) ]
+        if
+    ] if ;
+
+: 24-game ( -- ) make-24 (24-game) ;
+
+MAIN: 24-game
