@@ -23,7 +23,7 @@ blas-fortran-abi [
             os macosx? cpu
             x86.64? and
             os-version second 6 = and
-        ] [ "The libblas.dylib included in Mac OS X 10.6 is incompatible with Factor. To use the math.blas bindings you will need to install a third-party BLAS library and configure Factor. See `\"math.blas.config\" about` for more information." ] }
+        ] [ "The libblas.dylib included in Mac OS X 10.6 is incompatible with Factor. To use the math.blas bindings you will need to install a third-party BLAS library and configure Factor. See `\"math.blas.config\" help` for more information." <bad-fortran-abi> ] }
         { [
             os macosx? cpu
             x86.64? and
