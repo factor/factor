@@ -25,3 +25,10 @@ os unix? [
 ] unit-test
 [ 32766 ] [ "factor-test-key-long" os-env length ] unit-test
 [ ] [ "factor-test-key-long" unset-os-env ] unit-test
+
+[ "abc" ] [
+    "a" "factor-test-key-change" set-os-env
+    "factor-test-key-change" [ "bc" append ] change-os-env
+    "factor-test-key-change" os-env
+] unit-test
+[ ] [ "factor-test-key-change" unset-os-env ] unit-test
