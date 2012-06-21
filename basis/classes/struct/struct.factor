@@ -139,11 +139,11 @@ M: struct-bit-slot-spec (writer-quot)
     drop [ >c-ptr ] ;
 
 MACRO: read-struct-slot ( slot -- )
-    dup type>> depends-on-c-type
+    dup type>> add-depends-on-c-type
     (reader-quot) ;
 
 MACRO: write-struct-slot ( slot -- )
-    dup type>> depends-on-c-type
+    dup type>> add-depends-on-c-type
     (writer-quot) ;
 PRIVATE>
 

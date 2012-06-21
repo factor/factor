@@ -48,7 +48,7 @@ IN: stack-checker.known-words
     ( value -- ) apply-word/effect ;
 
 : non-inline-word ( word -- )
-    dup depends-on-effect
+    dup add-depends-on-effect
     {
         { [ dup "shuffle" word-prop ] [ infer-shuffle-word ] }
         { [ dup "special" word-prop ] [ infer-special ] }
