@@ -179,7 +179,7 @@ M: cocoa-ui-backend raise-window* ( world -- )
     ] when* ;
 
 : pixel-size ( pixel-format -- size )
-    color-bits pixel-format-attribute -3 shift ;
+    color-bits (pixel-format-attribute) -3 shift ;
 
 : offscreen-buffer ( world pixel-format -- alien w h pitch )
     [ dim>> first2 ] [ pixel-size ] bi*
