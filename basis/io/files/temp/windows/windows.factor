@@ -21,8 +21,7 @@ IN: io.files.temp.windows
     0
     MAX_PATH 1 + WCHAR <c-array>
     [ SHGetFolderPath ] keep
-    swap check-ole32-error
-    utf16n alien>native-string ;
+    swap check-ole32-error alien>native-string ;
 
 PRIVATE>
 
