@@ -351,7 +351,7 @@ M: bad-escape error.
 
 M: bad-literal-tuple summary drop "Bad literal tuple" ;
 
-M: check-mixin-class summary drop "Not a mixin class" ;
+M: check-mixin-class-error summary drop "Not a mixin class" ;
 
 M: not-found-in-roots summary
     path>> "Cannot resolve vocab: " prepend ;
