@@ -20,12 +20,12 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
         swap ! icp
         FALSE ! fTrailing
     ] if
-    { int } [ ScriptStringCPtoX ole32-error ] with-out-parameters ;
+    { int } [ ScriptStringCPtoX check-ole32-error ] with-out-parameters ;
 
 : x>line-offset ( x script-string -- n trailing )
     ssa>> ! ssa
     swap ! iX
-    { int int } [ ScriptStringXtoCP ole32-error ] with-out-parameters ;
+    { int int } [ ScriptStringXtoCP check-ole32-error ] with-out-parameters ;
 
 <PRIVATE
 
@@ -44,7 +44,7 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
     f ! pbInClass
     f void* <ref> ! pssa
     [ ScriptStringAnalyse ] keep
-    [ ole32-error ] [ |ScriptStringFree void* deref ] bi* ;
+    [ check-ole32-error ] [ |ScriptStringFree void* deref ] bi* ;
 
 : set-dc-colors ( dc font -- )
     [ background>> color>RGB SetBkColor drop ]
@@ -65,7 +65,7 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
     ! iMinSel
     ! iMaxSel
     FALSE ! fDisabled
-    ScriptStringOut ole32-error ;
+    ScriptStringOut check-ole32-error ;
 
 : draw-script-string ( dc script-string -- )
     [ font>> set-dc-colors ] keep (draw-script-string) ;
@@ -103,7 +103,7 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
 PRIVATE>
 
 M: script-string dispose*
-    ssa>> void* <ref> ScriptStringFree ole32-error ;
+    ssa>> void* <ref> ScriptStringFree check-ole32-error ;
 
 SYMBOL: cached-script-strings
 
