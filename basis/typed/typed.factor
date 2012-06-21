@@ -30,14 +30,14 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 : typed-stack-effect? ( effect -- ? )
     [ object = ] all? not ;
 
-: depends-on-unboxing ( class -- )
-    [ dup tuple-layout depends-on-tuple-layout ]
-    [ depends-on-final ]
+: add-depends-on-unboxing ( class -- )
+    [ dup tuple-layout add-depends-on-tuple-layout ]
+    [ add-depends-on-final ]
     bi ;
 
 : (unboxer) ( type -- quot )
     dup unboxable-tuple-class? [
-        dup depends-on-unboxing
+        dup add-depends-on-unboxing
         all-slots [
             [ name>> reader-word 1quotation ]
             [ class>> (unboxer) ] bi compose
@@ -57,7 +57,7 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 : (unboxed-types) ( type -- types )
     dup unboxable-tuple-class?
     [
-        dup depends-on-unboxing
+        dup add-depends-on-unboxing
         all-slots [ class>> (unboxed-types) ] map concat
     ]
     [ 1array ] if ;
@@ -83,7 +83,7 @@ DEFER: make-boxer
 : boxer ( type -- quot )
     dup unboxable-tuple-class?
     [
-        dup depends-on-unboxing
+        dup add-depends-on-unboxing
         [ all-slots [ class>> ] map make-boxer ]
         [ [ boa ] curry ]
         bi compose

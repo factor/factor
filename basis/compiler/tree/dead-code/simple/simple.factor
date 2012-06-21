@@ -91,7 +91,7 @@ M: #push remove-dead-code*
     ] [ drop f ] if ;
 
 : remove-flushable-call ( #call -- node )
-    [ word>> depends-on-flushable ]
+    [ word>> add-depends-on-flushable ]
     [ in-d>> <#drop> remove-dead-code* ]
     bi ;
 
