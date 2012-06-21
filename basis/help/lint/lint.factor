@@ -68,7 +68,7 @@ PRIVATE>
 
 : check-about ( vocab -- )
     vocab-link boa dup
-    '[ _ vocab-help [ article drop ] when* ] check-something ;
+    '[ _ vocab-help [ lookup-article drop ] when* ] check-something ;
 
 : check-vocab ( vocab -- )
     "Checking " write dup write "..." print flush
