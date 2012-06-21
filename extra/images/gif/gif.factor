@@ -55,16 +55,16 @@ introducer label comment-data ;
 TUPLE: trailer byte ;
 CONSTRUCTOR: trailer ( byte -- obj ) ;
 
-CONSTANT: image-descriptor 0x2c
+CONSTANT: IMAGE-DESCRIPTOR 0x2c
 ! Extensions
-CONSTANT: extension-identifier 0x21
-CONSTANT: plain-text-extension 0x01
-CONSTANT: graphic-control-extension 0xf9
-CONSTANT: comment-extension 0xfe
-CONSTANT: application-extension 0xff
-CONSTANT: trailer 0x3b
-CONSTANT: graphic-control-extension-block-size 0x04
-CONSTANT: block-terminator 0x00
+CONSTANT: EXTENSION-IDENTIFIER 0x21
+CONSTANT: PLAIN-TEXT-EXTENSION 0x01
+CONSTANT: GRAPHICS-CONTROL-EXTENSION 0xf9
+CONSTANT: COMMENT-EXTENSION 0xfe
+CONSTANT: APPLICATION-EXTENSION 0xff
+CONSTANT: TRAILER 0x3b
+CONSTANT: GRAPHIC-CONTROL-EXTENSION-BLOCK-SIZE 0x04
+CONSTANT: BLOCK-TERMINATOR 0x00
 
 : <loading-gif> ( -- loading-gif )
     \ loading-gif new
@@ -91,11 +91,11 @@ CONSTANT: block-terminator 0x00
 
 : read-graphic-control-extension ( -- graphic-control-extension )
     \ graphics-control-extension new
-        1 read le> graphic-control-extension-block-size assert=
+        1 read le> GRAPHIC-CONTROL-EXTENSION-BLOCK-SIZE assert=
         1 read le> >>flags
         2 read le> >>delay-time
         1 read le> >>transparent-color-index
-        1 read le> block-terminator assert= ;
+        1 read le> BLOCK-TERMINATOR assert= ;
 
 : read-plain-text-extension ( -- plain-text-extension )
     \ plain-text-extension new
@@ -168,18 +168,18 @@ ERROR: unimplemented message ;
 
 : read-extension ( loading-gif -- loading-gif )
     read1 {
-        { plain-text-extension [
+        { PLAIN-TEXT-EXTENSION [
             read-plain-text-extension over plain-text-extensions>> push
         ] }
 
-        { graphic-control-extension [
+        { GRAPHICS-CONTROL-EXTENSION [
             read-graphic-control-extension
             over graphic-control-extensions>> push
         ] }
-        { comment-extension [
+        { COMMENT-EXTENSION [
             read-comment-extension over comment-extensions>> push
         ] }
-        { application-extension [
+        { APPLICATION-EXTENSION [
             read-application-extension over application-extensions>> push
         ] }
         { f [ gif-unexpected-eof ] }
@@ -190,13 +190,13 @@ ERROR: unhandled-data byte ;
 
 : read-data ( loading-gif -- loading-gif )
     read1 {
-        { extension-identifier [ read-extension ] }
-        { graphic-control-extension [
+        { EXTENSION-IDENTIFIER [ read-extension ] }
+        { GRAPHICS-CONTROL-EXTENSION [
             read-graphic-control-extension
             over graphic-control-extensions>> push
         ] }
-        { image-descriptor [ read-table-based-image ] }
-        { trailer [ f >>loading? ] }
+        { IMAGE-DESCRIPTOR [ read-table-based-image ] }
+        { TRAILER [ f >>loading? ] }
         [ unhandled-data ]
     } case ;
 
