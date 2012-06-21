@@ -67,7 +67,7 @@ pressed selected pressed-selected ;
 
 C: <button-pen> button-pen
 
-: button-pen ( button pen -- button pen )
+: lookup-button-pen ( button pen -- button pen )
     over find-button {
         { [ dup { [ pressed?>> ] [ selected?>> ] } 1&& ] [
             drop pressed-selected>>
@@ -79,10 +79,10 @@ C: <button-pen> button-pen
     } cond ;
 
 M: button-pen draw-interior
-    button-pen dup [ draw-interior ] [ 2drop ] if ;
+    lookup-button-pen dup [ draw-interior ] [ 2drop ] if ;
 
 M: button-pen draw-boundary
-    button-pen dup [ draw-boundary ] [ 2drop ] if ;
+    lookup-button-pen dup [ draw-boundary ] [ 2drop ] if ;
 
 M: button-pen pen-pref-dim
     [
@@ -95,10 +95,10 @@ M: button-pen pen-pref-dim
     ] [ vmax ] reduce-outputs ;
 
 M: button-pen pen-background
-    button-pen pen-background ;
+    lookup-button-pen pen-background ;
 
 M: button-pen pen-foreground
-    button-pen pen-foreground ;
+    lookup-button-pen pen-foreground ;
 
 <PRIVATE
 
