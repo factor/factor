@@ -8,8 +8,10 @@ IN: 24-game
 
 : nop ( -- ) ;
 
+: ?/ ( a b -- c ) [ drop 1/0. ] [ / ] if-zero ;
+
 : do-operation ( a b -- c )
-    { + - * } amb-execute ;
+    { + - * ?/ } amb-execute ;
 
 : permute-2 ( a b -- a b )
     { nop swap } amb-execute ;
