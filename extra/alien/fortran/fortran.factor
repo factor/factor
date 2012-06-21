@@ -12,13 +12,8 @@ IN: alien.fortran
 
 SINGLETONS: f2c-abi g95-abi gfortran-abi intel-unix-abi intel-windows-abi ;
 
-<< 
-: add-f2c-libraries ( -- )
-    "I77" "libI77.so" cdecl add-library
-    "F77" "libF77.so" cdecl add-library ;
-
-! os netbsd? [ add-f2c-libraries ] when
->>
+TUPLE: bad-fortran-abi detail ;
+C: <bad-fortran-abi> bad-fortran-abi
 
 : alien>nstring ( alien len encoding -- string )
     [ memory>byte-array ] dip decode ;
@@ -43,6 +38,7 @@ library-fortran-abis [ H{ } clone ] initialize
     [ "__" append ] [ "_" append ] if ;
 
 HOOK: fortran-c-abi fortran-abi ( -- abi )
+M: bad-fortran-abi fortran-c-abi cdecl ;
 M: f2c-abi fortran-c-abi cdecl ;
 M: g95-abi fortran-c-abi cdecl ;
 M: gfortran-abi fortran-c-abi cdecl ;
@@ -415,13 +411,18 @@ PRIVATE>
 : set-fortran-abi ( library -- )
     library-fortran-abis get-global at fortran-abi set ;
 
-: (fortran-invoke) ( return library function parameters -- quot )
+: ((fortran-invoke)) ( return library function parameters -- quot )
     {
         [ 2nip [<fortran-result>] ]
         [ nip nip nip [fortran-args>c-args] ]
         [ [fortran-invoke] ]
         [ 2nip [fortran-results>] ]
     } 4 ncleave 4 nappend ;
+
+:: (fortran-invoke) ( return library function parameters -- quot )
+    library library-fortran-abis get-global at dup bad-fortran-abi?
+    [ '[ _ throw ] ]
+    [ drop return library function parameters ((fortran-invoke)) ] if ;
 
 MACRO: fortran-invoke ( return library function parameters -- )
     { [ 2drop nip set-fortran-abi ] [ (fortran-invoke) ] } 4 ncleave ;
