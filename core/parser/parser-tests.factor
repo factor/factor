@@ -415,7 +415,7 @@ DEFER: foo
     "USE: this-better-not-exist" eval( -- )
 ] must-fail
 
-[ ": foo ;" eval( -- ) ] [ error>> error>> no-current-vocab? ] must-fail-with
+[ ": foo ;" eval( -- ) ] [ error>> error>> no-current-vocab-error? ] must-fail-with
 
 [ 92 ] [ "CHAR: \\" eval( -- n ) ] unit-test
 [ 92 ] [ "CHAR: \\\\" eval( -- n ) ] unit-test
