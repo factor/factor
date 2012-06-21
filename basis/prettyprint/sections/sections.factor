@@ -183,7 +183,7 @@ TUPLE: block < section sections ;
     [ short-section? ] bi
     and [ bl ] when ;
 
-: line-break ( type -- ) [ <line-break> add-section ] when* ;
+: add-line-break ( type -- ) [ <line-break> add-section ] when* ;
 
 M: block section-fits? ( section -- ? )
     line-limit? [ drop t ] [ call-next-method ] if ;
