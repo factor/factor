@@ -10,7 +10,7 @@ compiler.cfg.builder compiler.cfg.builder.alien.params
 compiler.cfg.builder.alien.boxing compiler.cfg.builder.blocks
 compiler.cfg.instructions compiler.cfg.stack-frame
 compiler.cfg.stacks compiler.cfg.stacks.local
-compiler.cfg.registers compiler.cfg.hats ;
+compiler.cfg.registers compiler.cfg.hats compiler.errors ;
 FROM: compiler.errors => no-such-symbol no-such-library ;
 IN: compiler.cfg.builder.alien
 
@@ -71,10 +71,10 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
     {
         { [ dup library-dll dll-valid? not ] [
             [ library-dll dll-path ] [ dlerror>> ] bi
-            cfg get word>> no-such-library drop 
+            cfg get word>> no-such-library-error drop 
         ] }
         { [ 2dup library-dll dlsym-valid? not ] [
-            drop dlerror cfg get word>> no-such-symbol
+            drop dlerror cfg get word>> no-such-symbol-error
         ] }
         [ 2drop ]
     } cond ;
