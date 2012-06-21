@@ -127,7 +127,7 @@ IN: stack-checker.transforms
     [ "method-class" word-prop ]
     [ "method-generic" word-prop ] bi
     2dup next-method
-    depends-on-next-method ;
+    add-depends-on-next-method ;
 
 \ (call-next-method) [
     [ add-next-method-dependency ]
@@ -140,7 +140,7 @@ IN: stack-checker.transforms
 \ boa [
     dup tuple-class? [
         dup tuple-layout
-        [ depends-on-tuple-layout ]
+        [ add-depends-on-tuple-layout ]
         [ [ "boa-check" word-prop [ ] or ] dip ] 2bi
         '[ @ _ <tuple-boa> ]
     ] [

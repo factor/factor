@@ -127,7 +127,7 @@ ERROR: local-allocation-error ;
     ;
 
 MACRO: (simple-local-allot) ( c-type -- quot )
-    [ depends-on-c-type ]
+    [ add-depends-on-c-type ]
     [ dup '[ _ heap-size _ c-type-align (local-allot) ] ] bi ;
 
 : [hairy-local-allot] ( c-type initial -- quot )
