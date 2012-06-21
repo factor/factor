@@ -29,7 +29,7 @@ GENERIC: command-word ( command -- word )
         H{ } clone [ "commands" set-word-prop ] keep
     ] ?if ;
 
-: command-map ( group class -- command-map )
+: get-command-at ( group class -- command-map )
     commands at ;
 
 : command-gestures ( class -- hash )
