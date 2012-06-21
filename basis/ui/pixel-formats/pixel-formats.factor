@@ -58,9 +58,6 @@ TUPLE: pixel-format < disposable world handle ;
 M: pixel-format dispose*
     [ (free-pixel-format) ] [ f >>handle drop ] bi ;
 
-: pixel-format-attribute ( pixel-format attribute-name -- value )
-    (pixel-format-attribute) ;
-
 <PRIVATE
 
 FUNCTOR: define-pixel-format-attribute-table ( NAME PERM TABLE -- )
