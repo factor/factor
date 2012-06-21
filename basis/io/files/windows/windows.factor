@@ -327,8 +327,7 @@ SLOT: attributes
 
 M: windows cwd
     MAX_UNICODE_PATH dup ushort <c-array>
-    [ GetCurrentDirectory win32-error=0/f ] keep
-    utf16n alien>string ;
+    [ GetCurrentDirectory win32-error=0/f ] keep alien>native-string ;
 
 M: windows cd
     SetCurrentDirectory win32-error=0/f ;
