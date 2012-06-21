@@ -92,7 +92,7 @@ M: word combinator? inline? ;
     drop [ clear-compiler-error ] [ deoptimize* ] bi ;
 
 : remember-error ( word error -- * )
-    [ swap <compiler-error> compiler-error ]
+    [ swap <compiler-error> save-compiler-error ]
     [ [ drop ] [ not-compiled-def ] 2bi deoptimize-with ]
     2bi ;
 
