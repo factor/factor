@@ -83,7 +83,7 @@ SYMBOL: describe-words
             [ vocab-tags [ \ $tags prefix , ] when* ]
             [ summary [ { $heading "Summary" } swap 2array , ] when* ]
             [ drop \ $nl , ]
-            [ vocab-help [ article content>> % ] when* ]
+            [ vocab-help [ lookup-article content>> % ] when* ]
             [ name>> fuel-vocab-describe-words , ]
             [ name>> fuel-vocab-children-help % ]
         } cleave
