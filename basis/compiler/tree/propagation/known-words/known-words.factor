@@ -314,7 +314,7 @@ generic-comparison-ops [
     dup literal>> classoid?
     [
         literal>>
-        [ depends-on-class ]
+        [ add-depends-on-class ]
         [ predicate-output-infos ]
         bi
     ] [ 2drop object-info ] if

@@ -167,7 +167,7 @@ ERROR: bad-partial-eval quot word ;
 : inline-new ( class -- quot/f )
     dup tuple-class? [
         dup tuple-layout
-        [ depends-on-tuple-layout ]
+        [ add-depends-on-tuple-layout ]
         [ drop all-slots [ initial>> literalize ] [ ] map-as ]
         [ nip ]
         2tri
@@ -318,7 +318,7 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
 ! We want to constant-fold calls to heap-size, and recompile those
 ! calls when a C type is redefined
 \ heap-size [
-    [ depends-on-c-type ] [ heap-size '[ _ ] ] bi
+    [ add-depends-on-c-type ] [ heap-size '[ _ ] ] bi
 ] 1 define-partial-eval
 
 ! Eliminates a few redundant checks here and there
