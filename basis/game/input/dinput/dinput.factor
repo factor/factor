@@ -24,7 +24,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : create-dinput ( -- )
     f GetModuleHandle DIRECTINPUT_VERSION IDirectInput8W-iid
-    f void* <ref> [ f DirectInput8Create ole32-error ] keep void* deref
+    f void* <ref> [ f DirectInput8Create check-ole32-error ] keep void* deref
     +dinput+ set-global ;
 
 : delete-dinput ( -- )
@@ -32,14 +32,14 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : device-for-guid ( guid -- device )
     +dinput+ get-global swap f void* <ref>
-    [ f IDirectInput8W::CreateDevice ole32-error ] keep void* deref ;
+    [ f IDirectInput8W::CreateDevice check-ole32-error ] keep void* deref ;
 
 : set-coop-level ( device -- )
     +device-change-window+ get-global DISCL_BACKGROUND DISCL_NONEXCLUSIVE bitor
-    IDirectInputDevice8W::SetCooperativeLevel ole32-error ; inline
+    IDirectInputDevice8W::SetCooperativeLevel check-ole32-error ; inline
 
 : set-data-format ( device format-symbol -- )
-    get-global IDirectInputDevice8W::SetDataFormat ole32-error ; inline
+    get-global IDirectInputDevice8W::SetDataFormat check-ole32-error ; inline
 
 : <buffer-size-diprop> ( size -- DIPROPDWORD )
     DIPROPDWORD <struct> [
@@ -53,7 +53,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : set-buffer-size ( device size -- )
     DIPROP_BUFFERSIZE swap <buffer-size-diprop>
-    IDirectInputDevice8W::SetProperty ole32-error ;
+    IDirectInputDevice8W::SetProperty check-ole32-error ;
 
 : configure-keyboard ( keyboard -- )
     [ c_dfDIKeyboard_HID set-data-format ] [ set-coop-level ] bi ;
@@ -80,11 +80,11 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 : device-info ( device -- DIDEVICEIMAGEINFOW )
     DIDEVICEINSTANCEW <struct>
         DIDEVICEINSTANCEW heap-size >>dwSize
-    [ IDirectInputDevice8W::GetDeviceInfo ole32-error ] keep ; inline
+    [ IDirectInputDevice8W::GetDeviceInfo check-ole32-error ] keep ; inline
 : device-caps ( device -- DIDEVCAPS )
     DIDEVCAPS <struct>
         DIDEVCAPS heap-size >>dwSize
-    [ IDirectInputDevice8W::GetCapabilities ole32-error ] keep ; inline
+    [ IDirectInputDevice8W::GetCapabilities check-ole32-error ] keep ; inline
 
 : device-guid ( device -- guid )
     device-info guidInstance>> ; inline
@@ -113,7 +113,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 : find-device-axes ( device controller-state -- controller-state )
     swap [ +controller-devices+ get-global set-at ] 2keep
     find-device-axes-callback over DIDFT_AXIS
-    IDirectInputDevice8W::EnumObjects ole32-error ;
+    IDirectInputDevice8W::EnumObjects check-ole32-error ;
 
 : controller-state-template ( device -- controller-state )
     controller-state new
@@ -150,7 +150,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : find-controllers ( -- )
     +dinput+ get-global DI8DEVCLASS_GAMECTRL find-controller-callback
-    f DIEDFL_ATTACHEDONLY IDirectInput8W::EnumDevices ole32-error ;
+    f DIEDFL_ATTACHEDONLY IDirectInput8W::EnumDevices check-ole32-error ;
 
 : set-up-controllers ( -- )
     4 <vector> +controller-devices+ set-global
@@ -305,7 +305,7 @@ CONSTANT: pov-values
 
 : read-device-buffer ( device buffer count -- buffer count' )
     [ DIDEVICEOBJECTDATA heap-size ] 2dip uint <ref>
-    [ 0 IDirectInputDevice8W::GetDeviceData ole32-error ] 2keep uint deref ;
+    [ 0 IDirectInputDevice8W::GetDeviceData check-ole32-error ] 2keep uint deref ;
 
 : (fill-mouse-state) ( state DIDEVICEOBJECTDATA -- state )
     [ dwData>> 32 >signed ] [ dwOfs>> ] bi {
@@ -319,9 +319,9 @@ CONSTANT: pov-values
     iota [ +mouse-state+ get-global ] 2dip swap [ nth (fill-mouse-state) ] curry each ;
 
 : get-device-state ( device DIJOYSTATE2 -- )
-    [ dup IDirectInputDevice8W::Poll ole32-error ] dip
+    [ dup IDirectInputDevice8W::Poll check-ole32-error ] dip
     [ byte-length ] keep
-    IDirectInputDevice8W::GetDeviceState ole32-error ;
+    IDirectInputDevice8W::GetDeviceState check-ole32-error ;
 
 : (read-controller) ( handle template -- state )
     swap [ DIJOYSTATE2 <struct> [ get-device-state ] keep ]
@@ -332,7 +332,7 @@ M: dinput-game-input-backend read-controller
     [ (read-controller) ] [ drop f ] if* ;
 
 M: dinput-game-input-backend calibrate-controller
-    handle>> f 0 IDirectInputDevice8W::RunControlPanel ole32-error ;
+    handle>> f 0 IDirectInputDevice8W::RunControlPanel check-ole32-error ;
 
 M: dinput-game-input-backend read-keyboard
     +keyboard-device+ get-global
