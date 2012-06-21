@@ -248,7 +248,7 @@ PRIVATE>
         1 >>fill
         { 5 5 } >>gap
         swap
-        [ [ "toolbar" ] dip class-of command-map commands>> ]
+        [ [ "toolbar" ] dip class-of get-command-at commands>> ]
         [ '[ [ _ ] 2dip <command-button> add-gadget ] ]
         bi assoc-each ;
 
