@@ -107,7 +107,7 @@ PRIVATE>
 
 ! Help support
 
-: fuel-get-article ( name -- ) article fuel-eval-set-result ;
+: fuel-get-article ( name -- ) lookup-article fuel-eval-set-result ;
 
 : fuel-get-article-title ( name -- )
     articles get at [ article-title ] [ f ] if* fuel-eval-set-result ;

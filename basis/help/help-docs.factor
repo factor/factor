@@ -131,7 +131,7 @@ ARTICLE: "help-impl" "Help system implementation"
 }
 "Help article implementation:"
 { $subsections
-    article
+    lookup-article
     articles
 }
 "Links:"
