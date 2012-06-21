@@ -197,7 +197,7 @@ M: no-next-method summary
 M: inconsistent-next-method summary
     drop "Executing call-next-method with inconsistent parameters" ;
 
-M: check-method summary
+M: check-method-error summary
     drop "Invalid parameters for create-method" ;
 
 M: not-a-tuple summary
