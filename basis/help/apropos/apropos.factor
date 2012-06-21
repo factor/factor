@@ -73,21 +73,21 @@ M: more-completions article-content
     [ dup articles-matching article-result (apropos) ]
     tri 3array print-element ;
 
-TUPLE: apropos search ;
+TUPLE: apropos-search text ;
 
-C: <apropos> apropos
+C: <apropos-search> apropos-search
 
-M: apropos valid-article? drop t ;
+M: apropos-search valid-article? drop t ;
 
-M: apropos article-title
-    search>> "Search results for “" "”" surround ;
+M: apropos-search article-title
+    text>> "Search results for “" "”" surround ;
 
-M: apropos article-content
-    search>> 1array \ $apropos prefix ;
+M: apropos-search article-content
+    text>> 1array \ $apropos prefix ;
 
-M: apropos >link ;
+M: apropos-search >link ;
 
-INSTANCE: apropos topic
+INSTANCE: apropos-search topic
 
 : apropos ( str -- )
-    [ blank? ] trim <apropos> print-topic ;
+    [ blank? ] trim <apropos-search> print-topic ;
