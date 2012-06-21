@@ -247,12 +247,12 @@ M: code-blocks nth-unsafe
 
 INSTANCE: code-blocks immutable-sequence
 
-: code-blocks ( -- blocks )
+: get-code-blocks ( -- blocks )
     (code-blocks) <code-blocks> ;
 
 : with-code-blocks ( quot -- )
     [
-        code-blocks
+        get-code-blocks
         [ \ code-blocks set ]
         [ first entry-point>> code-heap-start set ]
         [ last [ entry-point>> ] [ size>> ] bi + code-heap-end set ] tri
@@ -294,7 +294,7 @@ PRIVATE>
 : code-room. ( -- )
     "== Code heap ==" print nl
     code-room mark-sweep-table. nl
-    code-blocks code-block-stats code-block-table. ;
+    get-code-blocks code-block-stats code-block-table. ;
 
 : room. ( -- )
     data-room. nl code-room. ;
