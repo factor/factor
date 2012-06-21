@@ -1,6 +1,6 @@
 ! (c)2012 Joe Groff bsd license
 USING: alien.data alien.strings io.directories
-io.encodings.utf16n io.files.temp io.pathnames kernel math
+io.files.temp io.pathnames kernel math
 memoize specialized-arrays system windows.errors
 windows.kernel32 windows.ole32 windows.shell32
 windows.types ;
@@ -12,7 +12,7 @@ IN: io.files.temp.windows
 : (get-temp-directory) ( -- path )
     MAX_PATH 1 + dup WCHAR <c-array> [ GetTempPath ] keep
     swap win32-error=0/f
-    utf16n alien>string ;
+    alien>native-string ;
 
 : (get-appdata-directory) ( -- path )
     f
@@ -22,7 +22,7 @@ IN: io.files.temp.windows
     MAX_PATH 1 + WCHAR <c-array>
     [ SHGetFolderPath ] keep
     swap ole32-error
-    utf16n alien>string ;
+    alien>native-string ;
 
 PRIVATE>
 

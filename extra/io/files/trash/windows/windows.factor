@@ -52,7 +52,7 @@ PRIVATE>
 
 M: windows send-to-trash ( path -- )
     [
-        utf16n string>alien B{ 0 0 } append
+        native-string>alien B{ 0 0 } append
         malloc-byte-array &free
 
         SHFILEOPSTRUCTW <struct>

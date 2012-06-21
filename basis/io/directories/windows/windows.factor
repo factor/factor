@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system io.directories io.encodings.utf16n alien.strings
+USING: system io.directories alien.strings
 io.pathnames io.backend io.files.windows destructors
 kernel accessors calendar windows windows.errors
 windows.kernel32 alien.c-types sequences splitting
@@ -64,7 +64,7 @@ M: windows delete-directory ( path -- )
 TUPLE: windows-directory-entry < directory-entry attributes ;
 
 M: windows >directory-entry ( byte-array -- directory-entry )
-    [ cFileName>> utf16n alien>string ]
+    [ cFileName>> alien>native-string ]
     [
         dwFileAttributes>>
         [ win32-file-type ] [ win32-file-attributes ] bi
