@@ -23,12 +23,12 @@ IN: ui.commands
 : $command-map ( element -- )
     [ second (command-name) " commands" append $heading ]
     [
-        first2 swap command-map
+        first2 swap get-command-at
         [ blurb>> print-element ] [ commands>> command-map. ] bi
     ] bi ;
 
 : $command ( element -- )
-    reverse first3 command-map
+    reverse first3 get-command-at
     commands>> value-at gesture>string
     $snippet ;
 
