@@ -1,7 +1,7 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs byte-arrays combinators combinators.short-circuit
 continuations game.input game.input.dinput.keys-array
-io.encodings.utf16 io.encodings.utf16n kernel locals math
+io.encodings.utf16n kernel locals math
 math.bitwise math.rectangles namespaces parser sequences shuffle
 specialized-arrays ui.backend.windows vectors windows.com
 windows.directx.dinput windows.directx.dinput.constants
@@ -259,7 +259,7 @@ M: dinput-game-input-backend get-controllers
 
 M: dinput-game-input-backend product-string
     handle>> device-info tszProductName>>
-    utf16n alien>string ;
+    alien>native-string ;
 
 M: dinput-game-input-backend product-id
     handle>> device-info guidProduct>> ;

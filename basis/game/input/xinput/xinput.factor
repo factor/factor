@@ -1,7 +1,7 @@
 USING: game.input math math.order kernel macros fry sequences quotations
 arrays windows.directx.xinput combinators accessors windows.types
 game.input.dinput sequences.private namespaces classes.struct
-windows.errors windows.com.syntax io.encodings.utf16n alien.strings ;
+windows.errors windows.com.syntax alien.strings ;
 IN: game.input.xinput
 
 SINGLETON: xinput-game-input-backend
@@ -98,7 +98,7 @@ M: xinput-game-input-backend get-controllers
 M: xinput-game-input-backend product-string
     dup number?
     [ drop "Controller (Xbox 360 Wireless Receiver for Windows)" ]
-    [ handle>> device-info tszProductName>> utf16n alien>string ]
+    [ handle>> device-info tszProductName>> alien>native-string ]
     if ;
 
 M: xinput-game-input-backend product-id
