@@ -1,4 +1,4 @@
-USING: splitting tools.test kernel sequences arrays strings ascii ;
+USING: splitting tools.test kernel sequences arrays strings ascii math ;
 IN: splitting.tests
 
 [ "hello" "world ." ] [ "hello world ." " " split1 ] unit-test
@@ -64,3 +64,14 @@ unit-test
 [ "" f ] [ "" [ blank? ] split1-when ] unit-test
 [ "" "ABC" ] [ " ABC" [ blank? ] split1-when ] unit-test
 [ "a" " bc" ] [ "a  bc" [ blank? ] split1-when ] unit-test
+
+{ { } } [ { } { 0 } split* ] unit-test
+{ { { 1 2 3 } } } [ { 1 2 3 } { 0 } split* ] unit-test
+{ { { 0 } } } [ { 0 } { 0 } split* ] unit-test
+{ { { 0 } { 0 } } } [ { 0 0 } { 0 } split* ] unit-test
+{ { { 1 2 0 } { 3 0 } { 0 } } } [ { 1 2 0 3 0 0 } { 0 } split* ] unit-test
+
+{ { } } [ { } [ 0 > ] split*-when ] unit-test
+{ { { 0 } } } [ { 0 } [ 0 > ] split*-when ] unit-test
+{ { { 0 0 } } } [ { 0 0 } [ 0 > ] split*-when ] unit-test
+{ { { 1 } { 2 } { 0 3 } { 0 0 } } } [ { 1 2 0 3 0 0 } [ 0 > ] split*-when ] unit-test
