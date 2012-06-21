@@ -12,7 +12,7 @@ M: windows os-env ( key -- value )
     [ dup length GetEnvironmentVariable ] keep over 0 = [
         2drop f
     ] [
-        nip utf16n alien>string
+        nip alien>native-string
     ] if ;
 
 M: windows set-os-env ( value key -- )
