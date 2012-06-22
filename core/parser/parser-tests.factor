@@ -470,7 +470,7 @@ DEFER: foo
 
 [ t ] [ "staging-problem-test-2" "parser.tests" lookup-word >boolean ] unit-test
 
-[ "DEFER: blahy" eval( -- ) ] [ error>> error>> no-current-vocab? ] must-fail-with
+[ "DEFER: blahy" eval( -- ) ] [ error>> error>> no-current-vocab-error? ] must-fail-with
 
 [
     "IN: parser.tests SYNTAX: blahy ; FORGET: blahy" eval( -- )
