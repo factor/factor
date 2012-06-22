@@ -12,7 +12,9 @@ $nl
 "Interactors implement the " { $link stream-readln } ", " { $link stream-read } " and " { $link stream-read-quot } " generic words." } ;
 
 ARTICLE: "ui-listener" "UI listener"
-"The graphical listener adds input history and word and vocabulary completion. See " { $link "listener" } " for general information on the listener."
+"The graphical listener adds input history and word and vocabulary completion. A summary with any outstanding error conditions is displayed before every prompt (see " { $link "ui.tools.error-list" } " for details)."
+$nl
+"See " { $link "listener" } " for general information on the listener."
 { $command-map listener-gadget "toolbar" }
 { $command-map interactor "completion" }
 { $command-map interactor "interactor" }
@@ -28,7 +30,33 @@ ARTICLE: "ui-listener" "UI listener"
 { $heading "Editing commands" }
 "The text editing commands are standard; see " { $link "gadgets-editors-commands" } "."
 $nl
-"The listener displays a summary with any outstanding error conditions before every prompt. See " { $link "ui.tools.error-list" } " for details."
+"If you want to add support for Emacs-style text entry, specifically the following:"
+$nl
+{ $table
+    { "Ctrl-k" "Delete to end of line" }
+    { "Ctrl-a" "Move cursor to start of line" }
+    { "Ctrl-e" "Move cursor to end of line" }
+}
+$nl
+"Then you can run the following code, or add it to your " { $link ".factor-rc" } "."
+$nl
+{ $code
+    """USING: accessors assocs kernel sequences sets ui.commands
+ui.gadgets.editors ui.gestures ui.tools.listener ;
+
+"multiline" multiline-editor get-command-at [
+    {
+        { T{ key-down f { C+ } "k" } delete-to-end-of-line }
+        { T{ key-down f { C+ } "a" } start-of-line }
+        { T{ key-down f { C+ } "e" } end-of-line }
+    } append members
+] change-commands drop multiline-editor update-gestures
+
+"interactor" interactor get-command-at [
+    [ drop T{ key-down f { C+ } "k" } = not ] assoc-filter
+] change-commands drop interactor update-gestures"""
+}
+$nl
 { $heading "Implementation" }
 "Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } ") and an input area (instance of " { $link interactor } "). Clickable presentations can also be printed to the listener; see " { $link "ui-presentations" } "." ;
 
