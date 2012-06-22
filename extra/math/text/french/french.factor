@@ -49,11 +49,8 @@ MEMO: units ( -- seq ) ! up to 10^99
 
 : smaller-than-100 ( n -- str ) 80 base-onto ;
 
-: if-zero ( n quot quot -- )
-    [ dup zero? ] 2dip [ [ drop ] prepose ] dip if ; inline
-
 : complete ( str n -- newstr )
-    [ ] [ basic space-append ] if-zero ;
+    [ basic space-append ] unless-zero ;
 
 : smaller-than-1000 ( n -- str )
     100 /mod
