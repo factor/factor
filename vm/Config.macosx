@@ -24,7 +24,7 @@ LINKER = $(CPP) $(CFLAGS) -dynamiclib -single_module \
 LINK_WITH_ENGINE = -lfactor
 
 LEOPARD_P := $(shell [[ `uname -r | sed -E -e 's/^([0-9]+).*/\1/'` -le 9 ]]; echo $$?)
-XCODE_4_P := $(shell [[ `xcodebuild -version | sed -E -ne 's/^Xcode ([0-9]+).([0-9])/\1\2/p'` -ge 43 ]]; echo $$?)
+XCODE_4_P := $(shell [[ `xcodebuild -version | sed -E -ne 's/^Xcode ([0-9]+).([0-9]).*/\1\2/p'` -ge 43 ]]; echo $$?)
 
 ifeq ($(LEOPARD_P),0)
 	CC = gcc-4.2
