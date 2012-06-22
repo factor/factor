@@ -349,7 +349,7 @@ M: real atan >float atan ; inline
 
 : floor ( x -- y )
     dup 1 mod
-    [ ] [ dup 0 < [ - 1 - ] [ - ] if ] if-zero ; foldable
+    [ dup 0 < [ - 1 - ] [ - ] if ] unless-zero ; foldable
 
 : ceiling ( x -- y ) neg floor neg ; foldable
 
@@ -373,7 +373,7 @@ M: complex signum dup abs / ;
 
 MATH: copysign ( x y -- x' )
 
-M: real copysign [ >float ] bi@ copysign ;
+M: real copysign >float copysign ;
 
 M: float copysign
     [ double>bits ] [ fp-sign ] bi*
