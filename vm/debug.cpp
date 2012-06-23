@@ -182,6 +182,7 @@ void factor_vm::print_nested_obj(cell obj, fixnum nesting)
 		std::cout << (void*)obj << ">";
 		break;
 	}
+	std::cout << std::flush;
 }
 
 void factor_vm::print_obj(cell obj)
@@ -252,6 +253,12 @@ void factor_vm::print_callstack()
 	}
 	else
 		std::cout << "*** Context not initialized" << std::endl;
+}
+
+void factor_vm::print_callstack_object(callstack *obj)
+{
+	stack_frame_printer printer(this);
+	iterate_callstack_object(obj,printer);
 }
 
 struct padded_address {

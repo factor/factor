@@ -65,7 +65,7 @@ M: local protocol drop 0 ;
 
 SLOT: port
 
-TUPLE: ipv4 { host maybe: string read-only } ;
+TUPLE: ipv4 { host maybe{ string } read-only } ;
 
 <PRIVATE
 
@@ -131,7 +131,7 @@ M: inet4 present
 M: inet4 protocol drop 0 ;
 
 TUPLE: ipv6
-{ host maybe: string read-only }
+{ host maybe{ string } read-only }
 { scope-id integer read-only } ;
 
 <PRIVATE
@@ -281,6 +281,8 @@ TUPLE: raw-port < port addr ;
 
 HOOK: (raw) io-backend ( addr -- raw )
 
+HOOK: (broadcast) io-backend ( datagram -- datagram )
+
 HOOK: (receive-unsafe) io-backend ( n buf datagram -- size addrspec )
 
 ERROR: invalid-port object ;
@@ -363,6 +365,9 @@ SYMBOL: remote-address
         >>addr
     ] with-destructors ;
 
+: <broadcast> ( addrspec -- datagram )
+    <datagram> (broadcast) ;
+
 : receive-unsafe ( n buf datagram -- count addrspec )
     check-receive
     [ (receive-unsafe) ] [ addr>> ] bi parse-sockaddr ; inline
@@ -393,7 +398,7 @@ GENERIC: resolve-host ( addrspec -- seq )
 
 HOOK: resolve-localhost os ( -- obj )
 
-TUPLE: hostname { host maybe: string read-only } ;
+TUPLE: hostname { host maybe{ string } read-only } ;
 
 TUPLE: inet < hostname port ;
 

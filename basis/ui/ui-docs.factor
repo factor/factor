@@ -1,8 +1,9 @@
-USING: help.markup help.syntax strings quotations debugger
-namespaces ui.backend ui.gadgets ui.gadgets.worlds
-ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
-ui.gadgets.private math.rectangles colors ui.text fonts
-kernel ui.private vocabs.loader classes sequences ;
+USING: classes colors debugger fonts help.markup help.syntax kernel
+math.rectangles namespaces quotations sequences strings ui.backend
+ui.gadgets ui.gadgets.books ui.gadgets.grids ui.gadgets.packs
+ui.gadgets.private ui.gadgets.tracks ui.gadgets.worlds ui.private ui.text
+vocabs.loader ;
+
 IN: ui
 
 HELP: windows

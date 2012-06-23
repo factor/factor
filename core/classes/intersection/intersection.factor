@@ -51,6 +51,9 @@ M: anonymous-intersection (flatten-class)
         [ dup set ] each
     ] if-empty ;
 
+M: anonymous-intersection class-name
+    participants>> [ class-name ] map " " join ;
+
 PRIVATE>
 
 : define-intersection-class ( class participants -- )

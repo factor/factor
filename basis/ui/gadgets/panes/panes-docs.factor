@@ -47,6 +47,10 @@ HELP: <pane-stream>
 
 { with-pane make-pane } related-words
 
+HELP: content-gadget
+{ $values { "object" object } { "gadget/f" { $maybe gadget } } }
+{ $description "This generic function may be implemented for objects in order to display a rich representation of the object in the " { $link "ui-inspector" } ". If " { $snippet "content-gadget" } " returns a gadget for an inspected object, the returned gadget is displayed under the \"Content\" heading in the inspector window. If " { $snippet "content-gadget" } " returns " { $link POSTPONE: f } ", no content section is included in the given object's inspector." } ;
+
 ARTICLE: "ui.gadgets.panes" "Pane gadgets"
 "The " { $vocab-link "ui.gadgets.panes" } " vocabulary implements panes, which display formatted text."
 { $subsections

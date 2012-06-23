@@ -89,7 +89,8 @@ bool quotation_jit::special_subprimitive_p(cell obj)
 	return obj == parent->special_objects[SIGNAL_HANDLER_WORD]
 		|| obj == parent->special_objects[LEAF_SIGNAL_HANDLER_WORD]
 		|| obj == parent->special_objects[FFI_SIGNAL_HANDLER_WORD]
-		|| obj == parent->special_objects[FFI_LEAF_SIGNAL_HANDLER_WORD];
+		|| obj == parent->special_objects[FFI_LEAF_SIGNAL_HANDLER_WORD]
+		|| obj == parent->special_objects[UNWIND_NATIVE_FRAMES_WORD];
 }
 
 bool quotation_jit::word_stack_frame_p(cell obj)
@@ -239,7 +240,7 @@ void quotation_jit::iterate_quotation()
 				push(obj.value());
 			break;
 		case QUOTATION_TYPE:
-			/* 'if' preceeded by two literal quotations (this is why if and ? are
+			/* 'if' preceded by two literal quotations (this is why if and ? are
 			   mutually recursive in the library, but both still work) */
 			if(fast_if_p(i,length))
 			{
@@ -280,11 +281,15 @@ void quotation_jit::iterate_quotation()
 			/* Method dispatch */
 			if(mega_lookup_p(i,length))
 			{
+				fixnum index = untag_fixnum(array_nth(elements.untagged(),i + 1));
+				/* Load the object from the datastack, then remove our stack frame. */
+				emit_with_literal(parent->special_objects[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
 				emit_epilog(safepoint, stack_frame);
 				tail_call = true;
+
 				emit_mega_cache_lookup(
 					array_nth(elements.untagged(),i),
-					untag_fixnum(array_nth(elements.untagged(),i + 1)),
+					index,
 					array_nth(elements.untagged(),i + 2));
 				i += 3;
 			}

@@ -7,7 +7,8 @@ colors.constants combinators continuations effects generic
 hash-sets hashtables io io.pathnames io.styles kernel
 make math math.order math.parser namespaces prettyprint.config
 prettyprint.custom prettyprint.sections prettyprint.stylesheet
-quotations sbufs sequences strings vectors words words.symbol ;
+quotations sbufs sequences strings vectors words words.symbol
+classes.private ;
 FROM: sets => members ;
 IN: prettyprint.backend
 
@@ -26,13 +27,16 @@ M: effect pprint* effect>string text ;
 GENERIC: word-name* ( obj -- str )
 
 M: maybe word-name*
-    class>> word-name* "maybe: " prepend ;
+    class-name "maybe{ " " }" surround ;
+
+M: anonymous-complement word-name*
+    class-name "not{ " " }" surround ;
 
 M: anonymous-union word-name*
-    members>> [ word-name* ] map " " join "union{ " " }" surround ;
+    class-name "union{ " " }" surround ;
 
 M: anonymous-intersection word-name*
-    participants>> [ word-name* ] map " " join "intersection{ " " }" surround ;
+    class-name "intersection{ " " }" surround ;
 
 M: word word-name* ( word -- str )
     [ name>> "( no name )" or ] [ record-vocab ] bi ;
@@ -191,7 +195,7 @@ M: tuple pprint*
 : do-length-limit ( seq -- trimmed n/f )
     length-limit get dup [
         over length over [-]
-        dup zero? [ 2drop f ] [ [ head-slice ] dip ] if
+        [ drop f ] [ [ head-slice ] dip ] if-zero
     ] when ;
 
 : pprint-elements ( seq -- )
@@ -213,6 +217,8 @@ M: callstack pprint-delims drop \ CS{ \ } ;
 M: hash-set pprint-delims drop \ HS{ \ } ;
 M: anonymous-union pprint-delims drop \ union{ \ } ;
 M: anonymous-intersection pprint-delims drop \ intersection{ \ } ;
+M: anonymous-complement pprint-delims drop \ not{ \ } ;
+M: maybe pprint-delims drop \ maybe{ \ } ;
 
 M: object >pprint-sequence ;
 M: vector >pprint-sequence ;
@@ -224,6 +230,8 @@ M: callstack >pprint-sequence callstack>array ;
 M: hash-set >pprint-sequence members ;
 M: anonymous-union >pprint-sequence members>> ;
 M: anonymous-intersection >pprint-sequence participants>> ;
+M: anonymous-complement >pprint-sequence class>> 1array ;
+M: maybe >pprint-sequence class>> 1array ;
 
 : class-slot-sequence ( class slots -- sequence )
     [ 1array ] [ [ f 2array ] dip append ] if-empty ;
@@ -264,6 +272,8 @@ M: compose pprint* pprint-object ;
 M: hash-set pprint* pprint-object ;
 M: anonymous-union pprint* pprint-object ;
 M: anonymous-intersection pprint* pprint-object ;
+M: anonymous-complement pprint* pprint-object ;
+M: maybe pprint* pprint-object ;
 
 M: wrapper pprint*
     {
@@ -271,6 +281,3 @@ M: wrapper pprint*
         { [ dup wrapped>> word? ] [ <block \ \ pprint-word wrapped>> pprint-word block> ] }
         [ pprint-object ]
     } cond ;
-
-M: maybe pprint*
-    <block \ maybe: pprint-word class>> pprint-class block> ;

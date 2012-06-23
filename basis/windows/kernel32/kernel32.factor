@@ -1402,7 +1402,8 @@ ALIAS: GetSystemWindowsDirectory GetSystemWindowsDirectoryW
 ! FUNCTION: GetTempFileNameA
 ! FUNCTION: GetTempFileNameW
 ! FUNCTION: GetTempPathA
-! FUNCTION: GetTempPathW
+FUNCTION: DWORD GetTempPathW ( DWORD nBufferLength, LPWSTR lpBuffer ) ;
+ALIAS: GetTempPath GetTempPathW
 ! FUNCTION: GetThreadContext
 ! FUNCTION: GetThreadIOPendingFlag
 ! FUNCTION: GetThreadLocale

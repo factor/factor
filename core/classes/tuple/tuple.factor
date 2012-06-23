@@ -93,13 +93,15 @@ ERROR: bad-superclass class ;
         ] [ 2drop f ] if
     ] [ 2drop f ] if ; inline
 
-GENERIC: final-class? ( class -- ? )
+GENERIC: final-class? ( object -- ? )
 
 M: tuple-class final-class? "final" word-prop ;
 
 M: builtin-class final-class? tuple eq? not ;
 
 M: class final-class? drop t ;
+
+M: object final-class? drop f ;
 
 <PRIVATE
 
@@ -247,7 +249,8 @@ M: tuple-class update-class
     bi-curry* bi and ;
 
 : check-superclass ( superclass -- )
-    dup final-class? [ bad-superclass ] when drop ;
+    dup final-class? [ bad-superclass ] when
+    dup class? [ bad-superclass ] unless drop ;
 
 GENERIC# (define-tuple-class) 2 ( class superclass slots -- )
 

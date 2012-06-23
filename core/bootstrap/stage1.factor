@@ -37,6 +37,8 @@ load-help? off
     [
         f parser-quiet? set-global
 
+        init-resource-path
+
         "resource:basis/bootstrap/stage2.factor"
         dup exists? [
             run-file

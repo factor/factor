@@ -26,7 +26,7 @@ M: linkage-error error-type drop +linkage-error+ ;
     compiler-errors linkage-errors
     [ get-global delete-at ] bi-curry@ bi ;
 
-: compiler-error ( error -- )
+: save-compiler-error ( error -- )
     dup asset>> compiler-errors get-global set-at ;
 
 T{ error-type
@@ -61,13 +61,13 @@ TUPLE: no-such-library name message ;
 
 M: no-such-library summary drop "Library not found" ;
 
-: no-such-library ( name message word -- ) \ no-such-library linkage-error ;
+: no-such-library-error ( name message word -- ) \ no-such-library linkage-error ;
 
 TUPLE: no-such-symbol name message ;
 
 M: no-such-symbol summary drop "Symbol not found" ;
 
-: no-such-symbol ( name message word -- ) \ no-such-symbol linkage-error ;
+: no-such-symbol-error ( name message word -- ) \ no-such-symbol linkage-error ;
 
 ERROR: not-compiled word error ;
 

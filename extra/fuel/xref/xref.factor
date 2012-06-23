@@ -62,7 +62,7 @@ PRIVATE>
 
 : doc-location ( word -- loc ) props>> "help-loc" swap at get-loc ;
 
-: article-location ( name -- loc ) article loc>> get-loc ;
+: article-location ( name -- loc ) lookup-article loc>> get-loc ;
 
 : get-vocabs ( -- seq ) all-vocab-names ;
 

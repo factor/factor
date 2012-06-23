@@ -121,7 +121,6 @@ C: <rendered-line> rendered-line
         line line-rect :> rect
         rect origin>> CGPoint>loc :> (loc)
         rect size>> CGSize>dim :> (dim)
-        (loc) (dim) v+ :> (ext)
         (loc) [ floor ] map :> loc
         (loc) (dim) [ + ceiling ] 2map :> ext
         ext loc [ - >integer 1 max ] 2map :> dim

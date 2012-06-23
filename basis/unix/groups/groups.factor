@@ -70,10 +70,13 @@ ERROR: no-group string ;
     [ 4 grouping:group ] dip head-slice [ uint deref group-name ] map ;
 
 : (user-groups) ( string -- seq )
-    #! first group is -1337, legacy unix code
-    -1337 unix.ffi:NGROUPS_MAX [ 4 * <byte-array> ] keep
-    int <ref> [ [ unix.ffi:getgrouplist ] unix-system-call drop ] 2keep
-    [ 4 tail-slice ] [ int deref 1 - ] bi* >groups ;
+    dup user-passwd [
+        gid>> 64 [ 4 * <byte-array> ] keep
+        int <ref> [ [ unix.ffi:getgrouplist ] unix-system-call drop ] 2keep
+        int deref >groups
+    ] [
+        drop { }
+    ] if* ;
 
 PRIVATE>
     

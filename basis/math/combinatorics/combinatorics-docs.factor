@@ -36,6 +36,10 @@ HELP: permutation
         "5 { \"apple\" \"banana\" \"orange\" } permutation ." "{ \"orange\" \"banana\" \"apple\" }" }
 } ;
 
+HELP: <permutations>
+{ $values { "seq" sequence } { "permutations" sequence } }
+{ $description "An efficient sequence containing the lexicographical permutations of " { $snippet "seq" } "." } ;
+
 HELP: all-permutations
 { $values { "seq" sequence } { "seq'" sequence } }
 { $description "Outputs a sequence containing all permutations of " { $snippet "seq" } " in lexicographical order." }
@@ -70,6 +74,10 @@ HELP: combination
         "0 { \"a\" \"b\" \"c\" \"d\" } 2 combination ." "{ \"a\" \"b\" }" }
 } ;
 
+HELP: <combinations>
+{ $values { "seq" sequence } { "k" "a non-negative integer" } { "combinations" sequence } }
+{ $description "An efficient sequence containing the combinations of " { $snippet "seq" } " choosing " { $snippet "k" } " elements." } ;
+
 HELP: all-combinations
 { $values { "seq" sequence } { "k" "a non-negative integer" } { "seq'" sequence } }
 { $description "Outputs a sequence containing all combinations of " { $snippet "seq" } " choosing " { $snippet "k" } " elements, in lexicographical order." }
@@ -102,6 +110,12 @@ HELP: >permutation
 { $description "Converts an integer represented in factoradic form into its corresponding unique permutation (0-based)." }
 { $notes "For clarification, the following two statements are equivalent:" { $code "10 factoradic >permutation" "{ 1 2 0 0 } >permutation" } }
 { $examples { $example "USING: math.combinatorics.private prettyprint ;" "{ 0 0 0 0 } >permutation ." "{ 0 1 2 3 }" } } ;
+
+HELP: next-permutation
+{ $values { "seq" sequence } }
+{ $description "Rearranges the elements in " { $snippet "seq" } " into the lexicographically next greater permutation of elements." }
+{ $notes "Performs an in-place modification of " { $snippet "seq" } "." }
+{ $examples { $example "USING: math.combinatorics prettyprint ;" "\"ABC\" next-permutation ." "\"ACB\"" } } ;
 
 HELP: all-subsets
 { $values { "seq" sequence } { "subsets" sequence } }

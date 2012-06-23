@@ -69,7 +69,7 @@ UNION: wrap-set texture-wrap sequence ;
 TUPLE: texture-parameters
     { wrap wrap-set initial: { repeat-texcoord repeat-texcoord repeat-texcoord } }
     { min-filter texture-filter initial: filter-nearest }
-    { min-mipmap-filter maybe: texture-filter initial: filter-linear }
+    { min-mipmap-filter maybe{ texture-filter } initial: filter-linear }
     { mag-filter texture-filter initial: filter-linear }
     { min-lod integer initial: -1000 }
     { max-lod integer initial:  1000 }

@@ -1,8 +1,7 @@
 USING: alien.data kernel locals math math.bitwise
 windows.kernel32 sequences byte-arrays unicode.categories
-io.encodings.string io.encodings.utf16n alien.strings
-arrays literals windows.types specialized-arrays
-math.parser ;
+io.encodings.string alien.strings arrays literals
+windows.types specialized-arrays math.parser ;
 SPECIALIZED-ARRAY: TCHAR
 IN: windows.errors
 
@@ -716,7 +715,7 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   0x000000FF
     f pick [ FormatMessage ] dip
     swap zero?
     [ drop "Unknown error 0x" id 0xffff,ffff bitand >hex append ]
-    [ utf16n alien>string [ blank? ] trim ] if ;
+    [ alien>native-string [ blank? ] trim ] if ;
 
 : win32-error-string ( -- str )
     GetLastError n>win32-error-string ;

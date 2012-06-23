@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays assocs
-byte-arrays byte-vectors combinators fry io.backend io.binary
-kernel locals math math.bitwise math.constants math.functions
-math.order math.ranges namespaces sequences sequences.private
-sets summary system vocabs hints typed ;
+byte-arrays byte-vectors combinators combinators.short-circuit
+fry io.backend io.binary kernel locals math math.bitwise
+math.constants math.functions math.order math.ranges namespaces
+sequences sequences.private sets summary system vocabs hints
+typed ;
 IN: random
 
 SYMBOL: system-random-generator
@@ -100,16 +101,164 @@ ERROR: too-many-samples seq n ;
     4 random-bytes uint deref >float
     2.0 32 ^ * +
     [ over - 2.0 -64 ^ * ] dip
-    * + ; inline
+    * + ; inline    
+
+: random-unit ( -- n )
+    0.0 1.0 uniform-random-float ; inline
+
+: random-units ( length -- sequence )
+    [ random-unit ] replicate ;
+    
+: random-integers ( length n -- sequence )
+    '[ _ random ] replicate ;
 
 : (cos-random-float) ( -- n )
-    0. 2. pi * uniform-random-float cos ;
+    0. 2pi uniform-random-float cos ;
 
 : (log-sqrt-random-float) ( -- n )
-    0. 1. uniform-random-float log -2. * sqrt ;
+    random-unit log -2. * sqrt ;
 
 : normal-random-float ( mean sigma -- n )
     (cos-random-float) (log-sqrt-random-float) * * + ;
+
+: lognormal-random-float ( mean sigma -- n )
+    normal-random-float e^ ;
+
+: exponential-random-float ( lambda -- n )
+    random-unit log neg swap / ;
+
+: weibull-random-float ( alpha beta -- n )
+    [
+        [ random-unit log neg ] dip
+        1. swap / ^
+    ] dip * ;
+
+: pareto-random-float ( k alpha -- n )
+    [ random-unit ] dip recip ^ /f ;
+
+:: (gamma-random-float>1) ( alpha beta -- n )
+    ! Uses R.C.H. Cheng, "The generation of Gamma
+    ! variables with non-integral shape parameters",
+    ! Applied Statistics, (1977), 26, No. 1, p71-74
+    2. alpha * 1 - sqrt :> ainv
+    alpha 4. log -      :> bbb
+    alpha ainv +        :> ccc
+
+    0 :> r! 0 :> z! 0 :> result! ! initialize locals
+    [
+        r {
+            [ 1. 4.5 log + + z 4.5 * - 0 >= ]
+            [ z log >= ]
+        } 1|| not
+    ] [
+        random-unit :> u1
+        random-unit :> u2
+
+        u1 1. u1 - / log ainv / :> v
+        alpha v e^ *           :> x
+        u1 sq u2 *              z!
+        bbb ccc v * + x -       r!
+
+        x beta *                result!
+    ] do while result ;
+
+: (gamma-random-float=1) ( alpha beta -- n )
+    nip random-unit log neg * ;
+
+:: (gamma-random-float<1) ( alpha beta -- n )
+    ! Uses ALGORITHM GS of Statistical Computing - Kennedy & Gentle
+    alpha e + e / :> b
+
+    0 :> x! 0 :> p! ! initialize locals
+    [
+        p 1.0 > [
+            random-unit x alpha 1 - ^ >
+        ] [
+            random-unit x neg e^ >
+        ] if
+    ] [
+        random-unit b * p!
+        p 1.0 <= [
+            p 1. alpha / ^
+        ] [
+            b p - alpha / log neg
+        ] if x!
+    ] do while x beta * ;
+
+: gamma-random-float ( alpha beta -- n )
+    {
+        { [ over 1 > ] [ (gamma-random-float>1) ] }
+        { [ over 1 = ] [ (gamma-random-float=1) ] }
+        [ (gamma-random-float<1) ]
+    } cond ;
+
+: beta-random-float ( alpha beta -- n )
+    [ 1. gamma-random-float ] dip over zero?
+    [ 2drop 0 ] [ 1. gamma-random-float dupd + / ] if ;
+
+:: von-mises-random-float ( mu kappa -- n )
+    ! Based upon an algorithm published in: Fisher, N.I.,
+    ! "Statistical Analysis of Circular Data", Cambridge
+    ! University Press, 1993.
+    kappa 1e-6 <= [
+        2pi random-unit *
+    ] [
+        4. kappa sq * 1. + sqrt 1. + :> a
+        a 2. a * sqrt - 2. kappa * / :> b
+        b sq 1. + 2. b * /           :> r
+
+        0 :> c! 0 :> _f! ! initialize locals
+        [
+            random-unit {
+                [ 2. c - c * < ] [ 1. c - e^ c * <= ]
+            } 1|| not
+        ] [
+            random-unit pi * cos :> z
+            r z * 1. + r z + /   _f!
+            r _f - kappa *       c!
+        ] do while
+
+        mu 2pi mod _f cos random-unit 0.5 > [ + ] [ - ] if
+    ] if ;
+
+:: (triangular-random-float) ( low high mode -- n )
+    mode low - high low - / :> c!
+    random-unit :> u!
+    high low
+    u c > [ 1. u - u! 1. c - c! swap ] when
+    [ - u c * sqrt * ] keep + ;
+
+: triangular-random-float ( low high -- n )
+    2dup + 2 /f (triangular-random-float) ;
+
+: laplace-random-float ( mean scale -- n )
+    random-unit dup 0.5 <
+    [ 2 * log ] [ 1 swap - 2 * log neg ] if * + ;
+
+: cauchy-random-float ( median scale -- n )
+    random-unit 0.5 - pi * tan * + ;
+
+: chi-square-random-float ( dof -- n )
+    [ 0.5 ] dip 2 * gamma-random-float ;
+
+: student-t-random-float ( dof -- n )
+    [ 0 1 normal-random-float ] dip
+    [ chi-square-random-float ] [ / ] bi sqrt / ;
+
+: inv-gamma-random-float ( shape scale -- n )
+    recip gamma-random-float recip ;
+
+: rayleigh-random-float ( mode -- n )
+    random-unit log -2 * sqrt * ;
+
+: gumbel-random-float ( loc scale -- n )
+    random-unit log neg log * - ;
+
+: logistic-random-float ( loc scale -- n )
+    random-unit dup 1 swap - / log * + ;
+
+: power-random-float ( alpha -- n )
+    [ random-unit log e^ 1 swap - ] dip recip ^ ;
 
 {
     { [ os windows? ] [ "random.windows" require ] }

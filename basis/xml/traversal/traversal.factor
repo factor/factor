@@ -49,6 +49,9 @@ PRIVATE>
 : tag-with-attr ( tag attr-value attr-name -- matching-tag )
     assure-name '[ _ _ tag-with-attr? ] find nip ;
 
+: tag-named-with-attr ( tag tag-name attr-value attr-name -- matching-tag )
+    [ tags-named ] 2dip '[ _ _ tag-with-attr? ] find nip ;
+
 : tags-with-attr ( tag attr-value attr-name -- tags-seq )
     assure-name '[ _ _ tag-with-attr? ] { } filter-as ;
 

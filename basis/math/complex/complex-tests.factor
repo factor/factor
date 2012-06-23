@@ -70,8 +70,8 @@ IN: math.complex.tests
 [ ] [ C{ 1 4 } coth drop ] unit-test
 [ ] [ C{ 1 4 } cot drop ] unit-test
 
-[ t ] [ 0.0 pi rect> exp C{ -1 0 } 1.0e-7 ~ ] unit-test
-[ t ] [ 0 pi rect> exp C{ -1 0 } 1.0e-7 ~ ] unit-test
+[ t ] [ 0.0 pi rect> e^ C{ -1 0 } 1.0e-7 ~ ] unit-test
+[ t ] [ 0 pi rect> e^ C{ -1 0 } 1.0e-7 ~ ] unit-test
 
 10 number-base [
     [ "C{ 1/2 2/3 }" ] [ C{ 1/2 2/3 } unparse ] unit-test

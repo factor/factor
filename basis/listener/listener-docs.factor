@@ -18,9 +18,9 @@ ARTICLE: "listener-watch" "Watching variables in the listener"
 "Clearing the watch list:"
 { $subsections hide-all-vars } ;
 
-HELP: only-use-vocabs
+HELP: use-loaded-vocabs
 { $values { "vocabs" "a sequence of vocabulary specifiers" } }
-{ $description "Replaces the current manifest's vocabulary search path with the given set of vocabularies." } ;
+{ $description "Adds to the search path only those vocabularies which are loaded." } ;
 
 HELP: with-interactive-vocabs
 { $values { "quot" quotation } }

@@ -171,7 +171,7 @@ PRIVATE>
     call( -- ) notify-ui-thread start-ui-thread ;
 
 : ?attributes ( gadget title/attributes -- attributes )
-    dup string? [ world-attributes new swap >>title ] [ clone ] if
+    dup string? [ <world-attributes> swap >>title ] [ clone ] if
     swap [ [ [ 1array ] [ f ] if* ] curry unless* ] curry change-gadgets ;
 
 PRIVATE>

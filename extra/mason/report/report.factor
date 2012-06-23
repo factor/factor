@@ -8,7 +8,7 @@ combinators.short-circuit literals splitting ;
 IN: mason.report
 
 : git-link ( id -- link )
-    [ "http://github.com/slavapestov/factor/commit/" prepend ] keep
+    [ "http://github.com/slavapestov/factor/commit/" "" prepend-as ] keep
     [XML <a href=<->><-></a> XML] ;
 
 : common-report ( -- xml )
@@ -44,7 +44,7 @@ IN: mason.report
     [
         error [ error. ] with-string-writer :> error
         file utf8 400 file-tail :> output
-        
+
         [XML
         <h2><-what-></h2>
         Build output:
@@ -118,7 +118,7 @@ IN: mason.report
             test-all-vocabs-file
             test-all-errors-file
             error-dump
-            
+
             "Help lint failures"
             help-lint-vocabs-file
             help-lint-errors-file

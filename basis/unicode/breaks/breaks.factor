@@ -128,7 +128,7 @@ PRIVATE>
     [ first-grapheme ] >pieces ;
 
 : string-reverse ( str -- rts )
-    >graphemes reverse concat ;
+    >graphemes reverse! concat ;
 
 <PRIVATE
 

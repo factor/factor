@@ -65,7 +65,7 @@ SYMBOL: enter-out
 
 : check-return ( word label -- )
     2dup
-    [ stack-effect effect-height ]
+    [ stack-height ]
     [ entry-stack-height current-stack-height swap - ]
     bi*
     = [ 2drop ] [
@@ -147,7 +147,7 @@ M: declared-effect (undeclared-known) known>> (undeclared-known) ;
 
 : inline-word ( word -- )
     commit-literals
-    [ depends-on-definition ]
+    [ add-depends-on-definition ]
     [ declare-input-effects ]
     [
         dup inline-recursive-label [

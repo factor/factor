@@ -5,7 +5,7 @@ USING: accessors alien alien.c-types alien.data alien.parser
 arrays byte-arrays classes classes.parser classes.private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
 combinators combinators.smart cpu.architecture definitions fry
-functors.backend generalizations generic generic.parser kernel
+functors.backend generalizations generic generic.parser io kernel
 kernel.private lexer libc locals macros math math.order parser
 quotations sequences slots slots.private specialized-arrays
 stack-checker.dependencies summary vectors vocabs.loader
@@ -70,6 +70,9 @@ M: struct hashcode*
     ! This is sub-optimal if the class is not literal, but gets
     ! optimized down to efficient code if it is.
     '[ _ boa ] call( ptr -- struct ) ; inline
+
+: read-struct ( class -- struct )
+    [ heap-size read ] [ memory>struct ] bi ;
 
 <PRIVATE
 : (init-struct) ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
@@ -136,11 +139,11 @@ M: struct-bit-slot-spec (writer-quot)
     drop [ >c-ptr ] ;
 
 MACRO: read-struct-slot ( slot -- )
-    dup type>> depends-on-c-type
+    dup type>> add-depends-on-c-type
     (reader-quot) ;
 
 MACRO: write-struct-slot ( slot -- )
-    dup type>> depends-on-c-type
+    dup type>> add-depends-on-c-type
     (writer-quot) ;
 PRIVATE>
 

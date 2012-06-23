@@ -1,10 +1,20 @@
-USING: tools.test system io io.encodings.ascii io.pathnames
-io.files io.files.info io.files.temp kernel tools.deploy.config
-tools.deploy.config.editor tools.deploy.backend math sequences
-io.launcher arrays namespaces continuations layouts accessors
-urls math.parser io.directories tools.deploy tools.deploy.test
-vocabs ;
+USING: bootstrap.image tools.test system io io.encodings.ascii
+io.pathnames io.files io.files.info io.files.temp kernel
+tools.deploy.config tools.deploy.config.editor
+tools.deploy.backend math sequences io.launcher arrays
+namespaces continuations layouts accessors urls math.parser
+io.directories splitting tools.deploy tools.deploy.test vocabs ;
+
 IN: tools.deploy.tests
+
+! Delete all cached staging images in case syntax or
+! other core vocabularies have changed and staging
+! images are stale.
+cache-directory [
+    [ "staging." head? ] filter
+    my-arch ".image" append [ tail? ] curry filter
+    [ delete-file ] each
+] with-directory-files
 
 [ "nosuchvocab" deploy ] [ no-vocab? ] must-fail-with
 
@@ -16,9 +26,11 @@ IN: tools.deploy.tests
 
 [ ] [ "hello-ui" shake-and-bake 1300000 small-enough? ] unit-test
 
-[ "staging.math-threads-compiler-ui.image" ] [
-    "hello-ui" deploy-config
-    [ bootstrap-profile staging-image-name file-name ] bind
+[ "math-threads-compiler-ui" ] [
+    "hello-ui" deploy-config [
+        bootstrap-profile staging-image-name file-name
+        "." split second
+    ] bind
 ] unit-test
 
 [ ] [ "maze" shake-and-bake 1200000 small-enough? ] unit-test
@@ -72,7 +84,7 @@ M: quit-responder call-responder*
             f >>secure
         start-server
         servers>> first addr>> port>>
-        dup number>string "resource:temp/port-number" ascii set-file-contents
+        dup number>string "port-number" temp-file ascii set-file-contents
     ] with-scope
     "port" set ;
 

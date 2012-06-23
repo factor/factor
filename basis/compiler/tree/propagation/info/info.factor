@@ -47,7 +47,7 @@ CONSTANT: object-info T{ value-info f object full-interval }
             { [ over interval-length 0 > ] [ 3drop f f ] }
             { [ pick bignum class<= ] [ 2nip >bignum t ] }
             { [ pick integer class<= ] [ 2nip >fixnum t ] }
-            { [ pick float class<= ] [ 2nip dup zero? [ drop f f ] [ >float t ] if ] }
+            { [ pick float class<= ] [ 2nip [ f f ] [ >float t ] if-zero ] }
             [ 3drop f f ]
         } cond
     ] if ;

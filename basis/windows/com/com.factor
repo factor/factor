@@ -86,7 +86,7 @@ FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
 
 : com-query-interface ( interface iid -- interface' )
     { void* }
-    [ IUnknown::QueryInterface ole32-error ]
+    [ IUnknown::QueryInterface check-ole32-error ]
     with-out-parameters ;
 
 : com-add-ref ( interface -- interface )

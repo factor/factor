@@ -56,10 +56,10 @@ struct inline_cache_jit : public jit {
 
 	void emit_check(cell klass);
 	void compile_inline_cache(fixnum index,
-				  cell generic_word_,
-				  cell methods_,
-				  cell cache_entries_,
-				  bool tail_call_p);
+		cell generic_word_,
+		cell methods_,
+		cell cache_entries_,
+		bool tail_call_p);
 };
 
 void inline_cache_jit::emit_check(cell klass)
@@ -76,10 +76,10 @@ void inline_cache_jit::emit_check(cell klass)
 /* index: 0 = top of stack, 1 = item underneath, etc
    cache_entries: array of class/method pairs */
 void inline_cache_jit::compile_inline_cache(fixnum index,
-					    cell generic_word_,
-					    cell methods_,
-					    cell cache_entries_,
-					    bool tail_call_p)
+	cell generic_word_,
+	cell methods_,
+	cell cache_entries_,
+	bool tail_call_p)
 {
 	data_root<word> generic_word(generic_word_,parent);
 	data_root<array> methods(methods_,parent);
@@ -197,6 +197,7 @@ void *factor_vm::inline_cache_miss(cell return_address_)
 		<< (tail_call_site ? "tail" : "non-tail")
 		<< " call site 0x" << std::hex << return_address.value << std::dec
 		<< std::endl;
+	print_callstack();
 #endif
 
 	data_root<array> cache_entries(ctx->pop(),this);
@@ -244,6 +245,7 @@ void *factor_vm::inline_cache_miss(cell return_address_)
 			<< (tail_call_site ? "tail" : "non-tail")
 			<< " call site 0x" << std::hex << return_address.value << std::dec
 			<< " with 0x" << std::hex << (cell)xt << std::dec << std::endl;
+		print_callstack();
 #endif
 	}
 

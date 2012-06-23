@@ -11,9 +11,11 @@ IN: math.parser
                              [ CHAR: a 10 - - dup 10 < [ drop 255 ] when ]
     } cond ; inline
 
+ERROR: invalid-radix radix ;
+
 <PRIVATE
 
-TUPLE: number-parse 
+TUPLE: number-parse
     { str read-only }
     { length fixnum read-only }
     { radix fixnum read-only } ;
@@ -267,12 +269,20 @@ DEFER: @neg-digit
         [ @pos-first-digit ]
     } case ; inline
 
+: @first-char-no-radix ( i number-parse n char -- n/f ) 
+    {
+        { CHAR: - [ [ @neg-digit ] require-next-digit ?neg ] }
+        { CHAR: + [ [ @pos-digit ] require-next-digit ] }
+        [ @pos-digit ]
+    } case ; inline
+
 PRIVATE>
 
-: base> ( str radix -- n/f )
-    <number-parse> [ @first-char ] require-next-digit ;
+: string>number ( str -- n/f )
+    10 <number-parse> [ @first-char ] require-next-digit ;
 
-: string>number ( str -- n/f ) 10 base> ; inline
+: base> ( str radix -- n/f )
+    <number-parse> [ @first-char-no-radix ] require-next-digit ;
 
 : bin> ( str -- n/f )  2 base> ; inline
 : oct> ( str -- n/f )  8 base> ; inline
@@ -301,7 +311,7 @@ PRIVATE>
 <PRIVATE
 
 : positive>base ( num radix -- str )
-    dup 1 <= [ "Invalid radix" throw ] when
+    dup 1 <= [ invalid-radix ] when
     [ dup 0 > ] swap [ /mod >digit ] curry "" produce-as nip
     reverse! ; inline
 
@@ -367,9 +377,8 @@ M: ratio >base
 <PRIVATE
 
 : mantissa-expt-normalize ( mantissa expt -- mantissa' expt' )
-    dup zero?
-    [ over log2 52 swap - [ shift 52 2^ 1 - bitand ] [ 1022 + - ] bi-curry bi* ]
-    [ 1023 - ] if ;
+    [ dup log2 52 swap - [ shift 52 2^ 1 - bitand ] [ 1022 + neg ] bi ]
+    [ 1023 - ] if-zero ;
 
 : mantissa-expt ( float -- mantissa expt )
     [ 52 2^ 1 - bitand ]
@@ -397,10 +406,11 @@ M: ratio >base
     dup [ 0 = ] find drop head >string
     fix-float ;
 
-: float>base ( n base -- str )
+: float>base ( n radix -- str )
     {
         { 16 [ float>hex ] }
-        [ drop "%.16g" format-float ]
+        { 10 [ "%.16g" format-float ] }
+        [ invalid-radix ]
     } case ; inline
 
 PRIVATE>

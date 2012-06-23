@@ -49,13 +49,6 @@ M: extra-words equal?
 
 C: <extra-words> extra-words
 
-: clear-manifest ( -- )
-    manifest get
-    [ search-vocab-names>> clear-assoc ]
-    [ search-vocabs>> delete-all ]
-    [ qualified-vocabs>> delete-all ]
-    tri ;
-
 ERROR: no-word-in-vocab word vocab ;
 
 <PRIVATE
@@ -93,10 +86,10 @@ PRIVATE>
         [ set-current-vocab ] dip call
     ] with-variable ; inline
 
-TUPLE: no-current-vocab ;
+TUPLE: no-current-vocab-error ;
 
 : no-current-vocab ( -- vocab )
-    \ no-current-vocab boa
+    \ no-current-vocab-error boa
     { { "Define words in scratchpad vocabulary" "scratchpad" } }
     throw-restarts dup set-current-vocab ;
 

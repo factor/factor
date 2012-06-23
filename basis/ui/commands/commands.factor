@@ -29,7 +29,7 @@ GENERIC: command-word ( command -- word )
         H{ } clone [ "commands" set-word-prop ] keep
     ] ?if ;
 
-: command-map ( group class -- command-map )
+: get-command-at ( group class -- command-map )
     commands at ;
 
 : command-gestures ( class -- hash )
@@ -42,7 +42,7 @@ GENERIC: command-word ( command -- word )
     ] H{ } make-assoc ;
 
 : update-gestures ( class -- )
-    dup command-gestures "gestures" set-word-prop ;
+    dup command-gestures set-gestures ;
 
 : define-command-map ( class group blurb pairs -- )
     <command-map>

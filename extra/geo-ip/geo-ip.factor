@@ -7,7 +7,7 @@ math.intervals interval-maps memoize csv accessors assocs
 strings math splitting grouping arrays combinators.smart ;
 IN: geo-ip
 
-: db-path ( -- path ) "IpToCountry.csv" temp-file ;
+: db-path ( -- path ) "IpToCountry.csv" cache-file ;
 
 CONSTANT: db-url "http://software77.net/geo-ip/?DL=1"
 

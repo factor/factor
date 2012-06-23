@@ -1,10 +1,9 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.strings alien.syntax
-classes.struct combinators io.encodings.utf16n io.files
-io.pathnames kernel windows.errors windows.com
-windows.com.syntax windows.types windows.user32
-windows.ole32 windows specialized-arrays ;
+classes.struct combinators io.files io.pathnames kernel
+windows.errors windows.com windows.com.syntax windows.types
+windows.user32 windows.ole32 windows specialized-arrays ;
 SPECIALIZED-ARRAY: ushort
 IN: windows.shell32
 
@@ -90,7 +89,7 @@ ALIAS: ShellExecute ShellExecuteW
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
     MAX_UNICODE_PATH ushort <c-array>
-    [ SHGetFolderPath drop ] keep utf16n alien>string ;
+    [ SHGetFolderPath drop ] keep alien>native-string ;
 
 : desktop ( -- str )
     CSIDL_DESKTOPDIRECTORY shell32-directory ;

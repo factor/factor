@@ -185,11 +185,9 @@ SYMBOL: interactive-vocabs
     "vocabs.refresh"
     "vocabs.hierarchy"
     "words"
-    "scratchpad"
 } interactive-vocabs set-global
 
-: only-use-vocabs ( vocabs -- )
-    clear-manifest
+: use-loaded-vocabs ( vocabs -- )
     [ lookup-vocab ] filter
     [
         lookup-vocab
@@ -201,7 +199,7 @@ SYMBOL: interactive-vocabs
 : with-interactive-vocabs ( quot -- )
     [
         "scratchpad" set-current-vocab
-        interactive-vocabs get only-use-vocabs
+        interactive-vocabs get use-loaded-vocabs
         call
     ] with-manifest ; inline
 
