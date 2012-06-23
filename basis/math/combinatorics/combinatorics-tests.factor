@@ -1,6 +1,7 @@
-USING: math.combinatorics math.combinatorics.private tools.test sequences ;
+USING: kernel math math.combinatorics math.combinatorics.private tools.test sequences ;
 IN: math.combinatorics.tests
 
+[ 1 ] [ -1 factorial ] unit-test ! required by other math.combinatorics words
 [ 1 ] [ 0 factorial ] unit-test
 [ 1 ] [ 1 factorial ] unit-test
 [ 3628800 ] [ 10 factorial ] unit-test
@@ -44,25 +45,15 @@ IN: math.combinatorics.tests
 [ { 2 1 0 } ] [ { "c" "b" "a" } inverse-permutation ] unit-test
 [ { 3 0 2 1 } ] [ { 12 45 34 2 } inverse-permutation ] unit-test
 
+[ "" ] [ "" next-permutation ] unit-test
+[ "1" ] [ "1" next-permutation ] unit-test
+[ "21" ] [ "12" next-permutation ] unit-test
+[ "8344112666" ] [ "8342666411" next-permutation ] unit-test
+[ "ABC" "ACB" "BAC" "BCA" "CAB" "CBA" "ABC" ]
+[ "ABC" 6 [ dup dup clone-like next-permutation ] times ] unit-test
 
-[ 2598960 ] [ 52 iota 5 <combo> choose ] unit-test
-
-[ 6 3 13 6 ] [ 7 4 28 next-values ] unit-test
-[ 5 2 3 5 ] [ 6 3 13 next-values ] unit-test
-[ 3 1 0 3 ] [ 5 2 3 next-values ] unit-test
-[ 0 0 0 0 ] [ 3 1 0 next-values ] unit-test
-
-[ 9 ] [ 0 5 iota 3 <combo> dual-index ] unit-test
-[ 0 ] [ 9 5 iota 3 <combo> dual-index ] unit-test
-[ 179 ] [ 72 10 iota 5 <combo> dual-index ] unit-test
-
-[ { 5 3 2 1 } ] [ 7 iota 4 <combo> 8 combinadic ] unit-test
-[ { 4 3 2 1 0 } ] [ 10 iota 5 <combo> 0 combinadic ] unit-test
-[ { 8 6 3 1 0 } ] [ 10 iota 5 <combo> 72 combinadic ] unit-test
-[ { 9 8 7 6 5 } ] [ 10 iota 5 <combo> 251 combinadic ] unit-test
-
-[ { 0 1 2 } ] [ 0 5 iota 3 <combo> combination-indices ] unit-test
-[ { 2 3 4 } ] [ 9 5 iota 3 <combo> combination-indices ] unit-test
+[ { 0 1 2 } ] [ 0 3 5 combination-indices ] unit-test
+[ { 2 3 4 } ] [ 9 3 5 combination-indices ] unit-test
 
 [ { "a" "b" "c" } ] [ 0 { "a" "b" "c" "d" "e" } 3 combination ] unit-test
 [ { "c" "d" "e" } ] [ 9 { "a" "b" "c" "d" "e" } 3 combination ] unit-test
@@ -88,3 +79,21 @@ IN: math.combinatorics.tests
     { 2 1 1 } { 2 1 2 } { 2 2 1 } { 2 2 2 } } ]
 [ { 1 2 } 3 selections ] unit-test
 
+
+{ V{ { 1 2 } { 1 3 } } }
+[ { 1 2 3 } 2 [ { 1 } head? ] filter-combinations ] unit-test
+
+{ { 3 4 5 } }
+[ { 1 2 3 } 2 [ sum ] map-combinations ] unit-test
+
+{ V{ { 1 2 3 } { 1 3 2 } } }
+[ { 1 2 3 } [ { 1 } head? ] filter-permutations ] unit-test
+
+{ { 6 6 6 6 6 6 } }
+[ { 1 2 3 } [ sum ] map-permutations ] unit-test
+
+{ f } [ { 1 2 3 } 2 [ last 4 = ] find-combination ] unit-test
+{ { 2 3 } } [ { 1 2 3 } 2 [ first 2 = ] find-combination ] unit-test
+
+{ f } [ { 1 2 3 } [ last 4 = ] find-permutation ] unit-test
+{ { 2 1 3 } } [ { 1 2 3 } [ first 2 = ] find-permutation ] unit-test

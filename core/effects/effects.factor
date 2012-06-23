@@ -99,7 +99,7 @@ M: effect clone
     [ in>> clone ] [ out>> clone ] bi <effect> ;
 
 : stack-height ( word -- n )
-    stack-effect effect-height ;
+    stack-effect effect-height ; inline
 
 : shuffle-mapping ( effect -- mapping )
     [ out>> ] [ in>> ] bi [ index ] curry map ;

@@ -246,8 +246,12 @@ IN: bootstrap.syntax
         ] if*
     ] define-core-syntax
 
-    "maybe:" [
-        scan-class <maybe> suffix!
+    "maybe{" [
+        \ } [ <anonymous-union> <maybe> ] parse-literal
+    ] define-core-syntax
+
+    "not{" [
+        \ } [ <anonymous-union> <anonymous-complement> ] parse-literal
     ] define-core-syntax
 
     "intersection{" [

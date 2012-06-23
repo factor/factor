@@ -32,26 +32,26 @@ M: #push propagate-before
 : set-value-infos ( infos values -- )
     [ set-value-info ] 2each ;
 
-GENERIC: depends-on-class ( obj -- )
+GENERIC: add-depends-on-class ( obj -- )
 
-M: class depends-on-class
-    depends-on-conditionally ;
+M: class add-depends-on-class
+    add-depends-on-conditionally ;
 
-M: maybe depends-on-class
-    class>> depends-on-class ;
+M: maybe add-depends-on-class
+    class>> add-depends-on-class ;
 
-M: anonymous-union depends-on-class
-    members>> [ depends-on-class ] each ;
+M: anonymous-union add-depends-on-class
+    members>> [ add-depends-on-class ] each ;
 
-M: anonymous-intersection depends-on-class
-    participants>> [ depends-on-class ] each ;
+M: anonymous-intersection add-depends-on-class
+    participants>> [ add-depends-on-class ] each ;
 
 M: #declare propagate-before
     #! We need to force the caller word to recompile when the
     #! classes mentioned in the declaration are redefined, since
     #! now we're making assumptions but their definitions.
     declaration>> [
-        [ depends-on-class ]
+        [ add-depends-on-class ]
         [ <class-info> swap refine-value-info ]
         bi
     ] assoc-each ;
@@ -123,7 +123,7 @@ M: #declare propagate-before
     #! class definition itself.
     [ in-d>> first value-info ]
     [ "predicating" word-prop ] bi*
-    [ nip depends-on-conditionally ]
+    [ nip add-depends-on-conditionally ]
     [ predicate-output-infos 1array ] 2bi ;
 
 : default-output-value-infos ( #call word -- infos )

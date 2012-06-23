@@ -37,7 +37,7 @@ M: browser-gadget set-history-value
     model>> [ '[ _ print-topic ] try ] <pane-control> ;
 
 : search-browser ( string browser -- )
-    '[ <apropos> _ show-help ] unless-empty ;
+    '[ <apropos-search> _ show-help ] unless-empty ;
 
 : <search-field> ( browser -- field )
     '[ _ search-browser ] <action-field>

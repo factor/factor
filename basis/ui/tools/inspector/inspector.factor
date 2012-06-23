@@ -6,7 +6,7 @@ classes io io.styles arrays hashtables math.order sorting refs fonts
 ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons ui.gadgets.tables ui.gadgets.status-bar
-ui.gadgets.labeled ui.tools.common ui ;
+ui.gadgets.labeled ui.tools.common ui combinators ;
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < tool table ;
@@ -30,24 +30,34 @@ M: inspector-renderer column-titles
 : <summary-gadget> ( model -- gadget )
     [
         standard-table-style [
-            [
+            {
                 [
-                    [ "Class:" write ] with-cell
-                    [ class-of pprint ] with-cell
-                ] with-row
-            ]
-            [
+                    [
+                        [ "Class:" write ] with-cell
+                        [ class-of pprint ] with-cell
+                    ] with-row
+                ]
                 [
-                    [ "Object:" write ] with-cell
-                    [ pprint-short ] with-cell
-                ] with-row
-            ]
-            [
+                    [
+                        [ "Object:" write ] with-cell
+                        [ pprint-short ] with-cell
+                    ] with-row
+                ]
                 [
-                    [ "Summary:" write ] with-cell
-                    [ print-summary ] with-cell
-                ] with-row
-            ] tri
+                    [
+                        [ "Summary:" write ] with-cell
+                        [ print-summary ] with-cell
+                    ] with-row
+                ]
+                [
+                    content-gadget [
+                        [
+                            [ "Content:" write ] with-cell
+                            [ output-stream get write-gadget ] with-cell
+                        ] with-row
+                    ] when*
+                ]
+            } cleave
         ] tabular-output
     ] <pane-control> ;
 
@@ -123,3 +133,5 @@ inspector-gadget "multi-touch" f {
 
 : inspector ( obj -- )
     <model> inspect-model ;
+
+{ 550 400 } inspector-gadget set-tool-dim

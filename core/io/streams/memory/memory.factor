@@ -15,3 +15,6 @@ M: memory-stream stream-element-type drop +byte+ ;
 M: memory-stream stream-read1
     [ 1 over <displaced-alien> ] change-alien drop
     0 alien-unsigned-1 ; inline
+
+: with-memory-reader ( alien quot -- )
+    [ <memory-stream> ] dip with-input-stream* ; inline

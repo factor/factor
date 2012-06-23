@@ -50,15 +50,14 @@ HELP: std
 { $values { "seq" sequence } { "x" "a non-negative real number"} }
 { $description "Computes the standard deviation of " { $snippet "seq" } ", which is the square root of the variance. It measures how widely spread the values in a sequence are about the mean." }
 { $examples
-  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } std ." "1.0" }
-  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } std ." "1.290994448735806" } } ;
+  { $example "USING: math.statistics prettyprint ;" "{ 7 8 9 } std ." "1.0" } } ;
 
 HELP: ste
   { $values { "seq" sequence } { "x" "a non-negative real number"} }
   { $description "Computes the standard error of the mean for " { $snippet "seq" } ". It's defined as the standard deviation divided by the square root of the length of the sequence, and measures uncertainty associated with the estimate of the mean." }
   { $examples
     { $example "USING: math.statistics prettyprint ;" "{ -2 2 } ste ." "2.0" }
-    { $example "USING: math.statistics prettyprint ;" "{ -2 2 2 } ste ." "1.333333333333333" } } ;
+  } ;
 
 HELP: var
 { $values { "seq" sequence } { "x" "a non-negative real number"} }
@@ -69,6 +68,13 @@ HELP: var
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } var ." "1" }
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } var ." "1+2/3" } } ;
 
+HELP: cov
+{ $values { "{x}" sequence } { "{y}" sequence } { "cov" "a real number" } }
+{ $description "Computes the covariance of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
+
+HELP: corr
+{ $values { "{x}" sequence } { "{y}" sequence } { "corr" "a real number" } }
+{ $description "Computes the correlation of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
 
 HELP: histogram
 { $values
@@ -168,6 +174,58 @@ HELP: sequence>hashtable
     }
 } ;
 
+HELP: cum-sum
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative sum of " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 1 -1 2 -1 4 } cum-sum ."
+               "{ 1 0 2 1 5 }"
+    }
+} ;
+
+HELP: cum-product
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative product of " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 1 2 3 4 } cum-product ."
+               "{ 1 2 6 24 }"
+    }
+} ;
+
+HELP: cum-min
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative min of " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 5 3 4 1 } cum-min ."
+               "{ 5 3 3 1 }"
+    }
+} ;
+
+HELP: cum-max
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative max of " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 1 -1 3 5 } cum-max ."
+               "{ 1 1 3 5 }"
+    }
+} ;
+
+HELP: standardize
+{ $values { "u" sequence } { "v" sequence } }
+{ $description "Shifts and rescales the elements of " { $snippet "u" } " to have zero mean and unit sample variance." } ;
+
+HELP: differences
+{ $values { "u" sequence } { "v" sequence } }
+{ $description "Returns the successive differences of elements in " { $snippet "u" } "." } ;
+
+HELP: rescale
+{ $values { "u" sequence } { "v" sequence } }
+{ $description "Returns " { $snippet "u" } " rescaled to run from 0 to 1 over the range min to max." } ;
+
 ARTICLE: "histogram" "Computing histograms"
 "Counting elements in a sequence:"
 { $subsections
@@ -200,3 +258,8 @@ ARTICLE: "math.statistics" "Statistics"
 { $subsection "histogram" } ;
 
 ABOUT: "math.statistics"
+
+{ var full-var sample-var } related-words
+{ std full-std sample-std } related-words
+{ ste full-ste sample-ste } related-words
+{ corr full-corr sample-corr } related-words

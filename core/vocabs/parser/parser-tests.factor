@@ -40,11 +40,11 @@ must-fail-with
 
     [ ] [ [ "vocabs.parser.tests.foo" forget-vocab ] with-compilation-unit ] unit-test
     
-    [ [ "bbb" current-vocab create drop ] with-compilation-unit ] [ error>> no-current-vocab? ] must-fail-with
+    [ [ "bbb" current-vocab create drop ] with-compilation-unit ] [ error>> no-current-vocab-error? ] must-fail-with
 
-    [ begin-private ] [ error>> no-current-vocab? ] must-fail-with
+    [ begin-private ] [ error>> no-current-vocab-error? ] must-fail-with
 
-    [ end-private ] [ error>> no-current-vocab? ] must-fail-with
+    [ end-private ] [ error>> no-current-vocab-error? ] must-fail-with
 
     [ f ] [ "bbb" search >boolean ] unit-test
     

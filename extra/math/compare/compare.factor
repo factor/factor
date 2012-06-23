@@ -14,3 +14,11 @@ IN: math.compare
 
 : negmin ( a b -- x )
     0 min min ;
+
+: max-by ( obj1 obj2 quot: ( obj -- n ) -- obj1/obj2 )
+    [ bi@ dupd max = ] curry most ; inline
+
+: min-by ( obj1 obj2 quot: ( obj -- n ) -- obj1/obj2 )
+    [ bi@ dupd min = ] curry most ; inline
+
+

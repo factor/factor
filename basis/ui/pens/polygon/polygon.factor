@@ -35,5 +35,5 @@ M: polygon draw-interior
     tri ;
 
 : <polygon-gadget> ( color points -- gadget )
-    [ <polygon> ] [ { 0 0 } [ vmax ] reduce ] bi
+    [ <polygon> ] [ max-dim ] bi
     [ <gadget> ] 2dip [ >>interior ] [ >>dim ] bi* ;

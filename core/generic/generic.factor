@@ -89,11 +89,11 @@ ERROR: no-next-method method ;
 : (call-next-method) ( method -- )
     dup next-method-quot [ call ] [ no-next-method ] ?if ;
 
-TUPLE: check-method class generic ;
+ERROR: check-method-error class generic ;
 
 : check-method ( classoid generic -- class generic )
     2dup [ classoid? ] [ generic? ] bi* and [
-        \ check-method boa throw
+        check-method-error
     ] unless ; inline
 
 : remake-generic ( generic -- )
@@ -107,13 +107,8 @@ GENERIC: update-generic ( class generic -- )
 : with-methods ( class generic quot -- )
     [ "methods" word-prop ] prepose [ update-generic ] 2bi ; inline
 
-GENERIC# method-word-name 1 ( class generic -- string )
-
-M: class method-word-name ( class generic -- string )
-    [ name>> ] bi@ "=>" glue ;
-
-M: maybe method-word-name
-    [ class>> name>> ] [ name>> ] bi* "=>" glue ;
+: method-word-name ( class generic -- string )
+    [ class-name ] [ name>> ] bi* "=>" glue ;
 
 M: method parent-word
     "method-generic" word-prop ;

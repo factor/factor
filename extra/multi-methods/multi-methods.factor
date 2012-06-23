@@ -130,7 +130,7 @@ ERROR: no-method arguments generic ;
 
 : multi-dispatch-quot ( methods generic -- quot )
     [ make-default-method ]
-    [ drop [ [ multi-predicate ] dip ] assoc-map reverse ]
+    [ drop [ [ multi-predicate ] dip ] assoc-map reverse! ]
     2bi alist>quot ;
 
 ! Generic words

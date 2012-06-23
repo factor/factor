@@ -491,6 +491,7 @@ tuple
     { "bignum-bitxor" "math.private" "primitive_bignum_xor" ( x y -- z ) }
     { "bignum-log2" "math.private" "primitive_bignum_log2" ( x -- n ) }
     { "bignum-mod" "math.private" "primitive_bignum_mod" ( x y -- z ) }
+    { "bignum-gcd" "math.private" "primitive_bignum_gcd" ( x y -- z ) }
     { "bignum-shift" "math.private" "primitive_bignum_shift" ( x y -- z ) }
     { "bignum/i" "math.private" "primitive_bignum_divint" ( x y -- z ) }
     { "bignum/mod" "math.private" "primitive_bignum_divmod" ( x y -- z w ) }

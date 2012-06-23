@@ -30,7 +30,7 @@ SYMBOL: upload-images-destination
     [
         "scp" ,
         boot-image-names %
-        "temp/checksums.txt" , destination ,
+        checksums , destination ,
     ] { } make try-process ;
 
 : new-images ( -- )

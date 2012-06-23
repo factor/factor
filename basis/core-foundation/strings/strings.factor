@@ -1,9 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data alien.syntax alien.strings
-io.encodings.string kernel sequences byte-arrays
-io.encodings.utf8 math core-foundation core-foundation.arrays
-core-foundation.data destructors parser fry alien words ;
+USING: alien alien.c-types alien.data alien.strings alien.syntax
+byte-arrays combinators.short-circuit core-foundation
+core-foundation.arrays core-foundation.data destructors fry
+io.encodings.string io.encodings.utf8 kernel math math.order
+parser sequences words ;
+
 IN: core-foundation.strings
 
 TYPEDEF: void* CFStringRef
@@ -65,7 +67,7 @@ FUNCTION: CFStringRef CFCopyTypeIDDescription ( CFTypeID type_id ) ;
 
 : prepare-CFString ( string -- byte-array )
     [
-        dup 0x10ffff >
+        dup { [ 0x10ffff > ] [ 0xd800 0xdfff between? ] } 1||
         [ drop 0xfffd ] when
     ] map utf8 encode ;
 

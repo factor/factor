@@ -1,6 +1,6 @@
-USING: arrays kernel math math.order namespaces sequences kernel.private
-sequences.private strings sbufs tools.test vectors assocs
-generic vocabs.loader ;
+USING: arrays byte-arrays kernel math math.order math.parser
+namespaces sequences kernel.private sequences.private strings
+sbufs tools.test vectors assocs generic vocabs.loader ;
 IN: sequences.tests
 
 [ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
@@ -49,6 +49,10 @@ IN: sequences.tests
 [ f f ] [ "abcd" [ drop CHAR: e = ] find-index ] unit-test
 [ 3 CHAR: d ] [ "abcdefg" [ 3 = nip ] find-index ] unit-test
 [ 3 CHAR: d ] [ "abcdefg" [ drop CHAR: d = ] find-index ] unit-test
+
+[ 0 CHAR: a ] [ 0 "abcdef" [ drop CHAR: a >= ] find-index-from ] unit-test
+[ 1 CHAR: b ] [ 0 "abcdef" [ drop CHAR: a > ] find-index-from ] unit-test
+[ 2 CHAR: c ] [ 1 "abcdef" [ drop CHAR: b > ] find-index-from ] unit-test
 
 [ f ] [ 3 [ ]     member? ] unit-test
 [ f ] [ 3 [ 1 2 ] member? ] unit-test
@@ -104,6 +108,9 @@ unit-test
 
 [ "a" -1 append ] must-fail
 [ -1 "a" append ] must-fail
+
+{ t } [ B{ 0 } { 1 } append byte-array? ] unit-test
+{ t } [ B{ 0 } { 1 } prepend byte-array? ] unit-test
 
 [ [ ]       ] [ 1 [ ]           remove ] unit-test
 [ [ ]       ] [ 1 [ 1 ]         remove ] unit-test
@@ -330,3 +337,11 @@ USE: make
 
 [ { { { 1 "a" } { 1 "b" } } { { 2 "a" } { 2 "b" } } } ]
 [ { 1 2 } { "a" "b" } cartesian-product ] unit-test
+
+[ { } [ string>digits sum ] [ + ] map-reduce ] must-infer
+[ { } [ ] [ + ] map-reduce ] must-fail
+[ 4 ] [ { 1 1 } [ 1 + ] [ + ] map-reduce ] unit-test
+
+[ { } { } [ [ string>digits product ] bi@ + ] [ + ] 2map-reduce ] must-infer
+[ { } { } [ + ] [ + ] 2map-reduce ] must-fail
+[ 24 ] [ { 1 2 } { 3 4 } [ + ] [ * ] 2map-reduce ] unit-test

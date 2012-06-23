@@ -341,7 +341,7 @@ M: immutable-sequence clone-like like ; inline
 PRIVATE>
 
 : append-as ( seq1 seq2 exemplar -- newseq )
-    [ over length over length + ] dip
+    [ 2dup [ length ] bi@ + ] dip
     [ (append) ] new-like ; inline
 
 : 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
@@ -352,7 +352,9 @@ PRIVATE>
 
 : append ( seq1 seq2 -- newseq ) over append-as ;
 
-: prepend ( seq1 seq2 -- newseq ) swap append ; inline
+: prepend-as ( seq1 seq2 exemplar -- newseq ) swapd append-as ;
+
+: prepend ( seq1 seq2 -- newseq ) over prepend-as ;
 
 : 3append ( seq1 seq2 seq3 -- newseq ) pick 3append-as ;
 
@@ -419,6 +421,12 @@ PRIVATE>
 
 : (find-index) ( seq quot quot' -- i elt )
     pick [ [ (each-index) ] dip call ] dip finish-find ; inline
+
+: (find-index-from) ( n seq quot quot' -- i elt )
+    [ 2dup bounds-check? ] 2dip
+    [ (find-index) ] 2curry
+    [ 2drop f f ]
+    if ; inline
 
 : (accumulate) ( seq identity quot -- identity seq quot )
     swapd [ curry keep ] curry ; inline
@@ -493,6 +501,9 @@ PRIVATE>
 
 : find-last ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ [ 1 - ] dip find-last-integer ] (find) ; inline
+
+: find-index-from ( ... n seq quot: ( ... elt i -- ... ? ) -- ... i elt )
+    [ (find-integer) ] (find-index-from) ; inline
 
 : find-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
     [ find-integer ] (find-index) ; inline
@@ -664,8 +675,7 @@ PRIVATE>
 
 : prefix ( seq elt -- newseq )
     over [ over length 1 + ] dip [
-        [ 0 swap set-nth-unsafe ] keep
-        [ 1 swap copy ] keep
+        (1sequence) [ 1 swap copy ] keep
     ] new-like ;
 
 : suffix ( seq elt -- newseq )
@@ -857,12 +867,6 @@ PRIVATE>
         [ 3dup ] dip [ + swap nth-unsafe ] keep rot nth-unsafe =
     ] all? nip ; inline
 
-: prepare-2map-reduce ( seq1 seq2 map-quot -- initial length seq1 seq2 )
-    [ drop min-length dup 1 < [ "Empty sequence" throw ] when 1 - ]
-    [ drop [ [ 1 + ] 2dip 2nth-unsafe ] 2curry ]
-    [ [ [ first-unsafe ] bi@ ] dip call ]
-    3tri -rot ; inline
-
 PRIVATE>
 
 : start* ( subseq seq n -- i )
@@ -888,12 +892,12 @@ PRIVATE>
     [ rest-slice ] [ first-unsafe ] bi ; inline
 
 : map-reduce ( ..a seq map-quot: ( ..a x -- ..b elt ) reduce-quot: ( ..b prev elt -- ..a next ) -- ..a result )
-    [ [ unclip-slice ] dip [ call ] keep ] dip
-    compose reduce ; inline
+    [ [ dup first ] dip [ call ] keep ] dip compose
+    swapd [ 1 ] 2dip (each) (each-integer) ; inline
 
 : 2map-reduce ( ..a seq1 seq2 map-quot: ( ..a elt1 elt2 -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
-    [ [ prepare-2map-reduce ] keep ] dip
-    compose compose each-integer ; inline
+    [ [ 2dup [ first ] bi@ ] dip [ call ] keep ] dip compose
+    [ -rot ] dip [ 1 ] 3dip (2each) (each-integer) ; inline
 
 <PRIVATE
 
@@ -913,7 +917,7 @@ PRIVATE>
     [ but-last-slice ] [ last ] bi ; inline
 
 <PRIVATE
-    
+
 : (trim-head) ( seq quot -- seq n )
     over [ [ not ] compose find drop ] dip
     [ length or ] keep swap ; inline

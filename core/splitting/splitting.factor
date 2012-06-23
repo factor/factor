@@ -44,6 +44,9 @@ PRIVATE>
 : split1-slice ( seq subseq -- before-slice after-slice )
     [ snip-slice ] (split1) ;
 
+: split1-when ( ... seq quot: ( ... elt -- ... ? ) -- ... before after )
+    dupd find drop [ swap [ dup 1 + ] dip snip ] [ f ] if* ; inline
+
 : split1-last ( seq subseq -- before after )
     [ <reversed> ] bi@ split1 [ reverse ] bi@
     dup [ swap ] when ;
@@ -69,6 +72,24 @@ PRIVATE>
 
 : split-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
     [ split, ] { } make ; inline
+
+<PRIVATE
+
+: (split*) ( n seq quot: ( ... elt -- ... ? ) -- )
+    [ find-from ]
+    [ [ [ 1 + ] 3dip [ 3dup swapd subseq , ] dip [ drop ] 2dip (split*) ] 3curry ]
+    [ drop [ [ drop ] 2dip 2dup length < [ swap [ tail ] unless-zero , ] [ 2drop ] if ] 2curry ]
+    3tri if ; inline recursive
+
+: split*, ( ... seq quot: ( ... elt -- ... ? ) -- ... ) [ 0 ] 2dip (split*) ; inline
+
+PRIVATE>
+
+: split* ( seq separators -- pieces )
+    [ [ member? ] curry split*, ] { } make ;
+
+: split*-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
+    [ split*, ] { } make ; inline
 
 GENERIC: string-lines ( str -- seq )
 

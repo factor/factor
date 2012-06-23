@@ -21,6 +21,7 @@ namespace factor
 	_(bignum_lesseq) \
 	_(bignum_log2) \
 	_(bignum_mod) \
+	_(bignum_gcd) \
 	_(bignum_multiply) \
 	_(bignum_not) \
 	_(bignum_or) \

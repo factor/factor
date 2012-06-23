@@ -7,6 +7,8 @@ ifdef CONFIG
 	BUNDLE = Factor.app
 	LIBPATH = -L/usr/X11R6/lib
 
+	include $(CONFIG)
+
 	CFLAGS = -Wall $(SITE_CFLAGS)
 
 	ifdef DEBUG
@@ -14,8 +16,6 @@ ifdef CONFIG
 	else
 		CFLAGS += -O3
 	endif
-
-	include $(CONFIG)
 
 	ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
 	EXECUTABLE = factor$(EXE_SUFFIX)$(EXE_EXTENSION)

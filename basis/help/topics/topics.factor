@@ -61,12 +61,12 @@ ERROR: no-article name ;
 M: no-article summary
     drop "Help article does not exist" ;
 
-: article ( name -- article )
+: lookup-article ( name -- article )
     articles get ?at [ no-article ] unless ;
 
 M: object valid-article? articles get key? ;
-M: object article-title article article-title ;
-M: object article-content article article-content ;
+M: object article-title lookup-article article-title ;
+M: object article-content lookup-article article-content ;
 M: object article-parent article-xref get at ;
 M: object set-article-parent article-xref get set-at ;
 

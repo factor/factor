@@ -43,6 +43,7 @@ ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
     norm
     norm-sq
     normalize
+    p-norm
 }
 "Comparing entire vectors:"
 { $subsections
@@ -289,6 +290,10 @@ HELP: v.
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }
 { $description "Computes the dot product of two vectors." } ;
 
+HELP: h.
+{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }
+{ $description "Computes the Hermitian inner product of two vectors." } ;
+
 HELP: vs+
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Adds " { $snippet "u" } " and " { $snippet "v" } " component-wise with saturation." }
@@ -451,6 +456,10 @@ HELP: norm-sq
 HELP: norm
 { $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
 { $description "Computes the length of a mathematical vector." } ;
+
+HELP: p-norm
+{ $values { "v" "a sequence of numbers" } { "p" "a positive real number" } { "x" "a non-negative real number" } }
+{ $description "Computes the length of a mathematical vector in " { $snippet "L^p" } " space." } ;
 
 HELP: normalize
 { $values { "u" "a sequence of numbers, not all zero" } { "v" "a sequence of numbers" } }

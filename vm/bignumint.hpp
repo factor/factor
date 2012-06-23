@@ -48,6 +48,14 @@ namespace factor
 typedef fixnum bignum_digit_type;
 typedef fixnum bignum_length_type;
 
+#ifndef _WIN64
+#ifdef FACTOR_64
+typedef __int128_t bignum_twodigit_type;
+#else
+typedef s64 bignum_twodigit_type;
+#endif
+#endif
+
 /* BIGNUM_TO_POINTER casts a bignum object to a digit array pointer. */
 #define BIGNUM_TO_POINTER(bignum) ((bignum_digit_type *)(bignum + 1))
 

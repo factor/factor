@@ -48,7 +48,7 @@ IN: stack-checker.known-words
     ( value -- ) apply-word/effect ;
 
 : non-inline-word ( word -- )
-    dup depends-on-effect
+    dup add-depends-on-effect
     {
         { [ dup "shuffle" word-prop ] [ infer-shuffle-word ] }
         { [ dup "special" word-prop ] [ infer-special ] }
@@ -333,6 +333,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ bignum-bitxor { bignum bignum } { bignum } define-primitive \ bignum-bitxor make-foldable
 \ bignum-log2 { bignum } { bignum } define-primitive \ bignum-log2 make-foldable
 \ bignum-mod { bignum bignum } { bignum } define-primitive \ bignum-mod make-foldable
+\ bignum-gcd { bignum bignum } { bignum } define-primitive \ bignum-gcd make-foldable
 \ bignum-shift { bignum fixnum } { bignum } define-primitive \ bignum-shift make-foldable
 \ bignum/i { bignum bignum } { bignum } define-primitive \ bignum/i make-foldable
 \ bignum/mod { bignum bignum } { bignum bignum } define-primitive \ bignum/mod make-foldable

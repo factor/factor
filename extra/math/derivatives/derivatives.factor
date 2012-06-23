@@ -30,7 +30,7 @@ DERIVATIVE: abs
 
 DERIVATIVE: sqrt [ sqrt 2 * / ]
 
-DERIVATIVE: exp [ exp * ]
+DERIVATIVE: e^ [ e^ * ]
 DERIVATIVE: log [ / ]
 
 DERIVATIVE: sin [ cos * ]

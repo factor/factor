@@ -105,7 +105,7 @@ M: ffi-errors error.
     "(The messages were probably printed to STDERR.)" print ;
 
 : gvFreeContext ( gvc -- )
-    int-gvFreeContext dup zero? [ drop ] [ ffi-errors ] if ;
+    int-gvFreeContext [ ffi-errors ] unless-zero ;
 
 DESTRUCTOR: gvFreeContext
 
