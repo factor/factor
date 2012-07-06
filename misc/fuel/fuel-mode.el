@@ -198,6 +198,7 @@ interacting with a factor listener is at your disposal.
   --
   ("Edit word at point" ("\M-." "\C-c\C-e\C-d" "\C-c\C-ed")
    fuel-edit-word-at-point :enable (symbol-at-point))
+  ("Edit word help" "\C-c\C-e\C-h"  fuel-add-help-word-template :enable (symbol-at-point))
   ("Edit word..." ("\C-c\C-e\C-w" "\C-c\C-ew") fuel-edit-word)
   ("Edit vocab..." ("\C-c\C-e\C-v" "\C-c\C-ev") fuel-edit-vocabulary)
   ("Jump back" "\M-," fuel-edit-pop-edit-word-stack)
