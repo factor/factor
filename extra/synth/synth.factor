@@ -7,7 +7,7 @@ MEMO: single-sine-wave ( samples/wave -- seq )
     [ iota ] [ pi 2 * swap / [ * sin ] curry ] bi map ;
 
 : (sine-wave) ( samples/wave n-samples -- seq )
-    [ single-sine-wave ] dip <repeating> ;
+    [ single-sine-wave ] dip <cycles> ;
 
 : sine-wave ( sample-freq freq seconds -- seq )
     pick * >integer [ /i ] dip (sine-wave) ;
