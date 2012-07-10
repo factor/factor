@@ -1,5 +1,8 @@
 USING: sequences.repeating tools.test ;
 IN: sequences.repeating.tests
 
-[ { 1 2 3 1 2 } ] [ { 1 2 3 } 5 repeated ] unit-test
-[ { 1 2 3 1 2 3 1 2 3 } ] [ { 1 2 3 } 9 repeated ] unit-test
+[ { 1 2 3 1 2 } ] [ { 1 2 3 } 5 cycle ] unit-test
+[ { 1 2 3 1 2 3 1 2 3 } ] [ { 1 2 3 } 9 cycle ] unit-test
+
+[ { } ] [ { 1 2 3 } 0 repeat ] unit-test
+[ { 1 1 1 2 2 2 3 3 3 } ] [ { 1 2 3 } 3 repeat ] unit-test
