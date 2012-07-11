@@ -330,8 +330,7 @@ ALIAS: corr sample-corr
     [ ?first ] keep [ max dup ] map nip ;
 
 : entropy ( seq -- n )
-    dup members [ [ = ] curry count ] with map
-    dup sum v/n dup [ log ] map v* sum neg ;
+    histogram values dup sum '[ _ / dup log * ] map-sum neg ;
 
 : binary-entropy ( p -- h )
     [ dup log * ] [ 1 swap - dup log * ] bi + neg 2 log / ;
