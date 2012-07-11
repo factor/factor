@@ -12,7 +12,7 @@ IN: factor.vim.fgen
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2011 Apr 06
+" Last Change: 2012 Jul 11
 " To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
@@ -59,8 +59,8 @@ syn keyword factorBoolean f t
 syn keyword factorBreakpoint B
 syn keyword factorFrySpecifier @ _ contained
 syn keyword factorDeclaration delimiter deprecated final flushable foldable inline recursive
-syn match factorCallQuotation /\<call(\s\(\S*\s\)\?--\(\s\S*\)\?\s)\>/
-syn match factorExecute /\<execute(\s\(\S*\s\)\?--\(\s\S*\)\?\s)\>/
+syn match factorCallQuotation /\<call(\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+)\>/ contained contains=factorStackEffect
+syn match factorExecute /\<execute(\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+)\>/ contained contains=factorStackEffect
 syn keyword factorCallNextMethod call-next-method
 
 <%
@@ -78,19 +78,20 @@ syn keyword factorCallNextMethod call-next-method
     } [ print-keywords ] each
 %>
 
-syn cluster factorReal          contains=factorInt,factorFloat,factorRatio,factorBinary,factorHex,factorOctal
+syn cluster factorReal          contains=factorInt,factorFloat,factorPosRatio,factorNegRatio,factorBinary,factorHex,factorOctal
 syn cluster factorNumber        contains=@factorReal,factorComplex
 syn cluster factorNumErr        contains=factorBinErr,factorHexErr,factorOctErr
-syn match   factorInt           /\<-\=[0-9]\([0-9,]*[0-9]\)\?\>/
-syn match   factorFloat         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\.[0-9,]*[0-9]\+\>/
-syn match   factorRatio         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\(+[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
+syn match   factorInt           /\<-\=[0-9]\([0-9,]*[0-9]\)\?\([eE]\([+-]\)\?[0-9]\+\)\?\>/
+syn match   factorFloat         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\(\.\(\([0-9,]*[0-9]\+\)\?\([eE]\([+-]\)\?[0-9]\+\)\?\)\?\)\?\>/
+syn match   factorPosRatio      /\<+\=[0-9]\([0-9,]*[0-9]\)\?\(+[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
+syn match   factorNegRatio      /\<\-[0-9]\([0-9,]*[0-9]\)\?\(\-[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
 syn region  factorComplex       start=/\<C{\>/ end=/\<}\>/ contains=@factorReal
-syn match   factorBinErr        /\<BIN:\s\+-\=[01,]*[^01 ]\S*\>/
-syn match   factorBinary        /\<BIN:\s\+-\=[01,]\+\>/
-syn match   factorHexErr        /\<HEX:\s\+-\=\(,\S*\|\S*,\|[-0-9a-fA-Fp,]*[^-0-9a-fA-Fp, ]\S*\)\>/
-syn match   factorHex           /\<HEX:\s\+-\=[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\(\.[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\)\?\(p-\=[0-9]\([0-9,]*[0-9]\)\?\)\?\>/
-syn match   factorOctErr        /\<OCT:\s\+-\=\(,\S*\|\S*,\|[0-7,]*[^0-7, ]\S*\)\>/
-syn match   factorOctal         /\<OCT:\s\+-\=[0-7,]\+\>/
+syn match   factorBinErr        /\<-\=0b[01,]*[^01 ]\S*\>/
+syn match   factorBinary        /\<-\=0b[01,]\+\>/
+syn match   factorHexErr        /\<-\=0x\(,\S*\|\S*,\|[-0-9a-fA-Fp,]*[^-0-9a-fA-Fp, ]\S*\)\>/
+syn match   factorHex           /\<-\=0x[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\(\.[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\)\?\(p-\=[0-9]\([0-9,]*[0-9]\)\?\)\?\>/
+syn match   factorOctErr        /\<-\=0o\(,\S*\|\S*,\|[0-7,]*[^0-7, ]\S*\)\>/
+syn match   factorOctal         /\<\+-\=0o[0-7,]\+\>/
 syn match   factorNan           /\<NAN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
 
 syn match   factorIn            /\<IN:\s\+\S\+\>/
@@ -161,8 +162,12 @@ syn match factorMultiStringContents /.*/ contained
 "syn match factorStackEffectErr /\<)\>/
 "syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
 "syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
-syn match factorStackEffect /\<(\s\(\S*\s\)\?--\(\s\S*\)\?\s)\>/ contained
-syn match factorLiteralStackEffect /\<((\s\(\S*\s\)\?--\(\s\S*\)\?\s))\>/
+syn match factorStackEffect /(\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+)\>/ contained contains=factorStackDelims,factorStackItems,factorStackVariables,factorCallExecuteDelim
+syn match factorLiteralStackEffect /((\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+))\>/ contained contains=factorStackDelims,factorStackItems,factorStackVariables,factorCallExecuteDelim
+syn match factorStackVariables contained "\<\.\.\S\+\>"
+syn match factorStackItems contained "\<\(\.\.\)\@!\S\+\>"
+syn keyword factorStackDelims contained ( ) (( )) --
+syn match factorCallExecuteDelim contained /(\s/
 
 "adapted from lisp.vim
 if exists("g:factor_norainbow")
@@ -212,6 +217,10 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorShebang                PreProc
     HiLink factorShebangErr             Error
     HiLink factorStackEffect            Typedef
+    HiLink factorStackDelims            Delimiter
+    HiLink factorCallExecuteDelim       Delimiter
+    HiLink factorStackVariables         Special
+    HiLink factorStackItems             Identifier
     HiLink factorLiteralStackEffect     Typedef
     HiLink factorTodo                   Todo
     HiLink factorInclude                Include
@@ -244,7 +253,8 @@ if version >= 508 || !exists("did_factor_syn_inits")
     HiLink factorMultiStringDelims      Typedef
     HiLink factorBracketErr             Error
     HiLink factorComplex                Number
-    HiLink factorRatio                  Number
+    HiLink factorPosRatio               Number
+    HiLink factorNegRatio               Number
     HiLink factorBinary                 Number
     HiLink factorBinErr                 Error
     HiLink factorHex                    Number
