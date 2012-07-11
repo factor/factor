@@ -6,11 +6,11 @@ sequences namespaces fry continuations destructors math images
 images.memory math.rectangles ;
 IN: cairo
 
-ERROR: cairo-error message ;
+ERROR: cairo-error n message ;
 
 : (check-cairo) ( cairo_status_t -- )
     dup CAIRO_STATUS_SUCCESS =
-    [ drop ] [ cairo_status_to_string cairo-error ] if ;
+    [ drop ] [ [ ] [ cairo_status_to_string ] bi cairo-error ] if ;
 
 : check-cairo ( cairo -- ) cairo_status (check-cairo) ;
 
