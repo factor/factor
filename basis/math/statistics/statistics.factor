@@ -94,7 +94,7 @@ PRIVATE>
 PRIVATE>
 
 : kth-object ( seq k quot: ( x y -- ? ) -- elt )
-    [ [ nth ] [ exchange ] ] dip (kth-object) ; inline    
+    [ [ nth ] [ exchange ] ] dip (kth-object) ; inline
 
 : kth-objects ( seq kths quot: ( x y -- ? ) -- elts )
     [ clone ] 2dip
@@ -142,8 +142,7 @@ PRIVATE>
     bi kth-smallests first2 ;
 
 : median ( seq -- x )
-    dup length odd?
-    [ lower-median ] [ medians + 2 / ] if ;
+    dup length odd? [ lower-median ] [ medians + 2 / ] if ;
 
 ! quantile can be any n-tile. quartile is n = 4, percentile is n = 100
 ! a,b,c,d parameters, N - number of samples, q is quantile (1/2 for median, 1/4 for 1st quartile)
