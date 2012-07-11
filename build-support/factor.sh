@@ -111,6 +111,14 @@ set_make() {
     MAKE='make'
 }
 
+check_git_branch() {
+    BRANCH=`git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'`
+    if [ "$BRANCH" != "master" ] ; then
+        $ECHO "git branch is $BRANCH, not master"
+        exit_script 3
+    fi
+}
+
 check_installed_programs() {
     ensure_program_installed chmod
     ensure_program_installed uname
@@ -504,6 +512,7 @@ get_url() {
 
 get_config_info() {
     find_build_info
+    check_git_branch
     check_installed_programs
     check_libraries
 }
