@@ -28,7 +28,7 @@ IN: xml.traversal
     assure-name '[ _ swap tag-named? ] find nip ;
 
 : tags-named ( tag name/string -- tags-seq )
-    assure-name '[ _ swap tag-named? ] filter { } like ;
+    assure-name '[ _ swap tag-named? ] { } filter-as ;
 
 <PRIVATE
 
@@ -41,7 +41,7 @@ PRIVATE>
     prepare-deep '[ _ swap tag-named? ] deep-find ;
 
 : deep-tags-named ( tag name/string -- tags-seq )
-    prepare-deep '[ _ swap tag-named? ] deep-filter { } like ;
+    prepare-deep '[ _ swap tag-named? ] { } deep-filter-as ;
 
 : tag-with-attr? ( elem attr-value attr-name -- ? )
     rot dup tag? [ swap attr = ] [ 3drop f ] if ;
