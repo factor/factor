@@ -11,8 +11,12 @@ HELP: deep-map
 { $description "Execute a quotation on each nested element of an object and its children, in preorder. That is, the result of the execution of the quotation on the outer is used to map the inner elements." }
 { $see-also map } ;
 
+HELP: deep-filter-as
+{ $values { "obj" object } { "quot" { $quotation "( ... elt -- ... ? )" } } { "exemplar" sequence } { "seq" sequence } }
+{ $description "Creates a sequence (of the same type as " { $snippet "exemplar" } ") of sub-nodes in the object which satisfy the given quotation, in preorder. This includes the object itself, if it passes the quotation." } ;
+
 HELP: deep-filter
-{ $values { "obj" object } { "quot" { $quotation "( ... elt -- ... ? )" } } { "seq" "a sequence" } }
+{ $values { "obj" object } { "quot" { $quotation "( ... elt -- ... ? )" } } { "seq" sequence } }
 { $description "Creates a sequence of sub-nodes in the object which satisfy the given quotation, in preorder. This includes the object itself, if it passes the quotation." }
 { $see-also filter } ;
 
@@ -26,8 +30,12 @@ HELP: deep-any?
 { $description "Tests whether the given object or any subnode satisfies the given quotation." }
 { $see-also any? } ;
 
+HELP: flatten-as
+{ $values { "obj" object } { "exemplar" sequence } { "seq" sequence } }
+{ $description "Creates a sequence (of the same type as " { $snippet "exemplar" } ") of all of the leaf nodes (non-sequence nodes, but including strings and numbers) in the object." } ;
+
 HELP: flatten
-{ $values { "obj" object } { "seq" "a sequence" } }
+{ $values { "obj" object } { "seq" sequence } }
 { $description "Creates a sequence of all of the leaf nodes (non-sequence nodes, but including strings and numbers) in the object." } ;
 
 HELP: deep-map!
