@@ -20,15 +20,17 @@ M: object branch? drop f ;
     [ call ] keep over branch?
     [ '[ _ deep-map ] map ] [ drop ] if ; inline recursive
 
+: deep-filter-as ( ... obj quot: ( ... elt -- ... ? ) exemplar -- ... seq )
+    [ selector [ deep-each ] dip ] dip [ like ] when* ; inline recursive
+
 : deep-filter ( ... obj quot: ( ... elt -- ... ? ) -- ... seq )
-    over [ selector [ deep-each ] dip ] dip
-    dup branch? [ like ] [ drop ] if ; inline recursive
+    over dup branch? [ drop f ] unless deep-filter-as ; inline
 
 : (deep-find) ( ... obj quot: ( ... elt -- ... ? ) -- ... elt ? )
     [ call ] 2keep rot [ drop t ] [
         over branch? [
             [ f ] 2dip '[ nip _ (deep-find) ] any?
-        ] [ 2drop f f ] if  
+        ] [ 2drop f f ] if
     ] if ; inline recursive
 
 : deep-find ( ... obj quot: ( ... elt -- ... ? ) -- ... elt ) (deep-find) drop ; inline
@@ -55,3 +57,6 @@ M: object branch? drop f ;
 
 : flatten ( obj -- seq )
     [ branch? not ] deep-filter ;
+
+: flatten-as ( obj exemplar -- seq )
+    [ branch? not ] swap deep-filter-as ;
