@@ -24,7 +24,7 @@ INSTANCE: cycles virtual-sequence
 TUPLE: repeats seq length ;
 
 : <repeats> ( seq times -- repeats )
-    [ dup length ] dip * repeats boa ;
+    over length * repeats boa ;
 
 : repeat ( seq times -- new-seq )
     dupd <repeats> swap like ;
