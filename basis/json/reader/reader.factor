@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: arrays assocs combinators hashtables io io.streams.string
-json kernel make math math.parser prettyprint sequences strings
-vectors ;
+USING: arrays assocs combinators fry hashtables io
+io.streams.string json kernel make math math.parser namespaces
+prettyprint sequences strings vectors ;
 
 IN: json.reader
 
@@ -80,7 +80,8 @@ ERROR: json-error ;
 PRIVATE>
 
 : read-jsons ( -- objects )
-    V{ } clone [ read1 dup ] [ scan ] while drop ;
+    V{ } clone input-stream get
+    '[ _ stream-read1 dup ] [ scan ] while drop ;
 
 : json> ( string -- object )
     [ read-jsons first ] with-string-reader ;
