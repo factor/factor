@@ -39,9 +39,7 @@ M: real json-print ( num -- )
 
 M: sequence json-print ( array -- )
     CHAR: [ write1 [
-        unclip-last-slice swap
-        [ json-print CHAR: , write1 ] each
-        json-print
+        [ CHAR: , write1 ] [ json-print ] interleave
     ] unless-empty CHAR: ] write1 ;
 
 SYMBOL: jsvar-encode?
@@ -52,23 +50,18 @@ TR: jsvar-encode "-" "_" ;
 
 : json-print-assoc ( assoc -- )
     CHAR: { write1 >alist [
-        unclip-last-slice swap
         jsvar-encode? get [
+            [ CHAR: , write1 ]
             [
                 [ first jsvar-encode json-print ]
                 [ CHAR: : write1 second json-print ] bi
-                CHAR: , write1
-            ] each
-            [ first jsvar-encode json-print ]
-            [ CHAR: : write1 second json-print ] bi
+            ] interleave
         ] [
+            [ CHAR: , write1 ]
             [
                 [ first json-print ]
                 [ CHAR: : write1 second json-print ] bi
-                CHAR: , write1
-            ] each
-            [ first json-print ]
-            [ CHAR: : write1 second json-print ] bi
+            ] interleave
         ] if
     ] unless-empty CHAR: } write1 ;
 
