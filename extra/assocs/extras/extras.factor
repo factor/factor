@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: assocs kernel sequences ;
+USING: arrays assocs assocs.private kernel sequences ;
 
 IN: assocs.extras
 
@@ -13,3 +13,11 @@ IN: assocs.extras
 
 : deep-at ( assoc seq -- value/f )
     [ swap at ] each ;
+
+: zip-as ( keys values exemplar -- assocs )
+    dup sequence? [
+        [ 2array ] swap 2map-as
+    ] [
+        [ dup length ] dip new-assoc
+        [ [ set-at ] with-assoc 2each ] keep
+    ] if ;
