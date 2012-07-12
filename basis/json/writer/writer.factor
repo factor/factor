@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel io.streams.string io strings splitting
 sequences math math.parser assocs classes words namespaces make
-prettyprint hashtables mirrors tr json fry ;
+prettyprint hashtables mirrors tr json fry combinators ;
 IN: json.writer
 
 #! Writes the object out to a stream in JSON format
@@ -22,7 +22,14 @@ M: json-null json-print ( null -- )
     drop "null" write ;
 
 M: string json-print ( obj -- )
-    CHAR: " write1 "\"" split "\\\"" join CHAR: \r swap remove "\n" split "\\r\\n" join write CHAR: " write1 ;
+    CHAR: " write1 [
+        {
+            { CHAR: "  [ "\\\"" write ] }
+            { CHAR: \r [ ] }
+            { CHAR: \n [ "\\r\\n" write ] }
+            [ write1 ]
+        } case
+    ] each CHAR: " write1 ;
 
 M: integer json-print ( num -- )
     number>string write ;
@@ -30,26 +37,45 @@ M: integer json-print ( num -- )
 M: real json-print ( num -- )
     >float number>string write ;
 
-M: sequence json-print ( array -- ) 
-    CHAR: [ write1 [ >json ] map "," join write CHAR: ] write1 ;
+M: sequence json-print ( array -- )
+    CHAR: [ write1 [
+        unclip-last-slice swap
+        [ json-print CHAR: , write1 ] each
+        json-print
+    ] unless-empty CHAR: ] write1 ;
 
 SYMBOL: jsvar-encode?
 t jsvar-encode? set-global
-TR: jsvar-encode "-" "_" ; 
-  
-: tuple>fields ( object -- seq )
-    <mirror>
-    jsvar-encode? get
-    '[ [ swap _ [ jsvar-encode ] when >json % ":" % >json % ] "" make ] { } assoc>map ;
+TR: jsvar-encode "-" "_" ;
 
-M: tuple json-print ( tuple -- )
-    CHAR: { write1 tuple>fields "," join write CHAR: } write1 ;
+<PRIVATE
 
-M: hashtable json-print ( hashtable -- )
-    CHAR: { write1 
-    jsvar-encode? get
-    '[ [ swap _ [ jsvar-encode ] when >json % CHAR: : , >json % ] "" make ] { } assoc>map
-    "," join write 
-    CHAR: } write1 ;
+: json-print-assoc ( assoc -- )
+    CHAR: { write1 >alist [
+        unclip-last-slice swap
+        jsvar-encode? get [
+            [
+                [ first jsvar-encode json-print ]
+                [ CHAR: : write1 second json-print ] bi
+                CHAR: , write1
+            ] each
+            [ first jsvar-encode json-print ]
+            [ CHAR: : write1 second json-print ] bi
+        ] [
+            [
+                [ first json-print ]
+                [ CHAR: : write1 second json-print ] bi
+                CHAR: , write1
+            ] each
+            [ first json-print ]
+            [ CHAR: : write1 second json-print ] bi
+        ] if
+    ] unless-empty CHAR: } write1 ;
+
+PRIVATE>
+
+M: tuple json-print ( tuple -- ) <mirror> json-print-assoc ;
+
+M: hashtable json-print ( hashtable -- ) json-print-assoc ;
 
 M: word json-print name>> json-print ;
