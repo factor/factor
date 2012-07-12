@@ -53,14 +53,18 @@ TR: jsvar-encode "-" "_" ;
         jsvar-encode? get [
             [ CHAR: , write1 ]
             [
-                [ first jsvar-encode json-print ]
-                [ CHAR: : write1 second json-print ] bi
+                first2
+                [ jsvar-encode json-print ]
+                [ CHAR: : write1 json-print ]
+                bi*
             ] interleave
         ] [
             [ CHAR: , write1 ]
             [
-                [ first json-print ]
-                [ CHAR: : write1 second json-print ] bi
+                first2
+                [ json-print ]
+                [ CHAR: : write1 json-print ]
+                bi*
             ] interleave
         ] if
     ] unless-empty CHAR: } write1 ;
