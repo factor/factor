@@ -23,23 +23,23 @@ SLOT: i
 : <sequence-copy> ( dest n i src -- n copy )
     [ 0 ] 3curry dip <copy> ; inline
 
-: (sequence-read) ( n buf stream -- count )
+: (sequence-read-unsafe) ( n buf stream -- count )
     [ (sequence-read-length) ]
     [ [ dup pick + ] change-i underlying>> ] bi
     [ <sequence-copy> (copy) drop ] 2curry keep ; inline
 
 : sequence-read-unsafe ( n buf stream -- count )
     dup >sequence-stream< bounds-check?
-    [ (sequence-read) ] [ 3drop 0 ] if ; inline
+    [ (sequence-read-unsafe) ] [ 3drop 0 ] if ; inline
 
-: find-sep ( seps stream -- sep/f n )
-    swap [ >sequence-stream< swap tail-slice ] dip
-    [ member-eq? ] curry [ find swap ] curry keep
-    over [ drop ] [ nip length ] if ; inline
+: find-separator ( seps stream -- sep/f n )
+    swap [ >sequence-stream< ] dip
+    [ member-eq? ] curry [ find-from swap ] curry 2keep
+    pick [ drop - ] [ length swap - nip ] if ; inline
 
-: sequence-read-until ( separators stream -- seq sep/f )
-    [ find-sep ] keep
-    [ [ sequence-read-unsafe ] (read-into-new) ] [ next ] bi swap ; inline
+: sequence-read-until ( seps stream -- seq sep/f )
+    [ find-separator ] keep
+    [ [ (sequence-read-unsafe) ] (read-into-new) ] [ next ] bi swap ; inline
 
 ! Writers
 M: growable dispose drop ;
