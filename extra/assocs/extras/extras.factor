@@ -12,12 +12,12 @@ IN: assocs.extras
     [ nip ] assoc-filter ; inline
 
 : deep-at ( assoc seq -- value/f )
-    [ swap at ] each ;
+    [ swap at ] each ; inline
 
-: zip-as ( keys values exemplar -- assocs )
+: zip-as ( keys values exemplar -- assoc )
     dup sequence? [
         [ 2array ] swap 2map-as
     ] [
         [ dup length ] dip new-assoc
         [ [ set-at ] with-assoc 2each ] keep
-    ] if ;
+    ] if ; inline
