@@ -17,16 +17,16 @@ GENERIC: deque-empty? ( deque -- ? )
 
 ERROR: empty-deque ;
 
-: peek-front ( dlist -- obj )
+: peek-front ( deque -- obj )
     peek-front* [ drop empty-deque ] unless ;
 
-: ?peek-front ( dlist -- obj/f )
+: ?peek-front ( deque -- obj/f )
     peek-front* [ drop f ] unless ;
 
-: peek-back ( dlist -- obj )
+: peek-back ( deque -- obj )
     peek-back* [ drop empty-deque ] unless ;
 
-: ?peek-back ( dlist -- obj/f )
+: ?peek-back ( deque -- obj/f )
     peek-back* [ drop f ] unless ;
 
 : push-front ( obj deque -- )
