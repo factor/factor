@@ -78,17 +78,17 @@ IN: dlists.tests
 [ V{ 2 1 } V{ 2 1 3 } ] [
     <dlist> 1 over push-front 2 over push-front
     dup clone 3 over push-back
-    [ dlist>seq ] bi@
+    [ dlist>sequence ] bi@
 ] unit-test
 
-[ V{ f 3 1 f } ] [ <dlist> 1 over push-front 3 over push-front f over push-front f over push-back dlist>seq ] unit-test
+[ V{ f 3 1 f } ] [ <dlist> 1 over push-front 3 over push-front f over push-front f over push-back dlist>sequence ] unit-test
 
-[ V{ } ] [ <dlist> dlist>seq ] unit-test
+[ V{ } ] [ <dlist> dlist>sequence ] unit-test
 
-[ V{ 0 2 4 } ] [ <dlist> { 0 1 2 3 4 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
-[ V{ 2 4 } ] [ <dlist> { 1 2 3 4 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
-[ V{ 2 4 } ] [ <dlist> { 1 2 3 4 5 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
-[ V{ 0 2 4 } ] [ <dlist> { 0 1 2 3 4 5 } over push-all-back [ even? ] dlist-filter dlist>seq ] unit-test
+[ V{ 0 2 4 } ] [ <dlist> { 0 1 2 3 4 } over push-all-back [ even? ] dlist-filter dlist>sequence ] unit-test
+[ V{ 2 4 } ] [ <dlist> { 1 2 3 4 } over push-all-back [ even? ] dlist-filter dlist>sequence ] unit-test
+[ V{ 2 4 } ] [ <dlist> { 1 2 3 4 5 } over push-all-back [ even? ] dlist-filter dlist>sequence ] unit-test
+[ V{ 0 2 4 } ] [ <dlist> { 0 1 2 3 4 5 } over push-all-back [ even? ] dlist-filter dlist>sequence ] unit-test
 
 [ t ] [ DL{ } DL{ } = ] unit-test
 [ t ] [ DL{ 1 } DL{ 1 } = ] unit-test
@@ -107,17 +107,17 @@ TUPLE: my-node < dlist-link { obj fixnum } ;
     my-node new
         swap >>obj ; inline
 
-[ V{ 1 } ] [ <dlist> 1 <my-node> over push-node-front dlist>seq ] unit-test
-[ V{ 2 1 } ] [ <dlist> 1 <my-node> over push-node-front 2 <my-node> over push-node-front dlist>seq ] unit-test
+[ V{ 1 } ] [ <dlist> 1 <my-node> over push-node-front dlist>sequence ] unit-test
+[ V{ 2 1 } ] [ <dlist> 1 <my-node> over push-node-front 2 <my-node> over push-node-front dlist>sequence ] unit-test
 
-[ V{ 1 } ] [ <dlist> 1 <my-node> over push-node-back dlist>seq ] unit-test
-[ V{ 1 2 } ] [ <dlist> 1 <my-node> over push-node-back 2 <my-node> over push-node-back dlist>seq ] unit-test
-[ V{ 1 2 3 } ] [ <dlist> 1 <my-node> over push-node-back 2 <my-node> over push-node-back 3 <my-node> over push-node-back dlist>seq ] unit-test
+[ V{ 1 } ] [ <dlist> 1 <my-node> over push-node-back dlist>sequence ] unit-test
+[ V{ 1 2 } ] [ <dlist> 1 <my-node> over push-node-back 2 <my-node> over push-node-back dlist>sequence ] unit-test
+[ V{ 1 2 3 } ] [ <dlist> 1 <my-node> over push-node-back 2 <my-node> over push-node-back 3 <my-node> over push-node-back dlist>sequence ] unit-test
 
 : assert-links ( dlist-node -- )
     [ prev>> ] [ next>> ] bi 2array { f f } assert= ;
 
-[ V{ } ] [ <dlist> 1 <my-node> over push-node-back [ [ back>> ] [ ] bi delete-node ] [ ] bi dlist>seq ] unit-test
+[ V{ } ] [ <dlist> 1 <my-node> over push-node-back [ [ back>> ] [ ] bi delete-node ] [ ] bi dlist>sequence ] unit-test
 [ V{ 1 2 } ] [| |
     <dlist> :> dl
         1 <my-node> :> n1 n1 dl push-node-back
@@ -125,7 +125,7 @@ TUPLE: my-node < dlist-link { obj fixnum } ;
         3 <my-node> :> n3 n3 dl push-node-back
 
     n3 dl delete-node n3 assert-links
-    dl dlist>seq
+    dl dlist>sequence
 ] unit-test
 
 [ V{ 1 3 } ] [| |
@@ -135,7 +135,7 @@ TUPLE: my-node < dlist-link { obj fixnum } ;
         3 <my-node> :> n3 n3 dl push-node-back
 
     n2 dl delete-node n2 assert-links
-    dl dlist>seq
+    dl dlist>sequence
 ] unit-test
 
 [ V{ 2 3 } ] [| |
@@ -145,7 +145,7 @@ TUPLE: my-node < dlist-link { obj fixnum } ;
         3 <my-node> :> n3 n3 dl push-node-back
 
     n1 dl delete-node n1 assert-links
-    dl dlist>seq
+    dl dlist>sequence
 ] unit-test
 
 
