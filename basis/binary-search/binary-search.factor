@@ -14,9 +14,9 @@ IN: binary-search
         midpoint@ midpoint
     ] [
         midpoint quot call {
-            { +eq+ [ midpoint@ midpoint ] }
             { +lt+ [ seq from midpoint@ quot (search) ] }
             { +gt+ [ seq midpoint@ to quot (search) ] }
+            { +eq+ [ midpoint@ midpoint ] }
         } case
     ] if ; inline recursive
 
