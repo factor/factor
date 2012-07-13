@@ -8,12 +8,10 @@ IN: xml.data
 TUPLE: interpolated var ;
 C: <interpolated> interpolated
 
-UNION: nullable-string string POSTPONE: f ;
-
 TUPLE: name
-    { space nullable-string }
+    { space maybe{ string } }
     { main string }
-    { url nullable-string } ;
+    { url maybe{ string } } ;
 C: <name> name
 
 : ?= ( object/f object/f -- ? )
@@ -97,8 +95,6 @@ TUPLE: attlist-decl < directive
     { att-defs string } ;
 C: <attlist-decl> attlist-decl
 
-UNION: boolean t POSTPONE: f ;
-
 TUPLE: entity-decl < directive
     { name string }
     { def string }
@@ -111,20 +107,16 @@ C: <system-id> system-id
 TUPLE: public-id { pubid-literal string } { system-literal string } ;
 C: <public-id> public-id
 
-UNION: id system-id public-id POSTPONE: f ;
-
 TUPLE: dtd
     { directives sequence }
     { entities assoc }
     { parameter-entities assoc } ;
 C: <dtd> dtd
 
-UNION: dtd/f dtd POSTPONE: f ;
-
 TUPLE: doctype-decl < directive
     { name string }
-    { external-id id }
-    { internal-subset dtd/f } ;
+    { external-id maybe{ system-id public-id } }
+    { internal-subset maybe{ dtd } } ;
 C: <doctype-decl> doctype-decl
 
 TUPLE: notation-decl < directive
