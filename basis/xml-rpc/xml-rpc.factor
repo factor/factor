@@ -18,8 +18,6 @@ M: integer item>xml
     [ "Integers must fit in 32 bits" throw ] unless
     [XML <i4><-></i4> XML] ;
 
-UNION: boolean t POSTPONE: f ;
-
 M: boolean item>xml
     "1" "0" ? [XML <boolean><-></boolean> XML] ;
 
