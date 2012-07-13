@@ -187,7 +187,7 @@ M: dlist clear-deque ( dlist -- )
 : dlist-each ( ... dlist quot: ( ... value -- ... ) -- ... )
     '[ obj>> @ ] dlist-each-node ; inline
 
-: dlist>seq ( dlist -- seq )
+: dlist>sequence ( dlist -- seq )
     [ ] collector [ dlist-each ] dip ;
 
 : >dlist ( seq -- dlist )
