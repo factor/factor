@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private assocs arrays
 delegate.protocols delegate vectors accessors multiline
-macros words quotations combinators slots fry strings ;
+macros words quotations combinators slots fry strings
+combinators.short-circuit ;
 IN: xml.data
 
 TUPLE: interpolated var ;
@@ -18,9 +19,11 @@ C: <name> name
     2dup and [ = ] [ 2drop t ] if ;
 
 : names-match? ( name1 name2 -- ? )
-    [ [ space>> ] bi@ ?= ]
-    [ [ url>> ] bi@ ?= ]
-    [ [ main>> ] bi@ ?= ] 2tri and and ;
+    {
+        [ [ space>> ] bi@ ?= ]
+        [ [ url>> ] bi@ ?= ]
+        [ [ main>> ] bi@ ?= ]
+    } 2&& ;
 
 : <simple-name> ( string -- name )
     "" swap f <name> ;
