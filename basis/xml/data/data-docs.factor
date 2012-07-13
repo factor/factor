@@ -201,7 +201,7 @@ HELP: notation-decl
 { $class-description "Describes the class of element declarations, like " { $snippet "<!NOTATION jpg SYSTEM './jpgviewer'>" } "." } ;
 
 HELP: <notation-decl>
-{ $values { "name" string } { "id" id } { "notation-decl" notation-decl } }
+{ $values { "name" string } { "id" string } { "notation-decl" notation-decl } }
 { $description "Creates an notation declaration object, of the class " { $link notation-decl } "." } ;
 
 HELP: doctype-decl
