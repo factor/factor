@@ -18,7 +18,7 @@ M: dlist-link obj>> ;
         swap >>prev
         swap >>obj ; inline
 
-: <dlist-node> ( obj prev next -- node )
+: <dlist-node> ( obj prev next -- dlist-node )
     \ dlist-node new-dlist-link ; inline
 
 TUPLE: dlist
@@ -105,12 +105,12 @@ M: dlist push-front* ( obj dlist -- dlist-node )
     [ front<< ] keep
     set-back-to-front ;
 
-: push-node-front ( node dlist -- )
+: push-node-front ( dlist-node dlist -- )
     [ front>> >>next drop ]
     [ front<< ]
     [ [ set-next-prev ] [ set-back-to-front ] bi* ] 2tri ;
 
-: push-node-back ( node dlist -- )
+: push-node-back ( dlist-node dlist -- )
     [ back>> >>prev drop ]
     [ back<< ]
     [ [ set-prev-next ] [ set-front-to-back ] bi* ] 2tri ;
