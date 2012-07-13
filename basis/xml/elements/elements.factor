@@ -18,29 +18,26 @@ IN: xml.elements
 : interpolate-quote ( -- interpolated )
     [ quoteless-attr ] take-interpolated ;
 
-: parse-attr ( -- )
-    parse-name pass-blank "=" expect pass-blank
-    get-char CHAR: < eq?
-    [ "<-" expect interpolate-quote ]
-    [ t parse-quote* ] if 2array , ;
-
 : start-tag ( -- name ? )
     #! Outputs the name and whether this is a closing tag
     get-char CHAR: / eq? dup [ next ] when
     parse-name swap ;
-
-: (middle-tag) ( -- )
-    pass-blank version-1.0? get-char name-start?
-    [ parse-attr (middle-tag) ] when ;
 
 : assure-no-duplicates ( attrs-alist -- attrs-alist )
     H{ } clone 2dup '[ swap _ push-at ] assoc-each
     [ nip length 2 >= ] { } assoc-filter-as
     [ first first2 duplicate-attr ] unless-empty ;
 
+: parse-attr ( -- array )
+    parse-name pass-blank "=" expect pass-blank
+    get-char CHAR: < eq?
+    [ "<-" expect interpolate-quote ]
+    [ t parse-quote* ] if 2array ;
+
 : middle-tag ( -- attrs-alist )
-    ! f make will make a vector if it has any elements
-    [ (middle-tag) ] f make pass-blank
+    ! f produce-as will make a vector if it has any elements
+    [ pass-blank version-1.0? get-char name-start? ]
+    [ parse-attr ] f produce-as pass-blank
     dup length 1 > [ assure-no-duplicates ] when ;
 
 : end-tag ( name attrs-alist -- tag )

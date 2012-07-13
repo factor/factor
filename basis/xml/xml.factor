@@ -89,7 +89,7 @@ M: closer process
     [ drop default-prolog ] unless ;
 
 : cut-prolog ( seq -- newseq )
-    [ [ prolog? not ] [ "" = not ] bi and ] filter ;
+    [ { [ prolog? not ] [ "" = not ] } 1&& ] filter ;
 
 : make-xml-doc ( seq -- xml-doc )
     [ get-prolog ] keep
