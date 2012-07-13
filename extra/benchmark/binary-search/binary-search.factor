@@ -10,6 +10,7 @@ MEMO: primes-under-million ( -- seq ) 1000000 primes-upto ;
 primes-under-million drop
 
 : binary-search-benchmark ( -- )
-    1 1000000 [a,b] [ primes-under-million sorted-member? ] map length . ;
+    1 1000000 [a,b] [ primes-under-million sorted-member? ] map
+    length 1000000 assert= ;
 
 MAIN: binary-search-benchmark
