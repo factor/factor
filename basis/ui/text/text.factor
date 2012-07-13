@@ -19,22 +19,14 @@ HOOK: flush-layout-cache font-renderer ( -- )
 
 HOOK: string-dim font-renderer ( font string -- dim )
 
-HOOK: string-width font-renderer ( font string -- w )
+: string-width ( font string -- w ) string-dim first ; inline
 
-HOOK: string-height font-renderer ( font string -- h )
-
-M: object string-dim [ string-width ] [ string-height ] 2bi 2array ;
-
-M: object string-width string-dim first ;
-
-M: object string-height string-dim second ;
+: string-height ( font string -- h ) string-dim second ; inline
 
 HOOK: free-fonts font-renderer ( world -- )
 
 : combine-text-dim ( dim1 dim2 -- dim3 )
-    [ [ first ] bi@ max ]
-    [ [ second ] bi@ + ]
-    2bi 2array ;
+    [ first2 ] bi@ swapd [ max ] [ + ] 2bi* 2array ; inline
 
 PRIVATE>
 
