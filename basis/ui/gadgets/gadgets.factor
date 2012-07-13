@@ -336,7 +336,7 @@ PRIVATE>
 
 : add-gadgets ( parent children -- parent )
     not-in-layout
-    [ over (add-gadget) ] each
+    over '[ _ (add-gadget) ] each
     dup relayout ;
 
 : parents ( gadget -- seq )
