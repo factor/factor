@@ -110,6 +110,8 @@ C: <system-id> system-id
 TUPLE: public-id { pubid-literal string } { system-literal string } ;
 C: <public-id> public-id
 
+UNION: id system-id public-id ;
+
 TUPLE: dtd
     { directives sequence }
     { entities assoc }
@@ -118,7 +120,7 @@ C: <dtd> dtd
 
 TUPLE: doctype-decl < directive
     { name string }
-    { external-id maybe{ system-id public-id } }
+    { external-id maybe{ id } }
     { internal-subset maybe{ dtd } } ;
 C: <doctype-decl> doctype-decl
 
