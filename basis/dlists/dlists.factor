@@ -12,6 +12,8 @@ TUPLE: dlist-node < dlist-link obj ;
 
 M: dlist-link obj>> ;
 
+M: dlist-link node-value obj>> ;
+
 : new-dlist-link ( obj prev next class -- node )
     new
         swap >>next
@@ -33,14 +35,12 @@ TUPLE: dlist
 
 M: dlist deque-empty? front>> not ; inline
 
-M: dlist-node node-value obj>> ;
-
 <PRIVATE
 
 : dlist-nodes= ( dlist-node/f dlist-node/f -- ? )
     {
-        [ [ dlist-node? ] both? ]
-        [ [ obj>> ] bi@ = ] 
+        [ [ dlist-link? ] both? ]
+        [ [ obj>> ] bi@ = ]
     } 2&& ; inline
 
 PRIVATE>
@@ -49,7 +49,7 @@ M: dlist equal?
     over dlist? [
         [ front>> ] bi@
         [ 2dup dlist-nodes= ]
-        [ [ next>> ] bi@ ] while 
+        [ [ next>> ] bi@ ] while
         or not
     ] [
         2drop f
