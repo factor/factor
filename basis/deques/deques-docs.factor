@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel math sequences
-quotations dlists ;
+quotations ;
 IN: deques
 
 HELP: deque-empty?
@@ -53,12 +53,12 @@ HELP: peek-front*
 { $contract "Returns the object at the front of the deque, and a boolean indicating if an object was found." } ;
 
 HELP: peek-front
-{ $values { "dlist" dlist } { "obj" object } }
+{ $values { "deque" deque } { "obj" object } }
 { $description "Returns the object at the front of the deque." }
 { $errors "Throws an error if the deque is empty." } ;
 
 HELP: ?peek-front
-{ $values { "dlist" dlist } { "obj/f" "an object or " { $link f } } }
+{ $values { "deque" deque } { "obj/f" "an object or " { $link f } } }
 { $description "A forgiving version of " { $link peek-front } ". If the deque is empty, returns " { $link f } "." } ;
 
 HELP: pop-front
@@ -76,12 +76,12 @@ HELP: peek-back*
 { $contract "Returns the object at the back of the deque, and a boolean indicating if an object was found." } ;
 
 HELP: peek-back
-{ $values { "dlist" dlist } { "obj" object } }
+{ $values { "deque" deque } { "obj" object } }
 { $description "Returns the object at the back of the deque." }
 { $errors "Throws an error if the deque is empty." } ;
 
 HELP: ?peek-back
-{ $values { "dlist" dlist } { "obj/f" "an object or " { $link f } } }
+{ $values { "deque" deque } { "obj/f" "an object or " { $link f } } }
 { $description "A forgiving version of " { $link peek-back } ". If the deque is empty, returns " { $link f } "." } ;
 
 HELP: pop-back
