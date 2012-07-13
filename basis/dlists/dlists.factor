@@ -190,7 +190,7 @@ M: dlist clear-deque ( dlist -- )
 : dlist>seq ( dlist -- seq )
     [ ] collector [ dlist-each ] dip ;
 
-: seq>dlist ( seq -- dlist )
+: >dlist ( seq -- dlist )
     <dlist> [ '[ _ push-back ] each ] keep ;
 
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
@@ -204,6 +204,6 @@ M: dlist clone
 
 INSTANCE: dlist deque
 
-SYNTAX: DL{ \ } [ seq>dlist ] parse-literal ;
+SYNTAX: DL{ \ } [ >dlist ] parse-literal ;
 
 { "dlists" "prettyprint" } "dlists.prettyprint" require-when
