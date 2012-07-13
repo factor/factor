@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax assocs core-foundation
 core-foundation.dictionaries core-foundation.strings
-core-graphics.types destructors init
-kernel math memoize fonts combinators unix.types ;
+core-graphics.types destructors init kernel locals
+math memoize fonts combinators unix.types ;
 IN: core-text.fonts
 
 TYPEDEF: void* CTFontRef
@@ -85,33 +85,24 @@ CONSTANT: font-names
 : font-name ( string -- string' )
     font-names ?at drop ;
 
-: (bold) ( x -- y ) kCTFontBoldTrait bitor ; inline
-
-: (italic) ( x -- y ) kCTFontItalicTrait bitor ; inline
-
 : font-traits ( font -- n )
     [ 0 ] dip
-    [ bold?>> [ (bold) ] when ]
-    [ italic?>> [ (italic) ] when ] bi ;
+    [ bold?>> [ kCTFontBoldTrait bitor ] when ]
+    [ italic?>> [ kCTFontItalicTrait bitor ] when ] bi ;
 
-: apply-font-traits ( font style -- font' )
-    [ drop ] [ [ 0.0 f ] dip font-traits dup ] 2bi
-    CTFontCreateCopyWithSymbolicTraits
-    dup [ [ CFRelease ] dip ] [ drop ] if ;
-
-MEMO: (cache-font) ( font -- open-font )
+MEMO:: (cache-font) ( name size traits -- open-font )
     [
-        [
-            [ name>> font-name <CFString> &CFRelease ] [ size>> ] bi
-            f CTFontCreateWithName
-        ] keep apply-font-traits
+        name font-name <CFString> &CFRelease
+        size f CTFontCreateWithName dup
+        0.0 f traits dup CTFontCreateCopyWithSymbolicTraits
+        [ [ CFRelease ] dip ] when*
     ] with-destructors ;
 
 : cache-font ( font -- open-font )
-    strip-font-colors (cache-font) ;
+    [ name>> ] [ size>> ] [ font-traits ] tri (cache-font) ;
 
-MEMO: (cache-font-metrics) ( font -- metrics )
-    [ metrics new ] dip
+MEMO: (cache-font-metrics) ( name size traits -- metrics )
+    [ metrics new ] 3dip
     (cache-font) {
         [ CTFontGetAscent >>ascent ]
         [ CTFontGetDescent >>descent ]
@@ -122,7 +113,7 @@ MEMO: (cache-font-metrics) ( font -- metrics )
     compute-height ;
 
 : cache-font-metrics ( font -- metrics )
-    strip-font-colors (cache-font-metrics) ;
+    [ name>> ] [ size>> ] [ font-traits ] tri (cache-font-metrics) ;
 
 [
     \ (cache-font) reset-memoized
