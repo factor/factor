@@ -35,20 +35,10 @@ TUPLE: dlist
 
 M: dlist deque-empty? front>> not ; inline
 
-<PRIVATE
-
-: dlist-nodes= ( dlist-node/f dlist-node/f -- ? )
-    {
-        [ [ dlist-link? ] both? ]
-        [ [ obj>> ] bi@ = ]
-    } 2&& ; inline
-
-PRIVATE>
-
 M: dlist equal?
     over dlist? [
         [ front>> ] bi@
-        [ 2dup dlist-nodes= ]
+        [ 2dup { [ and ] [ [ obj>> ] bi@ = ] } 2&& ]
         [ [ next>> ] bi@ ] while
         or not
     ] [
