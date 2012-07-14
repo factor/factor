@@ -158,7 +158,7 @@ PRIVATE>
 
 : process-names ( data -- names-hash )
     1 swap (process-data) [
-        >lower { { CHAR: \s CHAR: - } } substitute swap
+        >lower H{ { CHAR: \s CHAR: - } } substitute swap
     ] H{ } assoc-map-as ;
 
 : multihex ( hexstring -- string )

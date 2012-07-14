@@ -42,7 +42,7 @@ M: string vocab-path ( string -- path/f )
 PRIVATE>
 
 : vocab-dir ( vocab -- dir )
-    vocab-name { { CHAR: . CHAR: / } } substitute ;
+    vocab-name H{ { CHAR: . CHAR: / } } substitute ;
 
 : append-vocab-dir ( vocab str/f -- path )
     [ vocab-name "." split ] dip

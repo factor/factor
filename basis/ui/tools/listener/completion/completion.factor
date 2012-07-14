@@ -17,7 +17,7 @@ SLOT: history
 
 : history-list ( interactor -- alist )
     history>> elements>>
-    [ dup string>> { { CHAR: \n CHAR: \s } } substitute ] { } map>assoc
+    [ dup string>> H{ { CHAR: \n CHAR: \s } } substitute ] { } map>assoc
     <reversed> ;
 
 : history-completions ( short interactor -- seq )
