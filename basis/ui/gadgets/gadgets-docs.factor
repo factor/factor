@@ -38,11 +38,11 @@ HELP: pick-up
 { $values { "point" "a pair of integers" } { "gadget" gadget } { "child/f" { $maybe gadget } } }
 { $description "Outputs the child at a point in the gadget's co-ordinate system. This word recursively descends the gadget hierarchy, and so outputs the deepest child." } ;
 
-HELP: max-dim
+HELP: max-dims
 { $values { "dims" "a sequence of pairs of integers" } { "dim" "a pair of integers" } }
 { $description "Outputs the smallest dimensions of a rectangle which can fit all the dimensions in the sequence." } ;
 
-{ pref-dims max-dim dim-sum } related-words
+{ pref-dims max-dims sum-dims } related-words
 
 HELP: each-child
 { $values { "gadget" gadget } { "quot" { $quotation "( child -- )" } } }
@@ -88,7 +88,7 @@ HELP: prefer
 { $values { "gadget" gadget } }
 { $contract "Resizes the gadget to assume its preferred dimensions." } ;
 
-HELP: dim-sum
+HELP: sum-dims
 { $values { "seq" "a sequence of pairs of integers" } { "dim" "a pair of integers" } }
 { $description "Sums a sequence of dimensions." } ;
 
