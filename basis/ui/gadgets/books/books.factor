@@ -26,7 +26,7 @@ M: book model-changed ( model book -- )
 : <empty-book> ( model -- book )
     book new-book ;
 
-M: book pref-dim* ( book -- dim ) children>> pref-dims max-dim ;
+M: book pref-dim* ( book -- dim ) children>> pref-dims max-dims ;
 
 M: book layout* ( book -- )
     [ children>> ] [ dim>> ] bi '[ _ >>dim drop ] each ;

@@ -270,8 +270,8 @@ ARTICLE: "ui-layout-impl" "Implementing layout gadgets"
     pref-dim
     pref-dims
     prefer
-    max-dim
-    dim-sum
+    max-dims
+    sum-dims
 }
 { $warning
     "When implementing the " { $link layout* } " generic word for a gadget which inherits from another layout, the " { $link children-on } " word might have to be re-implemented as well."
