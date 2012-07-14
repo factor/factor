@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences io namespaces make combinators
 unicode.categories io.files combinators.short-circuit
-io.streams.string ;
+io.streams.string fry memoize ;
 IN: csv
 
 SYMBOL: delimiter
@@ -13,13 +13,19 @@ CHAR: , delimiter set-global
 
 : delimiter> ( -- delimiter ) delimiter get ; inline
 
-DEFER: quoted-field
+MEMO: (field-end) ( delimiter -- delimiter' )
+    "\n" swap suffix ;
 
 : skip-to-field-end ( -- endchar )
-  "\n" delimiter> suffix read-until nip ; inline
+    delimiter> (field-end) read-until nip ; inline
+
+DEFER: quoted-field
+
+MEMO: (quoted-field) ( delimiter -- delimiter' )
+    "\"\n" swap suffix ;
 
 : not-quoted-field ( -- endchar )
-    "\"\n" delimiter> suffix read-until
+    delimiter> (quoted-field) read-until
     dup {
         { CHAR: "    [ 2drop quoted-field ] }
         { delimiter> [ swap [ blank? ] trim % ] }
@@ -43,16 +49,15 @@ DEFER: quoted-field
     [ not-quoted-field ] "" make  ;
 
 : (row) ( -- sep )
-    field ,
-    dup delimiter> = [ drop (row) ] when ;
+    f delimiter> '[ dup _ = ]
+    [ drop field , ] do while ;
 
 : row ( -- eof? array[string] )
     [ (row) ] { } make ;
 
 : (csv) ( -- )
-    row
-    dup [ empty? ] all? [ drop ] [ , ] if
-    [ (csv) ] when ;
+    [ dup [ empty? ] all? [ drop ] [ , ] if ]
+    [ row ] do while ;
 
 PRIVATE>
 
@@ -75,7 +80,9 @@ PRIVATE>
 <PRIVATE
 
 : needs-escaping? ( cell -- ? )
-    [ { [ "\n\"" member? ] [ delimiter> = ] } 1|| ] any? ; inline
+    delimiter> '[
+        dup "\n\"" member? [ drop t ] [ _ = ] if
+    ] any? ; inline
 
 : escape-quotes ( cell -- cell' )
     [
@@ -95,7 +102,7 @@ PRIVATE>
 PRIVATE>
 
 : write-row ( row -- )
-    [ delimiter> write1 ]
+    delimiter> '[ _ write1 ]
     [ escape-if-required write ] interleave nl ; inline
 
 <PRIVATE
