@@ -14,7 +14,7 @@ CHAR: , delimiter set-global
 : delimiter> ( -- delimiter ) delimiter get ; inline
 
 MEMO: (field-end) ( delimiter -- delimiter' )
-    "\n" swap suffix ;
+    "\n" swap suffix ; inline
 
 : skip-to-field-end ( -- endchar )
     delimiter> (field-end) read-until nip ; inline
@@ -22,16 +22,14 @@ MEMO: (field-end) ( delimiter -- delimiter' )
 DEFER: quoted-field
 
 MEMO: (quoted-field) ( delimiter -- delimiter' )
-    "\"\n" swap suffix ;
+    "\"\n" swap suffix ; inline
 
 : not-quoted-field ( -- endchar )
     delimiter> (quoted-field) read-until
-    dup {
-        { CHAR: "    [ 2drop quoted-field ] }
-        { delimiter> [ swap [ blank? ] trim % ] }
-        { CHAR: \n   [ swap [ blank? ] trim % ] }
-        { f          [ swap [ blank? ] trim % ] }
-    } case ;
+    dup CHAR: " =
+    [ 2drop quoted-field ]
+    [ swap [ blank? ] trim % ]
+    if ;
 
 : maybe-escaped-quote ( -- endchar )
     read1 dup {
