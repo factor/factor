@@ -1,6 +1,5 @@
-USING: deques dlists dlists.private kernel tools.test random
-assocs sets sequences namespaces sorting debugger io prettyprint
-math accessors classes locals arrays ;
+USING: accessors arrays classes deques dlists kernel locals
+math tools.test ;
 IN: dlists.tests
 
 [ t ] [ <dlist> deque-empty? ] unit-test
