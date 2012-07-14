@@ -39,14 +39,14 @@ TUPLE: track < pack sizes ;
 M: track layout* ( track -- ) dup track-layout pack-layout ;
 
 : track-pref-dims-1 ( track -- dim )
-    [ children>> pref-dims max-dim ]
+    [ children>> pref-dims max-dims ]
     [ pref-dim>> { 0 0 } or ] bi vmax ;
 
 : track-pref-dims-2 ( track -- dim )
     [
         [ children>> pref-dims ] [ normalized-sizes ] bi
         [ dup { 0 f } member? [ 2drop { 0 0 } ] [ v/n ] if ] 2map
-        max-dim [ >fixnum ] map
+        max-dims [ >fixnum ] map
     ] [ gap-dim ] bi v+ ;
 
 M: track pref-dim* ( gadget -- dim )
