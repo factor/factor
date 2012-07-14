@@ -66,11 +66,11 @@ PRIVATE>
 
 : max-pack-dim ( pack sizes -- dim )
     over align>> +baseline+ eq?
-    [ [ children>> ] dip measure-height 0 swap 2array ] [ nip max-dim ] if ;
+    [ [ children>> ] dip measure-height 0 swap 2array ] [ nip max-dims ] if ;
 
 : pack-pref-dim ( pack sizes -- dim )
     [ max-pack-dim ]
-    [ [ gap-dim ] [ dim-sum ] bi* v+ ]
+    [ [ gap-dim ] [ sum-dims ] bi* v+ ]
     [ drop orientation>> ]
     2tri set-axis ;
 

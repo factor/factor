@@ -87,9 +87,9 @@ M: gadget contains-point? ( loc gadget -- ? )
     [ contains-point? ] with find-last nip
     [ [ loc>> v- ] [ pick-up ] bi ] [ nip ] ?if ;
 
-: max-dim ( dims -- dim ) { 0 0 } [ vmax ] reduce ;
+: max-dims ( dims -- dim ) { 0 0 } [ vmax ] reduce ;
 
-: dim-sum ( seq -- dim ) { 0 0 } [ v+ ] reduce ;
+: sum-dims ( seq -- dim ) { 0 0 } [ v+ ] reduce ;
 
 : each-child ( gadget quot -- )
     [ children>> ] dip each ; inline
