@@ -91,15 +91,23 @@ PRIVATE>
 : split*-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
     [ split*, ] { } make ; inline
 
+<PRIVATE
+
+: crlf? ( str -- ? )
+    [ dup CHAR: \r = [ drop t ] [ CHAR: \n = ] if ] find drop ;
+    inline
+
+PRIVATE>
+
 GENERIC: string-lines ( str -- seq )
 
 M: string string-lines
-    dup "\r\n" intersects? [
-        "\n" split [
-            but-last-slice [
-                "\r" ?tail drop "\r" split
-            ] map
-        ] keep last "\r" split suffix concat
+    dup crlf? [
+        "\n" split
+        [ but-last-slice [ "\r" ?tail drop "\r" split ] map! drop ]
+        [ [ length 1 - ] keep [ "\r" split ] change-nth ]
+        [ concat ]
+        tri
     ] [
         1array
     ] if ;
