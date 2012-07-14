@@ -83,7 +83,7 @@ M: vocab-completion row-color
     { ";" } split1-last [ ] [ ] ?if ;
 
 : complete-vocab-list? ( tokens -- ? )
-    chop-; 1 short head* { "USING:" } intersects? ;
+    chop-; 1 short head* "USING:" swap member? ;
 
 : complete-CHAR:? ( tokens -- ? )
     2 short tail* "CHAR:" swap member? ;
