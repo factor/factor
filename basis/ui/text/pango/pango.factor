@@ -120,7 +120,7 @@ SYMBOL: dpi
 : escape-nulls ( str -- str' )
     #! Replace nulls with something else since Pango uses null-terminated
     #! strings
-    { { 0 CHAR: zero-width-no-break-space } } substitute ;
+    H{ { 0 CHAR: zero-width-no-break-space } } substitute ;
 
 : unpack-selection ( layout string/selection -- layout )
     dup selection? [
