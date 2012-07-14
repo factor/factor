@@ -77,7 +77,8 @@ M: did-not-fail summary drop "Did not fail" ;
     [ { } quot with-datastack drop did-not-fail t ] [ drop f f ] recover ;
 
 : experiment-title ( word -- string )
-    "(" ?head drop ")" ?tail drop { { CHAR: - CHAR: \s } } substitute >title ;
+    "(" ?head drop ")" ?tail drop
+    H{ { CHAR: - CHAR: \s } } substitute >title ;
 
 MACRO: <experiment> ( word -- )
     [ stack-effect in>> length dup ]
