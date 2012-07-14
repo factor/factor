@@ -21,3 +21,6 @@ IN: assocs.extras
         [ dup length ] dip new-assoc
         [ [ set-at ] with-assoc 2each ] keep
     ] if ; inline
+
+: substitute! ( seq assoc -- seq )
+    substituter map! ;
