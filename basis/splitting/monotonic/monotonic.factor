@@ -20,21 +20,21 @@ IN: splitting.monotonic
 PRIVATE>
 
 : monotonic-split ( seq quot: ( obj1 obj2 -- ? ) -- newseq )
-    over empty? [ 2drop { } ] [ (monotonic-split) ] if ; inline
+    [ drop { } ] [ (monotonic-split) ] if-empty ; inline
 
 <PRIVATE
 
 : (monotonic-slice) ( seq quot class -- slices )
     [
         dupd '[
-            [ length iota ] [ ] [ <circular> 1 over change-circular-start ] tri
+            [ length iota ] [ ] [ 1 circular boa ] tri
             [ @ not [ 1 + , ] [ drop ] if ] 3each
         ] { } make
         2dup {
             [ nip empty? ]
             [ [ length ] [ last ] bi* = not ]
         } 2|| [ over length suffix ] when
-        0 prefix 2 clump
+        0 prefix 2 <clumps>
         swap
     ] dip
     '[ first2 _ _ boa ] map ; inline
@@ -42,11 +42,10 @@ PRIVATE>
 PRIVATE>
 
 : monotonic-slice ( seq quot: ( obj1 obj2 -- ? ) class -- slices )
-    pick length {
-        { 0 [ 2drop ] }
-        { 1 [ nip [ 0 1 rot ] dip boa 1array ] }
-        [ drop (monotonic-slice) ]
-    } case ; inline
+    pick length dup 1 >
+    [ drop (monotonic-slice) ]
+    [ zero? [ 2drop ] [ nip [ 0 1 ] 2dip boa 1array ] if ]
+    if ; inline
 
 TUPLE: downward-slice < slice ;
 TUPLE: stable-slice < slice ;
@@ -62,13 +61,11 @@ TUPLE: upward-slice < slice ;
     [ < ] upward-slice monotonic-slice [ length 1 > ] filter ;
 
 : trends ( seq -- slices )
-    dup length {
-        { 0 [ ] }
-        { 1 [ [ 0 1 ] dip stable-slice boa ] }
-        [
-            drop
-            [ downward-slices ]
-            [ stable-slices ]
-            [ upward-slices ] tri 3append [ from>> ] sort-with
-        ]
-    } case ;
+    dup length dup 1 > [
+        drop
+        [ downward-slices ]
+        [ stable-slices ]
+        [ upward-slices ] tri 3append [ from>> ] sort-with
+    ] [
+        zero? [ ] [ [ 0 1 ] dip stable-slice boa ] if
+    ] if ;
