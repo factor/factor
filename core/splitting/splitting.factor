@@ -104,8 +104,15 @@ GENERIC: string-lines ( str -- seq )
 M: string string-lines
     dup crlf? [
         "\n" split
-        [ but-last-slice [ "\r" ?tail drop "\r" split ] map! drop ]
-        [ [ length 1 - ] keep [ "\r" split ] change-nth ]
+        [
+            but-last-slice [
+                dup ?last CHAR: \r = [ but-last ] when
+                [ CHAR: \r = ] split-when
+            ] map! drop
+        ] [
+            [ length 1 - ] keep
+            [ [ CHAR: \r = ] split-when ] change-nth
+        ]
         [ concat ]
         tri
     ] [
