@@ -7,7 +7,7 @@ IN: alien.inline.types
 
 : cify-type ( str -- str' )
     dup word? [ name>> ] when
-    { { CHAR: - CHAR: space } } substitute ;
+    H{ { CHAR: - CHAR: space } } substitute ;
 
 : factorize-type ( str -- str' )
     cify-type

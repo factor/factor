@@ -5,7 +5,7 @@ mason.config bootstrap.image assocs ;
 IN: mason.platform
 
 : (platform) ( os cpu -- string )
-    { { CHAR: . CHAR: - } } substitute "-" glue ;
+    H{ { CHAR: . CHAR: - } } substitute "-" glue ;
 
 : platform ( -- string )
     target-os get name>> target-cpu get name>> (platform)
