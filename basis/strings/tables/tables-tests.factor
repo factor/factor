@@ -3,6 +3,8 @@
 USING: tools.test strings.tables ;
 IN: strings.tables.tests
 
+[ { } ] [ { } format-table ] unit-test
+
 [ { "A  BB" "CC D" } ] [ { { "A" "BB" } { "CC" "D" } } format-table ] unit-test
 
 [ { "A C" "B " "D E" } ] [ { { "A\nB" "C" } { "D" "E" } } format-table ] unit-test
