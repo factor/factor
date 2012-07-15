@@ -1,23 +1,26 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.data calendar classes.struct kernel math
-system unix unix.time unix.types ;
+USING: accessors alien.data calendar calendar.private
+classes.struct kernel math system unix unix.time unix.types ;
 IN: calendar.unix
 
+: timeval>seconds ( timeval -- seconds )
+    [ sec>> ] [ usec>> 1000000000 / ] bi + ; inline
+
 : timeval>duration ( timeval -- duration )
-    [ sec>> seconds ] [ usec>> microseconds ] bi time+ ;
+    timeval>seconds seconds ;
 
 : timeval>unix-time ( timeval -- timestamp )
-    timeval>duration since-1970 ;
+    [ unix-1970 ] dip timeval>seconds +second ;
 
-: timespec>duration ( timespec -- seconds )
-    [ sec>> seconds ] [ nsec>> nanoseconds ] bi time+ ;
+: timespec>seconds ( timespec -- seconds )
+    [ sec>> ] [ nsec>> 1000000000 / ] bi + ; inline
 
-: timespec>nanoseconds ( timespec -- seconds )
-    [ sec>> 1000000000 * ] [ nsec>> ] bi + ;
+: timespec>duration ( timespec -- duration )
+    timespec>seconds seconds ;
 
 : timespec>unix-time ( timespec -- timestamp )
-    timespec>duration since-1970 ;
+    [ unix-1970 ] dip timespec>seconds +second ;
 
 : get-time ( -- alien )
     f time time_t <ref> localtime ;
