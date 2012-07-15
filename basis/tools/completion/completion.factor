@@ -93,5 +93,5 @@ PRIVATE>
     all-vocabs-recursive filter-vocabs name-completions ;
 
 : chars-matching ( str -- seq )
-    name-map get keys dup zip completions ;
+    name-map keys dup zip completions ;
 
