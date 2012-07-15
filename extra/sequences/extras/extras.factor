@@ -195,3 +195,6 @@ PRIVATE>
 
 : harvest-as ( seq exemplar -- newseq )
     [ empty? not ] swap filter-as ;
+
+: contains? ( seq elts -- ? )
+    [ member? ] curry any? ; inline
