@@ -28,7 +28,13 @@ MEMO: (quoted-field) ( delimiter -- delimiter' )
     delimiter> (quoted-field) read-until
     dup CHAR: " =
     [ 2drop quoted-field ]
-    [ swap [ blank? ] trim % ]
+    [
+        swap dup {
+            [ ?first blank? ]
+            [ ?last blank? ]
+        } 1||
+        [ [ blank? ] trim ] when %
+    ]
     if ;
 
 : maybe-escaped-quote ( -- endchar )
