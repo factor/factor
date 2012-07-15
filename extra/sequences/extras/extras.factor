@@ -198,3 +198,6 @@ PRIVATE>
 
 : contains? ( seq elts -- ? )
     [ member? ] curry any? ; inline
+
+: trim-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... newseq )
+    [ trim-slice ] [ like ] bi* ; inline
