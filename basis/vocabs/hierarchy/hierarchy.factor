@@ -37,7 +37,7 @@ ERROR: vocab-root-required root ;
     [ ensure-vocab-root ] [ check-vocab-name ] bi* ;
 
 : (child-vocabs) ( root prefix -- vocabs )
-    ensure-vocab-root/prefix
+    check-vocab-name
     [ vocab-dir append-path dup exists? [ vocab-subdirs ] [ drop { } ] if ]
     [ nip [ "." append '[ _ prepend ] map! ] unless-empty ]
     [ drop '[ _ over vocab-dir? [ >vocab-link ] [ <vocab-prefix> ] if ] map! ]
@@ -48,6 +48,7 @@ ERROR: vocab-root-required root ;
     [ ((child-vocabs-recursive)) ] with each ;
 
 : (child-vocabs-recursive) ( root prefix -- seq )
+    [ ensure-vocab-root ] dip
     [ ((child-vocabs-recursive)) ] { } make ;
 
 : no-rooted ( seq -- seq' ) [ find-vocab-root not ] filter ;
