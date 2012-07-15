@@ -74,3 +74,6 @@ IN: sequences.extras.tests
 
 { { } } [ { } round-robin ] unit-test
 { "ADEBFC" } [ { "ABC" "D" "EF" } round-robin >string ] unit-test
+
+{ { } } [ "ABC" [ ] { } trim-as ] unit-test
+{ "ABC" } [ { 32 65 66 67 32 } [ blank? ] "" trim-as ] unit-test
