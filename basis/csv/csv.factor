@@ -43,8 +43,8 @@ MEMO: (quoted-field) ( delimiter -- delimiter' )
     ] [
         swap [ "" ] [
             dup {
-                [ ?first blank? ]
-                [ ?last blank? ]
+                [ first blank? ]
+                [ last blank? ]
             } 1||
             [ [ blank? ] trim ] when
         ] if-empty
