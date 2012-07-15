@@ -39,13 +39,13 @@ ERROR: vocab-root-required root ;
 : (child-vocabs) ( root prefix -- vocabs )
     ensure-vocab-root/prefix
     [ vocab-dir append-path dup exists? [ vocab-subdirs ] [ drop { } ] if ]
-    [ nip [ '[ [ _ "." ] dip 3append ] map ] unless-empty ]
-    [ drop '[ _ over vocab-dir? [ >vocab-link ] [ <vocab-prefix> ] if ] map ]
+    [ nip [ "." append '[ _ prepend ] map! ] unless-empty ]
+    [ drop '[ _ over vocab-dir? [ >vocab-link ] [ <vocab-prefix> ] if ] map! ]
     2tri ;
 
 : ((child-vocabs-recursive)) ( root prefix -- )
-    dupd vocab-name (child-vocabs)
-    [ dup , ((child-vocabs-recursive)) ] with each ;
+    dupd vocab-name (child-vocabs) [ % ] keep
+    [ ((child-vocabs-recursive)) ] with each ;
 
 : (child-vocabs-recursive) ( root prefix -- seq )
     [ ((child-vocabs-recursive)) ] { } make ;
@@ -53,7 +53,7 @@ ERROR: vocab-root-required root ;
 : no-rooted ( seq -- seq' ) [ find-vocab-root not ] filter ;
 
 : one-level-only? ( name prefix -- ? )
-    ?head [ "." split1 nip not ] dip and ;
+    ?head [ "." split1 nip not ] [ drop f ] if ;
 
 : unrooted-child-vocabs ( prefix -- seq )
     [ vocabs no-rooted ] dip
@@ -87,7 +87,7 @@ PRIVATE>
 
 : child-vocabs ( prefix -- assoc )
     [ [ vocab-roots get ] dip '[ dup _ (child-vocabs) ] { } map>assoc ]
-    [ unrooted-child-vocabs [ lookup-vocab ] map f swap 2array ]
+    [ unrooted-child-vocabs [ lookup-vocab ] map! f swap 2array ]
     bi suffix ;
 
 : all-vocabs ( -- assoc )
@@ -95,17 +95,17 @@ PRIVATE>
 
 : child-vocabs-recursive ( prefix -- assoc )
     [ [ vocab-roots get ] dip '[ dup _ (child-vocabs-recursive) ] { } map>assoc ]
-    [ unrooted-child-vocabs-recursive [ lookup-vocab ] map f swap 2array ]
+    [ unrooted-child-vocabs-recursive [ lookup-vocab ] map! f swap 2array ]
     bi suffix ;
 
 MEMO: all-vocabs-recursive ( -- assoc )
     "" child-vocabs-recursive ;
 
 : all-vocab-names ( -- seq )
-    all-vocabs-recursive filter-vocabs [ vocab-name ] map ;
+    all-vocabs-recursive filter-vocabs [ vocab-name ] map! ;
 
 : child-vocab-names ( prefix -- seq )
-    child-vocabs filter-vocabs [ vocab-name ] map ;
+    child-vocabs filter-vocabs [ vocab-name ] map! ;
 
 <PRIVATE
 
