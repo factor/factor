@@ -24,19 +24,6 @@ DEFER: quoted-field
 MEMO: (quoted-field) ( delimiter -- delimiter' )
     "\"\n" swap suffix ; inline
 
-: not-quoted-field ( -- endchar )
-    delimiter> (quoted-field) read-until
-    dup CHAR: " =
-    [ 2drop quoted-field ]
-    [
-        swap dup {
-            [ ?first blank? ]
-            [ ?last blank? ]
-        } 1||
-        [ [ blank? ] trim ] when %
-    ]
-    if ;
-
 : maybe-escaped-quote ( -- endchar )
     read1 dup {
         { CHAR: "    [ , quoted-field ] }
@@ -50,7 +37,18 @@ MEMO: (quoted-field) ( delimiter -- delimiter' )
     drop % maybe-escaped-quote ;
 
 : field ( -- sep string )
-    [ not-quoted-field ] "" make  ;
+    delimiter> (quoted-field) read-until
+    dup CHAR: " = [
+        2drop [ quoted-field ] "" make
+    ] [
+        swap [ "" ] [
+            dup {
+                [ ?first blank? ]
+                [ ?last blank? ]
+            } 1||
+            [ [ blank? ] trim ] when
+        ] if-empty
+    ] if ;
 
 : (row) ( -- sep )
     f delimiter> '[ dup _ = ]
