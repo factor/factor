@@ -342,8 +342,25 @@ M: timestamp time-
 : before ( duration -- -duration )
     -1 time* ;
 
+<PRIVATE
+
+: -slots ( obj1 obj2 quot -- n obj1 obj2 )
+    [ bi@ - ] curry 2keep ; inline
+
+PRIVATE>
+
 M: duration time-
-    before time+ ;
+    over timestamp? [
+        before time+
+    ] [
+        [ year>> ] -slots
+        [ month>> ] -slots
+        [ day>> ] -slots
+        [ hour>> ] -slots
+        [ minute>> ] -slots
+        [ second>> ] -slots
+        2drop <duration>
+    ] if ;
 
 : <zero> ( -- timestamp )
     0 0 0 <date-gmt> ; inline
@@ -356,19 +373,22 @@ M: duration time-
     1970 <year-gmt> ; inline
 
 : millis>timestamp ( x -- timestamp )
-    [ unix-1970 ] dip milliseconds time+ ;
+    [ unix-1970 ] dip 1000 / +second ;
 
 : timestamp>millis ( timestamp -- n )
     unix-1970 (time-) 1000 * >integer ;
 
 : micros>timestamp ( x -- timestamp )
-    [ unix-1970 ] dip microseconds time+ ;
+    [ unix-1970 ] dip 1000000 / +second ;
 
 : timestamp>micros ( timestamp -- n )
     unix-1970 (time-) 1000000 * >integer ;
 
-: now ( -- timestamp ) gmt >local-time ;
+: now ( -- timestamp )
+    gmt gmt-offset-duration (time+) >>gmt-offset ;
+
 : hence ( duration -- timestamp ) now swap time+ ;
+
 : ago ( duration -- timestamp ) now swap time- ;
 
 : zeller-congruence ( year month day -- n )
@@ -532,10 +552,10 @@ M: integer end-of-year 12 31 <date> ;
     unix-1970 time+ ; inline
 
 : timestamp>unix-time ( timestamp -- seconds )
-    unix-1970 time- second>> ; inline
+    unix-1970 (time-) ; inline
 
 : unix-time>timestamp ( seconds -- timestamp )
-    seconds since-1970 ; inline
+    [ unix-1970 ] dip +second ; inline
 
 {
     { [ os unix? ] [ "calendar.unix" ] }
