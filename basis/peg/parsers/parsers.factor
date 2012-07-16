@@ -48,11 +48,11 @@ PRIVATE>
   swap <repetition> seq ;
 
 : at-most-n ( parser n -- parser' )
-  dup zero? [
-    2drop epsilon
+  [
+    drop epsilon
   ] [
     [ exactly-n ] [ 1 - at-most-n ] 2bi 2choice
-  ] if ;
+  ] if-zero ;
 
 : at-least-n ( parser n -- parser' )
   dupd exactly-n swap repeat0 2seq
