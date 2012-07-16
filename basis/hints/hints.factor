@@ -92,6 +92,10 @@ SYNTAX: HINTS:
 { { string string } { array array } }
 "specializer" set-word-prop
 
+\ prepend
+{ { string string } { array array } }
+"specializer" set-word-prop
+
 \ subseq
 { { fixnum fixnum string } { fixnum fixnum array } }
 "specializer" set-word-prop
