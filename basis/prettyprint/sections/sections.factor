@@ -59,8 +59,8 @@ M: maybe vocabulary-name
     ] if ;
 
 : text-fits? ( len -- ? )
-    margin get dup zero?
-    [ 2drop t ] [ [ pprinter get indent>> + ] dip <= ] if ;
+    margin get
+    [ drop t ] [ [ pprinter get indent>> + ] dip <= ] if-zero ;
 
 ! break only if position margin 2 / >
 SYMBOL: soft
