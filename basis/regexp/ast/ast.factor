@@ -54,10 +54,9 @@ M: at-least <times>
     n>> swap [ repetition ] [ <star> ] bi 2array <concatenation> ;
 
 : to-times ( term n -- ast )
-    dup zero?
-    [ 2drop epsilon ]
+    [ drop epsilon ]
     [ dupd 1 - to-times 2array <concatenation> <maybe> ]
-    if ;
+    if-zero ;
 
 M: from-to <times>
     [ n>> swap repetition ]
