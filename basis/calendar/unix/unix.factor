@@ -5,7 +5,7 @@ classes.struct kernel math system unix unix.time unix.types ;
 IN: calendar.unix
 
 : timeval>seconds ( timeval -- seconds )
-    [ sec>> ] [ usec>> 1000000 / ] bi + ; inline
+    [ sec>> ] [ usec>> 1,000,000 / ] bi + ; inline
 
 : timeval>duration ( timeval -- duration )
     timeval>seconds seconds ;
@@ -14,7 +14,7 @@ IN: calendar.unix
     [ unix-1970 ] dip timeval>seconds +second ;
 
 : timespec>seconds ( timespec -- seconds )
-    [ sec>> ] [ nsec>> 1000000000 / ] bi + ; inline
+    [ sec>> ] [ nsec>> 1,000,000,000 / ] bi + ; inline
 
 : timespec>duration ( timespec -- duration )
     timespec>seconds seconds ;

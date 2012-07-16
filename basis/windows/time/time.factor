@@ -14,7 +14,7 @@ IN: windows.time
     [ dwLowDateTime>> ] [ dwHighDateTime>> ] bi >64bit ;
 
 : windows-time>timestamp ( n -- timestamp )
-    10000000 /i seconds windows-1601 swap time+ ;
+    [ windows-1601 ] dip 10,000,000 /i +second ;
 
 : windows-time ( -- n )
     FILETIME <struct> [ GetSystemTimeAsFileTime ] keep
@@ -22,7 +22,7 @@ IN: windows.time
 
 : timestamp>windows-time ( timestamp -- n )
     #! 64bit number representing # of nanoseconds since Jan 1, 1601 (UTC)
-    >gmt windows-1601 (time-) 10000000 * >integer ;
+    >gmt windows-1601 (time-) 10,000,000 * >integer ;
 
 : windows-time>FILETIME ( n -- FILETIME )
     [ FILETIME <struct> ] dip
