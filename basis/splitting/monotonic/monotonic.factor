@@ -20,7 +20,7 @@ IN: splitting.monotonic
 PRIVATE>
 
 : monotonic-split ( seq quot: ( obj1 obj2 -- ? ) -- newseq )
-    [ drop { } ] [ (monotonic-split) ] if-empty ; inline
+    over empty? [ 2drop { } ] [ (monotonic-split) ] if ; inline
 
 <PRIVATE
 
