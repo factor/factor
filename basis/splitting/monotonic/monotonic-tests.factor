@@ -1,6 +1,7 @@
 IN: splitting.monotonic
 USING: tools.test math arrays kernel sequences ;
 
+{ { } } [ { } [ < ] monotonic-split ] unit-test
 [ { { 1 } { -1 5 } { 2 4 } } ]
 [ { 1 -1 5 2 4 } [ < ] monotonic-split [ >array ] map ] unit-test
 [ { { 1 1 1 1 } { 2 2 } { 3 } { 4 } { 5 } { 6 6 6 } } ]
