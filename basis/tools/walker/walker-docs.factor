@@ -3,11 +3,23 @@ USING: help.syntax help.markup tools.continuations sequences math words ;
 
 HELP: breakpoint
 { $values { "word" word } }
-{ $description "Annotates a word definition to enter the single stepper when executed." } ;
+{ $description "Annotates a word definition to enter the single stepper when executed." }
+{ $examples
+    { $unchecked-example "USE: tools.walker \\ sq breakpoint"
+        ""
+    }
+} ;
 
 HELP: breakpoint-if
 { $values { "word" word } { "quot" { $quotation "( -- ? )" } } }
-{ $description "Annotates a word definition to enter the single stepper if the quotation yields true." } ;
+{ $description "Annotates a word definition to enter the single stepper if the quotation yields true. The quotation has access to the datastack as it exists just before " { $snippet "word" } " is called." }
+{ $examples
+    "Break if the input to sq is 3:"
+    { $unchecked-example 
+        "USE: tools.walker \\ sq [ dup 3 = ] breakpoint-if"
+        ""
+    }
+} ;
 
 HELP: B
 { $description "An alias for " { $link break } ", defined in the " { $vocab-link "syntax" } " vocabulary so that it is always available." } ;
