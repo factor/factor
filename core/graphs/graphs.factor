@@ -3,50 +3,35 @@
 USING: assocs kernel namespaces sequences sets ;
 IN: graphs
 
-SYMBOL: graph
-
 : if-graph ( vertex edges graph quot -- )
-    over
-    [ graph swap with-variable ]
-    [ 2drop 2drop ] if ; inline
+    dupd [ 3drop ] if ; inline
 
-: nest ( key -- hash )
-    graph get [ drop H{ } clone ] cache ;
+: nest ( key graph -- hash )
+    [ drop H{ } clone ] cache ; inline
 
 : add-vertex ( vertex edges graph -- )
-    [ [ dupd nest set-at ] with each ] if-graph ; inline
-
-: (add-vertex) ( key value vertex -- )
-    rot nest set-at ;
+    [ [ nest dupd set-at ] curry with each ] if-graph ; inline
 
 : add-vertex* ( vertex edges graph -- )
     [
-        swap [ (add-vertex) ] curry assoc-each
+        swapd [ [ rot ] dip nest set-at ] 2curry assoc-each
     ] if-graph ; inline
 
 : remove-vertex ( vertex edges graph -- )
-    [ [ graph get at delete-at ] with each ] if-graph ; inline
-
-: (remove-vertex) ( key value vertex -- )
-    rot graph get at delete-at drop ;
+    [ [ at delete-at ] curry with each ] if-graph ; inline
 
 : remove-vertex* ( vertex edges graph -- )
     [
-        swap [ (remove-vertex) ] curry assoc-each
+        swapd [ [ rot ] dip at delete-at drop ] 2curry assoc-each
     ] if-graph ; inline
 
-SYMBOL: previous
-
-: (closure) ( obj quot: ( elt -- assoc ) -- )
-    over previous get key? [
-        2drop
+: (closure) ( obj assoc quot: ( elt -- assoc ) -- )
+    2over key? [
+        3drop
     ] [
-        over previous get conjoin
-        [ call ] keep
-        [ nip (closure) ] curry assoc-each
+        2over conjoin [ dip ] keep
+        [ [ drop ] 3dip (closure) ] 2curry assoc-each
     ] if ; inline recursive
 
 : closure ( obj quot -- assoc )
-    H{ } clone [
-        previous [ (closure) ] with-variable
-    ] keep ; inline
+    H{ } clone [ swap (closure) ] keep ; inline
