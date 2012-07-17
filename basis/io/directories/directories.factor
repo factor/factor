@@ -65,7 +65,7 @@ HOOK: move-file io-backend ( from to -- )
     to-directory move-file ;
 
 : move-files-into ( files to -- )
-    to-directory '[ _ move-file ] each ;
+    '[ _ move-file-into ] each ;
 
 ! Copying files
 HOOK: copy-file io-backend ( from to -- )
@@ -82,7 +82,7 @@ M: object copy-file
     to-directory copy-file ;
 
 : copy-files-into ( files to -- )
-    to-directory '[ _ copy-file ] each ;
+    '[ _ copy-file-into ] each ;
 
 {
     { [ os unix? ] [ "io.directories.unix" require ] }
