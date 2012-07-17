@@ -18,7 +18,7 @@ ERROR: bad-length bytes n ;
     1 - 8 * 0 swap 8 <range> ; inline
 
 : reassemble-bytes ( range -- quot )
-    [ dup 0 = [ drop [ ] ] [ '[ _ shift ] ] if ] map
+    [ [ [ ] ] [ '[ _ shift ] ] if-zero ] map
     '[ [ _ spread ] [ bitor ] reduce-outputs ] ; inline
 
 MACRO: reassemble-be ( n -- quot ) be-range reassemble-bytes ;
