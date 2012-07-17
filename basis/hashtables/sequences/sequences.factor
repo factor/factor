@@ -31,6 +31,8 @@ M: sequence-hashtable clone
 : >sequence-hashtable ( assoc -- shashtable )
     [ assoc-size <sequence-hashtable> ] keep assoc-union! ;
 
+M: sequence-hashtable new-assoc drop <sequence-hashtable> ;
+
 SYNTAX: SH{ \ } [ >sequence-hashtable ] parse-literal ;
 
 { "hashtables.sequences" "prettyprint" } "hashtables.sequences.prettyprint" require-when
