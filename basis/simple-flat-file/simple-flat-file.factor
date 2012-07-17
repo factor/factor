@@ -5,7 +5,7 @@ biassocs ascii namespaces arrays make assocs interval-maps sets ;
 IN: simple-flat-file
 
 : drop-comments ( seq -- newseq )
-    [ "#@" split1 drop ] map harvest ;
+    [ "#@" split first ] map harvest ;
 
 : split-column ( line -- columns )
     " \t" split harvest 2 short head 2 f pad-tail ;
