@@ -3,17 +3,17 @@ USING: accessors assocs hashtables hashtables.wrapped kernel
 parser vocabs.loader ;
 IN: hashtables.identity
 
-TUPLE: identity-wrapper < wrapped-key ;
+TUPLE: identity-wrapper < wrapped-key identity-hashcode ;
 
-C: <identity-wrapper> identity-wrapper
+: <identity-wrapper> ( wrapped-key -- identity-wrapper )
+    dup identity-hashcode identity-wrapper boa ; inline
 
 M: identity-wrapper equal?
     over identity-wrapper?
     [ [ underlying>> ] bi@ eq? ]
     [ 2drop f ] if ; inline
 
-M: identity-wrapper hashcode*
-    nip underlying>> identity-hashcode ; inline
+M: identity-wrapper hashcode* nip identity-hashcode>> ; inline
 
 TUPLE: identity-hashtable < wrapped-hashtable ;
 
