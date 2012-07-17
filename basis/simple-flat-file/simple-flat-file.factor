@@ -17,19 +17,19 @@ IN: simple-flat-file
     ] when ;
 
 : parse-line ( line -- code-unicode )
-    split-column [ parse-hex ] map ;
+    split-column [ parse-hex ] map! ;
 
 : process-codetable-lines ( lines -- assoc )
-    drop-comments [ parse-line ] map ; 
+    drop-comments [ parse-line ] map! ;
 
 : flat-file>biassoc ( filename -- biassoc )
     utf8 file-lines process-codetable-lines >biassoc ;
 
 : split-; ( line -- array )
-    ";" split [ [ blank? ] trim ] map ;
+    ";" split [ [ blank? ] trim ] map! ;
 
 : data ( filename -- data )
-    utf8 file-lines drop-comments [ split-; ] map ;
+    utf8 file-lines drop-comments [ split-; ] map! ;
 
 SYMBOL: interned
 
