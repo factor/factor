@@ -155,13 +155,13 @@ M: timestamp easter ( timestamp -- timestamp )
 : >time< ( timestamp -- hour minute second )
     [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
-: years ( x -- duration ) instant clone swap >>year ;
-: months ( x -- duration ) instant clone swap >>month ;
-: days ( x -- duration ) instant clone swap >>day ;
+: years ( x -- duration ) instant swap >>year ;
+: months ( x -- duration ) instant swap >>month ;
+: days ( x -- duration ) instant swap >>day ;
 : weeks ( x -- duration ) 7 * days ;
-: hours ( x -- duration ) instant clone swap >>hour ;
-: minutes ( x -- duration ) instant clone swap >>minute ;
-: seconds ( x -- duration ) instant clone swap >>second ;
+: hours ( x -- duration ) instant swap >>hour ;
+: minutes ( x -- duration ) instant swap >>minute ;
+: seconds ( x -- duration ) instant swap >>second ;
 : milliseconds ( x -- duration ) 1000 / seconds ;
 : microseconds ( x -- duration ) 1000000 / seconds ;
 : nanoseconds ( x -- duration ) 1000000000 / seconds ;
