@@ -15,7 +15,7 @@ IN: memoize
 : [nsequence] ( length exemplar -- quot )
     [ [ [ 1 - ] keep ] dip '[ _ _ _ new-sequence ] ]
     [ drop [ [ set-nth-unsafe ] 2keep [ 1 - ] dip ] (n*quot) ] 2bi
-    [ nip ] 3append ; 
+    [ nip ] 3append ;
 
 : [firstn] ( length -- quot )
     [ 0 swap ] swap
@@ -29,7 +29,7 @@ IN: memoize
 
 : unpacker ( seq -- quot )
     length dup 4 <=
-    [ { [ drop ] [ ] [ first2 ] [ first3 ] [ first4 ] } nth ]
+    [ { [ drop ] [ ] [ first2-unsafe ] [ first3-unsafe ] [ first4-unsafe ] } nth ]
     [ [firstn] ] if ;
 
 : pack/unpack ( quot effect -- newquot )
