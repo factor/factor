@@ -38,10 +38,10 @@ HOOK: reserved-stack-space cpu ( -- n )
 : spill@ ( n -- op ) spill-offset special-offset stack@ ;
 
 : decr-stack-reg ( n -- )
-    dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
+    [ stack-reg swap SUB ] unless-zero ;
 
 : incr-stack-reg ( n -- )
-    dup 0 = [ drop ] [ stack-reg swap ADD ] if ;
+    [ stack-reg swap ADD ] unless-zero ;
 
 : align-stack ( n -- n' ) 16 align ;
 
@@ -61,7 +61,7 @@ M: x86 test-instruction? t ;
 
 M: x86 immediate-store? immediate-comparand? ;
 
-M: x86 %load-immediate dup 0 = [ drop dup XOR ] [ MOV ] if ;
+M: x86 %load-immediate [ dup XOR ] [ MOV ] if-zero ;
 
 M: x86 %load-reference
     [ swap 0 MOV rc-absolute-cell rel-literal ]
