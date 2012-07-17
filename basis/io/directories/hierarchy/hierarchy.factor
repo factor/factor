@@ -44,4 +44,4 @@ DEFER: copy-trees-into
     to-directory copy-tree ;
 
 : copy-trees-into ( files to -- )
-    to-directory '[ _ copy-tree ] each ;
+    '[ _ copy-tree-into ] each ;
