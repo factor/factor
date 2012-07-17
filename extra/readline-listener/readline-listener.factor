@@ -20,10 +20,10 @@ M: readline-reader prompt.
     >>prompt drop ;
 
 : word-names ( -- strs )
-    all-words [ name>> ] map ;
+    all-words [ name>> ] map! ;
 
 : vocab-names ( -- strs )
-    all-vocabs-recursive filter-vocabs [ name>> ] map ;
+    all-vocabs-recursive filter-vocabs [ name>> ] map! ;
 
 : prefixed-words ( prefix -- words )
     '[ _ head? ] word-names swap filter ;
@@ -36,7 +36,7 @@ M: readline-reader prompt.
 
 : get-completions ( prefix -- completions )
     completions tget dup [ nip ] [
-        drop current-line " " split first
+        drop current-line " " split1 drop
         "USING:" = [
             prefixed-vocabs
         ] [
