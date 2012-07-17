@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
-combinators continuations destructors fry io io.backend
+assocs combinators continuations destructors fry io io.backend
 io.directories io.encodings.binary io.files.info.unix
 io.encodings.utf8 io.files io.pathnames io.files.types kernel
 math.bitwise sequences system unix unix.stat vocabs.loader
@@ -31,7 +31,7 @@ M: unix delete-directory ( path -- )
 
 M: unix copy-file ( from to -- )
     [ normalize-path ] bi@
-    [ call-next-method ] 
+    [ call-next-method ]
     [ [ file-permissions ] dip swap set-file-permissions ] 2bi ;
 
 : with-unix-directory ( path quot -- )
@@ -48,17 +48,16 @@ M: unix find-next-file ( DIR* -- byte-array )
     void* deref [ drop f ] unless ;
 
 : dirent-type>file-type ( ch -- type )
-    {
-        { DT_BLK  [ +block-device+ ] }
-        { DT_CHR  [ +character-device+ ] }
-        { DT_DIR  [ +directory+ ] }
-        { DT_LNK  [ +symbolic-link+ ] }
-        { DT_SOCK [ +socket+ ] }
-        { DT_FIFO [ +fifo+ ] }
-        { DT_REG  [ +regular-file+ ] }
-        { DT_WHT  [ +whiteout+ ] }
-        [ drop +unknown+ ]
-    } case ;
+    H{
+        { $ DT_BLK   +block-device+ }
+        { $ DT_CHR  +character-device+ }
+        { $ DT_DIR  +directory+ }
+        { $ DT_LNK  +symbolic-link+ }
+        { $ DT_SOCK +socket+ }
+        { $ DT_FIFO +fifo+ }
+        { $ DT_REG  +regular-file+ }
+        { $ DT_WHT  +whiteout+ }
+    } at* [ drop +unknown+ ] unless ;
 
 M: unix >directory-entry ( byte-array -- directory-entry )
     {
