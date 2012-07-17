@@ -309,7 +309,15 @@ GENERIC: time- ( time1 time2 -- time3 )
     gmt-offset-duration convert-timezone ;
 
 : >gmt ( timestamp -- timestamp' )
-    instant convert-timezone ;
+    dup gmt-offset>> dup instant =
+    [ drop ] [
+        [ neg +second 0 ] change-second
+        [ neg +minute 0 ] change-minute
+        [ neg +hour   0 ] change-hour
+        [ neg +day    0 ] change-day
+        [ neg +month  0 ] change-month
+        [ neg +year   0 ] change-year drop
+    ] if ;
 
 M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
