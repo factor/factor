@@ -159,8 +159,7 @@ M: process-failed error.
     ] [ process>> . ] bi ;
 
 : wait-for-success ( process -- )
-    dup wait-for-process 0 =
-    [ drop ] [ process-failed ] if ;
+    dup wait-for-process [ drop ] [ process-failed ] if-zero ;
 
 : try-process ( desc -- )
     run-process wait-for-success ;
