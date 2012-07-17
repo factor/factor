@@ -105,16 +105,10 @@ SYMBOL: error-stream
 <PRIVATE
 
 : stream-exemplar ( stream -- exemplar )
-    stream-element-type {
-        { +byte+ [ B{ } ] }
-        { +character+ [ "" ] }
-    } case ; inline
+    stream-element-type +byte+ = B{ } "" ? ; inline
 
 : stream-exemplar-growable ( stream -- exemplar )
-    stream-element-type {
-        { +byte+ [ BV{ } ] }
-        { +character+ [ SBUF" " ] }
-    } case ; inline
+    stream-element-type +byte+ = BV{ } SBUF" " ? ; inline
 
 : (new-sequence-for-stream) ( n stream -- seq )
     stream-exemplar new-sequence ; inline
