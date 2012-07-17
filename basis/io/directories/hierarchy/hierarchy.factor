@@ -2,19 +2,22 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel sequences combinators fry
 io.directories io.pathnames io.files.info io.files.types
-io.files.links io.backend ;
+io.files.links io.backend make ;
 IN: io.directories.hierarchy
 
+<PRIVATE
+
+: directory-tree-files% ( path prefix -- )
+    [ dup directory-entries ] dip '[
+        [ name>> [ append-path ] [ _ prepend-path ] bi ]
+        [ type>> +directory+ = ] bi over ,
+        [ directory-tree-files% ] [ 2drop ] if
+    ] with each ;
+
+PRIVATE>
+
 : directory-tree-files ( path -- seq )
-    dup directory-entries
-    [
-        dup type>> +directory+ =
-        [ name>>
-            [ append-path directory-tree-files ]
-            [ [ prepend-path ] curry map ]
-            [ prefix ] tri
-        ] [ nip name>> 1array ] if
-    ] with map concat ;
+    [ "" directory-tree-files% ] { } make ;
 
 : with-directory-tree-files ( path quot -- )
     '[ "" directory-tree-files @ ] with-directory ; inline
@@ -26,14 +29,14 @@ IN: io.directories.hierarchy
         bi
     ] [ delete-file ] if ;
 
-DEFER: copy-tree-into
+DEFER: copy-trees-into
 
 : copy-tree ( from to -- )
     normalize-path
     over link-info type>>
     {
         { +symbolic-link+ [ copy-link ] }
-        { +directory+ [ '[ [ _ copy-tree-into ] each ] with-directory-files ] }
+        { +directory+ [ '[ _ copy-trees-into ] with-directory-files ] }
         [ drop copy-file ]
     } case ;
 
@@ -41,4 +44,4 @@ DEFER: copy-tree-into
     to-directory copy-tree ;
 
 : copy-trees-into ( files to -- )
-    '[ _ copy-tree-into ] each ;
+    to-directory '[ _ copy-tree ] each ;
