@@ -167,7 +167,12 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : inc-at ( key assoc -- ) [ 1 ] 2dip at+ ; inline
 
 : map>assoc ( ... seq quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
-    [ [ 2array ] compose { } map-as ] dip assoc-like ; inline
+    dup sequence? [
+        [ [ 2array ] compose ] dip map-as
+    ] [
+        [ over assoc-size ] dip new-assoc
+        [ [ swapd set-at ] curry compose each ] keep
+    ] if ; inline
 
 : extract-keys ( seq assoc -- subassoc )
     [ [ dupd at ] curry ] keep map>assoc ;
