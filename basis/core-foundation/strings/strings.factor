@@ -69,7 +69,7 @@ FUNCTION: CFStringRef CFCopyTypeIDDescription ( CFTypeID type_id ) ;
     [
         dup { [ 0x10ffff > ] [ 0xd800 0xdfff between? ] } 1||
         [ drop 0xfffd ] when
-    ] map utf8 encode ;
+    ] map! utf8 encode ;
 
 : <CFString> ( string -- alien )
     [ f ] dip
