@@ -22,10 +22,6 @@ GENERIC: byte-length ( obj -- n ) flushable
 
 M: object byte-length [ length ] [ element-size ] bi * ; inline
 
-M: byte-array byte-length length ; inline
-
-M: byte-vector byte-length length ; inline
-
 GENERIC: >c-ptr ( obj -- c-ptr ) flushable
 
 M: c-ptr >c-ptr ; inline
