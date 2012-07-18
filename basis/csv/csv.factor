@@ -16,38 +16,39 @@ CHAR: , delimiter set-global
 MEMO: (field-end) ( delimiter -- delimiter' )
     "\n" swap suffix ; inline
 
-: skip-to-field-end ( -- endchar )
-    delimiter> (field-end) read-until nip ; inline
+: field-end ( -- str sep )
+    delimiter> (field-end) read-until ; inline
 
 DEFER: quoted-field
 
 MEMO: (quoted-field) ( delimiter -- delimiter' )
     "\"\n" swap suffix ; inline
 
-: maybe-escaped-quote ( -- endchar )
+: maybe-escaped-quote ( quoted? -- endchar )
     read1 dup {
-        { CHAR: "    [ , quoted-field ] }
+        { CHAR: "    [ over [ , ] [ drop ] if quoted-field ] }
         { delimiter> [ ] }
-        { CHAR: \n   [ ] }
-        [ 2drop skip-to-field-end ]
-    } case ;
+        { CHAR: \n   [ ] } ! Error: newline inside string?
+        [ [ , f maybe-escaped-quote ] when ]
+    } case nip ;
 
 : quoted-field ( -- endchar )
     "\"" read-until
-    drop % maybe-escaped-quote ;
+    drop % t maybe-escaped-quote ;
+
+: ?trim ( string -- string' )
+    dup { [ first blank? ] [ last blank? ] } 1||
+    [ [ blank? ] trim ] when ;
 
 : field ( -- sep string )
     delimiter> (quoted-field) read-until
     dup CHAR: " = [
-        2drop [ quoted-field ] "" make
+        over empty?
+        [ 2drop [ quoted-field ] "" make ]
+        [ drop field-end [ "\"" glue ] dip swap ?trim ]
+        if
     ] [
-        swap [ "" ] [
-            dup {
-                [ first blank? ]
-                [ last blank? ]
-            } 1||
-            [ [ blank? ] trim ] when
-        ] if-empty
+        swap [ "" ] [ ?trim ] if-empty
     ] if ;
 
 : (row) ( -- sep )

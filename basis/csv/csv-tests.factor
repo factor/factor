@@ -47,7 +47,7 @@ IN: csv.tests
 
 
 ! !!!!!!!!  other tests
-   
+
 [ { { "Phil Dawes" } } ] 
 [ "\"Phil Dawes\"" <string-reader> csv ] unit-test
 
@@ -90,3 +90,12 @@ IN: csv.tests
 ] unit-test
 
 [ { { "hello" "" "" "" "goodbye" "" } } ] [ "hello,,\"\",,goodbye," <string-reader> csv ] unit-test
+
+{ { { "asd\"f\"" "asdf" } } } [ "asd\"f\",asdf" string>csv ] unit-test
+{ { { "a\"sdf" "asdf" } } } [ "a\"sdf,asdf" string>csv ] unit-test
+{ { { "as\"df" "asdf" } } } [ "    as\"df,asdf" string>csv ] unit-test
+{ { { "asd" "f" "asdf" } } } [ "\"as\"d,f,asdf" string>csv ] unit-test
+{ { { "as,df" "asdf" } } } [ "\"as,\"df,asdf" string>csv ] unit-test
+! FIXME: { { { "as,df" "asdf" } } } [ "\"as,\"df  ,asdf" string>csv ] unit-test
+! FIXME: { { { "asd\"f\"" "asdf" } } } [ "\"asd\"\"\"f\",asdf" string>csv ] unit-test
+{ { { "as,d\"f" "asdf" } } } [ "\"as,\"d\"\"\"\"f,asdf" string>csv ] unit-test
