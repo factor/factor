@@ -688,9 +688,13 @@ PRIVATE>
 
 : append! ( seq1 seq2 -- seq1 ) over push-all ; inline
 
-: last ( seq -- elt ) [ length 1 - ] [ nth ] bi ;
+: last ( seq -- elt )
+    [ length 1 - ] keep
+    over 0 < [ bounds-error ] [ nth-unsafe ] if ; inline
 
-: set-last ( elt seq -- ) [ length 1 - ] keep set-nth ;
+: set-last ( elt seq -- )
+    [ length 1 - ] keep
+    over 0 < [ bounds-error ] [ set-nth-unsafe ] if ; inline
 
 : pop* ( seq -- ) [ length 1 - ] [ shorten ] bi ;
 
