@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
-combinators generic layouts memoize ;
+combinators combinators.short-circuit generic layouts memoize ;
 IN: math.intervals
 
 SYMBOL: empty-interval
@@ -66,26 +66,26 @@ MEMO: array-capacity-interval ( -- interval )
 : [-inf,inf] ( -- interval ) full-interval ; inline
 
 : compare-endpoints ( p1 p2 quot -- ? )
-    [ 2dup [ first ] bi@ ] dip call [
-        2drop t
+    [ 2dup [ first ] bi@ 2dup ] dip call [
+        2drop 2drop t
     ] [
-        2dup [ first ] bi@ number= [
-            [ second ] bi@ not or
-        ] [
-            2drop f
-        ] if
+        number= [ [ second ] bi@ not or ] [ 2drop f ] if
     ] if ; inline
 
 : endpoint= ( p1 p2 -- ? )
-    [ [ first ] bi@ number= ] [ [ second ] bi@ eq? ] 2bi and ;
+    { [ [ first ] bi@ number= ] [ [ second ] bi@ eq? ] } 2&& ;
 
-: endpoint< ( p1 p2 -- ? ) [ < ] compare-endpoints ;
+: endpoint< ( p1 p2 -- ? )
+    [ < ] compare-endpoints ;
 
-: endpoint<= ( p1 p2 -- ? ) [ endpoint< ] [ endpoint= ] 2bi or ;
+: endpoint<= ( p1 p2 -- ? )
+    { [ endpoint< ] [ endpoint= ] } 2|| ;
 
-: endpoint> ( p1 p2 -- ? ) [ > ] compare-endpoints ;
+: endpoint> ( p1 p2 -- ? )
+    [ > ] compare-endpoints ;
 
-: endpoint>= ( p1 p2 -- ? ) [ endpoint> ] [ endpoint= ] 2bi or ;
+: endpoint>= ( p1 p2 -- ? )
+    { [ endpoint> ] [ endpoint= ] } 2|| ;
 
 : endpoint-min ( p1 p2 -- p3 ) [ endpoint< ] most ;
 
@@ -167,9 +167,10 @@ MEMO: array-capacity-interval ( -- interval )
 : interval-contains? ( x int -- ? )
     dup empty-interval eq? [ 2drop f ] [
         dup full-interval eq? [ 2drop t ] [
-            [ from>> first2 [ >= ] [ > ] if ]
-            [ to>>   first2 [ <= ] [ < ] if ]
-            2bi and
+            {
+                [ from>> first2 [ >= ] [ > ] if ]
+                [ to>>   first2 [ <= ] [ < ] if ]
+            } 2&&
         ] if
     ] if ;
 
@@ -311,16 +312,18 @@ MEMO: array-capacity-interval ( -- interval )
 SYMBOL: incomparable
 
 : left-endpoint-< ( i1 i2 -- ? )
-    [ swap interval-subset? ]
-    [ nip interval-singleton? ]
-    [ [ from>> ] bi@ endpoint= ]
-    2tri and and ;
+    {
+        [ swap interval-subset? ]
+        [ nip interval-singleton? ]
+        [ [ from>> ] bi@ endpoint= ]
+    } 2&& ;
 
 : right-endpoint-< ( i1 i2 -- ? )
-    [ interval-subset? ]
-    [ drop interval-singleton? ]
-    [ [ to>> ] bi@ endpoint= ]
-    2tri and and ;
+    {
+        [ interval-subset? ]
+        [ drop interval-singleton? ]
+        [ [ to>> ] bi@ endpoint= ]
+    } 2&& ;
 
 : (interval<) ( i1 i2 -- i1 i2 ? )
     2dup [ from>> ] bi@ endpoint< ;
