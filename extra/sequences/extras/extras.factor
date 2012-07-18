@@ -201,3 +201,15 @@ PRIVATE>
 
 : trim-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... newseq )
     [ trim-slice ] [ like ] bi* ; inline
+
+<PRIVATE
+
+: last-unsafe ( seq -- elt ) [ length 1 - ] [ nth-unsafe ] bi ;
+
+PRIVATE>
+
+: ?trim ( ... seq quot: ( ... elt -- ... ? ) -- ... seq/newseq )
+    over empty? [ drop ] [
+        over [ first-unsafe ] [ last-unsafe ] bi pick bi@ or
+        [ trim ] [ drop ] if
+    ] if ; inline
