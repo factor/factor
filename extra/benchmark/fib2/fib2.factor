@@ -8,6 +8,6 @@ IN: benchmark.fib2
         1 fixnum- dup fixnum-fib swap 1 fixnum- fixnum-fib fixnum+
     ] if ;
 
-: fib-main ( -- ) 34 fixnum-fib 9227465 assert= ;
+: fib2-benchmark ( -- ) 34 fixnum-fib 9227465 assert= ;
 
-MAIN: fib-main
+MAIN: fib2-benchmark
