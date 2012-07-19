@@ -2,7 +2,7 @@ USING: help.markup help.syntax quotations strings ;
 IN: init
 
 HELP: boot
-{ $description "Called on startup as part of the boot quotation  to initialize the runtime and prepare it for running user code." } ;
+{ $description "Called on startup as part of the boot quotation to initialize the runtime and prepare it for running user code." } ;
 
 { boot startup-quot set-startup-quot } related-words
 
