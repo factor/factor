@@ -180,9 +180,9 @@ M: #push emit-node
 : make-input-map ( #shuffle -- assoc )
     ! Assoc maps high-level IR values to stack locations.
     [
-        [ in-d>> <reversed> [ <ds-loc> swap set ] each-index ]
-        [ in-r>> <reversed> [ <rs-loc> swap set ] each-index ] bi
-    ] H{ } make-assoc ;
+        [ in-d>> <reversed> [ <ds-loc> swap ,, ] each-index ]
+        [ in-r>> <reversed> [ <rs-loc> swap ,, ] each-index ] bi
+    ] H{ } make ;
 
 : make-output-seq ( values mapping input-map -- vregs )
     '[ _ at _ at peek-loc ] map ;

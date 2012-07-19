@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel sequences strings
-math assocs words generic namespaces make quotations
-splitting ui.gestures unicode.case unicode.categories tr fry ;
+math assocs words generic make quotations splitting
+ui.gestures unicode.case unicode.categories tr fry ;
 IN: ui.commands
 
 SYMBOL: +nullary+
@@ -37,9 +37,9 @@ GENERIC: command-word ( command -- word )
         [
             commands>>
             [ drop ] assoc-filter
-            [ '[ _ invoke-command ] swap set ] assoc-each
+            [ '[ _ invoke-command ] swap ,, ] assoc-each
         ] each
-    ] H{ } make-assoc ;
+    ] H{ } make ;
 
 : update-gestures ( class -- )
     dup command-gestures set-gestures ;

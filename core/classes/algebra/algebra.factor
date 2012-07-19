@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
-combinators kernel math math.order namespaces sequences sorting
-vectors words ;
+combinators kernel make math math.order namespaces sequences
+sorting vectors words ;
 FROM: classes => members ;
 RENAME: members sets => set-members
 IN: classes.algebra
@@ -285,4 +285,4 @@ ERROR: topological-sort-failed ;
     ] if-empty ;
 
 : flatten-class ( class -- assoc )
-    [ (flatten-class) ] H{ } make-assoc ;
+    [ (flatten-class) ] H{ } make ;

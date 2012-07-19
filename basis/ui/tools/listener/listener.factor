@@ -4,7 +4,7 @@ USING: accessors arrays assocs calendar combinators locals
 source-files.errors colors.constants combinators.short-circuit
 compiler.units help.tips concurrency.flags concurrency.mailboxes
 continuations destructors documents documents.elements fry hashtables
-help help.markup io io.styles kernel lexer listener math models sets
+help help.markup io io.styles kernel lexer listener make math models sets
 models.delay models.arrow namespaces parser prettyprint quotations
 sequences strings threads vocabs vocabs.refresh vocabs.loader
 vocabs.parser words debugger ui ui.commands ui.pens.solid ui.gadgets
@@ -103,9 +103,9 @@ M: input (print-input)
 M: word (print-input)
     "Command: "
     [
-        "sans-serif" font-name set
-        bold font-style set
-    ] H{ } make-assoc format . ;
+        "sans-serif" font-name ,,
+        bold font-style ,,
+    ] H{ } make format . ;
 
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
