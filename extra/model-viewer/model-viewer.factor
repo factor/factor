@@ -100,7 +100,7 @@ TUPLE: vbo
         BGR >>component-order
         ubyte-components >>component-type
         B{ 0 0 0 } >>bitmap ;
-        
+
 : make-texture ( pathname alt -- texture )
     swap [ nip load-image ] [ ] if*
     [
@@ -115,7 +115,7 @@ TUPLE: vbo
     [
         0 swap [ allocate-texture-image ] 3keep 2drop
     ] bi ;
-        
+
 : <model-buffers> ( models -- buffers )
     [
         {

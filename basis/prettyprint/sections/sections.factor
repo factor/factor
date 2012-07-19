@@ -354,15 +354,16 @@ M: block long-section ( block -- )
 
 : make-pprint ( obj quot -- block manifest )
     [
-        0 position set
-        H{ } clone pprinter-use set
-        V{ } clone recursion-check set
-        V{ } clone pprinter-stack set
+        0 position ,,
+        H{ } clone pprinter-use ,,
+        V{ } clone recursion-check ,,
+        V{ } clone pprinter-stack ,,
+    ] H{ } make [
         over <object
         call
         pprinter-block
         pprinter-manifest
-    ] with-scope ; inline
+    ] with-variables ; inline
 
 : with-pprint ( obj quot -- )
     make-pprint drop do-pprint ; inline

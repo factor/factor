@@ -5,7 +5,8 @@ FROM: namespaces => set ;
 IN: help.markup.tests
 
 : with-markup-test ( quot -- )
-    '[ f last-element set _ with-string-writer ] with-scope ; inline
+    [ f last-element ] dip
+    '[ _ with-string-writer ] with-variable ; inline
 
 TUPLE: blahblah quux ;
 
