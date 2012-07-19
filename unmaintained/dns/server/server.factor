@@ -164,7 +164,7 @@ DEFER: query->rrs
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : is-nx ( message -- message/f )
-  [ message-query name>> records [ name>> = ] with filter empty? ]
+  [ message-query name>> records [ name>> = ] with any? not ]
     [
       NAME-ERROR >>rcode
       dup
