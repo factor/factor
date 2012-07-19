@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math math.functions kernel io io.styles prettyprint
-combinators hints fry namespaces sequences ;
+USING: make math math.functions kernel io io.styles prettyprint
+combinators hints fry sequences ;
 IN: benchmark.partial-sums
 
 ! Helper words
@@ -24,17 +24,17 @@ IN: benchmark.partial-sums
 : partial-sums ( n -- results )
     [
         {
-            [ 2/3^k                 \ 2/3^k                set ]
-            [ k^-0.5                \ k^-0.5               set ]
-            [ 1/k(k+1)              \ 1/k(k+1)             set ]
-            [ flint-hills           \ flint-hills          set ]
-            [ cookson-hills         \ cookson-hills        set ]
-            [ harmonic              \ harmonic             set ]
-            [ riemann-zeta          \ riemann-zeta         set ]
-            [ alternating-harmonic  \ alternating-harmonic set ]
-            [ gregory               \ gregory              set ]
+            [ 2/3^k                 \ 2/3^k                ,, ]
+            [ k^-0.5                \ k^-0.5               ,, ]
+            [ 1/k(k+1)              \ 1/k(k+1)             ,, ]
+            [ flint-hills           \ flint-hills          ,, ]
+            [ cookson-hills         \ cookson-hills        ,, ]
+            [ harmonic              \ harmonic             ,, ]
+            [ riemann-zeta          \ riemann-zeta         ,, ]
+            [ alternating-harmonic  \ alternating-harmonic ,, ]
+            [ gregory               \ gregory              ,, ]
         } cleave
-    ] { } make-assoc ;
+    ] { } make ;
 
 HINTS: partial-sums fixnum ;
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words accessors sequences kernel assocs combinators
 classes classes.private classes.algebra classes.algebra.private
-classes.builtin namespaces arrays math quotations ;
+classes.builtin namespaces arrays math quotations make ;
 IN: classes.intersection
 
 PREDICATE: intersection-class < class
@@ -48,7 +48,7 @@ M: anonymous-intersection (flatten-class)
     participants>> [ full-cover ] [
         [ flatten-class keys ]
         [ intersect-flattened-classes ] map-reduce
-        [ dup set ] each
+        [ dup ,, ] each
     ] if-empty ;
 
 M: anonymous-intersection class-name
