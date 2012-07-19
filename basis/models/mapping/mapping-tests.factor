@@ -1,13 +1,13 @@
 USING: arrays generic kernel math models namespaces sequences assocs
-tools.test models.mapping accessors ;
+tools.test models.mapping accessors make ;
 IN: models.mapping.tests
 
 ! Test mapping
 [ ] [
     [
-        1 <model> "one" set
-        2 <model> "two" set
-    ] H{ } make-assoc
+        1 <model> "one" ,,
+        2 <model> "two" ,,
+    ] H{ } make
     <mapping> "m" set
 ] unit-test
 

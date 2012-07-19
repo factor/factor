@@ -102,7 +102,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     [ prefix 1array ] dip prefix , ;
 
 : ($navigation-table) ( element -- )
-    help-path-style get table-style set [ $table ] with-scope ;
+    help-path-style get table-style [ $table ] with-variable ;
 
 : $navigation-table ( topic -- )
     [

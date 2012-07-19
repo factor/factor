@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.pathnames io.files io.encodings.ascii
 io.encodings.binary io.encodings.utf8 assocs sequences
-splitting kernel namespaces fry memoize ;
+splitting kernel make fry memoize ;
 IN: mime.types
 
 MEMO: mime-db ( -- seq )
@@ -18,8 +18,8 @@ MEMO: mime-db ( -- seq )
 
 MEMO: mime-types ( -- assoc )
     [
-        mime-db [ unclip '[ [ _ ] dip set ] each ] each
-    ] H{ } make-assoc
+        mime-db [ unclip '[ [ _ ] dip ,, ] each ] each
+    ] H{ } make
     nonstandard-mime-types assoc-union ;
 
 : mime-type ( filename -- mime-type )

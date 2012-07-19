@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry http.client io io.encodings.utf8 io.files
 kernel mason.common mason.config mason.email mason.twitter
-namespaces prettyprint sequences debugger continuations ;
+namespaces prettyprint sequences debugger continuations make ;
 IN: mason.notify
 
 : status-notify? ( -- ? )
@@ -11,14 +11,14 @@ IN: mason.notify
 
 : status-params ( report arg message -- assoc )
     [
-        short-host-name "host-name" set
-        target-cpu get "target-cpu" set
-        target-os get "target-os" set
-        status-secret get "secret" set
-        [ "report" set ]
-        [ "arg" set ]
-        [ "message" set ] tri*
-    ] H{ } make-assoc ;
+        short-host-name "host-name" ,,
+        target-cpu get "target-cpu" ,,
+        target-os get "target-os" ,,
+        status-secret get "secret" ,,
+        [ "report" ,, ]
+        [ "arg" ,, ]
+        [ "message" ,, ] tri*
+    ] H{ } make ;
 
 : status-notify ( report arg message -- )
     status-notify? [
