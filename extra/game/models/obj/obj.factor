@@ -76,9 +76,9 @@ TUPLE: material
 
 : read-mtl ( file -- material-dictionary )
     [
-        f current-material set
-        H{ } clone material-dictionary set
-    ] H{ } make-assoc
+        f current-material ,,
+        H{ } clone material-dictionary ,,
+    ] H{ } make
     [
         ascii file-lines [ line>mtl ] each
         md
@@ -104,7 +104,7 @@ VERTEX-FORMAT: obj-vertex-format
             [ 1 - vt get nth ] bi* 2array flatten
         ] }
     } case ;
-          
+
 : quad>aos ( x -- y z )
     [ 3 head [ triangle>aos 1array ] map ]
     [ [ 2 swap nth ]

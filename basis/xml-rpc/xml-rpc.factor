@@ -70,7 +70,7 @@ M: base64 item>xml
     params <XML <methodResponse><-></methodResponse> XML> ;
 
 : return-fault ( fault-code fault-string -- xml )
-    [ "faultString" set "faultCode" set ] H{ } make-assoc item>xml
+    [ "faultString" ,, "faultCode" ,, ] H{ } make item>xml
     <XML
         <methodResponse>
             <fault>

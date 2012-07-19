@@ -101,11 +101,10 @@ SYMBOL: ->
         [
             "Quotation: " write
             dup [ second ] [ third ] bi remove-breakpoints
-            [
-                3 nesting-limit set
-                100 length-limit set
-                pprint
-            ] with-scope
+            H{
+                { nesting-limit 3 }
+                { length-limit 100 }
+            } clone [ pprint ] with-variables
         ] with-cell
     ] with-row
     dup frame-word? [
