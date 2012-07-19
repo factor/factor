@@ -48,7 +48,7 @@ MACRO: match-cond ( assoc -- )
     [
         first2
         [ [ dupd match ] curry ] dip
-        [ bind ] curry rot
+        [ with-variables ] curry rot
         [ ?if ] 2curry append
     ] reduce ;
 
@@ -63,7 +63,7 @@ MACRO: match-cond ( assoc -- )
 
 : match-replace ( object pattern1 pattern2 -- result )
     [ match [ "Pattern does not match" throw ] unless* ] dip swap
-    [ replace-patterns ] bind ;
+    [ replace-patterns ] with-variables ;
 
 : ?1-tail ( seq -- tail/f )
     dup length zero? not [ rest ] [ drop f ] if ;

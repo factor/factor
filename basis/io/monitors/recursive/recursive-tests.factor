@@ -26,7 +26,7 @@ M: mock-io-backend (monitor)
     ] if ;
 
 M: mock-io-backend link-info
-    global [ link-info ] bind ;
+    global [ link-info ] with-variables ;
 
 [ ] [ 0 counter boa dummy-monitor-created set ] unit-test
 [ ] [ 0 counter boa dummy-monitor-disposed set ] unit-test

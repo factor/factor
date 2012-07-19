@@ -63,7 +63,7 @@ ENUM: fcgi-protocol-status
     FCGI_UNKNOWN_ROLE ;
 
 :: debug-print ( print-quot -- )
-    global [ print-quot call flush ] bind ; inline
+    [ print-quot call flush ] with-global ; inline
 
 ! read either a 1 byte or 4 byte big endian integer
 : read-var-int ( -- n/f )

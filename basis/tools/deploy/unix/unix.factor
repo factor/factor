@@ -22,5 +22,5 @@ M: unix deploy* ( vocab -- )
             bundle-name "" [ copy-resources ] [ copy-libraries ] 3bi
             bundle-name normalize-path "Binary deployed to " "." surround print
             bundle-name webbrowser:open-file
-        ] bind
+        ] with-variables
     ] with-directory ;
