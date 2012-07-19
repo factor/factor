@@ -19,25 +19,23 @@ SYMBOL: c-object-pointers?
 15 nesting-limit set-global
 100 length-limit set-global
 10 number-base set-global
-string-limit? on
+t string-limit? set-global
 
 : with-short-limits ( quot -- )
-    [
-        1 line-limit set
-        15 length-limit set
-        2 nesting-limit set
-        string-limit? on
-        boa-tuples? on
-        c-object-pointers? off
-        call
-    ] with-scope ; inline
+    H{
+        { line-limit 1 }
+        { length-limit 15 }
+        { nesting-limit 2 }
+        { string-limit? t }
+        { boa-tuples? t }
+        { c-object-pointers? f }
+    } clone swap with-variables ; inline
 
 : without-limits ( quot -- )
-    [
-        nesting-limit off
-        length-limit off
-        line-limit off
-        string-limit? off
-        c-object-pointers? off
-        call
-    ] with-scope ; inline
+    H{
+        { nesting-limit f }
+        { length-limit f }
+        { line-limit f }
+        { string-limit? f }
+        { c-object-pointers? f }
+    } clone swap with-variables ; inline
