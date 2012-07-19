@@ -32,7 +32,7 @@ SYMBOLS: lion giraffe elephant rabbit ;
 [ rabbit f ] [ rabbit <obj-ref> [ take ] keep get-ref ] unit-test
 [ lion ] [ rabbit <obj-ref> dup [ drop lion ] change-ref get-ref ] unit-test
 
-! var-refs 
+! var-refs
 [ giraffe ] [ [ giraffe rabbit set rabbit <var-ref> get-ref ] with-scope ] unit-test
 
 [ rabbit ]

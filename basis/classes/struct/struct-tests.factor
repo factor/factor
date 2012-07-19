@@ -161,36 +161,30 @@ STRUCT: struct-test-string-ptr
 
 [ "S{ struct-test-foo { x 0 } { y 7654 } { z f } }" ]
 [
-    [
-        boa-tuples? off
-        c-object-pointers? off
+    H{ { boa-tuples? f } { c-object-pointers? f } } [
         struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer
-    ] with-scope
+    ] with-variables
 ] unit-test
 
 [ "S@ struct-test-foo B{ 0 0 0 0 0 0 0 0 0 0 0 0 }" ]
 [
-    [
-        c-object-pointers? on
+    H{ { c-object-pointers? t } } [
         12 <byte-array> struct-test-foo memory>struct [ pprint ] with-string-writer
-    ] with-scope
+    ] with-variables
 ] unit-test
 
 [ "S{ struct-test-foo f 0 7654 f }" ]
 [
-    [
-        boa-tuples? on
-        c-object-pointers? off
+    H{ { boa-tuples? t } { c-object-pointers? f } } [
         struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer
-    ] with-scope
+    ] with-variables
 ] unit-test
 
 [ "S@ struct-test-foo f" ]
 [
-    [
-        c-object-pointers? off
+    H{ { c-object-pointers? f } } [
         f struct-test-foo memory>struct [ pprint ] with-string-writer
-    ] with-scope
+    ] with-variables
 ] unit-test
 
 [ "USING: alien.c-types classes.struct ;

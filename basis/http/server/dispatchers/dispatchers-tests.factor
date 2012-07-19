@@ -19,15 +19,14 @@ M: mock-responder call-responder*
     main-responder get call-responder
     write-response get ;
 
-[
+<dispatcher>
+    "foo" <mock-responder> "foo" add-responder
+    "bar" <mock-responder> "bar" add-responder
     <dispatcher>
-        "foo" <mock-responder> "foo" add-responder
-        "bar" <mock-responder> "bar" add-responder
-        <dispatcher>
-            "123" <mock-responder> "123" add-responder
-            "default" <mock-responder> >>default
-        "baz" add-responder
-    main-responder set
+        "123" <mock-responder> "123" add-responder
+        "default" <mock-responder> >>default
+    "baz" add-responder
+main-responder [
 
     [ "foo" ] [
         { "foo" } main-responder get find-responder path>> nip
@@ -46,15 +45,14 @@ M: mock-responder call-responder*
     [ t ] [ "123" "baz/123" check-dispatch ] unit-test
     [ t ] [ "123" "baz///123" check-dispatch ] unit-test
 
-] with-scope
+] with-variable
 
-[
-    <dispatcher>
-        "default" <mock-responder> >>default
-    main-responder set
+<dispatcher>
+    "default" <mock-responder> >>default
+main-responder [
 
     [ "/default" ] [ "/default" main-responder get find-responder drop ] unit-test
-] with-scope
+] with-variable
 
 ! Make sure path for default responder isn't chopped
 TUPLE: path-check-responder ;

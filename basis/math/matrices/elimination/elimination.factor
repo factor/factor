@@ -7,7 +7,7 @@ IN: math.matrices.elimination
 SYMBOL: matrix
 
 : with-matrix ( matrix quot -- )
-    [ swap matrix set call matrix get ] with-scope ; inline
+    matrix swap [ matrix get ] compose with-variable ; inline
 
 : nth-row ( row# -- seq ) matrix get nth ;
 

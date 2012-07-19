@@ -29,10 +29,9 @@ yield
 
 :: spawn-namespace-test ( -- ? )
     <promise> :> p gensym :> g
-    [
-        g "x" set
+    g "x" [
         [ "x" get p fulfill ] "B" spawn drop
-    ] with-scope
+    ] with-variable
     p ?promise g eq? ;
 
 [ t ] [ spawn-namespace-test ] unit-test

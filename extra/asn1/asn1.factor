@@ -193,10 +193,7 @@ TUPLE: tag value ;
 : <tag> ( -- <tag> ) 4 tag boa ;
 
 : with-ber ( quot -- )
-    [
-        <tag> tagnum set
-        call
-    ] with-scope ; inline
+    [ <tag> tagnum ] dip with-variable ; inline
 
 : set-tag ( value -- )
     tagnum get value<< ;
