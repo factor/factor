@@ -68,7 +68,7 @@ CONSTANT: stylesheet
     [
         stylesheet clone [
             [ print-element ] with-default-style
-        ] bind
+        ] with-variables
     ] make-pane
     dup page-theme ;
 

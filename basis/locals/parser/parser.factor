@@ -46,10 +46,10 @@ SYMBOL: locals
     ?rewrite-closures ;
 
 : parse-multi-def ( locals -- multi-def )
-    [ ")" [ make-local ] map-tokens ] bind <multi-def> ;
+    [ ")" [ make-local ] map-tokens ] with-variables <multi-def> ;
 
 : parse-def ( name/paren locals -- def )
-    over "(" = [ nip parse-multi-def ] [ [ make-local ] bind <def> ] if ;
+    over "(" = [ nip parse-multi-def ] [ [ make-local ] with-variables <def> ] if ;
 
 M: lambda-parser parse-quotation ( -- quotation )
     H{ } clone (parse-lambda) ;
