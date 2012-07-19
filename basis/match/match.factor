@@ -23,7 +23,7 @@ SYNTAX: MATCH-VARS: ! vars ...
     dup word? [ "match-var" word-prop ] [ drop f ] if ;
 
 : set-match-var ( value var -- ? )
-    dup namespace key? [ get = ] [ set t ] if ;
+    dup building get key? [ get = ] [ ,, t ] if ;
 
 : (match) ( value1 value2 -- matched? )
     {
@@ -40,7 +40,7 @@ SYNTAX: MATCH-VARS: ! vars ...
     } cond ;
 
 : match ( value1 value2 -- bindings )
-    [ (match) ] H{ } make-assoc swap [ drop f ] unless ;
+    [ (match) ] H{ } make swap [ drop f ] unless ;
 
 MACRO: match-cond ( assoc -- )
     <reversed>
@@ -73,7 +73,7 @@ MACRO: match-cond ( assoc -- )
         2dup length head over match
         [ swap ?1-tail ] [ [ rest ] dip (match-first) ] ?if
     ] if ;
-    
+
 : match-first ( seq pattern-seq -- bindings )
     (match-first) drop ;
 
