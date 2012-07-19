@@ -55,7 +55,7 @@ SYMBOL: terms
 
 ! Addition
 : (alt+) ( x -- )
-    terms get [ [ swap +@ ] assoc-each ] bind ;
+    terms get [ [ swap +@ ] assoc-each ] with-variables ;
 
 : alt+ ( x y -- x+y )
     [ >alt ] bi@ [ (alt+) (alt+) ] with-terms ;
