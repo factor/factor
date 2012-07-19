@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators fry grouping http.client io
-json.reader kernel locals namespaces sequences ;
+json.reader kernel locals make namespaces sequences ;
 IN: google.translate
 
 CONSTANT: google-translate-url "http://ajax.googleapis.com/ajax/services/language/translate"
