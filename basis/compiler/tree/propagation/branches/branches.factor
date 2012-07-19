@@ -74,7 +74,7 @@ SYMBOL: infer-children-data
             _ [
                 dup +bottom+ eq?
                 [ drop null-info ] [ value-info ] if
-            ] bind
+            ] with-variables
         ] map
     ] 2map ;
 

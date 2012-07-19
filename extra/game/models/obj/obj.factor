@@ -82,7 +82,7 @@ TUPLE: material
     [
         ascii file-lines [ line>mtl ] each
         md
-    ] bind ;
+    ] with-variables ;
 
 VERTEX-FORMAT: obj-vertex-format
     { "POSITION" float-components 3 f }
@@ -162,5 +162,5 @@ M: obj-models stream>models
     [
         [ line>obj ] each-stream-line push-current-model
         models get
-    ] bind ;
+    ] with-variables ;
 

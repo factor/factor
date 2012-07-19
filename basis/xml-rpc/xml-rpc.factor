@@ -161,7 +161,7 @@ TAG: array xml>item
 
 : parse-fault ( xml -- fault-code fault-string )
     first-child-tag first-child-tag first-child-tag
-    xml>item [ "faultCode" get "faultString" get ] bind ;
+    xml>item [ "faultCode" get "faultString" get ] with-variables ;
 
 : receive-rpc ( xml -- rpc )
     dup main>> dup "methodCall" =

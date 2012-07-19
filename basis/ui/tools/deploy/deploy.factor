@@ -49,7 +49,7 @@ TUPLE: deploy-gadget < pack vocab settings ;
 
         deploy-settings-theme
         namespace <mapping> >>model
-    ] bind ;
+    ] with-variables ;
 
 : find-deploy-gadget ( gadget -- deploy-gadget )
     [ deploy-gadget? ] find-parent ;

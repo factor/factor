@@ -7,7 +7,6 @@ io.encodings.utf8 io.files.private io.pathnames
 io.sockets.private io.streams.duplex kernel libc locals math
 math.parser sequences system threads unix unix.ffi
 vocabs ;
-EXCLUDE: namespaces => bind ;
 EXCLUDE: io => read write ;
 EXCLUDE: io.sockets => accept ;
 IN: io.sockets.unix

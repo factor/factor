@@ -69,6 +69,6 @@ M: interpolated [undo-xml]
     sort-keys values <enum> ;
 
 : undo-xml ( xml -- quot )
-    [undo-xml] '[ H{ } clone [ _ bind ] keep >enum ] ;
+    [undo-xml] '[ H{ } clone [ _ with-variables ] keep >enum ] ;
 
 \ interpolate-xml 1 [ undo-xml ] define-pop-inverse

@@ -381,7 +381,7 @@ SYMBOL: ignore-ws
     parser set 
     swap (transform) 
     main set 
-  ] bind ;
+  ] with-variables ;
 
 M: ebnf (transform) ( ast -- parser )
   rules>> [ (transform) ] map last ;

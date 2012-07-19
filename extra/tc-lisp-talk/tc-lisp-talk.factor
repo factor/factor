@@ -115,7 +115,7 @@ M: circle perimeter radius>> pi * 2 * ;"""
         { "Useful words are " { $link get-global } ", " { $link set-global } }
         "Factor idiom for changing a particular namespace"
         { $code """SYMBOL: king
-global [ "Henry VIII" king set ] bind"""
+global [ "Henry VIII" king set ] with-variables"""
         }
         { $code "with-scope" }
         { $code "namestack" }

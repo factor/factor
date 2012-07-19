@@ -51,7 +51,7 @@ unit-test
 
 [ 3 ]
 [
-    global [ 3 \ foo set ] bind
+    global [ 3 \ foo set ] with-variables
     \ foo [ global >n get namespaces.private:ndrop ] compile-call
 ] unit-test
 
@@ -59,20 +59,20 @@ unit-test
 
 [ 3 ]
 [
-    global [ 3 \ foo set ] bind
+    global [ 3 \ foo set ] with-variables
     \ foo [ global [ get ] swap blech call ] compile-call
 ] unit-test
 
 [ 3 ]
 [
-    global [ 3 \ foo set ] bind
+    global [ 3 \ foo set ] with-variables
     \ foo [ global [ get ] swap >n call namespaces.private:ndrop ] compile-call
 ] unit-test
 
 [ 3 ]
 [
-    global [ 3 \ foo set ] bind
-    \ foo [ global [ get ] bind ] compile-call
+    global [ 3 \ foo set ] with-variables
+    \ foo [ global [ get ] with-variables ] compile-call
 ] unit-test
 
 [ 12 13 ] [

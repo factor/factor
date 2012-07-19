@@ -40,5 +40,5 @@ M: windows deploy*
                 [ nip "" [ copy-resources ] [ copy-libraries ] 3bi ]
                 [ nip open-in-explorer ]
             } 2cleave 
-        ] bind
+        ] with-variables
     ] with-directory ;

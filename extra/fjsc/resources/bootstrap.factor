@@ -1,6 +1,6 @@
 IN: namespaces
 USE: kernel-internals
-: bind ( ns quot -- )
+: with-variables ( ns quot -- )
   swap >n call n> drop ;
 
 "browser-dom" set-in
@@ -14,7 +14,7 @@ USE: kernel-internals
   { } "" "html" { "string" } alien-invoke ;
 
 : bind-event ( name element quot -- )
-  >function swap { } "" "bind" { "string" "function" } alien-invoke ;
+  >function swap { } "" "with-variables" { "string" "function" } alien-invoke ;
 
 "scratchpad" set-in
 

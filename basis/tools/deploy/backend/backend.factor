@@ -112,7 +112,7 @@ DEFER: ?make-staging-image
             "-output-image=" prepend ,
             "-pic=0" ,
         ] { } make
-    ] bind ;
+    ] with-variables ;
 
 : parse-vocab-manifest-file ( path -- vocab-manifest )
     utf8 file-lines [ "empty vocab manifest!" throw ] [

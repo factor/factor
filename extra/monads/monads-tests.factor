@@ -10,7 +10,7 @@ IN: monads.tests
 ] unit-test
 
 [ nothing ] [
-    111 just [ maybe-monad fail ] bind
+    111 just [ maybe-monad fail ] with-variables
 ] unit-test
 
 [ 100 ] [
@@ -26,7 +26,7 @@ IN: monads.tests
 ] unit-test
 
 [ { } ] [
-    { 1 2 3 } [ drop "OOPS" array-monad fail ] bind
+    { 1 2 3 } [ drop "OOPS" array-monad fail ] with-variables
 ] unit-test
 
 [ 5 ] [
@@ -34,7 +34,7 @@ IN: monads.tests
 ] unit-test
 
 [ 8 ] [
-    5 state-monad return [ 3 + state-monad return ] bind
+    5 state-monad return [ 3 + state-monad return ] with-variables
     "initial state" run-st
 ] unit-test
 
@@ -52,9 +52,9 @@ IN: monads.tests
 
 [ 15 ] [
     f state-monad return
-    [ drop get-st ] bind
-    [ 4 + put-st ] bind
-    [ drop get-st ] bind
+    [ drop get-st ] with-variables
+    [ 4 + put-st ] with-variables
+    [ drop get-st ] with-variables
     11 run-st
 ] unit-test
 
@@ -104,12 +104,12 @@ LAZY: nats-from ( n -- list )
 ] unit-test
 
 [ 6 ] [
-    f reader-monad return [ drop ask ] bind [ 1 + ] local 5 run-reader
+    f reader-monad return [ drop ask ] with-variables [ 1 + ] local 5 run-reader
 ] unit-test
 
 [ f { 1 2 3 } ] [
     5 writer-monad return
-    [ drop { 1 2 3 } tell ] bind
+    [ drop { 1 2 3 } tell ] with-variables
     run-writer
 ] unit-test
 

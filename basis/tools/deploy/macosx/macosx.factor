@@ -84,11 +84,11 @@ IN: tools.deploy.macosx
             [ "Contents/Resources" copy-resources ]
             [ "Contents/Frameworks" copy-libraries ] 2bi
             bundle-name show-in-finder
-        ] bind
+        ] with-variables
     ] with-directory ;
 
 : deploy-app-bundle? ( vocab -- ? )
-    deploy-config [ deploy-console? get not deploy-ui? get or ] bind ;
+    deploy-config [ deploy-console? get not deploy-ui? get or ] with-variables ;
 
 M: macosx deploy* ( vocab -- )
     ! pass off to M: unix deploy* if we're building a console app

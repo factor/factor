@@ -30,7 +30,7 @@ cache-directory [
     "hello-ui" deploy-config [
         bootstrap-profile staging-image-name file-name
         "." split second
-    ] bind
+    ] with-variables
 ] unit-test
 
 [ ] [ "maze" shake-and-bake 1200000 small-enough? ] unit-test

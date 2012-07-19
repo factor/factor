@@ -14,7 +14,7 @@ IN: tools.deploy.shaker.cocoa
 : pool-values ( assoc -- assoc' ) [ pool-array ] assoc-map ;
 
 H{ } clone \ pool [
-    global [
+    [
         ! Only keeps those methods that we actually call
         sent-messages get super-sent-messages get assoc-union
         objc-methods [ assoc-intersect pool-values ] change
@@ -34,7 +34,7 @@ H{ } clone \ pool [
         ! We need this for strip-stack-traces to work fully
         { message-senders super-message-senders }
         [ get values compile ] each
-    ] bind
+    ] with-global
 ] with-variable
 
 \ make-prepare-send reset-memoized

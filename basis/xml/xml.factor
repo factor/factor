@@ -120,7 +120,7 @@ TUPLE: pull-xml scope ;
         text-now? get [ parse-text f ] [
             get-char [ make-tag t ] [ f f ] if
         ] if text-now? set
-    ] bind ;
+    ] with-variables ;
 
 <PRIVATE
 
