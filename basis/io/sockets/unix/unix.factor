@@ -1,12 +1,9 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov. 
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-byte-arrays classes.struct combinators continuations
-destructors generic init io.backend io.backend.unix io.binary
-io.encodings.utf8 io.files.private io.pathnames
-io.sockets.private io.streams.duplex kernel libc locals math
-math.parser sequences system threads unix unix.ffi
-vocabs ;
+classes.struct combinators destructors io.backend.unix
+io.encodings.utf8 io.pathnames io.sockets.private kernel libc
+locals math namespaces sequences system unix unix.ffi vocabs ;
 EXCLUDE: io => read write ;
 EXCLUDE: io.sockets => accept ;
 IN: io.sockets.unix
