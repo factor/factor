@@ -76,7 +76,7 @@ SYMBOL: total
 ! Part II: Topologically sorting specializers
 : maximal-element ( seq quot -- n elt )
     dupd [
-        swapd [ call +lt+ = ] 2curry filter empty?
+        swapd [ call +lt+ = ] 2curry any? not
     ] 2curry find [ "Topological sort failed" throw ] unless* ;
     inline
 
