@@ -42,7 +42,7 @@ gc
     ! Compile a set of words ahead of the full compile.
     ! This set of words was determined semi-empirically
     ! using the profiler. It improves bootstrap time
-    ! significantly, because frequenly called words
+    ! significantly, because frequently called words
     ! which are also quick to compile are replaced by
     ! compiled definitions as soon as possible.
     {
