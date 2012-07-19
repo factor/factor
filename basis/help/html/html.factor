@@ -118,13 +118,12 @@ M: topic url-of topic>filename ;
     all-topics [ '[ _ generate-help-file ] try ] each ;
 
 : generate-help-files ( -- )
-    [
-        recent-searches off
-        recent-words off
-        recent-articles off
-        recent-vocabs off
-        (generate-help-files)
-    ] with-scope ;
+    H{
+        { recent-searches f }
+        { recent-words f }
+        { recent-articles f }
+        { recent-vocabs f }
+    } [ (generate-help-files) ] with-variables ;
 
 : generate-help ( -- )
     "docs" cache-file

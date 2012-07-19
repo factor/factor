@@ -136,7 +136,7 @@ M: gadget draw-children
             [ gadget-background ]
             [ gadget-foreground ]
         } cleave [
-            
+
             {
                 [ [ selected-gadgets set ] when* ]
                 [ [ selection-background set ] when* ]
