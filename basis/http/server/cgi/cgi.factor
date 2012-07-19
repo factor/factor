@@ -3,43 +3,43 @@
 USING: namespaces kernel assocs io.files io.streams.duplex
 combinators arrays io.launcher io.encodings io.encodings.binary io
 http.server.static http.server http accessors sequences strings
-math.parser fry urls urls.encoding calendar ;
+math.parser fry urls urls.encoding calendar make ;
 IN: http.server.cgi
 
 : cgi-variables ( script-path -- assoc )
     #! This needs some work.
     [
-        "CGI/1.0" "GATEWAY_INTERFACE" set
-        "HTTP/" request get version>> append "SERVER_PROTOCOL" set
-        "Factor" "SERVER_SOFTWARE" set
+        "CGI/1.0" "GATEWAY_INTERFACE" ,,
+        "HTTP/" request get version>> append "SERVER_PROTOCOL" ,,
+        "Factor" "SERVER_SOFTWARE" ,,
 
-        [ "PATH_TRANSLATED" set ] [ "SCRIPT_FILENAME" set ] bi
+        [ "PATH_TRANSLATED" ,, ] [ "SCRIPT_FILENAME" ,, ] bi
 
-        url get path>> "SCRIPT_NAME" set
+        url get path>> "SCRIPT_NAME" ,,
 
-        url get host>> "SERVER_NAME" set
-        url get port>> number>string "SERVER_PORT" set
-        "" "PATH_INFO" set
-        "" "REMOTE_HOST" set
-        "" "REMOTE_ADDR" set
-        "" "AUTH_TYPE" set
-        "" "REMOTE_USER" set
-        "" "REMOTE_IDENT" set
+        url get host>> "SERVER_NAME" ,,
+        url get port>> number>string "SERVER_PORT" ,,
+        "" "PATH_INFO" ,,
+        "" "REMOTE_HOST" ,,
+        "" "REMOTE_ADDR" ,,
+        "" "AUTH_TYPE" ,,
+        "" "REMOTE_USER" ,,
+        "" "REMOTE_IDENT" ,,
 
-        request get method>> "REQUEST_METHOD" set
-        url get query>> assoc>query "QUERY_STRING" set
-        request get "cookie" header "HTTP_COOKIE" set 
+        request get method>> "REQUEST_METHOD" ,,
+        url get query>> assoc>query "QUERY_STRING" ,,
+        request get "cookie" header "HTTP_COOKIE" ,,
 
-        request get "user-agent" header "HTTP_USER_AGENT" set
-        request get "accept" header "HTTP_ACCEPT" set
+        request get "user-agent" header "HTTP_USER_AGENT" ,,
+        request get "accept" header "HTTP_ACCEPT" ,,
 
         post-request? [
             request get post-data>> data>>
-            [ "CONTENT_TYPE" set ]
-            [ length number>string "CONTENT_LENGTH" set ]
+            [ "CONTENT_TYPE" ,, ]
+            [ length number>string "CONTENT_LENGTH" ,, ]
             bi
         ] when
-    ] H{ } make-assoc ;
+    ] H{ } make ;
 
 : <cgi-process> ( name -- desc )
     <process>
