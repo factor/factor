@@ -19,7 +19,7 @@ SYMBOL: c-object-pointers?
 15 nesting-limit set-global
 100 length-limit set-global
 10 number-base set-global
-t string-limit? set-global
+string-limit? on
 
 : with-short-limits ( quot -- )
     H{
