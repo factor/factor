@@ -55,10 +55,11 @@ PRIVATE>
 : +@ ( n variable -- ) [ 0 or + ] change ; inline
 : inc ( variable -- ) 1 swap +@ ; inline
 : dec ( variable -- ) -1 swap +@ ; inline
-: bind ( ns quot -- ) swap >n call ndrop ; inline
+: with-variables ( ns quot -- ) swap >n call ndrop ; inline
 : counter ( variable -- n ) [ 0 or 1 + dup ] change-global ;
-: make-assoc ( quot exemplar -- hash ) 20 swap new-assoc [ swap bind ] keep ; inline
-: with-scope ( quot -- ) 5 <hashtable> swap bind ; inline
-: with-variable ( value key quot -- ) [ associate ] dip bind ; inline
-: with-global ( quot -- ) global swap bind ; inline
+: make-assoc ( quot exemplar -- hash ) 20 swap new-assoc [ swap with-variables ] keep ; inline
+: with-scope ( quot -- ) 5 <hashtable> swap with-variables ; inline
+: with-variable ( value key quot -- ) [ associate ] dip with-variables ; inline
+: with-new-scope ( quot -- ) 5 <hashtable> swap with-variables ; inline
+: with-global ( quot -- ) [ global ] dip with-variables ; inline
 : initialize ( variable quot -- ) [ unless* ] curry change-global ; inline

@@ -640,7 +640,7 @@ SYMBOL: deploy-vocab
             "Saving final image" show
             save-image-and-exit
         ] deploy-error-handler
-    ] bind ;
+    ] with-variables ;
 
 : do-deploy ( -- )
     "output-image" get

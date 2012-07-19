@@ -8,7 +8,7 @@ ARTICLE: "namespaces-combinators" "Namespace combinators"
     make-assoc
     with-scope
     with-variable
-    bind
+    with-variables
 } ;
 
 ARTICLE: "namespaces-change" "Changing variable values"
@@ -150,7 +150,7 @@ HELP: make-assoc
 { $values { "quot" quotation } { "exemplar" assoc } { "hash" "a new assoc" } }
 { $description "Calls the quotation in a new namespace of the same type as " { $snippet "exemplar" } ", and outputs this namespace when the quotation returns. Useful for quickly building assocs." } ;
 
-HELP: bind
+HELP: with-variables
 { $values { "ns" assoc } { "quot" quotation } }
 { $description "Calls the quotation in the dynamic scope of " { $snippet "ns" } ". When variables are looked up by the quotation, " { $snippet "ns" } " is checked first, and setting variables in the quotation stores them in " { $snippet "ns" } "." } ;
 

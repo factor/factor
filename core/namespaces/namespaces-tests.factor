@@ -5,13 +5,13 @@ IN: namespaces.tests
 H{ } clone "test-namespace" set
 
 : test-namespace ( -- ? )
-    H{ } clone dup [ namespace = ] bind ;
+    H{ } clone dup [ namespace = ] with-variables ;
 
 [ t ] [ test-namespace ] unit-test
 
 10 "some-global" set
 [ f ]
-[ H{ } clone [ f "some-global" set "some-global" get ] bind ]
+[ H{ } clone [ f "some-global" set "some-global" get ] with-variables ]
 unit-test
 
 SYMBOL: test-initialize
