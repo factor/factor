@@ -187,7 +187,7 @@ SYMBOL: node-count
         } [
             nl print get keys natural-sort stack.
         ] assoc-each
-    ] bind ;
+    ] with-variables ;
 
 : optimizer-report. ( word -- )
     make-report report. ;

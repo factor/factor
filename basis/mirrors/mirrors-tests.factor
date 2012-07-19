@@ -26,11 +26,11 @@ C: <foo> foo
     gensym [
         <mirror> [
             "foo" "name" set
-        ] bind
+        ] with-variables
     ] [ name>> ] bi
 ] unit-test
 
-[ gensym <mirror> [ "compiled" off ] bind ] must-fail
+[ gensym <mirror> [ "compiled" off ] with-variables ] must-fail
 
 TUPLE: declared-mirror-test
 { a integer initial: 0 } ;
@@ -39,10 +39,10 @@ TUPLE: declared-mirror-test
     3 declared-mirror-test boa <mirror> [
         5 "a" set
         "a" get
-    ] bind
+    ] with-variables
 ] unit-test
 
-[ 3 declared-mirror-test boa <mirror> [ t "a" set ] bind ] must-fail
+[ 3 declared-mirror-test boa <mirror> [ t "a" set ] with-variables ] must-fail
 
 TUPLE: color
 { red integer }

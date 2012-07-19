@@ -159,7 +159,7 @@ VERTEX-FORMAT: collada-vertex-format
     [
         { { up-axis y-up } { unit-ratio 1 } } [
             mesh>sources
-        ] bind
+        ] with-variables
     ]
     [ mesh>vertices ]
     [ mesh>triangles ] tri ;
