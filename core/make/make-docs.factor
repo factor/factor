@@ -1,6 +1,6 @@
 IN: make
-USING: help.markup help.syntax quotations sequences math.parser
-kernel ;
+USING: assocs help.markup help.syntax kernel math.parser
+quotations sequences ;
 
 ARTICLE: "make-philosophy" "Make philosophy"
 { $heading "When to use make" }
@@ -73,3 +73,11 @@ HELP: ,
 HELP: %
 { $values { "seq" sequence } }
 { $description "Appends a sequence to the end of the sequence being constructed by " { $link make } "." } ;
+
+HELP: ,,
+{ $values { "value" object } { "key" object } }
+{ $description "Stores the key/value pair into the assoc being constructed by " { $link make } "." } ;
+
+HELP: %%
+{ $values { "assoc" assoc } }
+{ $description "Adds all entries from " { $snippet "assoc" } " to the assoc being constructed by " { $link make } "." } ;
