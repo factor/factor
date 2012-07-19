@@ -10,9 +10,9 @@ CONSTANT: maximum-translation-size 5120
 
 : parameters>assoc ( text from to -- assoc )
     "|" glue [
-        [ "q" set ] [ "langpair" set ] bi*
-        "1.0" "v" set
-    ] { } make-assoc ;
+        [ "q" ,, ] [ "langpair" ,, ] bi*
+        "1.0" "v" ,,
+    ] { } make ;
 
 : assoc>query-response ( assoc -- response )
     google-translate-url http-post nip ;

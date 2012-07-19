@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces accessors xml.tokenize xml.data assocs
 xml.errors xml.char-classes combinators.short-circuit splitting
-fry xml.state sequences combinators ascii math ;
+fry xml.state sequences combinators ascii math make ;
 IN: xml.name
 
 ! XML namespace processing: ns = namespace
@@ -15,13 +15,13 @@ SYMBOL: ns-stack
     [
         [
             swap dup space>> "xmlns" =
-            [ main>> set ]
+            [ main>> ,, ]
             [
                 T{ name f "" "xmlns" f } names-match?
-                [ "" set ] [ drop ] if
+                [ "" ,, ] [ drop ] if
             ] if
         ] assoc-each
-    ] { } make-assoc f like ;
+    ] { } make f like ;
 
 : add-ns ( name -- )
     dup space>> dup ns-stack get assoc-stack
