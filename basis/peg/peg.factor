@@ -240,17 +240,15 @@ TUPLE: peg-head rule-id involved-set eval-set ;
    ] if* ; inline
 
 : with-packrat ( input quot -- result )
-  #! Run the quotation with a packrat cache active.
-  [ 
-    swap input set
-    0 pos set
-    f lrstack set
-    V{ } clone error-stack set
-    H{ } clone \ heads set
-    H{ } clone \ packrat set
-    call
-  ] with-scope ; inline
-
+    #! Run the quotation with a packrat cache active.
+    [
+        swap input ,,
+        0 pos ,,
+        f lrstack ,,
+        V{ } clone error-stack ,,
+        H{ } clone \ heads ,,
+        H{ } clone \ packrat ,,
+    ] H{ } make swap with-variables ; inline
 
 GENERIC: (compile) ( peg -- quot )
 
