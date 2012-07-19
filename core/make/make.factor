@@ -18,7 +18,7 @@ SYMBOL: building
 
 : make-assoc ( quot exemplar -- assoc )
     [
-        20 swap new-assoc [
+        5 swap new-assoc [
             building set call
         ] keep
     ] with-scope ; inline
