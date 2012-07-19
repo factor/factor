@@ -151,14 +151,14 @@ PRIVATE>
 M: obj-models stream>models
     drop
     [
-        V{ } clone vp set
-        V{ } clone vt set
-        V{ } clone vn set
-        V{ } clone models set
-        V{ } V{ } H{ } <indexed-seq> current-model set
-        f current-material set
-        f material-dictionary set
-    ] H{ } make-assoc 
+        V{ } clone vp ,,
+        V{ } clone vt ,,
+        V{ } clone vn ,,
+        V{ } clone models ,,
+        V{ } V{ } H{ } <indexed-seq> current-model ,,
+        f current-material ,,
+        f material-dictionary ,,
+    ] H{ } make
     [
         [ line>obj ] each-stream-line push-current-model
         models get
