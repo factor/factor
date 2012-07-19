@@ -373,10 +373,10 @@ SYMBOL: a
 
 [ "4" ] [
     [
-        "4" "a" set
-        "http://localhost" add-addr "__u" set
-        "session-id" get session-id-key set
-    ] H{ } make-assoc
+        "4" "a" ,,
+        "http://localhost" add-addr "__u" ,,
+        "session-id" get session-id-key ,,
+    ] H{ } make
     "http://localhost/" add-addr <post-request> "cookies" get >>cookies http-request nip test-a
 ] unit-test
 
@@ -385,10 +385,10 @@ SYMBOL: a
 ! Test flash scope
 [ "xyz" ] [
     [
-        "xyz" "a" set
-        "http://localhost" add-addr "__u" set
-        "session-id" get session-id-key set
-    ] H{ } make-assoc
+        "xyz" "a" ,,
+        "http://localhost" add-addr "__u" ,,
+        "session-id" get session-id-key ,,
+    ] H{ } make
     "http://localhost/" add-addr <post-request> "cookies" get >>cookies http-request nip test-a
 ] unit-test
 
