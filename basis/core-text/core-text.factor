@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien alien.c-types alien.data alien.syntax kernel
 destructors accessors fry words hashtables strings sequences
-memoize assocs math math.order math.vectors math.rectangles
+memoize assocs make math math.order math.vectors math.rectangles
 math.functions locals init namespaces combinators fonts colors
 cache core-foundation core-foundation.strings
 core-foundation.attributed-strings core-foundation.utilities
@@ -41,9 +41,9 @@ ERROR: not-a-string object ;
             dup string? [ not-a-string ] unless
         ] 2dip
         [
-            kCTForegroundColorAttributeName set
-            kCTFontAttributeName set
-        ] H{ } make-assoc <CFAttributedString> &CFRelease
+            kCTForegroundColorAttributeName ,,
+            kCTFontAttributeName ,,
+        ] H{ } make <CFAttributedString> &CFRelease
         CTLineCreateWithAttributedString
     ] with-destructors ;
 

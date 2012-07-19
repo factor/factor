@@ -117,7 +117,7 @@ TUPLE: couchdb-auth-provider
     username-view>> get-url
     swap >json "key" set-query-param
     ((get-user)) ;
-    
+
 : strip-hash ( hash1 -- hash2 )
     [ drop first CHAR: _ = not ] assoc-filter ;
 
@@ -156,10 +156,10 @@ TUPLE: couchdb-auth-provider
 : (new-user) ( user -- user/f )
     dup
     [
-        [ username>> "username" set ]
-        [ email>> "email" set ]
+        [ username>> "username" ,, ]
+        [ email>> "email" ,, ]
         bi
-    ] H{ } make-assoc
+    ] H{ } make
     reserve-multiple
     [
         user>user-hash >json
@@ -203,22 +203,19 @@ PRIVATE>
     couchdb-auth-provider new swap >>username-view swap >>base-url ;
 
 M: couchdb-auth-provider get-user ( username provider -- user/f )
-    [
-        couchdb-auth-provider set
+    couchdb-auth-provider [
         (get-user) [ user-hash>user ] [ f ] if*
-    ] with-scope ;
+    ] with-variable ;
 
 M: couchdb-auth-provider new-user ( user provider -- user/f )
-    [
-        couchdb-auth-provider set
+    couchdb-auth-provider [
         dup (new-user) [
             username>> couchdb-auth-provider get get-user
         ] [ drop f ] if
-    ] with-scope ;
+    ] with-variable ;
 
 M: couchdb-auth-provider update-user ( user provider -- )
-    [
-        couchdb-auth-provider set
+    couchdb-auth-provider [
         [ username>> (get-user)/throw-on-no-user dup ]
         [ drop "_id" swap at get-url ]
         [ user>user-hash swapd
@@ -226,4 +223,4 @@ M: couchdb-auth-provider update-user ( user provider -- )
           unify-users >json swap couch-put drop
         ]
         tri
-    ] with-scope ;
+    ] with-variable ;

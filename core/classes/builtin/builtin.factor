@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.algebra.private classes.private kernel
-kernel.private namespaces sequences words ;
+kernel.private make namespaces sequences words ;
 IN: classes.builtin
 
 SYMBOL: builtins
@@ -21,7 +21,7 @@ M: builtin-class rank-class drop 0 ;
 
 M: builtin-class instance? [ tag ] [ class>type ] bi* eq? ;
 
-M: builtin-class (flatten-class) dup set ;
+M: builtin-class (flatten-class) dup ,, ;
 
 M: builtin-class (classes-intersect?) eq? ;
 
