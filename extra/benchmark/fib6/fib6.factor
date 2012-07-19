@@ -9,6 +9,6 @@ IN: benchmark.fib6
     ] alien-callback
     int { int } cdecl alien-indirect ;
 
-: fib-main ( -- ) 32 fib drop ;
+: fib6-benchmark ( -- ) 32 fib drop ;
 
-MAIN: fib-main
+MAIN: fib6-benchmark
