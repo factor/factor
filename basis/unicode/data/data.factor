@@ -6,7 +6,6 @@ math.parser math.order byte-arrays namespaces math.bitwise
 compiler.units parser io.encodings.ascii interval-maps
 ascii sets combinators locals math.ranges sorting make
 strings.parser io.encodings.utf8 memoize simple-flat-file ;
-FROM: namespaces => set ;
 IN: unicode.data
 
 <PRIVATE
@@ -174,7 +173,7 @@ C: <code-point> code-point
 
 : set-code-point ( seq -- )
     4 head [ multihex ] map first4
-    <code-point> swap first set ;
+    <code-point> swap first ,, ;
 
 ! Extra properties
 : parse-properties ( -- {{[a,b],prop}} )
@@ -197,7 +196,7 @@ C: <code-point> code-point
 : load-special-casing ( -- special-casing )
     "vocab:unicode/data/SpecialCasing.txt" data
     [ length 5 = ] filter
-    [ [ set-code-point ] each ] H{ } make-assoc ;
+    [ [ set-code-point ] each ] H{ } make ;
 
 load-data {
     [ process-names name-map swap assoc-union! drop ]

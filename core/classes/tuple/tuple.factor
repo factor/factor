@@ -344,7 +344,7 @@ M: tuple-class rank-class drop 1 ;
 M: tuple-class instance?
     dup echelon-of layout-class-offset tuple-instance? ;
 
-M: tuple-class (flatten-class) dup set ;
+M: tuple-class (flatten-class) dup ,, ;
 
 M: tuple-class (classes-intersect?)
     {

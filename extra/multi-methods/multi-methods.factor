@@ -164,9 +164,9 @@ M: method-body crossref?
 
 : method-word-props ( specializer generic -- assoc )
     [
-        "multi-method-generic" set
-        "multi-method-specializer" set
-    ] H{ } make-assoc ;
+        "multi-method-generic" ,,
+        "multi-method-specializer" ,,
+    ] H{ } make ;
 
 : <method> ( specializer generic -- word )
     [ method-word-props ] 2keep

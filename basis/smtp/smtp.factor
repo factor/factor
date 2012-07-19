@@ -7,7 +7,6 @@ io.encodings.ascii io.timeouts io.sockets io.sockets.secure io.crlf
 kernel logging sequences combinators splitting assocs strings
 math.order math.parser random system calendar summary calendar.format
 accessors sets hashtables base64 debugger classes prettyprint words ;
-FROM: namespaces => set ;
 IN: smtp
 
 SYMBOL: smtp-domain
@@ -194,18 +193,18 @@ ERROR: invalid-header-string string ;
 
 : email>headers ( email -- assoc )
     [
-        now timestamp>rfc822 "Date" set
-        message-id "Message-Id" set
-        "1.0" "MIME-Version" set
-        "base64" "Content-Transfer-Encoding" set
+        now timestamp>rfc822 "Date" ,,
+        message-id "Message-Id" ,,
+        "1.0" "MIME-Version" ,,
+        "base64" "Content-Transfer-Encoding" ,,
         {
-            [ from>> "From" set ]
-            [ to>> ", " join "To" set ]
-            [ cc>> ", " join [ "Cc" set ] unless-empty ]
-            [ subject>> "Subject" set ]
-            [ email-content-type "Content-Type" set ]
+            [ from>> "From" ,, ]
+            [ to>> ", " join "To" ,, ]
+            [ cc>> ", " join [ "Cc" ,, ] unless-empty ]
+            [ subject>> "Subject" ,, ]
+            [ email-content-type "Content-Type" ,, ]
         } cleave
-    ] { } make-assoc ;
+    ] H{ } make ;
 
 : (send-email) ( headers email -- )
     [

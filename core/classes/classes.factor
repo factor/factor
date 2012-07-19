@@ -154,12 +154,12 @@ M: sequence implementors [ implementors ] gather ;
 : make-class-props ( superclass members participants metaclass -- assoc )
     [
         {
-            [ dup [ bootstrap-word ] when "superclass" set ]
-            [ [ bootstrap-word ] map "members" set ]
-            [ [ bootstrap-word ] map "participants" set ]
-            [ "metaclass" set ]
+            [ dup [ bootstrap-word ] when "superclass" ,, ]
+            [ [ bootstrap-word ] map "members" ,, ]
+            [ [ bootstrap-word ] map "participants" ,, ]
+            [ "metaclass" ,, ]
         } spread
-    ] H{ } make-assoc ;
+    ] H{ } make ;
 
 GENERIC: metaclass-changed ( use class -- )
 

@@ -4,7 +4,6 @@ USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.maybe classes.private
 combinators definitions kernel make namespaces sequences sets
 words ;
-FROM: namespaces => set ;
 IN: generic
 
 ! Method combination protocol
@@ -118,9 +117,9 @@ M: method crossref?
 
 : method-word-props ( class generic -- assoc )
     [
-        "method-generic" set
-        "method-class" set
-    ] H{ } make-assoc ;
+        "method-generic" ,,
+        "method-class" ,,
+    ] H{ } make ;
 
 : <method> ( class generic -- method )
     check-method

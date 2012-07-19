@@ -40,17 +40,17 @@ nonce ;
 
 : make-token-params ( params quot -- assoc )
     '[
-        "1.0" "oauth_version" set
-        "HMAC-SHA1" "oauth_signature_method" set
+        "1.0" "oauth_version" ,,
+        "HMAC-SHA1" "oauth_signature_method" ,,
 
         _
         [
-            [ consumer-token>> key>> "oauth_consumer_key" set ]
-            [ timestamp>> "oauth_timestamp" set ]
-            [ nonce>> "oauth_nonce" set ]
+            [ consumer-token>> key>> "oauth_consumer_key" ,, ]
+            [ timestamp>> "oauth_timestamp" ,, ]
+            [ nonce>> "oauth_nonce" ,, ]
             tri
         ] bi
-    ] H{ } make-assoc ; inline
+    ] H{ } make ; inline
 
 :: sign-params ( url request-method consumer-token request-token params -- signed-params )
     params sort-keys :> params
@@ -90,7 +90,7 @@ TUPLE: request-token-params < token-params
     <post-request> ;
 
 : make-request-token-params ( params -- assoc )
-    [ callback-url>> "oauth_callback" set ] make-token-params ;
+    [ callback-url>> "oauth_callback" ,, ] make-token-params ;
 
 : <request-token-request> ( url params -- request )
     [ consumer-token>> f ] [ make-request-token-params ] bi
@@ -110,8 +110,8 @@ TUPLE: access-token-params < token-params request-token verifier ;
 
 : make-access-token-params ( params -- assoc )
     [
-        [ request-token>> key>> "oauth_token" set ]
-        [ verifier>> "oauth_verifier" set ]
+        [ request-token>> key>> "oauth_token" ,, ]
+        [ verifier>> "oauth_verifier" ,, ]
         bi
     ] make-token-params ;
 
@@ -143,8 +143,8 @@ TUPLE: oauth-request-params < token-params access-token ;
     params access-token>>
     params
     [
-        access-token>> key>> "oauth_token" set
-        namespace request post-data>> assoc-union! drop
+        access-token>> key>> "oauth_token" ,,
+        request post-data>> %%
     ] make-token-params
     sign-params ;
 

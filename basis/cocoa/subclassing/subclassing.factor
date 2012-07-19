@@ -58,7 +58,7 @@ IN: cocoa.subclassing
     ] [
         class sel imp types add-method
     ] if* ;
-    
+
 : redefine-objc-methods ( methods name -- )
     dup class-exists? [
         objc_getClass '[ [ _ ] dip (redefine-objc-method) ] each
@@ -92,7 +92,7 @@ SYNTAX: CLASS:
     [ sift { "self" "selector" } prepend ] tri* ;
 
 : parse-method-body ( names -- quot )
-    [ [ make-local ] map ] H{ } make-assoc
+    [ [ make-local ] map ] H{ } make
     (parse-lambda) <lambda> ?rewrite-closures first ;
 
 SYNTAX: METHOD:

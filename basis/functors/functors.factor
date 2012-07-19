@@ -147,23 +147,19 @@ DEFER: ;FUNCTOR delimiter
 : pop-functor-words ( -- )
     functor-words unuse-words ;
 
-: (parse-bindings) ( end -- )
-    dup parse-binding dup [
-        first2 [ make-local ] dip 2array ,
-        (parse-bindings)
-    ] [ 2drop ] if ;
+: (parse-bindings) ( end -- words )
+    [ dup parse-binding dup ]
+    [ first2 [ make-local ] dip 2array ]
+    produce 2nip ;
 
 : with-bindings ( quot -- words assoc )
-    '[
-        in-lambda? on
-        _ H{ } make-assoc
-    ] { } make swap ; inline
+    in-lambda? on H{ } make ; inline
 
 : parse-bindings ( end -- words assoc )
     [
-        namespace use-words
+        building get use-words
         (parse-bindings)
-        namespace unuse-words
+        building get unuse-words
     ] with-bindings ;
 
 : parse-functor-body ( -- form )
