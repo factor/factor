@@ -585,14 +585,14 @@ M: quotation '
 PRIVATE>
 
 : make-image ( arch -- )
-    [
-        parser-quiet? off
-        auto-use? off
-        architecture set
+    architecture associate H{
+        { parser-quiet? f }
+        { auto-use? f }
+    } assoc-union! [
         "resource:/core/bootstrap/stage1.factor" run-file
         build-image
         write-image
-    ] with-scope ;
+    ] with-variables ;
 
 : make-images ( -- )
     images [ make-image ] each ;

@@ -34,7 +34,7 @@ ERROR: cl-error err ;
 
 : 2info ( handle1 handle2 name info_quot lift_quot -- value )
     [ 4dup 2info-data-size 2info-data-bytes ] dip call ; inline
-    
+
 : info-bool ( handle name quot -- ? )
     [ uint deref CL_TRUE = ] info ; inline
 
@@ -414,15 +414,16 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
 GENERIC: bind-kernel-arg ( kernel index data -- )
 M: cl-buffer  bind-kernel-arg bind-kernel-arg-buffer ;
 M: byte-array bind-kernel-arg bind-kernel-arg-data ;
+
 PRIVATE>
 
 : with-cl-state ( context/f device/f queue/f quot -- )
     [
         [
-            [ cl-current-queue   set ] when*
-            [ cl-current-device  set ] when*
-            [ cl-current-context set ] when*
-        ] 3curry H{ } make-assoc
+            [ cl-current-queue   ,, ] when*
+            [ cl-current-device  ,, ] when*
+            [ cl-current-context ,, ] when*
+        ] 3curry H{ } make
     ] dip with-variable ; inline
 
 : cl-platforms ( -- platforms )
