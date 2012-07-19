@@ -41,13 +41,12 @@ yield
 [ datagram-client delete-file ] ignore-errors
 
 [
-    [
-        datagram-server <local> <datagram> "d" set
+    datagram-server <local> <datagram> "d" [
 
         "Receive 1" print
 
         "d" get receive [ reverse ] dip
-        
+
         "Send 1" print
         dup .
 
@@ -56,7 +55,7 @@ yield
         "Receive 2" print
 
         "d" get receive [ " world" append ] dip
-        
+
         "Send 1" print
         dup .
 
@@ -67,7 +66,7 @@ yield
         "Done" print
 
         datagram-server delete-file
-    ] with-scope
+    ] with-variable
 ] "Test" spawn drop
 
 yield
