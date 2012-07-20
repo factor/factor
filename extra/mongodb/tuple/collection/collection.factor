@@ -1,7 +1,7 @@
-
 USING: accessors arrays assocs bson.constants classes classes.tuple
 combinators continuations fry kernel mongodb.driver sequences strings
-vectors words combinators.smart literals memoize slots constructors ;
+vectors words combinators.smart literals memoize slots constructors
+hashtables ;
 
 IN: mongodb.tuple
 
@@ -88,8 +88,8 @@ GENERIC: mdb-index-map ( tuple -- sequence )
 : user-defined-key-index ( class -- assoc )
     mdb-slot-map user-defined-key
     [ drop [ "user-defined-key-index" 1 ] dip
-      H{ } clone [ set-at ] keep <tuple-index> t >>unique?
-      [ ] [ name>> ] bi  H{ } clone [ set-at ] keep
+      associate <tuple-index> t >>unique?
+      [ ] [ name>> ] bi associate
     ] [ 2drop H{ } clone ] if ;
 
 
