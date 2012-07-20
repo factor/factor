@@ -1388,7 +1388,7 @@ HELP: short
 HELP: shorten
 { $values
      { "n" integer } { "seq" sequence } }
-{ $description "Shortens a " { $link "growable" } " sequence to by " { $snippet "n" } " elements long." }
+{ $description "Shortens a " { $link "growable" } " sequence to be " { $snippet "n" } " elements long." }
 { $examples { $example "USING: sequences prettyprint kernel ;"
     "V{ 1 2 3 4 5 } 3 over shorten ."
     "V{ 1 2 3 }"
