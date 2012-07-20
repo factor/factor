@@ -108,7 +108,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ delete-at* ] keep [ set-at ] with-assoc [ 2drop ] if ;
 
 : assoc-empty? ( assoc -- ? )
-    assoc-size 0 = ;
+    assoc-size 0 = ; inline
 
 : assoc-stack ( key seq -- value )
     [ length 1 - ] keep (assoc-stack) ; flushable
@@ -235,7 +235,7 @@ C: <enum> enum
 
 M: enum at*
     seq>> 2dup bounds-check?
-    [ nth t ] [ 2drop f f ] if ; inline
+    [ nth-unsafe t ] [ 2drop f f ] if ; inline
 
 M: enum set-at seq>> set-nth ; inline
 
