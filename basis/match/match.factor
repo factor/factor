@@ -23,7 +23,7 @@ SYNTAX: MATCH-VARS: ! vars ...
     dup word? [ "match-var" word-prop ] [ drop f ] if ;
 
 : set-match-var ( value var -- ? )
-    dup namespace get key? [ get = ] [ set t ] if ;
+    dup namespace key? [ get = ] [ set t ] if ;
 
 : (match) ( value1 value2 -- matched? )
     {
