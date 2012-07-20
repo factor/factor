@@ -60,6 +60,5 @@ PRIVATE>
 : make-assoc ( quot exemplar -- hash ) 20 swap new-assoc [ swap with-variables ] keep ; inline
 : with-scope ( quot -- ) 5 <hashtable> swap with-variables ; inline
 : with-variable ( value key quot -- ) [ associate ] dip with-variables ; inline
-: with-new-scope ( quot -- ) 5 <hashtable> swap with-variables ; inline
 : with-global ( quot -- ) [ global ] dip with-variables ; inline
 : initialize ( variable quot -- ) [ unless* ] curry change-global ; inline
