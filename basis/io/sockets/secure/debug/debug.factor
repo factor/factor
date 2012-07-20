@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io.sockets.secure kernel ;
-IN: io.sockets.secure.unix.debug
+IN: io.sockets.secure.debug
 
 : <test-secure-config> ( -- config )
     <secure-config>
