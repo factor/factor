@@ -46,10 +46,8 @@ CONSTANT: words { 24-from-1 24-from-2 24-from-3 24-from-4 }
 
 : backtrack-benchmark ( -- )
     words [ reset-memoized ] each
-    find-impossible-24 pprint "/10000 quadruples can make 24." print
-    words [
-        dup pprint " tested " write "memoize" word-prop assoc-size pprint
-        " possibilities" print
-    ] each ;
+    find-impossible-24 6479 assert=
+    words [ "memoize" word-prop assoc-size ] map
+    { 1588 5137 4995 10000 } assert= ;
 
 MAIN: backtrack-benchmark
