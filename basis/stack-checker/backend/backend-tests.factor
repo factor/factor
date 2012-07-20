@@ -3,9 +3,9 @@ stack-checker.state stack-checker.values sequences assocs ;
 IN: stack-checker.backend.tests
 
 [ ] [
-    V{ } clone \ meta-d set
-    V{ } clone \ meta-r set
-    V{ } clone \ literals set
+    V{ } clone (meta-d) set
+    V{ } clone (meta-r) set
+    V{ } clone literals set
     H{ } clone known-values set
     0 input-count set
     0 inner-d-index set
