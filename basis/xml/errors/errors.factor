@@ -1,180 +1,110 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces sequences vocabs.loader
-xml.state ;
+USING: accessors classes classes.tuple classes.tuple.parser
+classes.tuple.private combinators generalizations kernel math
+namespaces parser sequences vocabs.loader words xml.state ;
 IN: xml.errors
 
-TUPLE: xml-error-at line column ;
+<<
 
-: xml-error-at ( class -- obj )
-    new
-        get-line >>line
-        get-column >>column ;
+PREDICATE: generated-xml-error < tuple class-of "xml-error-class" word-prop ;
 
-TUPLE: expected < xml-error-at should-be was ;
+: define-xml-error-class ( class superclass slots -- )
+    { "line" "column" } prepend error-slots {
+        [ define-tuple-class ]
+        [ 2drop reset-generic ]
+        [ 2drop t "error-class" set-word-prop ]
+        [ 2drop t "xml-error-class" set-word-prop ]
+        [
+            [
+                length 1 - nip dupd
+                [ [ get-line get-column ] swap ndip boa throw ]
+                2curry
+            ]
+            [ 2drop all-slots 2 head* thrower-effect ] 3bi define-declared
+        ]
+    } 3cleave ;
 
-: expected ( should-be was -- * )
-    \ expected xml-error-at
-        swap >>was
-        swap >>should-be throw ;
+SYNTAX: XML-ERROR:
+    parse-tuple-definition pick save-location
+    define-xml-error-class ;
 
-TUPLE: unexpected-end < xml-error-at ;
+>>
 
-: unexpected-end ( -- * ) \ unexpected-end xml-error-at throw ;
+XML-ERROR: expected should-be was ;
 
-TUPLE: missing-close < xml-error-at ;
+XML-ERROR: unexpected-end ;
 
-: missing-close ( -- * ) \ missing-close xml-error-at throw ;
+XML-ERROR: missing-close ;
 
-TUPLE: disallowed-char < xml-error-at char ;
-
-: disallowed-char ( char -- * )
-    \ disallowed-char xml-error-at swap >>char throw ;
+XML-ERROR: disallowed-char char ;
 
 ERROR: multitags ;
 
 ERROR: pre/post-content string pre? ;
 
-TUPLE: no-entity < xml-error-at thing ;
+XML-ERROR: no-entity thing ;
 
-: no-entity ( string -- * )
-    \ no-entity xml-error-at swap >>thing throw ;
+XML-ERROR: mismatched open close ;
 
-TUPLE: mismatched < xml-error-at open close ;
-
-: mismatched ( open close -- * )
-    \ mismatched xml-error-at swap >>close swap >>open throw ;
-
-TUPLE: unclosed < xml-error-at tags ;
+TUPLE: unclosed line column tags ;
 
 : unclosed ( -- * )
-    \ unclosed xml-error-at
-        xml-stack get rest-slice [ first name>> ] map >>tags
-    throw ;
+    get-line get-column
+    xml-stack get rest-slice [ first name>> ] map
+    \ unclosed boa throw ;
 
-TUPLE: bad-uri < xml-error-at string ;
+XML-ERROR: bad-uri string ;
 
-: bad-uri ( string -- * )
-    \ bad-uri xml-error-at swap >>string throw ;
-
-TUPLE: nonexist-ns < xml-error-at name ;
-
-: nonexist-ns ( name-string -- * )
-    \ nonexist-ns xml-error-at swap >>name throw ;
+XML-ERROR: nonexist-ns name ;
 
 ! this should give which tag was unopened
-TUPLE: unopened < xml-error-at ;
+XML-ERROR: unopened ;
 
-: unopened ( -- * )
-    \ unopened xml-error-at throw ;
-
-TUPLE: not-yes/no < xml-error-at text ;
-
-: not-yes/no ( text -- * )
-    \ not-yes/no xml-error-at swap >>text throw ;
+XML-ERROR: not-yes/no text ;
 
 ! this should actually print the names
-TUPLE: extra-attrs < xml-error-at attrs ;
+XML-ERROR: extra-attrs attrs ;
 
-: extra-attrs ( attrs -- * )
-    \ extra-attrs xml-error-at swap >>attrs throw ;
-
-TUPLE: bad-version < xml-error-at num ;
-
-: bad-version ( num -- * )
-    \ bad-version xml-error-at swap >>num throw ;
+XML-ERROR: bad-version num ;
 
 ERROR: notags ;
 
-TUPLE: bad-prolog < xml-error-at prolog ;
+XML-ERROR: bad-prolog prolog ;
 
-: bad-prolog ( prolog -- * )
-    \ bad-prolog xml-error-at swap >>prolog throw ;
+XML-ERROR: capitalized-prolog name ;
 
-TUPLE: capitalized-prolog < xml-error-at name ;
+XML-ERROR: versionless-prolog ;
 
-: capitalized-prolog ( name -- capitalized-prolog )
-    \ capitalized-prolog xml-error-at swap >>name throw ;
+XML-ERROR: bad-directive dir ;
 
-TUPLE: versionless-prolog < xml-error-at ;
+XML-ERROR: bad-decl ;
 
-: versionless-prolog ( -- * )
-    \ versionless-prolog xml-error-at throw ;
+XML-ERROR: bad-external-id ;
 
-TUPLE: bad-directive < xml-error-at dir ;
+XML-ERROR: misplaced-directive dir ;
 
-: bad-directive ( directive -- * )
-    \ bad-directive xml-error-at swap >>dir throw ;
+XML-ERROR: bad-name name ;
 
-TUPLE: bad-decl < xml-error-at ;
+XML-ERROR: unclosed-quote ;
 
-: bad-decl ( -- * )
-    \ bad-decl xml-error-at throw ;
+XML-ERROR: quoteless-attr ;
 
-TUPLE: bad-external-id < xml-error-at ;
+XML-ERROR: attr-w/< ;
 
-: bad-external-id ( -- * )
-    \ bad-external-id xml-error-at throw ;
+XML-ERROR: text-w/]]> ;
 
-TUPLE: misplaced-directive < xml-error-at dir ;
+XML-ERROR: duplicate-attr key values ;
 
-: misplaced-directive ( directive -- * )
-    \ misplaced-directive xml-error-at swap >>dir throw ;
+XML-ERROR: bad-cdata ;
 
-TUPLE: bad-name < xml-error-at name ;
+XML-ERROR: not-enough-characters ;
 
-: bad-name ( name -- * )
-    \ bad-name xml-error-at swap >>name throw ;
+XML-ERROR: bad-doctype contents ;
 
-TUPLE: unclosed-quote < xml-error-at ;
-
-: unclosed-quote ( -- * )
-    \ unclosed-quote xml-error-at throw ;
-
-TUPLE: quoteless-attr < xml-error-at ;
-
-: quoteless-attr ( -- * )
-    \ quoteless-attr xml-error-at throw ;
-
-TUPLE: attr-w/< < xml-error-at ;
-
-: attr-w/< ( -- * )
-    \ attr-w/< xml-error-at throw ;
-
-TUPLE: text-w/]]> < xml-error-at ;
-
-: text-w/]]> ( -- * )
-    \ text-w/]]> xml-error-at throw ;
-
-TUPLE: duplicate-attr < xml-error-at key values ;
-
-: duplicate-attr ( key values -- * )
-    \ duplicate-attr xml-error-at
-    swap >>values swap >>key throw ;
-
-TUPLE: bad-cdata < xml-error-at ;
-
-: bad-cdata ( -- * )
-    \ bad-cdata xml-error-at throw ;
-
-TUPLE: not-enough-characters < xml-error-at ;
-
-: not-enough-characters ( -- * )
-    \ not-enough-characters xml-error-at throw ;
-
-TUPLE: bad-doctype < xml-error-at contents ;
-
-: bad-doctype ( contents -- * )
-    \ bad-doctype xml-error-at swap >>contents throw ;
-
-TUPLE: bad-encoding < xml-error-at encoding ;
-
-: bad-encoding ( encoding -- * )
-    \ bad-encoding xml-error-at
-        swap >>encoding
-    throw ;
+XML-ERROR: bad-encoding encoding ;
 
 UNION: xml-error
-    multitags notags pre/post-content xml-error-at ;
+    unclosed multitags notags pre/post-content generated-xml-error ;
 
 { "xml.errors" "debugger" } "xml.errors.debugger" require-when

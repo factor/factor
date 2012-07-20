@@ -4,7 +4,7 @@ USING: accessors debugger io kernel prettyprint sequences
 xml.errors xml.writer ;
 IN: xml.errors.debugger
 
-M: xml-error-at error.
+M: xml-error error.
     "XML parsing error" print
     "Line: " write dup line>> .
     "Column: " write column>> . ;
