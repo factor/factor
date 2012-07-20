@@ -156,7 +156,7 @@ C: <db> db
     <json-post-data> couch get db-url "_temp_view" append couch-post ;
 
 : temp-view-map ( map -- results )
-    "map" H{ } clone [ set-at ] keep temp-view ;
+    "map" associate temp-view ;
 
 : save-doc-as ( assoc id -- )
     [ dup <json-post-data> ] dip id-url couch-put response-ok
