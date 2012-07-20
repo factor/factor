@@ -216,16 +216,16 @@ M: block short-section ( block -- )
 : <object ( obj -- ) presented associate <block> (<block) ;
 
 ! Text section
-TUPLE: text < section string ;
+TUPLE: text-section < section string ;
 
 : <text> ( string style -- text )
-    over length 1 + \ text new-section
+    over length 1 + \ text-section new-section
         swap >>style
         swap >>string ;
 
-M: text short-section string>> write ;
+M: text-section short-section string>> write ;
 
-M: text long-section short-section ;
+M: text-section long-section short-section ;
 
 : styled-text ( string style -- ) <text> add-section ;
 
