@@ -21,7 +21,9 @@ TUPLE: global-box value ;
     (box-at) { global-box } declare ; inline
 
 M: global-hashtable at*
-    box-at value>> dup ; inline
+    boxes>> at* [
+        { global-box } declare value>> dup
+    ] [ drop f f ] if ; inline
 
 M: global-hashtable set-at
     box-at value<< ; inline
@@ -48,10 +50,11 @@ PRIVATE>
 : on ( variable -- ) t swap set ; inline
 : off ( variable -- ) f swap set ; inline
 : is-global ( variable -- ? ) global boxes>> key? ; inline
-: get-global ( variable -- value ) global at ; inline
+: get-global ( variable -- value ) global box-at value>> ; inline
 : set-global ( value variable -- ) global set-at ; inline
 : change ( variable quot -- ) [ [ get ] keep ] dip dip set ; inline
-: change-global ( variable quot -- ) [ global ] dip change-at ; inline
+: change-global ( variable quot -- )
+    [ [ get-global ] keep ] dip dip set-global ; inline
 : toggle ( variable -- ) [ not ] change ; inline
 : +@ ( n variable -- ) [ 0 or + ] change ; inline
 : inc ( variable -- ) 1 swap +@ ; inline
