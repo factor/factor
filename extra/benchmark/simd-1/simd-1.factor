@@ -25,7 +25,7 @@ IN: benchmark.simd-1
 : simd-benchmark ( len -- )
     >fixnum make-points [ normalize-points ] [ max-points ] bi print-point ;
 
-: main ( -- )
+: simd-1-benchmark ( -- )
     10 [ 500000 simd-benchmark ] times ;
 
-MAIN: main
+MAIN: simd-1-benchmark

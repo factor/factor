@@ -7,8 +7,8 @@ IN: benchmark.beust1
 : count-numbers ( max -- n )
     1 [a,b] [ number>string all-unique? ] count ; inline
 
-: beust ( -- )
+: beust1-benchmark ( -- )
     2000000 count-numbers
     number>string " unique numbers." append print ;
 
-MAIN: beust
+MAIN: beust1-benchmark

@@ -3,9 +3,9 @@
 USING: math.parser fry sequences kernel assocs hashtables ;
 IN: benchmark.gc3
 
-: gc3 ( -- )
+: gc3-benchmark ( -- )
     1000000 iota
     1000000 <hashtable>
     '[ [ number>string ] keep _ set-at ] each ;
 
-MAIN: gc3
+MAIN: gc3-benchmark

@@ -31,6 +31,6 @@ IN: benchmark.nsieve
     [ 2 - 2^ 10000 * nsieve. ]
     tri ;
 
-: nsieve-main* ( -- ) 9 nsieve-main ;
+: nsieve-benchmark ( -- ) 9 nsieve-main ;
 
-MAIN: nsieve-main*
+MAIN: nsieve-benchmark

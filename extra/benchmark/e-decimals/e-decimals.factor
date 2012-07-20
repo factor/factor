@@ -11,7 +11,7 @@ IN: benchmark.e-decimals
     n [1,b] D: 1
     [ D-factorial D: 1 swap n D/ D+ ] reduce ;
 
-: calculate-e-decimals-benchmark ( -- )
+: e-decimals-benchmark ( -- )
     5 [ 800 calculate-e-decimals drop ] times ;
 
-MAIN: calculate-e-decimals-benchmark
+MAIN: e-decimals-benchmark

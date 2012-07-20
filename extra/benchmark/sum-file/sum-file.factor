@@ -8,7 +8,7 @@ IN: benchmark.sum-file
 : sum-file ( file -- )
     ascii [ 0 sum-file-loop ] with-file-reader . ;
 
-: sum-file-main ( -- )
+: sum-file-benchmark ( -- )
     5 [ random-numbers-path sum-file ] times ;
 
-MAIN: sum-file-main
+MAIN: sum-file-benchmark

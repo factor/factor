@@ -3,6 +3,6 @@
 USING: math sequences kernel ;
 IN: benchmark.gc1
 
-: gc1 ( -- ) 600000 iota [ >bignum 1 + ] map drop ;
+: gc1-benchmark ( -- ) 600000 iota [ >bignum 1 + ] map drop ;
 
-MAIN: gc1
+MAIN: gc1-benchmark

@@ -54,7 +54,7 @@ SYMBOL: clen
     clen get number>string print
     length number>string print ;
 
-: regex-dna-main ( -- )
+: regex-dna-benchmark ( -- )
     knucleotide-in regex-dna ;
 
-MAIN: regex-dna-main
+MAIN: regex-dna-benchmark

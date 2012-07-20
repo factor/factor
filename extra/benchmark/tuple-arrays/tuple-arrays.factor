@@ -8,7 +8,7 @@ TUPLE: point { x float } { y float } { z float } ; final
 
 TUPLE-ARRAY: point
 
-: tuple-array-benchmark ( -- )
+: tuple-arrays-benchmark ( -- )
     100 iota [
         drop 5000 <point-array> [
             [ 1 + ] change-x
@@ -17,4 +17,4 @@ TUPLE-ARRAY: point
         ] map [ z>> ] map-sum
     ] map-sum . ;
 
-MAIN: tuple-array-benchmark
+MAIN: tuple-arrays-benchmark

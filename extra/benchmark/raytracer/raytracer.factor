@@ -181,7 +181,7 @@ DEFER: create
         [ [ oversampling sq / pgm-pixel ] each ] each
     ] B{ } make ;
 
-: raytracer-main ( -- )
+: raytracer-benchmark ( -- )
     run "raytracer.pnm" temp-file binary set-file-contents ;
 
-MAIN: raytracer-main
+MAIN: raytracer-benchmark

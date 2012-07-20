@@ -167,7 +167,7 @@ CONSTANT: create-offsets
         [ [ oversampling sq / pgm-pixel ] each ] each
     ] B{ } make ;
 
-: raytracer-main ( -- )
+: raytracer-simd-benchmark ( -- )
     run "raytracer.pnm" temp-file binary set-file-contents ;
 
-MAIN: raytracer-main
+MAIN: raytracer-simd-benchmark

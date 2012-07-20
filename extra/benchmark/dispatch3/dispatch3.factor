@@ -44,7 +44,7 @@ M: object g drop "object" ;
         ALIEN: 1234 ,
     ] { } make ;
 
-: dispatch-test ( -- )
+: dispatch3-benchmark ( -- )
     2000000 objects [ [ g drop ] each ] curry times ;
 
-MAIN: dispatch-test
+MAIN: dispatch3-benchmark

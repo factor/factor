@@ -31,7 +31,7 @@ IN: benchmark.mandel
     "P6\n" write width pprint " " write height pprint "\n255\n" write
     binary encode-output ; inline
 
-: mandel-main ( -- )
+: mandel-benchmark ( -- )
     "mandel.ppm" temp-file binary [ ppm-header render ] with-file-writer ;
 
-MAIN: mandel-main
+MAIN: mandel-benchmark

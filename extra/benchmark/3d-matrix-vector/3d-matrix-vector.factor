@@ -15,7 +15,7 @@ TYPED:: mv-matrix ( pitch: float yaw: float location: float-4 -- matrix: matrix4
     float-4{ 0.0 1.0 0.0 0.0 } yaw   rotation-matrix4
     location vneg translation-matrix4 m4. m4. ;
 
-:: 3d-matrix ( -- )
+:: 3d-matrix-vector-benchmark ( -- )
     f :> result!
     100000 [
         float-4{ 1024.0 768.0 0.0 0.0 } 0.7 0.25 1024.0 p-matrix :> p
@@ -24,4 +24,4 @@ TYPED:: mv-matrix ( pitch: float yaw: float location: float-4 -- matrix: matrix4
     ] times
     result . ;
 
-MAIN: 3d-matrix
+MAIN: 3d-matrix-vector-benchmark

@@ -88,14 +88,14 @@ TUPLE: meeting-place count mailbox ;
         [ nip nl bl [ bl ] [ color>> name>> write ] interleave nl ]
         [ [ '[ _ _ try-meet ] in-thread ] with each ]
         [ drop run-meeting-place ]
-    
+
         [ nip [ [ count>> number>string write bl ] [ self-count>> number>text write nl ] bi ] each ]
         [ nip 0 [ count>> + ] reduce bl number>chameneos-string print ]
     } 2cleave ;
 
 ! 6000000 for shootout, too slow right now
 
-: chameneos-redux-main ( -- )
+: chameneos-redux-benchmark ( -- )
     print-color-table
     60000 [
         { blue red yellow } chameneos-redux
@@ -103,4 +103,4 @@ TUPLE: meeting-place count mailbox ;
         { blue red yellow red yellow blue red yellow red blue } chameneos-redux
     ] bi ;
 
-MAIN: chameneos-redux-main
+MAIN: chameneos-redux-benchmark

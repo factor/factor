@@ -62,7 +62,7 @@ IN: benchmark.spectral-norm-simd
 TYPED: spectral-norm ( n: fixnum -- norm )
     u/v [ double cast-array ] bi@ [ v. ] [ norm-sq ] bi /f sqrt ;
 
-: spectral-norm-main ( -- )
+: spectral-norm-simd-benchmark ( -- )
     2000 spectral-norm . ;
 
-MAIN: spectral-norm-main
+MAIN: spectral-norm-simd-benchmark

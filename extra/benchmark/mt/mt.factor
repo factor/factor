@@ -3,9 +3,9 @@
 USING: fry kernel math random random.mersenne-twister ;
 IN: benchmark.mt
 
-: mt-benchmark ( n -- )
+: mt-bench ( n -- )
     >fixnum 0x533d <mersenne-twister> '[ _ random-32* drop ] times ;
 
-: mt-main ( -- ) 10000000 mt-benchmark ;
+: mt-benchmark ( -- ) 10000000 mt-bench ;
 
-MAIN: mt-main
+MAIN: mt-benchmark

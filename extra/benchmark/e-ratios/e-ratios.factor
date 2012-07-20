@@ -6,7 +6,7 @@ IN: benchmark.e-ratios
 : calculate-e-ratios ( n -- e )
     iota [ factorial recip ] map-sum ;
 
-: calculate-e-ratios-benchmark ( -- )
+: e-ratios-benchmark ( -- )
     5 [ 300 calculate-e-ratios drop ] times ;
 
-MAIN: calculate-e-ratios-benchmark
+MAIN: e-ratios-benchmark

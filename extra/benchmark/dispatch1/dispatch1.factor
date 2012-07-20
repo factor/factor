@@ -70,8 +70,8 @@ M: x30 g ;
 : a-bunch-of-objects ( -- seq )
     my-classes [ new ] map ;
 
-: dispatch-benchmark ( -- )
+: dispatch1-benchmark ( -- )
     1000000 a-bunch-of-objects
     [ [ g drop ] each ] curry times ;
 
-MAIN: dispatch-benchmark
+MAIN: dispatch1-benchmark

@@ -50,7 +50,7 @@ IN: benchmark.dispatch4
         { [ dup 19 eq? ] [ drop 19 ] }
     } cond ;
 
-: foobar-test-1 ( -- )
+: dispatch4-benchmark ( -- )
     20000000 [
         20 [
             foobar-1 drop
@@ -64,4 +64,4 @@ IN: benchmark.dispatch4
         ] each-integer
     ] times ;
 
-MAIN: foobar-test-1
+MAIN: dispatch4-benchmark

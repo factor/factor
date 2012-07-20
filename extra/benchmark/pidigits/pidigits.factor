@@ -53,7 +53,7 @@ IN: benchmark.pidigits
 : pidigits ( n -- )
     [ 1 { { 1 0 } { 0 1 } } ] dip 0 0 (pidigits) ;
 
-: pidigits-main ( -- )
+: pidigits-benchmark ( -- )
     2000 pidigits ;
 
-MAIN: pidigits-main
+MAIN: pidigits-benchmark

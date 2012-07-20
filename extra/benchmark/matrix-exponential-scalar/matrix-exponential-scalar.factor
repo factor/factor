@@ -13,7 +13,7 @@ IN: benchmark.matrix-exponential-scalar
         m i m^n i factorial >float m/n m+
     ] each ;
 
-:: matrix-e ( -- )
+:: matrix-exponential-scalar-benchmark ( -- )
     f :> result!
     4 identity-matrix :> i4
     10000 [
@@ -21,4 +21,4 @@ IN: benchmark.matrix-exponential-scalar
     ] times
     result . ;
 
-MAIN: matrix-e
+MAIN: matrix-exponential-scalar-benchmark

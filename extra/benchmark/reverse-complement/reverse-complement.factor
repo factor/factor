@@ -36,9 +36,9 @@ HINTS: do-line vector string ;
 : reverse-complement-out ( -- path )
     "reverse-complement-out.txt" temp-file ;
 
-: reverse-complement-main ( -- )
+: reverse-complement-benchmark ( -- )
     reverse-complement-in
     reverse-complement-out
     reverse-complement ;
 
-MAIN: reverse-complement-main
+MAIN: reverse-complement-benchmark

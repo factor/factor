@@ -59,7 +59,7 @@ M: collision hashcode* value>> hashcode* 15 bitand ;
         2bi
     ] with each ;
 
-: hashtable-benchmark ( -- )
+: hashtables-benchmark ( -- )
     H{ } clone
     10000 [
         dup {
@@ -73,4 +73,4 @@ M: collision hashcode* value>> hashcode* 15 bitand ;
     ] times
     drop ;
 
-MAIN: hashtable-benchmark
+MAIN: hashtables-benchmark

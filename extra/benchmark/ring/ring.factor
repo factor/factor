@@ -21,7 +21,7 @@ SYMBOL: done
 : ring-bench ( messages processes -- )
     create-ring [ send-messages ] keep destroy-ring ; 
 
-: main-ring-bench ( -- )
+: ring-benchmark ( -- )
     1000 1000 ring-bench ;
 
-MAIN: main-ring-bench
+MAIN: ring-benchmark

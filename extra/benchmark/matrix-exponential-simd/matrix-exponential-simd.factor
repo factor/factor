@@ -8,11 +8,11 @@ TYPED:: e^m4 ( m: matrix4 iterations: fixnum -- e^m: matrix4 )
         m i m4^n i factorial >float m4/n m4+
     ] each ;
 
-:: matrix-e ( -- )
+:: matrix-exponential-simd-benchmark ( -- )
     f :> result!
     10000 [
         identity-matrix4 20 e^m4 result!
     ] times
     result . ;
 
-MAIN: matrix-e
+MAIN: matrix-exponential-simd-benchmark
