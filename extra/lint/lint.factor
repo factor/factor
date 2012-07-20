@@ -91,7 +91,7 @@ CONSTANT: trivial-defs
             {
                 [ length 2 = ]
                 [ first { [ sequence? ] [ assoc? ] } 1|| ]
-                [ second { clone clone-like like assoc-like make make-assoc } member? ]
+                [ second { clone clone-like like assoc-like make } member? ]
             } 1&&
         ]
 
