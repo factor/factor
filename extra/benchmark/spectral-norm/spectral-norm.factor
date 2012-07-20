@@ -49,7 +49,7 @@ IN: benchmark.spectral-norm
 TYPED: spectral-norm ( n: fixnum -- norm )
     u/v [ v. ] [ norm-sq ] bi /f sqrt ;
 
-: spectral-norm-main ( -- )
+: spectral-norm-benchmark ( -- )
     2000 spectral-norm number>string print ;
 
-MAIN: spectral-norm-main
+MAIN: spectral-norm-benchmark

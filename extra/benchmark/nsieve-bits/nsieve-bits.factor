@@ -32,6 +32,6 @@ IN: benchmark.nsieve-bits
     [ 2 - 2^ 10000 * nsieve-bits. ]
     tri ;
 
-: nsieve-bits-main* ( -- ) 11 nsieve-bits-main ;
+: nsieve-bits-benchmark ( -- ) 11 nsieve-bits-main ;
 
-MAIN: nsieve-bits-main*
+MAIN: nsieve-bits-benchmark

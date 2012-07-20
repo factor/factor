@@ -18,6 +18,6 @@ IN: benchmark.udp-echo0
     ] with-destructors ;
 
 
-: udp-echo0 ( -- ) 10,000 1 udp-echo ;
+: udp-echo0-benchmark ( -- ) 10,000 1 udp-echo ;
 
-MAIN: udp-echo0
+MAIN: udp-echo0-benchmark

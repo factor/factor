@@ -102,6 +102,6 @@ TYPED:: make-repeat-fasta ( k: fixnum len: fixnum alu: string -- k': fixnum )
         ] with-file-writer
     ] ;
 
-: run-fasta ( -- ) 2500000 reverse-complement-in fasta ;
+: fasta-benchmark ( -- ) 2500000 reverse-complement-in fasta ;
 
-MAIN: run-fasta
+MAIN: fasta-benchmark

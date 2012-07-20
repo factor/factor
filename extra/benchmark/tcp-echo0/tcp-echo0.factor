@@ -17,7 +17,7 @@ TUPLE: tcp-echo < threaded-server #times #bytes ;
         swap >>#bytes
         swap >>#times
         f 0 <inet4> >>insecure ;
-    
+
 ERROR: incorrect-#bytes ;
 
 : check-bytes ( bytes n -- bytes )
@@ -50,7 +50,7 @@ M: tcp-echo handle-client*
         ] with-client
     ] with-threaded-server ;
 
-: tcp-echo-benchmark0 ( -- )
+: tcp-echo0-benchmark ( -- )
     4 test-size0 tcp-echo-benchmark ;
-    
-MAIN: tcp-echo-benchmark0
+
+MAIN: tcp-echo0-benchmark

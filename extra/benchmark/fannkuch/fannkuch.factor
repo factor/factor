@@ -29,7 +29,7 @@ IN: benchmark.fannkuch
     ] keep
     "Pfannkuchen(" write pprint ") = " write . ;
 
-: fannkuch-main ( -- )
+: fannkuch-benchmark ( -- )
     9 fannkuch ;
 
-MAIN: fannkuch-main
+MAIN: fannkuch-benchmark

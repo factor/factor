@@ -10,7 +10,7 @@ IN: benchmark.random
         [ 200 random 100 - number>string print ] times
     ] with-file-writer ;
 
-: random-main ( -- )
+: random-benchmark ( -- )
     300000 write-random-numbers ;
 
-MAIN: random-main
+MAIN: random-benchmark
