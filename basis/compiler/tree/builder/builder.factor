@@ -35,7 +35,7 @@ M: word (build-tree)
     [
         <recursive-state> recursive-state set
         V{ } clone stack-visitor set
-        [ [ >vector \ meta-d set ] [ length input-count set ] bi ]
+        [ [ >vector (meta-d) set ] [ length input-count set ] bi ]
         [ (build-tree) ]
         bi*
     ] with-infer nip ;

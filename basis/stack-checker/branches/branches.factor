@@ -70,9 +70,9 @@ SYMBOLS: combinator quotations ;
 : datastack-phi ( seq -- phi-in phi-out )
     [ input-count branch-variable ]
     [ inner-d-index branch-variable infimum inner-d-index set ]
-    [ \ meta-d active-variable ] tri
+    [ (meta-d) active-variable ] tri
     unify-branches
-    [ input-count set ] [ ] [ dup >vector \ meta-d set ] tri* ;
+    [ input-count set ] [ ] [ dup >vector (meta-d) set ] tri* ;
 
 : terminated-phi ( seq -- terminated )
     terminated? branch-variable ;
@@ -87,7 +87,7 @@ SYMBOLS: combinator quotations ;
     tri ;
 
 : copy-inference ( -- )
-    \ meta-d [ clone ] change
+    (meta-d) [ clone ] change
     literals [ clone ] change
     input-count [ ] change
     inner-d-index [ ] change ;
