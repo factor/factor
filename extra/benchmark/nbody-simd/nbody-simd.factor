@@ -98,6 +98,6 @@ SPECIALIZED-ARRAY: body
     [ '[ _ 0.01 advance ] times ]
     [ energy number>string print ] tri ;
 
-: nbody-main ( -- ) 1000000 nbody ;
+: nbody-simd-benchmark ( -- ) 1000000 nbody ;
 
-MAIN: nbody-main
+MAIN: nbody-simd-benchmark

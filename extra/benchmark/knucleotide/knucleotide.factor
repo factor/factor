@@ -37,9 +37,9 @@ CONSTANT: knucleotide-in "vocab:benchmark/knucleotide/knucleotide-input.txt"
     ]
     tri ;
 
-: knucleotide ( -- )
+: knucleotide-benchmark ( -- )
     knucleotide-in
     ascii [ read-input ] with-file-reader
     process-input ;
 
-MAIN: knucleotide
+MAIN: knucleotide-benchmark
