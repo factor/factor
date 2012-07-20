@@ -35,3 +35,5 @@ PRIVATE>
 : ,, ( value key -- ) building get set-at ;
 
 : %% ( assoc -- ) building get swap assoc-union! drop ;
+
+: ,+ ( n key -- ) building get at+ ;
