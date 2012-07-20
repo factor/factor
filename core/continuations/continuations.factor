@@ -39,7 +39,7 @@ TUPLE: continuation data call retain name catch ;
 
 C: <continuation> continuation
 
-: continuation ( -- continuation )
+: current-continuation ( -- continuation )
     datastack callstack retainstack namestack catchstack
     <continuation> ;
 
@@ -51,7 +51,7 @@ C: <continuation> continuation
 PRIVATE>
 
 : ifcc ( capture restore -- )
-    [ dummy-1 continuation ] 2dip [ dummy-2 ] prepose ?if ; inline
+    [ dummy-1 current-continuation ] 2dip [ dummy-2 ] prepose ?if ; inline
 
 : callcc0 ( quot -- ) [ drop ] ifcc ; inline
 
@@ -196,7 +196,7 @@ M: condition compute-restarts
     [
         ! 65 = self
         OBJ-CURRENT-THREAD special-object error-thread set-global
-        continuation error-continuation set-global
+        current-continuation error-continuation set-global
         [ original-error set-global ] [ rethrow ] bi
     ] ERROR-HANDLER-QUOT set-special-object
     ! VM adds this to kernel errors, so that user-space
