@@ -143,7 +143,7 @@ M: word optimized. specialized-def optimized. ;
 
 M: callable optimized.
     build-tree optimize-tree nodes>quot
-    [ length-limit off . ] with-scope ;
+    f length-limit [ . ] with-variable ;
 
 SYMBOL: words-called
 SYMBOL: generics-called
@@ -155,10 +155,10 @@ SYMBOL: node-count
     [
         build-tree optimize-tree
 
-        H{ } clone words-called set
-        H{ } clone generics-called set
-        H{ } clone methods-called set
-        H{ } clone intrinsics-called set
+        H{ } clone words-called ,,
+        H{ } clone generics-called ,,
+        H{ } clone methods-called ,,
+        H{ } clone intrinsics-called ,,
 
         0 swap [
             [ 1 + ] dip
@@ -168,11 +168,11 @@ SYMBOL: node-count
                     { [ dup generic? ] [ generics-called ] }
                     { [ dup method? ] [ methods-called ] }
                     [ words-called ]
-                } cond get inc-at
+                } cond building get at inc-at
             ] [ drop ] if
         ] each-node
-        node-count set
-    ] H{ } make-assoc ;
+        node-count ,,
+    ] H{ } make ;
 
 : report. ( report -- )
     [
