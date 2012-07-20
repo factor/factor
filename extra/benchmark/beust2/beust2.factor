@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math math.ranges math.parser sequences kernel io locals ;
+USING: kernel locals math math.ranges math.parser sequences ;
 IN: benchmark.beust2
 
 ! http://crazybob.org/BeustSequence.java.html
@@ -34,6 +34,6 @@ IN: benchmark.beust2
 :: beust2-benchmark ( -- )
     0 :> i!
     5000000000 [ i 1 + i! ] count-numbers
-    i number>string " unique numbers." append print ;
+    i 7063290 assert= ;
 
 MAIN: beust2-benchmark
