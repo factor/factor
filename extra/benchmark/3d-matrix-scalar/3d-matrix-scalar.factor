@@ -11,7 +11,7 @@ IN: benchmark.3d-matrix-scalar
     { 0.0 1.0 0.0 } yaw   rotation-matrix4
     location vneg translation-matrix4 m. m. ;
 
-:: 3d-matrix ( -- )
+:: 3d-matrix-scalar-benchmark ( -- )
     f :> result!
     100000 [
         { 1024.0 768.0 } 0.7 0.25 1024.0 p-matrix :> p
@@ -20,4 +20,4 @@ IN: benchmark.3d-matrix-scalar
     ] times
     result . ;
 
-MAIN: 3d-matrix
+MAIN: 3d-matrix-scalar-benchmark

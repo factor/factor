@@ -11,11 +11,11 @@ kernel ;
 : reverse-iter ( -- ) 100 [ 0 100000 <range> >vector <reversed> [ ] map drop ] times ;
 : dot-iter ( -- ) 100 [ 0 100000 <range> dup v. drop ] times ;
 
-: iter-main ( -- )
+: iteration-benchmark ( -- )
     vector-iter
     array-iter
     string-iter
     sbuf-iter
     reverse-iter ;
 
-MAIN: iter-main
+MAIN: iteration-benchmark

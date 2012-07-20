@@ -45,9 +45,10 @@ SPECIALIZED-ARRAY: point
 : print-point ( point -- )
     [ xyz [ number>string ] tri@ ] output>array ", " join print ; inline
 
-: struct-array-benchmark ( len -- )
+: struct-arrays-bench ( len -- )
     make-points [ normalize-points ] [ max-points ] bi print-point ;
 
-: main ( -- ) 10 [ 500000 struct-array-benchmark ] times ;
+: struct-arrays-benchmark ( -- )
+    10 [ 500000 struct-arrays-bench ] times ;
 
-MAIN: main
+MAIN: struct-arrays-benchmark

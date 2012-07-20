@@ -3,6 +3,6 @@
 USING: benchmark.udp-echo0 ;
 IN: benchmark.udp-echo2
 
-: udp-echo2 ( -- ) 10,000 1450 udp-echo ;
+: udp-echo2-benchmark ( -- ) 10,000 1450 udp-echo ;
 
-MAIN: udp-echo2
+MAIN: udp-echo2-benchmark

@@ -70,8 +70,8 @@ INSTANCE: x30 g
 : a-bunch-of-objects ( -- seq )
     my-classes [ new ] map ;
 
-: dispatch-benchmark ( -- )
+: dispatch5-benchmark ( -- )
     1000000 a-bunch-of-objects
     [ f [ g? or ] reduce drop ] curry times ;
 
-MAIN: dispatch-benchmark
+MAIN: dispatch5-benchmark
