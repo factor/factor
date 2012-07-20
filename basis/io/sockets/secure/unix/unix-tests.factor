@@ -3,7 +3,7 @@ USING: accessors kernel namespaces io io.sockets
 io.sockets.secure io.encodings.ascii io.streams.duplex
 io.backend.unix classes words destructors threads tools.test
 concurrency.promises byte-arrays locals calendar io.timeouts
-io.sockets.secure.unix.debug ;
+io.sockets.secure.debug ;
 
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
 
