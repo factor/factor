@@ -1,5 +1,7 @@
 USING: accessors assocs classes.mixin classes.tuple
-classes.tuple.parser compiler.units fry kernel sequences mongodb.driver
+classes.tuple.parser compiler.units fry kernel sequences
+hashtables
+mongodb.driver
 mongodb.msg mongodb.tuple.collection 
 mongodb.tuple.persistent mongodb.tuple.state strings ;
 FROM: mongodb.driver => update delete find count ;
@@ -45,7 +47,7 @@ DEFER: tuple>query
 GENERIC: id-selector ( object -- selector )
 
 M: toid id-selector
-   [ value>> ] [ key>> ] bi H{ } clone [ set-at ] keep ; inline
+   [ value>> ] [ key>> ] bi associate ; inline
 
 M: mdb-persistent id-selector
    >toid id-selector ;
