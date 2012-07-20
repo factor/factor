@@ -139,7 +139,7 @@ PRIVATE>
     { execute [ (step-into-execute) ] }
     { if [ (step-into-if) ] }
     { dispatch [ (step-into-dispatch) ] }
-    { continuation [ (step-into-continuation) ] }
+    { current-continuation [ (step-into-continuation) ] }
     { (call-next-method) [ (step-into-call-next-method) ] }
 } [ "step-into" set-word-prop ] assoc-each
 
