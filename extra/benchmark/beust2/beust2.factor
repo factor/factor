@@ -31,9 +31,9 @@ IN: benchmark.beust2
     10 iota [ 1 + 1 1 0 max listener (count-numbers) ] any? drop ;
     inline
 
-:: beust ( -- )
+:: beust2-benchmark ( -- )
     0 :> i!
     5000000000 [ i 1 + i! ] count-numbers
     i number>string " unique numbers." append print ;
 
-MAIN: beust
+MAIN: beust2-benchmark

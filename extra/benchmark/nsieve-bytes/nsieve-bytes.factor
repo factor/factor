@@ -30,6 +30,6 @@ byte-arrays make io ;
     dup 1 - 2^ 10000 * nsieve.
     2 - 2^ 10000 * nsieve. ;
 
-: nsieve-main* ( -- ) 9 nsieve-main ;
+: nsieve-bytes-benchmark ( -- ) 9 nsieve-main ;
 
-MAIN: nsieve-main*
+MAIN: nsieve-bytes-benchmark

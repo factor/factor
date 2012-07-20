@@ -38,7 +38,7 @@ IN: benchmark.partial-sums
 
 HINTS: partial-sums fixnum ;
 
-: partial-sums-main ( -- )
+: partial-sums-benchmark ( -- )
     2500000 partial-sums simple-table. ;
 
-MAIN: partial-sums-main
+MAIN: partial-sums-benchmark

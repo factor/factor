@@ -53,7 +53,7 @@ CONSTANT: min-depth 4
 : binary-trees ( n -- )
     min-depth 2 + max [ stretch-tree ] [ long-lived-tree ] bi ; inline
 
-: binary-trees-main ( -- )
+: binary-trees-benchmark ( -- )
     16 binary-trees ;
 
-MAIN: binary-trees-main
+MAIN: binary-trees-benchmark
