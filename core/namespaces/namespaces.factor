@@ -47,6 +47,7 @@ PRIVATE>
 : set ( value variable -- ) namespace set-at ;
 : on ( variable -- ) t swap set ; inline
 : off ( variable -- ) f swap set ; inline
+: is-global ( variable -- ? ) global boxes>> key? ; inline
 : get-global ( variable -- value ) global at ; inline
 : set-global ( value variable -- ) global set-at ; inline
 : change ( variable quot -- ) [ [ get ] keep ] dip dip set ; inline
