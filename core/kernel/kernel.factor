@@ -220,6 +220,8 @@ M: identity-tuple hashcode* nip identity-hashcode ; inline
         2dup both-fixnums? [ 2drop f ] [ equal? ] if
     ] if ; inline
 
+: same? ( x y quot -- ? ) bi@ = ; inline
+
 GENERIC: clone ( obj -- cloned )
 
 M: object clone ; inline
