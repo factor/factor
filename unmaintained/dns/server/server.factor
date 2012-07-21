@@ -18,7 +18,7 @@ SYMBOL: records-var
 : {name-type-class} ( obj -- array )
   [ [ name>> >lower ] [ type>> ] [ class>> ] tri ] output>array ; 
 
-: rr=query? ( obj obj -- ? ) [ {name-type-class} ] bi@ = ;
+: rr=query? ( obj obj -- ? ) [ {name-type-class} ] same? ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

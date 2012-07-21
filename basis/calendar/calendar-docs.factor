@@ -323,7 +323,7 @@ HELP: >local-time
 { $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"
-               "now gmt >local-time [ gmt-offset>> ] bi@ = ."
+               "now gmt >local-time [ gmt-offset>> ] same? ."
                "t"
     }
 } ;

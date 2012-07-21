@@ -15,7 +15,7 @@ IN: io.files.trash.unix
 
 : top-directory? ( path -- ? )
     dup ".." append-path [ link-status ] bi@
-    [ [ st_dev>> ] bi@ = not ] [ [ st_ino>> ] bi@ = ] 2bi or ;
+    [ [ st_dev>> ] same? not ] [ [ st_ino>> ] same? ] 2bi or ;
 
 : top-directory ( path -- path' )
     [ dup top-directory? not ] [ ".." append-path ] while ;

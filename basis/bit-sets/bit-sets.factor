@@ -75,7 +75,7 @@ M: bit-set members
 : bit-set-like ( set bit-set -- bit-set' )
     ! Throws an error if there are keys that can't be put
     ! in the bit set
-    over bit-set? [ 2dup [ table>> length ] bi@ = ] [ f ] if
+    over bit-set? [ 2dup [ table>> length ] same? ] [ f ] if
     [ drop ] [
         [ members ] dip table>> length <bit-set>
         [ [ adjoin ] curry each ] keep

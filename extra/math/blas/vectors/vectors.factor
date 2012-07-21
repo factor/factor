@@ -111,7 +111,7 @@ PRIVATE>
 
 M: blas-vector-base equal?
     {
-        [ [ length ] bi@ = ]
+        [ [ length ] same? ]
         [ [ = ] 2all? ]
     } 2&& ;
 

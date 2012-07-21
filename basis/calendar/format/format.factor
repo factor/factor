@@ -292,7 +292,7 @@ TYPED: timestamp>ymdhms ( timestamp: timestamp -- str )
         {
             MONTH " " DD " "
             [
-                dup now [ year>> ] bi@ =
+                dup now [ year>> ] same?
                 [ [ hh ":" write ] [ mm ] bi ] [ YYYYY ] if
             ]
         } formatted

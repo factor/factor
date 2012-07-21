@@ -74,12 +74,12 @@ IN: io.pathnames.tests
 
 ! Testing ~ special pathname
 [ t ] [ os windows? "~\\" "~/" ? absolute-path home = ] unit-test 
-[ t ] [ "~/" home [ normalize-path ] bi@ = ] unit-test 
+[ t ] [ "~/" home [ normalize-path ] same? ] unit-test 
 
 [ t ] [ "~" absolute-path home = ] unit-test
-[ t ] [ "~" home [ normalize-path ] bi@ = ] unit-test 
+[ t ] [ "~" home [ normalize-path ] same? ] unit-test 
 
-[ t ] [ "~" home [ "foo" append-path ] bi@ [ normalize-path ] bi@ = ] unit-test
-[ t ] [ os windows? "~\\~/" "~/~/" ? "~" "~" append-path [ path-components ] bi@ = ] unit-test
+[ t ] [ "~" home [ "foo" append-path ] bi@ [ normalize-path ] same? ] unit-test
+[ t ] [ os windows? "~\\~/" "~/~/" ? "~" "~" append-path [ path-components ] same? ] unit-test
 
 

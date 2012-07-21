@@ -12,7 +12,7 @@ TUPLE: parse-result remaining ast ;
 TUPLE: parse-error position messages ; 
 TUPLE: parser peg compiled id ;
 
-M: parser equal?    { [ [ class-of ] bi@ = ] [ [ id>> ] bi@ = ] } 2&& ;
+M: parser equal?    { [ [ class-of ] same? ] [ [ id>> ] same? ] } 2&& ;
 M: parser hashcode* id>> hashcode* ;
 
 C: <parse-result> parse-result
