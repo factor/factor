@@ -98,6 +98,7 @@ M: #push remove-dead-code*
 : define-simplifications ( word seq -- )
     "simplifications" set-word-prop ;
 
+! true if dead
 \ /mod {
     { { f t } /i }
     { { t f } mod }
@@ -114,7 +115,7 @@ M: #push remove-dead-code*
 } define-simplifications
 
 : out-d-matches? ( out-d seq -- ? )
-    [ [ live-value? ] [ drop t ] if ] 2all? not ;
+    [ swap live-value? xor ] 2all? ;
 
 : (simplify-call) ( #call -- new-word/f )
     [ out-d>> ] [ word>> "simplifications" word-prop ] bi
@@ -123,7 +124,9 @@ M: #push remove-dead-code*
 : simplify-call ( #call -- nodes )
     dup (simplify-call) [
         >>word [ filter-live ] change-out-d
-    ] when* ;
+    ] [
+        maybe-drop-dead-outputs
+    ] if* ;
 
 M: #call remove-dead-code*
     {
