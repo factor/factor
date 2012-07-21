@@ -8,7 +8,7 @@ IN: io.directories.search.tests
     [
         10 [ "io.paths.test" "gogogo" make-unique-file ] replicate
         current-temporary-directory get [ ] find-all-files
-    ] cleanup-unique-directory [ natural-sort ] bi@ =
+    ] cleanup-unique-directory [ natural-sort ] same?
 ] unit-test
 
 [ f ] [

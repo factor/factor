@@ -52,7 +52,7 @@ M: struct >c-ptr
 
 M: struct equal?
     over struct? [
-        2dup [ class-of ] bi@ = [
+        2dup [ class-of ] same? [
             2dup [ >c-ptr ] both?
             [ [ >c-ptr ] [ binary-object ] bi* memory= ]
             [ [ >c-ptr not ] both? ]

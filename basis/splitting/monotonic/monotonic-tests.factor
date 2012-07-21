@@ -58,8 +58,8 @@ USING: tools.test math arrays kernel sequences ;
 
 [ { { 2 2 } { 3 3 3 3 } { 4 } { 5 } } ]
 [
-    { 2 2 3 3 3 3 4 5 }        
-    [ [ odd? ] bi@ = ] slice monotonic-slice
+    { 2 2 3 3 3 3 4 5 }
+    [ [ odd? ] same? ] slice monotonic-slice
     [ >array ] map
 ] unit-test
 
@@ -67,6 +67,6 @@ USING: tools.test math arrays kernel sequences ;
     { { 1 1 1 } { 2 2 2 2 } { 3 3 } }
 ] [
     { 1 1 1 2 2 2 2 3 3 }
-    [ [ odd? ] bi@ = ] slice monotonic-slice
+    [ [ odd? ] same? ] slice monotonic-slice
     [ >array ] map
 ] unit-test

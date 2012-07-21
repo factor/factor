@@ -96,7 +96,7 @@ TUPLE: complex { real real read-only } { imaginary real read-only } ;
 
 UNION: number real complex ;
 
-: fp-bitwise= ( x y -- ? ) [ double>bits ] bi@ = ; inline
+: fp-bitwise= ( x y -- ? ) [ double>bits ] same? ; inline
 
 GENERIC: fp-special? ( x -- ? )
 GENERIC: fp-nan? ( x -- ? )

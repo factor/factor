@@ -41,7 +41,7 @@ M: maze heuristic
     drop v- [ abs ] [ + ] map-reduce ;
 
 M: maze cost
-    drop 2dup [ first ] bi@ = [ [ second ] bi@ > 1 5 ? ] [ 2drop 2 ] if ;
+    drop 2dup [ first ] same? [ [ second ] bi@ > 1 5 ? ] [ 2drop 2 ] if ;
 
 : test1 ( to -- path considered )
     { 1 1 } swap maze new [ find-path ] [ considered ] bi ;

@@ -153,7 +153,7 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
     simple-lexer-dump ;
 
 : parsing-word-lexer-dump ( error parsing-word -- )
-    2dup [ line>> ] bi@ =
+    2dup [ line>> ] same?
     [ drop simple-lexer-dump ]
     [ (parsing-word-lexer-dump) ] if ;
 

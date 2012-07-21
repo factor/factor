@@ -182,14 +182,14 @@ TUPLE: couchdb-auth-provider
 ! (This word is called by the 'update-user' method.)
 : check-update ( old new -- ? )
     [
-        2dup [ "email" swap at ] bi@ = not [
+        2dup [ "email" swap at ] same? not [
             [ "email" swap at ] bi@
             [ drop "email" reservation-id unreserve-from-id ]
             [ nip "email" reserve ]
             2bi
         ] [ 2drop t ] if
     ] [
-        2dup [ "username" swap at ] bi@ = not [
+        2dup [ "username" swap at ] same? not [
             [ "username" swap at ] bi@
             [ drop "username" reservation-id unreserve-from-id ]
             [ nip "username" reserve ]
