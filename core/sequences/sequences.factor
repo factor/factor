@@ -623,7 +623,7 @@ M: sequence <=>
     [ 2nth-unsafe <=> ] [ [ length ] compare nip ] if ;
 
 : sequence= ( seq1 seq2 -- ? )
-    2dup [ length ] bi@ =
+    2dup [ length ] same?
     [ mismatch not ] [ 2drop f ] if ; inline
 
 ERROR: assert-sequence got expected ;

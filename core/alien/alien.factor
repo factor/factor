@@ -54,7 +54,7 @@ M: alien equal?
         2dup [ expired? ] either? [
             [ expired? ] both?
         ] [
-            [ alien-address ] bi@ =
+            [ alien-address ] same?
         ] if
     ] [
         2drop f

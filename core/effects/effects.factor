@@ -39,14 +39,14 @@ TUPLE: effect
         { [ 2dup [ bivariable-effect? ] either? ] [ f ] }
         { [ 2dup [ variable-effect? ] [ variable-effect? not ] bi* and ] [ f ] }
         { [ 2dup [ in>> length ] bi@ > ] [ f ] }
-        { [ 2dup [ effect-height ] bi@ = not ] [ f ] }
+        { [ 2dup [ effect-height ] same? not ] [ f ] }
         [ t ]
     } cond 2nip ; inline
 
 : effect= ( effect1 effect2 -- ? )
-    [ [ in>> length ] bi@ = ]
-    [ [ out>> length ] bi@ = ]
-    [ [ terminated?>> ] bi@ = ]
+    [ [ in>> length ] same? ]
+    [ [ out>> length ] same? ]
+    [ [ terminated?>> ] same? ]
     2tri and and ;
 
 GENERIC: effect>string ( obj -- str )
