@@ -9,19 +9,15 @@ SYMBOL: building
 
 : make-sequence ( quot exemplar -- seq )
     [
-        [
-            32 swap new-resizable [
-                building set call
-            ] keep
-        ] keep like
-    ] with-scope ; inline
+        32 swap new-resizable [
+            building [ call ] with-variable
+        ] keep
+    ] keep like ; inline
 
 : make-assoc ( quot exemplar -- assoc )
-    [
-        5 swap new-assoc [
-            building set call
-        ] keep
-    ] with-scope ; inline
+    5 swap new-assoc [
+        building [ call ] with-variable
+    ] keep ; inline
 
 PRIVATE>
 
