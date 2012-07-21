@@ -70,7 +70,7 @@ ERROR: no-word-in-vocab word vocab ;
     words>> swap [ swap [ swap ":" glue ] dip ] curry assoc-map ;
 
 : (lookup) ( name assoc -- word/f )
-    at dup forward-reference? [ drop f ] when ;
+    at* [ dup forward-reference? [ drop f ] when ] when ;
 
 : (use-words) ( assoc -- extra-words seq )
     <extra-words> manifest get qualified-vocabs>> ;
