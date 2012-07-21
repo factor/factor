@@ -22,7 +22,7 @@ node "node"
 : node-content ( node -- content )
     dup content>> [ nip ] [ select-tuple content>> ] if* ;
 
-: node= ( node node -- ? ) [ id>> ] bi@ = ;
+: node= ( node node -- ? ) [ id>> ] same? ;
 
 ! TODO: get rid of arc id and write our own sql
 TUPLE: arc id subject object relation ;

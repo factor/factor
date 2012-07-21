@@ -440,7 +440,7 @@ TUPLE: space name dimension solids ambient-color lights ;
 
 : get-silhouette ( solid -- silhouette )    
     silhouettes>> pv> swap nth ;
-: solid= ( solid solid -- ? )            [ corners>> ]  bi@ = ;
+: solid= ( solid solid -- ? )            [ corners>> ]  same? ;
 
 : space-apply ( space m quot -- space ) 
         curry [ map ] curry [ dup solids>> ] dip

@@ -27,7 +27,7 @@ TUPLE: location
 
 M: location equal?
     over location? [
-        { [ [ reg>> ] bi@ = ] [ [ reg-class>> ] bi@ = ] } 2&&
+        { [ [ reg>> ] same? ] [ [ reg-class>> ] same? ] } 2&&
     ] [ 2drop f ] if ;
 
 M: location hashcode*

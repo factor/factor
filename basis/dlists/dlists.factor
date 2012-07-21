@@ -38,7 +38,7 @@ M: dlist deque-empty? front>> not ; inline
 M: dlist equal?
     over dlist? [
         [ front>> ] bi@
-        [ 2dup { [ and ] [ [ obj>> ] bi@ = ] } 2&& ]
+        [ 2dup { [ and ] [ [ obj>> ] same? ] } 2&& ]
         [ [ next>> ] bi@ ] while
         or not
     ] [

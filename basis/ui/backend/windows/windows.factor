@@ -859,7 +859,7 @@ M: windows-ui-backend (set-fullscreen) ( ? world -- )
 M: windows-ui-backend (fullscreen?) ( world -- ? )
     handle>> hWnd>>
     [ hwnd>RECT ] [ fullscreen-RECT ] bi
-    [ get-RECT-dimensions 2array 2nip ] bi@ = ;
+    [ get-RECT-dimensions 2array 2nip ] same? ;
 
 M: windows-ui-backend ui-backend-available?
     t ;

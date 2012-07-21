@@ -131,10 +131,10 @@ unit-test
 [ "xx" ] [ "blahxx" 2 tail* ] unit-test
 
 [ t ] [ "xxfoo" 2 head-slice "xxbar" 2 head-slice = ] unit-test
-[ t ] [ "xxfoo" 2 head-slice "xxbar" 2 head-slice [ hashcode ] bi@ = ] unit-test
+[ t ] [ "xxfoo" 2 head-slice "xxbar" 2 head-slice [ hashcode ] same? ] unit-test
 
 [ t ] [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* = ] unit-test
-[ t ] [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* [ hashcode ] bi@ = ] unit-test
+[ t ] [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* [ hashcode ] same? ] unit-test
 
 [ t ] [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
 [ t ] [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test
@@ -222,7 +222,7 @@ unit-test
 
 [ t ] [ "hi" <reversed> SBUF" hi" <reversed> = ] unit-test
 
-[ t ] [ "hi" <reversed> SBUF" hi" <reversed> [ hashcode ] bi@ = ] unit-test
+[ t ] [ "hi" <reversed> SBUF" hi" <reversed> [ hashcode ] same? ] unit-test
 
 [ -10 "hi" "bye" copy ] must-fail
 [ 10 "hi" "bye" copy ] must-fail

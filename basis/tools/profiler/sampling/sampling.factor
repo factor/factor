@@ -147,7 +147,7 @@ PRIVATE>
     per-word-samples [ f 0 <profile-node> ] assoc-map ;
 
 : redundant-flat-node? ( child-node root-node -- ? )
-    [ total-time>> ] bi@ = ;
+    [ total-time>> ] same? ;
 
 : trim-flat ( root-node -- root-node' )
     dup '[ [ nip _ redundant-flat-node? not ] assoc-filter ] change-children ;

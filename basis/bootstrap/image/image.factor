@@ -48,7 +48,7 @@ M: eql-wrapper hashcode* obj>> hashcode* ;
 GENERIC: (eql?) ( obj1 obj2 -- ? )
 
 : eql? ( obj1 obj2 -- ? )
-    { [ [ class-of ] bi@ = ] [ (eql?) ] } 2&& ;
+    { [ [ class-of ] same? ] [ (eql?) ] } 2&& ;
 
 M: fixnum (eql?) eq? ;
 
@@ -56,7 +56,7 @@ M: bignum (eql?) = ;
 
 M: float (eql?) fp-bitwise= ;
 
-M: sequence (eql?) 2dup [ length ] bi@ = [ [ eql? ] 2all? ] [ 2drop f ] if ;
+M: sequence (eql?) 2dup [ length ] same? [ [ eql? ] 2all? ] [ 2drop f ] if ;
 
 M: object (eql?) = ;
 

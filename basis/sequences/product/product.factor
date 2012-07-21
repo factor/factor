@@ -42,7 +42,7 @@ M: product-sequence length lengths>> product ;
     [ length 0 <array> ] [ [ length ] map ] bi ;
 
 : end-product-iter? ( ns lengths -- ? )
-    [ last ] bi@ = ;
+    [ last ] same? ;
 
 PRIVATE>
 

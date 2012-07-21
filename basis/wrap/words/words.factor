@@ -18,7 +18,7 @@ C: <word> word
     [ ?first ] [ ?second ] bi ;
 
 : split-words ( seq -- half-elements )
-    [ [ break?>> ] bi@ = ] monotonic-split ;
+    [ [ break?>> ] same? ] monotonic-split ;
 
 : ?first-break ( seq -- newseq f/element )
     dup first first break?>>

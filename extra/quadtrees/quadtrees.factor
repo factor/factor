@@ -160,14 +160,14 @@ DEFER: in-rect*
 : quadtree-size ( tree -- count )
     dup leaf?>> [ leaf-size ] [ node-size ] if ;
 
-: leaf= ( a b -- ? ) [ [ point>> ] [ value>> ] bi 2array ] bi@ = ;
+: leaf= ( a b -- ? ) [ [ point>> ] [ value>> ] bi 2array ] same? ;
 
-: node= ( a b -- ? ) [ {quadrants} ] bi@ = ;
+: node= ( a b -- ? ) [ {quadrants} ] same? ;
 
 : (tree=) ( a b -- ? ) dup leaf?>> [ leaf= ] [ node= ] if ;
 
 : tree= ( a b -- ? )
-    2dup [ leaf?>> ] bi@ = [ (tree=) ] [ 2drop f ] if ;
+    2dup [ leaf?>> ] same? [ (tree=) ] [ 2drop f ] if ;
 
 PRIVATE>
 

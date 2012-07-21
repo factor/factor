@@ -33,7 +33,7 @@ $nl
     "More generally, the following should always be the case:"
     { $example
       "USING: accessors graphviz kernel prettyprint ;"
-      "<anon> <anon> [ id>> ] bi@ = ."
+      "<anon> <anon> [ id>> ] same? ."
       "f"
     }
 }

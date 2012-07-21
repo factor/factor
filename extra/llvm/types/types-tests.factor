@@ -18,8 +18,8 @@ USING: kernel llvm.types sequences tools.test ;
 [ T{ struct f f { float TYPE: i32 (i32)* ; } t } ]
 [ TYPE: < { float, i32 (i32)* } > ; ] unit-test
 
-[ t ] [ TYPE: i32 ; TYPE: i32 ; [ >tref ] bi@ = ] unit-test
-[ t ] [ TYPE: i32 * ; TYPE: i32 * ; [ >tref ] bi@ = ] unit-test
+[ t ] [ TYPE: i32 ; TYPE: i32 ; [ >tref ] same? ] unit-test
+[ t ] [ TYPE: i32 * ; TYPE: i32 * ; [ >tref ] same? ] unit-test
 
 [ TYPE: i32 ; ] [ TYPE: i32 ; >tref tref> ] unit-test
 [ TYPE: float ; ] [ TYPE: float ; >tref tref> ] unit-test

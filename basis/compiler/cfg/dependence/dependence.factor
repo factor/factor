@@ -24,7 +24,7 @@ TUPLE: node
     children parent
     registers parent-index ;
 
-M: node equal? over node? [ [ number>> ] bi@ = ] [ 2drop f ] if ;
+M: node equal? over node? [ [ number>> ] same? ] [ 2drop f ] if ;
 
 M: node hashcode* nip number>> ;
 
@@ -145,7 +145,7 @@ ERROR: node-missing-children trees nodes ;
 : verify-children ( trees -- trees )
     dup [ flatten-tree ] map concat
     nodes get
-    { [ [ length ] bi@ = ] [ set= ] } 2&&
+    { [ [ length ] same? ] [ set= ] } 2&&
     [ nodes get node-missing-children ] unless ;
 
 : verify-trees ( trees -- trees )

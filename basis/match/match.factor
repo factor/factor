@@ -32,7 +32,7 @@ SYNTAX: MATCH-VARS: ! vars ...
         { [ 2dup = ] [ 2drop t ] }
         { [ 2dup [ _ eq? ] either? ] [ 2drop t ] }
         { [ 2dup [ sequence? ] both? ] [
-            2dup [ length ] bi@ =
+            2dup [ length ] same?
             [ [ (match) ] 2all? ] [ 2drop f ] if ] }
         { [ 2dup [ tuple? ] both? ]
           [ [ tuple>array ] bi@ [ (match) ] 2all? ] }

@@ -134,7 +134,7 @@ PRIVATE>
     [
         [ collation-key ] dip
         [ [ 0 = not ] trim-tail but-last ] times
-    ] curry bi@ = ;
+    ] curry same? ;
 PRIVATE>
 
 : primary= ( str1 str2 -- ? )

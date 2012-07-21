@@ -78,5 +78,5 @@ IN: sequences.extras.tests
 { { } } [ "ABC" [ ] { } trim-as ] unit-test
 { "ABC" } [ { 32 65 66 67 32 } [ blank? ] "" trim-as ] unit-test
 
-{ t } [ "ABC" dup [ blank? ] ?trim [ identity-hashcode ] bi@ = ] unit-test
+{ t } [ "ABC" dup [ blank? ] ?trim [ identity-hashcode ] same? ] unit-test
 { "ABC" } [ " ABC " [ blank? ] ?trim ] unit-test

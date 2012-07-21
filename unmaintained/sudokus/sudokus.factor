@@ -8,7 +8,7 @@ IN: sudokus
 : row ( index -- row ) 1 + 9 / ceiling ;
 : col ( index -- col ) 9 mod 1 + ;
 : sq ( index -- square ) [ row ] [ col ] bi [ 3 / ceiling ] bi@ 2array ;
-: near ( a pos -- ? ) { [ [ row ] bi@ = ] [ [ col ] bi@ = ] [ [ sq ] bi@ = ] } 2|| ;
+: near ( a pos -- ? ) { [ [ row ] same? ] [ [ col ] same? ] [ [ sq ] same? ] } 2|| ;
 : nth-or-lower ( n seq -- elt ) [ length 1 - 2dup > [ nip ] [ drop ] if ] keep nth ;
 
 :: solutions ( puzzle random? -- solutions )

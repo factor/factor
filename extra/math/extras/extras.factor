@@ -60,7 +60,7 @@ PRIVATE>
 
 : mod' ( x y -- n )
     [ mod ] keep over zero? [ drop ] [
-        2dup [ sgn ] bi@ = [ drop ] [ + ] if
+        2dup [ sgn ] same? [ drop ] [ + ] if
     ] if ;
 
 PRIVATE>

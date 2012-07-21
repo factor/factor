@@ -267,7 +267,7 @@ STRUCT: struct-test-equality-2
     [
         struct-test-equality-1 <struct> 5 >>x
         struct-test-equality-1 malloc-struct &free 5 >>x
-        [ hashcode ] bi@ =
+        [ hashcode ] same?
     ] with-destructors
 ] unit-test
 

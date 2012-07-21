@@ -40,7 +40,7 @@ M: wrapped-hashtable >alist
     underlying>> >alist [ [ first underlying>> ] [ second ] bi 2array ] map ;
 
 M: wrapped-hashtable equal?
-    over wrapped-hashtable? [ [ underlying>> ] bi@ = ] [ 2drop f ] if ;
+    over wrapped-hashtable? [ [ underlying>> ] same? ] [ 2drop f ] if ;
 
 INSTANCE: wrapped-hashtable assoc
 

@@ -129,7 +129,7 @@ TUPLE: ole32-error code message ;
     f OleInitialize check-ole32-error ;
 
 : guid= ( a b -- ? )
-    [ 16 memory>byte-array ] bi@ = ;
+    [ 16 memory>byte-array ] same? ;
 
 CONSTANT: GUID-STRING-LENGTH
     $[ "{01234567-89ab-cdef-0123-456789abcdef}" length ]

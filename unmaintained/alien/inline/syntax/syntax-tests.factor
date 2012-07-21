@@ -30,7 +30,7 @@ C-FUNCTION: int area ( rectangle c )
 { 2 1 } [ add ] must-infer-as
 [ 5 ] [ 2 3 add ] unit-test
 
-[ t ] [ "double" "bigfloat" [ resolve-typedef ] bi@ = ] unit-test
+[ t ] [ "double" "bigfloat" [ resolve-typedef ] same? ] unit-test
 { 1 1 } [ smaller ] must-infer-as
 [ 1.0 ] [ 10 smaller ] unit-test
 

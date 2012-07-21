@@ -51,8 +51,8 @@ M: decimal equal?
         [
             scale-decimals
             {
-                [ [ mantissa>> ] bi@ = ]
-                [ [ exponent>> ] bi@ = ]
+                [ [ mantissa>> ] same? ]
+                [ [ exponent>> ] same? ]
             } 2&&
         ]
     } 2&& ;

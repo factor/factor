@@ -108,7 +108,7 @@ CONSTANT: nested-forms-key "__n"
             [ host>> ]
             [ port>> remap-port ]
             tri 3array
-        ] bi@ =
+        ] same?
     ] when ;
 
 : cookie-client-state ( key request -- value/f )

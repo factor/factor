@@ -47,7 +47,7 @@ TUPLE: reply data tag ;
     tag>> \ reply boa ;
 
 : synchronous-reply? ( response synchronous -- ? )
-    over reply? [ [ tag>> ] bi@ = ] [ 2drop f ] if ;
+    over reply? [ [ tag>> ] same? ] [ 2drop f ] if ;
 
 ERROR: cannot-send-synchronous-to-self message thread ;
 

@@ -41,7 +41,7 @@ IN: http.server.tests
         "host: 127.0.0.1:55532"
         "user-agent: Factor http.client"
     } [ "\n" join ] [ "\r\n" join ] bi
-    [ [ read-request ] with-string-reader ] bi@ =
+    [ [ read-request ] with-string-reader ] same?
 ] unit-test
 
 ! RFC 2616: Section 4.1

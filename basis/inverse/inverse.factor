@@ -225,7 +225,7 @@ DEFER: __
 \ prepend 1 [ [ ?head assure ] curry ] define-pop-inverse
 
 : assure-same-class ( obj1 obj2 -- )
-    [ class-of ] bi@ = assure ; inline
+    [ class-of ] same? assure ; inline
 
 \ output>sequence 2 [ [undo] '[ dup _ assure-same-class _ input<sequence ] ] define-pop-inverse
 \ input<sequence 1 [ [undo] '[ _ { } output>sequence ] ] define-pop-inverse
