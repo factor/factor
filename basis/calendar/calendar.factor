@@ -323,7 +323,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
 
 : same-day? ( ts1 ts2 -- ? )
-    [ >gmt >date< <date> ] bi@ = ;
+    [ >gmt >date< <date> ] same? ;
 
 : (time-) ( timestamp timestamp -- n )
     [ >gmt ] bi@
@@ -463,7 +463,7 @@ M: timestamp day-name day-of-week day-names nth ;
 
 :: nth-day-this-month ( timestamp n day -- new-timestamp )
     timestamp beginning-of-month day day-this-week
-    dup timestamp [ month>> ] bi@ = [ 1 weeks time+ ] unless
+    dup timestamp [ month>> ] same? [ 1 weeks time+ ] unless
     n 1 - [ weeks time+ ] unless-zero ;
 
 : last-day-this-month ( timestamp day -- new-timestamp )

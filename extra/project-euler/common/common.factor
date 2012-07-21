@@ -118,7 +118,7 @@ PRIVATE>
     [ propagate dup ] map nip reverse swap suffix ;
 
 : permutations? ( n m -- ? )
-    [ count-digits ] bi@ = ;
+    [ count-digits ] same? ;
 
 : sum-divisors ( n -- sum )
     dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;
