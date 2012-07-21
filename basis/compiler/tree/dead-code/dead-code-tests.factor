@@ -200,3 +200,7 @@ IN: compiler.tree.dead-code.tests
 [ [ bignum/i ] ] [ [ { bignum bignum } declare /mod drop ] optimize-quot ] unit-test
 
 [ [ bignum-mod ] ] [ [ { bignum bignum } declare /mod nip ] optimize-quot ] unit-test
+
+[ [ /i ] ] [ [ /mod drop ] optimize-quot ] unit-test
+
+[ [ mod ] ] [ [ /mod nip ] optimize-quot ] unit-test
