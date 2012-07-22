@@ -167,6 +167,15 @@ M: interactor stream-read1
         [ nip first first ]
     } cond ;
 
+M: interactor stream-read-until ( seps stream -- seq sep/f )
+    swap '[
+        _ interactor-read [
+            "\n" join CHAR: \n suffix
+            [ _ member? ] dupd find
+            [ [ head ] when* ] dip
+        ] [ f f ] if* dup not
+    ] [ drop ] produce swap [ concat prepend ] dip ;
+
 M: interactor dispose drop ;
 
 : go-to-error ( interactor error -- )
