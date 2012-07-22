@@ -184,6 +184,14 @@ HELP: either?
     { $example "USING: kernel math prettyprint ;" "5 7 [ even? ] either? ." "f" }
 } ;
 
+HELP: same?
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( ... obj -- ... obj' )" } } { "?" "a boolean" } }
+{ $description "Applies the quotation to both " { $snippet "x" } " and " { $snippet "y" } ", and then checks if the results are equal." }
+{ $examples
+    { $example "USING: kernel math prettyprint ;" "4 5 [ 2/ ] same? ." "t" }
+    { $example "USING: kernel math prettyprint ;" "3 7 [ sq ] same? ." "f" }
+} ;
+
 HELP: execute
 { $values { "word" word } }
 { $description "Executes a word. Words which " { $link execute } " an input parameter must be declared " { $link POSTPONE: inline } " so that a caller which passes in a literal word can have a static stack effect." }
