@@ -83,7 +83,7 @@ M: error-renderer row-columns
             [ error-type error-icon ]
             [ line#>> [ number>string ] [ "" ] if* ]
             [ asset>> [ unparse-short ] [ "" ] if* ]
-            [ error>> summary ]
+            [ error>> safe-summary ]
         } cleave
     ] output>array ;
 
