@@ -10,7 +10,8 @@ IN: inspector
 
 SYMBOL: +number-rows+
 
-: print-summary ( obj -- ) [ summary ] keep write-object ;
+: print-summary ( obj -- )
+    [ safe-summary ] keep write-object ;
 
 <PRIVATE
 
