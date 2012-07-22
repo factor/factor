@@ -239,7 +239,8 @@ C: <vocab-author> vocab-author
     [
         [ vocab-tags [ "Tags:" swap \ $tags prefix 2array , ] unless-empty ]
         [ vocab-authors [ "Authors:" swap \ $authors prefix 2array , ] unless-empty ]
-        bi
+        [ vocab-platforms [ "Platforms:" swap \ $links prefix 2array , ] unless-empty ]
+        tri
     ] { } make
     [ "Meta-data" $heading $table ] unless-empty ;
 
