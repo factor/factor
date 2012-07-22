@@ -4,8 +4,13 @@ USING: tools.deploy.backend system vocabs vocabs.loader kernel
 combinators tools.deploy.config.editor ;
 IN: tools.deploy
 
+ERROR: no-vocab-main vocab ;
+
+: check-vocab-main ( vocab -- vocab )
+    [ require ] keep dup vocab-main [ no-vocab-main ] unless ;
+
 : deploy ( vocab -- )
-    dup find-vocab-root [ deploy* ] [ no-vocab ] if ;
+    dup find-vocab-root [ check-vocab-main deploy* ] [ no-vocab ] if ;
 
 : deploy-image-only ( vocab image -- ) 
     [ vm ] 2dip
