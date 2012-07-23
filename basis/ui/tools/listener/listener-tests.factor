@@ -82,6 +82,22 @@ IN: ui.tools.listener.tests
 
     [ { "AB" 67 } ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
 
+    [ ] [ <promise> "promise" set ] unit-test
+
+    [
+        self "interactor" get thread<<
+        "Z" "interactor" get stream-read-until 2array "promise" get fulfill
+    ] "Interactor test" spawn drop
+
+    [ ] [ "Hello\nWorld" "interactor" get set-editor-string ] unit-test
+
+    [ ] [ [ "interactor" get interactor-busy? ] [ yield ] while ] unit-test
+
+    [ ] [ "interactor" get evaluate-input ] unit-test
+
+    [ ] [ "interactor" get interactor-eof ] unit-test
+
+    [ { "Hello\nWorld\n" f } ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
 ] with-interactive-vocabs
 
 ! Hang
