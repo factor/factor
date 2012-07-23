@@ -60,6 +60,12 @@ M: f topic>filename* drop \ f topic>filename* ;
 
 M: topic url-of topic>filename ;
 
+M: pathname url-of
+    string>> "resource:" ?head [
+        "https://github.com/slavapestov/factor/blob/master/"
+        prepend
+    ] [ drop f ] if ;
+
 : help-stylesheet ( -- xml )
     "vocab:help/html/stylesheet.css" ascii file-contents
     [XML <style><-></style> XML] ;
