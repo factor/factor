@@ -95,11 +95,11 @@ IN: compiler.tree.propagation.transforms
             }
             {
                 [ 2dup simplify-bitand? ]
-                [ 2drop [ >fixnum fixnum-bitand ] ]
+                [ 2drop [ integer>fixnum fixnum-bitand ] ]
             }
             {
                 [ 2dup swap simplify-bitand? ]
-                [ 2drop [ [ >fixnum ] dip fixnum-bitand ] ]
+                [ 2drop [ [ integer>fixnum ] dip fixnum-bitand ] ]
             }
             [ 2drop f ]
         } cond
@@ -114,7 +114,7 @@ IN: compiler.tree.propagation.transforms
     2^? [
         cell-bits tag-bits get - 1 -
         '[
-            >fixnum dup 0 < [ 2drop 0 ] [
+            integer>fixnum dup 0 < [ 2drop 0 ] [
                 dup _ < [ fixnum-shift ] [
                     fixnum-shift
                 ] if
@@ -309,10 +309,17 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
     [ \ push def>> ] [ f ] if
 ] "custom-inlining" set-word-prop
 
+: custom-inline-fixnum ( x -- y )
+    in-d>> first value-info class>> fixnum \ f class-or class<=
+    [ [ dup [ \ >fixnum no-method ] unless ] ] [ f ] if ;
+
 ! Speeds up fasta benchmark
 \ >fixnum [
-    in-d>> first value-info class>> fixnum \ f class-or class<=
-    [ [ dup [ \ >fixnum no-method ] unless ] ] [ f ] if
+    custom-inline-fixnum
+] "custom-inlining" set-word-prop
+
+\ integer>fixnum [
+    custom-inline-fixnum
 ] "custom-inlining" set-word-prop
 
 ! We want to constant-fold calls to heap-size, and recompile those

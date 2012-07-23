@@ -7,6 +7,7 @@ GENERIC: >fixnum ( x -- n ) foldable
 GENERIC: >bignum ( x -- n ) foldable
 GENERIC: >integer ( x -- n ) foldable
 GENERIC: >float ( x -- y ) foldable
+GENERIC: integer>fixnum ( x -- y ) foldable
 
 GENERIC: numerator ( a/b -- a )
 GENERIC: denominator ( a/b -- b )

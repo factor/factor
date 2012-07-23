@@ -15,6 +15,7 @@ M: fixnum >fixnum ; inline
 M: fixnum >bignum fixnum>bignum ; inline
 M: fixnum >integer ; inline
 M: fixnum >float fixnum>float ; inline
+M: fixnum integer>fixnum ; inline
 
 M: fixnum hashcode* nip ; inline
 M: fixnum equal? over bignum? [ >bignum bignum= ] [ 2drop f ] if ; inline
@@ -45,7 +46,7 @@ M: fixnum /mod fixnum/mod ; inline
 M: fixnum bitand fixnum-bitand ; inline
 M: fixnum bitor fixnum-bitor ; inline
 M: fixnum bitxor fixnum-bitxor ; inline
-M: fixnum shift >fixnum fixnum-shift ; inline
+M: fixnum shift integer>fixnum fixnum-shift ; inline
 
 M: fixnum bitnot fixnum-bitnot ; inline
 
@@ -61,6 +62,7 @@ M: fixnum (log2) fixnum-log2 ; inline
 
 M: bignum >fixnum bignum>fixnum ; inline
 M: bignum >bignum ; inline
+M: bignum integer>fixnum bignum>fixnum ; inline
 
 M: bignum hashcode* nip >fixnum ;
 
@@ -92,7 +94,7 @@ M: bignum /mod bignum/mod ; inline
 M: bignum bitand bignum-bitand ; inline
 M: bignum bitor bignum-bitor ; inline
 M: bignum bitxor bignum-bitxor ; inline
-M: bignum shift >fixnum bignum-shift ; inline
+M: bignum shift integer>fixnum bignum-shift ; inline
 
 M: bignum bitnot bignum-bitnot ; inline
 M: bignum bit? bignum-bit? ; inline
