@@ -36,7 +36,10 @@ M: object editor-detached? t ;
     dup status>> { 0 f } member?
     [ drop ] [ process-failed ] if ;
 
+ERROR: invalid-location file line ;
+
 : edit-location ( file line -- )
+    over [ invalid-location ] unless
     [ absolute-path ] dip
     editor-command [ run-and-wait-for-editor ] when* ;
 
@@ -97,7 +100,7 @@ M: word edit-docs
 
 GENERIC: edit-tests ( object -- )
 
-M: object edit-tests vocab-tests-file 1 edit-location ;
+M: object edit-tests vocab-tests-path 1 edit-location ;
 
 M: word edit-tests vocabulary>> edit-tests ;
 
