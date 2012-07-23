@@ -275,7 +275,7 @@ HELP: inline
 { $description
     "Declares the most recently defined word as an inline word. The optimizing compiler copies definitions of inline words when compiling calls to them."
     $nl
-    "Combinators must be inlined in order to compile with the optimizing compiler - see " { $link "inference-combinators" } ". For any other word, inlining is merely an optimization."
+    "Combinators must be inlined in order to compile with the optimizing compiler - see " { $link "inference-combinators" } ". For any other word, inlining is merely an optimization. Note that inlined words that can be compiled stand-alone are also, themselves, compiled by the optimizing compiler."
     $nl
     "The non-optimizing quotation compiler ignores inlining declarations."
 } ;
