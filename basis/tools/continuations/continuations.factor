@@ -27,6 +27,30 @@ SYMBOL: break-hook
 
 \ break t "break?" set-word-prop
 
+SYMBOL: break-counter
+
+: break-counter-get ( -- n )
+    break-counter get ;
+
+: break-count-zero ( -- )
+    0 break-counter set ;
+
+: break-count ( -- )
+    break-counter get dup
+    [  1 + ]
+    [ drop 1 ] if
+    break-counter set ;
+
+: break-count= ( n -- )
+    break-count
+    break-counter get swap >=
+    [     continuation callstack >>call
+    break-hook get call( continuation -- continuation' )
+    after-break  ]
+    [ ] if ;
+
+! \ break-count= t "break?" set-word-prop
+
 GENERIC: add-breakpoint ( quot -- quot' )
 
 <PRIVATE
