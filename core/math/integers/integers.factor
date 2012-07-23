@@ -64,7 +64,7 @@ M: bignum >fixnum bignum>fixnum ; inline
 M: bignum >bignum ; inline
 M: bignum integer>fixnum bignum>fixnum ; inline
 
-M: bignum hashcode* nip >fixnum ;
+M: bignum hashcode* nip bignum>fixnum ;
 
 M: bignum equal?
     over bignum? [ bignum= ] [
