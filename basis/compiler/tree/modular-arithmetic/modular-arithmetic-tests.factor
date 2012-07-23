@@ -43,7 +43,7 @@ TUPLE: declared-fixnum { x fixnum } ;
 
 [ f ] [
     [ { integer } declare 127 bitand 3 + ]
-    { >fixnum } inlined?
+    { integer>fixnum } inlined?
 ] unit-test
 
 [ t ] [
