@@ -51,6 +51,37 @@ IN: ui.tools.listener.tests
     [ ] [ "interactor" get evaluate-input ] unit-test
 
     [ "hi" ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
+
+    [ ] [ <promise> "promise" set ] unit-test
+
+    [
+        self "interactor" get thread<<
+        "\n" "interactor" get stream-read-until 2array "promise" get fulfill
+    ] "Interactor test" spawn drop
+
+    [ ] [ "Hello\nWorld\n" "interactor" get set-editor-string ] unit-test
+
+    [ ] [ [ "interactor" get interactor-busy? ] [ yield ] while ] unit-test
+
+    [ ] [ "interactor" get evaluate-input ] unit-test
+
+    [ { "Hello" 10 } ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
+
+    [ ] [ <promise> "promise" set ] unit-test
+
+    [
+        self "interactor" get thread<<
+        "C\n" "interactor" get stream-read-until 2array "promise" get fulfill
+    ] "Interactor test" spawn drop
+
+    [ ] [ "ABCDEFGHIJKLM" "interactor" get set-editor-string ] unit-test
+
+    [ ] [ [ "interactor" get interactor-busy? ] [ yield ] while ] unit-test
+
+    [ ] [ "interactor" get evaluate-input ] unit-test
+
+    [ { "AB" 67 } ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
+
 ] with-interactive-vocabs
 
 ! Hang
@@ -84,7 +115,7 @@ CONSTANT: text "Hello world.\nThis is a test."
 [ ] [ "interactor" get evaluate-input ] unit-test
 
 [ ] [ 100 milliseconds sleep ] unit-test
-    
+
 [ ] [ "interactor" get interactor-eof ] unit-test
 
 [ t ] [ "promise" get 2 seconds ?promise-timeout text = ] unit-test
@@ -122,7 +153,7 @@ CONSTANT: text "Hello world.\nThis is a test."
     [ ] [
         "i" get [ { "SYMBOL:" } parse-lines ] [ go-to-error ] recover
     ] unit-test
-    
+
     [ t ] [
         "i" get model>> doc-end
         "i" get editor-caret =
