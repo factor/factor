@@ -4,8 +4,11 @@ USING: io.directories io.files io.pathnames kernel make
 sequences vocabs.loader ;
 IN: vocabs.files
 
-: vocab-tests-file ( vocab -- path )
-    dup "-tests.factor" append-vocab-dir vocab-append-path dup
+: vocab-tests-path ( vocab -- path )
+    dup "-tests.factor" append-vocab-dir vocab-append-path ;
+
+: vocab-tests-file ( vocab -- path/f )
+    vocab-tests-path dup
     [ dup exists? [ drop f ] unless ] [ drop f ] if ;
 
 : vocab-tests-dir ( vocab -- paths )
