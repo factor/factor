@@ -15,6 +15,7 @@ NO_UI=${NO_UI-}
 GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
 SCRIPT_ARGS="$*"
+SKIP_UPDATE=false
 
 test_program_installed() {
     if ! [[ -n `type -p $1` ]] ; then
@@ -397,18 +398,20 @@ update_script_changed() {
 }
 
 git_fetch_factorcode() {
-    $ECHO "Fetching the git repository from factorcode.org..."
-
-    rm -f `update_script_name`
-    invoke_git fetch "$GIT_URL" master
-
-    if update_script_changed; then
-        $ECHO "Updating and restarting the factor.sh script..."
-        update_script
-    else
-        $ECHO "Updating the working tree..."
-        invoke_git pull "$GIT_URL" master
-    fi
+	if [[ $SKIP_UPDATE == true ]] ; then
+		$ECHO "Fetching the git repository from factorcode.org..."
+		
+		rm -f `update_script_name`
+		invoke_git fetch "$GIT_URL" master
+		
+		if update_script_changed; then
+			$ECHO "Updating and restarting the factor.sh script..."
+			update_script
+		else
+			$ECHO "Updating the working tree..."
+			invoke_git pull "$GIT_URL" master
+		fi
+	fi
 }
 
 cd_factor() {
@@ -615,6 +618,7 @@ case "$1" in
     deps-linux) install_deps_linux ;;
     deps-macosx) install_deps_macosx ;;
     self-update) update; make_boot_image; bootstrap;;
+    make-boot) $SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
