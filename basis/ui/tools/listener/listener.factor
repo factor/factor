@@ -172,9 +172,9 @@ M: interactor stream-read-until ( seps stream -- seq sep/f )
         _ interactor-read [
             "\n" join CHAR: \n suffix
             [ _ member? ] dupd find
-            [ [ head ] when* ] dip
-        ] [ f f ] if* dup not
-    ] [ drop ] produce swap [ concat prepend ] dip ;
+            [ [ head ] when* ] dip dup not
+        ] [ f f f ] if*
+    ] [ drop ] produce swap [ concat "" prepend-as ] dip ;
 
 M: interactor dispose drop ;
 
