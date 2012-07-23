@@ -1,12 +1,11 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings.utf8 io.encodings.binary io.files
-io.files.temp io.directories html.streams help help.home kernel
-assocs sequences make words accessors arrays help.topics vocabs
-vocabs.hierarchy help.vocabs namespaces prettyprint io
-vocabs.loader serialize fry memoize unicode.case math.order
-sorting debugger html xml.syntax xml.writer math.parser
-sets hashtables ;
+USING: accessors arrays assocs debugger fry hashtables help
+help.home help.topics help.vocabs html html.streams
+io.directories io.encodings.binary io.encodings.utf8 io.files
+io.files.temp io.pathnames kernel make math.parser memoize
+namespaces sequences serialize sorting splitting unicode.case
+vocabs vocabs.hierarchy words xml.syntax xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
