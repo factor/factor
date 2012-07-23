@@ -1,5 +1,5 @@
-USING: arrays ascii kernel make math random sequences
-sequences.extras strings tools.test ;
+USING: arrays ascii kernel make math math.vectors random
+sequences sequences.extras strings tools.test ;
 
 IN: sequences.extras.tests
 
