@@ -1,7 +1,7 @@
 USING: generic help.markup help.syntax kernel
 classes.tuple.private classes slots quotations words arrays
 generic.standard sequences definitions compiler.units
-growable vectors sbufs assocs math ;
+growable vectors sbufs assocs math strings ;
 IN: classes.tuple
 
 ARTICLE: "slot-read-only-declaration" "Read-only slots"
@@ -448,3 +448,15 @@ HELP: boa
 
 HELP: bad-superclass
 { $error-description "Thrown if an attempt is made to subclass a class that is not a tuple class, or a tuple class declared " { $link POSTPONE: final } "." } ;
+
+HELP: offset-of-slot
+{ $values { "name" string } { "tuple" tuple } { "n" integer } }
+{ $description "Returns the offset of a tuple slot accessed by " { $snippet "name" } "." } ;
+
+HELP: get-slot-named
+{ $values { "name" string } { "tuple" tuple } { "value" object } }
+{ $description "Returns the " { $snippet "value" } " stored in a tuple slot accessed by " { $snippet "name" } "." } ;
+
+HELP: set-slot-named
+{ $values { "value" object } { "name" string } { "tuple" tuple } }
+{ $description "Stores the " { $snippet "value" } " into a tuple slot accessed by " { $snippet "name" } "." } ;

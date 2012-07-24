@@ -16,6 +16,17 @@ ERROR: not-a-tuple object ;
 : all-slots ( class -- slots )
     superclasses [ "slots" word-prop ] map concat ;
 
+ERROR: no-slot ;
+
+: offset-of-slot ( name tuple -- n )
+    class-of all-slots slot-named dup [ no-slot ] unless offset>> ;
+
+: get-slot-named ( name tuple -- value )
+    [ nip ] [ offset-of-slot ] 2bi slot ;
+
+: set-slot-named ( value name tuple -- )
+    [ nip ] [ offset-of-slot ] 2bi set-slot ;
+
 PREDICATE: immutable-tuple-class < tuple-class
     all-slots [ read-only>> ] all? ;
 
