@@ -47,7 +47,7 @@ intensities [| r i |
 ] each-index
 
 ! Add the Grayscale colors
-0x08 0xee over - 10 /i 10 <range> [
+0x08 0xee 10 <range> [
     [ dup dup 3array ] dip 232 + swap
     256colors set-at
 ] each-index
