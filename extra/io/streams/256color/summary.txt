@@ -1,0 +1,1 @@
+xterm-256color implementation of formatted stream protocol
