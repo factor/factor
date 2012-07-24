@@ -32,5 +32,4 @@ build-support/wordsize
 checksums.txt
 *.so
 a.out
-FactorFinder.zip
-factor.image.[0-9a-f]*
+TAGS

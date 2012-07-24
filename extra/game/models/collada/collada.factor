@@ -67,7 +67,7 @@ M: z-up >y-up-axis!
         [ 0 swap set-nth ] tri
     ] bi ;
 
-: source>seq ( source-tag up-axis scale -- sequence )
+: source>sequence ( source-tag up-axis scale -- sequence )
     rot
     [ "float_array" x/ xt string>numbers [ * ] with map ]
     [ nip "technique_common" x/ "accessor" x/ "stride" x@ string>number ] 2bi
@@ -76,7 +76,7 @@ M: z-up >y-up-axis!
 
 : source>pair ( source-tag -- pair )
     [ "id" x@ ]
-    [ up-axis get unit-ratio get source>seq ] bi 2array ;
+    [ up-axis get unit-ratio get source>sequence ] bi 2array ;
 
 : mesh>sources ( mesh-tag -- hashtable )
     "source" [ source>pair ] x* >hashtable ;
