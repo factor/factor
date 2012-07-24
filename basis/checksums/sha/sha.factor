@@ -308,17 +308,17 @@ M: sha2-short checksum-block
     [ prepare-message-schedule ]
     [ [ block-size>> ] [ H>> clone ] [ ] tri process-chunk ] bi ;
 
-: seq>byte-array ( seq n -- string )
+: sequence>byte-array ( seq n -- string )
     '[ _ >be ] map B{ } concat-as ;
 
 : sha1>checksum ( sha2 -- bytes )
-    H>> 4 seq>byte-array ;
+    H>> 4 sequence>byte-array ;
 
 : sha-224>checksum ( sha2 -- bytes )
-    H>> 7 head 4 seq>byte-array ;
+    H>> 7 head 4 sequence>byte-array ;
 
 : sha-256>checksum ( sha2 -- bytes )
-    H>> 4 seq>byte-array ;
+    H>> 4 sequence>byte-array ;
 
 : pad-last-short-block ( state -- )
     [ bytes>> t ] [ bytes-read>> pad-last-block ] [ ] tri

@@ -32,7 +32,7 @@ IN: id3.tests
     "Classical"
 ] [ "vocab:id3/tests/blah2.mp3" mp3>id3 id3-params ] unit-test
 
-[    
+[
    "Stormy Weather"
    "Frank Sinatra"
    "Night and Day Frank Sinatra"
@@ -43,4 +43,4 @@ IN: id3.tests
 
 
 [ t ]
-[ 10000 iota [ synchsafe>seq seq>synchsafe ] map [ < ] monotonic? ] unit-test
+[ 10000 iota [ synchsafe>sequence sequence>synchsafe ] map [ < ] monotonic? ] unit-test
