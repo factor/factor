@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays classes combinators
-continuations db db.errors db.private db.tuples
+USING: accessors arrays byte-arrays classes classes.tuple
+combinators continuations db db.errors db.private db.tuples
 db.tuples.private db.types destructors kernel make math
 math.bitwise math.intervals math.parser namespaces nmake
 prettyprint random sequences shuffle strings words fry ;
