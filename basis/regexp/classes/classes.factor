@@ -148,7 +148,7 @@ DEFER: substitute
 : flatten ( seq class -- newseq )
     '[ dup _ instance? [ seq>> ] [ 1array ] if ] map concat ; inline
 
-:: seq>instance ( seq empty class -- instance )
+:: sequence>instance ( seq empty class -- instance )
     seq length {
         { 0 [ empty ] }
         { 1 [ seq first ] }
@@ -167,7 +167,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     [ or-class? ] partition
     class-partition boa ;
 
-: class-partition>seq ( class-partition -- seq )
+: class-partition>sequence ( class-partition -- seq )
     [
         {
             [ integers>> ]
@@ -182,7 +182,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
 
 : repartition ( partition -- partition' )
     ! This could be made more efficient; only and and or are effected
-    class-partition>seq partition-classes ;
+    class-partition>sequence partition-classes ;
 
 : filter-not-integers ( partition -- partition' )
     dup
@@ -205,7 +205,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     [ t swap remove ] change-other
     dup contradiction?
     [ drop f ]
-    [ filter-not-integers class-partition>seq members t and-class seq>instance ] if ;
+    [ filter-not-integers class-partition>sequence members t and-class sequence>instance ] if ;
 
 : <and-class> ( seq -- class )
     dup and-class flatten partition-classes
@@ -236,7 +236,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     [ f swap remove ] change-other
     dup tautology?
     [ drop t ]
-    [ filter-integers class-partition>seq members f or-class seq>instance ] if ;
+    [ filter-integers class-partition>sequence members f or-class sequence>instance ] if ;
 
 : <or-class> ( seq -- class )
     dup or-class flatten partition-classes

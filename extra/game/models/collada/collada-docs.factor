@@ -32,7 +32,7 @@ HELP: >y-up-axis!
 { $values { "seq" sequence } { "from-axis" rh-up } }
 { $description "Destructively swizzles the first three elements of the input sequence to a right-handed 3D coordinate system where Y is up and returns the modified sequence." } ;
 
-HELP: source>seq
+HELP: source>sequence
 { $values { "source-tag" tag } { "up-axis" rh-up } { "scale" number } { "sequence" sequence } }
 { $description "Convert the " { $emphasis "float_array" } " in a " { $emphasis "source tag" } " to a sequence of number sequences according to the element stride. The values are scaled according to " { $emphasis "scale" } " and swizzled from " { $emphasis "up-axis" } " so that the Y coordinate points up." } ;
 
