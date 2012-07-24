@@ -277,14 +277,14 @@ GENERIC: ' ( obj -- ptr )
 
 : bignum-radix ( -- n ) bignum-bits 2^ 1 - ;
 
-: bignum>seq ( n -- seq )
+: bignum>sequence ( n -- seq )
     #! n is positive or zero.
     [ dup 0 > ]
     [ [ bignum-bits neg shift ] [ bignum-radix bitand ] bi ]
     produce nip ;
 
 : emit-bignum ( n -- )
-    dup dup 0 < [ neg ] when bignum>seq
+    dup dup 0 < [ neg ] when bignum>sequence
     [ nip length 1 + emit-fixnum ]
     [ drop 0 < 1 0 ? emit ]
     [ nip emit-seq ]

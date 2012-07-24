@@ -290,8 +290,8 @@ ERROR: bmp-not-supported n ;
             color-index>>
         ] }
         { 8 [ color-lookup ] }
-        { 4 [ [ 4 b:byte-array-n>seq ] change-color-index color-lookup ] }
-        { 1 [ [ 1 b:byte-array-n>seq ] change-color-index color-lookup ] }
+        { 4 [ [ 4 b:byte-array-n>sequence ] change-color-index color-lookup ] }
+        { 1 [ [ 1 b:byte-array-n>sequence ] change-color-index color-lookup ] }
         [ bmp-not-supported ]
     } case >byte-array ;
 

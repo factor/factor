@@ -194,7 +194,7 @@ CONSULT: name xml body>> ;
     [ [ prolog>> ] [ before>> ] [ after>> ] tri ] dip
     swap <xml> ;
 
-: seq>xml ( xml seq -- newxml )
+: sequence>xml ( xml seq -- newxml )
     over body>> like tag>xml ;
 PRIVATE>
 
@@ -203,7 +203,7 @@ M: xml clone
 
 M: xml like
     swap dup xml? [ nip ] [
-        dup tag? [ tag>xml ] [ seq>xml ] if
+        dup tag? [ tag>xml ] [ sequence>xml ] if
     ] if ;
 
 ! tag with children=f is contained
