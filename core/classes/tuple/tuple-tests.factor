@@ -6,7 +6,8 @@ io.streams.string kernel kernel.private math math.constants
 math.order namespaces parser parser.notes prettyprint
 quotations random see sequences sequences.private slots
 slots.private splitting strings summary threads tools.test
-vectors vocabs words words.symbol fry literals memory ;
+vectors vocabs words words.symbol fry literals memory
+combinators.short-circuit ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -837,3 +838,41 @@ DEFER: initial-slot
 [ "IN: classes.tuple.tests USE: math TUPLE: foo < foo ;" eval( -- ) ] [ error>> bad-superclass? ] must-fail-with
 
 [ "IN: classes.tuple.tests USE: math TUPLE: foo < + ;" eval( -- ) ] [ error>> bad-superclass? ] must-fail-with
+
+
+! Test no-slot error and get/set-slot-named
+
+TUPLE: no-slot-tuple0 a b c ;
+C: <no-slot-tuple0> no-slot-tuple0
+
+[ 1 2 3 <no-slot-tuple0> "d" over get-slot-named ]
+[
+    {
+        [ no-slot? ]
+        [ tuple>> no-slot-tuple0? ]
+        [ name>> "d" = ]
+    } 1&&
+] must-fail-with
+
+{ 1 }
+[ 1 2 3 <no-slot-tuple0> "a" swap get-slot-named ] unit-test
+
+{ 2 }
+[ 1 2 3 <no-slot-tuple0> "b" swap get-slot-named ] unit-test
+
+{ 3 }
+[ 1 2 3 <no-slot-tuple0> "c" swap get-slot-named ] unit-test
+
+{ 4 } [
+    1 2 3 <no-slot-tuple0> 4 "a" pick set-slot-named
+    "a" swap get-slot-named
+] unit-test
+
+[ 1 2 3 <no-slot-tuple0> 4 "d" pick set-slot-named ]
+[
+    {
+        [ no-slot? ]
+        [ tuple>> no-slot-tuple0? ]
+        [ name>> "d" = ]
+    } 1&&
+] must-fail-with
