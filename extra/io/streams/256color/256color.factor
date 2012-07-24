@@ -1,10 +1,10 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs destructors formatting fry io
-io.streams.string io.styles kernel locals math math.functions
-math.ranges math.vectors namespaces sequences sequences.extras
-strings strings.tables ;
+USING: accessors arrays assocs destructors environment
+formatting fry io io.streams.string io.styles kernel locals
+math math.functions math.ranges math.vectors namespaces
+sequences sequences.extras strings strings.tables ;
 
 IN: io.streams.256color
 
@@ -79,7 +79,7 @@ M: 256color stream-format
     [
         [ foreground swap at [ color>foreground ] [ "" ] if* ]
         [ background swap at [ color>background ] [ "" ] if* ]
-        bi append "\u00001b[0m" surround
+        bi append [ "\u00001b[0m" surround ] unless-empty
     ] dip stream>> stream-write ;
 
 M: 256color make-span-stream
@@ -103,6 +103,9 @@ M: 256color make-cell-stream
 M: 256color dispose drop ;
 
 PRIVATE>
+
+: 256color-terminal? ( -- ? )
+    "TERM" os-env "-256color" tail? ;
 
 : with-256color ( quot -- )
     output-stream get <256color> swap with-output-stream* ; inline
