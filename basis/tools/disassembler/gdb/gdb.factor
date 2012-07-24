@@ -20,13 +20,11 @@ SINGLETON: gdb-disassembler
         "i" write bl from number>string write
     ] with-file-writer ;
 
-: gdb-binary ( -- string ) "gdb" ;
-
 : run-gdb ( -- lines )
     <process>
         +closed+ >>stdin
         out-file >>stdout
-        [ gdb-binary , "-x" , in-file , "-batch" , ] { } make >>command
+        [ "gdb" , "-x" , in-file , "-batch" , ] { } make >>command
     try-process
     out-file ascii file-lines ;
 
