@@ -23,11 +23,11 @@ IN: google.search
     new [ set-slots ] keep ;
 
 TUPLE: search-result cacheUrl GsearchResultClass visibleUrl
-title content unescapedUrl url titleNoFormatting ;
+title content unescapedUrl url titleNoFormatting fileFormat ;
 
 PRIVATE>
 
-: http-search ( query -- results )
+: google-search ( query -- results )
     search-url http-get nip json>
     { "responseData" "results" } deep-at
     [ \ search-result from-slots ] map ;
@@ -56,9 +56,9 @@ PRIVATE>
 
 PRIVATE>
 
-: http-search. ( query -- )
+: google-search. ( query -- )
     [ "Search results for '%s'" sprintf write-heading nl ]
-    [ http-search ] bi [
+    [ google-search ] bi [
         {
             [ titleNoFormatting>> write-title ]
             [ content>> write-content ]
