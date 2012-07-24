@@ -112,11 +112,13 @@ set_make() {
 }
 
 check_git_branch() {
-    BRANCH=`git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'`
-    if [ "$BRANCH" != "master" ] ; then
-        $ECHO "git branch is $BRANCH, not master"
-        exit_script 3
-    fi
+	if [[ $SKIP_UPDATE == true ]] ; then
+		BRANCH=`git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'`
+		if [ "$BRANCH" != "master" ] ; then
+			$ECHO "git branch is $BRANCH, not master"
+			exit_script 3
+		fi
+	fi
 }
 
 check_installed_programs() {
