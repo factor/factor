@@ -9,18 +9,18 @@ IN: xkcd
 
 <PRIVATE
 
-: xkcd-image. ( url -- )
+: comic-image. ( url -- )
     http-get nip
     R" http://imgs\.xkcd\.com/comics/[^\.]+\.(png|jpg)"
     first-match >string load-http-image image. ;
 
-: xkcd-text. ( url -- )
+: comic-text. ( url -- )
     http-get nip string>xml
     "transcript" "id" deep-tag-with-attr children>string
     80 wrap-lines [ print ] each ;
 
 : comic. ( url -- )
-    ui-running? [ xkcd-image. ] [ xkcd-text. ] if ;
+    ui-running? [ comic-image. ] [ comic-text. ] if ;
 
 PRIVATE>
 
