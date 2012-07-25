@@ -213,3 +213,6 @@ PRIVATE>
         over [ first-unsafe ] [ last-unsafe ] bi pick bi@ or
         [ trim ] [ drop ] if
     ] if ; inline
+
+: unsurround ( newseq seq2 seq3 -- seq1 )
+   [ ?head drop ] [ ?tail drop ] bi* ;
