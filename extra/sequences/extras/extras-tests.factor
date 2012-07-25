@@ -96,3 +96,7 @@ IN: sequences.extras.tests
 
 { t } [ "ABC" dup [ blank? ] ?trim [ identity-hashcode ] same? ] unit-test
 { "ABC" } [ " ABC " [ blank? ] ?trim ] unit-test
+
+{ "" } [ "" "" "" unsurround ] unit-test
+{ "" } [ "  " " " " " unsurround ] unit-test
+{ "foo.com" } [ "http://foo.com" "http://" "/" unsurround ] unit-test
