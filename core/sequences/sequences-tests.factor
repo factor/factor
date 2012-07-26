@@ -214,7 +214,6 @@ unit-test
 
 [ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] bi@ ] unit-test
 
-[ 0.5 10 iota nth ] [ no-method? ] must-fail-with
 [ 0.5 { 1 2 3 } nth ] [ no-method? ] must-fail-with
 [ 0.5 "asdfasdf" nth ] [ no-method? ] must-fail-with
 
