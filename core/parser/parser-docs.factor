@@ -107,7 +107,7 @@ $nl
     run-file
     parse-file
 }
-"If Factor is run from the command line with a script file supplied as an argument, the script is run using " { $link run-file } ". See " { $link "cli" } "."
+"If Factor is run from the command line with a script file supplied as an argument, the script is run using " { $link run-file } ". See " { $link "command-line" } "."
 $nl
 "While " { $link run-file } " can be used interactively in the listener to load user code into the session, this should only be done for quick one-off scripts, and real programs should instead rely on the automatic " { $link "vocabs.loader" } "."
 { $see-also "parsing-words" "definitions" "definition-checking" } ;

@@ -317,7 +317,7 @@ ARTICLE: "handbook-system-reference" "The implementation"
 { $heading "Virtual machine" }
 { $subsections
     "images"
-    "cli"
+    "command-line"
     "rc-files"
     "init"
     "system"
