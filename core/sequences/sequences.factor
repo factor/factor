@@ -106,7 +106,7 @@ TUPLE: iota { n integer read-only } ;
 : iota ( n -- iota ) \ iota boa ; inline
 
 M: iota length n>> ; inline
-M: iota nth-unsafe drop integer>fixnum ; inline
+M: iota nth-unsafe drop ; inline
 
 INSTANCE: iota immutable-sequence
 

@@ -357,13 +357,13 @@ cell-bits 32 = [
 [ f ] [
     [
         { integer } declare iota [ ] map
-    ] \ >fixnum inlined?
+    ] \ integer>fixnum inlined?
 ] unit-test
 
 [ f ] [
     [
         { integer } declare { } set-nth-unsafe
-    ] \ >fixnum inlined?
+    ] \ integer>fixnum inlined?
 ] unit-test
 
 [ f ] [
