@@ -142,7 +142,7 @@ os macosx? [
 [ t ] [
     "tools.deploy.test.18" shake-and-bake
     deploy-test-command ascii [ readln ] with-process-reader
-    "test.image" temp-file =
+    test-image temp-file =
 ] unit-test
 
 [ ] [ "resource:license.txt" "license.txt" temp-file copy-file ] unit-test
