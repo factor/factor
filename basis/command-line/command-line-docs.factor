@@ -51,7 +51,6 @@ ARTICLE: "runtime-cli-args" "Command line switches for the VM"
     { { $snippet "-codeheap=" { $emphasis "n" } } "Code heap size, megabytes" }
     { { $snippet "-callbacks=" { $emphasis "n" } } "Callback heap size, megabytes" }
     { { $snippet "-pic=" { $emphasis "n" } } "Maximum inline cache size. Setting of 0 disables inline caching, > 1 enables polymorphic inline caching" }
-    { { $snippet "-securegc" } "If specified, unused portions of the data heap will be zeroed out after every garbage collection" }
 }
 "If an " { $snippet "-i=" } " switch is not present, the default image file is used, which is usually a file named " { $snippet "factor.image" } " in the same directory as the Factor executable." ;
 
