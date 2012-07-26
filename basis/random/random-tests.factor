@@ -46,7 +46,7 @@ IN: random.tests
 { t t }
 [
     50000 [ 1 3 pareto-random-float ] replicate [ mean ] [ std ] bi
-    [ 1.5 .3 ~ ] [ 3 sqrt 2 / .3 ~ ] bi*
+    [ 1.5 .5 ~ ] [ 3 sqrt 2 / .5 ~ ] bi*
 ] unit-test
 
 { t t }
