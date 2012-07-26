@@ -1,6 +1,7 @@
 USING: arrays byte-arrays kernel math math.order math.parser
 namespaces sequences kernel.private sequences.private strings
-sbufs tools.test vectors assocs generic vocabs.loader ;
+sbufs tools.test vectors assocs generic vocabs.loader
+generic.single ;
 IN: sequences.tests
 
 [ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
@@ -213,7 +214,9 @@ unit-test
 
 [ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] bi@ ] unit-test
 
-[ 1 ] [ 0.5 { 1 2 3 } nth ] unit-test
+[ 0.5 10 iota nth ] [ no-method? ] must-fail-with
+[ 0.5 { 1 2 3 } nth ] [ no-method? ] must-fail-with
+[ 0.5 "asdfasdf" nth ] [ no-method? ] must-fail-with
 
 ! Pathological case
 [ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test

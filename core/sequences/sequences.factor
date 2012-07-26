@@ -106,7 +106,7 @@ TUPLE: iota { n integer read-only } ;
 : iota ( n -- iota ) \ iota boa ; inline
 
 M: iota length n>> ; inline
-M: iota nth-unsafe drop ; inline
+M: iota nth-unsafe drop integer>fixnum ; inline
 
 INSTANCE: iota immutable-sequence
 
@@ -634,7 +634,7 @@ ERROR: assert-sequence got expected ;
 <PRIVATE
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
-    >fixnum swap [
+    integer>fixnum swap [
         [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi
         fixnum+fast fixnum+fast
     ] keep fixnum-bitxor ; inline
@@ -845,7 +845,7 @@ PRIVATE>
     #! We can't use case here since combinators depends on
     #! sequences
     pick length dup 0 3 between? [
-        >fixnum {
+        integer>fixnum {
             [ drop nip ]
             [ 2drop first ]
             [ [ drop first2 ] dip call ]
