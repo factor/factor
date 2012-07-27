@@ -29,12 +29,12 @@ ERROR: cannot-annotate-twice word ;
 
 M: cannot-annotate-twice summary drop "Cannot annotate a word twice" ;
 
+PREDICATE: annotated < word "unannotated-def" word-prop >boolean ;
+
 <PRIVATE
 
 : check-annotate-twice ( word -- word )
-    dup "unannotated-def" word-prop [
-        cannot-annotate-twice
-    ] when ;
+    dup annotated? [ cannot-annotate-twice ] when ;
 
 : annotate-generic ( word quot -- )
     [ "methods" word-prop values ] dip each ; inline
