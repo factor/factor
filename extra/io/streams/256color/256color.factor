@@ -61,10 +61,10 @@ intensities [| r i |
     256colors [ keys swap infimum-by ] [ at ] bi ;
 
 : color>foreground ( color -- str )
-    color>256color "\u00001b[38;5;%sm" sprintf ;
+    color>256color "\e[38;5;%sm" sprintf ;
 
 : color>background ( color -- str )
-    color>256color "\u00001b[48;5;%sm" sprintf ;
+    color>256color "\e[48;5;%sm" sprintf ;
 
 TUPLE: 256color stream ;
 
@@ -79,7 +79,7 @@ M: 256color stream-format
     [
         [ foreground swap at [ color>foreground ] [ "" ] if* ]
         [ background swap at [ color>background ] [ "" ] if* ]
-        bi append [ "\u00001b[0m" surround ] unless-empty
+        bi append [ "\e[0m" surround ] unless-empty
     ] dip stream>> stream-write ;
 
 M: 256color make-span-stream
