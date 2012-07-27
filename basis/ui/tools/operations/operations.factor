@@ -116,7 +116,9 @@ IN: ui.tools.operations
     { +listener+ t }
 } define-operation
 
-[ word? ] \ watch H{ } define-operation
+[ annotated? not ] \ watch H{ } define-operation
+
+[ annotated? ] \ reset H{ } define-operation
 
 [ word? ] \ breakpoint H{ } define-operation
 
