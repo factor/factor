@@ -75,13 +75,17 @@ M: word-completion row-color
 M: vocab-completion row-color
     drop vocab? COLOR: black COLOR: dark-gray ? ;
 
+: (complete-vocab?) ( str -- ? )
+    { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" }
+    member? ; inline
+
 : complete-vocab? ( tokens -- ? )
-    harvest 2 short tail* [ f ] [
-        [
-            { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" }
-            member?
-        ] any?
-    ] if-empty ;
+    dup last empty? [
+        harvest ?last (complete-vocab?)
+    ] [
+        harvest 2 short tail*
+        [ f ] [ [ (complete-vocab?) ] any? ] if-empty
+    ] if ;
 
 : chop-; ( seq -- seq' )
     { ";" } split1-last [ ] [ ] ?if ;
