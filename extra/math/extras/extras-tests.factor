@@ -23,3 +23,11 @@ IN: math.extras.test
 
 { { } } [ { 0 0 } nonzero ] unit-test
 { { 1 2 3 } } [ { 0 1 0 2 0 3 0 } nonzero ] unit-test
+
+{ { } } [ 0 bartlett ] unit-test
+{ { 1 } } [ 1 bartlett ] unit-test
+{ { 0 0 } } [ 2 bartlett ] unit-test
+{ { 0 1 0 } } [ 3 bartlett ] unit-test
+{ { 0 2/3 2/3 0 } } [ 4 bartlett ] unit-test
+{ { 0 1/2 1 1/2 0 } } [ 5 bartlett ] unit-test
+{ { 0 2/5 4/5 4/5 2/5 0 } } [ 6 bartlett ] unit-test
