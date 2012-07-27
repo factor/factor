@@ -76,8 +76,12 @@ M: vocab-completion row-color
     drop vocab? COLOR: black COLOR: dark-gray ? ;
 
 : complete-vocab? ( tokens -- ? )
-    1 short head* 2 short tail*
-    { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" } intersects? ;
+    harvest 2 short tail* [ f ] [
+        [
+            { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" }
+            member?
+        ] any?
+    ] if-empty ;
 
 : chop-; ( seq -- seq' )
     { ";" } split1-last [ ] [ ] ?if ;
