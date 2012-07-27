@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: combinators.short-circuit grouping kernel math
-math.combinatorics math.functions math.order math.primes
-math.ranges math.statistics math.vectors memoize sequences ;
+math.combinatorics math.constants math.functions math.order
+math.primes math.ranges math.statistics math.vectors memoize
+sequences ;
 
 IN: math.extras
 
@@ -97,3 +98,41 @@ PRIVATE>
 
 : nonzero ( seq -- seq' )
     [ zero? not ] filter ;
+
+: bartlett ( n -- seq )
+    dup 1 <= [ 1 = { 1 } { } ? ] [
+        [ iota ] [ 1 - 2 / ] bi [
+            [ recip * ] [ >= ] 2bi [ 2 swap - ] when
+        ] curry map
+    ] if ;
+
+: hanning ( n -- seq )
+    dup 1 <= [ 1 = { 1 } { } ? ] [
+        [ iota ] [ 1 - 2pi swap / ] bi v*n
+        [ cos -0.5 * 0.5 + ] map!
+    ] if ;
+
+: hamming ( n -- seq )
+    dup 1 <= [ 1 = { 1 } { } ? ] [
+        [ iota ] [ 1 - 2pi swap / ] bi v*n
+        [ cos -0.46 * 0.54 + ] map!
+    ] if ;
+
+: blackman ( n -- seq )
+    dup 1 <= [ 1 = { 1 } { } ? ] [
+        [ iota ] [ 1 - 2pi swap / ] bi v*n
+        [ [ cos -0.5 * ] map ] [ [ 2 * cos 0.08 * ] map ] bi
+        v+ 0.42 v+n
+    ] if ;
+
+: nan-sum ( seq -- n )
+    0 [ dup fp-nan? [ drop ] [ + ] if ] binary-reduce ;
+
+: nan-min ( seq -- n )
+    [ fp-nan? not ] filter infimum ;
+
+: nan-max ( seq -- n )
+    [ fp-nan? not ] filter supremum ;
+
+: sinc ( x -- y )
+    [ 1 ] [ pi * [ sin ] [ / ] bi ] if-zero ;
