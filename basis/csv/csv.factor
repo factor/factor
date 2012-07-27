@@ -84,10 +84,8 @@ PRIVATE>
 
 <PRIVATE
 
-: needs-escaping? ( cell -- ? )
-    delimiter> '[
-        dup "\n\"" member? [ drop t ] [ _ = ] if
-    ] any? ; inline
+: needs-escaping? ( cell delimiter -- ? )
+    '[ dup "\n\"" member? [ drop t ] [ _ = ] if ] any? ; inline
 
 : escape-quotes ( cell -- cell' )
     [
@@ -100,13 +98,13 @@ PRIVATE>
 : enclose-in-quotes ( cell -- cell' )
     "\"" dup surround ; inline
 
-: escape-if-required ( cell -- cell' )
-    dup needs-escaping?
+: escape-if-required ( cell delimiter -- cell' )
+    dupd needs-escaping?
     [ escape-quotes enclose-in-quotes ] when ; inline
 
 : (write-row) ( row delimiter -- )
-    '[ _ write1 ]
-    [ escape-if-required write ] interleave nl ; inline
+    dup '[ _ write1 ] swap
+    '[ _ escape-if-required write ] interleave nl ; inline
 
 PRIVATE>
 
