@@ -21,3 +21,35 @@ HELP: chi2P
 { $values { "chi" real } { "df" real } { "p" real } }
 { $description "Returns the inverse chi-squared value according to " { $snippet "P(chi|df) = P(df/2,chi/2)" } "." } ;
 
+HELP: bartlett
+{ $values { "n" integer } { "seq" sequence } }
+{ $description "Return the Bartlett window." } ;
+
+HELP: hanning
+{ $values { "n" integer } { "seq" sequence } }
+{ $description "Return the Hanning window." } ;
+
+HELP: hamming
+{ $values { "n" integer } { "seq" sequence } }
+{ $description "Return the Hamming window." } ;
+
+HELP: blackman
+{ $values { "n" integer } { "seq" sequence } }
+{ $description "Return the Blackman window." } ;
+
+HELP: nan-sum
+{ $values { "seq" sequence } { "n" number } }
+{ $description "Return the " { $link sum } " of " { $snippet "seq" } " treating any NaNs as zero." } ;
+
+HELP: nan-min
+{ $values { "seq" sequence } { "n" number } }
+{ $description "Return the " { $link infimum } " of " { $snippet "seq" } " ignoring any NaNs." } ;
+
+HELP: nan-max
+{ $values { "seq" sequence } { "n" number } }
+{ $description "Return the " { $link supremum } " of " { $snippet "seq" } " ignoring any NaNs." } ;
+
+HELP: sinc
+{ $values { "x" number } { "y" number } }
+{ $description "Returns the " { $link sinc } " function, calculated according to " { $snippet "sin(pi * x) / (pi * x)" } ". The name " { $link sinc } " is short for \"sine cardinal\" or \"sinus cardinalis\"." }
+{ $notes { $snippet "0 sinc" } " is the limit value of 1." } ;
