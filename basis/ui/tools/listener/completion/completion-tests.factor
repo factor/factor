@@ -7,6 +7,8 @@ IN: ui.tools.listener.completion.tests
 
 [ f ] [ { "USE:" "A" "B" } complete-vocab? ] unit-test
 
+[ f ] [ { "USE:" "A" "" } complete-vocab? ] unit-test
+
 [ t ] [ { "USE:" "A" } complete-vocab? ] unit-test
 
 [ t ] [ { "USE:" } complete-vocab? ] unit-test
