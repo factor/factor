@@ -249,7 +249,7 @@ PRIVATE>
 : help. ( word -- )
     [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
 
-: scaffold-help ( vocab -- )
+: scaffold-docs ( vocab -- )
     ensure-vocab-exists
     [
         dup "-docs.factor" vocab/suffix>path scaffolding? [
