@@ -128,7 +128,7 @@ M: f parse-quotation \ ] parse-until >quotation ;
     [ f parse-until >quotation ] with-lexer ;
 
 : parse-lines ( lines -- quot )
-    <lexer> (parse-lines) ;
+    >array <lexer> (parse-lines) ;
 
 : parse-literal ( accum end quot -- accum )
     [ parse-until ] dip call suffix! ; inline
