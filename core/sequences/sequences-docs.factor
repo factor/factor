@@ -433,7 +433,7 @@ HELP: find-from
           { "quot" { $quotation "( ... elt -- ... ? )" } }
           { "i" "the index of the first match, or " { $link f } }
           { "elt" "the first matching element, or " { $link f } } }
-{ $description "Applies the quotation to each element of the sequence in turn, until it outputs a true value or the end of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of f and " { $link f } " as the element." } ;
+{ $description "Applies the quotation to each element of the sequence in turn, until it outputs a true value or the end of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of " { $link f } " and " { $link f } " as the element." } ;
 
 HELP: find-last
 { $values { "seq" sequence } { "quot" { $quotation "( ... elt -- ... ? )" } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
@@ -441,7 +441,7 @@ HELP: find-last
 
 HELP: find-last-from
 { $values { "n" "a starting index" } { "seq" sequence } { "quot" { $quotation "( ... elt -- ... ? )" } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
-{ $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of f and " { $link f } " as the element." } ;
+{ $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of " { $link f } " and " { $link f } " as the element." } ;
 
 HELP: find-index
 { $values { "seq" sequence }
