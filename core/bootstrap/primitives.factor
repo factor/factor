@@ -235,7 +235,7 @@ bi
 
 "word" "words" create {
     { "hashcode" { "fixnum" "math" } }
-    { "name" { "string" "strings" } read-only }
+    "name"
     "vocabulary"
     { "def" { "quotation" "quotations" } initial: [ ] }
     "props"
