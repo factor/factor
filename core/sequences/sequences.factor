@@ -615,18 +615,24 @@ PRIVATE>
 : harvest ( seq -- newseq )
     [ empty? not ] filter ;
 
-: mismatch ( seq1 seq2 -- i )
-    [ min-length ] 2keep
+<PRIVATE
+
+: mismatch-unsafe ( n seq1 seq2 -- i )
     [ 2nth-unsafe = not ] 2curry
     find-integer ; inline
+
+PRIVATE>
+
+: mismatch ( seq1 seq2 -- i )
+    [ min-length ] 2keep mismatch-unsafe ; inline
 
 M: sequence <=>
     [ mismatch ] 2keep pick
     [ 2nth-unsafe <=> ] [ [ length ] compare nip ] if ;
 
 : sequence= ( seq1 seq2 -- ? )
-    2dup [ length ] same?
-    [ mismatch not ] [ 2drop f ] if ; inline
+    2dup [ length ] bi@ dupd =
+    [ -rot mismatch-unsafe not ] [ 3drop f ] if ; inline
 
 ERROR: assert-sequence got expected ;
 
