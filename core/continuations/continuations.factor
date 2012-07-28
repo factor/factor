@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.private kernel
-kernel.private make namespaces sequences vectors ;
+USING: accessors arrays assocs combinators combinators.private
+kernel kernel.private make namespaces sequences vectors ;
 IN: continuations
 
 : with-datastack ( stack quot -- new-stack )
@@ -35,7 +35,12 @@ SYMBOL: restarts
 
 PRIVATE>
 
-TUPLE: continuation data call retain name catch ;
+TUPLE: continuation
+{ data array }
+{ call callstack }
+{ retain array }
+{ name vector }
+{ catch vector } ;
 
 C: <continuation> continuation
 
