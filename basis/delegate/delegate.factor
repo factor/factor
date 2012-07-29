@@ -54,7 +54,8 @@ TUPLE: broadcast < consultation ;
     [ class>> swap first create-method dup fake-definition ] keep
     [ drop ] [ "consultation" set-word-prop ] 2bi ;
 
-PREDICATE: consult-method < method "consultation" word-prop ;
+PREDICATE: consult-method < method
+    "consultation" word-prop >boolean ;
 
 M: consult-method reset-word
     [ call-next-method ] [ f "consultation" set-word-prop ] bi ;
