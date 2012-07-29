@@ -45,7 +45,7 @@ M: no-c-type summary drop "Not a C type" ;
 GENERIC: lookup-c-type ( name -- c-type ) foldable
 
 PREDICATE: c-type-word < word
-    "c-type" word-prop ;
+    "c-type" word-prop >boolean ;
 
 TUPLE: pointer { to initial: void read-only } ;
 C: <pointer> pointer

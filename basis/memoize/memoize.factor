@@ -72,7 +72,7 @@ SYNTAX: MEMO: (:) define-memoized ;
 
 SYNTAX: IDENTITY-MEMO: (:) define-identity-memoized ;
 
-PREDICATE: memoized < word "memoize" word-prop ;
+PREDICATE: memoized < word "memoize" word-prop >boolean ;
 
 M: memoized definer drop \ MEMO: \ ; ;
 
