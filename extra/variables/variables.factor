@@ -7,7 +7,7 @@ FROM: help.markup.private => link-effect? ;
 IN: variables
 
 PREDICATE: variable < word
-    "variable-setter" word-prop ;
+    "variable-setter" word-prop >boolean ;
 
 GENERIC: variable-setter ( word -- word' )
 
@@ -35,7 +35,7 @@ SYNTAX: set:
     dup [ [variable-getter] ] [ [variable-setter] ] bi (define-variable) ;
 
 SYNTAX: VAR:
-    scan-new-word define-variable ;    
+    scan-new-word define-variable ;
 
 M: variable definer drop \ VAR: f ;
 M: variable definition drop f ;
@@ -43,7 +43,7 @@ M: variable link-effect? drop f ;
 M: variable print-stack-effect? drop f ;
 
 PREDICATE: typed-variable < variable
-    "variable-type" word-prop ;
+    "variable-type" word-prop >boolean ;
 
 : [typed-getter] ( quot type -- quot )
     1array '[ @ _ declare ] ;
