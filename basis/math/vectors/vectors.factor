@@ -57,6 +57,15 @@ M: object v*hs+ [ * ] 2map (h+) ; inline
 GENERIC: v/ ( u v -- w )
 M: object v/ [ / ] 2map ; inline
 
+GENERIC: v^ ( u v -- w )
+M: object v^ [ ^ ] 2map ; inline
+
+GENERIC: v^n ( u n -- w )
+M: object v^n [ ^ ] curry map ; inline
+
+GENERIC: n^v ( n v -- w )
+M: object n^v [ ^ ] with map ; inline
+
 GENERIC: vavg ( u v -- w )
 M: object vavg [ + 2 / ] 2map ; inline
 
