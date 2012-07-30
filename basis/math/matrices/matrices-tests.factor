@@ -24,6 +24,15 @@ IN: math.matrices.tests
 ] unit-test
 
 {
+    { { 1 1 1 }
+      { 4 2 1 }
+      { 9 3 1 }
+      { 25 5 1 } }
+} [
+    { 1 2 3 5 } 3 van-der-monde-matrix
+] unit-test
+
+{
     {
         { 1 0 0 }
         { 0 1 0 }
@@ -130,7 +139,7 @@ IN: math.matrices.tests
     { { 1 0 0 }
        { 0 2 0 }
        { 0 0 3 } }
-       
+
     { { 0 0 -4 }
        { 0 -5 0 }
        { -6 0 0 } }
