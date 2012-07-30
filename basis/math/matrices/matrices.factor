@@ -31,6 +31,9 @@ IN: math.matrices
 : box-matrix ( r -- matrix )
     2 * 1 + dup '[ _ 1 <array> ] replicate ;
 
+: van-der-monde-matrix ( u n -- matrix )
+    iota [ v^n ] with map reverse flip ;
+
 :: rotation-matrix3 ( axis theta -- matrix )
     theta cos :> c
     theta sin :> s
