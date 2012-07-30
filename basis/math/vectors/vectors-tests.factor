@@ -8,6 +8,10 @@ SPECIALIZED-ARRAY: int
 [ { 1 2 3 } ] [ { 2 4 6 } 2 v/n ] unit-test
 [ { 1/1 1/2 1/3 } ] [ 1 { 1 2 3 } n/v ] unit-test
 
+{ { 1 4 27 } } [ { 1 2 3 } { 1 2 3 } v^ ] unit-test
+{ { 1 4 9 } } [ { 1 2 3 } 2 v^n ] unit-test
+{ { 2 4 8 } } [ 2 { 1 2 3 } n^v ] unit-test
+
 [ 5 ] [ { 1 2 } norm-sq ] unit-test
 [ 13 ] [ { 2 3 } norm-sq ] unit-test
 
