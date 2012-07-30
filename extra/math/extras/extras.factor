@@ -96,6 +96,15 @@ PRIVATE>
 : moving-median ( u n -- v )
     <clumps> [ median ] map ;
 
+: moving-supremum ( u n -- v )
+    <clumps> [ supremum ] map ;
+
+: moving-infimum ( u n -- v )
+    <clumps> [ infimum ] map ;
+
+: moving-sum ( u n -- v )
+    <clumps> [ sum ] map ;
+
 : nonzero ( seq -- seq' )
     [ zero? not ] filter ;
 
