@@ -29,7 +29,7 @@ IN: math.matrices.tests
       { 9 3 1 }
       { 25 5 1 } }
 } [
-    { 1 2 3 5 } 3 van-der-monde-matrix
+    { 1 2 3 5 } 3 vandermonde-matrix
 ] unit-test
 
 {
