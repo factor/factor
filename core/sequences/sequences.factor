@@ -365,7 +365,7 @@ PRIVATE>
 : glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
 
 : change-nth ( ..a i seq quot: ( ..a elt -- ..b newelt ) -- ..b )
-    [ [ nth ] dip call ] 3keep drop set-nth ; inline
+    [ [ nth ] dip call ] 3keep drop set-nth-unsafe ; inline
 
 : min-length ( seq1 seq2 -- n ) [ length ] bi@ min ; inline
 
@@ -618,8 +618,7 @@ PRIVATE>
 <PRIVATE
 
 : mismatch-unsafe ( n seq1 seq2 -- i )
-    [ 2nth-unsafe = not ] 2curry
-    find-integer ; inline
+    [ 2nth-unsafe = not ] 2curry find-integer ; inline
 
 PRIVATE>
 
