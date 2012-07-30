@@ -45,7 +45,7 @@ PRIVATE>
     vocab-name H{ { CHAR: . CHAR: / } } substitute ;
 
 : append-vocab-dir ( vocab str/f -- path )
-    [ vocab-name "." split ] dip
+    [ vocab-name ".private" ?tail drop "." split ] dip
     [ [ dup last ] dip append suffix ] when*
     "/" join ;
 
