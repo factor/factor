@@ -8,14 +8,14 @@ ABOUT: "lists"
 ARTICLE: "lists" "Lists"
 "The " { $vocab-link "lists" } " vocabulary implements linked lists. There are simple strict linked lists, but a generic list protocol allows the implementation of lazy lists as well."
 { $subsections
-    { "lists" "protocol" }
-    { "lists" "strict" }
-    { "lists" "manipulation" }
-    { "lists" "combinators" }
+    "lists-protocol"
+    "lists-strict"
+    "lists-manipulation"
+    "lists-combinators"
 }
 { $vocab-subsection "Lazy lists" "lists.lazy" } ;
 
-ARTICLE: { "lists" "protocol" } "The list protocol"
+ARTICLE: "lists-protocol" "The list protocol"
 "Lists are instances of a mixin class:"
 { $subsections list }
 "Instances of the mixin must implement the following words:"
@@ -25,7 +25,7 @@ ARTICLE: { "lists" "protocol" } "The list protocol"
     nil?
 } ;
 
-ARTICLE: { "lists" "strict" } "Constructing strict lists"
+ARTICLE: "lists-strict" "Constructing strict lists"
 "Strict lists are simply cons cells where the car and cdr have already been evaluated. These are the lists of Lisp. To construct a strict list, the following words are provided:"
 { $subsections
     cons
@@ -36,7 +36,7 @@ ARTICLE: { "lists" "strict" } "Constructing strict lists"
     3list
 } ;
 
-ARTICLE: { "lists" "combinators" } "Combinators for lists"
+ARTICLE: "lists-combinators" "Combinators for lists"
 "Several combinators exist for list traversal."
 { $subsections
     leach
@@ -46,7 +46,7 @@ ARTICLE: { "lists" "combinators" } "Combinators for lists"
     lmap>array
 } ;
 
-ARTICLE: { "lists" "manipulation" } "Manipulating lists"
+ARTICLE: "lists-manipulation" "Manipulating lists"
 "To get at the contents of a list:"
 { $subsections
     uncons
@@ -151,7 +151,7 @@ HELP: list>array
 { $description "Convert a list into an array." } ;
 
 HELP: list
-{ $class-description "The class of lists. All lists are expected to conform to " { $link { "lists" "protocol" } } "." } ;
+{ $class-description "The class of lists. All lists are expected to conform to " { $link "lists-protocol" } "." } ;
 
 HELP: cadr
 { $values { "list" list } { "elt" object } }
