@@ -197,7 +197,7 @@ bi
 "null?" "kernel" vocab-words delete-at
 
 "fixnum" "math" create { } define-builtin
-"fixnum" "math" create ">fixnum" "math" create 1quotation "coercer" set-word-prop
+"fixnum" "math" create "integer>fixnum" "math" create 1quotation "coercer" set-word-prop
 
 "bignum" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
