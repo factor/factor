@@ -50,10 +50,12 @@ M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 
 : push ( elt seq -- ) [ length ] [ set-nth ] bi ;
 
-: bounds-check? ( n seq -- ? )
-    dupd length < [ 0 >= ] [ drop f ] if ; inline
-
 ERROR: bounds-error index seq ;
+
+GENERIC# bounds-check? 1 ( n seq -- ? )
+
+M: integer bounds-check? ( n seq -- ? )
+    dupd length < [ 0 >= ] [ drop f ] if ; inline
 
 : bounds-check ( n seq -- n seq )
     2dup bounds-check? [ bounds-error ] unless ; inline
