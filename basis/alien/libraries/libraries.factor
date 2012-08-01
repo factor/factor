@@ -56,8 +56,12 @@ M: library dispose dll>> [ dispose ] when* ;
 
 ERROR: no-such-symbol name library ;
 
-: address-of ( name library -- value )
-    2dup load-library dlsym-raw [ 2nip ] [ no-such-symbol ] if* ;
+: (address-of) ( name -- value )
+    dup f dlsym-raw [ nip ] [ f no-such-symbol ] if* ; foldable
+
+: address-of ( name library/f -- value )
+    [ 2dup load-library dlsym-raw [ 2nip ] [ no-such-symbol ] if* ]
+    [ (address-of) ] if* ; inline
 
 SYMBOL: deploy-libraries
 
