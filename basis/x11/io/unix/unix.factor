@@ -12,4 +12,7 @@ M: unix init-x-io dpy get XConnectionNumber <fd> dpy-fd set-global ;
 M: unix wait-for-display dpy-fd get +input+ wait-for-fd ;
 
 M: unix awaken-event-loop
-    dpy-fd get [ fd>> mx get remove-input-callbacks [ resume ] each ] when* ;
+    dpy-fd get [
+        fd>> mx get-global remove-input-callbacks
+        [ resume ] each
+    ] when* ;
