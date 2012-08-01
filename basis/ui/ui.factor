@@ -114,13 +114,17 @@ M: world ungraft*
     dup hand-world get-global eq?
     [ hand-loc get-global swap move-hand ] [ drop ] if ;
 
-: layout-queued ( -- seq )
+: (layout-queued) ( deque -- seq )
     [
         in-layout? on
-        layout-queue [
+        [
             dup layout find-world [ , ] when*
         ] slurp-deque
-    ] { } make members ;
+    ] { } make members ; inline
+
+: layout-queued ( -- seq )
+    layout-queue dup deque-empty?
+    [ drop { } ] [ (layout-queued) ] if ;
 
 : redraw-worlds ( seq -- )
     [ dup update-hand draw-world ] each ;
