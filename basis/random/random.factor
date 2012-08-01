@@ -44,14 +44,17 @@ TYPED: random-bytes ( n: fixnum -- byte-array: byte-array )
 
 <PRIVATE
 
-: (random-integer) ( bits -- n required-bits )
-    [ random-32 32 ] dip 32 - [ dup 0 > ] [
-        [ 32 shift random-32 + ] [ 32 + ] [ 32 - ] tri*
+:: ((random-integer)) ( bits obj -- n required-bits )
+    obj random-32* 32 bits 32 - [ dup 0 > ] [
+        [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
     ] while drop ;
 
-: random-integer ( n -- n' )
-    dup next-power-of-2 log2 (random-integer)
+: (random-integer) ( n obj -- n' )
+    [ dup next-power-of-2 log2 ] dip ((random-integer))
     [ * ] [ 2^ /i ] bi* ;
+
+: random-integer ( n -- n' )
+    random-generator get (random-integer) ;
 
 PRIVATE>
 
@@ -96,21 +99,27 @@ ERROR: too-many-samples seq n ;
 : with-secure-random ( quot -- )
     secure-random-generator get swap with-random ; inline
 
-: uniform-random-float ( min max -- n )
-    4 random-bytes uint deref >float
-    4 random-bytes uint deref >float
+<PRIVATE
+
+: (uniform-random-float) ( min max obj -- n )
+    [ 4 4 ] dip [ random-bytes* uint deref >float ] curry bi@
     2.0 32 ^ * +
     [ over - 2.0 -64 ^ * ] dip
-    * + ; inline    
+    * + ; inline
+
+PRIVATE>
+
+: uniform-random-float ( min max -- n )
+    random-generator get (uniform-random-float) ; inline
 
 : random-unit ( -- n )
     0.0 1.0 uniform-random-float ; inline
 
 : random-units ( length -- sequence )
-    [ random-unit ] replicate ;
-    
+    random-generator get '[ 0.0 1.0 _ (uniform-random-float) ] replicate ;
+
 : random-integers ( length n -- sequence )
-    '[ _ random ] replicate ;
+    random-generator get '[ _ _ (random-integer) ] replicate ;
 
 : (cos-random-float) ( -- n )
     0. 2pi uniform-random-float cos ;
