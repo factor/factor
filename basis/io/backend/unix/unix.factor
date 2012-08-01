@@ -135,7 +135,7 @@ M: unix (wait-to-write) ( port -- )
     dup handle>> dup check-disposed drain
     dup [ wait-for-port ] [ 2drop ] if ;
 
-M: unix io-multiplex ( ms/f -- )
+M: unix io-multiplex ( nanos -- )
     mx get-global wait-for-events ;
 
 ! On Unix, you're not supposed to set stdin to non-blocking
