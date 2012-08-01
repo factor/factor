@@ -12,8 +12,8 @@ TUPLE: run-loop-mx kqueue-mx ;
 : file-descriptor-callback ( -- callback )
     void { CFFileDescriptorRef CFOptionFlags void* }
     cdecl [
-        2drop enable-all-callbacks
-        0 mx get kqueue-mx>> wait-for-events
+        3drop
+        0 mx get-global kqueue-mx>> wait-for-events
         yield
     ] alien-callback ;
 
