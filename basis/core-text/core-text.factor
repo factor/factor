@@ -34,16 +34,19 @@ FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context ) ;
 
 ERROR: not-a-string object ;
 
+MEMO: make-attributes ( open-font color -- hashtable )
+    [
+        kCTForegroundColorAttributeName ,,
+        kCTFontAttributeName ,,
+    ] H{ } make ;
+
 : <CTLine> ( string open-font color -- line )
     [
         [
             dup selection? [ string>> ] when
             dup string? [ not-a-string ] unless
         ] 2dip
-        [
-            kCTForegroundColorAttributeName ,,
-            kCTFontAttributeName ,,
-        ] H{ } make <CFAttributedString> &CFRelease
+        make-attributes <CFAttributedString> &CFRelease
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
