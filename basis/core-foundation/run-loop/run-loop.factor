@@ -128,5 +128,5 @@ PRIVATE>
 : run-one-iteration ( nanos -- handled? )
     reset-run-loop
     CFRunLoopDefaultMode
-    swap [ nanoseconds ] [ 5 minutes ] if* >CFTimeInterval
+    swap [ 1,000,000,000 / ] [ 300 ] if*
     t CFRunLoopRunInMode kCFRunLoopRunHandledSource = ;
