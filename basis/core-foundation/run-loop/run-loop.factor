@@ -126,7 +126,6 @@ PRIVATE>
     60 timer-callback <CFTimer> add-timer-to-run-loop ;
 
 : run-one-iteration ( nanos -- handled? )
-    reset-run-loop
     CFRunLoopDefaultMode
     swap [ 1,000,000,000 / ] [ 300 ] if*
     t CFRunLoopRunInMode kCFRunLoopRunHandledSource = ;
