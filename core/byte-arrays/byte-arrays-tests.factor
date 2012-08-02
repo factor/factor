@@ -15,3 +15,6 @@ IN: byte-arrays.tests
 [ B{ 123 } ] [ 123 0 B{ 0 } [ set-nth ] keep ] unit-test
 
 [ B{ 123 } ] [ 123 >bignum 0 B{ 0 } [ set-nth ] keep ] unit-test
+
+[ 1.5 B{ 1 2 3 } nth-unsafe ] must-fail
+[ 0 1.5 B{ 1 2 3 } set-nth-unsafe ] must-fail
