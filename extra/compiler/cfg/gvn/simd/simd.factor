@@ -3,7 +3,7 @@
 USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
 math.bitwise math.order classes generalizations
-combinators.smart locals make alien.c-types io.binary grouping
+locals make alien.c-types io.binary grouping
 math.vectors.simd.intrinsics
 compiler.cfg
 compiler.cfg.registers
@@ -27,7 +27,7 @@ IN: compiler.cfg.gvn.simd
         [ [ dst>> ] [ src>> ] bi* ]
         [ [ shuffle>> ] bi@ nths ]
         [ drop rep>> ]
-        2tri \ ##shuffle-vector-imm new-insn
+        2tri ##shuffle-vector-imm new-insn
     ] [ 2drop f ] if ;
 
 : (fold-shuffle-vector-imm) ( shuffle bytes -- bytes' )
@@ -35,7 +35,7 @@ IN: compiler.cfg.gvn.simd
 
 : fold-shuffle-vector-imm ( outer inner -- insn' )
     [ [ dst>> ] [ shuffle>> ] bi ] [ obj>> ] bi*
-    (fold-shuffle-vector-imm) \ ##load-reference new-insn ;
+    (fold-shuffle-vector-imm) ##load-reference new-insn ;
 
 M: ##shuffle-vector-imm rewrite
     dup src>> vreg>insn {
@@ -54,7 +54,7 @@ M: ##shuffle-vector-imm rewrite
 
 : (fold-scalar>vector) ( insn bytes -- insn' )
     [ [ dst>> ] [ rep>> rep-length ] bi ] dip <repetition> concat
-    \ ##load-reference new-insn ;
+    ##load-reference new-insn ;
 
 : fold-scalar>vector ( outer inner -- insn' )
     over rep>> scalar-value (fold-scalar>vector) ;
@@ -69,7 +69,7 @@ M: ##scalar>vector rewrite
 :: fold-gather-vector-2 ( insn src1 src2 -- insn )
     insn dst>>
     src1 src2 [ insn rep>> scalar-value ] bi@ append
-    \ ##load-reference new-insn ;
+    ##load-reference new-insn ;
 
 : rewrite-gather-vector-2 ( insn -- insn/f )
     dup [ src1>> vreg>insn ] [ src2>> vreg>insn ] bi {
@@ -85,9 +85,9 @@ M: ##gather-int-vector-2 rewrite rewrite-gather-vector-2 ;
     insn dst>>
     [
         src1 src2 src3 src4
-        [ insn rep>> scalar-value ] 4 napply
-    ] B{ } append-outputs-as
-    \ ##load-reference new-insn ;
+        [ insn rep>> scalar-value % ] 4 napply
+    ] B{ } make
+    ##load-reference new-insn ;
 
 : rewrite-gather-vector-4 ( insn -- insn/f )
     dup { [ src1>> ] [ src2>> ] [ src3>> ] [ src4>> ] } cleave [ vreg>insn ] 4 napply
@@ -102,7 +102,7 @@ M: ##gather-int-vector-4 rewrite rewrite-gather-vector-4 ;
 
 : fold-shuffle-vector ( insn src1 src2 -- insn )
     [ dst>> ] [ obj>> ] [ obj>> ] tri*
-    swap nths \ ##load-reference new-insn ;
+    swap nths ##load-reference new-insn ;
 
 M: ##shuffle-vector rewrite
     dup [ src>> vreg>insn ] [ shuffle>> vreg>insn ] bi
@@ -113,7 +113,7 @@ M: ##shuffle-vector rewrite
 
 M: ##xor-vector rewrite
     dup diagonal?
-    [ [ dst>> ] [ rep>> ] bi \ ##zero-vector new-insn ] [ drop f ] if ;
+    [ [ dst>> ] [ rep>> ] bi ##zero-vector new-insn ] [ drop f ] if ;
 
 : vector-not? ( insn -- ? )
     {
@@ -140,7 +140,7 @@ M: ##and-vector rewrite
                 [ src1>> vreg>insn vector-not-src ]
                 [ src2>> ]
                 [ rep>> ]
-            } cleave \ ##andn-vector new-insn
+            } cleave ##andn-vector new-insn
         ] }
         { [ dup src2>> vreg>insn vector-not? ] [
             {
@@ -148,7 +148,7 @@ M: ##and-vector rewrite
                 [ src2>> vreg>insn vector-not-src ]
                 [ src1>> ]
                 [ rep>> ]
-            } cleave \ ##andn-vector new-insn
+            } cleave ##andn-vector new-insn
         ] }
         [ drop f ]
     } cond ;
@@ -160,5 +160,5 @@ M: ##andn-vector rewrite
             [ src1>> vreg>insn vector-not-src ]
             [ src2>> ]
             [ rep>> ]
-        } cleave \ ##and-vector new-insn
+        } cleave ##and-vector new-insn
     ] [ drop f ] if ;

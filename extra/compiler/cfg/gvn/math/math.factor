@@ -20,8 +20,8 @@ IN: compiler.cfg.gvn.math
 
 M: ##tagged>integer rewrite
     [ dst>> ] [ src>> vreg>insn ] bi {
-        { [ dup ##load-integer? ] [ val>> tag-fixnum \ ##load-integer new-insn ] }
-        { [ dup f-insn? ] [ drop \ f type-number \ ##load-integer new-insn ] }
+        { [ dup ##load-integer? ] [ val>> tag-fixnum ##load-integer new-insn ] }
+        { [ dup f-insn? ] [ drop \ f type-number ##load-integer new-insn ] }
         [ 2drop f ]
     } cond ;
 
@@ -81,14 +81,14 @@ M: ##add-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##add-imm? ] [ \ ##add-imm reassociate-arithmetic ] }
+        { [ dup src1>> vreg>insn ##add-imm? ] [ ##add-imm reassociate-arithmetic ] }
         [ drop f ]
     } cond ;
 
 : sub-imm>add-imm ( insn -- insn' )
     [ dst>> ] [ src1>> ] [ src2>> neg ] tri
     dup immediate-arithmetic?
-    \ ##add-imm ?new-insn ;
+    ##add-imm ?new-insn ;
 
 M: ##sub-imm rewrite sub-imm>add-imm ;
 
@@ -97,14 +97,14 @@ M: ##sub-imm rewrite sub-imm>add-imm ;
     src2>> -1 = ;
 
 : mul-to-neg ( insn -- insn' )
-    [ dst>> ] [ src1>> ] bi \ ##neg new-insn ;
+    [ dst>> ] [ src1>> ] bi ##neg new-insn ;
 
 ! Convert ##mul-imm 2^X => ##shl-imm X
 : mul-to-shl? ( insn -- ? )
     src2>> power-of-2? ;
 
 : mul-to-shl ( insn -- insn' )
-    [ [ dst>> ] [ src1>> ] bi ] [ src2>> log2 ] bi \ ##shl-imm new-insn ;
+    [ [ dst>> ] [ src1>> ] bi ] [ src2>> log2 ] bi ##shl-imm new-insn ;
 
 ! Distribution converts
 ! ##+-imm 2 1 X
@@ -145,17 +145,17 @@ M: ##mul-imm rewrite
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
         { [ dup mul-to-neg? ] [ mul-to-neg ] }
         { [ dup mul-to-shl? ] [ mul-to-shl ] }
-        { [ dup src1>> vreg>insn ##mul-imm? ] [ \ ##mul-imm reassociate-arithmetic ] }
-        { [ dup distribute-over-add? ] [ \ ##add-imm \ ##mul-imm distribute ] }
-        { [ dup distribute-over-sub? ] [ \ ##sub-imm \ ##mul-imm distribute ] }
+        { [ dup src1>> vreg>insn ##mul-imm? ] [ ##mul-imm reassociate-arithmetic ] }
+        { [ dup distribute-over-add? ] [ \ ##add-imm, \ ##mul-imm, distribute ] }
+        { [ dup distribute-over-sub? ] [ \ ##sub-imm, \ ##mul-imm, distribute ] }
         [ drop f ]
     } cond ;
 
 M: ##and-imm rewrite
     {
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##and-imm? ] [ \ ##and-imm reassociate-bitwise ] }
-        { [ dup src2>> 0 = ] [ dst>> 0 \ ##load-integer new-insn ] }
+        { [ dup src1>> vreg>insn ##and-imm? ] [ ##and-imm reassociate-bitwise ] }
+        { [ dup src2>> 0 = ] [ dst>> 0 ##load-integer new-insn ] }
         { [ dup src2>> -1 = ] [ identity ] }
         [ drop f ]
     } cond ;
@@ -163,18 +163,18 @@ M: ##and-imm rewrite
 M: ##or-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
-        { [ dup src2>> -1 = ] [ dst>> -1 \ ##load-integer new-insn ] }
+        { [ dup src2>> -1 = ] [ dst>> -1 ##load-integer new-insn ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##or-imm? ] [ \ ##or-imm reassociate-bitwise ] }
+        { [ dup src1>> vreg>insn ##or-imm? ] [ ##or-imm reassociate-bitwise ] }
         [ drop f ]
     } cond ;
 
 M: ##xor-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
-        { [ dup src2>> -1 = ] [ [ dst>> ] [ src1>> ] bi \ ##not new-insn ] }
+        { [ dup src2>> -1 = ] [ [ dst>> ] [ src1>> ] bi ##not new-insn ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##xor-imm? ] [ \ ##xor-imm reassociate-bitwise ] }
+        { [ dup src1>> vreg>insn ##xor-imm? ] [ ##xor-imm reassociate-bitwise ] }
         [ drop f ]
     } cond ;
 
@@ -182,9 +182,9 @@ M: ##shl-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##shl-imm? ] [ \ ##shl-imm reassociate-shift ] }
-        { [ dup distribute-over-add? ] [ \ ##add-imm \ ##shl-imm distribute ] }
-        { [ dup distribute-over-sub? ] [ \ ##sub-imm \ ##shl-imm distribute ] }
+        { [ dup src1>> vreg>insn ##shl-imm? ] [ ##shl-imm reassociate-shift ] }
+        { [ dup distribute-over-add? ] [ \ ##add-imm, \ ##shl-imm, distribute ] }
+        { [ dup distribute-over-sub? ] [ \ ##sub-imm, \ ##shl-imm, distribute ] }
         [ drop f ]
     } cond ;
 
@@ -192,7 +192,7 @@ M: ##shr-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##shr-imm? ] [ \ ##shr-imm reassociate-shift ] }
+        { [ dup src1>> vreg>insn ##shr-imm? ] [ ##shr-imm reassociate-shift ] }
         [ drop f ]
     } cond ;
 
@@ -200,7 +200,7 @@ M: ##sar-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##sar-imm? ] [ \ ##sar-imm reassociate-shift ] }
+        { [ dup src1>> vreg>insn ##sar-imm? ] [ ##sar-imm reassociate-shift ] }
         [ drop f ]
     } cond ;
 
@@ -217,8 +217,8 @@ M: ##sar-imm rewrite
 
 M: ##add rewrite
     {
-        { [ dup src2>> vreg-immediate-arithmetic? ] [ \ ##add-imm f insn>imm-insn ] }
-        { [ dup src1>> vreg-immediate-arithmetic? ] [ \ ##add-imm t insn>imm-insn ] }
+        { [ dup src2>> vreg-immediate-arithmetic? ] [ ##add-imm f insn>imm-insn ] }
+        { [ dup src1>> vreg-immediate-arithmetic? ] [ ##add-imm t insn>imm-insn ] }
         [ drop f ]
     } cond ;
 
@@ -227,7 +227,7 @@ M: ##add rewrite
 
 ! ##sub 2 1 1 => ##load-integer 2 0
 : rewrite-subtraction-identity ( insn -- insn' )
-    dst>> 0 \ ##load-integer new-insn ;
+    dst>> 0 ##load-integer new-insn ;
 
 ! ##load-integer 1 0
 ! ##sub 3 1 2
@@ -237,61 +237,61 @@ M: ##add rewrite
     src1>> vreg>insn zero-insn? ;
 
 : sub-to-neg ( ##sub -- insn )
-    [ dst>> ] [ src2>> ] bi \ ##neg new-insn ;
+    [ dst>> ] [ src2>> ] bi ##neg new-insn ;
 
 M: ##sub rewrite
     {
         { [ dup sub-to-neg? ] [ sub-to-neg ] }
         { [ dup diagonal? ] [ rewrite-subtraction-identity ] }
-        { [ dup src2>> vreg-immediate-arithmetic? ] [ \ ##sub-imm f insn>imm-insn ] }
+        { [ dup src2>> vreg-immediate-arithmetic? ] [ ##sub-imm f insn>imm-insn ] }
         [ drop f ]
     } cond ;
 
 M: ##mul rewrite
     {
-        { [ dup src2>> vreg-immediate-arithmetic? ] [ \ ##mul-imm f insn>imm-insn ] }
-        { [ dup src1>> vreg-immediate-arithmetic? ] [ \ ##mul-imm t insn>imm-insn ] }
+        { [ dup src2>> vreg-immediate-arithmetic? ] [ ##mul-imm f insn>imm-insn ] }
+        { [ dup src1>> vreg-immediate-arithmetic? ] [ ##mul-imm t insn>imm-insn ] }
         [ drop f ]
     } cond ;
 
 M: ##and rewrite
     {
         { [ dup diagonal? ] [ identity ] }
-        { [ dup src2>> vreg-immediate-bitwise? ] [ \ ##and-imm f insn>imm-insn ] }
-        { [ dup src1>> vreg-immediate-bitwise? ] [ \ ##and-imm t insn>imm-insn ] }
+        { [ dup src2>> vreg-immediate-bitwise? ] [ ##and-imm f insn>imm-insn ] }
+        { [ dup src1>> vreg-immediate-bitwise? ] [ ##and-imm t insn>imm-insn ] }
         [ drop f ]
     } cond ;
 
 M: ##or rewrite
     {
         { [ dup diagonal? ] [ identity ] }
-        { [ dup src2>> vreg-immediate-bitwise? ] [ \ ##or-imm f insn>imm-insn ] }
-        { [ dup src1>> vreg-immediate-bitwise? ] [ \ ##or-imm t insn>imm-insn ] }
+        { [ dup src2>> vreg-immediate-bitwise? ] [ ##or-imm f insn>imm-insn ] }
+        { [ dup src1>> vreg-immediate-bitwise? ] [ ##or-imm t insn>imm-insn ] }
         [ drop f ]
     } cond ;
 
 M: ##xor rewrite
     {
-        { [ dup diagonal? ] [ dst>> 0 \ ##load-integer new-insn ] }
-        { [ dup src2>> vreg-immediate-bitwise? ] [ \ ##xor-imm f insn>imm-insn ] }
-        { [ dup src1>> vreg-immediate-bitwise? ] [ \ ##xor-imm t insn>imm-insn ] }
+        { [ dup diagonal? ] [ dst>> 0 ##load-integer new-insn ] }
+        { [ dup src2>> vreg-immediate-bitwise? ] [ ##xor-imm f insn>imm-insn ] }
+        { [ dup src1>> vreg-immediate-bitwise? ] [ ##xor-imm t insn>imm-insn ] }
         [ drop f ]
     } cond ;
 
 M: ##shl rewrite
     {
-        { [ dup src2>> vreg-immediate-bitwise? ] [ \ ##shl-imm f insn>imm-insn ] }
+        { [ dup src2>> vreg-immediate-bitwise? ] [ ##shl-imm f insn>imm-insn ] }
         [ drop f ]
     } cond ;
 
 M: ##shr rewrite
     {
-        { [ dup src2>> vreg-immediate-bitwise? ] [ \ ##shr-imm f insn>imm-insn ] }
+        { [ dup src2>> vreg-immediate-bitwise? ] [ ##shr-imm f insn>imm-insn ] }
         [ drop f ]
     } cond ;
 
 M: ##sar rewrite
     {
-        { [ dup src2>> vreg-immediate-bitwise? ] [ \ ##sar-imm f insn>imm-insn ] }
+        { [ dup src2>> vreg-immediate-bitwise? ] [ ##sar-imm f insn>imm-insn ] }
         [ drop f ]
     } cond ;
