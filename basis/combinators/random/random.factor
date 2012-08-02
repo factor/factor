@@ -6,7 +6,9 @@ summary ;
 IN: combinators.random
 
 : ifp ( p true false -- ) [ random-unit > ] 2dip if ; inline
+
 : whenp ( p true -- ) [ ] ifp ; inline
+
 : unlessp ( p false -- ) [ [ ] ] dip ifp ; inline
 
 <PRIVATE
@@ -20,7 +22,7 @@ ERROR: bad-probabilities assoc ;
 
 M: bad-probabilities summary
     drop "The probabilities do not satisfy the rules stated in the docs." ;
-    
+
 : good-probabilities? ( assoc -- ? )
     dup last pair? [
         keys { [ sum 1 number= ] [ [ 0 1 between? ] all? ] } 1&&
@@ -34,21 +36,22 @@ M: bad-probabilities summary
         [ dup pair? [ prepare-pair ] [ with-drop ] if ] map
         cond>quot
     ] [ bad-probabilities ] if ;
-    
+
 MACRO: (casep) ( assoc -- ) (casep>quot) ;
 
 : casep>quot ( assoc -- quot )
     (casep>quot) [ random-unit ] prepend ;
-    
+
 : (conditional-probabilities) ( seq i -- p )
-    [ dup 0 > [ head [ 1 swap - ] [ * ] map-reduce ] [ 2drop 1 ] if ] [ swap nth ] 2bi * ;
-    
+    [ dup 0 > [ head [ 1 swap - ] [ * ] map-reduce ] [ 2drop 1 ] if ]
+    [ swap nth ] 2bi * ;
+
 : conditional-probabilities ( seq -- seq' )
     dup length iota [ (conditional-probabilities) ] with map ;
-    
+
 : (direct>conditional) ( assoc -- assoc' )
-        [ keys conditional-probabilities ] [ values ] bi zip ;
-        
+    [ keys conditional-probabilities ] [ values ] bi zip ;
+
 : direct>conditional ( assoc -- assoc' )
     dup last pair? [ (direct>conditional) ] [
         unclip-last [ (direct>conditional) ] [ suffix ] bi*
@@ -56,7 +59,7 @@ MACRO: (casep) ( assoc -- ) (casep>quot) ;
 
 : call-random>casep ( seq -- assoc )
     [ length recip ] keep [ 2array ] with map ;
-    
+
 PRIVATE>
 
 MACRO: casep ( assoc -- ) casep>quot ;
