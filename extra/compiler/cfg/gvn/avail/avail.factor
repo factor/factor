@@ -8,6 +8,7 @@ compiler.cfg.def-use
 compiler.cfg.gvn.graph
 compiler.cfg.predecessors
 compiler.cfg.rpo ;
+FROM: assocs => change-at ;
 FROM: namespaces => set ;
 IN: compiler.cfg.gvn.avail
 
