@@ -91,4 +91,4 @@ M: ##load-reference >expr obj>> <reference-expr> ;
 M: ##phi >expr
     inputs>> values [ vreg>vn ] map
     basic-block get number>> prefix
-    \ ##phi prefix ;
+    ##phi prefix ;
