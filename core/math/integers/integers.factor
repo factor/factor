@@ -16,6 +16,7 @@ M: fixnum >bignum fixnum>bignum ; inline
 M: fixnum >integer ; inline
 M: fixnum >float fixnum>float ; inline
 M: fixnum integer>fixnum ; inline
+M: fixnum integer>fixnum-strict ; inline
 
 M: fixnum hashcode* nip ; inline
 M: fixnum equal? over bignum? [ >bignum bignum= ] [ 2drop f ] if ; inline
@@ -63,6 +64,10 @@ M: fixnum (log2) fixnum-log2 ; inline
 M: bignum >fixnum bignum>fixnum ; inline
 M: bignum >bignum ; inline
 M: bignum integer>fixnum bignum>fixnum ; inline
+
+M: bignum integer>fixnum-strict
+    dup bignum>fixnum
+    2dup number= [ nip ] [ drop out-of-fixnum-range ] if ; inline
 
 M: bignum hashcode* nip bignum>fixnum ;
 
