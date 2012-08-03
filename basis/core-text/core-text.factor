@@ -164,6 +164,6 @@ M: line dispose* line>> CFRelease ;
 SYMBOL: cached-lines
 
 : cached-line ( font string -- line )
-    cached-lines get [ <line> ] 2cache ;
+    cached-lines get-global [ <line> ] 2cache ;
 
 [ <cache-assoc> cached-lines set-global ] "core-text" add-startup-hook
