@@ -131,7 +131,7 @@ M: hashtable set-at ( value key hash -- )
     dup ?grow-hash dupd new-key@ set-nth-pair ;
 
 : associate ( value key -- hash )
-    2 <hashtable> [ set-at ] keep ; inline
+    1 <hashtable> [ set-at ] keep ; inline
 
 <PRIVATE
 
