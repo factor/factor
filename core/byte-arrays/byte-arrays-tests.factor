@@ -1,4 +1,5 @@
-USING: tools.test byte-arrays sequences kernel math ;
+USING: byte-arrays kernel math sequences sequences.private
+tools.test ;
 IN: byte-arrays.tests
 
 [ 6 B{ 1 2 3 } ] [
