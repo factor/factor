@@ -8,11 +8,11 @@ IN: wrap.strings
 : split-lines ( string -- elements-lines )
     string-lines [
         " \t" split harvest
-        [ dup length 1 <element> ] map
-    ] map ;
+        [ dup length 1 <element> ] map!
+    ] map! ;
 
 : join-elements ( wrapped-lines -- lines )
-    [ " " join ] map ;
+    [ " " join ] map! ;
 
 : join-lines ( strings -- string )
     "\n" join ;
@@ -20,10 +20,10 @@ IN: wrap.strings
 PRIVATE>
 
 : wrap-lines ( lines width -- newlines )
-    [ split-lines ] dip '[ _ dup wrap join-elements ] map concat ;
+    [ split-lines ] dip '[ _ dup wrap join-elements ] map! concat ;
 
 : wrap-string ( string width -- newstring )
     wrap-lines join-lines ;
 
 : wrap-indented-string ( string width indent -- newstring )
-    [ length - wrap-lines ] keep '[ _ prepend ] map join-lines ;
+    [ length - wrap-lines ] keep '[ _ prepend ] map! join-lines ;
