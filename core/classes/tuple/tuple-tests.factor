@@ -533,9 +533,17 @@ unit-test
 must-fail-with
 
 ! Check fixnum coercer
-[ 0.0 "hi" declared-types boa n>> ] [ T{ no-method f 0.0 integer>fixnum } = ] must-fail-with
+[ 0.0 "hi" declared-types boa n>> ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
 
-[ declared-types new 0.0 >>n n>> ] [ T{ no-method f 0.0 integer>fixnum } = ] must-fail-with
+[ declared-types new 0.0 >>n n>> ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
+
+[ T{ declared-types f 33333 "asdf" } ]
+[ 33333 >bignum "asdf" declared-types boa ] unit-test
+
+[ 444444444444444444444444444444444444444444444444433333 >bignum "asdf" declared-types boa ]
+[
+    T{ out-of-fixnum-range f 444444444444444444444444444444444444444444444444433333 }
+] must-fail-with
 
 ! Check bignum coercer
 TUPLE: bignum-coercer { n bignum initial: $[ 0 >bignum ] } ;
@@ -562,10 +570,10 @@ TUPLE: integer-coercer { n integer } ;
 
 \ foo def>> must-infer
 
-[ 0.0 "hi" foo ] [ T{ no-method f 0.0 integer>fixnum } = ] must-fail-with
+[ 0.0 "hi" foo ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
 
 [ "hi" 0.0 declared-types boa ]
-[ T{ no-method f "hi" integer>fixnum } = ]
+[ T{ no-method f "hi" integer>fixnum-strict } = ]
 must-fail-with
 
 [ 0 { } declared-types boa ]
@@ -573,7 +581,7 @@ must-fail-with
 must-fail-with
 
 [ "hi" 0.0 foo ]
-[ T{ no-method f "hi" integer>fixnum } = ]
+[ T{ no-method f "hi" integer>fixnum-strict } = ]
 must-fail-with
 
 [ 0 { } foo ]
