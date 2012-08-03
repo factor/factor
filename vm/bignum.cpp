@@ -1768,10 +1768,10 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 {
     GC_BIGNUM(a);
     GC_BIGNUM(b);
-    bignum *c, *d, *e, *f, *g;
+    bignum *c, *d, *e;
     bignum_twodigit_type x, y, q, s, t, A, B, C, D;
     int nbits, k;
-    bignum_length_type size_a, size_b;
+    bignum_length_type size_a, size_b, size_d;
     bignum_digit_type *scan_a, *scan_b, *scan_c, *scan_d, *a_end, *b_end;
 
     /* clone the bignums so we can modify them in-place */
@@ -1797,8 +1797,11 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
     /* Initial reduction: make sure that 0 <= b <= a. */
     if (bignum_compare(a, b) == bignum_comparison_less) {
         d = a;
+        size_d = size_a;
         a = b;
+        size_a = size_b;
         b = d;
+        size_b = size_d;
     }
 
     while (size_a > 1) {
@@ -1832,21 +1835,17 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 
         if (k == 0) {
             /* no progress; do a Euclidean step */
-            if (BIGNUM_LENGTH (b) == 0) {
+            if (size_b == 0) {
                 return a;
             }
-            e = bignum_trim (a);
+            e = bignum_remainder (a, b);
             GC_BIGNUM(e);
-            f = bignum_trim (b);
-            GC_BIGNUM(f);
-            g = bignum_remainder (e, f);
-            GC_BIGNUM(g);
-            if (g == BIGNUM_OUT_OF_BAND) {
-                return g;
+            if (e == BIGNUM_OUT_OF_BAND) {
+                return e;
             }
             a = b;
-            size_a = BIGNUM_LENGTH (a);
-            b = g;
+            size_a = size_b;
+            b = e;
             size_b = BIGNUM_LENGTH (b);
             continue;
         }
@@ -1907,14 +1906,9 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
         while (size_b > 0 && *(--scan_b) == 0) size_b--;
     }
 
-    e = bignum_trim (a);
-    GC_BIGNUM(e);
-    f = bignum_trim (b);
-    GC_BIGNUM(f);
-
     /* a fits into a fixnum, so b must too */
-    fixnum xx = bignum_to_fixnum (e);
-    fixnum yy = bignum_to_fixnum (f);
+    fixnum xx = bignum_to_fixnum (a);
+    fixnum yy = bignum_to_fixnum (b);
     fixnum tt;
 
     /* usual Euclidean algorithm for longs */
