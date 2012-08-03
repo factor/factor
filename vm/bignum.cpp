@@ -1714,6 +1714,8 @@ int factor_vm::bignum_unsigned_logbitp(int shift, bignum * bignum)
 /* Allocates memory */
 bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 {
+    GC_BIGNUM(a);
+    GC_BIGNUM(b);
     bignum * d;
     bignum_length_type size_a, size_b;
     bignum_digit_type * scan_a, * scan_b, * scan_d, * a_end, * b_end;
@@ -1723,6 +1725,7 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
         size_a = BIGNUM_LENGTH (a);
         a_end = scan_a + size_a;
         d = allot_bignum (size_a, 0);
+        GC_BIGNUM(d);
         scan_d = BIGNUM_START_PTR (d);
         while (scan_a < a_end)
             (*scan_d++) = (*scan_a++);
@@ -1734,6 +1737,7 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
         size_b = BIGNUM_LENGTH (b);
         b_end = scan_b + size_b;
         d = allot_bignum (size_b, 0);
+        GC_BIGNUM(d);
         scan_d = BIGNUM_START_PTR (d);
         while (scan_b < b_end)
             (*scan_d++) = (*scan_b++);
@@ -1748,6 +1752,7 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 
     while (BIGNUM_LENGTH (b) != 0) {
         d = bignum_remainder (a, b);
+        GC_BIGNUM(d);
         if (d == BIGNUM_OUT_OF_BAND) {
             return d;
         }
