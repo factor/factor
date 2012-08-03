@@ -1766,25 +1766,29 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 /* Allocates memory */
 bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 {
-    bignum * d;
+    GC_BIGNUM(a);
+    GC_BIGNUM(b);
+    bignum *c, *d, *e, *f, *g;
     bignum_twodigit_type x, y, q, s, t, A, B, C, D;
     int nbits, k;
     bignum_length_type size_a, size_b;
-    bignum_digit_type * scan_a, * scan_b, * scan_c, * scan_d, * a_end, * b_end;
+    bignum_digit_type *scan_a, *scan_b, *scan_c, *scan_d, *a_end, *b_end;
 
     /* clone the bignums so we can modify them in-place */
     scan_a = BIGNUM_START_PTR (a);
     size_a = BIGNUM_LENGTH (a);
     a_end = scan_a + size_a;
-    d = allot_bignum (size_a, 0);
-    scan_d = BIGNUM_START_PTR (d);
+    c = allot_bignum (size_a, 0);
+    GC_BIGNUM(c);
+    scan_c = BIGNUM_START_PTR (c);
     while (scan_a < a_end)
-        (*scan_d++) = (*scan_a++);
-    a = d;
+        (*scan_c++) = (*scan_a++);
+    a = c;
     scan_b = BIGNUM_START_PTR (b);
     size_b = BIGNUM_LENGTH (b);
     b_end = scan_b + size_b;
     d = allot_bignum (size_b, 0);
+    GC_BIGNUM(d);
     scan_d = BIGNUM_START_PTR (d);
     while (scan_b < b_end)
         (*scan_d++) = (*scan_b++);
@@ -1797,9 +1801,8 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
         b = d;
     }
 
-    while ((size_a = BIGNUM_LENGTH (a)) > 1) {
+    while (size_a > 1) {
         nbits = log2 (BIGNUM_REF (a, size_a-1));
-        size_b = BIGNUM_LENGTH (b);
         x = ((BIGNUM_REF (a, size_a-1) << (BIGNUM_DIGIT_LENGTH - nbits)) |
              (BIGNUM_REF (a, size_a-2) >> nbits));
         y = ((size_b >= size_a - 1 ? BIGNUM_REF (b, size_a-2) >> nbits : 0) |
@@ -1832,12 +1835,19 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
             if (BIGNUM_LENGTH (b) == 0) {
                 return a;
             }
-            d = bignum_remainder (a, b);
-            if (d == BIGNUM_OUT_OF_BAND) {
-                return d;
+            e = bignum_trim (a);
+            GC_BIGNUM(e);
+            f = bignum_trim (b);
+            GC_BIGNUM(f);
+            g = bignum_remainder (e, f);
+            GC_BIGNUM(g);
+            if (g == BIGNUM_OUT_OF_BAND) {
+                return g;
             }
             a = b;
-            b = d;
+            size_a = BIGNUM_LENGTH (a);
+            b = g;
+            size_b = BIGNUM_LENGTH (b);
             continue;
         }
 
@@ -1892,13 +1902,19 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
         BIGNUM_ASSERT (s == 0);
         BIGNUM_ASSERT (t == 0);
 
-        a = bignum_trim (a);
-        b = bignum_trim (b);
+        // update size_a and size_b to remove any zeros at end
+        while (size_a > 0 && *(scan_a + size_a - 1) == 0) size_a--;
+        while (size_b > 0 && *(scan_b + size_b - 1) == 0) size_b--;
     }
 
+    e = bignum_trim (a);
+    GC_BIGNUM(e);
+    f = bignum_trim (b);
+    GC_BIGNUM(f);
+
     /* a fits into a fixnum, so b must too */
-    fixnum xx = bignum_to_fixnum (a);
-    fixnum yy = bignum_to_fixnum (b);
+    fixnum xx = bignum_to_fixnum (e);
+    fixnum yy = bignum_to_fixnum (f);
     fixnum tt;
 
     /* usual Euclidean algorithm for longs */
