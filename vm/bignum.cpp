@@ -1903,8 +1903,8 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
         BIGNUM_ASSERT (t == 0);
 
         // update size_a and size_b to remove any zeros at end
-        while (size_a > 0 && *(scan_a + size_a - 1) == 0) size_a--;
-        while (size_b > 0 && *(scan_b + size_b - 1) == 0) size_b--;
+        while (size_a > 0 && *(--scan_a) == 0) size_a--;
+        while (size_b > 0 && *(--scan_b) == 0) size_b--;
     }
 
     e = bignum_trim (a);
