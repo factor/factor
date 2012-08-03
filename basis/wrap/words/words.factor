@@ -16,7 +16,7 @@ C: <word> word
     [ append ] [ [ words-length ] bi@ ] 2bi <element> ;
 
 : ?first2 ( seq -- first/f second/f )
-    dup length dup 1 > [ first2-unsafe ] [
+    dup length dup 1 > [ drop first2-unsafe ] [
         0 > [ first-unsafe f ] [ drop f f ] if
     ] if ;
 
