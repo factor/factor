@@ -318,9 +318,9 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
     custom-inline-fixnum
 ] "custom-inlining" set-word-prop
 
-\ integer>fixnum [
-    custom-inline-fixnum
-] "custom-inlining" set-word-prop
+{ integer>fixnum integer>fixnum-strict } [
+    [ custom-inline-fixnum ] "custom-inlining" set-word-prop
+] each
 
 ! We want to constant-fold calls to heap-size, and recompile those
 ! calls when a C type is redefined
