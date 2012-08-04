@@ -22,7 +22,7 @@ IN: rosetta-code.y-combinator
 ! functions or lambda expressions.
 
 : Y ( quot -- quot )
-    '[ [ dup call call ] curry _ call ] dup call( x -- x )  ;
+    '[ [ dup call call ] curry @ ] dup call ; inline
 
 : almost-fac ( quot -- quot )
     '[ dup zero? [ drop 1 ] [ dup 1 - _ call * ] if ] ;
