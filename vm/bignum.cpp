@@ -1772,7 +1772,8 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
     bignum_twodigit_type x, y, q, s, t, A, B, C, D;
     int nbits, k;
     bignum_length_type size_a, size_b, size_c;
-    bignum_digit_type *scan_a, *scan_b, *scan_c, *scan_d, *a_end, *b_end;
+    bignum_digit_type *scan_a, *scan_b, *scan_c, *scan_d;
+    bignum_digit_type *a_end, *b_end, *c_end;
 
     /* clone the bignums so we can modify them in-place */
     scan_a = BIGNUM_START_PTR (a);
@@ -1838,15 +1839,32 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
             if (size_b == 0) {
                 return a;
             }
-            e = bignum_remainder (a, b);
-            GC_BIGNUM (e);
-            if (e == BIGNUM_OUT_OF_BAND) {
-                return e;
+            e = bignum_trim (a);
+            GC_BIGNUM(e);
+            f = bignum_trim (b);
+            GC_BIGNUM(f);
+            c = bignum_remainder (e, f);
+            GC_BIGNUM (c);
+            if (c == BIGNUM_OUT_OF_BAND) {
+                return c;
             }
-            a = b;
+
+            // copy 'b' to 'a'
+            scan_a = BIGNUM_START_PTR (a);
+            scan_b = BIGNUM_START_PTR (b);
+            b_end = scan_b + size_b;
+            while (scan_b < b_end) *(scan_a++) = *(scan_b++);
             size_a = size_b;
-            b = e;
-            size_b = BIGNUM_LENGTH (e);
+
+            // copy 'c' to 'b'
+            scan_b = BIGNUM_START_PTR (b);
+            scan_c = BIGNUM_START_PTR (c);
+            size_c = BIGNUM_LENGTH (c);
+            BIGNUM_ASSERT (size_c <= size_b);
+            c_end = scan_c + size_c;
+            while (scan_c < c_end) *(scan_b++) = *(scan_c++);
+            size_b = size_c;
+
             continue;
         }
 
@@ -1901,14 +1919,10 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
         BIGNUM_ASSERT (s == 0);
         BIGNUM_ASSERT (t == 0);
 
-        e = bignum_trim (a);
-        GC_BIGNUM(e);
-        a = e;
-        size_a = BIGNUM_LENGTH (a);
-        f = bignum_trim (b);
-        GC_BIGNUM(f);
-        b = f;
-        size_b = BIGNUM_LENGTH (b);
+        // update size_a and size_b to remove any zeros at end
+        while (size_a > 0 && *(--scan_a) == 0) size_a--;
+        while (size_b > 0 && *(--scan_b) == 0) size_b--;
+
         BIGNUM_ASSERT (size_a >= size_b);
     }
 
