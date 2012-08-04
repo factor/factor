@@ -5,8 +5,15 @@ math.parser models models.arrow random sequences threads timers
 ui ui.gadgets ui.gadgets.labels ui.gadgets.packs ;
 IN: noise-ui
  
+: bits>pixels ( bits -- bits' pixels )
+  [ -1 shift ] [ 1 bitand ] bi 255 * ; inline
+: ?generate-more-bits ( a bits -- a bits' )
+  over 32 mod zero? [ drop random-32 ] when ; inline
 : <random-images-bytes> ( dim -- bytes )
-    product 2 random-integers [ zero? 0 255 ? ] B{ } map-as ;
+  [ 0 0 ] dip product  [
+    ?generate-more-bits
+    [ 1 + ] [ bits>pixels ] bi*
+  ] B{ } replicate-as 2nip ;
 
 : <random-bw-image> ( -- image )
     <image>

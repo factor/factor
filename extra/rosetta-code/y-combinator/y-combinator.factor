@@ -1,7 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel math ;
-IN: rosettacode.y-combinator
+USING: combinators fry kernel locals math ;
+IN: rosetta-code.y-combinator
 
 ! http://rosettacode.org/wiki/Y_combinator
 
@@ -22,10 +22,22 @@ IN: rosettacode.y-combinator
 ! functions or lambda expressions.
 
 : Y ( quot -- quot )
-    '[ [ dup call call ] curry _ call ] dup call( x -- x )  ;
+    '[ [ dup call call ] curry @ ] dup call ; inline
 
+! factorial sequence
 : almost-fac ( quot -- quot )
-    '[ dup zero? [ drop 1 ] [ dup 1 - _ call * ] if ] ;
+    '[ dup zero? [ drop 1 ] [ dup 1 - @ * ] if ] ;
 
+! fibonacci sequence
 : almost-fib ( quot -- quot )
-    '[ dup 2 >= [ 1 2 [ - _ call ] bi-curry@ bi + ] when ] ;
+    '[ dup 2 >= [ 1 2 [ - @ ] bi-curry@ bi + ] when ] ;
+
+! Ackermann–Péter function
+:: almost-ack ( quot -- quot )
+    [
+        {
+          { [ over zero? ] [ nip 1 + ] }
+          { [ dup zero? ] [ [ 1 - ] [ drop 1 ] bi* quot call ] }
+          [ [ drop 1 - ] [ 1 - quot call ] 2bi quot call ]
+        } cond
+    ] ;

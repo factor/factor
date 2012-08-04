@@ -1,20 +1,27 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators effects.parser kernel math random
-combinators.random sequences ;
+USING: combinators combinators.random effects.parser kernel
+literals math random sequences ;
 IN: random.data
 
+CONSTANT: digits-count 10
+CONSTANT: letters-count 26
+
 : random-digit ( -- ch )
-    10 random CHAR: 0 + ;
+    digits-count random CHAR: 0 + ;
 
-: random-LETTER ( -- ch ) 26 random CHAR: A + ;
+: random-LETTER ( -- ch ) letters-count random CHAR: A + ;
 
-: random-letter ( -- ch ) 26 random CHAR: a + ;
+: random-letter ( -- ch ) letters-count random CHAR: a + ;
 
 : random-Letter ( -- ch )
     { random-LETTER  random-letter } execute-random ;
 
+CONSTANT: digit-probability $[ letters-count 2 * digits-count / 1 + recip ]
 : random-ch ( -- ch )
-    { random-digit random-Letter } execute-random ;
+    {
+      { $ digit-probability [ random-digit ] }
+      [ random-Letter ]
+    } casep ;
 
 : random-string ( n -- string ) [ random-ch ] "" replicate-as ;
