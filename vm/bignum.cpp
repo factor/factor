@@ -1768,10 +1768,10 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 {
     GC_BIGNUM(a);
     GC_BIGNUM(b);
-    bignum *c, *d, *e;
+    bignum *c, *d, *e, *f;
     bignum_twodigit_type x, y, q, s, t, A, B, C, D;
     int nbits, k;
-    bignum_length_type size_a, size_b, size_d;
+    bignum_length_type size_a, size_b, size_c;
     bignum_digit_type *scan_a, *scan_b, *scan_c, *scan_d, *a_end, *b_end;
 
     /* clone the bignums so we can modify them in-place */
@@ -1796,12 +1796,12 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 
     /* Initial reduction: make sure that 0 <= b <= a. */
     if (bignum_compare(a, b) == bignum_comparison_less) {
-        d = a;
-        size_d = size_a;
+        c = a;
+        size_c = size_a;
         a = b;
         size_a = size_b;
-        b = d;
-        size_b = size_d;
+        b = c;
+        size_b = size_c;
     }
 
     while (size_a > 1) {
@@ -1839,14 +1839,14 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
                 return a;
             }
             e = bignum_remainder (a, b);
-            GC_BIGNUM(e);
+            GC_BIGNUM (e);
             if (e == BIGNUM_OUT_OF_BAND) {
                 return e;
             }
             a = b;
             size_a = size_b;
             b = e;
-            size_b = BIGNUM_LENGTH (b);
+            size_b = BIGNUM_LENGTH (e);
             continue;
         }
 
@@ -1856,8 +1856,8 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
         */
         scan_a = BIGNUM_START_PTR (a);
         scan_b = BIGNUM_START_PTR (b);
-        scan_c = BIGNUM_START_PTR (a);
-        scan_d = BIGNUM_START_PTR (b);
+        scan_c = scan_a;
+        scan_d = scan_b;
         a_end = scan_a + size_a;
         b_end = scan_b + size_b;
         s = 0;
@@ -1875,7 +1875,7 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
                 s -= (B * *scan_a);
                 t += (D * *scan_a++);
                 *scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
-                *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
+                //*scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
                 s >>= BIGNUM_DIGIT_LENGTH;
                 t >>= BIGNUM_DIGIT_LENGTH;
             }
@@ -1893,7 +1893,7 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
                 s += (A * *scan_a);
                 t -= (C * *scan_a++);
                 *scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
-                *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
+                //*scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
                 s >>= BIGNUM_DIGIT_LENGTH;
                 t >>= BIGNUM_DIGIT_LENGTH;
             }
@@ -1901,9 +1901,15 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
         BIGNUM_ASSERT (s == 0);
         BIGNUM_ASSERT (t == 0);
 
-        // update size_a and size_b to remove any zeros at end
-        while (size_a > 0 && *(--scan_a) == 0) size_a--;
-        while (size_b > 0 && *(--scan_b) == 0) size_b--;
+        e = bignum_trim (a);
+        GC_BIGNUM(e);
+        a = e;
+        size_a = BIGNUM_LENGTH (a);
+        f = bignum_trim (b);
+        GC_BIGNUM(f);
+        b = f;
+        size_b = BIGNUM_LENGTH (b);
+        BIGNUM_ASSERT (size_a >= size_b);
     }
 
     /* a fits into a fixnum, so b must too */
