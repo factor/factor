@@ -120,12 +120,12 @@ cpu x86.64? [
     ! Boundary case
     [
         {
-            T{ ##load-integer f 0 HEX: 7fffffff }
+            T{ ##load-integer f 0 0x7fffffff }
             T{ ##replace f 0 D 0 }
         }
     ] [
         {
-            T{ ##load-integer f 0 HEX: 7fffffff }
+            T{ ##load-integer f 0 0x7fffffff }
             T{ ##replace f 0 D 0 }
         } value-numbering-step
     ] unit-test
@@ -2025,7 +2025,7 @@ cell 8 = [
         {
             T{ ##peek f 0 D 0 }
             T{ ##load-integer f 1 -1 }
-            T{ ##load-integer f 3 HEX: ffffffffffff }
+            T{ ##load-integer f 3 0xffffffffffff }
         }
     ] [
         {
@@ -2081,21 +2081,24 @@ cell 8 = [
         } value-numbering-step
     ] unit-test
 
-    [
-        {
-            T{ ##peek f 0 D 0 }
-            T{ ##load-integer f 2 2147483647 }
-            T{ ##add-imm f 3 0 2147483647 }
-            T{ ##add-imm f 4 3 2147483647 }
-        }
-    ] [
-        {
-            T{ ##peek f 0 D 0 }
-            T{ ##load-integer f 2 2147483647 }
-            T{ ##add f 3 0 2 }
-            T{ ##add f 4 3 2 }
-        } value-numbering-step
-    ] unit-test
+    ! PPC ADDI can't hold immediates this big.
+    cpu ppc? [
+        [
+            {
+                T{ ##peek f 0 D 0 }
+                T{ ##load-integer f 2 2147483647 }
+                T{ ##add-imm f 3 0 2147483647 }
+                T{ ##add-imm f 4 3 2147483647 }
+            }
+        ] [
+            {
+                T{ ##peek f 0 D 0 }
+                T{ ##load-integer f 2 2147483647 }
+                T{ ##add f 3 0 2 }
+                T{ ##add f 4 3 2 }
+            } value-numbering-step
+        ] unit-test
+    ] unless
 ] when
 
 [
