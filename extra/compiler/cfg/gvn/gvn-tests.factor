@@ -28,9 +28,9 @@ IN: compiler.cfg.gvn.tests
 
 : value-number-bb ( insns -- insns' )
     0 test-bb
-    cfg new 0 get >>entry dup cfg set
-    value-numbering
-    entry>> instructions>> ;
+    cfg new 0 get >>entry
+    value-numbering drop
+    0 get instructions>> ;
 
 ! Folding constants together
 [
@@ -1252,7 +1252,7 @@ cpu x86? [
             T{ ##compare-integer-imm f 1 0 0 cc<= }
         } value-number-bb
     ] unit-test
-    
+
     [
         V{
             T{ ##peek f 0 D 0 }
@@ -2570,19 +2570,23 @@ cell 8 = [
 
 ! Branch folding
 : test-branch-folding ( insns -- insns' n )
-    <basic-block>
-    [ V{ 0 1 } clone >>successors basic-block set value-numbering-step ] keep
-    successors>> first ;
+    0 test-bb
+    V{ } 1 test-bb
+    V{ } 2 test-bb
+    0 { 1 2 } edges
+    cfg new 0 get >>entry
+    value-numbering drop
+    0 get [ instructions>> ] [ successors>> first number>> 1 - ] bi ;
 
 [
-    {
+    V{
         T{ ##load-integer f 1 1 }
         T{ ##load-integer f 2 2 }
         T{ ##branch }
     }
     1
 ] [
-    {
+    V{
         T{ ##load-integer f 1 1 }
         T{ ##load-integer f 2 2 }
         T{ ##compare-branch f 1 2 cc= }
@@ -2590,14 +2594,14 @@ cell 8 = [
 ] unit-test
 
 [
-    {
+    V{
         T{ ##load-integer f 1 1 }
         T{ ##load-integer f 2 2 }
         T{ ##branch }
     }
     0
 ] [
-    {
+    V{
         T{ ##load-integer f 1 1 }
         T{ ##load-integer f 2 2 }
         T{ ##compare-branch f 1 2 cc/= }
@@ -2605,14 +2609,14 @@ cell 8 = [
 ] unit-test
 
 [
-    {
+    V{
         T{ ##load-integer f 1 1 }
         T{ ##load-integer f 2 2 }
         T{ ##branch }
     }
     0
 ] [
-    {
+    V{
         T{ ##load-integer f 1 1 }
         T{ ##load-integer f 2 2 }
         T{ ##compare-integer-branch f 1 2 cc< }
@@ -2620,14 +2624,14 @@ cell 8 = [
 ] unit-test
 
 [
-    {
+    V{
         T{ ##load-integer f 1 1 }
         T{ ##load-integer f 2 2 }
         T{ ##branch }
     }
     1
 ] [
-    {
+    V{
         T{ ##load-integer f 1 1 }
         T{ ##load-integer f 2 2 }
         T{ ##compare-integer-branch f 2 1 cc< }
@@ -2635,92 +2639,92 @@ cell 8 = [
 ] unit-test
 
 [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##branch }
     }
     1
 ] [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##compare-integer-branch f 0 0 cc< }
     } test-branch-folding
 ] unit-test
 
 [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##branch }
     }
     0
 ] [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##compare-integer-branch f 0 0 cc<= }
     } test-branch-folding
 ] unit-test
 
 [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##branch }
     }
     1
 ] [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##compare-integer-branch f 0 0 cc> }
     } test-branch-folding
 ] unit-test
 
 [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##branch }
     }
     0
 ] [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##compare-integer-branch f 0 0 cc>= }
     } test-branch-folding
 ] unit-test
 
 [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##branch }
     }
     0
 ] [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##compare-integer-branch f 0 0 cc= }
     } test-branch-folding
 ] unit-test
 
 [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##branch }
     }
     1
 ] [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##compare-integer-branch f 0 0 cc/= }
     } test-branch-folding
 ] unit-test
 
 [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##load-reference f 1 t }
         T{ ##branch }
     }
     0
 ] [
-    {
+    V{
         T{ ##peek f 0 D 0 }
         T{ ##compare f 1 0 0 cc<= }
         T{ ##compare-imm-branch f 1 f cc/= }
