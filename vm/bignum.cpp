@@ -1837,7 +1837,7 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
         if (k == 0) {
             /* no progress; do a Euclidean step */
             if (size_b == 0) {
-                return a;
+                return bignum_trim (a);
             }
             e = bignum_trim (a);
             GC_BIGNUM(e);
@@ -1852,17 +1852,19 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
             // copy 'b' to 'a'
             scan_a = BIGNUM_START_PTR (a);
             scan_b = BIGNUM_START_PTR (b);
+            a_end = scan_a + size_a;
             b_end = scan_b + size_b;
             while (scan_b < b_end) *(scan_a++) = *(scan_b++);
+            while (scan_a < a_end) *(scan_a++) = 0;
             size_a = size_b;
 
             // copy 'c' to 'b'
             scan_b = BIGNUM_START_PTR (b);
             scan_c = BIGNUM_START_PTR (c);
             size_c = BIGNUM_LENGTH (c);
-            BIGNUM_ASSERT (size_c <= size_b);
             c_end = scan_c + size_c;
             while (scan_c < c_end) *(scan_b++) = *(scan_c++);
+            while (scan_b < b_end) *(scan_b++) = 0;
             size_b = size_c;
 
             continue;
