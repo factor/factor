@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors kernel io io.encodings.ascii io.servers ;
+USING: accessors kernel io io.encodings.utf8 io.servers ;
 
 IN: echo-server
 
@@ -9,7 +9,7 @@ IN: echo-server
     readln [ write "\r\n" write flush echo-loop ] when* ;
 
 : <echo-server> ( port -- server )
-    ascii <threaded-server>
+    utf8 <threaded-server>
         swap >>insecure
         "echo.server" >>name
         [ echo-loop ] >>handler ;
