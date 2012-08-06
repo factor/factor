@@ -100,3 +100,11 @@ IN: sequences.extras.tests
 { "" } [ "" "" "" unsurround ] unit-test
 { "" } [ "  " " " " " unsurround ] unit-test
 { "foo.com" } [ "http://foo.com" "http://" "/" unsurround ] unit-test
+
+{ t } [ { 1 3 5 7 } [ even? ] none? ] unit-test
+{ f } [ { 1 2 3 4 } [ even? ] none? ] unit-test
+{ t } [ { } [ even? ] none? ] unit-test
+
+{ f } [ { 1 2 3 4 } [ even? ] one? ] unit-test
+{ t } [ { 1 2 3 } [ even? ] one? ] unit-test
+{ f } [ { } [ even? ] one? ] unit-test
