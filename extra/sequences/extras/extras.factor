@@ -216,3 +216,11 @@ PRIVATE>
 
 : unsurround ( newseq seq2 seq3 -- seq1 )
    [ ?head drop ] [ ?tail drop ] bi* ;
+
+: none? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
+    any? not ; inline
+
+: one? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
+    [ find ] 2keep rot [
+        [ 1 + ] 2dip find-from drop not
+    ] [ 3drop f ] if ; inline
