@@ -6,9 +6,9 @@ IN: lint.tests
 
 [ { { lint1 { [ [ ] if ] } } } ] [ \ lint1 lint-word ] unit-test
 
-: lint2 ( a b -- b a b ) dup -rot ; ! tuck
+! : lint2 ( a b -- b a b ) dup -rot ; ! tuck
 
-[ { { lint2 { [ dup -rot ] } } } ] [ \ lint2 lint-word ] unit-test
+! [ { { lint2 { [ dup -rot ] } } } ] [ \ lint2 lint-word ] unit-test
 
 : lint3 ( seq -- seq ) [ 0 swap nth 1 + ] map ;
 
