@@ -68,7 +68,7 @@ PRIVATE>
 PRIVATE>
 
 : split ( seq separators -- pieces )
-    [ [ member? ] curry split, ] { } make ;
+    [ [ member? ] curry split, ] { } make ; inline
 
 : split-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
     [ split, ] { } make ; inline
@@ -86,7 +86,7 @@ PRIVATE>
 PRIVATE>
 
 : split* ( seq separators -- pieces )
-    [ [ member? ] curry split*, ] { } make ;
+    [ [ member? ] curry split*, ] { } make ; inline
 
 : split*-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
     [ split*, ] { } make ; inline
