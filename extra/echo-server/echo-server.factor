@@ -1,15 +1,15 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors kernel io io.encodings.utf8 io.servers ;
+USING: accessors kernel io io.encodings.binary io.servers ;
 
 IN: echo-server
 
 : echo-loop ( -- )
-    readln [ write "\r\n" write flush echo-loop ] when* ;
+    1024 read-partial [ write flush echo-loop ] when* ;
 
 : <echo-server> ( port -- server )
-    utf8 <threaded-server>
+    binary <threaded-server>
         swap >>insecure
         "echo.server" >>name
         [ echo-loop ] >>handler ;
