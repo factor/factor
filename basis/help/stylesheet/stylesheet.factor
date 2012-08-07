@@ -130,7 +130,9 @@ SYMBOL: bullet
     [
         font-size
         {
-            default-span-style title-style heading-style
-            subsection-style snippet-style code-char-style
+            default-span-style title-style
+            help-path-style heading-style
+            subsection-style snippet-style
+            code-char-style
         }
     ] dip '[ get-global [ _ + ] change-at ] with each ;
