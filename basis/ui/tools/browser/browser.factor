@@ -175,7 +175,9 @@ browser-gadget "scrolling"
     -2 adjust-help-font-size model>> notify-connections ;
 
 browser-gadget "fonts" f {
+    { T{ key-down f { A+ } "+" } com-font-size-plus }
     { T{ key-down f { A+ } "=" } com-font-size-plus }
+    { T{ key-down f { A+ } "_" } com-font-size-minus }
     { T{ key-down f { A+ } "-" } com-font-size-minus }
 } define-command-map
 
