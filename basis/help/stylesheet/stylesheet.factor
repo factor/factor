@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: colors colors.constants io.styles namespaces ;
+USING: assocs colors colors.constants fry io.styles kernel
+math namespaces sequences ;
 IN: help.stylesheet
 
 SYMBOL: default-span-style
@@ -124,3 +125,12 @@ H{ { table-gap { 10 2 } } } list-style set-global
 
 SYMBOL: bullet
 "• " bullet set-global
+
+: adjust-help-font-size ( delta -- )
+    [
+        font-size
+        {
+            default-span-style title-style heading-style
+            subsection-style snippet-style code-char-style
+        }
+    ] dip '[ get-global [ _ + ] change-at ] with each ;
