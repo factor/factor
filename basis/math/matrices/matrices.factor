@@ -165,3 +165,6 @@ IN: math.matrices
 
 : kron ( m1 m2 -- m )
     '[ [ _ n*m  ] map ] map stitch stitch ;
+
+: outer ( u v -- m )
+    [ n*v ] curry map ;
