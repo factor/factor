@@ -233,3 +233,6 @@ PRIVATE>
 
 : 2map! ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... seq1 )
     pick [ 2map-into ] keep ; inline
+
+: 2map-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... newelt ) -- ... newseq )
+    pick [ (2each-index) ] dip map-integers ; inline
