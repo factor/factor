@@ -6,6 +6,7 @@ IN: math.transforms.fft
 
 <PRIVATE
 
+! Discrete Fourier Transform
 :: (slow-fft) ( seq inverse? -- seq' )
     seq length :> N
     inverse? 1 -1 ? 2pi * i* N / :> O
@@ -14,6 +15,7 @@ IN: math.transforms.fft
         inverse? [ N / ] when
     ] map ; inline
 
+! Cooley–Tukey Algorithm
 :: (fft) ( seq inverse? -- seq' )
     seq length :> N
     N 1 = [ seq ] [
