@@ -18,14 +18,12 @@ IN: math.transforms.fft
     seq length :> N
     N 1 = [ seq ] [
         inverse? 1 -1 ? 2pi * i* N / :> O
-        N 0 <array> :> X
         N 2/ :> M
         seq even-indices inverse? (fft)
         seq odd-indices inverse? (fft)
-        [ [ [ O * e^ * + inverse? [ 2 / ] when ] [ X set-nth-unsafe ] bi ] 2each-index ]
-        [ [ [ O * e^ * - inverse? [ 2 / ] when ] [ M + X set-nth-unsafe ] bi ] 2each-index ]
-        2bi
-        X
+        [ [ O * e^ * + inverse? [ 2 / ] when ] 2map-index ]
+        [ [ O * e^ * - inverse? [ 2 / ] when ] 2map-index ]
+        2bi append
     ] if ; inline recursive
 
 PRIVATE>
