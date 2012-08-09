@@ -2236,6 +2236,7 @@ cell 8 = [
 
 [
     V{
+        T{ ##peek f 1 D 0 }
         T{ ##box-alien f 0 1 }
         T{ ##load-integer f 2 16 }
         T{ ##box-displaced-alien f 3 2 0 c-ptr }
@@ -2244,6 +2245,7 @@ cell 8 = [
     }
 ] [
     V{
+        T{ ##peek f 1 D 0 }
         T{ ##box-alien f 0 1 }
         T{ ##load-integer f 2 16 }
         T{ ##box-displaced-alien f 3 2 0 c-ptr }
@@ -2272,11 +2274,13 @@ cell 8 = [
 ! Various SIMD simplifications
 [
     V{
+        T{ ##peek f 0 D 0 }
         T{ ##vector>scalar f 1 0 float-4-rep }
         T{ ##copy f 2 0 any-rep }
     }
 ] [
     V{
+        T{ ##peek f 0 D 0 }
         T{ ##vector>scalar f 1 0 float-4-rep }
         T{ ##scalar>vector f 2 1 float-4-rep }
     } value-number-bb
@@ -2294,11 +2298,13 @@ cell 8 = [
 
 [
     V{
+        T{ ##peek f 0 D 0 }
         T{ ##shuffle-vector-imm f 1 0 { 1 2 3 0 } float-4-rep }
         T{ ##shuffle-vector-imm f 2 0 { 0 2 3 1 } float-4-rep }
     }
 ] [
     V{
+        T{ ##peek f 0 D 0 }
         T{ ##shuffle-vector-imm f 1 0 { 1 2 3 0 } float-4-rep }
         T{ ##shuffle-vector-imm f 2 1 { 3 1 2 0 } float-4-rep }
     } value-number-bb
@@ -2452,12 +2458,16 @@ cell 8 = [
 
 [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##fill-vector f 3 float-4-rep }
         T{ ##xor-vector  f 4 0 3 float-4-rep }
         T{ ##andn-vector f 5 0 1 float-4-rep }
     }
 ] [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##fill-vector f 3 float-4-rep }
         T{ ##xor-vector  f 4 0 3 float-4-rep }
         T{ ##and-vector  f 5 4 1 float-4-rep }
@@ -2466,11 +2476,15 @@ cell 8 = [
 
 [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##not-vector  f 4 0 float-4-rep }
         T{ ##andn-vector f 5 0 1 float-4-rep }
     }
 ] [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##not-vector  f 4 0 float-4-rep }
         T{ ##and-vector  f 5 4 1 float-4-rep }
     } value-number-bb
@@ -2480,12 +2494,16 @@ cell 8 = [
 
 [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##fill-vector f 3 float-4-rep }
         T{ ##xor-vector  f 4 0 3 float-4-rep }
         T{ ##andn-vector f 5 0 1 float-4-rep }
     }
 ] [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##fill-vector f 3 float-4-rep }
         T{ ##xor-vector  f 4 0 3 float-4-rep }
         T{ ##and-vector  f 5 1 4 float-4-rep }
@@ -2494,11 +2512,15 @@ cell 8 = [
 
 [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##not-vector  f 4 0 float-4-rep }
         T{ ##andn-vector f 5 0 1 float-4-rep }
     }
 ] [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##not-vector  f 4 0 float-4-rep }
         T{ ##and-vector  f 5 1 4 float-4-rep }
     } value-number-bb
@@ -2508,12 +2530,16 @@ cell 8 = [
 
 [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##fill-vector f 3 float-4-rep }
         T{ ##xor-vector  f 4 0 3 float-4-rep }
         T{ ##and-vector  f 5 0 1 float-4-rep }
     }
 ] [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##fill-vector f 3 float-4-rep }
         T{ ##xor-vector  f 4 0 3 float-4-rep }
         T{ ##andn-vector f 5 4 1 float-4-rep }
@@ -2522,11 +2548,15 @@ cell 8 = [
 
 [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##not-vector  f 4 0 float-4-rep }
         T{ ##and-vector  f 5 0 1 float-4-rep }
     }
 ] [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
         T{ ##not-vector  f 4 0 float-4-rep }
         T{ ##andn-vector f 5 4 1 float-4-rep }
     } value-number-bb
@@ -2536,6 +2566,9 @@ cell 8 = [
 
 [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
         T{ ##fill-vector f 3 float-4-rep }
         T{ ##xor-vector  f 4 0 3 float-4-rep }
         T{ ##andn-vector f 5 0 1 float-4-rep }
@@ -2544,6 +2577,9 @@ cell 8 = [
     }
 ] [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
         T{ ##fill-vector f 3 float-4-rep }
         T{ ##xor-vector  f 4 0 3 float-4-rep }
         T{ ##and-vector  f 5 4 1 float-4-rep }
@@ -2554,6 +2590,9 @@ cell 8 = [
 
 [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
         T{ ##not-vector  f 4 0   float-4-rep }
         T{ ##andn-vector f 5 0 1 float-4-rep }
         T{ ##and-vector  f 6 0 2 float-4-rep }
@@ -2561,6 +2600,9 @@ cell 8 = [
     }
 ] [
     V{
+        T{ ##peek f 0 D 0 }
+        T{ ##peek f 1 D 1 }
+        T{ ##peek f 2 D 2 }
         T{ ##not-vector  f 4 0   float-4-rep }
         T{ ##and-vector  f 5 4 1 float-4-rep }
         T{ ##andn-vector f 6 4 2 float-4-rep }
