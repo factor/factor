@@ -230,3 +230,6 @@ PRIVATE>
 
 : 2map-into ( seq1 seq2 quot into -- )
     [ (2each) ] dip collect ; inline
+
+: 2map! ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... seq1 )
+    pick [ 2map-into ] keep ; inline
