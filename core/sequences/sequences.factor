@@ -402,9 +402,6 @@ PRIVATE>
 : (2each) ( seq1 seq2 quot -- n quot' )
     [ ((2each)) ] dip compose ; inline
 
-: (2each-index) ( seq1 seq2 quot -- n quot' )
-    [ ((2each)) [ keep ] curry ] dip compose ; inline
-
 : 3nth-unsafe ( n seq1 seq2 seq3 -- elt1 elt2 elt3 )
     [ nth-unsafe ] tri-curry@ tri ; inline
 
@@ -475,9 +472,6 @@ PRIVATE>
 
 : 2each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     (2each) each-integer ; inline
-
-: 2each-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... ) -- ... )
-    (2each-index) each-integer ; inline
 
 : 2reduce ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
     [ -rot ] dip 2each ; inline
