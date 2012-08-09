@@ -24,3 +24,8 @@ IN: math.transforms.fft
     { C{ 1+2/3 0 } C{ -1/3 0 } C{ -1/3 0 } }
     { 1 2 2 } ifft 1e-12 v~
 ] unit-test
+
+{ t } [
+    { C{ 0.05 0.0 } C{ 0.05 0.0 } C{ 0.05 0.0 } C{ 0.05 0.0 } }
+    { 0.1 0.1 0.1 0.1 } { 0.2 0.1 0.1 0.1 } correlate 1e-12 v~
+] unit-test

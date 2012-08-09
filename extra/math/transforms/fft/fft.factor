@@ -41,3 +41,6 @@ ERROR: not-enough-data ;
     [ not-enough-data ] [
         t over length even? [ (fft) ] [ (slow-fft) ] if
     ] if-empty ;
+
+: correlate ( x y -- z )
+    [ fft ] [ reverse fft ] bi* v* ifft ;
