@@ -228,6 +228,16 @@ PRIVATE>
 : map-index! ( ... seq quot: ( ... elt index -- ... newelt ) -- ... seq )
     over [ [ (each-index) ] dip collect ] keep ; inline
 
+<PRIVATE
+
+: (2each-index) ( seq1 seq2 quot -- n quot' )
+    [ ((2each)) [ keep ] curry ] dip compose ; inline
+
+PRIVATE>
+
+: 2each-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... ) -- ... )
+    (2each-index) each-integer ; inline
+
 : 2map-into ( seq1 seq2 quot into -- )
     [ (2each) ] dip collect ; inline
 
