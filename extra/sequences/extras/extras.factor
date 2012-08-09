@@ -224,3 +224,6 @@ PRIVATE>
     [ find ] 2keep rot [
         [ 1 + ] 2dip find-from drop not
     ] [ 3drop f ] if ; inline
+
+: map-index! ( ... seq quot: ( ... elt index -- ... newelt ) -- ... seq )
+    over [ [ (each-index) ] dip collect ] keep ; inline
