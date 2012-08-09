@@ -3151,3 +3151,44 @@ cpu x86? [
         } dup value-number-bb assert=
     ] unit-test
 ] when
+
+! FIXME rewrite redundancy elimination to search for available
+! registers that compute the same value number, instead of just
+! relying on the availability of the canonical leader
+
+V{ T{ ##branch } } 0 test-bb
+
+V{
+    T{ ##inc-d { n -1 } }
+    T{ ##peek { dst 1 } { loc D -1 } }
+    T{ ##compare-imm-branch { src1 1 } { src2 f } { cc cc/= } }
+} 1 test-bb
+
+V{
+    T{ ##inc-d { n 1 } }
+    T{ ##load-integer { dst 2 } { val 100 } }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##inc-d { n 1 } }
+    T{ ##load-integer { dst 3 } { val 200 } }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##load-integer { dst 4 } { val 100 } }
+    T{ ##load-integer { dst 5 } { val 100 } }
+    T{ ##load-integer { dst 6 } { val 100 } }
+} 4 test-bb
+
+test-diamond
+
+[ ] [
+    cfg new 0 get >>entry
+    value-numbering drop
+] unit-test
+
+! Not fixed yet; and would need to change if value-numbering
+! subsumed copy-prop.
+! [ t ] [ 4 get instructions>> [ ##copy? ] any? ] unit-test
