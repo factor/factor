@@ -1,6 +1,6 @@
-USING: arrays grouping kernel locals math math.order math.ranges
-sequences sequences.private splitting ;
-
+USING: accessors arrays grouping kernel locals math math.order
+math.ranges sequences sequences.private splitting ;
+FROM: sequences => change-nth ;
 IN: sequences.extras
 
 : reduce1 ( seq quot -- result ) [ unclip ] dip reduce ; inline
@@ -236,3 +236,25 @@ PRIVATE>
 
 : 2map-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... newelt ) -- ... newseq )
     pick [ (2each-index) ] dip map-integers ; inline
+
+TUPLE: evens seq length ;
+
+: <evens> ( seq -- evens )
+    dup length 1 + 2/ evens boa ; inline
+
+M: evens length length>> ; inline
+
+M: evens nth-unsafe [ 2 * ] [ seq>> nth-unsafe ] bi* ; inline
+
+INSTANCE: evens immutable-sequence
+
+TUPLE: odds seq length ;
+
+: <odds> ( seq -- odds )
+    dup length 2/ odds boa ; inline
+
+M: odds length length>> ; inline
+
+M: odds nth-unsafe [ 2 * 1 + ] [ seq>> nth-unsafe ] bi* ; inline
+
+INSTANCE: odds immutable-sequence
