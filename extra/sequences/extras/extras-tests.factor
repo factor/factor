@@ -110,3 +110,11 @@ IN: sequences.extras.tests
 { f } [ { } [ even? ] one? ] unit-test
 
 { { { 5 8 0 } { 6 9 1 } { 7 10 2 } } } [ { 5 6 7 } { 8 9 10 } [ 3array ] 2map-index ] unit-test
+
+{ { } } [ { } <evens> >array ] unit-test
+{ { 0 2 } } [ 4 iota <evens> >array ] unit-test
+{ { 0 2 4 } } [ 5 iota <evens> >array ] unit-test
+
+{ { } } [ { } <odds> >array ] unit-test
+{ { 1 3 } } [ 5 iota <odds> >array ] unit-test
+{ { 1 3 5 } } [ 6 iota <odds> >array ] unit-test
