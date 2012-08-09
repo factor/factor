@@ -276,3 +276,9 @@ IN: math.matrices.tests
     { { 1 1 } { 1 -1 } }
     { { 1 2 3 4 5 } { 6 7 8 9 10 } } swap kron
 ] unit-test
+
+{
+    { { 5 10 15 }
+      { 6 12 18 }
+      { 7 14 21 } }
+} [ { 5 6 7 } { 1 2 3 } outer ] unit-test
