@@ -2806,7 +2806,7 @@ test-diamond
 
 [ t ] [ 1 get successors>> first 3 get eq? ] unit-test
 
-[ 1 ] [ 3 get instructions>> first inputs>> assoc-size ] unit-test
+[ t ] [ 3 get instructions>> first ##copy? ] unit-test
 
 V{ T{ ##prologue } T{ ##branch } } 0 test-bb
 
