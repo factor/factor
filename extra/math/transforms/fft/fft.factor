@@ -9,9 +9,9 @@ IN: math.transforms.fft
 ! Discrete Fourier Transform
 :: (slow-fft) ( seq inverse? -- seq' )
     seq length :> N
-    inverse? 1 -1 ? 2pi * i* N / :> O
+    inverse? 1 -1 ? 2pi * i* N / N iota n*v :> omega
     N iota [| k |
-        0 seq [ O k * * e^ * + ] each-index
+        0 seq omega [ k * e^ * + ] 2each
         inverse? [ N / ] when
     ] map ; inline
 
@@ -19,12 +19,12 @@ IN: math.transforms.fft
 :: (fft) ( seq inverse? -- seq' )
     seq length :> N
     N 1 = [ seq ] [
-        inverse? 1 -1 ? 2pi * i* N / :> O
-        N 2/ :> M
         seq even-indices inverse? (fft)
         seq odd-indices inverse? (fft)
-        [ [ O * e^ * + inverse? [ 2 / ] when ] 2map-index ]
-        [ [ O * e^ * - inverse? [ 2 / ] when ] 2map-index ]
+        inverse? 1 -1 ? 2pi * i* N /
+        [ * e^ * ] curry map-index!
+        [ [ + inverse? [ 2 / ] when ] 2map ]
+        [ [ - inverse? [ 2 / ] when ] 2map ]
         2bi append
     ] if ; inline recursive
 
