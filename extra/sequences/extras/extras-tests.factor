@@ -108,3 +108,5 @@ IN: sequences.extras.tests
 { f } [ { 1 2 3 4 } [ even? ] one? ] unit-test
 { t } [ { 1 2 3 } [ even? ] one? ] unit-test
 { f } [ { } [ even? ] one? ] unit-test
+
+{ { { 5 8 0 } { 6 9 1 } { 7 10 2 } } } [ { 5 6 7 } { 8 9 10 } [ 3array ] 2map-index ] unit-test
