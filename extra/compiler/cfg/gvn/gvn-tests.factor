@@ -3152,9 +3152,9 @@ cpu x86? [
     ] unit-test
 ] when
 
-! FIXME rewrite redundancy elimination to search for available
-! registers that compute the same value number, instead of just
-! relying on the availability of the canonical leader
+! Make sure to search for available registers that compute the
+! same value number, instead of just relying on the
+! availability of the canonical leader.
 
 V{ T{ ##branch } } 0 test-bb
 
@@ -3189,13 +3189,11 @@ test-diamond
     value-numbering drop
 ] unit-test
 
-! ##load-integer cannot be turned into a ##copy because the
-! canonical leader for the value 100 is unavailable.
+! First ##load-integer cannot be turned into a ##copy because
+! the canonical leader for the value 100 is unavailable, but
+! the rest should still be redundant.
 [ t ] [ 4 get instructions>> first ##load-integer? ] unit-test
-
-! Not fixed yet; and would need to change if value-numbering
-! subsumed copy-prop.
-! [ t ] [ 4 get instructions>> rest [ ##copy? ] all? ] unit-test
+[ 1 ] [ 4 get instructions>> [ ##load-integer? ] count ] unit-test
 
 ! Global optimization
 V{ T{ ##prologue } T{ ##branch } } 0 test-bb
