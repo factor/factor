@@ -89,7 +89,9 @@ require-when-table [ V{ } clone ] initialize
     dup check-vocab-hook get call( vocab -- )
     [
         +parsing+ >>source-loaded?
-        dup vocab-source-path [ parse-file ] [ [ ] ] if*
+        dup vocab-name ".private" tail? [ [ ] ] [
+            dup vocab-source-path [ parse-file ] [ [ ] ] if*
+        ] if
         [ +parsing+ >>source-loaded? ] dip
         [ % ] [ call( -- ) ] if-bootstrapping
         +done+ >>source-loaded?
@@ -100,7 +102,11 @@ require-when-table [ V{ } clone ] initialize
     load-help? get [
         [
             +parsing+ >>docs-loaded?
-            [ vocab-docs-path [ ?run-file ] when* ] keep
+            [
+                dup vocab-name ".private" tail? [ drop ] [
+                    vocab-docs-path [ ?run-file ] when*
+                ] if
+            ] keep
             +done+ >>docs-loaded?
         ] [ ] [ f >>docs-loaded? ] cleanup
     ] when drop ;
