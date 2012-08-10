@@ -16,9 +16,6 @@ license.
 
 ## Getting Started
 
-* [Learning Factor](http://concatenative.org/wiki/view/Factor/Learning)
-* [System requirements](http://concatenative.org/wiki/view/Factor/Requirements)
-
 ### Building Factor from source
 
 If you have a build environment set up, then you can build Factor from git.
@@ -27,17 +24,18 @@ a boot image stored on factorcode.org.
 
 To check out Factor:
 
-* git clone git://factorcode.org/git/factor.git
-* cd factor
+* `git clone git://factorcode.org/git/factor.git`
+* `cd factor`
 
 To build the latest complete Factor system from git:
 
-* Windows: build-support\factor.cmd
-* Unix: ./build-support/factor.sh update
+* Windows: `build-support\factor.cmd`
+* Unix: `./build-support/factor.sh update`
 
 Now you should have a complete Factor system ready to run.
 
-[More information on building factor](http://concatenative.org/wiki/view/Factor/Building%20Factor)
+More information on [building factor](http://concatenative.org/wiki/view/Factor/Building%20Factor)
+and [system requirements](http://concatenative.org/wiki/view/Factor/Requirements).
 
 ### To run a Factor binary:
 
@@ -70,6 +68,8 @@ Some other simple things you can try in the listener:
     2 = "dear NAME" "to You" ? print
 ] each
 ```
+
+For more tips, see [Learning Factor](http://concatenative.org/wiki/view/Factor/Learning).
 
 ## Documentation
 
