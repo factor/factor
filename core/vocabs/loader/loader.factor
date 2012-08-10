@@ -45,7 +45,7 @@ PRIVATE>
     vocab-name* H{ { CHAR: . CHAR: / } } substitute ;
 
 : append-vocab-dir ( vocab str/f -- path )
-    [ vocab-name "." split ] dip
+    [ vocab-name* "." split ] dip
     [ [ dup last ] dip append suffix ] when*
     "/" join ;
 
@@ -57,10 +57,10 @@ PRIVATE>
     swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
 
 : vocab-source-path ( vocab -- path/f )
-    vocab-name* dup ".factor" append-vocab-dir vocab-append-path ;
+    dup ".factor" append-vocab-dir vocab-append-path ;
 
 : vocab-docs-path ( vocab -- path/f )
-    vocab-name* dup "-docs.factor" append-vocab-dir vocab-append-path ;
+    dup "-docs.factor" append-vocab-dir vocab-append-path ;
 
 SYMBOL: load-help?
 
