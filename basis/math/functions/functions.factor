@@ -8,7 +8,7 @@ IN: math.functions
     [ numerator ] [ denominator ] bi ; inline
 
 : rect> ( x y -- z )
-    dup 0 = [ drop ] [ complex boa ] if ; inline
+    [ complex boa ] unless-zero ; inline
 
 GENERIC: sqrt ( x -- y ) foldable
 
