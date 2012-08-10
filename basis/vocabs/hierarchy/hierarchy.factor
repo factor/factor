@@ -38,7 +38,12 @@ ERROR: vocab-root-required root ;
 
 : (child-vocabs) ( root prefix -- vocabs )
     check-vocab-name
-    [ vocab-dir append-path dup exists? [ vocab-subdirs ] [ drop { } ] if ]
+    [
+        dup ".private" tail? [ 2drop { } ] [
+            vocab-dir append-path dup exists?
+            [ vocab-subdirs ] [ drop { } ] if
+        ] if
+    ]
     [ nip [ "." append '[ _ prepend ] map! ] unless-empty ]
     [ drop '[ _ over vocab-dir? [ >vocab-link ] [ <vocab-prefix> ] if ] map! ]
     2tri ;
