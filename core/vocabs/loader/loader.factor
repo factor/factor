@@ -102,11 +102,9 @@ require-when-table [ V{ } clone ] initialize
     load-help? get [
         [
             +parsing+ >>docs-loaded?
-            [
-                dup vocab-name ".private" tail? [ drop ] [
-                    vocab-docs-path [ ?run-file ] when*
-                ] if
-            ] keep
+            dup vocab-name ".private" tail? [
+                dup vocab-docs-path [ ?run-file ] when*
+            ] unless
             +done+ >>docs-loaded?
         ] [ ] [ f >>docs-loaded? ] cleanup
     ] when drop ;
