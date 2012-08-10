@@ -76,3 +76,6 @@ IN: math.complex.tests
 10 number-base [
     [ "C{ 1/2 2/3 }" ] [ C{ 1/2 2/3 } unparse ] unit-test
 ] with-variable
+
+[ "C{ 1 2 3 }" eval( -- obj ) ]
+[ error>> T{ malformed-complex f V{ 1 2 3 } } = ] must-fail-with
