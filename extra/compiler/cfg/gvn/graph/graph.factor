@@ -15,6 +15,10 @@ SYMBOL: exprs>vns
 ! assoc mapping value numbers to instructions
 SYMBOL: vns>insns
 
+! assoc mapping each value number to a sequence of vregs
+! sharing that value number (i.e., the congruence class)
+SYMBOL: vns>vregs
+
 ! boolean to track whether vregs>vns changes
 SYMBOL: changed?
 
@@ -31,9 +35,17 @@ SYMBOL: final-iteration?
 
 : vreg>insn ( vreg -- insn ) vreg>vn vn>insn ;
 
+: congruence-class ( vreg -- vregs )
+    vreg>vn vns>vregs get at ;
+
 : clear-exprs ( -- )
     exprs>vns get clear-assoc
     vns>insns get clear-assoc ;
+
+: compute-congruence-classes ( -- )
+    vregs>vns get H{ } clone [
+        [ push-at ] curry assoc-each
+    ] keep vns>vregs set ;
 
 : init-value-graph ( -- )
     0 input-expr-counter set

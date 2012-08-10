@@ -23,7 +23,7 @@ IN: compiler.cfg.gvn
 
 GENERIC: simplify ( insn -- insn' )
 
-M: insn simplify dup rewrite [ simplify ] [ ] ?if ;
+M: insn simplify dup rewrite [ simplify ] [ dup >avail-insn-uses ] ?if ;
 M: array simplify [ simplify ] map ;
 M: ##copy simplify ;
 
@@ -96,7 +96,7 @@ M: ##copy gcse defs-available ;
     ] [ drop defs-available ] if ;
 
 : eliminate-redundancy ( insn -- insn' )
-    dup >expr exprs>vns get at
+    dup >expr exprs>vns get at >avail-vreg
     [ ?eliminate ] [ defs-available ] if* ;
 
 M: ##phi gcse
@@ -113,6 +113,7 @@ M: insn gcse
 
 : eliminate-common-subexpressions ( cfg -- )
     final-iteration? on
+    compute-congruence-classes
     dup compute-avail-sets
     [ gcse-step ] simple-optimization ;
 
