@@ -1721,33 +1721,29 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
     bignum_digit_type * scan_a, * scan_b, * scan_d, * a_end, * b_end;
 
     if (BIGNUM_NEGATIVE_P (a)) {
-        scan_a = BIGNUM_START_PTR (a);
         size_a = BIGNUM_LENGTH (a);
-        a_end = scan_a + size_a;
         d = allot_bignum (size_a, 0);
-        GC_BIGNUM(d);
         scan_d = BIGNUM_START_PTR (d);
+        scan_a = BIGNUM_START_PTR (a);
+        a_end = scan_a + size_a;
         while (scan_a < a_end)
             (*scan_d++) = (*scan_a++);
         a = d;
     }
 
     if (BIGNUM_NEGATIVE_P (b)) {
-        scan_b = BIGNUM_START_PTR (b);
         size_b = BIGNUM_LENGTH (b);
-        b_end = scan_b + size_b;
         d = allot_bignum (size_b, 0);
-        GC_BIGNUM(d);
         scan_d = BIGNUM_START_PTR (d);
+        scan_b = BIGNUM_START_PTR (b);
+        b_end = scan_b + size_b;
         while (scan_b < b_end)
             (*scan_d++) = (*scan_b++);
         b = d;
     }
 
     if (bignum_compare(a, b) == bignum_comparison_less) {
-        d = a;
-        a = b;
-        b = d;
+        std::swap(a, b);
     }
 
     while (BIGNUM_LENGTH (b) != 0) {
@@ -1776,19 +1772,19 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
     bignum_digit_type *a_end, *b_end, *c_end;
 
     /* clone the bignums so we can modify them in-place */
-    scan_a = BIGNUM_START_PTR (a);
     size_a = BIGNUM_LENGTH (a);
-    a_end = scan_a + size_a;
     c = allot_bignum (size_a, 0);
+    scan_a = BIGNUM_START_PTR (a);
+    a_end = scan_a + size_a;
     GC_BIGNUM(c);
     scan_c = BIGNUM_START_PTR (c);
     while (scan_a < a_end)
         (*scan_c++) = (*scan_a++);
     a = c;
-    scan_b = BIGNUM_START_PTR (b);
     size_b = BIGNUM_LENGTH (b);
-    b_end = scan_b + size_b;
     d = allot_bignum (size_b, 0);
+    scan_b = BIGNUM_START_PTR (b);
+    b_end = scan_b + size_b;
     GC_BIGNUM(d);
     scan_d = BIGNUM_START_PTR (d);
     while (scan_b < b_end)
@@ -1797,12 +1793,8 @@ bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 
     /* Initial reduction: make sure that 0 <= b <= a. */
     if (bignum_compare(a, b) == bignum_comparison_less) {
-        c = a;
-        size_c = size_a;
-        a = b;
-        size_a = size_b;
-        b = c;
-        size_b = size_c;
+        std::swap(a, b);
+        std::swap(size_a, size_b);
     }
 
     while (size_a > 1) {
