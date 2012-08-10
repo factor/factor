@@ -41,6 +41,9 @@ M: vocab-link vocab-name name>> ;
 
 M: object vocab-name check-vocab-name ;
 
+: vocab-name* ( vocab-spec -- name )
+    vocab-name ".private" ?tail drop ;
+
 GENERIC: lookup-vocab ( vocab-spec -- vocab )
 
 M: vocab lookup-vocab ;
