@@ -3189,6 +3189,73 @@ test-diamond
     value-numbering drop
 ] unit-test
 
+! ##load-integer cannot be turned into a ##copy because the
+! canonical leader for the value 100 is unavailable.
+[ t ] [ 4 get instructions>> first ##load-integer? ] unit-test
+
 ! Not fixed yet; and would need to change if value-numbering
 ! subsumed copy-prop.
-! [ t ] [ 4 get instructions>> [ ##copy? ] any? ] unit-test
+! [ t ] [ 4 get instructions>> rest [ ##copy? ] all? ] unit-test
+
+! Global optimization
+V{ T{ ##prologue } T{ ##branch } } 0 test-bb
+
+V{
+    T{ ##inc-d f 3 }
+    T{ ##load-integer f 21 0 }
+    T{ ##load-integer f 22 100 }
+    T{ ##load-integer f 23 0 }
+    T{ ##copy f 24 22 any-rep }
+    T{ ##copy f 25 21 any-rep }
+    T{ ##copy f 26 24 any-rep }
+    T{ ##copy f 27 23 any-rep }
+    T{ ##branch }
+} 1 test-bb
+
+! Need to define bb 3 before the ##phi in bb 2 can be resolved
+V{
+    T{ ##load-integer f 35 1 }
+    T{ ##add f 36 29 35 }
+    T{ ##load-integer f 37 1 }
+    T{ ##add f 38 30 37 }
+    T{ ##copy f 39 30 any-rep }
+    T{ ##copy f 40 26 any-rep }
+    T{ ##copy f 41 36 any-rep }
+    T{ ##copy f 42 38 any-rep }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##phi f 29 H{ { 1 25 } { 3 41 } } }
+    T{ ##phi f 30 H{ { 1 27 } { 3 42 } } }
+    T{ ##compare-integer f 31 30 26 cc< 9 }
+    T{ ##copy f 32 31 any-rep }
+    T{ ##copy f 33 26 any-rep }
+    T{ ##copy f 34 31 any-rep }
+    T{ ##compare-imm-branch f 32 f cc/= }
+} 2 test-bb
+
+V{
+    T{ ##inc-d f -2 }
+    T{ ##replace f 29 D 0 }
+    T{ ##branch }
+} 4 test-bb
+
+V{ T{ ##epilogue } T{ ##return } } 5 test-bb
+
+0 1 edge
+1 2 edge
+2 { 3 4 } edges
+3 2 edge
+4 5 edge
+
+[ ] [
+    cfg new 0 get >>entry
+    value-numbering eliminate-dead-code drop
+] unit-test
+
+[ 1 ] [ 1 get instructions>> [ ##load-integer? ] count ] unit-test
+[ 1 ] [ 2 get instructions>> [ ##phi? ] count ] unit-test
+[ t ] [ 2 get instructions>> last ##compare-integer-imm-branch? ] unit-test
+[ f ] [ 3 get instructions>> [ ##load-integer? ] any? ] unit-test
+[ 1 ] [ 3 get instructions>> [ ##add-imm? ] count ] unit-test
