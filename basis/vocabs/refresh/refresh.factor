@@ -54,7 +54,7 @@ SYMBOL: modified-docs
         V{ } clone modified-sources set
         V{ } clone modified-docs set
 
-        child-vocabs [
+        child-vocabs [ ".private" tail? not ] filter [
             [
                 [
                     [ modified-sources ]
