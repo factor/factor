@@ -1,11 +1,12 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg compiler.cfg.graphviz
-compiler.cfg.gvn compiler.cfg.gvn.expressions
-compiler.cfg.gvn.graph compiler.cfg.optimizer continuations
-formatting graphviz graphviz.notation graphviz.render
-io.directories kernel math.parser namespaces prettyprint
-sequences sorting splitting tools.annotations ;
+USING: accessors assocs compiler.cfg compiler.cfg.debugger
+compiler.cfg.graphviz compiler.cfg.gvn
+compiler.cfg.gvn.expressions compiler.cfg.gvn.graph
+compiler.cfg.optimizer continuations formatting graphviz
+graphviz.notation graphviz.render io.directories kernel
+math.parser namespaces prettyprint sequences sorting splitting
+tools.annotations ;
 IN: compiler.cfg.gvn.testing
 
 GENERIC: expr>str ( expr -- str )
@@ -94,3 +95,13 @@ SYMBOL: iteration
 
 : watch-gvn ( path quot -- )
     annotate-gvn [ test-gvn ] [ reset-gvn ] [ ] cleanup ;
+
+: watch-gvn-cfg ( path cfg -- )
+    annotate-gvn [
+        { value-numbering } passes [
+            0 iteration [ watch-cfg ] with-variable
+        ] with-variable
+    ] [ reset-gvn ] [ ] cleanup ;
+
+: watch-gvn-bb ( path insns -- )
+    0 test-bb cfg new 0 get >>entry watch-gvn-cfg ;
