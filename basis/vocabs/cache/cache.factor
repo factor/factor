@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel namespaces memoize init sequences vocabs
+USING: assocs fry kernel namespaces memoize init sequences vocabs
 vocabs.hierarchy vocabs.loader vocabs.metadata vocabs.refresh
 words ;
 IN: vocabs.cache
@@ -9,8 +9,8 @@ IN: vocabs.cache
     vocab-name
     [ root-cache get-global delete-at ]
     [
-        \ vocab-file-contents "memoize" word-prop
-        [ drop [ first vocab-name ] [ = not ] bi* ] with assoc-filter! drop
+        \ vocab-file-contents "memoize" word-prop swap
+        '[ drop first vocab-name _ = not ] assoc-filter! drop
     ] bi
     \ all-vocabs-recursive reset-memoized
     \ all-authors reset-memoized
