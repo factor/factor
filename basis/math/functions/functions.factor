@@ -8,6 +8,7 @@ IN: math.functions
     [ numerator ] [ denominator ] bi ; inline
 
 : rect> ( x y -- z )
+    ! Note: an imaginary 0.0 should still create a complex
     dup 0 = [ drop ] [ complex boa ] if ; inline
 
 GENERIC: sqrt ( x -- y ) foldable
