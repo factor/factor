@@ -50,8 +50,11 @@ PRIVATE>
     "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
-    vocab-name root-cache get
-    [ ".factor" append-vocab-dir find-root-for ] cache ;
+    vocab-name root-cache get [
+        dup ".private" tail? [ drop f ] [
+            ".factor" append-vocab-dir find-root-for
+        ] if
+    ] cache ;
 
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
