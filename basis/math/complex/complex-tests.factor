@@ -16,6 +16,8 @@ IN: math.complex.tests
 [ f ] [ C{ 1.0 2.3 } C{ 1 2 } number= ] unit-test
 
 [ C{ 2 5 } ] [ 2 5  rect> ] unit-test
+{ 2 } [ 2 0  rect> ] unit-test
+{ C{ 2 0.0 } } [ 2 0.0  rect> ] unit-test
 [ 2 5 ] [ C{ 2 5 }  >rect ] unit-test
 [ C{ 1/2 1 } ] [ 1/2 C{ 0 1 }  + ] unit-test
 [ C{ 1/2 1 } ] [ C{ 0 1 } 1/2  + ] unit-test
