@@ -192,6 +192,3 @@ forget-junk
 [
     "mnop" [ "vocabs.loader.test." swap suffix forget-vocab ] each
 ] with-compilation-unit
-
-{ "math" } [ "math.private" vocab-dir ] unit-test
-{ "resource:core/math/math-docs.factor" } [ "math.private" vocab-docs-path ] unit-test
