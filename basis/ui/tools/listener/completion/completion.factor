@@ -83,8 +83,8 @@ M: vocab-completion row-color
     dup last empty? [
         harvest ?last (complete-vocab?)
     ] [
-        harvest 2 short tail*
-        [ f ] [ [ (complete-vocab?) ] any? ] if-empty
+        harvest dup length 1 >
+        [ 2 tail* ?first (complete-vocab?) ] [ drop f ] if
     ] if ;
 
 : chop-; ( seq -- seq' )

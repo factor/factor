@@ -11,7 +11,9 @@ IN: ui.tools.listener.completion.tests
 
 [ t ] [ { "USE:" "A" } complete-vocab? ] unit-test
 
-[ t ] [ { "USE:" } complete-vocab? ] unit-test
+[ t ] [ { "USE:" "" } complete-vocab? ] unit-test
+
+[ f ] [ { "USE:" } complete-vocab? ] unit-test
 
 [ t ] [ { "UNUSE:" "A" } complete-vocab? ] unit-test
 
