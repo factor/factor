@@ -42,10 +42,10 @@ M: string vocab-path ( string -- path/f )
 PRIVATE>
 
 : vocab-dir ( vocab -- dir )
-    vocab-name* H{ { CHAR: . CHAR: / } } substitute ;
+    vocab-name H{ { CHAR: . CHAR: / } } substitute ;
 
 : append-vocab-dir ( vocab str/f -- path )
-    [ vocab-name* "." split ] dip
+    [ vocab-name "." split ] dip
     [ [ dup last ] dip append suffix ] when*
     "/" join ;
 
@@ -89,9 +89,7 @@ require-when-table [ V{ } clone ] initialize
     dup check-vocab-hook get call( vocab -- )
     [
         +parsing+ >>source-loaded?
-        dup vocab-name ".private" tail? [ [ ] ] [
-            dup vocab-source-path [ parse-file ] [ [ ] ] if*
-        ] if
+        dup vocab-source-path [ parse-file ] [ [ ] ] if*
         [ +parsing+ >>source-loaded? ] dip
         [ % ] [ call( -- ) ] if-bootstrapping
         +done+ >>source-loaded?
@@ -102,9 +100,7 @@ require-when-table [ V{ } clone ] initialize
     load-help? get [
         [
             +parsing+ >>docs-loaded?
-            dup vocab-name ".private" tail? [
-                dup vocab-docs-path [ ?run-file ] when*
-            ] unless
+            dup vocab-docs-path [ ?run-file ] when*
             +done+ >>docs-loaded?
         ] [ ] [ f >>docs-loaded? ] cleanup
     ] when drop ;
