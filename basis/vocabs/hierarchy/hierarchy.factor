@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit fry
-io.directories io.files io.files.info io.pathnames kernel make
+io.directories io.files io.files.types io.pathnames kernel make
 memoize namespaces sequences sorting splitting vocabs sets
 vocabs.loader vocabs.metadata vocabs.errors ;
 RENAME: child-vocabs vocabs => vocabs:child-vocabs
@@ -18,9 +18,12 @@ M: vocab-prefix vocab-name name>> ;
 : vocab-subdirs ( dir -- dirs )
     [
         [
-            { [ link-info directory? ] [ "." head? not ] } 1&&
-        ] filter
-    ] with-directory-files natural-sort ;
+            {
+                [ type>> +directory+ = ]
+                [ name>> "." head? not ]
+            } 1&&
+        ] filter [ name>> ] map!
+    ] with-directory-entries natural-sort ;
 
 : vocab-dir? ( root name -- ? )
     over
