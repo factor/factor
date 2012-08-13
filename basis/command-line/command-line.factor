@@ -66,7 +66,10 @@ SYMBOL: command-line
     [ command-line off script off ] [
         unclip "-" ?head
         [ param parse-command-line ]
-        [ script set command-line set ] if
+        [
+            "run" get-global [ prefix f ] when
+            script set command-line set
+        ] if
     ] if-empty ;
 
 SYMBOL: main-vocab-hook
