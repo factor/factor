@@ -64,10 +64,19 @@ counter "COUNTER" {
 : increment-counter-value ( -- n )
     counter-tuple [ 0 or 1 + dup ] change-value update-tuple ;
 
+: all-builders ( -- builders )
+    builder new select-tuples ; inline
+
+: crashed? ( builder -- ? )
+    heartbeat-timestamp>> 30 minutes ago before? ;
+
+: broken? ( builder -- ? )
+    [ clean-git-id>> ] [ last-git-id>> ] bi = not ;
+
 : funny-builders ( -- crashed broken )
-    builder new select-tuples
-    [ [ heartbeat-timestamp>> 30 minutes ago before? ] filter ]
-    [ [ [ clean-git-id>> ] [ last-git-id>> ] bi = not ] filter ]
+    all-builders
+    [ [ crashed? ] filter ]
+    [ [ broken? ] filter ]
     bi ;
 
 : os/cpu ( builder -- string )
