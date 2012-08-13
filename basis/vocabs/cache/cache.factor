@@ -9,7 +9,7 @@ IN: vocabs.cache
     vocab-name
     [ root-cache get-global delete-at ]
     [
-        \ vocab-file-contents "memoize" word-prop
+        \ vocab-file-contents "memoize" word-prop swap
         '[ drop first vocab-name _ = not ] assoc-filter! drop
     ] bi
     \ all-vocabs-recursive reset-memoized
