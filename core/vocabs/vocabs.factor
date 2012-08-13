@@ -79,7 +79,7 @@ M: f vocab-main ;
 
 SYMBOL: vocab-observers
 
-GENERIC: vocabs-changed ( obj -- )
+GENERIC: vocab-changed ( vocab obj -- )
 
 : add-vocab-observer ( obj -- )
     vocab-observers get push ;
@@ -87,13 +87,13 @@ GENERIC: vocabs-changed ( obj -- )
 : remove-vocab-observer ( obj -- )
     vocab-observers get remove-eq! drop ;
 
-: notify-vocab-observers ( -- )
-    vocab-observers get [ vocabs-changed ] each ;
+: notify-vocab-observers ( vocab -- )
+    vocab-observers get [ vocab-changed ] with each ;
 
 : create-vocab ( name -- vocab )
     check-vocab-name
     dictionary get [ <vocab> ] cache
-    notify-vocab-observers ;
+    dup notify-vocab-observers ;
 
 ERROR: no-vocab name ;
 
@@ -126,8 +126,8 @@ M: object >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
 
 : forget-vocab ( vocab -- )
     [ words forget-all ]
-    [ vocab-name dictionary get delete-at ] bi
-    notify-vocab-observers ;
+    [ vocab-name dictionary get delete-at ]
+    [ notify-vocab-observers ] tri ;
 
 M: vocab-spec forget* forget-vocab ;
 
