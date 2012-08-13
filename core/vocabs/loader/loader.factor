@@ -26,7 +26,6 @@ SYMBOL: add-vocab-root-hook
     [ add-vocab-root-hook get-global call( root -- ) ] bi ;
 
 SYMBOL: root-cache
-
 root-cache [ H{ } clone ] initialize
 
 ERROR: not-found-in-roots path ;
@@ -69,7 +68,6 @@ SYMBOL: load-help?
 
 ! Defined by vocabs.metadata
 SYMBOL: check-vocab-hook
-
 check-vocab-hook [ [ drop ] ] initialize
 
 <PRIVATE
