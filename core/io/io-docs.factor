@@ -123,7 +123,7 @@ $io-error ;
 
 HELP: stream-copy*
 { $values { "in" "an input stream" } { "out" "an output stream" } }
-{ $description "Copies the contents of one stream into another. The streams are left open when the copy is completed." { $link stream-copy } " will copy the streams and close them on completion." }
+{ $description "Copies the contents of one stream into another. The streams are left open when the copy is completed. The " { $link stream-copy } " word can be used instead to close them on completion, if desired." }
 $io-error ;
 
 HELP: stream-copy
