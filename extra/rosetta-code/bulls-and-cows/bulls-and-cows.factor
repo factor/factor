@@ -49,7 +49,7 @@ TUPLE: bull ;
 : narr>nhash ( narr -- nhash ) { 1 2 3 4 } swap zip ;
 
 : num>hash ( n -- hash )
-    [ 1string string>number ] { } map-as narr>nhash ;
+    [ digit> ] { } map-as narr>nhash ;
 
 :: cow-or-bull ( n g -- arr )
     {
