@@ -2,9 +2,9 @@ USING: definitions editors help help.markup help.syntax
 io io.files io.pathnames words ;
 IN: editors.vim
 
-ABOUT: { "vim" "vim" }
+ABOUT: "editors.vim"
 
-ARTICLE: { "vim" "vim" } "Vim support"
+ARTICLE: "editors.vim" "Vim support"
 "The " { $link vim-path } " variable contains the name of the vim executable. The default " { $link vim-path } " is " { $snippet "\"vim\"" } ". Which is not very useful, as it starts vim in the same terminal where you started factor."
 { $list
     { "If you want to use gvim instead or are on a Windows platform use " { $vocab-link "editors.gvim" } "." }
