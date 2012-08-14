@@ -119,3 +119,6 @@ MACRO: map-reduce-outputs ( quot mapper reducer -- quot )
 
 : smart-apply ( quot n -- )
     [ dup inputs ] dip mnapply ; inline
+
+: smart-with ( param obj quot -- obj curry )
+    swapd dup inputs '[ [ _ -nrot ] dip call ] 2curry ; inline

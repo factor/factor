@@ -226,6 +226,11 @@ HELP: smart-when*
 }
 { $description "A version of " { $link when } " that takes two quotations, where the first quotation is a predicate that preserves any inputs it consumes and the second is the " { $snippet "true" } " branch. If the " { $snippet "true" }  " branch is taken, the values are left on the stack and the quotation is called. If the " { $snippet "false" } " branch is taken, the number of inputs inferred from predicate quotation is dropped." } ;
 
+HELP: smart-with
+{ $values
+    { "param" object } { "obj" object } { "quot" { $quotation "( param ..a -- ..b" } } { "curry" curry } }
+{ $description "A version of " { $link with } " that puts the parameter before any inputs the quotation uses." } ;
+
 ARTICLE: "combinators.smart" "Smart combinators"
 "A " { $emphasis "smart combinator" } " is a macro which reflects on the stack effect of an input quotation. The " { $vocab-link "combinators.smart" } " vocabulary implements a few simple smart combinators which look at the static stack effects of input quotations and generate code which produces or consumes the relevant number of stack values." $nl
 "Take all input values from a sequence:"
