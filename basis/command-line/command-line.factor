@@ -62,12 +62,15 @@ SYMBOL: command-line
         [ source-file main>> [ execute( -- ) ] when* ] bi
     ] with-variable ;
 
+: run-script? ( rest first -- rest first ? )
+    over empty? not "run" get-global and ;
+
 : parse-command-line ( args -- )
     [ command-line off script off ] [
         unclip "-" ?head
         [ param parse-command-line ]
         [
-            "run" get-global [ prefix f ] when
+            run-script? [ prefix f ] when
             script set command-line set
         ] if
     ] if-empty ;
