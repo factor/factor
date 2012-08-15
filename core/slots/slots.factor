@@ -11,11 +11,11 @@ TUPLE: slot-spec name offset class initial read-only ;
 
 PREDICATE: reader < word "reader" word-prop ;
 
-PREDICATE: reader-method < method "reading" word-prop ;
+PREDICATE: reader-method < method "reading" word-prop >boolean ;
 
 PREDICATE: writer < word "writer" word-prop ;
 
-PREDICATE: writer-method < method "writing" word-prop ;
+PREDICATE: writer-method < method "writing" word-prop >boolean ;
 
 : <slot-spec> ( -- slot-spec )
     slot-spec new
