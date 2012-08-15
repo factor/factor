@@ -22,6 +22,8 @@ $nl
 "You are now ready to go on to the next section: " { $link "first-program-logic" } "." ;
 
 ARTICLE: "first-program-logic" "Writing some logic in your first program"
+"The Factor workflow is to edit source code on disk and then to refresh the live image. Let's examine the file that we just created with the scaffold tool."
+$nl
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
 { $code
     "! Copyright (C) 2011 <your name here>"
