@@ -1296,6 +1296,7 @@ bignum * factor_vm::allot_bignum_zeroed(bignum_length_type length, int negative_
 	return (result);
 }
 
+/* can allocate if not in nursery or size is larger */
 #define BIGNUM_REDUCE_LENGTH(source, length)	\
 source = reallot_array(source,length + 1)
 
@@ -1306,6 +1307,7 @@ bignum *factor_vm::bignum_shorten_length(bignum * bignum, bignum_length_type len
 	BIGNUM_ASSERT ((length >= 0) || (length <= current_length));
 	if (length < current_length)
 	{
+		GC_BIGNUM(bignum);
 		BIGNUM_REDUCE_LENGTH (bignum, length);
 		BIGNUM_SET_NEGATIVE_P (bignum, (length != 0) && (BIGNUM_NEGATIVE_P (bignum)));
 	}
@@ -1323,6 +1325,7 @@ bignum *factor_vm::bignum_trim(bignum * bignum)
 	scan += 1;
 	if (scan < end)
 	{
+		GC_BIGNUM(bignum);
 		bignum_length_type length = (scan - start);
 		BIGNUM_REDUCE_LENGTH (bignum, length);
 		BIGNUM_SET_NEGATIVE_P (bignum, (length != 0) && (BIGNUM_NEGATIVE_P (bignum)));
@@ -1349,6 +1352,7 @@ bignum *factor_vm::bignum_maybe_new_sign(bignum * x, int negative_p)
 		return (x);
 	else
 	{
+		GC_BIGNUM(x);
 		bignum * result =
 			(allot_bignum ((BIGNUM_LENGTH (x)), negative_p));
 		bignum_destructive_copy (x, result);
