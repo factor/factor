@@ -219,11 +219,13 @@ void factor_vm::primitive_bignum_log2()
 	ctx->replace(tag<bignum>(bignum_integer_length(untag<bignum>(ctx->peek()))));
 }
 
+/* allocates memory */
 cell factor_vm::unbox_array_size_slow()
 {
 	if(tagged<object>(ctx->peek()).type() == BIGNUM_TYPE)
 	{
 		bignum *zero = untag<bignum>(bignum_zero);
+		GC_BIGNUM(zero);
 		bignum *max = cell_to_bignum(array_size_max);
 		bignum *n = untag<bignum>(ctx->peek());
 		if(bignum_compare(n,zero) != bignum_comparison_less
