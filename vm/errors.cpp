@@ -41,7 +41,7 @@ void out_of_memory()
 	abort();
 }
 
-void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_)
+void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
 {
 	faulting_p = true;
 
@@ -49,9 +49,6 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_)
 	data_roots.clear();
 	bignum_roots.clear();
 	code_roots.clear();
-
-	data_root<object> arg1(arg1_,this);
-	data_root<object> arg2(arg2_,this);
 
 	/* If we had an underflow or overflow, data or retain stack
 	pointers might be out of bounds, so fix them before allocating
@@ -72,7 +69,7 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_)
 
 		/* Now its safe to allocate and GC */
 		cell error_object = allot_array_4(special_objects[OBJ_ERROR],
-			tag_fixnum(error),arg1.value(),arg2.value());
+			tag_fixnum(error),arg1,arg2);
 
 		ctx->push(error_object);
 
@@ -87,8 +84,8 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_)
 	{
 		std::cout << "You have triggered a bug in Factor. Please report.\n";
 		std::cout << "error: " << error << std::endl;
-		std::cout << "arg 1: "; print_obj(arg1.value()); std::cout << std::endl;
-		std::cout << "arg 2: "; print_obj(arg2.value()); std::cout << std::endl;
+		std::cout << "arg 1: "; print_obj(arg1); std::cout << std::endl;
+		std::cout << "arg 2: "; print_obj(arg2); std::cout << std::endl;
 		factorbug();
 		abort();
 	}
