@@ -41,6 +41,7 @@ void out_of_memory()
 	abort();
 }
 
+/* Allocates memory */
 void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_)
 {
 	data_root<object> arg1(arg1_,this);
