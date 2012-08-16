@@ -325,6 +325,7 @@ bignum *factor_vm::bignum_remainder(bignum * numerator, bignum * denominator)
 }
 
 /* allocates memory */
+/* cell_to_bignum, fixnum_to_bignum, long_long_to_bignum, ulong_long_to_bignum */
 #define FOO_TO_BIGNUM(name,type,stype,utype)				\
 bignum * factor_vm::name##_to_bignum(type n)				\
 {									\
@@ -361,6 +362,7 @@ FOO_TO_BIGNUM(long_long,s64,s64,u64)
 FOO_TO_BIGNUM(ulong_long,u64,s64,u64)
 
 /* cannot allocate memory */
+/* bignum_to_cell, fixnum_to_cell, long_long_to_cell, ulong_long_to_cell */
 #define BIGNUM_TO_FOO(name,type,stype,utype)				\
 	type factor_vm::bignum_to_##name(bignum * bignum)		\
 	{								\
@@ -389,9 +391,9 @@ BIGNUM_TO_FOO(ulong_long,u64,s64,u64)
 	significand -= ((double) digit);				\
 }
 
-/* allocates memory */
 #define inf std::numeric_limits<double>::infinity()
 
+/* allocates memory */
 bignum *factor_vm::double_to_bignum(double x)
 {
 	if (x == inf || x == -inf || x != x) return (BIGNUM_ZERO ());

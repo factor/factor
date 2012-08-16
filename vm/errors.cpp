@@ -118,6 +118,7 @@ void factor_vm::verify_memory_protection_error(cell addr)
 		fatal_error("Memory protection fault during gc", addr);
 }
 
+/* Allocates memory */
 void factor_vm::memory_protection_error(cell pc, cell addr)
 {
 	if(code->safepoint_p(addr))
@@ -138,6 +139,7 @@ void factor_vm::memory_protection_error(cell pc, cell addr)
 		general_error(ERROR_MEMORY,from_unsigned_cell(addr),false_object);
 }
 
+/* Allocates memory */
 void factor_vm::signal_error(cell signal)
 {
 	general_error(ERROR_SIGNAL,from_unsigned_cell(signal),false_object);

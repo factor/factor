@@ -5,6 +5,7 @@ static const fixnum fixnum_max = (((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
 static const fixnum fixnum_min = (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)));
 static const fixnum array_size_max = ((cell)1 << (WORD_SIZE - TAG_BITS - 2));
 
+/* Allocates memory */
 inline cell factor_vm::from_signed_cell(fixnum x)
 {
 	if(x < fixnum_min || x > fixnum_max)
@@ -13,6 +14,7 @@ inline cell factor_vm::from_signed_cell(fixnum x)
 		return tag_fixnum(x);
 }
 
+/* Allocates memory */
 inline cell factor_vm::from_unsigned_cell(cell x)
 {
 	if(x > (cell)fixnum_max)
@@ -21,6 +23,7 @@ inline cell factor_vm::from_unsigned_cell(cell x)
 		return tag_fixnum(x);
 }
 
+/* Allocates memory */
 inline cell factor_vm::allot_float(double n)
 {
 	boxed_float *flo = allot<boxed_float>(sizeof(boxed_float));
@@ -28,6 +31,7 @@ inline cell factor_vm::allot_float(double n)
 	return tag(flo);
 }
 
+/* Allocates memory */
 inline bignum *factor_vm::float_to_bignum(cell tagged)
 {
 	return double_to_bignum(untag_float(tagged));
