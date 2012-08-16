@@ -361,6 +361,7 @@ void *factor_vm::lazy_jit_compile_entry_point()
 	return untag<word>(special_objects[LAZY_JIT_COMPILE_WORD])->entry_point;
 }
 
+/* Allocates memory */
 /* push a new quotation on the stack */
 void factor_vm::primitive_array_to_quotation()
 {
@@ -374,9 +375,10 @@ void factor_vm::primitive_array_to_quotation()
 	ctx->replace(tag<quotation>(quot));
 }
 
+/* Allocates memory (from_unsigned_cell) */
 void factor_vm::primitive_quotation_code()
 {
-	quotation *quot = untag_check<quotation>(ctx->pop());
+	data_root<quotation> quot(ctx->pop(),this);
 
 	ctx->push(from_unsigned_cell((cell)quot->entry_point));
 	ctx->push(from_unsigned_cell((cell)quot->code() + quot->code()->size()));

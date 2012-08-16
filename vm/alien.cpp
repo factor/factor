@@ -76,6 +76,7 @@ void factor_vm::primitive_displaced_alien()
 	}
 }
 
+/* Allocates memory (from_unsigned_cell can allocate) */
 /* address of an object representing a C pointer. Explicitly throw an error
 if the object is a byte array, as a sanity check. */
 void factor_vm::primitive_alien_address()
