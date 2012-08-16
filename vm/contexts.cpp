@@ -143,11 +143,13 @@ context *factor_vm::new_context()
 	return new_context;
 }
 
+/* Allocates memory */
 void factor_vm::init_context(context *ctx)
 {
 	ctx->context_objects[OBJ_CONTEXT] = allot_alien(ctx);
 }
 
+/* Allocates memory */
 context *new_context(factor_vm *parent)
 {
 	context *new_context = parent->new_context();
@@ -173,12 +175,14 @@ VM_C_API void delete_context(factor_vm *parent, context *old_context)
 	parent->delete_context(old_context);
 }
 
+/* Allocates memory */
 VM_C_API void reset_context(factor_vm *parent, context *ctx)
 {
 	ctx->reset();
 	parent->init_context(ctx);
 }
 
+/* Allocates memory */
 cell factor_vm::begin_callback(cell quot_)
 {
 	data_root<object> quot(quot_,this);
@@ -233,6 +237,7 @@ void factor_vm::primitive_context_object_for()
 	ctx->push(other_ctx->context_objects[n]);
 }
 
+/* Allocates memory */
 cell factor_vm::stack_to_array(cell bottom, cell top)
 {
 	fixnum depth = (fixnum)(top - bottom + sizeof(cell));
