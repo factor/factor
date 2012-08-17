@@ -34,7 +34,7 @@
 	<key>CFBundleVersion</key>
 	<string>0.95</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2003-2011 Factor developers</string>
+	<string>Copyright © 2003-2012 Factor developers</string>
 	<key>NSServices</key>
 	<array>
 		<dict>
