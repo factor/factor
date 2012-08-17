@@ -1,10 +1,14 @@
 # Factor
 
-The Factor programming language combines [powerful language
+Factor is a [concatenative](http://www.concatenative.org), stack-based
+programming language with [high-level
 features](http://concatenative.org/wiki/view/Factor/Features/The%20language)
-with a [full-featured
-library](http://docs.factorcode.org/content/article-vocab-index.html). The
-implementation is [fully
+including dynamic types, extensible syntax, macros, and garbage collection.
+On a practical side, Factor has a [full-featured
+library](http://docs.factorcode.org/content/article-vocab-index.html),
+supports many different platforms, and has been extensively documented. 
+
+The implementation is [fully
 compiled](http://concatenative.org/wiki/view/Factor/Optimizing%20compiler)
 for performance, while still supporting [interactive
 development](http://concatenative.org/wiki/view/Factor/Interactive%20development).
