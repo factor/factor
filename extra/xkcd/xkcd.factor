@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors formatting http.client images.http
-images.viewer io kernel math parser prettyprint.custom regexp
-sequences strings ui wrap.strings xml xml.traversal ;
+images.viewer images.viewer.prettyprint io kernel parser
+prettyprint.custom prettyprint.sections regexp sequences
+strings ui wrap.strings xml xml.traversal ;
 
 IN: xkcd
 
@@ -50,4 +51,4 @@ C: <xkcd> xkcd
 
 SYNTAX: XKCD: scan-number xkcd-image <xkcd> suffix! ;
 
-M: xkcd pprint* image>> image. ;
+M: xkcd pprint* image>> <image-section> add-section ;
