@@ -9,19 +9,19 @@ IN: xkcd
 
 <PRIVATE
 
-: xkcd-url>image ( url -- image )
+: comic-image ( url -- image )
     http-get nip
     R" http://imgs\.xkcd\.com/comics/[^\.]+\.(png|jpg)"
     first-match >string load-http-image ;
 
-: comic-image. ( url -- ) xkcd-url>image image. ;
+: comic-image. ( url -- ) comic-image image. ;
 
-: xkcd-url>string ( url -- string )
+: comic-string ( url -- string )
     http-get nip string>xml
     "transcript" "id" deep-tag-with-attr children>string ;
 
 : comic-text. ( url -- )
-    xkcd-url>string
+    comic-image
     80 wrap-lines [ print ] each ;
 
 : comic. ( url -- )
