@@ -171,7 +171,7 @@ browser-gadget "scrolling"
 : com-font-size-plus ( browser -- )
     2 adjust-help-font-size model>> notify-connections ;
 
-: com-font-size-minus ( listener -- )
+: com-font-size-minus ( browser -- )
     -2 adjust-help-font-size model>> notify-connections ;
 
 browser-gadget "fonts" f {
