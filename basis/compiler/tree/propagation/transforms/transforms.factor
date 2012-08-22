@@ -293,9 +293,6 @@ M\ set diff [ diff-quot ] 1 define-partial-eval
 
 M\ set intersect [ intersect-quot ] 1 define-partial-eval
 
-: fixnum-bits ( -- n )
-    cell-bits tag-bits get - ;
-
 : bit-quot ( #call -- quot/f )
     in-d>> second value-info interval>> 0 fixnum-bits [a,b] interval-subset?
     [ [ >fixnum ] dip fixnum-bit? ] f ? ;
