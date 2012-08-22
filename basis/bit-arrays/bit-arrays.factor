@@ -40,6 +40,9 @@ TUPLE: bit-array
         tri
     ] if ; inline
 
+:: toggle-bit ( ? n x -- y )
+    x n ? [ set-bit ] [ clear-bit ] if ; inline
+
 PRIVATE>
 
 ERROR: bad-array-length n ;
@@ -53,9 +56,6 @@ M: bit-array length length>> ; inline
 
 M: bit-array nth-unsafe
     bit-index nth-unsafe swap bit? ; inline
-
-:: toggle-bit ( ? n x -- y )
-    x n ? [ set-bit ] [ clear-bit ] if ; inline
 
 M: bit-array set-nth-unsafe
     bit-index [ toggle-bit ] change-nth-unsafe ; inline
