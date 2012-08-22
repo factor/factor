@@ -22,6 +22,9 @@ HELP: tag-fixnum
 { $values { "n" integer } { "tagged" integer } }
 { $description "Outputs a tagged fixnum." } ;
 
+HELP: fixnum-bits
+{ $values { "n" "number of bits in a fixnum" } } ;
+
 HELP: first-bignum
 { $values { "n" "smallest positive integer not representable by a fixnum" } } ;
 
