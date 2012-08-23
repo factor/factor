@@ -43,10 +43,8 @@ void factor_vm::primitive_fixnum_divmod()
 	}
 	else
 	{
-		fixnum z = x / y;
-		fixnum w = x % y;
-		*s1 = tag_fixnum(z);
-		*s0 = tag_fixnum(w);
+		*s1 = tag_fixnum(x / y);
+		*s0 = tag_fixnum(x % y);
 	}
 }
 
