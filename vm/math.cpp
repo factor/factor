@@ -18,7 +18,7 @@ void factor_vm::primitive_float_to_fixnum()
 by -1. */
 void factor_vm::primitive_fixnum_divint()
 {
-	fixnum y = untag_fixnum(ctx->pop()); \
+	fixnum y = untag_fixnum(ctx->pop());
 	fixnum x = untag_fixnum(ctx->peek());
 	fixnum result = x / y;
 	if(result == -fixnum_min)
@@ -31,18 +31,22 @@ void factor_vm::primitive_fixnum_divint()
 /* does not allocate, even though from_signed_cell can allocate */
 void factor_vm::primitive_fixnum_divmod()
 {
-	cell y = ((cell *)ctx->datastack)[0];
-	cell x = ((cell *)ctx->datastack)[-1];
-	if(y == tag_fixnum(-1) && x == tag_fixnum(fixnum_min))
+	cell *s0 = (cell *)(ctx->datastack);
+	cell *s1 = (cell *)(ctx->datastack - sizeof(cell));
+	fixnum y = untag_fixnum(*s0);
+	fixnum x = untag_fixnum(*s1);
+	if(y == -1 && x == fixnum_min)
 	{
 		/* Does not allocate */
-		((cell *)ctx->datastack)[-1] = from_signed_cell(-fixnum_min);
-		((cell *)ctx->datastack)[0] = tag_fixnum(0);
+		*s1 = from_signed_cell(-fixnum_min);
+		*s0 = tag_fixnum(0);
 	}
 	else
 	{
-		((cell *)ctx->datastack)[-1] = tag_fixnum(untag_fixnum(x) / untag_fixnum(y));
-		((cell *)ctx->datastack)[0] = (fixnum)x % (fixnum)y;
+		fixnum z = x / y;
+		fixnum w = x % y;
+		*s1 = tag_fixnum(z);
+		*s0 = tag_fixnum(w);
 	}
 }
 
