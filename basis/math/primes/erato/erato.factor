@@ -9,16 +9,17 @@ IN: math.primes.erato
 CONSTANT: masks B{ 0 128 0 0 0 0 0 64 0 0 0 32 0 16 0 0 0 8 0 4 0 0 0 2 0 0 0 0 0 1 }
 
 : bit-pos ( n -- byte/f mask/f )
-    30 /mod masks nth-unsafe [ drop f f ] when-zero ;
+    30 /mod masks nth-unsafe [ drop f f ] when-zero ; inline
 
 : marked-unsafe? ( n arr -- ? )
-    [ bit-pos ] dip swap [ [ nth-unsafe ] [ bitand zero? not ] bi* ] [ 2drop f ] if* ;
+    [ bit-pos ] dip swap
+    [ [ nth-unsafe ] [ bitand zero? not ] bi* ] [ 2drop f ] if* ; inline
 
 : unmark ( n arr -- )
     [ bit-pos swap ] dip
-    over [ [ swap unmask ] change-nth-unsafe ] [ 3drop ] if ;
+    over [ [ swap unmask ] change-nth-unsafe ] [ 3drop ] if ; inline
 
-: upper-bound ( arr -- n ) length 30 * 1 - ;
+: upper-bound ( arr -- n ) length 30 * 1 - ; inline
 
 : unmark-multiples ( i arr -- )
     2dup marked-unsafe? [
@@ -26,9 +27,9 @@ CONSTANT: masks B{ 0 128 0 0 0 0 0 64 0 0 0 32 0 16 0 0 0 8 0 4 0 0 0 2 0 0 0 0 
         [ unmark ] curry each
     ] [
         2drop
-    ] if ;
+    ] if ; inline
 
-: init-sieve ( n -- arr ) 30 /i 1 + 255 <array> >byte-array ;
+: init-sieve ( n -- arr ) 30 /i 1 + 255 <array> >byte-array ; inline
 
 PRIVATE>
 
