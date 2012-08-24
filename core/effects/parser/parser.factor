@@ -59,7 +59,7 @@ ERROR: can't-nest-definitions word ;
 : check-in-definition ( -- )
     in-definition get [ word can't-nest-definitions ] when ;
 
-: in-word-definition ( quot -- )
+: in-definition ( quot -- )
     [ check-in-definition t in-definition ] dip with-variable ; inline
 
 : (:) ( -- word def effect )
@@ -67,4 +67,4 @@ ERROR: can't-nest-definitions word ;
         scan-new-word
         scan-effect
         parse-definition swap
-    ] in-word-definition ;
+    ] in-definition ;
