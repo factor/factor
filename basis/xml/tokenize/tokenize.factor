@@ -77,17 +77,17 @@ HINTS: next* { spot } ;
     #! advance spot to after the substring.
    10 <sbuf> [
        '[ _ keep over [ drop ] [ _ push ] if ] skip-until
-   ] keep >string ; inline
+   ] keep "" like ; inline
 
 : take-to ( seq -- string )
-    '[ _ member? ] take-until ;
+    '[ _ member? ] take-until ; inline
 
 : pass-blank ( -- )
     #! Advance code past any whitespace, including newlines
     [ blank? not ] skip-until ;
 
 : next-matching ( pos ch str -- pos' )
-    [ over ] dip nth eq? [ 1 + ] [ drop 0 ] if ;
+    [ over ] dip nth eq? [ 1 + ] [ drop 0 ] if ; inline
 
 : string-matcher ( str -- quot: ( pos char -- pos ? ) )
     dup length 1 - '[ _ next-matching dup _ > ] ; inline
@@ -142,14 +142,14 @@ HINTS: next* { spot } ;
     } cond ; inline recursive
 
 : parse-char ( quot: ( ch -- ? ) -- seq )
-    1024 <sbuf> [ spot get (parse-char) ] keep >string ; inline
+    512 <sbuf> [ spot get (parse-char) ] keep "" like ; inline
 
 : assure-no-]]> ( pos char -- pos' )
-    "]]>" next-matching dup 2 > [ text-w/]]> ] when ;
+    "]]>" next-matching dup 2 > [ text-w/]]> ] when ; inline
 
 :: parse-text ( -- string )
-    0 :> pos!
     depth get zero? :> no-text
+    0 :> pos!
     [| char |
         pos char assure-no-]]> pos!
         no-text [
@@ -164,7 +164,7 @@ HINTS: next* { spot } ;
     pass-blank ">" expect ;
 
 : normalize-quote ( str -- str )
-    [ dup "\t\r\n" member? [ drop CHAR: \s ] when ] map ;
+    [ dup "\t\r\n" member? [ drop CHAR: \s ] when ] map! ;
 
 : (parse-quote) ( <-disallowed? ch -- string )
     swap '[
@@ -179,4 +179,3 @@ HINTS: next* { spot } ;
 
 : parse-quote ( -- seq )
    f parse-quote* ;
-
