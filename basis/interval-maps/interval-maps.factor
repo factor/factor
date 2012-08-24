@@ -36,7 +36,7 @@ PRIVATE>
 : interval-at* ( key map -- value ? )
     [ drop ] [ find-interval ] 2bi
     [ nip ] [ interval-contains? ] 2bi
-    [ value t ] [ drop f f ] if ;
+    [ value t ] [ drop f f ] if ; inline
 
 : interval-at ( key map -- value ) interval-at* drop ;
 
