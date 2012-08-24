@@ -151,6 +151,11 @@ $nl
     assoc-any?
     assoc-all?
 }
+"Removing empty keys or values:"
+{ $subsections
+    sift-keys
+    sift-values
+}
 "Mapping between assocs and sequences:"
 { $subsections
     map>assoc
@@ -305,6 +310,14 @@ HELP: assoc-refine
 HELP: assoc-subset?
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" boolean } }
 { $description "Tests if " { $snippet "assoc2" } " contains all key/value pairs of " { $snippet "assoc1" } "." } ;
+
+HELP: sift-keys
+{ $values { "assoc" assoc } { "assoc'" "a new assoc" } }
+{ $description "Outputs an assoc removing keys that are " { $link f } "." } ;
+
+HELP: sift-values
+{ $values { "assoc" assoc } { "assoc'" "a new assoc" } }
+{ $description "Outputs an assoc removing values that are " { $link f } "." } ;
 
 HELP: assoc=
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" boolean } }
