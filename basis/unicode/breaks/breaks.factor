@@ -256,11 +256,6 @@ PRIVATE>
     1 swap dup '[ _ word-break-next ] find-index-from
     drop nip swap or ;
 
-: first-word2 ( str -- i )
-    [ unclip-slice word-break-prop over ] keep
-    '[ _ word-break-next ] find-index drop
-    nip swap length or 1 + ;
-
 : >words ( str -- words )
     [ first-word ] >pieces ;
 
