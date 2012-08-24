@@ -54,4 +54,6 @@ ERROR: bad-method-effect ;
 PRIVATE>
 
 : (M:) ( -- method def )
-    scan-new-method [ parse-method-definition ] with-method-definition ;
+    [
+        scan-new-method [ parse-method-definition ] with-method-definition
+    ] in-word-definition ;
