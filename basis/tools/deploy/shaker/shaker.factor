@@ -125,13 +125,11 @@ IN: tools.deploy.shaker
     [ "no-def-strip" word-prop not ] filter
     [ [ ] >>def drop ] each ;
 
-: sift-assoc ( assoc -- assoc' ) [ nip ] assoc-filter ;
-
 : strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
     swap '[
         [
-            [ drop _ member? not ] assoc-filter sift-assoc
+            [ drop _ member? not ] assoc-filter sift-values
             >alist f like
         ] change-props drop
     ] each ;

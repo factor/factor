@@ -199,3 +199,16 @@ unit-test
 [ 1 ] [ "a" { H{ { "a" 1 } } H{ { "b" 2 } } } assoc-stack ] unit-test
 [ 2 ] [ "b" { H{ { "a" 1 } } H{ { "b" 2 } } } assoc-stack ] unit-test
 [ f ] [ "c" { H{ { "a" 1 } } H{ { "b" 2 } } } assoc-stack ] unit-test
+
+
+{
+    { { 1 f } }
+} [
+    { { 1 f } { f 2 } } sift-keys
+] unit-test
+
+{
+    { { f 2 } }
+} [
+    { { 1 f } { f 2 } } sift-values
+] unit-test

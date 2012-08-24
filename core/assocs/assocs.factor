@@ -78,6 +78,12 @@ PRIVATE>
         assoc-each
     ] [ drop ] 2bi ; inline
 
+: sift-keys ( assoc -- assoc' )
+    [ drop ] assoc-filter ; inline
+
+: sift-values ( assoc -- assoc' )
+    [ nip ] assoc-filter ; inline
+
 : assoc-partition ( ... assoc quot: ( ... key value -- ... ? ) -- ... true-assoc false-assoc )
     [ (assoc-each) partition ] [ drop ] 2bi
     [ assoc-like ] curry bi@ ; inline
