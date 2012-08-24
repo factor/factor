@@ -188,6 +188,8 @@ PRIVATE>
 ! two cannot depend on us
 M: sequence hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
+M: array hashcode* [ sequence-hashcode ] recursive-hashcode ;
+
 M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
