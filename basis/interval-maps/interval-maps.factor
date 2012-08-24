@@ -29,7 +29,7 @@ ALIAS: value third
     [ "Intervals are not disjoint" throw ] unless ;
 
 : >intervals ( specification -- intervals )
-    [ suffix ] { } assoc>map concat 3 <groups> ;
+    [ suffix ] { } assoc>map concat 3 group ;
 
 PRIVATE>
 
