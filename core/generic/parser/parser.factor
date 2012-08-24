@@ -56,4 +56,4 @@ PRIVATE>
 : (M:) ( -- method def )
     [
         scan-new-method [ parse-method-definition ] with-method-definition
-    ] in-word-definition ;
+    ] in-definition ;
