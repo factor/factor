@@ -48,7 +48,7 @@ IN: compiler.tree.combinators
     [ [ drop f ] unless ] 2map ;
 
 : sift-children ( seq flags -- seq' )
-    zip [ nip ] assoc-filter keys ;
+    zip sift-values keys ;
 
 : until-fixed-point ( ... #recursive quot: ( ... node -- ... ) -- ... )
     over label>> t >>fixed-point drop
