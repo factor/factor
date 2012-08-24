@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lexer sets sequences kernel splitting effects
-combinators arrays make vocabs.parser classes parser ;
+USING: arrays combinators effects kernel lexer make namespaces
+parser sequences splitting words ;
 IN: effects.parser
 
 DEFER: parse-effect
@@ -12,6 +12,8 @@ ERROR: row-variable-can't-have-type ;
 ERROR: stack-effect-omits-dashes ;
 
 SYMBOL: effect-var
+
+SYMBOL: in-definition
 
 <PRIVATE
 : end-token? ( end token -- token ? ) [ nip ] [ = ] 2bi ; inline
@@ -52,7 +54,17 @@ PRIVATE>
 : parse-call( ( accum word -- accum )
     [ ")" parse-effect ] dip 2array append! ;
 
+ERROR: can't-nest-definitions word ;
+
+: check-in-definition ( -- )
+    in-definition get [ word can't-nest-definitions ] when ;
+
+: in-word-definition ( quot -- )
+    [ check-in-definition t in-definition ] dip with-variable ; inline
+
 : (:) ( -- word def effect )
-    scan-new-word
-    scan-effect
-    parse-definition swap ;
+    [
+        scan-new-word
+        scan-effect
+        parse-definition swap
+    ] in-word-definition ;
