@@ -181,4 +181,12 @@ M: hashtable assoc-like
     [ hashcode 0x13c6ef37 + ] dip
     [ 6 shift ] [ -2 shift ] bi + + ;
 
+ERROR: malformed-hashtable-pair seq pair ;
+
+: check-hashtable ( seq -- seq )
+    dup [ dup length 2 = [ drop ] [ malformed-hashtable-pair ] if ] each ;
+
+: parse-hashtable ( seq -- hashtable )
+    check-hashtable H{ } assoc-clone-like ;
+
 INSTANCE: hashtable assoc
