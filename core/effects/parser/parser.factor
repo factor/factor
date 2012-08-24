@@ -13,8 +13,6 @@ ERROR: stack-effect-omits-dashes ;
 
 SYMBOL: effect-var
 
-SYMBOL: in-definition
-
 <PRIVATE
 : end-token? ( end token -- token ? ) [ nip ] [ = ] 2bi ; inline
 : effect-opener? ( token -- token ? ) dup { f "(" "((" "--" } member? ; inline
@@ -54,12 +52,14 @@ PRIVATE>
 : parse-call( ( accum word -- accum )
     [ ")" parse-effect ] dip 2array append! ;
 
+SYMBOL: in-definition
+
 ERROR: can't-nest-definitions word ;
 
 : check-in-definition ( -- )
     in-definition get [ word can't-nest-definitions ] when ;
 
-: in-definition ( quot -- )
+: with-definition ( quot -- )
     [ check-in-definition t in-definition ] dip with-variable ; inline
 
 : (:) ( -- word def effect )
@@ -67,4 +67,4 @@ ERROR: can't-nest-definitions word ;
         scan-new-word
         scan-effect
         parse-definition swap
-    ] in-definition ;
+    ] with-definition ;
