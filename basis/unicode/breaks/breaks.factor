@@ -246,12 +246,17 @@ word-table set-global
     new-class (format/extended?)
     [ old-class dup ${ wCR wLF wNewline } member? ] [
         new-class old-class over word-table-nth
-        [ str i ] dip word-break?
+        [ str i 1 - ] dip word-break?
     ] if ;
 
 PRIVATE>
 
-: first-word ( str -- i )
+ : first-word ( str -- i )
+    [ [ length ] [ first word-break-prop ] bi ] keep
+    1 swap dup '[ _ word-break-next ] find-index-from
+    drop nip swap or ;
+
+: first-word2 ( str -- i )
     [ unclip-slice word-break-prop over ] keep
     '[ _ word-break-next ] find-index drop
     nip swap length or 1 + ;
