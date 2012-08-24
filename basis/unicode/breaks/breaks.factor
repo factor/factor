@@ -252,9 +252,9 @@ word-table set-global
 PRIVATE>
 
 : first-word ( str -- i )
-    [ [ length ] [ first word-break-prop ] bi ] keep
-    1 swap dup '[ _ word-break-next ] find-index-from
-    drop nip swap or ;
+    [ unclip-slice word-break-prop over ] keep
+    '[ _ word-break-next ] find-index drop
+    nip swap length or 1 + ;
 
 : >words ( str -- words )
     [ first-word ] >pieces ;
