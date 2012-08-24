@@ -90,7 +90,7 @@ M: lambda-parser parse-quotation ( -- quotation )
         scan-new-word
         [ parse-definition ]
         parse-locals-definition
-    ] in-definition ;
+    ] with-definition ;
 
 : (M::) ( -- word def )
     [
@@ -99,4 +99,4 @@ M: lambda-parser parse-quotation ( -- quotation )
             [ parse-definition ]
             parse-locals-method-definition drop
         ] with-method-definition
-    ] in-definition ;
+    ] with-definition ;
