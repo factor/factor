@@ -107,10 +107,11 @@ HINTS: >upper string ;
 PRIVATE>
 
 : capitalize ( string -- title )
-    unclip 1string [ >lower ] [ (>title) ] bi* prepend ; inline
+    unclip-slice 1string [ >lower ] [ (>title) ] bi*
+    "" prepend-as ; inline
 
 : >title ( string -- title )
-    final-sigma >words [ capitalize ] map concat ;
+    final-sigma >words [ capitalize ] map! concat ;
 
 HINTS: >title string ;
 
