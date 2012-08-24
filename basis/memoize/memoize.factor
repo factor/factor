@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators definitions effects
-effects.parser fry hashtables.identity kernel math sequences
-sequences.private words ;
+USING: kernel hashtables sequences sequences.private arrays
+words namespaces make parser effects.parser math assocs effects
+definitions quotations summary accessors fry hashtables.identity ;
 IN: memoize
 
 <PRIVATE
@@ -41,10 +41,6 @@ IN: memoize
 : make/n ( table quot effect -- quot )
     [ unpack/pack '[ _ _ cache ] ] keep pack/unpack ;
 
-: make/1 ( table quot effect -- quot )
-    out>> [ packer compose '[ _ _ cache ] ] keep
-    unpacker compose ;
-
 : make/0 ( table quot effect -- quot )
     out>> [
         packer '[
@@ -54,11 +50,7 @@ IN: memoize
     ] keep unpacker compose ;
 
 : make-memoizer ( table quot effect -- quot )
-    dup in>> length {
-        { 0 [ make/0 ] }
-        { 1 [ make/1 ] }
-        [ drop make/n ]
-    } case ;
+    dup in>> length zero? [ make/0 ] [ make/n ] if ;
 
 PRIVATE>
 
