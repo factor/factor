@@ -300,8 +300,7 @@ M: object substitute answer ;
 M: not-class substitute [ <not-class> ] bi@ answer ;
 
 : assoc-answer ( table question answer -- new-table )
-    '[ _ _ substitute ] assoc-map
-    [ nip ] assoc-filter ;
+    '[ _ _ substitute ] assoc-map sift-values ;
 
 : assoc-answers ( table questions answer -- new-table )
     '[ _ assoc-answer ] each ;

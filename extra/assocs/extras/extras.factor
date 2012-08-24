@@ -8,9 +8,6 @@ IN: assocs.extras
 : assoc-harvest ( assoc -- assoc' )
     [ nip empty? not ] assoc-filter ; inline
 
-: assoc-sift ( assoc -- assoc' )
-    [ nip ] assoc-filter ; inline
-
 : deep-at ( assoc seq -- value/f )
     [ swap at ] each ; inline
 
