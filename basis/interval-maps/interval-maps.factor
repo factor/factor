@@ -16,7 +16,7 @@ ALIAS: value third
     array>> [ start <=> ] with search nip ;
 
 : interval-contains? ( key interval-node -- ? )
-    [ start ] [ end ] bi between? ;
+    first2 between? ;
 
 : all-intervals ( sequence -- intervals )
     [ [ dup number? [ dup 2array ] when ] dip ] { } assoc-map-as ;
@@ -56,7 +56,7 @@ PRIVATE>
     ! Only works with integer keys, because they're discrete
     ! Makes 2array keys
     [
-        alist sort-keys unclip swap [ [ first dup ] [ second ] bi ] dip
+        alist sort-keys unclip swap [ first2 dupd ] dip
         [| oldkey oldval key val | ! Underneath is start
             oldkey 1 + key =
             oldval val = and
