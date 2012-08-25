@@ -370,7 +370,7 @@ ERROR: unsupported-bitmap-file magic ;
 : loading-bitmap>bytes ( loading-bitmap -- byte-array )
     uncompress-bitmap bitmap>bytes ;
 
-M: bmp-image stream>image ( stream bmp-image -- bitmap )
+M: bmp-image stream>image* ( stream bmp-image -- bitmap )
     drop load-bitmap
     [ image new ] dip
     {

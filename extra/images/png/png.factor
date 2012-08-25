@@ -357,5 +357,5 @@ ERROR: invalid-color-type/bit-depth loading-png ;
         ] throw-on-eof
     ] with-input-stream ;
 
-M: png-image stream>image
+M: png-image stream>image*
     drop load-png loading-png>image ;

@@ -64,9 +64,8 @@ os linux? [
 
 PRIVATE>
 
-M: gtk-image stream>image
-    drop [
-        stream-contents data>GInputStream &g_object_unref
-        GInputStream>GdkPixbuf &g_object_unref
-        GdkPixbuf>image
-    ] with-destructors ;
+M: gtk-image stream>image*
+    drop
+    stream-contents data>GInputStream &g_object_unref
+    GInputStream>GdkPixbuf &g_object_unref
+    GdkPixbuf>image ;
