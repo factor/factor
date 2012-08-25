@@ -33,5 +33,5 @@ os macosx? [
         0 0 w h <CGRect> image CGContextDrawImage
     ] make-bitmap-image ;
 
-M: ns-image stream>image
+M: ns-image stream>image*
     drop stream-contents <CGImage> CGImage>image ;
