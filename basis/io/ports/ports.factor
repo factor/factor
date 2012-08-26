@@ -202,7 +202,10 @@ M: output-port dispose*
     ] with-destructors ;
 
 M: buffered-port dispose*
-    [ call-next-method ] [ buffer>> dispose ] bi ;
+    [
+        [ buffer>> &dispose drop ]
+        [ call-next-method ] bi
+    ] with-destructors ;
 
 M: port cancel-operation handle>> cancel-operation ;
 
