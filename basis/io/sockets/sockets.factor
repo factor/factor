@@ -348,7 +348,7 @@ SYMBOL: remote-address
         [ (accept) ] keep
         parse-sockaddr swap
         <ports>
-    ] keep encoding>> <encoder-duplex> swap ;
+    ] [ encoding>> ] bi <encoder-duplex> swap ;
 
 : <datagram> ( addrspec -- datagram )
     [
