@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax io.streams.string sequences strings ;
+USING: assocs environment.unix help.markup help.syntax
+io.streams.string libc sequences strings ;
 IN: environment
 
 HELP: (os-envs)
