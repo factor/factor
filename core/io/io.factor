@@ -13,7 +13,8 @@ GENERIC: stream-read-unsafe ( n buf stream -- count )
 GENERIC: stream-read-until ( seps stream -- seq sep/f )
 GENERIC: stream-read-partial-unsafe ( n buf stream -- count )
 GENERIC: stream-readln ( stream -- str/f )
-GENERIC: stream-contents ( stream -- seq )
+GENERIC: stream-contents* ( stream -- seq )
+: stream-contents ( stream -- seq ) [ stream-contents* ] with-disposal ;
 
 GENERIC: stream-write1 ( elt stream -- )
 GENERIC: stream-write ( data stream -- )
@@ -183,16 +184,13 @@ CONSTANT: each-block-size 65536
     input-stream get swap each-stream-block ; inline
 
 : (stream-contents-by-length) ( stream len -- seq )
-    dup rot [
-        [ (new-sequence-for-stream) ]
-        [ [ stream-read-unsafe ] curry keep resize ] bi
-    ] with-disposal ; inline
+    dup rot
+    [ (new-sequence-for-stream) ]
+    [ [ stream-read-unsafe ] curry keep resize ] bi ; inline
 
 : (stream-contents-by-block) ( stream -- seq )
-    [
-        [ [ ] collector [ each-stream-block ] dip { } like ]
-        [ stream-exemplar concat-as ] bi
-    ] with-disposal ; inline
+    [ [ ] collector [ each-stream-block ] dip { } like ]
+    [ stream-exemplar concat-as ] bi ; inline
 
 : (stream-contents-by-length-or-block) ( stream -- seq )
     dup stream-length
@@ -238,7 +236,7 @@ M: input-stream stream-read-partial-unsafe stream-read-unsafe ; inline
 M: input-stream stream-read-until read-until-loop ; inline
 M: input-stream stream-readln
     "\n" swap stream-read-until drop ; inline
-M: input-stream stream-contents (stream-contents-by-length-or-block) ; inline
+M: input-stream stream-contents* (stream-contents-by-length-or-block) ; inline
 M: input-stream stream-seekable? drop f ; inline
 M: input-stream stream-length drop f ; inline
 
@@ -253,7 +251,7 @@ M: f stream-read-unsafe 3drop 0 ; inline
 M: f stream-read-until 2drop f f ; inline
 M: f stream-read-partial-unsafe 3drop 0 ; inline
 M: f stream-readln drop f ; inline
-M: f stream-contents drop f ; inline
+M: f stream-contents* drop f ; inline
 
 M: f stream-write1 2drop ; inline
 M: f stream-write 2drop ; inline
