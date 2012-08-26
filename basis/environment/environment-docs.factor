@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs environment.unix help.markup help.syntax
-io.streams.string libc sequences strings ;
+USING: assocs help.markup help.syntax io.streams.string
+libc sequences strings ;
 IN: environment
 
 HELP: (os-envs)
@@ -62,7 +62,7 @@ HELP: set-os-envs
 
 HELP: set-os-envs-pointer
 { $values { "malloc" "a pointer to memory from the heap obtained through " { $link malloc } " or similar" } }
-{ $description "Set then " { $link environ } " pointer. Factor must retain a pointer to this memory until exiting the program." }
+{ $description "Set then " { $snippet "environ" } " pointer. Factor must retain a pointer to this memory until exiting the program." }
 { $notes
     "Names and values of environment variables are operating system-specific."
 } ;
@@ -101,6 +101,7 @@ ARTICLE: "environment" "Environment variables"
 "Leak-free setting of all environment variables on Unix:"
 { $subsections
     set-os-envs-pointer
+
 } ;
 
 ABOUT: "environment"
