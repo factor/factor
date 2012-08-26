@@ -7,7 +7,7 @@ db.sqlite.lib db.sqlite.ffi db.tuples words db.types combinators
 math.intervals io locals nmake accessors vectors math.ranges random
 math.bitwise db.queries destructors db.tuples.private interpolate
 io.streams.string make db.private sequences.deep
-db.errors.sqlite ;
+db.errors.sqlite math.parser ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
