@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators help.markup help.syntax init
-io.streams.string kernel libc sequences splitting
-strings system vocabs vocabs.loader ;
+USING: assocs combinators init kernel sequences splitting
+system vocabs vocabs.loader ;
 IN: environment
 
 HOOK: os-env os ( key -- value )
