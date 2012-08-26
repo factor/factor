@@ -21,8 +21,10 @@ M: unix (os-envs) ( -- seq )
 
 : set-void* ( value alien -- ) 0 set-alien-cell ;
 
+M: unix set-os-envs-pointer ( malloc -- ) environ set-void* ;
+
 M: unix (set-os-envs) ( seq -- )
-    utf8 strings>alien malloc-byte-array environ set-void* ;
+    utf8 strings>alien malloc-byte-array set-os-envs-pointer ;
 
 os {
     { macosx [ "environment.unix.macosx" require ] }
