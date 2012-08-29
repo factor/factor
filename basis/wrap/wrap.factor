@@ -1,35 +1,36 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel sequences math arrays locals fry accessors
-lists splitting make combinators.short-circuit namespaces
-grouping splitting.monotonic ;
+USING: accessors arrays combinators combinators.short-circuit
+fry kernel lists locals math sequences typed ;
 IN: wrap
 
 ! black is the text length, white is the whitespace length
 TUPLE: element contents black white ;
 C: <element> element
 
-: element-length ( element -- n )
+<PRIVATE
+
+TYPED: element-length ( element: element -- n )
     [ black>> ] [ white>> ] bi + ;
 
 TUPLE: paragraph line-max line-ideal lines head-width tail-cost ;
 C: <paragraph> paragraph
 
-: top-fits? ( paragraph -- ? )
+TYPED: top-fits? ( paragraph: paragraph -- ? )
     [ head-width>> ]
     [ dup lines>> 1list? [ line-ideal>> ] [ line-max>> ] if ] bi <= ;
 
-: fits? ( paragraph -- ? )
+TYPED: fits? ( paragraph: paragraph -- ? )
     ! Make this not count spaces at end
     { [ lines>> car 1list? ] [ top-fits? ] } 1|| ;
 
 :: min-by ( seq quot -- elt )
-    f 1/0. seq [| key value new |
-        new quot call :> newvalue
-        newvalue value < [ new newvalue ] [ key value ] if
+    f 1/0. seq [| key value newkey |
+        newkey quot call :> newvalue
+        newvalue value < [ newkey newvalue ] [ key value ] if
     ] each drop ; inline
 
-: paragraph-cost ( paragraph -- cost )
+TYPED: paragraph-cost ( paragraph: paragraph -- cost )
     dup lines>> 1list? [ drop 0 ] [
         [ [ head-width>> ] [ line-ideal>> ] bi - sq ]
         [ tail-cost>> ] bi +
@@ -46,18 +47,15 @@ C: <paragraph> paragraph
         [ drop paragraph-cost ]
     } 2cleave <paragraph> ;
 
-: glue ( paragraph element -- paragraph )
-    {
-        [ drop [ line-max>> ] [ line-ideal>> ] bi ]
-        [ [ lines>> unswons ] dip swons swons ]
-        [ [ head-width>> ] [ element-length ] bi* + ]
-        [ drop tail-cost>> ]
-    } 2cleave <paragraph> ;
+TYPED: add-element ( paragraph: paragraph element: element -- )
+    [ element-length [ + ] curry change-head-width ]
+    [ [ [ unswons ] dip swons swons ] curry change-lines ]
+    bi drop ;
 
 : wrap-step ( paragraphs element -- paragraphs )
-    [ '[ _ glue ] map ]
     [ [ min-cost ] dip new-line ]
-    2bi prefix
+    [ dupd '[ _ add-element ] each ]
+    2bi swap prefix
     [ fits? ] filter ;
 
 : 1paragraph ( line-max line-ideal element -- paragraph )
@@ -67,9 +65,11 @@ C: <paragraph> paragraph
     lines>> [ [ contents>> ] lmap>array ] lmap>array ;
 
 : initialize ( line-max line-ideal elements -- elements paragraph )
-    <reversed> unclip-slice [ -rot ] dip 1paragraph 1array ;
+    reverse unclip [ -rot ] dip 1paragraph 1array ;
 
-: wrap ( elements line-max line-ideal -- paragraph )
+PRIVATE>
+
+: wrap ( elements line-max line-ideal -- array )
     rot [ 2drop { } ] [
         initialize
         [ wrap-step ] reduce
