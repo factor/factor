@@ -225,10 +225,20 @@ M: object h. [ conjugate * ] [ + ] 2map-reduce ; inline
 GENERIC: norm-sq ( v -- x )
 M: object norm-sq [ absq ] [ + ] map-reduce ; inline
 
+: l1-norm ( v -- x ) [ abs ] map-sum ; inline
+
 : norm ( v -- x ) norm-sq sqrt ; inline
 
-: p-norm ( v p -- x )
+: p-norm-default ( v p -- x )
     [ [ [ abs ] dip ^ ] curry map-sum ] keep recip ^ ; inline
+
+: p-norm ( v p -- x )
+    {
+        { [ dup 1 = ] [ drop l1-norm ] }
+        { [ dup 2 = ] [ drop norm ] }
+        { [ dup fp-infinity? ] [ drop supremum ] }
+        [ p-norm-default ]
+    } cond ;
 
 : normalize ( u -- v ) dup norm v/n ; inline
 
