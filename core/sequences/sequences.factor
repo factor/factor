@@ -24,7 +24,6 @@ GENERIC: lengthen ( n seq -- )
 GENERIC: shorten ( n seq -- )
 
 M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ; inline
-
 M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 
 : empty? ( seq -- ? ) length 0 = ; inline
@@ -663,9 +662,13 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 <PRIVATE
 
+: move-unsafe ( to from seq -- )
+    2over =
+    [ 3drop ] [ [ nth-unsafe swap ] [ set-nth-unsafe ] bi ] if ; inline
+
 : (filter!) ( ... quot: ( ... elt -- ... ? ) store scan seq -- ... )
     2dup length < [
-        [ move ] 3keep
+        [ move-unsafe ] 3keep
         [ nth-unsafe pick call [ 1 + ] when ] 2keep
         [ 1 + ] dip
         (filter!)
@@ -701,6 +704,12 @@ PRIVATE>
     [ length 1 - ] keep
     over 0 < [ bounds-error ] [ nth-unsafe ] if ; inline
 
+<PRIVATE
+
+: last-unsafe ( seq -- elt ) [ length 1 - ] [ nth-unsafe ] bi ;
+
+PRIVATE>
+
 : set-last ( elt seq -- )
     [ length 1 - ] keep
     over 0 < [ bounds-error ] [ set-nth-unsafe ] if ; inline
@@ -713,7 +722,7 @@ PRIVATE>
     2over = [
         2drop 2drop
     ] [
-        [ [ 2over + pick ] dip move [ 1 + ] dip ] keep
+        [ [ 2over + pick ] dip move-unsafe [ 1 + ] dip ] keep
         move-backward
     ] if ;
 
@@ -721,7 +730,7 @@ PRIVATE>
     2over = [
         2drop 2drop
     ] [
-        [ [ pick [ dup dup ] dip + swap ] dip move 1 - ] keep
+        [ [ pick [ dup dup ] dip + swap ] dip move-unsafe 1 - ] keep
         move-forward
     ] if ;
 
@@ -762,7 +771,9 @@ PRIVATE>
     [ [ { } ] dip dup 1 + ] dip replace-slice ;
 
 : pop ( seq -- elt )
-    [ length 1 - ] [ [ nth ] [ shorten ] 2bi ] bi ;
+    [ length 1 - ] keep over 0 >=
+    [ [ nth-unsafe ] [ shorten ] 2bi ]
+    [ bounds-error ] if ;
 
 : exchange ( m n seq -- )
     [ nip bounds-check 2drop ]
@@ -899,7 +910,7 @@ PRIVATE>
     [ rest ] [ first-unsafe ] bi ;
 
 : unclip-last ( seq -- butlast last )
-    [ but-last ] [ last ] bi ;
+    [ but-last ] [ last-unsafe ] bi ;
 
 : unclip-slice ( seq -- rest-slice first )
     [ rest-slice ] [ first-unsafe ] bi ; inline
@@ -927,7 +938,7 @@ PRIVATE>
     [ find-last ] (map-find) ; inline
 
 : unclip-last-slice ( seq -- butlast-slice last )
-    [ but-last-slice ] [ last ] bi ; inline
+    [ but-last-slice ] [ last-unsafe ] bi ; inline
 
 <PRIVATE
 
