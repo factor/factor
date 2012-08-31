@@ -10,18 +10,19 @@ IN: math.bitwise
 ! utilities
 : clear-bit ( x n -- y ) 2^ bitnot bitand ; inline
 : set-bit ( x n -- y ) 2^ bitor ; inline
-: bit-clear? ( x n -- ? ) 2^ bitand 0 = ; inline
+: bit-clear? ( x n -- ? ) 2^ bitand zero? ; inline
 : unmask ( x n -- ? ) bitnot bitand ; inline
-: unmask? ( x n -- ? ) unmask 0 > ; inline
+: unmask? ( x n -- ? ) unmask zero? not ; inline
 : mask ( x n -- ? ) bitand ; inline
-: mask? ( x n -- ? ) mask 0 > ; inline
+: mask? ( x n -- ? ) mask zero? not ; inline
 : wrap ( m n -- m' ) 1 - bitand ; inline
 : on-bits ( m -- n ) 2^ 1 - ; inline
 : bits ( m n -- m' ) on-bits mask ; inline
 : mask-bit ( m n -- m' ) 2^ mask ; inline
 : toggle-bit ( m n -- m' ) 2^ bitxor ; inline
 : >signed ( x n -- y )
-    [ bits ] keep 2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
+    [ bits ] keep 2dup neg 1 + shift
+    1 number= [ 2^ - ] [ drop ] if ;
 : >odd ( m -- n ) 0 set-bit ; foldable
 : >even ( m -- n ) 0 clear-bit ; foldable
 : next-even ( m -- n ) >even 2 + ; foldable
@@ -109,9 +110,9 @@ M: fixnum (bit-count)
     fixnum-bit-count { fixnum } declare ; inline
 
 M: bignum (bit-count)
-    dup 0 = [ drop 0 ] [
+    [ 0 ] [
         [ byte-bit-count ] [ -8 shift (bit-count) ] bi +
-    ] if ;
+    ] if-zero ;
 
 : byte-array-bit-count ( byte-array -- n )
     0 [ byte-bit-count + ] reduce ; inline
