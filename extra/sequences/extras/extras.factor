@@ -262,3 +262,6 @@ M: odds length length>> ; inline
 M: odds nth-unsafe [ 2 * 1 + ] [ seq>> nth-unsafe ] bi* ; inline
 
 INSTANCE: odds immutable-sequence
+
+: until-empty ( seq quot -- )
+    [ dup empty? ] swap until drop ; inline
