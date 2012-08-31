@@ -1380,7 +1380,59 @@ void factor_vm::bignum_destructive_copy(bignum * source, bignum * target)
 /* allocates memory */
 bignum *factor_vm::bignum_bitwise_not(bignum * x)
 {
-	return bignum_subtract(BIGNUM_ONE(1), x);
+	GC_BIGNUM (x);
+
+	bignum_length_type size = BIGNUM_LENGTH (x);
+	bignum_digit_type *scan_x, *end_x, *scan_y;
+	bignum *y;
+	int carry = 1;
+
+	if (BIGNUM_NEGATIVE_P (x)) {
+		y = allot_bignum (size, 0);
+		scan_x = BIGNUM_START_PTR (x);
+		end_x = scan_x + size;
+		scan_y = BIGNUM_START_PTR (y);
+		while (scan_x < end_x) {
+			if (*scan_x == 0) {
+				*scan_y++ = BIGNUM_RADIX - 1;
+				scan_x++;
+			} else {
+				*scan_y++ = *scan_x++ - 1;
+				carry = 0;
+				break;
+			}
+		}
+	} else {
+		y = allot_bignum (size, 1);
+		scan_x = BIGNUM_START_PTR (x);
+		end_x = scan_x + size;
+		scan_y = BIGNUM_START_PTR (y);
+		while (scan_x < end_x) {
+			if (*scan_x == (BIGNUM_RADIX - 1)) {
+				*scan_y++ = 0;
+				scan_x++;
+			} else {
+				*scan_y++ = *scan_x++ + 1;
+				carry = 0;
+				break;
+			}
+		}
+	}
+
+	while (scan_x < end_x) {
+		*scan_y++ = *scan_x++;
+	}
+
+	if (carry) {
+		GC_BIGNUM (y);
+		x = allot_bignum (size + 1, BIGNUM_NEGATIVE_P (y));
+		bignum_destructive_copy (y, x);
+		scan_x = BIGNUM_START_PTR (x);
+		*(scan_x + size) = 1;
+		return x;
+	} else {
+		return bignum_trim (y);
+	}
 }
 
 /* allocates memory */
