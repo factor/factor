@@ -148,3 +148,6 @@ PRIVATE>
 
 : sinc ( x -- y )
     [ 1 ] [ pi * [ sin ] [ / ] bi ] if-zero ;
+
+: until-zero ( n quot -- )
+    [ dup zero? ] swap until drop ; inline
