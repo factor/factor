@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: math.extras math.ranges tools.test ;
+USING: math math.extras math.ranges tools.test ;
 
 IN: math.extras.test
 
@@ -20,6 +20,8 @@ IN: math.extras.test
 [ 10 [1,b] 2 exponential-moving-average ] unit-test
 
 { { 2 5 5 4 3 } } [ { 1 2 5 6 1 4 3 } 3 moving-median ] unit-test
+
+{ { 2 1 1 2 1 1 } } [ { 1 1 2 3 5 8 13 } 2 [ odd? ] moving-count ] unit-test
 
 { { } } [ { 0 0 } nonzero ] unit-test
 { { 1 2 3 } } [ { 0 1 0 2 0 3 0 } nonzero ] unit-test

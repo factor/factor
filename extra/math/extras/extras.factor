@@ -105,6 +105,9 @@ PRIVATE>
 : moving-sum ( u n -- v )
     <clumps> [ sum ] map ;
 
+: moving-count ( ... u n quot: ( ... elt -- ... ? ) -- ... v )
+    [ <clumps> ] [ [ count ] curry map ] bi* ; inline
+
 : nonzero ( seq -- seq' )
     [ zero? not ] filter ;
 
