@@ -69,7 +69,6 @@ ERROR: log2-expects-positive x ;
 : 2/ ( x -- y ) -1 shift ; inline
 : sq ( x -- y ) dup * ; inline
 : neg ( x -- -x ) -1 * ; inline
-: recip ( x -- y ) 1 swap / ; inline
 : sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
 : ?1+ ( x -- y ) [ 1 + ] [ 0 ] if* ; inline
 : rem ( x y -- z ) abs [ mod ] [ + ] [ mod ] tri ; foldable
@@ -99,6 +98,10 @@ UNION: real rational float ;
 TUPLE: complex { real real read-only } { imaginary real read-only } ;
 
 UNION: number real complex ;
+
+GENERIC: recip ( x -- y )
+
+M: number recip 1 swap / ; inline
 
 : fp-bitwise= ( x y -- ? ) [ double>bits ] same? ; inline
 
