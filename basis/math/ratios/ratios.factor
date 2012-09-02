@@ -33,6 +33,16 @@ M: integer /
         2dup fast-gcd [ /i ] curry bi@ fraction>
     ] if-zero ;
 
+M: integer recip
+    1 swap [
+        division-by-zero
+    ] [
+        dup 0 < [ [ neg ] bi@ ] when fraction>
+    ] if-zero ;
+
+M: ratio recip
+    >fraction swap fraction> ;
+
 M: ratio hashcode*
     nip >fraction [ hashcode ] bi@ bitxor ;
 
