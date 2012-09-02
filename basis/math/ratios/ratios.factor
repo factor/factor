@@ -41,7 +41,7 @@ M: integer recip
     ] if-zero ;
 
 M: ratio recip
-    >fraction swap fraction> ;
+    >fraction swap dup 0 < [ [ neg ] bi@ ] when fraction> ;
 
 M: ratio hashcode*
     nip >fraction [ hashcode ] bi@ bitxor ;
