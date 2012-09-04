@@ -867,9 +867,9 @@ PRIVATE>
     pick length dup 0 3 between? [
         integer>fixnum {
             [ drop nip ]
-            [ 2drop first ]
-            [ [ drop first2 ] dip call ]
-            [ [ drop first3 ] dip bi@ ]
+            [ 2drop first-unsafe ]
+            [ [ drop first2-unsafe ] dip call ]
+            [ [ drop first3-unsafe ] dip bi@ ]
         } dispatch
     ] [
         drop
