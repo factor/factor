@@ -230,14 +230,12 @@ TUPLE: slice-error from to seq reason ;
 <PRIVATE
 
 : <slice-unsafe> ( from to seq -- slice )
-    slice boa ; inline
+    dup slice? [ collapse-slice ] when slice boa ; inline
 
 PRIVATE>
 
 : <slice> ( from to seq -- slice )
-    check-slice
-    dup slice? [ collapse-slice ] when
-    <slice-unsafe> ; inline
+    check-slice <slice-unsafe> ; inline
 
 M: slice virtual-exemplar seq>> ; inline
 
@@ -853,13 +851,14 @@ PRIVATE>
     ] if ;
 
 : cut-slice ( seq n -- before-slice after-slice )
-    [ head-slice ] [ tail-slice ] 2bi ;
+    [ head-slice ] [ tail-slice ] 2bi ; inline
 
 : insert-nth ( elt n seq -- seq' )
     swap cut-slice [ swap suffix ] dip append ;
 
 : halves ( seq -- first-slice second-slice )
-    dup midpoint@ cut-slice ;
+    [ 0 swap length [ 2/ dup ] keep ] keep
+    [ <slice-unsafe> ] curry 2bi@ ; inline
 
 : binary-reduce ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) -- ... value )
     #! We can't use case here since combinators depends on
