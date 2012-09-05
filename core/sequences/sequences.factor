@@ -865,10 +865,7 @@ PRIVATE>
     [ nth-unsafe ] [ [ 1 + ] dip nth-unsafe ] 2bi ; inline
 
 : nth3-unsafe ( n seq -- a b c )
-    [ nth-unsafe ]
-    [ [ 1 + ] dip nth-unsafe ]
-    [ [ 2 + ] dip nth-unsafe ]
-    2tri ; inline
+    [ nth2-unsafe ] [ [ 2 + ] dip nth-unsafe ] 2bi ; inline
 
 : (binary-reduce) ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) from to -- ... value )
     #! We can't use case here since combinators depends on
