@@ -157,3 +157,15 @@ IN: math.statistics.tests
 ] unit-test
 
 { { 0 1/4 1/2 3/4 1 } } [ 5 iota rescale ] unit-test
+
+
+{
+    { 2 2 2 1 0 5 6 7 7 7 7 }
+} [
+    { 30 30 30 20 10 40 50 60 60 60 60 } rank-values
+] unit-test
+
+{
+    { 1 0 2 3 4 }
+}
+[ { 3 1 4 15 92 } rank-values ] unit-test
