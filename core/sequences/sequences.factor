@@ -1010,7 +1010,10 @@ M: object sum 0 [ + ] binary-reduce ; inline
 <PRIVATE
 
 : generic-flip ( matrix -- newmatrix )
-    [ dup first length [ length min ] reduce iota ] keep
+    [
+        [ first-unsafe length 1 ] keep
+        [ length min ] (each) (each-integer) iota
+    ] keep
     [ [ nth-unsafe ] with { } map-as ] curry { } map-as ; inline
 
 USE: arrays
@@ -1020,7 +1023,10 @@ USE: arrays
 
 : array-flip ( matrix -- newmatrix )
     { array } declare
-    [ dup first array-length [ array-length min ] reduce iota ] keep
+    [
+        [ first-unsafe array-length 1 ] keep
+        [ array-length min ] (each) (each-integer) iota
+    ] keep
     [ [ { array } declare array-nth ] with { } map-as ] curry { } map-as ;
 
 PRIVATE>
