@@ -139,16 +139,13 @@ INSTANCE: iota immutable-sequence
     [ 0 swap set-nth-unsafe ] keep ; inline
 
 : (2sequence) ( obj1 obj2 seq -- seq )
-    [ 1 swap set-nth-unsafe ] keep
-    (1sequence) ; inline
+    [ 1 swap set-nth-unsafe ] keep (1sequence) ; inline
 
 : (3sequence) ( obj1 obj2 obj3 seq -- seq )
-    [ 2 swap set-nth-unsafe ] keep
-    (2sequence) ; inline
+    [ 2 swap set-nth-unsafe ] keep (2sequence) ; inline
 
 : (4sequence) ( obj1 obj2 obj3 obj4 seq -- seq )
-    [ 3 swap set-nth-unsafe ] keep
-    (3sequence) ; inline
+    [ 3 swap set-nth-unsafe ] keep (3sequence) ; inline
 
 PRIVATE>
 
@@ -992,7 +989,8 @@ M: object sum 0 [ + ] binary-reduce ; inline
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline
 
-: count ( ... seq quot: ( ... elt -- ... ? ) -- ... n ) [ 1 0 ? ] compose map-sum ; inline
+: count ( ... seq quot: ( ... elt -- ... ? ) -- ... n )
+    [ 1 0 ? ] compose map-sum ; inline
 
 : cartesian-each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     [ with each ] 2curry each ; inline
