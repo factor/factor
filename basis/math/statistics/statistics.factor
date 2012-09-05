@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators generalizations kernel locals math
 math.functions math.order math.vectors sequences
-sequences.private sorting fry arrays grouping sets ;
+sequences.private sorting fry arrays grouping sets
+splitting.monotonic ;
 IN: math.statistics
 
 : power-mean ( seq p -- x )
@@ -343,3 +344,11 @@ ALIAS: corr sample-corr
 
 : rescale ( u -- v )
     dup minmax over - [ v-n ] [ v/n ] bi* ;
+
+: rank-values ( seq -- seq' )
+    [
+        [ ] [ length iota ] bi zip sort-keys
+        [ [ first ] bi@ = ] monotonic-split
+        [ values ] map [ 0 [ length + ] accumulate nip ] [ ] bi zip
+    ] [ length f <array> ] bi
+    [ '[ first2 [ _ set-nth ] with each ] each ] keep ;
