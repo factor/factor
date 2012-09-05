@@ -857,25 +857,39 @@ PRIVATE>
     swap cut-slice [ swap suffix ] dip append ;
 
 : halves ( seq -- first-slice second-slice )
-    [ 0 swap length [ 2/ dup ] keep ] keep
-    [ <slice-unsafe> ] curry 2bi@ ; inline
+    dup midpoint@ cut-slice ; inline
 
-: binary-reduce ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) -- ... value )
+<PRIVATE
+
+: nth2-unsafe ( n seq -- a b )
+    [ nth-unsafe ] [ [ 1 + ] dip nth-unsafe ] 2bi ; inline
+
+: nth3-unsafe ( n seq -- a b c )
+    [ nth-unsafe ]
+    [ [ 1 + ] dip nth-unsafe ]
+    [ [ 2 + ] dip nth-unsafe ]
+    2tri ; inline
+
+: (binary-reduce) ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) from to -- ... value )
     #! We can't use case here since combinators depends on
     #! sequences
-    pick length dup 0 3 between? [
-        integer>fixnum {
-            [ drop nip ]
-            [ 2drop first-unsafe ]
-            [ [ drop first2-unsafe ] dip call ]
-            [ [ drop first3-unsafe ] dip bi@ ]
+    2dup swap - dup 4 < [
+        nip integer>fixnum {
+            [ 2drop nip ]
+            [ 2nip swap nth-unsafe ]
+            [ -rot [ drop swap nth2-unsafe ] dip call ]
+            [ -rot [ drop swap nth3-unsafe ] dip bi@ ]
         } dispatch
     ] [
-        drop
-        [ halves ] 2dip
-        [ [ binary-reduce ] 2curry bi@ ] keep
-        call
+        2/ over [ - dup ] dip
+        [ (binary-reduce) ] [ 2curry ] curry 2bi@
+        pick [ 3bi ] dip call
     ] if ; inline recursive
+
+PRIVATE>
+
+: binary-reduce ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) -- ... value )
+    pick length 0 max 0 swap (binary-reduce) ; inline
 
 : cut ( seq n -- before after )
     [ head ] [ tail ] 2bi ;
