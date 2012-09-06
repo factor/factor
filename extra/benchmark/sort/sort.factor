@@ -1,10 +1,9 @@
-USING: kernel sequences sorting benchmark.random math.parser
-io.files io.encodings.ascii ;
+USING: io.files io.encodings.ascii kernel math math.parser
+random sequences sorting ;
 IN: benchmark.sort
 
 : sort-benchmark ( -- )
-    random-numbers-path
-    ascii file-lines [ string>number ] map
-    natural-sort drop ;
+    10 300000 200 random-integers
+    [ natural-sort drop ] curry times ;
 
 MAIN: sort-benchmark
