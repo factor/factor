@@ -271,3 +271,7 @@ INSTANCE: odds immutable-sequence
 
 : arg-min ( seq -- n )
     dup length iota zip [ first-unsafe ] infimum-by second ;
+
+: arg-where ( ... seq quot: ( ... elt -- ... ? ) -- ... indices )
+    [ dup length iota zip ] dip
+    [ first-unsafe ] prepose filter values ; inline
