@@ -1,5 +1,5 @@
-USING: accessors arrays grouping kernel locals math math.order
-math.ranges sequences sequences.private splitting ;
+USING: accessors arrays assocs grouping kernel locals math
+math.order math.ranges sequences sequences.private splitting ;
 FROM: sequences => change-nth ;
 IN: sequences.extras
 
@@ -35,13 +35,13 @@ IN: sequences.extras
 
 : supremum-by ( seq quot: ( ... elt -- ... x ) -- elt )
     [ [ first dup ] dip call ] 2keep [
-        dupd call pick dupd max over =
+        dupd call pick dupd after?
         [ [ 2drop ] 2dip ] [ 2drop ] if
     ] curry 1 each-from drop ; inline
 
 : infimum-by ( seq quot: ( ... elt -- ... x ) -- elt )
     [ [ first dup ] dip call ] 2keep [
-        dupd call pick dupd min over =
+        dupd call pick dupd before?
         [ [ 2drop ] 2dip ] [ 2drop ] if
     ] curry 1 each-from drop ; inline
 
@@ -265,3 +265,9 @@ INSTANCE: odds immutable-sequence
 
 : until-empty ( seq quot -- )
     [ dup empty? ] swap until drop ; inline
+
+: arg-max ( seq -- n )
+    dup length iota zip [ first-unsafe ] supremum-by second ;
+
+: arg-min ( seq -- n )
+    dup length iota zip [ first-unsafe ] infimum-by second ;
