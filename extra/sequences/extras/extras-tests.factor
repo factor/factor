@@ -5,6 +5,8 @@ IN: sequences.extras.tests
 
 [ 4 ] [ 5 iota [ ] supremum-by ] unit-test
 [ 0 ] [ 5 iota [ ] infimum-by ] unit-test
+{ "bar" } [ { "bar" "baz" "qux" } [ length ] supremum-by ] unit-test
+{ "bar" } [ { "bar" "baz" "qux" } [ length ] infimum-by ] unit-test
 [ { "foo" } ] [ { { "foo" } { "bar" } } [ first ] supremum-by ] unit-test
 [ { "bar" } ] [ { { "foo" } { "bar" } } [ first ] infimum-by ] unit-test
 
@@ -118,3 +120,6 @@ IN: sequences.extras.tests
 { { } } [ { } <odds> >array ] unit-test
 { { 1 3 } } [ 5 iota <odds> >array ] unit-test
 { { 1 3 5 } } [ 6 iota <odds> >array ] unit-test
+
+{ 1 } [ { 1 7 3 7 6 3 7 } arg-max ] unit-test
+{ 0 } [ { 1 7 3 7 6 3 7 } arg-min ] unit-test
