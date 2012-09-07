@@ -1,4 +1,4 @@
-USING: accessors arrays assocs grouping kernel locals math
+USING: accessors arrays assocs fry grouping kernel locals math
 math.order math.ranges sequences sequences.private splitting ;
 FROM: sequences => change-nth ;
 IN: sequences.extras
@@ -158,6 +158,22 @@ IN: sequences.extras
 
 : map-harvest ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     [ empty? not ] map-filter ; inline
+
+<PRIVATE
+
+: ((each-from)) ( i seq -- n quot )
+    [ length over - 0 max swap ] keep '[ _ + _ nth-unsafe ] ; inline
+
+: (each-from) ( i seq quot -- n quot' ) [ ((each-from)) ] dip compose ;
+    inline
+
+PRIVATE>
+
+: map-from-as ( ... seq quot: ( ... elt -- ... newelt ) i exemplar -- ... newseq )
+    [ -rot (each-from) ] dip map-integers ; inline
+
+: map-from ( ... seq quot: ( ... elt -- ... newelt ) i -- ... newseq )
+    pick map-from-as ; inline
 
 <PRIVATE
 
