@@ -126,6 +126,9 @@ IN: sequences.extras
         2over = [ -rot nip over ] when
     ] until 3drop ;
 
+: all-rotations ( seq -- seq' )
+    dup length iota [ rotate ] with map ;
+
 : appender-for ( quot exemplar -- quot' vec )
     [ length ] keep new-resizable
     [ [ push-all ] curry compose ] keep ; inline
