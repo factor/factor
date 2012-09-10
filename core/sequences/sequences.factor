@@ -864,18 +864,18 @@ PRIVATE>
 : nth3-unsafe ( n seq -- a b c )
     [ nth2-unsafe ] [ [ 2 + ] dip nth-unsafe ] 2bi ; inline
 
-: (binary-reduce) ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) from to -- ... value )
+: (binary-reduce) ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) from length -- ... value )
     #! We can't use case here since combinators depends on
     #! sequences
-    2dup swap - dup 4 < [
-        nip integer>fixnum {
+    dup 4 < [
+        integer>fixnum {
             [ 2drop nip ]
             [ 2nip swap nth-unsafe ]
             [ -rot [ drop swap nth2-unsafe ] dip call ]
             [ -rot [ drop swap nth3-unsafe ] dip bi@ ]
         } dispatch
     ] [
-        2/ over [ - dup ] dip
+        [ 2/ ] [ over - ] bi [ 2dup + ] dip
         [ (binary-reduce) ] [ 2curry ] curry 2bi@
         pick [ 3bi ] dip call
     ] if ; inline recursive
