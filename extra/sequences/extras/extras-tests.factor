@@ -123,3 +123,17 @@ IN: sequences.extras.tests
 
 { 1 } [ { 1 7 3 7 6 3 7 } arg-max ] unit-test
 { 0 } [ { 1 7 3 7 6 3 7 } arg-min ] unit-test
+
+{ t } [ { 1 2 3 4 5 } 1 first= ] unit-test
+{ t } [ { 1 2 3 4 5 } 2 second= ] unit-test
+{ t } [ { 1 2 3 4 5 } 3 third= ] unit-test
+{ t } [ { 1 2 3 4 5 } 4 fourth= ] unit-test
+{ t } [ { 1 2 3 4 5 } 5 last= ] unit-test
+{ t } [ 4 { 1 2 3 4 5 } 5 nth= ] unit-test
+
+{ t } [ { 1 2 3 4 5 } [ 1 = ] first? ] unit-test
+{ t } [ { 1 2 3 4 5 } [ 2 = ] second? ] unit-test
+{ t } [ { 1 2 3 4 5 } [ 3 = ] third? ] unit-test
+{ t } [ { 1 2 3 4 5 } [ 4 = ] fourth? ] unit-test
+{ t } [ { 1 2 3 4 5 } [ 5 = ] last? ] unit-test
+{ t } [ 4 { 1 2 3 4 5 } [ 5 = ] nth? ] unit-test
