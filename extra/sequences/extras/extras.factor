@@ -294,3 +294,17 @@ INSTANCE: odds immutable-sequence
 : arg-where ( ... seq quot: ( ... elt -- ... ? ) -- ... indices )
     [ dup length iota zip ] dip
     [ first-unsafe ] prepose filter values ; inline
+
+: first= ( seq elt -- ? ) [ first ] dip = ; inline
+: second= ( seq elt -- ? ) [ second ] dip = ; inline
+: third= ( seq elt -- ? ) [ third ] dip = ; inline
+: fourth= ( seq elt -- ? ) [ fourth ] dip = ; inline
+: last= ( seq elt -- ? ) [ last ] dip = ; inline
+: nth= ( n seq elt -- ? ) [ nth ] dip = ; inline
+
+: first? ( seq quot -- ? ) [ first ] dip call ; inline
+: second? ( seq quot -- ? ) [ second ] dip call ; inline
+: third? ( seq quot -- ? ) [ third ] dip call ; inline
+: fourth? ( seq quot -- ? ) [ fourth ] dip call ; inline
+: last? ( seq quot -- ? ) [ last ] dip call ; inline
+: nth? ( n seq quot -- ? ) [ nth ] dip call ; inline
