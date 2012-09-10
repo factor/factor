@@ -7,9 +7,9 @@ IN: math.transforms.bwt
 ! Inefficient versions of Burrows-Wheeler Transform
 
 : bwt ( seq -- newseq )
-    { 0 } swap append all-rotations natural-sort [ last ] map ;
+    0 suffix all-rotations natural-sort [ last ] map ;
 
 : ibwt ( newseq -- seq )
     [ length [ { } <array> ] keep ] keep
     '[ _ [ prefix ] 2map natural-sort ] times
-    [ { 0 } tail? ] find nip 1 head* ;
+    [ { 0 } tail? ] find nip but-last ;
