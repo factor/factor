@@ -57,7 +57,7 @@ M: fixnum bitnot fixnum-bitnot ; inline
 M: fixnum bit? fixnum-bit? ; inline
 
 : fixnum-log2 ( x -- n )
-    0 swap [ dup 1 eq? ] [ [ 1 + ] [ 2/ ] bi* ] until drop ;
+    0 swap [ dup 1 eq? ] [ [ 1 + ] [ 2/ ] bi* ] until drop ; inline
 
 M: fixnum (log2) fixnum-log2 ; inline
 
