@@ -1,5 +1,6 @@
-USING: accessors arrays assocs fry grouping kernel locals math
-math.order math.ranges sequences sequences.private splitting ;
+USING: accessors arrays assocs fry grouping kernel locals make
+math math.order math.ranges sequences sequences.private
+splitting ;
 FROM: sequences => change-nth ;
 IN: sequences.extras
 

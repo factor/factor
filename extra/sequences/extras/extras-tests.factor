@@ -1,5 +1,6 @@
-USING: arrays ascii kernel make math math.vectors random
-sequences sequences.extras strings tools.test ;
+USING: arrays ascii io io.streams.string kernel make math
+math.vectors random sequences sequences.extras strings
+tools.test ;
 
 IN: sequences.extras.tests
 
@@ -137,3 +138,11 @@ IN: sequences.extras.tests
 { t } [ { 1 2 3 4 5 } [ 4 = ] fourth? ] unit-test
 { t } [ { 1 2 3 4 5 } [ 5 = ] last? ] unit-test
 { t } [ 4 { 1 2 3 4 5 } [ 5 = ] nth? ] unit-test
+
+{ { 97 115 100 102 } } [
+    "asdf" [ [ read1 ] loop>array ] with-string-reader
+] unit-test
+
+{ V{ 97 115 100 102 } } [
+    "asdf" [ [ read1 ] V{ } loop>sequence ] with-string-reader
+] unit-test
