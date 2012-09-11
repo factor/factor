@@ -130,7 +130,7 @@ HINTS: next* { spot } ;
             accum parse-entity
             quot accum spot (parse-char)
         ] }
-        { [ char CHAR: % eq? in-dtd? get and ] [
+        { [ char CHAR: % eq? [ in-dtd? get ] [ f ] if ] [
             accum parse-pe
             quot accum spot (parse-char)
         ] }
