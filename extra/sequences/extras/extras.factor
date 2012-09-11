@@ -308,3 +308,9 @@ INSTANCE: odds immutable-sequence
 : fourth? ( seq quot -- ? ) [ fourth ] dip call ; inline
 : last? ( seq quot -- ? ) [ last ] dip call ; inline
 : nth? ( n seq quot -- ? ) [ nth ] dip call ; inline
+
+: loop>sequence ( quot exemplar -- seq )
+   [ '[ [ @ [ [ , ] when* ] keep ] loop ] ] dip make ; inline
+
+: loop>array ( quot -- seq )
+   { } loop>sequence ; inline
