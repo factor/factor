@@ -322,11 +322,7 @@ cell-bits 32 = [
 ] unit-test
 
 [ t ] [
-    [ { fixnum } declare 10 [ -1 shift ] times ] \ shift inlined?
-] unit-test
-
-[ f ] [
-    [ { integer } declare 10 [ -1 shift ] times ] \ shift inlined?
+    [ 10 [ -1 shift ] times ] \ shift inlined?
 ] unit-test
 
 [ f ] [
