@@ -110,17 +110,35 @@ IN: compiler.tree.propagation.transforms
 : 2^? ( #call -- ? )
     in-d>> first value-info literal>> 1 eq? ;
 
-\ shift [
-    2^? [
-        cell-bits tag-bits get - 1 -
-        '[
-            integer>fixnum dup 0 < [ 2drop 0 ] [
-                dup _ < [ fixnum-shift ] [
-                    fixnum-shift
-                ] if
+: shift-2^ ( -- quot )
+    cell-bits tag-bits get - 1 -
+    '[
+        integer>fixnum dup 0 < [ 2drop 0 ] [
+            dup _ < [ fixnum-shift ] [
+                fixnum-shift
             ] if
-        ]
-    ] [ f ] if
+        ] if
+    ] ;
+
+! Speeds up 2/
+: 2/? ( #call -- ? )
+    in-d>> second value-info literal>> -1 eq? ;
+
+: shift-2/ ( -- quot )
+    [
+        {
+            { [ over fixnum? ] [ fixnum-shift ] }
+            { [ over bignum? ] [ bignum-shift ] }
+            [ drop \ shift no-method ]
+        } cond
+    ] ;
+
+\ shift [
+    {
+        { [ dup 2^? ] [ drop shift-2^ ] }
+        { [ dup 2/? ] [ drop shift-2/ ] }
+        [ drop f ]
+    } cond
 ] "custom-inlining" set-word-prop
 
 { /i fixnum/i fixnum/i-fast bignum/i } [
