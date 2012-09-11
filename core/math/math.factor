@@ -66,7 +66,13 @@ ERROR: log2-expects-positive x ;
     dup 0 <= [ log2-expects-positive ] [ (log2) ] if ; inline
 
 : zero? ( x -- ? ) 0 number= ; inline
-: 2/ ( x -- y ) -1 shift ; inline
+
+! the following lines are necessary because the "-1 shift"
+! definition doesn't (yet) compile as nicely...
+GENERIC: 2/ ( x -- y ) foldable
+M: bignum 2/ -1 bignum-shift ; inline
+M: fixnum 2/ -1 fixnum-shift ; inline
+
 : sq ( x -- y ) dup * ; inline
 : neg ( x -- -x ) -1 * ; inline
 : sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
