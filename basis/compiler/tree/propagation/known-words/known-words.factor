@@ -3,7 +3,7 @@
 USING: effects accessors kernel kernel.private layouts math
 math.private math.integers.private math.floats.private
 math.partial-dispatch math.intervals math.parser math.order
-math.functions math.libm namespaces words sequences
+math.functions math.libm math.ratios namespaces words sequences
 sequences.private arrays assocs classes classes.algebra
 combinators generic.math splitting fry locals classes.tuple
 alien.accessors classes.tuple.private slots.private definitions
@@ -239,7 +239,7 @@ generic-comparison-ops [
     '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
 ] assoc-each
 
-{ numerator denominator }
+{ numerator denominator >fraction }
 [ [ drop integer <class-info> ] "outputs" set-word-prop ] each
 
 { (log2) fixnum-log2 bignum-log2 } [
