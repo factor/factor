@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Alex Chapman, Daniel Ehrenberg
-! See http;//factorcode.org/license.txt for BSD license
+! See http://factorcode.org/license.txt for BSD license
 USING: arrays kernel tools.test sequences sequences.private
 circular strings ;
 IN: circular.tests
