@@ -17,19 +17,19 @@ unmatchable-class terminator-class word-boundary-class ;
 SINGLETONS: beginning-of-input ^ end-of-input $ end-of-file
 ^unix $unix word-break ;
 
-TUPLE: range-class from to ;
+TUPLE: range-class { from read-only } { to read-only } ;
 C: <range-class> range-class
 
-TUPLE: primitive-class class ;
+TUPLE: primitive-class { class read-only } ;
 C: <primitive-class> primitive-class
 
-TUPLE: category-class category ;
+TUPLE: category-class { category read-only } ;
 C: <category-class> category-class
 
-TUPLE: category-range-class category ;
+TUPLE: category-range-class { category read-only } ;
 C: <category-range-class> category-range-class
 
-TUPLE: script-class script ;
+TUPLE: script-class { script read-only } ;
 C: <script-class> script-class
 
 GENERIC: class-member? ( obj class -- ? )
@@ -122,7 +122,7 @@ M: category-class class-member?
 M: category-range-class class-member? inline
     [ category first ] [ category>> ] same? ; inline
 
-TUPLE: not-class class ;
+TUPLE: not-class { class read-only } ;
 
 PREDICATE: not-integer < not-class class>> integer? ;
 
@@ -133,12 +133,12 @@ PREDICATE: not-simple < not-class class>> simple-class? ;
 M: not-class class-member?
     class>> class-member? not ; inline
 
-TUPLE: or-class seq ;
+TUPLE: or-class { seq read-only } ;
 
 M: or-class class-member?
     seq>> [ class-member? ] with any? ; inline
 
-TUPLE: and-class seq ;
+TUPLE: and-class { seq read-only } ;
 
 M: and-class class-member?
     seq>> [ class-member? ] with all? ; inline
@@ -152,7 +152,7 @@ DEFER: substitute
     seq length {
         { 0 [ empty ] }
         { 1 [ seq first ] }
-        [ drop class new seq { } like >>seq ]
+        [ drop seq { } like class boa ]
     } case ; inline
 
 TUPLE: class-partition integers not-integers simples not-simples and or other ;
