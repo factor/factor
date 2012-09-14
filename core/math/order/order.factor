@@ -17,20 +17,20 @@ GENERIC: <=> ( obj1 obj2 -- <=> )
 
 <PRIVATE
 
-! defining a math generic for comparison forces a single math
+! Defining a math generic for comparison forces a single math
 ! promotion, and speeds up comparisons on numbers.
-: (number<=>) ( x y -- ? )
+: (real<=>) ( x y -- ? )
     2dup < [ 2drop +lt+ ] [ number= +eq+ +gt+ ? ] if ; inline
 
-MATH: number<=> ( x y -- ? )
-M: fixnum number<=> { fixnum fixnum } declare (number<=>) ; inline
-M: bignum number<=> { bignum bignum } declare (number<=>) ; inline
-M: float number<=> { float float } declare (number<=>) ; inline
-M: real number<=> (number<=>) ; inline
+MATH: real<=> ( x y -- ? )
+M: fixnum real<=> { fixnum fixnum } declare (real<=>) ; inline
+M: bignum real<=> { bignum bignum } declare (real<=>) ; inline
+M: float real<=> { float float } declare (real<=>) ; inline
+M: real real<=> (real<=>) ; inline
 
 PRIVATE>
 
-M: real <=> number<=> ; inline
+M: real <=> real<=> ; inline
 
 GENERIC: before? ( obj1 obj2 -- ? )
 GENERIC: after? ( obj1 obj2 -- ? )
