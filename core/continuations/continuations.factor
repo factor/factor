@@ -45,8 +45,11 @@ C: <continuation> continuation
 
 <PRIVATE
 
+ERROR: not-a-continuation obj ;
+
 : >continuation< ( continuation -- data call retain name catch )
-    { [ data>> ] [ call>> ] [ retain>> ] [ name>> ] [ catch>> ] } cleave ;
+    dup continuation? [ not-a-continuation ] unless
+    { [ data>> ] [ call>> ] [ retain>> ] [ name>> ] [ catch>> ] } cleave ; inline
 
 PRIVATE>
 
@@ -160,7 +163,7 @@ ERROR: attempt-all-error ;
 
 TUPLE: condition error restarts continuation ;
 
-C: <condition> condition ( error restarts cc -- condition )
+C: <condition> condition
 
 : throw-restarts ( error restarts -- restart )
     [ <condition> throw ] callcc1 2nip ;
