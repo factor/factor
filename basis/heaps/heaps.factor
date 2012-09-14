@@ -22,7 +22,8 @@ TUPLE: heap { data vector } ;
 
 TUPLE: entry value key heap index ;
 
-: <entry> ( value key heap -- entry ) f entry boa ; inline
+: <entry> ( value key heap -- entry )
+    f entry boa ; inline
 
 PRIVATE>
 
@@ -38,7 +39,7 @@ M: heap heap-empty? ( heap -- ? )
     data>> empty? ; inline
 
 M: heap heap-size ( heap -- n )
-    data>> length ;
+    data>> length ; inline
 
 <PRIVATE
 
