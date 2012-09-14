@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math ;
+USING: kernel kernel.private math ;
 IN: math.order
 
 SYMBOL: +lt+
@@ -15,7 +15,22 @@ GENERIC: <=> ( obj1 obj2 -- <=> )
 
 : >=< ( obj1 obj2 -- >=< ) <=> invert-comparison ; inline
 
-M: real <=> 2dup < [ 2drop +lt+ ] [ number= +eq+ +gt+ ? ] if ; inline
+<PRIVATE
+
+! defining a math generic for comparison forces a single math
+! promotion, and speeds up comparisons on numbers.
+: (number<=>) ( x y -- ? )
+    2dup < [ 2drop +lt+ ] [ number= +eq+ +gt+ ? ] if ; inline
+
+MATH: number<=> ( x y -- ? )
+M: fixnum number<=> { fixnum fixnum } declare (number<=>) ; inline
+M: bignum number<=> { bignum bignum } declare (number<=>) ; inline
+M: float number<=> { float float } declare (number<=>) ; inline
+M: real number<=> (number<=>) ; inline
+
+PRIVATE>
+
+M: real <=> number<=> ; inline
 
 GENERIC: before? ( obj1 obj2 -- ? )
 GENERIC: after? ( obj1 obj2 -- ? )
