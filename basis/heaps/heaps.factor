@@ -95,7 +95,7 @@ M: max-heap heap-compare (heap-compare) +lt+ eq? ;
 : continue? ( m n heap -- ? )
     [ data-nth nip ]
     [ nip data-nth ]
-    [ 2nip ] 3tri heap-compare ;
+    [ 2nip ] 3tri heap-compare ; inline
 
 DEFER: up-heap
 
@@ -112,11 +112,11 @@ DEFER: up-heap
 
 : (child) ( m heap -- n )
     { [ drop ] [ left-value ] [ right-value ] [ nip ] } 2cleave
-    heap-compare [ right ] [ left ] if ;
+    heap-compare [ right ] [ left ] if ; inline
 
 : child ( m heap -- n )
     2dup right-bounds-check?
-    [ drop left ] [ (child) ] if ;
+    [ drop left ] [ (child) ] if ; inline
 
 DEFER: down-heap
 
@@ -151,7 +151,7 @@ ERROR: bad-heap-delete ;
 
 M: bad-heap-delete summary 
     drop "Invalid entry passed to heap-delete" ;
-    
+
 : entry>index ( entry heap -- n )
     over heap>> eq? [ bad-heap-delete ] unless
     index>> ;
