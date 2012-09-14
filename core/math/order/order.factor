@@ -7,7 +7,7 @@ SYMBOL: +lt+
 SYMBOL: +eq+
 SYMBOL: +gt+
 
-: invert-comparison ( <=> -- <=>' )
+: invert-comparison ( <=> -- >=< )
     #! Can't use case, index or nth here
     dup +lt+ eq? [ drop +gt+ ] [ +eq+ eq? +eq+ +lt+ ? ] if ;
 
@@ -19,10 +19,10 @@ GENERIC: <=> ( obj1 obj2 -- <=> )
 
 ! Defining a math generic for comparison forces a single math
 ! promotion, and speeds up comparisons on numbers.
-: (real<=>) ( x y -- ? )
+: (real<=>) ( x y -- <=> )
     2dup < [ 2drop +lt+ ] [ number= +eq+ +gt+ ? ] if ; inline
 
-MATH: real<=> ( x y -- ? )
+MATH: real<=> ( x y -- <=> )
 M: fixnum real<=> { fixnum fixnum } declare (real<=>) ; inline
 M: bignum real<=> { bignum bignum } declare (real<=>) ; inline
 M: float real<=> { float float } declare (real<=>) ; inline
