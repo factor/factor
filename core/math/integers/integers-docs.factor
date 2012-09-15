@@ -37,7 +37,7 @@ HELP: >bignum
 { $description "Converts a real number to a bignum, with a possible loss of precision." } ;
 
 HELP: >integer
-{ $values { "x" real } { "n" bignum } }
+{ $values { "x" real } { "n" integer } }
 { $description "Converts a real number to an integer, with a possible loss of precision." } ;
 
 HELP: integer
