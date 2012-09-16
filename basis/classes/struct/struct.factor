@@ -344,11 +344,7 @@ ERROR: bad-type-for-bits type ;
 :: set-bits ( slot-spec n -- slot-spec )
     struct-bit-slot-spec new
         n >>bits
-        slot-spec type>> {
-            { int [ t ] }
-            { uint [ f ] }
-            [ bad-type-for-bits ]
-        } case >>signed?
+        slot-spec type>> c-type-signed >>signed?
         slot-spec name>> >>name
         slot-spec class>> >>class
         slot-spec type>> >>type
