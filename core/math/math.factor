@@ -7,6 +7,8 @@ GENERIC: >fixnum ( x -- n ) foldable
 GENERIC: >bignum ( x -- n ) foldable
 GENERIC: >integer ( x -- n ) foldable
 GENERIC: >float ( x -- y ) foldable
+GENERIC: integer>fixnum ( x -- y ) foldable
+GENERIC: integer>fixnum-strict ( x -- y ) foldable
 
 GENERIC: numerator ( a/b -- a )
 GENERIC: denominator ( a/b -- b )
@@ -56,8 +58,6 @@ GENERIC: (log2) ( x -- n ) foldable
 
 PRIVATE>
 
-ERROR: not-an-integer n ;
-
 ERROR: out-of-fixnum-range n ;
 
 ERROR: log2-expects-positive x ;
@@ -86,19 +86,6 @@ GENERIC: neg? ( x -- -x )
 : unless-zero ( ..a n quot: ( ..a -- ..b ) -- ..b ) [ ] swap if-zero ; inline
 
 UNION: integer fixnum bignum ;
-
-: integer>fixnum ( m -- n )
-    dup fixnum? [
-        dup bignum? [ bignum>fixnum ] [ not-an-integer ] if
-    ] unless ; inline foldable
-
-: integer>fixnum-strict ( m -- n )
-    dup fixnum? [
-        dup bignum? [
-            dup bignum>fixnum 2dup number=
-            [ nip ] [ drop out-of-fixnum-range ] if
-        ] [ not-an-integer ] if
-    ] unless ; inline foldable
 
 TUPLE: ratio { numerator integer read-only } { denominator integer read-only } ;
 
