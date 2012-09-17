@@ -339,8 +339,6 @@ SYMBOL: bits:
 
 <PRIVATE
 
-ERROR: bad-type-for-bits type ;
-
 :: set-bits ( slot-spec n -- slot-spec )
     struct-bit-slot-spec new
         n >>bits
