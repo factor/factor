@@ -168,17 +168,15 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     class-partition boa ;
 
 : class-partition>sequence ( class-partition -- seq )
-    [
-        {
-            [ integers>> ]
-            [ not-integers>> ]
-            [ simples>> ]
-            [ not-simples>> ]
-            [ and>> ]
-            [ or>> ]
-            [ other>> ]
-        } cleave
-    ] output>array concat ;
+    {
+        [ integers>> ]
+        [ not-integers>> ]
+        [ simples>> ]
+        [ not-simples>> ]
+        [ and>> ]
+        [ or>> ]
+        [ other>> ]
+    } cleave>array concat ;
 
 : repartition ( partition -- partition' )
     ! This could be made more efficient; only and and or are effected
