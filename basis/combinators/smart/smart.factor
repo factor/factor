@@ -3,7 +3,8 @@
 USING: accessors arrays effects fry generalizations kernel
 macros math math.order sequences sequences.generalizations
 stack-checker stack-checker.backend stack-checker.errors
-stack-checker.values stack-checker.visitor words memoize ;
+stack-checker.values stack-checker.visitor words memoize
+combinators ;
 IN: combinators.smart
 
 GENERIC: infer-known* ( known -- effect )
@@ -65,6 +66,9 @@ M: object infer-known* drop f ;
 
 : output>array ( quot -- array )
     { } output>sequence ; inline
+    
+: cleave>array ( x seq -- array )
+    '[ _ cleave ] output>array ; inline
 
 : input<sequence ( seq quot -- )
     [ inputs firstn ] [ call ] bi ; inline
