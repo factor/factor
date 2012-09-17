@@ -3,8 +3,9 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays byte-arrays classes.struct combinators
 combinators.smart destructors io.encodings.string
-io.encodings.utf8 kernel libc make sequences sequences.extras
-windows.errors windows.kernel32 windows.types windows.winsock ;
+io.encodings.utf8 io.sockets io.sockets.private kernel libc
+make refs sequences sequences.extras windows.errors
+windows.kernel32 windows.types windows.winsock fry ;
 IN: windows.iphlpapi
 
 LIBRARY: iphlpapi
@@ -43,7 +44,7 @@ CONSTANT: MIB_IF_TYPE_LOOPBACK 24
 CONSTANT: MIB_IF_TYPE_SLIP 28
 CONSTANT: MAX_DNS_SUFFIX_STRING_LENGTH 256 ! 246?
 CONSTANT: MAX_DHCPV6_DUID_LENGTH 130
-
+CONSTANT: MAX_ADAPTER_NAME 128
 
 STRUCT: IP_ADDRESS_STRING
     { String char[16] } ;
@@ -330,6 +331,45 @@ TYPEDEF: IP_ADAPTER_ADDRESSES* PIP_ADAPTER_ADDRESSES
 
 TYPEDEF: FIXED_INFO* PFIXED_INFO
 
+STRUCT: S_un_b
+    { s_b1 uchar }
+    { s_b2 uchar }
+    { s_b3 uchar }
+    { s_b4 uchar } ;
+    
+STRUCT: S_un_w
+    { s_w1 ushort }
+    { s_w2 ushort } ;
+
+UNION-STRUCT: IPAddr
+    { S_un_b S_un_b }
+    { S_un_w S_un_w }
+    { S_addr ulong } ;
+    
+UNION-STRUCT: S_un
+    { S_un_b S_un_b }
+    { S_un_w S_un_w }
+    { S_addr ulong } ;
+    
+STRUCT: IP_ADAPTER_INDEX_MAP
+    { Index ULONG }
+    { Name WCHAR[MAX_ADAPTER_NAME] } ;
+TYPEDEF: IP_ADAPTER_INDEX_MAP* PIP_ADAPTER_INDEX_MAP
+
+FUNCTION: DWORD IpReleaseAddress ( PIP_ADAPTER_INDEX_MAP AdapterInfo ) ;
+FUNCTION: DWORD IpRenewAddress ( PIP_ADAPTER_INDEX_MAP AdapterInfo ) ;
+
+
+FUNCTION: DWORD GetBestInterface (
+   IPAddr dwDestAddr,
+   PDWORD pdwBestIfIndex
+) ;
+
+FUNCTION: DWORD GetBestInterfaceEx (
+    sockaddr* pDestAddr,
+    PDWORD pdwBestIfIndex
+) ;
+
 FUNCTION: ULONG GetAdaptersAddresses (
     ULONG Family,
     ULONG Flags,
@@ -376,7 +416,6 @@ FUNCTION: DWORD GetNetworkParams ( PFIXED_INFO pFixedInfo, PULONG pOutBufLen ) ;
 
 PRIVATE>
 
-
 : interfaces-each ( quot -- seq )
     [ [ iterate-interfaces ] dip each ] with-destructors ; inline
 
@@ -398,3 +437,7 @@ PRIVATE>
             [ FirstUnicastAddress>> loop-list [ Address>> SOCKET_ADDRESS>sockaddr sockaddr>ip ] map ]
         } cleave>array
     ] interfaces-map ;
+
+: get-best-interface ( inet -- interface )
+    make-sockaddr 0 DWORD <ref>
+    [ GetBestInterfaceEx win32-error=0/f ] keep DWORD deref ;
