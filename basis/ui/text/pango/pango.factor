@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays assocs
 cache cairo cairo.ffi classes.struct combinators destructors fonts fry
-gobject.ffi init io.encodings.utf8 kernel math math.rectangles
+gobject.ffi init io.encodings.utf8 kernel locals math math.rectangles
 math.vectors memoize namespaces pango.cairo.ffi pango.ffi sequences
 ui.text ui.text.private ;
 IN: ui.text.pango
@@ -10,20 +10,20 @@ IN: ui.text.pango
 : pango>float ( n -- x ) PANGO_SCALE /f ; inline
 : float>pango ( x -- n ) PANGO_SCALE * >integer ; inline
 
-MEMO: (cache-font-description) ( font -- description )
+MEMO:: (cache-font-description) ( name size bold? italic? -- description )
     [
-        [ pango_font_description_new |pango_font_description_free ] dip {
-            [ name>> utf8 string>alien pango_font_description_set_family ]
-            [ size>> float>pango pango_font_description_set_size ]
-            [ bold?>> PANGO_WEIGHT_BOLD PANGO_WEIGHT_NORMAL ? pango_font_description_set_weight ]
-            [ italic?>> PANGO_STYLE_ITALIC PANGO_STYLE_NORMAL ? pango_font_description_set_style ]
-            [ drop ]
-        } 2cleave
+        pango_font_description_new |pango_font_description_free {
+            [ name utf8 string>alien pango_font_description_set_family ]
+            [ size float>pango pango_font_description_set_size ]
+            [ bold? PANGO_WEIGHT_BOLD PANGO_WEIGHT_NORMAL ? pango_font_description_set_weight ]
+            [ italic? PANGO_STYLE_ITALIC PANGO_STYLE_NORMAL ? pango_font_description_set_style ]
+            [ ]
+        } cleave
     ] with-destructors ;
 
 : cache-font-description ( font -- description )
-    strip-font-colors (cache-font-description) ;
-
+    { [ name>> ] [ size>> ] [ bold?>> ] [ italic?>> ] } cleave
+    (cache-font-description) ;
 
 TUPLE: layout < disposable font string selection layout metrics ink-rect logical-rect image ;
 
