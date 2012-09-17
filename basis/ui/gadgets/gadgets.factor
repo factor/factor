@@ -32,9 +32,9 @@ M: gadget hashcode* nip identity-hashcode ;
 
 M: gadget model-changed 2drop ;
 
-: gadget-child ( gadget -- child ) children>> first ;
+: gadget-child ( gadget -- child ) children>> first ; inline
 
-: nth-gadget ( n gadget -- child ) children>> nth ;
+: nth-gadget ( n gadget -- child ) children>> nth ; inline
 
 : <gadget> ( -- gadget )
     gadget new ;
