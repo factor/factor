@@ -1473,13 +1473,13 @@ FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
 ! FUNCTION: Heap32ListFirst
 ! FUNCTION: Heap32ListNext
 ! FUNCTION: Heap32Next
-! FUNCTION: HeapAlloc
+FUNCTION: LPVOID HeapAlloc ( HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes ) ;
 ! FUNCTION: HeapCompact
 ! FUNCTION: HeapCreate
 ! FUNCTION: HeapCreateTagsW
 ! FUNCTION: HeapDestroy
 ! FUNCTION: HeapExtend
-! FUNCTION: HeapFree
+FUNCTION: BOOL HeapFree ( HANDLE hHeap, DWORD dwFlags, LPVOID lpMem ) ;
 ! FUNCTION: HeapLock
 ! FUNCTION: HeapQueryInformation
 ! FUNCTION: HeapQueryTagW
