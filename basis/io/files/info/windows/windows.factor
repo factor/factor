@@ -182,10 +182,12 @@ CONSTANT: names-buf-length 16384
         [ { } ] [ [ alien>native-string ] map ] if-empty
     ] with-destructors ;
 
+! Can error with T{ windows-error f 21 "The device is not ready." }
+! if there is a D: that is not ready, for instance. Ignore these drives.
 M: windows file-systems ( -- array )
     find-volumes [ volume>paths ] map concat [
-        (file-system-info)
-    ] map ;
+        [ (file-system-info) ] [ 2drop f ] recover
+    ] map sift ;
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
