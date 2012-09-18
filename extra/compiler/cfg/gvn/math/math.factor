@@ -81,7 +81,7 @@ M: ##add-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##add-imm? ] [ ##add-imm reassociate-arithmetic ] }
+        { [ dup src1>> vreg>insn [ ##add-imm? ] with-available-uses? ] [ ##add-imm reassociate-arithmetic ] }
         [ drop f ]
     } cond ;
 
@@ -145,7 +145,7 @@ M: ##mul-imm rewrite
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
         { [ dup mul-to-neg? ] [ mul-to-neg ] }
         { [ dup mul-to-shl? ] [ mul-to-shl ] }
-        { [ dup src1>> vreg>insn ##mul-imm? ] [ ##mul-imm reassociate-arithmetic ] }
+        { [ dup src1>> vreg>insn [ ##mul-imm? ] with-available-uses? ] [ ##mul-imm reassociate-arithmetic ] }
         { [ dup distribute-over-add? ] [ \ ##add-imm, \ ##mul-imm, distribute ] }
         { [ dup distribute-over-sub? ] [ \ ##sub-imm, \ ##mul-imm, distribute ] }
         [ drop f ]
@@ -154,7 +154,7 @@ M: ##mul-imm rewrite
 M: ##and-imm rewrite
     {
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##and-imm? ] [ ##and-imm reassociate-bitwise ] }
+        { [ dup src1>> vreg>insn [ ##and-imm? ] with-available-uses? ] [ ##and-imm reassociate-bitwise ] }
         { [ dup src2>> 0 = ] [ dst>> 0 ##load-integer new-insn ] }
         { [ dup src2>> -1 = ] [ identity ] }
         [ drop f ]
@@ -165,7 +165,7 @@ M: ##or-imm rewrite
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup src2>> -1 = ] [ dst>> -1 ##load-integer new-insn ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##or-imm? ] [ ##or-imm reassociate-bitwise ] }
+        { [ dup src1>> vreg>insn [ ##or-imm? ] with-available-uses? ] [ ##or-imm reassociate-bitwise ] }
         [ drop f ]
     } cond ;
 
@@ -174,7 +174,7 @@ M: ##xor-imm rewrite
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup src2>> -1 = ] [ [ dst>> ] [ src1>> ] bi ##not new-insn ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##xor-imm? ] [ ##xor-imm reassociate-bitwise ] }
+        { [ dup src1>> vreg>insn [ ##xor-imm? ] with-available-uses? ] [ ##xor-imm reassociate-bitwise ] }
         [ drop f ]
     } cond ;
 
@@ -182,7 +182,7 @@ M: ##shl-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##shl-imm? ] [ ##shl-imm reassociate-shift ] }
+        { [ dup src1>> vreg>insn [ ##shl-imm? ] with-available-uses? ] [ ##shl-imm reassociate-shift ] }
         { [ dup distribute-over-add? ] [ \ ##add-imm, \ ##shl-imm, distribute ] }
         { [ dup distribute-over-sub? ] [ \ ##sub-imm, \ ##shl-imm, distribute ] }
         [ drop f ]
@@ -192,7 +192,7 @@ M: ##shr-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##shr-imm? ] [ ##shr-imm reassociate-shift ] }
+        { [ dup src1>> vreg>insn [ ##shr-imm? ] with-available-uses? ] [ ##shr-imm reassociate-shift ] }
         [ drop f ]
     } cond ;
 
@@ -200,7 +200,7 @@ M: ##sar-imm rewrite
     {
         { [ dup src2>> 0 = ] [ identity ] }
         { [ dup binary-constant-fold? ] [ binary-constant-fold ] }
-        { [ dup src1>> vreg>insn ##sar-imm? ] [ ##sar-imm reassociate-shift ] }
+        { [ dup src1>> vreg>insn [ ##sar-imm? ] with-available-uses? ] [ ##sar-imm reassociate-shift ] }
         [ drop f ]
     } cond ;
 
