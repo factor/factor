@@ -52,11 +52,18 @@ M: label string<< ( string label -- )
 M: label pref-dim*
     >label< text-dim ;
 
+<PRIVATE
+
+: label-metrics ( label -- metrics )
+    >label< dup string? [ first ] unless line-metrics ;
+
+PRIVATE>
+
 M: label baseline
-    font>> font-metrics ascent>> round ;
+    label-metrics ascent>> round ;
 
 M: label cap-height
-    font>> font-metrics cap-height>> round ;
+    label-metrics cap-height>> round ;
 
 M: label draw-gadget*
     >label<
