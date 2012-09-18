@@ -8,7 +8,7 @@ combinators opengl.gl ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
-TUPLE: label < gadget text font ;
+TUPLE: label < aligned-gadget text font ;
 
 SLOT: string
 
@@ -59,10 +59,10 @@ M: label pref-dim*
 
 PRIVATE>
 
-M: label baseline
+M: label baseline*
     label-metrics ascent>> round ;
 
-M: label cap-height
+M: label cap-height*
     label-metrics cap-height>> round ;
 
 M: label draw-gadget*
