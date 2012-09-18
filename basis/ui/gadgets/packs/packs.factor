@@ -5,7 +5,7 @@ ui.baseline-alignment.private kernel math math.functions math.vectors
 math.order math.rectangles namespaces accessors fry combinators arrays ;
 IN: ui.gadgets.packs
 
-TUPLE: pack < gadget
+TUPLE: pack < aligned-gadget
 { align initial: 0 } { fill initial: 0 } { gap initial: { 0 0 } } ;
 
 <PRIVATE
@@ -88,13 +88,13 @@ M: pack pref-dim*
 
 PRIVATE>
 
-M: pack baseline
+M: pack baseline*
     dup orientation>> {
         { vertical [ vertical-baseline ] }
         { horizontal [ horizontal-baseline ] }
     } case ;
 
-M: pack cap-height pack-cap-height ;
+M: pack cap-height* pack-cap-height ;
 
 M: pack layout*
     dup children>> pref-dims pack-layout ;
