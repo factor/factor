@@ -18,7 +18,7 @@ M: word-break-gadget draw-gadget* drop ;
 INSTANCE: word-break-gadget word-break
 
 ! A gadget that arranges its children in a word-wrap style.
-TUPLE: paragraph < gadget margin wrapped ;
+TUPLE: paragraph < aligned-gadget margin wrapped ;
 
 : <paragraph> ( margin -- gadget )
     paragraph new
@@ -40,8 +40,9 @@ TUPLE: line words height baseline ;
     [ children>> [ gadget>word ] map ] [ margin>> ] bi
     dup wrap-words [ <line> ] map ;
 
-M: paragraph children<<
-    [ call-next-method ] [ [ wrap-paragraph ] keep wrapped<< ] bi ;
+: cached-wrapped ( paragraph -- wrapped-paragraph )
+    dup wrapped>>
+    [ nip ] [ [ wrap-paragraph dup ] keep wrapped<< ] if* ;
 
 : line-width ( wrapped-line -- n )
     [ break?>> ] trim-tail-slice [ width>> ] map-sum ;
@@ -53,7 +54,7 @@ M: paragraph children<<
     [ height>> ] map-sum ;
 
 M: paragraph pref-dim*
-    wrapped>> [ max-line-width ] [ sum-line-heights ] bi 2array ;
+    cached-wrapped [ max-line-width ] [ sum-line-heights ] bi 2array ;
 
 : line-y-coordinates ( wrapped-paragraph -- ys )
     0 [ height>> + ] accumulate nip ;
@@ -73,11 +74,12 @@ M: paragraph pref-dim*
     ] dip '[ _ + layout-word ] 3each ;
 
 M: paragraph layout*
-    wrapped>> dup line-y-coordinates [ layout-line ] 2each ;
+    f >>wrapped
+    cached-wrapped dup line-y-coordinates [ layout-line ] 2each ;
 
-M: paragraph baseline
-    wrapped>> [ f ] [ first baseline>> ] if-empty ;
+M: paragraph baseline*
+    cached-wrapped [ f ] [ first baseline>> ] if-empty ;
 
-M: paragraph cap-height pack-cap-height ;
+M: paragraph cap-height* pack-cap-height ;
 
 PRIVATE>
