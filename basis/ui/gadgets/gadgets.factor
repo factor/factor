@@ -37,7 +37,7 @@ M: gadget model-changed 2drop ;
 : nth-gadget ( n gadget -- child ) children>> nth ; inline
 
 : <gadget> ( -- gadget )
-    gadget new ;
+    gadget new ; inline
 
 : control-value ( control -- value )
     model>> value>> ;
@@ -162,7 +162,7 @@ PRIVATE>
     [ drop ] [ dup invalidate layout-later ] if ;
 
 : show-gadget ( gadget -- ) t >>visible? drop ;
-                              
+
 : hide-gadget ( gadget -- ) f >>visible? drop ;
 
 <PRIVATE
@@ -189,7 +189,7 @@ GENERIC: pref-dim* ( gadget -- dim )
         [ drop ] [ dupd pref-dim<< ] if
     ] ?if ;
 
-: pref-dims ( gadgets -- seq ) [ pref-dim ] map ;
+: pref-dims ( gadgets -- seq ) [ pref-dim ] map ; inline
 
 M: gadget pref-dim* dim>> ;
 

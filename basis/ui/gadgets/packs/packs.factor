@@ -78,13 +78,13 @@ M: pack pref-dim*
     dup children>> pref-dims pack-pref-dim ;
 
 : vertical-baseline ( pack -- y )
-    children>> [ f ] [ first baseline ] if-empty ;
+    children>> [ f ] [ first baseline ] if-empty ; inline
 
 : horizontal-baseline ( pack -- y )
-    children>> dup pref-dims measure-metrics drop ;
+    children>> dup pref-dims measure-metrics drop ; inline
 
-: pack-cap-height ( pack -- n )
-    children>> [ cap-height ] map ?supremum ;
+: pack-cap-height ( pack -- n/f )
+    children>> [ cap-height ] map ?supremum ; inline
 
 PRIVATE>
 

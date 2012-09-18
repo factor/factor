@@ -47,7 +47,7 @@ M: label string<< ( string label -- )
     label new-label ;
 
 : >label< ( label -- font text )
-    [ font>> ] [ text>> ] bi ;
+    [ font>> ] [ text>> ] bi ; inline
 
 M: label pref-dim*
     >label< text-dim ;
