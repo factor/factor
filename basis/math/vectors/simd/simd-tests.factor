@@ -159,9 +159,10 @@ TUPLE: simd-test-failure
         input-quot code-quot' [ [ call ] dip compile-call ]
         call( i c -- result ) :> optimized-result
         input-quot code-quot' [
-            t "always-inline-simd-intrinsics"
-            [ [ call ] dip compile-call ]
-            with-variable
+            t "always-inline-simd-intrinsics" [
+                "print-inline-mr" get [ code-quot' regs. ] when
+                [ call ] dip compile-call
+            ] with-variable
         ] call( i c -- result ) :> nonintrinsic-result
 
         unoptimized-result optimized-result eq-quot call
