@@ -4,7 +4,7 @@ USING: alien alien.c-types arrays assocs combinators
 compiler.codegen.labels cpu.architecture cpu.x86.assembler
 cpu.x86.assembler.operands init kernel math math.order
 math.parser memoize namespaces sequences
-specialized-arrays system ;
+specialized-arrays system math.bitwise combinators.smart ;
 SPECIALIZED-ARRAY: uint
 IN: cpu.x86.features
 
@@ -90,14 +90,32 @@ HOOK: (cpuid) cpu ( n regs -- )
 : cpuid ( n -- 4array )
    4 <uint-array> [ (cpuid) ] keep >array ;
 
-: popcnt? ( -- ? )
-    bool { } cdecl [
-        return-reg 1 MOV
-        CPUID
-        return-reg dup XOR
-        ECX 23 BT
-        return-reg SETB
-    ] alien-assembly ;
+: cpu-stepping ( -- n ) 1 cpuid first 4 bits ;
+: cpu-model ( -- n ) 1 cpuid first -4 shift 4 bits ;
+: cpu-family ( -- n ) 1 cpuid first -8 shift 4 bits ;
+: cpu-processor-type ( -- n ) 1 cpuid first -12 shift 2 bits ;
+: cpu-extended-model ( -- n ) 1 cpuid first -16 shift 4 bits ;
+: cpu-extended-family ( -- n ) 1 cpuid first -20 shift 8 bits ;
+
+: cpu-family-model-string ( -- string )
+    [
+        cpu-extended-family cpu-family [ >hex ] bi@
+        "_"
+        cpu-extended-model cpu-model [ >hex ] bi@
+    ] "" append-outputs-as ;
+
+: popcnt? ( -- ? ) 1 cpuid third 23 bit? ;
+: tscdeadline? ( -- ? ) 1 cpuid third 24 bit? ;
+: aes? ( -- ? ) 1 cpuid third 25 bit? ;
+: xsave? ( -- ? ) 1 cpuid third 26 bit? ;
+: osxsave? ( -- ? ) 1 cpuid third 27 bit? ;
+: avx? ( -- ? ) 1 cpuid third 28 bit? ;
+: f16c? ( -- ? ) 1 cpuid third 29 bit? ;
+: rdrnd? ( -- ? ) 1 cpuid third 30 bit? ;
+
+: msr? ( -- ? ) 1 cpuid fourth 5 bit? ;
+: tm1? ( -- ? ) 1 cpuid fourth 29 bit? ;
+: tm2? ( -- ? ) 1 cpuid third 8 bit? ;
 
 MEMO: enable-popcnt? ( -- ? )
     popcnt? "disable-popcnt" get not and ;
