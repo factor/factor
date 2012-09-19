@@ -77,3 +77,5 @@ SPECIALIZED-ARRAY: uint-4
 [ t ] [ 0x0 1 bit-clear? ] unit-test
 
 [ -1 bit-count ] [ invalid-bit-count-target? ] must-fail-with
+
+{ 0b11 } [ 0b110000 5 4 bit-range ] unit-test
