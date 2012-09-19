@@ -131,10 +131,11 @@ M: x86.64 float-on-stack? f ;
 
 M: x86.64 struct-return-on-stack? f ;
 
-M: x86.64 (cpuid) ( n regs -- )
-    void { uint void* } cdecl [
+M: x86.64 (cpuid) ( rax rcx regs -- )
+    void { uint uint void* } cdecl [
         RAX param-reg-0 MOV
-        RSI param-reg-1 MOV
+        RCX param-reg-1 MOV
+        RSI param-reg-2 MOV
         CPUID
         RSI [] EAX MOV
         RSI 4 [+] EBX MOV
