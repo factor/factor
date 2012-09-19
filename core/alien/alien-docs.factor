@@ -1,5 +1,5 @@
 USING: alien.accessors alien.c-types alien.libraries
-alien.syntax arrays byte-arrays compiler cpu.x86 cpu.x86.64
+alien.syntax arrays byte-arrays compiler cpu.x86
 debugger definitions eval help.markup help.syntax io io.backend
 kernel libc math parser quotations sequences system ;
 IN: alien
@@ -150,7 +150,7 @@ HELP: alien-assembly
     $nl
     "It's important to mind the ABI. For instance, on x86.32, parameters are passed on the stack in " { $snippet "ESP" } ", while on x86.64 arguments are passed in " { $snippet "RDI" } ", " { $snippet "RSI" } ", " { $snippet "RDX" } ", and " { $snippet "RCX" } ". On Windows 64, integers and pointers are passed in " { $snippet "RCX" } ", " { $snippet "RDX" } ", " { $snippet "R8" } ", and " { $snippet "R9" } ", and then on the stack."
     $nl
-    "There are Factor words for the input parameters, such as " { $link param-reg-0 } " and " { $link param-reg-1 } "."
+    "There are Factor words for the input parameters, such as " { $snippet "param-reg-0" } " and " { $snippet "param-reg-1" } "."
     $nl
     "For output parameters, use " { $link return-reg } "."
     $nl
