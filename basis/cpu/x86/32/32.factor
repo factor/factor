@@ -230,13 +230,14 @@ M: x86.32 flatten-struct-type
 
 M: x86.32 struct-return-on-stack? os linux? not ;
 
-M: x86.32 (cpuid) ( n regs -- )
-    void { uint void* } cdecl [
+M: x86.32 (cpuid) ( eax ecx regs -- )
+    void { uint uint void* } cdecl [
         ! Save ds-reg, rs-reg
         EDI PUSH
         EAX ESP 4 [+] MOV
+        ECX ESP 8 [+] MOV
         CPUID
-        EDI ESP 8 [+] MOV
+        EDI ESP 12 [+] MOV
         EDI [] EAX MOV
         EDI 4 [+] EBX MOV
         EDI 8 [+] ECX MOV
