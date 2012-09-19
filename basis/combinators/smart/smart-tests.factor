@@ -90,3 +90,8 @@ IN: combinators.smart.tests
 { 1 1 1 } [ 1 3 [ ] smart-with times ] unit-test
 { "BCD" } [ 1 "ABC" [ + ] smart-with map ] unit-test
 { H{ { 1 2 } } } [ 1 H{ { 1 2 } { 3 4 } } [ drop = ] smart-with assoc-filter ] unit-test
+
+: test-cleave>sequence ( obj -- seq )  { [ 1 + ] [ sq ] [ 1 - ] } V{ } cleave>sequence ;
+\ test-cleave>sequence def>> must-infer
+
+{ V{ 34 1089 32 } } [ 33 test-cleave>sequence ] unit-test
