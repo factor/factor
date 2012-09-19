@@ -85,10 +85,13 @@ MEMO: sse-version ( -- n )
 : sse4.1? ( -- ? ) sse-version 41 >= ;
 : sse4.2? ( -- ? ) sse-version 42 >= ;
 
-HOOK: (cpuid) cpu ( n regs -- )
+HOOK: (cpuid) cpu ( rax rcx regs -- )
 
-: cpuid ( n -- 4array )
+
+: cpuid-extended ( rax rcx -- 4array )
    4 <uint-array> [ (cpuid) ] keep >array ;
+
+: cpuid ( rax -- 4array ) 0 cpuid-extended ;
 
 : cpu-stepping ( -- n ) 1 cpuid first 4 bits ;
 : cpu-model ( -- n ) 1 cpuid first -4 shift 4 bits ;
