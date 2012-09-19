@@ -16,7 +16,7 @@ IN: math.bitwise
 : mask ( x n -- ? ) bitand ; inline
 : mask? ( x n -- ? ) mask zero? not ; inline
 : wrap ( m n -- m' ) 1 - bitand ; inline
-: on-bits ( m -- n ) 2^ 1 - ; inline
+: on-bits ( m -- n ) dup 0 <= [ drop 0 ] [ 2^ 1 - ] if ; inline
 : bits ( m n -- m' ) on-bits mask ; inline
 : mask-bit ( m n -- m' ) 2^ mask ; inline
 : toggle-bit ( m n -- m' ) 2^ bitxor ; inline
