@@ -29,7 +29,7 @@ IN: math.bitwise
 : next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ; foldable
 : shift-mod ( m s w -- n ) [ shift ] dip 2^ wrap ; inline
 : bit-range ( x high low -- y )
-    [ nip neg shift ] [ - 1 + ] 2bi bits ;
+    [ nip neg shift ] [ - 1 + ] 2bi bits ; inline
 
 : bitroll ( x s w -- y )
     [ wrap ] keep
