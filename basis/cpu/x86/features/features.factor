@@ -4,7 +4,7 @@ USING: accessors assocs sequences alien alien.c-types
 combinators compiler compiler.codegen.labels compiler.units
 cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
 init io kernel locals math math.order math.parser memoize
-namespaces system arrays specialized-arrays ;
+namespaces system arrays specialized-arrays cpu.x86.64 ;
 SPECIALIZED-ARRAY: uint
 IN: cpu.x86.features
 
@@ -103,7 +103,8 @@ M: x86.32 (cpuid) ( n regs -- )
 
 M: x86.64 (cpuid) ( n regs -- )
     void { uint void* } cdecl [
-        RAX RDI MOV
+        RAX param-reg-0 MOV
+        RSI param-reg-1 MOV
         CPUID
         RSI [] EAX MOV
         RSI 4 [+] EBX MOV
