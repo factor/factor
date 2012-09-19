@@ -70,6 +70,9 @@ M: object infer-known* drop f ;
 : cleave>array ( x seq -- array )
     '[ _ cleave ] output>array ; inline
 
+: cleave>sequence ( x seq exemplar -- array )
+    [ '[ _ cleave ] ] dip output>sequence ; inline
+
 : input<sequence ( seq quot -- )
     [ inputs firstn ] [ call ] bi ; inline
 
