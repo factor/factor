@@ -104,7 +104,15 @@ HOOK: (cpuid) cpu ( n regs -- )
         cpu-extended-model cpu-model [ >hex ] bi@
     ] "" append-outputs-as ;
 
-: popcnt? ( -- ? ) 1 cpuid third 23 bit? ;
+: popcnt? ( -- ? )
+    bool { } cdecl [
+        return-reg 1 MOV
+        CPUID
+        return-reg dup XOR
+        ECX 23 BT
+        return-reg SETB
+    ] alien-assembly ;
+
 : tscdeadline? ( -- ? ) 1 cpuid third 24 bit? ;
 : aes? ( -- ? ) 1 cpuid third 25 bit? ;
 : xsave? ( -- ? ) 1 cpuid third 26 bit? ;
