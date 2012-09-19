@@ -740,16 +740,16 @@ HELP: <repetition>
     { $example "USING: prettyprint sequences ;" "10 \"X\" <repetition> concat ." "\"XXXXXXXXXX\"" }
 } ;
 HELP: copy
-{ $values { "src" sequence } { "i" "an index in " { $snippet "dest" } } { "dst" "a mutable sequence" } }
-{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dest" } ", with destination indices starting from " { $snippet "i" } ". Grows " { $snippet "to" } " first if necessary." }
-{ $side-effects "dest" }
-{ $errors "An error is thrown if " { $snippet "to" } " is not resizable, and not large enough to hold the copied elements." } ;
+{ $values { "src" sequence } { "i" "an index in " { $snippet "dst" } } { "dst" "a mutable sequence" } }
+{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dst" } ", with destination indices starting from " { $snippet "i" } ". Grows " { $snippet "dst" } " first if necessary." }
+{ $side-effects "dst" }
+{ $errors "An error is thrown if " { $snippet "dst" } " is not resizable, and not large enough to hold the copied elements." } ;
 
 HELP: push-all
-{ $values { "src" sequence } { "dest" "a resizable mutable sequence" } }
-{ $description "Appends " { $snippet "src" } " to the end of " { $snippet "dest" } "." }
-{ $side-effects "dest" }
-{ $errors "Throws an error if " { $snippet "src" } " contains elements not permitted in " { $snippet "dest" } "." } ;
+{ $values { "src" sequence } { "dst" "a resizable mutable sequence" } }
+{ $description "Appends " { $snippet "src" } " to the end of " { $snippet "dst" } "." }
+{ $side-effects "dst" }
+{ $errors "Throws an error if " { $snippet "src" } " contains elements not permitted in " { $snippet "dst" } "." } ;
 
 HELP: append
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
