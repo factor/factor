@@ -158,14 +158,14 @@ CONSTANT: wNumeric 11
 CONSTANT: wExtendNumLet 12
 CONSTANT: words 13
 
-: word-break-classes ( -- table ) ! Is there a way to avoid this?
-    H{
-        { "Other" 0 } { "CR" 1 } { "LF" 2 } { "Newline" 3 }
-        { "Extend" 4 } { "Format" 5 } { "Katakana" 6 }
-        { "ALetter" 7 } { "MidLetter" 8 }
-        { "MidNum" 9 } { "MidNumLet" 10 } { "Numeric" 11 }
-        { "ExtendNumLet" 12 }
-    } ;
+! Is there a way to avoid this?
+CONSTANT: word-break-classes H{
+    { "Other" 0 } { "CR" 1 } { "LF" 2 } { "Newline" 3 }
+    { "Extend" 4 } { "Format" 5 } { "Katakana" 6 }
+    { "ALetter" 7 } { "MidLetter" 8 }
+    { "MidNum" 9 } { "MidNumLet" 10 } { "Numeric" 11 }
+    { "ExtendNumLet" 12 }
+}
 
 : word-break-prop ( char -- word-break-prop )
     word-break-table get-global interval-at
