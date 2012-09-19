@@ -1,8 +1,7 @@
-USING: byte-arrays arrays help.syntax help.markup
-alien.syntax compiler definitions math libc eval
-debugger parser io io.backend system alien.accessors
-alien.libraries alien.c-types quotations kernel
-sequences ;
+USING: alien.accessors alien.c-types alien.libraries
+alien.syntax arrays byte-arrays compiler cpu.x86 cpu.x86.64
+debugger definitions eval help.markup help.syntax io io.backend
+kernel libc math parser quotations sequences system ;
 IN: alien
 
 HELP: cdecl
