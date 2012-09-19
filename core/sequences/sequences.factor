@@ -329,7 +329,7 @@ M: sequence clone-like
 
 M: immutable-sequence clone-like like ; inline
 
-: push-all ( src dest -- ) [ length ] [ copy ] bi ; inline
+: push-all ( src dst -- ) [ length ] [ copy ] bi ; inline
 
 <PRIVATE
 
