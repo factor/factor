@@ -146,3 +146,6 @@ IN: sequences.extras.tests
 { V{ 97 115 100 102 } } [
     "asdf" [ [ read1 ] V{ } loop>sequence ] with-string-reader
 ] unit-test
+
+{ "" } [ { } "" reverse-as ] unit-test
+{ "ABC" } [ { 67 66 65 } "" reverse-as ] unit-test
