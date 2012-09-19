@@ -315,3 +315,13 @@ INSTANCE: odds immutable-sequence
 
 : loop>array ( quot -- seq )
    { } loop>sequence ; inline
+
+<PRIVATE
+
+: (reverse) ( seq -- newseq )
+    dup [ length ] keep new-sequence [ 0 swap copy ] keep reverse! ;
+
+PRIVATE>
+
+: reverse-as ( seq exemplar -- newseq )
+    [ (reverse) ] [ like ] bi* ;
