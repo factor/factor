@@ -146,6 +146,15 @@ HELP: alien-assembly
 { $values { "args..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } { "quot" quotation } { "return..." "the return value of the function, if not " { $link void } } }
 { $description
     "Invokes arbitrary machine code, generated at compile-time by the quotation. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected."
+    $nl
+    "The caller of this word must preserve the " { $link ds-reg } " and " { $link rs-reg } " registers. Note that this is not a " { $snippet "call" } " in the assembly sense, so there is no return address on the stack."
+    $nl
+    "It's important to mind the ABI. For instance, on x86.32, parameters are passed on the stack in " { $snippet "ESP" } ", while on x86.64 arguments are passed in " { $snippet "RDI" } ", " { $snippet "RSI" } ", " { $snippet "RDX" } ", and " { $snippet "RCX" } ". On Windows 64, integers and pointers are passed in " { $snippet "RCX" } ", " { $snippet "RDX" } ", " { $snippet "R8" } ", and " { $snippet "R9" } ", and then on the stack."
+    $nl
+    "There are Factor words for the input parameters, such as " { $link param-reg-0 } " and " { $link param-reg-1 } "."
+    $nl
+    "For output parameters, use " { $link return-reg } "."
+    $nl
 }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }
 { $errors "Throws an " { $link alien-assembly-error } " if the word calling " { $link alien-assembly } " is not compiled." } ;
