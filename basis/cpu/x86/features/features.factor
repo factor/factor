@@ -4,7 +4,8 @@ USING: accessors assocs sequences alien alien.c-types
 combinators compiler compiler.codegen.labels compiler.units
 cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
 init io kernel locals math math.order math.parser memoize
-namespaces system ;
+namespaces system arrays specialized-arrays ;
+SPECIALIZED-ARRAY: uint
 IN: cpu.x86.features
 
 <PRIVATE
@@ -83,6 +84,35 @@ MEMO: sse-version ( -- n )
 : ssse3? ( -- ? ) sse-version 33 >= ;
 : sse4.1? ( -- ? ) sse-version 41 >= ;
 : sse4.2? ( -- ? ) sse-version 42 >= ;
+
+HOOK: (cpuid) cpu ( n regs -- )
+
+M: x86.32 (cpuid) ( n regs -- )
+    void { uint void* } cdecl [
+        ! Save ds-reg, rs-reg
+        EDI PUSH
+        EAX ESP 4 [+] MOV
+        CPUID
+        EDI ESP 8 [+] MOV
+        EDI [] EAX MOV
+        EDI 4 [+] EBX MOV
+        EDI 8 [+] ECX MOV
+        EDI 12 [+] EDX MOV
+        EDI POP
+    ] alien-assembly ;
+
+M: x86.64 (cpuid) ( n regs -- )
+    void { uint void* } cdecl [
+        RAX RDI MOV
+        CPUID
+        RSI [] EAX MOV
+        RSI 4 [+] EBX MOV
+        RSI 8 [+] ECX MOV
+        RSI 12 [+] EDX MOV
+    ] alien-assembly ;
+
+: cpuid ( n -- 4array )
+   4 <uint-array> [ (cpuid) ] keep >array ;
 
 : popcnt? ( -- ? )
     bool { } cdecl [
