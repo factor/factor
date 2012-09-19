@@ -17,7 +17,7 @@ SLOT: i
 : (sequence-read-length) ( n buf stream -- buf count )
     [ underlying>> length ] [ i>> ] bi - rot min ; inline
 
-: <sequence-copy> ( dest n i src -- n copy )
+: <sequence-copy> ( dst n i src -- n copy )
     [ 0 ] 3curry dip <copy> ; inline
 
 : (sequence-read-unsafe) ( n buf stream -- count )
