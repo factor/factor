@@ -93,18 +93,31 @@ HOOK: (cpuid) cpu ( rax rcx regs -- )
 
 : cpuid ( rax -- 4array ) 0 cpuid-extended ;
 
-: cpu-stepping ( -- n ) 1 cpuid first 4 bits ;
-: cpu-model ( -- n ) 1 cpuid first -4 shift 4 bits ;
-: cpu-family ( -- n ) 1 cpuid first -8 shift 4 bits ;
-: cpu-processor-type ( -- n ) 1 cpuid first -12 shift 2 bits ;
-: cpu-extended-model ( -- n ) 1 cpuid first -16 shift 4 bits ;
-: cpu-extended-family ( -- n ) 1 cpuid first -20 shift 8 bits ;
+: cpuid-processor-info ( -- eax ) 1 cpuid first ; inline
+
+: parse-stepping ( eax -- n ) 3 0 bit-range ; inline
+: parse-model ( eax -- n ) 7 4 bit-range ; inline
+: parse-family ( eax -- n ) 11 8 bit-range ; inline
+: parse-processor-type ( eax -- n ) 13 12 bit-range ; inline
+: parse-extended-model ( eax -- n ) 19 16 bit-range ; inline
+: parse-extended-family ( eax -- n ) 27 20 bit-range ; inline
+
+: cpu-stepping ( -- n ) cpuid-processor-info parse-stepping ;
+: cpu-model ( -- n ) cpuid-processor-info parse-model ;
+: cpu-family ( -- n ) cpuid-processor-info parse-family ;
+: cpu-processor-type ( -- n ) cpuid-processor-info parse-processor-type ;
+: cpu-extended-model ( -- n ) cpuid-processor-info parse-extended-model ;
+: cpu-extended-family ( -- n ) cpuid-processor-info parse-extended-family ;
 
 : cpu-family-model-string ( -- string )
     [
-        cpu-extended-family cpu-family [ >hex ] bi@
-        "_"
-        cpu-extended-model cpu-model [ >hex ] bi@
+        cpuid-processor-info {
+            [ parse-extended-family >hex ]
+            [ parse-family >hex ]
+            [ drop "_" ]
+            [ parse-extended-model >hex ]
+            [ parse-model >hex ]
+        } cleave
     ] "" append-outputs-as ;
 
 : popcnt? ( -- ? )
