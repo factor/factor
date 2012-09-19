@@ -113,17 +113,19 @@ INSTANCE: iota immutable-sequence
 
 <PRIVATE
 
-: first-unsafe ( seq -- first )
-    0 swap nth-unsafe ; inline
+: first-unsafe ( seq -- first ) 0 swap nth-unsafe ; inline
+: second-unsafe ( seq -- second ) 1 swap nth-unsafe ; inline
+: third-unsafe ( seq -- third ) 2 swap nth-unsafe ; inline
+: fourth-unsafe ( seq -- fourth ) 3 swap nth-unsafe ; inline
 
 : first2-unsafe ( seq -- first second )
-    [ first-unsafe ] [ 1 swap nth-unsafe ] bi ; inline
+    [ first-unsafe ] [ second-unsafe ] bi ; inline
 
 : first3-unsafe ( seq -- first second third )
-    [ first2-unsafe ] [ 2 swap nth-unsafe ] bi ; inline
+    [ first2-unsafe ] [ third-unsafe ] bi ; inline
 
 : first4-unsafe ( seq -- first second third fourth )
-    [ first3-unsafe ] [ 3 swap nth-unsafe ] bi ; inline
+    [ first3-unsafe ] [ fourth-unsafe ] bi ; inline
 
 : exchange-unsafe ( m n seq -- )
     [ [ nth-unsafe ] curry bi@ ]
