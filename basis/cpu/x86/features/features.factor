@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs sequences alien alien.c-types
-combinators compiler compiler.codegen.labels compiler.units
-cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
-init io kernel locals math math.order math.parser memoize
-namespaces system arrays specialized-arrays cpu.x86.64 ;
+USING: alien alien.c-types arrays assocs combinators
+compiler.codegen.labels cpu.architecture cpu.x86.assembler
+cpu.x86.assembler.operands init kernel math math.order
+math.parser memoize namespaces sequences
+specialized-arrays system ;
 SPECIALIZED-ARRAY: uint
 IN: cpu.x86.features
 
@@ -86,31 +86,6 @@ MEMO: sse-version ( -- n )
 : sse4.2? ( -- ? ) sse-version 42 >= ;
 
 HOOK: (cpuid) cpu ( n regs -- )
-
-M: x86.32 (cpuid) ( n regs -- )
-    void { uint void* } cdecl [
-        ! Save ds-reg, rs-reg
-        EDI PUSH
-        EAX ESP 4 [+] MOV
-        CPUID
-        EDI ESP 8 [+] MOV
-        EDI [] EAX MOV
-        EDI 4 [+] EBX MOV
-        EDI 8 [+] ECX MOV
-        EDI 12 [+] EDX MOV
-        EDI POP
-    ] alien-assembly ;
-
-M: x86.64 (cpuid) ( n regs -- )
-    void { uint void* } cdecl [
-        RAX param-reg-0 MOV
-        RSI param-reg-1 MOV
-        CPUID
-        RSI [] EAX MOV
-        RSI 4 [+] EBX MOV
-        RSI 8 [+] ECX MOV
-        RSI 12 [+] EDX MOV
-    ] alien-assembly ;
 
 : cpuid ( n -- 4array )
    4 <uint-array> [ (cpuid) ] keep >array ;
