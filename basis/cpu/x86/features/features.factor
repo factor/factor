@@ -88,13 +88,13 @@ MEMO: sse-version ( -- n )
     bool { } cdecl [
         return-reg 1 MOV
         CPUID
-        ECX 23 BT
         return-reg dup XOR
+        ECX 23 BT
         return-reg SETB
     ] alien-assembly ;
 
 MEMO: enable-popcnt? ( -- ? )
-    popcnt? "enable-popcnt" get and ;
+    popcnt? "disable-popcnt" get not and ;
 
 [ { sse-version enable-popcnt? } [ reset-memoized ] each ]
 "cpu.x86.features" add-startup-hook
