@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators combinators.smart fry kernel
-macros math math.bits sequences sequences.private words
-byte-arrays alien alien.c-types alien.data specialized-arrays
-kernel.private layouts ;
+USING: alien alien.c-types alien.data arrays assocs byte-arrays
+combinators combinators.short-circuit fry kernel kernel.private
+layouts macros math math.bits sequences sequences.private
+specialized-arrays words ;
 SPECIALIZED-ARRAY: uchar
 IN: math.bitwise
 
@@ -28,7 +28,10 @@ IN: math.bitwise
 : next-even ( m -- n ) >even 2 + ; foldable
 : next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ; foldable
 : shift-mod ( m s w -- n ) [ shift ] dip 2^ wrap ; inline
+
+ERROR: bit-range-error x high low ;
 : bit-range ( x high low -- y )
+    2dup { [ nip 0 < ] [ < ] } 2|| [ bit-range-error ] when
     [ nip neg shift ] [ - 1 + ] 2bi bits ; inline
 
 : bitroll ( x s w -- y )

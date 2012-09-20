@@ -78,8 +78,6 @@ SPECIALIZED-ARRAY: uint-4
 
 [ -1 bit-count ] [ invalid-bit-count-target? ] must-fail-with
 
-{ 0b11 } [ 0b110000 5 4 bit-range ] unit-test
-
 { 0b1111 } [ 4 on-bits ] unit-test
 { 0 } [ 0 on-bits ] unit-test
 { 0 } [ -2 on-bits ] unit-test
@@ -102,3 +100,11 @@ SPECIALIZED-ARRAY: uint-4
 { 0b10 } [ 0 1 toggle-bit ] unit-test
 { 0 } [ 0 0 toggle-bit 0 toggle-bit ] unit-test
 { 0 } [ 0 1 toggle-bit 1 toggle-bit ] unit-test
+
+
+{ 0 } [ 0b1111 33 33 bit-range ] unit-test
+{ 0 } [ 0b1111 33 20 bit-range ] unit-test
+{ 0b11 } [ 0b1111 3 2 bit-range ] unit-test
+[ 0b1111 2 3 bit-range ] [ T{ bit-range-error f 0b1111 2 3 } = ] must-fail-with
+[ 0b1111 -2 -4 bit-range ] [ T{ bit-range-error f 0b1111 -2 -4 } = ] must-fail-with
+
