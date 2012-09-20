@@ -135,7 +135,7 @@ HOOK: (cpuid) cpu ( rax rcx regs -- )
 : osxsave? ( -- ? ) 1 cpuid third 27 bit? ;
 : avx? ( -- ? ) 1 cpuid third 28 bit? ;
 : f16c? ( -- ? ) 1 cpuid third 29 bit? ;
-: rdrnd? ( -- ? ) 1 cpuid third 30 bit? ;
+: rdrand? ( -- ? ) 1 cpuid third 30 bit? ;
 
 : msr? ( -- ? ) 1 cpuid fourth 5 bit? ;
 : tm1? ( -- ? ) 1 cpuid fourth 29 bit? ;
