@@ -49,7 +49,8 @@ selection-index
 selection
 mouse-index
 { takes-focus? initial: t }
-focused? ;
+focused?
+rows ;
 
 : new-table ( rows renderer class -- table )
     new-line-gadget
@@ -88,6 +89,9 @@ M: image-name draw-cell nip draw-image ;
 : table-rows ( table -- rows )
     [ control-value ] [ renderer>> ] bi '[ _ row-columns ] map ;
 
+: update-table-rows ( table -- )
+    [ table-rows ] [ rows<< ] bi ; inline
+
 : column-offsets ( widths gap -- x xs )
     [ 0 ] dip '[ _ + + ] accumulate ;
 
@@ -109,7 +113,7 @@ CONSTANT: column-title-background COLOR: light-gray
     swap [ column-offsets drop ] keep - ;
 
 : compute-column-widths ( table -- total widths )
-    dup table-rows [ drop 0 { } ] [
+    dup rows>> [ drop 0 { } ] [
         [ drop gap>> ] [ initial-widths ] [ ] 2tri
         [ row-column-widths vmax ] with each
         [ compute-total-width ] keep
@@ -131,7 +135,9 @@ CONSTANT: column-title-background COLOR: light-gray
     [ [ + ] change-nth ] [ 3drop ] if ;
 
 M: table layout*
-    [ update-cached-widths ] [ update-filled-column ] bi ;
+    [ update-table-rows ]
+    [ update-cached-widths ]
+    [ update-filled-column ] tri ;
 
 : row-rect ( table row -- rect )
     [ [ line-height ] dip * 0 swap 2array ]
@@ -225,7 +231,7 @@ M: table draw-gadget*
         ] with-variable
     ] if ;
 
-M: table line-height ( table -- y )
+M: table line-height* ( table -- y )
     [ font>> ] [ renderer>> prototype-row ] bi
     [ [ cell-height ] [ cell-padding ] bi + ] with
     [ max ] map-reduce ;
@@ -349,7 +355,7 @@ PRIVATE>
 : prev/next-row ( table n -- )
     [ dup selection-index>> value>> ] dip
     '[ _ + ] [ 0 ] if* select-row ;
-    
+
 : previous-row ( table -- )
     -1 prev/next-row ;
 
