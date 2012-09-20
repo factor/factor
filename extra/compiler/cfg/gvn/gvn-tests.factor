@@ -144,7 +144,7 @@ cpu x86.64? [
         T{ ##peek f 2 D 2 }
         T{ ##compare f 4 2 1 cc= }
         T{ ##copy f 6 4 any-rep }
-        T{ ##replace f 6 D 0 }
+        T{ ##replace f 4 D 0 }
     }
 ] [
     V{
@@ -161,7 +161,7 @@ cpu x86.64? [
         T{ ##peek f 1 D 1 }
         T{ ##compare-imm f 2 1 16 cc= }
         T{ ##copy f 3 2 any-rep }
-        T{ ##replace f 3 D 0 }
+        T{ ##replace f 2 D 0 }
     }
 ] [
     V{
@@ -178,7 +178,7 @@ cpu x86.64? [
         T{ ##peek f 2 D 2 }
         T{ ##compare-integer f 4 2 1 cc> }
         T{ ##copy f 6 4 any-rep }
-        T{ ##replace f 6 D 0 }
+        T{ ##replace f 4 D 0 }
     }
 ] [
     V{
@@ -1696,7 +1696,7 @@ cpu x86? [
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
         T{ ##copy f 3 0 any-rep }
-        T{ ##replace f 3 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -1712,7 +1712,7 @@ cpu x86? [
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
         T{ ##copy f 3 0 any-rep }
-        T{ ##replace f 3 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -1728,7 +1728,7 @@ cpu x86? [
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
         T{ ##copy f 3 0 any-rep }
-        T{ ##replace f 3 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -1755,7 +1755,7 @@ cpu x86? [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##copy f 1 0 any-rep }
-        T{ ##replace f 1 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -1769,7 +1769,7 @@ cpu x86? [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##copy f 1 0 any-rep }
-        T{ ##replace f 1 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -1783,7 +1783,7 @@ cpu x86? [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##copy f 1 0 any-rep }
-        T{ ##replace f 1 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -1809,7 +1809,7 @@ cpu x86? [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##copy f 1 0 any-rep }
-        T{ ##replace f 1 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -1823,7 +1823,7 @@ cpu x86? [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##copy f 1 0 any-rep }
-        T{ ##replace f 1 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -1863,7 +1863,7 @@ cpu x86? [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##copy f 2 0 any-rep }
-        T{ ##replace f 2 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -1877,7 +1877,7 @@ cpu x86? [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##copy f 2 0 any-rep }
-        T{ ##replace f 2 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -1891,7 +1891,7 @@ cpu x86? [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##copy f 2 0 any-rep }
-        T{ ##replace f 2 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -1905,7 +1905,7 @@ cpu x86? [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##copy f 2 0 any-rep }
-        T{ ##replace f 2 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -2170,7 +2170,7 @@ cell 8 = [
         T{ ##peek f 0 D 0 }
         T{ ##box-alien f 1 0 }
         T{ ##copy f 2 0 any-rep }
-        T{ ##replace f 2 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -2186,7 +2186,7 @@ cell 8 = [
         T{ ##peek f 0 D 0 }
         T{ ##box-alien f 1 0 }
         T{ ##copy f 2 0 any-rep }
-        T{ ##replace f 2 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -2202,7 +2202,7 @@ cell 8 = [
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 2 0 }
         T{ ##copy f 1 0 any-rep }
-        T{ ##replace f 1 D 0 }
+        T{ ##replace f 0 D 0 }
     }
 ] [
     V{
@@ -2260,7 +2260,7 @@ cell 8 = [
         T{ ##peek f 0 D 0 }
         T{ ##load-integer f 2 0 }
         T{ ##copy f 3 0 any-rep }
-        T{ ##replace f 3 D 1 }
+        T{ ##replace f 0 D 1 }
     }
 ] [
     V{
@@ -2842,7 +2842,6 @@ test-diamond
 [ ] [
     cfg new 0 get >>entry
     value-numbering
-    eliminate-dead-code
     drop
 ] unit-test
 
