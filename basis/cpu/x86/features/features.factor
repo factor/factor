@@ -141,6 +141,26 @@ HOOK: (cpuid) cpu ( rax rcx regs -- )
 : tm1? ( -- ? ) 1 cpuid fourth 29 bit? ;
 : tm2? ( -- ? ) 1 cpuid third 8 bit? ;
 
+: rdrand8 ( -- x )
+    uchar { } cdecl [
+        AL RDRAND
+    ] alien-assembly ;
+
+: rdrand16 ( -- x )
+    ushort { } cdecl [
+        AX RDRAND
+    ] alien-assembly ;
+
+: rdrand32 ( -- x )
+    uint { } cdecl [
+        EAX RDRAND
+    ] alien-assembly ;
+
+: rdrand64 ( -- x )
+    ulonglong { } cdecl [
+        RAX RDRAND
+    ] alien-assembly ;
+
 MEMO: enable-popcnt? ( -- ? )
     popcnt? "disable-popcnt" get not and ;
 
