@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
-fry kernel lists locals math sequences typed ;
+fry kernel kernel.private lists locals math sequences typed ;
 IN: wrap
 
 ! black is the text length, white is the whitespace length
@@ -10,19 +10,19 @@ C: <element> element
 
 <PRIVATE
 
-TYPED: element-length ( element: element -- n )
-    [ black>> ] [ white>> ] bi + ;
+: element-length ( element -- n )
+    [ black>> ] [ white>> ] bi + ; inline
 
 TUPLE: paragraph line-max line-ideal lines head-width tail-cost ;
 C: <paragraph> paragraph
 
 TYPED: top-fits? ( paragraph: paragraph -- ? )
     [ head-width>> ]
-    [ dup lines>> 1list? [ line-ideal>> ] [ line-max>> ] if ] bi <= ;
+    [ dup lines>> 1list? [ line-ideal>> ] [ line-max>> ] if ] bi <= ; inline
 
 TYPED: fits? ( paragraph: paragraph -- ? )
     ! Make this not count spaces at end
-    { [ lines>> car 1list? ] [ top-fits? ] } 1|| ;
+    { [ lines>> car 1list? ] [ top-fits? ] } 1|| ; inline
 
 :: min-by ( seq quot -- elt )
     f 1/0. seq [| key value newkey |
@@ -34,28 +34,28 @@ TYPED: paragraph-cost ( paragraph: paragraph -- cost )
     dup lines>> 1list? [ drop 0 ] [
         [ [ head-width>> ] [ line-ideal>> ] bi - sq ]
         [ tail-cost>> ] bi +
-    ] if ;
+    ] if ; inline
 
 : min-cost ( paragraphs -- paragraph )
-    [ paragraph-cost ] min-by ;
+    [ paragraph-cost ] min-by ; inline
 
-: new-line ( paragraph element -- paragraph )
+TYPED: new-line ( paragraph: paragraph element: element -- paragraph )
     {
         [ drop [ line-max>> ] [ line-ideal>> ] bi ]
         [ [ lines>> ] [ 1list ] bi* swons ]
         [ nip black>> ]
         [ drop paragraph-cost ]
-    } 2cleave <paragraph> ;
+    } 2cleave <paragraph> ; inline
 
 TYPED: add-element ( paragraph: paragraph element: element -- )
     [ element-length [ + ] curry change-head-width ]
     [ [ [ unswons ] dip swons swons ] curry change-lines ]
-    bi drop ;
+    bi drop ; inline
 
-: wrap-step ( paragraphs element -- paragraphs )
+TYPED: wrap-step ( paragraphs: array element: element -- paragraphs )
     [ [ min-cost ] dip new-line ]
     [ dupd '[ _ add-element ] each ]
-    2bi swap prefix
+    2bi swap prefix { array } declare
     [ fits? ] filter ;
 
 : 1paragraph ( line-max line-ideal element -- paragraph )
