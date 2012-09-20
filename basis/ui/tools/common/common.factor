@@ -12,14 +12,14 @@ tool-dims [ H{ } clone ] initialize
 TUPLE: tool < track ;
 
 M: tool pref-dim*
-    { [ class-of tool-dims get at ] [ call-next-method ] } 1|| ;
+    { [ class-of tool-dims get-global at ] [ call-next-method ] } 1|| ;
 
 M: tool layout*
     [ call-next-method ]
-    [ [ dim>> ] [ class-of ] bi tool-dims get set-at ]
+    [ [ dim>> ] [ class-of ] bi tool-dims get-global set-at ]
     bi ;
 
-: set-tool-dim ( dim class -- ) tool-dims get set-at ;
+: set-tool-dim ( dim class -- ) tool-dims get-global set-at ;
 
 SLOT: scroller
 
