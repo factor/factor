@@ -84,22 +84,22 @@ HELP: fixnum/mod
 
 HELP: fixnum<
 { $values { "x" fixnum } { "y" fixnum } { "?" "a boolean" } }
-{ $description "Primitive version of " { $link < } ". The result may overflow to a bignum." }
+{ $description "Primitive version of " { $link < } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link < } " instead." } ;
 
 HELP: fixnum<=
 { $values { "x" fixnum } { "y" fixnum } { "z" integer } }
-{ $description "Primitive version of " { $link <= } ". The result may overflow to a bignum." }
+{ $description "Primitive version of " { $link <= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link <= } " instead." } ;
 
 HELP: fixnum>
 { $values { "x" fixnum } { "y" fixnum } { "?" "a boolean" } }
-{ $description "Primitive version of " { $link > } ". The result may overflow to a bignum." }
+{ $description "Primitive version of " { $link > } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link > } " instead." } ;
 
 HELP: fixnum>=
 { $values { "x" fixnum } { "y" fixnum } { "?" "a boolean" } }
-{ $description "Primitive version of " { $link >= } ". The result may overflow to a bignum." }
+{ $description "Primitive version of " { $link >= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link >= } " instead." } ;
 
 HELP: fixnum-bitand
