@@ -185,10 +185,10 @@ M: table layout*
     dup renderer>> column-alignment
     [ ] [ column-widths>> length 0 <repetition> ] ?if ;
 
-:: row-font ( row ind table -- font )
+:: row-font ( row index table -- font )
     table font>> clone
     row table renderer>> row-color [ >>foreground ] when*
-    ind table selection-index>> value>> =
+    index table selection-index>> value>> =
     [ table selection-color>> >>background ] when ;
 
 : draw-columns ( columns widths alignment font gap -- )
@@ -227,7 +227,7 @@ M: table pref-dim*
     [ compute-column-widths drop ] keep
     [ line-height ] [ control-value length ] bi * 2array ;
 
-: nth-row ( row table -- value/f ? )
+: nth-row ( index table -- value/f ? )
     over [ control-value nth t ] [ 2drop f f ] if ;
 
 PRIVATE>
