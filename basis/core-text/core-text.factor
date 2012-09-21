@@ -50,10 +50,8 @@ MEMO: make-attributes ( open-font color -- hashtable )
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
-TUPLE: line < disposable line metrics image loc dim rendered-line ;
-
-TUPLE: rendered-line font string loc dim ;
-C: <rendered-line> rendered-line
+TUPLE: line < disposable font string line metrics image loc dim
+render-loc render-dim ;
 
 : typographic-bounds ( line -- width ascent descent leading )
     { CGFloat CGFloat CGFloat }
@@ -117,35 +115,38 @@ C: <rendered-line> rendered-line
 :: <line> ( font string -- line )
     [
         line new-disposable
-
         font cache-font :> open-font
         string open-font font foreground>> <CTLine> |CFRelease :> line
+        open-font line compute-line-metrics
+        [ >>metrics ] [ metrics>dim >>dim ] bi
+        font >>font
+        string >>string
+        line >>line
+    ] with-destructors ;
 
-        line line-rect :> rect
+:: render ( line -- line image )
+    line line>> :> ctline
+    line string>> :> string
+    line font>> :> font
+
+    line render-loc>> [
+
+        ctline line-rect :> rect
         rect origin>> CGPoint>loc :> (loc)
         rect size>> CGSize>dim :> (dim)
         (loc) [ floor ] map :> loc
         (loc) (dim) [ + ceiling ] 2map :> ext
         ext loc [ - >integer 1 max ] 2map :> dim
-        open-font line compute-line-metrics :> metrics
 
-        line >>line
+        loc line render-loc<<
+        dim line render-dim<<
 
-        font string loc dim <rendered-line> >>rendered-line
+        line metrics>> loc dim line-loc line loc<<
 
-        metrics >>metrics
+    ] unless
 
-        metrics loc dim line-loc >>loc
-
-        metrics metrics>dim >>dim
-    ] with-destructors ;
-
-:: render ( line -- line image )
-    line line>> :> ctline
-    line rendered-line>> string>> :> string
-    line rendered-line>> font>> :> font
-    line rendered-line>> loc>> :> loc
-    line rendered-line>> dim>> :> dim
+    line render-loc>> :> loc
+    line render-dim>> :> dim
 
     line dim [
         {
