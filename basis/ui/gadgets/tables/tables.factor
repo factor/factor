@@ -194,16 +194,12 @@ M: table layout*
 : draw-columns ( columns widths alignment font gap -- )
     '[ [ _ ] 3dip _ draw-column ] 3each ;
 
-M: table draw-line ( row index table -- )
-    [
-        nip
-        [ renderer>> row-columns ]
-        [ column-widths>> ]
-        [ table-column-alignment ]
-        tri
-    ]
-    [ row-font ]
-    [ 2nip gap>> ] 3tri
+M:: table draw-line ( row index table -- )
+    row table renderer>> row-columns
+    table column-widths>>
+    table table-column-alignment
+    row index table row-font
+    table gap>>
     draw-columns ;
 
 M: table draw-gadget*
