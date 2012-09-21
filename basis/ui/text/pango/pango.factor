@@ -163,7 +163,6 @@ MEMO: missing-font-metrics ( font -- metrics )
             dup [ string>> ] [ font>> ] bi <PangoLayout> >>layout
             dup layout>> layout-extents [ >>ink-rect ] [ >>logical-rect ] bi*
             dup layout-metrics >>metrics
-            dup draw-layout >>image
     ] with-destructors ;
 
 M: layout dispose* layout>> g_object_unref ;
@@ -176,6 +175,9 @@ SYMBOL: cached-layouts
 : cached-line ( font string -- line )
     cached-layout layout>> first-line ;
 
+: layout>image ( layout -- image )
+    dup image>> [ dup draw-layout >>image ] unless image>> ;
+
 SINGLETON: pango-renderer
 
 M: pango-renderer string-dim
@@ -186,7 +188,7 @@ M: pango-renderer flush-layout-cache
     cached-layouts get purge-cache ;
 
 M: pango-renderer string>image ( font string -- image loc )
-    cached-layout [ image>> ] [ text-position vneg ] bi ;
+    cached-layout [ layout>image ] [ text-position vneg ] bi ;
 
 M: pango-renderer x>offset ( x font string -- n )
     cached-layout swap x>line-offset ;
