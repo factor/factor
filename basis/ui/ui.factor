@@ -147,7 +147,7 @@ SYMBOL: ui-thread
 PRIVATE>
 
 : find-window ( quot: ( world -- ? ) -- world )
-    [ windows get values ] dip
+    [ windows get-global values ] dip
     '[ dup children>> [ ] [ nip first ] if-empty @ ]
     find-last nip ; inline
 
@@ -202,7 +202,7 @@ PRIVATE>
     find-world raise-window* ;
 
 : topmost-window ( -- world )
-    windows get last second ;
+    windows get-global last second ;
 
 HOOK: close-window ui-backend ( gadget -- )
 
