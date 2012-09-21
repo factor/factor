@@ -59,6 +59,17 @@ IN: sequences.extras
         ] each
     ] each ;
 
+: map-like ( seq exemplar -- seq' )
+    '[ _ like ] map ; inline
+
+: filter-all-subseqs-range ( ... seq range quot: ( ... x -- ... ) -- seq )
+    [
+        '[ <sliced-clumps> _ filter ] with map concat
+    ] 3keep 2drop map-like ; inline
+
+: filter-all-subseqs ( ... seq quot: ( ... x -- ... ) -- seq )
+    [ dup length [1,b] ] dip filter-all-subseqs-range ; inline
+
 :: longest-subseq ( seq1 seq2 -- subseq )
     seq1 length :> len1
     seq2 length :> len2
