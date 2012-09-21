@@ -4,7 +4,7 @@ USING: bootstrap.image.private compiler.constants
 compiler.codegen.relocation compiler.units cpu.x86.assembler
 cpu.x86.assembler.operands kernel kernel.private layouts
 locals locals.backend make math math.private namespaces sequences
-slots.private strings.private vocabs math.bitwise ;
+slots.private strings.private vocabs ;
 IN: bootstrap.x86
 
 big-endian off
@@ -341,7 +341,8 @@ big-endian off
     ! turn slot number into offset
     fixnum>slot@
     ! mask off tag
-    temp1 tag-bits get on-bits bitnot AND
+    temp1 tag-bits get SHR
+    temp1 tag-bits get SHL
     ! load slot value
     temp0 temp1 temp0 [+] MOV
     ! push to stack
