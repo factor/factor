@@ -80,12 +80,6 @@ CONSTANT: image-padding 2
 M: image-name cell-dim nip image-dim first2 image-padding ;
 M: image-name draw-cell nip draw-image ;
 
-: table-rows ( table -- rows )
-    [ control-value ] [ renderer>> ] bi '[ _ row-columns ] map ;
-
-: update-table-rows ( table -- )
-    [ table-rows ] [ rows<< ] bi ; inline
-
 : column-offsets ( widths gap -- x xs )
     [ 0 ] dip '[ _ + + ] accumulate ;
 
@@ -129,9 +123,7 @@ CONSTANT: column-title-background COLOR: light-gray
     [ [ + ] change-nth ] [ 3drop ] if ;
 
 M: table layout*
-    [ update-table-rows ]
-    [ update-cached-widths ]
-    [ update-filled-column ] tri ;
+    [ update-cached-widths ] [ update-filled-column ] bi ;
 
 : row-rect ( table row -- rect )
     [ [ line-height ] dip * 0 swap 2array ]
@@ -279,6 +271,13 @@ PRIVATE>
     [ model>> value>> ] [ renderer>> ] bi
     '[ _ row-value? ] with find drop ;
 
+: update-table-rows ( table -- )
+    [
+        [ control-value ] [ renderer>> ] bi
+        '[ _ row-columns ] map
+    ]
+    [ rows<< ] bi ; inline
+
 : update-selection ( table -- )
     [
         {
@@ -294,6 +293,7 @@ PRIVATE>
 
 M: table model-changed
     nip
+        dup update-table-rows
         dup update-selection
         dup update-mouse-index
     [ dup mouse-index>> show-row-summary ] [ relayout ] bi ;
