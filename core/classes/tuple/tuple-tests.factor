@@ -59,6 +59,12 @@ TUPLE: point x y ;
 [ 200 ] [ "p" get y>> ] unit-test
 [ 300 ] [ "p" get "z>>" "accessors" lookup-word execute ] unit-test
 
+TUPLE: slotty a b c ;
+
+[ T{ slotty } ] [ H{ } slotty from-slots ] unit-test
+[ T{ slotty f 1 2 f } ] [ H{ { "a" 1 } { "b" 2 } } slotty from-slots ] unit-test
+[ H{ { "d" 0 } } slotty new set-slots ] must-fail
+
 TUPLE: predicate-test ;
 
 C: <predicate-test> predicate-test
