@@ -128,7 +128,7 @@ SYMBOL: dpi
     ] [ escape-nulls >>string ] if ; inline
 
 : set-layout-resolution ( layout -- )
-    pango_layout_get_context dpi get pango_cairo_context_set_resolution ;
+    pango_layout_get_context dpi get-global pango_cairo_context_set_resolution ;
 
 : <PangoLayout> ( text font -- layout )
     dummy-cairo pango_cairo_create_layout |g_object_unref
@@ -170,7 +170,7 @@ M: layout dispose* layout>> g_object_unref ;
 SYMBOL: cached-layouts
 
 : cached-layout ( font string -- layout )
-    cached-layouts get [ <layout> ] 2cache ;
+    cached-layouts get-global [ <layout> ] 2cache ;
 
 : cached-line ( font string -- line )
     cached-layout layout>> first-line ;
@@ -185,7 +185,7 @@ M: pango-renderer string-dim
     [ cached-layout logical-rect>> dim>> [ >integer ] map ] if-empty ;
 
 M: pango-renderer flush-layout-cache
-    cached-layouts get purge-cache ;
+    cached-layouts get-global purge-cache ;
 
 M: pango-renderer string>image ( font string -- image loc )
     cached-layout [ layout>image ] [ text-position vneg ] bi ;
