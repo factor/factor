@@ -170,7 +170,7 @@ SYMBOL: double-click-timeout
 300 milliseconds double-click-timeout set-global
 
 : hand-moved? ( -- ? )
-    hand-loc get hand-click-loc get = not ;
+    hand-loc get-global hand-click-loc get-global = not ;
 
 : button-gesture ( gesture -- )
     hand-clicked get-global propagate-gesture ;
@@ -257,7 +257,7 @@ SYMBOL: drag-timer
     dup hand-last-button get = ;
 
 : multi-click-position? ( -- ? )
-    hand-loc get hand-click-loc get distance 10 <= ;
+    hand-loc get-global hand-click-loc get-global distance 10 <= ;
 
 : multi-click? ( button -- ? )
     {
