@@ -28,6 +28,12 @@ ERROR: no-slot name tuple ;
 : set-slot-named ( value name tuple -- )
     [ nip ] [ offset-of-slot ] 2bi set-slot ;
 
+: set-slots ( assoc tuple -- )
+    [ swapd set-slot-named ] curry assoc-each ; inline
+
+: from-slots ( assoc class -- tuple )
+    new [ set-slots ] keep ; inline
+
 PREDICATE: immutable-tuple-class < tuple-class
     all-slots [ read-only>> ] all? ;
 
