@@ -19,7 +19,7 @@ HOOK: open-file os ( path -- )
 
 [ url? ] \ open-url H{ } define-operation
 
-PREDICATE: url-like < string
+PREDICATE: url-string < string
     { [ "http://" head? ] [ "https://" head? ] } 1|| ;
 
-[ url-like? ] \ open-url H{ } define-operation
+[ url-string? ] \ open-url H{ } define-operation
