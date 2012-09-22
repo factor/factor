@@ -1,33 +1,71 @@
-! Copyright (C) 2010 Slava Pestov.
+! Copyright (C) 2010-2012 Slava Pestov, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs http.client json.reader kernel namespaces urls ;
+USING: assocs http.client json.reader kernel namespaces
+sequences urls ;
 IN: bit.ly
 
-SYMBOLS: login api-key ;
+SYMBOLS: bitly-api-user bitly-api-key ;
 
 <PRIVATE
 
 : of ( assoc key -- value ) swap at ;
 
-: make-request ( long-url -- request )
-    "http://api.bit.ly/v3/shorten" >url
-        login get "login" set-query-param
-        api-key get "apiKey" set-query-param
-        "json" "format" set-query-param
-        swap "longUrl" set-query-param ;
+: <bitly-url> ( path -- url )
+    "http://api.bitly.com/v3/" prepend >url
+        bitly-api-user get "login" set-query-param
+        bitly-api-key get "apiKey" set-query-param
+        "json" "format" set-query-param ;
 
 ERROR: bad-response json status ;
 
-: check-response ( json -- json )
+: check-status ( json -- json )
     dup "status_code" of 200 = [
         dup "status_txt" of
         bad-response
     ] unless ;
 
-: parse-response ( response data -- short-url )
-    nip json> check-response "data" of "url" of ;
+: json-data ( url -- json )
+    http-get nip json> check-status "data" swap at ;
+
+: get-short-url ( short-url path -- data )
+    <bitly-url> swap "shortUrl" set-query-param json-data ;
+
+: get-long-url ( long-url path -- data )
+    <bitly-url> swap "longUrl" set-query-param json-data ;
 
 PRIVATE>
 
 : shorten-url ( long-url -- short-url )
-    make-request http-get parse-response ;
+    "shorten" get-long-url "url" of ;
+
+: expand-url ( short-url -- url )
+    "expand" get-short-url "expand" of first "long_url" of ;
+
+: valid-user? ( user api-key -- ? )
+    "validate" <bitly-url>
+        swap "x_apiKey" set-query-param
+        swap "x_login" set-query-param
+    json-data "valid" of 1 = ;
+
+: clicks ( short-url -- clicks )
+    "clicks" get-short-url "clicks" of first "global_clicks" of ;
+
+: referrers ( short-url -- referrers )
+    "referrers" get-short-url "referrers" of ;
+
+: countries ( short-url -- countries )
+    "countries" get-short-url "countries" of ;
+
+: clicks-by-minute ( short-url -- clicks )
+    "clicks_by_minute" get-short-url "clicks_by_minute" of ;
+
+: clicks-by-day ( short-url -- clicks )
+    "clicks_by_day" get-short-url "clicks_by_day" of ;
+
+: lookup ( long-urls -- short-urls )
+    "lookup" <bitly-url>
+        swap "url" set-query-param
+    json-data "lookup" of [ "short_url" of ] map ;
+
+: info ( short-url -- title )
+    "info" get-short-url "info" of first "title" of ;
