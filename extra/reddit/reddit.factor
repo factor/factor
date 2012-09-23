@@ -1,9 +1,9 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs calendar classes.tuple combinators
-formatting http.client json json.reader kernel make math
-math.statistics sequences urls ;
+USING: accessors assocs calendar classes.tuple colors.constants
+colors.hex combinators formatting http.client io io.styles json
+json.reader kernel make math math.statistics sequences urls ;
 
 IN: reddit
 
@@ -93,11 +93,27 @@ PRIVATE>
 : subreddit-links ( subreddit -- links )
     (subreddit) data>> [ url>> ] map ;
 
+<PRIVATE
+
+: write-title ( str -- )
+    H{ { foreground COLOR: blue } } format ;
+
+: write-text ( str -- )
+    H{ { foreground HEXCOLOR: 888888 } } format ;
+
+: write-url ( str -- )
+    dup >url H{
+        { font-name "monospace" }
+        { foreground COLOR: dark-green }
+    } [ write-object ] with-style nl ;
+
+PRIVATE>
+
 : subreddit-top ( subreddit -- )
     (subreddit) data>> [
-        1 + "%2d. " printf {
-            [ title>> ]
-            [ url>> ]
+        1 + "%2d. " sprintf write-text {
+            [ title>> write-title nl ]
+            [ "    " write url>> write-url ]
             [ score>> ]
             [ num_comments>> ]
             [
@@ -106,8 +122,8 @@ PRIVATE>
             ]
             [ author>> ]
         } cleave
-        "%s\n    %s\n    %d points, %d comments, posted %s by %s\n\n"
-        printf
+        "    %d points, %d comments, posted %s by %s\n\n"
+        sprintf write-text
     ] each-index ;
 
 : domain-stats ( domain -- stats )
