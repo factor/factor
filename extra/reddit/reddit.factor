@@ -3,7 +3,8 @@
 
 USING: accessors assocs calendar classes.tuple colors.constants
 colors.hex combinators formatting http.client io io.styles json
-json.reader kernel make math math.statistics sequences urls ;
+json.reader kernel make math math.statistics sequences urls
+namespaces fry ;
 
 IN: reddit
 
@@ -52,9 +53,6 @@ TUPLE: page url data before after ;
     "http://api.reddit.com/user/%s/about" sprintf
     http-get nip json> parse-data ;
 
-: (subreddit) ( subreddit -- data )
-    "http://api.reddit.com/r/%s" sprintf json-page ;
-
 : (url) ( url -- data )
     "http://api.reddit.com/api/info?url=%s" sprintf json-page ;
 
@@ -78,6 +76,9 @@ TUPLE: page url data before after ;
 
 PRIVATE>
 
+: get-subreddit ( subreddit -- data )
+    "http://api.reddit.com/r/%s" sprintf json-page ;
+
 : user-links ( username -- stories )
     (user) data>> [ story? ] filter [ url>> ] map ;
 
@@ -91,12 +92,28 @@ PRIVATE>
     (url) data>> [ score>> ] map-sum ;
 
 : subreddit-links ( subreddit -- links )
-    (subreddit) data>> [ url>> ] map ;
+    get-subreddit data>> [ url>> ] map ;
+
+: story>comments-url ( story -- url )
+    permalink>> "http://reddit.com" prepend >url ;
+
+: story>author-url ( story -- url )
+    author>> "http://reddit.com/user/" prepend >url ;
+
 
 <PRIVATE
 
-: write-title ( str -- )
-    H{ { foreground COLOR: blue } } format ;
+: write-title ( title url -- )
+    '[
+        _ presented ,,
+        COLOR: blue foreground ,,
+    ] H{ } make format ;
+
+: write-link ( title url -- )
+    '[
+        _ presented ,,
+        HEXCOLOR: 888888 foreground ,,
+    ] H{ } make format ;
 
 : write-text ( str -- )
     H{ { foreground HEXCOLOR: 888888 } } format ;
@@ -110,20 +127,17 @@ PRIVATE>
 PRIVATE>
 
 : subreddit-top ( subreddit -- )
-    (subreddit) data>> [
+    get-subreddit data>> [
         1 + "%2d. " sprintf write-text {
-            [ title>> write-title nl ]
-            [ "    " write url>> write-url ]
-            [ score>> ]
-            [ num_comments>> ]
+            [ [ title>> ] [ url>> ] bi write-title nl ]
+            [ score>> "    %d points, " sprintf write-text ]
+            [ [ num_comments>> "%d comments" sprintf ] [ story>comments-url ] bi write-link ]
             [
                 created_utc>> unix-time>timestamp now swap time-
-                duration>hours "%d hours ago" sprintf
+                duration>hours ", posted %d hours ago" sprintf write-text
             ]
-            [ author>> ]
+            [ " by " write-text [ author>> ] [ story>author-url ] bi write-link nl nl ]
         } cleave
-        "    %d points, %d comments, posted %s by %s\n\n"
-        sprintf write-text
     ] each-index ;
 
 : domain-stats ( domain -- stats )
