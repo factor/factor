@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.tuple colors.constants
 colors.hex combinators formatting fry hashtables http.client io
-io.streams.256color.private io.styles json json.reader kernel
-make math math.parser namespaces sequences splitting urls ;
+io.styles json json.reader kernel make math math.parser
+sequences splitting ui urls ;
 IN: hacker-news
 
 TUPLE: post title postedBy points id url commentCount postedAgo ;
@@ -31,11 +31,7 @@ TUPLE: post title postedBy points id url commentCount postedAgo ;
 : write-title ( title url -- )
     '[
         _ presented ,,
-        output-stream get 256color? [
-            COLOR: white foreground ,,
-        ] [
-            COLOR: black foreground ,,
-        ] if
+        ui-running? COLOR: black COLOR: white ? foreground ,,
     ] H{ } make format ;
 
 : write-link ( title url -- )
