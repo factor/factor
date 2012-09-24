@@ -1,9 +1,9 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.tuple colors.constants
-colors.hex combinators formatting fry http.client io io.styles
-json.reader kernel make math sequences splitting urls json
-math.parser hashtables ;
+colors.hex combinators formatting fry hashtables http.client io
+io.streams.256color.private io.styles json json.reader kernel
+make math math.parser namespaces sequences splitting urls ;
 IN: hacker-news
 
 TUPLE: post title postedBy points id url commentCount postedAgo ;
@@ -31,7 +31,11 @@ TUPLE: post title postedBy points id url commentCount postedAgo ;
 : write-title ( title url -- )
     '[
         _ presented ,,
-        COLOR: black foreground ,,
+        output-stream get 256color? [
+            COLOR: white foreground ,,
+        ] [
+            COLOR: black foreground ,,
+        ] if
     ] H{ } make format ;
 
 : write-link ( title url -- )
@@ -80,6 +84,7 @@ PRIVATE>
         { font-size 20 }
         { font-style bold }
         { background HEXCOLOR: ff6600 }
+        { foreground COLOR: black }
     } assoc-union format nl ;
 
 : hacker-news. ( -- )
