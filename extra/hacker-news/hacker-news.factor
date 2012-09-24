@@ -75,11 +75,12 @@ PRIVATE>
 
 : banner. ( -- )
     "Hacker News"
+    "http://news.ycombinator.com" >url presented associate
     H{
         { font-size 20 }
         { font-style bold }
         { background HEXCOLOR: ff6600 }
-    } format nl ;
+    } assoc-union format nl ;
 
 : hacker-news. ( -- )
     hacker-news-items banner.
