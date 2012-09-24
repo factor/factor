@@ -163,7 +163,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     unless ; inline
 
 : 2cache ( ... key1 key2 assoc quot: ( ... key1 key2 -- ... value ) -- ... value )
-    [ 2array ] 2dip [ first2 ] prepose cache ; inline
+    [ 2array ] 2dip [ first2-unsafe ] prepose cache ; inline
 
 : change-at ( ..a key assoc quot: ( ..a value -- ..b newvalue ) -- ..b )
     [ [ at ] dip call ] [ drop ] 3bi set-at ; inline
