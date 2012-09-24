@@ -100,7 +100,6 @@ PRIVATE>
 : story>author-url ( story -- url )
     author>> "http://reddit.com/user/" prepend >url ;
 
-
 <PRIVATE
 
 : write-title ( title url -- )
@@ -126,7 +125,7 @@ PRIVATE>
 
 PRIVATE>
 
-: subreddit-top ( subreddit -- )
+: subreddit. ( subreddit -- )
     get-subreddit data>> [
         1 + "%2d. " sprintf write-text {
             [ [ title>> ] [ url>> ] bi write-title nl ]
