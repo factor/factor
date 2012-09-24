@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs combinators fry io kernel locals
-make math math.order namespaces sequences sorting strings
-unicode.case unicode.categories unicode.data vectors vocabs
-vocabs.hierarchy words ;
+USING: accessors arrays assocs colors.constants combinators fry
+io kernel locals make math math.order namespaces sequences
+sorting strings unicode.case unicode.categories unicode.data
+vectors vocabs vocabs.hierarchy words ;
 
 IN: tools.completion
 
@@ -95,3 +95,5 @@ PRIVATE>
 : chars-matching ( str -- seq )
     name-map keys dup zip completions ;
 
+: colors-matching ( str -- seq )
+    named-colors dup zip completions ;
