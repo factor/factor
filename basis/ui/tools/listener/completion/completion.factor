@@ -26,9 +26,10 @@ SLOT: history
 TUPLE: word-completion manifest ;
 C: <word-completion> word-completion
 
-SINGLETONS: vocab-completion char-completion history-completion ;
+SINGLETONS: vocab-completion color-completion char-completion history-completion ;
 UNION: definition-completion word-completion vocab-completion ;
-UNION: listener-completion definition-completion char-completion history-completion ;
+UNION: listener-completion definition-completion
+color-completion char-completion history-completion ;
 
 GENERIC: completion-quot ( interactor completion-mode -- quot )
 
@@ -37,6 +38,7 @@ GENERIC: completion-quot ( interactor completion-mode -- quot )
 
 M: word-completion completion-quot [ words-matching ] (completion-quot) ;
 M: vocab-completion completion-quot [ vocabs-matching ] (completion-quot) ;
+M: color-completion completion-quot [ colors-matching ] (completion-quot) ;
 M: char-completion completion-quot [ chars-matching ] (completion-quot) ;
 M: history-completion completion-quot drop '[ _ history-completions ] ;
 
@@ -49,6 +51,7 @@ GENERIC: completion-banner ( completion-mode -- string )
 
 M: word-completion completion-banner drop "Words" ;
 M: vocab-completion completion-banner drop "Vocabularies" ;
+M: color-completion completion-banner drop "Colors" ;
 M: char-completion completion-banner drop "Unicode code point names" ;
 M: history-completion completion-banner drop "Input history" ;
 
@@ -75,6 +78,9 @@ M: word-completion row-color
 M: vocab-completion row-color
     drop vocab? COLOR: black COLOR: dark-gray ? ;
 
+M: color-completion row-color
+    drop named-color ;
+
 : (complete-vocab?) ( str -- ? )
     { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" }
     member? ; inline
@@ -96,6 +102,9 @@ M: vocab-completion row-color
 : complete-CHAR:? ( tokens -- ? )
     2 short tail* "CHAR:" swap member? ;
 
+: complete-COLOR:? ( tokens -- ? )
+    2 short tail* "COLOR:" swap member? ;
+
 : up-to-caret ( caret document -- string )
     [ { 0 0 } ] 2dip doc-range ;
 
@@ -104,6 +113,7 @@ M: vocab-completion row-color
     {
         { [ dup { [ complete-vocab? ] [ complete-vocab-list? ] } 1|| ] [ 2drop vocab-completion ] }
         { [ dup complete-CHAR:? ] [ 2drop char-completion ] }
+        { [ dup complete-COLOR:? ] [ 2drop color-completion ] }
         [ drop <word-completion> ]
     } cond ;
 
