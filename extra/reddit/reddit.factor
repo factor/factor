@@ -25,8 +25,9 @@ link_flair_text media media_embed name edited num_comments
 num_reports over_18 permalink saved score selftext selftext_html
 subreddit subreddit_id thumbnail title ups url ;
 
-TUPLE: subreddit created created_utc description display_name id
-name over18 subscribers title url ;
+TUPLE: subreddit accounts_active created created_utc description
+display_name id header_img header_size header_title name over18
+public_description subscribers title url ;
 
 : parse-data ( assoc -- obj )
     [ "data" swap at ] [ "kind" swap at ] bi {
@@ -46,24 +47,27 @@ TUPLE: page url data before after ;
         [ "after" swap at [ f ] when-json-null ]
     } cleave \ page boa ;
 
-: (user) ( username -- data )
+: get-user ( username -- page )
     "http://api.reddit.com/user/%s" sprintf json-page ;
 
-: (about) ( username -- data )
+: get-user-info ( username -- user )
     "http://api.reddit.com/user/%s/about" sprintf
     http-get nip json> parse-data ;
 
-: (url) ( url -- data )
+: get-url-info ( url -- page )
     "http://api.reddit.com/api/info?url=%s" sprintf json-page ;
 
-: (search) ( query -- data )
+: search-reddit ( query -- page )
     "http://api.reddit.com/search?q=%s" sprintf json-page ;
 
-: (subreddits) ( query -- data )
+: search-subreddits ( query -- page )
     "http://api.reddit.com/reddits/search?q=%s" sprintf json-page ;
 
-: (domains) ( query -- data )
+: get-domains ( query -- page )
     "http://api.reddit.com/domain/%s" sprintf json-page ;
+
+: get-subreddit ( subreddit -- page )
+    "http://api.reddit.com/r/%s" sprintf json-page ;
 
 : next-page ( page -- page' )
     [ url>> ] [ after>> "after" set-query-param ] bi json-page ;
@@ -76,20 +80,17 @@ TUPLE: page url data before after ;
 
 PRIVATE>
 
-: get-subreddit ( subreddit -- data )
-    "http://api.reddit.com/r/%s" sprintf json-page ;
-
 : user-links ( username -- stories )
-    (user) data>> [ story? ] filter [ url>> ] map ;
+    get-user data>> [ story? ] filter [ url>> ] map ;
 
 : user-comments ( username -- comments )
-    (user) data>> [ comment? ] filter [ body>> ] map ;
+    get-user data>> [ comment? ] filter [ body>> ] map ;
 
 : user-karma ( username -- karma )
-    (about) link_karma>> ;
+    get-user-info link_karma>> ;
 
 : url-score ( url -- score )
-    (url) data>> [ score>> ] map-sum ;
+    get-url-info data>> [ score>> ] map-sum ;
 
 : subreddit-links ( subreddit -- links )
     get-subreddit data>> [ url>> ] map ;
@@ -140,6 +141,6 @@ PRIVATE>
     ] each-index ;
 
 : domain-stats ( domain -- stats )
-    (domains) all-pages [
+    get-domains all-pages [
         created>> 1000 * millis>timestamp year>>
     ] collect-by [ [ score>> ] map-sum ] assoc-map ;
