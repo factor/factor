@@ -118,18 +118,13 @@ PRIVATE>
 : write-text ( str -- )
     H{ { foreground HEXCOLOR: 888888 } } format ;
 
-: write-url ( str -- )
-    dup >url H{
-        { font-name "monospace" }
-        { foreground COLOR: dark-green }
-    } [ write-object ] with-style nl ;
-
 PRIVATE>
 
 : subreddit. ( subreddit -- )
     get-subreddit data>> [
         1 + "%2d. " sprintf write-text {
-            [ [ title>> ] [ url>> ] bi write-title nl ]
+            [ [ title>> ] [ url>> ] bi write-title ]
+            [ domain>> " (%s)\n" sprintf write-text ]
             [ score>> "    %d points, " sprintf write-text ]
             [ [ num_comments>> "%d comments" sprintf ] [ story>comments-url ] bi write-link ]
             [
