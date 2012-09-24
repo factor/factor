@@ -3,7 +3,7 @@
 USING: accessors assocs classes.tuple colors.constants
 colors.hex combinators formatting fry http.client io io.styles
 json.reader kernel make math sequences splitting urls json
-math.parser ;
+math.parser hashtables ;
 IN: hacker-news
 
 TUPLE: post title postedBy points id url commentCount postedAgo ;
