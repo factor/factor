@@ -81,37 +81,13 @@ M: vocab-completion row-color
 M: color-completion row-color
     drop named-color ;
 
-: (complete-vocab?) ( str -- ? )
-    { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" }
-    member? ; inline
-
-: complete-vocab? ( tokens -- ? )
-    dup last empty? [
-        harvest ?last (complete-vocab?)
-    ] [
-        harvest dup length 1 >
-        [ 2 tail* ?first (complete-vocab?) ] [ drop f ] if
-    ] if ;
-
-: chop-; ( seq -- seq' )
-    { ";" } split1-last [ ] [ ] ?if ;
-
-: complete-vocab-list? ( tokens -- ? )
-    chop-; 1 short head* "USING:" swap member? ;
-
-: complete-CHAR:? ( tokens -- ? )
-    2 short tail* "CHAR:" swap member? ;
-
-: complete-COLOR:? ( tokens -- ? )
-    2 short tail* "COLOR:" swap member? ;
-
 : up-to-caret ( caret document -- string )
     [ { 0 0 } ] 2dip doc-range ;
 
 : completion-mode ( interactor -- symbol )
     [ manifest>> ] [ editor-caret ] [ model>> ] tri up-to-caret " \r\n" split
     {
-        { [ dup { [ complete-vocab? ] [ complete-vocab-list? ] } 1|| ] [ 2drop vocab-completion ] }
+        { [ dup complete-vocab? ] [ 2drop vocab-completion ] }
         { [ dup complete-CHAR:? ] [ 2drop char-completion ] }
         { [ dup complete-COLOR:? ] [ 2drop color-completion ] }
         [ drop <word-completion> ]
