@@ -30,25 +30,25 @@ TUPLE: paragraph < aligned-gadget margin wrapped ;
 : gadget>word ( gadget -- word )
     [ ] [ pref-dim first ] [ word-break? ] tri <word> ;
 
-TUPLE: line words height baseline ;
+: line-width ( words -- n )
+    [ break?>> ] trim-tail-slice [ width>> ] map-sum ;
+
+TUPLE: line words width height baseline ;
 
 : <line> ( words -- line )
-    dup [ key>> ] map dup pref-dims
+    [ ] [ line-width ] [ [ key>> ] map dup pref-dims ] tri
     [ measure-height ] [ measure-metrics drop ] 2bi line boa ;
 
 : wrap-paragraph ( paragraph -- wrapped-paragraph )
     [ children>> [ gadget>word ] map ] [ margin>> ] bi
-    dup wrap-words [ <line> ] map ;
+    dup wrap-words [ <line> ] map! ;
 
 : cached-wrapped ( paragraph -- wrapped-paragraph )
     dup wrapped>>
     [ nip ] [ [ wrap-paragraph dup ] keep wrapped<< ] if* ;
 
-: line-width ( wrapped-line -- n )
-    [ break?>> ] trim-tail-slice [ width>> ] map-sum ;
-
 : max-line-width ( wrapped-paragraph -- x )
-    [ words>> line-width ] [ max ] map-reduce ;
+    [ width>> ] [ max ] map-reduce ;
 
 : sum-line-heights ( wrapped-paragraph -- y )
     [ height>> ] map-sum ;
