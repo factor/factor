@@ -15,8 +15,6 @@ IN: tools.completion
     rot [ ch>lower ] [ ch>upper ] bi
     '[ dup _ eq? [ drop t ] [ _ eq? ] if ] find-from drop ;
 
-PRIVATE>
-
 :: (fuzzy) ( accum i full ch -- accum i ? )
     ch i full smart-index-from [
         [ accum push ]
@@ -25,9 +23,13 @@ PRIVATE>
         f -1 f
     ] if* ;
 
+PRIVATE>
+
 : fuzzy ( full short -- indices )
     dup [ length <vector> 0 ] curry 2dip
     [ (fuzzy) ] with all? 2drop ;
+
+<PRIVATE
 
 : (runs) ( runs n seq -- runs n )
     [
@@ -38,8 +40,12 @@ PRIVATE>
         ] keep pick last push
     ] each ;
 
+PRIVATE>
+
 : runs ( seq -- newseq )
     [ V{ } clone 1vector ] dip [ first ] keep (runs) drop ;
+
+<PRIVATE
 
 : score-1 ( i full -- n )
     {
@@ -49,6 +55,8 @@ PRIVATE>
         { [ 2dup [ 1 + ] dip nth Letter? not ] [ 2drop 4 ] }
         [ 2drop 1 ]
     } cond ;
+
+PRIVATE>
 
 : score ( full fuzzy -- n )
     dup [
@@ -72,11 +80,15 @@ PRIVATE>
     [ <reversed> ] bi@
     dupd fuzzy score max ;
 
+<PRIVATE
+
 : completion ( short candidate -- result )
     [ second swap complete ] keep 2array ;
 
 : completion, ( short candidate -- )
     completion dup first 0 > [ , ] [ drop ] if ;
+
+PRIVATE>
 
 : completions ( short candidates -- seq )
     [ ] [
