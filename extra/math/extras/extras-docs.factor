@@ -9,7 +9,7 @@ HELP: bernoulli
 { $values { "p" integer } { "n" rational } }
 { $description "Return the Bernoulli number " { $snippet "p" } "." } ;
 
-HELP: sterling
+HELP: stirling
 { $values { "n" integer } { "k" integer } { "x" integer } }
 { $description "Return the Stirling number of the second kind for a set with " { $snippet "n" } " elements partitioned into " { $snippet "k" } " disjoint non-empty sets." } ;
 
