@@ -80,10 +80,10 @@ PRIVATE>
     [ <reversed> ] bi@
     dupd fuzzy score max ;
 
-<PRIVATE
-
 : completion ( short candidate -- result )
     [ second swap complete ] keep 2array ;
+
+<PRIVATE
 
 : completion, ( short candidate -- )
     completion dup first 0 > [ , ] [ drop ] if ;
