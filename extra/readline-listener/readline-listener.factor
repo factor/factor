@@ -1,7 +1,8 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators io kernel listener readline
-sequences splitting threads tools.completion ;
+USING: accessors assocs colors.constants combinators fry io
+kernel listener readline sequences splitting threads
+tools.completion unicode.data vocabs vocabs.hierarchy ;
 IN: readline-listener
 
 <PRIVATE
@@ -21,14 +22,29 @@ M: readline-reader prompt.
 : clear-completions ( -- )
     f completions tset ;
 
+: prefixed ( prefix seq -- seq' )
+    swap '[ _ head? ] filter ;
+
+: prefixed-words ( prefix -- words )
+    all-words [ name>> ] map! prefixed ;
+
+: prefixed-vocabs ( prefix -- vocabs )
+    all-vocabs-recursive filter-vocabs [ name>> ] map! prefixed ;
+
+: prefixed-colors ( prefix -- colors )
+    named-colors prefixed ;
+
+: prefixed-chars ( prefix -- chars )
+    name-map keys prefixed ;
+
 : get-completions ( prefix -- completions )
     completions tget [ nip ] [
         current-line " \r\n" split {
-            { [ dup complete-vocab? ] [ drop vocabs-matching ] }
-            { [ dup complete-CHAR:? ] [ drop chars-matching ] }
-            { [ dup complete-COLOR:? ] [ drop colors-matching ] }
-            [ drop words-matching ]
-        } cond values dup completions tset
+            { [ dup complete-vocab? ] [ drop prefixed-vocabs ] }
+            { [ dup complete-CHAR:? ] [ drop prefixed-chars ] }
+            { [ dup complete-COLOR:? ] [ drop prefixed-colors ] }
+            [ drop prefixed-words ]
+        } cond dup completions tset
     ] if* ;
 
 PRIVATE>
