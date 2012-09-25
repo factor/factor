@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators.short-circuit grouping kernel math
+USING: combinators.short-circuit grouping kernel locals math
 math.combinatorics math.constants math.functions math.order
 math.primes math.ranges math.statistics math.vectors memoize
 sequences ;
@@ -10,18 +10,21 @@ IN: math.extras
 
 <PRIVATE
 
-DEFER: sterling
+DEFER: stirling
 
-: (sterling) ( n k -- x )
-    [ [ 1 - ] bi@ sterling ]
-    [ [ 1 - ] dip sterling ]
+: (stirling) ( n k -- x )
+    [ [ 1 - ] bi@ stirling ]
+    [ [ 1 - ] dip stirling ]
     [ nip * + ] 2tri ;
 
 PRIVATE>
 
-MEMO: sterling ( n k -- x )
+MEMO: stirling ( n k -- x )
     2dup { [ = ] [ nip 1 = ] } 2||
-    [ 2drop 1 ] [ (sterling) ] if ;
+    [ 2drop 1 ] [ (stirling) ] if ;
+
+:: ramanujan ( x -- y )
+    pi sqrt x e / x ^ * x 8 * 4 + x * 1 + x * 1/30 + 1/6 ^ * ;
 
 <PRIVATE
 
