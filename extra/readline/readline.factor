@@ -18,6 +18,9 @@ IN: readline
 : current-line ( -- str )
     readline.ffi:rl_line_buffer ;
 
+: completion-line ( -- str )
+    current-line readline.ffi:rl_point head ;
+
 : has-readline? ( -- ? )
     "readline" dup load-library dlsym-raw >boolean ;
 

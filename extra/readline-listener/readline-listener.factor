@@ -39,7 +39,7 @@ M: readline-reader prompt.
 
 : get-completions ( prefix -- completions )
     completions tget [ nip ] [
-        current-line " \r\n" split {
+        completion-line " \r\n" split {
             { [ dup complete-vocab? ] [ drop prefixed-vocabs ] }
             { [ dup complete-CHAR:? ] [ drop prefixed-chars ] }
             { [ dup complete-COLOR:? ] [ drop prefixed-colors ] }
