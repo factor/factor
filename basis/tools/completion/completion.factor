@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs colors.constants combinators fry
-io io.directories kernel locals make math math.order namespaces
-sequences sorting strings unicode.case unicode.categories
-unicode.data vectors vocabs vocabs.hierarchy words ;
+USING: accessors arrays assocs colors.constants combinators
+combinators.short-circuit fry io io.directories kernel locals
+make math math.order namespaces sequences sorting splitting
+strings unicode.case unicode.categories unicode.data vectors
+vocabs vocabs.hierarchy words ;
 
 IN: tools.completion
 
@@ -100,3 +101,34 @@ PRIVATE>
 
 : paths-matching ( str path -- seq )
     directory-files dup zip completions ;
+
+<PRIVATE
+
+: (complete-single-vocab?) ( str -- ? )
+    { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" }
+    member? ; inline
+
+: complete-single-vocab? ( tokens -- ? )
+    dup last empty? [
+        harvest ?last (complete-single-vocab?)
+    ] [
+        harvest dup length 1 >
+        [ 2 tail* ?first (complete-single-vocab?) ] [ drop f ] if
+    ] if ;
+
+: chop-; ( seq -- seq' )
+    { ";" } split1-last [ ] [ ] ?if ;
+
+: complete-vocab-list? ( tokens -- ? )
+    chop-; 1 short head* "USING:" swap member? ;
+
+PRIVATE>
+
+: complete-vocab? ( tokens -- ? )
+    { [ complete-single-vocab? ] [ complete-vocab-list? ] } 1|| ;
+
+: complete-CHAR:? ( tokens -- ? )
+    2 short tail* "CHAR:" swap member? ;
+
+: complete-COLOR:? ( tokens -- ? )
+    2 short tail* "COLOR:" swap member? ;
