@@ -83,12 +83,8 @@ PRIVATE>
 : completion ( short candidate -- result )
     [ second swap complete ] keep 2array ;
 
-<PRIVATE
-
 : completion, ( short candidate -- )
     completion dup first 0 > [ , ] [ drop ] if ;
-
-PRIVATE>
 
 : completions ( short candidates -- seq )
     [ ] [
