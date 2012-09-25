@@ -76,7 +76,9 @@ M: word-completion row-color
     } cond 2nip ;
 
 M: vocab-completion row-color
-    drop vocab? COLOR: black COLOR: dark-gray ? ;
+    drop dup vocab? [
+        name>> ".private" tail? COLOR: dark-red COLOR: black ?
+    ] [ drop COLOR: dark-gray ] if ;
 
 M: color-completion row-color
     drop named-color ;
