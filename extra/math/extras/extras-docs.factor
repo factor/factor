@@ -13,6 +13,10 @@ HELP: stirling
 { $values { "n" integer } { "k" integer } { "x" integer } }
 { $description "Return the Stirling number of the second kind for a set with " { $snippet "n" } " elements partitioned into " { $snippet "k" } " disjoint non-empty sets." } ;
 
+HELP: ramanujan
+{ $values { "x" number } { "y" number } }
+{ $description "Return the Ramanujan approximation of " { $snippet "factorial(x)" } "." } ;
+
 HELP: chi2
 { $values { "actual" sequence } { "expected" sequence } { "n" real } }
 { $description "Return the chi-squared metric between " { $snippet "actual" } " and " { $snippet "expected" } " observations." } ;
