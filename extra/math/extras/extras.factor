@@ -180,7 +180,7 @@ PRIVATE>
     ] if ;
 
 : herfindahl ( seq -- x )
-    dup sum sq '[ sq _ / ] map-sum ;
+    [ sum-of-squares ] [ sum sq ] bi / ;
 
 : normalized-herfindahl ( seq -- x )
     [ herfindahl ] [ length recip ] bi
