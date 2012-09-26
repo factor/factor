@@ -155,15 +155,15 @@ PRIVATE>
 : until-zero ( n quot -- )
     [ dup zero? ] swap until drop ; inline
 
-: sum-cum-sum ( seq -- sum sum-of-cumulative-sum-of-seq )
-    [ 0 0 ] dip [ '[ _ + ] dip dupd + ] each ; inline
+: cum-reduce ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result cum-result )
+    [ dup rot ] dip dup '[ _ curry dip dupd @ ] each ; inline
 
 <PRIVATE
 
 :: (gini) ( seq -- x )
     seq natural-sort :> sorted
     seq length :> len
-    sorted sum-cum-sum :> ( a b )
+    sorted 0 [ + ] cum-reduce :> ( a b )
     b len a * / :> B
     1 len recip + 2 B * - ;
 
