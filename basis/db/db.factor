@@ -145,11 +145,8 @@ M: db-connection rollback-transaction ( -- ) "ROLLBACK" sql-command ;
 
 : in-transaction? ( -- ? ) in-transaction get ;
 
-: (with-transaction) ( quot -- )
-    t in-transaction [
-        begin-transaction [ ] [ rollback-transaction ] cleanup
-        commit-transaction
-    ] with-variable ; inline
-
 : with-transaction ( quot -- )
-    in-transaction get [ (with-transaction) ] unless ; inline
+    t in-transaction [
+        begin-transaction
+        [ ] [ rollback-transaction ] cleanup commit-transaction
+    ] with-variable ; inline
