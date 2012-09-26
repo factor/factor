@@ -33,3 +33,30 @@ IN: math.extras.test
 { { 0 2/3 2/3 0 } } [ 4 bartlett ] unit-test
 { { 0 1/2 1 1/2 0 } } [ 5 bartlett ] unit-test
 { { 0 2/5 4/5 4/5 2/5 0 } } [ 6 bartlett ] unit-test
+
+{ 2819/3914 } [
+    {
+        998,000
+        20,000
+        17,500
+        70,000
+        23,500
+        45,200
+    } gini
+] unit-test
+
+{ 8457/9785 } [
+    {
+        998,000
+        20,000
+        17,500
+        70,000
+        23,500
+        45,200
+    } concentration-coefficient
+] unit-test
+
+{ 0 } [ { 1 } gini ] unit-test
+{ 0 } [ { 1 1 1 1 1 1 } gini ] unit-test
+{ 0 } [ { 10 10 10 10 } gini ] unit-test
+{ 0 } [ { } gini ] unit-test
