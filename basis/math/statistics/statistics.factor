@@ -330,8 +330,17 @@ ALIAS: corr sample-corr
 : cum-max ( seq -- seq' )
     [ ?first ] keep [ max dup ] map nip ;
 
-: entropy ( seq -- n )
-    histogram values dup sum '[ _ / dup log * ] map-sum neg ;
+: probabilities ( seq -- probabilities )
+    [ histogram values ] [ length ] bi v/n ;
+
+: entropy ( probabilities -- n )
+    dup sum '[ _ / dup log * ] map-sum neg ;
+
+: maximum-entropy ( probabilities -- n )
+    length log ;
+
+: normalized-entropy ( probabilities -- n )
+    [ entropy ] [ maximum-entropy ] bi / ;
 
 : binary-entropy ( p -- h )
     [ dup log * ] [ 1 swap - dup log * ] bi + neg 2 log / ;
