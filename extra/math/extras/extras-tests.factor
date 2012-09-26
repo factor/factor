@@ -65,3 +65,6 @@ IN: math.extras.test
 { 0 } [ { 1 1 1 1 1 1 } concentration-coefficient ] unit-test
 { 0 } [ { 10 10 10 10 } concentration-coefficient ] unit-test
 { 0 } [ { } concentration-coefficient ] unit-test
+
+{ 57/200 } [ { 80 60 10 20 30 } herfindahl ] unit-test
+{ 17/160 } [ { 80 60 10 20 30 } normalized-herfindahl ] unit-test
