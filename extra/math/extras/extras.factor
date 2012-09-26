@@ -4,7 +4,7 @@
 USING: combinators.short-circuit grouping kernel locals math
 math.combinatorics math.constants math.functions math.order
 math.primes math.ranges math.statistics math.vectors memoize
-sequences ;
+sequences sequences.extras sorting assocs ;
 
 IN: math.extras
 
@@ -154,3 +154,20 @@ PRIVATE>
 
 : until-zero ( n quot -- )
     [ dup zero? ] swap until drop ; inline
+
+<PRIVATE
+
+:: (gini) ( seq -- x )
+    seq natural-sort :> sorted
+    seq length :> len
+    len [1,b] sorted zip 0 [ * + ] assoc-reduce :> sum0
+    2 sum0 * sorted sum len * / :> G
+    G 1 - 1 len / - ; inline
+
+PRIVATE>
+
+: gini ( seq -- x )
+    dup length 1 <= [ drop 0 ] [ (gini) ] if ;
+
+: concentration-coefficient ( seq -- x )
+    [ gini ] [ length [ ] [ 1 - ] bi / ] bi * ;
