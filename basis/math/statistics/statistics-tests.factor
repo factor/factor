@@ -77,6 +77,9 @@ IN: math.statistics.tests
     "aabbcc" histogram
 ] unit-test
 
+{ H{ { 1 1/2 } { 2 1/6 } { 3 1/3 } } }
+[ { 1 1 1 1 1 1 2 2 3 3 3 3 } normalized-histogram ] unit-test
+
 {
     V{ 0 3 6 9 }
     V{ 1 4 7 }
