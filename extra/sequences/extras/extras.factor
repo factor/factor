@@ -337,18 +337,5 @@ PRIVATE>
 : reverse-as ( seq exemplar -- newseq )
     [ (reverse) ] [ like ] bi* ;
 
-: assoc-reduce ( ... assoc identity quot: ( ... prev key value -- next ) -- ... result )
-    [ >alist ] 2dip [ first2 ] prepose reduce ; inline
-
-: reduce-keys ( ... assoc identity quot: ( ... prev elt -- ... next ) -- ... result )
-    [ drop ] prepose assoc-reduce ; inline
-
-: reduce-values ( ... assoc identity quot: ( ... prev elt -- ... next ) -- ... result )
-    [ nip ] prepose assoc-reduce ; inline
-
-: sum-keys ( assoc -- n ) 0 [ + ] reduce-keys ; inline
-
-: sum-values ( assoc -- n ) 0 [ + ] reduce-values ; inline
-
 : map-product ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 1 ] 2dip [ dip * ] curry [ swap ] prepose each ; inline
