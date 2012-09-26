@@ -172,4 +172,8 @@ PRIVATE>
     dup length 1 <= [ drop 0 ] [ (gini) ] if ;
 
 : concentration-coefficient ( seq -- x )
-    [ gini ] [ length [ ] [ 1 - ] bi / ] bi * ;
+    dup gini [
+        drop 0
+    ] [
+        [ length [ ] [ 1 - ] bi / ] dip *
+    ] if-zero ;
