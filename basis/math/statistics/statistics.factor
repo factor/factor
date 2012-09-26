@@ -227,6 +227,9 @@ PRIVATE>
 : sorted-histogram ( seq -- alist )
     histogram sort-values ;
 
+: normalized-histogram ( seq -- alist )
+    [ histogram ] [ length ] bi '[ _ / ] assoc-map ;
+
 : collect-pairs ( seq quot: ( x -- v k ) -- hashtable )
     [ push-at ] sequence>hashtable ; inline
 
