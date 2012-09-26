@@ -60,3 +60,8 @@ IN: math.extras.test
 { 0 } [ { 1 1 1 1 1 1 } gini ] unit-test
 { 0 } [ { 10 10 10 10 } gini ] unit-test
 { 0 } [ { } gini ] unit-test
+
+{ 0 } [ { 1 } concentration-coefficient ] unit-test
+{ 0 } [ { 1 1 1 1 1 1 } concentration-coefficient ] unit-test
+{ 0 } [ { 10 10 10 10 } concentration-coefficient ] unit-test
+{ 0 } [ { } concentration-coefficient ] unit-test
