@@ -338,7 +338,7 @@ PRIVATE>
     [ (reverse) ] [ like ] bi* ;
 
 : assoc-reduce ( ... assoc identity quot: ( ... prev key value -- next ) -- ... result )
-    [ first2 ] prepose reduce ; inline
+    [ >alist ] 2dip [ first2 ] prepose reduce ; inline
     
 : reduce-keys ( ... assoc identity quot: ( ... prev elt -- ... next ) -- ... result )
     [ drop ] prepose assoc-reduce ; inline
