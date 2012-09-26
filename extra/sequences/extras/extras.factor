@@ -339,7 +339,7 @@ PRIVATE>
 
 : assoc-reduce ( ... assoc identity quot: ( ... prev key value -- next ) -- ... result )
     [ >alist ] 2dip [ first2 ] prepose reduce ; inline
-    
+
 : reduce-keys ( ... assoc identity quot: ( ... prev elt -- ... next ) -- ... result )
     [ drop ] prepose assoc-reduce ; inline
 
@@ -350,3 +350,5 @@ PRIVATE>
 
 : sum-values ( assoc -- n ) 0 [ + ] reduce-values ; inline
 
+: map-product ( ... seq quot: ( ... elt -- ... n ) -- ... n )
+    [ 1 ] 2dip [ dip * ] curry [ swap ] prepose each ; inline
