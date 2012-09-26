@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs assocs.private kernel sequences ;
+USING: arrays assocs assocs.private kernel math sequences ;
 
 IN: assocs.extras
 
