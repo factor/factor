@@ -185,3 +185,6 @@ PRIVATE>
 : normalized-herfindahl ( seq -- x )
     [ herfindahl ] [ length recip ] bi
     [ - ] [ 1 swap - / ] bi ;
+
+: exponential-index ( seq -- x )
+    dup sum '[ _ / dup ^ ] map-product ;
