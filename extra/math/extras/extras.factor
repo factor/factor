@@ -178,3 +178,10 @@ PRIVATE>
     ] [
         [ gini ] [ length [ ] [ 1 - ] bi / ] bi *
     ] if ;
+
+: herfindahl ( seq -- x )
+    dup sum sq '[ sq _ / ] map-sum ;
+
+: normalized-herfindahl ( seq -- x )
+    [ herfindahl ] [ length recip ] bi
+    [ - ] [ 1 swap - / ] bi ;
