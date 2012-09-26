@@ -155,14 +155,15 @@ PRIVATE>
 : until-zero ( n quot -- )
     [ dup zero? ] swap until drop ; inline
 
+: sum-cum-sum ( seq -- sum sum-of-cumulative-sum-of-seq )
+    [ 0 0 ] dip [ '[ _ + ] dip dupd + ] each ; inline
+
 <PRIVATE
 
 :: (gini) ( seq -- x )
     seq natural-sort :> sorted
     seq length :> len
-    0 0 sorted [
-        '[ _ + ] dip dupd +
-    ] each  :> ( a b )
+    sorted sum-cum-sum :> ( a b )
     b len a * / :> B
     1 len recip + 2 B * - ;
 
@@ -172,8 +173,8 @@ PRIVATE>
     dup length 1 <= [ drop 0 ] [ (gini) ] if ;
 
 : concentration-coefficient ( seq -- x )
-    dup gini [
+    dup length 1 <= [
         drop 0
     ] [
-        [ length [ ] [ 1 - ] bi / ] dip *
-    ] if-zero ;
+        [ gini ] [ length [ ] [ 1 - ] bi / ] bi *
+    ] if ;
