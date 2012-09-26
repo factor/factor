@@ -318,17 +318,20 @@ ALIAS: ste sample-ste
 
 ALIAS: corr sample-corr
 
+: cum-map ( seq identity quot -- seq' )
+    swapd [ dup ] compose map nip ; inline
+
 : cum-sum ( seq -- seq' )
-    0 swap [ + dup ] map nip ;
+    0 [ + ] cum-map ;
 
 : cum-product ( seq -- seq' )
-    1 swap [ * dup ] map nip ;
+    1 [ * ] cum-map ;
 
 : cum-min ( seq -- seq' )
-    [ ?first ] keep [ min dup ] map nip ;
+    dup ?first [ min ] cum-map ;
 
 : cum-max ( seq -- seq' )
-    [ ?first ] keep [ max dup ] map nip ;
+    dup ?first [ max ] cum-map ;
 
 : probabilities ( seq -- probabilities )
     [ histogram values ] [ length ] bi v/n ;
