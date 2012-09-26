@@ -5,6 +5,8 @@ USING: arrays assocs assocs.private kernel math sequences ;
 
 IN: assocs.extras
 
+: of ( assoc key -- value ) swap at ; inline
+
 : assoc-harvest ( assoc -- assoc' )
     [ nip empty? not ] assoc-filter ; inline
 
