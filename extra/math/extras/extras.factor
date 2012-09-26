@@ -176,7 +176,7 @@ PRIVATE>
     dup length 1 <= [
         drop 0
     ] [
-        [ gini ] [ length [ ] [ 1 - ] bi / ] bi *
+        [ (gini) ] [ length [ ] [ 1 - ] bi / ] bi *
     ] if ;
 
 : herfindahl ( seq -- x )
