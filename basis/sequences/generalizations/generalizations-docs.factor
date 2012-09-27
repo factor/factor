@@ -110,6 +110,10 @@ HELP: nproduce-as
 { $values { "pred" { $quotation "( -- ? )" } } { "quot" { $quotation "( -- obj1 obj2 ... objn )" } } { "exemplar..." { $snippet "n" } " sequences on the datastack" } { "n" integer } { "seq..." { $snippet "n" } " sequences on the datastack of the same types as the " { $snippet "exemplar" } "s" } }
 { $description "A generalization of " { $link produce-as } " that generates " { $snippet "n" } " sequences in parallel by calling " { $snippet "quot" } " repeatedly until " { $snippet "pred" } " outputs false." } ;
 
+HELP: nmap-reduce
+{ $values { "map-quot" quotation } { "reduce-quot" quotation } { "n" integer } }
+{ $description "A generalization of " { $link map-reduce } " that can be applied to any number of sequences." } ;
+
 ARTICLE: "sequences.generalizations" "Generalized sequence words"
 "The " { $vocab-link "sequences.generalizations" } " vocabulary defines generalized versions of various sequence operations."
 { $subsections
