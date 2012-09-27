@@ -115,7 +115,7 @@ HELP: nmap-reduce
 { $description "A generalization of " { $link map-reduce } " that can be applied to any number of sequences." } ;
 
 HELP: nall?
-{ $values { "seqs... " { $snippet "n" } " sequences on the datastack" } { "quot" { $quotation "( element... - ? )" } } { "n" integer } }
+{ $values { "seqs..." { $snippet "n" } " sequences on the datastack" } { "quot" { $quotation "( element... - ? )" } } { "n" integer } { "?" boolean } }
 { $description "A generalization of " { $link all? } " that can be applied to any number of sequences." } ;
 
 ARTICLE: "sequences.generalizations" "Generalized sequence words"
