@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data alien.libraries
 alien.syntax arrays ascii assocs classes.struct combinators
 destructors io.encodings.ascii io.files kernel libc math.parser
 math.ranges sequences slots.syntax specialized-arrays
-splitting system ;
+splitting system nested-comments prettyprint ;
 IN: libsvm
 
 << "libsvm" {
@@ -33,7 +33,7 @@ ENUM: kernel_type LINEAR POLY RBF SIGMOID PRECOMPUTED ;
 
 STRUCT: svm_parameter
     { svm_type int }
-    { kernel_type int }
+    { kernel_type kernel_type }
     { degree int }
     { gamma double }
     { coef0 double }
@@ -96,23 +96,46 @@ FUNCTION: void svm_set_print_string_function ( void *print_func ) ;
         2array
     ] map ;
 
-: indexed-sequence>nodes ( seq -- svm_nodes )
-    [ first2 svm_node <struct-boa> ] svm_node-array{ } map-as ;
+: indexed>nodes ( assoc -- svm_nodes )
+    [ nip 0 = not ] assoc-filter
+    [ first2 svm_node <struct-boa> ] svm_node-array{ } map-as
+    -1 0 svm_node <struct-boa> suffix ;
 
-: >indexed-sequence ( seq -- nodes )
+: >1-indexed ( seq -- nodes )
     [ length [1,b] ] keep zip ;
 
 : matrix>nodes ( seq -- nodes )
-    [ >indexed-sequence indexed-sequence>nodes ] map concat
-    \ svm_node malloc-like ;
+    [ >1-indexed indexed>nodes \ svm_node malloc-like ] map
+    void* malloc-like ;
 
 : make-svm-problem ( X y -- svm-problem )
     [ svm_problem <struct> ] 2dip
         [ matrix>nodes >>x ]
-        [ \ double malloc-like >>y ] bi* ;
+        [ [ \ double malloc-like >>y ] [ length >>l ] bi ] bi* ;
+
+: make-csvc-parameter ( -- paramter )
+    svm_parameter <struct>
+        RBF >>kernel_type
+        .1 >>gamma
+        1 >>C
+        .5 >>nu
+        .1 >>eps
+        100 >>cache_size ;
 
 M: svm_problem dispose
-    [ slots{ x y } [ &free drop ] each ] with-destructors ;
+    [
+        [ x>> [ [ &free drop ] each ] [ &free drop ] bi ]
+        [ y>> &free drop ] bi
+    ] with-destructors ;
 
-! clear { { 100 200 300 400 500 } } { 1 1 1 0 0 } make-svm-problem
-! svm_parameter <struct> svm_train
+(*
+{
+    { 0 .1 .2 0 0 }
+    { 0 .1 .3 -1.2 0 }
+    { 0.4 0 0 0 0 }
+    { 0 0.1 0 1.4 .5 }
+    { -.1 -.2 .1 1.1 .1 }
+} { 1 2 1 2 3 } make-svm-problem
+make-csvc-parameter
+[ svm_check_param alien>native-string ] [ svm_train ] 2bi
+*)
