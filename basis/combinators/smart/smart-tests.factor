@@ -95,3 +95,17 @@ IN: combinators.smart.tests
 \ test-cleave>sequence def>> must-infer
 
 { V{ 34 1089 32 } } [ 33 test-cleave>sequence ] unit-test
+
+{ 60 6000 } [
+    { 10 20 30 } {
+        { 0 [ + ] }
+        { 1 [ * ] }
+    } smart-reduce
+] unit-test
+
+{ 1400 60 } [
+    { 10 20 30 } {
+        { [ sq ] [ + ] }
+        { [ ] [ + ] }
+    } smart-map-reduce
+] unit-test
