@@ -114,6 +114,10 @@ HELP: nmap-reduce
 { $values { "map-quot" { $quotation "( element... -- intermediate )" } } { "reduce-quot" { $quotation "( prev intermediate -- next )" } } { "n" integer } }
 { $description "A generalization of " { $link map-reduce } " that can be applied to any number of sequences." } ;
 
+HELP: nall?
+{ $values { "seqs... " { $snippet "n" } " sequences on the datastack" } { "quot" { $quotation "( element... - ? )" } } { "n" integer } }
+{ $description "A generalization of " { $link all? } " that can be applied to any number of sequences." } ;
+
 ARTICLE: "sequences.generalizations" "Generalized sequence words"
 "The " { $vocab-link "sequences.generalizations" } " vocabulary defines generalized versions of various sequence operations."
 { $subsections

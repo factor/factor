@@ -121,3 +121,6 @@ MACRO: nmap-reduce ( map-quot reduce-quot n -- quot )
         [ [ first ] _ napply @ 1 ] _ nkeep
         _ _ (neach) (each-integer)
     ] ;
+
+: nall? ( seqs... quot n -- )
+    (neach) all-integers? ; inline
