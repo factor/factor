@@ -240,14 +240,8 @@ PRIVATE>
     histogram >alist
     [ ] [ [ [ second ] bi@ > ] most ] map-reduce first ;
 
-ERROR: empty-sequence ;
-
 : minmax ( seq -- min max )
-    [
-        empty-sequence
-    ] [
-        [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] each
-    ] if-empty ;
+    [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] each ;
 
 : range ( seq -- x )
     minmax swap - ;
