@@ -239,6 +239,14 @@ HELP: smart-map-reduce
 { $values { "map-reduce-quots" sequence } }
 { $description "A version of " { $link map-reduce } " that takes a sequence of " { $snippet "{ map-quot reduce-quot }" } " pairs, returning the " { $link map-reduce } " result for each pair." } ;
 
+HELP: smart-2reduce
+{ $values { "2reduce-quots" sequence } }
+{ $description "A version of " { $link 2reduce } " that takes a sequence of " { $snippet "{ identity 2reduce-quot }" } " pairs, returning the " { $link 2reduce } " result for each pair." } ;
+
+HELP: smart-2map-reduce
+{ $values { "2map-reduce-quots" sequence } }
+{ $description "A version of " { $link 2map-reduce } " that takes a sequence of " { $snippet "{ 2map-quot 2reduce-quot }" } " pairs, returning the " { $link 2map-reduce } " result for each pair." } ;
+
 ARTICLE: "combinators.smart" "Smart combinators"
 "A " { $emphasis "smart combinator" } " is a macro which reflects on the stack effect of an input quotation. The " { $vocab-link "combinators.smart" } " vocabulary implements a few simple smart combinators which look at the static stack effects of input quotations and generate code which produces or consumes the relevant number of stack values." $nl
 "Take all input values from a sequence:"
