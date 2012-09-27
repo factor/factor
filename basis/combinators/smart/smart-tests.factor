@@ -109,3 +109,17 @@ IN: combinators.smart.tests
         { [ ] [ + ] }
     } smart-map-reduce
 ] unit-test
+
+{ 0 12 } [
+    { 1 2 3 } dup {
+        { 0 [ - + ] }
+        { 0 [ + + ] }
+    } smart-2reduce
+] unit-test
+
+{ 36 12 } [
+    { 1 2 3 } dup {
+        { [ * ] [ * ] }
+        { [ + ] [ + ] }
+    } smart-2map-reduce
+] unit-test
