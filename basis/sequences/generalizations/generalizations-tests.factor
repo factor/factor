@@ -132,3 +132,7 @@ D4d$
 
 [ { 10 8 6 4 2 } { 9 7 5 3 1 } ]
 [ 10 nproduce-test ] unit-test
+
+{ 45 } [
+    { 1 2 3 } { 4 5 6 } { 7 8 9 } [ + + ] [ + ] 3 nmap-reduce
+] unit-test

@@ -42,6 +42,9 @@ MACRO: nmin-length ( n -- )
     dup 1 - [ min ] n*quot
     '[ [ length ] _ napply @ ] ;
 
+: nnth ( n seq... n -- )
+    [ nth ] swap [ apply-curry ] [ cleave* ] bi ; inline
+
 : nnth-unsafe ( n seq... n -- )
     [ nth-unsafe ] swap [ apply-curry ] [ cleave* ] bi ; inline
 
@@ -112,3 +115,9 @@ MACRO: (ncollect) ( n -- )
 
 : nproduce ( pred quot n -- seq... )
     [ { } swap dupn ] keep nproduce-as ; inline
+
+MACRO: nmap-reduce ( map-quot reduce-quot n -- quot )
+    -rot dupd compose [ over ] dip over '[
+        [ [ first ] _ napply @ 1 ] _ nkeep
+        _ _ (neach) (each-integer)
+    ] ;
