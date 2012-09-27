@@ -141,3 +141,16 @@ MACRO: smart-map-reduce ( map-reduce-quots -- quot )
         [ @ _ cleave-curry _ spread* ]
         [ 1 ] 2dip (each) (each-integer)
     ] ;
+
+MACRO: smart-2reduce ( 2reduce-quots -- quot )
+    unzip [ [ ] like ] bi@ dup length dup '[
+        [ @ ] 2dip
+        [ @ _ [ cleave-curry ] [ cleave-curry ] bi _ spread* ] 2each
+    ] ;
+
+MACRO: smart-2map-reduce ( 2map-reduce-quots -- quot )
+    [ keys ] [ [ [ ] concat-as ] [ ] map-as ] bi dup length dup '[
+        [ [ first ] bi@ _ 2cleave ] 2keep
+        [ @ _ [ cleave-curry ] [ cleave-curry ] bi _ spread* ]
+        [ 1 ] 3dip (2each) (each-integer)
+    ] ;
