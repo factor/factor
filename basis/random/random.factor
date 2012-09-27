@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2008, 2012 Doug Coleman & Davison Avery.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays assocs
 byte-arrays byte-vectors combinators combinators.short-circuit
@@ -44,15 +44,23 @@ TYPED: random-bytes ( n: fixnum -- byte-array: byte-array )
 
 <PRIVATE
 
-:: ((random-integer)) ( bits obj -- n required-bits )
-    obj random-32* 32 bits 32 - [ dup 0 > ] [
-        [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
+:: ((random-integer)) ( upper-limit num-bits obj -- n )
+    obj random-32* num-bits bits num-bits 32 - [ dup 0 > ] 
+    [
+        [ num-bits 32 - shift obj random-32* + ] 
+        [ over upper-limit > [ [ drop obj random-32* ] dip ] [ 32 - ] if ] bi*
     ] while drop ;
 
-: (random-integer) ( n obj -- n' )
-    [ dup next-power-of-2 log2 ] dip ((random-integer))
-    [ * ] [ 2^ /i ] bi* ;
+:: (n-bits) ( n -- upper-limit num-bits )
+    n next-power-of-2 :> b!
+    b n mod b / 
+    [ 0.001 > ] [ 1 b + next-power-of-2 b! b n mod b / ] while
+    b b n mod 1 + -
+    b log2 ;
 
+: (random-integer) ( n obj -- n' )
+    [ dup (n-bits) ] dip ((random-integer)) swap mod ;
+    
 : random-integer ( n -- n' )
     random-generator get (random-integer) ;
 
@@ -274,4 +282,3 @@ PRIVATE>
     { [ os unix? ] [ "random.unix" require ] }
 } cond
 
-"random.mersenne-twister" require
