@@ -924,7 +924,7 @@ PRIVATE>
 : unclip-slice ( seq -- rest-slice first )
     [ rest-slice ] [ first-unsafe ] bi ; inline
 
-: map-reduce ( ..a seq map-quot: ( ..a x -- ..b elt ) reduce-quot: ( ..b prev elt -- ..a next ) -- ..a result )
+: map-reduce ( ..a seq map-quot: ( ..a elt -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
     [ [ dup first ] dip [ call ] keep ] dip compose
     swapd [ 1 ] 2dip (each) (each-integer) ; inline
 
