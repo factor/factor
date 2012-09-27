@@ -1344,7 +1344,7 @@ HELP: insert-nth
 
 HELP: map-reduce
 { $values
-     { "seq" sequence } { "map-quot" quotation } { "reduce-quot" quotation }
+     { "seq" sequence } { "map-quot" { $quotation "( ..a x -- ..b elt )" } } { "reduce-quot" { $quotation "( ..b prev elt -- ..a next )" } }
      { "result" object } }
 { $description "Calls " { $snippet "map-quot" } " on each element and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
