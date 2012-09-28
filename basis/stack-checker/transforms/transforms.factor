@@ -87,6 +87,10 @@ IN: stack-checker.transforms
 
 \ 3cleave t "no-compile" set-word-prop
 
+\ 4cleave [ 4cleave>quot ] 1 define-transform
+
+\ 4cleave t "no-compile" set-word-prop
+
 \ spread [ deep-spread>quot ] 1 define-transform
 
 \ spread t "no-compile" set-word-prop

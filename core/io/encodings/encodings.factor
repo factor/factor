@@ -90,7 +90,7 @@ M: decoder stream-read-unsafe
         (read-first) [
             0 (store-read)
             1 (read-rest)
-        ] [ 2drop 2drop 0 ] if*
+        ] [ 4drop 0 ] if*
     ] if ; inline
 
 M: decoder stream-contents*

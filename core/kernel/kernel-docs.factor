@@ -11,9 +11,11 @@ HELP: eq?
 HELP: drop  $shuffle ;
 HELP: 2drop $shuffle ;
 HELP: 3drop $shuffle ;
+HELP: 4drop $shuffle ;
 HELP: dup   $shuffle ;
 HELP: 2dup  $shuffle ;
 HELP: 3dup  $shuffle ;
+HELP: 4dup  $shuffle ;
 HELP: nip   $shuffle ;
 HELP: 2nip  $shuffle ;
 HELP: over  $shuffle ;
