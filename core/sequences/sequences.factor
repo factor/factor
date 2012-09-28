@@ -717,7 +717,7 @@ PRIVATE>
 
 : move-backward ( shift from to seq -- )
     2over = [
-        2drop 2drop
+        4drop
     ] [
         [ [ 2over + pick ] dip move-unsafe [ 1 + ] dip ] keep
         move-backward
@@ -725,7 +725,7 @@ PRIVATE>
 
 : move-forward ( shift from to seq -- )
     2over = [
-        2drop 2drop
+        4drop
     ] [
         [ [ pick [ dup dup ] dip + swap ] dip move-unsafe 1 - ] keep
         move-forward
