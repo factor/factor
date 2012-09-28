@@ -64,6 +64,13 @@ SLOT: terminated?
 : 3cleave>quot ( seq -- quot )
     [ [ 3keep ] curry ] map concat [ 3drop ] append [ ] like ;
 
+! 4cleave
+: 4cleave ( w x y z seq -- )
+    [ 4keep ] each 4drop ;
+
+: 4cleave>quot ( seq -- quot )
+    [ [ 4keep ] curry ] map concat [ 4drop ] append [ ] like ;
+
 ! spread
 : shallow-spread>quot ( seq -- quot )
     [ ] [ [ dup empty? [ [ dip ] curry ] unless ] dip append ] reduce ;

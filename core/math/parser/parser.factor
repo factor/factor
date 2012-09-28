@@ -99,7 +99,7 @@ TUPLE: float-parse
     dup ratio? [ + ] [ 2drop f ] if ; inline
 
 : @abort ( i number-parse n x -- f )
-    2drop 2drop f ; inline
+    4drop f ; inline
 
 : @split ( i number-parse n -- n i number-parse n' )
     -rot 0 ; inline
@@ -295,7 +295,7 @@ PRIVATE>
 <PRIVATE
 
 : (digits>integer) ( valid? accum digit radix -- valid? accum )
-    2dup < [ swapd * + ] [ 2drop 2drop f 0 ] if ; inline
+    2dup < [ swapd * + ] [ 4drop f 0 ] if ; inline
 
 : each-digit ( seq radix quot -- n/f )
     [ t 0 ] 3dip curry each swap [ drop f ] unless ; inline
