@@ -113,6 +113,7 @@ CONSTANT: action-key-codes
     H{
         { $ GDK_KEY_BackSpace "BACKSPACE" }
         { $ GDK_KEY_Tab "TAB" }
+        { $ GDK_KEY_ISO_Left_Tab "TAB" }
         { $ GDK_KEY_Return "RET" }
         { $ GDK_KEY_KP_Enter "ENTER" }
         { $ GDK_KEY_Escape "ESC" }
