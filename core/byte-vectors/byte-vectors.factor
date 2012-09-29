@@ -12,7 +12,7 @@ TUPLE: byte-vector
     (byte-array) 0 byte-vector boa ; inline
 
 : >byte-vector ( seq -- byte-vector )
-    >byte-array dup length byte-vector boa ;
+    >byte-array dup length byte-vector boa ; inline
 
 M: byte-vector like
     drop dup byte-vector? [
