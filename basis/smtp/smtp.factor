@@ -146,7 +146,7 @@ GENERIC: send-auth ( auth -- )
 M: no-auth send-auth drop ;
 
 : plain-auth-string ( username password -- string )
-    [ "\0" prepend ] bi@ append utf8 encode >base64 ;
+    [ "\0" prepend ] bi@ append utf8 encode >base64 >string ;
 
 M: plain-auth send-auth
     [ username>> ] [ password>> ] bi plain-auth-string
