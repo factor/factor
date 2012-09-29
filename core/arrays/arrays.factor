@@ -14,7 +14,7 @@ M: f new-sequence drop [ f ] [ 0 <array> ] if-zero ; inline
 
 INSTANCE: array sequence
 
-: >array ( seq -- array ) { } clone-like ;
+: >array ( seq -- array ) { } clone-like ; inline
 : 1array ( x -- array ) 1 swap <array> ; inline
 : 2array ( x y -- array ) { } 2sequence ; inline
 : 3array ( x y z -- array ) { } 3sequence ; inline
