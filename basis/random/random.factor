@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays assocs
 byte-arrays byte-vectors combinators combinators.short-circuit
-fry io.backend io.binary kernel locals math math.bitwise
-math.constants math.functions math.order math.ranges namespaces
-sequences sequences.private sets summary system vocabs hints
-typed ;
+fry hashtables hashtables.private hints io.backend io.binary
+kernel locals math math.bitwise math.constants math.functions
+math.order math.ranges namespaces sequences sequences.private
+sets summary system typed vocabs ;
 IN: random
 
 SYMBOL: system-random-generator
@@ -71,6 +71,16 @@ M: sequence random
     [ f ] [
         [ length random-integer ] keep nth
     ] if-empty ;
+
+M: assoc random >alist random ;
+
+M: hashtable random
+    dup assoc-size [ drop f ] [
+        [ 0 ] [ array>> ] [ random ] tri* 1 + [
+            [ 2dup array-nth tombstone? [ 2 + ] 2dip ] loop
+        ] times [ 2 - ] dip
+        [ array-nth ] [ [ 1 + ] dip array-nth ] 2bi 2array
+    ] if-zero ;
 
 : randomize-n-last ( seq n -- seq )
     [ dup length dup ] dip - 1 max '[ dup _ > ]
