@@ -9,8 +9,16 @@ IN: math.statistics
 : power-mean ( seq p -- x )
     [ '[ _ ^ ] map-sum ] [ [ length / ] [ recip ^ ] bi* ] 2bi ; inline
 
+! Delta in degrees-of-freedom
+: mean-ddof ( seq ddof -- x )
+    [ [ sum ] [ length ] bi ] dip -
+    dup zero? [ 2drop 0 ] [ / ] if ; inline
+
 : mean ( seq -- x )
-    [ sum ] [ length ] bi / ; inline
+    0 mean-ddof ; inline
+
+: unbiased-mean ( seq -- x )
+    1 mean-ddof ; inline
 
 : sum-of-squares ( seq -- x )
     [ sq ] map-sum ; inline
@@ -246,26 +254,25 @@ PRIVATE>
 : range ( seq -- x )
     minmax swap - ;
 
-: sample-var ( seq -- x )
-    #! normalize by N-1; unbiased
-    dup length 1 <= [
-        drop 0
+: var-ddof ( seq n -- x )
+    2dup [ length ] dip - 0 <= [
+        2drop 0
     ] [
-        [ sum-of-squared-errors ] [ length 1 - ] bi /
-    ] if ;
+        [ [ sum-of-squared-errors ] [ length ] bi ] dip - /
+    ] if ; inline
 
-: full-var ( seq -- x )
-    dup length 1 <= [
-        drop 0
-    ] [
-        [ sum-of-squared-errors ] [ length ] bi /
-    ] if ;
+: full-var ( seq -- x ) 0 var-ddof ; inline
+    
+: sample-var ( seq -- x ) 1 var-ddof ; inline
 
 ALIAS: var sample-var
 
-: sample-std ( seq -- x ) sample-var sqrt ;
+: std-ddof ( seq n -- x )
+    var-ddof sqrt ; inline
 
-: full-std ( seq -- x ) full-var sqrt ;
+: full-std ( seq -- x ) 0 std-ddof ; inline
+
+: sample-std ( seq -- x ) 1 std-ddof ; inline
 
 ALIAS: std sample-std
 
@@ -275,9 +282,11 @@ ALIAS: std sample-std
 
 : median-dev ( seq -- x ) dup median v-n vabs mean ;
 
-: sample-ste ( seq -- x ) [ sample-std ] [ length ] bi sqrt / ;
+: ste-ddof ( seq n -- x ) '[ _ std-ddof ] [ length ] bi sqrt / ;
 
-: full-ste ( seq -- x ) [ full-std ] [ length ] bi sqrt / ;
+: full-ste ( seq -- x ) 0 ste-ddof ;
+
+: sample-ste ( seq -- x ) 1 ste-ddof ;
 
 ALIAS: ste sample-ste
 
@@ -304,14 +313,20 @@ ALIAS: ste sample-ste
     swap / * ! stack is mean(x) mean(y) beta
     [ swapd * - ] keep ;
 
-: cov ( {x} {y} -- cov )
-    [ dup mean v-n ] bi@ v* mean ;
+: cov-ddof ( {x} {y} ddof -- cov )
+    [ [ dup mean v-n ] bi@ v* ] dip mean-ddof ;
 
-: sample-corr ( {x} {y} -- corr )
-     [ cov ] [ [ sample-var ] bi@ * sqrt ] 2bi / ;
+: cov ( {x} {y} -- cov ) 0 cov-ddof ; inline
 
-: full-corr ( {x} {y} -- corr )
-     [ cov ] [ [ full-var ] bi@ * sqrt ] 2bi / ;
+: unbiased-cov ( {x} {y} -- cov ) 1 cov-ddof ; inline
+
+: corr-ddof ( {x} {y} n -- corr )
+    [ [ cov ] ] dip
+    '[ [ _ var-ddof ] bi@ * sqrt ] 2bi / ;
+
+: full-corr ( {x} {y} -- corr ) 0 corr-ddof ; inline
+
+: sample-corr ( {x} {y} -- corr ) 1 corr-ddof ; inline
 
 ALIAS: corr sample-corr
 
@@ -343,7 +358,8 @@ ALIAS: corr sample-corr
     [ dup log * ] [ 1 swap - dup log * ] bi + neg 2 log / ;
 
 : standardize ( u -- v )
-    [ dup mean v-n ] [ std ] bi v/n ;
+    [ dup mean v-n ] [ std ] bi
+    dup zero? [ drop ] [ v/n ] if ;
 
 : differences ( u -- v )
     [ 1 tail-slice ] keep [ - ] 2map ;
@@ -358,3 +374,4 @@ ALIAS: corr sample-corr
         [ values ] map [ 0 [ length + ] accumulate nip ] [ ] bi zip
     ] [ length f <array> ] bi
     [ '[ first2 [ _ set-nth ] with each ] each ] keep ;
+
