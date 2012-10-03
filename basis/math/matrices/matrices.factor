@@ -168,3 +168,31 @@ IN: math.matrices
 
 : outer ( u v -- m )
     [ n*v ] curry map ;
+
+: row ( n m -- col )
+    nth ; inline
+
+: rows ( seq m -- cols )
+    '[ _ row ] map ; inline
+
+: col ( n m -- col )
+    swap '[ _ swap nth ] map ; inline
+
+: cols ( seq m -- cols )
+    '[ _ col ] map ; inline
+
+: matrix-map ( m quot -- )
+    '[ _ map ] map ; inline
+
+: column-map ( m quot -- seq )
+    [ [ first length iota ] keep ] dip '[ _ col @ ] map ; inline
+
+: cartesian-indices ( n -- matrix )
+    iota dup cartesian-product ; inline
+
+: cartesian-matrix-map ( m quot -- m' )
+    [ [ first length cartesian-indices ] keep ] dip
+    '[ _ @ ] matrix-map ; inline
+
+: cartesian-matrix-column-map ( m quot -- m' )
+    [ cols first2 ] prepose cartesian-matrix-map ; inline
