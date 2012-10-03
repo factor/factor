@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays columns kernel locals math math.bits
 math.functions math.order math.vectors sequences
-sequences.private fry ;
+sequences.private fry math.statistics ;
 IN: math.matrices
 
 ! Matrices
@@ -196,3 +196,11 @@ IN: math.matrices
 
 : cartesian-matrix-column-map ( m quot -- m' )
     [ cols first2 ] prepose cartesian-matrix-map ; inline
+
+: cov-matrix-ddof ( m ddof -- cov )
+    '[ _ cov-ddof ] cartesian-matrix-column-map ; inline
+
+: cov-matrix ( m -- cov ) 0 cov-matrix-ddof ; inline
+
+: sample-cov-matrix ( m -- cov ) 1 cov-matrix-ddof ; inline
+
