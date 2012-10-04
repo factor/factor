@@ -124,3 +124,23 @@ MACRO: nmap-reduce ( map-quot reduce-quot n -- quot )
 
 : nall? ( seqs... quot n -- ? )
     (neach) all-integers? ; inline
+
+MACRO: finish-nfind ( n -- quot )
+    [ 1 + ] keep dup dup dup '[
+        _ npick
+        [ [ dup ] _ ndip _ nnth-unsafe ]
+        [ _ ndrop _ [ f ] times ]
+        if
+    ] ;
+
+: (nfind) ( seqs... quot n quot' -- i elts... )
+    over
+    [ '[ _ _ (neach) @ ] ] dip
+    [ '[ _ finish-nfind ] ] keep
+    nbi ; inline
+
+: nfind ( seqs... quot n -- i elts... )
+    [ find-integer ] (nfind) ; inline
+
+: nany? ( seqs... quot n -- ? )
+    [ nfind ] [ ndrop ] bi >boolean ; inline
