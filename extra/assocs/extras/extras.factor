@@ -37,4 +37,5 @@ IN: assocs.extras
 
 : sum-values ( assoc -- n ) 0 [ + ] reduce-values ; inline
 
-
+: if-assoc-empty ( ..a assoc quot1: ( ..a -- ..b ) quot2: ( ..a assoc -- ..b ) -- ..b )
+    [ dup assoc-empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
