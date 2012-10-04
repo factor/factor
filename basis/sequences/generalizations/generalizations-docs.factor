@@ -118,6 +118,14 @@ HELP: nall?
 { $values { "seqs..." { $snippet "n" } " sequences on the datastack" } { "quot" { $quotation "( element... - ? )" } } { "n" integer } { "?" boolean } }
 { $description "A generalization of " { $link all? } " that can be applied to any number of sequences." } ;
 
+HELP: nfind
+{ $values { "seqs..." { $snippet "n" } " sequences on the datastack" } { "quot" { $quotation "( element... - ? )" } } { "n" integer } { "i" integer } { "elts..." { $snippet "n" } " elements on the datastack" } }
+{ $description "A generalization of " { $link find } " that can be applied to any number of sequences." } ;
+
+HELP: nany?
+{ $values { "seqs..." { $snippet "n" } " sequences on the datastack" } { "quot" { $quotation "( element... - ? )" } } { "n" integer } { "?" boolean } }
+{ $description "A generalization of " { $link any? } " that can be applied to any number of sequences." } ;
+
 ARTICLE: "sequences.generalizations" "Generalized sequence words"
 "The " { $vocab-link "sequences.generalizations" } " vocabulary defines generalized versions of various sequence operations."
 { $subsections
