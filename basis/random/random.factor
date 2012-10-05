@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays assocs byte-arrays
 byte-vectors combinators combinators.short-circuit fry
-hashtables hashtables.private hints io.backend io.binary
-kernel locals math math.bitwise math.constants math.functions
-math.order math.ranges namespaces sequences sequences.private
-sets summary system typed vocabs ;
+hashtables hashtables.private hash-sets hints io.backend
+io.binary kernel locals math math.bitwise math.constants
+math.functions math.order math.ranges namespaces sequences
+sequences.private sets summary system typed vocabs ;
 QUALIFIED-WITH: alien.c-types c
+QUALIFIED-WITH: sets sets
 IN: random
 
 SYMBOL: system-random-generator
@@ -82,6 +83,10 @@ M: hashtable random
         ] times [ 2 - ] dip
         [ array-nth ] [ [ 1 + ] dip array-nth ] 2bi 2array
     ] if-zero ;
+
+M: sets:set random members random ;
+
+M: hash-set random table>> random first ;
 
 : randomize-n-last ( seq n -- seq )
     [ dup length dup ] dip - 1 max '[ dup _ > ]
