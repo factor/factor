@@ -29,7 +29,7 @@ IN: compiler.tree.propagation.known-words
 
 \ /mod { rational rational } "input-classes" set-word-prop
 
-{ bitand bitor bitxor bitnot shift }
+{ bitand bitor bitxor shift }
 [ { integer integer } "input-classes" set-word-prop ] each
 
 \ bitnot { integer } "input-classes" set-word-prop
@@ -240,12 +240,9 @@ generic-comparison-ops [
     '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
 ] assoc-each
 
-{ numerator denominator }
-[ [ drop integer <class-info> ] "outputs" set-word-prop ] each
-
-\ >fraction [
-    drop integer <class-info> dup
-] "outputs" set-word-prop
+{ numerator denominator >fraction } [
+    { integer } "default-output-classes" set-word-prop
+] each
 
 { (log2) fixnum-log2 bignum-log2 } [
     [
