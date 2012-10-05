@@ -166,7 +166,7 @@ M: assoc new-assoc drop <hashtable> ; inline
 M: f new-assoc drop <hashtable> ; inline
 
 : >hashtable ( assoc -- hashtable )
-    H{ } assoc-clone-like ; inline
+    H{ } assoc-clone-like ;
 
 M: hashtable assoc-like
     drop dup hashtable? [ >hashtable ] unless ; inline
