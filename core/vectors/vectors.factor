@@ -10,7 +10,7 @@ TUPLE: vector
 
 : <vector> ( n -- vector ) 0 <array> 0 vector boa ; inline
 
-: >vector ( seq -- vector ) V{ } clone-like ; inline
+: >vector ( seq -- vector ) V{ } clone-like ;
 
 M: vector like
     drop dup vector? [
