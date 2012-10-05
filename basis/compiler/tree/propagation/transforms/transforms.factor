@@ -324,13 +324,13 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
     [ \ push def>> ] [ f ] if
 ] "custom-inlining" set-word-prop
 
-: custom-inline-fixnum ( x -- y )
-    in-d>> first value-info class>> fixnum \ f class-or class<=
-    [ [ dup [ \ >fixnum no-method ] unless ] ] [ f ] if ;
+: custom-inline-fixnum ( x method -- y )
+    [ in-d>> first value-info class>> fixnum \ f class-or class<= ] dip
+    '[ [ dup [ _ no-method ] unless ] ] [ f ] if ;
 
 ! Speeds up fasta benchmark
 { >fixnum integer>fixnum integer>fixnum-strict } [
-    [ custom-inline-fixnum ] "custom-inlining" set-word-prop
+    dup '[ _ custom-inline-fixnum ] "custom-inlining" set-word-prop
 ] each
 
 ! We want to constant-fold calls to heap-size, and recompile those
