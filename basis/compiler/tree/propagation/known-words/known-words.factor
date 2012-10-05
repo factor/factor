@@ -240,9 +240,12 @@ generic-comparison-ops [
     '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
 ] assoc-each
 
-{ numerator denominator >fraction } [
-    { integer } "default-output-classes" set-word-prop
-] each
+{ numerator denominator }
+[ [ drop integer <class-info> ] "outputs" set-word-prop ] each
+
+\ >fraction [
+    drop integer <class-info> dup
+] "outputs" set-word-prop
 
 { (log2) fixnum-log2 bignum-log2 } [
     [
