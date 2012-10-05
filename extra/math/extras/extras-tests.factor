@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: math math.extras math.ranges tools.test ;
+USING: math math.extras math.ranges sequences tools.test ;
 
 IN: math.extras.test
 
@@ -68,3 +68,7 @@ IN: math.extras.test
 
 { 57/200 } [ { 80 60 10 20 30 } herfindahl ] unit-test
 { 17/160 } [ { 80 60 10 20 30 } normalized-herfindahl ] unit-test
+
+{ { 0 5 1 2 2 } } [
+    { -10 10 2 2.5 3 } [ { 1 2 3 4 5 } search-sorted ] map
+] unit-test

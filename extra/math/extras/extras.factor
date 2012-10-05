@@ -1,10 +1,10 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators.short-circuit grouping kernel locals math
-math.combinatorics math.constants math.functions math.order
-math.primes math.ranges math.statistics math.vectors memoize
-sequences sequences.extras sorting assocs fry ;
+USING: assocs combinators.short-circuit fry grouping kernel
+locals math math.combinatorics math.constants math.functions
+math.order math.primes math.ranges math.statistics math.vectors
+memoize random sequences sequences.extras sorting ;
 
 IN: math.extras
 
@@ -188,3 +188,9 @@ PRIVATE>
 
 : exponential-index ( seq -- x )
     dup sum '[ _ / dup ^ ] map-product ;
+
+: search-sorted ( obj seq -- i )
+    swap '[ [ _ >= ] find drop dup ] [ length ] bi ? ;
+
+: weighted-random ( histogram -- obj )
+    unzip cum-sum [ last random ] [ search-sorted ] bi swap nth ;
