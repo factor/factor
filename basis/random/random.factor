@@ -1,11 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays assocs
-byte-arrays byte-vectors combinators combinators.short-circuit
-fry hashtables hashtables.private hints io.backend io.binary
+USING: accessors alien.data arrays assocs byte-arrays
+byte-vectors combinators combinators.short-circuit fry
+hashtables hashtables.private hints io.backend io.binary
 kernel locals math math.bitwise math.constants math.functions
 math.order math.ranges namespaces sequences sequences.private
 sets summary system typed vocabs ;
+QUALIFIED-WITH: alien.c-types c
 IN: random
 
 SYMBOL: system-random-generator
@@ -18,10 +19,10 @@ GENERIC: random-bytes* ( n tuple -- byte-array )
 
 M: object random-bytes* ( n tuple -- byte-array )
     [ [ <byte-vector> ] keep 4 /mod ] dip
-    [ pick '[ _ random-32* int <ref> _ push-all ] times ]
+    [ pick '[ _ random-32* c:int <ref> _ push-all ] times ]
     [
         over zero?
-        [ 2drop ] [ random-32* int <ref> swap head append! ] if
+        [ 2drop ] [ random-32* c:int <ref> swap head append! ] if
     ] bi-curry bi* B{ } like ;
 
 HINTS: M\ object random-bytes* { fixnum object } ;
@@ -112,7 +113,7 @@ ERROR: too-many-samples seq n ;
 <PRIVATE
 
 : (uniform-random-float) ( min max obj -- n )
-    [ 4 4 ] dip [ random-bytes* uint deref >float ] curry bi@
+    [ 4 4 ] dip [ random-bytes* c:uint deref >float ] curry bi@
     2.0 32 ^ * +
     [ over - 2.0 -64 ^ * ] dip
     * + ; inline
@@ -121,6 +122,8 @@ PRIVATE>
 
 : uniform-random-float ( min max -- n )
     random-generator get (uniform-random-float) ; inline
+
+M: float random [ f ] [ 0.0 swap uniform-random-float ] if-zero ;
 
 : random-unit ( -- n )
     0.0 1.0 uniform-random-float ; inline
