@@ -225,6 +225,7 @@ generic-comparison-ops [
     { >fixnum fixnum }
     { bignum>fixnum fixnum }
     { integer>fixnum fixnum }
+    { integer>fixnum-strict fixnum }
 
     { >bignum bignum }
     { fixnum>bignum bignum }

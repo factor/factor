@@ -329,11 +329,7 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
     [ [ dup [ \ >fixnum no-method ] unless ] ] [ f ] if ;
 
 ! Speeds up fasta benchmark
-\ >fixnum [
-    custom-inline-fixnum
-] "custom-inlining" set-word-prop
-
-{ integer>fixnum integer>fixnum-strict } [
+{ >fixnum integer>fixnum integer>fixnum-strict } [
     [ custom-inline-fixnum ] "custom-inlining" set-word-prop
 ] each
 
