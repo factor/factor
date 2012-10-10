@@ -372,9 +372,14 @@ M: TXT rdata>byte-array
 : message>names ( message -- names )
     answer-section>> [ rdata>> name>> ] map ;
 
+: filter-message-rdata>names ( message quot -- names )
+    [ answer-section>> [ rdata>> ] map ] dip filter [ name>> ] map ; inline
+
 : message>a-names ( message -- names )
-    answer-section>>
-    [ rdata>> ] map [ a? ] filter [ name>> ] map ;
+    [ a? ] filter-message-rdata>names ;
+
+: message>aaaa-names ( message -- names )
+    [ aaaa? ] filter-message-rdata>names ;
 
 : message>mxs ( message -- assoc )
     answer-section>> [ rdata>> [ preference>> ] [ exchange>> ] bi 2array ] map ;
