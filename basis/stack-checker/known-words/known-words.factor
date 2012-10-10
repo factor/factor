@@ -245,26 +245,25 @@ M: object infer-call* \ call bad-macro-input ;
 \ alien-callback [ infer-alien-callback ] "special" set-word-prop
 
 {
+    c-to-factor
     do-primitive
-    mega-cache-miss
     mega-cache-lookup
+    mega-cache-miss
     inline-cache-miss
     inline-cache-miss-tail
-    unwind-native-frames
-    set-datastack
+    lazy-jit-compile
     set-callstack
+    set-datastack
     set-retainstack
     unwind-native-frames
-    lazy-jit-compile
-    c-to-factor
 } [ dup '[ _ do-not-compile ] "special" set-word-prop ] each
 
 {
     declare call (call) dip 2dip 3dip curry compose
-    execute (execute) call-effect-unsafe execute-effect-unsafe if
-    dispatch <tuple-boa> load-local load-locals get-local
-    drop-locals do-primitive alien-invoke alien-indirect
-    alien-callback
+    execute (execute) call-effect-unsafe execute-effect-unsafe
+    if dispatch <tuple-boa> do-primitive
+    load-local load-locals get-local drop-locals
+    alien-invoke alien-indirect alien-callback alien-assembly
 } [ t "no-compile" set-word-prop ] each
 
 ! Exceptions to the above
