@@ -314,3 +314,66 @@ CONSTANT: test-points {
     test-points cov-matrix
 ] unit-test
 
+{
+    {
+        { 5 5 }
+        { 5 5 }
+    }
+} [
+    2 2 5 <matrix>
+] unit-test
+
+{
+    {
+        { 5 5 }
+        { 5 5 }
+    }
+} [
+    2 2 [ 5 ] make-matrix
+] unit-test
+
+{
+    {
+        { 0 1 2 }
+        { 1 2 3 }
+    }
+} [
+    2 3 [ + ] make-matrix-with-indices
+] unit-test
+
+{
+    {
+        { 0 1 }
+        { 0 1 }
+    }
+} [
+    2 square-rows
+] unit-test
+
+{
+    {
+        { 0 0 }
+        { 1 1 }
+    }
+} [
+    2 square-cols
+] unit-test
+
+{
+    {
+        { 5 6 }
+        { 5 6 }
+    }
+} [
+    { 5 6 } square-rows
+] unit-test
+
+{
+    {
+        { 5 5 }
+        { 6 6 }
+    }
+} [
+    { 5 6 } square-cols
+] unit-test
+
