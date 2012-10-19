@@ -21,30 +21,15 @@ IN: ip-parser
 : join-components ( array -- str )
     bubble [ number>string ] map "." join ;
 
-: components ( str -- n )
-    [ CHAR: . = ] count ;
-
-: parse-1 ( str -- ip )
-    split-components { 0 0 0 } prepend ;
-
-: parse-2 ( str -- ip )
-    split-components first2 [| A D | { A 0 0 D } ] call ;
-
-: parse-3 ( str -- ip )
-    split-components first3 [| A B D | { A B 0 D } ] call ;
-
-: parse-4 ( str -- ip )
-    split-components ;
-
 PRIVATE>
 
 ERROR: invalid-ipv4 str ;
 
 : parse-ipv4 ( str -- ip )
-    dup components {
-        { 0 [ parse-1 ] }
-        { 1 [ parse-2 ] }
-        { 2 [ parse-3 ] }
-        { 3 [ parse-4 ] }
-        [ invalid-ipv4 ]
-    } case join-components ;
+    dup split-components dup length {
+        { 1 [ { 0 0 0 } prepend ] }
+        { 2 [ first2 [| A D | { A 0 0 D } ] call ] }
+        { 3 [ first3 [| A B D | { A B 0 D } ] call ] }
+        { 4 [ ] }
+        [ drop invalid-ipv4 ]
+    } case join-components nip ;
