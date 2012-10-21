@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel math locals ;
+USING: accessors combinators kernel math ;
 IN: colors
 
 TUPLE: color ;
@@ -29,9 +29,9 @@ M: color blue>> ( color -- blue ) >rgba blue>> ;
 
 CONSTANT: transparent T{ rgba f 0.0 0.0 0.0 0.0 }
 
-:: linear-gradient ( color1 color2 percent -- color )
-    color1 >rgba-components drop [ 1.0 percent - * ] tri@
-    color2 >rgba-components drop [ percent * ] tri@
+: linear-gradient ( color1 color2 percent -- color )
+    [ 1.0 swap - * ] [ * ] bi-curry swapd
+    [ [ >rgba-components drop ] [ tri@ ] bi* ] 2bi@
     [ + ] tri-curry@ tri* 1.0 <rgba> ;
 
 : inverse-color ( color -- color' )
