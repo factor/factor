@@ -33,3 +33,6 @@ CONSTANT: transparent T{ rgba f 0.0 0.0 0.0 0.0 }
     color1 >rgba-components drop [ 1.0 percent - * ] tri@
     color2 >rgba-components drop [ percent * ] tri@
     [ + ] tri-curry@ tri* 1.0 <rgba> ;
+
+: inverse-color ( color -- color' )
+    >rgba-components [ [ 1.0 swap - ] tri@ ] dip <rgba> ;
