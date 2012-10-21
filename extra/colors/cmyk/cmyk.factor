@@ -6,7 +6,7 @@ math.order ;
 
 IN: colors.cmyk
 
-TUPLE: cmyka
+TUPLE: cmyka < color
 { cyan read-only }
 { magenta read-only }
 { yellow read-only }
