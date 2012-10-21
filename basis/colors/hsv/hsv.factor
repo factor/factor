@@ -55,3 +55,12 @@ M: hsva >rgba ( hsva -- rgba )
             { [ b x = r z > and ] [ 5 x r - x z - / - ] }
         } cond 6 / 360 * x z - x / x a <hsva>
     ] if ;
+
+: complimentary-color ( color -- color' )
+    dup hsva? [ >rgba rgba>hsva ] unless
+    {
+        [ hue>> 180 + 360 mod ]
+        [ saturation>> ]
+        [ value>> ]
+        [ alpha>> ]
+    } cleave <hsva> ;
