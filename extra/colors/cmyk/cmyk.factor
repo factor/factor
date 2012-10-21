@@ -1,7 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors colors kernel math math.order ;
+USING: accessors combinators colors colors.gray kernel math
+math.order ;
 
 IN: colors.cmyk
 
