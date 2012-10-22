@@ -424,7 +424,7 @@ PRIVATE>
             [ cl-current-device  ,, ] when*
             [ cl-current-context ,, ] when*
         ] 3curry H{ } make
-    ] dip with-variable ; inline
+    ] dip with-variables ; inline
 
 : cl-platforms ( -- platforms )
     0 f 0 uint <ref> [ clGetPlatformIDs cl-success ] keep uint deref
