@@ -440,7 +440,8 @@ PRIVATE>
     swapd each ; inline
 
 : map-integers ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
-    [ over ] dip [ [ collect ] keep ] new-like ; inline
+    [ integer>fixnum-strict ] 2dip [ over ] dip
+    [ [ collect ] keep ] new-like ; inline
 
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
     [ (each) ] dip map-integers ; inline
