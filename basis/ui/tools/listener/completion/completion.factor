@@ -26,10 +26,11 @@ SLOT: history
 TUPLE: word-completion manifest ;
 C: <word-completion> word-completion
 
-SINGLETONS: vocab-completion color-completion char-completion history-completion ;
+SINGLETONS: vocab-completion color-completion char-completion
+path-completion history-completion ;
 UNION: definition-completion word-completion vocab-completion ;
 UNION: listener-completion definition-completion
-color-completion char-completion history-completion ;
+color-completion char-completion path-completion history-completion ;
 
 GENERIC: completion-quot ( interactor completion-mode -- quot )
 
@@ -40,6 +41,7 @@ M: word-completion completion-quot [ words-matching ] (completion-quot) ;
 M: vocab-completion completion-quot [ vocabs-matching ] (completion-quot) ;
 M: color-completion completion-quot [ colors-matching ] (completion-quot) ;
 M: char-completion completion-quot [ chars-matching ] (completion-quot) ;
+M: path-completion completion-quot [ paths-matching ] (completion-quot) ;
 M: history-completion completion-quot drop '[ _ history-completions ] ;
 
 GENERIC: completion-element ( completion-mode -- element )
@@ -53,6 +55,7 @@ M: word-completion completion-banner drop "Words" ;
 M: vocab-completion completion-banner drop "Vocabularies" ;
 M: color-completion completion-banner drop "Colors" ;
 M: char-completion completion-banner drop "Unicode code point names" ;
+M: path-completion completion-banner drop "Paths" ;
 M: history-completion completion-banner drop "Input history" ;
 
 ! Completion modes also implement the row renderer protocol
@@ -92,6 +95,7 @@ M: color-completion row-color
         { [ dup complete-vocab? ] [ 2drop vocab-completion ] }
         { [ dup complete-CHAR:? ] [ 2drop char-completion ] }
         { [ dup complete-COLOR:? ] [ 2drop color-completion ] }
+        { [ dup complete-P"? ] [ 2drop path-completion ] }
         [ drop <word-completion> ]
     } cond ;
 
