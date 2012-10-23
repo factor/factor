@@ -18,4 +18,4 @@ M: effect present effect>string ;
 
 M: f present drop "" ;
 
-M: pathname present string>> >string ;
+M: pathname present string>> ;
