@@ -149,3 +149,6 @@ IN: sequences.extras.tests
 
 { "" } [ { } "" reverse-as ] unit-test
 { "ABC" } [ { 67 66 65 } "" reverse-as ] unit-test
+
+{ V{ 1 } } [ 1 0 V{ } [ insert-nth! ] keep ] unit-test
+{ V{ 1 2 3 4 } } [ 2 1 V{ 1 3 4 } [ insert-nth! ] keep ] unit-test
