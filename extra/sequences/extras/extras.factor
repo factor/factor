@@ -1,6 +1,6 @@
-USING: accessors arrays assocs fry grouping kernel locals make
-math math.order math.ranges sequences sequences.private
-splitting ;
+USING: accessors arrays assocs fry grouping growable kernel
+locals make math math.order math.ranges sequences
+sequences.private splitting ;
 FROM: sequences => change-nth ;
 IN: sequences.extras
 
@@ -339,3 +339,8 @@ PRIVATE>
 
 : map-product ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 1 ] 2dip [ dip * ] curry [ swap ] prepose each ; inline
+
+: insert-nth! ( elt n seq -- )
+    [ length ] keep ensure swap pick (a,b]
+    over '[ [ 1 + ] keep _ move-unsafe ] each
+    set-nth-unsafe ;
