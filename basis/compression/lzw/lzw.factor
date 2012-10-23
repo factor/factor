@@ -83,8 +83,8 @@ M: gif-lzw increment-code-size [ 1 + 12 min ] change-code-size ;
 DEFER: handle-clear-code
 : lzw-process-next-code ( lzw quot: ( lzw code -- ) -- )
     [ lzw-read ] dip {
-        { [ 3dup drop end-of-information? ] [ 3drop ] }
-        { [ 3dup drop clear-code? ] [ 2drop handle-clear-code ] }
+        { [ 2over end-of-information? ] [ 3drop ] }
+        { [ 2over clear-code? ] [ 2drop handle-clear-code ] }
         [ call( lzw code -- ) ]
     } cond ; inline
 

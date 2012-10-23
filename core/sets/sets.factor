@@ -91,7 +91,7 @@ M: set all-unique? drop t ;
 <PRIVATE
 
 : (pruned) ( elt hash vec -- )
-    3dup drop in? [ 3drop ] [
+    2over in? [ 3drop ] [
         [ drop adjoin ] [ nip push ] 3bi
     ] if ; inline
 
