@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs colors.constants combinators
-combinators.short-circuit fry io io.directories kernel locals
-make math math.order namespaces sequences sorting splitting
-strings unicode.case unicode.categories unicode.data vectors
-vocabs vocabs.hierarchy words ;
+combinators.short-circuit fry io.directories io.files
+io.files.info io.pathnames kernel locals make math math.order
+sequences sorting splitting unicode.categories unicode.data
+vectors vocabs vocabs.hierarchy ;
 
 IN: tools.completion
 
@@ -107,8 +107,23 @@ PRIVATE>
 : colors-matching ( str -- seq )
     named-colors dup zip completions ;
 
-: paths-matching ( str path -- seq )
-    directory-files dup zip completions ;
+<PRIVATE
+
+: directory-paths ( directory -- paths )
+    dup '[
+        [
+            [ _ prepend-path ]
+            [ file-info directory? [ path-separator append ] when ]
+            bi
+        ] map
+    ] with-directory-files ;
+
+PRIVATE>
+
+: paths-matching ( str -- seq )
+    dup file-directory [ ?head drop ] keep
+    dup { [ exists? ] [ file-info directory? ] } 1&&
+    [ directory-paths dup zip completions ] [ 2drop { } ] if ;
 
 <PRIVATE
 
@@ -150,3 +165,5 @@ PRIVATE>
 : complete-CHAR:? ( tokens -- ? ) "CHAR:" complete-token? ;
 
 : complete-COLOR:? ( tokens -- ? ) "COLOR:" complete-token? ;
+
+: complete-P"? ( tokens -- ? ) "P\"" complete-token? ;
