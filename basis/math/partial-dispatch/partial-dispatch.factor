@@ -147,7 +147,7 @@ SYMBOL: fast-math-ops
 
 : math-both-known? ( word left right -- ? )
     3dup math-op
-    [ 2drop 2drop t ]
+    [ 4drop t ]
     [ drop math-class-max swap method-for-class >boolean ] if ;
 
 : (derived-ops) ( word assoc -- words )
