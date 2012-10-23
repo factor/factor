@@ -1167,6 +1167,7 @@ ALIAS: glTexImage2DMultisample gl:glTexImage2DMultisample
 ALIAS: glTexImage3DMultisample gl:glTexImage3DMultisample
 ALIAS: glGetMultisamplefv gl:glGetMultisamplefv
 ALIAS: glSampleMaski gl:glSampleMaski
+ALIAS: glDrawElementsBaseVertex gl:glDrawElementsBaseVertex
 ALIAS: glBindFragDataLocationIndexed gl:glBindFragDataLocationIndexed
 ALIAS: glGetFragDataIndex gl:glGetFragDataIndex
 ALIAS: glGenSamplers gl:glGenSamplers
