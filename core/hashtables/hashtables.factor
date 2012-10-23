@@ -24,7 +24,7 @@ TUPLE: hashtable
 
 : (key@) ( key array i probe# -- array n ? )
     [ 3dup swap array-nth ] dip over ((empty)) eq?
-    [ drop 3drop no-key ] [
+    [ 4drop no-key ] [
         [ = ] dip swap
         [ drop rot drop t ]
         [ probe (key@) ]
