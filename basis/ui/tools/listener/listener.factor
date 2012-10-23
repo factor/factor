@@ -64,6 +64,8 @@ M: word-completion (word-at-caret)
 
 M: char-completion (word-at-caret) 2drop f ;
 
+M: path-completion (word-at-caret) 2drop f ;
+
 M: color-completion (word-at-caret) 2drop f ;
 
 : word-at-caret ( token interactor -- obj )
