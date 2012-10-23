@@ -39,15 +39,7 @@ HELP: file-stem
     { $example "USING: io.pathnames prettyprint ;" "\"/home/csi/gui.vbs\" file-stem ." "\"gui\"" }
 } ;
 
-HELP: file-directory
-{ $values { "path" "a pathname string" } { "directory" string } }
-{ $description "Outputs the directory of " { $snippet "path" } " with the " { $link file-name } " removed, if any." }
-{ $examples
-    { $example "USING: io.pathnames prettyprint ;" "\"/usr/bin/gcc\" file-directory ." "\"/usr/bin\"" }
-    { $example "USING: io.pathnames prettyprint ;" "\"/home/csi/gui.vbs\" file-directory ." "\"/home/csi\"" }
-} ;
-
-{ file-name file-stem file-extension file-directory } related-words
+{ file-name file-stem file-extension } related-words
 
 HELP: path-components
 { $values { "path" "a pathnames string" } { "seq" sequence } }
