@@ -6,10 +6,11 @@ IN: math.primes.erato
 
 <PRIVATE
 
-CONSTANT: masks B{ 0 128 0 0 0 0 0 64 0 0 0 32 0 16 0 0 0 8 0 4 0 0 0 2 0 0 0 0 0 1 }
+CONSTANT: masks
+{ f 128 f f f f f 64 f f f 32 f 16 f f f 8 f 4 f f f 2 f f f f f 1 }
 
-: bit-pos ( n -- byte/f mask/f )
-    30 /mod masks nth-unsafe [ drop f f ] when-zero ; inline
+: bit-pos ( n -- byte mask/f )
+    30 /mod masks nth-unsafe ; inline
 
 : marked-unsafe? ( n arr -- ? )
     [ bit-pos ] dip swap
@@ -17,7 +18,7 @@ CONSTANT: masks B{ 0 128 0 0 0 0 0 64 0 0 0 32 0 16 0 0 0 8 0 4 0 0 0 2 0 0 0 0 
 
 : unmark ( n arr -- )
     [ bit-pos swap ] dip
-    over [ [ swap unmask ] change-nth-unsafe ] [ 3drop ] if ; inline
+    pick [ [ swap unmask ] change-nth-unsafe ] [ 3drop ] if ; inline
 
 : upper-bound ( arr -- n ) length 30 * 1 - ; inline
 
