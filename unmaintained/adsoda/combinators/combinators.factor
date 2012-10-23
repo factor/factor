@@ -24,17 +24,17 @@ IN: adsoda.combinators
     2dup swap length 
     {
         { [ over 1 = ] [ 3drop columnize ] }
-        { [ over 0 = ] [ 2drop 2drop { } ] }
-        { [ 2dup < ] [ 2drop [ 1 cut ] dip  
-                         [ 1 - among [ append ] with map  ] 
+        { [ over 0 = ] [ 4drop { } ] }
+        { [ 2dup < ] [ 2drop [ 1 cut ] dip
+                         [ 1 - among [ append ] with map ]
                          [ among append ] 2bi
                        ] }
         { [ 2dup = ] [ 3drop 1array ] }
-        { [ 2dup > ] [ 2drop 2drop {  } ] } 
+        { [ 2dup > ] [ 4drop { } ] }
     } cond
 ;
 
-: concat-nth ( seq1 seq2 -- seq )  
+: concat-nth ( seq1 seq2 -- seq )
     [ nth append ] curry map-index ;
 
 : do-cycle   ( array -- array )   dup first suffix ;
