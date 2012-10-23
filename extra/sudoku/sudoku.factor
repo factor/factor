@@ -30,7 +30,7 @@ DEFER: search
 : attempt ( n x y -- )
     {
         { [ 3dup nip row-any? ] [ 3drop ] }
-        { [ 3dup drop col-any? ] [ 3drop ] }
+        { [ 2over col-any? ] [ 3drop ] }
         { [ 3dup box-any? ] [ 3drop ] }
         [ assume ]
     } cond ;
