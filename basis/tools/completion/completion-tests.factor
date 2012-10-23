@@ -30,3 +30,6 @@ IN: tools.completion
 { f } [ { "USING:" "A" "B" "C" ";" } complete-vocab? ] unit-test
 { t } [ { "X" ";" "USING:" "A" "B" "C" } complete-vocab? ] unit-test
 
+{ f } [ { "CHAR:" } complete-CHAR:? ] unit-test
+{ t } [ { "CHAR:" "" } complete-CHAR:? ] unit-test
+{ t } [ { "CHAR:" "a" } complete-CHAR:? ] unit-test
