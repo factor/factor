@@ -2256,6 +2256,7 @@ GL-FUNCTION: void glTexImage2DMultisample { } (  GLenum target, GLsizei samples,
 GL-FUNCTION: void glTexImage3DMultisample { } (  GLenum target, GLsizei samples, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLboolean fixedsamplelocations ) ;
 GL-FUNCTION: void glGetMultisamplefv { } (  GLenum pname, GLuint index, GLfloat* val ) ;
 GL-FUNCTION: void glSampleMaski { } ( GLuint index, GLbitfield mask ) ;
+GL-FUNCTION: void glDrawElementsBaseVertex { glDrawElementsBaseVertexARB } ( GLenum mode, GLsizei count, GLenum type, GLvoid* indices, GLint basevertex ) ;
 
 
 ! OpenGL 3.3
