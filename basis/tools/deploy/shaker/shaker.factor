@@ -272,7 +272,7 @@ IN: tools.deploy.shaker
         _ _
         {
             ! old becomes new
-            { [ 3dup drop eq? ] [ 2nip ] }
+            { [ 2over eq? ] [ 2nip ] }
             ! recurse into arrays
             { [ pick array? ] [ [ dup ] 2dip recursive-subst ] }
             ! otherwise do nothing
