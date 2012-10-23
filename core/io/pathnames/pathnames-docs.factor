@@ -33,13 +33,21 @@ HELP: file-extension
 
 HELP: file-stem
 { $values { "path" "a pathname string" } { "stem" string } }
-{ $description "Outputs the " { $link file-name } " of " { $snippet "filename" } " with the file extension removed, if any." }
+{ $description "Outputs the " { $link file-name } " of " { $snippet "path" } " with the file extension removed, if any." }
 { $examples
     { $example "USING: io.pathnames prettyprint ;" "\"/usr/bin/gcc\" file-stem ." "\"gcc\"" }
     { $example "USING: io.pathnames prettyprint ;" "\"/home/csi/gui.vbs\" file-stem ." "\"gui\"" }
 } ;
 
-{ file-name file-stem file-extension } related-words
+HELP: file-directory
+{ $values { "path" "a pathname string" } { "directory" string } }
+{ $description "Outputs the directory of " { $snippet "path" } " with the " { $link file-name } " removed, if any." }
+{ $examples
+    { $example "USING: io.pathnames prettyprint ;" "\"/usr/bin/gcc\" file-directory ." "\"/usr/bin\"" }
+    { $example "USING: io.pathnames prettyprint ;" "\"/home/csi/gui.vbs\" file-directory ." "\"/home/csi\"" }
+} ;
+
+{ file-name file-stem file-extension file-directory } related-words
 
 HELP: path-components
 { $values { "path" "a pathnames string" } { "seq" sequence } }
