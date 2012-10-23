@@ -97,7 +97,7 @@ M:: input-port stream-read-unsafe ( n dst port -- count )
             drop read-until-loop
         ] if
     ] [
-        [ 2drop 2drop ] dip
+        [ 4drop ] dip
     ] if ;
 
 M: input-port stream-read-until ( seps port -- str/f sep/f )

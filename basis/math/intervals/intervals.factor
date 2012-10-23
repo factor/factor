@@ -67,7 +67,7 @@ MEMO: array-capacity-interval ( -- interval )
 
 : compare-endpoints ( p1 p2 quot -- ? )
     [ 2dup [ first ] bi@ 2dup ] dip call [
-        2drop 2drop t
+        4drop t
     ] [
         number= [ [ second ] bi@ not or ] [ 2drop f ] if
     ] if ; inline
