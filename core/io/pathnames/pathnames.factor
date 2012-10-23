@@ -76,6 +76,13 @@ ERROR: no-parent-directory path ;
         [ f ]
     } cond ;
 
+: special-path ( path -- prefix )
+    {
+        { [ dup "resource:" head? ] [ drop "resource:" ] }
+        { [ dup "vocab:" head? ] [ drop "vocab:" ] }
+        [ drop "" ]
+    } cond ;
+
 PRIVATE>
 
 : absolute-path? ( path -- ? )
@@ -125,6 +132,11 @@ PRIVATE>
 : file-extension ( path -- extension )
     file-name "." split1-last nip ;
 
+: file-directory ( path -- directory )
+    [ special-path ] [ special-path? drop ] bi
+    dup last-path-separator [ head append ] [ 2drop ] if
+    [ path-separator ] when-empty ;
+
 : path-components ( path -- seq )
     normalize-path path-separator split harvest ;
 
@@ -155,9 +167,9 @@ M: string absolute-path
             "~" ?head [
                 trim-head-separators home prepend-path
                 absolute-path
-        ] [    
+        ] [
             current-directory get prepend-path
-        ] if ] if 
+        ] if ] if
     ] if ;
 
 M: object normalize-path ( path -- path' )
