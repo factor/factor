@@ -109,21 +109,21 @@ PRIVATE>
 
 <PRIVATE
 
-: directory-paths ( directory -- paths )
+: directory-paths ( directory -- alist )
     dup '[
         [
-            [ _ prepend-path ]
+            [ dup _ prepend-path ]
             [ file-info directory? [ path-separator append ] when ]
-            bi
-        ] map
+            bi swap
+        ] { } map>assoc
     ] with-directory-files ;
 
 PRIVATE>
 
 : paths-matching ( str -- seq )
-    dup file-directory [ ?head drop ] keep
+    dup file-directory [ ?head drop trim-head-separators ] keep
     dup { [ exists? ] [ file-info directory? ] } 1&&
-    [ directory-paths dup zip completions ] [ 2drop { } ] if ;
+    [ directory-paths completions ] [ 2drop { } ] if ;
 
 <PRIVATE
 
