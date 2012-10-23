@@ -12,5 +12,5 @@ IN: io.random
 
 PRIVATE>
 
-: random-line ( -- line/f )
+: random-readln ( -- line/f )
     f 1 [ swap [ ?replace ] [ 1 + ] bi ] each-line drop ;
