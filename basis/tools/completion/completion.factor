@@ -135,8 +135,18 @@ PRIVATE>
 : complete-vocab? ( tokens -- ? )
     { [ complete-single-vocab? ] [ complete-vocab-list? ] } 1|| ;
 
-: complete-CHAR:? ( tokens -- ? )
-    2 short tail* "CHAR:" swap member? ;
+<PRIVATE
 
-: complete-COLOR:? ( tokens -- ? )
-    2 short tail* "COLOR:" swap member? ;
+: complete-token? ( tokens token -- ? )
+    over last empty? [
+        [ harvest ?last ] [ = ] bi*
+    ] [
+        swap harvest dup length 1 >
+        [ 2 tail* ?first = ] [ 2drop f ] if
+    ] if ;
+
+PRIVATE>
+
+: complete-CHAR:? ( tokens -- ? ) "CHAR:" complete-token? ;
+
+: complete-COLOR:? ( tokens -- ? ) "COLOR:" complete-token? ;
