@@ -21,7 +21,7 @@ PRIVATE>
     [| line line# |
         line# random :> r
         r n < [
-            line# n <
+            line# n <=
             [ line r accum insert-nth! ]
             [ line r accum set-nth ] if
         ] when
