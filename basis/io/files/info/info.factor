@@ -25,6 +25,10 @@ available-space free-space used-space total-space ;
 
 HOOK: file-system-info os ( path -- file-system-info )
 
+HOOK: file-readable? os ( path -- ? )
+HOOK: file-writable? os ( path -- ? )
+HOOK: file-executable? os ( path -- ? )
+
 {
     { [ os unix? ] [ "io.files.info.unix" ] }
     { [ os windows? ] [ "io.files.info.windows" ] }
