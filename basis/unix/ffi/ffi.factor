@@ -69,6 +69,7 @@ FUNCTION: void endpwent ( ) ;
 FUNCTION: int fchdir ( int fd ) ;
 FUNCTION: int fchown ( int fd, uid_t owner, gid_t group ) ;
 FUNCTION: int fcntl ( int fd, int cmd, int arg ) ;
+FUNCTION: int fileno ( FILE* stream ) ;
 FUNCTION: int flock ( int fd, int operation ) ;
 FUNCTION: void freeaddrinfo ( addrinfo* ai ) ;
 FUNCTION: int futimes ( int id, timeval[2] times ) ;
