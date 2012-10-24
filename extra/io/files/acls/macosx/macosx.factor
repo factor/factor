@@ -5,7 +5,7 @@ classes.struct combinators destructors io.backend io.files
 kernel libc literals locals math.order prettyprint sequences
 unix unix.ffi unix.groups unix.types unix.users ;
 QUALIFIED: io
-IN: acls.macosx
+IN: io.files.acls.macosx
 
 <PRIVATE
 
@@ -26,14 +26,14 @@ CONSTANT: ACL_NEXT_ENTRY -1
 CONSTANT: ACL_LAST_ENTRY -2
 
 ! acl_type_t Supported:
-CONSTANT: ACL_TYPE_EXTENDED HEX: 00000100
+CONSTANT: ACL_TYPE_EXTENDED 0x00000100
 ! acl_type_t Unsupported:
-CONSTANT: ACL_TYPE_ACCESS HEX: 00000000
-CONSTANT: ACL_TYPE_DEFAULT HEX: 00000001
-CONSTANT: ACL_TYPE_AFS HEX: 00000002
-CONSTANT: ACL_TYPE_CODA HEX: 00000003
-CONSTANT: ACL_TYPE_NTFS HEX: 00000004
-CONSTANT: ACL_TYPE_NWFS HEX: 00000005
+CONSTANT: ACL_TYPE_ACCESS 0x00000000
+CONSTANT: ACL_TYPE_DEFAULT 0x00000001
+CONSTANT: ACL_TYPE_AFS 0x00000002
+CONSTANT: ACL_TYPE_CODA 0x00000003
+CONSTANT: ACL_TYPE_NTFS 0x00000004
+CONSTANT: ACL_TYPE_NWFS 0x00000005
 
 ! acl_perm_t
 CONSTANT: ACL_READ_DATA        2
@@ -196,7 +196,7 @@ FUNCTION: int mbr_uuid_to_string (  uuid_t uu, char* string ) ;
     {
         { ID_TYPE_UID [ user-name "user:" prepend ] }
         { ID_TYPE_GID [ group-name "group:" prepend ] }
-        ! [ uuid_string_t <c-object> [ mbr_uuid_to_string io-error ] keep ]
+        ! [ uuid_string_t <struct> [ mbr_uuid_to_string io-error ] keep ]
     } case ;
 
 : acl-error ( n -- ) -1 = [ (io-error) ] when ; inline
@@ -218,7 +218,7 @@ FUNCTION: int mbr_uuid_to_string (  uuid_t uu, char* string ) ;
 DESTRUCTOR: free-acl
 
 : get-acl-entry ( acl_t n -- acl_entry_t )
-    acl_entry_t <c-object> [ acl_get_entry ] keep swap -1 = [ drop f ] when ;
+    acl_entry_t <struct> [ acl_get_entry ] keep swap -1 = [ drop f ] when ;
 
 : first-acl-entry ( acl_t -- acl_entry_t ) ACL_FIRST_ENTRY get-acl-entry ;
 : next-acl-entry ( acl_t -- acl_entry_t ) ACL_NEXT_ENTRY get-acl-entry ;
@@ -233,9 +233,9 @@ PRIVATE>
         path file-acl &free-acl :> acl
         f :> acl-entry!
         acl [
-            acl first-acl-entry *void* quot call
+            acl first-acl-entry void* deref quot call
             [ acl next-acl-entry dup acl-entry! ]
-            [ acl-entry *void* quot call ] while
+            [ acl-entry void* deref quot call ] while
         ] when
     ] with-destructors ; inline
 
@@ -270,7 +270,7 @@ ERROR: add-permission-failed permission-set permission ;
     acl_add_perm acl-error ;
 
 : acl-entry>permset ( acl_entry_t -- acl_permset )
-    acl_permset_t <c-object> [ acl_get_permset acl-error ] keep ;
+    acl_permset_t <struct> [ acl_get_permset acl-error ] keep ;
 
 : filter-strings ( obj strings -- string )
    [ [ 1 = ] dip f ? ] 2map sift "," join ;
@@ -291,20 +291,20 @@ ERROR: add-permission-failed permission-set permission ;
 : acl-entry>owner-name ( acl-entry -- string )
     [
         acl_get_qualifier dup acl-error &free-acl
-        uid_t <c-object> -1 <int> [ mbr_uuid_to_id io-error ] 2keep
-        [ *uint ] bi@ unix-id>string
+        uid_t <struct> -1 int <ref> [ mbr_uuid_to_id io-error ] 2keep
+        [ uint deref ] bi@ unix-id>string
     ] with-destructors ;
 
 : acl-entry>tag-name ( acl-entry -- string )
-    acl_tag_t <c-object> [ acl_get_tag_type acl-error ] keep
-    *uint acl_tag_t>string ;
+    acl_tag_t <struct> [ acl_get_tag_type acl-error ] keep
+    uint deref acl_tag_t>string ;
 
 : flagset>strings ( flagset -- strings )
     acl-flags [ acl_get_flag_np dup acl-error ] with map
     acl-flag-names filter-strings ;
 
 : acl-entry>flagset ( acl-entry -- flagset )
-    acl_flagset_t <c-object> [ acl_get_flagset_np acl-error ] keep ;
+    acl_flagset_t <struct> [ acl_get_flagset_np acl-error ] keep ;
 
 : acl-entry>flag-names ( acl-entry -- strings )
     acl-entry>flagset flagset>strings ;
