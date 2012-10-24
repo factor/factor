@@ -787,6 +787,23 @@ CONSTANT: STATUS_CONTROL_C_EXIT             0xC000013A
 CONSTANT: STATUS_FLOAT_MULTIPLE_FAULTS      0xC00002B4
 CONSTANT: STATUS_FLOAT_MULTIPLE_TRAPS       0xC00002B5
 
+STRUCT: COORD
+{ X SHORT }
+{ Y SHORT } ;
+
+STRUCT: SMALL_RECT
+{ Left SHORT }
+{ Top SHORT }
+{ Right SHORT }
+{ Bottom SHORT } ;
+
+STRUCT: CONSOLE_SCREEN_BUFFER_INFO
+{ dwSize COORD }
+{ dwCursorPosition COORD }
+{ wAttributes WORD }
+{ srWindow SMALL_RECT }
+{ dwMaximumWindowSize COORD } ;
+
 ! Resource IDs
 : MAKEINTRESOURCE ( int -- resource ) 0xffff bitand <alien> ; inline
 
@@ -1228,7 +1245,7 @@ ALIAS: GetComputerNameEx GetComputerNameExW
 ! FUNCTION: GetConsoleNlsMode
 ! FUNCTION: GetConsoleOutputCP
 ! FUNCTION: GetConsoleProcessList
-! FUNCTION: GetConsoleScreenBufferInfo
+FUNCTION: BOOL GetConsoleScreenBufferInfo ( HANDLE hConsoleOutput, CONSOLE_SCREEN_BUFFER_INFO* lpConsoleScreenBufferInfo ) ;
 ! FUNCTION: GetConsoleSelectionInfo
 FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
 ALIAS: GetConsoleTitle GetConsoleTitleW
