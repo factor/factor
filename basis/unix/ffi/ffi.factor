@@ -54,7 +54,13 @@ STRUCT: protoent
     { aliases void* }
     { proto int } ;
 
+CONSTANT: F_OK 0 ! test for existence of file
+CONSTANT: X_OK 1 ! test for execute or search permission
+CONSTANT: W_OK 2 ! test for write permission
+CONSTANT: R_OK 4 ! test for read permission
+
 FUNCTION: int accept ( int s, void* sockaddr, socklen_t* socklen ) ;
+FUNCTION: int access ( c-string path, int amode ) ;
 FUNCTION: int bind ( int s, void* name, socklen_t namelen ) ;
 FUNCTION: int chdir ( c-string path ) ;
 FUNCTION: int chmod ( c-string path, mode_t mode ) ;
