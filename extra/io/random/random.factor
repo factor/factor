@@ -1,8 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: fry io kernel locals math random sequences
-sequences.extras ;
+USING: combinators fry io kernel locals math math.order random
+sequences ;
 
 IN: io.random
 
@@ -19,10 +19,10 @@ PRIVATE>
 :: random-lines ( n -- lines )
     V{ } clone :> accum
     [| line line# |
-        line# random :> r
-        r n < [
-            line# n <=
-            [ line r accum insert-nth! ]
-            [ line r accum set-nth ] if
-        ] when
+        line# n <=> {
+            { +lt+ [ line accum push ] }
+            { +eq+ [ line accum [ push ] [ randomize drop ] bi ] }
+            { +gt+ [ line# random :> r
+                     r n < [ line r accum set-nth ] when ] }
+        } case
     ] each-numbered-line accum ;
