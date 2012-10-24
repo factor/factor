@@ -103,6 +103,10 @@ M: xml-data push-item , ;
 M: object push-item present , ;
 M: sequence push-item
     dup xml-data? [ , ] [ [ push-item ] each ] if ;
+M: xml push-item
+    [ before>> push-item ]
+    [ body>> push-item ]
+    [ after>> push-item ] tri ;
 M: number push-item present , ;
 M: xml-chunk push-item % ;
 
