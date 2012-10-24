@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays classes.struct io.streams.c kernel
-system terminal unix unix.ffi ;
+math system terminal unix unix.ffi ;
 QUALIFIED-WITH: alien.c-types c
 
 IN: terminal.linux
