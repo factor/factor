@@ -258,12 +258,18 @@ ARTICLE: "cumulative" "Computing cumulative sequences"
     cum-map
     cum-map0
 }
-"Cumulative sum:"
+"Cumulative math:"
 { $subsections
     cum-sum
     cum-sum0
+    cum-product
 }
-"Cumulative count:"
+"Cumulative comparisons:"
+{ $subsections
+    cum-min
+    cum-max
+}
+"Cumulative counting:"
 { $subsections
     cum-count
 } ;
