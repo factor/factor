@@ -158,3 +158,9 @@ IN: sequences.extras.tests
 { "defg" } [ B{ 97 98 99 100 101 102 103 } 3 "" tail-as ] unit-test
 { "efg" } [ B{ 97 98 99 100 101 102 103 } 3 "" tail*-as ] unit-test
 
+{ { 1 0 0 1 0 0 0 1 0 0 } }
+[ 1 { 0 3 7 } 10 0 <array> [ set-nths ] keep ] unit-test
+
+{ { 1 0 0 1 0 0 0 1 0 0 } }
+[ 1 { 0 3 7 } 10 0 <array> [ set-nths-unsafe ] keep ] unit-test
+
