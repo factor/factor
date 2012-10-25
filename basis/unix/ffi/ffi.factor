@@ -127,6 +127,7 @@ FUNCTION: int lchown ( c-string path, uid_t owner, gid_t group ) ;
 FUNCTION: int listen ( int s, int backlog ) ;
 FUNCTION: off_t lseek ( int fildes, off_t offset, int whence ) ;
 FUNCTION: int mkdir ( c-string path, mode_t mode ) ;
+FUNCTION: int mkfifo ( c-string path, mode_t mode ) ;
 FUNCTION: void* mmap ( void* addr, size_t len, int prot, int flags, int fd, off_t offset ) ;
 FUNCTION: int munmap ( void* addr, size_t len ) ;
 FUNCTION: uint ntohl ( uint n ) ;
