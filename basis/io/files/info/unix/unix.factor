@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays calendar
 calendar.unix classes.struct combinators
-combinators.short-circuit io.backend
-io.files.info io.files.types kernel literals math math.bitwise
+combinators.short-circuit io.backend io.files.info
+io.files.types kernel libc literals math math.bitwise
 sequences specialized-arrays strings system unix unix.ffi
 unix.groups unix.stat unix.time unix.users vocabs ;
 IN: io.files.info.unix
@@ -284,8 +284,17 @@ PRIVATE>
         [ drop file-type>executable ]
     } case ;
 
-M: unix file-readable? normalize-path R_OK access io-error t ;
-M: unix file-writable? normalize-path W_OK access io-error t ;
-M: unix file-executable? normalize-path X_OK access io-error t ;
+<PRIVATE
+
+: access? ( path mode -- ? )
+    [ normalize-path ] [ access ] bi* 0 < [
+        errno EACCES = [ f ] [ (io-error) ] if
+    ] [ t ] if ;
+
+PRIVATE>
+
+M: unix file-readable? R_OK access? ;
+M: unix file-writable? W_OK access? ;
+M: unix file-executable? X_OK access? ;
 
 "io.files.info.unix." os name>> append require
