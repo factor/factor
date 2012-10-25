@@ -7,7 +7,7 @@ combinators generalizations system alien.strings
 sequences splitting windows.errors fry
 continuations destructors calendar ascii
 combinators.short-circuit literals locals classes.struct
-specialized-arrays alien.data libc ;
+specialized-arrays alien.data libc windows.shell32 ;
 SPECIALIZED-ARRAY: ushort
 QUALIFIED: sequences
 IN: io.files.info.windows
@@ -214,3 +214,7 @@ M: windows file-systems ( -- array )
 
 : set-file-write-time ( path timestamp -- )
     [ f f ] dip set-file-times ;
+
+M: windows file-readable? file-info >boolean ;
+M: windows file-writable? file-info attributes>> +read-only+ swap member? not ;
+M: windows file-executable? file-executable-type windows-executable? ;
