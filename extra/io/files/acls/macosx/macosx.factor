@@ -136,10 +136,10 @@ FUNCTION: acl_t acl_init ( int count ) ;
 
 FUNCTION: acl_t acl_get_fd ( int fd ) ;
 FUNCTION: acl_t acl_get_fd_np ( int fd, acl_type_t type ) ;
-FUNCTION: acl_t acl_get_file ( char* path_p, acl_type_t type ) ;
-FUNCTION: acl_t acl_get_link_np ( char* path_p, acl_type_t type ) ;
+FUNCTION: acl_t acl_get_file ( c-string path_p, acl_type_t type ) ;
+FUNCTION: acl_t acl_get_link_np ( c-string path_p, acl_type_t type ) ;
 
-FUNCTION: int acl_set_file ( char* path_p, acl_type_t type, acl_t acl ) ;
+FUNCTION: int acl_set_file ( c-string path_p, acl_type_t type, acl_t acl ) ;
 
 FUNCTION: int acl_get_entry ( acl_t acl, int entry_id, acl_entry_t* entry_p ) ;
 
@@ -150,9 +150,9 @@ FUNCTION: ssize_t acl_copy_ext ( void* buf_p, acl_t acl, ssize_t size ) ;
 FUNCTION: ssize_t acl_copy_ext_native ( void* buf_p, acl_t acl, ssize_t size ) ;
 FUNCTION: acl_t acl_copy_int ( void* buf_p ) ;
 FUNCTION: acl_t acl_copy_int_native ( void* buf_p ) ;
-FUNCTION: acl_t acl_from_text ( char* buf_p ) ;
+FUNCTION: acl_t acl_from_text ( c-string buf_p ) ;
 FUNCTION: ssize_t acl_size ( acl_t acl ) ;
-FUNCTION: char* acl_to_text ( acl_t acl, ssize_t* len_p ) ;
+FUNCTION: c-string acl_to_text ( acl_t acl, ssize_t* len_p ) ;
 FUNCTION: int acl_valid ( acl_t acl ) ;
 FUNCTION: int acl_add_perm ( acl_permset_t permset_d, acl_perm_t perm ) ;
 FUNCTION: int acl_delete_perm ( acl_permset_t permset_d, acl_perm_t perm ) ;
@@ -190,7 +190,7 @@ FUNCTION: int mbr_uuid_to_sid ( uuid_t uu, nt_sid_t *sid ) ;
 
 TYPEDEF: char[37] uuid_string_t
 
-FUNCTION: int mbr_uuid_to_string (  uuid_t uu, char* string ) ;
+FUNCTION: int mbr_uuid_to_string ( uuid_t uu, c-string string ) ;
 
 : unix-id>string ( byte-array id-type -- string )
     {
@@ -218,7 +218,7 @@ FUNCTION: int mbr_uuid_to_string (  uuid_t uu, char* string ) ;
 DESTRUCTOR: free-acl
 
 : get-acl-entry ( acl_t n -- acl_entry_t )
-    acl_entry_t <struct> [ acl_get_entry ] keep swap -1 = [ drop f ] when ;
+    f acl_entry_t <ref> [ acl_get_entry ] keep swap -1 = [ drop f ] when ;
 
 : first-acl-entry ( acl_t -- acl_entry_t ) ACL_FIRST_ENTRY get-acl-entry ;
 : next-acl-entry ( acl_t -- acl_entry_t ) ACL_NEXT_ENTRY get-acl-entry ;
@@ -270,7 +270,7 @@ ERROR: add-permission-failed permission-set permission ;
     acl_add_perm acl-error ;
 
 : acl-entry>permset ( acl_entry_t -- acl_permset )
-    acl_permset_t <struct> [ acl_get_permset acl-error ] keep ;
+    f acl_permset_t <ref> [ acl_get_permset acl-error ] keep ;
 
 : filter-strings ( obj strings -- string )
    [ [ 1 = ] dip f ? ] 2map sift "," join ;
@@ -291,12 +291,12 @@ ERROR: add-permission-failed permission-set permission ;
 : acl-entry>owner-name ( acl-entry -- string )
     [
         acl_get_qualifier dup acl-error &free-acl
-        uid_t <struct> -1 int <ref> [ mbr_uuid_to_id io-error ] 2keep
+        0 uid_t <ref> -1 int <ref> [ mbr_uuid_to_id io-error ] 2keep
         [ uint deref ] bi@ unix-id>string
     ] with-destructors ;
 
 : acl-entry>tag-name ( acl-entry -- string )
-    acl_tag_t <struct> [ acl_get_tag_type acl-error ] keep
+    f acl_tag_t <ref> [ acl_get_tag_type acl-error ] keep
     uint deref acl_tag_t>string ;
 
 : flagset>strings ( flagset -- strings )
@@ -304,7 +304,7 @@ ERROR: add-permission-failed permission-set permission ;
     acl-flag-names filter-strings ;
 
 : acl-entry>flagset ( acl-entry -- flagset )
-    acl_flagset_t <struct> [ acl_get_flagset_np acl-error ] keep ;
+    f acl_flagset_t <ref> [ acl_get_flagset_np acl-error ] keep ;
 
 : acl-entry>flag-names ( acl-entry -- strings )
     acl-entry>flagset flagset>strings ;
