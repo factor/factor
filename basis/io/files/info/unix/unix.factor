@@ -284,8 +284,8 @@ PRIVATE>
         [ drop file-type>executable ]
     } case ;
 
-M: unix file-readable? flags{ F_OK R_OK } access 0 = ;
-M: unix file-writable? flags{ F_OK W_OK } access 0 = ;
-M: unix file-executable? flags{ F_OK X_OK } access 0 = ;
+M: unix file-readable? normalize-path flags{ F_OK R_OK } access 0 = ;
+M: unix file-writable? normalize-path flags{ F_OK W_OK } access 0 = ;
+M: unix file-executable? normalize-path flags{ F_OK X_OK } access 0 = ;
 
 "io.files.info.unix." os name>> append require
