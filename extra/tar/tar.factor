@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators io io.files io.files.links io.directories
-io.pathnames io.streams.string kernel math math.parser
-continuations namespaces pack prettyprint sequences strings
-system tools.hexdump io.encodings.binary summary accessors
-io.backend byte-arrays io.streams.byte-array splitting ;
+USING: accessors byte-arrays combinators io io.backend
+io.directories io.encodings.binary io.files io.files.links
+io.pathnames io.streams.byte-array io.streams.string kernel
+math math.parser namespaces sequences strings summary ;
 IN: tar
 
 CONSTANT: zero-checksum 256
@@ -221,7 +220,7 @@ M: symbolic-link do-link
 ! FIXME: linux tar calls unlinkat and makelinkat
 : make-links ( -- )
     to-link get [
-        [ [ name>> delete-file ] [ 2drop ] recover ] [ do-link ] bi
+        [ name>> ?delete-file ] [ do-link ] bi
     ] each ;
 
 : untar ( path -- )

@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs io.directories io.encodings.utf8
-io.files io.pathnames kernel make math.parser memoize sequences
-sets sorting summary vocabs vocabs.loader words system
-classes.algebra combinators.short-circuit fry continuations
-namespaces ;
+USING: accessors arrays assocs classes.algebra
+combinators.short-circuit continuations io.directories
+io.encodings.utf8 io.files io.pathnames kernel make math.parser
+memoize namespaces sequences sets summary system vocabs
+vocabs.loader words ;
 IN: vocabs.metadata
 
 : check-vocab ( vocab -- vocab )
@@ -13,8 +13,6 @@ IN: vocabs.metadata
 MEMO: vocab-file-contents ( vocab name -- seq )
     vocab-append-path dup
     [ dup exists? [ utf8 file-lines ] [ drop f ] if ] when ;
-
-: ?delete-file ( pathname -- ) '[ _ delete-file ] ignore-errors ;
 
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-append-path [
