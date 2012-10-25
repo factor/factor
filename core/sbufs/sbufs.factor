@@ -19,6 +19,8 @@ M: sbuf new-sequence
 
 : >sbuf ( seq -- sbuf ) SBUF" " clone-like ; inline
 
+M: sbuf contract 2drop ; inline
+
 M: sbuf like
     drop dup sbuf? [
         dup string? [ dup length sbuf boa ] [ >sbuf ] if
