@@ -221,7 +221,7 @@ M: symbolic-link do-link
 ! FIXME: linux tar calls unlinkat and makelinkat
 : make-links ( -- )
     to-link get [
-        [ name>> delete-file ] [ do-link ] bi
+        [ [ name>> delete-file ] [ 2drop ] recover ] [ do-link ] bi
     ] each ;
 
 : untar ( path -- )
