@@ -39,15 +39,18 @@ HELP: file-system-info
 
 HELP: file-readable?
 { $values { "path" "a pathname string" } { "?" boolean } }
-{ $description "Returns whether the file specified by " { $snippet "path" } " exists and is readable by the current process." } ;
+{ $description "Returns whether the file specified by " { $snippet "path" } " is readable by the current process." }
+{ $errors "Throws an error if the file does not exist." } ;
 
 HELP: file-writable?
 { $values { "path" "a pathname string" } { "?" boolean } }
-{ $description "Returns whether the file specified by " { $snippet "path" } " exists and is writable by the current process." } ;
+{ $description "Returns whether the file specified by " { $snippet "path" } " is writable by the current process." }
+{ $errors "Throws an error if the file does not exist." } ;
 
 HELP: file-executable?
 { $values { "path" "a pathname string" } { "?" boolean } }
-{ $description "Returns whether the file specified by " { $snippet "path" } " exists and is executable by the current process." } ;
+{ $description "Returns whether the file specified by " { $snippet "path" } " is executable by the current process." }
+{ $errors "Throws an error if the file does not exist." } ;
 
 ARTICLE: "io.files.info" "File system meta-data"
 "File meta-data:"
