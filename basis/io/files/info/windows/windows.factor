@@ -96,6 +96,31 @@ M: windows file-info ( path -- info )
 M: windows link-info ( path -- info )
     file-info ;
 
+: file-executable-type ( path -- executable/f )
+    normalize-path dup
+    0
+    f
+    ! hi is zero means old style executable
+    0 SHGFI_EXETYPE SHGetFileInfoW
+    [
+        file-info drop f
+    ] [
+        nip >lo-hi first2 zero? [
+            {
+                { 0x5A4D [ +dos-executable+ ] }
+                { 0x4550 [ +win32-console-executable+ ] }
+                [ drop f ]
+            } case
+        ] [
+            {
+                { 0x454C [ +win32-vxd-executable+ ] }
+                { 0x454E [ +win32-os2-executable+ ] }
+                { 0x4550 [ +win32-nt-executable+ ] }
+                [ drop f ]
+            } case
+        ] if
+    ] if-zero ;
+
 CONSTANT: path-length $[ MAX_PATH 1 + ]
 
 : volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
