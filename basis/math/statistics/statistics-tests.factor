@@ -191,3 +191,12 @@ IN: math.statistics.tests
     { 1 0 2 3 4 }
 }
 [ { 3 1 4 15 92 } rank-values ] unit-test
+
+{ { 1 1 2 3 3 4 } }
+[ { 1 2 3 3 2 3 } [ odd? ] cum-count ] unit-test
+
+{ { 0 0 1 2 2 3 } }
+[ { 1 2 3 3 2 3 } [ 3 = ] cum-count ] unit-test
+
+{ { 0 1 3 6 } }
+[ { 1 2 3 4 } cum-sum0 ] unit-test

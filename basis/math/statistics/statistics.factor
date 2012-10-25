@@ -333,11 +333,21 @@ ALIAS: corr sample-corr
 : cum-map ( seq identity quot -- seq' )
     swapd [ dup ] compose map nip ; inline
 
+: cum-map0 ( seq identity quot -- seq' )
+    accumulate nip ; inline
+
 : cum-sum ( seq -- seq' )
     0 [ + ] cum-map ;
 
+: cum-sum0 ( seq -- seq' )
+    0 [ + ] cum-map0 ;
+
 : cum-product ( seq -- seq' )
     1 [ * ] cum-map ;
+
+: cum-count ( seq quot -- seq' )
+    [ 0 ] dip
+    '[ _ call [ 1 + ] when ] cum-map ; inline
 
 : cum-min ( seq -- seq' )
     dup ?first [ min ] cum-map ;

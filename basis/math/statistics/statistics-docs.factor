@@ -184,6 +184,17 @@ HELP: cum-sum
     }
 } ;
 
+HELP: cum-count
+{ $values { "seq" sequence } { "quot" quotation } { "seq'" sequence } }
+{ $description "Returns the cumulative count of how many times " { $snippet "quot" } " returns true." }
+{ $examples
+    { $example "USING: math math.statistics prettyprint ;"
+               "{ 1 -1 2 -1 4 } [ 0 < ] cum-count ."
+               "{ 0 1 1 2 2 }"
+    }
+} ;
+
+
 HELP: cum-product
 { $values { "seq" sequence } { "seq'" sequence } }
 { $description "Returns the cumulative product of " { $snippet "seq" } "." }
@@ -241,6 +252,22 @@ ARTICLE: "histogram" "Computing histograms"
     sequence>hashtable
 } ;
 
+ARTICLE: "cumulative" "Computing cumulative sequences"
+"Cumulative mapping combinators:"
+{ $subsections
+    cum-map
+    cum-map0
+}
+"Cumulative sum:"
+{ $subsections
+    cum-sum
+    cum-sum0
+}
+"Cumulative count:"
+{ $subsections
+    cum-count
+} ;
+
 ARTICLE: "math.statistics" "Statistics"
 "Computing the mean:"
 { $subsections mean geometric-mean harmonic-mean }
@@ -255,7 +282,9 @@ ARTICLE: "math.statistics" "Statistics"
 "Computing the kth smallest element:"
 { $subsections kth-smallest }
 "Counting the frequency of occurrence of elements:"
-{ $subsection "histogram" } ;
+{ $subsection "histogram" }
+"Computing cumulative sequences:"
+{ $subsection "cumulative" } ;
 
 ABOUT: "math.statistics"
 
