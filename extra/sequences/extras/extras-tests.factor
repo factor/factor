@@ -152,3 +152,9 @@ IN: sequences.extras.tests
 
 { V{ 1 } } [ 1 0 V{ } [ insert-nth! ] keep ] unit-test
 { V{ 1 2 3 4 } } [ 2 1 V{ 1 3 4 } [ insert-nth! ] keep ] unit-test
+
+{ "abc" } [ B{ 97 98 99 100 101 102 103 } 3 "" head-as ] unit-test
+{ "abcd" } [ B{ 97 98 99 100 101 102 103 } 3 "" head*-as ] unit-test
+{ "defg" } [ B{ 97 98 99 100 101 102 103 } 3 "" tail-as ] unit-test
+{ "efg" } [ B{ 97 98 99 100 101 102 103 } 3 "" tail*-as ] unit-test
+
