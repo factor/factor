@@ -1,8 +1,13 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel windows.types
-math multiline classes.struct ;
+math multiline classes.struct alien.data arrays ;
+QUALIFIED-WITH: alien.c-types c
 IN: windows.kernel32
+
+: lo-word ( wparam -- lo ) c:short <ref> c:short deref ; inline
+: hi-word ( wparam -- hi ) -16 shift lo-word ; inline
+: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ; inline
 
 CONSTANT: MAX_PATH 260
 

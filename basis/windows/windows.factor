@@ -1,8 +1,6 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.data alien.libraries arrays kernel math
-sequences ;
-QUALIFIED-WITH: alien.c-types c
+USING: alien alien.libraries sequences ;
 IN: windows
 
 CONSTANT: MAX_UNICODE_PATH 32768
@@ -25,7 +23,3 @@ CONSTANT: MAX_UNICODE_PATH 32768
     { "usp10"       "usp10.dll"          stdcall }
     { "psapi"       "psapi.dll"          stdcall }
 } [ first3 add-library ] each
-
-: lo-word ( wparam -- lo ) c:short <ref> c:short deref ; inline
-: hi-word ( wparam -- hi ) -16 shift lo-word ; inline
-: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ; inline
