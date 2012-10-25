@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct kernel
 literals math.order sequences unix.types ;
-IN: acls.macosx.ffi
+IN: io.files.acls.macosx.ffi
 
 TYPEDEF: uint acl_type_t
 TYPEDEF: uint acl_perm_t
@@ -21,14 +21,14 @@ CONSTANT: ACL_NEXT_ENTRY -1
 CONSTANT: ACL_LAST_ENTRY -2
 
 ! acl_type_t Supported:
-CONSTANT: ACL_TYPE_EXTENDED HEX: 00000100
+CONSTANT: ACL_TYPE_EXTENDED 0x00000100
 ! acl_type_t Unsupported:
-CONSTANT: ACL_TYPE_ACCESS HEX: 00000000
-CONSTANT: ACL_TYPE_DEFAULT HEX: 00000001
-CONSTANT: ACL_TYPE_AFS HEX: 00000002
-CONSTANT: ACL_TYPE_CODA HEX: 00000003
-CONSTANT: ACL_TYPE_NTFS HEX: 00000004
-CONSTANT: ACL_TYPE_NWFS HEX: 00000005
+CONSTANT: ACL_TYPE_ACCESS 0x00000000
+CONSTANT: ACL_TYPE_DEFAULT 0x00000001
+CONSTANT: ACL_TYPE_AFS 0x00000002
+CONSTANT: ACL_TYPE_CODA 0x00000003
+CONSTANT: ACL_TYPE_NTFS 0x00000004
+CONSTANT: ACL_TYPE_NWFS 0x00000005
 
 ! acl_perm_t
 CONSTANT: ACL_READ_DATA        2
@@ -169,7 +169,7 @@ CONSTANT: ID_TYPE_KERBEROS 12
 
 CONSTANT: NTSID_MAX_AUTHORITIES 16
 
-! Supposed to be packed
+! FIXME: Supposed to be packed
 STRUCT: nt_sid_t
     { sid_kind u_int8_t }
     { sid_authcount u_int8_t }
