@@ -169,9 +169,6 @@ M: windows-ui-backend (pixel-format-attribute)
 
 PRIVATE>
 
-: lo-word ( wparam -- lo ) c:short <ref> c:short deref ; inline
-: hi-word ( wparam -- hi ) -16 shift lo-word ; inline
-: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ; inline
 : GET_APPCOMMAND_LPARAM ( lParam -- appCommand )
     hi-word FAPPCOMMAND_MASK lo-word bitnot bitand ; inline
 
