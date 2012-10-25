@@ -5,7 +5,7 @@ alien.syntax classes.struct combinators io.backend io.files
 io.pathnames kernel math sequences specialized-arrays
 ui.backend.windows windows windows.com windows.com.syntax
 windows.errors windows.kernel32 windows.ole32 windows.types
-windows.user32 io.files.info ;
+windows.user32 ;
 SPECIALIZED-ARRAY: ushort
 IN: windows.shell32
 
@@ -141,31 +141,6 @@ INSTANCE: +win32-console-executable+ windows-executable
 INSTANCE: +win32-vxd-executable+ windows-executable  ! le
 INSTANCE: +win32-os2-executable+ windows-executable  ! ne
 INSTANCE: +win32-nt-executable+ windows-executable   ! pe
-
-: file-executable-type ( path -- executable/f )
-    normalize-path dup
-    0
-    f
-    ! hi is zero means old style executable
-    0 SHGFI_EXETYPE SHGetFileInfoW
-    [
-        file-info drop f
-    ] [
-        nip >lo-hi first2 zero? [
-            {
-                { 0x5A4D [ +dos-executable+ ] }
-                { 0x4550 [ +win32-console-executable+ ] }
-                [ drop f ]
-            } case
-        ] [
-            {
-                { 0x454C [ +win32-vxd-executable+ ] }
-                { 0x454E [ +win32-os2-executable+ ] }
-                { 0x4550 [ +win32-nt-executable+ ] }
-                [ drop f ]
-            } case
-        ] if
-    ] if-zero ;
 
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
