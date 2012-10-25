@@ -10,6 +10,11 @@ IN: tar
 CONSTANT: zero-checksum 256
 CONSTANT: block-size 512
 
+SYMBOL: to-link
+
+: save-link ( link -- )
+    to-link get push ;
+
 TUPLE: tar-header name mode uid gid size mtime checksum typeflag
 linkname magic version uname gname devmajor devminor prefix ;
 
@@ -85,19 +90,21 @@ M: unknown-typeflag summary ( obj -- str )
 
 ! Normal file
 : typeflag-0 ( header -- )
-    dup name>> dup "global_pax_header" = [
-        drop [ read-data-blocks ] with-string-writer drop
-    ] [
-        prepend-current-directory read/write-blocks
-    ] if ;
+    dup name>> prepend-current-directory read/write-blocks ;
 
-! Hard link
+TUPLE: hard-link linkname name ;
+C: <hard-link> hard-link
+
+TUPLE: symbolic-link linkname name ;
+C: <symbolic-link> symbolic-link
+
+! Hard link, don't call normalize-path
 : typeflag-1 ( header -- )
-    [ name>> ] [ linkname>> ] bi make-hard-link ;
+    [ linkname>> ] [ name>> ] bi <hard-link> save-link ;
 
-! Symlink
+! Symlink, don't call normalize-path
 : typeflag-2 ( header -- )
-    [ name>> ] [ linkname>> ] bi make-link ;
+    [ linkname>> ] [ name>> ] bi <symbolic-link> save-link ;
 
 ! character special
 : typeflag-3 ( header -- ) unknown-typeflag ;
@@ -122,7 +129,10 @@ M: unknown-typeflag summary ( obj -- str )
 : typeflag-9 ( header -- ) unknown-typeflag ;
 
 ! Global POSIX header
-: typeflag-g ( header -- ) typeflag-0 ;
+: typeflag-g ( header -- )
+    ! Read something like: 52 comment=9f2a940965286754f3a34d5737c3097c05db8725
+    ! and drop it
+    [ read-data-blocks ] with-string-writer drop ;
 
 ! Extended POSIX header
 : typeflag-x ( header -- ) unknown-typeflag ;
@@ -198,7 +208,26 @@ M: unknown-typeflag summary ( obj -- str )
         drop
     ] if ;
 
+GENERIC: do-link ( object -- )
+
+M: hard-link do-link
+    [ linkname>> ]
+    [ name>> prepend-current-directory ] bi make-hard-link ;
+
+M: symbolic-link do-link
+    [ linkname>> ]
+    [ name>> prepend-current-directory ] bi make-link ;
+
+! FIXME: linux tar calls unlinkat and makelinkat
+: make-links ( -- )
+    to-link get [
+        [ name>> delete-file ] [ do-link ] bi
+    ] each ;
+
 : untar ( path -- )
     normalize-path dup parent-directory [
-         binary [ parse-tar ] with-file-reader
+        V{ } clone to-link [
+            binary [ parse-tar ] with-file-reader
+            make-links
+        ] with-variable
     ] with-directory ;
