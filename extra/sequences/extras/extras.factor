@@ -356,3 +356,9 @@ PRIVATE>
     [ length ] keep ensure swap pick (a,b]
     over '[ [ 1 + ] keep _ move-unsafe ] each
     set-nth-unsafe ;
+
+: set-nths ( value indices seq -- )
+    swapd '[ [ _ ] dip _ set-nth ] each ; inline
+
+: set-nths-unsafe ( value indices seq -- )
+    swapd '[ [ _ ] dip _ set-nth-unsafe ] each ; inline
