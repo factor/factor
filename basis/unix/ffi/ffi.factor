@@ -54,6 +54,10 @@ STRUCT: protoent
     { aliases void* }
     { proto int } ;
 
+STRUCT: iovec
+    { iov_base void* }
+    { iov_len size_t } ;
+
 CONSTANT: F_OK 0 ! test for existence of file
 CONSTANT: X_OK 1 ! test for execute or search permission
 CONSTANT: W_OK 2 ! test for write permission
@@ -141,6 +145,7 @@ FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
 FUNCTION: void* popen ( c-string command, c-string type ) ;
 FUNCTION: ssize_t read ( int fd, void* buf, size_t nbytes ) ;
+FUNCTION: ssize_t readv ( int fd, iovec* iov, int iovcnt ) ;
 
 FUNCTION: dirent* readdir ( DIR* dirp ) ;
 FUNCTION: int readdir_r ( void* dirp, dirent* entry, dirent** result ) ;
@@ -154,6 +159,7 @@ FUNCTION: int rename ( c-string from, c-string to ) ;
 FUNCTION: int rmdir ( c-string path ) ;
 FUNCTION: int select ( int nfds, void* readfds, void* writefds, void* exceptfds, timeval* timeout ) ;
 FUNCTION: ssize_t sendto ( int s, void* buf, size_t len, int flags, sockaddr-in* to, socklen_t tolen ) ;
+
 FUNCTION: int setenv ( c-string name, c-string value, int overwrite ) ;
 FUNCTION: int unsetenv ( c-string name ) ;
 FUNCTION: int setegid ( gid_t egid ) ;
@@ -172,5 +178,6 @@ FUNCTION: int link ( c-string path1, c-string path2 ) ;
 FUNCTION: int unlink ( c-string path ) ;
 FUNCTION: int utimes ( c-string path, timeval[2] times ) ;
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
+FUNCTION: ssize_t writev ( int fds, iovec* iov, int iovcnt ) ;
 
 "librt" "librt.so" cdecl add-library
