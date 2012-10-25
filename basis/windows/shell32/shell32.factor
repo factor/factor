@@ -1,12 +1,11 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.strings
-alien.syntax classes.struct combinators io.backend io.files
-io.pathnames kernel math sequences specialized-arrays
-ui.backend.windows windows windows.com windows.com.syntax
-windows.errors windows.kernel32 windows.ole32 windows.types
-windows.user32 ;
-SPECIALIZED-ARRAY: ushort
+alien.syntax classes.struct io.backend kernel
+specialized-arrays
+specialized-arrays.instances.alien.c-types.ushort windows
+windows.com windows.com.syntax windows.kernel32 windows.ole32
+windows.types ;
 IN: windows.shell32
 
 CONSTANT: CSIDL_DESKTOP 0x00
