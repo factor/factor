@@ -230,6 +230,18 @@ PRIVATE>
 : contains? ( seq elts -- ? )
     [ member? ] curry any? ; inline
 
+: head-as ( seq n exemplar -- seq' )
+    [ head-slice ] [ like ] bi* ; inline
+
+: head*-as ( seq n exemplar -- seq' )
+    [ head-slice* ] [ like ] bi* ; inline
+
+: tail-as ( seq n exemplar -- seq' )
+    [ tail-slice ] [ like ] bi* ; inline
+
+: tail*-as ( seq n exemplar -- seq' )
+    [ tail-slice* ] [ like ] bi* ; inline
+
 : trim-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... newseq )
     [ trim-slice ] [ like ] bi* ; inline
 
