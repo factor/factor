@@ -4,10 +4,16 @@ USING: tools.test machine-learning.one-hot ;
 IN: machine-learning.one-hot.tests
 
 CONSTANT: test-data {
-    { "male" "female" }
-    { "from Europe" "from US" "from Asia" }
-    { "uses Firefox" "uses Chrome" "uses Safari" "uses Internet Explorer" }
+    { "hot" "cold" }
+    { "cloudy" "raining" "snowing" "sunny" }
+    { "light" "heavy" }
+    { "bright-colored" "dark-colored" "neutral" }
+    { "quickly" "slowly" }
+    { "well" "sick" "tired" }
 }
 
-{ { 1 0 0 1 0 0 0 0 1 } }
-[ { 0 1 3 } test-data one-hot ] unit-test
+{ { 1 0 0 0 0 1 1 0 0 0 1 0 1 1 0 0 } }
+[ { 0 3 0 2 1 0 } test-data one-hot ] unit-test
+
+{ { 0 1 0 0 1 0 0 1 0 1 0 1 0 0 1 0 } }
+[ { 1 2 1 1 0 1 } test-data one-hot ] unit-test
