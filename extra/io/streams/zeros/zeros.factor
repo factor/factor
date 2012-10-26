@@ -10,7 +10,8 @@ C: <zero-stream> zero-stream
 
 M: zero-stream stream-element-type drop +byte+ ;
 
-M: zero-stream stream-read-unsafe drop [ drop 0 ] map! drop ;
+M: zero-stream stream-read-unsafe
+    drop over head-slice [ drop 0 ] map! drop ;
 
 M: zero-stream stream-read1 drop 0 ;
 
