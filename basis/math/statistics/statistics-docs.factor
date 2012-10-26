@@ -288,9 +288,9 @@ ARTICLE: "math.statistics" "Statistics"
 "Computing the kth smallest element:"
 { $subsections kth-smallest }
 "Counting the frequency of occurrence of elements:"
-{ $subsection "histogram" }
+{ $subsections "histogram" }
 "Computing cumulative sequences:"
-{ $subsection "cumulative" } ;
+{ $subsections "cumulative" } ;
 
 ABOUT: "math.statistics"
 
