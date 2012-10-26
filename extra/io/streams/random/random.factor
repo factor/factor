@@ -1,6 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: destructors io kernel random sequences ;
+USING: destructors io io.encodings.binary io.files
+io.streams.limited kernel random sequences ;
 IN: io.streams.random
 
 TUPLE: random-stream ;
@@ -19,3 +20,10 @@ M: random-stream stream-read-partial-unsafe stream-read-unsafe ;
 M: random-stream dispose drop ;
 
 INSTANCE: random-stream input-stream
+
+: random-file ( n path -- )
+    [
+        [ <random-stream> swap limit-stream ]
+        [ binary <file-writer> ] bi*
+        [ &dispose ] bi@ stream-copy
+    ] with-destructors ;
