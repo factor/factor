@@ -1,9 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators destructors fry io io.encodings.binary
-io.files io.streams.limited io.streams.random kernel locals
-math math.order random sequences sequences.private ;
+USING: fry io kernel locals math random sequences
+sequences.private ;
 
 IN: io.random
 
@@ -27,10 +26,3 @@ PRIVATE>
             r n < [ line r accum set-nth-unsafe ] when
         ] if
     ] each-numbered-line accum ;
-
-: random-file ( n path -- )
-    [
-        [ <random-stream> swap limit-stream ]
-        [ binary <file-writer> ] bi*
-        [ &dispose ] bi@ stream-copy
-    ] with-destructors ;
