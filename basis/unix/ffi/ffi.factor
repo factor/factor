@@ -176,6 +176,8 @@ FUNCTION: int setuid ( uid_t uid ) ;
 FUNCTION: int socket ( int domain, int type, int protocol ) ;
 FUNCTION: int symlink ( c-string path1, c-string path2 ) ;
 FUNCTION: int link ( c-string path1, c-string path2 ) ;
+FUNCTION: int ftruncate ( int fd, int length ) ;
+FUNCTION: int truncate ( c-string path, int length ) ;
 FUNCTION: int unlink ( c-string path ) ;
 FUNCTION: int utimes ( c-string path, timeval[2] times ) ;
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
