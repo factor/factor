@@ -21,12 +21,13 @@ IN: grouping.tests
 { { { 1 2 } } } [ { 1 2 } 2 clump ] unit-test
 { { { 1 2 } { 2 3 } } } [ { 1 2 3 } 2 clump ] unit-test
 
-[ { } 2 <circular-clumps> length ] must-fail
-[ { 1 } 2 <circular-clumps> length ] must-fail
+{ 0 } [ { } 2 <circular-clumps> length ] unit-test
+{ 1 } [ { 1 } 2 <circular-clumps> length ] unit-test
 
 [ 2 ] [ { 1 2 } 2 <circular-clumps> length ] unit-test
 [ 3 ] [ { 1 2 3 } 2 <circular-clumps> length ] unit-test
 
+[ { { 1 1 }                 } ] [ { 1     } 2 circular-clump ] unit-test
 [ { { 1 2 } { 2 1 }         } ] [ { 1 2   } 2 circular-clump ] unit-test
 [ { { 1 2 } { 2 3 } { 3 1 } } ] [ { 1 2 3 } 2 circular-clump ] unit-test
 
