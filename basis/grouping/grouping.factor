@@ -43,13 +43,15 @@ MIXIN: abstract-clumps
 INSTANCE: abstract-clumps sequence
 
 M: abstract-clumps length
-    [ seq>> length 1 + ] [ n>> ] bi [-] ; inline
+    dup seq>> length [ drop 0 ] [
+        swap [ 1 + ] [ n>> ] bi* - 1 max
+    ] if-zero ; inline
 
 M: abstract-clumps set-length
     [ n>> + 1 - ] [ seq>> ] bi set-length ; inline
 
 M: abstract-clumps group@
-    [ n>> over + ] [ seq>> ] bi ; inline
+    [ [ n>> over + ] [ seq>> length ] bi min ] [ seq>> ] bi ; inline
 
 TUPLE: chunking-seq { seq read-only } { n read-only } ;
 
