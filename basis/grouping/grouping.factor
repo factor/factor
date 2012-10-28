@@ -62,12 +62,6 @@ TUPLE: chunking-seq { seq read-only } { n read-only } ;
 : new-groups ( seq n class -- groups )
     [ check-groups ] dip boa ; inline
 
-: slice-mod ( n length -- n' )
-    2dup >= [ - ] [ drop ] if ; inline
-
-: check-circular-clumps ( seq n -- seq n )
-    2dup 1 - swap bounds-check 2drop ; inline
-
 PRIVATE>
 
 TUPLE: groups < chunking-seq ;
@@ -129,7 +123,7 @@ M: circular-slice length [ to>> ] [ from>> ] bi - ; inline
 M: circular-slice virtual-exemplar seq>> ; inline
 
 M: circular-slice virtual@
-    [ from>> + ] [ seq>> ] bi [ length slice-mod ] keep ; inline
+    [ from>> + ] [ seq>> ] bi [ length rem ] keep ; inline
 
 C: <circular-slice> circular-slice
 
@@ -143,7 +137,7 @@ M: sliced-circular-clumps nth
     [ n>> over + ] [ seq>> ] bi <circular-slice> ; inline
 
 : <sliced-circular-clumps> ( seq n -- clumps )
-    check-circular-clumps sliced-circular-clumps boa ; inline
+    sliced-circular-clumps new-groups ; inline
 
 TUPLE: circular-clumps < chunking-seq ;
 INSTANCE: circular-clumps sequence
@@ -155,7 +149,7 @@ M: circular-clumps nth
     [ n>> over + ] [ seq>> ] bi [ <circular-slice> ] [ like ] bi ; inline
 
 : <circular-clumps> ( seq n -- clumps )
-    check-circular-clumps circular-clumps boa ; inline
+    circular-clumps new-groups ; inline
 
 : circular-clump ( seq n -- array )
     <circular-clumps> { } like ; inline
