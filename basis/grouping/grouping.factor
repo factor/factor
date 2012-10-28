@@ -43,7 +43,9 @@ MIXIN: abstract-clumps
 INSTANCE: abstract-clumps sequence
 
 M: abstract-clumps length
-    [ seq>> length 1 + ] [ n>> ] bi - 1 max ; inline
+    dup seq>> length [ drop 0 ] [
+        swap [ 1 + ] [ n>> ] bi* - 1 max
+    ] if-zero ; inline
 
 M: abstract-clumps set-length
     [ n>> + 1 - ] [ seq>> ] bi set-length ; inline
