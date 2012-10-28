@@ -12,8 +12,8 @@ IN: grouping.tests
     >array
 ] unit-test
 
-[ 0 ] [ { } 2 <clumps> length ] unit-test
-[ 0 ] [ { 1 } 2 <clumps> length ] unit-test
+[ 1 ] [ { } 2 <clumps> length ] unit-test
+[ 1 ] [ { 1 } 2 <clumps> length ] unit-test
 [ 1 ] [ { 1 2 } 2 <clumps> length ] unit-test
 [ 2 ] [ { 1 2 3 } 2 <clumps> length ] unit-test
 
