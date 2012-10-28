@@ -117,7 +117,7 @@ $nl
 HELP: clump
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
 { $description "Splits the sequence into overlapping clumps of " { $snippet "n" } " elements and collects the clumps into a new array." }
-{ $errors "Throws an error if " { $snippet "n" } " is larger than the length of the sequence." }
+{ $notes "If the sequence length is smaller than " { $snippet "n" } ", the result will be an array with one element: the original sequence " { $snippet "seq" } "." }
 { $examples
     { $example "USING: grouping prettyprint ;" "{ 3 1 3 3 7 } 2 clump ." "{ { 3 1 } { 1 3 } { 3 3 } { 3 7 } }" }
 } ;
