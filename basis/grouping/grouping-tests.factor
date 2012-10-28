@@ -12,10 +12,14 @@ IN: grouping.tests
     >array
 ] unit-test
 
-[ 1 ] [ { } 2 <clumps> length ] unit-test
+[ 0 ] [ { } 2 <clumps> length ] unit-test
 [ 1 ] [ { 1 } 2 <clumps> length ] unit-test
 [ 1 ] [ { 1 2 } 2 <clumps> length ] unit-test
 [ 2 ] [ { 1 2 3 } 2 <clumps> length ] unit-test
+
+{ { { 1 } } } [ { 1 } 2 clump ] unit-test
+{ { { 1 2 } } } [ { 1 2 } 2 clump ] unit-test
+{ { { 1 2 } { 2 3 } } } [ { 1 2 3 } 2 clump ] unit-test
 
 [ { } 2 <circular-clumps> length ] must-fail
 [ { 1 } 2 <circular-clumps> length ] must-fail
