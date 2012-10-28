@@ -4,6 +4,7 @@ USING: kernel math math.order strings arrays vectors sequences
 sequences.private accessors fry combinators ;
 IN: grouping
 
+ERROR: groups-error seq group-size ;
 <PRIVATE
 
 MIXIN: chunking
@@ -53,8 +54,8 @@ M: abstract-clumps group@
 
 TUPLE: chunking-seq { seq read-only } { n read-only } ;
 
-: check-groups ( n -- n )
-    dup 0 <= [ "Invalid group count" throw ] when ; inline
+: check-groups ( seq n -- seq n )
+    dup 0 <= [ groups-error ] when ; inline
 
 : new-groups ( seq n class -- groups )
     [ check-groups ] dip boa ; inline
