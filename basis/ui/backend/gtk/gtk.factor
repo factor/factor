@@ -42,9 +42,13 @@ M: gtk-clipboard clipboard-contents
         [ &g_free utf8 alien>string ] [ f ] if*
     ] with-destructors ;
 
+: save-global-clipboard ( -- )
+    clipboard get-global handle>> gtk_clipboard_store ;
+
 M: gtk-clipboard set-clipboard-contents
     swap [ handle>> ] [ utf8 string>alien ] bi*
-    -1 gtk_clipboard_set_text ;
+    -1 gtk_clipboard_set_text
+    save-global-clipboard ;
 
 : init-clipboard ( -- )
     selection "PRIMARY"
