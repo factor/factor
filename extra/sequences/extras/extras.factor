@@ -1,6 +1,6 @@
 USING: accessors arrays assocs fry grouping growable kernel
 locals make math math.order math.ranges sequences
-sequences.private splitting ;
+sequences.private sorting splitting ;
 FROM: sequences => change-nth ;
 IN: sequences.extras
 
@@ -318,6 +318,9 @@ INSTANCE: odds immutable-sequence
 : arg-where ( ... seq quot: ( ... elt -- ... ? ) -- ... indices )
     [ dup length iota zip ] dip
     [ first-unsafe ] prepose filter values ; inline
+
+: arg-sort ( seq -- indices )
+    dup length iota zip sort-keys values ;
 
 : first= ( seq elt -- ? ) [ first ] dip = ; inline
 : second= ( seq elt -- ? ) [ second ] dip = ; inline
