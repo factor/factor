@@ -130,10 +130,26 @@ CONSTANT: key-codes
         { 0xFFC4 "F7"        }
         { 0xFFC5 "F8"        }
         { 0xFFC6 "F9"        }
+
+        { 0xFFE1 f } ! Left shift
+        { 0xFFE2 f } ! Right shift
+        { 0xFFE3 f } ! Left control
+        { 0xFFE4 f } ! Right control
+        { 0xFFE5 f } ! Caps lock
+        { 0xFFE6 f } ! Shift lock
+
+        { 0xFFE7 f } ! Left meta
+        { 0xFFE8 f } ! Right meta
+        { 0xFFE9 f } ! Left alt
+        { 0xFFEA f } ! Right alt
+        { 0xFFEB f } ! Left super
+        { 0xFFEC f } ! Right super
+        { 0xFFED f } ! Left hyper
+        { 0xFFEE f } ! Right hyper
     }
 
 : key-code ( keysym -- keycode action? )
-    dup key-codes at [ t ] [ 1string f ] ?if ;
+    dup key-codes at* [ nip dup t and ] [ [ 1string ] dip ] if ;
 
 : event-modifiers ( event -- seq )
     state>> modifiers modifier ;
