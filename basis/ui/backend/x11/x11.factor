@@ -107,6 +107,7 @@ CONSTANT: key-codes
     H{
         { 0xFF08 "BACKSPACE" }
         { 0xFF09 "TAB"       }
+        { 0xFE20 "TAB"       }
         { 0xFF0D "RET"       }
         { 0xFF8D "ENTER"     }
         { 0xFF1B "ESC"       }
