@@ -17,7 +17,7 @@ IN: assocs.extras
     dup sequence? [
         [ 2array ] swap 2map-as
     ] [
-        [ dup length ] dip new-assoc
+        [ 2dup min-length ] dip new-assoc
         [ [ set-at ] with-assoc 2each ] keep
     ] if ; inline
 
