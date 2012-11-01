@@ -13,6 +13,8 @@ SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: uint
 IN: opengl
 
+SYMBOL: gl-scale-factor
+
 : gl-color ( color -- ) >rgba-components glColor4d ; inline
 
 : gl-clear-color ( color -- ) >rgba-components glClearColor ;
@@ -200,8 +202,14 @@ MACRO: set-draw-buffers ( buffers -- )
 : with-translation ( loc quot -- )
     [ [ gl-translate ] dip call ] do-matrix ; inline
 
+: gl-scale ( m -- n )
+    gl-scale-factor get-global [ * ] when* ; inline
+
+: gl-unscale ( m -- n )
+    gl-scale-factor get-global [ / ] when* ; inline
+
 : fix-coordinates ( point1 point2 -- x1 y1 x2 y2 )
-    [ first2 [ >fixnum ] bi@ ] bi@ ;
+    [ first2 [ gl-scale >fixnum ] bi@ ] bi@ ;
 
 : gl-set-clip ( loc dim -- )
     fix-coordinates glScissor ;
