@@ -117,7 +117,7 @@ render-loc render-dim ;
 :: <line> ( font string -- line )
     [
         line new-disposable
-        font retina? [ cache-font@2x ] [ cache-font ] if :> open-font
+        font retina? get-global [ cache-font@2x ] [ cache-font ] if :> open-font
         string open-font font foreground>> <CTLine> |CFRelease :> line
         open-font line compute-line-metrics
         [ >>metrics ] [ metrics>dim >>dim ] bi
