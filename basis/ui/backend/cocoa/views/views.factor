@@ -307,9 +307,9 @@ CLASS: FactorView < NSOpenGLView NSTextInput
 
     METHOD: void prepareOpenGL [
         self 1 -> setWantsBestResolutionOpenGLSurface:
-        self -> backingScaleFactor
-        [ gl-scale-factor set-global ]
-        [ 1.0 > retina? set-global ] bi
+        self -> backingScaleFactor dup 1.0 > [
+            gl-scale-factor set-global t retina? set-global
+        ] [ drop ] if
     ]
 
     ! Initialization
