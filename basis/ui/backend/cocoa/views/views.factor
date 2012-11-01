@@ -305,6 +305,10 @@ CLASS: FactorView < NSOpenGLView NSTextInput
 
     METHOD: NSInteger conversationIdentifier [ self alien-address ]
 
+    METHOD: void prepareOpenGL [
+        self 1 -> setWantsBestResolutionOpenGLSurface:
+    ]
+
     ! Initialization
     METHOD: void updateFactorGadgetSize: id notification
     [
