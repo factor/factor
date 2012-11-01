@@ -32,6 +32,8 @@ FUNCTION: double CTLineGetTypographicBounds ( CTLineRef line, CGFloat* ascent, C
 
 FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context ) ;
 
+SYMBOL: retina?
+
 ERROR: not-a-string object ;
 
 MEMO: make-attributes ( open-font color -- hashtable )
@@ -115,7 +117,7 @@ render-loc render-dim ;
 :: <line> ( font string -- line )
     [
         line new-disposable
-        font cache-font :> open-font
+        font retina? [ cache-font@2x ] [ cache-font ] if :> open-font
         string open-font font foreground>> <CTLine> |CFRelease :> line
         open-font line compute-line-metrics
         [ >>metrics ] [ metrics>dim >>dim ] bi
@@ -155,7 +157,7 @@ render-loc render-dim ;
             [ loc set-text-position ]
             [ [ ctline ] dip CTLineDraw ]
         } cleave
-    ] make-bitmap-image ;
+    ] make-bitmap-image retina? get-global >>2x? ;
 
 : line>image ( line -- image )
     dup image>> [ render >>image ] unless image>> ;
@@ -167,4 +169,4 @@ SYMBOL: cached-lines
 : cached-line ( font string -- line )
     cached-lines get-global [ <line> ] 2cache ;
 
-[ <cache-assoc> cached-lines set-global ] "core-text" add-startup-hook
+[ <cache-assoc> cached-lines set-global f retina? set-global ] "core-text" add-startup-hook
