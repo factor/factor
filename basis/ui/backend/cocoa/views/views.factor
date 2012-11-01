@@ -4,9 +4,10 @@ USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs cocoa cocoa.application cocoa.classes
 cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
 cocoa.views combinators core-foundation.strings core-graphics
-core-graphics.types io.encodings.utf8 kernel locals math
-math.rectangles namespaces opengl sequences threads ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.private ;
+core-graphics.types core-text io.encodings.utf8 kernel locals
+math math.rectangles namespaces opengl sequences threads
+ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.private ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -306,7 +307,9 @@ CLASS: FactorView < NSOpenGLView NSTextInput
 
     METHOD: void prepareOpenGL [
         self 1 -> setWantsBestResolutionOpenGLSurface:
-        self -> backingScaleFactor gl-scale-factor set-global
+        self -> backingScaleFactor
+        [ gl-scale-factor set-global ]
+        [ 1.0 > retina? set-global ] bi
     ]
 
     ! Initialization

@@ -101,6 +101,9 @@ MEMO:: (cache-font) ( name size traits -- open-font )
 : cache-font ( font -- open-font )
     [ name>> ] [ size>> ] [ font-traits ] tri (cache-font) ;
 
+: cache-font@2x ( font -- open-font )
+    [ name>> ] [ size>> 2 * ] [ font-traits ] tri (cache-font) ;
+
 MEMO: (cache-font-metrics) ( name size traits -- metrics )
     [ metrics new ] 3dip
     (cache-font) {
