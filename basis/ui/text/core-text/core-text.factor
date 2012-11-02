@@ -12,13 +12,13 @@ SINGLETON: core-text-renderer
 <PRIVATE
 
 : unscale ( m -- n )
-    retina? get-global [ 2.0 / ] when ; inline
+    retina? get-global [ 2 /i ] when ; inline
 
 : scale ( m -- n )
-    retina? get-global [ 2.0 * ] when ; inline
+    retina? get-global [ 2 * ] when ; inline
 
 : scale-dim ( dim -- dim' )
-    retina? get-global [ [ 2.0 / ] map ] when ; inline
+    retina? get-global [ [ 2 /i ] map ] when ; inline
 
 : scale-metrics ( metrics -- metrics' )
     retina? get-global [
