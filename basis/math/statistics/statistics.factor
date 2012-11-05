@@ -371,6 +371,10 @@ ALIAS: corr sample-corr
     [ dup mean v-n ] [ std ] bi
     dup zero? [ drop ] [ v/n ] if ;
 
+: standardize-2d ( u -- v )
+    flip dup [ [ mean ] [ std ] bi 2array ] map
+    [ [ first v-n ] 2map ] keep [ second v/n ] 2map flip ;
+
 : differences ( u -- v )
     [ 1 tail-slice ] keep [ - ] 2map ;
 
