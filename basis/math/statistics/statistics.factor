@@ -265,8 +265,6 @@ PRIVATE>
 
 : sample-var ( seq -- x ) 1 var-ddof ; inline
 
-ALIAS: var sample-var
-
 : std-ddof ( seq n -- x )
     var-ddof sqrt ; inline
 
@@ -274,9 +272,7 @@ ALIAS: var sample-var
 
 : sample-std ( seq -- x ) 1 std-ddof ; inline
 
-ALIAS: std sample-std
-
-: signal-to-noise ( seq -- x ) [ mean ] [ std ] bi / ;
+: signal-to-noise ( seq -- x ) [ mean ] [ population-std ] bi / ;
 
 : mean-dev ( seq -- x ) dup mean v-n vabs mean ;
 
@@ -288,8 +284,6 @@ ALIAS: std sample-std
 
 : sample-ste ( seq -- x ) 1 ste-ddof ;
 
-ALIAS: ste sample-ste
-
 : ((r)) ( mean(x) mean(y) {x} {y} -- (r) )
     ! finds sigma((xi-mean(x))(yi-mean(y))
     0 [ [ [ pick ] dip swap - ] bi@ * + ] 2reduce 2nip ;
@@ -298,7 +292,7 @@ ALIAS: ste sample-ste
     * recip [ [ ((r)) ] keep length 1 - / ] dip * ;
 
 : [r] ( {{x,y}...} -- mean(x) mean(y) {x} {y} sx sy )
-    first2 [ [ [ mean ] bi@ ] 2keep ] 2keep [ std ] bi@ ;
+    first2 [ [ [ mean ] bi@ ] 2keep ] 2keep [ population-std ] bi@ ;
 
 : r ( {{x,y}...} -- r )
     [r] (r) ;
@@ -316,19 +310,17 @@ ALIAS: ste sample-ste
 : cov-ddof ( {x} {y} ddof -- cov )
     [ [ dup mean v-n ] bi@ v* ] dip mean-ddof ;
 
-: cov ( {x} {y} -- cov ) 0 cov-ddof ; inline
+: population-cov ( {x} {y} -- cov ) 0 cov-ddof ; inline
 
-: unbiased-cov ( {x} {y} -- cov ) 1 cov-ddof ; inline
+: sample-cov ( {x} {y} -- cov ) 1 cov-ddof ; inline
 
 : corr-ddof ( {x} {y} n -- corr )
-    [ [ cov ] ] dip
+    [ [ population-cov ] ] dip
     '[ [ _ var-ddof ] bi@ * sqrt ] 2bi / ;
 
 : population-corr ( {x} {y} -- corr ) 0 corr-ddof ; inline
 
 : sample-corr ( {x} {y} -- corr ) 1 corr-ddof ; inline
-
-ALIAS: corr sample-corr
 
 : cum-map ( seq identity quot -- seq' )
     swapd [ dup ] compose map nip ; inline
@@ -368,11 +360,11 @@ ALIAS: corr sample-corr
     [ dup log * ] [ 1 swap - dup log * ] bi + neg 2 log / ;
 
 : standardize ( u -- v )
-    [ dup mean v-n ] [ std ] bi
+    [ dup mean v-n ] [ sample-std ] bi
     dup zero? [ drop ] [ v/n ] if ;
 
 : standardize-2d ( u -- v )
-    flip dup [ [ mean ] [ std ] bi 2array ] map
+    flip dup [ [ mean ] [ sample-std ] bi 2array ] map
     [ [ first v-n ] 2map ] keep [ second v/n ] 2map flip ;
 
 : differences ( u -- v )
