@@ -46,33 +46,33 @@ HELP: minmax
     }
 } ;
 
-HELP: std
+HELP: sample-std
 { $values { "seq" sequence } { "x" "a non-negative real number"} }
-{ $description "Computes the standard deviation of " { $snippet "seq" } ", which is the square root of the variance. It measures how widely spread the values in a sequence are about the mean." }
+{ $description "Computes the sample standard deviation of " { $snippet "seq" } ", which is the square root of the sample variance. It measures how widely spread the values in a sequence are about the mean for a random subset of a dataset." }
 { $examples
-  { $example "USING: math.statistics prettyprint ;" "{ 7 8 9 } std ." "1.0" } } ;
+  { $example "USING: math.statistics prettyprint ;" "{ 7 8 9 } sample-std ." "1.0" } } ;
 
-HELP: ste
+HELP: sample-ste
   { $values { "seq" sequence } { "x" "a non-negative real number"} }
   { $description "Computes the standard error of the mean for " { $snippet "seq" } ". It's defined as the standard deviation divided by the square root of the length of the sequence, and measures uncertainty associated with the estimate of the mean." }
   { $examples
-    { $example "USING: math.statistics prettyprint ;" "{ -2 2 } ste ." "2.0" }
+    { $example "USING: math.statistics prettyprint ;" "{ -2 2 } sample-ste ." "2.0" }
   } ;
 
-HELP: var
+HELP: sample-var
 { $values { "seq" sequence } { "x" "a non-negative real number"} }
-{ $description "Computes the variance of " { $snippet "seq" } ". It's a measurement of the spread of values in a sequence. The larger the variance, the larger the distance of values from the mean." }
+{ $description "Computes the variance of " { $snippet "seq" } ". It's a measurement of the spread of values in a sequence." }
 { $notes "If the number of elements in " { $snippet "seq" } " is 1 or less, it outputs 0." }
 { $examples
-  { $example "USING: math.statistics prettyprint ;" "{ 1 } var ." "0" }
-  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } var ." "1" }
-  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } var ." "1+2/3" } } ;
+  { $example "USING: math.statistics prettyprint ;" "{ 1 } sample-var ." "0" }
+  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } sample-var ." "1" }
+  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } sample-var ." "1+2/3" } } ;
 
-HELP: cov
+HELP: population-cov 
 { $values { "{x}" sequence } { "{y}" sequence } { "cov" "a real number" } }
 { $description "Computes the covariance of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
 
-HELP: corr
+HELP: population-corr
 { $values { "{x}" sequence } { "{y}" sequence } { "corr" "a real number" } }
 { $description "Computes the correlation of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
 
@@ -281,8 +281,12 @@ ARTICLE: "math.statistics" "Statistics"
 { $subsections median lower-median upper-median medians }
 "Computing the mode:"
 { $subsections mode }
-"Computing the standard deviation, standard error, and variance:"
-{ $subsections std ste var }
+"Computing the population standard deviation, standard error, and variance:"
+{ $subsections population-std population-ste population-var }
+"Computing the sample standard deviation, standard error, and variance:"
+{ $subsections sample-std sample-ste sample-var }
+"Computing the nth delta-degrees-of-freedom statistics:"
+{ $subsections std-ddof ste-ddof var-ddof }
 "Computing the range and minimum and maximum elements:"
 { $subsections range minmax }
 "Computing the kth smallest element:"
@@ -294,7 +298,8 @@ ARTICLE: "math.statistics" "Statistics"
 
 ABOUT: "math.statistics"
 
-{ var var-ddof population-var sample-var } related-words
-{ std std-ddof population-std sample-std } related-words
-{ ste ste-ddof population-ste sample-ste } related-words
-{ corr corr-ddof population-corr sample-corr } related-words
+{ var-ddof population-var sample-var } related-words
+{ std-ddof population-std sample-std } related-words
+{ ste-ddof population-ste sample-ste } related-words
+{ corr-ddof population-corr sample-corr } related-words
+{ cov-ddof population-cov sample-cov } related-words
