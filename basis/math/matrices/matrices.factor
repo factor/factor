@@ -118,6 +118,10 @@ IN: math.matrices
 ! Matrix operations
 : mneg ( m -- m ) [ vneg ] map ;
 
+: n+m  ( n m -- m ) [ n+v ] with map ;
+: m+n  ( m n -- m ) [ v+n ] curry map ;
+: n-m  ( n m -- m ) [ n-v ] with map ;
+: m-n  ( m n -- m ) [ v-n ] curry map ;
 : n*m ( n m -- m ) [ n*v ] with map ;
 : m*n ( m n -- m ) [ v*n ] curry map ;
 : n/m ( n m -- m ) [ n/v ] with map ;
