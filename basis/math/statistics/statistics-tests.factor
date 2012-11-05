@@ -52,15 +52,14 @@ IN: math.statistics.tests
 [ 2 ] [ { 1 2 } upper-median ] unit-test
 [ 3/2 ] [ { 1 2 } median ] unit-test
 
-[ 1 ] [ { 1 2 3 } var ] unit-test
-[ 16 ] [ { 4 6 8 10 10 12 14 16 } var ] unit-test
+[ 1 ] [ { 1 2 3 } sample-var ] unit-test
+[ 16 ] [ { 4 6 8 10 10 12 14 16 } sample-var ] unit-test
 
 { 16 } [ { 4 6 8 10 12 14 16 } population-var ] unit-test
-{ 1.0 } [ { 7 8 9 } std ] unit-test
+{ 1.0 } [ { 7 8 9 } sample-std ] unit-test
 { 2/3 } [ { 7 8 9 } 0 var-ddof ] unit-test
 { 2/3 } [ { 7 8 9 } population-var ] unit-test
 { 1 } [ { 7 8 9 } 1 var-ddof ] unit-test
-{ 1 } [ { 7 8 9 } var ] unit-test
 { 1 } [ { 7 8 9 } sample-var ] unit-test
 { 2 } [ { 7 8 9 } 2 var-ddof ] unit-test
 { 0 } [ { 7 8 9 } 3 var-ddof ] unit-test
@@ -68,18 +67,18 @@ IN: math.statistics.tests
 { t } [ { 7 8 9 } 0 std-ddof 0.816496580927726 .0001 ~ ] unit-test
 { t } [ { 7 8 9 } population-std 0.816496580927726 .0001 ~ ] unit-test
 { 1.0 } [ { 7 8 9 } 1 std-ddof ] unit-test
-{ 1.0 } [ { 7 8 9 } std ] unit-test
+{ 1.0 } [ { 7 8 9 } sample-std ] unit-test
 { 1.0 } [ { 7 8 9 } sample-std ] unit-test
 { t } [ { 7 8 9 } 2 std-ddof 1.414213562373095 .0001 ~ ] unit-test
 { 0.0 } [ { 7 8 9 } 3 std-ddof ] unit-test
 
-[ t ] [ { 1 2 3 4 } ste 0.6454972243679028 - .0001 < ] unit-test
+[ t ] [ { 1 2 3 4 } sample-ste 0.6454972243679028 - .0001 < ] unit-test
 
-[ t ] [ { 23.2 33.4 22.5 66.3 44.5 } std 18.1906 - .0001 < ] unit-test
+[ t ] [ { 23.2 33.4 22.5 66.3 44.5 } sample-std 18.1906 - .0001 < ] unit-test
 
-[ 0 ] [ { 1 } var ] unit-test
-[ 0.0 ] [ { 1 } std ] unit-test
-[ 0.0 ] [ { 1 } ste ] unit-test
+[ 0 ] [ { 1 } sample-var ] unit-test
+[ 0.0 ] [ { 1 } sample-std ] unit-test
+[ 0.0 ] [ { 1 } sample-ste ] unit-test
 
 { 2 } [ { 1 3 5 7 } mean-dev ] unit-test
 { 4/5 } [ { 1 3 3 3 5 } median-dev ] unit-test
@@ -106,11 +105,12 @@ IN: math.statistics.tests
     [ 0 swap at ] [ 1 swap at ] [ 2 swap at ] tri
 ] unit-test
 
-[ 0 ] [ { 1 } { 1 } cov ] unit-test
-[ 2/3 ] [ { 1 2 3 } { 4 5 6 } cov ] unit-test
+[ 0 ] [ { 1 } { 1 } sample-cov ] unit-test
+[ 2/3 ] [ { 1 2 3 } { 4 5 6 } population-cov ] unit-test
 
-[ 0.75 ] [ { 1 2 3 4 } dup corr ] unit-test
-[ -0.75 ] [ { 1 2 3 4 } { -4 -5 -6 -7 } corr ] unit-test
+[ 0.75 ] [ { 1 2 3 4 } dup sample-corr ] unit-test
+[ 1.0 ] [ { 1 2 3 4 } dup population-corr ] unit-test
+[ -0.75 ] [ { 1 2 3 4 } { -4 -5 -6 -7 } sample-corr ] unit-test
 
 [ { 1 2 4 7 } ] [ { 1 1 2 3 } cum-sum ] unit-test
 [ { 1 1 2 6 } ] [ { 1 1 2 3 } cum-product ] unit-test
@@ -173,7 +173,14 @@ IN: math.statistics.tests
 
 { t t } [
     { 6.5 3.8 6.6 5.7 6.0 6.4 5.3 } standardize
-    [ mean 0 1e-10 ~ ] [ var 1 1e-10 ~ ] bi
+    [ mean 0 1e-10 ~ ] [ sample-var 1 1e-10 ~ ] bi
+] unit-test
+
+{ t t } [
+    { { 1 -1 2 } { 2 0 0 } { 0 1 -1 } } standardize-2d
+    flip
+    [ [ mean ] map { 0 0 0 } 1e-10 v~ ]
+    [ [ sample-var ] map { 1 1 1 } 1e-10 v~ ] bi
 ] unit-test
 
 { { 0 0 0 } } [ { 1 1 1 } standardize ] unit-test
