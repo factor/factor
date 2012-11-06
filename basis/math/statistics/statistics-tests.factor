@@ -55,10 +55,10 @@ IN: math.statistics.tests
 [ 1 ] [ { 1 2 3 } var ] unit-test
 [ 16 ] [ { 4 6 8 10 10 12 14 16 } var ] unit-test
 
-{ 16 } [ { 4 6 8 10 12 14 16 } full-var ] unit-test
+{ 16 } [ { 4 6 8 10 12 14 16 } population-var ] unit-test
 { 1.0 } [ { 7 8 9 } std ] unit-test
 { 2/3 } [ { 7 8 9 } 0 var-ddof ] unit-test
-{ 2/3 } [ { 7 8 9 } full-var ] unit-test
+{ 2/3 } [ { 7 8 9 } population-var ] unit-test
 { 1 } [ { 7 8 9 } 1 var-ddof ] unit-test
 { 1 } [ { 7 8 9 } var ] unit-test
 { 1 } [ { 7 8 9 } sample-var ] unit-test
@@ -66,7 +66,7 @@ IN: math.statistics.tests
 { 0 } [ { 7 8 9 } 3 var-ddof ] unit-test
 
 { t } [ { 7 8 9 } 0 std-ddof 0.816496580927726 .0001 ~ ] unit-test
-{ t } [ { 7 8 9 } full-std 0.816496580927726 .0001 ~ ] unit-test
+{ t } [ { 7 8 9 } population-std 0.816496580927726 .0001 ~ ] unit-test
 { 1.0 } [ { 7 8 9 } 1 std-ddof ] unit-test
 { 1.0 } [ { 7 8 9 } std ] unit-test
 { 1.0 } [ { 7 8 9 } sample-std ] unit-test

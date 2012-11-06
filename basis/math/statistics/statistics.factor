@@ -261,8 +261,8 @@ PRIVATE>
         [ [ sum-of-squared-errors ] [ length ] bi ] dip - /
     ] if ; inline
 
-: full-var ( seq -- x ) 0 var-ddof ; inline
-    
+: population-var ( seq -- x ) 0 var-ddof ; inline
+
 : sample-var ( seq -- x ) 1 var-ddof ; inline
 
 ALIAS: var sample-var
@@ -270,7 +270,7 @@ ALIAS: var sample-var
 : std-ddof ( seq n -- x )
     var-ddof sqrt ; inline
 
-: full-std ( seq -- x ) 0 std-ddof ; inline
+: population-std ( seq -- x ) 0 std-ddof ; inline
 
 : sample-std ( seq -- x ) 1 std-ddof ; inline
 
@@ -284,7 +284,7 @@ ALIAS: std sample-std
 
 : ste-ddof ( seq n -- x ) '[ _ std-ddof ] [ length ] bi sqrt / ;
 
-: full-ste ( seq -- x ) 0 ste-ddof ;
+: population-ste ( seq -- x ) 0 ste-ddof ;
 
 : sample-ste ( seq -- x ) 1 ste-ddof ;
 
@@ -324,7 +324,7 @@ ALIAS: ste sample-ste
     [ [ cov ] ] dip
     '[ [ _ var-ddof ] bi@ * sqrt ] 2bi / ;
 
-: full-corr ( {x} {y} -- corr ) 0 corr-ddof ; inline
+: population-corr ( {x} {y} -- corr ) 0 corr-ddof ; inline
 
 : sample-corr ( {x} {y} -- corr ) 1 corr-ddof ; inline
 

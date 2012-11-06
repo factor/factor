@@ -294,7 +294,7 @@ ARTICLE: "math.statistics" "Statistics"
 
 ABOUT: "math.statistics"
 
-{ var full-var sample-var } related-words
-{ std full-std sample-std } related-words
-{ ste full-ste sample-ste } related-words
-{ corr full-corr sample-corr } related-words
+{ var population-var sample-var } related-words
+{ std population-std sample-std } related-words
+{ ste population-ste sample-ste } related-words
+{ corr population-corr sample-corr } related-words
