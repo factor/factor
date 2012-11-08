@@ -1,10 +1,11 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: assocs combinators.short-circuit fry grouping kernel
-locals math math.combinatorics math.constants math.functions
-math.order math.primes math.ranges math.statistics math.vectors
-memoize random sequences sequences.extras sorting ;
+USING: assocs assocs.extras combinators.short-circuit fry
+grouping kernel locals math math.combinatorics math.constants
+math.functions math.order math.primes math.ranges
+math.statistics math.vectors memoize random sequences
+sequences.extras sets sorting ;
 
 IN: math.extras
 
@@ -194,3 +195,6 @@ PRIVATE>
 
 : weighted-random ( histogram -- obj )
     unzip cum-sum [ last random ] [ search-sorted ] bi swap nth ;
+
+: unique-indices ( seq -- unique indices )
+    [ members ] keep over dup length iota H{ } zip-as '[ _ at ] map ;
