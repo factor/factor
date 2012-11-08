@@ -1,6 +1,6 @@
 USING: accessors arrays assocs fry grouping growable kernel
 locals make math math.order math.ranges sequences
-sequences.private sorting splitting ;
+sequences.deep sequences.private sorting splitting ;
 FROM: sequences => change-nth ;
 IN: sequences.extras
 
@@ -365,3 +365,12 @@ PRIVATE>
 
 : set-nths-unsafe ( value indices seq -- )
     swapd '[ [ _ ] dip _ set-nth-unsafe ] each ; inline
+
+: flatten1 ( obj -- seq )
+    [
+        [
+            dup branch? [
+                [ dup branch? [ % ] [ , ] if ] each
+            ] [ , ] if
+        ]
+    ] keep dup branch? [ drop f ] unless make ;
