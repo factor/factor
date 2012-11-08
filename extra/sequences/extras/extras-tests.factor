@@ -166,3 +166,6 @@ IN: sequences.extras.tests
 { { 1 0 0 1 0 0 0 1 0 0 } }
 [ 1 { 0 3 7 } 10 0 <array> [ set-nths-unsafe ] keep ] unit-test
 
+{ V{ 1 } } [ 1 flatten1 ] unit-test
+{ { 1 2 3 } } [ { 1 2 3 } flatten1 ] unit-test
+{ { 1 2 3 { { 4 } } } } [ { 1 { 2 } { 3 { { 4 } } } } flatten1 ] unit-test
