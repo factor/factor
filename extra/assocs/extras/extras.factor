@@ -39,3 +39,9 @@ IN: assocs.extras
 
 : if-assoc-empty ( ..a assoc quot1: ( ..a -- ..b ) quot2: ( ..a assoc -- ..b ) -- ..b )
     [ dup assoc-empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
+
+: assoc-invert-as ( assoc exemplar -- newassoc )
+    [ swap ] swap assoc-map-as ;
+
+: assoc-invert ( assoc -- newassoc )
+    dup assoc-invert-as ;
