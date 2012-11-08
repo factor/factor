@@ -72,3 +72,8 @@ IN: math.extras.test
 { { 0 5 1 2 2 } } [
     { -10 10 2 2.5 3 } [ { 1 2 3 4 5 } search-sorted ] map
 ] unit-test
+
+{
+    { 1 2 3 4 }
+    { 0 1 0 0 2 3 }
+} [ { 1 2 1 1 3 4 } unique-indices ] unit-test
