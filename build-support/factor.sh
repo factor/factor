@@ -596,6 +596,7 @@ usage() {
     $ECHO "  bootstrap - bootstrap with an existing boot image"
     $ECHO "  net-bootstrap - download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
+    $ECHO "  make-boot - same as update, but use current git commit"
     $ECHO "  report - print the build variables"
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
