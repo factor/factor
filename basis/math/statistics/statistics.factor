@@ -272,6 +272,8 @@ PRIVATE>
 
 : sample-std ( seq -- x ) 1 std-ddof ; inline
 
+ALIAS: std sample-std
+
 : signal-to-noise ( seq -- x ) [ mean ] [ population-std ] bi / ;
 
 : mean-dev ( seq -- x ) dup mean v-n vabs mean ;
