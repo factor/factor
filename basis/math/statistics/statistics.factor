@@ -209,24 +209,27 @@ PRIVATE>
 
 <PRIVATE
 
-: (sequence>assoc) ( seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) assoc -- assoc )
-    [ swap curry compose each ] keep ; inline
+: (sequence>assoc) ( seq map-quot insert-quot assoc -- assoc )
+    [ swap curry compose each-index ] keep ; inline
 
 PRIVATE>
 
-: sequence>assoc! ( assoc seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) -- assoc )
+: sequence>assoc! ( assoc seq map-quot: ( x -- ..y ) insert-quot: ( ..y index assoc -- ) -- assoc )
     4 nrot (sequence>assoc) ; inline
 
-: sequence>assoc ( seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) exemplar -- assoc )
+: sequence>assoc ( seq map-quot insert-quot exemplar -- assoc )
     clone (sequence>assoc) ; inline
 
-: sequence>hashtable ( seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) -- hashtable )
+: sequence>hashtable ( seq map-quot insert-quot -- hashtable )
     H{ } sequence>assoc ; inline
 
 : histogram! ( hashtable seq -- hashtable )
-    [ ] [ inc-at ] sequence>assoc! ;
+    [ ] [ nip inc-at ] sequence>assoc! ;
 
 : histogram-by ( seq quot: ( x -- bin ) -- hashtable )
+    [ nip inc-at ] sequence>hashtable ; inline
+
+: histogram-index-by ( seq quot: ( x -- bin ) -- hashtable )
     [ inc-at ] sequence>hashtable ; inline
 
 : histogram ( seq -- hashtable )
@@ -238,11 +241,17 @@ PRIVATE>
 : normalized-histogram ( seq -- alist )
     [ histogram ] [ length ] bi '[ _ / ] assoc-map ;
 
-: collect-pairs ( seq quot: ( x -- v k ) -- hashtable )
-    [ push-at ] sequence>hashtable ; inline
+: collect-pairs ( seq quot: ( x y -- v k y ) -- hashtable )
+    [ [ nip ] dip push-at ] sequence>hashtable ; inline
+
+: collect-index-by ( seq quot: ( x -- x' ) -- hashtable )
+    [ swap dup ] prepose collect-pairs ; inline
 
 : collect-by ( seq quot: ( x -- x' ) -- hashtable )
     [ dup ] prepose collect-pairs ; inline
+
+: equal-probabilities ( n -- array )
+    dup recip <array> ; inline
 
 : mode ( seq -- x )
     histogram >alist
@@ -382,4 +391,3 @@ ALIAS: std sample-std
         [ values ] map [ 0 [ length + ] accumulate nip ] [ ] bi zip
     ] [ length f <array> ] bi
     [ '[ first2 [ _ set-nth ] with each ] each ] keep ;
-
