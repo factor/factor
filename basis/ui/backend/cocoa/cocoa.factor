@@ -216,6 +216,8 @@ M: cocoa-ui-backend offscreen-pixels ( world -- alien w h )
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;
 
+M: cocoa-ui-backend resize-window [ handle>> window>> ] [ first2 ] bi* <CGSize> -> setContentSize: ;
+
 M: cocoa-ui-backend system-alert
     NSAlert -> alloc -> init -> autorelease [
         {
