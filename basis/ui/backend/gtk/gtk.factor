@@ -479,6 +479,8 @@ M: gtk-ui-backend (close-window) ( handle -- )
     window>> [ gtk_widget_destroy ] [ unregister-window ] bi
     event-loop? [ gtk_main_quit ] unless ;
 
+M: gtk-ui-backend resize-window [ handle>> window>> ] [ first2 ] bi* gtk_window_resize ;
+
 M: gtk-ui-backend set-title
     swap [ handle>> window>> ] [ utf8 string>alien ] bi*
     gtk_window_set_title ;
