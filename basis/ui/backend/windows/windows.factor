@@ -861,6 +861,10 @@ M: windows-ui-backend (fullscreen?) ( world -- ? )
     [ hwnd>RECT ] [ fullscreen-RECT ] bi
     [ get-RECT-dimensions 2array 2nip ] same? ;
 
+M: windows-ui-backend resize-window ( world dim -- )
+  [ handle>> hWnd>> dup hwnd>RECT get-RECT-top-left ]
+  [ first2 FALSE ] bi* MoveWindow win32-error=0/f ;
+
 M: windows-ui-backend ui-backend-available?
     t ;
 
