@@ -241,14 +241,14 @@ PRIVATE>
 : normalized-histogram ( seq -- alist )
     [ histogram ] [ length ] bi '[ _ / ] assoc-map ;
 
-: collect-pairs ( seq quot: ( x y -- v k y ) -- hashtable )
-    [ [ nip ] dip push-at ] sequence>hashtable ; inline
+: collect-at ( seq quot -- hashtable )
+    [ push-at ] sequence>hashtable ; inline
 
-: collect-index-by ( seq quot: ( x -- x' ) -- hashtable )
-    [ swap dup ] prepose collect-pairs ; inline
+: collect-index-by ( seq quot -- hashtable )
+    [ swap ] prepose collect-at ; inline
 
-: collect-by ( seq quot: ( x -- x' ) -- hashtable )
-    [ dup ] prepose collect-pairs ; inline
+: collect-by ( seq quot -- hashtable )
+    [ drop dup ] prepose collect-at ; inline
 
 : equal-probabilities ( n -- array )
     dup recip <array> ; inline
