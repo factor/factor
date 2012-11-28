@@ -22,6 +22,9 @@ MEMO: probabilities-seq ( seq -- seq' )
 : stratified-sample ( stratified-sequences probability-sequence -- elt )
     probabilities-quot call swap nth random ; inline
 
+: stratified-samples ( stratified-sequences probability-sequence n -- elt )
+    [ '[ _ _ stratified-sample ] ] dip swap replicate ;
+
 : equal-stratified-sample ( stratified-sequences -- elt )
     random random ; inline
 
