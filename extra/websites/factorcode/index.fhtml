@@ -16,7 +16,7 @@ xml.writer xmode.highlight ; %>
 
 <body>
 
-<div><img src="logo.png" alt="Factor programming language" /></div>
+<div align="center"><img src="logo.png" alt="Factor programming language" /></div>
 
 <table border="0" width="100%">
 
