@@ -1,8 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: assocs csv io.encodings.utf8 io.files kernel math.parser
-sequences ;
+USING: accessors ascii assocs csv io.encodings.utf8 io.files
+kernel math.parser sequences splitting ;
 
 IN: machine-learning.data-sets
 
@@ -16,6 +16,11 @@ C: <data-set> data-set
 : load-file ( name -- contents )
     "resource:extra/machine-learning/data-sets/" prepend
     utf8 file-contents ;
+
+: load-table ( name -- data names )
+    load-file [ blank? ] trim string-lines
+    [ [ blank? ] split-when ] map unclip
+    [ [ [ string>number ] map ] map ] dip ;
 
 PRIVATE>
 
@@ -32,3 +37,12 @@ PRIVATE>
         "sepal length (cm)" "sepal width (cm)"
         "petal length (cm)" "petal width (cm)"
     } <data-set> ;
+
+: load-linnerud ( -- data-set )
+    data-set new
+        "linnerud_exercise.csv" load-table
+        [ >>data ] [ >>feature-names ] bi*
+        "linnerud_physiological.csv" load-table
+        [ >>target ] [ >>target-names ] bi*
+        "linnerud.rst" load-file >>description ;
+
