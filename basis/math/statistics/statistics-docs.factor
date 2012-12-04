@@ -255,7 +255,6 @@ ARTICLE: "cumulative" "Computing cumulative sequences"
 "Cumulative mapping combinators:"
 { $subsections
     cum-map
-    cum-map0
 }
 "Cumulative math:"
 { $subsections

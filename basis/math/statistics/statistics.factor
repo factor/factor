@@ -336,14 +336,11 @@ ALIAS: std sample-std
 : cum-map ( seq identity quot -- seq' )
     swapd [ dup ] compose map nip ; inline
 
-: cum-map0 ( seq identity quot -- seq' )
-    accumulate nip ; inline
-
 : cum-sum ( seq -- seq' )
     0 [ + ] cum-map ;
 
 : cum-sum0 ( seq -- seq' )
-    0 [ + ] cum-map0 ;
+    0 [ + ] accumulate nip ;
 
 : cum-product ( seq -- seq' )
     1 [ * ] cum-map ;
