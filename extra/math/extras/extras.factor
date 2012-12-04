@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: assocs assocs.extras combinators.short-circuit fry
+USING: arrays assocs assocs.extras combinators.short-circuit fry
 grouping kernel locals math math.combinatorics math.constants
 math.functions math.order math.primes math.ranges
 math.statistics math.vectors memoize random sequences
@@ -116,26 +116,26 @@ PRIVATE>
     [ zero? not ] filter ;
 
 : bartlett ( n -- seq )
-    dup 1 <= [ 1 = { 1 } { } ? ] [
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
         [ iota ] [ 1 - 2 / ] bi [
             [ recip * ] [ >= ] 2bi [ 2 swap - ] when
         ] curry map
     ] if ;
 
 : hanning ( n -- seq )
-    dup 1 <= [ 1 = { 1 } { } ? ] [
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
         [ iota ] [ 1 - 2pi swap / ] bi v*n
         [ cos -0.5 * 0.5 + ] map!
     ] if ;
 
 : hamming ( n -- seq )
-    dup 1 <= [ 1 = { 1 } { } ? ] [
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
         [ iota ] [ 1 - 2pi swap / ] bi v*n
         [ cos -0.46 * 0.54 + ] map!
     ] if ;
 
 : blackman ( n -- seq )
-    dup 1 <= [ 1 = { 1 } { } ? ] [
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
         [ iota ] [ 1 - 2pi swap / ] bi v*n
         [ [ cos -0.5 * ] map ] [ [ 2 * cos 0.08 * ] map ] bi
         v+ 0.42 v+n
