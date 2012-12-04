@@ -17,21 +17,21 @@ C: <data-set> data-set
     "resource:extra/machine-learning/data-sets/" prepend
     utf8 file-contents ;
 
+: numerify ( table -- data names )
+    unclip [ [ [ string>number ] map ] map ] dip ;
+
 : load-table ( name -- data names )
     load-file [ blank? ] trim string-lines
-    [ [ blank? ] split-when ] map unclip
-    [ [ [ string>number ] map ] map ] dip ;
+    [ [ blank? ] split-when ] map numerify ;
+
+: load-table-csv ( name -- data names )
+    load-file string>csv numerify ;
 
 PRIVATE>
 
 : load-iris ( -- data-set )
-    "iris.csv" load-file string>csv unclip [
-        [
-            unclip-last
-            [ [ string>number ] map ]
-            [ string>number ] bi*
-        ] { } map>assoc unzip
-    ] [ 2 tail ] bi*
+    "iris.csv" load-table-csv
+    [ [ unclip-last ] { } map>assoc unzip ] [ 2 tail ] bi*
     "iris.rst" load-file
     {
         "sepal length (cm)" "sepal width (cm)"
@@ -45,4 +45,3 @@ PRIVATE>
         "linnerud_physiological.csv" load-table
         [ >>target ] [ >>target-names ] bi*
         "linnerud.rst" load-file >>description ;
-
