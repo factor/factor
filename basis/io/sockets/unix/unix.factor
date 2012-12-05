@@ -85,8 +85,9 @@ M: object ((client)) ( addrspec -- fd )
 : init-server-socket ( fd -- )
     SOL_SOCKET SO_REUSEADDR set-socket-option ;
 
+FROM: unix.ffi => bind ;
 : server-socket-fd ( addrspec type -- fd )
-    [ dup protocol-family ] dip pick protocol socket-fd
+B    [ dup protocol-family ] dip pick protocol socket-fd
     [ init-server-socket ] keep
     [ handle-fd swap make-sockaddr/size [ bind ] unix-system-call drop ] keep ;
 

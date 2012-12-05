@@ -40,7 +40,6 @@ void factor_vm::compile_all_words()
 	}
 }
 
-/* Allocates memory */
 word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 {
 	data_root<object> vocab(vocab_,this);
@@ -63,7 +62,6 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 	return new_word.untagged();
 }
 
-/* Allocates memory */
 /* (word) ( name vocabulary hashcode -- word ) */
 void factor_vm::primitive_word()
 {
@@ -73,7 +71,6 @@ void factor_vm::primitive_word()
 	ctx->push(tag<word>(allot_word(name,vocab,hashcode)));
 }
 
-/* Allocates memory (from_unsigned_cell allocates) */
 /* word-code ( word -- start end ) */
 void factor_vm::primitive_word_code()
 {
@@ -90,7 +87,6 @@ void factor_vm::primitive_optimized_p()
 	ctx->replace(tag_boolean(w->code()->optimized_p()));
 }
 
-/* Allocates memory */
 void factor_vm::primitive_wrapper()
 {
 	wrapper *new_wrapper = allot<wrapper>(sizeof(wrapper));

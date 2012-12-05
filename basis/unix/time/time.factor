@@ -13,14 +13,16 @@ STRUCT: timespec
     { nsec long } ;
 
 : make-timeval ( us -- timeval )
-    [ timeval <struct> ] dip [
-        1000000 /mod [ >>sec ] [ >>usec ] bi*
-    ] unless-zero ;
+    1000000 /mod
+    timeval <struct>
+        swap >>usec
+        swap >>sec ;
 
 : make-timespec ( nanos -- timespec )
-    [ timespec <struct> ] dip [
-        1000000000 /mod [ >>sec ] [ >>nsec ] bi*
-    ] unless-zero ;
+    1000000000 /mod
+    timespec <struct>
+        swap >>nsec
+        swap >>sec ;
 
 STRUCT: timezone
     { tz_minuteswest int }

@@ -21,8 +21,7 @@ STRUCT: HIST_ENTRY
     { timestamp c-string   }
     { data      histdata_t } ;
 
-: HISTENT_BYTES ( hs -- n )
-    [ line>> strlen ] [ timestamp>> strlen ] bi + ; inline
+: HISTENT_BYTES ( hs -- n ) [ line>> strlen ] [ timestamp>> strlen ] bi + ; inline
 
 STRUCT: HISTORY_STATE
     { entries HIST_ENTRY** }

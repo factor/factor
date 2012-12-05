@@ -90,11 +90,11 @@ M: decoder stream-read-unsafe
         (read-first) [
             0 (store-read)
             1 (read-rest)
-        ] [ 4drop 0 ] if*
+        ] [ 2drop 2drop 0 ] if*
     ] if ; inline
 
-M: decoder stream-contents*
-    (stream-contents-by-element) ; inline
+M: decoder stream-contents
+    (stream-contents-by-element) ;
 
 : line-ends/eof ( stream str -- str ) f like swap cr- ; inline
 

@@ -310,7 +310,7 @@ PRIVATE>
 GENERIC: set-gpu-state* ( state -- )
 
 M: viewport-state set-gpu-state*
-    rect>> [ loc>> ] [ dim>> ] bi gl-viewport ;
+    rect>> [ loc>> first2 ] [ dim>> first2 ] bi glViewport ;
 
 M: triangle-cull-state set-gpu-state*
     {

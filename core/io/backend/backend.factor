@@ -19,7 +19,7 @@ HOOK: init-stdio io-backend ( -- )
     [ utf8 <encoder> output-stream set-global ]
     [ utf8 <encoder> error-stream set-global ] tri* ;
 
-HOOK: io-multiplex io-backend ( nanos -- )
+HOOK: io-multiplex io-backend ( us -- )
 
 HOOK: normalize-directory io-backend ( path -- path' )
 

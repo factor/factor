@@ -10,7 +10,7 @@ classes compiler.units generic.standard generic.single vocabs
 init kernel.private io.encodings accessors math.order
 destructors source-files parser classes.tuple.parser
 effects.parser lexer generic.parser strings.parser vocabs.loader
-vocabs.parser source-files.errors grouping ;
+vocabs.parser source-files.errors ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -219,8 +219,6 @@ M: slice-error summary
     drop "Cannot create slice" ;
 
 M: bounds-error summary drop "Sequence index out of bounds" ;
-
-M: groups-error summary drop "Non positive group size" ;
 
 M: condition error. error>> error. ;
 

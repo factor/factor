@@ -38,9 +38,7 @@ SYMBOL: header-bits
 <<
 : cell ( -- n ) OBJ-CELL-SIZE special-object ; foldable
 
-: (fixnum-bits) ( m -- n ) tag-bits get - ; foldable
-
-: (first-bignum) ( m -- n ) (fixnum-bits) 1 - 2^ ; foldable
+: (first-bignum) ( m -- n ) tag-bits get - 1 - 2^ ; foldable
 >>
 
 : cells ( m -- n ) cell * ; inline
@@ -55,9 +53,6 @@ SYMBOL: header-bits
 
 : first-bignum ( -- n )
     cell-bits (first-bignum) ; inline
-
-: fixnum-bits ( -- n )
-    cell-bits (fixnum-bits) ; inline
 
 : most-positive-fixnum ( -- n )
     first-bignum 1 - >fixnum ; inline

@@ -86,17 +86,13 @@ M: lambda-parser parse-quotation ( -- quotation )
     (parse-locals-definition) ; inline
 
 : (::) ( -- word def effect )
-    [
-        scan-new-word
-        [ parse-definition ]
-        parse-locals-definition
-    ] with-definition ;
+    scan-new-word
+    [ parse-definition ]
+    parse-locals-definition ;
 
 : (M::) ( -- word def )
+    scan-new-method
     [
-        scan-new-method
-        [
-            [ parse-definition ]
-            parse-locals-method-definition drop
-        ] with-method-definition
-    ] with-definition ;
+        [ parse-definition ]
+        parse-locals-method-definition drop
+    ] with-method-definition ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008, 2011 Doug Coleman.
+! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien arrays assocs classes
@@ -19,6 +19,7 @@ CONSTANT: manual-substitutions
         { rot [ [ swap ] dip swap ] }
         { rot [ swapd swap ] }
         { over [ dup swap ] }
+        { tuck [ dup -rot ] }
         { swapd [ [ swap ] dip ] }
         { 2nip [ nip nip ] }
         { 2drop [ drop drop ] }

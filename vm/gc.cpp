@@ -290,7 +290,6 @@ void factor_vm::primitive_compact_gc()
 		true /* trace contexts? */);
 }
 
-/* Allocates memory */
 /*
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!

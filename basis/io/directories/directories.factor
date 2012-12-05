@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit
-continuations destructors fry io io.backend io.encodings.binary
-io.files io.pathnames kernel namespaces sequences system vocabs ;
+USING: accessors arrays combinators combinators.short-circuit
+destructors fry io io.backend io.encodings.binary io.files
+io.files.types io.pathnames kernel namespaces sequences
+system vocabs vocabs.loader ;
 IN: io.directories
 
 : set-current-directory ( path -- )
@@ -53,9 +54,6 @@ HOOK: touch-file io-backend ( path -- )
 HOOK: delete-file io-backend ( path -- )
 
 HOOK: delete-directory io-backend ( path -- )
-
-: ?delete-file ( path -- )
-    '[ _ delete-file ] ignore-errors ;
 
 : to-directory ( from to -- from to' )
     over file-name append-path ;

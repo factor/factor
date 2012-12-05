@@ -57,7 +57,7 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
             swap {
                 { "version" [ >>version ] }
                 { "comment" [ >>comment ] }
-                { "expires" [ [ cookie-string>timestamp >>expires ] unless-empty ] }
+                { "expires" [ cookie-string>timestamp >>expires ] }
                 { "max-age" [ string>number seconds >>max-age ] }
                 { "domain" [ >>domain ] }
                 { "path" [ >>path ] }

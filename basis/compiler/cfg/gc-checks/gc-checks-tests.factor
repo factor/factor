@@ -103,7 +103,7 @@ V{
 
 [ ] [ 1 get instructions>> allocation-size 123 <alien> size assert= ] unit-test
 
-2 vreg-counter set-global
+2 \ vreg-counter set-global
 
 : gc-check? ( bb -- ? )
     instructions>>
@@ -119,11 +119,11 @@ V{
         T{ ##branch }
     } = ;
 
-4 vreg-counter set-global
+4 \ vreg-counter set-global
 
 [ t ] [ <gc-call> gc-call? ] unit-test
 
-30 vreg-counter set-global
+30 \ vreg-counter set-global
 
 V{
     T{ ##prologue }
@@ -290,7 +290,7 @@ V{
 0 1 edge
 1 2 edge
 
-2 vreg-counter set-global
+2 \ vreg-counter set-global
 
 [ ] [ test-gc-checks ] unit-test
 
@@ -326,7 +326,7 @@ V{
 0 1 edge
 1 2 edge
 
-2 vreg-counter set-global
+2 \ vreg-counter set-global
 
 [ ] [ test-gc-checks ] unit-test
 

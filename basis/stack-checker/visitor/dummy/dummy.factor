@@ -8,7 +8,7 @@ M: f #introduce, drop ;
 M: f #call, 3drop ;
 M: f #call-recursive, 3drop ;
 M: f #push, 2drop ;
-M: f #shuffle, 4drop drop ;
+M: f #shuffle, 2drop 2drop drop ;
 M: f #>r, 2drop ;
 M: f #r>, 2drop ;
 M: f #return, drop ;

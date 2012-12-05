@@ -499,7 +499,6 @@ editor "selection" f {
     } show-commands-menu ;
 
 editor "misc" f {
-    ! { T{ button-down f f 2 } paste-selection }
     { T{ button-down f f 3 } editor-menu }
 } define-command-map
 

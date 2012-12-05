@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors effects io.pathnames kernel math math.parser
-strings vocabs words ;
+USING: accessors math math.parser strings words vocabs
+kernel effects ;
 IN: present
 
 GENERIC: present ( object -- string )
@@ -17,5 +17,3 @@ M: vocab-spec present name>> ;
 M: effect present effect>string ;
 
 M: f present drop "" ;
-
-M: pathname present string>> ;

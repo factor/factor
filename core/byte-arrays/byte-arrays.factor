@@ -6,8 +6,8 @@ IN: byte-arrays
 
 M: byte-array clone (clone) ; inline
 M: byte-array length length>> ; inline
-M: byte-array nth-unsafe swap integer>fixnum alien-unsigned-1 ; inline
-M: byte-array set-nth-unsafe swap integer>fixnum set-alien-unsigned-1 ; inline
+M: byte-array nth-unsafe swap >fixnum alien-unsigned-1 ; inline
+M: byte-array set-nth-unsafe swap >fixnum set-alien-unsigned-1 ; inline
 : >byte-array ( seq -- byte-array ) B{ } clone-like ; inline
 M: byte-array new-sequence drop (byte-array) ; inline
 

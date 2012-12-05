@@ -9,7 +9,7 @@ SYMBOL: vreg-counter
 : next-vreg ( -- vreg )
     ! This word cannot be called AFTER representation selection has run;
     ! use next-vreg-rep in that case
-    vreg-counter counter ;
+    \ vreg-counter counter ;
 
 SYMBOL: representations
 

@@ -22,10 +22,10 @@ HELP: operation
 $nl
 "Operations have the following slots:"
 { $list
-    { { $snippet "predicate" } " - " { $quotation "( obj -- ? )" } }
+    { { $snippet "predicate" } " - a quotation with stack effect " { $snippet "( obj -- ? )" } }
     { { $snippet "command" } " - a " { $link word } }
-    { { $snippet "translator" } " - " { $quotation "( obj -- newobj )" } ", or " { $link f } }
-    { { $snippet "hook" } " - " { $quotation "( obj -- newobj )" } ", or " { $link f } }
+    { { $snippet "translator" } " - a quotation with stack effect " { $snippet "( obj -- newobj )" } ", or " { $link f } }
+    { { $snippet "hook" } " - a quotation with stack effect " { $snippet "( obj -- newobj )" } ", or " { $link f } }
     { { $snippet "listener?" } " - a boolean" }
 } } ;
 

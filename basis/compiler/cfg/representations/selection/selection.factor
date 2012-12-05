@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays combinators
-disjoint-sets fry kernel locals math math.functions
-namespaces sequences sets
+disjoint-sets fry kernel locals math namespaces sequences sets
 compiler.cfg
 compiler.cfg.instructions
 compiler.cfg.loop-detection
@@ -73,6 +72,8 @@ SYMBOL: costs
 : init-costs ( -- )
     ! Initialize cost as 0 for each possibility.
     possibilities get [ [ 0 ] H{ } map>assoc ] assoc-map costs set ;
+
+: 10^ ( n -- x ) 10 <repetition> product ;
 
 : increase-cost ( rep scc factor -- )
     ! Increase cost of keeping vreg in rep, making a choice of rep less

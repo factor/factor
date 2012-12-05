@@ -45,6 +45,7 @@ A          DEFINES-CLASS ${T}-array
 <A>        DEFINES <${A}>
 (A)        DEFINES (${A})
 <direct-A> DEFINES <direct-${A}>
+malloc-A   DEFINES malloc-${A}
 A{         DEFINES ${A}{
 A@         DEFINES ${A}@
 

@@ -7,7 +7,7 @@ combinators generalizations system alien.strings
 sequences splitting windows.errors fry
 continuations destructors calendar ascii
 combinators.short-circuit literals locals classes.struct
-specialized-arrays alien.data libc windows.shell32 ;
+specialized-arrays alien.data libc ;
 SPECIALIZED-ARRAY: ushort
 QUALIFIED: sequences
 IN: io.files.info.windows
@@ -96,31 +96,6 @@ M: windows file-info ( path -- info )
 M: windows link-info ( path -- info )
     file-info ;
 
-: file-executable-type ( path -- executable/f )
-    normalize-path dup
-    0
-    f
-    ! hi is zero means old style executable
-    0 SHGFI_EXETYPE SHGetFileInfoW
-    [
-        file-info drop f
-    ] [
-        nip >lo-hi first2 zero? [
-            {
-                { 0x5A4D [ +dos-executable+ ] }
-                { 0x4550 [ +win32-console-executable+ ] }
-                [ drop f ]
-            } case
-        ] [
-            {
-                { 0x454C [ +win32-vxd-executable+ ] }
-                { 0x454E [ +win32-os2-executable+ ] }
-                { 0x4550 [ +win32-nt-executable+ ] }
-                [ drop f ]
-            } case
-        ] if
-    ] if-zero ;
-
 CONSTANT: path-length $[ MAX_PATH 1 + ]
 
 : volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
@@ -207,12 +182,10 @@ CONSTANT: names-buf-length 16384
         [ { } ] [ [ alien>native-string ] map ] if-empty
     ] with-destructors ;
 
-! Can error with T{ windows-error f 21 "The device is not ready." }
-! if there is a D: that is not ready, for instance. Ignore these drives.
 M: windows file-systems ( -- array )
     find-volumes [ volume>paths ] map concat [
-        [ (file-system-info) ] [ 2drop f ] recover
-    ] map sift ;
+        (file-system-info)
+    ] map ;
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
@@ -239,7 +212,3 @@ M: windows file-systems ( -- array )
 
 : set-file-write-time ( path timestamp -- )
     [ f f ] dip set-file-times ;
-
-M: windows file-readable? file-info >boolean ;
-M: windows file-writable? file-info attributes>> +read-only+ swap member? not ;
-M: windows file-executable? file-executable-type windows-executable? ;

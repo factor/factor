@@ -116,6 +116,12 @@ HELP: find-primary-key
 { $description "Returns the rows from the SQL specs array that are part of the primary key. Composite primary keys are supported, so this word must return a sequence." }
 { $notes "This is a low-level word." } ;
 
+HELP: get-slot-named
+{ $values
+     { "name" "a slot name" } { "tuple" tuple }
+     { "value" "the value stored in the slot" } }
+{ $description "Returns the value stored in a tuple slot, where the tuple slot is a string." } ;
+
 HELP: no-sql-type
 { $values
      { "type" "a SQL type" } }
@@ -125,6 +131,12 @@ HELP: normalize-spec
 { $values
      { "spec" "a SQL spec" } }
 { $description "Normalizes a SQL spec." } ;
+
+HELP: offset-of-slot
+{ $values
+     { "string" string } { "tuple" tuple }
+     { "n" integer } }
+{ $description "Returns the offset of a tuple slot accessed by name." } ;
 
 HELP: primary-key?
 { $values

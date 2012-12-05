@@ -1,13 +1,8 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel windows.types
-math multiline classes.struct alien.data arrays ;
-QUALIFIED-WITH: alien.c-types c
+math multiline classes.struct ;
 IN: windows.kernel32
-
-: lo-word ( wparam -- lo ) c:short <ref> c:short deref ; inline
-: hi-word ( wparam -- hi ) -16 shift lo-word ; inline
-: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ; inline
 
 CONSTANT: MAX_PATH 260
 
@@ -792,23 +787,6 @@ CONSTANT: STATUS_CONTROL_C_EXIT             0xC000013A
 CONSTANT: STATUS_FLOAT_MULTIPLE_FAULTS      0xC00002B4
 CONSTANT: STATUS_FLOAT_MULTIPLE_TRAPS       0xC00002B5
 
-STRUCT: COORD
-{ X SHORT }
-{ Y SHORT } ;
-
-STRUCT: SMALL_RECT
-{ Left SHORT }
-{ Top SHORT }
-{ Right SHORT }
-{ Bottom SHORT } ;
-
-STRUCT: CONSOLE_SCREEN_BUFFER_INFO
-{ dwSize COORD }
-{ dwCursorPosition COORD }
-{ wAttributes WORD }
-{ srWindow SMALL_RECT }
-{ dwMaximumWindowSize COORD } ;
-
 ! Resource IDs
 : MAKEINTRESOURCE ( int -- resource ) 0xffff bitand <alien> ; inline
 
@@ -1250,7 +1228,7 @@ ALIAS: GetComputerNameEx GetComputerNameExW
 ! FUNCTION: GetConsoleNlsMode
 ! FUNCTION: GetConsoleOutputCP
 ! FUNCTION: GetConsoleProcessList
-FUNCTION: BOOL GetConsoleScreenBufferInfo ( HANDLE hConsoleOutput, CONSOLE_SCREEN_BUFFER_INFO* lpConsoleScreenBufferInfo ) ;
+! FUNCTION: GetConsoleScreenBufferInfo
 ! FUNCTION: GetConsoleSelectionInfo
 FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
 ALIAS: GetConsoleTitle GetConsoleTitleW
@@ -1495,13 +1473,13 @@ FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
 ! FUNCTION: Heap32ListFirst
 ! FUNCTION: Heap32ListNext
 ! FUNCTION: Heap32Next
-FUNCTION: LPVOID HeapAlloc ( HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes ) ;
+! FUNCTION: HeapAlloc
 ! FUNCTION: HeapCompact
 ! FUNCTION: HeapCreate
 ! FUNCTION: HeapCreateTagsW
 ! FUNCTION: HeapDestroy
 ! FUNCTION: HeapExtend
-FUNCTION: BOOL HeapFree ( HANDLE hHeap, DWORD dwFlags, LPVOID lpMem ) ;
+! FUNCTION: HeapFree
 ! FUNCTION: HeapLock
 ! FUNCTION: HeapQueryInformation
 ! FUNCTION: HeapQueryTagW

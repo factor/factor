@@ -1,18 +1,14 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays combinators io io.backend
-io.directories io.encodings.binary io.files io.files.links
-io.pathnames io.streams.byte-array io.streams.string kernel
-math math.parser namespaces sequences strings summary ;
+USING: combinators io io.files io.files.links io.directories
+io.pathnames io.streams.string kernel math math.parser
+continuations namespaces pack prettyprint sequences strings
+system tools.hexdump io.encodings.binary summary accessors
+io.backend byte-arrays io.streams.byte-array splitting ;
 IN: tar
 
 CONSTANT: zero-checksum 256
 CONSTANT: block-size 512
-
-SYMBOL: to-link
-
-: save-link ( link -- )
-    to-link get push ;
 
 TUPLE: tar-header name mode uid gid size mtime checksum typeflag
 linkname magic version uname gname devmajor devminor prefix ;
@@ -89,21 +85,19 @@ M: unknown-typeflag summary ( obj -- str )
 
 ! Normal file
 : typeflag-0 ( header -- )
-    dup name>> prepend-current-directory read/write-blocks ;
+    dup name>> dup "global_pax_header" = [
+        drop [ read-data-blocks ] with-string-writer drop
+    ] [
+        prepend-current-directory read/write-blocks
+    ] if ;
 
-TUPLE: hard-link linkname name ;
-C: <hard-link> hard-link
-
-TUPLE: symbolic-link linkname name ;
-C: <symbolic-link> symbolic-link
-
-! Hard link, don't call normalize-path
+! Hard link
 : typeflag-1 ( header -- )
-    [ linkname>> ] [ name>> ] bi <hard-link> save-link ;
+    [ name>> ] [ linkname>> ] bi make-hard-link ;
 
-! Symlink, don't call normalize-path
+! Symlink
 : typeflag-2 ( header -- )
-    [ linkname>> ] [ name>> ] bi <symbolic-link> save-link ;
+    [ name>> ] [ linkname>> ] bi make-link ;
 
 ! character special
 : typeflag-3 ( header -- ) unknown-typeflag ;
@@ -128,10 +122,7 @@ C: <symbolic-link> symbolic-link
 : typeflag-9 ( header -- ) unknown-typeflag ;
 
 ! Global POSIX header
-: typeflag-g ( header -- )
-    ! Read something like: 52 comment=9f2a940965286754f3a34d5737c3097c05db8725
-    ! and drop it
-    [ read-data-blocks ] with-string-writer drop ;
+: typeflag-g ( header -- ) typeflag-0 ;
 
 ! Extended POSIX header
 : typeflag-x ( header -- ) unknown-typeflag ;
@@ -207,26 +198,7 @@ C: <symbolic-link> symbolic-link
         drop
     ] if ;
 
-GENERIC: do-link ( object -- )
-
-M: hard-link do-link
-    [ linkname>> ]
-    [ name>> prepend-current-directory ] bi make-hard-link ;
-
-M: symbolic-link do-link
-    [ linkname>> ]
-    [ name>> prepend-current-directory ] bi make-link ;
-
-! FIXME: linux tar calls unlinkat and makelinkat
-: make-links ( -- )
-    to-link get [
-        [ name>> ?delete-file ] [ do-link ] bi
-    ] each ;
-
 : untar ( path -- )
     normalize-path dup parent-directory [
-        V{ } clone to-link [
-            binary [ parse-tar ] with-file-reader
-            make-links
-        ] with-variable
+         binary [ parse-tar ] with-file-reader
     ] with-directory ;

@@ -17,71 +17,71 @@ unmatchable-class terminator-class word-boundary-class ;
 SINGLETONS: beginning-of-input ^ end-of-input $ end-of-file
 ^unix $unix word-break ;
 
-TUPLE: range-class { from read-only } { to read-only } ;
+TUPLE: range-class from to ;
 C: <range-class> range-class
 
-TUPLE: primitive-class { class read-only } ;
+TUPLE: primitive-class class ;
 C: <primitive-class> primitive-class
 
-TUPLE: category-class { category read-only } ;
+TUPLE: category-class category ;
 C: <category-class> category-class
 
-TUPLE: category-range-class { category read-only } ;
+TUPLE: category-range-class category ;
 C: <category-range-class> category-range-class
 
-TUPLE: script-class { script read-only } ;
+TUPLE: script-class script ;
 C: <script-class> script-class
 
 GENERIC: class-member? ( obj class -- ? )
 
-M: t class-member? ( obj class -- ? ) 2drop t ; inline
+M: t class-member? ( obj class -- ? ) 2drop t ;
 
-M: integer class-member? ( obj class -- ? ) = ; inline
+M: integer class-member? ( obj class -- ? ) = ;
 
 M: range-class class-member? ( obj class -- ? )
-    [ from>> ] [ to>> ] bi between? ; inline
+    [ from>> ] [ to>> ] bi between? ;
 
 M: letter-class class-member? ( obj class -- ? )
-    drop letter? ; inline
-
+    drop letter? ;
+            
 M: LETTER-class class-member? ( obj class -- ? )
-    drop LETTER? ; inline
+    drop LETTER? ;
 
 M: Letter-class class-member? ( obj class -- ? )
-    drop Letter? ; inline
+    drop Letter? ;
 
 M: ascii-class class-member? ( obj class -- ? )
-    drop ascii? ; inline
+    drop ascii? ;
 
 M: digit-class class-member? ( obj class -- ? )
-    drop digit? ; inline
+    drop digit? ;
 
 : c-identifier-char? ( ch -- ? )
     { [ alpha? ] [ CHAR: _ = ] } 1|| ;
 
 M: c-identifier-class class-member? ( obj class -- ? )
-    drop c-identifier-char? ; inline
+    drop c-identifier-char? ;
 
 M: alpha-class class-member? ( obj class -- ? )
-    drop alpha? ; inline
+    drop alpha? ;
 
 : punct? ( ch -- ? )
     "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" member? ;
 
 M: punctuation-class class-member? ( obj class -- ? )
-    drop punct? ; inline
+    drop punct? ;
 
 : java-printable? ( ch -- ? )
     { [ alpha? ] [ punct? ] } 1|| ;
 
 M: java-printable-class class-member? ( obj class -- ? )
-    drop java-printable? ; inline
+    drop java-printable? ;
 
 M: non-newline-blank-class class-member? ( obj class -- ? )
-    drop { [ blank? ] [ CHAR: \n = not ] } 1&& ; inline
+    drop { [ blank? ] [ CHAR: \n = not ] } 1&& ;
 
 M: control-character-class class-member? ( obj class -- ? )
-    drop control? ; inline
+    drop control? ;
 
 : hex-digit? ( ch -- ? )
     {
@@ -91,7 +91,7 @@ M: control-character-class class-member? ( obj class -- ? )
     } 1|| ;
 
 M: hex-digit-class class-member? ( obj class -- ? )
-    drop hex-digit? ; inline
+    drop hex-digit? ;
 
 : java-blank? ( ch -- ? )
     {
@@ -100,29 +100,29 @@ M: hex-digit-class class-member? ( obj class -- ? )
     } member? ;
 
 M: java-blank-class class-member? ( obj class -- ? )
-    drop java-blank? ; inline
+    drop java-blank? ;
 
 M: unmatchable-class class-member? ( obj class -- ? )
-    2drop f ; inline
+    2drop f ;
 
 M: terminator-class class-member? ( obj class -- ? )
-    drop "\r\n\u000085\u002029\u002028" member? ; inline
+    drop "\r\n\u000085\u002029\u002028" member? ;
 
-M: f class-member? 2drop f ; inline
+M: f class-member? 2drop f ;
 
 : same? ( obj1 obj2 quot1: ( obj1 -- val1 ) quot2: ( obj2 -- val2 ) -- ? )
     bi* = ; inline
 
 M: script-class class-member?
-    [ script-of ] [ script>> ] same? ; inline
+    [ script-of ] [ script>> ] same? ;
 
 M: category-class class-member?
-    [ category ] [ category>> ] same? ; inline
+    [ category ] [ category>> ] same? ;
 
-M: category-range-class class-member? inline
-    [ category first ] [ category>> ] same? ; inline
+M: category-range-class class-member?
+    [ category first ] [ category>> ] same? ;
 
-TUPLE: not-class { class read-only } ;
+TUPLE: not-class class ;
 
 PREDICATE: not-integer < not-class class>> integer? ;
 
@@ -131,17 +131,17 @@ UNION: simple-class
 PREDICATE: not-simple < not-class class>> simple-class? ;
 
 M: not-class class-member?
-    class>> class-member? not ; inline
+    class>> class-member? not ;
 
-TUPLE: or-class { seq read-only } ;
+TUPLE: or-class seq ;
 
 M: or-class class-member?
-    seq>> [ class-member? ] with any? ; inline
+    seq>> [ class-member? ] with any? ;
 
-TUPLE: and-class { seq read-only } ;
+TUPLE: and-class seq ;
 
 M: and-class class-member?
-    seq>> [ class-member? ] with all? ; inline
+    seq>> [ class-member? ] with all? ;
 
 DEFER: substitute
 
@@ -152,7 +152,7 @@ DEFER: substitute
     seq length {
         { 0 [ empty ] }
         { 1 [ seq first ] }
-        [ drop seq { } like class boa ]
+        [ drop class new seq { } like >>seq ]
     } case ; inline
 
 TUPLE: class-partition integers not-integers simples not-simples and or other ;
@@ -168,15 +168,17 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     class-partition boa ;
 
 : class-partition>sequence ( class-partition -- seq )
-    {
-        [ integers>> ]
-        [ not-integers>> ]
-        [ simples>> ]
-        [ not-simples>> ]
-        [ and>> ]
-        [ or>> ]
-        [ other>> ]
-    } cleave>array concat ;
+    [
+        {
+            [ integers>> ]
+            [ not-integers>> ]
+            [ simples>> ]
+            [ not-simples>> ]
+            [ and>> ]
+            [ or>> ]
+            [ other>> ]
+        } cleave
+    ] output>array concat ;
 
 : repartition ( partition -- partition' )
     ! This could be made more efficient; only and and or are effected
@@ -271,7 +273,7 @@ M: f <not-class> drop t ;
     2array [ <or-class> ] [ <and-class> ] bi <minus-class> ;
 
 M: primitive-class class-member?
-    class>> class-member? ; inline
+    class>> class-member? ;
 
 TUPLE: condition question yes no ;
 C: <condition> condition
@@ -298,7 +300,8 @@ M: object substitute answer ;
 M: not-class substitute [ <not-class> ] bi@ answer ;
 
 : assoc-answer ( table question answer -- new-table )
-    '[ _ _ substitute ] assoc-map sift-values ;
+    '[ _ _ substitute ] assoc-map
+    [ nip ] assoc-filter ;
 
 : assoc-answers ( table questions answer -- new-table )
     '[ _ assoc-answer ] each ;

@@ -39,8 +39,7 @@ IN: compiler.tree.modular-arithmetic
 ! is a modular arithmetic word, then the input can be converted into
 ! a form that is cheaper to compute.
 {
-    >fixnum bignum>fixnum integer>fixnum integer>fixnum-strict
-    float>fixnum
+    >fixnum bignum>fixnum integer>fixnum float>fixnum
     set-alien-unsigned-1 set-alien-signed-1
     set-alien-unsigned-2 set-alien-signed-2
 }
@@ -182,10 +181,7 @@ MEMO: fixnum-coercion ( flags -- nodes )
     ] when ;
 
 : like->fixnum? ( #call -- ? )
-    word>> {
-        >fixnum bignum>fixnum float>fixnum
-        integer>fixnum integer>fixnum-strict
-    } member-eq? ;
+    word>> { >fixnum bignum>fixnum float>fixnum integer>fixnum } member-eq? ;
 
 : like->integer? ( #call -- ? )
     word>> { >integer >bignum fixnum>bignum } member-eq? ;

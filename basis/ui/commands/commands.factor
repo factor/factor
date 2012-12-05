@@ -36,7 +36,7 @@ GENERIC: command-word ( command -- word )
     commands values [
         [
             commands>>
-            sift-keys
+            [ drop ] assoc-filter
             [ '[ _ invoke-command ] swap ,, ] assoc-each
         ] each
     ] H{ } make ;

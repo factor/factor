@@ -62,23 +62,21 @@ IN: stack-checker.known-words
     } cond ;
 
 {
-    { drop  ( x       --                 ) }
-    { 2drop ( x y     --                 ) }
-    { 3drop ( x y z   --                 ) }
-    { 4drop ( w x y z --                 ) }
-    { dup   ( x       -- x x             ) }
-    { 2dup  ( x y     -- x y x y         ) }
-    { 3dup  ( x y z   -- x y z x y z     ) }
-    { 4dup  ( w x y z -- w x y z w x y z ) }
-    { rot   ( x y z   -- y z x           ) }
-    { -rot  ( x y z   -- z x y           ) }
-    { dupd  ( x y     -- x x y           ) }
-    { swapd ( x y z   -- y x z           ) }
-    { nip   ( x y     -- y               ) }
-    { 2nip  ( x y z   -- z               ) }
-    { over  ( x y     -- x y x           ) }
-    { pick  ( x y z   -- x y z x         ) }
-    { swap  ( x y     -- y x             ) }
+    { drop  ( x     --             ) }
+    { 2drop ( x y   --             ) }
+    { 3drop ( x y z --             ) }
+    { dup   ( x     -- x x         ) }
+    { 2dup  ( x y   -- x y x y     ) }
+    { 3dup  ( x y z -- x y z x y z ) }
+    { rot   ( x y z -- y z x       ) }
+    { -rot  ( x y z -- z x y       ) }
+    { dupd  ( x y   -- x x y       ) }
+    { swapd ( x y z -- y x z       ) }
+    { nip   ( x y   -- y           ) }
+    { 2nip  ( x y z -- z           ) }
+    { over  ( x y   -- x y x       ) }
+    { pick  ( x y z -- x y z x     ) }
+    { swap  ( x y   -- y x         ) }
 } [ "shuffle" set-word-prop ] assoc-each
 
 : check-declaration ( declaration -- declaration )
@@ -247,25 +245,26 @@ M: object infer-call* \ call bad-macro-input ;
 \ alien-callback [ infer-alien-callback ] "special" set-word-prop
 
 {
-    c-to-factor
     do-primitive
-    mega-cache-lookup
     mega-cache-miss
+    mega-cache-lookup
     inline-cache-miss
     inline-cache-miss-tail
-    lazy-jit-compile
-    set-callstack
+    unwind-native-frames
     set-datastack
+    set-callstack
     set-retainstack
     unwind-native-frames
+    lazy-jit-compile
+    c-to-factor
 } [ dup '[ _ do-not-compile ] "special" set-word-prop ] each
 
 {
     declare call (call) dip 2dip 3dip curry compose
-    execute (execute) call-effect-unsafe execute-effect-unsafe
-    if dispatch <tuple-boa> do-primitive
-    load-local load-locals get-local drop-locals
-    alien-invoke alien-indirect alien-callback alien-assembly
+    execute (execute) call-effect-unsafe execute-effect-unsafe if
+    dispatch <tuple-boa> load-local load-locals get-local
+    drop-locals do-primitive alien-invoke alien-indirect
+    alien-callback
 } [ t "no-compile" set-word-prop ] each
 
 ! Exceptions to the above

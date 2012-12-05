@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.smart kernel math
-sequences stack-checker tools.test locals ;
+USING: accessors arrays combinators.smart kernel math
+stack-checker tools.test locals ;
 IN: combinators.smart.tests
 
 : test-bi ( -- 9 11 )
@@ -86,40 +86,3 @@ IN: combinators.smart.tests
 [ ( x x -- x ) ] [ [ curry inputs ] infer ] unit-test
 
 [ ( x -- x ) ] [ [ [ curry ] curry inputs ] infer ] unit-test
-
-{ 1 1 1 } [ 1 3 [ ] smart-with times ] unit-test
-{ "BCD" } [ 1 "ABC" [ + ] smart-with map ] unit-test
-{ H{ { 1 2 } } } [ 1 H{ { 1 2 } { 3 4 } } [ drop = ] smart-with assoc-filter ] unit-test
-
-: test-cleave>sequence ( obj -- seq )  { [ 1 + ] [ sq ] [ 1 - ] } V{ } cleave>sequence ;
-\ test-cleave>sequence def>> must-infer
-
-{ V{ 34 1089 32 } } [ 33 test-cleave>sequence ] unit-test
-
-{ 60 6000 } [
-    { 10 20 30 } {
-        { 0 [ + ] }
-        { 1 [ * ] }
-    } smart-reduce
-] unit-test
-
-{ 1400 60 } [
-    { 10 20 30 } {
-        { [ sq ] [ + ] }
-        { [ ] [ + ] }
-    } smart-map-reduce
-] unit-test
-
-{ 0 12 } [
-    { 1 2 3 } dup {
-        { 0 [ - + ] }
-        { 0 [ + + ] }
-    } smart-2reduce
-] unit-test
-
-{ 36 12 } [
-    { 1 2 3 } dup {
-        { [ * ] [ * ] }
-        { [ + ] [ + ] }
-    } smart-2map-reduce
-] unit-test

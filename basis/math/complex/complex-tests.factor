@@ -1,6 +1,5 @@
 USING: kernel math math.constants math.functions math.order
-tools.test prettyprint prettyprint.config namespaces eval
-accessors ;
+tools.test prettyprint prettyprint.config namespaces ;
 IN: math.complex.tests
 
 [ 1 C{ 0 1 } rect> ] must-fail
@@ -16,8 +15,6 @@ IN: math.complex.tests
 [ f ] [ C{ 1.0 2.3 } C{ 1 2 } number= ] unit-test
 
 [ C{ 2 5 } ] [ 2 5  rect> ] unit-test
-{ 2 } [ 2 0  rect> ] unit-test
-{ C{ 2 0.0 } } [ 2 0.0  rect> ] unit-test
 [ 2 5 ] [ C{ 2 5 }  >rect ] unit-test
 [ C{ 1/2 1 } ] [ 1/2 C{ 0 1 }  + ] unit-test
 [ C{ 1/2 1 } ] [ C{ 0 1 } 1/2  + ] unit-test
@@ -79,6 +76,3 @@ IN: math.complex.tests
 10 number-base [
     [ "C{ 1/2 2/3 }" ] [ C{ 1/2 2/3 } unparse ] unit-test
 ] with-variable
-
-[ "C{ 1 2 3 }" eval( -- obj ) ]
-[ error>> T{ malformed-complex f V{ 1 2 3 } } = ] must-fail-with

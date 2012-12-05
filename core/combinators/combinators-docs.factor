@@ -24,7 +24,6 @@ $nl
     cleave
     2cleave
     3cleave
-    4cleave
 }
 "Cleave combinators provide a more readable alternative to repeated applications of the " { $link keep } " combinators. The following example using " { $link keep } ":"
 { $code

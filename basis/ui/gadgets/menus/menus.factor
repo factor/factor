@@ -9,7 +9,7 @@ math math.order sorting ;
 IN: ui.gadgets.menus
 
 : show-menu ( owner menu -- )
-    [ find-world ] dip hand-loc get-global { 0 0 } <rect> show-glass ;
+    [ find-world ] dip hand-loc get { 0 0 } <rect> show-glass ;
 
 GENERIC: <menu-item> ( target hook command -- button )
 

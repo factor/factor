@@ -96,7 +96,7 @@ M: windows (broadcast) ( datagram -- datagram )
     int <ref> malloc-byte-array ; inline
 
 M: windows WSASocket-flags ( -- DWORD )
-    WSA_FLAG_OVERLAPPED ; inline
+    WSA_FLAG_OVERLAPPED ;
 
 : get-ConnectEx-ptr ( socket -- void* )
     SIO_GET_EXTENSION_FUNCTION_POINTER

@@ -32,12 +32,12 @@ M: gadget hashcode* nip identity-hashcode ;
 
 M: gadget model-changed 2drop ;
 
-: gadget-child ( gadget -- child ) children>> first ; inline
+: gadget-child ( gadget -- child ) children>> first ;
 
-: nth-gadget ( n gadget -- child ) children>> nth ; inline
+: nth-gadget ( n gadget -- child ) children>> nth ;
 
 : <gadget> ( -- gadget )
-    gadget new ; inline
+    gadget new ;
 
 : control-value ( control -- value )
     model>> value>> ;
@@ -87,11 +87,9 @@ M: gadget contains-point? ( loc gadget -- ? )
     [ contains-point? ] with find-last nip
     [ [ loc>> v- ] [ pick-up ] bi ] [ nip ] ?if ;
 
-: max-dims ( seq -- dim )
-    [ 0 0 ] dip [ first2 swapd [ max ] 2bi@ ] each 2array ;
+: max-dims ( dims -- dim ) { 0 0 } [ vmax ] reduce ;
 
-: sum-dims ( seq -- dim )
-    [ 0 0 ] dip [ first2 swapd [ + ] 2bi@ ] each 2array ;
+: sum-dims ( seq -- dim ) { 0 0 } [ v+ ] reduce ;
 
 : each-child ( gadget quot -- )
     [ children>> ] dip each ; inline
@@ -162,7 +160,7 @@ PRIVATE>
     [ drop ] [ dup invalidate layout-later ] if ;
 
 : show-gadget ( gadget -- ) t >>visible? drop ;
-
+                              
 : hide-gadget ( gadget -- ) f >>visible? drop ;
 
 <PRIVATE
@@ -189,7 +187,7 @@ GENERIC: pref-dim* ( gadget -- dim )
         [ drop ] [ dupd pref-dim<< ] if
     ] ?if ;
 
-: pref-dims ( gadgets -- seq ) [ pref-dim ] map ; inline
+: pref-dims ( gadgets -- seq ) [ pref-dim ] map ;
 
 M: gadget pref-dim* dim>> ;
 

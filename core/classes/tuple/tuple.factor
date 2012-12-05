@@ -16,24 +16,6 @@ ERROR: not-a-tuple object ;
 : all-slots ( class -- slots )
     superclasses [ "slots" word-prop ] map concat ;
 
-ERROR: no-slot name tuple ;
-
-: offset-of-slot ( name tuple -- n )
-    2dup class-of all-slots slot-named
-    [ 2nip offset>> ] [ no-slot ] if* ;
-
-: get-slot-named ( name tuple -- value )
-    [ nip ] [ offset-of-slot ] 2bi slot ;
-
-: set-slot-named ( value name tuple -- )
-    [ nip ] [ offset-of-slot ] 2bi set-slot ;
-
-: set-slots ( assoc tuple -- )
-    [ swapd set-slot-named ] curry assoc-each ; inline
-
-: from-slots ( assoc class -- tuple )
-    new [ set-slots ] keep ; inline
-
 PREDICATE: immutable-tuple-class < tuple-class
     all-slots [ read-only>> ] all? ;
 

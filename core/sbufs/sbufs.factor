@@ -11,15 +11,12 @@ TUPLE: sbuf
 : <sbuf> ( n -- sbuf ) 0 <string> 0 sbuf boa ; inline
 
 M: sbuf set-nth-unsafe
-    [ integer>fixnum ] [ integer>fixnum ] [ underlying>> ] tri*
-    set-string-nth ; inline
+    [ >fixnum ] [ >fixnum ] [ underlying>> ] tri* set-string-nth ; inline
 
 M: sbuf new-sequence
-    drop [ 0 <string> ] [ integer>fixnum ] bi sbuf boa ; inline
+    drop [ 0 <string> ] [ >fixnum ] bi sbuf boa ; inline
 
 : >sbuf ( seq -- sbuf ) SBUF" " clone-like ; inline
-
-M: sbuf contract 2drop ; inline
 
 M: sbuf like
     drop dup sbuf? [

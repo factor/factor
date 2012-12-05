@@ -596,6 +596,3 @@ PRIVATE>
 
 : make-images ( -- )
     images [ make-image ] each ;
-
-: make-my-image ( -- )
-    my-arch make-image ;

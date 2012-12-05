@@ -49,7 +49,7 @@ SINGLETON: pgm-image
     data                                               >>bitmap
     wide [ ushort-components ] [ ubyte-components ] if >>component-type ;
 
-M: pgm-image stream>image*
+M: pgm-image stream>image
     drop [ [ read-pgm ] throw-on-eof ] with-input-stream ;
 
 M: pgm-image image>stream

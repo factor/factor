@@ -37,9 +37,9 @@ $nl
 { $code "'[ 2 _ + ]" } ;
 
 ARTICLE: "namespaces-make" "Making sequences with variables"
-"The " { $vocab-link "make" } " vocabulary implements a facility for constructing " { $link sequence } "s and " { $link assoc } "s by holding a collector object in a variable. Storing the collector object in a variable rather than the stack may allow code to be written with less stack manipulation."
+"The " { $vocab-link "make" } " vocabulary implements a facility for constructing sequences by holding a collector sequence in a variable. Storing the collector sequence in a variable rather than the stack may allow code to be written with less stack manipulation."
 $nl
-"Object construction is wrapped in a combinator:"
+"Sequence construction is wrapped in a combinator:"
 { $subsections make }
 "Inside the quotation passed to " { $link make } ", several words accumulate values:"
 { $subsections
@@ -47,12 +47,7 @@ $nl
     %
     #
 }
-"When making an " { $link assoc } ", you can use these words to add key/value pairs:"
-{ $subsections
-    ,,
-    %%
-}
-"The collector object can be accessed directly from inside a " { $link make } ":"
+"The collector sequence can be accessed directly from inside a " { $link make } ":"
 { $subsections building }
 { $example
   "USING: make math.parser ;"
@@ -64,15 +59,12 @@ $nl
 ABOUT: "namespaces-make"
 
 HELP: building
-{ $var-description "Temporary mutable growable sequence (or assoc) holding elements accumulated so far by " { $link make } "." } ;
+{ $var-description "Temporary mutable growable sequence holding elements accumulated so far by " { $link make } "." } ;
 
 HELP: make
 { $values { "quot" quotation } { "exemplar" sequence } { "seq" "a new sequence" } }
-{ $description "Calls the quotation in a new dynamic scope with the " { $link building } " variable bound to a new resizable mutable sequence. The quotation and any words it calls can execute the " { $link , } " and " { $link % } " words to accumulate elements into a sequence (or " { $link ,, } " and " { $link %% } " into an assoc). When the quotation returns, all accumulated elements are collected into an object with the same type as " { $snippet "exemplar" } "." }
-{ $examples
-    { $example "USING: make prettyprint ;" "[ 1 , 2 , 3 , ] { } make ." "{ 1 2 3 }" }
-    { $example "USING: make prettyprint ;" "[ 2 1 ,, 4 3 ,, ] H{ } make ." "H{ { 1 2 } { 3 4 } }" }
-} ;
+{ $description "Calls the quotation in a new dynamic scope with the " { $link building } " variable bound to a new resizable mutable sequence. The quotation and any words it calls can execute the " { $link , } " and " { $link % } " words to accumulate elements. When the quotation returns, all accumulated elements are collected into a sequence with the same type as " { $snippet "exemplar" } "." }
+{ $examples { $example "USING: make prettyprint ;" "[ 1 , 2 , 3 , ] { } make ." "{ 1 2 3 }" } } ;
 
 HELP: ,
 { $values { "elt" object } }

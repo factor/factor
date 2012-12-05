@@ -2,8 +2,7 @@ USING: definitions kernel locals.definitions see see.private typed
 words summary make accessors classes prettyprint ;
 IN: typed.prettyprint
 
-PREDICATE: typed-lambda-word < lambda-word
-    "typed-word" word-prop >boolean ;
+PREDICATE: typed-lambda-word < lambda-word "typed-word" word-prop ;
 
 M: typed-word definer drop \ TYPED: \ ; ;
 M: typed-lambda-word definer drop \ TYPED:: \ ; ;

@@ -7,7 +7,7 @@ sequences ;
 IN: benchmark.udp-echo0
 
 : send/recv ( packet server client -- )
-    [ 2dup addr>> ] [ send ] bi* receive drop assert= ;
+    [ over over addr>> ] [ send ] bi* receive drop assert= ;
 
 : udp-echo ( #times #bytes -- )
     '[

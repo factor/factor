@@ -1,19 +1,18 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators locals io.directories
+USING: arrays combinators locals io.directories
 io.directories.hierarchy io.files io.launcher io.pathnames
 kernel make mason.common mason.config mason.platform namespaces
-prettyprint sequences system words ;
+prettyprint sequences system ;
 IN: mason.release.archive
 
 : base-name ( -- string )
     [ "factor-" % platform % "-" % stamp get % ] "" make ;
 
 : extension ( os -- extension )
-    dup word? [ name>> ] when
     {
-        { "windows" [ ".zip" ] }
-        { "macosx" [ ".dmg" ] }
+        { windows [ ".zip" ] }
+        { macosx [ ".dmg" ] }
         [ drop ".tar.gz" ]
     } case ;
 

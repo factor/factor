@@ -125,7 +125,6 @@ void callback_heap::update()
 	each_callback(updater);
 }
 
-/* Allocates memory */
 void factor_vm::primitive_callback()
 {
 	cell return_rewind = to_cell(ctx->pop());

@@ -158,14 +158,14 @@ CONSTANT: wNumeric 11
 CONSTANT: wExtendNumLet 12
 CONSTANT: words 13
 
-! Is there a way to avoid this?
-CONSTANT: word-break-classes H{
-    { "Other" 0 } { "CR" 1 } { "LF" 2 } { "Newline" 3 }
-    { "Extend" 4 } { "Format" 5 } { "Katakana" 6 }
-    { "ALetter" 7 } { "MidLetter" 8 }
-    { "MidNum" 9 } { "MidNumLet" 10 } { "Numeric" 11 }
-    { "ExtendNumLet" 12 }
-}
+: word-break-classes ( -- table ) ! Is there a way to avoid this?
+    H{
+        { "Other" 0 } { "CR" 1 } { "LF" 2 } { "Newline" 3 }
+        { "Extend" 4 } { "Format" 5 } { "Katakana" 6 }
+        { "ALetter" 7 } { "MidLetter" 8 }
+        { "MidNum" 9 } { "MidNumLet" 10 } { "Numeric" 11 }
+        { "ExtendNumLet" 12 }
+    } ;
 
 : word-break-prop ( char -- word-break-prop )
     word-break-table get-global interval-at
@@ -246,15 +246,15 @@ word-table set-global
     new-class (format/extended?)
     [ old-class dup ${ wCR wLF wNewline } member? ] [
         new-class old-class over word-table-nth
-        [ str i 1 - ] dip word-break?
+        [ str i ] dip word-break?
     ] if ;
 
 PRIVATE>
 
- : first-word ( str -- i )
-    [ [ length ] [ first word-break-prop ] bi ] keep
-    1 swap dup '[ _ word-break-next ] find-index-from
-    drop nip swap or ;
+: first-word ( str -- i )
+    [ unclip-slice word-break-prop over ] keep
+    '[ _ word-break-next ] find-index drop
+    nip swap length or 1 + ;
 
 : >words ( str -- words )
     [ first-word ] >pieces ;

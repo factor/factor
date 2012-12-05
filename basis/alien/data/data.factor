@@ -84,9 +84,6 @@ M: bad-byte-array-length summary
 : malloc-array ( n c-type -- array )
     [ heap-size calloc ] [ <c-direct-array> ] 2bi ; inline
 
-: malloc-like ( seq c-type -- malloc )
-    [ dup length ] dip malloc-array [ 0 swap copy ] keep ;
-
 : malloc-byte-array ( byte-array -- alien )
     binary-object [ nip malloc dup ] 2keep memcpy ;
 

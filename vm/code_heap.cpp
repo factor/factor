@@ -260,7 +260,6 @@ code_heap_room factor_vm::code_room()
 	return room;
 }
 
-/* Allocates memory */
 void factor_vm::primitive_code_room()
 {
 	code_heap_room room = code_room();

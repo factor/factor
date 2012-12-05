@@ -13,38 +13,32 @@ void factor_vm::primitive_float_to_fixnum()
 	ctx->replace(tag_fixnum(float_to_fixnum(ctx->peek())));
 }
 
-/* does not allocate, even though from_signed_cell can allocate */
 /* Division can only overflow when we are dividing the most negative fixnum
 by -1. */
 void factor_vm::primitive_fixnum_divint()
 {
-	fixnum y = untag_fixnum(ctx->pop());
+	fixnum y = untag_fixnum(ctx->pop()); \
 	fixnum x = untag_fixnum(ctx->peek());
 	fixnum result = x / y;
 	if(result == -fixnum_min)
-		/* Does not allocate */
 		ctx->replace(from_signed_cell(-fixnum_min));
 	else
 		ctx->replace(tag_fixnum(result));
 }
 
-/* does not allocate, even though from_signed_cell can allocate */
 void factor_vm::primitive_fixnum_divmod()
 {
-	cell *s0 = (cell *)(ctx->datastack);
-	cell *s1 = (cell *)(ctx->datastack - sizeof(cell));
-	fixnum y = untag_fixnum(*s0);
-	fixnum x = untag_fixnum(*s1);
-	if(y == -1 && x == fixnum_min)
+	cell y = ((cell *)ctx->datastack)[0];
+	cell x = ((cell *)ctx->datastack)[-1];
+	if(y == tag_fixnum(-1) && x == tag_fixnum(fixnum_min))
 	{
-		/* Does not allocate */
-		*s1 = from_signed_cell(-fixnum_min);
-		*s0 = tag_fixnum(0);
+		((cell *)ctx->datastack)[-1] = from_signed_cell(-fixnum_min);
+		((cell *)ctx->datastack)[0] = tag_fixnum(0);
 	}
 	else
 	{
-		*s1 = tag_fixnum(x / y);
-		*s0 = tag_fixnum(x % y);
+		((cell *)ctx->datastack)[-1] = tag_fixnum(untag_fixnum(x) / untag_fixnum(y));
+		((cell *)ctx->datastack)[0] = (fixnum)x % (fixnum)y;
 	}
 }
 
@@ -225,13 +219,11 @@ void factor_vm::primitive_bignum_log2()
 	ctx->replace(tag<bignum>(bignum_integer_length(untag<bignum>(ctx->peek()))));
 }
 
-/* allocates memory */
 cell factor_vm::unbox_array_size_slow()
 {
 	if(tagged<object>(ctx->peek()).type() == BIGNUM_TYPE)
 	{
 		bignum *zero = untag<bignum>(bignum_zero);
-		GC_BIGNUM(zero);
 		bignum *max = cell_to_bignum(array_size_max);
 		bignum *n = untag<bignum>(ctx->peek());
 		if(bignum_compare(n,zero) != bignum_comparison_less
@@ -318,13 +310,11 @@ void factor_vm::primitive_float_greatereq()
 	ctx->push(tag_boolean(x >= y));
 }
 
-/* Allocates memory */
 void factor_vm::primitive_float_bits()
 {
 	ctx->push(from_unsigned_cell(float_bits((float)untag_float_check(ctx->pop()))));
 }
 
-/* Allocates memory */
 void factor_vm::primitive_bits_float()
 {
 	ctx->push(allot_float(bits_float((u32)to_cell(ctx->pop()))));
@@ -370,19 +360,16 @@ VM_C_API cell to_cell(cell tagged, factor_vm *parent)
 	return parent->to_cell(tagged);
 }
 
-/* Allocates memory */
 VM_C_API cell from_signed_cell(fixnum integer, factor_vm *parent)
 {
 	return parent->from_signed_cell(integer);
 }
 
-/* Allocates memory */
 VM_C_API cell from_unsigned_cell(cell integer, factor_vm *parent)
 {
 	return parent->from_unsigned_cell(integer);
 }
 
-/* Allocates memory */
 cell factor_vm::from_signed_8(s64 n)
 {
 	if(n < fixnum_min || n > fixnum_max)

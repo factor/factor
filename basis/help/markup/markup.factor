@@ -372,9 +372,8 @@ M: f ($instance)
     f suffix $or ;
 
 : $quotation ( element -- )
-    check-first
-    { "a " { $link quotation } " with stack effect " }
-    print-element $snippet ;
+    { "a " { $link quotation } " with stack effect " } print-element
+    $snippet ;
 
 : values-row ( seq -- seq )
     unclip \ $snippet swap present 2array

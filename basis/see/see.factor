@@ -6,8 +6,8 @@ classes.tuple classes.union combinators definitions effects generic
 generic.single generic.standard generic.hook io io.pathnames
 io.streams.string io.styles kernel make namespaces prettyprint
 prettyprint.backend prettyprint.config prettyprint.custom
-prettyprint.sections sequences sets slots sorting strings summary
-words words.symbol words.constant words.alias vocabs ;
+prettyprint.sections sequences sets sorting strings summary words
+words.symbol words.constant words.alias vocabs slots ;
 FROM: namespaces => set ;
 FROM: classes => members ;
 RENAME: members sets => set-members
@@ -204,12 +204,7 @@ M: tuple-class see-class*
 M: word see-class* drop ;
 
 M: builtin-class see-class*
-    "! Built-in class" comment.
-    <block
-    \ PRIMITIVE: pprint-word
-    [ pprint-word ]
-    [ <block "slots" word-prop [ pprint-slot ] each pprint-; block> ] bi
-    block> ;
+    drop "! Built-in class" comment. ;
 
 : see-class ( class -- )
     dup class? [

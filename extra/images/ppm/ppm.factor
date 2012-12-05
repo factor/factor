@@ -46,7 +46,7 @@ SINGLETON: ppm-image
     data             >>bitmap
     ubyte-components >>component-type ;
 
-M: ppm-image stream>image*
+M: ppm-image stream>image
     drop [ [ read-ppm ] throw-on-eof ] with-input-stream ;
 
 M: ppm-image image>stream

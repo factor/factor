@@ -14,7 +14,7 @@ HELP: readline
 
 HELP: set-completion
 { $values
-    { "quot" { $quotation "( str n -- str )" } }
+    { "quot" "a quotation with stack effect ( str n -- str )"}
 }
 { $description "Set the given quotation as the completion hook for readline. The quotation is called with the string to complete and the index in the completion list to return. When all completions have been returned, returning " { $snippet "f" } " terminates the loop." }
 { $examples

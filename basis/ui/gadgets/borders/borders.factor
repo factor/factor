@@ -4,7 +4,7 @@ USING: accessors arrays ui.gadgets ui.baseline-alignment kernel math fry
 namespaces vectors sequences math.vectors math.rectangles ;
 IN: ui.gadgets.borders
 
-TUPLE: border < aligned-gadget
+TUPLE: border < gadget
 { size initial: { 0 0 } }
 { fill initial: { 0 0 } }
 { align initial: { 1/2 1/2 } }
@@ -52,9 +52,9 @@ M: border pref-dim*
 
 PRIVATE>
 
-M: border baseline* [ baseline ] border-metric ;
+M: border baseline [ baseline ] border-metric ;
 
-M: border cap-height* [ cap-height ] border-metric ;
+M: border cap-height [ cap-height ] border-metric ;
 
 M: border layout*
     [ border-child-rect ] [ gadget-child ] bi set-rect-bounds ;

@@ -275,5 +275,3 @@ CONSTANT: SIGIO           29
 ALIAS:    SIGPOLL         SIGIO
 CONSTANT: SIGPWR          30
 CONSTANT: SIGSYS          31
-
-FUNCTION: ssize_t sendfile ( int out_fd, int in_fd, off_t* offset, size_t count ) ;

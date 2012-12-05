@@ -1,4 +1,4 @@
-USING: arrays help.markup help.syntax kernel io.files ;
+USING: help.markup help.syntax arrays io.files ;
 IN: io.files.info
 
 HELP: file-info
@@ -37,21 +37,6 @@ HELP: file-system-info
     }
 } ;
 
-HELP: file-readable?
-{ $values { "path" "a pathname string" } { "?" boolean } }
-{ $description "Returns whether the file specified by " { $snippet "path" } " is readable by the current process." }
-{ $errors "Throws an error if the file does not exist." } ;
-
-HELP: file-writable?
-{ $values { "path" "a pathname string" } { "?" boolean } }
-{ $description "Returns whether the file specified by " { $snippet "path" } " is writable by the current process." }
-{ $errors "Throws an error if the file does not exist." } ;
-
-HELP: file-executable?
-{ $values { "path" "a pathname string" } { "?" boolean } }
-{ $description "Returns whether the file specified by " { $snippet "path" } " is executable by the current process." }
-{ $errors "Throws an error if the file does not exist." } ;
-
 ARTICLE: "io.files.info" "File system meta-data"
 "File meta-data:"
 { $subsections
@@ -66,12 +51,6 @@ ARTICLE: "io.files.info" "File system meta-data"
 { $subsections
     file-system-info
     file-systems
-}
-"File permissions:"
-{ $subsections
-    file-readable?
-    file-writable?
-    file-executable?
 } ;
 
 ABOUT: "io.files.info"

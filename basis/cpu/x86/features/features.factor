@@ -1,11 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays assocs combinators
-compiler.codegen.labels cpu.architecture cpu.x86.assembler
-cpu.x86.assembler.operands init kernel math math.order
-math.parser memoize namespaces sequences
-specialized-arrays system math.bitwise combinators.smart ;
-SPECIALIZED-ARRAY: uint
+USING: accessors assocs sequences alien alien.c-types
+combinators compiler compiler.codegen.labels compiler.units
+cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
+init io kernel locals math math.order math.parser memoize
+namespaces system ;
 IN: cpu.x86.features
 
 <PRIVATE
@@ -85,84 +84,17 @@ MEMO: sse-version ( -- n )
 : sse4.1? ( -- ? ) sse-version 41 >= ;
 : sse4.2? ( -- ? ) sse-version 42 >= ;
 
-HOOK: (cpuid) cpu ( rax rcx regs -- )
-
-
-: cpuid-extended ( rax rcx -- 4array )
-   4 <uint-array> [ (cpuid) ] keep >array ;
-
-: cpuid ( rax -- 4array ) 0 cpuid-extended ;
-
-: cpuid-processor-info ( -- eax ) 1 cpuid first ; inline
-
-: parse-stepping ( eax -- n ) 3 0 bit-range ; inline
-: parse-model ( eax -- n ) 7 4 bit-range ; inline
-: parse-family ( eax -- n ) 11 8 bit-range ; inline
-: parse-processor-type ( eax -- n ) 13 12 bit-range ; inline
-: parse-extended-model ( eax -- n ) 19 16 bit-range ; inline
-: parse-extended-family ( eax -- n ) 27 20 bit-range ; inline
-
-: cpu-stepping ( -- n ) cpuid-processor-info parse-stepping ;
-: cpu-model ( -- n ) cpuid-processor-info parse-model ;
-: cpu-family ( -- n ) cpuid-processor-info parse-family ;
-: cpu-processor-type ( -- n ) cpuid-processor-info parse-processor-type ;
-: cpu-extended-model ( -- n ) cpuid-processor-info parse-extended-model ;
-: cpu-extended-family ( -- n ) cpuid-processor-info parse-extended-family ;
-
-: cpu-family-model-string ( -- string )
-    [
-        cpuid-processor-info {
-            [ parse-extended-family >hex ]
-            [ parse-family >hex ]
-            [ drop "_" ]
-            [ parse-extended-model >hex ]
-            [ parse-model >hex ]
-        } cleave
-    ] "" append-outputs-as ;
-
 : popcnt? ( -- ? )
     bool { } cdecl [
         return-reg 1 MOV
         CPUID
-        return-reg dup XOR
         ECX 23 BT
+        return-reg dup XOR
         return-reg SETB
     ] alien-assembly ;
 
-: tscdeadline? ( -- ? ) 1 cpuid third 24 bit? ;
-: aes? ( -- ? ) 1 cpuid third 25 bit? ;
-: xsave? ( -- ? ) 1 cpuid third 26 bit? ;
-: osxsave? ( -- ? ) 1 cpuid third 27 bit? ;
-: avx? ( -- ? ) 1 cpuid third 28 bit? ;
-: f16c? ( -- ? ) 1 cpuid third 29 bit? ;
-: rdrand? ( -- ? ) 1 cpuid third 30 bit? ;
-
-: msr? ( -- ? ) 1 cpuid fourth 5 bit? ;
-: tm1? ( -- ? ) 1 cpuid fourth 29 bit? ;
-: tm2? ( -- ? ) 1 cpuid third 8 bit? ;
-
-: rdrand8 ( -- x )
-    uchar { } cdecl [
-        AL RDRAND
-    ] alien-assembly ;
-
-: rdrand16 ( -- x )
-    ushort { } cdecl [
-        AX RDRAND
-    ] alien-assembly ;
-
-: rdrand32 ( -- x )
-    uint { } cdecl [
-        EAX RDRAND
-    ] alien-assembly ;
-
-: rdrand64 ( -- x )
-    ulonglong { } cdecl [
-        RAX RDRAND
-    ] alien-assembly ;
-
 MEMO: enable-popcnt? ( -- ? )
-    popcnt? "disable-popcnt" get not and ;
+    popcnt? "enable-popcnt" get and ;
 
 [ { sse-version enable-popcnt? } [ reset-memoized ] each ]
 "cpu.x86.features" add-startup-hook

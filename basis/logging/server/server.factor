@@ -20,8 +20,8 @@ SYMBOL: log-files
 
 : open-log-stream ( service -- stream )
     log-path
-    [ make-directories ]
-    [ 1 log# utf8 <file-appender> ] bi ;
+    dup make-directories
+    1 log# utf8 <file-appender> ;
 
 : log-stream ( service -- stream )
     log-files get [ open-log-stream ] cache ;
@@ -60,7 +60,8 @@ SYMBOL: log-files
 
 : (close-logs) ( -- )
     log-files get
-    [ values [ try-dispose ] each ] [ clear-assoc ] bi ;
+    dup values [ try-dispose ] each
+    clear-assoc ;
 
 CONSTANT: keep-logs 10
 
@@ -76,12 +77,10 @@ CONSTANT: keep-logs 10
     [ 1 - log# ] 2keep log# ?move-file ;
 
 : rotate-log ( service -- )
-    [ close-log ]
-    [
-        log-path
-        [ delete-oldest ]
-        [ keep-logs 1 [a,b] [ advance-log ] with each ] bi
-    ] bi ;
+    dup close-log
+    log-path
+    dup delete-oldest
+    keep-logs 1 [a,b] [ advance-log ] with each ;
 
 : (rotate-logs) ( -- )
     (close-logs)

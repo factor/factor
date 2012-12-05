@@ -11,11 +11,11 @@ TUPLE: slot-spec name offset class initial read-only ;
 
 PREDICATE: reader < word "reader" word-prop ;
 
-PREDICATE: reader-method < method "reading" word-prop >boolean ;
+PREDICATE: reader-method < method "reading" word-prop ;
 
 PREDICATE: writer < word "writer" word-prop ;
 
-PREDICATE: writer-method < method "writing" word-prop >boolean ;
+PREDICATE: writer-method < method "writing" word-prop ;
 
 : <slot-spec> ( -- slot-spec )
     slot-spec new
@@ -71,6 +71,7 @@ M: class instance-check-quot ( class -- quot )
     {
         { [ dup object bootstrap-word eq? ] [ drop [ ] ] }
         { [ dup "coercer" word-prop ] [ "coercer" word-prop ] }
+        { [ dup integer bootstrap-word eq? ] [ drop [ >integer ] ] }
         [ call-next-method ]
     } cond ;
 
@@ -199,7 +200,6 @@ M: anonymous-intersection initial-value*
         { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop t ] }
         { [ \ f bootstrap-word over class<= ] [ f t ] }
         { [ \ array-capacity bootstrap-word over class<= ] [ 0 t ] }
-        { [ bignum bootstrap-word over class<= ] [ 0 >bignum t ] }
         { [ float bootstrap-word over class<= ] [ 0.0 t ] }
         { [ string bootstrap-word over class<= ] [ "" t ] }
         { [ array bootstrap-word over class<= ] [ { } t ] }

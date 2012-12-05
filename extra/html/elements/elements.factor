@@ -16,7 +16,7 @@ SYMBOL: html
 
 <<
 
-CONSTANT: elements-vocab "html.elements"
+: elements-vocab ( -- vocab-name ) "html.elements" ;
 
 : html-word ( name def effect -- )
     #! Define 'word creating' word to allow

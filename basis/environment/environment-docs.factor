@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax io.streams.string
-libc sequences strings ;
+USING: assocs help.markup help.syntax io.streams.string sequences strings ;
 IN: environment
 
 HELP: (os-envs)
@@ -55,16 +54,8 @@ HELP: os-envs
 HELP: set-os-envs
 { $values { "assoc" "an association mapping strings to strings" } }
 { $description "Replaces the current set of environment variables." }
-{ $warning "Leaks memory on Unix. If your program calls this function repeatedly, call " { $link set-os-envs-pointer } " with a malloced pointer and manage your memory instead." }
 { $notes
     "Names and values of environment variables are operating system-specific. Windows NT allows values up to 32766 characters in length."
-} ;
-
-HELP: set-os-envs-pointer
-{ $values { "malloc" "a pointer to memory from the heap obtained through " { $link malloc } " or similar" } }
-{ $description "Set then " { $snippet "environ" } " pointer. Factor must retain a pointer to this memory until exiting the program." }
-{ $notes
-    "Names and values of environment variables are operating system-specific."
 } ;
 
 HELP: set-os-env
@@ -81,7 +72,7 @@ HELP: unset-os-env
     "Names and values of environment variables are operating system-specific."
 } ;
 
-{ os-env os-envs set-os-env unset-os-env set-os-envs set-os-envs-pointer change-os-env } related-words
+{ os-env os-envs set-os-env unset-os-env set-os-envs change-os-env } related-words
 
 
 ARTICLE: "environment" "Environment variables"
@@ -97,11 +88,6 @@ ARTICLE: "environment" "Environment variables"
     unset-os-env
     set-os-envs
     change-os-env
-}
-"Leak-free setting of all environment variables on Unix:"
-{ $subsections
-    set-os-envs-pointer
-
 } ;
 
 ABOUT: "environment"

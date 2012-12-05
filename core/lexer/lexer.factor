@@ -5,13 +5,7 @@ io vectors arrays math.parser combinators continuations
 source-files.errors ;
 IN: lexer
 
-TUPLE: lexer
-{ text array }
-{ line fixnum }
-{ line-text maybe{ string } }
-{ line-length fixnum }
-{ column fixnum }
-{ parsing-words vector } ;
+TUPLE: lexer text line line-text line-length column parsing-words ;
 
 TUPLE: lexer-parsing-word word line line-text column ;
 

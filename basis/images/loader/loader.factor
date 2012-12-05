@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii assocs byte-arrays destructors fry
-io.encodings.binary io.files io.pathnames io.streams.byte-array
-kernel namespaces sequences strings ;
+USING: ascii assocs byte-arrays io.encodings.binary io.files
+io.pathnames io.streams.byte-array kernel namespaces sequences
+strings fry ;
 IN: images.loader
 
 ERROR: unknown-image-extension extension ;
@@ -24,10 +24,7 @@ PRIVATE>
 
 GENERIC# load-image* 1 ( obj class -- image )
 
-GENERIC: stream>image* ( stream class -- image )
-
-: stream>image ( stream class -- image )
-    '[ _ &dispose _ stream>image* ] with-destructors ; inline
+GENERIC: stream>image ( stream class -- image )
 
 : register-image-class ( extension class -- )
     swap types get set-at ;

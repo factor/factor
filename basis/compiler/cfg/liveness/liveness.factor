@@ -97,7 +97,7 @@ M: vreg-insn lookup-base-pointer* drop f ;
     pick rep-of {
         { tagged-rep [ nip adjoin ] }
         { int-rep [ visit-derived-root ] }
-        [ 4drop ]
+        [ 2drop 2drop ]
     } case ;
 
 : gc-roots ( live-set -- derived-roots gc-roots )

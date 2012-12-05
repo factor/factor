@@ -7,7 +7,7 @@ IN: bit-sets
 TUPLE: bit-set { table bit-array read-only } ;
 
 : <bit-set> ( capacity -- bit-set )
-    <bit-array> bit-set boa ; inline
+    <bit-array> bit-set boa ;
 
 INSTANCE: bit-set set
 

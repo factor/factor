@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays assocs
 cache cairo cairo.ffi classes.struct combinators destructors fonts fry
-gobject.ffi init io.encodings.utf8 kernel locals math math.rectangles
+gobject.ffi init io.encodings.utf8 kernel math math.rectangles
 math.vectors memoize namespaces pango.cairo.ffi pango.ffi sequences
 ui.text ui.text.private ;
 IN: ui.text.pango
@@ -10,20 +10,20 @@ IN: ui.text.pango
 : pango>float ( n -- x ) PANGO_SCALE /f ; inline
 : float>pango ( x -- n ) PANGO_SCALE * >integer ; inline
 
-MEMO:: (cache-font-description) ( name size bold? italic? -- description )
+MEMO: (cache-font-description) ( font -- description )
     [
-        pango_font_description_new |pango_font_description_free {
-            [ name utf8 string>alien pango_font_description_set_family ]
-            [ size float>pango pango_font_description_set_size ]
-            [ bold? PANGO_WEIGHT_BOLD PANGO_WEIGHT_NORMAL ? pango_font_description_set_weight ]
-            [ italic? PANGO_STYLE_ITALIC PANGO_STYLE_NORMAL ? pango_font_description_set_style ]
-            [ ]
-        } cleave
+        [ pango_font_description_new |pango_font_description_free ] dip {
+            [ name>> utf8 string>alien pango_font_description_set_family ]
+            [ size>> float>pango pango_font_description_set_size ]
+            [ bold?>> PANGO_WEIGHT_BOLD PANGO_WEIGHT_NORMAL ? pango_font_description_set_weight ]
+            [ italic?>> PANGO_STYLE_ITALIC PANGO_STYLE_NORMAL ? pango_font_description_set_style ]
+            [ drop ]
+        } 2cleave
     ] with-destructors ;
 
 : cache-font-description ( font -- description )
-    { [ name>> ] [ size>> ] [ bold?>> ] [ italic?>> ] } cleave
-    (cache-font-description) ;
+    strip-font-colors (cache-font-description) ;
+
 
 TUPLE: layout < disposable font string selection layout metrics ink-rect logical-rect image ;
 
@@ -128,7 +128,7 @@ SYMBOL: dpi
     ] [ escape-nulls >>string ] if ; inline
 
 : set-layout-resolution ( layout -- )
-    pango_layout_get_context dpi get-global pango_cairo_context_set_resolution ;
+    pango_layout_get_context dpi get pango_cairo_context_set_resolution ;
 
 : <PangoLayout> ( text font -- layout )
     dummy-cairo pango_cairo_create_layout |g_object_unref
@@ -163,6 +163,7 @@ MEMO: missing-font-metrics ( font -- metrics )
             dup [ string>> ] [ font>> ] bi <PangoLayout> >>layout
             dup layout>> layout-extents [ >>ink-rect ] [ >>logical-rect ] bi*
             dup layout-metrics >>metrics
+            dup draw-layout >>image
     ] with-destructors ;
 
 M: layout dispose* layout>> g_object_unref ;
@@ -170,13 +171,10 @@ M: layout dispose* layout>> g_object_unref ;
 SYMBOL: cached-layouts
 
 : cached-layout ( font string -- layout )
-    cached-layouts get-global [ <layout> ] 2cache ;
+    cached-layouts get [ <layout> ] 2cache ;
 
 : cached-line ( font string -- line )
     cached-layout layout>> first-line ;
-
-: layout>image ( layout -- image )
-    dup image>> [ dup draw-layout >>image ] unless image>> ;
 
 SINGLETON: pango-renderer
 
@@ -185,10 +183,10 @@ M: pango-renderer string-dim
     [ cached-layout logical-rect>> dim>> [ >integer ] map ] if-empty ;
 
 M: pango-renderer flush-layout-cache
-    cached-layouts get-global purge-cache ;
+    cached-layouts get purge-cache ;
 
 M: pango-renderer string>image ( font string -- image loc )
-    cached-layout [ layout>image ] [ text-position vneg ] bi ;
+    cached-layout [ image>> ] [ text-position vneg ] bi ;
 
 M: pango-renderer x>offset ( x font string -- n )
     cached-layout swap x>line-offset ;

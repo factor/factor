@@ -23,13 +23,24 @@ TUPLE: merge
 { from2  array-capacity }
 { to2    array-capacity } ;
 
-: push-unsafe ( elt seq -- )
-    [ length ] keep
-    [ set-nth-unsafe ] [ [ 1 + ] dip length<< ] 2bi ; inline
-
-: push-all-unsafe ( from to src dst -- )
-    [ over - swap ] 2dip [ pick ] dip [ length ] keep
-    [ [ + ] dip length<< ] 2keep <copy> (copy) drop ; inline
+: dump ( from to seq accum -- )
+    #! Optimize common case where to - from = 1, 2, or 3.
+    [ 2dup swap - ] 2dip pick 1 = 
+    [ [ [ 2drop ] dip nth-unsafe ] dip push ] [
+        pick 2 = [
+            [
+                [ 2drop dup 1 + ] dip
+                [ nth-unsafe ] curry bi@
+            ] dip [ push ] curry bi@
+        ] [
+            pick 3 = [
+                [
+                    [ 2drop dup 1 + dup 1 + ] dip
+                    [ nth-unsafe ] curry tri@
+                ] dip [ push ] curry tri@
+            ] [ [ nip subseq ] dip push-all ] if
+        ] if
+    ] if ; inline
 
 : l-elt ( merge -- elt ) [ from1>> ] [ seq>> ] bi nth-unsafe ; inline
 
@@ -40,22 +51,18 @@ TUPLE: merge
 : r-done? ( merge -- ? ) [ from2>> ] [ to2>> ] bi eq? ; inline
 
 : dump-l ( merge -- )
-    [ [ from1>> ] [ to1>> ] [ seq>> ] tri ] [ accum>> ] bi
-    push-all-unsafe ; inline
+    [ [ from1>> ] [ to1>> ] [ seq>> ] tri ] [ accum>> ] bi dump ; inline
 
 : dump-r ( merge -- )
-    [ [ from2>> ] [ to2>> ] [ seq>> ] tri ] [ accum>> ] bi
-    push-all-unsafe ; inline
+    [ [ from2>> ] [ to2>> ] [ seq>> ] tri ] [ accum>> ] bi dump ; inline
 
 : l-next ( merge -- )
-    [ [ l-elt ] [ [ 1 + ] change-from1 drop ] bi ] [ accum>> ] bi
-    push-unsafe ; inline
+    [ [ l-elt ] [ [ 1 + ] change-from1 drop ] bi ] [ accum>> ] bi push ; inline
 
 : r-next ( merge -- )
-    [ [ r-elt ] [ [ 1 + ] change-from2 drop ] bi ] [ accum>> ] bi
-    push-unsafe ; inline
+    [ [ r-elt ] [ [ 1 + ] change-from2 drop ] bi ] [ accum>> ] bi push ; inline
 
-: decide ( merge quot: ( elt1 elt2 -- <=> ) -- ? )
+: decide ( merge -- ? )
     [ [ l-elt ] [ r-elt ] bi ] dip call +gt+ eq? ; inline
 
 : (merge) ( merge quot: ( elt1 elt2 -- <=> ) -- )
@@ -82,7 +89,8 @@ TUPLE: merge
         over >vector >>accum1
         swap length <vector> >>accum2
         dup accum1>> underlying>> >>seq
-        dup accum2>> >>accum ; inline
+        dup accum2>> >>accum
+        dup accum>> 0 >>length drop ; inline
 
 : compute-midpoint ( merge -- merge )
     dup [ from1>> ] [ to2>> ] bi + 2/ >>to1 ; inline
@@ -116,7 +124,7 @@ TUPLE: merge
     [ merge ] 2curry each-chunk ; inline
 
 : sort-loop ( merge quot -- )
-    [ 2 over seq>> length [ over > ] curry ] dip
+    [ 2 [ over seq>> length over > ] ] dip
     [ [ 1 shift 2dup ] dip sort-pass ] curry
     while 2drop ; inline
 
@@ -126,12 +134,12 @@ TUPLE: merge
 
 : (sort-pairs) ( i1 i2 seq quot accum -- )
     [ 2dup length = ] 2dip rot [
-        [ drop nip nth-unsafe ] dip push-unsafe
+        [ drop nip nth ] dip push
     ] [
         [
             [ [ nth-unsafe ] curry bi@ 2dup ] dip call +gt+ eq?
             [ swap ] when
-        ] dip [ push-unsafe ] curry bi@
+        ] dip [ push ] curry bi@
     ] if ; inline
 
 : sort-pairs ( merge quot -- )

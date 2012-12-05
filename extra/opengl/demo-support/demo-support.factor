@@ -51,7 +51,7 @@ M: demo-world pref-dim* ( gadget -- dim )
 M: demo-world resize-world
     GL_PROJECTION glMatrixMode
     glLoadIdentity
-    [ [ { 0 0 } ] dip dim>> gl-viewport ]
+    [ [ 0 0 ] dip dim>> first2 glViewport ]
     [ demo-world-frustum glFrustum ] bi ;
 
 : demo-world-set-matrix ( gadget -- )

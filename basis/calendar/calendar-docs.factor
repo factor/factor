@@ -29,7 +29,7 @@ HELP: <date>
 HELP: month-names
 { $values { "value" object } }
 { $description "Returns an array with the English names of all the months." }
-{ $warning "Do not use this array for looking up a month name directly. Use " { $link month-name } " instead." } ;
+{ $warning "Do not use this array for looking up a month name directly. Use month-name instead." } ;
 
 HELP: month-name
 { $values { "obj" { $or integer timestamp } } { "string" string } }
@@ -38,7 +38,7 @@ HELP: month-name
 HELP: month-abbreviations
 { $values { "value" array } }
 { $description "Returns an array with the English abbreviated names of all the months." }
-{ $warning "Do not use this array for looking up a month name directly. Use " { $link month-abbreviation } " instead." } ;
+{ $warning "Do not use this array for looking up a month name directly. Use month-abbreviation instead." } ;
 
 HELP: month-abbreviation
 { $values { "n" integer } { "string" string } }

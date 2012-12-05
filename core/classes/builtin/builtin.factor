@@ -11,7 +11,7 @@ PREDICATE: builtin-class < class
 
 : class>type ( class -- n ) "type" word-prop ; foldable
 
-: type>class ( n -- class ) builtins get-global nth ; foldable
+: type>class ( n -- class ) builtins get-global nth ;
 
 : bootstrap-type>class ( n -- class ) builtins get nth ;
 

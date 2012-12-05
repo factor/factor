@@ -57,9 +57,10 @@ os windows? [
 
 PRIVATE>
 
-M: gdi+-image stream>image*
-    drop
-    start-gdi+ &stop-gdi+ drop
-    stream>gdi+-bitmap
-    gdi+-bitmap>data
-    data>image ;
+M: gdi+-image stream>image
+    drop [
+        start-gdi+ &stop-gdi+ drop
+        stream>gdi+-bitmap
+        gdi+-bitmap>data
+        data>image
+    ] with-destructors ;

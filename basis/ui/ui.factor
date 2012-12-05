@@ -114,17 +114,13 @@ M: world ungraft*
     dup hand-world get-global eq?
     [ hand-loc get-global swap move-hand ] [ drop ] if ;
 
-: (layout-queued) ( deque -- seq )
+: layout-queued ( -- seq )
     [
         in-layout? on
-        [
+        layout-queue [
             dup layout find-world [ , ] when*
         ] slurp-deque
-    ] { } make members ; inline
-
-: layout-queued ( -- seq )
-    layout-queue dup deque-empty?
-    [ drop { } ] [ (layout-queued) ] if ;
+    ] { } make members ;
 
 : redraw-worlds ( seq -- )
     [ dup update-hand draw-world ] each ;
@@ -147,7 +143,7 @@ SYMBOL: ui-thread
 PRIVATE>
 
 : find-window ( quot: ( world -- ? ) -- world )
-    [ windows get-global values ] dip
+    [ windows get values ] dip
     '[ dup children>> [ ] [ nip first ] if-empty @ ]
     find-last nip ; inline
 
@@ -202,7 +198,7 @@ PRIVATE>
     find-world raise-window* ;
 
 : topmost-window ( -- world )
-    windows get-global last second ;
+    windows get last second ;
 
 HOOK: close-window ui-backend ( gadget -- )
 

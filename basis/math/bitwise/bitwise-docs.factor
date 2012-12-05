@@ -37,11 +37,6 @@ HELP: bits
 { $description "Keep only n bits from the integer m." }
 { $example "USING: math.bitwise prettyprint ;" "0x123abcdef 16 bits .h" "cdef" } ;
 
-HELP: bit-range
-{ $values { "x" integer } { "high" integer } { "low" integer } { "y" integer } }
-{ $description "Extract a range of bits from an integer, inclusive of each boundary." }
-{ $example "USING: math.bitwise prettyprint ;" "0b1100 3 2 bit-range .b" "11" } ;
-
 HELP: bitroll
 { $values { "x" integer } { "s" "a shift integer" } { "w" "a wrap integer" } { "y" integer }
 }
@@ -445,11 +440,6 @@ $nl
 { $subsections
     bit?
     bit-clear?
-}
-"Extracting bits from an integer:"
-{ $subsections
-    bit-range
-    bits
 }
 "Toggling a bit:"
 { $subsections

@@ -1,38 +1,32 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data arrays assocs byte-arrays
-combinators combinators.short-circuit fry kernel kernel.private
-layouts macros math math.bits sequences sequences.private
-specialized-arrays words ;
+USING: arrays assocs combinators combinators.smart fry kernel
+macros math math.bits sequences sequences.private words
+byte-arrays alien alien.c-types alien.data specialized-arrays
+kernel.private layouts ;
 SPECIALIZED-ARRAY: uchar
 IN: math.bitwise
 
 ! utilities
 : clear-bit ( x n -- y ) 2^ bitnot bitand ; inline
 : set-bit ( x n -- y ) 2^ bitor ; inline
-: bit-clear? ( x n -- ? ) 2^ bitand zero? ; inline
+: bit-clear? ( x n -- ? ) 2^ bitand 0 = ; inline
 : unmask ( x n -- ? ) bitnot bitand ; inline
-: unmask? ( x n -- ? ) unmask zero? not ; inline
+: unmask? ( x n -- ? ) unmask 0 > ; inline
 : mask ( x n -- ? ) bitand ; inline
-: mask? ( x n -- ? ) mask zero? not ; inline
+: mask? ( x n -- ? ) mask 0 > ; inline
 : wrap ( m n -- m' ) 1 - bitand ; inline
-: on-bits ( m -- n ) dup 0 <= [ drop 0 ] [ 2^ 1 - ] if ; inline
+: on-bits ( m -- n ) 2^ 1 - ; inline
 : bits ( m n -- m' ) on-bits mask ; inline
 : mask-bit ( m n -- m' ) 2^ mask ; inline
 : toggle-bit ( m n -- m' ) 2^ bitxor ; inline
 : >signed ( x n -- y )
-    [ bits ] keep 2dup neg 1 + shift
-    1 number= [ 2^ - ] [ drop ] if ;
+    [ bits ] keep 2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
 : >odd ( m -- n ) 0 set-bit ; foldable
 : >even ( m -- n ) 0 clear-bit ; foldable
 : next-even ( m -- n ) >even 2 + ; foldable
 : next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ; foldable
 : shift-mod ( m s w -- n ) [ shift ] dip 2^ wrap ; inline
-
-ERROR: bit-range-error x high low ;
-: bit-range ( x high low -- y )
-    2dup { [ nip 0 < ] [ < ] } 2|| [ bit-range-error ] when
-    [ nip neg shift ] [ - 1 + ] 2bi bits ; inline
 
 : bitroll ( x s w -- y )
     [ wrap ] keep
@@ -115,9 +109,9 @@ M: fixnum (bit-count)
     fixnum-bit-count { fixnum } declare ; inline
 
 M: bignum (bit-count)
-    [ 0 ] [
+    dup 0 = [ drop 0 ] [
         [ byte-bit-count ] [ -8 shift (bit-count) ] bi +
-    ] if-zero ;
+    ] if ;
 
 : byte-array-bit-count ( byte-array -- n )
     0 [ byte-bit-count + ] reduce ; inline

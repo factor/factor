@@ -1,16 +1,16 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators.short-circuit continuations
-destructors images images.loader io.pathnames kernel locals
-math models opengl.gl opengl.textures opengl.textures.private
-sequences strings ui ui.gadgets ui.gadgets.panes
-ui.gadgets.worlds ui.render ;
-FROM: images => image-dim ;
+USING: accessors images images.loader io.pathnames kernel
+models namespaces opengl opengl.gl opengl.textures opengl.textures.private
+sequences math arrays
+strings ui ui.gadgets ui.gadgets.panes ui.images ui.render
+constructors locals combinators.short-circuit 
+literals destructors ui.gadgets.worlds continuations ;
 IN: images.viewer
 
 TUPLE: image-gadget < gadget image texture ;
 <PRIVATE
-M: image-gadget pref-dim* image>> [ image-dim ] [ { 640 480 } ] if* ;
+M: image-gadget pref-dim* image>> [ dim>> ] [ { 640 480 } ] if* ;
 
 : (image-gadget-texture) ( gadget -- texture )
     dup image>> { 0 0 } <texture> >>texture texture>> ;

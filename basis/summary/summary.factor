@@ -7,7 +7,7 @@ IN: summary
 GENERIC: summary ( object -- string )
 
 : object-summary ( object -- string )
-    class-of name>> ; inline
+    class-of name>> ;
 
 M: object summary object-summary ;
 

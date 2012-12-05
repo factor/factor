@@ -34,18 +34,8 @@ M: set cardinality members length ;
 
 M: set set-like drop ; inline
 
-<PRIVATE
-
-: ?members ( set -- seq )
-    dup sequence? [ members ] unless ; inline
-
-: (union) ( set1 set2 -- seq )
-    [ ?members ] bi@ append ; inline
-
-PRIVATE>
-
 M: set union
-    [ (union) ] keep set-like ;
+    [ [ members ] bi@ append ] keep set-like ;
 
 <PRIVATE
 
@@ -91,7 +81,7 @@ M: set all-unique? drop t ;
 <PRIVATE
 
 : (pruned) ( elt hash vec -- )
-    2over in? [ 3drop ] [
+    3dup drop in? [ 3drop ] [
         [ drop adjoin ] [ nip push ] 3bi
     ] if ; inline
 
@@ -123,11 +113,11 @@ M: sequence null?
     empty? ; inline
 
 M: sequence cardinality
-    fast-set cardinality ;
+    pruned length ;
 
 : combine ( sets -- set/f )
     [ f ]
-    [ [ [ ?members ] map concat ] [ first ] bi set-like ]
+    [ [ [ members ] map concat ] [ first ] bi set-like ]
     if-empty ;
 
 : gather ( ... seq quot: ( ... elt -- ... elt' ) -- ... newseq )

@@ -12,7 +12,7 @@ IN: irc.client.internals
         [ drop call( host port -- stream ) ]
         [ drop 15 sleep 1 - do-connect ]
         recover
-    ] [ 4drop f ] if ;
+    ] [ 2drop 2drop f ] if ;
 
 : /NICK ( nick -- ) "NICK " prepend irc-print ;
 : /PONG ( text -- ) "PONG " prepend irc-print ;

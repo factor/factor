@@ -9,39 +9,19 @@ IN: ui.gadgets.line-support
 TUPLE: line-gadget < gadget
 font selection-color
 min-rows max-rows
-min-cols max-cols
-line-leading line-height
-pref-viewport-dim ;
+min-cols max-cols ;
 
 : new-line-gadget ( class -- gadget )
     new
         selection-color >>selection-color ;
 
-GENERIC: line-leading* ( gadget -- n )
-
-M: line-gadget line-leading* font>> font-metrics leading>> ;
-
 GENERIC: line-leading ( gadget -- n )
 
-M: line-gadget line-leading
-    dup line-leading>>
-    [ ] [
-        [ line-leading* ] [ ] [ layout-state>> ] tri
-        [ drop ] [ dupd line-leading<< ] if
-    ] ?if ;
-
-GENERIC: line-height* ( gadget -- n )
-
-M: line-gadget line-height* font>> font-metrics height>> ceiling ;
+M: line-gadget line-leading font>> font-metrics leading>> ;
 
 GENERIC: line-height ( gadget -- n )
 
-M: line-gadget line-height
-    dup line-height>>
-    [ ] [
-        [ line-height* ] [ ] [ layout-state>> ] tri
-        [ drop ] [ dupd line-height<< ] if
-    ] ?if ;
+M: line-gadget line-height font>> font-metrics height>> ceiling ;
 
 : y>line ( y gadget -- n ) line-height /i ;
 
@@ -98,18 +78,11 @@ PRIVATE>
 : line-gadget-height ( pref-dim gadget -- h )
     [ second ] [ [ line-height ] [ min-rows>> ] [ max-rows>> ] tri ] bi* clamp ;
 
-: pref-viewport-dim* ( gadget -- dim )
+M: line-gadget pref-viewport-dim
     [ pref-dim ] [ ] bi
     [ line-gadget-width ]
     [ line-gadget-height ]
-    2bi 2array ; inline
-
-M: line-gadget pref-viewport-dim
-    dup pref-viewport-dim>>
-    [ ] [
-        [ pref-viewport-dim* ] [ ] [ layout-state>> ] tri
-        [ drop ] [ dupd pref-viewport-dim<< ] if
-    ] ?if ;
+    2bi 2array ;
 
 : visible-lines ( gadget -- n )
     [ visible-dim second ] [ line-height ] bi /i ;

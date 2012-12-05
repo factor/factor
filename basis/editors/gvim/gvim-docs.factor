@@ -1,3 +1,3 @@
 USING: help.syntax ;
 IN: editors.gvim
-ABOUT: "editors.vim"
+ABOUT: { "vim" "vim" }

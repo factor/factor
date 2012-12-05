@@ -42,14 +42,14 @@ syn match factorShebangErr /\%\^#!\S\+/
 
 syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
 
-syn region factorDefn matchgroup=factorDefnDelims start=/\<\(SYNTAX\|\(MACRO\|MEMO\|TYPED\)\?:\?\):\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
+syn region factorDefn matchgroup=factorDefnDelims start=/\<\(SYNTAX\|\(MACRO\|MEMO\)\?:\?\):\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
 syn region factorMethod matchgroup=factorMethodDelims start=/\<M::\?\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
-syn region factorGeneric matchgroup=factorGenericDelims start=/\<\(GENERIC\|MATH\):\s\+\S\+\>/ end=/$/ contains=factorStackEffect
+syn region factorGeneric matchgroup=factorGenericDelims start=/\<GENERIC:\s\+\S\+\>/ end=/$/ contains=factorStackEffect
 syn region factorGenericN matchgroup=factorGenericNDelims start=/\<GENERIC#\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect
 
-syn region factorPrivateDefn matchgroup=factorPrivateDefnDelims start=/\<\(SYNTAX\|\(MACRO\|MEMO\|TYPED\)\?:\?\):\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
+syn region factorPrivateDefn matchgroup=factorPrivateDefnDelims start=/\<\(SYNTAX\|\(MACRO\|MEMO\)\?:\?\):\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
 syn region factorPrivateMethod matchgroup=factorPrivateMethodDelims start=/\<M::\?\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
-syn region factorPGeneric matchgroup=factorPGenericDelims start=/\<\(GENERIC\|MATH\):\s\+\S\+\>/ end=/$/ contains=factorStackEffect contained
+syn region factorPGeneric matchgroup=factorPGenericDelims start=/\<GENERIC:\s\+\S\+\>/ end=/$/ contains=factorStackEffect contained
 syn region factorPGenericN matchgroup=factorPGenericNDelims start=/\<GENERIC#\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect
 
 syn region None matchgroup=factorPrivate start=/\<<PRIVATE\>/ end=/\<PRIVATE>\>/ contains=@factorDefnContents,factorPrivateDefn,factorPrivateMethod,factorPGeneric,factorPGenericN
@@ -82,7 +82,7 @@ syn cluster factorReal          contains=factorInt,factorFloat,factorPosRatio,fa
 syn cluster factorNumber        contains=@factorReal,factorComplex
 syn cluster factorNumErr        contains=factorBinErr,factorHexErr,factorOctErr
 syn match   factorInt           /\<-\=[0-9]\([0-9,]*[0-9]\)\?\([eE]\([+-]\)\?[0-9]\+\)\?\>/
-syn match   factorFloat         /\<-\=\([0-9,]*[0-9]\)\?\(\.\(\([0-9,]*[0-9]\+\)\?\([eE]\([+-]\)\?[0-9]\+\)\?\)\?\)\?\>/
+syn match   factorFloat         /\<-\=[0-9]\([0-9,]*[0-9]\)\?\(\.\(\([0-9,]*[0-9]\+\)\?\([eE]\([+-]\)\?[0-9]\+\)\?\)\?\)\?\>/
 syn match   factorPosRatio      /\<+\=[0-9]\([0-9,]*[0-9]\)\?\(+[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
 syn match   factorNegRatio      /\<\-[0-9]\([0-9,]*[0-9]\)\?\(\-[0-9]\([0-9,]*[0-9]\+\)\?\)\?\/-\=[0-9]\([0-9,]*[0-9]\+\)\?\.\?\>/
 syn region  factorComplex       start=/\<C{\>/ end=/\<}\>/ contains=@factorReal
@@ -151,7 +151,7 @@ syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingle
 " LIBRARY:
 "#\ "
 
-syn match factorEscape /\\\([\\astnr0e\"]\|u\x\{6}\|u{\S\+}\|x\x\{2}\)/ contained display
+syn match factorEscape /\\\([\\stnr0e\"]\|u\x\{6}\|u{\S\+}\)/ contained display
 syn region factorString start=/\<"/ skip=/\\"/ end=/"/ contains=factorEscape
 syn region factorTriString start=/\<"""/ skip=/\\"/ end=/"""/ contains=factorEscape
 syn region factorSbuf start=/\<[-a-zA-Z0-9]\+"\>/ skip=/\\"/ end=/"/

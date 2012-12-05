@@ -133,12 +133,10 @@ M: openssl <secure-context> ( config -- context )
     ] with-destructors ;
 
 M: openssl-context dispose*
-    [
-        [ aliens>> [ &free drop ] each ]
-        [ sessions>> values [ SSL_SESSION_free ] each ]
-        [ handle>> SSL_CTX_free ]
-        tri
-    ] with-destructors ;
+    [ aliens>> [ free ] each ]
+    [ sessions>> values [ SSL_SESSION_free ] each ]
+    [ handle>> SSL_CTX_free ]
+    tri ;
 
 TUPLE: ssl-handle < disposable file handle connected ;
 
@@ -152,19 +150,13 @@ SYMBOL: default-secure-context
     ] unless* ;
 
 : <ssl-handle> ( fd -- ssl )
-    [
-        ssl-handle new-disposable |dispose
-        current-secure-context handle>> SSL_new
-        dup ssl-error >>handle
-        swap >>file
-    ] with-destructors ;
+    ssl-handle new-disposable
+    current-secure-context handle>> SSL_new
+    dup ssl-error >>handle
+    swap >>file ;
 
 M: ssl-handle dispose*
-    [
-        ! Free file>> after SSL_free
-        [ file>> &dispose drop ]
-        [ handle>> SSL_free ] bi
-    ] with-destructors ;
+    [ handle>> SSL_free ] [ file>> dispose ] bi ;
 
 : check-verify-result ( ssl-handle -- )
     SSL_get_verify_result dup X509_V_OK =

@@ -15,7 +15,7 @@ IN: tools.time
     "dispatch-stats.  - Print method dispatch statistics" print
     "gc-events.       - Print all garbage collection events" print
     "gc-stats.        - Print breakdown of different garbage collection events" print
-    "gc-summary.      - Print aggregate garbage collection statistics" print flush ;
+    "gc-summary.      - Print aggregate garbage collection statistics" print ;
 
 : time ( quot -- )
     [

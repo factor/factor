@@ -39,7 +39,7 @@ HELP: pick-up
 { $description "Outputs the child at a point in the gadget's co-ordinate system. This word recursively descends the gadget hierarchy, and so outputs the deepest child." } ;
 
 HELP: max-dims
-{ $values { "seq" "a sequence of pairs of integers" } { "dim" "a pair of integers" } }
+{ $values { "dims" "a sequence of pairs of integers" } { "dim" "a pair of integers" } }
 { $description "Outputs the smallest dimensions of a rectangle which can fit all the dimensions in the sequence." } ;
 
 { pref-dims max-dims sum-dims } related-words

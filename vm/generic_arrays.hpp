@@ -19,7 +19,6 @@ template<typename Array> cell array_size(Array *array)
 	return array_size<Array>(array_capacity(array));
 }
 
-/* Allocates memory */
 template<typename Array> Array *factor_vm::allot_uninitialized_array(cell capacity)
 {
 	Array *array = allot<Array>(array_size<Array>(capacity));
@@ -32,7 +31,6 @@ template<typename Array> bool factor_vm::reallot_array_in_place_p(Array *array, 
 	return nursery.contains_p(array) && capacity <= array_capacity(array);
 }
 
-/* Allocates memory (sometimes) */
 template<typename Array> Array *factor_vm::reallot_array(Array *array_, cell capacity)
 {
 	data_root<Array> array(array_,this);

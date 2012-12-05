@@ -2237,9 +2237,12 @@ CONSTANT: GL_LAST_VERTEX_CONVENTION         0x8E4E
 CONSTANT: GL_PROVOKING_VERTEX               0x8E4F
 CONSTANT: GL_TEXTURE_CUBE_MAP_SEAMLESS      0x884F
 
-GL-FUNCTION: void glFramebufferTexture { glFramebufferTextureARB glFramebufferTextureEXT } ( GLenum target, GLenum attachment, GLuint texture, GLint level ) ;
-GL-FUNCTION: void glGetBufferParameteri64v { } ( GLenum target, GLenum pname, GLint64* params ) ;
-GL-FUNCTION: void glGetInteger64i_v { } ( GLenum target, GLuint index, GLint64* data ) ;
+GL-FUNCTION: void glFramebufferTexture { glFramebufferTextureARB glFramebufferTextureEXT }
+    ( GLenum target, GLenum attachment, GLuint texture, GLint level ) ;
+GL-FUNCTION: void glGetBufferParameteri64v { }
+    ( GLenum target, GLenum pname, GLint64* params ) ;
+GL-FUNCTION: void glGetInteger64i_v { }
+    ( GLenum target, GLuint index, GLint64* data ) ;
 GL-FUNCTION: void glProvokingVertex { } ( GLenum mode ) ;
 
 GL-FUNCTION: GLsync glFenceSync { } ( GLenum condition, GLbitfield flags ) ;
@@ -2249,11 +2252,10 @@ GL-FUNCTION: GLenum glClientWaitSync { } ( GLsync sync, GLbitfield flags, GLuint
 GL-FUNCTION: void glWaitSync { } ( GLsync sync, GLbitfield flags, GLuint64 timeout ) ;
 GL-FUNCTION: void glGetInteger64v { } ( GLenum pname, GLint64* params ) ;
 GL-FUNCTION: void glGetSynciv { } ( GLsync sync, GLenum pname, GLsizei bufSize, GLsizei* length, GLint* values ) ;
-GL-FUNCTION: void glTexImage2DMultisample { } ( GLenum target, GLsizei samples, GLint internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations ) ;
-GL-FUNCTION: void glTexImage3DMultisample { } ( GLenum target, GLsizei samples, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLboolean fixedsamplelocations ) ;
-GL-FUNCTION: void glGetMultisamplefv { } ( GLenum pname, GLuint index, GLfloat* val ) ;
+GL-FUNCTION: void glTexImage2DMultisample { } (  GLenum target, GLsizei samples, GLint internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations ) ;
+GL-FUNCTION: void glTexImage3DMultisample { } (  GLenum target, GLsizei samples, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLboolean fixedsamplelocations ) ;
+GL-FUNCTION: void glGetMultisamplefv { } (  GLenum pname, GLuint index, GLfloat* val ) ;
 GL-FUNCTION: void glSampleMaski { } ( GLuint index, GLbitfield mask ) ;
-GL-FUNCTION: void glDrawElementsBaseVertex { glDrawElementsBaseVertexARB } ( GLenum mode, GLsizei count, GLenum type, GLvoid* indices, GLint basevertex ) ;
 
 
 ! OpenGL 3.3

@@ -4,7 +4,6 @@ USING: kernel math math.order strings arrays vectors sequences
 sequences.private accessors fry combinators ;
 IN: grouping
 
-ERROR: groups-error seq group-size ;
 <PRIVATE
 
 MIXIN: chunking
@@ -44,9 +43,7 @@ MIXIN: abstract-clumps
 INSTANCE: abstract-clumps sequence
 
 M: abstract-clumps length
-    dup seq>> length [ drop 0 ] [
-        swap [ 1 + ] [ n>> ] bi* [-]
-    ] if-zero ; inline
+    [ seq>> length 1 + ] [ n>> ] bi [-] ; inline
 
 M: abstract-clumps set-length
     [ n>> + 1 - ] [ seq>> ] bi set-length ; inline
@@ -56,11 +53,17 @@ M: abstract-clumps group@
 
 TUPLE: chunking-seq { seq read-only } { n read-only } ;
 
-: check-groups ( seq n -- seq n )
-    dup 0 <= [ groups-error ] when ; inline
+: check-groups ( n -- n )
+    dup 0 <= [ "Invalid group count" throw ] when ; inline
 
 : new-groups ( seq n class -- groups )
     [ check-groups ] dip boa ; inline
+
+: slice-mod ( n length -- n' )
+    2dup >= [ - ] [ drop ] if ; inline
+
+: check-circular-clumps ( seq n -- seq n )
+    2dup 1 - swap bounds-check 2drop ; inline
 
 PRIVATE>
 
@@ -123,7 +126,7 @@ M: circular-slice length [ to>> ] [ from>> ] bi - ; inline
 M: circular-slice virtual-exemplar seq>> ; inline
 
 M: circular-slice virtual@
-    [ from>> + ] [ seq>> ] bi [ length rem ] keep ; inline
+    [ from>> + ] [ seq>> ] bi [ length slice-mod ] keep ; inline
 
 C: <circular-slice> circular-slice
 
@@ -137,7 +140,7 @@ M: sliced-circular-clumps nth
     [ n>> over + ] [ seq>> ] bi <circular-slice> ; inline
 
 : <sliced-circular-clumps> ( seq n -- clumps )
-    sliced-circular-clumps new-groups ; inline
+    check-circular-clumps sliced-circular-clumps boa ; inline
 
 TUPLE: circular-clumps < chunking-seq ;
 INSTANCE: circular-clumps sequence
@@ -149,7 +152,7 @@ M: circular-clumps nth
     [ n>> over + ] [ seq>> ] bi [ <circular-slice> ] [ like ] bi ; inline
 
 : <circular-clumps> ( seq n -- clumps )
-    circular-clumps new-groups ; inline
+    check-circular-clumps circular-clumps boa ; inline
 
 : circular-clump ( seq n -- array )
     <circular-clumps> { } like ; inline

@@ -35,57 +35,57 @@ IN: random.tests
 [ [ 100 random-bytes ] with-system-random drop ] unit-test
 
 { t t }
-[ 500000 [ 0 1 normal-random-float ] replicate [ mean 0 .2 ~ ] [ std 1 .2 ~ ] bi ] unit-test
+[ 50000 [ 0 1 normal-random-float ] replicate [ mean 0 .2 ~ ] [ std 1 .2 ~ ] bi ] unit-test
 
 { t }
-[ 500000 [ .15 exponential-random-float ] replicate [ mean ] [ std ] bi .2 ~ ] unit-test
+[ 50000 [ .15 exponential-random-float ] replicate [ mean ] [ std ] bi .2 ~ ] unit-test
 
 { t }
-[ 500000 [ 1 exponential-random-float ] replicate [ mean ] [ std ] bi .2 ~ ] unit-test
+[ 50000 [ 1 exponential-random-float ] replicate [ mean ] [ std ] bi .2 ~ ] unit-test
 
 { t t }
 [
-    500000 [ 1 3 pareto-random-float ] replicate [ mean ] [ std ] bi
-    [ 1.5 .5 ~ ] [ 3 sqrt 2 / .5 ~ ] bi*
+    50000 [ 1 3 pareto-random-float ] replicate [ mean ] [ std ] bi
+    [ 1.5 .3 ~ ] [ 3 sqrt 2 / .3 ~ ] bi*
 ] unit-test
 
 { t t }
 [
-    500000 [ 2 3 gamma-random-float ] replicate
+    50000 [ 2 3 gamma-random-float ] replicate
     [ mean 6 .2 ~ ] [ std 2 sqrt 3 * .2 ~ ] bi
 ] unit-test
 
 { t t }
 [
-    500000 [ 2 3 beta-random-float ] replicate
+    50000 [ 2 3 beta-random-float ] replicate
     [ mean 2 2 3 + / .2 ~ ]
     [ std 2 sqrt 3 sqrt + 2 3 + dup 1 + sqrt * / .2 ~ ] bi
 ] unit-test
 
 { t }
-[ 500000 [ 3 4 von-mises-random-float ] replicate mean 3 .2 ~ ] unit-test
+[ 50000 [ 3 4 von-mises-random-float ] replicate mean 3 .2 ~ ] unit-test
 
 { t t }
 [
-    500000 [ 2 7 triangular-random-float ] replicate
+    50000 [ 2 7 triangular-random-float ] replicate
     [ mean 2 7 + 2 / .2 ~ ] [ std 7 2 - 2 6 sqrt * / .2 ~ ] bi
 ] unit-test
 
 { t t }
 [
-    500000 [ 2 3 laplace-random-float ] replicate
+    50000 [ 2 3 laplace-random-float ] replicate
     [ mean 2 .2 ~ ] [ std 2 sqrt 3 * .2 ~ ] bi
 ] unit-test
 
 { t t }
 [
-    500000 [ 12 rayleigh-random-float ] replicate
+    50000 [ 12 rayleigh-random-float ] replicate
     [ mean pi 2 / sqrt 12 * .2 ~ ]
     [ std 2 pi 2 / - sqrt 12 * .2 ~ ] bi
 ] unit-test
 
 { t t }
 [
-    500000 [ 3 4 logistic-random-float ] replicate
+    50000 [ 3 4 logistic-random-float ] replicate
     [ mean 3 .2 ~ ] [ std pi 4 * 3 sqrt / .2 ~ ] bi
 ] unit-test

@@ -49,8 +49,7 @@ selection-index
 selection
 mouse-index
 { takes-focus? initial: t }
-focused?
-rows ;
+focused? ;
 
 : new-table ( rows renderer class -- table )
     new-line-gadget
@@ -66,19 +65,28 @@ rows ;
 
 <PRIVATE
 
-GENERIC: cell-dim ( font cell -- width height padding )
+GENERIC: cell-width ( font cell -- x )
+GENERIC: cell-height ( font cell -- y )
+GENERIC: cell-padding ( cell -- y )
 GENERIC: draw-cell ( font cell -- )
 
 : single-line ( str -- str' )
     dup [ "\r\n" member? ] any? [ string-lines " " join ] when ;
 
-M: string cell-dim single-line text-dim first2 ceiling 0 ;
+M: string cell-width single-line text-width ;
+M: string cell-height single-line text-height ceiling ;
+M: string cell-padding drop 0 ;
 M: string draw-cell single-line draw-text ;
 
 CONSTANT: image-padding 2
 
-M: image-name cell-dim nip image-dim first2 image-padding ;
+M: image-name cell-width nip image-dim first ;
+M: image-name cell-height nip image-dim second ;
+M: image-name cell-padding drop image-padding ;
 M: image-name draw-cell nip draw-image ;
+
+: table-rows ( table -- rows )
+    [ control-value ] [ renderer>> ] bi '[ _ row-columns ] map ;
 
 : column-offsets ( widths gap -- x xs )
     [ 0 ] dip '[ _ + + ] accumulate ;
@@ -95,13 +103,13 @@ CONSTANT: column-title-background COLOR: light-gray
     if ;
 
 : row-column-widths ( table row -- widths )
-    [ font>> ] dip [ cell-dim nip + ] with map ;
+    [ font>> ] dip [ [ cell-width ] [ cell-padding ] bi + ] with map ;
 
 : compute-total-width ( gap widths -- total )
     swap [ column-offsets drop ] keep - ;
 
 : compute-column-widths ( table -- total widths )
-    dup rows>> [ drop 0 { } ] [
+    dup table-rows [ drop 0 { } ] [
         [ drop gap>> ] [ initial-widths ] [ ] 2tri
         [ row-column-widths vmax ] with each
         [ compute-total-width ] keep
@@ -164,10 +172,8 @@ M: table layout*
     ] bi ;
 
 :: column-loc ( font column width align -- loc )
-    font column cell-dim :> ( cell-width cell-height cell-padding )
-    cell-width width swap - align *
-    cell-padding 2 / 1 align - * +
-    cell-height \ line-height get swap - 2 /
+    font column cell-width width swap - align * column cell-padding 2 / 1 align - * +
+    font column cell-height \ line-height get swap - 2 /
     [ >integer ] bi@ 2array ;
 
 : translate-column ( width gap -- )
@@ -185,21 +191,25 @@ M: table layout*
     dup renderer>> column-alignment
     [ ] [ column-widths>> length 0 <repetition> ] ?if ;
 
-:: row-font ( row index table -- font )
+:: row-font ( row ind table -- font )
     table font>> clone
     row table renderer>> row-color [ >>foreground ] when*
-    index table selection-index>> value>> =
+    ind table selection-index>> value>> =
     [ table selection-color>> >>background ] when ;
 
 : draw-columns ( columns widths alignment font gap -- )
     '[ [ _ ] 3dip _ draw-column ] 3each ;
 
-M:: table draw-line ( row index table -- )
-    row table renderer>> row-columns
-    table column-widths>>
-    table table-column-alignment
-    row index table row-font
-    table gap>>
+M: table draw-line ( row index table -- )
+    [
+        nip
+        [ renderer>> row-columns ]
+        [ column-widths>> ]
+        [ table-column-alignment ]
+        tri
+    ]
+    [ row-font ]
+    [ 2nip gap>> ] 3tri
     draw-columns ;
 
 M: table draw-gadget*
@@ -215,15 +225,16 @@ M: table draw-gadget*
         ] with-variable
     ] if ;
 
-M: table line-height* ( table -- y )
+M: table line-height ( table -- y )
     [ font>> ] [ renderer>> prototype-row ] bi
-    [ cell-dim + nip ] with [ max ] map-reduce ;
+    [ [ cell-height ] [ cell-padding ] bi + ] with
+    [ max ] map-reduce ;
 
 M: table pref-dim*
     [ compute-column-widths drop ] keep
     [ line-height ] [ control-value length ] bi * 2array ;
 
-: nth-row ( index table -- value/f ? )
+: nth-row ( row table -- value/f ? )
     over [ control-value nth t ] [ 2drop f f ] if ;
 
 PRIVATE>
@@ -267,13 +278,6 @@ PRIVATE>
     [ model>> value>> ] [ renderer>> ] bi
     '[ _ row-value? ] with find drop ;
 
-: update-table-rows ( table -- )
-    [
-        [ control-value ] [ renderer>> ] bi
-        '[ _ row-columns ] map
-    ]
-    [ rows<< ] bi ; inline
-
 : update-selection ( table -- )
     [
         {
@@ -289,7 +293,6 @@ PRIVATE>
 
 M: table model-changed
     nip
-        dup update-table-rows
         dup update-selection
         dup update-mouse-index
     [ dup mouse-index>> show-row-summary ] [ relayout ] bi ;
@@ -346,7 +349,7 @@ PRIVATE>
 : prev/next-row ( table n -- )
     [ dup selection-index>> value>> ] dip
     '[ _ + ] [ 0 ] if* select-row ;
-
+    
 : previous-row ( table -- )
     -1 prev/next-row ;
 

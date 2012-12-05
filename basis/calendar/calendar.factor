@@ -447,12 +447,6 @@ M: timestamp day-name day-of-week day-names nth ;
 : today ( -- timestamp )
     now midnight ; inline
 
-: tomorrow ( -- timestamp )
-    1 days hence midnight ; inline
-
-: yesterday ( -- timestamp )
-    1 days ago midnight ; inline
-
 : beginning-of-month ( timestamp -- new-timestamp )
     midnight 1 >>day ; inline
 
@@ -550,20 +544,6 @@ M: timestamp december clone 12 >>month ;
 
 : beginning-of-week ( timestamp -- new-timestamp )
     midnight sunday ;
-
-: o'clock ( timestamp n -- new-timestamp )
-    [ midnight ] dip >>hour ;
-
-ERROR: twelve-hour-expected n ;
-
-: check-twelve-hour ( n -- n )
-    dup 0 12 between? [ twelve-hour-expected ] unless ;
-
-: am ( timestamp n -- new-timestamp )
-    check-twelve-hour o'clock ;
-
-: pm ( timestamp n -- new-timestamp )
-    check-twelve-hour 12 + o'clock ;
 
 GENERIC: beginning-of-year ( object -- new-timestamp )
 M: timestamp beginning-of-year beginning-of-month 1 >>month ;

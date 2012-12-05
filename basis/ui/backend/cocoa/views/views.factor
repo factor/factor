@@ -1,13 +1,13 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-arrays assocs cocoa cocoa.application cocoa.classes
-cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
-cocoa.views combinators core-foundation.strings core-graphics
-core-graphics.types core-text io.encodings.utf8 kernel locals
-math math.rectangles namespaces opengl sequences threads
-ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.private ;
+arrays assocs cocoa kernel math cocoa.messages cocoa.subclassing
+cocoa.classes cocoa.views cocoa.application cocoa.pasteboard
+cocoa.runtime cocoa.types cocoa.windows sequences
+io.encodings.utf8 locals ui ui.private ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures
+core-foundation.strings core-graphics core-graphics.types
+threads combinators math.rectangles ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -304,13 +304,6 @@ CLASS: FactorView < NSOpenGLView NSTextInput
     METHOD: NSRect firstRectForCharacterRange: NSRange range [ 0 0 0 0 <CGRect> ]
 
     METHOD: NSInteger conversationIdentifier [ self alien-address ]
-
-    METHOD: void prepareOpenGL [
-        self 1 -> setWantsBestResolutionOpenGLSurface:
-        self -> backingScaleFactor dup 1.0 > [
-            gl-scale-factor set-global t retina? set-global
-        ] [ drop ] if
-    ]
 
     ! Initialization
     METHOD: void updateFactorGadgetSize: id notification

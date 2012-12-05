@@ -14,7 +14,7 @@ IN: ui.backend.gtk.io.unix
 
 : dispatch ( source callback user-data -- ? )
      3drop
-     0 mx get-global wait-for-events
+     0 mx get wait-for-events
      yield t ;
 
 : <funcs> ( -- funcs )
@@ -35,7 +35,7 @@ CONSTANT: poll-fd-events
 
 : <poll-fd> ( -- poll-fd )
     GPollFD malloc-struct &free
-        mx get-global fd>> >>fd
+        mx get fd>> >>fd
         poll-fd-events >>events ;
 
 M:: unix with-event-loop ( quot -- )

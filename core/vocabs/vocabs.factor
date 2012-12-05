@@ -41,12 +41,6 @@ M: vocab-link vocab-name name>> ;
 
 M: object vocab-name check-vocab-name ;
 
-: vocab-name* ( vocab-spec -- name )
-    vocab-name ".private" ?tail drop ;
-
-: private-vocab? ( vocab -- ? )
-    vocab-name ".private" tail? ;
-
 GENERIC: lookup-vocab ( vocab-spec -- vocab )
 
 M: vocab lookup-vocab ;
@@ -79,7 +73,7 @@ M: f vocab-main ;
 
 SYMBOL: vocab-observers
 
-GENERIC: vocab-changed ( vocab obj -- )
+GENERIC: vocabs-changed ( obj -- )
 
 : add-vocab-observer ( obj -- )
     vocab-observers get push ;
@@ -87,13 +81,13 @@ GENERIC: vocab-changed ( vocab obj -- )
 : remove-vocab-observer ( obj -- )
     vocab-observers get remove-eq! drop ;
 
-: notify-vocab-observers ( vocab -- )
-    vocab-observers get [ vocab-changed ] with each ;
+: notify-vocab-observers ( -- )
+    vocab-observers get [ vocabs-changed ] each ;
 
 : create-vocab ( name -- vocab )
     check-vocab-name
     dictionary get [ <vocab> ] cache
-    dup notify-vocab-observers ;
+    notify-vocab-observers ;
 
 ERROR: no-vocab name ;
 
@@ -126,8 +120,8 @@ M: object >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
 
 : forget-vocab ( vocab -- )
     [ words forget-all ]
-    [ vocab-name dictionary get delete-at ]
-    [ notify-vocab-observers ] tri ;
+    [ vocab-name dictionary get delete-at ] bi
+    notify-vocab-observers ;
 
 M: vocab-spec forget* forget-vocab ;
 

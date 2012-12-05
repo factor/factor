@@ -11,7 +11,7 @@ HELP: pprint-word
 $prettyprinting-note ;
 
 HELP: ch>ascii-escape
-{ $values { "ch" "a character" } { "ch'" "a character" } { "?" boolean } }
+{ $values { "ch" "a character" } { "str" string } }
 { $description "Converts a character to an escape code." } ;
 
 HELP: unparse-ch

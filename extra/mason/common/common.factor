@@ -5,7 +5,7 @@ math.functions make io io.files io.pathnames io.directories
 io.directories.hierarchy io.launcher io.encodings.utf8 prettyprint
 combinators.short-circuit parser combinators math calendar
 calendar.format arrays mason.config locals debugger fry
-continuations strings io.sockets prettyprint.config ;
+continuations strings io.sockets ;
 IN: mason.common
 
 : print-timestamp ( string -- )
@@ -50,7 +50,7 @@ SYMBOL: current-git-id
     dup utf8 file-lines parse-fresh
     [ "Empty file: " swap append throw ] [ nip first ] if-empty ;
 
-: to-file ( object file -- ) utf8 [ [ . ] without-limits ] with-file-writer ;
+: to-file ( object file -- ) utf8 [ . ] with-file-writer ;
 
 : datestamp ( timestamp -- string )
     [

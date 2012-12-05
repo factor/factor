@@ -26,7 +26,6 @@ TUPLE: abstract-c-type
 { getter callable }
 { setter callable }
 { size integer }
-{ signed boolean }
 { align integer }
 { align-first integer } ;
 
@@ -46,7 +45,7 @@ M: no-c-type summary drop "Not a C type" ;
 GENERIC: lookup-c-type ( name -- c-type ) foldable
 
 PREDICATE: c-type-word < word
-    "c-type" word-prop >boolean ;
+    "c-type" word-prop ;
 
 TUPLE: pointer { to initial: void read-only } ;
 C: <pointer> pointer
@@ -94,10 +93,6 @@ M: c-type c-type-copier drop [ ] ;
 GENERIC: c-type-setter ( name -- quot )
 
 M: c-type c-type-setter setter>> ;
-
-GENERIC: c-type-signed ( name -- boolean ) foldable
-
-M: abstract-c-type c-type-signed signed>> ;
 
 GENERIC: c-type-align ( name -- n ) foldable
 
@@ -148,7 +143,6 @@ PROTOCOL: c-type-protocol
     c-type-getter
     c-type-copier
     c-type-setter
-    c-type-signed
     c-type-align
     c-type-align-first
     base-type
@@ -242,7 +236,6 @@ M: pointer lookup-c-type
         [ alien-signed-2 ] >>getter
         [ set-alien-signed-2 ] >>setter
         2 >>size
-        t >>signed
         2 >>align
         2 >>align-first
         "from_signed_2" >>boxer
@@ -269,7 +262,6 @@ M: pointer lookup-c-type
         [ alien-signed-1 ] >>getter
         [ set-alien-signed-1 ] >>setter
         1 >>size
-        t >>signed
         1 >>align
         1 >>align-first
         "from_signed_1" >>boxer
@@ -324,7 +316,6 @@ M: pointer lookup-c-type
             [ alien-signed-4 ] >>getter
             [ set-alien-signed-4 ] >>setter
             4 >>size
-            t >>signed
             4 >>align
             4 >>align-first
             "from_signed_4" >>boxer
@@ -351,7 +342,6 @@ M: pointer lookup-c-type
             [ alien-signed-cell ] >>getter
             [ set-alien-signed-cell ] >>setter
             8 >>size
-            t >>signed
             8 >>align
             8 >>align-first
             "from_signed_cell" >>boxer
@@ -392,7 +382,6 @@ M: pointer lookup-c-type
             [ alien-signed-cell ] >>getter
             [ set-alien-signed-cell ] >>setter
             4 >>size
-            t >>signed
             4 >>align
             4 >>align-first
             "from_signed_cell" >>boxer
@@ -419,7 +408,6 @@ M: pointer lookup-c-type
             [ alien-signed-8 ] >>getter
             [ set-alien-signed-8 ] >>setter
             8 >>size
-            t >>signed
             8-byte-alignment
             "from_signed_8" >>boxer
             "to_signed_8" >>unboxer
@@ -475,8 +463,8 @@ M: double-2-rep rep-component-type drop double ;
 : c-type-interval ( c-type -- from to )
     {
         { [ dup { float double } member-eq? ] [ drop -1/0. 1/0. ] }
-        { [ dup c-type-signed ] [ signed-interval ] }
-        { [ dup c-type-signed not ] [ unsigned-interval ] }
+        { [ dup { char short int long longlong } member-eq? ] [ signed-interval ] }
+        { [ dup { uchar ushort uint ulong ulonglong } member-eq? ] [ unsigned-interval ] }
     } cond ; foldable
 
 : c-type-clamp ( value c-type -- value' )

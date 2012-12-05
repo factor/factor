@@ -7,26 +7,23 @@ IN: calendar.unix
 : timeval>seconds ( timeval -- seconds )
     [ sec>> ] [ usec>> 1,000,000 / ] bi + ; inline
 
-: timeval>micros ( timeval -- micros )
-    [ sec>> 1,000,000 * ] [ usec>> ] bi + ; inline
-
 : timeval>duration ( timeval -- duration )
-    timeval>seconds seconds ; inline
+    timeval>seconds seconds ;
 
 : timeval>unix-time ( timeval -- timestamp )
-    [ unix-1970 ] dip timeval>seconds +second ; inline
+    [ unix-1970 ] dip timeval>seconds +second ;
 
 : timespec>seconds ( timespec -- seconds )
     [ sec>> ] [ nsec>> 1,000,000,000 / ] bi + ; inline
 
 : timespec>duration ( timespec -- duration )
-    timespec>seconds seconds ; inline
+    timespec>seconds seconds ;
 
 : timespec>unix-time ( timespec -- timestamp )
-    [ unix-1970 ] dip timespec>seconds +second ; inline
+    [ unix-1970 ] dip timespec>seconds +second ;
 
 : get-time ( -- alien )
-    f time time_t <ref> localtime ; inline
+    f time time_t <ref> localtime ;
 
 : timezone-name ( -- string )
     get-time zone>> ;
@@ -35,10 +32,11 @@ M: unix gmt-offset ( -- hours minutes seconds )
     get-time gmtoff>> 3600 /mod 60 /mod ;
 
 : current-timeval ( -- timeval )
-    timeval <struct> f [ gettimeofday io-error ] 2keep drop ; inline
+    timeval <struct> f [ gettimeofday io-error ] 2keep drop ;
 
 : system-micros ( -- n )
-    current-timeval timeval>micros ;
+    current-timeval
+    [ sec>> 1,000,000 * ] [ usec>> ] bi + ;
 
 M: unix gmt
     current-timeval timeval>unix-time ;

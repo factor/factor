@@ -111,8 +111,3 @@ unit-test
 [ -3 ] [ "-1-1/2" string>number 2 * ] unit-test
 [ "2+1/7" ] [ 1 7 / 2 + number>string ] unit-test
 [ "1/8" ] [ 1 8 / number>string ] unit-test
-
-{ t } [ 2/3 dup number= ] unit-test
-{ t } [ 2/33333333333333333333333333333333 dup number= ] unit-test
-{ t } [ -2/3 dup number= ] unit-test
-{ t } [ -2/33333333333333333333333333333333 dup number= ] unit-test

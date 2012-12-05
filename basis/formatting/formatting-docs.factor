@@ -5,54 +5,51 @@ IN: formatting
 
 HELP: printf
 { $values { "format-string" string } }
-{ $description
-    "Writes the arguments (specified on the stack) formatted according to the format string." 
+{ $description 
+    "Writes the arguments (specified on the stack) formatted according to the format string.\n" 
     $nl
     "Several format specifications exist for handling arguments of different types, and "
     "specifying attributes for the result string, including such things as maximum width, "
-    "padding, and decimals."
-    $nl
+    "padding, and decimals.\n"
     { $table
-        { { $snippet "%%" }          "Single %"                   "" }
-        { { $snippet "%P.Ds" }       "String format"              "string" }
-        { { $snippet "%P.DS" }       "String format uppercase"    "string" }
-        { { $snippet "%c" }          "Character format"           "char" } 
-        { { $snippet "%C" }          "Character format uppercase" "char" } 
-        { { $snippet "%+Pd" }        "Integer format"             "fixnum" }
-        { { $snippet "%+P.De" }      "Scientific notation"        "fixnum, float" }
-        { { $snippet "%+P.DE" }      "Scientific notation"        "fixnum, float" }
-        { { $snippet "%+P.Df" }      "Fixed format"               "fixnum, float" }
-        { { $snippet "%+Px" }        "Hexadecimal"                "hex" }
-        { { $snippet "%+PX" }        "Hexadecimal uppercase"      "hex" }
-        { { $snippet "%[%?, %]" }    "Sequence format"            "sequence" }
-        { { $snippet "%[%?: %? %]" } "Assocs format"              "assocs" }
+        { "%%"          "Single %"                   "" }
+        { "%P.Ds"       "String format"              "string" }
+        { "%P.DS"       "String format uppercase"    "string" }
+        { "%c"          "Character format"           "char" } 
+        { "%C"          "Character format uppercase" "char" } 
+        { "%+Pd"        "Integer format"             "fixnum" }
+        { "%+P.De"      "Scientific notation"        "fixnum, float" }
+        { "%+P.DE"      "Scientific notation"        "fixnum, float" }
+        { "%+P.Df"      "Fixed format"               "fixnum, float" }
+        { "%+Px"        "Hexadecimal"                "hex" }
+        { "%+PX"        "Hexadecimal uppercase"      "hex" }
+        { "%[%?, %]"    "Sequence format"            "sequence" }
+        { "%[%?: %? %]" "Assocs format"              "assocs" }
     }
     $nl
-    "A plus sign (" { $snippet "+" } ") is used to optionally specify that the number should be "
-    "formatted with a " { $snippet "+" } " preceeding it if positive."
+    "A plus sign ('+') is used to optionally specify that the number should be "
+    "formatted with a '+' preceeding it if positive.\n"
     $nl
-    "Padding (" { $snippet "P" } ") is used to optionally specify the minimum width of the result "
+    "Padding ('P') is used to optionally specify the minimum width of the result "
     "string, the padding character, and the alignment.  By default, the padding "
     "character defaults to a space and the alignment defaults to right-aligned. "
-    "For example:"
-    $nl
+    "For example:\n"
     { $list
-        { { $snippet "%5s" } " formats a string padding with spaces up to 5 characters wide." }
-        { { $snippet "%03d" } " formats an integer padding with zeros up to 3 characters wide." }
-        { { $snippet "%'#5f" } " formats a float padding with " { $snippet "#" } " up to 3 characters wide." }
-        { { $snippet "%-10d" } " formats an integer to 10 characters wide and left-aligns." }
+        "\"%5s\" formats a string padding with spaces up to 5 characters wide."
+        "\"%03d\" formats an integer padding with zeros up to 3 characters wide."
+        "\"%'#5f\" formats a float padding with '#' up to 3 characters wide."
+        "\"%-10d\" formats an integer to 10 characters wide and left-aligns." 
     }
     $nl
-    "Digits (" { $snippet "D" } ") is used to optionally specify the maximum digits in the result "
-    "string. For example:"
-    $nl
-    { $list
-        { { $snippet "%.3s" } " formats a string to truncate at 3 characters (from the left)." }
-        { { $snippet "%.10f" } " formats a float to pad-tail with zeros up to 10 digits beyond the decimal point." }
-        { { $snippet "%.5E" } " formats a float into scientific notation with zeros up to 5 digits beyond the decimal point, but before the exponent." }
+    "Digits ('D') is used to optionally specify the maximum digits in the result "
+    "string. For example:\n"
+    { $list 
+        "\"%.3s\" formats a string to truncate at 3 characters (from the left)."
+        "\"%.10f\" formats a float to pad-tail with zeros up to 10 digits beyond the decimal point."
+        "\"%.5E\" formats a float into scientific notation with zeros up to 5 digits beyond the decimal point, but before the exponent."
     }
 }
-{ $examples
+{ $examples 
     { $example
         "USING: formatting ;"
         "123 \"%05d\" printf"
@@ -90,37 +87,36 @@ HELP: sprintf
 
 HELP: strftime
 { $values { "format-string" string } }
-{ $description
-    "Writes the timestamp (specified on the stack) formatted according to the format string."
+{ $description 
+    "Writes the timestamp (specified on the stack) formatted according to the format string.\n"
     $nl
-    "Different attributes of the timestamp can be retrieved using format specifications."
-    $nl
+    "Different attributes of the timestamp can be retrieved using format specifications.\n"
     { $table
-        { { $snippet "%a" }    "Abbreviated weekday name." }
-        { { $snippet "%A" }    "Full weekday name." }
-        { { $snippet "%b" }    "Abbreviated month name." }
-        { { $snippet "%B" }    "Full month name." }
-        { { $snippet "%c" }    "Date and time representation." }
-        { { $snippet "%d" }    "Day of the month as a decimal number [01,31]." }
-        { { $snippet "%H" }    "Hour (24-hour clock) as a decimal number [00,23]." }
-        { { $snippet "%I" }    "Hour (12-hour clock) as a decimal number [01,12]." }
-        { { $snippet "%j" }    "Day of the year as a decimal number [001,366]." }
-        { { $snippet "%m" }    "Month as a decimal number [01,12]." }
-        { { $snippet "%M" }    "Minute as a decimal number [00,59]." }
-        { { $snippet "%p" }    "Either AM or PM." }
-        { { $snippet "%S" }    "Second as a decimal number [00,59]." }
-        { { $snippet "%U" }    "Week number of the year (Sunday as the first day of the week) as a decimal number [00,53]." }
-        { { $snippet "%w" }    "Weekday as a decimal number [0(Sunday),6]." }
-        { { $snippet "%W" }    "Week number of the year (Monday as the first day of the week) as a decimal number [00,53]." }
-        { { $snippet "%x" }    "Date representation." }
-        { { $snippet "%X" }    "Time representation." }
-        { { $snippet "%y" }    "Year without century as a decimal number [00,99]." }
-        { { $snippet "%Y" }    "Year with century as a decimal number." }
-        { { $snippet "%Z" }    "Time zone name (no characters if no time zone exists)." }
-        { { $snippet "%%" }    "A literal '%' character." }
-    }
-}
-{ $examples
+        { "%a"     "Abbreviated weekday name." }
+        { "%A"     "Full weekday name." }
+        { "%b"     "Abbreviated month name." }
+        { "%B"     "Full month name." }
+        { "%c"     "Date and time representation." }
+        { "%d"     "Day of the month as a decimal number [01,31]." }
+        { "%H"     "Hour (24-hour clock) as a decimal number [00,23]." }
+        { "%I"     "Hour (12-hour clock) as a decimal number [01,12]." }
+        { "%j"     "Day of the year as a decimal number [001,366]." }
+        { "%m"     "Month as a decimal number [01,12]." }
+        { "%M"     "Minute as a decimal number [00,59]." }
+        { "%p"     "Either AM or PM." }
+        { "%S"     "Second as a decimal number [00,59]." }
+        { "%U"     "Week number of the year (Sunday as the first day of the week) as a decimal number [00,53]." }
+        { "%w"     "Weekday as a decimal number [0(Sunday),6]." }
+        { "%W"     "Week number of the year (Monday as the first day of the week) as a decimal number [00,53]." }
+        { "%x"     "Date representation." }
+        { "%X"     "Time representation." }
+        { "%y"     "Year without century as a decimal number [00,99]." }
+        { "%Y"     "Year with century as a decimal number." }
+        { "%Z"     "Time zone name (no characters if no time zone exists)." }
+        { "%%"     "A literal '%' character." }
+    } 
+} 
+{ $examples 
     { $unchecked-example
         "USING: calendar formatting io ;"
         "now \"%c\" strftime print"

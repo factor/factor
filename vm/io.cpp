@@ -196,7 +196,6 @@ void factor_vm::primitive_fgetc()
 		ctx->push(tag_fixnum(c));
 }
 
-/* Allocates memory */
 void factor_vm::primitive_fread()
 {
 	FILE *file = pop_file_handle();

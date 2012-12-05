@@ -83,8 +83,9 @@ M: unsupported-engine summary
         graph id>> graph kind agopen &agclose :> g
         g graph build-alien
         g -K compute-engine :> engine
-        gvc g engine gvLayout ?ffi-errors
-        gvc g -T -o gvRenderFilename ?ffi-errors -o
+        gvc g engine gvLayout drop
+        [ gvc g -T -o gvRenderFilename drop -o ]
+        [ gvc g gvFreeLayout drop ] [ ] cleanup
     ] with-destructors ;
 
 : (preview) ( graph -- -o )

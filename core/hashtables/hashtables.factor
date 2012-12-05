@@ -24,7 +24,7 @@ TUPLE: hashtable
 
 : (key@) ( key array i probe# -- array n ? )
     [ 3dup swap array-nth ] dip over ((empty)) eq?
-    [ 4drop no-key ] [
+    [ drop 3drop no-key ] [
         [ = ] dip swap
         [ drop rot drop t ]
         [ probe (key@) ]
@@ -131,7 +131,7 @@ M: hashtable set-at ( value key hash -- )
     dup ?grow-hash dupd new-key@ set-nth-pair ;
 
 : associate ( value key -- hash )
-    1 <hashtable> [ set-at ] keep ; inline
+    2 <hashtable> [ set-at ] keep ; inline
 
 <PRIVATE
 
@@ -180,13 +180,5 @@ M: hashtable assoc-like
 : hash-combine ( obj oldhash -- newhash )
     [ hashcode 0x13c6ef37 + ] dip
     [ 6 shift ] [ -2 shift ] bi + + ;
-
-ERROR: malformed-hashtable-pair seq pair ;
-
-: check-hashtable ( seq -- seq )
-    dup [ dup length 2 = [ drop ] [ malformed-hashtable-pair ] if ] each ;
-
-: parse-hashtable ( seq -- hashtable )
-    check-hashtable H{ } assoc-clone-like ;
 
 INSTANCE: hashtable assoc

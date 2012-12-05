@@ -155,9 +155,9 @@ M: string absolute-path
             "~" ?head [
                 trim-head-separators home prepend-path
                 absolute-path
-        ] [
+        ] [    
             current-directory get prepend-path
-        ] if ] if
+        ] if ] if 
     ] if ;
 
 M: object normalize-path ( path -- path' )

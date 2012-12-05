@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.private
-math.functions arrays math.functions.private sequences
-sequences.private parser ;
+math.functions arrays math.functions.private sequences parser ;
 IN: math.complex.private
 
 M: real real-part ; inline
@@ -31,12 +30,7 @@ M: complex sqrt >polar [ sqrt ] [ 2.0 / ] bi* polar> ; inline
 
 IN: syntax
 
-ERROR: malformed-complex obj ;
-
-: parse-complex ( seq -- complex )
-    dup length 2 = [ first2-unsafe rect> ] [ malformed-complex ] if ;
-
-SYNTAX: C{ \ } [ parse-complex ] parse-literal ;
+SYNTAX: C{ \ } [ first2 rect> ] parse-literal ;
 
 USE: prettyprint.custom
 

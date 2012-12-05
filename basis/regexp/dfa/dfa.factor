@@ -43,7 +43,7 @@ IN: regexp.dfa
     [ tagged-epsilon? not ] filter ;
 
 : add-todo-state ( state visited-states new-states -- )
-    2over key? [ 3drop ] [
+    3dup drop key? [ 3drop ] [
         [ conjoin ] [ push ] bi-curry* bi
     ] if ;
 

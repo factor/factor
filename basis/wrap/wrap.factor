@@ -1,78 +1,86 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators combinators.short-circuit
-fry kernel kernel.private lists locals math sequences typed ;
+USING: kernel sequences math arrays locals fry accessors
+lists splitting make combinators.short-circuit namespaces
+grouping splitting.monotonic ;
 IN: wrap
 
 ! black is the text length, white is the whitespace length
 TUPLE: element contents black white ;
 C: <element> element
 
-<PRIVATE
-
 : element-length ( element -- n )
-    [ black>> ] [ white>> ] bi + ; inline
+    [ black>> ] [ white>> ] bi + ;
 
-TUPLE: paragraph line-max line-ideal lines head-width tail-cost ;
+TUPLE: paragraph lines head-width tail-cost ;
 C: <paragraph> paragraph
 
-TYPED: top-fits? ( paragraph: paragraph -- ? )
-    [ head-width>> ]
-    [ dup lines>> 1list? [ line-ideal>> ] [ line-max>> ] if ] bi <= ; inline
+SYMBOL: line-max
+SYMBOL: line-ideal
 
-TYPED: fits? ( paragraph: paragraph -- ? )
+: deviation ( length -- n )
+    line-ideal get - sq ;
+
+: top-fits? ( paragraph -- ? )
+    [ head-width>> ]
+    [ lines>> 1list? line-ideal line-max ? get ] bi <= ;
+
+: fits? ( paragraph -- ? )
     ! Make this not count spaces at end
-    { [ lines>> car 1list? ] [ top-fits? ] } 1|| ; inline
+    { [ lines>> car 1list? ] [ top-fits? ] } 1|| ;
 
 :: min-by ( seq quot -- elt )
-    f 1/0. seq [| key value newkey |
-        newkey quot call :> newvalue
-        newvalue value < [ newkey newvalue ] [ key value ] if
+    f 1/0. seq [| key value new |
+        new quot call :> newvalue
+        newvalue value < [ new newvalue ] [ key value ] if
     ] each drop ; inline
 
-TYPED: paragraph-cost ( paragraph: paragraph -- cost )
+: paragraph-cost ( paragraph -- cost )
     dup lines>> 1list? [ drop 0 ] [
-        [ [ head-width>> ] [ line-ideal>> ] bi - sq ]
+        [ head-width>> deviation ]
         [ tail-cost>> ] bi +
-    ] if ; inline
+    ] if ;
 
 : min-cost ( paragraphs -- paragraph )
-    [ paragraph-cost ] min-by ; inline
+    [ paragraph-cost ] min-by ;
 
-TYPED: new-line ( paragraph: paragraph element: element -- paragraph )
-    {
-        [ drop [ line-max>> ] [ line-ideal>> ] bi ]
-        [ [ lines>> ] [ 1list ] bi* swons ]
-        [ nip black>> ]
-        [ drop paragraph-cost ]
-    } 2cleave <paragraph> ; inline
+: new-line ( paragraph element -- paragraph )
+    [ [ lines>> ] [ 1list ] bi* swons ]
+    [ nip black>> ]
+    [ drop paragraph-cost ] 2tri
+    <paragraph> ;
 
-TYPED: add-element ( paragraph: paragraph element: element -- )
-    [ element-length [ + ] curry change-head-width ]
-    [ [ [ unswons ] dip swons swons ] curry change-lines ]
-    bi drop ; inline
+: glue ( paragraph element -- paragraph )
+    [ [ lines>> unswons ] dip swons swons ]
+    [ [ head-width>> ] [ element-length ] bi* + ]
+    [ drop tail-cost>> ] 2tri
+    <paragraph> ;
 
-TYPED: wrap-step ( paragraphs: array element: element -- paragraphs )
+: wrap-step ( paragraphs element -- paragraphs )
+    [ '[ _ glue ] map ]
     [ [ min-cost ] dip new-line ]
-    [ dupd '[ _ add-element ] each ]
-    2bi swap prefix { array } declare
+    2bi prefix
     [ fits? ] filter ;
 
-: 1paragraph ( line-max line-ideal element -- paragraph )
-    [ 1list 1list ] [ black>> ] bi 0 <paragraph> ;
+: 1paragraph ( element -- paragraph )
+    [ 1list 1list ]
+    [ black>> ] bi
+    0 <paragraph> ;
 
 : post-process ( paragraph -- array )
     lines>> [ [ contents>> ] lmap>array ] lmap>array ;
 
-: initialize ( line-max line-ideal elements -- elements paragraph )
-    reverse unclip [ -rot ] dip 1paragraph 1array ;
+: initialize ( elements -- elements paragraph )
+    <reversed> unclip-slice 1paragraph 1array ;
 
-PRIVATE>
-
-: wrap ( elements line-max line-ideal -- array )
-    rot [ 2drop { } ] [
-        initialize
-        [ wrap-step ] reduce
-        min-cost
-        post-process
-    ] if-empty ;
+: wrap ( elements line-max line-ideal -- paragraph )
+    [
+        line-ideal set
+        line-max set
+        [ { } ] [
+            initialize
+            [ wrap-step ] reduce
+            min-cost
+            post-process
+        ] if-empty
+    ] with-scope ;

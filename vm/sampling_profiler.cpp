@@ -122,7 +122,6 @@ void factor_vm::primitive_sampling_profiler()
 	set_sampling_profiler(to_fixnum(ctx->pop()));
 }
 
-/* Allocates memory */
 void factor_vm::primitive_get_samples()
 {
 	if (atomic::load(&sampling_profiler_p) || samples.empty()) {

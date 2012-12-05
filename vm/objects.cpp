@@ -77,7 +77,6 @@ cell factor_vm::object_size(cell tagged)
 		return untag<object>(tagged)->size();
 }
 
-/* Allocates memory */
 void factor_vm::primitive_size()
 {
 	ctx->push(from_unsigned_cell(object_size(ctx->pop())));

@@ -51,6 +51,7 @@ ARTICLE: "runtime-cli-args" "Command line switches for the VM"
     { { $snippet "-codeheap=" { $emphasis "n" } } "Code heap size, megabytes" }
     { { $snippet "-callbacks=" { $emphasis "n" } } "Callback heap size, megabytes" }
     { { $snippet "-pic=" { $emphasis "n" } } "Maximum inline cache size. Setting of 0 disables inline caching, > 1 enables polymorphic inline caching" }
+    { { $snippet "-securegc" } "If specified, unused portions of the data heap will be zeroed out after every garbage collection" }
 }
 "If an " { $snippet "-i=" } " switch is not present, the default image file is used, which is usually a file named " { $snippet "factor.image" } " in the same directory as the Factor executable." ;
 
@@ -131,7 +132,7 @@ $nl
     "\"/opt/local/bin\" \\ gvim-path set-global"
 } ;
 
-ARTICLE: "command-line" "Command line arguments"
+ARTICLE: "cli" "Command line arguments"
 "Factor command line usage:"
 { $code "factor [VM args...] [script] [args...]" }
 "Zero or more VM arguments can be passed in, followed by an optional script file name. If the script file is specified, it will be run on startup using " { $link run-script } ". Any arguments after the script file are stored in the following variable, with no further processing by Factor itself:"
@@ -163,4 +164,4 @@ HELP: run-script
 { $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used. If the source file contains a " { $link POSTPONE: MAIN: } " declaration, the main entry point of the file will be also be executed. Loading messages will be suppressed." }
 { $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation or executing the main entry point." }  ;
 
-ABOUT: "command-line"
+ABOUT: "cli"

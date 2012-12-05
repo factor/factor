@@ -273,7 +273,7 @@ struct code_compaction_fixup {
 
 	code_block *translate_code(const code_block *compiled)
 	{
-		if(compiled < *code_finger)
+		if(compiled >= *code_finger)
 			return fixup_code((code_block *)compiled);
 		else
 			return (code_block *)compiled;

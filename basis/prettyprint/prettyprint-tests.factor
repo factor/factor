@@ -40,10 +40,6 @@ unit-test
 [ "\e" unparse ]
 unit-test
 
-[ "\"\\x01\"" ]
-[ 1 1string unparse ]
-unit-test
-
 [ "f" ] [ f unparse ] unit-test
 [ "t" ] [ t unparse ] unit-test
 

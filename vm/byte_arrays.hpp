@@ -14,7 +14,6 @@ struct growable_byte_array {
 	void trim();
 };
 
-/* Allocates memory */
 template<typename Type> byte_array *factor_vm::byte_array_from_value(Type *value)
 {
 	byte_array *data = allot_uninitialized_array<byte_array>(sizeof(Type));

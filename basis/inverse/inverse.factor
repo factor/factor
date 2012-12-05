@@ -61,9 +61,9 @@ ERROR: bad-math-inverse ;
 
 : undo-literal ( object -- quot ) [ =/fail ] curry ;
 
-PREDICATE: normal-inverse < word "inverse" word-prop >boolean ;
-PREDICATE: math-inverse < word "math-inverse" word-prop >boolean ;
-PREDICATE: pop-inverse < word "pop-length" word-prop >boolean ;
+PREDICATE: normal-inverse < word "inverse" word-prop ;
+PREDICATE: math-inverse < word "math-inverse" word-prop ;
+PREDICATE: pop-inverse < word "pop-length" word-prop ;
 UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : enough? ( stack word -- ? )

@@ -22,8 +22,7 @@ TUPLE: heap { data vector } ;
 
 TUPLE: entry value key heap index ;
 
-: <entry> ( value key heap -- entry )
-    f entry boa ; inline
+: <entry> ( value key heap -- entry ) f entry boa ; inline
 
 PRIVATE>
 
@@ -39,7 +38,7 @@ M: heap heap-empty? ( heap -- ? )
     data>> empty? ; inline
 
 M: heap heap-size ( heap -- n )
-    data>> length ; inline
+    data>> length ;
 
 <PRIVATE
 
@@ -96,7 +95,7 @@ M: max-heap heap-compare (heap-compare) +lt+ eq? ;
 : continue? ( m n heap -- ? )
     [ data-nth nip ]
     [ nip data-nth ]
-    [ 2nip ] 3tri heap-compare ; inline
+    [ 2nip ] 3tri heap-compare ;
 
 DEFER: up-heap
 
@@ -113,11 +112,11 @@ DEFER: up-heap
 
 : (child) ( m heap -- n )
     { [ drop ] [ left-value ] [ right-value ] [ nip ] } 2cleave
-    heap-compare [ right ] [ left ] if ; inline
+    heap-compare [ right ] [ left ] if ;
 
 : child ( m heap -- n )
     2dup right-bounds-check?
-    [ drop left ] [ (child) ] if ; inline
+    [ drop left ] [ (child) ] if ;
 
 DEFER: down-heap
 
@@ -152,7 +151,7 @@ ERROR: bad-heap-delete ;
 
 M: bad-heap-delete summary 
     drop "Invalid entry passed to heap-delete" ;
-
+    
 : entry>index ( entry heap -- n )
     over heap>> eq? [ bad-heap-delete ] unless
     index>> ;

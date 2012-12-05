@@ -56,7 +56,7 @@ M: cannot-find-source error.
 DEFER: edit
 
 : edit-vocab ( vocab -- )
-    vocab-name* >vocab-link edit ;
+    >vocab-link edit ;
 
 GENERIC: edit ( object -- )
 
@@ -90,8 +90,7 @@ M: string edit edit-vocab ;
 
 GENERIC: edit-docs ( object -- )
 
-M: object edit-docs
-    vocab-name* vocab-docs-path 1 edit-location ;
+M: object edit-docs vocab-docs-path 1 edit-location ;
 
 M: word edit-docs
     dup "help-loc" word-prop
@@ -101,8 +100,7 @@ M: word edit-docs
 
 GENERIC: edit-tests ( object -- )
 
-M: object edit-tests
-    vocab-name* vocab-tests-path 1 edit-location ;
+M: object edit-tests vocab-tests-path 1 edit-location ;
 
 M: word edit-tests vocabulary>> edit-tests ;
 

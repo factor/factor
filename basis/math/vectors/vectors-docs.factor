@@ -9,7 +9,6 @@ ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
     v+-
     v*
     v/
-    v^
 }
 "Vector unary operations:"
 { $subsections
@@ -31,8 +30,6 @@ ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
     n+v
     v-n
     n-v
-    v^n
-    n^v
 }
 "Saturated arithmetic (only on " { $link "specialized-arrays" } "):"
 { $subsections
@@ -215,7 +212,7 @@ HELP: vtruncate
 
 HELP: n+v
 { $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Adds " { $snippet "n" } " to each element of " { $snippet "v" } "." } ;
+{ $description "Adds " { $snippet "n" } " to each element of " { $snippet "u" } "." } ;
 
 HELP: v+n
 { $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
@@ -223,7 +220,7 @@ HELP: v+n
 
 HELP: n-v
 { $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Subtracts each element of " { $snippet "v" } " from " { $snippet "n" } "." } ;
+{ $description "Subtracts each element of " { $snippet "u" } " from " { $snippet "n" } "." } ;
 
 HELP: v-n
 { $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
@@ -231,7 +228,7 @@ HELP: v-n
 
 HELP: n*v
 { $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Multiplies each element of " { $snippet "v" } " by " { $snippet "n" } "." } ;
+{ $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
 
 HELP: v*n
 { $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
@@ -239,21 +236,13 @@ HELP: v*n
 
 HELP: n/v
 { $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Divides " { $snippet "n" } " by each element of " { $snippet "v" } "." }
+{ $description "Divides " { $snippet "n" } " by each element of " { $snippet "u" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
 HELP: v/n
 { $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
 { $description "Divides each element of " { $snippet "u" } " by " { $snippet "n" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
-
-HELP: n^v
-{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Raises " { $snippet "n" } " to the power of each element of " { $snippet "v" } "." } ;
-
-HELP: v^n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
-{ $description "Raises each element of " { $snippet "u" } " to the power of " { $snippet "n" } "." } ;
 
 HELP: v+
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
@@ -286,10 +275,6 @@ HELP: v/
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Divides " { $snippet "u" } " by " { $snippet "v" } " component-wise." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
-
-HELP: v^
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Raises " { $snippet "u" } " to the power of " { $snippet "v" } " component-wise." } ;
 
 HELP: vmax
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }

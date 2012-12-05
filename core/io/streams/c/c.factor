@@ -42,7 +42,7 @@ M: c-reader stream-read1 dup check-disposed handle>> fgetc ;
         dup pick member-eq? [ 2nip ] [ , read-until-loop ] if
     ] [
         2nip
-    ] if ; inline recursive
+    ] if ;
 
 M: c-reader stream-read-until
     dup check-disposed

@@ -110,35 +110,17 @@ IN: compiler.tree.propagation.transforms
 : 2^? ( #call -- ? )
     in-d>> first value-info literal>> 1 eq? ;
 
-: shift-2^ ( -- quot )
-    cell-bits tag-bits get - 1 -
-    '[
-        integer>fixnum dup 0 < [ 2drop 0 ] [
-            dup _ < [ fixnum-shift ] [
-                fixnum-shift
-            ] if
-        ] if
-    ] ;
-
-! Speeds up 2/
-: 2/? ( #call -- ? )
-    in-d>> second value-info literal>> -1 eq? ;
-
-: shift-2/ ( -- quot )
-    [
-        {
-            { [ over fixnum? ] [ fixnum-shift ] }
-            { [ over bignum? ] [ bignum-shift ] }
-            [ drop \ shift no-method ]
-        } cond
-    ] ;
-
 \ shift [
-    {
-        { [ dup 2^? ] [ drop shift-2^ ] }
-        { [ dup 2/? ] [ drop shift-2/ ] }
-        [ drop f ]
-    } cond
+    2^? [
+        cell-bits tag-bits get - 1 -
+        '[
+            integer>fixnum dup 0 < [ 2drop 0 ] [
+                dup _ < [ fixnum-shift ] [
+                    fixnum-shift
+                ] if
+            ] if
+        ]
+    ] [ f ] if
 ] "custom-inlining" set-word-prop
 
 { /i fixnum/i fixnum/i-fast bignum/i } [
@@ -311,6 +293,9 @@ M\ set diff [ diff-quot ] 1 define-partial-eval
 
 M\ set intersect [ intersect-quot ] 1 define-partial-eval
 
+: fixnum-bits ( -- n )
+    cell-bits tag-bits get - ;
+
 : bit-quot ( #call -- quot/f )
     in-d>> second value-info interval>> 0 fixnum-bits [a,b] interval-subset?
     [ [ >fixnum ] dip fixnum-bit? ] f ? ;
@@ -324,14 +309,18 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
     [ \ push def>> ] [ f ] if
 ] "custom-inlining" set-word-prop
 
-: custom-inline-fixnum ( x method -- y )
-    [ in-d>> first value-info class>> fixnum \ f class-or class<= ] dip
-    '[ [ dup [ _ no-method ] unless ] ] [ f ] if ;
+: custom-inline-fixnum ( x -- y )
+    in-d>> first value-info class>> fixnum \ f class-or class<=
+    [ [ dup [ \ >fixnum no-method ] unless ] ] [ f ] if ;
 
 ! Speeds up fasta benchmark
-{ >fixnum integer>fixnum integer>fixnum-strict } [
-    dup '[ _ custom-inline-fixnum ] "custom-inlining" set-word-prop
-] each
+\ >fixnum [
+    custom-inline-fixnum
+] "custom-inlining" set-word-prop
+
+\ integer>fixnum [
+    custom-inline-fixnum
+] "custom-inlining" set-word-prop
 
 ! We want to constant-fold calls to heap-size, and recompile those
 ! calls when a C type is redefined

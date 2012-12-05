@@ -49,7 +49,7 @@ SYNTAX: STRING:
             0 end (scan-multiline-string)
         ] if*
     ] [ end unexpected-eof ] if ;
-
+        
 :: (parse-multiline-string) ( end-text skip-n-chars -- str )
     [
         lexer get

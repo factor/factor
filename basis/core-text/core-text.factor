@@ -32,15 +32,7 @@ FUNCTION: double CTLineGetTypographicBounds ( CTLineRef line, CGFloat* ascent, C
 
 FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context ) ;
 
-SYMBOL: retina?
-
 ERROR: not-a-string object ;
-
-MEMO: make-attributes ( open-font color -- hashtable )
-    [
-        kCTForegroundColorAttributeName ,,
-        kCTFontAttributeName ,,
-    ] H{ } make ;
 
 : <CTLine> ( string open-font color -- line )
     [
@@ -48,12 +40,17 @@ MEMO: make-attributes ( open-font color -- hashtable )
             dup selection? [ string>> ] when
             dup string? [ not-a-string ] unless
         ] 2dip
-        make-attributes <CFAttributedString> &CFRelease
+        [
+            kCTForegroundColorAttributeName ,,
+            kCTFontAttributeName ,,
+        ] H{ } make <CFAttributedString> &CFRelease
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
-TUPLE: line < disposable font string line metrics image loc dim
-render-loc render-dim ;
+TUPLE: line < disposable line metrics image loc dim rendered-line ;
+
+TUPLE: rendered-line font string loc dim ;
+C: <rendered-line> rendered-line
 
 : typographic-bounds ( line -- width ascent descent leading )
     { CGFloat CGFloat CGFloat }
@@ -117,38 +114,35 @@ render-loc render-dim ;
 :: <line> ( font string -- line )
     [
         line new-disposable
-        font retina? get-global [ cache-font@2x ] [ cache-font ] if :> open-font
+
+        font cache-font :> open-font
         string open-font font foreground>> <CTLine> |CFRelease :> line
-        open-font line compute-line-metrics
-        [ >>metrics ] [ metrics>dim >>dim ] bi
-        font >>font
-        string >>string
-        line >>line
-    ] with-destructors ;
 
-:: render ( line -- line image )
-    line line>> :> ctline
-    line string>> :> string
-    line font>> :> font
-
-    line render-loc>> [
-
-        ctline line-rect :> rect
+        line line-rect :> rect
         rect origin>> CGPoint>loc :> (loc)
         rect size>> CGSize>dim :> (dim)
         (loc) [ floor ] map :> loc
         (loc) (dim) [ + ceiling ] 2map :> ext
         ext loc [ - >integer 1 max ] 2map :> dim
+        open-font line compute-line-metrics :> metrics
 
-        loc line render-loc<<
-        dim line render-dim<<
+        line >>line
 
-        line metrics>> loc dim line-loc line loc<<
+        font string loc dim <rendered-line> >>rendered-line
 
-    ] unless
+        metrics >>metrics
 
-    line render-loc>> :> loc
-    line render-dim>> :> dim
+        metrics loc dim line-loc >>loc
+
+        metrics metrics>dim >>dim
+    ] with-destructors ;
+
+:: render ( line -- line image )
+    line line>> :> ctline
+    line rendered-line>> string>> :> string
+    line rendered-line>> font>> :> font
+    line rendered-line>> loc>> :> loc
+    line rendered-line>> dim>> :> dim
 
     line dim [
         {
@@ -157,7 +151,7 @@ render-loc render-dim ;
             [ loc set-text-position ]
             [ [ ctline ] dip CTLineDraw ]
         } cleave
-    ] make-bitmap-image retina? get-global >>2x? ;
+    ] make-bitmap-image ;
 
 : line>image ( line -- image )
     dup image>> [ render >>image ] unless image>> ;
@@ -167,6 +161,6 @@ M: line dispose* line>> CFRelease ;
 SYMBOL: cached-lines
 
 : cached-line ( font string -- line )
-    cached-lines get-global [ <line> ] 2cache ;
+    cached-lines get [ <line> ] 2cache ;
 
-[ <cache-assoc> cached-lines set-global f retina? set-global ] "core-text" add-startup-hook
+[ <cache-assoc> cached-lines set-global ] "core-text" add-startup-hook

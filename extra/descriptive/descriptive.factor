@@ -38,7 +38,7 @@ PRIVATE>
 SYNTAX: DESCRIPTIVE: (:) define-descriptive ;
 
 PREDICATE: descriptive < word
-    "descriptive-definition" word-prop >boolean ;
+    "descriptive-definition" word-prop ;
 
 M: descriptive definer drop \ DESCRIPTIVE: \ ; ;
 

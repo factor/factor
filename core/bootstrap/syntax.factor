@@ -12,6 +12,7 @@ IN: bootstrap.syntax
         "\""
         "#!"
         "("
+        "(("
         ":"
         ";"
         "<PRIVATE"

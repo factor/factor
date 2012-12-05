@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs binary-search classes.tuple fry
-kernel locals math math.order math.ranges memoize namespaces
-sequences sequences.private sorting ;
+kernel locals math math.order math.ranges namespaces sequences
+sequences.private sorting ;
 FROM: sequences => change-nth ;
 IN: math.combinatorics
 
@@ -17,7 +17,7 @@ IN: math.combinatorics
 
 PRIVATE>
 
-MEMO: factorial ( n -- n! )
+: factorial ( n -- n! )
     dup 1 > [ [1,b] product ] [ drop 1 ] if ;
 
 : nPk ( n k -- nPk )

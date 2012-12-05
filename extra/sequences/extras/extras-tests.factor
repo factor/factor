@@ -1,13 +1,10 @@
-USING: arrays ascii io io.streams.string kernel make math
-math.vectors random sequences sequences.extras strings
-tools.test ;
+USING: arrays ascii kernel make math math.vectors random
+sequences sequences.extras strings tools.test ;
 
 IN: sequences.extras.tests
 
 [ 4 ] [ 5 iota [ ] supremum-by ] unit-test
 [ 0 ] [ 5 iota [ ] infimum-by ] unit-test
-{ "bar" } [ { "bar" "baz" "qux" } [ length ] supremum-by ] unit-test
-{ "bar" } [ { "bar" "baz" "qux" } [ length ] infimum-by ] unit-test
 [ { "foo" } ] [ { { "foo" } { "bar" } } [ first ] supremum-by ] unit-test
 [ { "bar" } ] [ { { "foo" } { "bar" } } [ first ] infimum-by ] unit-test
 
@@ -99,73 +96,3 @@ IN: sequences.extras.tests
 
 { t } [ "ABC" dup [ blank? ] ?trim [ identity-hashcode ] same? ] unit-test
 { "ABC" } [ " ABC " [ blank? ] ?trim ] unit-test
-
-{ "" } [ "" "" "" unsurround ] unit-test
-{ "" } [ "  " " " " " unsurround ] unit-test
-{ "foo.com" } [ "http://foo.com" "http://" "/" unsurround ] unit-test
-
-{ t } [ { 1 3 5 7 } [ even? ] none? ] unit-test
-{ f } [ { 1 2 3 4 } [ even? ] none? ] unit-test
-{ t } [ { } [ even? ] none? ] unit-test
-
-{ f } [ { 1 2 3 4 } [ even? ] one? ] unit-test
-{ t } [ { 1 2 3 } [ even? ] one? ] unit-test
-{ f } [ { } [ even? ] one? ] unit-test
-
-{ { { 5 8 0 } { 6 9 1 } { 7 10 2 } } } [ { 5 6 7 } { 8 9 10 } [ 3array ] 2map-index ] unit-test
-
-{ { } } [ { } <evens> >array ] unit-test
-{ { 0 2 } } [ 4 iota <evens> >array ] unit-test
-{ { 0 2 4 } } [ 5 iota <evens> >array ] unit-test
-
-{ { } } [ { } <odds> >array ] unit-test
-{ { 1 3 } } [ 5 iota <odds> >array ] unit-test
-{ { 1 3 5 } } [ 6 iota <odds> >array ] unit-test
-
-{ 1 } [ { 1 7 3 7 6 3 7 } arg-max ] unit-test
-{ 0 } [ { 1 7 3 7 6 3 7 } arg-min ] unit-test
-{ { 0 4 } } [ { 5 3 2 10 5 } [ 5 = ] arg-where ] unit-test
-{ { 2 1 0 4 3 } } [ { 5 3 2 10 5 } arg-sort ] unit-test
-
-{ t } [ { 1 2 3 4 5 } 1 first= ] unit-test
-{ t } [ { 1 2 3 4 5 } 2 second= ] unit-test
-{ t } [ { 1 2 3 4 5 } 3 third= ] unit-test
-{ t } [ { 1 2 3 4 5 } 4 fourth= ] unit-test
-{ t } [ { 1 2 3 4 5 } 5 last= ] unit-test
-{ t } [ 4 { 1 2 3 4 5 } 5 nth= ] unit-test
-
-{ t } [ { 1 2 3 4 5 } [ 1 = ] first? ] unit-test
-{ t } [ { 1 2 3 4 5 } [ 2 = ] second? ] unit-test
-{ t } [ { 1 2 3 4 5 } [ 3 = ] third? ] unit-test
-{ t } [ { 1 2 3 4 5 } [ 4 = ] fourth? ] unit-test
-{ t } [ { 1 2 3 4 5 } [ 5 = ] last? ] unit-test
-{ t } [ 4 { 1 2 3 4 5 } [ 5 = ] nth? ] unit-test
-
-{ { 97 115 100 102 } } [
-    "asdf" [ [ read1 ] loop>array ] with-string-reader
-] unit-test
-
-{ V{ 97 115 100 102 } } [
-    "asdf" [ [ read1 ] V{ } loop>sequence ] with-string-reader
-] unit-test
-
-{ "" } [ { } "" reverse-as ] unit-test
-{ "ABC" } [ { 67 66 65 } "" reverse-as ] unit-test
-
-{ V{ 1 } } [ 1 0 V{ } [ insert-nth! ] keep ] unit-test
-{ V{ 1 2 3 4 } } [ 2 1 V{ 1 3 4 } [ insert-nth! ] keep ] unit-test
-
-{ "abc" } [ B{ 97 98 99 100 101 102 103 } 3 "" head-as ] unit-test
-{ "abcd" } [ B{ 97 98 99 100 101 102 103 } 3 "" head*-as ] unit-test
-{ "defg" } [ B{ 97 98 99 100 101 102 103 } 3 "" tail-as ] unit-test
-{ "efg" } [ B{ 97 98 99 100 101 102 103 } 3 "" tail*-as ] unit-test
-
-{ { 1 0 0 1 0 0 0 1 0 0 } }
-[ 1 { 0 3 7 } 10 0 <array> [ set-nths ] keep ] unit-test
-
-{ { 1 0 0 1 0 0 0 1 0 0 } }
-[ 1 { 0 3 7 } 10 0 <array> [ set-nths-unsafe ] keep ] unit-test
-
-{ V{ 1 } } [ 1 flatten1 ] unit-test
-{ { 1 2 3 } } [ { 1 2 3 } flatten1 ] unit-test
-{ { 1 2 3 { { 4 } } } } [ { 1 { 2 } { 3 { { 4 } } } } flatten1 ] unit-test

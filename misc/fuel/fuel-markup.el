@@ -262,7 +262,7 @@
     (insert (cadr e))))
 
 (defun fuel-markup--snippet (e)
-  (insert (mapconcat '(lambda (s)
+  (insert (mapconcat #'(lambda (s)
                         (if (stringp s)
                             (fuel-font-lock--factor-str s)
                           (fuel-markup--print-str s)))
@@ -342,7 +342,7 @@
     (insert " ")))
 
 (defun fuel-markup--vocab-list (e)
-  (let ((rows (mapcar '(lambda (elem)
+  (let ((rows (mapcar #'(lambda (elem)
                          (list (list '$vocab-link (car elem))
                                (cadr elem)))
                       (cdr e))))
@@ -374,7 +374,7 @@
                  (super (and (cadr objs)
                              (list (list '$link (cadr objs) (cadr objs) 'word))))
                  (slots (when (cddr objs)
-                          (list (mapcar '(lambda (s) (list s " ")) (cddr objs))))))
+                          (list (mapcar #'(lambda (s) (list s " ")) (cddr objs))))))
             (push `(,class ,@super ,@slots) rows))
           (forward-line))
         (push `(,heading ($table ,@(reverse rows))) elems))
@@ -465,7 +465,7 @@
   (delete-blank-lines)
   (newline)
   (fuel-table--insert
-   (mapcar '(lambda (row) (mapcar 'fuel-markup--print-str row)) (cdr e)))
+   (mapcar #'(lambda (row) (mapcar 'fuel-markup--print-str row)) (cdr e)))
   (newline))
 
 (defun fuel-markup--instance (e)

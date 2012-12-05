@@ -1,9 +1,16 @@
-USING: kernel math random ;
+USING: io io.files io.files.temp io.encodings.ascii random
+math.parser math sequences ;
 IN: benchmark.random
 
+: random-numbers-path ( -- path )
+    "random-numbers.txt" temp-file ;
+
+: write-random-numbers ( n -- )
+    random-numbers-path ascii [
+        [ 200 random 100 - number>string print ] times
+    ] with-file-writer ;
+
 : random-benchmark ( -- )
-    1,000,000 [
-        200 random random-unit random-32 3drop
-    ] times ;
+    300000 write-random-numbers ;
 
 MAIN: random-benchmark

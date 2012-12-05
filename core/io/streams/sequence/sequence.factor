@@ -11,13 +11,16 @@ SLOT: i
 : >sequence-stream< ( stream -- i underlying )
     [ i>> ] [ underlying>> ] bi ; inline
 
+: next ( stream -- )
+    [ 1 + ] change-i drop ; inline
+
 : sequence-read1 ( stream -- elt/f )
-    dup >sequence-stream< dupd ?nth [ 1 + swap i<< ] dip ; inline
+    [ >sequence-stream< ?nth ] [ next ] bi ; inline
 
 : (sequence-read-length) ( n buf stream -- buf count )
     [ underlying>> length ] [ i>> ] bi - rot min ; inline
 
-: <sequence-copy> ( dst n i src -- n copy )
+: <sequence-copy> ( dest n i src -- n copy )
     [ 0 ] 3curry dip <copy> ; inline
 
 : (sequence-read-unsafe) ( n buf stream -- count )
@@ -36,8 +39,7 @@ SLOT: i
 
 : sequence-read-until ( seps stream -- seq sep/f )
     [ find-separator ] keep
-    [ [ (sequence-read-unsafe) ] (read-into-new) ]
-    [ [ 1 + ] change-i drop ] bi swap ; inline
+    [ [ (sequence-read-unsafe) ] (read-into-new) ] [ next ] bi swap ; inline
 
 ! Writers
 M: growable dispose drop ;

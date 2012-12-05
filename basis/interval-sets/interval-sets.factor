@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs binary-search
-combinators fry grouping kernel locals make math math.order
-sequences sequences.private sorting specialized-arrays ;
+combinators fry grouping hints kernel locals make math
+math.order sequences sorting specialized-arrays ;
 SPECIALIZED-ARRAY: uint
 IN: interval-sets
 ! Sets of positive integers
@@ -11,24 +11,21 @@ TUPLE: interval-set { array uint-array read-only } ;
 
 <PRIVATE
 
-ALIAS: start first-unsafe
-ALIAS: end second-unsafe
+ALIAS: start first
+ALIAS: end second
 
 : find-interval ( key interval-set -- slice )
     array>> 2 <sliced-groups>
     [ start <=> ] with search nip ; inline
 
-ERROR: not-an-interval-set obj ;
-
-: check-interval-set ( map -- map )
-    dup interval-set? [ not-an-interval-set ] unless ; inline
-
 PRIVATE>
 
 : in? ( key set -- ? )
-    check-interval-set dupd find-interval
+    dupd find-interval
     [ [ start ] [ end 1 - ] bi between? ]
     [ drop f ] if* ;
+
+HINTS: in? { integer interval-set } ;
 
 <PRIVATE
 

@@ -1,11 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs colors.constants combinators
-combinators.short-circuit fry io.directories io.files
-io.files.info io.pathnames kernel locals make math math.order
-sequences sorting splitting unicode.categories unicode.data
-vectors vocabs vocabs.hierarchy ;
+USING: accessors arrays assocs combinators fry io kernel locals
+make math math.order namespaces sequences sorting strings
+unicode.case unicode.categories unicode.data vectors vocabs
+vocabs.hierarchy words ;
 
 IN: tools.completion
 
@@ -15,6 +14,8 @@ IN: tools.completion
     rot [ ch>lower ] [ ch>upper ] bi
     '[ dup _ eq? [ drop t ] [ _ eq? ] if ] find-from drop ;
 
+PRIVATE>
+
 :: (fuzzy) ( accum i full ch -- accum i ? )
     ch i full smart-index-from [
         [ accum push ]
@@ -23,13 +24,9 @@ IN: tools.completion
         f -1 f
     ] if* ;
 
-PRIVATE>
-
 : fuzzy ( full short -- indices )
     dup [ length <vector> 0 ] curry 2dip
     [ (fuzzy) ] with all? 2drop ;
-
-<PRIVATE
 
 : (runs) ( runs n seq -- runs n )
     [
@@ -40,12 +37,8 @@ PRIVATE>
         ] keep pick last push
     ] each ;
 
-PRIVATE>
-
 : runs ( seq -- newseq )
     [ V{ } clone 1vector ] dip [ first ] keep (runs) drop ;
-
-<PRIVATE
 
 : score-1 ( i full -- n )
     {
@@ -55,8 +48,6 @@ PRIVATE>
         { [ 2dup [ 1 + ] dip nth Letter? not ] [ 2drop 4 ] }
         [ 2drop 1 ]
     } cond ;
-
-PRIVATE>
 
 : score ( full fuzzy -- n )
     dup [
@@ -104,66 +95,3 @@ PRIVATE>
 : chars-matching ( str -- seq )
     name-map keys dup zip completions ;
 
-: colors-matching ( str -- seq )
-    named-colors dup zip completions ;
-
-<PRIVATE
-
-: directory-paths ( directory -- alist )
-    dup '[
-        [
-            [ dup _ prepend-path ]
-            [ file-info directory? [ path-separator append ] when ]
-            bi swap
-        ] { } map>assoc
-    ] with-directory-files ;
-
-PRIVATE>
-
-: paths-matching ( str -- seq )
-    dup last-path-separator [ 1 + cut ] [ drop "" ] if swap
-    dup { [ exists? ] [ file-info directory? ] } 1&&
-    [ directory-paths completions ] [ 2drop { } ] if ;
-
-<PRIVATE
-
-: (complete-single-vocab?) ( str -- ? )
-    { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" }
-    member? ; inline
-
-: complete-single-vocab? ( tokens -- ? )
-    dup last empty? [
-        harvest ?last (complete-single-vocab?)
-    ] [
-        harvest dup length 1 >
-        [ 2 tail* ?first (complete-single-vocab?) ] [ drop f ] if
-    ] if ;
-
-: chop-; ( seq -- seq' )
-    { ";" } split1-last [ ] [ ] ?if ;
-
-: complete-vocab-list? ( tokens -- ? )
-    chop-; 1 short head* "USING:" swap member? ;
-
-PRIVATE>
-
-: complete-vocab? ( tokens -- ? )
-    { [ complete-single-vocab? ] [ complete-vocab-list? ] } 1|| ;
-
-<PRIVATE
-
-: complete-token? ( tokens token -- ? )
-    over last empty? [
-        [ harvest ?last ] [ = ] bi*
-    ] [
-        swap harvest dup length 1 >
-        [ 2 tail* ?first = ] [ 2drop f ] if
-    ] if ;
-
-PRIVATE>
-
-: complete-CHAR:? ( tokens -- ? ) "CHAR:" complete-token? ;
-
-: complete-COLOR:? ( tokens -- ? ) "COLOR:" complete-token? ;
-
-: complete-P"? ( tokens -- ? ) "P\"" complete-token? ;

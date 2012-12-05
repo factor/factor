@@ -14,7 +14,7 @@ delete-at clear-assoc new-assoc assoc-like ;
 
 PROTOCOL: input-stream-protocol
 stream-read1 stream-read-unsafe stream-read-partial-unsafe
-stream-readln stream-read-until stream-contents* ;
+stream-readln stream-read-until stream-contents ;
 
 PROTOCOL: output-stream-protocol
 stream-flush stream-write1 stream-write stream-nl ;

@@ -49,7 +49,6 @@ string *factor_vm::allot_string(cell capacity, cell fill)
 	return str.untagged();
 }
 
-/* Allocates memory */
 void factor_vm::primitive_string()
 {
 	cell initial = to_cell(ctx->pop());
@@ -64,7 +63,6 @@ bool factor_vm::reallot_string_in_place_p(string *str, cell capacity)
 		&& capacity <= string_capacity(str);
 }
 
-/* Allocates memory */
 string* factor_vm::reallot_string(string *str_, cell capacity)
 {
 	data_root<string> str(str_,this);
@@ -106,7 +104,6 @@ string* factor_vm::reallot_string(string *str_, cell capacity)
 	}
 }
 
-/* Allocates memory */
 void factor_vm::primitive_resize_string()
 {
 	data_root<string> str(ctx->pop(),this);

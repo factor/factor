@@ -78,12 +78,6 @@ PRIVATE>
         assoc-each
     ] [ drop ] 2bi ; inline
 
-: sift-keys ( assoc -- assoc' )
-    [ drop ] assoc-filter ; inline
-
-: sift-values ( assoc -- assoc' )
-    [ nip ] assoc-filter ; inline
-
 : assoc-partition ( ... assoc quot: ( ... key value -- ... ? ) -- ... true-assoc false-assoc )
     [ (assoc-each) partition ] [ drop ] 2bi
     [ assoc-like ] curry bi@ ; inline
@@ -163,7 +157,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     unless ; inline
 
 : 2cache ( ... key1 key2 assoc quot: ( ... key1 key2 -- ... value ) -- ... value )
-    [ 2array ] 2dip [ first2-unsafe ] prepose cache ; inline
+    [ 2array ] 2dip [ first2 ] prepose cache ; inline
 
 : change-at ( ..a key assoc quot: ( ..a value -- ..b newvalue ) -- ..b )
     [ [ at ] dip call ] [ drop ] 3bi set-at ; inline

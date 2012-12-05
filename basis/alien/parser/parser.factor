@@ -171,7 +171,7 @@ PREDICATE: alien-function-word < alien-function-alias-word
     [ def>> third ] [ name>> ] bi = ;
 
 PREDICATE: alien-callback-type-word < typedef-word
-    "callback-effect" word-prop >boolean ;
+    "callback-effect" word-prop ;
 
 : global-quot ( type word -- quot )
     swap [ name>> current-library get ] dip

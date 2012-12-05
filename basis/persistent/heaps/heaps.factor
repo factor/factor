@@ -37,7 +37,7 @@ PRIVATE>
 GENERIC: sift-down ( value prio left right -- heap )
 
 : singleton-sift-down ( value prio singleton empty -- heap )
-    2over prio>> <= [ <branch> ] [
+    3dup drop prio>> <= [ <branch> ] [
         drop -rot [ [ value>> ] [ prio>> ] bi ] 2dip
         <singleton-heap> <persistent-heap> <branch>
     ] if ;

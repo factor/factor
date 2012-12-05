@@ -34,7 +34,7 @@ SPECIALIZED-ARRAYS: bool uchar ushort char uint float ulonglong ;
 [ B{ 210 4 1 } ushort cast-array ] must-fail
 
 [ { 3 1 3 3 7 } ] [
-    int-array{ 3 1 3 3 7 } malloc-byte-array [ &free 5 int <c-direct-array> >array ] with-destructors
+    int-array{ 3 1 3 3 7 } malloc-byte-array 5 int <c-direct-array> >array
 ] unit-test
 
 [ float-array{ 0x1.222,222p0   0x1.111,112p0   } ]

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.directories io.files io.pathnames kernel make
-sequences vocabs vocabs.loader ;
+sequences vocabs.loader ;
 IN: vocabs.files
 
 : vocab-tests-path ( vocab -- path )

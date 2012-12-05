@@ -266,7 +266,7 @@ M: terrain-world end-game-world
 M: terrain-world resize-world
     GL_PROJECTION glMatrixMode
     glLoadIdentity
-    dim>> [ [ { 0 0 } ] dip gl-viewport ]
+    dim>> [ [ 0 0 ] dip first2 glViewport ]
     [ frustum glFrustum ] bi ;
 
 M: terrain-world draw-world*

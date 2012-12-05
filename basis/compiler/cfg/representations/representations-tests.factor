@@ -28,7 +28,7 @@ IN: compiler.cfg.representations
 
 H{ } clone representations set
 
-3 vreg-counter set-global
+3 \ vreg-counter set-global
 
 [
     {
@@ -197,7 +197,7 @@ V{
 3 { 3 4 } edges
 2 4 edge
 
-3 vreg-counter set-global
+3 \ vreg-counter set-global
 
 [ ] [ test-representations ] unit-test
 
@@ -396,7 +396,7 @@ cpu x86.32? [
 
 ! Don't convert the def site into anything but tagged-rep since
 ! we might lose precision
-5 vreg-counter set-global
+5 \ vreg-counter set-global
 
 [ f ] [
     V{
@@ -426,7 +426,7 @@ cpu x86.32? [
 ] unit-test
 
 ! Peephole optimization if input to ##shl-imm is tagged
-3 vreg-counter set-global
+3 \ vreg-counter set-global
 
 [
     V{
@@ -445,7 +445,7 @@ cpu x86.32? [
     } test-peephole
 ] unit-test
 
-3 vreg-counter set-global
+3 \ vreg-counter set-global
 
 [
     V{
@@ -531,7 +531,7 @@ cpu x86.32? [
     } test-peephole
 ] unit-test
 
-6 vreg-counter set-global
+6 \ vreg-counter set-global
 
 ! Peephole optimization if input to ##sar-imm is tagged
 [
@@ -549,7 +549,7 @@ cpu x86.32? [
     } test-peephole
 ] unit-test
 
-6 vreg-counter set-global
+6 \ vreg-counter set-global
 
 ! (Lack of) peephole optimization if output of ##sar-imm needs to be tagged
 [
@@ -630,7 +630,7 @@ cpu x86.32? [
     } test-peephole
 ] unit-test
 
-6 vreg-counter set-global
+6 \ vreg-counter set-global
 
 [
     V{
@@ -686,7 +686,7 @@ cpu x86.32? [
 
 ! Make sure we don't exceed immediate bounds
 cpu x86.64? [
-    4 vreg-counter set-global
+    4 \ vreg-counter set-global
 
     [
         V{
@@ -735,7 +735,7 @@ cpu x86.64? [
     } test-peephole
 ] unit-test
 
-4 vreg-counter set-global
+4 \ vreg-counter set-global
 
 [
     V{
@@ -860,7 +860,7 @@ cpu x86.64? [
     } test-peephole
 ] unit-test
 
-4 vreg-counter set-global
+4 \ vreg-counter set-global
 
 [
     V{
@@ -883,7 +883,7 @@ cpu x86.64? [
 ] unit-test
 
 ! Tag/untag elimination for ##not
-2 vreg-counter set-global
+2 \ vreg-counter set-global
 
 [
     V{

@@ -37,7 +37,7 @@ HELP: >bignum
 { $description "Converts a real number to a bignum, with a possible loss of precision." } ;
 
 HELP: >integer
-{ $values { "x" real } { "n" integer } }
+{ $values { "x" real } { "n" bignum } }
 { $description "Converts a real number to an integer, with a possible loss of precision." } ;
 
 HELP: integer
@@ -84,22 +84,22 @@ HELP: fixnum/mod
 
 HELP: fixnum<
 { $values { "x" fixnum } { "y" fixnum } { "?" "a boolean" } }
-{ $description "Primitive version of " { $link < } "." }
+{ $description "Primitive version of " { $link < } ". The result may overflow to a bignum." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link < } " instead." } ;
 
 HELP: fixnum<=
 { $values { "x" fixnum } { "y" fixnum } { "z" integer } }
-{ $description "Primitive version of " { $link <= } "." }
+{ $description "Primitive version of " { $link <= } ". The result may overflow to a bignum." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link <= } " instead." } ;
 
 HELP: fixnum>
 { $values { "x" fixnum } { "y" fixnum } { "?" "a boolean" } }
-{ $description "Primitive version of " { $link > } "." }
+{ $description "Primitive version of " { $link > } ". The result may overflow to a bignum." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link > } " instead." } ;
 
 HELP: fixnum>=
 { $values { "x" fixnum } { "y" fixnum } { "?" "a boolean" } }
-{ $description "Primitive version of " { $link >= } "." }
+{ $description "Primitive version of " { $link >= } ". The result may overflow to a bignum." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link >= } " instead." } ;
 
 HELP: fixnum-bitand

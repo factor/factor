@@ -8,24 +8,24 @@ ABOUT: "regexp"
 
 ARTICLE: "regexp" "Regular expressions"
 "The " { $vocab-link "regexp" } " vocabulary provides word for creating and using regular expressions."
-{ $subsections "regexp-intro" }
+{ $subsections { "regexp" "intro" } }
 "The class of regular expressions:"
 { $subsections regexp }
 "Basic usage:"
 { $subsections
-    "regexp-syntax"
-    "regexp-options"
-    "regexp-construction"
-    "regexp-operations"
+    { "regexp" "syntax" }
+    { "regexp" "options" }
+    { "regexp" "construction" }
+    { "regexp" "operations" }
 }
 "Advanced topics:"
 { $vocab-subsection "Regular expression combinators" "regexp.combinators" }
 { $subsections
-    "regexp-theory"
-    "regexp-deploy"
+    { "regexp" "theory" }
+    { "regexp" "deploy" }
 } ;
 
-ARTICLE: "regexp-intro" "A quick introduction to regular expressions"
+ARTICLE: { "regexp" "intro" } "A quick introduction to regular expressions"
 "Regular expressions are a terse way to do certain simple string processing tasks. For example, to replace all instances of " { $snippet "foo" } " in one string with " { $snippet "bar" } ", the following can be used:"
 { $code "R/ foo/ \"bar\" re-replace" }
 "That could be done with sequence operations, but consider doing this replacement for an arbitrary number of o's, at least two:"
@@ -38,14 +38,14 @@ ARTICLE: "regexp-intro" "A quick introduction to regular expressions"
 { $example """USE: regexp "fooo" R/ (b|f)oo+/ matches? .""" "t" }
 "Regular expressions can't be used for all parsing tasks. For example, they are not powerful enough to match balancing parentheses." ;
 
-ARTICLE: "regexp-construction" "Constructing regular expressions"
+ARTICLE: { "regexp" "construction" } "Constructing regular expressions"
 "Most of the time, regular expressions are literals and the parsing word should be used, to construct them at parse time. This ensures that they are only compiled once, and gives parse time syntax checking."
 { $subsections POSTPONE: R/ }
 "Sometimes, regular expressions need to be constructed at run time instead; for example, in a text editor, the user might input a regular expression to search for in a document."
 { $subsections <regexp> <optioned-regexp> }
 "Another approach is to use " { $vocab-link "regexp.combinators" } "." ;
 
-ARTICLE: "regexp-syntax" "Regular expression syntax"
+ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
 "Regexp syntax is largely compatible with Perl, Java and extended POSIX regexps, but not completely. Below, the syntax is documented."
 { $heading "Characters" }
 "At its core, regular expressions consist of character literals. For example, " { $snippet "R/ f/" } " is a regular expression matching just the string 'f'. In addition, the normal escape codes are provided, like " { $snippet "\\t" } " for the tab character and " { $snippet "\\uxxxxxx" } " for an arbitrary Unicode code point, by its hex value. In addition, any character can be preceded by a backslash to escape it, unless this has special meaning. For example, to match a literal opening parenthesis, use " { $snippet "\\(" } "."
@@ -115,7 +115,7 @@ ARTICLE: "regexp-syntax" "Regular expression syntax"
 { $subheading "Group capture" }
 { $subheading "Reluctant and possessive quantifiers" }
 { $subheading "Backreferences" }
-"Backreferences were omitted because of a design decision to allow only regular expressions following the formal theory of regular languages. For more information, see " { $link "regexp-theory" } "."
+"Backreferences were omitted because of a design decision to allow only regular expressions following the formal theory of regular languages. For more information, see " { $link { "regexp" "theory" } } "."
 $nl
 "To work around the lack of backreferences, consider using group capture and then creating a new regular expression to match the captured string using " { $vocab-link "regexp.combinators" } "."
 { $subheading "Previous match" }
@@ -125,8 +125,8 @@ $nl
 { $heading "Casing operations" }
 "No special casing operations are included, for example Perl's " { $snippet "\\L" } "." ;
 
-ARTICLE: "regexp-options" "Regular expression options"
-"When " { $link "regexp-construction" } ", various options can be provided. Options have single-character names. A string of options has one of the following two forms:"
+ARTICLE: { "regexp" "options" } "Regular expression options"
+"When " { $link { "regexp" "construction" } } ", various options can be provided. Options have single-character names. A string of options has one of the following two forms:"
 { $code "on" "on-off" }
 "The latter syntax allows some options to be disabled. The " { $snippet "on" } " and " { $snippet "off" } " strings name options to be enabled and disabled, respectively."
 $nl
@@ -159,7 +159,7 @@ HELP: reversed-regexp
 { $syntax "R/ .../r" }
 { $description "When running a regexp compiled with this mode, matches will start from the end of the input string, going towards the beginning." } ;
 
-ARTICLE: "regexp-theory" "The theory of regular expressions"
+ARTICLE: { "regexp" "theory" } "The theory of regular expressions"
 "Far from being just a practical tool invented by Unix hackers, regular expressions were studied formally before computer programs were written to process them." $nl
 "A regular language is a set of strings that is matched by a regular expression, which is defined to have characters and the empty string, along with the operations concatenation, disjunction and Kleene star. Another way to define the class of regular languages is as the class of languages which can be recognized with constant space overhead, ie with a DFA. These two definitions are provably equivalent." $nl
 "One basic result in the theory of regular language is that the complement of a regular language is regular. In other words, for any regular expression, there exists another regular expression which matches exactly the strings that the first one doesn't match." $nl
@@ -168,7 +168,7 @@ ARTICLE: "regexp-theory" "The theory of regular expressions"
 "But, if not, the language is not regular. There is strong evidence that there is no efficient way to parse with backreferences in the general case. Perl uses a naive backtracking algorithm which has pathological behavior in some cases, taking exponential time to match even if backreferences aren't used. Additionally, expressions with backreferences don't have the properties with negation and intersection described above." $nl
 "The Factor regular expression engine was built with the design decision to support negation and intersection at the expense of backreferences. This lets us have a guaranteed linear-time matching algorithm. Systems like Ragel and Lex use the same algorithm." ;
 
-ARTICLE: "regexp-operations" "Matching operations with regular expressions"
+ARTICLE: { "regexp" "operations" } "Matching operations with regular expressions"
 "Testing if a string matches a regular expression:"
 { $subsections matches? }
 "Finding a match inside a string:"
@@ -184,7 +184,7 @@ ARTICLE: "regexp-operations" "Matching operations with regular expressions"
 "Replacing occurrences of a regular expression with a string:"
 { $subsections re-replace } ;
 
-ARTICLE: "regexp-deploy" "Regular expressions and the deploy tool"
+ARTICLE: { "regexp" "deploy" } "Regular expressions and the deploy tool"
 "The " { $link "tools.deploy" } " tool has the option to strip out the optimizing compiler from the resulting image. Since regular expressions compile to Factor code, this creates a minor performance-related caveat."
 $nl
 "Regular expressions constructed at runtime from a deployed application will be compiled with the non-optimizing compiler, which is always available because it is built into the Factor VM. This will result in lower performance than when using the optimizing compiler."
@@ -192,22 +192,22 @@ $nl
 "Literal regular expressions constructed at parse time do not suffer from this restriction, since the deployed application is loaded and compiled before anything is stripped out."
 $nl
 "None of this applies to deployed applications which include the optimizing compiler, or code running inside a development image."
-{ $see-also "compiler" "regexp-construction" "deploy-flags" } ;
+{ $see-also "compiler" { "regexp" "construction" } "deploy-flags" } ;
 
 HELP: <regexp>
 { $values { "string" string } { "regexp" regexp } }
 { $description "Creates a regular expression object, given a string in regular expression syntax. When it is first used for matching, a DFA is compiled, and this DFA is stored for reuse so it is only compiled once." } ;
 
 HELP: <optioned-regexp>
-{ $values { "string" string } { "options" "a string of " { $link "regexp-options" } } { "regexp" regexp } }
+{ $values { "string" string } { "options" "a string of " { $link { "regexp" "options" } } } { "regexp" regexp } }
 { $description "Given a string in regular expression syntax, and a string of options, creates a regular expression object. When it is first used for matching, a DFA is compiled, and this DFA is stored for reuse so it is only compiled once." } ;
 
 HELP: R/
 { $syntax "R/ foo.*|[a-zA-Z]bar/options" }
-{ $description "Literal syntax for a regular expression. When this syntax is used, the DFA is compiled at compile-time, rather than on first use. The syntax for the " { $snippet "options" } " string is documented in " { $link "regexp-options" } "." } ;
+{ $description "Literal syntax for a regular expression. When this syntax is used, the DFA is compiled at compile-time, rather than on first use. The syntax for the " { $snippet "options" } " string is documented in " { $link { "regexp" "options" } } "." } ;
 
 HELP: regexp
-{ $class-description "The class of regular expressions. To construct these, see " { $link "regexp-construction" } "." } ;
+{ $class-description "The class of regular expressions. To construct these, see " { $link { "regexp" "construction" } } "." } ;
 
 HELP: matches?
 { $values { "string" string } { "regexp" regexp } { "?" "a boolean" } }

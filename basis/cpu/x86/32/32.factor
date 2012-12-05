@@ -1,13 +1,14 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types arrays classes.struct
-combinators compiler.cfg.builder.alien.boxing
-compiler.codegen.gc-maps compiler.codegen.labels
-compiler.codegen.relocation compiler.constants cpu.architecture
-cpu.x86 cpu.x86.assembler cpu.x86.assembler.operands
-cpu.x86.features kernel locals make math namespaces sequences
-specialized-arrays system vocabs ;
-SPECIALIZED-ARRAY: uint
+USING: locals alien alien.c-types alien.libraries alien.syntax
+arrays kernel fry math namespaces sequences system layouts io
+vocabs.loader accessors init classes.struct combinators make
+words compiler.constants compiler.codegen.gc-maps
+compiler.codegen.labels compiler.codegen.relocation
+compiler.cfg.instructions compiler.cfg.builder
+compiler.cfg.builder.alien.boxing compiler.cfg.intrinsics
+compiler.cfg.stack-frame cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86 cpu.architecture vm vocabs ;
 FROM: layouts => cell ;
 IN: cpu.x86.32
 
@@ -229,20 +230,5 @@ M: x86.32 flatten-struct-type
     call-next-method [ first t f 3array ] map ;
 
 M: x86.32 struct-return-on-stack? os linux? not ;
-
-M: x86.32 (cpuid) ( eax ecx regs -- )
-    void { uint uint void* } cdecl [
-        ! Save ds-reg, rs-reg
-        EDI PUSH
-        EAX ESP 4 [+] MOV
-        ECX ESP 8 [+] MOV
-        CPUID
-        EDI ESP 12 [+] MOV
-        EDI [] EAX MOV
-        EDI 4 [+] EBX MOV
-        EDI 8 [+] ECX MOV
-        EDI 12 [+] EDX MOV
-        EDI POP
-    ] alien-assembly ;
 
 check-cpu-features

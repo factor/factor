@@ -282,7 +282,7 @@ HOOK: (raw) io-backend ( addr -- raw )
 
 HOOK: (broadcast) io-backend ( datagram -- datagram )
 
-HOOK: (receive-unsafe) io-backend ( n buf datagram -- count addrspec )
+HOOK: (receive-unsafe) io-backend ( n buf datagram -- size addrspec )
 
 ERROR: invalid-port object ;
 
@@ -336,7 +336,7 @@ SYMBOL: remote-address
     ] with-scope ; inline
 
 : <server> ( addrspec encoding -- server )
-    [
+B    [
         [ (server) ] keep
         [ drop server-port <port> ] [ get-local-address ] 2bi
         >>addr
@@ -348,7 +348,7 @@ SYMBOL: remote-address
         [ (accept) ] keep
         parse-sockaddr swap
         <ports>
-    ] [ encoding>> ] bi <encoder-duplex> swap ;
+    ] keep encoding>> <encoder-duplex> swap ;
 
 : <datagram> ( addrspec -- datagram )
     [

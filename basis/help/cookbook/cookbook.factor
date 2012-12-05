@@ -245,7 +245,7 @@ $nl
 "The space between " { $snippet "#!" } " and " { $snippet "/usr/bin/env" } " is necessary, since " { $link POSTPONE: #! } " is a parsing word, and a syntax error would otherwise result."
 { $references
     { }
-    "command-line"
+    "cli"
     "cookbook-application"
     "images"
 } ;

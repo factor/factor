@@ -1613,7 +1613,7 @@ cpu x86? [
 ] unit-test
 
 ! Distributive law
-2 vreg-counter set-global
+2 \ vreg-counter set-global
 
 [
     {

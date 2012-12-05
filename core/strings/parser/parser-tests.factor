@@ -34,6 +34,3 @@ IN: strings.parser.tests
 
 
 [ "\"\\" ] [ "\"\\" ] unit-test
-
-[ "\e" ] [ "\u00001b" ] unit-test
-[ "\e" ] [ "\x1b" ] unit-test

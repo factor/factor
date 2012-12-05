@@ -18,7 +18,7 @@ M: vector like
     ] unless ; inline
 
 M: vector new-sequence
-    drop [ f <array> ] [ integer>fixnum ] bi vector boa ; inline
+    drop [ f <array> ] [ >fixnum ] bi vector boa ; inline
 
 M: vector equal?
     over vector? [ sequence= ] [ 2drop f ] if ;

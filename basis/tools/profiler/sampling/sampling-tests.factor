@@ -11,8 +11,8 @@ TUPLE: boom ;
 { } [ 10 [ [ 100 [ 1000 random (byte-array) drop ] times compact-gc ] profile ] times ] unit-test
 { } [ 2 [ [ 1 seconds sleep ] profile ] times ] unit-test
 
-[ ] [ [ 3,000,000 iota [ sq sq sq ] map drop ] profile flat profile. ] unit-test
-[ ] [ [ 3,000,000 iota [ sq sq sq ] map drop ] profile top-down profile. ] unit-test
+[ ] [ [ 3,000,000 iota [ sq ] map drop ] profile flat profile. ] unit-test
+[ ] [ [ 3,000,000 iota [ sq ] map drop ] profile top-down profile. ] unit-test
 
 (clear-samples)
 f raw-profile-data set-global
