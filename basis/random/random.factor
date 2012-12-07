@@ -287,6 +287,12 @@ M: float random [ f ] [ 0.0 swap uniform-random-float ] if-zero ;
 : power-random-float ( alpha -- n )
     [ random-unit log e^ 1 swap - ] dip recip ^ ;
 
+! Box-Muller
+: poisson-random-float ( mean -- n )
+    [ -1 0 ] dip
+    [ 2dup < ]
+    [ [ 1 + ] 2dip [ random-unit log neg + ] dip ] while 2drop ;
+
 {
     { [ os windows? ] [ "random.windows" require ] }
     { [ os unix? ] [ "random.unix" require ] }
