@@ -325,6 +325,7 @@ bignum *factor_vm::bignum_remainder(bignum * numerator, bignum * denominator)
 }
 
 /* allocates memory */
+/* cell_to_bignum, fixnum_to_bignum, long_long_to_bignum, ulong_long_to_bignum */
 #define FOO_TO_BIGNUM(name,type,stype,utype)				\
 bignum * factor_vm::name##_to_bignum(type n)				\
 {									\
@@ -361,6 +362,7 @@ FOO_TO_BIGNUM(long_long,s64,s64,u64)
 FOO_TO_BIGNUM(ulong_long,u64,s64,u64)
 
 /* cannot allocate memory */
+/* bignum_to_cell, fixnum_to_cell, long_long_to_cell, ulong_long_to_cell */
 #define BIGNUM_TO_FOO(name,type,stype,utype)				\
 	type factor_vm::bignum_to_##name(bignum * bignum)		\
 	{								\
@@ -389,9 +391,9 @@ BIGNUM_TO_FOO(ulong_long,u64,s64,u64)
 	significand -= ((double) digit);				\
 }
 
-/* allocates memory */
 #define inf std::numeric_limits<double>::infinity()
 
+/* allocates memory */
 bignum *factor_vm::double_to_bignum(double x)
 {
 	if (x == inf || x == -inf || x != x) return (BIGNUM_ZERO ());
@@ -1296,6 +1298,7 @@ bignum * factor_vm::allot_bignum_zeroed(bignum_length_type length, int negative_
 	return (result);
 }
 
+/* can allocate if not in nursery or size is larger */
 #define BIGNUM_REDUCE_LENGTH(source, length)	\
 source = reallot_array(source,length + 1)
 
@@ -1306,6 +1309,7 @@ bignum *factor_vm::bignum_shorten_length(bignum * bignum, bignum_length_type len
 	BIGNUM_ASSERT ((length >= 0) || (length <= current_length));
 	if (length < current_length)
 	{
+		GC_BIGNUM(bignum);
 		BIGNUM_REDUCE_LENGTH (bignum, length);
 		BIGNUM_SET_NEGATIVE_P (bignum, (length != 0) && (BIGNUM_NEGATIVE_P (bignum)));
 	}
@@ -1323,6 +1327,7 @@ bignum *factor_vm::bignum_trim(bignum * bignum)
 	scan += 1;
 	if (scan < end)
 	{
+		GC_BIGNUM(bignum);
 		bignum_length_type length = (scan - start);
 		BIGNUM_REDUCE_LENGTH (bignum, length);
 		BIGNUM_SET_NEGATIVE_P (bignum, (length != 0) && (BIGNUM_NEGATIVE_P (bignum)));
@@ -1349,6 +1354,7 @@ bignum *factor_vm::bignum_maybe_new_sign(bignum * x, int negative_p)
 		return (x);
 	else
 	{
+		GC_BIGNUM(x);
 		bignum * result =
 			(allot_bignum ((BIGNUM_LENGTH (x)), negative_p));
 		bignum_destructive_copy (x, result);
@@ -1374,7 +1380,59 @@ void factor_vm::bignum_destructive_copy(bignum * source, bignum * target)
 /* allocates memory */
 bignum *factor_vm::bignum_bitwise_not(bignum * x)
 {
-	return bignum_subtract(BIGNUM_ONE(1), x);
+	GC_BIGNUM (x);
+
+	bignum_length_type size = BIGNUM_LENGTH (x);
+	bignum_digit_type *scan_x, *end_x, *scan_y;
+	bignum *y;
+	int carry = 1;
+
+	if (BIGNUM_NEGATIVE_P (x)) {
+		y = allot_bignum (size, 0);
+		scan_x = BIGNUM_START_PTR (x);
+		end_x = scan_x + size;
+		scan_y = BIGNUM_START_PTR (y);
+		while (scan_x < end_x) {
+			if (*scan_x == 0) {
+				*scan_y++ = BIGNUM_RADIX - 1;
+				scan_x++;
+			} else {
+				*scan_y++ = *scan_x++ - 1;
+				carry = 0;
+				break;
+			}
+		}
+	} else {
+		y = allot_bignum (size, 1);
+		scan_x = BIGNUM_START_PTR (x);
+		end_x = scan_x + size;
+		scan_y = BIGNUM_START_PTR (y);
+		while (scan_x < end_x) {
+			if (*scan_x == (BIGNUM_RADIX - 1)) {
+				*scan_y++ = 0;
+				scan_x++;
+			} else {
+				*scan_y++ = *scan_x++ + 1;
+				carry = 0;
+				break;
+			}
+		}
+	}
+
+	while (scan_x < end_x) {
+		*scan_y++ = *scan_x++;
+	}
+
+	if (carry) {
+		GC_BIGNUM (y);
+		x = allot_bignum (size + 1, BIGNUM_NEGATIVE_P (y));
+		bignum_destructive_copy (y, x);
+		scan_x = BIGNUM_START_PTR (x);
+		*(scan_x + size) = 1;
+		return x;
+	} else {
+		return bignum_trim (y);
+	}
 }
 
 /* allocates memory */
@@ -1714,196 +1772,225 @@ int factor_vm::bignum_unsigned_logbitp(int shift, bignum * bignum)
 /* Allocates memory */
 bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 {
-    bignum * d;
-    bignum_length_type size_a, size_b;
-    bignum_digit_type * scan_a, * scan_b, * scan_d, * a_end, * b_end;
+	GC_BIGNUM(a);
+	GC_BIGNUM(b);
+	bignum * d;
+	bignum_length_type size_a, size_b;
+	bignum_digit_type * scan_a, * scan_b, * scan_d, * a_end, * b_end;
 
-    if (BIGNUM_NEGATIVE_P (a)) {
-        scan_a = BIGNUM_START_PTR (a);
-        size_a = BIGNUM_LENGTH (a);
-        a_end = scan_a + size_a;
-        d = allot_bignum (size_a, 0);
-        scan_d = BIGNUM_START_PTR (d);
-        while (scan_a < a_end)
-            (*scan_d++) = (*scan_a++);
-        a = d;
-    }
+	if (BIGNUM_NEGATIVE_P (a)) {
+		size_a = BIGNUM_LENGTH (a);
+		d = allot_bignum (size_a, 0);
+		scan_d = BIGNUM_START_PTR (d);
+		scan_a = BIGNUM_START_PTR (a);
+		a_end = scan_a + size_a;
+		while (scan_a < a_end)
+			(*scan_d++) = (*scan_a++);
+		a = d;
+	}
 
-    if (BIGNUM_NEGATIVE_P (b)) {
-        scan_b = BIGNUM_START_PTR (b);
-        size_b = BIGNUM_LENGTH (b);
-        b_end = scan_b + size_b;
-        d = allot_bignum (size_b, 0);
-        scan_d = BIGNUM_START_PTR (d);
-        while (scan_b < b_end)
-            (*scan_d++) = (*scan_b++);
-        b = d;
-    }
+	if (BIGNUM_NEGATIVE_P (b)) {
+		size_b = BIGNUM_LENGTH (b);
+		d = allot_bignum (size_b, 0);
+		scan_d = BIGNUM_START_PTR (d);
+		scan_b = BIGNUM_START_PTR (b);
+		b_end = scan_b + size_b;
+		while (scan_b < b_end)
+			(*scan_d++) = (*scan_b++);
+		b = d;
+	}
 
-    if (bignum_compare(a, b) == bignum_comparison_less) {
-        d = a;
-        a = b;
-        b = d;
-    }
+	if (bignum_compare(a, b) == bignum_comparison_less) {
+		std::swap(a, b);
+	}
 
-    while (BIGNUM_LENGTH (b) != 0) {
-        d = bignum_remainder (a, b);
-        if (d == BIGNUM_OUT_OF_BAND) {
-            return d;
-        }
-        a = b;
-        b = d;
-    }
+	while (BIGNUM_LENGTH (b) != 0) {
+		d = bignum_remainder (a, b);
+		GC_BIGNUM(d);
+		if (d == BIGNUM_OUT_OF_BAND) {
+			return d;
+		}
+		a = b;
+		b = d;
+	}
 
-    return a;
+	return a;
 }
 #else
 /* Allocates memory */
 bignum * factor_vm::bignum_gcd(bignum * a, bignum * b)
 {
-    bignum * d;
-    bignum_twodigit_type x, y, q, s, t, A, B, C, D;
-    int nbits, k;
-    bignum_length_type size_a, size_b;
-    bignum_digit_type * scan_a, * scan_b, * scan_c, * scan_d, * a_end, * b_end;
+	GC_BIGNUM(a);
+	GC_BIGNUM(b);
+	bignum *c, *d, *e, *f;
+	bignum_twodigit_type x, y, q, s, t, A, B, C, D;
+	int nbits, k;
+	bignum_length_type size_a, size_b, size_c;
+	bignum_digit_type *scan_a, *scan_b, *scan_c, *scan_d;
+	bignum_digit_type *a_end, *b_end, *c_end;
 
-    /* clone the bignums so we can modify them in-place */
-    scan_a = BIGNUM_START_PTR (a);
-    size_a = BIGNUM_LENGTH (a);
-    a_end = scan_a + size_a;
-    d = allot_bignum (size_a, 0);
-    scan_d = BIGNUM_START_PTR (d);
-    while (scan_a < a_end)
-        (*scan_d++) = (*scan_a++);
-    a = d;
-    scan_b = BIGNUM_START_PTR (b);
-    size_b = BIGNUM_LENGTH (b);
-    b_end = scan_b + size_b;
-    d = allot_bignum (size_b, 0);
-    scan_d = BIGNUM_START_PTR (d);
-    while (scan_b < b_end)
-        (*scan_d++) = (*scan_b++);
-    b = d;
+	/* clone the bignums so we can modify them in-place */
+	size_a = BIGNUM_LENGTH (a);
+	c = allot_bignum (size_a, 0);
+	scan_a = BIGNUM_START_PTR (a);
+	a_end = scan_a + size_a;
+	GC_BIGNUM(c);
+	scan_c = BIGNUM_START_PTR (c);
+	while (scan_a < a_end)
+		(*scan_c++) = (*scan_a++);
+	a = c;
+	size_b = BIGNUM_LENGTH (b);
+	d = allot_bignum (size_b, 0);
+	scan_b = BIGNUM_START_PTR (b);
+	b_end = scan_b + size_b;
+	GC_BIGNUM(d);
+	scan_d = BIGNUM_START_PTR (d);
+	while (scan_b < b_end)
+		(*scan_d++) = (*scan_b++);
+	b = d;
 
-    /* Initial reduction: make sure that 0 <= b <= a. */
-    if (bignum_compare(a, b) == bignum_comparison_less) {
-        d = a;
-        a = b;
-        b = d;
-    }
+	/* Initial reduction: make sure that 0 <= b <= a. */
+	if (bignum_compare(a, b) == bignum_comparison_less) {
+		std::swap(a, b);
+		std::swap(size_a, size_b);
+	}
 
-    while ((size_a = BIGNUM_LENGTH (a)) > 1) {
-        nbits = log2 (BIGNUM_REF (a, size_a-1));
-        size_b = BIGNUM_LENGTH (b);
-        x = ((BIGNUM_REF (a, size_a-1) << (BIGNUM_DIGIT_LENGTH - nbits)) |
-             (BIGNUM_REF (a, size_a-2) >> nbits));
-        y = ((size_b >= size_a - 1 ? BIGNUM_REF (b, size_a-2) >> nbits : 0) |
-             (size_b >= size_a ? BIGNUM_REF (b, size_a-1) << (BIGNUM_DIGIT_LENGTH - nbits) : 0));
+	while (size_a > 1) {
+		nbits = log2 (BIGNUM_REF (a, size_a-1));
+		x = ((BIGNUM_REF (a, size_a-1) << (BIGNUM_DIGIT_LENGTH - nbits)) |
+			(BIGNUM_REF (a, size_a-2) >> nbits));
+		y = ((size_b >= size_a - 1 ? BIGNUM_REF (b, size_a-2) >> nbits : 0) |
+			(size_b >= size_a ? BIGNUM_REF (b, size_a-1) << (BIGNUM_DIGIT_LENGTH - nbits) : 0));
 
         /* inner loop of Lehmer's algorithm; */
-        A = 1; B = 0; C = 0; D = 1;
-        for (k=0 ;; k++) {
-            if (y - C == 0)
-                break;
+		A = 1; B = 0; C = 0; D = 1;
+		for (k=0 ;; k++) {
+			if (y - C == 0)
+				break;
 
-            q = (x + (A - 1)) / (y - C);
+			q = (x + (A - 1)) / (y - C);
 
-            s = B + (q * D);
-            t = x - (q * y);
+			s = B + (q * D);
+			t = x - (q * y);
 
-            if (s > t)
-                break;
+			if (s > t)
+				break;
 
-            x = y;
-            y = t;
+			x = y;
+			y = t;
 
-            t = A + (q * C);
+			t = A + (q * C);
 
-            A = D; B = C; C = s; D = t;
-        }
+			A = D; B = C; C = s; D = t;
+		}
 
-        if (k == 0) {
-            /* no progress; do a Euclidean step */
-            if (BIGNUM_LENGTH (b) == 0) {
-                return a;
-            }
-            d = bignum_remainder (a, b);
-            if (d == BIGNUM_OUT_OF_BAND) {
-                return d;
-            }
-            a = b;
-            b = d;
-            continue;
-        }
+		if (k == 0) {
+			/* no progress; do a Euclidean step */
+			if (size_b == 0) {
+				return bignum_trim (a);
+			}
+			e = bignum_trim (a);
+			GC_BIGNUM(e);
+			f = bignum_trim (b);
+			GC_BIGNUM(f);
+			c = bignum_remainder (e, f);
+			GC_BIGNUM (c);
+			if (c == BIGNUM_OUT_OF_BAND) {
+				return c;
+			}
 
-        /*
-          a, b = A*b - B*a, D*a - C*b if k is odd
-          a, b = A*a - B*b, D*b - C*a if k is even
-        */
-        scan_a = BIGNUM_START_PTR (a);
-        scan_b = BIGNUM_START_PTR (b);
-        scan_c = BIGNUM_START_PTR (a);
-        scan_d = BIGNUM_START_PTR (b);
-        a_end = scan_a + size_a;
-        b_end = scan_b + size_b;
-        s = 0;
-        t = 0;
-        if (k & 1) {
-            while (scan_b < b_end) {
-                s += (A * *scan_b) - (B * *scan_a);
-                t += (D * *scan_a++) - (C * *scan_b++);
-                *scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
-                *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
-                s >>= BIGNUM_DIGIT_LENGTH;
-                t >>= BIGNUM_DIGIT_LENGTH;
-            }
-            while (scan_a < a_end) {
-                s -= (B * *scan_a);
-                t += (D * *scan_a++);
-                *scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
-                *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
-                s >>= BIGNUM_DIGIT_LENGTH;
-                t >>= BIGNUM_DIGIT_LENGTH;
-            }
-        }
-        else {
-            while (scan_b < b_end) {
-                s += (A * *scan_a) - (B * *scan_b);
-                t += (D * *scan_b++) - (C * *scan_a++);
-                *scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
-                *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
-                s >>= BIGNUM_DIGIT_LENGTH;
-                t >>= BIGNUM_DIGIT_LENGTH;
-            }
-            while (scan_a < a_end) {
-                s += (A * *scan_a);
-                t -= (C * *scan_a++);
-                *scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
-                *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
-                s >>= BIGNUM_DIGIT_LENGTH;
-                t >>= BIGNUM_DIGIT_LENGTH;
-            }
-        }
-        BIGNUM_ASSERT (s == 0);
-        BIGNUM_ASSERT (t == 0);
+			// copy 'b' to 'a'
+			scan_a = BIGNUM_START_PTR (a);
+			scan_b = BIGNUM_START_PTR (b);
+			a_end = scan_a + size_a;
+			b_end = scan_b + size_b;
+			while (scan_b < b_end) *(scan_a++) = *(scan_b++);
+			while (scan_a < a_end) *(scan_a++) = 0;
+			size_a = size_b;
 
-        a = bignum_trim (a);
-        b = bignum_trim (b);
-    }
+			// copy 'c' to 'b'
+			scan_b = BIGNUM_START_PTR (b);
+			scan_c = BIGNUM_START_PTR (c);
+			size_c = BIGNUM_LENGTH (c);
+			c_end = scan_c + size_c;
+			while (scan_c < c_end) *(scan_b++) = *(scan_c++);
+			while (scan_b < b_end) *(scan_b++) = 0;
+			size_b = size_c;
 
-    /* a fits into a fixnum, so b must too */
-    fixnum xx = bignum_to_fixnum (a);
-    fixnum yy = bignum_to_fixnum (b);
-    fixnum tt;
+			continue;
+		}
 
-    /* usual Euclidean algorithm for longs */
-    while (yy != 0) {
-        tt = yy;
-        yy = xx % yy;
-        xx = tt;
-    }
+		/*
+		  a, b = A*b - B*a, D*a - C*b if k is odd
+		  a, b = A*a - B*b, D*b - C*a if k is even
+		*/
+		scan_a = BIGNUM_START_PTR (a);
+		scan_b = BIGNUM_START_PTR (b);
+		scan_c = scan_a;
+		scan_d = scan_b;
+		a_end = scan_a + size_a;
+		b_end = scan_b + size_b;
+		s = 0;
+		t = 0;
+		if (k & 1) {
+			while (scan_b < b_end) {
+				s += (A * *scan_b) - (B * *scan_a);
+				t += (D * *scan_a++) - (C * *scan_b++);
+				*scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
+				*scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
+				s >>= BIGNUM_DIGIT_LENGTH;
+				t >>= BIGNUM_DIGIT_LENGTH;
+			}
+			while (scan_a < a_end) {
+				s -= (B * *scan_a);
+				t += (D * *scan_a++);
+				*scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
+				//*scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
+				s >>= BIGNUM_DIGIT_LENGTH;
+				t >>= BIGNUM_DIGIT_LENGTH;
+			}
+		}
+		else {
+			while (scan_b < b_end) {
+				s += (A * *scan_a) - (B * *scan_b);
+				t += (D * *scan_b++) - (C * *scan_a++);
+				*scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
+				*scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
+				s >>= BIGNUM_DIGIT_LENGTH;
+				t >>= BIGNUM_DIGIT_LENGTH;
+			}
+			while (scan_a < a_end) {
+				s += (A * *scan_a);
+				t -= (C * *scan_a++);
+				*scan_c++ = (bignum_digit_type) (s & BIGNUM_DIGIT_MASK);
+				//*scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
+				s >>= BIGNUM_DIGIT_LENGTH;
+				t >>= BIGNUM_DIGIT_LENGTH;
+			}
+		}
+		BIGNUM_ASSERT (s == 0);
+		BIGNUM_ASSERT (t == 0);
 
-    return fixnum_to_bignum (xx);
+		// update size_a and size_b to remove any zeros at end
+		while (size_a > 0 && *(--scan_a) == 0) size_a--;
+		while (size_b > 0 && *(--scan_b) == 0) size_b--;
+
+		BIGNUM_ASSERT (size_a >= size_b);
+	}
+
+	/* a fits into a fixnum, so b must too */
+	fixnum xx = bignum_to_fixnum (a);
+	fixnum yy = bignum_to_fixnum (b);
+	fixnum tt;
+
+	/* usual Euclidean algorithm for longs */
+	while (yy != 0) {
+		tt = yy;
+		yy = xx % yy;
+		xx = tt;
+	}
+
+	return fixnum_to_bignum (xx);
 }
 #endif
 

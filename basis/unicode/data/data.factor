@@ -71,7 +71,7 @@ PRIVATE>
         [ drop 26 ] [
             0xE0100 0xE01EF between?  5 29 ?
         ] if
-    ] ?if ;
+    ] ?if ; inline
 
 : category ( char -- category )
     category# categories nth ;

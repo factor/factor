@@ -26,7 +26,6 @@ SYMBOL: add-vocab-root-hook
     [ add-vocab-root-hook get-global call( root -- ) ] bi ;
 
 SYMBOL: root-cache
-
 root-cache [ H{ } clone ] initialize
 
 ERROR: not-found-in-roots path ;
@@ -50,8 +49,11 @@ PRIVATE>
     "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
-    vocab-name root-cache get
-    [ ".factor" append-vocab-dir find-root-for ] cache ;
+    vocab-name root-cache get [
+        dup ".private" tail? [ drop f ] [
+            ".factor" append-vocab-dir find-root-for
+        ] if
+    ] cache ;
 
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
@@ -66,7 +68,6 @@ SYMBOL: load-help?
 
 ! Defined by vocabs.metadata
 SYMBOL: check-vocab-hook
-
 check-vocab-hook [ [ drop ] ] initialize
 
 <PRIVATE
@@ -100,7 +101,7 @@ require-when-table [ V{ } clone ] initialize
     load-help? get [
         [
             +parsing+ >>docs-loaded?
-            [ vocab-docs-path [ ?run-file ] when* ] keep
+            dup vocab-docs-path [ ?run-file ] when*
             +done+ >>docs-loaded?
         ] [ ] [ f >>docs-loaded? ] cleanup
     ] when drop ;

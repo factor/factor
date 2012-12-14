@@ -33,7 +33,7 @@ HELP: file-extension
 
 HELP: file-stem
 { $values { "path" "a pathname string" } { "stem" string } }
-{ $description "Outputs the " { $link file-name } " of " { $snippet "filename" } " with the file extension removed, if any." }
+{ $description "Outputs the " { $link file-name } " of " { $snippet "path" } " with the file extension removed, if any." }
 { $examples
     { $example "USING: io.pathnames prettyprint ;" "\"/usr/bin/gcc\" file-stem ." "\"gcc\"" }
     { $example "USING: io.pathnames prettyprint ;" "\"/home/csi/gui.vbs\" file-stem ." "\"gui\"" }

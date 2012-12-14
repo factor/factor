@@ -1,15 +1,13 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel math namespaces make sequences
-system layouts alien alien.c-types alien.accessors
-alien.libraries slots splitting assocs combinators fry locals
-compiler.constants classes.struct compiler.codegen
-compiler.codegen.gc-maps compiler.codegen.labels
-compiler.codegen.relocation compiler.cfg.instructions
-compiler.cfg.builder compiler.cfg.intrinsics
-compiler.cfg.stack-frame cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86 cpu.architecture vm ;
+USING: alien alien.c-types assocs combinators
+compiler.cfg.intrinsics compiler.codegen.gc-maps
+compiler.codegen.labels compiler.codegen.relocation
+compiler.constants cpu.architecture cpu.x86 cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86.features kernel locals math
+sequences specialized-arrays system vocabs ;
 FROM: layouts => cell cells ;
+SPECIALIZED-ARRAY: uint
 IN: cpu.x86.64
 
 : param-reg ( n -- reg ) int-regs cdecl param-regs at nth ;
@@ -133,11 +131,21 @@ M: x86.64 float-on-stack? f ;
 
 M: x86.64 struct-return-on-stack? f ;
 
+M: x86.64 (cpuid) ( rax rcx regs -- )
+    void { uint uint void* } cdecl [
+        RAX param-reg-0 MOV
+        RCX param-reg-1 MOV
+        RSI param-reg-2 MOV
+        CPUID
+        RSI [] EAX MOV
+        RSI 4 [+] EBX MOV
+        RSI 8 [+] ECX MOV
+        RSI 12 [+] EDX MOV
+    ] alien-assembly ;
+
 ! The result of reading 4 bytes from memory is a fixnum on
 ! x86-64.
 enable-alien-4-intrinsics
-
-USE: vocabs
 
 {
     { [ os unix? ] [ "cpu.x86.64.unix" require ] }

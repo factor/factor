@@ -68,7 +68,7 @@ PRIVATE>
 PRIVATE>
 
 : split ( seq separators -- pieces )
-    [ [ member? ] curry split, ] { } make ;
+    [ [ member? ] curry split, ] { } make ; inline
 
 : split-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
     [ split, ] { } make ; inline
@@ -86,23 +86,15 @@ PRIVATE>
 PRIVATE>
 
 : split* ( seq separators -- pieces )
-    [ [ member? ] curry split*, ] { } make ;
+    [ [ member? ] curry split*, ] { } make ; inline
 
 : split*-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
     [ split*, ] { } make ; inline
 
-<PRIVATE
-
-: crlf? ( str -- ? )
-    [ dup CHAR: \r = [ drop t ] [ CHAR: \n = ] if ] find drop ;
-    inline
-
-PRIVATE>
-
 GENERIC: string-lines ( str -- seq )
 
 M: string string-lines
-    dup crlf? [
+    dup [ "\r\n" member? ] any? [
         "\n" split
         [
             but-last-slice [

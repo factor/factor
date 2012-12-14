@@ -1,11 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays assocs
-byte-arrays byte-vectors combinators combinators.short-circuit
-fry io.backend io.binary kernel locals math math.bitwise
-math.constants math.functions math.order math.ranges namespaces
-sequences sequences.private sets summary system vocabs hints
-typed ;
+USING: accessors alien.data arrays assocs byte-arrays
+byte-vectors combinators combinators.short-circuit fry
+hashtables hashtables.private hash-sets hints io.backend
+io.binary kernel locals math math.bitwise math.constants
+math.functions math.order math.ranges namespaces sequences
+sequences.private sets summary system typed vocabs ;
+QUALIFIED-WITH: alien.c-types c
+QUALIFIED-WITH: sets sets
 IN: random
 
 SYMBOL: system-random-generator
@@ -18,10 +20,10 @@ GENERIC: random-bytes* ( n tuple -- byte-array )
 
 M: object random-bytes* ( n tuple -- byte-array )
     [ [ <byte-vector> ] keep 4 /mod ] dip
-    [ pick '[ _ random-32* int <ref> _ push-all ] times ]
+    [ pick '[ _ random-32* c:int <ref> _ push-all ] times ]
     [
         over zero?
-        [ 2drop ] [ random-32* int <ref> swap head append! ] if
+        [ 2drop ] [ random-32* c:int <ref> swap head append! ] if
     ] bi-curry bi* B{ } like ;
 
 HINTS: M\ object random-bytes* { fixnum object } ;
@@ -44,14 +46,17 @@ TYPED: random-bytes ( n: fixnum -- byte-array: byte-array )
 
 <PRIVATE
 
-: (random-integer) ( bits -- n required-bits )
-    [ random-32 32 ] dip 32 - [ dup 0 > ] [
-        [ 32 shift random-32 + ] [ 32 + ] [ 32 - ] tri*
+:: ((random-integer)) ( bits obj -- n required-bits )
+    obj random-32* 32 bits 32 - [ dup 0 > ] [
+        [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
     ] while drop ;
 
-: random-integer ( n -- n' )
-    dup next-power-of-2 log2 (random-integer)
+: (random-integer) ( n obj -- n' )
+    [ dup next-power-of-2 log2 ] dip ((random-integer))
     [ * ] [ 2^ /i ] bi* ;
+
+: random-integer ( n -- n' )
+    random-generator get (random-integer) ;
 
 PRIVATE>
 
@@ -68,6 +73,20 @@ M: sequence random
     [ f ] [
         [ length random-integer ] keep nth
     ] if-empty ;
+
+M: assoc random >alist random ;
+
+M: hashtable random
+    dup assoc-size [ drop f ] [
+        [ 0 ] [ array>> ] [ random ] tri* 1 + [
+            [ 2dup array-nth tombstone? [ 2 + ] 2dip ] loop
+        ] times [ 2 - ] dip
+        [ array-nth ] [ [ 1 + ] dip array-nth ] 2bi 2array
+    ] if-zero ;
+
+M: sets:set random members random ;
+
+M: hash-set random table>> random first ;
 
 : randomize-n-last ( seq n -- seq )
     [ dup length dup ] dip - 1 max '[ dup _ > ]
@@ -96,21 +115,29 @@ ERROR: too-many-samples seq n ;
 : with-secure-random ( quot -- )
     secure-random-generator get swap with-random ; inline
 
-: uniform-random-float ( min max -- n )
-    4 random-bytes uint deref >float
-    4 random-bytes uint deref >float
+<PRIVATE
+
+: (uniform-random-float) ( min max obj -- n )
+    [ 4 4 ] dip [ random-bytes* c:uint deref >float ] curry bi@
     2.0 32 ^ * +
     [ over - 2.0 -64 ^ * ] dip
-    * + ; inline    
+    * + ; inline
+
+PRIVATE>
+
+: uniform-random-float ( min max -- n )
+    random-generator get (uniform-random-float) ; inline
+
+M: float random [ f ] [ 0.0 swap uniform-random-float ] if-zero ;
 
 : random-unit ( -- n )
     0.0 1.0 uniform-random-float ; inline
 
 : random-units ( length -- sequence )
-    [ random-unit ] replicate ;
-    
+    random-generator get '[ 0.0 1.0 _ (uniform-random-float) ] replicate ;
+
 : random-integers ( length n -- sequence )
-    '[ _ random ] replicate ;
+    random-generator get '[ _ _ (random-integer) ] replicate ;
 
 : (cos-random-float) ( -- n )
     0. 2pi uniform-random-float cos ;

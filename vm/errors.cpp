@@ -41,14 +41,13 @@ void out_of_memory()
 	abort();
 }
 
-void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
+/* Allocates memory */
+void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_)
 {
-	faulting_p = true;
+	data_root<object> arg1(arg1_,this);
+	data_root<object> arg2(arg2_,this);
 
-	/* Reset local roots before allocating anything */
-	data_roots.clear();
-	bignum_roots.clear();
-	code_roots.clear();
+	faulting_p = true;
 
 	/* If we had an underflow or overflow, data or retain stack
 	pointers might be out of bounds, so fix them before allocating
@@ -69,9 +68,14 @@ void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
 
 		/* Now its safe to allocate and GC */
 		cell error_object = allot_array_4(special_objects[OBJ_ERROR],
-			tag_fixnum(error),arg1,arg2);
+			tag_fixnum(error),arg1.value(),arg2.value());
 
 		ctx->push(error_object);
+
+		/* Reset local roots */
+		data_roots.clear();
+		bignum_roots.clear();
+		code_roots.clear();
 
 		/* The unwind-native-frames subprimitive will clear faulting_p
 		if it was successfully reached. */
@@ -84,8 +88,8 @@ void factor_vm::general_error(vm_error_type error, cell arg1, cell arg2)
 	{
 		std::cout << "You have triggered a bug in Factor. Please report.\n";
 		std::cout << "error: " << error << std::endl;
-		std::cout << "arg 1: "; print_obj(arg1); std::cout << std::endl;
-		std::cout << "arg 2: "; print_obj(arg2); std::cout << std::endl;
+		std::cout << "arg 1: "; print_obj(arg1.value()); std::cout << std::endl;
+		std::cout << "arg 2: "; print_obj(arg2.value()); std::cout << std::endl;
 		factorbug();
 		abort();
 	}
@@ -115,6 +119,7 @@ void factor_vm::verify_memory_protection_error(cell addr)
 		fatal_error("Memory protection fault during gc", addr);
 }
 
+/* Allocates memory */
 void factor_vm::memory_protection_error(cell pc, cell addr)
 {
 	if(code->safepoint_p(addr))
@@ -135,6 +140,7 @@ void factor_vm::memory_protection_error(cell pc, cell addr)
 		general_error(ERROR_MEMORY,from_unsigned_cell(addr),false_object);
 }
 
+/* Allocates memory */
 void factor_vm::signal_error(cell signal)
 {
 	general_error(ERROR_SIGNAL,from_unsigned_cell(signal),false_object);

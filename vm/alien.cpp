@@ -27,6 +27,7 @@ char *factor_vm::pinned_alien_offset(cell obj)
 	}
 }
 
+/* Allocates memory */
 /* make an alien */
 cell factor_vm::allot_alien(cell delegate_, cell displacement)
 {
@@ -52,11 +53,13 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement)
 	return new_alien.value();
 }
 
+/* Allocates memory */
 cell factor_vm::allot_alien(void *address)
 {
 	return allot_alien(false_object,(cell)address);
 }
 
+/* Allocates memory */
 /* make an alien pointing at an offset of another alien */
 void factor_vm::primitive_displaced_alien()
 {
@@ -76,6 +79,7 @@ void factor_vm::primitive_displaced_alien()
 	}
 }
 
+/* Allocates memory (from_unsigned_cell can allocate) */
 /* address of an object representing a C pointer. Explicitly throw an error
 if the object is a byte array, as a sanity check. */
 void factor_vm::primitive_alien_address()
@@ -116,6 +120,7 @@ void factor_vm::primitive_dlopen()
 	ctx->push(library.value());
 }
 
+/* Allocates memory */
 /* look up a symbol in a native library */
 void factor_vm::primitive_dlsym()
 {
@@ -138,6 +143,7 @@ void factor_vm::primitive_dlsym()
 		ctx->push(allot_alien(ffi_dlsym(NULL,sym)));
 }
 
+/* Allocates memory */
 /* look up a symbol in a native library */
 void factor_vm::primitive_dlsym_raw()
 {

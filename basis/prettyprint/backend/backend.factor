@@ -96,7 +96,7 @@ M: f pprint* drop \ f pprint-word ;
     [ effect>string ] [ effect-style ] bi styled-text ;
 
 ! Strings
-: ch>ascii-escape ( ch -- str )
+: ch>ascii-escape ( ch -- ch' ? )
     H{
         { CHAR: \a CHAR: a  }
         { CHAR: \e CHAR: e  }
@@ -106,10 +106,12 @@ M: f pprint* drop \ f pprint-word ;
         { CHAR: \0 CHAR: 0  }
         { CHAR: \\ CHAR: \\ }
         { CHAR: \" CHAR: \" }
-    } at ;
+    } ?at ; inline
 
 : unparse-ch ( ch -- )
-    dup ch>ascii-escape [ "\\" % ] [ ] ?if , ;
+    ch>ascii-escape [ "\\" % , ] [
+        dup 32 < [ dup 16 < "\\x0" "\\x" ? % >hex % ] [ , ] if
+    ] if ;
 
 : do-string-limit ( str -- trimmed )
     string-limit? get [

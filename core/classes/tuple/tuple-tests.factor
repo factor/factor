@@ -6,7 +6,8 @@ io.streams.string kernel kernel.private math math.constants
 math.order namespaces parser parser.notes prettyprint
 quotations random see sequences sequences.private slots
 slots.private splitting strings summary threads tools.test
-vectors vocabs words words.symbol fry literals memory ;
+vectors vocabs words words.symbol fry literals memory
+combinators.short-circuit ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -57,6 +58,12 @@ TUPLE: point x y ;
 [ "p" get x>> ] must-fail
 [ 200 ] [ "p" get y>> ] unit-test
 [ 300 ] [ "p" get "z>>" "accessors" lookup-word execute ] unit-test
+
+TUPLE: slotty a b c ;
+
+[ T{ slotty } ] [ H{ } slotty from-slots ] unit-test
+[ T{ slotty f 1 2 f } ] [ H{ { "a" 1 } { "b" 2 } } slotty from-slots ] unit-test
+[ H{ { "d" 0 } } slotty new set-slots ] must-fail
 
 TUPLE: predicate-test ;
 
@@ -532,9 +539,17 @@ unit-test
 must-fail-with
 
 ! Check fixnum coercer
-[ 0 ] [ 0.0 "hi" declared-types boa n>> ] unit-test
+[ 0.0 "hi" declared-types boa n>> ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
 
-[ 0 ] [ declared-types new 0.0 >>n n>> ] unit-test
+[ declared-types new 0.0 >>n n>> ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
+
+[ T{ declared-types f 33333 "asdf" } ]
+[ 33333 >bignum "asdf" declared-types boa ] unit-test
+
+[ 444444444444444444444444444444444444444444444444433333 >bignum "asdf" declared-types boa ]
+[
+    T{ out-of-fixnum-range f 444444444444444444444444444444444444444444444444433333 } =
+] must-fail-with
 
 ! Check bignum coercer
 TUPLE: bignum-coercer { n bignum initial: $[ 0 >bignum ] } ;
@@ -553,18 +568,18 @@ TUPLE: float-coercer { n float } ;
 ! Check integer coercer
 TUPLE: integer-coercer { n integer } ;
 
-[ 13 fixnum ] [ 13.5 integer-coercer boa n>> dup class-of ] unit-test
+[ 13.5 integer-coercer boa n>> dup class-of ] [ T{ bad-slot-value f 13.5 integer } = ] must-fail-with
 
-[ 13 fixnum ] [ integer-coercer new 13.5 >>n n>> dup class-of ] unit-test
+[ integer-coercer new 13.5 >>n n>> dup class-of ] [ T{ bad-slot-value f 13.5 integer } = ] must-fail-with
 
 : foo ( a b -- c ) declared-types boa ;
 
 \ foo def>> must-infer
 
-[ T{ declared-types f 0 "hi" } ] [ 0.0 "hi" foo ] unit-test
+[ 0.0 "hi" foo ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
 
 [ "hi" 0.0 declared-types boa ]
-[ T{ no-method f "hi" >fixnum } = ]
+[ T{ no-method f "hi" integer>fixnum-strict } = ]
 must-fail-with
 
 [ 0 { } declared-types boa ]
@@ -572,7 +587,7 @@ must-fail-with
 must-fail-with
 
 [ "hi" 0.0 foo ]
-[ T{ no-method f "hi" >fixnum } = ]
+[ T{ no-method f "hi" integer>fixnum-strict } = ]
 must-fail-with
 
 [ 0 { } foo ]
@@ -837,3 +852,41 @@ DEFER: initial-slot
 [ "IN: classes.tuple.tests USE: math TUPLE: foo < foo ;" eval( -- ) ] [ error>> bad-superclass? ] must-fail-with
 
 [ "IN: classes.tuple.tests USE: math TUPLE: foo < + ;" eval( -- ) ] [ error>> bad-superclass? ] must-fail-with
+
+
+! Test no-slot error and get/set-slot-named
+
+TUPLE: no-slot-tuple0 a b c ;
+C: <no-slot-tuple0> no-slot-tuple0
+
+[ 1 2 3 <no-slot-tuple0> "d" over get-slot-named ]
+[
+    {
+        [ no-slot? ]
+        [ tuple>> no-slot-tuple0? ]
+        [ name>> "d" = ]
+    } 1&&
+] must-fail-with
+
+{ 1 }
+[ 1 2 3 <no-slot-tuple0> "a" swap get-slot-named ] unit-test
+
+{ 2 }
+[ 1 2 3 <no-slot-tuple0> "b" swap get-slot-named ] unit-test
+
+{ 3 }
+[ 1 2 3 <no-slot-tuple0> "c" swap get-slot-named ] unit-test
+
+{ 4 } [
+    1 2 3 <no-slot-tuple0> 4 "a" pick set-slot-named
+    "a" swap get-slot-named
+] unit-test
+
+[ 1 2 3 <no-slot-tuple0> 4 "d" pick set-slot-named ]
+[
+    {
+        [ no-slot? ]
+        [ tuple>> no-slot-tuple0? ]
+        [ name>> "d" = ]
+    } 1&&
+] must-fail-with

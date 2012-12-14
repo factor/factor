@@ -54,6 +54,10 @@ FUNCTION: int _exit ( int status ) ;
 
 M: unix open-file [ open ] unix-system-call ;
 
+: make-fifo ( path mode -- ) [ mkfifo ] unix-system-call drop ;
+
+: truncate-file ( path n -- ) [ truncate ] unix-system-call drop ;
+
 : touch ( filename -- ) f [ utime ] unix-system-call drop ;
 
 : change-file-times ( filename access modification -- )

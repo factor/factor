@@ -72,7 +72,7 @@ SYNTAX: MEMO: (:) define-memoized ;
 
 SYNTAX: IDENTITY-MEMO: (:) define-identity-memoized ;
 
-PREDICATE: memoized < word "memoize" word-prop ;
+PREDICATE: memoized < word "memoize" word-prop >boolean ;
 
 M: memoized definer drop \ MEMO: \ ; ;
 
@@ -91,6 +91,11 @@ M: memoized reset-word
     [ f swap set-first ] [ clear-assoc ] if ;
 
 : invalidate-memoized ( inputs... word -- )
-    [ stack-effect in>> packer call ] [ "memoize" word-prop delete-at ] bi ;
+    [ stack-effect in>> packer call ]
+    [
+        "memoize" word-prop dup sequence?
+        [ f swap set-first ] [ delete-at ] if
+    ]
+    bi ;
 
 \ invalidate-memoized t "no-compile" set-word-prop

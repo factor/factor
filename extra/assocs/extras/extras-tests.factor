@@ -13,3 +13,5 @@ IN: assocs.extras
 {  { { 1 3 } { 2 4 } } } [ { 1 2 } { 3 4 }  { } zip-as ] unit-test
 { V{ { 1 3 } { 2 4 } } } [ { 1 2 } { 3 4 } V{ } zip-as ] unit-test
 { H{ { 1 3 } { 2 4 } } } [ { 1 2 } { 3 4 } H{ } zip-as ] unit-test
+
+{ H{ { 2 1 } { 4 3 } } } [ H{ { 1 2 } { 3 4 } } assoc-invert ] unit-test

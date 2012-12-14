@@ -12,7 +12,7 @@ HELP: help.
     { "word" word } }
 { $description "Prints out scaffold help markup for a given word." } ;
 
-HELP: scaffold-help
+HELP: scaffold-docs
 { $values { "vocab" vocab } }
 { $description "Takes an existing vocabulary and creates a help file with scaffolded help for each word. This word only works if no help file yet exists." } ;
 
@@ -21,7 +21,7 @@ HELP: scaffold-undocumented
     { "string" string } }
 { $description "Prints scaffolding documentation for undocumented words in a vocabulary except for automatically generated class predicates." } ;
 
-{ scaffold-help scaffold-undocumented } related-words
+{ scaffold-docs scaffold-undocumented } related-words
 
 HELP: scaffold-authors
 { $values
@@ -80,7 +80,7 @@ ARTICLE: "tools.scaffold" "Scaffold tool"
 { $subsections scaffold-vocab }
 "Generate help scaffolding:"
 { $subsections
-    scaffold-help
+    scaffold-docs
     scaffold-undocumented
     help.
 }

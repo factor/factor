@@ -282,7 +282,7 @@ HOOK: (raw) io-backend ( addr -- raw )
 
 HOOK: (broadcast) io-backend ( datagram -- datagram )
 
-HOOK: (receive-unsafe) io-backend ( n buf datagram -- size addrspec )
+HOOK: (receive-unsafe) io-backend ( n buf datagram -- count addrspec )
 
 ERROR: invalid-port object ;
 
@@ -348,7 +348,7 @@ B    [
         [ (accept) ] keep
         parse-sockaddr swap
         <ports>
-    ] keep encoding>> <encoder-duplex> swap ;
+    ] [ encoding>> ] bi <encoder-duplex> swap ;
 
 : <datagram> ( addrspec -- datagram )
     [

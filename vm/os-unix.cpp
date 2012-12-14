@@ -505,8 +505,10 @@ A Nvidia driver bug on Linux is the reason this has to be done, see:
 http://www.nvnews.net/vbulletin/showthread.php?t=164619 */
 void factor_vm::close_console()
 {
-	if (stdin_thread_initialized_p)
+	if (stdin_thread_initialized_p) {
 		pthread_cancel(stdin_thread);
+		pthread_join(stdin_thread, 0);
+	}
 }
 
 void factor_vm::lock_console()

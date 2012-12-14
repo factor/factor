@@ -26,9 +26,11 @@ SLOT: history
 TUPLE: word-completion manifest ;
 C: <word-completion> word-completion
 
-SINGLETONS: vocab-completion char-completion history-completion ;
+SINGLETONS: vocab-completion color-completion char-completion
+path-completion history-completion ;
 UNION: definition-completion word-completion vocab-completion ;
-UNION: listener-completion definition-completion char-completion history-completion ;
+UNION: listener-completion definition-completion
+color-completion char-completion path-completion history-completion ;
 
 GENERIC: completion-quot ( interactor completion-mode -- quot )
 
@@ -37,7 +39,9 @@ GENERIC: completion-quot ( interactor completion-mode -- quot )
 
 M: word-completion completion-quot [ words-matching ] (completion-quot) ;
 M: vocab-completion completion-quot [ vocabs-matching ] (completion-quot) ;
+M: color-completion completion-quot [ colors-matching ] (completion-quot) ;
 M: char-completion completion-quot [ chars-matching ] (completion-quot) ;
+M: path-completion completion-quot [ paths-matching ] (completion-quot) ;
 M: history-completion completion-quot drop '[ _ history-completions ] ;
 
 GENERIC: completion-element ( completion-mode -- element )
@@ -49,7 +53,9 @@ GENERIC: completion-banner ( completion-mode -- string )
 
 M: word-completion completion-banner drop "Words" ;
 M: vocab-completion completion-banner drop "Vocabularies" ;
+M: color-completion completion-banner drop "Colors" ;
 M: char-completion completion-banner drop "Unicode code point names" ;
+M: path-completion completion-banner drop "Paths" ;
 M: history-completion completion-banner drop "Input history" ;
 
 ! Completion modes also implement the row renderer protocol
@@ -67,26 +73,18 @@ M: definition-completion row-columns
 M: word-completion row-color
     [ vocabulary>> ] [ manifest>> ] bi* {
         { [ dup not ] [ COLOR: black ] }
-        { [ 2dup search-vocabs>> member-eq? ] [ COLOR: black ] }
+        { [ 2dup search-vocab-names>> keys member? ] [ COLOR: black ] }
         { [ over ".private" tail? ] [ COLOR: dark-red ] }
         [ COLOR: dark-gray ]
     } cond 2nip ;
 
 M: vocab-completion row-color
-    drop vocab? COLOR: black COLOR: dark-gray ? ;
+    drop dup vocab? [
+        name>> ".private" tail? COLOR: dark-red COLOR: black ?
+    ] [ drop COLOR: dark-gray ] if ;
 
-: complete-vocab? ( tokens -- ? )
-    1 short head* 2 short tail*
-    { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" } intersects? ;
-
-: chop-; ( seq -- seq' )
-    { ";" } split1-last [ ] [ ] ?if ;
-
-: complete-vocab-list? ( tokens -- ? )
-    chop-; 1 short head* "USING:" swap member? ;
-
-: complete-CHAR:? ( tokens -- ? )
-    2 short tail* "CHAR:" swap member? ;
+M: color-completion row-color
+    drop named-color ;
 
 : up-to-caret ( caret document -- string )
     [ { 0 0 } ] 2dip doc-range ;
@@ -94,8 +92,10 @@ M: vocab-completion row-color
 : completion-mode ( interactor -- symbol )
     [ manifest>> ] [ editor-caret ] [ model>> ] tri up-to-caret " \r\n" split
     {
-        { [ dup { [ complete-vocab? ] [ complete-vocab-list? ] } 1|| ] [ 2drop vocab-completion ] }
+        { [ dup complete-vocab? ] [ 2drop vocab-completion ] }
         { [ dup complete-CHAR:? ] [ 2drop char-completion ] }
+        { [ dup complete-COLOR:? ] [ 2drop color-completion ] }
+        { [ dup complete-P"? ] [ 2drop path-completion ] }
         [ drop <word-completion> ]
     } cond ;
 

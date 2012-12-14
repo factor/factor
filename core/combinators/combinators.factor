@@ -64,6 +64,13 @@ SLOT: terminated?
 : 3cleave>quot ( seq -- quot )
     [ [ 3keep ] curry ] map concat [ 3drop ] append [ ] like ;
 
+! 4cleave
+: 4cleave ( w x y z seq -- )
+    [ 4keep ] each 4drop ;
+
+: 4cleave>quot ( seq -- quot )
+    [ [ 4keep ] curry ] map concat [ 4drop ] append [ ] like ;
+
 ! spread
 : shallow-spread>quot ( seq -- quot )
     [ ] [ [ dup empty? [ [ dip ] curry ] unless ] dip append ] reduce ;
@@ -187,6 +194,8 @@ PRIVATE>
 ! These go here, not in sequences and hashtables, since those
 ! two cannot depend on us
 M: sequence hashcode* [ sequence-hashcode ] recursive-hashcode ;
+
+M: array hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
 

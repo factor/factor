@@ -78,6 +78,7 @@ void jit::emit(cell code_template_)
 	code.append_byte_array(insns.value());
 }
 
+/* Allocates memory */
 void jit::emit_with_literal(cell code_template_, cell argument_) {
 	data_root<array> code_template(code_template_,parent);
 	data_root<object> argument(argument_,parent);
@@ -85,6 +86,7 @@ void jit::emit_with_literal(cell code_template_, cell argument_) {
 	emit(code_template.value());
 }
 
+/* Allocates memory */
 void jit::emit_with_parameter(cell code_template_, cell argument_) {
 	data_root<array> code_template(code_template_,parent);
 	data_root<object> argument(argument_,parent);
@@ -92,6 +94,7 @@ void jit::emit_with_parameter(cell code_template_, cell argument_) {
 	emit(code_template.value());
 }
 
+/* Allocates memory */
 bool jit::emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p)
 {
 	data_root<word> word(word_,parent);
@@ -99,6 +102,7 @@ bool jit::emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p)
 	parameters.append(untag<array>(array_nth(code_template.untagged(),0)));
 	literals.append(untag<array>(array_nth(code_template.untagged(),1)));
 	emit(array_nth(code_template.untagged(),2));
+
 	if(array_capacity(code_template.untagged()) == 5)
 	{
 		if(tail_call_p)

@@ -37,7 +37,7 @@ IN: project-euler.040
     SBUF" " clone 1 -rot (concat-upto) ;
 
 : nth-integer ( n str -- m )
-    [ 1 - ] dip nth 1string string>number ;
+    [ 1 - ] dip nth digit> ;
 
 PRIVATE>
 

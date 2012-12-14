@@ -1,12 +1,12 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.data fry io io.encodings.utf8 kernel
-listener namespaces readline sequences threads vocabs
-command-line vocabs.hierarchy sequences.deep locals
-splitting math ;
+USING: accessors assocs colors.constants combinators fry io
+kernel listener readline sequences splitting threads
+tools.completion unicode.data vocabs vocabs.hierarchy ;
 IN: readline-listener
 
 <PRIVATE
+
 SYMBOL: completions
 
 TUPLE: readline-reader { prompt initial: f } ;
@@ -19,30 +19,34 @@ M: readline-reader stream-readln
 M: readline-reader prompt.
     >>prompt drop ;
 
-: word-names ( -- strs )
-    all-words [ name>> ] map! ;
-
-: vocab-names ( -- strs )
-    all-vocabs-recursive filter-vocabs [ name>> ] map! ;
-
-: prefixed-words ( prefix -- words )
-    '[ _ head? ] word-names swap filter ;
-
-: prefixed-vocabs ( prefix -- words )
-    '[ _ head? ] vocab-names swap filter ;
-
 : clear-completions ( -- )
     f completions tset ;
 
+: prefixed ( prefix seq -- seq' )
+    swap '[ _ head? ] filter ;
+
+: prefixed-words ( prefix -- words )
+    all-words [ name>> ] map! prefixed ;
+
+: prefixed-vocabs ( prefix -- vocabs )
+    all-vocabs-recursive filter-vocabs [ name>> ] map! prefixed ;
+
+: prefixed-colors ( prefix -- colors )
+    named-colors prefixed ;
+
+: prefixed-chars ( prefix -- chars )
+    name-map keys prefixed ;
+
 : get-completions ( prefix -- completions )
-    completions tget dup [ nip ] [
-        drop current-line " " split1 drop
-        "USING:" = [
-            prefixed-vocabs
-        ] [
-            prefixed-words
-        ] if dup completions tset
-    ] if ;
+    completions tget [ nip ] [
+        completion-line " \r\n" split {
+            { [ dup complete-vocab? ] [ drop prefixed-vocabs ] }
+            { [ dup complete-CHAR:? ] [ drop prefixed-chars ] }
+            { [ dup complete-COLOR:? ] [ drop prefixed-colors ] }
+            [ drop prefixed-words ]
+        } cond dup completions tset
+    ] if* ;
+
 PRIVATE>
 
 : readline-listener ( -- )

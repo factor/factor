@@ -433,7 +433,7 @@ HELP: find-from
           { "quot" { $quotation "( ... elt -- ... ? )" } }
           { "i" "the index of the first match, or " { $link f } }
           { "elt" "the first matching element, or " { $link f } } }
-{ $description "Applies the quotation to each element of the sequence in turn, until it outputs a true value or the end of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of f and " { $link f } " as the element." } ;
+{ $description "Applies the quotation to each element of the sequence in turn, until it outputs a true value or the end of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of " { $link f } " and " { $link f } " as the element." } ;
 
 HELP: find-last
 { $values { "seq" sequence } { "quot" { $quotation "( ... elt -- ... ? )" } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
@@ -441,7 +441,7 @@ HELP: find-last
 
 HELP: find-last-from
 { $values { "n" "a starting index" } { "seq" sequence } { "quot" { $quotation "( ... elt -- ... ? )" } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
-{ $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of f and " { $link f } " as the element." } ;
+{ $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of " { $link f } " and " { $link f } " as the element." } ;
 
 HELP: find-index
 { $values { "seq" sequence }
@@ -740,16 +740,16 @@ HELP: <repetition>
     { $example "USING: prettyprint sequences ;" "10 \"X\" <repetition> concat ." "\"XXXXXXXXXX\"" }
 } ;
 HELP: copy
-{ $values { "src" sequence } { "i" "an index in " { $snippet "dest" } } { "dst" "a mutable sequence" } }
-{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dest" } ", with destination indices starting from " { $snippet "i" } ". Grows " { $snippet "to" } " first if necessary." }
-{ $side-effects "dest" }
-{ $errors "An error is thrown if " { $snippet "to" } " is not resizable, and not large enough to hold the copied elements." } ;
+{ $values { "src" sequence } { "i" "an index in " { $snippet "dst" } } { "dst" "a mutable sequence" } }
+{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dst" } ", with destination indices starting from " { $snippet "i" } ". Grows " { $snippet "dst" } " first if necessary." }
+{ $side-effects "dst" }
+{ $errors "An error is thrown if " { $snippet "dst" } " is not resizable, and not large enough to hold the copied elements." } ;
 
 HELP: push-all
-{ $values { "src" sequence } { "dest" "a resizable mutable sequence" } }
-{ $description "Appends " { $snippet "src" } " to the end of " { $snippet "dest" } "." }
-{ $side-effects "dest" }
-{ $errors "Throws an error if " { $snippet "src" } " contains elements not permitted in " { $snippet "dest" } "." } ;
+{ $values { "src" sequence } { "dst" "a resizable mutable sequence" } }
+{ $description "Appends " { $snippet "src" } " to the end of " { $snippet "dst" } "." }
+{ $side-effects "dst" }
+{ $errors "Throws an error if " { $snippet "src" } " contains elements not permitted in " { $snippet "dst" } "." } ;
 
 HELP: append
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
@@ -1344,7 +1344,7 @@ HELP: insert-nth
 
 HELP: map-reduce
 { $values
-     { "seq" sequence } { "map-quot" quotation } { "reduce-quot" quotation }
+     { "seq" sequence } { "map-quot" { $quotation "( ..a elt -- ..b intermediate )" } } { "reduce-quot" { $quotation "( ..b prev intermediate -- ..a next )" } }
      { "result" object } }
 { $description "Calls " { $snippet "map-quot" } " on each element and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }

@@ -63,11 +63,11 @@ M: string length
     length>> ; inline
 
 M: string nth-unsafe
-    [ >fixnum ] dip string-nth ; inline
+    [ integer>fixnum ] dip string-nth ; inline
 
 M: string set-nth-unsafe
     dup reset-string-hashcode
-    [ >fixnum ] [ >fixnum ] [ ] tri* set-string-nth ; inline
+    [ integer>fixnum ] [ integer>fixnum ] [ ] tri* set-string-nth ; inline
 
 M: string clone
     (clone) [ clone ] change-aux ; inline

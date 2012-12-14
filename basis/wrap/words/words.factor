@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel splitting.monotonic accessors grouping wrap ;
+USING: accessors grouping kernel math sequences
+sequences.private splitting.monotonic wrap ;
 IN: wrap.words
 
 TUPLE: word key width break? ;
@@ -13,9 +14,11 @@ C: <word> word
 
 : make-element ( whites blacks -- element )
     [ append ] [ [ words-length ] bi@ ] 2bi <element> ;
- 
+
 : ?first2 ( seq -- first/f second/f )
-    [ ?first ] [ ?second ] bi ;
+    dup length dup 1 > [ drop first2-unsafe ] [
+        0 > [ first-unsafe f ] [ drop f f ] if
+    ] if ;
 
 : split-words ( seq -- half-elements )
     [ [ break?>> ] same? ] monotonic-split ;
@@ -26,7 +29,7 @@ C: <word> word
     [ f ] if ;
 
 : make-elements ( seq f/element -- elements )
-    [ 2 <groups> [ ?first2 make-element ] map ] dip
+    [ 2 group [ ?first2 make-element ] map! ] dip
     [ prefix ] when* ;
 
 : words>elements ( seq -- newseq )
@@ -35,5 +38,5 @@ C: <word> word
 PRIVATE>
 
 : wrap-words ( words line-max line-ideal -- lines )
-    [ words>elements ] 2dip wrap [ concat ] map ;
+    [ words>elements ] 2dip wrap [ concat ] map! ;
 

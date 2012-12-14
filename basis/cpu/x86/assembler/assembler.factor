@@ -448,7 +448,10 @@ PRIVATE>
 : PAUSE ( -- ) 0xf3 , 0x90 , ;
 
 : RDTSC ( -- ) 0x0f , 0x31 , ;
+: RDMSR ( -- ) 0x0f , 0x32 , ; ! Only available in privileged level 0
 : RDPMC ( -- ) 0x0f , 0x33 , ;
+
+: RDRAND ( dst -- ) { 0b110 t { 0x0f 0xc7 } } 1-operand ;
 
 ! x87 Floating Point Unit
 

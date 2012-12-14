@@ -62,12 +62,18 @@ SYMBOL: command-line
         [ source-file main>> [ execute( -- ) ] when* ] bi
     ] with-variable ;
 
-: parse-command-line ( args -- )
-    [ command-line off script off ] [
+: (parse-command-line) ( run? args -- )
+    [ command-line off script off drop ] [
         unclip "-" ?head
-        [ param parse-command-line ]
-        [ script set command-line set ] if
+        [ param (parse-command-line) ]
+        [
+            rot [ prefix f ] when
+            script set command-line set
+        ] if
     ] if-empty ;
+
+: parse-command-line ( args -- )
+    [ [ "-run=" head? ] any? ] keep (parse-command-line) ;
 
 SYMBOL: main-vocab-hook
 

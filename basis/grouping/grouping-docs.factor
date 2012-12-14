@@ -117,7 +117,7 @@ $nl
 HELP: clump
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
 { $description "Splits the sequence into overlapping clumps of " { $snippet "n" } " elements and collects the clumps into a new array." }
-{ $errors "Throws an error if " { $snippet "n" } " is larger than the length of the sequence." }
+{ $notes "For an empty sequence, the result is an empty sequence. For a non empty sequence with a length smaller than " { $snippet "n" } ", the result will be an empty sequence." }
 { $examples
     { $example "USING: grouping prettyprint ;" "{ 3 1 3 3 7 } 2 clump ." "{ { 3 1 } { 1 3 } { 3 3 } { 3 7 } }" }
 } ;
@@ -125,7 +125,7 @@ HELP: clump
 HELP: circular-clump
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
 { $description "Splits the sequence into overlapping clumps of " { $snippet "n" } " elements, wrapping around the end of the sequence, and collects the clumps into a new array." }
-{ $errors "Throws an error if " { $snippet "n" } " is larger than the length of the sequence." }
+{ $notes "For an empty sequence, the result is an empty sequence." }
 { $examples
     { $example "USING: grouping prettyprint ;" "{ 3 1 3 3 7 } 2 circular-clump ." "{ { 3 1 } { 1 3 } { 3 3 } { 3 7 } { 7 3 } }" }
 } ;

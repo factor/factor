@@ -31,7 +31,10 @@ TR: convert-separators "/\\" ".." ;
 : monitor-loop ( monitor -- )
     #! On OS X, monitors give us the full path, so we chop it
     #! off if its there.
-    [ next-change path>> path>vocab changed-vocab reset-cache ]
+    [
+        next-change path>> path>vocab
+        [ changed-vocab ] [ reset-cache ] bi
+    ]
     [ monitor-loop ]
     bi ;
 

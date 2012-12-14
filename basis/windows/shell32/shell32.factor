@@ -1,10 +1,11 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.strings alien.syntax
-classes.struct combinators io.files io.pathnames kernel
-windows.errors windows.com windows.com.syntax windows.types
-windows.user32 windows.ole32 windows specialized-arrays ;
-SPECIALIZED-ARRAY: ushort
+USING: alien alien.c-types alien.data alien.strings
+alien.syntax classes.struct io.backend kernel
+specialized-arrays
+specialized-arrays.instances.alien.c-types.ushort windows
+windows.com windows.com.syntax windows.kernel32 windows.ole32
+windows.types ;
 IN: windows.shell32
 
 CONSTANT: CSIDL_DESKTOP 0x00
@@ -86,6 +87,60 @@ ALIAS: SHGetFolderPath SHGetFolderPathW
 FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile, LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShowCmd ) ;
 ALIAS: ShellExecute ShellExecuteW
 
+CONSTANT: SHGFI_ICON 0x000000100
+CONSTANT: SHGFI_DISPLAYNAME 0x000000200
+CONSTANT: SHGFI_TYPENAME 0x000000400
+CONSTANT: SHGFI_ATTRIBUTES 0x000000800
+CONSTANT: SHGFI_ICONLOCATION 0x000001000
+CONSTANT: SHGFI_EXETYPE 0x000002000
+CONSTANT: SHGFI_SYSICONINDEX 0x000004000
+CONSTANT: SHGFI_LINKOVERLAY 0x000008000
+CONSTANT: SHGFI_SELECTED 0x000010000
+CONSTANT: SHGFI_ATTR_SPECIFIED 0x000020000
+CONSTANT: SHGFI_LARGEICON 0x000000000
+CONSTANT: SHGFI_SMALLICON 0x000000001
+CONSTANT: SHGFI_OPENICON 0x000000002
+CONSTANT: SHGFI_SHELLICONSIZE 0x000000004
+CONSTANT: SHGFI_PIDL 0x000000008
+CONSTANT: SHGFI_USEFILEATTRIBUTES 0x000000010
+CONSTANT: SHGFI_ADDOVERLAYS 0x000000020
+CONSTANT: SHGFI_OVERLAYINDEX 0x000000040
+
+STRUCT: SHFILEINFO
+    { hIcon HICON }
+    { iIcon int }
+    { dwAttributes DWORD }
+    { szDisplayName TCHAR[MAX_PATH] }
+    { szTypeName TCHAR[80] } ;
+
+FUNCTION: DWORD_PTR SHGetFileInfoW (
+    LPCTSTR pszPath,
+    DWORD dwFileAttributes,
+    SHFILEINFO *psfi,
+    UINT cbFileInfo,
+    UINT uFlags
+) ;
+
+: shell32-file-info ( path -- err struct )
+    normalize-path
+    0
+    SHFILEINFO <struct>
+    [ dup byte-length SHGFI_EXETYPE SHGetFileInfoW ] keep ;
+
+SINGLETONS:
+    +dos-executable+
+    +win32-console-executable+
+    +win32-vxd-executable+
+    +win32-os2-executable+
+    +win32-nt-executable+ ;
+
+MIXIN: windows-executable
+INSTANCE: +dos-executable+ windows-executable        ! mz
+INSTANCE: +win32-console-executable+ windows-executable
+INSTANCE: +win32-vxd-executable+ windows-executable  ! le
+INSTANCE: +win32-os2-executable+ windows-executable  ! ne
+INSTANCE: +win32-nt-executable+ windows-executable   ! pe
+
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
     MAX_UNICODE_PATH ushort <c-array>
@@ -117,6 +172,7 @@ ALIAS: ShellExecute ShellExecuteW
 
 : program-files-common-x86 ( -- str )
     CSIDL_PROGRAM_FILES_COMMONX86 shell32-directory ;
+    
 
 CONSTANT: SHCONTF_FOLDERS 32
 CONSTANT: SHCONTF_NONFOLDERS 64

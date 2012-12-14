@@ -20,7 +20,7 @@ must-fail
 [ most-positive-fixnum 2 * 2 + V{ } clone set-length ]
 must-fail
 
-[ ] [
+[
     10 V{ } [ set-length ] keep
     0.5 swap set-length
-] unit-test
+] must-fail

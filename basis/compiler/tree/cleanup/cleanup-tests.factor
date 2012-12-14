@@ -322,11 +322,7 @@ cell-bits 32 = [
 ] unit-test
 
 [ t ] [
-    [ { fixnum } declare 10 [ -1 shift ] times ] \ shift inlined?
-] unit-test
-
-[ f ] [
-    [ { integer } declare 10 [ -1 shift ] times ] \ shift inlined?
+    [ 10 [ -1 shift ] times ] \ shift inlined?
 ] unit-test
 
 [ f ] [
@@ -357,13 +353,13 @@ cell-bits 32 = [
 [ f ] [
     [
         { integer } declare iota [ ] map
-    ] \ >fixnum inlined?
+    ] \ integer>fixnum inlined?
 ] unit-test
 
 [ f ] [
     [
         { integer } declare { } set-nth-unsafe
-    ] \ >fixnum inlined?
+    ] \ integer>fixnum inlined?
 ] unit-test
 
 [ f ] [

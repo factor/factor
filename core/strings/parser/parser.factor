@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel lexer make math math.parser
-namespaces parser sequences splitting strings arrays
-math.order ;
+USING: accessors arrays assocs combinators kernel lexer make
+math math.order math.parser namespaces parser sequences
+splitting strings ;
 IN: strings.parser
 
 ERROR: bad-escape char ;
@@ -27,6 +27,9 @@ name>char-hook [
     [ "Unicode support not available" throw ]
 ] initialize
 
+: hex-escape ( str -- ch str' )
+    2 cut-slice [ hex> ] dip ;
+
 : unicode-escape ( str -- ch str' )
     "{" ?head-slice [
         CHAR: } over index cut-slice
@@ -37,11 +40,11 @@ name>char-hook [
     ] if ;
 
 : next-escape ( str -- ch str' )
-    "u" ?head-slice [
-        unicode-escape
-    ] [
-        unclip-slice escape swap
-    ] if ;
+    dup first {
+        { CHAR: u [ 1 tail-slice unicode-escape ] }
+        { CHAR: x [ 1 tail-slice hex-escape ] }
+        [ drop unclip-slice escape swap ]
+    } case ;
 
 : (unescape-string) ( str -- )
     CHAR: \\ over index dup [

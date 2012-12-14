@@ -97,7 +97,7 @@ M:: input-port stream-read-unsafe ( n dst port -- count )
             drop read-until-loop
         ] if
     ] [
-        [ 2drop 2drop ] dip
+        [ 4drop ] dip
     ] if ;
 
 M: input-port stream-read-until ( seps port -- str/f sep/f )
@@ -202,7 +202,10 @@ M: output-port dispose*
     ] with-destructors ;
 
 M: buffered-port dispose*
-    [ call-next-method ] [ buffer>> dispose ] bi ;
+    [
+        [ buffer>> &dispose drop ]
+        [ call-next-method ] bi
+    ] with-destructors ;
 
 M: port cancel-operation handle>> cancel-operation ;
 

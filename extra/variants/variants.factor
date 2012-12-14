@@ -5,7 +5,7 @@ classes.union combinators inverse kernel lexer macros make
 parser quotations sequences slots splitting words ;
 IN: variants
 
-PREDICATE: variant-class < mixin-class "variant" word-prop ;
+PREDICATE: variant-class < mixin-class "variant?" word-prop ;
 
 M: variant-class initial-value*
     dup members [ drop f f ]
@@ -19,7 +19,7 @@ M: variant-class initial-value*
     dup array? [ first3 pick [ define-tuple-class-and-boa-word ] dip ] [ dup define-singleton-class ] if ;
 
 : define-variant-class ( class -- )
-    [ define-mixin-class ] [ t "variant" set-word-prop ] bi ;
+    [ define-mixin-class ] [ t "variant?" set-word-prop ] bi ;
 
 : define-variant-class-member ( class member -- )
     define-variant-member swap add-mixin-instance ;

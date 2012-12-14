@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleExecutable</key>
-	<string>factor</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>factor</string>
+				<string>*</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Any</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>****</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>org.factorcode.factor-source</string>
-			</array>
 		</dict>
 	</array>
+	<key>CFBundleExecutable</key>
+	<string>factor</string>
 	<key>CFBundleIconFile</key>
 	<string>Factor.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -30,9 +32,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleVersion</key>
-	<string>0.94</string>
+	<string>0.95</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2003-2011 Factor developers</string>
+	<string>Copyright © 2003-2012 Factor developers</string>
 	<key>NSServices</key>
 	<array>
 		<dict>
@@ -70,25 +72,7 @@
 			</array>
 		</dict>
 	</array>
-	<key>UTExportedTypeDeclarations</key>
-	<array>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.source-code</string>
-				<string>public.text</string>
-				<string>public.content</string>
-			</array>
-			<key>UTTypeIdentifier</key>
-			<string>org.factorcode.factor-source</string>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>public.filename-extension</key>
-				<array>
-					<string>factor</string>
-				</array>
-			</dict>
-		</dict>
-	</array>
+	<key>NSHighResolutionCapable</key>
+	<true/>
 </dict>
 </plist>

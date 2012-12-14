@@ -18,7 +18,7 @@ M: word-break-gadget draw-gadget* drop ;
 INSTANCE: word-break-gadget word-break
 
 ! A gadget that arranges its children in a word-wrap style.
-TUPLE: paragraph < gadget margin ;
+TUPLE: paragraph < aligned-gadget margin wrapped ;
 
 : <paragraph> ( margin -- gadget )
     paragraph new
@@ -30,26 +30,31 @@ TUPLE: paragraph < gadget margin ;
 : gadget>word ( gadget -- word )
     [ ] [ pref-dim first ] [ word-break? ] tri <word> ;
 
-TUPLE: line words height ;
+: line-width ( words -- n )
+    [ break?>> ] trim-tail-slice [ width>> ] map-sum ;
+
+TUPLE: line words width height baseline ;
 
 : <line> ( words -- line )
-    dup [ key>> ] map dup pref-dims measure-height line boa ;
+    [ ] [ line-width ] [ [ key>> ] map dup pref-dims ] tri
+    [ measure-height ] [ measure-metrics drop ] 2bi line boa ;
 
 : wrap-paragraph ( paragraph -- wrapped-paragraph )
     [ children>> [ gadget>word ] map ] [ margin>> ] bi
-    dup wrap-words [ <line> ] map ;
+    dup wrap-words [ <line> ] map! ;
 
-: line-width ( wrapped-line -- n )
-    [ break?>> ] trim-tail-slice [ width>> ] map-sum ;
+: cached-wrapped ( paragraph -- wrapped-paragraph )
+    dup wrapped>>
+    [ nip ] [ [ wrap-paragraph dup ] keep wrapped<< ] if* ;
 
 : max-line-width ( wrapped-paragraph -- x )
-    [ words>> line-width ] [ max ] map-reduce ;
+    [ width>> ] [ max ] map-reduce ;
 
 : sum-line-heights ( wrapped-paragraph -- y )
     [ height>> ] map-sum ;
 
 M: paragraph pref-dim*
-    wrap-paragraph [ max-line-width ] [ sum-line-heights ] bi 2array ;
+    cached-wrapped [ max-line-width ] [ sum-line-heights ] bi 2array ;
 
 : line-y-coordinates ( wrapped-paragraph -- ys )
     0 [ height>> + ] accumulate nip ;
@@ -69,17 +74,12 @@ M: paragraph pref-dim*
     ] dip '[ _ + layout-word ] 3each ;
 
 M: paragraph layout*
-    wrap-paragraph dup line-y-coordinates
-    [ layout-line ] 2each ;
+    f >>wrapped
+    cached-wrapped dup line-y-coordinates [ layout-line ] 2each ;
 
-M: paragraph baseline
-    wrap-paragraph [ f ] [
-        first words>>
-        [ key>> ] map
-        dup [ pref-dim ] map
-        measure-metrics drop
-    ] if-empty ;
+M: paragraph baseline*
+    cached-wrapped [ f ] [ first baseline>> ] if-empty ;
 
-M: paragraph cap-height pack-cap-height ;
-    
+M: paragraph cap-height* pack-cap-height ;
+
 PRIVATE>

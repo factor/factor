@@ -46,33 +46,33 @@ HELP: minmax
     }
 } ;
 
-HELP: std
+HELP: sample-std
 { $values { "seq" sequence } { "x" "a non-negative real number"} }
-{ $description "Computes the standard deviation of " { $snippet "seq" } ", which is the square root of the variance. It measures how widely spread the values in a sequence are about the mean." }
+{ $description "Computes the sample standard deviation of " { $snippet "seq" } ", which is the square root of the sample variance. It measures how widely spread the values in a sequence are about the mean for a random subset of a dataset." }
 { $examples
-  { $example "USING: math.statistics prettyprint ;" "{ 7 8 9 } std ." "1.0" } } ;
+  { $example "USING: math.statistics prettyprint ;" "{ 7 8 9 } sample-std ." "1.0" } } ;
 
-HELP: ste
+HELP: sample-ste
   { $values { "seq" sequence } { "x" "a non-negative real number"} }
   { $description "Computes the standard error of the mean for " { $snippet "seq" } ". It's defined as the standard deviation divided by the square root of the length of the sequence, and measures uncertainty associated with the estimate of the mean." }
   { $examples
-    { $example "USING: math.statistics prettyprint ;" "{ -2 2 } ste ." "2.0" }
+    { $example "USING: math.statistics prettyprint ;" "{ -2 2 } sample-ste ." "2.0" }
   } ;
 
-HELP: var
+HELP: sample-var
 { $values { "seq" sequence } { "x" "a non-negative real number"} }
-{ $description "Computes the variance of " { $snippet "seq" } ". It's a measurement of the spread of values in a sequence. The larger the variance, the larger the distance of values from the mean." }
+{ $description "Computes the variance of " { $snippet "seq" } ". It's a measurement of the spread of values in a sequence." }
 { $notes "If the number of elements in " { $snippet "seq" } " is 1 or less, it outputs 0." }
 { $examples
-  { $example "USING: math.statistics prettyprint ;" "{ 1 } var ." "0" }
-  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } var ." "1" }
-  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } var ." "1+2/3" } } ;
+  { $example "USING: math.statistics prettyprint ;" "{ 1 } sample-var ." "0" }
+  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } sample-var ." "1" }
+  { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } sample-var ." "1+2/3" } } ;
 
-HELP: cov
+HELP: population-cov 
 { $values { "{x}" sequence } { "{y}" sequence } { "cov" "a real number" } }
 { $description "Computes the covariance of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
 
-HELP: corr
+HELP: population-corr
 { $values { "{x}" sequence } { "{y}" sequence } { "corr" "a real number" } }
 { $description "Computes the correlation of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
 
@@ -134,42 +134,41 @@ HELP: sorted-histogram
 
 HELP: sequence>assoc
 { $values
-    { "seq" sequence } { "map-quot" { $quotation "( x -- ..y )" } } { "insert-quot" { $quotation "( ..y assoc -- )" } } { "exemplar" "an exemplar assoc" }
+    { "seq" sequence } { "map-quot" $quotation } { "insert-quot" quotation } { "exemplar" "an exemplar assoc" }
     { "assoc" assoc }
 }
 { $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created " { $snippet "assoc" } ". The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
 { $examples
     { $example "! Iterate over a sequence and increment the count at each element"
                "! The first quotation has stack effect ( key -- key ), a no-op"
-               "USING: assocs prettyprint math.statistics ;"
-               "\"aaabc\" [ ] [ inc-at ] H{ } sequence>assoc ."
+               "USING: assocs prettyprint kernel math.statistics ;"
+               "\"aaabc\" [ ] [ nip inc-at ] H{ } sequence>assoc ."
                "H{ { 97 3 } { 98 1 } { 99 1 } }"
     }
 } ;
 
 HELP: sequence>assoc!
 { $values
-    { "assoc" assoc } { "seq" sequence } { "map-quot" { $quotation "( x -- ..y )" } } { "insert-quot" { $quotation "( ..y assoc -- )" } }
-}
+    { "assoc" assoc } { "seq" sequence } { "map-quot" quotation } { "insert-quot" quotation } }
 { $description "Iterates over a sequence, allowing elements of the sequence to be added to an existing " { $snippet "assoc" } ". The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
 { $examples
     { $example "! Iterate over a sequence and add the counts to an existing assoc"
                "USING: assocs prettyprint math.statistics kernel ;"
-               "H{ { 97 2 } { 98 1 } } clone \"aaabc\" [ ] [ inc-at ] sequence>assoc! ."
+               "H{ { 97 2 } { 98 1 } } clone \"aaabc\" [ ] [ nip inc-at ] sequence>assoc! ."
                "H{ { 97 5 } { 98 2 } { 99 1 } }"
     }
 } ;
 
 HELP: sequence>hashtable
 { $values
-    { "seq" sequence } { "map-quot" { $quotation "( x -- ..y )" } } { "insert-quot" { $quotation "( ..y assoc -- )" } }
+    { "seq" sequence } { "map-quot" quotation } { "insert-quot" quotation }
     { "hashtable" hashtable }
 }
 { $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created hashtable. The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
 { $examples
     { $example "! Count the number of times an element occurs in a sequence"
-               "USING: assocs prettyprint math.statistics ;"
-               "\"aaabc\" [ ] [ inc-at ] sequence>hashtable ."
+               "USING: assocs kernel prettyprint math.statistics ;"
+               "\"aaabc\" [ ] [ nip inc-at ] sequence>hashtable ."
                "H{ { 97 3 } { 98 1 } { 99 1 } }"
     }
 } ;
@@ -183,6 +182,17 @@ HELP: cum-sum
                "{ 1 0 2 1 5 }"
     }
 } ;
+
+HELP: cum-count
+{ $values { "seq" sequence } { "quot" quotation } { "seq'" sequence } }
+{ $description "Returns the cumulative count of how many times " { $snippet "quot" } " returns true." }
+{ $examples
+    { $example "USING: math math.statistics prettyprint ;"
+               "{ 1 -1 2 -1 4 } [ 0 < ] cum-count ."
+               "{ 0 1 1 2 2 }"
+    }
+} ;
+
 
 HELP: cum-product
 { $values { "seq" sequence } { "seq'" sequence } }
@@ -241,6 +251,27 @@ ARTICLE: "histogram" "Computing histograms"
     sequence>hashtable
 } ;
 
+ARTICLE: "cumulative" "Computing cumulative sequences"
+"Cumulative mapping combinators:"
+{ $subsections
+    cum-map
+}
+"Cumulative math:"
+{ $subsections
+    cum-sum
+    cum-sum0
+    cum-product
+}
+"Cumulative comparisons:"
+{ $subsections
+    cum-min
+    cum-max
+}
+"Cumulative counting:"
+{ $subsections
+    cum-count
+} ;
+
 ARTICLE: "math.statistics" "Statistics"
 "Computing the mean:"
 { $subsections mean geometric-mean harmonic-mean }
@@ -248,18 +279,25 @@ ARTICLE: "math.statistics" "Statistics"
 { $subsections median lower-median upper-median medians }
 "Computing the mode:"
 { $subsections mode }
-"Computing the standard deviation, standard error, and variance:"
-{ $subsections std ste var }
+"Computing the population standard deviation, standard error, and variance:"
+{ $subsections population-std population-ste population-var }
+"Computing the sample standard deviation, standard error, and variance:"
+{ $subsections sample-std sample-ste sample-var }
+"Computing the nth delta-degrees-of-freedom statistics:"
+{ $subsections std-ddof ste-ddof var-ddof }
 "Computing the range and minimum and maximum elements:"
 { $subsections range minmax }
 "Computing the kth smallest element:"
 { $subsections kth-smallest }
 "Counting the frequency of occurrence of elements:"
-{ $subsection "histogram" } ;
+{ $subsections "histogram" }
+"Computing cumulative sequences:"
+{ $subsections "cumulative" } ;
 
 ABOUT: "math.statistics"
 
-{ var full-var sample-var } related-words
-{ std full-std sample-std } related-words
-{ ste full-ste sample-ste } related-words
-{ corr full-corr sample-corr } related-words
+{ var-ddof population-var sample-var } related-words
+{ std-ddof population-std sample-std } related-words
+{ ste-ddof population-ste sample-ste } related-words
+{ corr-ddof population-corr sample-corr } related-words
+{ cov-ddof population-cov sample-cov } related-words

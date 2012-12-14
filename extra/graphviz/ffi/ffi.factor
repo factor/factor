@@ -104,8 +104,11 @@ M: ffi-errors error.
     " error(s) occurred while rendering." print
     "(The messages were probably printed to STDERR.)" print ;
 
+: ?ffi-errors ( n -- )
+    [ ffi-errors ] unless-zero ; inline
+
 : gvFreeContext ( gvc -- )
-    int-gvFreeContext [ ffi-errors ] unless-zero ;
+    int-gvFreeContext ?ffi-errors ;
 
 DESTRUCTOR: gvFreeContext
 
@@ -162,7 +165,7 @@ FUNCTION: c-string
         gvContext &gvFreeContext _ "" gvplugin_list
         " " split harvest
     ] with-destructors ;
-    
+
 PRIVATE>
 
 MEMO: supported-engines ( -- seq ) API_layout plugin-list ;

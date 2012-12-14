@@ -29,7 +29,7 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
 
 <PRIVATE
 
-: make-script-string ( dc string -- script-string )
+: make-ssa ( dc script-string -- ssa )
     dup selection? [ string>> ] when
     [ utf16n encode ] ! pString
     [ length ] bi ! cString
@@ -53,32 +53,29 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
 : selection-start/end ( script-string -- iMinSel iMaxSel )
     string>> dup selection? [ [ start>> ] [ end>> ] bi ] [ drop 0 0 ] if ;
 
-: (draw-script-string) ( script-string -- )
+: draw-script-string ( ssa size script-string -- )
     [
-        ssa>> ! ssa
         0 ! iX
         0 ! iY
         ETO_OPAQUE ! uOptions
     ]
-    [ [ { 0 0 } ] dip size>> <RECT> ]
-    [ selection-start/end ] tri
+    [ [ { 0 0 } ] dip <RECT> ]
+    [ selection-start/end ] tri*
     ! iMinSel
     ! iMaxSel
     FALSE ! fDisabled
     ScriptStringOut check-ole32-error ;
 
-: draw-script-string ( dc script-string -- )
-    [ font>> set-dc-colors ] keep (draw-script-string) ;
-
-:: make-script-string-image ( dc script-string -- image )
-    script-string size>> dc
-    [ dc script-string draw-script-string ] make-bitmap-image ;
+:: render-image ( dc ssa script-string -- image )
+    script-string size>> :> size
+    size dc
+    [ ssa size script-string draw-script-string ] make-bitmap-image ;
 
 : set-dc-font ( dc font -- )
     cache-font SelectObject win32-error=0/f ;
 
-: script-string-size ( script-string -- dim )
-    ssa>> ScriptString_pSize
+: ssa-size ( ssa -- dim )
+    ScriptString_pSize
     dup win32-error=0/f
     [ cx>> ] [ cy>> ] bi 2array ;
 
@@ -87,6 +84,7 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
     [ GetTextMetrics drop ] keep
     TEXTMETRIC>metrics ;
 
+! DC limit is default soft-limited to 10,000 per process.
 : <script-string> ( font string -- script-string )
     [ script-string new-disposable ] 2dip
         [ >>font ] [ >>string ] bi*
@@ -94,9 +92,7 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
         {
             [ over font>> set-dc-font ]
             [ dc-metrics >>metrics ]
-            [ over string>> make-script-string >>ssa ]
-            [ drop dup script-string-size >>size ]
-            [ over make-script-string-image >>image ]
+            [ over string>> make-ssa [ >>ssa ] [ ssa-size >>size ] bi ]
         } cleave
     ] with-memory-dc ;
 
@@ -109,6 +105,20 @@ SYMBOL: cached-script-strings
 
 : cached-script-string ( font string -- script-string )
     cached-script-strings get-global [ <script-string> ] 2cache ;
+
+: script-string>image ( script-string -- image )
+    dup image>> [
+        [
+            {
+                [ over font>> [ set-dc-font ] [ set-dc-colors ] 2bi ]
+                [
+                    dup pick string>> make-ssa
+                    dup void* <ref> &ScriptStringFree drop
+                    pick render-image >>image
+                ]
+            } cleave
+        ] with-memory-dc
+    ] unless image>> ;
 
 [ <cache-assoc> &dispose cached-script-strings set-global ]
 "windows.uniscribe" add-startup-hook

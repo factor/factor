@@ -3,11 +3,15 @@
 USING: assocs kernel namespaces sequences sets ;
 IN: graphs
 
+<PRIVATE
+
 : if-graph ( vertex edges graph quot -- )
     dupd [ 3drop ] if ; inline
 
 : nest ( key graph -- hash )
     [ drop H{ } clone ] cache ; inline
+
+PRIVATE>
 
 : add-vertex ( vertex edges graph -- )
     [ [ nest dupd set-at ] curry with each ] if-graph ; inline
@@ -25,6 +29,8 @@ IN: graphs
         swapd [ [ rot ] dip at delete-at drop ] 2curry assoc-each
     ] if-graph ; inline
 
+<PRIVATE
+
 : (closure) ( obj assoc quot: ( elt -- assoc ) -- )
     2over key? [
         3drop
@@ -32,6 +38,8 @@ IN: graphs
         2over conjoin [ dip ] keep
         [ [ drop ] 3dip (closure) ] 2curry assoc-each
     ] if ; inline recursive
+
+PRIVATE>
 
 : closure ( obj quot -- assoc )
     H{ } clone [ swap (closure) ] keep ; inline

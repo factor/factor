@@ -6,13 +6,34 @@ IN: ui.baseline-alignment
 
 SYMBOL: +baseline+
 
+
+TUPLE: aligned-gadget < gadget baseline cap-height ;
+
+GENERIC: baseline* ( gadget -- y )
+
 GENERIC: baseline ( gadget -- y )
 
 M: gadget baseline drop f ;
 
+M: aligned-gadget baseline
+    dup baseline>>
+    [ ] [
+        [ baseline* ] [ ] [ layout-state>> ] tri
+        [ drop ] [ dupd baseline<< ] if
+    ] ?if ;
+
+GENERIC: cap-height* ( gadget -- y )
+
 GENERIC: cap-height ( gadget -- y )
 
 M: gadget cap-height drop f ;
+
+M: aligned-gadget cap-height
+    dup cap-height>>
+    [ ] [
+        [ cap-height* ] [ ] [ layout-state>> ] tri
+        [ drop ] [ dupd cap-height<< ] if
+    ] ?if ;
 
 <PRIVATE
 
@@ -63,7 +84,7 @@ PRIVATE>
     dup max-ascent 0 or :> max-ascent
     dup max-cap-height 0 or :> max-cap-height
     dup max-graphics-height :> max-graphics-height
-    
+
     max-cap-height max-graphics-height + 2 /i :> critical-line
     critical-line max-ascent [-] :> text-leading
     max-ascent critical-line [-] :> graphics-leading

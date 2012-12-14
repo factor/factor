@@ -1,9 +1,10 @@
-! Copyright (C) 2009, 2011 Doug Coleman.
+! Copyright (C) 2009, 2011 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays effects fry generalizations kernel
-macros math math.order sequences sequences.generalizations
-stack-checker stack-checker.backend stack-checker.errors
-stack-checker.values stack-checker.visitor words memoize ;
+USING: accessors arrays assocs combinators effects fry
+generalizations kernel macros math math.order memoize sequences
+sequences.generalizations sequences.private stack-checker
+stack-checker.backend stack-checker.errors stack-checker.values
+stack-checker.visitor words ;
 IN: combinators.smart
 
 GENERIC: infer-known* ( known -- effect )
@@ -65,6 +66,12 @@ M: object infer-known* drop f ;
 
 : output>array ( quot -- array )
     { } output>sequence ; inline
+    
+: cleave>array ( x seq -- array )
+    '[ _ cleave ] output>array ; inline
+
+: cleave>sequence ( x seq exemplar -- array )
+    [ '[ _ cleave ] ] dip output>sequence ; inline
 
 : input<sequence ( seq quot -- )
     [ inputs firstn ] [ call ] bi ; inline
@@ -119,3 +126,31 @@ MACRO: map-reduce-outputs ( quot mapper reducer -- quot )
 
 : smart-apply ( quot n -- )
     [ dup inputs ] dip mnapply ; inline
+
+: smart-with ( param obj quot -- obj curry )
+    swapd dup inputs '[ [ _ -nrot ] dip call ] 2curry ; inline
+
+MACRO: smart-reduce ( reduce-quots -- quot )
+    unzip [ [ ] like ] bi@ dup length dup '[
+        [ @ ] dip [ @ _ cleave-curry _ spread* ] each
+    ] ;
+
+MACRO: smart-map-reduce ( map-reduce-quots -- quot )
+    [ keys ] [ [ [ ] concat-as ] [ ] map-as ] bi dup length dup '[
+        [ first _ cleave ] keep
+        [ @ _ cleave-curry _ spread* ]
+        [ 1 ] 2dip (each) (each-integer)
+    ] ;
+
+MACRO: smart-2reduce ( 2reduce-quots -- quot )
+    unzip [ [ ] like ] bi@ dup length dup '[
+        [ @ ] 2dip
+        [ @ _ [ cleave-curry ] [ cleave-curry ] bi _ spread* ] 2each
+    ] ;
+
+MACRO: smart-2map-reduce ( 2map-reduce-quots -- quot )
+    [ keys ] [ [ [ ] concat-as ] [ ] map-as ] bi dup length dup '[
+        [ [ first ] bi@ _ 2cleave ] 2keep
+        [ @ _ [ cleave-curry ] [ cleave-curry ] bi _ spread* ]
+        [ 1 ] 3dip (2each) (each-integer)
+    ] ;

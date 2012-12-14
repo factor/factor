@@ -5,8 +5,8 @@ IN: arrays
 
 M: array clone (clone) ; inline
 M: array length length>> ; inline
-M: array nth-unsafe [ >fixnum ] dip array-nth ; inline
-M: array set-nth-unsafe [ >fixnum ] dip set-array-nth ; inline
+M: array nth-unsafe [ integer>fixnum ] dip array-nth ; inline
+M: array set-nth-unsafe [ integer>fixnum ] dip set-array-nth ; inline
 M: array resize resize-array ; inline
 M: array equal? over array? [ sequence= ] [ 2drop f ] if ;
 M: object new-sequence drop 0 <array> ; inline

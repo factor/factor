@@ -47,14 +47,14 @@ SYMBOL: modified-docs
                 source-modified? [ get push ] [ 2drop ] if
             ] [ 3drop ] if
         ] [ drop get push ] if
-    ] [ 2drop 2drop ] if ;
+    ] [ 4drop ] if ;
 
 : to-refresh ( prefix -- modified-sources modified-docs unchanged )
     [
         V{ } clone modified-sources set
         V{ } clone modified-docs set
 
-        child-vocabs [
+        child-vocabs [ ".private" tail? not ] filter [
             [
                 [
                     [ modified-sources ]

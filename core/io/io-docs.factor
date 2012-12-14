@@ -123,7 +123,7 @@ $io-error ;
 
 HELP: stream-copy*
 { $values { "in" "an input stream" } { "out" "an output stream" } }
-{ $description "Copies the contents of one stream into another. The streams are left open when the copy is completed." { $link stream-copy } " will copy the streams and close them on completion." }
+{ $description "Copies the contents of one stream into another. The streams are left open when the copy is completed. The " { $link stream-copy } " word can be used instead to close them on completion, if desired." }
 $io-error ;
 
 HELP: stream-copy
@@ -308,7 +308,7 @@ HELP: each-block
 
 HELP: stream-contents
 { $values { "stream" "an input stream" } { "seq" { $or string byte-array } } }
-{ $description "Reads all elements in the given stream until the stream is exhausted. The type of the sequence depends on the stream's element type." }
+{ $description "Reads all elements in the given stream until the stream is exhausted. The type of the sequence depends on the stream's element type. The stream is closed after completion." }
 $io-error ;
 
 HELP: contents

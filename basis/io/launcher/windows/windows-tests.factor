@@ -2,7 +2,7 @@ USING: accessors arrays assocs calendar continuations
 environment eval hashtables io io.directories
 io.encodings.ascii io.files io.files.temp io.launcher
 io.launcher.windows io.pathnames kernel math namespaces parser
-sequences splitting system tools.test ;
+sequences splitting system tools.test combinators.short-circuit ;
 IN: io.launcher.windows.tests
 
 [ "hello world" ] [ { "hello" "world" } join-arguments ] unit-test
@@ -230,3 +230,14 @@ IN: io.launcher.windows.tests
     "vocab:io/launcher/windows/test/input.txt" >>stdin
     try-process
 ] unit-test
+
+! Regression
+[ "asdfdontexistplzplz" >process wait-for-success ]
+[
+    {
+        [ process-failed? ]
+        [ process>> process? ]
+        [ process>> command>> "asdfdontexistplzplz" = ]
+        [ process>> status>> f = ]
+    } 1&&
+] must-fail-with

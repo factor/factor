@@ -74,7 +74,7 @@ SYNTAX: HINTS:
     [ parse-definition { } like "specializer" set-word-prop ] tri ;
 
 ! Default specializers
-{ last pop* pop } [
+{ pop* pop } [
     { vector } "specializer" set-word-prop
 ] each
 
@@ -88,13 +88,10 @@ SYNTAX: HINTS:
 { { string sbuf } { array vector } { byte-array byte-vector } }
 "specializer" set-word-prop
 
-\ append
-{ { string string } { array array } }
-"specializer" set-word-prop
-
-\ prepend
-{ { string string } { array array } }
-"specializer" set-word-prop
+{ append prepend } [
+    { { string string } { array array } }
+    "specializer" set-word-prop
+] each
 
 \ subseq
 { { fixnum fixnum string } { fixnum fixnum array } }
@@ -118,15 +115,16 @@ SYNTAX: HINTS:
 
 \ split, { string string } "specializer" set-word-prop
 
-\ member-eq? { array } "specializer" set-word-prop
-
-\ member? { array } "specializer" set-word-prop
+{ member? member-eq? } [
+    { array } "specializer" set-word-prop
+] each
 
 \ assoc-stack { vector } "specializer" set-word-prop
 
-\ >le { { fixnum fixnum } { bignum fixnum } } "specializer" set-word-prop
-
-\ >be { { bignum fixnum } { fixnum fixnum } } "specializer" set-word-prop
+{ >le >be } [
+    { { fixnum fixnum } { bignum fixnum } }
+    "specializer" set-word-prop
+] each
 
 \ base> { string fixnum } "specializer" set-word-prop
 

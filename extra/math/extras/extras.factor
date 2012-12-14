@@ -1,26 +1,31 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators.short-circuit grouping kernel math
-math.combinatorics math.functions math.order math.primes
-math.ranges math.statistics math.vectors memoize sequences ;
+USING: arrays assocs assocs.extras combinators.short-circuit fry
+grouping kernel locals math math.combinatorics math.constants
+math.functions math.order math.primes math.ranges
+math.statistics math.vectors memoize random sequences
+sequences.extras sets sorting ;
 
 IN: math.extras
 
 <PRIVATE
 
-DEFER: sterling
+DEFER: stirling
 
-: (sterling) ( n k -- x )
-    [ [ 1 - ] bi@ sterling ]
-    [ [ 1 - ] dip sterling ]
+: (stirling) ( n k -- x )
+    [ [ 1 - ] bi@ stirling ]
+    [ [ 1 - ] dip stirling ]
     [ nip * + ] 2tri ;
 
 PRIVATE>
 
-MEMO: sterling ( n k -- x )
+MEMO: stirling ( n k -- x )
     2dup { [ = ] [ nip 1 = ] } 2||
-    [ 2drop 1 ] [ (sterling) ] if ;
+    [ 2drop 1 ] [ (stirling) ] if ;
+
+:: ramanujan ( x -- y )
+    pi sqrt x e / x ^ * x 8 * 4 + x * 1 + x * 1/30 + 1/6 ^ * ;
 
 <PRIVATE
 
@@ -95,5 +100,101 @@ PRIVATE>
 : moving-median ( u n -- v )
     <clumps> [ median ] map ;
 
+: moving-supremum ( u n -- v )
+    <clumps> [ supremum ] map ;
+
+: moving-infimum ( u n -- v )
+    <clumps> [ infimum ] map ;
+
+: moving-sum ( u n -- v )
+    <clumps> [ sum ] map ;
+
+: moving-count ( ... u n quot: ( ... elt -- ... ? ) -- ... v )
+    [ <clumps> ] [ [ count ] curry map ] bi* ; inline
+
 : nonzero ( seq -- seq' )
     [ zero? not ] filter ;
+
+: bartlett ( n -- seq )
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
+        [ iota ] [ 1 - 2 / ] bi [
+            [ recip * ] [ >= ] 2bi [ 2 swap - ] when
+        ] curry map
+    ] if ;
+
+: hanning ( n -- seq )
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
+        [ iota ] [ 1 - 2pi swap / ] bi v*n
+        [ cos -0.5 * 0.5 + ] map!
+    ] if ;
+
+: hamming ( n -- seq )
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
+        [ iota ] [ 1 - 2pi swap / ] bi v*n
+        [ cos -0.46 * 0.54 + ] map!
+    ] if ;
+
+: blackman ( n -- seq )
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
+        [ iota ] [ 1 - 2pi swap / ] bi v*n
+        [ [ cos -0.5 * ] map ] [ [ 2 * cos 0.08 * ] map ] bi
+        v+ 0.42 v+n
+    ] if ;
+
+: nan-sum ( seq -- n )
+    0 [ dup fp-nan? [ drop ] [ + ] if ] binary-reduce ;
+
+: nan-min ( seq -- n )
+    [ fp-nan? not ] filter infimum ;
+
+: nan-max ( seq -- n )
+    [ fp-nan? not ] filter supremum ;
+
+: sinc ( x -- y )
+    [ 1 ] [ pi * [ sin ] [ / ] bi ] if-zero ;
+
+: until-zero ( n quot -- )
+    [ dup zero? ] swap until drop ; inline
+
+: cum-reduce ( seq identity quot: ( prev elt -- next ) -- result cum-result )
+    [ dup rot ] dip dup '[ _ curry dip dupd @ ] each ; inline
+
+<PRIVATE
+
+:: (gini) ( seq -- x )
+    seq natural-sort :> sorted
+    seq length :> len
+    sorted 0 [ + ] cum-reduce :> ( a b )
+    b len a * / :> B
+    1 len recip + 2 B * - ;
+
+PRIVATE>
+
+: gini ( seq -- x )
+    dup length 1 <= [ drop 0 ] [ (gini) ] if ;
+
+: concentration-coefficient ( seq -- x )
+    dup length 1 <= [
+        drop 0
+    ] [
+        [ (gini) ] [ length [ ] [ 1 - ] bi / ] bi *
+    ] if ;
+
+: herfindahl ( seq -- x )
+    [ sum-of-squares ] [ sum sq ] bi / ;
+
+: normalized-herfindahl ( seq -- x )
+    [ herfindahl ] [ length recip ] bi
+    [ - ] [ 1 swap - / ] bi ;
+
+: exponential-index ( seq -- x )
+    dup sum '[ _ / dup ^ ] map-product ;
+
+: search-sorted ( obj seq -- i )
+    swap '[ [ _ >= ] find drop dup ] [ length ] bi ? ;
+
+: weighted-random ( histogram -- obj )
+    unzip cum-sum [ last random ] [ search-sorted ] bi swap nth ;
+
+: unique-indices ( seq -- unique indices )
+    [ members ] keep over dup length iota H{ } zip-as '[ _ at ] map ;

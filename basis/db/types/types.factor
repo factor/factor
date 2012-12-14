@@ -35,17 +35,6 @@ SYMBOL: IGNORE
     [ <mirror> [ nip IGNORE = ] assoc-filter keys ] dip
     [ slot-name>> swap member? not ] with filter ;
 
-ERROR: no-slot ;
-
-: offset-of-slot ( string tuple -- n )
-    class-of all-slots slot-named dup [ no-slot ] unless offset>> ;
-
-: get-slot-named ( name tuple -- value )
-    [ nip ] [ offset-of-slot ] 2bi slot ;
-
-: set-slot-named ( value name obj -- )
-    [ nip ] [ offset-of-slot ] 2bi set-slot ;
-
 ERROR: not-persistent class ;
 
 : db-table-name ( class -- object )

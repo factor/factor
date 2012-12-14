@@ -24,7 +24,6 @@ GENERIC: lengthen ( n seq -- )
 GENERIC: shorten ( n seq -- )
 
 M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ; inline
-
 M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 
 : empty? ( seq -- ? ) length 0 = ; inline
@@ -50,10 +49,12 @@ M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 
 : push ( elt seq -- ) [ length ] [ set-nth ] bi ;
 
-: bounds-check? ( n seq -- ? )
-    dupd length < [ 0 >= ] [ drop f ] if ; inline
-
 ERROR: bounds-error index seq ;
+
+GENERIC# bounds-check? 1 ( n seq -- ? )
+
+M: integer bounds-check? ( n seq -- ? )
+    dupd length < [ 0 >= ] [ drop f ] if ; inline
 
 : bounds-check ( n seq -- n seq )
     2dup bounds-check? [ bounds-error ] unless ; inline
@@ -112,17 +113,19 @@ INSTANCE: iota immutable-sequence
 
 <PRIVATE
 
-: first-unsafe ( seq -- first )
-    0 swap nth-unsafe ; inline
+: first-unsafe ( seq -- first ) 0 swap nth-unsafe ; inline
+: second-unsafe ( seq -- second ) 1 swap nth-unsafe ; inline
+: third-unsafe ( seq -- third ) 2 swap nth-unsafe ; inline
+: fourth-unsafe ( seq -- fourth ) 3 swap nth-unsafe ; inline
 
 : first2-unsafe ( seq -- first second )
-    [ first-unsafe ] [ 1 swap nth-unsafe ] bi ; inline
+    [ first-unsafe ] [ second-unsafe ] bi ; inline
 
 : first3-unsafe ( seq -- first second third )
-    [ first2-unsafe ] [ 2 swap nth-unsafe ] bi ; inline
+    [ first2-unsafe ] [ third-unsafe ] bi ; inline
 
 : first4-unsafe ( seq -- first second third fourth )
-    [ first3-unsafe ] [ 3 swap nth-unsafe ] bi ; inline
+    [ first3-unsafe ] [ fourth-unsafe ] bi ; inline
 
 : exchange-unsafe ( m n seq -- )
     [ [ nth-unsafe ] curry bi@ ]
@@ -138,16 +141,13 @@ INSTANCE: iota immutable-sequence
     [ 0 swap set-nth-unsafe ] keep ; inline
 
 : (2sequence) ( obj1 obj2 seq -- seq )
-    [ 1 swap set-nth-unsafe ] keep
-    (1sequence) ; inline
+    [ 1 swap set-nth-unsafe ] keep (1sequence) ; inline
 
 : (3sequence) ( obj1 obj2 obj3 seq -- seq )
-    [ 2 swap set-nth-unsafe ] keep
-    (2sequence) ; inline
+    [ 2 swap set-nth-unsafe ] keep (2sequence) ; inline
 
 : (4sequence) ( obj1 obj2 obj3 obj4 seq -- seq )
-    [ 3 swap set-nth-unsafe ] keep
-    (3sequence) ; inline
+    [ 3 swap set-nth-unsafe ] keep (3sequence) ; inline
 
 PRIVATE>
 
@@ -177,7 +177,9 @@ PRIVATE>
 
 : ?first ( seq -- elt/f ) 0 swap ?nth ; inline
 : ?second ( seq -- elt/f ) 1 swap ?nth ; inline
-: ?last ( seq -- elt/f ) [ length 1 - ] [ ?nth ] bi ; inline
+: ?last ( seq -- elt/f )
+    [ length 1 - ] keep over 0 <
+    [ 2drop f ] [ nth-unsafe ] if ; inline
 
 MIXIN: virtual-sequence
 GENERIC: virtual-exemplar ( seq -- seq' )
@@ -227,14 +229,12 @@ TUPLE: slice-error from to seq reason ;
 <PRIVATE
 
 : <slice-unsafe> ( from to seq -- slice )
-    slice boa ; inline
+    dup slice? [ collapse-slice ] when slice boa ; inline
 
 PRIVATE>
 
 : <slice> ( from to seq -- slice )
-    check-slice
-    dup slice? [ collapse-slice ] when
-    <slice-unsafe> ; inline
+    check-slice <slice-unsafe> ; inline
 
 M: slice virtual-exemplar seq>> ; inline
 
@@ -329,7 +329,7 @@ M: sequence clone-like
 
 M: immutable-sequence clone-like like ; inline
 
-: push-all ( src dest -- ) [ length ] [ copy ] bi ; inline
+: push-all ( src dst -- ) [ length ] [ copy ] bi ; inline
 
 <PRIVATE
 
@@ -363,7 +363,7 @@ PRIVATE>
 : glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
 
 : change-nth ( ..a i seq quot: ( ..a elt -- ..b newelt ) -- ..b )
-    [ [ nth ] dip call ] 3keep drop set-nth ; inline
+    [ [ nth ] dip call ] 3keep drop set-nth-unsafe ; inline
 
 : min-length ( seq1 seq2 -- n ) [ length ] bi@ min ; inline
 
@@ -392,11 +392,11 @@ PRIVATE>
 : 2nth-unsafe ( n seq1 seq2 -- elt1 elt2 )
     [ nth-unsafe ] bi-curry@ bi ; inline
 
+: ((2each)) ( seq1 seq2 -- n quot )
+    [ min-length ] 2keep [ 2nth-unsafe ] 2curry ; inline
+
 : (2each) ( seq1 seq2 quot -- n quot' )
-    [
-        [ min-length ] 2keep
-        [ 2nth-unsafe ] 2curry
-    ] dip compose ; inline
+    [ ((2each)) ] dip compose ; inline
 
 : 3nth-unsafe ( n seq1 seq2 seq3 -- elt1 elt2 elt3 )
     [ nth-unsafe ] tri-curry@ tri ; inline
@@ -613,18 +613,23 @@ PRIVATE>
 : harvest ( seq -- newseq )
     [ empty? not ] filter ;
 
+<PRIVATE
+
+: mismatch-unsafe ( n seq1 seq2 -- i )
+    [ 2nth-unsafe = not ] 2curry find-integer ; inline
+
+PRIVATE>
+
 : mismatch ( seq1 seq2 -- i )
-    [ min-length ] 2keep
-    [ 2nth-unsafe = not ] 2curry
-    find-integer ; inline
+    [ min-length ] 2keep mismatch-unsafe ; inline
 
 M: sequence <=>
     [ mismatch ] 2keep pick
     [ 2nth-unsafe <=> ] [ [ length ] compare nip ] if ;
 
 : sequence= ( seq1 seq2 -- ? )
-    2dup [ length ] same?
-    [ mismatch not ] [ 2drop f ] if ; inline
+    2dup [ length ] bi@ dupd =
+    [ -rot mismatch-unsafe not ] [ 3drop f ] if ; inline
 
 ERROR: assert-sequence got expected ;
 
@@ -634,7 +639,7 @@ ERROR: assert-sequence got expected ;
 <PRIVATE
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
-    >fixnum swap [
+    integer>fixnum swap [
         [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi
         fixnum+fast fixnum+fast
     ] keep fixnum-bitxor ; inline
@@ -654,9 +659,13 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 <PRIVATE
 
+: move-unsafe ( to from seq -- )
+    2over =
+    [ 3drop ] [ [ nth-unsafe swap ] [ set-nth-unsafe ] bi ] if ; inline
+
 : (filter!) ( ... quot: ( ... elt -- ... ? ) store scan seq -- ... )
     2dup length < [
-        [ move ] 3keep
+        [ move-unsafe ] 3keep
         [ nth-unsafe pick call [ 1 + ] when ] 2keep
         [ 1 + ] dip
         (filter!)
@@ -692,6 +701,12 @@ PRIVATE>
     [ length 1 - ] keep
     over 0 < [ bounds-error ] [ nth-unsafe ] if ; inline
 
+<PRIVATE
+
+: last-unsafe ( seq -- elt ) [ length 1 - ] [ nth-unsafe ] bi ;
+
+PRIVATE>
+
 : set-last ( elt seq -- )
     [ length 1 - ] keep
     over 0 < [ bounds-error ] [ set-nth-unsafe ] if ; inline
@@ -702,17 +717,17 @@ PRIVATE>
 
 : move-backward ( shift from to seq -- )
     2over = [
-        2drop 2drop
+        4drop
     ] [
-        [ [ 2over + pick ] dip move [ 1 + ] dip ] keep
+        [ [ 2over + pick ] dip move-unsafe [ 1 + ] dip ] keep
         move-backward
     ] if ;
 
 : move-forward ( shift from to seq -- )
     2over = [
-        2drop 2drop
+        4drop
     ] [
-        [ [ pick [ dup dup ] dip + swap ] dip move 1 - ] keep
+        [ [ pick [ dup dup ] dip + swap ] dip move-unsafe 1 - ] keep
         move-forward
     ] if ;
 
@@ -753,7 +768,9 @@ PRIVATE>
     [ [ { } ] dip dup 1 + ] dip replace-slice ;
 
 : pop ( seq -- elt )
-    [ length 1 - ] [ [ nth ] [ shorten ] 2bi ] bi ;
+    [ length 1 - ] keep over 0 >=
+    [ [ nth-unsafe ] [ shorten ] 2bi ]
+    [ bounds-error ] if ;
 
 : exchange ( m n seq -- )
     [ nip bounds-check 2drop ]
@@ -833,30 +850,42 @@ PRIVATE>
     ] if ;
 
 : cut-slice ( seq n -- before-slice after-slice )
-    [ head-slice ] [ tail-slice ] 2bi ;
+    [ head-slice ] [ tail-slice ] 2bi ; inline
 
 : insert-nth ( elt n seq -- seq' )
     swap cut-slice [ swap suffix ] dip append ;
 
 : halves ( seq -- first-slice second-slice )
-    dup midpoint@ cut-slice ;
+    dup midpoint@ cut-slice ; inline
 
-: binary-reduce ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) -- ... value )
+<PRIVATE
+
+: nth2-unsafe ( n seq -- a b )
+    [ nth-unsafe ] [ [ 1 + ] dip nth-unsafe ] 2bi ; inline
+
+: nth3-unsafe ( n seq -- a b c )
+    [ nth2-unsafe ] [ [ 2 + ] dip nth-unsafe ] 2bi ; inline
+
+: (binary-reduce) ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) from length -- ... value )
     #! We can't use case here since combinators depends on
     #! sequences
-    pick length dup 0 3 between? [
-        >fixnum {
-            [ drop nip ]
-            [ 2drop first ]
-            [ [ drop first2 ] dip call ]
-            [ [ drop first3 ] dip bi@ ]
+    dup 4 < [
+        integer>fixnum {
+            [ 2drop nip ]
+            [ 2nip swap nth-unsafe ]
+            [ -rot [ drop swap nth2-unsafe ] dip call ]
+            [ -rot [ drop swap nth3-unsafe ] dip bi@ ]
         } dispatch
     ] [
-        drop
-        [ halves ] 2dip
-        [ [ binary-reduce ] 2curry bi@ ] keep
-        call
+        [ 2/ ] [ over - ] bi [ 2dup + ] dip
+        [ (binary-reduce) ] [ 2curry ] curry 2bi@
+        pick [ 3bi ] dip call
     ] if ; inline recursive
+
+PRIVATE>
+
+: binary-reduce ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) -- ... value )
+    pick length 0 max 0 swap (binary-reduce) ; inline
 
 : cut ( seq n -- before after )
     [ head ] [ tail ] 2bi ;
@@ -890,12 +919,12 @@ PRIVATE>
     [ rest ] [ first-unsafe ] bi ;
 
 : unclip-last ( seq -- butlast last )
-    [ but-last ] [ last ] bi ;
+    [ but-last ] [ last-unsafe ] bi ;
 
 : unclip-slice ( seq -- rest-slice first )
     [ rest-slice ] [ first-unsafe ] bi ; inline
 
-: map-reduce ( ..a seq map-quot: ( ..a x -- ..b elt ) reduce-quot: ( ..b prev elt -- ..a next ) -- ..a result )
+: map-reduce ( ..a seq map-quot: ( ..a elt -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
     [ [ dup first ] dip [ call ] keep ] dip compose
     swapd [ 1 ] 2dip (each) (each-integer) ; inline
 
@@ -918,7 +947,7 @@ PRIVATE>
     [ find-last ] (map-find) ; inline
 
 : unclip-last-slice ( seq -- butlast-slice last )
-    [ but-last-slice ] [ last ] bi ; inline
+    [ but-last-slice ] [ last-unsafe ] bi ; inline
 
 <PRIVATE
 
@@ -962,7 +991,8 @@ M: object sum 0 [ + ] binary-reduce ; inline
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline
 
-: count ( ... seq quot: ( ... elt -- ... ? ) -- ... n ) [ 1 0 ? ] compose map-sum ; inline
+: count ( ... seq quot: ( ... elt -- ... ? ) -- ... n )
+    [ 1 0 ? ] compose map-sum ; inline
 
 : cartesian-each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     [ with each ] 2curry each ; inline
@@ -980,7 +1010,10 @@ M: object sum 0 [ + ] binary-reduce ; inline
 <PRIVATE
 
 : generic-flip ( matrix -- newmatrix )
-    [ dup first length [ length min ] reduce iota ] keep
+    [
+        [ first-unsafe length 1 ] keep
+        [ length min ] (each) (each-integer) iota
+    ] keep
     [ [ nth-unsafe ] with { } map-as ] curry { } map-as ; inline
 
 USE: arrays
@@ -990,7 +1023,10 @@ USE: arrays
 
 : array-flip ( matrix -- newmatrix )
     { array } declare
-    [ dup first array-length [ array-length min ] reduce iota ] keep
+    [
+        [ first-unsafe array-length 1 ] keep
+        [ array-length min ] (each) (each-integer) iota
+    ] keep
     [ [ { array } declare array-nth ] with { } map-as ] curry { } map-as ;
 
 PRIVATE>
