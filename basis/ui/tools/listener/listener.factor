@@ -389,6 +389,8 @@ interactor "completion" f {
     { T{ key-down f f "TAB" } code-completion-popup }
     { T{ key-down f { C+ } "p" } recall-previous }
     { T{ key-down f { C+ } "n" } recall-next }
+    { T{ key-down f { A+ } "LEFT" } recall-previous }
+    { T{ key-down f { A+ } "RIGHT" } recall-next }
     { T{ key-down f { C+ } "r" } history-completion-popup }
 } define-command-map
 
