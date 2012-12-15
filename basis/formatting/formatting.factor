@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors arrays assocs calendar combinators fry kernel
-generalizations io io.streams.string macros math math.functions
-math.parser peg.ebnf quotations sequences splitting strings
-unicode.categories unicode.case vectors combinators.smart
-present ;
+USING: accessors arrays assocs calendar combinators combinators.smart
+fry io io.streams.string kernel macros math math.functions math.parser
+peg.ebnf present prettyprint quotations sequences strings unicode.case
+unicode.categories vectors ;
 FROM: math.parser.private => format-float ;
 IN: formatting
 
@@ -56,6 +55,7 @@ width     = (width_)?            => [[ [ ] or ]]
 digits_   = "." ([0-9])*         => [[ second >digits ]]
 digits    = (digits_)?           => [[ 6 or ]]
 
+fmt-@     = "@"                  => [[ [ unparse ] ]]
 fmt-%     = "%"                  => [[ [ "%" ] ]]
 fmt-c     = "c"                  => [[ [ 1string ] ]]
 fmt-C     = "C"                  => [[ [ 1string >upper ] ]]
@@ -75,7 +75,9 @@ strings   = pad width strings_   => [[ <reversed> compose-all ]]
 numbers_  = fmt-d|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
 numbers   = sign pad numbers_    => [[ unclip-last prefix compose-all [ fix-sign ] append ]]
 
-types     = strings|numbers
+object    = fmt-@
+
+types     = strings|numbers|object
 
 lists     = "[%" types ", %]"    => [[ second '[ _ map ", " join "{ " prepend " }" append ] ]]
 

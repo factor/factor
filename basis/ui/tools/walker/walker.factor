@@ -77,7 +77,9 @@ walker-gadget "toolbar" f {
     { T{ key-down f f "b" } com-back }
     { T{ key-down f f "c" } com-continue }
     { T{ key-down f f "a" } com-abandon }
+    { T{ key-down f f "q" } com-abandon }
     { T{ key-down f f "d" } close-window }
+    { T{ key-down f f "w" } close-window }
     { T{ key-down f f "F1" } walker-help }
 } define-command-map
 

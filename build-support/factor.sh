@@ -2,6 +2,7 @@
 
 # Programs returning != 0 will not cause script to exit
 set +e
+set -x
 
 # Case insensitive string comparison
 shopt -s nocaseglob
@@ -15,6 +16,8 @@ NO_UI=${NO_UI-}
 GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
 SCRIPT_ARGS="$*"
+SKIP_UPDATE=false
+DO_CLEAN=true
 
 test_program_installed() {
     if ! [[ -n `type -p $1` ]] ; then
@@ -111,11 +114,13 @@ set_make() {
 }
 
 check_git_branch() {
-    BRANCH=`git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'`
-    if [ "$BRANCH" != "master" ] ; then
-        $ECHO "git branch is $BRANCH, not master"
-        exit_script 3
-    fi
+	if [[ $SKIP_UPDATE == false ]] ; then
+		BRANCH=`git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'`
+		if [ "$BRANCH" != "master" ] ; then
+			$ECHO "git branch is $BRANCH, not master"
+			exit_script 3
+		fi
+	fi
 }
 
 check_installed_programs() {
@@ -397,18 +402,20 @@ update_script_changed() {
 }
 
 git_fetch_factorcode() {
-    $ECHO "Fetching the git repository from factorcode.org..."
-
-    rm -f `update_script_name`
-    invoke_git fetch "$GIT_URL" master
-
-    if update_script_changed; then
-        $ECHO "Updating and restarting the factor.sh script..."
-        update_script
-    else
-        $ECHO "Updating the working tree..."
-        invoke_git pull "$GIT_URL" master
-    fi
+	if [[ $SKIP_UPDATE == false ]] ; then
+		$ECHO "Fetching the git repository from factorcode.org..."
+		
+		rm -f `update_script_name`
+		invoke_git fetch "$GIT_URL" master
+		
+		if update_script_changed; then
+			$ECHO "Updating and restarting the factor.sh script..."
+			update_script
+		else
+			$ECHO "Updating the working tree..."
+			invoke_git pull "$GIT_URL" master
+		fi
+	fi
 }
 
 cd_factor() {
@@ -452,12 +459,15 @@ check_makefile_exists() {
 
 invoke_make() {
     check_makefile_exists
+	echo $MAKE $MAKE_OPTS $*
     $MAKE $MAKE_OPTS $*
     check_ret $MAKE
 }
 
 make_clean() {
-    invoke_make clean
+	if [[ $DO_CLEAN == true ]] ; then
+		invoke_make clean
+	fi
 }
 
 make_factor() {
@@ -476,18 +486,23 @@ update_boot_images() {
     $DELETE $BOOT_IMAGE.{?,??} > /dev/null 2>&1
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
-        get_url http://downloads.factorcode.org/images/latest/checksums.txt
-        factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`
-        set_md5sum
-        disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '`
-        $ECHO "Factorcode md5: $factorcode_md5";
-        $ECHO "Disk md5: $disk_md5";
-        if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
-            $ECHO "Your disk boot image matches the one on factorcode.org."
-        else
-            $DELETE $BOOT_IMAGE > /dev/null 2>&1
-            get_boot_image;
-        fi
+		set -e
+        if [[ $(get_url http://downloads.factorcode.org/images/latest/checksums.txt) ]] ; then
+			factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`
+			set_md5sum
+			disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '`
+			$ECHO "Factorcode md5: $factorcode_md5";
+			$ECHO "Disk md5: $disk_md5";
+			if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
+				$ECHO "Your disk boot image matches the one on factorcode.org."
+			else
+				$DELETE $BOOT_IMAGE > /dev/null 2>&1
+				get_boot_image;
+			fi
+		else
+		    $ECHO "Could not connect to server to check image checksum"
+		fi
+		set +e
     else
         get_boot_image
     fi
@@ -495,7 +510,18 @@ update_boot_images() {
 
 get_boot_image() {
     $ECHO "Downloading boot image $BOOT_IMAGE."
-    get_url http://downloads.factorcode.org/images/latest/$BOOT_IMAGE
+	if [[ $($DOWNLOADER http://downloads.factorcode.org/images/latest/$BOOT_IMAGE) ]] ; then
+		$ECHO "Download complete."
+	else
+		$ECHO "Could not connect to server to download image."
+		$ECHO "Use the backup images? (y|n)"
+		read ok
+		if [[ "$ok" == "y" ]] ; then
+			$COPY $BOOT_IMAGE.bak $BOOT_IMAGE
+		else
+			exit_script 7
+		fi
+	fi
 }
 
 get_url() {
@@ -558,7 +584,8 @@ refresh_image() {
 }
 
 make_boot_image() {
-    ./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
+    echo ./$FACTOR_BINARY -no-user-init -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
+    ./$FACTOR_BINARY -no-user-init -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
     check_ret factor
 }
 
@@ -587,10 +614,12 @@ usage() {
     $ECHO "  deps-macosx - install git on MacOSX using port"
     $ECHO "  self-update - git pull, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
-    $ECHO "  update - git pull, download a boot image, recompile, bootstrap"
+    $ECHO "  update - download a boot image, recompile, bootstrap"
     $ECHO "  bootstrap - bootstrap with an existing boot image"
     $ECHO "  net-bootstrap - download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
+    $ECHO "  make-clean - same as update, but use current git commit"
+    $ECHO "  make - same as make-boot, but does not clean first"
     $ECHO "  report - print the build variables"
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
@@ -615,6 +644,8 @@ case "$1" in
     deps-linux) install_deps_linux ;;
     deps-macosx) install_deps_macosx ;;
     self-update) update; make_boot_image; bootstrap;;
+    make-clean) SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
+    make) DO_CLEAN=false; SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
