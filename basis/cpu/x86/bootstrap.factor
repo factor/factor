@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private compiler.constants
-compiler.codegen.relocation compiler.units cpu.x86.assembler
-cpu.x86.assembler.operands kernel kernel.private layouts
-locals locals.backend make math math.private namespaces sequences
-slots.private strings.private vocabs ;
+USING: bootstrap.image.private compiler.codegen.relocation
+compiler.constants compiler.units cpu.architecture cpu.x86 cpu.x86.64
+cpu.x86.assembler cpu.x86.assembler.operands kernel kernel.private
+layouts locals locals.backend math math.private namespaces sequences
+shuffle slots.private strings.private vocabs ;
 IN: bootstrap.x86
 
 big-endian off

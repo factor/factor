@@ -2,6 +2,7 @@
 
 # Programs returning != 0 will not cause script to exit
 set +e
+set -x
 
 # Case insensitive string comparison
 shopt -s nocaseglob
@@ -401,7 +402,7 @@ update_script_changed() {
 }
 
 git_fetch_factorcode() {
-	if [[ $SKIP_UPDATE == true ]] ; then
+	if [[ $SKIP_UPDATE == false ]] ; then
 		$ECHO "Fetching the git repository from factorcode.org..."
 		
 		rm -f `update_script_name`
@@ -583,8 +584,8 @@ refresh_image() {
 }
 
 make_boot_image() {
-    echo ./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
-    ./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
+    echo ./$FACTOR_BINARY -no-user-init -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
+    ./$FACTOR_BINARY -no-user-init -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
     check_ret factor
 }
 
@@ -617,7 +618,7 @@ usage() {
     $ECHO "  bootstrap - bootstrap with an existing boot image"
     $ECHO "  net-bootstrap - download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
-    $ECHO "  make-boot - same as update, but use current git commit"
+    $ECHO "  make-clean - same as update, but use current git commit"
     $ECHO "  make - same as make-boot, but does not clean first"
     $ECHO "  report - print the build variables"
     $ECHO ""
@@ -643,7 +644,7 @@ case "$1" in
     deps-linux) install_deps_linux ;;
     deps-macosx) install_deps_macosx ;;
     self-update) update; make_boot_image; bootstrap;;
-    make-boot) SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
+    make-clean) SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
     make) DO_CLEAN=false; SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
