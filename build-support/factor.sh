@@ -2,7 +2,7 @@
 
 # Programs returning != 0 will not cause script to exit
 set +e
-set -x
+
 # Case insensitive string comparison
 shopt -s nocaseglob
 #shopt -s nocasematch
@@ -113,7 +113,7 @@ set_make() {
 }
 
 check_git_branch() {
-	if [[ $SKIP_UPDATE == true ]] ; then
+	if [[ $SKIP_UPDATE == false ]] ; then
 		BRANCH=`git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'`
 		if [ "$BRANCH" != "master" ] ; then
 			$ECHO "git branch is $BRANCH, not master"
