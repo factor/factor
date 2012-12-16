@@ -87,7 +87,7 @@ M: object ((client)) ( addrspec -- fd )
 
 FROM: unix.ffi => bind ;
 : server-socket-fd ( addrspec type -- fd )
-B    [ dup protocol-family ] dip pick protocol socket-fd
+    [ dup protocol-family ] dip pick protocol socket-fd
     [ init-server-socket ] keep
     [ handle-fd swap make-sockaddr/size [ bind ] unix-system-call drop ] keep ;
 

@@ -336,7 +336,7 @@ SYMBOL: remote-address
     ] with-scope ; inline
 
 : <server> ( addrspec encoding -- server )
-B    [
+    [
         [ (server) ] keep
         [ drop server-port <port> ] [ get-local-address ] 2bi
         >>addr
