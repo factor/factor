@@ -2,7 +2,6 @@
 
 # Programs returning != 0 will not cause script to exit
 set +e
-set -x
 
 # Case insensitive string comparison
 shopt -s nocaseglob
