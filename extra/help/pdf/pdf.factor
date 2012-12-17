@@ -63,3 +63,12 @@ PRIVATE>
         "error-index"
         "class-index"
     } topics>pdf "index.pdf" write-pdf ;
+
+: furnace-pdf ( -- )
+    "furnace" "furnace.pdf" article-pdf ;
+
+: alien-pdf ( -- )
+    "alien" "alien.pdf" article-pdf ;
+
+: io-pdf ( -- )
+    "io" "io.pdf" article-pdf ;
