@@ -92,7 +92,7 @@ PRIVATE>
     [
         dup ascent>>
         [ ascent>> max-ascent swap - text-leading ]
-        [ height>> max-graphics-height swap - 2/ graphics-leading ] if +
+        [ height>> max-graphics-height swap - 2 /i graphics-leading ] if +
     ] map ;
 
 : measure-metrics ( children sizes -- ascent descent )
