@@ -4,8 +4,8 @@ USING: accessors alien.c-types alien.data cocoa cocoa.application
 cocoa.classes cocoa.nibs cocoa.pasteboard cocoa.runtime
 cocoa.subclassing cocoa.views cocoa.windows combinators
 core-foundation.run-loop core-graphics core-graphics.types formatting
-generalizations io.thread kernel libc literals locals math
-math.bitwise math.rectangles namespaces sequences syslog system
+generalizations io.thread kernel libc literals locals make math
+math.bitwise math.rectangles namespaces prettyprint sequences syslog
 threads ui ui.backend ui.backend.cocoa.views ui.clipboards
 ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private ui.private
 ;
@@ -83,15 +83,41 @@ FROM: ui.private => windows ;
     #! Note: if this is the initial window, the length of the windows
     #! vector should be 1, since (open-window) calls auto-position
     #! after register-window.
-    dup "window-loc: %@" sprintf SYSLOG_TEST
+    dup "Loc: %@" SYSLOG
+    windows get-global last second title>> "last title: %s" SYSLOG
     dup { 0 0 } = [
-        first2 <CGPoint> -> setFrameTopLeftPoint:
-        ! windows get-global length 1 <= [ drop ] [
-        !     windows get-global last second window-loc>>
-        !     dup "window-loc: %@" sprintf SYSLOG_TEST
-        !     dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
-        !     -> setFrameTopLeftPoint:
-        ! ] if
+        drop
+        windows get-global dup  last second title>>
+        swap [ over = ] filter nip  empty?
+        [
+            windows get-global last second title>> 
+          {
+          ! { "Browser" [ [ 0 ,  screen-size second 2 / , ] { } make  ] }
+          { "Browser" [ [ 0 ,  20 , ] { } make  ] }
+          { "Walker" [ [ 0 ,  screen-size second 2 / , ] { } make  ] }
+          { "Listener" [ [ 0 ,  screen-size second 2 / , ] { } make  ] }
+          [ drop { 0 0 } ]
+        } case
+          first2 <CGPoint> -> setFrameTopLeftPoint:
+        ]
+        [ windows get-global last second window-loc>>
+          dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
+          -> setFrameTopLeftPoint:
+        ] if
+    ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
+
+: auto-position.1 ( window loc -- )
+    #! Note: if this is the initial window, the length of the windows
+    #! vector should be 1, since (open-window) calls auto-position
+    #! after register-window. 
+    dup { 0 0 } = [
+        drop
+        windows get-global length 1 <=
+        [ -> center ]
+        [ windows get-global last second window-loc>>
+          dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
+          -> setFrameTopLeftPoint:
+        ] if
     ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
 M: cocoa-ui-backend set-title ( string world -- )
