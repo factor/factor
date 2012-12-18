@@ -75,3 +75,4 @@ unit-test
 { { { 0 } } } [ { 0 } [ 0 > ] split*-when ] unit-test
 { { { 0 0 } } } [ { 0 0 } [ 0 > ] split*-when ] unit-test
 { { { 1 } { 2 } { 0 3 } { 0 0 } } } [ { 1 2 0 3 0 0 } [ 0 > ] split*-when ] unit-test
+[ { { 1 2 } { 3 4 } { 5 } } ] [ 2 { 1 2 3 4 5 } split-nth ] unit-test
