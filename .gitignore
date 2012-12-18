@@ -33,3 +33,6 @@ checksums.txt
 *.so
 a.out
 TAGS
+unmaintained/mysql-1/ffi/ffi.factor
+unmaintained/mysql-1/lib/lib.factor
+unmaintained/mysql-1/mysql.factor
