@@ -15,19 +15,26 @@ IN: compiler.cfg.ssa.cssa
 ! selection, so it must keep track of representations when introducing
 ! new values.
 
-SYMBOL: copies
+SYMBOLS: edge-copies phi-copies ;
 
 : init-copies ( bb -- )
-    predecessors>> [ V{ } clone ] H{ } map>assoc copies set ;
+    V{ } clone phi-copies set
+    predecessors>> [ V{ } clone ] H{ } map>assoc edge-copies set ;
 
 :: convert-operand ( src pred rep -- dst )
     rep next-vreg-rep :> dst
-    { dst src } pred copies get at push
+    { dst src } pred edge-copies get at push
     dst ;
 
 :: convert-phi ( insn preds -- )
-    insn dst>> rep-of :> rep
+    insn dst>> :> dst
+    dst rep-of :> rep
     insn inputs>> :> inputs
+    rep next-vreg-rep :> dst'
+
+    { dst dst' } phi-copies get push
+    dst' insn dst<<
+
     preds [| pred |
         pred inputs [ pred rep convert-operand ] change-at
     ] each ;
@@ -35,10 +42,26 @@ SYMBOL: copies
 : insert-edge-copies ( from to copies -- )
     [ ##parallel-copy, ##branch, ] { } make insert-basic-block ;
 
-: insert-copies ( bb -- )
-    [ copies get ] dip '[
+: insert-all-edge-copies ( bb -- )
+    [ edge-copies get ] dip '[
         [ drop ] [ [ _ ] dip insert-edge-copies ] if-empty
     ] assoc-each ;
+
+: phi-copy-insn ( -- insn )
+    phi-copies get f \ ##parallel-copy boa ;
+
+: end-of-phis ( insns -- i )
+    [ [ ##phi? not ] find drop ] [ length ] bi or ;
+
+: insert-phi-copies ( bb -- )
+    [
+        [
+            [ drop phi-copy-insn ] [ end-of-phis ] [ ] tri insert-nth
+        ] change-instructions drop
+    ] if-has-phis ;
+
+: insert-copies ( bb -- )
+    [ insert-all-edge-copies ] [ insert-phi-copies ] bi ;
 
 : convert-phis ( bb -- )
     [ init-copies ]
