@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs cpu.architecture compiler.cfg.registers
-compiler.cfg.instructions deques dlists fry kernel locals namespaces
-sequences hashtables ;
+compiler.cfg.instructions compiler.cfg.ssa.destruction deques
+dlists fry kernel locals namespaces sequences hashtables ;
+FROM: sets => conjoin ;
 IN: compiler.cfg.parallel-copy
 
 ! Revisiting Out-of-SSA Translation for Correctness, Code Quality, and Efficiency
@@ -67,7 +68,8 @@ PRIVATE>
 SYMBOL: temp-vregs
 
 : temp-vreg ( rep -- vreg )
-    temp-vregs get [ next-vreg-rep ] cache ;
+    temp-vregs get [ next-vreg-rep ] cache
+    [ leader-map get conjoin ] keep ;
 
 PRIVATE>
 
