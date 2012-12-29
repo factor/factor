@@ -3,8 +3,9 @@
 USING: arrays kernel accessors assocs fry locals combinators
 deques dlists namespaces sequences sets compiler.cfg
 compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.utilities
-compiler.cfg.predecessors compiler.cfg.rpo cpu.architecture ;
+compiler.cfg.registers compiler.cfg.ssa.destruction
+compiler.cfg.utilities compiler.cfg.predecessors
+compiler.cfg.rpo cpu.architecture ;
 FROM: namespaces => set ;
 IN: compiler.cfg.liveness
 
@@ -44,11 +45,19 @@ SYMBOL: base-pointers
 
 GENERIC: visit-insn ( live-set insn -- live-set )
 
+! If liveness analysis is run after SSA destruction, we need to
+! use the canonical vreg representatives (leaders) because SSA
+! destruction does not rename the old vregs.
+
 : kill-defs ( live-set insn -- live-set )
-    defs-vregs [ over delete-at ] each ; inline
+    defs-vregs [
+        [ leader ] keep or over delete-at
+    ] each ; inline
 
 : gen-uses ( live-set insn -- live-set )
-    uses-vregs [ over conjoin ] each ; inline
+    uses-vregs [
+        [ leader ] keep or over conjoin
+    ] each ; inline
 
 M: vreg-insn visit-insn
     [ kill-defs ] [ gen-uses ] bi ;
