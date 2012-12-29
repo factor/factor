@@ -96,14 +96,14 @@ M: editor ungraft*
 : set-caret ( loc editor -- )
     [ model>> validate-loc ] [ caret>> ] bi set-model ;
 
-: change-caret ( editor quot -- )
+: change-caret ( editor quot: ( loc document -- newloc ) -- )
     [ [ [ editor-caret ] [ model>> ] bi ] dip call ] [ drop ] 2bi
     set-caret ; inline
 
 : mark>caret ( editor -- )
     [ editor-caret ] [ mark>> ] bi set-model ;
 
-: change-caret&mark ( editor quot -- )
+: change-caret&mark ( editor quot: ( loc document -- newloc ) -- )
     [ change-caret ] [ drop mark>caret ] 2bi ; inline
 
 : editor-line ( n editor -- str ) control-value nth ;
