@@ -74,6 +74,8 @@ GENERIC: prepare-insn ( insn -- )
 
 M: insn prepare-insn drop ;
 
+M: alien-call-insn prepare-insn drop ;
+
 M: vreg-insn prepare-insn
     [ temp-vregs [ leader-map get conjoin ] each ]
     [
