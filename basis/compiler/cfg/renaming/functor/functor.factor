@@ -32,7 +32,7 @@ M: insn rename-insn-temps drop ;
 
 ! Special rename-insn-defs methods
 M: ##parallel-copy rename-insn-defs
-    [ [ first2 [ DEF-QUOT ] dip 2array ] map ] change-values ;
+    [ [ first2 DEF-QUOT dip 2array ] map ] change-values drop ;
 
 M: ##phi rename-insn-defs DEF-QUOT change-dst drop ;
 
@@ -47,7 +47,7 @@ M: ##callback-inputs rename-insn-defs
 
 ! Special rename-insn-uses methods
 M: ##parallel-copy rename-insn-uses
-    [ [ first2 USE-QUOT 2array ] map ] change-values ;
+    [ [ first2 USE-QUOT call 2array ] map ] change-values drop ;
 
 M: ##phi rename-insn-uses
     [ USE-QUOT assoc-map ] change-inputs drop ;
