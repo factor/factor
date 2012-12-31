@@ -9,7 +9,7 @@ compiler.cfg.liveness
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linearization
-compiler.cfg.ssa.destruction
+compiler.cfg.ssa.destruction.leaders
 compiler.cfg.renaming.functor
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
