@@ -7,7 +7,7 @@ compiler.cfg.registers
 compiler.cfg.def-use
 compiler.cfg.liveness
 compiler.cfg.linearization
-compiler.cfg.ssa.destruction
+compiler.cfg.ssa.destruction.leaders
 compiler.cfg
 cpu.architecture ;
 IN: compiler.cfg.linear-scan.live-intervals
