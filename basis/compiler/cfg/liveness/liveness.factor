@@ -46,18 +46,24 @@ SYMBOL: base-pointers
 GENERIC: visit-insn ( live-set insn -- live-set )
 
 ! If liveness analysis is run after SSA destruction, we need to
-! use the canonical vreg representatives (leaders) because SSA
-! destruction does not rename the old vregs.
+! kill vregs that have been coalesced with others (they won't
+! have been renamed from their original values in the CFG).
+! Otherwise, we get a bunch of stray uses that wind up
+! live-in/out when they shouldn't be.  However, we must take
+! care to still report the original vregs in the live-sets,
+! because they have information associated with them (like
+! representations) that would get lost if we just used the
+! leaders for everything.
+
+: ?leader ( vreg -- vreg' ) [ leader ] keep or ; inline
 
 : kill-defs ( live-set insn -- live-set )
     defs-vregs [
-        [ leader ] keep or over delete-at
+        ?leader '[ drop ?leader _ eq? not ] assoc-filter!
     ] each ; inline
 
 : gen-uses ( live-set insn -- live-set )
-    uses-vregs [
-        [ leader ] keep or over conjoin
-    ] each ; inline
+    uses-vregs [ over conjoin ] each ; inline
 
 M: vreg-insn visit-insn
     [ kill-defs ] [ gen-uses ] bi ;
@@ -93,7 +99,7 @@ M: ##sub lookup-base-pointer*
 M: vreg-insn lookup-base-pointer* drop f ;
 
 : lookup-base-pointer ( vreg -- vreg/f )
-    base-pointers get [ insn-of lookup-base-pointer* ] cache ;
+    base-pointers get [ ?leader insn-of lookup-base-pointer* ] cache ;
 
 :: visit-derived-root ( vreg derived-roots gc-roots -- )
     vreg lookup-base-pointer :> base
