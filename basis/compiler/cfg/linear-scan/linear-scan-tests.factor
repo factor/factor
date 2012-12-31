@@ -11,7 +11,7 @@ compiler.cfg.rpo
 compiler.cfg.debugger
 compiler.cfg.def-use
 compiler.cfg.comparisons
-compiler.cfg.ssa.destruction
+compiler.cfg.ssa.destruction.leaders
 compiler.cfg.linear-scan
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.live-intervals

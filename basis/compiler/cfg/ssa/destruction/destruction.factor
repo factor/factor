@@ -11,6 +11,7 @@ compiler.cfg.dominance
 compiler.cfg.instructions
 compiler.cfg.liveness
 compiler.cfg.ssa.cssa
+compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges
 compiler.cfg.parallel-copy
@@ -32,10 +33,6 @@ IN: compiler.cfg.ssa.destruction
 ! 3) This pass computes live sets and fills out GC maps with
 ! compiler.cfg.liveness, so the linear scan register allocator
 ! does not need to compute liveness again.
-
-SYMBOL: leader-map
-
-: leader ( vreg -- vreg' ) leader-map get compress-path ;
 
 ! Maps leaders to equivalence class elements.
 SYMBOL: class-element-map

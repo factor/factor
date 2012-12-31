@@ -3,7 +3,7 @@
 USING: arrays kernel accessors assocs fry locals combinators
 deques dlists namespaces sequences sets compiler.cfg
 compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.ssa.destruction
+compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
 compiler.cfg.utilities compiler.cfg.predecessors
 compiler.cfg.rpo cpu.architecture ;
 FROM: namespaces => set ;
@@ -54,8 +54,6 @@ GENERIC: visit-insn ( live-set insn -- live-set )
 ! because they have information associated with them (like
 ! representations) that would get lost if we just used the
 ! leaders for everything.
-
-: ?leader ( vreg -- vreg' ) [ leader ] keep or ; inline
 
 : kill-defs ( live-set insn -- live-set )
     defs-vregs [
