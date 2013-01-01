@@ -98,10 +98,15 @@ M: ##sub lookup-base-pointer*
 
 M: vreg-insn lookup-base-pointer* 2drop f ;
 
+! Can't use cache here because of infinite recursion inside
+! the quotation passed to cache
 : lookup-base-pointer ( vreg -- vregs/f )
-    base-pointers get [
-        dup ?leader insn-of lookup-base-pointer*
-    ] cache ;
+    base-pointers get ?at [
+        f over base-pointers get set-at
+        [ dup ?leader insn-of lookup-base-pointer* ] keep
+        dupd base-pointers get set-at
+    ] unless ;
+
 
 :: visit-derived-root ( vreg derived-roots gc-roots -- )
     vreg lookup-base-pointer :> base
