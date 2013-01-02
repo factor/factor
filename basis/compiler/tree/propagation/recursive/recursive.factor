@@ -91,7 +91,7 @@ M: #recursive propagate-around ( #recursive -- )
 
 : generalize-return-interval ( info -- info' )
     dup [ literal?>> ] [ class>> null-class? ] bi or
-    [ clone [-inf,inf] >>interval ] unless ;
+    [ clone dup class>> class-interval >>interval ] unless ;
 
 : generalize-return ( infos -- infos' )
     [ generalize-return-interval ] map ;
