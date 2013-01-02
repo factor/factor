@@ -33,10 +33,10 @@ M: object v/n [ / ] curry map ; inline
 GENERIC: n/v ( n v -- w )
 M: object n/v [ / ] with map ; inline
 
-GENERIC: v+  ( u v -- w )
+GENERIC: v+ ( u v -- w )
 M: object v+ [ + ] 2map ; inline
 
-GENERIC: v-  ( u v -- w )
+GENERIC: v- ( u v -- w )
 M: object v- [ - ] 2map ; inline
 
 GENERIC: [v-] ( u v -- w )
@@ -159,8 +159,8 @@ M: object vand [ and ] 2map ; inline
 GENERIC: vandn ( u v -- w )
 M: object vandn [ [ not ] dip and ] 2map ; inline
 
-GENERIC: vor  ( u v -- w )
-M: object vor  [ or  ] 2map ; inline
+GENERIC: vor ( u v -- w )
+M: object vor [ or ] 2map ; inline
 
 GENERIC: vxor ( u v -- w )
 M: object vxor [ xor ] 2map ; inline
@@ -180,23 +180,23 @@ M: object vany? [ ] any? ; inline
 GENERIC: vnone? ( v -- ? )
 M: object vnone? [ not ] all? ; inline
 
-GENERIC: v<  ( u v -- w )
-M: object v<  [ <   ] 2map ; inline
+GENERIC: v< ( u v -- w )
+M: object v< [ < ] 2map ; inline
 
 GENERIC: v<= ( u v -- w )
-M: object v<= [ <=  ] 2map ; inline
+M: object v<= [ <= ] 2map ; inline
 
 GENERIC: v>= ( u v -- w )
-M: object v>= [ >=  ] 2map ; inline
+M: object v>= [ >= ] 2map ; inline
 
-GENERIC: v>  ( u v -- w )
-M: object v>  [ >   ] 2map ; inline
+GENERIC: v> ( u v -- w )
+M: object v> [ > ] 2map ; inline
 
 GENERIC: vunordered? ( u v -- w )
 M: object vunordered? [ unordered? ] 2map ; inline
 
-GENERIC: v=  ( u v -- w )
-M: object v=  [ =   ] 2map ; inline
+GENERIC: v= ( u v -- w )
+M: object v= [ = ] 2map ; inline
 
 GENERIC: v? ( mask true false -- result )
 M: object v? 
@@ -204,13 +204,13 @@ M: object v?
 
 :: vif ( mask true-quot: ( -- vector ) false-quot: ( -- vector ) -- result )
     {
-        { [ mask vall?  ] [ true-quot  call ] }
+        { [ mask vall? ] [ true-quot call ] }
         { [ mask vnone? ] [ false-quot call ] }
         [ mask true-quot call false-quot call v? ]
     } cond ; inline
 
-: vfloor    ( u -- v ) [ floor ] map ;
-: vceiling  ( u -- v ) [ ceiling ] map ;
+: vfloor ( u -- v ) [ floor ] map ;
+: vceiling ( u -- v ) [ ceiling ] map ;
 : vtruncate ( u -- v ) [ truncate ] map ;
 
 : vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; inline
