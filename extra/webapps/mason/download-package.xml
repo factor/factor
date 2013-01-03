@@ -7,7 +7,7 @@
 
 	<t:title>Factor binary package for <t:label t:name="platform" /></t:title>
 
-	<div><img src="http://factorcode.org/logo.png" alt="Logo" /></div>
+	<div><img src="http://factorcode.org/logo.png" alt="Logo" height="150" /></div>
 
 	<h1>Factor binary package for <t:label t:name="platform" /></h1>
 
