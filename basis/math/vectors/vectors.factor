@@ -202,11 +202,11 @@ GENERIC: v? ( mask true false -- result )
 M: object v? 
     [ vand ] [ vandn ] bi-curry* bi vor ; inline
 
-:: vif ( mask true-quot: ( -- vector ) false-quot: ( -- vector ) -- result )
+: vif ( mask true-quot: ( -- vector ) false-quot: ( -- vector ) -- result )
     {
-        { [ mask vall? ] [ true-quot call ] }
-        { [ mask vnone? ] [ false-quot call ] }
-        [ mask true-quot call false-quot call v? ]
+        { [ pick vall? ] [ drop nip call ] }
+        { [ pick vnone? ] [ 2nip call ] }
+        [ [ call ] dip call v? ]
     } cond ; inline
 
 : vfloor ( u -- v ) [ floor ] map ;
