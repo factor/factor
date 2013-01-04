@@ -624,7 +624,13 @@ HELP: join
 { $notes "If the " { $snippet "glue" } " sequence is empty, this word calls " { $link concat-as } "." }
 { $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "glue" } "." } ;
 
-{ join concat concat-as } related-words
+HELP: join-as
+{ $values { "seq" sequence } { "glue" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }
+{ $notes "If the " { $snippet "glue" } " sequence is empty, this word calls " { $link concat-as } "." }
+{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." } ;
+
+{ join join-as concat concat-as } related-words
 
 HELP: last
 { $values { "seq" sequence } { "elt" object } }
