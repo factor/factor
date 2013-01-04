@@ -84,10 +84,14 @@ IN: sequences.tests
 [ V{ 3 } ] [ V{ 1 2 3 } clone 2 [ swap < ] curry filter! ] unit-test
 
 [ "hello world how are you" ]
-[ { "hello" "world" "how" "are" "you" } " " join ]
-unit-test
+[ { "hello" "world" "how" "are" "you" } " " join ] unit-test
+
+[ "hello world how are you" ]
+[ { "hello" "world" "how" "are" "you" } " " "" join-as ] unit-test
 
 [ "" ] [ { } "" join ] unit-test
+
+[ "" ] [ { } "" "" join-as ] unit-test
 
 [ { } ] [ { } flip ] unit-test
 

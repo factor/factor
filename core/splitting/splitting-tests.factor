@@ -75,3 +75,17 @@ unit-test
 { { { 0 } } } [ { 0 } [ 0 > ] split*-when ] unit-test
 { { { 0 0 } } } [ { 0 0 } [ 0 > ] split*-when ] unit-test
 { { { 1 } { 2 } { 0 3 } { 0 0 } } } [ { 1 2 0 3 0 0 } [ 0 > ] split*-when ] unit-test
+
+{ "abarbbarc" }
+[ "afoobfooc" "foo" "bar" replace ] unit-test
+
+{ "abc" }
+[ "afoobfooc" "foo" "" replace ] unit-test
+
+{ "afoobfooc" }
+[ "afoobfooc" "" "bar" replace ] unit-test
+
+{ "afoobfooc" }
+[ "afoobfooc" "" "" replace ] unit-test
+
+{ "" } [ "" "" "" replace ] unit-test
