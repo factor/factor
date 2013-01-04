@@ -811,15 +811,18 @@ PRIVATE>
 
 PRIVATE>
 
-: join ( seq glue -- newseq )
-    dup empty? [ concat-as ] [
+: join-as ( seq glue exemplar -- newseq )
+    over empty? [ nip concat-as ] [
         [
             2dup joined-length over new-resizable [
                 [ [ push-all ] 2curry ] [ [ nip push-all ] 2curry ] 2bi
                 interleave
             ] keep
-        ] keep like
+        ] dip like
     ] if ;
+
+: join ( seq glue -- newseq )
+    dup join-as ; inline
 
 : padding ( ... seq n elt quot: ( ... seq1 seq2 -- ... newseq ) -- ... newseq )
     [

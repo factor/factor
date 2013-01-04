@@ -19,7 +19,9 @@ ARTICLE: "sequences-split" "Splitting sequences"
     split*-when
 }
 "Splitting a string into lines:"
-{ $subsections string-lines } ;
+{ $subsections string-lines }
+"Replacing subsequences with another subsequence:"
+{ $subsections replace } ;
 
 ABOUT: "sequences-split"
 
@@ -97,3 +99,13 @@ HELP: split-nth
     }
 }
 ;
+
+HELP: replace
+{ $values { "seq" sequence } { "old" sequence } { "new" sequence } { "new-seq" sequence } }
+{ $description "Replaces every occurrence of " { $snippet "old" } " with " { $snippet "new" } " in the " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: io splitting ;"
+               "\"cool example is cool\" \"cool\" \"silly\" replace print"
+               "silly example is silly"
+    }
+} ;
