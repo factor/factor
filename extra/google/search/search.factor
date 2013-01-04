@@ -16,12 +16,6 @@ IN: google.search
         "8" "rsz" set-query-param
         "0" "start" set-query-param ;
 
-: set-slots ( assoc obj -- )
-    '[ swap _ set-slot-named ] assoc-each ;
-
-: from-slots ( assoc class -- obj )
-    new [ set-slots ] keep ;
-
 TUPLE: search-result cacheUrl GsearchResultClass visibleUrl
 title content unescapedUrl url titleNoFormatting fileFormat ;
 
