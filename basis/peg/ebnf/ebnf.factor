@@ -8,6 +8,7 @@ combinators.short-circuit lexer io.streams.string stack-checker
 io combinators parser summary ;
 FROM: compiler.units => with-compilation-unit ;
 FROM: vocabs.parser => search ;
+FROM: peg.search => replace ;
 IN: peg.ebnf
 
 : rule ( name word -- parser )
