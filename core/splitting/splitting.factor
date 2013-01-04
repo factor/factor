@@ -44,6 +44,13 @@ PRIVATE>
 : split1-slice ( seq subseq -- before-slice after-slice )
     [ snip-slice ] (split1) ;
 
+: split-subseq ( seq subseq -- seqs )
+    dup empty? [
+        drop 1array
+    ] [
+        [ dup ] swap [ split1-slice swap ] curry produce nip
+    ] if ;
+
 : split1-when ( ... seq quot: ( ... elt -- ... ? ) -- ... before after )
     dupd find drop [ swap [ dup 1 + ] dip snip ] [ f ] if* ; inline
 
@@ -54,6 +61,9 @@ PRIVATE>
 : split1-last-slice ( seq subseq -- before-slice after-slice )
     [ <reversed> ] bi@ split1-slice [ <reversed> ] bi@
     [ f ] [ swap ] if-empty ;
+
+: replace ( seq old new -- new-seq )
+    pick [ [ split-subseq ] dip ] dip join-as ;
 
 <PRIVATE
 
