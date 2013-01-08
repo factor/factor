@@ -53,12 +53,22 @@ STRUCT: group-directory-entry
     header clone >c-ptr group-directory concat append
     icon-bytes ; inline
 
+ERROR: unsupported-ico-format bytes format ;
+
+: check-ico-type ( bytes -- bytes )
+    dup "PNG" head? [
+        "PNG" unsupported-ico-format
+    ] when
+    dup B{ 0 0 } head? [
+        "UNKNOWN" unsupported-ico-format
+    ] unless ;
+
 PRIVATE>
 
 :: embed-icon-resource ( exe ico-bytes id -- )
     exe normalize-path 1 BeginUpdateResource :> hUpdate
     hUpdate [
-        ico-bytes ico-group-and-icons :> ( group icons )
+        ico-bytes check-ico-type ico-group-and-icons :> ( group icons )
         hUpdate RT_GROUP_ICON id 0 group dup byte-length
         UpdateResource drop
 
