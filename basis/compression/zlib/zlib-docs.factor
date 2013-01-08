@@ -34,8 +34,11 @@ HELP: uncompress
 }
 { $description "Uncompresses a compressed object, returning a byte-array of the underlying data." } ;
 
-ARTICLE: "compression.zlib" "compression.zlib"
-{ $vocab-link "compression.zlib" }
-;
+ARTICLE: "compression.zlib" "Compression (ZLIB)"
+"The " { $vocab-link "compression.zlib" } " vocabulary provides support for ZLIB:"
+{ $subsections
+    compress
+    uncompress
+} ;
 
 ABOUT: "compression.zlib"
