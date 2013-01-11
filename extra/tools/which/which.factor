@@ -9,25 +9,15 @@ IN: tools.which
 
 <PRIVATE
 
-: default-path ( -- path )
-    os {
-        { windows [ ".;C:\\bin" ] }
-        { macosx [ ":" ] }
-        { linux [ ":/bin:/usr/bin" ] }
-    } case ;
-
-: current-path ( -- path )
-    "PATH" os-env [ default-path ] unless* ;
-
-: split-path ( path -- seq )
-    os windows? ";" ":" ? split harvest ;
-
 : executable? ( path -- ? )
     {
         [ exists? ]
         [ file-executable? ]
         [ file-info directory? not ]
     } 1&& ;
+
+: split-path ( paths -- seq )
+    os windows? ";" ":" ? split harvest ;
 
 : path-extensions ( command -- commands )
     "PATHEXT" os-env [
@@ -41,7 +31,7 @@ IN: tools.which
     [ prepend-path ] { } assoc>map
     [ executable? ] find nip ;
 
-: (which) ( command paths -- file/f )
+: (which) ( command path -- file/f )
     split-path os windows? [
         [ path-extensions ] [ "." prefix ] bi*
     ] [ [ 1array ] dip ] if ((which)) ;
@@ -49,4 +39,4 @@ IN: tools.which
 PRIVATE>
 
 : which ( command -- file/f )
-    current-path (which) ;
+    "PATH" os-env (which) ;
