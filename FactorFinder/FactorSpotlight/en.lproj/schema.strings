@@ -1,6 +1,0 @@
-	/* Localized DisplayNames for your custom metadata attributes */
-	/* The form is:  "myMetadataKey" = "My Metadata Key";    */
-	/* The name on the left is the name defined in schema.xml */
-	/* The name on the right is what the user will see */
-	"public_factor_definitions" = "Definitions created in Factor file"; 
-	"public_factor_uses" = "Vocabularies used by Factor file";
