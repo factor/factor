@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.order
-math.private slots.private splitting locals assocs ;
+math.private slots.private ;
 IN: sequences
 
 MIXIN: sequence
@@ -1042,15 +1042,4 @@ PRIVATE>
         ] [ generic-flip ] if
     ] unless ;
 
-:: unique-filter ( seq quot -- seq )
-    H{ } :> buckets
-    seq 
-    [ dup quot call( element -- key ) :> aKey
-      aKey buckets at*
-      [ 2drop ]
-      [ drop aKey buckets set-at ]
-      if
-    ] each
-    buckets values
-    ;
 
