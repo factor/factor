@@ -252,6 +252,7 @@ $io-error ;
 HELP: print
 { $values { "str" string } }
 { $description "Writes a newline-terminated string to " { $link output-stream } "." }
+{ $notes "To write without a newline-terminated string see " { $link write } "." }
 $io-error ;
 
 HELP: with-input-stream

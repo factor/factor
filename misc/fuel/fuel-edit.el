@@ -122,6 +122,89 @@ With prefix, asks for the word to edit."
           (format "%s-docs.factor"
                   (file-name-sans-extension (buffer-file-name)))))))))
 
+(defun fuel-add-help-word-template (&optional arg word)
+  "Adds a help template for word at point."
+  (interactive "P")
+  (let* ((word (or word
+                   (and (not arg) (fuel-syntax-symbol-at-point))
+                   (fuel-completion--read-word "Edit word: ")))
+         (cmd `(:fuel* ((:quote ,word) fuel-get-doc-location)))
+         (marker (and (not arg) (point-marker)))
+		 (startPoint   (save-excursion (goto-char (cdr (fuel-syntax-symbol-at-point-with-bounds)))
+					   (re-search-forward "(")
+					   (- (point) 1)))
+		 (endPoint  (save-excursion (fuel-syntax--end-of-effect) (point)))
+		 (effect   (let ((newlist ()))
+					 (dolist (value (split-string  (fuel--region-to-string startPoint endPoint)) newlist)
+					   (if (not (or (equal value "(") (equal value "--") (equal value ")")))
+						   (setq newlist (cons value newlist))))
+					 (reverse newlist)))
+		 )
+    (condition-case nil
+        (fuel-edit--try-edit (fuel-eval--send/wait cmd))
+      (error
+       (message "Documentation for '%s' not found" word)
+       (when
+		 (and (eq major-mode 'factor-mode)
+                  (y-or-n-p (concat "No documentation found. "
+                                    "Do you want to open the vocab's "
+                                    "doc file? ")))
+         (when marker (ring-insert find-tag-marker-ring marker))
+         (find-file-other-window
+          (format "%s-docs.factor"
+                  (file-name-sans-extension (buffer-file-name))))
+		 (end-of-buffer)
+		 (fuel-template--begin word)
+		 (fuel-template--values effect)
+		 (fuel-template--description)
+		 (fuel-template--examples)
+		 (fuel-template--notes)
+		 (fuel-template--end)
+)))))
+
+(defun escape-string-region (start end)
+  "Escape special characters in the region as if a CL string.
+Inserts backslashes in front of special characters (namely backslash
+and double quote) in the region, according to the Common Lisp string
+escape requirements.
+
+Note that region should only contain the characters actually
+comprising the string, without the surrounding quotes."
+  (interactive "*r")
+  (save-excursion
+    (save-restriction
+      (narrow-to-region start end)
+      (goto-char start)
+      (while (search-forward "\\" nil t)
+ (replace-match "\\\\" nil t))
+      (goto-char start)
+      (while (search-forward "\"" nil t)
+ (replace-match "\\\"" nil t)))))
+
+(defun fuel-help-quote-region (start end)
+  "Quotes a region as a string. Created to quote as pasted example from the listener"
+  (interactive "r")
+  (let ((end (or end (point))))
+    (if (< start end)
+		(save-excursion
+			(escape-string-region start end)
+			  (setq end (point))
+			(let (
+				  ;; (print-escape-newlines t)
+				  ;; (print-quoted t)
+				  (regionText (split-string (buffer-substring-no-properties start end) "\n"))
+				  )
+			  (goto-char start)
+			  (delete-region start end)
+			  (dolist (line regionText)
+				(insert (format "\"%s\"\n" line))))))))
+
+(defun fuel-help-quote-indent (start end)
+  "Quotes and indents a region, presumably pasted example code."
+  (interactive "r")
+  (fuel-help-quote-region start end)
+  (indent-region))
+
 (defun fuel-edit-pop-edit-word-stack ()
   "Pop back to where \\[fuel-edit-word-at-point] or \\[fuel-edit-word-doc-at-point]
 was last invoked."

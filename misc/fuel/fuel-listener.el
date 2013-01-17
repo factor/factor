@@ -257,6 +257,7 @@ the vocabulary name."
    fuel-completion--complete-symbol :enable (symbol-at-point))
   ("Edit word definition" "\M-." fuel-edit-word-at-point
    :enable (symbol-at-point))
+  ("Edit word help" "\C-c\C-e\C-h"  fuel-add-help-word-template :enable (symbol-at-point))
   ("Edit vocabulary" "\C-c\C-v" fuel-edit-vocabulary)
   --
   ("Word help" "\C-c\C-w" fuel-help)

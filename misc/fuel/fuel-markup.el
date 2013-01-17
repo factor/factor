@@ -262,7 +262,7 @@
     (insert (cadr e))))
 
 (defun fuel-markup--snippet (e)
-  (insert (mapconcat '(lambda (s)
+  (insert (mapconcat #'(lambda (s)
                         (if (stringp s)
                             (fuel-font-lock--factor-str s)
                           (fuel-markup--print-str s)))
@@ -342,7 +342,7 @@
     (insert " ")))
 
 (defun fuel-markup--vocab-list (e)
-  (let ((rows (mapcar '(lambda (elem)
+  (let ((rows (mapcar #'(lambda (elem)
                          (list (list '$vocab-link (car elem))
                                (cadr elem)))
                       (cdr e))))
@@ -374,7 +374,7 @@
                  (super (and (cadr objs)
                              (list (list '$link (cadr objs) (cadr objs) 'word))))
                  (slots (when (cddr objs)
-                          (list (mapcar '(lambda (s) (list s " ")) (cddr objs))))))
+                          (list (mapcar #'(lambda (s) (list s " ")) (cddr objs))))))
             (push `(,class ,@super ,@slots) rows))
           (forward-line))
         (push `(,heading ($table ,@(reverse rows))) elems))
@@ -465,7 +465,7 @@
   (delete-blank-lines)
   (newline)
   (fuel-table--insert
-   (mapcar '(lambda (row) (mapcar 'fuel-markup--print-str row)) (cdr e)))
+   (mapcar #'(lambda (row) (mapcar 'fuel-markup--print-str row)) (cdr e)))
   (newline))
 
 (defun fuel-markup--instance (e)
@@ -490,6 +490,44 @@
     (insert " " (car val) " - ")
     (fuel-markup--print (cdr val))
     (newline)))
+
+(defun fuel-template--begin (word)
+  (fuel-markup--insert-newline)
+  (insert (concat "HELP: " word))
+  (fuel-markup--insert-newline))
+
+(defun fuel-template--values (e)
+  (fuel-markup--insert-string "{ $values")
+  (dolist (value e)
+	(insert " { \"" value "\" \"" "value" "\" }"))
+  (insert " }")
+  (newline))
+
+(defun fuel-template--description ()
+  (fuel-markup--insert-string "{ $description \"")
+  (fuel-markup--insert-string "No Description\" }")
+  (newline))
+
+(defun fuel-template--examples ()
+    (fuel-markup--insert-string "{ $examples")
+	(newline)
+    (fuel-markup--insert-string "  { $code ")
+	(newline)
+    (fuel-markup--insert-string "        \"No Example\"")
+	(newline)
+    (fuel-markup--insert-string "    }")
+	(newline)
+    (fuel-markup--insert-string "}")
+	(newline))
+
+(defun fuel-template--notes ()
+  (fuel-markup--insert-string "{ $notes \"")
+  (fuel-markup--insert-string "No Notes\" }")
+  (newline))
+
+(defun fuel-template--end ()
+    (fuel-markup--insert-string ";")
+	(newline))
 
 (defun fuel-markup--predicate (e)
   (fuel-markup--values '($values ("object" object) ("?" "a boolean")))

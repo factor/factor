@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io.files.private io.pathnames
+USING: arrays help.markup help.syntax io.files.private io.pathnames
 quotations ;
 IN: io.directories
 
@@ -38,7 +38,8 @@ HELP: (directory-entries)
 
 HELP: directory-entries
 { $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
+{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
+{ $notes "The sequence returned is an " { $link array } ", which is a fixed-size sequence." } ; 
 
 HELP: directory-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors colors.constants
+USING: syslog accessors arrays assocs calendar colors colors.constants
 documents documents.elements fry kernel words sets splitting math
 math.vectors models.delay models.arrow combinators.short-circuit
 parser present sequences tools.completion help.vocabs generic fonts
@@ -75,7 +75,7 @@ M: word-completion row-color
         { [ dup not ] [ COLOR: black ] }
         { [ 2dup search-vocab-names>> keys member? ] [ COLOR: black ] }
         { [ over ".private" tail? ] [ COLOR: dark-red ] }
-        [ COLOR: dark-gray ]
+        [ COLOR: dark-blue ]
     } cond 2nip ;
 
 M: vocab-completion row-color

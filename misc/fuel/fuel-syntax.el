@@ -39,6 +39,8 @@
   (let ((s (substring-no-properties (thing-at-point 'factor-symbol))))
     (and (> (length s) 0) s)))
 
+(defun fuel-syntax-symbol-at-point-with-bounds ()
+  (cdr (thing-at-point-with-bounds 'factor-symbol)))
 
 
 ;;; Regexps galore:
@@ -409,6 +411,9 @@
 
 (defsubst fuel-syntax--beginning-of-defun (&optional times)
   (re-search-backward fuel-syntax--begin-of-def-regex nil t times))
+
+(defun fuel-syntax--end-of-effect ()
+  (re-search-forward fuel-syntax--stack-effect-regex nil t))
 
 (defsubst fuel-syntax--end-of-defun ()
   (re-search-forward fuel-syntax--end-of-def-regex nil t))

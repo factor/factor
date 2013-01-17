@@ -351,3 +351,4 @@ USE: make
 [ { } { } [ [ string>digits product ] bi@ + ] [ + ] 2map-reduce ] must-infer
 [ { } { } [ + ] [ + ] 2map-reduce ] must-fail
 [ 24 ] [ { 1 2 } { 3 4 } [ + ] [ * ] 2map-reduce ] unit-test
+[ { { 1 "one" } { 3 "three" }  { 2 "two" } } ] [ { { 1 "one" } { 2 "two" } { 1 "one"} { 2 "two" } { 3 "three" } } [ second ] unique-filter ] unit-test
