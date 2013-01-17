@@ -101,6 +101,11 @@ PRIVATE>
 : split*-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
     [ split*, ] { } make ; inline
 
+: split-nth ( seq n -- seq )
+    0 swap
+    [ drop 1 + 2dup = [ drop 0 t ] [ f ] if ] split*-when 2nip
+    ;
+
 GENERIC: string-lines ( str -- seq )
 
 M: string string-lines

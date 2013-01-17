@@ -99,3 +99,13 @@ HELP: replace
                "silly example is silly"
     }
 } ;
+
+HELP: split-nth
+{ $values  { "n" "value" } { "seq" "value" } { "seq" "value" } }
+{ $description "Splits a sequence into groups n wide. Last group is not padded" }
+{ $examples
+  { $code 
+    "USING: splitting ;" "2 { 1 2 3 4 5 } split-nth ." "{ { 1 2 } { 3 4 } { 5 } }"
+    }
+}
+;

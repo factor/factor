@@ -89,3 +89,5 @@ unit-test
 [ "afoobfooc" "" "" replace ] unit-test
 
 { "" } [ "" "" "" replace ] unit-test
+
+[ { { 1 2 } { 3 4 } { 5 } } ] [ 2 { 1 2 3 4 5 } split-nth ] unit-test
