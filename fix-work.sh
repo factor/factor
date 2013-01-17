@@ -4,5 +4,5 @@ if [[ ! -L ./work ]] ; then
 	if [[ -e ./work ]] ; then
 		rm -fr ./work
 	fi
-	ln -s ../FactorWork work
+	ln -s $HOME/Sources/FactorWork work
 fi
