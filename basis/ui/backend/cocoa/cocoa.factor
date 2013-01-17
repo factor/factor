@@ -5,7 +5,7 @@ cocoa.classes cocoa.nibs cocoa.pasteboard cocoa.runtime
 cocoa.subclassing cocoa.views cocoa.windows combinators
 core-foundation.run-loop core-graphics core-graphics.types formatting
 generalizations io.thread kernel libc literals locals math
-math.bitwise math.rectangles namespaces sequences syslog system
+math.bitwise math.rectangles namespaces sequences system
 threads ui ui.backend ui.backend.cocoa.views ui.clipboards
 ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private ui.private
 ;
@@ -83,7 +83,6 @@ FROM: ui.private => windows ;
     #! Note: if this is the initial window, the length of the windows
     #! vector should be 1, since (open-window) calls auto-position
     #! after register-window.
-    dup "window-loc: %@" sprintf SYSLOG_TEST
     dup { 0 0 } = [
         first2 <CGPoint> -> setFrameTopLeftPoint:
         ! windows get-global length 1 <= [ drop ] [
