@@ -78,6 +78,13 @@ M: pasteboard set-clipboard-contents
 : world>NSRect ( world -- NSRect )
     [ 0 0 ] dip dim>> first2 <CGRect> ;
 
+: screen-size ( -- size )
+    { }
+      NSScreen -> mainScreen -> frame
+      size>> dup
+      [ w>> prefix ] dip
+      h>> suffix ;
+
 FROM: ui.private => windows ;
 : auto-position ( window loc -- )
     #! Note: if this is the initial window, the length of the windows
