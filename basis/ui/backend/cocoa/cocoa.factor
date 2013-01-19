@@ -5,7 +5,7 @@ cocoa.classes cocoa.nibs cocoa.pasteboard cocoa.runtime
 cocoa.subclassing cocoa.views cocoa.windows combinators
 core-foundation.run-loop core-graphics core-graphics.types formatting
 generalizations io.thread kernel libc literals locals make math
-math.bitwise math.rectangles namespaces prettyprint sequences syslog
+math.bitwise math.rectangles namespaces prettyprint sequences logging.syslog
 threads ui ui.backend ui.backend.cocoa.views ui.clipboards
 ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private ui.private
 ;
@@ -90,8 +90,8 @@ FROM: ui.private => windows ;
     #! Note: if this is the initial window, the length of the windows
     #! vector should be 1, since (open-window) calls auto-position
     #! after register-window.
-    dup "Loc: %@" SYSLOG
-    windows get-global last second title>> "last title: %s" SYSLOG
+    ! dup "Loc: %@" SYSLOG
+    ! windows get-global last second title>> "last title: %s" SYSLOG
     dup { 0 0 } = [
         drop
         windows get-global dup  last second title>>
