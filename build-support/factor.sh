@@ -446,11 +446,6 @@ backup_factor() {
 }
 
 restore_factor() {
-    find_build_info
-	set_factor_binary
-	set_factor_image
-	set_factor_library
-	set_build_info
     $ECHO "Restoring factor..."
     $COPY $FACTOR_BINARY.bak $FACTOR_BINARY
     $COPY $FACTOR_LIBRARY.bak $FACTOR_LIBRARY
