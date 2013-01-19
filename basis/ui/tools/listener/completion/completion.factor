@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: syslog accessors arrays assocs calendar colors colors.constants
+USING: accessors arrays assocs calendar colors colors.constants
 documents documents.elements fry kernel words sets splitting math
 math.vectors models.delay models.arrow combinators.short-circuit
 parser present sequences tools.completion help.vocabs generic fonts

@@ -445,6 +445,15 @@ backup_factor() {
     $ECHO "Done with backup."
 }
 
+restore_factor() {
+    $ECHO "Restoring factor..."
+    $COPY $FACTOR_BINARY.bak $FACTOR_BINARY
+    $COPY $FACTOR_LIBRARY.bak $FACTOR_LIBRARY
+    $COPY $BOOT_IMAGE.bak $BOOT_IMAGE
+    $COPY $FACTOR_IMAGE.bak $FACTOR_IMAGE
+    $ECHO "Done with restore."
+}
+
 check_makefile_exists() {
     if [[ ! -e "GNUmakefile" ]] ; then
         $ECHO ""
@@ -619,6 +628,7 @@ usage() {
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  make-clean - same as update, but use current git commit"
     $ECHO "  make - same as make-boot, but does not clean first"
+    $ECHO "  restore - restore from backup files"
     $ECHO "  report - print the build variables"
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
@@ -650,6 +660,7 @@ case "$1" in
     bootstrap) get_config_info; bootstrap ;;
     net-bootstrap) net_bootstrap_no_pull ;;
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
+	restore) restore_factor ;;
     report) find_build_info ;;
     *) usage ;;
 esac
