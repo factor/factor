@@ -85,3 +85,6 @@ M: peek-stream stream-flush stream>> stream-flush ;
         [ stream-read ] 2bi
         [ reverse swap peeked>> push-all ] keep
     ] if ;
+
+: peek1 ( -- seq ) input-stream get stream-peek1 ; inline
+: peek ( n -- seq ) input-stream get stream-peek ; inline
