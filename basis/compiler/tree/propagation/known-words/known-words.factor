@@ -9,6 +9,7 @@ combinators generic.math splitting fry locals classes.tuple
 alien.accessors classes.tuple.private slots.private definitions
 strings.private vectors hashtables generic quotations alien
 alien.data alien.data.private
+strings sbufs byte-arrays byte-vectors
 stack-checker.dependencies
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -238,6 +239,18 @@ generic-comparison-ops [
     { >integer integer }
 } [
     '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
+] assoc-each
+
+{
+    { >array array }
+    { >vector vector }
+    { >string string }
+    { >sbuf sbuf }
+    { >byte-array byte-array }
+    { >byte-vector byte-vector }
+    { >hashtable hashtable }
+} [
+    '[ drop _ <class-info> ] "outputs" set-word-prop
 ] assoc-each
 
 { numerator denominator }
