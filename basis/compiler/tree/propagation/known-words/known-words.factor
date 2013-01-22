@@ -1,23 +1,17 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: effects accessors kernel kernel.private layouts math
-math.private math.integers.private math.floats.private
-math.partial-dispatch math.intervals math.parser math.order
-math.functions math.libm math.ratios namespaces words sequences
-sequences.private arrays assocs classes classes.algebra
-combinators generic.math splitting fry locals classes.tuple
-alien.accessors classes.tuple.private slots.private definitions
-strings.private vectors hashtables generic quotations alien
-alien.data alien.data.private
-stack-checker.dependencies
-compiler.tree.comparisons
-compiler.tree.propagation.info
-compiler.tree.propagation.nodes
-compiler.tree.propagation.slots
-compiler.tree.propagation.simple
-compiler.tree.propagation.constraints
-compiler.tree.propagation.call-effect
-compiler.tree.propagation.transforms ;
+USING: accessors alien alien.accessors alien.data.private
+arrays assocs byte-arrays byte-vectors classes classes.algebra
+classes.tuple classes.tuple.private combinators
+compiler.tree.comparisons compiler.tree.propagation.constraints
+compiler.tree.propagation.info compiler.tree.propagation.simple
+compiler.tree.propagation.slots fry generic.math hashtables
+kernel kernel.private layouts locals math math.floats.private
+math.functions math.integers.private math.intervals math.libm
+math.parser math.partial-dispatch math.private namespaces sbufs
+sequences slots.private splitting strings strings.private
+vectors words ;
+USE: compiler.tree.propagation.transforms ! required?
 FROM: alien.c-types => (signed-interval) (unsigned-interval) ;
 IN: compiler.tree.propagation.known-words
 
@@ -238,6 +232,18 @@ generic-comparison-ops [
     { >integer integer }
 } [
     '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
+] assoc-each
+
+{
+    { >array array }
+    { >vector vector }
+    { >string string }
+    { >sbuf sbuf }
+    { >byte-array byte-array }
+    { >byte-vector byte-vector }
+    { >hashtable hashtable }
+} [
+    '[ drop _ <class-info> ] "outputs" set-word-prop
 ] assoc-each
 
 { numerator denominator }
