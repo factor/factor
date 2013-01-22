@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit
-destructors io io.private kernel locals math sequences
-vectors ;
+destructors io io.private kernel locals math namespaces
+sequences vectors ;
 IN: io.streams.peek
 
 TUPLE: peek-stream stream peeked ;
