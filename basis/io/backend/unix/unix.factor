@@ -88,12 +88,6 @@ M: io-timeout summary drop "I/O operation timed out" ;
 ! Some general stuff
 CONSTANT: file-mode 0o0666
  
-! Readers
-: (refill) ( port -- n )
-    [ handle>> ]
-    [ buffer>> buffer-end ]
-    [ buffer>> buffer-capacity ] tri read ;
-
 ! Returns an event to wait for which will ensure completion of
 ! this request
 GENERIC: refill ( port handle -- event/f )
