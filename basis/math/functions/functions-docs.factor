@@ -40,6 +40,7 @@ ARTICLE: "arithmetic-functions" "Arithmetic functions"
     floor
     truncate
     round
+    round-to
 }
 "Inexact comparison:"
 { $subsections ~ }
@@ -327,6 +328,15 @@ HELP: round
 { $values { "x" real } { "y" "a whole real number" } }
 { $description "Outputs the whole number closest to " { $snippet "x" } "." }
 { $notes "The result is not necessarily an integer." } ;
+
+HELP: round-to
+{ $values { "x" real } { "n" integer } { "y" real } }
+{ $description "Outputs the number closest to " { $snippet "x" } ", rounded to " { $snippet "n" } " decimals." }
+{ $notes "The result is not necessarily an integer." }
+{ $examples
+    { $example "USING: math.functions prettyprint ;" "1.23456 2 round-to ." "1.23" }
+    { $example "USING: math.functions prettyprint ;" "12345.6789 -3 round-to ." "12000.0" }
+} ;
 
 HELP: roots
 { $values { "x" number } { "t" integer } { "seq" sequence } }
