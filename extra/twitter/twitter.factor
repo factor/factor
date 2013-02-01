@@ -22,7 +22,7 @@ twitter-source [ "factor" ] initialize
 
 : twitter-url ( string -- string' )
     ssl-supported?
-    "https://twitter.com/" "http://twitter.com/" ? prepend ;
+    "https://api.twitter.com/" "http://api.twitter.com/" ? prepend ;
 
 PRIVATE>
 
@@ -54,7 +54,7 @@ MACRO: keys-boa ( keys class -- )
 
 ! Twitter requests
 : status-url ( string -- url )
-    "statuses/" ".json" surround twitter-url ;
+    "1.1/statuses/" ".json" surround twitter-url ;
 
 : set-request-twitter-auth ( request -- request )
     [ <oauth-request-params> set-oauth ] with-twitter-oauth ;
