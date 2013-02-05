@@ -1,7 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry io kernel math.parser sequences
-sorting ;
+sorting math.statistics ;
 IN: rosetta-code.top-rank
 
 ! http://rosettacode.org/wiki/Top_rank_per_group
@@ -46,11 +46,8 @@ CONSTANT: employees {
         T{ employee f "Timothy Grove" "E16398" 29900 "D190" }
     }
 
-: group-by ( seq quot -- hash )
-    H{ } clone [ '[ dup @ _ push-at ] each ] keep ; inline
-
 : prepare-departments ( seq -- departments )
-    [ department>> ] group-by
+    [ department>> ] collect-by
     [ [ salary>> ] inv-sort-with ] assoc-map ;
 
 : first-n-each ( seq n quot -- )
