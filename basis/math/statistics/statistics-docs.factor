@@ -236,6 +236,37 @@ HELP: rescale
 { $values { "u" sequence } { "v" sequence } }
 { $description "Returns " { $snippet "u" } " rescaled to run from 0 to 1 over the range min to max." } ;
 
+HELP: collect-by
+{ $values
+    { "seq" sequence } { "quot" { $quotation "( obj -- ? )" } }
+    { "hashtable" hashtable }
+}
+{ $description "Applies a quotation to each element in the input sequence and returns a " { $snippet "hashtable" } " of like elements. The keys of this " { $snippet "hashtable" } " are the output of " { $snippet "quot" } " and the values at each key are the elements that transformed to that key." }
+{ $examples
+    "Collect even and odd elements:"
+    { $example
+               "USING: math math.statistics prettyprint ;"
+               "{ 11 12 13 14 14 13 12 11 } [ odd? ] collect-by ."
+               "H{ { f V{ 12 14 14 12 } } { t V{ 11 13 13 11 } } }"
+    }
+}
+{ $notes "May be named " { $snippet "group-by" } " in other languages." } ;
+
+HELP: collect-index-by
+{ $values
+    { "seq" sequence } { "quot" { $quotation "( obj -- ? )" } }
+    { "hashtable" hashtable }
+}
+{ $description "Applies a quotation to each element in the input sequence and returns a " { $snippet "hashtable" } " of like elements. The keys of this " { $snippet "hashtable" } " are the output of " { $snippet "quot" } " and the values at each key are the indices for the elements that transformed to that key." }
+{ $examples
+    "Collect even and odd elements:"
+    { $example
+               "USING: math math.statistics prettyprint ;"
+               "{ 11 12 13 14 14 13 12 11 } [ odd? ] collect-index-by ."
+               "H{ { f V{ 1 3 4 6 } } { t V{ 0 2 5 7 } } }"
+    }
+} ;
+
 ARTICLE: "histogram" "Computing histograms"
 "Counting elements in a sequence:"
 { $subsections
@@ -291,6 +322,8 @@ ARTICLE: "math.statistics" "Statistics"
 { $subsections kth-smallest }
 "Counting the frequency of occurrence of elements:"
 { $subsections "histogram" }
+"Collecting related items:"
+{ $subsections collect-by collect-index-by }
 "Computing cumulative sequences:"
 { $subsections "cumulative" } ;
 
