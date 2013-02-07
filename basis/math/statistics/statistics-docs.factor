@@ -267,6 +267,10 @@ HELP: collect-index-by
     }
 } ;
 
+HELP: z-score
+{ $values { "seq" sequence } { "n" number } }
+{ $description "Calculates the Z-Score for " { $snippet "seq" } "." } ;
+
 ARTICLE: "histogram" "Computing histograms"
 "Counting elements in a sequence:"
 { $subsections
