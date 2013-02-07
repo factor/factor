@@ -388,3 +388,6 @@ ALIAS: std sample-std
         [ values ] map [ 0 [ length + ] accumulate nip ] [ ] bi zip
     ] [ length f <array> ] bi
     [ '[ first2 [ _ set-nth ] with each ] each ] keep ;
+
+: z-score ( seq -- n )
+    dup [ mean ] [ sample-std ] bi '[ _ - _ / ] map ;
