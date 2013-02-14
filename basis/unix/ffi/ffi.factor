@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax
-classes.struct combinators kernel system unix.time unix.types
-vocabs vocabs.loader ;
+USING: alien alien.c-types alien.data alien.libraries
+alien.syntax classes.struct combinators system unix.time
+unix.types vocabs ;
 IN: unix.ffi
 
 <<
@@ -38,6 +38,10 @@ CONSTANT: DT_REG       8
 CONSTANT: DT_LNK      10
 CONSTANT: DT_SOCK     12
 CONSTANT: DT_WHT      14
+
+: SIG_EFF ( -- obj ) -1 void* <ref> ; inline
+: SIG_DFL ( -- obj ) 0 void* <ref> ; inline
+: SIG_IGN ( -- obj ) 1 void* <ref> ; inline
 
 LIBRARY: libc
 
@@ -182,5 +186,7 @@ FUNCTION: int unlink ( c-string path ) ;
 FUNCTION: int utimes ( c-string path, timeval[2] times ) ;
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 FUNCTION: ssize_t writev ( int fds, iovec* iov, int iovcnt ) ;
+TYPEDEF: void* sighandler_t
+FUNCTION: sighandler_t signal ( int signum, sighandler_t handler) ;
 
 "librt" "librt.so" cdecl add-library

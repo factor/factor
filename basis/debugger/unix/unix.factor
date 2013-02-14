@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: debugger io kernel math prettyprint sequences system ;
+USING: debugger io kernel math prettyprint sequences system
+io.launcher.unix accessors strings ;
 IN: debugger.unix
 
 CONSTANT: signal-names
@@ -13,7 +14,11 @@ CONSTANT: signal-names
     "SIGUSR1" "SIGUSR2"
 }
 
-: signal-name ( n -- str/f ) 1 - signal-names ?nth ;
+GENERIC: signal-name ( obj -- str/f )
+
+M: signal signal-name n>> signal-name ;
+
+M: integer signal-name ( n -- str/f ) 1 - signal-names ?nth ;
 
 : signal-name. ( n -- )
     signal-name [ " (" ")" surround write ] when* ;
