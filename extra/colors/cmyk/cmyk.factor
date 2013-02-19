@@ -19,7 +19,7 @@ M: cmyka >rgba
     [ [ cyan>> ] [ black>> ] bi + ]
     [ [ magenta>> ] [ black>> ] bi + ]
     [ [ yellow>> ] [ black>> ] bi + ] tri
-    [ 1.0 min 1.0 swap - ] tri@ 1.0 <rgba> ;
+    [ 1.0 min 1.0 swap - ] tri@ 1.0 <rgba> ; inline
 
 : rgba>cmyka ( rgba -- cmyka )
     >rgba-components [

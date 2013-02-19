@@ -41,7 +41,7 @@ M: hsla >rgba
             p q h value
             p q h 1/3 - value
         ] if
-    ] dip <rgba> ;
+    ] dip <rgba> ; inline
 
 : rgba>hsla ( rgba -- hsla )
     >rgba-components [| r g b |

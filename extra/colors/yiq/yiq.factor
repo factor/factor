@@ -21,7 +21,7 @@ M: yiqa >rgba
         [ [ 0.276066 * ] [ 0.639810 * ] bi* + - ]
         [ [ 1.105450 * ] [ 1.729860 * ] bi* - - ]
         3tri [ 0.0 1.0 clamp ] tri@
-    ] dip <rgba> ;
+    ] dip <rgba> ; inline
 
 : rgba>yiqa ( rgba -- yiqa )
     >rgba-components [
