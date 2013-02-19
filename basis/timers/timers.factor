@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar combinators.short-circuit fry
 heaps init kernel math math.functions math.parser namespaces
-quotations sequences system threads ;
+quotations sequences system threads typed ;
 IN: timers
 
 TUPLE: timer
@@ -22,9 +22,9 @@ M: f >nanoseconds ;
 M: real >nanoseconds >integer ;
 M: duration >nanoseconds duration>nanoseconds >integer ;
 
-: set-next-timer-time ( timer -- timer )
+TYPED: set-next-timer-time ( timer: timer -- timer )
     ! start + delay + ceiling((now - (start + delay)) / interval) * interval
-    nano-count 
+    nano-count
     over start-nanos>> -
     over delay-nanos>> [ - ] when*
     over interval-nanos>> / ceiling
@@ -33,23 +33,23 @@ M: duration >nanoseconds duration>nanoseconds >integer ;
     over delay-nanos>> [ + ] when*
     >>iteration-start-nanos ;
 
-: stop-timer? ( timer -- ? )
-    { [ thread>> self eq? not ] [ restart?>> ] } 1|| ;
+TYPED: stop-timer? ( timer: timer -- ? )
+    { [ thread>> self eq? not ] [ restart?>> ] } 1|| ; inline
 
 DEFER: call-timer-loop
 
-: loop-timer ( timer -- )
+TYPED: loop-timer ( timer: timer -- )
     nano-count over
     [ iteration-start-nanos>> - ] [ interval-nanos>> ] bi <
     [ set-next-timer-time ] dip
     [ dup iteration-start-nanos>> ] [ 0 ] if
     0 or sleep-until call-timer-loop ;
 
-: maybe-loop-timer ( timer -- )
+TYPED: maybe-loop-timer ( timer: timer -- )
     dup { [ stop-timer? ] [ interval-nanos>> not ] } 1||
     [ drop ] [ loop-timer ] if ;
 
-: call-timer-loop ( timer -- )
+TYPED: call-timer-loop ( timer: timer -- )
     dup stop-timer? [
         drop
     ] [
@@ -61,7 +61,7 @@ DEFER: call-timer-loop
         maybe-loop-timer
     ] if ;
 
-: sleep-delay ( timer -- )
+TYPED: sleep-delay ( timer: timer -- )
     dup stop-timer? [
         drop
     ] [
@@ -69,7 +69,7 @@ DEFER: call-timer-loop
         delay-nanos>> [ sleep ] when*
     ] if ;
 
-: timer-loop ( timer -- )
+TYPED: timer-loop ( timer: timer -- )
     [ sleep-delay ]
     [ nano-count >>iteration-start-nanos call-timer-loop ]
     [ dup restart?>> [ f >>restart? timer-loop ] [ drop ] if ] tri ;
@@ -105,7 +105,7 @@ PRIVATE>
 <PRIVATE
 
 : (start-timer) ( quot start-duration interval-duration -- timer )
-    <timer> [ start-timer ] keep ;
+    <timer> [ start-timer ] keep ; inline
 
 PRIVATE>
 
