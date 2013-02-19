@@ -16,7 +16,7 @@ C: <rgba> rgba
 
 GENERIC: >rgba ( color -- rgba )
 
-M: rgba >rgba ( rgba -- rgba ) ;
+M: rgba >rgba ( rgba -- rgba ) ; inline
 
 M: color red>> ( color -- red ) >rgba red>> ;
 M: color green>> ( color -- green ) >rgba green>> ;

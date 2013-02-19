@@ -40,7 +40,7 @@ M: hsva >rgba ( hsva -- rgba )
             { 4 [ [ t ] [ p ] [ value>> ] tri ] }
             { 5 [ [ value>> ] [ p ] [ q ] tri ] }
         } case
-    ] [ alpha>> ] bi <rgba> ;
+    ] [ alpha>> ] bi <rgba> ; inline
 
 :: rgba>hsva ( rgba -- hsva )
     rgba >rgba-components :> ( r g b a )
