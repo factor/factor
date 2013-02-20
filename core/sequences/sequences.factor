@@ -175,6 +175,9 @@ PRIVATE>
 : ?nth ( n seq -- elt/f )
     2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ; inline
 
+: ?set-nth ( elt n seq -- )
+    2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
+
 : ?first ( seq -- elt/f ) 0 swap ?nth ; inline
 : ?second ( seq -- elt/f ) 1 swap ?nth ; inline
 : ?last ( seq -- elt/f )

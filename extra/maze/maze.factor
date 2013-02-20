@@ -1,7 +1,7 @@
 ! From http://www.ffconsultancy.com/ocaml/maze/index.html
 USING: accessors arrays fry kernel math math.order math.vectors
 namespaces opengl.gl random sequences ui ui.gadgets
-ui.gadgets.canvas ui.render sequences.private ;
+ui.gadgets.canvas ui.render ;
 IN: maze
 
 CONSTANT: line-width 8
@@ -9,13 +9,6 @@ CONSTANT: line-width 8
 SYMBOL: visited
 
 : unvisited? ( cell -- ? ) first2 visited get ?nth ?nth ;
-
-<PRIVATE
-
-: ?set-nth ( elt n seq -- )
-    2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
-
-PRIVATE>
 
 : visit ( cell -- ) f swap first2 visited get ?nth ?set-nth ;
 

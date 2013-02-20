@@ -1,11 +1,9 @@
-USING: cocoa cocoa.plists core-foundation iokit iokit.hid
-kernel cocoa.enumeration destructors math.parser cocoa.application 
-core-foundation.data core-foundation.strings
-sequences locals combinators.short-circuit threads
-namespaces assocs arrays combinators hints alien
-core-foundation.run-loop accessors sequences.private
-alien.c-types alien.data math parser game.input vectors
-bit-arrays unix.types ;
+USING: accessors alien alien.c-types arrays assocs bit-arrays
+cocoa.application cocoa.enumeration cocoa.plists combinators
+combinators.short-circuit core-foundation core-foundation.data
+core-foundation.run-loop core-foundation.strings destructors
+game.input hints iokit iokit.hid kernel locals math namespaces
+sequences vectors ;
 FROM: namespaces => change-global ;
 IN: game.input.iokit
 
@@ -176,9 +174,6 @@ CONSTANT: pov-values
     } cond ;
 
 HINTS: record-controller { controller-state alien } ;
-
-: ?set-nth ( elt n seq -- )
-    2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
 
 : record-keyboard ( keyboard-state value -- )
     dup IOHIDValueGetElement dup keyboard-key? [
