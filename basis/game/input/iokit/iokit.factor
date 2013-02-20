@@ -177,8 +177,8 @@ CONSTANT: pov-values
 
 HINTS: record-controller { controller-state alien } ;
 
-: ?set-nth ( value nth seq -- )
-    2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ;
+: ?set-nth ( elt n seq -- )
+    2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
 
 : record-keyboard ( keyboard-state value -- )
     dup IOHIDValueGetElement dup keyboard-key? [
