@@ -10,8 +10,12 @@ SYMBOL: visited
 
 : unvisited? ( cell -- ? ) first2 visited get ?nth ?nth ;
 
-: ?set-nth ( elt i seq -- )
-    2dup bounds-check? [ set-nth ] [ 3drop ] if ;
+<PRIVATE
+
+: ?set-nth ( elt n seq -- )
+    2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
+
+PRIVATE>
 
 : visit ( cell -- ) f swap first2 visited get ?nth ?set-nth ;
 

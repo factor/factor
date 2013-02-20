@@ -138,8 +138,8 @@ PRIVATE>
 
 ! the maximum unicode char in the first 3 planes
 
-: ?set-nth ( val index seq -- )
-    2dup bounds-check? [ set-nth ] [ 3drop ] if ;
+: ?set-nth ( elt n seq -- )
+    2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
 
 :: fill-ranges ( table -- table )
     name-map sort-values keys
