@@ -179,6 +179,10 @@ HELP: ?nth
 { $values { "n" "an integer" } { "seq" sequence } { "elt/f" "an object or " { $link f } } }
 { $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
 
+HELP: ?set-nth
+{ $values { "elt" object } { "n" "an integer" } { "seq" sequence } }
+{ $description "A forgiving version of " { $link set-nth } ".  If the index is out of bounds, does nothing." } ;
+
 HELP: ?first
 { $values { "seq" sequence } { "elt/f" "an object or " { $link f } } }
 { $description "A forgiving version of " { $link first } ". If the sequence is empty, or if the sequence is " { $link f } ", simply outputs " { $link f } "." }
