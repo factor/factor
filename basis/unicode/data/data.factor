@@ -5,7 +5,8 @@ io.files hashtables quotations splitting grouping arrays io
 math.parser math.order byte-arrays namespaces math.bitwise
 compiler.units parser io.encodings.ascii interval-maps
 ascii sets combinators locals math.ranges sorting make
-strings.parser io.encodings.utf8 memoize simple-flat-file ;
+strings.parser io.encodings.utf8 memoize simple-flat-file
+sequences.private ;
 IN: unicode.data
 
 <PRIVATE

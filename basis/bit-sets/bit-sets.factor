@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences byte-arrays bit-arrays math
-math.bitwise hints sets ;
+math.bitwise hints sets sequences.private ;
 IN: bit-sets
 
 TUPLE: bit-set { table bit-array read-only } ;
