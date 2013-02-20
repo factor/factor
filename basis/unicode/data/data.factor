@@ -5,8 +5,7 @@ io.files hashtables quotations splitting grouping arrays io
 math.parser math.order byte-arrays namespaces math.bitwise
 compiler.units parser io.encodings.ascii interval-maps
 ascii sets combinators locals math.ranges sorting make
-strings.parser io.encodings.utf8 memoize simple-flat-file
-sequences.private ;
+strings.parser io.encodings.utf8 memoize simple-flat-file ;
 IN: unicode.data
 
 <PRIVATE
@@ -138,9 +137,6 @@ PRIVATE>
     >hashtable ;
 
 ! the maximum unicode char in the first 3 planes
-
-: ?set-nth ( elt n seq -- )
-    2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
 
 :: fill-ranges ( table -- table )
     name-map sort-values keys

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences byte-arrays bit-arrays math
-math.bitwise hints sets sequences.private ;
+math.bitwise hints sets ;
 IN: bit-sets
 
 TUPLE: bit-set { table bit-array read-only } ;
@@ -18,13 +18,6 @@ M: bit-set adjoin
     ! This is allowed to throw an error when the elt couldn't
     ! go in the set
     [ t ] 2dip table>> set-nth ;
-
-<PRIVATE
-
-: ?set-nth ( elt n seq -- )
-    2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
-
-PRIVATE>
 
 M: bit-set delete
     ! This isn't allowed to throw an error if the elt wasn't
