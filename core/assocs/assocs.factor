@@ -260,6 +260,4 @@ M: enum length seq>> length ; inline
 
 M: enum nth-unsafe dupd seq>> nth-unsafe 2array ; inline
 
-M: enum set-nth-unsafe seq>> set-nth-unsafe ; inline
-
-INSTANCE: enum sequence
+INSTANCE: enum immutable-sequence
