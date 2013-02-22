@@ -255,3 +255,11 @@ M: enum assoc-size seq>> length ; inline
 M: enum clear-assoc seq>> delete-all ; inline
 
 INSTANCE: enum assoc
+
+M: enum length seq>> length ; inline
+
+M: enum nth-unsafe dupd seq>> nth-unsafe 2array ; inline
+
+M: enum set-nth-unsafe seq>> set-nth-unsafe ; inline
+
+INSTANCE: enum sequence
