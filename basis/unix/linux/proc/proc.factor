@@ -3,7 +3,7 @@
 USING: accessors arrays combinators combinators.smart
 io.encodings.utf8 io.files kernel math math.order math.parser
 memoize sequences sorting.slots splitting splitting.monotonic
-strings ;
+strings io.pathnames ;
 IN: unix.linux.proc
 
 ! /proc/*
@@ -220,16 +220,24 @@ TUPLE: cpu-stat name user nice system idle iowait irq softirq steal guest guest-
 
 ! /proc/pid/*
 
-: proc-pid-path ( pid string -- path )
+GENERIC# proc-pid-path 1 ( object string -- path )
+
+M: integer proc-pid-path ( pid string -- path )
     [ "/proc/" ] 2dip
     [ number>string "/" append ] dip
     3append ;
 
-: proc-pid-first-line ( pid string -- string )
-    proc-pid-path utf8 file-lines first ;
+M: string proc-pid-path ( pid-string string -- path )
+    [ "/proc/" ] 2dip [ append-path ] dip append-path ;
 
-: proc-pid-cmdline ( pid -- string )
-    "cmdline" proc-pid-first-line ;
+: proc-file-lines ( path -- strings ) utf8 file-lines ;
+: proc-first-line ( path -- string/f ) proc-file-lines ?first ;
+
+: proc-pid-first-line ( pid string -- string )
+    proc-pid-path proc-first-line ;
+
+: parse-proc-pid-cmdline ( pid -- string/f )
+    "cmdline" proc-pid-path proc-first-line ;
 
 TUPLE: pid-stat pid filename state parent-pid group-id session-id terminal#
     terminal-group-id task-flags
@@ -263,7 +271,9 @@ TUPLE: pid-stat pid filename state parent-pid group-id session-id terminal#
     env-start env-end
     exit-code ;
 
-: proc-pid-stat ( pid -- stat )
-    "stat" proc-pid-first-line " " split harvest
+: parse-proc-pid-stat ( pid -- stat )
+    "stat" proc-pid-path
+    proc-first-line
+    " " split harvest
     [ dup string>number [ nip ] when* ] map
     [ pid-stat boa ] input<sequence ;
