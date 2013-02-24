@@ -1,0 +1,2 @@
+User-agent: *
+Disallow: http://gitweb.factorcode.org/*
