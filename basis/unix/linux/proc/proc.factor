@@ -304,5 +304,6 @@ TUPLE: pid-stat pid filename state parent-pid group-id session-id terminal#
     "stat" proc-pid-path
     proc-first-line
     " " split harvest
+    52 "0" pad-tail  ! XXX: Kernel 3.2 doesn't have enough entries
     [ dup string>number [ nip ] when* ] map
     [ pid-stat boa ] input<sequence ;
