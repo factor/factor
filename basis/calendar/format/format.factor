@@ -281,6 +281,12 @@ TYPED: timestamp>ymd ( timestamp: timestamp -- str )
 TYPED: timestamp>hms ( timestamp: timestamp -- str )
     [ (timestamp>hms) ] with-string-writer ;
 
+: (timestamp>hm) ( timestamp -- )
+    { hh ":" mm } formatted ;
+
+TYPED: timestamp>hm ( timestamp: timestamp -- str )
+    [ (timestamp>hm) ] with-string-writer ;
+
 TYPED: timestamp>ymdhms ( timestamp: timestamp -- str )
     [
         >gmt
@@ -299,3 +305,24 @@ TYPED: timestamp>ymdhms ( timestamp: timestamp -- str )
     ] with-string-writer ;
 
 M: timestamp present timestamp>string ;
+
+TYPED: duration>hm ( duration: duration -- string )
+    [ duration>hours >integer 24 mod pad-00 ]
+    [ duration>minutes >integer 60 mod pad-00 ] bi ":" glue ;
+
+TYPED: duration>human-readable ( duration: duration -- string )
+    [
+        [
+            duration>years >integer
+            [
+                [ number>string write ]
+                [ 1 > " years, " " year, " ? write ] bi
+            ] unless-zero
+        ] [
+            duration>days >integer 365 mod
+            [
+                [ number>string write ]
+                [ 1 > " days, " " day, " ? write ] bi
+            ] unless-zero
+        ] [ duration>hm write ] tri
+    ] with-string-writer ;
