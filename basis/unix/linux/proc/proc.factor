@@ -3,14 +3,13 @@
 USING: accessors arrays combinators combinators.smart
 io.encodings.utf8 io.files kernel math math.order math.parser
 memoize sequences sorting.slots splitting splitting.monotonic
-strings io.pathnames ;
+strings io.pathnames calendar ;
 IN: unix.linux.proc
 
 ! /proc/*
 
 ! /proc/buddyinfo
 ! /proc/cgroups
-! /proc/cmdline
 
 TUPLE: proc-cmdline string ;
 C: <proc-cmdline> proc-cmdline
@@ -18,9 +17,6 @@ C: <proc-cmdline> proc-cmdline
     "/proc/cmdline" utf8 file-lines first <proc-cmdline> ;
 
 
-! /proc/consoles
-
-! /proc/cpuinfo
 TUPLE: processor-info
     { processor integer }
     { vendor-id string }
@@ -81,7 +77,8 @@ TUPLE: processor-info
     ] input<sequence processor-info boa ;
 
 MEMO: parse-proc-cpuinfo ( -- seq )
-    "/proc/cpuinfo" utf8 file-lines { "" } split harvest [ lines>processor-info ] map ;
+    "/proc/cpuinfo" utf8 file-lines
+    { "" } split harvest [ lines>processor-info ] map ;
 
 : sort-cpus ( seq -- seq )
     { { physical-id>> <=> } { core-id>> <=> } } sort-by
@@ -94,7 +91,6 @@ MEMO: parse-proc-cpuinfo ( -- seq )
     [ [ [ length ] map-sum ] map-sum ] tri ;
 
 
-! /proc/loadavg
 TUPLE: proc-loadavg
     load-average-1
     load-average-5
@@ -116,9 +112,8 @@ TUPLE: proc-loadavg
     ] input<sequence proc-loadavg boa ;
 
 
-! /proc/meminfo
 ! In the file as kb, convert to bytes
-TUPLE: meminfo
+TUPLE: proc-meminfo
     mem-total
     mem-free
     buffers
@@ -165,11 +160,9 @@ TUPLE: meminfo
 : parse-proc-meminfo ( -- meminfo )
     "/proc/meminfo" utf8 file-lines [
         " " split harvest second string>number 1024 *
-    ] map [ meminfo boa ] input<sequence ;
+    ] map [ proc-meminfo boa ] input<sequence ;
 
-! /proc/stat
 ! All cpu-stat fields are measured in jiffies.
-
 TUPLE: proc-stat
     cpu
     cpus
@@ -181,13 +174,13 @@ TUPLE: proc-stat
     procs-blocked
     softirq ;
 
-TUPLE: cpu-stat name user nice system idle iowait irq softirq steal guest guest-nice ;
+TUPLE: proc-cpu-stat name user nice system idle iowait irq softirq steal guest guest-nice ;
 
 : line>cpu ( string -- cpu )
     " " split
     unclip-slice
     [ [ [ CHAR: \s = ] trim string>number ] map ] dip prefix
-    [ cpu-stat boa ] input<sequence ;
+    [ proc-cpu-stat boa ] input<sequence ;
 
 : parse-proc-stat ( -- obj )
     "/proc/stat" utf8 file-lines
@@ -214,9 +207,45 @@ TUPLE: cpu-stat name user nice system idle iowait irq softirq steal guest guest-
 : active-cpus ( -- n )
     parse-proc-stat procs-running>> ;
 
-! /proc/partitions
+TUPLE: proc-partition major minor #blocks name ;
 
-! /proc/swaps
+: parse-proc-partitions ( -- partitions )
+    "/proc/partitions" utf8 file-lines 2 tail
+    [
+        " \t" split harvest
+        [
+            {
+                [ string>number ]
+                [ string>number ]
+                [ string>number ]
+                [ ]
+            } spread
+        ] input<sequence proc-partition boa
+    ] map ;
+
+TUPLE: proc-swap filename type size used priority ;
+
+: parse-proc-swaps ( -- sequence )
+    "/proc/swaps" utf8 file-lines rest
+    [
+        " \t" split harvest
+        [
+            {
+                [ ]
+                [ ]
+                [ string>number ]
+                [ string>number ]
+                [ string>number ]
+            } spread
+        ] input<sequence proc-swap boa
+    ] map ;
+
+TUPLE: proc-uptime up idle ;
+
+: parse-proc-uptime ( -- uptime )
+    "/proc/uptime" utf8 file-lines first
+    " " split first2 [ string>number seconds ] bi@
+    proc-uptime boa ;
 
 ! /proc/pid/*
 
