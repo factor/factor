@@ -94,8 +94,10 @@ M: hash-set random table>> random first ;
 
 : randomize-n-last ( seq n -- seq )
     [ dup length dup ] dip - 1 max '[ dup _ > ]
-    [ [ random ] [ 1 - ] bi [ pick exchange-unsafe ] keep ]
-    while drop ;
+    random-generator get '[
+        [ _ (random-integer) ] [ 1 - ] bi
+        [ pick exchange-unsafe ] keep
+    ] while drop ;
 
 : randomize ( seq -- randomized )
     dup length randomize-n-last ;
