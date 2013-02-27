@@ -46,21 +46,24 @@ TYPED: random-bytes ( n: fixnum -- byte-array: byte-array )
 
 <PRIVATE
 
-:: ((random-integer)) ( bits obj -- n required-bits )
+: #bits ( n -- bits )
+    dup 2 <= [ drop 1 ] [ 1 - log2 1 + ] if ; inline
+
+:: (random-bits) ( n bits obj -- n' )
     obj random-32* 32 bits 32 - [ dup 0 > ] [
         [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
-    ] while drop ;
+    ] while drop [ n * ] [ 2^ /i ] bi* ; inline
 
 : (random-integer) ( n obj -- n' )
-    [ dup next-power-of-2 log2 ] dip ((random-integer))
-    [ * ] [ 2^ /i ] bi* ;
+    [ dup #bits ] dip (random-bits) ;
 
 : random-integer ( n -- n' )
     random-generator get (random-integer) ;
 
 PRIVATE>
 
-: random-bits ( numbits -- r ) 2^ random-integer ;
+: random-bits ( numbits -- r )
+    [ 2^ ] keep random-generator get (random-bits) ;
 
 : random-bits* ( numbits -- n )
     1 - [ random-bits ] keep set-bit ;
