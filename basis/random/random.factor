@@ -53,7 +53,7 @@ TYPED: random-bytes ( n: fixnum -- byte-array: byte-array )
 :: (random-bits) ( n bits obj -- n' )
     obj random-32* 32 bits 32 - [ dup 0 > ] [
         [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
-    ] while drop [ n * ] [ 2^ /i ] bi* ; inline
+    ] while drop [ n * ] [ neg shift ] bi* ; inline
 
 : (random-integer) ( n obj -- n' )
     [ dup #bits ] dip (random-bits) ;
