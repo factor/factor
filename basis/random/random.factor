@@ -28,7 +28,8 @@ M: object random-bytes* ( n tuple -- byte-array )
 
 HINTS: M\ object random-bytes* { fixnum object } ;
 
-M: object random-32* ( tuple -- r ) 4 swap random-bytes* be> ;
+M: object random-32* ( tuple -- r )
+    4 swap random-bytes* c:uint deref ;
 
 ERROR: no-random-number-generator ;
 
@@ -121,7 +122,7 @@ ERROR: too-many-samples seq n ;
 <PRIVATE
 
 : (uniform-random-float) ( min max obj -- n )
-    [ 4 4 ] dip [ random-bytes* c:uint deref >float ] curry bi@
+    [ random-32* ] keep random-32* [ >float ] bi@
     2.0 32 ^ * +
     [ over - 2.0 -64 ^ * ] dip
     * + ; inline
