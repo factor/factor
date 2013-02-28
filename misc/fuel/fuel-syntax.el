@@ -84,6 +84,12 @@
 (defconst fuel-syntax--declaration-words-regex
   (regexp-opt fuel-syntax--declaration-words 'words))
 
+(defconst fuel-syntax--redwords
+  '("deprecated"))
+
+(defconst fuel-syntax--redwords-regex
+  (regexp-opt fuel-syntax--redwords 'words))
+
 (defsubst fuel-syntax--second-word-regex (prefixes)
   (format "%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
 
@@ -201,6 +207,10 @@
 (defconst fuel-syntax--definition-end-regex
   (format "\\(\\(^\\| +\\);\\( *%s\\)*\\($\\| +\\)\\)"
           fuel-syntax--declaration-words-regex))
+
+(defconst fuel-syntax--redwords-end-regex
+  (format "\\(\\(^\\| +\\);\\( *%s\\)*\\($\\| +\\)\\)"
+          fuel-syntax--redwords-regex))
 
 (defconst fuel-syntax--single-liner-regex
   (regexp-opt '("ABOUT:"
