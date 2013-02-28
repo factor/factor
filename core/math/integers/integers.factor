@@ -57,11 +57,12 @@ M: fixnum bitnot fixnum-bitnot ; inline
 M: fixnum bit? fixnum-bit? ; inline
 
 : fixnum-log2 ( x -- n )
+    { fixnum } declare
     0 swap [ dup 1 eq? ] [
         [ 1 fixnum+fast ] [ 2/ ] bi*
-    ] until drop ; inline
+    ] until drop ;
 
-M: fixnum (log2) fixnum-log2 ; inline
+M: fixnum (log2) fixnum-log2 { fixnum } declare ; inline
 
 M: bignum >fixnum bignum>fixnum ; inline
 M: bignum >bignum ; inline
