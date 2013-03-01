@@ -184,9 +184,10 @@ PRIVATE>
     ! Uses R.C.H. Cheng, "The generation of Gamma
     ! variables with non-integral shape parameters",
     ! Applied Statistics, (1977), 26, No. 1, p71-74
-    2. alpha * 1 - sqrt :> ainv
-    alpha 4. log -      :> bbb
-    alpha ainv +        :> ccc
+    random-generator get :> rnd
+    2. alpha * 1 - sqrt  :> ainv
+    alpha 4. log -       :> bbb
+    alpha ainv +         :> ccc
 
     0 :> r! 0 :> z! 0 :> result! ! initialize locals
     [
@@ -195,11 +196,11 @@ PRIVATE>
             [ z log >= ]
         } 1|| not
     ] [
-        random-unit :> u1
-        random-unit :> u2
+        rnd (random-unit) :> u1
+        rnd (random-unit) :> u2
 
         u1 1. u1 - / log ainv / :> v
-        alpha v e^ *           :> x
+        alpha v e^ *            :> x
         u1 sq u2 *              z!
         bbb ccc v * + x -       r!
 
@@ -211,17 +212,18 @@ PRIVATE>
 
 :: (gamma-random-float<1) ( alpha beta -- n )
     ! Uses ALGORITHM GS of Statistical Computing - Kennedy & Gentle
+    random-generator get :> rnd
     alpha e + e / :> b
 
     0 :> x! 0 :> p! ! initialize locals
     [
         p 1.0 > [
-            random-unit x alpha 1 - ^ >
+            rnd (random-unit) x alpha 1 - ^ >
         ] [
-            random-unit x neg e^ >
+            rnd (random-unit) x neg e^ >
         ] if
     ] [
-        random-unit b * p!
+        rnd (random-unit) b * p!
         p 1.0 <= [
             p 1. alpha / ^
         ] [
@@ -244,8 +246,9 @@ PRIVATE>
     ! Based upon an algorithm published in: Fisher, N.I.,
     ! "Statistical Analysis of Circular Data", Cambridge
     ! University Press, 1993.
+    random-generator get :> rnd
     kappa 1e-6 <= [
-        2pi random-unit *
+        2pi rnd (random-unit) *
     ] [
         4. kappa sq * 1. + sqrt 1. + :> a
         a 2. a * sqrt - 2. kappa * / :> b
@@ -253,16 +256,17 @@ PRIVATE>
 
         0 :> c! 0 :> _f! ! initialize locals
         [
-            random-unit {
+            rnd (random-unit) {
                 [ 2. c - c * < ] [ 1. c - e^ c * <= ]
             } 1|| not
         ] [
-            random-unit pi * cos :> z
+            rnd (random-unit) pi * cos :> z
             r z * 1. + r z + /   _f!
             r _f - kappa *       c!
         ] do while
 
-        mu 2pi mod _f cos random-unit 0.5 > [ + ] [ - ] if
+        mu 2pi mod _f cos
+        rnd (random-unit) 0.5 > [ + ] [ - ] if
     ] if ;
 
 :: (triangular-random-float) ( low high mode -- n )
@@ -306,9 +310,9 @@ PRIVATE>
 
 ! Box-Muller
 : poisson-random-float ( mean -- n )
-    [ -1 0 ] dip
-    [ 2dup < ]
-    [ [ 1 + ] 2dip [ random-unit log neg + ] dip ] while 2drop ;
+    [ -1 0 ] dip [ 2dup < ] random-generator get '[
+        [ 1 + ] 2dip [ _ (random-unit) log neg + ] dip
+    ] while 2drop ;
 
 {
     { [ os windows? ] [ "random.windows" require ] }
