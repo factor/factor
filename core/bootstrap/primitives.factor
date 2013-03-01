@@ -104,7 +104,6 @@ call( -- )
     "threads.private"
     "tools.dispatch.private"
     "tools.memory.private"
-    "tools.profiler.counting.private"
     "tools.profiler.sampling.private"
     "words"
     "words.private"
