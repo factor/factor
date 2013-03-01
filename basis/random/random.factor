@@ -140,11 +140,18 @@ PRIVATE>
 
 M: float random [ f ] [ 0.0 swap uniform-random-float ] if-zero ;
 
+<PRIVATE
+
+: (random-unit) ( obj -- n )
+    [ 0.0 1.0 ] dip (uniform-random-float) ; inline
+
+PRIVATE>
+
 : random-unit ( -- n )
-    0.0 1.0 uniform-random-float ; inline
+    random-generator get (random-unit) ; inline
 
 : random-units ( length -- sequence )
-    random-generator get '[ 0.0 1.0 _ (uniform-random-float) ] replicate ;
+    random-generator get '[ _ (random-unit) ] replicate ;
 
 : random-integers ( length n -- sequence )
     random-generator get '[ _ _ (random-integer) ] replicate ;
