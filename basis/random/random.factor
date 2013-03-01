@@ -55,8 +55,12 @@ TYPED: random-bytes ( n: fixnum -- byte-array: byte-array )
         [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
     ] while drop [ n * ] [ neg shift ] bi* ; inline
 
-: (random-integer) ( n obj -- n' )
-    [ dup #bits ] dip (random-bits) ;
+: ((random-integer)) ( n obj -- n' )
+    [ dup #bits ] dip (random-bits) ; inline
+
+GENERIC# (random-integer) 1 ( n obj -- n )
+M: fixnum (random-integer) ( n obj -- n' ) ((random-integer)) ;
+M: bignum (random-integer) ( n obj -- n' ) ((random-integer)) ;
 
 : random-integer ( n -- n' )
     random-generator get (random-integer) ;
