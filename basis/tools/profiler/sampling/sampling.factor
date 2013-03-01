@@ -58,10 +58,13 @@ PRIVATE>
 
 : total-time ( -- n )
     most-recent-profile-data total-time* ;
+
 : gc-time ( -- n )
     most-recent-profile-data gc-time* ;
+
 : foreign-time ( -- n )
     most-recent-profile-data foreign-time* ;
+
 : foreign-thread-time ( -- n )
     most-recent-profile-data foreign-thread-time* ;
 
@@ -127,7 +130,7 @@ PRIVATE>
     most-recent-profile-data top-down-max-depth* ;
 
 : top-down* ( profile-data -- tree )
-    most-positive-fixnum top-down-max-depth* ;
+    [ most-positive-fixnum ] dip top-down-max-depth* ;
 
 : top-down ( -- tree )
     most-positive-fixnum top-down-max-depth ;
