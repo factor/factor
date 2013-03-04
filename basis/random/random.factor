@@ -114,7 +114,8 @@ ERROR: too-many-samples seq n ;
     [ drop ] 2bi nths ;
 
 : delete-random ( seq -- elt )
-    [ length random-integer ] keep [ nth ] 2keep remove-nth! drop ;
+    [ length random-integer ] keep
+    [ nth ] 2keep remove-nth! drop ;
 
 : with-random ( tuple quot -- )
     random-generator swap with-variable ; inline
