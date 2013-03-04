@@ -201,8 +201,6 @@ M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
-M: iota hashcode* over 0 <= [ 2drop 0 ] [ sequence-hashcode ] if ;
-
 M: hashtable hashcode*
     [
         dup assoc-size 1 eq?
