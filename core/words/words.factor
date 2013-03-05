@@ -108,6 +108,10 @@ M: word parent-word drop f ;
 
 : inline? ( word -- ? ) "inline" word-prop ; inline
 
+: inline-recursive? ( word -- ? )
+    dup "inline" word-prop
+    [ "recursive" word-prop ] [ drop f ] if ; inline
+
 ERROR: cannot-be-inline word ;
 
 GENERIC: make-inline ( word -- )
