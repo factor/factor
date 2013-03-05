@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes classes.private classes.algebra
-classes.algebra.private classes.union classes.union.private
-words kernel sequences definitions combinators arrays assocs
-generic accessors ;
+USING: accessors assocs classes classes.algebra
+classes.algebra.private classes.private classes.union
+classes.union.private combinators definitions kernel sequences
+words ;
 IN: classes.mixin
 
 PREDICATE: mixin-class < union-class "mixin" word-prop ;
