@@ -144,6 +144,9 @@ GENERIC: prev-float ( m -- n )
     #! Apply quot to i, keep i and quot, hide n.
     [ nip call ] 3keep ; inline
 
+: iterate-rot ( ? i n quot -- i n quot ? )
+    [ rot ] dip swap ; inline
+
 : iterate-next ( i n quot -- i' n quot ) [ 1 + ] 2dip ; inline
 
 PRIVATE>
@@ -152,18 +155,16 @@ PRIVATE>
     [ iterate-step iterate-next (each-integer) ]
     [ 3drop ] if-iterate? ; inline recursive
 
-: (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i )
+: (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
     [
-        iterate-step
-        [ [ ] ] 2dip
-        [ iterate-next (find-integer) ] 2curry bi-curry if
+        iterate-step iterate-rot
+        [ 2drop ] [ iterate-next (find-integer) ] if
     ] [ 3drop f ] if-iterate? ; inline recursive
 
 : (all-integers?) ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
     [
-        iterate-step
-        [ iterate-next (all-integers?) ] 3curry
-        [ f ] if
+        iterate-step iterate-rot
+        [ iterate-next (all-integers?) ] [ 3drop f ] if
     ] [ 3drop t ] if-iterate? ; inline recursive
 
 : each-integer ( ... n quot: ( ... i -- ... ) -- ... )
