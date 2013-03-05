@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser vocabs.parser words kernel classes compiler.units lexer ;
+USING: classes compiler.units kernel parser vocabs.parser words ;
 IN: classes.parser
 
 : save-class-location ( class -- )

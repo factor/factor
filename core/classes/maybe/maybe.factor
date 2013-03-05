@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.algebra
 classes.algebra.private classes.private classes.union.private
-effects kernel words sequences arrays ;
+kernel words ;
 IN: classes.maybe
 
 ! The class slot has to be a union of a word and a classoid
