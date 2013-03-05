@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors continuations kernel namespaces make
-sequences vectors sets assocs init math ;
+USING: accessors assocs continuations init kernel make
+namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: destructors
 

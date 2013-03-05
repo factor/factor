@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel math vectors math.order
-sequences sequences.private ;
+USING: accessors arrays assocs kernel math math.order sequences
+sequences.private vectors ;
 IN: sorting
 
 ! Optimized merge-sort:

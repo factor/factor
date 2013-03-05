@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel kernel.private math sequences
-sequences.private growable byte-arrays accessors ;
+USING: accessors byte-arrays growable kernel math sequences
+sequences.private ;
 IN: byte-vectors
 
 TUPLE: byte-vector

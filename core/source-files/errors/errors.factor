@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel math.order sorting sequences definitions
-namespaces arrays splitting io math.parser math init continuations ;
+USING: accessors assocs continuations definitions init io
+kernel math math.parser namespaces sequences sorting ;
 IN: source-files.errors
 
 GENERIC: error-file ( error -- file )

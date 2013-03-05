@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors definitions words ;
+USING: accessors definitions kernel sequences words ;
 IN: words.symbol
 
 PREDICATE: symbol < word

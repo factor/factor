@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private sequences init namespaces system io
-io.encodings.utf8 io.backend io.pathnames io.encodings io.files.private
-alien.strings splitting ;
+USING: alien.strings init io io.backend io.encodings
+io.encodings.utf8 io.files.private io.pathnames kernel
+kernel.private namespaces sequences splitting system ;
 IN: io.files
 
 MIXIN: file-reader
