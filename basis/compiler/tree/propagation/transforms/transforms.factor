@@ -113,7 +113,7 @@ IN: compiler.tree.propagation.transforms
 : shift-2^ ( -- quot )
     cell-bits tag-bits get - 1 -
     '[
-        integer>fixnum dup 0 < [ 2drop 0 ] [
+        integer>fixnum-strict dup 0 < [ 2drop 0 ] [
             dup _ < [ fixnum-shift ] [
                 fixnum-shift
             ] if
@@ -324,7 +324,7 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
     [ \ push def>> ] [ f ] if
 ] "custom-inlining" set-word-prop
 
-: custom-inline-fixnum ( x method -- y )
+: custom-inline-fixnum ( #call method -- y )
     [ in-d>> first value-info class>> fixnum \ f class-or class<= ] dip
     '[ [ dup [ _ no-method ] unless ] ] [ f ] if ;
 
