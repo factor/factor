@@ -139,7 +139,3 @@ M\ hashtable set-at
 set-specializer
 
 \ encode-string { string object object } set-specializer
-
-{ each-integer find-integer all-integers? } [
-    { { fixnum object } } set-specializer
-] each
