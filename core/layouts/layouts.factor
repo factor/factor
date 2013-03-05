@@ -91,17 +91,4 @@ M: real >integer
     dup most-negative-fixnum most-positive-fixnum between?
     [ >fixnum ] [ >bignum ] if ; inline
 
-! we put this here so that it can use the references to
-! most-positive-fixnum otherwise would be in combinatrs
-M: iota hashcode*
-    over 0 <= [ 2drop 0 ] [
-        nip length [
-            0 most-positive-fixnum clamp integer>fixnum
-            0 swap [ sequence-hashcode-step ] each-integer
-        ] [
-            most-positive-fixnum swap
-            [ sequence-hashcode-step ] (each-integer)
-        ] bi
-    ] if ;
-
 UNION: immediate fixnum POSTPONE: f ;
