@@ -1,11 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions hashtables kernel kernel.private math
-namespaces make sequences sequences.private strings vectors
-words quotations memory combinators generic classes
-classes.algebra classes.algebra.private classes.builtin
-classes.private slots.private slots math.private accessors
-assocs effects ;
+USING: accessors arrays assocs classes classes.algebra
+classes.algebra.private classes.builtin classes.private
+combinators definitions effects generic kernel kernel.private
+make math math.private memory namespaces quotations sequences
+sequences.private slots slots.private strings words ;
 IN: classes.tuple
 
 PREDICATE: tuple-class < class

@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.algebra
-classes.algebra.private classes.builtin
-classes.private combinators definitions kernel kernel.private
-math math.private quotations sequences words vocabs ;
+classes.algebra.private classes.builtin classes.private
+combinators definitions kernel kernel.private math math.private
+quotations sequences words ;
 IN: classes.union
 
 PREDICATE: union-class < class

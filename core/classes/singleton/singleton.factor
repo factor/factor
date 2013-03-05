@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes classes.algebra classes.algebra.private
-classes.predicate classes.predicate.private kernel sequences
-words vocabs.parser accessors ;
+USING: classes classes.algebra.private classes.predicate
+classes.predicate.private kernel sequences words ;
 IN: classes.singleton
 
 <PRIVATE
