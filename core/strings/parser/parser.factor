@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators kernel lexer make
-math math.order math.parser namespaces parser sequences
-splitting strings ;
+math math.parser namespaces sequences splitting strings ;
 IN: strings.parser
 
 ERROR: bad-escape char ;

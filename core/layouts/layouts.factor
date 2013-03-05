@@ -1,7 +1,6 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces math words kernel assocs classes
-math.order kernel.private sequences sequences.private ;
+USING: assocs kernel kernel.private math math.order namespaces ;
 IN: layouts
 
 SYMBOL: data-alignment

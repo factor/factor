@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.strings kernel kernel.private namespaces make
-io io.encodings sequences math generic threads.private classes
-io.backend io.files io.encodings.utf8 continuations destructors
-byte-arrays accessors combinators ;
+USING: accessors alien alien.strings byte-arrays destructors io
+io.backend io.encodings.utf8 io.files kernel kernel.private
+make math sequences threads.private ;
 IN: io.streams.c
 
 TUPLE: c-stream < disposable handle ;
