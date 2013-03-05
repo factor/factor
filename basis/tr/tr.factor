@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays strings sequences sequences.private ascii
-fry kernel words parser lexer assocs math math.order summary ;
+USING: ascii assocs byte-arrays fry hints kernel lexer math
+math.order parser sequences sequences.private strings summary
+words ;
 IN: tr
 
 ERROR: bad-tr ;
@@ -21,7 +22,7 @@ M: bad-tr summary
     '[ [ _ call( x -- y ) _ at ] keep or ] B{ } map-as ; inline
 
 : tr-hints ( word -- )
-    { { byte-array } { string } } "specializer" set-word-prop ;
+    { { byte-array } { string } } set-specializer ;
 
 : create-tr ( token -- word )
     create-in dup tr-hints ;
