@@ -1,11 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic assocs kernel math namespaces
-sequences strings vectors words words.symbol quotations io
-combinators sorting splitting math.parser effects continuations
-io.files vocabs io.encodings.utf8 source-files classes
-hashtables compiler.units accessors sets lexer vocabs.parser
-slots parser.notes classes.algebra ;
+USING: accessors arrays assocs classes combinators
+compiler.units continuations definitions effects io
+io.encodings.utf8 io.files kernel lexer math.parser namespaces
+parser.notes quotations sequences slots source-files vectors
+vocabs vocabs.parser words words.symbol ;
 IN: parser
 
 : location ( -- loc )

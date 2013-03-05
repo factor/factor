@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations continuations.private kernel
-kernel.private sequences assocs namespaces namespaces.private ;
+USING: assocs continuations continuations.private kernel
+kernel.private namespaces ;
 IN: init
 
 SYMBOL: startup-hooks

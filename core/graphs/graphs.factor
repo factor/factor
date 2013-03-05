@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel namespaces sequences sets ;
+USING: assocs kernel sequences sets ;
 IN: graphs
 
 <PRIVATE
