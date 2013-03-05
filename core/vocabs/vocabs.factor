@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs definitions kernel namespaces sequences
-sets sorting splitting strings ;
+sorting splitting strings ;
 IN: vocabs
 
 SYMBOL: dictionary

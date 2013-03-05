@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions kernel kernel.private
-slots.private math namespaces sequences strings vectors sbufs
-quotations assocs hashtables sorting vocabs math.order sets
-words.private ;
+USING: accessors arrays assocs definitions hashtables kernel
+kernel.private math math.order namespaces quotations sequences
+slots.private strings vocabs ;
 FROM: assocs => change-at ;
 IN: words
 

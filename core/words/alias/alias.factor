@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: quotations effects accessors sequences words kernel definitions ;
+USING: accessors definitions effects kernel quotations
+sequences words ;
 IN: words.alias
 
 PREDICATE: alias < word "alias" word-prop ;

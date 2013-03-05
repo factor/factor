@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays sequences sequences.private
-kernel kernel.private math assocs quotations.private
-slots.private ;
+USING: accessors arrays kernel kernel.private math sequences
+sequences.private slots.private ;
 IN: quotations
 
 <PRIVATE

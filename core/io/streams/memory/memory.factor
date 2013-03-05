@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors alien alien.accessors math io ;
+USING: accessors alien alien.accessors io kernel ;
 IN: io.streams.memory
 
 TUPLE: memory-stream alien ;

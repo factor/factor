@@ -1,15 +1,15 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays byte-arrays byte-vectors definitions generic
-hashtables kernel math namespaces parser lexer sequences strings
-strings.parser sbufs vectors words words.symbol words.constant
-words.alias quotations io assocs splitting classes.tuple
-generic.standard generic.hook generic.math generic.parser classes
-io.pathnames vocabs vocabs.parser classes.parser classes.union
-classes.intersection classes.mixin classes.predicate
-classes.singleton classes.tuple.parser compiler.units classes.maybe
-combinators effects.parser slots hash-sets source-files
-classes.algebra.private ;
+USING: accessors arrays byte-arrays byte-vectors
+classes.algebra.private classes.intersection classes.maybe
+classes.mixin classes.parser classes.predicate
+classes.singleton classes.tuple classes.tuple.parser
+classes.union combinators compiler.units definitions
+effects.parser generic generic.hook generic.math generic.parser
+generic.standard hash-sets hashtables io.pathnames kernel lexer
+math namespaces parser quotations sbufs sequences slots
+source-files splitting strings strings.parser vectors
+vocabs.parser words words.alias words.constant words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with

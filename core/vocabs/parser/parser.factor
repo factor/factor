@@ -1,10 +1,9 @@
 ! Copyright (C) 2007, 2010 Daniel Ehrenberg, Bruno Deferrari,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables kernel namespaces sequences
-sets strings vocabs sorting accessors arrays compiler.units
-combinators vectors splitting continuations math words
-parser.notes ;
+USING: accessors arrays assocs combinators compiler.units
+continuations hashtables kernel math namespaces parser.notes
+sequences sets sorting splitting vectors vocabs words ;
 IN: vocabs.parser
 
 ERROR: no-word-error name ;

@@ -1,10 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic assocs kernel math namespaces
-sequences strings vectors words quotations io io.files
-io.pathnames combinators sorting splitting math.parser effects
-continuations checksums checksums.crc32 vocabs hashtables
-compiler.units io.encodings.utf8 accessors source-files.errors ;
+USING: accessors arrays assocs checksums checksums.crc32
+compiler.units continuations definitions io.encodings.utf8
+io.files io.pathnames kernel namespaces sequences
+source-files.errors strings words ;
 IN: source-files
 
 SYMBOL: source-files

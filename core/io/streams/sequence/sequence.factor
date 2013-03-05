@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences io io.streams.plain kernel accessors math math.order
-growable destructors combinators sequences.private io.private ;
+USING: accessors combinators destructors growable io io.private
+io.streams.plain kernel math math.order sequences
+sequences.private ;
 IN: io.streams.sequence
 
 ! Readers

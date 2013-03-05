@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser math.order namespaces make
-sequences strings words assocs combinators accessors arrays
-quotations classes.algebra classes ;
+USING: accessors arrays classes combinators kernel make math
+math.order math.parser sequences strings words ;
 IN: effects
 
 TUPLE: effect
