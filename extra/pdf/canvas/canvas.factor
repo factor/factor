@@ -106,10 +106,10 @@ foreground background page-color inset line-height metrics ;
     [ 0 >>x ] dip [ dup line-break ] times drop ;
 
 : avail-width ( canvas -- n )
-    [ width ] [ x>> ] bi - 0 max ;
+    [ width ] [ x>> ] bi [-] ;
 
 : avail-height ( canvas -- n )
-    [ height ] [ y>> ] bi - 0 max ;
+    [ height ] [ y>> ] bi [-] ;
 
 : avail-lines ( canvas -- n )
     [ avail-height ] [ line-height>> ] bi /i ; ! FIXME: 1 +
