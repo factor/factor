@@ -106,9 +106,23 @@ INSTANCE: sliced-clumps abstract-clumps
         ] if
     ] if ; inline
 
-: all-equal? ( seq -- ? ) [ = ] monotonic? ;
+: all-equal? ( seq -- ? )
+    dup length dup 2 < [ 2drop t ] [
+        2 = [
+            first2-unsafe =
+        ] [
+            dup first-unsafe [ = ] curry all?
+        ] if
+    ] if ;
 
-: all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
+: all-eq? ( seq -- ? )
+    dup length dup 2 < [ 2drop t ] [
+        2 = [
+            first2-unsafe eq?
+        ] [
+            dup first-unsafe [ eq? ] curry all?
+        ] if
+    ] if ;
 
 TUPLE: circular-slice { from read-only } { to read-only } { seq read-only } ;
 
