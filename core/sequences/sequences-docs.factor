@@ -59,11 +59,11 @@ HELP: immutable
 
 HELP: new-sequence
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a mutable sequence" } }
-{ $contract "Outputs a mutable sequence of length " { $snippet "n" } " which can hold the elements of " { $snippet "seq" } ". The initial contents of the sequence are undefined." } ;
+{ $contract "Outputs a mutable sequence of length " { $snippet "len" } " which can hold the elements of " { $snippet "seq" } ". The initial contents of the sequence are undefined." } ;
 
 HELP: new-resizable
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a resizable mutable sequence" } }
-{ $contract "Outputs a resizable mutable sequence with an initial capacity of " { $snippet "n" } " elements and zero length, which can hold the elements of " { $snippet "seq" } "." }
+{ $contract "Outputs a resizable mutable sequence with an initial capacity of " { $snippet "len" } " elements and zero length, which can hold the elements of " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences ;" "300 V{ } new-resizable ." "V{ }" }
     { $example "USING: prettyprint sequences ;" "300 SBUF\" \" new-resizable ." "SBUF\" \"" }
