@@ -58,7 +58,7 @@ total-births total-deaths ;
     } cleave 100 /i 1 + ;
 
 : #starved ( game -- n )
-    [ population>> ] [ feed>> 20 /i ] bi - 0 max ;
+    [ population>> ] [ feed>> 20 /i ] bi [-] ;
 
 : leave-fink ( -- )
     "DUE TO THIS EXTREME MISMANAGEMENT YOU HAVE NOT ONLY" print

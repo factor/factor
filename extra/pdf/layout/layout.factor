@@ -256,7 +256,7 @@ M: table-row pdf-render
     ] each widths >alist sort-keys values
 
     ! make last cell larger
-    dup sum 400 swap - 0 max [ + ] curry dupd change-last
+    dup sum 400 swap [-] [ + ] curry dupd change-last
 
     ! size down each column
     dup sum dup 400 > [ 400 swap / [ * ] curry map ] [ drop ] if ;
