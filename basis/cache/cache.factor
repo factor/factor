@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs math accessors destructors fry sequences ;
+USING: accessors assocs continuations destructors fry kernel
+make math sequences ;
 IN: cache
 
 TUPLE: cache-assoc < disposable assoc max-age ;
@@ -26,9 +27,7 @@ M: cache-assoc set-at
     assoc>> set-at ;
 
 M: cache-assoc clear-assoc
-    [ assoc>> values dispose-each ]
-    [ assoc>> clear-assoc ]
-    bi ;
+    assoc>> [ values dispose-each ] [ clear-assoc ] bi ;
 
 M: cache-assoc >alist assoc>> [ value>> ] { } assoc-map-as ;
 
@@ -39,7 +38,9 @@ M: cache-assoc dispose* clear-assoc ;
 PRIVATE>
 
 : purge-cache ( cache -- )
-    dup max-age>> '[
-        [ nip [ 1 + ] change-age age>> _ < ] assoc-partition
-        values dispose-each
-    ] change-assoc drop ;
+    [ assoc>> ] [ max-age>> ] bi '[
+        [
+            nip dup age>> 1 + [ >>age ] keep
+            _ < [ drop t ] [ dispose, f ] if
+        ] assoc-filter! drop
+    ] { } make [ last rethrow ] unless-empty ;
