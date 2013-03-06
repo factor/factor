@@ -97,32 +97,18 @@ INSTANCE: sliced-clumps abstract-clumps
 : clump ( seq n -- array ) <clumps> { } like ;
 
 : monotonic? ( seq quot: ( elt1 elt2 -- ? ) -- ? )
-    over length 2 < [ 2drop t ] [
-        over length 2 = [
+    over length dup 2 < [ 3drop t ] [
+        2 = [
             [ first2-unsafe ] dip call
         ] [
-            [ 2 <sliced-clumps> ] dip
-            '[ first2-unsafe @ ] all?
+            [ [ first-unsafe 1 ] [ ((each)) ] bi ] dip
+            '[ @ _ keep swap ] (all-integers?) nip
         ] if
     ] if ; inline
 
-: all-equal? ( seq -- ? )
-    dup length dup 2 < [ 2drop t ] [
-        2 = [
-            first2-unsafe =
-        ] [
-            dup first-unsafe [ = ] curry all?
-        ] if
-    ] if ;
+: all-equal? ( seq -- ? ) [ = ] monotonic? ;
 
-: all-eq? ( seq -- ? )
-    dup length dup 2 < [ 2drop t ] [
-        2 = [
-            first2-unsafe eq?
-        ] [
-            dup first-unsafe [ eq? ] curry all?
-        ] if
-    ] if ;
+: all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
 
 TUPLE: circular-slice { from read-only } { to read-only } { seq read-only } ;
 
