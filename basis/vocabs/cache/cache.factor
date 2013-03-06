@@ -7,7 +7,7 @@ IN: vocabs.cache
 
 : reset-cache ( vocab -- )
     vocab-name
-    [ root-cache get-global delete-at ]
+    [ root-cache get delete-at ]
     [
         \ vocab-file-contents "memoize" word-prop swap
         '[ drop first vocab-name _ = not ] assoc-filter! drop
