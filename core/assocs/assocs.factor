@@ -50,7 +50,7 @@ M: assoc assoc-like drop ; inline
 PRIVATE>
 
 : assoc-find ( ... assoc quot: ( ... key value -- ... ? ) -- ... key value ? )
-    (assoc-each) find swap [ first2 t ] [ drop f f f ] if ; inline
+    (assoc-each) find swap [ first2-unsafe t ] [ drop f f f ] if ; inline
 
 : key? ( key assoc -- ? ) at* nip ; inline
 
@@ -58,7 +58,7 @@ PRIVATE>
     (assoc-each) each ; inline
 
 : assoc>map ( ... assoc quot: ( ... key value -- ... elt ) exemplar -- ... seq )
-    [ >alist ] 2dip [ [ first2 ] prepose ] dip map-as ; inline
+    [ (assoc-each) ] dip map-as ; inline
 
 : assoc-map-as ( ... assoc quot: ( ... key value -- ... newkey newvalue ) exemplar -- ... newassoc )
     [ [ 2array ] compose { } assoc>map ] dip assoc-like ; inline
