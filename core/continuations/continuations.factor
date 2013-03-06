@@ -28,10 +28,14 @@ SYMBOL: restarts
 
 : catchstack ( -- catchstack ) catchstack* clone ; inline
 
-: set-catchstack ( catchstack -- )
-    >vector CONTEXT-OBJ-CATCHSTACK set-context-object ; inline
+: (set-catchstack) ( catchstack -- )
+    CONTEXT-OBJ-CATCHSTACK set-context-object ; inline
 
-: init-catchstack ( -- ) f set-catchstack ;
+: set-catchstack ( catchstack -- )
+    >vector (set-catchstack) ; inline
+
+: init-catchstack ( -- )
+    V{ } clone (set-catchstack) ;
 
 PRIVATE>
 
