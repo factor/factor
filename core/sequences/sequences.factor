@@ -291,8 +291,9 @@ C: <copy> copy-state
     [ [ dst-i>> + ] [ dst>> ] bi set-nth-unsafe ] 2bi ; inline
 
 : (copy) ( n copy -- dst )
-    over 0 <= [ nip dst>> ] [ [ 1 - ] dip [ ((copy)) ] [ (copy) ] 2bi ] if ;
-    inline recursive
+    over 0 <= [ nip dst>> ] [
+        [ 1 - ] dip [ ((copy)) ] [ (copy) ] 2bi
+    ] if ; inline recursive
 
 : subseq>copy ( from to seq -- n copy )
     [ over - check-length swap ] dip
@@ -304,6 +305,10 @@ C: <copy> copy-state
 : check-copy ( src n dst -- src n dst )
     3dup bounds-check-head
     [ swap length + ] dip lengthen ; inline
+
+: copy-unsafe ( src i dst -- )
+    #! The check-length call forces partial dispatch
+    [ [ length check-length 0 ] keep ] 2dip <copy> (copy) drop ; inline
 
 PRIVATE>
 
@@ -323,12 +328,10 @@ PRIVATE>
 : but-last ( seq -- headseq ) 1 head* ;
 
 : copy ( src i dst -- )
-    #! The check-length call forces partial dispatch
-    [ [ length check-length 0 ] keep ] 2dip
-    check-copy <copy> (copy) drop ; inline
+    check-copy copy-unsafe ; inline
 
 M: sequence clone-like
-    [ dup length ] dip new-sequence [ 0 swap copy ] keep ; inline
+    [ dup length ] dip new-sequence [ 0 swap copy-unsafe ] keep ; inline
 
 M: immutable-sequence clone-like like ; inline
 
@@ -337,8 +340,8 @@ M: immutable-sequence clone-like like ; inline
 <PRIVATE
 
 : (append) ( seq1 seq2 accum -- accum )
-    [ [ over length ] dip copy ]
-    [ 0 swap copy ]
+    [ [ over length ] dip copy-unsafe ]
+    [ 0 swap copy-unsafe ]
     [ ] tri ; inline
 
 PRIVATE>
@@ -349,7 +352,7 @@ PRIVATE>
 
 : 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
     [ 3dup [ length ] tri@ + + ] dip [
-        [ [ 2over [ length ] bi@ + ] dip copy ]
+        [ [ 2over [ length ] bi@ + ] dip copy-unsafe ]
         [ (append) ] bi
     ] new-like ; inline
 
@@ -687,13 +690,13 @@ PRIVATE>
 
 : prefix ( seq elt -- newseq )
     over [ over length 1 + ] dip [
-        (1sequence) [ 1 swap copy ] keep
+        (1sequence) [ 1 swap copy-unsafe ] keep
     ] new-like ;
 
 : suffix ( seq elt -- newseq )
     over [ over length 1 + ] dip [
         [ [ over length ] dip set-nth-unsafe ] keep
-        [ 0 swap copy ] keep
+        [ 0 swap copy-unsafe ] keep
     ] new-like ;
 
 : suffix! ( seq elt -- seq ) over push ; inline
@@ -790,9 +793,9 @@ PRIVATE>
     ] keep ;
 
 : reverse ( seq -- newseq )
-    [
+     [
         dup [ length ] keep new-sequence
-        [ 0 swap copy ] keep reverse!
+        [ 0 swap copy-unsafe ] keep reverse!
     ] keep like ;
 
 : sum-lengths ( seq -- n )
@@ -818,7 +821,8 @@ PRIVATE>
     over empty? [ nip concat-as ] [
         [
             2dup joined-length over new-resizable [
-                [ [ push-all ] 2curry ] [ [ nip push-all ] 2curry ] 2bi
+                [ [ push-all ] 2curry ]
+                [ nip [ push-all ] curry ] 2bi
                 interleave
             ] keep
         ] dip like
