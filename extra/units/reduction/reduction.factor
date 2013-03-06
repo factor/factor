@@ -18,7 +18,7 @@ CONSTANT: unit-suffix-hash H{
 :: find-unit-suffix ( suffixes n multiplier base -- i/f )
     suffixes length
     [ [ n ] dip multiplier base threshhold < ] find-integer
-   suffixes length or 1 - 0 max ;
+   suffixes length or 1 [-] ;
 
 :: reduce-magnitude ( n multiplier base suffixes -- string )
     n 0 < [
