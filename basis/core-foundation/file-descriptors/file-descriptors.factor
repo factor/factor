@@ -27,7 +27,7 @@ FUNCTION: void CFFileDescriptorEnableCallBacks (
 
 : enable-all-callbacks ( fd -- )
     flags{ kCFFileDescriptorReadCallBack kCFFileDescriptorWriteCallBack }
-    CFFileDescriptorEnableCallBacks ;
+    CFFileDescriptorEnableCallBacks ; inline
 
 : <CFFileDescriptor> ( fd callback -- handle )
     [ f swap ] [ t swap ] bi* f CFFileDescriptorCreate
