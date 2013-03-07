@@ -52,7 +52,7 @@ PRIVATE>
     check-interval-map array>> [ value ] map ;
 
 : <interval-map> ( specification -- map )
-    all-intervals [ first second ] sort-with
+    all-intervals [ first-unsafe second-unsafe ] sort-with
     >intervals ensure-disjoint interval-map boa ;
 
 : <interval-set> ( specification -- map )
