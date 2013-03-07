@@ -107,6 +107,9 @@ PRIVATE>
 : colors-matching ( str -- seq )
     named-colors dup zip completions ;
 
+: strings-matching ( str seq -- seq' )
+    dup zip completions keys ;
+
 <PRIVATE
 
 : directory-paths ( directory -- alist )
