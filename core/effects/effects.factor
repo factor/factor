@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes combinators kernel make math
-math.order math.parser sequences strings words ;
+math.order math.parser sequences sequences.private strings words ;
 IN: effects
 
 TUPLE: effect
@@ -53,7 +53,7 @@ M: string effect>string ;
 M: object effect>string drop "object" ;
 M: word effect>string name>> ;
 M: integer effect>string number>string ;
-M: pair effect>string first2 [ effect>string ] bi@ ": " glue ;
+M: pair effect>string first2-unsafe [ effect>string ] bi@ ": " glue ;
 
 : stack-picture ( seq -- string )
     [ [ effect>string % CHAR: \s , ] each ] "" make ;
@@ -77,7 +77,7 @@ M: effect effect>string ( effect -- string )
 GENERIC: effect>type ( obj -- type )
 M: object effect>type drop object ;
 M: word effect>type ;
-M: pair effect>type second effect>type ;
+M: pair effect>type second-unsafe effect>type ;
 M: classoid effect>type ;
 
 : effect-in-types ( effect -- input-types )

@@ -65,7 +65,7 @@ M: integer (bitfield-quot) ( spec -- quot )
     [ swapd shift bitor ] curry ;
 
 M: pair (bitfield-quot) ( spec -- quot )
-    first2 over word? [ [ swapd execute ] dip ] [ ] ?
+    first2-unsafe over word? [ [ swapd execute ] dip ] [ ] ?
     [ shift bitor ] append 2curry ;
 
 PRIVATE>
