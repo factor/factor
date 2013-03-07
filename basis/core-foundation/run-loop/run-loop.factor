@@ -127,5 +127,5 @@ PRIVATE>
 
 : run-one-iteration ( nanos -- handled? )
     CFRunLoopDefaultMode
-    swap [ 1,000,000,000 / ] [ 300 ] if*
+    swap [ 1,000,000,000 /f ] [ 300 ] if*
     t CFRunLoopRunInMode kCFRunLoopRunHandledSource = ;
