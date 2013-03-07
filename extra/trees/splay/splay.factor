@@ -1,8 +1,7 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math namespaces sequences assocs parser
-trees generic math.order accessors prettyprint.custom
-trees.private combinators ;
+USING: accessors assocs combinators kernel math.order parser
+prettyprint.custom trees trees.private typed ;
 IN: trees.splay
 
 TUPLE: splay < tree ;
@@ -12,75 +11,75 @@ TUPLE: splay < tree ;
 
 <PRIVATE
 
-: rotate-right ( node -- node )
+TYPED: rotate-right ( node: node -- node )
     dup left>>
     [ right>> swap left<< ] 2keep
     [ right<< ] keep ;
 
-: rotate-left ( node -- node )
+TYPED: rotate-left ( node: node -- node )
     dup right>>
     [ left>> swap right<< ] 2keep
     [ left<< ] keep ;
 
-: link-right ( left right key node -- left right key node )
+TYPED: link-right ( left right key node: node -- left right key node )
     swap [ [ swap left<< ] 2keep
     nip dup left>> ] dip swap ;
 
-: link-left ( left right key node -- left right key node )
+TYPED: link-left ( left right key node: node -- left right key node )
     swap [ rot [ right<< ] 2keep
     drop dup right>> swapd ] dip swap ;
 
 : cmp ( key node -- obj node <=> )
-    2dup key>> <=> ;
+    2dup key>> <=> ; inline
 
 : lcmp ( key node -- obj node <=> ) 
-    2dup left>> key>> <=> ;
+    2dup left>> key>> <=> ; inline
 
 : rcmp ( key node -- obj node <=> ) 
-    2dup right>> key>> <=> ;
+    2dup right>> key>> <=> ; inline
 
 DEFER: (splay)
 
-: splay-left ( left right key node -- left right key node )
+TYPED: splay-left ( left right key node: node -- left right key node )
     dup left>> [
         lcmp +lt+ = [ rotate-right ] when
         dup left>> [ link-right (splay) ] when
     ] when ;
 
-: splay-right ( left right key node -- left right key node )
+TYPED: splay-right ( left right key node: node -- left right key node )
     dup right>> [
         rcmp +gt+ = [ rotate-left ] when
         dup right>> [ link-left (splay) ] when
     ] when ;
 
-: (splay) ( left right key node -- left right key node )
+TYPED: (splay) ( left right key node: node -- left right key node )
     cmp {
         { +lt+ [ splay-left ] }
         { +gt+ [ splay-right ] }
         { +eq+ [ ] }
     } case ;
 
-: assemble ( head left right node -- root )
+TYPED: assemble ( head left right node: node -- root )
     [ right>> swap left<< ] keep
     [ left>> swap right<< ] keep
     [ swap left>> swap right<< ] 2keep
     [ swap right>> swap left<< ] keep ;
 
-: splay-at ( key node -- node )
+TYPED: splay-at ( key node: node -- node )
     [ T{ node } clone dup dup ] 2dip
     (splay) nip assemble ;
 
-: do-splay ( key tree -- )
+TYPED: do-splay ( key tree: splay -- )
     [ root>> splay-at ] keep root<< ;
 
-: splay-split ( key tree -- node node )
+TYPED: splay-split ( key tree: splay -- node node )
     2dup do-splay root>> cmp +lt+ = [
         nip dup left>> swap f over left<<
     ] [
         nip dup right>> swap f over right<< swap
     ] if ;
 
-: get-splay ( key tree -- node ? )
+TYPED: get-splay ( key tree: splay -- node ? )
     2dup do-splay root>> cmp +eq+ = [
         nip t
     ] [
@@ -96,20 +95,20 @@ DEFER: (splay)
 : splay-join ( n2 n1 -- node )
     splay-largest [ [ right<< ] keep ] when* ;
 
-: remove-splay ( key tree -- )
+TYPED: remove-splay ( key tree: splay -- )
     2dup get-splay [
         dup right>> swap left>> splay-join
         >>root dec-count drop
     ] [ 3drop ] if ;
 
-: set-splay ( value key tree -- )
+TYPED: set-splay ( value key tree: splay -- )
     2dup get-splay [ 2nip value<< ] [
        drop dup inc-count
        2dup splay-split rot
        [ [ swapd ] dip node boa ] dip root<<
     ] if ;
 
-: new-root ( value key tree -- )
+TYPED: new-root ( value key tree: splay -- )
     1 >>count
     [ swap <node> ] dip root<< ;
 
