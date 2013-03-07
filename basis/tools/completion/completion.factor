@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: accessors arrays assocs colors.constants combinators
 combinators.short-circuit fry io.directories io.files
 io.files.info io.pathnames kernel locals make math math.order
-sequences sorting splitting unicode.categories unicode.data
-vectors vocabs vocabs.hierarchy ;
+sequences sequences.private sorting splitting typed
+unicode.categories unicode.data vectors vocabs vocabs.hierarchy
+;
 
 IN: tools.completion
 
@@ -21,7 +21,7 @@ IN: tools.completion
         [ accum swap 1 + t ] bi
     ] [
         f -1 f
-    ] if* ;
+    ] if* ; inline
 
 PRIVATE>
 
@@ -38,7 +38,7 @@ PRIVATE>
             [ drop ] [ nip V{ } clone pick push ] if
             1 +
         ] keep pick last push
-    ] each ;
+    ] each ; inline
 
 PRIVATE>
 
@@ -51,10 +51,10 @@ PRIVATE>
     {
         { [ over zero? ] [ 2drop 10 ] }
         { [ 2dup length 1 - number= ] [ 2drop 4 ] }
-        { [ 2dup [ 1 - ] dip nth Letter? not ] [ 2drop 10 ] }
-        { [ 2dup [ 1 + ] dip nth Letter? not ] [ 2drop 4 ] }
+        { [ 2dup [ 1 - ] dip nth-unsafe Letter? not ] [ 2drop 10 ] }
+        { [ 2dup [ 1 + ] dip nth-unsafe Letter? not ] [ 2drop 4 ] }
         [ 2drop 1 ]
-    } cond ;
+    } cond ; inline
 
 PRIVATE>
 
@@ -72,7 +72,7 @@ PRIVATE>
 : rank-completions ( results -- newresults )
     sort-keys <reversed>
     [ 0 [ first max ] reduce 3 /f ] keep
-    [ first < ] with filter
+    [ first-unsafe < ] with filter
     values ;
 
 : complete ( full short -- score )
@@ -81,10 +81,10 @@ PRIVATE>
     dupd fuzzy score max ;
 
 : completion ( short candidate -- result )
-    [ second swap complete ] keep 2array ;
+    [ second swap complete ] keep 2array ; inline
 
 : completion, ( short candidate -- )
-    completion dup first 0 > [ , ] [ drop ] if ;
+    completion dup first-unsafe 0 > [ , ] [ drop ] if ;
 
 : completions ( short candidates -- seq )
     [ ] [
@@ -158,7 +158,7 @@ PRIVATE>
     ] [
         swap harvest dup length 1 >
         [ 2 tail* ?first = ] [ 2drop f ] if
-    ] if ;
+    ] if ; inline
 
 PRIVATE>
 
