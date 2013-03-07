@@ -224,8 +224,14 @@ PRIVATE>
 : sift-as ( seq exemplar -- newseq )
     [ ] swap filter-as ;
 
+: sift! ( seq -- newseq )
+    [ ] filter! ;
+
 : harvest-as ( seq exemplar -- newseq )
     [ empty? not ] swap filter-as ;
+
+: harvest! ( seq -- newseq )
+    [ empty? not ] filter! ;
 
 : contains? ( seq elts -- ? )
     [ member? ] curry any? ; inline
