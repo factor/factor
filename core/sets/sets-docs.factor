@@ -26,6 +26,7 @@ ARTICLE: "set-operations" "Operations on sets"
     delete
     clear-set
     union!
+    diff!
 }
 "To test if a set is the empty set:"
 { $subsections null? }
@@ -166,6 +167,11 @@ HELP: union
 HELP: union!
 { $values { "set1" set } { "set2" set } }
 { $description "Adds all members from " { $snippet "set2" } " to " { $snippet "set1" } "." }
+{ $side-effects "set1" } ;
+
+HELP: diff!
+{ $values { "set1" set } { "set2" set } }
+{ $description "Removes all members from " { $snippet "set1" } " contained in " { $snippet "set2" } "." }
 { $side-effects "set1" } ;
 
 HELP: intersects?
