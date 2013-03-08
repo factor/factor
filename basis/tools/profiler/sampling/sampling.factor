@@ -143,7 +143,7 @@ PRIVATE>
 :: collect-flat ( samples -- flat )
     IH{ } clone :> per-word-samples
     samples [| sample |
-        sample sample-callstack unique keys [ ignore-word? not ] filter [
+        sample sample-callstack members [ ignore-word? not ] filter [
             per-word-samples sample counts+at
         ] each
     ] each
