@@ -45,12 +45,12 @@ M: insn compute-insn-defs 2drop ;
 M: vreg-insn compute-insn-defs
     defs-vregs [
         defs get [ conjoin-at ] [ drop ] [ at assoc-size 1 > ] 2tri
-        [ defs-multi get conjoin ] [ drop ] if
+        [ defs-multi get adjoin ] [ drop ] if
     ] with each ;
 
 : compute-defs ( cfg -- )
     H{ } clone defs set
-    H{ } clone defs-multi set
+    HS{ } clone defs-multi set
     [
         [ basic-block get ] dip
         [ compute-insn-defs ] with each
@@ -68,7 +68,8 @@ SYMBOL: inserting-phis
 
 : compute-phis ( -- )
     H{ } clone inserting-phis set
-    defs-multi get defs get '[ _ at compute-phis-for ] assoc-each ;
+    defs-multi get members
+    defs get '[ dup _ at compute-phis-for ] each ;
 
 ! Maps vregs to ##phi instructions
 SYMBOL: phis
@@ -86,9 +87,9 @@ SYMBOLS: stacks pushed ;
 
 : gen-name ( vreg -- vreg' )
     [ next-vreg dup ] dip
-    dup pushed get 2dup key?
+    dup pushed get 2dup in?
     [ 2drop stacks get at set-last ]
-    [ conjoin stacks get push-at ]
+    [ adjoin stacks get push-at ]
     if ;
 
 : (top-name) ( vreg -- vreg' )
@@ -131,10 +132,10 @@ M: vreg-insn rename-insn
     [ successors>> ] keep '[ _ rename-successor-phis ] each ;
 
 : pop-stacks ( -- )
-    pushed get stacks get '[ drop _ at pop* ] assoc-each ;
+    pushed get members stacks get '[ _ at pop* ] each ;
 
 : rename-in-block ( bb -- )
-    H{ } clone pushed set
+    HS{ } clone pushed set
     {
         [ rename-phis ]
         [ rename-insns ]
@@ -155,15 +156,15 @@ M: vreg-insn rename-insn
 SYMBOL: live-phis
 
 : live-phi? ( ##phi -- ? )
-    dst>> live-phis get key? ;
+    dst>> live-phis get in? ;
 
 : compute-live-phis ( -- )
-    H{ } clone live-phis set
+    HS{ } clone live-phis set
     used-vregs get [
         phis get at [
             [
                 dst>>
-                [ live-phis get conjoin ]
+                [ live-phis get adjoin ]
                 [ phis get delete-at ]
                 bi
             ]
