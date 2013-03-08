@@ -123,3 +123,6 @@ M: null-set members drop f ;
 [ t ] [ { } set? ] unit-test
 [ t ] [ 5 <bit-set> set? ] unit-test
 [ f ] [ H{ } set? ] unit-test
+
+[ HS{ } ] [ HS{ } [ clear-set ] keep ] unit-test
+[ HS{ } ] [ HS{ 1 2 3 } [ clear-set ] keep ] unit-test
