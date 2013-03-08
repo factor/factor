@@ -27,18 +27,18 @@ SYMBOLS: visited active ;
 DEFER: find-loop-headers
 
 : visit-edge ( from to -- )
-    dup active get key?
+    dup active get in?
     [ record-back-edge ]
     [ nip find-loop-headers ]
     if ;
 
 : find-loop-headers ( bb -- )
-    dup visited get key? [ drop ] [
+    dup visited get in? [ drop ] [
         {
-            [ visited get conjoin ]
-            [ active get conjoin ]
+            [ visited get adjoin ]
+            [ active get adjoin ]
             [ dup successors>> [ visit-edge ] with each ]
-            [ active get delete-at ]
+            [ active get delete ]
         } cleave
     ] if ;
 
@@ -70,8 +70,8 @@ SYMBOL: loop-nesting
 : detect-loops ( cfg -- cfg' )
     needs-predecessors
     H{ } clone loops set
-    H{ } clone visited set
-    H{ } clone active set
+    HS{ } clone visited set
+    HS{ } clone active set
     H{ } clone loop-nesting set
     dup entry>> find-loop-headers process-loop-headers compute-loop-nesting ;
 
