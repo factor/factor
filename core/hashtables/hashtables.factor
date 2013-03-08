@@ -87,8 +87,11 @@ TUPLE: hashtable
     2 fixnum+fast [ set-slot ] 2keep
     1 fixnum+fast set-slot ; inline
 
-: (rehash) ( hash alist -- )
-    swap [ swapd dupd new-key@ set-nth-pair ] curry assoc-each ; inline
+: (set-at) ( value key hash -- )
+    dupd new-key@ set-nth-pair ; inline
+
+: (rehash) ( alist hash -- )
+    [ swapd (set-at) ] curry assoc-each ; inline
 
 : hash-large? ( hash -- ? )
     [ count>> 3 fixnum*fast 1 fixnum+fast ]
@@ -99,7 +102,7 @@ TUPLE: hashtable
         [ >alist { array } declare ]
         [ assoc-size 1 + ]
         [ reset-hash ] tri
-    ] keep swap (rehash) ;
+    ] keep (rehash) ;
 
 : ?grow-hash ( hash -- )
     dup hash-large? [ grow-hash ] [ drop ] if ; inline
@@ -127,10 +130,10 @@ M: hashtable assoc-size ( hash -- n )
     [ count>> ] [ deleted>> ] bi - ; inline
 
 : rehash ( hash -- )
-    dup >alist [ dup clear-assoc ] dip (rehash) ;
+    [ >alist ] [ clear-assoc ] [ (rehash) ] tri ;
 
 M: hashtable set-at ( value key hash -- )
-    dup ?grow-hash dupd new-key@ set-nth-pair ;
+    dup ?grow-hash (set-at) ;
 
 : associate ( value key -- hash )
     1 <hashtable> [ set-at ] keep ; inline
@@ -168,7 +171,7 @@ M: assoc new-assoc drop <hashtable> ; inline
 M: f new-assoc drop <hashtable> ; inline
 
 : >hashtable ( assoc -- hashtable )
-    H{ } assoc-clone-like ;
+    [ >alist ] [ assoc-size <hashtable> ] bi [ (rehash) ] keep ;
 
 M: hashtable assoc-like
     drop dup hashtable? [ >hashtable ] unless ; inline
