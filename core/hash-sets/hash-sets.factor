@@ -103,6 +103,9 @@ M: hash-set delete ( key hash -- )
 M: hash-set cardinality ( hash -- n )
     [ count>> ] [ deleted>> ] bi - ; inline
 
+: rehash ( hash -- )
+    [ members ] [ clear-set ] [ (rehash) ] tri ;
+
 M: hash-set adjoin ( key hash -- )
     dup ?grow-hash (adjoin) ;
 
