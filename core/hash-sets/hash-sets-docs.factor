@@ -2,7 +2,7 @@ USING: help.markup help.syntax math sequences ;
 IN: hash-sets
 
 ARTICLE: "hash-sets" "Hash sets"
-"The " { $vocab-link "hash-sets" } " vocabulary implements hashtable-backed sets. Hash sets form a class:"
+"The " { $vocab-link "hash-sets" } " vocabulary implements hashtable-like sets. Hash sets form a class:"
 { $subsections hash-set }
 "Constructing new hash sets:"
 { $subsections <hash-set> >hash-set }
@@ -11,7 +11,7 @@ ARTICLE: "hash-sets" "Hash sets"
 ABOUT: "hash-sets"
 
 HELP: hash-set
-{ $class-description "The class of hashtable-based sets. These implement the " { $link "sets" } "." } ;
+{ $class-description "The class of hashtable-like sets. These implement the " { $link "sets" } "." } ;
 
 HELP: <hash-set>
 { $values { "capacity" number } { "hash-set" hash-set } }

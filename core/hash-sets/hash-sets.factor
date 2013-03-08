@@ -83,16 +83,16 @@ TUPLE: hash-set
 
 PRIVATE>
 
-: <hash-set> ( n -- hash )
+: <hash-set> ( capacity -- hash-set )
     hash-set new [ reset-hash ] keep ; inline
 
-M: hash-set in? ( key hash -- ? )
+M: hash-set in?
      key@ 2nip ;
 
-M: hash-set clear-set ( hash -- )
+M: hash-set clear-set
     [ init-hash ] [ array>> [ drop ((empty)) ] map! drop ] bi ;
 
-M: hash-set delete ( key hash -- )
+M: hash-set delete
     [ nip ] [ key@ ] 2bi [
         [ ((tombstone)) ] 2dip set-nth-item
         hash-deleted+
@@ -100,13 +100,13 @@ M: hash-set delete ( key hash -- )
         3drop
     ] if ;
 
-M: hash-set cardinality ( hash -- n )
+M: hash-set cardinality
     [ count>> ] [ deleted>> ] bi - ; inline
 
-: rehash ( hash -- )
+: rehash ( hash-set -- )
     [ members ] [ clear-set ] [ (rehash) ] tri ;
 
-M: hash-set adjoin ( key hash -- )
+M: hash-set adjoin ( key hash-set -- )
     dup ?grow-hash (adjoin) ;
 
 <PRIVATE
