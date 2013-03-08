@@ -5,7 +5,7 @@ assocs fry compiler.cfg compiler.cfg.instructions ;
 FROM: namespaces => set ;
 IN: compiler.cfg.rpo
 
-: post-order-traversal ( visited bb -- visited' )
+: post-order-traversal ( visited bb -- visited )
     dup pick in? [ drop ] [
         dup pick adjoin
         [
