@@ -52,7 +52,7 @@ CONSTANT: object-info T{ value-info f object full-interval }
         } cond
     ] if ;
 
-: <value-info> ( -- info ) \ value-info new ;
+: <value-info> ( -- info ) \ value-info new ; inline
 
 DEFER: <literal-info>
 
