@@ -12,7 +12,7 @@ SYMBOL: loops
 <PRIVATE
 
 : <natural-loop> ( header index -- loop )
-    H{ } clone H{ } clone natural-loop boa ;
+    HS{ } clone H{ } clone natural-loop boa ;
 
 : lookup-header ( header -- loop )
     loops get [
@@ -22,12 +22,12 @@ SYMBOL: loops
 SYMBOLS: visited active ;
 
 : record-back-edge ( from to -- )
-    lookup-header ends>> conjoin ;
+    lookup-header ends>> adjoin ;
 
 DEFER: find-loop-headers
 
-: visit-edge ( from to -- )
-    dup active get in?
+: visit-edge ( from to active -- )
+    dupd in?
     [ record-back-edge ]
     [ nip find-loop-headers ]
     if ;
@@ -37,7 +37,7 @@ DEFER: find-loop-headers
         {
             [ visited get adjoin ]
             [ active get adjoin ]
-            [ dup successors>> [ visit-edge ] with each ]
+            [ dup successors>> active get '[ _ visit-edge ] with each ]
             [ active get delete ]
         } cleave
     ] if ;
@@ -54,7 +54,7 @@ SYMBOL: work-list
     ] if ;
 
 : process-loop-ends ( loop -- )
-    [ ends>> keys <dlist> [ push-all-front ] [ work-list set ] [ ] tri ] keep
+    [ ends>> members <dlist> [ push-all-front ] [ work-list set ] [ ] tri ] keep
     '[ _ process-loop-block ] slurp-deque ;
 
 : process-loop-headers ( -- )
