@@ -68,9 +68,9 @@ M: node node-call-graph 2drop ;
 
 SYMBOLS: not-loops recursive-nesting ;
 
-: not-a-loop ( label -- ) not-loops get conjoin ;
+: not-a-loop ( label -- ) not-loops get adjoin ;
 
-: not-a-loop? ( label -- ? ) not-loops get key? ;
+: not-a-loop? ( label -- ? ) not-loops get in? ;
 
 : non-tail-calls ( call-graph-node -- seq )
     calls>> [ tail?>> not ] filter ;
@@ -112,7 +112,7 @@ SYMBOL: changed?
     inline recursive
 
 : detect-loops ( call-graph -- )
-    H{ } clone not-loops set
+    HS{ } clone not-loops set
     V{ } clone recursive-nesting set
     [ visit-back-edges ]
     [ '[ _ detect-cross-frame-calls ] while-changing ]
