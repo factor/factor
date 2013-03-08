@@ -94,7 +94,12 @@ M: hashtable random
 
 M: sets:set random members random ;
 
-M: hash-set random table>> random first ;
+M: hash-set random
+    dup cardinality [ drop f ] [
+        [ 0 ] [ array>> ] [ random ] tri* 1 + [
+            [ 2dup array-nth tombstone? [ 1 + ] 2dip ] loop
+        ] times [ 1 - ] dip array-nth
+    ] if-zero ;
 
 : randomize-n-last ( seq n -- seq )
     [ dup length dup ] dip - 1 max '[ dup _ > ]
