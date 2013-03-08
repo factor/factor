@@ -3,6 +3,7 @@
 USING: accessors assocs combinators definitions graphs kernel
 make namespaces quotations sequences sets words words.symbol ;
 FROM: namespaces => set ;
+QUALIFIED: sets
 IN: classes
 
 ERROR: bad-inheritance class superclass ;
@@ -133,7 +134,7 @@ GENERIC: implementors ( class/classes -- seq )
 
 : class-usages ( class -- seq ) [ class-usage ] closure keys ;
 
-M: class implementors implementors-map get at keys ;
+M: class implementors implementors-map get at sets:members ;
 
 M: sequence implementors [ implementors ] gather ;
 
@@ -146,7 +147,7 @@ M: sequence implementors [ implementors ] gather ;
     dup class-uses update-map get remove-vertex ;
 
 : implementors-map+ ( class -- )
-    [ H{ } clone ] dip implementors-map get set-at ;
+    [ HS{ } clone ] dip implementors-map get set-at ;
 
 : implementors-map- ( class -- )
     implementors-map get delete-at ;

@@ -140,7 +140,7 @@ M: anonymous-intersection implementor-classes participants>> ;
     [ swap implementor-classes [ implementors-map get at ] map ] dip call ; inline
 
 : reveal-method ( method classes generic -- )
-    [ [ [ conjoin ] with each ] with-implementors ]
+    [ [ [ adjoin ] with each ] with-implementors ]
     [ [ set-at ] with-methods ]
     2bi ;
 
@@ -176,8 +176,8 @@ M: method forget*
                 ] keep eq?
                 [
                     [ [ delete-at ] with-methods ]
-                    [ [ [ delete-at ] with each ] with-implementors ] 2bi
-                    reset-caches
+                    [ [ [ delete ] with each ] with-implementors ]
+                    2bi reset-caches
                 ] [ 2drop ] if
             ] if
         ]
