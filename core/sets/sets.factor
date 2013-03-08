@@ -159,6 +159,10 @@ M: sequence clear-set
 : union! ( set1 set2 -- set1 )
     ?members over [ adjoin ] curry each ;
 
+: diff! ( set1 set2 -- set1 )
+    dupd sequence/tester [ dup ] prepose pick
+    [ delete ] curry [ [ drop ] if ] curry compose each ;
+
 ! Temporarily for compatibility
 
 : unique ( seq -- assoc )
