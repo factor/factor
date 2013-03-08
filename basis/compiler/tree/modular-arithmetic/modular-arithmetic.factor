@@ -54,19 +54,19 @@ cell 8 = [
 SYMBOL: modular-values
 
 : modular-value? ( value -- ? )
-    modular-values get key? ;
+    modular-values get in? ;
 
 : modular-value ( value -- )
-    modular-values get conjoin ;
+    modular-values get adjoin ;
 
 ! Values which are known to be fixnums.
 SYMBOL: fixnum-values
 
 : fixnum-value? ( value -- ? )
-    fixnum-values get key? ;
+    fixnum-values get in? ;
 
 : fixnum-value ( value -- )
-    fixnum-values get conjoin ;
+    fixnum-values get adjoin ;
 
 GENERIC: compute-modular-candidates* ( node -- )
 
@@ -103,8 +103,8 @@ M: node compute-modular-candidates*
     drop ;
 
 : compute-modular-candidates ( nodes -- )
-    H{ } clone modular-values set
-    H{ } clone fixnum-values set
+    HS{ } clone modular-values set
+    HS{ } clone fixnum-values set
     [ compute-modular-candidates* ] each-node ;
 
 GENERIC: only-reads-low-order? ( node -- ? )
@@ -126,9 +126,9 @@ SYMBOL: changed?
     actually-used-by [ node>> only-reads-low-order? ] all? ;
 
 : (compute-modular-values) ( -- )
-    modular-values get keys [
+    modular-values get members [
         dup only-used-as-low-order?
-        [ drop ] [ modular-values get delete-at changed? on ] if
+        [ drop ] [ modular-values get delete changed? on ] if
     ] each ;
 
 : compute-modular-values ( -- )
@@ -203,6 +203,6 @@ M: node optimize-modular-arithmetic* ;
 
 : optimize-modular-arithmetic ( nodes -- nodes' )
     dup compute-modular-candidates compute-modular-values
-    modular-values get assoc-empty? [
+    modular-values get null? [
         [ optimize-modular-arithmetic* ] map-nodes
     ] unless ;
