@@ -16,7 +16,7 @@ IN: compiler.cfg.alias-analysis
 
 ! We try to eliminate redundant slot operations using some
 ! simple heuristics.
-! 
+!
 ! All heap-allocated objects which are loaded from the stack, or
 ! other object slots are pessimistically assumed to belong to
 ! the same alias class.
@@ -24,10 +24,10 @@ IN: compiler.cfg.alias-analysis
 ! Freshly-allocated objects get their own alias class.
 !
 ! Simple pseudo-C example showing load elimination:
-! 
+!
 ! int *x, *y, z: inputs
 ! int a, b, c, d, e: locals
-! 
+!
 ! Before alias analysis:
 !
 ! a = x[2]
@@ -314,7 +314,7 @@ M: insn eliminate-dead-stores drop t ;
     acs>vregs get clear-assoc
     live-slots get clear-assoc
     copies get clear-assoc
-    dead-stores get table>> clear-assoc
+    dead-stores get clear-set
 
     next-ac heap-ac set
     ##vm-field set-new-ac
