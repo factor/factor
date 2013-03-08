@@ -2,8 +2,9 @@
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.units
-continuations hashtables kernel math namespaces parser.notes
-sequences sets sorting splitting vectors vocabs words ;
+continuations hash-sets hashtables kernel math namespaces
+parser.notes sequences sets sorting splitting vectors vocabs
+words ;
 IN: vocabs.parser
 
 ERROR: no-word-error name ;
@@ -22,14 +23,14 @@ ERROR: no-word-error name ;
 
 TUPLE: manifest
 current-vocab
-{ search-vocab-names hashtable }
+{ search-vocab-names hash-set }
 { search-vocabs vector }
 { qualified-vocabs vector }
 { auto-used vector } ;
 
 : <manifest> ( -- manifest )
     manifest new
-        H{ } clone >>search-vocab-names
+        HS{ } clone >>search-vocab-names
         V{ } clone >>search-vocabs
         V{ } clone >>qualified-vocabs
         V{ } clone >>auto-used ;
@@ -104,14 +105,14 @@ TUPLE: no-current-vocab-error ;
     [ set-current-vocab ] [ drop ] if ;
 
 : using-vocab? ( vocab -- ? )
-    vocab-name manifest get search-vocab-names>> key? ;
+    vocab-name manifest get search-vocab-names>> in? ;
 
 : use-vocab ( vocab -- )
     dup using-vocab?
     [ vocab-name "Already using ``" "'' vocabulary" surround note. ] [
         manifest get
         [ [ load-vocab ] dip search-vocabs>> push ]
-        [ [ vocab-name ] dip search-vocab-names>> conjoin ]
+        [ [ vocab-name ] dip search-vocab-names>> adjoin ]
         2bi
     ] if ;
 
@@ -124,7 +125,7 @@ TUPLE: no-current-vocab-error ;
     dup using-vocab? [
         manifest get
         [ [ load-vocab ] dip search-vocabs>> remove-eq! drop ]
-        [ [ vocab-name ] dip search-vocab-names>> delete-at ]
+        [ [ vocab-name ] dip search-vocab-names>> delete ]
         2bi
     ] [ drop ] if ;
 
@@ -222,8 +223,8 @@ M: vocab update dup name>> lookup-vocab eq? ;
 
 : update-manifest ( manifest -- )
     [ dup [ name>> lookup-vocab ] when ] change-current-vocab
-    [ [ drop lookup-vocab ] assoc-filter ] change-search-vocab-names
-    dup search-vocab-names>> keys [ lookup-vocab ] V{ } map-as >>search-vocabs
+    [ members [ lookup-vocab ] filter dup fast-set ] change-search-vocab-names
+    swap [ lookup-vocab ] V{ } map-as >>search-vocabs
     qualified-vocabs>> [ update ] filter! drop ;
 
 M: manifest definitions-changed ( assoc manifest -- )
