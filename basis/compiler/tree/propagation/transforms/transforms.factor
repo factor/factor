@@ -9,7 +9,7 @@ math.integers.private layouts math.order vectors hashtables
 combinators effects generalizations sequences.generalizations
 assocs sets combinators.short-circuit sequences.private locals
 growable stack-checker namespaces compiler.tree.propagation.info
-;
+hash-sets ;
 FROM: math => float ;
 FROM: sets => set ;
 IN: compiler.tree.propagation.transforms
@@ -157,7 +157,7 @@ IN: compiler.tree.propagation.transforms
     in-d>> first value-info literal>> {
         { V{ } [ [ drop { } 0 vector boa ] ] }
         { H{ } [ [ drop 0 <hashtable> ] ] }
-        { HS{ } [ [ drop f fast-set ] ] }
+        { HS{ } [ [ drop 0 <hash-set> ] ] }
         [ drop f ]
     } case
 ] "custom-inlining" set-word-prop
