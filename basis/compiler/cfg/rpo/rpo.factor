@@ -5,16 +5,14 @@ assocs fry compiler.cfg compiler.cfg.instructions ;
 FROM: namespaces => set ;
 IN: compiler.cfg.rpo
 
-SYMBOL: visited
-
-: post-order-traversal ( bb -- )
-    dup visited get key? [ drop ] [
-        dup visited get conjoin
+: post-order-traversal ( visited bb -- visited' )
+    dup pick in? [ drop ] [
+        dup pick adjoin
         [
             successors>> <reversed>
             [ post-order-traversal ] each
         ] [ , ] bi
-    ] if ;
+    ] if ; inline recursive
 
 : number-blocks ( blocks -- )
     dup length iota <reversed>
@@ -23,8 +21,8 @@ SYMBOL: visited
 : post-order ( cfg -- blocks )
     dup post-order>> [ ] [
         [
-            H{ } clone visited set
-            dup entry>> post-order-traversal
+            HS{ } clone over entry>>
+            post-order-traversal drop
         ] { } make dup number-blocks
         >>post-order post-order>>
     ] ?if ;

@@ -15,15 +15,15 @@ TUPLE: real-usage value node ;
 SYMBOLS: visited accum ;
 
 : if-not-visited ( value quot -- )
-    over visited get key?
-    [ 2drop ] [ over visited get conjoin call ] if ; inline
+    over visited get in?
+    [ 2drop ] [ over visited get adjoin call ] if ; inline
 
 : with-simplified-def-use ( quot -- real-usages )
     [
-        H{ } clone visited set
-        H{ } clone accum set
+        HS{ } clone visited set
+        HS{ } clone accum set
         call
-        accum get keys
+        accum get members
     ] with-scope ; inline
 
 PRIVATE>
@@ -54,7 +54,7 @@ M: #phi actually-defined-by*
     ] with each ;
 
 M: node actually-defined-by*
-    real-usage boa accum get conjoin ;
+    real-usage boa accum get adjoin ;
 
 : actually-defined-by ( value -- real-usages )
     [ (actually-defined-by) ] with-simplified-def-use ;
@@ -88,7 +88,7 @@ M: #phi actually-used-by*
 M: #recursive actually-used-by* 2drop ;
 
 M: node actually-used-by*
-    real-usage boa accum get conjoin ;
+    real-usage boa accum get adjoin ;
 
 : actually-used-by ( value -- real-usages )
     [ (actually-used-by) ] with-simplified-def-use ;
