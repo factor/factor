@@ -25,6 +25,7 @@ ARTICLE: "set-operations" "Operations on sets"
     adjoin
     delete
     clear-set
+    union!
 }
 "To test if a set is the empty set:"
 { $subsections null? }
@@ -148,6 +149,10 @@ HELP: intersect
     { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } intersect ." "{ 2 3 }" }
 } ;
 
+HELP: intersection
+{ $values { "sets" sequence } { "set/f" "a " { $link set } " or " { $link f } } }
+{ $description "Outputs the intersection of all the sets of the sequence " { $snippet "sets" } ", or " { $link f } " if " { $snippet "sets" } " is empty." } ;
+
 HELP: union
 { $values { "set1" set } { "set2" set } { "set" set } }
 { $description "Outputs a set consisting of elements present in either " { $snippet "set1" } " or " { $snippet "set2" } " which does not contain duplicate values."
@@ -157,6 +162,11 @@ HELP: union
 } ;
 
 { diff intersect union } related-words
+
+HELP: union!
+{ $values { "set1" set } { "set2" set } }
+{ $description "Adds all members from " { $snippet "set2" } " to " { $snippet "set1" } "." }
+{ $side-effects "set1" } ;
 
 HELP: intersects?
 { $values { "set1" set } { "set2" set } { "?" "a boolean" } }

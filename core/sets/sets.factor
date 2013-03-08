@@ -138,6 +138,9 @@ M: sequence clear-set
     [ [ [ ?members ] map concat ] [ first ] bi set-like ]
     if-empty ;
 
+: intersection ( sets -- set/f )
+    [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
+
 : gather ( ... seq quot: ( ... elt -- ... elt' ) -- ... newseq )
     map concat members ; inline
 
@@ -152,6 +155,9 @@ M: sequence clear-set
 
 : ?adjoin ( elt set -- ? )
     2dup in? [ 2drop f ] [ adjoin t ] if ; inline
+
+: union! ( set1 set2 -- set1 )
+    ?members over [ adjoin ] curry each ;
 
 ! Temporarily for compatibility
 
