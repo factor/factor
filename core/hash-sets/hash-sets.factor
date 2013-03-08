@@ -25,6 +25,7 @@ M: hash-set cardinality table>> assoc-size ;
 M: hash-set intersect small/large sequence/tester filter >hash-set ;
 M: hash-set union (union) >hash-set ;
 M: hash-set diff sequence/tester [ not ] compose filter >hash-set ;
+M: hash-set clear-set table>> clear-assoc ;
 
 M: sequence fast-set >hash-set ;
 M: f fast-set drop H{ } clone hash-set boa ;
