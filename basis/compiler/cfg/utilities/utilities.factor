@@ -18,7 +18,7 @@ IN: compiler.cfg.utilities
         [ first ##branch? ]
     } 1&& ;
 
-: (skip-empty-blocks) ( visited bb -- visited' bb' )
+: (skip-empty-blocks) ( visited bb -- visited bb' )
     dup pick in? [
         dup empty-block? [
             dup pick adjoin
