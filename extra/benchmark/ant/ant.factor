@@ -35,7 +35,7 @@ C: <point> point
     [ x>> ] [ y>> ] bi [ sum-digits ] bi@ + 25 <= ; inline
 
 :: ant-benchmark ( -- )
-    200000 <hashtable> hash-set boa :> seen
+    200000 <hash-set> :> seen
     100000 <vector> :> stack
     0 :> total!
 
