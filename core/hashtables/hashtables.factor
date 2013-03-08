@@ -88,16 +88,18 @@ TUPLE: hashtable
     1 fixnum+fast set-slot ; inline
 
 : (rehash) ( hash alist -- )
-    swap [ swapd set-at ] curry assoc-each ; inline
+    swap [ swapd dupd new-key@ set-nth-pair ] curry assoc-each ; inline
 
 : hash-large? ( hash -- ? )
     [ count>> 3 fixnum*fast 1 fixnum+fast ]
     [ array>> length>> ] bi fixnum> ; inline
 
 : grow-hash ( hash -- )
-    [ [ >alist ] [ assoc-size 1 + ] bi ] keep
-    [ reset-hash ] keep
-    swap (rehash) ;
+    { hashtable } declare [
+        [ >alist { array } declare ]
+        [ assoc-size 1 + ]
+        [ reset-hash ] tri
+    ] keep swap (rehash) ;
 
 : ?grow-hash ( hash -- )
     dup hash-large? [ grow-hash ] [ drop ] if ; inline
