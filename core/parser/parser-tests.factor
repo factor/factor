@@ -4,7 +4,7 @@ sequences strings io.files io.pathnames definitions
 continuations sorting classes.tuple compiler.units debugger
 vocabs vocabs.loader accessors eval combinators lexer
 vocabs.parser words.symbol multiline source-files.errors
-tools.crossref grouping ;
+tools.crossref grouping sets ;
 IN: parser.tests
 
 [ 1 [ 2 [ 3 ] 4 ] 5 ]
@@ -621,9 +621,9 @@ EXCLUDE: qualified.tests.bar => x ;
 
 [
     [ "vocabs.loader.test.l" use-vocab ] must-fail
-    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> key? ] unit-test
+    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> in? ] unit-test
     [ ] [ "vocabs.loader.test.l" unuse-vocab ] unit-test
-    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> key? ] unit-test    
+    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> in? ] unit-test    
 ] with-file-vocabs
 
 ! Test cases for #183
