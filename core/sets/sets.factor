@@ -22,8 +22,11 @@ GENERIC: duplicates ( set -- seq )
 GENERIC: all-unique? ( set -- ? )
 GENERIC: null? ( set -- ? )
 GENERIC: cardinality ( set -- n )
+GENERIC: clear-set ( set -- )
 
 M: f cardinality drop 0 ;
+
+M: f clear-set drop ; inline
 
 ! Defaults for some methods.
 ! Override them for efficiency
@@ -31,6 +34,8 @@ M: f cardinality drop 0 ;
 M: set null? members null? ; inline
 
 M: set cardinality members length ;
+
+M: set clear-set [ members ] keep [ delete ] curry each ;
 
 M: set set-like drop ; inline
 
@@ -124,6 +129,9 @@ M: sequence null?
 
 M: sequence cardinality
     fast-set cardinality ;
+
+M: sequence clear-set
+    delete-all ; inline
 
 : combine ( sets -- set/f )
     [ f ]

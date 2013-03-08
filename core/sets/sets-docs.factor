@@ -24,6 +24,7 @@ ARTICLE: "set-operations" "Operations on sets"
 { $subsections
     adjoin
     delete
+    clear-set
 }
 "To test if a set is the empty set:"
 { $subsections null? }
@@ -95,6 +96,11 @@ HELP: ?adjoin
 HELP: delete
 { $values { "elt" object } { "set" set } }
 { $description "Destructively removes " { $snippet "elt" } " from " { $snippet "set" } ". If the element is not present, this does nothing." $nl "Each mutable set type is expected to implement a method on this generic word." }
+{ $side-effects "set" } ;
+
+HELP: clear-set
+{ $values { "set" set } }
+{ $contract "Removes all entries from the set." }
 { $side-effects "set" } ;
 
 HELP: members
