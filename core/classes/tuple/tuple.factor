@@ -332,8 +332,14 @@ M: error-class reset-class
 : boa-effect ( class -- effect )
     [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
 
+ERROR: not-a-tuple-class obj ;
+
+: check-tuple-class ( class -- class )
+    dup tuple-class? [ not-a-tuple-class ] unless ; inline
+
 : define-boa-word ( word class -- )
-    [ [ boa ] curry ] [ boa-effect ] bi define-inline ;
+    check-tuple-class [ [ boa ] curry ] [ boa-effect ] bi
+    define-inline ;
 
 : forget-slot-accessors ( class slots -- )
     [
