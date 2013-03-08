@@ -61,8 +61,11 @@ TUPLE: hash-set
 : set-nth-item ( key seq n -- )
     2 fixnum+fast set-slot ; inline
 
-: (rehash) ( hash seq -- )
-    swap [ dupd new-key@ set-nth-item ] curry each ; inline
+: (adjoin) ( key hash -- )
+    dupd new-key@ set-nth-item ; inline
+
+: (rehash) ( seq hash -- )
+    [ (adjoin) ] curry each ; inline
 
 : hash-large? ( hash -- ? )
     [ count>> 3 fixnum*fast 1 fixnum+fast ]
@@ -73,7 +76,7 @@ TUPLE: hash-set
         [ members { array } declare ]
         [ cardinality 1 + ]
         [ reset-hash ] tri
-    ] keep swap (rehash) ;
+    ] keep (rehash) ;
 
 : ?grow-hash ( hash -- )
     dup hash-large? [ grow-hash ] [ drop ] if ; inline
@@ -101,7 +104,7 @@ M: hash-set cardinality ( hash -- n )
     [ count>> ] [ deleted>> ] bi - ; inline
 
 M: hash-set adjoin ( key hash -- )
-    dup ?grow-hash dupd new-key@ set-nth-item ;
+    dup ?grow-hash (adjoin) ;
 
 <PRIVATE
 
@@ -128,7 +131,7 @@ M: hash-set equal?
     over hash-set? [ set= ] [ 2drop f ] if ;
 
 : >hash-set ( members -- hash-set )
-    dup length <hash-set> [ [ adjoin ] curry each ] keep ;
+    dup length <hash-set> [ (rehash) ] keep ;
 
 M: hash-set set-like
     drop dup hash-set? [ ?members >hash-set ] unless ; inline
