@@ -20,13 +20,13 @@ SYMBOL: copies
 GENERIC: eliminate-write-barrier ( insn -- ? )
 
 : fresh-allocation ( vreg -- )
-    fresh-allocations get conjoin ;
+    fresh-allocations get adjoin ;
 
 M: ##allot eliminate-write-barrier
     dst>> fresh-allocation t ;
 
 : mutated-object ( vreg -- )
-    resolve-copy mutated-objects get conjoin ;
+    resolve-copy mutated-objects get adjoin ;
 
 M: ##set-slot eliminate-write-barrier
     obj>> mutated-object t ;
@@ -36,8 +36,8 @@ M: ##set-slot-imm eliminate-write-barrier
 
 : needs-write-barrier? ( insn -- ? )
     resolve-copy {
-        [ fresh-allocations get key? not ]
-        [ mutated-objects get key? ]
+        [ fresh-allocations get in? not ]
+        [ mutated-objects get in? ]
     } 1&& ;
 
 M: ##write-barrier eliminate-write-barrier
@@ -47,7 +47,7 @@ M: ##write-barrier-imm eliminate-write-barrier
     src>> needs-write-barrier? ;
 
 M: gc-map-insn eliminate-write-barrier
-    fresh-allocations get clear-assoc ;
+    fresh-allocations get clear-set ;
 
 M: ##copy eliminate-write-barrier
     [ src>> resolve-copy ] [ dst>> ] bi copies get set-at t ;
@@ -55,8 +55,8 @@ M: ##copy eliminate-write-barrier
 M: insn eliminate-write-barrier drop t ;
 
 : write-barriers-step ( insns -- insns' )
-    H{ } clone fresh-allocations set
-    H{ } clone mutated-objects set
+    HS{ } clone fresh-allocations set
+    HS{ } clone mutated-objects set
     H{ } clone copies set
     [ eliminate-write-barrier ] filter! ;
 
