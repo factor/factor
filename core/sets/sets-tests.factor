@@ -135,3 +135,8 @@ M: null-set members drop f ;
 [ f ] [ { } intersection ] unit-test
 [ HS{ } ] [ { HS{ } } intersection ] unit-test
 [ HS{ 1 } ] [ { HS{ 1 2 3 } HS{ 1 } } intersection ] unit-test
+
+[ HS{ } ] [ HS{ } HS{ } diff! ] unit-test
+[ HS{ 1 } ] [ HS{ 1 2 3 } HS{ 2 3 } diff! ] unit-test
+[ HS{ 1 } ] [ HS{ 1 } HS{ 2 3 4 } diff! ] unit-test
+[ HS{ 1 2 3 } ] [ HS{ 1 2 3 } HS{ 4 } diff! ] unit-test
