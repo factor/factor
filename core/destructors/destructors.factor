@@ -17,10 +17,10 @@ SLOT: continuation
 
 : register-disposable ( obj -- )
     debug-leaks? get-global [ current-continuation >>continuation ] when
-    disposables get conjoin ;
+    disposables get adjoin ;
 
 : unregister-disposable ( obj -- )
-    disposables get 2dup key? [ delete-at ] [ drop already-unregistered ] if ;
+    disposables get 2dup in? [ delete ] [ drop already-unregistered ] if ;
 
 PRIVATE>
 
@@ -92,7 +92,7 @@ PRIVATE>
     ] with-scope ; inline
 
 [
-    H{ } clone disposables set-global
+    HS{ } clone disposables set-global
     V{ } clone always-destructors set-global
     V{ } clone error-destructors set-global
 ] "destructors" add-startup-hook
