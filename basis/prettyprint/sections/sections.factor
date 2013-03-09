@@ -5,6 +5,7 @@ namespaces make sequences strings io.styles vectors words
 prettyprint.config splitting classes continuations
 accessors sets vocabs.parser combinators vocabs
 classes.maybe ;
+FROM: sets => members ;
 FROM: namespaces => set ;
 IN: prettyprint.sections
 
@@ -23,7 +24,7 @@ TUPLE: pprinter last-newline line-count indent ;
 
 : (record-vocab) ( vocab -- )
     dup pprinter-in get dup [ vocab-name ] when =
-    [ drop ] [ pprinter-use get conjoin ] if ;
+    [ drop ] [ pprinter-use get adjoin ] if ;
 
 GENERIC: vocabulary-name ( obj -- string )
 
@@ -347,7 +348,7 @@ M: block long-section ( block -- )
 
 : pprinter-manifest ( -- manifest )
     <manifest>
-    [ [ pprinter-use get keys >vector ] dip search-vocabs<< ]
+    [ [ pprinter-use get members >vector ] dip search-vocabs<< ]
     [ [ pprinter-in get ] dip current-vocab<< ]
     [ ]
     tri ;
@@ -355,7 +356,7 @@ M: block long-section ( block -- )
 : make-pprint ( obj quot -- block manifest )
     [
         0 position ,,
-        H{ } clone pprinter-use ,,
+        HS{ } clone pprinter-use ,,
         V{ } clone recursion-check ,,
         V{ } clone pprinter-stack ,,
     ] H{ } make [
