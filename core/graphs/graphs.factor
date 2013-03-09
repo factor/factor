@@ -31,12 +31,15 @@ PRIVATE>
 
 <PRIVATE
 
-: (closure) ( obj set quot: ( elt -- seq ) -- )
-    2over ?adjoin [
-        [ dip ] keep [ (closure) ] 2curry each
-    ] [ 3drop ] if ; inline recursive
+: (closure) ( obj assoc quot: ( elt -- assoc ) -- )
+    2over key? [
+        3drop
+    ] [
+        2over conjoin [ dip ] keep
+        [ [ drop ] 3dip (closure) ] 2curry assoc-each
+    ] if ; inline recursive
 
 PRIVATE>
 
-: closure ( obj quot -- set )
-    HS{ } clone [ swap (closure) ] keep ; inline
+: closure ( obj quot -- assoc )
+    H{ } clone [ swap (closure) ] keep ; inline
