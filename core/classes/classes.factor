@@ -3,7 +3,6 @@
 USING: accessors assocs combinators definitions kernel
 make namespaces quotations sequences sets words words.symbol ;
 FROM: namespaces => set ;
-FROM: graphs => add-vertex remove-vertex ;
 QUALIFIED: sets
 IN: classes
 
@@ -131,7 +130,8 @@ GENERIC: implementors ( class/classes -- seq )
         tri
     ] { } make ;
 
-: class-usage ( class -- seq ) update-map get at keys ;
+: class-usage ( class -- seq )
+    update-map get at sets:members ;
 
 <PRIVATE
 
@@ -155,10 +155,12 @@ M: sequence implementors [ implementors ] gather ;
 <PRIVATE
 
 : update-map+ ( class -- )
-    dup class-uses update-map get add-vertex ;
+    dup class-uses update-map get
+    [ adjoin-at ] curry with each ;
 
 : update-map- ( class -- )
-    dup class-uses update-map get remove-vertex ;
+    dup class-uses update-map get
+    [ at delete ] curry with each ;
 
 : implementors-map+ ( class -- )
     [ HS{ } clone ] dip implementors-map get set-at ;
