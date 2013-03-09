@@ -298,7 +298,7 @@ PRIVATE>
 GENERIC: make-final ( class -- )
 
 M: tuple-class make-final
-    [ dup class-usage ?metaclass-changed ]
+    [ dup class-usage keys ?metaclass-changed ]
     [ t "final" set-word-prop ]
     bi ;
 
