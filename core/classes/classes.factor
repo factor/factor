@@ -130,9 +130,11 @@ GENERIC: implementors ( class/classes -- seq )
         tri
     ] { } make ;
 
-: class-usage ( class -- seq ) update-map get at ;
+: class-usage ( class -- seq )
+    update-map get at keys ;
 
-: class-usages ( class -- seq ) [ class-usage ] closure keys ;
+: class-usages ( class -- seq )
+    [ class-usage ] closure sets:members ;
 
 M: class implementors implementors-map get at sets:members ;
 
@@ -170,7 +172,7 @@ GENERIC: metaclass-changed ( use class -- )
 : check-metaclass ( class metaclass -- usages/f )
     over class? [
         over "metaclass" word-prop eq?
-        [ drop f ] [ class-usage keys ] if
+        [ drop f ] [ class-usage ] if
     ] [ 2drop f ] if ;
 
 : ?define-symbol ( word -- )

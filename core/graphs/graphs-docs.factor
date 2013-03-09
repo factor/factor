@@ -1,4 +1,5 @@
-USING: assocs hashtables help.markup help.syntax kernel sequences ;
+USING: assocs hashtables help.markup help.syntax kernel
+sequences sets ;
 IN: graphs
 
 ARTICLE: "graphs" "Directed graph utilities"
@@ -28,5 +29,5 @@ HELP: remove-vertex
 { $side-effects "graph" } ;
 
 HELP: closure
-{ $values { "obj" object } { "quot" { $quotation "( obj -- assoc )" } } { "assoc" "a new assoc" } }
+{ $values { "obj" object } { "quot" { $quotation "( obj -- assoc )" } } { "set" set } }
 { $description "Outputs a set of all vertices reachable from " { $snippet "vertex" } " via edges given by the quotation. The set always includes " { $snippet "vertex" } "." } ;
