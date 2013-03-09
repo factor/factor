@@ -15,23 +15,23 @@ GENERIC: uses ( defspec -- seq )
 
 SYMBOL: visited
 
-GENERIC# quot-uses 1 ( obj assoc -- )
+USE: bootstrap.image.private
+
+GENERIC# quot-uses 1 ( obj set -- )
 
 M: object quot-uses 2drop ;
 
-M: word quot-uses over crossref? [ conjoin ] [ 2drop ] if ;
+M: word quot-uses over crossref? [ adjoin ] [ 2drop ] if ;
 
-: seq-uses ( seq assoc -- )
-    over visited get member-eq? [ 2drop ] [
-        over visited get push
+: seq-uses ( seq set -- )
+    over <eq-wrapper> visited get ?adjoin [
         [ quot-uses ] curry each
-    ] if ;
+    ] [ 2drop ] if ; inline
 
-: assoc-uses ( assoc' assoc -- )
-    over visited get member-eq? [ 2drop ] [
-        over visited get push
+: assoc-uses ( assoc' set -- )
+    over <eq-wrapper> visited get ?adjoin [
         [ quot-uses ] curry [ bi@ ] curry assoc-each
-    ] if ;
+    ] [ 2drop ] if ; inline
 
 M: array quot-uses seq-uses ;
 
@@ -41,9 +41,9 @@ M: callable quot-uses seq-uses ;
 
 M: wrapper quot-uses [ wrapped>> ] dip quot-uses ;
 
-M: callable uses ( quot -- assoc )
-    V{ } clone visited [
-        H{ } clone [ quot-uses ] keep keys
+M: callable uses ( quot -- seq )
+    HS{ } clone visited [
+        HS{ } clone [ quot-uses ] keep members
     ] with-variable ;
 
 M: word uses def>> uses ;
