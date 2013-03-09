@@ -43,9 +43,7 @@ IN: regexp.dfa
     [ tagged-epsilon? not ] filter ;
 
 : add-todo-state ( state visited-states new-states -- )
-    2over key? [ 3drop ] [
-        [ conjoin ] [ push ] bi-curry* bi
-    ] if ;
+    2over ?adjoin [ nip push ] [ 3drop ] if ;
 
 : add-todo-states ( state/condition visited-states new-states -- )
     [ condition-states ] 2dip
@@ -82,6 +80,6 @@ IN: regexp.dfa
 : construct-dfa ( nfa -- dfa )
     dup initialize-dfa
     dup start-state>> condition-states >vector
-    H{ } clone
+    HS{ } clone
     new-transitions
     [ set-final-states ] keep ;
