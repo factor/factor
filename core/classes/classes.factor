@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators definitions graphs kernel
+USING: accessors assocs combinators definitions kernel
 make namespaces quotations sequences sets words words.symbol ;
 FROM: namespaces => set ;
+FROM: graphs => add-vertex remove-vertex ;
 QUALIFIED: sets
 IN: classes
 
@@ -132,7 +133,20 @@ GENERIC: implementors ( class/classes -- seq )
 
 : class-usage ( class -- seq ) update-map get at ;
 
-: class-usages ( class -- seq ) [ class-usage ] closure keys ;
+<PRIVATE
+
+: (closure) ( obj set quot: ( elt -- seq ) -- )
+    2over ?adjoin [
+        [ dip ] keep [ (closure) ] 2curry each
+    ] [ 3drop ] if ; inline recursive
+
+: closure ( obj quot -- set )
+    HS{ } clone [ swap (closure) ] keep ; inline
+
+PRIVATE>
+
+: class-usages ( class -- seq )
+    [ class-usage keys ] closure sets:members ;
 
 M: class implementors implementors-map get at sets:members ;
 
