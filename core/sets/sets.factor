@@ -26,6 +26,8 @@ GENERIC: clear-set ( set -- )
 
 M: f cardinality drop 0 ;
 
+M: f delete 2drop ;
+
 M: f clear-set drop ; inline
 
 ! Defaults for some methods.
