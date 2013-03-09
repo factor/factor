@@ -1,16 +1,19 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes destructors fry kernel math namespaces
-prettyprint sequences sets sorting continuations accessors arrays
-io io.styles combinators.smart ;
+USING: accessors arrays assocs classes combinators.smart
+continuations destructors fry io io.styles kernel namespaces
+prettyprint sequences sets sorting ;
+FROM: sets => members ;
 IN: tools.destructors
 
 <PRIVATE
 
-: class-tally ( assoc -- assoc' )
-    H{ } clone [ [ keys ] dip '[ dup class-of _ push-at ] each ] keep ;
+: class-tally ( set -- assoc' )
+    H{ } clone [
+        [ members ] dip '[ dup class-of _ push-at ] each
+    ] keep ;
 
-: (disposables.) ( assoc -- )
+: (disposables.) ( set -- )
     class-tally >alist [ first2 [ length ] keep 3array ] map [ second ] sort-with
     standard-table-style [
         [
@@ -39,7 +42,7 @@ PRIVATE>
     disposables get (disposables.) ;
 
 : disposables-of-class. ( class -- )
-    [ disposables get values sort-disposables ] dip
+    [ disposables get members sort-disposables ] dip
     '[ _ instance? ] filter stack. ;
 
 : leaks ( quot -- )
@@ -48,4 +51,4 @@ PRIVATE>
     [
         [ call disposables get clone ] dip
     ] [ f debug-leaks? set-global ] [ ] cleanup
-     assoc-diff (disposables.) ; inline
+    diff (disposables.) ; inline
