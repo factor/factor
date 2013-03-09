@@ -1,5 +1,4 @@
 USING: graphs tools.test namespaces kernel sorting assocs ;
-FROM: sets => members ;
 
 H{ } "g" set
 { 1 2 3 } "v" set
@@ -15,7 +14,7 @@ H{
 } "g" set
 
 [ { 2 3 4 5 } ] [
-    2 [ "g" get at keys ] closure members natural-sort
+    2 [ "g" get at ] closure keys natural-sort 
 ] unit-test
 
 H{ } "g" set
