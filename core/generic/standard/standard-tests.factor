@@ -1,11 +1,9 @@
-USING: tools.test math math.functions math.constants
-generic.standard generic.single strings sequences arrays kernel
-accessors words byte-arrays bit-arrays parser namespaces make
-quotations stack-checker vectors growable hashtables sbufs
-prettyprint byte-vectors bit-vectors specialized-vectors
-definitions generic sets graphs assocs grouping see eval
-classes.union classes.tuple compiler.units io.streams.string
-compiler.crossref math.order ;
+USING: accessors arrays assocs bit-arrays bit-vectors
+byte-arrays classes.tuple classes.union compiler.crossref
+compiler.units definitions eval generic generic.single
+generic.standard io.streams.string kernel make math
+math.constants math.functions namespaces parser quotations
+sequences specialized-vectors strings tools.test words ;
 QUALIFIED-WITH: alien.c-types c
 FROM: namespaces => set ;
 SPECIALIZED-VECTOR: c:double
