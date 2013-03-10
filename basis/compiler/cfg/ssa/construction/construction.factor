@@ -44,7 +44,7 @@ M: insn compute-insn-defs 2drop ;
 
 M: vreg-insn compute-insn-defs
     defs-vregs [
-        defs get [ conjoin-at ] [ drop ] [ at assoc-size 1 > ] 2tri
+        defs get [ adjoin-at ] [ drop ] [ at cardinality 1 > ] 2tri
         [ defs-multi get adjoin ] [ drop ] if
     ] with each ;
 
@@ -64,7 +64,7 @@ SYMBOL: inserting-phis
     inserting-phis get push-at ;
 
 : compute-phis-for ( vreg bbs -- )
-    keys merge-set [ insert-phi-later ] with each ;
+    members merge-set [ insert-phi-later ] with each ;
 
 : compute-phis ( -- )
     H{ } clone inserting-phis set
