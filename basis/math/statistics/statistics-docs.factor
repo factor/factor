@@ -142,7 +142,7 @@ HELP: sequence>assoc
     { $example "! Iterate over a sequence and increment the count at each element"
                "! The first quotation has stack effect ( key -- key ), a no-op"
                "USING: assocs prettyprint kernel math.statistics ;"
-               "\"aaabc\" [ ] [ nip inc-at ] H{ } sequence>assoc ."
+               "\"aaabc\" [ ] [ inc-at ] H{ } sequence>assoc ."
                "H{ { 97 3 } { 98 1 } { 99 1 } }"
     }
 } ;
@@ -154,7 +154,7 @@ HELP: sequence>assoc!
 { $examples
     { $example "! Iterate over a sequence and add the counts to an existing assoc"
                "USING: assocs prettyprint math.statistics kernel ;"
-               "H{ { 97 2 } { 98 1 } } clone \"aaabc\" [ ] [ nip inc-at ] sequence>assoc! ."
+               "H{ { 97 2 } { 98 1 } } clone \"aaabc\" [ ] [ inc-at ] sequence>assoc! ."
                "H{ { 97 5 } { 98 2 } { 99 1 } }"
     }
 } ;
@@ -168,7 +168,7 @@ HELP: sequence>hashtable
 { $examples
     { $example "! Count the number of times an element occurs in a sequence"
                "USING: assocs kernel prettyprint math.statistics ;"
-               "\"aaabc\" [ ] [ nip inc-at ] sequence>hashtable ."
+               "\"aaabc\" [ ] [ inc-at ] sequence>hashtable ."
                "H{ { 97 3 } { 98 1 } { 99 1 } }"
     }
 } ;

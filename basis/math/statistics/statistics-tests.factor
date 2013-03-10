@@ -1,5 +1,6 @@
 USING: assocs kernel math math.functions math.statistics sequences
 math.order tools.test math.vectors ;
+FROM: math.ranges => [a,b] ;
 IN: math.statistics.tests
 
 [ 3 ] [ { 1 2 3 4 5 } 1 power-mean ] unit-test
@@ -207,3 +208,18 @@ IN: math.statistics.tests
 
 { { 0 1 3 6 } }
 [ { 1 2 3 4 } cum-sum0 ] unit-test
+
+{
+    H{
+        { 0 V{ 600 603 606 609 } }
+        { 1 V{ 601 604 607 610 } }
+        { 2 V{ 602 605 608 } }
+    }
+}
+[ 600 610 [a,b] [ 3 mod ] collect-by ] unit-test
+
+
+{
+    H{ { 0 V{ 0 3 6 9 } } { 1 V{ 1 4 7 10 } } { 2 V{ 2 5 8 } } }
+}
+[ 600 610 [a,b] [ 3 mod ] collect-index-by ] unit-test

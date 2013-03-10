@@ -210,26 +210,32 @@ PRIVATE>
 <PRIVATE
 
 : (sequence>assoc) ( seq map-quot insert-quot assoc -- assoc )
+    [ swap curry compose each ] keep ; inline
+
+: (sequence-index>assoc) ( seq map-quot insert-quot assoc -- assoc )
     [ swap curry compose each-index ] keep ; inline
 
 PRIVATE>
 
-: sequence>assoc! ( assoc seq map-quot: ( x -- ..y ) insert-quot: ( ..y index assoc -- ) -- assoc )
+: sequence>assoc! ( assoc seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) -- assoc )
     4 nrot (sequence>assoc) ; inline
 
 : sequence>assoc ( seq map-quot insert-quot exemplar -- assoc )
     clone (sequence>assoc) ; inline
 
+: sequence-index>assoc ( seq map-quot insert-quot exemplar -- assoc )
+    clone (sequence-index>assoc) ; inline
+
+: sequence-index>hashtable ( seq map-quot insert-quot -- hashtable )
+    H{ } sequence-index>assoc ; inline
+
 : sequence>hashtable ( seq map-quot insert-quot -- hashtable )
     H{ } sequence>assoc ; inline
 
 : histogram! ( hashtable seq -- hashtable )
-    [ ] [ nip inc-at ] sequence>assoc! ;
+    [ ] [ inc-at ] sequence>assoc! ;
 
 : histogram-by ( seq quot: ( x -- bin ) -- hashtable )
-    [ nip inc-at ] sequence>hashtable ; inline
-
-: histogram-index-by ( seq quot: ( x -- bin ) -- hashtable )
     [ inc-at ] sequence>hashtable ; inline
 
 : histogram ( seq -- hashtable )
@@ -241,14 +247,11 @@ PRIVATE>
 : normalized-histogram ( seq -- alist )
     [ histogram ] [ length ] bi '[ _ / ] assoc-map ;
 
-: collect-at ( seq quot -- hashtable )
-    [ push-at ] sequence>hashtable ; inline
-
 : collect-index-by ( seq quot -- hashtable )
-    [ swap ] prepose collect-at ; inline
+    [ swap ] prepose [ push-at ] sequence-index>hashtable ; inline
 
 : collect-by ( seq quot -- hashtable )
-    [ drop dup ] prepose collect-at ; inline
+    [ dup ] prepose [ push-at ] sequence>hashtable ; inline
 
 : equal-probabilities ( n -- array )
     dup recip <array> ; inline
