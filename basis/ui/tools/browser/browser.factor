@@ -3,12 +3,12 @@
 USING: accessors arrays assocs classes combinators
 combinators.short-circuit compiler.units debugger fry help
 help.apropos help.crossref help.home help.topics help.stylesheet
-kernel models sequences ui ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.buttons ui.gadgets.editors ui.gadgets.glass
-ui.gadgets.labels ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.viewports
-ui.gestures ui.tools.browser.history ui.tools.browser.popups
-ui.tools.common vocabs ;
+kernel models sequences sets ui ui.commands ui.gadgets
+ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
+ui.gadgets.glass ui.gadgets.labels ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks
+ui.gadgets.viewports ui.gestures ui.tools.browser.history
+ui.tools.browser.popups ui.tools.common vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
@@ -75,14 +75,14 @@ M: browser-gadget handle-gesture
         [ call-next-method ]
     } cond ;
 
-: showing-definition? ( defspec assoc -- ? )
+: showing-definition? ( defspec set -- ? )
     {
-        [ key? ]
-        [ [ dup word-link? [ name>> ] when ] dip key? ]
-        [ [ dup vocab-link? [ lookup-vocab ] when ] dip key? ]
+        [ in? ]
+        [ [ dup word-link? [ name>> ] when ] dip in? ]
+        [ [ dup vocab-link? [ lookup-vocab ] when ] dip in? ]
     } 2|| ;
 
-M: browser-gadget definitions-changed ( assoc browser -- )
+M: browser-gadget definitions-changed ( set browser -- )
     [ model>> value>> swap showing-definition? ] keep
     '[ _ [ history-value ] keep set-history-value ] when ;
 

@@ -5,6 +5,7 @@ classes.tuple classes.tuple.private continuations definitions
 generic init kernel kernel.private math namespaces sequences
 sets source-files.errors vocabs words ;
 FROM: namespaces => set ;
+FROM: sets => members ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -84,7 +85,7 @@ M: f process-forgotten-words drop ;
 
 SYMBOL: definition-observers
 
-GENERIC: definitions-changed ( assoc obj -- )
+GENERIC: definitions-changed ( set obj -- )
 
 [ V{ } clone definition-observers set-global ]
 "compiler.units" add-startup-hook
@@ -99,7 +100,7 @@ GENERIC: definitions-changed ( assoc obj -- )
 : remove-definition-observer ( obj -- )
     definition-observers get remove-eq! drop ;
 
-: notify-definition-observers ( assoc -- )
+: notify-definition-observers ( set -- )
     definition-observers get
     [ definitions-changed ] with each ;
 
@@ -114,18 +115,18 @@ M: object always-bump-effect-counter? drop f ;
 
 <PRIVATE
 
-: changed-vocabs ( assoc -- vocabs )
-    [ drop word? ] assoc-filter
-    [ drop vocabulary>> dup [ lookup-vocab ] when dup ] assoc-map ;
+: changed-vocabs ( set -- vocabs )
+    members [ word? ] filter
+    [ vocabulary>> dup [ lookup-vocab ] when ] map ;
 
-: updated-definitions ( -- assoc )
-    H{ } clone
-    forgotten-definitions get assoc-union!
-    new-definitions get first assoc-union!
-    new-definitions get second assoc-union!
-    changed-definitions get assoc-union!
-    maybe-changed get assoc-union!
-    dup changed-vocabs assoc-union! ;
+: updated-definitions ( -- set )
+    HS{ } clone
+    forgotten-definitions get keys over adjoin-all
+    new-definitions get first keys over adjoin-all
+    new-definitions get second keys over adjoin-all
+    changed-definitions get keys over adjoin-all
+    maybe-changed get keys over adjoin-all
+    dup changed-vocabs over adjoin-all ;
 
 : process-forgotten-definitions ( -- )
     forgotten-definitions get keys
@@ -146,7 +147,7 @@ M: object always-bump-effect-counter? drop f ;
     ] when ;
 
 : notify-observers ( -- )
-    updated-definitions dup assoc-empty?
+    updated-definitions dup null?
     [ drop ] [ notify-definition-observers notify-error-observers ] if ;
 
 : update-existing? ( defs -- ? )
@@ -169,7 +170,8 @@ M: object always-bump-effect-counter? drop f ;
 
 TUPLE: nesting-observer new-words ;
 
-M: nesting-observer definitions-changed new-words>> swap assoc-diff! drop ;
+M: nesting-observer definitions-changed
+    [ members ] dip new-words>> [ delete-at ] curry each ;
 
 : add-nesting-observer ( -- )
     new-words get nesting-observer boa

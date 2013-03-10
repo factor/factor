@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes colors colors.constants
 combinators combinators.smart compiler.units definitions
-definitions.icons effects fry generic hashtables help.stylesheet
-help.topics io io.styles kernel locals make math namespaces
-parser present prettyprint prettyprint.stylesheet quotations
-see sequences sequences.private sets slots sorting splitting
-strings urls vectors vocabs vocabs.loader words words.symbol ;
+definitions.icons effects fry generic hash-sets hashtables
+help.stylesheet help.topics io io.styles kernel locals make math
+namespaces parser present prettyprint prettyprint.stylesheet
+quotations see sequences sequences.private sets slots sorting
+splitting strings urls vectors vocabs vocabs.loader words
+words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
 FROM: namespaces => set ;
 IN: help.markup
@@ -301,7 +302,8 @@ PRIVATE>
     [ "related" [ words diff ] change-word-prop ] each ;
 
 : notify-related-words ( affected-words -- )
-    [ dup associate notify-definition-observers ] each ;
+    fast-set notify-definition-observers ;
+
 PRIVATE>
 
 : related-words ( seq -- )

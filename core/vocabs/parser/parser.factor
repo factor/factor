@@ -227,7 +227,7 @@ M: vocab update dup name>> lookup-vocab eq? ;
     swap [ lookup-vocab ] V{ } map-as >>search-vocabs
     qualified-vocabs>> [ update ] filter! drop ;
 
-M: manifest definitions-changed ( assoc manifest -- )
+M: manifest definitions-changed
     nip update-manifest ;
 
 PRIVATE>
