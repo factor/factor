@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays assocs combinators.short-circuit
-compiler.units debugger init io
+compiler.units debugger init io sets
 io.streams.null kernel namespaces prettyprint sequences
 source-files.errors summary tools.crossref
 tools.crossref.private tools.errors words ;
@@ -67,7 +67,7 @@ SINGLETON: deprecation-observer
     ] with-null-writer ;
 
 M: deprecation-observer definitions-changed
-    drop keys [ word? ] filter
+    drop members [ word? ] filter
     dup [ deprecated? ] any? not
     [ [ check-deprecations ] each ]
     [ drop initialize-deprecation-notes ] if ;

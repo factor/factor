@@ -17,7 +17,7 @@ main ;
 
 : record-top-level-form ( quot file -- )
     top-level-form<<
-    [ ] [ H{ } notify-definition-observers ] if-bootstrapping ;
+    [ ] [ f notify-definition-observers ] if-bootstrapping ;
 
 : record-checksum ( lines source-file -- )
     [ crc32 checksum-lines ] dip checksum<< ;
