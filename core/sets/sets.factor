@@ -158,8 +158,11 @@ M: sequence clear-set
 : ?adjoin ( elt set -- ? )
     2dup in? [ 2drop f ] [ adjoin t ] if ; inline
 
+: adjoin-all ( seq set -- )
+    [ adjoin ] curry each ;
+
 : union! ( set1 set2 -- set1 )
-    ?members over [ adjoin ] curry each ;
+    ?members over adjoin-all ;
 
 : diff! ( set1 set2 -- set1 )
     dupd sequence/tester [ dup ] prepose pick
