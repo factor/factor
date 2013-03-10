@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays byte-vectors
-classes.algebra.private classes.intersection classes.maybe
-classes.mixin classes.parser classes.predicate
+classes.algebra.private classes.builtin classes.intersection
+classes.maybe classes.mixin classes.parser classes.predicate
 classes.singleton classes.tuple classes.tuple.parser
 classes.union combinators compiler.units definitions
 effects.parser generic generic.hook generic.math generic.parser
@@ -114,6 +114,12 @@ IN: bootstrap.syntax
 
     "SYNTAX:" [
         scan-new-word parse-definition define-syntax
+    ] define-core-syntax
+
+    "BUILTIN:" [
+        scan-word-name
+        current-vocab lookup-word
+        (parse-tuple-definition) 2drop check-builtin
     ] define-core-syntax
 
     "SYMBOL:" [

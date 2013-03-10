@@ -5,6 +5,8 @@ kernel.private math math.private sequences sequences.private
 slots.private ;
 IN: strings
 
+BUILTIN: string { length array-capacity read-only initial: 0 } aux ;
+
 <PRIVATE
 
 : string-hashcode ( str -- n ) 3 slot ; inline
