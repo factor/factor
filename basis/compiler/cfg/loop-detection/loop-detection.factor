@@ -12,12 +12,10 @@ SYMBOL: loops
 <PRIVATE
 
 : <natural-loop> ( header index -- loop )
-    HS{ } clone H{ } clone natural-loop boa ;
+    HS{ } clone HS{ } clone natural-loop boa ;
 
 : lookup-header ( header -- loop )
-    loops get [
-        loops get assoc-size <natural-loop>
-    ] cache ;
+    loops get dup '[ _ assoc-size <natural-loop> ] cache ;
 
 SYMBOLS: visited active ;
 
@@ -45,8 +43,8 @@ DEFER: find-loop-headers
 SYMBOL: work-list
 
 : process-loop-block ( bb loop -- )
-    2dup blocks>> key? [ 2drop ] [
-        [ blocks>> conjoin ] [
+    2dup blocks>> in? [ 2drop ] [
+        [ blocks>> adjoin ] [
             2dup header>> eq? [ 2drop ] [
                 drop predecessors>> work-list get push-all-front
             ] if
@@ -64,7 +62,7 @@ SYMBOL: loop-nesting
 
 : compute-loop-nesting ( -- )
     loops get H{ } clone [
-        [ values ] dip '[ blocks>> values [ _ inc-at ] each ] each
+        [ values ] dip '[ blocks>> members [ _ inc-at ] each ] each
     ] keep loop-nesting set ;
 
 : detect-loops ( cfg -- cfg' )
