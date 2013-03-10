@@ -4,6 +4,7 @@ USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.maybe classes.private
 combinators definitions kernel make namespaces sequences sets
 words ;
+FROM: sets => members ;
 IN: generic
 
 ! Method combination protocol
@@ -96,10 +97,11 @@ ERROR: check-method-error class generic ;
     ] unless ; inline
 
 : remake-generic ( generic -- )
-    dup outdated-generics get set-in-unit ;
+    outdated-generics get add-to-unit ;
 
 : remake-generics ( -- )
-    outdated-generics get keys [ generic? ] filter [ make-generic ] each ;
+    outdated-generics get members [ generic? ] filter
+    [ make-generic ] each ;
 
 GENERIC: update-generic ( class generic -- )
 

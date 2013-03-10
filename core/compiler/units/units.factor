@@ -71,7 +71,7 @@ M: f update-call-sites
     2drop { } ;
 
 M: f to-recompile
-    changed-definitions get [ drop word? ] assoc-filter keys ;
+    changed-definitions get members [ word? ] filter ;
 
 M: f recompile
     [ dup def>> ] { } map>assoc ;
@@ -121,25 +121,24 @@ M: object always-bump-effect-counter? drop f ;
 
 : updated-definitions ( -- set )
     HS{ } clone
-    forgotten-definitions get keys over adjoin-all
+    forgotten-definitions get union!
     new-definitions get first keys over adjoin-all
     new-definitions get second keys over adjoin-all
-    changed-definitions get keys over adjoin-all
-    maybe-changed get keys over adjoin-all
+    changed-definitions get union!
+    maybe-changed get union!
     dup changed-vocabs over adjoin-all ;
 
 : process-forgotten-definitions ( -- )
-    forgotten-definitions get keys
+    forgotten-definitions get members
     [ [ word? ] filter process-forgotten-words ]
     [ [ delete-definition-errors ] each ]
     bi ;
 
 : bump-effect-counter? ( -- ? )
-    changed-effects get
-    maybe-changed get
-    changed-definitions get [ drop always-bump-effect-counter? ] assoc-filter
-    3array assoc-combine
-    new-words get [ nip key? not ] curry assoc-any? ;
+    changed-effects get members
+    maybe-changed get members
+    changed-definitions get members [ always-bump-effect-counter? ] filter
+    3array combine new-words get [ in? not ] curry any? ;
 
 : bump-effect-counter ( -- )
     bump-effect-counter? [
@@ -152,10 +151,10 @@ M: object always-bump-effect-counter? drop f ;
     [ drop ] [ notify-definition-observers notify-error-observers ] if ;
 
 : update-existing? ( defs -- ? )
-    new-words get [ key? not ] curry any? ;
+    new-words get [ in? not ] curry any? ;
 
 : reset-pics? ( -- ? )
-    outdated-generics get assoc-empty? not ;
+    outdated-generics get null? not ;
 
 : finish-compilation-unit ( -- )
     [ ] [
@@ -172,7 +171,7 @@ M: object always-bump-effect-counter? drop f ;
 TUPLE: nesting-observer new-words ;
 
 M: nesting-observer definitions-changed
-    [ members ] dip new-words>> [ delete-at ] curry each ;
+    [ members ] dip new-words>> [ delete ] curry each ;
 
 : add-nesting-observer ( -- )
     new-words get nesting-observer boa
@@ -185,12 +184,12 @@ PRIVATE>
 
 : with-nested-compilation-unit ( quot -- )
     [
-        H{ } clone changed-definitions set
-        H{ } clone maybe-changed set
-        H{ } clone changed-effects set
-        H{ } clone outdated-generics set
+        HS{ } clone changed-definitions set
+        HS{ } clone maybe-changed set
+        HS{ } clone changed-effects set
+        HS{ } clone outdated-generics set
         H{ } clone outdated-tuples set
-        H{ } clone new-words set
+        HS{ } clone new-words set
         add-nesting-observer
         [
             remove-nesting-observer
@@ -202,6 +201,6 @@ PRIVATE>
     [
         <definitions> new-definitions set
         <definitions> old-definitions set
-        H{ } clone forgotten-definitions set
+        HS{ } clone forgotten-definitions set
         with-nested-compilation-unit
     ] with-scope ; inline

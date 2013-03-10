@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes.algebra compiler.units definitions
 graphs grouping kernel namespaces sequences words fry
-stack-checker.dependencies combinators ;
+stack-checker.dependencies combinators sets ;
 IN: compiler.crossref
 
 SYMBOL: compiled-crossref
@@ -22,24 +22,21 @@ generic-call-site-crossref [ H{ } clone ] initialize
 : conditional-dependencies-of ( word -- assoc )
     effect-dependencies-of [ nip conditional-dependency dependency>= ] assoc-filter ;
 
-: outdated-definition-usages ( assoc -- assocs )
-    [ drop word? ] assoc-filter
-    [ drop definition-dependencies-of ] { } assoc>map ;
+: outdated-definition-usages ( set -- assocs )
+    members [ word? ] filter [ definition-dependencies-of ] map ;
 
-: outdated-effect-usages ( assoc -- assocs )
-    [ drop word? ] assoc-filter
-    [ drop effect-dependencies-of ] { } assoc>map ;
+: outdated-effect-usages ( set -- assocs )
+    members [ word? ] filter [ effect-dependencies-of ] map ;
 
 : dependencies-satisfied? ( word cache -- ? )
     [ "dependency-checks" word-prop ] dip
     '[ _ [ satisfied? ] cache ] all? ;
 
-: outdated-conditional-usages ( assoc -- assocs )
-    H{ } clone '[
-        drop
+: outdated-conditional-usages ( set -- assocs )
+    members H{ } clone '[
         conditional-dependencies-of
         [ drop _ dependencies-satisfied? not ] assoc-filter
-    ] { } assoc>map ;
+    ] map ;
 
 : generic-call-sites-of ( word -- assoc )
     generic-call-site-crossref get at ;
