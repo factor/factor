@@ -4,6 +4,11 @@ USING: accessors arrays kernel kernel.private math sequences
 sequences.private slots.private ;
 IN: quotations
 
+BUILTIN: quotation
+    { array array read-only initial: { } }
+    cached-effect
+    cache-counter ;
+
 <PRIVATE
 
 : uncurry ( curry -- obj quot )

@@ -54,8 +54,7 @@ ERROR: invalid-slot-name name ;
 : parse-tuple-slots ( -- )
     ";" parse-tuple-slots-delim ;
 
-: parse-tuple-definition ( -- class superclass slots )
-    scan-new-class
+: (parse-tuple-definition) ( word -- class superclass slots )
     scan-token {
         { ";" [ tuple f ] }
         { "<" [ scan-word [ parse-tuple-slots ] { } make ] }
@@ -63,6 +62,10 @@ ERROR: invalid-slot-name name ;
     } case
     dup check-duplicate-slots
     3dup check-slot-shadowing ;
+
+: parse-tuple-definition ( -- class superclass slots )
+    scan-new-class (parse-tuple-definition) ;
+
 
 ERROR: bad-literal-tuple ;
 

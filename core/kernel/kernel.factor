@@ -3,6 +3,10 @@
 USING: kernel.private slots.private math.private ;
 IN: kernel
 
+BUILTIN: callstack ;
+BUILTIN: tuple ;
+BUILTIN: wrapper { wrapped read-only } ;
+
 DEFER: dip
 DEFER: 2dip
 DEFER: 3dip

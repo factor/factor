@@ -3,6 +3,8 @@
 USING: accessors kernel math sequences sequences.private ;
 IN: arrays
 
+BUILTIN: array { length array-capacity read-only initial: 0 } ;
+
 M: array clone (clone) ; inline
 M: array length length>> ; inline
 M: array nth-unsafe [ integer>fixnum ] dip array-nth ; inline

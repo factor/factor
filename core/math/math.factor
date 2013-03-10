@@ -3,6 +3,10 @@
 USING: kernel ;
 IN: math
 
+BUILTIN: fixnum ;
+BUILTIN: bignum ;
+BUILTIN: float ;
+
 GENERIC: >fixnum ( x -- n ) foldable
 GENERIC: >bignum ( x -- n ) foldable
 GENERIC: >integer ( x -- n ) foldable
