@@ -76,8 +76,6 @@ M: word article-title
 
 M: word article-content (word-help) ;
 
-<PRIVATE
-
 : word-with-methods ( word -- elements )
     [
         [ (word-help) % ]
