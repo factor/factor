@@ -138,7 +138,7 @@ M: object always-bump-effect-counter? drop f ;
     changed-effects get
     maybe-changed get
     changed-definitions get [ drop always-bump-effect-counter? ] assoc-filter
-    3array assoc-combine new-words get assoc-diff assoc-empty? not ;
+    3array assoc-combine new-words get assoc-diff! assoc-empty? not ;
 
 : bump-effect-counter ( -- )
     bump-effect-counter? [
@@ -151,7 +151,7 @@ M: object always-bump-effect-counter? drop f ;
     [ drop ] [ notify-definition-observers notify-error-observers ] if ;
 
 : update-existing? ( defs -- ? )
-    new-words get keys diff empty? not ;
+    new-words get [ key? not ] curry any? ;
 
 : reset-pics? ( -- ? )
     outdated-generics get assoc-empty? not ;
