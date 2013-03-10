@@ -3,8 +3,8 @@
 USING: accessors arrays assocs classes combinators
 compiler.units continuations definitions effects io
 io.encodings.utf8 io.files kernel lexer math.parser namespaces
-parser.notes quotations sequences slots source-files vectors
-vocabs vocabs.parser words words.symbol ;
+parser.notes quotations sequences sets slots source-files
+vectors vocabs vocabs.parser words words.symbol ;
 IN: parser
 
 : location ( -- loc )
@@ -90,7 +90,7 @@ ERROR: staging-violation word ;
     pop-parsing-word ; inline
 
 : execute-parsing ( accum word -- accum )
-    dup changed-definitions get key? [ staging-violation ] when
+    dup changed-definitions get in? [ staging-violation ] when
     (execute-parsing) ;
 
 : scan-object ( -- object )
