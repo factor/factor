@@ -4,6 +4,9 @@ USING: accessors alien.accessors kernel math sequences
 sequences.private ;
 IN: byte-arrays
 
+BUILTIN: byte-array
+{ length array-capacity read-only initial: 0 } ;
+
 M: byte-array clone (clone) ; inline
 M: byte-array length length>> ; inline
 M: byte-array nth-unsafe swap integer>fixnum alien-unsigned-1 ; inline
