@@ -138,7 +138,8 @@ M: object always-bump-effect-counter? drop f ;
     changed-effects get
     maybe-changed get
     changed-definitions get [ drop always-bump-effect-counter? ] assoc-filter
-    3array assoc-combine new-words get assoc-diff! assoc-empty? not ;
+    3array assoc-combine
+    new-words get [ nip key? not ] curry assoc-any? ;
 
 : bump-effect-counter ( -- )
     bump-effect-counter? [
