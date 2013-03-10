@@ -6,6 +6,11 @@ slots.private strings vocabs ;
 FROM: assocs => change-at ;
 IN: words
 
+BUILTIN: word
+{ hashcode fixnum initial: 0 } name vocabulary
+{ def quotation initial: [ ] } props pic-def pic-tail-def
+{ sub-primitive read-only } ;
+
 : word ( -- word ) \ word get-global ;
 
 : set-word ( word -- ) \ word set-global ;

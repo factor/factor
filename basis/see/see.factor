@@ -204,9 +204,8 @@ M: tuple-class see-class*
 M: word see-class* drop ;
 
 M: builtin-class see-class*
-    "! Built-in class" comment.
     <block
-    \ PRIMITIVE: pprint-word
+    \ BUILTIN: pprint-word
     [ pprint-word ]
     [ <block "slots" word-prop [ pprint-slot ] each pprint-; block> ] bi
     block> ;
