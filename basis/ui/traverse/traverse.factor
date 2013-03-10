@@ -89,12 +89,12 @@ M: node gadget-text*
 : gadget-at-path ( parent path -- gadget )
     [ swap nth-gadget ] each ;
 
-GENERIC# leaves* 1 ( tree assoc -- )
+GENERIC# leaves* 1 ( tree set -- )
 
 M: node leaves* [ children>> ] dip leaves* ;
 
 M: array leaves* '[ _ leaves* ] each ;
 
-M: gadget leaves* conjoin ;
+M: gadget leaves* adjoin ;
 
-: leaves ( tree -- assoc ) H{ } clone [ leaves* ] keep ;
+: leaves ( tree -- set ) HS{ } clone [ leaves* ] keep ;
