@@ -4,6 +4,7 @@ USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs definitions math graphs generic
 generic.single combinators macros make source-files.errors
 combinators.short-circuit classes.algebra vocabs.loader
+sets
 
 stack-checker stack-checker.dependencies stack-checker.inlining
 stack-checker.errors
@@ -149,10 +150,10 @@ SINGLETON: optimizing-compiler
 M: optimizing-compiler update-call-sites ( class generic -- words )
     #! Words containing call sites with inferred type 'class'
     #! which inlined a method on 'generic'
-    generic-call-sites-of swap '[
-        nip _ 2dup [ valid-classoid? ] both?
+    generic-call-sites-of keys swap '[
+        _ 2dup [ valid-classoid? ] both?
         [ classes-intersect? ] [ 2drop f ] if
-    ] assoc-filter keys ;
+    ] filter ;
 
 M: optimizing-compiler recompile ( words -- alist )
     H{ } clone compiled [
@@ -164,10 +165,16 @@ M: optimizing-compiler recompile ( words -- alist )
 
 M: optimizing-compiler to-recompile ( -- words )
     [
-        changed-effects get new-words get assoc-diff outdated-effect-usages %
-        changed-definitions get new-words get assoc-diff outdated-definition-usages %
-        maybe-changed get new-words get assoc-diff outdated-conditional-usages %
-        changed-definitions get [ drop word? ] assoc-filter 1array %
+        changed-effects get new-words get diff
+        outdated-effect-usages %
+
+        changed-definitions get new-words get diff
+        outdated-definition-usages %
+
+        maybe-changed get new-words get diff
+        outdated-conditional-usages %
+
+        changed-definitions get members [ word? ] filter dup zip ,
     ] { } make assoc-combine keys ;
 
 M: optimizing-compiler process-forgotten-words
