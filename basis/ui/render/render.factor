@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math.rectangles math.vectors namespaces kernel accessors
-assocs combinators sequences opengl opengl.gl colors
+assocs combinators sequences sets opengl opengl.gl colors
 colors.constants ui.gadgets ui.pens ;
+FROM: namespaces => set ;
 IN: ui.render
 
 SYMBOL: clip
@@ -94,7 +95,7 @@ M: gadget gadget-foreground dup interior>> pen-foreground ;
 : draw-background ( gadget -- )
     origin get [
         [
-            dup selected-gadgets get key?
+            dup selected-gadgets get in?
             [ draw-selection-background ]
             [ draw-standard-background ] if
         ] [ draw-gadget* ] bi
