@@ -28,7 +28,7 @@ M: object add-recent-where f ;
     drop recent-searches get [ <$link> ] map $list ;
 
 : redisplay-recent-page ( -- )
-    "help.home" >link dup associate
+    HS{ } clone "help.home" >link over adjoin
     notify-definition-observers ;
 
 : expire ( seq -- )
