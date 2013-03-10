@@ -93,7 +93,7 @@ M: word parent-word drop f ;
     over changed-definition [ ] like >>def drop ;
 
 : changed-effect ( word -- )
-    [ dup changed-effects get set-in-unit ]
+    [ changed-effects get add-to-unit ]
     [ dup primitive? [ drop ] [ changed-definition ] if ] bi ;
 
 : set-stack-effect ( effect word -- )
