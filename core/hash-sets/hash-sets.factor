@@ -109,16 +109,6 @@ M: hash-set cardinality
 M: hash-set adjoin ( key hash-set -- )
     dup ?grow-hash (adjoin) ;
 
-<PRIVATE
-
-: push-unsafe ( elt seq -- )
-    [ length ] keep
-    [ underlying>> set-array-nth ]
-    [ [ 1 fixnum+fast { array-capacity } declare ] dip length<< ]
-    2bi ; inline
-
-PRIVATE>
-
 M: hash-set members
     [ array>> [ length ] keep ] [ cardinality <vector> ] bi [
         [
