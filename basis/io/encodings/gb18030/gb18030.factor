@@ -135,3 +135,5 @@ M: gb18030 decode-char ( stream encoding -- char )
         { [ dup quad-1/3? ] [ two-byte ] }
         [ 2drop replacement-char ]
     } cond ;
+
+PRIVATE>

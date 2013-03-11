@@ -62,3 +62,5 @@ M: jis decode-char
             [ 2drop replacement-char ] if*
         ] if
     ] [ 2drop f ] if* ;
+
+PRIVATE>
