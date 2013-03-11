@@ -15,8 +15,7 @@ TUPLE: real-usage value node ;
 SYMBOLS: visited accum ;
 
 : if-not-visited ( value quot -- )
-    over visited get in?
-    [ 2drop ] [ over visited get adjoin call ] if ; inline
+    over visited get ?adjoin [ call ] [ 2drop ] if ; inline
 
 : with-simplified-def-use ( quot -- real-usages )
     [
