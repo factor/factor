@@ -1,4 +1,4 @@
-USING: math definitions help.topics help tools.test
+USING: math definitions help.topics help tools.test sets
 prettyprint parser io.streams.string kernel source-files
 assocs namespaces words io sequences eval accessors see ;
 IN: help.definitions.tests
@@ -10,7 +10,7 @@ IN: help.definitions.tests
         "IN: help.definitions.tests USING: help.syntax ; : hello ( -- ) ; HELP: hello \"test\" ; ARTICLE: \"hello\" \"world\" ; ARTICLE: \"hello2\" \"world\" ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file definitions>> first assoc-size
+        "foo" source-file definitions>> first cardinality
     ] unit-test
 
     [ t ] [ "hello" articles get key? ] unit-test
@@ -23,7 +23,7 @@ IN: help.definitions.tests
         "IN: help.definitions.tests USING: help.syntax ; : hello ( -- ) ; ARTICLE: \"hello\" \"world\" ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file definitions>> first assoc-size
+        "foo" source-file definitions>> first cardinality
     ] unit-test
 
     [ t ] [ "hello" articles get key? ] unit-test

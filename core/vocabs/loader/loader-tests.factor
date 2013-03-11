@@ -1,5 +1,5 @@
 USING: vocabs.loader tools.test continuations vocabs math
-kernel arrays sequences namespaces io.streams.string
+kernel arrays sequences namespaces io.streams.string sets
 parser source-files words assocs classes.tuple definitions
 debugger compiler.units accessors eval vocabs.hierarchy
 combinators vocabs.parser grouping vocabs.files vocabs.refresh ;
@@ -41,14 +41,14 @@ IN: vocabs.loader.tests
 
 2 [
     [ "vocabs.loader.test.a" require ] must-fail
-    
+
     [ f ] [ "vocabs.loader.test.a" lookup-vocab source-loaded?>> ] unit-test
-    
+
     [ t ] [
         "resource:core/vocabs/loader/test/a/a.factor"
         source-file definitions>> dup USE: prettyprint .
         "v-l-t-a-hello" "vocabs.loader.test.a" lookup-word dup .
-        swap first key?
+        swap first in?
     ] unit-test
 ] times
 

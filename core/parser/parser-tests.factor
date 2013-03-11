@@ -110,7 +110,7 @@ DEFER: foo
     "IN: parser.tests : smudge-me ( -- ) ;" <string-reader> "foo"
     parse-stream drop
 
-    "foo" source-file definitions>> first assoc-size
+    "foo" source-file definitions>> first cardinality
 ] unit-test
 
 [ t ] [ "smudge-me" "parser.tests" lookup-word >boolean ] unit-test
@@ -127,21 +127,21 @@ DEFER: foo
     "IN: parser.tests USING: math strings ; GENERIC: smudge-me ( a -- b ) M: integer smudge-me ; M: string smudge-me ;" <string-reader> "foo"
     parse-stream drop
 
-    "foo" source-file definitions>> first assoc-size
+    "foo" source-file definitions>> first cardinality
 ] unit-test
 
 [ 1 ] [
     "IN: parser.tests USING: arrays ; M: array smudge-me ;" <string-reader> "bar"
     parse-stream drop
 
-    "bar" source-file definitions>> first assoc-size
+    "bar" source-file definitions>> first cardinality
 ] unit-test
 
 [ 2 ] [
     "IN: parser.tests USING: math strings ; GENERIC: smudge-me ( a -- b ) M: integer smudge-me ;" <string-reader> "foo"
     parse-stream drop
 
-    "foo" source-file definitions>> first assoc-size
+    "foo" source-file definitions>> first cardinality
 ] unit-test
 
 [ t ] [
