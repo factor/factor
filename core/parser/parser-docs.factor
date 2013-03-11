@@ -246,8 +246,8 @@ HELP: parse-fresh
 { $errors "Throws a parse error if the input is malformed." } ;
 
 HELP: filter-moved
-{ $values { "assoc1" assoc } { "assoc2" assoc } { "seq" "an sequence of definitions" } }
-{ $description "Removes all definitions from " { $snippet "assoc2" } " which are in " { $snippet "assoc1" } " or are no longer present in the current " { $link file } "." } ;
+{ $values { "set1" set } { "set2" set } { "seq" "an sequence of definitions" } }
+{ $description "Removes all definitions from " { $snippet "set2" } " which are in " { $snippet "set1" } " or are no longer present in the current " { $link file } "." } ;
 
 HELP: forget-smudged
 { $description "Forgets removed definitions." } ;
