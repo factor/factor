@@ -59,12 +59,11 @@ SYMBOLS: work-list loop-heads visited ;
     successors>> <reversed> [ loop-nesting-at ] sort-with ;
 
 : process-block ( bb -- )
-    dup visited? [ drop ] [
+    dup visited get ?adjoin [
         [ , ]
-        [ visited get adjoin ]
         [ sorted-successors [ process-successor ] each ]
-        tri
-    ] if ;
+        bi
+    ] [ drop ] if ;
 
 : (linearization-order) ( cfg -- bbs )
     init-linearization-order
