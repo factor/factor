@@ -31,25 +31,22 @@ DEFER: find-loop-headers
     if ;
 
 : find-loop-headers ( bb -- )
-    dup visited get in? [ drop ] [
-        {
-            [ visited get adjoin ]
-            [ active get adjoin ]
-            [ dup successors>> active get '[ _ visit-edge ] with each ]
-            [ active get delete ]
-        } cleave
-    ] if ;
+    dup visited get ?adjoin [
+        active get
+        [ adjoin ]
+        [ [ dup successors>> ] dip '[ _ visit-edge ] with each ]
+        [ delete ]
+        2tri
+    ] [ drop ] if ;
 
 SYMBOL: work-list
 
 : process-loop-block ( bb loop -- )
-    2dup blocks>> in? [ 2drop ] [
-        [ blocks>> adjoin ] [
-            2dup header>> eq? [ 2drop ] [
-                drop predecessors>> work-list get push-all-front
-            ] if
-        ] 2bi
-    ] if ;
+    2dup blocks>> ?adjoin [
+        2dup header>> eq? [ 2drop ] [
+            drop predecessors>> work-list get push-all-front
+        ] if
+    ] [ 2drop ] if ;
 
 : process-loop-ends ( loop -- )
     [ ends>> members <dlist> [ push-all-front ] [ work-list set ] [ ] tri ] keep
