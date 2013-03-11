@@ -110,11 +110,17 @@ M: word parent-word drop f ;
 : make-deprecated ( word -- )
     t "deprecated" set-word-prop ;
 
-: inline? ( word -- ? ) "inline" word-prop ; inline
+: inline? ( obj -- ? )
+    dup word? [ "inline" word-prop ] [ drop f ] if ; inline
 
-: inline-recursive? ( word -- ? )
-    dup "inline" word-prop
-    [ "recursive" word-prop ] [ drop f ] if ; inline
+: recursive? ( obj -- ? )
+    dup word? [ "recursive" word-prop ] [ drop f ] if ; inline
+
+: inline-recursive? ( obj -- ? )
+    dup word? [
+        dup "inline" word-prop
+        [ "recursive" word-prop ] [ drop f ] if
+    ] [ drop f ] if ; inline
 
 ERROR: cannot-be-inline word ;
 
