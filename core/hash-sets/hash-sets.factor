@@ -144,12 +144,5 @@ M: sequence fast-set >hash-set ;
 M: sequence duplicates
     dup length <hash-set> [ ?adjoin not ] curry filter ;
 
-<PRIVATE
-
-: (all-unique?) ( elt hash -- ? )
-    2dup in? [ 2drop f ] [ adjoin t ] if ; inline
-
-PRIVATE>
-
 M: sequence all-unique?
-    dup length <hash-set> [ (all-unique?) ] curry all? ;
+    dup length <hash-set> [ ?adjoin ] curry all? ;
