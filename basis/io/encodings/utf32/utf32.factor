@@ -60,3 +60,5 @@ M: utf32 <decoder> ( stream utf32 -- decoder )
 
 M: utf32 <encoder> ( stream utf32 -- encoder )
     drop bom-le over stream-write utf32le <encoder> ;
+
+PRIVATE>
