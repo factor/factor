@@ -105,3 +105,5 @@ M:: iso2022-state decode-char ( stream encoding -- char )
             ] [ encoding finish-decode ] if
         ]
     } case ;
+
+PRIVATE>

@@ -216,3 +216,5 @@ load-properties properties swap assoc-union! drop
 
 [ name>char [ "Invalid character" throw ] unless* ]
 name>char-hook set-global
+
+PRIVATE>
