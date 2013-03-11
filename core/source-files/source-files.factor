@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs checksums checksums.crc32
 compiler.units continuations definitions io.encodings.utf8
-io.files io.pathnames kernel namespaces sequences
+io.files io.pathnames kernel namespaces sequences sets
 source-files.errors strings words ;
+FROM: namespaces => set ;
 IN: source-files
 
 SYMBOL: source-files
@@ -47,14 +48,14 @@ M: pathname where string>> 1 2array ;
 
 : forget-source ( path -- )
     source-files get delete-at*
-    [ definitions>> [ keys forget-all ] each ] [ drop ] if ;
+    [ definitions>> [ members forget-all ] each ] [ drop ] if ;
 
 M: pathname forget*
     string>> forget-source ;
 
 : rollback-source-file ( file -- )
     [
-        new-definitions get [ assoc-union ] 2map
+        new-definitions get [ union ] 2map
     ] change-definitions drop ;
 
 SYMBOL: file
