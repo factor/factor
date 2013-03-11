@@ -5,6 +5,7 @@ compiler.units continuations definitions effects io
 io.encodings.utf8 io.files kernel lexer math.parser namespaces
 parser.notes quotations sequences sets slots source-files
 vectors vocabs vocabs.parser words words.symbol ;
+FROM: sets => members ;
 IN: parser
 
 : location ( -- loc )
@@ -179,8 +180,8 @@ FROM: namespaces => set ;
     parser-quiet? get [ drop ]
     [ (parsing-file-level) "Loading " append write print flush ] if ;
 
-: filter-moved ( assoc1 assoc2 -- seq )
-    swap assoc-diff keys [
+: filter-moved ( set1 set2 -- seq )
+    swap diff members [
         {
             { [ dup where dup [ first ] when file get path>> = not ] [ f ] }
             { [ dup reader-method? ] [ f ] }
@@ -189,11 +190,11 @@ FROM: namespaces => set ;
         } cond nip
     ] filter ;
 
-: removed-definitions ( -- assoc1 assoc2 )
+: removed-definitions ( -- set1 set2 )
     new-definitions old-definitions
-    [ get first2 assoc-union ] bi@ ;
+    [ get first2 union ] bi@ ;
 
-: removed-classes ( -- assoc1 assoc2 )
+: removed-classes ( -- set1 set2 )
     new-definitions old-definitions
     [ get second ] bi@ ;
 

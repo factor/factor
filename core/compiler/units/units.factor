@@ -18,10 +18,10 @@ TUPLE: redefine-error def ;
 
 <PRIVATE
 
-: add-once ( key assoc -- )
-    2dup key? [ over redefine-error ] when conjoin ;
+: add-once ( key set -- )
+    2dup in? [ over redefine-error ] when adjoin ;
 
-: (remember-definition) ( definition loc assoc -- )
+: (remember-definition) ( definition loc set -- )
     [ over set-where ] dip add-once ;
 
 PRIVATE>
@@ -30,16 +30,16 @@ PRIVATE>
     new-definitions get first (remember-definition) ;
 
 : fake-definition ( definition -- )
-    old-definitions get [ delete-at ] with each ;
+    old-definitions get [ delete ] with each ;
 
 : remember-class ( class loc -- )
-    [ dup new-definitions get first key? [ dup redefine-error ] when ] dip
+    [ dup new-definitions get first in? [ dup redefine-error ] when ] dip
     new-definitions get second (remember-definition) ;
 
 : forward-reference? ( word -- ? )
-    dup old-definitions get assoc-stack
-    [ new-definitions get assoc-stack not ]
-    [ drop f ] if ;
+    dup old-definitions get [ in? ] with any? [
+        new-definitions get [ in? ] with any? not
+    ] [ drop f ] if ;
 
 SYMBOL: compiler-impl
 
@@ -81,7 +81,7 @@ M: f process-forgotten-words drop ;
 : without-optimizer ( quot -- )
     [ f compiler-impl ] dip with-variable ; inline
 
-: <definitions> ( -- pair ) { H{ } H{ } } [ clone ] map ;
+: <definitions> ( -- pair ) { HS{ } HS{ } } [ clone ] map ;
 
 SYMBOL: definition-observers
 
@@ -122,8 +122,8 @@ M: object always-bump-effect-counter? drop f ;
 : updated-definitions ( -- set )
     HS{ } clone
     forgotten-definitions get union!
-    new-definitions get first keys over adjoin-all
-    new-definitions get second keys over adjoin-all
+    new-definitions get first union!
+    new-definitions get second union!
     changed-definitions get union!
     maybe-changed get union!
     dup changed-vocabs over adjoin-all ;
