@@ -26,12 +26,8 @@ MEMO: word-list ( -- seq )
 : ordered-word? ( word -- ? )
     >lower 2 <clumps> [ first2 <= ] all? ;
 
-: filter-longest-words ( seq -- seq' )
-    dup [ length ] [ max ] map-reduce
-    '[ length _ = ] filter ;
-
 : ordered-words-main ( -- )
     word-list [ ordered-word? ] filter
-    filter-longest-words [ print ] each ;
+    all-longest [ print ] each ;
 
 MAIN: ordered-words-main
