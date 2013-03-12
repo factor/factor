@@ -51,7 +51,7 @@ M:: offset modified-set-nth ( elt n seq -- )
 TUPLE: summed < modified seqs ;
 C: <summed> summed
 
-M: summed length seqs>> [ length ] [ max ] map-reduce ;
+M: summed length seqs>> longest length ;
 
 <PRIVATE
 : ?+ ( x/f y/f -- sum )
