@@ -1016,11 +1016,26 @@ M: object sum 0 [ + ] binary-reduce ; inline
 : cartesian-product ( seq1 seq2 -- newseq )
     [ { } 2sequence ] cartesian-map ;
 
-: filter-length ( seq n -- seq' ) [ swap length = ] curry filter ;
+: each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
+    -rot (each) (each-integer) ; inline
 
-: shortest ( seqs -- elt ) [ ] [ shorter ] map-reduce ;
+: supremum-by ( seq quot: ( ... elt -- ... x ) -- elt )
+    [ [ first dup ] dip call ] 2keep [
+        dupd call pick dupd after?
+        [ [ 2drop ] 2dip ] [ 2drop ] if
+    ] curry 1 each-from drop ; inline
 
-: longest ( seqs -- elt ) [ ] [ longer ] map-reduce ;
+: infimum-by ( seq quot: ( ... elt -- ... x ) -- elt )
+    [ [ first dup ] dip call ] 2keep [
+        dupd call pick dupd before?
+        [ [ 2drop ] 2dip ] [ 2drop ] if
+    ] curry 1 each-from drop ; inline
+
+: filter-length ( seq n -- seq' ) swap [ length = ] with filter ;
+
+: shortest ( seqs -- elt ) [ length ] infimum-by ;
+
+: longest ( seqs -- elt ) [ length ] supremum-by ;
 
 : all-shortest ( seqs -- seqs' ) dup shortest length filter-length ;
 
