@@ -5,14 +5,11 @@ IN: strings.tables
 
 <PRIVATE
 
-: max-length ( seq -- n )
-    [ length ] [ max ] map-reduce ; inline
-
 : format-row ( seq -- seq )
-    dup max-length '[ _ "" pad-tail ] map! ;
+    dup longest length '[ _ "" pad-tail ] map! ;
 
 : format-column ( seq -- seq )
-    dup max-length '[ _ CHAR: \s pad-tail ] map! ;
+    dup longest length '[ _ CHAR: \s pad-tail ] map! ;
 
 PRIVATE>
 

@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.primes sequences project-euler.common ;
+USING: arrays kernel locals math math.order math.primes
+project-euler.common sequences ;
 IN: project-euler.050
 
 ! http://projecteuler.net/index.php?section=problems&id=50
@@ -62,14 +63,11 @@ IN: project-euler.050
         [ length ] dip 2array
     ] if ;
 
-: longest ( pair pair -- longest )
-    2dup [ first ] bi@ > [ drop ] [ nip ] if ;
-
 : continue? ( pair seq -- ? )
     [ first ] [ length 1 - ] bi* < ;
 
 : (find-longest) ( best seq limit -- best )
-    [ longest-prime longest ] 2keep 2over continue? [
+    [ longest-prime max ] 2keep 2over continue? [
         [ rest-slice ] dip (find-longest)
     ] [ 2drop ] if ;
 

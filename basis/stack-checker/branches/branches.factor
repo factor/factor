@@ -21,7 +21,7 @@ SYMBOLS: +bottom+ +top+ ;
     ! Terminated branches are padded with bottom values which
     ! unify with literals.
     dup empty? [
-        dup [ length ] [ max ] map-reduce
+        dup longest length
         '[ _ +bottom+ pad-head ] map
     ] unless ;
 

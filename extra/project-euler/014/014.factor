@@ -38,16 +38,13 @@ IN: project-euler.014
 : next-collatz ( n -- n )
     dup even? [ 2 / ] [ 3 * 1 + ] if ;
 
-: longest ( seq seq -- seq )
-    2dup [ length ] bi@ > [ drop ] [ nip ] if ;
-
 PRIVATE>
 
 : collatz ( n -- seq )
     [ [ dup 1 > ] [ dup , next-collatz ] while , ] { } make ;
 
 : euler014 ( -- answer )
-    1000000 [1,b] { } [ collatz longest ] reduce first ;
+    1000000 [1,b] { } [ collatz longer ] reduce first ;
 
 ! [ euler014 ] time
 ! 52868 ms run / 483 ms GC time
@@ -65,7 +62,7 @@ PRIVATE>
 
 : euler014a ( -- answer )
     500000 1000000 [a,b] { 1 } [
-        dup worth-calculating? [ collatz longest ] [ drop ] if
+        dup worth-calculating? [ collatz longer ] [ drop ] if
     ] reduce first ;
 
 ! [ euler014a ] 10 ave-time

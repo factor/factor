@@ -844,6 +844,9 @@ PRIVATE>
     [ append ] padding ;
 
 : shorter? ( seq1 seq2 -- ? ) [ length ] bi@ < ;
+: longer? ( seq1 seq2 -- ? ) [ length ] bi@ > ;
+: shorter ( seq1 seq2 -- seq ) [ [ length ] bi@ <= ] 2keep ? ; inline
+: longer ( seq1 seq2 -- seq ) [ [ length ] bi@ >= ] 2keep ? ; inline
 
 : head? ( seq begin -- ? )
     2dup shorter? [
@@ -1012,6 +1015,16 @@ M: object sum 0 [ + ] binary-reduce ; inline
 
 : cartesian-product ( seq1 seq2 -- newseq )
     [ { } 2sequence ] cartesian-map ;
+
+: filter-length ( seq n -- seq' ) [ swap length = ] curry filter ;
+
+: shortest ( seqs -- elt ) [ ] [ shorter ] map-reduce ;
+
+: longest ( seqs -- elt ) [ ] [ longer ] map-reduce ;
+
+: all-shortest ( seqs -- seqs' ) dup shortest length filter-length ;
+
+: all-longest ( seqs -- seqs' ) dup longest length filter-length ;
 
 ! We hand-optimize flip to such a degree because type hints
 ! cannot express that an array is an array of arrays yet, and

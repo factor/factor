@@ -217,7 +217,7 @@ PRIVATE>
 
 : round-robin ( seq -- newseq )
     [ { } ] [
-        [ [ length ] [ max ] map-reduce iota ] keep
+        [ longest length iota ] keep
         [ [ ?nth ] with map ] curry map concat sift
     ] if-empty ;
 

@@ -46,12 +46,9 @@ SYMBOLS: return-addresses gc-maps ;
         compiled-offset return-addresses get push
     ] [ drop ] if ;
 
-: longest ( seqs -- n )
-    [ length ] [ max ] map-reduce ;
-
 : emit-scrub ( seqs -- n )
     ! seqs is a sequence of sequences of 0/1
-    dup longest
+    dup longest length
     [ '[ [ 0 = ] ?{ } map-as _ f pad-tail % ] each ] keep ;
 
 : integers>bits ( seq n -- bit-array )
