@@ -28,23 +28,8 @@ IN: sequences.extras
 : insert-sorted ( elt seq -- seq )
     2dup [ < ] with find drop over length or swap insert-nth ;
 
-: each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
-    -rot (each) (each-integer) ; inline
-
 : reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) i -- ... result )
     [ swap ] 2dip each-from ; inline
-
-: supremum-by ( seq quot: ( ... elt -- ... x ) -- elt )
-    [ [ first dup ] dip call ] 2keep [
-        dupd call pick dupd after?
-        [ [ 2drop ] 2dip ] [ 2drop ] if
-    ] curry 1 each-from drop ; inline
-
-: infimum-by ( seq quot: ( ... elt -- ... x ) -- elt )
-    [ [ first dup ] dip call ] 2keep [
-        dupd call pick dupd before?
-        [ [ 2drop ] 2dip ] [ 2drop ] if
-    ] curry 1 each-from drop ; inline
 
 : all-subseqs ( seq -- seqs )
     dup length [1,b] [ <clumps> ] with map concat ;
