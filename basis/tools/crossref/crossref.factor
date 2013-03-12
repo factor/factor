@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words assocs definitions io io.pathnames io.styles kernel
-prettyprint sorting see sets sequences arrays hashtables help
-help.crossref help.topics help.markup quotations accessors
-source-files namespaces graphs vocabs generic generic.single
-threads compiler.units init combinators.smart ;
+USING: accessors arrays assocs bootstrap.image.private
+combinators.smart compiler.units generic generic.single graphs
+hashtables help help.apropos help.crossref help.markup
+help.topics init io io.pathnames io.styles kernel namespaces
+quotations see sequences sets sorting source-files threads
+vocabs words ;
 IN: tools.crossref
 
 SYMBOL: crossref
@@ -14,8 +15,6 @@ GENERIC: uses ( defspec -- seq )
 <PRIVATE
 
 SYMBOL: visited
-
-USE: bootstrap.image.private
 
 GENERIC# quot-uses 1 ( obj set -- )
 
@@ -57,6 +56,8 @@ M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
 
 ! To make UI browser happy
 M: vocab uses drop f ;
+M: vocab-link uses drop f ;
+M: apropos-search uses drop f ;
 
 : crossref-def ( defspec -- )
     dup uses crossref get-global add-vertex ;
