@@ -4,29 +4,6 @@ tools.test ;
 
 IN: sequences.extras.tests
 
-[ 4 ] [ 5 iota [ ] supremum-by ] unit-test
-[ 0 ] [ 5 iota [ ] infimum-by ] unit-test
-{ "bar" } [ { "bar" "baz" "qux" } [ length ] supremum-by ] unit-test
-{ "bar" } [ { "bar" "baz" "qux" } [ length ] infimum-by ] unit-test
-[ { "foo" } ] [ { { "foo" } { "bar" } } [ first ] supremum-by ] unit-test
-[ { "bar" } ] [ { { "foo" } { "bar" } } [ first ] infimum-by ] unit-test
-
-[ { 0 0 255 } ] [
-    {
-        { 0 0 0 }
-        { 95 255 95 }
-        { 215 95 95 }
-        { 95 135 255 }
-        { 135 95 135 }
-        { 135 255 255 }
-        { 0 0 255 }
-        { 0 95 95 }
-        { 0 255 215 }
-        { 135 0 95 }
-        { 255 0 175 }
-    } [ { 0 0 255 } distance ] infimum-by
-] unit-test
-
 { V{ 0 1 2 3 4 5 6 7 8 9 } } [
     V{ } clone
     10 iota >array randomize
