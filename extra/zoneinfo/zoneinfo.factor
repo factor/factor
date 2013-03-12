@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.smart io.encodings.utf8 io.files
-kernel namespaces sequences splitting unicode.case accessors
-math.parser calendar memoize fry ;
+USING: accessors assocs combinators combinators.short-circuit
+combinators.smart fry io.encodings.utf8 io.files kernel
+math.parser math.statistics memoize namespaces sequences
+splitting unicode.case ;
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths
@@ -127,6 +128,16 @@ TUPLE: leap ;
 
 MEMO: zoneinfo-files ( -- seq )
     zoneinfo-paths [ parse-zoneinfo-file ] map ;
+
+MEMO: zoneinfo-array ( -- seq )
+    zoneinfo-files concat ;
+
+
+: raw-rule-map ( -- assoc )
+    zoneinfo-array [ raw-rule? ] filter [ name>> ] collect-by ;
+
+: raw-zone-map ( -- assoc )
+    zoneinfo-array [ raw-zone? ] filter [ name>> ] collect-by ;
     
 GENERIC: zone-matches? ( string rule -- ? )
 
@@ -135,14 +146,20 @@ M: raw-zone zone-matches? name>> = ;
 M: raw-link zone-matches? from>> = ;
 M: raw-leap zone-matches? 2drop f ;
 
-: find-timezone-rules ( string -- seq )
-    [ zoneinfo-files ] dip '[
-        [ [ _ ] dip zone-matches? ] filter
-    ] map concat sift ;
+: find-rules ( string -- rules )
+    raw-rule-map
+    [ [ to>> "max" = ] filter ] assoc-map at ;
 
-: find-applicable-rules ( string -- seq )
-    find-timezone-rules [ until>> empty? ] filter ;
+ERROR: zone-not-found name ;
 
+: find-zone ( string -- rules )
+    raw-zone-map
+    [ last ] assoc-map ?at [ zone-not-found ] unless ;
+
+: find-zone-rules ( string -- zone rules )
+    find-zone dup rules/save>> find-rules ;
+
+! "Europe/Helsinki" find-zone-rules
 
 ! Rule
 ! name - string
