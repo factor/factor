@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs definitions fry help kernel
-colors.constants math.rectangles models.arrow namespaces sequences
-sorting definitions.icons tools.crossref ui.gadgets ui.gadgets.glass
-ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
-ui.gadgets.search-tables ui.gadgets.wrappers ui.gestures ui.operations
-ui.pens.solid ui.images ;
+USING: accessors arrays assocs colors.constants
+definitions.icons fry help help.topics kernel math.rectangles
+models.arrow namespaces sequences tools.crossref ui.gadgets
+ui.gadgets.glass ui.gadgets.labeled ui.gadgets.search-tables
+ui.gadgets.tables ui.gadgets.wrappers ui.gestures ui.images
+ui.operations ui.pens.solid ;
 FROM: ui.gadgets.wrappers => wrapper ;
 IN: ui.tools.browser.popups
 
@@ -18,12 +18,11 @@ M: link-renderer row-value drop first ;
 
 TUPLE: links-popup < wrapper ;
 
-: match? ( value str -- ? )
-    swap second subseq? ;
-
 : <links-table> ( model quot -- table )
-    '[ @ sort-articles ] <arrow>
-    link-renderer [ second ] <search-table>
+    '[
+        @ sort-articles
+        [ dup article-title ] { } map>assoc
+    ] <arrow> link-renderer [ second ] <search-table>
         [ invoke-primary-operation ] >>action
         [ hide-glass ] >>hook
         t >>selection-required?
