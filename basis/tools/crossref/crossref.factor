@@ -2,10 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bootstrap.image.private
 combinators.smart compiler.units generic generic.single graphs
-hashtables help help.apropos help.crossref help.markup
-help.topics init io io.pathnames io.styles kernel namespaces
-quotations see sequences sets sorting source-files threads
-vocabs words ;
+hashtables help help.crossref help.markup help.topics init io
+io.pathnames io.styles kernel namespaces quotations see
+sequences sets sorting source-files threads vocabs words ;
 IN: tools.crossref
 
 SYMBOL: crossref
@@ -55,9 +54,7 @@ M: link uses
 M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
 
 ! To make UI browser happy
-M: vocab uses drop f ;
-M: vocab-link uses drop f ;
-M: apropos-search uses drop f ;
+M: object uses drop f ;
 
 : crossref-def ( defspec -- )
     dup uses crossref get-global add-vertex ;
