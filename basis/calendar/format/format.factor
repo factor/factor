@@ -106,7 +106,7 @@ M: timestamp year. ( timestamp -- )
     #! RFC822 timestamp format
     #! Example: Tue, 15 Nov 1994 08:12:31 +0200
     [
-        [ (timestamp>string) " " write ]
+        [ (timestamp>string) bl ]
         [ gmt-offset>> write-gmt-offset ]
         bi
     ] with-string-writer ;
