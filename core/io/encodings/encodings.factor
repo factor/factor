@@ -111,15 +111,18 @@ M: decoder stream-contents*
         { CHAR: \n [ line-ends\n ] }
     } case ; inline
 
+! If the stop? branch is taken convert the sbuf to a string
 ! If sep is present, returns ``string sep'' (string can be "")
 ! If sep is f, returns ``string f'' or ``f f''
-: (decoder-read-until) ( quot: ( -- char stop? ) -- string/f sep/f )
-    [ 100 <sbuf> ] dip over [ push ] curry until
-    [ "" like ] dip [ f like f ] unless* ; inline
+: read-until-loop ( buf quot: ( -- char stop? ) -- string/f sep/f )
+    dup call
+    [ nip [ "" like ] dip [ f like f ] unless* ]
+    [ pick push read-until-loop ] if ; inline recursive
 
 : decoder-read-until ( seps stream encoding -- string/f sep/f )
     [ decode-char dup ] 2curry swap [ dupd member? ] curry
-    [ [ drop f t ] if ] curry compose (decoder-read-until) ; inline
+    [ [ drop f t ] if ] curry compose
+    [ 100 <sbuf> ] dip read-until-loop ; inline
 
 M: decoder stream-read-until >decoder< decoder-read-until ;
 
