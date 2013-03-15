@@ -709,7 +709,8 @@ PRIVATE>
 
 <PRIVATE
 
-: last-unsafe ( seq -- elt ) [ length 1 - ] [ nth-unsafe ] bi ;
+: last-unsafe ( seq -- elt )
+    [ length 1 - ] [ nth-unsafe ] bi ; inline
 
 PRIVATE>
 
