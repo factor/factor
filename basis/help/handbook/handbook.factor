@@ -186,7 +186,7 @@ ARTICLE: "encodings-introduction" "An introduction to encodings"
 "Constructors for streams which deal with bytes usually take an encoding as an explicit parameter. For example, to open a text file for reading whose contents are in UTF-8, use the following"
 { $code "\"file.txt\" utf8 <file-reader>" }
 "If there is an error in the encoded stream, a replacement character (0xFFFD) will be inserted. To throw an exception upon error, use a strict encoding as follows"
-{ $code "\"file.txt\" utf8 strict <file-reader>" }
+{ $code "USE: io.encodings.strict" "\"file.txt\" utf8 strict <file-reader>" }
 "In a similar way, encodings can be specified when opening a file for writing."
 { $code "USE: io.encodings.ascii" "\"file.txt\" ascii <file-writer>" }
 "An encoding is also needed for some words that don't return streams, such as " { $link file-contents } ", for example"
