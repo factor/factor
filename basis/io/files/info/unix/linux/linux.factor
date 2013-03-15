@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax combinators csv
-io.backend io.encodings.utf8 io.files io.files.info io.streams.string
+io.backend io.encodings.utf8 io.files io.files.info
 io.files.unix kernel math.order namespaces sequences sorting
 system unix unix.statfs.linux unix.statvfs.linux io.files.links
 arrays io.files.info.unix assocs io.pathnames unix.types
@@ -50,7 +50,7 @@ frequency pass-number ;
         [ first >>file-system-name ]
         [ second >>mount-point ]
         [ third >>type ]
-        [ fourth <string-reader> csv first >>options ]
+        [ fourth string>csv first >>options ]
         [ 4 swap ?nth [ 0 ] unless* >>frequency ]
         [ 5 swap ?nth [ 0 ] unless* >>pass-number ]
     } cleave ;
