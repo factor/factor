@@ -71,6 +71,6 @@ M: +middle+ align-string
 
 : print-aligned ( text alignment -- )
     [ split-and-pad flip ] dip align-columns flip
-    [ [ write " " write ] each nl ] each ;
+    [ [ write bl ] each nl ] each ;
 
 ! USAGE: example-text +left+ print-aligned

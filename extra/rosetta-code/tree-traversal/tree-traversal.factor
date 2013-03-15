@@ -88,7 +88,7 @@ CONSTANT: example-tree
     ] while drop ; inline
 
 : tree-traversal-main ( -- )
-    example-tree [ number>string write " " write ] {
+    example-tree [ number>string write bl ] {
         [ "preorder:    " write preorder    nl ]
         [ "inorder:     " write inorder     nl ]
         [ "postorder:   " write postorder   nl ]
