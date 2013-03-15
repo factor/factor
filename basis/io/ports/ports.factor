@@ -232,8 +232,6 @@ M: object underlying-handle underlying-port handle>> ;
 
 HINTS: decoder-read-until { string input-port utf8 } { string input-port ascii } ;
 
-HINTS: decoder-readln { input-port utf8 } { input-port ascii } ;
-
 HINTS: M\ input-port stream-read-partial-unsafe
     { fixnum byte-array input-port }
     { fixnum string input-port } ;
