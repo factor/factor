@@ -6,41 +6,45 @@ prettyprint hashtables mirrors tr json fry combinators ;
 IN: json.writer
 
 #! Writes the object out to a stream in JSON format
-GENERIC: json-print ( obj -- )
+GENERIC# stream-json-print 1 ( obj stream -- )
+
+: json-print ( obj -- )
+    output-stream get stream-json-print ;
 
 : >json ( obj -- string )
     #! Returns a string representing the factor object in JSON format
     [ json-print ] with-string-writer ;
 
-M: f json-print ( f -- )
-    drop "false" write ;
+M: f stream-json-print
+    [ drop "false" ] [ stream-write ] bi* ;
 
-M: t json-print ( t -- )
-    drop "true" write ;
+M: t stream-json-print
+    [ drop "true" ] [ stream-write ] bi* ;
 
-M: json-null json-print ( null -- )
-    drop "null" write ;
+M: json-null stream-json-print
+    [ drop "null" ] [ stream-write ] bi* ;
 
-M: string json-print ( obj -- )
-    CHAR: " write1 [
+M: string stream-json-print
+    CHAR: " over stream-write1 swap [
         {
-            { CHAR: "  [ "\\\"" write ] }
+            { CHAR: "  [ "\\\"" over stream-write ] }
             { CHAR: \r [ ] }
-            { CHAR: \n [ "\\r\\n" write ] }
-            [ write1 ]
+            { CHAR: \n [ "\\r\\n" over stream-write ] }
+            [ over stream-write1 ]
         } case
-    ] each CHAR: " write1 ;
+    ] each CHAR: " swap stream-write1 ;
 
-M: integer json-print ( num -- )
-    number>string write ;
+M: integer stream-json-print
+    [ number>string ] [ stream-write ] bi* ;
 
-M: real json-print ( num -- )
-    >float number>string write ;
+M: real stream-json-print
+    [ >float number>string ] [ stream-write ] bi* ;
 
-M: sequence json-print ( array -- )
-    CHAR: [ write1 [
-        [ CHAR: , write1 ] [ json-print ] interleave
-    ] unless-empty CHAR: ] write1 ;
+M: sequence stream-json-print
+    CHAR: [ over stream-write1 swap [
+        over '[ CHAR: , _ stream-write1 ]
+        pick '[ _ stream-json-print ] interleave
+    ] unless-empty CHAR: ] swap stream-write1 ;
 
 SYMBOL: jsvar-encode?
 t jsvar-encode? set-global
@@ -48,31 +52,33 @@ TR: jsvar-encode "-" "_" ;
 
 <PRIVATE
 
-: json-print-assoc ( assoc -- )
-    CHAR: { write1 >alist [
+: json-print-assoc ( assoc stream -- )
+    CHAR: { over stream-write1 swap >alist [
         jsvar-encode? get [
-            [ CHAR: , write1 ]
-            [
+            over '[ CHAR: , _ stream-write1 ]
+            pick dup '[
                 first2
-                [ jsvar-encode json-print ]
-                [ CHAR: : write1 json-print ]
+                [ jsvar-encode _ stream-json-print ]
+                [ _ CHAR: : over stream-write1 stream-json-print ]
                 bi*
             ] interleave
         ] [
-            [ CHAR: , write1 ]
-            [
+            over '[ CHAR: , _ stream-write1 ]
+            pick dup '[
                 first2
-                [ json-print ]
-                [ CHAR: : write1 json-print ]
+                [ _ stream-json-print ]
+                [ _ CHAR: : over stream-write1 stream-json-print ]
                 bi*
             ] interleave
         ] if
-    ] unless-empty CHAR: } write1 ;
+    ] unless-empty CHAR: } swap stream-write1 ;
 
 PRIVATE>
 
-M: tuple json-print ( tuple -- ) <mirror> json-print-assoc ;
+M: tuple stream-json-print
+    [ <mirror> ] dip json-print-assoc ;
 
-M: hashtable json-print ( hashtable -- ) json-print-assoc ;
+M: hashtable stream-json-print json-print-assoc ;
 
-M: word json-print name>> json-print ;
+M: word stream-json-print
+    [ name>> ] dip stream-json-print ;
