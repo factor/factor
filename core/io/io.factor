@@ -99,7 +99,9 @@ SYMBOL: error-stream
 
 : print ( str -- ) output-stream get stream-print ; inline
 
-: bl ( -- ) " " write ;
+: stream-bl ( stream -- ) " " swap stream-write ; inline
+
+: bl ( -- ) output-stream get stream-bl ;
 
 : each-morsel ( ..a handler: ( ..a data -- ..b ) reader: ( ..b -- ..a data ) -- ..a )
     [ dup ] compose swap while drop ; inline
