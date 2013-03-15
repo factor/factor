@@ -3,13 +3,11 @@ io.pathnames strings ;
 IN: csv
 
 HELP: read-row
-{ $values { "stream" "an input stream" }
-          { "row" "an array of fields" } }
+{ $values { "row" "an array of fields" } }
 { $description "parses a row from a csv stream" } ;
 
 HELP: read-csv
-{ $values { "stream" "an input stream" }
-          { "rows" "an array of arrays of fields" } }
+{ $values { "rows" "an array of arrays of fields" } }
 { $description "Parses a csv stream into an array of row arrays." } ;
 
 HELP: file>csv
@@ -45,8 +43,7 @@ HELP: write-row
 { $description "writes a row to the output stream" } ;
 
 HELP: write-csv
-{ $values { "rows" "a sequence of sequences of strings" }
-          { "stream" "an output stream" } }
+{ $values { "rows" "a sequence of sequences of strings" } }
 { $description "Writes a sequence of sequences of comma-separated-values to the output stream, escaping where necessary." } ;
 
 HELP: with-delimiter
