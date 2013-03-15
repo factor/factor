@@ -2,9 +2,14 @@ USING: help.syntax help.markup kernel prettyprint sequences
 io.pathnames strings ;
 IN: csv
 
-HELP: csv
+HELP: read-row
 { $values { "stream" "an input stream" }
-          { "rows" "an array of arrays of fields" } } 
+          { "row" "an array of fields" } }
+{ $description "parses a row from a csv stream" } ;
+
+HELP: read-csv
+{ $values { "stream" "an input stream" }
+          { "rows" "an array of arrays of fields" } }
 { $description "Parses a csv stream into an array of row arrays." } ;
 
 HELP: file>csv
@@ -35,36 +40,31 @@ HELP: csv>string
 }
 { $description "Writes a comma-separated-value structure to a string." } ;
 
-HELP: csv-row
-{ $values { "stream" "an input stream" }
-          { "row" "an array of fields" } } 
-{ $description "parses a row from a csv stream" } ;
+HELP: write-row
+{ $values { "row" "an array of fields" } }
+{ $description "writes a row to the output stream" } ;
 
 HELP: write-csv
 { $values { "rows" "a sequence of sequences of strings" }
-          { "stream" "an output stream" } } 
+          { "stream" "an output stream" } }
 { $description "Writes a sequence of sequences of comma-separated-values to the output stream, escaping where necessary." } ;
 
 HELP: with-delimiter
-{ $values { "ch" "field delimiter (e.g. CHAR: \t)" }
+{ $values { "ch" "field delimiter (e.g. CHAR: \\t)" }
           { "quot" "a quotation" } }
-{ $description "Sets the field delimiter for csv or csv-row words." } ;
+{ $description "Sets the field delimiter for read-csv, read-row, write-csv, or write-row words." } ;
 
 ARTICLE: "csv" "Comma-separated-values parsing and writing"
 "The " { $vocab-link "csv" } " vocabulary can read and write CSV (comma-separated-value) files." $nl
-"Reading a csv file:"
-{ $subsections file>csv }
-"Writing a csv file:"
-{ $subsections csv>file }
-"Reading a string to csv:"
-{ $subsections string>csv }
-"Writing csv to a string:"
-{ $subsections csv>string }
+"Working with CSV files:"
+{ $subsections file>csv csv>file }
+"Working with CSV strings:"
+{ $subsections string>csv csv>string }
 "Changing the delimiter from a comma:"
 { $subsections with-delimiter }
 "Reading from a stream:"
-{ $subsections csv }
+{ $subsections read-csv read-row }
 "Writing to a stream:"
-{ $subsections write-csv } ;
+{ $subsections write-csv write-row } ;
 
 ABOUT: "csv"
