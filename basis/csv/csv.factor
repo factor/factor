@@ -11,8 +11,6 @@ CHAR: , delimiter set-global
 
 <PRIVATE
 
-: delimiter> ( -- delimiter ) delimiter get ; inline
-
 MEMO: field-delimiters ( delimiter -- field-end quoted-field )
     [ "\n" swap suffix ] [ "\"\n" swap suffix ] bi ; inline
 
@@ -49,33 +47,36 @@ DEFER: quoted-field
         if-empty
     ] [ [ 2drop ] 2dip swap ?trim ] if ;
 
-: (row) ( delimiter stream field-end quoted-field -- delimiter sep/f fields )
-    [ dup [ 2dup = ] ] 3dip
-    [ [ drop ] 3dip field ] 3curry produce ;
+: (stream-read-row) ( delimiter stream field-end quoted-field -- delimiter sep/f fields )
+    [ dup [ 2dup = ] ] 3dip '[ drop _ _ _ field ] produce ;
 
-: row ( delimiter -- delimiter sep/f fields )
-    input-stream get over field-delimiters (row) ;
-
-: (csv) ( -- )
-    delimiter>
+: (stream-read-csv) ( stream -- )
+    delimiter get
     [ dup [ empty? ] all? [ drop ] [ , ] if ]
-    input-stream get pick field-delimiters
-    [ (row) ] 3curry do while drop ;
+    rot pick field-delimiters
+    '[ _ _ _ (stream-read-row) ] do while drop ;
 
 PRIVATE>
 
-: read-row ( stream -- row )
-    [ delimiter> row 2nip ] with-input-stream ;
+: stream-read-row ( stream -- row )
+    delimiter get swap over field-delimiters
+    (stream-read-row) 2nip ; inline
 
-: read-csv ( stream -- rows )
-    [ [ (csv) ] { } make ] with-input-stream
-    dup last { "" } = [ but-last ] when ;
+: read-row ( -- row )
+    input-stream get stream-read-row ; inline
+
+: stream-read-csv ( stream -- rows )
+    [ (stream-read-csv) ] { } make
+    dup last { "" } = [ but-last ] when ; inline
+
+: read-csv ( -- rows )
+    input-stream get stream-read-csv ; inline
 
 : string>csv ( string -- csv )
-    <string-reader> read-csv ;
+    [ read-csv ] with-string-reader ;
 
 : file>csv ( path encoding -- csv )
-    <file-reader> read-csv ;
+    [ read-csv ] with-file-reader ;
 
 : with-delimiter ( ch quot -- )
     [ delimiter ] dip with-variable ; inline
@@ -95,27 +96,26 @@ PRIVATE>
     [ dupd needs-escaping? ] dip
     [ escape-quotes ] [ stream-write ] bi-curry if ; inline
 
-: (write-row) ( row delimiter stream -- )
+: (stream-write-row) ( row delimiter stream -- )
     [ '[ _ _ stream-write1 ] ] 2keep
     '[ _ _ escape-if-required ] interleave nl ; inline
 
 PRIVATE>
 
+: stream-write-row ( row stream -- )
+    delimiter get swap (stream-write-row) ; inline
+
 : write-row ( row -- )
-    delimiter> output-stream get (write-row) ; inline
+    output-stream get stream-write-row ; inline
 
-<PRIVATE
+: stream-write-csv ( rows stream -- )
+    delimiter get swap '[ _ _ (stream-write-row) ] each ;
 
-: (write-csv) ( rows -- )
-    delimiter> output-stream get '[ _ _ (write-row) ] each ;
-
-PRIVATE>
-
-: write-csv ( rows stream -- )
-    [ (write-csv) ] with-output-stream ;
+: write-csv ( rows -- )
+    output-stream get stream-write-csv ;
 
 : csv>string ( csv -- string )
-    [ (write-csv) ] with-string-writer ;
+    [ write-csv ] with-string-writer ;
 
 : csv>file ( rows path encoding -- )
-    <file-writer> write-csv ;
+    [ write-csv ] with-file-writer ;
