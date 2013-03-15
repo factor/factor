@@ -208,12 +208,12 @@ DEFER: (profile.)
 
 :: times. ( node -- )
     node {
-        [ depth>> number>string 4 CHAR: \s pad-head write " " write ]
-        [ total-time>> duration. " " write ]
-        [ [ gc-time>> ] [ total-time>> ] bi percentage. " " write ]
-        [ [ jit-time>> ] [ total-time>> ] bi percentage. " " write ]
-        [ [ foreign-time>> ] [ total-time>> ] bi percentage. " " write ]
-        [ [ foreign-thread-time>> ] [ total-time>> ] bi percentage. " " write ]
+        [ depth>> number>string 4 CHAR: \s pad-head write bl ]
+        [ total-time>> duration. bl ]
+        [ [ gc-time>> ] [ total-time>> ] bi percentage. bl ]
+        [ [ jit-time>> ] [ total-time>> ] bi percentage. bl ]
+        [ [ foreign-time>> ] [ total-time>> ] bi percentage. bl ]
+        [ [ foreign-thread-time>> ] [ total-time>> ] bi percentage. bl ]
     } cleave ;
 
 :: (profile-node.) ( word node depth -- )

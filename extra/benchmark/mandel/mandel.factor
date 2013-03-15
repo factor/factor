@@ -28,7 +28,7 @@ IN: benchmark.mandel
 
 : ppm-header ( -- )
     ascii encode-output
-    "P6\n" write width pprint " " write height pprint "\n255\n" write
+    "P6\n" write width pprint bl height pprint "\n255\n" write
     binary encode-output ; inline
 
 : mandel-benchmark ( -- )
