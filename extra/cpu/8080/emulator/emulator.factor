@@ -539,7 +539,7 @@ SYMBOL: rom-root
   [ " A: " write a>> >hex 2 CHAR: \s pad-head write ] keep
   [ " SP: " write sp>> >hex 4 CHAR: \s pad-head write ] keep
   [ " cycles: " write cycles>> number>string 5 CHAR: \s pad-head write ] keep
-  [ " " write peek-instruction name>> write " " write ] keep
+  [ bl peek-instruction name>> write bl ] keep
   nl drop ;
 
 : cpu*. ( cpu -- )
