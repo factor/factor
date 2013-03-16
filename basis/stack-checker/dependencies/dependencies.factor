@@ -69,7 +69,7 @@ GENERIC: satisfied? ( dependency -- ? )
 
 : add-conditional-dependency ( ... class -- )
     boa conditional-dependencies get
-    dup [ conjoin ] [ 2drop ] if ; inline
+    dup [ adjoin ] [ 2drop ] if ; inline
 
 TUPLE: depends-on-class-predicate class1 class2 result ;
 
@@ -147,7 +147,7 @@ M: depends-on-final satisfied?
 : init-dependencies ( -- )
     H{ } clone dependencies set
     H{ } clone generic-dependencies set
-    H{ } clone conditional-dependencies set ;
+    HS{ } clone conditional-dependencies set ;
 
 : without-dependencies ( quot -- )
     [

@@ -109,4 +109,4 @@ generic-call-site-crossref [ H{ } clone ] initialize
     tri ;
 
 : set-dependency-checks ( word deps -- )
-    keys f like "dependency-checks" set-word-prop ;
+    members f like "dependency-checks" set-word-prop ;
