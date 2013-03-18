@@ -15,6 +15,27 @@ M: object guess-encoded-length drop ; inline
 
 GENERIC: decode-char ( stream encoding -- char/f )
 
+GENERIC: decode-until ( seps stream encoding -- string/f sep/f )
+
+<PRIVATE
+
+! If the stop? branch is taken convert the sbuf to a string
+! If sep is present, returns ``string sep'' (string can be "")
+! If sep is f, returns ``string f'' or ``f f''
+: read-until-loop ( buf quot: ( -- char stop? ) -- string/f sep/f )
+    dup call
+    [ nip [ "" like ] dip [ f like f ] unless* ]
+    [ pick push read-until-loop ] if ; inline recursive
+
+PRIVATE>
+
+: (decode-until) ( seps stream encoding -- string/f sep/f )
+    [ decode-char dup ] 2curry swap [ dupd member? ] curry
+    [ [ drop f t ] if ] curry compose
+    [ 100 <sbuf> ] dip read-until-loop ; inline
+
+M: object decode-until (decode-until) ;
+
 GENERIC: encode-char ( char stream encoding -- )
 
 GENERIC: encode-string ( string stream encoding -- )
@@ -111,23 +132,10 @@ M: decoder stream-contents*
         { CHAR: \n [ line-ends\n ] }
     } case ; inline
 
-! If the stop? branch is taken convert the sbuf to a string
-! If sep is present, returns ``string sep'' (string can be "")
-! If sep is f, returns ``string f'' or ``f f''
-: read-until-loop ( buf quot: ( -- char stop? ) -- string/f sep/f )
-    dup call
-    [ nip [ "" like ] dip [ f like f ] unless* ]
-    [ pick push read-until-loop ] if ; inline recursive
-
-: decoder-read-until ( seps stream encoding -- string/f sep/f )
-    [ decode-char dup ] 2curry swap [ dupd member? ] curry
-    [ [ drop f t ] if ] curry compose
-    [ 100 <sbuf> ] dip read-until-loop ; inline
-
-M: decoder stream-read-until >decoder< decoder-read-until ;
+M: decoder stream-read-until >decoder< decode-until ;
 
 M: decoder stream-readln
-    "\r\n" over >decoder< decoder-read-until handle-readln ;
+    "\r\n" over >decoder< decode-until handle-readln ;
 
 M: decoder dispose stream>> dispose ;
 
