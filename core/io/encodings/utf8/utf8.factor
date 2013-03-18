@@ -54,6 +54,8 @@ SINGLETON: utf8
 M: utf8 decode-char
     drop decode-utf8 ; inline
 
+M: utf8 decode-until (decode-until) ;
+
 ! Encoding UTF-8
 
 : encoded ( stream char -- )

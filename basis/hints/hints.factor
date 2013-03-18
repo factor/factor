@@ -117,9 +117,9 @@ set-specializer
 
 \ split, { string string } set-specializer
 
-{ member? member-eq? } [
-    { array } set-specializer
-] each
+\ member? { { array } { string } } set-specializer
+
+\ member-eq? { array } set-specializer
 
 \ assoc-stack { vector } set-specializer
 

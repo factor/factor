@@ -230,7 +230,7 @@ M: object underlying-handle underlying-port handle>> ;
 
 ! Fast-path optimization
 
-HINTS: decoder-read-until { string input-port utf8 } { string input-port ascii } ;
+HINTS: (decode-until) { string input-port object } ;
 
 HINTS: M\ input-port stream-read-partial-unsafe
     { fixnum byte-array input-port }
