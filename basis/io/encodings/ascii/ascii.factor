@@ -25,3 +25,5 @@ M: ascii decode-char
     stream-read1 dup [
         dup 127 <= [ >fixnum ] [ drop replacement-char ] if
     ] when ; inline
+
+M: ascii decode-until (decode-until) ;
