@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Phil Dawes
+! Copyright (C) 2007, 2008 Phil Dawes, 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators fry io io.files io.streams.string kernel
 make math memoize namespaces sbufs sequences sequences.private
@@ -11,23 +11,26 @@ CHAR: , delimiter set-global
 
 <PRIVATE
 
-MEMO: field-delimiters ( delimiter -- field-end quoted-field )
-    [ "\n" swap suffix ] [ "\"\n" swap suffix ] bi ; inline
+MEMO: field-delimiters ( delimiter -- field-seps quote-seps )
+    [ "\n" swap prefix ] [ "\"\n" swap prefix ] bi ; inline
 
-DEFER: quoted-field
+DEFER: quoted-field,
 
-: maybe-escaped-quote ( delimeter stream quoted? -- delimiter stream endchar/f )
+: maybe-escaped-quote ( delimeter stream quoted? -- delimiter stream sep/f )
     2over stream-read1 swap over =
     [ nip ] [
         {
-            { CHAR: "    [ [ CHAR: " , ] when quoted-field ] }
+            { CHAR: "    [ [ CHAR: " , ] when quoted-field, ] }
             { CHAR: \n   [ ] } ! Error: newline inside string?
             [ [ , drop f maybe-escaped-quote ] when* ]
         } case
      ] if ; inline recursive
 
-: quoted-field ( delimiter stream -- delimiter stream endchar/f )
+: quoted-field, ( delimiter stream -- delimiter stream sep/f )
     "\"" over stream-read-until drop % t maybe-escaped-quote ;
+
+: quoted-field ( delimiter stream -- sep/f field )
+    [ quoted-field, 2nip ] "" make ;
 
 : ?trim ( string -- string' )
     dup length [ drop "" ] [
@@ -36,31 +39,29 @@ DEFER: quoted-field
         [ [ blank? ] trim ] when
     ] if-zero ; inline
 
-: field ( delimiter stream field-end quoted-field -- delimiter sep/f field )
-    pick stream-read-until dup CHAR: " = [
-        drop
-        [ drop [ quoted-field nip ] "" make ]
-        [
-            swap rot stream-read-until
-            [ "\"" glue ] dip swap ?trim
-        ]
-        if-empty
-    ] [ [ 2drop ] 2dip swap ?trim ] if ;
+: continue-field ( delimiter stream field-seps seq -- sep/f field )
+    swap rot stream-read-until [ "\"" glue ] dip
+    swap ?trim [ drop ] 2dip ; inline
 
-: (stream-read-row) ( delimiter stream field-end quoted-field -- delimiter sep/f fields )
-    [ dup [ 2dup = ] ] 3dip '[ drop _ _ _ field ] produce ;
+: field ( delimiter stream field-seps quote-seps -- sep/f field )
+    pick stream-read-until dup CHAR: " = [
+        drop [ drop quoted-field ] [ continue-field ] if-empty
+    ] [ [ 3drop ] 2dip swap ?trim ] if ;
+
+: (stream-read-row) ( delimiter stream field-end quoted-field -- sep/f fields )
+    [ [ dup '[ dup _ = ] ] keep ] 3dip
+    '[ drop _ _ _ _ field ] produce ; inline
 
 : (stream-read-csv) ( stream -- )
-    delimiter get
     [ dup [ empty? ] all? [ drop ] [ , ] if ]
-    rot pick field-delimiters
-    '[ _ _ _ (stream-read-row) ] do while drop ;
+    delimiter get rot over field-delimiters
+    '[ _ _ _ _ (stream-read-row) ] do while ;
 
 PRIVATE>
 
 : stream-read-row ( stream -- row )
     delimiter get swap over field-delimiters
-    (stream-read-row) 2nip ; inline
+    (stream-read-row) nip ; inline
 
 : read-row ( -- row )
     input-stream get stream-read-row ; inline
@@ -90,7 +91,7 @@ PRIVATE>
     CHAR: " over stream-write1 swap [
         [ over stream-write1 ]
         [ dup CHAR: " = [ over stream-write1 ] [ drop ] if ] bi
-    ] each CHAR: " swap stream-write1 ; inline
+    ] each CHAR: " swap stream-write1 ;
 
 : escape-if-required ( cell delimiter stream -- )
     [ dupd needs-escaping? ] dip
