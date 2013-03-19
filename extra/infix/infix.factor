@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 effects fry infix.parser infix.ast kernel locals locals.parser
-locals.types math math.order multiline namespaces parser
-quotations sequences summary words vocabs.parser ;
+locals.types math math.order math.ranges multiline namespaces
+parser quotations sequences summary words vocabs.parser ;
 
 IN: infix
 
@@ -41,16 +41,27 @@ M: ast-array infix-codegen
     [ index>> infix-codegen prepare-operand ]
     [ name>> >local-word ] bi '[ @ _ infix-nth ] ;
 
-:: infix-subseq ( from to seq -- subseq )
+: infix-subseq-step ( subseq step -- subseq' )
+    dup 0 < [ [ reverse! ] dip ] when
+    abs dup 1 = [ drop ] [
+        [ dup length 1 - 0 swap ] dip
+        <range> swap nths
+    ] if ;
+
+:: infix-subseq ( from to step seq -- subseq )
     seq length :> len
     from 0 or dup 0 < [ len + ] when
     to [ dup 0 < [ len + ] when ] [ len ] if*
-    [ 0 len clamp ] bi@ dupd max seq subseq ;
+    [ 0 len clamp ] bi@ dupd max seq subseq
+    step [ infix-subseq-step ] when* ;
 
 M: ast-slice infix-codegen
-    [ from>> [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
-    [ to>> [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
-    [ name>> >local-word ] tri '[ @ @ _ infix-subseq ] ;
+    {
+        [ from>> [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
+        [ to>>   [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
+        [ step>> [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
+        [ name>> >local-word ]
+    } cleave '[ @ @ @ _ infix-subseq ] ;
 
 M: ast-op infix-codegen
     [ left>> infix-codegen ] [ right>> infix-codegen ]
@@ -93,6 +104,7 @@ M: ast-function infix-codegen
 : [infix-parse ( end -- result/quot )
     parse-multiline-string build-infix-ast
     infix-codegen prepare-operand ;
+
 PRIVATE>
 
 SYNTAX: [infix
