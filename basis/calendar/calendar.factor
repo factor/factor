@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel locals math math.functions
-math.order sequences summary system vocabs vocabs.loader ;
+math.order sequences summary system vocabs vocabs.loader
+assocs ;
 IN: calendar
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
@@ -69,14 +70,28 @@ GENERIC: month-name ( obj -- string )
 M: integer month-name check-month 1 - month-names nth ;
 M: timestamp month-name month>> 1 - month-names nth ;
 
-CONSTANT: month-abbreviations
+ERROR: not-a-month-abbreviation string ;
+
+CONSTANT: month-abbreviations-array
     {
         "Jan" "Feb" "Mar" "Apr" "May" "Jun"
         "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
     }
 
-: month-abbreviation ( n -- string )
-    check-month 1 - month-abbreviations nth ;
+CONSTANT: month-abbreviations-hash
+    H{
+        { "Jan" 1 } { "Feb" 2 } { "Mar" 3 }
+        { "Apr" 4 } { "May" 5 } { "Jun" 6 }
+        { "Jul" 7 } { "Aug" 8 } { "Sep" 9 }
+        { "Oct" 10 } { "Nov" 11 } { "Dec" 12 }
+    }
+
+: n>month-abbreviation ( n -- string )
+    check-month 1 - month-abbreviations-array nth ;
+
+: month-abbreviation>n ( string -- n )
+    month-abbreviations-hash ?at
+    [ not-a-month-abbreviation ] unless ;
 
 CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 
@@ -89,11 +104,14 @@ CONSTANT: day-abbreviations2
 : day-abbreviation2 ( n -- string )
     day-abbreviations2 nth ; inline
 
-CONSTANT: day-abbreviations3
+CONSTANT: day-abbreviations3-array
     { "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" }
 
-: day-abbreviation3 ( n -- string )
-    day-abbreviations3 nth ; inline
+CONSTANT: day-abbreviations3-hash
+    H{
+        { "Sun" 0 } { "Mon" 1 } { "Tue" 2 } { "Wed" 3 }
+        { "Thu" 4 } { "Fri" 5 } { "Sat" 6 }
+    }
 
 CONSTANT: average-month 30+5/12
 CONSTANT: months-per-year 12
@@ -547,6 +565,23 @@ M: timestamp december clone 12 >>month ;
 : last-thursday-of-month ( timestamp -- new-timestamp ) 4 last-day-this-month ;
 : last-friday-of-month ( timestamp -- new-timestamp ) 5 last-day-this-month ;
 : last-saturday-of-month ( timestamp -- new-timestamp ) 6 last-day-this-month ;
+
+CONSTANT: day-predicates-array
+    { sunday? monday? tuesday? wednesday? thursday? friday? saturday? }
+
+: n>day-predicate ( string -- predicate )
+    day-predicates-array nth ;
+
+: n>day-abbreviation3 ( n -- string )
+    day-abbreviations3-array nth ; inline
+
+ERROR: not-a-day-abbreviation string ;
+
+: day-abbreviation3>n ( string -- n )
+    day-abbreviations3-hash ?at [ not-a-day-abbreviation ] unless ; inline
+
+: day-abbreviation3>predicate ( string -- predicate )
+    day-abbreviation3>n day-predicates-array nth ;
 
 : beginning-of-week ( timestamp -- new-timestamp )
     midnight sunday ;
