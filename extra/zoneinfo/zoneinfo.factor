@@ -3,7 +3,7 @@
 USING: accessors assocs combinators combinators.short-circuit
 combinators.smart fry io.encodings.utf8 io.files kernel
 math.parser math.statistics memoize namespaces sequences
-splitting unicode.case ;
+splitting unicode.case calendar arrays ;
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths
@@ -158,6 +158,31 @@ ERROR: zone-not-found name ;
 
 : find-zone-rules ( string -- zone rules )
     find-zone dup rules/save>> find-rules ;
+
+: number>value ( n -- n' )
+    {
+        { "only" [ f ] }
+        { "min" [ f ] }
+        { "max" [ t ] }
+        [ string>number ]
+    } case ;
+
+: on>value ( n -- n' )
+    ! "3", "Thu>=8" always >=, "lastFri"
+    {
+        { [ dup 3 swap ?nth CHAR: > = ] [
+            3 cut 2 tail [ day-abbreviation3>predicate ] [ string>number ] bi* 2array
+        ] }
+        { [ dup "last" head? ] [ 4 tail day-abbreviation3>n ] }
+        [ string>number ]
+    } cond ;
+
+: raw-rule>triple ( raw-rule -- quot )
+    {
+        [ from>> string>number ]
+        [ in>> month-abbreviation>n ]
+        [ on>> on>value ]
+    } cleave>array ;
 
 ! "Europe/Helsinki" find-zone-rules
 
