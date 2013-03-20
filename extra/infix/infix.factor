@@ -44,16 +44,22 @@ M: ast-array infix-codegen
 : infix-subseq-step ( subseq step -- subseq' )
     dup 0 < [ [ reverse! ] dip ] when
     abs dup 1 = [ drop ] [
-        [ dup length 1 - 0 swap ] dip
+        [ dup length 1 [-] 0 swap ] dip
         <range> swap nths
     ] if ;
 
+:: infix-subseq-range ( from to step len -- from to )
+    step [ 0 < ] [ f ] if* [
+        to [ dup 0 < [ len + ] when 1 + ] [ 0 ] if*
+        from [ dup 0 < [ len + ] when 1 + ] [ len ] if*
+    ] [
+        from 0 or dup 0 < [ len + ] when
+        to [ dup 0 < [ len + ] when ] [ len ] if*
+    ] if [ 0 len clamp ] bi@ dupd max ;
+
 :: infix-subseq ( from to step seq -- subseq )
-    seq length :> len
-    from 0 or dup 0 < [ len + ] when
-    to [ dup 0 < [ len + ] when ] [ len ] if*
-    [ 0 len clamp ] bi@ dupd max seq subseq
-    step [ infix-subseq-step ] when* ;
+    from to step seq length infix-subseq-range
+    seq subseq step [ infix-subseq-step ] when* ;
 
 M: ast-slice infix-codegen
     {
