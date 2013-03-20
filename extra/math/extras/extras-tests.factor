@@ -78,4 +78,5 @@ IN: math.extras.test
     { 0 1 0 0 2 3 }
 } [ { 1 2 1 1 3 4 } unique-indices ] unit-test
 
-{ { 1 10+3/4 20+1/2 30+1/4 40 } } [ 1 40 5 linspace >array ] unit-test
+{ { 1 8+4/5 16+3/5 24+2/5 32+1/5 } } [ 1 40 5 linspace) >array ] unit-test
+{ { 1 10+3/4 20+1/2 30+1/4 40 } } [ 1 40 5 linspace] >array ] unit-test

@@ -58,10 +58,18 @@ HELP: sinc
 { $description "Returns the " { $link sinc } " function, calculated according to " { $snippet "sin(pi * x) / (pi * x)" } ". The name " { $link sinc } " is short for \"sine cardinal\" or \"sinus cardinalis\"." }
 { $notes { $snippet "0 sinc" } " is the limit value of 1." } ;
 
-HELP: linspace
+HELP: linspace)
+{ $values { "from" number } { "to" number } { "points" number } { "seq" sequence } }
+{ $description "Return evenly spaced numbers over a specified interval " { $snippet "[from,to)" } "." } ;
+
+HELP: linspace]
 { $values { "from" number } { "to" number } { "points" number } { "seq" sequence } }
 { $description "Return evenly spaced numbers over a specified interval " { $snippet "[from,to]" } "." } ;
 
-HELP: logspace
+HELP: logspace)
+{ $values { "from" number } { "to" number } { "points" number } { "base" number } { "seq" sequence } }
+{ $description "Return evenly spaced numbers on a log scaled interval " { $snippet "[base^from,base^to)" } "." } ;
+
+HELP: logspace]
 { $values { "from" number } { "to" number } { "points" number } { "base" number } { "seq" sequence } }
 { $description "Return evenly spaced numbers on a log scaled interval " { $snippet "[base^from,base^to]" } "." } ;
