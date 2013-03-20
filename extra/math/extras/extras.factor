@@ -201,3 +201,6 @@ PRIVATE>
 
 : linspace ( from to points -- seq )
     1 - [ 2dup swap - ] dip / <range> ;
+
+: logspace ( from to points base -- seq )
+    [ linspace ] dip swap n^v ;
