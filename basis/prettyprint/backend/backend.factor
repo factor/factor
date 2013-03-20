@@ -196,7 +196,7 @@ M: tuple pprint*
 
 : do-length-limit ( seq -- trimmed n/f )
     length-limit get dup [
-        over length over [-]
+        1 - over length over [-]
         dup 1 > [ [ head-slice ] dip ] [ 2drop f ] if
     ] when ;
 
