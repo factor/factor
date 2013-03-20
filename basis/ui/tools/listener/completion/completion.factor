@@ -93,8 +93,8 @@ M: color-completion row-color
     [ manifest>> ] [ editor-caret ] [ model>> ] tri up-to-caret " \r\n" split
     {
         { [ dup complete-vocab? ] [ 2drop vocab-completion ] }
-        { [ dup complete-CHAR:? ] [ 2drop char-completion ] }
-        { [ dup complete-COLOR:? ] [ 2drop color-completion ] }
+        { [ dup complete-char? ] [ 2drop char-completion ] }
+        { [ dup complete-color? ] [ 2drop color-completion ] }
         { [ dup complete-pathname? ] [ 2drop path-completion ] }
         [ drop <word-completion> ]
     } cond ;

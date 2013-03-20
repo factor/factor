@@ -165,8 +165,8 @@ PRIVATE>
 
 PRIVATE>
 
-: complete-CHAR:? ( tokens -- ? ) "CHAR:" complete-token? ;
+: complete-char? ( tokens -- ? ) "CHAR:" complete-token? ;
 
-: complete-COLOR:? ( tokens -- ? ) "COLOR:" complete-token? ;
+: complete-color? ( tokens -- ? ) "COLOR:" complete-token? ;
 
 : complete-pathname? ( tokens -- ? ) "P\"" complete-token? ;
