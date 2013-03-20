@@ -44,7 +44,6 @@ HELP: month-abbreviation
 { $values { "n" integer } { "string" string } }
 { $description "Looks up the abbreviated month name and returns it as a string. January has an index of 1 instead of zero." } ;
 
-
 HELP: day-names
 { $values { "value" array } }
 { $description "Returns an array with the English names of the days of the week." } ;
