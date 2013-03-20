@@ -61,3 +61,7 @@ HELP: sinc
 HELP: linspace
 { $values { "from" number } { "to" number } { "points" number } { "seq" sequence } }
 { $description "Return evenly spaced numbers over a specified interval " { $snippet "[from,to]" } "." } ;
+
+HELP: logspace
+{ $values { "from" number } { "to" number } { "points" number } { "base" number } { "seq" sequence } }
+{ $description "Return evenly spaced numbers on a log scaled interval " { $snippet "[base^from,base^to]" } "." } ;
