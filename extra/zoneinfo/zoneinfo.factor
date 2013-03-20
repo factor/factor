@@ -171,16 +171,16 @@ ERROR: zone-not-found name ;
     ! "3", "Thu>=8" always >=, "lastFri"
     {
         { [ dup 3 swap ?nth CHAR: > = ] [
-            3 cut 2 tail [ day-abbreviation3>predicate ] [ string>number ] bi* 2array
+            3 cut 2 tail [ day-abbreviation3-predicate ] [ string>number ] bi* 2array
         ] }
-        { [ dup "last" head? ] [ 4 tail day-abbreviation3>n ] }
+        { [ dup "last" head? ] [ 4 tail day-abbreviation3-index ] }
         [ string>number ]
     } cond ;
 
 : raw-rule>triple ( raw-rule -- quot )
     {
         [ from>> string>number ]
-        [ in>> month-abbreviation>n ]
+        [ in>> month-abbreviation-index ]
         [ on>> on>value ]
     } cleave>array ;
 
