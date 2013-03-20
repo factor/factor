@@ -465,12 +465,7 @@ TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
     with-string-writer
 ] unit-test
 
-{ "{ 0 1 2 3 4 5 }" } [
+{ "{ 0 1 2 3 ~2 more~ }" } [
     [ 5 length-limit [ 6 iota >array pprint ] with-variable ]
-    with-string-writer
-] unit-test
-
-{ "{ 0 1 2 3 4 ~2 more~ }" } [
-    [ 5 length-limit [ 7 iota >array pprint ] with-variable ]
     with-string-writer
 ] unit-test
