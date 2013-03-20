@@ -363,7 +363,7 @@ TYPED:: read-framebuffer-to ( framebuffer-rect: framebuffer-rect
 : read-framebuffer ( framebuffer-rect -- byte-array )
     dup framebuffer-rect-size <byte-array> [ read-framebuffer-to ] keep ; inline
 
-TYPED: read-framebuffer-image ( framebuffer-rect -- image )
+TYPED: read-framebuffer-image ( framebuffer-rect: framebuffer-rect -- image )
     [ <image> ] dip {
         [ rect>> dim>> >>dim ]
         [
