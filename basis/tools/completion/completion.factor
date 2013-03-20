@@ -169,4 +169,4 @@ PRIVATE>
 
 : complete-COLOR:? ( tokens -- ? ) "COLOR:" complete-token? ;
 
-: complete-P"? ( tokens -- ? ) "P\"" complete-token? ;
+: complete-pathname? ( tokens -- ? ) "P\"" complete-token? ;
