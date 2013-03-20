@@ -829,7 +829,7 @@ UNION: nlist_32/64-array nlist-array nlist_64-array ;
 TUPLE: fat-binary-member cpu-type cpu-subtype data ;
 ERROR: not-fat-binary ;
 
-TYPED: fat-binary-members ( >c-ptr -- fat-binary-members )
+: fat-binary-members ( >c-ptr -- fat-binary-members )
     fat_header memory>struct dup magic>> {
         { FAT_MAGIC [ ] }
         { FAT_CIGAM [ ] }
@@ -853,7 +853,7 @@ TYPED: 64-bit? ( macho: mach_header_32/64 -- ? )
         [ drop f ]
     } case ;
 
-TYPED: macho-header ( c-ptr -- macho: mach_header_32/64 )
+: macho-header ( c-ptr -- macho: mach_header_32/64 )
     dup mach_header_64 memory>struct 64-bit?
     [ mach_header_64 memory>struct ]
     [ mach_header memory>struct ] if ;
