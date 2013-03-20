@@ -89,7 +89,7 @@ CONSTANT: month-abbreviations-hash
 : month-abbreviation ( n -- string )
     check-month 1 - month-abbreviations nth ;
 
-: month-abbreviation# ( string -- n )
+: month-abbreviation-index ( string -- n )
     month-abbreviations-hash ?at
     [ not-a-month-abbreviation ] unless ;
 
@@ -577,11 +577,11 @@ CONSTANT: day-predicates
 
 ERROR: not-a-day-abbreviation string ;
 
-: day-abbreviation3# ( string -- n )
+: day-abbreviation3-index ( string -- n )
     day-abbreviations3-hash ?at [ not-a-day-abbreviation ] unless ; inline
 
 : day-abbreviation3-predicate ( string -- predicate )
-    day-abbreviation3# day-predicates nth ;
+    day-abbreviation3-index day-predicates nth ;
 
 : beginning-of-week ( timestamp -- new-timestamp )
     midnight sunday ;
