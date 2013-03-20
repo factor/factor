@@ -38,9 +38,14 @@ IN: infix.tests
 [ "foo" ] [ [let "foobar" :> s [infix s[0:3] infix] ] ] unit-test
 [ "foo" ] [ [let "foobar" :> s [infix s[:3] infix] ] ] unit-test
 [ "bar" ] [ [let "foobar" :> s [infix s[-3:] infix] ] ] unit-test
-[ "rab" ] [ [let "foobar" :> s [infix s[-3::-1] infix] ] ] unit-test
+[ "boof" ] [ [let "foobar" :> s [infix s[-3::-1] infix] ] ] unit-test
 [ "foobar" ] [ [let "foobar" :> s [infix s[:] infix] ] ] unit-test
 [ "foa" ] [ [let "foobar" :> s [infix s[::2] infix] ] ] unit-test
 [ "bar" ] [ [let "foobar" :> s [infix s[-3:100] infix] ] ] unit-test
 [ "foobar" ] [ [let "foobar" :> s [infix s[-100:100] infix] ] ] unit-test
-
+[ "olh" ] [ [let "hello" :> s [infix s[4::-2] infix] ] ] unit-test
+[ "rb" ] [ [let "foobar" :> s [infix s[:1:-2] infix] ] ] unit-test
+[ "foa" ] [ [let "foobar" :> s [infix s[:-1:2] infix] ] ] unit-test
+[ "rbo" ] [ [let "foobar" :> s [infix s[::-2] infix] ] ] unit-test
+[ "rbo" ] [ [let "foobar" :> s [infix s[:0:-2] infix] ] ] unit-test
+[ "rb" ] [ [let "foobar" :> s [infix s[:-5:-2] infix] ] ] unit-test
