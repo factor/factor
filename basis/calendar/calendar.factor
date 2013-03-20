@@ -72,7 +72,7 @@ M: timestamp month-name month>> 1 - month-names nth ;
 
 ERROR: not-a-month-abbreviation string ;
 
-CONSTANT: month-abbreviations-array
+CONSTANT: month-abbreviations
     {
         "Jan" "Feb" "Mar" "Apr" "May" "Jun"
         "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
@@ -86,10 +86,10 @@ CONSTANT: month-abbreviations-hash
         { "Oct" 10 } { "Nov" 11 } { "Dec" 12 }
     }
 
-: n>month-abbreviation ( n -- string )
-    check-month 1 - month-abbreviations-array nth ;
+: month-abbreviation ( n -- string )
+    check-month 1 - month-abbreviations nth ;
 
-: month-abbreviation>n ( string -- n )
+: month-abbreviation# ( string -- n )
     month-abbreviations-hash ?at
     [ not-a-month-abbreviation ] unless ;
 
@@ -104,7 +104,7 @@ CONSTANT: day-abbreviations2
 : day-abbreviation2 ( n -- string )
     day-abbreviations2 nth ; inline
 
-CONSTANT: day-abbreviations3-array
+CONSTANT: day-abbreviations3
     { "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" }
 
 CONSTANT: day-abbreviations3-hash
@@ -566,22 +566,22 @@ M: timestamp december clone 12 >>month ;
 : last-friday-of-month ( timestamp -- new-timestamp ) 5 last-day-this-month ;
 : last-saturday-of-month ( timestamp -- new-timestamp ) 6 last-day-this-month ;
 
-CONSTANT: day-predicates-array
+CONSTANT: day-predicates
     { sunday? monday? tuesday? wednesday? thursday? friday? saturday? }
 
-: n>day-predicate ( string -- predicate )
-    day-predicates-array nth ;
+: day-predicate ( string -- predicate )
+    day-predicates nth ;
 
-: n>day-abbreviation3 ( n -- string )
-    day-abbreviations3-array nth ; inline
+: day-abbreviation3 ( n -- string )
+    day-abbreviations3 nth ; inline
 
 ERROR: not-a-day-abbreviation string ;
 
-: day-abbreviation3>n ( string -- n )
+: day-abbreviation3# ( string -- n )
     day-abbreviations3-hash ?at [ not-a-day-abbreviation ] unless ; inline
 
-: day-abbreviation3>predicate ( string -- predicate )
-    day-abbreviation3>n day-predicates-array nth ;
+: day-abbreviation3-predicate ( string -- predicate )
+    day-abbreviation3# day-predicates nth ;
 
 : beginning-of-week ( timestamp -- new-timestamp )
     midnight sunday ;
