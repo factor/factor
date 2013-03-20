@@ -95,7 +95,7 @@ M: color-completion row-color
         { [ dup complete-vocab? ] [ 2drop vocab-completion ] }
         { [ dup complete-CHAR:? ] [ 2drop char-completion ] }
         { [ dup complete-COLOR:? ] [ 2drop color-completion ] }
-        { [ dup complete-P"? ] [ 2drop path-completion ] }
+        { [ dup complete-pathname? ] [ 2drop path-completion ] }
         [ drop <word-completion> ]
     } cond ;
 
