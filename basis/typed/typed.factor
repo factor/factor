@@ -11,6 +11,7 @@ IN: typed
 ERROR: type-mismatch-error value expected-type word expected-types ;
 ERROR: input-mismatch-error < type-mismatch-error ;
 ERROR: output-mismatch-error < type-mismatch-error ;
+ERROR: no-types-specified word effect ;
 
 PREDICATE: typed-gensym < word "typed-gensym" word-prop >boolean ;
 PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
@@ -142,7 +143,7 @@ MACRO: typed ( quot word effect -- quot' )
     dup {
         [ effect-in-types typed-stack-effect? ]
         [ effect-out-types typed-stack-effect? ]
-    } 1|| [ (typed-def) ] [ drop nip ] if ;
+    } 1|| [ (typed-def) ] [ nip no-types-specified ] if ;
 
 M: typed-word subwords
     [ call-next-method ]
