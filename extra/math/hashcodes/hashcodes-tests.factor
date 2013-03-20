@@ -12,5 +12,9 @@ IN: math.hashcodes
 
 { t } [
     1.5 3/2 1.5 0 complex boa 3/2 0 complex boa 4array
-    [ number-hashcode 3458764513820540928 = ] all?
+    [
+        number-hashcode
+        cell-bits 64 = 3458764513820540928 3221225472 ?
+        =
+    ] all?
 ] unit-test
