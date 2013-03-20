@@ -133,13 +133,17 @@ HELP: mod
 { $see-also "division-by-zero" rem } ;
 
 HELP: /mod
-{ $values { "x" integer } { "y" integer } { "z" integer } { "w" integer } }
+{ $values { "x" real } { "y" real } { "z" integer } { "w" real } }
 { $description
     "Computes the quotient " { $snippet "z" } " and remainder " { $snippet "w" } " of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
     { $list
         "The quotient of two fixnums may overflow and yield a bignum; the remainder is always a fixnum"
         "The quotient and remainder of two bignums is always a bignum."
     }
+}
+{ $examples
+    { $example "USING: kernel math prettyprint ;" "5 3 /mod [ . ] bi@" "1\n2" }
+    { $example "USING: kernel math prettyprint ;" "5/2 1/3 /mod [ . ] bi@" "7\n1/6" }
 }
 { $see-also "division-by-zero" } ;
 
