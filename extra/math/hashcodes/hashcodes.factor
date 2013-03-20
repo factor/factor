@@ -46,5 +46,4 @@ M: float number-hashcode ( x -- h )
 
 M: complex number-hashcode ( x -- h )
     >rect [ number-hashcode ] bi@ 1000003 * +
-    [ M 1 - bitand ] [ M bitand ] bi -
-    dup -1 = [ drop -2 ] when ;
+    cell-bits on-bits bitand dup -1 = [ drop -2 ] when ;
