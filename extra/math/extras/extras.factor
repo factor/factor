@@ -4,8 +4,8 @@
 USING: arrays assocs assocs.extras combinators.short-circuit fry
 grouping kernel locals math math.combinatorics math.constants
 math.functions math.order math.primes math.ranges
-math.statistics math.vectors memoize random sequences
-sequences.extras sets sorting ;
+math.ranges.private math.statistics math.vectors memoize
+random sequences sequences.extras sets sorting ;
 
 IN: math.extras
 
@@ -199,8 +199,25 @@ PRIVATE>
 : unique-indices ( seq -- unique indices )
     [ members ] keep over dup length iota H{ } zip-as '[ _ at ] map ;
 
-: linspace ( from to points -- seq )
-    1 - [ 2dup swap - ] dip / <range> ;
+<PRIVATE
 
-: logspace ( from to points base -- seq )
-    [ linspace ] dip swap n^v ;
+: steps ( from to point -- from to step )
+    [ 2dup swap - ] dip / ; inline
+
+PRIVATE>
+
+: linspace) ( from to points -- seq )
+    steps ,b) <range> ;
+
+: linspace] ( from to points -- seq )
+    {
+        { [ dup 1 < ] [ 3drop { } ] }
+        { [ dup 1 = ] [ 2drop 1array ] }
+        [ steps <range> ]
+    } cond ;
+
+: logspace) ( from to points base -- seq )
+    [ linspace) ] dip swap n^v ;
+
+: logspace] ( from to points base -- seq )
+    [ linspace] ] dip swap n^v ;
