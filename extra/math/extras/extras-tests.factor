@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: math math.extras math.ranges sequences tools.test ;
+USING: arrays math math.extras math.ranges sequences tools.test ;
 
 IN: math.extras.test
 
@@ -77,3 +77,5 @@ IN: math.extras.test
     { 1 2 3 4 }
     { 0 1 0 0 2 3 }
 } [ { 1 2 1 1 3 4 } unique-indices ] unit-test
+
+{ { 1 10+3/4 20+1/2 30+1/4 40 } } [ 1 40 5 linspace >array ] unit-test

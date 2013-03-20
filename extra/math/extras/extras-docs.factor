@@ -57,3 +57,7 @@ HELP: sinc
 { $values { "x" number } { "y" number } }
 { $description "Returns the " { $link sinc } " function, calculated according to " { $snippet "sin(pi * x) / (pi * x)" } ". The name " { $link sinc } " is short for \"sine cardinal\" or \"sinus cardinalis\"." }
 { $notes { $snippet "0 sinc" } " is the limit value of 1." } ;
+
+HELP: linspace
+{ $values { "from" number } { "to" number } { "points" number } { "seq" sequence } }
+{ $description "Return evenly spaced numbers over a specified interval " { $snippet "[from,to]" } "." } ;

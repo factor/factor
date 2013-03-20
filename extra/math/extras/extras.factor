@@ -198,3 +198,6 @@ PRIVATE>
 
 : unique-indices ( seq -- unique indices )
     [ members ] keep over dup length iota H{ } zip-as '[ _ at ] map ;
+
+: linspace ( from to points -- seq )
+    1 - [ 2dup swap - ] dip / <range> ;
