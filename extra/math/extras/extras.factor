@@ -1,11 +1,12 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs assocs.extras combinators.short-circuit fry
-grouping kernel locals math math.combinatorics math.constants
-math.functions math.order math.primes math.ranges
-math.ranges.private math.statistics math.vectors memoize
-random sequences sequences.extras sets sorting ;
+USING: arrays assocs assocs.extras combinators
+combinators.short-circuit fry grouping kernel locals math
+math.combinatorics math.constants math.functions math.order
+math.primes math.ranges math.ranges.private math.statistics
+math.vectors memoize random sequences sequences.extras sets
+sorting ;
 
 IN: math.extras
 
@@ -206,18 +207,18 @@ PRIVATE>
 
 PRIVATE>
 
-: linspace) ( from to points -- seq )
+: linspace[a,b) ( a b points -- seq )
     steps ,b) <range> ;
 
-: linspace] ( from to points -- seq )
+: linspace[a,b] ( a b points -- seq )
     {
         { [ dup 1 < ] [ 3drop { } ] }
         { [ dup 1 = ] [ 2drop 1array ] }
-        [ steps <range> ]
+        [ 1 - steps <range> ]
     } cond ;
 
-: logspace) ( from to points base -- seq )
-    [ linspace) ] dip swap n^v ;
+: logspace[a,b) ( a b points base -- seq )
+    [ linspace[a,b) ] dip swap n^v ;
 
-: logspace] ( from to points base -- seq )
-    [ linspace] ] dip swap n^v ;
+: logspace[a,b] ( a b points base -- seq )
+    [ linspace[a,b] ] dip swap n^v ;
