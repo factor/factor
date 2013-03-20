@@ -9,8 +9,16 @@ TUPLE: range
 { length read-only }
 { step read-only } ;
 
+<PRIVATE
+
+: sign/mod ( x y -- z w ) [ [ /i ] 2keep pick * - ] keep 0 < [ neg ] when ; inline
+
+PRIVATE>
+
 : <range> ( a b step -- range )
-    [ over - ] dip [ /i 1 + 0 max ] keep range boa ; inline
+    [ over - ] dip
+    [ sign/mod 0 < [ 1 + ] unless 0 max ] keep
+    range boa ; inline
 
 M: range length ( seq -- n ) length>> ; inline
 
