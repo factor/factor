@@ -202,23 +202,23 @@ PRIVATE>
 
 <PRIVATE
 
-: steps ( from to point -- from to step )
+: steps ( a b length -- a b step )
     [ 2dup swap - ] dip / ; inline
 
 PRIVATE>
 
-: linspace[a,b) ( a b points -- seq )
+: linspace[a,b) ( a b length -- seq )
     steps ,b) <range> ;
 
-: linspace[a,b] ( a b points -- seq )
+: linspace[a,b] ( a b length -- seq )
     {
         { [ dup 1 < ] [ 3drop { } ] }
         { [ dup 1 = ] [ 2drop 1array ] }
         [ 1 - steps <range> ]
     } cond ;
 
-: logspace[a,b) ( a b points base -- seq )
+: logspace[a,b) ( a b length base -- seq )
     [ linspace[a,b) ] dip swap n^v ;
 
-: logspace[a,b] ( a b points base -- seq )
+: logspace[a,b] ( a b length base -- seq )
     [ linspace[a,b] ] dip swap n^v ;
