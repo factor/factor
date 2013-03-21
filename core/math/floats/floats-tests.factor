@@ -93,3 +93,12 @@ unit-test
 
 [ 5.0 ] [ 3 5.0 max ] unit-test
 [ 3 ] [ 3 5.0 min ] unit-test
+
+{ 39 0x1.999999999998ap-4 } [ 4.0 .1 /mod ] unit-test
+{ 38 0x1.9999999999984p-4 } [ 3.9 .1 /mod ] unit-test
+{ 39 0x1.999999999998ap-4 } [ 4.0 -.1 /mod ] unit-test
+{ 38 0x1.9999999999984p-4 } [ 3.9 -.1 /mod ] unit-test
+{ 39 -0x1.999999999998ap-4 } [ -4.0 -.1 /mod ] unit-test
+{ 38 -0x1.9999999999984p-4 } [ -3.9 -.1 /mod ] unit-test
+{ 39 -0x1.999999999998ap-4 } [ -4.0 .1 /mod ] unit-test
+{ 38 -0x1.9999999999984p-4 } [ -3.9 .1 /mod ] unit-test
