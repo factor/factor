@@ -153,16 +153,26 @@ PRIVATE>
 : inv-sort-with ( seq quot: ( elt -- key ) -- sortedseq )
     [ compare invert-comparison ] curry sort ; inline
 
+<PRIVATE
+
+: check-bounds ( alist n -- alist )
+    [ swap 2dup bounds-check? [ 2drop ] [ bounds-error ] if ]
+    curry dupd each ;
+
+PRIVATE>
+
 GENERIC: sort-keys ( obj -- sortedseq )
 
 M: object sort-keys >alist sort-keys ;
 
-M: sequence sort-keys [ first ] sort-with ;
+M: sequence sort-keys
+    0 check-bounds [ first-unsafe ] sort-with ;
 
 GENERIC: sort-values ( obj -- sortedseq )
 
 M: object sort-values >alist sort-values ;
 
-M: sequence sort-values [ second ] sort-with ;
+M: sequence sort-values
+    1 check-bounds [ second-unsafe ] sort-with ;
 
 : sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;
