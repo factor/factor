@@ -97,12 +97,21 @@ TUPLE: hashtable
     [ count>> 3 fixnum*fast 1 fixnum+fast ]
     [ array>> length>> ] bi fixnum> ; inline
 
+: each-pair ( array quot: ( key value -- ) -- )
+    [
+        [ length 2/ ] keep [
+            [ 1 fixnum-shift-fast ] dip [ array-nth ] 2keep
+            pick tombstone? [ 3drop ]
+        ] curry
+    ] dip [ [ 1 fixnum+fast ] dip array-nth ] prepose
+    [ if ] curry compose each-integer ; inline
+
 : grow-hash ( hash -- )
     { hashtable } declare [
-        [ >alist { array } declare ]
+        [ array>> ]
         [ assoc-size 1 + ]
         [ reset-hash ] tri
-    ] keep (rehash) ;
+    ] keep [ swapd (set-at) ] curry each-pair ;
 
 : ?grow-hash ( hash -- )
     dup hash-large? [ grow-hash ] [ drop ] if ; inline
@@ -149,14 +158,8 @@ M: hashtable set-at ( value key hash -- )
 PRIVATE>
 
 M: hashtable >alist
-    [ array>> [ length 2/ ] keep ] [ assoc-size <vector> ] bi [
-        [
-            [
-                [ 1 fixnum-shift-fast ] dip
-                [ array-nth ] [ [ 1 fixnum+fast ] dip array-nth ] 2bi
-            ] dip
-            pick tombstone? [ 3drop ] [ [ 2array ] dip push-unsafe ] if
-        ] 2curry each-integer
+    [ array>> ] [ assoc-size <vector> ] bi [
+        [ [ 2array ] dip push-unsafe ] curry each-pair
     ] keep { } like ;
 
 M: hashtable clone
