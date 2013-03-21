@@ -71,12 +71,18 @@ TUPLE: hash-set
     [ count>> 3 fixnum*fast 1 fixnum+fast ]
     [ array>> length>> 1 fixnum-shift-fast ] bi fixnum> ; inline
 
+: each-member ( array quot: ( elt -- ) -- )
+    [
+        [ length ] keep
+        [ array-nth dup tombstone? [ drop ] ] curry
+    ] dip [ if ] curry compose each-integer ; inline
+
 : grow-hash ( hash -- )
     { hash-set } declare [
-        [ members { array } declare ]
+        [ array>> ]
         [ cardinality 1 + ]
         [ reset-hash ] tri
-    ] keep (rehash) ;
+    ] keep [ (adjoin) ] curry each-member ;
 
 : ?grow-hash ( hash -- )
     dup hash-large? [ grow-hash ] [ drop ] if ; inline
@@ -110,11 +116,8 @@ M: hash-set adjoin ( key hash-set -- )
     dup ?grow-hash (adjoin) ;
 
 M: hash-set members
-    [ array>> [ length ] keep ] [ cardinality <vector> ] bi [
-        [
-            [ array-nth ] dip over tombstone?
-            [ 2drop ] [ push-unsafe ] if
-        ] 2curry each-integer
+    [ array>> ] [ cardinality <vector> ] bi [
+        [ push-unsafe ] curry each-member
     ] keep { } like ;
 
 M: hash-set clone
