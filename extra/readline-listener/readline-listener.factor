@@ -41,8 +41,8 @@ M: readline-reader prompt.
     completions tget [ nip ] [
         completion-line " \r\n" split {
             { [ dup complete-vocab? ] [ drop prefixed-vocabs ] }
-            { [ dup complete-CHAR:? ] [ drop prefixed-chars ] }
-            { [ dup complete-COLOR:? ] [ drop prefixed-colors ] }
+            { [ dup complete-char? ] [ drop prefixed-chars ] }
+            { [ dup complete-color? ] [ drop prefixed-colors ] }
             [ drop prefixed-words ]
         } cond dup completions tset
     ] if* ;
