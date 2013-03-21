@@ -59,17 +59,17 @@ HELP: sinc
 { $notes { $snippet "0 sinc" } " is the limit value of 1." } ;
 
 HELP: linspace[a,b)
-{ $values { "a" number } { "b" number } { "points" number } { "seq" sequence } }
+{ $values { "a" number } { "b" number } { "length" integer } { "seq" sequence } }
 { $description "Return evenly spaced numbers over an interval " { $snippet "[a,b)" } "." } ;
 
 HELP: linspace[a,b]
-{ $values { "a" number } { "b" number } { "points" number } { "seq" sequence } }
+{ $values { "a" number } { "b" number } { "length" integer } { "seq" sequence } }
 { $description "Return evenly spaced numbers over an interval " { $snippet "[a,b]" } "." } ;
 
 HELP: logspace[a,b)
-{ $values { "a" number } { "b" number } { "points" number } { "base" number } { "seq" sequence } }
+{ $values { "a" number } { "b" number } { "length" integer } { "base" number } { "seq" sequence } }
 { $description "Return evenly spaced numbers on a log scaled interval " { $snippet "[base^a,base^b)" } "." } ;
 
 HELP: logspace[a,b]
-{ $values { "a" number } { "b" number } { "points" number } { "base" number } { "seq" sequence } }
+{ $values { "a" number } { "b" number } { "length" integer } { "base" number } { "seq" sequence } }
 { $description "Return evenly spaced numbers on a log scaled interval " { $snippet "[base^a,base^b]" } "." } ;

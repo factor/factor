@@ -11,7 +11,8 @@ TUPLE: range
 
 <PRIVATE
 
-: sign/mod ( x y -- z w ) [ [ /i ] 2keep pick * - ] keep 0 < [ neg ] when ; inline
+: sign/mod ( x y -- z w )
+    [ [ /i ] 2keep pick * - ] keep 0 < [ neg ] when ; inline
 
 PRIVATE>
 
@@ -22,7 +23,8 @@ PRIVATE>
 
 M: range length ( seq -- n ) length>> ; inline
 
-M: range nth-unsafe ( n range -- obj ) [ step>> * ] keep from>> + ; inline
+M: range nth-unsafe ( n range -- obj )
+    [ step>> * ] keep from>> + ; inline
 
 ! We want M\ tuple hashcode, not M\ sequence hashcode here!
 ! sequences hashcode is O(n) in number of elements
