@@ -61,7 +61,7 @@ M: integer bounds-check? ( n seq -- ? )
 
 MIXIN: immutable-sequence
 
-ERROR: immutable seq ;
+ERROR: immutable element index sequence ;
 
 M: immutable-sequence set-nth immutable ;
 
