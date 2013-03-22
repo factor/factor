@@ -50,8 +50,8 @@ void factor_vm::primitive_callstack()
 
 void factor_vm::primitive_callstack_for()
 {
-	context *other_ctx = (context *)pinned_alien_offset(ctx->pop());
-	ctx->push(capture_callstack(other_ctx));
+	context *other_ctx = (context *)pinned_alien_offset(ctx->peek());
+	ctx->replace(capture_callstack(other_ctx));
 }
 
 void *factor_vm::frame_predecessor(void *frame_top)
@@ -86,7 +86,7 @@ struct stack_frame_in_array { cell cells[3]; };
 
 void factor_vm::primitive_callstack_to_array()
 {
-	data_root<callstack> callstack(ctx->pop(),this);
+	data_root<callstack> callstack(ctx->peek(),this);
 
 	stack_frame_accumulator accum(this);
 	iterate_callstack_object(callstack.untagged(),accum);
@@ -98,7 +98,7 @@ void factor_vm::primitive_callstack_to_array()
 
 	accum.frames.trim();
 
-	ctx->push(accum.frames.elements.value());
+	ctx->replace(accum.frames.elements.value());
 
 }
 
@@ -106,18 +106,18 @@ void factor_vm::primitive_callstack_to_array()
 Used by the single stepper. */
 void factor_vm::primitive_innermost_stack_frame_executing()
 {
-	callstack *stack = untag_check<callstack>(ctx->pop());
+	callstack *stack = untag_check<callstack>(ctx->peek());
 	void *frame = stack->top();
 	void *addr = frame_return_address(frame);
-	ctx->push(code->code_block_for_address((cell)addr)->owner_quot());
+	ctx->replace(code->code_block_for_address((cell)addr)->owner_quot());
 }
 
 void factor_vm::primitive_innermost_stack_frame_scan()
 {
-	callstack *stack = untag_check<callstack>(ctx->pop());
+	callstack *stack = untag_check<callstack>(ctx->peek());
 	void *frame = stack->top();
 	void *addr = frame_return_address(frame);
-	ctx->push(code->code_block_for_address((cell)addr)->scan(this,addr));
+	ctx->replace(code->code_block_for_address((cell)addr)->scan(this,addr));
 }
 
 void factor_vm::primitive_set_innermost_stack_frame_quot()

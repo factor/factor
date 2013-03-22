@@ -84,7 +84,7 @@ void factor_vm::primitive_displaced_alien()
 if the object is a byte array, as a sanity check. */
 void factor_vm::primitive_alien_address()
 {
-	ctx->push(from_unsigned_cell((cell)pinned_alien_offset(ctx->pop())));
+	ctx->replace(from_unsigned_cell((cell)pinned_alien_offset(ctx->peek())));
 }
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
@@ -125,7 +125,7 @@ void factor_vm::primitive_dlopen()
 void factor_vm::primitive_dlsym()
 {
 	data_root<object> library(ctx->pop(),this);
-	data_root<byte_array> name(ctx->pop(),this);
+	data_root<byte_array> name(ctx->peek(),this);
 	name.untag_check(this);
 
 	symbol_char *sym = name->data<symbol_char>();
@@ -135,12 +135,12 @@ void factor_vm::primitive_dlsym()
 		dll *d = untag_check<dll>(library.value());
 
 		if(d->handle == NULL)
-			ctx->push(false_object);
+			ctx->replace(false_object);
 		else
-			ctx->push(allot_alien(ffi_dlsym(d,sym)));
+			ctx->replace(allot_alien(ffi_dlsym(d,sym)));
 	}
 	else
-		ctx->push(allot_alien(ffi_dlsym(NULL,sym)));
+		ctx->replace(allot_alien(ffi_dlsym(NULL,sym)));
 }
 
 /* Allocates memory */
@@ -148,7 +148,7 @@ void factor_vm::primitive_dlsym()
 void factor_vm::primitive_dlsym_raw()
 {
 	data_root<object> library(ctx->pop(),this);
-	data_root<byte_array> name(ctx->pop(),this);
+	data_root<byte_array> name(ctx->peek(),this);
 	name.untag_check(this);
 
 	symbol_char *sym = name->data<symbol_char>();
@@ -158,12 +158,12 @@ void factor_vm::primitive_dlsym_raw()
 		dll *d = untag_check<dll>(library.value());
 
 		if(d->handle == NULL)
-			ctx->push(false_object);
+			ctx->replace(false_object);
 		else
-			ctx->push(allot_alien(ffi_dlsym_raw(d,sym)));
+			ctx->replace(allot_alien(ffi_dlsym_raw(d,sym)));
 	}
 	else
-		ctx->push(allot_alien(ffi_dlsym_raw(NULL,sym)));
+		ctx->replace(allot_alien(ffi_dlsym_raw(NULL,sym)));
 }
 
 /* close a native library handle */
@@ -176,11 +176,11 @@ void factor_vm::primitive_dlclose()
 
 void factor_vm::primitive_dll_validp()
 {
-	cell library = ctx->pop();
+	cell library = ctx->peek();
 	if(to_boolean(library))
-		ctx->push(tag_boolean(untag_check<dll>(library)->handle != NULL));
+		ctx->replace(tag_boolean(untag_check<dll>(library)->handle != NULL));
 	else
-		ctx->push(true_object);
+		ctx->replace(true_object);
 }
 
 /* gets the address of an object representing a C pointer */

@@ -556,6 +556,7 @@ struct factor_vm
 	void safe_fclose(FILE *stream);
 	void primitive_fopen();
 	FILE *pop_file_handle();
+	FILE *peek_file_handle();
 	void primitive_fgetc();
 	void primitive_fread();
 	void primitive_fputc();

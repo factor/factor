@@ -219,8 +219,8 @@ void factor_vm::primitive_bignum_not()
 void factor_vm::primitive_bignum_bitp()
 {
 	int bit = (int)to_fixnum(ctx->pop());
-	bignum *x = untag<bignum>(ctx->pop());
-	ctx->push(tag_boolean(bignum_logbitp(bit,x)));
+	bignum *x = untag<bignum>(ctx->peek());
+	ctx->replace(tag_boolean(bignum_logbitp(bit,x)));
 }
 
 void factor_vm::primitive_bignum_log2()
@@ -258,9 +258,9 @@ void factor_vm::primitive_format_float()
 {
 	byte_array *array = allot_byte_array(100);
 	char *format = alien_offset(ctx->pop());
-	double value = untag_float_check(ctx->pop());
+	double value = untag_float_check(ctx->peek());
 	SNPRINTF(array->data<char>(),99,format,value);
-	ctx->push(tag<byte_array>(array));
+	ctx->replace(tag<byte_array>(array));
 }
 
 #define POP_FLOATS(x,y) \

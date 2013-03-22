@@ -182,37 +182,42 @@ FILE *factor_vm::pop_file_handle()
 	return (FILE *)alien_offset(ctx->pop());
 }
 
+FILE *factor_vm::peek_file_handle()
+{
+	return (FILE *)alien_offset(ctx->peek());
+}
+
 void factor_vm::primitive_fgetc()
 {
-	FILE *file = pop_file_handle();
+	FILE *file = peek_file_handle();
 
 	int c = safe_fgetc(file);
 	if(c == EOF && feof(file))
 	{
 		clearerr(file);
-		ctx->push(false_object);
+		ctx->replace(false_object);
 	}
 	else
-		ctx->push(tag_fixnum(c));
+		ctx->replace(tag_fixnum(c));
 }
 
 /* Allocates memory */
 void factor_vm::primitive_fread()
 {
 	FILE *file = pop_file_handle();
-	void *buf = (void*)alien_offset(ctx->pop());
+	void *buf = (void*)alien_offset(ctx->peek());
 	fixnum size = unbox_array_size();
 
 	if(size == 0)
 	{
-		ctx->push(from_unsigned_cell(0));
+		ctx->replace(from_unsigned_cell(0));
 		return;
 	}
 
 	size_t c = safe_fread(buf,1,size,file);
 	if(c == 0 || feof(file))
 		clearerr(file);
-	ctx->push(from_unsigned_cell(c));
+	ctx->replace(from_unsigned_cell(c));
 }
 
 void factor_vm::primitive_fputc()
@@ -238,8 +243,8 @@ void factor_vm::primitive_fwrite()
 
 void factor_vm::primitive_ftell()
 {
-	FILE *file = pop_file_handle();
-	ctx->push(from_signed_8(safe_ftell(file)));
+	FILE *file = peek_file_handle();
+	ctx->replace(from_signed_8(safe_ftell(file)));
 }
 
 void factor_vm::primitive_fseek()
