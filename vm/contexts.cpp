@@ -233,8 +233,8 @@ void factor_vm::primitive_set_context_object()
 void factor_vm::primitive_context_object_for()
 {
 	context *other_ctx = (context *)pinned_alien_offset(ctx->pop());
-	fixnum n = untag_fixnum(ctx->pop());
-	ctx->push(other_ctx->context_objects[n]);
+	fixnum n = untag_fixnum(ctx->peek());
+	ctx->replace(other_ctx->context_objects[n]);
 }
 
 /* Allocates memory */
@@ -271,8 +271,8 @@ void factor_vm::primitive_datastack()
 
 void factor_vm::primitive_datastack_for()
 {
-	context *other_ctx = (context *)pinned_alien_offset(ctx->pop());
-	ctx->push(datastack_to_array(other_ctx));
+	context *other_ctx = (context *)pinned_alien_offset(ctx->peek());
+	ctx->replace(datastack_to_array(other_ctx));
 }
 
 cell factor_vm::retainstack_to_array(context *ctx)
@@ -294,8 +294,8 @@ void factor_vm::primitive_retainstack()
 
 void factor_vm::primitive_retainstack_for()
 {
-	context *other_ctx = (context *)pinned_alien_offset(ctx->pop());
-	ctx->push(retainstack_to_array(other_ctx));
+	context *other_ctx = (context *)pinned_alien_offset(ctx->peek());
+	ctx->replace(retainstack_to_array(other_ctx));
 }
 
 /* returns pointer to top of stack */
