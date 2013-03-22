@@ -96,8 +96,11 @@ SYMBOL: +escaping+
 : unknown-allocations ( values -- )
     [ unknown-allocation ] each ;
 
+: (escaping-value?) ( value escaping-values -- ? )
+    +escaping+ swap equiv? ; inline
+
 : escaping-value? ( value -- ? )
-    +escaping+ escaping-values get equiv? ;
+    escaping-values get (escaping-value?) ;
 
 DEFER: copy-value
 
@@ -127,8 +130,8 @@ DEFER: copy-value
 SYMBOL: escaping-allocations
 
 : compute-escaping-allocations ( -- )
-    allocations get
-    [ drop escaping-value? ] assoc-filter
+    allocations get escaping-values get
+    '[ drop _ (escaping-value?) ] assoc-filter
     escaping-allocations set ;
 
 : escaping-allocation? ( value -- ? )
