@@ -50,10 +50,10 @@ HELP: remember-definition
 { $description "Saves the location of a definition and associates this definition with the current source file." } ;
 
 HELP: old-definitions
-{ $var-description "Stores an assoc where the keys form the set of definitions which were defined by " { $link file } " the most recent time it was loaded." } ;
+{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined by " { $link file } " the most recent time it was loaded." } ;
 
 HELP: new-definitions
-{ $var-description "Stores an assoc where the keys form the set of definitions which were defined so far by the current parsing of " { $link file } "." } ;
+{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined so far by the current parsing of " { $link file } "." } ;
 
 HELP: with-compilation-unit
 { $values { "quot" quotation } }
