@@ -104,7 +104,10 @@ INSTANCE: f immutable-sequence
 ! Integer sequences
 TUPLE: iota { n integer read-only } ;
 
-: iota ( n -- iota ) \ iota boa ; inline
+ERROR: non-negative-integer-expected n ;
+
+: iota ( n -- iota )
+    dup 0 < [ non-negative-integer-expected ] when \ iota boa ; inline
 
 M: iota length n>> ; inline
 M: iota nth-unsafe drop ; inline
