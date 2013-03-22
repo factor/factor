@@ -1,5 +1,6 @@
 USING: accessors arrays combinators combinators.short-circuit
-kernel locals make math math.order sequences sequences.private ;
+kernel locals make math math.order sequences sequences.private
+typed ;
 IN: lcs
 
 <PRIVATE
@@ -10,7 +11,7 @@ IN: lcs
 : lcs-step ( insert delete change same? -- next )
     1 -1/0. ? + max max ; ! -1/0. is -inf (float)
 
-:: loop-step ( i j matrix old new step -- )
+TYPED:: loop-step ( i j matrix: array old new step -- )
     i j 1 + matrix nth-unsafe nth-unsafe ! insertion
     i 1 + j matrix nth-unsafe nth-unsafe ! deletion
     i j matrix nth-unsafe nth-unsafe ! replace/retain
