@@ -290,7 +290,8 @@ DEFER: (value-info-union)
 SYMBOL: value-infos
 
 : value-info* ( value -- info ? )
-    resolve-copy value-infos get assoc-stack [ null-info or ] [ >boolean ] bi ; inline
+    resolve-copy value-infos get assoc-stack
+    [ null-info or ] [ >boolean ] bi ; inline
 
 : value-info ( value -- info )
     value-info* drop ;
