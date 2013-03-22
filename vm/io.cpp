@@ -205,19 +205,19 @@ void factor_vm::primitive_fgetc()
 void factor_vm::primitive_fread()
 {
 	FILE *file = pop_file_handle();
-	void *buf = (void*)alien_offset(ctx->peek());
+	void *buf = (void*)alien_offset(ctx->pop());
 	fixnum size = unbox_array_size();
 
 	if(size == 0)
 	{
-		ctx->replace(from_unsigned_cell(0));
+		ctx->push(from_unsigned_cell(0));
 		return;
 	}
 
 	size_t c = safe_fread(buf,1,size,file);
 	if(c == 0 || feof(file))
 		clearerr(file);
-	ctx->replace(from_unsigned_cell(c));
+	ctx->push(from_unsigned_cell(c));
 }
 
 void factor_vm::primitive_fputc()
