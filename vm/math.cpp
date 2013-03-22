@@ -140,11 +140,14 @@ void factor_vm::primitive_bignum_divint()
 
 void factor_vm::primitive_bignum_divmod()
 {
+	cell *s0 = (cell *)(ctx->datastack);
+	cell *s1 = (cell *)(ctx->datastack - sizeof(cell));
+	bignum *y = untag<bignum>(*s0);
+	bignum *x = untag<bignum>(*s1);
 	bignum *q, *r;
-	POP_BIGNUMS(x,y);
-	bignum_divide(x,y,&q,&r);
-	ctx->replace(tag<bignum>(q));
-	ctx->push(tag<bignum>(r));
+	bignum_divide(x, y, &q, &r);
+	*s1 = tag<bignum>(q);
+	*s0 = tag<bignum>(r);
 }
 
 void factor_vm::primitive_bignum_mod()
