@@ -20,8 +20,14 @@ SYMBOL: phis
 : resolve ( vreg -- vreg )
     copies get at ;
 
+: (record-copy) ( dst src copies -- )
+    swapd maybe-set-at [ changed? on ] when ; inline
+
 : record-copy ( dst src -- )
-    swap copies get maybe-set-at [ changed? on ] when ; inline
+    copies get (record-copy) ; inline
+
+: record-copies ( seq -- )
+    copies get '[ dup _ (record-copy) ] each ; inline
 
 GENERIC: visit-insn ( insn -- )
 
@@ -46,7 +52,7 @@ M: ##phi visit-insn
     ] if ;
 
 M: vreg-insn visit-insn
-    defs-vregs [ dup record-copy ] each ;
+    defs-vregs record-copies  ;
 
 M: insn visit-insn drop ;
 
