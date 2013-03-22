@@ -29,7 +29,7 @@ SYMBOL: allocations
     (allocation) set-at ;
 
 : record-allocations ( allocations values -- )
-    [ record-allocation ] 2each ;
+    (allocation) '[ _ set-at ] 2each ;
 
 ! We track slot access to connect constructor inputs with
 ! accessor outputs.
@@ -53,13 +53,15 @@ SYMBOL: +escaping+
 : init-escaping-values ( -- )
     <escaping-values> escaping-values set ;
 
-: introduce-value ( values -- )
-    escaping-values get
+: (introduce-value) ( values escaping-values -- )
     2dup disjoint-set-member?
-    [ 2drop ] [ add-atom ] if ;
+    [ 2drop ] [ add-atom ] if ; inline
+
+: introduce-value ( values -- )
+    escaping-values get (introduce-value) ;
 
 : introduce-values ( values -- )
-    [ introduce-value ] each ;
+    escaping-values get '[ _ (introduce-value) ] each ;
 
 : <slot-value> ( -- value )
     <value> dup introduce-value ;
