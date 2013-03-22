@@ -1,22 +1,22 @@
-USING: sequences kernel math locals math.order math.ranges
-accessors arrays namespaces make combinators
-combinators.short-circuit ;
+USING: accessors arrays combinators combinators.short-circuit
+kernel locals make math math.order sequences sequences.private ;
 IN: lcs
 
 <PRIVATE
+
 : levenshtein-step ( insert delete change same? -- next )
-    0 1 ? + [ [ 1 + ] bi@ ] dip min min ;
+    [ [ 1 + ] bi@ ] 2dip [ 1 + ] unless min min ;
 
 : lcs-step ( insert delete change same? -- next )
     1 -1/0. ? + max max ; ! -1/0. is -inf (float)
 
 :: loop-step ( i j matrix old new step -- )
-    i j 1 + matrix nth nth ! insertion
-    i 1 + j matrix nth nth ! deletion
-    i j matrix nth nth ! replace/retain
-    i old nth j new nth = ! same?
+    i j 1 + matrix nth-unsafe nth-unsafe ! insertion
+    i 1 + j matrix nth-unsafe nth-unsafe ! deletion
+    i j matrix nth-unsafe nth-unsafe ! replace/retain
+    i old nth-unsafe j new nth-unsafe = ! same?
     step call
-    i 1 + j 1 + matrix nth set-nth ; inline
+    i 1 + j 1 + matrix nth-unsafe set-nth-unsafe ; inline
 
 : lcs-initialize ( |str1| |str2| -- matrix )
     iota [ drop 0 <array> ] with map ;
@@ -27,9 +27,11 @@ IN: lcs
 :: run-lcs ( old new init step -- matrix )
     old length 1 + new length 1 + init call :> matrix
     old length iota [| i |
-        new length iota
-        [| j | i j matrix old new step loop-step ] each
+        new length iota [| j |
+            i j matrix old new step loop-step
+        ] each
     ] each matrix ; inline
+
 PRIVATE>
 
 : levenshtein ( old new -- n )
@@ -41,17 +43,18 @@ TUPLE: delete item ;
 TUPLE: insert item ;
 
 <PRIVATE
+
 TUPLE: trace-state old new table i j ;
 
 : old-nth ( state -- elt )
-    [ i>> 1 - ] [ old>> ] bi nth ;
+    [ i>> 1 - ] [ old>> ] bi nth-unsafe ;
 
 : new-nth ( state -- elt )
-    [ j>> 1 - ] [ new>> ] bi nth ;
+    [ j>> 1 - ] [ new>> ] bi nth-unsafe ;
 
 : top-beats-side? ( state -- ? )
-    [ [ i>> ] [ j>> 1 - ] [ table>> ] tri nth nth ]
-    [ [ i>> 1 - ] [ j>> ] [ table>> ] tri nth nth ] bi > ;
+    [ [ i>> ] [ j>> 1 - ] [ table>> ] tri nth-unsafe nth-unsafe ]
+    [ [ i>> 1 - ] [ j>> ] [ table>> ] tri nth-unsafe nth-unsafe ] bi > ;
 
 : retained? ( state -- ? )
     {
@@ -91,7 +94,8 @@ TUPLE: trace-state old new table i j ;
 
 : trace-diff ( old new table -- diff )
     [ ] [ first length 1 - ] [ length 1 - ] tri trace-state boa
-    [ (trace-diff) ] { } make reverse ;
+    [ (trace-diff) ] { } make reverse! ;
+
 PRIVATE>
 
 : diff ( old new -- diff )
