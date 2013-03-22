@@ -789,8 +789,9 @@ PRIVATE>
 
 : reverse! ( seq -- seq )
     [
-        [ midpoint@ iota ] [ length ] [ ] tri
-        [ [ over - 1 - ] dip exchange-unsafe ] 2curry each
+        [ midpoint@ ] [ length ] [ ] tri
+        [ [ over - 1 - ] dip exchange-unsafe ] 2curry
+        each-integer
     ] keep ;
 
 : reverse ( seq -- newseq )
@@ -909,17 +910,16 @@ PRIVATE>
 
 <PRIVATE
 
-: (start) ( subseq seq n -- subseq seq ? )
-    pick length iota [
+: (start) ( subseq seq n length -- subseq seq ? )
+    [
         [ 3dup ] dip [ + swap nth-unsafe ] keep rot nth-unsafe =
-    ] all? nip ; inline
+    ] all-integers? nip ; inline
 
 PRIVATE>
 
 : start* ( subseq seq n -- i )
-    pick length pick length swap - 1 + iota
-    [ (start) ] find-from
-    swap [ 3drop ] dip ;
+    pick length [ pick length swap - 1 + ] keep
+    [ (start) ] curry (find-integer) 2nip ;
 
 : start ( subseq seq -- i ) 0 start* ; inline
 
