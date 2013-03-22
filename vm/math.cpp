@@ -106,36 +106,36 @@ void factor_vm::primitive_float_to_bignum()
 
 #define POP_BIGNUMS(x,y) \
 	bignum * y = untag<bignum>(ctx->pop()); \
-	bignum * x = untag<bignum>(ctx->pop());
+	bignum * x = untag<bignum>(ctx->peek());
 
 void factor_vm::primitive_bignum_eq()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag_boolean(bignum_equal_p(x,y)));
+	ctx->replace(tag_boolean(bignum_equal_p(x,y)));
 }
 
 void factor_vm::primitive_bignum_add()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_add(x,y)));
+	ctx->replace(tag<bignum>(bignum_add(x,y)));
 }
 
 void factor_vm::primitive_bignum_subtract()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_subtract(x,y)));
+	ctx->replace(tag<bignum>(bignum_subtract(x,y)));
 }
 
 void factor_vm::primitive_bignum_multiply()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_multiply(x,y)));
+	ctx->replace(tag<bignum>(bignum_multiply(x,y)));
 }
 
 void factor_vm::primitive_bignum_divint()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_quotient(x,y)));
+	ctx->replace(tag<bignum>(bignum_quotient(x,y)));
 }
 
 void factor_vm::primitive_bignum_divmod()
@@ -143,69 +143,69 @@ void factor_vm::primitive_bignum_divmod()
 	bignum *q, *r;
 	POP_BIGNUMS(x,y);
 	bignum_divide(x,y,&q,&r);
-	ctx->push(tag<bignum>(q));
+	ctx->replace(tag<bignum>(q));
 	ctx->push(tag<bignum>(r));
 }
 
 void factor_vm::primitive_bignum_mod()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_remainder(x,y)));
+	ctx->replace(tag<bignum>(bignum_remainder(x,y)));
 }
 
 void factor_vm::primitive_bignum_gcd()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_gcd(x,y)));
+	ctx->replace(tag<bignum>(bignum_gcd(x,y)));
 }
 
 void factor_vm::primitive_bignum_and()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_bitwise_and(x,y)));
+	ctx->replace(tag<bignum>(bignum_bitwise_and(x,y)));
 }
 
 void factor_vm::primitive_bignum_or()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_bitwise_ior(x,y)));
+	ctx->replace(tag<bignum>(bignum_bitwise_ior(x,y)));
 }
 
 void factor_vm::primitive_bignum_xor()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_bitwise_xor(x,y)));
+	ctx->replace(tag<bignum>(bignum_bitwise_xor(x,y)));
 }
 
 void factor_vm::primitive_bignum_shift()
 {
 	fixnum y = untag_fixnum(ctx->pop());
-	bignum* x = untag<bignum>(ctx->pop());
-	ctx->push(tag<bignum>(bignum_arithmetic_shift(x,y)));
+	bignum* x = untag<bignum>(ctx->peek());
+	ctx->replace(tag<bignum>(bignum_arithmetic_shift(x,y)));
 }
 
 void factor_vm::primitive_bignum_less()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag_boolean(bignum_compare(x,y) == bignum_comparison_less));
+	ctx->replace(tag_boolean(bignum_compare(x,y) == bignum_comparison_less));
 }
 
 void factor_vm::primitive_bignum_lesseq()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag_boolean(bignum_compare(x,y) != bignum_comparison_greater));
+	ctx->replace(tag_boolean(bignum_compare(x,y) != bignum_comparison_greater));
 }
 
 void factor_vm::primitive_bignum_greater()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag_boolean(bignum_compare(x,y) == bignum_comparison_greater));
+	ctx->replace(tag_boolean(bignum_compare(x,y) == bignum_comparison_greater));
 }
 
 void factor_vm::primitive_bignum_greatereq()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag_boolean(bignum_compare(x,y) != bignum_comparison_less));
+	ctx->replace(tag_boolean(bignum_compare(x,y) != bignum_comparison_less));
 }
 
 void factor_vm::primitive_bignum_not()
@@ -262,60 +262,60 @@ void factor_vm::primitive_format_float()
 
 #define POP_FLOATS(x,y) \
 	double y = untag_float(ctx->pop()); \
-	double x = untag_float(ctx->pop());
+	double x = untag_float(ctx->peek());
 
 void factor_vm::primitive_float_eq()
 {
 	POP_FLOATS(x,y);
-	ctx->push(tag_boolean(x == y));
+	ctx->replace(tag_boolean(x == y));
 }
 
 void factor_vm::primitive_float_add()
 {
 	POP_FLOATS(x,y);
-	ctx->push(allot_float(x + y));
+	ctx->replace(allot_float(x + y));
 }
 
 void factor_vm::primitive_float_subtract()
 {
 	POP_FLOATS(x,y);
-	ctx->push(allot_float(x - y));
+	ctx->replace(allot_float(x - y));
 }
 
 void factor_vm::primitive_float_multiply()
 {
 	POP_FLOATS(x,y);
-	ctx->push(allot_float(x * y));
+	ctx->replace(allot_float(x * y));
 }
 
 void factor_vm::primitive_float_divfloat()
 {
 	POP_FLOATS(x,y);
-	ctx->push(allot_float(x / y));
+	ctx->replace(allot_float(x / y));
 }
 
 void factor_vm::primitive_float_less()
 {
 	POP_FLOATS(x,y);
-	ctx->push(tag_boolean(x < y));
+	ctx->replace(tag_boolean(x < y));
 }
 
 void factor_vm::primitive_float_lesseq()
 {
 	POP_FLOATS(x,y);
-	ctx->push(tag_boolean(x <= y));
+	ctx->replace(tag_boolean(x <= y));
 }
 
 void factor_vm::primitive_float_greater()
 {
 	POP_FLOATS(x,y);
-	ctx->push(tag_boolean(x > y));
+	ctx->replace(tag_boolean(x > y));
 }
 
 void factor_vm::primitive_float_greatereq()
 {
 	POP_FLOATS(x,y);
-	ctx->push(tag_boolean(x >= y));
+	ctx->replace(tag_boolean(x >= y));
 }
 
 /* Allocates memory */
