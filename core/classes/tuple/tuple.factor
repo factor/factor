@@ -238,10 +238,12 @@ M: tuple-class update-class
     } cleave ;
 
 : define-new-tuple-class ( class superclass slots -- )
-    [ drop f f tuple-class define-class ]
-    [ nip "slots" set-word-prop ]
-    [ 2drop update-classes ]
-    3tri ;
+    {
+        [ drop f f tuple-class define-class ]
+        [ nip "slots" set-word-prop ]
+        [ 2drop update-classes ]
+        [ 2drop f "defining-class" set-word-prop ]
+    } 3cleave ;
 
 : subclasses ( class -- classes )
     class-usages [ tuple-class? ] filter ;

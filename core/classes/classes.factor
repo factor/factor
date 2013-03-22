@@ -10,8 +10,11 @@ ERROR: bad-inheritance class superclass ;
 
 PREDICATE: class < word "class" word-prop ;
 
+PREDICATE: defining-class < word "defining-class" word-prop ;
+
 MIXIN: classoid
 INSTANCE: class classoid
+INSTANCE: defining-class classoid
 
 <PRIVATE
 
@@ -52,6 +55,7 @@ GENERIC: reset-class ( class -- )
 
 M: class reset-class
     {
+        "defining-class"
         "class"
         "metaclass"
         "superclass"
