@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel math math.order sequences
-sequences.private vectors ;
+USING: accessors arrays assocs growable.private kernel math
+math.order sequences sequences.private vectors ;
 IN: sorting
 
 ! Optimized merge-sort:
@@ -22,14 +22,6 @@ TUPLE: merge
 { to1    array-capacity }
 { from2  array-capacity }
 { to2    array-capacity } ;
-
-: push-unsafe ( elt seq -- )
-    [ length ] keep
-    [ set-nth-unsafe ] [ [ 1 + ] dip length<< ] 2bi ; inline
-
-: push-all-unsafe ( from to src dst -- )
-    [ over - swap ] 2dip [ pick ] dip [ length ] keep
-    [ [ + ] dip length<< ] 2keep <copy> (copy) drop ; inline
 
 : l-elt ( merge -- elt ) [ from1>> ] [ seq>> ] bi nth-unsafe ; inline
 
