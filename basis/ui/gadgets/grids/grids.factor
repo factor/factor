@@ -44,7 +44,7 @@ M: cell baseline baseline>> ;
 
 M: cell cap-height cap-height>> ;
 
-TUPLE: grid-layout grid gap fill? row-heights column-widths ;
+TUPLE: grid-layout-tuple grid gap fill? row-heights column-widths ;
 
 : iterate-cell-dims ( cells quot -- seq )
     '[ [ pref-dim>> @ ] [ max ] map-reduce ] map ; inline
@@ -59,7 +59,7 @@ TUPLE: grid-layout grid gap fill? row-heights column-widths ;
     grid>> flip [ first ] iterate-cell-dims ;
 
 : <grid-layout> ( grid -- grid-layout )
-    \ grid-layout new
+    \ grid-layout-tuple new
         swap
         [ grid>> [ [ <cell> ] map ] map >>grid ]
         [ fill?>> >>fill? ]
