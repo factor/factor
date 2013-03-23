@@ -16,7 +16,7 @@ TUPLE: grid-mesh dim buffer row-length ;
 
 : vertex-array ( dim -- vertices )
     first2 [ [ 0.0 1.0 1.0 ] dip /f <range> ] bi@
-    2 <sliced-clumps> [ first2 vertex-array-row ] with map concat ;
+    2 <clumps> [ first2 vertex-array-row ] with map concat ;
 
 : >vertex-buffer ( bytes -- buffer )
     [ GL_ARRAY_BUFFER ] dip GL_STATIC_DRAW <gl-buffer> ; inline

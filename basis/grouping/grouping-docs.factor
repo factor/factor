@@ -11,9 +11,9 @@ ARTICLE: "grouping" "Groups and clumps"
 "Splitting a sequence into overlapping, fixed-length subsequences, wrapping around the end of the sequence:"
 { $subsections circular-clump }
 "A virtual sequence for splitting a sequence into overlapping, fixed-length subsequences:"
-{ $subsections clumps <clumps> <sliced-clumps> }
+{ $subsections clumps <clumps> }
 "A virtual sequence for splitting a sequence into overlapping, fixed-length subsequences:"
-{ $subsections circular-clumps <circular-clumps> <sliced-circular-clumps> }
+{ $subsections circular-clumps <circular-clumps> }
 "The difference can be summarized as the following:"
 { $list
     { "With groups, the subsequences form the original sequence when concatenated:"
@@ -97,7 +97,7 @@ $nl
 HELP: circular-clumps
 { $class-description "Instances are virtual sequences whose elements are overlapping fixed-length subsequences of an underlying sequence, beginning with every element in the original sequence and wrapping around its end. Circular clumps are mutable and resizable if the underlying sequence is mutable and resizable, respectively."
 $nl
-"New clumps are created by calling " { $link <circular-clumps> } " and " { $link <sliced-circular-clumps> } "." } ;
+"New clumps are created by calling " { $link <circular-clumps> } "." } ;
 
 HELP: clump
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
@@ -137,22 +137,11 @@ HELP: <clumps>
 
 HELP: <circular-clumps>
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "clumps" clumps } }
-{ $description "Outputs a virtual sequence whose elements are overlapping subsequences of " { $snippet "n" } " elements from the underlying sequence, starting with each of its elements and wrapping around the end of the sequence." }
+{ $description "Outputs a virtual sequence whose elements are overlapping slices of " { $snippet "n" } " elements from the underlying sequence, starting with each of its elements and wrapping around the end of the sequence." }
 { $examples
     { $example
         "USING: kernel sequences grouping prettyprint ;"
         "{ 1 2 3 4 } 3 <circular-clumps> third ."
-        "{ 3 4 1 }"
-    }
-} ;
-
-HELP: <sliced-circular-clumps>
-{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "clumps" clumps } }
-{ $description "Outputs a virtual sequence whose elements are overlapping slices of " { $snippet "n" } " elements from the underlying sequence, starting with each of its elements and wrapping around the end of the sequence." }
-{ $examples
-    { $example
-        "USING: arrays kernel sequences grouping prettyprint ;"
-        "{ 1 2 3 4 } 3 <sliced-circular-clumps> third >array ."
         "{ 3 4 1 }"
     }
 } ;
@@ -162,8 +151,6 @@ HELP: <sliced-circular-clumps>
 { clump circular-clump group } related-words
 
 { <clumps> <circular-clumps> <groups> } related-words
-
-{ <sliced-clumps> <sliced-circular-clumps> <groups> } related-words
 
 HELP: monotonic?
 { $values { "seq" sequence } { "quot" { $quotation "( elt1 elt2 -- ? )" } } { "?" "a boolean" } }
