@@ -18,7 +18,7 @@ CONSTANT: knucleotide-in "vocab:benchmark/knucleotide/knucleotide-input.txt"
     CHAR: \n swap remove >upper ;
 
 : handle-table ( inputs n -- )
-    <clumps>
+    clump
     [ histogram sort-values reverse ] [ length ] bi
     '[
         [ first write bl ]
@@ -26,7 +26,7 @@ CONSTANT: knucleotide-in "vocab:benchmark/knucleotide/knucleotide-input.txt"
     ] each ;
 
 : handle-n ( input x -- )
-    [ nip ] [ length <clumps> histogram ] 2bi at 0 or "%d\t" printf ;
+    [ nip ] [ length clump histogram ] 2bi at 0 or "%d\t" printf ;
 
 : process-input ( input -- )
     [ 1 handle-table nl ]
