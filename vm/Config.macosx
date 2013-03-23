@@ -1,5 +1,6 @@
 include vm/Config.unix
 SITE_CFLAGS +=
+# SITE_CFLAGS += -mmacosx-version-min=10.6
 
 PLAF_DLL_OBJS += vm/os-macosx.o vm/mach_signal.o vm/mvm-unix.o
 PLAF_MASTER_HEADERS += vm/os-macosx.hpp vm/mach_signal.hpp
