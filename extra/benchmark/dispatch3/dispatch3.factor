@@ -30,7 +30,7 @@ M: object g drop "object" ;
         double-array{ 1.0 2.0 3.0 } ,
         "hello world" 4 tail-slice ,
         10 f <repetition> ,
-        100 2 <sliced-groups> ,
+        100 2 <groups> ,
         "hello" <reversed> ,
         f ,
         { { 1 2 } { 3 4 } } 0 <column> ,

@@ -51,7 +51,7 @@ INSTANCE: data-map-param immutable-sequence
     ] ;
 
 : [>object-param] ( class count -- quot )
-    nip '[ _ <sliced-groups> ] ;
+    nip '[ _ <groups> ] ;
 
 : [>param] ( type -- quot )
     c-type-count over c-type-name?
