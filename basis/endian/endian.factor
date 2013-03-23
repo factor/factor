@@ -67,7 +67,7 @@ M: little-endian unsigned-endian> le> ;
     native-endianness get-global dup endianness get = [
         2drop
     ] [
-        [ [ <sliced-groups> ] keep ] dip
+        [ [ <groups> ] keep ] dip
         little-endian = [
             '[ be> _ >le ] map
         ] [

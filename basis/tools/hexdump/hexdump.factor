@@ -30,7 +30,7 @@ IN: tools.hexdump
 
 : hexdump-bytes ( bytes -- )
     [ length write-header ]
-    [ 16 <sliced-groups> [ write-hex-line ] each-index ] bi ;
+    [ 16 <groups> [ write-hex-line ] each-index ] bi ;
 
 PRIVATE>
 
