@@ -124,7 +124,7 @@ UNIFORM-TUPLE: loading-uniforms
     a b c [ vertexes nth [ n v+ ] change-normal drop ] tri@ ; inline
 
 : calc-bunny-normals ( vertexes indexes -- )
-    3 <sliced-groups> swap
+    3 <groups> swap
     [ [ first3 ] dip calc-bunny-normal ] curry each ; inline
 
 : normalize-bunny-normals ( vertexes -- )

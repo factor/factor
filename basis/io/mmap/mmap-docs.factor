@@ -80,7 +80,7 @@ ARTICLE: "io.mmap.examples" "Memory-mapped file examples"
     "SPECIALIZED-ARRAY: char"
     ""
     "\"mydata.dat\" char ["
-    "    4 <sliced-groups>"
+    "    4 <groups>"
     "    [ reverse! drop ] each"
     "] with-mapped-array"
 }

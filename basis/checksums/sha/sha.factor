@@ -290,7 +290,7 @@ GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
     [ w+ a ] dip set-nth-unsafe ; inline
 
 : prepare-message-schedule ( seq sha2 -- w-seq )
-    [ word-size>> <sliced-groups> [ be> ] map ]
+    [ word-size>> <groups> [ be> ] map ]
     [
         block-size>> [ 0 pad-tail 16 ] keep [a,b) over
         '[ _ prepare-M-256 ] each
@@ -352,7 +352,7 @@ M: sha-256 checksum-stream ( stream checksum -- byte-array )
     } 2cleave set-nth-unsafe ;
 
 : prepare-sha1-message-schedule ( seq -- w-seq )
-    4 <sliced-groups> [ be> ] map
+    4 <groups> [ be> ] map
     80 0 pad-tail 16 80 [a,b) over
     '[ _ sha1-W ] each ; inline
 
