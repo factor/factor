@@ -5,7 +5,7 @@ ARTICLE: "grouping" "Groups and clumps"
 "Splitting a sequence into disjoint, fixed-length subsequences:"
 { $subsections group }
 "A virtual sequence for splitting a sequence into disjoint, fixed-length subsequences:"
-{ $subsections groups <groups> <sliced-groups> }
+{ $subsections groups <groups> }
 "Splitting a sequence into overlapping, fixed-length subsequences:"
 { $subsections clump }
 "Splitting a sequence into overlapping, fixed-length subsequences, wrapping around the end of the sequence:"
@@ -62,7 +62,7 @@ ABOUT: "grouping"
 HELP: groups
 { $class-description "Instances are virtual sequences whose elements are disjoint fixed-length subsequences of an underlying sequence. Groups are mutable and resizable if the underlying sequence is mutable and resizable, respectively."
 $nl
-"New groups are created by calling " { $link <groups> } " and " { $link <sliced-groups> } "." } ;
+"New groups are created by calling " { $link <groups> } "." } ;
 
 HELP: group
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
@@ -74,32 +74,17 @@ HELP: group
 
 HELP: <groups>
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "groups" groups } }
-{ $description "Outputs a virtual sequence whose elements are disjoint subsequences of " { $snippet "n" } " elements from the underlying sequence." }
-{ $examples
-    { $example
-        "USING: arrays kernel prettyprint sequences grouping ;"
-        "9 iota >array 3 <groups> reverse! concat >array ." "{ 6 7 8 3 4 5 0 1 2 }"
-    }
-    { $example
-        "USING: kernel prettyprint sequences grouping ;"
-        "{ 1 2 3 4 5 6 } 3 <groups> first ."
-        "{ 1 2 3 }"
-    }
-} ;
-
-HELP: <sliced-groups>
-{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "groups" groups } }
 { $description "Outputs a virtual sequence whose elements are slices of disjoint subsequences of " { $snippet "n" } " elements from the underlying sequence." }
 { $examples
     { $example
         "USING: arrays kernel prettyprint sequences grouping ;"
-        "9 iota >array 3 <sliced-groups>"
+        "9 iota >array 3 <groups>"
         "dup [ reverse! drop ] each concat >array ."
         "{ 2 1 0 5 4 3 8 7 6 }"
     }
     { $example
         "USING: kernel prettyprint sequences grouping ;"
-        "{ 1 2 3 4 5 6 } 3 <sliced-groups> second ."
+        "{ 1 2 3 4 5 6 } 3 <groups> second ."
         "T{ slice { from 3 } { to 6 } { seq { 1 2 3 4 5 6 } } }"
     }
 } ;
@@ -107,7 +92,7 @@ HELP: <sliced-groups>
 HELP: clumps
 { $class-description "Instances are virtual sequences whose elements are overlapping fixed-length subsequences of an underlying sequence. Clumps are mutable and resizable if the underlying sequence is mutable and resizable, respectively."
 $nl
-"New clumps are created by calling " { $link <clumps> } " and " { $link <sliced-clumps> } "." } ;
+"New clumps are created by calling " { $link <clumps> } " and " { $link <clumps> } "." } ;
 
 HELP: circular-clumps
 { $class-description "Instances are virtual sequences whose elements are overlapping fixed-length subsequences of an underlying sequence, beginning with every element in the original sequence and wrapping around its end. Circular clumps are mutable and resizable if the underlying sequence is mutable and resizable, respectively."
@@ -178,7 +163,7 @@ HELP: <sliced-circular-clumps>
 
 { <clumps> <circular-clumps> <groups> } related-words
 
-{ <sliced-clumps> <sliced-circular-clumps> <sliced-groups> } related-words
+{ <sliced-clumps> <sliced-circular-clumps> <groups> } related-words
 
 HELP: monotonic?
 { $values { "seq" sequence } { "quot" { $quotation "( elt1 elt2 -- ? )" } } { "?" "a boolean" } }

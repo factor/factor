@@ -65,18 +65,11 @@ TUPLE: chunking-seq { seq read-only } { n read-only } ;
 PRIVATE>
 
 TUPLE: groups < chunking-seq ;
-INSTANCE: groups subseq-chunking
+INSTANCE: groups slice-chunking
 INSTANCE: groups abstract-groups
 
 : <groups> ( seq n -- groups )
     groups new-groups ; inline
-
-TUPLE: sliced-groups < chunking-seq ;
-INSTANCE: sliced-groups slice-chunking
-INSTANCE: sliced-groups abstract-groups
-
-: <sliced-groups> ( seq n -- groups )
-    sliced-groups new-groups ; inline
 
 TUPLE: clumps < chunking-seq ;
 INSTANCE: clumps subseq-chunking
@@ -92,7 +85,7 @@ INSTANCE: sliced-clumps abstract-clumps
 : <sliced-clumps> ( seq n -- clumps )
     sliced-clumps new-groups ; inline
 
-: group ( seq n -- array ) <groups> { } like ;
+: group ( seq n -- array ) [ <groups> ] 2keep drop '[ _ like ] map ;
 
 : clump ( seq n -- array ) <clumps> { } like ;
 
