@@ -204,7 +204,7 @@ HELP: set-at
 
 HELP: new-assoc
 { $values { "capacity" "a non-negative integer" } { "exemplar" assoc } { "newassoc" assoc } }
-{ $contract "Creates a new assoc of the same size as " { $snippet "exemplar" } " which can hold " { $snippet "capacity" } " entries before growing." } ;
+{ $contract "Creates a new assoc from an " { $snippet "exemplar" } " which can hold " { $snippet "capacity" } " entries before growing." } ;
 
 HELP: assoc-find
 { $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "key" "the successful key, or f" } { "value" "the successful value, or f" } { "?" boolean } }
