@@ -314,7 +314,7 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 
 [ "asdf" iota ] must-fail
 [ -1 iota ] must-fail
-[ T{ iota { n 10 } } ] [ 10 iota ] unit-test
+[ T{ iota-tuple { n 10 } } ] [ 10 iota ] unit-test
 [ 0 ] [ 10 iota first ] unit-test
 
 [ "hi" 3 ] [
