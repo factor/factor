@@ -4,6 +4,7 @@ USING: accessors assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
 combinators definitions kernel kernel.private math math.private
 quotations sequences words ;
+FROM: sets => set= ;
 IN: classes.union
 
 PREDICATE: union-class < class
@@ -55,8 +56,15 @@ M: union-class update-class define-union-predicate ;
 
 ERROR: cannot-reference-self class members ;
 
+: union-members ( union -- members )
+    "members" word-prop [ f ] when-empty ;
+
 : check-self-reference ( class members -- class members )
-    2dup member-eq? [ cannot-reference-self ] when ;
+    2dup [
+        dup dup [ union-members ] map concat sift append
+        2dup set= [ 2drop f ] [ nip ] if
+    ] follow concat
+    member-eq? [ cannot-reference-self ] when ;
 
 PRIVATE>
 
