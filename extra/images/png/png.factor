@@ -215,7 +215,7 @@ ERROR: bad-filter n ;
     loading-png width>> :> width
     loading-png bit-depth>> :> bit-depth
     loading-png png-components-per-pixel :> #bytes!
-    width height * f <array> width <sliced-groups> :> image
+    width height * f <array> width <groups> :> image
 
     bit-depth 16 = [
         #bytes 2 * #bytes!
@@ -228,7 +228,7 @@ ERROR: bad-filter n ;
     [ pass 7 < ] [
       ba loading-png pass read-adam7-subimage
 
-      #bytes <sliced-groups>
+      #bytes <groups>
 
       pass starting-row nth row!
       pass starting-col nth col!

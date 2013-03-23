@@ -14,7 +14,7 @@ IN: benchmark.dispatch2
         double-array{ 1.0 2.0 3.0 } ,
         "hello world" 4 tail-slice ,
         10 f <repetition> ,
-        100 iota 2 <sliced-groups> ,
+        100 iota 2 <groups> ,
         "hello" <reversed> ,
         { { 1 2 } { 3 4 } } 0 <column> ,
         ?{ t f t } ,

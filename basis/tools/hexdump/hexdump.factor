@@ -50,7 +50,7 @@ VAR: hexdump-address f set: hexdump-address
 
 : hexdump-bytes ( bytes -- )
     [ length write-header ]
-    [ 16 <sliced-groups> [ write-hex-line ] each-index ] bi ;
+    [ 16 <groups> [ write-hex-line ] each-index ] bi ;
 
 : hexdump-set-address ( n -- )  set: hexdump-address ;
 PRIVATE>

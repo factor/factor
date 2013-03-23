@@ -213,7 +213,7 @@ M: object parse-color-data* ( loading-bitmap header -- loading-bitmap )
     [ nip ] [ drop color-index-length ] if read >>color-index ;
 
 : alpha-used? ( loading-bitmap -- ? )
-    color-index>> 4 <sliced-groups> [ fourth 0 = ] all? not ;
+    color-index>> 4 <groups> [ fourth 0 = ] all? not ;
 
 GENERIC: bitmap>component-order* ( loading-bitmap header -- object )
 
@@ -240,12 +240,12 @@ GENERIC: bitmap>component-order* ( loading-bitmap header -- object )
 
 : color-lookup3 ( loading-bitmap -- seq )
     [ color-index>> >array ]
-    [ color-palette>> 3 <sliced-groups> ] bi
+    [ color-palette>> 3 <groups> ] bi
     '[ _ nth ] map concat ;
 
 : color-lookup4 ( loading-bitmap -- seq )
     [ color-index>> >array ]
-    [ color-palette>> 4 <sliced-groups> [ 3 head-slice ] map ] bi
+    [ color-palette>> 4 <groups> [ 3 head-slice ] map ] bi
     '[ _ nth ] map concat ;
 
 ! os2v1 is 3bytes each, all others are 3 + 1 unused

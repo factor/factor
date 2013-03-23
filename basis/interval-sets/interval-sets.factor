@@ -15,7 +15,7 @@ ALIAS: start first-unsafe
 ALIAS: end second-unsafe
 
 : find-interval ( key interval-set -- slice )
-    array>> 2 <sliced-groups>
+    array>> 2 <groups>
     [ start <=> ] with search nip ; inline
 
 ERROR: not-an-interval-set obj ;

@@ -39,7 +39,7 @@ os linux? [
         [ pixels h rowstride * memory>byte-array ]
         [
             pixels rowstride h * uchar <c-direct-array>
-            rowstride <sliced-groups>
+            rowstride <groups>
             [ bytes-per-row head-slice ] map concat
         ] if
     ] ;
