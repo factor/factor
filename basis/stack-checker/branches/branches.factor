@@ -78,7 +78,7 @@ SYMBOLS: combinator quotations ;
     terminated? branch-variable ;
 
 : terminate-branches ( seq -- )
-    [ terminated? swap at ] all? [ terminate ] when ;
+    [ terminated? of ] all? [ terminate ] when ;
 
 : compute-phi-function ( seq -- )
     [ quotation active-variable sift quotations set ]

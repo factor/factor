@@ -100,10 +100,10 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 
 : set-objtype ( syntax -- )
     builtin-syntax 2array [
-        elements get tagclass>> swap at
-        elements get encoding>> swap at
+        elements get tagclass>> of
+        elements get encoding>> of
         elements get tag>>
-        swap at [ 
+        of [ 
             elements get objtype<<
         ] when*
     ] each ;

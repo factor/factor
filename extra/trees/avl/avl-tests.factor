@@ -88,7 +88,7 @@ IN: trees.avl.tests
 
 [ "another eight" ] [ ! ERROR!
     <avl> "seven" 7 pick set-at
-    "another eight" 8 pick set-at 8 swap at
+    "another eight" 8 pick set-at 8 of
 ] unit-test
 
 : test-tree ( -- tree )
@@ -102,16 +102,16 @@ IN: trees.avl.tests
 
 ! test set-at, at, at*
 [ t ] [ test-tree avl? ] unit-test
-[ "seven" ] [ <avl> "seven" 7 pick set-at 7 swap at ] unit-test
-[ "seven" t ] [ <avl> "seven" 7 pick set-at 7 swap at* ] unit-test
-[ f f ] [ <avl> "seven" 7 pick set-at 8 swap at* ] unit-test
-[ "seven" ] [ <avl> "seven" 7 pick set-at 7 swap at ] unit-test
-[ "replacement" ] [ <avl> "seven" 7 pick set-at "replacement" 7 pick set-at 7 swap at ] unit-test
-[ "nine" ] [ test-tree 9 swap at ] unit-test
-[ "replaced four" ] [ test-tree 4 swap at ] unit-test
-[ "replaced seven" ] [ test-tree 7 swap at ] unit-test
+[ "seven" ] [ <avl> "seven" 7 pick set-at 7 of ] unit-test
+[ "seven" t ] [ <avl> "seven" 7 pick set-at 7 ?of ] unit-test
+[ 8 f ] [ <avl> "seven" 7 pick set-at 8 ?of ] unit-test
+[ "seven" ] [ <avl> "seven" 7 pick set-at 7 of ] unit-test
+[ "replacement" ] [ <avl> "seven" 7 pick set-at "replacement" 7 pick set-at 7 of ] unit-test
+[ "nine" ] [ test-tree 9 of ] unit-test
+[ "replaced four" ] [ test-tree 4 of ] unit-test
+[ "replaced seven" ] [ test-tree 7 of ] unit-test
 
 ! test delete-at--all errors!
-[ f ] [ test-tree 9 over delete-at 9 swap at ] unit-test
-[ "replaced seven" ] [ test-tree 9 over delete-at 7 swap at ] unit-test
-[ "nine" ] [ test-tree 7 over delete-at 4 over delete-at 9 swap at ] unit-test
+[ f ] [ test-tree 9 over delete-at 9 of ] unit-test
+[ "replaced seven" ] [ test-tree 9 over delete-at 7 of ] unit-test
+[ "nine" ] [ test-tree 7 over delete-at 4 over delete-at 9 of ] unit-test

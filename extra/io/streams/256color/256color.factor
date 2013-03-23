@@ -84,9 +84,9 @@ M: 256color stream-nl stream>> stream-nl ;
 
 M: 256color stream-format
     [
-        [ foreground swap at [ color>foreground ] [ "" ] if* ]
-        [ background swap at [ color>background ] [ "" ] if* ]
-        [ font-style swap at [ font-styles ] [ "" ] if* ]
+        [ foreground of [ color>foreground ] [ "" ] if* ]
+        [ background of [ color>background ] [ "" ] if* ]
+        [ font-style of [ font-styles ] [ "" ] if* ]
         tri 3append [ "\e[0m" surround ] unless-empty
     ] dip stream>> stream-write ;
 

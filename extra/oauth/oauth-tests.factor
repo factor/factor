@@ -21,6 +21,6 @@ IN: oauth.tests
         54321 >>nonce
     <request-token-request>
     post-data>>
-    "oauth_signature" swap at
+    "oauth_signature" of
     >string
 ] unit-test

@@ -23,8 +23,8 @@ DEFER: start-walker-thread
 
 : get-walker-thread ( -- status continuation thread )
     walker-thread tget [
-        [ variables>> walker-status swap at ]
-        [ variables>> walker-continuation swap at ]
+        [ variables>> walker-status of ]
+        [ variables>> walker-continuation of ]
         [ ] tri
     ] [
         f <model>

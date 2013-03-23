@@ -8,8 +8,6 @@ SYMBOLS: bitly-api-user bitly-api-key ;
 
 <PRIVATE
 
-: of ( assoc key -- value ) swap at ;
-
 : <bitly-url> ( path -- url )
     "http://api.bitly.com/v3/" prepend >url
         bitly-api-user get "login" set-query-param
@@ -25,7 +23,7 @@ ERROR: bad-response json status ;
     ] unless ;
 
 : json-data ( url -- json )
-    http-get nip json> check-status "data" swap at ;
+    http-get nip json> check-status "data" of ;
 
 : get-short-url ( short-url path -- data )
     <bitly-url> swap "shortUrl" set-query-param json-data ;

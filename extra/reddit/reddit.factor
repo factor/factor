@@ -30,7 +30,7 @@ display_name id header_img header_size header_title name over18
 public_description subscribers title url ;
 
 : parse-data ( assoc -- obj )
-    [ "data" swap at ] [ "kind" swap at ] bi {
+    [ "data" of ] [ "kind" of ] bi {
         { "t1" [ comment ] }
         { "t2" [ user ] }
         { "t3" [ story ] }
@@ -41,10 +41,10 @@ public_description subscribers title url ;
 TUPLE: page url data before after ;
 
 : json-page ( url -- page )
-    >url dup http-get nip json> "data" swap at {
-        [ "children" swap at [ parse-data ] map ]
-        [ "before" swap at [ f ] when-json-null ]
-        [ "after" swap at [ f ] when-json-null ]
+    >url dup http-get nip json> "data" of {
+        [ "children" of [ parse-data ] map ]
+        [ "before" of [ f ] when-json-null ]
+        [ "after" of [ f ] when-json-null ]
     } cleave \ page boa ;
 
 : get-user ( username -- page )

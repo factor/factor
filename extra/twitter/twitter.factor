@@ -50,7 +50,7 @@ PRIVATE>
 
 ! Utilities
 MACRO: keys-boa ( keys class -- )
-    [ [ '[ _ swap at ] ] map ] dip '[ _ cleave _ boa ] ;
+    [ [ '[ _ of ] ] map ] dip '[ _ cleave _ boa ] ;
 
 ! Twitter requests
 : status-url ( string -- url )

@@ -42,7 +42,7 @@ CONSTRUCTOR: dbref ( ref id -- dbref ) ;
     } 2cleave ; inline
 
 : assoc>dbref ( assoc -- dbref )
-    [ "$ref" swap at ] [ "$id" swap at ] [ "$db" swap at ] tri
+    [ "$ref" of ] [ "$id" of ] [ "$db" of ] tri
     dbref boa ; inline
 
 : dbref-assoc? ( assoc -- ? )

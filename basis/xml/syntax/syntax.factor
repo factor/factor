@@ -72,7 +72,7 @@ SYNTAX: XML-NS:
 DEFER: interpolate-sequence
 
 : get-interpolated ( interpolated -- quot )
-    var>> '[ [ _ swap at ] keep ] ;
+    var>> '[ [ _ of ] keep ] ;
 
 : ?present ( object -- string )
     dup [ present ] when ;

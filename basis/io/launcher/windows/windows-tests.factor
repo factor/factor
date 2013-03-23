@@ -173,7 +173,7 @@ IN: io.launcher.windows.tests
         ascii <process-reader> stream-contents
     ] with-directory eval( -- alist )
 
-    "A" swap at
+    "A" of
 ] unit-test
 
 [ f ] [
@@ -185,7 +185,7 @@ IN: io.launcher.windows.tests
         ascii <process-reader> stream-contents
     ] with-directory eval( -- alist )
 
-    "USERPROFILE" swap at "XXX" =
+    "USERPROFILE" of "XXX" =
 ] unit-test
 
 2 [

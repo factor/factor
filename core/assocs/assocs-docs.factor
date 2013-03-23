@@ -236,7 +236,7 @@ HELP: key?
 { $values { "key" object } { "assoc" assoc } { "?" boolean } }
 { $description "Tests if an assoc contains a key." } ;
 
-{ at at* key? ?at } related-words
+{ at at* key? ?at of ?of } related-words
 
 HELP: at
 { $values { "key" object } { "assoc" assoc } { "value/f" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } }
@@ -244,6 +244,14 @@ HELP: at
 
 HELP: ?at
 { $values { "key" object } { "assoc" assoc } { "value/key" "the value associated to the key, or the key if the key is not present in the assoc" } { "?" "a " { $link boolean } " indicating if the key was present" } }
+{ $description "Looks up the value associated with a key. If the key was not present, an error can be thrown without extra stack shuffling. This word handles assocs that store " { $link f } "." } ;
+
+HELP: of
+{ $values { "assoc" assoc } { "key" object } { "value/f" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } }
+{ $description "Looks up the value associated with a key. This word makes no distinction between a missing value and a value set to " { $link f } "; if the difference is important, use " { $link ?of } "." } ;
+
+HELP: ?of
+{ $values { "assoc" assoc } { "key" object } { "value/key" "the value associated to the key, or the key if the key is not present in the assoc" } { "?" "a " { $link boolean } " indicating if the key was present" } }
 { $description "Looks up the value associated with a key. If the key was not present, an error can be thrown without extra stack shuffling. This word handles assocs that store " { $link f } "." } ;
 
 HELP: assoc-each

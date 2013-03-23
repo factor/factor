@@ -92,7 +92,7 @@ PRIVATE>
 
 : (chain-decomposed) ( hash value -- newvalue )
     [
-        2dup swap at
+        2dup of
         [ (chain-decomposed) ] [ 1array nip ] ?if
     ] with map concat ;
 

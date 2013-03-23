@@ -555,14 +555,14 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   'ebnf' (parse) check-parse-result ast>> transform ;
 
 : ebnf>quot ( string -- hashtable quot )
-  parse-ebnf dup dup parser [ main swap at compile ] with-variable
+  parse-ebnf dup dup parser [ main of compile ] with-variable
   [ compiled-parse ] curry [ with-scope ast>> ] curry ;
 
 PRIVATE>
 
 SYNTAX: <EBNF
   "EBNF>"
-  reset-tokenizer parse-multiline-string parse-ebnf main swap at  
+  reset-tokenizer parse-multiline-string parse-ebnf main of
   suffix! reset-tokenizer ;
 
 SYNTAX: [EBNF

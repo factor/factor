@@ -5,13 +5,11 @@ USING: arrays assocs assocs.private kernel math sequences ;
 
 IN: assocs.extras
 
-: of ( assoc key -- value ) swap at ; inline
-
 : assoc-harvest ( assoc -- assoc' )
     [ nip empty? not ] assoc-filter ; inline
 
 : deep-at ( assoc seq -- value/f )
-    [ swap at ] each ; inline
+    [ of ] each ; inline
 
 : zip-as ( keys values exemplar -- assoc )
     dup sequence? [

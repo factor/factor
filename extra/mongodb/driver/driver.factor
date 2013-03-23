@@ -105,7 +105,7 @@ SYNTAX: r/
     [ mdb-pool get ] dip with-mdb-pool ; inline
 
 : >id-selector ( assoc -- selector )
-    [ MDB_OID_FIELD swap at ] keep
+    [ MDB_OID_FIELD of ] keep
     H{ } clone [ set-at ] keep ;
 
 : <mdb> ( db host port -- mdb )
