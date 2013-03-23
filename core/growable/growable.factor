@@ -13,6 +13,18 @@ M: growable length length>> ; inline
 M: growable nth-unsafe underlying>> nth-unsafe ; inline
 M: growable set-nth-unsafe underlying>> set-nth-unsafe ; inline
 
+<PRIVATE
+
+: push-unsafe ( elt seq -- )
+    [ length ] keep
+    [ set-nth-unsafe ] [ [ 1 + ] dip length<< ] 2bi ; inline
+
+: push-all-unsafe ( from to src dst -- )
+    [ over - swap ] 2dip [ pick ] dip [ length ] keep
+    [ [ + ] dip length<< ] 2keep <copy> (copy) drop ; inline
+
+PRIVATE>
+
 : capacity ( seq -- n ) underlying>> length ; inline
 
 : expand ( len seq -- )
