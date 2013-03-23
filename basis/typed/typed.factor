@@ -154,7 +154,7 @@ PRIVATE>
 : define-typed ( word def effect -- )
     [ [ 2drop ] [ typed-def ] [ 2nip ] 3tri define-inline ] 
     [ drop "typed-def" set-word-prop ]
-    [ 2drop "typed-word" word-prop \ word set-global ] 3tri ;
+    [ 2drop "typed-word" word-prop set-last-word ] 3tri ;
 
 SYNTAX: TYPED:
     (:) define-typed ;
