@@ -5,13 +5,13 @@ images math.vectors arrays ;
 IN: images.tessellation
 
 : group-rows ( bitmap bitmap-dim -- rows )
-    first <sliced-groups> ; inline
+    first <groups> ; inline
 
 : tesselate-rows ( bitmap-rows tess-dim -- bitmaps )
-    second <sliced-groups> ; inline
+    second <groups> ; inline
 
 : tesselate-columns ( bitmap-rows tess-dim -- bitmaps )
-    first '[ _ <sliced-groups> ] map flip ; inline
+    first '[ _ <groups> ] map flip ; inline
 
 : tesselate-bitmap ( bitmap bitmap-dim tess-dim -- bitmap-grid )
     [ group-rows ] dip

@@ -90,7 +90,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
     get remove-vertex* ;
 
 : generic-call-sites ( word -- alist )
-    "generic-call-sites" word-prop 2 <groups> ;
+    "generic-call-sites" word-prop 2 group ;
 
 : compiled-unxref ( word -- )
     {

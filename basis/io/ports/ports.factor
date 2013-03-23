@@ -126,7 +126,7 @@ M: output-port stream-write1
 
 : write-in-groups ( byte-array port -- )
     [ binary-object uchar <c-direct-array> ] dip
-    [ buffer>> size>> <sliced-groups> ] [ '[ _ stream-write ] ] bi
+    [ buffer>> size>> <groups> ] [ '[ _ stream-write ] ] bi
     each ;
 
 M: output-port stream-write
