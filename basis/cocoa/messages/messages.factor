@@ -37,9 +37,9 @@ super-message-senders [ H{ } clone ] initialize
     [ ] [ object_getClass class_getSuperclass ] bi
     objc-super <struct-boa> ;
 
-TUPLE: selector name object ;
+TUPLE: selector-tuple name object ;
 
-MEMO: <selector> ( name -- sel ) f \ selector boa ;
+MEMO: <selector> ( name -- sel ) f \ selector-tuple boa ;
 
 : selector ( selector -- alien )
     dup object>> expired? [
