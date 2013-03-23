@@ -9,7 +9,7 @@ IN: source-files
 
 SYMBOL: source-files
 
-TUPLE: source-file
+TUPLE: source-file-tuple
 path
 top-level-form
 checksum
@@ -27,7 +27,7 @@ main ;
     new-definitions get >>definitions drop ;
 
 : <source-file> ( path -- source-file )
-    \ source-file new
+    \ source-file-tuple new
         swap >>path
         <definitions> >>definitions ;
 
