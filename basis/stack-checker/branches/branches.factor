@@ -94,7 +94,7 @@ SYMBOLS: combinator quotations ;
 
 GENERIC: infer-branch ( literal -- namespace )
 
-M: literal infer-branch
+M: literal-tuple infer-branch
     [
         copy-inference
         nest-visitor
