@@ -6,12 +6,6 @@ IN: grouping.tests
 
 [ { "hell" "o wo" "rld" } ] [ "hello world" 4 group ] unit-test
 
-[ { V{ "a" "b" } V{ 0 0 } } ] [
-    V{ "a" "b" } clone 2 <groups>
-    2 over set-length
-    >array
-] unit-test
-
 [ 0 ] [ { } 2 <clumps> length ] unit-test
 [ 0 ] [ { 1 } 2 <clumps> length ] unit-test
 [ 1 ] [ { 1 2 } 2 <clumps> length ] unit-test
@@ -44,5 +38,3 @@ IN: grouping.tests
 [ f ] [ [ 1.0 1 1 ] all-equal? ] unit-test
 [ t ] [ { 1 2 3 4 } [ < ] monotonic? ] unit-test
 [ f ] [ { 1 2 3 4 } [ > ] monotonic? ] unit-test
-
-[ { 6 7 8 3 4 5 0 1 2 } ] [ 9 iota >array dup 3 <groups> reverse! drop ] unit-test
