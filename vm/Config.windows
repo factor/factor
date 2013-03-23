@@ -1,4 +1,4 @@
-CFLAGS += -mno-cygwin -mwindows
+SITE_CFLAGS += -mno-cygwin -mwindows
 CFLAGS_CONSOLE += -mconsole
 SHARED_FLAG = -shared
 SHARED_DLL_EXTENSION=.dll
