@@ -311,7 +311,7 @@ M: mark-previous-rule handle-rule-start
 
 : tokenize-line ( line-context line rules -- line-context' seq )
     [
-        "MAIN" swap at -rot
+        "MAIN" of -rot
         init-token-marker
         mark-token-loop
         mark-remaining

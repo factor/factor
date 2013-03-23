@@ -21,10 +21,10 @@ C: <couchdb-error> couchdb-error
 M: couchdb-error error. ( error -- )
     "CouchDB Error: " write data>>
     "error" over at [ print ] when*
-    "reason" swap at [ print ] when* ;
+    "reason" of [ print ] when* ;
 
 PREDICATE: file-exists-error < couchdb-error
-    data>> "error" swap at "file_exists" = ;
+    data>> "error" of "file_exists" = ;
 
 ! http tools
 : couch-http-request ( request -- data )
@@ -83,7 +83,7 @@ CONSTANT: default-uuids-to-cache 100
     [ dup server-url % "_uuids?count=" % uuids-to-cache>> number>string % ] "" make ;
 
 : uuids-get ( server -- uuids )
-     uuids-url couch-get "uuids" swap at >vector ;
+     uuids-url couch-get "uuids" of >vector ;
 
 : get-uuids ( server -- server )
     dup uuids-get [ nip ] curry change-uuids ;
@@ -129,11 +129,11 @@ C: <db> db
     >json utf8 encode "application/json" <post-data> swap >>data ;
 
 ! documents
-: id> ( assoc -- id ) "_id" swap at ; 
+: id> ( assoc -- id ) "_id" of ; 
 : >id ( assoc id -- assoc ) "_id" pick set-at ;
-: rev> ( assoc -- rev ) "_rev" swap at ;
+: rev> ( assoc -- rev ) "_rev" of ;
 : >rev ( assoc rev -- assoc ) "_rev" pick set-at ;
-: attachments> ( assoc -- attachments ) "_attachments" swap at ;
+: attachments> ( assoc -- attachments ) "_attachments" of ;
 : >attachments ( assoc attachments -- assoc ) "_attachments" pick set-at ;
 
 :: copy-key ( to from to-key from-key -- )
@@ -174,8 +174,8 @@ C: <db> db
 : delete-doc ( assoc -- deletion-revision )
     [
         [ doc-url % ]
-        [ "?rev=" % "_rev" swap at % ] bi
-    ] "" make couch-delete response-ok "rev" swap at  ;
+        [ "?rev=" % "_rev" of % ] bi
+    ] "" make couch-delete response-ok "rev" of ;
 
 : remove-keys ( assoc keys -- )
     swap [ delete-at ] curry each ;

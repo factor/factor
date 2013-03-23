@@ -63,12 +63,12 @@ IN: xml.elements
     dup { "1.0" "1.1" } member? [ bad-version ] unless ;
 
 : prolog-version ( alist -- version )
-    T{ name { space "" } { main "version" } } swap at
+    T{ name { space "" } { main "version" } } of
     [ good-version ] [ versionless-prolog ] if*
     dup set-version ;
 
 : prolog-encoding ( alist -- encoding )
-    T{ name { space "" } { main "encoding" } } swap at
+    T{ name { space "" } { main "encoding" } } of
     "UTF-8" or ;
 
 : yes/no>bool ( string -- t/f )
@@ -79,7 +79,7 @@ IN: xml.elements
     } case ;
 
 : prolog-standalone ( alist -- version )
-    T{ name { space "" } { main "standalone" } } swap at
+    T{ name { space "" } { main "standalone" } } of
     [ yes/no>bool ] [ f ] if* ;
 
 : prolog-attrs ( alist -- prolog )
