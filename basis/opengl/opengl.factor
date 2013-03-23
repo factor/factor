@@ -32,10 +32,10 @@ SYMBOL: gl-scale-factor
         { 0x0506 "Invalid framebuffer operation" }
     } at "Unknown error" or ;
 
-TUPLE: gl-error function code string ;
+TUPLE: gl-error-tuple function code string ;
 
 : <gl-error> ( function code -- gl-error )
-    dup error>string \ gl-error boa ; inline
+    dup error>string \ gl-error-tuple boa ; inline
 
 : gl-error-code ( -- code/f )
     glGetError dup 0 = [ drop f ] when ; inline
