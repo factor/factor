@@ -103,7 +103,7 @@ GENERIC: infer-call* ( value known -- )
 
 \ (call) [ infer-call ] "special" set-word-prop
 
-M: literal infer-call*
+M: literal-tuple infer-call*
     [ 1array #drop, ] [ infer-literal-quot ] bi* ;
 
 M: curried infer-call*
