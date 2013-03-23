@@ -134,11 +134,19 @@ M: hash-set set-like
 
 INSTANCE: hash-set set
 
-M: hash-set intersect small/large sequence/tester filter >hash-set ;
+M: hash-set intersect
+    small/large sequence/tester filter >hash-set ;
 
-M: hash-set union (union) >hash-set ;
+M: hash-set union
+    over hash-set? [
+        small/large [ array>> ] [ clone ] bi*
+        [ [ adjoin ] curry each-member ] keep
+    ] [
+        (union) >hash-set
+    ] if ;
 
-M: hash-set diff sequence/tester [ not ] compose filter >hash-set ;
+M: hash-set diff
+    sequence/tester [ not ] compose filter >hash-set ;
 
 M: f fast-set drop 0 <hash-set> ;
 
