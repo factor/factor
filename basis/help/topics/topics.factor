@@ -7,7 +7,7 @@ IN: help.topics
 
 TUPLE: link name ;
 
-INSTANCE: link definition
+INSTANCE: link definition-mixin
 
 MIXIN: topic
 

@@ -58,4 +58,4 @@ H{
 : $tips-of-the-day ( element -- )
     drop tips get [ nl nl ] [ content>> print-element ] interleave ;
 
-INSTANCE: tip definition
+INSTANCE: tip definition-mixin
