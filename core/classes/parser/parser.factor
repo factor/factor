@@ -9,7 +9,7 @@ IN: classes.parser
 : create-class-in ( string -- word )
     current-vocab create
     dup t "defining-class" set-word-prop
-    dup set-word
+    dup set-last-word
     dup save-class-location
     dup create-predicate-word save-location ;
 

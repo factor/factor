@@ -105,12 +105,12 @@ IN: bootstrap.syntax
     "POSTPONE:" [ scan-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
     "M\\" [ scan-word scan-word lookup-method <wrapper> suffix! ] define-core-syntax
-    "inline" [ word make-inline ] define-core-syntax
-    "recursive" [ word make-recursive ] define-core-syntax
-    "foldable" [ word make-foldable ] define-core-syntax
-    "flushable" [ word make-flushable ] define-core-syntax
-    "delimiter" [ word t "delimiter" set-word-prop ] define-core-syntax
-    "deprecated" [ word make-deprecated ] define-core-syntax
+    "inline" [ last-word make-inline ] define-core-syntax
+    "recursive" [ last-word make-recursive ] define-core-syntax
+    "foldable" [ last-word make-foldable ] define-core-syntax
+    "flushable" [ last-word make-flushable ] define-core-syntax
+    "delimiter" [ last-word t "delimiter" set-word-prop ] define-core-syntax
+    "deprecated" [ last-word make-deprecated ] define-core-syntax
 
     "SYNTAX:" [
         scan-new-word parse-definition define-syntax
@@ -136,7 +136,7 @@ IN: bootstrap.syntax
 
     "DEFER:" [
         scan-token current-vocab create
-        [ fake-definition ] [ set-word ] [ undefined-def define ] tri
+        [ fake-definition ] [ set-last-word ] [ undefined-def define ] tri
     ] define-core-syntax
     
     "ALIAS:" [
@@ -206,7 +206,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "final" [
-        word make-final
+        last-word make-final
     ] define-core-syntax
 
     "SLOT:" [

@@ -80,7 +80,7 @@ DEFER: deferred
 [ f ] [ "no-loc-2" "words.tests" lookup-word where ] unit-test
 
 [ ] [ "IN: words.tests : test-last ( -- ) ;" eval( -- ) ] unit-test
-[ "test-last" ] [ word name>> ] unit-test
+[ "test-last" ] [ last-word name>> ] unit-test
 
 "undef-test" "words.tests" lookup-word [
     [ forget ] with-compilation-unit

@@ -18,7 +18,7 @@ IN: parser
 M: parsing-word stack-effect drop ( parsed -- parsed ) ;
 
 : create-in ( str -- word )
-    current-vocab create dup set-word dup save-location ;
+    current-vocab create dup set-last-word dup save-location ;
 
 SYMBOL: auto-use?
 

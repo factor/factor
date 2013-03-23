@@ -25,13 +25,13 @@ SYNTAX: FUNCTOR-SYNTAX:
 : scan-c-type-param ( -- c-type/param )
     scan-token dup "{" = [ drop \ } parse-until >array ] [ >string-param ] if ;
 
-: define* ( word def -- ) over set-word define ;
+: define* ( word def -- ) over set-last-word define ;
 
 : define-declared* ( word def effect -- )
-    pick set-word define-declared ;
+    pick set-last-word define-declared ;
 
 : define-simple-generic* ( word effect -- )
-    over set-word define-simple-generic ;
+    over set-last-word define-simple-generic ;
 
 : define-tuple-class* ( class superclass slots -- )
-    pick set-word define-tuple-class ;
+    pick set-last-word define-tuple-class ;

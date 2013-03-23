@@ -11,9 +11,16 @@ BUILTIN: word
 { def quotation initial: [ ] } props pic-def pic-tail-def
 { sub-primitive read-only } ;
 
-: word ( -- word ) \ word get-global ;
+! Need a dummy word here because BUILTIN: word is not a real word
+! and parse-datum looks for things that are actually words instead of
+! also looking for classes
+: word ( -- * ) "dummy word" throw ;
 
-: set-word ( word -- ) \ word set-global ;
+SYMBOL: last-word-symbol
+
+: last-word ( -- word ) \ last-word-symbol get-global ;
+
+: set-last-word ( word -- ) \ last-word-symbol set-global ;
 
 M: word execute (execute) ;
 
