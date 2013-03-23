@@ -73,6 +73,8 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
     key?
     at
     ?at
+    of
+    ?of
     assoc-empty?
     keys
     values
