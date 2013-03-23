@@ -61,17 +61,17 @@ IN: quadtrees.tests
         "c" { -0.5  -0.75 } value>>key
         "d" {  0.75  0.25 } value>>key
 
-    {  0.25  0.25 } swap at*
+    {  0.25  0.25 } ?of
 ] unit-test
 
-[ f f ] [
+[ { 1.0 1.0 } f ] [
     unit-bounds <quadtree>
         "a" {  0.0  -0.25 } value>>key
         "b" {  0.25  0.25 } value>>key
         "c" { -0.5  -0.75 } value>>key
         "d" {  0.75  0.25 } value>>key
 
-    {  1.0   1.0  } swap at*
+    {  1.0   1.0  } ?of
 ] unit-test
 
 [ { "a" "c" } ] [

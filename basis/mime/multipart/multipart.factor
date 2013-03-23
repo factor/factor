@@ -81,7 +81,7 @@ ERROR: end-of-stream multipart ;
         drop
     ] [
         [ [ header>> ] [ filename>> ] [ temp-file>> ] tri mime-file boa ]
-        [ content-disposition>> "name" swap at unquote ]
+        [ content-disposition>> "name" of unquote ]
         [ mime-parts>> set-at ] tri
     ] if ;
 

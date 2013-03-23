@@ -65,13 +65,13 @@ STRUCT: struct-test-bar
     make-mirror >alist
 ] unit-test
 
-[ 55 t ] [ S{ struct-test-foo { x 55 } } make-mirror { "x" "char" } swap at* ] unit-test
-[ 55 t ] [ S{ struct-test-foo { y 55 } } make-mirror { "y" "int"  } swap at* ] unit-test
-[ t  t ] [ S{ struct-test-foo { z t  } } make-mirror { "z" "bool" } swap at* ] unit-test
-[ f  t ] [ S{ struct-test-foo { z f  } } make-mirror { "z" "bool" } swap at* ] unit-test
-[ f  f ] [ S{ struct-test-foo } make-mirror { "nonexist" "bool" } swap at* ] unit-test
-[ f  f ] [ S{ struct-test-foo } make-mirror "nonexist" swap at* ] unit-test
-[ f  t ] [ f struct-test-foo memory>struct make-mirror "underlying" swap at* ] unit-test
+[ 55 t ] [ S{ struct-test-foo { x 55 } } make-mirror { "x" "char" } ?of ] unit-test
+[ 55 t ] [ S{ struct-test-foo { y 55 } } make-mirror { "y" "int"  } ?of ] unit-test
+[ t  t ] [ S{ struct-test-foo { z t  } } make-mirror { "z" "bool" } ?of ] unit-test
+[ f  t ] [ S{ struct-test-foo { z f  } } make-mirror { "z" "bool" } ?of ] unit-test
+[ { "nonexist" "bool" } f ] [ S{ struct-test-foo } make-mirror { "nonexist" "bool" } ?of ] unit-test
+[ "nonexist" f ] [ S{ struct-test-foo } make-mirror "nonexist" ?of ] unit-test
+[ f  t ] [ f struct-test-foo memory>struct make-mirror "underlying" ?of ] unit-test
 
 [ S{ struct-test-foo { x 3 } { y 2 } { z f } } ] [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }

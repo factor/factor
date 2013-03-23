@@ -31,8 +31,8 @@ ERROR: response-error response error ;
 
 : query-response>text ( response -- text )
     json> check-response
-    "responseData" swap at
-    "translatedText" swap at ;
+    "responseData" of
+    "translatedText" of ;
 
 : (translate) ( text from to -- text' )
     parameters>assoc

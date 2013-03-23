@@ -95,7 +95,7 @@ M: #phi propagate-before ( #phi -- )
     new [| key value | key old [ value union ] change-at ] assoc-each ;
 
 : include-child-constraints ( i -- )
-    infer-children-data get nth constraints swap at last
+    infer-children-data get nth constraints of last
     constraints get last update-constraints ;
 
 : branch-phi-constraints ( output values booleans -- )
