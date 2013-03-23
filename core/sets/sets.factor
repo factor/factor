@@ -7,6 +7,7 @@ IN: sets
 ! Set protocol
 MIXIN: set
 GENERIC: adjoin ( elt set -- )
+GENERIC: ?adjoin ( elt set -- ? )
 GENERIC: in? ( elt set -- ? )
 GENERIC: delete ( elt set -- )
 GENERIC: set-like ( set exemplar -- set' )
@@ -34,6 +35,8 @@ M: f clear-set drop ; inline
 
 ! Defaults for some methods.
 ! Override them for efficiency
+
+M: set ?adjoin 2dup in? [ 2drop f ] [ adjoin t ] if ;
 
 M: set null? members null? ; inline
 
@@ -100,9 +103,7 @@ M: set all-unique? drop t ;
 <PRIVATE
 
 : (pruned) ( elt set accum -- )
-    2over in? [ 3drop ] [
-        [ drop adjoin ] [ nip push ] 3bi
-    ] if ; inline
+    2over ?adjoin [ nip push ] [ 3drop ] if ; inline
 
 : pruned ( seq -- newseq )
     [ f fast-set ] [ length <vector> ] bi
@@ -156,9 +157,6 @@ M: sequence clear-set
 
 : without ( seq set -- subseq )
     tester [ not ] compose filter ;
-
-: ?adjoin ( elt set -- ? )
-    2dup in? [ 2drop f ] [ adjoin t ] if ; inline
 
 : adjoin-all ( seq set -- )
     [ adjoin ] curry each ;
