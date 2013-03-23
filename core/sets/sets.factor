@@ -1,7 +1,6 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables growable.private kernel math sequences
-vectors ;
+USING: assocs hashtables kernel math sequences vectors ;
 FROM: assocs => change-at ;
 IN: sets
 
@@ -102,7 +101,7 @@ M: set all-unique? drop t ;
 
 : (pruned) ( elt set accum -- )
     2over in? [ 3drop ] [
-        [ drop adjoin ] [ nip push-unsafe ] 3bi
+        [ drop adjoin ] [ nip push ] 3bi
     ] if ; inline
 
 : pruned ( seq -- newseq )
