@@ -45,9 +45,9 @@ TUPLE: couchdb-auth-provider
     make-mirror H{ } assoc-like ;
 
 : is-couchdb-conflict-error? ( error -- ? )
-    { [ couchdb-error? ] [ data>> "error" swap at "conflict" = ] } 1&& ;
+    { [ couchdb-error? ] [ data>> "error" of "conflict" = ] } 1&& ;
 : is-couchdb-not-found-error? ( error -- ? )
-    { [ couchdb-error? ] [ data>> "error" swap at "not_found" = ] } 1&& ;
+    { [ couchdb-error? ] [ data>> "error" of "not_found" = ] } 1&& ;
 
 : get-url ( url -- url' )
     couchdb-auth-provider get
@@ -73,15 +73,15 @@ TUPLE: couchdb-auth-provider
     over [ (reserve) ] [ 2drop t ] if ;
 
 : unreserve ( couch-rval -- )
-    [ "id" swap at get-url ]
-    [ "rev" swap at "rev" set-query-param ]
+    [ "id" of get-url ]
+    [ "rev" of "rev" set-query-param ]
     bi
     couch-delete drop ;
 
 : unreserve-from-id ( id -- )
     [
         get-url dup couch-get
-        "_rev" swap at "rev" set-query-param
+        "_rev" of "rev" set-query-param
         couch-delete drop
     ] [
         dup is-couchdb-not-found-error? [ 2drop ] [ rethrow ] if
@@ -110,7 +110,7 @@ TUPLE: couchdb-auth-provider
 ! Should be given a view URL.
 : ((get-user)) ( couchdb-url -- user/f )
     couch-get
-    "rows" swap at dup empty? [ drop f ] [ first "value" swap at ] if ;
+    "rows" of dup empty? [ drop f ] [ first "value" of ] if ;
 
 : (get-user) ( username -- user/f )
     couchdb-auth-provider get
@@ -171,8 +171,8 @@ TUPLE: couchdb-auth-provider
 
 : unify-users ( old new -- new )
     swap
-    [ "_rev" swap at "_rev" rot set-at ]
-    [ "_id" swap at "_id" rot set-at ]
+    [ "_rev" of "_rev" rot set-at ]
+    [ "_id" of "_id" rot set-at ]
     [ swap assoc-union ]
     2tri ;
 
@@ -182,15 +182,15 @@ TUPLE: couchdb-auth-provider
 ! (This word is called by the 'update-user' method.)
 : check-update ( old new -- ? )
     [
-        2dup [ "email" swap at ] same? not [
-            [ "email" swap at ] bi@
+        2dup [ "email" of ] same? not [
+            [ "email" of ] bi@
             [ drop "email" reservation-id unreserve-from-id ]
             [ nip "email" reserve ]
             2bi
         ] [ 2drop t ] if
     ] [
-        2dup [ "username" swap at ] same? not [
-            [ "username" swap at ] bi@
+        2dup [ "username" of ] same? not [
+            [ "username" of ] bi@
             [ drop "username" reservation-id unreserve-from-id ]
             [ nip "username" reserve ]
             2bi
@@ -217,7 +217,7 @@ M: couchdb-auth-provider new-user ( user provider -- user/f )
 M: couchdb-auth-provider update-user ( user provider -- )
     couchdb-auth-provider [
         [ username>> (get-user)/throw-on-no-user dup ]
-        [ drop "_id" swap at get-url ]
+        [ drop "_id" of get-url ]
         [ user>user-hash swapd
           2dup check-update drop
           unify-users >json swap couch-put drop

@@ -5,7 +5,7 @@ sequences random sets make grouping ;
 IN: trees.splay.tests
 
 : randomize-numeric-splay-tree ( splay-tree -- )
-    100 iota [ drop 100 random swap at drop ] with each ;
+    100 iota [ drop 100 random of drop ] with each ;
 
 : make-numeric-splay-tree ( n -- splay-tree )
     iota <splay> [ [ conjoin ] curry each ] keep ;
@@ -18,7 +18,7 @@ IN: trees.splay.tests
 [ 10 ] [ 10 make-numeric-splay-tree keys length ] unit-test
 [ 10 ] [ 10 make-numeric-splay-tree values length ] unit-test
 
-[ f ] [ <splay> f 4 pick set-at 4 swap at ] unit-test
+[ f ] [ <splay> f 4 pick set-at 4 of ] unit-test
 
 ! Ensure that f can be a value
 [ t ] [ <splay> f 4 pick set-at 4 swap key? ] unit-test

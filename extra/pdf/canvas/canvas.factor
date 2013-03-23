@@ -31,7 +31,7 @@ foreground background page-color inset line-height metrics ;
 : set-style ( canvas style -- canvas )
     {
         [
-            font-name swap at "sans-serif" or {
+            font-name of "sans-serif" or {
                 { "sans-serif" [ "Helvetica" ] }
                 { "serif"      [ "Times"     ] }
                 { "monospace"  [ "Courier"   ] }
@@ -39,21 +39,21 @@ foreground background page-color inset line-height metrics ;
             } case [ dup font>> ] dip >>name drop
         ]
         [
-            font-size swap at 12 or
+            font-size of 12 or
             [ dup font>> ] dip >>size drop
         ]
         [
-            font-style swap at [ dup font>> ] dip {
+            font-style of [ dup font>> ] dip {
                 { bold        [ t f ] }
                 { italic      [ f t ] }
                 { bold-italic [ t t ] }
                 [ drop f f ]
             } case [ >>bold? ] [ >>italic? ] bi* drop
         ]
-        [ foreground swap at COLOR: black or >>foreground ]
-        [ background swap at f or >>background ]
-        [ page-color swap at f or >>page-color ]
-        [ inset swap at { 0 0 } or >>inset ]
+        [ foreground of COLOR: black or >>foreground ]
+        [ background of f or >>background ]
+        [ page-color of f or >>page-color ]
+        [ inset of { 0 0 } or >>inset ]
     } cleave
     dup font>> font-metrics
     [ >>metrics ] [ height>> '[ _ max ] change-line-height ] bi ;

@@ -60,7 +60,7 @@ PRIVATE>
 
 : vocab-usage-xref ( vocab -- seq ) vocab-usage [ vocab>xref ] map ;
 
-: doc-location ( word -- loc ) props>> "help-loc" swap at get-loc ;
+: doc-location ( word -- loc ) props>> "help-loc" of get-loc ;
 
 : article-location ( name -- loc ) lookup-article loc>> get-loc ;
 

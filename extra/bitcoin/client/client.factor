@@ -64,7 +64,7 @@ IN: bitcoin.client
     payload bitcoin-url <post-request> 
     basic-auth "Authorization" set-header
     dup post-data>> data>> length "Content-Length" set-header
-    http-request nip >string json> "result" swap at ;
+    http-request nip >string json> "result" of ;
 
 PRIVATE>
 

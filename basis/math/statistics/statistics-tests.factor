@@ -103,7 +103,7 @@ IN: math.statistics.tests
     V{ 2 5 8 }
 } [
     10 iota [ 3 mod ] collect-by
-    [ 0 swap at ] [ 1 swap at ] [ 2 swap at ] tri
+    [ 0 of ] [ 1 of ] [ 2 of ] tri
 ] unit-test
 
 [ 0 ] [ { 1 } { 1 } sample-cov ] unit-test

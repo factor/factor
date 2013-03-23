@@ -198,7 +198,7 @@ GENERIC: metaclass-changed ( use class -- )
 
 : (define-class) ( word props -- )
     reset-caches
-    2dup "metaclass" swap at check-metaclass
+    2dup "metaclass" of check-metaclass
     {
         [ 2drop update-map- ]
         [ 2drop dup class? [ reset-class ] [ implementors-map+ ] if ]
