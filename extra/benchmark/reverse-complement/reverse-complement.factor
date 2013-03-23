@@ -12,7 +12,7 @@ TR: trans-map ch>upper "ACGTUMRYKVHDB" "TGCAAKYRMBDHV" ;
     concat reverse! dup trans-map-fast ;
 
 : show-seq ( seq -- )
-    translate-seq 60 <groups> [ print ] each ;
+    translate-seq 60 group [ print ] each ;
 
 : do-line ( seq line -- seq )
     dup first ">;" member-eq?
