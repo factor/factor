@@ -1,6 +1,7 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables kernel math sequences vectors ;
+USING: assocs hashtables growable.private kernel math sequences
+vectors ;
 FROM: assocs => change-at ;
 IN: sets
 
@@ -23,6 +24,8 @@ GENERIC: all-unique? ( set -- ? )
 GENERIC: null? ( set -- ? )
 GENERIC: cardinality ( set -- n )
 GENERIC: clear-set ( set -- )
+
+M: f members drop f ;
 
 M: f cardinality drop 0 ;
 
@@ -97,9 +100,9 @@ M: set all-unique? drop t ;
 
 <PRIVATE
 
-: (pruned) ( elt hash vec -- )
+: (pruned) ( elt set accum -- )
     2over in? [ 3drop ] [
-        [ drop adjoin ] [ nip push ] 3bi
+        [ drop adjoin ] [ nip push-unsafe ] 3bi
     ] if ; inline
 
 : pruned ( seq -- newseq )
