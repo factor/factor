@@ -132,3 +132,7 @@ PREDICATE: numba-ova-10 < union{ float integer }
 [ t ] [ 100.0 numba-ova-10? ] unit-test
 [ f ] [ 5 numba-ova-10? ] unit-test
 [ f ] [ 5.75 numba-ova-10? ] unit-test
+
+! Issue #420 lol
+[ "IN: issue-420 UNION: omg omg ;" eval( -- ) ]
+[ error>> cannot-reference-self? ] must-fail-with
