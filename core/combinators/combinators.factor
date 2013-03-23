@@ -201,7 +201,7 @@ M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
-M: iota hashcode*
+M: iota-tuple hashcode*
     over 0 <= [ 2drop 0 ] [
         nip length 0 swap [ sequence-hashcode-step ] each-integer
     ] if ;
