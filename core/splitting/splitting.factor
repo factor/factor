@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel make math sequences strings ;
+USING: arrays kernel make math sequences strings sbufs ;
 IN: splitting
 
 <PRIVATE
@@ -120,3 +120,6 @@ M: string string-lines
     ] [
         1array
     ] if ;
+
+M: sbuf string-lines
+    [ "" like string-lines ] keep [ like ] curry map ;
