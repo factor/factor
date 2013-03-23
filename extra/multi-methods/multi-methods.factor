@@ -230,7 +230,7 @@ SYNTAX: GENERIC: scan-new-word scan-effect define-generic ;
     parse-definition [ 2 tail ] [ second ] [ first ] tri ;
 
 : create-method-in ( specializer generic -- method )
-    create-method dup save-location f set-word ;
+    create-method dup save-location f set-last-word ;
 
 : scan-new-method ( -- method )
     scan-word scan-object swap create-method-in ;

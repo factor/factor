@@ -64,7 +64,7 @@ FUNCTOR-SYNTAX: TUPLE:
     \ define-tuple-class* suffix! ;
 
 FUNCTOR-SYNTAX: final
-    [ word make-final ] append! ;
+    [ last-word make-final ] append! ;
 
 FUNCTOR-SYNTAX: SINGLETON:
     scan-param suffix!
@@ -117,7 +117,7 @@ FUNCTOR-SYNTAX: MACRO:
     parse-declared*
     \ define-macro suffix! ;
 
-FUNCTOR-SYNTAX: inline [ word make-inline ] append! ;
+FUNCTOR-SYNTAX: inline [ last-word make-inline ] append! ;
 
 FUNCTOR-SYNTAX: call-next-method T{ fake-call-next-method } suffix! ;
 
