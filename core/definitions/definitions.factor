@@ -3,7 +3,7 @@
 USING: accessors assocs kernel namespaces sequences sets ;
 IN: definitions
 
-MIXIN: definition
+MIXIN: definition-mixin
 
 ERROR: no-compilation-unit definition ;
 
