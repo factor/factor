@@ -6,7 +6,7 @@ IN: concurrency.count-downs
 
 ! http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/CountDownLatch.html
 
-TUPLE: count-down n promise ;
+TUPLE: count-down-tuple n promise ;
 
 : count-down-check ( count-down -- )
     dup n>> zero? [ t swap promise>> fulfill ] [ drop ] if ;
@@ -15,7 +15,7 @@ ERROR: invalid-count-down-count count ;
 
 : <count-down> ( n -- count-down )
     dup 0 < [ invalid-count-down-count ] when
-    <promise> \ count-down boa
+    <promise> \ count-down-tuple boa
     dup count-down-check ;
 
 ERROR: count-down-already-done ;
