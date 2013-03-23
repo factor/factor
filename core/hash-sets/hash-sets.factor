@@ -54,18 +54,18 @@ TUPLE: hash-set
         if
     ] if ; inline recursive
 
-: new-key@ ( key hash -- array n )
+: new-key@ ( key hash -- array n ? )
     [ array>> 2dup hash@ 0 f (new-key@) ] keep swap
-    [ over [ hash-deleted- ] [ hash-count+ ] if swap or ] [ 2drop ] if ; inline
+    [ over [ hash-deleted- ] [ hash-count+ ] if swap or t ] [ 2drop f ] if ; inline
 
 : set-nth-item ( key seq n -- )
     2 fixnum+fast set-slot ; inline
 
-: (adjoin) ( key hash -- )
-    dupd new-key@ set-nth-item ; inline
+: (adjoin) ( key hash -- ? )
+    dupd new-key@ [ set-nth-item ] dip ; inline
 
 : (rehash) ( seq hash -- )
-    [ (adjoin) ] curry each ; inline
+    [ (adjoin) drop ] curry each ; inline
 
 : hash-large? ( hash -- ? )
     [ count>> 3 fixnum*fast 1 fixnum+fast ]
@@ -82,7 +82,7 @@ TUPLE: hash-set
         [ array>> ]
         [ cardinality 1 + ]
         [ reset-hash ] tri
-    ] keep [ (adjoin) ] curry each-member ;
+    ] keep [ (adjoin) drop ] curry each-member ;
 
 : ?grow-hash ( hash -- )
     dup hash-large? [ grow-hash ] [ drop ] if ; inline
@@ -112,7 +112,10 @@ M: hash-set cardinality
 : rehash ( hash-set -- )
     [ members ] [ clear-set ] [ (rehash) ] tri ;
 
-M: hash-set adjoin ( key hash-set -- )
+M: hash-set adjoin
+    dup ?grow-hash (adjoin) drop ;
+
+M: hash-set ?adjoin
     dup ?grow-hash (adjoin) ;
 
 M: hash-set members
