@@ -74,7 +74,7 @@ IN: ui.tools.operations
     { +listener+ t }
 } define-operation
 
-[ definition? ] \ edit H{
+[ definition-mixin? ] \ edit H{
     { +keyboard+ T{ key-down f { C+ } "e" } }
     { +listener+ t }
 } define-operation
@@ -97,7 +97,7 @@ IN: ui.tools.operations
 : com-forget ( defspec -- )
     [ forget ] with-compilation-unit ;
 
-[ definition? ] \ com-forget H{ } define-operation
+[ definition-mixin? ] \ com-forget H{ } define-operation
 
 [ topic? ] \ com-browse H{
     { +keyboard+ T{ key-down f { C+ } "h" } }
