@@ -9,7 +9,7 @@ unix.groups unix.stat unix.time unix.users vocabs ;
 IN: io.files.info.unix
 SPECIALIZED-ARRAY: timeval
 
-TUPLE: unix-file-system-info < file-system-info
+TUPLE: unix-file-system-info < file-system-info-tuple
 block-size preferred-block-size
 blocks blocks-free blocks-available
 files files-free files-available
@@ -48,7 +48,7 @@ M: unix file-system-info
     [ file-system-statvfs statvfs>file-system-info ] bi
     file-system-calculations ;
 
-TUPLE: unix-file-info < file-info uid gid dev ino
+TUPLE: unix-file-info < file-info-tuple uid gid dev ino
 nlink rdev blocks blocksize ;
 
 HOOK: new-file-info os ( -- file-info )
@@ -115,7 +115,7 @@ GENERIC# file-mode? 1 ( obj mask -- ? )
 
 M: integer file-mode? mask? ;
 M: string file-mode? [ stat-mode ] dip mask? ;
-M: file-info file-mode? [ permissions>> ] dip mask? ;
+M: file-info-tuple file-mode? [ permissions>> ] dip mask? ;
 
 PRIVATE>
 
