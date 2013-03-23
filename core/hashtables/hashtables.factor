@@ -121,13 +121,13 @@ PRIVATE>
 : <hashtable> ( n -- hash )
     hashtable new [ reset-hash ] keep ; inline
 
-M: hashtable at* ( key hash -- value ? )
+M: hashtable at*
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;
 
-M: hashtable clear-assoc ( hash -- )
+M: hashtable clear-assoc
     [ init-hash ] [ array>> [ drop ((empty)) ] map! drop ] bi ;
 
-M: hashtable delete-at ( key hash -- )
+M: hashtable delete-at
     [ nip ] [ key@ ] 2bi [
         [ ((tombstone)) dup ] 2dip set-nth-pair
         hash-deleted+
@@ -135,13 +135,13 @@ M: hashtable delete-at ( key hash -- )
         3drop
     ] if ;
 
-M: hashtable assoc-size ( hash -- n )
+M: hashtable assoc-size
     [ count>> ] [ deleted>> ] bi - ; inline
 
 : rehash ( hash -- )
     [ >alist ] [ clear-assoc ] [ (rehash) ] tri ;
 
-M: hashtable set-at ( value key hash -- )
+M: hashtable set-at
     dup ?grow-hash (set-at) ;
 
 : associate ( value key -- hash )
