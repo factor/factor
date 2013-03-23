@@ -136,7 +136,8 @@ INSTANCE: hash-set set
 
 M: hash-set intersect small/large sequence/tester filter >hash-set ;
 
-M: hash-set union (union) >hash-set ;
+M: hash-set union
+    [ ?members ] [ clone ] bi* [ [ adjoin ] curry each ] keep ;
 
 M: hash-set diff sequence/tester [ not ] compose filter >hash-set ;
 
