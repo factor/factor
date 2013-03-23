@@ -102,17 +102,18 @@ M: f like drop [ f ] when-empty ; inline
 INSTANCE: f immutable-sequence
 
 ! Integer sequences
-TUPLE: iota { n integer read-only } ;
+TUPLE: iota-tuple { n integer read-only } ;
 
 ERROR: non-negative-integer-expected n ;
 
 : iota ( n -- iota )
-    dup 0 < [ non-negative-integer-expected ] when \ iota boa ; inline
+    dup 0 < [ non-negative-integer-expected ] when
+    \ iota-tuple boa ; inline
 
-M: iota length n>> ; inline
-M: iota nth-unsafe drop ; inline
+M: iota-tuple length n>> ; inline
+M: iota-tuple nth-unsafe drop ; inline
 
-INSTANCE: iota immutable-sequence
+INSTANCE: iota-tuple immutable-sequence
 
 <PRIVATE
 
