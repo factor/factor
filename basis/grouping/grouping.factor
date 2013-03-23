@@ -72,22 +72,22 @@ INSTANCE: groups abstract-groups
     groups new-groups ; inline
 
 TUPLE: clumps < chunking-seq ;
-INSTANCE: clumps subseq-chunking
+INSTANCE: clumps slice-chunking
 INSTANCE: clumps abstract-clumps
 
 : <clumps> ( seq n -- clumps )
     clumps new-groups ; inline
 
-TUPLE: sliced-clumps < chunking-seq ;
-INSTANCE: sliced-clumps slice-chunking
-INSTANCE: sliced-clumps abstract-clumps
+<PRIVATE
 
-: <sliced-clumps> ( seq n -- clumps )
-    sliced-clumps new-groups ; inline
+: map-like ( seq n quot -- seq )
+    2keep drop '[ _ like ] map ; inline
 
-: group ( seq n -- array ) [ <groups> ] 2keep drop '[ _ like ] map ;
+PRIVATE>
 
-: clump ( seq n -- array ) <clumps> { } like ;
+: group ( seq n -- array ) [ <groups> ] map-like ; inline
+
+: clump ( seq n -- array ) [ <clumps> ] map-like ; inline
 
 : monotonic? ( seq quot: ( elt1 elt2 -- ? ) -- ? )
     over length dup 2 < [ 3drop t ] [
@@ -120,18 +120,6 @@ M: circular-slice virtual@
 
 C: <circular-slice> circular-slice
 
-TUPLE: sliced-circular-clumps < chunking-seq ;
-INSTANCE: sliced-circular-clumps sequence
-
-M: sliced-circular-clumps length
-    seq>> length ; inline
-
-M: sliced-circular-clumps nth
-    [ n>> over + ] [ seq>> ] bi <circular-slice> ; inline
-
-: <sliced-circular-clumps> ( seq n -- clumps )
-    sliced-circular-clumps new-groups ; inline
-
 TUPLE: circular-clumps < chunking-seq ;
 INSTANCE: circular-clumps sequence
 
@@ -139,10 +127,10 @@ M: circular-clumps length
     seq>> length ; inline
 
 M: circular-clumps nth
-    [ n>> over + ] [ seq>> ] bi [ <circular-slice> ] [ like ] bi ; inline
+    [ n>> over + ] [ seq>> ] bi <circular-slice> ; inline
 
 : <circular-clumps> ( seq n -- clumps )
     circular-clumps new-groups ; inline
 
 : circular-clump ( seq n -- array )
-    <circular-clumps> { } like ; inline
+    [ <circular-clumps> ] map-like ; inline

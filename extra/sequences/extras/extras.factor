@@ -32,7 +32,7 @@ IN: sequences.extras
     [ swap ] 2dip each-from ; inline
 
 : all-subseqs ( seq -- seqs )
-    dup length [1,b] [ <clumps> ] with map concat ;
+    dup length [1,b] [ clump ] with map concat ;
 
 :: each-subseq ( ... seq quot: ( ... x -- ... ) -- ... )
     seq length :> len
@@ -49,7 +49,7 @@ IN: sequences.extras
 
 : filter-all-subseqs-range ( ... seq range quot: ( ... x -- ... ) -- seq )
     [
-        '[ <sliced-clumps> _ filter ] with map concat
+        '[ <clumps> _ filter ] with map concat
     ] 3keep 2drop map-like ; inline
 
 : filter-all-subseqs ( ... seq quot: ( ... x -- ... ) -- seq )
