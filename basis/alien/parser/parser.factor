@@ -61,7 +61,7 @@ ERROR: *-in-c-type-name name ;
 : (CREATE-C-TYPE) ( word -- word )
     validate-c-type-name current-vocab create {
         [ fake-definition ]
-        [ set-word ]
+        [ set-last-word ]
         [ reset-c-type ]
         [ ]
     } cleave ;
