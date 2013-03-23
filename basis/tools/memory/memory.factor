@@ -204,7 +204,7 @@ TUPLE: code-block
 { size read-only }
 { entry-point read-only } ;
 
-TUPLE: code-blocks { blocks sliced-groups } { cache hashtable } ;
+TUPLE: code-blocks { blocks groups } { cache hashtable } ;
 
 <PRIVATE
 
@@ -222,7 +222,7 @@ TUPLE: code-blocks { blocks sliced-groups } { cache hashtable } ;
     } spread code-block boa ; inline
 
 : <code-blocks> ( seq -- code-blocks )
-    6 <sliced-groups> H{ } clone \ code-blocks boa ;
+    6 <groups> H{ } clone \ code-blocks boa ;
 
 SYMBOL: code-heap-start
 SYMBOL: code-heap-end
