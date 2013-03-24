@@ -182,7 +182,7 @@ TUPLE: restart name obj continuation ;
 
 C: <restart> restart
 
-: restart ( restart -- * )
+: continue-restart ( restart -- * )
     [ obj>> ] [ continuation>> ] bi continue-with ;
 
 M: object compute-restarts drop { } ;
