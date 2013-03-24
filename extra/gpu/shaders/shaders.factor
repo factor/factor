@@ -451,16 +451,16 @@ M: vertex-array-collection vertex-array-buffers
 : vertex-array-buffer ( vertex-array: vertex-array -- vertex-buffer: buffer )
     vertex-array-buffers first ; inline
 
-TUPLE: compile-shader-error shader log ;
-TUPLE: link-program-error program log ;
+ERROR: compile-shader-error shader log ;
+ERROR: link-program-error program log ;
 
 : throw-compile-shader-error ( shader instance -- * )
-    [ dup ] dip [ gl-shader-info-log ] [ delete-gl-shader ] bi replace-log-line-numbers
-    \ compile-shader-error boa throw ;
+    [ dup ] dip [ gl-shader-info-log ] [ delete-gl-shader ] bi
+    replace-log-line-numbers compile-shader-error ;
 
 : throw-link-program-error ( program instance -- * )
-    [ dup ] dip [ gl-program-info-log ] [ delete-gl-program ] bi replace-log-line-numbers
-    \ link-program-error boa throw ;
+    [ dup ] dip [ gl-program-info-log ] [ delete-gl-program ] bi
+    replace-log-line-numbers link-program-error ;
 
 DEFER: <shader-instance>
 
