@@ -27,7 +27,7 @@ M: kqueue-mx dispose* fd>> close-file ;
         swap >>ident ;
 
 : register-kevent ( kevent mx -- )
-    fd>> swap 1 f 0 f kevent io-error ;
+    fd>> swap 1 f 0 f kevent-func io-error ;
 
 M: kqueue-mx add-input-callback ( thread fd mx -- )
     [ call-next-method ] [
@@ -61,7 +61,7 @@ M: kqueue-mx remove-output-callbacks ( fd mx -- seq )
     [
         [ fd>> f 0 ]
         [ events>> dup length ] bi
-    ] dip kevent multiplexer-error ;
+    ] dip kevent-func multiplexer-error ;
 
 : handle-kevent ( mx kevent -- )
     [ ident>> swap ] [ filter>> ] bi {
