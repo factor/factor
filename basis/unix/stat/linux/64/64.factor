@@ -25,6 +25,6 @@ FUNCTION: int __xstat64  ( int ver, c-string pathname, stat* buf ) ;
 FUNCTION: int __lxstat64 ( int ver, c-string pathname, stat* buf ) ;
 FUNCTION: int __fxstat64 ( int ver, int fd, stat* buf ) ;
 
-:  stat ( pathname buf -- int ) [ 1 ] 2dip __xstat64 ;
+:  stat-func ( pathname buf -- int ) [ 1 ] 2dip __xstat64 ;
 : lstat ( pathname buf -- int ) [ 1 ] 2dip __lxstat64 ;
 : fstat ( fd buf -- int ) [ 1 ] 2dip __fxstat64 ;
