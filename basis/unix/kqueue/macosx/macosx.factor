@@ -9,7 +9,7 @@ STRUCT: kevent
     { data   long }
     { udata  void* } ;
 
-FUNCTION: int kevent ( int kq, kevent* changelist, int nchanges, kevent* eventlist, int nevents, timespec* timeout ) ;
+FUNCTION-ALIAS: kevent-func int kevent ( int kq, kevent* changelist, int nchanges, kevent* eventlist, int nevents, timespec* timeout ) ;
 
 CONSTANT: EVFILT_READ     -1
 CONSTANT: EVFILT_WRITE    -2
