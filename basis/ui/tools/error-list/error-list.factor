@@ -182,14 +182,14 @@ M: error-list-gadget focusable-child*
     { T{ key-down f f "F1" } error-list-help }
 } define-command-map
 
-MEMO: error-list-gadget ( -- gadget )
+MEMO: get-error-list-gadget ( -- gadget )
     error-list-model get-global [ drop all-errors ] <arrow>
     <error-list-gadget> ;
 
 [ \ error-list-gadget reset-memoized ] "ui.tools.error-list" add-startup-hook
 
 : show-error-list ( -- )
-    [ error-list-gadget eq? ] find-window
-    [ raise-window ] [ error-list-gadget "Errors" open-status-window ] if* ;
+    [ get-error-list-gadget eq? ] find-window
+    [ raise-window ] [ get-error-list-gadget "Errors" open-status-window ] if* ;
 
 \ show-error-list H{ { +nullary+ t } } define-command
