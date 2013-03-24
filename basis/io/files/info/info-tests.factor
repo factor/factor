@@ -12,5 +12,5 @@ IN: io.files.info.tests
     temp-directory [ "test41" file-info size>> ] with-directory 4 =
 ] unit-test
 
-[ t ] [ "/" file-system-info file-system-info? ] unit-test
-[ t ] [ file-systems [ file-system-info? ] all? ] unit-test
+[ t ] [ "/" file-system-info file-system-info-tuple? ] unit-test
+[ t ] [ file-systems [ file-system-info-tuple? ] all? ] unit-test
