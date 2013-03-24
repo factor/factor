@@ -151,6 +151,7 @@ PRIVATE>
     bi kth-smallests first2 ;
 
 : median ( seq -- x )
+    clone
     dup length odd? [ lower-median ] [ medians + 2 / ] if ;
 
 ! quantile can be any n-tile. quartile is n = 4, percentile is n = 100
