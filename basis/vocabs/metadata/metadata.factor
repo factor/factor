@@ -118,7 +118,7 @@ ERROR: bad-platform name ;
 
 TUPLE: unsupported-platform vocab requires ;
 
-: unsupported-platform ( vocab requires -- )
+: throw-unsupported-platform ( vocab requires -- )
     \ unsupported-platform boa throw-continue ;
 
 M: unsupported-platform summary
@@ -126,5 +126,5 @@ M: unsupported-platform summary
 
 [
     dup vocab-platforms dup supported-platform?
-    [ 2drop ] [ [ vocab-name ] dip unsupported-platform ] if
+    [ 2drop ] [ [ vocab-name ] dip throw-unsupported-platform ] if
 ] check-vocab-hook set-global
