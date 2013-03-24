@@ -60,4 +60,4 @@ M: source-file-error fuel-pprint
     [ file>> ] [ error>> ] bi 2array source-file-error prefix
     fuel-pprint ;
 
-M: source-file fuel-pprint path>> fuel-pprint ;
+M: source-file-tuple fuel-pprint path>> fuel-pprint ;
