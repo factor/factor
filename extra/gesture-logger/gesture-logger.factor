@@ -22,7 +22,7 @@ M: gesture-logger user-input*
         "User input: " write print
     ] with-output-stream* t ;
 
-: gesture-logger ( -- )
+: run-gesture-logger ( -- )
     [
         <pane> t >>scrolls? dup <scroller>
         { 450 500 } >>pref-dim
@@ -31,4 +31,4 @@ M: gesture-logger user-input*
         "Gesture input" open-window
     ] with-ui ;
 
-MAIN: gesture-logger
+MAIN: run-gesture-logger
