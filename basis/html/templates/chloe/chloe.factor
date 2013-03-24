@@ -101,14 +101,14 @@ SYMBOL: template-cache
 
 H{ } template-cache set-global
 
-TUPLE: cached-template path last-modified quot ;
+TUPLE: cached-template-state path last-modified quot ;
 
 : load-template ( chloe -- cached-template )
     path>> ".xml" append
     [ ]
     [ file-info modified>> ]
     [ file>xml compile-template ] tri
-    \ cached-template boa ;
+    \ cached-template-state boa ;
 
 \ load-template DEBUG add-input-logging
 
