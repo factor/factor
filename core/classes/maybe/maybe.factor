@@ -1,6 +1,6 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.algebra
+USING: accessors arrays classes classes.algebra
 classes.algebra.private classes.private classes.union.private
 kernel words ;
 IN: classes.maybe
@@ -41,3 +41,6 @@ M: maybe class-name
 
 M: maybe predicate-def
     class>> predicate-def [ [ t ] if* ] curry ;
+
+M: maybe classes-contained-by
+    class>> 1array ;

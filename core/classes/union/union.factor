@@ -56,12 +56,17 @@ M: union-class update-class define-union-predicate ;
 
 ERROR: cannot-reference-self class members ;
 
-: union-members ( union -- members )
+GENERIC: classes-contained-by ( obj -- members )
+
+M: union-class classes-contained-by ( union -- members )
+    "members" word-prop [ f ] when-empty ;
+
+M: object classes-contained-by
     "members" word-prop [ f ] when-empty ;
 
 : check-self-reference ( class members -- class members )
     2dup [
-        dup dup [ union-members ] map concat sift append
+        dup dup [ classes-contained-by ] map concat sift append
         2dup set= [ 2drop f ] [ nip ] if
     ] follow concat
     member-eq? [ cannot-reference-self ] when ;
