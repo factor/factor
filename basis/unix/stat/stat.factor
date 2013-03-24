@@ -27,7 +27,7 @@ TYPEDEF: fsid fsid_t
 } case >>
 
 : file-status ( pathname -- stat )
-    \ stat <struct> [ [ stat ] unix-system-call drop ] keep ;
+    \ stat <struct> [ [ stat-func ] unix-system-call drop ] keep ;
 
 : link-status ( pathname -- stat )
     \ stat <struct> [ [ lstat ] unix-system-call drop ] keep ;
