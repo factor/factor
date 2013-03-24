@@ -44,7 +44,7 @@ SYMBOL: :uses-suggestions
 
 : try-suggested-restarts ( -- )
     restarts get [ is-suggested-restart ] filter
-    dup length 1 = [ first restart ] [ drop ] if ;
+    dup length 1 = [ first continue-restart ] [ drop ] if ;
 
 : fuel-set-use-hook ( -- )
     [ manifest get auto-used>> clone :uses prefix fuel-eval-set-result ]
