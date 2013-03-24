@@ -123,9 +123,9 @@ FUNCTION: IOReturn IORegistryEntryCreateCFProperties ( io_registry_entry_t entry
 
 FUNCTION: c-string mach_error_string ( IOReturn error ) ;
 
-TUPLE: mach-error error-code error-string ;
+TUPLE: mach-error-state error-code error-string ;
 : <mach-error> ( code -- error )
-    dup mach_error_string \ mach-error boa ;
+    dup mach_error_string \ mach-error-state boa ;
 
 : mach-error ( return -- )
     dup KERN_SUCCESS = [ drop ] [ <mach-error> throw ] if ;
