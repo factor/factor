@@ -27,8 +27,6 @@ M: source-file-error compute-restarts error>> compute-restarts ;
 
 TUPLE: error-type-holder type word plural icon quot forget-quot { fatal? initial: t } ;
 
-TUPLE: error-type type word plural icon quot forget-quot { fatal? initial: t } ;
-
 GENERIC: error-type ( error -- type )
 
 : <definition-error> ( error definition class -- source-file-error )
