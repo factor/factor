@@ -14,7 +14,7 @@ IN: compiler.cfg.ssa.construction.tdmsc
 
 <PRIVATE
 
-SYMBOLS: merge-sets levels again? ;
+SYMBOLS: visited merge-sets levels again? ;
 
 : init-merge-sets ( cfg -- )
     post-order dup length '[ _ <bit-set> ] H{ } map>assoc merge-sets set ;
@@ -52,22 +52,22 @@ SYMBOLS: merge-sets levels again? ;
 : consistent? ( snode lnode -- ? )
     [ merge-sets get at ] bi@ subset? ;
 
-: (process-edge) ( from to visited -- )
-    [ f walk ] dip '[
-        2dup 2array _ ?adjoin [ 2drop ] [
-            consistent? [ again? on ] unless
-        ] if
+: (process-edge) ( from to -- )
+    f walk [
+        2dup 2array visited get ?adjoin
+        [ 2drop ] [ consistent? [ again? on ] unless ] if
     ] each-incoming-j-edge ;
 
-: process-edge ( from to visited -- )
-    [ 2over 2array swap ?adjoin ] keep
-    '[ _ (process-edge) ] [ 2drop ] if ;
+: process-edge ( from to -- )
+    2dup 2array visited get ?adjoin
+    [ (process-edge) ] [ 2drop ] if ;
 
-: process-block ( bb visited -- )
-    '[ _ process-edge ] each-incoming-j-edge ;
+: process-block ( bb -- )
+    [ process-edge ] each-incoming-j-edge ;
 
 : compute-merge-set-step ( bfo -- )
-    HS{ } clone '[ _ process-block ] each ;
+    HS{ } clone visited set
+    [ process-block ] each ;
 
 : compute-merge-set-loop ( cfg -- )
     breadth-first-order
