@@ -342,7 +342,7 @@ DEFER: foo
 ] unit-test
 
 [ t ] [
-    "foo" "parser.tests" lookup-word word eq?
+    "foo" "parser.tests" lookup-word last-word eq?
 ] unit-test
 
 [ ] [
