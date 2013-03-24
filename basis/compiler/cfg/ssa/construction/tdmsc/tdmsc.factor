@@ -14,7 +14,7 @@ IN: compiler.cfg.ssa.construction.tdmsc
 
 <PRIVATE
 
-SYMBOLS: visited merge-sets levels again? ;
+SYMBOLS: merge-sets levels again? ;
 
 : init-merge-sets ( cfg -- )
     post-order dup length '[ _ <bit-set> ] H{ } map>assoc merge-sets set ;
@@ -32,10 +32,9 @@ SYMBOLS: visited merge-sets levels again? ;
 : level ( bb -- n ) levels get at ; inline
 
 : update-merge-set ( tmp to -- )
-    [ merge-sets get ] dip
-    '[
+    [ merge-sets get ] dip over '[
         _
-        [ merge-sets get at union ]
+        [ _ at union ]
         [ number>> over adjoin ]
         bi
     ] change-at ;
@@ -50,30 +49,25 @@ SYMBOLS: visited merge-sets levels again? ;
     [ [ predecessors>> ] keep ] dip
     '[ _ 2dup j-edge? _ [ 2drop ] if ] each ; inline
 
-: visited? ( pair -- ? ) visited get in? ;
-
 : consistent? ( snode lnode -- ? )
-    [ merge-sets get at ] bi@ subset? ;
+    merge-sets get '[ _ at ] bi@ subset? ;
 
-: (process-edge) ( from to -- )
-    f walk [
-        2dup 2array visited? [
+: (process-edge) ( from to visited -- )
+    [ f walk ] dip '[
+        2dup 2array _ in? [
             consistent? [ again? on ] unless
         ] [ 2drop ] if
     ] each-incoming-j-edge ;
 
-: process-edge ( from to -- )
-    2dup 2array dup visited? [ 3drop ] [
-        visited get adjoin
-        (process-edge)
-    ] if ;
+: process-edge ( from to visited -- )
+    [ 2over 2array swap ?adjoin ] keep
+    '[ _ (process-edge) ] [ 2drop ] if ;
 
-: process-block ( bb -- )
-    [ process-edge ] each-incoming-j-edge ;
+: process-block ( bb visited -- )
+    '[ _ process-edge ] each-incoming-j-edge ;
 
 : compute-merge-set-step ( bfo -- )
-    HS{ } clone visited set
-    [ process-block ] each ;
+    HS{ } clone '[ _ process-block ] each ;
 
 : compute-merge-set-loop ( cfg -- )
     breadth-first-order
