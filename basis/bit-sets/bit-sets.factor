@@ -76,7 +76,7 @@ M: bit-set members
     over bit-set? [ 2dup [ table>> length ] same? ] [ f ] if
     [ drop ] [
         [ members ] dip table>> length <bit-set>
-        [ [ adjoin ] curry each ] keep
+        [ adjoin-all ] keep
     ] if ;
 
 PRIVATE>
