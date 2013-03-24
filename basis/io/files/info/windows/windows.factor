@@ -19,7 +19,7 @@ IN: io.files.info.windows
         multiple swap - n +
     ] if-zero ;
 
-TUPLE: windows-file-info < file-info attributes ;
+TUPLE: windows-file-info < file-info-tuple attributes ;
 
 : get-compressed-file-size ( path -- n )
     { DWORD } [ GetCompressedFileSize ] with-out-parameters
@@ -137,7 +137,7 @@ CONSTANT: path-length $[ MAX_PATH 1 + ]
 : calculate-file-system-info ( file-system-info -- file-system-info' )
     [ dup [ total-space>> ] [ free-space>> ] bi - >>used-space drop ] keep ;
 
-TUPLE: win32-file-system-info < file-system-info max-component flags device-serial ;
+TUPLE: win32-file-system-info < file-system-info-tuple max-component flags device-serial ;
 
 ERROR: not-absolute-path ;
 
