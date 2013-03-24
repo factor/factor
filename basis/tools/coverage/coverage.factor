@@ -7,9 +7,9 @@ combinators.short-circuit namespaces tools.test
 combinators continuations classes ;
 IN: tools.coverage
 
-TUPLE: coverage < identity-tuple executed? ;
+TUPLE: coverage-state < identity-tuple executed? ;
 
-C: <coverage> coverage
+C: <coverage-state> coverage-state
 
 SYMBOL: covered
 
@@ -61,7 +61,7 @@ M: string remove-coverage
 M: word add-coverage 
     H{ } clone [ "coverage" set-word-prop ] 2keep
     '[
-        \ coverage new [ _ set-at ] 2keep
+        \ coverage-state new [ _ set-at ] 2keep
         '[ _ flag-covered ] prepend
     ] deep-annotate ;
 
@@ -72,7 +72,7 @@ M: string reset-coverage
     [ reset-coverage ] each-word ;
 
 M: word reset-coverage
-    [ dup coverage? [ f >>executed? ] when drop ] each-word ;
+    [ dup coverage-state? [ f >>executed? ] when drop ] each-word ;
 
 GENERIC: coverage ( object -- seq )
 
