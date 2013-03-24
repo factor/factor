@@ -65,14 +65,14 @@ INSTANCE:  maybe-monad monad
 SINGLETON: nothing
 
 TUPLE: just value ;
-: just ( value -- just ) \ just boa ;
+C: <just> just
 
 UNION: maybe just nothing ;
 INSTANCE: maybe monad
 
 M: maybe monad-of drop maybe-monad ;
 
-M: maybe-monad return drop just ;
+M: maybe-monad return drop <just> ;
 M: maybe-monad fail   2drop nothing ;
 
 M: nothing >>= '[ drop _ ] ;
@@ -86,18 +86,18 @@ SINGLETON: either-monad
 INSTANCE:  either-monad monad
 
 TUPLE: left value ;
-: left ( value -- left ) \ left boa ;
+C: <left> left
 
 TUPLE: right value ;
-: right ( value -- right ) \ right boa ;
+C: <right> right
 
 UNION: either left right ;
 INSTANCE: either monad
 
 M: either monad-of drop either-monad ;
 
-M: either-monad return  drop right ;
-M: either-monad fail    drop left ;
+M: either-monad return  drop <right> ;
+M: either-monad fail    drop <left> ;
 
 M: left  >>= '[ drop _ ] ;
 M: right >>= value>> '[ _ swap call( x -- y ) ] ;
@@ -134,21 +134,21 @@ SINGLETON: state-monad
 INSTANCE:  state-monad monad
 
 TUPLE: state quot ;
-: state ( quot -- state ) \ state boa ;
+C: <state> state
 
 INSTANCE: state monad
 
 M: state monad-of drop state-monad ;
 
-M: state-monad return drop '[ _ 2array ] state ;
+M: state-monad return drop '[ _ 2array ] <state> ;
 M: state-monad fail   "Fail" throw ;
 
 : mcall ( x state -- y ) quot>> call( x -- y ) ;
 
-M: state >>= '[ _ swap '[ _ mcall first2 @ mcall ] state ] ;
+M: state >>= '[ _ swap '[ _ mcall first2 @ mcall ] <state> ] ;
 
-: get-st ( -- state ) [ dup 2array ] state ;
-: put-st ( value -- state ) '[ drop _ f 2array ] state ;
+: get-st ( -- state ) [ dup 2array ] <state> ;
+: put-st ( value -- state ) '[ drop _ f 2array ] <state> ;
 
 : run-st ( state initial -- value ) swap mcall second ;
 
@@ -159,37 +159,37 @@ SINGLETON: reader-monad
 INSTANCE:  reader-monad monad
 
 TUPLE: reader quot ;
-: reader ( quot -- reader ) \ reader boa ;
+C: <reader> reader
 INSTANCE: reader monad
 
 M: reader monad-of drop reader-monad ;
 
-M: reader-monad return drop '[ drop _ ] reader ;
+M: reader-monad return drop '[ drop _ ] <reader> ;
 M: reader-monad fail   "Fail" throw ;
 
-M: reader >>= '[ _ swap '[ dup _ mcall @ mcall ] reader ] ;
+M: reader >>= '[ _ swap '[ dup _ mcall @ mcall ] <reader> ] ;
 
 : run-reader ( reader env -- value ) swap quot>> call( env -- value ) ;
 
-: ask ( -- reader ) [ ] reader ;
-: local ( reader quot -- reader' ) swap '[ @ _ mcall ] reader ;
+: ask ( -- reader ) [ ] <reader> ;
+: local ( reader quot -- reader' ) swap '[ @ _ mcall ] <reader> ;
 
 ! Writer
 SINGLETON: writer-monad
 INSTANCE:  writer-monad monad
 
 TUPLE: writer value log ;
-: writer ( value log -- writer ) \ writer boa ;
+C: <writer> writer
 
 M: writer monad-of drop writer-monad ;
 
-M: writer-monad return drop { } writer ;
+M: writer-monad return drop { } <writer> ;
 M: writer-monad fail   "Fail" throw ;
 
 : run-writer ( writer -- value log ) [ value>> ] [ log>> ] bi ;
 
-M: writer >>= '[ [ _ run-writer ] dip '[ @ run-writer ] dip append writer ] ;
+M: writer >>= '[ [ _ run-writer ] dip '[ @ run-writer ] dip append <writer> ] ;
 
-: pass ( writer -- writer' ) run-writer [ first2 ] dip swap call( x -- y ) writer ;
-: listen ( writer -- writer' ) run-writer [ 2array ] keep writer ;
-: tell ( seq -- writer ) f swap writer ;
+: pass ( writer -- writer' ) run-writer [ first2 ] dip swap call( x -- y ) <writer> ;
+: listen ( writer -- writer' ) run-writer [ 2array ] keep <writer> ;
+: tell ( seq -- writer ) f swap <writer> ;

@@ -6,11 +6,11 @@ IN: monads.tests
 [ "OH HAI" identity-monad fail ] must-fail
 
 [ 666 ] [
-    111 just [ 6 * ] fmap [ ] [ "OOPS" throw ] if-maybe
+    111 <just> [ 6 * ] fmap [ ] [ "OOPS" throw ] if-maybe
 ] unit-test
 
 [ nothing ] [
-    111 just [ maybe-monad fail ] bind
+    111 <just> [ maybe-monad fail ] bind
 ] unit-test
 
 [ 100 ] [
@@ -70,10 +70,10 @@ IN: monads.tests
 
 [ nothing ] [
     {
-        [ "hi" just ]
-        [ " bye" append just ]
+        [ "hi" <just> ]
+        [ " bye" append <just> ]
         [ drop nothing ]
-        [ reverse just ]
+        [ reverse <just> ]
     } do
 ] unit-test
 
@@ -121,9 +121,9 @@ LAZY: nats-from ( n -- list )
 ] unit-test
 
 [ nothing ] [
-    5 just nothing maybe-monad apply
+    5 <just> nothing maybe-monad apply
 ] unit-test
 
 [ T{ just f 15 } ] [
-    5 just [ 10 + ] just maybe-monad apply
+    5 <just> [ 10 + ] <just> maybe-monad apply
 ] unit-test
