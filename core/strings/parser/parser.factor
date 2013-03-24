@@ -163,7 +163,7 @@ ERROR: trailing-characters string ;
             (parse-multiline-string)
         ] if*
     ] [
-        unexpected-eof
+        throw-unexpected-eof
     ] if ;
 
 PRIVATE>
