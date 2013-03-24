@@ -550,7 +550,8 @@ SYMBOL: deploy-vocab
 : write-vocab-manifest ( vocab-manifest-out -- )
     "Writing vocabulary manifest to " write dup print flush
     vocabs "VOCABS:" prefix
-    deploy-libraries get [ library path>> ] map members "LIBRARIES:" prefix append
+    deploy-libraries get [ lookup-library path>> ] map members
+    "LIBRARIES:" prefix append
     swap utf8 set-file-lines ;
 
 : prepare-deploy-libraries ( -- )
