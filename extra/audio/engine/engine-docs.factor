@@ -10,12 +10,12 @@ HELP: <audio-engine>
 }
 { $description "Constructs an " { $link audio-engine } " instance capable of playing " { $snippet "voice-count" } " simultaneous clips. The OpenAL device named " { $snippet "device-name" } " will be used, or the default device if " { $snippet "device-name" } " is " { $link f } ". An error will be thrown if the engine cannot be initialized. The engine is returned in the stopped state; to start audio processing, use " { $link start-audio } " or " { $link start-audio* } "." } ;
 
-HELP: <audio-orientation>
+HELP: <audio-orientation-state>
 { $values
     { "forward" "a sequence of 3 floats" } { "up" "a sequence of 3 floats" }
-    { "audio-orientation" audio-orientation }
+    { "audio-orientation" audio-orientation-state }
 }
-{ $description "Constructs an " { $link audio-orientation } " tuple." } ;
+{ $description "Constructs an " { $link audio-orientation-state } " tuple." } ;
 
 HELP: <standard-audio-engine>
 { $values
