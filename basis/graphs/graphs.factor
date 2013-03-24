@@ -31,7 +31,7 @@ PRIVATE>
 
 <PRIVATE
 
-: (closure) ( obj assoc quot: ( elt -- assoc ) -- )
+: (closure) ( vertex assoc quot: ( vertex -- assoc ) -- )
     2over key? [
         3drop
     ] [
@@ -41,5 +41,5 @@ PRIVATE>
 
 PRIVATE>
 
-: closure ( obj quot -- assoc )
+: closure ( vertex quot: ( vertex -- assoc ) -- assoc )
     H{ } clone [ swap (closure) ] keep ; inline
