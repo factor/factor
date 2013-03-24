@@ -26,16 +26,16 @@ M: complex eql? over complex? [ = ] [ 2drop f ] if ;
 ! you receive, always construct new ones. We don't declare the
 ! slots read-only to allow cloning followed by writing, and to
 ! simplify constructors.
-TUPLE: value-info
+TUPLE: value-info-state
 class
 interval
 literal
 literal?
 slots ;
 
-CONSTANT: null-info T{ value-info f null empty-interval }
+CONSTANT: null-info T{ value-info-state f null empty-interval }
 
-CONSTANT: object-info T{ value-info f object full-interval }
+CONSTANT: object-info T{ value-info-state f object full-interval }
 
 : interval>literal ( class interval -- literal literal? )
     #! If interval has zero length and the class is sufficiently
@@ -52,7 +52,7 @@ CONSTANT: object-info T{ value-info f object full-interval }
         } cond
     ] if ;
 
-: <value-info> ( -- info ) \ value-info new ; inline
+: <value-info> ( -- info ) \ value-info-state new ; inline
 
 DEFER: <literal-info>
 
