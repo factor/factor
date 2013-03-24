@@ -44,7 +44,7 @@ IN: compiler.tree.propagation.info.tests
     value-info-intersect >literal<
 ] unit-test
 
-[ T{ value-info f null empty-interval f f } ] [
+[ T{ value-info-state f null empty-interval f f } ] [
     fixnum -10 0 [a,b] <class/interval-info>
     fixnum 19 29 [a,b] <class/interval-info>
     value-info-intersect
