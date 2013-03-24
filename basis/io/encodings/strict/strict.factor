@@ -3,9 +3,9 @@
 USING: io.encodings kernel accessors summary ;
 IN: io.encodings.strict
 
-TUPLE: strict code ;
+TUPLE: strict-state code ;
 
-C: strict strict
+C: strict strict-state
 
-M: strict decode-char
+M: strict-state decode-char
     code>> decode-char dup replacement-char = [ decode-error ] when ;
