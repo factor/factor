@@ -14,20 +14,20 @@ M: promise nil? ( cons -- ? )
     force nil? ;
  
 ! Both 'car' and 'cdr' are promises
-TUPLE: lazy-cons car cdr ;
+TUPLE: lazy-cons-state car cdr ;
 
 : lazy-cons ( car cdr -- promise )
     [ T{ promise f f t f } clone ] 2dip
-        [ promise ] bi@ \ lazy-cons boa
+        [ promise ] bi@ \ lazy-cons-state boa
         >>value ;
 
-M: lazy-cons car ( lazy-cons -- car )
+M: lazy-cons-state car ( lazy-cons -- car )
     car>> force ;
 
-M: lazy-cons cdr ( lazy-cons -- cdr )
+M: lazy-cons-state cdr ( lazy-cons -- cdr )
     cdr>> force ;
 
-M: lazy-cons nil? ( lazy-cons -- ? )
+M: lazy-cons-state nil? ( lazy-cons -- ? )
     nil eq? ;
 
 : 1lazy-list ( a -- lazy-cons )
@@ -70,20 +70,20 @@ M: memoized-cons nil? ( memoized-cons -- ? )
         nil?>>
     ] if ;
 
-TUPLE: lazy-map cons quot ;
+TUPLE: lazy-map-state cons quot ;
 
-C: <lazy-map> lazy-map
+C: <lazy-map-state> lazy-map-state
 
 : lazy-map ( list quot -- result )
-    over nil? [ 2drop nil ] [ <lazy-map> <memoized-cons> ] if ;
+    over nil? [ 2drop nil ] [ <lazy-map-state> <memoized-cons> ] if ;
 
-M: lazy-map car ( lazy-map -- car )
+M: lazy-map-state car ( lazy-map -- car )
     [ cons>> car ] [ quot>> call( old -- new ) ] bi ;
 
-M: lazy-map cdr ( lazy-map -- cdr )
+M: lazy-map-state cdr ( lazy-map -- cdr )
     [ cons>> cdr ] [ quot>> lazy-map ] bi ;
 
-M: lazy-map nil? ( lazy-map -- ? )
+M: lazy-map-state nil? ( lazy-map -- ? )
     cons>> nil? ;
 
 TUPLE: lazy-take n cons ;
@@ -352,8 +352,8 @@ INSTANCE: memoized-cons list
 INSTANCE: promise list
 INSTANCE: lazy-io list
 INSTANCE: lazy-concat list
-INSTANCE: lazy-cons list
-INSTANCE: lazy-map list
+INSTANCE: lazy-cons-state list
+INSTANCE: lazy-map-state list
 INSTANCE: lazy-take list
 INSTANCE: lazy-append list
 INSTANCE: lazy-from-by list

@@ -10,13 +10,13 @@ GENERIC: car ( cons -- car )
 GENERIC: cdr ( cons -- cdr )
 GENERIC: nil? ( object -- ?   )
     
-TUPLE: cons { car read-only } { cdr read-only } ;
+TUPLE: cons-state { car read-only } { cdr read-only } ;
 
-C: cons cons
+C: cons cons-state
 
-M: cons car ( cons -- car ) car>> ;
+M: cons-state car ( cons -- car ) car>> ;
 
-M: cons cdr ( cons -- cdr ) cdr>> ;
+M: cons-state cdr ( cons -- cdr ) cdr>> ;
 
 SINGLETON: +nil+
 M: +nil+ nil? drop t ;
