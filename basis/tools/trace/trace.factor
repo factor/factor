@@ -43,9 +43,9 @@ SYMBOL: end
         ]
     } 1&& ;
 
-TUPLE: trace-step word inputs ;
+TUPLE: trace-step-state word inputs ;
 
-M: trace-step summary
+M: trace-step-state summary
     [
         [ "Word: " % word>> name>> % ]
         [ " -- inputs: " % inputs>> unparse-short % ] bi
@@ -53,7 +53,7 @@ M: trace-step summary
 
 : <trace-step> ( continuation word -- trace-step )
     [ nip ] [ [ data>> ] [ stack-effect in>> length ] bi* short tail* ] 2bi
-    \ trace-step boa ;
+    \ trace-step-state boa ;
 
 : print-step ( continuation -- )
     dup continuation-current dup word? [
