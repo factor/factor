@@ -39,9 +39,9 @@ CONSTANT: DT_LNK      10
 CONSTANT: DT_SOCK     12
 CONSTANT: DT_WHT      14
 
-: SIG_EFF ( -- obj ) -1 void* <ref> ; inline
-: SIG_DFL ( -- obj ) 0 void* <ref> ; inline
-: SIG_IGN ( -- obj ) 1 void* <ref> ; inline
+: SIG_EFF ( -- obj ) ALIEN: -1 void* <ref> ; inline
+: SIG_DFL ( -- obj ) ALIEN: 0 void* <ref> ; inline
+: SIG_IGN ( -- obj ) ALIEN: 1 void* <ref> ; inline
 
 LIBRARY: libc
 
