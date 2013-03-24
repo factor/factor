@@ -32,9 +32,10 @@ SYMBOLS: visited merge-sets levels again? ;
 : level ( bb -- n ) levels get at ; inline
 
 : update-merge-set ( tmp to -- )
-    [ merge-sets get ] dip over '[
+    [ merge-sets get ] dip
+    '[
         _
-        [ _ at union ]
+        [ merge-sets get at union ]
         [ number>> over adjoin ]
         bi
     ] change-at ;
@@ -49,18 +50,23 @@ SYMBOLS: visited merge-sets levels again? ;
     [ [ predecessors>> ] keep ] dip
     '[ _ 2dup j-edge? _ [ 2drop ] if ] each ; inline
 
+: visited? ( pair -- ? ) visited get in? ;
+
 : consistent? ( snode lnode -- ? )
     [ merge-sets get at ] bi@ subset? ;
 
 : (process-edge) ( from to -- )
     f walk [
-        2dup 2array visited get ?adjoin
-        [ 2drop ] [ consistent? [ again? on ] unless ] if
+        2dup 2array visited? [
+            consistent? [ again? on ] unless
+        ] [ 2drop ] if
     ] each-incoming-j-edge ;
 
 : process-edge ( from to -- )
-    2dup 2array visited get ?adjoin
-    [ (process-edge) ] [ 2drop ] if ;
+    2dup 2array dup visited? [ 3drop ] [
+        visited get adjoin
+        (process-edge)
+    ] if ;
 
 : process-block ( bb -- )
     [ process-edge ] each-incoming-j-edge ;
