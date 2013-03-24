@@ -63,7 +63,7 @@ ERROR: number-expected ;
     (scan-token) dup [ parse-datum ] when ;
 
 : scan-datum ( -- word/number )
-    (scan-datum) [ \ word unexpected-eof ] unless* ;
+    (scan-datum) [ \ word throw-unexpected-eof ] unless* ;
 
 : scan-word ( -- word )
     (scan-token) parse-word ;
@@ -106,7 +106,7 @@ ERROR: staging-violation word ;
 : parse-until-step ( accum end -- accum ? )
     (scan-datum) {
         { [ 2dup eq? ] [ 2drop f ] }
-        { [ dup not ] [ drop unexpected-eof t ] }
+        { [ dup not ] [ drop throw-unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
         { [ dup parsing-word? ] [ nip execute-parsing t ] }
         [ pick push drop t ]
