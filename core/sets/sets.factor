@@ -168,6 +168,10 @@ M: sequence clear-set
     dupd sequence/tester [ dup ] prepose pick
     [ delete ] curry [ [ drop ] if ] curry compose each ;
 
+: intersect! ( set1 set2 -- set1 )
+    dupd sequence/tester [ dup ] prepose [ not ] compose pick
+    [ delete ] curry [ [ drop ] if ] curry compose each ;
+
 ! Temporarily for compatibility
 
 : unique ( seq -- assoc )
