@@ -20,4 +20,4 @@ STRUCT: statvfs
 CONSTANT: ST_RDONLY   0x1 ! Read-only file system
 CONSTANT: ST_NOSUID   0x2 ! Does not honor setuid/setgid
 
-FUNCTION: int statvfs ( c-string path, statvfs* buf ) ;
+FUNCTION-ALIAS: statvfs-func int statvfs ( c-string path, statvfs* buf ) ;
