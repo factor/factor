@@ -12,37 +12,37 @@ IN: lists.tests
 ] unit-test
 
 { { 3 4 5 6 } } [
-    T{ cons f 1       
-        T{ cons f 2 
-            T{ cons f 3
-                T{ cons f 4
+    T{ cons-state f 1
+        T{ cons-state f 2
+            T{ cons-state f 3
+                T{ cons-state f 4
                 +nil+ } } } } [ 2 + ] lmap>array
 ] unit-test
 
 { 10 } [
-    T{ cons f 1       
-        T{ cons f 2 
-            T{ cons f 3
-                T{ cons f 4
+    T{ cons-state f 1
+        T{ cons-state f 2
+            T{ cons-state f 3
+                T{ cons-state f 4
                 +nil+ } } } } 0 [ + ] foldl
 ] unit-test
-    
-{ T{ cons f 2 T{ cons f 3 T{ cons f 4 T{ cons f 5 +nil+ } } } } } [
+
+{ T{ cons-state f 2 T{ cons-state f 3 T{ cons-state f 4 T{ cons-state f 5 +nil+ } } } } } [
     { 1 2 3 4 } sequence>list [ 1 + ] lmap
 ] unit-test
-    
+
 { 15 } [
  { 1 2 3 4 5 } sequence>list 0 [ + ] foldr
 ] unit-test
-    
+
 { { 5 4 3 2 1 } } [
     { 1 2 3 4 5 } sequence>list lreverse list>array
 ] unit-test
-    
+
 { 5 } [
     { 1 2 3 4 5 } sequence>list llength
 ] unit-test
-    
+
 { { 1 2 3 4 5 6 } } [
     { 1 2 3 } sequence>list { 4 5 6 } sequence>list lappend list>array
 ] unit-test
