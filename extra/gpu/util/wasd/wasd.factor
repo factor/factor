@@ -97,7 +97,8 @@ CONSTANT: fov 0.7
     { 1.0 0.0 0.0 } n*v eye-rotate ;
 
 M: wasd-world audio-position location>> ; inline
-M: wasd-world audio-orientation forward-vector { 0.0 1.0 0.0 } <audio-orientation> ; inline
+M: wasd-world audio-orientation
+    forward-vector { 0.0 1.0 0.0 } <audio-orientation-state> ; inline
 
 : walk-forward ( world -- )
     dup forward-vector [ v+ ] curry change-location drop ;
