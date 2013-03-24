@@ -454,11 +454,11 @@ M: vertex-array-collection vertex-array-buffers
 TUPLE: compile-shader-error shader log ;
 TUPLE: link-program-error program log ;
 
-: compile-shader-error ( shader instance -- * )
+: throw-compile-shader-error ( shader instance -- * )
     [ dup ] dip [ gl-shader-info-log ] [ delete-gl-shader ] bi replace-log-line-numbers
     \ compile-shader-error boa throw ;
 
-: link-program-error ( program instance -- * )
+: throw-link-program-error ( program instance -- * )
     [ dup ] dip [ gl-program-info-log ] [ delete-gl-program ] bi replace-log-line-numbers
     \ link-program-error boa throw ;
 
@@ -473,7 +473,7 @@ DEFER: <shader-instance>
     [ ] [ source>> ] [ kind>> gl-shader-kind ] tri <gl-shader>
     dup gl-shader-ok?
     [ swap world get \ shader-instance boa window-resource ]
-    [ compile-shader-error ] if ;
+    [ throw-compile-shader-error ] if ;
 
 : (link-program) ( program shader-instances -- program-instance )
     '[ _ [ handle>> ] map ]
@@ -488,7 +488,7 @@ DEFER: <shader-instance>
     dup gl-program-ok?  [
         [ swap world get \ program-instance boa |dispose dup verify-feedback-format ]
         with-destructors window-resource
-    ] [ link-program-error ] if ;
+    ] [ throw-link-program-error ] if ;
 
 : link-program ( program -- program-instance )
     dup shaders>> [ <shader-instance> ] map (link-program) ;
