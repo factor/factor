@@ -75,7 +75,12 @@ IN: io.launcher.unix
         dup get-environment set-os-envs
     ] when ;
 
+! Ignored signals are not reset to the default handler.
+: reset-ignored-signals ( process -- process )
+    SIGPIPE SIG_DFL signal drop ;
+
 : spawn-process ( process -- * )
+    [ reset-ignored-signals ] [ 2drop 248 _exit ] recover
     [ setup-process-group ] [ 2drop 249 _exit ] recover
     [ setup-priority ] [ 2drop 250 _exit ] recover
     [ setup-redirection ] [ 2drop 251 _exit ] recover
