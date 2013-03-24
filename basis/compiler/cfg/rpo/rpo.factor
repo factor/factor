@@ -6,13 +6,12 @@ FROM: namespaces => set ;
 IN: compiler.cfg.rpo
 
 : post-order-traversal ( visited bb -- visited )
-    dup pick in? [ drop ] [
-        dup pick adjoin
+    dup pick ?adjoin [
         [
             successors>> <reversed>
             [ post-order-traversal ] each
         ] [ , ] bi
-    ] if ; inline recursive
+    ] [ drop ] if ; inline recursive
 
 : number-blocks ( blocks -- )
     dup length iota <reversed>

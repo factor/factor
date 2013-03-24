@@ -19,12 +19,11 @@ IN: compiler.cfg.utilities
     } 1&& ;
 
 : (skip-empty-blocks) ( visited bb -- visited bb' )
-    dup pick in? [
-        dup empty-block? [
-            dup pick adjoin
+    dup empty-block? [
+        dup pick ?adjoin [
             successors>> first (skip-empty-blocks)
         ] when
-    ] unless ; inline recursive
+    ] when ; inline recursive
 
 : skip-empty-blocks ( bb -- bb' )
     [ HS{ } clone ] dip (skip-empty-blocks) nip ;
