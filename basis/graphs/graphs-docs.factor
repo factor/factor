@@ -28,5 +28,5 @@ HELP: remove-vertex
 { $side-effects "graph" } ;
 
 HELP: closure
-{ $values { "obj" object } { "quot" { $quotation "( obj -- assoc )" } } { "assoc" "a new assoc" } }
+{ $values { "vertex" object } { "quot" { $quotation "( vertex -- assoc )" } } { "assoc" "a new assoc" } }
 { $description "Outputs a set of all vertices reachable from " { $snippet "vertex" } " via edges given by the quotation. The set always includes " { $snippet "vertex" } "." } ;
