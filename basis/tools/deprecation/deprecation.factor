@@ -20,7 +20,7 @@ TUPLE: deprecated-usages asset usages ;
 : :deprecations ( -- )
     deprecation-notes get-global values errors. ;
 
-T{ error-type
+T{ error-type-holder
     { type +deprecation-note+ }
     { word ":deprecations" }
     { plural "deprecated word usages" }
