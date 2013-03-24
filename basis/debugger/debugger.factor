@@ -245,8 +245,8 @@ M: redefine-error error.
     "Re-definition of " write
     def>> . ;
 
-M: undefined summary
-    word>> undefined?
+M: undefined-word summary
+    word>> undefined-word?
     "Cannot execute a deferred word before it has been defined"
     "Cannot execute a word before it has been compiled"
     ? ;
