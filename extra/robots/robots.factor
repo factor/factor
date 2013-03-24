@@ -97,6 +97,6 @@ PRIVATE>
         [ <rules> dup ] dip [ parse-robots.txt-line drop ] with each
     ] map ;
 
-: robots ( url -- robots )
+: url>robots ( url -- robots )
     >url
     dup get-robots.txt nip parse-robots.txt <robots> ;
