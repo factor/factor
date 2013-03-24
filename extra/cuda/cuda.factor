@@ -10,10 +10,10 @@ sequences words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cuda
 
-TUPLE: cuda-error code ;
+TUPLE: cuda-error-state code ;
 
 : cuda-error ( code -- )
-    dup CUDA_SUCCESS = [ drop ] [ \ cuda-error boa throw ] if ;
+    dup CUDA_SUCCESS = [ drop ] [ \ cuda-error-state boa throw ] if ;
 
 : cuda-version ( -- n )
     { c:int } [ cuDriverGetVersion cuda-error ] with-out-parameters ;
