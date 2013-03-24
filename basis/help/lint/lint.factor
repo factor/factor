@@ -34,7 +34,7 @@ M: help-lint-error error-type drop +help-lint-failure+ ;
 
 PRIVATE>
 
-: help-lint-error ( error topic -- )
+: notify-help-lint-error ( error topic -- )
     lint-failures get pick
     [ [ [ <help-lint-error> ] keep ] dip set-at ] [ delete-at drop ] if
     notify-error-observers ;
@@ -43,7 +43,7 @@ PRIVATE>
 
 :: check-something ( topic quot -- )
     [ quot call( -- ) f ] [ ] recover
-    topic help-lint-error ; inline
+    topic notify-help-lint-error ; inline
 
 : check-word ( word -- )
     [ with-file-vocabs ] vocabs-quot set
