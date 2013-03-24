@@ -53,8 +53,8 @@ M: word definition def>> ;
 
 PRIVATE>
 
-TUPLE: undefined word ;
-: undefined ( -- * ) callstack caller \ undefined boa throw ;
+TUPLE: undefined-word word ;
+: undefined ( -- * ) callstack caller \ undefined-word boa throw ;
 
 : undefined-def ( -- quot )
     #! 'f' inhibits tail call optimization in non-optimizing

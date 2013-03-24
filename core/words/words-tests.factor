@@ -66,10 +66,10 @@ FORGET: another-forgotten
 
 ! Make sure that undefined words throw proper errors
 DEFER: deferred
-[ deferred ] [ T{ undefined f deferred } = ] must-fail-with
+[ deferred ] [ T{ undefined-word f deferred } = ] must-fail-with
 
 [ "IN: words.tests DEFER: not-compiled << not-compiled >>" eval( -- ) ]
-[ error>> [ undefined? ] [ word>> name>> "not-compiled" = ] bi and ] must-fail-with
+[ error>> [ undefined-word? ] [ word>> name>> "not-compiled" = ] bi and ] must-fail-with
 
 [ ] [ "IN: words.tests FORGET: not-compiled" eval( -- ) ] unit-test
 
@@ -87,7 +87,7 @@ DEFER: deferred
 ] when*
 
 [ "IN: words.tests : undef-test ( -- ) ; << undef-test >>" eval( -- ) ]
-[ error>> undefined? ] must-fail-with
+[ error>> undefined-word? ] must-fail-with
 
 [ ] [
     "IN: words.tests GENERIC: symbol-generic ( -- )" eval( -- )
