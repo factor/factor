@@ -7,7 +7,7 @@ IN: opengl.annotations
 
 TUPLE: gl-error-log
     { function word initial: t }
-    { error gl-error }
+    { error gl-error-tuple }
     { timestamp timestamp } ;
 
 gl-error-log [ V{ } clone ] initialize
