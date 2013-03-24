@@ -19,7 +19,7 @@ TUPLE: redefine-error def ;
 <PRIVATE
 
 : add-once ( key set -- )
-    2dup in? [ over throw-redefine-error ] when adjoin ;
+    dupd ?adjoin [ drop ] [ throw-redefine-error ] if ;
 
 : (remember-definition) ( definition loc set -- )
     [ over set-where ] dip add-once ;
