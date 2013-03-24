@@ -23,7 +23,7 @@ M: pool dispose* connections>> dispose-each ;
 : with-pool ( pool quot -- )
     [ pool swap with-variable ] curry with-disposal ; inline
 
-TUPLE: return-connection conn pool ;
+TUPLE: return-connection-state conn pool ;
 
 : return-connection ( conn pool -- )
     dup check-pool connections>> push ;
@@ -49,7 +49,7 @@ M: return-connection dispose
     [ conn>> ] [ pool>> ] bi return-connection ;
 
 : return-connection-later ( db pool -- )
-    \ return-connection boa &dispose drop ;
+    \ return-connection-state boa &dispose drop ;
 
 TUPLE: datagram-pool < pool addrspec ;
 
