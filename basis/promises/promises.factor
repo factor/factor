@@ -4,9 +4,9 @@ USING: accessors arrays effects fry generalizations kernel math
 namespaces parser effects.parser sequences words ;
 IN: promises
 
-TUPLE: promise-state quot forced? value ;
+TUPLE: promise quot forced? value ;
 
-: promise ( quot -- promise ) f f \ promise-state boa ;
+: <promise> ( quot -- promise ) f f promise boa ;
 
 : force ( promise -- value )
     dup forced?>> [
@@ -16,7 +16,7 @@ TUPLE: promise-state quot forced? value ;
     value>> ;
 
 : make-lazy-quot ( quot effect -- quot )
-    in>> length '[ _ _ ncurry promise ] ;
+    in>> length '[ _ _ ncurry <promise> ] ;
 
 SYNTAX: LAZY:
     (:) [ make-lazy-quot ] [ 2nip ] 3bi define-declared ;
