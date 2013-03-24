@@ -42,11 +42,11 @@ ALIAS: SP R13 ALIAS: LR R14 ALIAS: PC R15
 
 <PRIVATE
 
-PREDICATE: register < word register >boolean ;
-
 GENERIC: register ( register -- n )
 M: word register "register" word-prop ;
 M: f register drop 0 ;
+
+PREDICATE: register-class < word register >boolean ;
 
 PRIVATE>
 
@@ -114,7 +114,7 @@ GENERIC# shift-imm/reg 2 ( shift-imm/Rs Rm shift -- n )
 M: integer shift-imm/reg ( shift-imm Rm shift -- n )
     { { 0 4 } 5 { register 0 } 7 } bitfield ;
 
-M: register shift-imm/reg ( Rs Rm shift -- n )
+M: register-class shift-imm/reg ( Rs Rm shift -- n )
     {
         { 1 4 }
         { 0 7 }
@@ -149,7 +149,7 @@ PRIVATE>
 : <ROR> ( Rm shift-imm/Rs -- shifter-op ) 0b11 <shifter> ;
 : <RRX> ( Rm -- shifter-op ) 0 <ROR> ;
 
-M: register shifter-op 0 <LSL> shifter-op ;
+M: register-class shifter-op 0 <LSL> shifter-op ;
 M: integer shifter-op 0 <IMM> shifter-op ;
 
 <PRIVATE
@@ -296,7 +296,7 @@ SYMBOL: have-BLX?
 
 GENERIC# (BX) 1 ( Rm l -- )
 
-M: register (BX) ( Rm l -- )
+M: register-class (BX) ( Rm l -- )
     {
         { 1 24 }
         { 1 21 }
