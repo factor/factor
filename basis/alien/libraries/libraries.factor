@@ -21,7 +21,7 @@ TUPLE: library { path string } { abi abi initial: cdecl } dll dlerror ;
 
 ERROR: no-library name ;
 
-: library ( name -- library ) libraries get at ;
+: lookup-library ( name -- library ) libraries get at ;
 
 : <library> ( path abi -- library )
     over dup
@@ -32,7 +32,7 @@ ERROR: no-library name ;
     dup [ dll>> ] when ;
 
 : load-library ( name -- dll )
-    library library-dll ;
+    lookup-library library-dll ;
 
 M: dll dispose dlclose ;
 
@@ -42,7 +42,7 @@ M: library dispose dll>> [ dispose ] when* ;
     libraries get delete-at* [ dispose ] [ drop ] if ;
 
 : add-library? ( name path abi -- ? )
-    [ library ] 2dip
+    [ lookup-library ] 2dip
     '[ [ path>> _ = ] [ abi>> _ = ] bi and not ] [ t ] if* ;
 
 : add-library ( name path abi -- )
@@ -52,7 +52,7 @@ M: library dispose dll>> [ dispose ] when* ;
     ] [ 3drop ] if ;
 
 : library-abi ( library -- abi )
-    library [ abi>> ] [ cdecl ] if* ;
+    lookup-library [ abi>> ] [ cdecl ] if* ;
 
 ERROR: no-such-symbol name library ;
 
