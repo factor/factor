@@ -130,7 +130,7 @@ TUPLE: declared-fixnum { x fixnum } ;
 
 [ t ] [
     [
-        { iota } declare [ 256 rem ] map
+        { iota-tuple } declare [ 256 rem ] map
     ] { mod fixnum-mod rem } inlined?
 ] unit-test
 
