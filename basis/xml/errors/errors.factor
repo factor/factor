@@ -49,7 +49,7 @@ XML-ERROR: mismatched open close ;
 
 TUPLE: unclosed line column tags ;
 
-: unclosed ( -- * )
+: throw-unclosed ( -- * )
     get-line get-column
     xml-stack get rest-slice [ first name>> ] map
     \ unclosed boa throw ;
