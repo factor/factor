@@ -134,7 +134,7 @@ unit-test
     gc ;
 
 [ f ] [ "f-stdcall" load-library f = ] unit-test
-[ stdcall ] [ "f-stdcall" library abi>> ] unit-test
+[ stdcall ] [ "f-stdcall" lookup-library abi>> ] unit-test
 
 : ffi_test_18 ( w x y z -- int )
     int "f-stdcall" "ffi_test_18" { int int int int }
@@ -628,7 +628,7 @@ FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
 [ ] [ assembly-test-1 ] unit-test
 
 [ f ] [ "f-fastcall" load-library f = ] unit-test
-[ fastcall ] [ "f-fastcall" library abi>> ] unit-test
+[ fastcall ] [ "f-fastcall" lookup-library abi>> ] unit-test
 
 : ffi_test_49 ( x -- int )
     int "f-fastcall" "ffi_test_49" { int }
