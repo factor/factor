@@ -13,11 +13,11 @@ IN: compiler.cfg.intrinsics.simd.tests
         { in-d  { 1 2 3 4 } }
         { out-d { 5 } }
         { info H{
-            { 1 T{ value-info { class byte-array } } }
-            { 2 T{ value-info { class byte-array } } }
-            { 3 T{ value-info { class byte-array } } }
-            { 4 T{ value-info { class word } { literal? t } { literal rep } } }
-            { 5 T{ value-info { class byte-array } } }
+            { 1 T{ value-info-state { class byte-array } } }
+            { 2 T{ value-info-state { class byte-array } } }
+            { 3 T{ value-info-state { class byte-array } } }
+            { 4 T{ value-info-state { class word } { literal? t } { literal rep } } }
+            { 5 T{ value-info-state { class byte-array } } }
         } }
     } ;
 
@@ -27,11 +27,11 @@ IN: compiler.cfg.intrinsics.simd.tests
         { in-d  { 1 2 3 4 } }
         { out-d { 5 } }
         { info H{
-            { 1 T{ value-info { class byte-array } } }
-            { 2 T{ value-info { class byte-array } } }
-            { 3 T{ value-info { class lit-class } { literal? t } { literal lit } } }
-            { 4 T{ value-info { class word } { literal? t } { literal rep } } }
-            { 5 T{ value-info { class byte-array } } }
+            { 1 T{ value-info-state { class byte-array } } }
+            { 2 T{ value-info-state { class byte-array } } }
+            { 3 T{ value-info-state { class lit-class } { literal? t } { literal lit } } }
+            { 4 T{ value-info-state { class word } { literal? t } { literal rep } } }
+            { 5 T{ value-info-state { class byte-array } } }
         } }
     } ;
 
@@ -40,11 +40,11 @@ IN: compiler.cfg.intrinsics.simd.tests
         { in-d  { 1 2 3 4 } }
         { out-d { 5 } }
         { info H{
-            { 1 T{ value-info { class byte-array } } }
-            { 2 T{ value-info { class byte-array } } }
-            { 3 T{ value-info { class byte-array } } }
-            { 4 T{ value-info { class object } } }
-            { 5 T{ value-info { class byte-array } } }
+            { 1 T{ value-info-state { class byte-array } } }
+            { 2 T{ value-info-state { class byte-array } } }
+            { 3 T{ value-info-state { class byte-array } } }
+            { 4 T{ value-info-state { class object } } }
+            { 5 T{ value-info-state { class byte-array } } }
         } }
     } ;
 
