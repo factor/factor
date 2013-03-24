@@ -32,7 +32,7 @@ SYMBOL: changed-vocabs
     [ unchanged-vocab ] each ;
 
 : changed-vocab? ( vocab -- ? )
-    changed-vocabs get dup [ key? ] [ 2drop t ] if ;
+    changed-vocabs get [ key? ] [ drop t ] if* ;
 
 : filter-changed ( vocabs -- vocabs' )
     [ changed-vocab? ] filter ;

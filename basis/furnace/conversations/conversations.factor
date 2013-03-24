@@ -99,12 +99,12 @@ M: conversations call-responder*
     <redirect> ;
 
 : restore-conversation ( seq -- )
-    conversation get dup [
+    conversation get [
         namespace>>
         [ '[ _ key? ] filter ]
         [ '[ [ _ at ] keep set ] each ]
         bi
-    ] [ 2drop ] if ;
+    ] [ drop ] if* ;
 
 M: conversations modify-form ( conversations -- xml/f )
     drop
