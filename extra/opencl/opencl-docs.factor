@@ -4,7 +4,7 @@ USING: help.markup help.syntax kernel quotations strings opencl.private
 math byte-arrays alien ;
 IN: opencl
 
-HELP: cl-addressing-mode
+HELP: sampler>cl-addressing-mode
 { $values
     { "sampler" cl-sampler }
     { "addressing-mode" cl-addressing-mode }
@@ -61,7 +61,7 @@ HELP: cl-event-type
 }
 { $description "Returns the type of operation that created the event." } ;
 
-HELP: cl-filter-mode
+HELP: sampler>cl-filter-mode
 { $values
     { "sampler" cl-sampler }
     { "filter-mode" cl-filter-mode }
