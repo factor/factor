@@ -186,7 +186,7 @@ MEMO: get-error-list-gadget ( -- gadget )
     error-list-model get-global [ drop all-errors ] <arrow>
     <error-list-gadget> ;
 
-[ \ error-list-gadget reset-memoized ] "ui.tools.error-list" add-startup-hook
+[ \ get-error-list-gadget reset-memoized ] "ui.tools.error-list" add-startup-hook
 
 : show-error-list ( -- )
     [ get-error-list-gadget eq? ] find-window
