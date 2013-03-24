@@ -236,7 +236,7 @@ TUPLE: id obj ;
 [ { { 1 2 } { 3 4 } } ] [
     { 1 2 3 4 }
     [
-        [ { array } declare 2 <groups> [ , ] each ] compile-call
+        [ { array } declare 2 group [ , ] each ] compile-call
     ] { } make
 ] unit-test
 
