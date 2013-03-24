@@ -16,7 +16,7 @@ TUPLE: help-lint-error < source-file-error ;
 
 SYMBOL: +help-lint-failure+
 
-T{ error-type
+T{ error-type-holder
    { type +help-lint-failure+ }
    { word ":lint-failures" }
    { plural "help lint failures" }
