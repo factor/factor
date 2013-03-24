@@ -20,10 +20,10 @@ exclude-vocabs { "math" "accessors" } swap set-global
 SYMBOL: end
 
 : include? ( vocab -- ? )
-    include-vocabs get dup [ member? ] [ 2drop t ] if ;
+    include-vocabs get [ member? ] [ drop t ] if* ;
 
 : exclude? ( vocab -- ? )
-    exclude-vocabs get dup [ member? ] [ 2drop f ] if ;
+    exclude-vocabs get [ member? ] [ drop f ] if* ;
 
 : into? ( obj -- ? )
     {
