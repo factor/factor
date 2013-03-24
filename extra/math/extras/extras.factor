@@ -99,7 +99,7 @@ PRIVATE>
     [ 1 ] 2dip [ [ dupd swap - ] dip * + dup ] curry map nip ;
 
 : moving-median ( u n -- v )
-    <clumps> [ median ] map ;
+    clump [ median ] map ;
 
 : moving-supremum ( u n -- v )
     <clumps> [ supremum ] map ;
