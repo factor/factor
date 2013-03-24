@@ -93,5 +93,5 @@ PRIVATE>
 : list>array ( list -- array )  
     [ ] lmap>array ;
 
-INSTANCE: cons list
+INSTANCE: cons-state list
 INSTANCE: +nil+ list
