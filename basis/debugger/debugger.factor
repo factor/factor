@@ -43,7 +43,8 @@ M: string error. print ;
     error-continuation get name>> assoc-stack ;
 
 : :res ( n -- * )
-    1 - restarts get-global nth f restarts set-global restart ;
+    1 - restarts get-global nth f restarts set-global
+    continue-restart ;
 
 : :1 ( -- * ) 1 :res ;
 : :2 ( -- * ) 2 :res ;
