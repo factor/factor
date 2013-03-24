@@ -50,7 +50,7 @@ IN: compiler.cfg.linear-scan.allocation
 
 GENERIC: handle ( obj -- )
 
-M: live-interval handle
+M: live-interval-state handle
     [ start>> deactivate-intervals ]
     [ start>> activate-intervals ]
     [ assign-register ]

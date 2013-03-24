@@ -20,7 +20,7 @@ TUPLE: vreg-use n def-rep use-rep spill-slot? ;
 
 : <vreg-use> ( n -- vreg-use ) vreg-use new swap >>n ;
 
-TUPLE: live-interval
+TUPLE: live-interval-state
 vreg
 reg spill-to spill-rep reload-from reload-rep
 start end ranges uses
@@ -47,7 +47,7 @@ M: f covers? 2drop f ;
 
 M: live-range covers? [ from>> ] [ to>> ] bi between? ;
 
-M: live-interval covers? ( insn# live-interval -- ? )
+M: live-interval-state covers? ( insn# live-interval -- ? )
     ranges>>
     dup length 4 <= [
         [ covers? ] with any?
@@ -84,7 +84,7 @@ M: live-interval covers? ( insn# live-interval -- ? )
     [ extend-range ] [ add-new-range ] if ;
 
 : <live-interval> ( vreg reg-class -- live-interval )
-    \ live-interval new
+    \ live-interval-state new
         V{ } clone >>uses
         V{ } clone >>ranges
         swap >>reg-class
