@@ -5,10 +5,7 @@ IN: units
 
 TUPLE: dimensioned value top bot ;
 
-TUPLE: dimensions-not-equal ;
-
-: dimensions-not-equal ( -- * )
-    \ dimensions-not-equal new throw ;
+ERROR: dimensions-not-equal ;
 
 M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
