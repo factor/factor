@@ -92,7 +92,7 @@ IN: vocabs.loader.tests
 
 [ 2 ] [ "count-me" get-global ] unit-test
 
-[ f ] [ "fred" "vocabs.loader.test.b" lookup-word undefined? ] unit-test
+[ f ] [ "fred" "vocabs.loader.test.b" lookup-word undefined-word? ] unit-test
 
 [ ] [
     [
