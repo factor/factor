@@ -95,7 +95,7 @@ C: <empty> empty
 [ t length ] [ object>> t eq? ] must-fail-with
 
 [ "<constructor-test>" ]
-[ "IN: classes.tuple.test TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval( -- ) word name>> ] unit-test
+[ "IN: classes.tuple.test TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval( -- ) last-word name>> ] unit-test
 
 TUPLE: size-test a b c d ;
 

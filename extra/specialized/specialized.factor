@@ -48,7 +48,7 @@ ERROR: bad-outputs word quot ;
     [ dupd specialized-quot "custom-inlining" set-word-prop ] 2bi ;
 
 SYNTAX: specialized
-    word dup stack-effect in>> length make-specialized ;
+    last-word dup stack-effect in>> length make-specialized ;
 
 PREDICATE: specialized-word < word
    "specialized-defs" word-prop >boolean ;
