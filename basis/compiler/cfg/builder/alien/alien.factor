@@ -91,7 +91,7 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
 
 : caller-linkage ( params -- symbols dll )
     [ dup abi>> callee-cleanup? [ decorated-symbol ] [ function>> ] if ]
-    [ library>> library ]
+    [ library>> lookup-library ]
     bi 2dup check-dlsym library-dll ;
 
 : caller-return ( params -- )
