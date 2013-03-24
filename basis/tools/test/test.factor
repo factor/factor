@@ -65,16 +65,16 @@ SYMBOL: file
     [ quot infer drop f f ] [ t ] recover ;
 
 TUPLE: did-not-fail ;
-CONSTANT: did-not-fail T{ did-not-fail }
+CONSTANT: did-not-fail-literal T{ did-not-fail }
 
 M: did-not-fail summary drop "Did not fail" ;
 
 :: (must-fail-with) ( quot pred -- error ? )
-    [ { } quot with-datastack drop did-not-fail t ]
+    [ { } quot with-datastack drop did-not-fail-literal t ]
     [ dup pred call( error -- ? ) [ drop f f ] [ t ] if ] recover ;
 
 :: (must-fail) ( quot -- error ? )
-    [ { } quot with-datastack drop did-not-fail t ] [ drop f f ] recover ;
+    [ { } quot with-datastack drop did-not-fail-literal t ] [ drop f f ] recover ;
 
 : experiment-title ( word -- string )
     "(" ?head drop ")" ?tail drop
