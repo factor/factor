@@ -7,7 +7,7 @@ math.vectors math.vectors.simd math.vectors.simd.cords
 math.parser make sequences words combinators ;
 IN: benchmark.raytracer-simd
 
-<< SYNTAX: no-compile word t "no-compile" set-word-prop ; >>
+<< SYNTAX: no-compile last-word t "no-compile" set-word-prop ; >>
 
 ! parameters
 
