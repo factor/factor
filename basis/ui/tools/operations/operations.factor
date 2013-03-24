@@ -46,7 +46,7 @@ IN: ui.tools.operations
 } define-operation
 
 ! Restart
-[ restart? ] \ restart H{
+[ restart? ] \ continue-restart H{
     { +primary+ t }
     { +secondary+ t }
     { +listener+ t }

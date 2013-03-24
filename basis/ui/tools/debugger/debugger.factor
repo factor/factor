@@ -22,7 +22,7 @@ M: restart-renderer row-columns
 
 : <restart-list> ( debugger -- gadget )
     dup restarts>> f prefix <model> restart-renderer <table>
-        [ [ \ restart invoke-command ] when* ] >>action
+        [ [ \ continue-restart invoke-command ] when* ] >>action
         swap restart-hook>> >>hook
         t >>selection-required?
         t >>single-click? ; inline
