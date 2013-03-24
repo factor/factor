@@ -18,7 +18,7 @@ IN: html.forms.tests
 [ t ] [
     [
         "140" [ v-number 13 v-min-value 100 v-max-value ] validate
-        [ validation-error? ]
+        [ validation-error-state? ]
         [ value>> "140" = ]
         bi and
     ] with-validation
@@ -38,7 +38,7 @@ person {
         validate-values
         validation-failed?
         "age" value
-        [ validation-error? ]
+        [ validation-error-state? ]
         [ message>> "required" = ]
         bi and
     ] with-validation
