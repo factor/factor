@@ -102,10 +102,7 @@ M: rpc-fault send-rpc
 ! * Recieving RPC requests
 ! this needs to have much better error checking
 
-TUPLE: server-error tag message ;
-
-: server-error ( tag message -- * )
-    \ server-error boa throw ;
+ERROR: server-error tag message ;
 
 M: server-error error.
     "Error in XML supplied to server" print
