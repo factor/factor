@@ -87,9 +87,9 @@ SYMBOLS: stacks pushed ;
 
 : gen-name ( vreg -- vreg' )
     [ next-vreg dup ] dip
-    dup pushed get 2dup in?
-    [ 2drop stacks get at set-last ]
-    [ adjoin stacks get push-at ]
+    dup pushed get ?adjoin
+    [ stacks get push-at ]
+    [ stacks get at set-last ]
     if ;
 
 : (top-name) ( vreg -- vreg' )
