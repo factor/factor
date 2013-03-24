@@ -25,6 +25,8 @@ M: source-file-error compute-restarts error>> compute-restarts ;
 : group-by-source-file ( errors -- assoc )
     H{ } clone [ [ push-at ] curry [ dup file>> ] prepose each ] keep ;
 
+TUPLE: error-type-holder type word plural icon quot forget-quot { fatal? initial: t } ;
+
 TUPLE: error-type type word plural icon quot forget-quot { fatal? initial: t } ;
 
 GENERIC: error-type ( error -- type )
