@@ -94,7 +94,7 @@ CONSTANT: pastebin-url URL" $pastebin/"
 : paste-url ( id -- url )
     "$pastebin/paste" >url swap "id" set-query-param ;
 
-M: paste entity-url
+M: paste-state entity-url
     id>> paste-url ;
 
 : annotation-url ( parent id -- url )
