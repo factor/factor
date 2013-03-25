@@ -189,6 +189,7 @@ void factor_vm::initialize_code_blocks()
 	code->uninitialized_blocks.clear();
 }
 
+/* Allocates memory */
 void factor_vm::primitive_modify_code_heap()
 {
 	bool reset_inline_caches = to_boolean(ctx->pop());
@@ -307,6 +308,7 @@ struct code_block_accumulator {
 	}
 };
 
+/* Allocates memory */
 cell factor_vm::code_blocks()
 {
 	code_block_accumulator accum;
@@ -314,6 +316,7 @@ cell factor_vm::code_blocks()
 	return std_vector_to_array(accum.objects);
 }
 
+/* Allocates memory */
 void factor_vm::primitive_code_blocks()
 {
 	ctx->push(code_blocks());

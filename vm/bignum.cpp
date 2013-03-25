@@ -1299,6 +1299,7 @@ bignum * factor_vm::allot_bignum_zeroed(bignum_length_type length, int negative_
 }
 
 /* can allocate if not in nursery or size is larger */
+/* Allocates memory conditionally */
 #define BIGNUM_REDUCE_LENGTH(source, length)	\
 source = reallot_array(source,length + 1)
 

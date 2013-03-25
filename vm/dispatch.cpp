@@ -138,6 +138,7 @@ void factor_vm::primitive_reset_dispatch_stats()
 	memset(&dispatch_stats,0,sizeof(dispatch_statistics));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_dispatch_stats()
 {
 	ctx->push(tag<byte_array>(byte_array_from_value(&dispatch_stats)));
