@@ -80,3 +80,12 @@ IN: math.extras.test
 
 { { 1 8+4/5 16+3/5 24+2/5 32+1/5 } } [ 1 40 5 linspace[a,b) >array ] unit-test
 { { 1 10+3/4 20+1/2 30+1/4 40 } } [ 1 40 5 linspace[a,b] >array ] unit-test
+
+[ f ] [ { } majority ] unit-test
+[ 1 ] [ { 1 } majority ] unit-test
+[ f ] [ { 1 2 } majority ] unit-test
+[ 1 ] [ { 1 1 2 } majority ] unit-test
+[ f ] [ { 1 1 2 2 } majority ] unit-test
+[ 2 ] [ { 1 1 2 2 2 } majority ] unit-test
+[ 3 ] [ { 1 2 3 1 2 3 1 2 3 3 } majority ] unit-test
+{ CHAR: C } [ "AAACCBBCCCBCC" majority ] unit-test
