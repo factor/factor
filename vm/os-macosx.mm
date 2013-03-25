@@ -13,14 +13,6 @@ void factor_vm::c_to_factor_toplevel(cell quot)
 
 void early_init(void)
 {
-	SInt32 version;
-	Gestalt(gestaltSystemVersion,&version);
-	if(version < 0x1050)
-	{
-		std::cout << "Factor requires Mac OS X 10.5 or later.\n";
-		exit(1);
-	}
-
 	[[NSAutoreleasePool alloc] init];
 }
 
