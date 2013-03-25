@@ -1,17 +1,16 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.strings arrays byte-arrays generic hashtables
-hashtables.private io io.binary io.files io.encodings.binary
-io.pathnames kernel kernel.private math namespaces make parser
-prettyprint sequences combinators.smart strings sbufs vectors
-words quotations assocs system layouts splitting grouping
-growable classes classes.private classes.builtin classes.tuple
-classes.tuple.private vocabs vocabs.loader source-files
-definitions debugger quotations.private combinators
-combinators.short-circuit math.order math.private accessors
-slots.private generic.single.private compiler.units
-compiler.constants compiler.codegen.relocation fry locals
-bootstrap.image.syntax parser.notes namespaces.private ;
+USING: accessors arrays assocs bootstrap.image.syntax
+byte-arrays classes classes.builtin classes.private
+classes.tuple classes.tuple.private combinators
+combinators.short-circuit combinators.smart
+compiler.codegen.relocation compiler.units fry generic
+generic.single.private grouping hashtables hashtables.private
+io io.binary io.encodings.binary io.files io.pathnames kernel
+kernel.private layouts locals make math math.order namespaces
+namespaces.private parser parser.notes prettyprint quotations
+sequences sequences.private source-files strings system vectors
+vocabs words ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -52,11 +51,12 @@ GENERIC: (eql?) ( obj1 obj2 -- ? )
 
 M: fixnum (eql?) eq? ;
 
-M: bignum (eql?) = ;
+M: bignum (eql?) { bignum bignum } declare = ;
 
 M: float (eql?) fp-bitwise= ;
 
-M: sequence (eql?) 2dup [ length ] same? [ [ eql? ] 2all? ] [ 2drop f ] if ;
+M: sequence (eql?)
+    2dup [ length ] same? [ [ eql? ] 2all? ] [ 2drop f ] if ;
 
 M: object (eql?) = ;
 
@@ -81,9 +81,11 @@ SYMBOL: objects
 : cache-eq-object ( obj quot -- value )
     [ <eq-wrapper> objects get ] dip '[ obj>> @ ] cache ; inline
 
-: lookup-object ( obj -- n/f ) <eq-wrapper> objects get at ;
+: lookup-object ( obj -- n/f )
+    <eq-wrapper> objects get at ;
 
-: put-object ( n obj -- ) <eq-wrapper> objects get set-at ;
+: put-object ( n obj -- )
+    <eq-wrapper> objects get set-at ;
 
 ! Constants
 
@@ -343,17 +345,17 @@ M: f ' drop \ f type-number ;
         [
             [
                 {
-                    [ hashcode <fake-bignum> , ]
-                    [ name>> , ]
-                    [ vocabulary>> , ]
-                    [ def>> , ]
-                    [ props>> , ]
-                    [ pic-def>> , ]
-                    [ pic-tail-def>> , ]
-                    [ word-sub-primitive , ]
-                    [ drop 0 , ] ! entry point
+                    [ hashcode <fake-bignum> ]
+                    [ name>> ]
+                    [ vocabulary>> ]
+                    [ def>> ]
+                    [ props>> ]
+                    [ pic-def>> ]
+                    [ pic-tail-def>> ]
+                    [ word-sub-primitive ]
+                    [ drop 0 ] ! entry point
                 } cleave
-            ] { } make [ ' ] map
+            ] output>array [ ' ] map!
         ] bi
         \ word [ emit-seq ] emit-object
     ] keep put-object ;
@@ -469,10 +471,11 @@ M: array ' [ emit-array ] cache-eq-object ;
 ! them a built-in type is not worth it.
 PREDICATE: tuple-layout-array < array
     dup length 5 >= [
-        [ first tuple-class? ]
-        [ second fixnum? ]
-        [ third fixnum? ]
-        tri and and
+        {
+            [ first-unsafe tuple-class? ]
+            [ second-unsafe fixnum? ]
+            [ third-unsafe fixnum? ]
+        } 1&&
     ] [ drop f ] if ;
 
 M: tuple-layout-array '
@@ -547,8 +550,8 @@ M: quotation '
     ] with-compilation-unit ;
 
 : build-image ( -- image )
-    800000 <vector> image set
-    20000 <hashtable> objects set
+    600,000 <vector> image set
+    60,000 <hashtable> objects set
     emit-image-header t, 0, 1, -1,
     "Building generic words..." print flush
     build-generics
@@ -572,9 +575,10 @@ M: quotation '
 ! Image output
 
 : (write-image) ( image -- )
-    bootstrap-cell big-endian get
-    [ '[ _ >be write ] each ]
-    [ '[ _ >le write ] each ] if ;
+    bootstrap-cell output-stream get
+    big-endian get
+    [ '[ _ >be _ stream-write ] each ]
+    [ '[ _ >le _ stream-write ] each ] if ;
 
 : write-image ( image -- )
     "Writing image to " write
