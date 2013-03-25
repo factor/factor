@@ -1,16 +1,19 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math io io.streams.string sequences strings
-combinators peg memoize arrays continuations ;
+USING: combinators continuations io io.streams.string kernel
+math memoize namespaces peg sequences strings ;
 IN: peg.search
 
-: tree-write ( object -- )
+: stream-tree-write ( object stream -- )
     {
-        { [ dup number? ] [ write1 ] }
-        { [ dup string? ] [ write ] }
-        { [ dup sequence? ] [ [ tree-write ] each ] }
-        { [ t ] [ write ] }
+        { [ over number? ] [ stream-write1 ] }
+        { [ over string? ] [ stream-write ] }
+        { [ over sequence? ] [ [ stream-tree-write ] curry each ] }
+        { [ t ] [ stream-write ] }
     } cond ;
+
+: tree-write ( object -- )
+    output-stream get stream-tree-write ;
 
 MEMO: any-char-parser ( -- parser )
     [ drop t ] satisfy ;
@@ -23,6 +26,4 @@ MEMO: any-char-parser ( -- parser )
     any-char-parser 2choice repeat0 parse sift ;
 
 : replace ( string parser -- result )
-    [ (replace) [ tree-write ] each ] with-string-writer ;
-
-
+    [ (replace) tree-write ] with-string-writer ;
