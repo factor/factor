@@ -18,7 +18,7 @@ TUPLE: lazy-cons-state car cdr ;
 
 : lazy-cons ( car cdr -- promise )
     [ T{ promise f f t f } clone ] 2dip
-        [ promise ] bi@ \ lazy-cons-state boa
+        [ <promise> ] bi@ \ lazy-cons-state boa
         >>value ;
 
 M: lazy-cons-state car ( lazy-cons -- car )
