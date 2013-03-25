@@ -324,8 +324,8 @@ bignum *factor_vm::bignum_remainder(bignum * numerator, bignum * denominator)
 		}
 }
 
-/* Allocates memory */
 /* cell_to_bignum, fixnum_to_bignum, long_long_to_bignum, ulong_long_to_bignum */
+/* Allocates memory */
 #define FOO_TO_BIGNUM(name,type,stype,utype)				\
 bignum * factor_vm::name##_to_bignum(type n)				\
 {									\

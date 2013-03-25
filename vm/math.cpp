@@ -474,6 +474,7 @@ double factor_vm::to_double(cell value)
 
 /* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
 overflow, they call these functions. */
+/* Allocates memory */
 inline void factor_vm::overflow_fixnum_add(fixnum x, fixnum y)
 {
 	ctx->replace(tag<bignum>(fixnum_to_bignum(
@@ -485,6 +486,7 @@ VM_C_API void overflow_fixnum_add(fixnum x, fixnum y, factor_vm *parent)
 	parent->overflow_fixnum_add(x,y);
 }
 
+/* Allocates memory */
 inline void factor_vm::overflow_fixnum_subtract(fixnum x, fixnum y)
 {
 	ctx->replace(tag<bignum>(fixnum_to_bignum(
@@ -496,6 +498,7 @@ VM_C_API void overflow_fixnum_subtract(fixnum x, fixnum y, factor_vm *parent)
 	parent->overflow_fixnum_subtract(x,y);
 }
 
+/* Allocates memory */
 inline void factor_vm::overflow_fixnum_multiply(fixnum x, fixnum y)
 {
 	bignum *bx = fixnum_to_bignum(x);
