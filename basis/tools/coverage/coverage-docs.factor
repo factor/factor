@@ -4,7 +4,7 @@ USING: alien.c-types help.markup help.syntax kernel quotations
 sequences strings ;
 IN: tools.coverage
 
-HELP: <coverage>
+HELP: <coverage-state>
 { $values
     { "executed?" boolean }
     { "coverage" coverage }
