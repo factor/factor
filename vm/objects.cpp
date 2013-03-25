@@ -47,6 +47,7 @@ void factor_vm::primitive_set_slot()
 	write_barrier(slot_ptr);
 }
 
+/* Allocates memory */
 cell factor_vm::clone_object(cell obj_)
 {
 	data_root<object> obj(obj_,this);
@@ -63,6 +64,7 @@ cell factor_vm::clone_object(cell obj_)
 	}
 }
 
+/* Allocates memory */
 void factor_vm::primitive_clone()
 {
 	ctx->replace(clone_object(ctx->peek()));
