@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: help.markup help.syntax math sequences ;
+USING: help.markup help.syntax kernel math sequences ;
 
 IN: math.extras
 
@@ -73,3 +73,7 @@ HELP: logspace[a,b)
 HELP: logspace[a,b]
 { $values { "a" number } { "b" number } { "length" integer } { "base" number } { "seq" sequence } }
 { $description "Return evenly spaced numbers on a log scaled interval " { $snippet "[base^a,base^b]" } "." } ;
+
+HELP: majority
+{ $values { "seq" sequence } { "elt/f" object } }
+{ $description "Returns the element of " { $snippet "seq" } " that is in the majority, provided there is such an element, using a linear-time majority vote algorithm." } ;
