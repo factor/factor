@@ -1,12 +1,12 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs assocs.extras combinators
-combinators.short-circuit fry grouping kernel locals math
-math.combinatorics math.constants math.functions math.order
-math.primes math.ranges math.ranges.private math.statistics
-math.vectors memoize random sequences sequences.extras sets
-sorting ;
+USING: accessors arrays assocs assocs.extras byte-arrays
+combinators combinators.short-circuit compression.zlib fry
+grouping kernel locals math math.combinatorics math.constants
+math.functions math.order math.primes math.ranges
+math.ranges.private math.statistics math.vectors memoize random
+sequences sequences.extras sets sorting ;
 
 IN: math.extras
 
@@ -229,3 +229,12 @@ PRIVATE>
             pick = [ 1 + ] [ 1 - ] if
         ] if
     ] each zero? [ drop f ] when ;
+
+: compression-lengths ( a b -- len(a+b) len(a) len(b) )
+    [ append ] 2keep [ >byte-array compress data>> length ] tri@ ;
+
+: compression-distance ( a b -- n )
+    compression-lengths sort-pair [ - ] [ / ] bi* ;
+
+: compression-dissimilarity ( a b -- n )
+    compression-lengths + / ;
