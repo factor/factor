@@ -129,8 +129,8 @@ HELP: <clumps>
         "{ 113/400 167/400 201/400 241/400 243/400 91/200 1/4 }"
     }
     { $example
-        "USING: kernel sequences grouping prettyprint ;"
-        "{ 1 2 3 4 5 6 } 3 <clumps> second ."
+        "USING: arrays kernel sequences grouping prettyprint ;"
+        "{ 1 2 3 4 5 6 } 3 <clumps> second >array ."
         "{ 2 3 4 }"
     }
 } ;
@@ -140,8 +140,8 @@ HELP: <circular-clumps>
 { $description "Outputs a virtual sequence whose elements are overlapping slices of " { $snippet "n" } " elements from the underlying sequence, starting with each of its elements and wrapping around the end of the sequence." }
 { $examples
     { $example
-        "USING: kernel sequences grouping prettyprint ;"
-        "{ 1 2 3 4 } 3 <circular-clumps> third ."
+        "USING: arrays kernel sequences grouping prettyprint ;"
+        "{ 1 2 3 4 } 3 <circular-clumps> third >array ."
         "{ 3 4 1 }"
     }
 } ;
