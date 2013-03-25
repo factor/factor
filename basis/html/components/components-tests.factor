@@ -191,7 +191,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
     }
 ] [ values ] unit-test
 
-[ ] [ "error" "blah" <validation-error> "error" set-value ] unit-test
+[ ] [ "error" "blah" <validation-error-state> "error" set-value ] unit-test
 
 [ ] [
     "error" hidden render
