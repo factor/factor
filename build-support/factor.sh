@@ -52,7 +52,7 @@ ensure_program_installed() {
             $ECHO -n "any of [ $* ]"
         fi
         $ECHO " and try again."
-        if [[ $OS -eq macosx ]] ; then
+        if [[ $OS == macosx ]] ; then
             $ECHO "If you have Xcode 4.3 or higher installed, you must install the"
             $ECHO "Command Line Tools from Xcode Preferences > Downloads in order"
             $ECHO "to build Factor."
