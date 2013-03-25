@@ -121,5 +121,4 @@ M: string string-lines
         1array
     ] if ;
 
-M: sbuf string-lines
-    [ "" like string-lines ] keep [ like ] curry map ;
+M: sbuf string-lines "" like string-lines ;
