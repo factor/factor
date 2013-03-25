@@ -160,7 +160,7 @@ M: and-parser parse ( input parser -- list )
     #! input then parser2 is applied to the rest of
     #! the input strings from the first parser.
     parsers>> unclip swapd parse
-    [ [ and-parser-parse ] reduce ] 2curry promise ;
+    [ [ and-parser-parse ] reduce ] 2curry <promise> ;
 
 TUPLE: or-parser parsers ;
 
