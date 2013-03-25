@@ -45,7 +45,7 @@ GENERIC: make-connection ( pool -- conn )
     [ [ acquire-connection ] keep ] dip
     [ (with-pooled-connection) ] [ ] [ 2drop dispose ] cleanup ; inline
 
-M: return-connection dispose
+M: return-connection-state dispose
     [ conn>> ] [ pool>> ] bi return-connection ;
 
 : return-connection-later ( db pool -- )
