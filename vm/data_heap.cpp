@@ -148,6 +148,7 @@ data_heap_room factor_vm::data_room()
 	return room;
 }
 
+/* Allocates memory */
 void factor_vm::primitive_data_room()
 {
 	data_heap_room room = data_room();

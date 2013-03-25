@@ -328,6 +328,7 @@ void factor_vm::primitive_enable_gc_events()
 	gc_events = new std::vector<gc_event>();
 }
 
+/* Allocates memory */
 void factor_vm::primitive_disable_gc_events()
 {
 	if(gc_events)
