@@ -375,6 +375,7 @@ struct factor_vm
 	object *allot_object(cell type, cell size);
 	object *allot_large_object(cell type, cell size);
 
+	/* Allocates memory */
 	template<typename Type> Type *allot(cell size)
 	{
 		return (Type *)allot_object(Type::type_number,size);
