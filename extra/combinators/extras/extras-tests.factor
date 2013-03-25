@@ -21,3 +21,5 @@ IN: combinators.extras.tests
         } cond-case
     ] map
 ] unit-test
+
+{ { 1 2 3 } } [ 1 { [ ] [ 1 + ] [ 2 + ] } cleave-array ] unit-test

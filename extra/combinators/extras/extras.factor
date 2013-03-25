@@ -1,6 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators kernel macros quotations sequences ;
+USING: arrays combinators fry kernel macros quotations
+sequences sequences.generalizations ;
 IN: combinators.extras
 
 : once ( quot -- ) call ; inline
@@ -14,3 +15,6 @@ MACRO: cond-case ( assoc -- )
             [ second [ drop ] prepose ] bi 2array
         ] when
     ] map [ cond ] curry ;
+
+MACRO: cleave-array ( quots -- )
+    [ '[ _ cleave ] ] [ length '[ _ narray ] ] bi compose ;
