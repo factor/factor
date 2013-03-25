@@ -222,3 +222,10 @@ PRIVATE>
 
 : logspace[a,b] ( a b length base -- seq )
     [ linspace[a,b] ] dip swap n^v ;
+
+: majority ( seq -- elt/f )
+    [ f 0 ] dip [
+        over zero? [ 2nip 1 ] [
+            pick = [ 1 + ] [ 1 - ] if
+        ] if
+    ] each zero? [ drop f ] when ;
