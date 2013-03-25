@@ -13,7 +13,7 @@ HELP: <audio-engine>
 HELP: <audio-orientation-state>
 { $values
     { "forward" "a sequence of 3 floats" } { "up" "a sequence of 3 floats" }
-    { "audio-orientation" audio-orientation-state }
+    { "audio-orientation-state" audio-orientation-state }
 }
 { $description "Constructs an " { $link audio-orientation-state } " tuple." } ;
 
