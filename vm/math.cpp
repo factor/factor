@@ -228,7 +228,7 @@ void factor_vm::primitive_bignum_log2()
 	ctx->replace(tag<bignum>(bignum_integer_length(untag<bignum>(ctx->peek()))));
 }
 
-/* allocates memory */
+/* Allocates memory */
 cell factor_vm::unbox_array_size_slow()
 {
 	if(tagged<object>(ctx->peek()).type() == BIGNUM_TYPE)
@@ -249,11 +249,13 @@ cell factor_vm::unbox_array_size_slow()
 	return 0; /* can't happen */
 }
 
+/* Allocates memory */
 void factor_vm::primitive_fixnum_to_float()
 {
 	ctx->replace(allot_float(fixnum_to_float(ctx->peek())));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_format_float()
 {
 	byte_array *array = allot_byte_array(100);
@@ -273,24 +275,28 @@ void factor_vm::primitive_float_eq()
 	ctx->replace(tag_boolean(x == y));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_float_add()
 {
 	POP_FLOATS(x,y);
 	ctx->replace(allot_float(x + y));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_float_subtract()
 {
 	POP_FLOATS(x,y);
 	ctx->replace(allot_float(x - y));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_float_multiply()
 {
 	POP_FLOATS(x,y);
 	ctx->replace(allot_float(x * y));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_float_divfloat()
 {
 	POP_FLOATS(x,y);
@@ -338,6 +344,7 @@ void factor_vm::primitive_double_bits()
 	ctx->push(from_unsigned_8(double_bits(untag_float_check(ctx->pop()))));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_bits_double()
 {
 	ctx->push(allot_float(bits_double(to_unsigned_8(ctx->pop()))));
@@ -419,6 +426,7 @@ VM_C_API s64 to_signed_8(cell obj, factor_vm *parent)
 	return parent->to_signed_8(obj);
 }
 
+/* Allocates memory */
 cell factor_vm::from_unsigned_8(u64 n)
 {
 	if(n > (u64)fixnum_max)

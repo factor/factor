@@ -63,8 +63,8 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 	return new_word.untagged();
 }
 
-/* Allocates memory */
 /* (word) ( name vocabulary hashcode -- word ) */
+/* Allocates memory */
 void factor_vm::primitive_word()
 {
 	cell hashcode = ctx->pop();
@@ -73,8 +73,8 @@ void factor_vm::primitive_word()
 	ctx->push(tag<word>(allot_word(name,vocab,hashcode)));
 }
 
-/* Allocates memory (from_unsigned_cell allocates) */
 /* word-code ( word -- start end ) */
+/* Allocates memory (from_unsigned_cell allocates) */
 void factor_vm::primitive_word_code()
 {
 	data_root<word> w(ctx->pop(),this);
