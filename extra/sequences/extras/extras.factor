@@ -365,3 +365,10 @@ PRIVATE>
             ] [ , ] if
         ]
     ] keep dup branch? [ drop f ] unless make ;
+
+: (map-find-index) ( seq quot find-quot -- result elt index )
+    [ [ f ] 2dip [ [ nip ] 2dip call dup ] curry ] dip call
+    [ [ [ drop f ] unless ] keep ] dip ; inline
+
+: map-find-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result elt index )
+    [ find-index ] (map-find-index) ; inline
