@@ -14,7 +14,7 @@ GENERIC: render* ( value name renderer -- xml )
 : render>xml ( name renderer -- xml )
     prepare-value
     [
-        dup validation-error?
+        dup validation-error-state?
         [ [ message>> render-error ] [ value>> ] bi ]
         [ f swap ]
         if
