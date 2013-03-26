@@ -326,8 +326,12 @@ HELP: ceiling
 
 HELP: round
 { $values { "x" real } { "y" "a whole real number" } }
-{ $description "Outputs the whole number closest to " { $snippet "x" } "." }
-{ $notes "The result is not necessarily an integer." } ;
+{ $description "Outputs the whole number closest to " { $snippet "x" } ", rounding out at half." }
+{ $notes "The result is not necessarily an integer." }
+{ $examples
+    { $example "USING: math.functions prettyprint ;" "4.5 round ." "5.0" }
+    { $example "USING: math.functions prettyprint ;" "4.4 round ." "4.0" }
+} ;
 
 HELP: round-to
 { $values { "x" real } { "n" integer } { "y" real } }
