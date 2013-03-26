@@ -56,8 +56,7 @@ M: set set-like drop ; inline
 
 PRIVATE>
 
-M: set union
-    [ (union) ] keep set-like ;
+M: set union [ (union) ] keep set-like ;
 
 <PRIVATE
 
@@ -70,13 +69,17 @@ M: set union
 : small/large ( set1 set2 -- set1' set2' )
     2dup [ cardinality ] bi@ > [ swap ] when ;
 
+: (intersect) ( set1 set2 -- seq )
+    small/large sequence/tester filter ; inline
+
+: (diff) ( set1 set2 -- seq )
+    sequence/tester [ not ] compose filter ; inline
+
 PRIVATE>
 
-M: set intersect
-    [ small/large sequence/tester filter ] keep set-like ;
+M: set intersect [ (intersect) ] keep set-like ;
 
-M: set diff
-    [ sequence/tester [ not ] compose filter ] keep set-like ;
+M: set diff [ (diff) ] keep set-like ;
 
 M: set intersects?
     small/large sequence/tester any? ;
