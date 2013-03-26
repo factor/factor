@@ -49,7 +49,7 @@ M: unix find-next-file ( DIR* -- byte-array )
 
 : dirent-type>file-type ( ch -- type )
     H{
-        { $ DT_BLK   +block-device+ }
+        { $ DT_BLK  +block-device+ }
         { $ DT_CHR  +character-device+ }
         { $ DT_DIR  +directory+ }
         { $ DT_LNK  +symbolic-link+ }
