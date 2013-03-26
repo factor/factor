@@ -89,3 +89,17 @@ IN: math.extras.test
 [ 2 ] [ { 1 1 2 2 2 } majority ] unit-test
 [ 3 ] [ { 1 2 3 1 2 3 1 2 3 3 } majority ] unit-test
 { CHAR: C } [ "AAACCBBCCCBCC" majority ] unit-test
+
+[ -5 ] [ -4-3/5 round-to-even ] unit-test
+[ -4 ] [ -4-1/2 round-to-even ] unit-test
+[ -4 ] [ -4-2/5 round-to-even ] unit-test
+[ 5 ] [ 4+3/5 round-to-even ] unit-test
+[ 4 ] [ 4+1/2 round-to-even ] unit-test
+[ 4 ] [ 4+2/5 round-to-even ] unit-test
+
+[ -5.0 ] [ -4.6 round-to-even ] unit-test
+[ -4.0 ] [ -4.5 round-to-even ] unit-test
+[ -4.0 ] [ -4.4 round-to-even ] unit-test
+[ 5.0 ] [ 4.6 round-to-even ] unit-test
+[ 4.0 ] [ 4.5 round-to-even ] unit-test
+[ 4.0 ] [ 4.4 round-to-even ] unit-test

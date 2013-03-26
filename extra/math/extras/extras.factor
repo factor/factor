@@ -238,3 +238,17 @@ PRIVATE>
 
 : compression-dissimilarity ( a b -- n )
     compression-lengths + / ;
+
+GENERIC: round-to-even ( x -- y )
+
+M: integer round-to-even ; inline
+
+M: ratio round-to-even
+    >fraction [ /mod abs 2 * ] keep > [ dup 0 < -1 1 ? + ] when ;
+
+M: float round-to-even
+    dup 0 > [
+        dup 0x1p52 <= [ 0x1p52 + 0x1p52 - ] when
+    ] [
+        dup -0x1p52 >= [ 0x1p52 - 0x1p52 + ] when
+    ] if ;
