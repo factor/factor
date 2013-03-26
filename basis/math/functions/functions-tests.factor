@@ -203,6 +203,11 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 [ -4.0 ] [ -4.0 floor ] unit-test
 [ -4.0 ] [ -4.0 ceiling ] unit-test
 
+[ -5 ] [ -9/2 round ] unit-test
+[ -4 ] [ -22/5 round ] unit-test
+[ 5 ] [ 9/2 round ] unit-test
+[ 4 ] [ 22/5 round ] unit-test
+
 [ -5.0 ] [ -4.5 round ] unit-test
 [ -4.0 ] [ -4.4 round ] unit-test
 [ 5.0 ] [ 4.5 round ] unit-test
