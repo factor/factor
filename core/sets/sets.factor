@@ -67,7 +67,7 @@ M: set union [ (union) ] keep set-like ;
     [ members ] [ tester ] bi* ; inline
 
 : small/large ( set1 set2 -- set1' set2' )
-    2dup [ cardinality ] bi@ > [ swap ] when ;
+    2dup [ cardinality ] bi@ > [ swap ] when ; inline
 
 : (intersect) ( set1 set2 -- seq )
     small/large sequence/tester filter ; inline
