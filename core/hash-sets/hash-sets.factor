@@ -72,10 +72,7 @@ TUPLE: hash-set
     [ array>> length>> 1 fixnum-shift-fast ] bi fixnum> ; inline
 
 : each-member ( array quot: ( elt -- ) -- )
-    [
-        [ length ] keep
-        [ array-nth dup tombstone? [ drop ] ] curry
-    ] dip [ if ] curry compose each-integer ; inline
+    [ if ] curry [ dup tombstone? [ drop ] ] prepose each ; inline
 
 : grow-hash ( hash -- )
     { hash-set } declare [
@@ -137,8 +134,9 @@ M: hash-set set-like
 
 INSTANCE: hash-set set
 
-M: hash-set intersect
-    small/large sequence/tester filter >hash-set ;
+! Overrides for performance
+
+M: hash-set intersect (intersect) >hash-set ;
 
 M: hash-set union
     over hash-set? [
@@ -148,8 +146,9 @@ M: hash-set union
         (union) >hash-set
     ] if ;
 
-M: hash-set diff
-    sequence/tester [ not ] compose filter >hash-set ;
+M: hash-set diff (diff) >hash-set ;
+
+! Default methods
 
 M: f fast-set drop 0 <hash-set> ;
 
