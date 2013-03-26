@@ -136,12 +136,24 @@ INSTANCE: hash-set set
 
 ! Overrides for performance
 
+<PRIVATE
+
+: and-tombstones ( quot: ( elt -- ? ) -- quot: ( elt -- ? ) )
+    [ if ] curry [ dup tombstone? [ drop t ] ] prepose ; inline
+
+: not-tombstones ( quot: ( elt -- ? ) -- quot: ( elt -- ? ) )
+    [ if ] curry [ dup tombstone? [ drop f ] ] prepose ; inline
+
+: array/tester ( hash-set1 hash-set2 -- array quot )
+    [ array>> ] dip [ in? ] curry ; inline
+
+PRIVATE>
+
 M: hash-set intersect (intersect) >hash-set ;
 
 M: hash-set intersects?
     over hash-set? [
-        small/large [ array>> ] dip [ in? ] curry
-        [ if ] curry [ dup tombstone? [ drop t ] ] prepose any?
+        small/large array/tester not-tombstones any?
     ] [ small/large sequence/tester any? ] if ;
 
 M: hash-set union
@@ -153,6 +165,20 @@ M: hash-set union
     ] if ;
 
 M: hash-set diff (diff) >hash-set ;
+
+M: hash-set subset?
+    over hash-set? [
+        2dup [ cardinality ] bi@ > [ 2drop f ] [
+            array/tester and-tombstones all?
+        ] if
+    ] [ call-next-method ] if ;
+
+M: hash-set set=
+    over hash-set? [
+        2dup [ cardinality ] bi@ eq? [
+            array/tester and-tombstones all?
+        ] [ 2drop f ] if
+    ] [ call-next-method ] if ;
 
 ! Default methods
 
