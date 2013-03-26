@@ -149,7 +149,11 @@ INSTANCE: hash-set set
 
 PRIVATE>
 
-M: hash-set intersect (intersect) >hash-set ;
+M: hash-set intersect
+    over hash-set? [
+        small/large array/tester not-tombstones
+        filter >hash-set
+    ] [ (intersect) >hash-set ] if ;
 
 M: hash-set intersects?
     over hash-set? [
@@ -160,11 +164,13 @@ M: hash-set union
     over hash-set? [
         small/large [ array>> ] [ clone ] bi*
         [ [ adjoin ] curry each-member ] keep
-    ] [
-        (union) >hash-set
-    ] if ;
+    ] [ (union) >hash-set ] if ;
 
-M: hash-set diff (diff) >hash-set ;
+M: hash-set diff
+    over hash-set? [
+        array/tester [ not ] compose not-tombstones
+        filter >hash-set
+    ] [ (diff) >hash-set ] if ;
 
 M: hash-set subset?
     over hash-set? [
