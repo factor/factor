@@ -362,7 +362,14 @@ M: real atan >float atan ; inline
 
 : truncate ( x -- y ) dup 1 mod - ; inline
 
-: round ( x -- y ) dup sgn 2 / + truncate ; inline
+GENERIC: round ( x -- y )
+
+M: integer round ; inline
+
+M: ratio round
+    >fraction [ /mod abs 2 * ] keep >= [ dup 0 < -1 1 ? + ] when ;
+
+M: float round dup sgn 2 /f + truncate ;
 
 : floor ( x -- y )
     dup 1 mod
