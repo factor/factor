@@ -1,6 +1,8 @@
 #import <Cocoa/Cocoa.h>
 
 #include <mach/mach_time.h>
+#include <sys/utsname.h>
+
 #include "master.hpp"
 
 namespace factor
@@ -11,17 +13,18 @@ void factor_vm::c_to_factor_toplevel(cell quot)
 	c_to_factor(quot);
 }
 
+// Darwin 9 is 10.5, Darwin 10 is 10.6
+// http://en.wikipedia.org/wiki/Darwin_(operating_system)#Release_history
 void early_init(void)
 {
-	SInt32 version;
-	Gestalt(gestaltSystemVersion,&version);
-	if(version < 0x1050)
-	{
+	struct utsname u;
+	int n;
+	uname(&u);
+	sscanf(u.release,"%d", &n);
+	if(n < 9) {
 		std::cout << "Factor requires Mac OS X 10.5 or later.\n";
 		exit(1);
 	}
-
-	[[NSAutoreleasePool alloc] init];
 }
 
 const char *vm_executable_path(void)
