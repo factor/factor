@@ -138,6 +138,12 @@ INSTANCE: hash-set set
 
 M: hash-set intersect (intersect) >hash-set ;
 
+M: hash-set intersects?
+    over hash-set? [
+        small/large [ array>> ] dip [ in? ] curry
+        [ if ] curry [ dup tombstone? [ drop t ] ] prepose any?
+    ] [ small/large sequence/tester any? ] if ;
+
 M: hash-set union
     over hash-set? [
         small/large [ array>> ] [ clone ] bi*
