@@ -13,7 +13,7 @@ T{ nonexist-ns f 1 5 "x" } "<x:y/>" xml-error-test
 T{ unopened f 1 4 } "</x>" xml-error-test
 T{ not-yes/no f 1 41 "maybe" }
     "<?xml version='1.0' standalone='maybe'?><x/>" xml-error-test
-T{ extra-attrs f 1 32 V{ T{ name f "" "foo" f } }
+T{ extra-attrs f 1 32 { T{ name f "" "foo" f } }
 } "<?xml version='1.1' foo='bar'?><x/>" xml-error-test
 T{ bad-version f 1 28 "5 million" }
     "<?xml version='5 million'?><x/>" xml-error-test
