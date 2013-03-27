@@ -73,9 +73,19 @@ unit-test
 [ { "hey" "world" "what's" "happening" } ]
 [ "heyAworldBwhat'sChappening" [ LETTER? ] split-when ] unit-test
 
+[ { "hey" "world" "what's" "happening" } ]
+[
+    "heyAworldBwhat'sChappening" [ LETTER? ] split-when-slice
+    [ >string ] map
+] unit-test
+
 [ "" f ] [ "" [ blank? ] split1-when ] unit-test
 [ "" "ABC" ] [ " ABC" [ blank? ] split1-when ] unit-test
 [ "a" " bc" ] [ "a  bc" [ blank? ] split1-when ] unit-test
+
+[ "" f ] [ "" [ blank? ] split1-when-slice ] unit-test
+[ "" "ABC" ] [ " ABC" [ blank? ] split1-when-slice [ >string ] bi@ ] unit-test
+[ "a" " bc" ] [ "a  bc" [ blank? ] split1-when-slice [ >string ] bi@ ] unit-test
 
 { { } } [ { } { 0 } split* ] unit-test
 { { { 1 2 3 } } } [ { 1 2 3 } { 0 } split* ] unit-test
