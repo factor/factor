@@ -1,7 +1,8 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff, 2013 John Benediktsson
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators kernel kernel.private
-make math namespaces sequences sequences.private splitting
-strings ;
+layouts make math namespaces sbufs sequences sequences.private
+splitting strings ;
 IN: math.parser
 
 : digit> ( ch -- n )
@@ -310,10 +311,40 @@ PRIVATE>
 
 <PRIVATE
 
-: positive>base ( num radix -- str )
+CONSTANT: TENS
+"0000000000111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999"
+
+CONSTANT: ONES
+"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
+
+: (two-digit) ( num accum -- num' accum )
+    [
+        100 /mod [ TENS nth-unsafe ] [ ONES nth-unsafe ] bi
+    ] dip [ push ] keep [ push ] keep ; inline
+
+: (one-digit) ( num accum -- num' accum )
+    [ 10 /mod CHAR: 0 + ] dip [ push ] keep ; inline
+
+: (bignum>dec) ( num accum -- num' accum )
+    [ over most-positive-fixnum > ]
+    [ { bignum sbuf } declare (two-digit) ] while
+    [ >fixnum ] dip ; inline
+
+: (fixnum>dec) ( num accum -- num' accum )
+    { fixnum sbuf } declare
+    [ over 65536 >= ] [ (two-digit) ] while
+    [ over zero? ] [ (one-digit) ] until ; inline
+
+: (positive>dec) ( num -- str )
+    3 <sbuf> (bignum>dec) (fixnum>dec) "" like reverse! nip ; inline
+
+: (positive>base) ( num radix -- str )
     dup 1 <= [ invalid-radix ] when
     [ dup 0 > ] swap [ /mod >digit ] curry "" produce-as nip
     reverse! ; inline
+
+: positive>base ( num radix -- str )
+    dup 10 = [ drop (positive>dec) ] [ (positive>base) ] if ; inline
 
 PRIVATE>
 
