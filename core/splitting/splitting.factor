@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel make math sequences strings sbufs ;
+USING: arrays kernel math sequences strings sbufs ;
 IN: splitting
 
 <PRIVATE
@@ -97,22 +97,25 @@ PRIVATE>
 
 <PRIVATE
 
-: (split*) ( n seq quot: ( ... elt -- ... ? ) -- )
-    [ find-from ]
-    [ [ [ 1 + ] 3dip [ 3dup swapd subseq , ] dip [ drop ] 2dip (split*) ] 3curry ]
-    [ drop [ [ drop ] 2dip 2dup length < [ swap [ tail ] unless-zero , ] [ 2drop ] if ] 2curry ]
-    3tri if ; inline recursive
-
-: split*, ( ... seq quot: ( ... elt -- ... ? ) -- ... )
-    [ 0 ] 2dip (split*) ; inline
+: (split*) ( n seq quot: ( ... elt -- ... ? ) quot -- )
+    pick [
+        swap curry [ 1 + ] prepose [ keep 1 + swap ] curry
+        [ [ find-from drop dup ] 2curry [ dup ] prepose ] dip
+        produce nip
+    ] keep rot over dupd length < [
+        [ tail ] unless-zero suffix
+    ] [ 2drop ] if ; inline
 
 PRIVATE>
 
-: split* ( seq separators -- pieces )
-    [ [ member? ] curry split*, ] { } make ; inline
-
 : split*-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ split*, ] { } make ; inline
+    [ 0 ] 2dip [ subseq ] (split*) ; inline
+
+: split*-when-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
+    [ 0 ] 2dip [ <slice> ] (split*) ; inline
+
+: split* ( seq separators -- pieces )
+    [ member? ] curry split*-when ; inline
 
 GENERIC: string-lines ( str -- seq )
 
