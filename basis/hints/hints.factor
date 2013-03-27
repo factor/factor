@@ -115,7 +115,7 @@ set-specializer
 
 \ >sbuf { string } set-specializer
 
-\ split, { string string } set-specializer
+\ split { string string } set-specializer
 
 \ member? { { array } { string } } set-specializer
 
