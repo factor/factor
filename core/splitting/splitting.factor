@@ -95,6 +95,9 @@ PRIVATE>
 : split ( seq separators -- pieces )
     [ member? ] curry split-when ; inline
 
+: split-slice ( seq separators -- pieces )
+    [ member? ] curry split-when-slice ; inline
+
 <PRIVATE
 
 : (split*) ( n seq quot: ( ... elt -- ... ? ) quot -- )
@@ -116,6 +119,9 @@ PRIVATE>
 
 : split* ( seq separators -- pieces )
     [ member? ] curry split*-when ; inline
+
+: split*-slice ( seq separators -- pieces )
+    [ member? ] curry split*-when-slice ; inline
 
 GENERIC: string-lines ( str -- seq )
 
