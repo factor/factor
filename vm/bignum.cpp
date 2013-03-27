@@ -46,6 +46,7 @@
  *  - Remove s48 prefix from function names
  *  - Various fixes for Win64
  *  - Port to C++
+ *  - Added bignum_gcd implementation
  */
 
 #include "master.hpp"
