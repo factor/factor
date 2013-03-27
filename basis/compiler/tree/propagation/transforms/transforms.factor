@@ -11,7 +11,7 @@ assocs sets combinators.short-circuit sequences.private locals
 growable stack-checker namespaces compiler.tree.propagation.info
 hash-sets ;
 FROM: math => float ;
-FROM: sets => set ;
+FROM: sets => set members ;
 IN: compiler.tree.propagation.transforms
 
 \ equal? [
@@ -307,9 +307,14 @@ CONSTANT: lookup-table-at-max 256
 M\ set diff [ diff-quot ] 1 define-partial-eval
 
 : intersect-quot ( seq -- quot: ( seq' -- seq'' ) )
-    tester '[ [ _ filter ] keep set-like ] ;
+    tester '[ [ members _ filter ] keep set-like ] ;
 
 M\ set intersect [ intersect-quot ] 1 define-partial-eval
+
+: intersects?-quot ( seq -- quot: ( seq' -- seq'' ) )
+    tester '[ members _ any? ] ;
+
+M\ set intersects? [ intersects?-quot ] 1 define-partial-eval
 
 : bit-quot ( #call -- quot/f )
     in-d>> second value-info interval>> 0 fixnum-bits [a,b] interval-subset?

@@ -973,6 +973,9 @@ M: tuple-with-read-only-slot clone
 [ t ] [ [ { 1 } intersect ] { intersect } inlined? ] unit-test
 [ f ] [ [ { 1 } swap intersect ] { intersect } inlined? ] unit-test ! We could do this
 
+[ t ] [ [ { 1 } intersects? ] { intersects? } inlined? ] unit-test
+[ f ] [ [ { 1 } swap intersects? ] { intersects? } inlined? ] unit-test ! We could do this
+
 [ t ] [ [ { 1 } diff ] { diff } inlined? ] unit-test
 [ f ] [ [ { 1 } swap diff ] { diff } inlined? ] unit-test ! We could do this
 
