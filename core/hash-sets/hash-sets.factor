@@ -127,7 +127,7 @@ M: hash-set equal?
     over hash-set? [ set= ] [ 2drop f ] if ;
 
 : >hash-set ( members -- hash-set )
-    dup length <hash-set> [ (rehash) ] keep ;
+    dup length <hash-set> [ (rehash) ] keep ; inline
 
 M: hash-set set-like
     drop dup hash-set? [ ?members >hash-set ] unless ; inline
