@@ -302,12 +302,12 @@ CONSTANT: lookup-table-at-max 256
 \ at* [ at-quot ] 1 define-partial-eval
 
 : diff-quot ( seq -- quot: ( seq' -- seq'' ) )
-    tester '[ [ members [ @ not ] filter ] keep set-like ] ;
+    [ tester ] keep '[ members [ @ not ] filter _ set-like ] ;
 
 M\ set diff [ diff-quot ] 1 define-partial-eval
 
 : intersect-quot ( seq -- quot: ( seq' -- seq'' ) )
-    tester '[ [ members _ filter ] keep set-like ] ;
+    [ tester ] keep '[ members _ filter _ set-like ] ;
 
 M\ set intersect [ intersect-quot ] 1 define-partial-eval
 
