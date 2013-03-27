@@ -147,12 +147,18 @@ INSTANCE: hash-set set
 : array/tester ( hash-set1 hash-set2 -- array quot )
     [ array>> ] dip [ in? ] curry ; inline
 
+: filter-members ( hash-set array quot: ( elt -- ? ) -- accum )
+    [ dup ] prepose rot cardinality <vector> [
+        [ push-unsafe ] curry [ [ drop ] if ] curry
+        compose each
+    ] keep ; inline
+
 PRIVATE>
 
 M: hash-set intersect
     over hash-set? [
-        small/large array/tester not-tombstones
-        filter >hash-set
+        small/large dupd array/tester not-tombstones
+        filter-members >hash-set
     ] [ (intersect) >hash-set ] if ;
 
 M: hash-set intersects?
@@ -168,8 +174,8 @@ M: hash-set union
 
 M: hash-set diff
     over hash-set? [
-        array/tester [ not ] compose not-tombstones
-        filter >hash-set
+        dupd array/tester [ not ] compose not-tombstones
+        filter-members >hash-set
     ] [ (diff) >hash-set ] if ;
 
 M: hash-set subset?
