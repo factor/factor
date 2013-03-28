@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: help.markup help.syntax sequences strings xmode.catalog
-xmode.highlight xmode.tokens ;
+USING: help.markup help.syntax sequences strings words
+xmode.catalog xmode.highlight xmode.tokens ;
 
 IN: xmode.highlight
 
@@ -20,8 +20,7 @@ HELP: highlight-lines
 } ;
 
 HELP: highlight.
-{ $values { "path" string } }
+{ $values { "obj" string } }
 { $description
-    "Highlight and print code from the specified file (represented by "
-    { $snippet "path" } ").  The mode is determined using the file extension."
+    "Highlight and print code from the specified " { $link word } " or path (with a mode determined using the file extension)."
 } ;
