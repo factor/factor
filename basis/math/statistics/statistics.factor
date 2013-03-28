@@ -288,9 +288,13 @@ ALIAS: std sample-std
 
 : signal-to-noise ( seq -- x ) [ mean ] [ population-std ] bi / ;
 
-: mean-dev ( seq -- x ) dup mean v-n vabs mean ;
+: demean ( seq -- seq' ) dup mean v-n ;
 
-: median-dev ( seq -- x ) dup median v-n vabs mean ;
+: mean-dev ( seq -- x ) demean vabs mean ;
+
+: demedian ( seq -- seq' ) dup median v-n ;
+
+: median-dev ( seq -- x ) demedian vabs mean ;
 
 : ste-ddof ( seq n -- x ) '[ _ std-ddof ] [ length ] bi sqrt / ;
 
@@ -322,7 +326,7 @@ ALIAS: std sample-std
     [ swapd * - ] keep ;
 
 : cov-ddof ( {x} {y} ddof -- cov )
-    [ [ dup mean v-n ] bi@ v* ] dip mean-ddof ;
+    [ [ demean ] bi@ v* ] dip mean-ddof ;
 
 : population-cov ( {x} {y} -- cov ) 0 cov-ddof ; inline
 
@@ -349,8 +353,7 @@ ALIAS: std sample-std
     1 [ * ] cum-map ;
 
 : cum-count ( seq quot -- seq' )
-    [ 0 ] dip
-    '[ _ call [ 1 + ] when ] cum-map ; inline
+    [ 0 ] dip '[ _ call [ 1 + ] when ] cum-map ; inline
 
 : cum-min ( seq -- seq' )
     dup ?first [ min ] cum-map ;
@@ -371,15 +374,13 @@ ALIAS: std sample-std
     [ dup log * ] [ 1 swap - dup log * ] bi + neg 2 log / ;
 
 : standardize ( u -- v )
-    [ dup mean v-n ] [ sample-std ] bi
-    dup zero? [ drop ] [ v/n ] if ;
+    [ demean ] [ sample-std ] bi [ v/n ] unless-zero ;
 
 : standardize-2d ( u -- v )
-    flip dup [ [ mean ] [ sample-std ] bi 2array ] map
-    [ [ first v-n ] 2map ] keep [ second v/n ] 2map flip ;
+    flip [ standardize ] map flip ;
 
 : differences ( u -- v )
-    [ 1 tail-slice ] keep [ - ] 2map ;
+    [ 1 tail-slice ] keep v- ;
 
 : rescale ( u -- v )
     dup minmax over - [ v-n ] [ v/n ] bi* ;
@@ -393,4 +394,4 @@ ALIAS: std sample-std
     [ '[ first2 [ _ set-nth ] with each ] each ] keep ;
 
 : z-score ( seq -- n )
-    dup [ mean ] [ sample-std ] bi '[ _ - _ / ] map ;
+    [ demean ] [ sample-std ] bi v/n ;
