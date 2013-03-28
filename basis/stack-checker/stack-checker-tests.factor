@@ -450,9 +450,7 @@ DEFER: eee'
 [ [ [ append ] strict-each ] infer ] [ unbalanced-branches-error? ] must-fail-with
 [ [ [ 1 + ] strict-2map ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
-! ensure that polymorphic checking works on recursive combinators
-FROM: splitting.private => split, ;
-{ 2 0 } [ [ member? ] curry split, ] must-infer-as
+! TODO: ensure that polymorphic checking works on recursive combinators
 
 [ [ [ write write ] each      ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
