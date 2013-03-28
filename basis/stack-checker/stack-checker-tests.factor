@@ -451,12 +451,15 @@ DEFER: eee'
 [ [ [ 1 + ] strict-2map ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
 ! ensure that polymorphic checking works on recursive combinators
-: recursive-reduce ( identity i seq quot: ( prev elt -- next ) -- x )
-    2over bounds-check? [
-        [ [ nth-unsafe ] dip call ] 3keep [ 1 + ] 2dip recursive-reduce
-    ] [ 3drop ] if ; inline recursive
-{ 24995000 } [ 0 0 10000 iota [ dup even? [ + ] [ drop ] if ] recursive-reduce ] unit-test
-{ 4 1 } [ [ member? [ 1 + ] when ] curry recursive-reduce ] must-infer-as
+: (recursive-reduce) ( identity i seq quot: ( prev elt -- next ) n -- result )
+    [ pick ] dip swap over < [
+        [ [ [ nth-unsafe ] dip call ] 3keep [ 1 + ] 2dip ] dip
+        (recursive-reduce)
+    ] [ 4drop ] if ; inline recursive
+: recursive-reduce ( seq i quot: ( prev elt -- next ) -- result )
+    swapd [ 0 ] 2dip over length (recursive-reduce) ; inline
+{ 24995000 } [ 10000 iota 0 [ dup even? [ + ] [ drop ] if ] recursive-reduce ] unit-test
+{ 3 1 } [ [ member? [ 1 + ] when ] curry recursive-reduce ] must-infer-as
 
 [ [ [ write write ] each      ] infer ] [ unbalanced-branches-error? ] must-fail-with
 
