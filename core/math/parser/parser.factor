@@ -342,7 +342,7 @@ CONSTANT: ONES B{
 
 : (fixnum>dec) ( num accum -- num' accum )
     { fixnum sbuf } declare
-    [ over 65536 >= ] [ (two-digit) ] while
+    [ over 10 >= ] [ (two-digit) ] while
     [ over zero? ] [ (one-digit) ] until ; inline
 
 : (positive>dec) ( num -- str )
