@@ -31,4 +31,4 @@ IN: math.distances
     [ v- ] [ v+ ] 2bi [ vabs sum ] bi@ / ;
 
 : correlation-distance ( a b -- n )
-    [ dup mean v-n ] bi@ [ v* sum ] [ [ norm ] bi@ * ] 2bi / 1 swap - ;
+    [ demean ] bi@ [ v* sum ] [ [ norm ] bi@ * ] 2bi / 1 swap - ;
