@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff, 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators kernel kernel.private
-layouts make math namespaces sbufs sequences sequences.private
-splitting strings ;
+layouts make math math.private namespaces sbufs sequences
+sequences.private splitting strings ;
 IN: math.parser
 
 : digit> ( ch -- n )
@@ -47,7 +47,7 @@ TUPLE: number-parse
     [ / ] [ drop f ] if* ; inline
 
 TUPLE: float-parse
-    { radix read-only }
+    { radix fixnum read-only }
     { point read-only }
     { exponent read-only } ;
 
@@ -345,8 +345,44 @@ CONSTANT: ONES B{
     [ over 10 >= ] [ (two-digit) ] while
     [ over zero? ] [ (one-digit) ] until ; inline
 
-: (positive>dec) ( num -- str )
-    3 <sbuf> (bignum>dec) (fixnum>dec) "" like reverse! nip ; inline
+GENERIC: (positive>dec) ( num -- str )
+
+M: bignum (positive>dec)
+    12 <sbuf> (bignum>dec) (fixnum>dec) "" like reverse! nip ; inline
+
+: (count-digits) ( digits n -- digits' )
+    {
+        { [ dup 10 < ] [ drop ] }
+        { [ dup 100 < ] [ drop 1 fixnum+fast ] }
+        { [ dup 1,000 < ] [ drop 2 fixnum+fast ] }
+        [
+            dup 1,000,000,000,000 < [
+                dup 100,000,000 < [
+                    dup 1,000,000 < [
+                        dup 10,000 < [
+                            drop 3
+                        ] [
+                            100,000 >= 5 4 ?
+                        ] if
+                    ] [
+                        10,000,000 >= 7 6 ?
+                    ] if
+                ] [
+                    dup 10,000,000,000 < [
+                        1,000,000,000 >= 9 8 ?
+                    ] [
+                        100,000,000,000 >= 11 10 ?
+                    ] if
+                ] if fixnum+fast
+            ] [
+                [ 12 fixnum+fast ] [ 1,000,000,000,000 /i ] bi*
+                (count-digits)
+            ] if
+        ]
+    } cond ; inline recursive
+
+M: fixnum (positive>dec)
+    1 over (count-digits) <sbuf> (fixnum>dec) "" like reverse! nip ; inline
 
 : (positive>base) ( num radix -- str )
     dup 1 <= [ invalid-radix ] when
@@ -361,6 +397,7 @@ PRIVATE>
 GENERIC# >base 1 ( n radix -- str )
 
 : number>string ( n -- str ) 10 >base ; inline
+
 : >bin ( n -- str ) 2 >base ; inline
 : >oct ( n -- str ) 8 >base ; inline
 : >hex ( n -- str ) 16 >base ; inline
