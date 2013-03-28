@@ -76,4 +76,4 @@ M: ratio / scale / ;
 M: ratio /i scale /i ;
 M: ratio /f scale /f ;
 M: ratio mod 2dup /i * - ;
-M: ratio /mod [ /i ] 2keep mod ;
+M: ratio /mod scale+d [ /mod ] [ / ] bi* ;
