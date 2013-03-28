@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs colors.hex io io.encodings.utf8 io.files
-io.styles kernel locals math math.parser namespaces sequences
-xmode.catalog xmode.marker ;
+USING: accessors assocs colors.hex io io.encodings.utf8
+io.files io.streams.string io.styles kernel locals see
+sequences splitting strings words xmode.catalog xmode.marker ;
 
 IN: xmode.highlight
 
@@ -46,7 +46,7 @@ PRIVATE>
 : highlight-tokens ( tokens -- )
     [
         [ str>> ] [ id>> ] bi
-        [ name>> STYLES at ] [ f ] if* BASE assoc-union
+        [ name>> STYLES at BASE assoc-union ] [ BASE ] if*
         format
     ] each nl ;
 
@@ -55,7 +55,13 @@ PRIVATE>
         tokenize-line highlight-tokens
     ] curry each drop ;
 
-:: highlight. ( path -- )
+GENERIC: highlight. ( obj -- )
+
+M:: string highlight. ( path -- )
     path utf8 file-lines [
         path over first find-mode highlight-lines
     ] unless-empty ;
+
+M: word highlight.
+    [ see ] with-string-writer string-lines
+    "factor" highlight-lines ;
