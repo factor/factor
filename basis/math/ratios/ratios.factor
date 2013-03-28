@@ -75,5 +75,5 @@ M: ratio * 2>fraction [ * ] 2bi@ / ;
 M: ratio / scale / ;
 M: ratio /i scale /i ;
 M: ratio /f scale /f ;
-M: ratio mod 2dup /i * - ;
+M: ratio mod scale+d [ mod ] [ / ] bi* ;
 M: ratio /mod scale+d [ /mod ] [ / ] bi* ;
