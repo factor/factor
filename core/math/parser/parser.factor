@@ -402,20 +402,6 @@ GENERIC# >base 1 ( n radix -- str )
 : >oct ( n -- str ) 8 >base ; inline
 : >hex ( n -- str ) 16 >base ; inline
 
-<PRIVATE
-
-SYMBOL: radix
-SYMBOL: negative?
-
-: sign ( -- str ) negative? get "-" "+" ? ;
-
-: with-radix ( radix quot -- )
-    radix swap with-variable ; inline
-
-: (>base) ( n -- str ) radix get positive>base ;
-
-PRIVATE>
-
 M: integer >base
     over 0 = [
         2drop "0"
@@ -428,17 +414,13 @@ M: integer >base
     ] if ;
 
 M: ratio >base
+    [ [ 0 < ] [ abs 1 /mod ] bi ]
+    [ [ positive>base ] curry ] bi*
     [
-        dup 0 < negative? set
-        abs 1 /mod
-        [ [ "" ] [ (>base) sign append ] if-zero ]
-        [
-            [ numerator (>base) ]
-            [ denominator (>base) ] bi
-            "/" glue
-        ] bi* append
-        negative? get [ CHAR: - prefix ] when
-    ] with-radix ;
+        [ [ numerator ] [ denominator ] bi ] dip bi@ "/" glue
+    ] keep rot [ drop ] [
+        swap call pick "-" "+" ? rot 3append
+    ] if-zero swap [ CHAR: - prefix ] when ;
 
 : fix-float ( str -- newstr )
     {
