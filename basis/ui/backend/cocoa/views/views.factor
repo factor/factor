@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs cocoa cocoa.application cocoa.classes
-cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
-cocoa.views combinators core-foundation.strings core-graphics
-core-graphics.types core-text io.encodings.utf8 kernel locals
-math math.order math.rectangles namespaces opengl sequences
-system-info threads ui.gadgets ui.gadgets.private
+cocoa.messages cocoa.pasteboard cocoa.runtime cocoa.subclassing
+cocoa.types cocoa.views combinators core-foundation.strings
+core-graphics core-graphics.types core-text io.encodings.utf8
+kernel locals math math.order math.rectangles namespaces opengl
+sequences system-info threads ui.gadgets ui.gadgets.private
 ui.gadgets.worlds ui.gestures ui.private vocabs vocabs.parser ;
 IN: ui.backend.cocoa.views
 
@@ -146,13 +146,22 @@ CONSTANT: selector>action H{
     selector>action at
     [ swap world-focus parents-handle-gesture? t ] [ drop f f ] if* ;
 
-<<
-os-version { 10 7 0 } after=? "retina" "non-retina" ?
-"ui.backend.cocoa.views." prepend use-vocab
->>
-
-CLASS: FactorView < BaseFactorView
+CLASS: FactorView < NSOpenGLView NSTextInput
 [
+
+    METHOD: void prepareOpenGL [
+
+        self "setWantsBestResolutionOpenGLSurface:" [
+            1 swap execute( x x x -- )
+        ] when-method
+
+        self "backingScaleFactor" [
+            execute( x x -- x ) dup 1.0 > [
+                gl-scale-factor set-global t retina? set-global
+            ] [ drop ] if
+        ] when-method
+    ]
+
     ! Rendering
     METHOD: void drawRect: NSRect rect [ self window [ draw-world ] when* ]
 
