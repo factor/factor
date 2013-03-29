@@ -360,15 +360,14 @@ M: f ' drop \ f type-number ;
         \ word [ emit-seq ] emit-object
     ] keep put-object ;
 
-: word-error ( word msg -- * )
-    [ % dup vocabulary>> % " " % name>> % ] "" make throw ;
+ERROR: not-in-image vocabulary word ;
 
 : transfer-word ( word -- word )
     [ target-word ] keep or ;
 
 : fixup-word ( word -- offset )
     transfer-word dup lookup-object
-    [ ] [ "Not in image: " word-error ] ?if ;
+    [ ] [ [ vocabulary>> ] [ name>> ] bi not-in-image ] ?if ;
 
 : fixup-words ( -- )
     image get [ dup word? [ fixup-word ] when ] map! drop ;
