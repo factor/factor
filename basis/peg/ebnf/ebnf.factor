@@ -538,16 +538,17 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 : transform-ebnf ( string -- object )
   'ebnf' parse transform ;
 
+ERROR: unable-to-fully-parse-ebnf remaining ;
+
+ERROR: could-not-parse-ebnf ;
+
 : check-parse-result ( result -- result )
   [
     dup remaining>> [ blank? ] trim [
-      [
-        "Unable to fully parse EBNF. Left to parse was: " %
-        %
-      ] "" make throw
+        unable-to-fully-parse-ebnf
     ] unless-empty
   ] [
-    "Could not parse EBNF" throw
+    could-not-parse-ebnf
   ] if* ;
 
 : parse-ebnf ( string -- hashtable )
