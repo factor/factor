@@ -68,6 +68,11 @@ unit-test
 [ 1/3 ] [ 10/3 3 mod ] unit-test
 [ -1/3 ] [ -10/3 3 mod ] unit-test
 
+{ 4 1/2 } [ 3+1/2 3/4 /mod ] unit-test
+{ -4 -1/2 } [ -3-1/2 3/4 /mod ] unit-test
+{ 4 -1/2 } [ -3-1/2 -3/4 /mod ] unit-test
+{ -4 1/2 } [ 3+1/2 -3/4 /mod ] unit-test
+
 [ 5 ] [ 5 floor ] unit-test
 [ -5 ] [ -5 floor ] unit-test
 [ 6 ] [ 6 truncate ] unit-test
