@@ -53,9 +53,10 @@ SYMBOL: objc-methods
 
 objc-methods [ H{ } clone ] initialize
 
+ERROR: no-objc-method name ;
+
 : lookup-method ( selector -- method )
-    dup objc-methods get at
-    [ ] [ "No such method: " prepend throw ] ?if ;
+    dup objc-methods get at [ ] [ no-objc-method ] ?if ;
 
 MEMO: make-prepare-send ( selector method super? -- quot )
     [
