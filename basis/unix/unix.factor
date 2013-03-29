@@ -2,7 +2,7 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.libraries
-alien.syntax byte-arrays classes.struct combinators
+alien.syntax byte-vectors classes.struct combinators
 combinators.short-circuit combinators.smart continuations
 generalizations io kernel libc locals macros math namespaces
 sequences sequences.generalizations stack-checker strings system
@@ -67,10 +67,10 @@ M: unix open-file [ open ] unix-system-call ;
         [ utime ] unix-system-call drop ;
 
 : read-symbolic-link ( path -- path )
-    PATH_MAX <byte-array> dup [
-        PATH_MAX
+    PATH_MAX <byte-vector> [
+        underlying>> PATH_MAX
         [ readlink ] unix-system-call
-    ] dip swap head-slice >string ;
+    ] keep swap >>length >string ;
 
 : unlink-file ( path -- ) [ unlink ] unix-system-call drop ;
 
