@@ -107,7 +107,7 @@ TUPLE: circular-slice { from read-only } { to read-only } { seq read-only } ;
 
 INSTANCE: circular-slice virtual-sequence
 
-M: circular-slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
+M: circular-slice equal? over circular-slice? [ sequence= ] [ 2drop f ] if ;
 
 M: circular-slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
