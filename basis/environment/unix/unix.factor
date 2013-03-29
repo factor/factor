@@ -12,7 +12,12 @@ M: unix environ ( -- void* ) &: environ ;
 
 M: unix os-env ( key -- value ) getenv ;
 
-M: unix set-os-env ( value key -- ) swap 1 setenv io-error ;
+M: unix set-os-env ( value key -- )
+    over [
+        swap 1 setenv io-error
+    ] [
+        nip unset-os-env
+    ] if ;
 
 M: unix unset-os-env ( key -- ) unsetenv io-error ;
 
