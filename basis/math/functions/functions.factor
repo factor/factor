@@ -61,8 +61,11 @@ M: complex ^n (^n) ;
 
 PRIVATE>
 
-: >rect ( z -- x y )
-    [ real-part ] [ imaginary-part ] bi ; inline
+GENERIC: >rect ( z -- x y )
+
+M: real >rect 0 ; inline
+
+M: complex >rect [ real-part ] [ imaginary-part ] bi ; inline
 
 : >float-rect ( z -- x y )
     >rect [ >float ] bi@ ; inline
