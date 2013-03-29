@@ -111,7 +111,9 @@ HOOK: signal-error. os ( obj -- )
 : undefined-symbol-error. ( obj -- )
     "Cannot resolve C library function" print
     "Symbol: " write dup third symbol>string print
-    "Library: " write fourth . ;
+    "Library: " write fourth .
+    "You are probably missing a library or the library path is wrong." .
+    "See http://concatenative.org/wiki/view/Factor/Requirements" . ;
 
 : stack-underflow. ( obj name -- )
     write " stack underflow" print drop ;
