@@ -96,14 +96,19 @@ unit-test
 
 { 39 0x1.999999999998ap-4 } [ 4.0 .1 /mod ] unit-test
 { 38 0x1.9999999999984p-4 } [ 3.9 .1 /mod ] unit-test
-{ 39 0x1.999999999998ap-4 } [ 4.0 -.1 /mod ] unit-test
-{ 38 0x1.9999999999984p-4 } [ 3.9 -.1 /mod ] unit-test
+{ -39 0x1.999999999998ap-4 } [ 4.0 -.1 /mod ] unit-test
+{ -38 0x1.9999999999984p-4 } [ 3.9 -.1 /mod ] unit-test
 { 39 -0x1.999999999998ap-4 } [ -4.0 -.1 /mod ] unit-test
 { 38 -0x1.9999999999984p-4 } [ -3.9 -.1 /mod ] unit-test
-{ 39 -0x1.999999999998ap-4 } [ -4.0 .1 /mod ] unit-test
-{ 38 -0x1.9999999999984p-4 } [ -3.9 .1 /mod ] unit-test
+{ -39 -0x1.999999999998ap-4 } [ -4.0 .1 /mod ] unit-test
+{ -38 -0x1.9999999999984p-4 } [ -3.9 .1 /mod ] unit-test
 
 { 0.5 } [ 3.5 0.75 mod ] unit-test
 { -0.5 } [ -3.5 0.75 mod ] unit-test
 { -0.5 } [ -3.5 -0.75 mod ] unit-test
 { 0.5 } [ 3.5 -0.75 mod ] unit-test
+
+{ 4 0.5 } [ 3.5 0.75 /mod ] unit-test
+{ -4 -0.5 } [ -3.5 0.75 /mod ] unit-test
+{ 4 -0.5 } [ -3.5 -0.75 /mod ] unit-test
+{ -4 0.5 } [ 3.5 -0.75 /mod ] unit-test
