@@ -2,4 +2,9 @@ include vm/Config.unix
 PLAF_DLL_OBJS += vm/os-genunix.o vm/os-linux.o vm/mvm-unix.o
 PLAF_MASTER_HEADERS += vm/os-genunix.hpp vm/os-linux.hpp
 LIBS = -ldl -lm -lrt -lpthread $(X11_UI_LIBS) -Wl,--export-dynamic
-SITE_CFLAGS += -Wl,--no-as-needed
+
+# clang spams warnings if we use -Wl,--no-as-needed with -c
+# -Wl,--no-as-needed is a gcc optimization, not required
+ifneq ($(CPP),clang++)
+	SITE_CFLAGS += -Wl,--no-as-needed
+endif
