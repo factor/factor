@@ -55,8 +55,17 @@ objc-methods [ H{ } clone ] initialize
 
 ERROR: no-objc-method name ;
 
+: ?lookup-method ( selector -- method/f )
+    objc-methods get at ;
+
 : lookup-method ( selector -- method )
-    dup objc-methods get at [ ] [ no-objc-method ] ?if ;
+    dup ?lookup-method [ ] [ no-objc-method ] ?if ;
+
+: selector/sender ( selector method -- alien word )
+    [ <selector> selector ] [ message-senders get at ] bi* ;
+
+: when-method ( receiver selector quot: ( receiver selector method -- ) -- )
+    [ dup ?lookup-method ] dip [ selector/sender ] prepose [ 2drop ] if* ; inline
 
 MEMO: make-prepare-send ( selector method super? -- quot )
     [
