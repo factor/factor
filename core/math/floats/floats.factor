@@ -38,7 +38,7 @@ M: float /i float/f >integer ; inline
 
 M: real abs dup 0 < [ neg ] when ; inline
 
-M: real /mod dupd mod [ [ - ] [ /i ] bi ] keep ; inline
+M: real /mod 2dup mod [ swap [ - ] [ /i ] bi* ] keep ; inline
 
 M: float fp-special?
     double>bits -52 shift 0x7ff [ bitand ] keep = ; inline
