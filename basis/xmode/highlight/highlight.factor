@@ -1,9 +1,10 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs colors.hex io io.encodings.utf8
-io.files io.streams.string io.styles kernel locals see
-sequences splitting strings words xmode.catalog xmode.marker ;
+USING: accessors assocs colors.hex io io.encodings.utf8 io.files
+io.pathnames io.streams.string io.styles kernel locals see
+sequences splitting strings vocabs vocabs.loader words
+xmode.catalog xmode.marker ;
 
 IN: xmode.highlight
 
@@ -61,6 +62,12 @@ M:: string highlight. ( path -- )
     path utf8 file-lines [
         path over first find-mode highlight-lines
     ] unless-empty ;
+
+M: pathname highlight.
+    string>> highlight. ;
+
+M: vocab highlight.
+    vocab-source-path highlight. ;
 
 M: word highlight.
     [ see ] with-string-writer string-lines
