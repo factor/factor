@@ -152,6 +152,7 @@ CLASS: FactorView < NSOpenGLView NSTextInput
     METHOD: void prepareOpenGL [
 
         os-version { 10 7 0 } after=? [
+
             self "setWantsBestResolutionOpenGLSurface:"
             selector/sender 1 swap execute( x x x -- )
 
@@ -160,6 +161,7 @@ CLASS: FactorView < NSOpenGLView NSTextInput
             dup 1.0 > [
                 gl-scale-factor set-global t retina? set-global
             ] [ drop ] if
+
         ] when
     ]
 
