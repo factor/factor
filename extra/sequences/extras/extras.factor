@@ -90,9 +90,15 @@ IN: sequences.extras
 : filter-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... seq' )
     over filter-index-as ; inline
 
-: even-indices ( seq -- seq' ) [ nip even? ] filter-index ;
+: even-indices ( seq -- seq' )
+    [ length 1 + 2/ ] keep [
+        [ [ 2 * ] dip nth-unsafe ] curry
+    ] keep map-integers ;
 
-: odd-indices ( seq -- seq' ) [ nip odd? ] filter-index ;
+: odd-indices ( seq -- seq' )
+    [ length 2/ ] keep [
+        [ [ 2 * 1 + ] dip nth-unsafe ] curry
+    ] keep map-integers ;
 
 : compact ( seq quot elt -- seq' )
     [ split-when harvest ] dip join ; inline
