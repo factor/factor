@@ -32,3 +32,6 @@ os unix? [
     "factor-test-key-change" os-env
 ] unit-test
 [ ] [ "factor-test-key-change" unset-os-env ] unit-test
+
+! Issue #794, setting something to ``f`` is a memory protection fault on mac
+[ ] [ f "dummy-env-variable-for-factor-test" set-os-env ] unit-test
