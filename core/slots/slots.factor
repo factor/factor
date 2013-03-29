@@ -156,11 +156,10 @@ GENERIC: initial-value* ( class -- object ? )
 
 M: class initial-value* drop f f ;
 
-M: maybe initial-value*
-    drop f t ;
+M: maybe initial-value* drop f t ;
 
-! Default initial value is f, 0, or the default inital value
-! of the smallest class. Special case 0 because float is ostensibly
+! Default initial value is f, 0, or the default initial value of
+! the smallest class. Special case 0 because float is ostensibly
 ! smaller than integer in union{ integer float } because of
 ! alphabetical sorting.
 M: anonymous-union initial-value*
@@ -174,8 +173,8 @@ M: anonymous-union initial-value*
     } cond ;
 
 ! See if any of the initial values fit the intersection class,
-! or else return that none do, and leave it up to the user to provide
-! an initial: value.
+! or else return that none do, and leave it up to the user to
+! provide an initial: value.
 M: anonymous-intersection initial-value*
     {
         { [ f over instance? ] [ drop f t ] }
