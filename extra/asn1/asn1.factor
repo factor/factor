@@ -70,13 +70,13 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 : get-id ( -- id )
     elements get id>> ;
 
+ERROR: unsupported-tag-encoding id ;
+
 : (set-tag) ( -- )
     elements get id>> 31 bitand
     dup elements get tag<<
     31 < [
-        [ "unsupported tag encoding: #{" % 
-          get-id # "}" %
-        ] "" make throw
+        get-id unsupported-tag-encoding
     ] unless ;
 
 : set-tagclass ( -- )
