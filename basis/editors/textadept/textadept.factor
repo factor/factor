@@ -17,31 +17,30 @@
 !
 ! For more information about Textadept, consult http://foicica.com/textadept/
 
-USING:  editors io.launcher kernel make math math.parser namespaces sequences
-        system ;
-IN:     editors.textadept
+USING: editors io.launcher kernel make math math.parser
+namespaces sequences system ;
 
-SINGLETON:  textadept
+IN: editors.textadept
+
+SINGLETON: textadept
 textadept editor-class set-global
 
-HOOK:   find-textadept-path os ( -- path )
+HOOK: find-textadept-path os ( -- path )
 
-M:  object find-textadept-path "textadept" ;
+M: object find-textadept-path "textadept" ;
 
 ! Example of OS-specific method
 ! -----------------------------
-! M:  windows find-textadept-path
-!         let-Windows-users-fill-this-in
+! M: windows find-textadept-path
+!     let-Windows-users-fill-this-in
 !     ;
 
-:   textadept-path  ( -- path )
-        \ textadept-path get-global [
-            find-textadept-path "textadept" or
-        ] unless*
-    ;
+: textadept-path  ( -- path )
+    \ textadept-path get-global [
+        find-textadept-path "textadept" or
+    ] unless* ;
 
-M:  textadept editor-command ( file line -- command )
-        swap [
-            textadept-path , "-f" , , "-J" , number>string ,
-        ] { } make
-    ;
+M: textadept editor-command ( file line -- command )
+    swap [
+        textadept-path , "-f" , , "-J" , number>string ,
+    ] { } make ;
