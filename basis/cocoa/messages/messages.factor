@@ -64,15 +64,8 @@ ERROR: no-objc-method name ;
 : lookup-method ( selector -- method )
     dup ?lookup-method [ ] [ no-objc-method ] ?if ;
 
-: (selector/sender) ( selector super? -- alien word )
-    [ [ lookup-selector ] [ lookup-method ] bi ]
-    [ super-message-senders message-senders ? get at ] bi* ; inline
-
-: selector/sender ( selector -- alien word )
-    f (selector/sender) ; inline
-
-: selector/super-sender ( selector -- alien word )
-    t (selector/sender) ; inline
+: lookup-sender ( name -- method )
+    lookup-method message-senders get at ;
 
 MEMO: make-prepare-send ( selector method super? -- quot )
     [
