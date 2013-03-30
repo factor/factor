@@ -151,6 +151,9 @@ CLASS: FactorView < NSOpenGLView NSTextInput
 
     METHOD: void prepareOpenGL [
 
+        ?-> setWantsBestResolutionOpenGLSurface:
+        ?-> backingScaleFactor
+
         self "setWantsBestResolutionOpenGLSurface:"
         lookup-selector -> respondsToSelector: c-bool> [
 
