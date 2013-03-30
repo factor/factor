@@ -5,9 +5,9 @@ arrays assocs cocoa cocoa.application cocoa.classes
 cocoa.messages cocoa.pasteboard cocoa.runtime cocoa.subclassing
 cocoa.types cocoa.views combinators core-foundation.strings
 core-graphics core-graphics.types core-text io.encodings.utf8
-kernel locals math math.order math.rectangles namespaces opengl
-sequences system-info threads ui.gadgets ui.gadgets.private
-ui.gadgets.worlds ui.gestures ui.private vocabs vocabs.parser ;
+kernel locals math math.rectangles namespaces opengl sequences
+threads ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.private ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -151,7 +151,8 @@ CLASS: FactorView < NSOpenGLView NSTextInput
 
     METHOD: void prepareOpenGL [
 
-        os-version { 10 7 0 } after=? [
+        self "setWantsBestResolutionOpenGLSurface:"
+        lookup-selector -> respondsToSelector: c-bool> [
 
             self "setWantsBestResolutionOpenGLSurface:"
             selector/sender 1 swap execute( x x x -- )

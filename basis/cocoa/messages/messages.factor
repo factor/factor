@@ -49,6 +49,9 @@ MEMO: <selector> ( name -- sel ) f \ selector-tuple boa ;
         object>>
     ] if ;
 
+: lookup-selector ( name -- alien )
+    <selector> selector ;
+
 SYMBOL: objc-methods
 
 objc-methods [ H{ } clone ] initialize
@@ -62,7 +65,7 @@ ERROR: no-objc-method name ;
     dup ?lookup-method [ ] [ no-objc-method ] ?if ;
 
 : (selector/sender) ( selector super? -- alien word )
-    [ [ <selector> selector ] [ lookup-method ] bi ]
+    [ [ lookup-selector ] [ lookup-method ] bi ]
     [ super-message-senders message-senders ? get at ] bi* ; inline
 
 : selector/sender ( selector -- alien word )
@@ -73,8 +76,7 @@ ERROR: no-objc-method name ;
 
 MEMO: make-prepare-send ( selector method super? -- quot )
     [
-        [ \ <super> , ] when
-        swap <selector> , \ selector ,
+        [ \ <super> , ] when swap lookup-selector ,
     ] [ ] make
     swap second length 2 - '[ _ _ ndip ] ;
 
