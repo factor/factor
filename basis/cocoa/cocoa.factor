@@ -16,6 +16,8 @@ SYMBOL: sent-messages
 
 SYNTAX: -> scan-token dup remember-send suffix! \ send suffix! ;
 
+SYNTAX: ?-> scan-token [ remember-send ] [ <selector> drop ] bi ;
+
 SYMBOL: super-sent-messages
 
 : remember-super-send ( selector -- )
