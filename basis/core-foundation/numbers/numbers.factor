@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data alien.syntax kernel math
-core-foundation ;
+USING: alien.c-types alien.data alien.syntax combinators
+core-foundation kernel math ;
+QUALIFIED-WITH: alien.c-types c
 FROM: math => float ;
 IN: core-foundation.numbers
 
@@ -28,6 +29,10 @@ CONSTANT: kCFNumberMaxType 16
 
 FUNCTION: CFNumberRef CFNumberCreate ( CFAllocatorRef allocator, CFNumberType theType, void* valuePtr ) ;
 
+FUNCTION: CFNumberType CFNumberGetType ( CFNumberRef number ) ;
+
+FUNCTION: Boolean CFNumberGetValue ( CFNumberRef number, CFNumberType theType, void* valuePtr ) ;
+
 GENERIC: <CFNumber> ( number -- alien )
 
 M: integer <CFNumber>
@@ -42,3 +47,25 @@ M: t <CFNumber>
 M: f <CFNumber>
     drop f kCFNumberIntType 0 int <ref> CFNumberCreate ;
 
+ERROR: unsupported-number-type type ;
+
+: (CFNumber>number) ( alien c-type -- number )
+    [
+        0 swap <ref> [ CFNumberGetValue drop ] keep
+    ] keep deref ; inline
+
+: CFNumber>number ( alien -- number )
+    dup CFNumberGetType dup {
+        { kCFNumberSInt8Type [ SInt8 (CFNumber>number) ] }
+        { kCFNumberSInt16Type [ SInt16 (CFNumber>number) ] }
+        { kCFNumberSInt32Type [ SInt32 (CFNumber>number) ] }
+        { kCFNumberSInt64Type [ SInt64 (CFNumber>number) ] }
+        { kCFNumberFloat64Type [ double (CFNumber>number) ] }
+        { kCFNumberCharType [ char (CFNumber>number) ] }
+        { kCFNumberShortType [ c:short (CFNumber>number) ] }
+        { kCFNumberIntType [ int (CFNumber>number) ] }
+        { kCFNumberLongType [ long (CFNumber>number) ] }
+        { kCFNumberLongLongType [ longlong (CFNumber>number) ] }
+        { kCFNumberDoubleType [ double (CFNumber>number) ] }
+        [ unsupported-number-type ]
+    } case ;
