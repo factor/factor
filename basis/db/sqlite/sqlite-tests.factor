@@ -162,3 +162,13 @@ watch "WATCH" {
         user>> f user boa select-tuple
     ] with-db
 ] unit-test
+
+{ } [
+    test.db [ [
+            user ensure-table [
+                "mew" "foo" user boa insert-tuple
+                "denny" "kitty" user boa insert-tuple
+            ] with-transaction
+        ] with-transaction
+    ] with-db
+] unit-test
