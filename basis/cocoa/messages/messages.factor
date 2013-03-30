@@ -76,7 +76,7 @@ ERROR: no-objc-method name ;
 
 MEMO: make-prepare-send ( selector method super? -- quot )
     [
-        [ \ <super> , ] when swap lookup-selector ,
+        [ \ <super> , ] when swap <selector> , \ selector ,
     ] [ ] make
     swap second length 2 - '[ _ _ ndip ] ;
 
