@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.order sequences strings
-combinators.short-circuit hints ;
+USING: combinators.short-circuit hints kernel math math.order
+sequences splitting strings ;
 IN: ascii
 
 : ascii? ( ch -- ? ) 0 127 between? ; inline
@@ -18,6 +18,9 @@ IN: ascii
 : >lower ( str -- lower ) [ ch>lower ] map ;
 : ch>upper ( ch -- upper ) dup letter? [ 0x20 - ] when ; inline
 : >upper ( str -- upper ) [ ch>upper ] map ;
+: >words ( str -- words ) [ blank? ] split*-when-slice ;
+: capitalize ( str -- str' ) unclip [ >lower ] [ ch>upper ] bi* prefix ;
+: >title ( str -- title ) >words [ capitalize ] map concat ;
 
 HINTS: >lower string ;
 HINTS: >upper string ;
