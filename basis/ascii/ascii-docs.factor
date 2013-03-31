@@ -57,6 +57,18 @@ HELP: >upper
 { $values { "str" "a string" } { "upper" "a string" } }
 { $description "Converts an ASCII string to upper case." } ;
 
+HELP: >title
+{ $values { "str" "a string" } { "title" "a string" } }
+{ $description "Converts a string to title case." } ;
+
+HELP: >words
+{ $values { "str" "a string" } { "words" "an array of slices" } }
+{ $description "Divides the string up into words." } ;
+
+HELP: capitalize
+{ $values { "str" "a string" } { "str'" "a string" } }
+{ $description "Capitalize all the words in a string." } ;
+
 ARTICLE: "ascii" "ASCII"
 "The " { $vocab-link "ascii" } " vocabulary implements support for the legacy ASCII character set. Most applications should use " { $link "unicode" } " instead."
 $nl
@@ -77,6 +89,7 @@ $nl
     ch>upper
     >lower
     >upper
+    >title
 } ;
 
 ABOUT: "ascii"
