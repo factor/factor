@@ -1,4 +1,4 @@
-USING: ascii tools.test sequences kernel math ;
+USING: ascii tools.test sequences kernel math strings ;
 IN: ascii.tests
 
 [ t ] [ CHAR: a letter? ] unit-test
@@ -17,3 +17,6 @@ IN: ascii.tests
 
 [ "HELLO HOW ARE YOU?" ] [ "hellO hOw arE YOU?" >upper ] unit-test
 [ "i'm good thx bai" ] [ "I'm Good THX bai" >lower ] unit-test
+
+[ "Hello How Are You?" ] [ "hEllo how ARE yOU?" >title ] unit-test
+[ { " " "Hello" "    " "World" } ] [ " Hello    World" >words [ >string ] map ] unit-test
