@@ -91,6 +91,19 @@ M: mixin-instance synopsis*
 
 M: pathname synopsis* pprint* ;
 
+M: alias summary
+    [
+        0 margin set 1 line-limit set
+        [
+            {
+                [ seeing-word ]
+                [ definer. ]
+                [ pprint-word ]
+                [ stack-effect pprint-effect ]
+            } cleave
+        ] with-in
+    ] with-string-writer ;
+
 M: word summary synopsis ;
 
 GENERIC: declarations. ( obj -- )
