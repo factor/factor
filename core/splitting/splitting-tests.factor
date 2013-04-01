@@ -91,24 +91,6 @@ unit-test
 [ "" "ABC" ] [ " ABC" [ blank? ] split1-when-slice [ >string ] bi@ ] unit-test
 [ "a" " bc" ] [ "a  bc" [ blank? ] split1-when-slice [ >string ] bi@ ] unit-test
 
-{ { } } [ { } { 0 } split* ] unit-test
-{ { { 1 2 3 } } } [ { 1 2 3 } { 0 } split* ] unit-test
-{ { { 0 } } } [ { 0 } { 0 } split* ] unit-test
-{ { { 0 0 } } } [ { 0 0 } { 0 } split* ] unit-test
-{ { { 1 2 } { 0 } { 3 } { 0 0 } } } [ { 1 2 0 3 0 0 } { 0 } split* ] unit-test
-{ { "hello" } } [ "hello" " " split* ] unit-test
-{ { "  " "hello" } } [ "  hello" " " split* ] unit-test
-{ { "hello" "    " "world" } } [ "hello    world" " " split* ] unit-test
-{ { "hello" "    " "world" "    " } } [ "hello    world    " " " split* ] unit-test
-
-{ { } } [ { } [ 0 > ] split*-when ] unit-test
-{ { { 0 } } } [ { 0 } [ 0 > ] split*-when ] unit-test
-{ { { 0 0 } } } [ { 0 0 } [ 0 > ] split*-when ] unit-test
-{ { { 1 2 } { 0 } { 3 } { 0 0 } } } [ { 1 2 0 3 0 0 } [ 0 > ] split*-when ] unit-test
-{ { { 1 } { 2 3 } { 1 } { 4 5 } { 1 } { 6 } } } [
-    1 { 1 2 3 1 4 5 1 6 } [ dupd = ] split*-when nip
-] unit-test
-
 { "abarbbarc" }
 [ "afoobfooc" "foo" "bar" replace ] unit-test
 
