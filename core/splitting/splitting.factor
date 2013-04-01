@@ -97,36 +97,8 @@ PRIVATE>
 : split ( seq separators -- pieces )
     [ member? ] curry split-when ; inline
 
-<PRIVATE
-
-: (split*) ( n seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
-    pick [
-        swap curry [ keep swap ] curry [
-            [ [ find-from drop dup ] 2curry [ keep -rot ] curry ] 2keep
-            [ not ] compose [ find-from drop dup ] 2curry
-            [ dip -rot ] curry [ swap ] prepose
-            [ [ dup ] if ] curry [ 2dup = ] prepose
-            [ [ f ] if ] curry compose
-        ] dip produce nip
-    ] 2keep swap [
-        [ length [ swapd dupd < ] keep ] keep
-    ] dip 2curry [ suffix ] compose [ drop ] if ; inline
-
-PRIVATE>
-
-: split*-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ 0 ] 2dip [ subseq ] (split*) ; inline
-
-: split*-when-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ 0 ] 2dip [ <slice> ] (split*) ; inline
-
-: split* ( seq separators -- pieces )
-    [ member? ] curry split*-when ; inline
-
-: split-nth ( seq n -- seq )
-    0 swap
-    [ drop 1 + 2dup = [ drop 0 t ] [ f ] if ] split*-when 2nip
-    ;
+: split-slice ( seq separators -- pieces )
+    [ member? ] curry split-when-slice ; inline
 
 GENERIC: string-lines ( str -- seq )
 
@@ -148,5 +120,4 @@ M: string string-lines
         1array
     ] if ;
 
-M: sbuf string-lines
-    [ "" like string-lines ] keep [ like ] curry map ;
+M: sbuf string-lines "" like string-lines ;

@@ -58,17 +58,17 @@ unit-test
 [ { "hello" "hi" } ] [ "hello\rhi" string-lines ] unit-test
 [ { "hello" "hi" } ] [ "hello\r\nhi" string-lines ] unit-test
 
-[ { SBUF" " } ] [ SBUF" " string-lines ] unit-test
-[ { SBUF" " SBUF"  " } ] [ SBUF" \n" string-lines ] unit-test
-[ { SBUF" " SBUF" " } ] [ SBUF" \r" string-lines ] unit-test
-[ { SBUF" " SBUF" " } ] [ SBUF" \r\n" string-lines ] unit-test
-[ { SBUF" hello" } ] [ SBUF" hello" string-lines ] unit-test
-[ { SBUF" hello" SBUF" " } ] [ SBUF" hello\n" string-lines ] unit-test
-[ { SBUF" hello" SBUF" " } ] [ SBUF" hello\r" string-lines ] unit-test
-[ { SBUF" hello" SBUF" " } ] [ SBUF" hello\r\n" string-lines ] unit-test
-[ { SBUF" hello" SBUF" hi" } ] [ SBUF" hello\nhi" string-lines ] unit-test
-[ { SBUF" hello" SBUF" hi" } ] [ SBUF" hello\rhi" string-lines ] unit-test
-[ { SBUF" hello" SBUF" hi" } ] [ SBUF" hello\r\nhi" string-lines ] unit-test
+[ { "" } ] [ SBUF" " string-lines ] unit-test
+[ { "" "" } ] [ SBUF" \n" string-lines ] unit-test
+[ { "" "" } ] [ SBUF" \r" string-lines ] unit-test
+[ { "" "" } ] [ SBUF" \r\n" string-lines ] unit-test
+[ { "hello" } ] [ SBUF" hello" string-lines ] unit-test
+[ { "hello" "" } ] [ SBUF" hello\n" string-lines ] unit-test
+[ { "hello" "" } ] [ SBUF" hello\r" string-lines ] unit-test
+[ { "hello" "" } ] [ SBUF" hello\r\n" string-lines ] unit-test
+[ { "hello" "hi" } ] [ SBUF" hello\nhi" string-lines ] unit-test
+[ { "hello" "hi" } ] [ SBUF" hello\rhi" string-lines ] unit-test
+[ { "hello" "hi" } ] [ SBUF" hello\r\nhi" string-lines ] unit-test
 
 [ { "hey" "world" "what's" "happening" } ]
 [ "heyAworldBwhat'sChappening" [ LETTER? ] split-when ] unit-test
@@ -90,26 +90,6 @@ unit-test
 [ "" f ] [ "" [ blank? ] split1-when-slice ] unit-test
 [ "" "ABC" ] [ " ABC" [ blank? ] split1-when-slice [ >string ] bi@ ] unit-test
 [ "a" " bc" ] [ "a  bc" [ blank? ] split1-when-slice [ >string ] bi@ ] unit-test
-
-{ { } } [ { } { 0 } split* ] unit-test
-{ { { 1 2 3 } } } [ { 1 2 3 } { 0 } split* ] unit-test
-{ { { 0 } } } [ { 0 } { 0 } split* ] unit-test
-{ { { 0 0 } } } [ { 0 0 } { 0 } split* ] unit-test
-{ { { 1 2 } { 0 } { 3 } { 0 0 } } } [ { 1 2 0 3 0 0 } { 0 } split* ] unit-test
-{ { "hello" } } [ "hello" " " split* ] unit-test
-{ { "  " "hello" } } [ "  hello" " " split* ] unit-test
-{ { "hello" "    " "world" } } [ "hello    world" " " split* ] unit-test
-{ { "hello" "    " "world" "    " } } [ "hello    world    " " " split* ] unit-test
-
-{ { } } [ { } [ 0 > ] split*-when ] unit-test
-{ { { 0 } } } [ { 0 } [ 0 > ] split*-when ] unit-test
-{ { { 0 0 } } } [ { 0 0 } [ 0 > ] split*-when ] unit-test
-{ { { 1 2 } { 0 } { 3 } { 0 0 } } } [ { 1 2 0 3 0 0 } [ 0 > ] split*-when ] unit-test
-{ { { 1 } { 2 3 } { 1 } { 4 5 } { 1 } { 6 } } } [
-    1 { 1 2 3 1 4 5 1 6 } [ dupd = ] split*-when nip
-] unit-test
-
-[ { { 1 2 } { 3 4 } { 5 } } ] [ 2 { 1 2 3 4 5 } split-nth ] unit-test
 
 { "abarbbarc" }
 [ "afoobfooc" "foo" "bar" replace ] unit-test
