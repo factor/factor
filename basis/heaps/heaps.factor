@@ -194,3 +194,9 @@ ERROR: not-a-heap obj ;
     [ check-heap ] dip over heap-empty? [ 2drop ] [
         [ [ heap-pop drop ] dip call ] [ slurp-heap ] 2bi
     ] if ; inline recursive
+
+: >min-heap ( assoc -- min-heap )
+    <min-heap> [ heap-push-all ] keep ;
+
+: >max-heap ( assoc -- min-heap )
+    <max-heap> [ heap-push-all ] keep ;
