@@ -19,4 +19,4 @@ IN: ascii.tests
 [ "i'm good thx bai" ] [ "I'm Good THX bai" >lower ] unit-test
 
 [ "Hello How Are You?" ] [ "hEllo how ARE yOU?" >title ] unit-test
-[ { " " "Hello" "    " "World" } ] [ " Hello    World" >words [ >string ] map ] unit-test
+[ { " " "Hello" " " " " " " "World" } ] [ " Hello   World" >words [ >string ] map ] unit-test
