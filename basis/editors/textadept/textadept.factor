@@ -7,14 +7,6 @@
 ! published by Sam Hocevar.  Consult http://www.wtfpl.net/txt/copying for full
 ! legal details.
 !
-! For this code to work, the following code needs to be added to the textadept
-! "init.lua" file:
-!
-! function my_goto_line(line)
-!     _G.buffer:goto_line(line - 1)
-! end
-! args.register('-J', '--JUMP', 1, my_goto_line, 'Jump to line')
-!
 ! For more information about Textadept, consult http://foicica.com/textadept/
 
 USING: editors io.launcher io.pathnames io.standard-paths kernel
@@ -47,5 +39,6 @@ M: macosx find-textadept-path
 
 M: textadept editor-command ( file line -- command )
     swap [
-        textadept-path , "-f" , , "-J" , number>string ,
+        textadept-path , "-f" , , "-e" ,
+        1 - number>string "goto_line(" ")" surround ,
     ] { } make ;
