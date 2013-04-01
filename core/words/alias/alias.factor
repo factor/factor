@@ -14,5 +14,3 @@ M: alias reset-word
     [ call-next-method ] [ f "alias" set-word-prop ] bi ;
 
 M: alias definer drop \ ALIAS: f ;
-
-M: alias definition def>> first 1quotation ;
