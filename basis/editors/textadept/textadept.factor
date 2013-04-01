@@ -17,8 +17,8 @@
 !
 ! For more information about Textadept, consult http://foicica.com/textadept/
 
-USING: editors io.launcher kernel make math math.parser
-namespaces sequences system ;
+USING: editors io.launcher io.pathnames io.standard-paths kernel
+make math math.parser namespaces sequences system ;
 
 IN: editors.textadept
 
@@ -29,8 +29,13 @@ HOOK: find-textadept-path os ( -- path )
 
 M: object find-textadept-path "textadept" ;
 
-! Example of OS-specific method
-! -----------------------------
+M: macosx find-textadept-path
+    "com.textadept" find-native-bundle [
+        "Contents/MacOS/textadept" append-path
+    ] [
+        f
+    ] if* ;
+
 ! M: windows find-textadept-path
 !     let-Windows-users-fill-this-in
 !     ;
