@@ -72,6 +72,10 @@ unit-test
 
 [ { "hey" "world" "what's" "happening" } ]
 [ "heyAworldBwhat'sChappening" [ LETTER? ] split-when ] unit-test
+{ { { 2 } { 3 } { 5 1 } { 7 } } } [
+    1 { 2 1 3 2 5 1 3 7 }
+    [ dupd = dup [ [ 1 + ] dip ] when ] split-when nip
+] unit-test
 
 [ { "hey" "world" "what's" "happening" } ]
 [
@@ -90,13 +94,20 @@ unit-test
 { { } } [ { } { 0 } split* ] unit-test
 { { { 1 2 3 } } } [ { 1 2 3 } { 0 } split* ] unit-test
 { { { 0 } } } [ { 0 } { 0 } split* ] unit-test
-{ { { 0 } { 0 } } } [ { 0 0 } { 0 } split* ] unit-test
-{ { { 1 2 0 } { 3 0 } { 0 } } } [ { 1 2 0 3 0 0 } { 0 } split* ] unit-test
+{ { { 0 0 } } } [ { 0 0 } { 0 } split* ] unit-test
+{ { { 1 2 } { 0 } { 3 } { 0 0 } } } [ { 1 2 0 3 0 0 } { 0 } split* ] unit-test
+{ { "hello" } } [ "hello" " " split* ] unit-test
+{ { "  " "hello" } } [ "  hello" " " split* ] unit-test
+{ { "hello" "    " "world" } } [ "hello    world" " " split* ] unit-test
+{ { "hello" "    " "world" "    " } } [ "hello    world    " " " split* ] unit-test
 
 { { } } [ { } [ 0 > ] split*-when ] unit-test
 { { { 0 } } } [ { 0 } [ 0 > ] split*-when ] unit-test
 { { { 0 0 } } } [ { 0 0 } [ 0 > ] split*-when ] unit-test
-{ { { 1 } { 2 } { 0 3 } { 0 0 } } } [ { 1 2 0 3 0 0 } [ 0 > ] split*-when ] unit-test
+{ { { 1 2 } { 0 } { 3 } { 0 0 } } } [ { 1 2 0 3 0 0 } [ 0 > ] split*-when ] unit-test
+{ { { 1 } { 2 3 } { 1 } { 4 5 } { 1 } { 6 } } } [
+    1 { 1 2 3 1 4 5 1 6 } [ dupd = ] split*-when nip
+] unit-test
 
 { "abarbbarc" }
 [ "afoobfooc" "foo" "bar" replace ] unit-test

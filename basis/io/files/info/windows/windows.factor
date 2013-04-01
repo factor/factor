@@ -203,8 +203,8 @@ CONSTANT: names-buf-length 16384
         0 uint <ref>
         [ GetVolumePathNamesForVolumeName win32-error=0/f ] 3keep nip
         uint deref head but-last-slice
-        { 0 } split* 
-        [ { } ] [ [ alien>native-string ] map ] if-empty
+        { 0 } split-slice harvest
+        [ { } ] [ [ { 0 } append alien>native-string ] map ] if-empty
     ] with-destructors ;
 
 ! Can error with T{ windows-error f 21 "The device is not ready." }

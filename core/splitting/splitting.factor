@@ -26,7 +26,7 @@ PRIVATE>
 
 <PRIVATE
 
-: (split1) ( seq subseq quot -- before after )
+: (split1) ( seq subseq snip-quot -- before after )
     [
         swap [
             [ drop length ] [ start dup ] 2bi
@@ -56,7 +56,7 @@ PRIVATE>
 
 <PRIVATE
 
-: (split1-when) ( ... seq quot: ( ... elt -- ... ? ) quot -- ... before-slice after-slice )
+: (split1-when) ( ... seq quot: ( ... elt -- ... ? ) snip-quot -- ... before-slice after-slice )
     [ dupd find drop ] dip [ swap [ dup 1 + ] dip ] prepose [ f ] if* ; inline
 
 PRIVATE>
@@ -77,12 +77,14 @@ PRIVATE>
 
 <PRIVATE
 
-: (split) ( n seq quot: ( ... elt -- ... ? ) quot -- pieces )
+: (split) ( n seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
     pick [
-        swap curry [ keep 1 + swap ] curry
-        [ [ find-from drop dup ] 2curry [ dup ] prepose ] dip
-        produce nip
-    ] keep rot [ tail ] unless-zero suffix ; inline
+        swap curry [ keep 1 + swap ] curry [
+            [ find-from drop dup ] 2curry [ keep -rot ] curry
+        ] dip produce nip
+    ] 2keep swap [
+        [ length swapd ] keep
+    ] dip 2curry call suffix ; inline
 
 PRIVATE>
 
@@ -100,14 +102,18 @@ PRIVATE>
 
 <PRIVATE
 
-: (split*) ( n seq quot: ( ... elt -- ... ? ) quot -- )
+: (split*) ( n seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
     pick [
-        swap curry [ 1 + ] prepose [ keep 1 + swap ] curry
-        [ [ find-from drop dup ] 2curry [ dup ] prepose ] dip
-        produce nip
-    ] keep rot over dupd length < [
-        [ tail ] unless-zero suffix
-    ] [ 2drop ] if ; inline
+        swap curry [ keep swap ] curry [
+            [ [ find-from drop dup ] 2curry [ keep -rot ] curry ] 2keep
+            [ not ] compose [ find-from drop dup ] 2curry
+            [ dip -rot ] curry [ swap ] prepose
+            [ [ dup ] if ] curry [ 2dup = ] prepose
+            [ [ f ] if ] curry compose
+        ] dip produce nip
+    ] 2keep swap [
+        [ length [ swapd dupd < ] keep ] keep
+    ] dip 2curry [ suffix ] compose [ drop ] if ; inline
 
 PRIVATE>
 
