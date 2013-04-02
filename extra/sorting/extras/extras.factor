@@ -7,5 +7,5 @@ IN: sorting.extras
     sort [ second-unsafe ] map! ; inline
 
 : map-sort ( ... seq quot: ( ... elt -- ... key ) -- ... sortedseq )
-    [ map ] curry keep zip [ second-unsafe ] sort-with
-    [ first-unsafe ] map ; inline
+    [ map ] curry keep zip [ first-unsafe ] sort-with
+    [ second-unsafe ] map ; inline
