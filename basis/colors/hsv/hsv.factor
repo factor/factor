@@ -42,9 +42,16 @@ M: hsva >rgba ( hsva -- rgba )
         } case
     ] [ alpha>> ] bi <rgba> ; inline
 
+<PRIVATE
+
+: sort-triple ( a b c -- d e f )
+    sort-pair [ sort-pair ] dip sort-pair ;
+
+PRIVATE>
+
 :: rgba>hsva ( rgba -- hsva )
     rgba >rgba-components :> ( r g b a )
-    r g b 3array natural-sort first3 :> ( z y x )
+    r g b sort-triple :> ( z y x )
     x z = x zero? or [ 0 0 x a <hsva> ] [
         {
             { [ r x = g z = and ] [ 5 x b - x z - / + ] }
