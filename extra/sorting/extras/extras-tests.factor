@@ -6,4 +6,7 @@ IN: sorting.extras
     { "hello" "goodbye" "yo" } [ [ length ] bi@ <=> ] argsort
 ] unit-test
 
-{ 1 { 2 3 4 5 } } [ 1 { 1 2 3 4 } [ dupd + ] map-sort ] unit-test
+{ { "blue" "green" "purple" } } [
+    { "green" "blue" "purple" } [ length ] map-sort
+] unit-test
+{ 1 { 1 2 3 4 } } [ 1 { 4 2 1 3 } [ dupd + ] map-sort ] unit-test
