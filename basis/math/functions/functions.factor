@@ -406,6 +406,3 @@ M: float copysign
     [ double>bits ] [ fp-sign ] bi*
     [ 63 2^ bitor ] [ 63 2^ bitnot bitand ] if
     bits>double ;
-
-: round-to ( x n -- y )
-    10^ [ * 0.5 over 0 > [ + ] [ - ] if truncate ] [ / ] bi ;
