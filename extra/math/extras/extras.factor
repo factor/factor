@@ -252,3 +252,6 @@ M: float round-to-even
     ] [
         dup -0x1p52 >= [ 0x1p52 - 0x1p52 + ] when
     ] if ;
+
+: round-to-decimal ( x n -- y )
+    10^ [ * 0.5 over 0 > [ + ] [ - ] if truncate ] [ / ] bi ;
