@@ -34,7 +34,7 @@ IN: regexp.minimize
     ] each out ;
 
 : same-partition? ( s1 s2 partitions -- ? )
-    { [ [ 2array natural-sort ] dip key? ] [ drop = ] } 3|| ;
+    { [ [ sort-pair 2array ] dip key? ] [ drop = ] } 3|| ;
 
 : assemble-values ( assoc1 assoc2 -- values )
     dup keys '[ _ swap [ at ] curry map ] bi@ zip ;
