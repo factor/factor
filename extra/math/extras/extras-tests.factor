@@ -120,3 +120,9 @@ IN: math.extras.test
         12345.6789012 12345.67890123 12345.678901235
     }
 } [ 12345.67890123456 -6 9 [a,b] [ round-to-decimal ] with map ] unit-test
+
+{ 0 } [ 0 5 round-to-step ] unit-test
+{ 0 } [ 1 5 round-to-step ] unit-test
+{ 5 } [ 3 5 round-to-step ] unit-test
+{ 10 } [ 12 5 round-to-step ] unit-test
+{ 15 } [ 13 5 round-to-step ] unit-test
