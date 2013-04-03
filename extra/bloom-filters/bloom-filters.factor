@@ -72,8 +72,8 @@ ERROR: invalid-n-objects n-objects ;
 
 ! If the number of hashes isn't positive, we haven't found
 ! anything smaller than the identity configuration.
-: validate-sizes ( 2seq -- )
-    first 0 <= [ capacity-error ] when ;
+: check-capacity ( 2seq -- 2seq )
+    dup first 0 <= [ capacity-error ] when ;
 
 ! The consensus on the tradeoff between increasing the number of
 ! bits and increasing the number of hash functions seems to be
@@ -83,14 +83,11 @@ ERROR: invalid-n-objects n-objects ;
 ! seen any usage studies from the implementations that made this
 ! tradeoff to support it, and I haven't done my own, but we'll
 ! go with it anyway.
-!
 : size-bloom-filter ( error-rate number-objects -- number-hashes number-bits )
-    [ n-hashes-range identity-configuration ] 2dip
-    '[ dup [ _ _ bits-to-satisfy-error-rate ]
-       call 2array smaller-second ]
-    reduce
-    dup validate-sizes
-    first2 ;
+    [ n-hashes-range identity-configuration ] 2dip '[
+        dup _ _ bits-to-satisfy-error-rate
+        2array smaller-second
+    ] reduce check-capacity first2 ;
 
 : check-n-objects ( n-objects -- n-objects )
     dup 0 <= [ invalid-n-objects ] when ;
