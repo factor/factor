@@ -77,6 +77,11 @@ IN: sequences.extras.tests
 { t } [ "ABC" dup [ blank? ] ?trim [ identity-hashcode ] same? ] unit-test
 { "ABC" } [ " ABC " [ blank? ] ?trim ] unit-test
 
+{ t } [ "ABC" dup [ blank? ] ?trim-head [ identity-hashcode ] same? ] unit-test
+{ t } [ "ABC" dup [ blank? ] ?trim-tail [ identity-hashcode ] same? ] unit-test
+{ "ABC " } [ " ABC " [ blank? ] ?trim-head ] unit-test
+{ " ABC" } [ " ABC " [ blank? ] ?trim-tail ] unit-test
+
 { "" } [ "" "" "" unsurround ] unit-test
 { "" } [ "  " " " " " unsurround ] unit-test
 { "foo.com" } [ "http://foo.com" "http://" "/" unsurround ] unit-test
