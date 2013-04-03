@@ -242,10 +242,22 @@ PRIVATE>
 : trim-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... newseq )
     [ trim-slice ] [ like ] bi* ; inline
 
-: ?trim ( ... seq quot: ( ... elt -- ... ? ) -- ... seq/newseq )
+: ?trim ( seq quot: ( elt -- ? ) -- seq/newseq )
     over empty? [ drop ] [
         over [ first-unsafe ] [ last-unsafe ] bi pick bi@ or
         [ trim ] [ drop ] if
+    ] if ; inline
+
+: ?trim-head ( seq quot: ( elt -- ? ) -- seq/newseq )
+    over empty? [ drop ] [
+        over first-unsafe over call
+        [ trim-head ] [ drop ] if
+    ] if ; inline
+
+: ?trim-tail ( seq quot: ( elt -- ? ) -- seq/newseq )
+    over empty? [ drop ] [
+        over last-unsafe over call
+        [ trim-tail ] [ drop ] if
     ] if ; inline
 
 : unsurround ( newseq seq2 seq3 -- seq1 )
