@@ -32,11 +32,6 @@ $nl
 { $subsections >rgba }
 "Extracting RGBA components of colors:"
 { $subsections >rgba-components }
-"Mixing colors:"
-{ $subsections
-    linear-gradient
-    sample-linear-gradient
-}
 "Further topics:"
 { $subsections
     "colors.protocol"
