@@ -1,5 +1,5 @@
 USING: colors.constants kernel tools.test ;
-IN: colors
+IN: colors.mix
 
 { COLOR: blue } [ COLOR: blue COLOR: red 0.0 linear-gradient ] unit-test
 { COLOR: red } [ COLOR: blue COLOR: red 1.0 linear-gradient ] unit-test
