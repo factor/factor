@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors combinators kernel locals math
-math.functions sequences sorting ;
+math.functions random sequences sorting ;
 IN: colors.hsv
 
 ! h [0,360)
@@ -71,3 +71,8 @@ PRIVATE>
         [ value>> ]
         [ alpha>> ]
     } cleave <hsva> ;
+
+: golden-rainbow ( num-colors saturation luminance -- colors )
+    [ random-unit ] 3dip '[
+        0.618033988749895 + 1.0 mod dup _ _ 1.0 <hsva>
+    ] replicate nip ;
