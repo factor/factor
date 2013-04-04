@@ -44,14 +44,14 @@ TODO:
 */
 
 TUPLE: bloom-filter
-{ n-hashes fixnum read-only }
+{ #hashes fixnum read-only }
 { bits bit-array read-only }
-{ maximum-n-objects fixnum read-only }
-{ current-n-objects fixnum } ;
+{ capacity fixnum read-only }
+{ count fixnum } ;
 
 ERROR: capacity-error ;
 ERROR: invalid-error-rate error-rate ;
-ERROR: invalid-n-objects n-objects ;
+ERROR: invalid-capacity capacity ;
 
 <PRIVATE
 
@@ -60,10 +60,10 @@ ERROR: invalid-n-objects n-objects ;
     ceiling >integer ;
 
 ! 100 hashes ought to be enough for anybody.
-: n-hashes-range ( -- range )
+: #hashes-range ( -- range )
     100 [1,b] ;
 
-! { n-hashes n-bits }
+! { #hashes #bits }
 : identity-configuration ( -- 2seq )
     0 max-array-capacity 2array ;
 
@@ -72,7 +72,7 @@ ERROR: invalid-n-objects n-objects ;
 
 ! If the number of hashes isn't positive, we haven't found
 ! anything smaller than the identity configuration.
-: check-capacity ( 2seq -- 2seq )
+: check-hashes ( 2seq -- 2seq )
     dup first 0 <= [ capacity-error ] when ;
 
 ! The consensus on the tradeoff between increasing the number of
@@ -84,13 +84,13 @@ ERROR: invalid-n-objects n-objects ;
 ! tradeoff to support it, and I haven't done my own, but we'll
 ! go with it anyway.
 : size-bloom-filter ( error-rate number-objects -- number-hashes number-bits )
-    [ n-hashes-range identity-configuration ] 2dip '[
+    [ #hashes-range identity-configuration ] 2dip '[
         dup _ _ bits-to-satisfy-error-rate
         2array smaller-second
-    ] reduce check-capacity first2 ;
+    ] reduce check-hashes first2 ;
 
-: check-n-objects ( n-objects -- n-objects )
-    dup 0 <= [ invalid-n-objects ] when ;
+: check-capacity ( capacity -- capacity )
+    dup 0 <= [ invalid-capacity ] when ;
 
 : check-error-rate ( error-rate -- error-rate )
     dup [ 0 after? ] [ 1 before? ] bi and
@@ -98,8 +98,8 @@ ERROR: invalid-n-objects n-objects ;
 
 PRIVATE>
 
-: <bloom-filter> ( error-rate number-objects -- bloom-filter )
-    [ check-error-rate ] [ check-n-objects ] bi*
+: <bloom-filter> ( error-rate capacity -- bloom-filter )
+    [ check-error-rate ] [ check-capacity ] bi*
     [ size-bloom-filter <bit-array> ] keep
     0 ! initially empty
     bloom-filter boa ;
@@ -110,32 +110,28 @@ PRIVATE>
 ! Dillinger and Panagiotis Manolios, section 5.2, "Enhanced
 ! Double Hashing":
 ! http://www.cc.gatech.edu/~manolios/research/bloom-filters-verification.html
-: enhanced-double-hash ( index hash0 hash1 -- hash )
+: combine-hashcodes ( index hash0 hash1 -- hash )
     { fixnum fixnum fixnum } declare
     [ [ [ 3 ^ ] [ - ] bi 6 /i ] keep ]
     [ fixnum*fast ] [ fixnum+fast ] tri* + abs ;
 
-: enhanced-double-hashes ( hash0 hash1 length -- quot: ( elt -- n ) )
-    '[ _ _ enhanced-double-hash _ mod ] ; inline
-
-! Make sure it's a fixnum here to speed up double-hashing.
-: hashcodes-from-object ( object -- n n )
+: double-hashcodes ( object -- hash0 hash1 )
     hashcode >fixnum dup most-positive-fixnum bitxor >fixnum ;
 
-: increment-n-objects ( bloom-filter -- )
-    [ 1 + ] change-current-n-objects drop ; inline
+: increment-count ( bloom-filter -- )
+    [ 1 + ] change-count drop ; inline
 
-: n-hashes-and-length ( bloom-filter -- n-hashes length )
-    [ n-hashes>> ] [ bits>> length ] bi ; inline
+: #hashes-and-length ( bloom-filter -- #hashes length )
+    [ #hashes>> ] [ bits>> length ] bi ; inline
 
 : relevant-indices ( object bloom-filter -- n quot: ( elt -- n ) )
-    [ hashcodes-from-object ] [ n-hashes-and-length ] bi*
-    [ -rot ] dip enhanced-double-hashes ; inline
+    [ double-hashcodes ] [ #hashes-and-length ] bi*
+    [ -rot ] dip '[ _ _ combine-hashcodes _ mod ] ; inline
 
 PRIVATE>
 
 TYPED: bloom-filter-insert ( object bloom-filter: bloom-filter -- )
-    [ increment-n-objects ]
+    [ increment-count ]
     [ relevant-indices ]
     [ bits>> [ [ t ] 2dip set-nth-unsafe ] curry ]
     tri compose each-integer ;
