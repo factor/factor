@@ -3,10 +3,10 @@ IN: bloom-filters
 
 HELP: <bloom-filter>
 { $values { "error-rate" "The desired false positive rate.  A " { $link float } " between 0 and 1." }
-          { "number-objects" "The expected number of object in the set.  A positive " { $link integer } "." }
+          { "capacity" "The expected number of object in the set.  A positive " { $link integer } "." }
           { "bloom-filter" bloom-filter } }
 { $description "Creates an empty Bloom filter." }
-{ $errors "Throws a " { $link capacity-error } " when unable to produce a filter meeting the given constraints.  Throws a " { $link invalid-error-rate } " or a " { $link invalid-n-objects } " when input is invalid." } ;
+{ $errors "Throws a " { $link invalid-size } " when unable to produce a filter meeting the given constraints.  Throws a " { $link invalid-error-rate } " or a " { $link invalid-capacity } " when input is invalid." } ;
 
 
 HELP: bloom-filter-insert
