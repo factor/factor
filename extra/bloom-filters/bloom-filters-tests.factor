@@ -38,8 +38,6 @@ IN: bloom-filters.tests
 ! lot of hash codes, and it's better to do this earlier than later.
 [ t ] [ 10000 iota [ hashcodes-from-object [ fixnum? ] both? ] map [ ] all? ] unit-test
 
-[ ?{ t f t f t f } ] [ { 0 2 4 } 6 <bit-array> [ set-indices ] keep ] unit-test
-
 : empty-bloom-filter ( -- bloom-filter )
     0.01 2000 <bloom-filter> ;
 
