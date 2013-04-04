@@ -23,7 +23,7 @@ IN: bloom-filters.tests
 [ 4 32 ] [ 0.05 5 size-bloom-filter ] unit-test
 
 ! This is a lot of bits.
-[ 0.00000001 max-array-capacity size-bloom-filter ] [ capacity-error? ]  must-fail-with
+[ 0.00000001 max-array-capacity size-bloom-filter ] [ invalid-size? ]  must-fail-with
 
 ! Other error conditions.
 [ 1.0 2000 <bloom-filter> ] [ invalid-error-rate? ] must-fail-with
