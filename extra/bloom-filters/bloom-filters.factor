@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Alec Berryman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays bit-arrays fry kernel layouts locals
-math math.functions math.order math.private multiline sequences
-sequences.private typed ;
+USING: accessors arrays bit-arrays fry kernel kernel.private
+layouts locals math math.functions math.order math.private
+multiline sequences sequences.private typed ;
 FROM: math.ranges => [1,b] ;
 
 IN: bloom-filters
@@ -110,38 +110,37 @@ PRIVATE>
 ! Dillinger and Panagiotis Manolios, section 5.2, "Enhanced
 ! Double Hashing":
 ! http://www.cc.gatech.edu/~manolios/research/bloom-filters-verification.html
-TYPED:: enhanced-double-hash ( index: fixnum hash0: fixnum hash1: fixnum -- hash )
-    hash0 index fixnum*fast hash1 fixnum+fast
-    index 3 ^ index - 6 /i + abs ;
+: enhanced-double-hash ( index hash0 hash1 -- hash )
+    { fixnum fixnum fixnum } declare
+    [ [ [ 3 ^ ] [ - ] bi 6 /i ] keep ]
+    [ fixnum*fast ] [ fixnum+fast ] tri* + abs ;
 
-: enhanced-double-hashes ( hash0 hash1 n -- seq )
-    -rot '[ _ _ enhanced-double-hash ] { } map-integers ;
+: enhanced-double-hashes ( hash0 hash1 length -- quot: ( elt -- n ) )
+    '[ _ _ enhanced-double-hash _ mod ] ; inline
 
 ! Make sure it's a fixnum here to speed up double-hashing.
-: hashcodes-from-object ( obj -- n n )
+: hashcodes-from-object ( object -- n n )
     hashcode >fixnum dup most-positive-fixnum bitxor >fixnum ;
 
-TYPED: set-indices ( indices: array bit-array: bit-array -- )
-    [ t ] 2dip [ set-nth-unsafe ] curry with each ; inline
-
-TYPED: increment-n-objects ( bloom-filter: bloom-filter -- )
+: increment-n-objects ( bloom-filter -- )
     [ 1 + ] change-current-n-objects drop ; inline
 
-TYPED: n-hashes-and-length ( bloom-filter: bloom-filter -- n-hashes length )
-    [ n-hashes>> ] [ bits>> length ] bi ;
+: n-hashes-and-length ( bloom-filter -- n-hashes length )
+    [ n-hashes>> ] [ bits>> length ] bi ; inline
 
-TYPED: relevant-indices ( value bloom-filter: bloom-filter -- indices )
+: relevant-indices ( object bloom-filter -- n quot: ( elt -- n ) )
     [ hashcodes-from-object ] [ n-hashes-and-length ] bi*
-    [ enhanced-double-hashes ] dip '[ _ mod ] map ;
+    [ -rot ] dip enhanced-double-hashes ; inline
 
 PRIVATE>
 
-: bloom-filter-insert ( object bloom-filter -- )
+TYPED: bloom-filter-insert ( object bloom-filter: bloom-filter -- )
     [ increment-n-objects ]
     [ relevant-indices ]
-    [ bits>> set-indices ]
-    tri ;
+    [ bits>> [ [ t ] 2dip set-nth-unsafe ] curry ]
+    tri compose each-integer ;
 
-: bloom-filter-member? ( object bloom-filter -- ? )
-    [ relevant-indices ] [ bits>> ] bi
-    [ nth-unsafe ] curry all? ;
+TYPED: bloom-filter-member? ( object bloom-filter: bloom-filter -- ? )
+    [ relevant-indices ]
+    [ bits>> [ nth-unsafe ] curry ]
+    bi compose all-integers? ;
