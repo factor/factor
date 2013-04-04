@@ -21,7 +21,7 @@ Terminal    =   ("-"|"+"):op Terminal:term => [[ term op "-" = [ ast-negation bo
               | Number | Array | Slice | Function
               | Identifier => [[ ast-local boa ]]
 
-Product     =   Product:p ("*"|"/"|"%"):op Terminal:term  => [[ p term op ast-op boa ]]
+Product     =   Product:p ("**"|"*"|"/"|"%"):op Terminal:term  => [[ p term op ast-op boa ]]
               | Terminal
 
 Sum         =   Sum:s ("+"|"-"):op Product:p  => [[ s p op ast-op boa ]]

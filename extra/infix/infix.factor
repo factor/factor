@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 effects fry infix.parser infix.ast kernel locals locals.parser
-locals.types math math.order math.ranges multiline namespaces
-parser quotations sequences summary words vocabs.parser ;
+locals.types math math.functions math.order math.ranges
+multiline namespaces parser quotations sequences summary
+words vocabs.parser ;
 
 IN: infix
 
@@ -18,13 +19,17 @@ M: local-not-defined summary
 : >local-word ( string -- word )
     locals get ?at [ local-not-defined ] unless ;
 
+ERROR: invalid-op string ;
+
 : select-op ( string -- word )
     {
         { "+" [ [ + ] ] }
         { "-" [ [ - ] ] }
         { "*" [ [ * ] ] }
         { "/" [ [ / ] ] }
-        [ drop [ mod ] ]
+        { "%" [ [ mod ] ] }
+        { "**" [ [ ^ ] ] }
+        [ invalid-op ]
     } case ;
 
 GENERIC: infix-codegen ( ast -- quot/number )
