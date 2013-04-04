@@ -114,7 +114,7 @@ M: range-observer model-changed
 
     2 2 <frame> { 4 4 } >>gap { 0 0 } >>filled-cell
 
-    "polulation" <label> { 0 0 } grid-add
+    "population" <label> { 0 0 } grid-add
     initial-population 0 0 200 10 mr:<range>
     dup [ boids-gadget set-population ] connect
     horizontal <slider> { 1 0 } grid-add
