@@ -29,15 +29,11 @@ ERROR: malformed-base85 ;
         reverse! nip [ _ write1-lines ] each
     ] change ; inline
 
-: encode-pad ( seq n -- )
-    [ 4 0 pad-tail binary [ encode4 ] with-byte-writer ]
-    [ 1 + ] bi* head-slice 5 CHAR: = pad-tail write-lines ; inline
-
 : (encode-base85) ( stream -- )
     4 over stream-read dup length {
         { 0 [ 2drop ] }
         { 4 [ encode4 (encode-base85) ] }
-        [ encode-pad (encode-base85) ]
+        [ drop 4 0 pad-tail encode4 (encode-base85) ]
     } case ;
 
 PRIVATE>
@@ -51,9 +47,9 @@ PRIVATE>
 <PRIVATE
 
 : decode5 ( seq -- )
-    [ 0 [ [ 85 * ] [ base85>ch ] bi* + ] reduce 4 >be ]
-    [ [ CHAR: = = ] count ] bi head-slice*
-    output-stream get '[ _ stream-write1 ] each ; inline
+    0 [ [ 85 * ] [ base85>ch ] bi* + ] reduce 4 >be
+    [ zero? ] trim-tail-slice output-stream get
+    '[ _ stream-write1 ] each ; inline
 
 : (decode-base85) ( stream -- )
     5 "\n\r" pick read-ignoring dup length {
