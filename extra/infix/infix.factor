@@ -112,14 +112,11 @@ M: ast-function infix-codegen
     [ arguments>> [ arguments-codegen ] [ length ] bi ]
     [ name>> ] bi find-and-check ;
 
-: [infix-parse ( end -- result/quot )
+: parse-infix-quotation ( end -- result/quot )
     parse-multiline-string build-infix-ast
     infix-codegen prepare-operand ;
 
 PRIVATE>
 
 SYNTAX: [infix
-    "infix]" [infix-parse suffix! \ call suffix! ;
-
-SYNTAX: infix[
-    "]" [infix-parse suffix! \ call suffix! ;
+    "infix]" parse-infix-quotation suffix! \ call suffix! ;
