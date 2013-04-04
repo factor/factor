@@ -8,6 +8,7 @@ IN: infix.tests
 [ 0.5 ] [ [infix 3.0/6 infix] ] unit-test
 [ 1+2/3 ] [ [infix 5/3 infix] ] unit-test
 [ 3 ] [ [infix 2*7%3+1 infix] ] unit-test
+[ 1419857 ] [ [infix 17**5 infix] ] unit-test
 [ 1 ] [ [infix 2-
      1
      -5*
