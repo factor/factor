@@ -120,3 +120,6 @@ PRIVATE>
 
 SYNTAX: [infix
     "infix]" [infix-parse suffix! \ call suffix! ;
+
+SYNTAX: infix[
+    "]" [infix-parse suffix! \ call suffix! ;
