@@ -11,7 +11,7 @@ $nl
 { $code "USE: tools.scaffold" }
 $nl
 "Then, ask the scaffold tool to create a new vocabulary named " { $snippet "palindrome" } ":"
-{ $code "\"resource:work\" \"palindrome\" scaffold-vocab" }
+{ $code "\"palindrome\" scaffold-work" }
 $nl
 "If you look at the output, you will see that a few files were created in your “work” directory, and that the new source file was loaded."
 $nl
