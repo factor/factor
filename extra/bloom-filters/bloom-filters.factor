@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Alec Berryman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays bit-arrays fry kernel layouts locals
-math math.functions math.order multiline sequences
+math math.functions math.order math.private multiline sequences
 sequences.private typed ;
 FROM: math.ranges => [1,b] ;
 
@@ -110,18 +110,16 @@ PRIVATE>
 ! Dillinger and Panagiotis Manolios, section 5.2, "Enhanced
 ! Double Hashing":
 ! http://www.cc.gatech.edu/~manolios/research/bloom-filters-verification.html
-:: enhanced-double-hash ( index hash0 hash1 -- hash )
-    hash0 index * hash1 + index 3 ^ index - 6 /i + ;
+TYPED:: enhanced-double-hash ( index: fixnum hash0: fixnum hash1: fixnum -- hash )
+    hash0 index fixnum*fast hash1 fixnum+fast
+    index 3 ^ index - 6 /i + abs ;
 
 : enhanced-double-hashes ( hash0 hash1 n -- seq )
     -rot '[ _ _ enhanced-double-hash ] { } map-integers ;
 
 ! Make sure it's a fixnum here to speed up double-hashing.
-: hashcodes-from-hashcode ( hash0 -- hash0 hash1 )
-    dup most-positive-fixnum bitxor ;
-
 : hashcodes-from-object ( obj -- n n )
-    hashcode abs hashcodes-from-hashcode ;
+    hashcode >fixnum dup most-positive-fixnum bitxor >fixnum ;
 
 TYPED: set-indices ( indices: array bit-array: bit-array -- )
     [ t ] 2dip [ set-nth-unsafe ] curry with each ; inline
