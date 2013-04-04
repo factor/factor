@@ -49,7 +49,7 @@ TUPLE: bloom-filter
 { capacity fixnum read-only }
 { count fixnum } ;
 
-ERROR: capacity-error ;
+ERROR: invalid-size ;
 ERROR: invalid-error-rate error-rate ;
 ERROR: invalid-capacity capacity ;
 
@@ -73,7 +73,7 @@ ERROR: invalid-capacity capacity ;
 ! If the number of hashes isn't positive, we haven't found
 ! anything smaller than the identity configuration.
 : check-hashes ( 2seq -- 2seq )
-    dup first 0 <= [ capacity-error ] when ;
+    dup first 0 <= [ invalid-size ] when ;
 
 ! The consensus on the tradeoff between increasing the number of
 ! bits and increasing the number of hash functions seems to be
