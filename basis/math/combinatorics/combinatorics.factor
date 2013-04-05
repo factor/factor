@@ -34,11 +34,14 @@ MEMO: factorial ( n -- n! )
 : factoradic ( n -- factoradic )
     0 [ over 0 > ] [ 1 + [ /mod ] keep swap ] produce reverse! 2nip ;
 
-: (>permutation) ( seq n -- seq )
-    [ '[ _ dupd >= [ 1 + ] when ] map! ] keep prefix ;
+: bump-indices ( seq n -- )
+    '[ dup _ >= [ 1 + ] when ] map! drop ; inline
+
+: (>permutation) ( seq n index -- seq )
+    swap [ dupd head-slice ] dip bump-indices ;
 
 : >permutation ( factoradic -- permutation )
-    reverse! 1 cut [ (>permutation) ] each ;
+    reverse! dup [ (>permutation) ] each-index reverse! ;
 
 : permutation-indices ( n seq -- permutation )
     length [ factoradic ] dip 0 pad-head >permutation ;
