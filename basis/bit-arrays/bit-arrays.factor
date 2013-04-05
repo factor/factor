@@ -18,7 +18,7 @@ TUPLE: bit-array
 : bit/byte ( n -- bit byte ) [ 7 bitand ] [ n>byte ] bi ; inline
 
 : bit-index ( n bit-array -- bit# byte# byte-array )
-    [ >fixnum bit/byte ] [ underlying>> ] bi* ; inline
+    [ integer>fixnum bit/byte ] [ underlying>> ] bi* ; inline
 
 : bits>cells ( m -- n ) 31 + -5 shift ; inline
 
@@ -28,17 +28,17 @@ TUPLE: bit-array
     [ [ length bits>cells ] keep ] dip swap underlying>>
     '[ [ _ _ ] dip 4 * set-alien-unsigned-4 ] each-integer ; inline
 
-: clean-up ( bit-array -- )
+: clean-up ( bit-array -- bit-array )
     ! Zero bits after the end.
-    dup underlying>> empty? [ drop ] [
+    dup underlying>> [ ] [
         [
-            [ underlying>> length 8 * ] [ length ] bi -
+            length 8 * over length -
             8 swap - -1 swap shift bitnot
         ]
-        [ underlying>> last bitand ]
-        [ underlying>> set-last ]
+        [ last bitand ]
+        [ set-last ]
         tri
-    ] if ; inline
+    ] if-empty ; inline
 
 :: toggle-bit ( ? n x -- y )
     x n ? [ set-bit ] [ clear-bit ] if ; inline
@@ -82,12 +82,8 @@ M: bit-array equal?
     over bit-array? [ [ underlying>> ] bi@ sequence= ] [ 2drop f ] if ;
 
 M: bit-array resize
-    [ drop ] [
-        [ bits>bytes ] [ underlying>> ] bi*
-        resize-byte-array
-    ] 2bi
-    bit-array boa
-    dup clean-up ; inline
+    dupd [ bits>bytes ] [ underlying>> ] bi*
+    resize-byte-array bit-array boa clean-up ; inline
 
 M: bit-array byte-length length bits>bytes ; inline
 
