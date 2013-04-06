@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bootstrap.image.private
-combinators.smart compiler.units generic generic.single graphs
-hashtables help help.crossref help.markup help.topics init io
-io.pathnames io.styles kernel namespaces quotations see
-sequences sets sorting source-files threads vocabs words ;
+USING: accessors arrays assocs combinators.smart compiler.units
+generic generic.single graphs hash-sets.identity hashtables help
+help.crossref help.markup help.topics init io io.pathnames
+io.styles kernel namespaces quotations see sequences sets
+sorting source-files threads vocabs words ;
 IN: tools.crossref
 
 SYMBOL: crossref
@@ -22,12 +22,12 @@ M: object quot-uses 2drop ;
 M: word quot-uses over crossref? [ adjoin ] [ 2drop ] if ;
 
 : seq-uses ( seq set -- )
-    over <eq-wrapper> visited get ?adjoin [
+    over visited get ?adjoin [
         [ quot-uses ] curry each
     ] [ 2drop ] if ; inline
 
 : assoc-uses ( assoc' set -- )
-    over <eq-wrapper> visited get ?adjoin [
+    over visited get ?adjoin [
         [ quot-uses ] curry [ bi@ ] curry assoc-each
     ] [ 2drop ] if ; inline
 
@@ -40,7 +40,7 @@ M: callable quot-uses seq-uses ;
 M: wrapper quot-uses [ wrapped>> ] dip quot-uses ;
 
 M: callable uses ( quot -- seq )
-    HS{ } clone visited [
+    IHS{ } clone visited [
         HS{ } clone [ quot-uses ] keep members
     ] with-variable ;
 
