@@ -4,7 +4,7 @@ USING: arrays generic hashtables io kernel math assocs
 namespaces make sequences strings io.styles vectors words
 prettyprint.config splitting classes continuations
 accessors sets vocabs.parser combinators vocabs
-classes.maybe ;
+classes.maybe combinators.short-circuit ;
 FROM: sets => members ;
 FROM: namespaces => set ;
 IN: prettyprint.sections
@@ -180,9 +180,10 @@ TUPLE: block < section sections ;
     last-section t >>end-group? drop ;
 
 : advance ( section -- )
-    [ start>> pprinter get last-newline>> = not ]
-    [ short-section? ] bi
-    and [ bl ] when ;
+    {
+        [ start>> pprinter get last-newline>> = not ]
+        [ short-section? ]
+    } 1&& [ bl ] when ;
 
 : add-line-break ( type -- ) [ <line-break> add-section ] when* ;
 
@@ -263,9 +264,10 @@ M: flow short-section? ( section -- ? )
     #! If we can make room for this entire block by inserting
     #! a newline, do it; otherwise, don't bother, print it as
     #! a short section
-    [ section-fits? ]
-    [ [ end>> ] [ start>> ] bi - text-fits? not ] bi
-    or ;
+    {
+        [ section-fits? ]
+        [ [ end>> ] [ start>> ] bi - text-fits? not ]
+    } 1|| ;
 
 : <flow ( -- ) <flow> (<block) ;
 
@@ -311,9 +313,10 @@ SYMBOL: next
 : split-groups ( ? -- ) [ t , ] when ;
 
 : split-before ( section -- )
-    [ start-group?>> prev get [ end-group?>> ] [ t ] if* and ]
-    [ flow? prev get flow? not and ]
-    bi or split-groups ;
+    {
+        [ start-group?>> prev get [ end-group?>> ] [ t ] if* and ]
+        [ flow? prev get flow? not and ]
+    } 1|| split-groups ;
 
 : split-after ( section -- )
     [ end-group?>> ] [ f ] if* split-groups ;
@@ -328,7 +331,7 @@ SYMBOL: next
     ] { } make { t } split harvest ;
 
 : break-group? ( seq -- ? )
-    [ first section-fits? ] [ last section-fits? not ] bi and ;
+    { [ first section-fits? ] [ last section-fits? not ] } 1&& ;
 
 : ?break-group ( seq -- )
     dup break-group? [ first <fresh-line ] [ drop ] if ;
@@ -353,18 +356,16 @@ M: block long-section ( block -- )
     [ ]
     tri ;
 
-: make-pprint ( obj quot -- block manifest )
+: make-pprint ( obj quot manifest? -- block manifest/f )
     [
         0 position ,,
         HS{ } clone pprinter-use ,,
         V{ } clone recursion-check ,,
         V{ } clone pprinter-stack ,,
     ] H{ } make [
-        over <object
-        call
-        pprinter-block
-        pprinter-manifest
+        [ over <object call pprinter-block ] dip
+        [ pprinter-manifest ] [ f ] if
     ] with-variables ; inline
 
 : with-pprint ( obj quot -- )
-    make-pprint drop do-pprint ; inline
+    f make-pprint drop do-pprint ; inline
