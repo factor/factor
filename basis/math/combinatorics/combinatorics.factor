@@ -49,9 +49,6 @@ MEMO: factorial ( n -- n! )
 : permutation-iota ( seq -- iota )
     length factorial iota ; inline
 
-: nths-unsafe ( indices seq -- seq' )
-    [ [ nth-unsafe ] curry ] keep map-as ;
-
 PRIVATE>
 
 : permutation ( n seq -- seq' )
