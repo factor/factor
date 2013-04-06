@@ -49,10 +49,13 @@ MEMO: factorial ( n -- n! )
 : permutation-iota ( seq -- iota )
     length factorial iota ; inline
 
+: nths-unsafe ( indices seq -- seq' )
+    [ [ nth-unsafe ] curry ] keep map-as ;
+
 PRIVATE>
 
 : permutation ( n seq -- seq' )
-    [ permutation-indices ] keep nths ;
+    [ permutation-indices ] keep nths-unsafe ;
 
 TUPLE: permutations length seq ;
 
@@ -139,13 +142,13 @@ PRIVATE>
 :: combinations-quot ( seq k quot -- seq quot )
     seq length :> n
     n k nCk iota [
-        k n combination-indices seq nths quot call
+        k n combination-indices seq nths-unsafe quot call
     ] ; inline
 
 PRIVATE>
 
 : combination ( m seq k -- seq' )
-    swap [ length combination-indices ] [ nths ] bi ;
+    swap [ length combination-indices ] [ nths-unsafe ] bi ;
 
 TUPLE: combinations seq k length ;
 
