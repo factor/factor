@@ -599,6 +599,13 @@ PRIVATE>
     swap V{ } clone
     [ [ (indices) ] 2curry each-index ] keep ;
 
+<PRIVATE
+
+: nths-unsafe ( indices seq -- seq' )
+    [ [ nth-unsafe ] curry ] keep map-as ;
+
+PRIVATE>
+
 : nths ( indices seq -- seq' )
     [ [ nth ] curry ] keep map-as ;
 
