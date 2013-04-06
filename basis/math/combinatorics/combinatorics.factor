@@ -24,7 +24,7 @@ MEMO: factorial ( n -- n! )
     2dup possible? [ dupd - [a,b) product ] [ 2drop 0 ] if ;
 
 : nCk ( n k -- nCk )
-    twiddle [ nPk ] keep factorial / ;
+    twiddle [ nPk ] keep factorial /i ;
 
 
 ! Factoradic-based permutation methodology
@@ -111,6 +111,7 @@ PRIVATE>
 
 : next-permutation ( seq -- seq )
     dup [ ] [ drop (next-permutation) ] if-empty ;
+
 
 ! Combinadic-based combination methodology
 
