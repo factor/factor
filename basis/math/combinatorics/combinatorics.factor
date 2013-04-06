@@ -189,8 +189,8 @@ INSTANCE: combinations immutable-sequence
 <PRIVATE
 
 : (selections) ( seq n -- selections )
-    [ [ 1array ] map dup ] [ 1 - ] bi* [
-        cartesian-product concat [ { } concat-as ] map
+    [ dup [ 1sequence ] curry { } map-as dup ] [ 1 - ] bi* [
+        cartesian-product concat [ concat ] map
     ] with times ;
 
 PRIVATE>
