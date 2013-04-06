@@ -1,11 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays io io.styles kernel namespaces make
-parser prettyprint sequences words words.symbol assocs
-definitions generic quotations effects slots continuations
-classes.tuple debugger combinators vocabs help.stylesheet
-help.topics help.crossref help.markup sorting classes
-vocabs.loader ;
+USING: accessors arrays assocs classes classes.tuple
+combinators combinators.short-circuit continuations debugger
+effects generic help.crossref help.markup help.stylesheet
+help.topics io io.styles kernel make namespaces prettyprint
+sequences sorting vocabs words words.symbol ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -40,7 +39,10 @@ M: predicate word-help* drop \ $predicate ;
     all-articles [ xref-article ] each ;
 
 : error? ( word -- ? )
-    \ $error-description swap word-help elements empty? not ;
+    {
+        [ error-class? ]
+        [ \ $error-description swap word-help elements empty? not ]
+    } 1|| ;
 
 : sort-articles ( seq -- newseq )
     [ dup article-title ] { } map>assoc sort-values keys ;
