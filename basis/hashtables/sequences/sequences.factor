@@ -20,7 +20,7 @@ M: sequence-wrapper hashcode*
 
 TUPLE: sequence-hashtable < wrapped-hashtable ;
 
-: <sequence-hashtable> ( n -- ihash )
+: <sequence-hashtable> ( n -- shashtable )
     <hashtable> sequence-hashtable boa ; inline
 
 M: sequence-hashtable wrap-key drop <sequence-wrapper> ;
