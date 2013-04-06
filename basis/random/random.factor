@@ -116,7 +116,7 @@ ERROR: too-many-samples seq n ;
 : sample ( seq n -- seq' )
     2dup [ length ] dip < [ too-many-samples ] when
     [ [ length iota >array ] dip [ randomize-n-last ] keep tail-slice* ]
-    [ drop ] 2bi nths ;
+    [ drop ] 2bi nths-unsafe ;
 
 : delete-random ( seq -- elt )
     [ length random-integer ] keep
