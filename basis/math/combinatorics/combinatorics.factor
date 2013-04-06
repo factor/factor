@@ -68,13 +68,18 @@ M: permutations hashcode* tuple-hashcode ;
 
 INSTANCE: permutations immutable-sequence
 
+<PRIVATE
+
+: permutations-quot ( seq quot -- seq quot' )
+    [ [ permutation-iota ] keep ] dip '[ _ permutation @ ] ; inline
+
+PRIVATE>
+
 : each-permutation ( seq quot -- )
-    [ [ permutation-iota ] keep ] dip
-    '[ _ permutation @ ] each ; inline
+    permutations-quot each ; inline
 
 : map-permutations ( seq quot -- seq' )
-    [ [ permutation-iota ] keep ] dip
-    '[ _ permutation @ ] map ; inline
+    permutations-quot map ; inline
 
 : filter-permutations ( seq quot -- seq' )
     selector [ each-permutation ] dip ; inline
@@ -83,9 +88,8 @@ INSTANCE: permutations immutable-sequence
     [ ] map-permutations ;
 
 : find-permutation ( seq quot -- elt )
-    [ dup [ permutation-iota ] keep ] dip
-    '[ _ permutation @ ] find drop
-    [ swap permutation ] [ drop f ] if* ; inline
+    [ permutations-quot find drop ]
+    [ drop over [ permutation ] [ 2drop f ] if ] 2bi ; inline
 
 : reduce-permutations ( seq identity quot -- result )
     swapd each-permutation ; inline
