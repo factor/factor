@@ -78,7 +78,8 @@ TUPLE: depends-on-class-predicate class1 class2 result ;
 
 M: depends-on-class-predicate satisfied?
     {
-        [ [ class1>> valid-classoid? ] [ class2>> valid-classoid? ] bi and ]
+        [ class1>> valid-classoid? ]
+        [ class2>> valid-classoid? ]
         [ [ [ class1>> ] [ class2>> ] bi evaluate-class-predicate ] [ result>> ] bi eq? ]
     } 1&& ;
 
