@@ -17,7 +17,7 @@ M: identity-wrapper hashcode* nip identity-hashcode>> ; inline
 
 TUPLE: identity-hashtable < wrapped-hashtable ;
 
-: <identity-hashtable> ( n -- ihash )
+: <identity-hashtable> ( n -- ihashtable )
     <hashtable> identity-hashtable boa ; inline
 
 M: identity-hashtable wrap-key drop <identity-wrapper> ;
@@ -25,7 +25,7 @@ M: identity-hashtable wrap-key drop <identity-wrapper> ;
 M: identity-hashtable clone
     underlying>> clone identity-hashtable boa ; inline
 
-: identity-associate ( value key -- hash )
+: identity-associate ( value key -- ihashtable )
     2 <identity-hashtable> [ set-at ] keep ; inline
 
 : >identity-hashtable ( assoc -- ihashtable )
