@@ -10,12 +10,12 @@ FROM: namespaces => set ;
 IN: prettyprint
 
 : with-use ( obj quot -- )
-    make-pprint (pprint-manifest
+    t make-pprint (pprint-manifest
     [ pprint-manifest) ] [ [ drop nl ] unless-empty ] bi
     do-pprint ; inline
 
 : with-in ( obj quot -- )
-    make-pprint current-vocab>> [ pprint-in bl ] when* do-pprint ; inline
+    t make-pprint current-vocab>> [ pprint-in bl ] when* do-pprint ; inline
 
 : pprint ( obj -- ) [ pprint* ] with-pprint ;
 
