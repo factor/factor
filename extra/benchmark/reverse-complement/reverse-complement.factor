@@ -20,13 +20,12 @@ TR: trans-map ch>upper "ACGTUMRYKVHDB" "TGCAAKYRMBDHV" ;
 
 HINTS: do-line vector string ;
 
-: (reverse-complement) ( seq -- )
-    readln [ do-line (reverse-complement) ] [ show-seq ] if* ;
-
 : reverse-complement ( infile outfile -- )
     ascii [
         ascii [
-            500000 <vector> (reverse-complement)
+            500,000 <vector>
+            [ do-line ] each-line
+            show-seq
         ] with-file-reader
     ] with-file-writer ;
 
