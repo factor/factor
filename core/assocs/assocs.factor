@@ -16,6 +16,8 @@ GENERIC: assoc-size ( assoc -- n )
 GENERIC: assoc-like ( assoc exemplar -- newassoc )
 GENERIC: assoc-clone-like ( assoc exemplar -- newassoc )
 GENERIC: >alist ( assoc -- newassoc )
+GENERIC: keys ( assoc -- keys )
+GENERIC: values ( assoc -- values )
 
 M: assoc assoc-like drop ; inline
 
@@ -107,11 +109,9 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ dup assoc-size ] dip new-assoc
     [ [ set-at ] with-assoc assoc-each ] keep ; inline
 
-: keys ( assoc -- keys )
-    [ drop ] { } assoc>map ;
+M: assoc keys [ drop ] { } assoc>map ;
 
-: values ( assoc -- values )
-    [ nip ] { } assoc>map ;
+M: assoc values [ nip ] { } assoc>map ;
 
 : delete-at* ( key assoc -- old ? )
     [ at* ] 2keep delete-at ;
