@@ -40,7 +40,7 @@ M: wrapped-hash-set cardinality
     underlying>> cardinality ; inline
 
 M: wrapped-hash-set members
-    underlying>> members [ underlying>> ] map ;
+    underlying>> members [ underlying>> ] map! ;
 
 M: wrapped-hash-set equal?
     over wrapped-hash-set? [ [ underlying>> ] same? ] [ 2drop f ] if ;
