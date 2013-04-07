@@ -44,6 +44,13 @@ M: mirror >alist ( mirror -- alist )
     [ object>> [ swap slot ] curry ] bi
     map zip ;
 
+M: mirror keys ( mirror -- keys )
+    object-slots [ name>> ] map ;
+
+M: mirror values ( mirror -- values )
+    [ object-slots [ offset>> ] map ]
+    [ object>> [ swap slot ] curry ] bi map ;
+
 M: mirror assoc-size object>> layout-of second ;
 
 INSTANCE: mirror assoc
