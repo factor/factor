@@ -326,10 +326,10 @@ M: macosx modifiers>string
             { S+ [ "\u0021e7" ] }
             { C+ [ "\u002303" ] }
         } case
-    ] map concat ;
+    ] map "" concat-as ;
 
 M: object modifiers>string
-    [ name>> ] map concat ;
+    [ name>> ] map "" concat-as ;
 
 HOOK: keysym>string os ( keysym -- string )
 
