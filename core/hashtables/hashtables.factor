@@ -162,6 +162,16 @@ M: hashtable >alist
         [ [ 2array ] dip push-unsafe ] curry each-pair
     ] keep { } like ;
 
+M: hashtable keys
+    [ array>> ] [ assoc-size <vector> ] bi [
+        [ nip push-unsafe ] curry each-pair
+    ] keep { } like ;
+
+M: hashtable values
+    [ array>> ] [ assoc-size <vector> ] bi [
+        [ [ drop ] 2dip push-unsafe ] curry each-pair
+    ] keep { } like ;
+
 M: hashtable clone
     (clone) [ clone ] change-array ; inline
 
