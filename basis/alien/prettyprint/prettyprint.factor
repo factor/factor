@@ -35,7 +35,7 @@ M: array c-type-string
     unclip
     [ [ unparse "[" "]" surround ] map ]
     [ c-type-string ] bi*
-    prefix "" join ;
+    prefix concat ;
 PRIVATE>
 
 : pprint-c-type ( c-type -- )
