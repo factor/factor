@@ -1,7 +1,7 @@
 ! Based on Clojure's PersistentHashMap by Rich Hickey.
 
 USING: kernel math accessors assocs fry combinators parser
-prettyprint.custom locals make
+prettyprint.custom locals make sequences
 persistent.assocs
 persistent.hashtables.nodes
 persistent.hashtables.nodes.empty
@@ -38,6 +38,10 @@ M: persistent-hash pluck-at
     } cond ;
 
 M: persistent-hash >alist [ root>> >alist% ] { } make ;
+
+M: persistent-hash keys >alist [ first ] map ;
+
+M: persistent-hash values >alist [ second ] map ;
 
 :: >persistent-hash ( assoc -- phash )
     T{ persistent-hash } assoc [| ph k v | v k ph new-at ] assoc-each ;
