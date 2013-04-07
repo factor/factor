@@ -31,8 +31,11 @@ M: no-biassoc-deletion summary
 M: biassoc delete-at
     no-biassoc-deletion ;
 
-M: biassoc >alist
-    from>> >alist ;
+M: biassoc >alist from>> >alist ;
+
+M: biassoc keys from>> keys ;
+
+M: biassoc values from>> values ;
 
 M: biassoc clear-assoc
     [ from>> clear-assoc ] [ to>> clear-assoc ] bi ;
