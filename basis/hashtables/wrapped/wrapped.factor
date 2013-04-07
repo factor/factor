@@ -3,7 +3,7 @@
 
 USING: accessors arrays assocs hashtables kernel sequences
 vocabs.loader ;
-
+FROM: sequences => change-nth ;
 IN: hashtables.wrapped
 
 TUPLE: wrapped-key
@@ -37,7 +37,15 @@ M: wrapped-hashtable set-at
     wrapper@ set-at ; inline
 
 M: wrapped-hashtable >alist
-    underlying>> >alist [ [ first underlying>> ] [ second ] bi 2array ] map ;
+    underlying>> >alist [
+        [ 0 swap [ underlying>> ] change-nth ] each
+    ] keep ;
+
+M: wrapped-hashtable keys
+    underlying>> keys [ underlying>> ] map! ;
+
+M: wrapped-hashtable values
+    underlying>> values ;
 
 M: wrapped-hashtable equal?
     over wrapped-hashtable? [ [ underlying>> ] same? ] [ 2drop f ] if ;
