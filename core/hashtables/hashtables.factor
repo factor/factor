@@ -155,22 +155,18 @@ M: hashtable set-at
     [ [ 1 fixnum+fast { array-capacity } declare ] dip length<< ]
     2bi ; inline
 
+: collect-pairs ( hash quot: ( key value -- elt ) -- seq )
+    [ [ array>> ] [ assoc-size <vector> ] bi ] dip swap [
+        [ push-unsafe ] curry compose each-pair
+    ] keep { } like ; inline
+
 PRIVATE>
 
-M: hashtable >alist
-    [ array>> ] [ assoc-size <vector> ] bi [
-        [ [ 2array ] dip push-unsafe ] curry each-pair
-    ] keep { } like ;
+M: hashtable >alist [ 2array ] collect-pairs ;
 
-M: hashtable keys
-    [ array>> ] [ assoc-size <vector> ] bi [
-        [ nip push-unsafe ] curry each-pair
-    ] keep { } like ;
+M: hashtable keys [ drop ] collect-pairs ;
 
-M: hashtable values
-    [ array>> ] [ assoc-size <vector> ] bi [
-        [ [ drop ] 2dip push-unsafe ] curry each-pair
-    ] keep { } like ;
+M: hashtable values [ nip ] collect-pairs ;
 
 M: hashtable clone
     (clone) [ clone ] change-array ; inline
