@@ -1,13 +1,13 @@
 ! Copyright (c) 2009 Aaron Schaefer. All rights reserved.
 ! The contents of this file are licensed under the Simplified BSD License
 ! A copy of the license is available at http://factorcode.org/license.txt
-USING: arrays formatting fry grouping io kernel locals math math.functions
-    math.matrices math.parser math.primes.factors math.vectors prettyprint
-    sequences sequences.deep ;
+USING: arrays formatting fry grouping io kernel locals math
+math.functions math.matrices math.parser math.primes.factors
+math.vectors prettyprint sequences sequences.deep ;
 IN: benchmark.pidigits
 
 : extract ( z x -- n )
-    1 2array '[ _ v* sum ] map first2 /i ;
+    [ first2 ] dip '[ first2 [ _ * ] [ + ] bi* ] bi@ /i ;
 
 : next ( z -- n )
     3 extract ;
@@ -16,7 +16,7 @@ IN: benchmark.pidigits
     [ 4 extract ] dip = ;
 
 : >matrix ( q s r t -- z )
-    4array 2 group ;
+    [ 2array ] 2bi@ 2array ;
 
 : produce ( z y -- z' )
     [ 10 ] dip -10 * 0 1 >matrix swap m. ;
