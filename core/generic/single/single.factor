@@ -161,7 +161,7 @@ M: tag-dispatch-engine compile-engine
 
 : build-fast-hash ( methods -- buckets )
     >alist V{ } clone [ hashcode 1array ] distribute-buckets
-    [ compile-engines* >alist { } join ] map ;
+    [ compile-engines* >alist concat ] map ;
 
 M: echelon-dispatch-engine compile-engine
     dup n>> 0 = [

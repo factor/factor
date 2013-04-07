@@ -215,7 +215,7 @@ M: string >ber ( str -- byte-array )
 
 : >ber-seq-internal ( array code -- byte-array )
     1array "C" pack-native swap dup length >ber-length-encoding
-    swapd append swap [ number>string ] map "" join >array append ;
+    swapd append swap [ number>string ] map { } concat-as append ;
 
 M: array >ber ( array -- byte-array )
     0x30 >ber-seq-internal ;

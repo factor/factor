@@ -7,8 +7,8 @@ IN: byte-arrays.hex
 ERROR: odd-length-hex-string string ;
 
 SYNTAX: HEX{
-    "}" parse-tokens "" join
+    "}" parse-tokens concat
     [ blank? not ] filter
     dup length even? [ odd-length-hex-string ] unless
-    2 group [ hex> ] B{ } map-as
+    2 <groups> [ hex> ] B{ } map-as
     suffix! ;

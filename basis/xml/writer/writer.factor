@@ -19,7 +19,7 @@ SYMBOL: indentation
 
 : indent-string ( -- string )
     xml-pprint? get
-    [ indentation get indenter get <repetition> "" join ]
+    [ indentation get indenter get <repetition> concat ]
     [ "" ] if ;
 
 : ?indent ( -- )
