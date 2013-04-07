@@ -256,6 +256,10 @@ M: enum delete-at seq>> remove-nth! drop ; inline
 M: enum >alist ( enum -- alist )
     seq>> [ length iota ] keep zip ; inline
 
+M: enum keys seq>> length iota >array ; inline
+
+M: enum values seq>> >array ; inline
+
 M: enum assoc-size seq>> length ; inline
 
 M: enum clear-assoc seq>> delete-all ; inline
