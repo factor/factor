@@ -11,8 +11,8 @@ MEMO: factorial ( n -- n! )
 
 : factorial/ ( n k -- n!/k! )
     {
-        { [ dup 1 < ] [ drop factorial ] }
-        { [ over 1 < ] [ nip factorial recip ] }
+        { [ dup 1 <= ] [ drop factorial ] }
+        { [ over 1 <= ] [ nip factorial recip ] }
         [
             2dup < [ t ] [ swap f ] if
             [ (a,b] product ] dip [ recip ] when
