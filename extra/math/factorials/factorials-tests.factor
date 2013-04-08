@@ -10,6 +10,9 @@ IN: math.factorials
 { 720 } [ 10 7 factorial/ ] unit-test
 { 604800 } [ 10 3 factorial/ ] unit-test
 { 3628800 } [ 10 0 factorial/ ] unit-test
+{ 6 } [ 3 -3 factorial/ ] unit-test
+{ 1/6 } [ -3 3 factorial/ ] unit-test
+{ 1/720 } [ 7 10 factorial/ ] unit-test
 
 { 17160 } [ 10 4 rising-factorial ] unit-test
 { 1/57120 } [ 10 -4 rising-factorial ] unit-test
