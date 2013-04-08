@@ -9,9 +9,15 @@ IN: math.factorials
 MEMO: factorial ( n -- n! )
     dup 1 > [ [1,b] product ] [ drop 1 ] if ;
 
-:: factorial/ ( n k -- n!/k! )
-    { [ k 0 < ] [ n 0 < ] [ k n > ] } 0||
-    [ 0 ] [ k n (a,b] product ] if ;
+: factorial/ ( n k -- n!/k! )
+    {
+        { [ dup 1 < ] [ drop factorial ] }
+        { [ over 1 < ] [ nip factorial recip ] }
+        [
+            2dup < [ t ] [ swap f ] if
+            [ (a,b] product ] dip [ recip ] when
+        ]
+    } cond ;
 
 : rising-factorial ( x n -- x(n) )
     {
