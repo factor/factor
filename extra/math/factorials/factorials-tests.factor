@@ -65,3 +65,9 @@ IN: math.factorials
 [ 10 iota [ alternating-factorial ] map ] unit-test
 
 { { 1 1 2 9 262144 } } [ 5 iota [ exponential-factorial ] map ] unit-test
+
+{ V{ 2 3 5 7 23 719 5039 } }
+[ 10,000 iota [ factorial-prime? ] filter ] unit-test
+
+{ V{ 3 5 7 29 31 211 2309 2311 } }
+[ 10,000 iota [ primorial-prime? ] filter ] unit-test
