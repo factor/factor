@@ -9,6 +9,15 @@ IN: math.factorials
 MEMO: factorial ( n -- n! )
     dup 1 > [ [1,b] product ] [ drop 1 ] if ;
 
+ALIAS: n! factorial
+
+MEMO: double-factorial ( n -- n!! )
+    dup 1 > [
+        dup even? 2 1 ? swap 2 <range> product
+    ] [ drop 1 ] if ;
+
+ALIAS: n!! double-factorial
+
 : factorial/ ( n k -- n!/k! )
     {
         { [ dup 1 <= ] [ drop factorial ] }
