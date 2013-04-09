@@ -104,21 +104,14 @@ ALIAS: pochhammer rising-factorial
 
 <PRIVATE
 
-: orial-prime? ( n quot: ( n -- m ) -- ? )
+: -prime? ( n quot: ( n -- m ) -- ? )
     [ 1 1 [ pick over - 1 <= ] ] dip
     '[ drop [ 1 + ] _ bi ] until nip - abs 1 = ; inline
 
 PRIVATE>
 
 : factorial-prime? ( n -- ? )
-    {
-        [ prime? ]
-        [ [ factorial ] orial-prime? ]
-    } 1&& ;
+    { [ prime? ] [ [ factorial ] -prime? ] } 1&& ;
 
 : primorial-prime? ( n -- ? )
-    {
-        [ prime? ]
-        [ 2 > ]
-        [ [ primorial ] orial-prime? ]
-    } 1&& ;
+    { [ prime? ] [ 2 > ] [ [ primorial ] -prime? ] } 1&& ;
