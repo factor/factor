@@ -60,3 +60,8 @@ IN: math.factorials
 { { 1 1 2 12 288 } } [ 5 iota [ super-factorial ] map ] unit-test
 
 { { 1 1 4 108 27648 } } [ 5 iota [ hyper-factorial ] map ] unit-test
+
+{ { 1 1 1 5 19 101 619 4421 35899 326981 } }
+[ 10 iota [ alternating-factorial ] map ] unit-test
+
+{ { 1 1 2 9 262144 } } [ 5 iota [ exponential-factorial ] map ] unit-test
