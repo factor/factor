@@ -9,9 +9,8 @@
 !
 ! For more information about Textadept, consult http://foicica.com/textadept/
 
-USING: editors io.launcher io.pathnames io.standard-paths kernel
-make math math.parser namespaces sequences system ;
-
+USING: editors io.launcher io.pathnames io.standard-paths
+kernel make math math.parser namespaces sequences system vocabs ;
 IN: editors.textadept
 
 SINGLETON: textadept
@@ -28,10 +27,6 @@ M: macosx find-textadept-path
         f
     ] if* ;
 
-! M: windows find-textadept-path
-!     let-Windows-users-fill-this-in
-!     ;
-
 : textadept-path  ( -- path )
     \ textadept-path get-global [
         find-textadept-path "textadept" or
@@ -42,3 +37,5 @@ M: textadept editor-command ( file line -- command )
         textadept-path , "-f" , , "-e" ,
         1 - number>string "goto_line(" ")" surround ,
     ] { } make ;
+
+os windows? [ "editors.textadept.windows" require ] when
