@@ -12,9 +12,13 @@ MEMO: factorial ( n -- n! )
 ALIAS: n! factorial
 
 MEMO: double-factorial ( n -- n!! )
-    dup 1 > [
-        dup even? 2 1 ? swap 2 <range> product
-    ] [ drop 1 ] if ;
+    dup [ even? ] [ 0 < ] bi [
+        [ drop 1/0. ] [
+            2 + -1 swap -2 <range> product recip
+        ] if
+    ] [
+        2 3 ? swap 2 <range> product
+    ] if ;
 
 ALIAS: n!! double-factorial
 
