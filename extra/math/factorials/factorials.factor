@@ -102,23 +102,23 @@ ALIAS: pochhammer rising-factorial
 : exponential-factorial ( n -- m )
     dup 1 > [ [1,b] 1 [ swap ^ ] reduce ] [ drop 1 ] if ;
 
+<PRIVATE
+
+: orial-prime? ( n quot: ( n -- m ) -- ? )
+    [ 1 1 [ pick over - 1 <= ] ] dip
+    '[ drop [ 1 + ] _ bi ] until nip - abs 1 = ; inline
+
+PRIVATE>
+
 : factorial-prime? ( n -- ? )
     {
         [ prime? ]
-        [
-            1 1 [ pick over - 1 <= ] [
-                drop [ 1 + ] [ factorial ] bi
-            ] until nip - abs 1 =
-        ]
+        [ [ factorial ] orial-prime? ]
     } 1&& ;
 
 : primorial-prime? ( n -- ? )
     {
         [ prime? ]
         [ 2 > ]
-        [
-            1 1 [ pick over - 1 <= ] [
-                drop [ 1 + ] [ primorial ] bi
-            ] until nip - abs 1 =
-        ]
+        [ [ primorial ] orial-prime? ]
     } 1&& ;
