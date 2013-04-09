@@ -1,6 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: editors fry kernel make math.parser namespaces system ;
+USING: editors fry kernel make math.parser namespaces system
+vocabs ;
 IN: editors.geany
 
 SINGLETON: geany
@@ -17,3 +18,5 @@ M: geany editor-command
         _ ,
         "--line" , _ number>string ,
     ] { } make ;
+
+os windows? [ "editors.geany.windows" require ] when
