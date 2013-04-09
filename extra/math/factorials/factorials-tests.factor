@@ -44,3 +44,19 @@ IN: math.factorials
 { 11960 } [ 20 3 -3 factorial-power ] unit-test
 { t } [ 20 3 [ 1 factorial-power ] [ falling-factorial ] 2bi = ] unit-test
 { t } [ 20 3 [ 0 factorial-power ] [ ^ ] 2bi = ] unit-test
+
+{ { 1 2 6 30 210 2310 } } [ 6 iota [ primorial ] map ] unit-test
+
+{ t } [
+    6 iota
+    [ [ double-factorial ] map ]
+    [ [ 2 multifactorial ] map ]
+    bi =
+] unit-test
+
+{ { 1 2 12 120 1680 30240 } }
+[ 6 iota [ quadruple-factorial ] map ] unit-test
+
+{ { 1 1 2 12 288 } } [ 5 iota [ super-factorial ] map ] unit-test
+
+{ { 1 1 4 108 27648 } } [ 5 iota [ hyper-factorial ] map ] unit-test
