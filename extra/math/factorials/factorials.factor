@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators kernel math math.functions math.ranges
-memoize sequences ;
+USING: combinators kernel math math.functions math.primes
+math.ranges memoize sequences ;
 
 IN: math.factorials
 
@@ -70,3 +70,24 @@ ALIAS: pochhammer rising-factorial
             ] if
         ]
     } case ;
+
+: primorial ( n -- p# )
+    dup 0 > [ nprimes product ] [ drop 1 ] if ;
+
+: multifactorial ( n k -- n!(k) )
+    2dup >= [
+        dupd [ - ] keep multifactorial *
+    ] [ 2drop 1 ] if ; inline recursive
+
+: quadruple-factorial ( n -- m )
+    [ 2 * ] keep factorial/ ;
+
+: super-factorial ( n -- m )
+    dup 1 > [
+        [1,b] [ factorial ] [ * ] map-reduce
+    ] [ drop 1 ] if ;
+
+: hyper-factorial ( n -- m )
+    dup 1 > [
+        [1,b] [ dup ^ ] [ * ] map-reduce
+    ] [ drop 1 ] if ;
