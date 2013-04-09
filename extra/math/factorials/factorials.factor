@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators fry kernel math math.functions math.primes
-math.ranges memoize sequences ;
+USING: combinators combinators.short-circuit fry kernel math
+math.functions math.primes math.ranges memoize sequences ;
 
 IN: math.factorials
 
@@ -101,3 +101,24 @@ ALIAS: pochhammer rising-factorial
 
 : exponential-factorial ( n -- m )
     dup 1 > [ [1,b] 1 [ swap ^ ] reduce ] [ drop 1 ] if ;
+
+: factorial-prime? ( n -- ? )
+    {
+        [ prime? ]
+        [
+            1 1 [ pick over - 1 <= ] [
+                drop [ 1 + ] [ factorial ] bi
+            ] until nip - abs 1 =
+        ]
+    } 1&& ;
+
+: primorial-prime? ( n -- ? )
+    {
+        [ prime? ]
+        [ 2 > ]
+        [
+            1 1 [ pick over - 1 <= ] [
+                drop [ 1 + ] [ primorial ] bi
+            ] until nip - abs 1 =
+        ]
+    } 1&& ;
