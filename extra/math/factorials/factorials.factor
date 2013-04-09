@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators kernel math math.functions math.primes
+USING: combinators fry kernel math math.functions math.primes
 math.ranges memoize sequences ;
 
 IN: math.factorials
@@ -91,3 +91,13 @@ ALIAS: pochhammer rising-factorial
     dup 1 > [
         [1,b] [ dup ^ ] [ * ] map-reduce
     ] [ drop 1 ] if ;
+
+: alternating-factorial ( n -- m )
+    dup 1 > [
+        [ [1,b] ] keep even? '[
+            [ factorial ] [ odd? _ = ] bi [ neg ] when
+        ] map-sum
+    ] [ drop 1 ] if ;
+
+: exponential-factorial ( n -- m )
+    dup 1 > [ [1,b] 1 [ swap ^ ] reduce ] [ drop 1 ] if ;
