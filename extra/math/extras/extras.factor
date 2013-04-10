@@ -3,8 +3,8 @@
 
 USING: accessors arrays assocs assocs.extras byte-arrays
 combinators combinators.short-circuit compression.zlib fry
-grouping kernel locals math math.combinatorics math.constants
-math.functions math.order math.primes math.ranges
+grouping kernel locals math math.bitwise math.combinatorics
+math.constants math.functions math.order math.primes math.ranges
 math.ranges.private math.statistics math.vectors memoize random
 sequences sequences.extras sets sorting ;
 
@@ -258,3 +258,12 @@ M: float round-to-even
 
 : round-to-step ( x step -- y )
     [ [ / round ] [ * ] bi ] unless-zero ;
+
+: next-permutation-bits ( v -- w )
+    [ dup 1 - bitor 1 + dup ] keep
+    [ dup neg bitand ] bi@ / -1 shift 1 - bitor ;
+
+: permutation-bits ( bit-count bits -- seq )
+    [ on-bits dup '[ dup _ >= ] ]
+    [ on-bits '[ [ next-permutation-bits _ bitand ] keep ] ]
+    bi* produce nip ;
