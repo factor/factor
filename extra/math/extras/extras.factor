@@ -261,7 +261,7 @@ M: float round-to-even
 
 : next-permutation-bits ( v -- w )
     [ dup 1 - bitor 1 + dup ] keep
-    [ dup neg bitand ] bi@ / -1 shift 1 - bitor ;
+    [ dup neg bitand ] bi@ /i -1 shift 1 - bitor ;
 
 : permutation-bits ( bit-count bits -- seq )
     [ on-bits dup '[ dup _ >= ] ]

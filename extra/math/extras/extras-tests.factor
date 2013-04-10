@@ -130,7 +130,7 @@ IN: math.extras.test
 { 10 } [ 12 5 round-to-step ] unit-test
 { 15 } [ 13 5 round-to-step ] unit-test
 
-{ 0b101 } [ 0b11 next-permutation-bits ] unit-test
+{ 0b101 } [ 0b011 next-permutation-bits ] unit-test
 { 0b110 } [ 0b101 next-permutation-bits ] unit-test
 
 {
