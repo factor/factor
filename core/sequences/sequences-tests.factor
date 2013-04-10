@@ -1,7 +1,7 @@
 USING: arrays byte-arrays kernel math math.order math.parser
 namespaces sequences kernel.private sequences.private strings
 sbufs tools.test vectors assocs generic vocabs.loader
-generic.single math.vectors ;
+generic.single math.vectors math.functions ;
 IN: sequences.tests
 
 [ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
@@ -359,6 +359,8 @@ USE: make
 { "bar" } [ { "bar" "baz" "qux" } [ length ] infimum-by ] unit-test
 [ { "foo" } ] [ { { "foo" } { "bar" } } [ first ] supremum-by ] unit-test
 [ { "bar" } ] [ { { "foo" } { "bar" } } [ first ] infimum-by ] unit-test
+{ -2 1 } [ -2 { 1 2 3 } [ over ^ ] supremum-by ] unit-test
+{ -2 3 } [ -2 { 1 2 3 } [ over ^ ] infimum-by ] unit-test
 
 [ { 0 0 255 } ] [
     {
