@@ -1,9 +1,8 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays ascii assocs fry io.encodings.ascii io.files
-kernel math math.order memoize sequences sorting
-math.statistics ;
+USING: ascii assocs fry io.encodings.ascii io.files kernel math
+math.statistics memoize sequences sequences.extras sorting ;
 FROM: sets => members ;
 IN: anagrams
 

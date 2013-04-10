@@ -390,3 +390,9 @@ PRIVATE>
 
 : map-find-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result elt index )
     [ find-index ] (map-find-index) ; inline
+
+: filter-length ( seq n -- seq' ) swap [ length = ] with filter ;
+
+: all-shortest ( seqs -- seqs' ) dup shortest length filter-length ;
+
+: all-longest ( seqs -- seqs' ) dup longest length filter-length ;
