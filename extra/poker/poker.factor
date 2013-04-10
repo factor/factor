@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Aaron Schaefer, Doug Coleman. All rights reserved.
 ! The contents of this file are licensed under the Simplified BSD License
 ! A copy of the license is available at http://factorcode.org/license.txt
-USING: accessors arrays ascii assocs binary-search combinators
-fry kernel locals math math.bitwise math.combinatorics
-math.order math.statistics poker.arrays random sequences
-sequences.product splitting grouping lexer strings ;
+USING: arrays ascii assocs combinators fry kernel lexer locals
+math math.bitwise math.combinatorics math.order math.statistics
+poker.arrays random sequences sequences.extras
+sequences.product splitting strings ;
 FROM: sequences => change-nth ;
 IN: poker
 
@@ -127,9 +127,6 @@ M: integer >ckf ;
 
 : lookup ( cards table -- value )
     [ rank-bits ] dip nth ;
-
-: map-product ( seq quot -- n )
-    [ 1 ] 2dip [ dip * ] curry [ swap ] prepose each ; inline
 
 : prime-bits ( cards -- q )
     [ 0xFF bitand ] map-product ;
