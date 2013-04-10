@@ -28,9 +28,9 @@ MEMO: stirling ( n k -- x )
 :: ramanujan ( x -- y )
     pi sqrt x e / x ^ * x 8 * 4 + x * 1 + x * 1/30 + 1/6 ^ * ;
 
-<PRIVATE
-
 DEFER: bernoulli
+
+<PRIVATE
 
 : (bernoulli) ( p -- n )
     [ iota ] [ 1 + ] bi [

@@ -6,6 +6,9 @@ tools.test ;
 
 IN: math.extras.test
 
+{ { 1 -1/2 1/6 0 -1/30 0 1/42 0 -1/30 0 } }
+[ 10 iota [ bernoulli ] map ] unit-test
+
 { -1 } [ -1 7 jacobi ] unit-test
 { 0 } [ 3 3 jacobi ] unit-test
 { -1 } [ 127 703 jacobi ] unit-test
