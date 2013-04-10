@@ -1,7 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry grouping http.client io io.encodings.utf8 io.files
-io.files.temp kernel math math.order memoize sequences
+USING: grouping http.client io io.encodings.utf8 io.files
+io.files.temp kernel math memoize sequences sequences.extras
 unicode.case urls ;
 IN: rosetta-code.ordered-words
 
@@ -24,7 +24,7 @@ MEMO: word-list ( -- seq )
     ] unless utf8 file-lines ;
 
 : ordered-word? ( word -- ? )
-    >lower 2 <clumps> [ first2 <= ] all? ;
+    >lower [ <= ] monotonic? ;
 
 : ordered-words-main ( -- )
     word-list [ ordered-word? ] filter
