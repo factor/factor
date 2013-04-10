@@ -1043,15 +1043,9 @@ M: object sum 0 [ + ] binary-reduce ; inline
         [ [ 2drop ] 2dip ] [ 2drop ] if
     ] curry 1 each-from drop ; inline
 
-: filter-length ( seq n -- seq' ) swap [ length = ] with filter ;
-
 : shortest ( seqs -- elt ) [ length ] infimum-by ;
 
 : longest ( seqs -- elt ) [ length ] supremum-by ;
-
-: all-shortest ( seqs -- seqs' ) dup shortest length filter-length ;
-
-: all-longest ( seqs -- seqs' ) dup longest length filter-length ;
 
 ! We hand-optimize flip to such a degree because type hints
 ! cannot express that an array is an array of arrays yet, and
