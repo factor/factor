@@ -1031,16 +1031,16 @@ M: object sum 0 [ + ] binary-reduce ; inline
 : each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
     -rot (each) (each-integer) ; inline
 
-: supremum-by ( seq quot: ( ... elt -- ... x ) -- elt )
-    [ [ first dup ] dip call ] 2keep [
-        dupd call pick dupd after?
-        [ [ 2drop ] 2dip ] [ 2drop ] if
+: supremum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
+    [ keep swap ] curry [ [ first ] dip call ] 2keep [
+        curry 2dip pick over after?
+        [ 2drop ] [ [ 2drop ] 2dip ] if
     ] curry 1 each-from drop ; inline
 
-: infimum-by ( seq quot: ( ... elt -- ... x ) -- elt )
-    [ [ first dup ] dip call ] 2keep [
-        dupd call pick dupd before?
-        [ [ 2drop ] 2dip ] [ 2drop ] if
+: infimum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
+    [ keep swap ] curry [ [ first ] dip call ] 2keep [
+        curry 2dip pick over before?
+        [ 2drop ] [ [ 2drop ] 2dip ] if
     ] curry 1 each-from drop ; inline
 
 : shortest ( seqs -- elt ) [ length ] infimum-by ;
