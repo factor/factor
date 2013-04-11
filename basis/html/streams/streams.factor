@@ -101,8 +101,15 @@ M: html-span-stream dispose
 : border-css, ( border -- )
     "border: 1px solid #" % hex-color, "; " % ;
 
+: (padding-css,) ( horizontal vertical -- )
+    2dup = [
+        drop "padding: " % # "px; " %
+    ] [
+        "padding: " % # "px " % # "px; " %
+    ] if ;
+
 : padding-css, ( padding -- )
-    first2 "padding: " % # "px " % # "px; " % ;
+    first2 (padding-css,) ;
 
 CONSTANT: pre-css "white-space: pre; font-family: monospace;"
 
@@ -129,7 +136,7 @@ M: html-block-stream dispose
     end-sub-stream format-html-div ;
 
 : border-spacing-css, ( pair -- )
-    first2 max 2 /i "padding: " % # "px; " % ;
+    first2 [ 2 /i ] bi@ (padding-css,) ;
 
 : table-style ( style -- str )
     {
