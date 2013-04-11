@@ -129,14 +129,13 @@ M: html-block-stream dispose
     end-sub-stream format-html-div ;
 
 : border-spacing-css, ( pair -- )
-    "padding: " % first2 max 2 /i # "px; " % ;
+    first2 max 2 /i dup "padding: " % # "px " % # "px; " % ;
 
 : table-style ( style -- str )
     {
         { table-border border-css, }
         { table-gap border-spacing-css, }
-    } make-css
-    " border-collapse: collapse;" append ;
+    } make-css ;
 
 PRIVATE>
 
@@ -170,7 +169,7 @@ M: html-writer stream-write-table
             [ data>> [XML <td valign="top" style=<->><-></td> XML] ] with map
             [XML <tr><-></tr> XML]
         ] with map
-        [XML <table style="display: inline-table;"><-></table> XML]
+        [XML <table style="display: inline-table; border-collapse: collapse;"><-></table> XML]
     ] emit-html ;
 
 M: html-writer dispose drop ;
