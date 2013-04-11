@@ -86,11 +86,3 @@ HELP: round-to-decimal
     { $example "USING: math.extras prettyprint ;" "1.23456 2 round-to-decimal ." "1.23" }
     { $example "USING: math.extras prettyprint ;" "12345.6789 -3 round-to-decimal ." "12000.0" }
 } ;
-
-HELP: next-permutation-bits
-{ $values { "v" integer } { "w" integer } }
-{ $description "Generates the next bitwise permutation with the same number of set bits, given a previous lexicographical value." } ;
-
-HELP: all-permutation-bits
-{ $values { "bit-count" integer } { "bits" integer } { "seq" sequence } }
-{ $description "Generates all permutations of numbers with a given bit-count and number of bits." } ;
