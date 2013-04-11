@@ -129,7 +129,7 @@ M: html-block-stream dispose
     end-sub-stream format-html-div ;
 
 : border-spacing-css, ( pair -- )
-    first2 max 2 /i dup "padding: " % # "px " % # "px; " % ;
+    first2 max 2 /i "padding: " % # "px; " % ;
 
 : table-style ( style -- str )
     {
