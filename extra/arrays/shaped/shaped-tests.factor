@@ -33,3 +33,11 @@ IN: arrays.shaped.tests
         { 20 21 22 23 24 }
     } >shaped-array shape
 ] unit-test
+
+{ sa{ 1 } } [ { } ones ] unit-test
+{ sa{ 1 } } [ { 1 } ones ] unit-test
+
+{ sa{ 0 } } [ { } zeros ] unit-test
+{ sa{ 0 } } [ { 1 } zeros ] unit-test
+
+! Error on 0, negative shapes
