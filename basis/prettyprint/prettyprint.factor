@@ -35,6 +35,9 @@ IN: prettyprint
 
 : short. ( obj -- ) pprint-short nl ;
 
+: pprint-error ( obj -- str )
+    class-of name>> "~pprint error: " "~" surround ;
+
 : .b ( n -- ) >bin print ;
 : .o ( n -- ) >oct print ;
 : .h ( n -- ) >hex print ;
@@ -42,9 +45,7 @@ IN: prettyprint
 : stack. ( seq -- )
     [
         [ short. ] [
-            drop
-            [ class-of name>> "~pprint error: " "~" surround ]
-            keep write-object nl
+            drop [ pprint-error ] keep write-object nl
         ] recover
     ] each ;
 
