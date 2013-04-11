@@ -12,7 +12,7 @@ IN: ui.tools.traceback
 TUPLE: stack-entry object string ;
 
 : <stack-entry> ( object -- stack-entry )
-    dup [ unparse-short ] [ drop pprint-error ] recover
+    dup [ unparse-short ] [ drop error-in-pprint ] recover
     stack-entry boa ;
 
 SINGLETON: stack-entry-renderer
