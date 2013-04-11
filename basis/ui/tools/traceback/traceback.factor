@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes continuations fonts fry
-inspector kernel models models.arrow prettyprint sequences
-ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+USING: accessors arrays continuations fonts fry inspector
+kernel models models.arrow prettyprint sequences ui.commands
+ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tables ui.gadgets.tracks
 ui.gestures ui.tools.common ;
@@ -12,9 +12,8 @@ IN: ui.tools.traceback
 TUPLE: stack-entry object string ;
 
 : <stack-entry> ( object -- stack-entry )
-    dup [ unparse-short ] [
-        drop class-of name>> "~pprint error: " "~" surround
-    ] recover stack-entry boa ;
+    dup [ unparse-short ] [ drop pprint-error ] recover
+    stack-entry boa ;
 
 SINGLETON: stack-entry-renderer
 
