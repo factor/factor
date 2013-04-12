@@ -23,6 +23,11 @@ IN: literals.tests
 CONSTANT: constant-a 3
 
 [ { 3 10 "ftw" } ] [ ${ constant-a 10 "ftw" } ] unit-test
+{ { 4 } } [ ${ 1 constant-a + } ] unit-test
+{ { 3 } } [ ${ 1 2 + } ] unit-test
+{ { 1 2 \ + } } [ ${ 1 2 \ + } ] unit-test
+{ { 4 } } [ ${ 1 2 + 1 + } ] unit-test
+{ { 1 3 } } [ ${ 1 2 1 + } ] unit-test
 
 : sixty-nine ( -- a b ) 6 9 ;
 
