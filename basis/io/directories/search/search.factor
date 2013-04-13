@@ -38,7 +38,7 @@ TUPLE: directory-iterator path bfs queue ;
     dup queue>> deque-empty? [ drop f ] [
         dup queue>> pop-back
         dup directory?
-        [ name>> over push-directory-entries next-directory-entry ]
+        [ [ name>> swap push-directory-entries ] keep ]
         [ nip ] if
     ] if ;
 
