@@ -57,7 +57,7 @@ SYMBOL: in-definition
 ERROR: can't-nest-definitions word ;
 
 : check-in-definition ( -- )
-    in-definition get [ word can't-nest-definitions ] when ;
+    in-definition get [ current-word can't-nest-definitions ] when ;
 
 : with-definition ( quot -- )
     [ check-in-definition t in-definition ] dip with-variable ; inline
