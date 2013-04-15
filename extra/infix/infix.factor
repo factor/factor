@@ -1,11 +1,9 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.short-circuit
-effects fry infix.parser infix.ast kernel locals locals.parser
-locals.types math math.functions math.order math.ranges
-multiline namespaces parser quotations sequences summary
-words vocabs.parser ;
-
+USING: accessors assocs combinators effects effects.parser fry
+infix.ast infix.parser kernel locals locals.parser math
+math.functions math.order math.ranges multiline namespaces
+parser quotations sequences summary words ;
 IN: infix
 
 <PRIVATE
@@ -120,3 +118,15 @@ PRIVATE>
 
 SYNTAX: [infix
     "infix]" parse-infix-quotation suffix! \ call suffix! ;
+
+<PRIVATE
+
+: (INFIX::) ( -- word def effect )
+    [
+        scan-new-word
+        [ ";" parse-infix-quotation ] parse-locals-definition
+    ] with-definition ;
+
+PRIVATE>
+
+SYNTAX: INFIX:: (INFIX::) define-declared ;
