@@ -50,3 +50,7 @@ IN: infix.tests
 [ "rbo" ] [ [let "foobar" :> s [infix s[::-2] infix] ] ] unit-test
 [ "rbo" ] [ [let "foobar" :> s [infix s[:0:-2] infix] ] ] unit-test
 [ "rb" ] [ [let "foobar" :> s [infix s[:-5:-2] infix] ] ] unit-test
+
+INFIX:: foo ( x y -- z ) x**2-abs(y);
+
+{ 194 } [ 15 31 foo ] unit-test
