@@ -8,7 +8,8 @@ PREDICATE: alias < word "alias" word-prop ;
 
 : define-alias ( new old -- )
     [ [ 1quotation ] [ stack-effect ] bi define-inline ]
-    [ drop t "alias" set-word-prop ] 2bi ;
+    [ drop t "alias" set-word-prop ]
+    [ parsing-word? [ t "parsing" set-word-prop ] [ drop ] if ] 2tri ;
 
 M: alias reset-word
     [ call-next-method ] [ f "alias" set-word-prop ] bi ;
