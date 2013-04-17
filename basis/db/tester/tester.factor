@@ -25,7 +25,8 @@ IN: db.tester
         "template1" >>database ;
 
 : sqlite-test-db ( -- sqlite-db )
-    "tuples-test.db" temp-file <sqlite-db> ;
+    cpu name>> "tuples-test." ".db" surround
+    temp-file <sqlite-db> ;
 
 ! These words leak resources, but are useful for interactivel testing
 : set-sqlite-db ( -- )
