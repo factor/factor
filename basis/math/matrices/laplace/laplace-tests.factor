@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 Your name.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test determinant kernel ;
+USING: tools.test laplace kernel ;
 IN: math.matrices.laplace.tests
 
 [ t ] [ 0 0 0 ij-to-n 0 = ] unit-test
