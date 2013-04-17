@@ -1031,17 +1031,23 @@ M: object sum 0 [ + ] binary-reduce ; inline
 : each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
     -rot (each) (each-integer) ; inline
 
+<PRIVATE
+
+: select-by ( ... seq quot: ( ... elt -- ... x ) compare: ( obj1 obj2 -- ? ) -- ... elt )
+    [
+        [ keep swap ] curry [ [ first ] dip call ] 2keep
+        [ curry 2dip pick over ] curry
+    ] [
+        [ [ 2drop ] [ [ 2drop ] 2dip ] if ] compose
+    ] bi* compose 1 each-from drop ; inline
+
+PRIVATE>
+
 : supremum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
-    [ keep swap ] curry [ [ first ] dip call ] 2keep [
-        curry 2dip pick over after?
-        [ 2drop ] [ [ 2drop ] 2dip ] if
-    ] curry 1 each-from drop ; inline
+    [ after? ] select-by ; inline
 
 : infimum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
-    [ keep swap ] curry [ [ first ] dip call ] 2keep [
-        curry 2dip pick over before?
-        [ 2drop ] [ [ 2drop ] 2dip ] if
-    ] curry 1 each-from drop ; inline
+    [ before? ] select-by ; inline
 
 : shortest ( seqs -- elt ) [ length ] infimum-by ;
 
