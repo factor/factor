@@ -783,7 +783,7 @@ PRIVATE>
     snip-slice surround ;
 
 : remove-nth ( n seq -- seq' )
-    [ [ { } ] dip dup 1 + ] dip replace-slice ;
+    [ [ dup 1 + ] dip snip-slice ] keep append-as ;
 
 : pop ( seq -- elt )
     [ length 1 - ] keep over 0 >=
