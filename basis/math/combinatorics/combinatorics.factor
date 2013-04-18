@@ -204,7 +204,7 @@ PRIVATE>
     [ combinations-quot find drop ]
     [ drop pick [ combination ] [ 3drop f ] if ] 3bi ; inline
 
-: reduce-combinations ( ... seq k identity quot: ( ... prev elt -- next ) -- ... result )
+: reduce-combinations ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
     [ -rot ] dip each-combination ; inline
 
 : all-subsets ( seq -- subsets )
