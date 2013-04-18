@@ -75,23 +75,23 @@ DEFER: next-permutation
 
 PRIVATE>
 
-: each-permutation ( seq quot -- )
+: each-permutation ( ... seq quot: ( ... elt -- ... ) -- ... )
     permutations-quot each ; inline
 
-: map-permutations ( seq quot -- seq' )
+: map-permutations ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     permutations-quot map ; inline
 
-: filter-permutations ( seq quot -- seq' )
+: filter-permutations ( ... seq quot: ( ... elt -- ... ? ) -- ... newseq )
     selector [ each-permutation ] dip ; inline
 
 : all-permutations ( seq -- seq' )
     [ ] map-permutations ;
 
-: find-permutation ( seq quot -- elt )
+: find-permutation ( ... seq quot: ( ... elt -- ... ? ) -- ... elt/f )
     [ permutations-quot find drop ]
     [ drop over [ permutation ] [ 2drop f ] if ] 2bi ; inline
 
-: reduce-permutations ( seq identity quot -- result )
+: reduce-permutations ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each-permutation ; inline
 
 : inverse-permutation ( seq -- permutation )
@@ -185,26 +185,26 @@ INSTANCE: combinations immutable-sequence
 
 PRIVATE>
 
-: each-combination ( seq k quot -- )
+: each-combination ( ... seq k quot: ( ... elt -- ... ) -- ... )
     combinations-quot each ; inline
 
-: map-combinations ( seq k quot -- seq' )
+: map-combinations ( ... seq k quot: ( ... elt -- ... newelt ) -- ... newseq )
     combinations-quot map ; inline
 
-: filter-combinations ( seq k quot -- seq' )
+: filter-combinations ( ... seq k quot: ( ... elt -- ... ? ) -- ... newseq )
     selector [ each-combination ] dip ; inline
 
-:: map>assoc-combinations ( seq k quot exemplar -- )
+:: map>assoc-combinations ( ... seq k quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
     [ combinations-quot ] dip map>assoc ; inline
 
 : all-combinations ( seq k -- seq' )
     [ ] map-combinations ;
 
-: find-combination ( seq k quot -- elt/f )
+: find-combination ( ... seq k quot: ( ... elt -- ... ? ) -- ... elt/f )
     [ combinations-quot find drop ]
     [ drop pick [ combination ] [ 3drop f ] if ] 3bi ; inline
 
-: reduce-combinations ( seq k identity quot -- result )
+: reduce-combinations ( ... seq k identity quot: ( ... prev elt -- next ) -- ... result )
     [ -rot ] dip each-combination ; inline
 
 : all-subsets ( seq -- subsets )
