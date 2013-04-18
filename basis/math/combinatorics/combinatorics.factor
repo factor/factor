@@ -140,12 +140,6 @@ PRIVATE>
     p 1 < [ drop ] [ x + k - p 1 - c set-nth ] if
     c [ 1 - ] map! ;
 
-:: combinations-quot ( seq k quot -- seq quot )
-    seq length :> n
-    n k nCk iota [
-        k n combination-indices seq nths-unsafe quot call
-    ] ; inline
-
 PRIVATE>
 
 : combination ( m seq k -- seq' )
@@ -162,24 +156,59 @@ M: combinations hashcode* tuple-hashcode ;
 
 INSTANCE: combinations immutable-sequence
 
+<PRIVATE
+
+: find-max-index ( seq n -- i )
+    over length - '[ _ + >= ] find-index drop ;
+
+: propagate-indices ( i seq -- )
+    [ 1 - ] dip [ nth ] [ swap tail-slice ] 2bi
+    [ drop 1 + dup ] map! 2drop ;
+
+: increment-last ( seq -- )
+    [ length 1 - ] keep [ 1 + ] change-nth ;
+
+:: next-combination-indices ( seq n -- seq )
+    seq n find-max-index [
+        seq propagate-indices
+    ] [
+        seq increment-last
+    ] if* seq ;
+
+:: combinations-quot ( seq k quot -- seq nCk pred body )
+    seq length :> n
+    n 1 - :> n-1
+    k 1 - :> k-1
+    k iota >array n k nCk
+    [ dup 0 > ] [
+        [ [ seq nths-unsafe quot call ] keep ] [ 1 - ] bi*
+        dup zero? [ [ n next-combination-indices ] dip ] unless
+    ] ; inline
+
+PRIVATE>
+
 : each-combination ( seq k quot -- )
-    combinations-quot each ; inline
+    combinations-quot while 2drop ; inline
 
 : map-combinations ( seq k quot -- seq' )
-    combinations-quot map ; inline
+    combinations-quot [ rot ] compose produce 2nip ; inline
 
 : filter-combinations ( seq k quot -- seq' )
     selector [ each-combination ] dip ; inline
 
-: map>assoc-combinations ( seq k quot exemplar -- )
-    [ combinations-quot ] dip map>assoc ; inline
+:: map>assoc-combinations ( seq k quot exemplar -- )
+    seq length :> n
+    n k nCk iota [
+        k n combination-indices seq nths-unsafe quot call
+    ] exemplar map>assoc ; inline
 
 : all-combinations ( seq k -- seq' )
     [ ] map-combinations ;
 
-: find-combination ( seq k quot -- i elt )
-    [ combinations-quot find drop ]
-    [ drop pick [ combination ] [ 3drop f ] if ] 3bi ; inline
+: find-combination ( seq k quot -- elt/f )
+    [ f f ] 3dip [ 2nip ] prepose [ keep swap ] curry
+    combinations-quot [ [ [ pick not ] dip and ] compose ] dip
+    while 2drop swap and ; inline
 
 : reduce-combinations ( seq k identity quot -- result )
     [ -rot ] dip each-combination ; inline
