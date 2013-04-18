@@ -65,10 +65,13 @@ M: permutations hashcode* tuple-hashcode ;
 
 INSTANCE: permutations immutable-sequence
 
+DEFER: next-permutation
+
 <PRIVATE
 
 : permutations-quot ( seq quot -- seq quot' )
-    [ [ permutation-iota ] keep ] dip '[ _ permutation @ ] ; inline
+    [ [ permutation-iota ] [ length iota >array ] [ ] tri ] dip
+    '[ drop _ [ _ nths-unsafe @ ] keep next-permutation drop ] ; inline
 
 PRIVATE>
 
@@ -161,54 +164,45 @@ INSTANCE: combinations immutable-sequence
 : find-max-index ( seq n -- i )
     over length - '[ _ + >= ] find-index drop ;
 
-: propagate-indices ( i seq -- )
-    [ 1 - ] dip [ nth ] [ swap tail-slice ] 2bi
+: increment-rest ( i seq -- )
+    [ nth ] [ swap tail-slice ] 2bi
     [ drop 1 + dup ] map! 2drop ;
 
 : increment-last ( seq -- )
-    [ length 1 - ] keep [ 1 + ] change-nth ;
+    [ [ length 1 - ] keep [ 1 + ] change-nth ] unless-empty ;
 
-:: next-combination-indices ( seq n -- seq )
+:: next-combination ( seq n -- seq )
     seq n find-max-index [
-        seq propagate-indices
+        1 [-] seq increment-rest
     ] [
         seq increment-last
     ] if* seq ;
 
-:: combinations-quot ( seq k quot -- seq nCk pred body )
+:: combinations-quot ( seq k quot -- seq quot' )
     seq length :> n
-    n 1 - :> n-1
-    k 1 - :> k-1
-    k iota >array n k nCk
-    [ dup 0 > ] [
-        [ [ seq nths-unsafe quot call ] keep ] [ 1 - ] bi*
-        dup zero? [ [ n next-combination-indices ] dip ] unless
-    ] ; inline
+    n k nCk iota k iota >array seq quot n
+    '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination drop ] ; inline
 
 PRIVATE>
 
 : each-combination ( seq k quot -- )
-    combinations-quot while 2drop ; inline
+    combinations-quot each ; inline
 
 : map-combinations ( seq k quot -- seq' )
-    combinations-quot [ rot ] compose produce 2nip ; inline
+    combinations-quot map ; inline
 
 : filter-combinations ( seq k quot -- seq' )
     selector [ each-combination ] dip ; inline
 
 :: map>assoc-combinations ( seq k quot exemplar -- )
-    seq length :> n
-    n k nCk iota [
-        k n combination-indices seq nths-unsafe quot call
-    ] exemplar map>assoc ; inline
+    [ combinations-quot ] dip map>assoc ; inline
 
 : all-combinations ( seq k -- seq' )
     [ ] map-combinations ;
 
 : find-combination ( seq k quot -- elt/f )
-    [ f f ] 3dip [ 2nip ] prepose [ keep swap ] curry
-    combinations-quot [ [ [ pick not ] dip and ] compose ] dip
-    while 2drop swap and ; inline
+    [ combinations-quot find drop ]
+    [ drop pick [ combination ] [ 3drop f ] if ] 3bi ; inline
 
 : reduce-combinations ( seq k identity quot -- result )
     [ -rot ] dip each-combination ; inline
