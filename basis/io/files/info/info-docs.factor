@@ -16,6 +16,14 @@ HELP: directory?
 { $values { "file-info" file-info } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "file-info" } " is a directory." } ;
 
+HELP: file?
+{ $values { "file-info" file-info } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "file-info" } " is a file." } ;
+
+HELP: symlink?
+{ $values { "file-info" file-info } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "file-info" } " is a symlink." } ;
+
 HELP: file-systems
 { $values { "array" array } }
 { $description "Returns an array of " { $link file-system-info } " objects returned by iterating the mount points and calling " { $link file-system-info } " on each." } ;
@@ -59,6 +67,8 @@ ARTICLE: "io.files.info" "File system meta-data"
     link-info
     exists?
     directory?
+    file?
+    symlink?
 }
 "File types:"
 { $subsections "file-types" }
