@@ -194,7 +194,7 @@ PRIVATE>
 : filter-combinations ( ... seq k quot: ( ... elt -- ... ? ) -- ... newseq )
     selector [ each-combination ] dip ; inline
 
-:: map>assoc-combinations ( ... seq k quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
+: map>assoc-combinations ( ... seq k quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
     [ combinations-quot ] dip map>assoc ; inline
 
 : all-combinations ( seq k -- seq' )
