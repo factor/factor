@@ -16,13 +16,13 @@ HELP: directory?
 { $values { "file-info" file-info } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "file-info" } " is a directory." } ;
 
-HELP: file?
+HELP: regular-file?
 { $values { "file-info" file-info } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "file-info" } " is a file." } ;
+{ $description "Tests if " { $snippet "file-info" } " is a normal file." } ;
 
-HELP: symlink?
+HELP: symbolic-link?
 { $values { "file-info" file-info } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "file-info" } " is a symlink." } ;
+{ $description "Tests if " { $snippet "file-info" } " is a symbolic link." } ;
 
 HELP: file-systems
 { $values { "array" array } }
@@ -67,8 +67,8 @@ ARTICLE: "io.files.info" "File system meta-data"
     link-info
     exists?
     directory?
-    file?
-    symlink?
+    regular-file?
+    symbolic-link?
 }
 "File types:"
 { $subsections "file-types" }

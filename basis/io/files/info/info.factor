@@ -13,8 +13,8 @@ HOOK: file-info os ( path -- info )
 HOOK: link-info os ( path -- info )
 
 : directory? ( file-info -- ? ) type>> +directory+ = ;
-: file? ( file-info -- ? ) type>> +regular-file+ = ;
-: symlink? ( file-info -- ? ) type>> +symbolic-link+ = ;
+: regular-file? ( file-info -- ? ) type>> +regular-file+ = ;
+: symbolic-link? ( file-info -- ? ) type>> +symbolic-link+ = ;
 
 : sparse-file? ( file-info -- ? )
     [ size-on-disk>> ] [ size>> ] bi < ;
