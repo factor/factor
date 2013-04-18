@@ -1,72 +1,40 @@
 ! Copyright (C) 2013 Your name.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays sequences sequences.deep sequences.extras 
-        math math.functions math.vectors math.matrices fry grouping ;
-IN: math.matrices.laplace 
+        math math.functions math.vectors math.matrices fry grouping 
+        sequences.private accessors  ;
+IN: math.matrices.laplace
+
+TUPLE: missing seq i ;
+C: <missing> missing
+M: missing nth-unsafe
+    [ i>> dupd >= [ 1 + ] when ] [ seq>> nth-unsafe ] bi ;
+M: missing length seq>> length 1 - ;
+INSTANCE: missing immutable-sequence
 
 : ij-to-n ( size row col -- n )
-    [ * ] dip   ! ( size*row col ) 
-    + ;  ! ( size*row+col ) 
+    [ * ] dip + ;   
 
 : n-to-ij ( size n -- row col )
     swap /mod ;
 
-: row-of-n ( size n -- row )
-    n-to-ij  ! ( row col )
-    drop ;  ! ( row ) 
+<PRIVATE
 
-: col-of-n ( size n -- col )
-    n-to-ij  ! ( row col )
-    nip ;  ! ( col ) 
+: (minor-1) ( row col matrix1 -- matrix2 )
+    [ remove-nth ] with map remove-nth ; 
 
-: in-row? ( size n row -- ? )
-    [ row-of-n ] dip  ! ( row row ) 
-    = ;  ! ( ? ) 
+: (minor-2) ( row col matrix1 -- matrix2 )
+    [ swap <missing> ] with map remove-nth ;        
 
-: in-col? ( size n col -- ? )
-    [ col-of-n ] dip  ! ( col col ) 
-    = ;  ! ( ? ) 
+: (minor) ( row col matrix1 -- matrix2 )
+    (minor-2) ;
 
-: pickswap ( x y z -- x y x z )
-    pick swap ;
+: minor ( matrix1 row col -- matrix2 )
+    rot (minor) ;
 
-: same-row? ( size n m -- ? )
-    pickswap  ! ( size n size m )
-    row-of-n  ! ( size n row-of-m )
-    in-row? ;  ! ( ? ) 
-
-: same-col? ( size n m -- ? )
-    pickswap  ! ( size n size m )
-    col-of-n  ! ( size n col-of-m )
-    in-col? ;  ! ( ? ) 
-
-: different-row-different-col? ( size n m -- ? )
-      [ same-row? not ] [ same-col? not ] 3bi and ;
-
-: flat-matrix-size ( matrix -- size )
-    length sqrt >integer ;  ! ( size )
-
-: flat-to-matrix ( seq -- matrix )
-    dup flat-matrix-size  
-    <groups> ;  ! 
-
-! filter-index, that doesn't put elt on the stack  
-: filter-index' ( ... seq quot: ( ... i -- ... ? ) -- ... seq' )
-    '[ [ nip @ ] filter-index ] call ; inline
- 
-! Flatten a 2d matrix.
-! Apply [ quot ] filter-index'.
-! Unflatten result. 
-: matrix-filter-index ( matrix1 quot -- matrix2 )
-      [ concat ] dip filter-index' flat-to-matrix ; inline
-
-: swaprot ( x y z -- z x y )
-    swap rot ;
-
-: minor ( matrix1 n -- matrix2 )
-    over length swaprot  ! ( size n matrix1 )
-    [ different-row-different-col? ]    
-    with with matrix-filter-index ;  
+: nth-minor ( matrix1 n -- matrix2 )
+    [ dup length ] dip  
+    n-to-ij minor ;
 
 : matrix-size-one? ( matrix -- ? )
     concat length 1 = ;
@@ -77,7 +45,7 @@ IN: math.matrices.laplace
 
 : minors ( matrix -- seq )
     dup length iota   
-    [ minor unbox-if-size-one ] with map ; 
+    [ nth-minor unbox-if-size-one ] with map ; 
 
 : coeffs ( matrix -- seq )
     first -1 swap  
@@ -94,7 +62,8 @@ IN: math.matrices.laplace
         [ coeffs-minors laplace ] map
     ] unless v* sum ;
 
+PRIVATE>
+
 : det ( matrix -- n )
     coeffs-minors
     laplace ;
-
