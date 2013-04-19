@@ -37,7 +37,7 @@ INSTANCE: missing immutable-sequence
     n-to-ij minor ;
 
 : matrix-size-one? ( matrix -- ? )
-    concat length 1 = ;
+    { [ length 1 = ] [ first length 1 = ] } 1&& ;
   
 : unbox-if-size-one ( matrix -- n )
     dup matrix-size-one?   
@@ -48,8 +48,7 @@ INSTANCE: missing immutable-sequence
     [ nth-minor unbox-if-size-one ] with map ; 
 
 : coeffs ( matrix -- seq )
-    first -1 swap  
-    [ ^ * ] with map-index ;
+    first [ odd? [ neg ] when ] map-index ;
 
 : coeffs-minors ( matrix -- coeffs minors )
       [ coeffs ] [ minors ] bi ;
@@ -67,3 +66,4 @@ PRIVATE>
 : det ( matrix -- n )
     coeffs-minors
     laplace ;
+
