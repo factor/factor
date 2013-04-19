@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators hints kernel locals math
-math.order sequences sequences.private ;
+USING: accessors arrays combinators kernel locals math
+math.order sequences sequences.private vectors ;
 IN: binary-search
 
 <PRIVATE
@@ -26,10 +26,10 @@ PRIVATE>
     over empty? [ 2drop f f ] [ [ 0 over length ] dip (search) ] if ;
     inline
 
-: natural-search ( obj seq -- i elt )
-    [ <=> ] with search ;
-
-HINTS: natural-search array ;
+GENERIC: natural-search ( obj seq -- i elt )
+M: object natural-search [ <=> ] with search ;
+M: array natural-search [ <=> ] with search ;
+M: vector natural-search [ <=> ] with search ;
 
 : sorted-index ( obj seq -- i )
     natural-search drop ;
