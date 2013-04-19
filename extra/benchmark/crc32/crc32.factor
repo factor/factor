@@ -2,7 +2,7 @@ USING: checksums checksums.crc32 io.encodings.ascii io.files kernel math ;
 IN: benchmark.crc32
 
 : crc32-benchmark ( -- )
-    10 [
+    1,000 [
         "vocab:mime/multipart/multipart-tests.factor"
         crc32 checksum-file drop
     ] times ;
