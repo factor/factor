@@ -40,7 +40,7 @@ IN: websites.concatenative
         init-furnace-tables
 
         {
-            paste annotation
+            paste-state annotation
             blog posting
             article revision
         } ensure-tables
