@@ -101,7 +101,9 @@ CONSTANT: zero-counts { 0 0 0 0 0 }
     ] [ f ] if ; inline
 
 :: collect-tops ( samples max-depth depth -- node )
-    samples [ drop unclip-callstack ] collect-by [
+    samples H{ } clone [
+        '[ unclip-callstack _ push-at ] each
+    ] keep [
         [ sum-counts ]
         [ max-depth depth [ max-depth depth 1 + collect-tops ] (collect-subtrees) ] bi
         depth <profile-node>
