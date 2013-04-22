@@ -397,7 +397,7 @@ CLASS: FactorWindowDelegate < NSObject
         notification -> object dup SEL: backingScaleFactor
         -> respondsToSelector: c-bool> [
             SEND: backingScaleFactor execute( x x -- x )
-            [ gl-scale-factor set-global ]
+            [ [ 1.0 > ] keep f ? gl-scale-factor set-global ]
             [ 1.0 > retina? set-global ] bi
         ] [ drop ] if
     ]
