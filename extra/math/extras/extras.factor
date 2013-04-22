@@ -123,23 +123,24 @@ PRIVATE>
         ] curry map
     ] if ;
 
+: 2pi-range ( n -- seq )
+    [ iota ] [ 1 - 2pi swap / ] bi v*n ;
+
 : hanning ( n -- seq )
     dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
-        [ iota ] [ 1 - 2pi swap / ] bi v*n
-        [ cos -0.5 * 0.5 + ] map!
+        2pi-range [ cos -0.5 * 0.5 + ] map!
     ] if ;
 
 : hamming ( n -- seq )
     dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
-        [ iota ] [ 1 - 2pi swap / ] bi v*n
-        [ cos -0.46 * 0.54 + ] map!
+        2pi-range [ cos -0.46 * 0.54 + ] map!
     ] if ;
 
 : blackman ( n -- seq )
     dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
-        [ iota ] [ 1 - 2pi swap / ] bi v*n
-        [ [ cos -0.5 * ] map ] [ [ 2 * cos 0.08 * ] map ] bi
-        v+ 0.42 v+n
+        2pi-range [
+            [ cos -0.5 * ] [ 2 * cos 0.08 * ] bi + 0.42 +
+        ] map
     ] if ;
 
 : nan-sum ( seq -- n )
