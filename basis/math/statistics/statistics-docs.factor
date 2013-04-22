@@ -238,7 +238,7 @@ HELP: rescale
 
 HELP: collect-by
 { $values
-    { "seq" sequence } { "quot" { $quotation "( obj -- ? )" } }
+    { "seq" sequence } { "quot" { $quotation "( ... obj -- ... key )" } }
     { "hashtable" hashtable }
 }
 { $description "Applies a quotation to each element in the input sequence and returns a " { $snippet "hashtable" } " of like elements. The keys of this " { $snippet "hashtable" } " are the output of " { $snippet "quot" } " and the values at each key are the elements that transformed to that key." }
@@ -254,7 +254,7 @@ HELP: collect-by
 
 HELP: collect-index-by
 { $values
-    { "seq" sequence } { "quot" { $quotation "( obj -- ? )" } }
+    { "seq" sequence } { "quot" { $quotation "( ... obj -- ... key )" } }
     { "hashtable" hashtable }
 }
 { $description "Applies a quotation to each element in the input sequence and returns a " { $snippet "hashtable" } " of like elements. The keys of this " { $snippet "hashtable" } " are the output of " { $snippet "quot" } " and the values at each key are the indices for the elements that transformed to that key." }
