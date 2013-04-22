@@ -390,6 +390,17 @@ CLASS: FactorWindowDelegate < NSObject
         notification -> object -> contentView
         [ window ungraft ] [ unregister-window ] bi
     ]
+
+    METHOD: void windowDidChangeBackingProperties: id notification
+    [
+
+        notification -> object dup SEL: backingScaleFactor
+        -> respondsToSelector: c-bool> [
+            SEND: backingScaleFactor execute( x x -- x )
+            [ gl-scale-factor set-global ]
+            [ 1.0 > retina? set-global ] bi
+        ] [ drop ] if
+    ]
 ]
 
 : install-window-delegate ( window -- )
