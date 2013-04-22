@@ -1,9 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables kernel sequences generic words
-arrays classes slots slots.private classes.tuple
-classes.tuple.private math vectors math.vectors quotations
-accessors combinators byte-arrays vocabs vocabs.loader ;
+USING: accessors arrays assocs byte-arrays classes
+classes.tuple classes.tuple.private combinators fry hashtables
+kernel math quotations sequences slots slots.private vectors ;
 IN: mirrors
 
 TUPLE: mirror { object read-only } ;
@@ -35,21 +34,21 @@ M: mirror delete-at ( key mirror -- )
     [ f ] 2dip set-at ;
 
 M: mirror clear-assoc ( mirror -- )
-    [ object>> ] [ object-slots ] bi [
-        [ initial>> ] [ offset>> ] bi swapd set-slot
-    ] with each ;
+    [ object-slots ] [ object>> ] bi '[
+        [ initial>> ] [ offset>> _ swap set-slot ] bi
+    ] each ;
 
 M: mirror >alist ( mirror -- alist )
-    [ object-slots [ [ name>> ] map ] [ [ offset>> ] map ] bi ]
-    [ object>> [ swap slot ] curry ] bi
-    map zip ;
+    [ object-slots ] [ object>> ] bi '[
+        [ name>> ] [ offset>> _ swap slot ] bi
+    ] { } map>assoc ;
 
 M: mirror keys ( mirror -- keys )
     object-slots [ name>> ] map ;
 
 M: mirror values ( mirror -- values )
-    [ object-slots [ offset>> ] map ]
-    [ object>> [ swap slot ] curry ] bi map ;
+    [ object-slots ] [ object>> ] bi
+    '[ offset>> _ swap slot ] map ;
 
 M: mirror assoc-size object>> layout-of second ;
 
