@@ -96,7 +96,7 @@ PRIVATE>
     <clumps> [ mean ] map ;
 
 : exponential-moving-average ( seq a -- newseq )
-    [ 1 ] 2dip [ [ dupd swap - ] dip * + dup ] curry map nip ;
+    [ 1 ] 2dip '[ dupd swap - _ * + dup ] map nip ;
 
 : moving-median ( u n -- v )
     clump [ median ] map ;
@@ -111,7 +111,7 @@ PRIVATE>
     <clumps> [ sum ] map ;
 
 : moving-count ( ... u n quot: ( ... elt -- ... ? ) -- ... v )
-    [ <clumps> ] [ [ count ] curry map ] bi* ; inline
+    [ <clumps> ] [ '[ _ count ] map ] bi* ; inline
 
 : nonzero ( seq -- seq' )
     [ zero? not ] filter ;
