@@ -40,8 +40,8 @@ name>char-hook [
 
 : next-escape ( str -- ch str' )
     dup first {
-        { CHAR: u [ 1 tail-slice unicode-escape ] }
-        { CHAR: x [ 1 tail-slice hex-escape ] }
+        { CHAR: u [ rest-slice unicode-escape ] }
+        { CHAR: x [ rest-slice hex-escape ] }
         [ drop unclip-slice escape swap ]
     } case ;
 
