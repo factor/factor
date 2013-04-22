@@ -247,18 +247,17 @@ PRIVATE>
 : normalized-histogram ( seq -- alist )
     [ histogram ] [ length ] bi '[ _ / ] assoc-map ;
 
-: collect-index-by ( seq quot -- hashtable )
-    [ swap ] prepose [ push-at ] sequence-index>hashtable ; inline
+: collect-index-by ( ... seq quot: ( ... obj -- ... key ) -- ... hashtable )
+    [ dip swap ] curry [ push-at ] sequence-index>hashtable ; inline
 
-: collect-by ( seq quot -- hashtable )
-    [ dup ] prepose [ push-at ] sequence>hashtable ; inline
+: collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... hashtable )
+    [ keep swap ] curry [ push-at ] sequence>hashtable ; inline
 
 : equal-probabilities ( n -- array )
     dup recip <array> ; inline
 
 : mode ( seq -- x )
-    histogram >alist
-    [ ] [ [ [ second ] bi@ > ] most ] map-reduce first ;
+    histogram >alist [ second ] supremum-by first ;
 
 : minmax ( seq -- min max )
     [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] each ;
@@ -380,18 +379,16 @@ ALIAS: std sample-std
     flip [ standardize ] map flip ;
 
 : differences ( u -- v )
-    [ 1 tail-slice ] keep v- ;
+    [ rest-slice ] keep v- ;
 
 : rescale ( u -- v )
     dup minmax over - [ v-n ] [ v/n ] bi* ;
 
+: rankings ( histogram -- assoc )
+    sort-keys 0 swap [ rot [ + ] keep swapd ] H{ } assoc-map-as nip ;
+
 : rank-values ( seq -- seq' )
-    [
-        [ ] [ length iota ] bi zip sort-keys
-        [ [ first ] bi@ = ] monotonic-split
-        [ values ] map [ 0 [ length + ] accumulate nip ] [ ] bi zip
-    ] [ length f <array> ] bi
-    [ '[ first2 [ _ set-nth ] with each ] each ] keep ;
+    dup histogram rankings '[ _ at ] map ;
 
 : z-score ( seq -- n )
     [ demean ] [ sample-std ] bi v/n ;
