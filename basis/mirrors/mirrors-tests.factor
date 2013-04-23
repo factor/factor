@@ -59,3 +59,6 @@ TUPLE: color
 [ ] [ "IN: mirrors.tests USE: math TUPLE: color { green integer } { red integer } { blue integer } ;" eval( -- ) ] unit-test
 
 [ 1 ] [ "red" "mirror" get at ] unit-test
+
+! Issue #857.
+{ 4 } [ "asdf" make-mirror assoc-size ] unit-test
