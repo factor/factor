@@ -51,7 +51,8 @@ M: mirror values ( mirror -- values )
     [ object-slots ] [ object>> ] bi
     '[ offset>> _ swap slot ] map ;
 
-M: mirror assoc-size object>> layout-of second ;
+M: mirror assoc-size
+    object>> class-of class-size ;
 
 INSTANCE: mirror assoc
 
@@ -60,7 +61,6 @@ INSTANCE: array             inspected-sequence
 INSTANCE: vector            inspected-sequence
 INSTANCE: callable          inspected-sequence
 INSTANCE: byte-array        inspected-sequence
-INSTANCE: string            inspected-sequence
 
 GENERIC: make-mirror ( obj -- assoc )
 M: hashtable make-mirror ;
