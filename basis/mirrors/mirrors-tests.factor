@@ -60,5 +60,6 @@ TUPLE: color
 
 [ 1 ] [ "red" "mirror" get at ] unit-test
 
-! Issue #857.
-{ 4 } [ "asdf" make-mirror assoc-size ] unit-test
+{ 3 } [ { 1 2 3 } make-mirror assoc-size ] unit-test
+{ 2 } [ "asdf" make-mirror assoc-size ] unit-test
+{ 8 } [ \ + make-mirror assoc-size ] unit-test
