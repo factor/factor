@@ -73,8 +73,11 @@ FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, voi
 : model ( -- str ) { 6 2 } sysctl-query-string ;
 M: macosx cpus ( -- n ) { 6 3 } sysctl-query-uint ;
 : byte-order ( -- n ) { 6 4 } sysctl-query-uint ;
-M: macosx physical-mem ( -- n ) { 6 5 } sysctl-query-uint ;
-: user-mem ( -- n ) { 6 6 } sysctl-query-uint ;
+
+! Only an int, not large enough. Deprecated.
+! M: macosx physical-mem ( -- n ) { 6 5 } sysctl-query-int ;
+! : user-mem ( -- n ) { 6 6 } sysctl-query-uint ;
+
 : page-size ( -- n ) { 6 7 } sysctl-query-uint ;
 : disknames ( -- n ) { 6 8 } 8 sysctl-query ;
 : diskstats ( -- n ) { 6 9 } 8 sysctl-query ;
@@ -92,5 +95,5 @@ M: macosx cpu-mhz ( -- n ) { 6 15 } sysctl-query-uint ;
 : l3-cache-settings ( -- n ) { 6 21 } sysctl-query-uint ;
 : l3-cache-size ( -- n ) { 6 22 } sysctl-query-uint ;
 : tb-frequency ( -- n ) { 6 23 } sysctl-query-uint ;
-: mem-size ( -- n ) { 6 24 } sysctl-query-ulonglong ;
+M: macosx physical-mem ( -- n ) { 6 24 } sysctl-query-ulonglong ;
 : available-cpus ( -- n ) { 6 25 } sysctl-query-uint ;
