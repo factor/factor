@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-fry html.parser http.client io kernel locals math sequences
-sets splitting unicode.case unicode.categories urls
+fry html.parser http.client io kernel locals math math.statistics
+sequences sets splitting unicode.case unicode.categories urls
 urls.encoding shuffle ;
 IN: html.parser.analyzer
 
@@ -51,14 +51,24 @@ ERROR: undefined-find-nth m n seq quot ;
 : find-first-name ( vector string -- i/f tag/f )
     >lower '[ name>> _ = ] find ; inline
 
-: find-matching-close ( vector string -- i/f tag/f )
+! Takes a sequence and a quotation expected to return -1 if the
+! element decrements the stack, 0 if it doesnt affect it and 1 if it
+! increments it. Then finds the matching element where the stack is
+! empty.
+: stack-find ( seq quot -- i/f )
+    map cum-sum [ 0 = ] find drop ; inline
+
+! Produces a function which returns 1 if the input item is an opening
+! tag element with the specified name, -1 if it is a closing tag of
+! the same name and 0 otherwise.
+: tag-classifier ( string -- quot )
     >lower
-    '[ [ name>> _ = ] [ closing?>> ] bi and ] find ; inline
+    '[ dup name>> _ = [ closing?>> [ -1 ] [ 1 ] if ] [ drop 0 ] if ] ; inline
 
 : find-between* ( vector i/f tag/f -- vector )
     over integer? [
         [ tail-slice ] [ name>> ] bi*
-        dupd find-matching-close drop [ 1 + ] [ 1 ] if*
+        dupd tag-classifier stack-find [ 1 + ] [ 1 ] if*
         head
     ] [
         3drop V{ } clone
