@@ -55,6 +55,16 @@ IN: math.functions.tests
 [  0.75 10,002 t ] [  3 10,000 2^ * [ frexp ] [ bignum? ] bi ] unit-test
 [ -0.75 10,002 t ] [ -3 10,000 2^ * [ frexp ] [ bignum? ] bi ] unit-test
 
+{ 0.0 } [ 0.0 1 ldexp ] unit-test
+{ -0.0 } [ -0.0 1 ldexp ] unit-test
+{ 1/0. } [ 1/0. 1 ldexp ] unit-test
+{ -1/0. } [ -1/0. 1 ldexp ] unit-test
+{ t } [ NAN: 90210 dup 1 ldexp [ fp-nan-payload ] same? ] unit-test
+{ 49152.0 } [ 12.0 12 ldexp ] unit-test
+{ 0x1.8p-9 } [ 12.0 -12 ldexp ] unit-test
+{ 49152 } [ 12 12 ldexp ] unit-test
+{ 0 } [ 12 -12 ldexp ] unit-test
+
 [ 0.0 ] [ 1 log ] unit-test
 [ 0.0 ] [ 1.0 log ] unit-test
 [ 1.0 ] [ e log ] unit-test
