@@ -116,6 +116,11 @@ HELP: frexp
 { $values { "x" number } { "y" float } { "exp" integer } }
 { $description "Break the number " { $snippet "x" } " into a normalized fraction " { $snippet "y" } " and an integral power of 2 " { $snippet "e^" } "." $nl "The function returns a number " { $snippet "y" } " in the interval [1/2, 1) or 0, and a number " { $snippet "exp" } " such that " { $snippet "x = y*(2**exp)" } "." } ;
 
+HELP: ldexp
+{ $values { "x" number } { "exp" number } { "y" number } }
+{ $description "Multiply " { $snippet "x" } " by " { $snippet "2^exp" } "." }
+{ $notes { $link ldexp } " is the inverse of " { $link frexp } "." } ;
+
 HELP: log
 { $values { "x" number } { "y" number } }
 { $description "Natural logarithm function. Outputs negative infinity if " { $snippet "x" } " is 0." } ;

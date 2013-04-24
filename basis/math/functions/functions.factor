@@ -204,6 +204,28 @@ M: integer frexp
         ] [ 1 + ] bi [ * ] dip
     ] if-zero ; inline
 
+DEFER: copysign
+
+GENERIC# ldexp 1 ( x exp -- y )
+
+M: float ldexp
+    over fp-special? [ over zero? ] unless* [ drop ] [
+        [ double>bits dup -52 shift 0x7ff bitand 1023 - ] dip +
+        {
+            { [ dup -1074 < ] [ drop 0 copysign ] }
+            { [ dup 1023 > ] [ drop 0 < -1/0. 1/0. ? ] }
+            [
+                dup -1022 < [ 52 + -52 2^ ] [ 1 ] if
+                [ -0x7ff0,0000,0000,0001 bitand ]
+                [ 1023 + 52 shift bitor bits>double ]
+                [ * ] tri*
+            ]
+        } cond
+    ] if ;
+
+M: integer ldexp
+    2dup [ zero? ] either? [ 2drop 0 ] [ shift ] if ;
+
 GENERIC: log ( x -- y )
 
 M: float log dup 0.0 >= [ flog ] [ 0.0 rect> log ] if ; inline
