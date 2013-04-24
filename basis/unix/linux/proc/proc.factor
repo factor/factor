@@ -76,7 +76,7 @@ TUPLE: processor-info
         } spread
     ] input<sequence processor-info boa ;
 
-MEMO: parse-proc-cpuinfo ( -- seq )
+: parse-proc-cpuinfo ( -- seq )
     "/proc/cpuinfo" utf8 file-lines
     { "" } split harvest [ lines>processor-info ] map ;
 
