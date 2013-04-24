@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-fry html.parser http.client io kernel locals math sequences
-sets splitting unicode.case unicode.categories urls
+fry html.parser http.client io kernel locals math math.statistics
+sequences sets splitting unicode.case unicode.categories urls
 urls.encoding shuffle ;
 IN: html.parser.analyzer
 
@@ -51,14 +51,17 @@ ERROR: undefined-find-nth m n seq quot ;
 : find-first-name ( vector string -- i/f tag/f )
     >lower '[ name>> _ = ] find ; inline
 
-: find-matching-close ( vector string -- i/f tag/f )
+: stack-find ( seq quot: ( elt -- 1/0/-1 ) -- i/f )
+    map cum-sum [ 0 = ] find drop ; inline
+
+: tag-classifier ( string -- quot )
     >lower
-    '[ [ name>> _ = ] [ closing?>> ] bi and ] find ; inline
+    '[ dup name>> _ = [ closing?>> -1 1  ? ] [ drop 0 ] if ] ; inline
 
 : find-between* ( vector i/f tag/f -- vector )
     over integer? [
         [ tail-slice ] [ name>> ] bi*
-        dupd find-matching-close drop [ 1 + ] [ 1 ] if*
+        dupd tag-classifier stack-find [ 1 + ] [ 1 ] if*
         head
     ] [
         3drop V{ } clone
