@@ -11,3 +11,9 @@ IN: sets.extras
 
 : proper-subset? ( set1 set2 -- ? )
     2dup subset? [ swap subset? not ] [ 2drop f ] if ;
+
+: superset? ( set1 set2 -- ? )
+    swap subset? ;
+
+: disjoint? ( set1 set2 -- ? )
+    intersects? not ;
