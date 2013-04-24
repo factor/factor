@@ -20,14 +20,11 @@ INSTANCE: missing immutable-sequence
 
 <PRIVATE
 
-: (minor-1) ( row col matrix1 -- matrix2 )
+: (minor') ( row col matrix1 -- matrix2 )
     [ remove-nth ] with map remove-nth ; 
 
-: (minor-2) ( row col matrix1 -- matrix2 )
-    [ swap <missing> ] with map remove-nth ;        
-
 : (minor) ( row col matrix1 -- matrix2 )
-    (minor-2) ;
+    [ swap <missing> ] with map swap <missing> ;        
 
 : minor ( matrix1 row col -- matrix2 )
     rot (minor) ;
