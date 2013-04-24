@@ -51,19 +51,12 @@ ERROR: undefined-find-nth m n seq quot ;
 : find-first-name ( vector string -- i/f tag/f )
     >lower '[ name>> _ = ] find ; inline
 
-! Takes a sequence and a quotation expected to return -1 if the
-! element decrements the stack, 0 if it doesnt affect it and 1 if it
-! increments it. Then finds the matching element where the stack is
-! empty.
-: stack-find ( seq quot -- i/f )
+: stack-find ( seq quot: ( elt -- 1/0/-1 ) -- i/f )
     map cum-sum [ 0 = ] find drop ; inline
 
-! Produces a function which returns 1 if the input item is an opening
-! tag element with the specified name, -1 if it is a closing tag of
-! the same name and 0 otherwise.
 : tag-classifier ( string -- quot )
     >lower
-    '[ dup name>> _ = [ closing?>> [ -1 ] [ 1 ] if ] [ drop 0 ] if ] ; inline
+    '[ dup name>> _ = [ closing?>> -1 1  ? ] [ drop 0 ] if ] ; inline
 
 : find-between* ( vector i/f tag/f -- vector )
     over integer? [
