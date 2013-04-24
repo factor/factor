@@ -146,13 +146,17 @@ M: timestamp year. ( timestamp -- )
     { { CHAR: + [ 1 ] } { CHAR: - [ -1 ] } } case time* ;
 
 : read-rfc3339-gmt-offset ( ch -- dt )
-    dup CHAR: Z = [ drop instant ] [
-        [
-            read-00 hours
-            read1 { { CHAR: : [ read-00 ] } { f [ 0 ] } } case minutes
-            time+
-        ] dip signed-gmt-offset
-    ] if ;
+    {
+        { f [ instant ] }
+        { CHAR: Z [ instant ] }
+        [ 
+            [
+                read-00 hours
+                read1 { { CHAR: : [ read-00 ] } { f [ 0 ] } } case minutes
+                time+
+            ] dip signed-gmt-offset
+        ]
+    } case ;
 
 : read-ymd ( -- y m d )
     read-0000 "-" expect read-00 "-" expect read-00 ;
