@@ -2,7 +2,7 @@ ifdef CONFIG
 	CC = gcc
 	CPP = g++
 
-	VERSION = 0.96
+	VERSION = 0.97
 
 	BUNDLE = Factor.app
 	LIBPATH = -L/usr/X11R6/lib
