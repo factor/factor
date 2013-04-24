@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax byte-arrays io
+USING: accessors alien.c-types alien.syntax byte-arrays io
 io.encodings.string io.encodings.utf8 io.streams.byte-array
-kernel sequences splitting strings system system-info unix ;
+kernel sequences splitting strings system system-info unix
+unix.linux.proc math ;
 IN: system-info.linux
 
 FUNCTION-ALIAS: (uname)
@@ -20,3 +21,8 @@ FUNCTION-ALIAS: (uname)
 : domainname ( -- string ) 5 uname nth ;
 
 M: linux os-version release ;
+M: linux cpus parse-proc-cpuinfo sort-cpus cpu-counts 2drop ;
+: cores ( -- n ) parse-proc-cpuinfo sort-cpus cpu-counts drop nip ;
+: hyperthreads ( -- n ) parse-proc-cpuinfo sort-cpus cpu-counts 2nip ;
+M: linux cpu-mhz parse-proc-cpuinfo first cpu-mhz>> 1,000,000 * ;
+M: linux physical-mem parse-proc-meminfo mem-total>> ;
