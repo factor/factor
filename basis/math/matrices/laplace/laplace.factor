@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays sequences sequences.deep sequences.extras 
         math math.functions math.vectors math.matrices fry grouping 
-        sequences.private accessors  ;
+        sequences.private accessors combinators.short-circuit ;
 IN: math.matrices.laplace
 
 TUPLE: missing seq i ;
