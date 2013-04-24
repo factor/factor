@@ -83,3 +83,14 @@ IN: calendar.format.tests
 
 [ ]
 [ { 2008 2009 } [ year. ] each ] unit-test
+
+[
+    T{ timestamp
+        { year 2013 }
+        { month 4 }
+        { day 23 }
+        { hour 13 }
+        { minute 50 }
+        { second 24 }
+    }
+] [ "2013-04-23T13:50:24" rfc3339>timestamp ] unit-test
