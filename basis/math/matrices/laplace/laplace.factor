@@ -44,8 +44,16 @@ INSTANCE: missing immutable-sequence
     dup length iota   
     [ nth-minor unbox-if-size-one ] with map ; 
 
+TUPLE: coeffs seq ;
+C: <coeffs> coeffs
+M: coeffs nth-unsafe
+dupd seq>> nth-unsafe swap odd? [ neg ] when ;
+M: coeffs length
+seq>> length ;
+INSTANCE: coeffs immutable-sequence
+
 : coeffs ( matrix -- seq )
-    first [ odd? [ neg ] when ] map-index ;
+first <coeffs> ;
 
 : coeffs-minors ( matrix -- coeffs minors )
       [ coeffs ] [ minors ] bi ;
