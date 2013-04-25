@@ -3,7 +3,7 @@
 
 USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs byte-arrays classes.struct continuations fry grouping
-kernel literals math sequences sorting splitting strings system
+kernel literals math sequences splitting strings system
 system-info.macosx tools.ps unix unix.time unix.types ;
 
 QUALIFIED-WITH: alien.c-types c
@@ -151,5 +151,4 @@ PRIVATE>
 
 M: macosx ps ( -- assoc )
     procs [ kp_proc>> p_pid>> 0 > ] filter
-    [ kp_proc>> [ p_pid>> ] [ ps-arg ] bi ] { } map>assoc
-    sort-keys ;
+    [ kp_proc>> [ p_pid>> ] [ ps-arg ] bi ] { } map>assoc ;
