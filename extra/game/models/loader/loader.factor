@@ -1,4 +1,4 @@
-! Copyright (C) 2010 Your name.
+! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs byte-arrays combinators game.models
 io.encodings.ascii io.files io.pathnames io.streams.byte-array
