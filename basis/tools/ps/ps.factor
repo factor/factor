@@ -1,6 +1,6 @@
 ! Copyright (C) 2012-2013 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators prettyprint system vocabs ;
+USING: combinators prettyprint sequences sorting system vocabs ;
 IN: tools.ps
 
 HOOK: ps os ( -- assoc )
@@ -12,4 +12,4 @@ HOOK: ps os ( -- assoc )
 } cond require
 
 : ps. ( -- )
-    ps simple-table. ;
+    ps sort-keys { "PID" "CMD" } prefix simple-table. ;
