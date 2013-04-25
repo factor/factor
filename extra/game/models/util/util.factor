@@ -1,4 +1,4 @@
-! Copyright (C) 2010 Your name.
+! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences accessors kernel locals assocs ;
 IN: game.models.util
