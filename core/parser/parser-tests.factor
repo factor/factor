@@ -35,6 +35,13 @@ unit-test
     eval( -- ) "USE: parser.tests hello" eval( -- string )
 ] unit-test
 
+[ "IN: parser.tests : \" ( -- n ) 123 ;" eval( -- ) ]
+[ error>> invalid-word-name? ] must-fail-with
+[ "IN: parser.tests : \"asdf ( -- n ) 123 ;" eval( -- ) ]
+[ error>> invalid-word-name? ] must-fail-with
+[ "IN: parser.tests : 123 ( -- n ) 123 ;" eval( -- ) ]
+[ error>> invalid-word-name? ] must-fail-with
+
 [ ]
 [ "! This is a comment, people." eval( -- ) ]
 unit-test

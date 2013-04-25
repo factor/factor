@@ -71,11 +71,12 @@ ERROR: number-expected ;
 : scan-number ( -- number )
     (scan-token) parse-number ;
 
+ERROR: invalid-word-name string ;
+
 : scan-word-name ( -- string )
     scan-token
-    dup string>number [
-        "Word names cannot be numbers" throw
-    ] when ;
+    dup "\"" = [ t ] [ dup string>number ] if
+    [ invalid-word-name ] when ;
 
 : scan-new ( -- word )
     scan-word-name create-in ;
