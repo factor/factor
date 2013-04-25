@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs io.directories io.pathnames kernel
 math.parser prettyprint sequences splitting system
-unix.linux.proc ;
+tools.ps unix.linux.proc ;
 IN: tools.ps.linux
 
 ! If cmdline is empty, read the filename from /proc/pid/stat
