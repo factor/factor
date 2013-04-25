@@ -377,3 +377,8 @@ CONSTANT: test-points {
     { 5 6 } square-cols
 ] unit-test
 
+{ t } [ { } square-matrix? ] unit-test
+{ t } [ { { 1 } } square-matrix? ] unit-test
+{ t } [ { { 1 2 } { 3 4 } } square-matrix? ] unit-test
+{ f } [ { { 1 } { 2 3 } } square-matrix? ] unit-test
+{ f } [ { { 1 2 } } square-matrix? ] unit-test
