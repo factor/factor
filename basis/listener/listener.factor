@@ -1,11 +1,10 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables io kernel math math.parser memory
-namespaces parser lexer sequences strings io.styles
-vectors words generic system combinators continuations debugger
-definitions compiler.units accessors colors prettyprint fry
-sets vocabs.parser source-files.errors locals vocabs vocabs.loader
-parser.notes ;
+USING: accessors colors colors.constants compiler.units
+continuations debugger fry io io.styles kernel lexer locals
+math math.parser namespaces parser parser.notes prettyprint
+sequences sets source-files.errors vocabs vocabs.loader
+vocabs.parser ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -16,8 +15,10 @@ GENERIC# prompt. 1 ( stream prompt -- )
     auto-use? get [ " auto-use" append ] when ;
 
 M: object prompt.
-    nip H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl
-    flush ;
+    nip H{
+        { background T{ rgba f 1 0.7 0.7 1 } }
+        { foreground COLOR: black }
+    } format bl flush ;
 
 : parse-lines-interactive ( lines -- quot/f )
     [ parse-lines ] with-compilation-unit ;
