@@ -1,25 +1,15 @@
-! Copyright (C) 2012 Doug Coleman.
+! Copyright (C) 2012-2013 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs io.directories io.pathnames kernel
-math.parser prettyprint sequences splitting unix.linux.proc ;
+USING: combinators prettyprint system vocabs ;
 IN: tools.ps
 
-! If cmdline is empty, read the filename from /proc/pid/stat
-: ps-cmdline ( path -- path string )
-    dup parse-proc-pid-cmdline [
-        dup parse-proc-pid-stat filename>>
-        [ "()" member? ] trim
-        "[" "]" surround
-    ] [
-        "\0" split " " join
-    ] if-empty ;
+HOOK: ps os ( -- assoc )
 
-: ps ( -- assoc )
-    "/proc" [
-        "." directory-files
-        [ file-name string>number ] filter
-        [ ps-cmdline ] { } map>assoc
-    ] with-directory ;
+{
+    { [ os macosx?  ] [ "tools.ps.macosx"  ] }
+    { [ os linux?   ] [ "tools.ps.linux"   ] }
+    { [ os windows? ] [ "tools.ps.windows" ] }
+} cond require
 
 : ps. ( -- )
     ps simple-table. ;
