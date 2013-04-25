@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Keith Lazuka.
+! Copyright (C) 2009 Keith Lazuka, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs colors colors.constants combinators
 combinators.short-circuit hashtables io.styles kernel literals
