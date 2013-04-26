@@ -14,8 +14,13 @@ SPECIALIZED-ARRAY: void*
 : make-sender ( signature function -- quot )
     [ over first , f , , second , \ alien-invoke , ] [ ] make ;
 
-: sender-stub ( name signature function -- word )
-    [ "( sender-stub:" ")" surround f <word> dup ] 2dip
+: sender-stub-name ( signature -- str )
+    first2 [ name>> ] [
+        [ name>> ] map "," join "(" ")" surround
+    ] bi* append "( sender-stub:" " )" surround ;
+
+: sender-stub ( signature function -- word )
+    [ [ sender-stub-name f <word> dup ] keep ] dip
     over first large-struct? [ "_stret" append ] when
     make-sender dup infer define-declared ;
 
@@ -25,13 +30,13 @@ SYMBOL: super-message-senders
 message-senders [ H{ } clone ] initialize
 super-message-senders [ H{ } clone ] initialize
 
-:: cache-stub ( name signature function assoc -- )
-    signature assoc [ [ name ] dip function sender-stub ] cache drop ;
+:: cache-stub ( signature function assoc -- )
+    signature assoc [ function sender-stub ] cache drop ;
 
-: cache-stubs ( name signature -- )
+: cache-stubs ( signature -- )
     [ "objc_msgSendSuper" super-message-senders get cache-stub ]
     [ "objc_msgSend" message-senders get cache-stub ]
-    2bi ;
+    bi ;
 
 : <super> ( receiver -- super )
     [ ] [ object_getClass class_getSuperclass ] bi
@@ -224,7 +229,7 @@ ERROR: no-objc-type name ;
 : register-objc-method ( method -- )
     [ method-name ]
     [ [ method-return-type ] [ method-arg-types ] bi 2array ] bi
-    [ cache-stubs ] [ swap objc-methods get set-at ] 2bi ;
+    [ nip cache-stubs ] [ swap objc-methods get set-at ] 2bi ;
 
 : each-method-in-class ( class quot -- )
     [ { uint } [ class_copyMethodList ] with-out-parameters ] dip
