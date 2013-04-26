@@ -30,7 +30,7 @@ C: <terminfo-header> terminfo-header
     5 firstn <terminfo-header> ;
 
 : read-names ( header -- names )
-    names-bytes>> read 1 head* "|" split [ >string ] map ;
+    names-bytes>> read but-last "|" split [ >string ] map ;
 
 : read-booleans ( header -- booleans )
     boolean-bytes>> read [ 1 = ] { } map-as ;
