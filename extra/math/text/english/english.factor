@@ -91,6 +91,8 @@ SYMBOL: and-needed?
 
 PRIVATE>
 
-: number>text ( n -- str )
-    dup zero? [ small-numbers ] [ [ (number>text) ] with-scope ] if ;
+GENERIC: number>text ( n -- str )
+
+M: integer number>text
+    [ "zero" ] [ [ (number>text) ] with-scope ] if-zero ;
 
