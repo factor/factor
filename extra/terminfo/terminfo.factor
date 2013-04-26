@@ -30,13 +30,13 @@ C: <terminfo-header> terminfo-header
     5 firstn <terminfo-header> ;
 
 : read-names ( header -- names )
-    names-bytes>> read 1 head* "|" split [ >string ] map ;
+    names-bytes>> read but-last "|" split [ >string ] map ;
 
 : read-booleans ( header -- booleans )
     boolean-bytes>> read [ 1 = ] { } map-as ;
 
 : read-shorts ( n -- seq' )
-    2 * read 2 <groups> [ le> dup 65534 >= [ drop f ] when ] map ;
+    2 * read 2 <groups> [ signed-le> dup 0 < [ drop f ] when ] map ;
 
 : align-even-bytes ( header -- )
     [ names-bytes>> ] [ boolean-bytes>> ] bi + odd?
