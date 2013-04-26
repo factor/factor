@@ -1,4 +1,5 @@
-USING: vocabs.prettyprint tools.test io.streams.string eval ;
+USING: vocabs.prettyprint vocabs.prettyprint.private tools.test
+io.streams.string eval ;
 IN: vocabs.prettyprint.tests
 
 : manifest-test-1 ( -- string )
@@ -42,3 +43,27 @@ EXCLUDE: parser => run-file ;
 IN: vocabs.prettyprint.tests"""
 ]
 [ [ manifest-test-3 eval( -- ) ] with-string-writer ] unit-test
+
+[
+"""USING: alien.c-types alien.syntax byte-arrays io
+io.encodings.binary io.encodings.string io.encodings.utf8
+io.streams.byte-array kernel sequences system system-info unix ;"""
+] [
+    [
+        {
+            "alien.c-types"
+            "alien.syntax"
+            "byte-arrays"
+            "io"
+            "io.encodings.binary"
+            "io.encodings.string"
+            "io.encodings.utf8"
+            "io.streams.byte-array"
+            "kernel"
+            "sequences"
+            "system"
+            "system-info"
+            "unix"
+        } pprint-using
+    ] with-string-writer
+] unit-test

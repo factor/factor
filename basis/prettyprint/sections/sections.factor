@@ -98,7 +98,7 @@ style overhang ;
         0 >>overhang ; inline
 
 M: section section-fits? ( section -- ? )
-    [ end>> pprinter get last-newline>> - ]
+    [ end>> 1 - pprinter get last-newline>> - ]
     [ overhang>> ] bi
     + text-fits? ;
 
@@ -266,7 +266,7 @@ M: flow short-section? ( section -- ? )
     #! a short section
     {
         [ section-fits? ]
-        [ [ end>> ] [ start>> ] bi - text-fits? not ]
+        [ [ end>> 1 - ] [ start>> ] bi - text-fits? not ]
     } 1|| ;
 
 : <flow ( -- ) <flow> (<block) ;
