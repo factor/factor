@@ -15,6 +15,8 @@ IN: sequences.extras.tests
 [ { "a" "ab" "abc" "abcd" "b" "bc" "bcd" "c" "cd" "d" } ]
 [ [ "abcd" [ , ] each-subseq ] { } make ] unit-test
 
+{ B{ 115 } } [ 1 2 "asdf" B{ } subseq-as ] unit-test
+
 [ "" ] [ "abc" "def" longest-subseq ] unit-test
 [ "abcd" ] [ "abcd" "abcde" longest-subseq ] unit-test
 [ "foo" ] [ "foo" "foobar" longest-subseq ] unit-test
