@@ -37,20 +37,14 @@ C: <terminfo-header> terminfo-header
 : read-booleans ( header -- booleans )
     boolean-bytes>> read [ 1 = ] { } map-as ;
 
-: parse-shorts ( seq -- seq' )
-    [ le> dup 65535 = [ drop f ] when ] map ;
+: read-shorts ( n -- seq' )
+    2 * read 2 <groups> [ le> dup 65535 = [ drop f ] when ] map ;
 
 : read-numbers ( header -- numbers )
-    #numbers>> 2 * read 2 <groups> parse-shorts ;
+    #numbers>> read-shorts ;
 
 : read-strings ( header -- strings )
-    #strings>> 2 * read 2 <groups> parse-shorts ;
-
-: read-string-table ( header -- string-table )
-    string-bytes>> read ;
-
-: parse-strings ( strings string-table -- strings )
-    '[
+    [ #strings>> read-shorts ] [ string-bytes>> read ] bi '[
         [ _ 0 2over index-from swap subseq >string ] [ f ] if*
     ] map ;
 
@@ -64,8 +58,7 @@ C: <terminfo> terminfo
         [ read-booleans ]
         [ read-numbers ]
         [ read-strings ]
-        [ read-string-table ]
-    } cleave parse-strings <terminfo> ;
+    } cleave <terminfo> ;
 
 PRIVATE>
 
