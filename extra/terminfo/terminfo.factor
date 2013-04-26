@@ -4,7 +4,7 @@
 USING: accessors assocs combinators formatting fry grouping
 hashtables io io.binary io.directories io.encodings.binary
 io.files kernel math math.parser memoize pack sequences
-sequences.generalizations splitting strings ;
+sequences.generalizations splitting strings system ;
 
 IN: terminfo
 
@@ -66,7 +66,8 @@ PRIVATE>
     binary [ read-terminfo ] with-file-reader ;
 
 : terminfo-path ( name -- path )
-    [ first >hex ] keep "/usr/share/terminfo/%s/%s" sprintf ;
+    [ first os macosx? [ >hex ] when ] keep
+    "/usr/share/terminfo/%s/%s" sprintf ;
 
 MEMO: terminfo-names ( -- names )
     "/usr/share/terminfo" [
