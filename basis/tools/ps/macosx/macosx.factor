@@ -122,14 +122,10 @@ STRUCT: kinfo_proc
     { e_login char[12] }
     { e_spare int32_t[4] } ;
 
-: split1-skip-slice ( seq quot: ( elt -- ? ) -- before-slice after-slice )
-    [ find drop dup ]
-    [ [ not ] compose find-from drop over or ]
-    [ drop snip-slice ] 2tri ; inline
-
 : head-split-skip ( seq n quot: ( elt -- ? ) -- pieces )
     [ dup 0 >= ] swap '[
-        [ _ split1-skip-slice ] [ 1 - rot ] bi*
+        [ _ [ trim-head-slice ] [ split1-when-slice ] bi ]
+        [ 1 - rot ] bi*
     ] produce 2nip ; inline
 
 : args ( pid -- args )
