@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators fry grouping http.client io
-json.reader kernel locals make namespaces sequences ;
+io.encodings.binary io.files io.files.unique json.reader kernel
+locals make namespaces sequences urls ;
 IN: google.translate
 
 CONSTANT: google-translate-url "http://ajax.googleapis.com/ajax/services/language/translate"
@@ -49,6 +50,12 @@ ERROR: response-error response error ;
         target source translate dup print
         swap dupd = not
     ] loop drop ;
+
+: translate-tts ( text -- file )
+    "http://translate.google.com/translate_tts?tl=en" >url
+    swap "q" set-query-param http-get nip
+    temporary-file ".mp3" append
+    [ binary set-file-contents ] keep ;
 
 ! Example:
 ! "dog" "en" "de" translate .
