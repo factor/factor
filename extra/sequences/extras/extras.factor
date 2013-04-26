@@ -6,16 +6,17 @@ IN: sequences.extras
 
 : reduce1 ( seq quot -- result ) [ unclip ] dip reduce ; inline
 
-:: reduce-r ( list identity quot: ( obj1 obj2 -- obj ) -- result )
-    list empty?
-    [ identity ]
-    [ list rest identity quot reduce-r list first quot call ] if ;
-    inline recursive
+:: reduce-r ( seq identity quot: ( obj1 obj2 -- obj ) -- result )
+    seq [ identity ] [
+        unclip [ identity quot reduce-r ] [ quot call ] bi*
+    ] if-empty ; inline recursive
 
 ! Quot must have static stack effect, unlike "reduce"
-:: reduce* ( seq id quot -- result ) seq
-    [ id ]
-    [ unclip id swap quot call( prev elt -- next ) quot reduce* ] if-empty ; inline recursive
+:: reduce* ( seq identity quot: ( prev elt -- next ) -- result )
+    seq [ identity ] [
+        unclip identity swap quot call( prev elt -- next )
+        quot reduce*
+    ] if-empty ; inline recursive
 
 :: combos ( list1 list2 -- result )
     list2 [ [ 2array ] curry list1 swap map ] map concat ;
