@@ -90,5 +90,7 @@ MEMO: units ( -- seq ) ! up to 10^99
 
 PRIVATE>
 
-: number>text ( n -- str )
-    dup abs 10 102 ^ >= [ number>string ] [ basic ] if ;
+GENERIC: number>text ( n -- str )
+
+M: integer number>text
+    dup abs 102 10^ >= [ number>string ] [ basic ] if ;
