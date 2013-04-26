@@ -36,7 +36,7 @@ C: <terminfo-header> terminfo-header
     boolean-bytes>> read [ 1 = ] { } map-as ;
 
 : read-shorts ( n -- seq' )
-    2 * read 2 <groups> [ le> dup 65535 = [ drop f ] when ] map ;
+    2 * read 2 <groups> [ le> dup 65534 >= [ drop f ] when ] map ;
 
 : align-even-bytes ( header -- )
     [ names-bytes>> ] [ boolean-bytes>> ] bi + odd?
