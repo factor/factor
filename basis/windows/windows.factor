@@ -22,4 +22,5 @@ CONSTANT: MAX_UNICODE_PATH 32768
     { "ole32"       "ole32.dll"          stdcall }
     { "usp10"       "usp10.dll"          stdcall }
     { "psapi"       "psapi.dll"          stdcall }
+    { "winmm"       "winmm.dll"          stdcall }
 } [ first3 add-library ] each
