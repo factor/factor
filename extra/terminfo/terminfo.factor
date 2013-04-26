@@ -65,9 +65,13 @@ PRIVATE>
 : file>terminfo ( path -- terminfo )
     binary [ read-terminfo ] with-file-reader ;
 
-: terminfo-path ( name -- path )
-    [ first os macosx? [ >hex ] when ] keep
-    "/usr/share/terminfo/%s/%s" sprintf ;
+HOOK: terminfo-path os ( name -- path )
+
+M: macosx terminfo-path ( name -- path )
+    [ first >hex ] keep "/usr/share/terminfo/%s/%s" sprintf ;
+
+M: linux terminfo-path ( name -- path )
+    [ first ] keep "/usr/share/terminfo/%c/%s" sprintf ;
 
 MEMO: terminfo-names ( -- names )
     "/usr/share/terminfo" [
