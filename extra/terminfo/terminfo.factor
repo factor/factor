@@ -45,10 +45,12 @@ C: <terminfo-header> terminfo-header
 : read-numbers ( header -- numbers )
     [ align-even-bytes ] [ #numbers>> read-shorts ] bi ;
 
+: string-offset ( from seq -- str )
+    0 2over index-from swap subseq >string ;
+
 : read-strings ( header -- strings )
-    [ #strings>> read-shorts ] [ string-bytes>> read ] bi '[
-        [ _ 0 2over index-from swap subseq >string ] [ f ] if*
-    ] map ;
+    [ #strings>> read-shorts ] [ string-bytes>> read ] bi
+    '[ [ _ string-offset ] [ f ] if* ] map ;
 
 TUPLE: terminfo names booleans numbers strings ;
 
