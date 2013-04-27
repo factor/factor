@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel windows.types
-math multiline classes.struct alien.data arrays ;
+math multiline classes.struct alien.data arrays literals ;
 QUALIFIED-WITH: alien.c-types c
 IN: windows.kernel32
 
@@ -809,6 +809,21 @@ STRUCT: CONSOLE_SCREEN_BUFFER_INFO
 { srWindow SMALL_RECT }
 { dwMaximumWindowSize COORD } ;
 
+STRUCT: PROCESSENTRY32
+    { dwSize DWORD }
+    { cntUsage DWORD }
+    { th32ProcessID DWORD }
+    { th32DefaultHeapID ULONG_PTR }
+    { th32ModuleID DWORD }
+    { cntThreads DWORD }
+    { th32ParentProcessID DWORD }
+    { pcPriClassBase LONG }
+    { dwFlags DWORD }
+    { szExeFile TCHAR[MAX_PATH] } ;
+
+TYPEDEF: PROCESSENTRY32* PPROCESSENTRY32
+TYPEDEF: PROCESSENTRY32* LPPROCESSENTRY32
+
 ! Resource IDs
 : MAKEINTRESOURCE ( int -- resource ) 0xffff bitand <alien> ; inline
 
@@ -1009,7 +1024,16 @@ FUNCTION: HANDLE CreateRemoteThread ( HANDLE hProcess,
 ! FUNCTION: CreateThread
 ! FUNCTION: CreateTimerQueue
 ! FUNCTION: CreateTimerQueueTimer
-! FUNCTION: CreateToolhelp32Snapshot
+
+CONSTANT: TH32CS_INHERIT 0x80000000
+CONSTANT: TH32CS_SNAPHEAPLIST 1
+CONSTANT: TH32CS_SNAPMODULE 8
+CONSTANT: TH32CS_SNAPMODULE32 0x10
+CONSTANT: TH32CS_SNAPPROCESS 2
+CONSTANT: TH32CS_SNAPTHREAD 4
+CONSTANT: TH32CS_SNAPALL flags{ TH32CS_SNAPHEAPLIST TH32CS_SNAPMODULE TH32CS_SNAPPROCESS TH32CS_SNAPTHREAD }
+
+FUNCTION: HANDLE CreateToolhelp32Snapshot ( DWORD dwFlags, DWORD th32ProcessID ) ;
 ! FUNCTION: CreateVirtualBuffer
 ! FUNCTION: CreateWaitableTimerA
 ! FUNCTION: CreateWaitableTimerW
@@ -1642,7 +1666,7 @@ ALIAS: OpenFileMapping OpenFileMappingW
 ! FUNCTION: OpenJobObjectA
 ! FUNCTION: OpenJobObjectW
 ! FUNCTION: OpenMutexA
-! FUNCTION: OpenMutexW
+! FUNCTION: OpenMutexW 
 FUNCTION: HANDLE OpenProcess ( DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId ) ;
 ! FUNCTION: OpenProfileUserMapping
 ! FUNCTION: OpenSemaphoreA
@@ -1660,9 +1684,11 @@ FUNCTION: HANDLE OpenProcess ( DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD
 ! FUNCTION: PrivCopyFileExW
 ! FUNCTION: PrivMoveFileIdentityW
 ! FUNCTION: Process32First
-! FUNCTION: Process32FirstW
+FUNCTION: BOOL Process32FirstW ( HANDLE hSnapshot, LPPROCESSENTRY32 lppe ) ;
+ALIAS: Process32First Process32FirstW
 ! FUNCTION: Process32Next
-! FUNCTION: Process32NextW
+FUNCTION: BOOL Process32NextW ( HANDLE hSnapshot, LPPROCESSENTRY32 lppe ) ;
+ALIAS: Process32Next Process32NextW
 ! FUNCTION: ProcessIdToSessionId
 ! FUNCTION: PulseEvent
 ! FUNCTION: PurgeComm
