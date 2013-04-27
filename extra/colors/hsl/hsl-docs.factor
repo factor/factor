@@ -5,7 +5,7 @@ HELP: hsla
 { $class-description "The class of HSL (Hue, Saturation, Lightness) colors with an alpha channel. All slots store values in the interval " { $snippet "[0,1]" } "." } ;
 
 ARTICLE: "colors.hsl" "HSL colors"
-"THe " { $vocab-link "colors.hsl" } " vocabulary implements colors specified by their hue, saturation, and lightness components, together with an alpha channel."
+"The " { $vocab-link "colors.hsl" } " vocabulary implements colors specified by their hue, saturation, and lightness components, together with an alpha channel."
 { $subsections
     hsla
     <hsla>
