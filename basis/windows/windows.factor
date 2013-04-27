@@ -23,4 +23,5 @@ CONSTANT: MAX_UNICODE_PATH 32768
     { "usp10"       "usp10.dll"          stdcall }
     { "psapi"       "psapi.dll"          stdcall }
     { "winmm"       "winmm.dll"          stdcall }
+    { "ntdll"       "ntdll.dll"          stdcall }
 } [ first3 add-library ] each
