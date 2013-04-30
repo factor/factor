@@ -44,8 +44,10 @@ TUPLE: processor-info
     { address-sizes array }
     { power-management string } ;
 
+! Linux 2.6 has fewer values than new kernels
 : lines>processor-info ( strings -- processor-info )
     [ ":" split second [ CHAR: \s = ] trim ] map
+    25 f pad-tail
     [
         {
             [ string>number ]
