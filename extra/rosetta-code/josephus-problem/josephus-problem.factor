@@ -40,8 +40,11 @@ IN: rosetta-code.josephus-problem
 !    simply walks away. These details are not relevant, at least not
 !    mathematically.
 
-:: josephus ( n k -- m )
+:: josephus-k ( n k -- m )
     n [1,b] 0 [ [ k + ] dip mod ] reduce ;
 
-: josephus2 ( n -- m )  ! faster for k=2
-    dup log2 2^ - 2 * ;
+:: josephus-2 ( n -- m )  ! faster for k=2
+    n n log2 2^ - 2 * ;
+
+:: josephus ( n k -- m )
+    k 2 = [ n josephus-2 ] [ n k josephus-k ] if ;
