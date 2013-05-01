@@ -361,7 +361,8 @@ INSTANCE: odds immutable-sequence
 <PRIVATE
 
 : (reverse) ( seq -- newseq )
-    dup [ length ] keep new-sequence [ 0 swap copy ] keep reverse! ;
+    dup [ length ] keep new-sequence
+    [ 0 swap copy-unsafe ] keep reverse! ;
 
 PRIVATE>
 
@@ -391,14 +392,18 @@ PRIVATE>
         ]
     ] keep dup branch? [ drop f ] unless make ;
 
+<PRIVATE
+
 : (map-find-index) ( seq quot find-quot -- result elt index )
     [ [ f ] 2dip [ [ nip ] 2dip call dup ] curry ] dip call
     [ [ [ drop f ] unless ] keep ] dip ; inline
 
+PRIVATE>
+
 : map-find-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result elt index )
     [ find-index ] (map-find-index) ; inline
 
-: filter-length ( seq n -- seq' ) swap [ length = ] with filter ;
+: filter-length ( seq n -- seq' ) '[ length _ = ] filter ;
 
 : all-shortest ( seqs -- seqs' ) dup shortest length filter-length ;
 
