@@ -122,6 +122,9 @@ IN: sequences.extras
         [ seq <slice> ] keep len or swap
     ] produce nip ; inline
 
+: cut-slice* ( seq n -- before after )
+    [ head-slice* ] [ tail-slice* ] 2bi ;
+
 : rotate ( seq n -- seq' )
     cut prepend ;
 
