@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup math prettyprint locals sequences ;
+USING: help.syntax help.markup math math.functions prettyprint locals sequences ;
 IN: infix
 
 HELP: [infix
@@ -29,14 +29,15 @@ ARTICLE: "infix" "Infix notation"
 "The " { $vocab-link "infix" } " vocabulary implements support for infix notation in Factor source code."
 { $subsections
     POSTPONE: [infix
+    POSTPONE: INFIX::
 }
-$nl
 "The usual infix math operators are supported:"
 { $list
     { $link + }
     { $link - }
     { $link * }
     { $link / }
+    { { $snippet "**" } ", which is the infix operator for " { $link ^ } "." }
     { { $snippet "%" } ", which is the infix operator for " { $link mod } "." }
 }
 "The standard precedence rules apply: Grouping with parentheses before " { $snippet "*" } ", " { $snippet "/" } "and " { $snippet "%" } " before " { $snippet "+" } " and " { $snippet "-" } "."
@@ -59,18 +60,30 @@ $nl
     "1.0"
 }
 $nl
-"You can access " { $vocab-link "sequences" } " inside infix expressions with the familiar " { $snippet "arr[index]" } " notation."
+"You can access " { $vocab-link "sequences" } " inside infix expressions with the familiar " { $snippet "seq[index]" } " notation."
 { $example
     "USING: arrays locals infix ;"
     "[let { 1 2 3 4 } :> myarr [infix myarr[4/2]*3 infix] ] ."
     "9"
 }
 $nl
-"You can create sub-" { $vocab-link "sequences" } " inside infix expressions using " { $snippet "arr[from:to]" } " notation."
+"You can create sub-" { $vocab-link "sequences" } " inside infix expressions using " { $snippet "seq[from:to]" } " notation."
 { $example
     "USING: arrays locals infix ;"
     "[let \"foobar\" :> s [infix s[0:3] infix] ] ."
     "\"foo\""
+}
+$nl
+"Additionally, you can step through " { $vocab-link "sequences" } " with " { $snippet "seq[from:to:step]" } " notation."
+{ $example
+    "USING: arrays locals infix ;"
+    "[let \"reverse\" :> s [infix s[::-1] infix] ] ."
+    "\"esrever\""
+}
+{ $example
+    "USING: arrays locals infix ;"
+    "[let \"0123456789\" :> s [infix s[::2] infix] ] ."
+    "\"02468\""
 }
 ;
 
