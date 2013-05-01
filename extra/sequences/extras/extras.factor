@@ -1,6 +1,6 @@
 USING: accessors arrays assocs fry grouping growable kernel
 locals make math math.order math.ranges sequences
-sequences.deep sequences.private sorting splitting ;
+sequences.deep sequences.private sorting splitting vectors ;
 FROM: sequences => change-nth ;
 IN: sequences.extras
 
@@ -104,10 +104,10 @@ IN: sequences.extras
         [ [ 2 * 1 + ] dip nth-unsafe ] curry
     ] keep map-integers ;
 
-: compact ( seq quot elt -- seq' )
+: compact ( ... seq quot: ( ... elt -- ... ? ) elt -- ... seq' )
     [ split-when harvest ] dip join ; inline
 
-: collapse ( seq quot elt -- seq' )
+: collapse ( ... seq quot: ( ... elt -- ... ? ) elt -- ... seq' )
     [ split-when ] dip
     [ [ harvest ] dip join ]
     [ [ first empty? ] dip [ prepend ] curry when ]
@@ -326,14 +326,22 @@ INSTANCE: odds immutable-sequence
     [ dup empty? ] swap until drop ; inline
 
 : arg-max ( seq -- n )
-    dup length iota zip [ first-unsafe ] supremum-by second ;
+    <enum> [ second-unsafe ] supremum-by first ;
 
 : arg-min ( seq -- n )
-    dup length iota zip [ first-unsafe ] infimum-by second ;
+    <enum> [ second-unsafe ] infimum-by first ;
+
+<PRIVATE
+
+: push-index-if ( ..a elt i quot: ( ..a elt -- ..b ? ) accum -- ..b )
+    [ dip ] dip rot [ push ] [ 2drop ] if ; inline
+
+PRIVATE>
 
 : arg-where ( ... seq quot: ( ... elt -- ... ? ) -- ... indices )
-    [ dup length iota zip ] dip
-    [ first-unsafe ] prepose filter values ; inline
+    over length <vector> [
+        [ push-index-if ] 2curry each-index
+    ] keep ; inline
 
 : arg-sort ( seq -- indices )
     dup length iota zip sort-keys values ;
