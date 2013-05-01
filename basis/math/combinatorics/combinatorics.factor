@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs binary-search classes.tuple fry
-kernel locals math math.order math.ranges memoize namespaces
-sequences sequences.private sorting ;
+hints kernel locals math math.order math.ranges memoize
+namespaces sequences sequences.private sorting ;
 FROM: sequences => change-nth ;
 IN: math.combinatorics
 
@@ -100,19 +100,21 @@ PRIVATE>
 <PRIVATE
 
 : cut-point ( seq -- n )
-    [ last ] keep [ [ > ] keep swap ] find-last drop nip ;
+    [ last ] keep [ [ > ] keep swap ] find-last drop nip ; inline
 
 : greater-from-last ( n seq -- i )
-    [ nip ] [ nth ] 2bi [ > ] curry find-last drop ;
+    [ nip ] [ nth ] 2bi [ > ] curry find-last drop ; inline
 
 : reverse-tail! ( n seq -- seq )
-    [ swap 1 + tail-slice reverse! drop ] keep ;
+    [ swap 1 + tail-slice reverse! drop ] keep ; inline
 
 : (next-permutation) ( seq -- seq )
     dup cut-point [
         swap [ greater-from-last ] 2keep
         [ exchange ] [ reverse-tail! nip ] 3bi
     ] [ reverse! ] if* ;
+
+HINTS: (next-permutation) array ;
 
 PRIVATE>
 
@@ -162,14 +164,14 @@ INSTANCE: combinations immutable-sequence
 <PRIVATE
 
 : find-max-index ( seq n -- i )
-    over length - '[ _ + >= ] find-index drop ;
+    over length - '[ _ + >= ] find-index drop ; inline
 
 : increment-rest ( i seq -- )
     [ nth ] [ swap tail-slice ] 2bi
-    [ drop 1 + dup ] map! 2drop ;
+    [ drop 1 + dup ] map! 2drop ; inline
 
 : increment-last ( seq -- )
-    [ [ length 1 - ] keep [ 1 + ] change-nth ] unless-empty ;
+    [ [ length 1 - ] keep [ 1 + ] change-nth ] unless-empty ; inline
 
 :: next-combination ( seq n -- seq )
     seq n find-max-index [
@@ -177,6 +179,8 @@ INSTANCE: combinations immutable-sequence
     ] [
         seq increment-last
     ] if* seq ;
+
+HINTS: next-combination array fixnum ;
 
 :: combinations-quot ( seq k quot -- seq quot' )
     seq length :> n
