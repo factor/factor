@@ -18,3 +18,7 @@ IN: sets.extras.tests
 { f } [ { 1 2 } { 1 2 } proper-subset? ] unit-test
 { f } [ { 1 2 3 } { 1 2 } proper-subset? ] unit-test
 { t } [ { 1 2 } { 1 2 3 } proper-subset? ] unit-test
+
+{ "abc" } [ "abc" non-repeating ] unit-test
+{ "abc" } [ "abcddd" non-repeating ] unit-test
+{ "" } [ "aabbcc" non-repeating ] unit-test
