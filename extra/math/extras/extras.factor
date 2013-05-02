@@ -152,6 +152,11 @@ PRIVATE>
 : nan-max ( seq -- n )
     [ fp-nan? not ] filter supremum ;
 
+: fill-nans ( seq -- newseq )
+    [ first ] keep [
+        dup fp-nan? [ drop dup ] [ nip dup ] if
+    ] map nip ;
+
 : sinc ( x -- y )
     [ 1 ] [ pi * [ sin ] [ / ] bi ] if-zero ;
 
