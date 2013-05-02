@@ -416,3 +416,9 @@ PRIVATE>
 : all-shortest ( seqs -- seqs' ) dup shortest length filter-length ;
 
 : all-longest ( seqs -- seqs' ) dup longest length filter-length ;
+
+: remove-first ( obj seq -- seq' )
+    [ index ] keep over [ remove-nth ] [ nip ] if ;
+
+: remove-first! ( obj seq -- seq )
+    [ index ] keep over [ remove-nth! ] [ nip ] if ;
