@@ -99,7 +99,7 @@ PRIVATE>
     [ 1 ] 2dip '[ dupd swap - _ * + dup ] map nip ;
 
 : moving-median ( u n -- v )
-    clump [ median ] map ;
+    <clumps> [ median ] map ;
 
 : moving-supremum ( u n -- v )
     <clumps> [ supremum ] map ;
