@@ -264,3 +264,17 @@ M: float round-to-even
 
 : round-to-step ( x step -- y )
     [ [ / round ] [ * ] bi ] unless-zero ;
+
+: monotonic-count ( seq quot: ( elt1 elt2 -- ? ) -- newseq )
+    over empty? [ 2drop { } ] [
+        [ 0 swap unclip-slice swap ] dip '[
+            [ @ [ 1 + ] [ drop 0 ] if ] keep over
+        ] { } map-as 2nip 0 prefix
+    ] if ; inline
+
+: max-monotonic-count ( seq quot: ( elt1 elt2 -- ? ) -- n )
+    over empty? [ 2drop 0 ] [
+        [ 0 swap unclip-slice swap 0 ] dip '[
+            [ swapd @ [ 1 + ] [ max 0 ] if ] keep swap
+        ] reduce nip max
+    ] if ; inline
