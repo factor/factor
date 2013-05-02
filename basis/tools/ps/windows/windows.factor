@@ -43,6 +43,16 @@ IN: tools.ps.windows
     ReadProcessMemory win32-error=0/f
     ba ;
 
+: read-peb ( handle address -- peb )
+    0 PEB heap-size read-process-memory PEB memory>struct ;
+
+: my-peb ( -- peb )
+    GetCurrentProcessId [
+        open-process-read
+        [ <win32-handle> &dispose drop ]
+        [ dup query-information-process PebBaseAddress>> read-peb ] bi
+    ] with-destructors ;
+
 :: read-args ( handle -- string/f )
     handle <win32-handle> &dispose drop
     handle query-information-process :> process-basic-information
