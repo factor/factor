@@ -18,4 +18,8 @@ IN: math.finance.tests
 
 [ { 1 3 1 } ] [ { 1 3 2 6 3 } 2 momentum ] unit-test
 
+{ { 0.0 50.0 25.0 75.0 100.0 125.0 -50.0 -75.0 -90.0 } } [
+    { 1 1.5 1.25 1.75 2.0 2.25 0.5 0.25 0.1 } performance
+] unit-test
+
 [ 4+1/6 ] [ 100 semimonthly ] unit-test
