@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel grouping sequences shuffle
-math math.functions math.statistics math.vectors ;
+USING: fry grouping kernel math math.statistics math.vectors
+sequences ;
 IN: math.finance
 
 : sma ( seq n -- newseq )
@@ -40,6 +40,9 @@ PRIVATE>
 
 : momentum ( seq n -- newseq )
     [ tail-slice ] 2keep [ dup length ] dip - head-slice v- ;
+
+: performance ( seq -- newseq )
+    dup first '[ _ [ - ] [ /f ] bi 100 * ] map ;
 
 : monthly ( x -- y ) 12 / ; inline
 
