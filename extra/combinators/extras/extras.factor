@@ -18,3 +18,9 @@ MACRO: cond-case ( assoc -- )
 
 MACRO: cleave-array ( quots -- )
     [ '[ _ cleave ] ] [ length '[ _ narray ] ] bi compose ;
+
+: 3bi* ( u v w x y z p q -- )
+    [ 3dip ] dip call ; inline
+
+: 3bi@ ( u v w x y z quot -- )
+    dup 3bi* ; inline
