@@ -117,6 +117,7 @@ IN: math.statistics.tests
 [ { 1 1 2 6 } ] [ { 1 1 2 3 } cum-product ] unit-test
 [ { 5 3 3 1 } ] [ { 5 3 4 1 } cum-min ] unit-test
 [ { 1 3 3 5 } ] [ { 1 3 1 5 } cum-max ] unit-test
+[ { 1.0 1.5 2.0 } ] [ { 1.0 2.0 3.0 } cum-mean ] unit-test
 
 { t }
 [
