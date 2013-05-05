@@ -13,10 +13,12 @@
 
 ;;; Code:
 
+(require 'fuel-base)
 (require 'fuel-scaffold)
 (require 'fuel-stack)
-(require 'fuel-syntax)
-(require 'fuel-base)
+(require 'fuel-xref)
+(require 'fuel-debug-uses)
+(require 'factor-mode)
 
 (require 'etags)
 
@@ -25,12 +27,12 @@
 
 (defconst fuel-refactor--next-defun-regex
   (format "^\\(:\\|MEMO:\\|MACRO:\\):? +\\(\\w+\\)\\(%s\\)\\([^;]+?\\) ;\\_>"
-          fuel-syntax--stack-effect-regex))
+          factor-stack-effect-regex))
 
 (defun fuel-refactor--previous-defun ()
   (let ((pos) (result))
     (while (and (not result)
-                (setq pos (fuel-syntax--beginning-of-defun)))
+                (setq pos (factor-beginning-of-defun)))
       (setq result (looking-at fuel-refactor--next-defun-regex)))
     (when (and result pos)
       (let ((name (match-string-no-properties 2))
@@ -79,9 +81,9 @@
       (and result found))))
 
 (defsubst fuel-refactor--insertion-point ()
-  (max (save-excursion (fuel-syntax--beginning-of-defun) (point))
+  (max (save-excursion (factor-beginning-of-defun) (point))
        (save-excursion
-         (re-search-backward fuel-syntax--end-of-def-regex nil t)
+         (re-search-backward factor-end-of-def-regex nil t)
          (forward-line 1)
          (skip-syntax-forward "-"))))
 
@@ -92,7 +94,7 @@
     (indent-region start (point))
     (move-overlay fuel-stack--overlay start (point))))
 
-(defun fuel-refactor--extract-other (start end code)
+(defun fuel-refactor--extract-other (start end word code)
   (unwind-protect
       (when (y-or-n-p "Apply refactoring to rest of buffer? ")
         (save-excursion
@@ -106,7 +108,7 @@
   (let* ((rp (< begin end))
          (code (and rp (buffer-substring begin end)))
          (existing (and code (fuel-refactor--reuse-existing code)))
-         (code-str (and code (or existing (fuel--region-to-string begin end))))
+         (code-str (and code (or existing (fuel-region-to-string begin end))))
          (word (or (car existing) (read-string "New word name: ")))
          (stack-effect (or existing
                            (and code-str (fuel-stack--infer-effect code-str))
@@ -123,7 +125,7 @@
         (if rp
             (fuel-refactor--extract-other start
                                           (or (car (cddr existing)) (point))
-                                          code)
+                                          word code)
           (unwind-protect
               (sit-for fuel-stack-highlight-period)
             (delete-overlay fuel-stack--overlay)))))))
@@ -148,9 +150,11 @@
   "Extracts current innermost sexp (up to point) as a separate
 word."
   (interactive)
-  (fuel-refactor-extract-region (1+ (fuel-syntax--beginning-of-sexp-pos))
-                                (if (looking-at-p ";") (point)
-                                  (fuel-syntax--end-of-symbol-pos))))
+  (fuel-refactor-extract-region (1+ (factor-beginning-of-sexp-pos))
+                                (if (looking-at-p ";")
+                                    (point)
+                                  (save-excursion
+                                    (factor-end-of-symbol) (point)))))
 
 
 ;;; Convert word to generic + method:
@@ -160,8 +164,8 @@ word."
 The word's body is put in a new method for the generic."
   (interactive)
   (let ((p (point)))
-    (fuel-syntax--beginning-of-defun)
-    (unless (re-search-forward fuel-syntax--word-signature-regex nil t)
+    (factor-beginning-of-defun)
+    (unless (re-search-forward factor-word-signature-regex nil t)
       (goto-char p)
       (error "Cannot find a proper word definition here"))
     (let ((begin (match-beginning 0))
@@ -186,11 +190,11 @@ The word's body is put in a new method for the generic."
 (defun fuel-refactor-inline-word ()
   "Inserts definition of word at point."
   (interactive)
-  (let ((word (fuel-syntax-symbol-at-point)))
+  (let ((word (factor-symbol-at-point)))
     (unless word (error "No word at point"))
     (let ((code (fuel-refactor--word-def word)))
       (unless code (error "Word's definition not found"))
-      (fuel-syntax--beginning-of-symbol)
+      (factor-beginning-of-symbol)
       (kill-word 1)
       (let ((start (point)))
         (insert code)
@@ -207,17 +211,17 @@ The word's body is put in a new method for the generic."
 
 (defun fuel-refactor--def-word ()
   (save-excursion
-    (fuel-syntax--beginning-of-defun)
-    (or (and (looking-at fuel-syntax--method-definition-regex)
+    (factor-beginning-of-defun)
+    (or (and (looking-at factor-method-definition-regex)
              (match-string-no-properties 2))
-        (and (looking-at fuel-syntax--word-definition-regex)
+        (and (looking-at factor-word-definition-regex)
              (match-string-no-properties 2)))))
 
 (defun fuel-refactor-rename-word (&optional arg)
   "Rename globally the word whose definition point is at.
 With prefix argument, use word at point instead."
   (interactive "P")
-  (let* ((from (if arg (fuel-syntax-symbol-at-point) (fuel-refactor--def-word)))
+  (let* ((from (if arg (factor-symbol-at-point) (fuel-refactor--def-word)))
          (from (read-string "Rename word: " from))
          (to (read-string (format "Rename '%s' to: " from)))
          (buffer (current-buffer)))
@@ -229,18 +233,26 @@ With prefix argument, use word at point instead."
 (defun fuel-refactor--insert-using (vocab)
   (save-excursion
     (goto-char (point-min))
-    (let ((usings (sort (cons vocab (fuel-syntax--usings)) 'string<)))
+    (let ((usings (sort (cons vocab (factor-usings)) 'string<)))
       (fuel-debug--replace-usings (buffer-file-name) usings))))
 
 (defun fuel-refactor--vocab-root (vocab)
   (let ((cmd `(:fuel* (,vocab fuel-scaffold-get-root) "fuel")))
     (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
 
+(defun fuel-update-usings (&optional arg)
+  "Asks factor for the vocabularies needed by this file,
+optionally updating the its USING: line.
+With prefix argument, ask for the file name."
+  (interactive "P")
+  (let ((file (car (fuel-mode--read-file arg))))
+    (when file (fuel-debug--uses-for-file file))))
+
 (defun fuel-refactor--extract-vocab (begin end)
   (when (< begin end)
     (let* ((str (buffer-substring begin end))
            (buffer (current-buffer))
-           (vocab (fuel-syntax--current-vocab))
+           (vocab (factor-current-vocab))
            (vocab-hint (and vocab (format "%s." vocab)))
            (root-hint (fuel-refactor--vocab-root vocab))
            (vocab (fuel-scaffold-vocab t vocab-hint root-hint)))
@@ -290,4 +302,5 @@ The region is extended to the closest definition boundaries."
 
 
 (provide 'fuel-refactor)
+
 ;;; fuel-refactor.el ends here

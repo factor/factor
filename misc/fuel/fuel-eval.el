@@ -13,12 +13,12 @@
 
 ;;; Code:
 
-(require 'fuel-syntax)
 (require 'fuel-connection)
 (require 'fuel-log)
 (require 'fuel-base)
+(require 'factor-mode)
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 
 
 ;;; Simple sexp-based representation of factor code
@@ -29,7 +29,7 @@
         ((or (stringp sexp) (numberp sexp)) (format "%S" sexp))
         ((vectorp sexp) (factor (cons :quotation (append sexp nil))))
         ((listp sexp)
-         (case (car sexp)
+         (cl-case (car sexp)
            (:array (factor--seq 'V{ '} (cdr sexp)))
            (:seq (factor--seq '{ '} (cdr sexp)))
            (:tuple (factor--seq 'T{ '} (cdr sexp)))
@@ -41,11 +41,11 @@
            (:fuel* (factor--fuel-factor (cons :nrs (cdr sexp))))
            (t (mapconcat 'factor sexp " "))))
         ((keywordp sexp)
-         (factor (case sexp
+         (factor (cl-case sexp
                    (:rs 'fuel-eval-restartable)
                    (:nrs 'fuel-eval-non-restartable)
-                   (:in (or (fuel-syntax--current-vocab) "fuel"))
-                   (:usings `(:array ,@(fuel-syntax--usings)))
+                   (:in (or (factor-current-vocab) "fuel"))
+                   (:usings `(:array ,@(factor-usings)))
                    (:get 'fuel-eval-set-result)
                    (:end '\;)
                    (t `(:factor ,(symbol-name sexp))))))
@@ -98,7 +98,7 @@
   (setq fuel-eval--sync-retort nil)
   (fuel-con--send-string/wait (or fuel-eval--proc (fuel-eval--default-proc))
                               (if (stringp code) code (factor code))
-                              '(lambda (s)
+                              #'(lambda (s)
                                  (setq fuel-eval--sync-retort
                                        (fuel-eval--parse-retort s)))
                               timeout

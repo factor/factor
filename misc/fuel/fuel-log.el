@@ -37,11 +37,11 @@
 (defvar fuel-log--debug-p nil
   "If t, all messages are logged no matter what")
 
+;;;###autoload
 (define-derived-mode factor-messages-mode fundamental-mode "FUEL Messages"
   "Simple mode to log interactions with the factor listener"
-  (kill-all-local-variables)
   (buffer-disable-undo)
-  (set (make-local-variable 'comint-redirect-subvert-readonly) t)
+  (setq-local comint-redirect-subvert-readonly t)
   (add-hook 'after-change-functions
             '(lambda (b e len)
                (let ((inhibit-read-only t))
@@ -52,8 +52,7 @@
 
 (defun fuel-log--buffer ()
   (or (get-buffer fuel-log--buffer-name)
-      (save-current-buffer
-        (set-buffer (get-buffer-create fuel-log--buffer-name))
+      (with-current-buffer (get-buffer-create fuel-log--buffer-name)
         (factor-messages-mode)
         (current-buffer))))
 
@@ -62,7 +61,7 @@
     (with-current-buffer (fuel-log--buffer)
       (let ((inhibit-read-only t))
         (insert
-         (fuel--shorten-str (format "\n%s: %s\n" type (apply 'format args))
+         (fuel-shorten-str (format "\n%s: %s\n" type (apply 'format args))
                             fuel-log--max-message-size))))))
 
 (defsubst fuel-log--warn (&rest args)
@@ -77,4 +76,5 @@
 
 
 (provide 'fuel-log)
+
 ;;; fuel-log.el ends here
