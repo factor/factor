@@ -204,6 +204,16 @@ HELP: cum-product
     }
 } ;
 
+HELP: cum-mean
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative mean of " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 1.0 2.0 3.0 } cum-mean ."
+               "{ 1.0 1.5 2.0 }"
+    }
+} ;
+
 HELP: cum-min
 { $values { "seq" sequence } { "seq'" sequence } }
 { $description "Returns the cumulative min of " { $snippet "seq" } "." }
