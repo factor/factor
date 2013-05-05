@@ -43,7 +43,7 @@
       (let ((fill-column width))
         (insert str)
         (fill-region (point-min) (point-max))
-        (mapcar '(lambda (s) (fuel-table--pad-str s width))
+        (mapcar #'(lambda (s) (fuel-table--pad-str s width))
                 (split-string (buffer-string) "\n"))))))
 
 (defun fuel-table--pad-row (row)
@@ -136,4 +136,5 @@
 
 
 (provide 'fuel-table)
+
 ;;; fuel-table.el ends here

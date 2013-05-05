@@ -14,7 +14,6 @@
 ;;; Code:
 
 (require 'fuel-eval)
-(require 'fuel-font-lock)
 (require 'fuel-base)
 (require 'fuel-table)
 
@@ -23,26 +22,40 @@
 
 ;;; Customization:
 
-(fuel-font-lock--defface fuel-font-lock-markup-title
-  'bold fuel-help "article titles in help buffers")
+(defface fuel-font-lock-markup-title '((t (:inherit bold)))
+  "article titles in help buffers"
+  :group 'fuel-help
+  :group 'fuel-faces
+  :group 'faces)
 
-(fuel-font-lock--defface fuel-font-lock-markup-heading
-  'bold fuel-help "headlines in help buffers")
+(defface fuel-font-lock-markup-heading '((t (:inherit bold)))
+  "headlines in help buffers"
+  :group 'fuel-help
+  :group 'fuel-faces
+  :group 'faces)
 
-(fuel-font-lock--defface fuel-font-lock-markup-link
-  'link fuel-help "links to topics in help buffers")
+(defface fuel-font-lock-markup-link '((t (:inherit link)))
+  "links to topics in help buffers"
+  :group 'fuel-help
+  :group 'fuel-faces
+  :group 'faces)
 
-(fuel-font-lock--defface fuel-font-lock-markup-emphasis
-  'italic fuel-help "emphasized words in help buffers")
+(defface fuel-font-lock-markup-emphasis '((t (:inherit italic)))
+  "emphasized words in help buffers"
+  :group 'fuel-help
+  :group 'fuel-faces
+  :group 'faces)
 
-(fuel-font-lock--defface fuel-font-lock-markup-strong
-  'link fuel-help "bold words in help buffers")
+(defface fuel-font-lock-markup-strong '((t (:inherit link)))
+  "bold words in help buffers"
+  :group 'fuel-help
+  :group 'fuel-faces
+  :group 'faces)
 
 
 ;;; Links:
 
-(make-variable-buffer-local
- (defvar fuel-markup--follow-link-function 'fuel-markup--echo-link))
+(defvar-local fuel-markup--follow-link-function 'fuel-markup--echo-link)
 
 (define-button-type 'fuel-markup--button
   'action 'fuel-markup--follow-link
@@ -154,8 +167,7 @@
     (describe-words . fuel-markup--describe-words)
     (vocab-list . fuel-markup--vocab-list)))
 
-(make-variable-buffer-local
- (defvar fuel-markup--maybe-nl nil))
+(defvar-local fuel-markup--maybe-nl nil)
 
 (defun fuel-markup--print (e)
   (cond ((null e) (insert "f"))
@@ -228,7 +240,7 @@
 (defun fuel-markup--subsections (e)
   (dolist (link (cdr e))
     (fuel-markup--insert-nl-if-nb)
-    (insert "  - ")      
+    (insert "  - ")
     (fuel-markup--link (list '$link link))
     (fuel-markup--maybe-nl)))
 
@@ -248,7 +260,7 @@
   (dolist (art (cdr e))
     (fuel-markup--insert-button (car art) (cadr art) 'article)
     (insert ", "))
-  (delete-backward-char 2)
+  (delete-char -2)
   (fuel-markup--insert-newline 'left))
 
 (defun fuel-markup--emphasis (e)
@@ -262,9 +274,9 @@
     (insert (cadr e))))
 
 (defun fuel-markup--snippet (e)
-  (insert (mapconcat '(lambda (s)
+  (insert (mapconcat #'(lambda (s)
                         (if (stringp s)
-                            (fuel-font-lock--factor-str s)
+                            (factor-font-lock-string s)
                           (fuel-markup--print-str s)))
                      (cdr e)
                      " ")))
@@ -274,7 +286,7 @@
   (newline)
   (dolist (snip (cdr e))
     (if (stringp snip)
-        (insert (fuel-font-lock--factor-str snip))
+        (insert (factor-font-lock-string snip))
       (fuel-markup--print snip))
     (newline))
   (newline))
@@ -311,10 +323,10 @@
   (dolist (link (cdr e))
     (fuel-markup--link (list '$link link))
     (insert ", "))
-  (delete-backward-char 2))
+  (delete-char -2))
 
 (defun fuel-markup--index-quotation (q)
-  (cond ((null q) null)
+  (cond ((null q) nil)
         ((listp q) (vconcat (mapcar 'fuel-markup--index-quotation q)))
         (t q)))
 
@@ -342,7 +354,7 @@
     (insert " ")))
 
 (defun fuel-markup--vocab-list (e)
-  (let ((rows (mapcar '(lambda (elem)
+  (let ((rows (mapcar #'(lambda (elem)
                          (list (list '$vocab-link (car elem))
                                (cadr elem)))
                       (cdr e))))
@@ -374,7 +386,7 @@
                  (super (and (cadr objs)
                              (list (list '$link (cadr objs) (cadr objs) 'word))))
                  (slots (when (cddr objs)
-                          (list (mapcar '(lambda (s) (list s " ")) (cddr objs))))))
+                          (list (mapcar #'(lambda (s) (list s " ")) (cddr objs))))))
             (push `(,class ,@super ,@slots) rows))
           (forward-line))
         (push `(,heading ($table ,@(reverse rows))) elems))
@@ -426,7 +438,7 @@
     (dolist (tag (cdr e))
       (fuel-markup--tag (list '$tag tag))
       (insert ", "))
-    (delete-backward-char 2)
+    (delete-char -2)
     (fuel-markup--insert-newline)))
 
 (defun fuel-markup--all-tags (e)
@@ -444,7 +456,7 @@
     (dolist (a (cdr e))
       (fuel-markup--author (list '$author a))
       (insert ", "))
-    (delete-backward-char 2)
+    (delete-char -2)
     (fuel-markup--insert-newline)))
 
 (defun fuel-markup--all-authors (e)
@@ -465,7 +477,7 @@
   (delete-blank-lines)
   (newline)
   (fuel-table--insert
-   (mapcar '(lambda (row) (mapcar 'fuel-markup--print-str row)) (cdr e)))
+   (mapcar #'(lambda (row) (mapcar 'fuel-markup--print-str row)) (cdr e)))
   (newline))
 
 (defun fuel-markup--instance (e)
@@ -620,4 +632,5 @@
 
 
 (provide 'fuel-markup)
+
 ;;; fuel-markup.el ends here
