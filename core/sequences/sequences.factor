@@ -41,11 +41,13 @@ M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 : second ( seq -- second ) 1 swap nth ; inline
 : third ( seq -- third ) 2 swap nth ; inline
 : fourth ( seq -- fourth ) 3 swap nth ; inline
+: fifth ( seq -- fifth ) 4 swap nth ; inline
 
 : set-first ( first seq -- ) 0 swap set-nth ; inline
 : set-second ( second seq -- ) 1 swap set-nth ; inline
 : set-third ( third seq -- ) 2 swap set-nth ; inline
 : set-fourth  ( fourth seq -- ) 3 swap set-nth ; inline
+: set-fifth  ( fifth seq -- ) 4 swap set-nth ; inline
 
 : push ( elt seq -- ) [ length ] [ set-nth ] bi ;
 
@@ -121,6 +123,7 @@ INSTANCE: iota-tuple immutable-sequence
 : second-unsafe ( seq -- second ) 1 swap nth-unsafe ; inline
 : third-unsafe ( seq -- third ) 2 swap nth-unsafe ; inline
 : fourth-unsafe ( seq -- fourth ) 3 swap nth-unsafe ; inline
+: fifth-unsafe ( seq -- fifth ) 4 swap nth-unsafe ; inline
 
 : first2-unsafe ( seq -- first second )
     [ first-unsafe ] [ second-unsafe ] bi ; inline
@@ -130,7 +133,10 @@ INSTANCE: iota-tuple immutable-sequence
 
 : first4-unsafe ( seq -- first second third fourth )
     [ first3-unsafe ] [ fourth-unsafe ] bi ; inline
-
+    
+: first5-unsafe ( seq -- first second third fourth fifth )
+    [ first4-unsafe ] [ fifth-unsafe ] bi ; inline
+    
 : exchange-unsafe ( m n seq -- )
     [ [ nth-unsafe ] curry bi@ ]
     [ [ set-nth-unsafe ] curry bi@ ] 3bi ; inline
