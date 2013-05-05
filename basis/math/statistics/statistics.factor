@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Doug Coleman, Michael Judge.
+! Copyright (C) 2008 Doug Coleman, Michael Judge, Loryn Jenkins.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators generalizations kernel locals math
-math.functions math.order math.vectors sequences
+math.functions math.order math.vectors math.ranges sequences
 sequences.private sorting fry arrays grouping sets
 splitting.monotonic ;
 IN: math.statistics
@@ -350,6 +350,9 @@ ALIAS: std sample-std
 
 : cum-product ( seq -- seq' )
     1 [ * ] cum-map ;
+    
+: cum-mean ( seq -- seq' )
+    [ cum-sum ] [ length [1,b] ] bi [ / ] 2map ;    
 
 : cum-count ( seq quot -- seq' )
     [ 0 ] dip '[ _ call [ 1 + ] when ] cum-map ; inline
