@@ -1,5 +1,5 @@
 USING: accessors arrays assocs fry grouping growable kernel
-locals make math math.order math.ranges sequences
+locals make math math.order math.ranges math.combinators sequences
 sequences.deep sequences.private sorting splitting vectors ;
 FROM: sequences => change-nth ;
 IN: sequences.extras
@@ -266,6 +266,12 @@ PRIVATE>
         over last-unsafe over call
         [ trim-tail ] [ drop ] if
     ] if ; inline
+     
+:: trim-pos ( n m seq -- newseq )
+    seq length :> l
+    n m [ l ] when-zero
+    [ [ l + ] when-negative 0 l clamp ] bi@
+    sort-pair seq subseq ;    
 
 : unsurround ( newseq seq2 seq3 -- seq1 )
    [ ?head drop ] [ ?tail drop ] bi* ;
