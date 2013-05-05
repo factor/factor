@@ -14,9 +14,9 @@
 ;;; Code:
 
 (require 'fuel-base)
-(require 'fuel-syntax)
 (require 'fuel-eval)
 (require 'fuel-log)
+(require 'factor-mode)
 
 
 ;;; Aux:
@@ -34,17 +34,20 @@
 
 (defun fuel-completion--vocabs (&optional reload)
   (when (or reload (not fuel-completion--vocabs))
-    (fuel--respecting-message "Retrieving vocabs list")
+    (fuel-respecting-message "Retrieving vocabs list")
     (let ((fuel-log--inhibit-p t))
       (setq fuel-completion--vocabs
             (fuel-eval--retort-result
              (fuel-eval--send/wait '(:fuel* (fuel-get-vocabs) "fuel" (:array)))))))
   fuel-completion--vocabs)
 
+(defvar fuel-completion--vocab-history nil)
+
 (defun fuel-completion--read-vocab (&optional reload init-input history)
   (let ((minibuffer-local-completion-map fuel-completion--minibuffer-map)
         (vocabs (fuel-completion--vocabs reload)))
-    (completing-read "Vocab name: " vocabs nil nil init-input history)))
+    (completing-read "Vocab name: " vocabs nil nil
+                     init-input (or history fuel-completion--vocab-history))))
 
 (defsubst fuel-completion--vocab-list (prefix)
   (fuel-eval--retort-result
@@ -61,17 +64,15 @@
 
 (defvar fuel-completion--comp-buffer "*Completions*")
 
-(make-variable-buffer-local
- (defvar fuel-completion--window-cfg nil
+(defvar-local fuel-completion--window-cfg nil
    "Window configuration before we show the *Completions* buffer.
 This is buffer local in the buffer where the completion is
-performed."))
+performed.")
 
-(make-variable-buffer-local
- (defvar fuel-completion--completions-window nil
+(defvar-local fuel-completion--completions-window nil
    "The window displaying *Completions* after saving window configuration.
 If this window is no longer active or displaying the completions
-buffer then we can ignore `fuel-completion--window-cfg'."))
+buffer then we can ignore `fuel-completion--window-cfg'.")
 
 (defun fuel-completion--save-window-cfg ()
   "Maybe save the current window configuration.
@@ -109,7 +110,7 @@ terminates a current completion."
   (remove-hook 'pre-command-hook
                'fuel-completion--maybe-restore-window-cfg)
   (condition-case err
-      (cond ((find last-command-char "()\"'`,# \r\n:")
+      (cond ((cl-find last-command-event "()\"'`,# \r\n:")
              (fuel-completion--restore-window-cfg))
             ((not (fuel-completion--window-active-p))
              (fuel-completion--forget-window-cfg))
@@ -131,8 +132,8 @@ terminates a current completion."
       (display-completion-list completions base)
       (let ((offset (- (point) 1 (length base))))
         (with-current-buffer standard-output
-          (setq completion-base-size offset)
-          (set-syntax-table fuel-syntax--syntax-table))))
+          (setq completion-base-position offset)
+          (set-syntax-table factor-mode-syntax-table))))
     (when savedp
       (setq fuel-completion--completions-window
             (get-buffer-window fuel-completion--comp-buffer)))))
@@ -157,8 +158,8 @@ terminates a current completion."
 
 (defun fuel-completion--word-list (prefix)
   (let* ((fuel-log--inhibit-p t)
-         (cv (fuel-syntax--current-vocab))
-         (vs (and cv `("syntax" ,cv ,@(fuel-syntax--usings)))))
+         (cv (factor-current-vocab))
+         (vs (and cv `("syntax" ,cv ,@(factor-usings)))))
     (fuel-completion--words prefix vs)))
 
 (defsubst fuel-completion--all-words-list (prefix)
@@ -186,36 +187,26 @@ terminates a current completion."
                        fuel-completion--word-list-func)
                      nil nil nil
                      history
-                     (or default (fuel-syntax-symbol-at-point)))))
-
-(defvar fuel-completion--vocab-history nil)
-
-(defun fuel-completion--read-vocab (refresh &optional init-input)
-  (let ((minibuffer-local-completion-map fuel-completion--minibuffer-map)
-        (vocabs (fuel-completion--vocabs refresh))
-        (prompt "Vocabulary name: "))
-    (if vocabs
-        (completing-read prompt vocabs nil nil init-input fuel-completion--vocab-history)
-      (read-string prompt init-input fuel-completion--vocab-history))))
+                     (or default (factor-symbol-at-point)))))
 
 (defun fuel-completion--complete-symbol ()
   "Complete the symbol at point.
 Perform completion similar to Emacs' complete-symbol."
   (interactive)
   (let* ((end (point))
-         (beg (fuel-syntax--beginning-of-symbol-pos))
+         (beg (save-excursion (factor-beginning-of-symbol) (point)))
          (prefix (buffer-substring-no-properties beg end))
-         (result (fuel-completion--complete prefix (fuel-syntax--in-using)))
+         (result (fuel-completion--complete prefix (factor-in-using)))
          (completions (car result))
          (partial (cdr result)))
     (cond ((null completions)
-           (fuel--respecting-message "Can't find completion for %S" prefix)
+           (fuel-respecting-message "Can't find completion for %S" prefix)
            (fuel-completion--restore-window-cfg))
           (t (insert-and-inherit (substring partial (length prefix)))
              (cond ((= (length completions) 1)
-                    (fuel--respecting-message "Sole completion")
+                    (fuel-respecting-message "Sole completion")
                     (fuel-completion--restore-window-cfg))
-                   (t (fuel--respecting-message "Complete but not unique")
+                   (t (fuel-respecting-message "Complete but not unique")
                       (fuel-completion--display-or-scroll completions
                                                           partial)))))))
 

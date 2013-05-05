@@ -14,6 +14,7 @@
 
 ;;; Code:
 
+(require 'fuel-base)
 (require 'fuel-listener)
 (require 'fuel-completion)
 (require 'fuel-debug)
@@ -24,15 +25,14 @@
 (require 'fuel-refactor)
 (require 'fuel-stack)
 (require 'fuel-autodoc)
-(require 'fuel-font-lock)
+(require 'fuel-autohelp)
 (require 'fuel-edit)
-(require 'fuel-syntax)
 (require 'fuel-menu)
-(require 'fuel-base)
 
 
 ;;; Customization:
 
+;;;###autoload
 (defgroup fuel-mode nil
   "Mode enabling FUEL's ultimate abilities."
   :group 'fuel)
@@ -43,6 +43,12 @@
   :group 'fuel-autodoc
   :type 'boolean)
 
+(defcustom fuel-mode-autohelp-p nil
+  "Whether `fuel-autohelp-mode' gets enabled by default in factor buffers."
+  :group 'fuel-mode
+  :group 'fuel-autohelp
+  :type 'boolean)
+
 (defcustom fuel-mode-stack-p nil
   "Whether `fuel-stack-mode' gets enabled by default in factor buffers."
   :group 'fuel-mode
@@ -51,17 +57,6 @@
 
 
 ;;; User commands
-
-(defun fuel-mode--read-file (arg)
-  (let* ((file (or (and arg (read-file-name "File: " nil (buffer-file-name) t))
-                   (buffer-file-name)))
-         (file (expand-file-name file))
-         (buffer (find-file-noselect file)))
-    (when (and  buffer
-                (buffer-modified-p buffer)
-                (y-or-n-p "Save file? "))
-      (save-buffer buffer))
-    (cons file buffer)))
 
 (defun fuel-run-file (&optional arg)
   "Sends the current file to Factor for compilation.
@@ -93,14 +88,14 @@ buffer in case of errors."
                               "[\f\n\r\v]+"
                               t))
          (cmd `(:fuel (,(mapcar (lambda (l) `(:factor ,l)) lines))))
-         (cv (fuel-syntax--current-vocab)))
+         (cv (factor-current-vocab)))
     (fuel-debug--prepare-compilation (buffer-file-name)
                                      (format "Evaluating:\n\n%s" rstr))
     (fuel-debug--display-retort
      (fuel-eval--send/wait cmd 10000)
      (format "%s%s"
              (if cv (format "IN: %s " cv) "")
-             (fuel--shorten-region begin end 70))
+             (fuel-shorten-region begin end 70))
      arg)))
 
 (defun fuel-eval-extended-region (begin end &optional arg)
@@ -125,14 +120,6 @@ buffer in case of errors."
       (unless (< begin end) (error "No evaluable definition around point"))
       (fuel-eval-region begin end arg))))
 
-(defun fuel-update-usings (&optional arg)
-  "Asks factor for the vocabularies needed by this file,
-optionally updating the its USING: line.
-With prefix argument, ask for the file name."
-  (interactive "P")
-  (let ((file (car (fuel-mode--read-file arg))))
-    (when file (fuel-debug--uses-for-file file))))
-
 (defun fuel-load-usings ()
   "Loads all vocabularies in the current buffer's USING: from.
 Useful to activate autodoc help messages in a vocabulary not yet
@@ -148,13 +135,13 @@ for details."
 
 ;;; Minor mode definition:
 
-(make-variable-buffer-local
- (defvar fuel-mode-string " F"
-   "Modeline indicator for fuel-mode"))
+(defvar-local fuel-mode-string " F"
+  "Modeline indicator for fuel-mode")
 
 (defvar fuel-mode-map (make-sparse-keymap)
   "Key map for fuel-mode")
 
+;;;###autoload
 (define-minor-mode fuel-mode
   "Toggle Fuel's mode.
 With no argument, this command toggles the mode.
@@ -171,6 +158,9 @@ interacting with a factor listener is at your disposal.
 
   (setq fuel-autodoc-mode-string "/A")
   (when fuel-mode-autodoc-p (fuel-autodoc-mode fuel-mode))
+
+  (setq fuel-autohelp-mode-string "/H")
+  (when fuel-mode-autohelp-p (fuel-autohelp-mode fuel-mode))
 
   (setq fuel-stack-mode-string "/S")
   (when fuel-mode-stack-p (fuel-stack-mode fuel-mode))
@@ -234,7 +224,7 @@ interacting with a factor listener is at your disposal.
   --
   (menu "Switch to"
         ("Listener" "\C-c\C-z" run-factor)
-        ("Related Factor file" "\C-c\C-o" factor-mode-visit-other-file)
+        ("Related Factor file" "\C-c\C-o" factor-visit-other-file)
         ("Other Factor buffer" "\C-c\C-s" fuel-switch-to-buffer)
         ("Other Factor buffer other window" "\C-x4s"
          fuel-switch-to-buffer-other-window)
@@ -243,4 +233,5 @@ interacting with a factor listener is at your disposal.
 
 
 (provide 'fuel-mode)
+
 ;;; fuel-mode.el ends here
