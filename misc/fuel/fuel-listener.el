@@ -15,10 +15,8 @@
 
 (require 'fuel-stack)
 (require 'fuel-completion)
-(require 'fuel-xref)
 (require 'fuel-eval)
 (require 'fuel-connection)
-(require 'fuel-syntax)
 (require 'fuel-menu)
 (require 'fuel-base)
 
@@ -27,23 +25,23 @@
 
 ;;; Customization:
 
+;;;###autoload
 (defgroup fuel-listener nil
   "Interacting with a Factor listener inside Emacs."
   :group 'fuel)
 
-(defcustom fuel-listener-factor-binary
-  (expand-file-name (cond ((eq system-type 'windows-nt)
-                           "factor.com")
-                          ((eq system-type 'darwin)
-                           "Factor.app/Contents/MacOS/factor")
-                          (t "factor"))
-                    fuel-factor-root-dir)
+(defcustom fuel-factor-root-dir nil
+  "Full path to the factor root directory when starting a listener."
+  :type 'directory
+  :group 'fuel-listener)
+
+;;; Is factor.com still valid on Windows...?
+(defcustom fuel-listener-factor-binary nil
   "Full path to the factor executable to use when starting a listener."
   :type '(file :must-match t)
   :group 'fuel-listener)
 
-(defcustom fuel-listener-factor-image
-  (expand-file-name "factor.image" fuel-factor-root-dir)
+(defcustom fuel-listener-factor-image nil
   "Full path to the factor image to use when starting a listener."
   :type '(file :must-match t)
   :group 'fuel-listener)
@@ -60,8 +58,10 @@ buffer."
   :type 'boolean
   :group 'fuel-listener)
 
-(defcustom fuel-listener-history-filename (expand-file-name "~/.fuel_history")
-  "File where listener input history is saved, so that it persists between sessions."
+(defcustom fuel-listener-history-filename
+  (expand-file-name "~/.fuel_history.eld")
+  "File where listener input history is saved, so that it persists between
+sessions."
   :type 'filename
   :group 'fuel-listener)
 
@@ -76,6 +76,24 @@ buffer."
   :group 'fuel-listener)
 
 
+;;; Factor paths:
+
+(defun fuel-listener-factor-binary ()
+  "Full path to the factor executable to use when starting a listener."
+  (or fuel-listener-factor-binary
+      (expand-file-name (cond ((eq system-type 'windows-nt)
+                               "factor.com")
+                              ((eq system-type 'darwin)
+                               "Factor.app/Contents/MacOS/factor")
+                              (t "factor"))
+                        fuel-factor-root-dir)))
+
+(defun fuel-listener-factor-image ()
+  "Full path to the factor image to use when starting a listener."
+  (or fuel-listener-factor-image
+      (expand-file-name "factor.image" fuel-factor-root-dir)))
+
+
 ;;; Listener history:
 
 (defun fuel-listener--sentinel (proc event)
@@ -88,10 +106,8 @@ buffer."
           (insert "Press C-c C-z to bring me back.\n" ))))))
 
 (defun fuel-listener--history-setup ()
-  (set (make-local-variable 'comint-input-ring-file-name)
-       fuel-listener-history-filename)
-  (set (make-local-variable 'comint-input-ring-size)
-       fuel-listener-history-size)
+  (setq-local comint-input-ring-file-name fuel-listener-history-filename)
+  (setq-local comint-input-ring-size fuel-listener-history-size)
   (add-hook 'kill-buffer-hook 'comint-write-input-ring nil t)
   (comint-read-input-ring t)
   (set-process-sentinel (get-buffer-process (current-buffer))
@@ -111,8 +127,8 @@ buffer."
       (setq fuel-listener--buffer (current-buffer)))))
 
 (defun fuel-listener--start-process ()
-  (let ((factor (expand-file-name fuel-listener-factor-binary))
-        (image (expand-file-name fuel-listener-factor-image))
+  (let ((factor (expand-file-name (fuel-listener-factor-binary)))
+        (image (expand-file-name (fuel-listener-factor-image)))
         (comint-redirect-perform-sanity-check nil))
     (unless (file-executable-p factor)
       (error "Could not run factor: %s is not executable" factor))
@@ -126,6 +142,7 @@ buffer."
     (fuel-listener--history-setup)
     (fuel-con--setup-connection (current-buffer))))
 
+;;; TODO Add the ability to debug to non-localhost
 (defun fuel-listener--connect-process (port)
   (message "Connecting to remote listener ...")
   (pop-to-buffer (fuel-listener--buffer))
@@ -157,12 +174,9 @@ buffer."
     (goto-char (point-max))
     (unless seen (error "No prompt found!"))))
 
-
 
 ;;; Interface: starting and interacting with fuel listener:
 
-(defalias 'switch-to-factor 'run-factor)
-(defalias 'switch-to-fuel-listener 'run-factor)
 ;;;###autoload
 (defun run-factor (&optional arg)
   "Show the fuel-listener buffer, starting the process if needed."
@@ -171,8 +185,10 @@ buffer."
         (pop-up-windows fuel-listener-window-allow-split))
     (if fuel-listener-use-other-window
         (pop-to-buffer buf)
-      (switch-to-buffer buf))))
+      (switch-to-buffer buf))
+    (add-hook 'factor-mode-hook 'fuel-mode)))
 
+;;;###autoload
 (defun connect-to-factor (&optional arg)
   "Connects to a remote listener running in the same host.
 Without prefix argument, the default port, 9000, is used.
@@ -182,7 +198,8 @@ remote listener you need to issue the words
 fuel-start-remote-listener', from the fuel vocabulary."
   (interactive "P")
   (let ((port (if (not arg) 9000 (read-number "Port: "))))
-    (fuel-listener--connect-process port)))
+    (fuel-listener--connect-process port)
+    (add-hook 'factor-mode-hook 'fuel-mode)))
 
 (defun fuel-listener-nuke ()
   "Try this command if the listener becomes unresponsive."
@@ -192,42 +209,44 @@ fuel-start-remote-listener', from the fuel vocabulary."
   (comint-redirect-cleanup)
   (fuel-con--setup-connection fuel-listener--buffer))
 
-(defun fuel-refresh-all ()
+(defun fuel-refresh-all (&optional arg)
   "Switch to the listener buffer and invokes Factor's refresh-all.
 With prefix, you're teletransported to the listener's buffer."
-  (interactive)
+  (interactive "P")
   (let ((buf (process-buffer (fuel-listener--process))))
-    (pop-to-buffer buf)
-    (comint-send-string nil "\"Refreshing loaded vocabs...\" write nl flush")
-    (comint-send-string nil " refresh-all \"Done!\" write nl flush\n")))
+    (with-current-buffer buf
+      (comint-send-string nil "\"Refreshing loaded vocabs...\" write nl flush")
+      (comint-send-string nil " refresh-all \"Done!\" write nl flush\n"))
+    (when arg (pop-to-buffer buf))))
 
 (defun fuel-test-vocab (&optional arg)
   "Run the unit tests for the current vocabulary. With prefix argument, ask for
 the vocabulary name."
   (interactive "P")
-  (let* ((vocab (or (and (not arg) (fuel-syntax--current-vocab))
+  (let* ((vocab (or (and (not arg) (factor-current-vocab))
                     (fuel-completion--read-vocab nil))))
     (comint-send-string (fuel-listener--process)
                         (concat "\"" vocab "\" reload nl flush\n"
                                 "\"" vocab "\" test nl flush\n"))))
 
 
-;;; Completion support
+;;; Completion support:
 
 (defsubst fuel-listener--current-vocab () nil)
 (defsubst fuel-listener--usings () nil)
 
 (defun fuel-listener--setup-completion ()
-  (setq fuel-syntax--current-vocab-function 'fuel-listener--current-vocab)
-  (setq fuel-syntax--usings-function 'fuel-listener--usings))
+  (setq factor-current-vocab-function 'fuel-listener--current-vocab)
+  (setq factor-usings-function 'fuel-listener--usings))
 
 
-;;; Stack mode support
+;;; Stack mode support:
 
 (defun fuel-listener--stack-region ()
-  (fuel--region-to-string (if (zerop (fuel-syntax--brackets-depth))
-                              (comint-line-beginning-position)
-                            (1+ (fuel-syntax--brackets-start)))))
+  (fuel-region-to-string
+   (if (zerop (factor-brackets-depth))
+       (comint-line-beginning-position)
+     (1+ (factor-brackets-start)))))
 
 (defun fuel-listener--setup-stack-mode ()
   (setq fuel-stack--region-function 'fuel-listener--stack-region))
@@ -243,10 +262,9 @@ the vocabulary name."
 (define-derived-mode fuel-listener-mode comint-mode "Fuel Listener"
   "Major mode for interacting with an inferior Factor listener process.
 \\{fuel-listener-mode-map}"
-  (set (make-local-variable 'comint-prompt-regexp) fuel-con--prompt-regex)
-  (set (make-local-variable 'comint-use-prompt-regexp) nil)
-  (set (make-local-variable 'comint-prompt-read-only)
-       fuel-listener-prompt-read-only-p)
+  (setq-local comint-prompt-regexp fuel-con--prompt-regex)
+  (setq-local comint-use-prompt-regexp nil)
+  (setq-local comint-prompt-read-only fuel-listener-prompt-read-only-p)
   (fuel-listener--setup-completion)
   (fuel-listener--setup-stack-mode))
 
@@ -271,4 +289,5 @@ the vocabulary name."
 
 
 (provide 'fuel-listener)
+
 ;;; fuel-listener.el ends here

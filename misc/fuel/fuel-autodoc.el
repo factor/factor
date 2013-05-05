@@ -15,13 +15,13 @@
 ;;; Code:
 
 (require 'fuel-eval)
-(require 'fuel-font-lock)
-(require 'fuel-syntax)
 (require 'fuel-base)
+(require 'factor-mode)
 
 
 ;;; Customization:
 
+;;;###autoload
 (defgroup fuel-autodoc nil
   "Options controlling FUEL's autodoc system."
   :group 'fuel)
@@ -54,22 +54,21 @@ USING: form with \\[fuel-load-usings]."
 (defvar fuel-autodoc--timeout 200)
 
 (defun fuel-autodoc--word-synopsis (&optional word)
-  (let ((word (or word (fuel-syntax-symbol-at-point)))
+  (let ((word (or word (factor-symbol-at-point)))
         (fuel-log--inhibit-p t))
     (when word
       (let* ((usings (if fuel-autodoc-eval-using-form-p :usings t))
-             (cmd (if (fuel-syntax--in-using)
+             (cmd (if (factor-in-using)
                       `(:fuel* (,word fuel-vocab-summary) :in t)
                     `(:fuel* ((,word :usings fuel-word-synopsis)) t ,usings)))
              (ret (fuel-eval--send/wait cmd fuel-autodoc--timeout))
              (res (fuel-eval--retort-result ret)))
         (when (and ret (not (fuel-eval--retort-error ret)) (stringp res))
           (if fuel-autodoc-minibuffer-font-lock
-              (fuel-font-lock--factor-str res)
+              (factor-font-lock-string res)
             res))))))
 
-(make-variable-buffer-local
- (defvar fuel-autodoc--fallback-function nil))
+(defvar-local fuel-autodoc--fallback-function nil)
 
 (defun fuel-autodoc--eldoc-function ()
   (or (and fuel-autodoc--fallback-function
@@ -82,10 +81,10 @@ USING: form with \\[fuel-load-usings]."
 
 ;;; Autodoc mode:
 
-(make-variable-buffer-local
- (defvar fuel-autodoc-mode-string " A"
-   "Modeline indicator for fuel-autodoc-mode"))
+(defvar-local fuel-autodoc-mode-string " A"
+  "Modeline indicator for fuel-autodoc-mode")
 
+;;;###autoload
 (define-minor-mode fuel-autodoc-mode
   "Toggle Fuel's Autodoc mode.
 With no argument, this command toggles the mode.
@@ -98,12 +97,13 @@ displayed in the minibuffer."
   :lighter fuel-autodoc-mode-string
   :group 'fuel-autodoc
 
-  (set (make-local-variable 'eldoc-documentation-function)
+  (setq-local eldoc-documentation-function
        (when fuel-autodoc-mode 'fuel-autodoc--eldoc-function))
-  (set (make-local-variable 'eldoc-minor-mode-string) nil)
+  (setq-local eldoc-minor-mode-string nil)
   (eldoc-mode fuel-autodoc-mode)
   (message "Fuel Autodoc %s" (if fuel-autodoc-mode "enabled" "disabled")))
 
 
 (provide 'fuel-autodoc)
+
 ;;; fuel-autodoc.el ends here

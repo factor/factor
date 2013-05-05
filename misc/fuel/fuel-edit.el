@@ -16,23 +16,19 @@
 (require 'fuel-completion)
 (require 'fuel-eval)
 (require 'fuel-base)
+(require 'factor-mode)
 
 (require 'etags)
 
 
 ;;; Customization
 
-(defmacro fuel-edit--define-custom-visit (var group doc)
-  `(defcustom ,var nil
-     ,doc
-     :group ',group
-     :type '(choice (const :tag "Other window" window)
-                    (const :tag "Other frame" frame)
-                    (const :tag "Current window" nil))))
-
-(fuel-edit--define-custom-visit
- fuel-edit-word-method fuel
- "How the new buffer is opened when invoking \\[fuel-edit-word-at-point]")
+(defcustom fuel-edit-word-method nil
+  "How the new buffer is opened when invoking `fuel-edit-word-at-point'."
+  :group 'fuel
+  :type '(choice (const :tag "Other window" window)
+                 (const :tag "Other frame" frame)
+                 (const :tag "Current window" nil)))
 
 
 ;;; Auxiliar functions:
@@ -44,7 +40,7 @@
 
 (defun fuel-edit--looking-at-vocab ()
   (save-excursion
-    (fuel-syntax--beginning-of-defun)
+    (factor-beginning-of-defun)
     (looking-at "USING:\\|USE:\\|IN:")))
 
 (defun fuel-edit--try-edit (ret)
@@ -55,7 +51,8 @@
     (unless (file-readable-p (car loc))
       (error "Couldn't open '%s' for read" (car loc)))
     (fuel-edit--visit-file (car loc) fuel-edit-word-method)
-    (goto-line (if (numberp (cadr loc)) (cadr loc) 1))))
+    (goto-char (point-min))
+    (forward-line (1- (if (numberp (cadr loc)) (cadr loc) 1)))))
 
 (defun fuel-edit--edit-article (name)
   (let ((cmd `(:fuel* (,name fuel-get-article-location) "fuel" t)))
@@ -66,6 +63,7 @@
 
 (defvar fuel-edit--word-history nil)
 
+;;;###autoload
 (defun fuel-edit-vocabulary (&optional refresh vocab)
   "Visits vocabulary file in Emacs.
 When called interactively, asks for vocabulary with completion.
@@ -75,6 +73,7 @@ With prefix argument, refreshes cached vocabulary list."
          (cmd `(:fuel* (,vocab fuel-get-vocab-location) "fuel" t)))
     (fuel-edit--try-edit (fuel-eval--send/wait cmd))))
 
+;;;###autoload
 (defun fuel-edit-word (&optional arg)
   "Asks for a word to edit, with completion.
 With prefix, only words visible in the current vocabulary are
@@ -91,7 +90,7 @@ offered."
   "Opens a new window visiting the definition of the word at point.
 With prefix, asks for the word to edit."
   (interactive "P")
-  (let* ((word (or (and (not arg) (fuel-syntax-symbol-at-point))
+  (let* ((word (or (and (not arg) (factor-symbol-at-point))
                    (fuel-completion--read-word "Edit word: ")))
          (cmd `(:fuel* ((:quote ,word) fuel-get-word-location)))
          (marker (and (not arg) (point-marker))))
@@ -105,7 +104,7 @@ With prefix, asks for the word to edit."
 With prefix, asks for the word to edit."
   (interactive "P")
   (let* ((word (or word
-                   (and (not arg) (fuel-syntax-symbol-at-point))
+                   (and (not arg) (factor-symbol-at-point))
                    (fuel-completion--read-word "Edit word: ")))
          (cmd `(:fuel* ((:quote ,word) fuel-get-doc-location)))
          (marker (and (not arg) (point-marker))))
@@ -138,7 +137,7 @@ was last invoked."
   (let ((buffer (completing-read "Factor buffer: "
                                  (remove (buffer-name)
                                          (mapcar 'buffer-name (buffer-list)))
-                                 '(lambda (s) (string-match "\\.factor$" s))
+                                 #'(lambda (s) (string-match "\\.factor$" s))
                                  t
                                  nil
                                  fuel-edit--buffer-history)))
