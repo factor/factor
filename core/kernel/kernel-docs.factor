@@ -93,6 +93,20 @@ HELP: =
     { $example "USING: arrays kernel prettyprint ;" "{ \"a\" \"b\" } [ \"a\" \"b\" ] = ." "f" }
 } ;
 
+HELP: /=
+{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
+{ $description
+    "Tests for negated equality. Tests reference equality followed by value equality. Outputs " { $link t } " when objects are neither identical nor have equivalent values."
+}
+{ $examples
+    { $example "USING: kernel prettyprint ;" "5 7 /= ." "t" }
+    { $example "USING: kernel prettyprint ;" "5 5 /= ." "f" }
+    { $example "USING: kernel prettyprint ;" "5 005 /= ." "f" }
+    { $example "USING: kernel prettyprint ;" "5 5.0 /= ." "t" }
+    { $example "USING: arrays kernel prettyprint ;" "{ \"a\" \"b\" } \"a\" \"b\" 2array /= ." "f" }
+    { $example "USING: arrays kernel prettyprint ;" "{ \"a\" \"b\" } [ \"a\" \"b\" ] /= ." "t" }
+} ;
+
 HELP: equal?
 { $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
 { $contract

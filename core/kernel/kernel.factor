@@ -226,6 +226,8 @@ M: identity-tuple hashcode* nip identity-hashcode ; inline
     2dup eq? [ 2drop t ] [
         2dup both-fixnums? [ 2drop f ] [ equal? ] if
     ] if ; inline
+    
+: /= ( obj1 obj2 -- ? ) = not ; inline
 
 : same? ( x y quot -- ? ) bi@ = ; inline
 

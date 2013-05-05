@@ -7,6 +7,8 @@ IN: kernel.tests
 
 [ 0 ] [ f size ] unit-test
 [ t ] [ [ \ = \ = ] all-equal? ] unit-test
+[ t ] [ 1 2 /= ] unit-test
+[ f ] [ 1 1 /= ] unit-test
 
 ! Don't leak extra roots if error is thrown
 [ ] [ 1000 [ [ 3 throw ] ignore-errors ] times ] unit-test
