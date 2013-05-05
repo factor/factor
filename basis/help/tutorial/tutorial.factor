@@ -22,7 +22,11 @@ $nl
 $nl
 "Open the work directory in your file manager, and open the subdirectory named " { $snippet "palindrome" } ". Inside this subdirectory you will see a file named " { $snippet "palindrome.factor" } ". Open this file in your text editor."
 $nl
-"You are now ready to go on to the next section: " { $link "first-program-logic" } "." ;
+"You are now ready to go on to the next section: " { $link "first-program-logic" } "." 
+$nl
+{ $notes """A Factor vocabulary consists of a single *.factor source file in a directory. The vocabulary can contain optional files for documents "*-docs.factor" and unit tests "*-tests.factor" and other helper files. When you choose to create a second Factor vocabulary, you create a new vocabulary in a new directory. Each Factor source file exists in a separate directory.""" }
+$nl 
+;
 
 ARTICLE: "first-program-logic" "Writing some logic in your first program"
 "The Factor workflow is to edit source code on disk and then to refresh the live image. Let's examine the file that we just created with the scaffold tool."

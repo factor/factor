@@ -156,3 +156,18 @@ IN: sequences.extras.tests
 
 { t 3 3 } [ 10 iota [ [ odd? ] [ 1 > ] bi* and ] map-find-index ] unit-test
 { f f f } [ 10 iota [ [ odd? ] [ 9 > ] bi* and ] map-find-index ] unit-test
+
+[ "cd" ] [ 2 -2 "abcdef" trim-pos ] unit-test
+[ "cd" ] [ -2 2 "abcdef" trim-pos ] unit-test
+[ "ab" ] [ 0 2 "abcdef" trim-pos ] unit-test
+[ "cdef" ] [ 2 0 "abcdef" trim-pos ] unit-test
+[ "abcdef" ] [ 0 0 "abcdef" trim-pos ] unit-test
+[ "abcdef" ] [ 0 50 "abcdef" trim-pos ] unit-test
+[ "" ] [ 0 -99 "abcdef" trim-pos ] unit-test
+[ "abcdef" ] [ -99 0 "abcdef" trim-pos ] unit-test
+[ "" ] [ 2 2 "abcdef" trim-pos ] unit-test
+[ "abcdef" ] [ 99 -99 "abcdef" trim-pos ] unit-test
+[ "abcdef" ] [ 0 0 "abcdef" trim-pos ] unit-test
+[ "abcd" ] [ 4 -99 "abcdef" trim-pos ] unit-test
+[ "cd" ] [ 4 -4 "abcdef" trim-pos ] unit-test
+[ "cd" ] [ -4 4 "abcdef" trim-pos ] unit-test

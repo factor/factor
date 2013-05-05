@@ -1,7 +1,7 @@
 USING: arrays byte-arrays kernel math math.order math.parser
 namespaces sequences kernel.private sequences.private strings
 sbufs tools.test vectors assocs generic vocabs.loader
-generic.single math.vectors math.functions ;
+generic.single math.vectors math.functions accessors ;
 IN: sequences.tests
 
 [ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
@@ -17,6 +17,12 @@ IN: sequences.tests
 [ 0 10 "hello" <slice> ] must-fail
 [ -10 3 "hello" <slice> ] must-fail
 [ 2 1 "hello" <slice> ] must-fail
+
+[ 1 ] [ V{ 1 2 3 4 5 } clone first ] unit-test
+[ 2 ] [ V{ 1 2 3 4 5 } clone second ] unit-test
+[ 3 ] [ V{ 1 2 3 4 5 } clone third ] unit-test
+[ 4 ] [ V{ 1 2 3 4 5 } clone fourth ] unit-test
+[ 5 ] [ V{ 1 2 3 4 5 } clone fifth ] unit-test
 
 [ "cba" ] [ "abcdef" 3 head-slice reverse ] unit-test
 
