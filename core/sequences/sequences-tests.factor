@@ -283,7 +283,7 @@ unit-test
 [ { "d" "a" "b" "c" } ] [ { 3 0 1 2 } { "a" "b" "c" "d" } nths ] unit-test
 
 [ "dac" ] [ { 3 0 2 } "abcd" nths ] unit-test
-                          
+
 TUPLE: bogus-hashcode ;
 
 M: bogus-hashcode hashcode* 2drop 0 >bignum ;
@@ -316,6 +316,10 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 [ -1 iota ] must-fail
 [ T{ iota-tuple { n 10 } } ] [ 10 iota ] unit-test
 [ 0 ] [ 10 iota first ] unit-test
+{ 0 } [ 0 iota sum ] unit-test
+{ 1 } [ 1 iota sum ] unit-test
+{ 10 } [ 5 iota sum ] unit-test
+{ 15 } [ 6 iota sum ] unit-test
 
 [ "hi" 3 ] [
     { 1 2 3 4 5 6 7 8 } [ H{ { 3 "hi" } } at ] map-find

@@ -1006,6 +1006,7 @@ PRIVATE>
 
 GENERIC: sum ( seq -- n )
 M: object sum 0 [ + ] binary-reduce ; inline
+M: iota-tuple sum length dup 1 - * 2/ ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
