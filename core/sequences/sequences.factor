@@ -892,7 +892,7 @@ PRIVATE>
 : nth3-unsafe ( n seq -- a b c )
     [ nth2-unsafe ] [ [ 2 + ] dip nth-unsafe ] 2bi ; inline
 
-: (binary-reduce) ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) from length -- ... value )
+: (binary-reduce) ( seq start quot: ( elt1 elt2 -- newelt ) from length -- value )
     #! We can't use case here since combinators depends on
     #! sequences
     dup 4 < [
@@ -910,7 +910,7 @@ PRIVATE>
 
 PRIVATE>
 
-: binary-reduce ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) -- ... value )
+: binary-reduce ( seq start quot: ( elt1 elt2 -- newelt ) -- value )
     pick length 0 max 0 swap (binary-reduce) ; inline
 
 : cut ( seq n -- before after )
