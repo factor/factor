@@ -1,4 +1,4 @@
-USING: math math.ranges sequences sets tools.test arrays ;
+USING: arrays kernel math math.ranges sequences sets tools.test ;
 IN: math.ranges.tests
 
 [ { } ] [ 1 1 (a,b) >array ] unit-test
@@ -51,3 +51,8 @@ IN: math.ranges.tests
 [ 100 ] [
     1 100 [a,b] [ 2^ [1,b] ] map members length
 ] unit-test
+
+{ t } [ -10 10 1 <range> [ sum ] [ >array sum ] bi = ] unit-test
+{ t } [ -10 10 2 <range> [ sum ] [ >array sum ] bi = ] unit-test
+{ t } [ 10 -10 -1 <range> [ sum ] [ >array sum ] bi = ] unit-test
+{ t } [ 10 -10 -2 <range> [ sum ] [ >array sum ] bi = ] unit-test
