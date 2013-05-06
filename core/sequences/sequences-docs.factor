@@ -1301,7 +1301,7 @@ HELP: collector
 
 HELP: binary-reduce
 { $values
-     { "seq" sequence } { "start" integer } { "quot" { $quotation "( ... elt1 elt2 -- ... newelt )" } }
+     { "seq" sequence } { "start" integer } { "quot" { $quotation "( elt1 elt2 -- newelt )" } }
      { "value" object } }
 { $description "Like " { $link reduce } ", but splits the sequence in half recursively until each sequence is small enough, and calls the quotation on these smaller sequences. If the quotation computes values that depend on the size of their input, such as bignum arithmetic, then this algorithm can be more efficient than using " { $link reduce } "." }
 { $examples "Computing factorial:"
