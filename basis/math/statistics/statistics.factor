@@ -339,7 +339,7 @@ ALIAS: std sample-std
 
 : sample-corr ( {x} {y} -- corr ) 1 corr-ddof ; inline
 
-: cum-map ( seq identity quot -- seq' )
+: cum-map ( seq identity quot: ( prev elt -- next ) -- seq' )
     swapd [ dup ] compose map nip ; inline
 
 : cum-sum ( seq -- seq' )
@@ -350,9 +350,9 @@ ALIAS: std sample-std
 
 : cum-product ( seq -- seq' )
     1 [ * ] cum-map ;
-    
+
 : cum-mean ( seq -- seq' )
-    [ cum-sum ] [ length [1,b] ] bi [ / ] 2map ;    
+    0 swap [ [ + dup ] dip 1 + / ] map-index nip ;
 
 : cum-count ( seq quot -- seq' )
     [ 0 ] dip '[ _ call [ 1 + ] when ] cum-map ; inline
