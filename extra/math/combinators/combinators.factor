@@ -1,10 +1,16 @@
 ! Copyright (C) 2013 Loryn Jenkins.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math fry ;
+USING: kernel math ;
 IN: math.combinators
 
-: when-negative ( ..n true: ( ..a -- ..b ) -- ..m )
-    '[ _ dup 0 < [ @ ] when ] call ; inline
-    
-: when-positive ( ..n true: ( ..a -- ..b ) -- ..m )
-    '[ _ dup 0 > [ @ ] when ] call ; inline 
+: if-negative ( ..a n true: ( ..a n -- ..b ) false: ( ..a n -- ..b ) -- ..b )
+    [ dup 0 < ] 2dip if ; inline
+
+: if-positive ( ..a n true: ( ..a n -- ..b ) false: ( ..a n -- ..b ) -- ..b )
+    [ dup 0 > ] 2dip if ; inline
+
+: when-negative ( ..a n true: ( ..a n -- ..b ) -- ..b )
+    [ ] if-negative ; inline
+
+: when-positive ( ..a n true: ( ..a n -- ..b ) -- ..b )
+    [ ] if-positive ; inline
