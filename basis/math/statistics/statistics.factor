@@ -350,9 +350,9 @@ ALIAS: std sample-std
 
 : cum-product ( seq -- seq' )
     1 [ * ] cum-map ;
-
+    
 : cum-mean ( seq -- seq' )
-    [ cum-sum ] [ length [1,b] ] bi v/ ;
+    [ cum-sum ] [ length [1,b] ] bi [ / ] 2map ;    
 
 : cum-count ( seq quot -- seq' )
     [ 0 ] dip '[ _ call [ 1 + ] when ] cum-map ; inline
