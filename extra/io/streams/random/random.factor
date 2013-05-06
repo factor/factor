@@ -11,9 +11,9 @@ C: <random-stream> random-stream
 M: random-stream stream-element-type drop +byte+ ;
 
 M: random-stream stream-read-unsafe
-    drop [ dup random-bytes ] [ 0 swap copy ] bi* ;
+    drop [ dup random-bytes ] [ 0 swap copy-unsafe ] bi* ;
 
-M: random-stream stream-read1 drop 256 random ;
+M: random-stream stream-read1 drop 256 random-integer ;
 
 M: random-stream stream-read-partial-unsafe stream-read-unsafe ;
 
