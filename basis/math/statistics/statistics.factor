@@ -70,7 +70,7 @@ PRIVATE>
     seq length 1 - :> m!
     [ l m < ]
     [
-        k seq nth x!
+        k seq nth-unsafe x!
         l i!
         m j!
         [ i j <= ]
@@ -87,18 +87,17 @@ PRIVATE>
         j k < [ i l! ] when
         k i < [ j m! ] when
     ] while
-    k seq nth ; inline
+    k seq nth-unsafe ; inline
 
 : (kth-object) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
     #! The algorithm modifiers seq, so we clone it
-    [ clone ] 4dip ((kth-object)) ; inline
+    [ { } clone-like ] 4dip ((kth-object)) ; inline
 
 : kth-object-unsafe ( seq k quot: ( x y -- ? ) -- elt )
     [ [ nth-unsafe ] [ exchange-unsafe ] ] dip (kth-object) ; inline
 
 : kth-objects-unsafe ( seq kths quot: ( x y -- ? ) -- elts )
-    [ clone ] 2dip
-    '[ [ nth-unsafe ] [ exchange-unsafe ]  _ ((kth-object)) ] with map ; inline
+    '[ _ kth-object-unsafe ] with map ; inline
 
 PRIVATE>
 
@@ -106,8 +105,7 @@ PRIVATE>
     [ [ nth ] [ exchange ] ] dip (kth-object) ; inline
 
 : kth-objects ( seq kths quot: ( x y -- ? ) -- elts )
-    [ clone ] 2dip
-    '[ [ nth ] [ exchange ]  _ ((kth-object)) ] with map ; inline
+    '[ _ kth-object ] with map ; inline
 
 : kth-smallests ( seq kths -- elts ) [ < ] kth-objects-unsafe ;
 
