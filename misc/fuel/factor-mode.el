@@ -1,4 +1,4 @@
-;;; factor-mode.el -- mode for editing Factor source
+;;; factor-mode.el --- Major mode for editing Factor programs.
 
 ;; Copyright (C) 2013 Erik Charlebois
 ;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
@@ -9,10 +9,11 @@
 ;; Keywords: languages, factor
 ;; Start date: Tue Dec 02, 2008 21:32
 
-;;; Comentary:
+;;; Commentary:
 
-;; Definition of factor-mode, a major Emacs for editing Factor source
-;; code.
+;; A major mode for editing Factor programs. It provides indenting and
+;; font-lock support.
+
 
 ;;; Code:
 
