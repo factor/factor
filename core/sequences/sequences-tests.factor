@@ -317,7 +317,7 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 [ T{ iota-tuple { n 10 } } ] [ 10 iota ] unit-test
 [ 0 ] [ 10 iota first ] unit-test
 { 0 } [ 0 iota sum ] unit-test
-{ 1 } [ 1 iota sum ] unit-test
+{ 0 } [ 1 iota sum ] unit-test
 { 10 } [ 5 iota sum ] unit-test
 { 15 } [ 6 iota sum ] unit-test
 
