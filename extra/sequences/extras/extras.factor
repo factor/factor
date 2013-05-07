@@ -422,3 +422,9 @@ PRIVATE>
 
 : remove-first! ( obj seq -- seq )
     [ index ] keep over [ remove-nth! ] [ nip ] if ;
+
+: remove-last ( obj seq -- seq' )
+    [ last-index ] keep over [ remove-nth ] [ nip ] if ;
+
+: remove-last! ( obj seq -- seq )
+    [ last-index ] keep over [ remove-nth! ] [ nip ] if ;
