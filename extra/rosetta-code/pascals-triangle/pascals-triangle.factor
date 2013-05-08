@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: grouping kernel math sequences ;
+USING: grouping kernel locals math math.ranges sequences ;
 IN: rosetta-code.pascals-triangle
 
 ! http://rosettacode.org/wiki/Pascal%27s_triangle
@@ -25,6 +25,11 @@ IN: rosetta-code.pascals-triangle
 ! previous rows or using a binary coefficient or combination
 ! function. Behavior for n <= 0 does not need to be uniform, but
 ! should be noted.
+
+:: pascal-coefficients ( n -- seq )
+    1 n [1,b] [
+        dupd [ n swap - * ] [ /i ] bi swap
+    ] map nip ;
 
 : (pascal) ( seq -- newseq )
     dup last 0 prefix 0 suffix 2 <clumps> [ sum ] map suffix ;
