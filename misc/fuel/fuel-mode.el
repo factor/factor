@@ -1,4 +1,4 @@
-;;; fuel-mode.el -- Minor mode enabling FUEL niceties
+;;; fuel-mode.el --- Major mode for editing Factor programs.
 
 ;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
@@ -7,10 +7,10 @@
 ;; Keywords: languages, fuel, factor
 ;; Start date: Sat Dec 06, 2008 00:52
 
-;;; Comentary:
+;;; Commentary:
 
-;; Enhancements to vanilla factor-mode (notably, listener interaction)
-;; enabled by means of a minor mode.
+;; A major mode (factor-mode) for editing Factor programs and a minor mode
+;; (fuel-mode) for interacting with a running Factor image.
 
 ;;; Code:
 
