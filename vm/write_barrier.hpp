@@ -6,32 +6,26 @@ card has a slot written to.
 
 the offset of the first object is set by the allocator. */
 
-namespace factor
-{
+namespace factor {
 
 /* if card_points_to_nursery is set, card_points_to_aging must also be set. */
 static const cell card_points_to_nursery = 0x80;
 static const cell card_points_to_aging = 0x40;
-static const cell card_mark_mask = (card_points_to_nursery | card_points_to_aging);
+static const cell card_mark_mask =
+    (card_points_to_nursery | card_points_to_aging);
 typedef u8 card;
 
 static const cell card_bits = 8;
-static const cell card_size = (1<<card_bits);
-static const cell addr_card_mask = (card_size-1);
+static const cell card_size = (1 << card_bits);
+static const cell addr_card_mask = (card_size - 1);
 
 typedef u8 card_deck;
 
 static const cell deck_bits = (card_bits + 10);
-static const cell deck_size = (1<<deck_bits);
-static const cell addr_deck_mask = (deck_size-1);
+static const cell deck_size = (1 << deck_bits);
+static const cell addr_deck_mask = (deck_size - 1);
 
-inline cell addr_to_card(cell a)
-{
-	return a >> card_bits;
-}
+inline cell addr_to_card(cell a) { return a >> card_bits; }
 
-inline cell addr_to_deck(cell a)
-{
-	return a >> deck_bits;
-}
+inline cell addr_to_deck(cell a) { return a >> deck_bits; }
 }
