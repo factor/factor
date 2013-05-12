@@ -33,8 +33,7 @@ Technology nor of any adaptation thereof in any advertising,
 promotional, or sales literature without prior written consent from
 MIT in each case. */
 
-namespace factor
-{
+namespace factor {
 
 /* Internal Interface to Bignum Code */
 #undef BIGNUM_ZERO_P
@@ -57,55 +56,51 @@ typedef s64 bignum_twodigit_type;
 #endif
 
 /* BIGNUM_TO_POINTER casts a bignum object to a digit array pointer. */
-#define BIGNUM_TO_POINTER(bignum) ((bignum_digit_type *)(bignum + 1))
+#define BIGNUM_TO_POINTER(bignum) ((bignum_digit_type*)(bignum + 1))
 
 /* BIGNUM_EXCEPTION is invoked to handle assertion violations. */
 #define BIGNUM_EXCEPTION abort
 
-#define BIGNUM_DIGIT_LENGTH (((sizeof (bignum_digit_type)) * CHAR_BIT) - 2)
+#define BIGNUM_DIGIT_LENGTH (((sizeof(bignum_digit_type)) * CHAR_BIT) - 2)
 #define BIGNUM_HALF_DIGIT_LENGTH (BIGNUM_DIGIT_LENGTH / 2)
 #define BIGNUM_RADIX (bignum_digit_type)(((cell) 1) << BIGNUM_DIGIT_LENGTH)
 #define BIGNUM_RADIX_ROOT (((bignum_digit_type) 1) << BIGNUM_HALF_DIGIT_LENGTH)
-#define BIGNUM_DIGIT_MASK	 (BIGNUM_RADIX - 1)
-#define BIGNUM_HALF_DIGIT_MASK	 (BIGNUM_RADIX_ROOT - 1)
+#define BIGNUM_DIGIT_MASK (BIGNUM_RADIX - 1)
+#define BIGNUM_HALF_DIGIT_MASK (BIGNUM_RADIX_ROOT - 1)
 
-#define BIGNUM_START_PTR(bignum)					\
-  ((BIGNUM_TO_POINTER (bignum)) + 1)
+#define BIGNUM_START_PTR(bignum) ((BIGNUM_TO_POINTER(bignum)) + 1)
 
 #define BIGNUM_LENGTH(bignum) (untag_fixnum((bignum)->capacity) - 1)
 
 #define BIGNUM_NEGATIVE_P(bignum) (bignum->data()[0] != 0)
-#define BIGNUM_SET_NEGATIVE_P(bignum,neg) (bignum->data()[0] = neg)
+#define BIGNUM_SET_NEGATIVE_P(bignum, neg) (bignum->data()[0] = neg)
 
-#define BIGNUM_ZERO_P(bignum)						\
-  ((BIGNUM_LENGTH (bignum)) == 0)
+#define BIGNUM_ZERO_P(bignum) ((BIGNUM_LENGTH(bignum)) == 0)
 
-#define BIGNUM_REF(bignum, index)					\
-  (* ((BIGNUM_START_PTR (bignum)) + (index)))
+#define BIGNUM_REF(bignum, index) (*((BIGNUM_START_PTR(bignum)) + (index)))
 
 /* These definitions are here to facilitate caching of the constants
    0, 1, and -1. */
 #define BIGNUM_ZERO() untag<bignum>(bignum_zero)
-#define BIGNUM_ONE(neg_p) \
-   untag<bignum>(neg_p ? bignum_neg_one : bignum_pos_one)
+#define BIGNUM_ONE(neg_p) untag<bignum>(neg_p ? bignum_neg_one : bignum_pos_one)
 
 #define HD_LOW(digit) ((digit) & BIGNUM_HALF_DIGIT_MASK)
 #define HD_HIGH(digit) ((digit) >> BIGNUM_HALF_DIGIT_LENGTH)
 #define HD_CONS(high, low) (((high) << BIGNUM_HALF_DIGIT_LENGTH) | (low))
 
-#define BIGNUM_BITS_TO_DIGITS(n)					\
+#define BIGNUM_BITS_TO_DIGITS(n) \
   (((n) + (BIGNUM_DIGIT_LENGTH - 1)) / BIGNUM_DIGIT_LENGTH)
 
 #define BIGNUM_DIGITS_FOR(type) \
-  (BIGNUM_BITS_TO_DIGITS ((sizeof (type)) * CHAR_BIT))
+  (BIGNUM_BITS_TO_DIGITS((sizeof(type)) * CHAR_BIT))
 
 #ifndef BIGNUM_DISABLE_ASSERTION_CHECKS
 
-#define BIGNUM_ASSERT(expression)					\
-{									\
-  if (! (expression))							\
-	BIGNUM_EXCEPTION ();						\
-}
+#define BIGNUM_ASSERT(expression) \
+  {                               \
+    if (!(expression))            \
+      BIGNUM_EXCEPTION();         \
+  }
 
 #endif /* not BIGNUM_DISABLE_ASSERTION_CHECKS */
 
