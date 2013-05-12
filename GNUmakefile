@@ -26,7 +26,6 @@ ifdef CONFIG
 		vm/alien.o \
 		vm/arrays.o \
 		vm/bignum.o \
-		vm/booleans.o \
 		vm/byte_arrays.o \
 		vm/callbacks.o \
 		vm/callstack.o \
@@ -99,13 +98,10 @@ ifdef CONFIG
 		vm/data_heap.hpp \
 		vm/code_heap.hpp \
 		vm/gc.hpp \
-		vm/debug.hpp \
 		vm/strings.hpp \
-		vm/words.hpp \
 		vm/float_bits.hpp \
 		vm/io.hpp \
 		vm/image.hpp \
-		vm/alien.hpp \
 		vm/callbacks.hpp \
 		vm/dispatch.hpp \
 		vm/entry_points.hpp \
@@ -124,7 +120,6 @@ ifdef CONFIG
 		vm/aging_collector.hpp \
 		vm/to_tenured_collector.hpp \
 		vm/code_block_visitor.hpp \
-		vm/compaction.hpp \
 		vm/full_collector.hpp \
 		vm/arrays.hpp \
 		vm/math.hpp \
