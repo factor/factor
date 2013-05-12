@@ -1,7 +1,6 @@
-namespace factor
-{
+namespace factor {
 
-/* 
+/*
 
 Copyright (C) 1989-1992 Massachusetts Institute of Technology
 Portions copyright (C) 2004-2009 Slava Pestov
@@ -35,10 +34,9 @@ Technology nor of any adaptation thereof in any advertising,
 promotional, or sales literature without prior written consent from
 MIT in each case. */
 
-#define BIGNUM_OUT_OF_BAND ((bignum *) 0)
+#define BIGNUM_OUT_OF_BAND ((bignum*)0)
 
-enum bignum_comparison
-{
+enum bignum_comparison {
   bignum_comparison_equal = 0,
   bignum_comparison_less = -1,
   bignum_comparison_greater = 1
