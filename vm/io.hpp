@@ -1,5 +1,4 @@
-namespace factor
-{
+namespace factor {
 
 /* Platform specific primitives */
 
