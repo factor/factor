@@ -1,38 +1,35 @@
-namespace factor
-{
+namespace factor {
 
 struct full_policy {
-	factor_vm *parent;
-	tenured_space *tenured;
+  factor_vm* parent;
+  tenured_space* tenured;
 
-	explicit full_policy(factor_vm *parent_) : parent(parent_), tenured(parent->data->tenured) {}
+  explicit full_policy(factor_vm* parent_)
+      : parent(parent_), tenured(parent->data->tenured) {}
 
-	bool should_copy_p(object *untagged)
-	{
-		return !tenured->contains_p(untagged);
-	}
+  bool should_copy_p(object* untagged) {
+    return !tenured->contains_p(untagged);
+  }
 
-	void promoted_object(object *obj)
-	{
-		tenured->set_marked_p(obj);
-		parent->mark_stack.push_back((cell)obj);
-	}
+  void promoted_object(object* obj) {
+    tenured->set_marked_p(obj);
+    parent->mark_stack.push_back((cell) obj);
+  }
 
-	void visited_object(object *obj)
-	{
-		if(!tenured->marked_p(obj))
-			promoted_object(obj);
-	}
+  void visited_object(object* obj) {
+    if (!tenured->marked_p(obj))
+      promoted_object(obj);
+  }
 };
 
-struct full_collector : collector<tenured_space,full_policy> {
-	code_block_visitor<gc_workhorse<tenured_space,full_policy> > code_visitor;
+struct full_collector : collector<tenured_space, full_policy> {
+  code_block_visitor<gc_workhorse<tenured_space, full_policy> > code_visitor;
 
-	explicit full_collector(factor_vm *parent_);
-	void trace_code_block(code_block *compiled);
-	void trace_context_code_blocks();
-	void trace_code_roots();
-	void trace_object_code_block(object *obj);
+  explicit full_collector(factor_vm* parent_);
+  void trace_code_block(code_block* compiled);
+  void trace_context_code_blocks();
+  void trace_code_roots();
+  void trace_object_code_block(object* obj);
 };
 
 }
