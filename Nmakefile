@@ -29,7 +29,6 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\alien.obj \
 	vm\arrays.obj \
 	vm\bignum.obj \
-	vm\booleans.obj \
 	vm\byte_arrays.obj \
 	vm\callbacks.obj \
 	vm\callstack.obj \
