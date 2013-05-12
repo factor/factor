@@ -1,5 +1,4 @@
-namespace factor
-{
+namespace factor {
 
 /* The callback heap is used to store the machine code that alien-callbacks
 actually jump to when C code invokes them.
@@ -25,46 +24,42 @@ saving the image will deallocate any code heap entries that were only reachable
 from the callback heap in the previous session when the image was saved. */
 
 struct callback_heap {
-	segment *seg;
-	cell here;
-	factor_vm *parent;
+  segment* seg;
+  cell here;
+  factor_vm* parent;
 
-	explicit callback_heap(cell size, factor_vm *parent);
-	~callback_heap();
+  explicit callback_heap(cell size, factor_vm* parent);
+  ~callback_heap();
 
-	void *callback_entry_point(code_block *stub)
-	{
-		word *w = (word *)UNTAG(stub->owner);
-		return w->entry_point;
-	}
+  void* callback_entry_point(code_block* stub) {
+    word* w = (word*)UNTAG(stub->owner);
+    return w->entry_point;
+  }
 
-	bool setup_seh_p();
-	bool return_takes_param_p();
-	instruction_operand callback_operand(code_block *stub, cell index);
-	void store_callback_operand(code_block *stub, cell index);
-	void store_callback_operand(code_block *stub, cell index, cell value);
+  bool setup_seh_p();
+  bool return_takes_param_p();
+  instruction_operand callback_operand(code_block* stub, cell index);
+  void store_callback_operand(code_block* stub, cell index);
+  void store_callback_operand(code_block* stub, cell index, cell value);
 
-	void update(code_block *stub);
+  void update(code_block* stub);
 
-	code_block *add(cell owner, cell return_rewind);
+  code_block* add(cell owner, cell return_rewind);
 
-	void update();
+  void update();
 
-	code_block *next(code_block *stub)
-	{
-		return (code_block *)((cell)stub + stub->size());
-	}
+  code_block* next(code_block* stub) {
+    return (code_block*)((cell) stub + stub->size());
+  }
 
-	template<typename Iterator> void each_callback(Iterator &iter)
-	{
-		code_block *scan = (code_block *)seg->start;
-		code_block *end = (code_block *)here;
-		while(scan < end)
-		{
-			iter(scan);
-			scan = next(scan);
-		}
-	}
+  template <typename Iterator> void each_callback(Iterator& iter) {
+    code_block* scan = (code_block*)seg->start;
+    code_block* end = (code_block*)here;
+    while (scan < end) {
+      iter(scan);
+      scan = next(scan);
+    }
+  }
 };
 
 }
