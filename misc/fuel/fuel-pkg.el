@@ -1,1 +1,1 @@
-(define-package "factor-mode" "1.1" "Factor major mode")
+(define-package "fuel" "1.1" "Major mode for the Factor programming language.")
