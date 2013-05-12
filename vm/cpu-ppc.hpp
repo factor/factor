@@ -1,5 +1,4 @@
-namespace factor
-{
+namespace factor {
 
 #ifdef FACTOR_64
 #define FACTOR_CPU_STRING "ppc.64"
@@ -7,7 +6,7 @@ namespace factor
 #define FACTOR_CPU_STRING "ppc.32"
 #endif
 
-#define CALLSTACK_BOTTOM(ctx) (void *)(ctx->callstack_seg->end - 32)
+#define CALLSTACK_BOTTOM(ctx) (void*)(ctx->callstack_seg->end - 32)
 
 /* In the instruction sequence:
 
@@ -18,66 +17,63 @@ namespace factor
    the branch is one instruction. */
 static const fixnum xt_tail_pic_offset = 4;
 
-inline static void check_call_site(cell return_address)
-{
-	u32 insn = *(u32 *)return_address;
-	/* Check that absolute bit is 0 */
-	FACTOR_ASSERT((insn & 0x2) == 0x0);
-	/* Check that instruction is branch */
-	FACTOR_ASSERT((insn >> 26) == 0x12);
+inline static void check_call_site(cell return_address) {
+  u32 insn = *(u32*)return_address;
+  /* Check that absolute bit is 0 */
+  FACTOR_ASSERT((insn & 0x2) == 0x0);
+  /* Check that instruction is branch */
+  FACTOR_ASSERT((insn >> 26) == 0x12);
 }
 
 static const u32 b_mask = 0x3fffffc;
 
-inline static void *get_call_target(cell return_address)
-{
-	return_address -= 4;
-	check_call_site(return_address);
+inline static void* get_call_target(cell return_address) {
+  return_address -= 4;
+  check_call_site(return_address);
 
-	u32 insn = *(u32 *)return_address;
-	u32 unsigned_addr = (insn & b_mask);
-	s32 signed_addr = (s32)(unsigned_addr << 6) >> 6;
-	return (void *)(signed_addr + return_address);
+  u32 insn = *(u32*)return_address;
+  u32 unsigned_addr = (insn & b_mask);
+  s32 signed_addr = (s32)(unsigned_addr << 6) >> 6;
+  return (void*)(signed_addr + return_address);
 }
 
-inline static void set_call_target(cell return_address, void *target)
-{
-	return_address -= 4;
-	check_call_site(return_address);
+inline static void set_call_target(cell return_address, void* target) {
+  return_address -= 4;
+  check_call_site(return_address);
 
-	u32 insn = *(u32 *)return_address;
+  u32 insn = *(u32*)return_address;
 
-	fixnum relative_address = ((cell)target - return_address);
-	insn = ((insn & ~b_mask) | (relative_address & b_mask));
-	*(u32 *)return_address = insn;
+  fixnum relative_address = ((cell) target - return_address);
+  insn = ((insn & ~b_mask) | (relative_address & b_mask));
+  *(u32*)return_address = insn;
 
-	/* Flush the cache line containing the call we just patched */
-	__asm__ __volatile__ ("icbi 0, %0\n" "sync\n"::"r" (return_address):);
+  /* Flush the cache line containing the call we just patched */
+  __asm__ __volatile__("icbi 0, %0\n"
+                       "sync\n" ::"r"(return_address)
+                       :);
 }
 
-inline static bool tail_call_site_p(cell return_address)
-{
-	return_address -= 4;
-	u32 insn = *(u32 *)return_address;
-	return (insn & 0x1) == 0;
+inline static bool tail_call_site_p(cell return_address) {
+  return_address -= 4;
+  u32 insn = *(u32*)return_address;
+  return (insn & 0x1) == 0;
 }
 
-inline static unsigned int fpu_status(unsigned int status)
-{
-	unsigned int r = 0;
+inline static unsigned int fpu_status(unsigned int status) {
+  unsigned int r = 0;
 
-	if (status & 0x20000000)
-		r |= FP_TRAP_INVALID_OPERATION;
-	if (status & 0x10000000)
-		r |= FP_TRAP_OVERFLOW;
-	if (status & 0x08000000)
-		r |= FP_TRAP_UNDERFLOW;
-	if (status & 0x04000000)
-		r |= FP_TRAP_ZERO_DIVIDE;
-	if (status & 0x02000000)
-		r |= FP_TRAP_INEXACT;
+  if (status & 0x20000000)
+    r |= FP_TRAP_INVALID_OPERATION;
+  if (status & 0x10000000)
+    r |= FP_TRAP_OVERFLOW;
+  if (status & 0x08000000)
+    r |= FP_TRAP_UNDERFLOW;
+  if (status & 0x04000000)
+    r |= FP_TRAP_ZERO_DIVIDE;
+  if (status & 0x02000000)
+    r |= FP_TRAP_INEXACT;
 
-	return r;
+  return r;
 }
 
 /* Defined in assembly */
