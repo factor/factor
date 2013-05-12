@@ -33,54 +33,53 @@
 #include <iomanip>
 #include <limits>
 
-
 #define FACTOR_STRINGIZE_I(x) #x
 #define FACTOR_STRINGIZE(x) FACTOR_STRINGIZE_I(x)
 
 /* Record compiler version */
 #if defined(__clang__)
-	#define FACTOR_COMPILER_VERSION "Clang (GCC " __VERSION__ ")"
+#define FACTOR_COMPILER_VERSION "Clang (GCC " __VERSION__ ")"
 #elif defined(__INTEL_COMPILER)
-	#define FACTOR_COMPILER_VERSION "Intel C Compiler " FACTOR_STRINGIZE(__INTEL_COMPILER)
+#define FACTOR_COMPILER_VERSION \
+  "Intel C Compiler " FACTOR_STRINGIZE(__INTEL_COMPILER)
 #elif defined(__GNUC__)
-	#define FACTOR_COMPILER_VERSION "GCC " __VERSION__
+#define FACTOR_COMPILER_VERSION "GCC " __VERSION__
 #elif defined(_MSC_FULL_VER)
-	#define FACTOR_COMPILER_VERSION "Microsoft Visual C++ " FACTOR_STRINGIZE(_MSC_FULL_VER)
+#define FACTOR_COMPILER_VERSION \
+  "Microsoft Visual C++ " FACTOR_STRINGIZE(_MSC_FULL_VER)
 #else
-	#define FACTOR_COMPILER_VERSION "unknown"
+#define FACTOR_COMPILER_VERSION "unknown"
 #endif
 
 /* Detect target CPU type */
 #if defined(__arm__)
-	#define FACTOR_ARM
+#define FACTOR_ARM
 #elif defined(__amd64__) || defined(__x86_64__) || defined(_M_AMD64)
-	#define FACTOR_AMD64
-	#define FACTOR_64
+#define FACTOR_AMD64
+#define FACTOR_64
 #elif defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86)
-	#define FACTOR_X86
-#elif (defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)) && (defined(__PPC64__) || defined(__64BIT__))
-	#define FACTOR_PPC64
-	#define FACTOR_PPC
-	#define FACTOR_64
+#define FACTOR_X86
+#elif(defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)) && \
+    (defined(__PPC64__) || defined(__64BIT__))
+#define FACTOR_PPC64
+#define FACTOR_PPC
+#define FACTOR_64
 #elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
-	#define FACTOR_PPC32
-	#define FACTOR_PPC
+#define FACTOR_PPC32
+#define FACTOR_PPC
 #else
-	#error "Unsupported architecture"
+#error "Unsupported architecture"
 #endif
 
 #if defined(_MSC_VER)
-	#define WINDOWS
-	#define WINNT
+#define WINDOWS
+#define WINNT
 #elif defined(WIN32)
-	#define WINDOWS
+#define WINDOWS
 #endif
 
 /* Forward-declare this since it comes up in function prototypes */
-namespace factor
-{
-	struct factor_vm;
-}
+namespace factor { struct factor_vm; }
 
 /* Factor headers */
 #include "assert.hpp"
