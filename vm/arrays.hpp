@@ -1,36 +1,34 @@
-namespace factor
-{
+namespace factor {
 
-inline cell array_nth(array *array, cell slot)
-{
+inline cell array_nth(array* array, cell slot) {
 #ifdef FACTOR_DEBUG
-	FACTOR_ASSERT(slot < array_capacity(array));
-	FACTOR_ASSERT(array->type() == ARRAY_TYPE);
+  FACTOR_ASSERT(slot < array_capacity(array));
+  FACTOR_ASSERT(array->type() == ARRAY_TYPE);
 #endif
-	return array->data()[slot];
+  return array->data()[slot];
 }
 
-inline void factor_vm::set_array_nth(array *array, cell slot, cell value)
-{
+inline void factor_vm::set_array_nth(array* array, cell slot, cell value) {
 #ifdef FACTOR_DEBUG
-	FACTOR_ASSERT(slot < array_capacity(array));
-	FACTOR_ASSERT(array->type() == ARRAY_TYPE);
+  FACTOR_ASSERT(slot < array_capacity(array));
+  FACTOR_ASSERT(array->type() == ARRAY_TYPE);
 #endif
-	cell *slot_ptr = &array->data()[slot];
-	*slot_ptr = value;
-	write_barrier(slot_ptr);
+  cell* slot_ptr = &array->data()[slot];
+  *slot_ptr = value;
+  write_barrier(slot_ptr);
 }
 
 struct growable_array {
-	cell count;
-	data_root<array> elements;
+  cell count;
+  data_root<array> elements;
 
-	explicit growable_array(factor_vm *parent, cell capacity = 10) :
-		count(0), elements(parent->allot_array(capacity,false_object),parent) {}
+  explicit growable_array(factor_vm* parent, cell capacity = 10)
+      : count(0),
+        elements(parent->allot_array(capacity, false_object), parent) {}
 
-	void add(cell elt);
-	void append(array *elts);
-	void trim();
+  void add(cell elt);
+  void append(array* elts);
+  void trim();
 };
 
 }
