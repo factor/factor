@@ -337,13 +337,13 @@ struct factor_vm {
   /* the write barrier must be called any time we are potentially storing a
      pointer from an older generation to a younger one */
   inline void write_barrier(cell* slot_ptr) {
-    *(char*)(cards_offset + ((cell) slot_ptr >> card_bits)) = card_mark_mask;
-    *(char*)(decks_offset + ((cell) slot_ptr >> deck_bits)) = card_mark_mask;
+    *(char*)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
+    *(char*)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
   }
 
   inline void write_barrier(object* obj, cell size) {
-    cell start = (cell) obj & (~card_size + 1);
-    cell end = ((cell) obj + size + card_size - 1) & (~card_size + 1);
+    cell start = (cell)obj & (~card_size + 1);
+    cell end = ((cell)obj + size + card_size - 1) & (~card_size + 1);
 
     for (cell offset = start; offset < end; offset += card_size)
       write_barrier((cell*)offset);
@@ -387,7 +387,7 @@ struct factor_vm {
 
   inline void check_data_pointer(object* pointer) {
     FACTOR_ASSERT((current_gc && current_gc->op == collect_growing_heap_op) ||
-                  data->seg->in_segment_p((cell) pointer));
+                  data->seg->in_segment_p((cell)pointer));
   }
 
   // generic arrays

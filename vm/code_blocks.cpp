@@ -34,9 +34,9 @@ cell code_block::scan(factor_vm* vm, void* addr) const {
 cell factor_vm::compute_entry_point_address(cell obj) {
   switch (tagged<object>(obj).type()) {
     case WORD_TYPE:
-      return (cell) untag<word>(obj)->entry_point;
+      return (cell)untag<word>(obj)->entry_point;
     case QUOTATION_TYPE:
-      return (cell) untag<quotation>(obj)->entry_point;
+      return (cell)untag<quotation>(obj)->entry_point;
     default:
       critical_error("Expected word or quotation", obj);
       return 0;
@@ -45,13 +45,13 @@ cell factor_vm::compute_entry_point_address(cell obj) {
 
 cell factor_vm::compute_entry_point_pic_address(word* w, cell tagged_quot) {
   if (!to_boolean(tagged_quot) || max_pic_size == 0)
-    return (cell) w->entry_point;
+    return (cell)w->entry_point;
   else {
     quotation* quot = untag<quotation>(tagged_quot);
     if (quot_compiled_p(quot))
-      return (cell) quot->entry_point;
+      return (cell)quot->entry_point;
     else
-      return (cell) w->entry_point;
+      return (cell)w->entry_point;
   }
 }
 
@@ -162,7 +162,7 @@ cell factor_vm::compute_dlsym_address(array* parameters, cell index) {
   void* undefined_symbol = (void*)factor::undefined_symbol;
   undefined_symbol = FUNCTION_CODE_POINTER(undefined_symbol);
   if (d != NULL && !d->handle)
-    return (cell) undefined_symbol;
+    return (cell)undefined_symbol;
 
   switch (tagged<object>(symbol).type()) {
     case BYTE_ARRAY_TYPE: {
@@ -170,9 +170,9 @@ cell factor_vm::compute_dlsym_address(array* parameters, cell index) {
       void* sym = ffi_dlsym(d, name);
 
       if (sym)
-        return (cell) sym;
+        return (cell)sym;
       else
-        return (cell) undefined_symbol;
+        return (cell)undefined_symbol;
     }
     case ARRAY_TYPE: {
       array* names = untag<array>(symbol);
@@ -181,13 +181,13 @@ cell factor_vm::compute_dlsym_address(array* parameters, cell index) {
         void* sym = ffi_dlsym(d, name);
 
         if (sym)
-          return (cell) sym;
+          return (cell)sym;
       }
-      return (cell) undefined_symbol;
+      return (cell)undefined_symbol;
     }
     default:
       critical_error("Bad symbol specifier", symbol);
-      return (cell) undefined_symbol;
+      return (cell)undefined_symbol;
   }
 }
 
@@ -201,16 +201,16 @@ cell factor_vm::compute_dlsym_toc_address(array* parameters, cell index) {
   void* undefined_toc = (void*)factor::undefined_symbol;
   undefined_toc = FUNCTION_TOC_POINTER(undefined_toc);
   if (d != NULL && !d->handle)
-    return (cell) undefined_toc;
+    return (cell)undefined_toc;
 
   switch (tagged<object>(symbol).type()) {
     case BYTE_ARRAY_TYPE: {
       symbol_char* name = alien_offset(symbol);
       void* toc = ffi_dlsym_toc(d, name);
       if (toc)
-        return (cell) toc;
+        return (cell)toc;
       else
-        return (cell) undefined_toc;
+        return (cell)undefined_toc;
     }
     case ARRAY_TYPE: {
       array* names = untag<array>(symbol);
@@ -219,19 +219,19 @@ cell factor_vm::compute_dlsym_toc_address(array* parameters, cell index) {
         void* toc = ffi_dlsym_toc(d, name);
 
         if (toc)
-          return (cell) toc;
+          return (cell)toc;
       }
-      return (cell) undefined_toc;
+      return (cell)undefined_toc;
     }
     default:
       critical_error("Bad symbol specifier", symbol);
-      return (cell) undefined_toc;
+      return (cell)undefined_toc;
   }
 }
 #endif
 
 cell factor_vm::compute_vm_address(cell arg) {
-  return (cell) this + untag_fixnum(arg);
+  return (cell)this + untag_fixnum(arg);
 }
 
 void factor_vm::store_external_address(instruction_operand op) {
@@ -246,10 +246,10 @@ void factor_vm::store_external_address(instruction_operand op) {
       op.store_value(compute_dlsym_address(parameters, index));
       break;
     case RT_THIS:
-      op.store_value((cell) compiled->entry_point());
+      op.store_value((cell)compiled->entry_point());
       break;
     case RT_MEGAMORPHIC_CACHE_HITS:
-      op.store_value((cell) & dispatch_stats.megamorphic_cache_hits);
+      op.store_value((cell)&dispatch_stats.megamorphic_cache_hits);
       break;
     case RT_VM:
       op.store_value(compute_vm_address(array_nth(parameters, index)));
@@ -262,7 +262,7 @@ void factor_vm::store_external_address(instruction_operand op) {
       break;
 #ifdef WINDOWS
     case RT_EXCEPTION_HANDLER:
-      op.store_value((cell) & factor::exception_handler);
+      op.store_value((cell)&factor::exception_handler);
       break;
 #endif
 #ifdef FACTOR_PPC
@@ -271,10 +271,10 @@ void factor_vm::store_external_address(instruction_operand op) {
       break;
 #endif
     case RT_INLINE_CACHE_MISS:
-      op.store_value((cell) & factor::inline_cache_miss);
+      op.store_value((cell)&factor::inline_cache_miss);
       break;
     case RT_SAFEPOINT:
-      op.store_value((cell) code->safepoint_page);
+      op.store_value((cell)code->safepoint_page);
       break;
     default:
       critical_error("Bad rel type in store_external_address()", op.rel_type());
@@ -286,9 +286,9 @@ cell factor_vm::compute_here_address(cell arg, cell offset,
                                      code_block* compiled) {
   fixnum n = untag_fixnum(arg);
   if (n >= 0)
-    return (cell) compiled->entry_point() + offset + n;
+    return (cell)compiled->entry_point() + offset + n;
   else
-    return (cell) compiled->entry_point() - n;
+    return (cell)compiled->entry_point() - n;
 }
 
 struct initial_code_block_visitor {
@@ -364,7 +364,7 @@ void factor_vm::fixup_labels(array* labels, code_block* compiled) {
     relocation_entry new_entry(RT_HERE, rel_class, offset);
 
     instruction_operand op(new_entry, compiled, 0);
-    op.store_value(target + (cell) compiled->entry_point());
+    op.store_value(target + (cell)compiled->entry_point());
   }
 }
 
@@ -440,9 +440,9 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
      block's instruction operands. In most cases this is done right after this
      method returns, except when compiling words with the non-optimizing
      compiler at the beginning of bootstrap */
-  this->code->uninitialized_blocks
-      .insert(std::make_pair(compiled, literals.value()));
-  this->code->all_blocks.insert((cell) compiled);
+  this->code->uninitialized_blocks.insert(
+      std::make_pair(compiled, literals.value()));
+  this->code->all_blocks.insert((cell)compiled);
 
   /* next time we do a minor GC, we have to trace this code block, since
      the fields of the code_block struct might point into nursery or aging */
@@ -480,12 +480,12 @@ struct find_symbol_at_address_visitor {
 void factor_vm::undefined_symbol() {
   void* frame = ctx->callstack_top;
   void* return_address = frame_return_address(frame);
-  code_block* compiled = code->code_block_for_address((cell) return_address);
-  find_symbol_at_address_visitor visitor(this, (cell) return_address);
+  code_block* compiled = code->code_block_for_address((cell)return_address);
+  find_symbol_at_address_visitor visitor(this, (cell)return_address);
   compiled->each_instruction_operand(visitor);
   if (!to_boolean(visitor.symbol))
     critical_error("Can't find RT_DLSYM at return address",
-                   (cell) return_address);
+                   (cell)return_address);
   else
     general_error(ERROR_UNDEFINED_SYMBOL, visitor.symbol, visitor.library);
 }

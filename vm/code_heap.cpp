@@ -53,7 +53,7 @@ void code_heap::free(code_block* compiled) {
   FACTOR_ASSERT(!uninitialized_p(compiled));
   points_to_nursery.erase(compiled);
   points_to_aging.erase(compiled);
-  all_blocks.erase((cell) compiled);
+  all_blocks.erase((cell)compiled);
   allocator->free(compiled);
 }
 
@@ -66,9 +66,9 @@ struct clear_free_blocks_from_all_blocks_iterator {
 
   void operator()(code_block* free_block, cell size) {
     std::set<cell>::iterator erase_from =
-        code->all_blocks.lower_bound((cell) free_block);
+        code->all_blocks.lower_bound((cell)free_block);
     std::set<cell>::iterator erase_to =
-        code->all_blocks.lower_bound((cell) free_block + size);
+        code->all_blocks.lower_bound((cell)free_block + size);
 
     code->all_blocks.erase(erase_from, erase_to);
   }
@@ -89,7 +89,7 @@ struct all_blocks_set_verifier {
       : all_blocks(all_blocks) {}
 
   void operator()(code_block* block, cell size) {
-    FACTOR_ASSERT(all_blocks->find((cell) block) != all_blocks->end());
+    FACTOR_ASSERT(all_blocks->find((cell)block) != all_blocks->end());
   }
 };
 
@@ -103,7 +103,7 @@ code_block* code_heap::code_block_for_address(cell address) {
   FACTOR_ASSERT(blocki != all_blocks.begin());
   --blocki;
   code_block* found_block = (code_block*)*blocki;
-  FACTOR_ASSERT((cell) found_block->entry_point() <=
+  FACTOR_ASSERT((cell)found_block->entry_point() <=
                 address /* XXX this isn't valid during fixup. should store the
                                size in the map
                               && address - (cell)found_block->entry_point() <
@@ -117,7 +117,7 @@ struct all_blocks_set_inserter {
   all_blocks_set_inserter(code_heap* code) : code(code) {}
 
   void operator()(code_block* block, cell size) {
-    code->all_blocks.insert((cell) block);
+    code->all_blocks.insert((cell)block);
   }
 };
 
@@ -263,7 +263,7 @@ struct code_block_accumulator {
        from_unsigned_cell() here. It is OK, however, to add it as
        if it were a fixnum, and have library code shift it to the
        left by 4. */
-    cell entry_point = (cell) compiled->entry_point();
+    cell entry_point = (cell)compiled->entry_point();
     FACTOR_ASSERT((entry_point & (data_alignment - 1)) == 0);
     FACTOR_ASSERT((entry_point & TAG_MASK) == FIXNUM_TYPE);
     objects.push_back(entry_point);

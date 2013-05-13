@@ -15,21 +15,21 @@ __forceinline static bool cas(volatile fixnum* ptr, fixnum old_val,
 }
 
 __forceinline static cell fetch_add(volatile cell* ptr, cell val) {
-  return (cell)
-      InterlockedExchangeAdd(reinterpret_cast<volatile LONG*>(ptr), (LONG) val);
+  return (cell)InterlockedExchangeAdd(reinterpret_cast<volatile LONG*>(ptr),
+                                      (LONG) val);
 }
 __forceinline static fixnum fetch_add(volatile fixnum* ptr, fixnum val) {
-  return (fixnum)
-      InterlockedExchangeAdd(reinterpret_cast<volatile LONG*>(ptr), (LONG) val);
+  return (fixnum)InterlockedExchangeAdd(reinterpret_cast<volatile LONG*>(ptr),
+                                        (LONG) val);
 }
 
 __forceinline static cell fetch_subtract(volatile cell* ptr, cell val) {
-  return (cell) InterlockedExchangeAdd(reinterpret_cast<volatile LONG*>(ptr),
-                                       -(LONG) val);
+  return (cell)InterlockedExchangeAdd(reinterpret_cast<volatile LONG*>(ptr),
+                                      -(LONG)val);
 }
 __forceinline static fixnum fetch_subtract(volatile fixnum* ptr, fixnum val) {
-  return (fixnum) InterlockedExchangeAdd(reinterpret_cast<volatile LONG*>(ptr),
-                                         -(LONG) val);
+  return (fixnum)InterlockedExchangeAdd(reinterpret_cast<volatile LONG*>(ptr),
+                                        -(LONG)val);
 }
 
 __forceinline static void fence() { MemoryBarrier(); }

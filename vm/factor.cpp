@@ -135,23 +135,23 @@ void factor_vm::init_factor(vm_parameters* p) {
       p->image_path = default_image_path();
   }
 
-  srand((unsigned int) nano_count());
+  srand((unsigned int)nano_count());
   init_ffi();
   init_contexts(p->datastack_size, p->retainstack_size, p->callstack_size);
   init_callbacks(p->callback_size);
   load_image(p);
   init_c_io();
-  init_inline_caching((int) p->max_pic_size);
+  init_inline_caching((int)p->max_pic_size);
   special_objects[OBJ_CPU] =
-      allot_alien(false_object, (cell) FACTOR_CPU_STRING);
-  special_objects[OBJ_OS] = allot_alien(false_object, (cell) FACTOR_OS_STRING);
+      allot_alien(false_object, (cell)FACTOR_CPU_STRING);
+  special_objects[OBJ_OS] = allot_alien(false_object, (cell)FACTOR_OS_STRING);
   special_objects[OBJ_CELL_SIZE] = tag_fixnum(sizeof(cell));
   special_objects[OBJ_EXECUTABLE] =
-      allot_alien(false_object, (cell) p->executable_path);
+      allot_alien(false_object, (cell)p->executable_path);
   special_objects[OBJ_ARGS] = false_object;
   special_objects[OBJ_EMBEDDED] = false_object;
   special_objects[OBJ_VM_COMPILER] =
-      allot_alien(false_object, (cell) FACTOR_COMPILER_VERSION);
+      allot_alien(false_object, (cell)FACTOR_COMPILER_VERSION);
 
   /* We can GC now */
   gc_off = false;
@@ -172,7 +172,7 @@ void factor_vm::pass_args_to_factor(int argc, vm_char** argv) {
   growable_array args(this);
 
   for (fixnum i = 1; i < argc; i++)
-    args.add(allot_alien(false_object, (cell) argv[i]));
+    args.add(allot_alien(false_object, (cell)argv[i]));
 
   args.trim();
   special_objects[OBJ_ARGS] = args.elements.value();

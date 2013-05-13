@@ -16,13 +16,13 @@ struct tenured_space : free_list_allocator<object> {
   }
 
   cell first_object() {
-    return (cell) next_allocated_block_after(this->first_block());
+    return (cell)next_allocated_block_after(this->first_block());
   }
 
   cell next_object_after(cell scan) {
     cell size = ((object*)scan)->size();
     object* next = (object*)(scan + size);
-    return (cell) next_allocated_block_after(next);
+    return (cell)next_allocated_block_after(next);
   }
 
   void clear_mark_bits() { state.clear_mark_bits(); }

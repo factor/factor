@@ -104,13 +104,13 @@ segment::segment(cell size_, bool executable_p) {
     out_of_memory();
 
   if (!VirtualProtect(mem, getpagesize(), PAGE_NOACCESS, &ignore))
-    fatal_error("Cannot allocate low guard page", (cell) mem);
+    fatal_error("Cannot allocate low guard page", (cell)mem);
 
   if (!VirtualProtect(mem + size + getpagesize(), getpagesize(), PAGE_NOACCESS,
                       &ignore))
-    fatal_error("Cannot allocate high guard page", (cell) mem);
+    fatal_error("Cannot allocate high guard page", (cell)mem);
 
-  start = (cell) mem + getpagesize();
+  start = (cell)mem + getpagesize();
   end = start + size;
 }
 
@@ -134,13 +134,13 @@ long getpagesize() {
 void code_heap::guard_safepoint() {
   DWORD ignore;
   if (!VirtualProtect(safepoint_page, getpagesize(), PAGE_NOACCESS, &ignore))
-    fatal_error("Cannot protect safepoint guard page", (cell) safepoint_page);
+    fatal_error("Cannot protect safepoint guard page", (cell)safepoint_page);
 }
 
 void code_heap::unguard_safepoint() {
   DWORD ignore;
   if (!VirtualProtect(safepoint_page, getpagesize(), PAGE_READWRITE, &ignore))
-    fatal_error("Cannot unprotect safepoint guard page", (cell) safepoint_page);
+    fatal_error("Cannot unprotect safepoint guard page", (cell)safepoint_page);
 }
 
 void factor_vm::move_file(const vm_char* path1, const vm_char* path2) {
@@ -184,7 +184,7 @@ uint64_t nano_count() {
 #endif
   lo = count.LowPart;
 
-  return (uint64_t)((((uint64_t) hi << 32) | (uint64_t) lo) * scale_factor);
+  return (uint64_t)((((uint64_t)hi << 32) | (uint64_t)lo) * scale_factor);
 }
 
 void sleep_nanos(uint64_t nsec) { Sleep((DWORD)(nsec / 1000000)); }
@@ -203,7 +203,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
       signal_fault_addr = e->ExceptionInformation[1];
       verify_memory_protection_error(signal_fault_addr);
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
-                              (cell) factor::memory_signal_handler_impl);
+                              (cell)factor::memory_signal_handler_impl);
       break;
 
     case STATUS_FLOAT_DENORMAL_OPERAND:
@@ -225,12 +225,12 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
 #endif
       MXCSR(c) &= 0xffffffc0;
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
-                              (cell) factor::fp_signal_handler_impl);
+                              (cell)factor::fp_signal_handler_impl);
       break;
     default:
       signal_number = e->ExceptionCode;
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
-                              (cell) factor::synchronous_signal_handler_impl);
+                              (cell)factor::synchronous_signal_handler_impl);
       break;
   }
 

@@ -4,7 +4,7 @@ namespace factor {
 
 std::ostream& operator<<(std::ostream& out, const string* str) {
   for (cell i = 0; i < string_capacity(str); i++)
-    out << (char) str->data()[i];
+    out << (char)str->data()[i];
   return out;
 }
 
@@ -201,13 +201,13 @@ struct stack_frame_printer {
     parent->print_obj(owner->scan(parent, addr));
     std::cout << std::endl;
     std::cout << "word/quot addr: ";
-    std::cout << std::hex << (cell) owner->owner << std::dec;
+    std::cout << std::hex << (cell)owner->owner << std::dec;
     std::cout << std::endl;
     std::cout << "word/quot xt: ";
-    std::cout << std::hex << (cell) owner->entry_point() << std::dec;
+    std::cout << std::hex << (cell)owner->entry_point() << std::dec;
     std::cout << std::endl;
     std::cout << "return address: ";
-    std::cout << std::hex << (cell) addr << std::dec;
+    std::cout << std::hex << (cell)addr << std::dec;
     std::cout << std::endl;
   }
 };
@@ -270,7 +270,7 @@ void factor_vm::dump_generations() {
   dump_generation("Tenured", data->tenured);
 
   std::cout << "Cards:";
-  std::cout << "base=" << (cell) data->cards << ", ";
+  std::cout << "base=" << (cell)data->cards << ", ";
   std::cout << "size=" << (cell)(data->cards_end - data->cards) << std::endl;
 
   std::cout << std::dec;
@@ -285,7 +285,7 @@ struct object_dumper {
 
   void operator()(object* obj) {
     if (type == TYPE_COUNT || obj->type() == type) {
-      std::cout << padded_address((cell) obj) << " ";
+      std::cout << padded_address((cell)obj) << " ";
       parent->print_nested_obj(tag_dynamic(obj), 2);
       std::cout << std::endl;
     }
@@ -309,7 +309,7 @@ struct find_data_reference_slot_visitor {
 
   void operator()(cell* scan) {
     if (look_for == *scan) {
-      std::cout << padded_address((cell) obj) << " ";
+      std::cout << padded_address((cell)obj) << " ";
       parent->print_nested_obj(tag_dynamic(obj), 2);
       std::cout << std::endl;
     }
@@ -374,7 +374,7 @@ struct code_block_printer {
       else
         status = "allocated";
 
-      std::cout << std::hex << (cell) scan << std::dec << " ";
+      std::cout << std::hex << (cell)scan << std::dec << " ";
       std::cout << std::hex << size << std::dec << " ";
       std::cout << status << " ";
       std::cout << "stack frame " << scan->stack_frame_size();
@@ -531,7 +531,7 @@ void factor_vm::factorbug() {
       print_callstack();
     else if (strcmp(cmd, "e") == 0) {
       for (cell i = 0; i < special_object_count; i++)
-        dump_cell((cell) & special_objects[i]);
+        dump_cell((cell)&special_objects[i]);
     } else if (strcmp(cmd, "g") == 0)
       dump_generations();
     else if (strcmp(cmd, "c") == 0) {

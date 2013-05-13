@@ -14,9 +14,9 @@ with many more capabilities so these words are not usually used in
 normal operation. */
 
 void factor_vm::init_c_io() {
-  special_objects[OBJ_STDIN] = allot_alien(false_object, (cell) stdin);
-  special_objects[OBJ_STDOUT] = allot_alien(false_object, (cell) stdout);
-  special_objects[OBJ_STDERR] = allot_alien(false_object, (cell) stderr);
+  special_objects[OBJ_STDIN] = allot_alien(false_object, (cell)stdin);
+  special_objects[OBJ_STDOUT] = allot_alien(false_object, (cell)stdout);
+  special_objects[OBJ_STDERR] = allot_alien(false_object, (cell)stderr);
 }
 
 void factor_vm::io_error() {
@@ -196,7 +196,7 @@ void factor_vm::primitive_fread() {
 void factor_vm::primitive_fputc() {
   FILE* file = pop_file_handle();
   fixnum ch = to_fixnum(ctx->pop());
-  safe_fputc((int) ch, file);
+  safe_fputc((int)ch, file);
 }
 
 void factor_vm::primitive_fwrite() {
@@ -219,8 +219,8 @@ void factor_vm::primitive_ftell() {
 
 void factor_vm::primitive_fseek() {
   FILE* file = pop_file_handle();
-  int whence = (int) to_fixnum(ctx->pop());
-  off_t offset = (off_t) to_signed_8(ctx->pop());
+  int whence = (int)to_fixnum(ctx->pop());
+  off_t offset = (off_t)to_signed_8(ctx->pop());
   safe_fseek(file, offset, whence);
 }
 

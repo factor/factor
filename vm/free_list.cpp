@@ -14,7 +14,7 @@ void free_list::initial_free_list(cell start, cell end, cell occupied) {
   clear_free_list();
   if (occupied != end - start) {
     free_heap_block* last_block = (free_heap_block*)(start + occupied);
-    last_block->make_free(end - (cell) last_block);
+    last_block->make_free(end - (cell)last_block);
     add_to_free_list(last_block);
   }
 }
@@ -49,7 +49,7 @@ free_heap_block* free_list::find_free_block(cell size) {
       /* Split it up into pieces and add each piece back to the free list */
       for (cell offset = 0; offset < large_block_size; offset += size) {
         free_heap_block* small_block = large_block;
-        large_block = (free_heap_block*)((cell) large_block + size);
+        large_block = (free_heap_block*)((cell)large_block + size);
         small_block->make_free(size);
         add_to_free_list(small_block);
       }
@@ -87,7 +87,7 @@ free_heap_block* free_list::split_free_block(free_heap_block* block,
                                              cell size) {
   if (block->size() != size) {
     /* split the block in two */
-    free_heap_block* split = (free_heap_block*)((cell) block + size);
+    free_heap_block* split = (free_heap_block*)((cell)block + size);
     split->make_free(block->size() - size);
     block->make_free(size);
     add_to_free_list(split);

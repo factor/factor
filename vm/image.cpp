@@ -20,7 +20,7 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   fixnum bytes_read =
       safe_fread((void*)data->tenured->start, 1, h->data_size, file);
 
-  if ((cell) bytes_read != h->data_size) {
+  if ((cell)bytes_read != h->data_size) {
     std::cout << "truncated image: " << bytes_read << " bytes read, ";
     std::cout << h->data_size << " bytes expected\n";
     fatal_error("load_data_heap failed", 0);
@@ -59,11 +59,11 @@ struct startup_fixup {
       : data_offset(data_offset), code_offset(code_offset) {}
 
   object* fixup_data(object* obj) {
-    return (object*)((cell) obj + data_offset);
+    return (object*)((cell)obj + data_offset);
   }
 
   code_block* fixup_code(code_block* obj) {
-    return (code_block*)((cell) obj + code_offset);
+    return (code_block*)((cell)obj + code_offset);
   }
 
   object* translate_data(const object* obj) { return fixup_data((object*)obj); }
@@ -140,7 +140,7 @@ struct startup_code_block_relocation_visitor {
   void operator()(instruction_operand op) {
     code_block* compiled = op.compiled;
     cell old_offset =
-        op.rel_offset() + (cell) compiled->entry_point() - fixup.code_offset;
+        op.rel_offset() + (cell)compiled->entry_point() - fixup.code_offset;
 
     switch (op.rel_type()) {
       case RT_LITERAL: {
@@ -159,7 +159,7 @@ struct startup_code_block_relocation_visitor {
         cell value = op.load_value(old_offset);
         cell offset = TAG(value);
         code_block* compiled = (code_block*)UNTAG(value);
-        op.store_value((cell) fixup.fixup_code(compiled) + offset);
+        op.store_value((cell)fixup.fixup_code(compiled) + offset);
         break;
       }
       case RT_UNTAGGED:
@@ -195,8 +195,8 @@ void factor_vm::fixup_code(cell data_offset, cell code_offset) {
 
 bool factor_vm::read_embedded_image_footer(FILE* file,
                                            embedded_image_footer* footer) {
-  safe_fseek(file, -(off_t) sizeof(embedded_image_footer), SEEK_END);
-  safe_fread(footer, (off_t) sizeof(embedded_image_footer), 1, file);
+  safe_fseek(file, -(off_t)sizeof(embedded_image_footer), SEEK_END);
+  safe_fread(footer, (off_t)sizeof(embedded_image_footer), 1, file);
   return footer->magic == image_magic;
 }
 
@@ -213,7 +213,7 @@ FILE* factor_vm::open_image(vm_parameters* p) {
       std::cout << "No embedded image" << std::endl;
       exit(1);
     }
-    safe_fseek(file, (off_t) footer.image_offset, SEEK_SET);
+    safe_fseek(file, (off_t)footer.image_offset, SEEK_SET);
     return file;
   } else
     return OPEN_READ(p->image_path);
@@ -253,7 +253,7 @@ void factor_vm::load_image(vm_parameters* p) {
   fixup_code(data_offset, code_offset);
 
   /* Store image path name */
-  special_objects[OBJ_IMAGE] = allot_alien(false_object, (cell) p->image_path);
+  special_objects[OBJ_IMAGE] = allot_alien(false_object, (cell)p->image_path);
 }
 
 /* Save the current image to disk */

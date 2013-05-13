@@ -43,7 +43,7 @@ inline static void set_call_target(cell return_address, void* target) {
 
   uint32_t insn = *(uint32_t*)return_address;
 
-  fixnum relative_address = ((cell) target - return_address);
+  fixnum relative_address = ((cell)target - return_address);
   insn = ((insn & ~b_mask) | (relative_address & b_mask));
   *(uint32_t*)return_address = insn;
 

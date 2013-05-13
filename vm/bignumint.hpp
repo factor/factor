@@ -63,7 +63,7 @@ typedef int64_t bignum_twodigit_type;
 
 #define BIGNUM_DIGIT_LENGTH (((sizeof(bignum_digit_type)) * CHAR_BIT) - 2)
 #define BIGNUM_HALF_DIGIT_LENGTH (BIGNUM_DIGIT_LENGTH / 2)
-#define BIGNUM_RADIX (bignum_digit_type)(((cell) 1) << BIGNUM_DIGIT_LENGTH)
+#define BIGNUM_RADIX (bignum_digit_type)(((cell)1) << BIGNUM_DIGIT_LENGTH)
 #define BIGNUM_RADIX_ROOT (((bignum_digit_type) 1) << BIGNUM_HALF_DIGIT_LENGTH)
 #define BIGNUM_DIGIT_MASK (BIGNUM_RADIX - 1)
 #define BIGNUM_HALF_DIGIT_MASK (BIGNUM_RADIX_ROOT - 1)
