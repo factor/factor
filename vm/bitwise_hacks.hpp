@@ -46,16 +46,16 @@ inline cell popcount(cell x) {
 #endif
 #else
 #ifdef FACTOR_64
-  u64 k1 = 0x5555555555555555ll;
-  u64 k2 = 0x3333333333333333ll;
-  u64 k4 = 0x0f0f0f0f0f0f0f0fll;
-  u64 kf = 0x0101010101010101ll;
+  uint64_t k1 = 0x5555555555555555ll;
+  uint64_t k2 = 0x3333333333333333ll;
+  uint64_t k4 = 0x0f0f0f0f0f0f0f0fll;
+  uint64_t kf = 0x0101010101010101ll;
   cell ks = 56;
 #else
-  u32 k1 = 0x55555555;
-  u32 k2 = 0x33333333;
-  u32 k4 = 0xf0f0f0f;
-  u32 kf = 0x1010101;
+  uint32_t k1 = 0x55555555;
+  uint32_t k2 = 0x33333333;
+  uint32_t k4 = 0xf0f0f0f;
+  uint32_t kf = 0x1010101;
   cell ks = 24;
 #endif
 
@@ -69,7 +69,7 @@ inline cell popcount(cell x) {
 #endif
 }
 
-inline bool bitmap_p(u8* bitmap, cell index) {
+inline bool bitmap_p(uint8_t* bitmap, cell index) {
   cell byte = index >> 3;
   cell bit = index & 7;
   return (bitmap[byte] & (1 << bit)) != 0;

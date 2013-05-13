@@ -19,7 +19,7 @@ void factor_vm::fill_string(string* str_, cell start, cell capacity,
   data_root<string> str(str_, this);
 
   if (fill <= 0x7f)
-    memset(&str->data()[start], (u8) fill, capacity - start);
+    memset(&str->data()[start], (uint8_t)fill, capacity - start);
   else {
     byte_array* aux;
     if (to_boolean(str->aux))
@@ -31,11 +31,11 @@ void factor_vm::fill_string(string* str_, cell start, cell capacity,
       write_barrier(&str->aux);
     }
 
-    u8 lo_fill = (u8)((fill & 0x7f) | 0x80);
-    u16 hi_fill = (u16)((fill >> 7) ^ 0x1);
+    uint8_t lo_fill = (uint8_t)((fill & 0x7f) | 0x80);
+    uint16_t hi_fill = (uint16_t)((fill >> 7) ^ 0x1);
     memset(&str->data()[start], lo_fill, capacity - start);
-    memset_2(&aux->data<u16>()[start], hi_fill,
-             (capacity - start) * sizeof(u16));
+    memset_2(&aux->data<uint16_t>()[start], hi_fill,
+             (capacity - start) * sizeof(uint16_t));
   }
 }
 
@@ -88,7 +88,8 @@ string* factor_vm::reallot_string(string* str_, cell capacity) {
       write_barrier(&new_str->aux);
 
       byte_array* aux = untag<byte_array>(str->aux);
-      memcpy(new_aux->data<u16>(), aux->data<u16>(), to_copy * sizeof(u16));
+      memcpy(new_aux->data<uint16_t>(), aux->data<uint16_t>(),
+             to_copy * sizeof(uint16_t));
     }
 
     fill_string(new_str.untagged(), to_copy, capacity, '\0');
@@ -108,7 +109,7 @@ void factor_vm::primitive_set_string_nth_fast() {
   string* str = untag<string>(ctx->pop());
   cell index = untag_fixnum(ctx->pop());
   cell value = untag_fixnum(ctx->pop());
-  str->data()[index] = (u8) value;
+  str->data()[index] = (uint8_t)value;
 }
 
 }

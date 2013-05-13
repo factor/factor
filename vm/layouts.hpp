@@ -1,21 +1,7 @@
 namespace factor {
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef unsigned long long u64;
-typedef signed char s8;
-typedef signed short s16;
-typedef signed int s32;
-typedef signed long long s64;
-
-#ifdef _WIN64
-typedef long long fixnum;
-typedef unsigned long long cell;
-#else
-typedef long fixnum;
-typedef unsigned long cell;
-#endif
+typedef intptr_t fixnum;
+typedef uintptr_t cell;
 
 inline static cell align(cell a, cell b) { return (a + (b - 1)) & ~(b - 1); }
 
@@ -211,7 +197,7 @@ struct string : public object {
   /* tagged */
   cell hashcode;
 
-  u8* data() const { return (u8*)(this + 1); }
+  uint8_t* data() const { return (uint8_t*)(this + 1); }
 };
 
 struct code_block;

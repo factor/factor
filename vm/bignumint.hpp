@@ -51,7 +51,7 @@ typedef fixnum bignum_length_type;
 #ifdef FACTOR_64
 typedef __int128_t bignum_twodigit_type;
 #else
-typedef s64 bignum_twodigit_type;
+typedef int64_t bignum_twodigit_type;
 #endif
 #endif
 

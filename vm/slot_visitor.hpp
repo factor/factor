@@ -293,13 +293,13 @@ template <typename Fixup> struct call_frame_slot_visitor {
               << return_address << std::endl;
 #endif
     cell* stack_pointer = (cell*)frame_top;
-    u8* bitmap = info->gc_info_bitmap();
+    uint8_t* bitmap = info->gc_info_bitmap();
 
     /* Subtract old value of base pointer from every derived pointer. */
     for (cell spill_slot = 0; spill_slot < info->derived_root_count;
          spill_slot++) {
-      u32 base_pointer = info->lookup_base_pointer(callsite, spill_slot);
-      if (base_pointer != (u32) - 1) {
+      uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
+      if (base_pointer != (uint32_t)-1) {
 #ifdef DEBUG_GC_MAPS
         std::cout << "visiting derived root " << spill_slot
                   << " with base pointer " << base_pointer << std::endl;
@@ -323,8 +323,8 @@ template <typename Fixup> struct call_frame_slot_visitor {
     /* Add the base pointers to obtain new derived pointer values. */
     for (cell spill_slot = 0; spill_slot < info->derived_root_count;
          spill_slot++) {
-      u32 base_pointer = info->lookup_base_pointer(callsite, spill_slot);
-      if (base_pointer != (u32) - 1)
+      uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
+      if (base_pointer != (uint32_t)-1)
         stack_pointer[spill_slot] += stack_pointer[base_pointer];
     }
   }
