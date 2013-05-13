@@ -22,10 +22,8 @@ cell object_start_map::find_object_containing_card(cell card_index) {
     card_index--;
 
     while (first_object_in_card(card_index) == card_starts_inside_object) {
-#ifdef FACTOR_DEBUG
       /* First card should start with an object */
       FACTOR_ASSERT(card_index > 0);
-#endif
       card_index--;
     }
 

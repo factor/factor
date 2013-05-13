@@ -13,9 +13,7 @@ struct code_root {
   }
 
   ~code_root() {
-#ifdef FACTOR_DEBUG
     FACTOR_ASSERT(parent->code_roots.back() == this);
-#endif
     parent->code_roots.pop_back();
   }
 };

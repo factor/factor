@@ -41,9 +41,7 @@ struct gc_bignum {
   }
 
   ~gc_bignum() {
-#ifdef FACTOR_DEBUG
     FACTOR_ASSERT(parent->bignum_roots.back() == (cell) addr);
-#endif
     parent->bignum_roots.pop_back();
   }
 };

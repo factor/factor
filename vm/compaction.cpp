@@ -173,7 +173,7 @@ void factor_vm::update_code_roots_for_compaction() {
 void factor_vm::collect_compact_impl(bool trace_contexts_p) {
   gc_event* event = current_gc->event;
 
-#if defined(FACTOR_DEBUG)
+#ifdef FACTOR_DEBUG
   code->verify_all_blocks_set();
 #endif
 
