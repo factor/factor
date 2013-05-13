@@ -194,7 +194,7 @@ struct call_frame_scrubber {
   factor_vm* parent;
   context* ctx;
 
-  explicit call_frame_scrubber(factor_vm* parent_, context* ctx_)
+  call_frame_scrubber(factor_vm* parent_, context* ctx_)
       : parent(parent_), ctx(ctx_) {}
 
   void operator()(void* frame_top, cell frame_size, code_block* owner,

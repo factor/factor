@@ -46,7 +46,7 @@ struct gc_state {
   u64 start_time;
   gc_event* event;
 
-  explicit gc_state(gc_op op_, factor_vm* parent);
+  gc_state(gc_op op_, factor_vm* parent);
   ~gc_state();
   void start_again(gc_op op_, factor_vm* parent);
 };

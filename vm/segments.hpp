@@ -9,7 +9,7 @@ struct segment {
   cell size;
   cell end;
 
-  explicit segment(cell size, bool executable_p);
+  segment(cell size, bool executable_p);
   ~segment();
 
   bool underflow_p(cell addr) {
