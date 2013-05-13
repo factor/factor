@@ -7,7 +7,7 @@ template <typename Block> struct free_list_allocator {
   free_list free_blocks;
   mark_bits<Block> state;
 
-  explicit free_list_allocator(cell size, cell start);
+  free_list_allocator(cell size, cell start);
   void initial_free_list(cell occupied);
   bool contains_p(Block* block);
   Block* first_block();
@@ -156,8 +156,8 @@ template <typename Block, typename Iterator> struct heap_compactor {
   Iterator& iter;
   const Block** finger;
 
-  explicit heap_compactor(mark_bits<Block>* state_, Block* address_,
-                          Iterator& iter_, const Block** finger_)
+  heap_compactor(mark_bits<Block>* state_, Block* address_,
+                 Iterator& iter_, const Block** finger_)
       : state(state_), address((char*)address_), iter(iter_), finger(finger_) {}
 
   void operator()(Block* block, cell size) {

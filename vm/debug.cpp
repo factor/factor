@@ -280,7 +280,7 @@ struct object_dumper {
   factor_vm* parent;
   cell type;
 
-  explicit object_dumper(factor_vm* parent_, cell type_)
+  object_dumper(factor_vm* parent_, cell type_)
       : parent(parent_), type(type_) {}
 
   void operator()(object* obj) {
@@ -303,8 +303,8 @@ struct find_data_reference_slot_visitor {
   object* obj;
   factor_vm* parent;
 
-  explicit find_data_reference_slot_visitor(cell look_for_, object* obj_,
-                                            factor_vm* parent_)
+  find_data_reference_slot_visitor(cell look_for_, object* obj_,
+                                   factor_vm* parent_)
       : look_for(look_for_), obj(obj_), parent(parent_) {}
 
   void operator()(cell* scan) {
@@ -320,7 +320,7 @@ struct dump_edges_slot_visitor {
   object* obj;
   factor_vm* parent;
 
-  explicit dump_edges_slot_visitor(cell, object* obj_, factor_vm* parent_)
+  dump_edges_slot_visitor(cell, object* obj_, factor_vm* parent_)
       : obj(obj_), parent(parent_) {}
 
   void operator()(cell* scan) {
@@ -334,7 +334,7 @@ template <typename SlotVisitor> struct data_reference_object_visitor {
   cell look_for;
   factor_vm* parent;
 
-  explicit data_reference_object_visitor(cell look_for_, factor_vm* parent_)
+  data_reference_object_visitor(cell look_for_, factor_vm* parent_)
       : look_for(look_for_), parent(parent_) {}
 
   void operator()(object* obj) {

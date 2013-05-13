@@ -28,7 +28,7 @@ struct callback_heap {
   cell here;
   factor_vm* parent;
 
-  explicit callback_heap(cell size, factor_vm* parent);
+  callback_heap(cell size, factor_vm* parent);
   ~callback_heap();
 
   void* callback_entry_point(code_block* stub) {

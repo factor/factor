@@ -296,7 +296,7 @@ struct initial_code_block_visitor {
   cell literals;
   cell literal_index;
 
-  explicit initial_code_block_visitor(factor_vm* parent_, cell literals_)
+  initial_code_block_visitor(factor_vm* parent_, cell literals_)
       : parent(parent_), literals(literals_), literal_index(0) {}
 
   cell next_literal() {

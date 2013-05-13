@@ -12,7 +12,7 @@ struct jit {
   cell offset;
   factor_vm* parent;
 
-  explicit jit(code_block_type type, cell owner, factor_vm* parent);
+  jit(code_block_type type, cell owner, factor_vm* parent);
   ~jit();
 
   void compute_position(cell offset);

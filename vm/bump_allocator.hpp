@@ -7,7 +7,7 @@ template <typename Block> struct bump_allocator {
   cell end;
   cell size;
 
-  explicit bump_allocator(cell size_, cell start_)
+  bump_allocator(cell size_, cell start_)
       : here(start_), start(start_), end(start_ + size_), size(size_) {}
 
   bool contains_p(Block* block) { return ((cell) block - start) < size; }
