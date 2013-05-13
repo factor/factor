@@ -4,7 +4,9 @@ namespace factor {
 
 typedef unsigned char UBYTE;
 
+#ifndef UNW_FLAG_EHANDLER
 const UBYTE UNW_FLAG_EHANDLER = 0x1;
+#endif
 
 struct UNWIND_INFO {
   UBYTE Version : 3;
