@@ -14,11 +14,11 @@ void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
     void* frame_top = (void*)ctx->callstack_top;
 
     while (frame_top < ctx->callstack_bottom &&
-           (cell) frame_top < ctx->callstack_seg->start + stack_reserved) {
+           (cell)frame_top < ctx->callstack_seg->start + stack_reserved) {
       frame_top = frame_predecessor(frame_top);
     }
 
-    *sp = (cell) frame_top;
+    *sp = (cell)frame_top;
     ctx->callstack_top = frame_top;
     *pc = handler;
   } else {
@@ -53,7 +53,7 @@ void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
     } else
       FACTOR_ASSERT(false);
 
-    *pc = (cell) handler_word->entry_point;
+    *pc = (cell)handler_word->entry_point;
   }
 }
 

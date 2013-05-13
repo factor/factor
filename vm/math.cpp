@@ -65,7 +65,7 @@ void factor_vm::primitive_fixnum_shift() {
     ctx->replace(tag_fixnum(x >> -y));
     return;
   } else if (y < WORD_SIZE - TAG_BITS) {
-    fixnum mask = -((fixnum) 1 << (WORD_SIZE - 1 - TAG_BITS - y));
+    fixnum mask = -((fixnum)1 << (WORD_SIZE - 1 - TAG_BITS - y));
     if (!(branchless_abs(x) & mask)) {
       ctx->replace(tag_fixnum(x << y));
       return;
@@ -179,7 +179,7 @@ void factor_vm::primitive_bignum_not() {
 }
 
 void factor_vm::primitive_bignum_bitp() {
-  int bit = (int) to_fixnum(ctx->pop());
+  int bit = (int)to_fixnum(ctx->pop());
   bignum* x = untag<bignum>(ctx->peek());
   ctx->replace(tag_boolean(bignum_logbitp(bit, x)));
 }
@@ -276,12 +276,12 @@ void factor_vm::primitive_float_greatereq() {
 /* Allocates memory */
 void factor_vm::primitive_float_bits() {
   ctx->push(
-      from_unsigned_cell(float_bits((float) untag_float_check(ctx->pop()))));
+      from_unsigned_cell(float_bits((float)untag_float_check(ctx->pop()))));
 }
 
 /* Allocates memory */
 void factor_vm::primitive_bits_float() {
-  ctx->push(allot_float(bits_float((uint32_t) to_cell(ctx->pop()))));
+  ctx->push(allot_float(bits_float((uint32_t)to_cell(ctx->pop()))));
 }
 
 void factor_vm::primitive_double_bits() {
@@ -310,7 +310,7 @@ VM_C_API fixnum to_fixnum(cell tagged, factor_vm* parent) {
   return parent->to_fixnum(tagged);
 }
 
-cell factor_vm::to_cell(cell tagged) { return (cell) to_fixnum(tagged); }
+cell factor_vm::to_cell(cell tagged) { return (cell)to_fixnum(tagged); }
 
 VM_C_API cell to_cell(cell tagged, factor_vm* parent) {
   return parent->to_cell(tagged);
@@ -331,7 +331,7 @@ cell factor_vm::from_signed_8(int64_t n) {
   if (n < fixnum_min || n > fixnum_max)
     return tag<bignum>(long_long_to_bignum(n));
   else
-    return tag_fixnum((fixnum) n);
+    return tag_fixnum((fixnum)n);
 }
 
 VM_C_API cell from_signed_8(int64_t n, factor_vm* parent) {
@@ -357,10 +357,10 @@ VM_C_API int64_t to_signed_8(cell obj, factor_vm* parent) {
 
 /* Allocates memory */
 cell factor_vm::from_unsigned_8(uint64_t n) {
-  if (n > (uint64_t) fixnum_max)
+  if (n > (uint64_t)fixnum_max)
     return tag<bignum>(ulong_long_to_bignum(n));
   else
-    return tag_fixnum((fixnum) n);
+    return tag_fixnum((fixnum)n);
 }
 
 VM_C_API cell from_unsigned_8(uint64_t n, factor_vm* parent) {
@@ -386,7 +386,7 @@ VM_C_API uint64_t to_unsigned_8(cell obj, factor_vm* parent) {
 
 /* Cannot allocate */
 float factor_vm::to_float(cell value) {
-  return (float) untag_float_check(value);
+  return (float)untag_float_check(value);
 }
 
 /* Cannot allocate */

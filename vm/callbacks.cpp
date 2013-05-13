@@ -51,7 +51,7 @@ void callback_heap::store_callback_operand(code_block* stub, cell index,
 
 void callback_heap::update(code_block* stub) {
   store_callback_operand(stub, setup_seh_p() ? 2 : 1,
-                         (cell) callback_entry_point(stub));
+                         (cell)callback_entry_point(stub));
   stub->flush_icache();
 }
 
@@ -76,7 +76,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   memcpy(stub->entry_point(), insns->data<void>(), size);
 
   /* Store VM pointer */
-  store_callback_operand(stub, 0, (cell) parent);
+  store_callback_operand(stub, 0, (cell)parent);
 
   cell index;
 

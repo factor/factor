@@ -46,7 +46,7 @@ void free_list_allocator<Block>::initial_free_list(cell occupied) {
 
 template <typename Block>
 bool free_list_allocator<Block>::contains_p(Block* block) {
-  return ((cell) block - start) < size;
+  return ((cell)block - start) < size;
 }
 
 template <typename Block> Block* free_list_allocator<Block>::first_block() {
@@ -59,14 +59,14 @@ template <typename Block> Block* free_list_allocator<Block>::last_block() {
 
 template <typename Block>
 Block* free_list_allocator<Block>::next_block_after(Block* block) {
-  return (Block*)((cell) block + block->size());
+  return (Block*)((cell)block + block->size());
 }
 
 template <typename Block>
 Block* free_list_allocator<Block>::next_allocated_block_after(Block* block) {
   while (block != this->last_block() && block->free_p()) {
     free_heap_block* free_block = (free_heap_block*)block;
-    block = (object*)((cell) free_block + free_block->size());
+    block = (object*)((cell)free_block + free_block->size());
   }
 
   if (block == this->last_block())
@@ -182,7 +182,7 @@ void free_list_allocator<Block>::compact(Iterator& iter, Fixup fixup,
 
   /* Now update the free list; there will be a single free block at
      the end */
-  free_blocks.initial_free_list(start, end, (cell) compactor.address - start);
+  free_blocks.initial_free_list(start, end, (cell)compactor.address - start);
 }
 
 /* During compaction we have to be careful and measure object sizes
@@ -195,7 +195,7 @@ void free_list_allocator<Block>::iterate(Iterator& iter, Fixup fixup) {
 
   while (scan != end) {
     cell size = fixup.size(scan);
-    Block* next = (Block*)((cell) scan + size);
+    Block* next = (Block*)((cell)scan + size);
     if (!scan->free_p())
       iter(scan, size);
     scan = next;

@@ -88,7 +88,7 @@ template <typename Fixup> struct code_block_compaction_relocation_visitor {
       : parent(parent), old_address(old_address), fixup(fixup) {}
 
   void operator()(instruction_operand op) {
-    cell old_offset = op.rel_offset() + (cell) old_address->entry_point();
+    cell old_offset = op.rel_offset() + (cell)old_address->entry_point();
 
     switch (op.rel_type()) {
       case RT_LITERAL: {
@@ -107,7 +107,7 @@ template <typename Fixup> struct code_block_compaction_relocation_visitor {
         cell value = op.load_value(old_offset);
         cell offset = TAG(value);
         code_block* compiled = (code_block*)UNTAG(value);
-        op.store_value((cell) fixup.fixup_code(compiled) + offset);
+        op.store_value((cell)fixup.fixup_code(compiled) + offset);
         break;
       }
       case RT_THIS:
@@ -159,11 +159,11 @@ void factor_vm::update_code_roots_for_compaction() {
     code_block* block = (code_block*)(root->value & (~data_alignment + 1));
 
     /* Offset of return address within 16-byte allocation line */
-    cell offset = root->value - (cell) block;
+    cell offset = root->value - (cell)block;
 
     if (root->valid && state->marked_p(block)) {
       block = state->forward_block(block);
-      root->value = (cell) block + offset;
+      root->value = (cell)block + offset;
     } else
       root->valid = false;
   }

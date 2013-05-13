@@ -23,7 +23,7 @@ void factor_vm::compute_identity_hashcode(object* obj) {
   object_counter++;
   if (object_counter == 0)
     object_counter++;
-  obj->set_hashcode((cell) obj ^ object_counter);
+  obj->set_hashcode((cell)obj ^ object_counter);
 }
 
 void factor_vm::primitive_compute_identity_hashcode() {

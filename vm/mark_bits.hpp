@@ -32,7 +32,7 @@ template <typename Block> struct mark_bits {
   }
 
   cell block_line(const Block* address) {
-    return (((cell) address - start) / data_alignment);
+    return (((cell)address - start) / data_alignment);
   }
 
   Block* line_block(cell line) {
@@ -48,19 +48,19 @@ template <typename Block> struct mark_bits {
 
   bool bitmap_elt(cell* bits, const Block* address) {
     std::pair<cell, cell> position = bitmap_deref(address);
-    return (bits[position.first] & ((cell) 1 << position.second)) != 0;
+    return (bits[position.first] & ((cell)1 << position.second)) != 0;
   }
 
   Block* next_block_after(const Block* block) {
-    return (Block*)((cell) block + block->size());
+    return (Block*)((cell)block + block->size());
   }
 
   void set_bitmap_range(cell* bits, const Block* address) {
     std::pair<cell, cell> start = bitmap_deref(address);
     std::pair<cell, cell> end = bitmap_deref(next_block_after(address));
 
-    cell start_mask = ((cell) 1 << start.second) - 1;
-    cell end_mask = ((cell) 1 << end.second) - 1;
+    cell start_mask = ((cell)1 << start.second) - 1;
+    cell end_mask = ((cell)1 << end.second) - 1;
 
     if (start.first == end.first)
       bits[start.first] |= start_mask ^ end_mask;
@@ -69,7 +69,7 @@ template <typename Block> struct mark_bits {
       bits[start.first] |= ~start_mask;
 
       for (cell index = start.first + 1; index < end.first; index++)
-        bits[index] = (cell) - 1;
+        bits[index] = (cell)-1;
 
       if (end_mask != 0) {
         FACTOR_ASSERT(end.first < bits_size);
@@ -97,10 +97,10 @@ template <typename Block> struct mark_bits {
   Block* forward_block(const Block* original) {
     FACTOR_ASSERT(marked_p(original));
     std::pair<cell, cell> position = bitmap_deref(original);
-    cell offset = (cell) original & (data_alignment - 1);
+    cell offset = (cell)original & (data_alignment - 1);
 
     cell approx_popcount = forwarding[position.first];
-    cell mask = ((cell) 1 << position.second) - 1;
+    cell mask = ((cell)1 << position.second) - 1;
 
     cell new_line_number =
         approx_popcount + popcount(marked[position.first] & mask);
@@ -114,7 +114,7 @@ template <typename Block> struct mark_bits {
     cell bit_index = position.second;
 
     for (cell index = position.first; index < bits_size; index++) {
-      cell mask = ((fixnum) marked[index] >> bit_index);
+      cell mask = ((fixnum)marked[index] >> bit_index);
       if (~mask) {
         /* Found an unmarked block on this page. Stop, it's hammer time */
         cell clear_bit = rightmost_clear_bit(mask);

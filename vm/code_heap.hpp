@@ -53,7 +53,7 @@ struct code_heap {
 
   bool safepoint_p(cell addr) {
     cell page_mask = ~(getpagesize() - 1);
-    return (addr & page_mask) == (cell) safepoint_page;
+    return (addr & page_mask) == (cell)safepoint_page;
   }
 };
 

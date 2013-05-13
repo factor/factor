@@ -37,11 +37,11 @@ struct gc_bignum {
   gc_bignum(bignum** addr, factor_vm* parent) : addr(addr), parent(parent) {
     if (*addr)
       parent->check_data_pointer(*addr);
-    parent->bignum_roots.push_back((cell) addr);
+    parent->bignum_roots.push_back((cell)addr);
   }
 
   ~gc_bignum() {
-    FACTOR_ASSERT(parent->bignum_roots.back() == (cell) addr);
+    FACTOR_ASSERT(parent->bignum_roots.back() == (cell)addr);
     parent->bignum_roots.pop_back();
   }
 };
