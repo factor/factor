@@ -4,14 +4,14 @@ inline cell log2(cell x) {
   cell n;
 #if defined(FACTOR_X86)
 #if defined(_MSC_VER)
-  _BitScanReverse(&n, x);
+  _BitScanReverse((unsigned long*)&n, x);
 #else
   asm("bsr %1, %0;" : "=r"(n) : "r"(x));
 #endif
 #elif defined(FACTOR_AMD64)
 #if defined(_MSC_VER)
   n = 0;
-  _BitScanReverse64((DWORD*)&n, x);
+  _BitScanReverse64((unsigned long*)&n, x);
 #else
   asm("bsr %1, %0;" : "=r"(n) : "r"(x));
 #endif
