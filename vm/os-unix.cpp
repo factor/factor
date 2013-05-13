@@ -17,7 +17,7 @@ THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
 
 static void* null_dll;
 
-void sleep_nanos(u64 nsec) {
+void sleep_nanos(uint64_t nsec) {
   timespec ts;
   timespec ts_rem;
   int ret;

@@ -20,6 +20,7 @@
 #include <string.h>
 #include <time.h>
 #include <wchar.h>
+#include <stdint.h>
 
 /* C++ headers */
 #include <algorithm>

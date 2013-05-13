@@ -13,13 +13,13 @@ static const cell card_points_to_nursery = 0x80;
 static const cell card_points_to_aging = 0x40;
 static const cell card_mark_mask =
     (card_points_to_nursery | card_points_to_aging);
-typedef u8 card;
+typedef uint8_t card;
 
 static const cell card_bits = 8;
 static const cell card_size = (1 << card_bits);
 static const cell addr_card_mask = (card_size - 1);
 
-typedef u8 card_deck;
+typedef uint8_t card_deck;
 
 static const cell deck_bits = (card_bits + 10);
 static const cell deck_size = (1 << deck_bits);

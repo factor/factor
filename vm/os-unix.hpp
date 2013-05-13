@@ -39,8 +39,8 @@ typedef pthread_t THREADHANDLE;
 THREADHANDLE start_thread(void* (*start_routine)(void*), void* args);
 inline static THREADHANDLE thread_id() { return pthread_self(); }
 
-u64 nano_count();
-void sleep_nanos(u64 nsec);
+uint64_t nano_count();
+void sleep_nanos(uint64_t nsec);
 
 void move_file(const vm_char* path1, const vm_char* path2);
 

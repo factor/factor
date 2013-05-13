@@ -36,19 +36,19 @@ namespace factor {
       _(tuple_boa) _(unimplemented) _(uninitialized_byte_array) _(word)        \
       _(word_code) _(wrapper)
 
-#define EACH_ALIEN_PRIMITIVE(_)                           \
-  _(signed_cell, fixnum, from_signed_cell, to_fixnum)     \
-      _(unsigned_cell, cell, from_unsigned_cell, to_cell) \
-      _(signed_8, s64, from_signed_8, to_signed_8)        \
-      _(unsigned_8, u64, from_unsigned_8, to_unsigned_8)  \
-      _(signed_4, s32, from_signed_cell, to_fixnum)       \
-      _(unsigned_4, u32, from_unsigned_cell, to_cell)     \
-      _(signed_2, s16, from_signed_cell, to_fixnum)       \
-      _(unsigned_2, u16, from_unsigned_cell, to_cell)     \
-      _(signed_1, s8, from_signed_cell, to_fixnum)        \
-      _(unsigned_1, u8, from_unsigned_cell, to_cell)      \
-      _(float, float, allot_float, to_float)              \
-      _(double, double, allot_float, to_double)           \
+#define EACH_ALIEN_PRIMITIVE(_)                               \
+  _(signed_cell, fixnum, from_signed_cell, to_fixnum)         \
+      _(unsigned_cell, cell, from_unsigned_cell, to_cell)     \
+      _(signed_8, int64_t, from_signed_8, to_signed_8)        \
+      _(unsigned_8, uint64_t, from_unsigned_8, to_unsigned_8) \
+      _(signed_4, int32_t, from_signed_cell, to_fixnum)       \
+      _(unsigned_4, uint32_t, from_unsigned_cell, to_cell)    \
+      _(signed_2, int16_t, from_signed_cell, to_fixnum)       \
+      _(unsigned_2, uint16_t, from_unsigned_cell, to_cell)    \
+      _(signed_1, int8_t, from_signed_cell, to_fixnum)        \
+      _(unsigned_1, uint8_t, from_unsigned_cell, to_cell)     \
+      _(float, float, allot_float, to_float)                  \
+      _(double, double, allot_float, to_double)               \
       _(cell, void*, allot_alien, pinned_alien_offset)
 
 #define DECLARE_PRIMITIVE(name) \
