@@ -13,7 +13,7 @@ struct full_policy {
 
   void promoted_object(object* obj) {
     tenured->set_marked_p(obj);
-    parent->mark_stack.push_back((cell) obj);
+    parent->mark_stack.push_back((cell)obj);
   }
 
   void visited_object(object* obj) {

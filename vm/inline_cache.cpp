@@ -7,7 +7,7 @@ void factor_vm::init_inline_caching(int max_size) { max_pic_size = max_size; }
 void factor_vm::deallocate_inline_cache(cell return_address) {
   /* Find the call target. */
   void* old_entry_point = get_call_target(return_address);
-  check_code_pointer((cell) old_entry_point);
+  check_code_pointer((cell)old_entry_point);
 
   code_block* old_block = (code_block*)old_entry_point - 1;
 
@@ -216,7 +216,7 @@ void* factor_vm::inline_cache_miss(cell return_address_) {
 #ifdef PIC_DEBUG
     std::cout << "Updated " << (tail_call_site ? "tail" : "non-tail")
               << " call site 0x" << std::hex << return_address.value << std::dec
-              << " with 0x" << std::hex << (cell) xt << std::dec << std::endl;
+              << " with 0x" << std::hex << (cell)xt << std::dec << std::endl;
     print_callstack();
 #endif
   }

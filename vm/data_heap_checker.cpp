@@ -19,8 +19,8 @@ inline generation generation_of(factor_vm* parent, object* obj) {
   else if (parent->data->tenured->contains_p(obj))
     return tenured_generation;
   else {
-    critical_error("Bad object", (cell) obj);
-    return (generation) - 1;
+    critical_error("Bad object", (cell)obj);
+    return (generation)-1;
   }
 }
 
@@ -33,9 +33,9 @@ struct slot_checker {
       : parent(parent), obj(obj), gen(gen) {}
 
   void check_write_barrier(cell* slot_ptr, generation target, char mask) {
-    cell object_card_pointer = parent->cards_offset + ((cell) obj >> card_bits);
+    cell object_card_pointer = parent->cards_offset + ((cell)obj >> card_bits);
     cell slot_card_pointer =
-        parent->cards_offset + ((cell) slot_ptr >> card_bits);
+        parent->cards_offset + ((cell)slot_ptr >> card_bits);
     char slot_card_value = *(char*)slot_card_pointer;
     if ((slot_card_value & mask) != mask) {
       std::cout << "card not marked" << std::endl;

@@ -21,8 +21,8 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
     void* fixed_addr = Fixup::translated_code_block_map
                            ? (void*)fixup.translate_code((code_block*)addr)
                            : addr;
-    code_block* owner = code->code_block_for_address((cell) fixed_addr);
-    cell frame_size = owner->stack_frame_size_for_address((cell) fixed_addr);
+    code_block* owner = code->code_block_for_address((cell)fixed_addr);
+    cell frame_size = owner->stack_frame_size_for_address((cell)fixed_addr);
 
     iterator(frame_top, frame_size, owner, fixed_addr);
     frame_offset += frame_size;
@@ -51,12 +51,12 @@ inline void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
                            ? (void*)fixup.translate_code((code_block*)addr)
                            : addr;
 
-    code_block* owner = code->code_block_for_address((cell) fixed_addr);
+    code_block* owner = code->code_block_for_address((cell)fixed_addr);
     code_block* fixed_owner =
         Fixup::translated_code_block_map ? owner : fixup.translate_code(owner);
 
     cell frame_size =
-        fixed_owner->stack_frame_size_for_address((cell) fixed_addr);
+        fixed_owner->stack_frame_size_for_address((cell)fixed_addr);
 
     void* fixed_addr_for_iter =
         Fixup::translated_code_block_map ? fixed_addr : addr;

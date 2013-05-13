@@ -40,7 +40,7 @@ cell factor_vm::lookup_tuple_method(cell obj, cell methods) {
   array* echelons = untag<array>(methods);
 
   fixnum echelon = std::min(untag_fixnum(layout->echelon),
-                            (fixnum) array_capacity(echelons) - 1);
+                            (fixnum)array_capacity(echelons) - 1);
 
   while (echelon >= 0) {
     cell echelon_methods = array_nth(echelons, echelon);

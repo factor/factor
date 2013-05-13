@@ -96,7 +96,7 @@ inline static bool immediate_p(cell obj) {
 
 inline static fixnum untag_fixnum(cell tagged) {
   FACTOR_ASSERT(TAG(tagged) == FIXNUM_TYPE);
-  return ((fixnum) tagged) >> TAG_BITS;
+  return ((fixnum)tagged) >> TAG_BITS;
 }
 
 inline static cell tag_fixnum(fixnum untagged) {
@@ -137,7 +137,7 @@ struct object {
 
   object* forwarding_pointer() const { return (object*)UNTAG(header); }
 
-  void forward_to(object* pointer) { header = ((cell) pointer | 2); }
+  void forward_to(object* pointer) { header = ((cell)pointer | 2); }
 };
 
 /* Assembly code makes assumptions about the layout of this struct */

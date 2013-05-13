@@ -63,7 +63,7 @@ struct gc_workhorse : no_fixup {
   code_block* fixup_code(code_block* compiled) {
     if (!code->marked_p(compiled)) {
       code->set_marked_p(compiled);
-      parent->mark_stack.push_back((cell) compiled + 1);
+      parent->mark_stack.push_back((cell)compiled + 1);
     }
 
     return compiled;

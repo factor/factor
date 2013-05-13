@@ -10,7 +10,7 @@ cell gc_info::return_address_index(cell return_address) {
       return i;
   }
 
-  return (cell) - 1;
+  return (cell)-1;
 }
 
 }

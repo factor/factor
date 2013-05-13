@@ -36,7 +36,7 @@ template <typename Fixup> cell object::size(Fixup fixup) const {
           callstack_object_size(untag_fixnum(((callstack*)this)->length)),
           data_alignment);
     default:
-      critical_error("Invalid header in size", (cell) this);
+      critical_error("Invalid header in size", (cell)this);
       return 0; /* can't happen */
   }
 }
@@ -79,7 +79,7 @@ template <typename Fixup> cell object::binary_payload_start(Fixup fixup) const {
     case WRAPPER_TYPE:
       return sizeof(wrapper);
     default:
-      critical_error("Invalid header in binary_payload_start", (cell) this);
+      critical_error("Invalid header in binary_payload_start", (cell)this);
       return 0; /* can't happen */
   }
 }
@@ -154,7 +154,7 @@ void slot_visitor<Fixup>::visit_object_array(cell* start, cell* end) {
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_slots(object* ptr, cell payload_start) {
   cell* slot = (cell*)ptr;
-  cell* end = (cell*)((cell) ptr + payload_start);
+  cell* end = (cell*)((cell)ptr + payload_start);
 
   if (slot != end) {
     slot++;
@@ -191,7 +191,7 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_bignum_roots() {
     cell* handle = (cell*)(*iter);
 
     if (*handle)
-      *handle = (cell) fixup.fixup_data(*(object**)handle);
+      *handle = (cell)fixup.fixup_data(*(object**)handle);
   }
 }
 
@@ -285,7 +285,7 @@ template <typename Fixup> struct call_frame_slot_visitor {
 
     FACTOR_ASSERT(return_address < compiled->size());
     cell callsite = info->return_address_index(return_address);
-    if (callsite == (cell) - 1)
+    if (callsite == (cell)-1)
       return;
 
 #ifdef DEBUG_GC_MAPS

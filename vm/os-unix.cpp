@@ -92,10 +92,10 @@ segment::segment(cell size_, bool executable_p) {
     out_of_memory();
 
   if (mprotect(array, pagesize, PROT_NONE) == -1)
-    fatal_error("Cannot protect low guard page", (cell) array);
+    fatal_error("Cannot protect low guard page", (cell)array);
 
   if (mprotect(array + pagesize + size, pagesize, PROT_NONE) == -1)
-    fatal_error("Cannot protect high guard page", (cell) array);
+    fatal_error("Cannot protect high guard page", (cell)array);
 
   start = (cell)(array + pagesize);
   end = start + size;
@@ -110,19 +110,19 @@ segment::~segment() {
 
 void code_heap::guard_safepoint() {
   if (mprotect(safepoint_page, getpagesize(), PROT_NONE) == -1)
-    fatal_error("Cannot protect safepoint guard page", (cell) safepoint_page);
+    fatal_error("Cannot protect safepoint guard page", (cell)safepoint_page);
 }
 
 void code_heap::unguard_safepoint() {
   if (mprotect(safepoint_page, getpagesize(), PROT_WRITE) == -1)
-    fatal_error("Cannot unprotect safepoint guard page", (cell) safepoint_page);
+    fatal_error("Cannot unprotect safepoint guard page", (cell)safepoint_page);
 }
 
 void factor_vm::dispatch_signal(void* uap, void(handler)()) {
   dispatch_signal_handler((cell*)&UAP_STACK_POINTER(uap),
                           (cell*)&UAP_PROGRAM_COUNTER(uap),
-                          (cell) FUNCTION_CODE_POINTER(handler));
-  UAP_SET_TOC_POINTER(uap, (cell) FUNCTION_TOC_POINTER(handler));
+                          (cell)FUNCTION_CODE_POINTER(handler));
+  UAP_SET_TOC_POINTER(uap, (cell)FUNCTION_TOC_POINTER(handler));
 }
 
 void factor_vm::start_sampling_profiler_timer() {
@@ -141,9 +141,9 @@ void factor_vm::end_sampling_profiler_timer() {
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   factor_vm* vm = current_vm();
-  vm->verify_memory_protection_error((cell) siginfo->si_addr);
-  vm->signal_fault_addr = (cell) siginfo->si_addr;
-  vm->signal_fault_pc = (cell) UAP_PROGRAM_COUNTER(uap);
+  vm->verify_memory_protection_error((cell)siginfo->si_addr);
+  vm->signal_fault_addr = (cell)siginfo->si_addr;
+  vm->signal_fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
   vm->dispatch_signal(uap, factor::memory_signal_handler_impl);
 }
 
@@ -195,7 +195,7 @@ void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
     vm = thread_vms.begin()->second;
   }
   if (atomic::load(&vm->sampling_profiler_p))
-    vm->safepoint.enqueue_samples(vm, 1, (cell) UAP_PROGRAM_COUNTER(uap),
+    vm->safepoint.enqueue_samples(vm, 1, (cell)UAP_PROGRAM_COUNTER(uap),
                                   foreign_thread);
   else if (!foreign_thread)
     enqueue_signal(vm, signal);
