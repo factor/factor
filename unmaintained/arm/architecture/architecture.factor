@@ -267,7 +267,7 @@ M: arm-backend %box-large-struct ( n size -- )
     "box_value_struct" f %alien-invoke ;
 
 M: arm-backend struct-small-enough? ( size -- ? )
-    wince? [ drop f ] [ 4 <= ] if ;
+    4 <= ;
 
 M: arm-backend %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
@@ -316,7 +316,7 @@ M: arm-backend value-structs? t ;
 
 M: arm-backend small-enough? ( n -- ? ) 0 255 between? ;
 
-M: long-long-type c-type-stack-align? drop wince? not ;
+M: long-long-type c-type-stack-align? drop t ;
 
 M: arm-backend fp-shadows-int? ( -- ? ) f ;
 
