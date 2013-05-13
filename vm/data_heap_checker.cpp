@@ -29,7 +29,7 @@ struct slot_checker {
   object* obj;
   generation gen;
 
-  explicit slot_checker(factor_vm* parent_, object* obj_, generation gen_)
+  slot_checker(factor_vm* parent_, object* obj_, generation gen_)
       : parent(parent_), obj(obj_), gen(gen_) {}
 
   void check_write_barrier(cell* slot_ptr, generation target, char mask) {

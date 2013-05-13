@@ -7,7 +7,7 @@ struct object_start_map {
   card* object_start_offsets;
   card* object_start_offsets_end;
 
-  explicit object_start_map(cell size_, cell start_);
+  object_start_map(cell size_, cell start_);
   ~object_start_map();
 
   cell first_object_in_card(cell card_index);

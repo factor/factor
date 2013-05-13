@@ -12,8 +12,7 @@ struct gc_workhorse : no_fixup {
   Policy policy;
   code_heap* code;
 
-  explicit gc_workhorse(factor_vm* parent_, TargetGeneration* target_,
-                        Policy policy_)
+  gc_workhorse(factor_vm* parent_, TargetGeneration* target_, Policy policy_)
       : parent(parent_), target(target_), policy(policy_), code(parent->code) {}
 
   object* resolve_forwarding(object* untagged) {
@@ -82,7 +81,7 @@ struct simple_unmarker {
 };
 
 struct full_unmarker {
-  explicit full_unmarker() {}
+  full_unmarker() {}
   void operator()(card* ptr) { *ptr = 0; }
 };
 
@@ -97,8 +96,7 @@ template <typename TargetGeneration, typename Policy> struct collector {
   cell decks_scanned;
   cell code_blocks_scanned;
 
-  explicit collector(factor_vm* parent_, TargetGeneration* target_,
-                     Policy policy_)
+  collector(factor_vm* parent_, TargetGeneration* target_, Policy policy_)
       : parent(parent_),
         data(parent_->data),
         code(parent_->code),

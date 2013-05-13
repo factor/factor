@@ -343,7 +343,7 @@ struct data_root_range {
   cell* start;
   cell len;
 
-  explicit data_root_range(cell* start_, cell len_)
+  data_root_range(cell* start_, cell len_)
       : start(start_), len(len_) {}
 };
 
