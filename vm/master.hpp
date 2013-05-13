@@ -9,9 +9,7 @@
 #define _REENTRANT
 #endif
 
-#ifndef WINCE
 #include <errno.h>
-#endif
 
 /* C headers */
 #include <fcntl.h>
