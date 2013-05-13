@@ -57,8 +57,8 @@ struct stack_frame_accumulator {
   factor_vm* parent;
   growable_array frames;
 
-  explicit stack_frame_accumulator(factor_vm* parent_)
-      : parent(parent_), frames(parent_) {}
+  explicit stack_frame_accumulator(factor_vm* parent)
+      : parent(parent), frames(parent) {}
 
   void operator()(void* frame_top, cell frame_size, code_block* owner,
                   void* addr) {

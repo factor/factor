@@ -137,7 +137,7 @@ struct object_accumulator {
   cell type;
   std::vector<cell> objects;
 
-  explicit object_accumulator(cell type_) : type(type_) {}
+  explicit object_accumulator(cell type) : type(type) {}
 
   void operator()(object* obj) {
     if (type == TYPE_COUNT || obj->type() == type)

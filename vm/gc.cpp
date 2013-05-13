@@ -2,8 +2,8 @@
 
 namespace factor {
 
-gc_event::gc_event(gc_op op_, factor_vm* parent)
-    : op(op_),
+gc_event::gc_event(gc_op op, factor_vm* parent)
+    : op(op),
       cards_scanned(0),
       decks_scanned(0),
       code_blocks_scanned(0),
@@ -57,7 +57,7 @@ void gc_event::ended_gc(factor_vm* parent) {
   total_time = (cell)(nano_count() - start_time);
 }
 
-gc_state::gc_state(gc_op op_, factor_vm* parent) : op(op_) {
+gc_state::gc_state(gc_op op, factor_vm* parent) : op(op) {
   if (parent->gc_events) {
     event = new gc_event(op, parent);
     start_time = nano_count();
@@ -194,8 +194,8 @@ struct call_frame_scrubber {
   factor_vm* parent;
   context* ctx;
 
-  call_frame_scrubber(factor_vm* parent_, context* ctx_)
-      : parent(parent_), ctx(ctx_) {}
+  call_frame_scrubber(factor_vm* parent, context* ctx)
+      : parent(parent), ctx(ctx) {}
 
   void operator()(void* frame_top, cell frame_size, code_block* owner,
                   void* addr) {

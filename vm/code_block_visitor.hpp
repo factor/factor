@@ -15,8 +15,8 @@ template <typename Fixup> struct code_block_visitor {
   factor_vm* parent;
   Fixup fixup;
 
-  code_block_visitor(factor_vm* parent_, Fixup fixup_)
-      : parent(parent_), fixup(fixup_) {}
+  code_block_visitor(factor_vm* parent, Fixup fixup)
+      : parent(parent), fixup(fixup) {}
 
   code_block* visit_code_block(code_block* compiled);
   void visit_object_code_block(object* obj);
@@ -36,8 +36,8 @@ template <typename Fixup> struct call_frame_code_block_visitor {
   factor_vm* parent;
   Fixup fixup;
 
-  call_frame_code_block_visitor(factor_vm* parent_, Fixup fixup_)
-      : parent(parent_), fixup(fixup_) {}
+  call_frame_code_block_visitor(factor_vm* parent, Fixup fixup)
+      : parent(parent), fixup(fixup) {}
 
   void operator()(void* frame_top, cell frame_size, code_block* owner,
                   void* addr) {
@@ -75,7 +75,7 @@ void code_block_visitor<Fixup>::visit_object_code_block(object* obj) {
 template <typename Fixup> struct embedded_code_pointers_visitor {
   Fixup fixup;
 
-  explicit embedded_code_pointers_visitor(Fixup fixup_) : fixup(fixup_) {}
+  explicit embedded_code_pointers_visitor(Fixup fixup) : fixup(fixup) {}
 
   void operator()(instruction_operand op) {
     relocation_type type = op.rel_type();

@@ -75,8 +75,8 @@ void factor_vm::primitive_size() {
 struct slot_become_fixup : no_fixup {
   std::map<object*, object*>* become_map;
 
-  slot_become_fixup(std::map<object*, object*>* become_map_)
-      : become_map(become_map_) {}
+  slot_become_fixup(std::map<object*, object*>* become_map)
+      : become_map(become_map) {}
 
   object* fixup_data(object* old) {
     std::map<object*, object*>::const_iterator iter = become_map->find(old);
@@ -90,8 +90,8 @@ struct slot_become_fixup : no_fixup {
 struct object_become_visitor {
   slot_visitor<slot_become_fixup>* workhorse;
 
-  explicit object_become_visitor(slot_visitor<slot_become_fixup>* workhorse_)
-      : workhorse(workhorse_) {}
+  explicit object_become_visitor(slot_visitor<slot_become_fixup>* workhorse)
+      : workhorse(workhorse) {}
 
   void operator()(object* obj) { workhorse->visit_slots(obj); }
 };
@@ -100,8 +100,8 @@ struct code_block_become_visitor {
   slot_visitor<slot_become_fixup>* workhorse;
 
   explicit code_block_become_visitor(
-      slot_visitor<slot_become_fixup>* workhorse_)
-      : workhorse(workhorse_) {}
+      slot_visitor<slot_become_fixup>* workhorse)
+      : workhorse(workhorse) {}
 
   void operator()(code_block* compiled, cell size) {
     workhorse->visit_code_block_objects(compiled);
@@ -112,7 +112,7 @@ struct code_block_become_visitor {
 struct code_block_write_barrier_visitor {
   code_heap* code;
 
-  explicit code_block_write_barrier_visitor(code_heap* code_) : code(code_) {}
+  explicit code_block_write_barrier_visitor(code_heap* code) : code(code) {}
 
   void operator()(code_block* compiled, cell size) {
     code->write_barrier(compiled);

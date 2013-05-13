@@ -31,11 +31,11 @@ template <typename Block> struct free_list_allocator {
 };
 
 template <typename Block>
-free_list_allocator<Block>::free_list_allocator(cell size_, cell start_)
-    : size(size_),
-      start(start_),
-      end(start_ + size_),
-      state(mark_bits<Block>(size_, start_)) {
+free_list_allocator<Block>::free_list_allocator(cell size, cell start)
+    : size(size),
+      start(start),
+      end(start + size),
+      state(mark_bits<Block>(size, start)) {
   initial_free_list(0);
 }
 
@@ -156,9 +156,9 @@ template <typename Block, typename Iterator> struct heap_compactor {
   Iterator& iter;
   const Block** finger;
 
-  heap_compactor(mark_bits<Block>* state_, Block* address_,
-                 Iterator& iter_, const Block** finger_)
-      : state(state_), address((char*)address_), iter(iter_), finger(finger_) {}
+  heap_compactor(mark_bits<Block>* state, Block* address,
+                 Iterator& iter, const Block** finger)
+      : state(state), address((char*)address), iter(iter), finger(finger) {}
 
   void operator()(Block* block, cell size) {
     if (this->state->marked_p(block)) {

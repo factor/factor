@@ -90,9 +90,9 @@ struct update_word_references_relocation_visitor {
   factor_vm* parent;
   bool reset_inline_caches;
 
-  update_word_references_relocation_visitor(factor_vm* parent_,
-                                            bool reset_inline_caches_)
-      : parent(parent_), reset_inline_caches(reset_inline_caches_) {}
+  update_word_references_relocation_visitor(factor_vm* parent,
+                                            bool reset_inline_caches)
+      : parent(parent), reset_inline_caches(reset_inline_caches) {}
 
   void operator()(instruction_operand op) {
     switch (op.rel_type()) {
@@ -296,8 +296,8 @@ struct initial_code_block_visitor {
   cell literals;
   cell literal_index;
 
-  initial_code_block_visitor(factor_vm* parent_, cell literals_)
-      : parent(parent_), literals(literals_), literal_index(0) {}
+  initial_code_block_visitor(factor_vm* parent, cell literals)
+      : parent(parent), literals(literals), literal_index(0) {}
 
   cell next_literal() {
     return array_nth(untag<array>(literals), literal_index++);
@@ -458,9 +458,9 @@ struct find_symbol_at_address_visitor {
   cell symbol;
   cell library;
 
-  find_symbol_at_address_visitor(factor_vm* parent_, cell return_address_)
-      : parent(parent_),
-        return_address(return_address_),
+  find_symbol_at_address_visitor(factor_vm* parent, cell return_address)
+      : parent(parent),
+        return_address(return_address),
         symbol(false_object),
         library(false_object) {}
 
