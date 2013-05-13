@@ -44,7 +44,7 @@ inline static void* get_call_target(cell return_address) {
 
 inline static void set_call_target(cell return_address, void* target) {
   check_call_site(return_address);
-  *(int*)(return_address - 4) = (u32)((cell) target - return_address);
+  *(int*)(return_address - 4) = (uint32_t)((cell) target - return_address);
 }
 
 inline static bool tail_call_site_p(cell return_address) {

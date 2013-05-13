@@ -5,16 +5,16 @@ representations and vice versa */
 
 union double_bits_pun {
   double x;
-  u64 y;
+  uint64_t y;
 };
 
-inline static u64 double_bits(double x) {
+inline static uint64_t double_bits(double x) {
   double_bits_pun b;
   b.x = x;
   return b.y;
 }
 
-inline static double bits_double(u64 y) {
+inline static double bits_double(uint64_t y) {
   double_bits_pun b;
   b.y = y;
   return b.x;
@@ -22,16 +22,16 @@ inline static double bits_double(u64 y) {
 
 union float_bits_pun {
   float x;
-  u32 y;
+  uint32_t y;
 };
 
-inline static u32 float_bits(float x) {
+inline static uint32_t float_bits(float x) {
   float_bits_pun b;
   b.x = x;
   return b.y;
 }
 
-inline static float bits_float(u32 y) {
+inline static float bits_float(uint32_t y) {
   float_bits_pun b;
   b.y = y;
   return b.x;

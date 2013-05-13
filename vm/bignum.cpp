@@ -300,8 +300,8 @@ bignum* factor_vm::bignum_remainder(bignum* numerator, bignum* denominator) {
 
 FOO_TO_BIGNUM(cell, cell, fixnum, cell)
 FOO_TO_BIGNUM(fixnum, fixnum, fixnum, cell)
-FOO_TO_BIGNUM(long_long, s64, s64, u64)
-FOO_TO_BIGNUM(ulong_long, u64, s64, u64)
+FOO_TO_BIGNUM(long_long, int64_t, int64_t, uint64_t)
+FOO_TO_BIGNUM(ulong_long, uint64_t, int64_t, uint64_t)
 
 /* cannot allocate memory */
 /* bignum_to_cell, fixnum_to_cell, long_long_to_cell, ulong_long_to_cell */
@@ -322,8 +322,8 @@ FOO_TO_BIGNUM(ulong_long, u64, s64, u64)
 
 BIGNUM_TO_FOO(cell, cell, fixnum, cell)
 BIGNUM_TO_FOO(fixnum, fixnum, fixnum, cell)
-BIGNUM_TO_FOO(long_long, s64, s64, u64)
-BIGNUM_TO_FOO(ulong_long, u64, s64, u64)
+BIGNUM_TO_FOO(long_long, int64_t, int64_t, uint64_t)
+BIGNUM_TO_FOO(ulong_long, uint64_t, int64_t, uint64_t)
 
 #define DTB_WRITE_DIGIT(factor)                \
   {                                            \

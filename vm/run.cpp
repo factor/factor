@@ -10,7 +10,7 @@ void exit(int status) {
 }
 
 void factor_vm::primitive_nano_count() {
-  u64 nanos = nano_count();
+  uint64_t nanos = nano_count();
   if (nanos < last_nano_count) {
     std::cout << "Monotonic counter decreased from 0x";
     std::cout << std::hex << last_nano_count;

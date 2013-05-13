@@ -67,8 +67,8 @@ typedef HANDLE THREADHANDLE;
 #define OPEN_WRITE(path) _wfopen((path), L"wb")
 
 inline static void early_init() {}
-u64 nano_count();
-void sleep_nanos(u64 nsec);
+uint64_t nano_count();
+void sleep_nanos(uint64_t nsec);
 long getpagesize();
 void move_file(const vm_char* path1, const vm_char* path2);
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,

@@ -18,14 +18,14 @@ struct gc_event {
   cell cards_scanned;
   cell decks_scanned;
   cell code_blocks_scanned;
-  u64 start_time;
+  uint64_t start_time;
   cell total_time;
   cell card_scan_time;
   cell code_scan_time;
   cell data_sweep_time;
   cell code_sweep_time;
   cell compaction_time;
-  u64 temp_time;
+  uint64_t temp_time;
 
   gc_event(gc_op op, factor_vm* parent);
   void started_card_scan();
@@ -43,7 +43,7 @@ struct gc_event {
 
 struct gc_state {
   gc_op op;
-  u64 start_time;
+  uint64_t start_time;
   gc_event* event;
 
   gc_state(gc_op op, factor_vm* parent);

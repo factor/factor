@@ -75,13 +75,13 @@ static const cell rel_relative_arm_3_mask = 0x00ffffff;
 
 /* code relocation table consists of a table of entries for each fixup */
 struct relocation_entry {
-  u32 value;
+  uint32_t value;
 
-  explicit relocation_entry(u32 value_) : value(value_) {}
+  explicit relocation_entry(uint32_t value) : value(value) {}
 
   relocation_entry(relocation_type rel_type, relocation_class rel_class,
                    cell offset) {
-    value = (u32)((rel_type << 28) | (rel_class << 24) | offset);
+    value = (uint32_t)((rel_type << 28) | (rel_class << 24) | offset);
   }
 
   relocation_type rel_type() {

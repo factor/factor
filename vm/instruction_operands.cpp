@@ -11,7 +11,7 @@ instruction_operand::instruction_operand(relocation_entry rel,
 
 /* Load a 32-bit value from a PowerPC LIS/ORI sequence */
 fixnum instruction_operand::load_value_2_2() {
-  u32* ptr = (u32*)pointer;
+  uint32_t* ptr = (uint32_t*)pointer;
   cell hi = (ptr[-2] & 0xffff);
   cell lo = (ptr[-1] & 0xffff);
   return hi << 16 | lo;
@@ -19,21 +19,21 @@ fixnum instruction_operand::load_value_2_2() {
 
 /* Load a 64-bit value from a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence */
 fixnum instruction_operand::load_value_2_2_2_2() {
-  u32* ptr = (u32*)pointer;
-  u64 hhi = (ptr[-5] & 0xffff);
-  u64 hlo = (ptr[-4] & 0xffff);
-  u64 lhi = (ptr[-2] & 0xffff);
-  u64 llo = (ptr[-1] & 0xffff);
-  u64 val = hhi << 48 | hlo << 32 | lhi << 16 | llo;
+  uint32_t* ptr = (uint32_t*)pointer;
+  uint64_t hhi = (ptr[-5] & 0xffff);
+  uint64_t hlo = (ptr[-4] & 0xffff);
+  uint64_t lhi = (ptr[-2] & 0xffff);
+  uint64_t llo = (ptr[-1] & 0xffff);
+  uint64_t val = hhi << 48 | hlo << 32 | lhi << 16 | llo;
   return (cell) val;
 }
 
 /* Load a value from a bitfield of a PowerPC instruction */
 fixnum instruction_operand::load_value_masked(cell mask, cell bits,
                                               cell shift) {
-  s32* ptr = (s32*)(pointer - sizeof(u32));
+  int32_t* ptr = (int32_t*)(pointer - sizeof(uint32_t));
 
-  return (((*ptr & (s32) mask) << bits) >> bits) << shift;
+  return (((*ptr & (int32_t) mask) << bits) >> bits) << shift;
 }
 
 fixnum instruction_operand::load_value(cell relative_to) {
@@ -41,9 +41,9 @@ fixnum instruction_operand::load_value(cell relative_to) {
     case RC_ABSOLUTE_CELL:
       return *(cell*)(pointer - sizeof(cell));
     case RC_ABSOLUTE:
-      return *(u32*)(pointer - sizeof(u32));
+      return *(uint32_t*)(pointer - sizeof(uint32_t));
     case RC_RELATIVE:
-      return *(s32*)(pointer - sizeof(u32)) + relative_to;
+      return *(int32_t*)(pointer - sizeof(uint32_t)) + relative_to;
     case RC_ABSOLUTE_PPC_2_2:
       return load_value_2_2();
     case RC_ABSOLUTE_PPC_2:
@@ -62,9 +62,9 @@ fixnum instruction_operand::load_value(cell relative_to) {
       return load_value_masked(rel_indirect_arm_mask, 20, 0) + relative_to +
              sizeof(cell);
     case RC_ABSOLUTE_2:
-      return *(u16*)(pointer - sizeof(u16));
+      return *(uint16_t*)(pointer - sizeof(uint16_t));
     case RC_ABSOLUTE_1:
-      return *(u8*)(pointer - sizeof(u8));
+      return *(uint8_t*)(pointer - sizeof(uint8_t));
     case RC_ABSOLUTE_PPC_2_2_2_2:
       return load_value_2_2_2_2();
     default:
@@ -85,15 +85,15 @@ code_block* instruction_operand::load_code_block() {
 
 /* Store a 32-bit value into a PowerPC LIS/ORI sequence */
 void instruction_operand::store_value_2_2(fixnum value) {
-  u32* ptr = (u32*)pointer;
+  uint32_t* ptr = (uint32_t*)pointer;
   ptr[-2] = ((ptr[-2] & ~0xffff) | ((value >> 16) & 0xffff));
   ptr[-1] = ((ptr[-1] & ~0xffff) | (value & 0xffff));
 }
 
 /* Store a 64-bit value into a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence */
 void instruction_operand::store_value_2_2_2_2(fixnum value) {
-  u64 val = value;
-  u32* ptr = (u32*)pointer;
+  uint64_t val = value;
+  uint32_t* ptr = (uint32_t*)pointer;
   ptr[-5] = ((ptr[-5] & ~0xffff) | ((val >> 48) & 0xffff));
   ptr[-4] = ((ptr[-4] & ~0xffff) | ((val >> 32) & 0xffff));
   ptr[-2] = ((ptr[-2] & ~0xffff) | ((val >> 16) & 0xffff));
@@ -103,8 +103,8 @@ void instruction_operand::store_value_2_2_2_2(fixnum value) {
 /* Store a value into a bitfield of a PowerPC instruction */
 void instruction_operand::store_value_masked(fixnum value, cell mask,
                                              cell shift) {
-  u32* ptr = (u32*)(pointer - sizeof(u32));
-  *ptr = (u32)((*ptr & ~mask) | ((value >> shift) & mask));
+  uint32_t* ptr = (uint32_t*)(pointer - sizeof(uint32_t));
+  *ptr = (uint32_t)((*ptr & ~mask) | ((value >> shift) & mask));
 }
 
 void instruction_operand::store_value(fixnum absolute_value) {
@@ -115,10 +115,10 @@ void instruction_operand::store_value(fixnum absolute_value) {
       *(cell*)(pointer - sizeof(cell)) = absolute_value;
       break;
     case RC_ABSOLUTE:
-      *(u32*)(pointer - sizeof(u32)) = (u32) absolute_value;
+      *(uint32_t*)(pointer - sizeof(uint32_t)) = (uint32_t) absolute_value;
       break;
     case RC_RELATIVE:
-      *(s32*)(pointer - sizeof(s32)) = (s32) relative_value;
+      *(int32_t*)(pointer - sizeof(int32_t)) = (int32_t) relative_value;
       break;
     case RC_ABSOLUTE_PPC_2_2:
       store_value_2_2(absolute_value);
@@ -144,10 +144,10 @@ void instruction_operand::store_value(fixnum absolute_value) {
                          0);
       break;
     case RC_ABSOLUTE_2:
-      *(u16*)(pointer - sizeof(u16)) = (u16) absolute_value;
+      *(uint16_t*)(pointer - sizeof(uint16_t)) = (uint16_t) absolute_value;
       break;
     case RC_ABSOLUTE_1:
-      *(u8*)(pointer - sizeof(u8)) = (u8) absolute_value;
+      *(uint8_t*)(pointer - sizeof(uint8_t)) = (uint8_t) absolute_value;
       break;
     case RC_ABSOLUTE_PPC_2_2_2_2:
       store_value_2_2_2_2(absolute_value);

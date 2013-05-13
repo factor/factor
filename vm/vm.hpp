@@ -137,7 +137,7 @@ struct factor_vm {
   cell object_counter;
 
   /* Sanity check to ensure that monotonic counter doesn't decrease */
-  u64 last_nano_count;
+  uint64_t last_nano_count;
 
   /* Stack for signal handlers, only used on Unix */
   segment* signal_callstack_seg;
@@ -239,8 +239,8 @@ struct factor_vm {
   bignum* bignum_remainder(bignum* numerator, bignum* denominator);
   cell bignum_to_cell(bignum* bignum);
   fixnum bignum_to_fixnum(bignum* bignum);
-  s64 bignum_to_long_long(bignum* bignum);
-  u64 bignum_to_ulong_long(bignum* bignum);
+  int64_t bignum_to_long_long(bignum* bignum);
+  uint64_t bignum_to_ulong_long(bignum* bignum);
   bignum* double_to_bignum(double x);
   int bignum_equal_p_unsigned(bignum* x, bignum* y);
   enum bignum_comparison bignum_compare_unsigned(bignum* x, bignum* y);
@@ -478,8 +478,8 @@ struct factor_vm {
   void primitive_fixnum_divmod();
   bignum* fixnum_to_bignum(fixnum);
   bignum* cell_to_bignum(cell);
-  bignum* long_long_to_bignum(s64 n);
-  bignum* ulong_long_to_bignum(u64 n);
+  bignum* long_long_to_bignum(int64_t n);
+  bignum* ulong_long_to_bignum(uint64_t n);
   inline fixnum sign_mask(fixnum x);
   inline fixnum branchless_max(fixnum x, fixnum y);
   inline fixnum branchless_abs(fixnum x);
@@ -524,10 +524,10 @@ struct factor_vm {
   void primitive_bits_double();
   fixnum to_fixnum(cell tagged);
   cell to_cell(cell tagged);
-  cell from_signed_8(s64 n);
-  s64 to_signed_8(cell obj);
-  cell from_unsigned_8(u64 n);
-  u64 to_unsigned_8(cell obj);
+  cell from_signed_8(int64_t n);
+  int64_t to_signed_8(cell obj);
+  cell from_unsigned_8(uint64_t n);
+  uint64_t to_unsigned_8(cell obj);
   float to_float(cell value);
   double to_double(cell value);
   inline void overflow_fixnum_add(fixnum x, fixnum y);
