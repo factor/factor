@@ -128,8 +128,8 @@ struct instruction_operand {
   cell index;
   cell pointer;
 
-  instruction_operand(relocation_entry rel_, code_block* compiled_,
-                      cell index_);
+  instruction_operand(relocation_entry rel, code_block* compiled,
+                      cell index);
 
   relocation_type rel_type() { return rel.rel_type(); }
 

@@ -109,8 +109,8 @@ template <typename Fixup> struct slot_visitor {
   factor_vm* parent;
   Fixup fixup;
 
-  slot_visitor<Fixup>(factor_vm* parent_, Fixup fixup_)
-      : parent(parent_), fixup(fixup_) {}
+  slot_visitor<Fixup>(factor_vm* parent, Fixup fixup)
+      : parent(parent), fixup(fixup) {}
 
   cell visit_pointer(cell pointer);
   void visit_handle(cell* handle);
@@ -199,9 +199,9 @@ template <typename Fixup> struct callback_slot_visitor {
   callback_heap* callbacks;
   slot_visitor<Fixup>* visitor;
 
-  callback_slot_visitor(callback_heap* callbacks_,
-                        slot_visitor<Fixup>* visitor_)
-      : callbacks(callbacks_), visitor(visitor_) {}
+  callback_slot_visitor(callback_heap* callbacks,
+                        slot_visitor<Fixup>* visitor)
+      : callbacks(callbacks), visitor(visitor) {}
 
   void operator()(code_block* stub) { visitor->visit_handle(&stub->owner); }
 };
@@ -263,9 +263,9 @@ template <typename Fixup> struct call_frame_slot_visitor {
   factor_vm* parent;
   slot_visitor<Fixup>* visitor;
 
-  call_frame_slot_visitor(factor_vm* parent_,
-                          slot_visitor<Fixup>* visitor_)
-      : parent(parent_), visitor(visitor_) {}
+  call_frame_slot_visitor(factor_vm* parent,
+                          slot_visitor<Fixup>* visitor)
+      : parent(parent), visitor(visitor) {}
 
   /*
 	frame top -> [return address]
@@ -360,8 +360,8 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_contexts() {
 template <typename Fixup> struct literal_references_visitor {
   slot_visitor<Fixup>* visitor;
 
-  explicit literal_references_visitor(slot_visitor<Fixup>* visitor_)
-      : visitor(visitor_) {}
+  explicit literal_references_visitor(slot_visitor<Fixup>* visitor)
+      : visitor(visitor) {}
 
   void operator()(instruction_operand op) {
     if (op.rel_type() == RT_LITERAL)

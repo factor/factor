@@ -3,7 +3,7 @@ namespace factor {
 struct nursery_policy {
   factor_vm* parent;
 
-  explicit nursery_policy(factor_vm* parent_) : parent(parent_) {}
+  explicit nursery_policy(factor_vm* parent) : parent(parent) {}
 
   bool should_copy_p(object* obj) { return parent->nursery.contains_p(obj); }
 
@@ -13,7 +13,7 @@ struct nursery_policy {
 };
 
 struct nursery_collector : copying_collector<aging_space, nursery_policy> {
-  explicit nursery_collector(factor_vm* parent_);
+  explicit nursery_collector(factor_vm* parent);
 };
 
 }

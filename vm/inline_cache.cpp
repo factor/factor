@@ -43,8 +43,8 @@ void factor_vm::update_pic_count(cell type) {
 struct inline_cache_jit : public jit {
   fixnum index;
 
-  inline_cache_jit(cell generic_word_, factor_vm* vm)
-      : jit(code_block_pic, generic_word_, vm) {}
+  inline_cache_jit(cell generic_word, factor_vm* vm)
+      : jit(code_block_pic, generic_word, vm) {}
   ;
 
   void emit_check(cell klass);

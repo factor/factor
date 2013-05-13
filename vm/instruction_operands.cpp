@@ -2,12 +2,12 @@
 
 namespace factor {
 
-instruction_operand::instruction_operand(relocation_entry rel_,
-                                         code_block* compiled_, cell index_)
-    : rel(rel_),
-      compiled(compiled_),
-      index(index_),
-      pointer((cell) compiled_->entry_point() + rel_.rel_offset()) {}
+instruction_operand::instruction_operand(relocation_entry rel,
+                                         code_block* compiled, cell index)
+    : rel(rel),
+      compiled(compiled),
+      index(index),
+      pointer((cell) compiled->entry_point() + rel.rel_offset()) {}
 
 /* Load a 32-bit value from a PowerPC LIS/ORI sequence */
 fixnum instruction_operand::load_value_2_2() {

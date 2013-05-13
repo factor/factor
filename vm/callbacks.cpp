@@ -2,8 +2,8 @@
 
 namespace factor {
 
-callback_heap::callback_heap(cell size, factor_vm* parent_)
-    : seg(new segment(size, true)), here(seg->start), parent(parent_) {}
+callback_heap::callback_heap(cell size, factor_vm* parent)
+    : seg(new segment(size, true)), here(seg->start), parent(parent) {}
 
 callback_heap::~callback_heap() {
   delete seg;
@@ -102,8 +102,8 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
 struct callback_updater {
   callback_heap* callbacks;
 
-  explicit callback_updater(callback_heap* callbacks_)
-      : callbacks(callbacks_) {}
+  explicit callback_updater(callback_heap* callbacks)
+      : callbacks(callbacks) {}
 
   void operator()(code_block* stub) { callbacks->update(stub); }
 };

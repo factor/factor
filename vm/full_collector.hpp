@@ -4,8 +4,8 @@ struct full_policy {
   factor_vm* parent;
   tenured_space* tenured;
 
-  explicit full_policy(factor_vm* parent_)
-      : parent(parent_), tenured(parent->data->tenured) {}
+  explicit full_policy(factor_vm* parent)
+      : parent(parent), tenured(parent->data->tenured) {}
 
   bool should_copy_p(object* untagged) {
     return !tenured->contains_p(untagged);
@@ -25,7 +25,7 @@ struct full_policy {
 struct full_collector : collector<tenured_space, full_policy> {
   code_block_visitor<gc_workhorse<tenured_space, full_policy> > code_visitor;
 
-  explicit full_collector(factor_vm* parent_);
+  explicit full_collector(factor_vm* parent);
   void trace_code_block(code_block* compiled);
   void trace_context_code_blocks();
   void trace_code_roots();

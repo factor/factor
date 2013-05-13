@@ -2,10 +2,10 @@
 
 namespace factor {
 
-object_start_map::object_start_map(cell size_, cell start_)
-    : size(size_), start(start_) {
-  object_start_offsets = new card[addr_to_card(size_)];
-  object_start_offsets_end = object_start_offsets + addr_to_card(size_);
+object_start_map::object_start_map(cell size, cell start)
+    : size(size), start(start) {
+  object_start_offsets = new card[addr_to_card(size)];
+  object_start_offsets_end = object_start_offsets + addr_to_card(size);
   clear_object_start_offsets();
 }
 

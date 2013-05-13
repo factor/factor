@@ -8,9 +8,9 @@ namespace factor {
 - polymorphic inline caches (inline_cache.cpp) */
 
 /* Allocates memory */
-jit::jit(code_block_type type_, cell owner_, factor_vm* vm)
-    : type(type_),
-      owner(owner_, vm),
+jit::jit(code_block_type type, cell owner, factor_vm* vm)
+    : type(type),
+      owner(owner, vm),
       code(vm),
       relocation(vm),
       parameters(vm),
