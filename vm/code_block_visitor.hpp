@@ -15,7 +15,7 @@ template <typename Fixup> struct code_block_visitor {
   factor_vm* parent;
   Fixup fixup;
 
-  explicit code_block_visitor(factor_vm* parent_, Fixup fixup_)
+  code_block_visitor(factor_vm* parent_, Fixup fixup_)
       : parent(parent_), fixup(fixup_) {}
 
   code_block* visit_code_block(code_block* compiled);
@@ -36,7 +36,7 @@ template <typename Fixup> struct call_frame_code_block_visitor {
   factor_vm* parent;
   Fixup fixup;
 
-  explicit call_frame_code_block_visitor(factor_vm* parent_, Fixup fixup_)
+  call_frame_code_block_visitor(factor_vm* parent_, Fixup fixup_)
       : parent(parent_), fixup(fixup_) {}
 
   void operator()(void* frame_top, cell frame_size, code_block* owner,

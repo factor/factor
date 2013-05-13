@@ -75,7 +75,7 @@ void factor_vm::primitive_size() {
 struct slot_become_fixup : no_fixup {
   std::map<object*, object*>* become_map;
 
-  explicit slot_become_fixup(std::map<object*, object*>* become_map_)
+  slot_become_fixup(std::map<object*, object*>* become_map_)
       : become_map(become_map_) {}
 
   object* fixup_data(object* old) {

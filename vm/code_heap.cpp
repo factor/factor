@@ -234,7 +234,7 @@ void factor_vm::primitive_code_room() {
 }
 
 struct stack_trace_stripper {
-  explicit stack_trace_stripper() {}
+  stack_trace_stripper() {}
 
   void operator()(code_block* compiled, cell size) {
     compiled->owner = false_object;

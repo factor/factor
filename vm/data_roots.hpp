@@ -7,12 +7,12 @@ template <typename Type> struct data_root : public tagged<Type> {
     parent->data_roots.push_back(data_root_range(&this->value_, 1));
   }
 
-  explicit data_root(cell value_, factor_vm* parent_)
+  data_root(cell value_, factor_vm* parent_)
       : tagged<Type>(value_), parent(parent_) {
     push();
   }
 
-  explicit data_root(Type* value_, factor_vm* parent_)
+  data_root(Type* value_, factor_vm* parent_)
       : tagged<Type>(value_), parent(parent_) {
     push();
   }

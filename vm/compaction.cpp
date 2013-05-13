@@ -10,10 +10,10 @@ struct compaction_fixup {
   const object** data_finger;
   const code_block** code_finger;
 
-  explicit compaction_fixup(mark_bits<object>* data_forwarding_map_,
-                            mark_bits<code_block>* code_forwarding_map_,
-                            const object** data_finger_,
-                            const code_block** code_finger_)
+  compaction_fixup(mark_bits<object>* data_forwarding_map_,
+                   mark_bits<code_block>* code_forwarding_map_,
+                   const object** data_finger_,
+                   const code_block** code_finger_)
       : data_forwarding_map(data_forwarding_map_),
         code_forwarding_map(code_forwarding_map_),
         data_finger(data_finger_),
@@ -61,8 +61,7 @@ struct object_compaction_updater {
   compaction_fixup fixup;
   object_start_map* starts;
 
-  explicit object_compaction_updater(factor_vm* parent_,
-                                     compaction_fixup fixup_)
+  object_compaction_updater(factor_vm* parent_, compaction_fixup fixup_)
       : parent(parent_),
         fixup(fixup_),
         starts(&parent->data->tenured->starts) {}
@@ -83,9 +82,9 @@ template <typename Fixup> struct code_block_compaction_relocation_visitor {
   code_block* old_address;
   Fixup fixup;
 
-  explicit code_block_compaction_relocation_visitor(factor_vm* parent_,
-                                                    code_block* old_address_,
-                                                    Fixup fixup_)
+  code_block_compaction_relocation_visitor(factor_vm* parent_,
+                                           code_block* old_address_,
+                                           Fixup fixup_)
       : parent(parent_), old_address(old_address_), fixup(fixup_) {}
 
   void operator()(instruction_operand op) {
@@ -129,7 +128,7 @@ template <typename Fixup> struct code_block_compaction_updater {
   slot_visitor<Fixup> data_forwarder;
   code_block_visitor<Fixup> code_forwarder;
 
-  explicit code_block_compaction_updater(
+  code_block_compaction_updater(
       factor_vm* parent_, Fixup fixup_, slot_visitor<Fixup> data_forwarder_,
       code_block_visitor<Fixup> code_forwarder_)
       : parent(parent_),
@@ -234,8 +233,8 @@ struct code_compaction_fixup {
   mark_bits<code_block>* code_forwarding_map;
   const code_block** code_finger;
 
-  explicit code_compaction_fixup(mark_bits<code_block>* code_forwarding_map_,
-                                 const code_block** code_finger_)
+  code_compaction_fixup(mark_bits<code_block>* code_forwarding_map_,
+                        const code_block** code_finger_)
       : code_forwarding_map(code_forwarding_map_), code_finger(code_finger_) {}
 
   object* fixup_data(object* obj) { return obj; }

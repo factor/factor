@@ -4,8 +4,7 @@ struct quotation_jit : public jit {
   data_root<array> elements;
   bool compiling, relocate;
 
-  explicit quotation_jit(cell owner, bool compiling_, bool relocate_,
-                         factor_vm* vm)
+  quotation_jit(cell owner, bool compiling_, bool relocate_, factor_vm* vm)
       : jit(code_block_unoptimized, owner, vm),
         elements(false_object, vm),
         compiling(compiling_),

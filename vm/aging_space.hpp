@@ -3,7 +3,7 @@ namespace factor {
 struct aging_space : bump_allocator<object> {
   object_start_map starts;
 
-  explicit aging_space(cell size, cell start)
+  aging_space(cell size, cell start)
       : bump_allocator<object>(size, start), starts(size, start) {}
 
   object* allot(cell size) {

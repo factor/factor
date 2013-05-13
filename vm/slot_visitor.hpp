@@ -109,7 +109,7 @@ template <typename Fixup> struct slot_visitor {
   factor_vm* parent;
   Fixup fixup;
 
-  explicit slot_visitor<Fixup>(factor_vm* parent_, Fixup fixup_)
+  slot_visitor<Fixup>(factor_vm* parent_, Fixup fixup_)
       : parent(parent_), fixup(fixup_) {}
 
   cell visit_pointer(cell pointer);
@@ -199,8 +199,8 @@ template <typename Fixup> struct callback_slot_visitor {
   callback_heap* callbacks;
   slot_visitor<Fixup>* visitor;
 
-  explicit callback_slot_visitor(callback_heap* callbacks_,
-                                 slot_visitor<Fixup>* visitor_)
+  callback_slot_visitor(callback_heap* callbacks_,
+                        slot_visitor<Fixup>* visitor_)
       : callbacks(callbacks_), visitor(visitor_) {}
 
   void operator()(code_block* stub) { visitor->visit_handle(&stub->owner); }
@@ -263,8 +263,8 @@ template <typename Fixup> struct call_frame_slot_visitor {
   factor_vm* parent;
   slot_visitor<Fixup>* visitor;
 
-  explicit call_frame_slot_visitor(factor_vm* parent_,
-                                   slot_visitor<Fixup>* visitor_)
+  call_frame_slot_visitor(factor_vm* parent_,
+                          slot_visitor<Fixup>* visitor_)
       : parent(parent_), visitor(visitor_) {}
 
   /*

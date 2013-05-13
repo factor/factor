@@ -55,7 +55,7 @@ struct startup_fixup {
   cell data_offset;
   cell code_offset;
 
-  explicit startup_fixup(cell data_offset_, cell code_offset_)
+  startup_fixup(cell data_offset_, cell code_offset_)
       : data_offset(data_offset_), code_offset(code_offset_) {}
 
   object* fixup_data(object* obj) {
