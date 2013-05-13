@@ -14,9 +14,9 @@ template <typename Block> struct mark_bits {
 
   void clear_forwarding() { memset(forwarding, 0, bits_size * sizeof(cell)); }
 
-  mark_bits(cell size_, cell start_)
-      : size(size_),
-        start(start_),
+  mark_bits(cell size, cell start)
+      : size(size),
+        start(start),
         bits_size(size / data_alignment / mark_bits_granularity),
         marked(new cell[bits_size]),
         forwarding(new cell[bits_size]) {

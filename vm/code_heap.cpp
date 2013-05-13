@@ -137,8 +137,8 @@ struct word_updater {
   factor_vm* parent;
   bool reset_inline_caches;
 
-  word_updater(factor_vm* parent_, bool reset_inline_caches_)
-      : parent(parent_), reset_inline_caches(reset_inline_caches_) {}
+  word_updater(factor_vm* parent, bool reset_inline_caches)
+      : parent(parent), reset_inline_caches(reset_inline_caches) {}
 
   void operator()(code_block* compiled, cell size) {
     parent->update_word_references(compiled, reset_inline_caches);

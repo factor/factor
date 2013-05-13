@@ -55,8 +55,8 @@ struct startup_fixup {
   cell data_offset;
   cell code_offset;
 
-  startup_fixup(cell data_offset_, cell code_offset_)
-      : data_offset(data_offset_), code_offset(code_offset_) {}
+  startup_fixup(cell data_offset, cell code_offset)
+      : data_offset(data_offset), code_offset(code_offset) {}
 
   object* fixup_data(object* obj) {
     return (object*)((cell) obj + data_offset);
@@ -83,11 +83,11 @@ struct start_object_updater {
   slot_visitor<startup_fixup> data_visitor;
   code_block_visitor<startup_fixup> code_visitor;
 
-  start_object_updater(factor_vm* parent_, startup_fixup fixup_)
-      : parent(parent_),
-        fixup(fixup_),
-        data_visitor(slot_visitor<startup_fixup>(parent_, fixup_)),
-        code_visitor(code_block_visitor<startup_fixup>(parent_, fixup_)) {}
+  start_object_updater(factor_vm* parent, startup_fixup fixup)
+      : parent(parent),
+        fixup(fixup),
+        data_visitor(slot_visitor<startup_fixup>(parent, fixup)),
+        code_visitor(code_block_visitor<startup_fixup>(parent, fixup)) {}
 
   void operator()(object* obj, cell size) {
     parent->data->tenured->starts.record_object_start_offset(obj);
@@ -131,11 +131,11 @@ struct startup_code_block_relocation_visitor {
   startup_fixup fixup;
   slot_visitor<startup_fixup> data_visitor;
 
-  startup_code_block_relocation_visitor(factor_vm* parent_,
-                                        startup_fixup fixup_)
-      : parent(parent_),
-        fixup(fixup_),
-        data_visitor(slot_visitor<startup_fixup>(parent_, fixup_)) {}
+  startup_code_block_relocation_visitor(factor_vm* parent,
+                                        startup_fixup fixup)
+      : parent(parent),
+        fixup(fixup),
+        data_visitor(slot_visitor<startup_fixup>(parent, fixup)) {}
 
   void operator()(instruction_operand op) {
     code_block* compiled = op.compiled;
@@ -175,8 +175,8 @@ struct startup_code_block_updater {
   factor_vm* parent;
   startup_fixup fixup;
 
-  startup_code_block_updater(factor_vm* parent_, startup_fixup fixup_)
-      : parent(parent_), fixup(fixup_) {}
+  startup_code_block_updater(factor_vm* parent, startup_fixup fixup)
+      : parent(parent), fixup(fixup) {}
 
   void operator()(code_block* compiled, cell size) {
     slot_visitor<startup_fixup> data_visitor(parent, fixup);

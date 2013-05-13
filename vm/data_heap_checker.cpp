@@ -29,8 +29,8 @@ struct slot_checker {
   object* obj;
   generation gen;
 
-  slot_checker(factor_vm* parent_, object* obj_, generation gen_)
-      : parent(parent_), obj(obj_), gen(gen_) {}
+  slot_checker(factor_vm* parent, object* obj, generation gen)
+      : parent(parent), obj(obj), gen(gen) {}
 
   void check_write_barrier(cell* slot_ptr, generation target, char mask) {
     cell object_card_pointer = parent->cards_offset + ((cell) obj >> card_bits);
@@ -81,7 +81,7 @@ struct slot_checker {
 struct object_checker {
   factor_vm* parent;
 
-  explicit object_checker(factor_vm* parent_) : parent(parent_) {}
+  explicit object_checker(factor_vm* parent) : parent(parent) {}
 
   void operator()(object* obj) {
     slot_checker checker(parent, obj, generation_of(parent, obj));

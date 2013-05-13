@@ -30,10 +30,10 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
 }
 
 template <typename Iterator>
-inline void factor_vm::iterate_callstack_object(callstack* stack_,
+inline void factor_vm::iterate_callstack_object(callstack* stack,
                                                 Iterator& iterator) {
   no_fixup none;
-  iterate_callstack_object(stack_, iterator, none);
+  iterate_callstack_object(stack, iterator, none);
 }
 
 template <typename Iterator, typename Fixup>

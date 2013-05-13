@@ -189,7 +189,7 @@ void factor_vm::print_retainstack() {
 struct stack_frame_printer {
   factor_vm* parent;
 
-  explicit stack_frame_printer(factor_vm* parent_) : parent(parent_) {}
+  explicit stack_frame_printer(factor_vm* parent) : parent(parent) {}
   void operator()(void* frame_top, cell frame_size, code_block* owner,
                   void* addr) {
     std::cout << std::endl;
@@ -229,7 +229,7 @@ void factor_vm::print_callstack_object(callstack* obj) {
 struct padded_address {
   cell value;
 
-  explicit padded_address(cell value_) : value(value_) {}
+  explicit padded_address(cell value) : value(value) {}
 };
 
 std::ostream& operator<<(std::ostream& out, const padded_address& value) {
@@ -280,8 +280,8 @@ struct object_dumper {
   factor_vm* parent;
   cell type;
 
-  object_dumper(factor_vm* parent_, cell type_)
-      : parent(parent_), type(type_) {}
+  object_dumper(factor_vm* parent, cell type)
+      : parent(parent), type(type) {}
 
   void operator()(object* obj) {
     if (type == TYPE_COUNT || obj->type() == type) {
@@ -303,9 +303,9 @@ struct find_data_reference_slot_visitor {
   object* obj;
   factor_vm* parent;
 
-  find_data_reference_slot_visitor(cell look_for_, object* obj_,
-                                   factor_vm* parent_)
-      : look_for(look_for_), obj(obj_), parent(parent_) {}
+  find_data_reference_slot_visitor(cell look_for, object* obj,
+                                   factor_vm* parent)
+      : look_for(look_for), obj(obj), parent(parent) {}
 
   void operator()(cell* scan) {
     if (look_for == *scan) {
@@ -320,8 +320,8 @@ struct dump_edges_slot_visitor {
   object* obj;
   factor_vm* parent;
 
-  dump_edges_slot_visitor(cell, object* obj_, factor_vm* parent_)
-      : obj(obj_), parent(parent_) {}
+  dump_edges_slot_visitor(cell, object* obj, factor_vm* parent)
+      : obj(obj), parent(parent) {}
 
   void operator()(cell* scan) {
     if (TAG(*scan) > F_TYPE)
@@ -334,8 +334,8 @@ template <typename SlotVisitor> struct data_reference_object_visitor {
   cell look_for;
   factor_vm* parent;
 
-  data_reference_object_visitor(cell look_for_, factor_vm* parent_)
-      : look_for(look_for_), parent(parent_) {}
+  data_reference_object_visitor(cell look_for, factor_vm* parent)
+      : look_for(look_for), parent(parent) {}
 
   void operator()(object* obj) {
     SlotVisitor visitor(look_for, obj, parent);
@@ -358,8 +358,8 @@ struct code_block_printer {
   factor_vm* parent;
   cell reloc_size, parameter_size;
 
-  explicit code_block_printer(factor_vm* parent_)
-      : parent(parent_), reloc_size(0), parameter_size(0) {}
+  explicit code_block_printer(factor_vm* parent)
+      : parent(parent), reloc_size(0), parameter_size(0) {}
 
   void operator()(code_block* scan, cell size) {
     const char* status;
