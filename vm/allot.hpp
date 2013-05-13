@@ -6,9 +6,7 @@ namespace factor {
  */
 /* Allocates memory */
 inline object* factor_vm::allot_object(cell type, cell size) {
-#ifdef FACTOR_DEBUG
   FACTOR_ASSERT(!current_gc);
-#endif
 
   /* If the object is smaller than the nursery, allocate it in the nursery,
      after a GC if needed */

@@ -125,7 +125,7 @@ void code_heap::initialize_all_blocks_set() {
   all_blocks.clear();
   all_blocks_set_inserter inserter(this);
   allocator->iterate(inserter);
-#if defined(FACTOR_DEBUG)
+#ifdef FACTOR_DEBUG
   verify_all_blocks_set();
 #endif
 }
