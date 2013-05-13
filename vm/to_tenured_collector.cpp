@@ -2,10 +2,10 @@
 
 namespace factor {
 
-to_tenured_collector::to_tenured_collector(factor_vm* parent_)
-    : collector<tenured_space, to_tenured_policy>(parent_,
-                                                  parent_->data->tenured,
-                                                  to_tenured_policy(parent_)) {}
+to_tenured_collector::to_tenured_collector(factor_vm* parent)
+    : collector<tenured_space, to_tenured_policy>(parent,
+                                                  parent->data->tenured,
+                                                  to_tenured_policy(parent)) {}
 
 void to_tenured_collector::tenure_reachable_objects() {
   std::vector<cell>* mark_stack = &parent->mark_stack;

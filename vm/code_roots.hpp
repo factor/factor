@@ -7,8 +7,8 @@ struct code_root {
 
   void push() { parent->code_roots.push_back(this); }
 
-  code_root(cell value_, factor_vm* parent_)
-      : value(value_), valid(true), parent(parent_) {
+  code_root(cell value, factor_vm* parent)
+      : value(value), valid(true), parent(parent) {
     push();
   }
 

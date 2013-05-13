@@ -7,13 +7,13 @@ template <typename Type> struct data_root : public tagged<Type> {
     parent->data_roots.push_back(data_root_range(&this->value_, 1));
   }
 
-  data_root(cell value_, factor_vm* parent_)
-      : tagged<Type>(value_), parent(parent_) {
+  data_root(cell value, factor_vm* parent)
+      : tagged<Type>(value), parent(parent) {
     push();
   }
 
-  data_root(Type* value_, factor_vm* parent_)
-      : tagged<Type>(value_), parent(parent_) {
+  data_root(Type* value, factor_vm* parent)
+      : tagged<Type>(value), parent(parent) {
     push();
   }
 
@@ -34,9 +34,9 @@ struct gc_bignum {
   bignum** addr;
   factor_vm* parent;
 
-  gc_bignum(bignum** addr_, factor_vm* parent_) : addr(addr_), parent(parent_) {
-    if (*addr_)
-      parent->check_data_pointer(*addr_);
+  gc_bignum(bignum** addr, factor_vm* parent) : addr(addr), parent(parent) {
+    if (*addr)
+      parent->check_data_pointer(*addr);
     parent->bignum_roots.push_back((cell) addr);
   }
 

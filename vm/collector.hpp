@@ -12,8 +12,8 @@ struct gc_workhorse : no_fixup {
   Policy policy;
   code_heap* code;
 
-  gc_workhorse(factor_vm* parent_, TargetGeneration* target_, Policy policy_)
-      : parent(parent_), target(target_), policy(policy_), code(parent->code) {}
+  gc_workhorse(factor_vm* parent, TargetGeneration* target, Policy policy)
+      : parent(parent), target(target), policy(policy), code(parent->code) {}
 
   object* resolve_forwarding(object* untagged) {
     parent->check_data_pointer(untagged);
@@ -76,7 +76,7 @@ struct dummy_unmarker {
 
 struct simple_unmarker {
   card unmask;
-  explicit simple_unmarker(card unmask_) : unmask(unmask_) {}
+  explicit simple_unmarker(card unmask) : unmask(unmask) {}
   void operator()(card* ptr) { *ptr &= ~unmask; }
 };
 
@@ -96,12 +96,12 @@ template <typename TargetGeneration, typename Policy> struct collector {
   cell decks_scanned;
   cell code_blocks_scanned;
 
-  collector(factor_vm* parent_, TargetGeneration* target_, Policy policy_)
-      : parent(parent_),
-        data(parent_->data),
-        code(parent_->code),
-        target(target_),
-        workhorse(parent, target, policy_),
+  collector(factor_vm* parent, TargetGeneration* target, Policy policy)
+      : parent(parent),
+        data(parent->data),
+        code(parent->code),
+        target(target),
+        workhorse(parent, target, policy),
         data_visitor(parent, workhorse),
         cards_scanned(0),
         decks_scanned(0),

@@ -4,11 +4,11 @@ struct quotation_jit : public jit {
   data_root<array> elements;
   bool compiling, relocate;
 
-  quotation_jit(cell owner, bool compiling_, bool relocate_, factor_vm* vm)
+  quotation_jit(cell owner, bool compiling, bool relocate, factor_vm* vm)
       : jit(code_block_unoptimized, owner, vm),
         elements(false_object, vm),
-        compiling(compiling_),
-        relocate(relocate_) {}
+        compiling(compiling),
+        relocate(relocate) {}
   ;
 
   void init_quotation(cell quot);

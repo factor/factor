@@ -2,10 +2,10 @@
 
 namespace factor {
 
-aging_collector::aging_collector(factor_vm* parent_)
-    : copying_collector<aging_space, aging_policy>(parent_,
-                                                   parent_->data->aging,
-                                                   aging_policy(parent_)) {}
+aging_collector::aging_collector(factor_vm* parent)
+    : copying_collector<aging_space, aging_policy>(parent,
+                                                   parent->data->aging,
+                                                   aging_policy(parent)) {}
 
 void factor_vm::collect_aging() {
   /* Promote objects referenced from tenured space to tenured space, copy

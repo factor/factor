@@ -2,9 +2,9 @@
 
 namespace factor {
 
-full_collector::full_collector(factor_vm* parent_)
-    : collector<tenured_space, full_policy>(parent_, parent_->data->tenured,
-                                            full_policy(parent_)),
+full_collector::full_collector(factor_vm* parent)
+    : collector<tenured_space, full_policy>(parent, parent->data->tenured,
+                                            full_policy(parent)),
       code_visitor(parent, workhorse) {}
 
 void full_collector::trace_code_block(code_block* compiled) {
