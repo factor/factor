@@ -40,7 +40,7 @@ void growable_byte_array::grow_bytes(cell len) {
 void growable_byte_array::append_bytes(void* elts, cell len) {
   cell old_count = count;
   grow_bytes(len);
-  memcpy(&elements->data<u8>()[old_count], elts, len);
+  memcpy(&elements->data<uint8_t>()[old_count], elts, len);
 }
 
 /* Allocates memory */
@@ -53,7 +53,7 @@ void growable_byte_array::append_byte_array(cell byte_array_) {
   if (new_size >= array_capacity(elements.untagged()))
     elements = parent->reallot_array(elements.untagged(), new_size * 2);
 
-  memcpy(&elements->data<u8>()[count], byte_array->data<u8>(), len);
+  memcpy(&elements->data<uint8_t>()[count], byte_array->data<uint8_t>(), len);
 
   count += len;
 }

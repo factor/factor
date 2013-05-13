@@ -64,10 +64,10 @@ Protocol* objc_getProtocol(char* name) {
     return nil;
 }
 
-u64 nano_count() {
-  u64 time = mach_absolute_time();
+uint64_t nano_count() {
+  uint64_t time = mach_absolute_time();
 
-  static u64 scaling_factor = 0;
+  static uint64_t scaling_factor = 0;
   if (!scaling_factor) {
     mach_timebase_info_data_t info;
     kern_return_t ret = mach_timebase_info(&info);

@@ -281,7 +281,7 @@ void factor_vm::primitive_float_bits() {
 
 /* Allocates memory */
 void factor_vm::primitive_bits_float() {
-  ctx->push(allot_float(bits_float((u32) to_cell(ctx->pop()))));
+  ctx->push(allot_float(bits_float((uint32_t) to_cell(ctx->pop()))));
 }
 
 void factor_vm::primitive_double_bits() {
@@ -327,19 +327,19 @@ VM_C_API cell from_unsigned_cell(cell integer, factor_vm* parent) {
 }
 
 /* Allocates memory */
-cell factor_vm::from_signed_8(s64 n) {
+cell factor_vm::from_signed_8(int64_t n) {
   if (n < fixnum_min || n > fixnum_max)
     return tag<bignum>(long_long_to_bignum(n));
   else
     return tag_fixnum((fixnum) n);
 }
 
-VM_C_API cell from_signed_8(s64 n, factor_vm* parent) {
+VM_C_API cell from_signed_8(int64_t n, factor_vm* parent) {
   return parent->from_signed_8(n);
 }
 
 /* Cannot allocate */
-s64 factor_vm::to_signed_8(cell obj) {
+int64_t factor_vm::to_signed_8(cell obj) {
   switch (tagged<object>(obj).type()) {
     case FIXNUM_TYPE:
       return untag_fixnum(obj);
@@ -351,24 +351,24 @@ s64 factor_vm::to_signed_8(cell obj) {
   }
 }
 
-VM_C_API s64 to_signed_8(cell obj, factor_vm* parent) {
+VM_C_API int64_t to_signed_8(cell obj, factor_vm* parent) {
   return parent->to_signed_8(obj);
 }
 
 /* Allocates memory */
-cell factor_vm::from_unsigned_8(u64 n) {
-  if (n > (u64) fixnum_max)
+cell factor_vm::from_unsigned_8(uint64_t n) {
+  if (n > (uint64_t) fixnum_max)
     return tag<bignum>(ulong_long_to_bignum(n));
   else
     return tag_fixnum((fixnum) n);
 }
 
-VM_C_API cell from_unsigned_8(u64 n, factor_vm* parent) {
+VM_C_API cell from_unsigned_8(uint64_t n, factor_vm* parent) {
   return parent->from_unsigned_8(n);
 }
 
 /* Cannot allocate */
-u64 factor_vm::to_unsigned_8(cell obj) {
+uint64_t factor_vm::to_unsigned_8(cell obj) {
   switch (tagged<object>(obj).type()) {
     case FIXNUM_TYPE:
       return untag_fixnum(obj);
@@ -380,7 +380,7 @@ u64 factor_vm::to_unsigned_8(cell obj) {
   }
 }
 
-VM_C_API u64 to_unsigned_8(cell obj, factor_vm* parent) {
+VM_C_API uint64_t to_unsigned_8(cell obj, factor_vm* parent) {
   return parent->to_unsigned_8(obj);
 }
 

@@ -42,7 +42,7 @@ void object_start_map::clear_object_start_offsets() {
   memset(object_start_offsets, card_starts_inside_object, addr_to_card(size));
 }
 
-void object_start_map::update_card_for_sweep(cell index, u16 mask) {
+void object_start_map::update_card_for_sweep(cell index, uint16_t mask) {
   cell offset = object_start_offsets[index];
   if (offset != card_starts_inside_object) {
     mask >>= (offset / data_alignment);

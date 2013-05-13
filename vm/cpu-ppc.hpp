@@ -18,22 +18,22 @@ namespace factor {
 static const fixnum xt_tail_pic_offset = 4;
 
 inline static void check_call_site(cell return_address) {
-  u32 insn = *(u32*)return_address;
+  uint32_t insn = *(uint32_t*)return_address;
   /* Check that absolute bit is 0 */
   FACTOR_ASSERT((insn & 0x2) == 0x0);
   /* Check that instruction is branch */
   FACTOR_ASSERT((insn >> 26) == 0x12);
 }
 
-static const u32 b_mask = 0x3fffffc;
+static const uint32_t b_mask = 0x3fffffc;
 
 inline static void* get_call_target(cell return_address) {
   return_address -= 4;
   check_call_site(return_address);
 
-  u32 insn = *(u32*)return_address;
-  u32 unsigned_addr = (insn & b_mask);
-  s32 signed_addr = (s32)(unsigned_addr << 6) >> 6;
+  uint32_t insn = *(uint32_t*)return_address;
+  uint32_t unsigned_addr = (insn & b_mask);
+  int32_t signed_addr = (int32_t)(unsigned_addr << 6) >> 6;
   return (void*)(signed_addr + return_address);
 }
 
@@ -41,11 +41,11 @@ inline static void set_call_target(cell return_address, void* target) {
   return_address -= 4;
   check_call_site(return_address);
 
-  u32 insn = *(u32*)return_address;
+  uint32_t insn = *(uint32_t*)return_address;
 
   fixnum relative_address = ((cell) target - return_address);
   insn = ((insn & ~b_mask) | (relative_address & b_mask));
-  *(u32*)return_address = insn;
+  *(uint32_t*)return_address = insn;
 
   /* Flush the cache line containing the call we just patched */
   __asm__ __volatile__("icbi 0, %0\n"
@@ -55,7 +55,7 @@ inline static void set_call_target(cell return_address, void* target) {
 
 inline static bool tail_call_site_p(cell return_address) {
   return_address -= 4;
-  u32 insn = *(u32*)return_address;
+  uint32_t insn = *(uint32_t*)return_address;
   return (insn & 0x1) == 0;
 }
 

@@ -50,7 +50,7 @@ void context::fix_stacks() {
 }
 
 void context::scrub_stacks(gc_info* info, cell index) {
-  u8* bitmap = info->gc_info_bitmap();
+  uint8_t* bitmap = info->gc_info_bitmap();
 
   {
     cell base = info->callsite_scrub_d(index);

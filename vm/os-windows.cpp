@@ -155,11 +155,11 @@ THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
                              args, 0, 0);
 }
 
-u64 nano_count() {
+uint64_t nano_count() {
   static double scale_factor;
 
-  static u32 hi = 0;
-  static u32 lo = 0;
+  static uint32_t hi = 0;
+  static uint32_t lo = 0;
 
   LARGE_INTEGER count;
   BOOL ret = QueryPerformanceCounter(&count);
@@ -184,10 +184,10 @@ u64 nano_count() {
 #endif
   lo = count.LowPart;
 
-  return (u64)((((u64) hi << 32) | (u64) lo) * scale_factor);
+  return (uint64_t)((((uint64_t) hi << 32) | (uint64_t) lo) * scale_factor);
 }
 
-void sleep_nanos(u64 nsec) { Sleep((DWORD)(nsec / 1000000)); }
+void sleep_nanos(uint64_t nsec) { Sleep((DWORD)(nsec / 1000000)); }
 
 typedef enum _EXCEPTION_DISPOSITION {
   ExceptionContinueExecution = 0,

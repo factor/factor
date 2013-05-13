@@ -64,11 +64,11 @@ inline cell factor_vm::unbox_array_size() {
 
 VM_C_API cell from_signed_cell(fixnum integer, factor_vm* vm);
 VM_C_API cell from_unsigned_cell(cell integer, factor_vm* vm);
-VM_C_API cell from_signed_8(s64 n, factor_vm* vm);
-VM_C_API cell from_unsigned_8(u64 n, factor_vm* vm);
+VM_C_API cell from_signed_8(int64_t n, factor_vm* vm);
+VM_C_API cell from_unsigned_8(uint64_t n, factor_vm* vm);
 
-VM_C_API s64 to_signed_8(cell obj, factor_vm* parent);
-VM_C_API u64 to_unsigned_8(cell obj, factor_vm* parent);
+VM_C_API int64_t to_signed_8(cell obj, factor_vm* parent);
+VM_C_API uint64_t to_unsigned_8(cell obj, factor_vm* parent);
 
 VM_C_API fixnum to_fixnum(cell tagged, factor_vm* vm);
 VM_C_API cell to_cell(cell tagged, factor_vm* vm);
