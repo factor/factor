@@ -386,10 +386,8 @@ struct factor_vm {
   }
 
   inline void check_data_pointer(object* pointer) {
-#ifdef FACTOR_DEBUG
-    if (!(current_gc && current_gc->op == collect_growing_heap_op))
-      FACTOR_ASSERT(data->seg->in_segment_p((cell) pointer));
-#endif
+    FACTOR_ASSERT((current_gc && current_gc->op == collect_growing_heap_op) ||
+                  data->seg->in_segment_p((cell) pointer));
   }
 
   // generic arrays

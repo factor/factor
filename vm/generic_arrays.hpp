@@ -1,9 +1,7 @@
 namespace factor {
 
 template <typename Array> cell array_capacity(const Array* array) {
-#ifdef FACTOR_DEBUG
   FACTOR_ASSERT(array->type() == Array::type_number);
-#endif
   return array->capacity >> TAG_BITS;
 }
 

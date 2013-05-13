@@ -1,18 +1,14 @@
 namespace factor {
 
 inline cell array_nth(array* array, cell slot) {
-#ifdef FACTOR_DEBUG
   FACTOR_ASSERT(slot < array_capacity(array));
   FACTOR_ASSERT(array->type() == ARRAY_TYPE);
-#endif
   return array->data()[slot];
 }
 
 inline void factor_vm::set_array_nth(array* array, cell slot, cell value) {
-#ifdef FACTOR_DEBUG
   FACTOR_ASSERT(slot < array_capacity(array));
   FACTOR_ASSERT(array->type() == ARRAY_TYPE);
-#endif
   cell* slot_ptr = &array->data()[slot];
   *slot_ptr = value;
   write_barrier(slot_ptr);

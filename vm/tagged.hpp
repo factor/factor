@@ -23,16 +23,12 @@ template <typename Type> struct tagged {
   }
 
   cell value() const {
-#ifdef FACTOR_DEBUG
     FACTOR_ASSERT(type_p());
-#endif
     return value_;
   }
 
   Type* untagged() const {
-#ifdef FACTOR_DEBUG
     FACTOR_ASSERT(type_p());
-#endif
     return (Type*)(UNTAG(value_));
   }
 

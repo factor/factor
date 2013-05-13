@@ -73,13 +73,13 @@ cell factor_vm::code_block_owner(code_block* compiled) {
   if (owner.type_p(QUOTATION_TYPE)) {
     tagged<quotation> quot(owner.as<quotation>());
     tagged<array> elements(quot->array);
-#ifdef FACTOR_DEBUG
+
     FACTOR_ASSERT(array_capacity(elements.untagged()) == 5);
     FACTOR_ASSERT(array_nth(elements.untagged(), 4) ==
                       special_objects[PIC_MISS_WORD] ||
                   array_nth(elements.untagged(), 4) ==
                       special_objects[PIC_MISS_TAIL_WORD]);
-#endif
+
     tagged<wrapper> word_wrapper(array_nth(elements.untagged(), 0));
     return word_wrapper->object;
   } else

@@ -65,18 +65,14 @@ template <typename Block> struct mark_bits {
     if (start.first == end.first)
       bits[start.first] |= start_mask ^ end_mask;
     else {
-#ifdef FACTOR_DEBUG
       FACTOR_ASSERT(start.first < bits_size);
-#endif
       bits[start.first] |= ~start_mask;
 
       for (cell index = start.first + 1; index < end.first; index++)
         bits[index] = (cell) - 1;
 
       if (end_mask != 0) {
-#ifdef FACTOR_DEBUG
         FACTOR_ASSERT(end.first < bits_size);
-#endif
         bits[end.first] |= end_mask;
       }
     }
@@ -99,9 +95,7 @@ template <typename Block> struct mark_bits {
   /* We have the popcount for every mark_bits_granularity entries; look
      up and compute the rest */
   Block* forward_block(const Block* original) {
-#ifdef FACTOR_DEBUG
     FACTOR_ASSERT(marked_p(original));
-#endif
     std::pair<cell, cell> position = bitmap_deref(original);
     cell offset = (cell) original & (data_alignment - 1);
 
@@ -111,9 +105,7 @@ template <typename Block> struct mark_bits {
     cell new_line_number =
         approx_popcount + popcount(marked[position.first] & mask);
     Block* new_block = (Block*)((char*)line_block(new_line_number) + offset);
-#ifdef FACTOR_DEBUG
     FACTOR_ASSERT(new_block <= original);
-#endif
     return new_block;
   }
 
