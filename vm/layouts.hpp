@@ -109,9 +109,7 @@ inline static bool immediate_p(cell obj) {
 }
 
 inline static fixnum untag_fixnum(cell tagged) {
-#ifdef FACTOR_DEBUG
   FACTOR_ASSERT(TAG(tagged) == FIXNUM_TYPE);
-#endif
   return ((fixnum) tagged) >> TAG_BITS;
 }
 
