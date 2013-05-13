@@ -205,7 +205,7 @@ struct call_frame_scrubber {
 
     FACTOR_ASSERT(return_address < owner->size());
     cell index = info->return_address_index(return_address);
-    if (index != (cell) - 1)
+    if (index != (cell)-1)
       ctx->scrub_stacks(info, index);
   }
 };

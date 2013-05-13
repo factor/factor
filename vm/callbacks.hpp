@@ -49,7 +49,7 @@ struct callback_heap {
   void update();
 
   code_block* next(code_block* stub) {
-    return (code_block*)((cell) stub + stub->size());
+    return (code_block*)((cell)stub + stub->size());
   }
 
   template <typename Iterator> void each_callback(Iterator& iter) {

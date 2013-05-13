@@ -1,9 +1,9 @@
 namespace factor {
 
 static const fixnum fixnum_max =
-    (((fixnum) 1 << (WORD_SIZE - TAG_BITS - 1)) - 1);
-static const fixnum fixnum_min = (-((fixnum) 1 << (WORD_SIZE - TAG_BITS - 1)));
-static const fixnum array_size_max = ((cell) 1 << (WORD_SIZE - TAG_BITS - 2));
+    (((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)) - 1);
+static const fixnum fixnum_min = (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)));
+static const fixnum array_size_max = ((cell)1 << (WORD_SIZE - TAG_BITS - 2));
 
 /* Allocates memory */
 inline cell factor_vm::from_signed_cell(fixnum x) {
@@ -15,7 +15,7 @@ inline cell factor_vm::from_signed_cell(fixnum x) {
 
 /* Allocates memory */
 inline cell factor_vm::from_unsigned_cell(cell x) {
-  if (x > (cell) fixnum_max)
+  if (x > (cell)fixnum_max)
     return tag<bignum>(cell_to_bignum(x));
   else
     return tag_fixnum(x);
@@ -42,18 +42,18 @@ inline double factor_vm::untag_float_check(cell tagged) {
 }
 
 inline fixnum factor_vm::float_to_fixnum(cell tagged) {
-  return (fixnum) untag_float(tagged);
+  return (fixnum)untag_float(tagged);
 }
 
 inline double factor_vm::fixnum_to_float(cell tagged) {
-  return (double) untag_fixnum(tagged);
+  return (double)untag_fixnum(tagged);
 }
 
 inline cell factor_vm::unbox_array_size() {
   cell obj = ctx->peek();
   if (TAG(obj) == FIXNUM_TYPE) {
     fixnum n = untag_fixnum(obj);
-    if (n >= 0 && n < (fixnum) array_size_max) {
+    if (n >= 0 && n < (fixnum)array_size_max) {
       ctx->pop();
       return n;
     }

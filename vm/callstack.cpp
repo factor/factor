@@ -31,7 +31,7 @@ cell factor_vm::capture_callstack(context* ctx) {
   void* top = second_from_top_stack_frame(ctx);
   void* bottom = ctx->callstack_bottom;
 
-  fixnum size = std::max((fixnum) 0, (fixnum) bottom - (fixnum) top);
+  fixnum size = std::max((fixnum)0, (fixnum)bottom - (fixnum)top);
 
   callstack* stack = allot_callstack(size);
   memcpy(stack->top(), top, size);
@@ -48,8 +48,8 @@ void factor_vm::primitive_callstack_for() {
 void* factor_vm::frame_predecessor(void* frame_top) {
   void* addr = frame_return_address((void*)frame_top);
   FACTOR_ASSERT(addr != 0);
-  code_block* owner = code->code_block_for_address((cell) addr);
-  cell frame_size = owner->stack_frame_size_for_address((cell) addr);
+  code_block* owner = code->code_block_for_address((cell)addr);
+  cell frame_size = owner->stack_frame_size_for_address((cell)addr);
   return (void*)((char*)frame_top + frame_size);
 }
 
@@ -99,14 +99,14 @@ void factor_vm::primitive_innermost_stack_frame_executing() {
   callstack* stack = untag_check<callstack>(ctx->peek());
   void* frame = stack->top();
   void* addr = frame_return_address(frame);
-  ctx->replace(code->code_block_for_address((cell) addr)->owner_quot());
+  ctx->replace(code->code_block_for_address((cell)addr)->owner_quot());
 }
 
 void factor_vm::primitive_innermost_stack_frame_scan() {
   callstack* stack = untag_check<callstack>(ctx->peek());
   void* frame = stack->top();
   void* addr = frame_return_address(frame);
-  ctx->replace(code->code_block_for_address((cell) addr)->scan(this, addr));
+  ctx->replace(code->code_block_for_address((cell)addr)->scan(this, addr));
 }
 
 void factor_vm::primitive_set_innermost_stack_frame_quot() {
@@ -120,7 +120,7 @@ void factor_vm::primitive_set_innermost_stack_frame_quot() {
 
   void* inner = stack->top();
   void* addr = frame_return_address(inner);
-  code_block* block = code->code_block_for_address((cell) addr);
+  code_block* block = code->code_block_for_address((cell)addr);
   cell offset = block->offset(addr);
   set_frame_return_address(inner, (char*)quot->entry_point + offset);
 }

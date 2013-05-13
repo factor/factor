@@ -3,8 +3,8 @@
 namespace factor {
 
 void factor_vm::init_card_decks() {
-  cards_offset = (cell) data->cards - addr_to_card(data->start);
-  decks_offset = (cell) data->decks - addr_to_deck(data->start);
+  cards_offset = (cell)data->cards - addr_to_card(data->start);
+  decks_offset = (cell)data->decks - addr_to_deck(data->start);
 }
 
 data_heap::data_heap(cell young_size_, cell aging_size_, cell tenured_size_) {

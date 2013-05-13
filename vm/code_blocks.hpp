@@ -75,7 +75,7 @@ struct code_block {
     return (gc_info*)((uint8_t*)this + size() - sizeof(gc_info));
   }
 
-  void flush_icache() { factor::flush_icache((cell) this, size()); }
+  void flush_icache() { factor::flush_icache((cell)this, size()); }
 
   template <typename Iterator> void each_instruction_operand(Iterator& iter) {
     if (to_boolean(relocation)) {

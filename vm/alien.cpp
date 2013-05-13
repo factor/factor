@@ -48,7 +48,7 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement) {
 
 /* Allocates memory */
 cell factor_vm::allot_alien(void* address) {
-  return allot_alien(false_object, (cell) address);
+  return allot_alien(false_object, (cell)address);
 }
 
 /* make an alien pointing at an offset of another alien */
@@ -73,7 +73,7 @@ void factor_vm::primitive_displaced_alien() {
 if the object is a byte array, as a sanity check. */
 /* Allocates memory (from_unsigned_cell can allocate) */
 void factor_vm::primitive_alien_address() {
-  ctx->replace(from_unsigned_cell((cell) pinned_alien_offset(ctx->peek())));
+  ctx->replace(from_unsigned_cell((cell)pinned_alien_offset(ctx->peek())));
 }
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
@@ -89,7 +89,7 @@ void* factor_vm::alien_pointer() {
   }                                                                     \
   VM_C_API void primitive_set_alien_##name(factor_vm * parent) {        \
     type* ptr = (type*)parent->alien_pointer();                         \
-    type value = (type) parent->to(parent->ctx->pop());                 \
+    type value = (type)parent->to(parent->ctx->pop());                  \
     *ptr = value;                                                       \
   }
 

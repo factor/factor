@@ -8,7 +8,7 @@ namespace factor {
   ((ucontext_t*)ucontext)->uc_mcontext.gp_regs[1]
 #define UAP_PROGRAM_COUNTER(ucontext) \
   (((ucontext_t*)ucontext)->uc_mcontext.gp_regs[32])
-#define UAP_SET_TOC_POINTER(uap, ptr) (void) 0
+#define UAP_SET_TOC_POINTER(uap, ptr) (void)0
 
 #define FACTOR_PPC_TOC 1
 

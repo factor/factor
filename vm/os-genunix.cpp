@@ -32,7 +32,7 @@ uint64_t nano_count() {
   int ret = clock_gettime(CLOCK_MONOTONIC, &t);
   if (ret != 0)
     fatal_error("clock_gettime failed", 0);
-  return (uint64_t) t.tv_sec * 1000000000 + t.tv_nsec;
+  return (uint64_t)t.tv_sec * 1000000000 + t.tv_nsec;
 }
 
 }

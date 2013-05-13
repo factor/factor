@@ -12,7 +12,7 @@ struct to_tenured_policy {
   }
 
   void promoted_object(object* obj) {
-    parent->mark_stack.push_back((cell) obj);
+    parent->mark_stack.push_back((cell)obj);
   }
 
   void visited_object(object* obj) {}

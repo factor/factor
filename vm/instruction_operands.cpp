@@ -7,7 +7,7 @@ instruction_operand::instruction_operand(relocation_entry rel,
     : rel(rel),
       compiled(compiled),
       index(index),
-      pointer((cell) compiled->entry_point() + rel.rel_offset()) {}
+      pointer((cell)compiled->entry_point() + rel.rel_offset()) {}
 
 /* Load a 32-bit value from a PowerPC LIS/ORI sequence */
 fixnum instruction_operand::load_value_2_2() {
@@ -25,7 +25,7 @@ fixnum instruction_operand::load_value_2_2_2_2() {
   uint64_t lhi = (ptr[-2] & 0xffff);
   uint64_t llo = (ptr[-1] & 0xffff);
   uint64_t val = hhi << 48 | hlo << 32 | lhi << 16 | llo;
-  return (cell) val;
+  return (cell)val;
 }
 
 /* Load a value from a bitfield of a PowerPC instruction */
@@ -33,7 +33,7 @@ fixnum instruction_operand::load_value_masked(cell mask, cell bits,
                                               cell shift) {
   int32_t* ptr = (int32_t*)(pointer - sizeof(uint32_t));
 
-  return (((*ptr & (int32_t) mask) << bits) >> bits) << shift;
+  return (((*ptr & (int32_t)mask) << bits) >> bits) << shift;
 }
 
 fixnum instruction_operand::load_value(cell relative_to) {
@@ -115,10 +115,10 @@ void instruction_operand::store_value(fixnum absolute_value) {
       *(cell*)(pointer - sizeof(cell)) = absolute_value;
       break;
     case RC_ABSOLUTE:
-      *(uint32_t*)(pointer - sizeof(uint32_t)) = (uint32_t) absolute_value;
+      *(uint32_t*)(pointer - sizeof(uint32_t)) = (uint32_t)absolute_value;
       break;
     case RC_RELATIVE:
-      *(int32_t*)(pointer - sizeof(int32_t)) = (int32_t) relative_value;
+      *(int32_t*)(pointer - sizeof(int32_t)) = (int32_t)relative_value;
       break;
     case RC_ABSOLUTE_PPC_2_2:
       store_value_2_2(absolute_value);
@@ -144,10 +144,10 @@ void instruction_operand::store_value(fixnum absolute_value) {
                          0);
       break;
     case RC_ABSOLUTE_2:
-      *(uint16_t*)(pointer - sizeof(uint16_t)) = (uint16_t) absolute_value;
+      *(uint16_t*)(pointer - sizeof(uint16_t)) = (uint16_t)absolute_value;
       break;
     case RC_ABSOLUTE_1:
-      *(uint8_t*)(pointer - sizeof(uint8_t)) = (uint8_t) absolute_value;
+      *(uint8_t*)(pointer - sizeof(uint8_t)) = (uint8_t)absolute_value;
       break;
     case RC_ABSOLUTE_PPC_2_2_2_2:
       store_value_2_2_2_2(absolute_value);
@@ -159,7 +159,7 @@ void instruction_operand::store_value(fixnum absolute_value) {
 }
 
 void instruction_operand::store_code_block(code_block* compiled) {
-  store_value((cell) compiled->entry_point());
+  store_value((cell)compiled->entry_point());
 }
 
 }
