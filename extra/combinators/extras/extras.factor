@@ -1,7 +1,8 @@
 ! Copyright (C) 2013 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators fry kernel macros quotations
-sequences sequences.generalizations ;
+USING: arrays combinators combinators.smart fry generalizations
+kernel macros math quotations sequences
+sequences.generalizations ;
 IN: combinators.extras
 
 : once ( quot -- ) call ; inline
@@ -27,3 +28,10 @@ MACRO: cleave-array ( quots -- )
 
 : keepd ( ..a x y quot: ( ..a x y -- ..b ) -- ..b x )
     2keep drop ; inline
+
+: plox ( ... x/f quot: ( ... x -- ... ) -- ... )
+    dupd when ; inline
+
+MACRO: smart-plox ( true -- )
+    [ inputs [ 1 - [ and ] n*quot ] keep ] keep swap
+    '[ _ _ [ _ ndrop f ] smart-if ] ;
