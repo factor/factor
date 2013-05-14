@@ -224,7 +224,7 @@ IN: math.matrices
 GENERIC: square-rows ( object -- matrix )
 M: integer square-rows iota square-rows ;
 M: sequence square-rows
-    >array [ length ] keep [ clone ] curry { } replicate-as ;
+    [ length ] keep >array '[ _ clone ] { } replicate-as ;
 
 GENERIC: square-cols ( object -- matrix )
 M: integer square-cols iota square-cols ;
