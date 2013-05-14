@@ -167,7 +167,7 @@ IN: math.matrices
 : norm-gram-schmidt ( seq -- orthonormal )
     gram-schmidt [ normalize ] map ;
 
-: m^n ( m n -- n ) 
+: m^n ( m n -- n )
     make-bits over first length identity-matrix
     [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;
 
@@ -197,7 +197,6 @@ IN: math.matrices
 
 : set-indices ( object sequence matrix -- )
     '[ _ set-index ] with each ; inline
-    
 
 : matrix-map ( matrix quot -- )
     '[ _ map ] map ; inline
@@ -224,24 +223,24 @@ IN: math.matrices
 
 GENERIC: square-rows ( object -- matrix )
 M: integer square-rows iota square-rows ;
-M: sequence square-rows dup [ nip ] cartesian-map ; 
+M: sequence square-rows
+    >array [ length ] keep [ clone ] curry { } replicate-as ;
 
 GENERIC: square-cols ( object -- matrix )
 M: integer square-cols iota square-cols ;
-M: sequence square-cols dup [ drop ] cartesian-map ; 
+M: sequence square-cols
+    [ length ] keep [ <array> ] with { } map-as ;
 
 : make-matrix-with-indices ( m n quot -- matrix )
     [ [ iota ] bi@ ] dip '[ @ ] cartesian-map ; inline
 
-: null-matrix? ( matrix -- ? ) empty? ;
+: null-matrix? ( matrix -- ? ) empty? ; inline
 
 : well-formed-matrix? ( matrix -- ? )
-    dup null-matrix? [
-        drop t
-    ] [
+    [ t ] [
         [ ] [ first length ] bi
         '[ length _ = ] all?
-    ] if ;
+    ] if-empty ;
 
 : dim ( matrix -- pair/f )
     [ 2 0 <array> ]
@@ -261,7 +260,6 @@ M: sequence square-cols dup [ drop ] cartesian-map ;
 
 : lower-matrix-indices ( matrix -- matrix' )
     dimension-range [ head-slice >array ] 2map concat ;
-
 
 : make-lower-matrix ( object m n -- matrix )
     zero-matrix [ lower-matrix-indices ] [ set-indices ] [ ] tri ;
