@@ -4,14 +4,18 @@ furnace.auth.login
 furnace.auth.providers
 furnace.auth.providers.db tools.test
 namespaces db db.sqlite db.tuples continuations
-io.files io.files.temp io.directories accessors kernel ;
+io.files io.files.temp io.directories accessors kernel
+sequences system ;
 IN: furnace.auth.providers.db.tests
 
 <action> "test" <login-realm> realm set
 
-[ "auth-test.db" temp-file delete-file ] ignore-errors
+: auth-test-db-name ( -- string )
+    cpu name>> "auth-test." ".db" surround ;
 
-"auth-test.db" temp-file <sqlite-db> [
+[ auth-test-db-name temp-file delete-file ] ignore-errors
+
+auth-test-db-name temp-file <sqlite-db> [
 
     user ensure-table
 
