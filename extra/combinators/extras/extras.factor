@@ -24,3 +24,6 @@ MACRO: cleave-array ( quots -- )
 
 : 3bi@ ( u v w x y z quot -- )
     dup 3bi* ; inline
+
+: keepd ( ..a x y quot: ( ..a x y -- ..b ) -- ..b x )
+    2keep drop ; inline

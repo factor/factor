@@ -27,3 +27,5 @@ IN: combinators.extras.tests
 { 2 15 } [ 1 2 3 4 5 6 [ - - ] [ + + ] 3bi* ] unit-test
 
 { 2 5 } [ 1 2 3 4 5 6 [ - - ] 3bi@ ] unit-test
+
+{ 3 1 } [ 1 2 [ + ] keepd ] unit-test
