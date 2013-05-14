@@ -98,6 +98,15 @@ MACRO: printf ( format-string -- )
 : sprintf ( format-string -- result )
     [ printf ] with-string-writer ; inline
 
+: vprintf ( seq format-string -- )
+    parse-printf reverse! [
+        first dup string?
+        [ '[ _ write ] ] [ '[ unclip-slice @ write ] ] if
+    ] map concat call( x -- x ) drop ;
+
+: vsprintf ( seq format-string -- result )
+    [ vprintf ] with-string-writer ; inline
+
 <PRIVATE
 
 : pad-00 ( n -- string ) number>string 2 CHAR: 0 pad-head ; inline
