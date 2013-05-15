@@ -40,6 +40,10 @@ HELP: <permutations>
 { $values { "seq" sequence } { "permutations" sequence } }
 { $description "An efficient sequence containing the lexicographical permutations of " { $snippet "seq" } "." } ;
 
+HELP: <k-permutations>
+{ $values { "seq" sequence } { "k" integer } { "permutations" sequence } }
+{ $description "An efficient sequence containing the " { $snippet "k" } " lexicographical permutations of " { $snippet "seq" } "." } ;
+
 HELP: all-permutations
 { $values { "seq" sequence } { "seq'" sequence } }
 { $description "Outputs a sequence containing all permutations of " { $snippet "seq" } " in lexicographical order." }
