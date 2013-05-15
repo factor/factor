@@ -1,9 +1,9 @@
 ! Copyright (c) 2007-2010 Slava Pestov, Doug Coleman, Aaron Schaefer, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs binary-search classes.tuple fry
-hints kernel locals math math.order math.ranges memoize
-namespaces sequences sequences.private sorting ;
+USING: accessors arrays assocs binary-search classes.tuple
+combinators fry hints kernel locals math math.order math.ranges
+memoize namespaces sequences sequences.private sorting ;
 FROM: sequences => change-nth ;
 IN: math.combinatorics
 
@@ -70,9 +70,11 @@ TUPLE: k-permutations length skip k seq ;
 :: <k-permutations> ( seq k -- permutations )
     seq length :> n
     n k nPk :> len
-    len zero? k zero? or [ { } ] [
-        len n factorial over /i k seq k-permutations boa
-    ] if ;
+    {
+        { [ len k [ zero? ] either? ] [ { } ] }
+        { [ n k = ] [ seq <permutations> ] }
+        [ len n factorial over /i k seq k-permutations boa ]
+    } cond ;
 
 M: k-permutations length length>> ; inline
 M: k-permutations nth-unsafe
