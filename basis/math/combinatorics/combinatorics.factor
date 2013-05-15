@@ -65,6 +65,24 @@ M: permutations hashcode* tuple-hashcode ;
 
 INSTANCE: permutations immutable-sequence
 
+TUPLE: k-permutations length skip k seq ;
+
+:: <k-permutations> ( seq k -- permutations )
+    seq length :> n
+    n k nPk :> len
+    len zero? k zero? or [ { } ] [
+        len n factorial over /i k seq k-permutations boa
+    ] if ;
+
+M: k-permutations length length>> ; inline
+M: k-permutations nth-unsafe
+    [ skip>> * ]
+    [ seq>> [ permutation-indices ] keep ]
+    [ k>> swap [ head ] dip nths-unsafe ] tri ;
+M: k-permutations hashcode* tuple-hashcode ;
+
+INSTANCE: k-permutations immutable-sequence
+
 DEFER: next-permutation
 
 <PRIVATE
