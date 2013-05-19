@@ -179,7 +179,7 @@ M: process cancel-operation kill-process ;
 
 M: object run-pipeline-element
     [ >process swap >>stdout swap >>stdin run-detached ]
-    [ drop [ [ dispose ] when* ] bi@ ]
+    [ [ drop [ [ &dispose drop ] when* ] bi@ ] with-destructors ]
     3bi
     wait-for-process ;
 
