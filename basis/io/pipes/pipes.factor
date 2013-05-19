@@ -9,7 +9,10 @@ IN: io.pipes
 TUPLE: pipe in out ;
 
 M: pipe dispose ( pipe -- )
-    [ in>> dispose ] [ out>> dispose ] bi ;
+    [
+        [ in>> &dispose drop ]
+        [ out>> &dispose drop ] bi
+    ] with-destructors ;
 
 HOOK: (pipe) io-backend ( -- pipe )
 
