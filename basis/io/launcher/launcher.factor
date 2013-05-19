@@ -233,15 +233,15 @@ PRIVATE>
 : <process-stream*> ( desc encoding -- stream process )
     [
         [
-            (pipe) (pipe) {
-                [ [ |dispose drop ] bi@ ]
+            (pipe) |dispose
+            (pipe) |dispose {
                 [
                     rot >process
                         [ swap in>> or ] change-stdin
                         [ swap out>> or ] change-stdout
                     run-detached
                 ]
-                [ [ out>> dispose ] [ in>> dispose ] bi* ]
+                [ [ out>> &dispose drop ] [ in>> &dispose drop ] bi* ]
                 [ [ in>> <input-port> ] [ out>> <output-port> ] bi* ]
             } 2cleave
         ] dip <encoder-duplex> swap
