@@ -146,6 +146,10 @@ PRIVATE>
 
 : tweet ( string -- ) (tweet) drop ;
 
+: verify-credentials ( -- foo )
+    "1.1/account/verify_credentials.json" twitter-url
+    <get-request> twitter-request json> ;
+
 ! Timelines
 <PRIVATE
 
