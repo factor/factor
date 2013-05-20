@@ -331,8 +331,7 @@ PRIVATE>
 
 : but-last ( seq -- headseq ) 1 head* ;
 
-: copy ( src i dst -- )
-    check-copy copy-unsafe ; inline
+: copy ( src i dst -- ) check-copy copy-unsafe ; inline
 
 M: sequence clone-like
     [ dup length ] dip new-sequence [ 0 swap copy-unsafe ] keep ; inline
@@ -524,14 +523,21 @@ PRIVATE>
 : push-if ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
 
+<PRIVATE
+
+: (selector-for) ( quot length exemplar -- selector accum )
+    new-resizable [ [ push-if ] 2curry ] keep ; inline
+
+PRIVATE>
+
 : selector-for ( quot exemplar -- selector accum )
-    [ length ] keep new-resizable [ [ push-if ] 2curry ] keep ; inline
+    [ length ] keep (selector-for) ; inline
 
 : selector ( quot -- selector accum )
     V{ } selector-for ; inline
 
 : filter-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... subseq )
-    dup [ selector-for [ each ] dip ] curry dip like ; inline
+    pick length over [ (selector-for) [ each ] dip ] 2curry dip like ; inline
 
 : filter ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over filter-as ; inline
