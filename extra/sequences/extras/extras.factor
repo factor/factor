@@ -21,7 +21,7 @@ IN: sequences.extras
 :: combos ( list1 list2 -- result )
     list2 [ [ 2array ] curry list1 swap map ] map concat ;
 
-: find-all ( seq quot -- elts )
+: find-all ( seq quot: ( elt -- ? ) -- elts )
     [ [ length iota ] keep ] dip
     [ dupd call( a -- ? ) [ 2array ] [ 2drop f ] if ] curry
     2map [ ] filter ; inline
@@ -41,9 +41,9 @@ IN: sequences.extras
         :> from
         from len (a,b] [
             :> to
-            from to seq subseq quot call( x -- )
+            from to seq subseq quot call
         ] each
-    ] each ;
+    ] each ; inline
 
 : subseq-as ( from to seq exemplar -- subseq )
     [ check-slice subseq>copy (copy) ] dip like ;
@@ -85,11 +85,18 @@ IN: sequences.extras
 : push-if-index ( ..a elt i quot: ( ..a elt i -- ..b ? ) accum -- ..b )
     [ 2keep drop ] dip rot [ push ] [ 2drop ] if ; inline
 
+<PRIVATE
+
+: (index-selector-for) ( quot length exampler -- selector accum )
+    new-resizable [ [ push-if-index ] 2curry ] keep ; inline
+
+PRIVATE>
+
 : index-selector-for ( quot exemplar -- selector accum )
-    [ length ] keep new-resizable [ [ push-if-index ] 2curry ] keep ; inline
+    [ length ] keep (index-selector-for) ; inline
 
 : filter-index-as ( ... seq quot: ( ... elt i -- ... ? ) exemplar -- ... seq' )
-    dup [ index-selector-for [ each-index ] dip ] curry dip like ; inline
+    pick length over [ (index-selector-for) [ each-index ] dip ] 2curry dip like ; inline
 
 : filter-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... seq' )
     over filter-index-as ; inline
