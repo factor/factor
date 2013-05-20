@@ -52,11 +52,11 @@ M: disposable dispose
         bi
     ] unless-disposed ;
 
-: dispose, ( obj -- )
-    [ dispose ] curry [ , ] recover ; inline
+: dispose-to ( obj accum -- )
+    [ dispose ] [ push ] bi-curry* recover ; inline
 
 : dispose-each ( seq -- )
-    [ [ dispose, ] each ] { } make
+    V{ } clone [ [ dispose-to ] curry each ] keep
     [ last rethrow ] unless-empty ;
 
 : with-disposal ( object quot -- )
