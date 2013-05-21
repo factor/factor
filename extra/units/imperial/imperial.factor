@@ -65,7 +65,7 @@ ALIAS: perches rods
 
 DEFER: imperial-fluid-ounces
 
-: minims ( n -- dimensioned ) 1/480 imperial-fluid-ounces ;
+: minims ( n -- dimensioned ) 1/480 * imperial-fluid-ounces ;
 
 : apothecary-fluid-scruples ( n -- dimensioned ) 20 * minims ;
 
