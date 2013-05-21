@@ -95,6 +95,9 @@ PRIVATE>
 : index-selector-for ( quot exemplar -- selector accum )
     [ length ] keep (index-selector-for) ; inline
 
+: index-selector ( quot -- selector accum )
+    V{ } index-selector-for ; inline
+
 : filter-index-as ( ... seq quot: ( ... elt i -- ... ? ) exemplar -- ... seq' )
     pick length over [ (index-selector-for) [ each-index ] dip ] 2curry dip like ; inline
 
