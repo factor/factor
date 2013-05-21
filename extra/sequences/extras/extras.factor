@@ -146,17 +146,23 @@ PRIVATE>
 : all-rotations ( seq -- seq' )
     dup length iota [ rotate ] with map ;
 
-: appender-for ( quot exemplar -- quot' vec )
-    [ length ] keep new-resizable
-    [ [ push-all ] curry compose ] keep ; inline
+<PRIVATE
 
-: appender ( quot -- quot' vec )
+: (appender-for) ( quot length exemplar -- appender accum )
+    new-resizable [ [ push-all ] curry compose ] keep ; inline
+
+PRIVATE>
+
+: appender-for ( quot exemplar -- appender accum )
+    [ length ] keep (appender-for) ; inline
+
+: appender ( quot -- appender accum )
     V{ } appender-for ; inline
 
 : map-concat-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    dup [ appender-for [ each ] dip ] curry dip like ; inline
+    pick length over [ (appender-for) [ each ] dip ] 2curry dip like ; inline
 
-: >resizable ( seq -- vec ) ! fixes map-concat "cannot apply call to run-time..."
+: >resizable ( seq -- accum ) ! fixes map-concat "cannot apply call to run-time..."
     [ length ] keep [ new-resizable ] [ over push-all ] bi ;
 
 : map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
@@ -168,7 +174,8 @@ PRIVATE>
     ] if-empty ; inline
 
 : map-filter-as ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) exemplar -- ... subseq )
-    dup [ selector-for [ compose each ] dip ] curry dip like ; inline
+    [ pick ] dip swap length over
+    [ (selector-for) [ compose each ] dip ] 2curry dip like ; inline
 
 : map-filter ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) -- ... subseq )
     pick map-filter-as ; inline
@@ -200,16 +207,20 @@ PRIVATE>
 : push-map-if ( ..a elt filter-quot: ( ..a elt -- ..b ? ) map-quot: ( ..a elt -- ..b newelt ) accum -- ..b )
     [ keep over ] 2dip [ when ] dip rot [ push ] [ 2drop ] if ; inline
 
-: filter-mapper-for ( filter-quot map-quot exemplar -- quot' vec )
-    [ length ] keep new-resizable [ [ push-map-if ] 3curry ] keep ; inline
+: (filter-mapper-for) ( filter-quot map-quot length exempler -- filter-mapper accum )
+    new-resizable [ [ push-map-if ] 3curry ] keep ; inline
 
-: filter-mapper ( filter-quot map-quot -- quot' vec )
+: filter-mapper-for ( filter-quot map-quot exemplar -- filter-mapper accum )
+    [ length ] keep (filter-mapper-for) ; inline
+
+: filter-mapper ( filter-quot map-quot -- filter-mapper accum )
     V{ } filter-mapper-for ; inline
 
 PRIVATE>
 
 : filter-map-as ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    dup [ filter-mapper-for [ each ] dip ] curry dip like ; inline
+    [ pick ] dip swap length over
+    [ (filter-mapper-for) [ each ] dip ] 2curry dip like ; inline
 
 : filter-map ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) -- ... newseq )
     pick filter-map-as ; inline
