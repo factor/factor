@@ -156,3 +156,9 @@ IN: sequences.extras.tests
 
 { t 3 3 } [ 10 iota [ [ odd? ] [ 1 > ] bi* and ] map-find-index ] unit-test
 { f f f } [ 10 iota [ [ odd? ] [ 9 > ] bi* and ] map-find-index ] unit-test
+
+{ "abcdef" } [ f f "abcdef" subseq* ] unit-test
+{ "abcdef" } [ 0 f "abcdef" subseq* ] unit-test
+{ "ab" } [ f 2 "abcdef" subseq* ] unit-test
+{ "cdef" } [ 2 f "abcdef" subseq* ] unit-test
+{ "cd" } [ -4 -2 "abcdef" subseq* ] unit-test
