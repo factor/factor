@@ -32,6 +32,15 @@ IN: sequences.extras
 : reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) i -- ... result )
     [ swap ] 2dip each-from ; inline
 
+:: subseq* ( from to seq -- subseq )
+    seq length :> len
+    from [ dup 0 < [ len + ] when ] [ 0 ] if*
+    to [ dup 0 < [ len + ] when ] [ len ] if*
+    [ 0 len clamp ] bi@ dupd max seq subseq ;
+
+: safe-subseq ( from to seq -- subseq )
+    [ length '[ 0 _ clamp ] bi@ ] keep subseq ;
+
 : all-subseqs ( seq -- seqs )
     dup length [1,b] [ clump ] with map concat ;
 
