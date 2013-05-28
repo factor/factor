@@ -17,61 +17,7 @@ IN: tools.disassembler.udis
 
 LIBRARY: libudis86
 
-STRUCT: ud_operand
-    { type int }
-    { size uchar }
-    { lval ulonglong }
-    { base int }
-    { index int }
-    { offset uchar }
-    { scale uchar } ;
-
-STRUCT: ud
-    { inp_hook void* }
-    { inp_curr uchar }
-    { inp_fill uchar }
-    { inp_file void* }
-    { inp_ctr uchar }
-    { inp_buff c-string }
-    { inp_buff_end c-string }
-    { inp_end uchar }
-    { translator void* }
-    { insn_offset ulonglong }
-    { insn_hexcode char[32] }
-    { insn_buffer char[64] }
-    { insn_fill uint }
-    { dis_mode uchar }
-    { pc ulonglong }
-    { vendor uchar }
-    { mapen void* }
-    { mnemonic int }
-    { operand ud_operand[3] }
-    { error uchar }
-    { pfx_rex uchar }
-    { pfx_seg uchar }
-    { pfx_opr uchar }
-    { pfx_adr uchar }
-    { pfx_lock uchar }
-    { pfx_rep uchar }
-    { pfx_repe uchar }
-    { pfx_repne uchar }
-    { pfx_insn uchar }
-    { default64 uchar }
-    { opr_mode uchar }
-    { adr_mode uchar }
-    { br_far uchar }
-    { br_near uchar }
-    { implicit_addr uchar }
-    { c1 uchar }
-    { c2 uchar }
-    { c3 uchar }
-    { inp_cache uchar[256] }
-    { inp_sess uchar[64] }
-    { have_modrm uchar }
-    { modrm uchar }
-    { user_opaque_data void* }
-    { itab_entry void* }
-    { le void* } ;
+TYPEDEF: void ud
 
 FUNCTION: void ud_translate_intel ( ud* u ) ;
 FUNCTION: void ud_translate_att ( ud* u ) ;
@@ -102,7 +48,7 @@ FUNCTION: uint ud_insn_len ( ud* u ) ;
 FUNCTION: c-string ud_lookup_mnemonic ( int c ) ;
 
 : <ud> ( -- ud )
-    ud malloc-struct &free
+    1,000 malloc &free
     dup ud_init
     dup cell-bits ud_set_mode
     dup UD_SYN_INTEL ud_set_syntax ;
