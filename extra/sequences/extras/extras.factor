@@ -174,8 +174,8 @@ PRIVATE>
 : map-concat-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
     [ appender-for [ each ] dip ] keep like ; inline
 
-: >resizable ( seq -- accum )
-    [ length ] keep [ new-resizable ] [ over push-all ] bi ; inline
+: >resizable ( seq -- accum ) ! fixes map-concat "cannot apply call to run-time..."
+    [ length ] keep [ new-resizable ] [ over push-all ] bi ;
 
 : map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over empty? [ 2drop { } ] [
