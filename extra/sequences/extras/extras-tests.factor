@@ -59,6 +59,8 @@ IN: sequences.extras.tests
 { "abc" } [ "abc" [ 1string ] map-concat ] unit-test
 { "abc" } [ { 97 98 99 } [ 1string ] map-concat ] unit-test
 { { 97 98 99 } } [ "abc" [ 1string ] { } map-concat-as ] unit-test
+{ "baz" { "foobaz" "barbaz" } }
+[ "baz" { { "foo" } { "bar" } } [ [ over append ] map ] map-concat ] unit-test
 
 { { } } [ { } [ ] [ even? ] map-filter ] unit-test
 { "bcde" } [ "abcd" [ 1 + ] [ drop t ] map-filter ] unit-test
