@@ -172,18 +172,18 @@ PRIVATE>
     V{ } appender-for ; inline
 
 : map-concat-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    pick length over [ (appender-for) [ each ] dip ] 2curry dip like ; inline
+    [ appender-for [ each ] dip ] keep like ; inline
 
-: >resizable ( seq -- accum ) ! fixes map-concat "cannot apply call to run-time..."
-    [ length ] keep [ new-resizable ] [ over push-all ] bi ;
+: >resizable ( seq -- accum )
+    [ length ] keep [ new-resizable ] [ over push-all ] bi ; inline
 
 : map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
-    over [ 2drop { } ] [
-        first over call dup [
+    over empty? [ 2drop { } ] [
+        [ [ first ] dip call ] 2keep rot dup [
             >resizable [ [ push-all ] curry compose ] keep
             [ 1 ] 3dip [ (each) (each-integer) ] dip
         ] curry dip like
-    ] if-empty ; inline
+    ] if ; inline
 
 : map-filter-as ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) exemplar -- ... subseq )
     [ pick ] dip swap length over
