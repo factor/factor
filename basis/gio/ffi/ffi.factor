@@ -13,7 +13,8 @@ LIBRARY: gio
 <<
 "gio" {
     { [ os windows? ] [ "libgio-2.0-0.dll" cdecl add-library ] }
-    { [ os unix? ] [ drop ] }
+    { [ os macosx? ] [ "libgio-2.0.dylib" cdecl add-library ] }
+    { [ os unix? ] [ "libgio-2.0.so" cdecl add-library ] }
 } cond
 >>
 
