@@ -631,6 +631,7 @@ LIBRARY: gl
 
 <<
 "gl" {
+    { [ os windows? ] [ drop ] }
     { [ os macosx? ] [ drop ] }
     { [ os unix? ] [ "libGL.so" cdecl add-library ] }
 } cond
