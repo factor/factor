@@ -8,10 +8,10 @@ IN: cairo.ffi
 
 ! Adapted from cairo.h, version 1.8.10
 
-<< {
-    { [ os windows? ] [ "cairo" "libcairo-2.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "cairo" "libcairo.dylib" cdecl add-library ] }
-    { [ os unix? ] [ ] }
+<< "cairo" {
+    { [ os windows? ] [ "libcairo-2.dll" cdecl add-library ] }
+    { [ os macosx? ] [ "libcairo.dylib" cdecl add-library ] }
+    { [ os unix? ] [ "libcairo.so" cdecl add-library ] }
 } cond >>
 
 LIBRARY: cairo
