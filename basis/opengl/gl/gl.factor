@@ -3,8 +3,9 @@
 
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 
-USING: alien alien.c-types alien.syntax combinators kernel parser
-sequences system words opengl.gl.extensions io.encodings.ascii ;
+USING: alien alien.c-types alien.libraries alien.syntax
+combinators kernel parser sequences system words
+opengl.gl.extensions io.encodings.ascii ;
 FROM: alien.c-types => short ;
 IN: opengl.gl
 
@@ -627,6 +628,13 @@ CONSTANT: GL_ALL_CLIENT_ATTRIB_BITS         0xFFFFFFFF
 CONSTANT: GL_CLIENT_ALL_ATTRIB_BITS         0xFFFFFFFF
 
 LIBRARY: gl
+
+<<
+"gl" {
+    { [ os macosx? ] [ drop ] }
+    { [ os unix? ] [ "libGL.so" cdecl add-library ] }
+} cond
+>>
 
 ! Miscellaneous
 
