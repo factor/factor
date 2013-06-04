@@ -14,8 +14,9 @@ LIBRARY: pango
 << 
 "pango" {
     { [ os windows? ] [ "libpango-1.0-0.dll" cdecl add-library ] }
-    { [ os unix? ] [ drop ] }
-} cond 
+    { [ os macosx? ] [ drop ] }
+    { [ os unix? ] [ "libpango-1.0.so" cdecl add-library ] }
+} cond
 >>
 
 IMPLEMENT-STRUCTS: PangoRectangle ;
