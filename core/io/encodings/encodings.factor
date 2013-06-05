@@ -86,6 +86,8 @@ M: decoder stream-element-type
 M: decoder stream-read1 ( decoder -- ch )
     dup (read1) fix-cr ; inline
 
+M: decoder stream-tell stream>> stream-tell ;
+
 : (read-first) ( n buf decoder -- buf stream encoding n c )
     [ rot [ >decoder< ] dip 2over decode-char ]
     [ swap fix-cr ] bi ; inline
