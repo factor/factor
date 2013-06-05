@@ -62,7 +62,6 @@ PRIVATE>
     [ <reversed> ] bi@ split1-slice [ <reversed> ] bi@
     [ f ] [ swap ] if-empty ;
 
-DEFER: join-as
 : replace ( seq old new -- new-seq )
     pick [ [ split-subseq ] dip ] dip join-as ;
 
