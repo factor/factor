@@ -19,8 +19,6 @@ CONSTANT: ACCOUNTING 9
 CONSTANT: SIGNATURE 10
 CONSTANT: SHUTDOWN_TIME 11
 
-C-TYPE: utmpx
-
 FUNCTION: void setutxent ( ) ;
 FUNCTION: void endutxent ( ) ;
 FUNCTION: utmpx* getutxent ( ) ;
@@ -41,8 +39,7 @@ M: unix new-utmpx-record
     utmpx-record new ;
     
 M: unix utmpx>utmpx-record ( utmpx -- utmpx-record )
-    [ new-utmpx-record ] dip
-    {
+    [ new-utmpx-record ] dip {
         [ ut_user>> _UTX_USERSIZE memory>string >>user ]
         [ ut_id>>   _UTX_IDSIZE memory>string >>id ]
         [ ut_line>> _UTX_LINESIZE memory>string >>line ]
@@ -61,7 +58,3 @@ M: unix utmpx>utmpx-record ( utmpx -- utmpx-record )
         [ utmpx>utmpx-record ]
         produce nip
     ] with-utmpx ;
-    
-os {
-    { macosx [ "unix.utmpx.macosx" require ] }
-} case

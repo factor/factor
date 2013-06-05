@@ -277,3 +277,25 @@ CONSTANT: SIGPWR          30
 CONSTANT: SIGSYS          31
 
 FUNCTION: ssize_t sendfile ( int out_fd, int in_fd, off_t* offset, size_t count ) ;
+
+
+CONSTANT: __UT_LINESIZE 32
+CONSTANT: __UT_NAMESIZE 32
+CONSTANT: __UT_HOSTSIZE 256
+
+STRUCT: exit_status
+    { e_termination short }
+    { e_exit short } ;
+
+STRUCT: utmpx
+    { ut_type short }
+    { ut_pid pid_t }
+    { ut_line short }
+    { ut_id short }
+    { ut_user short }
+    { ut_host short }
+    { ut_exit exit_status }
+    { ut_session long }
+    { ut_tv timeval }
+    { ut_addr_v6 int[4] }
+    { __unused char[20] } ;
