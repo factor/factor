@@ -1,6 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax classes.struct unix.types ;
+USING: alien.c-types alien.syntax classes.struct unix.time
+unix.types ;
 IN: unix.ffi
 
 CONSTANT: MAXPATHLEN 1024
@@ -290,10 +291,10 @@ STRUCT: exit_status
 STRUCT: utmpx
     { ut_type short }
     { ut_pid pid_t }
-    { ut_line short }
-    { ut_id short }
-    { ut_user short }
-    { ut_host short }
+    { ut_line char[__UT_LINESIZE] }
+    { ut_id char[4] }
+    { ut_user char[__UT_NAMESIZE] }
+    { ut_host char[__UT_HOSTSIZE] }
     { ut_exit exit_status }
     { ut_session long }
     { ut_tv timeval }
