@@ -19,30 +19,30 @@ IN: math.decimal
 : truncate* ( n p -- n' )
     /decmod drop ;
 
+: incr ( n p -- m )
+    dupd [ sgn ] [ 1/10^ ] bi* * + ;
+
 <PRIVATE
 
 : lsd-odd? ( n p -- ? )
     dup 0 <=> { 
-        { +gt+ [ decmod >fraction drop odd? ] }
+        { +gt+ [ drop numerator odd? ] }
         { +lt+ [ abs 10^ /i odd? ] }
-        { +eq+ [ drop odd? ] }
+        { +eq+ [ drop odd? ] } 
     } case ;
 
 : msd ( rem p -- d )
     1 + 10^ * 1 /i abs ;
-   
-:: round-half-to-even ( q p -- q' )
-    p 1/10^ :> pd
-    q p lsd-odd? 
-        [ q 0 > [ q pd + ] [ q pd - ] if ]
-        [ q ] if ;
+    
+: round-half-to-even ( n p -- q' )
+    2dup lsd-odd? [ incr ] [ drop ] if ;
 
 PRIVATE>
         
 :: round* ( n p -- q )   
     n p /decmod :> ( q r )
     r p msd 5 <=>
-    { { +gt+ [ q p 1/10^ + ] }
+    { { +gt+ [ q p incr ] }
       { +lt+ [ q ] }
       { +eq+ [ q p round-half-to-even ] }
-    } case ; 
+    } case ;
