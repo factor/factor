@@ -24,6 +24,7 @@ FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response ) ;
 : system-version-bugfix ( -- n ) "sys3" be> gestalt ;
 
 CONSTANT: system-code-names H{
+    { 0x1090 "Mavericks" }
     { 0x1080 "Mountain Lion" }
     { 0x1070 "Lion" }
     { 0x1060 "Snow Leopard" }
