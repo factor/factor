@@ -19,10 +19,10 @@ IN: math.decimal
 : truncate* ( n p -- n' )
     /decmod drop ;
 
+<PRIVATE
+
 : incr ( n p -- m )
     dupd [ sgn ] [ 1/10^ ] bi* * + ;
-
-<PRIVATE
 
 : lsd-odd? ( n p -- ? )
     dup 0 <=> { 
