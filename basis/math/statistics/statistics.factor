@@ -158,21 +158,21 @@ PRIVATE>
 ! could subtract 1 from a
 
 : quantile-x ( a b N q -- x )
-    [ + ] dip * + 1 [-] ; inline
+    [ + ] dip * + 1 - ; inline
 
 ! 2+1/4 frac is 1/4
 : frac ( x -- x' )
     >fraction [ /mod nip ] keep / ; inline
 
-:: quantile-indices ( seq qs a b c d -- seq )
+:: quantile-indices ( seq qs a b -- seq )
     qs [ [ a b seq length ] dip quantile-x ] map ;
 
 :: qabcd ( y-floor y-ceiling x c d -- qabcd )
     y-floor y-ceiling y-floor - c d x frac * + * + ;
 
 :: quantile-abcd ( seq qs a b c d -- quantile )
-    seq qs a b c d quantile-indices :> indices
-    indices [ [ floor ] [ ceiling ] bi 2array ] map
+    seq qs a b quantile-indices :> indices
+    indices [ [ floor 0 max ] [ ceiling seq length 1 - min ] bi 2array ] map
     concat :> index-pairs
 
     seq index-pairs kth-smallests
