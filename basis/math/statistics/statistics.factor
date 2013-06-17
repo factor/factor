@@ -205,6 +205,9 @@ PRIVATE>
 : quartile ( seq -- seq' )
     { 1/4 1/2 3/4 } quantile5 ;
 
+: trimean ( seq -- x )
+    quartile first3 [ 2 * ] dip + + 4 / ;
+
 <PRIVATE
 
 : (sequence>assoc) ( seq map-quot insert-quot assoc -- assoc )
