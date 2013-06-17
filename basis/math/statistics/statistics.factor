@@ -158,7 +158,7 @@ PRIVATE>
 ! could subtract 1 from a
 
 : quantile-x ( a b N q -- x )
-    [ + ] dip * + 1 - 0 max ; inline
+    [ + ] dip * + 1 [-] ; inline
 
 ! 2+1/4 frac is 1/4
 : frac ( x -- x' )
