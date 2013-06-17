@@ -230,3 +230,5 @@ IN: math.statistics.tests
     { 1 2 3 4 5 10 21 12 12 12 12203 3403 030 3022 2 2 }
     { 1/1000 } quantile5
 ] unit-test
+
+{ 15+1/2 } [ { 4 8 15 16 23 42 } trimean ] unit-test
