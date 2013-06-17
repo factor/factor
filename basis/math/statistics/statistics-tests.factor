@@ -224,3 +224,9 @@ IN: math.statistics.tests
     H{ { 0 V{ 0 3 6 9 } } { 1 V{ 1 4 7 10 } } { 2 V{ 2 5 8 } } }
 }
 [ 600 610 [a,b] [ 3 mod ] collect-index-by ] unit-test
+
+
+{ { 1 } } [
+    { 1 2 3 4 5 10 21 12 12 12 12203 3403 030 3022 2 2 }
+    { 1/1000 } quantile5
+] unit-test
