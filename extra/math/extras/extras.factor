@@ -265,6 +265,13 @@ M: float round-to-even
 : round-to-step ( x step -- y )
     [ [ / round ] [ * ] bi ] unless-zero ;
 
+GENERIC: round-away-from-zero ( x -- y )
+
+M: integer round-away-from-zero ; inline
+
+M: real round-away-from-zero
+    dup 0 < [ floor ] [ ceiling ] if ;
+
 : monotonic-count ( seq quot: ( elt1 elt2 -- ? ) -- newseq )
     over empty? [ 2drop { } ] [
         [ 0 swap unclip-slice swap ] dip '[
