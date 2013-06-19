@@ -39,7 +39,7 @@ $nl
 
 HELP: game-loop-error
 { $values
-    { "game-loop" game-loop } { "error" "an error object" }
+    { "error" "an error object" } { "game-loop" game-loop }
 }
 { $description "If an uncaught error is thrown from inside a game loop delegate's " { $link tick* } " or " { $link draw* } ", the game loop will catch the error, stop the game loop, and rethrow an error of this class." } ;
 
