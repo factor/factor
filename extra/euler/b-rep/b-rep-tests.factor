@@ -26,12 +26,12 @@ IN: euler.b-rep.tests
 
 [
     double-4{
-        HEX:  1.279a74590331dp-1
-        HEX:  1.279a74590331dp-1
-        HEX:  1.279a74590331dp-1
+        0x1.279a74590331dp-1
+        0x1.279a74590331dp-1
+        0x1.279a74590331dp-1
         0.0
     }
-    HEX: -1.bb67ae8584cabp1
+    -0x1.bb67ae8584cabp1
 ] [
     double-4{ 1 0 5 0 }
     double-4{ 0 1 5 0 }
