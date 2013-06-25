@@ -8,6 +8,8 @@ BUILTIN: byte-array
 { length array-capacity read-only initial: 0 } ;
 
 M: byte-array clone (clone) ; inline
+M: byte-array clone-like
+    over byte-array? [ drop clone ] [ call-next-method ] if ; inline
 M: byte-array length length>> ; inline
 M: byte-array nth-unsafe swap integer>fixnum alien-unsigned-1 ; inline
 M: byte-array set-nth-unsafe swap integer>fixnum set-alien-unsigned-1 ; inline
