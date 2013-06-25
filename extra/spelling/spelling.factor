@@ -1,35 +1,38 @@
 USING: arrays ascii assocs combinators combinators.smart fry
 http.client io.encodings.ascii io.files io.files.temp kernel
 literals locals math math.ranges math.statistics memoize
-sequences sets sorting splitting strings urls ;
+sequences sequences.private sets sorting splitting strings urls ;
 IN: spelling
 
 ! http://norvig.com/spell-correct.html
 
-CONSTANT: ALPHABET $[
-    "abcdefghijklmnopqrstuvwxyz" [ 1string ] { } map-as
-]
+CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
 
-: splits ( word -- splits )
-    dup length [0,b] [ cut 2array ] with map ;
+: deletes ( word -- edits )
+    [ length iota ] keep '[ _ remove-nth ] map ;
 
-: deletes ( splits -- edits )
-    [ second length 0 > ] filter [ first2 rest append ] map ;
+: transposes ( word -- edits )
+    [ length [1,b) ] keep '[
+        dup 1 - _ clone [ exchange-unsafe ] keep
+    ] map ;
 
-: transposes ( splits -- edits )
-    [ second length 1 > ] filter
-    [ first2 2 cut swap reverse! glue ] map ;
+: replaces ( word -- edits )
+    [ length iota ] keep '[
+        ALPHABET [
+            swap _ clone [ set-nth-unsafe ] keep
+        ] with { } map-as
+    ] map concat ;
 
-: replaces ( splits -- edits )
-    [ second length 0 > ] filter ALPHABET
-    [ [ first2 rest ] [ glue ] bi* ] cartesian-map concat ;
-
-: inserts ( splits -- edits )
-    ALPHABET [ [ first2 ] [ glue ] bi* ] cartesian-map concat ;
+: inserts ( word -- edits )
+    [ length [0,b] ] keep '[
+        CHAR: ? over _ insert-nth ALPHABET swap [
+            swapd clone [ set-nth-unsafe ] keep
+        ] curry with { } map-as
+    ] map concat ;
 
 : edits1 ( word -- edits )
     [
-        splits {
+        {
             [ deletes ]
             [ transposes ]
             [ replaces ]

@@ -1,5 +1,10 @@
-USING: spelling tools.test memoize ;
+USING: kernel sequences spelling tools.test memoize ;
 IN: spelling.tests
+
+{ { "bc" "ac" "ab" } } [ "abc" deletes ] unit-test
+{ { "bac" "acb" } } [ "abc" transposes ] unit-test
+{ t } [ "a" replaces concat ALPHABET = ] unit-test
+{ 104 } [ "abc" inserts length ] unit-test
 
 MEMO: test-dictionary ( -- assoc )
     "vocab:spelling/test.txt" load-dictionary ;
