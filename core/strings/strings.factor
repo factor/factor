@@ -75,6 +75,9 @@ M: string set-nth-unsafe
 M: string clone
     (clone) [ clone ] change-aux ; inline
 
+M: string clone-like
+    over string? [ drop clone ] [ call-next-method ] if ; inline
+
 M: string resize resize-string ; inline
 
 : 1string ( ch -- str ) 1 swap <string> ; inline
