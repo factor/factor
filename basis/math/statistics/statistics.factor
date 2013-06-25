@@ -91,7 +91,7 @@ PRIVATE>
 
 : (kth-object) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
     #! The algorithm modifiers seq, so we clone it
-    [ { } clone-like ] 4dip ((kth-object)) ; inline
+    [ >array ] 4dip ((kth-object)) ; inline
 
 : kth-object-unsafe ( seq k quot: ( x y -- ? ) -- elt )
     [ [ nth-unsafe ] [ exchange-unsafe ] ] dip (kth-object) ; inline
