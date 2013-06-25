@@ -4,8 +4,8 @@ IN: splitting.extras
 
 <PRIVATE
 
-: (split*) ( n seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
-    pick [
+: (split*) ( seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
+    [ 0 ] 3dip pick [
         swap curry [ [ 1 + ] when ] prepose [ 2keep ] curry
         [ 2dup = ] prepose [ [ 1 + ] when swap ] compose [
             [ find-from drop dup ] 2curry [ keep -rot ] curry
@@ -17,10 +17,10 @@ IN: splitting.extras
 PRIVATE>
 
 : split*-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ 0 ] 2dip [ subseq ] (split*) ; inline
+    [ subseq ] (split*) ; inline
 
 : split*-when-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ 0 ] 2dip [ <slice> ] (split*) ; inline
+    [ <slice> ] (split*) ; inline
 
 : split* ( seq separators -- pieces )
     [ member? ] curry split*-when ; inline
