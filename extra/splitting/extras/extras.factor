@@ -1,4 +1,4 @@
-USING: kernel math sequences ;
+USING: kernel locals math sequences ;
 
 IN: splitting.extras
 
@@ -32,3 +32,30 @@ PRIVATE>
     [ dup empty? not ] swap [ [ dup ] ] dip
     [ [ [ 1 ] when-zero cut-slice swap ] [ f swap ] if* ] compose
     compose produce nip ; inline
+
+<PRIVATE
+
+: (split-harvest) ( seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
+    [ [ [ not ] compose find drop 0 or ] 2keep ] dip [
+        drop
+        dupd [ find-from drop ] 2curry [ 1 + ] prepose
+        [ keep swap ] curry
+        swap [ length 2dup >= [ drop f ] when ] curry
+        [ unless* ] curry compose
+        [ [ dup ] if dup ] curry [ dup ] prepose
+    ] [
+        pick swap curry [ keep swap ] curry -rot
+        [ not ] compose [ find-from drop ] 2curry
+        [ 1 + ] prepose [ dip ] curry compose
+    ] 3bi produce 2nip ; inline
+
+PRIVATE>
+
+: split-when-harvest ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
+    [ subseq ] (split-harvest) ; inline
+
+: split-when-slice-harvest ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
+    [ <slice> ] (split-harvest) ; inline
+
+: split-harvest ( seq separators -- pieces )
+    [ member? ] curry split-when-harvest ; inline
