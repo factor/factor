@@ -91,7 +91,7 @@ PRIVATE>
 
 : (kth-object) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
     #! The algorithm modifiers seq, so we clone it
-    [ { } clone-like ] 4dip ((kth-object)) ; inline
+    [ >array ] 4dip ((kth-object)) ; inline
 
 : kth-object-unsafe ( seq k quot: ( x y -- ? ) -- elt )
     [ [ nth-unsafe ] [ exchange-unsafe ] ] dip (kth-object) ; inline
@@ -164,15 +164,15 @@ PRIVATE>
 : frac ( x -- x' )
     >fraction [ /mod nip ] keep / ; inline
 
-:: quantile-indices ( seq qs a b c d -- seq )
+:: quantile-indices ( seq qs a b -- seq )
     qs [ [ a b seq length ] dip quantile-x ] map ;
 
 :: qabcd ( y-floor y-ceiling x c d -- qabcd )
     y-floor y-ceiling y-floor - c d x frac * + * + ;
 
 :: quantile-abcd ( seq qs a b c d -- quantile )
-    seq qs a b c d quantile-indices :> indices
-    indices [ [ floor ] [ ceiling ] bi 2array ] map
+    seq qs a b quantile-indices :> indices
+    indices [ [ floor 0 max ] [ ceiling seq length 1 - min ] bi 2array ] map
     concat :> index-pairs
 
     seq index-pairs kth-smallests
@@ -204,6 +204,9 @@ PRIVATE>
 
 : quartile ( seq -- seq' )
     { 1/4 1/2 3/4 } quantile5 ;
+
+: trimean ( seq -- x )
+    quartile first3 [ 2 * ] dip + + 4 / ;
 
 <PRIVATE
 

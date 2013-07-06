@@ -2,12 +2,23 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs binary-search classes.tuple
-combinators fry hints kernel locals math math.order math.ranges
-memoize namespaces sequences sequences.private sorting ;
+combinators fry hints kernel kernel.private locals math
+math.order math.ranges memoize namespaces sequences
+sequences.private sorting strings ;
 FROM: sequences => change-nth ;
 IN: math.combinatorics
 
 <PRIVATE
+
+! Specialized version of nths-unsafe for performance
+: (nths-unsafe) ( indices seq -- seq' )
+    [ { array } declare ] dip
+    [ [ nth-unsafe ] curry ] keep map-as ; inline
+GENERIC: nths-unsafe ( indices seq -- seq' )
+M: string nths-unsafe (nths-unsafe) ;
+M: array nths-unsafe (nths-unsafe) ;
+M: iota-tuple nths-unsafe (nths-unsafe) ;
+M: object nths-unsafe (nths-unsafe) ;
 
 : possible? ( n m -- ? )
     0 rot between? ; inline
@@ -245,4 +256,3 @@ PRIVATE>
 
 : selections ( seq n -- selections )
     dup 0 > [ (selections) ] [ 2drop { } ] if ;
-

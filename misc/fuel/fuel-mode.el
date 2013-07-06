@@ -183,7 +183,7 @@ interacting with a factor listener is at your disposal.
    fuel-eval-definition)
   ("Eval extended region" ("\C-\M-r" "\C-c\C-e\C-e" "\C-c\C-ee")
    fuel-eval-extended-region :enable mark-active)
-  ("Eval region" ("\C-c\C-r" "\C-c\C-e\C-r" "\C-c\C-er")
+  ("Eval region" ("\C-c\C-e\C-r" "\C-c\C-er")
    fuel-eval-region :enable mark-active)
   --
   ("Edit word at point" ("\M-." "\C-c\C-e\C-d" "\C-c\C-ed")
