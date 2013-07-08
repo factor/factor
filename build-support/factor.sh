@@ -12,8 +12,8 @@ OS=
 ARCH=
 WORD=
 NO_UI=${NO_UI-}
-GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
-GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
+GIT_PROTOCOL=${GIT_PROTOCOL:="https"}
+GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://github.com/slavapestov/factor.git"}
 SCRIPT_ARGS="$*"
 
 test_program_installed() {
@@ -371,7 +371,7 @@ invoke_git() {
 }
 
 git_clone() {
-    $ECHO "Downloading the git repository from factorcode.org..."
+    $ECHO "Downloading the git repository from $GIT_URL"
     invoke_git clone $GIT_URL
 }
 
@@ -383,7 +383,7 @@ update_script() {
     update_script=`update_script_name`
     bash_path=`which bash`
     $ECHO "#!$bash_path" >"$update_script"
-    $ECHO "git pull \"$GIT_URL\" master" >>"$update_script"
+    $ECHO "git pull \"$GIT_URL\" " >>"$update_script"
     $ECHO "if [[ \$? -eq 0 ]]; then exec \"$0\" $SCRIPT_ARGS; else echo \"git pull failed\"; exit 2; fi" \
         >>"$update_script"
     $ECHO "exit 0" >>"$update_script"
@@ -397,7 +397,7 @@ update_script_changed() {
 }
 
 git_fetch_factorcode() {
-    $ECHO "Fetching the git repository from factorcode.org..."
+    $ECHO "Fetching the git repository from $GIT_URL"
 
     rm -f `update_script_name`
     invoke_git fetch "$GIT_URL" master
