@@ -1,7 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes classes.tuple generic.math generic.single arrays
 io.pathnames vocabs.loader io sequences assocs words.symbol
-words.alias words.constant combinators vocabs.parser command-line ;
+words.alias words.constant combinators vocabs.parser command-line multiline ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -27,8 +27,9 @@ $nl
 
 ARTICLE: "syntax-comments" "Comments"
 { $subsections
-    POSTPONE: !
-    POSTPONE: #!
+  POSTPONE: !
+  POSTPONE: #!
+  POSTPONE: /*
 } ;
 
 ARTICLE: "syntax-immediate" "Parse time evaluation"
@@ -274,7 +275,7 @@ HELP: inline
 { $description
     "Declares the most recently defined word as an inline word. The optimizing compiler copies definitions of inline words when compiling calls to them."
     $nl
-    "Combinators must be inlined in order to compile with the optimizing compiler - see " { $link "inference-combinators" } ". For any other word, inlining is merely an optimization. Note that inlined words that can be compiled stand-alone are also, themselves, compiled by the optimizing compiler."
+    "Combinators must be inlined in order to compile with the optimizing compiler - see " { $link "inference-combinators" } ". For any other word, inlining is merely an optimization."
     $nl
     "The non-optimizing quotation compiler ignores inlining declarations."
 } ;
@@ -654,7 +655,7 @@ HELP: !
 { $values { "comment" "characters" } }
 { $description "Discards all input until the end of the line." } ;
 
-{ POSTPONE: ! POSTPONE: #! } related-words
+{ POSTPONE: ! POSTPONE: #! POSTPONE: /* } related-words
 
 HELP: #!
 { $syntax "#!comment..." }

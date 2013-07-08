@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io.files.private io.pathnames
+USING: arrays help.markup help.syntax io.files.private io.pathnames
 quotations ;
 IN: io.directories
 
@@ -32,13 +32,14 @@ $nl
 "If " { $snippet "path" } " is relative, it is first resolved relative to the current directory. If " { $snippet "path" } " is absolute, it becomes the new current directory." } ;
 
 HELP: (directory-entries)
-{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
+{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ name dir? }" } " pairs" } }
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
 { $notes "This is a low-level word, and user code should call one of the related words instead." } ;
 
 HELP: directory-entries
 { $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
+{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
+{ $notes "The sequence returned is an " { $link array } ", which is a fixed-size sequence." } ; 
 
 HELP: directory-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
