@@ -172,7 +172,7 @@ SYNTAX: BC \ break-count suffix! ;
 SYNTAX: BC= \ break-count= suffix! ;
 SYNTAX: BC0 \ break-count-zero suffix! ;
 SYNTAX: BC@ \ break-counter-get suffix! ; 
- 
+
 SYNTAX: B: scan-word definition
     [ break "now press O I to land inside the parsing word" drop ]
     prepose call( accum -- accum ) ;

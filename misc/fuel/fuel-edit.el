@@ -122,7 +122,7 @@ With prefix, asks for the word to edit."
                   (file-name-sans-extension (buffer-file-name)))))))))
 
 (defun fuel-add-help-word-template (&optional arg word)
-  "Adds a help template for word at point."
+  "Adds a help template for word ad point."
   (interactive "P")
   (let* ((word (or word
                    (and (not arg) (fuel-syntax-symbol-at-point))

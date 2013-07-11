@@ -120,6 +120,14 @@ buffer in case of errors."
       (unless (< begin end) (error "No evaluable definition around point"))
       (fuel-eval-region begin end arg))))
 
+(defun fuel-update-usings (&optional arg)
+  "Asks factor for the vocabularies needed by this file,
+optionally updating the its USING: line.
+With prefix argument, ask for the file name."
+  (interactive "P")
+  (let ((file (car (fuel-mode--read-file arg))))
+    (when file (fuel-debug--uses-for-file file))))
+
 (defun fuel-load-usings ()
   "Loads all vocabularies in the current buffer's USING: from.
 Useful to activate autodoc help messages in a vocabulary not yet
