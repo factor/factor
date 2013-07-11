@@ -16,6 +16,35 @@ GIT_PROTOCOL=${GIT_PROTOCOL:="https"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://github.com/slavapestov/factor.git"}
 SCRIPT_ARGS="$*"
 
+move-aside() {
+	for arg in "$@"
+	do
+		FILE="$arg"
+		if [[ "${FILE:0:1}" != "/" ]] ; then
+			FILE="$(pwd)/$FILE" # must be relative
+		fi
+		
+	# add default
+		TRY="$FILE.1"
+		TRYAGAIN=1
+		while [ $TRYAGAIN == 1 ]; do
+	# now check if already exists
+			if [[ -e "$TRY" ]] ; then
+				EXT="${TRY#*.}"
+				NEW=$(expr $EXT + 1)
+				TRY="${TRY%.*}.$NEW"
+			else
+				TRYAGAIN=0
+			fi		
+		done
+		
+		mv "$FILE" "$TRY"
+    if [[ $? != 0 ]] ; then
+		echo "$0: WARNING, error while executing mv $FILE $TRY"
+    fi
+	done
+}
+
 test_program_installed() {
     if ! [[ -n `type -p $1` ]] ; then
         return 0;
@@ -432,10 +461,10 @@ set_delete() {
 
 backup_factor() {
     $ECHO "Backing up factor..."
-    $COPY $FACTOR_BINARY $FACTOR_BINARY.bak
-    $COPY $FACTOR_LIBRARY $FACTOR_LIBRARY.bak
-    $COPY $BOOT_IMAGE $BOOT_IMAGE.bak
-    $COPY $FACTOR_IMAGE $FACTOR_IMAGE.bak
+    move-aside $FACTOR_BINARY
+    move-aside $FACTOR_LIBRARY
+    move-aside $BOOT_IMAGE
+    move-aside $FACTOR_IMAGE
     $ECHO "Done with backup."
 }
 
@@ -596,6 +625,7 @@ usage() {
     $ECHO "  update - git pull, download a boot image, recompile, bootstrap"
     $ECHO "  bootstrap - bootstrap with an existing boot image"
     $ECHO "  net-bootstrap - download a boot image, bootstrap"
+    $ECHO "  make - make using current commit"
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  report - print the build variables"
     $ECHO ""
@@ -626,6 +656,7 @@ case "$1" in
     update) update; download_and_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
     net-bootstrap) net_bootstrap_no_pull ;;
+	make) 
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
     report) find_build_info ;;
     *) usage ;;
