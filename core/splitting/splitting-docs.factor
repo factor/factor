@@ -88,6 +88,16 @@ HELP: string-lines
     { $example "USING: prettyprint splitting ;" "\"Hello\\r\\nworld\\n\" string-lines ." "{ \"Hello\" \"world\" \"\" }" }
 } ;
 
+HELP: split-nth
+{ $values  { "n" "value" } { "seq" "value" } { "seq" "value" } }
+{ $description "Splits a sequence into groups n wide. Last group is not padded" }
+{ $examples
+  { $code 
+    "USING: splitting ;" "2 { 1 2 3 4 5 } split-nth ." "{ { 1 2 } { 3 4 } { 5 } }"
+    }
+}
+;
+
 HELP: replace
 { $values { "seq" sequence } { "old" sequence } { "new" sequence } { "new-seq" sequence } }
 { $description "Replaces every occurrence of " { $snippet "old" } " with " { $snippet "new" } " in the " { $snippet "seq" } "." }

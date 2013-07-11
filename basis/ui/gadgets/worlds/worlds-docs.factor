@@ -1,6 +1,6 @@
-USING: ui.gadgets ui.render ui.text ui.text.private
-ui.gestures ui.backend help.markup help.syntax
-models opengl sequences strings destructors ;
+USING: assocs colors.constants.private concurrency.promises
+destructors help.markup help.syntax models strings ui.backend
+ui.gadgets ui.gestures ui.render ;
 IN: ui.gadgets.worlds
 
 HELP: user-input
@@ -47,19 +47,25 @@ HELP: focus-path
 
 HELP: world
 { $class-description "A gadget which appears at the top of the gadget hieararchy, and in turn may be displayed in a native window. Worlds have the following slots:"
-    { $list
-        { { $snippet "active?" } " - if set to " { $link f } ", the world will not be drawn. This slot is set to " { $link f } " if an error is thrown while drawing the world; this prevents multiple debugger windows from being shown." }
-        { { $snippet "layers" } " - a sequence of glass panes in front of the primary gadget, used to implement behaviors such as popup menus which are hidden when the mouse is clicked outside the menu. See " { $link "ui.gadgets.glass" } "." }
-        { { $snippet "title" } " - a string to be displayed in the title bar of the native window containing the world." }
-        { { $snippet "status" } " - a " { $link model } " holding a string to be displayed in the world's status bar." }
-        { { $snippet "status-owner" } " - the gadget that displayed the most recent status message." }
-        { { $snippet "focus" } " - the current owner of the keyboard focus in the world." }
-        { { $snippet "focused?" } " - a boolean indicating if the native window containing the world has keyboard focus." }
-        { { $snippet "fonts" } " - a hashtable used by the " { $link font-renderer } "." }
-        { { $snippet "grab-input?" } " - if set to " { $link t } ", the world will hide the mouse cursor and disable normal mouse input while focused. Use " { $link grab-input } " and " { $link ungrab-input } " to change this setting." }
-        { { $snippet "handle" } " - a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
-        { { $snippet "window-loc" } " - the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
-        { { $snippet "window-controls" } " - the set of " { $link "ui.gadgets.worlds-window-controls" } " with which the world window was created." }
+  { $list
+    { { $snippet "active?" } " - if set to " { $link f } ", the world will not be drawn. This slot is set to " { $link f } " if an error is thrown while drawing the world; this prevents multiple debugger windows from being shown." }
+    { { $snippet "focused?" } " - a boolean indicating if the native window containing the world has keyboard focus." }
+    { { $snippet "layers" } " - a sequence of glass panes in front of the primary gadget, used to implement behaviors such as popup menus which are hidden when the mouse is clicked outside the menu. See " { $link "ui.gadgets.glass" } "." }
+    { { $snippet "fullscreen?" } " - a boolean indicating if the world is running in full screen mode. See " { $link "ui" } "." }
+    { { $snippet "saved-position" } " - if set to " { $link f } ", the position of the world has not been saved, otherwise will hold the position. (DAC-12/11/12 unverified)" }
+    { { $snippet "layers" } " - (DAC-12/11/12 unknown " }
+    { { $snippet "title" } " - a string to be displayed in the title bar of the native window containing the world." }
+    { { $snippet "status" } " - a " { $link model } " holding a string to be displayed in the world's status bar." }
+    { { $snippet "status-owner" } " - the gadget that displayed the most recent status message." }
+    { { $snippet "text-handle" } " - (DAC-12/11/12 unknown" }
+    { { $snippet "handle" } " - a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
+    { { $snippet "images" } " - a " { $link cache } " holding images to be displayed. (DAC-12/11/12 unknown)" }
+    { { $snippet "window-loc" } " - the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
+    { { $snippet "pixel-format-attributes" } " - (DAC-12/11/12 unknown)" }
+    { { $snippet "background-color" } " - a " { $link colors } " of the background" }
+    { { $snippet "promise" } " - a " { $link promise } }
+    { { $snippet "window-controls" } " - the set of " { $link "ui.gadgets.worlds-window-controls" } " with which the world window was created." }
+    { { $snippet "window-resources" } " - the set of " { $link "vectors" } " for the world window created." }
     }
 } ;
 
