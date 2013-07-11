@@ -5,7 +5,7 @@ assocs combinators continuations destructors fry io io.backend
 io.directories io.encodings.binary io.files.info.unix
 io.encodings.utf8 io.files io.pathnames io.files.types kernel
 math.bitwise sequences system unix unix.stat vocabs.loader
-classes.struct unix.ffi literals libc vocabs ;
+classes.struct unix.ffi literals libc vocabs io.files.info ;
 IN: io.directories.unix
 
 CONSTANT: file-mode 0o0666
@@ -35,8 +35,10 @@ M: unix copy-file ( from to -- )
     [ [ file-permissions ] dip swap set-file-permissions ] 2bi ;
 
 : with-unix-directory ( path quot -- )
-    [ opendir dup [ (io-error) ] unless ] dip
-    dupd curry swap '[ _ closedir io-error ] [ ] cleanup ; inline
+    dupd '[ _ _
+        [ opendir dup [ (io-error) ] unless ] dip
+        dupd curry swap '[ _ closedir io-error ] [ ] cleanup
+    ] with-directory ; inline
 
 HOOK: find-next-file os ( DIR* -- byte-array )
 
@@ -47,7 +49,7 @@ M: unix find-next-file ( DIR* -- byte-array )
     [ readdir_r 0 = [ errno 0 = [ (io-error) ] unless ] unless ] 2keep
     void* deref [ drop f ] unless ;
 
-: dirent-type>file-type ( ch -- type )
+: dirent-type>file-type ( type -- file-type )
     H{
         { $ DT_BLK  +block-device+ }
         { $ DT_CHR  +character-device+ }
@@ -59,10 +61,20 @@ M: unix find-next-file ( DIR* -- byte-array )
         { $ DT_WHT  +whiteout+ }
     } at* [ drop +unknown+ ] unless ;
 
+! An easy way to return +unknown+ is to mount a .iso on OSX and
+! call directory-entries on the mount point.
+: dirent>file-type ( dirent -- type )
+    dup d_type>> dirent-type>file-type
+    dup +unknown+ = [
+        drop d_name>> utf8 alien>string file-info type>>
+    ] [
+        nip
+    ] if ;
+
 M: unix >directory-entry ( byte-array -- directory-entry )
     {
         [ d_name>> underlying>> utf8 alien>string ]
-        [ d_type>> dirent-type>file-type ]
+        [ dirent>file-type ]
     } cleave directory-entry boa ;
 
 M: unix (directory-entries) ( path -- seq )
