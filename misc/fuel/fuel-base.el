@@ -31,6 +31,16 @@
 
 ;;; Utilities:
 
+(unless (fboundp 'setq-local)
+  (defmacro setq-local (var val)
+    (list 'set (list 'make-local-variable (list 'quote var)) val)))
+
+(unless (fboundp 'defvar-local)
+  (defmacro defvar-local (var val &optional docstring)
+    (declare (debug defvar) (doc-string 3))
+    (list 'progn (list 'defvar var val docstring)
+          (list 'make-variable-buffer-local (list 'quote var)))))
+
 (defun fuel-shorten-str (str len)
   (let ((sl (length str)))
     (if (<= sl len) str
