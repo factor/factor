@@ -20,8 +20,8 @@
 (require 'thingatpt)
 (require 'font-lock)
 (require 'ring)
+(require 'fuel-base)
 
-
 ;;; Customization:
 
 ;;;###autoload
