@@ -142,7 +142,8 @@ SYMBOL: redirects
 
 : request-url ( url -- url' )
     dup >url dup protocol>> [ nip ] [
-        drop "http://" prepend >url
+        drop dup url? [ present ] when
+        "http://" prepend >url
     ] if ensure-port ;
 
 : <client-request> ( url method -- request )
