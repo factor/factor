@@ -53,17 +53,26 @@ IN: tools.ps.windows
         [ dup query-information-process PebBaseAddress>> read-peb ] bi
     ] with-destructors ;
 
+: slot-offset-by-name ( struct-class name -- value/f )
+    [ struct-slots ] dip '[ name>> _ = ] find swap [ offset>> ] when ;
+
 :: read-args ( handle -- string/f )
     handle <win32-handle> &dispose drop
     handle query-information-process :> process-basic-information
     handle process-basic-information PebBaseAddress>>
     [
-        0x10 PVOID heap-size read-process-memory
+        PEB "ProcessParameters" slot-offset-by-name
+        PVOID heap-size
+        read-process-memory
         PVOID deref :> args-offset
         args-offset ALIEN: 0 = [
             f
         ] [
-            handle args-offset 0x40 UNICODE_STRING heap-size read-process-memory
+            handle
+            args-offset
+            RTL_USER_PROCESS_PARAMETERS "CommandLine" slot-offset-by-name
+            UNICODE_STRING heap-size
+            read-process-memory
             [ handle ] dip
             UNICODE_STRING deref [ Buffer>> 0 ] [ Length>> ] bi read-process-memory
             utf16n decode
