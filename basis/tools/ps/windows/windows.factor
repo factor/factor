@@ -33,7 +33,7 @@ IN: tools.ps.windows
         f
         NtQueryInformationProcess drop
     ] keep ;
-    
+
 :: read-process-memory ( HANDLE alien offset len -- byte-array )
     HANDLE
     offset alien <displaced-alien>
@@ -53,15 +53,12 @@ IN: tools.ps.windows
         [ dup query-information-process PebBaseAddress>> read-peb ] bi
     ] with-destructors ;
 
-: slot-offset-by-name ( struct-class name -- value/f )
-    [ struct-slots ] dip '[ name>> _ = ] find swap [ offset>> ] when ;
-
 :: read-args ( handle -- string/f )
     handle <win32-handle> &dispose drop
     handle query-information-process :> process-basic-information
     handle process-basic-information PebBaseAddress>>
     [
-        PEB "ProcessParameters" slot-offset-by-name
+        "ProcessParameters" PEB offset-of
         PVOID heap-size
         read-process-memory
         PVOID deref :> args-offset
@@ -70,7 +67,7 @@ IN: tools.ps.windows
         ] [
             handle
             args-offset
-            RTL_USER_PROCESS_PARAMETERS "CommandLine" slot-offset-by-name
+            "CommandLine" RTL_USER_PROCESS_PARAMETERS offset-of
             UNICODE_STRING heap-size
             read-process-memory
             [ handle ] dip
@@ -78,7 +75,7 @@ IN: tools.ps.windows
             utf16n decode
         ] if
     ] [ drop f ] if* ;
-    
+
 : process-list ( -- assoc )
     [
         TH32CS_SNAPALL do-snapshot
