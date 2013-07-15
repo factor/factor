@@ -140,10 +140,15 @@ SYMBOL: redirects
         [ do-redirect ] [ nip ] if
     ] with-variable ; inline recursive
 
+: request-url ( url -- url' )
+    dup >url dup protocol>> [ nip ] [
+        drop "http://" prepend >url
+    ] if ensure-port ;
+
 : <client-request> ( url method -- request )
     <request>
         swap >>method
-        swap >url ensure-port >>url ; inline
+        swap request-url >>url ; inline
 
 PRIVATE>
 
