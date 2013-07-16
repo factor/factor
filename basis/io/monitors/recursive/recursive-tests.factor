@@ -1,19 +1,19 @@
 USING: accessors math kernel namespaces continuations
 io.files io.monitors io.monitors.recursive io.backend
 concurrency.mailboxes tools.test destructors io.files.info
-io.pathnames io.files.temp io.directories.hierarchy ;
+io.pathnames io.files.temp io.directories.hierarchy fry ;
 IN: io.monitors.recursive.tests
 
 SINGLETON: mock-io-backend
 
-TUPLE: counter i ;
+TUPLE: mock-counter i ;
 
 SYMBOL: dummy-monitor-created
 SYMBOL: dummy-monitor-disposed
 
 TUPLE: dummy-monitor < monitor ;
 
-M: dummy-monitor dispose
+M: dummy-monitor dispose*
     drop dummy-monitor-disposed get [ 1 + ] change-i drop ;
 
 M: mock-io-backend (monitor)
@@ -28,8 +28,8 @@ M: mock-io-backend (monitor)
 M: mock-io-backend link-info
     global [ link-info ] with-variables ;
 
-[ ] [ 0 counter boa dummy-monitor-created set ] unit-test
-[ ] [ 0 counter boa dummy-monitor-disposed set ] unit-test
+[ ] [ 0 mock-counter boa dummy-monitor-created set ] unit-test
+[ ] [ 0 mock-counter boa dummy-monitor-disposed set ] unit-test
 
 [ ] [
     mock-io-backend io-backend [
@@ -44,14 +44,18 @@ M: mock-io-backend link-info
 [ "doesnotexist" temp-file delete-tree ] ignore-errors
 
 [
-    mock-io-backend io-backend [
-        "doesnotexist" temp-file <mailbox> <recursive-monitor> dispose
+    0 mock-counter boa dummy-monitor-created [
+        mock-io-backend io-backend [
+            "doesnotexist" temp-file <mailbox> <recursive-monitor> dispose
+        ] with-variable
     ] with-variable
 ] must-fail
 
+[ ] [ 0 mock-counter boa dummy-monitor-created set ] unit-test
+[ ] [ 0 mock-counter boa dummy-monitor-disposed set ] unit-test
+
+! Test that disposing twice is allowed
 [ ] [
-    mock-io-backend io-backend [
-        "" resource-path <mailbox> <recursive-monitor>
-        [ dispose ] [ dispose ] bi
-    ] with-variable
+    "" resource-path <mailbox> <recursive-monitor>
+    [ dispose ] [ dispose ] bi
 ] unit-test
