@@ -21,7 +21,7 @@ ERROR: image-too-big actual-size max-size ;
     [
         cell 4 / *
         cpu ppc? [ 100000 + ] when
-        os windows? [ 150000 + ] when
+        os windows? [ 160000 + ] when
     ] bi*
     2dup <= [ 2drop ] [ image-too-big ] if ;
 
