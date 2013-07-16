@@ -100,9 +100,11 @@ M: recursive-monitor dispose*
     ready>> ?promise ?linked drop ;
 
 : <recursive-monitor> ( path mailbox -- monitor )
-    [ absolute-path ] dip
-    recursive-monitor new-monitor
-        H{ } clone >>children
-        <promise> >>ready
-    dup start-pump-thread
-    dup wait-for-ready ;
+    '[ _ _
+        [ absolute-path ] dip
+        recursive-monitor new-monitor |dispose
+            H{ } clone >>children
+            <promise> >>ready
+        dup start-pump-thread
+        dup wait-for-ready
+    ] with-destructors ;
