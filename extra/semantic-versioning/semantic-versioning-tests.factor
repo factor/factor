@@ -1,16 +1,17 @@
-USING: math.order semantic-versioning tools.test ;
+USING: kernel math.order random semantic-versioning sequences
+sorting tools.test ;
 IN: semantic-versioning.tests
 
 {
     {
-        T{ version f 0 1 0 "" "" }
-        T{ version f 0 97 0 "" "" }
-        T{ version f 1 1 0 "" "" }
-        T{ version f 1 2 3 "" "" }
-        T{ version f 1 0 0 "dev1" "" }
-        T{ version f 1 0 0 "rc1" "build" }
-        T{ version f 1 0 0 "rc2" "" }
-        T{ version f 1 0 0 "rc2" "123456" }
+        { { 0 1 0 } f f }
+        { { 0 97 0 } f f }
+        { { 1 1 0 } f f }
+        { { 1 2 3 } f f }
+        { { 1 0 0 } "dev1" f }
+        { { 1 0 0 } "rc1" "build" }
+        { { 1 0 0 } "rc2" f }
+        { { 1 0 0 } "rc2" "123456" }
     }
 } [
     {
@@ -22,7 +23,7 @@ IN: semantic-versioning.tests
         "1.0.0rc1+build"
         "1.0.0-rc2"
         "1.0.0-rc2+123456"
-    } [ string>version ] map
+    } [ split-version ] map
 ] unit-test
 
 { +gt+ } [ "1.2.0dev1" "0.12.1dev2" version<=> ] unit-test
@@ -33,6 +34,7 @@ IN: semantic-versioning.tests
 { +lt+ } [ "1.0.0-rc.1" "1.0.0-rc.11" version<=> ] unit-test
 { +lt+ } [ "1.0.0-rc.2" "1.0.0-rc.11" version<=> ] unit-test
 { +eq+ } [ "1.0.0+foo" "1.0.0+bar" version<=> ] unit-test
+{ +eq+ } [ "1.0" "1.0.0" version<=> ] unit-test
 
 { t } [
     {

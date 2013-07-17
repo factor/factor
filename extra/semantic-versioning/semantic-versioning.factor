@@ -1,10 +1,13 @@
 ! Copyright (C) 2010 Maximilian Lupke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ascii kernel math.order math.parser
-sequences sorting.human sorting.slots splitting ;
+USING: arrays ascii kernel math math.order math.parser sequences
+sorting.human splitting ;
 IN: semantic-versioning
 
 <PRIVATE
+
+: number<=> ( obj1 obj2 -- <=> )
+    [ [ zero? ] trim-tail-slice ] bi@ <=> ;
 
 : pre-release<=> ( obj1 obj2 -- <=> )
     2dup [ empty? ] either?
@@ -12,27 +15,18 @@ IN: semantic-versioning
 
 PRIVATE>
 
-TUPLE: version major minor patch pre-release build ;
-
-C: <version> version
-
-M: version <=>
-    {
-        { major>> <=> }
-        { minor>> <=> }
-        { patch>> <=> }
-        { pre-release>> pre-release<=> }
-    } compare-slots ;
-
-: string>version ( string -- version )
-    "." split1 "." split1 dup [ digit? not ] find
-    [ [ cut ] [ CHAR: - = [ rest ] when ] bi* ] [ drop "" ] if*
-    [ [ string>number 0 or ] tri@ ] dip
-    CHAR: + over index [ cut rest ] [ "" ] if*
-    <version> ;
+: split-version ( string -- array )
+    "+" split1 [
+        dup [ [ digit? not ] [ CHAR: . = not ] bi and ] find [
+            [ cut ] [ CHAR: - = [ rest [ f ] when-empty ] when ] bi*
+        ] [ drop f ] if*
+        [ "." split [ string>number 0 or ] map 3 0 pad-tail ] dip
+    ] dip 3array ;
 
 : version<=> ( version1 version2 -- <=> )
-    [ string>version ] bi@ <=> ;
+    [ split-version ] bi@
+    2dup [ first ] bi@ number<=> dup +eq+ =
+    [ drop [ second ] bi@ pre-release<=> ] [ 2nip ] if ;
 
 : version< ( version1 version2 -- ? )
     version<=> +lt+ = ;
