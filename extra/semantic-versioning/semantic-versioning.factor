@@ -1,19 +1,38 @@
 ! Copyright (C) 2010 Maximilian Lupke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ascii kernel math.order math.parser sequences splitting
-;
+USING: accessors arrays ascii kernel math.order math.parser
+sequences sorting.human sorting.slots splitting ;
 IN: semantic-versioning
 
-: split-version ( string -- array )
-    "." split first3 dup [ digit? not ] find
-    [ cut [ [ string>number ] tri@ ] dip 4array ]
-    [ drop [ string>number ] tri@ 3array ]
-    if ;
+<PRIVATE
+
+: pre-release<=> ( obj1 obj2 -- <=> )
+    2dup [ empty? ] either?
+    [ [ length ] bi@ >=< ] [ human<=> ] if ;
+
+PRIVATE>
+
+TUPLE: version major minor patch pre-release build ;
+
+C: <version> version
+
+M: version <=>
+    {
+        { major>> <=> }
+        { minor>> <=> }
+        { patch>> <=> }
+        { pre-release>> pre-release<=> }
+    } compare-slots ;
+
+: string>version ( string -- version )
+    "." split1 "." split1 dup [ digit? not ] find
+    [ [ cut ] [ CHAR: - = [ rest ] when ] bi* ] [ drop "" ] if*
+    [ [ string>number 0 or ] tri@ ] dip
+    CHAR: + over index [ cut rest ] [ "" ] if*
+    <version> ;
 
 : version<=> ( version1 version2 -- <=> )
-    [ split-version ] bi@ drop-prefix
-    2dup [ length 0 = ] either?
-    [ [ length ] bi@ >=< ] [ [ first ] compare ] if ;
+    [ string>version ] bi@ <=> ;
 
 : version< ( version1 version2 -- ? )
     version<=> +lt+ = ;
