@@ -23,7 +23,7 @@ without connecting to a running Factor image:
 
     (require 'factor-mode)
 
-The fuel-mode minor mode provides interaction with a runnign Factor instance:
+The fuel-mode minor mode provides interaction with a running Factor instance:
 
     (require 'fuel-mode)
 
