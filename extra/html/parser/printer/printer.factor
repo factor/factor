@@ -81,6 +81,7 @@ SYMBOL: tagstack
 M: html-prettyprinter print-opening-tag ( tag -- )
     name>>
     [ tabs "<" append ">\n" surround write ]
+    ! These tags usually don't have any closing tag associated with them.
     [ { "br" "img" } member? [ #indentations inc ] unless ] bi ;
 
 M: html-prettyprinter print-closing-tag ( tag -- )
