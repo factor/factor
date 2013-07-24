@@ -5,7 +5,7 @@ IN: csv.tests
 
 ! I like to name my unit tests
 : named-unit-test ( name output input -- ) 
-  unit-test drop ; inline
+    unit-test drop ; inline
 
 "Fields are separated by commas"
 [ { { "1997" "Ford" "E350" } } ] 
@@ -22,17 +22,17 @@ IN: csv.tests
 "double quotes mean escaped in quotes"
 [ { { "1997" "Ford" "E350" "Super \"luxurious\" truck" } } ]
 [ "1997,Ford,E350,\"Super \"\"luxurious\"\" truck\"" 
-  string>csv ] named-unit-test
+    string>csv ] named-unit-test
 
 "Fields with embedded line breaks must be delimited by double-quote characters."
 [ { { "1997" "Ford" "E350" "Go get one now\nthey are going fast" } } ]
 [ "1997,Ford,E350,\"Go get one now\nthey are going fast\""
-  string>csv ] named-unit-test
+    string>csv ] named-unit-test
 
 "Fields with leading or trailing spaces must be delimited by double-quote characters. (See comment about leading and trailing spaces above)"
 [ { { "1997" "Ford" "E350" "  Super luxurious truck    " } } ]
 [ "1997,Ford,E350,\"  Super luxurious truck    \""
-  string>csv ] named-unit-test
+    string>csv ] named-unit-test
 
 "Fields may always be delimited by double-quote characters, whether necessary or not."
 [ { { "1997" "Ford" "E350" } } ]
@@ -43,7 +43,7 @@ IN: csv.tests
     { "1997" "Ford" "E350" }
     { "2000" "Mercury" "Cougar" } } ]
 [ "Year,Make,Model\n1997,Ford,E350\n2000,Mercury,Cougar" 
-   string>csv ] named-unit-test
+    string>csv ] named-unit-test
 
 
 ! !!!!!!!!  other tests

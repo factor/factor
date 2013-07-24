@@ -10,35 +10,35 @@ namespaces make words sorting present ;
 IN: ctags
 
 : ctag-word ( ctag -- word )
-  first ;
+    first ;
 
 : ctag-path ( ctag -- path )
-  second first ;
+    second first ;
 
 : ctag-lineno ( ctag -- n )
-  second second ;
+    second second ;
 
 : ctag ( seq -- str )
-  [
-    dup ctag-word present %
-    "\t" %
-    dup ctag-path normalize-path %
-    "\t" %
-    ctag-lineno number>string %
-  ] "" make ;
+    [
+        dup ctag-word present %
+        "\t" %
+        dup ctag-path normalize-path %
+        "\t" %
+        ctag-lineno number>string %
+    ] "" make ;
 
 : ctag-strings ( alist -- seq )
-  [ ctag ] map ;
+    [ ctag ] map ;
 
 : ctags-write ( seq path -- )
-  [ ctag-strings ] dip ascii set-file-lines ;
+    [ ctag-strings ] dip ascii set-file-lines ;
 
 : (ctags) ( -- seq )
-  all-words [
-    dup where [
-      2array
-    ] when*
-  ] map [ sequence? ] filter ;
+    all-words [
+        dup where [
+            2array
+        ] when*
+    ] map [ sequence? ] filter ;
 
 : ctags ( path -- )
-  (ctags) sort-keys swap ctags-write ;
+    (ctags) sort-keys swap ctags-write ;
