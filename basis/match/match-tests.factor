@@ -8,39 +8,39 @@ MATCH-VARS: ?a ?b ;
 [ f ] [ { ?a ?a } { 1 2 } match ] unit-test
 
 [ H{ { ?a 1 } { ?b 2 } } ] [
- { ?a ?b } { 1 2 } match
+    { ?a ?b } { 1 2 } match
 ] unit-test
 
-[ { 1 2 } ] [ 
-  { 1 2 } 
-  {
-    { { ?a ?b } [ ?a ?b 2array ] }
-  } match-cond
+[ { 1 2 } ] [
+    { 1 2 }
+    {
+        { { ?a ?b } [ ?a ?b 2array ] }
+    } match-cond
 ] unit-test
 
-[ t ] [ 
-  { 1 2 } 
-  {
-    { { 1 2 } [ t ] }
-    { f [ f ] }
-  } match-cond
+[ t ] [
+    { 1 2 }
+    {
+        { { 1 2 } [ t ] }
+        { f [ f ] }
+    } match-cond
 ] unit-test
 
-[ t ] [ 
-  { 1 3 } 
-  {
-    { { 1 2 } [ t ] }
-    { { 1 3 } [ t ] }
-  } match-cond
+[ t ] [
+    { 1 3 }
+    {
+        { { 1 2 } [ t ] }
+        { { 1 3 } [ t ] }
+    } match-cond
 ] unit-test
 
-[ f ] [ 
-  { 1 5 } 
-  {
-    { { 1 2 } [ t ] }
-    { { 1 3 } [ t ] }
-    { _       [ f ] }
-  } match-cond
+[ f ] [
+    { 1 5 }
+    {
+        { { 1 2 } [ t ] }
+        { { 1 3 } [ t ] }
+        { _       [ f ] }
+    } match-cond
 ] unit-test
 
 TUPLE: foo a b ;
@@ -48,31 +48,29 @@ TUPLE: foo a b ;
 C: <foo> foo
 
 { 1 2 } [
-  1 2 <foo> T{ foo f ?a ?b } match [
-    ?a ?b
-  ] with-variables
+    1 2 <foo> T{ foo f ?a ?b } match [
+        ?a ?b
+    ] with-variables
 ] unit-test
 
 { 1 2 } [
-  1 2 <foo> \ ?a \ ?b <foo> match [
-    ?a ?b
-  ] with-variables
+    1 2 <foo> \ ?a \ ?b <foo> match [
+        ?a ?b
+    ] with-variables
 ] unit-test
 
-{ H{ { ?a ?a } } } [ 
-  \ ?a \ ?a match 
+{ H{ { ?a ?a } } }
+    \ ?a \ ?a match
 ] unit-test
 
-[ "match" ] [ 
-  "abcd" {
-    { ?a [ "match" ] }
-  } match-cond
+[ "match" ] [
+    "abcd" {
+        { ?a [ "match" ] }
+    } match-cond
 ] unit-test
 
-[
-  { 2 1 }
-] [
-  { "a" 1 2 "b" } { _ ?a ?b _ } { ?b ?a } match-replace
+{ { 2 1 } } [
+    { "a" 1 2 "b" } { _ ?a ?b _ } { ?b ?a } match-replace
 ] unit-test
 
 TUPLE: match-replace-test a b ;
@@ -80,8 +78,8 @@ TUPLE: match-replace-test a b ;
 [
     T{ match-replace-test f 2 1 }
 ] [
-  T{ match-replace-test f 1 2 }
-  T{ match-replace-test f ?a ?b }
-  T{ match-replace-test f ?b ?a }
-  match-replace
+    T{ match-replace-test f 1 2 }
+    T{ match-replace-test f ?a ?b }
+    T{ match-replace-test f ?b ?a }
+    match-replace
 ] unit-test
