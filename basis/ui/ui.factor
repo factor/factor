@@ -218,8 +218,8 @@ HOOK: resize-window ui-backend ( world dim -- )
 M: object resize-window 2drop ;
 
 : relayout-window ( gadget -- )
-  [ relayout ]
-  [ find-world [ dup pref-dim resize-window ] when* ] bi ;
+    [ relayout ]
+    [ find-world [ dup pref-dim resize-window ] when* ] bi ;
 
 : with-ui ( quot: ( -- ) -- )
     ui-running? [ call( -- ) ] [ '[ init-ui @ ] (with-ui) ] if ;
