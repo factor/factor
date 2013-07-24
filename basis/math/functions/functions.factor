@@ -187,22 +187,13 @@ M: real absq sq ; inline
 : >=1? ( x -- ? )
     dup complex? [ drop f ] [ 1 >= ] if ; inline
 
-<PRIVATE
-
-: fp-normalize ( x -- y exp )
-    dup abs 0x1.0p-1022 < [ 52 2^ * -52 ] [ 0 ] if ; inline
-
-PRIVATE>
-
 GENERIC: frexp ( x -- y exp )
 
 M: float frexp
     dup fp-special? [ dup zero? ] unless* [ 0 ] [
-        fp-normalize [
-            double>bits
-            [ 0x800f,ffff,ffff,ffff bitand 0.5 double>bits bitor bits>double ]
-            [ -52 shift 0x7ff bitand 1022 - ] bi
-        ] dip +
+        double>bits
+        [ 0x800f,ffff,ffff,ffff bitand 0.5 double>bits bitor bits>double ]
+        [ -52 shift 0x7ff bitand 1022 - ] bi
     ] if ; inline
 
 M: integer frexp
@@ -219,9 +210,8 @@ GENERIC# ldexp 1 ( x exp -- y )
 
 M: float ldexp
     over fp-special? [ over zero? ] unless* [ drop ] [
-        [ fp-normalize ] dip
-        [ double>bits dup -52 shift 0x7ff bitand 1023 - ]
-        [ + ] [ + ] tri* {
+        [ double>bits dup -52 shift 0x7ff bitand 1023 - ] dip +
+        {
             { [ dup -1074 < ] [ drop 0 copysign ] }
             { [ dup 1023 > ] [ drop 0 < -1/0. 1/0. ? ] }
             [
