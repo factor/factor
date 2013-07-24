@@ -14,7 +14,7 @@ IN: lunar-rescue
 TUPLE: lunar-rescue < space-invaders ; 
 
 : <lunar-rescue> ( -- cpu )
-  lunar-rescue new cpu-init ;
+    lunar-rescue new cpu-init ;
 
 CONSTANT: rom-info {
     { 0x0000 "lrescue/lrescue.1" }
@@ -23,9 +23,9 @@ CONSTANT: rom-info {
     { 0x1800 "lrescue/lrescue.4" }
     { 0x4000 "lrescue/lrescue.5" }
     { 0x4800 "lrescue/lrescue.6" }
-  }
+}
 
 : run-lunar ( -- )  
-  [ "Lunar Rescue" <lunar-rescue>  rom-info (run) ] with-ui ;
+    [ "Lunar Rescue" <lunar-rescue>  rom-info (run) ] with-ui ;
 
 MAIN: run-lunar

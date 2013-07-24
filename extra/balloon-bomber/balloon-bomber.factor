@@ -14,7 +14,7 @@ IN: balloon-bomber
 TUPLE: balloon-bomber < space-invaders ; 
 
 : <balloon-bomber> ( -- cpu )
-  balloon-bomber new cpu-init ;
+    balloon-bomber new cpu-init ;
 
 CONSTANT: rom-info {
     { 0x0000 "ballbomb/tn01" }
@@ -22,9 +22,9 @@ CONSTANT: rom-info {
     { 0x1000 "ballbomb/tn03" }
     { 0x1800 "ballbomb/tn04" }
     { 0x4000 "ballbomb/tn05-1" }
-  }
+}
 
-: run-balloon ( -- )  
-  [ "Balloon Bomber" <balloon-bomber>  rom-info (run) ] with-ui ;
+: run-balloon ( -- )
+    [ "Balloon Bomber" <balloon-bomber>  rom-info (run) ] with-ui ;
 
 MAIN: run-balloon

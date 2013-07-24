@@ -54,12 +54,12 @@ TUPLE: s3-request path mime-type date method headers  bucket data ;
         ":" %
         signature secret-key get sha1 hmac-bytes >base64 %
     ] "" make ;
-  
+
 : s3-url ( s3-request -- string )
-    [ 
+    [
         "http://" % 
         dup bucket>> [ % "." % ] when* 
-        "s3.amazonaws.com" %  
+        "s3.amazonaws.com" %
         path>> %
     ] "" make ;
 
@@ -110,13 +110,13 @@ TUPLE: key name last-modified size ;
 <PRIVATE
 : (keys) ( xml -- seq )
     "Contents" tags-named [
-      [ "Key" tag-named children>string ]
-      [ "LastModified" tag-named children>string ]
-      [ "Size" tag-named children>string ]
-      tri key boa
-  ] map ;
+        [ "Key" tag-named children>string ]
+        [ "LastModified" tag-named children>string ]
+        [ "Size" tag-named children>string ]
+        tri key boa
+    ] map ;
 PRIVATE>
- 
+
 : keys ( bucket -- seq )
     "/" H{ } clone s3-get
     nip >string string>xml (keys) ;
@@ -138,7 +138,7 @@ PRIVATE>
 : delete-bucket ( bucket -- )
     "/" H{ } clone "DELETE" <s3-request>
     dup s3-url <delete-request> sign-http-request http-request 2drop ;
- 
+
 : put-object ( data mime-type bucket key headers -- )
     [ "/" prepend ] dip "PUT" <s3-request> 
     over >>mime-type
