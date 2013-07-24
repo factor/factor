@@ -1,4 +1,5 @@
-USING: assocs kernel sequences sequences.private sorting ;
+USING: arrays assocs kernel kernel.private sequences
+sequences.private sorting ;
 IN: sorting.extras
 
 : argsort ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )
@@ -7,5 +8,6 @@ IN: sorting.extras
     sort [ second-unsafe ] map! ; inline
 
 : map-sort ( ... seq quot: ( ... elt -- ... key ) -- ... sortedseq )
-    [ map ] curry keep zip [ first-unsafe ] sort-with
-    [ second-unsafe ] map ; inline
+    [ map ] curry keep zip
+    [ { array } declare first-unsafe ] sort-with
+    [ { array } declare second-unsafe ] map ; inline
