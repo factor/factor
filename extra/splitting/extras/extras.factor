@@ -1,4 +1,4 @@
-USING: kernel locals math sequences ;
+USING: kernel math sequences ;
 
 IN: splitting.extras
 
