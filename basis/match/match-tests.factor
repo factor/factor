@@ -59,7 +59,7 @@ C: <foo> foo
     ] with-variables
 ] unit-test
 
-{ H{ { ?a ?a } } }
+{ H{ { ?a ?a } } } [
     \ ?a \ ?a match
 ] unit-test
 
