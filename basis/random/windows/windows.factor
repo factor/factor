@@ -46,8 +46,12 @@ M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )
     handle>> swap [ ] [ <byte-array> ] bi
     [ CryptGenRandom win32-error=0/f ] keep ;
 
-: try-crypto-providers ( seq -- windows-crypto-context )
-    [ first2 <windows-crypto-context> ] attempt-all ;
+! Some Windows installations still don't work, so just set
+! system and secure rngs to f
+: try-crypto-providers ( seq -- windows-crypto-context/f )
+    [
+        [ first2 <windows-crypto-context> ] attempt-all
+    ] [ 2drop f ] recover ;
 
 [
     {
