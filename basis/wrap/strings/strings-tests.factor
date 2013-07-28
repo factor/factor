@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: wrap.strings tools.test ;
+USING: kernel tools.test wrap.strings ;
 IN: wrap.strings.tests
 
 [
