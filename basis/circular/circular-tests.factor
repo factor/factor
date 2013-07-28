@@ -42,3 +42,9 @@ IN: circular.tests
         swap growing-circular-push
     ] with each >array
 ] unit-test
+
+[ V{ 1 2 3 1 2 } ] [
+    { 1 2 3 } <circular> V{ } [
+        [ [ push ] [ length 4 < ] bi ] curry circular-while
+    ] keep
+] unit-test
