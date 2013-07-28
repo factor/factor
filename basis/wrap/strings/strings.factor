@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: wrap kernel sequences fry splitting math ;
+USING: fry kernel math sequences splitting strings wrap ;
 IN: wrap.strings
 
 <PRIVATE
@@ -19,11 +19,19 @@ IN: wrap.strings
 
 PRIVATE>
 
-: wrap-lines ( lines width -- newlines )
+: wrap-lines ( string width -- newlines )
     [ split-lines ] dip '[ _ dup wrap join-elements ] map! concat ;
 
 : wrap-string ( string width -- newstring )
     wrap-lines join-lines ;
 
+<PRIVATE
+
+: make-indent ( indent -- indent' )
+    dup string? [ CHAR: \s <string> ] unless ; inline
+
+PRIVATE>
+
 : wrap-indented-string ( string width indent -- newstring )
-    [ length - wrap-lines ] keep '[ _ prepend ] map! join-lines ;
+    make-indent [ length - wrap-lines ] keep
+    '[ _ prepend ] map! join-lines ;
