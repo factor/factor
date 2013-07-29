@@ -48,3 +48,9 @@ IN: circular.tests
         [ [ push ] [ length 5 < ] bi ] curry circular-while*
     ] keep
 ] unit-test
+
+[ V{ 1 } ] [
+    { 1 2 3 } <circular> V{ } [
+        [ push f ] curry circular-while*
+    ] keep
+] unit-test
