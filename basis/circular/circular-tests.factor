@@ -43,6 +43,26 @@ IN: circular.tests
     ] with each >array
 ] unit-test
 
+[ V{ 1 2 3 } ] [
+    { 1 2 3 } <circular> V{ } [
+        [ push f ] curry circular-while
+    ] keep
+] unit-test
+
+CONSTANT: test-sequence1 { t f f f }
+[ V{ 1 2 3 1 } ] [
+    { 1 2 3 } <circular> V{ } [
+        [ [ push ] [ length 1 - test-sequence1 nth ] bi ] curry circular-while
+    ] keep
+] unit-test
+
+CONSTANT: test-sequence2 { t f t t f f t t t f f f }
+[ V{ 1 2 3 1 2 3 1 2 3 1 2 3 } ] [
+    { 1 2 3 } <circular> V{ } [
+        [ [ push ] [ length 1 - test-sequence2 nth ] bi ] curry circular-while
+    ] keep
+] unit-test
+
 [ V{ 1 2 3 1 2 } ] [
     { 1 2 3 } <circular> V{ } [
         [ [ push ] [ length 5 < ] bi ] curry circular-while*
