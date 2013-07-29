@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Alex Chapman, Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license
-USING: arrays kernel tools.test sequences sequences.private
-circular strings ;
+USING: arrays circular kernel math sequences sequences.private
+strings tools.test ;
 IN: circular.tests
 
 [ 0 ] [ { 0 1 2 3 4 } <circular> 0 swap virtual@ drop ] unit-test
@@ -45,6 +45,6 @@ IN: circular.tests
 
 [ V{ 1 2 3 1 2 } ] [
     { 1 2 3 } <circular> V{ } [
-        [ [ push ] [ length 4 < ] bi ] curry circular-while
+        [ [ push ] [ length 5 < ] bi ] curry circular-while*
     ] keep
 ] unit-test
