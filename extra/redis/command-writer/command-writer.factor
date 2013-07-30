@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.crlf kernel math.parser sequences strings interpolate locals ;
+USING: assocs io io.crlf kernel math.parser sequences strings interpolate locals ;
 IN: redis.command-writer
 
 <PRIVATE
@@ -83,6 +83,28 @@ PRIVATE>
 : sunionstore ( keys destkey -- )
     "SUNIONSTORE " write write " " join space write crlf ;
 : smembers ( key -- ) "SMEMBERS " write write crlf ;
+
+#! Hashes
+: hdel ( field key -- ) "HDEL " write write space write crlf ;
+: hexists ( field key -- ) "HEXISTS " write write space write crlf ;
+: hget ( field key -- ) "HGET " write write space write crlf ;
+: hgetall ( key -- ) "HGETALL " write write crlf ;
+: hincrby ( integer field key -- )
+    "HINCRBY " write write space write space number>string write crlf ;
+: hincrbyfloat (  float field key -- )
+    "HINCRBYFLOAT " write write space write space number>string write crlf ;
+: hkeys ( key -- ) "HKEYS " write write crlf ;
+: hlen ( key -- ) "HLEN " write write crlf ;
+: hmget ( seq key  -- )
+    "HMGET " write write space " " join write crlf ;
+: hmset ( assoc key -- ) 
+    "HMSET " write write space
+    >alist [ " " join ] map " " join write crlf ;
+: hset ( value field key -- ) "HSET " write write space write
+    space write crlf ;
+: hsetnx ( value field key -- ) "HSETNX " write write space
+    write space write crlf ;
+: hvals ( key -- ) "HVALS " write write crlf ;
 
 #! Multiple db
 : select ( integer -- ) "SELECT " write number>string write crlf ;
