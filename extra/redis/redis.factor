@@ -56,6 +56,21 @@ IN: redis
 : redis-sunionstore ( keys destkey -- response ) sunionstore flush read-response ;
 : redis-smembers ( key -- response ) smembers flush read-response ;
 
+#! Hashes
+: redis-hdel ( field key -- response ) hdel flush read-response ;
+: redis-hexists ( field key -- response ) hexists flush read-response ;
+: redis-hget ( field key -- response ) hget flush read-response ;
+: redis-hgetall ( key -- response ) hgetall flush read-response ;
+: redis-hincrby ( integer field key -- response ) hincrby flush read-response ;
+: redis-hincrbyfloat (  float field key -- response ) hincrbyfloat flush read-response ;
+: redis-hkeys ( key -- response ) hkeys flush read-response ;
+: redis-hlen ( key -- response ) hlen flush read-response ;
+: redis-hmget ( seq key  -- response ) hmget flush read-response ;
+: redis-hmset ( assoc key -- response ) hmset flush read-response ;
+: redis-hset ( value field key -- response ) hset flush read-response ;
+: redis-hsetnx ( value field key -- response ) hsetnx flush read-response ;
+: redis-hvals ( key -- response ) hvals flush read-response ;
+
 #! Multiple db
 : redis-select ( integer -- response ) select flush read-response ;
 : redis-move ( integer key -- response ) move flush read-response ;

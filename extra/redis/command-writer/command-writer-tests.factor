@@ -112,6 +112,68 @@ IN: redis.command-writer.tests
 
 [ "SMEMBERS key\r\n" ] [ [ "key" smembers ] with-string-writer ] unit-test
 
+#! Hashes
+[ "HDEL key field\r\n" ] [
+    [ "field" "key" hdel ] with-string-writer
+] unit-test
+
+[ "HEXISTS key field\r\n" ] [
+    [ "field" "key" hexists ] with-string-writer
+] unit-test
+
+[ "HGET key field\r\n" ] [
+    [ "field" "key" hget ] with-string-writer
+] unit-test
+
+[ "HGETALL key\r\n" ] [
+    [ "key" hgetall ] with-string-writer
+] unit-test
+
+[ "HINCRBY key field 1\r\n" ] [
+    [ 1 "field" "key" hincrby ] with-string-writer
+] unit-test
+
+[ "HINCRBYFLOAT key field 1.0\r\n" ] [
+    [ 1.0 "field" "key" hincrbyfloat ] with-string-writer
+] unit-test
+
+[ "HKEYS key\r\n" ] [
+    [ "key" hkeys ] with-string-writer
+] unit-test
+
+[ "HLEN key\r\n" ] [
+    [ "key" hlen ] with-string-writer
+] unit-test
+
+[ "HMGET key field1 field2\r\n" ] [
+    [
+        { "field1" "field2" }
+        "key"
+        hmget
+    ] with-string-writer
+] unit-test
+
+[ "HMSET key field1 value1 field2 value2\r\n" ] [
+    [
+        { { "field1" "value1" } { "field2" "value2" } }
+        "key"
+        hmset
+    ] with-string-writer
+] unit-test
+
+[ "HSET key field value\r\n" ] [
+    [
+        "value"
+        "field"
+        "key"
+        hset
+    ] with-string-writer
+] unit-test
+
+[ "HSETNX key field value\r\n" ] [ [ "value" "field" "key" hsetnx ] with-string-writer ] unit-test
+
+[ "HVALS key\r\n" ] [ [ "key" hvals ] with-string-writer ] unit-test
+
 #! Multiple db
 [ "SELECT 2\r\n" ] [ [ 2 select ] with-string-writer ] unit-test
 
