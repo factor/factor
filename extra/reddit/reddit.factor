@@ -23,7 +23,7 @@ approved_by banned_by clicked created created_utc domain downs
 hidden id is_self levenshtein likes link_flair_css_class
 link_flair_text media media_embed name edited num_comments
 num_reports over_18 permalink saved score selftext selftext_html
-subreddit subreddit_id thumbnail title ups url ;
+subreddit subreddit_id thumbnail title ups url distinguished ;
 
 TUPLE: subreddit accounts_active created created_utc description
 display_name id header_img header_size header_title name over18
