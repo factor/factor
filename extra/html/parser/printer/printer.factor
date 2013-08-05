@@ -1,8 +1,6 @@
-USING: accessors assocs html.parser html.parser.utils combinators
-continuations hashtables
-hashtables.private io kernel make math
-namespaces prettyprint quotations sequences splitting
-strings unicode.categories ;
+USING: accessors assocs combinators html.parser
+html.parser.utils io kernel math namespaces sequences strings
+unicode.categories ;
 IN: html.parser.printer
 
 TUPLE: html-printer ;
@@ -38,7 +36,14 @@ ERROR: unknown-tag-error tag ;
 : html-src. ( vector -- )
     T{ src-printer } html-printer [ print-tags ] with-variable ;
 
-M: html-printer print-text-tag ( tag -- ) text>> write ;
+M: text-printer print-opening-tag
+    name>> "br" = [ nl ] when ;
+
+M: text-printer print-closing-tag
+    name>> "p" = [ nl ] when ;
+
+M: html-printer print-text-tag ( tag -- )
+    text>> write ;
 
 M: html-printer print-comment-tag ( tag -- )
     "<!--" write text>> write "-->" write ;
@@ -83,8 +88,9 @@ M: html-prettyprinter print-opening-tag ( tag -- )
     [ { "br" "img" } member? [ #indentations inc ] unless ] bi ;
 
 M: html-prettyprinter print-closing-tag ( tag -- )
-    #indentations dec
-    tabs write "</" write name>> write ">\n" write ;
+    [ tabs write "</" write name>> write ">\n" write ]
+    ! These tags usually don't have any closing tag associated with them.
+    [ { "br" "img" } member? [ #indentations dec ] unless ] bi ;
 
 M: html-prettyprinter print-text-tag ( tag -- )
     text>> [ blank? ] trim [ tabs write write "\n" write ] unless-empty ;
