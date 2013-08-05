@@ -34,4 +34,4 @@ PRIVATE>
 
 : wrap-indented-string ( string width indent -- newstring )
     make-indent [ length - wrap-lines ] keep
-    '[ _ prepend ] map! join-lines ;
+    over empty? [ nip ] [ '[ _ prepend ] map! join-lines ] if ;
