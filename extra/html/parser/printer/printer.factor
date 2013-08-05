@@ -1,6 +1,6 @@
 USING: accessors assocs combinators html.parser
-html.parser.utils io kernel math namespaces sequences strings
-unicode.categories ;
+html.parser.utils io kernel math math.order namespaces sequences
+strings unicode.categories ;
 IN: html.parser.printer
 
 TUPLE: html-printer ;
@@ -79,7 +79,7 @@ SYMBOL: tagstack
     ] with-scope ;
 
 : tabs ( -- vseq )
-    tab-width get #indentations get * CHAR: \s <repetition> ;
+    tab-width get #indentations get 0 max * CHAR: \s <repetition> ;
 
 M: html-prettyprinter print-opening-tag ( tag -- )
     name>>
