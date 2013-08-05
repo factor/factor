@@ -381,3 +381,8 @@ USE: make
         { 255 0 175 }
     } [ { 0 0 255 } distance ] infimum-by
 ] unit-test
+
+[ -1 0 <repetition> ] must-fail
+{ { } } [ 0 0 <repetition> >array ] unit-test
+{ { 0 } } [ 1 0 <repetition> >array ] unit-test
+{ { 0 0 0 } } [ 3 0 <repetition> >array ] unit-test
