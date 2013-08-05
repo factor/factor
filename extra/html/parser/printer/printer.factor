@@ -88,9 +88,9 @@ M: html-prettyprinter print-opening-tag ( tag -- )
     [ { "br" "img" } member? [ #indentations inc ] unless ] bi ;
 
 M: html-prettyprinter print-closing-tag ( tag -- )
-    [ tabs write "</" write name>> write ">\n" write ]
     ! These tags usually don't have any closing tag associated with them.
-    [ { "br" "img" } member? [ #indentations dec ] unless ] bi ;
+    [ { "br" "img" } member? [ #indentations dec ] unless ]
+    [ tabs write "</" write name>> write ">\n" write ] bi ;
 
 M: html-prettyprinter print-text-tag ( tag -- )
     text>> [ blank? ] trim [ tabs write write "\n" write ] unless-empty ;
