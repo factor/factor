@@ -47,3 +47,5 @@ word wrap."""
 
 [ "" ] [ "" 10 wrap-string ] unit-test
 [ "Hello" ] [ "\nHello\n" 10 wrap-string ] unit-test
+
+{ " > > > " } [ "" 70 " > > > " wrap-indented-string ] unit-test
