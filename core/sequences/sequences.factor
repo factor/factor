@@ -268,7 +268,9 @@ INSTANCE: slice virtual-sequence
 ! One element repeated many times
 TUPLE: repetition { len read-only } { elt read-only } ;
 
-C: <repetition> repetition
+: <repetition> ( len elt -- repetition )
+    over 0 < [ non-negative-integer-expected ] when
+    repetition boa ; inline
 
 M: repetition length len>> ; inline
 M: repetition nth-unsafe nip elt>> ; inline
