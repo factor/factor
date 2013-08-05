@@ -195,6 +195,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
 ;;; Regexps galore:
 
+;; Excludes parsing words that are handled by other regexps
 (defconst factor-parsing-words
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
@@ -216,9 +217,9 @@ source/docs/tests file. When set to false, you'll be asked only once."
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:"
-    "SPECIALIZED-ARRAYS:" "STRING:" "STRUCT:" "SYMBOL:" "SYMBOLS:" "SYNTAX:"
-    "TUPLE:" "TYPEDEF:" "TYPED:" "TYPED::"
-    "UNIFORM-TUPLE:" "UNION:" "UNION-STRUCT:" "USE:" "USING:"
+    "SPECIALIZED-ARRAYS:" "STRING:" "STRUCT:" "SYMBOLS:" "SYNTAX:"
+    "TYPEDEF:" "TYPED:" "TYPED::"
+    "UNIFORM-TUPLE:" "UNION:" "UNION-STRUCT:" "USE:"
     "VARIANT:" "VERTEX-FORMAT:"))
 
 (defconst factor-parsing-words-regex
@@ -255,7 +256,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "^AFTER: +\\([^ ]+\\) +\\([^ ]+\\)")
 
 (defconst factor-integer-regex
-  "\\_<-?[0-9]+\\_>")
+  "\\_<-?\\(0[xob]\\)?[0-9]+\\_>")
 
 (defconst factor-raw-float-regex
   "[0-9]*\\.[0-9]*\\([eEpP][+-]?[0-9]+\\)?")
@@ -273,32 +274,37 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
 
 (defconst factor-word-definition-regex
-  (format "\\_<\\(%s\\)?: +\\_<\\(%s\\)\\_>"
+  (format "\\_<\\(%s\\)?: +\\(%s\\)"
           (regexp-opt
            '(":" "GENERIC" "DEFER" "HOOK" "MAIN" "MATH" "POSTPONE"
-             "SYMBOL" "SYNTAX" "TYPED" "TYPED:" "RENAME"))
+             "SYNTAX" "TYPED" "TYPED:" "RENAME"))
           "\\(\\sw\\|\\s_\\|\\s(\\|\\s)\\)+"))
 
 (defconst factor-alias-definition-regex
   "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
 
-(defconst factor-vocab-ref-regexp
+(defconst factor-vocab-ref-regex
   (factor-second-word-regex
    '("IN:" "USE:" "FROM:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
+
+(defconst factor-using-lines-regex "^\\(USING\\):[ \n]+\\([^;]+\\);")
 
 (defconst factor-int-constant-def-regex
   (factor-second-word-regex '("ALIEN:" "CHAR:" "NAN:")))
 
 (defconst factor-type-definition-regex
   (factor-second-word-regex
-   '("C-STRUCT:" "C-UNION:" "COM-INTERFACE:" "MIXIN:" "TUPLE:" "SINGLETON:"
+   '("C-STRUCT:" "C-UNION:" "COM-INTERFACE:" "MIXIN:" "SINGLETON:"
      "SPECIALIZED-ARRAY:" "STRUCT:" "UNION:" "UNION-STRUCT:")))
 
 (defconst factor-error-regex
   (factor-second-word-regex '("ERROR:")))
 
-(defconst factor-tuple-decl-regex
-  "^TUPLE: +\\([^ \n]+\\) +< +\\([^ \n]+\\)\\_>")
+(defconst factor-simple-tuple-decl-regex
+  "\\(TUPLE\\):\\s-+\\(\\w+\\)\\s-+\\([^;]+\\);")
+
+(defconst factor-subclassed-tuple-decl-regex
+  "\\(TUPLE\\):\\s-+\\(\\(?:\\sw\\|\\s_\\)+\\)\\s-+<\\s-+\\(\\(?:\\sw\\|\\s_\\)+\\)\\s-+\\([^;]+\\);")
 
 (defconst factor-constructor-regex
   "<[^ >]+>")
@@ -310,12 +316,10 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "\\_<>>.+?\\_>")
 
 (defconst factor-symbol-definition-regex
-  (factor-second-word-regex '("&:" "SYMBOL:" "VAR:")))
+  (factor-second-word-regex '("&:" "SYMBOL:" "VAR:" "CONSTANT:")))
 
 (defconst factor-stack-effect-regex
   "\\( ( [^\n]* )\\)\\|\\( (( [^\n]* ))\\)")
-
-(defconst factor-using-lines-regex "^USING: +\\([^;]+\\);")
 
 (defconst factor-use-line-regex "^USE: +\\(.*\\)$")
 
@@ -379,10 +383,9 @@ source/docs/tests file. When set to false, you'll be asked only once."
                 "POSTPONE:" "PRIVATE>" "<PRIVATE"
                 "QUALIFIED-WITH:" "QUALIFIED:"
                 "RENAME:"
-                "SINGLETON:" "SLOT:" "SPECIALIZED-ARRAY:" "SYMBOL:"
+                "SINGLETON:" "SLOT:" "SPECIALIZED-ARRAY:"
                 "TYPEDEF:"
-                "USE:"
-                "VAR:")))
+                "USE:")))
 
 (defconst factor-begin-of-def-regex
   (format "^USING: \\|\\(%s\\)\\|\\(^%s .*\\)"
@@ -433,7 +436,11 @@ source/docs/tests file. When set to false, you'll be asked only once."
                                         (3 'factor-font-lock-word))
     (,factor-alien-callback-regex (1 'factor-font-lock-type-name)
                                   (2 'factor-font-lock-word))
-    (,factor-vocab-ref-regexp 2 'factor-font-lock-vocabulary-name)
+    (,factor-vocab-ref-regex 2 'factor-font-lock-vocabulary-name)
+
+    (,factor-using-lines-regex (1 'factor-font-lock-parsing-word)
+                               (2 'factor-font-lock-vocabulary-name))
+
     (,factor-constructor-decl-regex
      (1 'factor-font-lock-word)
      (2 'factor-font-lock-type-name)
@@ -466,11 +473,21 @@ source/docs/tests file. When set to false, you'll be asked only once."
                                      (2 'factor-font-lock-word))
     (,factor-after-definition-regex  (1 'factor-font-lock-type-name)
                                      (2 'factor-font-lock-word))
-    (,factor-tuple-decl-regex 2 'factor-font-lock-type-name)
+
+    ;; Order is important, otherwise "<" will be colorized as a slot.
+    (,factor-subclassed-tuple-decl-regex (1 'factor-font-lock-parsing-word)
+                                         (2 'factor-font-lock-type-name)
+                                         (3 'factor-font-lock-type-name)
+                                         (4 'factor-font-lock-symbol))
+    (,factor-simple-tuple-decl-regex (1 'factor-font-lock-parsing-word)
+                                     (2 'factor-font-lock-type-name)
+                                     (3 'factor-font-lock-symbol))
+
     (,factor-constructor-regex . 'factor-font-lock-constructor)
     (,factor-setter-regex . 'factor-font-lock-setter-word)
     (,factor-getter-regex . 'factor-font-lock-getter-word)
-    (,factor-symbol-definition-regex 2 'factor-font-lock-symbol)
+    (,factor-symbol-definition-regex (1 'factor-font-lock-parsing-word)
+                                     (2 'factor-font-lock-word))
     (,factor-bad-string-regex . 'factor-font-lock-invalid-syntax)
     ("\\_<\\(P\\|SBUF\\|DLL\\)\"" 1 'factor-font-lock-parsing-word)
     (,factor-constant-words-regex . 'factor-font-lock-constant)
@@ -555,9 +572,6 @@ source/docs/tests file. When set to false, you'll be asked only once."
   (save-excursion
     (beginning-of-line)
     (re-search-forward factor-constructor-regex (line-end-position) t)))
-
-(defsubst factor-at-using ()
-  (looking-at factor-using-lines-regex))
 
 (defun factor-in-using ()
   (let ((p (point)))
@@ -767,6 +781,9 @@ With prefix, non-existing files will be created."
 
 ;;; factor-mode:
 
+;; I think it is correct to put almost all punctuation characters in
+;; the word class because Factor words can be made up of almost
+;; anything. Otherwise you get incredibly annoying regexps.
 (defvar factor-mode-syntax-table
   (let ((table (make-syntax-table prog-mode-syntax-table)))
     (modify-syntax-entry ?\" "\"" table)
@@ -776,7 +793,7 @@ With prefix, non-existing files will be created."
     (modify-syntax-entry ?$ "_" table)
     (modify-syntax-entry ?@ "_" table)
     (modify-syntax-entry ?? "_" table)
-    (modify-syntax-entry ?_ "_" table)
+    (modify-syntax-entry ?_ "w" table)
     (modify-syntax-entry ?: "_" table)
     (modify-syntax-entry ?< "_" table)
     (modify-syntax-entry ?> "_" table)
@@ -786,8 +803,8 @@ With prefix, non-existing files will be created."
     (modify-syntax-entry ?= "_" table)
     (modify-syntax-entry ?/ "_" table)
     (modify-syntax-entry ?+ "_" table)
-    (modify-syntax-entry ?* "_" table)
-    (modify-syntax-entry ?- "_" table)
+    (modify-syntax-entry ?* "w" table)
+    (modify-syntax-entry ?- "w" table)
     (modify-syntax-entry ?\; "_" table)
     (modify-syntax-entry ?\( "()" table)
     (modify-syntax-entry ?\) ")(" table)
