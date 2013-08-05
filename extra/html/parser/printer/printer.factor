@@ -1,11 +1,9 @@
 USING: accessors assocs html.parser html.parser.utils combinators
 continuations hashtables
-hashtables.private io kernel math
+hashtables.private io kernel make math
 namespaces prettyprint quotations sequences splitting
-strings ;
+strings unicode.categories ;
 IN: html.parser.printer
-
-SYMBOL: printer
 
 TUPLE: html-printer ;
 TUPLE: text-printer < html-printer ;
@@ -68,22 +66,25 @@ SYMBOL: tagstack
 
 : prettyprint-html ( vector -- )
     [
-        T{ html-prettyprinter } printer set
+        T{ html-prettyprinter } html-printer set
         V{ } clone tagstack set
         2 tab-width set
         0 #indentations set
         print-tags
     ] with-scope ;
 
-: print-tabs ( -- )
-    tab-width get #indentations get * CHAR: \s <repetition> write ; 
+: tabs ( -- vseq )
+    tab-width get #indentations get * CHAR: \s <repetition> ;
 
 M: html-prettyprinter print-opening-tag ( tag -- )
-    print-tabs "<" write
-    name>> write
-    ">\n" write ;
+    name>>
+    [ tabs write "<" write write ">\n" write ]
+    ! These tags usually don't have any closing tag associated with them.
+    [ { "br" "img" } member? [ #indentations inc ] unless ] bi ;
 
 M: html-prettyprinter print-closing-tag ( tag -- )
-    "</" write
-    name>> write
-    ">" write ;
+    #indentations dec
+    tabs write "</" write name>> write ">\n" write ;
+
+M: html-prettyprinter print-text-tag ( tag -- )
+    text>> [ blank? ] trim [ tabs write write "\n" write ] unless-empty ;
