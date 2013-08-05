@@ -5,8 +5,6 @@ namespaces prettyprint quotations sequences sequences.repeating splitting
 strings unicode.categories ;
 IN: html.parser.printer
 
-SYMBOL: printer
-
 TUPLE: html-printer ;
 TUPLE: text-printer < html-printer ;
 TUPLE: src-printer < html-printer ;
