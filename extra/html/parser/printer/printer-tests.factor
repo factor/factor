@@ -2,13 +2,14 @@ USING:
     html.parser html.parser.printer
     io.streams.string
     namespaces
+    strings
     tools.test ;
 IN: html.parser.printer.tests
 
 [
     "          "
 ] [
-    [ 5 #indentations set 2 tab-width set tabs ] with-scope
+    [ 5 #indentations set 2 tab-width set tabs >string ] with-scope
 ] unit-test
 
 [
