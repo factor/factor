@@ -52,6 +52,20 @@ source/docs/tests file. When set to false, you'll be asked only once."
   :safe 'integerp
   :group 'factor)
 
+(defcustom factor-mode-use-fuel t
+  "Whether to use the full FUEL facilities in factor mode.
+
+Set this variable to nil if you just want to use Emacs as the
+external editor of your Factor environment, e.g., by putting
+these lines in your .emacs:
+
+  (add-to-list 'load-path \"/path/to/factor/misc/fuel\")
+  (setq factor-mode-use-fuel nil)
+  (require 'factor-mode)
+"
+  :type 'boolean
+  :group 'factor)
+
 
 ;;; Faces:
 
@@ -939,7 +953,9 @@ With prefix, non-existing files will be created."
   (setq-local indent-tabs-mode nil)
 
   (setq-local beginning-of-defun-function 'factor-beginning-of-defun)
-  (setq-local end-of-defun-function 'factor-end-of-defun))
+  (setq-local end-of-defun-function 'factor-end-of-defun)
+  ;; Load fuel-mode too if factor-mode-use-fuel is t.
+  (when factor-mode-use-fuel (require 'fuel-mode) (fuel-mode)))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
