@@ -231,7 +231,6 @@ interacting with a factor listener is at your disposal.
         ("Other Factor buffer other frame" "\C-x5s"
          fuel-switch-to-buffer-other-frame)))
 
-(add-hook 'factor-mode-hook (lambda () (fuel-mode 1)))
 
 (provide 'fuel-mode)
 
