@@ -40,13 +40,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
   :type 'boolean
   :group 'factor)
 
-(defcustom factor-indent-tabs-mode nil
-  "Indentation can insert tabs in Factor mode if this is non-nil."
-  :type 'boolean
-  :safe 'booleanp
-  :group 'factor)
-
-(defcustom factor-indent-level 2
+(defcustom factor-indent-level 4
   "Indentation of Factor statements."
   :type 'integer
   :safe 'integerp
@@ -287,7 +281,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
   (factor-second-word-regex
    '("IN:" "USE:" "FROM:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
 
-(defconst factor-using-lines-regex "^\\(USING\\):[ \n\t]+\\([^;]*\\);")
+(defconst factor-using-lines-regex "^\\(USING\\):[ \n]+\\([^;\t]*\\);")
 
 (defconst factor-int-constant-def-regex
   (factor-second-word-regex '("ALIEN:" "CHAR:" "NAN:")))
@@ -301,10 +295,10 @@ source/docs/tests file. When set to false, you'll be asked only once."
   (factor-second-word-regex '("ERROR:")))
 
 (defconst factor-simple-tuple-decl-regex
-  "\\(TUPLE\\):[ \n\t]+\\(\\w+\\)[ \n\t]+\\([^;]+\\);")
+  "\\(TUPLE\\):[ \n]+\\(\\w+\\)[ \n]+\\([^\t;]+\\);")
 
 (defconst factor-subclassed-tuple-decl-regex
-  "\\(TUPLE\\):[ \n\t]+\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n\t]+<[ \n\t]+\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n\t]+\\([^;]+\\);")
+  "\\(TUPLE\\):[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n]+<[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n]+\\([^\t;]+\\);")
 
 (defconst factor-constructor-regex
   "<[^ >]+>")
@@ -491,7 +485,8 @@ source/docs/tests file. When set to false, you'll be asked only once."
     (,factor-bad-string-regex . 'factor-font-lock-invalid-syntax)
     ("\\_<\\(P\\|SBUF\\|DLL\\)\"" 1 'factor-font-lock-parsing-word)
     (,factor-constant-words-regex . 'factor-font-lock-constant)
-    (,factor-parsing-words-regex . 'factor-font-lock-parsing-word)))
+    (,factor-parsing-words-regex . 'factor-font-lock-parsing-word)
+    (,"\t" . 'whitespace-highlight-face)))
 
 ;; Handling of multi-line constructs
 (defun factor-font-lock-extend-region ()
@@ -862,7 +857,8 @@ With prefix, non-existing files will be created."
               (append '(?\] ?\} ?\n) electric-indent-chars))
 
   (setq-local indent-line-function 'factor-indent-line)
-  (setq-local indent-tabs-mode factor-indent-tabs-mode)
+  ;; No tabs for you!!
+  (setq-local indent-tabs-mode nil)
 
   (setq-local beginning-of-defun-function 'factor-beginning-of-defun)
   (setq-local end-of-defun-function 'factor-end-of-defun))
