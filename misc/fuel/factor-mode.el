@@ -200,7 +200,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
     "B" "BEFORE:"
-    "C:" "CALLBACK:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COM-INTERFACE:" "CONSTANT:"
+    "C:" "CALLBACK:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:" "CONSTANT:"
     "CONSULT:" "call-next-method"
     "DEFER:" "DESTRUCTOR:"
     "EBNF:" ";EBNF" "ENUM:" "ERROR:" "EXCLUDE:"
@@ -287,7 +287,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
   (factor-second-word-regex
    '("IN:" "USE:" "FROM:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
 
-(defconst factor-using-lines-regex "^\\(USING\\):[ \n]+\\([^;]+\\);")
+(defconst factor-using-lines-regex "^\\(USING\\):[ \n\t]+\\([^;]*\\);")
 
 (defconst factor-int-constant-def-regex
   (factor-second-word-regex '("ALIEN:" "CHAR:" "NAN:")))
@@ -301,10 +301,10 @@ source/docs/tests file. When set to false, you'll be asked only once."
   (factor-second-word-regex '("ERROR:")))
 
 (defconst factor-simple-tuple-decl-regex
-  "\\(TUPLE\\):\\s-+\\(\\w+\\)\\s-+\\([^;]+\\);")
+  "\\(TUPLE\\):[ \n\t]+\\(\\w+\\)[ \n\t]+\\([^;]+\\);")
 
 (defconst factor-subclassed-tuple-decl-regex
-  "\\(TUPLE\\):\\s-+\\(\\(?:\\sw\\|\\s_\\)+\\)\\s-+<\\s-+\\(\\(?:\\sw\\|\\s_\\)+\\)\\s-+\\([^;]+\\);")
+  "\\(TUPLE\\):[ \n\t]++\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n\t]+<[ \n\t]+\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n\t]+\\([^;]+\\);")
 
 (defconst factor-constructor-regex
   "<[^ >]+>")
@@ -493,7 +493,18 @@ source/docs/tests file. When set to false, you'll be asked only once."
     (,factor-constant-words-regex . 'factor-font-lock-constant)
     (,factor-parsing-words-regex . 'factor-font-lock-parsing-word)))
 
-
+;; Handling of multi-line constructs
+(defun factor-font-lock-extend-region ()
+  (eval-when-compile (defvar font-lock-beg) (defvar font-lock-end))
+  (save-excursion
+    (goto-char font-lock-beg)
+    (let ((found (or (re-search-backward "\n\n" nil t) (point-min))))
+      (goto-char font-lock-end)
+      (when (re-search-forward "\n\n" nil t)
+        (beginning-of-line)
+        (setq font-lock-end (point)))
+      (setq font-lock-beg found))))
+
 ;;; Source code analysis:
 
 (defsubst factor-brackets-depth ()
@@ -838,7 +849,11 @@ With prefix, non-existing files will be created."
   (setq-local comment-start-skip "!+ *")
   (setq-local parse-sexp-ignore-comments t)
   (setq-local parse-sexp-lookup-properties t)
-  (setq-local font-lock-defaults '(factor-font-lock-keywords nil nil nil nil))
+  (setq-local font-lock-defaults '(factor-font-lock-keywords))
+  ;; Some syntactic constructs are often split over multiple lines so
+  ;; we need to setup multiline font-lock.
+  (setq-local font-lock-multiline t)
+  (add-hook 'font-lock-extend-region-functions 'factor-font-lock-extend-region)
 
   (define-key factor-mode-map [remap ff-get-other-file]
     'factor-visit-other-file)
