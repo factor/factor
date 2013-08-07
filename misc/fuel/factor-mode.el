@@ -304,7 +304,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "\\(TUPLE\\):[ \n\t]+\\(\\w+\\)[ \n\t]+\\([^;]+\\);")
 
 (defconst factor-subclassed-tuple-decl-regex
-  "\\(TUPLE\\):[ \n\t]++\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n\t]+<[ \n\t]+\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n\t]+\\([^;]+\\);")
+  "\\(TUPLE\\):[ \n\t]+\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n\t]+<[ \n\t]+\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n\t]+\\([^;]+\\);")
 
 (defconst factor-constructor-regex
   "<[^ >]+>")
