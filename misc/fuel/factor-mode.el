@@ -294,12 +294,6 @@ source/docs/tests file. When set to false, you'll be asked only once."
 (defconst factor-error-regex
   (factor-second-word-regex '("ERROR:")))
 
-(defconst factor-simple-tuple-decl-regex
-  "\\(TUPLE\\):[ \n]+\\(\\w+\\)[ \n]+\\([^\t;]+\\);")
-
-(defconst factor-subclassed-tuple-decl-regex
-  "\\(TUPLE\\):[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n]+<[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n]+\\([^\t;]+\\);")
-
 (defconst factor-constructor-regex
   "<[^ >]+>")
 
@@ -468,14 +462,25 @@ source/docs/tests file. When set to false, you'll be asked only once."
     (,factor-after-definition-regex  (1 'factor-font-lock-type-name)
                                      (2 'factor-font-lock-word))
 
-    ;; Order is important, otherwise "<" will be colorized as a slot.
-    (,factor-subclassed-tuple-decl-regex (1 'factor-font-lock-parsing-word)
-                                         (2 'factor-font-lock-type-name)
-                                         (3 'factor-font-lock-type-name)
-                                         (4 'factor-font-lock-symbol))
-    (,factor-simple-tuple-decl-regex (1 'factor-font-lock-parsing-word)
-                                     (2 'factor-font-lock-type-name)
-                                     (3 'factor-font-lock-symbol))
+    ;; Highlights tuple definitions. The TUPLE parsing word, tuple
+    ;; name and optional parent tuple are matched in three
+    ;; groups. Then the text up until the tuple definition is
+    ;; terminated with ";" is searched for words that are slot names
+    ;; which are highlighted with the face factor-font-lock-symbol.
+    (,"\\(TUPLE\\):[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)\\(?:[ \n]+<[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)\\)?"
+     (1 'factor-font-lock-parsing-word)
+     (2 'factor-font-lock-type-name)
+     (3 'factor-font-lock-type-name nil t)
+     ;; A tuple slot is either a single symbol or a sequence along the
+     ;; lines: { foo initial: "bar }
+     ("\\(\\(?:\\sw\\|\\s_\\)+\\)\\|\\(?:{[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)[^}]+\\)"
+      ((lambda (&rest foo)
+         (save-excursion
+           (re-search-forward " ;" nil t)
+           (1- (point)))))
+      nil
+      (1 'factor-font-lock-symbol nil t)
+      (2 'factor-font-lock-symbol nil t)))
 
     (,factor-constructor-regex . 'factor-font-lock-constructor)
     (,factor-setter-regex . 'factor-font-lock-setter-word)
