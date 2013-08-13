@@ -55,7 +55,6 @@ HELP: world
         { { $snippet "status-owner" } " - the gadget that displayed the most recent status message." }
         { { $snippet "focus" } " - the current owner of the keyboard focus in the world." }
         { { $snippet "focused?" } " - a boolean indicating if the native window containing the world has keyboard focus." }
-        { { $snippet "fonts" } " - a hashtable used by the " { $link font-renderer } "." }
         { { $snippet "grab-input?" } " - if set to " { $link t } ", the world will hide the mouse cursor and disable normal mouse input while focused. Use " { $link grab-input } " and " { $link ungrab-input } " to change this setting." }
         { { $snippet "handle" } " - a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
         { { $snippet "window-loc" } " - the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
