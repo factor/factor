@@ -254,10 +254,12 @@
   (fuel-help--word-help t))
 
 (defun fuel-help (&optional print-message)
-  "Show extended help about the symbol at point, using a help
-buffer."
+  "Show extended help about the word or vocabulary at point, using a
+help buffer."
   (interactive "p")
-  (fuel-help--word-help nil nil nil print-message))
+  (if (factor-in-using)
+      (fuel-help-vocab (factor-symbol-at-point))
+    (fuel-help--word-help nil nil nil print-message)))
 
 (defun fuel-help-vocab (vocab)
   "Ask for a vocabulary name and show its help page."
