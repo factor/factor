@@ -582,7 +582,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
 (defun factor-in-using ()
   (let ((p (point)))
     (save-excursion
-      (and (re-search-backward "^USING: " nil t)
+      (and (re-search-backward "^USING:[ \n]" nil t)
            (re-search-forward " ;" nil t)
            (< p (match-end 0))))))
 
