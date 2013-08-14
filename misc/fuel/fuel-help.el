@@ -126,17 +126,17 @@
                                         t)
       def)))
 
-(defun fuel-help--word-help (&optional see word display-only)
+(defun fuel-help--word-help (&optional see word display-only print-message)
   (let ((def (or word (fuel-help--read-word see))))
     (when def
       (let ((cmd `(:fuel* (,def ,(if see 'fuel-word-see 'fuel-word-help))
                           "fuel" t)))
-        (when (called-interactively-p 'any)
+        (when print-message
           (message "Looking up '%s' ..." def))
         (let* ((ret (fuel-eval--send/wait cmd))
                (res (fuel-eval--retort-result ret)))
           (if (not res)
-              (when (called-interactively-p 'any)
+              (when print-message
                 (message "No help for '%s'" def))
             (fuel-help--insert-contents
              (list def def 'word) res display-only)))))))
@@ -253,11 +253,11 @@
   (interactive)
   (fuel-help--word-help t))
 
-(defun fuel-help ()
+(defun fuel-help (&optional print-message)
   "Show extended help about the symbol at point, using a help
 buffer."
-  (interactive)
-  (fuel-help--word-help))
+  (interactive "p")
+  (fuel-help--word-help nil nil nil print-message))
 
 (defun fuel-help-vocab (vocab)
   "Ask for a vocabulary name and show its help page."
