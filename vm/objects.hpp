@@ -2,7 +2,7 @@ namespace factor {
 
 // Special object count and identifiers must be kept in sync with:
 //   core/kernel/kernel.factor
-//   core/bootstrap/image/image.factor
+//   basis/bootstrap/image/image.factor
 
 static const cell special_object_count = 80;
 
@@ -106,6 +106,9 @@ enum special_object {
 
   OBJ_SIGNAL_PIPE = 74, /* file descriptor for pipe used to communicate signals
                            only used on unix */
+  OBJ_VM_COMPILE_TIME = 75, /* when the binary was built */
+  OBJ_VERSION = 76, /* factor version */
+  OBJ_GIT_LABEL = 77, /* git label (git describe --all --long) */
 };
 
 /* save-image-and-exit discards special objects that are filled in on startup
