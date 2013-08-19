@@ -406,7 +406,7 @@ parse_build_info() {
     OS=`echo $1 | cut -d '-' -f 1`
     ARCH=`echo $1 | cut -d '-' -f 2`
     WORD=`echo $1 | cut -d '-' -f 3`
-    
+
     if [[ $OS == linux && $ARCH == ppc ]] ; then WORD=32; fi
     if [[ $OS == linux && $ARCH == arm ]] ; then WORD=32; fi
     if [[ $OS == macosx && $ARCH == ppc ]] ; then WORD=32; fi
@@ -458,7 +458,7 @@ update_script() {
 }
 
 update_script_changed() {
-    invoke_git diff --stat `invoke_git merge-base HEAD FETCH_HEAD` FETCH_HEAD | grep 'build-support.factor\.sh' >/dev/null 
+    invoke_git diff --stat `invoke_git merge-base HEAD FETCH_HEAD` FETCH_HEAD | grep 'build-support.factor\.sh' >/dev/null
 }
 
 git_fetch_factorcode() {

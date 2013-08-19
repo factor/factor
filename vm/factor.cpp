@@ -152,6 +152,12 @@ void factor_vm::init_factor(vm_parameters* p) {
   special_objects[OBJ_EMBEDDED] = false_object;
   special_objects[OBJ_VM_COMPILER] =
       allot_alien(false_object, (cell)FACTOR_COMPILER_VERSION);
+  special_objects[OBJ_VM_COMPILE_TIME] =
+      allot_alien(false_object, (cell)FACTOR_COMPILE_TIME);
+  special_objects[OBJ_VERSION] =
+      allot_alien(false_object, (cell)FACTOR_STRINGIZE(FACTOR_VERSION));
+  special_objects[OBJ_GIT_LABEL] =
+      allot_alien(false_object, (cell)FACTOR_STRINGIZE(FACTOR_GIT_LABEL));
 
   /* We can GC now */
   gc_off = false;

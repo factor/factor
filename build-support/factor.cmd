@@ -27,6 +27,11 @@ if not errorlevel 1 (
     ) else goto nocl
 )
 
+git describe --all --long > git_label.tmp
+set /p git_label= < git_label.tmp
+
+set version=0.97
+
 if %_bootimage_version%==clean (
     set _git_branch=clean-windows-%_target%
     set _bootimage_path=clean/windows-%_target%
@@ -87,4 +92,3 @@ echo     If clean is specified, then the working copy is updated to the
 echo     upstream "clean-windows-*" branch corresponding to the current
 echo     platform and the corresponding boot image is downloaded.
 goto :EOF
-
