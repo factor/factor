@@ -51,6 +51,9 @@
 #define FACTOR_COMPILER_VERSION "unknown"
 #endif
 
+/* Record compilation time */
+#define FACTOR_COMPILE_TIME __TIMESTAMP__
+
 /* Detect target CPU type */
 #if defined(__arm__)
 #define FACTOR_ARM
