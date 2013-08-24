@@ -23,17 +23,18 @@ $nl
 ABOUT: "source-files"
 
 HELP: source-files
-{ $var-description "An assoc mapping pathname strings to " { $link source-file } " instances, representing loaded source files." } ;
+{ $var-description "An assoc mapping pathname strings to " { $link source-file-tuple } " instances, representing loaded source files." } ;
 
 HELP: source-file
-{ $values { "path" "a pathname string" } { "source-file" source-file } }
-{ $description "Outputs the source file associated to a path name, creating the source file first if it doesn't exist. Source files are retained in the " { $link source-files } " variable." }
+{ $values { "path" "a pathname string" } { "source-file" source-file-tuple } }
+{ $description "Outputs the source file associated to a path name, creating the source file first if it doesn't exist. Source files are retained in the " { $link source-files } " variable." } ;
+
+HELP: source-file-tuple
 { $class-description "Instances retain information about loaded source files, and have the following slots:"
     { $list
-        { { $snippet "path" } " - a pathname string." }
-        { { $snippet "checksum" } " - the CRC32 checksum of the source file's contents at the time it was most recently loaded." }
-        { { $snippet "uses" } " - an assoc whose keys are words referenced from this source file's top level form." }
-        { { $snippet "definitions" } " - a pair of assocs, containing definitions and classes defined in this source file, respectively" }
+        { { $slot "path" } " - a pathname string." }
+        { { $slot "checksum" } " - the CRC32 checksum of the source file's contents at the time it was most recently loaded." }
+        { { $slot "definitions" } " - a pair of assocs, containing definitions and classes defined in this source file, respectively" }
     }
 } ;
 
