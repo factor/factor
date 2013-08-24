@@ -53,6 +53,7 @@ PRIVATE>
                 [ check-values ]
                 [ check-value-effects ]
                 [ check-class-description ]
+                [ check-class-slots ]
                 [ nip [ check-nulls ] [ check-see-also ] [ check-markup ] tri ]
             } 2cleave
         ] check-something
