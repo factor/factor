@@ -7,7 +7,7 @@ HELP: debug-leaks?
 { $see-also "tools.destructors" } ;
 
 HELP: disposable
-{ $class-description "Parent class for disposable resources. This class has three slots:"
+{ $class-description "Parent class for disposable resources. This class has two slots:"
     { $list
         { { $slot "disposed" } " - boolean. Set to true by " { $link dispose } ". Assert that it is false with " { $link check-disposed } "." }
         { { $slot "continuation" } " - current continuation at construction time, for debugging. Set by " { $link new-disposable } " if " { $link debug-leaks? } " is on." }
