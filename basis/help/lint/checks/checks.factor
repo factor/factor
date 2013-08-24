@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes combinators
-combinators.short-circuit definitions effects eval fry grouping
-help help.markup help.topics io.streams.string kernel macros
-namespaces sequences sequences.deep sets sorting splitting
-strings unicode.categories vocabs vocabs.loader words
-words.symbol summary debugger io ;
+USING: accessors arrays assocs classes classes.tuple combinators
+combinators.short-circuit debugger definitions effects eval fry
+grouping help help.markup help.topics io io.streams.string
+kernel macros namespaces sequences sequences.deep sets splitting
+strings summary unicode.categories vocabs vocabs.loader words
+words.constant words.symbol ;
 FROM: sets => members ;
 IN: help.lint.checks
 
@@ -74,6 +74,7 @@ SYMBOL: vocab-articles
         [ symbol? ]
         [ parsing-word? ]
         [ "declared-effect" word-prop not ]
+        [ constant? ]
     } 1|| ;
 
 : check-values ( word element -- )
@@ -86,7 +87,7 @@ SYMBOL: vocab-articles
             [ effect-values ]
             [ extract-values ]
             bi* sequence=
-        ] 
+        ]
     } 2|| [ "$values don't match stack effect" simple-lint-error ] unless ;
 
 : check-value-effects ( word element -- )
@@ -144,10 +145,23 @@ SYMBOL: vocab-articles
         simple-lint-error
     ] when ;
 
+: extract-slots ( elements -- seq )
+    [ dup pair? [ first \ $slot = ] [ drop f ] if ] deep-filter
+    [ second ] map ;
+
 : check-class-description ( word element -- )
-    [ class? not ]
-    [ { $class-description } swap elements empty? not ] bi* and
-    [ "A word that is not a class has a $class-description" simple-lint-error ] when ;
+    \ $class-description swap elements over class? [
+        [ all-slots [ name>> ] map ] [ extract-slots ] bi*
+        [ swap member? not ] with filter [
+            ", " join "Described $slot does not exist: " prepend
+            simple-lint-error
+        ] unless-empty
+    ] [
+        nip empty? not [
+            "A word that is not a class has a $class-description"
+            simple-lint-error
+        ] when
+    ] if ;
 
 : check-article-title ( article -- )
     article-title first LETTER?
