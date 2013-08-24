@@ -53,7 +53,9 @@ HELP: vocabs
 
 HELP: lookup-vocab
 { $values { "vocab-spec" "a vocabulary specifier" } { "vocab" vocab } }
-{ $description "Outputs a named vocabulary, or " { $link f } " if no vocabulary with this name exists." }
+{ $description "Outputs a named vocabulary, or " { $link f } " if no vocabulary with this name exists." } ;
+
+HELP: vocab
 { $class-description "Instances represent vocabularies." } ;
 
 HELP: vocab-name

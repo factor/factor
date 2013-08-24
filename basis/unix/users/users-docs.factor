@@ -20,7 +20,7 @@ HELP: new-passwd
 { $description "Creates a new passwd tuple dependent on the operating system." } ;
 
 HELP: passwd
-{ $description "A platform-specific tuple corresponding to every field from the Unix passwd struct. BSD passwd structures have four extra slots: " { $slot "change" } ", " { $slot "class" } ", " { $slot "expire" } ", " { $slot "fields" } "." } ;
+{ $description "A platform-specific tuple corresponding to every field from the Unix passwd struct. BSD passwd structures have four extra slots: " { $snippet "change" } ", " { $snippet "class" } ", " { $snippet "expire" } ", " { $snippet "fields" } "." } ;
 
 HELP: user-cache
 { $description "A symbol storing passwd structures indexed by user-ids when within a " { $link with-user-cache } "." } ;

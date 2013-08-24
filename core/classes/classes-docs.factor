@@ -71,10 +71,12 @@ $nl
 
 ABOUT: "classes"
 
+HELP: class
+{ $class-description "The class of all class words." } ;
+
 HELP: class-of
 { $values { "object" object } { "class" class } }
 { $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either its built-in class, or if the object is a tuple, its tuple class." }
-{ $class-description "The class of all class words." }
 { $examples { $example "USING: classes prettyprint ;" "1.0 class-of ." "float" } { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class-of ." "point" } } ;
 
 HELP: classes

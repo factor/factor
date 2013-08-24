@@ -22,7 +22,7 @@ HELP: improper-statement-error
 { $values
     { "obj" object }
 }
-{ $error-description "Thrown if, in a call to " { $link build-alien } ", any of a " { $link graph } "'s " { $slot "statements" } " is not an instance of:" { $list { $link subgraph } { $link node } { $link edge } { $link graph-attributes } { $link node-attributes } { $link edge-attributes } } }
+{ $error-description "Thrown if, in a call to " { $link build-alien } ", any of a " { $link graph } "'s " { $snippet "statements" } " is not an instance of:" { $list { $link subgraph } { $link node } { $link edge } { $link graph-attributes } { $link node-attributes } { $link edge-attributes } } }
 ;
 
 HELP: non-graph-error

@@ -28,7 +28,7 @@ HELP: one-line-elt
 { one-line-elt line-elt } related-words
 
 HELP: line-elt
-{ $class-description "An element representing a single line. The " { $link prev-elt } " and " { $link next-elt } " words return the location of the previous and next line from the current location." } ;
+{ $description "An element representing a single line. The " { $link prev-elt } " and " { $link next-elt } " words return the location of the previous and next line from the current location." } ;
 
 HELP: doc-elt
 { $class-description "An element representing the entire document. The " { $link prev-elt } " word outputs the start of the document and the " { $link next-elt } " word outputs the end of the document." } ;

@@ -483,7 +483,7 @@ HELP: edge
 { $class-description
 "Represents a Graphviz edge. Each " { $link edge } " is defined by its " { $slot "tail" } " slot and its " { $slot "head" } " slot. Each slot must be either"
 { $list
-    { { $instance string } " representing the " { $slot "id" } " of a " { $link node } " or" }
+    { { $instance string } " representing the " { $snippet "id" } " of a " { $link node } " or" }
     { { $instance subgraph } ", which is a convenient way to represent multiple Graphviz edges." }
 }
 
@@ -567,7 +567,7 @@ HELP: subgraph
 { $class-description
 "Represents a logical grouping of nodes and edges within a Graphviz graph. See " { $url "http://graphviz.org/Documentation.php" } " for more information."
 $nl
-"Its structure is largely similar to " { $link graph } ", except " { $link subgraph } " only has two slots: " { $slot "id" } " (" { $instance string } ") and " { $slot "statements" } " (" { $instance sequence } "). The " { $slot "strict?" } " and " { $slot "directed?" } " slots of the parent " { $link graph } " are implicitly inherited by a " { $link subgraph } "."
+"Its structure is largely similar to " { $link graph } ", except " { $link subgraph } " only has two slots: " { $slot "id" } " (" { $instance string } ") and " { $slot "statements" } " (" { $instance sequence } "). The " { $snippet "strict?" } " and " { $snippet "directed?" } " slots of the parent " { $link graph } " are implicitly inherited by a " { $link subgraph } "."
 $nl
 { $slot "id" } " and " { $slot "statements" } " correspond to the name and defining \"body\" of a subgraph in the DOT language, as in " { $strong "subgraph" } " " { $slot "id" } " " { $strong "{" } " ... " { $slot "statements" } " ... " { $strong "}" } "."
 $nl
