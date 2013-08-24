@@ -176,10 +176,10 @@ HELP: buttons-delta-as
 { button-delta buttons-delta buttons-delta-as } related-words
 
 HELP: pressed
-{ $class-description "This symbol is returned by " { $link button-delta } " or " { $link buttons-delta } " to represent a button or key being pressed between two samples of its state." } ;
+{ $description "This symbol is returned by " { $link button-delta } " or " { $link buttons-delta } " to represent a button or key being pressed between two samples of its state." } ;
 
 HELP: released
-{ $class-description "This symbol is returned by " { $link button-delta } " or " { $link buttons-delta } " to represent a button or key being released between two samples of its state." } ;
+{ $description "This symbol is returned by " { $link button-delta } " or " { $link buttons-delta } " to represent a button or key being released between two samples of its state." } ;
 
 { pressed released } related-words
 

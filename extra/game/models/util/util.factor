@@ -28,7 +28,7 @@ M:: indexed-seq set-nth ( elt n seq -- )
         elt dseq push
     ] if* ; inline
 
-: <indexed-seq> ( dseq-examplar iseq-exampler rassoc-examplar -- indexed-seq )
+: <indexed-seq> ( dseq-exemplar iseq-exemplar rassoc-exemplar -- indexed-seq )
     indexed-seq new
     swap clone >>rassoc
     swap clone >>iseq
