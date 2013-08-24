@@ -9,5 +9,5 @@ HELP: indexed-seq
 { $class-description "A sequence described by a sequence of unique elements and a sequence of indices. The sequence can only be appended to. An associative map is used as a reverse lookup table when appending." } ;
 
 HELP: <indexed-seq>
-{ $values { "dseq-exemplar" sequence } { "iseq-examplar" sequence } { "rassoc-examplar" assoc } }
-{ $class-description "Construct an " { $link indexed-seq } " using the given examplars for the underlying data structures." } ;
+{ $values { "dseq-exemplar" sequence } { "iseq-exemplar" sequence } { "rassoc-exemplar" assoc } { "indexed-seq" indexed-seq } }
+{ $description "Construct an " { $link indexed-seq } " using the given exemplars for the underlying data structures." } ;

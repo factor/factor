@@ -270,7 +270,9 @@ HELP: bootstrapping?
 
 HELP: last-word
 { $values { "word" word } }
-{ $description "Outputs the most recently defined word." }
+{ $description "Outputs the most recently defined word." } ;
+
+HELP: word
 { $class-description "The class of words. One notable subclass is " { $link class } ", the class of class words." } ;
 
 { last-word set-last-word save-location } related-words
