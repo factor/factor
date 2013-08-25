@@ -16,9 +16,9 @@ UNION: unix macosx linux ;
 
 : os ( -- class ) \ os get-global ; foldable
 
-: version ( -- string ) \ version get-global ; foldable
+: vm-version ( -- string ) \ vm-version get-global ; foldable
 
-: git-label ( -- string ) \ git-label get-global ; foldable
+: vm-git-label ( -- string ) \ vm-git-label get-global ; foldable
 
 : vm-compiler ( -- string ) \ vm-compiler get-global ; foldable
 
@@ -67,6 +67,6 @@ PRIVATE>
 
 : version-info ( -- str )
     ! formatting vocab not available in this context.
-    "Factor " version append " (" append git-label append ", " append
+    "Factor " vm-version append " (" append vm-git-label append ", " append
     vm-compile-time append ") [" append vm-compiler append
     " " append cpu cpu>string append "] on " append os os>string append ;
