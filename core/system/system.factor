@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs init kernel kernel.private namespaces strings sequences ;
+USING: assocs init kernel kernel.private make namespaces sequences strings  ;
 IN: system
 
 SINGLETONS: x86.32 x86.64 arm ppc.32 ppc.64 ;
@@ -67,6 +67,8 @@ PRIVATE>
 
 : version-info ( -- str )
     ! formatting vocab not available in this context.
-    "Factor " vm-version append " (" append vm-git-label append ", " append
-    vm-compile-time append ") [" append vm-compiler append
-    " " append cpu cpu>string append "] on " append os os>string append ;
+    [
+        "Factor " % vm-version % " (" % vm-git-label % ", " %
+        vm-compile-time % ") [" %
+        vm-compiler % " " % cpu cpu>string % "] on " % os os>string %
+    ] "" make ;
