@@ -107,8 +107,8 @@ enum special_object {
   OBJ_SIGNAL_PIPE = 74, /* file descriptor for pipe used to communicate signals
                            only used on unix */
   OBJ_VM_COMPILE_TIME = 75, /* when the binary was built */
-  OBJ_VERSION = 76, /* factor version */
-  OBJ_GIT_LABEL = 77, /* git label (git describe --all --long) */
+  OBJ_VM_VERSION = 76, /* factor version */
+  OBJ_VM_GIT_LABEL = 77, /* git label (git describe --all --long) */
 };
 
 /* save-image-and-exit discards special objects that are filled in on startup
