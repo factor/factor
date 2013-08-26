@@ -1,6 +1,7 @@
 from glob import glob
 from os.path import basename
 
+use = []
 source = [
     'aging_collector.cpp',
     'alien.cpp',
@@ -46,20 +47,33 @@ source = [
     'vm.cpp',
     'words.cpp'
     ]
-if bld.env.DEST_OS == 'win32':
+dest_os = bld.env.DEST_OS
+if dest_os == 'win32':
     source += [
-        'cpu-x86.cpp',
         'main-windows.cpp',
         'mvm-windows.cpp',
         'os-windows.cpp'
-        ]
+    ]
     bits = {'amd64' : 64, 'i386' : 32}[bld.env.DEST_CPU]
     source += ['os-windows-x86.%d.cpp' % bits]
+    use.append('shell32')
+elif dest_os == 'linux':
+    source += [
+        'main-unix.cpp',
+        'mvm-unix.cpp',
+        'os-genunix.cpp',
+        'os-linux.cpp',
+        'os-unix.cpp'
+    ]
+    use += ['dl', 'pthread', 'rt']
+
+if dest_os in ('win32', 'linux'):
+    source += ['cpu-x86.cpp']
 
 bld.program(
     features = 'cxx cxxprogram',
     source = source,
     includes = '.',
     target = 'factor',
-    use = 'shell32'
+    use = use
     )
