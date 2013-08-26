@@ -1,0 +1,65 @@
+from glob import glob
+from os.path import basename
+
+source = [
+    'aging_collector.cpp',
+    'alien.cpp',
+    'arrays.cpp',
+    'bignum.cpp',
+    'byte_arrays.cpp',
+    'callbacks.cpp',
+    'callstack.cpp',
+    'code_blocks.cpp',
+    'code_heap.cpp',
+    'compaction.cpp',
+    'contexts.cpp',
+    'data_heap.cpp',
+    'data_heap_checker.cpp',
+    'debug.cpp',
+    'dispatch.cpp',
+    'entry_points.cpp',
+    'errors.cpp',
+    'factor.cpp',
+    'free_list.cpp',
+    'full_collector.cpp',
+    'gc.cpp',
+    'gc_info.cpp',
+    'image.cpp',
+    'inline_cache.cpp',
+    'instruction_operands.cpp',
+    'io.cpp',
+    'jit.cpp',
+    'math.cpp',
+    'mvm.cpp',
+    'nursery_collector.cpp',
+    'object_start_map.cpp',
+    'objects.cpp',
+    'primitives.cpp',
+    'quotations.cpp',
+    'run.cpp',
+    'safepoints.cpp',
+    'sampling_profiler.cpp',
+    'strings.cpp',
+    'to_tenured_collector.cpp',
+    'tuples.cpp',
+    'utilities.cpp',
+    'vm.cpp',
+    'words.cpp'
+    ]
+if bld.env.DEST_OS == 'win32':
+    source += [
+        'cpu-x86.cpp',
+        'main-windows.cpp',
+        'mvm-windows.cpp',
+        'os-windows.cpp'
+        ]
+    bits = {'amd64' : 64, 'i386' : 32}[bld.env.DEST_CPU]
+    source += ['os-windows-x86.%d.cpp' % bits]
+
+bld.program(
+    features = 'cxx cxxprogram',
+    source = source,
+    includes = '.',
+    target = 'factor',
+    use = 'shell32'
+    )
