@@ -50,49 +50,48 @@ common_source = [
     'words.cpp'
     ]
 
-def options(opt):
-    opt.load('compiler_cxx')
+def options(ctx):
+    ctx.load('compiler_cxx')
 
-def configure(conf):
-    conf.load('compiler_cxx')
-    conf.check(features='cxx cxxprogram', cflags=['-Wall'])
-    env = conf.env
+def configure(ctx):
+    ctx.load('compiler_cxx')
+    ctx.check(features='cxx cxxprogram', cflags=['-Wall'])
+    env = ctx.env
     dest_cpu = env.DEST_CPU
     dest_os = env.DEST_OS
     if dest_os == 'win32':
-        conf.check_cxx(lib = 'shell32', uselib_store = 'shell32')
-        env.LINKFLAGS.append('/SUBSYSTEM:console')
-        env.CXXFLAGS.append('/EHsc')
+        ctx.check_lib_msvc('shell32')
+        #env.LINKFLAGS.append('/SUBSYSTEM:console')
+        env.CXXFLAGS += ['/EHsc', '/O2', '/WX', '/W3']
         if dest_cpu == 'i386':
             env.LINKFLAGS.append('/safesh')
-        conf.load('winres')
+        ctx.load('winres')
         env.WINRCFLAGS.append('/nologo')
-        conf.define('_CRT_SECURE_NO_WARNINGS', None)
+        ctx.define('_CRT_SECURE_NO_WARNINGS', None)
     elif dest_os == 'linux':
-        conf.check_cxx(lib = 'pthread', uselib_store = 'pthread')
-        conf.check_cxx(lib = 'dl', uselib_store = 'dl')
-        conf.check_cxx(
+        ctx.check_cxx(lib = 'pthread', uselib_store = 'pthread')
+        ctx.check_cxx(lib = 'dl', uselib_store = 'dl')
+        ctx.check_cxx(
             function_name = 'clock_gettime',
             header_name = ['sys/time.h','time.h'],
             lib = 'rt', uselib_store = 'rt'
         )
 
-def build(bld):
-    dest_os = bld.env.DEST_OS
-    dest_cpu = bld.env.DEST_CPU
-    if dest_os == 'win32':
-        bits = {'amd64' : 64, 'i386' : 32}[dest_cpu]
-        extra_source = [
+def build(ctx):
+    dest_os = ctx.env.DEST_OS
+    dest_cpu = ctx.env.DEST_CPU
+
+    bits = {'amd64' : 64, 'i386' : 32}[dest_cpu]
+    os_sources = {
+        'win32' : [
             'cpu-x86.cpp',
             'main-windows.cpp',
             'mvm-windows.cpp',
             'os-windows.cpp',
             'factor.rc',
             'os-windows-x86.%d.cpp' % bits
-            ]
-        use = ['shell32']
-    elif dest_os == 'linux':
-        extra_source = [
+            ],
+        'linux' : [
             'cpu-x86.cpp',
             'main-unix.cpp',
             'mvm-unix.cpp',
@@ -100,14 +99,44 @@ def build(bld):
             'os-linux.cpp',
             'os-unix.cpp'
             ]
-        use = ['dl', 'pthread', 'rt']
-    else:
-        raise Exception('Platform not implemented: %s' % dest_os)
+        }
+    os_uses = {
+        'win32' : ['SHELL32'],
+        'linux' : ['dl', 'pthread', 'rt']
+        }
+    vm_sources = [join('vm', s) for s in common_source + os_sources[dest_os]]
+    ctx.objects(includes = '.', source = vm_sources, target = 'OBJS')
 
-    bld.program(
-        features = 'cxx cxxprogram',
-        source = [join('vm', s) for s in common_source + extra_source],
-        includes = '.',
-        target = 'factor',
-        use = use
-        )
+    link_libs = os_uses[dest_os] + ['OBJS']
+    features = 'cxx cxxprogram'
+
+    if dest_os == 'win32':
+        ctx.program(
+            features = features,
+            source = [],
+            target = APPNAME,
+            use = link_libs,
+            linkflags = '/SUBSYSTEM:windows'
+            )
+        # The node name can't be factor.com because it will clash with
+        # the previously created factor.exe node.
+        target = ctx.path.get_bld().make_node('tmp.com')
+        ctx.program(
+            features = features,
+            source = [],
+            target = target,
+            use = link_libs,
+            linkflags = '/SUBSYSTEM:console'
+            )
+        ctx(
+            rule = 'mv ${SRC} ${TGT}',
+            source = 'tmp.com',
+            target = 'factor.com'
+            )
+    elif dest_os == 'linux':
+        ctx.program(
+            features = features,
+            source = [],
+            target = APPNAME,
+            use = link_libs,
+            )
