@@ -11,12 +11,14 @@ def configure(conf):
     dest_cpu = env.DEST_CPU
     dest_os = env.DEST_OS
     if dest_os == 'win32':
-        conf.load('winres')
         conf.check_cxx(lib = 'shell32', uselib_store = 'shell32')
         env.LINKFLAGS.append('/SUBSYSTEM:console')
         env.CXXFLAGS.append('/EHsc')
         if dest_cpu == 'i386':
             env.LINKFLAGS.append('/safesh')
+        conf.load('winres')
+        env.WINRCFLAGS.append('/nologo')
+        conf.define('_CRT_SECURE_NO_WARNINGS', None)
     elif dest_os == 'linux':
         conf.check_cxx(lib = 'pthread', uselib_store = 'pthread')
         conf.check_cxx(lib = 'dl', uselib_store = 'dl')
