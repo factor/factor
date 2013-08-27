@@ -48,13 +48,15 @@ source = [
     'words.cpp'
     ]
 dest_os = bld.env.DEST_OS
+dest_cpu = bld.env.DEST_CPU
 if dest_os == 'win32':
     source += [
         'main-windows.cpp',
         'mvm-windows.cpp',
-        'os-windows.cpp'
+        'os-windows.cpp',
+        'factor.rc'
     ]
-    bits = {'amd64' : 64, 'i386' : 32}[bld.env.DEST_CPU]
+    bits = {'amd64' : 64, 'i386' : 32}[dest_cpu]
     source += ['os-windows-x86.%d.cpp' % bits]
     use.append('shell32')
 elif dest_os == 'linux':
