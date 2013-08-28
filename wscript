@@ -59,9 +59,9 @@ def configure(ctx):
     env = ctx.env
     dest_cpu = env.DEST_CPU
     dest_os = env.DEST_OS
+    bits = {'amd64' : 64, 'i386' : 32, 'x86_64' : 64}[dest_cpu]
     if dest_os == 'win32':
         ctx.check_lib_msvc('shell32')
-        #env.LINKFLAGS.append('/SUBSYSTEM:console')
         env.CXXFLAGS += ['/EHsc', '/O2', '/WX', '/W3']
         if dest_cpu == 'i386':
             env.LINKFLAGS.append('/safesh')
@@ -69,6 +69,7 @@ def configure(ctx):
         env.WINRCFLAGS.append('/nologo')
         ctx.define('_CRT_SECURE_NO_WARNINGS', None)
     elif dest_os == 'linux':
+        # Lib checking
         ctx.check_cxx(lib = 'pthread', uselib_store = 'pthread')
         ctx.check_cxx(lib = 'dl', uselib_store = 'dl')
         ctx.check_cxx(
@@ -76,12 +77,33 @@ def configure(ctx):
             header_name = ['sys/time.h','time.h'],
             lib = 'rt', uselib_store = 'rt'
         )
+        ctx.check_cfg(atleast_pkgconfig_version='0.0.0')
+        ctx.check_cfg(
+            package = 'gtk+-2.0',
+            uselib_store = 'gtk',
+            atleast_version = '2.18.0',
+            args = '--cflags --libs',
+            mandatory = True
+        )
+        ctx.check_cfg(
+            package = 'gtkglext-1.0',
+            uselib_store = 'gtkglext',
+            atleast_version = '1.0.0',
+            args = '--cflags --libs',
+            mandatory = True
+        )
+
+        # Standard flags
+        env.CXXFLAGS += ['-O3', '-fomit-frame-pointer']
+        if bits == 64:
+            env.CXXFLAGS += ['-m64']
+        env.LINKFLAGS += ['-Wl,--no-as-needed', '-Wl,--export-dynamic']
 
 def build(ctx):
     dest_os = ctx.env.DEST_OS
     dest_cpu = ctx.env.DEST_CPU
 
-    bits = {'amd64' : 64, 'i386' : 32}[dest_cpu]
+    bits = {'amd64' : 64, 'i386' : 32, 'x86_64' : 64}[dest_cpu]
     os_sources = {
         'win32' : [
             'cpu-x86.cpp',
@@ -102,7 +124,7 @@ def build(ctx):
         }
     os_uses = {
         'win32' : ['SHELL32'],
-        'linux' : ['dl', 'pthread', 'rt']
+        'linux' : ['dl', 'gtk', 'gtkglext', 'pthread', 'rt']
         }
     vm_sources = [join('vm', s) for s in common_source + os_sources[dest_os]]
     ctx.objects(includes = '.', source = vm_sources, target = 'OBJS')
