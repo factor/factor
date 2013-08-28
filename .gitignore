@@ -12,7 +12,7 @@ Factor/factor
 *.exp
 *.res
 *.RES
-*.image
+*.factor.image
 factor.image.fresh
 *.dylib
 factor
