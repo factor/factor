@@ -4,6 +4,7 @@
 *.o
 *.s
 *.exe
+*.exe.manifest
 Factor/factor
 *.a
 *.dll
@@ -32,3 +33,6 @@ checksums.txt
 *.so
 a.out
 Factor.app/Contents/_CodeSignature
+build/
+waf-*/
+.lock*
