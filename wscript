@@ -1,4 +1,5 @@
 from os.path import join
+from waflib import Task
 
 APPNAME = 'factor'
 VERSION = '0.96'
@@ -49,6 +50,29 @@ common_source = [
     'vm.cpp',
     'words.cpp'
     ]
+
+def copy_file(ctx, source, target):
+    ctx(rule = 'cp ${SRC} ${TGT}', source = source, target = target)
+
+def build_full_image(ctx, binary, boot_image, full_image):
+    def run(task):
+        print task.inputs
+        cmd = './%s -i=%s -resource-path=..'
+        return task.exec_commad(cmd)
+    ctx(rule = run, source = [binary, boot_image], target = full_image)
+
+# This monkey patching enables syncronous output from rule tasks.
+# https://groups.google.com/d/msg/waf-users/2uA3DEltTKg/8T4X9I4OeeQJ
+def my_exec_command(self, cmd, **kw):
+    bld = self.generator.bld
+    try:
+        if not kw.get('cwd', None):
+            kw['cwd'] = bld.cwd
+    except AttributeError:
+        bld.cwd = kw['cwd'] = bld.variant_dir
+    kw["stdout"] = kw["stderr"] = None
+    return bld.exec_command(cmd, **kw)
+Task.TaskBase.exec_command = my_exec_command
 
 def options(ctx):
     ctx.load('compiler_cxx')
@@ -149,16 +173,30 @@ def build(ctx):
             target = target,
             use = link_libs,
             linkflags = '/SUBSYSTEM:console'
-            )
-        ctx(
-            rule = 'mv ${SRC} ${TGT}',
-            source = 'tmp.com',
-            target = 'factor.com'
-            )
+        )
+        copy_file('tmp.com', 'factor.com')
     elif dest_os == 'linux':
         ctx.program(
             features = features,
             source = [],
             target = APPNAME,
             use = link_libs,
-            )
+        )
+    # Build factor.image using the newly built executable.
+    os_family = {'linux' : 'unix'}[dest_os]
+    source_image = 'boot-images/boot.%s-x86.%s.image' % (os_family, bits)
+    copy_file(ctx, source_image, 'boot.image')
+
+    node = ctx(
+        rule = '${SRC[0].abspath()} -i=${SRC[1].abspath()} -resource-path=..',
+        source = ['factor', 'boot.image'],
+        target = '../factor.image'
+    )
+
+    # Move it back into the build directory. I think waf complains if
+    # this rules target is "factor.image".
+    ctx(
+        rule = 'mv ${SRC} ${TGT}',
+        source = '../factor.image',
+        target = 'factor-back.image'
+    )
