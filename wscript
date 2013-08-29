@@ -52,7 +52,11 @@ common_source = [
     ]
 
 def copy_file(ctx, source, target):
-    ctx(rule = 'cp ${SRC} ${TGT}', source = source, target = target)
+    ctx(
+        rule = 'cp ${SRC[0].abspath()} ${TGT[0].abspath()}',
+        source = source,
+        target = target
+        )
 
 def build_full_image(ctx, binary, boot_image, full_image):
     def run(task):
@@ -174,7 +178,7 @@ def build(ctx):
             use = link_libs,
             linkflags = '/SUBSYSTEM:console'
         )
-        copy_file('tmp.com', 'factor.com')
+        copy_file(ctx, 'tmp.com', 'factor.com')
     elif dest_os == 'linux':
         ctx.program(
             features = features,
@@ -183,13 +187,15 @@ def build(ctx):
             use = link_libs,
         )
     # Build factor.image using the newly built executable.
-    os_family = {'linux' : 'unix'}[dest_os]
+    os_family = {'linux' : 'unix', 'win32' : 'windows'}[dest_os]
     source_image = 'boot-images/boot.%s-x86.%s.image' % (os_family, bits)
     copy_file(ctx, source_image, 'boot.image')
 
-    node = ctx(
-        rule = '${SRC[0].abspath()} -i=${SRC[1].abspath()} -resource-path=..',
-        source = ['factor', 'boot.image'],
+    factor_exe = {'linux' : 'factor', 'win32' : 'factor.com'}[dest_os]
+
+    ctx(
+        rule = '${SRC[0]} -i=${SRC[1]} -resource-path=..',
+        source = [factor_exe, 'boot.image'],
         target = '../factor.image'
     )
 
