@@ -1,7 +1,7 @@
-from os.path import join
+from os import path
 from waflib import Task
 
-APPNAME = 'factor'
+APPNAME = 'factor-lang'
 VERSION = '0.96'
 
 # List source files
@@ -122,6 +122,7 @@ def configure(ctx):
         )
 
         # Standard flags
+        ctx.define('INSTALL_PREFIX', ctx.options.prefix)
         env.CXXFLAGS += ['-O3', '-fomit-frame-pointer']
         if bits == 64:
             env.CXXFLAGS += ['-m64']
@@ -154,7 +155,8 @@ def build(ctx):
         'win32' : ['SHELL32'],
         'linux' : ['dl', 'gtk', 'gtkglext', 'pthread', 'rt']
         }
-    vm_sources = [join('vm', s) for s in common_source + os_sources[dest_os]]
+    vm_sources = [path.join('vm', s)
+                  for s in common_source + os_sources[dest_os]]
     ctx.objects(includes = '.', source = vm_sources, target = 'OBJS')
 
     link_libs = os_uses[dest_os] + ['OBJS']
@@ -178,31 +180,61 @@ def build(ctx):
             use = link_libs,
             linkflags = '/SUBSYSTEM:console'
         )
-        copy_file(ctx, 'tmp.com', 'factor.com')
+        copy_file(ctx, 'tmp.com', '%s.com' % APPNAME)
     elif dest_os == 'linux':
         ctx.program(
             features = features,
             source = [],
             target = APPNAME,
-            use = link_libs,
+            use = link_libs
         )
     # Build factor.image using the newly built executable.
     os_family = {'linux' : 'unix', 'win32' : 'windows'}[dest_os]
     source_image = 'boot-images/boot.%s-x86.%s.image' % (os_family, bits)
     copy_file(ctx, source_image, 'boot.image')
 
-    factor_exe = {'linux' : 'factor', 'win32' : 'factor.com'}[dest_os]
+    factor_exe = {'linux' : APPNAME, 'win32' : '%s.com' % APPNAME}[dest_os]
 
+    # The first image we build doesn't contain local changes for some
+    # reason.
+    old_image = '%s.incomplete.image' % APPNAME
+    params = [
+        '-i=${SRC[1].abspath()}',
+        '-resource-path=..',
+        '-output-image=%s' % old_image
+    ]
     ctx(
-        rule = '${SRC[0]} -i=${SRC[1]} -resource-path=..',
+        rule = '${SRC[0].abspath()} ' + ' '.join(params),
         source = [factor_exe, 'boot.image'],
-        target = '../factor.image'
+        target = old_image
     )
 
-    # Move it back into the build directory. I think waf complains if
-    # this rules target is "factor.image".
+    # Image built, but it needs to be updated too.
+    real_image = '%s.image' % APPNAME
+    params = [
+        '-script',
+        '-resource-path=..',
+        '-i=%s' % old_image,
+        '-e="USING: vocabs.loader vocabs.refresh system memory ; '
+        'refresh-all \\"%s\\" save-image-and-exit"' % real_image
+    ]
     ctx(
-        rule = 'mv ${SRC} ${TGT}',
-        source = '../factor.image',
-        target = 'factor-back.image'
+        rule = '${SRC[0].abspath()} ' + ' '.join(params),
+        source = [factor_exe, old_image],
+        target = real_image
+    )
+
+    # Install standard library
+    libdir = '${PREFIX}/lib/factor'
+    for root in ['core', 'basis', 'extra']:
+        start_dir = ctx.path.find_dir(root)
+        dest = '%s/%s' % (libdir, root)
+        for ext in ['factor', 'tiff']:
+            glob = start_dir.ant_glob('**/*.%s' % ext)
+            ctx.install_files(dest, glob, cwd = start_dir, relative_trick = True)
+    # Install image
+    ctx.install_files(libdir, real_image)
+    ctx.symlink_as(
+        '${PREFIX}/bin/%s' % real_image,
+        '../lib/factor/%s' % real_image
     )

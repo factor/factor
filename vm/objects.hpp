@@ -118,6 +118,9 @@ enum special_object {
   OBJ_BIGNUM_ZERO,
   OBJ_BIGNUM_POS_ONE,
   OBJ_BIGNUM_NEG_ONE = 81,
+
+  OBJ_INSTALL_PREFIX = 82 /* System prefix used to figure out where the standard
+                             library is */
 };
 
 // save-image-and-exit discards special objects that are filled in on startup

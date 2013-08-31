@@ -413,6 +413,8 @@ CONSTANT: OBJ-BIGNUM-ZERO 79
 CONSTANT: OBJ-BIGNUM-POS-ONE 80
 CONSTANT: OBJ-BIGNUM-NEG-ONE 81
 
+CONSTANT: OBJ-INSTALL-PREFIX 82
+
 ! Context object count and identifiers must be kept in sync with:
 !   vm/contexts.hpp
 
