@@ -226,12 +226,17 @@ def build(ctx):
 
     # Install standard library
     libdir = '${PREFIX}/lib/factor'
-    for root in ['core', 'basis', 'extra']:
-        start_dir = ctx.path.find_dir(root)
-        dest = '%s/%s' % (libdir, root)
-        for ext in ['factor', 'tiff', 'TXT', 'txt']:
-            glob = start_dir.ant_glob('**/*.%s' % ext)
-            ctx.install_files(dest, glob, cwd = start_dir, relative_trick = True)
+    pat = '(basis|core|extra)/**/*.(c|factor|tiff|TXT|txt)'
+    glob = ctx.path.ant_glob(pat)
+    ctx.install_files(libdir, glob, cwd = ctx.path, relative_trick = True)
+
+    # Install stuff in misc
+    sharedir = '${PREFIX}/share/factor'
+    base = ctx.path.find_dir('misc')
+    pat = '(fuel|icons|textadept|vim)/**/*.(el|lua|png|vim)'
+    glob = base.ant_glob(pat)
+    ctx.install_files(sharedir, glob, cwd = base, relative_trick = True)
+
     # Install image
     ctx.install_files(libdir, real_image)
     ctx.symlink_as(
