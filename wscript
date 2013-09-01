@@ -79,10 +79,10 @@ def my_exec_command(self, cmd, **kw):
 Task.TaskBase.exec_command = my_exec_command
 
 def options(ctx):
-    ctx.load('compiler_cxx')
+    ctx.load('compiler_c compiler_cxx')
 
 def configure(ctx):
-    ctx.load('compiler_cxx')
+    ctx.load('compiler_c compiler_cxx')
     ctx.check(features='cxx cxxprogram', cflags=['-Wall'])
     env = ctx.env
     dest_cpu = env.DEST_CPU
@@ -188,6 +188,18 @@ def build(ctx):
             target = APPNAME,
             use = link_libs
         )
+
+    # Common paths
+    libdir = '${PREFIX}/lib/factor'
+    cwd = ctx.path
+
+    # Build ffi test library. It is used by some unit tests.
+    ctx.shlib(
+        target = 'factor-ffi-test',
+        source = ['vm/ffi_test.c'],
+        install_path = libdir
+    )
+
     # Build factor.image using the newly built executable.
     os_family = {'linux' : 'unix', 'win32' : 'windows'}[dest_os]
     source_image = 'boot-images/boot.%s-x86.%s.image' % (os_family, bits)
@@ -225,14 +237,15 @@ def build(ctx):
     )
 
     # Install standard library
-    libdir = '${PREFIX}/lib/factor'
     pat = '(basis|core|extra)/**/*.(c|factor|tiff|TXT|txt)'
-    glob = ctx.path.ant_glob(pat)
-    ctx.install_files(libdir, glob, cwd = ctx.path, relative_trick = True)
+    glob = cwd.ant_glob(pat)
+
+    ctx.install_files(libdir, glob, cwd = cwd, relative_trick = True)
+    ctx.install_files(libdir, 'license.txt', cwd = cwd)
 
     # Install stuff in misc
     sharedir = '${PREFIX}/share/factor'
-    base = ctx.path.find_dir('misc')
+    base = cwd.find_dir('misc')
     pat = '(fuel|icons|textadept|vim)/**/*.(el|lua|png|vim)'
     glob = base.ant_glob(pat)
     ctx.install_files(sharedir, glob, cwd = base, relative_trick = True)
