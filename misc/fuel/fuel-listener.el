@@ -76,22 +76,28 @@ sessions."
   :group 'fuel-listener)
 
 
+
 ;;; Factor paths:
+
+(defconst fuel-listener-factor-basename "factor-lang")
 
 (defun fuel-listener-factor-binary ()
   "Full path to the factor executable to use when starting a listener."
   (or fuel-listener-factor-binary
-      (expand-file-name (cond ((eq system-type 'windows-nt)
-                               "factor.com")
-                              ((eq system-type 'darwin)
-                               "Factor.app/Contents/MacOS/factor")
-                              (t "factor"))
-                        fuel-factor-root-dir)))
+      (expand-file-name
+       (format
+        (cond ((eq system-type 'windows-nt) "%.com")
+              ((eq system-type 'darwin) "Factor.app/Contents/MacOS/%s")
+              (t "%s"))
+        fuel-listener-factor-basename)
+       fuel-factor-root-dir)))
 
 (defun fuel-listener-factor-image ()
   "Full path to the factor image to use when starting a listener."
   (or fuel-listener-factor-image
-      (expand-file-name "factor.image" fuel-factor-root-dir)))
+      (expand-file-name
+       (concat fuel-listener-factor-basename ".image" )
+       fuel-factor-root-dir)))
 
 
 ;;; Listener history:
