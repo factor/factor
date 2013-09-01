@@ -229,7 +229,7 @@ def build(ctx):
     for root in ['core', 'basis', 'extra']:
         start_dir = ctx.path.find_dir(root)
         dest = '%s/%s' % (libdir, root)
-        for ext in ['factor', 'tiff']:
+        for ext in ['factor', 'tiff', 'TXT', 'txt']:
             glob = start_dir.ant_glob('**/*.%s' % ext)
             ctx.install_files(dest, glob, cwd = start_dir, relative_trick = True)
     # Install image
