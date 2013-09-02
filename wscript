@@ -195,12 +195,19 @@ def build(ctx):
     # Build factor.image using the newly built executable.
     os_family = {'linux' : 'unix', 'win32' : 'windows'}[dest_os]
     source_image = 'boot-images/boot.%s-x86.%s.image' % (os_family, bits)
-    copy_file(ctx, source_image, 'boot.image')
+
+    # On Windows, boot.image must reside in the projects root dir. Not
+    # sure if, or why, it is different on Linux. -resource-path
+    # doesn't seem to have much effect.
+    boot_image = {'win32' : '../boot.image', 'linux' : 'boot.image'}
+    copy_file(ctx, source_image, boot_image)
 
     factor_exe = {'linux' : APPNAME, 'win32' : '%s.com' % APPNAME}[dest_os]
 
     # The first image we build doesn't contain local changes for some
-    # reason.
+    # reason. Not sure how resource-path works in combination with a
+    # boot image on Windows. Seems like the resource-path switch
+    # doesn't work in that case.
     old_image = '%s.incomplete.image' % APPNAME
     params = [
         '-i=${SRC[1].abspath()}',
@@ -209,7 +216,7 @@ def build(ctx):
     ]
     ctx(
         rule = '${SRC[0].abspath()} ' + ' '.join(params),
-        source = [factor_exe, 'boot.image'],
+        source = [factor_exe, boot_image],
         target = old_image
     )
 
