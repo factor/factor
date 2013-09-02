@@ -58,13 +58,6 @@ def copy_file(ctx, source, target):
         target = target
         )
 
-def build_full_image(ctx, binary, boot_image, full_image):
-    def run(task):
-        print task.inputs
-        cmd = './%s -i=%s -resource-path=..'
-        return task.exec_commad(cmd)
-    ctx(rule = run, source = [binary, boot_image], target = full_image)
-
 # This monkey patching enables syncronous output from rule tasks.
 # https://groups.google.com/d/msg/waf-users/2uA3DEltTKg/8T4X9I4OeeQJ
 def my_exec_command(self, cmd, **kw):
@@ -121,12 +114,11 @@ def configure(ctx):
             mandatory = True
         )
 
-        # Standard flags
-        ctx.define('INSTALL_PREFIX', ctx.options.prefix)
         env.CXXFLAGS += ['-O3', '-fomit-frame-pointer']
         if bits == 64:
             env.CXXFLAGS += ['-m64']
         env.LINKFLAGS += ['-Wl,--no-as-needed', '-Wl,--export-dynamic']
+    ctx.define('INSTALL_PREFIX', ctx.options.prefix)
 
 def build(ctx):
     dest_os = ctx.env.DEST_OS
@@ -212,7 +204,7 @@ def build(ctx):
     old_image = '%s.incomplete.image' % APPNAME
     params = [
         '-i=${SRC[1].abspath()}',
-        '-resource-path=..',
+        '-resource-path=%s' % cwd.abspath(),
         '-output-image=%s' % old_image
     ]
     ctx(
