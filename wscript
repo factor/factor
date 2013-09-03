@@ -199,7 +199,7 @@ def build(ctx):
     # On Windows, boot.image must reside in the projects root dir. Not
     # sure if, or why, it is different on Linux. -resource-path
     # doesn't seem to have much effect.
-    boot_image = {'win32' : '../boot.image', 'linux' : 'boot.image'}
+    boot_image = {'win32' : '../boot.image', 'linux' : 'boot.image'}[dest_os]
     copy_file(ctx, source_image, boot_image)
 
     factor_exe = {'linux' : APPNAME, 'win32' : '%s.com' % APPNAME}[dest_os]
