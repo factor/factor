@@ -45,9 +45,9 @@ ERROR: can't-deploy-library-file library ;
     utf8 [ copy-lines ] with-process-reader ;
 
 : make-boot-image ( -- )
-    ! If stage1 image doesn't exist, create one.
-    my-boot-image-name resource-path exists?
-    [ make-my-image ] unless ;
+    #! If stage1 image doesn't exist, create one.
+    my-boot-image-name user-resource-path exists?
+    [ my-arch make-image ] unless ;
 
 : bootstrap-profile ( -- profile )
     [
@@ -81,7 +81,7 @@ ERROR: can't-deploy-library-file library ;
         ] [
             [ "-i=" my-boot-image-name append , ] [
                 but-last staging-image-name "-i=" prepend ,
-                "-resource-path=" "" resource-path append ,
+                "-resource-path=" "" site-resource-path append ,
                 "-run=tools.deploy.restage" ,
             ] if-empty
         ] bi
@@ -113,7 +113,7 @@ DEFER: ?make-staging-image
         [ "-deploy-vocab=" prepend , ]
         [ make-deploy-config "-deploy-config=" prepend , ] bi
         "-output-image=" prepend ,
-        "-resource-path=" "" resource-path append ,
+        "-resource-path=" "" site-resource-path append ,
         "-run=tools.deploy.shaker" ,
     ] { } make ;
 

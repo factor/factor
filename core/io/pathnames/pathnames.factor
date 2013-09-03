@@ -132,12 +132,15 @@ HOOK: resolve-symlinks os ( path -- path' )
 
 M: object resolve-symlinks normalize-path ;
 
-: resource-path ( path -- newpath )
-    "resource-path" get prepend-path ;
-
 HOOK: home io-backend ( -- dir )
 
-M: object home "" resource-path ;
+: site-resource-path ( path -- newpath )
+    "resource-path" get prepend-path ;
+
+M: object home "" site-resource-path ;
+
+: user-resource-path ( path -- newpath )
+    home ".factor" append-path prepend-path ;
 
 GENERIC: vocab-path ( path -- newpath )
 
@@ -145,7 +148,7 @@ GENERIC: absolute-path ( path -- path' )
 
 M: string absolute-path
     "resource:" ?head [
-        trim-head-separators resource-path
+        trim-head-separators site-resource-path
         absolute-path
     ] [
         "vocab:" ?head [

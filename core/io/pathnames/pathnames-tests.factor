@@ -68,13 +68,14 @@ H{
     unit-test
 ] with-variables
 
-{ t } [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
+[ t ] [ cwd "misc" site-resource-path [ ] with-directory cwd = ] unit-test
 
 ! Regression test for bug in file-extension
 { f } [ "/funny.directory/file-with-no-extension" file-extension ] unit-test
 { "" } [ "/funny.directory/file-with-no-extension." file-extension ] unit-test
 
 ! Testing ~ special pathname
+
 { t } [ os windows? "~\\" "~/" ? absolute-path home = ] unit-test
 { t } [ "~/" home [ normalize-path ] same? ] unit-test
 

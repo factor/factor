@@ -55,7 +55,7 @@ M: mock-io-backend link-info
 { } [ 0 mock-counter boa dummy-monitor-disposed set ] unit-test
 
 ! Test that disposing twice is allowed
-{ } [
-    "resource:core/io" resource-path <mailbox> <recursive-monitor>
+[ ] [
+    "" site-resource-path <mailbox> <recursive-monitor>
     [ dispose ] [ dispose ] bi
 ] unit-test

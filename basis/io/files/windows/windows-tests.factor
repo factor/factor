@@ -58,6 +58,7 @@ IN: io.files.windows.tests
 ] unit-test
 
 [ "c:\\blah" ] [ "c:\\foo\\bar" "\\blah" append-path ] unit-test
+
 [ t ] [ "" resource-path 2 tail exists? ] unit-test
 
 ! win32-file-attributes
@@ -78,3 +79,5 @@ IN: io.files.windows.tests
         } cleave
     ] [ ] recover
 ] unit-test
+
+[ t ] [ "" site-resource-path 2 tail exists? ] unit-test

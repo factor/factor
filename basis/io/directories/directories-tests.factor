@@ -4,8 +4,8 @@ io.files io.files.info io.files.temp io.launcher io.pathnames
 kernel sequences tools.test ;
 IN: io.directories.tests
 
-{ { "kernel" } } [
-    "core" resource-path [
+[ { "kernel" } ] [
+    "core" site-resource-path [
         "." directory-files [ "kernel" = ] filter
     ] with-directory
 ] unit-test

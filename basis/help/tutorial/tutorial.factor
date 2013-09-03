@@ -16,7 +16,7 @@ $nl
 "If you look at the output, you will see that a few files were created in your “work” directory, and that the new source file was loaded."
 $nl
 "The following phrase will print the full path of your work directory:"
-{ $code "\"work\" resource-path ." }
+{ $code "\"work\" user-resource-path ." }
 $nl
 "The work directory is one of several " { $link "vocabs.roots" } " where Factor searches for vocabularies. It is possible to define new vocabulary roots; see " { $link "add-vocab-roots" } ". To keep things simple in this tutorial, we'll just use the work directory, though."
 $nl

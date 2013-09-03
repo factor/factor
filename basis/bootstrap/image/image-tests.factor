@@ -79,3 +79,6 @@ IN: bootstrap.image.tests
     55 >bignum prepare-object
     data-base - 15 unmask bootstrap-cell /
 ] unit-test
+[ t ] [ 4.0 4.0 eql? ] unit-test
+
+[ ] [ my-arch make-image ] unit-test
