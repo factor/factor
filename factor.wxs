@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+  <Product
+      Name='Factor 0.97'
+      Id='6b66ea90-0be5-11e3-8820-417d92f52eef'
+      UpgradeCode='840a2300-0be5-11e3-b156-09eb3a9c2bdd'
+      Language='1033'
+      Codepage='1252'
+      Version='0.97.0'
+      Manufacturer='Slava Pestov'>
+    <Package
+        Id='*'
+        Keywords='Installer'
+        Description="Factor 0.97 Installer"
+        InstallerVersion='100'
+        Languages='1033'
+        Compressed='yes'
+        SummaryCodepage='1252' />
+    <Media Id='1' Cabinet='Sample.cab' EmbedCab='yes' DiskPrompt="CD-ROM #1" />
+    <Property Id='DiskPrompt' Value="Factor 0.97 Installation [1]" />
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='ProgramFilesFolder' Name='PFiles'>
+        <Directory Id='INSTALLDIR' Name='Factor 0.97'>
+          <Component Id='MainExe' Guid='b49087c0-1573-11e3-bd10-a9f1edab8a3d'>
+            <File
+                Id='FactorLangEXE'
+                Name='factor.exe'
+                DiskId='1'
+                Source='factor-lang.exe'
+                KeyPath='yes'/>
+          </Component>
+          <Component Id='SecondaryExe' Guid='ce8b4ad0-157c-11e3-b4a5-2b2c7e47f7bc'>
+            <File
+                Id='FactorLangCOM'
+                Name='factor.com'
+                DiskId='1'
+                Source='factor-lang.com'
+                KeyPath='yes'/>
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+    <Feature Id='Complete' Level='1'>
+      <ComponentRef Id='MainExe' />
+      <ComponentRef Id='SecondaryExe' />
+    </Feature>
+  </Product>
+</Wix>

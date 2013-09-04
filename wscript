@@ -1,5 +1,5 @@
 from os import path
-from waflib import Task
+from waflib import Task, TaskGen
 
 APPNAME = 'factor-lang'
 VERSION = '0.96'
@@ -58,6 +58,19 @@ def copy_file(ctx, source, target):
         target = target
         )
 
+# WIX support
+TaskGen.declare_chain(
+    name = 'wxs',
+    rule = 'candle.exe -nologo -out ${TGT} ${SRC}',
+    ext_in = '.wxs',
+    ext_out = '.wxsobj')
+TaskGen.declare_chain(
+    name = 'wxsobj',
+    rule = 'light.exe -nologo -out ${TGT} ${SRC}',
+    ext_in = '.wxsobj',
+    ext_out = '.msi')
+
+
 # This monkey patching enables syncronous output from rule tasks.
 # https://groups.google.com/d/msg/waf-users/2uA3DEltTKg/8T4X9I4OeeQJ
 def my_exec_command(self, cmd, **kw):
@@ -90,6 +103,9 @@ def configure(ctx):
         ctx.load('winres')
         env.WINRCFLAGS.append('/nologo')
         ctx.define('_CRT_SECURE_NO_WARNINGS', None)
+        # WIX checks
+        ctx.find_program('candle')
+        ctx.find_program('light')
     elif dest_os == 'linux':
         # Lib checking
         ctx.check_cxx(lib = 'pthread', uselib_store = 'pthread')
@@ -174,6 +190,9 @@ def build(ctx):
             linkflags = '/SUBSYSTEM:console'
         )
         copy_file(ctx, 'tmp.com', '%s.com' % APPNAME)
+        # Can you indicate that the exe and com files need to be built
+        # before this target?
+        ctx(source = ['factor.wxs'])
     elif dest_os == 'linux':
         ctx.program(
             features = features,
