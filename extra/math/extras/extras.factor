@@ -197,14 +197,23 @@ PRIVATE>
 : exponential-index ( seq -- x )
     dup sum '[ _ / dup ^ ] map-product ;
 
-: search-sorted ( obj seq -- i )
+: search-sorted] ( obj seq -- i )
     swap '[ [ _ >= ] find drop dup ] [ length ] bi ? ;
 
+: search-sorted) ( obj seq -- i )
+    swap '[ [ _ > ] find drop dup ] [ length ] bi ? ;
+
 : weighted-random ( histogram -- obj )
-    unzip cum-sum [ last random ] [ search-sorted ] bi swap nth ;
+    unzip cum-sum [ last random ] [ search-sorted] ] bi swap nth ;
 
 : unique-indices ( seq -- unique indices )
     [ members ] keep over dup length iota H{ } zip-as '[ _ at ] map ;
+
+: digitize] ( seq bins -- seq' )
+    '[ _ search-sorted] ] map ;
+
+: digitize) ( seq bins -- seq' )
+    '[ _ search-sorted) ] map ;
 
 <PRIVATE
 
