@@ -1,3 +1,6 @@
+! Copyright (C) 2013 John Benediktsson
+! See http://factorcode.org/license.txt for BSD license
+
 USING: accessors alien.c-types alien.data alien.endian arrays
 assocs calendar classes.struct combinators hashtables io
 io.binary io.encodings.binary io.files kernel locals math
