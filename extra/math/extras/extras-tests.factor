@@ -73,8 +73,20 @@ IN: math.extras.test
 { 57/200 } [ { 80 60 10 20 30 } herfindahl ] unit-test
 { 17/160 } [ { 80 60 10 20 30 } normalized-herfindahl ] unit-test
 
+{ 1 } [ 1   5 iota search-sorted] ] unit-test
+{ 2 } [ 1.5 5 iota search-sorted] ] unit-test
+{ 2 } [ 2   5 iota search-sorted] ] unit-test
+
+{ 2 } [ 1   5 iota search-sorted) ] unit-test
+{ 2 } [ 1.5 5 iota search-sorted) ] unit-test
+{ 3 } [ 2   5 iota search-sorted) ] unit-test
+
 { { 0 5 1 2 2 } } [
-    { -10 10 2 2.5 3 } [ { 1 2 3 4 5 } search-sorted ] map
+    { -10 10 2 2.5 3 } { 1 2 3 4 5 } digitize]
+] unit-test
+
+{ { 0 5 2 2 3 } } [
+    { -10 10 2 2.5 3 } { 1 2 3 4 5 } digitize)
 ] unit-test
 
 {
@@ -138,3 +150,6 @@ IN: math.extras.test
 
 { { 0 1 2 3 0 0 1 } } [ { 1 2 3 3 2 1 2 } [ <= ] monotonic-count ] unit-test
 { 4 } [ { 1 2 3 1 2 3 4 5 } [ < ] max-monotonic-count ] unit-test
+
+{ 1.0 0.5 } [ 1.5 modf ] unit-test
+{ -1.0 -0.5 } [ -1.5 modf ] unit-test
