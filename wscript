@@ -52,7 +52,7 @@ common_source = [
     ]
 
 def copy_file(ctx, source, target):
-    ctx(
+    return ctx(
         rule = 'cp ${SRC[0].abspath()} ${TGT[0].abspath()}',
         source = source,
         target = target
@@ -66,10 +66,9 @@ TaskGen.declare_chain(
     ext_out = '.wxsobj')
 TaskGen.declare_chain(
     name = 'wxsobj',
-    rule = 'light.exe -nologo -out ${TGT} ${SRC}',
+    rule = 'light.exe -ext WixUIExtension -nologo -out ${TGT} ${SRC}',
     ext_in = '.wxsobj',
     ext_out = '.msi')
-
 
 # This monkey patching enables syncronous output from rule tasks.
 # https://groups.google.com/d/msg/waf-users/2uA3DEltTKg/8T4X9I4OeeQJ
@@ -189,6 +188,7 @@ def build(ctx):
             use = link_libs,
             linkflags = '/SUBSYSTEM:console'
         )
+
         copy_file(ctx, 'tmp.com', '%s.com' % APPNAME)
         # Can you indicate that the exe and com files need to be built
         # before this target?
@@ -210,6 +210,15 @@ def build(ctx):
         target = 'factor-ffi-test',
         source = ['vm/ffi_test.c'],
         install_path = libdir
+    )
+
+    # Build main shared library.
+    ctx.shlib(
+        features = 'cxx cxxshlib',
+        target = APPNAME,
+        source = [],
+        install_path = libdir,
+        use = link_libs
     )
 
     # Build factor.image using the newly built executable.
