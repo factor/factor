@@ -1,5 +1,5 @@
-USING: accessors arrays assocs fry grouping growable kernel
-locals make math math.order math.ranges sequences
+USING: accessors arrays assocs combinators fry grouping growable
+kernel locals make math math.order math.ranges sequences
 sequences.deep sequences.private sorting splitting vectors ;
 FROM: sequences => change-nth ;
 IN: sequences.extras
@@ -458,3 +458,27 @@ PRIVATE>
 
 : remove-last! ( obj seq -- seq )
     [ last-index ] keep over [ remove-nth! ] [ nip ] if ;
+
+: ?first2 ( seq -- first/f second/f )
+    dup length {
+        { 0 [ drop f f ] }
+        { 1 [ first-unsafe f ] }
+        [ drop first2-unsafe ]
+    } case ;
+
+: ?first3 ( seq -- first/f second/f third/f )
+    dup length {
+        { 0 [ drop f f f ] }
+        { 1 [ first-unsafe f f ] }
+        { 2 [ first2-unsafe f ] }
+        [ drop first3-unsafe ]
+    } case ;
+
+: ?first4 ( seq -- first/f second/f third/f fourth/f )
+    dup length {
+        { 0 [ drop f f f f ] }
+        { 1 [ first-unsafe f f f ] }
+        { 2 [ first2-unsafe f f ] }
+        { 3 [ first3-unsafe f ] }
+        [ drop first4-unsafe ]
+    } case ;
