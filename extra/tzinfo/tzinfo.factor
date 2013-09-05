@@ -108,3 +108,6 @@ PRIVATE>
 
 : normalize ( timestamp tzinfo -- timestamp' )
     [ instant convert-timezone ] [ from-utc ] bi* ;
+
+: load-tzinfo ( name -- tzinfo )
+    "/usr/share/zoneinfo/" prepend file>tzinfo ;
