@@ -18,6 +18,7 @@
         SummaryCodepage='1252' />
     <Media Id='1' Cabinet='Sample.cab' EmbedCab='yes' DiskPrompt="CD-ROM #1" />
     <Property Id='DiskPrompt' Value="Factor 0.97 Installation [1]" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
         <Directory Id='INSTALLDIR' Name='Factor 0.97'>
@@ -37,12 +38,90 @@
                 Source='factor-lang.com'
                 KeyPath='yes'/>
           </Component>
+          <Component Id='MainImage' Guid='6b66ea90-6BE3-460D-A14F-75658D16550B'>
+            <File
+                Id='MainImage'
+                Name='factor.image'
+                DiskId='1'
+                Source='factor-lang.image'
+                KeyPath='yes' />
+          </Component>
+          <Component Id='MainLib' Guid='6a66ea90-6BE3-460D-A14F-75658D16550B'>
+            <File
+                Id='MainDLL'
+                Name='factor.dll'
+                DiskId='1'
+                Source='factor-lang.dll'
+                KeyPath='yes' />
+          </Component>
+          <Component Id='TestLib' Guid='6e66ea91-6BE3-460D-A14F-75658D16550A'>
+            <File
+                Id='TestDLL'
+                Name='factor-ffi-test.dll'
+                DiskId='1'
+                Source='factor-ffi-test.dll'
+                KeyPath='yes' />
+          </Component>
+          <Component Id='License' Guid='6c66ea90-6BE3-460D-A14F-75658D16550B'>
+            <File
+                Id='LicenseTXT'
+                Name='license.txt'
+                DiskId='1'
+                Source='../license.txt'
+                KeyPath='yes' />
+          </Component>
+          <Component Id='ReadmeHTML' Guid='6e66ea90-6BE3-460D-A14F-75658D16550B'>
+            <File
+                Id='ReadmeHTML'
+                Name='readme.html'
+                DiskId='1'
+                Source='../readme.html'
+                KeyPath='yes' />
+          </Component>
+          <Component Id='ReadmeMD' Guid='6e66ea91-6BE3-460D-A14F-75658D16550B'>
+            <File
+                Id='ReadmeMD'
+                Name='README.md'
+                DiskId='1'
+                Source='../README.md'
+                KeyPath='yes' />
+          </Component>
         </Directory>
       </Directory>
     </Directory>
-    <Feature Id='Complete' Level='1'>
+    <Feature
+        Id='Complete'
+        Level='1'
+        Title='Factor 0.97'
+        ConfigurableDirectory='INSTALLDIR'>
+      <ComponentGroupRef Id="CoreGroup"/>
       <ComponentRef Id='MainExe' />
       <ComponentRef Id='SecondaryExe' />
+      <ComponentRef Id='MainImage' />
+      <ComponentRef Id='MainLib' />
+      <ComponentRef Id='License' />
+      <ComponentRef Id='ReadmeHTML' />
+      <ComponentRef Id='ReadmeMD' />
+      <ComponentRef Id='TestLib' />
     </Feature>
+
+    <!-- The purpose of defining the gui like this is to not have to
+         show the license dialog. -->
+    <UI>
+      <UIRef Id="WixUI_InstallDir" />
+      <UIRef Id="WixUI_ErrorProgressText" />
+
+      <!-- Skip license dialog -->
+      <Publish Dialog="WelcomeDlg"
+               Control="Next"
+               Event="NewDialog"
+               Value="InstallDirDlg"
+               Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg"
+               Control="Back"
+               Event="NewDialog"
+               Value="WelcomeDlg"
+               Order="2">1</Publish>
+    </UI>
   </Product>
 </Wix>
