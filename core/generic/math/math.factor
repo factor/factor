@@ -97,6 +97,14 @@ SYMBOL: generic-word
     [ [ { ratio complex } ] dip make-math-method-table tuple-dispatch ] 2bi
     tuple swap 2array prefix tag-dispatch ; inline
 
+: fixnum-dispatch ( word quot -- word quot' )
+    [ dup fixnum bootstrap-word dup math-method ]
+    [
+        dup length 3 - cut unclip
+        [ length 2 - ] [ nth ] bi prefix append
+    ] bi*
+    [ if ] 2curry [ 2dup both-fixnums? ] prepend ;
+
 PRIVATE>
 
 SINGLETON: math-combination
@@ -106,18 +114,14 @@ M: math-combination make-default-method
 
 M: math-combination perform-combination
     drop dup generic-word [
-        dup
-        [ fixnum bootstrap-word dup math-method ]
-        [
-            [ over ] [
-                dup math-class? [
-                    [ dup ] [ math-method ] with with math-dispatch-step
-                ] [
-                    drop object-method
-                ] if
-            ] with math-dispatch-step
-        ] bi
-        [ if ] 2curry [ 2dup both-fixnums? ] prepend
+        dup [ over ] [
+            dup math-class? [
+                [ dup ] [ math-method ] with with math-dispatch-step
+            ] [
+                drop object-method
+            ] if
+        ] with math-dispatch-step
+        fixnum-dispatch
         define
     ] with-variable ;
 
