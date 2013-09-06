@@ -6,7 +6,8 @@ combinators combinators.short-circuit compression.zlib fry
 grouping kernel locals math math.combinatorics math.constants
 math.functions math.order math.primes math.ranges
 math.ranges.private math.statistics math.vectors memoize random
-sequences sequences.extras sequences.private sets sorting ;
+sequences sequences.extras sequences.private sets sorting
+sorting.extras ;
 
 IN: math.extras
 
@@ -197,29 +198,17 @@ PRIVATE>
 : exponential-index ( seq -- x )
     dup sum '[ _ / dup ^ ] map-product ;
 
-:: search-sorted] ( obj seq -- i )
-    0 seq length [ 2dup < ] [
-        2dup + 2/ dup seq nth-unsafe obj before?
-        [ swap [ nip 1 + ] dip ] [ nip ] if
-    ] while drop ;
-
-:: search-sorted) ( obj seq -- i )
-    0 seq length [ 2dup < ] [
-        2dup + 2/ dup seq nth-unsafe obj after?
-        [ nip ] [ swap [ nip 1 + ] dip ] if
-    ] while drop ;
-
 : weighted-random ( histogram -- obj )
-    unzip cum-sum [ last random ] [ search-sorted] ] bi swap nth ;
+    unzip cum-sum [ last random ] [ bisect-left ] bi swap nth ;
 
 : unique-indices ( seq -- unique indices )
     [ members ] keep over dup length iota H{ } zip-as '[ _ at ] map ;
 
 : digitize] ( seq bins -- seq' )
-    '[ _ search-sorted] ] map ;
+    '[ _ bisect-left ] map ;
 
 : digitize) ( seq bins -- seq' )
-    '[ _ search-sorted) ] map ;
+    '[ _ bisect-right ] map ;
 
 <PRIVATE
 
