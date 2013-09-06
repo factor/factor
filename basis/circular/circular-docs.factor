@@ -55,12 +55,13 @@ HELP: circular-while
 }
 { $description "Calls " { $snippet "quot" } " on each element of the sequence until each call yields " { $link f } " in succession." } ;
 
-HELP: circular-while*
+HELP: circular-loop
 { $values
     { "circular" circular }
     { "quot" quotation }
 }
-{ $description "Calls " { $snippet "quot" } " on each element of the sequence until one call yields " { $link f } "." } ;
+{ $description "Calls " { $snippet "quot" } " on each element of the sequence until one call yields " { $link f } "." }
+{ $notes "This rotates the " { $link circular } " object after each call, so the next element to be applied will always be the first element." } ;
 
 ARTICLE: "circular" "Circular sequences"
 "The " { $vocab-link "circular" } " vocabulary implements the " { $link "sequence-protocol" } " to allow an arbitrary start index and wrap-around indexing." $nl
@@ -81,6 +82,6 @@ ARTICLE: "circular" "Circular sequences"
     growing-circular-push
 }
 "Iterating over a circular until a stop condition:"
-{ $subsections circular-while circular-while* } ;
+{ $subsections circular-while circular-loop } ;
 
 ABOUT: "circular"

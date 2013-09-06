@@ -78,5 +78,5 @@ PRIVATE>
 : circular-while ( ... circular quot: ( ... obj -- ... ? ) -- ... )
     [ clone ] dip [ <circular-iterator> ] dip (circular-while) ; inline
 
-: circular-while* ( ... circular quot: ( ... obj -- ... ? ) -- ... )
+: circular-loop ( ... circular quot: ( ... obj -- ... ? ) -- ... )
   [ clone ] dip '[ [ first @ ] [ rotate-circular ] bi ] curry loop ; inline

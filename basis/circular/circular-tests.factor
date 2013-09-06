@@ -65,12 +65,12 @@ CONSTANT: test-sequence2 { t f t t f f t t t f f f }
 
 [ V{ 1 2 3 1 2 } ] [
     { 1 2 3 } <circular> V{ } [
-        [ [ push ] [ length 5 < ] bi ] curry circular-while*
+        [ [ push ] [ length 5 < ] bi ] curry circular-loop
     ] keep
 ] unit-test
 
 [ V{ 1 } ] [
     { 1 2 3 } <circular> V{ } [
-        [ push f ] curry circular-while*
+        [ push f ] curry circular-loop
     ] keep
 ] unit-test
