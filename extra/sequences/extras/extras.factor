@@ -482,3 +482,7 @@ PRIVATE>
         { 3 [ first3-unsafe f ] }
         [ drop first4-unsafe ]
     } case ;
+
+: cut-when ( ... seq quot: ( ... elt -- ... ? ) -- ... before after )
+    [ find drop ] 2keep drop swap
+    [ cut ] [ f over like ] if* ; inline
