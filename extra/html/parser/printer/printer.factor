@@ -21,10 +21,12 @@ ERROR: unknown-tag-error tag ;
         { [ dup name>> text = ] [ print-text-tag ] }
         { [ dup name>> comment = ] [ print-comment-tag ] }
         { [ dup name>> dtd = ] [ print-dtd-tag ] }
-        { [ dup [ name>> string? ] [ closing?>> ] bi and ]
-            [ print-closing-tag ] }
         { [ dup name>> string? ]
-            [ print-opening-tag ] }
+            [
+                dup closing?>>
+                [ print-closing-tag ] [ print-opening-tag ] if
+            ]
+        }
         [ unknown-tag-error ]
     } cond ;
 
@@ -37,10 +39,22 @@ ERROR: unknown-tag-error tag ;
     T{ src-printer } html-printer [ print-tags ] with-variable ;
 
 M: text-printer print-opening-tag
-    name>> "br" = [ nl ] when ;
+    name>> {
+        { "br" [ nl ] }
+        { "li" [ " * " write ] }
+        [ drop ]
+    } case ;
 
 M: text-printer print-closing-tag
-    name>> "p" = [ nl ] when ;
+    name>>
+    [
+        { "p" "blockquote" "h1" "h2" "h3" "h4" "h5" }
+        member? [ nl nl ] when
+    ]
+    [
+        { "ul" "ol" "li" "tr" } member? [ nl ] when
+    ]
+    [ "td" = [ " " write ] when ] tri ;
 
 M: html-printer print-text-tag ( tag -- )
     text>> write ;
