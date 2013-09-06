@@ -10,3 +10,11 @@ IN: sorting.extras
     { "green" "blue" "purple" } [ length ] map-sort
 ] unit-test
 { 1 { 1 2 3 4 } } [ 1 { 4 2 1 3 } [ dupd + ] map-sort ] unit-test
+
+{ 0 } [ 0 { 1 } bisect-right ] unit-test
+{ 1 } [ 1 { 1 } bisect-right ] unit-test
+{ 1 } [ 2 { 1 } bisect-right ] unit-test
+
+{ 0 } [ 0 { 1 } bisect-left ] unit-test
+{ 0 } [ 1 { 1 } bisect-left ] unit-test
+{ 1 } [ 2 { 1 } bisect-left ] unit-test
