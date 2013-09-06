@@ -2,7 +2,7 @@ ifdef CONFIG
 	CC = gcc
 	CPP = g++
 
-	VERSION = 0.97
+	VERSION = 0.97-git
 	GIT_LABEL = $(shell git describe --all --long)
 
 	BUNDLE = Factor.app
