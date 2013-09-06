@@ -164,3 +164,8 @@ IN: sequences.extras.tests
 { "ab" } [ f 2 "abcdef" subseq* ] unit-test
 { "cdef" } [ 2 f "abcdef" subseq* ] unit-test
 { "cd" } [ -4 -2 "abcdef" subseq* ] unit-test
+
+{ "foo" "" } [ "foo" [ blank? ] cut-when ] unit-test
+{ "foo" " " } [ "foo " [ blank? ] cut-when ] unit-test
+{ "" " foo" } [ " foo" [ blank? ] cut-when ] unit-test
+{ "foo" " bar" } [ "foo bar" [ blank? ] cut-when ] unit-test
