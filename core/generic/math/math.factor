@@ -97,9 +97,11 @@ SYMBOL: generic-word
     [ [ { ratio complex } ] dip make-math-method-table tuple-dispatch ] 2bi
     tuple swap 2array prefix tag-dispatch ; inline
 
-: fixnum-dispatch ( word quot -- word quot' )
+: fixnum-optimization ( word quot -- word quot' )
     [ dup fixnum bootstrap-word dup math-method ]
     [
+        ! remove redundant fixnum check since we know
+        ! both can't be fixnums in this branch
         dup length 3 - cut unclip
         [ length 2 - ] [ nth ] bi prefix append
     ] bi*
@@ -121,7 +123,7 @@ M: math-combination perform-combination
                 drop object-method
             ] if
         ] with math-dispatch-step
-        fixnum-dispatch
+        fixnum-optimization
         define
     ] with-variable ;
 
