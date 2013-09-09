@@ -1,5 +1,5 @@
 IN: urls.tests
-USING: urls urls.private tools.test prettyprint
+USING: io.sockets io.sockets.secure urls urls.private tools.test prettyprint
 arrays kernel assocs present accessors ;
 
 CONSTANT: urls
@@ -265,3 +265,13 @@ urls [
 [ "/" ] [ "http://www.jedit.org" >url path>> ] unit-test
 
 [ "USING: urls ;\nURL\" foo\"" ] [ URL" foo" unparse-use ] unit-test
+
+[ T{ inet { host "google.com" } { port 80 } } ]
+[ URL" http://google.com/" url-addr ] unit-test
+
+[
+    T{ secure
+       { addrspec T{ inet { host "google.com" } { port 443 } } }
+    }
+]
+[ URL" https://google.com/" url-addr ] unit-test
