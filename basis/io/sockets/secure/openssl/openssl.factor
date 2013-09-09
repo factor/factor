@@ -170,11 +170,16 @@ M: ssl-handle dispose*
     SSL_get_verify_result dup X509_V_OK =
     [ drop ] [ verify-message certificate-verify-error ] if ;
 
-: common-name ( certificate -- host )
-    X509_get_subject_name
+: x509name>string ( x509name -- string )
     NID_commonName 256 <byte-array>
     [ 256 X509_NAME_get_text_by_NID ] keep
     swap -1 = [ drop f ] [ latin1 alien>string ] if ;
+
+: common-name ( certificate -- host )
+    X509_get_subject_name x509name>string ;
+
+: issuer-name ( certificate -- issuer )
+    X509_get_issuer_name x509name>string ;
 
 : common-names-match? ( expected actual -- ? )
     [ >lower ] bi@ "*." ?head [ tail? ] [ = ] if ;
