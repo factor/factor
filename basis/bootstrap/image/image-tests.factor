@@ -81,4 +81,4 @@ IN: bootstrap.image.tests
 ] unit-test
 [ t ] [ 4.0 4.0 eql? ] unit-test
 
-[ ] [ my-arch make-image ] unit-test
+[ ] [ make-my-image ] unit-test
