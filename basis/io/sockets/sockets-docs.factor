@@ -218,7 +218,14 @@ HELP: send
 
 HELP: resolve-host
 { $values { "addrspec" "an address specifier" } { "seq" "a sequence of address specifiers" } }
-{ $description "Resolves host names to IP addresses." } ;
+{ $description "Resolves host names to IP addresses." }
+{ $examples
+    { $code
+      "\"www.facebook.com\" resolve-host . "
+      "{ T{ ipv4 { host \"31.13.64.32\" } } }"
+    }
+} ;
+
 
 HELP: with-local-address
 { $values { "addr" "an " { $link inet4 } " or " { $link inet6 } " address specifier" } { "quot" quotation } }
