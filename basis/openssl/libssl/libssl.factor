@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax combinators kernel
+USING: alien alien.c-types alien.syntax classes.struct combinators kernel
 system namespaces assocs parser lexer sequences words
 quotations math.bitwise alien.libraries literals ;
 
@@ -94,15 +94,63 @@ C-TYPE: SSL
 LIBRARY: libssl
 
 ! ===============================================
+! asn1t.h
+! ===============================================
+
+C-TYPE: ASN1_ITEM
+
+! ===============================================
+! asn1.h
+! ===============================================
+C-TYPE: ASN1_VALUE
+TYPEDEF: ASN1_ITEM ASN1_ITEM_EXP
+
+STRUCT: ASN1_STRING
+    { length int }
+    { type int }
+    { data uchar* }
+    { flags long } ;
+
+FUNCTION: ASN1_VALUE* ASN1_item_d2i ( ASN1_VALUE** val, uchar **in, long len, ASN1_ITEM *it ) ;
+
+! ===============================================
+! ossl_typ.h
+! ===============================================
+TYPEDEF: ASN1_STRING ASN1_OCTET_STRING
+
+! ===============================================
 ! x509.h
 ! ===============================================
+
+STRUCT: X509_EXTENSION
+    { object void* }
+    { critical void* }
+    { value ASN1_OCTET_STRING* } ;
 
 C-TYPE: X509_NAME
 C-TYPE: X509
 
 FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
+FUNCTION: int X509_get_ext_by_NID ( X509* a, int nid, int lastpos ) ;
 FUNCTION: X509_NAME* X509_get_issuer_name ( X509* a ) ;
 FUNCTION: X509_NAME* X509_get_subject_name ( X509* a ) ;
+
+FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc ) ;
+
+! ===============================================
+! x509v3.h
+! ===============================================
+
+STRUCT: X509V3_EXT_METHOD
+    { ext_nid int }
+    { ext_flags int }
+    { it void* } ;
+
+
+! C-TYPE: X509V3_EXT_METHOD
+
+FUNCTION: X509V3_EXT_METHOD* X509V3_EXT_get ( X509_EXTENSION* ext ) ;
+
 
 ! ===============================================
 ! ssl.h
@@ -333,4 +381,5 @@ X509_V_: ERR_APPLICATION_VERIFICATION 50
 ! obj_mac.h
 ! ===============================================
 
-CONSTANT: NID_commonName 13
+CONSTANT: NID_commonName        13
+CONSTANT: NID_subject_alt_name  85
