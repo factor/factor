@@ -486,3 +486,6 @@ PRIVATE>
 : cut-when ( ... seq quot: ( ... elt -- ... ? ) -- ... before after )
     [ find drop ] 2keep drop swap
     [ cut ] [ f over like ] if* ; inline
+
+: nth* ( n seq -- elt )
+    [ length 1 - swap - ] [ nth ] bi ; inline

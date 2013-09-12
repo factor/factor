@@ -169,3 +169,5 @@ IN: sequences.extras.tests
 { "foo" " " } [ "foo " [ blank? ] cut-when ] unit-test
 { "" " foo" } [ " foo" [ blank? ] cut-when ] unit-test
 { "foo" " bar" } [ "foo bar" [ blank? ] cut-when ] unit-test
+
+{ { 4 0 3 1 2 } } [ { 0 4 1 3 2 } 5 iota [ nth* ] curry map ] unit-test
