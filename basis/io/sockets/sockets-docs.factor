@@ -154,7 +154,16 @@ HELP: <client>
 HELP: with-client
 { $values { "remote" "an address specifier" } { "encoding" "an encoding descriptor" } { "quot" quotation } }
 { $description "Opens a network connection and calls the quotation in a new dynamic scope with " { $link input-stream } " and " { $link output-stream } " rebound to the network streams. The local address the socket is connected to is stored in the " { $link local-address } " variable, and the remote address is stored in the " { $link remote-address } " variable." }
-{ $errors "Throws an error if the connection cannot be established." } ;
+{ $errors "Throws an error if the connection cannot be established." }
+{ $examples
+    { $code
+        "T{ inet f \"www.factorcode.org\" 80 } ascii"
+        "["
+        "    \"GET / HTTP/1.1\\r\\nhost: www.factorcode.org\\r\\n\\r\\n\" write flush"
+        "    read-?crlf"
+        "] with-client"
+    }
+} ;
 
 HELP: <server>
 { $values { "addrspec" "an address specifier" } { "encoding" "an encoding descriptor" } { "server" "a handle" } }
