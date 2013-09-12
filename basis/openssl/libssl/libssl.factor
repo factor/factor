@@ -86,7 +86,6 @@ CONSTANT: SSL_ERROR_WANT_ACCEPT      8
         { 8  "SSL_ERROR_WANT_ACCEPT" }
     } ;
 
-TYPEDEF: void* ssl-method
 C-TYPE: SSL_CTX
 C-TYPE: SSL_SESSION
 C-TYPE: SSL
@@ -147,14 +146,43 @@ STRUCT: X509V3_EXT_METHOD
     { it void* } ;
 
 
-! C-TYPE: X509V3_EXT_METHOD
-
 FUNCTION: X509V3_EXT_METHOD* X509V3_EXT_get ( X509_EXTENSION* ext ) ;
-
 
 ! ===============================================
 ! ssl.h
 ! ===============================================
+
+STRUCT: ssl_method_st
+    { version int }
+    { ssl_new void* }
+    { ssl_clear void* }
+    { ssl_free void* }
+    { ssl_accept void* }
+    { ssl_connect void* }
+    { ssl_read void* }
+    { ssl_peek void* }
+    { ssl_write void* }
+    { ssl_shutdown void* }
+    { ssl_renegotiate void* }
+    { ssl_renegotiate_check void* }
+    { ssl_get_message void* }
+    { ssl_read_bytes void* }
+    { ssl_write_bytes void* }
+    { ssl_dispatch_alert void* }
+    { ssl_ctrl void* }
+    { ssl_ctx_ctrl void* }
+    { get_cipher_by_char void* }
+    { put_cipher_by_char void* }
+    { ssl_pending void* }
+    { num_ciphers void* }
+    { get_cipher void* }
+    { get_ssl_method void* }
+    { get_timeout void* }
+    { ssl3_enc void* }
+    { ssl_version void* }
+    { ssl_callback_ctrl void* }
+    { ssl_ctx_callback_ctrl void* } ;
+TYPEDEF: ssl_method_st* ssl-method
 
 FUNCTION: c-string SSL_get_version ( SSL* ssl ) ;
 
