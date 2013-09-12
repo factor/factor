@@ -42,9 +42,9 @@ STRUCT: bio
     { ptr void* }
     { next-bio void* }
     { prev-bio void* }
-    { references int } 
+    { references int }
     { num-read ulong }
-    { num-write ulong } 
+    { num-write ulong }
     { crypto-ex-data-stack void* }
     { crypto-ex-data-dummy int } ;
 
@@ -60,8 +60,46 @@ CONSTANT: BIO_C_GET_SSL     110
 LIBRARY: libcrypto
 
 ! ===============================================
+! crypto.h
+! ===============================================
+STRUCT: crypto_ex_data_st
+    { sk void* }
+    { dummy int } ;
+TYPEDEF: crypto_ex_data_st CRYPTO_EX_DATA
+
+! ===============================================
 ! bio.h
 ! ===============================================
+STRUCT: bio_method_st
+    { type int }
+    { name c-string }
+    { bwrite void* }
+    { bread void* }
+    { bputs void* }
+    { bgets void* }
+    { ctrl void* }
+    { create void* }
+    { destroy void* }
+    { callback_ctrl void* } ;
+TYPEDEF: bio_method_st BIO_METHOD
+
+STRUCT: bio_st
+    { method BIO_METHOD* }
+    { callback void* }
+    { cb_arg c-string }
+    { init int }
+    { shutdown int }
+    { flags int }
+    { retry_reason int }
+    { num int }
+    { ptr void* }
+    { next_bio bio_st* }
+    { prev_bio bio_st* }
+    { references int }
+    { num_read ulong }
+    { num_write ulong }
+    { ex_data CRYPTO_EX_DATA } ;
+TYPEDEF: bio_st BIO
 
 FUNCTION: bio* BIO_new_file ( c-string filename, c-string mode ) ;
 
@@ -69,7 +107,7 @@ FUNCTION: int BIO_printf ( bio* bio, c-string format ) ;
 
 FUNCTION: long BIO_ctrl ( void* bio, int cmd, long larg, void* parg ) ;
 
-FUNCTION: void* BIO_new_socket ( int fd, int close-flag ) ;
+FUNCTION: BIO* BIO_new_socket ( int fd, int close-flag ) ;
 
 FUNCTION: void* BIO_new ( void* method ) ;
 
@@ -128,7 +166,7 @@ FUNCTION: EVP_MD_CTX* EVP_MD_CTX_create ( ) ;
 
 FUNCTION: void EVP_MD_CTX_destroy ( EVP_MD_CTX* ctx ) ;
 
-FUNCTION: int EVP_MD_CTX_copy_ex ( EVP_MD_CTX* out, EVP_MD_CTX* in ) ;  
+FUNCTION: int EVP_MD_CTX_copy_ex ( EVP_MD_CTX* out, EVP_MD_CTX* in ) ;
 
 FUNCTION: int EVP_DigestInit_ex ( EVP_MD_CTX* ctx, EVP_MD* type, ENGINE* impl ) ;
 
@@ -138,7 +176,7 @@ FUNCTION: int EVP_DigestFinal_ex ( EVP_MD_CTX* ctx, void* md, uint* s ) ;
 
 FUNCTION: int EVP_Digest ( void* data, uint count, void* md, uint* size, EVP_MD* type, ENGINE* impl ) ;
 
-FUNCTION: int EVP_MD_CTX_copy ( EVP_MD_CTX* out, EVP_MD_CTX* in ) ;  
+FUNCTION: int EVP_MD_CTX_copy ( EVP_MD_CTX* out, EVP_MD_CTX* in ) ;
 
 FUNCTION: int EVP_DigestInit ( EVP_MD_CTX* ctx, EVP_MD* type ) ;
 
