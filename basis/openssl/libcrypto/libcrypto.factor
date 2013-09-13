@@ -30,32 +30,23 @@ STRUCT: bio-method
     { destroy void* }
     { callback-ctrl void* } ;
 
-STRUCT: bio
-    { method void* }
-    { callback void* }
-    { cb-arg void* }
-    { init int }
-    { shutdown int }
-    { flags int }
-    { retry-reason int }
-    { num int }
-    { ptr void* }
-    { next-bio void* }
-    { prev-bio void* }
-    { references int }
-    { num-read ulong }
-    { num-write ulong }
-    { crypto-ex-data-stack void* }
-    { crypto-ex-data-dummy int } ;
-
 CONSTANT: BIO_NOCLOSE       0x00
 CONSTANT: BIO_CLOSE         0x01
 
 CONSTANT: RSA_3             0x3
 CONSTANT: RSA_F4            0x10001
 
-CONSTANT: BIO_C_SET_SSL     109
-CONSTANT: BIO_C_GET_SSL     110
+CONSTANT: BIO_C_SET_CONNECT         100
+CONSTANT: BIO_C_DO_STATE_MACHINE    101
+CONSTANT: BIO_C_SET_NBIO            102
+CONSTANT: BIO_C_SET_PROXY_PARAM     103
+CONSTANT: BIO_C_SET_FD              104
+CONSTANT: BIO_C_GET_FD              105
+CONSTANT: BIO_C_SET_FILE_PTR        106
+CONSTANT: BIO_C_GET_FILE_PTR        107
+CONSTANT: BIO_C_SET_FILENAME        108
+CONSTANT: BIO_C_SET_SSL             109
+CONSTANT: BIO_C_GET_SSL             110
 
 LIBRARY: libcrypto
 
@@ -90,24 +81,26 @@ STRUCT: bio_st
     { init int }
     { shutdown int }
     { flags int }
-    { retry_reason int }
+    { retry-reason int }
     { num int }
     { ptr void* }
-    { next_bio bio_st* }
-    { prev_bio bio_st* }
+    { next-bio bio_st* }
+    { prev-bio bio_st* }
     { references int }
-    { num_read ulong }
-    { num_write ulong }
-    { ex_data CRYPTO_EX_DATA } ;
+    { num-read ulong }
+    { num-write ulong }
+    { ex-data CRYPTO_EX_DATA } ;
 TYPEDEF: bio_st BIO
 
-FUNCTION: bio* BIO_new_file ( c-string filename, c-string mode ) ;
+FUNCTION: BIO* BIO_new_file ( c-string filename, c-string mode ) ;
 
-FUNCTION: int BIO_printf ( bio* bio, c-string format ) ;
+FUNCTION: int BIO_printf ( BIO* bio, c-string format ) ;
 
 FUNCTION: long BIO_ctrl ( void* bio, int cmd, long larg, void* parg ) ;
 
 FUNCTION: BIO* BIO_new_socket ( int fd, int close-flag ) ;
+
+FUNCTION: BIO* BIO_new_connect ( c-string name ) ;
 
 FUNCTION: void* BIO_new ( void* method ) ;
 
@@ -117,13 +110,13 @@ FUNCTION: int BIO_free ( void* bio ) ;
 
 FUNCTION: void* BIO_push ( void* bio, void* append ) ;
 
-FUNCTION: int BIO_read ( void* b, void* buf, int len ) ;
+FUNCTION: int BIO_read ( BIO* bio, void* buf, int len ) ;
 
 FUNCTION: int BIO_gets ( void* b, c-string buf, int size ) ;
 
 FUNCTION: int BIO_write ( void* b, void* buf, int len ) ;
 
-FUNCTION: int BIO_puts ( void* bp, c-string buf ) ;
+FUNCTION: int BIO_puts ( BIO* bio, c-string buf ) ;
 
 FUNCTION: ulong ERR_get_error (  ) ;
 
