@@ -94,7 +94,9 @@
         Level='1'
         Title='Factor 0.97'
         ConfigurableDirectory='INSTALLDIR'>
-      <ComponentGroupRef Id="CoreGroup"/>
+      <ComponentGroupRef Id="basisgroup"/>
+      <ComponentGroupRef Id="coregroup"/>
+      <ComponentGroupRef Id="extragroup"/>
       <ComponentRef Id='MainExe' />
       <ComponentRef Id='SecondaryExe' />
       <ComponentRef Id='MainImage' />

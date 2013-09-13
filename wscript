@@ -58,18 +58,6 @@ def copy_file(ctx, source, target):
         target = target
         )
 
-# WIX support
-TaskGen.declare_chain(
-    name = 'wxs',
-    rule = 'candle.exe -nologo -out ${TGT} ${SRC}',
-    ext_in = '.wxs',
-    ext_out = '.wxsobj')
-TaskGen.declare_chain(
-    name = 'wxsobj',
-    rule = 'light.exe -ext WixUIExtension -nologo -out ${TGT} ${SRC}',
-    ext_in = '.wxsobj',
-    ext_out = '.msi')
-
 # This monkey patching enables syncronous output from rule tasks.
 # https://groups.google.com/d/msg/waf-users/2uA3DEltTKg/8T4X9I4OeeQJ
 def my_exec_command(self, cmd, **kw):
@@ -104,6 +92,7 @@ def configure(ctx):
         ctx.define('_CRT_SECURE_NO_WARNINGS', None)
         # WIX checks
         ctx.find_program('candle')
+        ctx.find_program('heat')
         ctx.find_program('light')
     elif dest_os == 'linux':
         # Lib checking
@@ -139,6 +128,8 @@ def configure(ctx):
 def build(ctx):
     dest_os = ctx.env.DEST_OS
     dest_cpu = ctx.env.DEST_CPU
+
+    image_target = '%s.image' % APPNAME
 
     bits = {'amd64' : 64, 'i386' : 32, 'x86_64' : 64}[dest_cpu]
     os_sources = {
@@ -190,9 +181,34 @@ def build(ctx):
         )
 
         copy_file(ctx, 'tmp.com', '%s.com' % APPNAME)
+
+        # heat generates a wxs fragment.
+        fmt = 'heat dir ../%s -nologo -var var.MySource -cg %sgroup -gg -dr INSTALLDIR -out ${TGT}'
+        for root in ['core', 'basis', 'extra']:
+            ctx(
+                rule = fmt % (root, root),
+                source = [],
+                target = '%s.wxs' % root
+                )
+            ctx(
+                rule = 'candle -nologo -out ${TGT} ${SRC} -dMySource="../%s"' % root,
+                source = ['%s.wxs' % root],
+                target = ['%s.wxsobj' % root]
+                )
+
         # Can you indicate that the exe and com files need to be built
         # before this target?
-        ctx(source = ['factor.wxs'])
+        ctx(
+            rule = 'candle -nologo -out ${TGT} ${SRC}',
+            source = ['factor.wxs'],
+            target = ['factor.wxsobj'])
+        wxsobjs = ['%s.wxsobj' % f for f in ['core', 'basis', 'extra', 'factor']]
+        ctx(
+            rule = 'light -ext WixUIExtension -nologo -out ${TGT} ${SRC}',
+            source = wxsobjs,
+            target = 'factor.msi'
+            )
+
     elif dest_os == 'linux':
         ctx.program(
             features = features,
@@ -250,18 +266,17 @@ def build(ctx):
     )
 
     # Image built, but it needs to be updated too.
-    real_image = '%s.image' % APPNAME
     params = [
         '-script',
         '-resource-path=..',
         '-i=%s' % old_image,
         '-e="USING: vocabs.loader vocabs.refresh system memory ; '
-        'refresh-all \\"%s\\" save-image-and-exit"' % real_image
+        'refresh-all \\"%s\\" save-image-and-exit"' % image_target
     ]
     ctx(
         rule = '${SRC[0].abspath()} ' + ' '.join(params),
         source = [factor_exe, old_image],
-        target = real_image
+        target = image_target
     )
 
     # Install standard library
@@ -279,8 +294,8 @@ def build(ctx):
     ctx.install_files(sharedir, glob, cwd = base, relative_trick = True)
 
     # Install image
-    ctx.install_files(libdir, real_image)
+    ctx.install_files(libdir, image_target)
     ctx.symlink_as(
-        '${PREFIX}/bin/%s' % real_image,
-        '../lib/factor/%s' % real_image
+        '${PREFIX}/bin/%s' % image_target,
+        '../lib/factor/%s' % image_target
     )
