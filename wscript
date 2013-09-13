@@ -58,6 +58,14 @@ def copy_file(ctx, source, target):
         target = target
         )
 
+def wix_light(ctx, source, target, extra_files):
+    wixobjs = ' '.join(source)
+    return ctx(
+        rule = 'light -ext WixUIExtension -nologo -out ${TGT} %s' % wixobjs,
+        source = source + extra_files,
+        target = target
+        )
+
 # This monkey patching enables syncronous output from rule tasks.
 # https://groups.google.com/d/msg/waf-users/2uA3DEltTKg/8T4X9I4OeeQJ
 def my_exec_command(self, cmd, **kw):
@@ -171,6 +179,7 @@ def build(ctx):
             )
         # The node name can't be factor.com because it will clash with
         # the previously created factor.exe node.
+        com_name = '%s.com' % APPNAME
         target = ctx.path.get_bld().make_node('tmp.com')
         ctx.program(
             features = features,
@@ -179,8 +188,7 @@ def build(ctx):
             use = link_libs,
             linkflags = '/SUBSYSTEM:console'
         )
-
-        copy_file(ctx, 'tmp.com', '%s.com' % APPNAME)
+        copy_file(ctx, 'tmp.com', com_name)
 
         # heat generates a wxs fragment.
         fmt = 'heat dir ../%s -nologo -var var.MySource -cg %sgroup -gg -dr INSTALLDIR -out ${TGT}'
@@ -203,12 +211,7 @@ def build(ctx):
             source = ['factor.wxs'],
             target = ['factor.wxsobj'])
         wxsobjs = ['%s.wxsobj' % f for f in ['core', 'basis', 'extra', 'factor']]
-        ctx(
-            rule = 'light -ext WixUIExtension -nologo -out ${TGT} ${SRC}',
-            source = wxsobjs,
-            target = 'factor.msi'
-            )
-
+        wix_light(ctx, wxsobjs, 'factor.msi', [image_target, com_name])
     elif dest_os == 'linux':
         ctx.program(
             features = features,
