@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings continuations init io io.backend
-io.encodings io.encodings.utf8 io.files.private io.pathnames
-kernel kernel.private namespaces sequences splitting system ;
+USING: alien.strings combinators init io io.backend io.encodings
+io.encodings.utf8 io.files.private io.pathnames kernel
+kernel.private namespaces sequences splitting system ;
 IN: io.files
 
 <PRIVATE
@@ -86,10 +86,13 @@ PRIVATE>
 
 : init-resource-path ( -- )
     OBJ-ARGS special-object
+    [ alien>native-string "-resource-path=" ?head [ drop f ] unless ] map-find drop
     [
-        alien>native-string "-resource-path=" ?head [ drop f ] unless
-    ] map-find drop
-    [ install-prefix "lib/factor" append-path ] unless*
+        {
+            { [ os windows? ] [ image parent-directory ] }
+            { [ os unix? ] [ install-prefix "lib/factor" append-path ] }
+        } cond
+    ] unless*
     "resource-path" set-global ;
 
 [
