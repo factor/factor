@@ -231,9 +231,16 @@ def build(ctx):
         install_path = libdir
     )
 
-    # Build main shared library.
-    ctx.shlib(
-        features = 'cxx cxxshlib',
+    # Build a library. Shared library on Windows, but a static one on
+    # Linux..
+    if dest_os == 'win32':
+        func = ctx.shlib
+        features = 'cxx cxxshlib'
+    elif dest_os == 'linux':
+        func = ctx.stlib
+        features = 'cxx cxxstlib'
+    func(
+        features = features,
         target = APPNAME,
         source = [],
         install_path = libdir,
