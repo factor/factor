@@ -93,6 +93,21 @@ C-TYPE: SSL
 LIBRARY: libssl
 
 ! ===============================================
+! stack.h
+! ===============================================
+
+STRUCT: stack_st
+    { num int }
+    { data char** }
+    { sorted int }
+    { num_alloc int }
+    { comp void* } ;
+TYPEDEF: stack_st _STACK
+
+FUNCTION: int sk_num ( _STACK *s ) ;
+FUNCTION: void* sk_value ( _STACK *s, int ) ;
+
+! ===============================================
 ! asn1t.h
 ! ===============================================
 
@@ -109,6 +124,8 @@ STRUCT: ASN1_STRING
     { type int }
     { data uchar* }
     { flags long } ;
+
+FUNCTION: int ASN1_STRING_cmp ( ASN1_STRING *a, ASN1_STRING *b ) ;
 
 FUNCTION: ASN1_VALUE* ASN1_item_d2i ( ASN1_VALUE** val, uchar **in, long len, ASN1_ITEM *it ) ;
 
@@ -131,9 +148,10 @@ C-TYPE: X509
 
 FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
 FUNCTION: int X509_get_ext_by_NID ( X509* a, int nid, int lastpos ) ;
+FUNCTION: void* X509_get_ext_d2i ( X509 *a, int nid, int* crit, int* idx ) ;
 FUNCTION: X509_NAME* X509_get_issuer_name ( X509* a ) ;
 FUNCTION: X509_NAME* X509_get_subject_name ( X509* a ) ;
-
+FUNCTION: int X509_check_trust ( X509* a, int id, int flags ) ;
 FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc ) ;
 
 ! ===============================================
@@ -145,8 +163,27 @@ STRUCT: X509V3_EXT_METHOD
     { ext_flags int }
     { it void* } ;
 
-
 FUNCTION: X509V3_EXT_METHOD* X509V3_EXT_get ( X509_EXTENSION* ext ) ;
+
+UNION-STRUCT: GENERAL_NAME_st_d
+    { ptr char* }
+    { otherName void* }
+    { rfc822Name void* }
+    { dNSName ASN1_STRING* } ;
+
+STRUCT: GENERAL_NAME_st
+    { type int }
+    { d GENERAL_NAME_st_d } ;
+
+CONSTANT: GEN_OTHERNAME 0
+CONSTANT: GEN_EMAIL     1
+CONSTANT: GEN_DNS       2
+CONSTANT: GEN_X400      3
+CONSTANT: GEN_DIRNAME   4
+CONSTANT: GEN_EDIPARTY  5
+CONSTANT: GEN_URI       6
+CONSTANT: GEN_IPADD     7
+CONSTANT: GEN_RID       8
 
 ! ===============================================
 ! ssl.h
@@ -411,3 +448,4 @@ X509_V_: ERR_APPLICATION_VERIFICATION 50
 
 CONSTANT: NID_commonName        13
 CONSTANT: NID_subject_alt_name  85
+CONSTANT: NID_issuer_alt_name   86
