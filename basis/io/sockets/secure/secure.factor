@@ -77,10 +77,10 @@ ERROR: certificate-verify-error result ;
 M: certificate-verify-error summary
     drop "Certificate verification failed" ;
 
-ERROR: common-name-verify-error expected got ;
+ERROR: subject-name-verify-error expected got ;
 
-M: common-name-verify-error summary
-    drop "Common name verification failed" ;
+M: subject-name-verify-error summary
+    drop "Subject name verification failed" ;
 
 ERROR: upgrade-on-non-socket ;
 

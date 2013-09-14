@@ -126,8 +126,8 @@ HELP: premature-close
 HELP: certificate-verify-error
 { $error-description "Thrown if certificate verification failed. The " { $snippet "result" } " slot contains an object identifying the low-level error that occurred." } ;
 
-HELP: common-name-verify-error
-{ $error-description "Thrown during certificate verification if the host name on the certificate does not match the host name the socket was connected to. This indicates a potential man-in-the-middle attack. The " { $slot "expected" } " and " { $slot "got" } " slots contain the mismatched host names." } ;
+HELP: subject-name-verify-error
+{ $error-description "Thrown during certificate verification if the subject names on the certificate does not match the host name the socket was connected to. This indicates a potential man-in-the-middle attack. The " { $slot "expected" } " and " { $slot "got" } " slots contain the mismatched host names." } ;
 
 HELP: upgrade-on-non-socket
 { $error-description "Thrown if " { $link send-secure-handshake } " or " { $link accept-secure-handshake } " is called with the " { $link input-stream } " and " { $link output-stream } " variables not set to a socket. This error can also indicate that the connection has already been upgraded to a secure connection." } ;

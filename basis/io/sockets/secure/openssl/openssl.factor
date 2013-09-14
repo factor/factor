@@ -1,11 +1,11 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays kernel sequences namespaces math
+USING: accessors byte-arrays classes.struct kernel sequences namespaces math
 math.order combinators init alien alien.c-types alien.data
 alien.strings libc continuations destructors summary splitting
 assocs random math.parser locals unicode.case openssl
 openssl.libcrypto openssl.libssl io.backend io.ports io.pathnames
-io.encodings.8-bit.latin1 io.timeouts io.sockets.secure ;
+io.encodings.8-bit.latin1 io.encodings.utf8 io.timeouts io.sockets.secure ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
@@ -175,25 +175,33 @@ M: ssl-handle dispose*
     [ 256 X509_NAME_get_text_by_NID ] keep
     swap -1 = [ drop f ] [ latin1 alien>string ] if ;
 
-: common-name ( certificate -- host )
+: subject-name ( certificate -- host )
     X509_get_subject_name x509name>string ;
 
 : issuer-name ( certificate -- issuer )
     X509_get_issuer_name x509name>string ;
 
-: common-names-match? ( expected actual -- ? )
+: name-stack>seq ( name-stack -- seq )
+    dup sk_num iota [ sk_value GENERAL_NAME_st memory>struct ] with map ;
+
+: alternative-dns-names ( certificate -- dns-names )
+    NID_subject_alt_name f f X509_get_ext_d2i [ name-stack>seq ] [ { } ] if*
+    [ type>> GEN_DNS = ] filter
+    [ d>> dNSName>> data>> utf8 alien>string ] map ;
+
+: subject-names-match? ( host subject -- ? )
     [ >lower ] bi@ "*." ?head [ tail? ] [ = ] if ;
 
-: check-common-name ( host ssl-handle -- )
-    SSL_get_peer_certificate common-name
-    2dup common-names-match?
-    [ 2drop ] [ common-name-verify-error ] if ;
+: check-subject-name ( host ssl-handle -- )
+    SSL_get_peer_certificate [ alternative-dns-names ] [ subject-name ] bi
+    suffix 2dup [ subject-names-match? ] with filter empty?
+    [ subject-name-verify-error ] [ 2drop ] if ;
 
 M: openssl check-certificate ( host ssl -- )
     current-secure-context config>> verify>> [
         handle>>
         [ nip check-verify-result ]
-        [ check-common-name ]
+        [ check-subject-name ]
         2bi
     ] [ 2drop ] if ;
 
