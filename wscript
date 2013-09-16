@@ -290,7 +290,7 @@ def build(ctx):
     )
 
     # Install standard library
-    pat = '(basis|core|extra)/**/*.(c|factor|png|tiff|TXT|txt)'
+    pat = '(basis|core|extra)/**/*.(c|factor|pem|png|tiff|TXT|txt)'
     glob = cwd.ant_glob(pat)
 
     ctx.install_files(libdir, glob, cwd = cwd, relative_trick = True)
