@@ -87,14 +87,6 @@ M: string >url
 
 M: pathname >url string>> >url ;
 
-: protocol-port ( protocol -- port )
-    {
-        { "http" [ 80 ] }
-        { "https" [ 443 ] }
-        { "ftp" [ 21 ] }
-        [ drop f ]
-    } case ;
-
 : relative-url ( url -- url' )
     clone
         f >>protocol

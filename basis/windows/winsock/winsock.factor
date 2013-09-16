@@ -146,6 +146,10 @@ STRUCT: timeval
     { sec long }
     { usec long } ;
 
+STRUCT: servent
+    { name c-string }
+    { proto c-string } ;
+
 GENERIC: sockaddr>ip ( sockaddr -- string )
 
 M: sockaddr-in sockaddr>ip ( sockaddr -- string )
@@ -186,6 +190,9 @@ FUNCTION: int getsockname ( SOCKET s, sockaddr-in* address, int* addrlen ) ;
 FUNCTION: int getpeername ( SOCKET s, sockaddr-in* address, int* addrlen ) ;
 
 FUNCTION: protoent* getprotobyname ( c-string name ) ;
+
+FUNCTION: servent* getservbyname ( c-string name, c-string prot ) ;
+FUNCTION: servent* getservbyport ( c-string name, c-string prot ) ;
 
 TYPEDEF: uint SERVICETYPE
 TYPEDEF: OVERLAPPED WSAOVERLAPPED
@@ -430,7 +437,7 @@ ERROR: winsock-exception n string ;
 
 : throw-winsock-error ( -- * )
     WSAGetLastError (throw-winsock-error) ;
-    
+
 : winsock-error=0/f ( n/f -- )
     { 0 f } member? [ throw-winsock-error ] when ;
 
