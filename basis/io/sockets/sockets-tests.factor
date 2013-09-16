@@ -169,3 +169,5 @@ os unix? [
 ! Binding to all interfaces should work
 [ ] [ f 0 <inet4> <datagram> dispose ] unit-test
 [ ] [ f 0 <inet6> <datagram> dispose ] unit-test
+
+[ 80 ] [ "http" protocol-port ] unit-test
