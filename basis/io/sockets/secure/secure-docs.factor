@@ -141,7 +141,7 @@ ARTICLE: "ssl-errors" "Secure socket errors"
 { $subsections
     premature-close
     certificate-verify-error
-    common-name-verify-error
+    subject-name-verify-error
 }
 "The " { $link send-secure-handshake } " word can throw one of two errors:"
 { $subsections
