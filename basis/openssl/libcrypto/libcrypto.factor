@@ -30,46 +30,77 @@ STRUCT: bio-method
     { destroy void* }
     { callback-ctrl void* } ;
 
-STRUCT: bio
-    { method void* }
-    { callback void* }
-    { cb-arg void* }
-    { init int }
-    { shutdown int }
-    { flags int }
-    { retry-reason int }
-    { num int }
-    { ptr void* }
-    { next-bio void* }
-    { prev-bio void* }
-    { references int } 
-    { num-read ulong }
-    { num-write ulong } 
-    { crypto-ex-data-stack void* }
-    { crypto-ex-data-dummy int } ;
-
 CONSTANT: BIO_NOCLOSE       0x00
 CONSTANT: BIO_CLOSE         0x01
 
 CONSTANT: RSA_3             0x3
 CONSTANT: RSA_F4            0x10001
 
-CONSTANT: BIO_C_SET_SSL     109
-CONSTANT: BIO_C_GET_SSL     110
+CONSTANT: BIO_C_SET_CONNECT         100
+CONSTANT: BIO_C_DO_STATE_MACHINE    101
+CONSTANT: BIO_C_SET_NBIO            102
+CONSTANT: BIO_C_SET_PROXY_PARAM     103
+CONSTANT: BIO_C_SET_FD              104
+CONSTANT: BIO_C_GET_FD              105
+CONSTANT: BIO_C_SET_FILE_PTR        106
+CONSTANT: BIO_C_GET_FILE_PTR        107
+CONSTANT: BIO_C_SET_FILENAME        108
+CONSTANT: BIO_C_SET_SSL             109
+CONSTANT: BIO_C_GET_SSL             110
 
 LIBRARY: libcrypto
 
 ! ===============================================
+! crypto.h
+! ===============================================
+STRUCT: crypto_ex_data_st
+    { sk void* }
+    { dummy int } ;
+TYPEDEF: crypto_ex_data_st CRYPTO_EX_DATA
+
+! ===============================================
 ! bio.h
 ! ===============================================
+STRUCT: bio_method_st
+    { type int }
+    { name c-string }
+    { bwrite void* }
+    { bread void* }
+    { bputs void* }
+    { bgets void* }
+    { ctrl void* }
+    { create void* }
+    { destroy void* }
+    { callback_ctrl void* } ;
+TYPEDEF: bio_method_st BIO_METHOD
 
-FUNCTION: bio* BIO_new_file ( c-string filename, c-string mode ) ;
+STRUCT: bio_st
+    { method BIO_METHOD* }
+    { callback void* }
+    { cb_arg c-string }
+    { init int }
+    { shutdown int }
+    { flags int }
+    { retry-reason int }
+    { num int }
+    { ptr void* }
+    { next-bio bio_st* }
+    { prev-bio bio_st* }
+    { references int }
+    { num-read ulong }
+    { num-write ulong }
+    { ex-data CRYPTO_EX_DATA } ;
+TYPEDEF: bio_st BIO
 
-FUNCTION: int BIO_printf ( bio* bio, c-string format ) ;
+FUNCTION: BIO* BIO_new_file ( c-string filename, c-string mode ) ;
+
+FUNCTION: int BIO_printf ( BIO* bio, c-string format ) ;
 
 FUNCTION: long BIO_ctrl ( void* bio, int cmd, long larg, void* parg ) ;
 
-FUNCTION: void* BIO_new_socket ( int fd, int close-flag ) ;
+FUNCTION: BIO* BIO_new_socket ( int fd, int close-flag ) ;
+
+FUNCTION: BIO* BIO_new_connect ( c-string name ) ;
 
 FUNCTION: void* BIO_new ( void* method ) ;
 
@@ -79,13 +110,13 @@ FUNCTION: int BIO_free ( void* bio ) ;
 
 FUNCTION: void* BIO_push ( void* bio, void* append ) ;
 
-FUNCTION: int BIO_read ( void* b, void* buf, int len ) ;
+FUNCTION: int BIO_read ( BIO* bio, void* buf, int len ) ;
 
 FUNCTION: int BIO_gets ( void* b, c-string buf, int size ) ;
 
 FUNCTION: int BIO_write ( void* b, void* buf, int len ) ;
 
-FUNCTION: int BIO_puts ( void* bp, c-string buf ) ;
+FUNCTION: int BIO_puts ( BIO* bio, c-string buf ) ;
 
 FUNCTION: ulong ERR_get_error (  ) ;
 
@@ -128,7 +159,7 @@ FUNCTION: EVP_MD_CTX* EVP_MD_CTX_create ( ) ;
 
 FUNCTION: void EVP_MD_CTX_destroy ( EVP_MD_CTX* ctx ) ;
 
-FUNCTION: int EVP_MD_CTX_copy_ex ( EVP_MD_CTX* out, EVP_MD_CTX* in ) ;  
+FUNCTION: int EVP_MD_CTX_copy_ex ( EVP_MD_CTX* out, EVP_MD_CTX* in ) ;
 
 FUNCTION: int EVP_DigestInit_ex ( EVP_MD_CTX* ctx, EVP_MD* type, ENGINE* impl ) ;
 
@@ -138,7 +169,7 @@ FUNCTION: int EVP_DigestFinal_ex ( EVP_MD_CTX* ctx, void* md, uint* s ) ;
 
 FUNCTION: int EVP_Digest ( void* data, uint count, void* md, uint* size, EVP_MD* type, ENGINE* impl ) ;
 
-FUNCTION: int EVP_MD_CTX_copy ( EVP_MD_CTX* out, EVP_MD_CTX* in ) ;  
+FUNCTION: int EVP_MD_CTX_copy ( EVP_MD_CTX* out, EVP_MD_CTX* in ) ;
 
 FUNCTION: int EVP_DigestInit ( EVP_MD_CTX* ctx, EVP_MD* type ) ;
 
