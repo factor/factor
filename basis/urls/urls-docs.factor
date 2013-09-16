@@ -87,10 +87,6 @@ HELP: parse-host
     }
 } ;
 
-HELP: protocol-port
-{ $values { "protocol" "a protocol string" } { "port" { $maybe integer } } }
-{ $description "Outputs the port number associated with a protocol, or " { $link f } " if the protocol is unknown." } ;
-
 HELP: query-param
 { $values
      { "url" url } { "key" string }
