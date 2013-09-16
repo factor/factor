@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io io.backend threads
-strings byte-arrays continuations destructors quotations ;
+strings byte-arrays continuations destructors quotations math ;
 IN: io.sockets
 
 ARTICLE: "network-addressing" "Address specifiers"
@@ -233,3 +233,7 @@ HELP: with-local-address
   }
   { $code "\"192.168.0.1\" 23000 <inet4> [ ] with-local-address" }
 } ;
+
+HELP: protocol-port
+{ $values { "protocol" "a protocol string" } { "port" { $maybe integer } } }
+{ $description "Outputs the port number associated with a protocol, or " { $link f } " if the protocol is unknown." } ;
