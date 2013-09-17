@@ -2,7 +2,7 @@ from os import path
 from waflib import Task, TaskGen
 
 APPNAME = 'factor-lang'
-VERSION = '0.96'
+VERSION = '0.97-git'
 
 # List source files
 common_source = [
@@ -170,48 +170,24 @@ def build(ctx):
     features = 'cxx cxxprogram'
 
     if dest_os == 'win32':
+        tg1 = ctx.program(
+            features = features,
+            source = [],
+            target = APPNAME,
+            use = link_libs,
+            linkflags = '/SUBSYSTEM:console',
+            name = 'factor-com'
+        )
+        tg1.env.cxxprogram_PATTERN = '%s.com'
+        ctx.add_group()
         ctx.program(
             features = features,
             source = [],
             target = APPNAME,
             use = link_libs,
-            linkflags = '/SUBSYSTEM:windows'
+            linkflags = '/SUBSYSTEM:windows',
+            name = 'factor-exe'
             )
-        # The node name can't be factor.com because it will clash with
-        # the previously created factor.exe node.
-        com_name = '%s.com' % APPNAME
-        target = ctx.path.get_bld().make_node('tmp.com')
-        ctx.program(
-            features = features,
-            source = [],
-            target = target,
-            use = link_libs,
-            linkflags = '/SUBSYSTEM:console'
-        )
-        copy_file(ctx, 'tmp.com', com_name)
-
-        # heat generates a wxs fragment.
-        fmt = 'heat dir ../%s -nologo -var var.MySource -cg %sgroup -gg -dr INSTALLDIR -out ${TGT}'
-        for root in ['core', 'basis', 'extra']:
-            ctx(
-                rule = fmt % (root, root),
-                source = [],
-                target = '%s.wxs' % root
-                )
-            ctx(
-                rule = 'candle -nologo -out ${TGT} ${SRC} -dMySource="../%s"' % root,
-                source = ['%s.wxs' % root],
-                target = ['%s.wxsobj' % root]
-                )
-
-        # Can you indicate that the exe and com files need to be built
-        # before this target?
-        ctx(
-            rule = 'candle -nologo -out ${TGT} ${SRC}',
-            source = ['factor.wxs'],
-            target = ['factor.wxsobj'])
-        wxsobjs = ['%s.wxsobj' % f for f in ['core', 'basis', 'extra', 'factor']]
-        wix_light(ctx, wxsobjs, 'factor.msi', [image_target, com_name])
     elif dest_os == 'linux':
         ctx.program(
             features = features,
@@ -229,22 +205,27 @@ def build(ctx):
         target = 'factor-ffi-test',
         source = ['vm/ffi_test.c'],
         install_path = libdir
-    )
+        )
 
-    # Build a library. Shared library on Windows, but a static one on
-    # Linux..
+    # Build shared lib on Windows, static on Linux.
+    # This is neede to trick waf into always building the dll after
+    # the exe.
+    ctx.add_group()
     if dest_os == 'win32':
         func = ctx.shlib
         features = 'cxx cxxshlib'
+        linkflags = '/SUBSYSTEM:console'
     elif dest_os == 'linux':
         func = ctx.stlib
         features = 'cxx cxxstlib'
+        linkflags = []
     func(
         features = features,
         target = APPNAME,
         source = [],
         install_path = libdir,
-        use = link_libs
+        use = link_libs,
+        linkflags = linkflags
     )
 
     # Build factor.image using the newly built executable.
@@ -289,7 +270,32 @@ def build(ctx):
         target = image_target
     )
 
-    # Install standard library
+    # Installer and installation targets.
+    if dest_os == 'win32':
+        # heat generates wxs fragments.
+        fmt = 'heat dir ../%s -nologo -var var.MySource -cg %sgroup -gg -dr INSTALLDIR -out ${TGT}'
+        for root in ['core', 'basis', 'extra']:
+            ctx(
+                rule = fmt % (root, root),
+                source = [],
+                target = '%s.wxs' % root
+                )
+            ctx(
+                rule = 'candle -nologo -out ${TGT} ${SRC} -dMySource="../%s"' % root,
+                source = ['%s.wxs' % root],
+                target = ['%s.wxsobj' % root]
+                )
+
+        # Can you indicate that the exe and com files need to be built
+        # before this target?
+        ctx(
+            rule = 'candle -nologo -out ${TGT} ${SRC}',
+            source = ['factor.wxs'],
+            target = ['factor.wxsobj'])
+        wxsobjs = ['%s.wxsobj' % f for f in ['core', 'basis', 'extra', 'factor']]
+        wix_light(ctx, wxsobjs, 'factor.msi', [image_target, '%s.com' % APPNAME])
+
+
     pat = '(basis|core|extra)/**/*.(c|factor|pem|png|tiff|TXT|txt)'
     glob = cwd.ant_glob(pat)
 
