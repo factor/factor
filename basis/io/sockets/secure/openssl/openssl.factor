@@ -1,11 +1,11 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays classes.struct kernel sequences namespaces math
-math.order combinators init alien alien.c-types alien.data
-alien.strings libc continuations destructors summary splitting
-assocs random math.parser locals unicode.case openssl
-openssl.libcrypto openssl.libssl io.backend io.ports io.pathnames
-io.encodings.8-bit.latin1 io.encodings.utf8 io.timeouts io.sockets.secure ;
+USING: accessors alien alien.c-types alien.data alien.strings
+assocs byte-arrays classes.struct combinators destructors
+io.backend io.encodings.8-bit.latin1 io.encodings.utf8
+io.pathnames io.sockets.secure kernel libc locals math
+math.order math.parser namespaces openssl openssl.libcrypto
+openssl.libssl random sequences splitting unicode.case ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
@@ -181,11 +181,12 @@ M: ssl-handle dispose*
 : issuer-name ( certificate -- issuer )
     X509_get_issuer_name x509name>string ;
 
-: name-stack>seq ( name-stack -- seq )
+: name-stack>sequence ( name-stack -- seq )
     dup sk_num iota [ sk_value GENERAL_NAME_st memory>struct ] with map ;
 
 : alternative-dns-names ( certificate -- dns-names )
-    NID_subject_alt_name f f X509_get_ext_d2i [ name-stack>seq ] [ { } ] if*
+    NID_subject_alt_name f f X509_get_ext_d2i
+    [ name-stack>sequence ] [ f ] if*
     [ type>> GEN_DNS = ] filter
     [ d>> dNSName>> data>> utf8 alien>string ] map ;
 
@@ -193,9 +194,10 @@ M: ssl-handle dispose*
     [ >lower ] bi@ "*." ?head [ tail? ] [ = ] if ;
 
 : check-subject-name ( host ssl-handle -- )
-    SSL_get_peer_certificate [ alternative-dns-names ] [ subject-name ] bi
-    suffix 2dup [ subject-names-match? ] with filter empty?
-    [ subject-name-verify-error ] [ 2drop ] if ;
+    SSL_get_peer_certificate
+    [ alternative-dns-names ] [ subject-name ] bi suffix
+    2dup [ subject-names-match? ] with any?
+    [ 2drop ] [ subject-name-verify-error ] if ;
 
 M: openssl check-certificate ( host ssl -- )
     current-secure-context config>> verify>> [
