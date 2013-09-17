@@ -464,6 +464,9 @@ M: invalid-local-address summary
         [ invalid-local-address ] if
     ] dip with-variable ; inline
 
+: protocol-port ( protocol -- port )
+    f getservbyname [ port>> htons ] [ f ] if* ;
+
 {
     { [ os unix? ] [ "io.sockets.unix" require ] }
     { [ os windows? ] [ "io.sockets.windows" require ] }
