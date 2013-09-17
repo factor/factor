@@ -148,6 +148,8 @@ STRUCT: timeval
 
 STRUCT: servent
     { name c-string }
+    { aliases void* }
+    { port int }
     { proto c-string } ;
 
 GENERIC: sockaddr>ip ( sockaddr -- string )
@@ -192,7 +194,7 @@ FUNCTION: int getpeername ( SOCKET s, sockaddr-in* address, int* addrlen ) ;
 FUNCTION: protoent* getprotobyname ( c-string name ) ;
 
 FUNCTION: servent* getservbyname ( c-string name, c-string prot ) ;
-FUNCTION: servent* getservbyport ( c-string name, c-string prot ) ;
+FUNCTION: servent* getservbyport ( int port, c-string prot ) ;
 
 TYPEDEF: uint SERVICETYPE
 TYPEDEF: OVERLAPPED WSAOVERLAPPED
