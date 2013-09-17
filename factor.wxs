@@ -20,6 +20,10 @@
     <Property Id='DiskPrompt' Value="Factor 0.97 Installation [1]" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id="DesktopFolder" Name="Desktop"/>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="Factor"/>
+      </Directory>
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
         <Directory Id='INSTALLDIR' Name='Factor 0.97'>
           <Component Id='MainExe' Guid='b49087c0-1573-11e3-bd10-a9f1edab8a3d'>
@@ -28,7 +32,17 @@
                 Name='factor.exe'
                 DiskId='1'
                 Source='factor-lang.exe'
-                KeyPath='yes'/>
+                KeyPath='yes'>
+              <Shortcut
+                  Advertise="yes"
+                  Id="MyProductDesktopShortcut"
+                  Directory="DesktopFolder"
+                  Name="Factor 0.97"
+                  WorkingDirectory="INSTALLDIR"
+                  Description="Factor 0.97">
+                <Icon Id="Icon.exe" SourceFile="factor-lang.exe"/>
+              </Shortcut>
+            </File>
           </Component>
           <Component Id='SecondaryExe' Guid='ce8b4ad0-157c-11e3-b4a5-2b2c7e47f7bc'>
             <File
@@ -89,6 +103,25 @@
         </Directory>
       </Directory>
     </Directory>
+    <DirectoryRef Id='ApplicationProgramsFolder'>
+      <Component Id="ApplicationShortcut" Guid='6e66ea91-6BE3-460D-A14F-23658D16550B'>
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="Factor 0.97"
+                  Description="The best programming language!"
+                  Target="[INSTALLDIR]factor.exe"
+                  WorkingDirectory="INSTALLDIR">
+          <Icon Id="Icon2.exe" SourceFile="factor-lang.exe"/>
+        </Shortcut>
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue
+            Root="HKCU"
+            Key="Software\Microsoft\MyApplicationName"
+            Name="installed"
+            Type="integer"
+            Value="1"
+            KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
     <Feature
         Id='Complete'
         Level='1'
@@ -97,6 +130,7 @@
       <ComponentGroupRef Id="basisgroup"/>
       <ComponentGroupRef Id="coregroup"/>
       <ComponentGroupRef Id="extragroup"/>
+      <ComponentGroupRef Id="miscgroup"/>
       <ComponentRef Id='MainExe' />
       <ComponentRef Id='SecondaryExe' />
       <ComponentRef Id='MainImage' />
@@ -105,7 +139,12 @@
       <ComponentRef Id='ReadmeHTML' />
       <ComponentRef Id='ReadmeMD' />
       <ComponentRef Id='TestLib' />
+      <ComponentRef Id='ApplicationShortcut' />
     </Feature>
+
+    <Icon Id="bigicon.ico" SourceFile="..\misc\icons\Factor.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="bigicon.ico" />
+    <Property Id="ARPHELPLINK" Value="http://www.factorcode.org/" />
 
     <!-- The purpose of defining the gui like this is to not have to
          show the license dialog. -->

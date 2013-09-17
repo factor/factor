@@ -273,8 +273,9 @@ def build(ctx):
     # Installer and installation targets.
     if dest_os == 'win32':
         # heat generates wxs fragments.
+        frags = ['core', 'basis', 'extra', 'misc']
         fmt = 'heat dir ../%s -nologo -var var.MySource -cg %sgroup -gg -dr INSTALLDIR -out ${TGT}'
-        for root in ['core', 'basis', 'extra']:
+        for root in frags:
             ctx(
                 rule = fmt % (root, root),
                 source = [],
@@ -291,10 +292,10 @@ def build(ctx):
         ctx(
             rule = 'candle -nologo -out ${TGT} ${SRC}',
             source = ['factor.wxs'],
-            target = ['factor.wxsobj'])
-        wxsobjs = ['%s.wxsobj' % f for f in ['core', 'basis', 'extra', 'factor']]
-        wix_light(ctx, wxsobjs, 'factor.msi', [image_target, '%s.com' % APPNAME])
-
+            target = ['factor.wxsobj']
+            )
+        wxsobjs = ['%s.wxsobj' % f for f in ['factor'] + frags]
+        wix_light(ctx, wxsobjs, 'factor.msi', []) # [image_target, '%s.com' % APPNAME])
 
     pat = '(basis|core|extra)/**/*.(c|factor|pem|png|tiff|TXT|txt)'
     glob = cwd.ant_glob(pat)
