@@ -8,6 +8,7 @@ IN: combinators.extras
 : once ( quot -- ) call ; inline
 : twice ( quot -- ) dup [ call ] dip call ; inline
 : thrice ( quot -- ) dup dup [ call ] 2dip [ call ] dip call ; inline
+: forever ( quot -- ) [ t ] compose loop ; inline
 
 MACRO: cond-case ( assoc -- )
     [
