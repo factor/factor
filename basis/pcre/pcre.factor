@@ -1,42 +1,45 @@
 USING:
-    alien alien.c-types alien.data alien.libraries alien.syntax
-    classes.struct
-    combinators
-    system ;
+    accessors
+    alien.c-types alien.data
+    arrays
+    kernel
+    pcre.ffi
+    sequences ;
 IN: pcre
 
-<< {
-    { [ os unix? ] [ "libpcre" "libpcre.so" cdecl add-library ] }
-} cond >>
+ERROR: malformed-regexp expr error ;
 
-STRUCT: pcre_extra
-    { flags int }
-    { study_data void* }
-    { match_limit long }
-    { callout_data void* }
-    { tables uchar* }
-    { match_limit_recursion int }
-    { mark uchar** } ;
+TUPLE: compiled-pcre pcre extra ;
 
-FUNCTION: void* pcre_compile ( c-string pattern,
-                               int options,
-                               char** errptr,
-                               int* erroffset,
-                               char* tableptr ) ;
+! Low-level
 
-FUNCTION: int pcre_info ( void* pcre, int* optptr, int* first_byte ) ;
+: exec ( pcre extra subject ofs -- count match-data )
+    [ dup length ] dip 0 30 int <c-array> [ 30 pcre_exec ] keep ;
 
-FUNCTION: pcre_extra* pcre_study ( void* pcre, int options, char** errptr ) ;
-
-FUNCTION: c-string pcre_version ( ) ;
-
-FUNCTION: uchar* pcre_maketables ( ) ;
-
-: <pcre> ( expr -- pcre err-message err-offset )
+: (pcre) ( expr -- pcre err-message err-offset )
     0 { c-string int } [ f pcre_compile ] with-out-parameters ;
+
+: <pcre> ( expr -- pcre )
+    dup (pcre) 2array swap [ 2nip ] [ malformed-regexp ] if* ;
+
+: <pcre-extra> ( pcre -- pcre-extra )
+    0 { c-string } [ pcre_study ] with-out-parameters drop ;
+
+! High-level
+
+: <compiled-pcre> ( expr -- compiled-pcre )
+    <pcre> dup <pcre-extra> compiled-pcre boa ;
+
+: findall ( subject compiled-pcre -- matches )
+    [ pcre>> ] [ extra>> ] bi rot 0 exec nip ;
+
+
 
 : info ( pcre -- x x x )
     { int int } [ pcre_info ] with-out-parameters ;
 
-: study ( pcre -- pcre-extra err-message )
-    0 { c-string } [ pcre_study ] with-out-parameters ;
+: fullinfo ( pcre pcre-extra what -- num x )
+    { int } [ pcre_fullinfo ] with-out-parameters ;
+
+: substring ( subject match-data count n -- str )
+    { c-string } [ pcre_get_substring drop ] with-out-parameters ;
