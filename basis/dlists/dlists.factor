@@ -215,7 +215,7 @@ PRIVATE>
     [ swap push-before-node ] [ push-back* ] if* ; inline
 
 : push-sorted ( obj dlist -- dlist-node )
-    dupd [ before? ] with push-before ;
+    dupd [ before? ] with push-before ; inline
 
 INSTANCE: dlist deque
 
