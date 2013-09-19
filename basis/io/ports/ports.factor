@@ -127,7 +127,7 @@ M: output-port stream-write1
 : write-in-groups ( byte-array port -- )
     [ binary-object uchar <c-direct-array> ] dip
     [ buffer>> size>> <groups> ] [ '[ _ stream-write ] ] bi
-    each ;
+    each ; inline
 
 M: output-port stream-write
     dup check-disposed
@@ -142,7 +142,7 @@ HOOK: (wait-to-write) io-backend ( port -- )
 
 : port-flush ( port -- )
     dup buffer>> buffer-empty?
-    [ drop ] [ dup (wait-to-write) port-flush ] if ;
+    [ drop ] [ dup (wait-to-write) port-flush ] if ; inline recursive
 
 M: output-port stream-flush
     [ check-disposed ] [ port-flush ] bi ;
