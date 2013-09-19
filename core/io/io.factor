@@ -171,13 +171,19 @@ ERROR: invalid-read-buffer buf stream ;
 
 CONSTANT: each-block-size 65536
 
-: each-stream-block-slice ( ... stream quot: ( ... block-slice -- ... ) -- ... )
-    [ drop ] prepose
-    swap [ each-block-size swap (new-sequence-for-stream) ] keep
+: (each-stream-block-slice) ( ... stream quot: ( ... block-slice -- ... ) block-size -- ... )
+    [ [ drop ] prepose swap ] dip
+    [ swap (new-sequence-for-stream) ] curry keep
     [ stream-read-partial-into ] 2curry each-morsel drop ; inline
 
+: each-stream-block-slice ( ... stream quot: ( ... block-slice -- ... ) -- ... )
+    each-block-size (each-stream-block-slice) ; inline
+
+: (each-stream-block) ( ... stream quot: ( ... block -- ... ) block-size -- ... )
+    rot [ stream-read-partial ] 2curry each-morsel ; inline
+
 : each-stream-block ( ... stream quot: ( ... block -- ... ) -- ... )
-    swap [ each-block-size swap stream-read-partial ] curry each-morsel ; inline
+    each-block-size (each-stream-block) ; inline
 
 : each-block-slice ( ... quot: ( ... block -- ... ) -- ... )
     input-stream get swap each-stream-block-slice ; inline
