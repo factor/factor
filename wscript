@@ -295,7 +295,7 @@ def build(ctx):
             target = ['factor.wxsobj']
             )
         wxsobjs = ['%s.wxsobj' % f for f in ['factor'] + frags]
-        wix_light(ctx, wxsobjs, 'factor.msi', []) # [image_target, '%s.com' % APPNAME])
+        wix_light(ctx, wxsobjs, 'factor.msi', [image_target, '%s.com' % APPNAME])
 
     pat = '(basis|core|extra)/**/*.(c|factor|pem|png|tiff|TXT|txt)'
     glob = cwd.ant_glob(pat)
