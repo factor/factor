@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2009 Mackenzie Straight, Doug Coleman,
-! Slava Pestov.
+! Slava Pestov, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
-deques fry hashtables kernel parser search-deques sequences
-summary vocabs.loader ;
+deques fry hashtables kernel math.order parser search-deques
+sequences summary vocabs.loader ;
 IN: dlists
 
 TUPLE: dlist-link { prev maybe{ dlist-link } } { next maybe{ dlist-link } } ;
@@ -191,6 +191,31 @@ M: dlist clear-deque ( dlist -- )
 
 M: dlist clone
     <dlist> [ '[ _ push-back ] dlist-each ] keep ;
+
+<PRIVATE
+
+: (push-before-node) ( obj dlist-node -- new-dlist-node )
+    [ [ prev>> ] keep <dlist-node> ] keep {
+        [ prev>> [ next<< ] [ drop ] if* ]
+        [ prev<< ]
+        [ drop ]
+    } 2cleave ; inline
+
+: push-before-node ( obj dlist-node dlist -- new-dlist-node )
+    2dup front>> eq? [
+        nip push-front*
+    ] [
+        drop (push-before-node)
+    ] if ; inline
+
+PRIVATE>
+
+: push-before ( ... obj dlist quot: ( ... obj -- ... ? ) -- ... dlist-node )
+    [ obj>> ] prepose over [ dlist-find-node ] dip swap
+    [ swap push-before-node ] [ push-back* ] if* ; inline
+
+: push-sorted ( obj dlist -- dlist-node )
+    dupd [ before? ] with push-before ;
 
 INSTANCE: dlist deque
 
