@@ -1,9 +1,13 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.destructors
-alien.syntax accessors destructors fry kernel math math.bitwise
-sequences libc colors images images.memory core-graphics.types
-core-foundation.utilities opengl.gl literals ;
+
+USING: accessors alien alien.c-types alien.data
+alien.destructors alien.syntax colors
+core-foundation.dictionaries core-foundation.strings
+core-foundation.urls core-foundation.utilities
+core-graphics.types destructors fry images images.memory kernel
+libc math opengl.gl sequences ;
+
 IN: core-graphics
 
 TYPEDEF: int CGImageAlphaInfo
@@ -59,6 +63,10 @@ FUNCTION: CGContextRef CGBitmapContextCreate (
    CGBitmapInfo bitmapInfo
 ) ;
 
+FUNCTION: CGImageRef CGBitmapContextCreateImage
+   CGContextRef c
+) ;
+
 FUNCTION: void CGColorSpaceRelease ( CGColorSpaceRef ref ) ;
 
 DESTRUCTOR: CGColorSpaceRelease
@@ -74,7 +82,7 @@ FUNCTION: void CGContextSetRGBStrokeColor (
    CGFloat blue,
    CGFloat alpha
 ) ;
-  
+
 FUNCTION: void CGContextSetRGBFillColor (
    CGContextRef c,
    CGFloat red,
@@ -111,6 +119,23 @@ FUNCTION: size_t CGImageGetWidth (
 
 FUNCTION: size_t CGImageGetHeight (
    CGImageRef image
+) ;
+
+FUNCTION: CGImageDestinationRef CGImageDestinationCreateWithURL (
+   CFURLRef url,
+   CFStringRef type,
+   size_t count,
+   CFDictionaryRef options
+) ;
+
+FUNCTION: void CGImageDestinationAddImage (
+   CGImageDestinationRef idst,
+   CGImageRef image,
+   CFDictionaryRef properties
+) ;
+
+FUNCTION: bool CGImageDestinationFinalize (
+   CGImageDestinationRef idst
 ) ;
 
 FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
