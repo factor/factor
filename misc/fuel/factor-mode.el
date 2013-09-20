@@ -203,7 +203,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
     "B" "BEFORE:"
-    "C:" "CALLBACK:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:" "CONSTANT:"
+    "C:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:" "CONSTANT:"
     "CONSULT:" "call-next-method"
     "DEFER:" "DESTRUCTOR:"
     "EBNF:" ";EBNF" "ENUM:" "ERROR:" "EXCLUDE:"
@@ -324,12 +324,6 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
 (defconst factor-sub-vocab-regex "^<\\([^ \n]+\\) *$")
 
-(defconst factor-alien-function-alias-regex
-  "\\_<FUNCTION-ALIAS: +\\(\\w+\\)[\n ]+\\(\\w+\\)[\n ]+\\(\\w+\\)")
-
-(defconst factor-alien-callback-regex
-  "\\_<CALLBACK:[ \n]+\\(\\w+\\)[ \n]+\\(\\w+\\)")
-
 (defconst factor-indent-def-starts
   '("" ":"
     "AFTER" "BEFORE"
@@ -422,11 +416,6 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
 (defconst factor-font-lock-keywords
   `((,factor-brace-words-regex 1 'factor-font-lock-parsing-word)
-    (,factor-alien-function-alias-regex (1 'factor-font-lock-word)
-                                        (2 'factor-font-lock-type-name)
-                                        (3 'factor-font-lock-word))
-    (,factor-alien-callback-regex (1 'factor-font-lock-type-name)
-                                  (2 'factor-font-lock-word))
     (,factor-vocab-ref-regex 2 'factor-font-lock-vocabulary-name)
 
     (,factor-using-lines-regex (1 'factor-font-lock-parsing-word)
@@ -489,7 +478,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
     ;; Highlights alien function definitions. Types in stack effect
     ;; declarations are given a bold face.
-    (,(format "\\(\\(?:GL-\\)?FUNCTION\\):[ \n]+%s[ \n]+%s[ \n]+" symbol symbol)
+    (,(format "\\(\\(?:GL-\\)?FUNCTION\\|CALLBACK\\):[ \n]+%s[ \n]+%s[ \n]+" symbol symbol)
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-type-name)
      (3 'factor-font-lock-word)
