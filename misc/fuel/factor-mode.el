@@ -167,6 +167,12 @@ source/docs/tests file. When set to false, you'll be asked only once."
   :group 'factor-faces
   :group 'faces)
 
+(defface factor-font-lock-type-in-stack-effect '((t :inherit font-lock-comment-face
+                                                    :bold t))
+  "Face for Factor types in stack effect declarations."
+  :group 'factor-faces
+  :group 'faces)
+
 
 ;;; Thing-at-point:
 
@@ -189,16 +195,19 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
 ;;; Regexps galore:
 
+;; Utility regexp used by other regexps to match a Factor symbol name
+(setq-local symbol "\\(\\(?:\\sw\\|\\s_\\)+\\)")
+
 ;; Excludes parsing words that are handled by other regexps
 (defconst factor-parsing-words
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
     "B" "BEFORE:"
-    "C:" "CALLBACK:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:" "CONSTANT:"
+    "C:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:" "CONSTANT:"
     "CONSULT:" "call-next-method"
     "DEFER:" "DESTRUCTOR:"
     "EBNF:" ";EBNF" "ENUM:" "ERROR:" "EXCLUDE:"
-    "FORGET:" "FROM:" "FUNCTION:" "FUNCTION-ALIAS:"
+    "FORGET:" "FROM:" "FUNCTION-ALIAS:"
     "GAME:" "GENERIC#" "GENERIC:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HELP:" "HINTS:" "HOOK:"
@@ -211,9 +220,9 @@ source/docs/tests file. When set to false, you'll be asked only once."
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:"
-    "SPECIALIZED-ARRAYS:" "STRING:" "STRUCT:" "SYMBOLS:" "SYNTAX:"
+    "SPECIALIZED-ARRAYS:" "STRING:" "SYMBOLS:" "SYNTAX:"
     "TYPEDEF:" "TYPED:" "TYPED::"
-    "UNIFORM-TUPLE:" "UNION:" "UNION-STRUCT:" "USE:"
+    "UNIFORM-TUPLE:" "UNION:" "USE:"
     "VARIANT:" "VERTEX-FORMAT:"))
 
 (defconst factor-parsing-words-regex
@@ -250,7 +259,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "^AFTER: +\\([^ ]+\\) +\\([^ ]+\\)")
 
 (defconst factor-integer-regex
-  "\\_<-?\\(0[xob]\\)?[0-9]+\\_>")
+  "\\_<-?\\(0[xob][0-9a-fA-F]+\\|[0-9]+\\)\\_>")
 
 (defconst factor-raw-float-regex
   "[0-9]*\\.[0-9]*\\([eEpP][+-]?[0-9]+\\)?")
@@ -307,22 +316,13 @@ source/docs/tests file. When set to false, you'll be asked only once."
   (factor-second-word-regex '("&:" "SYMBOL:" "VAR:" "CONSTANT:")))
 
 (defconst factor-stack-effect-regex
-  "\\( ( [^\n]* )\\)\\|\\( (( [^\n]* ))\\)")
+  "\\( ( [^)]* )\\)\\|\\( (( [^)]* ))\\)")
 
 (defconst factor-use-line-regex "^USE: +\\(.*\\)$")
 
 (defconst factor-current-vocab-regex "^IN: +\\([^ \r\n\f]+\\)")
 
 (defconst factor-sub-vocab-regex "^<\\([^ \n]+\\) *$")
-
-(defconst factor-alien-function-regex
-  "\\_<FUNCTION: +\\(\\w+\\)[\n ]+\\(\\w+\\)")
-
-(defconst factor-alien-function-alias-regex
-  "\\_<FUNCTION-ALIAS: +\\(\\w+\\)[\n ]+\\(\\w+\\)[\n ]+\\(\\w+\\)")
-
-(defconst factor-alien-callback-regex
-  "\\_<CALLBACK: +\\(\\w+\\) +\\(\\w+\\)")
 
 (defconst factor-indent-def-starts
   '("" ":"
@@ -400,13 +400,13 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
 
 (defconst factor-typedef-regex
-  "\\_<TYPEDEF: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+  (format "\\_<TYPEDEF: +%s +%s\\( .*\\)?$" symbol symbol))
 
 (defconst factor-c-global-regex
   "\\_<C-GLOBAL: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
 
 (defconst factor-c-type-regex
-  "\\_<C-TYPE: +\\(\\w+\\)\\( .*\\)?$")
+  (format "\\_<C-TYPE: +%s\\( .*\\)?$" symbol))
 
 (defconst factor-rename-regex
   "\\_<RENAME: +\\(\\w+\\) +\\(\\w+\\) +=> +\\(\\w+\\)\\( .*\\)?$")
@@ -415,15 +415,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
 ;;; Font lock:
 
 (defconst factor-font-lock-keywords
-  `((,factor-stack-effect-regex . 'factor-font-lock-stack-effect)
-    (,factor-brace-words-regex 1 'factor-font-lock-parsing-word)
-    (,factor-alien-function-regex (1 'factor-font-lock-type-name)
-                                  (2 'factor-font-lock-word))
-    (,factor-alien-function-alias-regex (1 'factor-font-lock-word)
-                                        (2 'factor-font-lock-type-name)
-                                        (3 'factor-font-lock-word))
-    (,factor-alien-callback-regex (1 'factor-font-lock-type-name)
-                                  (2 'factor-font-lock-word))
+  `((,factor-brace-words-regex 1 'factor-font-lock-parsing-word)
     (,factor-vocab-ref-regex 2 'factor-font-lock-vocabulary-name)
 
     (,factor-using-lines-regex (1 'factor-font-lock-parsing-word)
@@ -462,26 +454,58 @@ source/docs/tests file. When set to false, you'll be asked only once."
     (,factor-after-definition-regex  (1 'factor-font-lock-type-name)
                                      (2 'factor-font-lock-word))
 
-    ;; Highlights tuple definitions. The TUPLE parsing word, tuple
-    ;; name and optional parent tuple are matched in three
-    ;; groups. Then the text up until the tuple definition is
-    ;; terminated with ";" is searched for words that are slot names
-    ;; which are highlighted with the face factor-font-lock-symbol.
-    (,"\\(TUPLE\\):[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)\\(?:[ \n]+<[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)\\)?"
+    ;; Highlights tuple and struct definitions. The TUPLE/STRUCT
+    ;; parsing word, class name and optional parent classes are
+    ;; matched in three groups. Then the text up until the end of the
+    ;; definition that is terminated with ";" is searched for words
+    ;; that are slot names which are highlighted with the face
+    ;; factor-font-lock-symbol.
+    (,(format
+       "\\(%s\\):[ \n]+%s\\(?:[ \n]+<[ \n]+%s\\)?"
+       (regexp-opt '("STRUCT" "TUPLE" "UNION-STRUCT"))
+       symbol
+       symbol)
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-type-name)
      (3 'factor-font-lock-type-name nil t)
-     ;; A tuple slot is either a single symbol or a sequence along the
+     ;; A slot is either a single symbol or a sequence along the
      ;; lines: { foo initial: "bar }
      ("\\(\\(?:\\sw\\|\\s_\\)+\\)\\|\\(?:{[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)[^}]+\\)"
-      ((lambda (&rest foo)
-         (save-excursion
-           (re-search-forward " ;" nil t)
-           (1- (point)))))
+      (factor-find-end-of-def)
       nil
       (1 'factor-font-lock-symbol nil t)
       (2 'factor-font-lock-symbol nil t)))
 
+    ;; Highlights alien function definitions. Types in stack effect
+    ;; declarations are given a bold face.
+    (,(format "\\(\\(?:GL-\\)?FUNCTION\\|CALLBACK\\):[ \n]+%s[ \n]+%s[ \n]+" symbol symbol)
+     (1 'factor-font-lock-parsing-word)
+     (2 'factor-font-lock-type-name)
+     (3 'factor-font-lock-word)
+     ;; Regexp from hell that puts every type name in the first group,
+     ;; names and brackets in the second and third.
+     ("\\(?:\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n]+\\(\\(?:\\sw\\|\\s_\\)+,?\\(?:[ \n]+)\\)?\\)\\|\\([()]\\)\\)"
+      (factor-find-end-of-def)
+      nil
+      (1 'factor-font-lock-type-in-stack-effect nil t)
+      (2 'factor-font-lock-stack-effect nil t)
+      (3 'factor-font-lock-stack-effect nil t)))
+
+    ;; Almost identical to the previous one, but for function aliases.
+    (,(format "\\(FUNCTION-ALIAS\\):[ \n]+%s[ \n]+%s[ \n]+%s[ \n]+"
+              symbol symbol symbol)
+     (1 'factor-font-lock-parsing-word)
+     (2 'factor-font-lock-word)
+     (3 'factor-font-lock-type-name)
+     (4 'factor-font-lock-word)
+     ("\\(?:\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n]+\\(\\(?:\\sw\\|\\s_\\)+,?\\(?:[ \n]+)\\)?\\)\\|\\([()]\\)\\)"
+      (factor-find-end-of-def)
+      nil
+      (1 'factor-font-lock-type-in-stack-effect nil t)
+      (2 'factor-font-lock-stack-effect nil t)
+      (3 'factor-font-lock-stack-effect nil t)))
+
+    (,factor-stack-effect-regex . 'factor-font-lock-stack-effect)
     (,factor-constructor-regex . 'factor-font-lock-constructor)
     (,factor-setter-regex . 'factor-font-lock-setter-word)
     (,factor-getter-regex . 'factor-font-lock-getter-word)
@@ -609,6 +633,11 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
 (defsubst factor-beginning-of-sexp-pos ()
   (save-excursion (factor-beginning-of-sexp) (point)))
+
+(defun factor-find-end-of-def (&rest foo)
+  (save-excursion
+    (re-search-forward " ;" nil t)
+    (1- (point))))
 
 
 ;;; USING/IN:
