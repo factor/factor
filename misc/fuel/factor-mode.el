@@ -259,7 +259,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "^AFTER: +\\([^ ]+\\) +\\([^ ]+\\)")
 
 (defconst factor-integer-regex
-  "\\_<-?[0-9]\\([xob][0-9a-fA-F]+\\|[0-9]*\\)?\\_>")
+  "\\_<-?\\(0[xob][0-9a-fA-F]+\\|[0-9]+\\)\\_>")
 
 (defconst factor-raw-float-regex
   "[0-9]*\\.[0-9]*\\([eEpP][+-]?[0-9]+\\)?")
