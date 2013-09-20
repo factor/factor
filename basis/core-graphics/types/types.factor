@@ -77,6 +77,7 @@ TYPEDEF: void* CGColorRef
 TYPEDEF: void* CGColorSpaceRef
 TYPEDEF: void* CGContextRef
 TYPEDEF: void* CGImageRef
+TYPEDEF: void* CGImageDestinationRef
 
 TYPEDEF: uint CGBitmapInfo
 
