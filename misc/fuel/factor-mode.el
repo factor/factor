@@ -328,7 +328,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "\\_<FUNCTION-ALIAS: +\\(\\w+\\)[\n ]+\\(\\w+\\)[\n ]+\\(\\w+\\)")
 
 (defconst factor-alien-callback-regex
-  "\\_<CALLBACK: +\\(\\w+\\) +\\(\\w+\\)")
+  "\\_<CALLBACK:[ \n]+\\(\\w+\\)[ \n]+\\(\\w+\\)")
 
 (defconst factor-indent-def-starts
   '("" ":"
@@ -406,7 +406,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
 
 (defconst factor-typedef-regex
-  (format "\\_<TYPEDEF: +%s %s\\( .*\\)?$" symbol symbol))
+  (format "\\_<TYPEDEF: +%s +%s\\( .*\\)?$" symbol symbol))
 
 (defconst factor-c-global-regex
   "\\_<C-GLOBAL: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
