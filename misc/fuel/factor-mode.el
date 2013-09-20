@@ -189,6 +189,9 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
 ;;; Regexps galore:
 
+;; Utility regexp used by other regexps to match a Factor symbol name
+(setq-local symbol "\\(\\(?:\\sw\\|\\s_\\)+\\)")
+
 ;; Excludes parsing words that are handled by other regexps
 (defconst factor-parsing-words
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
@@ -211,9 +214,9 @@ source/docs/tests file. When set to false, you'll be asked only once."
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:"
-    "SPECIALIZED-ARRAYS:" "STRING:" "STRUCT:" "SYMBOLS:" "SYNTAX:"
+    "SPECIALIZED-ARRAYS:" "STRING:" "SYMBOLS:" "SYNTAX:"
     "TYPEDEF:" "TYPED:" "TYPED::"
-    "UNIFORM-TUPLE:" "UNION:" "UNION-STRUCT:" "USE:"
+    "UNIFORM-TUPLE:" "UNION:" "USE:"
     "VARIANT:" "VERTEX-FORMAT:"))
 
 (defconst factor-parsing-words-regex
@@ -316,7 +319,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
 (defconst factor-sub-vocab-regex "^<\\([^ \n]+\\) *$")
 
 (defconst factor-alien-function-regex
-  "\\_<FUNCTION: +\\(\\w+\\)[\n ]+\\(\\w+\\)")
+  (format "\\_<FUNCTION: +%s[\n ]+%s" symbol symbol))
 
 (defconst factor-alien-function-alias-regex
   "\\_<FUNCTION-ALIAS: +\\(\\w+\\)[\n ]+\\(\\w+\\)[\n ]+\\(\\w+\\)")
@@ -400,13 +403,13 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
 
 (defconst factor-typedef-regex
-  "\\_<TYPEDEF: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+  (format "\\_<TYPEDEF: +%s %s\\( .*\\)?$" symbol symbol))
 
 (defconst factor-c-global-regex
   "\\_<C-GLOBAL: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
 
 (defconst factor-c-type-regex
-  "\\_<C-TYPE: +\\(\\w+\\)\\( .*\\)?$")
+  (format "\\_<C-TYPE: +%s\\( .*\\)?$" symbol))
 
 (defconst factor-rename-regex
   "\\_<RENAME: +\\(\\w+\\) +\\(\\w+\\) +=> +\\(\\w+\\)\\( .*\\)?$")
@@ -462,16 +465,22 @@ source/docs/tests file. When set to false, you'll be asked only once."
     (,factor-after-definition-regex  (1 'factor-font-lock-type-name)
                                      (2 'factor-font-lock-word))
 
-    ;; Highlights tuple definitions. The TUPLE parsing word, tuple
-    ;; name and optional parent tuple are matched in three
-    ;; groups. Then the text up until the tuple definition is
-    ;; terminated with ";" is searched for words that are slot names
-    ;; which are highlighted with the face factor-font-lock-symbol.
-    (,"\\(TUPLE\\):[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)\\(?:[ \n]+<[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)\\)?"
+    ;; Highlights tuple and struct definitions. The TUPLE/STRUCT
+    ;; parsing word, class name and optional parent classes are
+    ;; matched in three groups. Then the text up until the end of the
+    ;; definition that is terminated with ";" is searched for words
+    ;; that are slot names which are highlighted with the face
+    ;; factor-font-lock-symbol.
+
+    (,(format
+       "\\(%s\\):[ \n]+%s\\(?:[ \n]+<[ \n]+%s\\)?"
+       (regexp-opt '("STRUCT" "TUPLE" "UNION-STRUCT"))
+       symbol
+       symbol)
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-type-name)
      (3 'factor-font-lock-type-name nil t)
-     ;; A tuple slot is either a single symbol or a sequence along the
+     ;; A slot is either a single symbol or a sequence along the
      ;; lines: { foo initial: "bar }
      ("\\(\\(?:\\sw\\|\\s_\\)+\\)\\|\\(?:{[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)[^}]+\\)"
       ((lambda (&rest foo)
