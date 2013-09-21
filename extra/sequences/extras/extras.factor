@@ -1,6 +1,7 @@
-USING: accessors arrays assocs combinators fry grouping growable
-kernel locals make math math.order math.ranges sequences
-sequences.deep sequences.private sorting splitting vectors ;
+USING: accessors arrays assocs combinators fry generalizations
+grouping growable kernel locals make math math.order math.ranges
+sequences sequences.deep sequences.private sorting splitting
+vectors ;
 FROM: sequences => change-nth ;
 IN: sequences.extras
 
@@ -489,3 +490,25 @@ PRIVATE>
 
 : nth* ( n seq -- elt )
     [ length 1 - swap - ] [ nth ] bi ; inline
+
+: each-index-from ( ... seq quot: ( ... elt index -- ... ) i -- ... )
+    -rot (each-index) (each-integer) ; inline
+
+<PRIVATE
+
+: select-by* ( ... seq quot: ( ... elt -- ... x ) compare: ( obj1 obj2 -- ? ) -- ... i elt )
+    [
+        [ keep swap ] curry [ dip ] curry
+        [ [ first 0 ] dip call ] 2keep
+        [ 2curry 3dip 5 npick pick ] curry
+    ] [
+        [ [ 3drop ] [ [ 3drop ] 3dip ] if ] compose
+    ] bi* compose 1 each-index-from nip swap ; inline
+
+PRIVATE>
+
+: supremum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
+    [ after? ] select-by* ; inline
+
+: infimum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
+    [ before? ] select-by* ; inline

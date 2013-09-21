@@ -171,3 +171,7 @@ IN: sequences.extras.tests
 { "foo" " bar" } [ "foo bar" [ blank? ] cut-when ] unit-test
 
 { { 4 0 3 1 2 } } [ { 0 4 1 3 2 } 5 iota [ nth* ] curry map ] unit-test
+
+{ 1 "beef" } [ { "chicken" "beef" "moose" } [ length ] infimum-by* ] unit-test
+{ 0 "chicken" } [ { "chicken" "beef" "moose" } [ length ] supremum-by* ] unit-test
+{ 2 "moose" } [ { "chicken" "beef" "moose" } [ first ] supremum-by* ] unit-test
