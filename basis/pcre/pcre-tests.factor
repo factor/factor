@@ -1,12 +1,13 @@
 USING:
     accessors
     arrays
+    assocs
+    http.client
     kernel
     math math.ranges
     pcre pcre.ffi pcre.info
     random
     sequences
-    splitting
     system
     tools.test ;
 IN: pcre.tests
@@ -20,7 +21,7 @@ CONSTANT: iso-date "(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})"
     { "year" "month" "day" } [ pcre_get_stringnumber ] with map
 ] unit-test
 
-[ t ] [ "foo" <compiled-pcre> pcre>> options PCRE_UTF8 bitand 0 > ] unit-test
+[ t ] [ "foo" <compiled-pcre> PCRE_UTF8 has-option? ] unit-test
 
 os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE config ] unit-test ] when
 
@@ -50,13 +51,57 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE config ] unit-test ] when
 
 [ 3 ] [ "foobar" "foo(?=bar)" findall first first second length ] unit-test
 
+[ { ", " ", " "." } ] [
+    "Words, words, word." "\\W+" findall [ first second ] map
+] unit-test
+
 : long-string ( -- x )
     10000 [ CHAR: a CHAR: z [a,b] random ] "" replicate-as ;
 
 ! Performance
 [ 0 ] [ long-string ".{0,15}foobar.{0,10}" findall length ] unit-test
 
+! Empty matches, corner case behaviour is copied from pcredemo.c
+[ { { { f "foo" } } { { f "" } } } ]
+[ "foo" ".*" findall ] unit-test
+
+[ { { { f "" } } { { f "" } } { { f "" } } { { f "" } } } ]
+[ "foo" "B*" findall ] unit-test
+
 ! Tests for matches?
 [ t ] [ "örjan" "örjan" matches? ] unit-test
 
 [ t ] [ "abcö" "\\p{Ll}{4}" matches? ] unit-test
+
+! Dotall mode, off by default
+[ f ] [ "." <compiled-pcre> PCRE_DOTALL has-option? ] unit-test
+[ t ] [ "(?s)." <compiled-pcre> PCRE_DOTALL has-option? ] unit-test
+
+[ f ] [ "\n" "." matches? ] unit-test
+[ t ] [ "\n" "(?s)." matches? ] unit-test
+
+! Caseless mode, off by default
+[ { f t } ] [
+    { "x" "(?i)x" } [ <compiled-pcre> PCRE_CASELESS has-option? ] map
+] unit-test
+
+! Backreferences
+[ { t f } ] [
+    { "response and responsibility" "sense and responsibility" }
+    [ "(sens|respons)e and \\1ibility" matches? ] map
+] unit-test
+
+[ { t t f } ] [
+    { "rah rah" "RAH RAH" "RAH rah" } [ "((?i)rah)\\s+\\1" matches? ] map
+] unit-test
+
+! Splitting
+[ { { "Words" "words" "word" } { "Words" "words" "word" } } ] [
+    "Words, words, word." { "\\W+" "[,. ]" } [ split ] with map
+] unit-test
+
+! Bigger tests
+[ t ] [
+    "http://factorcode.org/" http-get nip
+    "href=\"(?P<link>[^\"]+)\"" findall [ "link" of ] map sequence?
+] unit-test
