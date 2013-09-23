@@ -68,6 +68,9 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE config ] unit-test ] when
 [ { { { f "" } } { { f "" } } { { f "" } } { { f "" } } } ]
 [ "foo" "B*" findall ] unit-test
 
+! Empty matches in strings with multi-byte characters are tricky.
+[ ] [ "ööööö" "x*" findall ] unit-test
+
 ! Tests for matches?
 [ t ] [ "örjan" "örjan" matches? ] unit-test
 
