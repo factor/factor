@@ -163,7 +163,7 @@ ERROR: download-failed response ;
 : check-response-with-body ( response body -- response body )
     [ >>body check-response ] keep ;
 
-: with-http-request ( request quot -- response )
+: with-http-request ( request quot: ( chunk -- ) -- response )
     [ (with-http-request) ] with-destructors ; inline
 
 : http-request ( request -- response data )
@@ -176,7 +176,7 @@ ERROR: download-failed response ;
 : http-get ( url -- response data )
     <get-request> http-request ;
 
-: with-http-get ( url quot -- response )
+: with-http-get ( url quot: ( chunk -- ) -- response )
     [ <get-request> ] dip with-http-request ; inline
 
 : download-name ( url -- name )
