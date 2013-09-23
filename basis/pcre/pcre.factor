@@ -1,27 +1,21 @@
 USING:
     accessors
-    alien.c-types alien.data alien.strings
+    alien.c-types alien.data alien.enums alien.strings
     arrays
     assocs
-    fry
     io.encodings.utf8 io.encodings.string
     kernel
     math
     mirrors
-    pcre.ffi pcre.info
+    pcre.ffi pcre.info pcre.utils
     sequences sequences.generalizations
     strings ;
-QUALIFIED: splitting
 IN: pcre
 
 ERROR: malformed-regexp expr error ;
 ERROR: pcre-error value ;
 
 TUPLE: compiled-pcre pcre extra nametable ;
-
-! Gen. utility
-: replace-all ( seq subseqs new -- seq )
-    swapd '[ _ splitting:replace ] reduce ;
 
 : default-opts ( -- opts )
     PCRE_UTF8 PCRE_UCP bitor ;
@@ -53,17 +47,14 @@ TUPLE: matcher pcre extra subject ofs exec-opts match ;
 
 : findnext ( matcher -- matcher'/f )
     clone dup <mirror> values 6 firstn drop exec
-    over dup -1 < [ pcre-error ] when
+    over dup -1 < [ PCRE_ERRORS number>enum pcre-error ] when
     -1 =
     [
         2drop dup exec-opts>> 0 =
         [ drop f ]
         [
-            ! dup [ ofs>> 1 + dup ] [ subject>> ] bi bounds-check?
-            ! [ >>ofs 0 >>exec-opts findnext ] [ 2drop f ] if
-
-            dup [ ofs>> 1 + ] [ subject>> length ] bi over <
-            [ 2drop f ] [ >>ofs 0 >>exec-opts findnext ] if
+            dup [ subject>> ] [ ofs>> ] bi next-utf8-char
+            [ >>ofs 0 >>exec-opts findnext ] [ drop f ] if*
         ] if
     ]
     [
@@ -103,5 +94,4 @@ M: string findall
     dupd findall [ nip length 1 = ] [ ?first ?first ?last = ] 2bi and ;
 
 : split ( subject obj -- strings )
-    dupd findall [ first second ] map
-    dup first [ replace-all ] keep splitting:split harvest ;
+    dupd findall [ first second ] map split-subseqs ;
