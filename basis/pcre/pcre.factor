@@ -4,14 +4,12 @@ USING:
     arrays
     assocs
     fry
-    grouping
     io.encodings.utf8 io.encodings.string
     kernel
     math
     mirrors
     pcre.ffi pcre.info
     sequences sequences.generalizations
-    sets.private
     strings ;
 QUALIFIED: splitting
 IN: pcre
@@ -49,35 +47,33 @@ TUPLE: matcher pcre extra subject ofs exec-opts match ;
 : <matcher> ( subject compiled-pcre -- matcher )
     [ utf8 encode ] dip [ pcre>> ] [ extra>> ] bi rot 0 0 f matcher boa ;
 
-: exec-result>match ( count match-data -- match/f )
-    over dup -1 <
-    [ pcre-error ] [ dup -1 = [ 3drop f ] [ drop 2array ] if ] if ;
-
 ! This handling of zero-length matches is taken from pcredemo.c
 : empty-match-opts ( -- opts )
     PCRE_NOTEMPTY_ATSTART PCRE_ANCHORED bitor ;
 
 : findnext ( matcher -- matcher'/f )
-    clone dup <mirror> values 6 firstn drop exec exec-result>match
+    clone dup <mirror> values 6 firstn drop exec
+    over dup -1 < [ pcre-error ] when
+    -1 =
     [
-        [ >>match ]
-        [
-            second
-            [ first2 = [ empty-match-opts ] [ 0 ] if >>exec-opts ]
-            [ second >>ofs ] bi
-        ] bi
-    ]
-    [
-        dup exec-opts>> 0 =
+        2drop dup exec-opts>> 0 =
         [ drop f ]
         [
+            ! dup [ ofs>> 1 + dup ] [ subject>> ] bi bounds-check?
+            ! [ >>ofs 0 >>exec-opts findnext ] [ 2drop f ] if
+
             dup [ ofs>> 1 + ] [ subject>> length ] bi over <
-            [ 2drop f ]
-            [
-                [ >>ofs ] [ drop 0 >>exec-opts ] bi
-            ] if
+            [ 2drop f ] [ >>ofs 0 >>exec-opts findnext ] if
         ] if
-    ] if* ;
+    ]
+    [
+        [ 2array >>match ]
+        [
+            nip
+            [ first2 = [ empty-match-opts ] [ 0 ] if >>exec-opts ]
+            [ second >>ofs ] bi
+        ] 2bi
+    ] if ;
 
 ! Result parsing
 : substring-list ( subject match-array count -- alien )
@@ -97,7 +93,7 @@ TUPLE: matcher pcre extra subject ofs exec-opts match ;
 GENERIC: findall ( subject obj -- matches )
 
 M: compiled-pcre findall
-    [ <matcher> [ findnext ] follow [ match>> ] map pruned harvest ]
+    [ <matcher> [ findnext ] follow [ match>> ] map harvest ]
     [ nametable>> rot [ parse-match ] 2with map ] 2bi >array ;
 
 M: string findall
