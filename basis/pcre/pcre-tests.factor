@@ -51,6 +51,10 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE config ] unit-test ] when
 
 [ 3 ] [ "foobar" "foo(?=bar)" findall first first second length ] unit-test
 
+[ { { { f ", " } } { { f ", " } } { { f "." } } } ] [
+    "Words, words, word." "\\W+" findall
+] unit-test
+
 [ { ", " ", " "." } ] [
     "Words, words, word." "\\W+" findall [ first second ] map
 ] unit-test
@@ -65,11 +69,12 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE config ] unit-test ] when
 [ { { { f "foo" } } { { f "" } } } ]
 [ "foo" ".*" findall ] unit-test
 
-[ { { { f "" } } { { f "" } } { { f "" } } { { f "" } } } ]
+[ { { { f "" } } { { f "" } } { { f "" } } } ]
 [ "foo" "B*" findall ] unit-test
 
 ! Empty matches in strings with multi-byte characters are tricky.
-[ ] [ "ööööö" "x*" findall ] unit-test
+[ { { { f "" } } { { f "" } } { { f "" } } { { f "" } } } ]
+[ "öööö" "x*" findall ] unit-test
 
 ! Tests for matches?
 [ t ] [ "örjan" "örjan" matches? ] unit-test

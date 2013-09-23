@@ -4,16 +4,9 @@ USING:
     arrays
     kernel
     math
-    pcre.ffi
+    pcre.ffi pcre.utils
     sequences ;
 IN: pcre.info
-
-! Gen. utility
-: 2with ( param1 param2 obj quot -- obj curry )
-    [ -rot ] dip [ [ rot ] dip call ] 3curry ; inline
-
-: gen-array-addrs ( base size n -- addrs )
-    iota [ * + ] 2with map ;
 
 ! Mostly internal
 : fullinfo ( pcre extra what -- obj )
