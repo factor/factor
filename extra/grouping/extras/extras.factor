@@ -3,17 +3,26 @@ sequences sequences.generalizations sequences.private ;
 
 IN: grouping.extras
 
-: 2clump-map ( seq quot: ( elt1 elt2 -- newelt ) -- seq' )
-    [ dup 1 short tail-slice ] dip { } 2map-as ; inline
+: 2clump-map-as ( seq quot: ( elt1 elt2 -- newelt ) exemplar -- seq' )
+    [ dup 1 short tail-slice ] 2dip 2map-as ; inline
 
-: 3clump-map ( seq quot: ( elt1 elt2 elt3 -- newelt ) -- seq' )
+: 2clump-map ( seq quot: ( elt1 elt2 -- newelt ) -- seq' )
+    { } 2clump-map-as ; inline
+
+: 3clump-map-as ( seq quot: ( elt1 elt2 elt3 -- newelt ) exemplar -- seq' )
     [
         dup [ 1 short tail-slice ] [ 2 short tail-slice ] bi
-    ] dip { } 3map-as ; inline
+    ] 2dip 3map-as ; inline
 
-MACRO: nclump-map ( seq quot n -- result )
-    [ [1,b) [ [ short tail-slice ] curry ] map swap ] keep
-    '[ _ dup _ cleave _ { } _ nmap-as ] ;
+: 3clump-map ( seq quot: ( elt1 elt2 elt3 -- newelt ) -- seq' )
+    { } 3clump-map-as ; inline
+
+MACRO: nclump-map-as ( seq quot exemplar n -- result )
+    [ nip [1,b) [ [ short tail-slice ] curry ] map swap ] 2keep
+    '[ _ dup _ cleave _ _ _ nmap-as ] ;
+
+: nclump-map ( seq quot n -- result )
+    { } swap nclump-map-as ; inline
 
 TUPLE: head-clumps seq ;
 C: <head-clumps> head-clumps
