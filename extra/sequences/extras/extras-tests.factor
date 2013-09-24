@@ -175,3 +175,5 @@ IN: sequences.extras.tests
 { 1 "beef" } [ { "chicken" "beef" "moose" } [ length ] infimum-by* ] unit-test
 { 0 "chicken" } [ { "chicken" "beef" "moose" } [ length ] supremum-by* ] unit-test
 { 2 "moose" } [ { "chicken" "beef" "moose" } [ first ] supremum-by* ] unit-test
+
+{ "0123456789" } [ 58 iota [ 48 < ] "" reject-as ] unit-test

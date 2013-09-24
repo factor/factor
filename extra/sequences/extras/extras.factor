@@ -512,3 +512,9 @@ PRIVATE>
 
 : infimum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
     [ before? ] select-by* ; inline
+
+: reject-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... subseq )
+    [ [ not ] compose ] [ filter-as ] bi* ; inline
+
+: reject ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
+    over reject-as ; inline
