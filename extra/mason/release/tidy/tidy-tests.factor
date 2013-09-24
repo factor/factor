@@ -6,7 +6,7 @@ IN: mason.release.tidy.tests
 ! of the build directory, and they look for a file named
 ! build-support/cleanup there. Use with-directory here to
 ! ensure we use the file from the current source tree instead.
-"resource:" [
+[
     [ f ] [
         macosx target-os [
             "Factor.app" useless-files member?
@@ -18,4 +18,4 @@ IN: mason.release.tidy.tests
             "Factor.app" useless-files member?
         ] with-variable
     ] unit-test
-] with-directory
+] with-resource-directory

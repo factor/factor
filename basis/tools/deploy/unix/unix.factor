@@ -14,7 +14,7 @@ IN: tools.deploy.unix
     deploy-name get ;
 
 M: unix deploy* ( vocab -- )
-    "resource:" [
+    [
         dup deploy-config [
             [ bundle-name create-app-dir ] keep
             [ deployed-image-name ] keep
@@ -23,4 +23,4 @@ M: unix deploy* ( vocab -- )
             bundle-name normalize-path "Binary deployed to " "." surround print
             bundle-name webbrowser:open-file
         ] with-variables
-    ] with-directory ;
+    ] with-resource-directory ;

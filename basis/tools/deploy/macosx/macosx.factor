@@ -74,7 +74,7 @@ IN: tools.deploy.macosx
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;
 
 : deploy-app-bundle ( vocab -- )
-    "resource:" [
+    [
         dup deploy-config [
             bundle-name dup exists? [ delete-tree ] [ drop ] if
             [ bundle-name create-app-dir ] keep
@@ -85,7 +85,7 @@ IN: tools.deploy.macosx
             [ "Contents/Frameworks" copy-libraries ] 2bi
             bundle-name show-in-finder
         ] with-variables
-    ] with-directory ;
+    ] with-resource-directory ;
 
 : deploy-app-bundle? ( vocab -- ? )
     deploy-config [ deploy-console? get not deploy-ui? get or ] with-variables ;
