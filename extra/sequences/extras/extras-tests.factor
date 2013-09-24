@@ -1,6 +1,6 @@
 USING: arrays ascii io io.streams.string kernel make math
 math.vectors random sequences sequences.extras strings
-tools.test ;
+tools.test vectors ;
 
 IN: sequences.extras.tests
 
@@ -177,3 +177,4 @@ IN: sequences.extras.tests
 { 2 "moose" } [ { "chicken" "beef" "moose" } [ first ] supremum-by* ] unit-test
 
 { "0123456789" } [ 58 iota [ 48 < ] "" reject-as ] unit-test
+{ V{ 1 3 5 7 9 } } [ 10 iota >vector [ even? ] reject! ] unit-test
