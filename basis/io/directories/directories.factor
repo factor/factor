@@ -11,6 +11,9 @@ IN: io.directories
 : with-directory ( path quot -- )
     [ absolute-path current-directory ] dip with-variable ; inline
 
+: with-resource-directory ( quot -- )
+    [ "resource:" ] dip with-directory ; inline
+
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )
 
