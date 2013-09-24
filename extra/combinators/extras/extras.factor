@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators combinators.smart fry generalizations
 kernel macros math quotations sequences
-sequences.generalizations ;
+sequences.generalizations sequences.private system ;
 IN: combinators.extras
 
 : once ( quot -- ) call ; inline
@@ -42,3 +42,9 @@ MACRO: cleave-array ( quots -- )
 MACRO: smart-plox ( true -- )
     [ inputs [ 1 - [ and ] n*quot ] keep ] keep swap
     '[ _ _ [ _ ndrop f ] smart-if ] ;
+
+: throttle ( quot millis -- quot' )
+    1,000,000 * '[
+        _ nano-count { 0 } 2dup first-unsafe _ + >=
+        [ 0 swap set-nth-unsafe call ] [ 3drop ] if
+    ] ; inline
