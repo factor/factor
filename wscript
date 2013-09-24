@@ -131,7 +131,10 @@ def configure(ctx):
         if bits == 64:
             env.CXXFLAGS += ['-m64']
         env.LINKFLAGS += ['-Wl,--no-as-needed', '-Wl,--export-dynamic']
-    ctx.define('INSTALL_PREFIX', ctx.options.prefix)
+    pf = ctx.options.prefix
+    if dest_os == 'win32':
+        pf = pf.replace('\\', '\\\\')
+    ctx.define('INSTALL_PREFIX', pf)
 
 def build(ctx):
     dest_os = ctx.env.DEST_OS

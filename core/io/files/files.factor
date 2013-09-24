@@ -99,5 +99,8 @@ PRIVATE>
     cwd current-directory set-global
     OBJ-IMAGE special-object alien>native-string cwd prepend-path \ image-path set-global
     OBJ-EXECUTABLE special-object alien>native-string cwd prepend-path \ vm-path set-global
+    ! install-prefix is hardcoded into the binary when Factor is
+    ! compiled and is always utf8.
+    OBJ-INSTALL-PREFIX special-object utf8 alien>string \ install-prefix set-global
     init-resource-path
 ] "io.files" add-startup-hook
