@@ -518,3 +518,6 @@ PRIVATE>
 
 : reject ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over reject-as ; inline
+
+: reject! ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
+    [ not ] compose filter! ; inline
