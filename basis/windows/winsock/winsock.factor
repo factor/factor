@@ -3,10 +3,15 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays byte-arrays classes.struct grouping init
 io.encodings.utf16n kernel literals math math.bitwise
-math.parser sequences windows.com.syntax windows.errors
-windows.kernel32 windows.types ;
+math.parser sequences system vocabs.parser windows.com.syntax
+windows.errors windows.kernel32 windows.types ;
 FROM: alien.c-types => short ;
 IN: windows.winsock
+
+<<
+! Some differences between Win32 and Win64
+cpu x86.64? "windows.winsock.64" "windows.winsock.32" ? use-vocab
+>>
 
 TYPEDEF: int* SOCKET
 
@@ -145,12 +150,6 @@ STRUCT: addrinfo
 STRUCT: timeval
     { sec long }
     { usec long } ;
-
-STRUCT: servent
-    { name c-string }
-    { aliases void* }
-    { port int }
-    { proto c-string } ;
 
 GENERIC: sockaddr>ip ( sockaddr -- string )
 
