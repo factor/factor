@@ -5,9 +5,14 @@ USING:
     system ;
 IN: pcre.ffi
 
-<< {
-    { [ os unix? ] [ "libpcre" "libpcre.so" cdecl add-library ] }
-} cond >>
+! http://sourceforge.net/projects/gnuwin32/files/pcre/7.0/pcre-7.0-bin.zip/download
+
+<< "pcre" {
+    { [ os unix? ] [ "libpcre.so" ] }
+    { [ os windows? ] [ "pcre3.dll" ] }
+} cond cdecl add-library >>
+
+LIBRARY: pcre
 
 CONSTANT: PCRE_CASELESS           0x00000001
 CONSTANT: PCRE_MULTILINE          0x00000002
