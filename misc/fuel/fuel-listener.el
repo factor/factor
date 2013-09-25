@@ -86,7 +86,7 @@ sessions."
   (or fuel-listener-factor-binary
       (expand-file-name
        (format
-        (cond ((eq system-type 'windows-nt) "%.com")
+        (cond ((eq system-type 'windows-nt) "%s.com")
               ((eq system-type 'darwin) "Factor.app/Contents/MacOS/%s")
               (t "%s"))
         fuel-listener-factor-basename)

@@ -29,7 +29,7 @@
           <Component Id='MainExe' Guid='b49087c0-1573-11e3-bd10-a9f1edab8a3d'>
             <File
                 Id='FactorLangEXE'
-                Name='factor.exe'
+                Name='factor-lang.exe'
                 DiskId='1'
                 Source='factor-lang.exe'
                 KeyPath='yes'>
@@ -47,7 +47,7 @@
           <Component Id='SecondaryExe' Guid='ce8b4ad0-157c-11e3-b4a5-2b2c7e47f7bc'>
             <File
                 Id='FactorLangCOM'
-                Name='factor.com'
+                Name='factor-lang.com'
                 DiskId='1'
                 Source='factor-lang.com'
                 KeyPath='yes'/>
@@ -55,7 +55,7 @@
           <Component Id='MainImage' Guid='6b66ea90-6BE3-460D-A14F-75658D16550B'>
             <File
                 Id='MainImage'
-                Name='factor.image'
+                Name='factor-lang.image'
                 DiskId='1'
                 Source='factor-lang.image'
                 KeyPath='yes' />
@@ -63,7 +63,7 @@
           <Component Id='MainLib' Guid='6a66ea90-6BE3-460D-A14F-75658D16550B'>
             <File
                 Id='MainDLL'
-                Name='factor.dll'
+                Name='factor-lang.dll'
                 DiskId='1'
                 Source='factor-lang.dll'
                 KeyPath='yes' />
@@ -108,7 +108,7 @@
         <Shortcut Id="ApplicationStartMenuShortcut"
                   Name="Factor 0.97"
                   Description="The best programming language!"
-                  Target="[INSTALLDIR]factor.exe"
+                  Target="[INSTALLDIR]factor-lang.exe"
                   WorkingDirectory="INSTALLDIR">
           <Icon Id="Icon2.exe" SourceFile="factor-lang.exe"/>
         </Shortcut>
