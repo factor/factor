@@ -4,5 +4,5 @@ IN: windows.winsock.32
 STRUCT: servent
     { name c-string }
     { aliases void* }
-    { port int }
+    { port short }
     { proto c-string } ;
