@@ -5,4 +5,4 @@ STRUCT: servent
     { name c-string }
     { aliases void* }
     { proto c-string }
-    { port int } ;
+    { port short } ;
