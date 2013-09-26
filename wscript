@@ -51,13 +51,6 @@ common_source = [
     'words.cpp'
     ]
 
-def copy_file(ctx, source, target):
-    return ctx(
-        rule = 'cp ${SRC[0].abspath()} ${TGT[0].abspath()}',
-        source = source,
-        target = target
-        )
-
 def wix_light(ctx, source, target, extra_files):
     wixobjs = ' '.join(source)
     return ctx(
@@ -139,6 +132,7 @@ def configure(ctx):
 def build(ctx):
     dest_os = ctx.env.DEST_OS
     dest_cpu = ctx.env.DEST_CPU
+
 
     image_target = '%s.image' % APPNAME
 
@@ -239,7 +233,12 @@ def build(ctx):
     # sure if, or why, it is different on Linux. -resource-path
     # doesn't seem to have much effect.
     boot_image = {'win32' : '../boot.image', 'linux' : 'boot.image'}[dest_os]
-    copy_file(ctx, source_image, boot_image)
+    ctx(
+        features = 'subst',
+        source = source_image,
+        target = boot_image,
+        is_copy = True
+    )
 
     factor_exe = {'linux' : APPNAME, 'win32' : '%s.com' % APPNAME}[dest_os]
 
