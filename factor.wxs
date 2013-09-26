@@ -1,23 +1,23 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
   <Product
-      Name='Factor 0.97'
+      Name='Factor $(var.Version)'
       Id='6b66ea90-0be5-11e3-8820-417d92f52eef'
       UpgradeCode='840a2300-0be5-11e3-b156-09eb3a9c2bdd'
       Language='1033'
       Codepage='1252'
-      Version='0.97.0'
+      Version='$(var.Version)'
       Manufacturer='Slava Pestov'>
     <Package
         Id='*'
         Keywords='Installer'
-        Description="Factor 0.97 Installer"
+        Description="Factor $(var.Version) Installer"
         InstallerVersion='100'
         Languages='1033'
         Compressed='yes'
         SummaryCodepage='1252' />
     <Media Id='1' Cabinet='Sample.cab' EmbedCab='yes' DiskPrompt="CD-ROM #1" />
-    <Property Id='DiskPrompt' Value="Factor 0.97 Installation [1]" />
+    <Property Id='DiskPrompt' Value="Factor $(var.Version) Installation [1]" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id="DesktopFolder" Name="Desktop"/>
@@ -25,7 +25,7 @@
         <Directory Id="ApplicationProgramsFolder" Name="Factor"/>
       </Directory>
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
-        <Directory Id='INSTALLDIR' Name='Factor 0.97'>
+        <Directory Id='INSTALLDIR' Name='Factor $(var.Version)'>
           <Component Id='MainExe' Guid='b49087c0-1573-11e3-bd10-a9f1edab8a3d'>
             <File
                 Id='FactorLangEXE'
@@ -37,9 +37,9 @@
                   Advertise="yes"
                   Id="MyProductDesktopShortcut"
                   Directory="DesktopFolder"
-                  Name="Factor 0.97"
+                  Name="Factor $(var.Version)"
                   WorkingDirectory="INSTALLDIR"
-                  Description="Factor 0.97">
+                  Description="Factor $(var.Version)">
                 <Icon Id="Icon.exe" SourceFile="factor-lang.exe"/>
               </Shortcut>
             </File>
@@ -106,7 +106,7 @@
     <DirectoryRef Id='ApplicationProgramsFolder'>
       <Component Id="ApplicationShortcut" Guid='6e66ea91-6BE3-460D-A14F-23658D16550B'>
         <Shortcut Id="ApplicationStartMenuShortcut"
-                  Name="Factor 0.97"
+                  Name="Factor $(var.Version)"
                   Description="The best programming language!"
                   Target="[INSTALLDIR]factor-lang.exe"
                   WorkingDirectory="INSTALLDIR">
@@ -125,7 +125,7 @@
     <Feature
         Id='Complete'
         Level='1'
-        Title='Factor 0.97'
+        Title='Factor $(var.Version)'
         ConfigurableDirectory='INSTALLDIR'>
       <ComponentGroupRef Id="basisgroup"/>
       <ComponentGroupRef Id="coregroup"/>

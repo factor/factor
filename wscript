@@ -292,7 +292,7 @@ def build(ctx):
         # Can you indicate that the exe and com files need to be built
         # before this target?
         ctx(
-            rule = 'candle -nologo -out ${TGT} ${SRC}',
+            rule = 'candle -nologo -dVersion=%s -out ${TGT} ${SRC}' % VERSION,
             source = ['factor.wxs'],
             target = ['factor.wxsobj']
             )
