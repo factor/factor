@@ -289,16 +289,23 @@ def build(ctx):
                 target = ['%s.wxsobj' % root]
                 )
 
-        # Can you indicate that the exe and com files need to be built
-        # before this target?
+        # Wix wants the Product/@Version attribute to be all
+        # numeric. So if you have a version like 0.97-git, you need to
+        # strip out the -git part.
+        product_version = VERSION.split('-')[0]
         ctx(
-            rule = 'candle -nologo -dVersion=%s -out ${TGT} ${SRC}' % VERSION,
+            rule = 'candle -nologo -dProductVersion=%s -dVersion=%s ' \
+                '-out ${TGT} ${SRC}' % (product_version, VERSION),
             source = ['factor.wxs'],
             target = ['factor.wxsobj']
-            )
+        )
         wxsobjs = ['%s.wxsobj' % f for f in ['factor'] + frags]
-        wix_light(ctx, wxsobjs, 'factor.msi', [image_target, '%s.com' % APPNAME])
-
+        wix_light(
+            ctx,
+            wxsobjs,
+            'factor.%s.msi' % VERSION,
+            [image_target, '%s.com' % APPNAME]
+        )
     pat = '(basis|core|extra)/**/*.(c|factor|pem|png|tiff|TXT|txt)'
     glob = cwd.ant_glob(pat)
 

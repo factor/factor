@@ -6,7 +6,7 @@
       UpgradeCode='840a2300-0be5-11e3-b156-09eb3a9c2bdd'
       Language='1033'
       Codepage='1252'
-      Version='$(var.Version)'
+      Version='$(var.ProductVersion)'
       Manufacturer='Slava Pestov'>
     <Package
         Id='*'
