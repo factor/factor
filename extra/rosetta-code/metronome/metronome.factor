@@ -39,4 +39,6 @@ IN: rosetta-code.metronome
     [ start-metronome-timer ] dip
     [ run-metronome ] curry [ stop-timer ] [ ] cleanup ;
 
-! example usage: 60 { 440 220 330 } metronome
+: metronome-example ( -- ) 60 { 440 220 330 } metronome ;
+
+MAIN: metronome-example
