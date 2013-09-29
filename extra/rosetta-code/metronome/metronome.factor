@@ -2,15 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors calendar circular colors.constants colors.hsv
-concurrency.semaphores continuations formatting fry
-generalizations io.launcher kernel math sequences threads timers
-ui ui.gadgets ui.gadgets.worlds ui.pens.solid ;
+concurrency.semaphores continuations kernel math openal.example
+threads timers ui ui.gadgets ui.gadgets.worlds ui.pens.solid ;
 IN: rosetta-code.metronome
-
-! linux alsa..
-! For debian, in package alsa-utils
-: <wave-process> ( freq -- process )
-    "speaker-test -t sine -f %d -p 20000" sprintf ;
 
 : bpm>duration ( bpm -- duration ) 60 swap / seconds ;
 
@@ -21,9 +15,7 @@ IN: rosetta-code.metronome
     COLOR: white <solid> >>interior relayout-1 ;
 
 : play-note ( gadget freq -- )
-    [ dupd blink-gadget ] [ <wave-process> run-detached ] bi
-    [ [ kill-process blank-gadget ] 2curry 300 milliseconds later drop ]
-    [ [ wait-for-process ] ignore-errors drop ] bi ;
+    [ blink-gadget ] [ 0.3 play-sine blank-gadget ] 2bi ;
 
 : open-metronome-window ( -- gadget )
     gadget new { 200 200 } >>pref-dim
@@ -34,18 +26,19 @@ IN: rosetta-code.metronome
         acquire [ play-note ] [ drop find-world handle>> ] 2bi
     ] curry with circular-loop ;
 
-: start-metronome-timer ( bpm semaphore -- timer )
+: (start-metronome-timer) ( bpm semaphore -- timer )
     [ release ] curry swap bpm>duration every ;
 
-: metronome ( bpm notes -- )
-    <circular> open-metronome-window
-    [
-        swap 0 <semaphore>
-        {
-            [ 2nip start-metronome-timer ]
-            [ metronome-loop drop ]
-        } 4 ncleave
-    ]
-    [ close-window stop-timer ] bi ;
+: start-metronome-timer ( bpm -- timer semaphore )
+    0 <semaphore> [ (start-metronome-timer) ] keep ;
 
-! example usage: 60 { 440 220 330 } metronome
+: run-metronome ( semaphore notes -- )
+    [ open-metronome-window ] 2dip <circular> swap metronome-loop ;
+
+: metronome ( bpm notes -- )
+    [ start-metronome-timer ] dip
+    [ run-metronome ] curry [ stop-timer ] [ ] cleanup ;
+
+: metronome-example ( -- ) 60 { 440 220 330 } metronome ;
+
+MAIN: metronome-example
