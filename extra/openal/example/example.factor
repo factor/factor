@@ -9,6 +9,18 @@ IN: openal.example
     first dup AL_BUFFER  alutCreateBufferHelloWorld set-source-param
     source-play
     1000 milliseconds sleep ;
+
+: play-waveform ( waveshape freq phase duration -- )
+    init-openal
+    [
+        [ 1 gen-sources first dup AL_BUFFER ] 4dip
+        alutCreateBufferWaveform
+        set-source-param
+        source-play
+    ] [ seconds sleep ] bi ;
+
+: play-sine ( freq duration -- )
+  [ ALUT_WAVEFORM_SINE ] 2dip [ 0 ] dip play-waveform ;
   
 : (play-file) ( source -- )
     100 milliseconds sleep
