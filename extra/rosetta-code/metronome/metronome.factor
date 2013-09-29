@@ -32,13 +32,11 @@ IN: rosetta-code.metronome
 
 : metronome ( bpm notes -- )
     <circular> open-metronome-window
-    [
-        swap 0 <semaphore>
-        {
-            [ 2nip start-metronome-timer ]
-            [ metronome-loop drop ]
-        } 4 ncleave
-    ]
-    [ close-window stop-timer ] bi ;
+    swap 0 <semaphore>
+    {
+        [ 2nip start-metronome-timer ]
+        [ metronome-loop drop ]
+    } 4 ncleave
+    stop-timer ;
 
 ! example usage: 60 { 440 220 330 } metronome
