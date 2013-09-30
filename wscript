@@ -1,5 +1,7 @@
+from hashlib import md5
 from os import path
-from waflib import Task, TaskGen
+from urllib import urlopen
+from waflib import Errors, Task
 
 APPNAME = 'factor-lang'
 VERSION = '0.97-git'
@@ -50,6 +52,66 @@ common_source = [
     'vm.cpp',
     'words.cpp'
     ]
+
+# List of prebuilt libraries to download to create the windows msi.
+dlls = [
+    ('blas.dll', '', 'ec84cbbecb0573369de8f6e94b576035'),
+    ('bzip2.dll', '', '8a4efd59e29792f6400ce2e5c6799bea'),
+    ('freetype6.dll', '', 'fe5ec4b2a07d2c20a4cd3aa09ce0c571'),
+    ('glut32.dll', '', 'ae1f4dacacb463450dde420c0758666d'),
+    ('iconv.dll', '', 'd7cbbedfad7ad68e12bf6ffcc01c3080'),
+    ('intl.dll', '', '7b998b00a7c58475df42b10ef230b5b6'),
+    ('jpeg62.dll', '', '43e5901bca2aa2efd21531d83f5628aa'),
+    ('libasprintf-0.dll', '', '946ca7dae183e3cded6ca9505670340a'),
+    ('libatk-1.0-0.dll', '', 'f95d9eefcf85aeca128c218cb23c90e2'),
+    ('libcairo-2.dll', '', 'b2bb842451a11585d73b3eb65878ece9'),
+    ('libcairo-gobject-2.dll', '', 'd16b292282398324baa2dd0408c9515e'),
+    ('libcairo-script-interpreter-2.dll', '', '66eaa1bafa03beed6f1669e769013c25'),
+    ('libeay32.dll', '', 'd2173e4ef025da800827ffba70636d06'),
+    ('libexpat-1.dll', '', '3091605d9f53431b964351d80fe34ddf'),
+    ('libexpat.dll', '', '85c3f3058b8d6d6332b48542957b8419'),
+    ('libfontconfig-1.dll', '', '3d2d77ad23b8256c0cf97b36ffd64299'),
+    ('libfreetype-6.dll', '', 'c5839d957d29968e579178aa854b8651'),
+    ('libgailutil-18.dll', '', 'cf72818a626bb93eaab07f680f31a8dc'),
+    ('libgcc_s_1.dll', '', '881bb0989256fec0e79811e76af449f9'),
+    ('libgdk-win32-2.0-0.dll', '', '81cadf1413cadba0e3f67b52fd3f3c88'),
+    ('libgdk_pixbuf-2.0-0.dll', '', '835daf325a93ca18d78c9a2a292567ca'),
+    ('libgdkglext-win32-1.0-0.dll', '', '5f1420859ca7785c676e4ec852f3420f'),
+    ('libgettextlib-0-17.dll', '', 'ef2510ac293a4e29c2b246cd458b6fca'),
+    ('libgettextpo-0.dll', '', '1b48ba5651abb32b6b926542882e22c1'),
+    ('libgettextsrc-0-17.dll', '', '7da6cd30f6a5d0ad749db8c22e67edac'),
+    ('libgfortran-3.dll', '', 'd8d94f0272f7d7ab2b69a7df4e0716ad'),
+    ('libgio-2.0-0.dll', '', '02a497b2768cda2b47969a0244c9b766'),
+    ('libglade-2.0-0.dll', '', '12321a0e28e48530fb660de8eff0dbab'),
+    ('libgladeui-1-7.dll', '', '69785194e326e864c76a21b0313a52b6'),
+    ('libglib-2.0-0.dll', '', '8cc667edd3415395e21d79c3f83745ab'),
+    ('libgmodule-2.0-0.dll', '', '47417c314255bb58b28f77c880a6c810'),
+    ('libgobject-2.0-0.dll', '', '9f1f7d75728442258453d7ecec1a3e1a'),
+    ('libgthread-2.0-0.dll', '', '86fc9bcaa15f979b0102ec86e2c75737'),
+    ('libgtk-win32-2.0-0.dll', '', 'a38ccb75cd90a92afb6ff0cd295bf9e8'),
+    ('libgtkglext-win32-1.0-0.dll', '', '4ff420d58e49067419cc8593635492ba'),
+    ('libintl-8.dll', '', 'fd27a9a2a0bbbf1f9a1779585da702b1'),
+    ('libjpeg-62.dll', '', '9f9eca580a68017026fa64c70a286610'),
+    ('libltdl-3.dll', '', 'ffbaeae5c1c8f936332a01704963881b'),
+    ('libobjc-2.dll', '', '8ec985516958a2c99f2ca8fa0ae6843d'),
+    ('libpango-1.0-0.dll', '', '7fa55d38156d29623ebd1a883b8d0ad4'),
+    ('libpangocairo-1.0-0.dll', '', '055c444be08945547b454bf86f6e5d7b'),
+    ('libpangoft2-1.0-0.dll', '', '7360002ec4346643320c3ca577e9b9bf'),
+    ('libpangowin32-1.0-0.dll', '', '5afe3a001c4cf23bb4341725fc5644c0'),
+    ('libpng12-0.dll', '', '906e17e5ab42b7ceb127e72103c12395'),
+    ('libpng12.dll', '', '19ce7c5d61434ab553024ef46b2643a5'),
+    ('libpng14-14.dll', '', '33948c627ab6be9a5ce94a68878994f9'),
+    ('libssp-0.dll', '', '51515b2264de2f8660cc46b7f3ebbc6b'),
+    ('libstdc++-6.dll', '', '54a45223d73d6ea6dd5a1828d2b59195'),
+    ('libtiff.dll', '', '4ad93cded54c071c9f6410b47c292a4e'),
+    ('libudis86.dll', '', 'e7fb66c3f50469160ca992bd4d8b6544'),
+    ('libxml2.dll', '', 'e75d9887e0a9a6fbb812b629f8ea0916'),
+    ('sqlite3.dll', '', '7fa162fbf7a702b94810dbaec1bdacd7'),
+    ('ssleay32.dll', '', 'fa71efc3a246f2f523d611ddc10e7db1'),
+    ('zip32z64.dll', '', '10dc180ed4b49ddcd0ea2e61ae62259b'),
+    ('zlib1.dll', '', '55c57c4c216ff91c8776ac2df0c5d94a')
+    ]
+
 
 def wix_light(ctx, source, target, extra_files):
     wixobjs = ' '.join(source)
@@ -128,10 +190,28 @@ def configure(ctx):
         pf = pf.replace('\\', '\\\\')
     ctx.define('INSTALL_PREFIX', pf)
 
+def download_file(self):
+    gen = self.generator
+    url = gen.url
+    expected_digest = gen.digest
+    local_path = self.outputs[0].abspath()
+    if path.exists(local_path):
+        with open(local_path, 'rb') as f:
+            digest = md5(f.read()).hexdigest()
+            if digest == expected_digest:
+                return
+    data = urlopen(url).read()
+    digest = md5(data).hexdigest()
+    if digest != expected_digest:
+        fmt = 'Digest mismatch: File %s has digest %s, expected %s.'
+        raise Errors.WafError(fmt % (url, digest, expected_digest))
+    with open(local_path, 'wb') as f:
+        f.write(data)
+    return
+
 def build(ctx):
     dest_os = ctx.env.DEST_OS
     dest_cpu = ctx.env.DEST_CPU
-
 
     image_target = '%s.image' % APPNAME
 
@@ -286,6 +366,19 @@ def build(ctx):
                 rule = 'candle -nologo -out ${TGT} ${SRC} -dMySource="../%s"' % root,
                 source = ['%s.wxs' % root],
                 target = ['%s.wxsobj' % root]
+                )
+
+        # Download all dlls needed for the build
+        url_fmt = 'http://downloads.factorcode.org/dlls/%s%s'
+        for name, digest32, digest64 in dlls:
+            digest = digest32 if bits == 32 else digest64
+            url = url_fmt % ('' if bits == 32 else '64/', name)
+            ctx(
+                rule = download_file,
+                url = url,
+                digest = digest,
+                target = name,
+                always = True
                 )
 
         # Wix wants the Product/@Version attribute to be all
