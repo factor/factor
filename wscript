@@ -63,11 +63,10 @@ def wix_light(ctx, source, target, extra_files):
 # https://groups.google.com/d/msg/waf-users/2uA3DEltTKg/8T4X9I4OeeQJ
 def my_exec_command(self, cmd, **kw):
     bld = self.generator.bld
-    try:
-        if not kw.get('cwd', None):
-            kw['cwd'] = bld.cwd
-    except AttributeError:
-        bld.cwd = kw['cwd'] = bld.variant_dir
+    if not kw.get('cwd'):
+        cwd = getattr(bld, 'cwd', bld.variant_dir)
+        bld.cwd = kw['cwd'] = cwd
+
     kw["stdout"] = kw["stderr"] = None
     return bld.exec_command(cmd, **kw)
 Task.TaskBase.exec_command = my_exec_command
