@@ -37,7 +37,7 @@ IN: rosetta-code.metronome
 
 : metronome ( bpm notes -- )
     [ start-metronome-timer ] dip
-    [ run-metronome ] curry [ stop-timer ] [ ] cleanup ;
+    [ run-metronome ] 2curry [ stop-timer ] [ ] cleanup ;
 
 : metronome-example ( -- ) 60 { 440 220 330 } metronome ;
 
