@@ -4,7 +4,7 @@
 USING: accessors arrays assocs binary-search classes.tuple
 combinators fry hints kernel kernel.private locals math
 math.order math.ranges memoize namespaces sequences
-sequences.private sorting strings ;
+sequences.private sorting strings vectors ;
 FROM: sequences => change-nth ;
 IN: math.combinatorics
 
@@ -17,6 +17,7 @@ IN: math.combinatorics
 GENERIC: nths-unsafe ( indices seq -- seq' )
 M: string nths-unsafe (nths-unsafe) ;
 M: array nths-unsafe (nths-unsafe) ;
+M: vector nths-unsafe (nths-unsafe) ;
 M: iota-tuple nths-unsafe (nths-unsafe) ;
 M: object nths-unsafe (nths-unsafe) ;
 
@@ -117,6 +118,9 @@ PRIVATE>
 
 : all-permutations ( seq -- seq' )
     [ ] map-permutations ;
+
+: all-permutations? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
+    permutations-quot all? ; inline
 
 : find-permutation ( ... seq quot: ( ... elt -- ... ? ) -- ... elt/f )
     [ permutations-quot find drop ]
@@ -234,6 +238,9 @@ PRIVATE>
 
 : all-combinations ( seq k -- seq' )
     [ ] map-combinations ;
+
+: all-combinations? ( ... seq k quot: ( ... elt -- ... ? ) -- ... ? )
+    combinations-quot all? ; inline
 
 : find-combination ( ... seq k quot: ( ... elt -- ... ? ) -- ... elt/f )
     [ combinations-quot find drop ]
