@@ -24,7 +24,11 @@ M: yiqa >rgba
         3tri [ 0.0 1.0 clamp ] tri@
     ] dip <rgba> ; inline
 
-:: rgba>yiqa ( rgba -- yiqa )
+GENERIC: >yiqa ( color -- yiqa )
+
+M: object >yiqa >rgba >yiqa ;
+
+M:: rgba >yiqa ( rgba -- yiqa )
     rgba >rgba-components :> ( r g b a )
     0.30 r *  0.59 g * 0.11 b * + + :> y
     r y - :> r-y
