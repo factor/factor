@@ -21,13 +21,17 @@ M: cmyka >rgba
     [ [ yellow>> ] [ black>> ] bi + ] tri
     [ 1.0 min 1.0 swap - ] tri@ 1.0 <rgba> ; inline
 
-: rgba>cmyka ( rgba -- cmyka )
+GENERIC: >cmyka ( color -- cmyka )
+
+M: object >cmyka >rgba >cmyka ;
+
+M: rgba >cmyka
     >rgba-components [
         [ 1 swap - ] tri@ 3dup min min
         [ [ - 0.0 1.0 clamp ] curry tri@ ] keep
     ] dip <cmyka> ;
 
-: cmyka>gray ( cmyka -- gray )
+M: cmyka >gray
     [
         {
             [ cyan>> 0.3 * ]

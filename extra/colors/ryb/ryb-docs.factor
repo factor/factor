@@ -9,6 +9,6 @@ ARTICLE: "colors.ryb" "RYB colors"
 { $subsections
     ryba
     <ryba>
-    rgba>ryba
+    >ryba
 }
 { $see-also "colors" } ;

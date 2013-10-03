@@ -16,7 +16,11 @@ M: gray green>> gray>> ;
 
 M: gray blue>> gray>> ;
 
-: rgba>gray ( rgba -- gray )
+GENERIC: >gray ( color -- gray )
+
+M: object >gray >rgba >gray ;
+
+M: rgba >gray
     >rgba-components [
         [ 0.3 * ] [ 0.59 * ] [ 0.11 * ] tri* + +
     ] dip <gray> ;

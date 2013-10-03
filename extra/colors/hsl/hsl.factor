@@ -43,7 +43,11 @@ M: hsla >rgba
         ] if
     ] dip <rgba> ; inline
 
-: rgba>hsla ( rgba -- hsla )
+GENERIC: >hsla ( color -- hsla )
+
+M: object >hsla >rgba >hsla ;
+
+M: rgba >hsla
     >rgba-components [| r g b |
         r g b min min :> min-c
         r g b max max :> max-c

@@ -9,6 +9,6 @@ ARTICLE: "colors.yiq" "YIQ colors"
 { $subsections
     yiqa
     <yiqa>
-    rgba>yiqa
+    >yiqa
 }
 { $see-also "colors" } ;

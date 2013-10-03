@@ -49,7 +49,11 @@ M: hsva >rgba ( hsva -- rgba )
 
 PRIVATE>
 
-:: rgba>hsva ( rgba -- hsva )
+GENERIC: >hsva ( color -- hsva )
+
+M: object >hsva >rgba >hsva ;
+
+M:: rgba >hsva ( rgba -- hsva )
     rgba >rgba-components :> ( r g b a )
     r g b sort-triple :> ( z y x )
     x z = x zero? or [ 0 0 x a <hsva> ] [
@@ -64,7 +68,7 @@ PRIVATE>
     ] if ;
 
 : complimentary-color ( color -- color' )
-    dup hsva? [ >rgba rgba>hsva ] unless
+    dup hsva? [ >hsva ] unless
     {
         [ hue>> 180 + 360 mod ]
         [ saturation>> ]

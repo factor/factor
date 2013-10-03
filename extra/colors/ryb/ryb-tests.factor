@@ -10,7 +10,7 @@ IN: colors.ryb
     0.0 1.0 0.1 <range> [| r |
         0.0 1.0 0.1 <range> [| g |
             0.0 1.0 0.1 <range> [| b |
-                r g b 1.0 <rgba> dup rgba>ryba >rgba
+                r g b 1.0 <rgba> dup >ryba >rgba
                 [ >rgba-components 4array ] bi@
                 [ 0.00000001 ~ ] 2all?
             ] all?
