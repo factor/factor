@@ -10,6 +10,5 @@ ARTICLE: "colors.cmyk" "CMYK colors"
     cmyka
     <cmyka>
     >cmyka
-    cmyka>gray
 }
 { $see-also "colors" } ;
