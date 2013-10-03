@@ -9,6 +9,6 @@ ARTICLE: "colors.hsl" "HSL colors"
 { $subsections
     hsla
     <hsla>
-    rgba>hsla
+    >hsla
 }
 { $see-also "colors" } ;

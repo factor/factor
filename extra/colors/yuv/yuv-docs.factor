@@ -9,6 +9,6 @@ ARTICLE: "colors.yuv" "YUV colors"
 { $subsections
     yuva
     <yuva>
-    rgba>yuva
+    >yuva
 }
 { $see-also "colors" } ;

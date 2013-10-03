@@ -9,7 +9,7 @@ ARTICLE: "colors.cmyk" "CMYK colors"
 { $subsections
     cmyka
     <cmyka>
+    >cmyka
     cmyka>gray
-    rgba>cmyka
 }
 { $see-also "colors" } ;
