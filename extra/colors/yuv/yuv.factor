@@ -38,7 +38,11 @@ M: yuva >rgba
         [ 0.0 1.0 clamp ] tri@
     ] dip <rgba> ; inline
 
-:: rgba>yuva ( rgba -- yuva )
+GENERIC: >yuva ( color -- yuva )
+
+M: object >yuva >rgba >yuva ;
+
+M:: rgba >yuva ( rgba -- yuva )
     rgba >rgba-components :> ( r g b a )
     Wr r * Wg g * Wb b * + + :> y
     Umax 1 Wb - / b y - * :> u

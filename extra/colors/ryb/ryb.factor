@@ -67,5 +67,9 @@ M: ryba >rgba ( ryba -- rgba )
         [ ryb>rgb ] normalized
     ] [ alpha>> ] bi <rgba> ;
 
-: rgba>ryba ( rgba -- ryba )
+GENERIC: >ryba ( color -- ryba )
+
+M: object >ryba >rgba >ryba ;
+
+M: rgba >ryba
     >rgba-components [ [ rgb>ryb ] normalized ] [ <ryba> ] bi* ;
