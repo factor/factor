@@ -131,6 +131,7 @@
       <ComponentGroupRef Id="coregroup"/>
       <ComponentGroupRef Id="extragroup"/>
       <ComponentGroupRef Id="miscgroup"/>
+      <ComponentGroupRef Id="dllsgroup"/>
       <ComponentRef Id='MainExe' />
       <ComponentRef Id='SecondaryExe' />
       <ComponentRef Id='MainImage' />

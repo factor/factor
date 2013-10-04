@@ -121,6 +121,26 @@ def wix_light(ctx, source, target, extra_files):
         target = target
         )
 
+def wix_heat_dir(ctx, group, dirpath, source = None):
+    if source is None:
+        source = []
+    # -sw 5150 suppresses warning about self-registering dlls.
+    rule_fmt = ('heat dir %s -sw 5150 -nologo -var var.MySource '
+                '-cg %sgroup -gg -dr INSTALLDIR -out ${TGT}')
+    return ctx(
+        rule = rule_fmt % (dirpath, group),
+        source = source,
+        target = '%s.wxs' % group
+        )
+
+def wix_candle(ctx, group, dirpath):
+    return ctx(
+        rule = 'candle -nologo -out ${TGT} ${SRC} -dMySource="%s"' % dirpath,
+        source = ['%s.wxs' % group],
+        target = ['%s.wxsobj' % group]
+        )
+
+
 # This monkey patching enables syncronous output from rule tasks.
 # https://groups.google.com/d/msg/waf-users/2uA3DEltTKg/8T4X9I4OeeQJ
 def my_exec_command(self, cmd, **kw):
@@ -353,33 +373,31 @@ def build(ctx):
 
     # Installer and installation targets.
     if dest_os == 'win32':
-        # heat generates wxs fragments.
-        frags = ['core', 'basis', 'extra', 'misc']
-        fmt = 'heat dir ../%s -nologo -var var.MySource -cg %sgroup -gg -dr INSTALLDIR -out ${TGT}'
-        for root in frags:
-            ctx(
-                rule = fmt % (root, root),
-                source = [],
-                target = '%s.wxs' % root
-                )
-            ctx(
-                rule = 'candle -nologo -out ${TGT} ${SRC} -dMySource="../%s"' % root,
-                source = ['%s.wxs' % root],
-                target = ['%s.wxsobj' % root]
-                )
-
         # Download all dlls needed for the build
+        dll_targets = []
         url_fmt = 'http://downloads.factorcode.org/dlls/%s%s'
         for name, digest32, digest64 in dlls:
             digest = digest32 if bits == 32 else digest64
             url = url_fmt % ('' if bits == 32 else '64/', name)
-            ctx(
+            r = ctx(
                 rule = download_file,
                 url = url,
                 digest = digest,
-                target = name,
+                target = 'dlls/%s' % name,
                 always = True
                 )
+            dll_targets.append(r.target)
+
+        # Generate wxs fragments of the Factor sources.
+        frags = ['core', 'basis', 'extra', 'misc']
+        fmt = 'heat dir ../%s -nologo -var var.MySource -cg %sgroup -gg -dr INSTALLDIR -out ${TGT}'
+        for root in frags:
+            wix_heat_dir(ctx, root, '../%s' % root)
+            wix_candle(ctx, root, '../%s' % root)
+
+        # Generate one wxs fragment for all bundled dlls.
+        wix_heat_dir(ctx, 'dlls', 'dlls', source = dll_targets)
+        wix_candle(ctx, 'dlls', 'dlls')
 
         # Wix wants the Product/@Version attribute to be all
         # numeric. So if you have a version like 0.97-git, you need to
@@ -391,7 +409,7 @@ def build(ctx):
             source = ['factor.wxs'],
             target = ['factor.wxsobj']
         )
-        wxsobjs = ['%s.wxsobj' % f for f in ['factor'] + frags]
+        wxsobjs = ['%s.wxsobj' % f for f in ['factor', 'dlls'] + frags]
         wix_light(
             ctx,
             wxsobjs,
