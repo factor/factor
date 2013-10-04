@@ -37,3 +37,4 @@ Factor.app/Contents/_CodeSignature
 build/
 waf-*/
 .lock*
+*.pyc
