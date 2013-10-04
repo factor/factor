@@ -413,7 +413,7 @@ def build(ctx):
         wix_light(
             ctx,
             wxsobjs,
-            'factor.%s.msi' % VERSION,
+            'factor.%dbit.%s.msi' % (bits, VERSION),
             [image_target, '%s.com' % APPNAME]
         )
     pat = '(basis|core|extra)/**/*.(c|factor|pem|png|tiff|TXT|txt)'
