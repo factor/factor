@@ -180,6 +180,7 @@ FUNCTION: void freeaddrinfo ( addrinfo* ai ) ;
 
 FUNCTION: hostent* gethostbyname ( c-string name ) ;
 FUNCTION: int gethostname ( c-string name, int len ) ;
+FUNCTION: void* socket ( int domain, int type, int protocol ) ;
 FUNCTION: int connect ( void* socket, sockaddr-in* sockaddr, int addrlen ) ;
 FUNCTION: int select ( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, timeval* timeout ) ;
 FUNCTION: int closesocket ( SOCKET s ) ;
