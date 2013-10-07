@@ -2,7 +2,7 @@
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax classes.struct combinators kernel
-system namespaces assocs parser lexer sequences words
+openssl.libcrypto system namespaces assocs parser lexer sequences words
 quotations math.bitwise alien.libraries literals ;
 
 IN: openssl.libssl
@@ -62,6 +62,12 @@ CONSTANT: SSL_CTRL_GET_SESS_CACHE_MODE      45
 CONSTANT: SSL_CTRL_GET_MAX_CERT_LIST        50
 CONSTANT: SSL_CTRL_SET_MAX_CERT_LIST        51
 
+CONSTANT: SSL_OP_NO_SSLv2 0x01000000
+CONSTANT: SSL_OP_NO_SSLv3 0x02000000
+CONSTANT: SSL_OP_NO_TLSv1 0x04000000
+CONSTANT: SSL_OP_NO_TLSv1_2 0x08000000
+CONSTANT: SSL_OP_NO_TLSv1_1 0x10000000
+
 CONSTANT: SSL_ERROR_NONE             0
 CONSTANT: SSL_ERROR_SSL              1
 CONSTANT: SSL_ERROR_WANT_READ        2
@@ -88,7 +94,6 @@ CONSTANT: SSL_ERROR_WANT_ACCEPT      8
 
 C-TYPE: SSL_CTX
 C-TYPE: SSL_SESSION
-C-TYPE: SSL
 
 LIBRARY: libssl
 
@@ -157,7 +162,6 @@ FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc ) ;
 ! ===============================================
 ! x509v3.h
 ! ===============================================
-
 STRUCT: X509V3_EXT_METHOD
     { ext_nid int }
     { ext_flags int }
@@ -221,10 +225,69 @@ STRUCT: ssl_method_st
     { ssl_ctx_callback_ctrl void* } ;
 TYPEDEF: ssl_method_st* ssl-method
 
+STRUCT: ssl_st
+    { version int }
+    { type int }
+    { method ssl_method_st* }
+    { rbio BIO* }
+    { wbio BIO* }
+    { bbio BIO* }
+    { rwstate int }
+    { in_handshake int }
+    { handshake_func void* }
+    { server int }
+    { new_session int }
+    { quiet_shutdown int }
+    { shutdown int }
+    { state int }
+    { rstate int }
+    { init_buf void* }
+    { init_msg void* }
+    { init_num int }
+    { init_off int }
+    { packet void* }
+    { packet_length int }
+    { s2 void* }
+    { s3 void* }
+    { d1 void* }
+    { read_ahead int }
+    { msg_callback void* }
+    { msg_callback_arg void* }
+    { hit int }
+    { param void* }
+    { cipher_list void* }
+    { cipher_list_by_id void* }
+    { mac_flags int }
+    { enc_read_ctx void* }
+    { read_hash void* }
+    { expand void* }
+    { enc_write_ctx void* }
+    { write_hash void* }
+    { compress void* }
+    { cert void* }
+    { sid_ctx_length uint }
+    { sid_ctx void* }
+    { session SSL_SESSION* }
+    { generate_session_id void* }
+    { verify_mode int }
+    { verify_callback void* }
+    { info_callback void* }
+    { error int }
+    { error_code int }
+    { kssl_ctx void* }
+    { psk_client_callback void* }
+    { psk_server_callback void* }
+    { ctx SSL_CTX* } ;
+TYPEDEF: ssl_st SSL
+
 FUNCTION: c-string SSL_get_version ( SSL* ssl ) ;
 
 ! Maps OpenSSL errors to strings
 FUNCTION: void SSL_load_error_strings (  ) ;
+FUNCTION: c-string SSL_state_string ( SSL* ssl ) ;
+FUNCTION: c-string SSL_rstate_string ( SSL* ssl ) ;
+FUNCTION: c-string SSL_state_string_long ( SSL* ssl ) ;
+FUNCTION: c-string SSL_rstate_string_long ( SSL* ssl ) ;
 
 ! Must be called before any other action takes place
 FUNCTION: int SSL_library_init (  ) ;
@@ -264,6 +327,8 @@ FUNCTION: int SSL_set_fd ( SSL* ssl, int fd ) ;
 FUNCTION: void SSL_set_bio ( SSL* ssl, void* rbio, void* wbio ) ;
 
 FUNCTION: int SSL_set_session ( SSL* to, SSL_SESSION* session ) ;
+FUNCTION: SSL_SESSION* SSL_get_session ( SSL* to ) ;
+FUNCTION: SSL_SESSION* SSL_get1_session ( SSL* ssl ) ;
 
 FUNCTION: int SSL_get_error ( SSL* ssl, int ret ) ;
 
@@ -287,8 +352,6 @@ CONSTANT: SSL_RECEIVED_SHUTDOWN 2
 FUNCTION: int SSL_get_shutdown ( SSL* ssl ) ;
 
 FUNCTION: int SSL_CTX_set_session_id_context ( SSL_CTX* ctx, c-string sid_ctx, uint len ) ;
-
-FUNCTION: SSL_SESSION* SSL_get1_session ( SSL* ssl ) ;
 
 FUNCTION: void SSL_free ( SSL* ssl ) ;
 
