@@ -11,10 +11,6 @@
 //#define _WIN32_WINNT 0x0600  // For CancelSynchronousIo
 #endif
 
-#ifndef UNICODE
-#define UNICODE
-#endif
-
 #include <windows.h>
 #include <shellapi.h>
 

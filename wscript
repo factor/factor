@@ -101,16 +101,21 @@ def configure(ctx):
     ctx.load('compiler_c compiler_cxx')
     ctx.check(features='cxx cxxprogram', cflags=['-Wall'])
     env = ctx.env
-    dest_cpu = env.DEST_CPU
     dest_os = env.DEST_OS
-    bits = {'amd64' : 64, 'i386' : 32, 'x86_64' : 64}[dest_cpu]
+    bits = get_bits(ctx)
+
+    cxx = ctx.env.COMPILER_CXX
     if dest_os == 'win32':
         ctx.check_lib_msvc('shell32')
-        env.CXXFLAGS += ['/EHsc', '/O2', '/WX', '/W3']
-        if dest_cpu == 'i386':
-            env.LINKFLAGS.append('/safesh')
         ctx.load('winres')
-        env.WINRCFLAGS.append('/nologo')
+        if cxx == 'msvc':
+            env.WINRCFLAGS.append('/nologo')
+            env.CXXFLAGS += ['/EHsc', '/O2', '/WX', '/W3']
+            if bits == 32:
+                env.LINKFLAGS.append('/safesh')
+        elif cxx == 'g++':
+            env.LINKFLAGS.extend(['-static-libgcc', '-static-libstdc++', '-s'])
+            env.CXXFLAGS += ['-O2', '-fomit-frame-pointer']
         ctx.define('_CRT_SECURE_NO_WARNINGS', None)
         # WIX checks
         ctx.find_program('candle')
@@ -169,13 +174,61 @@ def download_file(self):
         f.write(data)
     return
 
+def get_bits(ctx):
+    types = {'amd64' : 64, 'i386' : 32, 'x86' : 32, 'x86_64' : 64}
+    return types[ctx.env.DEST_CPU]
+
+def build_msi(ctx, bits, image_target):
+    # Download all dlls needed for the build
+    dll_targets = []
+    url_fmt = 'http://downloads.factorcode.org/dlls/%s%s'
+    for name, digest32, digest64 in dlls:
+        digest = digest32 if bits == 32 else digest64
+        url = url_fmt % ('' if bits == 32 else '64/', name)
+        r = ctx(
+            rule = download_file,
+            url = url,
+            digest = digest,
+            target = 'dlls/%s' % name,
+            always = True
+            )
+        dll_targets.append(r.target)
+
+    # Generate wxs fragments of the Factor sources.
+    frags = ['core', 'basis', 'extra', 'misc']
+    fmt = 'heat dir ../%s -nologo -var var.MySource -cg %sgroup -gg -dr INSTALLDIR -out ${TGT}'
+    for root in frags:
+        wix_heat_dir(ctx, root, '../%s' % root)
+        wix_candle(ctx, root, '../%s' % root)
+
+    # Generate one wxs fragment for all bundled dlls.
+    wix_heat_dir(ctx, 'dlls', 'dlls', source = dll_targets)
+    wix_candle(ctx, 'dlls', 'dlls')
+
+    # Wix wants the Product/@Version attribute to be all
+    # numeric. So if you have a version like 0.97-git, you need to
+    # strip out the -git part.
+    product_version = VERSION.split('-')[0]
+    ctx(
+        rule = 'candle -nologo -dProductVersion=%s -dVersion=%s ' \
+            '-out ${TGT} ${SRC}' % (product_version, VERSION),
+        source = ['factor.wxs'],
+        target = ['factor.wxsobj']
+        )
+    wxsobjs = ['%s.wxsobj' % f for f in ['factor', 'dlls'] + frags]
+    wix_light(
+        ctx,
+        wxsobjs,
+        'factor.%dbit.%s.msi' % (bits, VERSION),
+        [image_target, '%s.com' % APPNAME]
+        )
+
+
 def build(ctx):
     dest_os = ctx.env.DEST_OS
-    dest_cpu = ctx.env.DEST_CPU
-
     image_target = '%s.image' % APPNAME
 
-    bits = {'amd64' : 64, 'i386' : 32, 'x86_64' : 64}[dest_cpu]
+    bits = get_bits(ctx)
     os_sources = {
         'win32' : [
             'cpu-x86.cpp',
@@ -206,12 +259,14 @@ def build(ctx):
     features = 'cxx cxxprogram'
 
     if dest_os == 'win32':
+        cxx = ctx.env.COMPILER_CXX
+        subsys_fmt = '/SUBSYSTEM:%s' if cxx == 'msvc' else '-Wl,-subsystem,%s'
         tg1 = ctx.program(
             features = features,
             source = [],
             target = APPNAME,
             use = link_libs,
-            linkflags = '/SUBSYSTEM:console',
+            linkflags = subsys_fmt % 'console',
             name = 'factor-com'
         )
         tg1.env.cxxprogram_PATTERN = '%s.com'
@@ -221,7 +276,7 @@ def build(ctx):
             source = [],
             target = APPNAME,
             use = link_libs,
-            linkflags = '/SUBSYSTEM:windows',
+            linkflags = subsys_fmt % 'windows',
             name = 'factor-exe'
             )
     elif dest_os == 'linux':
@@ -250,7 +305,7 @@ def build(ctx):
     if dest_os == 'win32':
         func = ctx.shlib
         features = 'cxx cxxshlib'
-        linkflags = '/SUBSYSTEM:console'
+        linkflags = subsys_fmt % 'console'
     elif dest_os == 'linux':
         func = ctx.stlib
         features = 'cxx cxxstlib'
@@ -313,49 +368,8 @@ def build(ctx):
 
     # Installer and installation targets.
     if dest_os == 'win32':
-        # Download all dlls needed for the build
-        dll_targets = []
-        url_fmt = 'http://downloads.factorcode.org/dlls/%s%s'
-        for name, digest32, digest64 in dlls:
-            digest = digest32 if bits == 32 else digest64
-            url = url_fmt % ('' if bits == 32 else '64/', name)
-            r = ctx(
-                rule = download_file,
-                url = url,
-                digest = digest,
-                target = 'dlls/%s' % name,
-                always = True
-                )
-            dll_targets.append(r.target)
+        build_msi(ctx, bits, image_target)
 
-        # Generate wxs fragments of the Factor sources.
-        frags = ['core', 'basis', 'extra', 'misc']
-        fmt = 'heat dir ../%s -nologo -var var.MySource -cg %sgroup -gg -dr INSTALLDIR -out ${TGT}'
-        for root in frags:
-            wix_heat_dir(ctx, root, '../%s' % root)
-            wix_candle(ctx, root, '../%s' % root)
-
-        # Generate one wxs fragment for all bundled dlls.
-        wix_heat_dir(ctx, 'dlls', 'dlls', source = dll_targets)
-        wix_candle(ctx, 'dlls', 'dlls')
-
-        # Wix wants the Product/@Version attribute to be all
-        # numeric. So if you have a version like 0.97-git, you need to
-        # strip out the -git part.
-        product_version = VERSION.split('-')[0]
-        ctx(
-            rule = 'candle -nologo -dProductVersion=%s -dVersion=%s ' \
-                '-out ${TGT} ${SRC}' % (product_version, VERSION),
-            source = ['factor.wxs'],
-            target = ['factor.wxsobj']
-        )
-        wxsobjs = ['%s.wxsobj' % f for f in ['factor', 'dlls'] + frags]
-        wix_light(
-            ctx,
-            wxsobjs,
-            'factor.%dbit.%s.msi' % (bits, VERSION),
-            [image_target, '%s.com' % APPNAME]
-        )
     pat = '(basis|core|extra)/**/*.(c|factor|pem|png|tiff|TXT|txt)'
     glob = cwd.ant_glob(pat)
 
