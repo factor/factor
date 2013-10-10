@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax classes.struct combinators kernel
-openssl.libcrypto system namespaces assocs parser lexer sequences words
+USING: alien alien.c-types alien.parser alien.syntax classes.struct combinators
+kernel openssl.libcrypto system namespaces assocs parser lexer sequences words
 quotations math.bitwise alien.libraries literals ;
 
 IN: openssl.libssl
@@ -507,13 +507,10 @@ CONSTANT: NID_issuer_alt_name   86
 ! libeay32.dll and not in the similarily named ssleay32.dll file.
 ! ===============================================
 
-<< "libssl-platform" {
-    { [ os windows? ] [ "libeay32.dll" ] }
-    { [ os macosx? ] [ "libssl.dylib" ] }
-    { [ os unix? ] [ "libssl.so" ] }
-} cond cdecl add-library >>
-
-LIBRARY: libssl-platform
+<< os windows? [
+    "libssl-windows"
+    [ "libeay32.dll" cdecl add-library ] [ current-library set ] bi
+] when >>
 
 ! x509.h
 FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
