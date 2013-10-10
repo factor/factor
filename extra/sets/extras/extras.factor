@@ -25,3 +25,6 @@ IN: sets.extras
         accum over visited ?adjoin
         [ push ] [ remove-first! drop ] if
     ] each accum seq like ;
+
+: adjoin-at* ( value key assoc -- set )
+    [ [ HS{ } clone ] unless* [ adjoin ] keep dup ] change-at ;
