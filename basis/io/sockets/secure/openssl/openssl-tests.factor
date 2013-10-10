@@ -7,8 +7,7 @@ USING:
     openssl.libcrypto openssl.libssl
     sequences
     tools.test
-    urls
-    windows.winsock ;
+    urls ;
 IN: io.sockets.secure.openssl.tests
 
 : new-ssl ( -- ssl )
@@ -29,4 +28,15 @@ IN: io.sockets.secure.openssl.tests
 [ "www.google.com" ] [
     new-ssl dup remote ssl-socket-connect dup SSL_set_bio
     dup SSL_connect drop SSL_get_peer_certificate subject-name
+] unit-test
+
+[ "www.google.com" ] [
+    new-ssl
+    [
+        remote (client) drop nip handle>> handle>>
+        alien-address BIO_NOCLOSE BIO_new_socket dup SSL_set_bio
+    ]
+    [ SSL_connect drop ]
+    [ SSL_get_peer_certificate ] tri
+    subject-name
 ] unit-test
