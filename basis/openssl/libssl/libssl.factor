@@ -7,11 +7,11 @@ quotations math.bitwise alien.libraries literals ;
 
 IN: openssl.libssl
 
-<< {
-    { [ os windows? ] [ "libssl" "ssleay32.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "libssl" "libssl.dylib" cdecl add-library ] }
-    { [ os unix? ] [ "libssl" "libssl.so" cdecl add-library ] }
-} cond >>
+<< "libssl" {
+    { [ os windows? ] [ "ssleay32.dll" ] }
+    { [ os macosx? ] [ "libssl.dylib" ] }
+    { [ os unix? ] [ "libssl.so" ] }
+} cond cdecl add-library >>
 
 CONSTANT: X509_FILETYPE_PEM       1
 CONSTANT: X509_FILETYPE_ASN1      2
@@ -109,9 +109,6 @@ STRUCT: stack_st
     { comp void* } ;
 TYPEDEF: stack_st _STACK
 
-FUNCTION: int sk_num ( _STACK *s ) ;
-FUNCTION: void* sk_value ( _STACK *s, int ) ;
-
 ! ===============================================
 ! asn1t.h
 ! ===============================================
@@ -150,14 +147,6 @@ STRUCT: X509_EXTENSION
 
 C-TYPE: X509_NAME
 C-TYPE: X509
-
-FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
-FUNCTION: int X509_get_ext_by_NID ( X509* a, int nid, int lastpos ) ;
-FUNCTION: void* X509_get_ext_d2i ( X509 *a, int nid, int* crit, int* idx ) ;
-FUNCTION: X509_NAME* X509_get_issuer_name ( X509* a ) ;
-FUNCTION: X509_NAME* X509_get_subject_name ( X509* a ) ;
-FUNCTION: int X509_check_trust ( X509* a, int id, int flags ) ;
-FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc ) ;
 
 ! ===============================================
 ! x509v3.h
@@ -512,3 +501,29 @@ X509_V_: ERR_APPLICATION_VERIFICATION 50
 CONSTANT: NID_commonName        13
 CONSTANT: NID_subject_alt_name  85
 CONSTANT: NID_issuer_alt_name   86
+
+! ===============================================
+! On Windows, some of the functions making up libssl are placed in the
+! libeay32.dll and not in the similarily named ssleay32.dll file.
+! ===============================================
+
+<< "libssl-platform" {
+    { [ os windows? ] [ "libeay32.dll" ] }
+    { [ os macosx? ] [ "libssl.dylib" ] }
+    { [ os unix? ] [ "libssl.so" ] }
+} cond cdecl add-library >>
+
+LIBRARY: libssl-platform
+
+! x509.h
+FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
+FUNCTION: int X509_get_ext_by_NID ( X509* a, int nid, int lastpos ) ;
+FUNCTION: void* X509_get_ext_d2i ( X509 *a, int nid, int* crit, int* idx ) ;
+FUNCTION: X509_NAME* X509_get_issuer_name ( X509* a ) ;
+FUNCTION: X509_NAME* X509_get_subject_name ( X509* a ) ;
+FUNCTION: int X509_check_trust ( X509* a, int id, int flags ) ;
+FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc ) ;
+
+! stack.h
+FUNCTION: int sk_num ( _STACK *s ) ;
+FUNCTION: void* sk_value ( _STACK *s, int ) ;
