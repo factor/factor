@@ -52,6 +52,7 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
 [
     {
         "NSAlert"
+        "NSAppleScript"
         "NSApplication"
         "NSArray"
         "NSAutoreleasePool"
