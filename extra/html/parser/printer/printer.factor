@@ -41,6 +41,8 @@ ERROR: unknown-tag-error tag ;
 M: text-printer print-opening-tag
     name>> {
         { "br" [ nl ] }
+        { "ol" [ nl ] }
+        { "ul" [ nl ] }
         { "li" [ " * " write ] }
         [ drop ]
     } case ;
@@ -55,6 +57,8 @@ M: text-printer print-closing-tag
         { "ul" "ol" "li" "tr" } member? [ nl ] when
     ]
     [ "td" = [ " " write ] when ] tri ;
+
+M: text-printer print-comment-tag drop ;
 
 M: html-printer print-text-tag ( tag -- )
     text>> write ;
