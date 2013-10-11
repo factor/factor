@@ -40,3 +40,9 @@ IN: io.sockets.secure.openssl.tests
     [ SSL_get_peer_certificate ] tri
     subject-name
 ] unit-test
+
+[ "google.com" ] [
+    URL" https://www.google.se" url-addr resolve-host first
+    [ ((client)) ] keep [ <ports> ] dip establish-connection
+    handle>> handle>> SSL_get_peer_certificate subject-name
+] unit-test
