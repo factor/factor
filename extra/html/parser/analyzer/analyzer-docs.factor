@@ -1,5 +1,5 @@
 USING: help.syntax help.markup html.parser.analyzer sequences strings ;
-IN: html.parser.analyzer-docs
+IN: html.parser.analyzer
 
 HELP: stack-find
 { $values { "seq" sequence } { "quot" { $quotation "( elt -- 1/0/-1 )" } } { "i/f" "an index or " { $link f } } }
