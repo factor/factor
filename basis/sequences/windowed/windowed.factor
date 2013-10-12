@@ -24,7 +24,7 @@ M: windowed-sequence length
 : in-bounds ( a b sequence -- a' b' sequence )
     [ nip in-bound ] [ [ nip ] dip in-bound ] [ 2nip ] 3tri ;
 
-:: rolling-map ( seq n quot: ( slice -- elt ) -- newseq )
+:: rolling-map ( ... seq n quot: ( ... slice -- ... elt ) -- ... newseq )
     seq length [
         [ n [-] ] [ seq <slice-unsafe> ] bi quot call
     ] { } map-integers ; inline
