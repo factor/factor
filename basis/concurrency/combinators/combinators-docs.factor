@@ -7,7 +7,7 @@ HELP: parallel-map
 { $errors "Throws an error if one of the iterations throws an error." } ;
 
 HELP: 2parallel-map
-{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt -- newelt )" } } { "newseq" sequence } }
+{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- newelt )" } } { "newseq" sequence } }
 { $description "Spawns a new thread for applying " { $snippet "quot" } " to pairwise elements of " { $snippet "seq1" } " and " { $snippet "seq2" } ", collecting the results at the end." }
 { $errors "Throws an error if one of the iterations throws an error." } ;
 
@@ -17,7 +17,7 @@ HELP: parallel-each
 { $errors "Throws an error if one of the iterations throws an error." } ;
 
 HELP: 2parallel-each
-{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt -- )" } } }
+{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- )" } } }
 { $description "Spawns a new thread for applying " { $snippet "quot" } " to pairwise elements of " { $snippet "seq1" } " and " { $snippet "seq2" } ", blocking until all quotations complete." }
 { $errors "Throws an error if one of the iterations throws an error." } ;
 
@@ -34,6 +34,7 @@ $nl
     parallel-each
     2parallel-each
     parallel-map
+    parallel-product-map
     2parallel-map
     parallel-filter
 }
