@@ -141,7 +141,7 @@ HELP: with-http-request
 
 ARTICLE: "http.client.get" "GET requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
-{ $subsections http-get }
+{ $subsections http-get http-get* }
 "Utilities to retrieve a " { $link url } " and save the contents to a file:"
 { $subsections
     download
@@ -155,6 +155,7 @@ ARTICLE: "http.client.get" "GET requests with the HTTP client"
 "The " { $link http-get } " and " { $link http-request } " words output sequences. This is undesirable if the response data may be large. Another pair of words take a quotation instead, and pass the quotation chunks of data incrementally:"
 { $subsections
     with-http-get
+    with-http-get*
     with-http-request
 } ;
 
@@ -178,21 +179,21 @@ ARTICLE: "http.client.post-data" "HTTP client post data"
 
 ARTICLE: "http.client.post" "POST requests with the HTTP client"
 "Basic usage involves passing post data and a " { $link url } ", and getting a " { $link response } " and data back:"
-{ $subsections http-post }
+{ $subsections http-post http-post* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections <post-request> }
 "Both words take a post data parameter; see " { $link "http.client.post-data" } "." ;
 
 ARTICLE: "http.client.put" "PUT requests with the HTTP client"
 "Basic usage involves passing post data and a " { $link url } ", and getting a " { $link response } " and data back:"
-{ $subsections http-put }
+{ $subsections http-put http-put* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections <put-request> }
 "Both words take a post data parameter; see " { $link "http.client.post-data" } "." ;
 
 ARTICLE: "http.client.head" "HEAD requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
-{ $subsections http-head }
+{ $subsections http-head http-head* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections
     <head-request>
@@ -200,7 +201,7 @@ ARTICLE: "http.client.head" "HEAD requests with the HTTP client"
 
 ARTICLE: "http.client.delete" "DELETE requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
-{ $subsections http-delete }
+{ $subsections http-delete http-delete* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections
     <delete-request>
@@ -208,7 +209,7 @@ ARTICLE: "http.client.delete" "DELETE requests with the HTTP client"
 
 ARTICLE: "http.client.options" "OPTIONS requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
-{ $subsections http-options }
+{ $subsections http-options http-options* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections
     <options-request>
@@ -217,7 +218,7 @@ ARTICLE: "http.client.options" "OPTIONS requests with the HTTP client"
 
 ARTICLE: "http.client.trace" "TRACE requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
-{ $subsections http-trace }
+{ $subsections http-trace http-trace* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections
     <trace-request>
