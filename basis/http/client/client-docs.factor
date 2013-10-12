@@ -55,40 +55,80 @@ HELP: http-get
 { $description "Downloads the contents of a URL." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: http-get*
+{ $values { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
+{ $description "A variant of " { $link http-get } " that checks that the response was successful." }
+{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+
 HELP: http-post
 { $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP POST request." }
 { $errors "Throws an error if the HTTP request fails." } ;
+
+HELP: http-post*
+{ $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
+{ $description "A variant of " { $link http-post } " that checks that the response was successful." }
+{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
 
 HELP: http-put
 { $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP PUT request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: http-put*
+{ $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
+{ $description "A variant of " { $link http-put } " that checks that the response was successful." }
+{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+
 HELP: http-head
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Same as " { $link http-get } " except that the server is not supposed to return a message-body in the response, as per RFC2616. However in practise, most web servers respond to GET and HEAD method calls with identical responses." }
 { $errors "Throws an error if the HTTP request fails." } ;
- 
+
+HELP: http-head*
+{ $values { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
+{ $description "A variant of " { $link http-head } " that checks that the response was successful." }
+{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+
 HELP: http-delete
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Requests that the origin server delete the resource identified by the URL." }
 { $errors "Throws an error if the HTTP request fails." } ;
+
+HELP: http-delete*
+{ $values { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
+{ $description "A variant of " { $link http-delete } " that checks that the response was successful." }
+{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
 
 HELP: http-options
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP OPTIONS request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: http-options*
+{ $values { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
+{ $description "A variant of " { $link http-options } " that checks that the response was successful." }
+{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+
 HELP: http-trace
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP TRACE request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: http-trace*
+{ $values { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
+{ $description "A variant of " { $link http-trace } " that checks that the response was successful." }
+{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+
 HELP: with-http-get
 { $values { "url" "a " { $link url } " or " { $link string } } { "quot" { $quotation "( chunk -- )" } } { "response" response } }
 { $description "Downloads the contents of a URL. Chunks of data are passed to the quotation as they are read." }
 { $errors "Throws an error if the HTTP request fails." } ;
+
+HELP: with-http-get*
+{ $values { "url" "a " { $link url } " or " { $link string } } { "quot" { $quotation "( chunk -- )" } } }
+{ $description "A variant of " { $link with-http-get } " that checks that the response was successful." }
+{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
 
 HELP: http-request
 { $values { "request" request } { "response" response } { "data" sequence } }
