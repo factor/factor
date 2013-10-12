@@ -4,7 +4,8 @@
 USING: accessors assocs calendar combinators environment fonts
 formatting fry io io.streams.string kernel literals locals make
 math math.order math.ranges pdf.canvas pdf.values pdf.wrap
-sequences sorting splitting ui.text xml.entities ;
+sequences sequences.extras sorting splitting ui.text
+xml.entities ;
 FROM: assocs => change-at ;
 FROM: sequences => change-nth ;
 FROM: pdf.canvas => draw-text ;
@@ -244,9 +245,6 @@ M: table-row pdf-render
             ] if-empty
         ] [ 0 ] if*
     ] map nip ;
-
-: change-last ( seq quot -- )
-    [ drop length 1 - ] [ change-nth ] 2bi ; inline
 
 :: max-col-widths ( canvas rows -- widths )
     H{ } clone :> widths
