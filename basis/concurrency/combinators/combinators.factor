@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: concurrency.futures concurrency.count-downs sequences
-kernel macros fry combinators generalizations ;
+USING: combinators concurrency.count-downs concurrency.futures
+fry generalizations kernel macros sequences sequences.product ;
 IN: concurrency.combinators
 
 <PRIVATE
@@ -11,17 +11,17 @@ IN: concurrency.combinators
 
 PRIVATE>
 
-: parallel-each ( seq quot -- )
+: parallel-each ( seq quot: ( elt -- ) -- )
     over length [
         '[ _ curry _ spawn-stage ] each
     ] (parallel-each) ; inline
 
-: 2parallel-each ( seq1 seq2 quot -- )
+: 2parallel-each ( seq1 seq2 quot: ( elt1 elt2 -- ) -- )
     2over min-length [
         '[ _ 2curry _ spawn-stage ] 2each
     ] (parallel-each) ; inline
 
-: parallel-filter ( seq quot -- newseq )
+: parallel-filter ( seq quot: ( elt -- ? ) -- newseq )
     over [ selector [ parallel-each ] dip ] dip like ; inline
 
 <PRIVATE
@@ -33,10 +33,13 @@ PRIVATE>
 
 PRIVATE>
 
-: parallel-map ( seq quot -- newseq )
+: parallel-map ( seq quot: ( elt -- newelt ) -- newseq )
     [future] map future-values ; inline
 
-: 2parallel-map ( seq1 seq2 quot -- newseq )
+: parallel-product-map ( seq quot: ( elt -- newelt ) -- newseq )
+    [ <product-sequence> ] dip parallel-map ;
+
+: 2parallel-map ( seq1 seq2 quot: ( elt1 elt2 -- newelt ) -- newseq )
     '[ _ 2curry future ] 2map future-values ;
 
 <PRIVATE
