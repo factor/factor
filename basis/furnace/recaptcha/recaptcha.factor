@@ -59,7 +59,7 @@ M: recaptcha call-responder*
         { "privatekey" private-key }
         { "remoteip" remote-ip }
     } URL" http://api-verify.recaptcha.net/verify"
-    http-post nip parse-recaptcha-response ;
+    http-post* parse-recaptcha-response ;
 
 : validate-recaptcha-params ( -- )
     {
