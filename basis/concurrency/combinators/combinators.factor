@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators concurrency.count-downs concurrency.futures
-fry generalizations kernel macros sequences sequences.product ;
+USING: arrays combinators concurrency.count-downs
+concurrency.futures fry generalizations kernel macros sequences
+sequences.private sequences.product ;
 IN: concurrency.combinators
 
 <PRIVATE
@@ -21,6 +22,12 @@ PRIVATE>
         '[ _ 2curry _ spawn-stage ] 2each
     ] (parallel-each) ; inline
 
+: parallel-product-each ( seq quot: ( elt -- ) -- )
+    [ <product-sequence> ] dip parallel-each ;
+
+: parallel-cartesian-each ( seq1 seq2 quot: ( elt1 elt2 -- ) -- )
+    [ 2array ] dip [ first2-unsafe ] prepose parallel-product-each ;
+
 : parallel-filter ( seq quot: ( elt -- ? ) -- newseq )
     over [ selector [ parallel-each ] dip ] dip like ; inline
 
@@ -36,11 +43,14 @@ PRIVATE>
 : parallel-map ( seq quot: ( elt -- newelt ) -- newseq )
     [future] map future-values ; inline
 
+: 2parallel-map ( seq1 seq2 quot: ( elt1 elt2 -- newelt ) -- newseq )
+    '[ _ 2curry future ] 2map future-values ;
+
 : parallel-product-map ( seq quot: ( elt -- newelt ) -- newseq )
     [ <product-sequence> ] dip parallel-map ;
 
-: 2parallel-map ( seq1 seq2 quot: ( elt1 elt2 -- newelt ) -- newseq )
-    '[ _ 2curry future ] 2map future-values ;
+: parallel-cartesian-map ( seq1 seq2 quot: ( elt1 elt2 -- newelt ) -- newseq )
+    [ 2array ] dip [ first2-unsafe ] prepose parallel-product-map ;
 
 <PRIVATE
 
