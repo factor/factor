@@ -5,8 +5,7 @@ IN: twitter.prettyprint
 
 MEMO: load-http-image ( url -- image/f )
     '[ _
-        [ http-get [ check-response drop ] dip ]
-        [ image-class ] bi load-image*
+        [ http-get* ] [ image-class ] bi load-image*
     ] [ drop f ] recover ;
 
 : user-image ( user -- image/f )

@@ -43,7 +43,7 @@ public_description subscribers title url ;
 TUPLE: page url data before after ;
 
 : json-page ( url -- page )
-    >url dup http-get nip json> "data" of {
+    >url dup http-get* json> "data" of {
         [ "children" of [ parse-data ] map ]
         [ "before" of [ f ] when-json-null ]
         [ "after" of [ f ] when-json-null ]
@@ -54,7 +54,7 @@ TUPLE: page url data before after ;
 
 : get-user-info ( username -- user )
     "http://api.reddit.com/user/%s/about" sprintf
-    http-get nip json> parse-data ;
+    http-get* json> parse-data ;
 
 : get-url-info ( url -- page )
     "http://api.reddit.com/api/info?url=%s" sprintf json-page ;

@@ -6,7 +6,7 @@ sequences sets splitting unicode.case unicode.categories urls
 urls.encoding shuffle ;
 IN: html.parser.analyzer
 
-: scrape-html ( url -- headers vector )
+: scrape-html ( url -- response vector )
     http-get parse-html ;
 
 : attribute ( tag string -- obj/f )
