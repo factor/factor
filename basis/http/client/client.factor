@@ -170,6 +170,9 @@ ERROR: download-failed response ;
     [ [ % ] with-http-request ] B{ } make
     over content-encoding>> decode check-response-with-body ;
 
+: http-request* ( request -- data )
+    http-request swap check-response drop ;
+
 : <get-request> ( url -- request )
     "GET" <client-request> ;
 
