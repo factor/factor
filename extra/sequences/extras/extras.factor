@@ -521,3 +521,9 @@ PRIVATE>
 
 : reject! ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     [ not ] compose filter! ; inline
+
+: change-last ( seq quot -- )
+    [ drop length 1 - ] [ change-nth ] 2bi ; inline
+
+: change-last-unsafe ( seq quot -- )
+    [ drop length 1 - ] [ change-nth-unsafe ] 2bi ; inline
