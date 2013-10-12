@@ -176,14 +176,20 @@ ERROR: download-failed response ;
 : http-get ( url -- response data )
     <get-request> http-request ;
 
+: http-get* ( url -- data )
+    http-get swap check-response drop ;
+
 : with-http-get ( url quot: ( chunk -- ) -- response )
     [ <get-request> ] dip with-http-request ; inline
+
+: with-http-get* ( url quot: ( chunk -- ) -- )
+    with-http-get check-response drop ; inline
 
 : download-name ( url -- name )
     present file-name "?" split1 drop "/" ?tail drop ;
 
 : download-to ( url file -- )
-    binary [ [ write ] with-http-get check-response drop ] with-file-writer ;
+    binary [ [ write ] with-http-get* ] with-file-writer ;
 
 : download ( url -- )
     dup download-name download-to ;
@@ -195,6 +201,9 @@ ERROR: download-failed response ;
 : http-post ( post-data url -- response data )
     <post-request> http-request ;
 
+: http-post* ( post-data url -- data )
+    http-post swap check-response drop ;
+
 : <put-request> ( post-data url -- request )
     "PUT" <client-request>
         swap >>post-data ;
@@ -202,11 +211,17 @@ ERROR: download-failed response ;
 : http-put ( post-data url -- response data )
     <put-request> http-request ;
 
+: http-put* ( post-data url -- data )
+    http-put swap check-response drop ;
+
 : <delete-request> ( url -- request )
     "DELETE" <client-request> ;
 
 : http-delete ( url -- response data )
     <delete-request> http-request ;
+
+: http-delete* ( url -- data )
+    http-delete swap check-response drop ;
 
 : <head-request> ( url -- request )
     "HEAD" <client-request> ;
@@ -214,17 +229,26 @@ ERROR: download-failed response ;
 : http-head ( url -- response data )
     <head-request> http-request ;
 
+: http-head* ( url -- data )
+    http-head swap check-response drop ;
+
 : <options-request> ( url -- request )
     "OPTIONS" <client-request> ;
 
 : http-options ( url -- response data )
     <options-request> http-request ;
 
+: http-options* ( url -- data )
+    http-options swap check-response drop ;
+
 : <trace-request> ( url -- request )
     "TRACE" <client-request> ;
 
 : http-trace ( url -- response data )
     <trace-request> http-request ;
+
+: http-trace* ( url -- data )
+    http-trace swap check-response drop ;
 
 USE: vocabs.loader
 
