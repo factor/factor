@@ -22,7 +22,7 @@ title content unescapedUrl url titleNoFormatting fileFormat ;
 PRIVATE>
 
 : google-search ( query -- results )
-    search-url http-get nip json>
+    search-url http-get* json>
     { "responseData" "results" } deep-at
     [ \ search-result from-slots ] map ;
 

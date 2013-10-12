@@ -40,7 +40,7 @@ IN: wikipedia
     "http://en.wikipedia.org/wiki/%s_%s" sprintf ;
 
 : (historical-events) ( timestamp -- seq )
-    historical-url http-get nip string>xml "ul" deep-tags-named ;
+    historical-url http-get* string>xml "ul" deep-tags-named ;
 
 : items>sequence ( tag -- seq )
     children-tags [ deep-children>string ] map ;
@@ -67,7 +67,7 @@ PRIVATE>
 
 : article. ( name -- )
     "http://en.wikipedia.org/wiki/%s" sprintf
-    http-get nip parse-html "content" find-by-id-between
+    http-get* parse-html "content" find-by-id-between
     [ html-text. ] with-string-writer string-lines
     [ [ blank? ] trim ] map harvest [
         R/ &lt;/ "<" re-replace

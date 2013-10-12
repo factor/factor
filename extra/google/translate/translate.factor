@@ -53,7 +53,7 @@ ERROR: response-error response error ;
 
 : translate-tts ( text -- file )
     "http://translate.google.com/translate_tts?tl=en" >url
-    swap "q" set-query-param http-get nip
+    swap "q" set-query-param http-get*
     temporary-file ".mp3" append
     [ binary set-file-contents ] keep ;
 

@@ -21,7 +21,7 @@ SYMBOLS: latest-sources last-built-sources ;
     [ maybe-download-image drop ] [ file-checksum ] bi ;
 
 : latest-counter ( -- counter )
-    counter-url get-global http-get nip string>number ;
+    counter-url get-global http-get* string>number ;
 
 : update-sources ( -- )
     #! Must be run from builds-dir
