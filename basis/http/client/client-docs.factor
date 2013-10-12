@@ -135,6 +135,11 @@ HELP: http-request
 { $description "Sends an HTTP request to an HTTP server, and reads the response." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: http-request*
+{ $values { "request" request } { "data" sequence } }
+{ $description "A variant of " { $link http-request } " that checks that the response was successful." }
+{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+
 HELP: with-http-request
 { $values { "request" request } { "quot" { $quotation "( chunk -- )" } } { "response" response } }
 { $description "Sends an HTTP request to an HTTP server, and reads the response incrementally. Chunks of data are passed to the quotation as they are read. Does not throw an error if the HTTP request fails; to do so, call " { $link check-response } " on the " { $snippet "response" } "." } ;
@@ -151,6 +156,7 @@ ARTICLE: "http.client.get" "GET requests with the HTTP client"
 { $subsections
     <get-request>
     http-request
+    http-request*
 }
 "The " { $link http-get } " and " { $link http-request } " words output sequences. This is undesirable if the response data may be large. Another pair of words take a quotation instead, and pass the quotation chunks of data incrementally:"
 { $subsections
