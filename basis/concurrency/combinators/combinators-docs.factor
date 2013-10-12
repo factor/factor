@@ -34,9 +34,15 @@ $nl
     parallel-each
     2parallel-each
     parallel-map
-    parallel-product-map
     2parallel-map
     parallel-filter
+}
+"Concurrent product sequence combinators:"
+{ $subsections
+    parallel-product-each
+    parallel-cartesian-each
+    parallel-product-map
+    parallel-cartesian-map
 }
 "Concurrent cleave combinators:"
 { $subsections
