@@ -45,11 +45,11 @@ PRIVATE>
     [ snip-slice ] (split1) ;
 
 : split-subseq ( seq subseq -- seqs )
-    dup empty? [
-        drop 1array
+    [
+        1array
     ] [
         [ dup ] swap [ split1-slice swap ] curry produce nip
-    ] if ;
+    ] if-empty ;
 
 : replace ( seq old new -- new-seq )
     pick [ [ split-subseq ] dip ] dip join-as ;
@@ -107,12 +107,10 @@ M: string string-lines
         "\n" split
         [
             but-last-slice [
-                dup ?last CHAR: \r = [ but-last ] when
-                [ CHAR: \r = ] split-when
+                "\r" ?tail drop "\r" split
             ] map! drop
         ] [
-            [ length 1 - ] keep
-            [ [ CHAR: \r = ] split-when ] change-nth
+            [ length 1 - ] keep [ "\r" split ] change-nth
         ]
         [ concat ]
         tri
