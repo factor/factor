@@ -29,8 +29,8 @@ visit-time request-rate crawl-delay unknowns ;
 : >robots.txt-url ( url -- url' )
     >url URL" robots.txt" derive-url ;
 
-: get-robots.txt ( url -- headers robots.txt )
-    >robots.txt-url http-get ;
+: get-robots.txt ( url -- robots.txt )
+    >robots.txt-url http-get* ;
 
 : normalize-robots.txt ( string -- sitemaps seq )
     string-lines
@@ -98,5 +98,4 @@ PRIVATE>
     ] map ;
 
 : url>robots ( url -- robots )
-    >url
-    dup get-robots.txt nip parse-robots.txt <robots> ;
+    >url dup get-robots.txt parse-robots.txt <robots> ;

@@ -15,7 +15,7 @@ IN: rosetta-code.web-scraping
 ! and popular such as CPAN for Perl or Boost for C++.
 
 : web-scraping-main ( -- )
-    "http://tycho.usno.navy.mil/cgi-bin/timer.pl" http-get nip
+    "http://tycho.usno.navy.mil/cgi-bin/timer.pl" http-get*
     [ "UTC" swap start [ 9 - ] [ 1 - ] bi ] keep subseq print ;
 
 MAIN: web-scraping-main
