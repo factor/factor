@@ -1,5 +1,6 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors arrays assocs kernel locals math sequences ;
+USING: accessors arrays assocs kernel locals math sequences
+sequences.private ;
 FROM: sequences => change-nth ;
 IN: sequences.product
 
@@ -25,24 +26,27 @@ M: product-sequence length lengths>> product ;
 
 :: (carry-n) ( ns lengths i -- )
     ns length i 1 + = [
-        i ns nth i lengths nth = [
-            0 i ns set-nth
-            i 1 + ns [ 1 + ] change-nth
+        i ns nth-unsafe i lengths nth-unsafe = [
+            0 i ns set-nth-unsafe
+            i 1 + ns [ 1 + ] change-nth-unsafe
             ns lengths i 1 + (carry-n)
         ] when
-    ] unless ;
+    ] unless ; inline recursive
 
 : carry-ns ( ns lengths -- )
-    0 (carry-n) ;
+    0 (carry-n) ; inline
 
 : product-iter ( ns lengths -- )
-    [ 0 over [ 1 + ] change-nth ] dip carry-ns ;
+    [ 0 over [ 1 + ] change-nth-unsafe ] dip carry-ns ; inline
 
 : start-product-iter ( sequences -- ns lengths )
-    [ length 0 <array> ] [ [ length ] map ] bi ;
+    [ length 0 <array> ] [ [ length ] map ] bi ; inline
 
 : end-product-iter? ( ns lengths -- ? )
-    [ last ] same? ;
+    [ last-unsafe ] same? ; inline
+
+: product-length ( sequences -- length )
+    [ length ] [ * ] map-reduce ; inline
 
 PRIVATE>
 
@@ -58,9 +62,9 @@ M: product-sequence nth
 
 :: product-map-as ( ... sequences quot: ( ... seq -- ... value ) exemplar -- ... sequence )
     0 :> i!
-    sequences [ length ] [ * ] map-reduce exemplar
+    sequences product-length exemplar
     [| result |
-        sequences [ quot call i result set-nth i 1 + i! ] product-each
+        sequences [ quot call i result set-nth-unsafe i 1 + i! ] product-each
         result
     ] new-like ; inline
 
@@ -69,8 +73,8 @@ M: product-sequence nth
 
 :: product-map>assoc ( ... sequences quot: ( ... seq -- ... key value ) exemplar -- ... assoc )
     0 :> i!
-    sequences [ length ] [ * ] map-reduce { }
+    sequences product-length { }
     [| result |
-        sequences [ quot call 2array i result set-nth i 1 + i! ] product-each
+        sequences [ quot call 2array i result set-nth-unsafe i 1 + i! ] product-each
         result
     ] new-like exemplar assoc-like ; inline
