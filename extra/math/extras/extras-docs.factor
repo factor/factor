@@ -86,3 +86,7 @@ HELP: round-to-decimal
     { $example "USING: math.extras prettyprint ;" "1.23456 2 round-to-decimal ." "1.23" }
     { $example "USING: math.extras prettyprint ;" "12345.6789 -3 round-to-decimal ." "12000.0" }
 } ;
+
+HELP: kahan-sum
+{ $values { "seq" sequence } { "n" float } }
+{ $description "Calculates the summation of the sequence using the Kahan summation algorithm." } ;
