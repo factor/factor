@@ -290,7 +290,16 @@ M: real round-away-from-zero
         ] reduce nip max
     ] if ; inline
 
+<PRIVATE
+
+: kahan+ ( c n elt -- c' n' )
+    rot - 2dup + [ -rot [ - ] bi@ ] keep ;
+
+PRIVATE>
+
 : kahan-sum ( seq -- n )
-    [ 0.0 0.0 ] dip [
-        rot - 2dup + [ -rot [ - ] bi@ ] keep
-    ] each nip ;
+    [ 0.0 0.0 ] dip [ kahan+ ] each nip ;
+
+: map-kahan-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
+    [ 0.0 0.0 ] 2dip [ 2dip rot kahan+ ] curry
+    [ -rot ] prepose each nip ; inline
