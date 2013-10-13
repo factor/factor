@@ -289,3 +289,8 @@ M: real round-away-from-zero
             [ swapd @ [ 1 + ] [ max 0 ] if ] keep swap
         ] reduce nip max
     ] if ; inline
+
+: kahan-sum ( seq -- n )
+    [ 0.0 0.0 ] dip [
+        rot - 2dup + [ -rot [ - ] bi@ ] keep
+    ] each nip ;
