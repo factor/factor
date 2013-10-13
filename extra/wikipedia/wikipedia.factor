@@ -3,14 +3,23 @@
 
 USING: accessors ascii assocs calendar colors.constants
 formatting html.parser html.parser.analyzer html.parser.printer
-http.client io io.streams.string io.styles kernel make regexp
-sequences splitting urls wrap.strings xml xml.data
-xml.traversal ;
+http.client io io.streams.string io.styles kernel make
+namespaces regexp sequences splitting urls wrap.strings xml
+xml.data xml.traversal ;
 FROM: xml.data => tag? ;
 
 IN: wikipedia
 
+SYMBOL: language
+"en" language set-global
+
+: with-language ( str quot -- )
+    language swap with-variable ; inline
+
 <PRIVATE
+
+: wikipedia-url ( path -- url )
+    language get swap "http://%s.wikipedia.org/wiki/%s" sprintf >url ;
 
 : header. ( string -- )
     H{ { font-size 20 } { font-style bold } } format nl ;
@@ -20,7 +29,7 @@ IN: wikipedia
 
 : link. ( tag -- )
     [ deep-children>string ] [ attrs>> "href" of ] bi
-    "http://en.wikipedia.org" prepend >url H{
+    wikipedia-url H{
         { font-name "monospace" }
         { foreground COLOR: blue }
     } [ write-object ] with-style ;
@@ -36,8 +45,7 @@ IN: wikipedia
     children-tags [ item. ] each nl ;
 
 : historical-url ( timestamp -- url )
-    [ month-name ] [ day>> ] bi
-    "http://en.wikipedia.org/wiki/%s_%s" sprintf ;
+    [ month-name ] [ day>> ] bi "%s_%s" sprintf wikipedia-url ;
 
 : (historical-events) ( timestamp -- seq )
     historical-url http-get* string>xml "ul" deep-tags-named ;
@@ -66,8 +74,8 @@ PRIVATE>
     (historical-events) "Deaths" header. fourth items. ;
 
 : article. ( name -- )
-    "http://en.wikipedia.org/wiki/%s" sprintf
-    http-get* parse-html "content" find-by-id-between
+    wikipedia-url http-get* parse-html
+    "content" find-by-id-between
     [ html-text. ] with-string-writer string-lines
     [ [ blank? ] trim ] map harvest [
         R/ &lt;/ "<" re-replace
