@@ -213,9 +213,7 @@ INSTANCE: combinations immutable-sequence
         1 [-] seq increment-rest
     ] [
         seq increment-last
-    ] if* seq ;
-
-HINTS: next-combination array fixnum ;
+    ] if* seq ; inline
 
 :: combinations-quot ( seq k quot -- seq quot' )
     seq length :> n
