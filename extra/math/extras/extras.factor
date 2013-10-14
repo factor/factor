@@ -293,7 +293,7 @@ M: real round-away-from-zero
 <PRIVATE
 
 : kahan+ ( c sum elt -- c' sum' )
-    rot - 2dup + [ -rot [ - ] bi@ ] keep ;
+    rot - 2dup + [ -rot [ - ] bi@ ] keep ; inline
 
 PRIVATE>
 
