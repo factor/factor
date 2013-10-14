@@ -103,50 +103,45 @@ M: integer write-msgpack
 M: float write-msgpack
     0xcb write1 double>bits 8 >be write ;
 
-: write-string ( obj -- )
+M: string write-msgpack
     dup length {
-        { [ dup 0x1f <= ] [ 0xa0 bitor write1 write ] }
-        { [ dup 0xff <= ] [ 0xd9 write1 write1 write ] }
-        { [ dup 0xffff <= ] [ 0xda write1 2 >be write write ] }
-        { [ dup 0xffffffff <= ] [ 0xdb write1 4 >be write write ] }
+        { [ dup 0x1f <= ] [ 0xa0 bitor write1 ] }
+        { [ dup 0xff <= ] [ 0xd9 write1 write1 ] }
+        { [ dup 0xffff <= ] [ 0xda write1 2 >be write ] }
+        { [ dup 0xffffffff <= ] [ 0xdb write1 4 >be write ] }
+        [ cannot-convert ]
+    } cond write ;
+
+M: byte-array write-msgpack
+    dup length {
+        { [ dup 0xff <= ] [ 0xc4 write1 write1 ] }
+        { [ dup 0xffff <= ] [ 0xc5 write1 2 >be write ] }
+        { [ dup 0xffffffff <= ] [ 0xc6 write1 4 >be write ] }
+        [ cannot-convert ]
+    } cond write ;
+
+: write-array-header ( n -- )
+    {
+        { [ dup 0xf <= ] [ 0x90 bitor write1 ] }
+        { [ dup 0xffff <= ] [ 0xdc write1 2 >be write ] }
+        { [ dup 0xffffffff <= ] [ 0xdd write1 4 >be write ] }
         [ cannot-convert ]
     } cond ;
-
-M: string write-msgpack write-string ;
-M: sbuf write-msgpack write-string ;
-
-: write-bytes ( obj -- )
-    dup length {
-        { [ dup 0xff <= ] [ 0xc4 write1 write1 write ] }
-        { [ dup 0xffff <= ] [ 0xc5 write1 2 >be write write ] }
-        { [ dup 0xffffffff <= ] [ 0xc6 write1 4 >be write write ] }
-        [ cannot-convert ]
-    } cond ;
-
-M: byte-array write-msgpack write-bytes ;
-M: byte-vector write-msgpack write-bytes ;
-
-: write-array ( obj -- )
-    [ write-msgpack ] each ; inline
-
-: write-map ( obj -- )
-    [ [ write-msgpack ] bi@ ] assoc-each ; inline
 
 M: sequence write-msgpack
-    dup length {
-        { [ dup 0xf <= ] [ 0x90 bitor write1 write-array ] }
-        { [ dup 0xffff <= ] [ 0xdc write1 2 >be write write-array ] }
-        { [ dup 0xffffffff <= ] [ 0xdd write1 4 >be write write-array ] }
+    dup length write-array-header [ write-msgpack ] each ;
+
+: write-map-header ( n -- )
+    {
+        { [ dup 0xf <= ] [ 0x80 bitor write1 ] }
+        { [ dup 0xffff <= ] [ 0xde write1 2 >be write ] }
+        { [ dup 0xffffffff <= ] [ 0xdf write1 4 >be write ] }
         [ cannot-convert ]
     } cond ;
 
 M: assoc write-msgpack
-    dup assoc-size {
-        { [ dup 0xf <= ] [ 0x80 bitor write1 write-map ] }
-        { [ dup 0xffff <= ] [ 0xde write1 2 >be write write-map ] }
-        { [ dup 0xffffffff <= ] [ 0xdf write1 4 >be write write-map ] }
-        [ cannot-convert ]
-    } cond ;
+    dup assoc-size write-map-header
+    [ [ write-msgpack ] bi@ ] assoc-each ;
 
 PRIVATE>
 
