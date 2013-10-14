@@ -14,7 +14,7 @@ IN: math.bitwise
 : unmask ( x n -- ? ) bitnot bitand ; inline
 : unmask? ( x n -- ? ) unmask zero? not ; inline
 : mask ( x n -- ? ) bitand ; inline
-: mask? ( x n -- ? ) mask zero? not ; inline
+: mask? ( x n -- ? ) [ mask ] [ = ] bi ; inline
 : wrap ( m n -- m' ) 1 - bitand ; inline
 : on-bits ( m -- n ) dup 0 <= [ drop 0 ] [ 2^ 1 - ] if ; inline
 : bits ( m n -- m' ) on-bits mask ; inline
