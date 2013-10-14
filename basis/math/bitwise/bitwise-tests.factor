@@ -64,6 +64,8 @@ SPECIALIZED-ARRAY: uint-4
 [ 3 ] [ 3 >odd ] unit-test
 [ 5 ] [ 4 >odd ] unit-test
 
+[ t ] [ 0b111 0b110 mask? ] unit-test
+[ f ] [ 0b101 0b110 mask? ] unit-test
 [ t ] [ 0xff 1 mask? ] unit-test
 [ f ] [ 0x0 1 mask? ] unit-test
 
