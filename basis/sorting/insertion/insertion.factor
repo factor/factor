@@ -1,11 +1,11 @@
-USING: locals sequences kernel math ;
+USING: kernel locals math sequences sequences.private ;
 IN: sorting.insertion
 
 <PRIVATE
 :: insert ( ... seq quot: ( ... elt -- ... elt' ) n -- ... )
     n zero? [
-        n n 1 - [ seq nth quot call ] bi@ >= [
-            n n 1 - seq exchange
+        n n 1 - [ seq nth-unsafe quot call ] bi@ >= [
+            n n 1 - seq exchange-unsafe
             seq quot n 1 - insert
         ] unless
     ] unless ; inline recursive
