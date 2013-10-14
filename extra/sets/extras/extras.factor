@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel locals sequences sequences.extras sets ;
+USING: assocs kernel locals sequences sequences.extras sets ;
 IN: sets.extras
 
 : setwise-xor ( seq1 seq2 -- set )
