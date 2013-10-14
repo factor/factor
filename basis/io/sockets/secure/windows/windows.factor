@@ -1,17 +1,19 @@
 USING:
     accessors
-    alien
+    alien alien.c-types alien.data
     combinators
     fry
     io io.sockets.private io.sockets.secure io.sockets.secure.openssl io.sockets.windows
     io.timeouts
     kernel
-    openssl openssl.libcrypto openssl.libssl ;
+    openssl openssl.libcrypto openssl.libssl
+    windows.winsock ;
 IN: io.sockets.secure.windows
 
 ! Most of this vocab is duplicated code from io.sockets.secure.unix so
 ! you could probably unify them.
 M: openssl ssl-supported? t ;
+M: openssl ssl-certificate-verification-supported? f ;
 
 : <ssl-socket> ( winsock -- ssl )
     [ handle>> alien-address BIO_NOCLOSE BIO_new_socket ] keep <ssl-handle>
@@ -19,6 +21,10 @@ M: openssl ssl-supported? t ;
 
 M: secure ((client)) ( addrspec -- handle )
     addrspec>> ((client)) <ssl-socket> ;
+
+M: secure (get-local-address) ( handle remote -- sockaddr )
+    [ file>> handle>> ] [ addrspec>> empty-sockaddr/size int <ref> ] bi*
+    [ getsockname socket-error ] 2keep drop ;
 
 : establish-ssl-connection ( client-out remote -- )
     make-sockaddr/size <ConnectEx-args>

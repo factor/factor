@@ -12,8 +12,10 @@ SYMBOL: secure-socket-timeout
 SYMBOL: secure-socket-backend
 
 HOOK: ssl-supported? secure-socket-backend ( -- ? )
+HOOK: ssl-certificate-verification-supported? secure-socket-backend ( -- ? )
 
 M: object ssl-supported? f ;
+M: object ssl-certificate-verification-supported? f ;
 
 SINGLETONS: SSLv2 SSLv23 SSLv3 TLSv1 ;
 
@@ -30,7 +32,7 @@ ephemeral-key-bits ;
     secure-config new
         SSLv23 >>method
         1024 >>ephemeral-key-bits
-        t >>verify ;
+        ssl-certificate-verification-supported? >>verify ;
 
 TUPLE: secure-context < disposable config handle ;
 
@@ -106,5 +108,5 @@ HOOK: accept-secure-handshake secure-socket-backend ( -- )
 
 {
     { [ os unix? ] [ "io.sockets.secure.unix" require ] }
-    { [ os windows? ] [ "openssl" require ] }
+    { [ os windows? ] [ "io.sockets.secure.windows" require ] }
 } cond
