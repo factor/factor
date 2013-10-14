@@ -1,5 +1,5 @@
 IN: io.sockets.secure.tests
-USING: accessors kernel io.sockets io.sockets.secure tools.test ;
+USING: accessors kernel io.sockets io.sockets.secure system tools.test ;
 
 [ "hello" 24 ] [ "hello" 24 <inet> <secure> [ host>> ] [ port>> ] bi ] unit-test
 
@@ -10,3 +10,5 @@ USING: accessors kernel io.sockets io.sockets.secure tools.test ;
         "password" >>password
     [ ] with-secure-context
 ] unit-test
+
+[ t ] [ os windows? ssl-certificate-verification-supported? or ] unit-test

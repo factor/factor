@@ -12,6 +12,7 @@ FROM: io.ports => shutdown ;
 IN: io.sockets.secure.unix
 
 M: openssl ssl-supported? t ;
+M: openssl ssl-certificate-verification-supported? t ;
 
 M: ssl-handle handle-fd file>> handle-fd ;
 
