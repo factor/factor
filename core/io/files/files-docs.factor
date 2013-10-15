@@ -79,6 +79,13 @@ HELP: set-file-lines
 HELP: file-lines
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "seq" "an array of strings" } }
 { $description "Opens the file at the given path using the given encoding, and returns a list of the lines in that file." }
+{ $examples
+  { $example
+    "USING: io.files io.encodings.utf8 ;"
+    "\"resource:core/kernel/kernel.factor\" utf8 file-lines first ."
+    "! Copyright (C) 2004, 2009 Slava Pestov."
+  }
+}
 { $errors "Throws an error if the file cannot be opened for reading." } ;
 
 HELP: set-file-contents
