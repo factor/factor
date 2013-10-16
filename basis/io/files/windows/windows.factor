@@ -170,8 +170,6 @@ M: windows handle-length ( handle -- n/f )
         [ buffer>> dup buffer-length 0 DWORD <ref> ] dip make-overlapped
     ] 2bi <FileArgs> ;
 
-GENERIC: drain ( port handle -- )
-
 : setup-write ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToWrite lpNumberOfBytesWritten lpOverlapped )
     {
         [ hFile>> ]
@@ -183,11 +181,9 @@ GENERIC: drain ( port handle -- )
 : finish-write ( n port -- )
     [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
 
-M: object drain ( port handle -- )
+M: object drain ( port handle -- event/f )
     [ make-FileArgs dup setup-write WriteFile ]
-    [ drop [ wait-for-file ] [ finish-write ] bi ] 2bi ;
-
-GENERIC: refill ( port handle -- )
+    [ drop [ wait-for-file ] [ finish-write ] bi ] 2bi f ;
 
 : setup-read ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRead lpOverlapped )
     {
@@ -200,15 +196,15 @@ GENERIC: refill ( port handle -- )
 : finish-read ( n port -- )
     [ update-file-ptr ] [ buffer>> n>buffer ] 2bi ;
 
-M: object refill ( port handle -- )
+M: object refill ( port handle -- event/f )
     [ make-FileArgs dup setup-read ReadFile ]
-    [ drop [ wait-for-file ] [ finish-read ] bi ] 2bi ;
+    [ drop [ wait-for-file ] [ finish-read ] bi ] 2bi f ;
 
-M: windows (wait-to-write)
-    [ dup handle>> drain ] with-destructors ;
+M: windows (wait-to-write) ( port -- )
+    [ dup handle>> drain ] with-destructors drop ;
 
 M: windows (wait-to-read) ( port -- )
-    [ dup handle>> refill ] with-destructors ;
+    [ dup handle>> refill ] with-destructors drop ;
 
 : console-app? ( -- ? ) GetConsoleWindow >boolean ;
 

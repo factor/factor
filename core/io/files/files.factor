@@ -5,6 +5,15 @@ io.encodings.utf8 io.files.private io.pathnames kernel
 kernel.private namespaces sequences splitting system ;
 IN: io.files
 
+SYMBOL: +retry+ ! just try the operation again without blocking
+SYMBOL: +input+
+SYMBOL: +output+
+
+! Returns an event to wait for which will ensure completion of
+! this request
+GENERIC: drain ( port handle -- event/f )
+GENERIC: refill ( port handle -- event/f )
+
 MIXIN: file-reader
 MIXIN: file-writer
 
