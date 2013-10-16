@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar circular colors.constants colors.hsv
-kernel math openal.example sequences timers ui ui.gadgets
-ui.pens.solid ;
+command-line kernel math math.parser namespaces openal.example
+sequences timers ui ui.gadgets ui.pens.solid ;
 IN: rosetta-code.metronome
 
 : bpm>duration ( bpm -- duration ) 60 swap / seconds ;
@@ -38,7 +38,19 @@ M: metronome-gadget ungraft*
 
 M: metronome-gadget pref-dim* drop { 200 200 } ;
 
-: metronome-example ( -- )
-    [ 60 { 440 220 330 } <metronome-gadget> "Metronome" open-window ] with-ui ;
+: metronome-defaults ( -- bpm notes ) 60 { 440 220 330 } ;
 
-MAIN: metronome-example
+: metronome-ui ( bpm notes -- ) <metronome-gadget> "Metronome" open-window ;
+
+: metronome-example ( -- ) metronome-defaults metronome-ui ;
+
+: (metronome-cmdline) ( args -- bpm notes )
+    [ string>number ] map unclip swap ;
+
+: metronome-cmdline ( -- bpm notes )
+    command-line get [ metronome-defaults ] [ (metronome-cmdline) ] if-empty ;
+
+: metronome-main ( -- )
+     [ metronome-cmdline metronome-ui ] with-ui ;
+
+MAIN: metronome-main
