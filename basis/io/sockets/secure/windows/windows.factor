@@ -3,17 +3,71 @@ USING:
     alien alien.c-types alien.data
     combinators
     fry
-    io io.sockets.private io.sockets.secure io.sockets.secure.openssl io.sockets.windows
+    io.buffers
+    io.files
+    io.ports
+    io.sockets.private io.sockets.secure io.sockets.secure.openssl
     io.timeouts
     kernel
-    openssl openssl.libcrypto openssl.libssl
-    windows.winsock ;
+    namespaces
+    openssl openssl.libcrypto openssl.libssl ;
 IN: io.sockets.secure.windows
 
 ! Most of this vocab is duplicated code from io.sockets.secure.unix so
 ! you could probably unify them.
 M: openssl ssl-supported? t ;
 M: openssl ssl-certificate-verification-supported? f ;
+
+: check-response ( port r -- port r n )
+    over handle>> handle>> over SSL_get_error ; inline
+
+: check-read-response ( port r -- event )
+    check-response
+    {
+        { SSL_ERROR_NONE [ swap buffer>> n>buffer f ] }
+        { SSL_ERROR_ZERO_RETURN [ 2drop f ] }
+        { SSL_ERROR_WANT_READ [ 2drop "input" ] }
+        { SSL_ERROR_WANT_WRITE [ 2drop "output" ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
+    } case ;
+
+: maybe-handshake ( ssl-handle -- )
+    dup connected>> [ drop ] [
+        t >>connected
+        [ do-ssl-accept ] with-timeout
+    ] if ;
+
+M: ssl-handle refill
+    dup maybe-handshake
+    handle>> ! ssl
+    over buffer>>
+    [ buffer-end ] ! buf
+    [ buffer-capacity ] bi ! len
+    SSL_read
+    check-read-response ;
+
+: check-write-response ( port r -- event )
+    check-response
+    {
+        { SSL_ERROR_NONE [ swap buffer>> buffer-consume f ] }
+        { SSL_ERROR_WANT_READ [ 2drop "input!" ] }
+        { SSL_ERROR_WANT_WRITE [ 2drop "output!" ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
+    } case ;
+
+M: ssl-handle drain
+    dup maybe-handshake
+    handle>> ! ssl
+    over buffer>>
+    [ buffer@ ] ! buf
+    [ buffer-length ] bi ! len
+    SSL_write
+    check-write-response ;
+
+M: ssl-handle timeout
+    drop secure-socket-timeout get ;
 
 : <ssl-socket> ( winsock -- ssl )
     [ handle>> alien-address BIO_NOCLOSE BIO_new_socket ] keep <ssl-handle>
@@ -23,15 +77,9 @@ M: secure ((client)) ( addrspec -- handle )
     addrspec>> ((client)) <ssl-socket> ;
 
 M: secure (get-local-address) ( handle remote -- sockaddr )
-    [ file>> handle>> ] [ addrspec>> empty-sockaddr/size int <ref> ] bi*
-    [ getsockname socket-error ] 2keep drop ;
+    [ file>> ] [ addrspec>> ] bi* (get-local-address) ;
 
-: establish-ssl-connection ( client-out remote -- )
-    make-sockaddr/size <ConnectEx-args>
-    swap >>port
-    dup port>> handle>> file>> handle>> >>s dup
-    s>> get-ConnectEx-ptr >>ptr dup
-    call-ConnectEx wait-for-socket drop ;
+M: secure parse-sockaddr addrspec>> parse-sockaddr <secure> ;
 
 ! The error codes needs to be handled properly.
 : check-connect-response ( ssl-handle r -- event )
@@ -77,4 +125,7 @@ M: secure (get-local-address) ( handle remote -- sockaddr )
     ] [ drop t >>connected drop ] 2bi ;
 
 M: secure establish-connection ( client-out remote -- )
-    addrspec>> [ establish-ssl-connection ] [ secure-connection ] 2bi ;
+    [
+        [ handle>> file>> <output-port> ] [ addrspec>> ] bi* establish-connection
+    ]
+    [ secure-connection ] 2bi ;
