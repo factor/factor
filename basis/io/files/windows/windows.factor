@@ -14,8 +14,6 @@ SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
 
 HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
-HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
-HOOK: add-completion io-backend ( port -- port )
 HOOK: open-append os ( path -- win32-file )
 
 TUPLE: win32-file < win32-handle ptr ;
@@ -25,9 +23,6 @@ TUPLE: win32-file < win32-handle ptr ;
 
 M: win32-file dispose
     [ cancel-operation ] [ call-next-method ] bi ;
-    
-: opened-file ( handle -- win32-file )
-    check-invalid-handle <win32-file> |dispose add-completion ;
 
 CONSTANT: share-mode
     flags{
@@ -35,7 +30,7 @@ CONSTANT: share-mode
         FILE_SHARE_WRITE
         FILE_SHARE_DELETE
     }
-    
+
 : default-security-attributes ( -- obj )
     SECURITY_ATTRIBUTES <struct>
     SECURITY_ATTRIBUTES heap-size >>nLength ;
@@ -46,16 +41,6 @@ TUPLE: FileArgs
 
 C: <FileArgs> FileArgs
 
-: make-FileArgs ( port -- <FileArgs> )
-    {
-        [ handle>> check-disposed ]
-        [ handle>> handle>> ]
-        [ buffer>> ]
-        [ buffer>> buffer-length ]
-        [ drop 0 DWORD <ref> ]
-        [ FileArgs-overlapped ]
-    } cleave <FileArgs> ;
-    
 ! Global variable with assoc mapping overlapped to threads
 SYMBOL: pending-overlapped
 
@@ -63,29 +48,19 @@ TUPLE: io-callback port thread ;
 
 C: <io-callback> io-callback
 
-: (make-overlapped) ( -- overlapped-ext )
-    OVERLAPPED malloc-struct &free ;
-
-: make-overlapped ( port -- overlapped-ext )
-    [ (make-overlapped) ] dip
-    handle>> ptr>> [
-        [ 32 bits >>offset ]
-        [ -32 shift >>offset-high ] bi
-    ] when* ;
-
-M: windows FileArgs-overlapped ( port -- overlapped )
-    make-overlapped ;
-
 : <completion-port> ( handle existing -- handle )
      f 1 CreateIoCompletionPort dup win32-error=0/f ;
-
-SYMBOL: master-completion-port
 
 : <master-completion-port> ( -- handle )
     INVALID_HANDLE_VALUE f <completion-port> ;
 
-M: windows add-completion ( win32-handle -- win32-handle )
+SYMBOL: master-completion-port
+
+: add-completion ( win32-handle -- win32-handle )
     dup handle>> master-completion-port get-global <completion-port> drop ;
+
+: opened-file ( handle -- win32-file )
+    check-invalid-handle <win32-file> |dispose add-completion ;
 
 : eof? ( error -- ? )
     { [ ERROR_HANDLE_EOF = ] [ ERROR_BROKEN_PIPE = ] } 1|| ;
@@ -143,7 +118,7 @@ ERROR: invalid-file-size n ;
         GetLastError ERROR_INVALID_FUNCTION =
         [ f ] [ throw-win32-error ] if
     ] unless* ;
-    
+
 ERROR: seek-before-start n ;
 
 : set-seek-ptr ( n handle -- )
@@ -182,45 +157,58 @@ M: windows handle-length ( handle -- n/f )
 : update-file-ptr ( n port -- )
     handle>> dup ptr>> [ rot + >>ptr drop ] [ 2drop ] if* ;
 
-: finish-write ( n port -- )
-    [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
+: (make-overlapped) ( -- overlapped-ext )
+    OVERLAPPED malloc-struct &free ;
 
-: setup-read ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRead lpOverlapped )
-    {
-        [ hFile>> ]
-        [ lpBuffer>> buffer-end ]
-        [ lpBuffer>> buffer-capacity ]
-        [ lpNumberOfBytesRet>> ]
-        [ lpOverlapped>> ]
-    } cleave ;
+: make-overlapped ( handle -- overlapped-ext )
+    (make-overlapped) swap
+    ptr>> [ [ 32 bits >>offset ] [ -32 shift >>offset-high ] bi ] when* ;
+
+: make-FileArgs ( port handle -- <FileArgs> )
+    [ nip dup check-disposed handle>> ]
+    [
+        [ buffer>> dup buffer-length 0 DWORD <ref> ] dip make-overlapped
+    ] 2bi <FileArgs> ;
+
+GENERIC: drain ( port handle -- )
 
 : setup-write ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToWrite lpNumberOfBytesWritten lpOverlapped )
     {
         [ hFile>> ]
-        [ lpBuffer>> buffer@ ]
-        [ lpBuffer>> buffer-length ]
+        [ lpBuffer>> [ buffer@ ] [ buffer-length ] bi ]
         [ lpNumberOfBytesRet>> ]
         [ lpOverlapped>> ]
     } cleave ;
-    
-M: windows (wait-to-write)
-    [
-        [ make-FileArgs dup setup-write WriteFile ]
-        [ wait-for-file ]
-        [ finish-write ]
-        tri
-    ] with-destructors ;
+
+: finish-write ( n port -- )
+    [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
+
+M: object drain ( port handle -- )
+    [ make-FileArgs dup setup-write WriteFile ]
+    [ drop [ wait-for-file ] [ finish-write ] bi ] 2bi ;
+
+GENERIC: refill ( port handle -- )
+
+: setup-read ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRead lpOverlapped )
+    {
+        [ hFile>> ]
+        [ lpBuffer>> [ buffer-end ] [ buffer-capacity ] bi ]
+        [ lpNumberOfBytesRet>> ]
+        [ lpOverlapped>> ]
+    } cleave ;
 
 : finish-read ( n port -- )
     [ update-file-ptr ] [ buffer>> n>buffer ] 2bi ;
 
+M: object refill ( port handle -- )
+    [ make-FileArgs dup setup-read ReadFile ]
+    [ drop [ wait-for-file ] [ finish-read ] bi ] 2bi ;
+
+M: windows (wait-to-write)
+    [ dup handle>> drain ] with-destructors ;
+
 M: windows (wait-to-read) ( port -- )
-    [
-        [ make-FileArgs dup setup-read ReadFile ]
-        [ wait-for-file ]
-        [ finish-read ]
-        tri
-    ] with-destructors ;
+    [ dup handle>> refill ] with-destructors ;
 
 : console-app? ( -- ? ) GetConsoleWindow >boolean ;
 
@@ -288,10 +276,10 @@ SLOT: attributes
 
 : read-only? ( file-info -- ? )
     attributes>> +read-only+ swap member? ;
-    
+
 : set-file-attributes ( path flags -- )
     SetFileAttributes win32-error=0/f ;
-    
+
 : set-file-normal-attribute ( path -- )
     FILE_ATTRIBUTE_NORMAL set-file-attributes ;
 
