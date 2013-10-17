@@ -2,10 +2,12 @@
 ! Copyright (C) 2007, 2010 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax assocs continuations
-alien.destructors kernel namespaces accessors sets summary
-destructors destructors.private ;
+USING: accessors alien alien.c-types alien.destructors alien.syntax assocs
+combinators continuations destructors destructors.private kernel math
+namespaces prettyprint sequences sets summary system vocabs ;
 IN: libc
+
+<< "libc." os unparse append require >>
 
 LIBRARY: factor
 
@@ -22,6 +24,14 @@ FUNCTION-ALIAS: set-errno
     errno [ call ] dip set-errno ; inline
 
 LIBRARY: libc
+
+FUNCTION: c-string strerror ( int errno ) ;
+
+ERROR: libc-error errno message ;
+
+: (io-error) ( -- * ) errno dup strerror libc-error ;
+
+: io-error ( n -- ) 0 < [ (io-error) ] when ;
 
 FUNCTION-ALIAS: (malloc)
     void* malloc ( size_t size ) ;
