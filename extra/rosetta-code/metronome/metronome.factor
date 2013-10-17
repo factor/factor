@@ -1,9 +1,9 @@
 ! Copyright (C) 2013 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: accessors calendar circular colors.constants colors.hsv
-concurrency.semaphores continuations kernel math openal.example
-threads timers ui ui.gadgets ui.gadgets.worlds ui.pens.solid ;
+command-line continuations io kernel math math.parser namespaces
+openal.example sequences system timers ui ui.gadgets
+ui.pens.solid ;
 IN: rosetta-code.metronome
 
 : bpm>duration ( bpm -- duration ) 60 swap / seconds ;
@@ -17,28 +17,54 @@ IN: rosetta-code.metronome
 : play-note ( gadget freq -- )
     [ blink-gadget ] [ 0.3 play-sine blank-gadget ] 2bi ;
 
-: open-metronome-window ( -- gadget )
-    gadget new { 200 200 } >>pref-dim
-    dup "Metronome" open-window yield ;
+: metronome-iteration ( gadget circular -- )
+    [ first play-note ] [ rotate-circular ] bi ;
 
-: metronome-loop ( gadget notes semaphore -- )
-    [
-        acquire [ play-note ] [ drop find-world handle>> ] 2bi
-    ] curry with circular-loop ;
+TUPLE: metronome-gadget < gadget bpm notes timer ;
 
-: (start-metronome-timer) ( bpm semaphore -- timer )
-    [ release ] curry swap bpm>duration every ;
+: <metronome-gadget> ( bpm notes -- gadget )
+    \ metronome-gadget new swap >>notes swap >>bpm ;
 
-: start-metronome-timer ( bpm -- timer semaphore )
-    0 <semaphore> [ (start-metronome-timer) ] keep ;
+: metronome-quot ( gadget -- quot )
+    dup notes>> <circular> [ metronome-iteration ] 2curry ;
 
-: run-metronome ( semaphore notes -- )
-    [ open-metronome-window ] 2dip <circular> swap metronome-loop ;
+: metronome-timer ( gadget -- timer )
+    [ metronome-quot ] [ bpm>> bpm>duration ] bi every ;
 
-: metronome ( bpm notes -- )
-    [ start-metronome-timer ] dip
-    [ run-metronome ] 2curry [ stop-timer ] [ ] cleanup ;
+M: metronome-gadget graft* ( gadget -- )
+    [ metronome-timer ] keep timer<< ;
 
-: metronome-example ( -- ) 60 { 440 220 330 } metronome ;
+M: metronome-gadget ungraft*
+    timer>> stop-timer ;
 
-MAIN: metronome-example
+M: metronome-gadget pref-dim* drop { 200 200 } ;
+
+: metronome-defaults ( -- bpm notes ) 60 { 440 220 330 } ;
+
+: metronome-ui ( bpm notes -- ) <metronome-gadget> "Metronome" open-window ;
+
+: metronome-example ( -- ) metronome-defaults metronome-ui ;
+
+: validate-args ( int-args -- )
+    [ length 2 < ] [ [ 0 <= ] any? ] bi or [ "args error" throw ] when ;
+
+: (metronome-cmdline) ( args -- bpm notes )
+    [ string>number ] map dup validate-args
+    unclip swap ;
+
+: metronome-cmdline ( -- bpm notes )
+    command-line get [ metronome-defaults ] [ (metronome-cmdline) ] if-empty ;
+
+: print-defaults ( -- )
+  metronome-defaults swap prefix
+  [ " " write ] [ number>string write ] interleave nl ;
+
+: metronome-usage ( -- )
+    "Usage: metronome [BPM FREQUENCIES...]" print
+    "Arguments must be non-zero" print
+    "Example: metronome " write print-defaults flush ;
+
+: metronome-main ( -- )
+     [ [ metronome-cmdline metronome-ui ] [ drop metronome-usage 1 exit ] recover ] with-ui ;
+
+MAIN: metronome-main
