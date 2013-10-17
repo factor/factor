@@ -1,12 +1,11 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-assocs byte-arrays classes.struct combinators destructors
-io.backend io.encodings.8-bit.latin1 io.encodings.utf8
-io.pathnames io.sockets.secure kernel libc locals math
-math.order math.parser namespaces openssl openssl.libcrypto
-openssl.libssl random sequences splitting unicode.case
-io.files ;
+assocs byte-arrays classes.struct combinators destructors fry
+io.backend io.buffers io.encodings.8-bit.latin1 io.encodings.utf8
+io.files io.pathnames io.sockets.secure io.timeouts kernel libc
+locals math math.order math.parser namespaces openssl openssl.libssl
+openssl.libcrypto random sequences splitting unicode.case ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
@@ -161,6 +160,12 @@ SYMBOL: default-secure-context
         ] initialize-alien
     ] unless* ;
 
+: get-session ( addrspec -- session/f )
+    current-secure-context sessions>> at ;
+
+: save-session ( session addrspec -- )
+    current-secure-context sessions>> set-at ;
+
 : <ssl-handle> ( fd -- ssl )
     [
         ssl-handle new-disposable |dispose
@@ -168,6 +173,130 @@ SYMBOL: default-secure-context
         dup ssl-error >>handle
         swap >>file
     ] with-destructors ;
+
+: syscall-error ( handle r -- event )
+    nip
+    ERR_get_error [
+        {
+            { -1 [ errno ECONNRESET = [ premature-close ] [ (io-error) ] if ] }
+            ! OpenSSL docs say this it is an error condition for
+            ! a server to not send a close notify, but web
+            ! servers in the wild don't seem to do this, for
+            ! example https://www.google.com.
+            { 0 [ f ] }
+        } case
+    ] [ nip (ssl-error) ] if-zero ;
+
+: check-response ( port r -- port r n )
+    over handle>> handle>> over SSL_get_error ; inline
+
+: check-accept-response ( handle r -- event )
+    over handle>> over SSL_get_error
+    {
+        { SSL_ERROR_NONE [ 2drop f ] }
+        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
+        { SSL_ERROR_WANT_ACCEPT [ 2drop +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_ZERO_RETURN [ (ssl-error) ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
+    } case ;
+
+! Does this work on windows?
+: do-ssl-accept ( ssl-handle -- )
+    dup dup handle>> SSL_accept check-accept-response dup
+    [
+        [ dup file>> ] dip
+        2drop ! wait-for-fd, todo: figure out wait-for-fd for windows
+        do-ssl-accept
+    ] [ 2drop ] if ;
+
+: maybe-handshake ( ssl-handle -- )
+    dup connected>> [ drop ] [
+        t >>connected
+        [ do-ssl-accept ] with-timeout
+    ] if ;
+
+! Input ports
+: check-read-response ( port r -- event )
+    check-response
+    {
+        { SSL_ERROR_NONE [ swap buffer>> n>buffer f ] }
+        { SSL_ERROR_ZERO_RETURN [ 2drop f ] }
+        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
+    } case ;
+
+M: ssl-handle refill
+    dup maybe-handshake
+    handle>> ! ssl
+    over buffer>>
+    [ buffer-end ] ! buf
+    [ buffer-capacity ] bi ! len
+    SSL_read
+    check-read-response ;
+
+! Output ports
+: check-write-response ( port r -- event )
+    check-response
+    {
+        { SSL_ERROR_NONE [ swap buffer>> buffer-consume f ] }
+        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
+    } case ;
+
+M: ssl-handle drain
+    dup maybe-handshake
+    handle>> ! ssl
+    over buffer>>
+    [ buffer@ ] ! buf
+    [ buffer-length ] bi ! len
+    SSL_write
+    check-write-response ;
+
+! Connect
+: check-connect-response ( ssl-handle r -- event )
+    over handle>> over SSL_get_error
+    {
+        { SSL_ERROR_NONE [ 2drop f ] }
+        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
+    } case ;
+
+: do-ssl-connect ( ssl-handle -- )
+    dup dup handle>> SSL_connect check-connect-response dup
+    [ dupd 2drop do-ssl-connect ] [ 2drop ] if ;
+
+: resume-session ( ssl-handle ssl-session -- )
+    [ [ handle>> ] dip SSL_set_session ssl-error ]
+    [ drop do-ssl-connect ]
+    2bi ;
+
+: begin-session ( ssl-handle addrspec -- )
+    [ drop do-ssl-connect ]
+    [ [ handle>> SSL_get1_session ] dip save-session ]
+    2bi ;
+
+: secure-connection ( client-out addrspec -- )
+    [ handle>> ] dip
+    [
+        '[
+            _ dup get-session
+            [ resume-session ] [ begin-session ] ?if
+        ] with-timeout
+    ] [ drop t >>connected drop ] 2bi ;
+
+M: ssl-handle timeout
+    drop secure-socket-timeout get ;
+
+M: ssl-handle cancel-operation
+    file>> cancel-operation ;
 
 M: ssl-handle dispose*
     [
@@ -217,11 +346,5 @@ M: openssl check-certificate ( host ssl -- )
         [ check-subject-name ]
         2bi
     ] [ 2drop ] if ;
-
-: get-session ( addrspec -- session/f )
-    current-secure-context sessions>> at ;
-
-: save-session ( session addrspec -- )
-    current-secure-context sessions>> set-at ;
 
 openssl secure-socket-backend set-global
