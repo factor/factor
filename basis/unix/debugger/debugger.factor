@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors debugger io kernel prettyprint unix ;
+USING: accessors debugger io kernel libc prettyprint unix ;
 IN: unix.debugger
 
-M: unix-error error.
+M: libc-error error.
     "Unix system call failed:" print
     nl
     dup message>> write " (" write errno>> pprint ")" print ;

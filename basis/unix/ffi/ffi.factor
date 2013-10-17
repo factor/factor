@@ -45,8 +45,6 @@ CONSTANT: DT_WHT      14
 
 LIBRARY: libc
 
-FUNCTION: c-string strerror ( int errno ) ;
-
 STRUCT: group
     { gr_name c-string }
     { gr_passwd c-string }
