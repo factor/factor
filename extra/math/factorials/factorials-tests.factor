@@ -6,6 +6,10 @@ IN: math.factorials
 [ 1 ] [ 1 factorial ] unit-test
 [ 3628800 ] [ 10 factorial ] unit-test
 
+{ { 1 1 2 6 24 120 720 5040 40320 362880 3628800 } } [
+    10 factorials
+] unit-test
+
 {
     {
         1/0. 1/105 1/0. -1/15 1/0. 1/3 1/0. -1 1/0.
