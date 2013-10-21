@@ -202,13 +202,10 @@ SYMBOL: default-secure-context
         { SSL_ERROR_SSL [ (ssl-error) ] }
     } case ;
 
-! Does this work on windows?
 : do-ssl-accept ( ssl-handle -- )
     dup dup handle>> SSL_accept check-accept-response dup
     [
-        [ dup file>> ] dip
-        2drop ! wait-for-fd, todo: figure out wait-for-fd for windows
-        do-ssl-accept
+        [ dup file>> ] dip wait-for-fd do-ssl-accept
     ] [ 2drop ] if ;
 
 : maybe-handshake ( ssl-handle -- )

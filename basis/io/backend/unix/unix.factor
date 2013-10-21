@@ -69,7 +69,7 @@ ERROR: io-timeout ;
 
 M: io-timeout summary drop "I/O operation timed out" ;
 
-: wait-for-fd ( handle event -- )
+M: unix wait-for-fd ( handle event -- )
     dup +retry+ eq? [ 2drop ] [
         [ [ self ] dip handle-fd mx get-global ] dip {
             { +input+ [ add-input-callback ] }
