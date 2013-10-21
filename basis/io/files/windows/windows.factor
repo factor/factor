@@ -206,6 +206,9 @@ M: windows (wait-to-write) ( port -- )
 M: windows (wait-to-read) ( port -- )
     [ dup handle>> refill ] with-destructors drop ;
 
+M: windows wait-for-fd ( handle event -- )
+    2drop ;
+
 : console-app? ( -- ? ) GetConsoleWindow >boolean ;
 
 M: windows init-stdio
