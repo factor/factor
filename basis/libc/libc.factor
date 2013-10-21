@@ -4,10 +4,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.destructors alien.syntax assocs
 combinators continuations destructors destructors.private kernel math
-namespaces prettyprint sequences sets summary system vocabs ;
+namespaces prettyprint sequences sets summary system vocabs vocabs.parser ;
 IN: libc
 
-<< "libc." os unparse append require >>
+<< "libc." os unparse append use-vocab >>
 
 LIBRARY: factor
 

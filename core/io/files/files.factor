@@ -14,7 +14,7 @@ SYMBOL: +output+
 GENERIC: drain ( port handle -- event/f )
 GENERIC: refill ( port handle -- event/f )
 
-HOOK: wait-for-fd ( handle event -- )
+HOOK: wait-for-fd io-backend ( handle event -- )
 
 MIXIN: file-reader
 MIXIN: file-writer

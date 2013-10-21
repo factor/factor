@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data io.directories.unix kernel
+USING: alien.c-types alien.data io.directories.unix kernel libc
 system unix classes.struct unix.ffi ;
 IN: io.directories.unix.linux
 
