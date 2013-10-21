@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.struct kernel destructors bit-arrays
 sequences assocs specialized-arrays math namespaces
-locals fry unix unix.linux.epoll unix.time io.ports
+libc locals fry unix unix.linux.epoll unix.time io.ports
 io.backend.unix io.backend.unix.multiplexers ;
 SPECIALIZED-ARRAY: epoll-event
 IN: io.backend.unix.multiplexers.epoll

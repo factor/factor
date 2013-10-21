@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data calendar calendar.private
-classes.struct kernel math system unix unix.time unix.types ;
+classes.struct kernel math system libc unix unix.time unix.types ;
 IN: calendar.unix
 
 : timeval>seconds ( timeval -- seconds )

@@ -3,7 +3,7 @@
 USING: kernel io.backend io.monitors io.monitors.recursive
 io.files io.pathnames io.buffers io.ports io.timeouts
 io.backend.unix io.encodings.utf8 unix.linux.inotify assocs
-namespaces make threads continuations init math math.bitwise
+namespaces make threads continuations init libc math math.bitwise
 sets alien alien.strings alien.c-types vocabs.loader accessors
 system hashtables destructors unix classes.struct literals ;
 FROM: namespaces => set ;

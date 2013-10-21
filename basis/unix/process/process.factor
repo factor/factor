@@ -1,7 +1,7 @@
 USING: kernel alien.c-types alien.data alien.strings sequences
 math alien.syntax unix namespaces continuations threads assocs
-io.backend.unix io.encodings.utf8 unix.types unix.utilities fry 
-unix.ffi ;
+io.backend.unix io.encodings.utf8 libc unix.types unix.utilities
+fry unix.ffi ;
 IN: unix.process
 
 ! Low-level Unix process launching utilities. These are used

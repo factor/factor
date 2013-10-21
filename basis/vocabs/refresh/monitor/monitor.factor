@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs command-line concurrency.messaging
 continuations init io.backend io.files io.monitors io.pathnames
-kernel namespaces sequences sets splitting threads fry
+kernel libc namespaces sequences sets splitting threads fry
 tr vocabs vocabs.loader vocabs.refresh vocabs.cache
 io.files.links ;
 IN: vocabs.refresh.monitor

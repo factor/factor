@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unix byte-arrays kernel io.backend.unix math.bitwise
-io.ports io.files io.files.private io.pathnames environment
+io.ports io.files io.files.private io.pathnames libc environment
 destructors system unix.ffi literals ;
 IN: io.files.unix
 

@@ -3,9 +3,9 @@
 USING: accessors alien.c-types alien.data arrays assocs
 combinators continuations environment io io.backend
 io.backend.unix io.files io.files.private io.files.unix
-io.launcher io.pathnames io.ports kernel math namespaces
-sequences strings system threads unix unix.process unix.ffi
-simple-tokenizer ;
+io.launcher io.pathnames io.ports kernel libc math
+namespaces sequences strings system threads unix unix.process
+unix.ffi simple-tokenizer ;
 IN: io.launcher.unix
 
 : get-arguments ( process -- seq )
