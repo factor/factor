@@ -1,5 +1,5 @@
 USING: alien.syntax ;
-IN: libc.macosx
+IN: libc
 
 LIBRARY: libc
 
