@@ -7,7 +7,7 @@ combinators continuations destructors destructors.private kernel math
 namespaces prettyprint sequences sets summary system vocabs vocabs.parser ;
 IN: libc
 
-<< "libc." os unparse append use-vocab >>
+<< "libc." os unparse append require >>
 
 LIBRARY: factor
 

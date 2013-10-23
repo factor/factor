@@ -1,5 +1,5 @@
 USING: alien.syntax ;
-IN: libc.linux
+IN: libc
 
 LIBRARY: libc
 
