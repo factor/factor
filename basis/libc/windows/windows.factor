@@ -1,5 +1,5 @@
 USING: alien.syntax ;
-IN: libc.windows
+IN: libc
 
 LIBRARY: libc
 
