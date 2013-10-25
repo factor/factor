@@ -2,6 +2,7 @@ USING:
     accessors
     alien alien.accessors alien.c-types alien.data alien.strings
     arrays
+    io.encodings.utf8
     kernel
     math
     pcre.ffi pcre.utils
@@ -22,7 +23,7 @@ IN: pcre.info
     PCRE_INFO_NAMEENTRYSIZE fullinfo ;
 
 : name-table-entry ( addr -- group-index group-name )
-    [ <alien> 1 alien-unsigned-1 ] [ 2 + <alien> alien>native-string ] bi ;
+    [ <alien> 1 alien-unsigned-1 ] [ 2 + <alien> utf8 alien>string ] bi ;
 
 : options ( pcre -- opts )
     f PCRE_INFO_OPTIONS fullinfo ;
