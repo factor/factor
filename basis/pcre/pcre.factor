@@ -72,7 +72,7 @@ TUPLE: matcher pcre extra subject ofs exec-opts match ;
 
 : parse-match ( subject nametable match-data -- match )
     swapd first2 swap [ substring-list ] keep void* <c-direct-array>
-    [ alien>native-string ] { } map-as [ of swap 2array ] with map-index ;
+    [ utf8 alien>string ] { } map-as [ of swap 2array ] with map-index ;
 
 ! High-level
 : <compiled-pcre> ( expr -- compiled-pcre )

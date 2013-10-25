@@ -1,4 +1,4 @@
-USING: accessors pcre pcre.info sequences tools.test ;
+USING: accessors pcre pcre.info pcre.utils sequences tools.test ;
 
 [ { { 3 "day" } { 2 "month" } { 1 "year" } } ]
 [
