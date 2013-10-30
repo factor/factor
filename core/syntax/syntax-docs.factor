@@ -161,6 +161,7 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\0" } "a null byte (ASCII 0)" }
     { { $snippet "\\e" } "escape (ASCII 27)" }
     { { $snippet "\\\"" } { $snippet "\"" } }
+    { { $snippet "\\x" { $emphasis "xx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xx" } } } }
     { { $snippet "\\u" { $emphasis "xxxxxx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xxxxxx" } } } }
     { { $snippet "\\u{" { $emphasis "name" } "}" } { "The Unicode code point named " { $snippet { $emphasis "name" } } } }
 } ;
