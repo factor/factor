@@ -46,7 +46,8 @@ TUPLE: processor-info
     { clflush-size integer }
     { cache-alignment integer }
     { address-sizes array }
-    { power-management string } ;
+    { power-management string }
+    { tlb-size string } ;
 
 
 ERROR: unknown-cpuinfo-line string ;
@@ -90,6 +91,7 @@ ERROR: unknown-cpuinfo-line string ;
         { "stepping" [ string>number >>stepping ] }
         { "vendor_id" [ >>vendor-id ] }
         { "wp" [ "yes" = >>wp? ] }
+        { "TLB size" [ >>tlb-size ] }
         [ unknown-cpuinfo-line ]
     } case ;
 
