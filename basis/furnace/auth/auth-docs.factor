@@ -196,7 +196,7 @@ $nl
 "Authentication realms can be adorned with additional functionality."
 { $subsections "furnace.auth.features" }
 "An administration tool."
-{ $subsections "furnace.auth.user-admin" }
+{ $subsections "webapps.user-admin" }
 "A concrete example."
 { $subsections "furnace.auth.example" } ;
 

@@ -13,7 +13,7 @@ HELP: make-admin
 { $values { "username" string } }
 { $description "Makes an existing user into an administrator by giving them the " { $link can-administer-users? } " capability, thus allowing them to use the user admin tool." } ;
 
-ARTICLE: "furnace.auth.user-admin" "Furnace user administration tool"
+ARTICLE: "webapps.user-admin" "Furnace user administration tool"
 "The " { $vocab-link "webapps.user-admin" } " vocabulary implements a web application for adding, removing and editing users in authentication realms that use " { $link "furnace.auth.providers.db" } "."
 { $subsections <user-admin> }
 "Access to the web app itself is protected, and only users having an administrative capability can access it:"
