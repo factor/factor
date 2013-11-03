@@ -27,3 +27,5 @@ M: basic-auth-realm logged-in-username ( realm -- uid )
     drop
     request get "authorization" header parse-basic-auth
     dup [ over check-login swap and ] [ 2drop f ] if ;
+
+M: basic-auth-realm init-realm drop ;
