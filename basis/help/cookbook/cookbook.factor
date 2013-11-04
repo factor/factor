@@ -239,10 +239,8 @@ command-line get [
 "Now, the " { $snippet "grep.factor" } " script will start up much faster. See " { $link "images" } " for details."
 { $heading "Executable scripts" }
 "It is also possible to make executable scripts. A Factor file can begin with a comment like the following:"
-{ $code "#! /usr/bin/env factor" }
+{ $code "#!/usr/bin/env factor" }
 "If the text file is made executable, then it can be run, assuming the " { $snippet "factor" } " binary is in your " { $snippet "$PATH" } "."
-$nl
-"The space between " { $snippet "#!" } " and " { $snippet "/usr/bin/env" } " is necessary, since " { $link POSTPONE: #! } " is a parsing word, and a syntax error would otherwise result."
 { $references
     { }
     "command-line"
