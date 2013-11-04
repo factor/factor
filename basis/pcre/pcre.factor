@@ -10,6 +10,7 @@ USING:
     pcre.ffi pcre.info pcre.utils
     sequences sequences.generalizations
     strings ;
+QUALIFIED: regexp
 IN: pcre
 
 ERROR: malformed-regexp expr error ;
@@ -89,6 +90,9 @@ M: compiled-pcre findall
 
 M: string findall
     <compiled-pcre> findall ;
+
+M: regexp:regexp findall
+    raw>> findall ;
 
 : matches? ( subject obj -- ? )
     dupd findall [ nip length 1 = ] [ ?first ?first ?last = ] 2bi and ;

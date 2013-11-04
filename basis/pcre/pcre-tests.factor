@@ -10,6 +10,7 @@ USING:
     sequences
     system
     tools.test ;
+QUALIFIED: regexp
 IN: pcre.tests
 
 CONSTANT: iso-date "(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})"
@@ -117,3 +118,6 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE config ] unit-test ] when
     "http://factorcode.org/" http-get nip
     "href=\"(?P<link>[^\"]+)\"" findall [ "link" of ] map sequence?
 ] unit-test
+
+! Test that the regexp syntax works.
+[ t ] [ "1234abcd" regexp:R[ ^\d+\w+$] matches? ] unit-test
