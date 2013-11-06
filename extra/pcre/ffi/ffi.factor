@@ -8,6 +8,7 @@ IN: pcre.ffi
 ! http://sourceforge.net/projects/gnuwin32/files/pcre/7.0/pcre-7.0-bin.zip/download
 
 << "pcre" {
+    { [ os macosx? ] [ "libpcre.dylib" ] }
     { [ os unix? ] [ "libpcre.so" ] }
     { [ os windows? ] [ "pcre3.dll" ] }
 } cond cdecl add-library >>
