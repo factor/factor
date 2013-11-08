@@ -4,6 +4,7 @@ USING:
     assocs
     combinators
     formatting
+    fry
     io io.encodings.utf8 io.launcher io.pathnames
     kernel
     sequences
@@ -16,23 +17,17 @@ IN: alien.libraries.finder
     [ 1array ] dip vsprintf ;
 
 CONSTANT: name-formats {
-    { windows { "lib%s.dll" "%s.dll" } }
+    { windows { "%s.dll" "lib%s.dll" } }
     { linux { "lib%s.so" } }
     { unix { "lib%s.so" } }
-    { macosx { "lib%s.0.dylib" } }
+    { macosx { "lib%s.dylib" } }
 }
 
 ! On Windows, bundled dlls are shipped in a directory named "dlls" in
 ! the Factor distribution. On other operating systems, the dynamic
 ! linker can itself figure out where libraries are located.
-CONSTANT: search-paths {
-    { windows { "" "dlls" } }
-    { unix { "" } }
-    { macosx { "" } }
-}
-
 : path-formats ( -- path-formats )
-    search-paths name-formats [ os of ] bi@
+    { "" } os windows? [ "dlls" suffix ] when name-formats os of
     [ append-path ] cartesian-map concat ;
 
 ! Find lib using ldconfig
@@ -53,14 +48,11 @@ CONSTANT: mach-map {
     [ start 0 = ] [ ldconfig-filter = ] bi* and ;
 
 : ldconfig-find-soname ( lib -- seq )
-    name-formats os of first vsprintf1
     ldconfig-cache [ first2 ldconfig-matches? ] with filter [ first ] map ;
 
 : candidate-paths ( name -- paths )
-    {
-        { [ os windows? ] [ path-formats [ vsprintf1 ] with map ] }
-        { [ os linux? ] [ ldconfig-find-soname ] }
-    } cond ;
+    path-formats [ vsprintf1 ] with map
+    os [ unix? ] [ linux? ] bi or [ first ldconfig-find-soname ] when ;
 
 : find-library ( name -- path/f )
     candidate-paths [ dlopen dll-valid? ] map-find nip ;
