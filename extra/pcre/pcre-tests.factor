@@ -35,6 +35,10 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE config ] unit-test ] when
 
 [ 1 ] [ PCRE_CONFIG_UNICODE_PROPERTIES config ] unit-test
 
+! libpcre must not support 16 or 32 bit code points.
+[ 0 ] [ PCRE_CONFIG_UTF16 config ] unit-test
+[ 0 ] [ PCRE_CONFIG_UTF32 config ] unit-test
+
 ! Tests for findall
 [
     { { f "1999-01-12" } { "year" "1999" } { "month" "01" } { "day" "12" } }
