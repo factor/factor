@@ -132,6 +132,10 @@ CONSTANT: PCRE_CONFIG_STACKRECURSE            5
 CONSTANT: PCRE_CONFIG_UNICODE_PROPERTIES      6
 CONSTANT: PCRE_CONFIG_MATCH_LIMIT_RECURSION   7
 CONSTANT: PCRE_CONFIG_BSR                     8
+CONSTANT: PCRE_CONFIG_JIT                     9
+CONSTANT: PCRE_CONFIG_UTF16                  10
+CONSTANT: PCRE_CONFIG_JITTARGET              11
+CONSTANT: PCRE_CONFIG_UTF32                  12
 
 
 STRUCT: pcre_extra
@@ -187,3 +191,5 @@ FUNCTION: int pcre_get_substring_list ( c-string subject,
 FUNCTION: c-string pcre_version ( ) ;
 
 FUNCTION: uchar* pcre_maketables ( ) ;
+
+FUNCTION: void pcre_free ( void* pcre ) ;
