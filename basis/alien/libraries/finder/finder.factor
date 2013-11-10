@@ -4,7 +4,6 @@ USING:
     assocs
     combinators
     formatting
-    fry
     io io.encodings.utf8 io.launcher io.pathnames
     kernel
     sequences
