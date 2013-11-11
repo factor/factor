@@ -1,4 +1,4 @@
-USING: accessors pcre pcre.info pcre.utils sequences tools.test ;
+USING: accessors continuations pcre pcre.info pcre.utils sequences tools.test ;
 
 [ { { 3 "day" } { 2 "month" } { 1 "year" } } ]
 [
@@ -7,3 +7,8 @@ USING: accessors pcre pcre.info pcre.utils sequences tools.test ;
 ] unit-test
 
 [ { 100 110 120 130 } ] [ 100 10 4 gen-array-addrs ] unit-test
+
+[ 33 ]
+[
+    [ "foo" <pcre> f 33 fullinfo ] [ what>> ] recover
+] unit-test

@@ -9,9 +9,14 @@ USING:
     sequences ;
 IN: pcre.info
 
+ERROR: bad-option what ;
+
 ! Mostly internal
+: (fullinfo) ( pcre extra what -- ret obj )
+    { int } [ pcre_fullinfo ] with-out-parameters ;
+
 : fullinfo ( pcre extra what -- obj )
-    { int } [ pcre_fullinfo ] with-out-parameters nip ;
+    [ (fullinfo) ] keep rot 0 = [ drop ] [ bad-option ] if ;
 
 : name-count ( pcre extra -- n )
     PCRE_INFO_NAMECOUNT fullinfo ;
