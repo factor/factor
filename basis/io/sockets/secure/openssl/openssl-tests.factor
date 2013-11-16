@@ -1,13 +1,6 @@
-USING:
-    accessors
-    alien
-    http.client
-    io.sockets io.sockets.private io.sockets.secure.openssl
-    kernel
-    openssl.libcrypto openssl.libssl
-    sequences
-    tools.test
-    urls ;
+USING: accessors alien http.client io.sockets io.sockets.private
+io.sockets.secure.openssl kernel openssl.libcrypto openssl.libssl
+sequences tools.test urls unix.ffi ;
 IN: io.sockets.secure.openssl.tests
 
 : new-ssl ( -- ssl )

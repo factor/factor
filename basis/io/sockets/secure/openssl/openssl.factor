@@ -5,7 +5,8 @@ assocs byte-arrays classes.struct combinators destructors
 io.backend io.encodings.8-bit.latin1 io.encodings.utf8
 io.pathnames io.sockets.secure kernel libc locals math
 math.order math.parser namespaces openssl openssl.libcrypto
-openssl.libssl random sequences splitting unicode.case ;
+openssl.libssl random sequences splitting unicode.case
+io.files ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
@@ -23,9 +24,17 @@ TUPLE: openssl-context < secure-context aliens sessions ;
     [ 32 random-bits >hex dup length SSL_CTX_set_session_id_context ssl-error ]
     bi ;
 
+ERROR: file-expected path ;
+
+: ensure-exists ( path -- path )
+    dup exists? [ file-expected ] unless ; inline
+
+: ssl-file-path ( path -- path' )
+    absolute-path ensure-exists ;
+
 : load-certificate-chain ( ctx -- )
     dup config>> key-file>> [
-        [ handle>> ] [ config>> key-file>> absolute-path ] bi
+        [ handle>> ] [ config>> key-file>> ssl-file-path ] bi
         SSL_CTX_use_certificate_chain_file
         ssl-error
     ] [ drop ] if ;
@@ -55,7 +64,8 @@ TUPLE: openssl-context < secure-context aliens sessions ;
 
 : use-private-key-file ( ctx -- )
     dup config>> key-file>> [
-        [ handle>> ] [ config>> key-file>> absolute-path ] bi
+        [ handle>> ]
+        [ config>> key-file>> ssl-file-path ] bi
         SSL_FILETYPE_PEM SSL_CTX_use_PrivateKey_file
         ssl-error
     ] [ drop ] if ;
@@ -65,8 +75,8 @@ TUPLE: openssl-context < secure-context aliens sessions ;
         [ handle>> ]
         [
             config>>
-            [ ca-file>> dup [ absolute-path ] when ]
-            [ ca-path>> dup [ absolute-path ] when ] bi
+            [ ca-file>> dup [ ssl-file-path ] when ]
+            [ ca-path>> dup [ ssl-file-path ] when ] bi
         ] bi
         SSL_CTX_load_verify_locations
     ] [ handle>> SSL_CTX_set_default_verify_paths ] if ssl-error ;
