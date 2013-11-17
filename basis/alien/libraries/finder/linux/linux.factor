@@ -26,7 +26,7 @@ CONSTANT: mach-map {
     [ start 0 = ] [ ldconfig-filter = ] bi* and ;
 
 : ldconfig-find-soname ( lib -- seq )
-    ldconfig-cache [ first2 ldconfig-matches? ] with filter [ first ] map ;
+    ldconfig-cache [ first2 ldconfig-matches? ] with filter [ third ] map ;
 
 PRIVATE>
 
