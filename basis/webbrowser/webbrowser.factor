@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators combinators.short-circuit present sequences strings system
-ui.operations urls vocabs ;
+USING: combinators combinators.short-circuit io.pathnames
+present sequences strings system ui.operations urls vocabs ;
 
 IN: webbrowser
 
@@ -15,7 +15,9 @@ HOOK: open-file os ( path -- )
 } cond require
 
 : open-url ( url -- )
-    >url present open-file ;
+    >url open-file ;
+
+[ pathname? ] \ open-file H{ } define-operation
 
 [ url? ] \ open-url H{ } define-operation
 
