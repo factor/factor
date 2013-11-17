@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: dns io kernel math.parser sequences ;
+USING: arrays dns fry io kernel math.parser sequences ;
 IN: tools.dns
 
 : a-line. ( host ip -- )
@@ -32,3 +32,11 @@ IN: tools.dns
     [ dns-A-query a-message. ]
     [ dns-AAAA-query aaaa-message. ]
     [ dns-MX-query mx-message. ] tri ;
+
+GENERIC# dns-host 1 ( servers domain -- )
+
+M: sequence dns-host ( servers domain -- )
+    '[ _ host ] with-dns-servers ;
+
+M: string dns-host
+    [ 1array ] dip dns-host ;
