@@ -1,9 +1,9 @@
 ! Copyright (C) 2013 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: alien.libraries alien.libraries.finder assocs io
-io.encodings.utf8 io.launcher kernel sequences splitting system
-;
+USING: alien.libraries alien.libraries.finder assocs
+combinators.short-circuit io io.encodings.utf8 io.files
+io.files.info io.launcher kernel sequences splitting system ;
 
 IN: alien.libraries.finder.linux
 
