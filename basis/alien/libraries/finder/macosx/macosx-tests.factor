@@ -1,5 +1,6 @@
 
-USING: sequences tools.test ;
+USING: alien.libraries.finder.macosx.private sequences
+tools.test ;
 
 IN: alien.libraries.finder.macosx
 
@@ -28,7 +29,7 @@ IN: alien.libraries.finder.macosx
         "Location/Name.framework/Versions/A"
         "Location/Name.framework/Versions/A/Name"
         "Location/Name.framework/Versions/A/Name_suffix"
-    } [ <framework-info> ] map
+    } [ make-framework-info ] map
 ] unit-test
 
 {
