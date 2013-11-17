@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays fry kernel machine-learning.transformer
-math.extras sequences sets sorting ;
+sequences sets sorting sorting.extras ;
 IN: machine-learning.label-binarizer
 
 TUPLE: label-binarizer classes_ ;
@@ -14,7 +14,7 @@ M: label-binarizer fit-y
 
 M: label-binarizer transform-y
     classes_>> dup length '[
-        _ search-sorted [ 1 ] dip _ 0 <array> [ set-nth ] keep
+        _ bisect-left [ 1 ] dip _ 0 <array> [ set-nth ] keep
     ] map ;
 
 M: label-binarizer inverse-transform-y
