@@ -31,6 +31,6 @@ CONSTANT: mach-map {
 PRIVATE>
 
 M: linux find-library
-    "lib" ".so" surround ldconfig-find-soname
-    [ dlopen dll-valid? ] map-find nip ;
-
+    "lib" ".so" surround ldconfig-find-soname [
+        { [ exists? ] [ file-info regular-file? ] } 1&&
+    ] map-find nip ;
