@@ -1,6 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays dns fry io kernel math.parser sequences ;
+USING: arrays dns fry io kernel math.parser sequences
+strings ;
 IN: tools.dns
 
 : a-line. ( host ip -- )
