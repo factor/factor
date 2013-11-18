@@ -68,8 +68,11 @@ HELP: mdfind
     "Return all files in the users home folder that have been modified in the last 3 days"
     { $code "\"~\" [ \"kMDItemFSContentChangeDate >= $time.today (-3)\" mdfind ] with-directory" }
 }
-{ $notes
-    "This word uses the " { $link current-directory } " to restrict the search, choosing to search from the root ('" { $snippet "/" } "') if not set." } ;
+{ $notes "This word uses the " { $link current-directory } " to restrict the search, choosing to search from the root ('" { $snippet "/" } "') if not set." } ;
+
+HELP: mdfind.
+{ $values { "query" string } }
+{ $description "Similar to " { $link mdfind } ", but prints out the results as a list of " { $link pathname } " objects, allowing you to right-click and \"Open File\" if used with the " { $snippet "webbrowser" } " vocabulary." } ;
 
 HELP: mdls
 { $values { "path" "string or pathname" } }
