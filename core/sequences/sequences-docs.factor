@@ -945,7 +945,13 @@ HELP: shorter?
 
 HELP: head?
 { $values { "seq" sequence } { "begin" sequence } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "seq" } " starts with " { $snippet "begin" } ". If " { $snippet "begin" } " is longer than " { $snippet "seq" } ", this word outputs " { $link f } "." } ;
+{ $description "Tests if " { $snippet "seq" } " starts with " { $snippet "begin" } ". If " { $snippet "begin" } " is longer than " { $snippet "seq" } ", this word outputs " { $link f } "." }
+{ $examples
+  { $example
+    "root-cache get keys [ \"help.l\" head? ] filter ."
+    "{ \"help.lint.checks\" \"help.lint.private\" \"help.lint\" }"
+  }
+} ;
 
 HELP: tail?
 { $values { "seq" sequence } { "end" sequence } { "?" "a boolean" } }

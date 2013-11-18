@@ -346,6 +346,18 @@ HELP: deprecated?
 { $description "Tests if an object is " { $link POSTPONE: deprecated } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
+HELP: subwords
+{ $values { "word" word } }
+{ $description "Lists all specializations for the given word." }
+{ $examples
+  { $example
+    "USING: math.functions ;"
+    "clear \ sin subwords ."
+    "{ M\ object sin M\ complex sin M\ real sin M\ float sin }"
+  }
+}
+{ $notes "Outputs " { $link f } " if the word isn't generic." } ;
+
 HELP: make-deprecated
 { $values { "word" word } }
 { $description "Declares a word as " { $link POSTPONE: deprecated } "." }
