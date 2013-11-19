@@ -129,6 +129,11 @@ M: integer set-effective-user ( id -- )
 M: string set-effective-user ( string -- )
     ?user-id (set-effective-user) ;
 
+ERROR: no-such-user obj ;
+
+: user-home ( name/uid -- path )
+    dup user-passwd [ nip dir>> ] [ no-such-user ] if* ;
+
 os {
     { [ dup macosx? ] [ drop "unix.users.macosx" require ] }
     { [ dup linux? ] [ drop ] }
