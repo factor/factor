@@ -68,7 +68,7 @@ PRIVATE>
     absolute-path "mdimport " prepend run-process-output ;
 
 : mdimport-with ( path options -- seq )
-    absolute-path swap "mdimport %s %s" sprintf run-process-output ;
+    swap absolute-path "mdimport %s %s" sprintf run-process-output ;
 
 MEMO: kMDItems ( -- seq )
     "mdimport -A" run-process-output
