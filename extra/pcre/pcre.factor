@@ -1,17 +1,50 @@
-USING:
-    accessors
-    alien.c-types alien.data alien.enums alien.strings
-    arrays
-    assocs
-    io.encodings.utf8 io.encodings.string
-    kernel
-    math
-    mirrors
-    pcre.ffi pcre.info pcre.utils
-    sequences sequences.generalizations
-    strings ;
+USING: accessors alien alien.accessors alien.c-types alien.data
+alien.enums alien.strings arrays assocs fry io.encodings.string
+io.encodings.utf8 kernel math math.bitwise mirrors pcre.ffi
+sequences sequences.generalizations splitting strings ;
 QUALIFIED: regexp
 IN: pcre
+
+<PRIVATE
+
+: 2with ( param1 param2 obj quot -- obj curry )
+    [ -rot ] dip [ [ rot ] dip call ] 3curry ; inline
+
+: gen-array-addrs ( base size n -- addrs )
+    iota [ * + ] 2with map ;
+
+: utf8-start-byte? ( byte -- ? )
+    0xc0 bitand 0x80 = not ;
+
+: next-utf8-char ( byte-array pos -- pos' )
+    1 + 2dup swap ?nth
+    [ utf8-start-byte? [ nip ] [ next-utf8-char ] if ] [ 2drop f ] if* ;
+
+: fullinfo ( pcre extra what -- obj )
+    { int } [ pcre_fullinfo ] with-out-parameters nip ;
+
+: name-count ( pcre extra -- n )
+    PCRE_INFO_NAMECOUNT fullinfo ;
+
+: name-table ( pcre extra -- addr )
+    [ drop alien-address 32 on-bits unmask ]
+    [ PCRE_INFO_NAMETABLE fullinfo ] 2bi + ;
+
+: name-entry-size ( pcre extra -- size )
+    PCRE_INFO_NAMEENTRYSIZE fullinfo ;
+
+: name-table-entry ( addr -- group-index group-name )
+    [ <alien> 1 alien-unsigned-1 ] 
+    [ 2 + <alien> utf8 alien>string ] bi ; 
+
+: options ( pcre -- opts ) 
+    f PCRE_INFO_OPTIONS fullinfo ;
+
+: name-table-entries ( pcre extra -- addrs )
+    [ name-table ] [ name-entry-size ] [ name-count ] 2tri
+    gen-array-addrs [ name-table-entry 2array ] map ;
+
+PRIVATE>
 
 ERROR: malformed-regexp expr error ;
 ERROR: pcre-error value ;
@@ -86,7 +119,7 @@ GENERIC: findall ( subject obj -- matches )
 
 M: compiled-pcre findall
     [ <matcher> [ findnext ] follow [ match>> ] map harvest ]
-    [ nametable>> rot [ parse-match ] 2with map ] 2bi >array ;
+    [ nametable>> rot [ parse-match ] 2with { } map-as ] 2bi ;
 
 M: string findall
     <compiled-pcre> findall ;
@@ -96,6 +129,16 @@ M: regexp:regexp findall
 
 : matches? ( subject obj -- ? )
     dupd findall [ nip length 1 = ] [ ?first ?first ?last = ] 2bi and ;
+
+<PRIVATE
+
+: replace-all ( seq subseqs new -- seq )
+    swapd '[ _ replace ] reduce ;
+
+: split-subseqs ( seq subseqs -- seqs )
+    dup first [ replace-all ] keep split-subseq [ >string ] map harvest ;
+
+PRIVATE>
 
 : split ( subject obj -- strings )
     dupd findall [ first second ] map split-subseqs ;
