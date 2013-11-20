@@ -1,17 +1,18 @@
-USING:
-    accessors
-    arrays
-    assocs
-    http.client
-    kernel
-    math math.ranges
-    pcre pcre.ffi pcre.info
-    random
-    sequences
-    system
-    tools.test ;
+USING: accessors arrays assocs http.client kernel math.ranges
+pcre pcre.ffi pcre.private random sequences system tools.test ;
 QUALIFIED: regexp
 IN: pcre.tests
+
+[ { "Bords" "words" "word" } ] [
+    "Bords, words, word." { ", " ", " "." } split-subseqs
+] unit-test
+
+[ { { 3 "day" } { 2 "month" } { 1 "year" } } ] [
+    "(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})"
+    <compiled-pcre> nametable>>
+] unit-test
+
+[ { 100 110 120 130 } ] [ 100 10 4 gen-array-addrs ] unit-test
 
 CONSTANT: iso-date "(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})"
 
