@@ -137,15 +137,15 @@ CONSTANT: PCRE_CONFIG_UTF16                  10
 CONSTANT: PCRE_CONFIG_JITTARGET              11
 CONSTANT: PCRE_CONFIG_UTF32                  12
 
-
 STRUCT: pcre_extra
-    { flags int }
+    { flags ulonglong }
     { study_data void* }
-    { match_limit long }
+    { match_limit ulonglong }
     { callout_data void* }
     { tables uchar* }
-    { match_limit_recursion int }
-    { mark uchar** } ;
+    { match_limit_recursion ulonglong }
+    { mark uchar** }
+    { executable_jit void* } ;
 
 FUNCTION: void pcre_config ( int what, void* where ) ;
 

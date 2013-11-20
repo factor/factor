@@ -4,7 +4,7 @@ USING:
     arrays
     io.encodings.utf8
     kernel
-    math
+    math math.bitwise
     pcre.ffi pcre.utils
     sequences ;
 IN: pcre.info
@@ -17,18 +17,20 @@ IN: pcre.info
     PCRE_INFO_NAMECOUNT fullinfo ;
 
 : name-table ( pcre extra -- addr )
-    PCRE_INFO_NAMETABLE fullinfo ;
+    [ drop alien-address 32 on-bits unmask ]
+    [ PCRE_INFO_NAMETABLE fullinfo ] 2bi + ;
 
 : name-entry-size ( pcre extra -- size )
     PCRE_INFO_NAMEENTRYSIZE fullinfo ;
 
 : name-table-entry ( addr -- group-index group-name )
-    [ <alien> 1 alien-unsigned-1 ] [ 2 + <alien> utf8 alien>string ] bi ;
+    [ <alien> 1 alien-unsigned-1 ]
+    [ 2 + <alien> utf8 alien>string ] bi ;
 
 : options ( pcre -- opts )
     f PCRE_INFO_OPTIONS fullinfo ;
 
 ! Exported
 : name-table-entries ( pcre extra -- addrs )
-    [ name-table ] [ name-entry-size ] [ name-count ] 2tri gen-array-addrs
-    [ name-table-entry 2array ] map ;
+    [ name-table ] [ name-entry-size ] [ name-count ] 2tri
+    gen-array-addrs [ name-table-entry 2array ] map ;
