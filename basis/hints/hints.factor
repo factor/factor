@@ -119,7 +119,7 @@ set-specializer
 
 \ member? { { array } { string } } set-specializer
 
-\ member-eq? { array } set-specializer
+\ member-eq? { { array } { string } } set-specializer
 
 \ assoc-stack { vector } set-specializer
 
