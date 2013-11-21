@@ -42,6 +42,8 @@ GENERIC: >yuva ( color -- yuva )
 
 M: object >yuva >rgba >yuva ;
 
+M: yuva >yuva ; inline
+
 M:: rgba >yuva ( rgba -- yuva )
     rgba >rgba-components :> ( r g b a )
     Wr r * Wg g * Wb b * + + :> y

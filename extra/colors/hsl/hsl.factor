@@ -47,6 +47,8 @@ GENERIC: >hsla ( color -- hsla )
 
 M: object >hsla >rgba >hsla ;
 
+M: hsla >hsla ; inline
+
 M: rgba >hsla
     >rgba-components [| r g b |
         r g b min min :> min-c
