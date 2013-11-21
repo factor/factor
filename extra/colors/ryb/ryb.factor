@@ -71,5 +71,7 @@ GENERIC: >ryba ( color -- ryba )
 
 M: object >ryba >rgba >ryba ;
 
+M: ryba >ryba ; inline
+
 M: rgba >ryba
     >rgba-components [ [ rgb>ryb ] normalized ] [ <ryba> ] bi* ;
