@@ -28,6 +28,8 @@ GENERIC: >yiqa ( color -- yiqa )
 
 M: object >yiqa >rgba >yiqa ;
 
+M: yiqa >yiqa ; inline
+
 M:: rgba >yiqa ( rgba -- yiqa )
     rgba >rgba-components :> ( r g b a )
     0.30 r *  0.59 g * 0.11 b * + + :> y

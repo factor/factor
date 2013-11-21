@@ -53,6 +53,8 @@ GENERIC: >hsva ( color -- hsva )
 
 M: object >hsva >rgba >hsva ;
 
+M: hsva >hsva ; inline
+
 M:: rgba >hsva ( rgba -- hsva )
     rgba >rgba-components :> ( r g b a )
     r g b sort-triple :> ( z y x )
