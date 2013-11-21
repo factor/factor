@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators concurrency.count-downs
+USING: arrays assocs combinators concurrency.count-downs
 concurrency.futures fry generalizations kernel macros sequences
 sequences.private sequences.product ;
 IN: concurrency.combinators
@@ -42,6 +42,14 @@ PRIVATE>
 
 : parallel-map ( seq quot: ( elt -- newelt ) -- newseq )
     [future] map future-values ; inline
+
+: parallel-assoc-map-as ( assoc quot: ( key value -- newkey newvalue ) exemplar -- newassoc )
+    [
+        [ 2array ] compose '[ _ 2curry future ] { } assoc>map future-values
+    ] dip assoc-like ;
+
+: parallel-assoc-map ( assoc quot: ( key value -- newkey newvalue ) -- newassoc )
+    over parallel-assoc-map-as ;
 
 : 2parallel-map ( seq1 seq2 quot: ( elt1 elt2 -- newelt ) -- newseq )
     '[ _ 2curry future ] 2map future-values ;

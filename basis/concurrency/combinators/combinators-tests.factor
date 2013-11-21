@@ -53,3 +53,9 @@ IN: concurrency.combinators.tests
     [ number>string ] 3 parallel-napply
     { [ "a" append ] [ "b" append ] [ "c" append ] } parallel-spread
 ] unit-test
+
+{ H{ { 0 4 } { 2 6 } { 4 8 } } } [
+    H{ { 1 2 } { 3 4 } { 5 6 } } [
+        [ 1 - ] [ 2 + ] bi*
+    ] parallel-assoc-map
+] unit-test
