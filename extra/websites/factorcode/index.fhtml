@@ -102,5 +102,12 @@ xml>string write-html
 <li><a href="http://paste.factorcode.org/">Factor community pastebin</a> - if you're in an IRC channel and want to share some code</li>
 </ul>
 
+<br>
+<table align="center"><tr>
+<td>Hosted provided by</td>
+<td><img src="rackspace.jpg" height="80" alt="Rackspace" /></td>
+</tr>
+</table>
+
 </body>
 </html>
