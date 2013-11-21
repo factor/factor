@@ -12,8 +12,6 @@ IN: pcre.tests
     <compiled-pcre> nametable>>
 ] unit-test
 
-[ { 100 110 120 130 } ] [ 100 10 4 gen-array-addrs ] unit-test
-
 CONSTANT: iso-date "(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})"
 
 ! On windows the erroffset appears to be set to 0 despite there being
@@ -29,16 +27,16 @@ CONSTANT: iso-date "(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})"
 
 [ t ] [ "foo" <compiled-pcre> PCRE_UTF8 has-option? ] unit-test
 
-os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE config ] unit-test ] when
+os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE pcre-config ] unit-test ] when
 
 ! In this day and age, not supporting utf-8 is broken.
-[ 1 ] [ PCRE_CONFIG_UTF8 config ] unit-test
+[ 1 ] [ PCRE_CONFIG_UTF8 pcre-config ] unit-test
 
-[ 1 ] [ PCRE_CONFIG_UNICODE_PROPERTIES config ] unit-test
+[ 1 ] [ PCRE_CONFIG_UNICODE_PROPERTIES pcre-config ] unit-test
 
 ! libpcre must not support 16 or 32 bit code points.
-[ 0 ] [ PCRE_CONFIG_UTF16 config ] unit-test
-[ 0 ] [ PCRE_CONFIG_UTF32 config ] unit-test
+[ 0 ] [ PCRE_CONFIG_UTF16 pcre-config ] unit-test
+[ 0 ] [ PCRE_CONFIG_UTF32 pcre-config ] unit-test
 
 ! Tests for findall
 [

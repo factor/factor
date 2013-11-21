@@ -1,7 +1,10 @@
+! Copyright (C) 2013 Björn Lindqvist
+! See http://factorcode.org/license.txt for BSD license
+
 USING: accessors alien alien.accessors alien.c-types alien.data
-alien.enums alien.strings arrays assocs fry io.encodings.string
-io.encodings.utf8 kernel literals math math.bitwise mirrors
-pcre.ffi sequences sequences.generalizations splitting strings ;
+alien.enums alien.strings arrays assocs combinators fry
+io.encodings.string io.encodings.utf8 kernel literals math
+math.bitwise pcre.ffi sequences splitting strings ;
 QUALIFIED: regexp
 IN: pcre
 
@@ -20,42 +23,43 @@ ERROR: pcre-error value ;
 : 2with ( param1 param2 obj quot -- obj curry )
     [ -rot ] dip [ [ rot ] dip call ] 3curry ; inline
 
-: gen-array-addrs ( base size n -- addrs )
-    iota [ * + ] 2with map ;
-
 : utf8-start-byte? ( byte -- ? )
     0xc0 bitand 0x80 = not ;
 
 : next-utf8-char ( byte-array pos -- pos' )
-    1 + 2dup swap ?nth
-    [ utf8-start-byte? [ nip ] [ next-utf8-char ] if ] [ 2drop f ] if* ;
+    1 + 2dup swap ?nth [
+        utf8-start-byte? [ nip ] [ next-utf8-char ] if
+    ] [ 2drop f ] if* ;
 
-: config ( what -- alien )
+: pcre-config ( what -- alien )
     { int } [ pcre_config ] with-out-parameters ;
 
-: fullinfo ( pcre extra what -- obj )
+: pcre-fullinfo ( pcre extra what -- obj )
     { int } [ pcre_fullinfo ] with-out-parameters nip ;
 
+: pcre-substring-list ( subject match-array count -- alien )
+    { void* } [ pcre_get_substring_list drop ] with-out-parameters ;
+
 : name-count ( pcre extra -- n )
-    PCRE_INFO_NAMECOUNT fullinfo ;
+    PCRE_INFO_NAMECOUNT pcre-fullinfo ;
 
 : name-table ( pcre extra -- addr )
     [ drop alien-address 32 on-bits unmask ]
-    [ PCRE_INFO_NAMETABLE fullinfo ] 2bi + ;
+    [ PCRE_INFO_NAMETABLE pcre-fullinfo ] 2bi + ;
 
 : name-entry-size ( pcre extra -- size )
-    PCRE_INFO_NAMEENTRYSIZE fullinfo ;
+    PCRE_INFO_NAMEENTRYSIZE pcre-fullinfo ;
 
 : name-table-entry ( addr -- group-index group-name )
-    [ <alien> 1 alien-unsigned-1 ] 
+    [ <alien> 1 alien-unsigned-1 ]
     [ 2 + <alien> utf8 alien>string ] bi ; 
-
-: options ( pcre -- opts )
-    f PCRE_INFO_OPTIONS fullinfo ;
 
 : name-table-entries ( pcre extra -- addrs )
     [ name-table ] [ name-entry-size ] [ name-count ] 2tri
-    gen-array-addrs [ name-table-entry 2array ] map ;
+    iota [ * + name-table-entry 2array ] 2with map ;
+
+: options ( pcre -- opts )
+    f PCRE_INFO_OPTIONS pcre-fullinfo ;
 
 CONSTANT: default-opts flags{ PCRE_UTF8 PCRE_UCP }
 
@@ -71,39 +75,43 @@ CONSTANT: default-opts flags{ PCRE_UTF8 PCRE_UCP }
 : exec ( pcre extra subject ofs opts -- count match-data )
     [ dup length ] 2dip 30 int <c-array> 30 [ pcre_exec ] 2keep drop ;
 
-TUPLE: matcher pcre extra subject ofs exec-opts match ;
+TUPLE: matcher pcre extra subject ofs exec-opts ;
 
 : <matcher> ( subject compiled-pcre -- matcher )
-    [ utf8 encode ] dip [ pcre>> ] [ extra>> ] bi rot 0 0 f matcher boa ;
+    [ utf8 encode ] dip [ pcre>> ] [ extra>> ] bi rot 0 0 matcher boa ;
 
 CONSTANT: empty-match-opts flags{ PCRE_NOTEMPTY_ATSTART PCRE_ANCHORED }
 
-: findnext ( matcher -- matcher'/f )
-    clone dup <mirror> values 6 firstn drop exec
-    over dup -1 < [ PCRE_ERRORS number>enum pcre-error ] when
-    -1 =
-    [
-        2drop dup exec-opts>> 0 =
-        [ drop f ]
-        [
-            dup [ subject>> ] [ ofs>> ] bi next-utf8-char
-            [ >>ofs 0 >>exec-opts findnext ] [ drop f ] if*
+: findnext ( matcher -- matcher match/f )
+    dup {
+        [ pcre>> ]
+        [ extra>> ]
+        [ subject>> ]
+        [ ofs>> ]
+        [ exec-opts>> ]
+    } cleave exec over dup -1 < [
+        PCRE_ERRORS number>enum pcre-error
+    ] [
+        -1 = [
+            2drop dup exec-opts>> 0 =
+            [ f ]
+            [
+                dup [ subject>> ] [ ofs>> ] bi next-utf8-char
+                [ >>ofs 0 >>exec-opts findnext ] [ f ] if*
+            ] if
+        ] [
+            [
+                nip
+                [ first2 = [ empty-match-opts ] [ 0 ] if >>exec-opts ]
+                [ second >>ofs ] bi
+            ] [
+                2array
+            ] 2bi
         ] if
-    ]
-    [
-        [ 2array >>match ]
-        [
-            nip
-            [ first2 = [ empty-match-opts ] [ 0 ] if >>exec-opts ]
-            [ second >>ofs ] bi
-        ] 2bi
     ] if ;
 
-: substring-list ( subject match-array count -- alien )
-    { void* } [ pcre_get_substring_list drop ] with-out-parameters ;
-
 : parse-match ( subject nametable match-data -- match )
-    swapd first2 swap [ substring-list ] keep void* <c-direct-array>
+    swapd first2 swap [ pcre-substring-list ] keep void* <c-direct-array>
     [ utf8 alien>string ] { } map-as [ of swap 2array ] with map-index ;
 
 PRIVATE>
@@ -119,7 +127,7 @@ TUPLE: compiled-pcre pcre extra nametable ;
 GENERIC: findall ( subject obj -- matches )
 
 M: compiled-pcre findall
-    [ <matcher> [ findnext ] follow [ match>> ] map harvest ]
+    [ <matcher> [ findnext dup ] [ ] produce 2nip ]
     [ nametable>> rot [ parse-match ] 2with { } map-as ] 2bi ;
 
 M: string findall
