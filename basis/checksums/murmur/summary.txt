@@ -1,0 +1,1 @@
+MurmurHash checksum algorithm
