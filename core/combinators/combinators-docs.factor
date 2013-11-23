@@ -402,4 +402,4 @@ HELP: distribute-buckets
 HELP: dispatch
 { $values { "n" "a fixnum" } { "array" "an array of quotations" } }
 { $description "Calls the " { $snippet "n" } "th quotation in the array." }
-{ $warning "This word is in the " { $vocab-link "kernel.private" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;
+{ $warning "This word is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;
