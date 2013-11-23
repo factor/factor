@@ -1,4 +1,5 @@
-USING: checksums fry kernel math sequences tools.test ;
+USING: byte-arrays checksums fry kernel math sequences
+tools.test ;
 IN: checksums.superfast
 
 {
@@ -18,4 +19,12 @@ IN: checksums.superfast
 } [
     "1234567890" [ length 1 + ] keep 0 <superfast>
     '[ _ swap head _ checksum-bytes ] { } map-integers
+] unit-test
+
+
+{ t } [
+    "1234567890" dup >byte-array [
+        [ length 1 + ] keep 0 <superfast>
+        '[ _ swap head _ checksum-bytes ] { } map-integers
+    ] bi@ =
 ] unit-test

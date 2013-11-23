@@ -1,8 +1,10 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors checksums combinators fry grouping io.binary
-kernel math math.bitwise sequences sequences.private ;
+USING: accessors alien alien.data byte-arrays checksums
+combinators fry grouping io.binary kernel math math.bitwise
+math.ranges sequences sequences.private ;
+QUALIFIED-WITH: alien.c-types c
 
 IN: checksums.superfast
 
@@ -13,16 +15,28 @@ C: <superfast> superfast
 
 : 32-bit ( n -- n' ) 32 on-bits mask ; inline
 
-: main-loop ( seq seed -- hash )
-    [ 4 <groups> ] dip [
-        2 cut-slice
-        [ le> + ] [ le> 11 shift dupd bitxor ] bi*
-        [ 16 shift ] [ bitxor ] bi* 32-bit
-        [ -11 shift ] [ + ] bi
-    ] reduce ; inline
+: main-loop ( seq hash -- seq hash' )
+    over byte-array? little-endian? and [
+        [ 0 over length 4 - 4 <range> ] dip
+        [
+            pick
+            [ <displaced-alien> c:short deref ]
+            [ [ 2 + ] dip <displaced-alien> c:short deref ] 2bi
+            [ + ] [ 11 shift dupd bitxor ] bi*
+            [ 16 shift ] [ bitxor ] bi* 32-bit
+            [ -11 shift ] [ + ] bi
+        ] reduce
+    ] [
+        [ dup length 4 mod dupd head-slice* 4 <groups> ] dip [
+            2 cut-slice
+            [ le> + ] [ le> 11 shift dupd bitxor ] bi*
+            [ 16 shift ] [ bitxor ] bi* 32-bit
+            [ -11 shift ] [ + ] bi
+        ] reduce
+    ] if ; inline
 
-: end-case ( hash seq -- hash' )
-    dup length {
+: end-case ( seq hash -- hash' )
+    swap dup length 4 mod [ tail-slice* ] keep {
         [ drop ]
         [
             first + [ 10 shift ] [ bitxor ] bi 32-bit
@@ -51,5 +65,4 @@ C: <superfast> superfast
 PRIVATE>
 
 M: superfast checksum-bytes
-    [ dup length 4 mod cut* ] [ seed>> 32-bit ] bi*
-    '[ _ main-loop ] [ end-case ] bi* avalanche ;
+    seed>> 32-bit main-loop end-case avalanche ;
