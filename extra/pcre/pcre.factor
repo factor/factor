@@ -31,8 +31,15 @@ ERROR: pcre-error value ;
         utf8-start-byte? [ nip ] [ next-utf8-char ] if
     ] [ 2drop f ] if* ;
 
-: pcre-config ( what -- alien )
-    { int } [ pcre_config ] with-out-parameters ;
+: pcre-config ( what -- value )
+    dup {
+        PCRE_CONFIG_MATCH_LIMIT
+        PCRE_CONFIG_MATCH_LIMIT_RECURSION
+    } member? [
+        { long } [ pcre_config ] with-out-parameters
+    ] [
+        { int } [ pcre_config ] with-out-parameters
+    ] if dup PCRE_ERROR_BADOPTION = [ pcre-error ] when ;
 
 : pcre-fullinfo ( pcre extra what -- obj )
     { int } [ pcre_fullinfo ] with-out-parameters nip ;
