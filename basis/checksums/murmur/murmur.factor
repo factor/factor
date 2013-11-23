@@ -1,8 +1,9 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors checksums fry grouping io.binary kernel math
-math.bitwise sequences ;
+USING: accessors alien alien.c-types alien.data byte-arrays
+checksums fry grouping io.binary kernel math math.bitwise
+math.ranges sequences ;
 
 IN: checksums.murmur
 
@@ -30,14 +31,28 @@ CONSTANT: n 0xe6546b64
 : hash-chunk ( hash k -- hash' )
     (hash-chunk) bitxor r2 rotl m * n + 32-bit ; inline
 
+: main-loop ( seq hash -- seq hash' )
+    over byte-array? little-endian? and [
+        [ 0 over length 4 - 4 <range> ] dip
+        [ pick <displaced-alien> int deref hash-chunk ] reduce
+    ] [
+        [ dup length 4 mod dupd head-slice* 4 <groups> ] dip
+        [ le> hash-chunk ] reduce
+    ] if ; inline
+
+: end-case ( seq hash -- hash' )
+    swap dup length
+    [ 4 mod tail-slice* be> (hash-chunk) bitxor ]
+    [ bitxor ] bi 32-bit ; inline
+
+: avalanche ( hash -- hash' )
+    [ -16 shift ] [ bitxor 0x85ebca6b * 32-bit ] bi
+    [ -13 shift ] [ bitxor 0xc2b2ae35 * 32-bit ] bi
+    [ -16 shift ] [ bitxor ] bi ; inline
+
 PRIVATE>
 
 M: murmur3-32 checksum-bytes ( bytes checksum -- value )
-    [ [ length ] keep over 4 mod cut* ] [ seed>> 32-bit ] bi*
-    '[ 4 <groups> _ [ le> hash-chunk ] reduce ]
-    [ be> (hash-chunk) bitxor bitxor 32-bit ] bi*
-    [ -16 shift ] [ bitxor 0x85ebca6b * 32-bit ] bi
-    [ -13 shift ] [ bitxor 0xc2b2ae35 * 32-bit ] bi
-    [ -16 shift ] [ bitxor ] bi ;
+    seed>> 32-bit main-loop end-case avalanche ;
 
 INSTANCE: murmur3-32 checksum
