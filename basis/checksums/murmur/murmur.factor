@@ -1,7 +1,9 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors checksums fry grouping io.binary kernel math
 math.bitwise sequences ;
+
 IN: checksums.murmur
 
 TUPLE: murmur3-32 seed ;
@@ -36,6 +38,6 @@ M: murmur3-32 checksum-bytes ( bytes checksum -- value )
     [ be> (hash-chunk) bitxor bitxor 32-bit ] bi*
     [ -16 shift ] [ bitxor 0x85ebca6b * 32-bit ] bi
     [ -13 shift ] [ bitxor 0xc2b2ae35 * 32-bit ] bi
-    [ -16 shift ] [ bitxor 32 >signed ] bi ;
+    [ -16 shift ] [ bitxor ] bi ;
 
 INSTANCE: murmur3-32 checksum
