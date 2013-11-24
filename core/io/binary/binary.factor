@@ -3,7 +3,7 @@
 USING: kernel math sequences ;
 IN: io.binary
 
-: le> ( seq -- x ) dup length iota 0 [ 8 * shift + ] 2reduce ;
+: le> ( seq -- x ) 0 [ 8 * shift + ] reduce-index ;
 
 : be> ( seq -- x ) 0 [ [ 8 shift ] dip + ] reduce ;
 
@@ -31,9 +31,13 @@ PRIVATE>
 : h>b/b ( h -- b1 b2 )
     [ mask-byte ] [ -8 shift mask-byte ] bi ;
 
-: signed-le> ( bytes -- x )
-    [ le> ] [ length 8 * 1 - 2^ 1 - ] bi
-    2dup > [ bitnot bitor ] [ drop ] if ;
+<PRIVATE
 
-: signed-be> ( bytes -- x )
-    <reversed> signed-le> ;
+: signed> ( x seq -- n )
+    length 8 * 1 - 2^ 1 - 2dup > [ bitnot bitor ] [ drop ] if ; inline
+
+PRIVATE>
+
+: signed-le> ( bytes -- x ) [ le> ] [ signed> ] bi ;
+
+: signed-be> ( bytes -- x ) [ be> ] [ signed> ] bi ;
