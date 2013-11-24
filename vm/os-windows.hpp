@@ -50,8 +50,6 @@ typedef HANDLE THREADHANDLE;
 
 #define FACTOR_OS_STRING "windows"
 
-#define FACTOR_DLL NULL
-
 // SSE traps raise these exception codes, which are defined in internal NT
 // headers
 // but not winbase.h
