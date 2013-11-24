@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Daniel Ehrenberg, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators destructors io io.streams.plain
-kernel math namespaces sbufs sequences sequences.private
-splitting strings ;
+USING: accessors byte-arrays combinators destructors io
+io.streams.plain kernel kernel.private math namespaces sbufs
+sequences sequences.private splitting strings strings.private ;
 IN: io.encodings
 
 ! The encoding descriptor protocol
@@ -35,6 +35,19 @@ PRIVATE>
     [ 100 <sbuf> ] dip read-until-loop ; inline
 
 M: object decode-until (decode-until) ;
+
+<PRIVATE
+
+: string>byte-array-fast ( string -- byte-array )
+    { string } declare ! aux>> must be f
+    [ length ] keep over <byte-array> [
+        [
+            [ [ string-nth-fast ] 2keep drop ]
+            [ set-nth-unsafe ] bi*
+        ] 2curry each-integer
+    ] keep ; inline
+
+PRIVATE>
 
 GENERIC: encode-char ( char stream encoding -- )
 
