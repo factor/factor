@@ -20,16 +20,14 @@ CONSTANT: n 0xe6546b64
 
 <PRIVATE
 
-: 32-bit ( n -- n' ) 32 on-bits mask ; inline
-
 : rotl ( k r -- k' )
     [ shift ] [ 32 - shift ] 2bi bitor ; inline
 
 : (hash-chunk) ( k -- k' )
-    c1 * 32-bit r1 rotl c2 * 32-bit ; inline
+    c1 * 32 bits r1 rotl c2 * 32 bits ; inline
 
 : hash-chunk ( hash k -- hash' )
-    (hash-chunk) bitxor r2 rotl m * n + 32-bit ; inline
+    (hash-chunk) bitxor r2 rotl m * n + 32 bits ; inline
 
 : main-loop ( seq hash -- seq hash' )
     over byte-array? little-endian? and [
@@ -43,16 +41,16 @@ CONSTANT: n 0xe6546b64
 : end-case ( seq hash -- hash' )
     swap dup length
     [ 4 mod tail-slice* be> (hash-chunk) bitxor ]
-    [ bitxor ] bi 32-bit ; inline
+    [ bitxor ] bi 32 bits ; inline
 
 : avalanche ( hash -- hash' )
-    [ -16 shift ] [ bitxor 0x85ebca6b * 32-bit ] bi
-    [ -13 shift ] [ bitxor 0xc2b2ae35 * 32-bit ] bi
+    [ -16 shift ] [ bitxor 0x85ebca6b * 32 bits ] bi
+    [ -13 shift ] [ bitxor 0xc2b2ae35 * 32 bits ] bi
     [ -16 shift ] [ bitxor ] bi ; inline
 
 PRIVATE>
 
 M: murmur3-32 checksum-bytes ( bytes checksum -- value )
-    seed>> 32-bit main-loop end-case avalanche ;
+    seed>> 32 bits main-loop end-case avalanche ;
 
 INSTANCE: murmur3-32 checksum
