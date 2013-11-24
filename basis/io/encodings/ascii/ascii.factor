@@ -15,7 +15,7 @@ M: ascii encode-string
     [
         dup aux>>
         [ [ dup 127 <= [ encode-error ] unless ] B{ } map-as ]
-        [ >byte-array ]
+        [ string>byte-array-fast ]
         if
     ] dip
     stream-write ;
