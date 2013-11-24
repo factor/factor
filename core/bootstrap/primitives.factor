@@ -44,8 +44,8 @@ init-caches
 
 bootstrapping? on
 
-call( -- )
-call( -- )
+call( -- ) ! layouts quot
+call( -- ) ! arch quot
 
 ! Vocabulary for slot accessors
 "accessors" create-vocab drop
@@ -55,7 +55,7 @@ num-types get f <array> builtins set
 
 [
 
-call( -- )
+call( -- ) ! syntax-quot
 
 ! Create some empty vocabs where the below primitives and
 ! classes will go
