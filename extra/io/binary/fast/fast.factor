@@ -3,6 +3,8 @@
 USING: combinators combinators.smart fry kernel macros math
 math.ranges sequences sequences.generalizations io.binary
 locals ;
+RENAME: be> io.binary => slow-be>
+RENAME: le> io.binary => slow-le>
 IN: io.binary.fast
 
 ERROR: bad-length bytes n ;
@@ -36,7 +38,22 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
 : 4be> ( bytes -- x ) 4 n-be> ;
 : 8be> ( bytes -- x ) 8 n-be> ;
 
+: be> ( bytes -- x )
+    dup length {
+        { 2 [ 2be> ] }
+        { 4 [ 4be> ] }
+        { 8 [ 8be> ] }
+        [ drop slow-be> ]
+    } case ;
+
 : 2le> ( bytes -- x ) 2 n-le> ;
 : 4le> ( bytes -- x ) 4 n-le> ;
 : 8le> ( bytes -- x ) 8 n-le> ;
 
+: le> ( bytes -- x )
+    dup length {
+        { 2 [ 2le> ] }
+        { 4 [ 4le> ] }
+        { 8 [ 8le> ] }
+        [ drop slow-le> ]
+    } case ;
