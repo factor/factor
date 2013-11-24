@@ -12,24 +12,23 @@ C: <superfast> superfast
 
 <PRIVATE
 
+: 16-bit ( n -- n' ) 16 on-bits mask ; inline
+
 : 32-bit ( n -- n' ) 32 on-bits mask ; inline
 
-: (main-loop) ( hash m n -- hash' )
+: (main-loop) ( hash n -- hash' )
+    [ 16-bit ] [ -16 shift ] bi
     [ + ] [ 11 shift dupd bitxor ] bi*
     [ 16 shift ] [ bitxor ] bi* 32-bit
     [ -11 shift ] [ + ] bi ; inline
 
 : main-loop ( seq hash -- seq hash' )
     over byte-array? little-endian? and [
-        [ 0 over length 4 - 4 <range> ] dip [
-            pick <displaced-alien> int deref
-            [ 16 on-bits mask ] [ -16 shift ] bi
-            (main-loop)
-        ] reduce
+        [ 0 over length 4 - 4 <range> ] dip
+        [ pick <displaced-alien> int deref (main-loop) ] reduce
     ] [
-        [ dup length 4 mod dupd head-slice* 4 <groups> ] dip [
-            2 cut-slice [ le> ] bi@ (main-loop)
-        ] reduce
+        [ dup length 4 mod dupd head-slice* 4 <groups> ] dip
+        [ le> (main-loop) ] reduce
     ] if ; inline
 
 : end-case ( seq hash -- hash' )
@@ -52,12 +51,9 @@ C: <superfast> superfast
     } dispatch ; inline
 
 : avalanche ( hash -- hash' )
-    [ 3 shift ] [ bitxor ] bi 32-bit
-    [ -5 shift ] [ + ] bi
-    [ 4 shift ] [ bitxor ] bi 32-bit
-    [ -17 shift ] [ + ] bi
-    [ 25 shift ] [ bitxor ] bi 32-bit
-    [ -6 shift ] [ + ] bi ; inline
+    [ 3 shift ] [ bitxor ] bi 32-bit [ -5 shift ] [ + ] bi
+    [ 4 shift ] [ bitxor ] bi 32-bit [ -17 shift ] [ + ] bi
+    [ 25 shift ] [ bitxor ] bi 32-bit [ -6 shift ] [ + ] bi ; inline
 
 PRIVATE>
 
