@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io io.encodings
-io.encodings.private kernel math math.order scratchpad sequences ;
+io.encodings.private kernel math math.order sequences ;
 IN: io.encodings.utf8
 
 ! Decoding UTF-8
