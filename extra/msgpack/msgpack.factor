@@ -1,9 +1,11 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs byte-arrays byte-vectors combinators
-grouping hashtables io io.binary io.streams.string kernel math
-math.bitwise math.order sbufs sequences strings ;
+USING: arrays assocs byte-arrays combinators grouping hashtables
+io io.binary io.encodings io.encodings.binary
+io.encodings.string io.encodings.utf8 io.streams.byte-array
+io.streams.string kernel math math.bitwise math.order namespaces
+sequences strings ;
 
 IN: msgpack
 
@@ -43,10 +45,10 @@ ERROR: unknown-format n ;
         { [ dup 0xd3 = ] [ drop 8 read signed-be> ] }
         { [ dup 0xca = ] [ drop 4 read be> bits>float ] }
         { [ dup 0xcb = ] [ drop 8 read be> bits>double ] }
-        { [ dup 0xe0 mask 0xa0 = ] [ 0x1f mask read ] }
-        { [ dup 0xd9 = ] [ drop read1 read "" like ] }
-        { [ dup 0xda = ] [ drop 2 read be> read "" like ] }
-        { [ dup 0xdb = ] [ drop 4 read be> read "" like ] }
+        { [ dup 0xe0 mask 0xa0 = ] [ 0x1f mask read utf8 decode ] }
+        { [ dup 0xd9 = ] [ drop read1 read utf8 decode ] }
+        { [ dup 0xda = ] [ drop 2 read be> read utf8 decode ] }
+        { [ dup 0xdb = ] [ drop 4 read be> read utf8 decode ] }
         { [ dup 0xc4 = ] [ drop read1 read B{ } like ] }
         { [ dup 0xc5 = ] [ drop 2 read be> read B{ } like ] }
         { [ dup 0xc6 = ] [ drop 4 read be> read B{ } like ] }
@@ -83,7 +85,7 @@ M: integer write-msgpack
     dup 0 >= [
         {
             { [ dup 0x7f <= ] [ write1 ] }
-            { [ dup 0xff <= ] [ 0xcc write1 1 >be write ] }
+            { [ dup 0xff <= ] [ 0xcc write1 write1 ] }
             { [ dup 0xffff <= ] [ 0xcd write1 2 >be write ] }
             { [ dup 0xffffffff <= ] [ 0xce write1 4 >be write ] }
             { [ dup 0xffffffffffffffff <= ] [ 0xcf write1 8 >be write ] }
@@ -91,8 +93,8 @@ M: integer write-msgpack
         } cond
     ] [
         {
-            { [ dup -0x1f >= ] [ 1 >be write ] }
-            { [ dup -0x80 >= ] [ 0xd0 write1 1 >be write ] }
+            { [ dup -0x1f >= ] [ write1 ] }
+            { [ dup -0x80 >= ] [ 0xd0 write1 write1 ] }
             { [ dup -0x8000 >= ] [ 0xd1 write1 2 >be write ] }
             { [ dup -0x80000000 >= ] [ 0xd2 write1 4 >be write ] }
             { [ dup -0x8000000000000000 >= ] [ 0xd3 write1 8 >be write ] }
@@ -110,7 +112,7 @@ M: string write-msgpack
         { [ dup 0xffff <= ] [ 0xda write1 2 >be write ] }
         { [ dup 0xffffffff <= ] [ 0xdb write1 4 >be write ] }
         [ cannot-convert ]
-    } cond write ;
+    } cond output-stream get utf8 encode-string ;
 
 M: byte-array write-msgpack
     dup length {
@@ -145,8 +147,13 @@ M: assoc write-msgpack
 
 PRIVATE>
 
-: msgpack> ( string -- obj )
+GENERIC: msgpack> ( seq -- obj )
+
+M: string msgpack>
     [ read-msgpack ] with-string-reader ;
 
-: >msgpack ( obj -- string )
-    [ write-msgpack ] with-string-writer ;
+M: byte-array msgpack>
+    binary [ read-msgpack ] with-byte-reader ;
+
+: >msgpack ( obj -- bytes )
+    binary [ write-msgpack ] with-byte-writer ;
