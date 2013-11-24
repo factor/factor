@@ -51,24 +51,7 @@ HELP: bitroll
     { $example "USING: math.bitwise prettyprint ;" "0xffff0000 8 32 bitroll .h" "ff0000ff" }
 } ;
 
-HELP: bit-clear?
-{ $values
-     { "x" integer } { "n" integer }
-     { "?" "a boolean" }
-}
-{ $description "Returns " { $link t } " if the nth bit is set to zero." }
-{ $examples
-    { $example "USING: math.bitwise prettyprint ;"
-               "0xff 8 bit-clear? ."
-               "t"
-    }
-    { $example "USING: math.bitwise prettyprint ;"
-               "0xff 7 bit-clear? ."
-               "f"
-    }
-} ;
-
-{ bit? bit-clear? set-bit clear-bit } related-words
+{ bit? set-bit clear-bit } related-words
 
 HELP: bit-count
 { $values
@@ -441,10 +424,9 @@ $nl
     set-bit
     clear-bit
 }
-"Testing if bits are set or clear:"
+"Testing if bits are set:"
 { $subsections
     bit?
-    bit-clear?
 }
 "Extracting bits from an integer:"
 { $subsections
