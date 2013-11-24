@@ -34,7 +34,7 @@ PRIVATE>
 <PRIVATE
 
 : signed> ( x seq -- n )
-    length 8 * 1 - 2^ 1 - 2dup > [ bitnot bitor ] [ drop ] if ; inline
+    length 8 * 2dup 1 - bit? [ 2^ - ] [ drop ] if ; inline
 
 PRIVATE>
 
