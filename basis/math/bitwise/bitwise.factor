@@ -10,7 +10,6 @@ IN: math.bitwise
 ! utilities
 : clear-bit ( x n -- y ) 2^ bitnot bitand ; inline
 : set-bit ( x n -- y ) 2^ bitor ; inline
-: bit-clear? ( x n -- ? ) 2^ bitand zero? ; inline
 : unmask ( x n -- ? ) bitnot bitand ; inline
 : unmask? ( x n -- ? ) unmask zero? not ; inline
 : mask ( x n -- ? ) bitand ; inline
