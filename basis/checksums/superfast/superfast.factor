@@ -12,14 +12,10 @@ C: <superfast> superfast
 
 <PRIVATE
 
-: 16-bit ( n -- n' ) 16 on-bits mask ; inline
-
-: 32-bit ( n -- n' ) 32 on-bits mask ; inline
-
 : (main-loop) ( hash n -- hash' )
-    [ 16-bit ] [ -16 shift ] bi
+    [ 16 bits ] [ -16 shift ] bi
     [ + ] [ 11 shift dupd bitxor ] bi*
-    [ 16 shift ] [ bitxor ] bi* 32-bit
+    [ 16 shift ] [ bitxor ] bi* 32 bits
     [ -11 shift ] [ + ] bi ; inline
 
 : main-loop ( seq hash -- seq hash' )
@@ -35,27 +31,27 @@ C: <superfast> superfast
     swap dup length 4 mod [ tail-slice* ] keep {
         [ drop ]
         [
-            first + [ 10 shift ] [ bitxor ] bi 32-bit
+            first + [ 10 shift ] [ bitxor ] bi 32 bits
             [ -1 shift ] [ + ] bi
         ]
         [
-            le> + [ 11 shift ] [ bitxor ] bi 32-bit
+            le> + [ 11 shift ] [ bitxor ] bi 32 bits
             [ -17 shift ] [ + ] bi
         ]
         [
             unclip-last-slice
             [ le> + [ 16 shift ] [ bitxor ] bi ]
-            [ 18 shift bitxor ] bi* 32-bit
+            [ 18 shift bitxor ] bi* 32 bits
             [ -11 shift ] [ + ] bi
         ]
     } dispatch ; inline
 
 : avalanche ( hash -- hash' )
-    [ 3 shift ] [ bitxor ] bi 32-bit [ -5 shift ] [ + ] bi
-    [ 4 shift ] [ bitxor ] bi 32-bit [ -17 shift ] [ + ] bi
-    [ 25 shift ] [ bitxor ] bi 32-bit [ -6 shift ] [ + ] bi ; inline
+    [ 3 shift ] [ bitxor ] bi 32 bits [ -5 shift ] [ + ] bi
+    [ 4 shift ] [ bitxor ] bi 32 bits [ -17 shift ] [ + ] bi
+    [ 25 shift ] [ bitxor ] bi 32 bits [ -6 shift ] [ + ] bi ; inline
 
 PRIVATE>
 
 M: superfast checksum-bytes
-    seed>> 32-bit main-loop end-case avalanche ;
+    seed>> 32 bits main-loop end-case avalanche ;
