@@ -5,7 +5,7 @@ namespace factor {
 HMODULE hFactorDll;
 
 void factor_vm::init_ffi() {
-  hFactorDll = GetModuleHandle(FACTOR_DLL);
+  hFactorDll = GetModuleHandle(NULL);
   if (!hFactorDll)
     fatal_error("GetModuleHandle() failed", 0);
 }
