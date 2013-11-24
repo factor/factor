@@ -21,8 +21,7 @@ IN: math.bitwise
 : mask-bit ( m n -- m' ) 2^ mask ; inline
 : toggle-bit ( m n -- m' ) 2^ bitxor ; inline
 : >signed ( x n -- y )
-    [ bits ] keep 2dup neg 1 + shift
-    1 number= [ 2^ - ] [ drop ] if ;
+    [ bits ] keep 2dup 1 - bit? [ 2^ - ] [ drop ] if ; inline
 : >odd ( m -- n ) 0 set-bit ; foldable
 : >even ( m -- n ) 0 clear-bit ; foldable
 : next-even ( m -- n ) >even 2 + ; foldable
