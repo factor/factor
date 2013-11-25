@@ -54,10 +54,10 @@ ERROR: cl-error err ;
     [ size_t deref ] 2info ; inline
 
 : info-string ( handle name quot -- string )
-    [ ascii decode 1 head* ] info ; inline
+    [ ascii decode but-last ] info ; inline
 
 : 2info-string ( handle name quot -- string )
-    [ ascii decode 1 head* ] 2info ; inline
+    [ ascii decode but-last ] 2info ; inline
 
 : info-size_t-array ( handle name quot -- size_t-array )
     [ [ length size_t heap-size / ] keep swap size_t <c-direct-array> ] info ; inline
