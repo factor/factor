@@ -45,11 +45,11 @@ IN: compiler.tree.propagation.transforms
     in-d>> rem-custom-inlining
 ] "custom-inlining" set-word-prop
 
-: positive-fixnum? ( obj -- ? )
+: non-negative-fixnum? ( obj -- ? )
     { [ fixnum? ] [ 0 >= ] } 1&& ;
 
 : simplify-bitand? ( value1 value2 -- ? )
-    [ literal>> positive-fixnum? ]
+    [ literal>> non-negative-fixnum? ]
     [ class>> fixnum swap class<= ]
     bi* and ;
 
