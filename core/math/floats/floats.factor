@@ -50,10 +50,10 @@ M: float fp-nan?
     dup float= not ;
 
 M: float fp-qnan?
-    dup fp-nan? [ fp-nan-payload 51 2^ bitand zero? not ] [ drop f ] if ; inline
+    dup fp-nan? [ fp-nan-payload 51 bit? ] [ drop f ] if ; inline
 
 M: float fp-snan?
-    dup fp-nan? [ fp-nan-payload 51 2^ bitand zero? ] [ drop f ] if ; inline
+    dup fp-nan? [ fp-nan-payload 51 bit? not ] [ drop f ] if ; inline
 
 M: float fp-infinity?
     dup fp-special? [ fp-nan-payload zero? ] [ drop f ] if ; inline
