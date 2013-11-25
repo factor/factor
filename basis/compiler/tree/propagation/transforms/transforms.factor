@@ -318,7 +318,7 @@ M\ set intersects? [ intersects?-quot ] 1 define-partial-eval
 
 : bit-quot ( #call -- quot/f )
     in-d>> second value-info interval>> 0 fixnum-bits [a,b] interval-subset?
-    [ [ >fixnum ] dip fixnum-bit? ] f ? ;
+    [ [ integer>fixnum ] dip fixnum-bit? ] f ? ;
 
 \ bit? [ bit-quot ] "custom-inlining" set-word-prop
 
