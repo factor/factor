@@ -12,11 +12,9 @@ IN: io.encodings.string
             byte-array byte-array>string-fast
         ] [
             byte-array encoding <byte-reader> :> reader
-            byte-array length
-            encoding guess-decoded-length
-            reader stream-exemplar-growable new-resizable :> buf
+            byte-array length encoding guess-decoded-length <sbuf> :> buf
             [ reader stream-read1 dup ] [ buf push ] while drop
-            buf reader stream-exemplar like
+            buf "" like
         ] if
     ] if ; inline
 
