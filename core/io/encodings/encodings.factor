@@ -36,6 +36,8 @@ PRIVATE>
 
 M: object decode-until (decode-until) ;
 
+CONSTANT: replacement-char 0xfffd
+
 <PRIVATE
 
 : string>byte-array-fast ( string -- byte-array )
@@ -47,6 +49,20 @@ M: object decode-until (decode-until) ;
         ] 2curry each-integer
     ] keep ; inline
 
+: byte-array>string-fast ( byte-array -- string )
+    { byte-array } declare
+    [ length ] keep over 0 <string> [
+        [
+            [
+                [
+                    nth-unsafe dup 127 <=
+                    [ drop replacement-char ] unless
+                ] 2keep drop
+            ]
+            [ set-string-nth ] bi*
+        ] 2curry each-integer
+    ] keep dup reset-string-hashcode ;
+
 PRIVATE>
 
 GENERIC: encode-char ( char stream encoding -- )
@@ -56,8 +72,6 @@ GENERIC: encode-string ( string stream encoding -- )
 M: object encode-string [ encode-char ] 2curry each ; inline
 
 GENERIC: <decoder> ( stream encoding -- newstream )
-
-CONSTANT: replacement-char 0xfffd
 
 TUPLE: decoder { stream read-only } { code read-only } { cr boolean } ;
 INSTANCE: decoder input-stream
