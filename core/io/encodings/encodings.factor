@@ -53,13 +53,13 @@ CONSTANT: replacement-char 0xfffd
     { byte-array } declare
     [ length ] keep over 0 <string> [
         [
+            [ [ nth-unsafe ] 2keep drop ]
             [
-                [
-                    nth-unsafe dup 127 <=
-                    [ drop replacement-char ] unless
-                ] 2keep drop
-            ]
-            [ set-string-nth ] bi*
+                pick 127 <=
+                [ set-string-nth-fast ]
+                [ [ drop replacement-char ] 2dip set-string-nth-slow ]
+                if
+            ] bi*
         ] 2curry each-integer
     ] keep dup reset-string-hashcode ;
 
