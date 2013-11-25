@@ -16,9 +16,10 @@ M: ratio >fraction [ numerator ] [ denominator ] bi ; inline
 
 GENERIC: sqrt ( x -- y ) foldable
 
-M: real sqrt
-    >float dup 0.0 <
-    [ neg fsqrt [ 0.0 ] dip rect> ] [ fsqrt ] if ; inline
+M: real sqrt >float sqrt ; inline
+
+M: float sqrt
+    dup 0.0 < [ neg fsqrt [ 0.0 ] dip rect> ] [ fsqrt ] if ; inline
 
 : factor-2s ( n -- r s )
     #! factor an integer into 2^r * s
