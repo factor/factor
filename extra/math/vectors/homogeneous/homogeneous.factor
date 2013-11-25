@@ -3,7 +3,8 @@ USING: kernel math math.vectors sequences ;
 IN: math.vectors.homogeneous
 
 : (homogeneous-xyz) ( h -- xyz )
-    1 head* ; inline
+    but-last ; inline
+
 : (homogeneous-w) ( h -- w )
     last ; inline
 

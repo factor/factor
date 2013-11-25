@@ -9,7 +9,7 @@ M: sequence ppush swap suffix ;
 
 GENERIC: ppop ( seq -- seq' )
 
-M: sequence ppop 1 head* ;
+M: sequence ppop but-last ;
 
 GENERIC: new-nth ( val i seq -- seq' )
 
