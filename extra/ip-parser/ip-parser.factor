@@ -10,7 +10,7 @@ IN: ip-parser
 
 : cleanup-octal ( str -- str )
     dup { [ "0" head? ] [ "0x" head? not ] } 1&&
-    [ 1 tail "0o" prepend ] when ;
+    [ rest "0o" prepend ] when ;
 
 : split-components ( str -- array )
     "." split [ cleanup-octal string>number ] map ;

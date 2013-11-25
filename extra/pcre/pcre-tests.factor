@@ -17,7 +17,7 @@ CONSTANT: iso-date "(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})"
 ! On windows the erroffset appears to be set to 0 despite there being
 ! nothing wrong with the regexp.
 [ t ] [
-    "foo" (pcre) 3array 1 tail { { f -1 } { f 0 } } member?
+    "foo" (pcre) 3array rest { { f -1 } { f 0 } } member?
 ] unit-test
 
 [ { 1 2 3 } ] [
