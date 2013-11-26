@@ -1,5 +1,6 @@
-USING: accessors combinators fry kernel macros math math.ranges
-sequences sequences.generalizations sequences.private ;
+USING: accessors combinators fry grouping kernel macros math
+math.ranges sequences sequences.generalizations
+sequences.private ;
 
 IN: grouping.extras
 
@@ -41,3 +42,9 @@ INSTANCE: tail-clumps immutable-sequence
 
 : tail-clump ( seq -- array )
     [ <tail-clumps> ] [ [ like ] curry map ] bi ;
+
+: clump-as ( seq n exemplar -- array )
+    [ <clumps> ] dip [ like ] curry map ;
+
+: group-as ( seq n exemplar -- array )
+    [ <groups> ] dip [ like ] curry map ;
