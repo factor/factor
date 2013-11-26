@@ -110,9 +110,7 @@ M: float number>text
     ] bi* " point " glue ;
 
 M: complex number>text
-    >rect
-    [ number>text " i" append ]
-    [
+    >rect [ number>text ] [
         [ 0 < " minus " " plus " ? ]
-        [ abs number>text " j" append ] bi
+        [ abs number>text " i" append ] bi
     ] bi* 3append ;
