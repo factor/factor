@@ -11,7 +11,6 @@ IN: tzinfo
 <PRIVATE
 
 STRUCT: tzhead
-    { tzh_magic char[4] }
     { tzh_reserved char[16] }
     { tzh_ttisgmtcnt be32 }
     { tzh_ttisstdcnt be32 }
@@ -27,8 +26,8 @@ PACKED-STRUCT: ttinfo
 
 ERROR: bad-magic ;
 
-: check-magic ( header -- header )
-    dup tzh_magic>> "TZif" sequence= [ bad-magic ] unless ;
+: check-magic ( -- )
+    4 read "TZif" sequence= [ bad-magic ] unless ;
 
 TUPLE: tzfile header transition-times local-times types abbrevs
 leaps is-std is-gmt ;
@@ -39,7 +38,7 @@ C: <tzfile> tzfile
     4 read be32 deref ;
 
 : read-tzfile ( -- tzfile )
-    tzhead read-struct check-magic dup {
+    check-magic tzhead read-struct dup {
         [ tzh_timecnt>> [ read-be32 ] replicate ]
         [ tzh_timecnt>> [ read1 ] replicate ]
         [ tzh_typecnt>> [ ttinfo read-struct ] replicate ]
