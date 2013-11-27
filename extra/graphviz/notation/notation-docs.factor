@@ -356,7 +356,7 @@ $nl
 $nl
 "For example, since " { $link graph-attributes } " has a " { $slot "label" } " slot, the generic " { $link =label } " is defined, along with methods so that if " { $snippet "graphviz-obj" } " is a..."
 { $list
-    { "..." { $link graph } " or " { $link subgraph } ", a new " { $link graph-attributes } " instance is created, has its " { $slot "label" } " slot is set to " { $snippet "val" } ", and is " { $link add } "ed to " { $snippet "graphviz-obj" } "." }
+    { "..." { $link graph } " or " { $link subgraph } ", a new " { $link graph-attributes } " instance is created, has its " { $slot "label" } " slot set to " { $snippet "val" } ", and is " { $link add } "ed to " { $snippet "graphviz-obj" } "." }
     { "..." { $link graph-attributes } " instance, its " { $slot "label" } " slot is set to " { $snippet "val" } "." }
 }
 $nl
