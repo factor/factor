@@ -1,40 +1,71 @@
-USING: arrays formatting graphviz graphviz.ffi
-graphviz.notation graphviz.render graphviz.render.private
-io.directories io.files io.files.unique kernel locals math
-math.combinatorics math.parser sequences sets tools.test ;
-IN: graphviz.testing
+USING: accessors arrays assocs combinators.short-circuit
+continuations formatting graphviz graphviz.attributes
+graphviz.dot graphviz.notation graphviz.render
+graphviz.render.private images.loader.private io.directories
+io.directories.hierarchy io.files io.files.unique io.launcher
+io.pathnames kernel locals make math math.combinatorics
+math.parser memoize namespaces sequences sequences.extras sets
+splitting system tools.test ;
+FROM: namespaces => set ;
+IN: graphviz.tests
 
-! Don't want to test canvas formats, since they'll open a
-! separate window (even if it's closed, that'll call exit() and
-! kill the Factor process).
-!
-! In fact, the exit() issue is why we probably don't even want
-! these formats supported in general, and why we have
-! graphviz.render:preview & preview-window.  Should probably
-! gank them out of supported-formats in graphviz.ffi to begin
-! with.
-CONSTANT: canvas { "gtk" "x11" "xlib" }
+! XXX hack
+: force-error-message ( flag -- elts )
+    [
+        [ default-graphviz-program , , "?" , ] { } make
+        try-output-process
+        ! To balance the stack height, have to return a default
+        ! 'elts' value, though it shouldn't ever get pushed:
+        f
+    ] [
+        nip output>>
+        "Use one of: " split1 nip "\n" ?tail drop
+        " " split
+    ] recover ;
 
-! Had some issues with the following formats.  Graphviz 2.26.3
-! would die with "Error: deflation finish problem -2 cnt=0".
-! Could just be my installation, though.
-CONSTANT: zlib { "svgz" "vmlz" }
+! http://www.graphviz.org/Download_macos.php#comment-474
+: remove-sfdp-in-case-homebrew-is-dumb ( seq -- seq' )
+    os macosx? [ "sfdp" swap remove ] when ;
 
-! These are aliases for the neato flags -n/-n1/-n2, which
-! assume that all nodes have already been positioned, and thus
-! have "pos" attributes.  Since this clearly isn't always the
-! case for our tests, we skip them to avoid useless rendering
-! errors.
-CONSTANT: neato-aliases { "nop" "nop1" "nop2" }
+SYMBOLS: supported-layouts supported-formats ;
+
+: init-supported-layouts/formats ( -- )
+    "-K" force-error-message standard-layouts intersect
+    remove-sfdp-in-case-homebrew-is-dumb
+    supported-layouts set-global
+
+    "-T" force-error-message standard-formats intersect
+    supported-formats set-global ;
+
+! Can't use cleanup-unique-working-directory without fixing
+! issue #890, so skip the cleanup on Windows.
+:: cleanup-unique-working-directory* ( quot -- )
+    unique-directory :> path
+    path [ path quot with-temporary-directory ] with-directory
+    os windows? [ path delete-tree ] unless ; inline
+
+! Can't predict file extension since we use Graphviz's actual
+! -O flag, so just look to see that there seems to be some sort
+! of output.
+: graphviz-output-appears-to-exist? ( base -- ? )
+    current-directory get directory-files
+    [ swap head? ] with count 1 = ;
+
+: next! ( seq -- elt ) [ first ] [ 1 rotate! ] bi ;
 
 :: smoke-test ( graph -- pass? )
-    temporary-file :> -O
-    supported-formats canvas diff zlib diff [| -T |
-        supported-engines neato-aliases diff [| -K |
-            graph -O -T -K (graphviz)
-            [ exists? ] [ delete-file ] bi
-        ] all?
-    ] all? ;
+    supported-formats get-global next! :> -T 
+    supported-layouts get-global next! :> -K
+    [
+        graph "smoke-test" -T -K graphviz
+        "smoke-test" graphviz-output-appears-to-exist?
+    ] cleanup-unique-working-directory* ;
+
+: preview-smoke-test ( graph -- pass? )
+    f "pass?" [
+        [ exists? "pass?" set ] with-preview
+        "pass?" get
+    ] with-variable ;
 
 : K_n ( n -- graph )
     <graph>
@@ -42,10 +73,6 @@ CONSTANT: neato-aliases { "nop" "nop1" "nop2" }
     graph[ "t" =labelloc "circo" =layout ];
     over number>string "K " prepend =label
     swap iota 2 [ first2 add-edge ] each-combination ;
-
-{ t } [ 5 K_n smoke-test ] unit-test
-{ t } [ 6 K_n smoke-test ] unit-test
-{ t } [ 7 K_n smoke-test ] unit-test
 
 :: partite-set ( n color -- cluster )
     color <cluster>
@@ -64,10 +91,6 @@ CONSTANT: neato-aliases { "nop" "nop1" "nop2" }
     add-edge
     n m "K %d,%d" sprintf =label ;
 
-{ t } [ 3 3 K_n,m smoke-test ] unit-test
-{ t } [ 3 4 K_n,m smoke-test ] unit-test
-{ t } [ 5 4 K_n,m smoke-test ] unit-test
-
 : add-cycle ( graph n -- graph' )
     [ iota add-path ] [ 1 - 0 add-edge ] bi ;
 
@@ -78,10 +101,6 @@ CONSTANT: neato-aliases { "nop" "nop1" "nop2" }
     over number>string "C " prepend =label
     swap add-cycle ;
 
-{ t } [ 5 C_n smoke-test ] unit-test
-{ t } [ 6 C_n smoke-test ] unit-test
-{ t } [ 7 C_n smoke-test ] unit-test
-
 : W_n ( n -- graph )
     <graph>
     graph[ "t" =labelloc "twopi" =layout ];
@@ -90,10 +109,6 @@ CONSTANT: neato-aliases { "nop" "nop1" "nop2" }
     over add-node
     over 1 - add-cycle
     swap [ ] [ 1 - iota >array ] bi add-edge ;
-
-{ t } [ 6 W_n smoke-test ] unit-test
-{ t } [ 7 W_n smoke-test ] unit-test
-{ t } [ 8 W_n smoke-test ] unit-test
 
 : cluster-example ( -- graph )
     <digraph>
@@ -122,8 +137,6 @@ CONSTANT: neato-aliases { "nop" "nop1" "nop2" }
         "end" add-node[ "Msquare" =shape ];
     ;
 
-{ t } [ cluster-example smoke-test ] unit-test
-
 : colored-circle ( i -- node )
     [ <node> ] keep
     [ 16.0 / 0.5 + =width ]
@@ -142,8 +155,6 @@ CONSTANT: neato-aliases { "nop" "nop1" "nop2" }
     16 iota [
         [ 0 -- ] [ colored-circle add ] bi
     ] each ;
-
-{ t } [ colored-circles-example smoke-test ] unit-test
 
 : dfa-example ( -- graph )
     <digraph>
@@ -167,8 +178,6 @@ CONSTANT: neato-aliases { "nop" "nop1" "nop2" }
         "LR_8" "LR_6" ->[ "S(b)" =label ];
         "LR_8" "LR_5" ->[ "S(a)" =label ];
     ;
-
-{ t } [ dfa-example smoke-test ] unit-test
 
 : record-example ( -- graph )
     <digraph>
@@ -234,7 +243,84 @@ CONSTANT: neato-aliases { "nop" "nop1" "nop2" }
         "node11" "node1"  ->[ "f2" =tailport "f0" =headport ];
     ;
 
-{ t } [ record-example smoke-test ] unit-test
+:: with-global-value ( value variable quot -- )
+    variable get-global "orig" [
+        [ value variable set-global quot call ]
+        [ "orig" get variable set-global ] [ ] cleanup
+    ] with-variable ; inline
 
-! TODO add the examples from graphviz's source code (the .gv
-! files in graphs/directed/ and graphs/undirected/)
+: preview-format-test ( format -- pass? )
+    preview-format [
+        <graph> preview-smoke-test
+    ] with-global-value ;
+
+: valid-preview-formats ( -- formats )
+    types get keys "jpe" suffix
+    supported-formats get-global intersect ;
+
+: encoding-test ( encoding -- pass? )
+    graph-encoding [ <graph> smoke-test ] with-global-value ;
+
+default-graphviz-program [
+
+    init-supported-layouts/formats
+
+    { t } [ 5 K_n smoke-test ] unit-test
+    { t } [ 6 K_n smoke-test ] unit-test
+    { t } [ 7 K_n smoke-test ] unit-test
+    { t } [ 8 K_n preview-smoke-test ] unit-test
+
+    { t } [ 8 6 K_n,m smoke-test ] unit-test
+    { t } [ 7 5 K_n,m smoke-test ] unit-test
+    { t } [ 3 9 K_n,m smoke-test ] unit-test
+    { t } [ 3 4 K_n,m preview-smoke-test ] unit-test
+
+    { t } [ 5 C_n smoke-test ] unit-test
+    { t } [ 6 C_n smoke-test ] unit-test
+    { t } [ 7 C_n smoke-test ] unit-test
+    { t } [ 8 C_n preview-smoke-test ] unit-test
+
+    { t } [ 5 W_n smoke-test ] unit-test
+    { t } [ 6 W_n smoke-test ] unit-test
+    { t } [ 7 W_n smoke-test ] unit-test
+    { t } [ 8 W_n preview-smoke-test ] unit-test
+
+    { t } [ cluster-example smoke-test ] unit-test
+    { t } [ cluster-example preview-smoke-test ] unit-test
+
+    { t } [ colored-circles-example smoke-test ] unit-test
+    { t } [ colored-circles-example preview-smoke-test ] unit-test
+
+    { t } [ dfa-example smoke-test ] unit-test
+    { t } [ dfa-example preview-smoke-test ] unit-test
+
+    { t } [ record-example smoke-test ] unit-test
+    { t } [ record-example preview-smoke-test ] unit-test
+
+    { t } [
+        valid-preview-formats [ preview-format-test ] all?
+    ] unit-test
+
+    [
+        supported-formats get-global valid-preview-formats diff
+        [ preview-format-test ] attempt-all
+    ] [ unsupported-preview-format? ] must-fail-with
+
+    { t }
+    [
+        USE: io.encodings.8-bit.latin1
+        latin1 encoding-test
+    ] unit-test
+
+    { t }
+    [
+        USE: io.encodings.utf8
+        utf8 encoding-test
+    ] unit-test
+
+    [
+        USE: io.encodings.ascii
+        ascii encoding-test
+    ] [ unsupported-encoding? ] must-fail-with
+
+] when

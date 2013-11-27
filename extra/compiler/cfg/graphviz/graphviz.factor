@@ -101,3 +101,7 @@ SYMBOL: passes
 
 : watch-optimizer ( quot -- )
     [ "" ] dip watch-optimizer* ;
+
+: ssa. ( quot -- ) test-ssa [ cfgviz preview ] each ;
+: flat. ( quot -- ) test-flat [ cfgviz preview ] each ;
+: regs. ( quot -- ) test-regs [ cfgviz preview ] each ;
