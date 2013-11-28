@@ -1,17 +1,14 @@
 USING:
-    alien alien.c-types alien.data alien.libraries alien.syntax
+    alien alien.c-types alien.data
+    alien.libraries alien.libraries.finder
+    alien.syntax
     classes.struct
     combinators
+    kernel
     system ;
 IN: pcre.ffi
 
-! http://sourceforge.net/projects/gnuwin32/files/pcre/7.0/pcre-7.0-bin.zip/download
-
-<< "pcre" {
-    { [ os macosx? ] [ "libpcre.dylib" ] }
-    { [ os unix? ] [ "libpcre.so" ] }
-    { [ os windows? ] [ "pcre3.dll" ] }
-} cond cdecl add-library >>
+<< "pcre" dup find-library cdecl add-library >>
 
 LIBRARY: pcre
 
