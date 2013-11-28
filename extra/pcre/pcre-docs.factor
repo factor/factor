@@ -2,7 +2,7 @@ USING: help.markup help.syntax sequences strings ;
 IN: pcre
 
 ARTICLE: "pcre" "PCRE binding"
-"The " { $vocab-link "pcre" } " vocab implements a simple binding for libpcre, enabling rich regular expression support for Factor applications."
+"The " { $vocab-link "pcre" } " vocab implements a simple binding for libpcre, enabling rich regular expression support for Factor applications." $nl
 "Precompiling and optimizing a regular expression:"
 { $subsections <compiled-pcre> }
 { $examples
@@ -14,9 +14,7 @@ ARTICLE: "pcre" "PCRE binding"
 { $notes "Regular expressions are by default utf8 and unicode aware." } ;
 
 HELP: <compiled-pcre>
-{ $values
-  { "expr" string }
-}
+{ $values { "expr" string } { "compiled-pcre" compiled-pcre } }
 { $description "Creates a precompiled regular expression object." } ;
 
 HELP: findall
