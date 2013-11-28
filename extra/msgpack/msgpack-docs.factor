@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io kernel strings ;
+USING: byte-arrays help.markup help.syntax io kernel sequences strings ;
 
 IN: msgpack
 
@@ -11,11 +11,11 @@ HELP: write-msgpack
 { $description "Encodes an object into the MessagePack format, writing to an " { $link output-stream } "." } ;
 
 HELP: msgpack>
-{ $values { "string" string } { "obj" object } }
-{ $description "Decodes an object from the MessagePack format." } ;
+{ $values { "seq" sequence } { "obj" object } }
+{ $description "Decodes an object from the MessagePack format, represented as a " { $link byte-array } " or " { $link string } "." } ;
 
 HELP: >msgpack
-{ $values { "obj" object } { "string" string } }
+{ $values { "obj" object } { "bytes" byte-array } }
 { $description "Encodes an object into the MessagePack format." } ;
 
 ARTICLE: "msgpack" "MessagePack"
