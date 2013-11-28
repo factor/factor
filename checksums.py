@@ -55,6 +55,7 @@ dlls = [
     ('libtiff.dll', '573d09e62d71cdaa0fa41f6ad62b2f81', '4ad93cded54c071c9f6410b47c292a4e'),
     ('libudis86.dll', 'c67f87d066b2bf1f545ca385bffbfaf6', 'e7fb66c3f50469160ca992bd4d8b6544'),
     ('libxml2.dll', '096d5e5683819f0d3b3f93428597a29c', 'e75d9887e0a9a6fbb812b629f8ea0916'),
+    ('pcre.dll', '57cac848fa14ae38f14f9441f8933282', '090e391013e2a806d17953283be4f0dd'),
     ('sqlite3.dll', '5405413fff79b8d9c747aa900f60f082', '7fa162fbf7a702b94810dbaec1bdacd7'),
     ('ssleay32.dll', 'e1f3b02f7670b6f92cf05ac7628297aa', 'fa71efc3a246f2f523d611ddc10e7db1'),
     ('zip32z64.dll', 'd389ce96885acb61c4e471b9ee3a8063', '10dc180ed4b49ddcd0ea2e61ae62259b'),
