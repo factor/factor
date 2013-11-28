@@ -96,6 +96,7 @@ void* factor_vm::alien_pointer() {
 EACH_ALIEN_PRIMITIVE(DEFINE_ALIEN_ACCESSOR)
 
 /* open a native library and push a handle */
+/* Allocates memory */
 void factor_vm::primitive_dlopen() {
   data_root<byte_array> path(ctx->pop(), this);
   path.untag_check(this);
