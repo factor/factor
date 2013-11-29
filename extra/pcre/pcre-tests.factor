@@ -1,5 +1,6 @@
-USING: accessors arrays assocs http.client kernel math.ranges
-pcre pcre.ffi pcre.private random sequences system tools.test ;
+USING: accessors arrays assocs continuations http.client kernel
+literals math.ranges pcre pcre.ffi pcre.private random sequences
+system tools.test ;
 QUALIFIED: regexp
 IN: pcre.tests
 
@@ -34,9 +35,16 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE pcre-config ] unit-test ] when
 
 [ 1 ] [ PCRE_CONFIG_UNICODE_PROPERTIES pcre-config ] unit-test
 
-! libpcre must not support 16 or 32 bit code points.
-[ 0 ] [ PCRE_CONFIG_UTF16 pcre-config ] unit-test
-[ 0 ] [ PCRE_CONFIG_UTF32 pcre-config ] unit-test
+! Ok if these options throw if the pcre library is to old to support
+! these configuration parameters.
+[ t ] [
+    [ PCRE_CONFIG_UTF16 pcre-config ] [ what>> ] recover
+    { 0 $ PCRE_CONFIG_UTF16 } member?
+] unit-test
+[ t ] [
+    [ PCRE_CONFIG_UTF32 pcre-config ] [ what>> ] recover
+    { 0 $ PCRE_CONFIG_UTF32 } member?
+] unit-test
 
 ! Tests for findall
 [
