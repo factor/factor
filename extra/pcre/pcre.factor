@@ -8,6 +8,8 @@ math.bitwise pcre.ffi sequences splitting strings ;
 QUALIFIED: regexp
 IN: pcre
 
+ERROR: bad-option what ;
+
 ERROR: malformed-regexp expr error ;
 
 ERROR: pcre-error value ;
@@ -32,14 +34,8 @@ ERROR: pcre-error value ;
     ] [ 2drop f ] if* ;
 
 : pcre-config ( what -- value )
-    dup {
-        PCRE_CONFIG_MATCH_LIMIT
-        PCRE_CONFIG_MATCH_LIMIT_RECURSION
-    } member? [
-        { long } [ pcre_config ] with-out-parameters
-    ] [
-        { int } [ pcre_config ] with-out-parameters
-    ] if dup PCRE_ERROR_BADOPTION = [ pcre-error ] when ;
+    [ { long } [ pcre_config ] with-out-parameters ] keep
+    rot 0 = [ drop ] [ bad-option ] if ;
 
 : pcre-fullinfo ( pcre extra what -- obj )
     { int } [ pcre_fullinfo ] with-out-parameters nip ;
@@ -59,7 +55,7 @@ ERROR: pcre-error value ;
 
 : name-table-entry ( addr -- group-index group-name )
     [ <alien> 1 alien-unsigned-1 ]
-    [ 2 + <alien> utf8 alien>string ] bi ; 
+    [ 2 + <alien> utf8 alien>string ] bi ;
 
 : name-table-entries ( pcre extra -- addrs )
     [ name-table ] [ name-entry-size ] [ name-count ] 2tri
