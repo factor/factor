@@ -38,7 +38,8 @@ ERROR: pcre-error value ;
     rot 0 = [ drop ] [ bad-option ] if ;
 
 : pcre-fullinfo ( pcre extra what -- obj )
-    { int } [ pcre_fullinfo ] with-out-parameters nip ;
+    [ { int } [ pcre_fullinfo ] with-out-parameters ] keep
+    rot 0 = [ drop ] [ bad-option ] if ;
 
 : pcre-substring-list ( subject match-array count -- alien )
     { void* } [ pcre_get_substring_list drop ] with-out-parameters ;

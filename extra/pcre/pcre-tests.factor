@@ -46,6 +46,11 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE pcre-config ] unit-test ] when
     { 0 $ PCRE_CONFIG_UTF32 } member?
 ] unit-test
 
+[ 33 ]
+[
+    [ "foo" <pcre> f 33 pcre-fullinfo ] [ what>> ] recover
+] unit-test
+
 ! Tests for findall
 [
     { { f "1999-01-12" } { "year" "1999" } { "month" "01" } { "day" "12" } }
