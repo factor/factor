@@ -1,10 +1,5 @@
-USING:
-    alien alien.libraries alien.syntax
-    formatting
-    io.pathnames
-    kernel
-    system
-    tools.test ;
+USING: alien alien.libraries alien.syntax formatting io.pathnames
+kernel system tools.test ;
 IN: alien.libraries.tests
 
 [ f ] [ DLL" fadfasdfsada" dll-valid? ] unit-test
