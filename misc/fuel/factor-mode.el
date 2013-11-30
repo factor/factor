@@ -216,7 +216,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
     "M:" "M::" "MACRO:" "MACRO::" "MAIN:" "MATH:"
     "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "NAN:"
-    "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROTOCOL:" "PROVIDE:"
+    "POSTPONE:" "PRIMITIVE:" "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:"
@@ -475,7 +475,11 @@ source/docs/tests file. When set to false, you'll be asked only once."
       nil
       (1 'factor-font-lock-symbol nil t)
       (2 'factor-font-lock-symbol nil t)))
-
+    ;; Highlights predicates
+    (,(format "\\(PREDICATE\\):[ \n]%s[ \n]<[ \n]%s" symbol symbol)
+     (1 'factor-font-lock-parsing-word)
+     (2 'factor-font-lock-type-name)
+     (3 'factor-font-lock-type-name))
     ;; Highlights alien function definitions. Types in stack effect
     ;; declarations are given a bold face.
     (,(format "\\(\\(?:GL-\\)?FUNCTION\\|CALLBACK\\):[ \n]+%s[ \n]+%s[ \n]+" symbol symbol)
