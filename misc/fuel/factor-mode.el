@@ -403,13 +403,13 @@ source/docs/tests file. When set to false, you'll be asked only once."
   (format "\\_<TYPEDEF: +%s +%s\\( .*\\)?$" symbol symbol))
 
 (defconst factor-c-global-regex
-  "\\_<C-GLOBAL: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+  (format "\\_<C-GLOBAL: +%s +%s\\( .*\\)?$" symbol symbol))
 
 (defconst factor-c-type-regex
   (format "\\_<C-TYPE: +%s\\( .*\\)?$" symbol))
 
 (defconst factor-rename-regex
-  "\\_<RENAME: +\\(\\w+\\) +\\(\\w+\\) +=> +\\(\\w+\\)\\( .*\\)?$")
+  (format "\\_<RENAME: +%s +%s +=> +%s\\( .*\\)?$" symbol symbol symbol))
 
 
 ;;; Font lock:
