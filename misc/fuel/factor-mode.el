@@ -101,12 +101,6 @@ source/docs/tests file. When set to false, you'll be asked only once."
   :group 'factor-faces
   :group 'faces)
 
-(defface factor-font-lock-macro-word
-  '((t (:inherit font-lock-preprocessor-face)))
-  "macro words"
-  :group 'factor-faces
-  :group 'faces)
-
 (defface factor-font-lock-postpone-body '((t (:inherit font-lock-comment-face)))
   "postponed form"
   :group 'factor-faces
@@ -277,9 +271,9 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
 
 (defconst factor-word-definition-regex
-  (format "\\_<\\(%s\\)?: +\\(%s\\)"
+  (format "\\_<\\(%s\\)?[:#] +\\(%s\\)"
           (regexp-opt
-           '(":" "GENERIC" "DEFER" "HOOK" "MAIN" "MATH" "POSTPONE"
+           '(":" "GENERIC" "DEFER" "HOOK" "MACRO" "MAIN" "MATH" "POSTPONE"
              "SYNTAX" "TYPED" "TYPED:" "RENAME"))
           "\\(\\sw\\|\\s_\\|\\s(\\|\\s)\\)+"))
 
