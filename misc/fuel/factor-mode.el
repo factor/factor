@@ -307,10 +307,10 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "<[^ >]+>")
 
 (defconst factor-getter-regex
-  "\\(^\\|\\_<\\)[^ ]+?>>\\_>")
+  "\\_<\\(?:\\sw\\|\\s_\\)+>>\\_>")
 
 (defconst factor-setter-regex
-  "\\_<>>.+?\\_>")
+  "\\_<>>\\(?:\\sw\\|\\s_\\)+\\_>")
 
 (defconst factor-symbol-definition-regex
   (factor-second-word-regex '("&:" "SYMBOL:" "VAR:" "CONSTANT:")))
