@@ -462,7 +462,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
     ;; factor-font-lock-symbol.
     (,(format
        "\\(%s\\):[ \n]+%s\\(?:[ \n]+<[ \n]+%s\\)?"
-       (regexp-opt '("STRUCT" "TUPLE" "UNION-STRUCT"))
+       (regexp-opt '("STRUCT" "TUPLE" "UNION-STRUCT" "ENUM"))
        symbol
        symbol)
      (1 'factor-font-lock-parsing-word)
