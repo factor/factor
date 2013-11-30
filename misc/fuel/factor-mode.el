@@ -207,11 +207,11 @@ source/docs/tests file. When set to false, you'll be asked only once."
     "CONSULT:" "call-next-method"
     "DEFER:" "DESTRUCTOR:"
     "EBNF:" ";EBNF" "ENUM:" "ERROR:" "EXCLUDE:"
-    "FORGET:" "FROM:" "FUNCTION-ALIAS:"
-    "GAME:" "GENERIC#" "GENERIC:"
+    "FOREIGN-ATOMIC-TYPE:" "FOREIGN-RECORD-TYPE:" "FORGET:" "FROM:" "FUNCTION-ALIAS:"
+    "GAME:" "GENERIC#" "GENERIC:" "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HELP:" "HINTS:" "HOOK:"
-    "IN:" "initial:" "INSTANCE:" "INTERSECTION:"
+    "IN:" "initial:" "INSTANCE:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
     "LIBRARY:"
     "M:" "M::" "MACRO:" "MACRO::" "MAIN:" "MATH:"
     "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
@@ -462,7 +462,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
     ;; factor-font-lock-symbol.
     (,(format
        "\\(%s\\):[ \n]+%s\\(?:[ \n]+<[ \n]+%s\\)?"
-       (regexp-opt '("STRUCT" "TUPLE" "UNION-STRUCT" "ENUM"))
+       (regexp-opt '("ENUM" "PROTOCOL" "STRUCT" "TUPLE" "UNION-STRUCT"))
        symbol
        symbol)
      (1 'factor-font-lock-parsing-word)
