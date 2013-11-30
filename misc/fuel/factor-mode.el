@@ -206,8 +206,8 @@ source/docs/tests file. When set to false, you'll be asked only once."
     "C:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:" "CONSTANT:"
     "CONSULT:" "call-next-method"
     "DEFER:" "DESTRUCTOR:"
-    "EBNF:" ";EBNF" "ENUM:" "ERROR:" "EXCLUDE:"
-    "FOREIGN-ATOMIC-TYPE:" "FOREIGN-RECORD-TYPE:" "FORGET:" "FROM:" "FUNCTION-ALIAS:"
+    "EBNF:" ";EBNF" "ENUM:" "ERROR:"
+    "FOREIGN-ATOMIC-TYPE:" "FOREIGN-RECORD-TYPE:" "FORGET:" "FUNCTION-ALIAS:"
     "GAME:" "GENERIC#" "GENERIC:" "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HELP:" "HINTS:" "HOOK:"
@@ -288,7 +288,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
 (defconst factor-vocab-ref-regex
   (factor-second-word-regex
-   '("IN:" "USE:" "FROM:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
+   '("IN:" "USE:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
 
 (defconst factor-using-lines-regex "^\\(USING\\):[ \n]+\\([^;\t]*\\);")
 
@@ -420,7 +420,10 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
     (,factor-using-lines-regex (1 'factor-font-lock-parsing-word)
                                (2 'factor-font-lock-vocabulary-name))
-
+    (,(format "^\\(FROM\\|EXCLUDE\\):[ \n]+%s[ \n]+=>+\\([^;\t]*\\);" symbol)
+     (1 'factor-font-lock-parsing-word)
+     (2 'factor-font-lock-vocabulary-name)
+     (3 'factor-font-lock-word))
     (,factor-constructor-decl-regex
      (1 'factor-font-lock-word)
      (2 'factor-font-lock-type-name)
