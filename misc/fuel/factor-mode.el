@@ -192,6 +192,17 @@ source/docs/tests file. When set to false, you'll be asked only once."
 ;; Utility regexp used by other regexps to match a Factor symbol name
 (setq-local symbol "\\(\\(?:\\sw\\|\\s_\\)+\\)")
 
+;; Used to font-lock stack effect declarations with may be nested.
+(defun factor-match-brackets (limit)
+  (let ((start (point)))
+    (when (re-search-forward "[ \n]([ \n]" limit t)
+      (backward-char 2)
+      (let ((bracket-start (point)))
+        (forward-sexp)
+        (let ((bracket-stop (point)))
+          (goto-char bracket-start)
+          (re-search-forward ".+" bracket-stop 'mv))))))
+
 ;; Excludes parsing words that are handled by other regexps
 (defconst factor-parsing-words
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
@@ -506,8 +517,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
       (1 'factor-font-lock-type-in-stack-effect nil t)
       (2 'factor-font-lock-stack-effect nil t)
       (3 'factor-font-lock-stack-effect nil t)))
-
-    (,factor-stack-effect-regex . 'factor-font-lock-stack-effect)
+    (factor-match-brackets . 'factor-font-lock-stack-effect)
     (,factor-constructor-regex . 'factor-font-lock-constructor)
     (,factor-setter-regex . 'factor-font-lock-setter-word)
     (,factor-getter-regex . 'factor-font-lock-getter-word)
