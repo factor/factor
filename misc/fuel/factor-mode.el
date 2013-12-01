@@ -199,9 +199,9 @@ source/docs/tests file. When set to false, you'll be asked only once."
     "B" "BEFORE:"
     "C:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:" "CONSTANT:"
     "CONSULT:" "call-next-method"
-    "DEFER:" "DESTRUCTOR:"
+    "DEFER:"
     "EBNF:" ";EBNF" "ENUM:" "ERROR:"
-    "FOREIGN-ATOMIC-TYPE:" "FOREIGN-RECORD-TYPE:" "FORGET:" "FUNCTION-ALIAS:"
+    "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
     "GAME:" "GENERIC#" "GENERIC:" "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HELP:" "HINTS:" "HOOK:"
@@ -307,7 +307,8 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "\\_<>>\\(?:\\sw\\|\\s_\\)+\\_>")
 
 (defconst factor-symbol-definition-regex
-  (factor-second-word-regex '("&:" "SYMBOL:" "VAR:" "CONSTANT:")))
+  (factor-second-word-regex
+   '("&:" "CONSTANT:" "DESTRUCTOR:" "FORGET:" "SYMBOL:" "VAR:")))
 
 (defconst factor-stack-effect-regex
   "\\( ( [^)]* )\\)\\|\\( (( [^)]* ))\\)")
