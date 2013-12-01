@@ -101,12 +101,6 @@ source/docs/tests file. When set to false, you'll be asked only once."
   :group 'factor-faces
   :group 'faces)
 
-(defface factor-font-lock-macro-word
-  '((t (:inherit font-lock-preprocessor-face)))
-  "macro words"
-  :group 'factor-faces
-  :group 'faces)
-
 (defface factor-font-lock-postpone-body '((t (:inherit font-lock-comment-face)))
   "postponed form"
   :group 'factor-faces
@@ -198,6 +192,17 @@ source/docs/tests file. When set to false, you'll be asked only once."
 ;; Utility regexp used by other regexps to match a Factor symbol name
 (setq-local symbol "\\(\\(?:\\sw\\|\\s_\\)+\\)")
 
+;; Used to font-lock stack effect declarations with may be nested.
+(defun factor-match-brackets (limit)
+  (let ((start (point)))
+    (when (re-search-forward "[ \n]([ \n]" limit t)
+      (backward-char 2)
+      (let ((bracket-start (point)))
+        (forward-sexp)
+        (let ((bracket-stop (point)))
+          (goto-char bracket-start)
+          (re-search-forward ".+" bracket-stop 'mv))))))
+
 ;; Excludes parsing words that are handled by other regexps
 (defconst factor-parsing-words
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
@@ -205,18 +210,18 @@ source/docs/tests file. When set to false, you'll be asked only once."
     "B" "BEFORE:"
     "C:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:" "CONSTANT:"
     "CONSULT:" "call-next-method"
-    "DEFER:" "DESTRUCTOR:"
-    "EBNF:" ";EBNF" "ENUM:" "ERROR:" "EXCLUDE:"
-    "FORGET:" "FROM:" "FUNCTION-ALIAS:"
-    "GAME:" "GENERIC#" "GENERIC:"
+    "DEFER:"
+    "EBNF:" ";EBNF" "ENUM:" "ERROR:"
+    "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
+    "GAME:" "GENERIC#" "GENERIC:" "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HELP:" "HINTS:" "HOOK:"
-    "IN:" "initial:" "INSTANCE:" "INTERSECTION:"
+    "IN:" "initial:" "INSTANCE:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
     "LIBRARY:"
     "M:" "M::" "MACRO:" "MACRO::" "MAIN:" "MATH:"
     "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "NAN:"
-    "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROTOCOL:" "PROVIDE:"
+    "POSTPONE:" "PRIMITIVE:" "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:"
@@ -277,9 +282,9 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
 
 (defconst factor-word-definition-regex
-  (format "\\_<\\(%s\\)?: +\\(%s\\)"
+  (format "\\_<\\(%s\\)?[:#] +\\(%s\\)"
           (regexp-opt
-           '(":" "GENERIC" "DEFER" "HOOK" "MAIN" "MATH" "POSTPONE"
+           '(":" "GENERIC" "DEFER" "HOOK" "MACRO" "MAIN" "MATH" "POSTPONE"
              "SYNTAX" "TYPED" "TYPED:" "RENAME"))
           "\\(\\sw\\|\\s_\\|\\s(\\|\\s)\\)+"))
 
@@ -288,7 +293,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
 (defconst factor-vocab-ref-regex
   (factor-second-word-regex
-   '("IN:" "USE:" "FROM:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
+   '("IN:" "USE:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
 
 (defconst factor-using-lines-regex "^\\(USING\\):[ \n]+\\([^;\t]*\\);")
 
@@ -307,13 +312,14 @@ source/docs/tests file. When set to false, you'll be asked only once."
   "<[^ >]+>")
 
 (defconst factor-getter-regex
-  "\\(^\\|\\_<\\)[^ ]+?>>\\_>")
+  "\\_<\\(?:\\sw\\|\\s_\\)+>>\\_>")
 
 (defconst factor-setter-regex
-  "\\_<>>.+?\\_>")
+  "\\_<>>\\(?:\\sw\\|\\s_\\)+\\_>")
 
 (defconst factor-symbol-definition-regex
-  (factor-second-word-regex '("&:" "SYMBOL:" "VAR:" "CONSTANT:")))
+  (factor-second-word-regex
+   '("&:" "CONSTANT:" "DESTRUCTOR:" "FORGET:" "SYMBOL:" "VAR:")))
 
 (defconst factor-stack-effect-regex
   "\\( ( [^)]* )\\)\\|\\( (( [^)]* ))\\)")
@@ -403,13 +409,13 @@ source/docs/tests file. When set to false, you'll be asked only once."
   (format "\\_<TYPEDEF: +%s +%s\\( .*\\)?$" symbol symbol))
 
 (defconst factor-c-global-regex
-  "\\_<C-GLOBAL: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+  (format "\\_<C-GLOBAL: +%s +%s\\( .*\\)?$" symbol symbol))
 
 (defconst factor-c-type-regex
   (format "\\_<C-TYPE: +%s\\( .*\\)?$" symbol))
 
 (defconst factor-rename-regex
-  "\\_<RENAME: +\\(\\w+\\) +\\(\\w+\\) +=> +\\(\\w+\\)\\( .*\\)?$")
+  (format "\\_<RENAME: +%s +%s +=> +%s\\( .*\\)?$" symbol symbol symbol))
 
 
 ;;; Font lock:
@@ -420,7 +426,10 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
     (,factor-using-lines-regex (1 'factor-font-lock-parsing-word)
                                (2 'factor-font-lock-vocabulary-name))
-
+    (,(format "^\\(FROM\\|EXCLUDE\\):[ \n]+%s[ \n]+=>+\\([^;\t]*\\);" symbol)
+     (1 'factor-font-lock-parsing-word)
+     (2 'factor-font-lock-vocabulary-name)
+     (3 'factor-font-lock-word))
     (,factor-constructor-decl-regex
      (1 'factor-font-lock-word)
      (2 'factor-font-lock-type-name)
@@ -462,7 +471,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
     ;; factor-font-lock-symbol.
     (,(format
        "\\(%s\\):[ \n]+%s\\(?:[ \n]+<[ \n]+%s\\)?"
-       (regexp-opt '("STRUCT" "TUPLE" "UNION-STRUCT"))
+       (regexp-opt '("ENUM" "PROTOCOL" "STRUCT" "TUPLE" "UNION-STRUCT"))
        symbol
        symbol)
      (1 'factor-font-lock-parsing-word)
@@ -475,7 +484,11 @@ source/docs/tests file. When set to false, you'll be asked only once."
       nil
       (1 'factor-font-lock-symbol nil t)
       (2 'factor-font-lock-symbol nil t)))
-
+    ;; Highlights predicates
+    (,(format "\\(PREDICATE\\):[ \n]%s[ \n]<[ \n]%s" symbol symbol)
+     (1 'factor-font-lock-parsing-word)
+     (2 'factor-font-lock-type-name)
+     (3 'factor-font-lock-type-name))
     ;; Highlights alien function definitions. Types in stack effect
     ;; declarations are given a bold face.
     (,(format "\\(\\(?:GL-\\)?FUNCTION\\|CALLBACK\\):[ \n]+%s[ \n]+%s[ \n]+" symbol symbol)
@@ -504,8 +517,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
       (1 'factor-font-lock-type-in-stack-effect nil t)
       (2 'factor-font-lock-stack-effect nil t)
       (3 'factor-font-lock-stack-effect nil t)))
-
-    (,factor-stack-effect-regex . 'factor-font-lock-stack-effect)
+    (factor-match-brackets . 'factor-font-lock-stack-effect)
     (,factor-constructor-regex . 'factor-font-lock-constructor)
     (,factor-setter-regex . 'factor-font-lock-setter-word)
     (,factor-getter-regex . 'factor-font-lock-getter-word)
