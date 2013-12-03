@@ -198,10 +198,12 @@ source/docs/tests file. When set to false, you'll be asked only once."
     (when (re-search-forward "[ \n]([ \n]" limit t)
       (backward-char 2)
       (let ((bracket-start (point)))
-        (forward-sexp)
-        (let ((bracket-stop (point)))
-          (goto-char bracket-start)
-          (re-search-forward ".+" bracket-stop 'mv))))))
+        (when (condition-case nil
+                  (progn (forward-sexp) 't)
+                ('scan-error nil))
+          (let ((bracket-stop (point)))
+            (goto-char bracket-start)
+            (re-search-forward ".+" bracket-stop 'mv)))))))
 
 ;; Excludes parsing words that are handled by other regexps
 (defconst factor-parsing-words
