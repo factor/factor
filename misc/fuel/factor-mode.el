@@ -225,7 +225,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:"
-    "SPECIALIZED-ARRAYS:" "STRING:" "SYMBOLS:" "SYNTAX:"
+    "SPECIALIZED-ARRAYS:" "STRING:" "SYNTAX:"
     "TYPEDEF:" "TYPED:" "TYPED::"
     "UNIFORM-TUPLE:" "UNION:" "USE:"
     "VARIANT:" "VERTEX-FORMAT:"))
@@ -291,11 +291,19 @@ source/docs/tests file. When set to false, you'll be asked only once."
 (defconst factor-alias-definition-regex
   "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
 
+;; Vocabulary patterns
 (defconst factor-vocab-ref-regex
   (factor-second-word-regex
    '("IN:" "USE:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
 
 (defconst factor-using-lines-regex "^\\(USING\\):[ \n]+\\([^;\t]*\\);")
+
+;; Symbols
+(defconst factor-symbol-definition-regex
+  (factor-second-word-regex
+   '("&:" "CONSTANT:" "DESTRUCTOR:" "FORGET:" "SYMBOL:" "VAR:")))
+
+(defconst factor-symbols-lines-regex "^\\(SYMBOLS\\):[ \n]+\\([^;\t]*\\);")
 
 (defconst factor-int-constant-def-regex
   (factor-second-word-regex '("ALIEN:" "CHAR:" "NAN:")))
@@ -316,10 +324,6 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
 (defconst factor-setter-regex
   "\\_<>>\\(?:\\sw\\|\\s_\\)+\\_>")
-
-(defconst factor-symbol-definition-regex
-  (factor-second-word-regex
-   '("&:" "CONSTANT:" "DESTRUCTOR:" "FORGET:" "SYMBOL:" "VAR:")))
 
 (defconst factor-stack-effect-regex
   "\\( ( [^)]* )\\)\\|\\( (( [^)]* ))\\)")
@@ -426,6 +430,8 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
     (,factor-using-lines-regex (1 'factor-font-lock-parsing-word)
                                (2 'factor-font-lock-vocabulary-name))
+    (,factor-symbols-lines-regex (1 'factor-font-lock-parsing-word)
+                                 (2 'factor-font-lock-word))
     (,(format "^\\(FROM\\|EXCLUDE\\):[ \n]+%s[ \n]+=>+\\([^;\t]*\\);" symbol)
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-vocabulary-name)
