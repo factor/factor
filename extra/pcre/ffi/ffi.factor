@@ -1,17 +1,14 @@
 USING:
-    alien alien.c-types alien.data alien.libraries alien.syntax
+    alien alien.c-types alien.data
+    alien.libraries alien.libraries.finder
+    alien.syntax
     classes.struct
     combinators
+    kernel
     system ;
 IN: pcre.ffi
 
-! http://sourceforge.net/projects/gnuwin32/files/pcre/7.0/pcre-7.0-bin.zip/download
-
-<< "pcre" {
-    { [ os macosx? ] [ "libpcre.dylib" ] }
-    { [ os unix? ] [ "libpcre.so" ] }
-    { [ os windows? ] [ "pcre3.dll" ] }
-} cond cdecl add-library >>
+<< "pcre" dup find-library cdecl add-library >>
 
 LIBRARY: pcre
 
@@ -78,33 +75,6 @@ ENUM: PCRE_ERRORS
     { PCRE_ERROR_BADOFFSET      -24 }
     { PCRE_ERROR_SHORTUTF8      -25 } ;
 
-CONSTANT: PCRE_ERROR_NOMATCH         -1
-CONSTANT: PCRE_ERROR_NULL            -2
-CONSTANT: PCRE_ERROR_BADOPTION       -3
-CONSTANT: PCRE_ERROR_BADMAGIC        -4
-CONSTANT: PCRE_ERROR_UNKNOWN_OPCODE  -5
-CONSTANT: PCRE_ERROR_UNKNOWN_NODE    -5
-CONSTANT: PCRE_ERROR_NOMEMORY        -6
-CONSTANT: PCRE_ERROR_NOSUBSTRING     -7
-CONSTANT: PCRE_ERROR_MATCHLIMIT      -8
-CONSTANT: PCRE_ERROR_CALLOUT         -9
-CONSTANT: PCRE_ERROR_BADUTF8        -10
-CONSTANT: PCRE_ERROR_BADUTF8_OFFSET -11
-CONSTANT: PCRE_ERROR_PARTIAL        -12
-CONSTANT: PCRE_ERROR_BADPARTIAL     -13
-CONSTANT: PCRE_ERROR_INTERNAL       -14
-CONSTANT: PCRE_ERROR_BADCOUNT       -15
-CONSTANT: PCRE_ERROR_DFA_UITEM      -16
-CONSTANT: PCRE_ERROR_DFA_UCOND      -17
-CONSTANT: PCRE_ERROR_DFA_UMLIMIT    -18
-CONSTANT: PCRE_ERROR_DFA_WSSIZE     -19
-CONSTANT: PCRE_ERROR_DFA_RECURSE    -20
-CONSTANT: PCRE_ERROR_RECURSIONLIMIT -21
-CONSTANT: PCRE_ERROR_NULLWSLIMIT    -22
-CONSTANT: PCRE_ERROR_BADNEWLINE     -23
-CONSTANT: PCRE_ERROR_BADOFFSET      -24
-CONSTANT: PCRE_ERROR_SHORTUTF8      -25
-
 CONSTANT: PCRE_INFO_OPTIONS            0
 CONSTANT: PCRE_INFO_SIZE               1
 CONSTANT: PCRE_INFO_CAPTURECOUNT       2
@@ -147,7 +117,7 @@ STRUCT: pcre_extra
     { mark uchar** }
     { executable_jit void* } ;
 
-FUNCTION: void pcre_config ( int what, void* where ) ;
+FUNCTION: int pcre_config ( int what, void* where ) ;
 
 FUNCTION: void* pcre_compile ( c-string pattern,
                                int options,
