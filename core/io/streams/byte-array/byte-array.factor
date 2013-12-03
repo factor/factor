@@ -18,7 +18,7 @@ M: byte-vector stream-element-type drop +byte+ ;
 TUPLE: byte-reader { underlying byte-array read-only } { i array-capacity } ;
 INSTANCE: byte-reader input-stream
 
-M: byte-reader stream-element-type drop +byte+ ;
+M: byte-reader stream-element-type drop +byte+ ; inline
 
 M: byte-reader stream-read-unsafe sequence-read-unsafe ;
 M: byte-reader stream-read1 sequence-read1 ;
