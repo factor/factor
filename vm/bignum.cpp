@@ -419,9 +419,7 @@ bignum* factor_vm::bignum_add_unsigned(bignum* x, bignum* y, int negative_p) {
   GC_BIGNUM(y);
 
   if ((BIGNUM_LENGTH(y)) > (BIGNUM_LENGTH(x))) {
-    bignum* z = x;
-    x = y;
-    y = z;
+    std::swap(x, y);
   }
   {
     bignum_length_type x_length = (BIGNUM_LENGTH(x));
@@ -481,9 +479,7 @@ bignum* factor_vm::bignum_subtract_unsigned(bignum* x, bignum* y) {
     case bignum_comparison_equal:
       return (BIGNUM_ZERO());
     case bignum_comparison_less: {
-      bignum* z = x;
-      x = y;
-      y = z;
+      std::swap(x, y);
     }
       negative_p = 1;
       break;
@@ -548,9 +544,7 @@ bignum* factor_vm::bignum_multiply_unsigned(bignum* x, bignum* y,
   GC_BIGNUM(y);
 
   if ((BIGNUM_LENGTH(y)) > (BIGNUM_LENGTH(x))) {
-    bignum* z = x;
-    x = y;
-    y = z;
+    std::swap(x, y);
   }
   {
     bignum_digit_type carry;
@@ -1578,15 +1572,23 @@ bignum* factor_vm::bignum_integer_length(bignum* x) {
 
   bignum_length_type index = ((BIGNUM_LENGTH(x)) - 1);
   bignum_digit_type digit = (BIGNUM_REF(x, index));
+  bignum_digit_type carry = 0;
+  bignum* result;
 
-  bignum* result = (allot_bignum(2, 0));
-
-  (BIGNUM_REF(result, 0)) = index;
-  (BIGNUM_REF(result, 1)) = 0;
-  bignum_destructive_scale_up(result, BIGNUM_DIGIT_LENGTH);
   while (digit > 1) {
-    bignum_destructive_add(result, ((bignum_digit_type) 1));
+    carry += 1;
     digit >>= 1;
+  }
+
+  if (index < BIGNUM_RADIX_ROOT) {
+     result = allot_bignum(1, 0);
+     (BIGNUM_REF(result, 0)) = (index * BIGNUM_DIGIT_LENGTH) + carry;
+  } else {
+     result = allot_bignum(2, 0);
+     (BIGNUM_REF(result, 0)) = index;
+     (BIGNUM_REF(result, 1)) = 0;
+     bignum_destructive_scale_up(result, BIGNUM_DIGIT_LENGTH);
+     bignum_destructive_add(result, carry);
   }
   return (bignum_trim(result));
 }
