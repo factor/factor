@@ -156,17 +156,19 @@ ERROR: undefined-find-nth m n seq quot ;
     "href" attribute* [ subseq? ] [ 2drop f ] if ;
 
 : find-hrefs ( vector -- vector' )
-    find-links
-    [ [ { [ name>> "a" = ] [ "href" attribute? ] } 1&& ] filter ] map sift
-    [ [ "href" attribute ] map ] map concat [ >url ] map ;
+    [ { [ name>> "a" = ] [ "href" attribute? ] } 1&& ] filter sift
+    [ "href" attribute >url ] map ;
 
 : find-frame-links ( vector -- vector' )
-    [ name>> "frame" = ] find-between-all
-    [ [ "src" attribute ] map sift ] map concat sift
-    [ >url ] map ;
+    [ { [ name>> "frame" = ] [ "src" attribute? ] } 1&& ] filter sift
+    [ "src" attribute >url ] map ;
+
+: find-script-links ( vector -- vector' )
+    [ { [ name>> "script" = ] [ "src" attribute? ] } 1&& ] filter sift
+    [ "src" attribute >url ] map ;
 
 : find-all-links ( vector -- vector' )
-    [ find-hrefs ] [ find-frame-links ] bi union ;
+    [ find-hrefs ] [ find-frame-links ] [ find-script-links ] tri union union ;
 
 : find-forms ( vector -- vector' )
     "form" over find-opening-tags-by-name
