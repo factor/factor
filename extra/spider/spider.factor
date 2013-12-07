@@ -5,7 +5,8 @@ http.client kernel tools.time sets assocs sequences
 concurrency.combinators io threads namespaces math multiline
 math.parser inspector urls logging combinators.short-circuit
 continuations calendar prettyprint dlists deques locals
-spider.unique-deque combinators concurrency.semaphores ;
+spider.unique-deque combinators concurrency.semaphores
+io.pathnames ;
 IN: spider
 
 TUPLE: spider
@@ -85,13 +86,20 @@ fetched-in parsed-html links processed-in fetched-at ;
     "depth: " write number>string write
     ", spidering: " write . yield ;
 
+: url-html? ( url -- ? )
+    path>> file-extension { ".htm" ".html" f } member? ;
+
 :: fill-spidered-result ( spider spider-result -- )
-    f spider-result url>> spider spidered>> set-at
+    f spider-result url>> dup :> url spider spidered>> set-at
     [ spider-result url>> http-get ] benchmark :> ( headers html fetched-in )
     [
-        html parse-html
-        spider currently-spidering>>
-        over find-all-links normalize-hrefs
+        url url-html? [
+            html parse-html
+            spider currently-spidering>>
+            over find-all-links normalize-hrefs
+        ] [
+            f { }
+        ] if
     ] benchmark :> ( parsed-html links processed-in )
     spider-result
         headers >>headers
@@ -128,7 +136,8 @@ fetched-in parsed-html links processed-in fetched-at ;
     dup todo>> pop-url [ url>> ] [ depth>> ] bi <spider-result> ;
 
 : spider-next-page ( spider -- )
-    setup-next-url spider-page ;
+    setup-next-url
+    spider-page ;
 
 PRIVATE>
 
