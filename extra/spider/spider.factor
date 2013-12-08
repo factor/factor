@@ -90,8 +90,9 @@ fetched-in parsed-html links processed-in fetched-at ;
     path>> file-extension { ".htm" ".html" f } member? ;
 
 :: fill-spidered-result ( spider spider-result -- )
-    f spider-result url>> dup :> url spider spidered>> set-at
-    [ spider-result url>> http-get ] benchmark :> ( headers html fetched-in )
+    spider-result url>> :> url
+    f url spider spidered>> set-at
+    [ url http-get ] benchmark :> ( headers html fetched-in )
     [
         url url-html? [
             html parse-html
