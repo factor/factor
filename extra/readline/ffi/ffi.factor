@@ -1,17 +1,11 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http:// factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types kernel alien.syntax classes.struct
-accessors libc math make unix.types namespaces system
-combinators alien.libraries ;
+USING: alien alien.c-types alien.syntax alien.libraries.finder
+classes.struct accessors kernel libc math make unix.types namespaces
+system combinators alien.libraries ;
 IN: readline.ffi
 
-<<
-"readline" {
-    { [ os windows? ] [ "readline.dll" ] }
-    { [ os macosx? ] [ "libreadline.dylib"  ] }
-    { [ os unix?  ] [ "libreadline.so" ] }
-} cond cdecl add-library
->>
+<< "readline" dup find-library cdecl add-library >>
 LIBRARY: readline
 
 TYPEDEF: void* histdata_t
