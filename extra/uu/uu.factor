@@ -85,9 +85,11 @@ PRIVATE>
     [ [ uu-encode ] with-string-writer ] with-string-reader ;
 
 : uu-decode ( -- )
-    [ "begin" head? ] [ readln ] do until
-    [ dup "end" head? [ drop t ] [ ascii>binary write f ] if ]
-    [ readln ] do until ;
+    [ [ "begin" head? ] [ not ] bi or ] [ readln ] do until
+    [
+        dup [ "end" head? ] [ not ] bi or
+        [ drop t ] [ ascii>binary write f ] if
+    ] [ readln ] do until ;
 
 : uu>string ( seq -- seq )
     [ [ uu-decode ] with-string-writer ] with-string-reader ;
