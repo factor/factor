@@ -56,6 +56,10 @@ HELP: random-integers
     }
 } ;
 
+HELP: random-unit
+{ $values { "n" float } }
+{ $description "Outputs a random uniform float from [0,1]." } ;
+
 HELP: random-units
 { $values { "length" integer } { "sequence" array } }
 { $description "Outputs an array with " { $snippet "length" } " random uniform floats from [0,1]." }
@@ -84,7 +88,6 @@ HELP: random-bits*
     { "n" integer }
 }
 { $description "Returns an integer exactly " { $snippet "numbits" } " in length, with the topmost bit set to one." } ;
-
 
 HELP: with-random
 { $values { "tuple" "a random generator" } { "quot" "a quotation" } }
