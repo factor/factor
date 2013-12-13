@@ -1,4 +1,4 @@
-USING: kernel math sequences ;
+USING: hints kernel math sequences strings ;
 
 IN: splitting.extras
 
@@ -64,3 +64,6 @@ PRIVATE>
 
 : split-harvest ( seq separators -- pieces )
     [ member? ] curry split-when-harvest ; inline
+
+{ split* split*-slice split-harvest }
+[ { string string } set-specializer ] each
