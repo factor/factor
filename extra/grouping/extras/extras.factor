@@ -1,4 +1,4 @@
-USING: accessors combinators fry grouping kernel macros math
+USING: accessors arrays combinators fry grouping kernel macros math
 math.ranges sequences sequences.generalizations
 sequences.private ;
 
@@ -48,3 +48,13 @@ INSTANCE: tail-clumps immutable-sequence
 
 : group-as ( seq n exemplar -- array )
     [ <groups> ] dip [ like ] curry map ;
+
+: (group-by-loop) ( elt key groups -- groups' )
+    2dup [ nip empty? ] [ ?last ?first = not ] 2bi or [
+        -rot swap 1array
+    ] [
+        nip unclip-last rot [ first2 ] dip suffix
+    ] if 2array suffix ;
+
+: group-by ( seq quot: ( elt -- key ) -- groups )
+    '[ dup _ call( x -- y ) rot (group-by-loop) ] { } swap reduce ;
