@@ -8,6 +8,8 @@ USING:
     io
     io.encodings io.encodings.string io.encodings.utf16
     kernel
+    math math.functions
+    namespaces
     sequences
     splitting
     strings ;
@@ -27,6 +29,9 @@ CONSTANT: dialect-data {
 : >raw-base64 ( byte-array -- str )
     >string utf16be encode >base64 [ CHAR: = = ] trim-tail ;
 
+: raw-base64> ( str -- str' )
+    dup length 4 / ceiling 4 * CHAR: = pad-tail base64> utf16be decode ;
+
 : (group-by-loop) ( elt key groups -- groups' )
     2dup [ nip empty? ] [ ?last ?first = not ] 2bi or [
         -rot swap 1array
@@ -42,12 +47,30 @@ CONSTANT: dialect-data {
     [ >raw-base64 -rot [ first2 replace ] [ first2 surround ] bi* ] if ;
 
 : encode-utf7-string ( str dialect -- byte-array )
-    dialect-data at first2 '[ _ _ rot first2 swap encode-chunk ]
-    [ [ printable? ] group-by ] dip map concat ;
+    [ [ printable? ] group-by ] dip
+    dialect-data at first2 '[ _ _ rot first2 swap encode-chunk ] map concat ;
 
 : stream-write-utf7 ( string stream encoding -- )
     swapd encode-utf7-string >byte-array swap stream-write ;
 
 M: utf7 encode-string stream-write-utf7 ;
-
 M: utf7imap4 encode-string stream-write-utf7 ;
+
+! UTF-7 decoding is stateful, hence this ugly workaround is needed.
+SYMBOL: decoding-buffer
+
+: emit-next-char ( buffer -- ch buffer' )
+    [
+        read1 dup CHAR: + = [
+            drop { CHAR: - } read-until drop
+            [ CHAR: + { } ] [ raw-base64> emit-next-char ] if-empty
+        ] [ { } ] if
+    ] [ unclip swap ] if-empty ;
+
+: decode-utf7 ( stream encoding -- char/f )
+    drop [
+        decoding-buffer [ [ { } ] unless* emit-next-char ] change-global
+    ] with-input-stream ;
+
+M: utf7 decode-char decode-utf7 ;
+M: utf7imap4 decode-char decode-utf7 ;
