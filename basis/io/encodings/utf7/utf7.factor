@@ -1,5 +1,4 @@
 USING:
-    accessors
     arrays
     ascii
     assocs
@@ -28,27 +27,23 @@ CONSTANT: dialect-data {
 : >raw-base64 ( byte-array -- str )
     >string utf16be encode >base64 [ CHAR: = = ] trim-tail ;
 
-: flush-buffer ( buffer repl-pair surround-pair -- result )
-    rot [ 2drop "" ] [
-        >raw-base64 -rot [ first2 replace ] [ first2 surround ] bi*
-    ] if-empty ;
-
-: escaped-char ( str1 begin end -- str )
-    -rot dupd = [ swap append ] [ nip ] if ;
-
-: encode-utf7-char ( result buffer dialect-info ch -- result buffer )
-    dup printable? [
-        1string -rot first2
-        [ flush-buffer swapd append swap ]
-        [ nip first2 escaped-char append ] 2bi ""
-    ] [ nip suffix ] if ;
-
-: encode-utf7-string ( str dialect -- str' )
-    { "" "" } swap dialect-data at [
-        '[ [ first2 ] dip _ swap encode-utf7-char 2array ] reduce
+: (group-by-loop) ( elt key groups -- groups' )
+    2dup [ nip empty? ] [ ?last ?first = not ] 2bi or [
+        -rot swap 1array
     ] [
-        [ first2 ] dip first2 flush-buffer append
-    ] bi ;
+        nip unclip-last rot [ first2 ] dip suffix
+    ] if 2array suffix ;
+
+: group-by ( seq quot: ( elt -- key ) -- groups )
+    '[ dup _ call( x -- y ) rot (group-by-loop) ] { } swap reduce ;
+
+: encode-chunk ( repl-pair surround-pair chunk ascii? -- byte-array )
+    [ swap [ first ] [ concat ] bi replace nip ]
+    [ >raw-base64 -rot [ first2 replace ] [ first2 surround ] bi* ] if ;
+
+: encode-utf7-string ( str dialect -- byte-array )
+    dialect-data at first2 '[ _ _ rot first2 swap encode-chunk ]
+    [ [ printable? ] group-by ] dip map concat ;
 
 : stream-write-utf7 ( string stream encoding -- )
     swapd encode-utf7-string >byte-array swap stream-write ;
