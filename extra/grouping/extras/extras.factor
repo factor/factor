@@ -51,7 +51,7 @@ INSTANCE: tail-clumps immutable-sequence
 
 <PRIVATE
 
-: (group-by) ( elt key groups -- groups' )
+: (group-by) ( groups elt key -- groups )
     pick [ t ] [ last first dupd = not ] if-empty [
         swap 1vector 2array over push
     ] [
