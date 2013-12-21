@@ -1,5 +1,4 @@
-USING: alien alien.libraries alien.syntax formatting io.pathnames
-kernel system tools.test ;
+USING: alien alien.libraries alien.syntax tools.test kernel ;
 IN: alien.libraries.tests
 
 [ f ] [ DLL" fadfasdfsada" dll-valid? ] unit-test
@@ -27,10 +26,3 @@ IN: alien.libraries.tests
     "test-library" "blah" cdecl add-library?
     "blah" remove-library
 ] unit-test
-
-! dlopen resolves resource:-paths
-os windows? [
-    [ t ] [
-        vm file-stem "resource:/%s.exe" sprintf dlopen dll-valid?
-    ] unit-test
-] when
