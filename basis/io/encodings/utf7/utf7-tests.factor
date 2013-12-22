@@ -42,3 +42,16 @@ IN: io.encodings.utf7.tests
         "~peter/mail/日本語/台北"
     } dup [ utf7 encode utf7 decode ] map =
 ] unit-test
+
+[ t ] [
+    {
+        "~/bågø"
+        "båx"
+        "bøx"
+        "test"
+        "Skräppost"
+        "Ting & Såger"
+        "~/Følder/mailbåx & stuff + more"
+        "~peter/mail/日本語/台北"
+    } dup [ utf7imap4 encode utf7imap4 decode ] map =
+] unit-test
