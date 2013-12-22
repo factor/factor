@@ -5,8 +5,8 @@ USING:
     base64
     byte-arrays
     fry
-    io
-    io.encodings io.encodings.string io.encodings.utf16
+    grouping.extras
+    io io.encodings io.encodings.string io.encodings.utf16
     kernel
     math math.functions
     namespaces
@@ -32,16 +32,6 @@ CONSTANT: dialect-data {
 : raw-base64> ( str -- str' )
     dup length 4 / ceiling 4 * CHAR: = pad-tail base64> utf16be decode ;
 
-: (group-by-loop) ( elt key groups -- groups' )
-    2dup [ nip empty? ] [ ?last ?first = not ] 2bi or [
-        -rot swap 1array
-    ] [
-        nip unclip-last rot [ first2 ] dip suffix
-    ] if 2array suffix ;
-
-: group-by ( seq quot: ( elt -- key ) -- groups )
-    '[ dup _ call( x -- y ) rot (group-by-loop) ] { } swap reduce ;
-
 : encode-chunk ( repl-pair surround-pair chunk ascii? -- byte-array )
     [ swap [ first ] [ concat ] bi replace nip ]
     [ >raw-base64 -rot [ first2 replace ] [ first2 surround ] bi* ] if ;
@@ -58,18 +48,23 @@ M: utf7imap4 encode-string stream-write-utf7 ;
 
 ! UTF-7 decoding is stateful, hence this ugly workaround is needed.
 SYMBOL: decoding-buffer
+DEFER: emit-char
 
-: emit-next-char ( buffer -- ch buffer' )
-    [
-        read1 dup CHAR: + = [
-            drop { CHAR: - } read-until drop
-            [ CHAR: + { } ] [ raw-base64> emit-next-char ] if-empty
-        ] [ { } ] if
-    ] [ unclip swap ] if-empty ;
+: decode-chunk ( dialect-info -- ch buffer )
+    dup first2 swap [ second read-until drop ] [ first2 swap replace ] bi*
+    [ second first first { } ] [ raw-base64> emit-char ] if-empty ;
+
+: fill-buffer ( dialect-info -- ch buffer )
+    dup second first first read1 dup swapd = [
+        drop decode-chunk
+    ] [ nip { } ] if ;
+
+: emit-char ( dialect-info buffer -- ch buffer' )
+    [ fill-buffer ] [ nip unclip swap ] if-empty ;
 
 : decode-utf7 ( stream encoding -- char/f )
-    drop [
-        decoding-buffer [ [ { } ] unless* emit-next-char ] change-global
+    dialect-data at swap [
+        decoding-buffer [ dup { } ? emit-char ] change-global
     ] with-input-stream ;
 
 M: utf7 decode-char decode-utf7 ;
