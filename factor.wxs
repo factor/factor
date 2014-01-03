@@ -2,7 +2,7 @@
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
   <Product
       Name='Factor $(var.Version)'
-      Id='6b66ea90-0be5-11e3-8820-417d92f52eef'
+      Id='*'
       UpgradeCode='840a2300-0be5-11e3-b156-09eb3a9c2bdd'
       Language='1033'
       Codepage='1252'
@@ -165,5 +165,15 @@
                Value="WelcomeDlg"
                Order="2">1</Publish>
     </UI>
+    <Property Id='PREVIOUSVERSIONSINSTALLED' Secure="yes" />
+    <Upgrade Id='840a2300-0be5-11e3-b156-09eb3a9c2bdd'>
+      <UpgradeVersion
+          Minimum="0.0.1.0" Maximum="99.0.0.0"
+          Property="PREVIOUSVERSIONSINSTALLED"
+          IncludeMinimum="yes" IncludeMaximum="no" />
+    </Upgrade>
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallInitialize"/>
+    </InstallExecuteSequence>
   </Product>
 </Wix>
