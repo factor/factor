@@ -17,6 +17,7 @@ IN: math.polynomials.tests
 [ { 4 8 0 12 } ] [ 4 { 1 2 0 3 } n*p ] unit-test
 [ { 1 4 4 0 0 } ] [ { 1 2 0 } p-sq ] unit-test
 [ { 1 6 12 8 0 0 0 } ] [ { 1 2 0 } 3 p^ ] unit-test
+[ { 1 2 0 } -3 p^ ] [ negative-power-polynomial? ] must-fail-with
 [ { 1 } ] [ { 1 2 0 } 0 p^ ] unit-test
 [ { 1 4 7 6 0 0 0 0 0 } ] [ { 1 2 3 0 0 0 } { 1 2 0 0 } p* ] unit-test
 [ V{ 7 -2 1 } V{ -20 0 0 } ] [ { 1 1 1 1 } { 3 1 } p/mod ] unit-test
