@@ -282,7 +282,7 @@ PRIVATE>
 
 : ?trim ( seq quot: ( elt -- ? ) -- seq/newseq )
     over empty? [ drop ] [
-        over [ first-unsafe ] [ last-unsafe ] bi pick bi@ or
+        over [ first-unsafe ] [ last-unsafe ] bi pick either?
         [ trim ] [ drop ] if
     ] if ; inline
 
