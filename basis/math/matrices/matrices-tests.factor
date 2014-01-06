@@ -208,6 +208,7 @@ IN: math.matrices.tests
 
 [ { { 4181 6765 } { 6765 10946 } } ]
 [ { { 0 1 } { 1 1 } } 20 m^n ] unit-test
+[ { { 0 1 } { 1 1 } } -20 m^n ] [ negative-power-matrix? ] must-fail-with
 
 {
     { { 0 5 0 10 } { 6 7 12 14 } { 0 15 0 20 } { 18 21 24 28 } }
