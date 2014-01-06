@@ -10,7 +10,7 @@ TUPLE: push-insn value ;
 GENERIC: eval-insn ( stack insn -- stack )
 
 : binary-op ( stack quot: ( x y -- z ) -- stack )
-    [ uncons uncons [ swap ] dip ] dip dip cons ; inline
+    [ uncons uncons swapd ] dip dip cons ; inline
 
 M: add-insn eval-insn drop [ + ] binary-op ;
 M: sub-insn eval-insn drop [ - ] binary-op ;
