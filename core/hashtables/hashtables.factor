@@ -94,8 +94,8 @@ TUPLE: hashtable
     [ swapd (set-at) ] curry assoc-each ; inline
 
 : hash-large? ( hash -- ? )
-    [ count>> 3 fixnum*fast 1 fixnum+fast ]
-    [ array>> length>> ] bi fixnum> ; inline
+    [ count>> 3 fixnum*fast ]
+    [ array>> length>> ] bi fixnum>= ; inline
 
 : each-pair ( array quot: ( key value -- ) -- )
     [
