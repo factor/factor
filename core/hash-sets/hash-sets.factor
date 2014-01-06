@@ -68,8 +68,8 @@ TUPLE: hash-set
     [ (adjoin) drop ] curry each ; inline
 
 : hash-large? ( hash -- ? )
-    [ count>> 3 fixnum*fast 1 fixnum+fast ]
-    [ array>> length>> 1 fixnum-shift-fast ] bi fixnum> ; inline
+    [ count>> 3 fixnum*fast ]
+    [ array>> length>> 1 fixnum-shift-fast ] bi fixnum>= ; inline
 
 : each-member ( array quot: ( elt -- ) -- )
     [ if ] curry [ dup tombstone? [ drop ] ] prepose each ; inline
