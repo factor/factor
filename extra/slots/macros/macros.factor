@@ -34,7 +34,7 @@ MACRO: set-slot ( name -- quot: ( value tuple -- ) )
 ! Chainable setters
 
 : set-slot* ( tuple value name -- tuple )
-    [ swap ] dip '[ _ set-slot ] keep ; inline
+    swapd '[ _ set-slot ] keep ; inline
 
 : change-slot* ( tuple name quot: ( ..a old -- ..b new ) -- ..b tuple ) 
     '[ _ _ change-slot ] keep ; inline
@@ -43,6 +43,7 @@ MACRO: set-slot ( name -- quot: ( value tuple -- ) )
 
 MACRO: slots ( names -- quot: ( tuple -- values... ) )
     [ '[ _ slot ] ] { } map-as '[ _ cleave ] ;
+
 MACRO: {slots} ( names -- quot: ( tuple -- {values} ) )
     dup length '[ _ slots _ narray ] ;
 

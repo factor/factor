@@ -287,7 +287,7 @@ SIMD-INTRINSIC: (simd-with)              (   n rep -- v )
     underlying>> ;
 SIMD-INTRINSIC: (simd-gather-2)          ( m n rep -- v ) <rep-array> [ 2 set-firstn-unsafe ] keep underlying>> ;
 SIMD-INTRINSIC: (simd-gather-4)          ( m n o p rep -- v ) <rep-array> [ 4 set-firstn-unsafe ] keep underlying>> ;
-SIMD-INTRINSIC: (simd-select)            ( a n rep -- x ) [ swap ] dip byte>rep-array nth-unsafe ;
+SIMD-INTRINSIC: (simd-select)            ( a n rep -- x ) swapd byte>rep-array nth-unsafe ;
 
 SIMD-INTRINSIC: alien-vector     (       c-ptr n rep -- value )
     [ swap <displaced-alien> ] dip rep-size memory>byte-array ;
