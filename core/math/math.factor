@@ -87,7 +87,7 @@ GENERIC: neg? ( x -- -x )
 
 : when-zero ( ..a n quot: ( ..a -- ..b ) -- ..b ) [ ] if-zero ; inline
 
-: unless-zero ( ..a n quot: ( ..a -- ..b ) -- ..b ) [ ] swap if-zero ; inline
+: unless-zero ( ..a n quot: ( ..a n -- ..b ) -- ..b ) [ ] swap if-zero ; inline
 
 UNION: integer fixnum bignum ;
 
