@@ -1,5 +1,5 @@
 USING: arrays assocs kernel kernel.private locals math
-math.order sequences sequences.private sorting ;
+math.order sequences sequences.extras sequences.private sorting ;
 IN: sorting.extras
 
 : argsort ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )
@@ -29,3 +29,9 @@ IN: sorting.extras
 
 : insort-right ( obj seq -- seq' )
     [ bisect-right ] 2keep swapd insert-nth ;
+
+: insort-left! ( obj seq -- seq )
+    [ bisect-left ] 2keep swapd [ insert-nth! ] keep ;
+
+: insort-right! ( obj seq -- seq )
+    [ bisect-right ] 2keep swapd [ insert-nth! ] keep ;
