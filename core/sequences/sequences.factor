@@ -985,8 +985,8 @@ PRIVATE>
 <PRIVATE
 
 : (trim-head) ( seq quot -- seq n )
-    over [ [ not ] compose find drop ] dip
-    [ length or ] keep swap ; inline
+    over [ [ not ] compose find drop ] dip swap
+    [ dup length ] unless* ; inline
 
 : (trim-tail) ( seq quot -- seq n )
     over [ [ not ] compose find-last drop ?1+ ] dip
