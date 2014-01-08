@@ -27,9 +27,6 @@ IN: sequences.extras
     [ dupd call( a -- ? ) [ 2array ] [ 2drop f ] if ] curry
     2map [ ] filter ; inline
 
-: insert-sorted ( elt seq -- seq )
-    2dup [ < ] with find drop over length or swap insert-nth ;
-
 : reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) i -- ... result )
     [ swap ] 2dip each-from ; inline
 
@@ -384,12 +381,12 @@ PRIVATE>
 : last= ( seq elt -- ? ) [ last ] dip = ; inline
 : nth= ( n seq elt -- ? ) [ nth ] dip = ; inline
 
-: first? ( seq quot -- ? ) [ first ] dip call ; inline
-: second? ( seq quot -- ? ) [ second ] dip call ; inline
-: third? ( seq quot -- ? ) [ third ] dip call ; inline
-: fourth? ( seq quot -- ? ) [ fourth ] dip call ; inline
-: last? ( seq quot -- ? ) [ last ] dip call ; inline
-: nth? ( n seq quot -- ? ) [ nth ] dip call ; inline
+: first? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? ) [ first ] dip call ; inline
+: second? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? ) [ second ] dip call ; inline
+: third? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? ) [ third ] dip call ; inline
+: fourth? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? ) [ fourth ] dip call ; inline
+: last? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? ) [ last ] dip call ; inline
+: nth? ( ... n seq quot: ( ... elt -- ... ? ) -- ... ? ) [ nth ] dip call ; inline
 
 : loop>sequence ( quot exemplar -- seq )
    [ '[ [ @ [ [ , ] when* ] keep ] loop ] ] dip make ; inline
@@ -417,10 +414,10 @@ PRIVATE>
     set-nth-unsafe ;
 
 : set-nths ( value indices seq -- )
-    swapd '[ [ _ ] dip _ set-nth ] each ; inline
+    swapd '[ _ swap _ set-nth ] each ; inline
 
 : set-nths-unsafe ( value indices seq -- )
-    swapd '[ [ _ ] dip _ set-nth-unsafe ] each ; inline
+    swapd '[ _ swap _ set-nth-unsafe ] each ; inline
 
 : flatten1 ( obj -- seq )
     [
