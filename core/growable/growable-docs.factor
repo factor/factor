@@ -27,12 +27,12 @@ HELP: new-size
 { $description "Computes the new size of a resizable sequence." } ;
 
 HELP: ensure
-{ $values { "n" "a positive integer" } { "seq" growable } }
-{ $description "This word behaves as follows, depending on the relation between " { $snippet "n" } " and the length of the sequence:"
+{ $values { "n" "a non-negative integer" } { "seq" growable } }
+{ $description "Ensures that " { $snippet "seq" } " has sufficient capacity to store an " { $snippet "n" } "th element." $nl "This word behaves as follows, depending on the relation between " { $snippet "n" } ", the capacity of the underlying storage, and the length of the sequence:"
 { $list
   { "If " { $snippet "n" } " is less than the length of the sequence, does nothing." }
-  { "If " { $snippet "n" } " exceeds the capacity of the underlying storage, the underlying storage is grown." }
-  { "If " { $snippet "n" } " is greater than or equal to the length but less than the capacity of the underlying storage, the fill pointer is moved and nothing else is done." }
+  { "If " { $snippet "n" } " is greater than or equal to the capacity of the underlying storage, the underlying storage is grown." }
+  { "If " { $snippet "n" } " is greater than or equal to the length, the length is increased." }
 }
 "In the case that new elements are added to the sequence (last two cases), the new elements are undefined." }
 { $notes "This word is used in the implementation of the " { $link set-nth } " generic for sequences supporting the resizable sequence protocol (see " { $link "growable" } ")."
