@@ -1,4 +1,5 @@
-USING: kernel math math.order sequences tools.test ;
+USING: arrays kernel math math.order random sequences
+tools.test ;
 IN: sorting.extras
 
 { { 0 2 1 } } [ { 10 30 20 } [ <=> ] argsort ] unit-test
@@ -18,3 +19,16 @@ IN: sorting.extras
 { 0 } [ 0 { 1 } bisect-left ] unit-test
 { 0 } [ 1 { 1 } bisect-left ] unit-test
 { 1 } [ 2 { 1 } bisect-left ] unit-test
+
+{ { 0 1 2 3 4 5 6 7 8 9 } } [
+    { }
+    10 iota >array randomize
+    [ swap insort-right ] each
+] unit-test
+
+{ V{ 0 1 2 3 4 5 6 7 8 9 } } [
+    V{ } clone
+    10 iota >array randomize
+    [ swap insort-right! ] each
+] unit-test
+
