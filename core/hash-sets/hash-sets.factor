@@ -87,7 +87,7 @@ TUPLE: hash-set
 PRIVATE>
 
 : <hash-set> ( capacity -- hash-set )
-    hash-set new [ reset-hash ] keep ; inline
+    [ 0 0 ] dip <hash-array> hash-set boa ; inline
 
 M: hash-set in?
      key@ 2nip ;
