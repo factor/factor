@@ -119,7 +119,7 @@ TUPLE: hashtable
 PRIVATE>
 
 : <hashtable> ( n -- hash )
-    hashtable new [ reset-hash ] keep ; inline
+    [ 0 0 ] dip <hash-array> hashtable boa ; inline
 
 M: hashtable at*
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;
