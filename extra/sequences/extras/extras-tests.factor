@@ -4,12 +4,6 @@ tools.test vectors ;
 
 IN: sequences.extras.tests
 
-{ V{ 0 1 2 3 4 5 6 7 8 9 } } [
-    V{ } clone
-    10 iota >array randomize
-    [ swap insert-sorted ] each
-] unit-test
-
 [ { "a" "b" "c" "d" "ab" "bc" "cd" "abc" "bcd" "abcd" } ] [ "abcd" all-subseqs ] unit-test
 
 [ { "a" "ab" "abc" "abcd" "b" "bc" "bcd" "c" "cd" "d" } ]
