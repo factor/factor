@@ -916,7 +916,7 @@ HELP: head
 
 HELP: tail
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "tailseq" "a new sequence" } }
-{ $description "Outputs a new sequence consisting of the input sequence with the first n items removed." }
+{ $description "Outputs a new sequence consisting of the input sequence with the first " { $snippet "n" } " items removed." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
 HELP: but-last
