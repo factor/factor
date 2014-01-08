@@ -156,8 +156,8 @@ IN: compiler.tree.propagation.transforms
 \ clone [
     in-d>> first value-info literal>> {
         { V{ } [ [ drop { } 0 vector boa ] ] }
-        { H{ } [ [ drop 0 0 8 ((empty)) <array> hashtable boa ] ] }
-        { HS{ } [ [ drop 0 0 4 ((empty)) <array> hash-set boa ] ] }
+        { H{ } [ [ drop 0 <hashtable> ] ] }
+        { HS{ } [ [ drop 0 <hash-set> ] ] }
         [ drop f ]
     } case
 ] "custom-inlining" set-word-prop
