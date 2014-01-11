@@ -23,7 +23,7 @@ IN: crypto.aes.utils
     [ gb3 ] keep [ gb2 ] keep [ gb1 ] keep gb0 ; inline
 
 : bytes>words ( seq -- seq )
-    4 <sliced-groups> [ <reversed> first4 >ui32 ] V{ } map-as ;
+    4 <groups> [ <reversed> first4 >ui32 ] V{ } map-as ;
 
 : .t ( seq -- )
     reverse
