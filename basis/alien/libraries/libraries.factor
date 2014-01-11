@@ -5,7 +5,9 @@ kernel namespaces destructors sequences strings
 system io.pathnames fry combinators vocabs ;
 IN: alien.libraries
 
-: dlopen ( path -- dll ) absolute-path native-string>alien (dlopen) ;
+: dlopen ( path -- dll )
+    dup absolute-path? [ normalize-path ] when
+    native-string>alien (dlopen) ;
 
 : dlsym ( name dll -- alien ) [ string>symbol ] dip (dlsym) ;
 
