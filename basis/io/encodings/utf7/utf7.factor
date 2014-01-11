@@ -1,6 +1,8 @@
-USING: accessors ascii base64 fry grouping.extras io io.encodings
-io.encodings.string io.encodings.utf16 kernel math math.functions
-sequences splitting strings ;
+! Copyright (C) 2013-2014 Björn Lindqvist
+! See http://factorcode.org/license.txt for BSD license
+USING: accessors ascii base64 fry grouping.extras io
+io.encodings io.encodings.string io.encodings.utf16 kernel math
+math.functions sequences splitting strings ;
 IN: io.encodings.utf7
 
 TUPLE: utf7codec dialect buffer ;
