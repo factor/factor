@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays.hex crypto.aes crypto.aes.utils
-grouping kernel sequences tools.test ;
+USING: accessors byte-arrays.hex crypto.aes crypto.aes.private
+crypto.aes.utils grouping kernel sequences tools.test ;
 IN: crypto.aes.tests
 
 #! fips-197 test vectors
