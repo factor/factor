@@ -56,8 +56,7 @@ GENERIC: update-frame-buffer ( <frame-buffer> -- )
     OLD LEN head-slice 0 NEW copy ] ;
 
 : copy-pixels ( old-pixels old-width new-pixels new-width -- )
-  [ 16 * <sliced-groups> ] 2bi@
-  [ copy-row ] 2each ;
+  [ 16 * <groups> ] 2bi@ [ copy-row ] 2each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
