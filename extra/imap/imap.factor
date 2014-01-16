@@ -110,7 +110,7 @@ CONSTANT: IMAP4_SSL_PORT 993
 : capabilities ( -- caps )
     "CAPABILITY" "" command-response parse-items ;
 
-: login ( user pass -- caps )
+: login ( username password -- caps )
     "LOGIN %s \"%s\"" sprintf "" command-response parse-items ;
 
 ! Folder management
@@ -146,10 +146,10 @@ CONSTANT: IMAP4_SSL_PORT 993
     [ "UID SEARCH CHARSET UTF-8 %s" sprintf ] dip utf8 encode
     command-response parse-items [ string>number ] map ;
 
-: fetch-mails ( message-set data-spec -- texts )
+: fetch-mails ( uids data-spec -- texts )
     [ comma-list ] dip "UID FETCH %s %s" sprintf "" command-response but-last ;
 
-: copy-mails ( message-set mailbox -- )
+: copy-mails ( uids mailbox -- )
     [ comma-list ] dip >utf7imap4 "UID COPY %s \"%s\"" sprintf ""
     command-response drop ;
 
@@ -161,6 +161,6 @@ CONSTANT: IMAP4_SSL_PORT 993
         "APPEND \"%s\" %s\"%s\"" sprintf
     ] dip utf8 encode command-response parse-append-mail ;
 
-: store-mail ( message-set command flags -- mail-flags )
+: store-mail ( uids command flags -- mail-flags )
     [ comma-list ] 2dip "UID STORE %s %s %s" sprintf "" command-response
     parse-store-mail ;
