@@ -32,6 +32,8 @@ CONSTANT: IMAP4_SSL_PORT 993
         read-hms " " expect readln parse-rfc822-gmt-offset <timestamp>
     ] with-string-reader  ;
 
+<PRIVATE
+
 : >utf7imap4 ( str -- str' )
     utf7imap4 encode >string ;
 
@@ -99,6 +101,8 @@ CONSTANT: IMAP4_SSL_PORT 993
         "\\(FLAGS \\(([^\\)]+)\\) UID (\\d+)\\)" pcre:findall
         first 1 tail values first2 [ " " split ] dip string>number swap 2array
     ] map ;
+
+PRIVATE>
 
 ! Constructor
 : <imap4ssl> ( host -- imap4 )
