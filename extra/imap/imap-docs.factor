@@ -70,7 +70,7 @@ HELP: delete-folder
 { $description "Deletes a folder." } ;
 
 HELP: rename-folder
-{ $values { "mailbox" string } }
+{ $values { "old-name" string } { "new-name" string } }
 { $description "Renames a folder." } ;
 
 HELP: status-folder
