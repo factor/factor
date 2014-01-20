@@ -4,11 +4,15 @@ USING:
     alien.destructors
     alien.libraries alien.libraries.finder
     alien.syntax
+    assocs
     kernel
-    sequences ;
+    sequences
+    system ;
 IN: python.ffi
 
-<< "python" { "3.0" "2.6" "2.7" } [
+<< "python" {
+    { unix { "3.0" "2.6" "2.7" } } { windows { "26" "27" "30" } }
+} os of [
     "python" prepend find-library
 ] map-find drop cdecl add-library >>
 
@@ -66,7 +70,7 @@ FUNCTION: PyObject* PyObject_GetAttrString ( PyObject* callable,
 FUNCTION: PyObject* PyObject_Str ( PyObject* o ) ;
 
 ! Strings
-FUNCTION: c-string PyString_AsString ( PyObject* string ) ;
+FUNCTION: void* PyString_AsString ( PyObject* string ) ;
 FUNCTION: PyObject* PyString_FromString ( c-string v ) ;
 
 ! Unicode
@@ -74,6 +78,8 @@ FUNCTION: PyObject* PyUnicode_DecodeUTF8 ( c-string s,
                                            int size,
                                            void* errors ) ;
 FUNCTION: PyObject* PyUnicodeUCS4_FromString ( c-string s ) ;
+FUNCTION: PyObject* PyUnicodeUCS2_FromString ( c-string s ) ;
+FUNCTION: PyObject* PyUnicodeUCS2_AsUTF8String ( PyObject* unicode ) ;
 FUNCTION: PyObject* PyUnicodeUCS4_AsUTF8String ( PyObject* unicode ) ;
 
 ! Ints
