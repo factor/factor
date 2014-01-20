@@ -34,6 +34,9 @@ FUNCTION: PyObject* PyImport_AddModule ( c-string name ) ;
 FUNCTION: long PyImport_GetMagicNumber ( ) ;
 FUNCTION: PyObject* PyImport_ImportModule ( c-string name ) ;
 
+! Sys module
+FUNCTION: PyObject* PySys_GetObject ( c-string name ) ;
+
 ! Dicts
 FUNCTION: PyObject* PyDict_GetItemString ( PyObject* d, c-string key ) ;
 FUNCTION: PyObject* PyDict_New ( ) ;
@@ -70,7 +73,7 @@ FUNCTION: PyObject* PyObject_GetAttrString ( PyObject* callable,
 FUNCTION: PyObject* PyObject_Str ( PyObject* o ) ;
 
 ! Strings
-FUNCTION: void* PyString_AsString ( PyObject* string ) ;
+FUNCTION: c-string PyString_AsString ( PyObject* string ) ;
 FUNCTION: PyObject* PyString_FromString ( c-string v ) ;
 
 ! Unicode

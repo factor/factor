@@ -86,7 +86,7 @@ ERROR: python-error type message ;
 
 ! Data marshalling to Python
 GENERIC: (>py) ( obj -- obj' )
-M: string (>py) PyUnicodeUCS4_FromString ;
+M: string (>py) PyUnicodeUCS2_FromString ;
 M: math:fixnum (>py) PyLong_FromLong ;
 M: math:float (>py) PyFloat_FromDouble ;
 
@@ -125,7 +125,7 @@ DEFER: >factor
             dup py-tuple-size iota [ py-tuple-get-item >factor ] with map
         ] }
         { "unicode" [
-            PyUnicodeUCS4_AsUTF8String (check-return)
+            PyUnicodeUCS2_AsUTF8String (check-return)
             PyString_AsString (check-return)
         ] }
     } clone ;
