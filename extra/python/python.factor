@@ -8,6 +8,7 @@ USING:
     grouping
     hashtables
     kernel
+    memoize
     namespaces
     python.ffi
     sequences
@@ -50,7 +51,7 @@ ERROR: python-error type message ;
 : with-py ( quot -- )
     '[ Py_Initialize _ call Py_Finalize ] with-destructors ; inline
 
-! Types and their methods
+! Types
 : <py-tuple> ( length -- tuple )
     PyTuple_New check-return ;
 
@@ -63,6 +64,7 @@ ERROR: python-error type message ;
 : py-tuple-size ( obj -- len )
     PyTuple_Size ;
 
+! Dicts
 : <py-dict> ( -- dict )
     PyDict_New check-return ;
 
@@ -78,11 +80,20 @@ ERROR: python-error type message ;
 : py-dict-size ( obj -- len )
     PyDict_Size ;
 
+! Lists
 : py-list-size ( list -- len )
     PyList_Size ;
 
 : py-list-get-item ( obj pos -- val )
     PyList_GetItem check-return ;
+
+! Unicodes
+: py-unicode>utf8 ( uni -- str )
+    PyUnicodeUCS2_AsUTF8String (check-return)
+    PyString_AsString (check-return)
+
+MEMO: py-ucs-size ( -- n )
+    "maxunicode" PySys_GetObject check-return PyInt_AsLong 0xffff = 2 4 ? ;
 
 ! Data marshalling to Python
 GENERIC: (>py) ( obj -- obj' )
