@@ -11,7 +11,8 @@ USING:
 IN: python.ffi
 
 << "python" {
-    { unix { "3.0" "2.6" "2.7" } } { windows { "26" "27" "30" } }
+    { linux { "3.0" "2.6" "2.7" } }
+    { windows { "26" "27" "30" } }
 } os of [
     "python" prepend find-library
 ] map-find drop cdecl add-library >>
@@ -35,9 +36,11 @@ FUNCTION: long PyImport_GetMagicNumber ( ) ;
 FUNCTION: PyObject* PyImport_ImportModule ( c-string name ) ;
 
 ! Sys module
+! Borrowed reference
 FUNCTION: PyObject* PySys_GetObject ( c-string name ) ;
 
 ! Dicts
+! Borrowed reference
 FUNCTION: PyObject* PyDict_GetItemString ( PyObject* d, c-string key ) ;
 FUNCTION: PyObject* PyDict_New ( ) ;
 FUNCTION: int PyDict_Size ( PyObject* d ) ;
@@ -50,6 +53,7 @@ FUNCTION: PyObject* PyDict_Items ( PyObject *d ) ;
 ! Tuples
 FUNCTION: PyObject* PyTuple_GetItem ( PyObject* t, int pos ) ;
 FUNCTION: PyObject* PyTuple_New ( int len ) ;
+! Steals the reference
 FUNCTION: int PyTuple_SetItem ( PyObject* t, int pos, PyObject* o ) ;
 FUNCTION: int PyTuple_Size ( PyObject* t ) ;
 
@@ -104,6 +108,7 @@ DESTRUCTOR: Py_DecRef
 FUNCTION: c-string PyEval_GetFuncName ( PyObject* func ) ;
 
 ! Errors
+FUNCTION: void PyErr_Clear ( ) ;
 FUNCTION: void PyErr_Print ( ) ;
 FUNCTION: void PyErr_Fetch ( PyObject** ptype,
                              PyObject** pvalue,

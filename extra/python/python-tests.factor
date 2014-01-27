@@ -2,20 +2,23 @@ USING:
     accessors arrays assocs
     calendar
     continuations
+    destructors
     fry kernel
     math
     namespaces
-    python python.ffi
+    python python.ffi python.stdlib.sys
     sequences
     strings tools.test ;
 IN: python.tests
 
+py-initialize
+
 : py-test ( result quot -- )
-    '[ _ with-py ] unit-test ; inline
+    '[ _ with-destructors ] unit-test ; inline
 
 [ t ] [ Py_GetVersion string? ] unit-test
 
-[ "os" ] [ "os" PyImport_ImportModule PyModule_GetName ] py-test
+[ "os" ] [ "os" import PyModule_GetName ] py-test
 
 [ t ] [ "os" import "getpid" getattr { } py-call 0 > ] py-test
 
@@ -33,7 +36,7 @@ IN: python.tests
     { "year" "month" "day" } [ getattr >factor ] with map
     first3 0 0 0 instant <timestamp> ;
 
-! Datetimes
+! ! Datetimes
 [ t ] [
     [ py-date>factor ] "date" py-type-dispatch get set-at
     "datetime" import
@@ -111,3 +114,17 @@ SYMBOLS: year month day ;
 
 ! Modules
 [ t ] [ "os" import PyModule_GetDict py-dict-size 200 > ] py-test
+
+! Reference counting tests
+[ 2 ] [ 3 <py-tuple> getrefcount >factor ] py-test
+
+[ -2 ] [
+    H{ { "foo" 33 } { "bar" 44 } } >py
+    [ "foo" py-dict-get-item-string getrefcount >factor ]
+    [
+        '[
+            500 [ _ "foo" py-dict-get-item-string drop ] times
+        ] with-destructors
+    ]
+    [ "foo" py-dict-get-item-string getrefcount >factor ] tri -
+] py-test
