@@ -17,6 +17,9 @@ IN: python.ffi
     "python" prepend find-library
 ] map-find drop cdecl add-library >>
 
+! Functions that return borrowed references needs to be called like this:
+! Py_Func dup Py_IncRef &Py_DecRef
+
 LIBRARY: python
 
 C-TYPE: PyObject
@@ -51,13 +54,15 @@ FUNCTION: int PyDict_SetItem ( PyObject* d, PyObject* k, PyObject* o ) ;
 FUNCTION: PyObject* PyDict_Items ( PyObject *d ) ;
 
 ! Tuples
+! Borrowed reference
 FUNCTION: PyObject* PyTuple_GetItem ( PyObject* t, int pos ) ;
 FUNCTION: PyObject* PyTuple_New ( int len ) ;
 ! Steals the reference
 FUNCTION: int PyTuple_SetItem ( PyObject* t, int pos, PyObject* o ) ;
 FUNCTION: int PyTuple_Size ( PyObject* t ) ;
 
-! Lists (sequences)
+! Lists
+! Borrowed reference
 FUNCTION: PyObject* PyList_GetItem ( PyObject* l, int pos ) ;
 FUNCTION: int PyList_Size ( PyObject* t ) ;
 
@@ -75,6 +80,7 @@ FUNCTION: PyObject* PyObject_Call ( PyObject* callable,
 FUNCTION: PyObject* PyObject_GetAttrString ( PyObject* callable,
                                              c-string attr_name ) ;
 FUNCTION: PyObject* PyObject_Str ( PyObject* o ) ;
+FUNCTION: int PyObject_IsTrue ( PyObject* o ) ;
 
 ! Strings
 FUNCTION: c-string PyString_AsString ( PyObject* string ) ;

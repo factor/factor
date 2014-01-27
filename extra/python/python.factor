@@ -60,7 +60,7 @@ ERROR: python-error type message ;
     dup Py_IncRef PyTuple_SetItem check-return-code ;
 
 : py-tuple-get-item ( obj pos -- val )
-    PyTuple_GetItem check-return ;
+    PyTuple_GetItem dup Py_IncRef check-return ;
 
 : py-tuple-size ( obj -- len )
     PyTuple_Size ;
@@ -89,7 +89,7 @@ ERROR: python-error type message ;
     PyList_Size ;
 
 : py-list-get-item ( obj pos -- val )
-    PyList_GetItem check-return ;
+    PyList_GetItem dup Py_IncRef check-return ;
 
 ! Unicodes
 : py-ucs-size ( -- n )
@@ -135,6 +135,7 @@ DEFER: >factor
 : init-py-type-dispatch ( -- table )
     H{
         { "NoneType" [ drop f ] }
+        { "bool" [ PyObject_IsTrue 1 = ] }
         { "dict" [ PyDict_Items (check-return) >factor >hashtable ] }
         { "int" [ PyInt_AsLong ] }
         { "list" [
