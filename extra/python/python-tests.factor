@@ -113,7 +113,9 @@ SYMBOLS: year month day ;
 ] py-test
 
 ! Modules
-[ t ] [ "os" import PyModule_GetDict py-dict-size 200 > ] py-test
+[ t ] [
+    "os" import PyModule_GetDict dup Py_IncRef &Py_DecRef py-dict-size 100 >
+] py-test
 
 ! Reference counting tests
 [ 2 ] [ 3 <py-tuple> getrefcount >factor ] py-test
