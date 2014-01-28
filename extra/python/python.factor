@@ -107,21 +107,20 @@ ERROR: python-error type message ;
     [ PyUnicodeUCS2_FromString ] if ;
 
 ! Data marshalling to Python
+: array>py-tuple ( arr -- py-tuple )
+    [ length <py-tuple> dup ] keep
+    [ rot py-tuple-set-item ] with each-index ;
+
 GENERIC: (>py) ( obj -- obj' )
 M: string (>py) utf8>py-unicode ;
 M: math:fixnum (>py) PyLong_FromLong ;
 M: math:float (>py) PyFloat_FromDouble ;
-
-M: array (>py)
-    [ length <py-tuple> dup ] [ [ (>py) ] map ] bi
-    [ rot py-tuple-set-item ] with each-index ;
-
+M: array (>py) [ (>py) ] map array>py-tuple ;
 M: hashtable (>py)
     <py-dict> swap dupd [
         swapd [ (>py) ] [ (>py) ] bi* py-dict-set-item
     ] with assoc-each ;
 
-! ! I'll make a fast-path for this
 M: word (>py) name>> (>py) ;
 
 : >py ( obj -- py-obj )
