@@ -99,6 +99,9 @@ ERROR: python-error type message ;
     [ length <py-tuple> dup ] keep
     [ rot py-tuple-set-item ] with each-index ;
 
+: py-tuple>array ( py-tuple -- arr )
+    dup py-tuple-size iota [ py-tuple-get-item ] with map ;
+
 GENERIC: (>py) ( obj -- obj' )
 M: string (>py) utf8>py-unicode ;
 M: math:fixnum (>py) PyLong_FromLong ;
@@ -130,9 +133,7 @@ DEFER: >factor
         ] }
         { "long" [ PyLong_AsLong ] }
         { "str" [ PyString_AsString (check-return) ] }
-        { "tuple" [
-            dup py-tuple-size iota [ py-tuple-get-item >factor ] with map
-        ] }
+        { "tuple" [ py-tuple>array [ >factor ] map ] }
         { "unicode" [ py-unicode>utf8 ] }
     } clone ;
 
