@@ -1,14 +1,5 @@
-USING:
-    accessors arrays assocs
-    calendar
-    continuations
-    destructors
-    fry kernel
-    math
-    namespaces
-    python python.ffi
-    sequences
-    strings tools.test ;
+USING: accessors arrays assocs calendar continuations destructors fry kernel
+math namespaces python python.ffi sequences strings tools.test ;
 IN: python.tests
 
 py-initialize

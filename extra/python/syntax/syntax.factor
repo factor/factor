@@ -1,19 +1,6 @@
-USING:
-    accessors
-    arrays
-    effects effects.parser
-    formatting
-    fry
-    generalizations
-    kernel
-    lexer
-    locals
-    namespaces
-    parser
-    python python.ffi
-    sequences sequences.generalizations
-    vocabs.parser
-    words ;
+USING: accessors arrays effects effects.parser formatting fry generalizations
+kernel lexer locals namespaces parser python python.ffi sequences
+sequences.generalizations vocabs.parser words ;
 IN: python.syntax
 
 py-initialize
@@ -47,11 +34,11 @@ SYMBOL: current-module
     effect quot [ define-inline ] bi ; inline
 
 :: add-function ( function effect -- )
+    effect in>> { "ret" } <effect> :> py-effect
     function "%s" effect [ factor>factor-quot ] make-function
     function "|%s" effect [ py>factor-quot ] make-function
-    function "|%s|" effect in>> { "ret" } <effect> [ py>py-quot ] make-function
-    function "%s|" effect in>> { "ret" } <effect> [ factor>py-quot ] make-function
-    ; inline
+    function "|%s|" py-effect [ py>py-quot ] make-function
+    function "%s|" py-effect [ factor>py-quot ] make-function ; inline
 
 : parse-python-word ( -- )
     scan-token dup ";" = [ drop ] [
