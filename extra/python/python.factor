@@ -1,17 +1,5 @@
-USING:
-    accessors
-    alien alien.c-types alien.data
-    arrays
-    assocs
-    fry
-    grouping
-    hashtables
-    kernel
-    namespaces
-    python.ffi
-    sequences
-    strings
-    words ;
+USING: accessors alien alien.c-types alien.data arrays assocs fry grouping
+hashtables kernel namespaces python.ffi sequences strings words ;
 IN: python
 QUALIFIED: math
 

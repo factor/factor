@@ -1,13 +1,5 @@
-USING:
-    assocs
-    destructors
-    fry
-    kernel
-    math
-    namespaces
-    python python.ffi python.syntax python.tests
-    sequences
-    tools.test ;
+USING: assocs destructors fry kernel math namespaces python python.ffi
+python.syntax python.tests sequences tools.test ;
 IN: python.syntax.tests
 
 ! Define your own type conversions.

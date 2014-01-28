@@ -1,13 +1,5 @@
-USING:
-    alien
-    alien.c-types
-    alien.destructors
-    alien.libraries alien.libraries.finder
-    alien.syntax
-    assocs
-    kernel
-    sequences
-    system ;
+USING: alien alien.c-types alien.destructors alien.libraries alien.libraries.finder
+alien.syntax assocs kernel sequences system ;
 IN: python.ffi
 
 << "python" {
