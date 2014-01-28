@@ -71,6 +71,9 @@ FUNCTION: int PyList_Size ( PyObject* t ) ;
 FUNCTION: c-string PyModule_GetName ( PyObject* module ) ;
 FUNCTION: PyObject* PyModule_GetDict ( PyObject* module ) ;
 
+! Callables
+FUNCTION: int PyCallable_Check ( PyObject* obj ) ;
+
 ! Objects
 FUNCTION: PyObject* PyObject_CallObject ( PyObject* callable,
                                           PyObject* args ) ;

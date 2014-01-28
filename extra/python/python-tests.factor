@@ -6,7 +6,7 @@ USING:
     fry kernel
     math
     namespaces
-    python python.ffi python.stdlib.builtin python.stdlib.sys
+    python python.ffi
     sequences
     strings tools.test ;
 IN: python.tests
@@ -116,31 +116,3 @@ SYMBOLS: year month day ;
 [ t ] [
     "os" import PyModule_GetDict dup Py_IncRef &Py_DecRef py-dict-size 100 >
 ] py-test
-
-! Reference counting tests
-[ 2 ] [ 3 <py-tuple> getrefcount >factor ] py-test
-
-[ -2 ] [
-    H{ { "foo" 33 } { "bar" 44 } } >py
-    [ "foo" py-dict-get-item-string getrefcount >factor ]
-    [
-        '[
-            500 [ _ "foo" py-dict-get-item-string drop ] times
-        ] with-destructors
-    ]
-    [ "foo" py-dict-get-item-string getrefcount >factor ] tri -
-] py-test
-
-[ -2 ] [
-    "abcd" >py <1py-tuple>
-    [ 0 py-tuple-get-item getrefcount >factor ]
-    [
-        [ 100 [ swap 0 py-tuple-get-item drop ] with times ] with-destructors
-    ]
-    [ 0 py-tuple-get-item getrefcount >factor ] tri -
-] py-test
-
-! Tests for builtins
-[ 10 ] [ 10 range >factor length ] py-test
-
-[ t ] [ "os" import "getpid" getattr callable >factor ] py-test
