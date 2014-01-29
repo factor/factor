@@ -1,5 +1,5 @@
 USING: arrays assocs destructors fry kernel math namespaces python python.ffi
-python.syntax python.tests sequences tools.test ;
+python.syntax python.tests sequences sets tools.test ;
 IN: python.syntax.tests
 
 ! Importing functions
@@ -24,20 +24,21 @@ PY-FROM: time => sleep ( n -- ) ;
 
 [ ] [ 0 >py sleep ] unit-test
 
-! ! Module variables are bound as zero-arg functions
+! Module variables are bound as zero-arg functions
 PY-FROM: sys => path ( -- seq ) ;
 
-[ t ] [ path >factor sequence? ] unit-test
+[ t ] [ $path >factor sequence? ] unit-test
 
-! ! Use the pipe functions to work on PyObjects.
 PY-FROM: __builtin__ =>
     callable ( obj -- ? )
-    open ( name mode -- file )
+    dir ( obj -- seq )
     int ( val -- s )
     len ( seq -- n )
-    range ( n -- seq ) ;
+    open ( name mode -- file )
+    range ( n -- seq )
+    repr ( obj -- str ) ;
 
-[ t ] [ path len int >factor 5 > ] unit-test
+[ t ] [ $path len int >factor 5 > ] unit-test
 
 [ 10 ] [ 10 >py range len >factor ] unit-test
 
@@ -79,16 +80,40 @@ PY-METHODS: file =>
 
 [ t ] [
     "testfile" >py "wb" >py open
-    [ ->tell ] [ ->fileno ] [ ->close ] tri
+    [ tell ] [ fileno ] [ close ] tri
     [ >factor integer? ] bi@ and
 ] py-test
 
 PY-METHODS: str =>
-    title ( self -- self' )
+    partition ( self sep -- bef sep aft )
     startswith ( self str -- ? )
+    title ( self -- self' )
     zfill ( self n -- str' ) ;
 
 ! Method chaining
 [ t ] [
-    "hello there" >py ->title 20 >py ->zfill "00" >py ->startswith >factor
+    "hello there" >py title 20 >py zfill "00" >py startswith >factor
+] py-test
+
+[ { "hello" "=" "there" } ] [
+    "hello=there" >py "=" >py partition 3array [ >factor ] map
+] py-test
+
+! Introspection
+PY-METHODS: func =>
+    func_code ( func -- code ) ;
+
+PY-METHODS: code =>
+    co_argcount ( code -- n ) ;
+
+[ 1 ] [ $splitext $func_code $co_argcount >factor ] py-test
+
+! Change sys.path
+PY-METHODS: list =>
+    append ( list obj -- )
+    remove ( list obj -- ) ;
+
+[ t ] [
+    $path "test" >py [ append ] [ drop >factor ] [ remove ] 2tri
+    "test" swap in?
 ] py-test
