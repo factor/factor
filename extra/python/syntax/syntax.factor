@@ -1,50 +1,57 @@
 USING: accessors arrays effects effects.parser fry generalizations
-kernel lexer locals math namespaces parser python python.ffi sequences
+kernel lexer math namespaces parser python python.ffi sequences
 sequences.generalizations vocabs.parser words ;
 IN: python.syntax
 
 py-initialize
 
-SYMBOL: current-module
+SYMBOL: current-context
 
-: call-or-eval ( args obj -- ret )
-    dup PyCallable_Check 1 = [ swap call-object ] [ nip ] if ;
-
-:: add-function ( function effect -- )
-    function create-in
-    effect [ in>> length ] [ out>> length ] bi
-    current-module get function getattr swap
-    '[
-        _ narray array>py-tuple _ call-or-eval
-        _ [ 0 = [ drop 0 <py-tuple> ] when ] keep
-        [ 1 = [ <1py-tuple> ] when ] keep
-        [ py-tuple>array ] dip firstn
-    ] effect define-inline ; inline
-
-: parse-python-word ( -- )
-    scan-token dup ";" = [ drop ] [
-        scan-effect add-function parse-python-word
+: with-each-definition ( quot -- )
+    scan-token dup ";" = [ 2drop ] [
+        scan-effect rot [ call( tok eff -- ) ] keep with-each-definition
     ] if ; inline recursive
 
-SYNTAX: PY-FROM:
-    scan-token import current-module set "=>" expect parse-python-word ; inline
+: scan-definitions ( quot -- )
+    scan-token current-context set "=>" expect with-each-definition ; inline
 
-:: add-method ( attr effect -- )
-    attr "->" prepend create-in
-    effect [ in>> length 1 - ] [ out>> length ] bi
+: unpack-value ( alien -- * )
+    [ 0 = [ drop 0 <py-tuple> ] when ] keep
+    [ 1 = [ <1py-tuple> ] when ] keep
+    [ py-tuple>array ] dip firstn ; inline
 
-    '[ _ narray array>py-tuple swap attr getattr swap call-object
-       _ [ 1 = [ 1array ] when ] [ firstn ] bi ]
+: make-function-quot ( alien in out -- quot )
+    swapd '[ _ narray array>py-tuple _ swap call-object _ unpack-value ] ;
 
+: function-callable ( name alien effect -- )
+    [ create-in ] 2dip
+    [ [ in>> length ] [ out>> length ] bi make-function-quot ] keep
+    define-inline ; inline
 
-    ! '[ attr getattr _ narray array>py-tuple call-object
-    !    _ [ 1 = [ 1array ] when ] [ firstn ] bi ]
-    effect define-inline ;
+: function-object ( name alien -- )
+    [ "$" prepend create-in ] [ '[ _ ] ] bi*
+    { } { "obj" } <effect> define-inline ; inline
 
-: parse-python-method ( -- )
-    scan-token dup ";" = [ drop ] [
-        scan-effect add-method parse-python-method
-    ] if ; inline recursive
+: add-function ( name effect -- )
+    [ dup current-context get import swap getattr 2dup ] dip
+    function-callable function-object ; inline
 
-SYNTAX: PY-METHODS:
-    scan-token drop "=>" expect parse-python-method ; inline
+SYNTAX: PY-FROM: [ add-function ] scan-definitions ; inline
+
+: make-method-quot ( name in out -- ret )
+    swapd '[
+        _ narray array>py-tuple swap
+        _ getattr swap call-object
+        _ unpack-value
+    ] ;
+
+: method-object ( name -- )
+    [ "$" prepend create-in ] [ '[ _ getattr ] ] bi
+    { "obj" } { "obj'" } <effect> define-inline ;
+
+: add-method ( name effect -- )
+    [ dup dup create-in swap ] dip
+    [ [ in>> length 1 - ] [ out>> length ] bi make-method-quot ] keep
+    define-inline method-object ;
+
+SYNTAX: PY-METHODS: [ add-method ] scan-definitions ; inline
