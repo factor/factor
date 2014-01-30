@@ -3,8 +3,8 @@ alien.syntax assocs kernel sequences system ;
 IN: python.ffi
 
 << "python" {
-    { linux { "3.0" "2.6" "2.7" } }
-    { windows { "26" "27" "30" } }
+    { linux { "3.0" "2.7" "2.6" } }
+    { windows { "30" "27" "26" } }
 } os of [
     "python" prepend find-library
 ] map-find drop cdecl add-library >>
@@ -56,7 +56,11 @@ FUNCTION: int PyTuple_Size ( PyObject* t ) ;
 ! Lists
 ! Borrowed reference
 FUNCTION: PyObject* PyList_GetItem ( PyObject* l, int pos ) ;
-FUNCTION: int PyList_Size ( PyObject* t ) ;
+! New reference
+FUNCTION: PyObject* PyList_New ( int len ) ;
+FUNCTION: int PyList_Size ( PyObject* l ) ;
+! Steals the reference
+FUNCTION: int PyList_SetItem ( PyObject* l, int pos, PyObject* o ) ;
 
 
 ! Modules
