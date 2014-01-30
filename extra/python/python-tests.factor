@@ -32,6 +32,9 @@ py-initialize
     { "year" "month" "day" } [ getattr >factor ] with map
     first3 0 0 0 instant <timestamp> ;
 
+! Lists
+[ t ] [ V{ 4 8 15 16 23 42 } dup >py >factor = ] py-test
+
 ! ! Datetimes
 [ t ] [
     [ py-date>factor ] "date" py-type-dispatch get set-at
