@@ -1,5 +1,5 @@
 USING: accessors alien alien.c-types alien.data arrays assocs fry grouping
-hashtables kernel namespaces python.ffi sequences strings words ;
+hashtables kernel namespaces python.ffi sequences strings vectors words ;
 IN: python
 QUALIFIED: math
 
@@ -76,11 +76,17 @@ ERROR: python-error type message ;
     PyDict_Size ;
 
 ! Lists
+: <py-list> ( length -- list )
+    PyList_New check-return ;
+
 : py-list-size ( list -- len )
     PyList_Size ;
 
 : py-list-get-item ( obj pos -- val )
     PyList_GetItem dup Py_IncRef check-return ;
+
+: py-list-set-item ( obj pos val -- )
+    dup Py_IncRef PyList_SetItem check-return-code ;
 
 ! Unicodes
 : py-ucs-size ( -- n )
@@ -102,6 +108,10 @@ ERROR: python-error type message ;
     [ length <py-tuple> dup ] keep
     [ rot py-tuple-set-item ] with each-index ;
 
+: vector>py-list ( vec -- py-list )
+    [ length <py-list> dup ] keep
+    [ rot py-list-set-item ] with each-index ;
+
 : py-tuple>array ( py-tuple -- arr )
     dup py-tuple-size iota [ py-tuple-get-item ] with map ;
 
@@ -114,6 +124,8 @@ M: hashtable (>py)
     <py-dict> swap dupd [
         swapd [ (>py) ] [ (>py) ] bi* py-dict-set-item
     ] with assoc-each ;
+M: vector (>py)
+    [ (>py) ] map vector>py-list ;
 
 M: word (>py) name>> (>py) ;
 
@@ -132,7 +144,7 @@ DEFER: >factor
         { "dict" [ PyDict_Items (check-return) >factor >hashtable ] }
         { "int" [ PyInt_AsLong ] }
         { "list" [
-            dup py-list-size iota [ py-list-get-item >factor ] with map
+            dup py-list-size iota [ py-list-get-item >factor ] with V{ } map-as
         ] }
         { "long" [ PyLong_AsLong ] }
         { "str" [ PyString_AsString (check-return) ] }

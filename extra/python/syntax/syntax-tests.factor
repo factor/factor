@@ -85,6 +85,7 @@ PY-METHODS: file =>
 ] py-test
 
 PY-METHODS: str =>
+    lower ( self -- self' )
     partition ( self sep -- bef sep aft )
     startswith ( self str -- ? )
     title ( self -- self' )
@@ -116,4 +117,11 @@ PY-METHODS: list =>
 [ t ] [
     $path "test" >py [ append ] [ drop >factor ] [ remove ] 2tri
     "test" swap in?
+] py-test
+
+! setattr doesn't affect which objects $words are referencing.
+PY-FROM: sys => platform ( -- x ) ;
+
+[ t ] [
+    $platform "sys" import "platform" "tjaba" >py setattr $platform =
 ] py-test
