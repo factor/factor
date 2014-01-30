@@ -115,6 +115,9 @@ ERROR: python-error type message ;
 : py-tuple>array ( py-tuple -- arr )
     dup py-tuple-size iota [ py-tuple-get-item ] with map ;
 
+: py-list>vector ( py-list -- vector )
+    dup py-list-size iota [ py-list-get-item ] with V{ } map-as ;
+
 GENERIC: (>py) ( obj -- obj' )
 M: string (>py) utf8>py-unicode ;
 M: math:fixnum (>py) PyLong_FromLong ;
@@ -143,9 +146,7 @@ DEFER: >factor
         { "bool" [ PyObject_IsTrue 1 = ] }
         { "dict" [ PyDict_Items (check-return) >factor >hashtable ] }
         { "int" [ PyInt_AsLong ] }
-        { "list" [
-            dup py-list-size iota [ py-list-get-item >factor ] with V{ } map-as
-        ] }
+        { "list" [ py-list>vector [ >factor ] map ] }
         { "long" [ PyLong_AsLong ] }
         { "str" [ PyString_AsString (check-return) ] }
         { "tuple" [ py-tuple>array [ >factor ] map ] }
