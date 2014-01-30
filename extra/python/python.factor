@@ -37,6 +37,9 @@ ERROR: python-error type message ;
 : getattr ( obj str -- value )
     PyObject_GetAttrString check-return ;
 
+: setattr ( obj str value -- )
+    PyObject_SetAttrString check-return-code ;
+
 : call-object ( obj args -- value )
     PyObject_CallObject check-return ;
 

@@ -20,6 +20,11 @@ py-initialize
     [ "kolobi" import ] [ [ type>> ] [ message>> ] bi 2array ] recover
 ] py-test
 
+! setattr
+[ 73 ] [
+    "sys" import "testit" [ 73 >py setattr ] [ getattr >factor ] 2bi
+] py-test
+
 ! Tuples
 [ 2 ] [ 2 <py-tuple> py-tuple-size ] py-test
 
