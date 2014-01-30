@@ -72,8 +72,13 @@ FUNCTION: PyObject* PyObject_CallObject ( PyObject* callable,
 FUNCTION: PyObject* PyObject_Call ( PyObject* callable,
                                     PyObject* args,
                                     PyObject* kw ) ;
-FUNCTION: PyObject* PyObject_GetAttrString ( PyObject* callable,
+! New reference
+FUNCTION: PyObject* PyObject_GetAttrString ( PyObject* o,
                                              c-string attr_name ) ;
+FUNCTION: int PyObject_SetAttrString ( PyObject* o,
+                                       c-string attr_name,
+                                       PyObject *v ) ;
+
 FUNCTION: PyObject* PyObject_Str ( PyObject* o ) ;
 FUNCTION: int PyObject_IsTrue ( PyObject* o ) ;
 
