@@ -1,5 +1,5 @@
 USING: arrays assocs destructors fry kernel math namespaces python python.ffi
-python.syntax python.tests sequences sets tools.test ;
+python.objects python.syntax python.tests sequences sets tools.test ;
 IN: python.syntax.tests
 
 ! Importing functions
