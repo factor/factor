@@ -11,7 +11,10 @@ py-initialize
 
 [ "os" ] [ "os" import PyModule_GetName ] py-test
 
-[ t ] [ "os" import "getpid" getattr { } py-call 0 > ] py-test
+[ t ] [
+    "os" import "getpid" getattr
+    { } >py call-object >factor 0 >
+] py-test
 
 [ t ] [ Py_IsInitialized ] py-test
 
@@ -38,15 +41,14 @@ py-initialize
 ! ! Datetimes
 [ t ] [
     [ py-date>factor ] "date" py-type-dispatch get set-at
-    "datetime" import
-    "date" getattr "today" getattr
-    { } py-call
+    "datetime" import "date" getattr "today" getattr
+    { } >py call-object >factor
     today instant >>gmt-offset =
 ] py-test
 
 ! Unicode
 [ "غثههح" ] [
-    "os.path" import "basename" getattr { "غثههح" } py-call
+    "os.path" import "basename" getattr { "غثههح" } >py call-object >factor
 ] py-test
 
 ! Instance variables
@@ -99,15 +101,8 @@ py-initialize
 ! Kwargs
 [ 2014 10 22 ] [
     "datetime" import "date" getattr
-    { } { "year" 2014 "month" 10 "day" 22 } py-call2
-    [ year>> ] [ month>> ] [ day>> ] tri
-] py-test
-
-SYMBOLS: year month day ;
-
-[ 2014 10 22 ] [
-    "datetime" import "date" getattr
-    { } { year 2014 month 10 day 22 } py-call2
+    { } >py H{ { "year" 2014 } { "month" 10 } { "day" 22 } } >py
+    call-object-full >factor
     [ year>> ] [ month>> ] [ day>> ] tri
 ] py-test
 
