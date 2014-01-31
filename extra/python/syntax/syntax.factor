@@ -1,4 +1,4 @@
-USING: accessors arrays effects effects.parser fry generalizations
+USING: accessors arrays combinators effects effects.parser fry generalizations
 kernel lexer math namespaces parser python python.ffi python.objects sequences
 sequences.generalizations vocabs.parser words ;
 IN: python.syntax
@@ -22,13 +22,26 @@ SYMBOL: current-context
     [ 1 = [ <1py-tuple> ] when ] keep
     [ py-tuple>array ] dip firstn ; inline
 
-: make-function-quot ( alien in out -- quot )
-    swapd '[ _ narray array>py-tuple _ swap call-object _ unpack-value ] ;
+: gather-args-quot ( in-effect -- quot )
+    dup ?last "**" = [
+        but-last length '[ [ _ narray array>py-tuple ] dip ]
+    ] [
+        length '[ _ narray array>py-tuple f ]
+    ] if ;
+
+: unpack-value-quot ( out-effect -- quot )
+    length {
+        { 0 [ [ drop ] ] }
+        { 1 [ [ ] ] }
+        [ '[ py-tuple>array _ firstn ] ]
+    } case ;
+
+: make-function-quot ( alien effect -- quot )
+    [ in>> gather-args-quot ] [ out>> unpack-value-quot ] bi
+    swapd '[ @ _ -rot call-object-full @ ] ;
 
 : function-callable ( name alien effect -- )
-    [ create-in ] 2dip
-    [ [ in>> length ] [ out>> length ] bi make-function-quot ] keep
-    define-inline ; inline
+    [ create-in ] 2dip [ make-function-quot ] keep define-inline ; inline
 
 : function-object ( name alien -- )
     [ "$" prepend create-in ] [ '[ _ ] ] bi*
