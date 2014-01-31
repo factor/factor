@@ -125,3 +125,11 @@ PY-FROM: sys => platform ( -- x ) ;
 [ t ] [
     $platform "sys" import "platform" "tjaba" >py setattr $platform =
 ] py-test
+
+! Support for kwargs
+
+PY-FROM: datetime => timedelta ( ** -- timedelta ) ;
+
+[ "datetime.timedelta(4, 10800)" ] [
+    H{ { "hours" 99 } } >py timedelta repr >factor
+] py-test
