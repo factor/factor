@@ -5,6 +5,8 @@ IN: python.syntax
 
 py-initialize
 
+<PRIVATE
+
 SYMBOL: current-context
 
 : with-each-definition ( quot -- )
@@ -36,8 +38,6 @@ SYMBOL: current-context
     [ dup current-context get import swap getattr 2dup ] dip
     function-callable function-object ; inline
 
-SYNTAX: PY-FROM: [ add-function ] scan-definitions ; inline
-
 : make-method-quot ( name in out -- ret )
     swapd '[
         _ narray array>py-tuple swap
@@ -53,5 +53,9 @@ SYNTAX: PY-FROM: [ add-function ] scan-definitions ; inline
     [ dup dup create-in swap ] dip
     [ [ in>> length 1 - ] [ out>> length ] bi make-method-quot ] keep
     define-inline method-object ;
+
+PRIVATE>
+
+SYNTAX: PY-FROM: [ add-function ] scan-definitions ; inline
 
 SYNTAX: PY-METHODS: [ add-method ] scan-definitions ; inline
