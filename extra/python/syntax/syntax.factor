@@ -1,5 +1,5 @@
 USING: accessors arrays effects effects.parser fry generalizations
-kernel lexer math namespaces parser python python.ffi sequences
+kernel lexer math namespaces parser python python.ffi python.objects sequences
 sequences.generalizations vocabs.parser words ;
 IN: python.syntax
 
