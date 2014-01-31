@@ -1,5 +1,6 @@
-USING: accessors alien alien.c-types alien.data arrays assocs fry
-hashtables kernel namespaces python.ffi sequences strings vectors ;
+USING: accessors alien alien.c-types alien.data arrays assocs fry hashtables
+kernel namespaces python.errors python.ffi python.objects sequences strings
+vectors ;
 IN: python
 QUALIFIED: math
 
@@ -10,86 +11,9 @@ QUALIFIED: math
 : py-finalize ( -- )
     Py_IsInitialized [ Py_Finalize ] when ;
 
-! Error handling
-ERROR: python-error type message ;
-
-: get-error ( -- ptype pvalue )
-    { void* void* void* } [ PyErr_Fetch ] with-out-parameters drop ;
-
-: throw-error ( ptype pvalue -- )
-    [ "__name__" PyObject_GetAttrString ] [ PyObject_Str ] bi* [ &Py_DecRef ] bi@
-    [ PyString_AsString ] bi@ python-error ;
-
-: (check-return) ( value/f -- value' )
-    [ get-error throw-error f ] unless* ;
-
-: check-return ( value/f -- value' )
-    (check-return) &Py_DecRef ;
-
-: check-return-code ( return -- )
-    0 = [ get-error throw-error ] unless ;
-
 ! Importing
 : import ( str -- module )
-    PyImport_ImportModule check-return ;
-
-! Objects
-: getattr ( obj str -- value )
-    PyObject_GetAttrString check-return ;
-
-: setattr ( obj str value -- )
-    PyObject_SetAttrString check-return-code ;
-
-: call-object ( obj args -- value )
-    PyObject_CallObject check-return ;
-
-: call-object-full ( obj args kwargs -- value )
-    PyObject_Call check-return ;
-
-! Types
-: <py-tuple> ( length -- tuple )
-    PyTuple_New check-return ;
-
-: py-tuple-set-item ( obj pos val -- )
-    dup Py_IncRef PyTuple_SetItem check-return-code ;
-
-: py-tuple-get-item ( obj pos -- val )
-    PyTuple_GetItem dup Py_IncRef check-return ;
-
-: py-tuple-size ( obj -- len )
-    PyTuple_Size ;
-
-: <1py-tuple> ( alien -- tuple )
-    1 <py-tuple> [ 0 rot py-tuple-set-item ] keep ;
-
-! Dicts
-: <py-dict> ( -- dict )
-    PyDict_New check-return ;
-
-: py-dict-set-item ( obj key val -- )
-    PyDict_SetItem check-return-code ;
-
-: py-dict-set-item-string ( dict key val -- )
-    PyDict_SetItemString check-return-code ;
-
-: py-dict-get-item-string ( obj key -- val )
-    PyDict_GetItemString dup Py_IncRef check-return ;
-
-: py-dict-size ( obj -- len )
-    PyDict_Size ;
-
-! Lists
-: <py-list> ( length -- list )
-    PyList_New check-return ;
-
-: py-list-size ( list -- len )
-    PyList_Size ;
-
-: py-list-get-item ( obj pos -- val )
-    PyList_GetItem dup Py_IncRef check-return ;
-
-: py-list-set-item ( obj pos val -- )
-    dup Py_IncRef PyList_SetItem check-return-code ;
+    PyImport_ImportModule check-new-ref ;
 
 ! Unicodes
 : py-ucs-size ( -- n )
@@ -98,8 +22,8 @@ ERROR: python-error type message ;
 : py-unicode>utf8 ( uni -- str )
     py-ucs-size 4 =
     [ PyUnicodeUCS4_AsUTF8String ]
-    [ PyUnicodeUCS2_AsUTF8String ] if (check-return)
-    PyString_AsString (check-return) ;
+    [ PyUnicodeUCS2_AsUTF8String ] if (check-ref)
+    PyString_AsString (check-ref) ;
 
 : utf8>py-unicode ( str -- uni )
     py-ucs-size 4 =
@@ -145,11 +69,11 @@ DEFER: >factor
     H{
         { "NoneType" [ drop f ] }
         { "bool" [ PyObject_IsTrue 1 = ] }
-        { "dict" [ PyDict_Items (check-return) >factor >hashtable ] }
+        { "dict" [ PyDict_Items (check-ref) >factor >hashtable ] }
         { "int" [ PyInt_AsLong ] }
         { "list" [ py-list>vector [ >factor ] map ] }
         { "long" [ PyLong_AsLong ] }
-        { "str" [ PyString_AsString (check-return) ] }
+        { "str" [ PyString_AsString (check-ref) ] }
         { "tuple" [ py-tuple>array [ >factor ] map ] }
         { "unicode" [ py-unicode>utf8 ] }
     } clone ;
