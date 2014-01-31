@@ -1,5 +1,5 @@
-USING: accessors alien alien.c-types alien.data arrays assocs fry grouping
-hashtables kernel namespaces python.ffi sequences strings vectors words ;
+USING: accessors alien alien.c-types alien.data arrays assocs fry
+hashtables kernel namespaces python.ffi sequences strings vectors ;
 IN: python
 QUALIFIED: math
 
@@ -42,6 +42,9 @@ ERROR: python-error type message ;
 
 : call-object ( obj args -- value )
     PyObject_CallObject check-return ;
+
+: call-object-full ( obj args kwargs -- value )
+    PyObject_Call check-return ;
 
 ! Types
 : <py-tuple> ( length -- tuple )
@@ -130,8 +133,6 @@ M: hashtable (>py)
 M: vector (>py)
     [ (>py) ] map vector>py-list ;
 
-M: word (>py) name>> (>py) ;
-
 : >py ( obj -- py-obj )
     (>py) &Py_DecRef ;
 
@@ -160,10 +161,3 @@ ERROR: missing-type type ;
 : >factor ( py-obj -- obj )
     dup "__class__" getattr "__name__" getattr PyString_AsString
     py-type-dispatch get ?at [ call( x -- x ) ] [ missing-type ] if ;
-
-! Utility
-: py-call ( obj args -- value )
-    >py call-object >factor ;
-
-: py-call2 ( obj args kwargs -- value )
-    [ >py ] [ 2 group >hashtable >py ] bi* PyObject_Call >factor ;
