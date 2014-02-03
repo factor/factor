@@ -1,5 +1,6 @@
 USING: arrays assocs destructors fry kernel math namespaces python python.ffi
-python.objects python.syntax python.tests sequences sets tools.test ;
+python.objects python.syntax python.tests sequences sets splitting tools.test
+unicode.categories ;
 IN: python.syntax.tests
 
 ! Importing functions
@@ -25,7 +26,7 @@ PY-FROM: time => sleep ( n -- ) ;
 [ ] [ 0 >py sleep ] unit-test
 
 ! Module variables are bound as zero-arg functions
-PY-FROM: sys => path ( -- seq ) ;
+PY-FROM: sys => path ( -- seq ) argv ( -- seq ) ;
 
 [ t ] [ $path >factor sequence? ] unit-test
 
@@ -127,9 +128,22 @@ PY-FROM: sys => platform ( -- x ) ;
 ] py-test
 
 ! Support for kwargs
-
 PY-FROM: datetime => timedelta ( ** -- timedelta ) ;
 
 [ "datetime.timedelta(4, 10800)" ] [
     H{ { "hours" 99 } } >py timedelta repr >factor
+] py-test
+
+! Kwargs in methods
+PY-FROM: argparse => ArgumentParser ( -- self ) ;
+PY-METHODS: ArgumentParser =>
+    add_argument ( self name ** -- )
+    format_help ( self -- str ) ;
+
+[ t ] [
+    [
+        ArgumentParser dup
+        "--foo" >py H{ { "help" "badger" } } >py add_argument
+        format_help >factor
+    ] with-destructors [ blank? ] trim " " split "badger" swap in?
 ] py-test
