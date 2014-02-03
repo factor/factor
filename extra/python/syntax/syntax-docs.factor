@@ -1,5 +1,5 @@
 IN: python.syntax
-USING: python.syntax help.markup help.syntax ;
+USING: hashtables python.syntax help.markup help.syntax ;
 
 HELP: PY-FROM:
 { $syntax "PY-FROM: module => name-effects ;" }
@@ -32,4 +32,23 @@ HELP: PY-METHODS:
     "! Then use the declarations like this"
     "\"name-of-zip.zip\" >py \"r\" >py ZipFile namelist >factor"
   }
+} ;
+
+ARTICLE: "python.syntax" "Syntax for python calls from factor"
+"The " { $vocab-link "python.syntax" } " vocab adds syntax to factor to make calls from factor to python natural and intuitive."
+$nl
+{ $examples "Here is how you bind and call a method namelist on a ZipFile instance created by importing the zipfile module:"
+  { $code
+    "PY-FROM: zipfile => ZipFile ( name mode -- file ) ;"
+    "PY-METHODS: ZipFile => namelist ( self -- names ) ;"
+    "! Then use the declarations like this"
+    "\"name-of-zip.zip\" >py \"r\" >py ZipFile namelist >factor"
+  }
+  "In python, a method or function takes keyword arguments if its last parameter starts with \"**\". If the name of the last argument to a declared function is \"**\" then a " { $link hashtable } " can be sent to the function:"
+  { $code
+    "PY-FROM: datetime => timedelta ( ** -- timedelta ) ;"
+    "PY-METHODS: timedelta  => seconds ( self -- n ) ;"
+    "H{ { \"hours\" 99 } { \"minutes\" 33 } } >py timedelta $seconds >factor ."
+    "12780"
+    }
 } ;

@@ -1,14 +1,6 @@
 IN: python
 USING: python help.markup help.syntax ;
 
-ARTICLE: "python" "Python binding"
-"The " { $vocab-link "python" } " vocab and its subvocabs implements a simple binding for libpython, allowing factor code to call native python."
-$nl
-"Initialization and finalization:"
-{ $subsections py-initialize py-finalize }
-"Module management:"
-{ $subsections import } ;
-
 HELP: py-initialize
 { $description "Initializes the python binding. This word must be called before any other words in the api can be used" } ;
 
@@ -26,3 +18,12 @@ HELP: >py
   }
 }
 { $see-also >factor } ;
+
+ARTICLE: "python" "Python binding"
+"The " { $vocab-link "python" } " vocab and its subvocabs implements a simple binding for libpython, allowing factor code to call native python."
+$nl
+"Initialization and finalization:"
+{ $subsections py-initialize py-finalize }
+"Module management:"
+{ $subsections import }
+"The vocab " { $vocab-link "python.syntax" } " implements a higher level factorific interface on top of the lower-level constructs in this vocab. Prefer to use that vocab most of the time." ;
