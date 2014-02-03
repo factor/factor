@@ -21,6 +21,7 @@ FUNCTION: c-string Py_GetVersion ( ) ;
 FUNCTION: void Py_Initialize ( ) ;
 FUNCTION: bool Py_IsInitialized ( ) ;
 FUNCTION: void Py_Finalize ( ) ;
+FUNCTION: void PySys_SetArgvEx ( int argc, c-string* argv, int updatepath ) ;
 
 ! Misc
 FUNCTION: int PyRun_SimpleString ( c-string command ) ;

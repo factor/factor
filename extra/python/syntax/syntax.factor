@@ -17,11 +17,6 @@ SYMBOL: current-context
 : scan-definitions ( quot -- )
     scan-token current-context set "=>" expect with-each-definition ; inline
 
-: unpack-value ( alien -- * )
-    [ 0 = [ drop 0 <py-tuple> ] when ] keep
-    [ 1 = [ <1py-tuple> ] when ] keep
-    [ py-tuple>array ] dip firstn ; inline
-
 : gather-args-quot ( in-effect -- quot )
     dup ?last "**" = [
         but-last length '[ [ _ narray array>py-tuple ] dip ]
@@ -51,21 +46,19 @@ SYMBOL: current-context
     [ dup current-context get import swap getattr 2dup ] dip
     function-callable function-object ; inline
 
-: make-method-quot ( name in out -- ret )
-    swapd '[
-        _ narray array>py-tuple swap
-        _ getattr swap call-object
-        _ unpack-value
-    ] ;
+: make-method-quot ( name effect -- quot )
+    [ in>> 1 tail gather-args-quot ] [ out>> unpack-value-quot ] bi swapd
+    '[ @ rot _ getattr -rot call-object-full @ ] ;
+
+: method-callable ( name effect -- )
+    [ dup create-in swap ] dip [ make-method-quot ] keep define-inline ;
 
 : method-object ( name -- )
     [ "$" prepend create-in ] [ '[ _ getattr ] ] bi
     { "obj" } { "obj'" } <effect> define-inline ;
 
 : add-method ( name effect -- )
-    [ dup dup create-in swap ] dip
-    [ [ in>> length 1 - ] [ out>> length ] bi make-method-quot ] keep
-    define-inline method-object ;
+    dupd method-callable method-object ;
 
 PRIVATE>
 
