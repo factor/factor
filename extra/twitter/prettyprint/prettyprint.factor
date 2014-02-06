@@ -58,3 +58,4 @@ CONSTANT: tweet-metadata-style
 : friends-timeline. ( -- )      friends-timeline [ tweet. ] each ;
 : public-timeline.  ( -- )      public-timeline  [ tweet. ] each ;
 : user-timeline.    ( user -- ) user-timeline    [ tweet. ] each ;
+: home-timeline.    ( -- )      home-timeline    [ tweet. ] each ;
