@@ -166,3 +166,6 @@ PRIVATE>
 
 : user-timeline ( username -- tweets )
     "user_timeline/" prepend timeline ;
+
+: home-timeline ( -- tweets )
+    "home_timeline" timeline ;
