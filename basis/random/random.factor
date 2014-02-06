@@ -19,14 +19,13 @@ GENERIC: random-32* ( tuple -- r )
 GENERIC: random-bytes* ( n tuple -- byte-array )
 
 M: object random-bytes* ( n tuple -- byte-array )
-    [ [ <byte-vector> ] keep 4 /mod ] dip
-    [ pick '[ _ random-32* c:int <ref> _ push-all ] times ]
-    [
-        over zero?
-        [ 2drop ] [ random-32* c:int <ref> swap head append! ] if
-    ] bi-curry bi* B{ } like ;
-
-HINTS: M\ object random-bytes* { fixnum object } ;
+    [ integer>fixnum-strict [ <byte-array> ] keep ] dip
+    [ over 4 >= ] [
+        [ 4 - ] dip
+        [ random-32* 2over c:int c:set-alien-value ] keep
+    ] while over zero? [ 2drop ] [
+        random-32* c:int <ref> swap head 0 pick copy-unsafe
+    ] if ;
 
 M: object random-32* ( tuple -- r )
     4 swap random-bytes* c:uint deref ;
@@ -40,10 +39,11 @@ M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
 
 M: f random-32* ( obj -- * ) no-random-number-generator ;
 
-: random-32 ( -- n ) random-generator get random-32* ;
+: random-32 ( -- n )
+    random-generator get random-32* ;
 
-TYPED: random-bytes ( n: fixnum -- byte-array: byte-array )
-    random-generator get random-bytes* ; inline
+: random-bytes ( n -- byte-array )
+    random-generator get random-bytes* ;
 
 <PRIVATE
 
