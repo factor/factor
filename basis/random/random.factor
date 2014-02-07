@@ -15,10 +15,10 @@ SYMBOL: secure-random-generator
 SYMBOL: random-generator
 
 GENERIC# seed-random 1 ( obj seed -- obj )
-GENERIC: random-32* ( obj -- r )
+GENERIC: random-32* ( obj -- n )
 GENERIC: random-bytes* ( n obj -- byte-array )
 
-M: object random-bytes* ( n obj -- byte-array )
+M: object random-bytes*
     [ integer>fixnum-strict [ <byte-array> ] keep ] dip
     [ over 4 >= ] [
         [ 4 - ] dip
@@ -27,7 +27,7 @@ M: object random-bytes* ( n obj -- byte-array )
         random-32* c:int <ref> swap head 0 pick copy-unsafe
     ] if ;
 
-M: object random-32* ( obj -- r )
+M: object random-32*
     4 swap random-bytes* c:uint deref ;
 
 ERROR: no-random-number-generator ;
@@ -47,7 +47,7 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 
 <PRIVATE
 
-:: (random-bits) ( numbits obj -- r )
+:: (random-bits) ( numbits obj -- n )
     numbits 32 > [
         obj random-32* numbits 32 - [ dup 32 > ] [
             [ 32 shift obj random-32* + ] [ 32 - ] bi*
@@ -60,27 +60,27 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 
 PRIVATE>
 
-: random-bits ( numbits -- r )
+: random-bits ( numbits -- n )
     random-generator get (random-bits) ;
 
-: random-bits* ( numbits -- r )
+: random-bits* ( numbits -- n )
     1 - [ random-bits ] keep set-bit ;
 
 <PRIVATE
 
-: next-power-of-2-bits ( n -- numbits )
+: next-power-of-2-bits ( m -- numbits )
     dup 2 <= [ drop 1 ] [ 1 - log2 1 + ] if ; inline
 
-:: ((random-integer)) ( n obj -- r )
-    obj random-32* 32 n next-power-of-2-bits 32 - [ dup 0 > ] [
+:: ((random-integer)) ( m obj -- n )
+    obj random-32* 32 m next-power-of-2-bits 32 - [ dup 0 > ] [
         [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
-    ] while drop [ n * ] [ neg shift ] bi* ; inline
+    ] while drop [ m * ] [ neg shift ] bi* ; inline
 
-GENERIC# (random-integer) 1 ( n obj -- r )
-M: fixnum (random-integer) ( n obj -- r ) ((random-integer)) ;
-M: bignum (random-integer) ( n obj -- r ) ((random-integer)) ;
+GENERIC# (random-integer) 1 ( m obj -- n )
+M: fixnum (random-integer) ( m obj -- n ) ((random-integer)) ;
+M: bignum (random-integer) ( m obj -- n ) ((random-integer)) ;
 
-: random-integer ( n -- r )
+: random-integer ( m -- n )
     random-generator get (random-integer) ;
 
 PRIVATE>
