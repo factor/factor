@@ -864,8 +864,8 @@ PRIVATE>
 : pad-tail ( seq n elt -- padded )
     [ append ] padding ;
 
-: shorter? ( seq1 seq2 -- ? ) [ length ] bi@ < ;
-: longer? ( seq1 seq2 -- ? ) [ length ] bi@ > ;
+: shorter? ( seq1 seq2 -- ? ) [ length ] bi@ < ; inline
+: longer? ( seq1 seq2 -- ? ) [ length ] bi@ > ; inline
 : shorter ( seq1 seq2 -- seq ) [ [ length ] bi@ <= ] 2keep ? ; inline
 : longer ( seq1 seq2 -- seq ) [ [ length ] bi@ >= ] 2keep ? ; inline
 
@@ -873,14 +873,16 @@ PRIVATE>
     2dup shorter? [
         2drop f
     ] [
-        [ nip ] [ length head-slice ] 2bi sequence=
+        [ length [ head-slice ] keep swap ] keep
+        mismatch-unsafe not
     ] if ;
 
 : tail? ( seq end -- ? )
     2dup shorter? [
         2drop f
     ] [
-        [ nip ] [ length tail-slice* ] 2bi sequence=
+        [ length [ tail-slice* ] keep swap ] keep
+        mismatch-unsafe not
     ] if ;
 
 : cut-slice ( seq n -- before-slice after-slice )
