@@ -97,7 +97,7 @@ TUPLE: hashtable
     [ count>> 3 fixnum*fast ]
     [ array>> length>> ] bi fixnum>= ; inline
 
-: each-pair ( array quot: ( key value -- ) -- )
+: each-pair ( ... array quot: ( ... key value -- ... ) -- ... )
     [
         [ length 2/ ] keep [
             [ 1 fixnum-shift-fast ] dip [ array-nth ] 2keep
@@ -145,20 +145,16 @@ M: hashtable set-at
     dup ?grow-hash (set-at) ;
 
 : associate ( value key -- hash )
-    1 <hashtable> [ set-at ] keep ; inline
+    [ 1 0 ] 2dip 1 <hash-array>
+    [ 2dup hash@ set-nth-pair ] keep
+    hashtable boa ; inline
 
 <PRIVATE
 
-: push-unsafe ( elt seq -- )
-    [ length ] keep
-    [ underlying>> set-array-nth ]
-    [ [ 1 fixnum+fast { array-capacity } declare ] dip length<< ]
-    2bi ; inline
-
 : collect-pairs ( hash quot: ( key value -- elt ) -- seq )
-    [ [ array>> ] [ assoc-size <vector> ] bi ] dip swap [
-        [ push-unsafe ] curry compose each-pair
-    ] keep { } like ; inline
+    [ [ array>> 0 swap ] [ assoc-size f <array> ] bi ] dip swap [
+        [ [ over ] dip set-nth-unsafe 1 + ] curry compose each-pair
+    ] keep nip ; inline
 
 PRIVATE>
 
