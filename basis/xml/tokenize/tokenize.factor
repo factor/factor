@@ -92,10 +92,18 @@ HINTS: next* { spot } ;
 : string-matcher ( str -- quot: ( pos char -- pos ? ) )
     dup length 1 - '[ _ next-matching dup _ > ] ; inline
 
+:: (take-string) ( match spot -- sbuf matched? )
+    10 <sbuf> f [
+        spot char>> [
+            nip over push
+            spot next*
+            dup match tail? dup not
+        ] [ f ] if*
+    ] loop ; inline
+
 : take-string ( match -- string )
-    [ 0 swap string-matcher take-until nip ] keep
-    dupd [ length ] bi@ 1 - - head
-    get-char [ missing-close ] unless next ;
+    [ spot get (take-string) [ missing-close ] unless ]
+    [ dupd [ length ] bi@ - over shorten "" like ] bi ;
 
 : expect ( string -- )
     dup length spot get '[ _ [ char>> ] keep next* ] "" replicate-as
