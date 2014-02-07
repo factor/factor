@@ -86,3 +86,10 @@ IN: math.tests
 { -0x3fffffffffffffff } [ 0x3ffffffffffffffe >bignum bitnot ] unit-test
 { -0x4000000000000000 } [ 0x3fffffffffffffff >bignum bitnot ] unit-test
 { -0x4000000000000001 } [ 0x4000000000000000 >bignum bitnot ] unit-test
+
+{ 2 } [ 0 next-power-of-2 ] unit-test
+{ 2 } [ 1 next-power-of-2 ] unit-test
+{ 2 } [ 2 next-power-of-2 ] unit-test
+{ 4 } [ 3 next-power-of-2 ] unit-test
+{ 4 } [ 4 next-power-of-2 ] unit-test
+{ 8 } [ 5 next-power-of-2 ] unit-test
