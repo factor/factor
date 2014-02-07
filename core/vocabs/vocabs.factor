@@ -111,8 +111,13 @@ ERROR: no-vocab name ;
     sift ;
 
 : child-vocab? ( prefix name -- ? )
-    2dup = pick empty? or
-    [ 2drop t ] [ swap CHAR: . suffix head? ] if ;
+    swap [ drop t ] [
+        2dup = [ 2drop t ] [
+            2dup head? [
+                length swap ?nth CHAR: . =
+            ] [ 2drop f ] if
+        ] if
+    ] if-empty ;
 
 : child-vocabs ( vocab -- seq )
     vocab-name vocabs [ child-vocab? ] with filter ;
