@@ -10,7 +10,7 @@ HELP: seed-random
 { $notes "Not supported on all random number generators." } ;
 
 HELP: random-32*
-{ $values { "obj" "a random number generator" } { "r" "an integer between 0 and 2^32-1" } }
+{ $values { "obj" "a random number generator" } { "n" "an integer between 0 and 2^32-1" } }
 { $description "Generates a random 32-bit unsigned integer." } ;
 
 HELP: random-bytes*
@@ -78,11 +78,11 @@ HELP: random-units
 } ;
 
 HELP: random-bits
-{ $values { "numbits" integer } { "r" "a random integer" } }
+{ $values { "numbits" integer } { "n" "a random integer" } }
 { $description "Outputs an random integer n bits in length." } ;
 
 HELP: random-bits*
-{ $values { "numbits" integer } { "r" "a random integer" } }
+{ $values { "numbits" integer } { "n" "a random integer" } }
 { $description "Returns an integer exactly " { $snippet "numbits" } " in length, with the topmost bit set to one." } ;
 
 HELP: with-random

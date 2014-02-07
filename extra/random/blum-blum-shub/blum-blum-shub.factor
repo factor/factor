@@ -25,6 +25,6 @@ PRIVATE>
     [ find-relative-prime ] keep
     blum-blum-shub boa ;
 
-M: blum-blum-shub random-32* ( bbs -- r )
+M: blum-blum-shub random-32*
     0 32 rot
     [ next-bbs-bit swap 1 shift bitor ] curry times ;
