@@ -26,4 +26,6 @@ $nl
 { $subsections py-initialize py-finalize }
 "Module management:"
 { $subsections import }
-"The vocab " { $vocab-link "python.syntax" } " implements a higher level factorific interface on top of the lower-level constructs in this vocab. Prefer to use that vocab most of the time." ;
+"The vocab " { $vocab-link "python.syntax" } " implements a higher level factorific interface on top of the lower-level constructs in this vocab. Prefer to use that vocab most of the time."
+{ $notes "Sometimes the embedded python interpreter can't find or finds the wrong load path to it's module library. To counteract that problem it is recommended that the " { $snippet "PYTHONHOME" } " environment variable is set before " { $link py-initialize } " is called. E.g:" }
+{ $code "\"C:/python27-64bit/\" \"PYTHONHOME\" set-os-env" } ;
