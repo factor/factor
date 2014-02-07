@@ -31,7 +31,7 @@ CONSTANT: a uint-array{ 0 0x9908b0df }
     [
         seq>>
         [ [ n m - ] dip '[ [ m ] dip _ mt[k] ] each-integer ]
-        [ [ m 1 - ] dip '[ [ m n - ] [ n m - + ] bi* _ mt[k] ] each-integer ]
+        [ [ m ] dip '[ [ m n - ] [ n m - + ] bi* _ mt[k] ] each-integer ]
         bi
     ] [ 0 >>i drop ] bi ; inline
 
