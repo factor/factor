@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! mersenne twister based on 
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
-USING: alien.c-types alien.data kernel math namespaces sequences
-sequences.private system init accessors math.ranges random
-math.bitwise combinators specialized-arrays fry ;
+USING: accessors alien.c-types alien.data fry init kernel math
+math.bitwise namespaces random sequences sequences.private
+specialized-arrays ;
 SPECIALIZED-ARRAY: uint
 IN: random.mersenne-twister
 
@@ -16,23 +16,23 @@ CONSTANT: n 624
 CONSTANT: m 397
 CONSTANT: a uint-array{ 0 0x9908b0df }
 
-: y ( n seq -- y )
-    [ nth-unsafe 31 mask-bit ]
-    [ [ 1 + ] [ nth-unsafe ] bi* 31 bits ] 2bi bitor ; inline
-
-: mt[k] ( offset n seq -- )
+: mt-step ( k+m k+1 k seq -- )
     [
-        [ [ + ] dip nth-unsafe ]
-        [ y [ 2/ ] [ 1 bitand a nth ] bi bitxor ] 2bi
-        bitxor
+        [ nth-unsafe ] curry tri@
+        [ 31 bits ] [ 31 mask-bit ] bi* bitor
+        [ 2/ ] [ 1 bitand a nth ] bi bitxor bitxor
     ] 2keep set-nth-unsafe ; inline
+
+: mt-steps ( k k+1 k+m n seq -- )
+    [ mt-step ] curry [ 3keep [ 1 + ] tri@ ] curry times 3drop ; inline
 
 : mt-generate ( mt -- )
     [
         seq>>
-        [ [ n m - ] dip '[ [ m ] dip _ mt[k] ] each-integer ]
-        [ [ m ] dip '[ [ m n - ] [ n m - + ] bi* _ mt[k] ] each-integer ]
-        bi
+        [ [ m 1 0 n m - ] dip mt-steps ]
+        [ [ 0 n m - 1 + n m - m 1 - ] dip mt-steps ]
+        [ [ m 1 - 0 n 1 - ] dip mt-step ]
+        tri
     ] [ 0 >>i drop ] bi ; inline
 
 : init-mt-formula ( i seq -- f(seq[i]) )
