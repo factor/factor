@@ -407,7 +407,7 @@ HELP: number
 
 HELP: next-power-of-2
 { $values { "m" "a non-negative integer" } { "n" "an integer" } }
-{ $description "Outputs the smallest power of 2 greater than " { $snippet "m" } ". The output value is always at least 2." } ;
+{ $description "Outputs the smallest power of 2 greater than or equal to " { $snippet "m" } ". The output value is always at least 2." } ;
 
 HELP: power-of-2?
 { $values { "n" integer } { "?" "a boolean" } }
