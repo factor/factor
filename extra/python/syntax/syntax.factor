@@ -3,8 +3,6 @@ kernel lexer math namespaces parser python python.ffi python.objects sequences
 sequences.generalizations vocabs.parser words ;
 IN: python.syntax
 
-py-initialize
-
 <PRIVATE
 
 SYMBOL: current-context
