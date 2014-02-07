@@ -1,6 +1,6 @@
-USING: arrays assocs destructors fry kernel math namespaces python python.ffi
-python.objects python.syntax python.tests sequences sets splitting tools.test
-unicode.categories ;
+USING: arrays assocs destructors fry io.files.temp kernel math namespaces
+python python.ffi python.objects python.syntax python.tests sequences sets
+splitting tools.test unicode.categories ;
 IN: python.syntax.tests
 
 ! Importing functions
@@ -80,7 +80,7 @@ PY-METHODS: file =>
     tell ( self -- n ) ;
 
 [ t ] [
-    "testfile" >py "wb" >py open
+    "python-file" temp-file >py "wb" >py open
     [ tell ] [ fileno ] [ close ] tri
     [ >factor integer? ] bi@ and
 ] py-test
@@ -147,3 +147,6 @@ PY-METHODS: ArgumentParser =>
         format_help >factor
     ] with-destructors [ blank? ] trim " " split "badger" swap in?
 ] py-test
+
+! Can you pass a callback written in factor to a python function?
+PY-FROM: wsgiref.simple_server => make_server ( iface port callback -- httpd ) ;
