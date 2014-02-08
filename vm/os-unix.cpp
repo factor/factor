@@ -36,7 +36,7 @@ void sleep_nanos(uint64_t nsec) {
 void factor_vm::init_ffi() { null_dll = dlopen(NULL, RTLD_LAZY); }
 
 void factor_vm::ffi_dlopen(dll* dll) {
-  dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY);
+  dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY | RTLD_GLOBAL);
 }
 
 void* factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
