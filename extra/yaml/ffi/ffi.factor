@@ -8,6 +8,8 @@ IN: yaml.ffi
 
 <<
 "libyaml" {
+    { [ os windows? ] [ "libyaml.dll" ] }
+    { [ os macosx?  ] [ "libyaml.dylib" ] }
     { [ os unix?  ] [ "libyaml.so" ] }
 } cond cdecl add-library
 >>
