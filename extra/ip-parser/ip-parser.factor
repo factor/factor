@@ -1,10 +1,13 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators combinators.short-circuit kernel locals math
-math.parser sequences splitting ;
+USING: combinators combinators.short-circuit formatting kernel
+literals locals math math.bitwise math.parser sequences
+splitting ;
 
 IN: ip-parser
+
+ERROR: invalid-ipv4 str ;
 
 <PRIVATE
 
@@ -19,17 +22,25 @@ IN: ip-parser
     reverse 0 swap [ + 256 /mod ] map reverse nip ;
 
 : join-components ( array -- str )
-    bubble [ number>string ] map "." join ;
+    [ number>string ] map "." join ;
 
-PRIVATE>
-
-ERROR: invalid-ipv4 str ;
-
-: parse-ipv4 ( str -- ip )
+: (parse-ipv4) ( str -- array )
     dup split-components dup length {
         { 1 [ { 0 0 0 } prepend ] }
         { 2 [ first2 [| A D | { A 0 0 D } ] call ] }
         { 3 [ first3 [| A B D | { A B 0 D } ] call ] }
         { 4 [ ] }
         [ drop invalid-ipv4 ]
-    } case join-components nip ;
+    } case bubble nip ;
+
+PRIVATE>
+
+: parse-ipv4 ( str -- ip )
+    (parse-ipv4) join-components ;
+
+: ipv4-ntoa ( integer -- ip )
+    $[ { -24 -16 -8 0 } [ [ shift 8 bits ] curry ] map ]
+    cleave "%s.%s.%s.%s" sprintf ;
+
+: ipv4-aton ( ip -- integer )
+    (parse-ipv4) { 24 16 8 0 } [ shift ] [ + ] 2map-reduce ;
