@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators combinators.smart
-csv grouping http.client interval-maps io.encodings.ascii
-io.files io.files.temp io.launcher io.pathnames kernel math
-math.parser math.vectors memoize sequences splitting strings ;
+USING: accessors arrays assocs combinators combinators.smart csv
+grouping http.client interval-maps io.encodings.ascii io.files
+io.files.temp io.launcher io.pathnames ip-parser kernel math
+math.parser memoize sequences strings ;
 IN: geo-ip
 
 : db-path ( -- path ) "IpToCountry.csv" cache-file ;
@@ -47,9 +47,6 @@ MEMO: ip-intervals ( -- interval-map )
 
 GENERIC: lookup-ip ( ip -- ip-entry )
 
-M: string lookup-ip
-    "." split [ string>number ] map
-    { 0x1000000 0x10000 0x100 0x1 } v.
-    lookup-ip ;
+M: string lookup-ip ipv4-aton lookup-ip ;
 
 M: integer lookup-ip ip-intervals interval-at ;
