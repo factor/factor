@@ -22,5 +22,5 @@ IN: ip-parser
     } [ parse-ipv4 "74.125.226.4" = ] all?
 ] unit-test
 
-{ "174.36.207.186" } [ 2921648058 ipv4-ntoa ] unit-test
-{ 2921648058 } [ "174.36.207.186" ipv4-aton ] unit-test
+{ "74.125.226.4" } [ 1249763844 ipv4-ntoa ] unit-test
+{ 1249763844 } [ "74.125.226.4" ipv4-aton ] unit-test
