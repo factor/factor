@@ -43,4 +43,4 @@ PRIVATE>
     cleave "%s.%s.%s.%s" sprintf ;
 
 : ipv4-aton ( ip -- integer )
-    (parse-ipv4) { 24 16 8 0 } [ shift ] [ + ] 2map-reduce ;
+    (parse-ipv4) B{ 24 16 8 0 } [ shift ] [ + ] 2map-reduce ;
