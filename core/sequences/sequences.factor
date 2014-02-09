@@ -1017,6 +1017,7 @@ PRIVATE>
 GENERIC: sum ( seq -- n )
 M: object sum 0 [ + ] binary-reduce ; inline
 M: iota-tuple sum length dup 1 - * 2/ ; inline
+M: repetition sum [ elt>> ] [ len>> ] bi * ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
