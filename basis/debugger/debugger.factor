@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings slots arrays definitions generic hashtables
-summary io kernel math namespaces make prettyprint
+USING: alien.libraries alien.strings formatting slots arrays definitions generic
+hashtables summary io kernel math multiline namespaces make prettyprint
 prettyprint.config sequences assocs sequences.private strings
 io.styles io.pathnames vectors words system splitting
 math.parser classes.mixin classes.tuple continuations
@@ -108,12 +108,24 @@ HOOK: signal-error. os ( obj -- )
 : ffi-error. ( obj -- )
     "FFI error" print drop ;
 
+STRING: undefined-symbol-error-message-format
+Cannot resolve C library function
+Symbol: %s
+Library: %s
+Dlerror: %s
+You might be missing a library or the library path is wrong.
+See http://concatenative.org/wiki/view/Factor/Requirements
+;
+
+: retrieve-dlerror ( name dll -- message/f )
+    dup dll-valid? [ dlsym ] [ nip path>> dlopen ] if drop dlerror ;
+
+: undefined-symbol-error-message ( obj -- message )
+    2 tail first2 [ symbol>string ] dip 2dup retrieve-dlerror [ unparse ] dip
+    undefined-symbol-error-message-format sprintf ;
+
 : undefined-symbol-error. ( obj -- )
-    "Cannot resolve C library function" print
-    "Symbol: " write dup third symbol>string print
-    "Library: " write fourth .
-    "You are probably missing a library or the library path is wrong." print
-    "See http://concatenative.org/wiki/view/Factor/Requirements" print ;
+    undefined-symbol-error-message print ;
 
 : stack-underflow. ( obj name -- )
     write " stack underflow" print drop ;
@@ -131,7 +143,7 @@ HOOK: signal-error. os ( obj -- )
 : memory-error. ( error -- )
     "Memory protection fault at address " write third .h ;
 
-: primitive-error. ( error -- ) 
+: primitive-error. ( error -- )
     "Unimplemented primitive" print drop ;
 
 : fp-trap-error. ( error -- )
