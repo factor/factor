@@ -23,7 +23,7 @@ CONSTANT: a uint-array{ 0 0x9908b0df }
         [ 2/ ] [ 1 bitand a nth ] bi bitxor bitxor
     ] 2keep set-nth-unsafe ; inline
 
-: mt-steps ( k k+1 k+m n seq -- )
+: mt-steps ( k+m k+1 k n seq -- )
     [ mt-step ] curry [ 3keep [ 1 + ] tri@ ] curry times 3drop ; inline
 
 : mt-generate ( mt -- )
