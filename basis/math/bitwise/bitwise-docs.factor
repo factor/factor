@@ -184,7 +184,7 @@ HELP: >signed
 HELP: mask
 { $values
      { "x" integer } { "n" integer }
-     { "?" "a boolean" }
+     { "y" integer }
 }
 { $description "After the operation, only the bits that were set in both the mask and the original number are set." }
 { $examples
@@ -297,7 +297,7 @@ HELP: shift-mod
 HELP: unmask
 { $values
      { "x" integer } { "n" integer }
-     { "?" "a boolean" }
+     { "y" integer }
 }
 { $description "Clears the bits in " { $snippet "x" } " if they are set in the mask " { $snippet "n" } "." }
 { $examples

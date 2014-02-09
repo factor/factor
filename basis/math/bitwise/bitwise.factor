@@ -10,9 +10,9 @@ IN: math.bitwise
 ! utilities
 : clear-bit ( x n -- y ) 2^ bitnot bitand ; inline
 : set-bit ( x n -- y ) 2^ bitor ; inline
-: unmask ( x n -- ? ) bitnot bitand ; inline
+: unmask ( x n -- y ) bitnot bitand ; inline
 : unmask? ( x n -- ? ) unmask zero? not ; inline
-: mask ( x n -- ? ) bitand ; inline
+: mask ( x n -- y ) bitand ; inline
 : mask? ( x n -- ? ) [ mask ] [ = ] bi ; inline
 : wrap ( m n -- m' ) 1 - bitand ; inline
 : on-bits ( m -- n ) dup 0 <= [ drop 0 ] [ 2^ 1 - ] if ; inline
