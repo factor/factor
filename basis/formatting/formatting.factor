@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors arrays assocs calendar combinators combinators.smart
-fry io io.streams.string kernel macros math math.functions math.parser
-peg.ebnf present prettyprint quotations sequences strings unicode.case
-unicode.categories vectors ;
+USING: accessors arrays assocs calendar combinators fry kernel
+generalizations io io.streams.string macros math math.functions
+math.parser peg.ebnf quotations sequences splitting strings
+unicode.categories unicode.case vectors combinators.smart
+present ;
 FROM: math.parser.private => format-float ;
 IN: formatting
 
@@ -61,6 +62,7 @@ fmt-c     = "c"                  => [[ [ 1string ] ]]
 fmt-C     = "C"                  => [[ [ 1string >upper ] ]]
 fmt-s     = "s"                  => [[ [ present ] ]]
 fmt-S     = "S"                  => [[ [ present >upper ] ]]
+fmt-u     = "u"                  => [[ [ unparse ] ]]
 fmt-d     = "d"                  => [[ [ >integer number>string ] ]]
 fmt-e     = digits "e"           => [[ first '[ _ format-scientific ] ]]
 fmt-E     = digits "E"           => [[ first '[ _ format-scientific >upper ] ]]
@@ -69,7 +71,7 @@ fmt-x     = "x"                  => [[ [ >hex ] ]]
 fmt-X     = "X"                  => [[ [ >hex >upper ] ]]
 unknown   = (.)*                 => [[ unknown-printf-directive ]]
 
-strings_  = fmt-c|fmt-C|fmt-s|fmt-S
+strings_  = fmt-c|fmt-C|fmt-s|fmt-S|fmt-u
 strings   = pad width strings_   => [[ <reversed> compose-all ]]
 
 numbers_  = fmt-d|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
