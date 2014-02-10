@@ -6,7 +6,7 @@ IN: formatting
 HELP: printf
 { $values { "format-string" string } }
 { $description
-    "Writes the arguments (specified on the stack) formatted according to the format string." 
+    "Writes the arguments (specified on the stack) formatted according to the format string."
     $nl
     "Several format specifications exist for handling arguments of different types, and "
     "specifying attributes for the result string, including such things as maximum width, "
@@ -16,8 +16,9 @@ HELP: printf
         { { $snippet "%%" }          "Single %"                   "" }
         { { $snippet "%P.Ds" }       "String format"              "string" }
         { { $snippet "%P.DS" }       "String format uppercase"    "string" }
-        { { $snippet "%c" }          "Character format"           "char" } 
-        { { $snippet "%C" }          "Character format uppercase" "char" } 
+        { { $snippet "%P.Du" }       "Unparsed format"            "object" }
+        { { $snippet "%c" }          "Character format"           "char" }
+        { { $snippet "%C" }          "Character format uppercase" "char" }
         { { $snippet "%+Pd" }        "Integer format"             "fixnum" }
         { { $snippet "%+P.De" }      "Scientific notation"        "fixnum, float" }
         { { $snippet "%+P.DE" }      "Scientific notation"        "fixnum, float" }
@@ -81,11 +82,15 @@ HELP: printf
         "USING: formatting ;"
         "H{ { 1 2 } { 3 4 } } \"%[%d: %d %]\" printf"
         "{ 1:2, 3:4 }" }
+    { $example
+      "USING: calendar formatting ;"
+      "3 years \"%u\" printf"
+      "T{ duration { year 3 } }" }
 } ;
 
 HELP: sprintf
 { $values { "format-string" string } { "result" string } }
-{ $description "Returns the arguments (specified on the stack) formatted according to the format string as a result string." } 
+{ $description "Returns the arguments (specified on the stack) formatted according to the format string as a result string." }
 { $see-also printf } ;
 
 HELP: strftime
@@ -136,5 +141,3 @@ ARTICLE: "formatting" "Formatted printing"
 } ;
 
 ABOUT: "formatting"
-
-
