@@ -706,7 +706,7 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   0x000000FF
 :: n>win32-error-string ( id -- string )
     flags{
         FORMAT_MESSAGE_FROM_SYSTEM
-        FORMAT_MESSAGE_ARGUMENT_ARRAY
+        FORMAT_MESSAGE_IGNORE_INSERTS
     }
     f
     id
@@ -739,7 +739,7 @@ ERROR: windows-error n string ;
     ] [
         dup n>win32-error-string windows-error
     ] if ;
-    
+
 : throw-win32-error ( -- * )
     win32-error-string throw ;
 
