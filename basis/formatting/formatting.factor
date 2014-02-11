@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors arrays assocs calendar combinators fry kernel
-generalizations io io.streams.string macros math math.functions
-math.parser peg.ebnf prettyprint quotations sequences splitting
-strings unicode.categories unicode.case vectors combinators.smart
-present ;
+USING: accessors arrays assocs calendar combinators
+combinators.smart fry generalizations io io.streams.string
+kernel macros math math.functions math.parser namespaces
+peg.ebnf present prettyprint quotations sequences strings
+unicode.case unicode.categories vectors ;
 FROM: math.parser.private => format-float ;
 IN: formatting
 
@@ -56,7 +56,7 @@ width     = (width_)?            => [[ [ ] or ]]
 digits_   = "." ([0-9])*         => [[ second >digits ]]
 digits    = (digits_)?           => [[ 6 or ]]
 
-fmt-%     = "%"                  => [[ [ "%" ] ]]
+fmt-%     = "%"                  => [[ "%" ]]
 fmt-c     = "c"                  => [[ [ 1string ] ]]
 fmt-C     = "C"                  => [[ [ 1string >upper ] ]]
 fmt-s     = "s"                  => [[ [ present ] ]]
@@ -82,28 +82,33 @@ lists     = "[%" types ", %]"    => [[ second '[ _ map ", " join "{ " prepend " 
 
 assocs    = "[%" types ": %" types " %]" => [[ [ second ] [ fourth ] bi '[ unzip [ _ map ] dip _ map zip [ ":" join ] map ", " join "{ " prepend " }" append ] ]]
 
-formats   = "%" (types|fmt-%|lists|assocs|unknown) => [[ second '[ _ dip ] ]]
+formats   = "%" (types|fmt-%|lists|assocs|unknown) => [[ second ]]
 
-plain-text = (!("%").)+          => [[ >string '[ _ swap ] ]]
+plain-text = (!("%").)+          => [[ >string ]]
 
-text      = (formats|plain-text)* => [[ <reversed> [ [ [ push ] keep ] append ] map ]]
+text      = (formats|plain-text)* => [[ ]]
 
 ;EBNF
 
 PRIVATE>
 
 MACRO: printf ( format-string -- )
-    parse-printf [ length ] keep compose-all
-    '[ _ <vector> @ <reversed> [ write ] each ] ;
+    parse-printf [ [ callable? ] count ] keep [
+        dup string? [ 1quotation ] [ [ 1 - ] dip ] if
+        over [ ndip ] 2curry
+    ] map nip [ compose-all ] [ length ] bi '[
+        @ output-stream get [ stream-write ] curry _ napply
+    ] ;
 
 : sprintf ( format-string -- result )
     [ printf ] with-string-writer ; inline
 
 : vprintf ( seq format-string -- )
-    parse-printf reverse! [
-        first dup string?
-        [ '[ _ write ] ] [ '[ unclip-slice @ write ] ] if
-    ] map concat call( x -- x ) drop ;
+    parse-printf output-stream get '[
+        dup string? [
+            [ unclip-slice ] dip call( x -- y )
+        ] unless _ stream-write
+    ] each drop ;
 
 : vsprintf ( seq format-string -- result )
     [ vprintf ] with-string-writer ; inline
