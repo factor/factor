@@ -35,7 +35,7 @@ PRIVATE>
 M: sbuf stream-element-type drop +character+ ;
 
 : <string-writer> ( -- stream )
-    512 <sbuf> ;
+    512 <sbuf> ; inline
 
 : with-string-writer ( quot -- str )
     <string-writer> [
