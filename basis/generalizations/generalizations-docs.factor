@@ -97,8 +97,8 @@ HELP: nrot
   { $example "USING: arrays generalizations kernel prettyprint ;" "1 2 3 4 4 nrot 4array ." "{ 2 3 4 1 }" }
   "Some core words expressed in terms of " { $link nrot } ":"
     { $table
-        { { $link swap } { $snippet "1 nrot" } }
-        { { $link rot } { $snippet "2 nrot" } }
+        { { $link swap } { $snippet "2 nrot" } }
+        { { $link rot } { $snippet "3 nrot" } }
     }
 } ;
 
@@ -111,8 +111,8 @@ HELP: -nrot
   { $example "USING: arrays generalizations kernel prettyprint ;" "1 2 3 4 4 -nrot 4array ." "{ 4 1 2 3 }" }
   "Some core words expressed in terms of " { $link -nrot } ":"
     { $table
-        { { $link swap } { $snippet "1 -nrot" } }
-        { { $link -rot } { $snippet "2 -nrot" } }
+        { { $link swap } { $snippet "2 -nrot" } }
+        { { $link -rot } { $snippet "3 -nrot" } }
     }
 } ;
 
