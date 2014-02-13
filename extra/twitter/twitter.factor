@@ -169,3 +169,6 @@ PRIVATE>
 
 : home-timeline ( -- tweets )
     "home_timeline" timeline ;
+
+: mentions-timeline ( -- tweets )
+    "mentions_timeline" timeline ;
