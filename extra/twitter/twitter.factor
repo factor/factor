@@ -59,7 +59,7 @@ MACRO: keys-boa ( keys class -- )
 : set-request-twitter-auth ( request -- request )
     [ <oauth-request-params> set-oauth ] with-twitter-oauth ;
 
-: twitter-request ( request -- data )
+: http-twitter-request ( request -- data )
     set-request-twitter-auth http-request* ; inline
 
 PRIVATE>
@@ -136,7 +136,7 @@ PRIVATE>
 
 : (tweet) ( string -- json )
     update-post-data "update" status-url
-    <post-request> twitter-request ;
+    <post-request> http-twitter-request ;
 
 PRIVATE>
 
@@ -145,18 +145,23 @@ PRIVATE>
 
 : tweet ( string -- ) (tweet) drop ;
 
+: twitter-request ( string -- obj )
+    twitter-url <get-request> http-twitter-request json> ;
+
 : verify-credentials ( -- foo )
-    "1.1/account/verify_credentials.json" twitter-url
-    <get-request> twitter-request json> ;
+    "1.1/account/verify_credentials.json" twitter-request ;
 
 ! Timelines
 <PRIVATE
 
 : timeline ( url -- tweets )
     status-url <get-request>
-    twitter-request json>twitter-statuses ;
+    http-twitter-request json>twitter-statuses ;
 
 PRIVATE>
+
+: user-profile ( user -- json )
+    "1.1/users/show.json?screen_name=" prepend twitter-request ;
 
 : public-timeline ( -- tweets )
     "public_timeline" timeline ;
