@@ -52,6 +52,7 @@ struct inline_cache_jit : public jit {
                             cell cache_entries_, bool tail_call_p);
 };
 
+/* Allocates memory */
 void inline_cache_jit::emit_check(cell klass) {
   cell code_template;
   if (TAG(klass) == FIXNUM_TYPE)
@@ -64,6 +65,7 @@ void inline_cache_jit::emit_check(cell klass) {
 
 /* index: 0 = top of stack, 1 = item underneath, etc
    cache_entries: array of class/method pairs */
+/* Allocates memory */
 void inline_cache_jit::compile_inline_cache(fixnum index, cell generic_word_,
                                             cell methods_, cell cache_entries_,
                                             bool tail_call_p) {
@@ -113,6 +115,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index, cell generic_word_,
       true); /* stack_frame_p */
 }
 
+/* Allocates memory */
 code_block* factor_vm::compile_inline_cache(fixnum index, cell generic_word_,
                                             cell methods_, cell cache_entries_,
                                             bool tail_call_p) {
@@ -167,6 +170,7 @@ void factor_vm::update_pic_transitions(cell pic_size) {
    compaction;
    also, the block containing the return address may now be dead. Use a
    code_root to take care of the details. */
+/* Allocates memory */
 void* factor_vm::inline_cache_miss(cell return_address_) {
   code_root return_address(return_address_, this);
   check_code_pointer(return_address.value);
@@ -224,6 +228,7 @@ void* factor_vm::inline_cache_miss(cell return_address_) {
   return xt;
 }
 
+/* Allocates memory */
 VM_C_API void* inline_cache_miss(cell return_address, factor_vm* parent) {
   return parent->inline_cache_miss(return_address);
 }

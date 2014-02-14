@@ -4,6 +4,7 @@ struct growable_byte_array {
   cell count;
   data_root<byte_array> elements;
 
+  /* Allocates memory */
   growable_byte_array(factor_vm* parent, cell capacity = 40)
       : count(0), elements(parent->allot_byte_array(capacity), parent) {}
 

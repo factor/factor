@@ -126,6 +126,7 @@ void factor_vm::primitive_dispatch_stats() {
   ctx->push(tag<byte_array>(byte_array_from_value(&dispatch_stats)));
 }
 
+/* Allocates memory */
 void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index,
                                            cell cache_) {
   data_root<array> methods(methods_, parent);
