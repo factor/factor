@@ -2,6 +2,7 @@
 
 namespace factor {
 
+/* Allocates memory (allot) */
 callstack* factor_vm::allot_callstack(cell size) {
   callstack* stack = allot<callstack>(callstack_object_size(size));
   stack->length = tag_fixnum(size);
@@ -27,6 +28,7 @@ void* factor_vm::second_from_top_stack_frame(context* ctx) {
   return frame_top;
 }
 
+/* Allocates memory (allot_callstack) */
 cell factor_vm::capture_callstack(context* ctx) {
   void* top = second_from_top_stack_frame(ctx);
   void* bottom = ctx->callstack_bottom;
@@ -38,8 +40,10 @@ cell factor_vm::capture_callstack(context* ctx) {
   return tag<callstack>(stack);
 }
 
+/* Allocates memory (capture_callstack) */
 void factor_vm::primitive_callstack() { ctx->push(capture_callstack(ctx)); }
 
+/* Allocates memory (capture_callstack) */
 void factor_vm::primitive_callstack_for() {
   context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
   ctx->replace(capture_callstack(other_ctx));
@@ -57,9 +61,12 @@ struct stack_frame_accumulator {
   factor_vm* parent;
   growable_array frames;
 
+  /* Allocates memory (frames is a growable_array, constructor allocates) */
   explicit stack_frame_accumulator(factor_vm* parent)
       : parent(parent), frames(parent) {}
 
+
+  /* Allocates memory (frames.add()) */
   void operator()(void* frame_top, cell frame_size, code_block* owner,
                   void* addr) {
     data_root<object> executing_quot(owner->owner_quot(), parent);
@@ -109,6 +116,7 @@ void factor_vm::primitive_innermost_stack_frame_scan() {
   ctx->replace(code->code_block_for_address((cell)addr)->scan(this, addr));
 }
 
+/* Allocates memory (jit_compile_quot) */
 void factor_vm::primitive_set_innermost_stack_frame_quot() {
   data_root<callstack> stack(ctx->pop(), this);
   data_root<quotation> quot(ctx->pop(), this);
@@ -125,6 +133,7 @@ void factor_vm::primitive_set_innermost_stack_frame_quot() {
   set_frame_return_address(inner, (char*)quot->entry_point + offset);
 }
 
+/* Allocates memory (allot_alien) */
 void factor_vm::primitive_callstack_bounds() {
   ctx->push(allot_alien((void*)ctx->callstack_seg->start));
   ctx->push(allot_alien((void*)ctx->callstack_seg->end));

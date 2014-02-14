@@ -7,7 +7,7 @@ namespace factor {
 - megamorphic caches (dispatch.cpp),
 - polymorphic inline caches (inline_cache.cpp) */
 
-/* Allocates memory */
+/* Allocates memory (`code` and `relocation` initializers create growable_byte_array) */
 jit::jit(code_block_type type, cell owner, factor_vm* vm)
     : type(type),
       owner(owner, vm),
@@ -30,6 +30,7 @@ jit::~jit() {
   (void)old_count;
 }
 
+/* Allocates memory */
 void jit::emit_relocation(cell relocation_template_) {
   data_root<byte_array> relocation_template(relocation_template_, parent);
   cell capacity =

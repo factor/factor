@@ -138,6 +138,7 @@ bool quotation_jit::trivial_quotation_p(array* elements) {
          tagged<object>(array_nth(elements, 0)).type_p(WORD_TYPE);
 }
 
+/* Allocates memory (emit) */
 void quotation_jit::emit_prolog(bool safepoint, bool stack_frame) {
   if (safepoint)
     emit(parent->special_objects[JIT_SAFEPOINT]);
@@ -145,6 +146,7 @@ void quotation_jit::emit_prolog(bool safepoint, bool stack_frame) {
     emit(parent->special_objects[JIT_PROLOG]);
 }
 
+/* Allocates memory (emit) */
 void quotation_jit::emit_epilog(bool safepoint, bool stack_frame) {
   if (safepoint)
     emit(parent->special_objects[JIT_SAFEPOINT]);
@@ -169,7 +171,7 @@ void quotation_jit::emit_quot(cell quot_) {
   }
 }
 
-/* Allocates memory */
+/* Allocates memory (parameter(), literal(), emit_prolog, emit_with_literal)*/
 void quotation_jit::iterate_quotation() {
   bool safepoint = safepoint_p();
   bool stack_frame = stack_frame_p();

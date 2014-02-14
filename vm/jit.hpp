@@ -20,9 +20,11 @@ struct jit {
   void emit_relocation(cell relocation_template);
   void emit(cell code_template);
 
+  /* Allocates memory */
   void parameter(cell parameter) { parameters.add(parameter); }
   void emit_with_parameter(cell code_template_, cell parameter_);
 
+  /* Allocates memory */
   void literal(cell literal) { literals.add(literal); }
   void emit_with_literal(cell code_template_, cell literal_);
 
@@ -30,6 +32,7 @@ struct jit {
     emit_with_literal(parent->special_objects[JIT_PUSH_IMMEDIATE], literal);
   }
 
+  /* Allocates memory */
   void word_jump(cell word_) {
     data_root<word> word(word_, parent);
 #ifndef FACTOR_AMD64
@@ -39,6 +42,7 @@ struct jit {
     emit(parent->special_objects[JIT_WORD_JUMP]);
   }
 
+  /* Allocates memory */
   void word_call(cell word) {
     emit_with_literal(parent->special_objects[JIT_WORD_CALL], word);
   }
