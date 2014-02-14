@@ -6,6 +6,7 @@ inline static cell callstack_object_size(cell size) {
 
 /* This is a little tricky. The iterator may allocate memory, so we
 keep the callstack in a GC root and use relative offsets */
+/* Allocates memory */
 template <typename Iterator, typename Fixup>
 inline void factor_vm::iterate_callstack_object(callstack* stack_,
                                                 Iterator& iterator,
@@ -29,6 +30,7 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
   }
 }
 
+/* Allocates memory */
 template <typename Iterator>
 inline void factor_vm::iterate_callstack_object(callstack* stack,
                                                 Iterator& iterator) {
@@ -36,6 +38,7 @@ inline void factor_vm::iterate_callstack_object(callstack* stack,
   iterate_callstack_object(stack, iterator, none);
 }
 
+/* Allocates memory */
 template <typename Iterator, typename Fixup>
 inline void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
                                          Fixup& fixup) {
@@ -66,6 +69,7 @@ inline void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
   }
 }
 
+/* Allocates memory */
 template <typename Iterator>
 inline void factor_vm::iterate_callstack(context* ctx, Iterator& iterator) {
   no_fixup none;
