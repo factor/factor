@@ -27,6 +27,12 @@ IN: html.parser.analyzer
 : loopn ( n quot -- )
     [ drop ] prepose loopn-index ; inline
 
+: html-class? ( tag string -- ? )
+    swap "class" attribute [ blank? ] split-when member? ;
+
+: html-id? ( tag string -- ? )
+    swap "id" attribute = ;
+
 ERROR: undefined-find-nth m n seq quot ;
 
 : check-trivial-find ( m n seq quot -- m n seq quot )
@@ -94,9 +100,9 @@ ERROR: undefined-find-nth m n seq quot ;
 
 : find-by-id ( vector id -- vector' elt/f )
     '[ "id" attribute _ = ] find ;
-    
+
 : find-by-class ( vector id -- vector' elt/f )
-    '[ "class" attribute _ = ] find ;
+    '[ _ html-class? ] find ;
 
 : find-by-name ( vector string -- vector elt/f )
     >lower '[ name>> _ = ] find ;
@@ -104,15 +110,15 @@ ERROR: undefined-find-nth m n seq quot ;
 : find-by-id-between ( vector string -- vector' )
     dupd
     '[ "id" attribute _ = ] find find-between* ;
-    
+
 : find-by-class-between ( vector string -- vector' )
     dupd
-    '[ "class" attribute _ = ] find find-between* ;
-    
+    '[ _ html-class? ] find find-between* ;
+
 : find-by-class-id-between ( vector class id -- vector' )
     [
         '[
-            [ "class" attribute _ = ]
+            [ _ html-class? ]
             [ "id" attribute _ = ] bi and
         ] find
     ] [
@@ -203,12 +209,6 @@ ERROR: undefined-find-nth m n seq quot ;
 
 : query>assoc* ( str -- hash )
     "?" split1 nip query>assoc ;
-    
-: html-class? ( tag string -- ? )
-    swap "class" attribute = ;
-    
-: html-id? ( tag string -- ? )
-    swap "id" attribute = ;
 
 : opening-tag? ( tag -- ? )
     closing?>> not ;
