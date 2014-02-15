@@ -34,9 +34,12 @@ DEFER: parse-mapping
     YAML_MAPPING_END_EVENT = [
       t done! f f
     ] [
-      event event>scalar t
+      event ?scalar-value
     ] if
-  ] with-destructors [ parser event next-value swap ,, ] [ drop ] if ] until
+  ] with-destructors 2dup or [
+    [ nip [ parser event ] dip next-complex-value ] when*
+    parser event next-value swap ,,
+  ] [ 2drop ] if ] until
 ] H{ } make ;
 :: parse-sequence ( parser event -- seq ) [
   f :> done!
