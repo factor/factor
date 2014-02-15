@@ -4,7 +4,7 @@
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
 USING: accessors alien.c-types alien.data fry init kernel math
 math.bitwise namespaces random sequences sequences.private
-specialized-arrays ;
+specialized-arrays system ;
 SPECIALIZED-ARRAY: uint
 IN: random.mersenne-twister
 
@@ -74,7 +74,7 @@ M: mersenne-twister random-32*
     [ [ 1 + ] change-i drop ] tri ;
 
 : default-mersenne-twister ( -- mersenne-twister )
-    [ random-32 ] with-system-random <mersenne-twister> ;
+    nano-count <mersenne-twister> ;
 
 [
     default-mersenne-twister random-generator set-global
