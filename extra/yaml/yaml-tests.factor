@@ -35,3 +35,13 @@ CONSTANT: test-represented-string """--- !!seq
 ${ test-obj } [ $ test-string yaml> ] unit-test
 ${ test-represented-string } [ $ test-obj >yaml ] unit-test
 ${ test-represented-string } [ $ test-represented-string yaml> >yaml ] unit-test
+
+CONSTANT: complex-key H{ { { "4" } "3" } }
+CONSTANT: complex-key-represented """--- !!map
+? !!seq
+- !!str 4
+: !!str 3
+...
+"""
+
+${ complex-key } [ $ complex-key-represented yaml> ] unit-test
