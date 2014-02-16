@@ -59,28 +59,42 @@ DEFER: parse-mapping
   [ "wrong event" throw ] unless
 ] with-destructors ;
 
+:: ?parse-yaml-doc ( parser event -- obj/f ? )
+  [ parser event next-event type>> {
+    { YAML_DOCUMENT_START_EVENT  [ t ] }
+    { YAML_STREAM_END_EVENT [ f ] }
+    [ "wrong event" throw ]
+  } case ] with-destructors
+  [ parser event next-value t
+    parser event YAML_DOCUMENT_END_EVENT expect-event
+  ] [ f f ] if ;
 
-:: yaml> ( str -- obj )
-[
-yaml_parser_t (malloc-struct) &free :> parser
-parser yaml_parser_initialize yaml-assert-ok
-parser &yaml_parser_delete drop
+! registers destructors (use with with-destructors)
+:: init-parser ( str -- parser event )
+  yaml_parser_t (malloc-struct) &free :> parser
+  parser yaml_parser_initialize yaml-assert-ok
+  parser &yaml_parser_delete drop
 
-str utf8 encode [ malloc-byte-array &free ] [ length ] bi :> ( input length )
-parser input length yaml_parser_set_input_string
+  str utf8 encode [ malloc-byte-array &free ] [ length ] bi :> ( input length )
+  parser input length yaml_parser_set_input_string
 
-yaml_event_t (malloc-struct) &free :> event
+  yaml_event_t (malloc-struct) &free :> event
+  parser event
+;
 
-parser event YAML_STREAM_START_EVENT expect-event
-parser event YAML_DOCUMENT_START_EVENT expect-event
 
-parser event next-value
-
-parser event YAML_DOCUMENT_END_EVENT expect-event
-parser event YAML_STREAM_END_EVENT expect-event
-
+: yaml> ( str -- obj ) [
+  init-parser
+  [ YAML_STREAM_START_EVENT expect-event ]
+  [ ?parse-yaml-doc [ "No Document" throw ] unless ] 2bi
 ] with-destructors
+;
 
+: yaml-docs> ( str -- seq ) [
+  init-parser
+  [ YAML_STREAM_START_EVENT expect-event ]
+  [ [ ?parse-yaml-doc ] 2curry [ ] produce nip ] 2bi
+] with-destructors
 ;
 
 ! TODO We can also pass some data when registering the write handler,
@@ -134,8 +148,8 @@ M: sequence emit-value ( emitter event seq -- )
 M: assoc emit-value ( emitter event seq -- )
   [ drop emit-assoc-start ] [ emit-assoc ] [ drop emit-assoc-end ] 3tri ;
 
-:: >yaml ( obj -- str )
-[
+! registers destructors (use with with-destructors)
+:: init-emitter ( -- emitter event )
 yaml_emitter_t (malloc-struct) &free :> emitter
 emitter yaml_emitter_initialize yaml-assert-ok
 emitter &yaml_emitter_delete drop
@@ -148,6 +162,10 @@ yaml_event_t (malloc-struct) &free :> event
 
 event YAML_UTF8_ENCODING yaml_stream_start_event_initialize yaml-assert-ok
 emitter event yaml_emitter_emit yaml-assert-ok
+emitter event
+;
+
+:: emit-doc ( emitter event obj -- )
 event f f f 0 yaml_document_start_event_initialize yaml-assert-ok
 emitter event yaml_emitter_emit yaml-assert-ok
 
@@ -155,12 +173,25 @@ emitter event obj emit-value
 
 event 0 yaml_document_end_event_initialize yaml-assert-ok
 emitter event yaml_emitter_emit yaml-assert-ok
+;
+
+! registers destructors (use with with-destructors)
+:: flush-emitter ( emitter event -- str )
 event yaml_stream_end_event_initialize yaml-assert-ok
 emitter event yaml_emitter_emit yaml-assert-ok
 
 emitter yaml_emitter_flush yaml-assert-ok
 yaml-write-buffer get utf8 decode
+;
 
+: >yaml ( obj -- str ) [
+[ init-emitter ] dip
+[ emit-doc ] [ drop flush-emitter ] 3bi
 ] with-destructors
+;
 
+: >yaml-docs ( seq -- str ) [
+[ init-emitter ] dip
+[ [ emit-doc ] with with each ] [ drop flush-emitter ] 3bi
+] with-destructors
 ;
