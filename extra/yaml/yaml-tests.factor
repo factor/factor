@@ -5,6 +5,7 @@ IN: yaml.tests
 
 ! TODO real conformance tests here
 
+! Basic test
 CONSTANT: test-string """--- # Favorite movies
  - Casablanca
  - North by Northwest
@@ -36,6 +37,7 @@ ${ test-obj } [ $ test-string yaml> ] unit-test
 ${ test-represented-string } [ $ test-obj >yaml ] unit-test
 ${ test-represented-string } [ $ test-represented-string yaml> >yaml ] unit-test
 
+! Non-scalar key
 CONSTANT: complex-key H{ { { "4" } "3" } }
 CONSTANT: complex-key-represented """--- !!map
 ? !!seq
@@ -45,3 +47,20 @@ CONSTANT: complex-key-represented """--- !!map
 """
 
 ${ complex-key } [ $ complex-key-represented yaml> ] unit-test
+
+! Multiple docs
+CONSTANT: test-docs """--- !!str a
+...
+--- !!seq
+- !!str b
+- !!str c
+...
+--- !!map
+!!str d: !!str e
+...
+"""
+CONSTANT: test-objs { "a" { "b" "c" } H{ { "d" "e" } } }
+
+${ test-objs } [ $ test-docs yaml-docs> ] unit-test
+${ test-docs } [ $ test-objs >yaml-docs ] unit-test
+${ test-docs } [ $ test-docs yaml-docs> >yaml-docs ] unit-test
