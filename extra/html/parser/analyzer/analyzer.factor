@@ -10,13 +10,13 @@ IN: html.parser.analyzer
     http-get parse-html ;
 
 : attribute ( tag string -- obj/f )
-    swap attributes>> [ at ] [ drop f ] if* ;
+    swap attributes>> at ;
 
 : attribute* ( tag string -- obj ? )
-    swap attributes>> [ at* ] [ drop f f ] if* ;
+    swap attributes>> at* ;
 
-: attribute? ( tag string -- obj )
-    swap attributes>> [ key? ] [ drop f ] if* ;
+: attribute? ( tag string -- ? )
+    swap attributes>> key? ;
 
 : find-all ( seq quot -- alist )
    [ <enum> >alist ] [ '[ second @ ] ] bi* filter ; inline
@@ -99,7 +99,7 @@ ERROR: undefined-find-nth m n seq quot ;
     ] map ;
 
 : find-by-id ( vector id -- vector' elt/f )
-    '[ "id" attribute _ = ] find ;
+    '[ _ html-id? ] find ;
 
 : find-by-class ( vector id -- vector' elt/f )
     '[ _ html-class? ] find ;
@@ -108,49 +108,32 @@ ERROR: undefined-find-nth m n seq quot ;
     >lower '[ name>> _ = ] find ;
 
 : find-by-id-between ( vector string -- vector' )
-    dupd
-    '[ "id" attribute _ = ] find find-between* ;
+    '[ _ html-id? ] dupd find find-between* ;
 
 : find-by-class-between ( vector string -- vector' )
-    dupd
-    '[ _ html-class? ] find find-between* ;
+    '[ _ html-class? ] dupd find find-between* ;
 
 : find-by-class-id-between ( vector class id -- vector' )
-    [
-        '[
-            [ _ html-class? ]
-            [ "id" attribute _ = ] bi and
-        ] find
-    ] [
-        2drop find-between*
-    ] 3bi ;
+    '[
+        [ _ html-class? ] [ _ html-id? ] bi and
+    ] dupd find find-between* ;
 
-: find-by-attribute-key ( vector key -- vector' elt/? )
-    >lower
-    [ attributes>> at _ = ] filter sift ;
+: find-by-attribute-key ( vector key -- vector' )
+    >lower '[ _ attribute? ] filter sift ;
 
 : find-by-attribute-key-value ( vector value key -- vector' )
-    >lower
-    [ attributes>> at over = ] with filter nip sift ;
+    >lower swap '[ _ attribute _ = ] filter sift ;
 
 : find-first-attribute-key-value ( vector value key -- i/f tag/f )
-    >lower
-    [ attributes>> at over = ] with find rot drop ;
-
-: tag-link ( tag -- link/f ) "href" attribute ;
+    >lower swap '[ _ attribute _ = ] find ;
 
 : find-links ( vector -- vector' )
     [ { [ name>> "a" = ] [ "href" attribute ] } 1&& ]
     find-between-all ;
 
 : find-images ( vector -- vector' )
-    [
-        {
-            [ name>> "img" = ]
-            [ "src" attribute ]
-        } 1&&
-    ] find-all
-    values [ "src" attribute ] map ;
+    [ { [ name>> "img" = ] [ "src" attribute ] } 1&& ] filter sift
+    [ "src" attribute ] map ;
 
 : find-by-text ( seq quot -- tag )
     [ dup name>> text = ] prepose find drop ; inline
@@ -192,8 +175,7 @@ ERROR: undefined-find-nth m n seq quot ;
     [ "type" attribute "hidden" = ] filter ;
 
 : input. ( tag -- )
-    dup name>> print
-    attributes>>
+    [ name>> print ] [ attributes>> ] bi
     [ bl bl bl bl [ write "=" write ] [ write bl ] bi* nl ] assoc-each ;
 
 : form. ( vector -- )
