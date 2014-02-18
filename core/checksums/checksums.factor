@@ -7,7 +7,9 @@ IN: checksums
 MIXIN: checksum
 
 TUPLE: checksum-state
-    { bytes-read integer } { block-size integer } { bytes byte-vector } ;
+{ bytes-read integer }
+{ block-size integer }
+{ bytes byte-vector } ;
 
 : new-checksum-state ( class -- checksum-state )
     new
@@ -17,7 +19,7 @@ M: checksum-state clone
     call-next-method
     [ clone ] change-bytes ;
 
-GENERIC: initialize-checksum-state ( class -- checksum-state )
+GENERIC: initialize-checksum-state ( checksum -- checksum-state )
 
 GENERIC: checksum-block ( bytes checksum -- )
 
@@ -27,9 +29,9 @@ GENERIC: get-checksum ( checksum -- value )
     over bytes>> [ push-all ] keep
     [ dup length pick block-size>> >= ]
     [
-        over block-size>> cut-slice [ >byte-array ] dip [
-            over [ checksum-block ]
-            [ [ ] [ block-size>> ] bi [ + ] curry change-bytes-read drop ] bi
+        over block-size>> cut-slice [
+            >byte-array over checksum-block
+            [ block-size>> ] keep [ + ] change-bytes-read
         ] dip
     ] while
     >byte-vector
