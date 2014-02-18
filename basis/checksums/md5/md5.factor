@@ -14,7 +14,9 @@ SINGLETON: md5
 
 INSTANCE: md5 stream-checksum
 
-TUPLE: md5-state < checksum-state state old-state ;
+TUPLE: md5-state < checksum-state
+{ state uint-array }
+{ old-state uint-array } ;
 
 : <md5-state> ( -- md5 )
     md5-state new-checksum-state
@@ -26,16 +28,13 @@ M: md5 initialize-checksum-state drop <md5-state> ;
 
 <PRIVATE
 
-: v-w+ ( v1 v2 -- v3 ) [ w+ ] 2map ;
-
 : update-md5 ( md5 -- )
-    [ state>> ] [ old-state>> v-w+ dup clone ] [ ] tri
-    [ old-state<< ] [ state<< ] bi ;
+    [ state>> ] [ old-state>> [ w+ ] 2map dup clone ] [ ] tri
+    [ old-state<< ] [ state<< ] bi ; inline
 
-CONSTANT: T
-    $[
-        80 iota [ sin abs 32 2^ * >integer ] uint-array{ } map-as
-    ]
+CONSTANT: T $[
+    80 iota [ sin abs 32 2^ * >integer ] uint-array{ } map-as
+]
 
 :: F ( X Y Z -- FXYZ )
     #! F(X,Y,Z) = XY v not(X) Z
@@ -108,7 +107,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 13 S12 14 ]
         [ c d a b 14 S13 15 ]
         [ b c d a 15 S14 16 ]
-    } [ F ] with-md5-round ;
+    } [ F ] with-md5-round ; inline
 
 : (process-md5-block-G) ( block state -- )
     {
@@ -128,7 +127,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 2  S22 30 ]
         [ c d a b 7  S23 31 ]
         [ b c d a 12 S24 32 ]
-    } [ G ] with-md5-round ;
+    } [ G ] with-md5-round ; inline
 
 : (process-md5-block-H) ( block state -- )
     {
@@ -148,7 +147,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 12 S32 46 ]
         [ c d a b 15 S33 47 ]
         [ b c d a 2  S34 48 ]
-    } [ H ] with-md5-round ;
+    } [ H ] with-md5-round ; inline
 
 : (process-md5-block-I) ( block state -- )
     {
@@ -168,12 +167,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 11 S42 62 ]
         [ c d a b 2  S43 63 ]
         [ b c d a 9  S44 64 ]
-    } [ I ] with-md5-round ;
-
-HINTS: (process-md5-block-F) { uint-array md5-state } ;
-HINTS: (process-md5-block-G) { uint-array md5-state } ;
-HINTS: (process-md5-block-H) { uint-array md5-state } ;
-HINTS: (process-md5-block-I) { uint-array md5-state } ;
+    } [ I ] with-md5-round ; inline
 
 : byte-array>le ( byte-array -- byte-array )
     little-endian? [
@@ -183,19 +177,11 @@ HINTS: (process-md5-block-I) { uint-array md5-state } ;
         ] each
     ] unless ;
 
-: uint-array-cast-le ( byte-array -- uint-array )
-    byte-array>le uint cast-array ;
+HINTS: byte-array>le byte-array ;
 
-HINTS: uint-array-cast-le byte-array ;
-
-: uint-array>byte-array-le ( uint-array -- byte-array )
-    underlying>> byte-array>le ;
-
-HINTS: uint-array>byte-array-le uint-array ;
-
-M: md5-state checksum-block ( block state -- )
+M: md5-state checksum-block
     [
-        [ uint-array-cast-le ] [ state>> ] bi* {
+        [ byte-array>le uint cast-array ] [ state>> ] bi* {
             [ (process-md5-block-F) ]
             [ (process-md5-block-G) ]
             [ (process-md5-block-H) ]
@@ -205,18 +191,20 @@ M: md5-state checksum-block ( block state -- )
         nip update-md5
     ] 2bi ;
 
-: md5>checksum ( md5 -- bytes ) state>> uint-array>byte-array-le ;
+: md5>checksum ( md5 -- bytes )
+    state>> underlying>> byte-array>le ;
 
-M: md5-state clone ( md5 -- new-md5 )
+M: md5-state clone
     call-next-method
     [ clone ] change-state
     [ clone ] change-old-state ;
 
-M: md5-state get-checksum ( md5 -- bytes )
-    clone [ bytes>> f ] [ bytes-read>> pad-last-block ] [ ] tri
+M: md5-state get-checksum
+    clone
+    [ bytes>> f ] [ bytes-read>> pad-last-block ] [ ] tri
     [ [ checksum-block ] curry each ] [ md5>checksum ] bi ;
 
-M: md5 checksum-stream ( stream checksum -- byte-array )
+M: md5 checksum-stream
     drop
     [ <md5-state> ] dip add-checksum-stream get-checksum ;
 
