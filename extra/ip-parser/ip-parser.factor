@@ -10,7 +10,7 @@ ERROR: invalid-ipv4 str ;
 <PRIVATE
 
 : cleanup-octal ( str -- str )
-    dup { [ "0" head? ] [ "0x" head? not ] } 1&&
+    dup { [ "0" = not ] [ "0" head? ] [ "0x" head? not ] } 1&&
     [ rest "0o" prepend ] when ;
 
 : split-components ( str -- array )
