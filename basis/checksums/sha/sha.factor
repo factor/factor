@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors checksums checksums.common checksums.stream
-combinators combinators.smart fry generalizations grouping
-io.binary kernel literals locals make math math.bitwise
-math.ranges multiline namespaces sbufs sequences
-sequences.generalizations sequences.private splitting strings ;
+USING: accessors arrays checksums checksums.common
+checksums.stream combinators combinators.smart fry grouping
+io.binary kernel literals locals math math.bitwise math.ranges
+sequences sequences.generalizations sequences.private ;
 IN: checksums.sha
 
 SINGLETON: sha1
@@ -16,10 +15,14 @@ SINGLETON: sha-256
 INSTANCE: sha-224 stream-checksum
 INSTANCE: sha-256 stream-checksum
 
-TUPLE: sha1-state < checksum-state K H W word-size ;
+TUPLE: sha1-state < checksum-state
+{ K array }
+{ H array }
+{ W array }
+{ word-size fixnum } ;
 
 CONSTANT: initial-H-sha1
-    { 
+    {
         0x67452301
         0xefcdab89
         0x98badcfe
@@ -36,7 +39,10 @@ CONSTANT: K-sha1
         4 { } nappend-as
     ]
 
-TUPLE: sha2-state < checksum-state K H word-size ;
+TUPLE: sha2-state < checksum-state
+{ K array }
+{ H array }
+{ word-size fixnum } ;
 
 TUPLE: sha2-short < sha2-state ;
 
@@ -308,21 +314,21 @@ M: sha2-short checksum-block
     [ prepare-message-schedule ]
     [ [ block-size>> ] [ H>> clone ] [ ] tri process-chunk ] bi ;
 
-: sequence>byte-array ( seq n -- string )
-    '[ _ >be ] map B{ } concat-as ;
+: sequence>byte-array ( seq n -- bytes )
+    '[ _ >be ] map B{ } concat-as ; inline
 
 : sha1>checksum ( sha2 -- bytes )
-    H>> 4 sequence>byte-array ;
+    H>> 4 sequence>byte-array ; inline
 
 : sha-224>checksum ( sha2 -- bytes )
-    H>> 7 head 4 sequence>byte-array ;
+    H>> 7 head 4 sequence>byte-array ; inline
 
 : sha-256>checksum ( sha2 -- bytes )
-    H>> 4 sequence>byte-array ;
+    H>> 4 sequence>byte-array ; inline
 
 : pad-last-short-block ( state -- )
     [ bytes>> t ] [ bytes-read>> pad-last-block ] [ ] tri
-    [ checksum-block ] curry each ;
+    [ checksum-block ] curry each ; inline
 
 PRIVATE>
 
@@ -349,7 +355,7 @@ M: sha-256 checksum-stream ( stream checksum -- byte-array )
         [ [ 14 - ] dip nth-unsafe bitxor ]
         [ [ 16 - ] dip nth-unsafe bitxor 1 bitroll-32 ]
         [ ]
-    } 2cleave set-nth-unsafe ;
+    } 2cleave set-nth-unsafe ; inline
 
 : prepare-sha1-message-schedule ( seq -- w-seq )
     4 <groups> [ be> ] map
@@ -374,16 +380,16 @@ M: sha-256 checksum-stream ( stream checksum -- byte-array )
     [
         A 5 bitroll-32
 
-        B C D n sha1-f 
+        B C D n sha1-f
 
         E
 
         n K nth-unsafe
 
         n W nth-unsafe
-    ] sum-outputs 32 bits ;
+    ] sum-outputs 32 bits ; inline
 
-:: process-sha1-chunk ( bytes H W K state -- )
+:: process-sha1-chunk ( H W K state -- )
     80 [
         H W K inner-loop
         d H nth-unsafe e H set-nth-unsafe
@@ -397,7 +403,6 @@ M: sha-256 checksum-stream ( stream checksum -- byte-array )
 M:: sha1-state checksum-block ( bytes state -- )
     bytes prepare-sha1-message-schedule state W<<
 
-    bytes
     state [ H>> clone ] [ W>> ] [ K>> ] tri state process-sha1-chunk ;
 
 M: sha1-state get-checksum
