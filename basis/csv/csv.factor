@@ -68,7 +68,7 @@ PRIVATE>
 
 : stream-read-csv ( stream -- rows )
     [ (stream-read-csv) ] { } make
-    dup last { "" } = [ but-last ] when ; inline
+    dup ?last { "" } = [ but-last ] when ; inline
 
 : read-csv ( -- rows )
     input-stream get stream-read-csv ; inline
