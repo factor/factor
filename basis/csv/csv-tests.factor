@@ -100,3 +100,5 @@ IN: csv.tests
 ! FIXME: { { { "as,df" "asdf" } } } [ "\"as,\"df  ,asdf" string>csv ] unit-test
 ! FIXME: { { { "asd\"f\"" "asdf" } } } [ "\"asd\"\"\"f\",asdf" string>csv ] unit-test
 { { { "as,d\"f" "asdf" } } } [ "\"as,\"d\"\"\"\"f,asdf" string>csv ] unit-test
+
+[ { } ] [ "" string>csv ] unit-test
