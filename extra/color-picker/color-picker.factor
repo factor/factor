@@ -1,10 +1,9 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.functions math.parser models
-models.arrow models.range models.product sequences ui
-ui.gadgets ui.gadgets.tracks ui.gadgets.labels ui.gadgets.packs
-ui.gadgets.sliders ui.pens.solid ui.render math.rectangles accessors
-ui.gadgets.grids colors ;
+USING: accessors colors formatting kernel math math.functions
+models models.arrow models.product models.range sequences ui
+ui.gadgets ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders
+ui.gadgets.tracks ui.pens.solid ;
 IN: color-picker
 
 ! Simple example demonstrating the use of models.
@@ -14,7 +13,7 @@ TUPLE: color-preview < gadget ;
 : <color-preview> ( model -- gadget )
     color-preview new
         swap >>model
-        { 100 100 } >>dim ;
+        { 200 200 } >>dim ;
 
 M: color-preview model-changed
     swap value>> >>interior relayout-1 ;
@@ -39,8 +38,10 @@ M: color-preview model-changed
         [
             [ <color-model> <color-preview> 1 track-add ]
             [
-                [ [ truncate number>string ] map " " join ]
-                <arrow> <label-control>
+                [
+                    [ truncate >integer ] map
+                    first3 3dup "%d %d %d #%02x%02x%02x" sprintf
+                ] <arrow> <label-control>
                 f track-add
             ] bi
         ] bi* ;
