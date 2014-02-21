@@ -201,7 +201,6 @@ M: condition compute-restarts
     init-catchstack
     ! VM calls on error
     [
-        ! 65 = self
         OBJ-CURRENT-THREAD special-object error-thread set-global
         current-continuation error-continuation set-global
         [ original-error set-global ] [ rethrow ] bi
