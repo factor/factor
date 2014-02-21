@@ -23,12 +23,9 @@ TUPLE: lexer-parsing-word word line line-text column ;
     drop ;
 
 : push-parsing-word ( word -- )
-    lexer-parsing-word new
-    swap >>word
     lexer get [
-        [ line>>      >>line      ]
-        [ line-text>> >>line-text ]
-        [ column>>    >>column    ] tri
+        [ line>> ] [ line-text>> ] [ column>> ] tri
+        lexer-parsing-word boa
     ] [ parsing-words>> push ] bi ;
 
 : pop-parsing-word ( -- )
@@ -50,8 +47,9 @@ ERROR: unexpected want got ;
     [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
 
 : skip ( i seq ? -- n )
-    over length
-    [ [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop ] dip or ;
+    over length [
+        [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
+    ] dip or ;
 
 : change-lexer-column ( lexer quot -- )
     [ [ column>> ] [ line-text>> ] bi ] prepose keep
@@ -133,19 +131,18 @@ M: lexer-error error-file error>> error-file ;
 M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
 
 : <lexer-error> ( msg -- error )
-    \ lexer-error new
-    lexer get [
-        [ line>> >>line ]
-        [ column>> >>column ] bi
-    ] [
-        [ line-text>> >>line-text ]
-        [ parsing-words>> clone >>parsing-words ] bi
-    ] bi
-    swap >>error ;
+    [
+        lexer get {
+            [ line>> ]
+            [ column>> ]
+            [ line-text>> ]
+            [ parsing-words>> clone ]
+        } cleave
+    ] dip lexer-error boa ;
 
 : simple-lexer-dump ( error -- )
     [ line>> number>string ": " append ]
-    [ line-text>> dup string? [ drop "" ] unless ]
+    [ line-text>> "" or ]
     [ column>> 0 or ] tri
     pick length + CHAR: \s <string>
     [ write ] [ print ] [ write "^" print ] tri* ;
@@ -156,7 +153,7 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
         over line>> number>string length
         CHAR: \s pad-head
         ": " append write
-    ] [ line-text>> dup string? [ drop "" ] unless print ] bi
+    ] [ line-text>> "" or print ] bi
     simple-lexer-dump ;
 
 : parsing-word-lexer-dump ( error parsing-word -- )
