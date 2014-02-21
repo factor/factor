@@ -611,7 +611,7 @@ SYMBOL: trace-messages?
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
-    c:uint { c:void* c:uint c:long c:long } stdcall [
+    c:uint { c:void* c:uint WPARAM LPARAM } stdcall [
         pick
 
         trace-messages? get-global
