@@ -214,8 +214,8 @@ INSTANCE: reversed virtual-sequence
 
 ! A slice of another sequence.
 TUPLE: slice
-{ from read-only }
-{ to read-only }
+{ from integer read-only }
+{ to integer read-only }
 { seq read-only } ;
 
 : collapse-slice ( m n slice -- m' n' seq )
@@ -266,7 +266,7 @@ M: slice length [ to>> ] [ from>> ] bi - ; inline
 INSTANCE: slice virtual-sequence
 
 ! One element repeated many times
-TUPLE: repetition { len read-only } { elt read-only } ;
+TUPLE: repetition { len integer read-only } { elt read-only } ;
 
 : <repetition> ( len elt -- repetition )
     over 0 < [ non-negative-integer-expected ] when

@@ -1120,7 +1120,7 @@ HELP: trim-tail-slice
 { $examples
     { $example "USING: prettyprint math sequences ;"
                "{ 0 0 1 2 3 0 0 } [ zero? ] trim-tail-slice ."
-               "T{ slice { from 0 } { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
+               "T{ slice { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
     }
 } ;
 
