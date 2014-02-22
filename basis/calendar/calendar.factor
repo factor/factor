@@ -59,7 +59,7 @@ M: not-a-month summary
 
 PRIVATE>
 
-CONSTANT: month-names 
+CONSTANT: month-names
     {
         "January" "February" "March" "April" "May" "June"
         "July" "August" "September" "October" "November" "December"
@@ -324,10 +324,11 @@ GENERIC: time- ( time1 time2 -- time3 )
     ] if ;
 
 : >local-time ( timestamp -- timestamp' )
+    clone [ clone ] change-gmt-offset
     gmt-offset-duration convert-timezone ;
 
 : >gmt ( timestamp -- timestamp' )
-    dup gmt-offset>> dup instant =
+    clone [ clone ] change-gmt-offset dup gmt-offset>> dup instant =
     [ drop ] [
         [ neg +second 0 ] change-second
         [ neg +minute 0 ] change-minute

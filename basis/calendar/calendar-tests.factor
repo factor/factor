@@ -188,3 +188,21 @@ IN: calendar.tests
 
 [ 0 ]
 [ gmt gmt-offset>> duration>seconds ] unit-test
+
+! None of the following words should mutate the incoming stack items.
+[ t ] [
+    { <=> same-day? time- time+ } [
+        [ gmt 3 hours >>gmt-offset dup now ] dip
+        execute( x y -- z ) drop
+        gmt-offset>> 3 hours =
+    ] all?
+] unit-test
+
+! These should produce brand new timestamps
+[ f ] [
+    { >gmt >local-time } [
+        [ now dup ] dip
+        execute( x -- y )
+        [ [ gmt-offset>> ] bi@ eq? ] [ eq? ] 2bi or
+    ] any?
+] unit-test
