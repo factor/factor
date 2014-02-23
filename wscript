@@ -97,7 +97,6 @@ def options(ctx):
     ctx.load('compiler_c compiler_cxx')
 
 def configure(ctx):
-    ctx.env['MSVC_VERSIONS'] = ['msvc 10.0']
     ctx.load('compiler_c compiler_cxx')
     ctx.check(features='cxx cxxprogram', cflags=['-Wall'])
     env = ctx.env
