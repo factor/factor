@@ -1,11 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays assocs byte-arrays io
-io.binary io.streams.string kernel math math.parser namespaces
-make parser quotations sequences strings vectors
-words macros math.functions math.bitwise fry generalizations
-combinators.smart io.streams.byte-array io.encodings.binary
-math.vectors combinators multiline endian ;
+USING: alien.c-types ascii assocs combinators combinators.smart
+endian fry io kernel macros math math.vectors sequences strings ;
 IN: pack
 
 GENERIC: >n-byte-array ( obj n -- byte-array )
@@ -32,6 +28,13 @@ M: string >n-byte-array ( n string -- byte-array ) heap-size >n-byte-array ;
 : write-c-string ( byte-array -- byte-array ) { 0 } B{ } append-as ;
 
 <PRIVATE
+
+: expand-pack-format ( str -- str' )
+    f swap [
+        dup digit?
+        [ [ 0 or 10 * ] [ CHAR: 0 - ] bi* + f ]
+        [ [ 1 or ] [ <string> ] bi* f swap ] if
+    ] { } map-as "" concat-as nip ; foldable
 
 CONSTANT: pack-table
     H{
@@ -90,6 +93,7 @@ CONSTANT: packed-length-table
 PRIVATE>
 
 MACRO: pack ( str -- quot )
+    expand-pack-format
     [ pack-table at '[ _ execute ] ] { } map-as
     '[ [ [ _ spread ] input<sequence ] B{ } append-outputs-as ] ;
 
@@ -116,6 +120,7 @@ MACRO: pack ( str -- quot )
 PRIVATE>
 
 MACRO: unpack ( str -- quot )
+    expand-pack-format
     [ [ ch>packed-length ] { } map-as start/end ]
     [ [ unpack-table at '[ @ ] ] { } map-as ] bi
     [ '[ [ _ _ ] dip <slice> @ ] ] 3map
