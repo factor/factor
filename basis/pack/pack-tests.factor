@@ -36,6 +36,9 @@ IN: pack.tests
     "cstiq" [ pack-native ] keep unpack-native
 ] unit-test
 
+{ B{ 1 2 3 4 5 0 0 0 } } [ { 1 2 3 4 5 } "4ci" pack-le ] unit-test
+{ { 1 2 3 4 5 } } [ B{ 1 2 3 4 5 0 0 0 } "4ci" unpack-le ] unit-test
+
 [ 9 ] [ "iic" packed-length ] unit-test
 [ "iii" read-packed-le ] must-infer
 [ "iii" read-packed-be ] must-infer
