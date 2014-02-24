@@ -53,3 +53,8 @@ IN: pack.tests
     "iii" pack ;
 
 [ test-pack ] must-infer
+
+{ "c" } [ "1c" expand-pack-format ] unit-test
+{ "cccc" } [ "4c" expand-pack-format ] unit-test
+{ "cccccccccccc" } [ "12c" expand-pack-format ] unit-test
+{ "iccqqq" } [ "1i2c3q" expand-pack-format ] unit-test
