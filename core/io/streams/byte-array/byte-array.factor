@@ -9,10 +9,10 @@ INSTANCE: byte-vector output-stream
 M: byte-vector stream-element-type drop +byte+ ; inline
 
 : <byte-writer> ( encoding -- stream )
-    512 <byte-vector> swap <encoder> ;
+    512 <byte-vector> swap <encoder> ; inline
 
 : with-byte-writer ( encoding quot -- byte-array )
-    [ <byte-writer> ] dip [ output-stream get ] compose with-output-stream*
+    [ <byte-writer> ] dip [ with-output-stream* ] 2keep drop
     dup encoder? [ stream>> ] when >byte-array ; inline
 
 TUPLE: byte-reader { underlying byte-array read-only } { i array-capacity } ;
