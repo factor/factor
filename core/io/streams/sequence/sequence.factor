@@ -48,7 +48,7 @@ PRIVATE>
 <PRIVATE
 
 : find-separator ( seps stream -- sep/f n )
-    >sequence-stream< rot [ member-eq? ] curry
+    >sequence-stream< rot [ member? ] curry
     [ find-from swap ] curry 2keep pick
     [ drop - ] [ length swap - nip ] if ; inline
 
