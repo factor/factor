@@ -20,10 +20,7 @@ INSTANCE: byte-reader input-stream
 
 M: byte-reader stream-element-type drop +byte+ ; inline
 
-M: byte-reader stream-read-unsafe
-    [ integer>fixnum ]
-    [ dup byte-array? [ "not a byte array" throw ] unless ]
-    [ sequence-read-unsafe ] tri* ;
+M: byte-reader stream-read-unsafe sequence-read-unsafe ;
 M: byte-reader stream-read1 sequence-read1 ;
 M: byte-reader stream-read-until sequence-read-until ;
 M: byte-reader dispose drop ;
