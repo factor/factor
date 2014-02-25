@@ -36,7 +36,7 @@ CONSTANT: a uint-array{ 0 0x9908b0df }
     ] [ 0 >>i drop ] bi ; inline
 
 : init-mt-formula ( i seq -- f(seq[i]) )
-    dupd nth dup -30 shift bitxor 1812433253 * + 1 + 32 bits ; inline
+    dupd nth dup -30 shift bitxor 1812433253 * + 1 w+ ; inline
 
 : init-mt-rest ( seq -- )
     n 1 - swap '[
