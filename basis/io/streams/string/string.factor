@@ -10,10 +10,7 @@ INSTANCE: string-reader input-stream
 
 M: string-reader stream-element-type drop +character+ ; inline
 
-M: string-reader stream-read-unsafe
-    [ integer>fixnum ]
-    [ dup string? [ "not a string" throw ] unless ]
-    [ sequence-read-unsafe ] tri* ;
+M: string-reader stream-read-unsafe sequence-read-unsafe ;
 M: string-reader stream-read1 sequence-read1 ;
 M: string-reader stream-read-until sequence-read-until ;
 M: string-reader stream-readln
