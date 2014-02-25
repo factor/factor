@@ -138,7 +138,7 @@ M:: string emit-value ( emitter event string -- )
         string utf8 encode
         [ malloc-byte-array &free ] [ length ] bi :> ( value length )
 
-        "tag:yaml.org,2002:str" utf8 malloc-string &free :> tag
+        YAML_STR_TAG utf8 malloc-string &free :> tag
 
         event f tag value length 0 0 0
         yaml_scalar_event_initialize yaml-assert-ok
@@ -148,7 +148,7 @@ M:: string emit-value ( emitter event string -- )
 
 :: emit-sequence-start ( emitter event -- )
     [
-        "tag:yaml.org,2002:seq" utf8 malloc-string &free :> tag
+        YAML_SEQ_TAG utf8 malloc-string &free :> tag
 
         event f tag 0 0
         yaml_sequence_start_event_initialize yaml-assert-ok
@@ -169,7 +169,7 @@ M: sequence emit-value ( emitter event seq -- )
 
 :: emit-assoc-start ( emitter event -- )
     [
-        "tag:yaml.org,2002:map" utf8 malloc-string &free :> tag
+        YAML_MAP_TAG utf8 malloc-string &free :> tag
 
         event f tag 0 0
         yaml_mapping_start_event_initialize yaml-assert-ok
