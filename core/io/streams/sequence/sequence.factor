@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators destructors growable io io.private
-io.streams.plain kernel math math.order sequences
-sequences.private ;
+USING: accessors byte-arrays combinators destructors growable
+io io.private io.streams.plain kernel math math.order sequences
+sequences.private strings ;
 IN: io.streams.sequence
 
 ! Readers
@@ -15,30 +15,49 @@ SLOT: i
 : sequence-read1 ( stream -- elt/f )
     dup >sequence-stream< dupd ?nth [ 1 + swap i<< ] dip ; inline
 
+<PRIVATE
+
 : (sequence-read-length) ( n buf stream -- buf count )
     [ underlying>> length ] [ i>> ] bi - rot min ; inline
 
 : <sequence-copy> ( dst n i src -- n copy )
     [ 0 ] 3curry dip <copy> ; inline
 
-: (sequence-read-unsafe) ( n buf stream -- count )
+: ((sequence-read-unsafe)) ( n buf stream -- count )
     [ (sequence-read-length) ]
     [ [ dup pick + ] change-i underlying>> ] bi
     [ <sequence-copy> (copy) drop ] 2curry keep ; inline
+
+: check-byte-array ( buf -- buf )
+    dup byte-array? [ "not a byte array" throw ] unless ; inline
+
+: check-string ( buf -- buf )
+    dup string? [ "not a string" throw ] unless ; inline
+
+: (sequence-read-unsafe) ( n buf stream -- count )
+    [ integer>fixnum ] 2dip dup stream-element-type +byte+ eq?
+    [ [ check-byte-array ] dip ((sequence-read-unsafe)) ]
+    [ [ check-string ] dip ((sequence-read-unsafe)) ] if ; inline
+
+PRIVATE>
 
 : sequence-read-unsafe ( n buf stream -- count )
     dup >sequence-stream< bounds-check?
     [ (sequence-read-unsafe) ] [ 3drop 0 ] if ; inline
 
+<PRIVATE
+
 : find-separator ( seps stream -- sep/f n )
-    swap [ >sequence-stream< ] dip
-    [ member-eq? ] curry [ find-from swap ] curry 2keep
-    pick [ drop - ] [ length swap - nip ] if ; inline
+    >sequence-stream< rot [ member-eq? ] curry
+    [ find-from swap ] curry 2keep pick
+    [ drop - ] [ length swap - nip ] if ; inline
 
 : (sequence-read-until) ( seps stream -- seq sep/f )
     [ find-separator ] keep
     [ [ (sequence-read-unsafe) ] (read-into-new) ]
     [ [ 1 + ] change-i drop ] bi swap ; inline
+
+PRIVATE>
 
 : sequence-read-until ( seps stream -- seq sep/f )
     dup >sequence-stream< bounds-check?
