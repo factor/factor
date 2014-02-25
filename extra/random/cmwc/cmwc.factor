@@ -43,14 +43,14 @@ M:: cmwc random-32* ( cmwc -- n )
     [ c>> + ] tri
 
     [ >fixnum -32 shift cmwc c<< ]
-    [ cmwc [ b>> bitand ] [ c>> + ] bi 32 bits ] bi
+    [ cmwc [ b>> bitand ] [ c>> w+ ] bi ] bi
 
     dup cmwc r>> > [
         cmwc [ 1 + ] change-c drop
-        cmwc b>> - 32 bits
+        cmwc b>> w-
     ] when
 
-    cmwc swap '[ r>> _ - 32 bits dup ] [ i>> ] [ Q>> ] tri set-nth-unsafe ;
+    cmwc swap '[ r>> _ w- dup ] [ i>> ] [ Q>> ] tri set-nth-unsafe ;
 
 : cmwc-4096 ( -- cmwc )
     4096
