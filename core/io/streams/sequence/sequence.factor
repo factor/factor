@@ -35,10 +35,14 @@ SLOT: i
     [ member-eq? ] curry [ find-from swap ] curry 2keep
     pick [ drop - ] [ length swap - nip ] if ; inline
 
-: sequence-read-until ( seps stream -- seq sep/f )
+: (sequence-read-until) ( seps stream -- seq sep/f )
     [ find-separator ] keep
     [ [ (sequence-read-unsafe) ] (read-into-new) ]
     [ [ 1 + ] change-i drop ] bi swap ; inline
+
+: sequence-read-until ( seps stream -- seq sep/f )
+    dup >sequence-stream< bounds-check?
+    [ (sequence-read-until) ] [ 2drop f f ] if ; inline
 
 ! Writers
 M: growable dispose drop ;

@@ -15,9 +15,7 @@ M: string-reader stream-read-unsafe
     [ dup string? [ "not a string" throw ] unless ]
     [ sequence-read-unsafe ] tri* ;
 M: string-reader stream-read1 sequence-read1 ;
-M: string-reader stream-read-until
-    dup >sequence-stream< bounds-check?
-    [ sequence-read-until ] [ 2drop f f ] if ;
+M: string-reader stream-read-until sequence-read-until ;
 M: string-reader stream-readln
     dup >sequence-stream< bounds-check? [
         "\r\n" over sequence-read-until CHAR: \r eq? [
