@@ -20,14 +20,11 @@ CONSTANT: n 0xe6546b64
 
 <PRIVATE
 
-: rotl ( k r -- k' )
-    [ shift ] [ 32 - shift ] 2bi bitor ; inline
-
 : (hash-chunk) ( k -- k' )
-    c1 * 32 bits r1 rotl c2 * 32 bits ; inline
+    c1 w* r1 bitroll-32 c2 w* ; inline
 
 : hash-chunk ( hash k -- hash' )
-    (hash-chunk) bitxor r2 rotl m * n + 32 bits ; inline
+    (hash-chunk) bitxor r2 bitroll-32 m w* n w+ ; inline
 
 : main-loop ( seq hash -- seq hash' )
     over byte-array? little-endian? and [
@@ -44,8 +41,8 @@ CONSTANT: n 0xe6546b64
     [ bitxor ] bi 32 bits ; inline
 
 : avalanche ( hash -- hash' )
-    [ -16 shift ] [ bitxor 0x85ebca6b * 32 bits ] bi
-    [ -13 shift ] [ bitxor 0xc2b2ae35 * 32 bits ] bi
+    [ -16 shift ] [ bitxor 0x85ebca6b w* ] bi
+    [ -13 shift ] [ bitxor 0xc2b2ae35 w* ] bi
     [ -16 shift ] [ bitxor ] bi ; inline
 
 PRIVATE>
