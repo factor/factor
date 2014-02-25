@@ -29,7 +29,7 @@ M: byte-reader stream-read-until sequence-read-until ;
 M: byte-reader dispose drop ;
 
 M: byte-reader stream-tell i>> ;
-M: byte-reader stream-seek (stream-seek) ;
+M: byte-reader stream-seek sequence-seek ;
 M: byte-reader stream-seekable? drop t ; inline
 M: byte-reader stream-length underlying>> length ; inline
 

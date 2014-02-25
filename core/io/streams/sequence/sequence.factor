@@ -55,7 +55,7 @@ INSTANCE: growable output-stream
 INSTANCE: growable plain-writer
 
 ! Seeking
-: (stream-seek) ( n seek-type stream -- )
+: sequence-seek ( n seek-type stream -- )
     swap {
         { seek-absolute [ i<< ] }
         { seek-relative [ [ + ] change-i drop ] }
