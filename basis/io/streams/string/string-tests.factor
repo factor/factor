@@ -11,6 +11,14 @@ IN: io.streams.string.tests
 ]
 unit-test
 
+{ { "line 1" "line 2" "line 3" } } [
+    "line 1\nline 2\nline 3" <string-reader> stream-lines
+] unit-test
+
+{ { "" "foo" "bar" "baz" } } [
+    "\rfoo\r\nbar\rbaz\n" <string-reader> stream-lines
+] unit-test
+
 [ f ]
 [ "" <string-reader> stream-readln ]
 unit-test
