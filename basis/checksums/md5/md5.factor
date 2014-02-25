@@ -83,7 +83,7 @@ CONSTANT: d 3
         k x nth-unsafe w+
         i T nth-unsafe w+
         s bitroll-32
-        b state nth-unsafe w+ 32 bits
+        b state nth-unsafe w+
     ] change-nth-unsafe ; inline
 
 MACRO: with-md5-round ( ops quot -- )
