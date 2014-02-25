@@ -28,16 +28,16 @@ SLOT: i
     [ [ dup pick + ] change-i underlying>> ] bi
     [ <sequence-copy> (copy) drop ] 2curry keep ; inline
 
-: check-byte-array ( buf -- buf )
-    dup byte-array? [ "not a byte array" throw ] unless ; inline
+: check-byte-array ( buf stream -- buf stream )
+    over byte-array? [ "not a byte array" throw ] unless ; inline
 
-: check-string ( buf -- buf )
-    dup string? [ "not a string" throw ] unless ; inline
+: check-string ( buf stream -- buf stream )
+    over string? [ "not a string" throw ] unless ; inline
 
 : (sequence-read-unsafe) ( n buf stream -- count )
     [ integer>fixnum ] 2dip dup stream-element-type +byte+ eq?
-    [ [ check-byte-array ] dip ((sequence-read-unsafe)) ]
-    [ [ check-string ] dip ((sequence-read-unsafe)) ] if ; inline
+    [ check-byte-array ((sequence-read-unsafe)) ]
+    [ check-string ((sequence-read-unsafe)) ] if ; inline
 
 PRIVATE>
 
