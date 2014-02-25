@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays byte-vectors destructors io
-io.encodings io.streams.sequence kernel namespaces sequences
-sequences.private ;
+io.encodings io.streams.sequence kernel math namespaces
+sequences sequences.private ;
 IN: io.streams.byte-array
 
 INSTANCE: byte-vector output-stream
-M: byte-vector stream-element-type drop +byte+ ;
+M: byte-vector stream-element-type drop +byte+ ; inline
 
 : <byte-writer> ( encoding -- stream )
     512 <byte-vector> swap <encoder> ;
@@ -20,7 +20,10 @@ INSTANCE: byte-reader input-stream
 
 M: byte-reader stream-element-type drop +byte+ ; inline
 
-M: byte-reader stream-read-unsafe sequence-read-unsafe ;
+M: byte-reader stream-read-unsafe
+    [ integer>fixnum ]
+    [ dup byte-array? [ "not a byte array" throw ] unless ]
+    [ sequence-read-unsafe ] tri* ;
 M: byte-reader stream-read1 sequence-read1 ;
 M: byte-reader stream-read-until sequence-read-until ;
 M: byte-reader dispose drop ;
