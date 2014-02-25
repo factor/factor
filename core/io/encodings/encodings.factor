@@ -106,8 +106,7 @@ M: decoder stream-element-type
 
 : fix-cr ( decoder c -- c' )
     over cr>> [
-        over cr-
-        dup CHAR: \n eq? [ drop (read1) ] [ nip ] if
+        over cr- dup CHAR: \n eq? [ drop (read1) ] [ nip ] if
     ] [ nip ] if ; inline
 
 M: decoder stream-read1 ( decoder -- ch )
@@ -151,8 +150,9 @@ M: decoder stream-contents*
 : line-ends\r ( stream str -- str ) swap cr+ ; inline
 
 : line-ends\n ( stream str -- str )
-    over cr>> over empty? and
-    [ drop dup cr- stream-readln ] [ swap cr- ] if ; inline
+    over cr>> [
+        over cr- [ stream-readln ] [ nip ] if-empty
+    ] [ nip ] if ; inline
 
 : handle-readln ( stream str ch -- str )
     {
@@ -188,6 +188,7 @@ M: encoder dispose stream>> dispose ; inline
 M: encoder stream-flush stream>> stream-flush ; inline
 
 INSTANCE: encoder plain-writer
+
 PRIVATE>
 
 GENERIC# re-encode 1 ( stream encoding -- newstream )
