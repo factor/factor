@@ -25,7 +25,7 @@ M: string-reader stream-readln
     ] [ drop f ] if ;
 
 M: string-reader stream-tell i>> ;
-M: string-reader stream-seek (stream-seek) ;
+M: string-reader stream-seek sequence-seek ;
 M: string-reader stream-seekable? drop t ; inline
 M: string-reader stream-length underlying>> length ;
 M: string-reader dispose drop ;
