@@ -10,7 +10,7 @@ SINGLETON: internet ! RFC 1071
 INSTANCE: internet checksum
 
 M: internet checksum-bytes
-    drop 0 swap 2 <groups> [ le> + ] each
+    drop 2 <groups> [ le> ] map-sum
     [ -16 shift ] [ 0xffff bitand ] bi +
     [ -16 shift ] keep + bitnot 2 >le ;
 
