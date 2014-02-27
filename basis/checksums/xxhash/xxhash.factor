@@ -17,9 +17,22 @@ TUPLE: xxhash seed ;
 
 C: <xxhash> xxhash
 
+<PRIVATE
+
+:: native-mapper ( from to bytes c-type -- seq )
+    from to bytes <slice>
+    bytes byte-array? little-endian? and
+    [ c-type cast-array ]
+    [ c-type heap-size <groups> [ le> ] map ] if ; inline
+
+PRIVATE>
+
 M:: xxhash checksum-bytes ( bytes checksum -- value )
     checksum seed>> :> seed
     bytes length :> len
+
+    len dup 16 mod - :> len/16
+    len dup 4 mod - :> len/4
 
     len 16 >= [
 
@@ -28,12 +41,7 @@ M:: xxhash checksum-bytes ( bytes checksum -- value )
         seed
         seed prime1 w-
 
-        bytes byte-array? little-endian? and [
-            0 len dup 16 mod - 4 - 4 <range>
-            [ bytes <displaced-alien> uint deref ] map
-        ] [
-            bytes len 16 mod head-slice* 4 <groups> [ le> ] map
-        ] if
+        0 len/16 bytes uint native-mapper
 
         4 <groups> [
             first4
@@ -53,16 +61,11 @@ M:: xxhash checksum-bytes ( bytes checksum -- value )
 
     len w+
 
-    bytes len 16 mod tail-slice*
-    dup length dup 4 mod - cut-slice [
-        4 <groups> [
-            le> prime3 w* w+ 17 bitroll-32 prime4 w*
-        ] each
-    ] [
-        [
-            prime5 w* w+ 11 bitroll-32 prime1 w*
-        ] each
-    ] bi*
+    len/16 len/4 bytes uint native-mapper
+    [ prime3 w* w+ 17 bitroll-32 prime4 w* ] each
+
+    bytes len/4 tail-slice
+    [ prime5 w* w+ 11 bitroll-32 prime1 w* ] each
 
     [ -15 shift ] [ bitxor ] bi prime2 w*
     [ -13 shift ] [ bitxor ] bi prime3 w*
