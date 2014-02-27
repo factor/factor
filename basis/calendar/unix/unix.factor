@@ -35,7 +35,7 @@ M: unix gmt-offset ( -- hours minutes seconds )
     get-time gmtoff>> 3600 /mod 60 /mod ;
 
 : current-timeval ( -- timeval )
-    timeval <struct> f [ gettimeofday io-error ] 2keep drop ; inline
+    timeval <struct> [ f gettimeofday io-error ] keep ; inline
 
 : system-micros ( -- n )
     current-timeval timeval>micros ;
