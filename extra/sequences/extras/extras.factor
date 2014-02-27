@@ -524,3 +524,6 @@ PRIVATE>
 
 : change-last-unsafe ( seq quot -- )
     [ drop length 1 - ] [ change-nth-unsafe ] 2bi ; inline
+
+: replicate-into ( ... seq quot: ( ... -- ... newelt ) -- ... )
+    over [ length ] 2dip '[ _ dip _ set-nth-unsafe ] each-integer ; inline
