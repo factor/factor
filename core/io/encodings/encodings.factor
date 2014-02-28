@@ -42,7 +42,7 @@ CONSTANT: replacement-char 0xfffd
 
 : string>byte-array-fast ( string -- byte-array )
     { string } declare ! aux>> must be f
-    [ length ] keep over <byte-array> [
+    [ length ] keep over (byte-array) [
         [
             [ [ string-nth-fast ] 2keep drop ]
             [ set-nth-unsafe ] bi*
