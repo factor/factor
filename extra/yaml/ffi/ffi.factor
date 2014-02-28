@@ -51,6 +51,10 @@ yaml_get_version ( int *major, int *minor, int *patch ) ;
 !  */
 
 ! /** The character type (UTF-8 octet). */
+! libYAML returns it's data as null-terminated UTF-8 string.
+! It copies it's input and we can use null-terminated string
+! if we give a negative length. So we can use factor's c-string
+! for input and output.
 TYPEDEF: uchar yaml_char_t
 
 ! /** The version directive data. */
@@ -61,8 +65,8 @@ STRUCT: yaml_version_directive_t
 
 ! /** The tag directive data. */
 STRUCT: yaml_tag_directive_t
-    { handle yaml_char_t* }
-    { prefix yaml_char_t* }
+    { handle c-string }
+    { prefix c-string }
 ;
 
 ! /** The stream encoding. */
@@ -185,22 +189,22 @@ STRUCT: stream_start_token_data
 ;
 ! /** The alias (for @c YAML_ALIAS_TOKEN). */
 STRUCT: alias_token_data
-    { value yaml_char_t* }
+    { value c-string }
 ;
 ! /** The anchor (for @c YAML_ANCHOR_TOKEN). */
 STRUCT: anchor_token_data
-    { value yaml_char_t* }
+    { value c-string }
 ;
 
 ! /** The tag (for @c YAML_TAG_TOKEN). */
 STRUCT: tag_token_data
-    { handle yaml_char_t* }
-    { suffix yaml_char_t* }
+    { handle c-string }
+    { suffix c-string }
 ;
 
 ! /** The scalar value (for @c YAML_SCALAR_TOKEN). */
 STRUCT: scalar_token_data
-    { value yaml_char_t* }
+    { value c-string }
     { length size_t }
     { style yaml_scalar_style_t }
 ;
@@ -293,14 +297,14 @@ STRUCT: document_end_event_data
 
 ! /** The alias parameters (for @c YAML_ALIAS_EVENT). */
 STRUCT: alias_event_data
-    { anchor yaml_char_t* }
+    { anchor c-string }
 ;
 
 ! /** The scalar parameters (for @c YAML_SCALAR_EVENT). */
 STRUCT: scalar_event_data
-    { anchor yaml_char_t* }
-    { tag yaml_char_t* }
-    { value yaml_char_t* }
+    { anchor c-string }
+    { tag c-string }
+    { value c-string }
     { length size_t }
     { plain_implicit int }
     { quoted_implicit int }
@@ -309,16 +313,16 @@ STRUCT: scalar_event_data
 
 ! /** The sequence parameters (for @c YAML_SEQUENCE_START_EVENT). */
 STRUCT: sequence_start_event_data
-    { anchor yaml_char_t* }
-    { tag yaml_char_t* }
+    { anchor c-string }
+    { tag c-string }
     { implicit int }
     { style yaml_sequence_style_t }
 ;
 
 ! /** The mapping parameters (for @c YAML_MAPPING_START_EVENT). */
 STRUCT: mapping_start_event_data
-    { anchor yaml_char_t* }
-    { tag yaml_char_t* }
+    { anchor c-string }
+    { tag c-string }
     { implicit int }
     { style yaml_mapping_style_t }
 ;
@@ -418,7 +422,7 @@ yaml_document_end_event_initialize ( yaml_event_t *event, int implicit ) ;
 !  */
 
 FUNCTION: int
-yaml_alias_event_initialize ( yaml_event_t *event, yaml_char_t *anchor ) ;
+yaml_alias_event_initialize ( yaml_event_t *event, c-string anchor ) ;
 
 ! /**
 !  * Create a SCALAR event.
@@ -444,8 +448,8 @@ yaml_alias_event_initialize ( yaml_event_t *event, yaml_char_t *anchor ) ;
 
 FUNCTION: int
 yaml_scalar_event_initialize ( yaml_event_t *event,
-        yaml_char_t *anchor, yaml_char_t *tag,
-        yaml_char_t *value, int length,
+        c-string anchor, c-string tag,
+        c-string value, int length,
         int plain_implicit, int quoted_implicit,
         yaml_scalar_style_t style ) ;
 
@@ -467,7 +471,7 @@ yaml_scalar_event_initialize ( yaml_event_t *event,
 
 FUNCTION: int
 yaml_sequence_start_event_initialize ( yaml_event_t *event,
-        yaml_char_t *anchor, yaml_char_t *tag, int implicit,
+        c-string anchor, c-string tag, int implicit,
         yaml_sequence_style_t style ) ;
 
 ! /**
@@ -499,7 +503,7 @@ yaml_sequence_end_event_initialize ( yaml_event_t *event ) ;
 
 FUNCTION: int
 yaml_mapping_start_event_initialize ( yaml_event_t *event,
-        yaml_char_t *anchor, yaml_char_t *tag, int implicit,
+        c-string anchor, c-string tag, int implicit,
         yaml_mapping_style_t style ) ;
 
 ! /**
@@ -579,7 +583,7 @@ STRUCT: yaml_node_pair_t
 ! /** The node structure. */
         ! /** The scalar parameters (for @c YAML_SCALAR_NODE). */
         STRUCT: scalar_node_data
-            { value yaml_char_t* }
+            { value c-string }
             { length size_t }
             { style yaml_scalar_style_t }
         ;
@@ -617,7 +621,7 @@ STRUCT: yaml_node_t
 
     { type yaml_node_type_t }
 
-    { tag yaml_char_t* }
+    { tag c-string }
 
     { data node_data }
 
@@ -741,7 +745,7 @@ yaml_document_get_root_node ( yaml_document_t *document ) ;
 
 FUNCTION: int
 yaml_document_add_scalar ( yaml_document_t *document,
-        yaml_char_t *tag, yaml_char_t *value, int length,
+        c-string tag, c-string value, int length,
         yaml_scalar_style_t style ) ;
 
 ! /**
@@ -758,7 +762,7 @@ yaml_document_add_scalar ( yaml_document_t *document,
 
 FUNCTION: int
 yaml_document_add_sequence ( yaml_document_t *document,
-        yaml_char_t *tag, yaml_sequence_style_t style ) ;
+        c-string tag, yaml_sequence_style_t style ) ;
 
 ! /**
 !  * Create a MAPPING node and attach it to the document.
@@ -774,7 +778,7 @@ yaml_document_add_sequence ( yaml_document_t *document,
 
 FUNCTION: int
 yaml_document_add_mapping ( yaml_document_t *document,
-        yaml_char_t *tag, yaml_mapping_style_t style ) ;
+        c-string tag, yaml_mapping_style_t style ) ;
 
 ! /**
 !  * Add an item to a SEQUENCE node.
@@ -882,7 +886,7 @@ ENUM: yaml_parser_state_t
 !  */
 
 STRUCT: yaml_alias_data_t
-    { anchor yaml_char_t* }
+    { anchor c-string }
     { index int }
     { mark yaml_mark_t }
 ;
@@ -1298,22 +1302,22 @@ ENUM: yaml_emitter_state_t
 
     ! /** Anchor analysis. */
     STRUCT: yaml_emitter_anchor_data
-        { anchor yaml_char_t* }
+        { anchor c-string }
         { anchor_length size_t }
         { alias int }
     ;
 
     ! /** Tag analysis. */
     STRUCT: yaml_emitter_tag_data
-        { handle yaml_char_t* }
+        { handle c-string }
         { handle_length size_t }
-        { suffix yaml_char_t* }
+        { suffix c-string }
         { suffix_length size_t }
     ;
 
     ! /** Scalar analysis. */
     STRUCT: yaml_emitter_scalar_data
-        { value yaml_char_t* }
+        { value c-string }
         { length size_t }
         { multiline int }
         { flow_plain_allowed int }
