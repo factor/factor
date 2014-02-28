@@ -11,8 +11,7 @@ IN: yaml
 : yaml-assert-ok ( n -- ) 0 = [ "yaml error" throw ] when ;
 
 : event>scalar ( event -- obj )
-    data>> scalar>> [ value>> ] [ length>> ] bi
-    memory>byte-array utf8 decode ;
+    data>> scalar>> value>> ;
 
 : ?scalar-value ( event -- scalar/f f/type )
     dup type>> YAML_SCALAR_EVENT =
@@ -134,27 +133,14 @@ SYMBOL: yaml-write-buffer
 GENERIC: emit-value ( emitter event obj -- )
 
 M:: string emit-value ( emitter event string -- )
-    [
-        string utf8 encode
-        [ malloc-byte-array &free ] [ length ] bi :> ( value length )
-
-        YAML_STR_TAG utf8 malloc-string &free :> tag
-
-        event f tag value length 0 0 0
-        yaml_scalar_event_initialize yaml-assert-ok
-
-        emitter event yaml_emitter_emit yaml-assert-ok
-    ] with-destructors ;
+    event f YAML_STR_TAG string -1 0 0 0
+    yaml_scalar_event_initialize yaml-assert-ok
+    emitter event yaml_emitter_emit yaml-assert-ok ;
 
 :: emit-sequence-start ( emitter event -- )
-    [
-        YAML_SEQ_TAG utf8 malloc-string &free :> tag
-
-        event f tag 0 0
-        yaml_sequence_start_event_initialize yaml-assert-ok
-
-        emitter event yaml_emitter_emit yaml-assert-ok
-    ] with-destructors ;
+    event f YAML_SEQ_TAG 0 0
+    yaml_sequence_start_event_initialize yaml-assert-ok
+    emitter event yaml_emitter_emit yaml-assert-ok ;
 : emit-sequence-end ( emitter event -- )
     dup yaml_sequence_end_event_initialize yaml-assert-ok
     yaml_emitter_emit yaml-assert-ok ;
@@ -168,14 +154,9 @@ M: sequence emit-value ( emitter event seq -- )
     [ drop emit-sequence-end ] 3tri ;
 
 :: emit-assoc-start ( emitter event -- )
-    [
-        YAML_MAP_TAG utf8 malloc-string &free :> tag
-
-        event f tag 0 0
-        yaml_mapping_start_event_initialize yaml-assert-ok
-
-        emitter event yaml_emitter_emit yaml-assert-ok
-    ] with-destructors ;
+    event f YAML_MAP_TAG 0 0
+    yaml_mapping_start_event_initialize yaml-assert-ok
+    emitter event yaml_emitter_emit yaml-assert-ok ;
 : emit-assoc-end ( emitter event -- )
     dup yaml_mapping_end_event_initialize yaml-assert-ok
     yaml_emitter_emit yaml-assert-ok ;
