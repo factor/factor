@@ -41,12 +41,12 @@ DEFER: parse-mapping
             [
                 parser event next-event type>>
                 YAML_MAPPING_END_EVENT = [
-                    t done! f f
+                    t done! f f f
                 ] [
-                    event ?scalar-value
+                    event ?scalar-value t
                 ] if
             ] with-destructors
-            2dup or [
+            [
                 [ nip [ parser event ] dip next-complex-value ] when*
                 parser event next-value swap ,,
             ] [ 2drop ] if
