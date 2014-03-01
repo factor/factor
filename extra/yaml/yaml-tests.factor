@@ -38,11 +38,11 @@ ${ test-represented-string } [ $ test-obj >yaml ] unit-test
 ${ test-represented-string } [ $ test-represented-string yaml> >yaml ] unit-test
 
 ! Non-scalar key
-CONSTANT: complex-key H{ { { "4" } "3" } }
+CONSTANT: complex-key H{ { { "foo" } "bar" } }
 CONSTANT: complex-key-represented """--- !!map
 ? !!seq
-- !!str 4
-: !!str 3
+- !!str foo
+: !!str bar
 ...
 """
 
