@@ -1,9 +1,11 @@
 ! Copyright (C) 2013 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax assocs
-classes.struct combinators continuations destructors
-io.encodings.string io.encodings.utf8 kernel libc locals make
-math namespaces prettyprint sequences strings yaml.ffi ;
+base64 byte-arrays classes.struct combinators continuations
+destructors io.encodings.string io.encodings.utf8 kernel libc
+locals make math math.parser namespaces prettyprint sequences
+strings yaml.ffi yaml.conversion ;
+FROM: math => float ;
 IN: yaml
 
 <PRIVATE
@@ -11,7 +13,7 @@ IN: yaml
 : yaml-assert-ok ( ? -- ) [ "yaml error" throw ] unless ;
 
 : event>scalar ( event -- obj )
-    data>> scalar>> value>> ;
+    data>> scalar>> construct-scalar ;
 
 : ?scalar-value ( event -- scalar/f f/type )
     dup type>> YAML_SCALAR_EVENT =
@@ -132,15 +134,20 @@ SYMBOL: yaml-write-buffer
 
 GENERIC: emit-value ( emitter event obj -- )
 
-M:: string emit-value ( emitter event string -- )
-    event f YAML_STR_TAG string -1 f f YAML_ANY_SCALAR_STYLE
+:: emit-scalar ( emitter event obj -- )
+    event f
+    obj [ yaml-tag ] [ represent-scalar ] bi
+    -1 f f YAML_ANY_SCALAR_STYLE
     yaml_scalar_event_initialize yaml-assert-ok
     emitter event yaml_emitter_emit yaml-assert-ok ;
+
+M: object emit-value ( emitter event obj -- ) emit-scalar ;
 
 :: emit-sequence-start ( emitter event -- )
     event f YAML_SEQ_TAG f YAML_ANY_SEQUENCE_STYLE
     yaml_sequence_start_event_initialize yaml-assert-ok
     emitter event yaml_emitter_emit yaml-assert-ok ;
+
 : emit-sequence-end ( emitter event -- )
     dup yaml_sequence_end_event_initialize yaml-assert-ok
     yaml_emitter_emit yaml-assert-ok ;
@@ -148,6 +155,8 @@ M:: string emit-value ( emitter event string -- )
 : emit-sequence ( emitter event seq -- )
     [ emit-value ] with with each ;
 
+M: string emit-value ( emitter event seq -- ) emit-scalar ;
+M: byte-array emit-value ( emitter event seq -- ) emit-scalar ;
 M: sequence emit-value ( emitter event seq -- )
     [ drop emit-sequence-start ]
     [ emit-sequence ]
@@ -157,6 +166,7 @@ M: sequence emit-value ( emitter event seq -- )
     event f YAML_MAP_TAG f YAML_ANY_MAPPING_STYLE
     yaml_mapping_start_event_initialize yaml-assert-ok
     emitter event yaml_emitter_emit yaml-assert-ok ;
+
 : emit-assoc-end ( emitter event -- )
     dup yaml_mapping_end_event_initialize yaml-assert-ok
     yaml_emitter_emit yaml-assert-ok ;
