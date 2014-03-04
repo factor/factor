@@ -160,15 +160,12 @@ ERROR: download-failed response ;
 : check-response ( response -- response )
     dup code>> success? [ download-failed ] unless ;
 
-: check-response-with-body ( response body -- response body )
-    [ >>body check-response ] keep ;
-
 : with-http-request ( request quot: ( chunk -- ) -- response )
     [ (with-http-request) ] with-destructors ; inline
 
 : http-request ( request -- response data )
     [ [ % ] with-http-request ] B{ } make
-    over content-encoding>> decode check-response-with-body ;
+    over content-encoding>> decode [ >>body ] keep ;
 
 : http-request* ( request -- data )
     http-request swap check-response drop ;
