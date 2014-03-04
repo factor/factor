@@ -30,7 +30,7 @@ HELP: PY-METHODS:
     "PY-FROM: zipfile => ZipFile ( name mode -- file ) ;"
     "PY-METHODS: ZipFile => namelist ( self -- names ) ;"
     "! Then use the declarations like this"
-    "\"name-of-zip.zip\" >py \"r\" >py ZipFile namelist >factor"
+    "\"name-of-zip.zip\" >py \"r\" >py ZipFile namelist py>"
   }
 } ;
 
@@ -42,13 +42,13 @@ $nl
     "PY-FROM: zipfile => ZipFile ( name mode -- file ) ;"
     "PY-METHODS: ZipFile => namelist ( self -- names ) ;"
     "! Then use the declarations like this"
-    "\"name-of-zip.zip\" >py \"r\" >py ZipFile namelist >factor"
+    "\"name-of-zip.zip\" >py \"r\" >py ZipFile namelist py>"
   }
   "In python, a method or function takes keyword arguments if its last parameter starts with \"**\". If the name of the last argument to a declared function is \"**\" then a " { $link hashtable } " can be sent to the function:"
   { $code
     "PY-FROM: datetime => timedelta ( ** -- timedelta ) ;"
     "PY-METHODS: timedelta  => seconds ( self -- n ) ;"
-    "H{ { \"hours\" 99 } { \"minutes\" 33 } } >py timedelta $seconds >factor ."
+    "H{ { \"hours\" 99 } { \"minutes\" 33 } } >py timedelta $seconds py> ."
     "12780"
     }
 } ;

@@ -23,7 +23,7 @@ SPECIALIZED-ARRAY: void*
     Py_IsInitialized [ Py_Finalize ] when ;
 
 ! Importing
-: import ( str -- module )
+: py-import ( str -- module )
     PyImport_ImportModule check-new-ref ;
 
 ! Unicodes
@@ -63,7 +63,7 @@ M: math:float (>py) PyFloat_FromDouble ;
 M: array (>py) [ (>py) ] map array>py-tuple ;
 M: hashtable (>py)
     <py-dict> swap dupd [
-        swapd [ (>py) ] [ (>py) ] bi* py-dict-set-item
+        swapd [ (>py) ] bi@ py-dict-set-item
     ] with assoc-each ;
 M: vector (>py)
     [ (>py) ] map vector>py-list ;
@@ -74,18 +74,18 @@ M: vector (>py)
 ! Data marshalling to Factor
 SYMBOL: py-type-dispatch
 
-DEFER: >factor
+DEFER: py>
 
 : init-py-type-dispatch ( -- table )
     H{
         { "NoneType" [ drop f ] }
         { "bool" [ PyObject_IsTrue 1 = ] }
-        { "dict" [ PyDict_Items (check-ref) >factor >hashtable ] }
+        { "dict" [ PyDict_Items (check-ref) py> >hashtable ] }
         { "int" [ PyInt_AsLong ] }
-        { "list" [ py-list>vector [ >factor ] map ] }
+        { "list" [ py-list>vector [ py> ] map ] }
         { "long" [ PyLong_AsLong ] }
         { "str" [ PyString_AsString (check-ref) ] }
-        { "tuple" [ py-tuple>array [ >factor ] map ] }
+        { "tuple" [ py-tuple>array [ py> ] map ] }
         { "unicode" [ py-unicode>utf8 ] }
     } clone ;
 
@@ -93,6 +93,6 @@ py-type-dispatch [ init-py-type-dispatch ] initialize
 
 ERROR: missing-type type ;
 
-: >factor ( py-obj -- obj )
+: py> ( py-obj -- obj )
     dup "__class__" getattr "__name__" getattr PyString_AsString
     py-type-dispatch get ?at [ call( x -- x ) ] [ missing-type ] if ;

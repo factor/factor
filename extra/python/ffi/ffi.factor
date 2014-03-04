@@ -2,12 +2,10 @@ USING: alien alien.c-types alien.destructors alien.libraries alien.libraries.fin
 alien.syntax assocs kernel sequences system ;
 IN: python.ffi
 
-<< "python" {
-    { linux { "3.0" "2.7" "2.6" } }
-    { windows { "30" "27" "26" } }
-} os of [
-    "python" prepend find-library
-] map-find drop cdecl add-library >>
+<< "python" { "3.0" "2.7" "2.6" }
+os windows? [ [ [ CHAR: . = not ] filter ] map ] when
+[ "python" prepend find-library ] map-find drop
+cdecl add-library >>
 
 ! Functions that return borrowed references needs to be called like this:
 ! Py_Func dup Py_IncRef &Py_DecRef
