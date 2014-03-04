@@ -369,7 +369,7 @@ M: sha-256 checksum-stream ( stream checksum -- byte-array )
         { 1 [ bitxor bitxor ] }
         { 2 [ 2dup bitand [ pick bitand [ bitand ] dip ] dip bitor bitor ] }
         { 3 [ bitxor bitxor ] }
-    } case ;
+    } case ; inline
 
 :: inner-loop ( n H W K -- temp )
     a H nth-unsafe :> A
