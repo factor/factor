@@ -14,17 +14,17 @@ ERROR: python-error type message ;
 
 PRIVATE>
 
-: (check-ref) ( ref -- ref' )
+: (check-ref) ( ref -- ref )
     [ get-error throw-error f ] unless* ;
 
-: check-new-ref ( ref -- ref' )
+: check-new-ref ( ref -- ref )
     &Py_DecRef (check-ref) ;
 
-: check-borrowed-ref ( ref -- ref' )
+: check-borrowed-ref ( ref -- ref )
     dup Py_IncRef &Py_DecRef (check-ref) ;
 
 : check-zero ( code -- )
     0 = [ get-error throw-error ] unless ;
 
-: unsteal-ref ( ref -- ref' )
+: unsteal-ref ( ref -- ref )
     dup Py_IncRef ;
