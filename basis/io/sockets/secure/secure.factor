@@ -82,6 +82,11 @@ ERROR: subject-name-verify-error expected got ;
 M: subject-name-verify-error summary
     drop "Subject name verification failed" ;
 
+ERROR: certificate-missing-error ;
+
+M: certificate-missing-error summary
+    drop "Host did not present any certificate" ;
+
 ERROR: upgrade-on-non-socket ;
 
 M: upgrade-on-non-socket summary
