@@ -204,10 +204,11 @@ M: ssl-handle dispose*
     [ >lower ] bi@ "*." ?head [ tail? ] [ = ] if ;
 
 : check-subject-name ( host ssl-handle -- )
-    SSL_get_peer_certificate
-    [ alternative-dns-names ] [ subject-name ] bi suffix
-    2dup [ subject-names-match? ] with any?
-    [ 2drop ] [ subject-name-verify-error ] if ;
+    SSL_get_peer_certificate [
+        [ alternative-dns-names ] [ subject-name ] bi suffix
+        2dup [ subject-names-match? ] with any?
+        [ 2drop ] [ subject-name-verify-error ] if
+    ] [ certificate-missing-error ] if* ;
 
 M: openssl check-certificate ( host ssl -- )
     current-secure-context config>> verify>> [
