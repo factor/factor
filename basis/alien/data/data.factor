@@ -8,7 +8,7 @@ QUALIFIED: math
 IN: alien.data
 
 : <ref> ( value c-type -- c-ptr )
-    [ heap-size <byte-array> ] keep
+    [ heap-size (byte-array) ] keep
     '[ 0 _ set-alien-value ] keep ; inline
 
 : deref ( c-ptr c-type -- value )
