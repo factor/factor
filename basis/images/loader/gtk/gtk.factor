@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Philipp Brüschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays combinators
-destructors gdk.pixbuf.ffi gobject.ffi grouping images
+USING: accessors alien.c-types alien.data alien.syntax arrays assocs
+combinators destructors gdk.pixbuf.ffi glib.ffi gobject.ffi grouping images
 images.loader io kernel locals math sequences
-specialized-arrays ;
+specialized-arrays unicode.case ;
 FROM: system => os linux? ;
 IN: images.loader.gtk
 SPECIALIZED-ARRAY: uchar
@@ -11,6 +11,8 @@ SPECIALIZED-ARRAY: uchar
 SINGLETON: gtk-image
 
 os linux? [
+    ! Explicit type initialization needed for glib < 2.36.
+    g_type_init
     "png"  gtk-image register-image-class
     "tif"  gtk-image register-image-class
     "tiff" gtk-image register-image-class
@@ -44,12 +46,14 @@ os linux? [
         ] if
     ] ;
 
+CONSTANT: bits>components {
+    { 8 ubyte-components }
+    { 16 ushort-components }
+    { 32 uint-components }
+}
+
 : component-type ( GdkPixbuf -- component-type )
-    gdk_pixbuf_get_bits_per_sample {
-        {  8 [ ubyte-components ] }
-        { 16 [ ushort-components ] }
-        { 32 [ uint-components ] }
-    } case ;
+    gdk_pixbuf_get_bits_per_sample bits>components at ;
 
 : GdkPixbuf>image ( GdkPixbuf -- image )
     [ image new ] dip
@@ -62,6 +66,39 @@ os linux? [
         f >>premultiplied-alpha?
         f >>upside-down? ;
 
+: bits-per-sample ( image -- bits )
+    component-type>> bits>components value-at ;
+
+: rowstride ( image -- rowstride )
+    [ dim>> first ] [ bits-per-sample 8 / ] [ has-alpha? 4 3 ? ] tri * * ;
+
+: image>GdkPixbuf ( image -- GdkPixbuf )
+    {
+        [ bitmap>> ]
+        [ drop GDK_COLORSPACE_RGB ]
+        [ has-alpha? ]
+        [ bits-per-sample ]
+        [ dim>> first2 ]
+        [ rowstride ]
+    } cleave f f gdk_pixbuf_new_from_data ;
+
+: GdkPixbuf>byte-array ( GdkPixbuf type -- byte-array )
+    { void* int } [
+        rot f f
+        { { pointer: GError initial: f } } [
+            gdk_pixbuf_save_to_bufferv drop
+        ] with-out-parameters
+    ] with-out-parameters rot handle-GError memory>byte-array ;
+
+! The type parameter is almost always the same as the file extension,
+! except for in the jpg -> jpeg and tif -> tiff cases.
+: extension>pixbuf-type ( extension -- type )
+    >lower { { "jpg" "jpeg" } { "tif" "tiff" } } ?at drop ;
+
+: write-image ( image extension -- )
+    [ image>GdkPixbuf &g_object_unref ] [ extension>pixbuf-type ] bi*
+    GdkPixbuf>byte-array write ;
+
 PRIVATE>
 
 M: gtk-image stream>image*
@@ -69,3 +106,6 @@ M: gtk-image stream>image*
     stream-contents data>GInputStream &g_object_unref
     GInputStream>GdkPixbuf &g_object_unref
     GdkPixbuf>image ;
+
+M: gtk-image image>stream
+    drop write-image ;
