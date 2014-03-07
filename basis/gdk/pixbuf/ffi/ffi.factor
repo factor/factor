@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.data alien.libraries alien.syntax
+USING: alien alien.c-types alien.data alien.libraries alien.syntax
 combinators gio.ffi glib.ffi gobject-introspection
 gobject-introspection.standard-types kernel libc
 sequences system vocabs ;
@@ -22,10 +22,31 @@ LIBRARY: gdk.pixbuf
 
 GIR: vocab:gdk/pixbuf/GdkPixbuf-2.0.gir
 
-! <workaround incorrect return-value in gir
+! <workaround incorrect return-values in gir
 
 FORGET: gdk_pixbuf_get_pixels
 FUNCTION: guint8* gdk_pixbuf_get_pixels ( GdkPixbuf* pixbuf ) ;
+
+FORGET: gdk_pixbuf_new_from_data
+FUNCTION: GdkPixbuf* gdk_pixbuf_new_from_data ( guint8* data,
+                                                GdkColorspace colorspace,
+                                                gboolean has_alpha,
+                                                int bits_per_sample,
+                                                int width,
+                                                int height,
+                                                int rowstride,
+                                                GdkPixbufDestroyNotify destroy_fn,
+                                                gpointer destroy_fn_data ) ;
+
+FORGET: gdk_pixbuf_save_to_bufferv
+FUNCTION: gboolean gdk_pixbuf_save_to_bufferv ( GdkPixbuf* pixbuf,
+                                                guint8** data,
+                                                gsize* buffer_size,
+                                                c-string type,
+                                                char **option_keys,
+                                                char **option_values,
+                                                GError **error ) ;
+
 
 ! workaround>
 
