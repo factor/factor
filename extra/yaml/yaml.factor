@@ -8,7 +8,7 @@ IN: yaml
 
 <PRIVATE
 
-: yaml-assert-ok ( n -- ) 0 = [ "yaml error" throw ] when ;
+: yaml-assert-ok ( ? -- ) [ "yaml error" throw ] unless ;
 
 : event>scalar ( event -- obj )
     data>> scalar>> value>> ;
@@ -133,12 +133,12 @@ SYMBOL: yaml-write-buffer
 GENERIC: emit-value ( emitter event obj -- )
 
 M:: string emit-value ( emitter event string -- )
-    event f YAML_STR_TAG string -1 0 0 0
+    event f YAML_STR_TAG string -1 f f YAML_ANY_SCALAR_STYLE
     yaml_scalar_event_initialize yaml-assert-ok
     emitter event yaml_emitter_emit yaml-assert-ok ;
 
 :: emit-sequence-start ( emitter event -- )
-    event f YAML_SEQ_TAG 0 0
+    event f YAML_SEQ_TAG f YAML_ANY_SEQUENCE_STYLE
     yaml_sequence_start_event_initialize yaml-assert-ok
     emitter event yaml_emitter_emit yaml-assert-ok ;
 : emit-sequence-end ( emitter event -- )
@@ -154,7 +154,7 @@ M: sequence emit-value ( emitter event seq -- )
     [ drop emit-sequence-end ] 3tri ;
 
 :: emit-assoc-start ( emitter event -- )
-    event f YAML_MAP_TAG 0 0
+    event f YAML_MAP_TAG f YAML_ANY_MAPPING_STYLE
     yaml_mapping_start_event_initialize yaml-assert-ok
     emitter event yaml_emitter_emit yaml-assert-ok ;
 : emit-assoc-end ( emitter event -- )
@@ -188,12 +188,12 @@ M: assoc emit-value ( emitter event seq -- )
     emitter event ;
 
 :: emit-doc ( emitter event obj -- )
-    event f f f 0 yaml_document_start_event_initialize yaml-assert-ok
+    event f f f f yaml_document_start_event_initialize yaml-assert-ok
     emitter event yaml_emitter_emit yaml-assert-ok
 
     emitter event obj emit-value
 
-    event 0 yaml_document_end_event_initialize yaml-assert-ok
+    event f yaml_document_end_event_initialize yaml-assert-ok
     emitter event yaml_emitter_emit yaml-assert-ok ;
 
 ! registers destructors (use with with-destructors)
