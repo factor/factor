@@ -31,11 +31,14 @@ SYMBOL: dpi
 
 72 dpi set-global
 
-: set-layout-font ( font layout -- )
-    swap cache-font-description pango_layout_set_font_description ;
+: set-layout-font ( layout font -- )
+    cache-font-description pango_layout_set_font_description ;
 
-: set-layout-text ( str layout -- )
-    swap utf8 string>alien -1 pango_layout_set_text ;
+: set-layout-text ( layout string -- )
+    utf8 string>alien -1 pango_layout_set_text ;
+
+: set-layout-width ( layout pixel-width -- )
+    dup -1 = [ float>pango ] unless pango_layout_set_width ;
 
 : PangoRectangle>rect ( PangoRectangle -- rect )
     [ [ x>> pango>float ] [ y>> pango>float ] bi 2array ]
@@ -130,14 +133,18 @@ SYMBOL: dpi
 : set-layout-resolution ( layout -- )
     pango_layout_get_context dpi get-global pango_cairo_context_set_resolution ;
 
-: <PangoLayout> ( text font -- layout )
-    dummy-cairo pango_cairo_create_layout |g_object_unref
-    [ set-layout-resolution ] keep
-    [ set-layout-font ] keep
-    [ set-layout-text ] keep ;
+:: <PangoLayout> ( string font width wrap -- layout )
+    dummy-cairo pango_cairo_create_layout |g_object_unref dup {
+        [ set-layout-resolution ]
+        [ string set-layout-text ]
+        [ font set-layout-font ]
+        [ width set-layout-width ]
+        [ wrap pango_layout_set_wrap ]
+    } cleave ;
 
 : glyph-height ( font string -- y )
-    swap <PangoLayout> &g_object_unref layout-extents drop dim>> second ;
+    swap -1 PANGO_WRAP_WORD_CHAR <PangoLayout> &g_object_unref
+    layout-extents drop dim>> second ;
 
 MEMO: missing-font-metrics ( font -- metrics )
     #! Pango doesn't provide x-height and cap-height but Core Text does, so we
@@ -160,7 +167,9 @@ MEMO: missing-font-metrics ( font -- metrics )
         layout new-disposable
             swap unpack-selection
             swap >>font
-            dup [ string>> ] [ font>> ] bi <PangoLayout> >>layout
+            dup [ string>> ] [ font>> ] bi
+            10000 PANGO_WRAP_WORD_CHAR <PangoLayout>
+            >>layout
             dup layout>> layout-extents [ >>ink-rect ] [ >>logical-rect ] bi*
             dup layout-metrics >>metrics
     ] with-destructors ;
@@ -210,4 +219,3 @@ M: pango-renderer line-metrics ( font string -- metrics )
 ] "ui.text.pango" add-startup-hook
 
 pango-renderer font-renderer set-global
-
