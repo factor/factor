@@ -356,7 +356,7 @@ STRUCT: yaml_event_t
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_stream_start_event_initialize ( yaml_event_t *event,
         yaml_encoding_t encoding ) ;
 
@@ -368,7 +368,7 @@ yaml_stream_start_event_initialize ( yaml_event_t *event,
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_stream_end_event_initialize ( yaml_event_t *event ) ;
 
 ! /**
@@ -390,12 +390,12 @@ yaml_stream_end_event_initialize ( yaml_event_t *event ) ;
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_document_start_event_initialize ( yaml_event_t *event,
         yaml_version_directive_t *version_directive,
         yaml_tag_directive_t *tag_directives_start,
         yaml_tag_directive_t *tag_directives_end,
-        int implicit ) ;
+        bool implicit ) ;
 
 ! /**
 !  * Create the DOCUMENT-END event.
@@ -409,8 +409,8 @@ yaml_document_start_event_initialize ( yaml_event_t *event,
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
-yaml_document_end_event_initialize ( yaml_event_t *event, int implicit ) ;
+FUNCTION: bool
+yaml_document_end_event_initialize ( yaml_event_t *event, bool implicit ) ;
 
 ! /**
 !  * Create an ALIAS event.
@@ -421,7 +421,7 @@ yaml_document_end_event_initialize ( yaml_event_t *event, int implicit ) ;
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_alias_event_initialize ( yaml_event_t *event, c-string anchor ) ;
 
 ! /**
@@ -446,11 +446,11 @@ yaml_alias_event_initialize ( yaml_event_t *event, c-string anchor ) ;
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_scalar_event_initialize ( yaml_event_t *event,
         c-string anchor, c-string tag,
         c-string value, int length,
-        int plain_implicit, int quoted_implicit,
+        bool plain_implicit, bool quoted_implicit,
         yaml_scalar_style_t style ) ;
 
 ! /**
@@ -469,9 +469,9 @@ yaml_scalar_event_initialize ( yaml_event_t *event,
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_sequence_start_event_initialize ( yaml_event_t *event,
-        c-string anchor, c-string tag, int implicit,
+        c-string anchor, c-string tag, bool implicit,
         yaml_sequence_style_t style ) ;
 
 ! /**
@@ -482,7 +482,7 @@ yaml_sequence_start_event_initialize ( yaml_event_t *event,
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_sequence_end_event_initialize ( yaml_event_t *event ) ;
 
 ! /**
@@ -501,9 +501,9 @@ yaml_sequence_end_event_initialize ( yaml_event_t *event ) ;
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_mapping_start_event_initialize ( yaml_event_t *event,
-        c-string anchor, c-string tag, int implicit,
+        c-string anchor, c-string tag, bool implicit,
         yaml_mapping_style_t style ) ;
 
 ! /**
@@ -514,7 +514,7 @@ yaml_mapping_start_event_initialize ( yaml_event_t *event,
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_mapping_end_event_initialize ( yaml_event_t *event ) ;
 
 ! /**
@@ -678,12 +678,12 @@ STRUCT: yaml_document_t
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_document_initialize ( yaml_document_t *document,
         yaml_version_directive_t *version_directive,
         yaml_tag_directive_t *tag_directives_start,
         yaml_tag_directive_t *tag_directives_end,
-        int start_implicit, int end_implicit ) ;
+        bool start_implicit, bool end_implicit ) ;
 
 ! /**
 !  * Delete a YAML document and all its nodes.
@@ -790,7 +790,7 @@ yaml_document_add_mapping ( yaml_document_t *document,
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_document_append_sequence_item ( yaml_document_t *document,
         int sequence, int item ) ;
 
@@ -805,7 +805,7 @@ yaml_document_append_sequence_item ( yaml_document_t *document,
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_document_append_mapping_pair ( yaml_document_t *document,
         int mapping, int key, int value ) ;
 
@@ -834,7 +834,7 @@ yaml_document_append_mapping_pair ( yaml_document_t *document,
 !  * @a size_read to @c 0 and return @c 1.
 !  */
 
-CALLBACK: int yaml_read_handler_t ( void *data,  uchar *buffer, size_t size,
+CALLBACK: bool yaml_read_handler_t ( void *data,  uchar *buffer, size_t size,
          size_t *size_read ) ;
 
 ! /**
@@ -1049,7 +1049,7 @@ STRUCT: yaml_parser_t
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_parser_initialize ( yaml_parser_t *parser ) ;
 
 ! /**
@@ -1135,7 +1135,7 @@ yaml_parser_set_encoding ( yaml_parser_t *parser, yaml_encoding_t encoding ) ;
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_parser_scan ( yaml_parser_t *parser, yaml_token_t *token ) ;
 
 ! /**
@@ -1159,7 +1159,7 @@ yaml_parser_scan ( yaml_parser_t *parser, yaml_token_t *token ) ;
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_parser_parse ( yaml_parser_t *parser, yaml_event_t *event ) ;
 
 ! /**
@@ -1184,7 +1184,7 @@ yaml_parser_parse ( yaml_parser_t *parser, yaml_event_t *event ) ;
 !  * @return @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_parser_load ( yaml_parser_t *parser, yaml_document_t *document ) ;
 
 ! /** @} */
@@ -1210,7 +1210,7 @@ yaml_parser_load ( yaml_parser_t *parser, yaml_document_t *document ) ;
 !  * the returned value should be @c 0.
 !  */
 
-CALLBACK: int yaml_write_handler_t ( void *data, uchar *buffer, size_t size ) ;
+CALLBACK: bool yaml_write_handler_t ( void *data, uchar *buffer, size_t size ) ;
 
 ! /** The emitter states. */
 ENUM: yaml_emitter_state_t
@@ -1408,7 +1408,7 @@ STRUCT: yaml_emitter_t
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_emitter_initialize ( yaml_emitter_t *emitter ) ;
 
 ! /**
@@ -1485,7 +1485,7 @@ yaml_emitter_set_encoding ( yaml_emitter_t *emitter, yaml_encoding_t encoding ) 
 !  */
 
 FUNCTION: void
-yaml_emitter_set_canonical ( yaml_emitter_t *emitter, int canonical ) ;
+yaml_emitter_set_canonical ( yaml_emitter_t *emitter, bool canonical ) ;
 
 ! /**
 !  * Set the intendation increment.
@@ -1515,7 +1515,7 @@ yaml_emitter_set_width ( yaml_emitter_t *emitter, int width ) ;
 !  */
 
 FUNCTION: void
-yaml_emitter_set_unicode ( yaml_emitter_t *emitter, int unicode ) ;
+yaml_emitter_set_unicode ( yaml_emitter_t *emitter, bool unicode ) ;
 
 ! /**
 !  * Set the preferred line break.
@@ -1541,7 +1541,7 @@ yaml_emitter_set_break ( yaml_emitter_t *emitter, yaml_break_t line_break ) ;
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_emitter_emit ( yaml_emitter_t *emitter, yaml_event_t *event ) ;
 
 ! /**
@@ -1554,7 +1554,7 @@ yaml_emitter_emit ( yaml_emitter_t *emitter, yaml_event_t *event ) ;
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_emitter_open ( yaml_emitter_t *emitter ) ;
 
 ! /**
@@ -1567,7 +1567,7 @@ yaml_emitter_open ( yaml_emitter_t *emitter ) ;
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_emitter_close ( yaml_emitter_t *emitter ) ;
 
 ! /**
@@ -1584,7 +1584,7 @@ yaml_emitter_close ( yaml_emitter_t *emitter ) ;
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_emitter_dump ( yaml_emitter_t *emitter, yaml_document_t *document ) ;
 
 ! /**
@@ -1595,7 +1595,7 @@ yaml_emitter_dump ( yaml_emitter_t *emitter, yaml_document_t *document ) ;
 !  * @returns @c 1 if the function succeeded, @c 0 on error.
 !  */
 
-FUNCTION: int
+FUNCTION: bool
 yaml_emitter_flush ( yaml_emitter_t *emitter ) ;
 
 ! /** @} */
