@@ -931,7 +931,7 @@ STRUCT: yaml_alias_data_t
     ;
 
     ! /** The indentation levels stack. */
-    STRUCT: yaml_parser_idents
+    STRUCT: yaml_parser_indents
         { start int* }
         { end int* }
         { top int* }
@@ -1013,7 +1013,7 @@ STRUCT: yaml_parser_t
 
     { token_available int }
 
-    { indents yaml_parser_idents }
+    { indents yaml_parser_indents }
 
     { indent int }
 
