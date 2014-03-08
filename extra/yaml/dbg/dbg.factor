@@ -31,12 +31,12 @@ yaml_event_t (malloc-struct) &free :> event
 f :> done!
 [
   [ done ] [
-    parser event yaml_parser_parse 0 = [
-      "error" throw
-    ] [ [
+    parser event yaml_parser_parse [ [
         event &yaml_event_delete event.
         event type>> YAML_STREAM_END_EVENT = done!
-    ] with-destructors ] if
+    ] with-destructors ] [
+      "error" throw
+    ] if
   ] until
 ] [ . ] recover
 
