@@ -1,7 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman, Keith Lazuka
 ! See http://factorcode.org/license.txt for BSD license.
-USING: images.testing io.directories ;
+USING: images.loader images.png images.testing io.directories ;
 IN: images.png.tests
+
+"png" png-image register-image-class
 
 ! Test files from PngSuite (http://www.libpng.org/pub/png/pngsuite.html)
 
