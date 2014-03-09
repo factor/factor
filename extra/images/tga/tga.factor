@@ -21,7 +21,7 @@ ERROR: bad-tga-unsupported ;
 : read-color-map-type ( -- byte )
     1 read le> dup
     { 0 1 } member? [ bad-tga-header ] unless ;
-      
+
 : read-image-type ( -- byte )
     1 read le> dup
     { 0 1 2 3 9 10 11 } member? [ bad-tga-header ] unless ; inline
@@ -167,7 +167,7 @@ ERROR: bad-tga-unsupported ;
         [ first ]
         [ dup third second seek-absolute seek-input read ] bi 2array
     ] map >hashtable ; inline
-    
+
 :: read-tga ( -- image )
     #! Read header
     read-id-length                                       :> id-length
@@ -185,7 +185,7 @@ ERROR: bad-tga-unsupported ;
     id-length read-image-id                              :> image-id
     map-type map-length map-entry-size read-color-map    :> color-map-data
     image-width image-height pixel-depth read-image-data :> image-data
-    
+
     [
         #! Read optional footer
         26 seek-end seek-input
@@ -208,11 +208,11 @@ ERROR: bad-tga-unsupported ;
             read-key-color               :> key-color
             read-pixel-aspect-ratio      :> aspect-ratio
             read-gamma-value             :> gamma-value
-            read-color-correction-offset :> color-correction-offset 
+            read-color-correction-offset :> color-correction-offset
             read-postage-stamp-offset    :> postage-stamp-offset
             read-scan-line-offset        :> scan-line-offset
             read-premultiplied-alpha     :> premultiplied-alpha
-            
+
             color-correction-offset 0 =
             [
                 color-correction-offset seek-absolute seek-input
@@ -224,10 +224,10 @@ ERROR: bad-tga-unsupported ;
                 postage-stamp-offset seek-absolute seek-input
                 pixel-depth read-postage-stamp-image :> postage-data
             ] unless
-            
+
             scan-line-offset seek-absolute seek-input
             image-height read-scan-line-table :> scan-offsets
-            
+
             #! Read optional developer section
             directory-offset 0 =
             [ f ]
@@ -240,11 +240,11 @@ ERROR: bad-tga-unsupported ;
 
     #! Only 24-bit uncompressed BGR and 32-bit uncompressed BGRA are supported.
     #! Other formats would need to be converted to work within the image class.
-    map-type 0 = [ bad-tga-unsupported ] unless 
+    map-type 0 = [ bad-tga-unsupported ] unless
     image-type 2 = [ bad-tga-unsupported ] unless
     pixel-depth { 24 32 } member? [ bad-tga-unsupported ] unless
     pixel-order { 0 2 } member? [ bad-tga-unsupported ] unless
-    
+
     #! Create image instance
     image new
     alpha-bits 0 = [ BGR ] [ BGRA ] if >>component-order
@@ -252,12 +252,12 @@ ERROR: bad-tga-unsupported ;
     pixel-order 0 =                    >>upside-down?
     image-data                         >>bitmap
     ubyte-components                   >>component-type ;
-    
+
 M: tga-image stream>image*
     drop [ [ read-tga ] throw-on-eof ] with-input-stream ;
 
 M: tga-image image>stream
-    drop
+    2drop
     [
         component-order>> { BGRA BGRA } member? [ bad-tga-unsupported ] unless
     ] keep
@@ -287,4 +287,3 @@ M: tga-image image>stream
         ]
         [ bitmap>> write ]
     } cleave ;
-       
