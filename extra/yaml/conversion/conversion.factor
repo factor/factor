@@ -1,8 +1,8 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors base64 byte-arrays combinators
-combinators.extras kernel locals math math.parser regexp
-sequences strings yaml.ffi ;
+combinators.extras kernel math math.parser regexp sequences
+strings yaml.ffi ;
 IN: yaml.conversion
 
 ! !!!!!!!!!!!!!!

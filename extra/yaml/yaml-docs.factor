@@ -1,7 +1,6 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs help.markup help.syntax kernel sequences
-strings ;
+USING: arrays help.markup help.syntax kernel sequences strings ;
 IN: yaml
 
 HELP: >yaml

@@ -1,6 +1,7 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel literals sequences tools.test yaml.ffi yaml.conversion ;
+USING: kernel literals sequences tools.test yaml.conversion
+yaml.ffi ;
 IN: yaml.conversion.tests
 
 : resolve-test ( res str -- ) [ resolve-plain-scalar ] curry unit-test ;
