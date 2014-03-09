@@ -1,11 +1,9 @@
 ! Copyright (C) 2013 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.syntax assocs
-base64 byte-arrays classes.struct combinators continuations
-destructors io.encodings.string io.encodings.utf8 kernel libc
-locals make math math.parser namespaces prettyprint sequences
-strings yaml.ffi yaml.conversion ;
-FROM: math => float ;
+USING: accessors alien.data assocs byte-arrays classes.struct
+combinators destructors io.encodings.string io.encodings.utf8
+kernel libc locals make namespaces sequences strings yaml.ffi
+yaml.conversion ;
 IN: yaml
 
 <PRIVATE
