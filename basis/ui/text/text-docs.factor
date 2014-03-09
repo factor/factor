@@ -50,7 +50,7 @@ HELP: line-metrics
 
 HELP: string>image
 { $values { "font" font } { "string" string } { "image" image } { "loc" "a pair of real numbers" } }
-{ $description "Renders a line of text into an image. The line may be wrapped so that the width of the mage does not exceed 10 000 pixels." } ;
+{ $description "Renders a line of text into an image. The line may be wrapped so that the width of the image does not exceed 10 000 pixels." } ;
 
 ARTICLE: "text-rendering" "Rendering text"
 "The " { $vocab-link "ui.text" } " vocabulary provides a cross-platform interface to the operating system's native font rendering engine. Currently, it uses Core Text on Mac OS X, Uniscribe on Windows and Pango on X11."
