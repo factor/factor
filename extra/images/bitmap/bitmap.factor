@@ -428,5 +428,4 @@ M: bmp-image stream>image* ( stream bmp-image -- bitmap )
     ] bi ;
 
 M: bmp-image image>stream
-    drop BGR reorder-components output-bmp ;
-
+    2drop BGR reorder-components output-bmp ;
