@@ -38,7 +38,7 @@ SINGLETON: ppm-image
         { "P3" [ [ 0 npixels read-numbers ] B{ } make ] }
         { "P6" [ npixels read ] }
     } case :> data
-    
+
     image new
     RGB              >>component-order
     { width height } >>dim
@@ -50,7 +50,7 @@ M: ppm-image stream>image*
     drop [ [ read-ppm ] throw-on-eof ] with-input-stream ;
 
 M: ppm-image image>stream
-    drop {
+    2drop {
         [ drop "P6\n" ascii encode write ]
         [ dim>> first number>string " " append ascii encode write ]
         [ dim>> second number>string "\n" append ascii encode write ]

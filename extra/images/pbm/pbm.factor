@@ -76,7 +76,7 @@ M: pbm-image stream>image*
     drop [ [ read-pbm ] throw-on-eof ] with-input-stream ;
 
 M: pbm-image image>stream
-    drop {
+    2drop {
         [ drop "P4\n" ascii encode write ]
         [ dim>> first number>string " " append ascii encode write ]
         [ dim>> second number>string "\n" append ascii encode write ]
