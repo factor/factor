@@ -50,6 +50,10 @@ unit-test
     ] { } make
 ] unit-test
 
+{ "" CHAR: \r } [
+    "\r\n" <string-reader> [ "\r" read-until ] with-input-stream
+] unit-test
+
 [ "hello" "hi" ] [
     "hello\nhi" <string-reader>
     dup stream-readln

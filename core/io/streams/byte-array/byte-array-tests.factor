@@ -28,6 +28,12 @@ IN: io.streams.byte-array.tests
     [ 1 read drop "\0" read-until ] with-byte-reader
 ] unit-test
 
+
+{ B{ } 1 } [
+    B{ 1 2 3 } binary [ B{ 1 } read-until ] with-byte-reader
+] unit-test
+
+
 [ 1 1 4 11 f ] [
     B{ 1 2 3 4 5 6 7 8 9 10 11 12 } binary
     [
