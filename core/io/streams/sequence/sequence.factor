@@ -55,7 +55,8 @@ PRIVATE>
 : (sequence-read-until) ( seps stream -- seq sep/f )
     [ find-separator ] keep
     [ [ (sequence-read-unsafe) ] (read-into-new) ]
-    [ [ 1 + ] change-i drop ] bi swap ; inline
+    [ [ 1 + ] change-i drop ]
+    [ stream-element-type +byte+ eq? B{ } "" ? or ] tri swap ; inline
 
 PRIVATE>
 
