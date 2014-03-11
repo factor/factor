@@ -21,11 +21,11 @@ log-level [ DEBUG ] initialize
         { WARNING 20 }
         { ERROR 30 }
         { CRITICAL 40 }
-    } ;
+    } ; inline
 
 ERROR: undefined-log-level ;
 
-: log-level<=> ( log-level log-level -- ? )
+: log-level<=> ( log-level log-level -- <=> )
     [ log-levels at* [ undefined-log-level ] unless ] compare ;
 
 : log? ( log-level -- ? )
