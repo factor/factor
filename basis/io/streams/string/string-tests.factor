@@ -6,70 +6,53 @@ IN: io.streams.string.tests
 
 [ "line 1" CHAR: l ]
 [
-    "line 1\nline 2\nline 3" <string-reader>
-    dup stream-readln swap stream-read1
+    "line 1\nline 2\nline 3" [ readln read1 ] with-string-reader
 ]
 unit-test
 
 { { "line 1" "line 2" "line 3" } } [
-    "line 1\nline 2\nline 3" <string-reader> stream-lines
+    "line 1\nline 2\nline 3" [ lines ] with-string-reader
 ] unit-test
 
 { { "" "foo" "bar" "baz" } } [
-    "\rfoo\r\nbar\rbaz\n" <string-reader> stream-lines
+    "\rfoo\r\nbar\rbaz\n" [ lines ] with-string-reader
 ] unit-test
 
-[ f ]
-[ "" <string-reader> stream-readln ]
-unit-test
+[ f ] [ "" [ readln ] with-string-reader ] unit-test
 
 [ "xyzzy" ] [ [ "xyzzy" write ] with-string-writer ] unit-test
 
-[ "a" ] [ 1 "abc" <string-reader> stream-read ] unit-test
-[ "ab" ] [ 2 "abc" <string-reader> stream-read ] unit-test
-[ "abc" ] [ 3 "abc" <string-reader> stream-read ] unit-test
-[ "abc" ] [ 4 "abc" <string-reader> stream-read ] unit-test
-[ "abc" f ] [
-    3 "abc" <string-reader> [ stream-read ] keep stream-read1
-] unit-test
+[ "a" ] [ "abc" [ 1 read ] with-string-reader ] unit-test
+[ "ab" ] [ "abc" [ 2 read ] with-string-reader ] unit-test
+[ "abc" ] [ "abc" [ 3 read ] with-string-reader ] unit-test
+[ "abc" ] [ "abc" [ 4 read ] with-string-reader ] unit-test
+[ "abc" f ] [ "abc" [ 3 read read1 ] with-string-reader ] unit-test
 
 [
-    {
-        { "It seems " CHAR: J }
-        { "obs has lost h" CHAR: i }
-        { "s grasp on reality again.\n" f }
-    }
+    { "It seems " CHAR: J }
+    { "obs has lost h" CHAR: i }
+    { "s grasp on reality again.\n" f }
 ] [
-    [
-        "It seems Jobs has lost his grasp on reality again.\n"
-        <string-reader> [
-            "J" read-until 2array ,
-            "i" read-until 2array ,
-            "X" read-until 2array ,
-        ] with-input-stream
-    ] { } make
+    "It seems Jobs has lost his grasp on reality again.\n" [
+        "J" read-until 2array
+        "i" read-until 2array
+        "X" read-until 2array
+    ] with-string-reader
 ] unit-test
 
-{ "" CHAR: \r } [
-    "\r\n" <string-reader> [ "\r" read-until ] with-input-stream
+{ "" CHAR: \r } [ "\r\n" [ "\r" read-until ] with-string-reader ] unit-test
+{ f f } [ "" [ "\r" read-until ] with-string-reader ] unit-test
+
+[ "hello" "hi" ] [
+    "hello\nhi" [ readln 2 read ] with-string-reader
 ] unit-test
 
 [ "hello" "hi" ] [
-    "hello\nhi" <string-reader>
-    dup stream-readln
-    2 rot stream-read
+    "hello\r\nhi" [ readln 2 read ] with-string-reader
 ] unit-test
 
 [ "hello" "hi" ] [
-    "hello\r\nhi" <string-reader>
-    dup stream-readln
-    2 rot stream-read
-] unit-test
-
-[ "hello" "hi" ] [
-    "hello\rhi" <string-reader>
-    dup stream-readln
-    2 rot stream-read
+    "hello\rhi" [ readln 2 read ] with-string-reader
 ] unit-test
 
 ! Issue #70 github
