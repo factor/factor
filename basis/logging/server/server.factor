@@ -1,14 +1,14 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces kernel io io.files io.pathnames io.directories
-io.encodings.utf8 calendar calendar.format sequences continuations
-destructors prettyprint assocs math.parser words debugger math
-combinators concurrency.messaging threads arrays init math.ranges
-strings ;
+USING: assocs calendar calendar.format combinators
+concurrency.messaging continuations debugger destructors init io
+io.directories io.encodings.utf8 io.files io.pathnames kernel
+literals math math.parser math.ranges namespaces sequences
+strings threads ;
 IN: logging.server
 
 : log-root ( -- string )
-    \ log-root get "logs" resource-path or ;
+    \ log-root get [ "logs" resource-path ] unless* ;
 
 : log-path ( service -- path )
     log-root prepend-path ;
@@ -26,32 +26,26 @@ SYMBOL: log-files
 : log-stream ( service -- stream )
     log-files get [ open-log-stream ] cache ;
 
-: multiline-header ( -- string ) 20 CHAR: - <string> ; foldable
+: timestamp-header. ( -- )
+    "[" write now (timestamp>rfc3339) "] " write ;
 
-: (write-message) ( msg word-name level multi? -- )
-    [
-        "[" write multiline-header write "] " write
-    ] [
-        "[" write now (timestamp>rfc3339) "] " write
-    ] if
-    write bl write ": " write print ;
+CONSTANT: multiline-header $[ 20 CHAR: - <string> ]
+
+: multiline-header. ( -- )
+    "[" write multiline-header write "] " write ;
 
 : write-message ( msg word-name level -- )
-    [ harvest ] 2dip {
-        { [ pick empty? ] [ 3drop ] }
-        { [ pick length 1 = ] [ [ first ] 2dip f (write-message) ] }
-        [
-            [ [ first ] 2dip f (write-message) ]
-            [ [ rest ] 2dip [ t (write-message) ] 2curry each ]
-            3bi
-        ]
-    } cond ;
+    [ harvest ] 2dip pick empty? [ 3drop ] [
+        timestamp-header.
+        [ write bl write ": " write print ] 2curry
+        [ multiline-header. ] swap interleave
+    ] if ;
 
 : (log-message) ( msg -- )
     #! msg: { msg word-name level service }
     first4 log-stream [ write-message flush ] with-output-stream* ;
 
-: try-dispose ( stream -- )
+: try-dispose ( obj -- )
     [ dispose ] curry [ error. ] recover ;
 
 : close-log ( service -- )
@@ -67,7 +61,8 @@ CONSTANT: keep-logs 10
 : ?delete-file ( path -- )
     dup exists? [ delete-file ] [ drop ] if ;
 
-: delete-oldest ( service -- ) keep-logs log# ?delete-file ;
+: delete-oldest ( service -- )
+    keep-logs log# ?delete-file ;
 
 : ?move-file ( old new -- )
     over exists? [ move-file ] [ 2drop ] if ;
