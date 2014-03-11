@@ -20,24 +20,29 @@ SLOT: i
 : (sequence-read-length) ( n buf stream -- buf count )
     [ underlying>> length ] [ i>> ] bi - rot min ; inline
 
-: <sequence-copy> ( dst n i src -- n copy )
-    [ 0 ] 3curry dip <copy> ; inline
+: <sequence-copy> ( dst n src-i src dst-i -- n copy )
+    [ ] curry 3curry dip <copy> ; inline
 
-: ((sequence-read-unsafe)) ( n buf stream -- count )
-    [ (sequence-read-length) ]
-    [ [ dup pick + ] change-i underlying>> ] bi
-    [ <sequence-copy> (copy) drop ] 2curry keep ; inline
+: ((sequence-read-unsafe)) ( n buf stream offset -- count )
+    [
+        [ (sequence-read-length) ]
+        [ [ dup pick + ] change-i underlying>> ] bi
+    ] dip [ <sequence-copy> (copy) drop ] 3curry keep ; inline
 
-: check-byte-array ( buf stream -- buf stream )
-    over byte-array? [ "not a byte array" throw ] unless ; inline
+: check-byte-array ( buf stream offset -- buf stream offset )
+    pick byte-array? [ "not a byte array" throw ] unless ; inline
 
-: check-string ( buf stream -- buf stream )
-    over string? [ "not a string" throw ] unless ; inline
+: check-string ( buf stream offset -- buf stream offset )
+    pick string? [ "not a string" throw ] unless ; inline
 
 : (sequence-read-unsafe) ( n buf stream -- count )
-    [ integer>fixnum ] 2dip dup stream-element-type +byte+ eq?
-    [ check-byte-array ((sequence-read-unsafe)) ]
-    [ check-string ((sequence-read-unsafe)) ] if ; inline
+    [ integer>fixnum ]
+    [ dup slice? [ [ seq>> ] [ from>> ] bi ] [ 0 ] if ]
+    [
+        swap over stream-element-type +byte+ eq?
+        [ check-byte-array ((sequence-read-unsafe)) ]
+        [ check-string ((sequence-read-unsafe)) ] if
+    ] tri* ; inline
 
 PRIVATE>
 
