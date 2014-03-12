@@ -225,13 +225,6 @@ urls [
     derive-url
 ] unit-test
 
-! Support //foo.com, which has the same protocol as the url we derive from
-[ URL" http://foo.com" ]
-[ URL" http://google.com" URL" //foo.com" derive-url ] unit-test
-
-[ URL" https://foo.com" ]
-[ URL" https://google.com" URL" //foo.com" derive-url ] unit-test
-
 [ "a" ] [
     <url> "a" "b" set-query-param "b" query-param
 ] unit-test
