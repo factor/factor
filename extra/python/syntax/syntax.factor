@@ -41,7 +41,7 @@ SYMBOL: current-context
     { } { "obj" } <effect> define-inline ; inline
 
 : add-function ( name effect -- )
-    [ dup current-context get import swap getattr 2dup ] dip
+    [ dup current-context get py-import swap getattr 2dup ] dip
     function-callable function-object ; inline
 
 : make-method-quot ( name effect -- quot )
