@@ -171,3 +171,4 @@ os unix? [
 [ ] [ f 0 <inet6> <datagram> dispose ] unit-test
 
 [ 80 ] [ "http" protocol-port ] unit-test
+[ f ] [ f protocol-port ] unit-test
