@@ -3,12 +3,12 @@
 USING: assocs calendar calendar.format combinators
 concurrency.messaging continuations debugger destructors init io
 io.directories io.encodings.utf8 io.files io.pathnames kernel
-literals math math.parser math.ranges namespaces sequences
+locals math math.parser math.ranges namespaces sequences
 strings threads ;
 IN: logging.server
 
 : log-root ( -- string )
-    \ log-root get [ "logs" resource-path ] unless* ;
+    \ log-root get-global [ "logs" resource-path ] unless* ;
 
 : log-path ( service -- path )
     log-root prepend-path ;
@@ -26,10 +26,19 @@ SYMBOL: log-files
 : log-stream ( service -- stream )
     log-files get [ open-log-stream ] cache ;
 
+: close-log-streams ( -- )
+    log-files get [ values dispose-each ] [ clear-assoc ] bi ;
+
+:: with-log-root ( path quot -- )
+    [ close-log-streams path \ log-root set-global quot call ]
+    \ log-root get-global
+    [ \ log-root set-global close-log-streams ] curry
+    [ ] cleanup ; inline
+
 : timestamp-header. ( -- )
     "[" write now (timestamp>rfc3339) "] " write ;
 
-CONSTANT: multiline-header $[ 20 CHAR: - <string> ]
+: multiline-header ( -- str ) 20 CHAR: - <string> ; foldable
 
 : multiline-header. ( -- )
     "[" write multiline-header write "] " write ;
