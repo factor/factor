@@ -1,5 +1,5 @@
-USING: accessors http.client http.client.private http
-io.streams.string kernel namespaces sequences tools.test urls ;
+USING: accessors continuations http.client http.client.private http http.server
+io.servers io.streams.string kernel namespaces sequences tools.test urls ;
 IN: http.client.tests
 
 [ "localhost" f ] [ "localhost" parse-host ] unit-test
@@ -52,4 +52,20 @@ IN: http.client.tests
         "server: Factor http.server"
     } [ "\n" join ] [ "\r\n" join ] bi
     [ [ read-response ] with-string-reader ] same?
+] unit-test
+
+: with-httpd ( quot -- )
+    <http-server> 8887 >>insecure f >>secure
+    swap with-threaded-server ; inline
+
+[ 404 ] [
+    [
+        [ "http://localhost:8887" http-get* ]
+        [ response>> code>> ] recover
+    ] with-httpd
+] unit-test
+
+[ 404 ] [
+    [ "http://localhost:8887" http-get ] with-httpd
+    drop code>>
 ] unit-test

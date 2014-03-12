@@ -5,7 +5,7 @@ http.client.post-data.private io.encodings.8-bit.latin1 ;
 IN: http.client
 
 HELP: download-failed
-{ $error-description "Thrown by " { $link http-request } " if the server returns a status code other than 200. The " { $slot "response" } " slot can be inspected for the underlying cause of the problem." } ;
+{ $error-description "Thrown by " { $link http-request } " if the server returns a status code not between 200 and 299. The " { $slot "response" } " slot can be inspected for the underlying cause of the problem." } ;
 
 HELP: too-many-redirects
 { $error-description "Thrown by " { $link http-request } " if the server returns a chain of than " { $link max-redirects } " redirections." } ;
@@ -58,7 +58,7 @@ HELP: http-get
 HELP: http-get*
 { $values { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
 { $description "A variant of " { $link http-get } " that checks that the response was successful." }
-{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+{ $errors "Throws an error if the HTTP request fails or if the status code is not between 200 and 299." } ;
 
 HELP: http-post
 { $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
@@ -68,7 +68,7 @@ HELP: http-post
 HELP: http-post*
 { $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
 { $description "A variant of " { $link http-post } " that checks that the response was successful." }
-{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+{ $errors "Throws an error if the HTTP request fails or if the status code is not between 200 and 299." } ;
 
 HELP: http-put
 { $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
@@ -78,7 +78,7 @@ HELP: http-put
 HELP: http-put*
 { $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
 { $description "A variant of " { $link http-put } " that checks that the response was successful." }
-{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+{ $errors "Throws an error if the HTTP request fails or if the status code is not between 200 and 299." } ;
 
 HELP: http-head
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
@@ -88,7 +88,7 @@ HELP: http-head
 HELP: http-head*
 { $values { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
 { $description "A variant of " { $link http-head } " that checks that the response was successful." }
-{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+{ $errors "Throws an error if the HTTP request fails or if the status code is not between 200 and 299." } ;
 
 HELP: http-delete
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
@@ -98,7 +98,7 @@ HELP: http-delete
 HELP: http-delete*
 { $values { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
 { $description "A variant of " { $link http-delete } " that checks that the response was successful." }
-{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+{ $errors "Throws an error if the HTTP request fails or if the status code is not between 200 and 299." } ;
 
 HELP: http-options
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
@@ -108,7 +108,7 @@ HELP: http-options
 HELP: http-options*
 { $values { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
 { $description "A variant of " { $link http-options } " that checks that the response was successful." }
-{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+{ $errors "Throws an error if the HTTP request fails or if the status code is not between 200 and 299." } ;
 
 HELP: http-trace
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
@@ -118,7 +118,7 @@ HELP: http-trace
 HELP: http-trace*
 { $values { "url" "a " { $link url } " or " { $link string } } { "data" sequence } }
 { $description "A variant of " { $link http-trace } " that checks that the response was successful." }
-{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+{ $errors "Throws an error if the HTTP request fails or if the status code is not between 200 and 299." } ;
 
 HELP: with-http-get
 { $values { "url" "a " { $link url } " or " { $link string } } { "quot" { $quotation "( chunk -- )" } } { "response" response } }
@@ -128,7 +128,7 @@ HELP: with-http-get
 HELP: with-http-get*
 { $values { "url" "a " { $link url } " or " { $link string } } { "quot" { $quotation "( chunk -- )" } } }
 { $description "A variant of " { $link with-http-get } " that checks that the response was successful." }
-{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+{ $errors "Throws an error if the HTTP request fails or if the status code is not between 200 and 299." } ;
 
 HELP: http-request
 { $values { "request" request } { "response" response } { "data" sequence } }
@@ -138,7 +138,7 @@ HELP: http-request
 HELP: http-request*
 { $values { "request" request } { "data" sequence } }
 { $description "A variant of " { $link http-request } " that checks that the response was successful." }
-{ $errors "Throws an error if the HTTP request fails or is not successful." } ;
+{ $errors "Throws an error if the HTTP request fails or if the status code is not between 200 and 299." } ;
 
 HELP: with-http-request
 { $values { "request" request } { "quot" { $quotation "( chunk -- )" } } { "response" response } }
