@@ -57,8 +57,7 @@ hostname-spec = hostname ("/"|!(.)) => [[ first ]]
 auth     = (username (":" password  => [[ second ]])? "@"
                                     => [[ first2 2array ]])?
 
-url      = (((protocol "://") => [[ first ]] auth hostname)
-                    | (("//") => [[ f ]] auth hostname))?
+url      = ((protocol "://")        => [[ first ]] auth hostname)?
            (pathname)?
            ("?" query               => [[ second ]])?
            ("#" anchor              => [[ second ]])?
@@ -107,7 +106,9 @@ M: pathname >url string>> >url ;
     [ port>> ] [ port>> ] [ protocol>> protocol-port ] tri =
     [ drop f ] when ;
 
-: unparse-host-part ( url -- )
+: unparse-host-part ( url protocol -- )
+    %
+    "://" %
     {
         [ unparse-username-password ]
         [ host>> url-encode % ]
@@ -115,22 +116,10 @@ M: pathname >url string>> >url ;
         [ path>> "/" head? [ "/" % ] unless ]
     } cleave ;
 
-! URL" //foo.com" takes on the protocol of the url it's derived from
-: unparse-protocol ( url -- )
-    dup protocol>> [
-        % "://" % unparse-host-part
-    ] [
-        dup host>> [
-            "//" % unparse-host-part
-        ] [
-            drop
-        ] if
-    ] if* ;
-
 M: url present
     [
         {
-            [ unparse-protocol ]
+            [ dup protocol>> dup [ unparse-host-part ] [ 2drop ] if ]
             [ path>> url-encode % ]
             [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>query % ] if ]
             [ anchor>> [ "#" % present url-encode % ] when* ]
