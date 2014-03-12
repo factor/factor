@@ -574,7 +574,7 @@ PRIVATE>
 : interleave ( ... seq between quot: ( ... elt -- ... ) -- ... )
     pick empty? [ 3drop ] [
         [ [ drop first-unsafe ] dip call ]
-        [ [ rest-slice ] 2dip [ bi* ] 2curry each ]
+        [ [ bi* ] 2curry [ 1 ] 2dip (each) (each-integer) ]
         3bi
     ] if ; inline
 
