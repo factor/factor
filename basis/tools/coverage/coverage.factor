@@ -127,6 +127,12 @@ PRIVATE>
         ] call
     ] bi ;
 
+: test-coverage-recursively ( vocab -- assoc )
+    child-vocabs [
+        dup test-coverage
+    ] { } map>assoc ;
+
+
 : %coverage ( string -- x )
     [ test-coverage values concat length ]
     [ count-callables ] bi [ swap - ] keep /f ; inline
