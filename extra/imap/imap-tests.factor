@@ -33,29 +33,37 @@ SYMBOLS: email host password ;
         email get password get login drop
     ] with-stream* ;
 
+ERROR: host-not-set ;
+
+: get-test-host ( -- host )
+    host get dup [ host-not-set throw ] unless ;
+
+: ensure-host ( -- ) get-test-host drop ;
+
 : imap-test ( result quot -- )
+    ensure-host
     '[ imap-login _ with-stream ] unit-test ; inline
 
 [ t ] [
-    host get <imap4ssl> duplex-stream?
+    get-test-host <imap4ssl> duplex-stream?
 ] unit-test
 
 [ t ] [
-    host get <imap4ssl> [ capabilities ] with-stream
+    get-test-host <imap4ssl> [ capabilities ] with-stream
     { "IMAP4rev1" "UNSELECT" "IDLE" "NAMESPACE" "QUOTA" } swap subset?
 ] unit-test
 
 [ "NO" ] [
-    [ host get <imap4ssl> [ "dont@exist.com" "foo" login ] with-stream ]
+    [ get-test-host <imap4ssl> [ "dont@exist.com" "foo" login ] with-stream ]
     [ ind>> ] recover
 ] unit-test
 
 [ "BAD" ] [
-    [ host get <imap4ssl> [ f f login ] with-stream ] [ ind>> ] recover
+    [ get-test-host <imap4ssl> [ f f login ] with-stream ] [ ind>> ] recover
 ] unit-test
 
 [ f ] [
-    host get <imap4ssl> [
+    get-test-host <imap4ssl> [
         email get password get login
     ] with-stream empty?
 ] unit-test
