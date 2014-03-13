@@ -60,7 +60,7 @@ MACRO: keys-boa ( keys class -- )
     [ <oauth-request-params> set-oauth ] with-twitter-oauth ;
 
 : http-twitter-request ( request -- data )
-    set-request-twitter-auth http-request* ; inline
+    set-request-twitter-auth http-request nip ; inline
 
 PRIVATE>
 
