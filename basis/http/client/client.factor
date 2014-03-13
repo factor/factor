@@ -226,6 +226,4 @@ ERROR: download-failed response ;
 : http-trace ( url -- response data )
     <trace-request> http-request ;
 
-USE: vocabs.loader
-
 { "http.client" "debugger" } "http.client.debugger" require-when
