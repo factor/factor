@@ -30,7 +30,7 @@ visit-time request-rate crawl-delay unknowns ;
     >url URL" robots.txt" derive-url ;
 
 : get-robots.txt ( url -- robots.txt )
-    >robots.txt-url http-get* ;
+    >robots.txt-url http-get nip ;
 
 : normalize-robots.txt ( string -- sitemaps seq )
     string-lines
