@@ -177,6 +177,9 @@ ERROR: download-failed response ;
 : http-get ( url -- response data )
     <get-request> http-request ;
 
+: http-get* ( url -- response data )
+    <get-request> http-request* ;
+
 : download-name ( url -- name )
     present file-name "?" split1 drop "/" ?tail drop ;
 
@@ -195,6 +198,9 @@ ERROR: download-failed response ;
 : http-post ( post-data url -- response data )
     <post-request> http-request ;
 
+: http-post* ( post-data url -- response data )
+    <post-request> http-request* ;
+
 : <put-request> ( post-data url -- request )
     "PUT" <client-request>
         swap >>post-data ;
@@ -202,11 +208,17 @@ ERROR: download-failed response ;
 : http-put ( post-data url -- response data )
     <put-request> http-request ;
 
+: http-put* ( post-data url -- response data )
+    <put-request> http-request* ;
+
 : <delete-request> ( url -- request )
     "DELETE" <client-request> ;
 
 : http-delete ( url -- response data )
     <delete-request> http-request ;
+
+: http-delete* ( url -- response data )
+    <delete-request> http-request* ;
 
 : <head-request> ( url -- request )
     "HEAD" <client-request> ;
@@ -214,16 +226,25 @@ ERROR: download-failed response ;
 : http-head ( url -- response data )
     <head-request> http-request ;
 
+: http-head* ( url -- response data )
+    <head-request> http-request* ;
+
 : <options-request> ( url -- request )
     "OPTIONS" <client-request> ;
 
 : http-options ( url -- response data )
     <options-request> http-request ;
 
+: http-options* ( url -- response data )
+    <options-request> http-request* ;
+
 : <trace-request> ( url -- request )
     "TRACE" <client-request> ;
 
 : http-trace ( url -- response data )
     <trace-request> http-request ;
+
+: http-trace* ( url -- response data )
+    <trace-request> http-request* ;
 
 { "http.client" "debugger" } "http.client.debugger" require-when
