@@ -1,7 +1,10 @@
-USING: arrays assocs destructors fry io.files.temp kernel math namespaces
-python python.ffi python.objects python.syntax python.tests sequences sets
+USING: arrays assocs destructors fry io.files.temp kernel math
+namespaces python python.ffi python.objects sequences sets
 splitting tools.test unicode.categories ;
-IN: python.syntax.tests
+IN: python.syntax
+
+: py-test ( result quot -- )
+    '[ _ with-destructors ] unit-test ; inline
 
 ! py-importing functions
 PY-FROM: os =>
