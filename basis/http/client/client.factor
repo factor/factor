@@ -1,14 +1,12 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators.short-circuit kernel math math.parser
-namespaces make sequences strings splitting calendar
-continuations accessors vectors math.order hashtables
-byte-arrays destructors io io.sockets io.streams.string io.files
-io.timeouts io.pathnames io.encodings io.encodings.string
-io.encodings.ascii io.encodings.utf8 io.encodings.binary
-io.encodings.iana io.crlf io.streams.duplex fry ascii urls
-urls.encoding present locals http http.parsers
-http.client.post-data mime.types ;
+USING: accessors ascii assocs calendar combinators.short-circuit
+destructors fry hashtables http http.client.post-data
+http.parsers io io.crlf io.encodings io.encodings.ascii
+io.encodings.binary io.encodings.iana io.encodings.string
+io.files io.pathnames io.sockets io.timeouts kernel locals math
+math.order math.parser mime.types namespaces present sequences
+splitting urls vocabs.loader ;
 IN: http.client
 
 ERROR: too-many-redirects ;
@@ -163,15 +161,18 @@ ERROR: download-failed response ;
 : check-response-with-body ( response body -- response body )
     [ >>body check-response ] keep ;
 
-: with-http-request ( request quot: ( chunk -- ) -- response )
+: with-http-request* ( request quot: ( chunk -- ) -- response )
     [ (with-http-request) ] with-destructors ; inline
 
-: http-request ( request -- response data )
-    [ [ % ] with-http-request ] B{ } make
-    over content-encoding>> decode check-response-with-body ;
+: with-http-request ( request quot: ( chunk -- ) -- response )
+    with-http-request* check-response ; inline
 
-: http-request* ( request -- data )
-    http-request swap check-response drop ;
+: http-request* ( request -- response data )
+    BV{ } clone [ '[ _ push-all ] with-http-request* ] keep
+    B{ } like over content-encoding>> decode [ >>body ] keep ;
+
+: http-request ( request -- response data )
+    http-request* [ check-response ] dip ;
 
 : <get-request> ( url -- request )
     "GET" <client-request> ;
@@ -179,20 +180,13 @@ ERROR: download-failed response ;
 : http-get ( url -- response data )
     <get-request> http-request ;
 
-: http-get* ( url -- data )
-    http-get swap check-response drop ;
-
-: with-http-get ( url quot: ( chunk -- ) -- response )
-    [ <get-request> ] dip with-http-request ; inline
-
-: with-http-get* ( url quot: ( chunk -- ) -- )
-    with-http-get check-response drop ; inline
-
 : download-name ( url -- name )
     present file-name "?" split1 drop "/" ?tail drop ;
 
 : download-to ( url file -- )
-    binary [ [ write ] with-http-get* ] with-file-writer ;
+    binary [
+        <get-request> [ write ] with-http-request drop
+    ] with-file-writer ;
 
 : download ( url -- )
     dup download-name download-to ;
@@ -204,9 +198,6 @@ ERROR: download-failed response ;
 : http-post ( post-data url -- response data )
     <post-request> http-request ;
 
-: http-post* ( post-data url -- data )
-    http-post swap check-response drop ;
-
 : <put-request> ( post-data url -- request )
     "PUT" <client-request>
         swap >>post-data ;
@@ -214,17 +205,11 @@ ERROR: download-failed response ;
 : http-put ( post-data url -- response data )
     <put-request> http-request ;
 
-: http-put* ( post-data url -- data )
-    http-put swap check-response drop ;
-
 : <delete-request> ( url -- request )
     "DELETE" <client-request> ;
 
 : http-delete ( url -- response data )
     <delete-request> http-request ;
-
-: http-delete* ( url -- data )
-    http-delete swap check-response drop ;
 
 : <head-request> ( url -- request )
     "HEAD" <client-request> ;
@@ -232,26 +217,17 @@ ERROR: download-failed response ;
 : http-head ( url -- response data )
     <head-request> http-request ;
 
-: http-head* ( url -- data )
-    http-head swap check-response drop ;
-
 : <options-request> ( url -- request )
     "OPTIONS" <client-request> ;
 
 : http-options ( url -- response data )
     <options-request> http-request ;
 
-: http-options* ( url -- data )
-    http-options swap check-response drop ;
-
 : <trace-request> ( url -- request )
     "TRACE" <client-request> ;
 
 : http-trace ( url -- response data )
     <trace-request> http-request ;
-
-: http-trace* ( url -- data )
-    http-trace swap check-response drop ;
 
 USE: vocabs.loader
 

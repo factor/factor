@@ -53,7 +53,7 @@ fry http.client kernel urls ;
     URL" http://www.oracle.com"
 }
 2 <semaphore> '[
-    _ [ http-get* ] with-semaphore
+    _ [ http-get nip ] with-semaphore
 ] parallel-map"""
 } ;
 

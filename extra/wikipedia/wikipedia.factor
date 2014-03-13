@@ -48,7 +48,7 @@ SYMBOL: language
     [ month-name ] [ day>> ] bi "%s_%s" sprintf wikipedia-url ;
 
 : (historical-events) ( timestamp -- seq )
-    historical-url http-get* string>xml "ul" deep-tags-named ;
+    historical-url http-get nip string>xml "ul" deep-tags-named ;
 
 : items>sequence ( tag -- seq )
     children-tags [ deep-children>string ] map ;
@@ -74,7 +74,7 @@ PRIVATE>
     (historical-events) "Deaths" header. fourth items. ;
 
 : article. ( name -- )
-    wikipedia-url http-get* parse-html
+    wikipedia-url http-get nip parse-html
     "content" find-by-id-between
     [ html-text. ] with-string-writer string-lines
     [ [ blank? ] trim ] map harvest [

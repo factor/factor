@@ -23,7 +23,7 @@ ERROR: bad-response json status ;
     ] unless ;
 
 : json-data ( url -- json )
-    http-get* json> check-status "data" of ;
+    http-get nip json> check-status "data" of ;
 
 : get-short-url ( short-url path -- data )
     <bitly-url> swap "shortUrl" set-query-param json-data ;

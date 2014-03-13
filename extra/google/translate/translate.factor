@@ -16,7 +16,7 @@ CONSTANT: maximum-translation-size 5120
     ] { } make ;
 
 : assoc>query-response ( assoc -- response )
-    google-translate-url http-post* ;
+    google-translate-url http-post nip ;
 
 ERROR: response-error response error ;
 
