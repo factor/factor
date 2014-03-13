@@ -34,8 +34,9 @@ TUPLE: fjsc < dispatcher ;
     swap append  ;
 
 : do-compile-url ( url -- response )
-    [ 
-        absolute-url http-get* 'expression' parse fjsc-compile write "();" write
+    [
+        absolute-url http-get nip 'expression' parse
+        fjsc-compile write "();" write
     ] with-string-writer
     "application/javascript" <content> ;
 

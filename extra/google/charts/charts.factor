@@ -100,6 +100,6 @@ PRIVATE>
 
 : chart. ( chart -- )
     chart>url present dup length 2000 < [ http-image. ] [
-        "?" split1 swap http-post*
+        "?" split1 swap http-post nip
         "png" (image-class) load-image* image.
     ] if ;

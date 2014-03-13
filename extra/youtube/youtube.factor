@@ -50,7 +50,7 @@ CONSTANT: video-info-url URL" http://www.youtube.com/get_video_info"
         "detailpage" "el" set-query-param
         "en_US" "hl" set-query-param
         swap "video_id" set-query-param
-    http-get* query>assoc ;
+    http-get nip query>assoc ;
 
 : video-formats ( video-info -- video-formats )
     "url_encoded_fmt_stream_map" of "," split

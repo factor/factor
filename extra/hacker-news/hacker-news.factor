@@ -25,7 +25,7 @@ TUPLE: post title postedBy points id url commentCount postedAgo ;
     ] map ;
 
 : hacker-news-items ( -- seq )
-    "http://api.ihackernews.com/page" http-get*
+    "http://api.ihackernews.com/page" http-get nip
     json> "items" of items> ;
 
 : write-title ( title url -- )
