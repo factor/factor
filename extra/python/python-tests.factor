@@ -1,6 +1,6 @@
 USING: accessors arrays assocs calendar continuations destructors fry kernel
 math namespaces python python.ffi python.objects sequences strings tools.test ;
-IN: python.tests
+IN: python
 
 py-initialize
 
