@@ -10,13 +10,13 @@ TUPLE: utf7codec dialect buffer ;
 ! These words encodes the difference between standard utf7 and the
 ! dialect used by IMAP which wants slashes replaced with commas when
 ! encoding and uses '&' instead of '+' as the escaping character.
-: utf7 ( -- t )
+: utf7 ( -- utf7codec )
     {
         { { } { } }
         { { CHAR: + } { CHAR: - } }
     } V{ } utf7codec boa ;
 
-: utf7imap4 ( -- t )
+: utf7imap4 ( -- utf7codec )
     {
         { { CHAR: / } { CHAR: , } }
         { { CHAR: & } { CHAR: - } }
