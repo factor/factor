@@ -1,9 +1,9 @@
-USING: help.syntax help.markup html.parser html.parser.analyzer sequences
-strings ;
+USING: help.syntax help.markup html.parser html.parser.analyzer
+kernel sequences strings ;
 IN: html.parser.analyzer
 
 HELP: html-class?
-{ $values { "tag" tag } { "string" "a classname" } }
+{ $values { "tag" tag } { "string" "a classname" } { "?" boolean } }
 { $description "t if the tag has the given class." } ;
 
 HELP: stack-find
