@@ -21,8 +21,7 @@ TUPLE: loading-jpeg < image
     { huff-tables initial: { f f f f } }
     { components } ;
 
-"jpg" jpeg-image register-image-class
-"jpeg" jpeg-image register-image-class
+{ "jpg" "jpeg" } [ jpeg-image ?register-image-class ] each
 
 <PRIVATE
 

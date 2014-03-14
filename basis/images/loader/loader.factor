@@ -32,6 +32,9 @@ GENERIC: stream>image* ( stream class -- image )
 : register-image-class ( extension class -- )
     swap types get set-at ;
 
+: ?register-image-class ( extension class -- )
+    over types get key? [ 2drop ] [ register-image-class ] if ;
+
 : load-image ( path -- image )
     [ binary <file-reader> ] [ image-class ] bi load-image* ;
 
