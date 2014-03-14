@@ -36,7 +36,7 @@ GENERIC: stream>image* ( stream class -- image )
     over types get key? [ 2drop ] [ register-image-class ] if ;
 
 : load-image ( path -- image )
-    [ binary <file-reader> ] [ image-class ] bi load-image* ;
+    dup image-class load-image* ;
 
 M: object load-image* stream>image ;
 
