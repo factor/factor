@@ -13,14 +13,8 @@ SINGLETON: gtk-image
 os linux? [
     ! Explicit type initialization needed for glib < 2.36.
     g_type_init
-    "png"  gtk-image register-image-class
-    "tif"  gtk-image register-image-class
-    "tiff" gtk-image register-image-class
-    "gif"  gtk-image register-image-class
-    "jpg"  gtk-image register-image-class
-    "jpeg" gtk-image register-image-class
-    "bmp"  gtk-image register-image-class
-    "ico"  gtk-image register-image-class
+    { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" }
+    [ gtk-image register-image-class ] each
 ] when
 
 <PRIVATE
