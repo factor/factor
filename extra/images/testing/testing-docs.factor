@@ -6,7 +6,7 @@ IN: images.testing
 
 HELP: decode-test
 { $values
-    { "path" "a pathname string" }
+    { "path" "a pathname string" } { "image-class" object }
 }
 { $description "Runs a unit-test on the image at " { $snippet "path" } " to test the image decoder. The image is decoded and compared against its corresponding " { $link { "images" "testing" "reference" } } "." } ;
 
