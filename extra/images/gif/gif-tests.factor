@@ -5,12 +5,12 @@ io.encodings.binary io.files kernel math math.bitwise
 namespaces sequences tools.test ;
 IN: images.gif.tests
 
-"vocab:images/testing/gif/circle.gif" decode-test
-"vocab:images/testing/gif/checkmark.gif" decode-test
-"vocab:images/testing/gif/monochrome.gif" decode-test
-"vocab:images/testing/gif/alpha.gif" decode-test
-"vocab:images/testing/gif/noise.gif" decode-test
-"vocab:images/testing/gif/astronaut_animation.gif" decode-test
+"vocab:images/testing/gif/circle.gif" gif-image decode-test
+"vocab:images/testing/gif/checkmark.gif" gif-image decode-test
+"vocab:images/testing/gif/monochrome.gif" gif-image decode-test
+"vocab:images/testing/gif/alpha.gif" gif-image decode-test
+"vocab:images/testing/gif/noise.gif" gif-image decode-test
+"vocab:images/testing/gif/astronaut_animation.gif" gif-image decode-test
 
 : path>gif ( path -- gif )
     binary [ input-stream get load-gif ] with-file-reader ;

@@ -1,262 +1,262 @@
 ! Copyright (C) 2009 Doug Coleman, Keith Lazuka
 ! See http://factorcode.org/license.txt for BSD license.
-USING: images.testing io.directories ;
+USING: images.testing io.directories images.png ;
 IN: images.png.tests
 
 ! Test files from PngSuite (http://www.libpng.org/pub/png/pngsuite.html)
 
 ! The subset of the suite that should work given the current implementation.
 "vocab:images/testing/png" [
-    "basi0g01.png" decode-test
-    "basi0g02.png" decode-test
-    "basi0g04.png" decode-test
-    "basi0g08.png" decode-test
-    "basi0g16.png" decode-test
-    "basi2c08.png" decode-test
-    "basi3p01.png" decode-test
-    "basi3p02.png" decode-test
-    "basi3p04.png" decode-test
-    "basi3p08.png" decode-test
-    "basn0g01.png" decode-test
-    "basn0g02.png" decode-test
-    "basn0g04.png" decode-test
-    "basn0g08.png" decode-test
-    "basn0g16.png" decode-test
-    "basn2c08.png" decode-test
-    "basn3p01.png" decode-test
-    "basn3p02.png" decode-test
-    "basn3p04.png" decode-test
-    "basn3p08.png" decode-test
-    "basn6a08.png" decode-test
-    "f00n2c08.png" decode-test
-    "f01n2c08.png" decode-test
-    "f02n2c08.png" decode-test
-    "f03n2c08.png" decode-test
-    "f04n2c08.png" decode-test
-    "s01i3p01.png" decode-test
-    "s01n3p01.png" decode-test
-    "s02i3p01.png" decode-test
-    "s02n3p01.png" decode-test
-    "s03i3p01.png" decode-test
-    "s03n3p01.png" decode-test
-    "s04i3p01.png" decode-test
-    "s04n3p01.png" decode-test
-    "s05i3p02.png" decode-test
-    "s05n3p02.png" decode-test
-    "s06i3p02.png" decode-test
-    "s06n3p02.png" decode-test
-    "s07i3p02.png" decode-test
-    "s07n3p02.png" decode-test
-    "s08i3p02.png" decode-test
-    "s08n3p02.png" decode-test
-    "s09i3p02.png" decode-test
-    "s32n3p04.png" decode-test
-    "s32i3p04.png" decode-test
-    "s33n3p04.png" decode-test
-    "s33i3p04.png" decode-test
-    "s34n3p04.png" decode-test
-    "s34i3p04.png" decode-test
-    "s35n3p04.png" decode-test
-    "s35i3p04.png" decode-test
-    "s36n3p04.png" decode-test
-    "s36i3p04.png" decode-test
-    "s37n3p04.png" decode-test
-    "s37i3p04.png" decode-test
-    "s38n3p04.png" decode-test
-    "s38i3p04.png" decode-test
-    "s39n3p04.png" decode-test
-    "s39i3p04.png" decode-test
-    "s40n3p04.png" decode-test
-    "s40i3p04.png" decode-test
-    "s07n3p02.png" decode-test
-    "z00n2c08.png" decode-test
-    "z03n2c08.png" decode-test
-    "z06n2c08.png" decode-test
-    "z09n2c08.png" decode-test
+    "basi0g01.png" png-image decode-test
+    "basi0g02.png" png-image decode-test
+    "basi0g04.png" png-image decode-test
+    "basi0g08.png" png-image decode-test
+    "basi0g16.png" png-image decode-test
+    "basi2c08.png" png-image decode-test
+    "basi3p01.png" png-image decode-test
+    "basi3p02.png" png-image decode-test
+    "basi3p04.png" png-image decode-test
+    "basi3p08.png" png-image decode-test
+    "basn0g01.png" png-image decode-test
+    "basn0g02.png" png-image decode-test
+    "basn0g04.png" png-image decode-test
+    "basn0g08.png" png-image decode-test
+    "basn0g16.png" png-image decode-test
+    "basn2c08.png" png-image decode-test
+    "basn3p01.png" png-image decode-test
+    "basn3p02.png" png-image decode-test
+    "basn3p04.png" png-image decode-test
+    "basn3p08.png" png-image decode-test
+    "basn6a08.png" png-image decode-test
+    "f00n2c08.png" png-image decode-test
+    "f01n2c08.png" png-image decode-test
+    "f02n2c08.png" png-image decode-test
+    "f03n2c08.png" png-image decode-test
+    "f04n2c08.png" png-image decode-test
+    "s01i3p01.png" png-image decode-test
+    "s01n3p01.png" png-image decode-test
+    "s02i3p01.png" png-image decode-test
+    "s02n3p01.png" png-image decode-test
+    "s03i3p01.png" png-image decode-test
+    "s03n3p01.png" png-image decode-test
+    "s04i3p01.png" png-image decode-test
+    "s04n3p01.png" png-image decode-test
+    "s05i3p02.png" png-image decode-test
+    "s05n3p02.png" png-image decode-test
+    "s06i3p02.png" png-image decode-test
+    "s06n3p02.png" png-image decode-test
+    "s07i3p02.png" png-image decode-test
+    "s07n3p02.png" png-image decode-test
+    "s08i3p02.png" png-image decode-test
+    "s08n3p02.png" png-image decode-test
+    "s09i3p02.png" png-image decode-test
+    "s32n3p04.png" png-image decode-test
+    "s32i3p04.png" png-image decode-test
+    "s33n3p04.png" png-image decode-test
+    "s33i3p04.png" png-image decode-test
+    "s34n3p04.png" png-image decode-test
+    "s34i3p04.png" png-image decode-test
+    "s35n3p04.png" png-image decode-test
+    "s35i3p04.png" png-image decode-test
+    "s36n3p04.png" png-image decode-test
+    "s36i3p04.png" png-image decode-test
+    "s37n3p04.png" png-image decode-test
+    "s37i3p04.png" png-image decode-test
+    "s38n3p04.png" png-image decode-test
+    "s38i3p04.png" png-image decode-test
+    "s39n3p04.png" png-image decode-test
+    "s39i3p04.png" png-image decode-test
+    "s40n3p04.png" png-image decode-test
+    "s40i3p04.png" png-image decode-test
+    "s07n3p02.png" png-image decode-test
+    "z00n2c08.png" png-image decode-test
+    "z03n2c08.png" png-image decode-test
+    "z06n2c08.png" png-image decode-test
+    "z09n2c08.png" png-image decode-test
 ] with-directory
 
 ! Test pngsuite
 "vocab:images/testing/png/suite" [
-    "PngSuite.png" decode-test
-    "basi0g01.png" decode-test
-    "basi0g02.png" decode-test
-    "basi0g04.png" decode-test
-    "basi0g08.png" decode-test
-    "basi0g16.png" decode-test
-    "basi2c08.png" decode-test
-    "basi2c16.png" decode-test
-    "basi3p01.png" decode-test
-    "basi3p02.png" decode-test
-    "basi3p04.png" decode-test
-    "basi3p08.png" decode-test
-    "basi4a08.png" decode-test
-    "basi4a16.png" decode-test
-    "basi6a08.png" decode-test
-    "basi6a16.png" decode-test
-    "basn0g01.png" decode-test
-    "basn0g02.png" decode-test
-    "basn0g04.png" decode-test
-    "basn0g08.png" decode-test
-    "basn0g16.png" decode-test
-    "basn2c08.png" decode-test
-    "basn2c16.png" decode-test
-    "basn3p01.png" decode-test
-    "basn3p02.png" decode-test
-    "basn3p04.png" decode-test
-    "basn3p08.png" decode-test
-    "basn4a08.png" decode-test
-    "basn4a16.png" decode-test
-    "basn6a08.png" decode-test
-    "basn6a16.png" decode-test
-    "bgai4a08.png" decode-test
-    "bgai4a16.png" decode-test
-    "bgan6a08.png" decode-test
-    "bgan6a16.png" decode-test
-    "bgbn4a08.png" decode-test
-    "bggn4a16.png" decode-test
-    "bgwn6a08.png" decode-test
-    "bgyn6a16.png" decode-test
-    "ccwn2c08.png" decode-test
-    "ccwn3p08.png" decode-test
-    "cdfn2c08.png" decode-test
-    "cdhn2c08.png" decode-test
-    "cdsn2c08.png" decode-test
-    "cdun2c08.png" decode-test
-    "ch1n3p04.png" decode-test
-    "ch2n3p08.png" decode-test
-    "cm0n0g04.png" decode-test
-    "cm7n0g04.png" decode-test
-    "cm9n0g04.png" decode-test
-    "cs3n2c16.png" decode-test
-    "cs3n3p08.png" decode-test
-    "cs5n2c08.png" decode-test
-    "cs5n3p08.png" decode-test
-    "cs8n2c08.png" decode-test
-    "cs8n3p08.png" decode-test
-    "ct0n0g04.png" decode-test
-    "ct1n0g04.png" decode-test
-    "cten0g04.png" decode-test
-    "ctfn0g04.png" decode-test
-    "ctgn0g04.png" decode-test
-    "cthn0g04.png" decode-test
-    "ctjn0g04.png" decode-test
-    "ctzn0g04.png" decode-test
-    "f00n0g08.png" decode-test
-    "f00n2c08.png" decode-test
-    "f01n0g08.png" decode-test
-    "f01n2c08.png" decode-test
-    "f02n0g08.png" decode-test
-    "f02n2c08.png" decode-test
-    "f03n0g08.png" decode-test
-    "f03n2c08.png" decode-test
-    "f04n0g08.png" decode-test
-    "f04n2c08.png" decode-test
-    "f99n0g04.png" decode-test
-    "g03n0g16.png" decode-test
-    "g03n2c08.png" decode-test
-    "g03n3p04.png" decode-test
-    "g04n0g16.png" decode-test
-    "g04n2c08.png" decode-test
-    "g04n3p04.png" decode-test
-    "g05n0g16.png" decode-test
-    "g05n2c08.png" decode-test
-    "g05n3p04.png" decode-test
-    "g07n0g16.png" decode-test
-    "g07n2c08.png" decode-test
-    "g07n3p04.png" decode-test
-    "g10n0g16.png" decode-test
-    "g10n2c08.png" decode-test
-    "g10n3p04.png" decode-test
-    "g25n0g16.png" decode-test
-    "g25n2c08.png" decode-test
-    "g25n3p04.png" decode-test
-    "oi1n0g16.png" decode-test
-    "oi1n2c16.png" decode-test
-    "oi2n0g16.png" decode-test
-    "oi2n2c16.png" decode-test
-    "oi4n0g16.png" decode-test
-    "oi4n2c16.png" decode-test
-    "oi9n0g16.png" decode-test
-    "oi9n2c16.png" decode-test
-    "pngsuite_logo.png" decode-test
-    "pp0n2c16.png" decode-test
-    "pp0n6a08.png" decode-test
-    "ps1n0g08.png" decode-test
-    "ps1n2c16.png" decode-test
-    "ps2n0g08.png" decode-test
-    "ps2n2c16.png" decode-test
-    "s01i3p01.png" decode-test
-    "s01n3p01.png" decode-test
-    "s02i3p01.png" decode-test
-    "s02n3p01.png" decode-test
-    "s03i3p01.png" decode-test
-    "s03n3p01.png" decode-test
-    "s04i3p01.png" decode-test
-    "s04n3p01.png" decode-test
-    "s05i3p02.png" decode-test
-    "s05n3p02.png" decode-test
-    "s06i3p02.png" decode-test
-    "s06n3p02.png" decode-test
-    "s07i3p02.png" decode-test
-    "s07n3p02.png" decode-test
-    "s08i3p02.png" decode-test
-    "s08n3p02.png" decode-test
-    "s09i3p02.png" decode-test
-    "s09n3p02.png" decode-test
-    "s32i3p04.png" decode-test
-    "s32n3p04.png" decode-test
-    "s33i3p04.png" decode-test
-    "s33n3p04.png" decode-test
-    "s34i3p04.png" decode-test
-    "s34n3p04.png" decode-test
-    "s35i3p04.png" decode-test
-    "s35n3p04.png" decode-test
-    "s36i3p04.png" decode-test
-    "s36n3p04.png" decode-test
-    "s37i3p04.png" decode-test
-    "s37n3p04.png" decode-test
-    "s38i3p04.png" decode-test
-    "s38n3p04.png" decode-test
-    "s39i3p04.png" decode-test
-    "s39n3p04.png" decode-test
-    "s40i3p04.png" decode-test
-    "s40n3p04.png" decode-test
-    "tbbn0g04.png" decode-test
-    "tbbn1g04.png" decode-test
-    "tbbn2c16.png" decode-test
-    "tbbn3p08.png" decode-test
-    "tbgn2c16.png" decode-test
-    "tbgn3p08.png" decode-test
-    "tbrn2c08.png" decode-test
-    "tbwn0g16.png" decode-test
-    "tbwn1g16.png" decode-test
-    "tbwn3p08.png" decode-test
-    "tbyn3p08.png" decode-test
-    "tp0n0g08.png" decode-test
-    "tp0n1g08.png" decode-test
-    "tp0n2c08.png" decode-test
-    "tp0n3p08.png" decode-test
-    "tp1n3p08.png" decode-test
-    "z00n2c08.png" decode-test
-    "z03n2c08.png" decode-test
-    "z06n2c08.png" decode-test
-    "z09n2c08.png" decode-test
+    "PngSuite.png" png-image decode-test
+    "basi0g01.png" png-image decode-test
+    "basi0g02.png" png-image decode-test
+    "basi0g04.png" png-image decode-test
+    "basi0g08.png" png-image decode-test
+    "basi0g16.png" png-image decode-test
+    "basi2c08.png" png-image decode-test
+    "basi2c16.png" png-image decode-test
+    "basi3p01.png" png-image decode-test
+    "basi3p02.png" png-image decode-test
+    "basi3p04.png" png-image decode-test
+    "basi3p08.png" png-image decode-test
+    "basi4a08.png" png-image decode-test
+    "basi4a16.png" png-image decode-test
+    "basi6a08.png" png-image decode-test
+    "basi6a16.png" png-image decode-test
+    "basn0g01.png" png-image decode-test
+    "basn0g02.png" png-image decode-test
+    "basn0g04.png" png-image decode-test
+    "basn0g08.png" png-image decode-test
+    "basn0g16.png" png-image decode-test
+    "basn2c08.png" png-image decode-test
+    "basn2c16.png" png-image decode-test
+    "basn3p01.png" png-image decode-test
+    "basn3p02.png" png-image decode-test
+    "basn3p04.png" png-image decode-test
+    "basn3p08.png" png-image decode-test
+    "basn4a08.png" png-image decode-test
+    "basn4a16.png" png-image decode-test
+    "basn6a08.png" png-image decode-test
+    "basn6a16.png" png-image decode-test
+    "bgai4a08.png" png-image decode-test
+    "bgai4a16.png" png-image decode-test
+    "bgan6a08.png" png-image decode-test
+    "bgan6a16.png" png-image decode-test
+    "bgbn4a08.png" png-image decode-test
+    "bggn4a16.png" png-image decode-test
+    "bgwn6a08.png" png-image decode-test
+    "bgyn6a16.png" png-image decode-test
+    "ccwn2c08.png" png-image decode-test
+    "ccwn3p08.png" png-image decode-test
+    "cdfn2c08.png" png-image decode-test
+    "cdhn2c08.png" png-image decode-test
+    "cdsn2c08.png" png-image decode-test
+    "cdun2c08.png" png-image decode-test
+    "ch1n3p04.png" png-image decode-test
+    "ch2n3p08.png" png-image decode-test
+    "cm0n0g04.png" png-image decode-test
+    "cm7n0g04.png" png-image decode-test
+    "cm9n0g04.png" png-image decode-test
+    "cs3n2c16.png" png-image decode-test
+    "cs3n3p08.png" png-image decode-test
+    "cs5n2c08.png" png-image decode-test
+    "cs5n3p08.png" png-image decode-test
+    "cs8n2c08.png" png-image decode-test
+    "cs8n3p08.png" png-image decode-test
+    "ct0n0g04.png" png-image decode-test
+    "ct1n0g04.png" png-image decode-test
+    "cten0g04.png" png-image decode-test
+    "ctfn0g04.png" png-image decode-test
+    "ctgn0g04.png" png-image decode-test
+    "cthn0g04.png" png-image decode-test
+    "ctjn0g04.png" png-image decode-test
+    "ctzn0g04.png" png-image decode-test
+    "f00n0g08.png" png-image decode-test
+    "f00n2c08.png" png-image decode-test
+    "f01n0g08.png" png-image decode-test
+    "f01n2c08.png" png-image decode-test
+    "f02n0g08.png" png-image decode-test
+    "f02n2c08.png" png-image decode-test
+    "f03n0g08.png" png-image decode-test
+    "f03n2c08.png" png-image decode-test
+    "f04n0g08.png" png-image decode-test
+    "f04n2c08.png" png-image decode-test
+    "f99n0g04.png" png-image decode-test
+    "g03n0g16.png" png-image decode-test
+    "g03n2c08.png" png-image decode-test
+    "g03n3p04.png" png-image decode-test
+    "g04n0g16.png" png-image decode-test
+    "g04n2c08.png" png-image decode-test
+    "g04n3p04.png" png-image decode-test
+    "g05n0g16.png" png-image decode-test
+    "g05n2c08.png" png-image decode-test
+    "g05n3p04.png" png-image decode-test
+    "g07n0g16.png" png-image decode-test
+    "g07n2c08.png" png-image decode-test
+    "g07n3p04.png" png-image decode-test
+    "g10n0g16.png" png-image decode-test
+    "g10n2c08.png" png-image decode-test
+    "g10n3p04.png" png-image decode-test
+    "g25n0g16.png" png-image decode-test
+    "g25n2c08.png" png-image decode-test
+    "g25n3p04.png" png-image decode-test
+    "oi1n0g16.png" png-image decode-test
+    "oi1n2c16.png" png-image decode-test
+    "oi2n0g16.png" png-image decode-test
+    "oi2n2c16.png" png-image decode-test
+    "oi4n0g16.png" png-image decode-test
+    "oi4n2c16.png" png-image decode-test
+    "oi9n0g16.png" png-image decode-test
+    "oi9n2c16.png" png-image decode-test
+    "pngsuite_logo.png" png-image decode-test
+    "pp0n2c16.png" png-image decode-test
+    "pp0n6a08.png" png-image decode-test
+    "ps1n0g08.png" png-image decode-test
+    "ps1n2c16.png" png-image decode-test
+    "ps2n0g08.png" png-image decode-test
+    "ps2n2c16.png" png-image decode-test
+    "s01i3p01.png" png-image decode-test
+    "s01n3p01.png" png-image decode-test
+    "s02i3p01.png" png-image decode-test
+    "s02n3p01.png" png-image decode-test
+    "s03i3p01.png" png-image decode-test
+    "s03n3p01.png" png-image decode-test
+    "s04i3p01.png" png-image decode-test
+    "s04n3p01.png" png-image decode-test
+    "s05i3p02.png" png-image decode-test
+    "s05n3p02.png" png-image decode-test
+    "s06i3p02.png" png-image decode-test
+    "s06n3p02.png" png-image decode-test
+    "s07i3p02.png" png-image decode-test
+    "s07n3p02.png" png-image decode-test
+    "s08i3p02.png" png-image decode-test
+    "s08n3p02.png" png-image decode-test
+    "s09i3p02.png" png-image decode-test
+    "s09n3p02.png" png-image decode-test
+    "s32i3p04.png" png-image decode-test
+    "s32n3p04.png" png-image decode-test
+    "s33i3p04.png" png-image decode-test
+    "s33n3p04.png" png-image decode-test
+    "s34i3p04.png" png-image decode-test
+    "s34n3p04.png" png-image decode-test
+    "s35i3p04.png" png-image decode-test
+    "s35n3p04.png" png-image decode-test
+    "s36i3p04.png" png-image decode-test
+    "s36n3p04.png" png-image decode-test
+    "s37i3p04.png" png-image decode-test
+    "s37n3p04.png" png-image decode-test
+    "s38i3p04.png" png-image decode-test
+    "s38n3p04.png" png-image decode-test
+    "s39i3p04.png" png-image decode-test
+    "s39n3p04.png" png-image decode-test
+    "s40i3p04.png" png-image decode-test
+    "s40n3p04.png" png-image decode-test
+    "tbbn0g04.png" png-image decode-test
+    "tbbn1g04.png" png-image decode-test
+    "tbbn2c16.png" png-image decode-test
+    "tbbn3p08.png" png-image decode-test
+    "tbgn2c16.png" png-image decode-test
+    "tbgn3p08.png" png-image decode-test
+    "tbrn2c08.png" png-image decode-test
+    "tbwn0g16.png" png-image decode-test
+    "tbwn1g16.png" png-image decode-test
+    "tbwn3p08.png" png-image decode-test
+    "tbyn3p08.png" png-image decode-test
+    "tp0n0g08.png" png-image decode-test
+    "tp0n1g08.png" png-image decode-test
+    "tp0n2c08.png" png-image decode-test
+    "tp0n3p08.png" png-image decode-test
+    "tp1n3p08.png" png-image decode-test
+    "z00n2c08.png" png-image decode-test
+    "z03n2c08.png" png-image decode-test
+    "z06n2c08.png" png-image decode-test
+    "z09n2c08.png" png-image decode-test
 ] with-directory
 
 "vocab:images/testing/png/suite/bads" [
-    "x00n0g01.png" image-load-must-fail
-    "xcsn0g01.png" image-load-must-fail
-    "xd0n2c08.png" image-load-must-fail
-    "xd3n2c08.png" image-load-must-fail
-    "xd9n2c08.png" image-load-must-fail
-    "xdtn0g01.png" image-load-must-fail
-    "xcrn0g04.png" image-load-must-fail
-    "xc1n0g08.png" image-load-must-fail
-    "xc9n2c08.png" image-load-must-fail
-    "xlfn0g04.png" image-load-must-fail
-    "xhdn0g08.png" image-load-must-fail
-    "xs1n0g01.png" image-load-must-fail
-    "xs2n0g01.png" image-load-must-fail
-    "xs4n0g01.png" image-load-must-fail
-    "xs7n0g01.png" image-load-must-fail
+    "x00n0g01.png" png-image image-load-must-fail
+    "xcsn0g01.png" png-image image-load-must-fail
+    "xd0n2c08.png" png-image image-load-must-fail
+    "xd3n2c08.png" png-image image-load-must-fail
+    "xd9n2c08.png" png-image image-load-must-fail
+    "xdtn0g01.png" png-image image-load-must-fail
+    "xcrn0g04.png" png-image image-load-must-fail
+    "xc1n0g08.png" png-image image-load-must-fail
+    "xc9n2c08.png" png-image image-load-must-fail
+    "xlfn0g04.png" png-image image-load-must-fail
+    "xhdn0g08.png" png-image image-load-must-fail
+    "xs1n0g01.png" png-image image-load-must-fail
+    "xs2n0g01.png" png-image image-load-must-fail
+    "xs4n0g01.png" png-image image-load-must-fail
+    "xs7n0g01.png" png-image image-load-must-fail
 ] with-directory
