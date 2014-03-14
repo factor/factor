@@ -47,9 +47,8 @@ M: pathname load-image*
     [ binary <file-reader> ] dip stream>image ;
 
 ! Image Encode
-
-GENERIC: image>stream ( image class -- )
+GENERIC: image>stream ( image extension class -- )
 
 : save-graphic-image ( image path -- )
-    [ image-class ] [ ] bi
+    dup file-extension dup (image-class) rot
     binary [ image>stream ] with-file-writer ;
