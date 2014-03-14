@@ -14,7 +14,7 @@ IN: images.bitmap
 ! http://www.digicamsoft.com/bmp/bmp.html
 
 SINGLETON: bmp-image
-"bmp" bmp-image register-image-class
+"bmp" bmp-image ?register-image-class
 
 : write2 ( n -- ) 2 >le write ;
 : write4 ( n -- ) 4 >le write ;
