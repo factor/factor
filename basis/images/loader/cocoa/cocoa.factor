@@ -10,14 +10,8 @@ IN: images.loader.cocoa
 SINGLETON: ns-image
 
 os macosx? [
-    "png" ns-image register-image-class
-    "tif" ns-image register-image-class
-    "tiff" ns-image register-image-class
-    "gif" ns-image register-image-class
-    "jpg" ns-image register-image-class
-    "jpeg" ns-image register-image-class
-    "bmp" ns-image register-image-class
-    "ico" ns-image register-image-class
+    { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" }
+    [ ns-image register-image-class ] each
 ] when
 
 : <CGImage> ( byte-array -- image-rep )
