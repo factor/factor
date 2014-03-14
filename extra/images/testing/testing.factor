@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Keith Lazuka.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry images images.loader images.normalization
-images.loader.private images.viewer io io.backend io.directories
-io.encodings.binary io.files io.pathnames io.streams.byte-array kernel locals
-namespaces quotations random sequences serialize tools.test ;
+USING: accessors arrays fry images images.loader
+images.normalization images.viewer io io.backend io.directories
+io.encodings.binary io.files io.pathnames io.streams.byte-array
+kernel locals namespaces quotations random sequences serialize
+tools.test ;
 IN: images.testing
 
 <PRIVATE
@@ -40,18 +41,19 @@ PRIVATE>
 
 :: encode-test ( path image-class -- )
     f verbose-tests? [
-        path load-image dup clone normalize-image 1quotation swap
+        path image-class load-image*
+        [ clone normalize-image 1array ] keep
         '[
             binary [
-                _ image-class [ types get value-at ] keep image>stream
+                _ path file-extension image-class image>stream
             ] with-byte-writer image-class load-image* normalize-image
         ] unit-test
     ] with-variable ;
 
-: decode-test ( path -- )
+:: decode-test ( path image-class -- )
     f verbose-tests? [
-        [ load-image 1quotation ]
-        [ '[ _ load-reference-image ] ] bi
+        path image-class load-image* 1array
+        [ path load-reference-image ]
         unit-test
     ] with-variable ;
 
@@ -63,5 +65,5 @@ PRIVATE>
 : randomize-image ( image -- image )
     dup bytes-per-image random-bytes >>bitmap ;
 
-: image-load-must-fail ( path -- )
-    '[ _ load-image ] must-fail ;
+: image-load-must-fail ( path image-class -- )
+    '[ _ _ load-image* ] must-fail ;

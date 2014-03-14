@@ -36,12 +36,12 @@ SINGLETON: pgm-image
     read-number        :> max
     width height *     :> npixels
     max 256 >=         :> wide
-    
+
     type {
         { "P2" [ [ 0 npixels read-numbers ] wide [ ushort-array{ } ] [ B{ } ] if make ] }
         { "P5" [ wide [ 2 ] [ 1 ] if npixels * read ] }
     } case :> data
-    
+
     image new
     L                                                  >>component-order
     { width height }                                   >>dim
@@ -53,7 +53,7 @@ M: pgm-image stream>image*
     drop [ [ read-pgm ] throw-on-eof ] with-input-stream ;
 
 M: pgm-image image>stream
-    drop {
+    2drop {
         [ drop "P5\n" ascii encode write ]
         [ dim>> first number>string " " append ascii encode write ]
         [ dim>> second number>string "\n" append ascii encode write ]
