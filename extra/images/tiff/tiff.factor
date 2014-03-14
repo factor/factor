@@ -563,4 +563,4 @@ ERROR: unknown-component-order ifd ;
 M: tiff-image stream>image* ( stream tiff-image -- image )
     drop [ [ load-tiff tiff>image ] throw-on-eof ] with-input-stream ;
 
-{ "tif" "tiff" } [ tiff-image register-image-class ] each
+{ "tif" "tiff" } [ tiff-image ?register-image-class ] each

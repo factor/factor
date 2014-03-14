@@ -6,7 +6,7 @@ math.parser sequences io.streams.throwing ;
 IN: images.ppm
 
 SINGLETON: ppm-image
-"ppm" ppm-image register-image-class
+"ppm" ppm-image ?register-image-class
 
 : read-token ( -- token )
     [ read1 dup blank?

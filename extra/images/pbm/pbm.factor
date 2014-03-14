@@ -7,7 +7,7 @@ sequences io.streams.throwing ;
 IN: images.pbm
 
 SINGLETON: pbm-image
-"pbm" pbm-image register-image-class
+"pbm" pbm-image ?register-image-class
 
 <PRIVATE
 : read-token ( -- token )

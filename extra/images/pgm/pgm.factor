@@ -7,7 +7,7 @@ SPECIALIZED-ARRAY: ushort
 IN: images.pgm
 
 SINGLETON: pgm-image
-"pgm" pgm-image register-image-class
+"pgm" pgm-image ?register-image-class
 
 : read-token ( -- token )
     [ read1 dup blank?

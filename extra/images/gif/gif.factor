@@ -7,7 +7,7 @@ kernel make math math.bitwise namespaces sequences ;
 IN: images.gif
 
 SINGLETON: gif-image
-"gif" gif-image register-image-class
+"gif" gif-image ?register-image-class
 
 TUPLE: loading-gif
 loading?

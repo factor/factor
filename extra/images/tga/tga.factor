@@ -7,7 +7,7 @@ ui.pixel-formats combinators continuations io.streams.throwing ;
 IN: images.tga
 
 SINGLETON: tga-image
-"tga" tga-image register-image-class
+"tga" tga-image ?register-image-class
 
 ERROR: bad-tga-header ;
 ERROR: bad-tga-footer ;

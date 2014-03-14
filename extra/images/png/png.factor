@@ -11,7 +11,7 @@ QUALIFIED: math
 IN: images.png
 
 SINGLETON: png-image
-"png" png-image register-image-class
+"png" png-image ?register-image-class
 
 TUPLE: loading-png
     chunks
