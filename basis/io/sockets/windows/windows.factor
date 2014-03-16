@@ -11,8 +11,8 @@ IN: io.sockets.windows
 : set-socket-option ( handle level opt -- )
     [ handle>> ] 2dip 1 int <ref> dup byte-length setsockopt socket-error ;
 
-M: windows addrinfo-error ( n -- )
-    winsock-return-check ;
+M: windows addrinfo-error-string ( n -- string )
+    n>win32-error-string ;
 
 M: windows sockaddr-of-family ( alien af -- addrspec )
     {
