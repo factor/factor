@@ -124,7 +124,6 @@ M: rsa dispose* handle>> RSA_free ;
         H{ } clone >>sessions ;
 
 M: openssl <secure-context> ( config -- context )
-    maybe-init-ssl
     [
         dup method>> ssl-method SSL_CTX_new
         dup ssl-error <openssl-context> |dispose
