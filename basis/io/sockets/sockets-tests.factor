@@ -1,5 +1,5 @@
-USING: io.sockets io.sockets.private sequences math tools.test
-namespaces accessors kernel destructors calendar io.timeouts
+USING: continuations io.sockets io.sockets.private sequences math
+tools.test namespaces accessors kernel destructors calendar io.timeouts
 io.encodings.utf8 io concurrency.promises threads
 io.streams.string present system ;
 IN: io.sockets.tests
@@ -172,3 +172,7 @@ os unix? [
 
 [ 80 ] [ "http" protocol-port ] unit-test
 [ f ] [ f protocol-port ] unit-test
+
+[ t ] [
+    [ "you-cant-resolve-me!" resolve-host ] [ addrinfo-error? ] recover
+] unit-test
