@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: init kernel namespaces openssl.libcrypto openssl.libssl
+USING: init io kernel namespaces openssl.libcrypto openssl.libssl
 sequences ;
 IN: openssl
 
@@ -26,12 +26,4 @@ SINGLETON: openssl
     OpenSSL_add_all_digests
     OpenSSL_add_all_ciphers ;
 
-SYMBOL: ssl-initialized?
-
-: maybe-init-ssl ( -- )
-    ssl-initialized? get-global [
-        init-ssl
-        t ssl-initialized? set-global
-    ] unless ;
-
-[ f ssl-initialized? set-global ] "openssl" add-startup-hook
+[ init-ssl ] "openssl" add-startup-hook
