@@ -10,12 +10,23 @@ IN: yaml
 
 : yaml-assert-ok ( ? -- ) [ "yaml error" throw ] unless ;
 
-: event>scalar ( event -- obj )
-    data>> scalar>> construct-scalar ;
+SYMBOL: anchors
+: ?register-anchor ( obj event -- obj )
+    dupd anchor>> [ anchors get set-at ] [ drop ] if* ;
+: deref-anchor ( event -- obj )
+    data>> alias>> anchor>> anchors get at ;
 
-: ?scalar-value ( event -- scalar/f f/type )
-    dup type>> YAML_SCALAR_EVENT =
-    [ event>scalar f ] [ type>> clone f swap ] if ;
+: event>scalar ( event -- obj )
+    data>> scalar>>
+    [ construct-scalar ]
+    [ ?register-anchor ] bi ;
+
+: ?scalar-value ( event -- scalar/event scalar? )
+    dup type>> {
+        { YAML_SCALAR_EVENT [ event>scalar t ] }
+        { YAML_ALIAS_EVENT [ deref-anchor t ] }
+        [ drop clone f ]
+    } case ;
 
 ! Must not reuse the event struct before with-destructors scope ends
 : next-event ( parser event -- event )
@@ -23,16 +34,21 @@ IN: yaml
 
 DEFER: parse-sequence
 DEFER: parse-mapping
-: next-complex-value ( parser event type -- obj )
-    {
-        { YAML_SEQUENCE_START_EVENT [ parse-sequence ] }
-        { YAML_MAPPING_START_EVENT [ parse-mapping ] }
+: (parse-sequence) ( parser event prev-event -- obj )
+    [ parse-sequence ] [ sequence_start>> ?register-anchor ] bi* ;
+: (parse-mapping) ( parser event prev-event -- obj )
+    [ parse-mapping ] [ mapping_start>> ?register-anchor ] bi* ;
+: next-complex-value ( parser event prev-event -- obj )
+    dup type>> {
+        { YAML_SEQUENCE_START_EVENT [ data>> (parse-sequence) ] }
+        { YAML_MAPPING_START_EVENT [ data>> (parse-mapping) ] }
+        { YAML_ALIAS_EVENT [ 2nip deref-anchor ] }
         [ throw ]
     } case ;
 
 :: next-value ( parser event -- obj )
     parser event [ next-event ?scalar-value ] with-destructors
-    [ [ drop parser event ] dip next-complex-value ] when* ;
+    [ [ parser event ] dip next-complex-value ] unless ;
 
 :: parse-mapping ( parser event -- map )
     [
@@ -41,15 +57,15 @@ DEFER: parse-mapping
             [
                 parser event next-event type>>
                 YAML_MAPPING_END_EVENT = [
-                    t done! f f f
+                    t done! f f
                 ] [
-                    event ?scalar-value t
+                    event ?scalar-value
                 ] if
             ] with-destructors
-            [
-                [ nip [ parser event ] dip next-complex-value ] when*
+            done [ 2drop ] [
+                [ [ parser event ] dip next-complex-value ] unless
                 parser event next-value swap ,,
-            ] [ 2drop ] if
+            ] if
         ] until
     ] H{ } make ;
 
@@ -60,12 +76,14 @@ DEFER: parse-mapping
             [
                 parser event next-event type>>
                 YAML_SEQUENCE_END_EVENT = [
-                    t done! f
+                    t done! f f
                 ] [
-                    event ?scalar-value dup [ nip ] [ [ , ] dip ] if
+                    event ?scalar-value
                 ] if
             ] with-destructors
-            [ [ parser event ] dip next-complex-value , ] when*
+            done [ 2drop ] [
+              [ [ parser event ] dip next-complex-value ] unless ,
+            ] if
         ] until
     ] { } make ;
 
@@ -74,6 +92,11 @@ DEFER: parse-mapping
         [ next-event type>> ] dip =
         [ "wrong event" throw ] unless
     ] with-destructors ;
+
+:: parse-yaml-doc ( parser event -- obj )
+    H{ } clone anchors [
+        parser event next-value
+    ] with-variable ;
 
 :: ?parse-yaml-doc ( parser event -- obj/f ? )
     [
@@ -84,7 +107,7 @@ DEFER: parse-mapping
         } case
     ] with-destructors
     [
-        parser event next-value t
+        parser event parse-yaml-doc t
         parser event YAML_DOCUMENT_END_EVENT expect-event
     ] [ f f ] if ;
 
