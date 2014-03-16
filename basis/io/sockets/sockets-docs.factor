@@ -228,13 +228,13 @@ HELP: send
 HELP: resolve-host
 { $values { "addrspec" "an address specifier" } { "seq" "a sequence of address specifiers" } }
 { $description "Resolves host names to IP addresses." }
+{ $errors "Throws an " { $link addrinfo-error } " if the host name cannot be resolved." }
 { $examples
     { $code
       "\"www.facebook.com\" resolve-host . "
       "{ T{ ipv4 { host \"31.13.64.32\" } } }"
     }
 } ;
-
 
 HELP: with-local-address
 { $values { "addr" "an " { $link inet4 } " or " { $link inet6 } " address specifier" } { "quot" quotation } }
