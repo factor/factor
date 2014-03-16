@@ -14,8 +14,8 @@ IN: io.sockets.windows
 : set-ioctl-socket ( handle cmd arg -- )
     [ handle>> ] 2dip ulong <ref> ioctlsocket socket-error ;
 
-M: windows addrinfo-error ( n -- )
-    winsock-return-check ;
+M: windows addrinfo-error-string ( n -- string )
+    n>win32-error-string ;
 
 M: windows sockaddr-of-family ( alien af -- addrspec )
     {

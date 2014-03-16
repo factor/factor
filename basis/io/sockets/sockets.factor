@@ -228,6 +228,8 @@ M: inet6 present
 
 M: inet6 protocol drop 0 ;
 
+ERROR: addrinfo-error n string ;
+
 <PRIVATE
 
 GENERIC: (get-local-address) ( handle remote -- sockaddr )
@@ -311,7 +313,7 @@ HOOK: (send) io-backend ( packet addrspec datagram -- )
     [ addrinfo>addrspec ] map
     sift ;
 
-HOOK: addrinfo-error io-backend ( n -- )
+HOOK: addrinfo-error-string io-backend ( n -- string )
 
 : prepare-addrinfo ( -- addrinfo )
     addrinfo <struct>
@@ -407,8 +409,11 @@ M: inet present
 C: <inet> inet
 
 M: string resolve-host
-    f prepare-addrinfo f void* <ref>
-    [ getaddrinfo addrinfo-error ] keep void* deref addrinfo memory>struct
+    f prepare-addrinfo f void* <ref> [
+        getaddrinfo 0 or [
+            dup addrinfo-error-string addrinfo-error
+        ] unless-zero
+    ] keep void* deref addrinfo memory>struct
     [ parse-addrinfo-list ] keep freeaddrinfo ;
 
 M: string with-port <inet> ;
