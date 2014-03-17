@@ -65,6 +65,22 @@ ${ test-objs } [ $ test-docs yaml-docs> ] unit-test
 ${ test-docs } [ $ test-objs >yaml-docs ] unit-test
 ${ test-docs } [ $ test-docs yaml-docs> >yaml-docs ] unit-test
 
+! Anchors
+CONSTANT: test-anchors """- &1 "1"
+- *1
+- &2 ["1","2"]
+- *2
+- &3
+  *1 : "one"
+- *3
+"""
+CONSTANT: test-anchors-obj {
+  "1" "1" { "1" "2" } { "1" "2" } H{ { "1" "one" } } H{ { "1" "one" } }
+}
+
+${ test-anchors-obj } [ $ test-anchors yaml> ] unit-test
+${ test-anchors-obj } [ $ test-anchors-obj >yaml yaml> ] unit-test
+
 ! Lifted from pyyaml
 ! http://pyyaml.org/browser/pyyaml/trunk/tests/data
 
