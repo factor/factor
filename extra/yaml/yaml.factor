@@ -21,11 +21,32 @@ SYMBOL: anchors
     [ construct-scalar ]
     [ ?register-anchor ] bi ;
 
+! TODO simplify this ?!?
+TUPLE: factor_sequence_start_event_data anchor tag implicit style ;
+TUPLE: factor_mapping_start_event_data anchor tag implicit style ;
+TUPLE: factor_event_data sequence_start mapping_start ;
+TUPLE: factor_yaml_event_t type data start_mark end_mark ;
+: deep-copy-seq ( data -- data' )
+    { [ anchor>> clone ] [ tag>> clone ] [ implicit>> ] [ style>> ] } cleave
+    factor_sequence_start_event_data boa ;
+: deep-copy-map ( data -- data' )
+    { [ anchor>> clone ] [ tag>> clone ] [ implicit>> ] [ style>> ] } cleave
+    factor_mapping_start_event_data boa ;
+: deep-copy-data ( event -- data )
+    [ data>> ] [ type>> ] bi {
+        { YAML_SEQUENCE_START_EVENT [ sequence_start>> deep-copy-seq f ] }
+        { YAML_MAPPING_START_EVENT [ mapping_start>> deep-copy-map f swap ] }
+        [ throw ]
+    } case factor_event_data boa ;
+: deep-copy-event ( event -- event' )
+    { [ type>> ] [ deep-copy-data ] [ start_mark>> ] [ end_mark>> ] } cleave
+    factor_yaml_event_t boa ;
+
 : ?scalar-value ( event -- scalar/event scalar? )
     dup type>> {
         { YAML_SCALAR_EVENT [ event>scalar t ] }
         { YAML_ALIAS_EVENT [ deref-anchor t ] }
-        [ drop clone f ]
+        [ drop deep-copy-event f ]
     } case ;
 
 ! Must not reuse the event struct before with-destructors scope ends
