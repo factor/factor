@@ -2,6 +2,8 @@
 
 namespace factor {
 
+HANDLE boot_thread;
+
 DWORD current_vm_tls_key;
 
 void init_mvm() {
