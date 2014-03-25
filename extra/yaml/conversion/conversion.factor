@@ -1,8 +1,8 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors base64 byte-arrays combinators
-combinators.extras kernel math math.parser regexp sequences
-strings yaml.ffi ;
+USING: accessors assocs base64 byte-arrays combinators
+combinators.extras hash-sets kernel linked-assocs math
+math.parser regexp sequences strings yaml.ffi ;
 IN: yaml.conversion
 
 ! !!!!!!!!!!!!!!
@@ -74,6 +74,25 @@ CONSTANT:  YAML_BINARY_TAG "tag:yaml.org,2002:binary"
         { YAML_FLOAT_TAG [ construct-float ] }
         { YAML_BINARY_TAG [ base64> ] }
         { YAML_STR_TAG   [ ] }
+    } case ;
+
+CONSTANT: YAML_OMAP_TAG  "tag:yaml.org,2002:omap"
+CONSTANT: YAML_PAIRS_TAG "tag:yaml.org,2002:pairs"
+: construct-pairs ( obj -- obj' ) [ >alist first ] map ;
+: construct-omap ( obj -- obj' ) <linked-hash> [ assoc-union! ] reduce ;
+: construct-sequence ( obj prev-event -- obj' )
+    tag>> {
+        { YAML_OMAP_TAG [ construct-omap ] }
+        { YAML_PAIRS_TAG [ construct-pairs ] }
+        [ drop ]
+    } case ;
+
+CONSTANT: YAML_SET_TAG   "tag:yaml.org,2002:set"
+: construct-set ( obj -- obj' ) keys >hash-set ;
+: construct-mapping ( obj prev-event -- obj' )
+    tag>> {
+        { YAML_SET_TAG [ construct-set ] }
+        [ drop ]
     } case ;
 
 ! !!!!!!!!!!!!!!
