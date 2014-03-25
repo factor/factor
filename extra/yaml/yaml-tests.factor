@@ -1,6 +1,6 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: literals tools.test yaml ;
+USING: assocs linked-assocs literals tools.test yaml ;
 IN: yaml.tests
 
 ! TODO real conformance tests here
@@ -225,34 +225,33 @@ ${ construct-seq-obj } [ $ construct-seq-obj >yaml yaml> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! construct-set
-! TODO implement this to hash-set
-! CONSTANT: construct-set-obj H{
-!   {
-!    "baseball players" HS{
-!       "Mark McGwire"
-!       "Sammy Sosa"
-!       "Ken Griffey"
-!     }
-!   } {
-!     "baseball teams" HS{
-!       "Boston Red Sox"
-!       "Detroit Tigers"
-!       "New York Yankees"
-!     }
-!   }
-! }
-! 
-! CONSTANT: construct-set-str """# Explicitly typed set.
-! baseball players: !!set
-!   ? Mark McGwire
-!   ? Sammy Sosa
-!   ? Ken Griffey
-! # Flow style
-! baseball teams: !!set { Boston Red Sox, Detroit Tigers, New York Yankees }
-! """
-! 
-! ${ construct-set-obj } [ $ construct-set-str yaml> ] unit-test
-! ${ construct-set-obj } [ $ construct-set-obj >yaml yaml> ] unit-test
+CONSTANT: construct-set-obj H{
+  {
+   "baseball players" HS{
+      "Mark McGwire"
+      "Sammy Sosa"
+      "Ken Griffey"
+    }
+  } {
+    "baseball teams" HS{
+      "Boston Red Sox"
+      "Detroit Tigers"
+      "New York Yankees"
+    }
+  }
+}
+
+CONSTANT: construct-set-str """# Explicitly typed set.
+baseball players: !!set
+  ? Mark McGwire
+  ? Sammy Sosa
+  ? Ken Griffey
+# Flow style
+baseball teams: !!set { Boston Red Sox, Detroit Tigers, New York Yankees }
+"""
+
+${ construct-set-obj } [ $ construct-set-str yaml> ] unit-test
+${ construct-set-obj } [ $ construct-set-obj >yaml yaml> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! construct-binary
@@ -370,38 +369,80 @@ ${ construct-binary-obj } [ $ construct-binary-obj >yaml yaml> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! construct-omap
-! TODO what to do with omap ?
-! CONSTANT: construct-omap-obj f
-! 
-! CONSTANT: construct-omap-str """# Explicitly typed ordered map (dictionary).
-! Bestiary: !!omap
-!   - aardvark: African pig-like ant eater. Ugly.
-!   - anteater: South-American ant eater. Two species.
-!   - anaconda: South-American constrictor snake. Scaly.
-!   # Etc.
-! # Flow style
-! Numbers: !!omap [ one: 1, two: 2, three : 3 ]
-! """
-! 
-! ${ construct-omap-obj } [ $ construct-omap-str yaml> ] unit-test
-! ${ construct-omap-obj } [ $ construct-omap-obj >yaml yaml> ] unit-test
+CONSTANT: construct-omap-obj H{
+  {
+    "Bestiary"
+    $[ <linked-hash> {
+        { "aardvark" "African pig-like ant eater. Ugly." }
+        { "anteater" "South-American ant eater. Two species." }
+        { "anaconda" "South-American constrictor snake. Scaly." }
+    } assoc-union! ]
+  } {
+    "Numbers"
+    $[ <linked-hash> {
+        { "one" 1 }
+        { "two" 2 }
+        { "three" 3 }
+    } assoc-union! ]
+  }
+}
+
+CONSTANT: construct-omap-str """# Explicitly typed ordered map (dictionary).
+Bestiary: !!omap
+  - aardvark: African pig-like ant eater. Ugly.
+  - anteater: South-American ant eater. Two species.
+  - anaconda: South-American constrictor snake. Scaly.
+  # Etc.
+# Flow style
+Numbers: !!omap [ one: 1, two: 2, three : 3 ]
+"""
+
+${ construct-omap-obj } [ $ construct-omap-str yaml> ] unit-test
+${ construct-omap-obj } [ $ construct-omap-obj >yaml yaml> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! construct-pairs
-! TODO what to do with pairs ?
-! CONSTANT: construct-pairs-obj f
-! 
-! CONSTANT: construct-pairs-str """# Explicitly typed pairs.
-! Block tasks: !!pairs
-!   - meeting: with team.
-!   - meeting: with boss.
-!   - break: lunch.
-!   - meeting: with client.
-! Flow tasks: !!pairs [ meeting: with team, meeting: with boss ]
-! """
-! 
-! ${ construct-pairs-obj } [ $ construct-pairs-str yaml> ] unit-test
-! ${ construct-pairs-obj } [ $ construct-pairs-obj >yaml yaml> ] unit-test
+CONSTANT: construct-pairs-obj H{
+  {
+    "Block tasks" {
+      { "meeting" "with team." }
+      { "meeting" "with boss." }
+      { "break" "lunch." }
+      { "meeting" "with client." }
+    }
+  } {
+    "Flow tasks" {
+      { "meeting" "with team" } { "meeting" "with boss" }
+    }
+  }
+}
+
+CONSTANT: construct-pairs-str """# Explicitly typed pairs.
+Block tasks: !!pairs
+  - meeting: with team.
+  - meeting: with boss.
+  - break: lunch.
+  - meeting: with client.
+Flow tasks: !!pairs [ meeting: with team, meeting: with boss ]
+"""
+
+CONSTANT: construct-pairs-obj-roundtripped H{
+  {
+    "Block tasks" {
+      H{ { "meeting" "with team." } }
+      H{ { "meeting" "with boss." } }
+      H{ { "break" "lunch." } }
+      H{ { "meeting" "with client." } }
+    }
+  } {
+    "Flow tasks" {
+      H{ { "meeting" "with team" } } H{ { "meeting" "with boss" } }
+    }
+  }
+}
+
+${ construct-pairs-obj } [ $ construct-pairs-str yaml> ] unit-test
+${ construct-pairs-obj } [ $ construct-pairs-obj >yaml yaml> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! construct-timestamp

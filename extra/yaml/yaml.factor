@@ -1,9 +1,11 @@
 ! Copyright (C) 2013 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.data assocs byte-arrays classes.struct
-combinators destructors io.encodings.string io.encodings.utf8
-kernel libc locals make namespaces sequences strings yaml.ffi
-yaml.conversion ;
+USING: accessors alien.data arrays assocs byte-arrays
+classes.struct combinators destructors hashtables
+io.encodings.string io.encodings.utf8 kernel libc linked-assocs
+locals make namespaces sequences sets strings yaml.conversion
+yaml.ffi ;
+FROM: sets => set ;
 IN: yaml
 
 <PRIVATE
@@ -56,13 +58,15 @@ TUPLE: factor_yaml_event_t type data start_mark end_mark ;
 DEFER: parse-sequence
 DEFER: parse-mapping
 : (parse-sequence) ( parser event prev-event -- obj )
-    [ parse-sequence ] [ sequence_start>> ?register-anchor ] bi* ;
+    data>> sequence_start>>
+    [ [ parse-sequence ] [ construct-sequence ] bi* ] [ 2nip ?register-anchor ] 3bi ;
 : (parse-mapping) ( parser event prev-event -- obj )
-    [ parse-mapping ] [ mapping_start>> ?register-anchor ] bi* ;
+    data>> mapping_start>>
+    [ [ parse-mapping ] [ construct-mapping ] bi* ] [ 2nip ?register-anchor ] 3bi ;
 : next-complex-value ( parser event prev-event -- obj )
     dup type>> {
-        { YAML_SEQUENCE_START_EVENT [ data>> (parse-sequence) ] }
-        { YAML_MAPPING_START_EVENT [ data>> (parse-mapping) ] }
+        { YAML_SEQUENCE_START_EVENT [ (parse-sequence) ] }
+        { YAML_MAPPING_START_EVENT [ (parse-mapping) ] }
         { YAML_ALIAS_EVENT [ 2nip deref-anchor ] }
         [ throw ]
     } case ;
@@ -90,7 +94,7 @@ DEFER: parse-mapping
         ] until
     ] H{ } make ;
 
-:: parse-sequence ( parser event -- seq )
+:: parse-sequence ( parser event  -- seq )
     [
         f :> done!
         [ done ] [
@@ -185,8 +189,8 @@ GENERIC: emit-value ( emitter event obj -- )
 
 M: object emit-value ( emitter event obj -- ) emit-scalar ;
 
-:: emit-sequence-start ( emitter event -- )
-    event f YAML_SEQ_TAG f YAML_ANY_SEQUENCE_STYLE
+:: emit-sequence-start ( emitter event tag -- )
+    event f tag f YAML_ANY_SEQUENCE_STYLE
     yaml_sequence_start_event_initialize yaml-assert-ok
     emitter event yaml_emitter_emit yaml-assert-ok ;
 
@@ -196,16 +200,26 @@ M: object emit-value ( emitter event obj -- ) emit-scalar ;
 
 : emit-sequence ( emitter event seq -- )
     [ emit-value ] with with each ;
+: emit-assoc ( emitter event assoc -- )
+    >alist concat emit-sequence ;
+: emit-linked-assoc ( emitter event linked-assoc -- )
+    >alist [ first2 swap associate ] map emit-sequence ;
+: emit-set ( emitter event set -- )
+    [ members ] [ cardinality f <array> ] bi zip concat emit-sequence ;
 
 M: string emit-value ( emitter event seq -- ) emit-scalar ;
 M: byte-array emit-value ( emitter event seq -- ) emit-scalar ;
 M: sequence emit-value ( emitter event seq -- )
-    [ drop emit-sequence-start ]
+    [ drop YAML_SEQ_TAG emit-sequence-start ]
     [ emit-sequence ]
     [ drop emit-sequence-end ] 3tri ;
+M: linked-assoc emit-value ( emitter event assoc -- )
+    [ drop YAML_OMAP_TAG emit-sequence-start ]
+    [ emit-linked-assoc ]
+    [ drop emit-sequence-end ] 3tri ;
 
-:: emit-assoc-start ( emitter event -- )
-    event f YAML_MAP_TAG f YAML_ANY_MAPPING_STYLE
+:: emit-assoc-start ( emitter event tag -- )
+    event f tag f YAML_ANY_MAPPING_STYLE
     yaml_mapping_start_event_initialize yaml-assert-ok
     emitter event yaml_emitter_emit yaml-assert-ok ;
 
@@ -213,12 +227,13 @@ M: sequence emit-value ( emitter event seq -- )
     dup yaml_mapping_end_event_initialize yaml-assert-ok
     yaml_emitter_emit yaml-assert-ok ;
 
-: emit-assoc ( emitter event assoc -- )
-    [ [ emit-value ] with with bi@ ] with with assoc-each ;
-
 M: assoc emit-value ( emitter event seq -- )
-    [ drop emit-assoc-start ]
+    [ drop YAML_MAP_TAG emit-assoc-start ]
     [ emit-assoc ]
+    [ drop emit-assoc-end ] 3tri ;
+M: set emit-value ( emitter event set -- )
+    [ drop YAML_SET_TAG emit-assoc-start ]
+    [ emit-set ]
     [ drop emit-assoc-end ] 3tri ;
 
 ! registers destructors (use with with-destructors)
