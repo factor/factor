@@ -88,6 +88,10 @@ CONSTANT: IPPROTO_TCP    6
 CONSTANT: IPPROTO_UDP   17
 CONSTANT: IPPROTO_RM   113
 
+CONSTANT: FIOASYNC      0x8004667d
+CONSTANT: FIONBIO       0x8004667e
+CONSTANT: FIONREAD      0x4004667f
+
 CONSTANT: WSA_FLAG_OVERLAPPED 1
 ALIAS: WSA_WAIT_EVENT_0 WAIT_OBJECT_0
 ALIAS: WSA_MAXIMUM_WAIT_EVENTS MAXIMUM_WAIT_OBJECTS
@@ -166,6 +170,7 @@ STRUCT: fd_set
 LIBRARY: winsock
 
 FUNCTION: int setsockopt ( SOCKET s, int level, int optname, c-string optval, int optlen ) ;
+FUNCTION: int ioctlsocket ( SOCKET s, long cmd, ulong* *argp ) ;
 
 FUNCTION: ushort htons ( ushort n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;

@@ -11,6 +11,9 @@ IN: io.sockets.windows
 : set-socket-option ( handle level opt -- )
     [ handle>> ] 2dip 1 int <ref> dup byte-length setsockopt socket-error ;
 
+: set-ioctl-socket ( handle cmd arg -- )
+    [ handle>> ] 2dip ulong <ref> ioctlsocket socket-error ;
+
 M: windows addrinfo-error ( n -- )
     winsock-return-check ;
 
