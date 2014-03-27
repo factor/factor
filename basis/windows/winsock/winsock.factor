@@ -102,7 +102,7 @@ CONSTANT: INADDR_ANY 0
 
 : INVALID_SOCKET ( -- n ) -1 <alien> ; inline
 
-: SOCKET_ERROR ( -- n ) -1 <alien> ; inline
+: SOCKET_ERROR ( -- n ) -1 ; inline
 
 CONSTANT: SD_RECV 0
 CONSTANT: SD_SEND 1
