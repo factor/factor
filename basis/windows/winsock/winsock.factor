@@ -169,8 +169,8 @@ FUNCTION: int setsockopt ( SOCKET s, int level, int optname, c-string optval, in
 
 FUNCTION: ushort htons ( ushort n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
-FUNCTION: int bind ( void* socket, sockaddr-in* sockaddr, int len ) ;
-FUNCTION: int listen ( void* socket, int backlog ) ;
+FUNCTION: int bind ( SOCKET socket, sockaddr-in* sockaddr, int len ) ;
+FUNCTION: int listen ( SOCKET socket, int backlog ) ;
 FUNCTION: c-string inet_ntoa ( int in-addr ) ;
 FUNCTION: int getaddrinfo ( c-string nodename,
                             c-string servername,
@@ -182,8 +182,8 @@ FUNCTION: void freeaddrinfo ( addrinfo* ai ) ;
 
 FUNCTION: hostent* gethostbyname ( c-string name ) ;
 FUNCTION: int gethostname ( c-string name, int len ) ;
-FUNCTION: void* socket ( int domain, int type, int protocol ) ;
-FUNCTION: int connect ( void* socket, sockaddr-in* sockaddr, int addrlen ) ;
+FUNCTION: SOCKET socket ( int domain, int type, int protocol ) ;
+FUNCTION: int connect ( SOCKET socket, sockaddr-in* sockaddr, int addrlen ) ;
 FUNCTION: int select ( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, timeval* timeout ) ;
 FUNCTION: int closesocket ( SOCKET s ) ;
 FUNCTION: int shutdown ( SOCKET s, int how ) ;
@@ -199,6 +199,7 @@ FUNCTION: servent* getservbyname ( c-string name, c-string prot ) ;
 FUNCTION: servent* getservbyport ( int port, c-string prot ) ;
 
 TYPEDEF: uint SERVICETYPE
+TYPEDEF: void* LPWSADATA
 TYPEDEF: OVERLAPPED WSAOVERLAPPED
 TYPEDEF: WSAOVERLAPPED* LPWSAOVERLAPPED
 TYPEDEF: uint GROUP
@@ -333,6 +334,7 @@ FUNCTION: BOOL WSAGetOverlappedResult ( SOCKET s,
                                         BOOL fWait,
                                         LPDWORD lpdwFlags ) ;
 
+TYPEDEF: void* LPWSAOVERLAPPED_COMPLETION_ROUTINE
 FUNCTION: int WSAIoctl ( SOCKET s,
                          DWORD dwIoControlCode,
                          LPVOID lpvInBuffer,
@@ -340,27 +342,26 @@ FUNCTION: int WSAIoctl ( SOCKET s,
                          LPVOID lpvOutBuffer,
                          DWORD cbOutBuffer,
                          LPDWORD lpcbBytesReturned,
-                         void* lpOverlapped,
-                         void* lpCompletionRoutine ) ;
+                         LPWSAOVERLAPPED lpOverlapped,
+                         LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
 
-TYPEDEF: void* LPWSAOVERLAPPED_COMPLETION_ROUTINE
 FUNCTION: int WSARecv ( SOCKET s,
                         LPWSABUF lpBuffers,
                         DWORD dwBufferCount,
                         LPDWORD lpNumberOfBytesRecvd,
                         LPDWORD lpFlags,
                         LPWSAOVERLAPPED lpOverlapped,
-                    LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
+                        LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
 
 FUNCTION: int WSARecvFrom ( SOCKET s,
-                    LPWSABUF lpBuffers,
-                    DWORD dwBufferCount,
-                    LPDWORD lpNumberOfBytesRecvd,
-                    LPDWORD lpFlags,
-                    sockaddr* lpFrom,
-                    LPINT lpFromlen,
-                    LPWSAOVERLAPPED lpOverlapped,
-                    LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
+                            LPWSABUF lpBuffers,
+                            DWORD dwBufferCount,
+                            LPDWORD lpNumberOfBytesRecvd,
+                            LPDWORD lpFlags,
+                            sockaddr* lpFrom,
+                            LPINT lpFromlen,
+                            LPWSAOVERLAPPED lpOverlapped,
+                            LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
 
 FUNCTION: BOOL WSAResetEvent ( WSAEVENT hEvent ) ;
 FUNCTION: int WSASend ( SOCKET s,
@@ -381,10 +382,7 @@ FUNCTION: int WSASendTo ( SOCKET s,
                           LPWSAOVERLAPPED lpOverlapped,
   LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
 
-
-FUNCTION: int WSAStartup ( short version, void* out-data ) ;
-
-
+FUNCTION: int WSAStartup ( WORD version,  LPWSADATA out-data ) ;
 
 FUNCTION: SOCKET WSASocketW ( int af,
                              int type,
@@ -403,7 +401,14 @@ FUNCTION: DWORD WSAWaitForMultipleEvents ( DWORD cEvents,
 
 LIBRARY: mswsock
 
-FUNCTION: int AcceptEx ( void* listen, void* accept, void* out-buf, int recv-len, int addr-len, int remote-len, void* out-len, void* overlapped ) ;
+FUNCTION: int AcceptEx ( SOCKET listen,
+                         SOCKET accept,
+                         PVOID out-buf,
+                         DWORD recv-len,
+                         DWORD addr-len,
+                         DWORD remote-len,
+                         LPDWORD out-len,
+                         LPOVERLAPPED overlapped ) ;
 
 FUNCTION: void GetAcceptExSockaddrs (
   PVOID lpOutputBuffer,
