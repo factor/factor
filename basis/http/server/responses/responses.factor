@@ -11,6 +11,9 @@ IN: http.server.responses
         utf8 >>content-encoding
         swap >>content-type
         swap >>body ;
+
+: <text-content> ( body -- response )
+    "text/plain" <content> ;
     
 : trivial-response-body ( code message -- )
     <XML
