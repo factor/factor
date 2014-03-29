@@ -268,7 +268,7 @@ M: ssl-handle drain
 
 : do-ssl-connect ( ssl-handle -- )
     dup dup handle>> SSL_connect check-connect-response dup
-    [ dupd 2drop do-ssl-connect ] [ 2drop ] if ;
+    [ dupd wait-for-fd do-ssl-connect ] [ 2drop ] if ;
 
 : resume-session ( ssl-handle ssl-session -- )
     [ [ handle>> ] dip SSL_set_session ssl-error ]
