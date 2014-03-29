@@ -98,7 +98,14 @@ HELP: get-environment
 
 HELP: current-process-handle
 { $values { "handle" "a process handle" } }
-{ $description "Returns the handle of the current process." } ;
+{ $description "Returns the handle of the current process." }
+{ $examples
+  { $example
+    "USING: io.launcher ;"
+    "current-process-handle ."
+    "6881"
+  }
+} ;
 
 HELP: run-process*
 { $values { "process" process } { "handle" "a process handle" } }
@@ -108,6 +115,20 @@ HELP: run-process*
 HELP: run-process
 { $values { "desc" "a launch descriptor" } { "process" process } }
 { $description "Launches a process. The object can either be a string, a sequence of strings or a " { $link process } ". See " { $link "io.launcher.descriptors" } " for details." }
+{ $examples
+  { $example
+    "USING: io.launcher ;"
+    "\"pwd\" run-process ."
+    "/tmp"
+    "T{ process"
+    "    { command \"pwd\" }"
+    "    { environment H{ } }"
+    "    { environment-mode +append-environment+ }"
+    "    { group +same-group+ }"
+    "    { status 0 }"
+    "}"
+  }
+}
 { $notes "The output value can be passed to " { $link wait-for-process } " to get an exit code." } ;
 
 HELP: run-detached
@@ -126,13 +147,37 @@ HELP: process-failed
 
 HELP: try-process
 { $values { "desc" "a launch descriptor" } }
-{ $description "Launches a process and waits for it to complete. If it exits with a non-zero status code, throws a " { $link process-failed } " error." } ;
+{ $description "Launches a process and waits for it to complete. If it exits with a non-zero status code, throws a " { $link process-failed } " error." }
+{ $examples
+  { $example
+    "USING: continuations io.launcher ;"
+    "[ \"ls --invalid-flag\" try-process ] [ ] recover ."
+    "ls: unknown flag \"--invalid-flag\""
+    "Try with ”ls --help” for more information."
+    "T{ process-failed"
+    "    { process"
+    "         T{ process"
+    "         { command \"ls --invalid-flag\" }"
+    "         { environment H{ } }"
+    "         { environment-mode +append-environment+ }"
+    "         { group +same-group+ }"
+    "         { status 2 }"
+    "    }"
+    "}"
+  }
+} ;
 
 { run-process try-process run-detached } related-words
 
 HELP: kill-process
 { $values { "process" process } }
-{ $description "Kills a running process. Does nothing if the process has already exited." } ;
+{ $description "Kills a running process. Does nothing if the process has already exited." }
+{ $examples
+  { $example
+    "USING: io.launcher ;"
+    "\"cat\" run-detached kill-process"
+  }
+} ;
 
 HELP: kill-process*
 { $values { "process" "process" } }
@@ -182,7 +227,14 @@ HELP: with-process-reader
   { "encoding" "an encoding descriptor" }
   { "quot" quotation }
 }
-{ $description "Launches a process and redirects its output via a pipe. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to this pipe." } ;
+{ $description "Launches a process and redirects its output via a pipe. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to this pipe." }
+{ $examples
+  { $example
+    "USING: io.launcher ;"
+    "\"ls -dl /etc\" utf8 [ contents ] with-process-reader ."
+    "\"drwxr-xr-x 213 root root 12288 mar 11 18:52 /etc\\n\""
+  }
+} ;
 
 HELP: with-process-writer
 { $values
