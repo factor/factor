@@ -9,12 +9,6 @@ sequences sequences.generalizations stack-checker strings system
 unix.time unix.types vocabs vocabs.loader unix.ffi ;
 IN: unix
 
-ERROR: unix-error errno message ;
-
-: (io-error) ( -- * ) errno dup strerror unix-error ;
-
-: io-error ( n -- ) 0 < [ (io-error) ] when ;
-
 ERROR: unix-system-call-error args errno message word ;
 
 : unix-call-failed? ( ret -- ? )
