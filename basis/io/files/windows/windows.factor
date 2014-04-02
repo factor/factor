@@ -3,13 +3,13 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays assocs classes.struct combinators
 combinators.short-circuit continuations destructors environment
-io io.backend io.binary io.buffers io.encodings.utf16n io.files
+fry io io.backend io.binary io.buffers io.encodings.utf16n io.files
 io.files.private io.files.types io.pathnames io.ports
 io.streams.c io.streams.null io.timeouts kernel libc literals
 locals make math math.bitwise namespaces sequences
 specialized-arrays system threads tr windows windows.errors
 windows.handles windows.kernel32 windows.shell32 windows.time
-windows.types fry ;
+windows.types windows.winsock ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
 
@@ -206,8 +206,17 @@ M: windows (wait-to-write) ( port -- )
 M: windows (wait-to-read) ( port -- )
     [ dup handle>> refill ] with-destructors drop ;
 
+: make-fd-set ( socket -- fd_set )
+    fd_set <struct> swap 1array void* >c-array >>fd_array 1 >>fd_count ;
+
+: select-sets ( socket event -- read-fds write-fds except-fds )
+    [ make-fd-set ] dip +input+ = [ f f ] [ f swap f ] if ;
+
+CONSTANT: select-timeval S{ timeval { sec 0 } { usec 1000 } }
+
 M: windows wait-for-fd ( handle event -- )
-    2drop ;
+    [ file>> handle>> 1 swap ] dip select-sets select-timeval
+    select drop yield ;
 
 : console-app? ( -- ? ) GetConsoleWindow >boolean ;
 

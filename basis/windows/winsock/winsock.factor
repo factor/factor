@@ -159,7 +159,9 @@ M: sockaddr-in sockaddr>ip ( sockaddr -- string )
 M: sockaddr-in6 sockaddr>ip ( uchar-array -- string )
     addr>> [ >hex ] { } map-as 2 group [ concat ] map ":" join ;
 
-C-TYPE: fd_set
+STRUCT: fd_set
+    { fd_count uint }
+    { fd_array SOCKET[64] } ;
 
 LIBRARY: winsock
 

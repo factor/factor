@@ -1,10 +1,6 @@
-USING:
-    accessors
-    alien
-    io.ports
-    io.sockets.private io.sockets.secure io.sockets.secure.openssl
-    kernel
-    openssl openssl.libcrypto openssl.libssl ;
+USING: accessors alien io.ports io.sockets.private io.sockets.secure
+io.sockets.secure.openssl io.sockets.windows kernel locals openssl
+openssl.libcrypto openssl.libssl windows.winsock ;
 IN: io.sockets.secure.windows
 
 M: openssl ssl-supported? t ;
@@ -24,8 +20,9 @@ M: secure (get-local-address) ( handle remote -- sockaddr )
 
 M: secure parse-sockaddr addrspec>> parse-sockaddr <secure> ;
 
-M: secure establish-connection ( client-out remote -- )
-    [
-        [ handle>> file>> <output-port> ] [ addrspec>> ] bi* establish-connection
-    ]
-    [ secure-connection ] 2bi ;
+M:: secure establish-connection ( client-out addrspec -- )
+    client-out handle>> file>> :> socket
+    socket FIONBIO 1 set-ioctl-socket
+    socket <output-port> addrspec addrspec>> establish-connection
+    client-out addrspec secure-connection
+    socket FIONBIO 0 set-ioctl-socket ;
