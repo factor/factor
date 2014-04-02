@@ -4,6 +4,8 @@ kernel openssl.libcrypto openssl.libssl sequences system tools.test urls
 unix.ffi ;
 IN: io.sockets.secure.openssl.tests
 
+<< os windows? [ "windows.winsock" ] [ "unix.ffi" ] if use-vocab >>
+
 : new-ssl ( -- ssl )
     SSLv23_client_method SSL_CTX_new SSL_new ;
 
