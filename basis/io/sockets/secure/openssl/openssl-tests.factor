@@ -1,7 +1,10 @@
-USING: accessors alien http.client io.sockets io.sockets.private
-io.sockets.secure.openssl kernel openssl.libcrypto openssl.libssl
-sequences tools.test urls unix.ffi ;
+USING: accessors alien continuations http.client http.server io.files.temp
+io.servers io.sockets io.sockets.private io.sockets.secure
+io.sockets.secure.openssl kernel logging.server openssl.libcrypto openssl.libssl
+sequences system tools.test urls vocabs.parser ;
 IN: io.sockets.secure.openssl.tests
+
+<< os windows? [ "windows.winsock" ] [ "unix.ffi" ] if use-vocab >>
 
 : new-ssl ( -- ssl )
     SSLv23_client_method SSL_CTX_new SSL_new ;
@@ -23,19 +26,14 @@ IN: io.sockets.secure.openssl.tests
     dup SSL_connect drop SSL_get_peer_certificate subject-name
 ] unit-test
 
-[ "www.google.com" ] [
-    new-ssl
-    [
-        remote (client) drop nip handle>> handle>>
-        alien-address BIO_NOCLOSE BIO_new_socket dup SSL_set_bio
-    ]
-    [ SSL_connect drop ]
-    [ SSL_get_peer_certificate ] tri
-    subject-name
+[ t ] [
+    temp-directory [
+        <http-server> 8887 >>insecure f >>secure [
+            [ "https://localhost:8887" http-get ] [ drop t ] recover
+        ] with-threaded-server
+    ] with-log-root
 ] unit-test
 
-[ "google.com" ] [
-    URL" https://www.google.se" url-addr resolve-host first
-    [ ((client)) ] keep [ <ports> ] dip establish-connection
-    handle>> handle>> SSL_get_peer_certificate subject-name
+[ t ] [
+    [ "test" 33 <ssl-handle> handle>> check-subject-name ] [ drop t ] recover
 ] unit-test
