@@ -1,7 +1,7 @@
 USING: accessors alien continuations http.client http.server io.servers
 io.sockets io.sockets.private io.sockets.secure io.sockets.secure.openssl
 kernel openssl.libcrypto openssl.libssl sequences system tools.test urls
-unix.ffi ;
+vocabs.parser ;
 IN: io.sockets.secure.openssl.tests
 
 << os windows? [ "windows.winsock" ] [ "unix.ffi" ] if use-vocab >>
