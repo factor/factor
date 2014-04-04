@@ -3,7 +3,7 @@
 USING: accessors alien.c-types alien.data alien.strings arrays
 calendar.unix classes.struct combinators grouping
 io.encodings.utf8 io.files io.files.info io.files.info.unix
-io.files.unix kernel math sequences specialized-arrays
+io.files.unix libc kernel math sequences specialized-arrays
 system unix unix.getfsstat.macosx unix.statfs.macosx
 unix.statvfs.macosx ;
 SPECIALIZED-ARRAY: uint
