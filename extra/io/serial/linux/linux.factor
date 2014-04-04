@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.struct combinators io.backend.unix
-io.ports io.serial io.streams.duplex kernel literals math
+io.ports io.serial io.streams.duplex kernel libc literals math
 system unix unix.ffi io.serial.linux.ffi ;
 IN: io.serial.linux
 

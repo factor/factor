@@ -1,9 +1,7 @@
 ! Copyright (C) 2007, 2009 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations destructors io.files io.files.info
-io.backend kernel quotations system alien alien.accessors
-accessors vocabs combinators alien.c-types alien.data
-math ;
+USING: accessors alien.c-types alien.data combinators
+destructors io.backend io.files.info kernel math system vocabs ;
 IN: io.mmap
 
 TUPLE: mapped-file < disposable address handle length ;
