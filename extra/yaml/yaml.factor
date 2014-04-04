@@ -207,6 +207,7 @@ M: object emit-value ( emitter event obj -- ) emit-scalar ;
 : emit-set ( emitter event set -- )
     [ members ] [ cardinality f <array> ] bi zip concat emit-sequence ;
 
+M: f emit-value ( emitter event seq -- ) emit-scalar ;
 M: string emit-value ( emitter event seq -- ) emit-scalar ;
 M: byte-array emit-value ( emitter event seq -- ) emit-scalar ;
 M: sequence emit-value ( emitter event seq -- )
