@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data combinators
-destructors io.backend.unix kernel math.bitwise sequences
+destructors io.backend.unix libc kernel math.bitwise sequences
 specialized-arrays unix unix.kqueue unix.time assocs
 io.backend.unix.multiplexers classes.struct literals ;
 SPECIALIZED-ARRAY: kevent
