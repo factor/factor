@@ -1,6 +1,6 @@
 IN: libc.tests
-USING: libc libc.private tools.test namespaces assocs system
-destructors kernel combinators ;
+USING: destructors kernel libc libc.private namespaces
+tools.test ;
 
 100 malloc "block" set
 
