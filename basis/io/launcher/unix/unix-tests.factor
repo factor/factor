@@ -3,8 +3,8 @@ concurrency.promises continuations debugger.unix destructors io
 io.backend.unix io.directories io.encodings.ascii
 io.encodings.binary io.encodings.utf8 io.files io.files.temp
 io.launcher io.launcher.unix io.pathnames io.streams.duplex
-io.timeouts kernel locals math namespaces sequences threads
-tools.test unix unix.process ;
+io.timeouts kernel libc locals math namespaces sequences
+threads tools.test unix unix.process ;
 IN: io.launcher.unix.tests
 
 : arch-temp-file ( str -- str' )
