@@ -65,6 +65,20 @@ ${ test-objs } [ $ test-docs yaml-docs> ] unit-test
 ${ test-docs } [ $ test-objs >yaml-docs ] unit-test
 ${ test-docs } [ $ test-docs yaml-docs> >yaml-docs ] unit-test
 
+! Misc types
+CONSTANT: test-types { 1 t f 1.0 }
+CONSTANT: test-represented-types """--- !!seq
+- !!int 1
+- !!bool true
+- !!bool false
+- !!float 1.0
+...
+"""
+
+${ test-types } [ $ test-represented-types yaml> ] unit-test
+${ test-types } [ $ test-types >yaml yaml> ] unit-test
+
+
 ! Anchors
 CONSTANT: test-anchors """- &1 "1"
 - *1
