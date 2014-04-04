@@ -35,6 +35,7 @@ TUPLE: dlist
 
 M: dlist deque-empty? front>> not ; inline
 
+M: dlist-node equal? over dlist-node? [ [ obj>> ] same? ] [ 2drop f ] if ;
 M: dlist equal?
     over dlist? [
         [ front>> ] bi@
