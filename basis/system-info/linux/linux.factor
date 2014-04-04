@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax byte-arrays io
 io.encodings.string io.encodings.utf8 io.streams.byte-array
-kernel sequences splitting strings system system-info unix
+libc kernel sequences splitting strings system system-info unix
 unix.linux.proc math ;
 IN: system-info.linux
 

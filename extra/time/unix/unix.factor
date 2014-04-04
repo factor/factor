@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar classes.struct kernel math system time
-unix unix.time ;
+USING: accessors calendar classes.struct kernel libc math
+system time unix unix.time ;
 IN: time.unix
 
 : timestamp>timezone ( timestamp -- timezone )

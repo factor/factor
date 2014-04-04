@@ -3,7 +3,7 @@
 
 USING: alien alien.c-types alien.data alien.strings alien.syntax
 arrays assocs byte-arrays combinators core-foundation io.binary
-io.encodings.utf8 kernel math namespaces sequences system
+io.encodings.utf8 libc kernel math namespaces sequences system
 system-info unix ;
 
 IN: system-info.macosx
