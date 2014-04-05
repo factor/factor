@@ -415,7 +415,7 @@ Numbers: !!omap [ one: 1, two: 2, three : 3 ]
 """
 
 ${ construct-omap-obj } [ $ construct-omap-str yaml> ] unit-test
-${ construct-omap-obj } [ $ construct-omap-obj >yaml yaml> ] unit-test
+${ construct-omap-obj } [ construct-omap-obj >yaml yaml> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! construct-pairs
