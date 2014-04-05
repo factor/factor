@@ -95,6 +95,9 @@ CONSTANT: test-anchors-obj {
 ${ test-anchors-obj } [ $ test-anchors yaml> ] unit-test
 ${ test-anchors-obj } [ $ test-anchors-obj >yaml yaml> ] unit-test
 
+! Missing anchors
+[ "*foo" yaml> ] [ "No previous anchor" = ] must-fail-with
+
 ! Lifted from pyyaml
 ! http://pyyaml.org/browser/pyyaml/trunk/tests/data
 
