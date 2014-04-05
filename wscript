@@ -95,6 +95,12 @@ Task.TaskBase.exec_command = my_exec_command
 
 def options(ctx):
     ctx.load('compiler_c compiler_cxx')
+    ctx.add_option(
+        '--make-bootstrap-image',
+        action = 'store_true',
+        default = False,
+        help = 'Generate new boot images (requires Factor to be installed)'
+    )
 
 def configure(ctx):
     ctx.load('compiler_c compiler_cxx')
@@ -102,6 +108,11 @@ def configure(ctx):
     env = ctx.env
     dest_os = env.DEST_OS
     bits = get_bits(ctx)
+    opts = ctx.options
+
+    if opts.make_bootstrap_image:
+        ctx.find_program(APPNAME)
+    ctx.env.MAKE_BOOTSTRAP_IMAGE = opts.make_bootstrap_image
 
     cxx = ctx.env.COMPILER_CXX
     if dest_os == 'win32':
@@ -149,7 +160,7 @@ def configure(ctx):
         if bits == 64:
             env.CXXFLAGS += ['-m64']
         env.LINKFLAGS += ['-Wl,--no-as-needed', '-Wl,--export-dynamic']
-    pf = ctx.options.prefix
+    pf = opts.prefix
     if dest_os == 'win32':
         pf = pf.replace('\\', '\\\\')
     ctx.define('INSTALL_PREFIX', pf)
@@ -297,9 +308,8 @@ def build(ctx):
         install_path = libdir
         )
 
-    # Build shared lib on Windows, static on Linux.
-    # This is neede to trick waf into always building the dll after
-    # the exe.
+    # Build shared lib on Windows, static on Linux.  This is needed to
+    # trick waf into always building the dll after the exe.
     ctx.add_group()
     if dest_os == 'win32':
         func = ctx.shlib
@@ -317,22 +327,36 @@ def build(ctx):
         use = link_libs,
         linkflags = linkflags
     )
+    os_family = {'linux' : 'unix', 'win32' : 'windows'}[dest_os]
+    boot_image_name = 'boot.%s-x86.%s.image' % (os_family, bits)
+
+    # Since factor-lang needs to be run with the project root
+    # directory as cwd, that is where the boot image needs to be
+    # placed.
+    boot_image_path = '../%s' % boot_image_name
+
+    if ctx.env.MAKE_BOOTSTRAP_IMAGE:
+        params = [
+            '-resource-path=%s' % cwd.abspath(),
+            '-script',
+            '-e="USING: system bootstrap.image vocabs.refresh ; '
+            'refresh-all make-my-image"',
+        ]
+        ctx(
+            rule = '%s %s' % (ctx.env['FACTOR-LANG'], ' '.join(params)),
+            source = [],
+            target = boot_image_path
+        )
+    else:
+        source_image = 'boot-images/%s' % boot_image_name
+        ctx(
+            features = 'subst',
+            source = source_image,
+            target = boot_image_path,
+            is_copy = True
+        )
 
     # Build factor.image using the newly built executable.
-    os_family = {'linux' : 'unix', 'win32' : 'windows'}[dest_os]
-    source_image = 'boot-images/boot.%s-x86.%s.image' % (os_family, bits)
-
-    # On Windows, boot.image must reside in the projects root dir. Not
-    # sure if, or why, it is different on Linux. -resource-path
-    # doesn't seem to have much effect.
-    boot_image = {'win32' : '../boot.image', 'linux' : 'boot.image'}[dest_os]
-    ctx(
-        features = 'subst',
-        source = source_image,
-        target = boot_image,
-        is_copy = True
-    )
-
     factor_exe = {'linux' : APPNAME, 'win32' : '%s.com' % APPNAME}[dest_os]
 
     # The first image we build doesn't contain local changes for some
@@ -347,7 +371,7 @@ def build(ctx):
     ]
     ctx(
         rule = '${SRC[0].abspath()} ' + ' '.join(params),
-        source = [factor_exe, boot_image],
+        source = [factor_exe, boot_image_path],
         target = old_image
     )
 
