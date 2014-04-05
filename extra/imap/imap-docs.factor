@@ -1,9 +1,21 @@
-USING: calendar help.markup help.syntax sequences strings ;
+USING: calendar help.markup help.syntax sequences strings
+quotations ;
 IN: imap
 
 ARTICLE: "imap" "IMAP library"
 "The " { $vocab-link "imap" } " vocab implements a large part of the IMAP4rev1 client protocol."
 $nl
+"IMAP is primarily used for retrieving and managing email and folders on an IMAP server. Note that some IMAP servers, such as " { $snippet "imap.gmail.com" } ", require application-specific passwords."
+$nl
+"Configuration:"
+{ $subsections
+    imap-settings
+}
+"Combinators:"
+{ $subsections
+    with-imap
+    with-imap-settings
+}
 "Constructing an IMAP session:"
 { $subsections <imap4ssl> }
 "IMAP folder management:"
@@ -23,21 +35,20 @@ $nl
 { $examples
   { $code
     "USING: imap ; "
-    "\"imap-server\" <imap4ssl> [ \"mail@example.com\" \"password\" login drop ] with-stream"
+    """"imap.gmail.com" "email_address@gmail.com" "password" [ list-folders ] with-imap"""
   }
-  { $code
-    "USING: imap ; "
-    "\"imap-server\" <imap4ssl> ["
-    "    \"mail@example.com\" \"password\" login drop"
-    "    \"factor\" select-folder drop "
-    "    \"ALL\" \"\" search-mails"
-    "    \"(BODY[HEADER.FIELDS (SUBJECT)])\" fetch-mails"
-    "] with-stream 3 head ."
-    "{"
-    "    \"Subject: [Factor-talk] Wiki Tutorial\\r\\n\\r\\n\""
-    "    \"Subject: Re: [Factor-talk] font-size in listener\\r\\n\\r\\n\""
-    "    \"Subject: Re: [Factor-talk] Indentation width and other style guidelines\\r\\n\\r\\n\""
-    "}"
+  { $unchecked-example
+    """USING: imap namespaces ;
+    \\ imap-settings get-global [
+        "factor" select-folder drop
+        "ALL" "" search-mails
+        "(BODY[HEADER.FIELDS (SUBJECT)])" fetch-mails
+    ] with-imap-settings 3 head ."""
+    """{
+    "Subject: [Factor-talk] Wiki Tutorial"
+    "Subject: Re: [Factor-talk] font-size in listener"
+    "Subject: Re: [Factor-talk] Indentation width and other style guidelines"
+}"""
   }
 } ;
 
@@ -81,13 +92,12 @@ HELP: status-folder
 }
 { $description "Requests a collection of attributes for the specified folder." }
 { $examples
-  { $code
-    "USE: imap"
-    "\"imap-host\" <imap4ssl> [ "
-    "    \"email\" \"pwd\" login drop "
-    "    \"INBOX\" { \"MESSAGES\" \"UNSEEN\" } status-folder "
-    "] with-stream ."
-    "{ { \"MESSAGES\" 67 } { \"UNSEEN\" 18 } }"
+  { $unchecked-example
+    """USING: imap ;
+    \\ imap-settings get-global [
+        "INBOX" { "MESSAGES" "UNSEEN" } status-folder
+    ] with-imap-settings"""
+    """{ { "MESSAGES" 67 } { "UNSEEN" 18 } }"""
   }
 } ;
 
@@ -135,3 +145,42 @@ HELP: store-mail
   { "mail-flags" "Flags of mails after update" }
 }
 { $description "Updates the attributes of a set of mails." } ;
+
+HELP: imap-settings
+{ $var-description "A tuple for holding the host, email, and password for an IMAP account. Setting this information as a global variable in your .factor-rc or .factor-bootstrap-rc is recommended." }
+{ $examples
+    "Run the next example and click the link to edit your boot rc:"
+    { $unchecked-example
+
+        "USING: imap tools.scaffold ; "
+        "scaffold-factor-boot-rc"
+        ""
+     }
+    "Add the following settings to your bootstrap rc file:"
+    { $unchecked-example
+        "USING: imap namespaces ;"
+        """"imap.gmail.com" "foo@gmail.com" "password" <imap-settings> \\ imap-settings set-global"""
+        ""
+    }
+    "Run your boot rc again:"
+    { $unchecked-example
+        "USING: command-line ;"
+        "run-bootstrap-init"
+        ""
+    }
+}
+{ $see-also with-imap-settings } ;
+
+HELP: with-imap
+{ $values
+    { "host" string } { "email" string } { "password" string } { "quot" quotation }
+}
+{ $description "Logs into the IMAP server with the provided settings. The quotation should contain code to execute once authentication has aloready occurred." } ;
+
+HELP: with-imap-settings
+{ $values
+    { "imap-settings" imap-settings } { "quot" quotation }
+}
+{ $description "Logs into the IMAP server with the provided settings. The quotation should contain code to execute once authentication has aloready occurred." } ;
+
+{ with-imap with-imap-settings } related-words
