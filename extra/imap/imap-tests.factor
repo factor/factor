@@ -1,5 +1,5 @@
 USING: accessors arrays assocs calendar calendar.format combinators
-continuations formatting fry grouping.extras imap io.streams.duplex kernel
+continuations formatting fry grouping.extras imap io io.streams.duplex kernel
 math math.parser math.ranges math.statistics namespaces pcre random sequences
 sets sorting strings tools.test ;
 IN: imap.tests
@@ -27,167 +27,151 @@ SYMBOLS: email host password ;
 : sample-mail ( -- mail )
     "Fred Foobar <foobar@Blurdybloop.COM>" make-mail ;
 
-! Fails unless you have set the settings.
 : imap-login ( -- imap4 )
     host get <imap4ssl> dup [
         email get password get login drop
     ] with-stream* ;
 
-ERROR: host-not-set ;
-
-: get-test-host ( -- host )
-    host get dup [ host-not-set throw ] unless ;
-
-: ensure-host ( -- ) get-test-host drop ;
-
 : imap-test ( result quot -- )
-    ensure-host
     '[ imap-login _ with-stream ] unit-test ; inline
 
-[ t ] [
-    get-test-host <imap4ssl> duplex-stream?
-] unit-test
+{ email host password } [ get ] all? [
+    [ t ] [
+        host get <imap4ssl> duplex-stream?
+    ] unit-test
 
-[ t ] [
-    get-test-host <imap4ssl> [ capabilities ] with-stream
-    { "IMAP4rev1" "UNSELECT" "IDLE" "NAMESPACE" "QUOTA" } swap subset?
-] unit-test
+    [ t ] [
+        host get <imap4ssl> [ capabilities ] with-stream
+        { "IMAP4rev1" "UNSELECT" "IDLE" "NAMESPACE" "QUOTA" } swap subset?
+    ] unit-test
 
-[ "NO" ] [
-    [ get-test-host <imap4ssl> [ "dont@exist.com" "foo" login ] with-stream ]
-    [ ind>> ] recover
-] unit-test
+    [ "NO" ] [
+        [ host get <imap4ssl> [ "dont@exist.com" "foo" login ] with-stream ]
+        [ ind>> ] recover
+    ] unit-test
 
-[ "BAD" ] [
-    [ get-test-host <imap4ssl> [ f f login ] with-stream ] [ ind>> ] recover
-] unit-test
+    [ "BAD" ] [
+        [ host get <imap4ssl> [ f f login ] with-stream ] [ ind>> ] recover
+    ] unit-test
 
-[ f ] [
-    get-test-host <imap4ssl> [
-        email get password get login
-    ] with-stream empty?
-] unit-test
+    [ f ] [
+        host get <imap4ssl> [
+            email get password get login
+        ] with-stream empty?
+    ] unit-test
 
-! Newly created and then selected folder is empty.
-[ 0 { } ] [
-    10 random-ascii
-    [ create-folder ]
-    [ select-folder ]
-    [ delete-folder ] tri
-    "ALL" "" search-mails
-] imap-test
-
-! Create delete select again.
-[ 0 ] [
-    "örjan" [ create-folder ] [ select-folder ] [ delete-folder ] tri
-] imap-test
-
-! Test list folders
-[ t ] [
-    10 random-ascii
-    [ create-folder "*" list-folders length 0 > ] [ delete-folder ] bi
-] imap-test
-
-! Generate some mails for searching
-[ t t f f ] [
-    10 random-ascii {
+    ! Newly created and then selected folder is empty.
+    [ 0 { } ] [
+        10 random-ascii
         [ create-folder ]
-        [
-            '[ _ "(\\Seen)" now sample-mail append-mail drop ]
-            10 swap times
-        ]
-        [
-            select-folder drop
-            "ALL" "" search-mails
-            5 sample "(RFC822)" fetch-mails
-            [ [ string? ] all? ] [ length 5 = ] bi
-            "SUBJECT" "afternoon" search-mails empty?
-            "(SINCE \"01-Jan-2014\")" "" search-mails empty?
-        ]
-        [ delete-folder ]
-    } cleave
-] imap-test
+        [ select-folder ]
+        [ delete-folder ] tri
+        "ALL" "" search-mails
+    ] imap-test
 
-! Stat folder
-[ t ] [
-    10 random-ascii {
-        [ create-folder ]
-        [
-            '[ _ "(\\Seen)" now sample-mail append-mail drop ]
-            10 swap times
-        ]
-        [
-            { "MESSAGES" "UNSEEN" } status-folder
-            [ "MESSAGES" of 0 > ] [ "UNSEEN" of 0 >= ] bi and
-        ]
-        [ delete-folder ]
-    } cleave
-] imap-test
+    ! Create delete select again.
+    [ 0 ] [
+        "örjan" [ create-folder ] [ select-folder ] [ delete-folder ] tri
+    ] imap-test
 
-! Rename folder
-[ ] [
-    "日本語" [ create-folder ] [
-        "ascii-name" [ rename-folder ] [ delete-folder ] bi
-    ] bi
-] imap-test
+    ! Test list folders
+    [ t ] [
+        10 random-ascii
+        [ create-folder "*" list-folders length 0 > ] [ delete-folder ] bi
+    ] imap-test
 
-! Create a folder hierarchy
-[ t ] [
-    "*" list-folders length
-    "foo/bar/baz/日本語" [
-        create-folder "*" list-folders length 4 - =
-    ] [ delete-folder ] bi
-] imap-test
+    ! Generate some mails for searching
+    [ t t f f ] [
+        10 random-ascii {
+            [ create-folder ]
+            [
+                '[ _ "(\\Seen)" now sample-mail append-mail drop ]
+                10 swap times
+            ]
+            [
+                select-folder drop
+                "ALL" "" search-mails
+                5 sample "(RFC822)" fetch-mails
+                [ [ string? ] all? ] [ length 5 = ] bi
+                "SUBJECT" "afternoon" search-mails empty?
+                "(SINCE \"01-Jan-2014\")" "" search-mails empty?
+            ]
+            [ delete-folder ]
+        } cleave
+    ] imap-test
 
-! A gmail compliant way of creating a folder hierarchy.
-[ ] [
-    "foo/bar/baz/boo" "/" split { } [ suffix ] cum-map [ "/" join ] map
-    [ [ create-folder ] each ] [ [ delete-folder ] each ] bi
-] imap-test
+    ! Stat folder
+    [ t ] [
+        10 random-ascii {
+            [ create-folder ]
+            [
+                '[ _ "(\\Seen)" now sample-mail append-mail drop ]
+                10 swap times
+            ]
+            [
+                { "MESSAGES" "UNSEEN" } status-folder
+                [ "MESSAGES" of 0 > ] [ "UNSEEN" of 0 >= ] bi and
+            ]
+            [ delete-folder ]
+        } cleave
+    ] imap-test
 
-[ ] [
-    "örjan" {
-        [ create-folder ]
-        [ select-folder drop ]
-        ! Append mail with a seen flag
-        [ "(\\Seen)" now sample-mail append-mail drop ]
-        ! And one without
-        [ "" now sample-mail append-mail drop ]
-        [ delete-folder ]
-    } cleave
-] imap-test
+    ! Rename folder
+    [ ] [
+        "日本語" [ create-folder ] [
+            "ascii-name" [ rename-folder ] [ delete-folder ] bi
+        ] bi
+    ] imap-test
 
-! Exercise store-mail
-[ 5 ] [
-    "INBOX" select-folder drop "ALL" "" search-mails
-    5 sample "+FLAGS" "(\\Recent)" store-mail length
-] imap-test
+    ! Create a folder hierarchy
+    [ t ] [
+        "*" list-folders length
+        "foo/bar/baz/日本語" [
+            create-folder "*" list-folders length 4 - =
+        ] [ delete-folder ] bi
+    ] imap-test
 
-! Internal date parsing
-[ "Mon, 19 Aug 2013 23:16:36 GMT" ] [
-    "19-Aug-2013 23:16:36 +0000" internal-date>timestamp timestamp>rfc822
-] unit-test
+    ! A gmail compliant way of creating a folder hierarchy.
+    [ ] [
+        "foo/bar/baz/boo" "/" split { } [ suffix ] cum-map [ "/" join ] map
+        [ [ create-folder ] each ] [ [ delete-folder ] each ] bi
+    ] imap-test
 
-[ "19-Aug-2014 23:16:36 GMT" ] [
-    "Mon, 19 Aug 2014 23:16:36 GMT" rfc822>timestamp timestamp>internal-date
-] unit-test
+    [ ] [
+        "örjan" {
+            [ create-folder ]
+            [ select-folder drop ]
+            ! Append mail with a seen flag
+            [ "(\\Seen)" now sample-mail append-mail drop ]
+            ! And one without
+            [ "" now sample-mail append-mail drop ]
+            [ delete-folder ]
+        } cleave
+    ] imap-test
 
-! Test parsing an INTERNALDATE from a real mail.
-[ t ] [
-    "INBOX" select-folder drop
-    "ALL" "" search-mails
-    "(INTERNALDATE)" fetch-mails first
-    "\"([^\"]+)\"" findall first second last
-    internal-date>timestamp timestamp?
-] imap-test
+    ! Exercise store-mail
+    [ 5 ] [
+        "INBOX" select-folder drop "ALL" "" search-mails
+        5 sample "+FLAGS" "(\\Recent)" store-mail length
+    ] imap-test
 
-! Just an interesting verb to gmail thread mails. Wonder if you can
-! avoid the double fetch-mails?
-: threaded-mailbox ( uids -- threads )
-    [
-        "(X-GM-THRID)" fetch-mails [
-            "\\d+" findall [ first last string>number
-            ] map
-        ] map
-    ] [ "(BODY[HEADER.FIELDS (SUBJECT)])" fetch-mails ] bi zip
-    [ first first ] [ sort-with ] [ group-by ] bi ;
+    ! Internal date parsing
+    [ "Mon, 19 Aug 2013 23:16:36 GMT" ] [
+        "19-Aug-2013 23:16:36 +0000" internal-date>timestamp timestamp>rfc822
+    ] unit-test
+
+    [ "19-Aug-2014 23:16:36 GMT" ] [
+        "Mon, 19 Aug 2014 23:16:36 GMT" rfc822>timestamp timestamp>internal-date
+    ] unit-test
+
+    ! Test parsing an INTERNALDATE from a real mail.
+    [ t ] [
+        "INBOX" select-folder drop
+        "ALL" "" search-mails
+        "(INTERNALDATE)" fetch-mails first
+        "\"([^\"]+)\"" findall first second last
+        internal-date>timestamp timestamp?
+    ] imap-test
+] [
+    "All tests skipped because email account is not configured." write nl
+] if
