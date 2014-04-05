@@ -168,3 +168,19 @@ PRIVATE>
 : store-mail ( uids command flags -- mail-flags )
     [ comma-list ] 2dip "UID STORE %s %s %s" sprintf "" command-response
     parse-store-mail ;
+
+! High level API
+
+: with-imap ( host email password quot -- )
+    [ <imap4ssl> ] 3dip '[ _ _ login drop @ ] with-stream ; inline
+
+TUPLE: imap-settings host email password ;
+
+: <imap-settings> ( host email password -- obj )
+    imap-settings new
+        swap >>password
+        swap >>email
+        swap >>host ; inline
+    
+: with-imap-settings ( imap-settings quot -- )
+    [ [ host>> ] [ email>> ] [ password>> ] tri ] dip with-imap ; inline
