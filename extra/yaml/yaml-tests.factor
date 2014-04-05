@@ -1,6 +1,7 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs linked-assocs literals tools.test yaml ;
+USING: assocs kernel linked-assocs literals locals sequences
+tools.test yaml yaml.private grouping ;
 IN: yaml.tests
 
 ! TODO real conformance tests here
@@ -94,9 +95,63 @@ CONSTANT: test-anchors-obj {
 
 ${ test-anchors-obj } [ $ test-anchors yaml> ] unit-test
 ${ test-anchors-obj } [ $ test-anchors-obj >yaml yaml> ] unit-test
+! and test indentity
+{ t } [ $ test-anchors yaml> 2 group [ all-eq? ] all? ] unit-test
+{ t } [ $ test-anchors yaml> >yaml yaml> 2 group [ all-eq? ] all? ] unit-test
+
+! Anchors and fancy types
+CONSTANT: fancy-anchors """- &1 [ "foo" ]
+- &2 !!set
+  ? *1
+- *2
+"""
+CONSTANT: fancy-anchors-obj {
+  { "foo" } HS{ { "foo" } } HS{ { "foo" } }
+}
+${ fancy-anchors-obj } [ $ fancy-anchors yaml> ] unit-test
+${ fancy-anchors-obj } [ $ fancy-anchors-obj >yaml yaml> ] unit-test
 
 ! Missing anchors
 [ "*foo" yaml> ] [ "No previous anchor" = ] must-fail-with
+
+! Simple Recursive output
+: simple-recursive-list ( -- obj )
+  { f } clone [ 0 over set-nth ] keep ;
+CONSTANT: simple-recursive-list-anchored T{ yaml-anchor f "0" {
+  T{ yaml-alias f "0" }
+} }
+CONSTANT: simple-recursive-list-yaml """&0
+- *0"""
+
+${ simple-recursive-list-anchored } [ simple-recursive-list replace-identities ] unit-test
+${ simple-recursive-list-anchored } [ $ simple-recursive-list-yaml yaml> replace-identities ] unit-test
+${ simple-recursive-list-anchored } [ simple-recursive-list >yaml yaml> replace-identities ] unit-test
+
+! many recursive outputs
+: many-recursive-objects ( -- obj )
+  4 [ simple-recursive-list ] replicate ;
+CONSTANT: many-recursive-objects-anchored {
+  T{ yaml-anchor f "0" { T{ yaml-alias f "0" } } }
+  T{ yaml-anchor f "1" { T{ yaml-alias f "1" } } }
+  T{ yaml-anchor f "2" { T{ yaml-alias f "2" } } }
+  T{ yaml-anchor f "3" { T{ yaml-alias f "3" } } }
+}
+
+${ many-recursive-objects-anchored } [ many-recursive-objects replace-identities ] unit-test
+
+! Advanced recursive outputs
+:: transitive-recursive-objects ( -- obj )
+  { f } :> list
+  HS{ list } :> set
+  H{ { set list } } :> hash
+  hash 0 list set-nth
+  list ;
+CONSTANT: transitive-recursive-objects-anchored T{ yaml-anchor f "0" {
+  H{ { HS{ T{ yaml-alias f "0" } } T{ yaml-alias f "0" } } }
+} }
+
+${ transitive-recursive-objects-anchored } [ transitive-recursive-objects replace-identities ] unit-test
+
 
 ! Lifted from pyyaml
 ! http://pyyaml.org/browser/pyyaml/trunk/tests/data
