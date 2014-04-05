@@ -4,9 +4,6 @@ math math.parser math.ranges math.statistics namespaces pcre random sequences
 sets sorting strings tools.test ;
 IN: imap.tests
 
-! Set these to your email account.
-SYMBOLS: email host password ;
-
 : random-ascii ( n -- str )
     [ CHAR: a CHAR: z [a,b] random ] "" replicate-as ;
 
@@ -27,22 +24,13 @@ SYMBOLS: email host password ;
 : sample-mail ( -- mail )
     "Fred Foobar <foobar@Blurdybloop.COM>" make-mail ;
 
-! Fails unless you have set the settings.
-: imap-login ( -- imap4 )
-    host get <imap4ssl> dup [
-        email get password get login drop
-    ] with-stream* ;
-
-ERROR: host-not-set ;
+ERROR: no-imap-test-host ;
 
 : get-test-host ( -- host )
-    host get dup [ host-not-set throw ] unless ;
-
-: ensure-host ( -- ) get-test-host drop ;
+    \ imap-settings get-global host>> [ no-imap-test-host ] unless* ;
 
 : imap-test ( result quot -- )
-    ensure-host
-    '[ imap-login _ with-stream ] unit-test ; inline
+    '[ \ imap-settings get-global _ with-imap-settings ] unit-test ; inline
 
 [ t ] [
     get-test-host <imap4ssl> duplex-stream?
@@ -62,11 +50,7 @@ ERROR: host-not-set ;
     [ get-test-host <imap4ssl> [ f f login ] with-stream ] [ ind>> ] recover
 ] unit-test
 
-[ f ] [
-    get-test-host <imap4ssl> [
-        email get password get login
-    ] with-stream empty?
-] unit-test
+[ ] [ \ imap-settings get-global [ ] with-imap-settings ] unit-test
 
 ! Newly created and then selected folder is empty.
 [ 0 { } ] [
