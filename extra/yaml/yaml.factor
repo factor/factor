@@ -16,7 +16,8 @@ SYMBOL: anchors
 : ?register-anchor ( obj event -- obj )
     dupd anchor>> [ anchors get set-at ] [ drop ] if* ;
 : deref-anchor ( event -- obj )
-    data>> alias>> anchor>> anchors get at ;
+    data>> alias>> anchor>> anchors get at*
+    [ "No previous anchor" throw ] unless ;
 
 : event>scalar ( event -- obj )
     data>> scalar>>
