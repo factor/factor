@@ -67,7 +67,6 @@ DEFER: parse-mapping
     dup type>> {
         { YAML_SEQUENCE_START_EVENT [ (parse-sequence) ] }
         { YAML_MAPPING_START_EVENT [ (parse-mapping) ] }
-        { YAML_ALIAS_EVENT [ 2nip deref-anchor ] }
         [ throw ]
     } case ;
 
