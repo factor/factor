@@ -28,7 +28,7 @@ IN: io.sockets.secure.openssl.tests
 
 [ "www.google.com" ] [
     new-ssl dup remote ssl-socket-connect dup SSL_set_bio
-    dup SSL_connect drop SSL_get_peer_certificate subject-name
+    dup SSL_connect -1 = [ "SSL_connect failed in unit test" ] [ SSL_get_peer_certificate subject-name ] if
 ] unit-test
 
 [ t ] [
