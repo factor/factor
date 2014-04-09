@@ -23,6 +23,7 @@ T{ error-type-holder
    { icon "vocab:ui/tools/error-list/icons/help-lint-error.tiff" }
    { quot [ lint-failures get values ] }
    { forget-quot [ lint-failures get delete-at ] }
+   { fatal? f }
 } define-error-type
 
 M: help-lint-error error-type drop +help-lint-failure+ ;

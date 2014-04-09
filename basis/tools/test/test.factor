@@ -26,6 +26,7 @@ T{ error-type-holder
    { plural "unit test failures" }
    { icon "vocab:ui/tools/error-list/icons/unit-test-error.tiff" }
    { quot [ test-failures get ] }
+   { fatal? f }
 } define-error-type
 
 SYMBOL: verbose-tests?
