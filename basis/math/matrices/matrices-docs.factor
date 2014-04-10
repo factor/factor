@@ -47,6 +47,17 @@ HELP: m+
   }
 } ;
 
+HELP: m-
+{ $values { "m" sequence } { "m" sequence } { "m" sequence } }
+{ $description "Subtracts the matrices component-wise." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "{ { 5 9 } { 15 17 } } { { 3 2 } { 4 9 } } m- ."
+    "{ { 2 7 } { 11 8 } }"
+  }
+} ;
+
 HELP: kron
 { $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
 { $description "Calculates the Kronecker product of two matrices." }
