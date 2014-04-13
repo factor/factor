@@ -49,7 +49,7 @@ $nl
 
 HELP: <buffer>
 { $values { "n" "a non-negative integer" } { "buffer" buffer } }
-{ $description "Creates a buffer with an initial capacity of " { $snippet "n" } " bytes." } ;
+{ $description "Allocates a buffer with an initial capacity of " { $snippet "n" } " bytes." } ;
 
 HELP: buffer-reset
 { $values { "n" "a non-negative integer" } { "buffer" buffer } }
@@ -72,8 +72,8 @@ HELP: buffer-read
 { $description "Collects a byte array of " { $snippet "n" } " bytes starting from the buffer's current position, and advances the position accordingly. If there are less than " { $snippet "n" } " bytes available, the output is truncated." }
 { $examples
   { $example
-    "USING: io.buffers ;"
-    "5 100 <buffer> B{ 7 14 21 } over >buffer buffer-read ."
+    "USING: destructors io.buffers kernel prettyprint ;"
+    "5 100 <buffer> [ B{ 7 14 21 } over >buffer buffer-read ] with-disposal ."
     "B{ 7 14 21 }"
   }
 } ;
@@ -83,8 +83,8 @@ HELP: buffer-length
 { $description "Outputs the number of unconsumed bytes in the buffer." }
 { $examples
   { $example
-    "USING: io.buffers ;"
-    "100 <buffer> B{ 7 14 21 } over >buffer buffer-length ."
+    "USING: destructors io.buffers kernel prettyprint ;"
+    "100 <buffer> [ B{ 7 14 21 } over >buffer buffer-length ] with-disposal ."
     "3"
   }
 } ;
@@ -94,8 +94,8 @@ HELP: buffer-capacity
 { $description "Outputs the buffer's maximum capacity before growing." }
 { $examples
   { $example
-    "USING: io.buffers ;"
-    "100 <buffer> buffer-capacity ."
+    "USING: destructors io.buffers prettyprint ;"
+    "100 <buffer> [ buffer-capacity ] with-disposal ."
     "100"
   }
 } ;
@@ -115,8 +115,8 @@ HELP: byte>buffer
 { $warning "This word will corrupt memory if the buffer is full." }
 { $examples
   { $example
-    "USING: io.buffers ;"
-    "100 <buffer> 237 over byte>buffer buffer-pop ."
+    "USING: destructors io.buffers kernel prettyprint ;"
+    "100 <buffer> [ 237 over byte>buffer buffer-pop ] with-disposal ."
     "237"
   }
 } ;

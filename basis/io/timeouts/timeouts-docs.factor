@@ -9,8 +9,8 @@ HELP: set-timeout
 { $values { "dt/f" { $maybe duration } } { "obj" object } }
 { $contract "Sets an object's timeout." }
 { $examples "Waits five seconds for a process that sleeps for ten seconds:"
-  { $example
-    "USING: calendar io.launcher io.timeouts ;"
+  { $unchecked-example
+    "USING: calendar io.launcher io.timeouts kernel ;"
     "\"sleep 10\" >process 5 seconds over set-timeout run-process"
     "Process was killed as a result of a call to"
     "kill-process, or a timeout"
