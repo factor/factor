@@ -1,19 +1,15 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs combinators help help.crossref
+USING: accessors arrays assocs combinators fuel.eval help help.crossref
 help.markup help.topics io io.streams.string kernel make namespaces
 parser prettyprint sequences summary help.vocabs
-vocabs vocabs.loader vocabs.hierarchy vocabs.metadata words see
-listener ;
+vocabs vocabs.loader vocabs.hierarchy vocabs.metadata vocabs.parser words see
+listener sets ;
 FROM: vocabs.hierarchy => child-vocabs ;
 IN: fuel.help
 
 <PRIVATE
-
-: fuel-find-word ( name -- word/f )
-    [ [ name>> ] dip = ] curry all-words swap filter
-    dup empty? not [ first ] [ drop f ] if ;
 
 : fuel-value-str ( word -- str )
     [ pprint-short ] with-string-writer ; inline
@@ -92,12 +88,12 @@ SYMBOL: describe-words
 PRIVATE>
 
 : (fuel-word-help) ( name -- elem )
-    fuel-find-word [ [ auto-use? on (fuel-word-element) ] with-scope ] [ f ] if* ;
+    search [ [ auto-use? on (fuel-word-element) ] with-scope ] [ f ] if* ;
 
 : (fuel-word-synopsis) ( word usings -- str/f )
     [
         [ lookup-vocab ] filter interactive-vocabs [ append ] change
-        fuel-find-word [ synopsis ] [ f ] if*
+        search [ synopsis ] [ f ] if*
     ] with-scope ;
 
 : (fuel-word-see) ( word -- elem )
@@ -105,7 +101,7 @@ PRIVATE>
     [ [ see ] with-string-writer \ $code swap 2array ] bi 3array ; inline
 
 : (fuel-word-def) ( name -- str )
-    fuel-find-word [ [ def>> pprint ] with-string-writer ] [ f ] if* ; inline
+    search [ [ def>> pprint ] with-string-writer ] [ f ] if* ; inline
 
 : (fuel-vocab-summary) ( name -- str ) >vocab-link summary ; inline
 
