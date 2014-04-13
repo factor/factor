@@ -12,7 +12,7 @@ HELP: error-type-holder
     { { $slot "icon" } { "path to an icon image representing this error type." } }
     { { $slot "quot" } { "quotation that produces a list of all errors of this type." } }
     { { $slot "forget-quot" } { "a quotation that removes errors of this type for a given word." } }
-    { { $slot "fatal?" } { "whether the error is fatal or not. default " { $snippet t } "." } }
+    { { $slot "fatal?" } { "whether the error is fatal or not. default " { $link t } "." } }
   }
 } ;
 
@@ -29,12 +29,14 @@ HELP: all-errors
 { $description "Lists all errors in the system." } ;
 
 HELP: error-file
+{ $values { "error" "an error" } { "file" "a file path" } }
 { $description "File in which the error occurred." } ;
 
 HELP: <definition-error>
 { $values
   { "error" "an error." }
   { "definition" "an asset that contains the error." }
-  { "class" "a tuple class deriving " { $snippet source-file-error } "." }
+  { "class" "a tuple class deriving source-file-error." }
+  { "source-file-error" source-file-error }
 }
-{ $description "Creates a new " { $snippet source-file-error } " instance." } ;
+{ $description "Creates a new " { $link source-file-error } " instance." } ;

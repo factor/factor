@@ -948,8 +948,9 @@ HELP: head?
 { $description "Tests if " { $snippet "seq" } " starts with " { $snippet "begin" } ". If " { $snippet "begin" } " is longer than " { $snippet "seq" } ", this word outputs " { $link f } "." }
 { $examples
   { $example
-    "root-cache get keys [ \"help.l\" head? ] filter ."
-    "{ \"help.lint.checks\" \"help.lint.private\" \"help.lint\" }"
+    "USING: prettyprint sequences ;"
+    "{ \"accept\" \"adept\" \"advance\" \"advice\" \"affect\" } [ \"ad\" head? ] filter ."
+    "{ \"adept\" \"advance\" \"advice\" }"
   }
 } ;
 

@@ -1,5 +1,4 @@
 USING: help.markup help.syntax math sequences ;
-
 IN: math.matrices
 
 HELP: zero-matrix
@@ -15,7 +14,7 @@ HELP: identity-matrix
 { $description "Creates an identity matrix of size " { $snippet "n x n" } ", where the diagonal values are all ones." } ;
 
 HELP: m.v
-{ $values { "m" sequence } { "v" sequence } { "v" sequence } }
+{ $values { "m" sequence } { "v" sequence } }
 { $description "Computes the dot product between a matrix and a vector." }
 { $examples
   { $example
@@ -26,7 +25,7 @@ HELP: m.v
 } ;
 
 HELP: m.
-{ $values { "m" sequence } { "m" sequence } { "m" sequence } }
+{ $values { "m" sequence } }
 { $description "Computes the dot product between two matrices, i.e multiplies them." }
 { $examples
   { $example
@@ -37,7 +36,7 @@ HELP: m.
 } ;
 
 HELP: m+
-{ $values { "m" sequence } { "m" sequence } { "m" sequence } }
+{ $values { "m" sequence } }
 { $description "Adds the matrices component-wise." }
 { $examples
   { $example
@@ -48,7 +47,7 @@ HELP: m+
 } ;
 
 HELP: m-
-{ $values { "m" sequence } { "m" sequence } { "m" sequence } }
+{ $values { "m" sequence } }
 { $description "Subtracts the matrices component-wise." }
 { $examples
   { $example
