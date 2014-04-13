@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax quotations kernel io io.files
-math calendar ;
+USING: calendar help.markup help.syntax io io.files kernel literals math
+quotations sequences ;
 IN: io.launcher
 
 ARTICLE: "io.launcher.command" "Specifying a command"
@@ -101,9 +101,9 @@ HELP: current-process-handle
 { $description "Returns the handle of the current process." }
 { $examples
   { $example
-    "USING: io.launcher ;"
-    "current-process-handle ."
-    "6881"
+    "USING: io.launcher math prettyprint ;"
+    "current-process-handle number? ."
+    "t"
   }
 } ;
 
@@ -117,16 +117,9 @@ HELP: run-process
 { $description "Launches a process. The object can either be a string, a sequence of strings or a " { $link process } ". See " { $link "io.launcher.descriptors" } " for details." }
 { $examples
   { $example
-    "USING: io.launcher ;"
+    "USING: io.launcher prettyprint ;"
     "\"pwd\" run-process ."
-    "/tmp"
-    "T{ process"
-    "    { command \"pwd\" }"
-    "    { environment H{ } }"
-    "    { environment-mode +append-environment+ }"
-    "    { group +same-group+ }"
-    "    { status 0 }"
-    "}"
+    "T{ process\n    { command \"pwd\" }\n    { environment H{ } }\n    { environment-mode +append-environment+ }\n    { group +same-group+ }\n    { status 0 }\n}"
   }
 }
 { $notes "The output value can be passed to " { $link wait-for-process } " to get an exit code." } ;
@@ -150,20 +143,23 @@ HELP: try-process
 { $description "Launches a process and waits for it to complete. If it exits with a non-zero status code, throws a " { $link process-failed } " error." }
 { $examples
   { $example
-    "USING: continuations io.launcher ;"
-    "[ \"ls --invalid-flag\" try-process ] [ ] recover ."
-    "ls: unknown flag \"--invalid-flag\""
-    "Try with ”ls --help” for more information."
-    "T{ process-failed"
-    "    { process"
-    "         T{ process"
-    "         { command \"ls --invalid-flag\" }"
-    "         { environment H{ } }"
-    "         { environment-mode +append-environment+ }"
-    "         { group +same-group+ }"
-    "         { status 2 }"
-    "    }"
-    "}"
+    "USING: continuations io.launcher prettyprint ;"
+    "[ \"i-dont-exist\" try-process ] [ ] recover ."
+    $[
+        {
+            "T{ process-failed"
+            "    { process"
+            "        T{ process"
+            "            { command \"i-dont-exist\" }"
+            "            { environment H{ } }"
+            "            { environment-mode +append-environment+ }"
+            "            { group +same-group+ }"
+            "            { status 255 }"
+            "        }"
+            "    }"
+            "}"
+        } "\n" join
+    ]
   }
 } ;
 
@@ -176,6 +172,7 @@ HELP: kill-process
   { $example
     "USING: io.launcher ;"
     "\"cat\" run-detached kill-process"
+    ""
   }
 } ;
 
@@ -229,8 +226,8 @@ HELP: with-process-reader
 }
 { $description "Launches a process and redirects its output via a pipe. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to this pipe." }
 { $examples
-  { $example
-    "USING: io.launcher ;"
+  { $unchecked-example
+    "USING: io.launcher prettyprint ;"
     "\"ls -dl /etc\" utf8 [ contents ] with-process-reader ."
     "\"drwxr-xr-x 213 root root 12288 mar 11 18:52 /etc\\n\""
   }
