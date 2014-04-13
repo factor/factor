@@ -662,7 +662,7 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
 ;;; USING/IN:
 
-(defvar-local factor-current-vocab-function 'factor-find-in)
+(defvar-local factor-current-vocab-function 'factor-find-vocab-name)
 
 (defsubst factor-current-vocab ()
   (funcall factor-current-vocab-function))
@@ -671,6 +671,16 @@ source/docs/tests file. When set to false, you'll be asked only once."
   (save-excursion
     (when (re-search-backward factor-current-vocab-regex nil t)
       (match-string-no-properties 1))))
+
+(defun factor-in-private? ()
+  "t if point is withing a PRIVATE-block, nil otherwise."
+  (save-excursion
+    (when (re-search-backward "\\_<<?PRIVATE>?\\_>" nil t)
+      (string= (match-string-no-properties 0) "<PRIVATE"))))
+
+(defun factor-find-vocab-name ()
+  "name of the vocab with possible .private suffix"
+  (concat (factor-find-in) (if (factor-in-private?) ".private" "")))
 
 (defvar-local factor-usings-function 'factor-find-usings)
 
