@@ -1,5 +1,5 @@
 USING: definitions help.markup help.syntax kernel parser
-kernel.private vocabs classes quotations
+kernel.private vocabs classes quotations sequences
 strings effects compiler.units ;
 IN: words
 
@@ -347,13 +347,13 @@ HELP: deprecated?
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
 HELP: subwords
-{ $values { "word" word } }
+{ $values { "word" word } { "seq" sequence } }
 { $description "Lists all specializations for the given word." }
 { $examples
   { $example
-    "USING: math.functions ;"
-    "clear \ sin subwords ."
-    "{ M\ object sin M\ complex sin M\ real sin M\ float sin }"
+    "USING: math.functions prettyprint words ;"
+    "\\ sin subwords ."
+    "{ M\\ object sin M\\ complex sin M\\ real sin M\\ float sin }"
   }
 }
 { $notes "Outputs " { $link f } " if the word isn't generic." } ;

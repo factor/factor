@@ -3,12 +3,12 @@ USING: help.markup help.syntax math sequences ;
 IN: math.matrices.elimination
 
 HELP: inverse
-{ $values { "matrix" sequence } { "matrix" sequence } }
+{ $values { "matrix" sequence } }
 { $description "Computes the multiplicative inverse of a matrix. Assuming the matrix is invertible." }
 { $examples
   "A matrix multiplied by its inverse is the identity matrix."
   { $example
-    "USING: math.matrices math.matrices.elimination prettyprint ;"
+    "USING: kernel math.matrices math.matrices.elimination prettyprint ;"
     "{ { 3 4 } { 7 9 } } dup inverse m. 2 identity-matrix = ."
     "t"
   }
