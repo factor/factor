@@ -157,11 +157,9 @@ HELP: url-addr
         "T{ inet { host \"ftp.cdrom.com\" } { port 21 } }"
     }
     { $example
-        "USING: prettyprint urls ;"
+        "USING: io.sockets.secure prettyprint urls ;"
         "URL\" https://google.com/\" url-addr ."
-        "T{ secure"
-        "{ addrspec T{ inet { host \"google.com\" } { port 443 } } }"
-        "}"
+        "T{ secure\n    { addrspec T{ inet { host \"google.com\" } { port 443 } } }\n}"
     }
 } ;
 

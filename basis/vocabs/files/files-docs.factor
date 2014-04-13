@@ -1,4 +1,4 @@
-USING: help.markup help.syntax strings ;
+USING: help.markup help.syntax literals sequences strings ;
 IN: vocabs.files
 
 HELP: vocab-tests-path
@@ -18,13 +18,17 @@ HELP: vocab-files
 { $description "Outputs a sequence of files comprising this vocabulary, or " { $link f } " if the vocabulary does not have a directory on disk." }
 { $examples
   { $example
-    "USING: vocabs.files ; "
+    "USING: prettyprint vocabs.files ; "
     "\"alien.libraries\" vocab-files ."
-    "{"
-    "    \"resource:basis/alien/libraries/libraries.factor\""
-    "    \"resource:basis/alien/libraries/libraries-docs.factor\""
-    "    \"resource:basis/alien/libraries/libraries-tests.factor\""
-    "}"
+    $[
+        {
+            "{"
+            "    \"resource:basis/alien/libraries/libraries.factor\""
+            "    \"resource:basis/alien/libraries/libraries-docs.factor\""
+            "    \"resource:basis/alien/libraries/libraries-tests.factor\""
+            "}"
+        } "\n" join
+    ]
   }
 } ;
 
@@ -33,17 +37,22 @@ HELP: vocab-tests
 { $description "Outputs a sequence of pathnames where the unit tests for " { $snippet "vocab" } " are located." }
 { $examples
   { $example
-    "USING: vocabs.files ; "
+    "USING: prettyprint vocabs.files ; "
     "\"xml\" vocab-tests ."
-    "{"
-    "    \"resource:basis/xml/tests/xmode-dtd.factor\""
-    "    \"resource:basis/xml/tests/test.factor\""
-    "    \"resource:basis/xml/tests/state-parser-tests.factor\""
-    "    \"resource:basis/xml/tests/soap.factor\""
-    "    \"resource:basis/xml/tests/templating.factor\""
-    "    \"resource:basis/xml/tests/encodings.factor\""
-    "    \"resource:basis/xml/tests/xmltest.factor\""
-    "    \"resource:basis/xml/tests/funny-dtd.factor\""
-    "}"
+    $[
+        {
+            "{"
+            "    \"resource:basis/xml/tests/xmode-dtd.factor\""
+            "    \"resource:basis/xml/tests/test.factor\""
+            "    \"resource:basis/xml/tests/state-parser-tests.factor\""
+            "    \"resource:basis/xml/tests/soap.factor\""
+            "    \"resource:basis/xml/tests/templating.factor\""
+            "    \"resource:basis/xml/tests/encodings.factor\""
+            "    \"resource:basis/xml/tests/xmltest.factor\""
+            "    \"resource:basis/xml/tests/funny-dtd.factor\""
+            "    \"resource:basis/xml/tests/cdata.factor\""
+            "}"
+        } "\n" join
+    ]
   }
 } ;
