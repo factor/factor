@@ -679,8 +679,9 @@ source/docs/tests file. When set to false, you'll be asked only once."
       (string= (match-string-no-properties 0) "<PRIVATE"))))
 
 (defun factor-find-vocab-name ()
-  "name of the vocab with possible .private suffix"
+  "Name of the vocab with possible .private suffix"
   (concat (factor-find-in) (if (factor-in-private?) ".private" "")))
+
 
 (defvar-local factor-usings-function 'factor-find-usings)
 
@@ -694,11 +695,12 @@ source/docs/tests file. When set to false, you'll be asked only once."
          (re-search-forward "\\_<PRIVATE>\\_>" nil t))))
 
 (defun factor-find-usings (&optional no-private)
+  "Lists all vocabs used by the vocab."
   (save-excursion
     (let ((usings))
       (goto-char (point-max))
       (while (re-search-backward factor-using-lines-regex nil t)
-        (dolist (u (split-string (match-string-no-properties 1) nil t))
+        (dolist (u (split-string (match-string-no-properties 2) nil t))
           (push u usings)))
       (when (and (not no-private) (factor-file-has-private))
         (goto-char (point-max))
