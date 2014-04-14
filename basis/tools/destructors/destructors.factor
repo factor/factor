@@ -45,10 +45,13 @@ PRIVATE>
     [ disposables get members sort-disposables ] dip
     '[ _ instance? ] filter stack. ;
 
-: leaks ( quot -- )
+: leaks ( quot -- disposables )
     disposables get clone
     t debug-leaks? set-global
     [
         [ call disposables get clone ] dip
     ] [ f debug-leaks? set-global ] [ ] cleanup
-    diff (disposables.) ; inline
+    diff ; inline
+
+: leaks. ( quot -- )
+    leaks (disposables.) ; inline
