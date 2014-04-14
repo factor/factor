@@ -129,8 +129,10 @@
 (defun fuel-help--word-help (&optional see word display-only print-message)
   (let ((def (or word (fuel-help--read-word see))))
     (when def
-      (let ((cmd `(:fuel* (,def ,(if see 'fuel-word-see 'fuel-word-help))
-                          ,(factor-current-vocab) t)))
+      (let ((cmd `(:fuel* (,def
+                           ,(if see 'fuel-word-see 'fuel-word-help))
+                          ,(factor-current-vocab)
+                          ,(factor-usings))))
         (when print-message
           (message "Looking up '%s' ..." def))
         (let* ((ret (fuel-eval--send/wait cmd))
