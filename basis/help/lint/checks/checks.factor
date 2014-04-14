@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple combinators
-combinators.short-circuit debugger definitions effects eval fry
-grouping help help.markup help.topics io io.streams.string
-kernel macros namespaces sequences sequences.deep sets splitting
-strings summary unicode.categories vocabs vocabs.loader words
-words.constant words.symbol ;
+combinators.short-circuit debugger definitions effects eval
+formatting fry grouping help help.markup help.topics io io.streams.string
+kernel macros math namespaces sequences sequences.deep sets splitting
+strings summary threads tools.destructors unicode.categories vocabs vocabs.loader
+words words.constant words.symbol ;
 FROM: sets => members ;
 IN: help.lint.checks
 
@@ -20,14 +20,18 @@ SYMBOL: all-vocabs
 SYMBOL: vocab-articles
 
 : check-example ( element -- )
-    '[
-        _ rest [
-            but-last "\n" join
-            [ (eval>string) ] call( code -- output )
-            "\n" ?tail drop
-        ] keep
-        last assert=
-    ] vocabs-quot get call( quot -- ) ;
+    [
+        '[
+            _ rest [
+                but-last "\n" join
+                [ (eval>string) ] call( code -- output )
+                "\n" ?tail drop
+            ] keep
+            last assert=
+        ] vocabs-quot get call( quot -- )
+    ] leaks members length [
+        "%d disposable(s) leaked in example" sprintf simple-lint-error
+    ] unless-zero ;
 
 : check-examples ( element -- )
     \ $example swap elements [ check-example ] each ;
@@ -39,7 +43,7 @@ SYMBOL: vocab-articles
 
 : extract-value-effects ( element -- seq )
     \ $values swap elements dup empty? [
-        first rest [ 
+        first rest [
             \ $quotation swap elements dup empty? [ drop f ] [
                 first second
             ] if
@@ -77,18 +81,17 @@ SYMBOL: vocab-articles
         [ constant? ]
     } 1|| ;
 
+: skip-check-values? ( word element -- ? )
+    [ don't-check-word? ] [ contains-funky-elements? ] bi* or ;
+
 : check-values ( word element -- )
-    {
-        [
-            [ don't-check-word? ]
-            [ contains-funky-elements? ]
-            bi* or
-        ] [
-            [ effect-values ]
-            [ extract-values ]
-            bi* sequence=
-        ]
-    } 2|| [ "$values don't match stack effect" simple-lint-error ] unless ;
+    2dup skip-check-values? [ 2drop ] [
+        [ effect-values ] [ extract-values ] bi* 2dup
+        sequence= [ 2drop ] [
+            "$values don't match stack effect; expected %u, got %u" sprintf
+            simple-lint-error
+        ] if
+    ] if ;
 
 : check-value-effects ( word element -- )
     [ effect-effects ]
