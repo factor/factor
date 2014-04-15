@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple combinators
 combinators.short-circuit debugger definitions effects eval
-formatting fry grouping help help.markup help.topics io io.streams.string
-kernel macros math namespaces sequences sequences.deep sets splitting
-strings summary threads tools.destructors unicode.categories vocabs vocabs.loader
-words words.constant words.symbol ;
+formatting fry grouping help help.markup help.topics io
+io.streams.string kernel macros namespaces sequences
+sequences.deep sets splitting strings summary unicode.categories
+vocabs vocabs.loader words words.constant words.symbol ;
 FROM: sets => members ;
 IN: help.lint.checks
 
@@ -20,7 +20,7 @@ SYMBOL: all-vocabs
 SYMBOL: vocab-articles
 
 : check-example ( element -- )
-    [
+    ! [
         '[
             _ rest [
                 but-last "\n" join
@@ -28,10 +28,10 @@ SYMBOL: vocab-articles
                 "\n" ?tail drop
             ] keep
             last assert=
-        ] vocabs-quot get call( quot -- )
-    ] leaks members length [
-        "%d disposable(s) leaked in example" sprintf simple-lint-error
-    ] unless-zero ;
+        ] vocabs-quot get call( quot -- ) ;
+    ! ] leaks members length [
+    !     "%d disposable(s) leaked in example" sprintf simple-lint-error
+    ! ] unless-zero ;
 
 : check-examples ( element -- )
     \ $example swap elements [ check-example ] each ;
