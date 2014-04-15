@@ -37,20 +37,20 @@ HELP: vocab-tests
 { $description "Outputs a sequence of pathnames where the unit tests for " { $snippet "vocab" } " are located." }
 { $examples
   { $example
-    "USING: prettyprint vocabs.files ; "
-    "\"xml\" vocab-tests ."
+    "USING: prettyprint sorting vocabs.files ; "
+    "\"xml\" vocab-tests natural-sort ."
     $[
         {
             "{"
-            "    \"resource:basis/xml/tests/xmode-dtd.factor\""
-            "    \"resource:basis/xml/tests/test.factor\""
-            "    \"resource:basis/xml/tests/state-parser-tests.factor\""
-            "    \"resource:basis/xml/tests/soap.factor\""
-            "    \"resource:basis/xml/tests/templating.factor\""
-            "    \"resource:basis/xml/tests/encodings.factor\""
-            "    \"resource:basis/xml/tests/xmltest.factor\""
-            "    \"resource:basis/xml/tests/funny-dtd.factor\""
             "    \"resource:basis/xml/tests/cdata.factor\""
+            "    \"resource:basis/xml/tests/encodings.factor\""
+            "    \"resource:basis/xml/tests/funny-dtd.factor\""
+            "    \"resource:basis/xml/tests/soap.factor\""
+            "    \"resource:basis/xml/tests/state-parser-tests.factor\""
+            "    \"resource:basis/xml/tests/templating.factor\""
+            "    \"resource:basis/xml/tests/test.factor\""
+            "    \"resource:basis/xml/tests/xmltest.factor\""
+            "    \"resource:basis/xml/tests/xmode-dtd.factor\""
             "}"
         } "\n" join
     ]
