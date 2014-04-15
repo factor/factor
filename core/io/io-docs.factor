@@ -285,9 +285,12 @@ HELP: with-output-stream*
 { $values { "stream" "an output stream" } { "quot" quotation } }
 { $description "Calls the quotation in a new dynamic scope, with " { $link output-stream } " rebound to " { $snippet "stream" } "." }
 { $examples
-  { $example
-    "USING: destructors io.encodings.utf8 ;"
-    "\"/tmp/test.txt\" utf8 <file-writer> dup [ \"Hello!\" write ] with-output-stream* dispose" }
+  { $unchecked-example
+    "USING: destructors io io.encodings.utf8 io.files prettyprint ;"
+    "\"/tmp/test.txt\" utf8 <file-writer> dup [ \"Hello!\" write ] with-output-stream* dispose"
+    "\"/tmp/test.txt\" utf8 file-contents ."
+    "\"Hello!\""
+  }
 }
 { $notes "This word does not close the stream. Compare with " { $link with-output-stream } "." } ;
 
