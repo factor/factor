@@ -4,6 +4,18 @@ namespaces logging accessors assocs sorting smtp.private
 concurrency.promises system ;
 IN: smtp.tests
 
+: with-test-smtp-config ( quot -- )
+    [
+        <promise> "p" set
+        "p" get mock-smtp-server
+
+        default-smtp-config
+            "localhost" "p" get ?promise <inet> >>server
+            no-auth >>auth
+            os unix? [ t >>tls? ] when
+        \ smtp-config
+    ] dip with-variable ; inline
+
 { 0 0 } [ [ ] with-smtp-connection ] must-infer-as
 
 [ "hello\nworld" validate-address ] must-fail
@@ -56,40 +68,36 @@ IN: smtp.tests
     { "slava@factorcode.org" "dharmatech@factorcode.org" }
     "erg@factorcode.org"
 ] [
-    <email>
-        "Factor rules" >>subject
-        {
-            "Slava <slava@factorcode.org>"
-            "Ed <dharmatech@factorcode.org>"
-        } >>to
-        "Doug <erg@factorcode.org>" >>from
     [
-        email>headers sort-keys [
-            drop { "Date" "Message-Id" } member? not
-        ] assoc-filter
-    ]
-    [ to>> [ extract-email ] map ]
-    [ from>> extract-email ] tri
-] unit-test
-
-<promise> "p" set
-
-[ ] [ "p" get mock-smtp-server ] unit-test
-
-[ ] [
-    <secure-config> f >>verify [
-        "localhost" "p" get ?promise <inet> smtp-server set
-        no-auth smtp-auth set
-        os unix? [ smtp-tls? on ] when
-
         <email>
-            "Hi guys\nBye guys" >>body
             "Factor rules" >>subject
             {
                 "Slava <slava@factorcode.org>"
                 "Ed <dharmatech@factorcode.org>"
             } >>to
             "Doug <erg@factorcode.org>" >>from
-        send-email
+        [
+            email>headers sort-keys [
+                drop { "Date" "Message-Id" } member? not
+            ] assoc-filter
+        ]
+        [ to>> [ extract-email ] map ]
+        [ from>> extract-email ] tri
+    ] with-test-smtp-config
+] unit-test
+
+[ ] [
+    <secure-config> f >>verify [
+        [
+            <email>
+                "Hi guys\nBye guys" >>body
+                "Factor rules" >>subject
+                {
+                    "Slava <slava@factorcode.org>"
+                    "Ed <dharmatech@factorcode.org>"
+                } >>to
+                "Doug <erg@factorcode.org>" >>from
+            send-email
+        ] with-test-smtp-config
     ] with-secure-context
 ] unit-test
