@@ -1,42 +1,46 @@
 ! Copyright (C) 2007, 2009 Elie CHAFTARI, Dirk Vleugels,
 ! Slava Pestov, Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays namespaces make io io.encodings io.encodings.string
-io.encodings.utf8 io.encodings.iana io.encodings.binary
-io.encodings.ascii io.timeouts io.sockets io.sockets.secure io.crlf
-kernel logging sequences combinators splitting assocs strings
-math.order math.parser random system calendar summary calendar.format
-accessors sets hashtables base64 debugger classes prettyprint words ;
+USING: accessors arrays assocs base64 calendar calendar.format
+classes combinators debugger fry io io.crlf io.encodings
+io.encodings.ascii io.encodings.binary io.encodings.iana
+io.encodings.string io.encodings.utf8 io.sockets
+io.sockets.secure io.timeouts kernel logging make math.order
+math.parser namespaces prettyprint random sequences sets
+splitting strings words ;
 IN: smtp
 
-SYMBOL: smtp-domain
-
-SYMBOL: smtp-server
-"localhost" 25 <inet> smtp-server set-global
-
-SYMBOL: smtp-tls?
-
-SYMBOL: smtp-read-timeout
-1 minutes smtp-read-timeout set-global
+TUPLE: smtp-config domain server tls? { read-timeout duration } auth ;
 
 SINGLETON: no-auth
 
 TUPLE: plain-auth username password ;
 C: <plain-auth> plain-auth
 
-SYMBOL: smtp-auth
-no-auth smtp-auth set-global
+: <smtp-config> ( -- smtp-config )
+    smtp-config new ; inline
+
+: default-smtp-config ( -- smtp-config )
+    <smtp-config>
+        "localhost" 25 <inet> >>server
+        1 minutes >>read-timeout
+        no-auth >>auth ; inline
 
 LOG: log-smtp-connection NOTICE
 
 : with-smtp-connection ( quot -- )
-    smtp-server get
+    smtp-config get server>>
     dup log-smtp-connection
     ascii [
-        smtp-domain [ host-name or ] change
-        smtp-read-timeout get timeouts
+        smtp-config get
+        [ [ host-name or ] change-domain drop ]
+        [ read-timeout>> timeouts ] bi
         call
     ] with-client ; inline
+
+: with-smtp-config ( quot -- )
+    [ \ smtp-config get-global clone \ smtp-config ] dip
+    '[ _ with-smtp-connection ] with-variable ; inline
 
 TUPLE: email
     { from string }
@@ -152,7 +156,7 @@ M: plain-auth send-auth
     [ username>> ] [ password>> ] bi plain-auth-string
     "AUTH PLAIN " prepend command get-ok ;
 
-: auth ( -- ) smtp-auth get send-auth ;
+: auth ( -- ) smtp-config get auth>> send-auth ;
 
 : encode-header ( string -- string' )
     dup aux>> [
@@ -180,7 +184,7 @@ ERROR: invalid-header-string string ;
         "-" %
         gmt timestamp>micros #
         "@" %
-        smtp-domain get [ host-name ] unless* %
+        smtp-config get domain>> [ host-name ] unless* %
         ">" %
     ] "" make ;
 
@@ -210,7 +214,7 @@ ERROR: invalid-header-string string ;
     [
         get-ok
         helo get-ok
-        smtp-tls? get [ start-tls get-ok send-secure-handshake ] when
+        smtp-config get tls?>> [ start-tls get-ok send-secure-handshake ] when
         auth
         dup from>> extract-email mail-from get-ok
         dup to>> [ extract-email rcpt-to get-ok ] each
