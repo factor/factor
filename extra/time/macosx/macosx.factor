@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.data calendar calendar.unix classes.struct
-io.files.info.unix.private kernel system time unix unix.time ;
+io.files.info.unix.private kernel libc system time unix
+unix.time ;
 IN: time.macosx
 
 M: macosx adjust-time-monotonic
