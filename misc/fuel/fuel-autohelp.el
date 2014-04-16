@@ -49,7 +49,7 @@ user.")
         (let ((word (factor-symbol-at-point))
               (fuel-log--inhibit-p t))
           (when word
-            (fuel-help--word-help nil word t))))
+            (fuel-help--word-help word t))))
     (error (message "FUEL Autohelp error: %s" err))))
 
 (defun fuel-autohelp-schedule-timer ()

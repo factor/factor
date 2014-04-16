@@ -127,7 +127,6 @@ M-x <command>, not necessarily in a factor buffer.
     |--------------------+------------------------------------------------------------|
     | C-c C-d a          | toggle autodoc mode (fuel-autodoc-mode)                    |
     | C-c C-d d          | help for word at point (fuel-help)                         |
-    | C-c C-d s          | short help word at point (fuel-help-short)                 |
     | C-c C-d e          | show stack effect of current sexp (with prefix, region)    |
     | C-c C-d p          | find words containing given substring (fuel-apropos)       |
     | C-c C-d v          | show words in current file (with prefix, ask for vocab)    |
