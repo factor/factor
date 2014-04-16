@@ -147,7 +147,7 @@ HELP: store-mail
 { $description "Updates the attributes of a set of mails." } ;
 
 HELP: imap-settings
-{ $var-description "A tuple for holding the host, email, and password for an IMAP account. Setting this information as a global variable in your .factor-rc or .factor-bootstrap-rc is recommended." }
+{ $var-description "A tuple for holding the host, email, and password for an IMAP account. Setting this information as a global variable in your .factor-rc or .factor-boot-rc is recommended." }
 { $examples
     "Run the next example and click the link to edit your boot rc:"
     { $unchecked-example
