@@ -194,7 +194,6 @@ interacting with a factor listener is at your disposal.
   ("Jump back" "\M-," fuel-edit-pop-edit-word-stack)
   --
   ("Help on word" ("\C-c\C-d\C-d" "\C-c\C-dd") fuel-help)
-  ("Short help on word" ("\C-c\C-d\C-s" "\C-c\C-ds") fuel-help)
   ("Apropos..." ("\C-c\C-d\C-p" "\C-c\C-dp") fuel-apropos)
   ("Show stack effect" ("\C-c\C-d\C-e" "\C-c\C-de") fuel-stack-effect-sexp)
   --
