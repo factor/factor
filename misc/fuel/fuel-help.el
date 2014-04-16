@@ -114,10 +114,9 @@
 
 (defvar-local fuel-help--buffer-link nil)
 
-(defun fuel-help--read-word (see)
+(defun fuel-help--read-word ()
   (let* ((def (factor-symbol-at-point))
-         (prompt (format "See%s help on%s: " (if see " short" "")
-                         (if def (format " (%s)" def) "")))
+         (prompt (format "See help on%s: " (if def (format " (%s)" def) "")))
          (ask (or (not def) fuel-help-always-ask)))
     (if ask
         (fuel-completion--read-word prompt
@@ -126,11 +125,10 @@
                                         t)
       def)))
 
-(defun fuel-help--word-help (&optional see word display-only print-message)
-  (let ((def (or word (fuel-help--read-word see))))
+(defun fuel-help--word-help (&optional word display-only print-message)
+  (let ((def (or word (fuel-help--read-word))))
     (when def
-      (let ((cmd `(:fuel* (,def
-                           ,(if see 'fuel-word-see 'fuel-word-help))
+      (let ((cmd `(:fuel* (,def ,'fuel-word-help)
                           ,(factor-current-vocab)
                           ,(factor-usings))))
         (when print-message
@@ -189,7 +187,7 @@
          (cached (and (not no-cache) (fuel-help--cache-get llink))))
     (if (not cached)
         (let ((fuel-help-always-ask nil))
-          (cond ((eq type 'word) (fuel-help--word-help nil link))
+          (cond ((eq type 'word) (fuel-help--word-help link))
                 ((eq type 'article) (fuel-help--get-article link label))
                 ((eq type 'vocab) (fuel-help--get-vocab link))
                 ((eq type 'author) (fuel-help--get-vocab/author label))
@@ -250,18 +248,13 @@
 
 ;;; Interactive help commands:
 
-(defun fuel-help-short ()
-  "See help summary of symbol at point."
-  (interactive)
-  (fuel-help--word-help t))
-
 (defun fuel-help (&optional print-message)
   "Show extended help about the word or vocabulary at point, using a
 help buffer."
   (interactive "p")
   (if (factor-in-using)
       (fuel-help-vocab (factor-symbol-at-point))
-    (fuel-help--word-help nil nil nil print-message)))
+    (fuel-help--word-help nil nil print-message)))
 
 (defun fuel-help-vocab (vocab)
   "Ask for a vocabulary name and show its help page."

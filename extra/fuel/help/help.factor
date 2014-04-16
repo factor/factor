@@ -96,10 +96,6 @@ PRIVATE>
         search [ synopsis ] [ f ] if*
     ] with-scope ;
 
-: (fuel-word-see) ( word -- elem )
-    [ name>> \ article swap ]
-    [ [ see ] with-string-writer \ $code swap 2array ] bi 3array ; inline
-
 : (fuel-word-def) ( name -- str )
     search [ [ def>> pprint ] with-string-writer ] [ f ] if* ; inline
 
