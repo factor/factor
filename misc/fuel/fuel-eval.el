@@ -121,6 +121,12 @@
 (defsubst fuel-eval--retort-result (ret) (nth 1 ret))
 (defsubst fuel-eval--retort-output (ret) (nth 2 ret))
 
+(defun fuel-eval--retort-result-safe (ret)
+  "Retort result or throws an error if the retort error is set."
+  (let ((err (fuel-eval--retort-error ret)))
+    (when err (error "%s" err))
+    (fuel-eval--retort-result ret)))
+
 (defsubst fuel-eval--retort-p (ret)
   (and (listp ret) (= 3 (length ret))))
 
