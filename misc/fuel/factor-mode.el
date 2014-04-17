@@ -628,12 +628,10 @@ source/docs/tests file. When set to false, you'll be asked only once."
     (beginning-of-line)
     (re-search-forward factor-constructor-regex (line-end-position) t)))
 
-(defun factor-in-using ()
-  (let ((p (point)))
-    (save-excursion
-      (and (re-search-backward "^USING:[ \n]" nil t)
-           (re-search-forward " ;" nil t)
-           (< p (match-end 0))))))
+(defun factor-on-vocab ()
+  "t if point is on a vocab name. We just piggyback on
+  font-lock's pretty accurate information."
+  (eq (get-char-property (point) 'face) 'factor-font-lock-vocabulary-name))
 
 (defsubst factor-end-of-defun-pos ()
   (save-excursion
