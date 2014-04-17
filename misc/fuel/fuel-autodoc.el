@@ -58,7 +58,7 @@ USING: form with \\[fuel-load-usings]."
         (fuel-log--inhibit-p t))
     (when word
       (let* ((usings (if fuel-autodoc-eval-using-form-p :usings t))
-             (cmd (if (factor-in-using)
+             (cmd (if (factor-on-vocab)
                       `(:fuel* (,word fuel-vocab-summary) :in t)
                     `(:fuel* ((,word :usings fuel-word-synopsis)) t ,usings)))
              (ret (fuel-eval--send/wait cmd fuel-autodoc--timeout))

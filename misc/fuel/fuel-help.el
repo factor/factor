@@ -252,7 +252,7 @@
   "Show extended help about the word or vocabulary at point, using a
 help buffer."
   (interactive "p")
-  (if (factor-in-using)
+  (if (factor-on-vocab)
       (fuel-help-vocab (factor-symbol-at-point))
     (fuel-help--word-help nil nil print-message)))
 
