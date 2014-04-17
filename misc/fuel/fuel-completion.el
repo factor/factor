@@ -196,7 +196,7 @@ Perform completion similar to Emacs' complete-symbol."
   (let* ((end (point))
          (beg (save-excursion (factor-beginning-of-symbol) (point)))
          (prefix (buffer-substring-no-properties beg end))
-         (result (fuel-completion--complete prefix (factor-in-using)))
+         (result (fuel-completion--complete prefix (factor-on-vocab)))
          (completions (car result))
          (partial (cdr result)))
     (cond ((null completions)
