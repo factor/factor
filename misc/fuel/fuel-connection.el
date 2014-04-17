@@ -188,13 +188,15 @@
   (get-buffer-create " *fuel connection retort*"))
 
 (defun fuel-con--comint-buffer-form ()
+  "Parse the text in the comint buffer into a
+sexp. fuel-con-error is thrown if the sexp is malformed."
   (with-current-buffer (fuel-con--comint-buffer)
     (goto-char (point-min))
-    (condition-case nil
+    (condition-case cerr
         (let ((form (read (current-buffer))))
           (if (listp form) form
             (list 'fuel-con-error (buffer-string))))
-      (error (list 'fuel-con-error (buffer-string))))))
+      (error (list 'fuel-con-error (format "%s" cerr))))))
 
 (defun fuel-con--process-next (con)
   (when (not (fuel-con--connection-current-request con))
