@@ -156,7 +156,7 @@
   (message "Retrieving help vocabulary for vocabulary '%s' ..." name)
   (let* ((cmd `(:fuel* ((,name fuel-vocab-help)) "fuel" (,name)))
          (ret (fuel-eval--send/wait cmd))
-         (res (fuel-eval--retort-result ret)))
+         (res (fuel-eval--retort-result-safe ret)))
     (if (not res)
         (message "No help available for vocabulary '%s'" name)
       (fuel-help--insert-contents (list name name 'vocab) res)
