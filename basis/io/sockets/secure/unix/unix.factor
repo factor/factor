@@ -48,7 +48,7 @@ M: secure (accept)
         { SSL_ERROR_NONE [ 2drop f ] }
         { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
         { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
-        { SSL_ERROR_SYSCALL [ [ drop f ] [ syscall-error ] if-zero ] }
+        { SSL_ERROR_SYSCALL [ [ drop f ] [ nip syscall-error ] if-zero ] }
         { SSL_ERROR_SSL [ (ssl-error) ] }
     } case ;
 
