@@ -21,14 +21,32 @@ IN: io.sockets.secure.openssl.tests
     socket-connect os windows? [ alien-address ] when
     BIO_NOCLOSE BIO_new_socket ;
 
-: remote ( -- remote )
-    URL" https://www.google.com" url-addr addrspec>> resolve-host first ;
-
 [ 200 ] [ "https://www.google.se" http-get drop code>> ] unit-test
 
+: remote ( url -- remote )
+    url-addr addrspec>> resolve-host first ;
+
+! These tests break if any of the sites change their certs or go
+! down. But that should never ever happen. :)
 [ "www.google.com" ] [
-    new-ssl dup remote ssl-socket-connect dup SSL_set_bio
-    dup SSL_connect -1 = [ "SSL_connect failed in unit test" ] [ SSL_get_peer_certificate subject-name ] if
+    new-ssl dup URL" https://www.google.com" remote
+    ssl-socket-connect dup SSL_set_bio
+    dup do-ssl-connect-once f assert=
+    SSL_get_peer_certificate subject-name
+] unit-test
+
+[ "*.facebook.com" ] [
+    new-ssl dup URL" https://www.facebook.com" remote
+    ssl-socket-connect dup SSL_set_bio
+    dup do-ssl-connect-once f assert=
+    SSL_get_peer_certificate subject-name
+] unit-test
+
+[ "github.com" ] [
+    new-ssl dup URL" https://www.github.com" remote
+    ssl-socket-connect dup SSL_set_bio
+    dup do-ssl-connect-once f assert=
+    SSL_get_peer_certificate subject-name
 ] unit-test
 
 [ t ] [
