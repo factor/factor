@@ -217,9 +217,8 @@ source/docs/tests file. When set to false, you'll be asked only once."
     "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
     "GAME:" "GENERIC#" "GENERIC:" "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
-    "HELP:" "HINTS:" "HOOK:"
+    "HINTS:" "HOOK:"
     "IN:" "initial:" "INSTANCE:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
-    "LIBRARY:"
     "M:" "M::" "MACRO:" "MACRO::" "MAIN:" "MATH:"
     "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "NAN:"
@@ -248,7 +247,13 @@ source/docs/tests file. When set to false, you'll be asked only once."
   (format "%s{" (regexp-opt factor-bracer-words t)))
 
 (defconst factor-declaration-words
-  '("flushable" "foldable" "inline" "parsing" "recursive" "delimiter"))
+  '("deprecated"
+    "flushable"
+    "foldable"
+    "inline"
+    "parsing"
+    "recursive"
+    "delimiter"))
 
 (defconst factor-declaration-words-regex
   (regexp-opt factor-declaration-words 'symbols))
@@ -298,12 +303,13 @@ source/docs/tests file. When set to false, you'll be asked only once."
   (factor-second-word-regex
    '("IN:" "USE:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
 
-(defconst factor-using-lines-regex "^\\(USING\\):[ \n]+\\([^;\t]*\\);")
+(defconst factor-using-lines-regex "^\\(USING:\\)[ \n]+\\([^;\t]*\\);")
 
 ;; Symbols
 (defconst factor-symbol-definition-regex
   (factor-second-word-regex
-   '("&:" "CONSTANT:" "DESTRUCTOR:" "FORGET:" "SYMBOL:" "VAR:")))
+   '("&:" "CONSTANT:" "DESTRUCTOR:" "FORGET:" "HELP:" "LIBRARY:"
+     "SYMBOL:" "VAR:")))
 
 (defconst factor-symbols-lines-regex "^\\(SYMBOLS\\):[ \n]+\\([^;\t]*\\);")
 
