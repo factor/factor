@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.data assocs classes.struct
 combinators continuations destructors io io.backend
 io.encodings.ascii io.encodings.string io.encodings.utf8
 io.launcher kernel libc locals math.parser prettyprint sequences
-yaml.ffi ;
+yaml.ffi yaml.private ;
 IN: yaml.dbg
 
 : event. ( event -- )
@@ -35,7 +35,7 @@ f :> done!
         event &yaml_event_delete event.
         event type>> YAML_STREAM_END_EVENT = done!
     ] with-destructors ] [
-      "error" throw
+      parser (libyaml-parser-error)
     ] if
   ] until
 ] [ . ] recover

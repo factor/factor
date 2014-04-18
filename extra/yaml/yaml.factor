@@ -2,16 +2,43 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays assocs byte-arrays
 classes.struct combinators combinators.extras
-combinators.short-circuit destructors fry hashtables
-hashtables.identity io.encodings.string io.encodings.utf8 kernel
-libc linked-assocs locals make math math.parser namespaces
-sequences sets strings yaml.conversion yaml.ffi ;
+combinators.short-circuit destructors fry generalizations
+hashtables hashtables.identity io.encodings.string
+io.encodings.utf8 kernel libc linked-assocs locals make math
+math.parser namespaces sequences sets strings yaml.conversion
+yaml.ffi ;
 FROM: sets => set ;
 IN: yaml
 
+ERROR: libyaml-parser-error
+    error problem problem_offset
+    problem_value problem_mark context context_mark ;
+ERROR: libyaml-initialize-error ;
+ERROR: libyaml-emitter-error error problem ;
+
+ERROR: yaml-undefined-anchor anchor anchors ;
+ERROR: yaml-unexpected-event actual expected ;
+ERROR: yaml-no-document ;
+
 <PRIVATE
 
-: yaml-assert-ok ( ? -- ) [ "yaml error" throw ] unless ;
+: yaml-initialize-assert-ok ( ? -- ) [ libyaml-initialize-error ] unless ;
+: (libyaml-parser-error) ( parser -- )
+    {
+        [ error>> ] [ problem>> ] [ problem_offset>> ] [ problem_value>> ]
+        [ problem_mark>> ] [ context>> ] [ context_mark>> ]
+    } cleave [ clone ] 7 napply libyaml-parser-error ;
+: (libyaml-emitter-error) ( emitter -- )
+    [ error>> ] [ problem>> ] bi [ clone ] bi@ libyaml-emitter-error ;
+: yaml-parser-assert-ok ( ? parser -- )
+    swap [ drop ] [ (libyaml-parser-error) ] if ;
+: yaml-emitter-assert-ok ( ? emitter -- )
+    swap [ drop ] [ (libyaml-emitter-error) ] if ;
+
+: yaml_parser_parse_asserted ( parser event -- )
+    [ yaml_parser_parse ] [ drop yaml-parser-assert-ok ] 2bi ;
+: yaml_emitter_emit_asserted ( emitter event -- )
+    [ yaml_emitter_emit ] [ drop yaml-emitter-assert-ok ] 2bi ;
 
 TUPLE: yaml-alias anchor ;
 C: <yaml-alias> yaml-alias
@@ -19,8 +46,8 @@ SYMBOL: anchors
 : ?register-anchor ( obj event -- obj )
     dupd anchor>> [ anchors get set-at ] [ drop ] if* ;
 : assert-anchor-exists ( anchor -- )
-    anchors get at* nip
-    [ "No previous anchor" throw ] unless ;
+    anchors get 2dup at* nip
+    [ 2drop ] [ yaml-undefined-anchor ] if ;
 
 : deref-anchor ( event -- obj )
     data>> alias>> anchor>>
@@ -47,7 +74,6 @@ TUPLE: factor_yaml_event_t type data start_mark end_mark ;
     [ data>> ] [ type>> ] bi {
         { YAML_SEQUENCE_START_EVENT [ sequence_start>> deep-copy-seq f ] }
         { YAML_MAPPING_START_EVENT [ mapping_start>> deep-copy-map f swap ] }
-        [ throw ]
     } case factor_event_data boa ;
 : deep-copy-event ( event -- event' )
     { [ type>> ] [ deep-copy-data ] [ start_mark>> ] [ end_mark>> ] } cleave
@@ -62,7 +88,7 @@ TUPLE: factor_yaml_event_t type data start_mark end_mark ;
 
 ! Must not reuse the event struct before with-destructors scope ends
 : next-event ( parser event -- event )
-    [ yaml_parser_parse yaml-assert-ok ] [ &yaml_event_delete ] bi ;
+    [ yaml_parser_parse_asserted ] [ &yaml_event_delete ] bi ;
 
 DEFER: parse-sequence
 DEFER: parse-mapping
@@ -76,7 +102,6 @@ DEFER: parse-mapping
     dup type>> {
         { YAML_SEQUENCE_START_EVENT [ (parse-sequence) ] }
         { YAML_MAPPING_START_EVENT [ (parse-mapping) ] }
-        [ throw ]
     } case ;
 
 :: next-value ( parser event -- obj )
@@ -122,8 +147,8 @@ DEFER: parse-mapping
 
 : expect-event ( parser event type -- )
     [
-        [ next-event type>> ] dip =
-        [ "wrong event" throw ] unless
+        [ next-event type>> ] dip 2dup =
+        [ 2drop ] [ 1array yaml-unexpected-event ] if
     ] with-destructors ;
 
 GENERIC: (deref-aliases) ( anchors obj -- obj' )
@@ -152,7 +177,7 @@ M: assoc (deref-aliases)
         parser event next-event type>> {
             { YAML_DOCUMENT_START_EVENT [ t ] }
             { YAML_STREAM_END_EVENT [ f ] }
-            [ "wrong event" throw ]
+            [ { YAML_DOCUMENT_START_EVENT YAML_STREAM_END_EVENT } yaml-unexpected-event ]
         } case
     ] with-destructors
     [
@@ -163,7 +188,7 @@ M: assoc (deref-aliases)
 ! registers destructors (use with with-destructors)
 :: init-parser ( str -- parser event )
     yaml_parser_t (malloc-struct) &free :> parser
-    parser yaml_parser_initialize yaml-assert-ok
+    parser yaml_parser_initialize yaml-initialize-assert-ok
     parser &yaml_parser_delete drop
 
     str utf8 encode
@@ -179,7 +204,7 @@ PRIVATE>
     [
         init-parser
         [ YAML_STREAM_START_EVENT expect-event ]
-        [ ?parse-yaml-doc [ "No Document" throw ] unless ] 2bi
+        [ ?parse-yaml-doc [ yaml-no-document ] unless ] 2bi
     ] with-destructors ;
 
 : yaml-docs> ( str -- arr )
@@ -262,25 +287,25 @@ GENERIC: emit-value ( emitter event anchor obj -- )
     event anchor
     obj [ yaml-tag ] [ represent-scalar ] bi
     -1 f f YAML_ANY_SCALAR_STYLE
-    yaml_scalar_event_initialize yaml-assert-ok
-    emitter event yaml_emitter_emit yaml-assert-ok ;
+    yaml_scalar_event_initialize yaml-initialize-assert-ok
+    emitter event yaml_emitter_emit_asserted ;
 
 M: object emit-value ( emitter event anchor obj -- ) emit-scalar ;
 
 M: yaml-anchor emit-value ( emitter event unused obj -- )
     nip [ anchor>> ] [ obj>> ] bi emit-value ;
 M:: yaml-alias emit-value ( emitter event unused obj -- )
-    event obj anchor>> yaml_alias_event_initialize yaml-assert-ok
-    emitter event yaml_emitter_emit yaml-assert-ok ;
+    event obj anchor>> yaml_alias_event_initialize yaml-initialize-assert-ok
+    emitter event yaml_emitter_emit_asserted ;
 
 :: emit-sequence-start ( emitter event anchor tag -- )
     event anchor tag f YAML_ANY_SEQUENCE_STYLE
-    yaml_sequence_start_event_initialize yaml-assert-ok
-    emitter event yaml_emitter_emit yaml-assert-ok ;
+    yaml_sequence_start_event_initialize yaml-initialize-assert-ok
+    emitter event yaml_emitter_emit_asserted ;
 
 : emit-sequence-end ( emitter event -- )
-    dup yaml_sequence_end_event_initialize yaml-assert-ok
-    yaml_emitter_emit yaml-assert-ok ;
+    dup yaml_sequence_end_event_initialize yaml-initialize-assert-ok
+    yaml_emitter_emit_asserted ;
 
 : emit-sequence-body ( emitter event seq -- )
     [ emit-object ] with with each ;
@@ -305,12 +330,12 @@ M: linked-assoc emit-value ( emitter event anchor assoc -- )
 
 :: emit-assoc-start ( emitter event anchor tag -- )
     event anchor tag f YAML_ANY_MAPPING_STYLE
-    yaml_mapping_start_event_initialize yaml-assert-ok
-    emitter event yaml_emitter_emit yaml-assert-ok ;
+    yaml_mapping_start_event_initialize yaml-initialize-assert-ok
+    emitter event yaml_emitter_emit_asserted ;
 
 : emit-assoc-end ( emitter event -- )
-    dup yaml_mapping_end_event_initialize yaml-assert-ok
-    yaml_emitter_emit yaml-assert-ok ;
+    dup yaml_mapping_end_event_initialize yaml-initialize-assert-ok
+    yaml_emitter_emit_asserted ;
 
 M: assoc emit-value ( emitter event anchor assoc -- )
     [ drop YAML_MAP_TAG emit-assoc-start ]
@@ -324,7 +349,7 @@ M: set emit-value ( emitter event anchor set -- )
 ! registers destructors (use with with-destructors)
 :: init-emitter ( -- emitter event )
     yaml_emitter_t (malloc-struct) &free :> emitter
-    emitter yaml_emitter_initialize yaml-assert-ok
+    emitter yaml_emitter_initialize yaml-initialize-assert-ok
     emitter &yaml_emitter_delete drop
 
     BV{ } clone :> output
@@ -334,26 +359,26 @@ M: set emit-value ( emitter event anchor set -- )
     yaml_event_t (malloc-struct) &free :> event
 
     event YAML_UTF8_ENCODING
-    yaml_stream_start_event_initialize yaml-assert-ok
+    yaml_stream_start_event_initialize yaml-initialize-assert-ok
 
-    emitter event yaml_emitter_emit yaml-assert-ok
+    emitter event yaml_emitter_emit_asserted
     emitter event ;
 
 :: emit-doc ( emitter event obj -- )
-    event f f f f yaml_document_start_event_initialize yaml-assert-ok
-    emitter event yaml_emitter_emit yaml-assert-ok
+    event f f f f yaml_document_start_event_initialize yaml-initialize-assert-ok
+    emitter event yaml_emitter_emit_asserted
 
     emitter event obj emit-object
 
-    event f yaml_document_end_event_initialize yaml-assert-ok
-    emitter event yaml_emitter_emit yaml-assert-ok ;
+    event f yaml_document_end_event_initialize yaml-initialize-assert-ok
+    emitter event yaml_emitter_emit_asserted ;
 
 ! registers destructors (use with with-destructors)
 :: flush-emitter ( emitter event -- str )
-    event yaml_stream_end_event_initialize yaml-assert-ok
-    emitter event yaml_emitter_emit yaml-assert-ok
+    event yaml_stream_end_event_initialize yaml-initialize-assert-ok
+    emitter event yaml_emitter_emit_asserted
 
-    emitter yaml_emitter_flush yaml-assert-ok
+    emitter [ yaml_emitter_flush ] [ yaml-emitter-assert-ok ] bi
     yaml-write-buffer get utf8 decode ;
 
 PRIVATE>
