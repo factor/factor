@@ -1,15 +1,20 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs combinators fuel.eval help help.crossref
-help.markup help.topics io io.streams.string kernel make namespaces
-parser prettyprint sequences summary help.vocabs
+USING: accessors arrays assocs combinators combinators.short-circuit fry
+fuel.eval help help.crossref help.markup help.topics io io.streams.string
+kernel make namespaces parser prettyprint sequences summary help.vocabs
 vocabs vocabs.loader vocabs.hierarchy vocabs.metadata vocabs.parser words see
 listener sets ;
 FROM: vocabs.hierarchy => child-vocabs ;
 IN: fuel.help
 
 <PRIVATE
+
+! Prefer to use search which takes the execution context into
+! account. If that fails, fall back on a search of all words.
+: fuel-find-word ( name -- word/f )
+    { [ search ] [ '[ name>> _ = ] all-words swap find nip ] } 1|| ;
 
 : fuel-value-str ( word -- str )
     [ pprint-short ] with-string-writer ; inline
@@ -88,16 +93,18 @@ SYMBOL: describe-words
 PRIVATE>
 
 : (fuel-word-help) ( name -- elem )
-    search [ [ auto-use? on (fuel-word-element) ] with-scope ] [ f ] if* ;
+    fuel-find-word [
+        [ auto-use? on (fuel-word-element) ] with-scope
+    ] [ f ] if* ;
 
 : (fuel-word-synopsis) ( word usings -- str/f )
     [
         [ lookup-vocab ] filter interactive-vocabs [ append ] change
-        search [ synopsis ] [ f ] if*
+        fuel-find-word [ synopsis ] [ f ] if*
     ] with-scope ;
 
 : (fuel-word-def) ( name -- str )
-    search [ [ def>> pprint ] with-string-writer ] [ f ] if* ; inline
+    fuel-find-word [ [ def>> pprint ] with-string-writer ] [ f ] if* ; inline
 
 : (fuel-vocab-summary) ( name -- str ) >vocab-link summary ; inline
 
