@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs byte-arrays hash-sets hashtables
 help.markup help.syntax kernel linked-assocs math sequences sets
-strings ;
+strings yaml.ffi ;
 IN: yaml
 
 HELP: >yaml
@@ -32,6 +32,36 @@ HELP: yaml>
     { "obj" object }
 }
 { $description "Deserializes the YAML formatted string into a Factor object." } ;
+
+HELP: libyaml-emitter-error
+{ $values
+    { "error" yaml_error_type_t } { "problem" string }
+}
+{ $description "yaml_emitter_emit returned with status 0. The slots of this error give more information." } ;
+
+HELP: libyaml-initialize-error
+{ $description "yaml_*_initialize returned with status 0. This usually means LibYAML failed to allocate memory." } ;
+
+HELP: libyaml-parser-error
+{ $values
+    { "error" yaml_error_type_t } { "problem" string } { "problem_offset" integer } { "problem_value" integer } { "problem_mark" yaml_mark_t } { "context" string } { "context_mark" yaml_mark_t }
+}
+{ $description "yaml_parser_parse returned with status 0. The slots of this error give more information." } ;
+
+HELP: yaml-no-document
+{ $description "The input of " { $link yaml> } " had no documents." } ;
+
+HELP: yaml-undefined-anchor
+{ $values
+    { "anchor" string } { "anchors" sequence }
+}
+{ $description "The document references an undefined anchor " { $snippet "anchor" } ". For information, the list of currently defined anchors in the document is " { $snippet "anchors" } "." } ;
+
+HELP: yaml-unexpected-event
+{ $values
+    { "actual" yaml_event_type_t } { "expected" sequence }
+}
+{ $description "LibYAML produced the unexpected event " { $snippet "actual" } ", but the list of expected events is " { $snippet "expected" } "." } ;
 
 ARTICLE: "yaml-mapping" "Mapping between Factor and YAML types"
 { $heading "Types mapping" }
@@ -90,6 +120,25 @@ ARTICLE: "yaml-input" "Deserialization control"
   "etc."
 }
 ;
+ARTICLE: "yaml-errors" "YAML errors"
+{ $heading "libYAML's errors" }
+"LibYAML exposes error when parsing/emitting yaml. See " { $url "http://pyyaml.org/wiki/LibYAML" } ". More information is available directly in pyyaml's source code in their C interface. They are groupped in the following errors:"
+{ $list
+  { $link libyaml-parser-error }
+  { $link libyaml-emitter-error }
+  { $link libyaml-initialize-error }
+}
+{ $heading "Conversion errors" }
+"Additional errors are thrown when converting to/from factor objects:"
+{ $list
+  { $link yaml-undefined-anchor }
+  { $link yaml-no-document }
+  "Or many errors thrown by library words (eg unparseable numbers, converting unsupported objects to yaml, etc)"
+}
+{ $heading "Bugs" }
+"The following error probably means that there is a bug in the implementation: " { $link yaml-unexpected-event }
+;
+
 ARTICLE: "yaml" "YAML serialization"
 "The " { $vocab-link "yaml" } " vocabulary implements YAML serialization/deserialization."
 { $heading "Main conversion words" }
@@ -104,6 +153,7 @@ ARTICLE: "yaml" "YAML serialization"
 "yaml-mapping"
 "yaml-output"
 "yaml-input"
+"yaml-errors"
 }
 { $examples
   { $example "USING: prettyprint yaml ;"
