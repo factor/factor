@@ -673,8 +673,11 @@ source/docs/tests file. When set to false, you'll be asked only once."
 
 (defun factor-find-in ()
   (save-excursion
-    (when (re-search-backward factor-current-vocab-regex nil t)
-      (match-string-no-properties 1))))
+    (beginning-of-line)
+    (if (re-search-backward factor-current-vocab-regex nil t)
+        (match-string-no-properties 1)
+      (when (re-search-forward factor-current-vocab-regex nil t)
+        (match-string-no-properties 1)))))
 
 (defun factor-in-private? ()
   "t if point is withing a PRIVATE-block, nil otherwise."
