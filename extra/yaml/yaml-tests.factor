@@ -111,9 +111,6 @@ CONSTANT: fancy-anchors-obj {
 ${ fancy-anchors-obj } [ $ fancy-anchors yaml> ] unit-test
 ${ fancy-anchors-obj } [ $ fancy-anchors-obj >yaml yaml> ] unit-test
 
-! Missing anchors
-[ "*foo" yaml> ] [ "No previous anchor" = ] must-fail-with
-
 ! Simple Recursive output
 : simple-recursive-list ( -- obj )
   { f } clone [ 0 over set-nth ] keep ;
@@ -561,4 +558,8 @@ ${ construct-value-obj } [ $ construct-value-str yaml-docs> ] unit-test
 ${ construct-value-obj } [ $ construct-value-obj >yaml-docs yaml-docs> ] unit-test
 
 ! !!!!!!!!!!!!!!!
-! *.detect
+! errors
+
+[ "- foo\n:)" yaml> ] [ libyaml-parser-error? ] must-fail-with
+[ "- &foo 1\n- *baz\n" yaml> ] [ yaml-undefined-anchor? ] must-fail-with
+[ "" yaml> ] [ yaml-no-document? ] must-fail-with
