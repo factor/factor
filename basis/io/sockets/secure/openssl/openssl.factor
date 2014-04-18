@@ -174,8 +174,8 @@ SYMBOL: default-secure-context
         swap >>file
     ] with-destructors ;
 
-: syscall-error ( handle r -- event )
-    nip
+! Error handling
+: syscall-error ( r -- event )
     ERR_get_error [
         {
             { -1 [ errno ECONNRESET = [ premature-close ] [ (io-error) ] if ] }
@@ -187,26 +187,27 @@ SYMBOL: default-secure-context
         } case
     ] [ nip (ssl-error) ] if-zero ;
 
-: check-response ( port r -- port r n )
-    over handle>> handle>> over SSL_get_error ; inline
-
-: check-accept-response ( handle r -- event )
-    over handle>> over SSL_get_error
+: check-ssl-error ( ssl ret exra-cases/f -- event/f )
+    [ swap over SSL_get_error ] dip
     {
-        { SSL_ERROR_NONE [ 2drop f ] }
-        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
-        { SSL_ERROR_WANT_ACCEPT [ 2drop +input+ ] }
-        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
+        { SSL_ERROR_NONE [ drop f ] }
+        { SSL_ERROR_WANT_READ [ drop +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ drop +output+ ] }
         { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ drop (ssl-error) ] }
+    } append [ [ execute( -- n ) ] dip ] assoc-map
+    at [ call( x -- y ) ] [ no-cond ] if* ;
+
+! Accept
+: do-ssl-accept-once ( ssl -- event/f )
+    dup SSL_accept {
         { SSL_ERROR_ZERO_RETURN [ (ssl-error) ] }
-        { SSL_ERROR_SSL [ (ssl-error) ] }
-    } case ;
+        { SSL_ERROR_WANT_ACCEPT [ drop +input+ ] }
+    } check-ssl-error ;
 
 : do-ssl-accept ( ssl-handle -- )
-    dup dup handle>> SSL_accept check-accept-response dup
-    [
-        [ dup file>> ] dip wait-for-fd do-ssl-accept
-    ] [ 2drop ] if ;
+    dup handle>> do-ssl-accept-once
+    [ [ dup file>> ] dip wait-for-fd do-ssl-accept ] [ drop ] if* ;
 
 : maybe-handshake ( ssl-handle -- )
     dup connected>> [ drop ] [
@@ -215,60 +216,29 @@ SYMBOL: default-secure-context
     ] if ;
 
 ! Input ports
-: check-read-response ( port r -- event )
-    check-response
-    {
-        { SSL_ERROR_NONE [ swap buffer>> n>buffer f ] }
-        { SSL_ERROR_ZERO_RETURN [ 2drop f ] }
-        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
-        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
-        { SSL_ERROR_SYSCALL [ syscall-error ] }
-        { SSL_ERROR_SSL [ (ssl-error) ] }
-    } case ;
+: do-ssl-read ( buffer ssl -- event/f )
+    2dup swap [ buffer-end ] [ buffer-capacity ] bi SSL_read [
+        { { SSL_ERROR_ZERO_RETURN [ drop f ] } } check-ssl-error
+    ] keep swap [ 2nip ] [ swap n>buffer f ] if* ;
 
-M: ssl-handle refill
-    dup maybe-handshake
-    handle>> ! ssl
-    over buffer>>
-    [ buffer-end ] ! buf
-    [ buffer-capacity ] bi ! len
-    SSL_read
-    check-read-response ;
+M: ssl-handle refill ( port handle -- event/f )
+    dup maybe-handshake [ buffer>> ] [ handle>> ] bi* do-ssl-read ;
 
 ! Output ports
-: check-write-response ( port r -- event )
-    check-response
-    {
-        { SSL_ERROR_NONE [ swap buffer>> buffer-consume f ] }
-        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
-        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
-        { SSL_ERROR_SYSCALL [ syscall-error ] }
-        { SSL_ERROR_SSL [ (ssl-error) ] }
-    } case ;
+: do-ssl-write ( buffer ssl -- event/f )
+    2dup swap [ buffer@ ] [ buffer-length ] bi SSL_write
+    [ f check-ssl-error ] keep swap [ 2nip ] [ swap buffer-consume f ] if* ;
 
-M: ssl-handle drain
-    dup maybe-handshake
-    handle>> ! ssl
-    over buffer>>
-    [ buffer@ ] ! buf
-    [ buffer-length ] bi ! len
-    SSL_write
-    check-write-response ;
+M: ssl-handle drain ( port handle -- event/f )
+    dup maybe-handshake [ buffer>> ] [ handle>> ] bi* do-ssl-write ;
 
 ! Connect
-: check-connect-response ( ssl-handle r -- event )
-    over handle>> over SSL_get_error
-    {
-        { SSL_ERROR_NONE [ 2drop f ] }
-        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
-        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
-        { SSL_ERROR_SYSCALL [ syscall-error ] }
-        { SSL_ERROR_SSL [ (ssl-error) ] }
-    } case ;
+: do-ssl-connect-once ( ssl -- event/f )
+    dup SSL_connect f check-ssl-error ;
 
 : do-ssl-connect ( ssl-handle -- )
-    dup dup handle>> SSL_connect check-connect-response dup
-    [ dupd wait-for-fd do-ssl-connect ] [ 2drop ] if ;
+    dup handle>> do-ssl-connect-once
+    [ dupd wait-for-fd do-ssl-connect ] [ drop ] if* ;
 
 : resume-session ( ssl-handle ssl-session -- )
     [ [ handle>> ] dip SSL_set_session ssl-error ]
