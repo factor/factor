@@ -410,7 +410,7 @@ C: <inet> inet
 
 M: string resolve-host
     f prepare-addrinfo f void* <ref> [
-        getaddrinfo 0 or [
+        getaddrinfo [
             dup addrinfo-error-string addrinfo-error
         ] unless-zero
     ] keep void* deref addrinfo memory>struct
