@@ -173,6 +173,4 @@ os unix? [
 [ 80 ] [ "http" protocol-port ] unit-test
 [ f ] [ f protocol-port ] unit-test
 
-[ t ] [
-    [ "you-cant-resolve-me!" resolve-host ] [ addrinfo-error? ] recover
-] unit-test
+[ "you-cant-resolve-me!" resolve-host ] [ addrinfo-error? ] must-fail-with
