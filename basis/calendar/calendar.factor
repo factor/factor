@@ -326,10 +326,10 @@ GENERIC: time- ( time1 time2 -- time3 )
     ] if ;
 
 : >local-time ( timestamp -- timestamp' )
-    gmt-offset-duration convert-timezone ;
+    clone gmt-offset-duration convert-timezone ;
 
 : >gmt ( timestamp -- timestamp' )
-    dup gmt-offset>> dup instant =
+    clone dup gmt-offset>> dup instant =
     [ drop ] [
         [ neg +second 0 ] change-second
         [ neg +minute 0 ] change-minute
