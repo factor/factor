@@ -33,6 +33,8 @@ TUPLE: timestamp
 
 C: <timestamp> timestamp
 
+M: timestamp clone (clone) [ clone ] change-gmt-offset ;
+
 : gmt-offset-duration ( -- duration )
     0 0 0 gmt-offset <duration> ; inline
 
