@@ -24,7 +24,7 @@ C: <tangle> tangle
     [ [ db>> ] [ seq>> ] bi ] dip with-db ;
 
 : node-response ( id -- response )
-    load-node [ node-content "text/plain" <content> ] [ <404> ] if* ;
+    load-node [ node-content <text-content> ] [ <404> ] if* ;
 
 : display-node ( params -- response )
     [
@@ -40,7 +40,7 @@ C: <tangle> tangle
 : submit-node ( params -- response )
     [
         "node_content" swap at* [
-            create-node id>> number>string "text/plain" <content>
+            create-node id>> number>string <text-content>
         ] [
             drop <400>
         ] if
@@ -56,7 +56,7 @@ TUPLE: path-responder ;
 C: <path-responder> path-responder
 
 M: path-responder call-responder* ( path responder -- response )
-    drop path>file [ node-content "text/plain" <content> ] [ <404> ] if* ;
+    drop path>file [ node-content <text-content> ] [ <404> ] if* ;
 
 TUPLE: tangle-dispatcher < dispatcher tangle ;
 

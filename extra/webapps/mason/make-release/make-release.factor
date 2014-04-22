@@ -16,6 +16,6 @@ IN: webapps.mason.make-release
     [
         [
             "version" value "announcement-url" value do-release
-            "OK" "text/html" <content>
+            "OK" <text-content>
         ] with-mason-db
     ] >>submit ;

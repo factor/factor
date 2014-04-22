@@ -71,7 +71,7 @@ http.server.responses http.server.static io.servers ;
 SINGLETON: quit-responder
 
 M: quit-responder call-responder*
-    2drop stop-this-server "Goodbye" "text/html" <content> ;
+    2drop stop-this-server "Goodbye" <html-content> ;
 
 : add-quot-responder ( responder -- responder )
     quit-responder "quit" add-responder ;

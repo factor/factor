@@ -9,6 +9,6 @@ IN: webapps.mason.counter
     [
         [
             counter-value number>string
-            "text/plain" <content>
+            <text-content>
         ] with-mason-db
     ] >>display ;

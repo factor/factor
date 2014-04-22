@@ -113,7 +113,7 @@ M: action modify-form
 TUPLE: page-action < action template ;
 
 : <chloe-content> ( path -- response )
-    resolve-template-path <chloe> "text/html" <content> ;
+    resolve-template-path <chloe> <html-content> ;
 
 : <page-action> ( -- page )
     page-action new-action

@@ -20,7 +20,7 @@ M: foo init-session* drop 0 "x" sset ;
 M: foo call-responder*
     2drop
     "x" [ 1 + ] schange
-    "x" sget number>string "text/html" <content> ;
+    "x" sget number>string <html-content> ;
 
 : url-responder-mock-test ( -- string )
     [
@@ -47,7 +47,7 @@ M: foo call-responder*
 
 : <exiting-action> ( -- action )
     <action>
-        [ [ ] "text/plain" <content> exit-with ] >>display ;
+        [ [ ] <text-content> exit-with ] >>display ;
 
 [ "auth-test.db" temp-file delete-file ] ignore-errors
 

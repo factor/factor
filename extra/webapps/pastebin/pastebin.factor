@@ -143,7 +143,7 @@ M: annotation entity-url
 : <raw-paste-action> ( -- action )
     <action>
         [ validate-integer-id "id" value paste from-object ] >>init
-        [ "contents" value "text/plain" <content> ] >>display ;
+        [ "contents" value <text-content> ] >>display ;
 
 : <paste-feed-action> ( -- action )
     <feed-action>
@@ -227,7 +227,7 @@ M: annotation entity-url
 : <raw-annotation-action> ( -- action )
     <action>
         [ validate-integer-id "id" value lookup-annotation from-object ] >>init
-        [ "contents" value "text/plain" <content> ] >>display ;
+        [ "contents" value <text-content> ] >>display ;
 
 : <delete-annotation-action> ( -- action )
     <action>

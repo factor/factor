@@ -33,12 +33,15 @@ TUPLE: fjsc < dispatcher ;
     over "/" head? [ "/" append ] unless 
     swap append  ;
 
+: <javascript-content> ( body -- content )
+    "application/javascript" <content> ;
+
 : do-compile-url ( url -- response )
     [
         absolute-url http-get nip 'expression' parse
         fjsc-compile write "();" write
     ] with-string-writer
-    "application/javascript" <content> ;
+    <javascript-content> ;
 
 : v-local ( string -- string )
     dup "http:" head? [ "Unable to compile code from remote sites" throw ] when ;
@@ -55,10 +58,10 @@ TUPLE: fjsc < dispatcher ;
         [ validate-compile-url "url" value do-compile-url ] >>display ;
 
 : do-compile ( code -- response )
-    [ 
+    [
         'expression' parse fjsc-compile write
     ] with-string-writer
-    "application/javascript" <content> ;
+    <javascript-content> ;
 
 : validate-compile ( -- )
     {
