@@ -182,10 +182,12 @@ TUPLE: proc-meminfo
     direct-map-4k
     direct-map-2m ;
 
+! Different kernels have fewer fields. Make sure we have enough.
 : parse-proc-meminfo ( -- meminfo )
     "/proc/meminfo" utf8 file-lines [
         " " split harvest second string>number 1024 *
-    ] map [ proc-meminfo boa ] input<sequence ;
+    ] map
+    50 f pad-tail [ proc-meminfo boa ] input<sequence ;
 
 ! All cpu-stat fields are measured in jiffies.
 TUPLE: proc-stat
