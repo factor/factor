@@ -6,7 +6,7 @@ IN: unix.ffi.tests
 
 ! Aliases seem unreliable. Leave this as an example but don't rely
 ! on aliases working.
-[ t ] [
+[ ] [
     "http" f getservbyname aliases>> utf8 alien>strings drop
 ] unit-test
 
