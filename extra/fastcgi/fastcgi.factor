@@ -209,7 +209,7 @@ ENUM: fcgi-protocol-status
 
 TUPLE: test-responder ;
 C: <test-responder> test-responder
-M: test-responder call-responder* 2drop test-output "text/html" <content> ;
+M: test-responder call-responder* 2drop test-output <html-content> ;
 
 : do-it ( -- )
     <test-responder> main-responder set

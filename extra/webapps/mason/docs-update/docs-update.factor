@@ -30,5 +30,5 @@ IN: webapps.mason.docs-update
     [ validate-secret ] >>validate
     [
         [ update-docs ] "Documentation update" spawn drop
-        "OK" "text/plain" <content>
+        "OK" <text-content>
     ] >>submit ;

@@ -9,7 +9,7 @@ IN: webapps.benchmark
 
 : <hello-action> ( -- action )
     <page-action>
-        [ "Hello, world!" "text/plain" <content> ] >>display ;
+        [ "Hello, world!" <text-content> ] >>display ;
 
 TUPLE: benchmark < dispatcher ;
 

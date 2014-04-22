@@ -14,7 +14,7 @@ C: <base-path-check-responder> base-path-check-responder
 M: base-path-check-responder call-responder*
     2drop
     "$funny-dispatcher" resolve-base-path
-    "text/plain" <content> ;
+    <text-content> ;
 
 [ ] [
     <dispatcher>

@@ -8,7 +8,13 @@ HELP: <content>
 
 HELP: <text-content>
 { $values { "body" "a response body" } { "response" response } }
-{ $description "Creates a plain text response." } ;
+{ $description "Creates a response with content type " { $snippet "text/plain" } "." } ;
+
+HELP: <html-content>
+{ $values { "body" "a response body" } { "response" response } }
+{ $description "Creates a response with content type " { $snippet "text/html" } "." } ;
+
+{ <content> <text-content> <html-content> } related-words
 
 HELP: <trivial-response>
 { $values { "code" integer } { "message" string } { "response" response } }
@@ -26,9 +32,8 @@ ARTICLE: "http.server.responses" "Canned HTTP responses"
 { $subsections
     <content>
     <text-content>
+    <html-content>
 }
-
-{ $vocab-link "furnace.json" } " implements " { $link <json-content> } "." $nl
 "For errors:"
 { $subsections
     <304>
