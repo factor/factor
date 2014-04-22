@@ -80,6 +80,8 @@ CONSTANT: invalid-codepoints {
     0x10fffe 0x10ffff
 }
 
+! see http://www.w3.org/TR/html5/syntax.html#named-character-references
+
 CONSTANT: html5 H{
     { "Aacute" "\xc1" }
     { "aacute" "\xe1" }
