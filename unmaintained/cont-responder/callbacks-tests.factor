@@ -21,7 +21,7 @@ IN: furnace.callbacks.tests
     <action> [
         [
             "hello" print
-            "text/html" <content>
+            <html-content>
         ] show-page
         "byebye" print
         [ 123 ] show-final

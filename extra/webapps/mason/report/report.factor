@@ -10,7 +10,7 @@ IN: webapps.mason.report
         [
             [
                 current-builder last-report>>
-                "text/html" <content>
+                <html-content>
             ] with-mason-db
         ] >>display ;
 
