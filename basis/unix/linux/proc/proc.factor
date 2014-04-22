@@ -3,7 +3,7 @@
 USING: accessors arrays combinators combinators.smart
 io.encodings.utf8 io.files kernel math math.order math.parser
 memoize sequences sorting.slots splitting splitting.monotonic
-strings io.pathnames calendar ;
+strings io.pathnames calendar words ;
 IN: unix.linux.proc
 
 ! /proc/*
@@ -184,10 +184,10 @@ TUPLE: proc-meminfo
 
 ! Different kernels have fewer fields. Make sure we have enough.
 : parse-proc-meminfo ( -- meminfo )
-    "/proc/meminfo" utf8 file-lines [
-        " " split harvest second string>number 1024 *
-    ] map
-    50 f pad-tail [ proc-meminfo boa ] input<sequence ;
+    "/proc/meminfo" utf8 file-lines
+    [ " " split harvest second string>number 1024 * ] map
+    proc-meminfo "slots" word-prop length f pad-tail
+    [ proc-meminfo boa ] input<sequence ;
 
 ! All cpu-stat fields are measured in jiffies.
 TUPLE: proc-stat
@@ -331,6 +331,6 @@ TUPLE: pid-stat pid filename state parent-pid group-id session-id terminal#
     "stat" proc-pid-path
     proc-first-line
     " " split harvest
-    52 "0" pad-tail  ! XXX: Kernel 3.2 doesn't have enough entries
+    pid-stat "slots" word-prop length "0" pad-tail
     [ dup string>number [ nip ] when* ] map
     [ pid-stat boa ] input<sequence ;
