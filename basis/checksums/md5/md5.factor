@@ -1,11 +1,9 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data kernel io io.binary io.files
-io.streams.byte-array math math.functions math.parser namespaces
-splitting grouping strings sequences byte-arrays locals
-sequences.private macros fry io.encodings.binary math.bitwise
-checksums accessors checksums.common checksums.stream
-combinators combinators.smart specialized-arrays literals hints ;
+USING: accessors alien.c-types alien.data byte-arrays checksums
+checksums.common checksums.stream combinators fry grouping hints
+kernel kernel.private literals locals macros math math.bitwise
+math.functions sequences sequences.private specialized-arrays ;
 FROM: sequences.private => change-nth-unsafe ;
 SPECIALIZED-ARRAY: uint
 IN: checksums.md5
@@ -90,7 +88,7 @@ MACRO: with-md5-round ( ops quot -- )
     '[ [ _ (ABCD) ] compose ] map '[ _ 2cleave ] ;
 
 : (process-md5-block-F) ( block state -- )
-    {
+    { uint-array uint-array } declare {
         [ a b c d 0  S11 1  ]
         [ d a b c 1  S12 2  ]
         [ c d a b 2  S13 3  ]
@@ -107,10 +105,10 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 13 S12 14 ]
         [ c d a b 14 S13 15 ]
         [ b c d a 15 S14 16 ]
-    } [ F ] with-md5-round ; inline
+    } [ F ] with-md5-round ;
 
 : (process-md5-block-G) ( block state -- )
-    {
+    { uint-array uint-array } declare {
         [ a b c d 1  S21 17 ]
         [ d a b c 6  S22 18 ]
         [ c d a b 11 S23 19 ]
@@ -127,10 +125,10 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 2  S22 30 ]
         [ c d a b 7  S23 31 ]
         [ b c d a 12 S24 32 ]
-    } [ G ] with-md5-round ; inline
+    } [ G ] with-md5-round ;
 
 : (process-md5-block-H) ( block state -- )
-    {
+    { uint-array uint-array } declare {
         [ a b c d 5  S31 33 ]
         [ d a b c 8  S32 34 ]
         [ c d a b 11 S33 35 ]
@@ -147,10 +145,10 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 12 S32 46 ]
         [ c d a b 15 S33 47 ]
         [ b c d a 2  S34 48 ]
-    } [ H ] with-md5-round ; inline
+    } [ H ] with-md5-round ;
 
 : (process-md5-block-I) ( block state -- )
-    {
+    { uint-array uint-array } declare {
         [ a b c d 0  S41 49 ]
         [ d a b c 7  S42 50 ]
         [ c d a b 14 S43 51 ]
@@ -167,7 +165,7 @@ MACRO: with-md5-round ( ops quot -- )
         [ d a b c 11 S42 62 ]
         [ c d a b 2  S43 63 ]
         [ b c d a 9  S44 64 ]
-    } [ I ] with-md5-round ; inline
+    } [ I ] with-md5-round ;
 
 : byte-array>le ( byte-array -- byte-array )
     little-endian? [
