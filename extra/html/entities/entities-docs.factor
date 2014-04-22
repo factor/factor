@@ -7,4 +7,4 @@ HELP: html-escape
 
 HELP: html-unescape
 { $values { "str" string } { "newstr" string } }
-{ $description "Convert all named and numeric character references (e.g. &gt;, &#62;, &x3e;) in the string " { $snippet "str" } " to the corresponding unicode characters using the rules defined by the HTML5 standard" } ;
+{ $description "Convert all named and numeric character references (e.g. " { $snippet "&gt;" } ", " { $snippet "&#62;" } ", " { $snippet "&x3e;" } ") in the string " { $snippet "str" } " to the corresponding unicode characters using the rules defined by the HTML5 standard." } ;
