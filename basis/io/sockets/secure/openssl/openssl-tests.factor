@@ -15,13 +15,11 @@ IN: io.sockets.secure.openssl.tests
     AF_INET SOCK_STREAM IPPROTO_TCP socket ;
 
 : socket-connect ( remote -- socket )
-    inet-socket swap dupd make-sockaddr/size connect drop ;
+    inet-socket swap dupd make-sockaddr/size connect 0 assert= ;
 
 : ssl-socket-connect ( remote -- ssl-socket )
     socket-connect os windows? [ alien-address ] when
     BIO_NOCLOSE BIO_new_socket ;
-
-[ 200 ] [ "https://www.google.se" http-get drop code>> ] unit-test
 
 : remote ( url -- remote )
     url-addr addrspec>> resolve-host first ;
@@ -49,16 +47,13 @@ IN: io.sockets.secure.openssl.tests
     SSL_get_peer_certificate subject-name
 ] unit-test
 
-[ t ] [
-    <http-server> 8887 >>insecure f >>secure [
-        [
-            "https://localhost:8887" http-get
-        ] [ certificate-missing-error? ] recover
-    ] with-threaded-server
-] unit-test
+{ 200 } [ "https://www.google.se" http-get drop code>> ] unit-test
 
-[ t ] [
-    [
-        "test" 33 <ssl-handle> handle>> check-subject-name
-    ] [ certificate-missing-error? ] recover
-] unit-test
+[
+    <http-server> 8887 >>insecure f >>secure [
+        "https://localhost:8887" http-get
+    ] with-threaded-server
+] [ certificate-missing-error? ] must-fail-with
+
+[ "test" 33 <ssl-handle> handle>> check-subject-name ]
+[ certificate-missing-error? ] must-fail-with
