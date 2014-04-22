@@ -1,7 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io kernel sequences assocs splitting parser
-namespaces math vocabs hashtables ;
+USING: assocs hashtables kernel math namespaces vocabs ;
 IN: tools.deploy.config
 
 SYMBOL: deploy-name
@@ -67,3 +66,6 @@ SYMBOL: deploy-image
         ! default value for deploy.macosx
         { "stop-after-last-window?" t }
     } assoc-union ;
+
+SYMBOL: deploy-directory
+"resource:" deploy-directory set-global

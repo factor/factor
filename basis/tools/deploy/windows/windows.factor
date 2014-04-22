@@ -29,7 +29,7 @@ CONSTANT: app-icon-resource-id "APPICON"
     [ 2drop ] if ;
 
 M: windows deploy*
-    [
+    deploy-directory get [
         dup deploy-config [
             deploy-name get
             {
@@ -41,4 +41,4 @@ M: windows deploy*
                 [ nip open-in-explorer ]
             } 2cleave 
         ] with-variables
-    ] with-resource-directory ;
+    ] with-directory ;
