@@ -81,7 +81,11 @@ HELP: unset-os-env
     "Names and values of environment variables are operating system-specific."
 } ;
 
-{ os-env os-envs set-os-env unset-os-env set-os-envs set-os-envs-pointer change-os-env } related-words
+HELP: with-os-env
+{ $values { "value" string } { "key" string } { "quot" "quotation" } }
+{ $description "Calls a quotation with the " { $snippet "key" } " environment variable set to " { $snippet "value" } ", resetting the environment variable afterwards to its previous value." } ;
+
+{ os-env os-envs set-os-env unset-os-env set-os-envs set-os-envs-pointer change-os-env with-os-env } related-words
 
 
 ARTICLE: "environment" "Environment variables"
