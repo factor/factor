@@ -88,6 +88,9 @@ $nl
 "On by default."
 { $notes "On Mac OS X, if " { $link deploy-ui? } " is set, the application will always be deployed as an application bundle regardless of the " { $snippet "deploy-console?" } " setting. The UI implementation on Mac OS X relies on the application being in a bundle." } } ;
 
+HELP: deploy-directory
+{ $description "Used to specify the directory where the deployed executable will be created." } ;
+
 HELP: deploy-io
 { $description "The level of I/O support required by the deployed image:"
     { $table
