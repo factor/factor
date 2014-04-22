@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators init kernel sequences splitting
-system vocabs vocabs.loader ;
+USING: assocs combinators continuations init kernel sequences
+splitting system vocabs vocabs.loader ;
 IN: environment
 
 HOOK: os-env os ( key -- value )
@@ -24,6 +24,10 @@ HOOK: set-os-envs-pointer os ( malloc -- )
 
 : set-os-envs ( assoc -- )
     [ "=" glue ] { } assoc>map (set-os-envs) ;
+
+: with-os-env ( value key quot -- )
+    over [ [ [ set-os-env ] 2curry ] [ compose ] bi* ] dip
+    [ os-env ] keep [ set-os-env ] 2curry [ ] cleanup ; inline
 
 {
     { [ os unix? ] [ "environment.unix" require ] }
