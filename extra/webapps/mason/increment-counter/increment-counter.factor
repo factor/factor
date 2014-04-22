@@ -9,6 +9,6 @@ IN: webapps.mason.increment-counter
     [
         [
             increment-counter-value
-            number>string "text/plain" <content>
+            number>string <text-content>
         ] with-mason-db
     ] >>submit ;

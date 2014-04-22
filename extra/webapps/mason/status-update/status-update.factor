@@ -90,5 +90,5 @@ IN: webapps.mason.status-update
             find-builder
             [ update-builder ] [ update-tuple ] bi
         ] with-mason-db
-        "OK" "text/plain" <content>
+        "OK" <text-content>
     ] >>submit ;
