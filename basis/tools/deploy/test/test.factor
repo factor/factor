@@ -9,10 +9,10 @@ IN: tools.deploy.test
 
 : shake-and-bake ( vocab -- )
     [ test-image temp-file delete-file ] ignore-errors
-    temp-directory [
+    [
         [ vm test-image temp-file ] dip
         dup deploy-config make-deploy-image drop
-    ] with-directory ;
+    ] with-resource-directory ;
 
 ERROR: image-too-big actual-size max-size ;
 
