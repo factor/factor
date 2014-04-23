@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii assocs calendar colors.constants
-formatting html.parser html.parser.analyzer html.parser.printer
-http.client io io.streams.string io.styles kernel make
-namespaces regexp sequences splitting urls wrap.strings xml
-xml.data xml.traversal ;
+formatting html.entities html.parser html.parser.analyzer
+html.parser.printer http.client io io.streams.string io.styles
+kernel make namespaces regexp sequences splitting urls
+wrap.strings xml xml.data xml.traversal ;
 FROM: xml.data => tag? ;
 
 IN: wikipedia
@@ -78,8 +78,5 @@ PRIVATE>
     "content" find-by-id-between
     [ html-text. ] with-string-writer string-lines
     [ [ blank? ] trim ] map harvest [
-        R/ &lt;/ "<" re-replace
-        R/ &gt;/ ">" re-replace
-        R/ &amp;/ "&" re-replace
-        72 wrap-string print nl
+        html-unescape 72 wrap-string print nl
     ] each ;
