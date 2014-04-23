@@ -2,15 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: assocs combinators combinators.short-circuit formatting
-grouping hashtables io kernel make math math.parser regexp
-sequences splitting strings unicode.categories ;
+grouping hashtables io kernel make math math.parser sequences
+splitting strings unicode.categories ;
 
 IN: txon
 
 <PRIVATE
 
 : decode-value ( string -- string' )
-    R" \\`" "`" re-replace ;
+    "\\`" "`" replace ;
 
 : `? ( ch1 ch2 -- ? )
     [ CHAR: \ = not ] [ CHAR: ` = ] bi* and ;
@@ -58,7 +58,7 @@ PRIVATE>
 <PRIVATE
 
 : encode-value ( string -- string' )
-    R" `" "\\`" re-replace ;
+    "`" "\\`" replace ;
 
 PRIVATE>
 
