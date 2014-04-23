@@ -84,14 +84,6 @@
                 Source='../license.txt'
                 KeyPath='yes' />
           </Component>
-          <Component Id='ReadmeHTML' Guid='6e66ea90-6BE3-460D-A14F-75658D16550B'>
-            <File
-                Id='ReadmeHTML'
-                Name='readme.html'
-                DiskId='1'
-                Source='../readme.html'
-                KeyPath='yes' />
-          </Component>
           <Component Id='ReadmeMD' Guid='6e66ea91-6BE3-460D-A14F-75658D16550B'>
             <File
                 Id='ReadmeMD'
@@ -137,7 +129,6 @@
       <ComponentRef Id='MainImage' />
       <ComponentRef Id='MainLib' />
       <ComponentRef Id='License' />
-      <ComponentRef Id='ReadmeHTML' />
       <ComponentRef Id='ReadmeMD' />
       <ComponentRef Id='TestLib' />
       <ComponentRef Id='ApplicationShortcut' />
