@@ -336,14 +336,16 @@ def build(ctx):
     boot_image_path = '../%s' % boot_image_name
 
     if ctx.env.MAKE_BOOTSTRAP_IMAGE:
+        # Backslashes are misinterpreted by Factor on Windows
+        resource_path = cwd.abspath().replace('\\', '/')
         params = [
-            '-resource-path=%s' % cwd.abspath(),
+            '-resource-path=%s' % resource_path,
             '-script',
             '-e="USING: system bootstrap.image vocabs.refresh ; '
             'refresh-all make-my-image"',
         ]
         ctx(
-            rule = '%s %s' % (ctx.env['FACTOR-LANG'], ' '.join(params)),
+            rule = '"%s" %s' % (ctx.env['FACTOR-LANG'], ' '.join(params)),
             source = [],
             target = boot_image_path
         )
