@@ -285,7 +285,14 @@ HELP: set-array-nth
 
 HELP: collect
 { $values { "n" "a non-negative integer" } { "quot" { $quotation "( ... n -- ... value )" } } { "into" "a sequence of length at least " { $snippet "n" } } }
-{ $description "A primitive mapping operation that applies a quotation to all integers from 0 up to but not including " { $snippet "n" } ", and collects the results in a new array. User code should use " { $link map } " instead." } ;
+{ $description "A primitive mapping operation that applies a quotation to all integers from 0 up to but not including " { $snippet "n" } ", and collects the results in a new array. User code should use " { $link map } " instead." }
+{ $examples
+  { $example
+    "USING: kernel math.parser prettyprint sequences sequences.private ;"
+    "10 [ number>string ] 10 f new-sequence [ collect ] keep ."
+    "{ \"0\" \"1\" \"2\" \"3\" \"4\" \"5\" \"6\" \"7\" \"8\" \"9\" }"
+  }
+} ;
 
 HELP: each
 { $values { "seq" sequence } { "quot" { $quotation "( ... x -- ... )" } } }
