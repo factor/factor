@@ -57,6 +57,8 @@ SYMBOL: infer-children-data
     value-infos off
     constraints off ;
 
+DEFER: collect-variables
+
 : infer-children ( node -- )
     [ live-children ] [ child-constraints ] bi [
         [
@@ -64,7 +66,8 @@ SYMBOL: infer-children-data
             [ copy-value-info assume (propagate) ]
             [ 2drop no-value-info ]
             if
-        ] H{ } make-assoc
+            collect-variables
+        ] with-scope
     ] 2map infer-children-data set ;
 
 : compute-phi-input-infos ( phi-in -- phi-info )
@@ -85,6 +88,14 @@ SYMBOL: infer-children-data
     [ [ value-infos-union ] map ] dip set-value-infos ;
 
 SYMBOL: condition-value
+
+: collect-variables ( -- hash )
+    {
+        condition-value
+        constraints
+        infer-children-data
+        value-infos
+    } [ dup get ] H{ } map>assoc ;
 
 M: #phi propagate-before ( #phi -- )
     [ annotate-phi-inputs ]
