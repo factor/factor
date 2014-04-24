@@ -5,7 +5,6 @@ IN: namespaces
 
 ARTICLE: "namespaces-combinators" "Namespace combinators"
 { $subsections
-    make-assoc
     with-scope
     with-variable
     with-variables
@@ -145,10 +144,6 @@ HELP: with-variable
     { $code "[ 3 x set foo ] with-scope" }
     { $code "3 x [ foo ] with-variable" }
 } ;
-
-HELP: make-assoc
-{ $values { "quot" quotation } { "exemplar" assoc } { "hash" "a new assoc" } }
-{ $description "Calls the quotation in a new namespace of the same type as " { $snippet "exemplar" } ", and outputs this namespace when the quotation returns. Useful for quickly building assocs." } ;
 
 HELP: with-variables
 { $values { "ns" assoc } { "quot" quotation } }
