@@ -103,16 +103,22 @@ M: closer process
 
 SYMBOL: text-now?
 
+: collect-variables ( -- hash )
+    {
+        input-stream
+        extra-entities
+        spot
+        ns-stack
+        text-now?
+    } [ dup get ] H{ } map>assoc ;
+
 PRIVATE>
 
 TUPLE: pull-xml scope ;
 : <pull-xml> ( -- pull-xml )
     [
-        init-parser
-        input-stream [ ] change ! bring var in this scope
-        init-xml text-now? on
-    ] H{ } make-assoc
-    pull-xml boa ;
+        init-parser init-xml text-now? on collect-variables
+    ] with-scope pull-xml boa ;
 ! pull-xml needs to call start-document somewhere
 
 : pull-event ( pull -- xml-event/f )

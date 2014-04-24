@@ -61,7 +61,6 @@ PRIVATE>
 : dec ( variable -- ) -1 swap +@ ; inline
 : with-variables ( ns quot -- ) swap >n call ndrop ; inline
 : counter ( variable -- n ) [ 0 or 1 + dup ] change-global ; inline
-: make-assoc ( quot exemplar -- hash ) 20 swap new-assoc [ swap with-variables ] keep ; inline
 : with-scope ( quot -- ) 5 <hashtable> swap with-variables ; inline
 : with-variable ( value key quot -- ) [ associate ] dip with-variables ; inline
 : with-global ( quot -- ) [ global ] dip with-variables ; inline

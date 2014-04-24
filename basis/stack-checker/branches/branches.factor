@@ -61,7 +61,7 @@ SYMBOLS: combinator quotations ;
     ] if-empty ;
 
 : branch-variable ( seq symbol -- seq )
-    '[ [ _ ] dip at ] map ;
+    '[ _ of ] map ;
 
 : active-variable ( seq symbol -- seq )
     [ [ terminated? over at [ drop f ] when ] map ] dip
@@ -92,6 +92,20 @@ SYMBOLS: combinator quotations ;
     input-count [ ] change
     inner-d-index [ ] change ;
 
+: collect-variables ( -- hash )
+    {
+        (meta-d)
+        (meta-r)
+        current-word
+        inner-d-index
+        input-count
+        literals
+        quotation
+        recursive-state
+        stack-visitor
+        terminated?
+    } [ dup get ] H{ } map>assoc ;
+
 GENERIC: infer-branch ( literal -- namespace )
 
 M: literal-tuple infer-branch
@@ -99,7 +113,8 @@ M: literal-tuple infer-branch
         copy-inference
         nest-visitor
         [ value>> quotation set ] [ infer-literal-quot ] bi
-    ] H{ } make-assoc ;
+        collect-variables
+    ] with-scope ;
 
 M: declared-effect infer-branch
     known>> infer-branch ;
@@ -109,7 +124,8 @@ M: callable infer-branch
         copy-inference
         nest-visitor
         [ quotation set ] [ infer-quot-here ] bi
-    ] H{ } make-assoc ;
+        collect-variables
+    ] with-scope ;
 
 : infer-branches ( branches -- input children data )
     [ pop-d ] dip
