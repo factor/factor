@@ -19,7 +19,7 @@ ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 "More words can be found in " { $link "compilation-units" } "." ;
 
 ARTICLE: "compiler-impl" "Compiler implementation"
-"The " { $vocab-link "compiler" } "vocabulary, in addition to providing the user-visible words of the compiler, implements the main compilation loop."
+"The " { $vocab-link "compiler" } " vocabulary, in addition to providing the user-visible words of the compiler, implements the main compilation loop."
 $nl
 "Once compiled, a word is added to the assoc stored in the " { $link compiled } " variable. When compilation is complete, this assoc is passed to " { $link modify-code-heap } "."
 $nl
