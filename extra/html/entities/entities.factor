@@ -2316,25 +2316,25 @@ CONSTANT: html5 H{
     { "zwnj;" "\u00200c" }
 }
 
-: replace-charref ( str -- str' )
-    "#" ?head [
-        ! numeric charref
-        ";" ?tail drop dup first "xX" member?
-        [ rest hex> ] [ dec> ] if invalid-charrefs ?at [
-            dup { [ 0xD800 0xDFFF between? ] [ 0x10FFFF > ] } 1||
-            [ drop "\u0FFFFD" ] [
-                dup invalid-codepoints member?
-                [ drop "" ] [ 1string ] if
-            ] if
-        ] unless
-    ] [
-        ! named charref
-        html5 ?at [
-            ! find the longest matching name
-            dup dup length 1 (a,b) [ head html5 at ] with map-find
-            [ swapd tail append ] [ drop "&" prepend ] if*
-        ] unless
-    ] if ;
+: numeric-charref ( str -- newstr )
+    ";" ?tail drop dup first "xX" member?
+    [ rest hex> ] [ dec> ] if invalid-charrefs ?at [
+        dup { [ 0xD800 0xDFFF between? ] [ 0x10FFFF > ] } 1||
+        [ drop "\u0FFFFD" ] [
+            dup invalid-codepoints member?
+            [ drop "" ] [ 1string ] if
+        ] if
+    ] unless ;
+
+: named-charref ( str -- newstr )
+    html5 ?at [
+        ! find the longest matching name
+        dup dup length 1 (a,b) [ head html5 at ] with map-find
+        [ swapd tail append ] [ drop "&" prepend ] if*
+    ] unless ;
+
+: replace-charref ( str -- newstr )
+    "#" ?head [ numeric-charref ] [ named-charref ] if ;
 
 CONSTANT: re-charref
 R/ &(#[0-9]+|#[xX][0-9a-fA-F]+|[^\t\n\f <&#;]{1,32});?/
