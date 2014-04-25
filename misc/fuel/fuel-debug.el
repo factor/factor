@@ -143,13 +143,16 @@ the debugger."
       (fuel-debug--display-output ret)
       (delete-blank-lines)
       (newline)
-      (when (and (not err) success-msg)
+      (cond
+       ((and (not err) success-msg)
         (message "%s" success-msg)
         (insert "\n" success-msg "\n"))
-      (when err
+       ((eq (car err) 'fuel-con-error)
+        (fuel-debug--display-parse-error (second err)))
+       (err
         (fuel-debug--display-restarts err)
         (delete-blank-lines)
-        (newline))
+        (newline)))
       (fuel-debug--display-uses ret)
       (let ((hstr (fuel-debug--help-string err fuel-debug--file)))
         (if fuel-debug-show-short-help
@@ -202,6 +205,7 @@ the debugger."
     (newline)))
 
 (defun fuel-debug--display-output (ret)
+  "Diplays the retort `ret' in fuels debug buffer."
   (let* ((last (fuel-eval--retort-output fuel-debug--last-ret))
          (current (fuel-eval--retort-output ret))
          (llen (length last))
@@ -215,6 +219,11 @@ the debugger."
     (goto-char (point-max))
     (when err
       (insert (format "\nError: %S\n\n" (fuel-eval--error-name err))))))
+
+(defun fuel-debug--display-parse-error (str)
+  (insert
+   (format
+    "FUEL failed to parse the connection response, displayed below:\n\n%s\n\n" str)))
 
 (defun fuel-debug--display-restarts (err)
   (let* ((rs (fuel-eval--error-restarts err))
