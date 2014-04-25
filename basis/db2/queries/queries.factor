@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii classes.tuple
 combinators.short-circuit db2 db2.connections db2.statements
-db2.types db2.utils fry kernel orm.tuples sequences strings ;
+db2.types db2.utils fry kernel sequences strings ;
 IN: db2.queries
 
 TUPLE: sql-object ;
@@ -38,14 +38,14 @@ PRIVATE>
 : database-table-schema-select-sql ( string -- string )
     information-schema-select-sql
     """WHERE
-            table_catalog=$1 AND 
+            table_catalog=$1 AND
             table_name=$2 AND
             table_schema='public'""" append ;
 
 : database-schema-select-sql ( string -- string )
     information-schema-select-sql
     """WHERE
-            table_catalog=$1 AND 
+            table_catalog=$1 AND
             table_schema='public'""" append ;
 
 M: object database-tables-statement

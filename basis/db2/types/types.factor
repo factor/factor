@@ -15,6 +15,8 @@ MIXIN: sql-type
 MIXIN: sql-modifier
 MIXIN: sql-primary-key
 
+INSTANCE: sql-primary-key sql-modifier
+
 <<
 
 : define-sql-instance ( word mixin -- )
