@@ -130,13 +130,11 @@
 (defsubst fuel-eval--retort-p (ret)
   (and (listp ret) (= 3 (length ret))))
 
-(defsubst fuel-eval--make-parse-error-retort (str)
-  (fuel-eval--retort-make (cons 'fuel-parse-retort-error str) nil))
-
 (defun fuel-eval--parse-retort (ret)
   (fuel-log--info "RETORT: %S" ret)
-  (if (fuel-eval--retort-p ret) ret
-    (fuel-eval--make-parse-error-retort ret)))
+  (if (fuel-eval--retort-p ret)
+      ret
+    (list ret nil nil)))
 
 (defsubst fuel-eval--error-name (err) (car err))
 
