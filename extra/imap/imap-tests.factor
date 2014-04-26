@@ -1,7 +1,9 @@
-USING: accessors arrays assocs calendar calendar.format combinators
-continuations formatting fry grouping.extras imap io.streams.duplex kernel
-math math.parser math.ranges math.statistics namespaces pcre random sequences
-sets sorting strings tools.test ;
+USING: accessors arrays assocs calendar calendar.format
+combinators continuations formatting fry grouping.extras imap
+io.streams.duplex kernel math math.parser math.ranges
+math.statistics namespaces random sequences sets sorting
+splitting strings system tools.test ;
+FROM: pcre => findall ;
 IN: imap.tests
 
 : random-ascii ( n -- str )
@@ -61,9 +63,16 @@ ERROR: no-imap-test-host ;
     "ALL" "" search-mails
 ] imap-test
 
+: base-folder ( -- s )
+    os name>> cpu name>> "-" glue ;
+
+: test-folder ( s -- s )
+    [ base-folder "/" ] dip 3append ;
+
 ! Create delete select again.
 [ 0 ] [
-    "örjan" [ create-folder ] [ select-folder ] [ delete-folder ] tri
+    "örjan" test-folder
+    [ create-folder ] [ select-folder ] [ delete-folder ] tri
 ] imap-test
 
 ! Test list folders
@@ -110,27 +119,30 @@ ERROR: no-imap-test-host ;
 
 ! Rename folder
 [ ] [
-    "日本語" [ create-folder ] [
-        "ascii-name" [ rename-folder ] [ delete-folder ] bi
+    "日本語" test-folder [ create-folder ] [
+        "ascii-name" test-folder
+        [ rename-folder ] [ delete-folder ] bi
     ] bi
 ] imap-test
 
 ! Create a folder hierarchy
 [ t ] [
-    "*" list-folders length
-    "foo/bar/baz/日本語" [
-        create-folder "*" list-folders length 4 - =
+    "*" test-folder list-folders length
+    "foo/bar/baz/日本語" test-folder [
+        create-folder
+        "*" test-folder list-folders length 4 - =
     ] [ delete-folder ] bi
 ] imap-test
 
 ! A gmail compliant way of creating a folder hierarchy.
 [ ] [
-    "foo/bar/baz/boo" "/" split { } [ suffix ] cum-map [ "/" join ] map
+    "foo/bar/baz/boo" test-folder "/" split
+    { } [ suffix ] cum-map [ "/" join ] map
     [ [ create-folder ] each ] [ [ delete-folder ] each ] bi
 ] imap-test
 
 [ ] [
-    "örjan" {
+    "örjan" test-folder {
         [ create-folder ]
         [ select-folder drop ]
         ! Append mail with a seen flag
