@@ -48,12 +48,6 @@ M: linked-assoc clear-assoc
 M: linked-assoc clone
     [ assoc>> clone ] [ dlist>> clone ] bi linked-assoc boa ;
 
-: >linked-assoc ( assoc -- linked-assoc )
-    >alist [ <linked-hash> ] dip assoc-union! ;
-
-M: linked-assoc assoc-like
-    drop dup linked-assoc? [ >linked-assoc ] unless ; inline
-
 INSTANCE: linked-assoc assoc
 
 : >linked-hash ( assoc -- assoc )
