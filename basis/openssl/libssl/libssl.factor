@@ -97,6 +97,32 @@ C-TYPE: SSL_SESSION
 
 LIBRARY: libssl
 
+! Must be called before any other action takes place
+FUNCTION: int SSL_library_init (  ) ;
+
+! Maps OpenSSL errors to strings
+FUNCTION: void SSL_load_error_strings (  ) ;
+
+: (ssl-error-string) ( n -- string )
+    ERR_clear_error f ERR_error_string ;
+
+: ssl-error-string ( -- string )
+    ERR_get_error (ssl-error-string) ;
+
+: (ssl-error) ( -- * )
+    ssl-error-string throw ;
+
+: ssl-error ( obj -- )
+    { f 0 } member? [ (ssl-error) ] when ;
+
+: init-ffi ( -- )
+    SSL_library_init ssl-error
+    SSL_load_error_strings
+    OpenSSL_add_all_digests
+    OpenSSL_add_all_ciphers ;
+
+INITIALIZER: init-ffi
+
 ! ===============================================
 ! stack.h
 ! ===============================================
@@ -271,15 +297,10 @@ TYPEDEF: ssl_st SSL
 
 FUNCTION: c-string SSL_get_version ( SSL* ssl ) ;
 
-! Maps OpenSSL errors to strings
-FUNCTION: void SSL_load_error_strings (  ) ;
 FUNCTION: c-string SSL_state_string ( SSL* ssl ) ;
 FUNCTION: c-string SSL_rstate_string ( SSL* ssl ) ;
 FUNCTION: c-string SSL_state_string_long ( SSL* ssl ) ;
 FUNCTION: c-string SSL_rstate_string_long ( SSL* ssl ) ;
-
-! Must be called before any other action takes place
-FUNCTION: int SSL_library_init (  ) ;
 
 ! Sets the default SSL version
 FUNCTION: ssl-method SSLv2_client_method (  ) ;
