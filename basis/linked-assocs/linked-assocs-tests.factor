@@ -74,3 +74,8 @@ IN: linked-assocs.test
     { { 1 2 } { 3 4 } { 5 6 } }
     { } <linked-assoc> assoc-like >alist
 ] unit-test
+
+{ t } [
+    { { "a" "b" } { "c" "d" } }
+    [ >linked-hash ] [ >linked-hash ] bi =
+] unit-test
