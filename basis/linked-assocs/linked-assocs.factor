@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov, James Cash.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs deques dlists fry kernel
+USING: accessors arrays assocs classes deques dlists fry kernel
 sequences sequences.private ;
 IN: linked-assocs
 
@@ -45,8 +45,15 @@ M: linked-assoc >alist
 M: linked-assoc clear-assoc
     [ assoc>> clear-assoc ] [ dlist>> clear-deque ] bi ;
 
-M: linked-assoc clone 
-    [ assoc>> clone ] [ dlist>> clone ] bi
-    linked-assoc boa ;
+M: linked-assoc clone
+    [ assoc>> clone ] [ dlist>> clone ] bi linked-assoc boa ;
 
 INSTANCE: linked-assoc assoc
+
+: >linked-hash ( assoc -- assoc )
+    [ <linked-hash> ] dip assoc-union! ;
+
+M: linked-assoc assoc-like
+    over linked-assoc?
+    [ 2dup [ assoc>> ] bi@ class-of instance? ] [ f ] if
+    [ drop ] [ assoc>> <linked-assoc> swap assoc-union! ] if ;

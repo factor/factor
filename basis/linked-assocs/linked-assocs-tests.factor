@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences assocs tools.test linked-assocs math ;
+USING: accessors assocs kernel linked-assocs math sequences
+tools.test ;
 IN: linked-assocs.test
 
 { { 1 2 3 } } [
@@ -62,4 +63,14 @@ IN: linked-assocs.test
     2 "by" pick set-at
     3 "cx" pick set-at
     >alist
+] unit-test
+
+{ t V{ { 1 20 } { 3 40 } { 5 60 } } } [
+    { { 1 2 } { 3 4 } { 5 6 } } >linked-hash
+    [ 10 * ] assoc-map [ linked-assoc? ] [ >alist ] bi
+] unit-test
+
+{ V{ { 1 2 } { 3 4 } { 5 6 } } } [
+    { { 1 2 } { 3 4 } { 5 6 } }
+    { } <linked-assoc> assoc-like >alist
 ] unit-test
