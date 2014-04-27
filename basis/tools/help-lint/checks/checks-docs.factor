@@ -1,5 +1,5 @@
 USING: help.markup help.syntax sequences words ;
-IN: help.lint.checks
+IN: tools.help-lint.checks
 
 HELP: check-example
 { $values { "element" sequence } }
@@ -10,7 +10,7 @@ HELP: check-values
 { $description "Throws an error if the $values pair doesnt match the declared stack effect." }
 { $examples
   { $unchecked-example
-    "USING: help.lint.checks math ;"
+    "USING: tools.help-lint.checks math ;"
     ": foo ( x -- y ) ;"
     "\\ foo { $values { \"a\" number } { \"b\" number } } check-values"
     "$values don't match stack effect; expected { \"x\" \"y\" }, got { \"a\" \"b\" }\n\nType :help for debugging help."
