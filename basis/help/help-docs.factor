@@ -113,7 +113,7 @@ $nl
 }
 "Related words can be cross-referenced:"
 { $subsections related-words }
-{ $see-also "help.lint" } ;
+{ $see-also "tools.help-lint" } ;
 
 ARTICLE: "help-impl" "Help system implementation"
 "Help topic protocol:"
@@ -151,7 +151,7 @@ ARTICLE: "help" "Help system"
 { $subsections
     "browsing-help"
     "writing-help"
-    "help.lint"
+    "tools.help-lint"
     "tips-of-the-day"
     "help-impl"
 } ;

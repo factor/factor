@@ -13,6 +13,7 @@ IN: bootstrap.tools
     "tools.destructors"
     "tools.disassembler"
     "tools.dispatch"
+    "tools.help-lint"
     "tools.memory"
     "tools.profiler.sampling"
     "tools.test"

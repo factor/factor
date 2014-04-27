@@ -4,7 +4,6 @@ parser vocabs vocabs.loader vocabs.loader.private accessors assocs ;
 IN: bootstrap.help
 
 : load-help ( -- )
-    "help.lint" require
     "help.vocabs" require
 
     t load-help? set-global
