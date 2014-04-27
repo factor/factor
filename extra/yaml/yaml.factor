@@ -22,29 +22,43 @@ ERROR: yaml-no-document ;
 
 <PRIVATE
 
-: yaml-initialize-assert-ok ( ? -- ) [ libyaml-initialize-error ] unless ;
+: yaml-initialize-assert-ok ( ? -- )
+    [ libyaml-initialize-error ] unless ;
+
 : (libyaml-parser-error) ( parser -- )
     {
-        [ error>> ] [ problem>> ] [ problem_offset>> ] [ problem_value>> ]
-        [ problem_mark>> ] [ context>> ] [ context_mark>> ]
+        [ error>> ]
+        [ problem>> ]
+        [ problem_offset>> ]
+        [ problem_value>> ]
+        [ problem_mark>> ]
+        [ context>> ]
+        [ context_mark>> ]
     } cleave [ clone ] 7 napply libyaml-parser-error ;
+
 : (libyaml-emitter-error) ( emitter -- )
     [ error>> ] [ problem>> ] bi [ clone ] bi@ libyaml-emitter-error ;
+
 : yaml-parser-assert-ok ( ? parser -- )
     swap [ drop ] [ (libyaml-parser-error) ] if ;
+
 : yaml-emitter-assert-ok ( ? emitter -- )
     swap [ drop ] [ (libyaml-emitter-error) ] if ;
 
 : yaml_parser_parse_asserted ( parser event -- )
     [ yaml_parser_parse ] [ drop yaml-parser-assert-ok ] 2bi ;
+
 : yaml_emitter_emit_asserted ( emitter event -- )
     [ yaml_emitter_emit ] [ drop yaml-emitter-assert-ok ] 2bi ;
 
 TUPLE: yaml-alias anchor ;
 C: <yaml-alias> yaml-alias
+
 SYMBOL: anchors
+
 : ?register-anchor ( obj event -- obj )
     dupd anchor>> [ anchors get set-at ] [ drop ] if* ;
+
 : assert-anchor-exists ( anchor -- )
     anchors get 2dup at* nip
     [ 2drop ] [ yaml-undefined-anchor ] if ;
@@ -64,20 +78,36 @@ TUPLE: factor_sequence_start_event_data anchor tag implicit style ;
 TUPLE: factor_mapping_start_event_data anchor tag implicit style ;
 TUPLE: factor_event_data sequence_start mapping_start ;
 TUPLE: factor_yaml_event_t type data start_mark end_mark ;
+
 : deep-copy-seq ( data -- data' )
-    { [ anchor>> clone ] [ tag>> clone ] [ implicit>> ] [ style>> ] } cleave
-    factor_sequence_start_event_data boa ;
+    {
+        [ anchor>> clone ]
+        [ tag>> clone ]
+        [ implicit>> ]
+        [ style>> ]
+    } cleave factor_sequence_start_event_data boa ;
+
 : deep-copy-map ( data -- data' )
-    { [ anchor>> clone ] [ tag>> clone ] [ implicit>> ] [ style>> ] } cleave
-    factor_mapping_start_event_data boa ;
+    {
+        [ anchor>> clone ]
+        [ tag>> clone ]
+        [ implicit>> ]
+        [ style>> ]
+    } cleave factor_mapping_start_event_data boa ;
+
 : deep-copy-data ( event -- data )
     [ data>> ] [ type>> ] bi {
         { YAML_SEQUENCE_START_EVENT [ sequence_start>> deep-copy-seq f ] }
         { YAML_MAPPING_START_EVENT [ mapping_start>> deep-copy-map f swap ] }
     } case factor_event_data boa ;
+
 : deep-copy-event ( event -- event' )
-    { [ type>> ] [ deep-copy-data ] [ start_mark>> ] [ end_mark>> ] } cleave
-    factor_yaml_event_t boa ;
+    {
+        [ type>> ]
+        [ deep-copy-data ]
+        [ start_mark>> ]
+        [ end_mark>> ]
+    } cleave factor_yaml_event_t boa ;
 
 : ?scalar-value ( event -- scalar/event scalar? )
     dup type>> {
@@ -92,12 +122,15 @@ TUPLE: factor_yaml_event_t type data start_mark end_mark ;
 
 DEFER: parse-sequence
 DEFER: parse-mapping
+
 : (parse-sequence) ( parser event prev-event -- obj )
     data>> sequence_start>> [ [ 2drop f ] dip ?register-anchor drop ]
     [ [ parse-sequence ] [ construct-sequence ] bi* ] [ 2nip ?register-anchor ] 3tri ;
+
 : (parse-mapping) ( parser event prev-event -- obj )
     data>> mapping_start>> [ [ 2drop f ] dip ?register-anchor drop ]
     [ [ parse-mapping ] [ construct-mapping ] bi* ] [ 2nip ?register-anchor ] 3tri ;
+
 : next-complex-value ( parser event prev-event -- obj )
     dup type>> {
         { YAML_SEQUENCE_START_EVENT [ (parse-sequence) ] }
@@ -152,17 +185,20 @@ DEFER: parse-mapping
     ] with-destructors ;
 
 GENERIC: (deref-aliases) ( anchors obj -- obj' )
+
 M: object (deref-aliases) nip ;
-M: byte-array (deref-aliases) nip ;
-M: string (deref-aliases) nip ;
+
 M: yaml-alias (deref-aliases) anchor>> swap at ;
 
 M: sequence (deref-aliases)
     [ (deref-aliases) ] with map! ;
+
 M: set (deref-aliases)
     [ members (deref-aliases) ] [ clear-set ] [ swap union! ] tri ;
+
 : assoc-map! ( assoc quot -- )
     [ assoc-map ] [ drop clear-assoc ] [ drop swap assoc-union! ] 2tri ; inline
+
 M: assoc (deref-aliases)
     swap '[ [ _ swap (deref-aliases) ] bi@ ] assoc-map! ;
 
@@ -178,12 +214,11 @@ M: assoc (deref-aliases)
             { YAML_DOCUMENT_START_EVENT [ t ] }
             { YAML_STREAM_END_EVENT [ f ] }
             [ { YAML_DOCUMENT_START_EVENT YAML_STREAM_END_EVENT } yaml-unexpected-event ]
-        } case
-    ] with-destructors
-    [
-        parser event parse-yaml-doc t
-        parser event YAML_DOCUMENT_END_EVENT expect-event
-    ] [ f f ] if ;
+        } case [
+            parser event parse-yaml-doc t
+            parser event YAML_DOCUMENT_END_EVENT expect-event
+        ] [ f f ] if
+    ] with-destructors ;
 
 ! registers destructors (use with with-destructors)
 :: init-parser ( str -- parser event )
@@ -217,14 +252,18 @@ PRIVATE>
 <PRIVATE
 
 TUPLE: yaml-anchors objects new-objects next-anchor ;
+
 : <yaml-anchors> ( -- yaml-anchors )
     IH{ } clone IH{ } clone 0 yaml-anchors boa ;
+
 GENERIC: (replace-aliases) ( yaml-anchors obj -- obj' )
+
 : incr-anchor ( yaml-anchors -- current-anchor )
     [ next-anchor>> ] [
         [ [ number>string ] [ 1 + ] bi ]
         [ next-anchor<< ] bi*
     ] bi ;
+
 :: ?replace-aliases ( yaml-anchors obj -- obj' )
     yaml-anchors objects>> :> objects
     obj objects at* [
@@ -238,12 +277,17 @@ GENERIC: (replace-aliases) ( yaml-anchors obj -- obj' )
     ] if ;
 
 M: object (replace-aliases) nip ;
+
 M: byte-array (replace-aliases) nip ;
+
 M: string (replace-aliases) nip ;
 
 M: sequence (replace-aliases)
     [ ?replace-aliases ] with map ;
-M: set (replace-aliases) [ members (replace-aliases) ] keep set-like ;
+
+M: set (replace-aliases)
+    [ members (replace-aliases) ] keep set-like ;
+
 M: assoc (replace-aliases)
     swap '[ [ _ swap ?replace-aliases ] bi@ ] assoc-map ;
 
@@ -251,18 +295,28 @@ TUPLE: yaml-anchor anchor obj ;
 C: <yaml-anchor> yaml-anchor
 
 GENERIC: (replace-anchors) ( yaml-anchors obj -- obj' )
-: (get-anchor) ( yaml-anchors obj -- anchor/f ) swap objects>> at ;
+
+: (get-anchor) ( yaml-anchors obj -- anchor/f )
+    swap objects>> at ;
+
 : get-anchor ( yaml-anchors obj -- anchor/f )
     { [ (get-anchor) ] [ over new-objects>> at (get-anchor) ] } 2|| ;
+
 : ?replace-anchors ( yaml-anchors obj -- obj' )
     [ (replace-anchors) ] [ get-anchor ] 2bi [ swap <yaml-anchor> ] when* ;
+
 M: object (replace-anchors) nip ;
+
 M: byte-array (replace-anchors) nip ;
+
 M: string (replace-anchors) nip ;
 
 M: sequence (replace-anchors)
     [ ?replace-anchors ] with map ;
-M: set (replace-anchors) [ members ?replace-anchors ] keep set-like ;
+
+M: set (replace-anchors)
+    [ members ?replace-anchors ] keep set-like ;
+
 M: assoc (replace-anchors)
     swap '[ [ _ swap ?replace-anchors ] bi@ ] assoc-map ;
 
@@ -281,6 +335,7 @@ SYMBOL: yaml-write-buffer
     ] yaml_write_handler_t ;
 
 GENERIC: emit-value ( emitter event anchor obj -- )
+
 : emit-object ( emitter event obj -- ) [ f ] dip emit-value ;
 
 :: emit-scalar ( emitter event anchor obj -- )
@@ -294,6 +349,7 @@ M: object emit-value ( emitter event anchor obj -- ) emit-scalar ;
 
 M: yaml-anchor emit-value ( emitter event unused obj -- )
     nip [ anchor>> ] [ obj>> ] bi emit-value ;
+
 M:: yaml-alias emit-value ( emitter event unused obj -- )
     event obj anchor>> yaml_alias_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
@@ -309,20 +365,27 @@ M:: yaml-alias emit-value ( emitter event unused obj -- )
 
 : emit-sequence-body ( emitter event seq -- )
     [ emit-object ] with with each ;
+
 : emit-assoc-body ( emitter event assoc -- )
     >alist concat emit-sequence-body ;
+
 : emit-linked-assoc-body ( emitter event linked-assoc -- )
     >alist [ first2 swap associate ] map emit-sequence-body ;
+
 : emit-set-body ( emitter event set -- )
     [ members ] [ cardinality f <array> ] bi zip concat emit-sequence-body ;
 
 M: f emit-value ( emitter event anchor f -- ) emit-scalar ;
+
 M: string emit-value ( emitter event anchor string -- ) emit-scalar ;
+
 M: byte-array emit-value ( emitter event anchor byte-array -- ) emit-scalar ;
+
 M: sequence emit-value ( emitter event anchor seq -- )
     [ drop YAML_SEQ_TAG emit-sequence-start ]
     [ nip emit-sequence-body ]
     [ 2drop emit-sequence-end ] 4tri ;
+
 M: linked-assoc emit-value ( emitter event anchor assoc -- )
     [ drop YAML_OMAP_TAG emit-sequence-start ]
     [ nip emit-linked-assoc-body ]
@@ -341,6 +404,7 @@ M: assoc emit-value ( emitter event anchor assoc -- )
     [ drop YAML_MAP_TAG emit-assoc-start ]
     [ nip emit-assoc-body ]
     [ 2drop emit-assoc-end ] 4tri ;
+
 M: set emit-value ( emitter event anchor set -- )
     [ drop YAML_SET_TAG emit-assoc-start ]
     [ nip emit-set-body ]
