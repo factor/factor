@@ -22,6 +22,13 @@ LIBRARY: gtk
 
 IMPLEMENT-STRUCTS: GtkTreeIter ;
 
+DEFER: gtk_init
+
+: init-ffi ( -- )
+    f f gtk_init ;
+
+INITIALIZER: init-ffi
+
 GIR: vocab:gtk/Gtk-3.0.gir
 
 DESTRUCTOR: gtk_widget_destroy
