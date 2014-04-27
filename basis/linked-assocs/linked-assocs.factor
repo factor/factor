@@ -57,3 +57,6 @@ M: linked-assoc assoc-like
     over linked-assoc?
     [ 2dup [ assoc>> ] bi@ class-of instance? ] [ f ] if
     [ drop ] [ assoc>> <linked-assoc> swap assoc-union! ] if ;
+
+M: linked-assoc equal?
+    over linked-assoc? [ [ dlist>> ] bi@ = ] [ 2drop f ] if ;
