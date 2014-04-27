@@ -3,7 +3,14 @@ IN: tools.help-lint.checks
 
 HELP: check-example
 { $values { "element" sequence } }
-{ $description "Throws an error if the expected output from the $example is different from the expected, or if it leaks disposables." } ;
+{ $description "Throws an error if the expected output from the $example is different from the expected, or if it leaks disposables." }
+{ $examples
+  { $example
+    "USING: continuations help.markup prettyprint tools.help-lint.checks ;"
+    "[ { $example \"USING: io ; \\\"hello\\\" print\" \"goodbye\" } check-example ] [ ] recover ."
+    "T{ assert { got \"hello\" } { expect \"goodbye\" } }"
+  }
+} ;
 
 HELP: check-values
 { $values { "word" word } { "element" sequence } }
