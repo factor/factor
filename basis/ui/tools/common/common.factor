@@ -9,17 +9,21 @@ SYMBOL: tool-dims
 
 tool-dims [ H{ } clone ] initialize
 
+: set-tool-dim ( dim class -- )
+    tool-dims get-global set-at ;
+
+: get-tool-dim ( class -- dim )
+    tool-dims get-global at ;
+
 TUPLE: tool < track ;
 
 M: tool pref-dim*
-    { [ class-of tool-dims get-global at ] [ call-next-method ] } 1|| ;
+    { [ class-of get-tool-dim ] [ call-next-method ] } 1|| ;
 
 M: tool layout*
     [ call-next-method ]
-    [ [ dim>> ] [ class-of ] bi tool-dims get-global set-at ]
+    [ [ dim>> ] [ class-of ] bi set-tool-dim ]
     bi ;
-
-: set-tool-dim ( dim class -- ) tool-dims get-global set-at ;
 
 SLOT: scroller
 
