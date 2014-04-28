@@ -8,7 +8,12 @@ USING:
     system ;
 IN: pcre.ffi
 
-<< "pcre" dup find-library cdecl add-library >>
+! Arch Linux multilib calls it pcre32
+<<
+    "pcre"
+    { "pcre" "pcre32" } find-first-library
+    cdecl add-library
+>>
 
 LIBRARY: pcre
 
