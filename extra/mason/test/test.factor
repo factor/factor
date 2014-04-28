@@ -68,10 +68,14 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
         ".factor-mason-rc" rc-path try-user-init
     ] with-variable ;
 
+: check-user-init-errors ( -- ? )
+    user-init-errors get-global assoc-empty?
+    [ f ] [ :user-init-errors t ] if ;
+
 : do-all ( -- )
     f parser-quiet? set-global
     ".." [
-        run-mason-rc
+        run-mason-rc check-user-init-errors [ 1 exit ] when
         bootstrap-time get boot-time-file to-file
         check-boot-image [ 1 exit ] when
         [ do-load ] benchmark load-time-file to-file
