@@ -16,7 +16,6 @@ CONSTANT: mach-map {
 
 : parse-ldconfig-lines ( string -- triple )
     [
-        
         "=>" split1 [ [ blank? ] trim ] bi@
         [ " " split1 [ "()" in? ] trim "," split ] dip 3array
     ] map ;
