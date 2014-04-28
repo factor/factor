@@ -5,10 +5,11 @@ IN: sorting.insertion
 
 :: insert ( ... seq quot: ( ... elt -- ... elt' ) n -- ... )
     n zero? [
-        n n 1 - [ seq nth-unsafe quot call ] bi@ >= [
-            n n 1 - seq exchange-unsafe
+        n n 1 - [ seq nth-unsafe ] bi@
+        2dup [ quot call ] bi@ >= [ 2drop ] [
+            n 1 - n [ seq set-nth-unsafe ] bi-curry@ bi*
             seq quot n 1 - insert
-        ] unless
+        ] if
     ] unless ; inline recursive
 
 PRIVATE>
