@@ -160,6 +160,7 @@ CLASS: FactorView < NSOpenGLView NSTextInput
             self SEND: backingScaleFactor execute( x x -- x )
             dup 1.0 > [
                 gl-scale-factor set-global t retina? set-global
+                cached-lines get-global clear-assoc
             ] [ drop ] if
 
         ] when
