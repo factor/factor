@@ -2,6 +2,7 @@ USING: kernel locals math sequences sequences.private ;
 IN: sorting.insertion
 
 <PRIVATE
+
 :: insert ( ... seq quot: ( ... elt -- ... elt' ) n -- ... )
     n zero? [
         n n 1 - [ seq nth-unsafe quot call ] bi@ >= [
@@ -9,8 +10,9 @@ IN: sorting.insertion
             seq quot n 1 - insert
         ] unless
     ] unless ; inline recursive
+
 PRIVATE>
 
 : insertion-sort ( ... seq quot: ( ... elt -- ... elt' ) -- ... )
     ! quot is a transformation on elements
-    over length [ insert ] with with each-integer ; inline
+    over length [ insert ] with with 1 -rot (each-integer) ; inline
