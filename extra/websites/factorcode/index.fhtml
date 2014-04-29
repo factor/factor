@@ -3,15 +3,14 @@ webapps.mason.version.data webapps.mason.backend webapps.mason.grids webapps.mas
 webapps.mason.utils html.elements html.streams accessors
 xml.writer xmode.highlight ; %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 
-	<title>Factor programming language</title>
-	<link rel="stylesheet" href="master.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+<title>Factor programming language</title>
+<link rel="stylesheet" href="master.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 </head>
 
 <body>
@@ -72,9 +71,7 @@ xml>string write-html
 <% latest-version <a [ announcement-url>> =href a> ] [ version>> write ] bi </a> %>
 </h2>
 
-<table id="mytable" cellspacing="0" summary="Stable releases">
-	<% release-grid write-xml %>
-</table>
+<% release-grid write-xml %>
 
 <p><b>Source code</b>:
 <% latest-version <a [ source-path>> download-url =href a> ] [ version>> write ] bi </a> %>
@@ -82,9 +79,7 @@ xml>string write-html
 
 <h2>Development release</h2>
 
-<table id="mytable" cellspacing="0" summary="Development releases">
-	<% package-grid write-xml %>
-</table>
+<% package-grid write-xml %>
 
 <% ] with-mason-db %>
 
@@ -93,7 +88,7 @@ xml>string write-html
 <p><b>Source code</b> is stored in our <a href="http://concatenative.org/wiki/view/Factor/GIT repository">GIT repository</a>. Source can can be browsed online via <a href="http://github.com/slavapestov/factor/">github</a> or <a href="http://gitweb.factorcode.org/">gitweb</a>.</p>
 
 <h1>More</h1>
-                    
+
 <ul>
 <li><a href="http://concatenative.org/wiki/view/Factor/Mailing list">Join the mailing list</a></li>
 <li><a href="http://concatenative.org/wiki/view/Concatenative IRC channel">Join the IRC channel</a></li>
