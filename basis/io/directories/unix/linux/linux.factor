@@ -12,6 +12,6 @@ IN: io.directories.unix.linux
 
 M: linux (directory-entries) ( path -- seq )
     [
-        dirent64 <struct>
+        dirent <struct>
         '[ _ _ next-dirent ] [ >directory-entry ] produce nip
     ] with-unix-directory ;
