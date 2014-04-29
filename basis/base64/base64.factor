@@ -50,8 +50,8 @@ SYMBOL: column
 
 : encode3 ( seq -- )
     column output-stream get '[
-        swap be> { 3 2 1 0 } [
-            -6 * shift 0x3f bitand ch>base64 _ write1-lines
+        swap be> { -18 -12 -6 0 } [
+            shift 0x3f bitand ch>base64 _ write1-lines
         ] with each
     ] change ; inline
 
