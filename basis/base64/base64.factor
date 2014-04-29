@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators fry io io.binary io.encodings.binary
-io.streams.byte-array kernel math namespaces
+io.streams.byte-array kernel math namespaces sbufs
 sequences strings ;
 IN: base64
 
@@ -11,12 +11,15 @@ ERROR: malformed-base64 ;
 
 : read1-ignoring ( ignoring stream -- ch )
     dup stream-read1 pick dupd member?
-    [ drop read1-ignoring ] [ 2nip ] if ;
+    [ drop read1-ignoring ] [ 2nip ] if ; inline recursive
 
-: read-ignoring ( n ignoring stream -- str )
-    '[ _ _ read1-ignoring ] replicate
-    [ { f 0 } member-eq? not ] "" filter-as
-    [ f ] when-empty ;
+: push-ignoring ( accum ch -- accum )
+    dup { f 0 } member-eq? [ drop ] [ over push ] if ; inline
+
+: read-ignoring ( n ignoring stream -- str/f )
+    [ [ <sbuf> ] keep ] 2dip
+    '[ _ _ read1-ignoring push-ignoring ] times
+    [ f ] [ "" like ] if-empty ; inline
 
 : ch>base64 ( ch -- ch )
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
