@@ -5,12 +5,11 @@ IN: io.streams.memory
 
 TUPLE: memory-stream alien ;
 
-: <memory-stream> ( alien -- stream )
-    memory-stream boa ;
+C: <memory-stream> memory-stream
 
 INSTANCE: memory-stream input-stream
 
-M: memory-stream stream-element-type drop +byte+ ;
+M: memory-stream stream-element-type drop +byte+ ; inline
 
 M: memory-stream stream-read1
     [ 1 over <displaced-alien> ] change-alien drop
