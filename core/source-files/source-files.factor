@@ -39,8 +39,8 @@ ERROR: invalid-source-file-path path ;
 
 : reset-checksums ( -- )
     source-files get [
-        swap dup exists? [
-            utf8 file-lines swap record-checksum
+        over exists? [
+            [ utf8 file-lines ] dip record-checksum
         ] [ 2drop ] if
     ] assoc-each ;
 
