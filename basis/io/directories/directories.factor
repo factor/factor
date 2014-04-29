@@ -31,7 +31,7 @@ HOOK: make-directory io-backend ( path -- )
 ! Listing directories
 TUPLE: directory-entry name type ;
 
-HOOK: >directory-entry os ( byte-array -- directory-entry )
+C: <directory-entry> directory-entry
 
 HOOK: (directory-entries) os ( path -- seq )
 

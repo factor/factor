@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.data alien.strings
 assocs combinators continuations destructors fry io io.backend
 io.directories io.encodings.binary io.files.info.unix
 io.encodings.utf8 io.files io.pathnames io.files.types kernel
-math.bitwise sequences system unix unix.stat vocabs.loader
+math math.bitwise sequences system unix unix.stat vocabs.loader
 classes.struct unix.ffi literals libc vocabs io.files.info ;
 IN: io.directories.unix
 
@@ -40,15 +40,6 @@ M: unix copy-file ( from to -- )
         dupd curry swap '[ _ closedir io-error ] [ ] cleanup
     ] with-directory ; inline
 
-HOOK: find-next-file os ( DIR* -- byte-array )
-
-M: unix find-next-file ( DIR* -- byte-array )
-    dirent <struct>
-    f void* <ref>
-    0 set-errno
-    [ readdir_r 0 = [ errno 0 = [ (io-error) ] unless ] unless ] 2keep
-    void* deref [ drop f ] unless ;
-
 : dirent-type>file-type ( type -- file-type )
     H{
         { $ DT_BLK  +block-device+ }
@@ -63,25 +54,22 @@ M: unix find-next-file ( DIR* -- byte-array )
 
 ! An easy way to return +unknown+ is to mount a .iso on OSX and
 ! call directory-entries on the mount point.
-: dirent>file-type ( dirent -- type )
-    dup d_type>> dirent-type>file-type
-    dup +unknown+ = [
-        drop d_name>> utf8 alien>string file-info type>>
-    ] [
-        nip
-    ] if ;
 
-M: unix >directory-entry ( byte-array -- directory-entry )
-    {
-        [ d_name>> underlying>> utf8 alien>string ]
-        [ dirent>file-type ]
-    } cleave directory-entry boa ;
+: next-dirent ( DIR* dirent* -- dirent* ? )
+    f void* <ref> [
+        readdir_r [ dup strerror libc-error ] unless-zero
+    ] 2keep void* deref ; inline
+
+: >directory-entry ( dirent* -- directory-entry )
+    [ d_name>> utf8 alien>string ]
+    [ d_type>> dirent-type>file-type ] bi
+    dup +unknown+ = [ drop dup file-info type>> ] when
+    <directory-entry> ; inline
 
 M: unix (directory-entries) ( path -- seq )
     [
-        '[ _ find-next-file dup ]
-        [ >directory-entry ]
-        produce nip
+        dirent <struct>
+        '[ _ _ next-dirent ] [ >directory-entry ] produce nip
     ] with-unix-directory ;
 
 os linux? [ "io.directories.unix.linux" require ] when
