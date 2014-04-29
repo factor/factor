@@ -98,18 +98,17 @@ STRUCT: passwd
     { pw_dir c-string }
     { pw_shell c-string } ;
 
-STRUCT: dirent64
+! dirent64
+STRUCT: dirent
     { d_ino ulonglong }
     { d_off longlong }
     { d_reclen ushort }
     { d_type uchar }
     { d_name char[256] } ;
 
-ALIAS: dirent dirent64
-
 FUNCTION: int open64 ( c-string path, int flags, int prot ) ;
-FUNCTION: dirent64* readdir64 ( DIR* dirp ) ;
-FUNCTION: int readdir64_r ( void* dirp, dirent64* entry, dirent64** result ) ;
+FUNCTION: dirent* readdir64 ( DIR* dirp ) ;
+FUNCTION: int readdir64_r ( void* dirp, dirent* entry, dirent** result ) ;
 
 FUNCTION: ssize_t sendfile ( int out_fd, int in_fd, off_t* offset, size_t count ) ;
 
