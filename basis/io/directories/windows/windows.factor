@@ -48,13 +48,11 @@ M: windows delete-directory ( path -- )
     normalize-path
     RemoveDirectory win32-error=0/f ;
 
-: find-first-file ( path -- WIN32_FIND_DATA handle )
-    WIN32_FIND_DATA <struct>
+: find-first-file ( path WIN32_FIND_DATA -- WIN32_FIND_DATA HANDLE )
     [ nip ] [ FindFirstFile ] 2bi
     [ INVALID_HANDLE_VALUE = [ win32-error-string throw ] when ] keep ;
 
-: find-next-file ( path -- WIN32_FIND_DATA/f )
-    WIN32_FIND_DATA <struct>
+: find-next-file ( HANDLE WIN32_FIND_DATA -- WIN32_FIND_DATA/f )
     [ nip ] [ FindNextFile ] 2bi 0 = [
         GetLastError ERROR_NO_MORE_FILES = [
             win32-error
@@ -63,23 +61,27 @@ M: windows delete-directory ( path -- )
 
 TUPLE: windows-directory-entry < directory-entry attributes ;
 
-M: windows >directory-entry ( byte-array -- directory-entry )
+C: <windows-directory-entry> windows-directory-entry
+
+: >windows-directory-entry ( WIN32_FIND_DATA -- directory-entry )
     [ cFileName>> alien>native-string ]
     [
         dwFileAttributes>>
         [ win32-file-type ] [ win32-file-attributes ] bi
     ] bi
-    dupd remove windows-directory-entry boa ;
+    dupd remove <windows-directory-entry> ; inline
 
 M: windows (directory-entries) ( path -- seq )
     "\\" ?tail drop "\\*" append
-    find-first-file [ >directory-entry ] dip
+    WIN32_FIND_DATA <struct>
+    find-first-file over
+    [ >windows-directory-entry ] 2dip
     [
         '[
-            [ _ find-next-file dup ]
-            [ >directory-entry ]
+            [ _ _ find-next-file dup ]
+            [ >windows-directory-entry ]
             produce nip
             over name>> "." = [ nip ] [ swap prefix ] if
         ]
-    ] [ '[ _ FindClose win32-error=0/f ] ] bi [ ] cleanup ;
+    ] [ drop '[ _ FindClose win32-error=0/f ] ] 2bi [ ] cleanup ;
 
