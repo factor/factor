@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences byte-arrays bit-arrays math
-math.bitwise hints sets ;
+USING: accessors bit-arrays fry kernel math math.bitwise
+sequences sequences.private sets ;
 IN: bit-sets
 
 TUPLE: bit-set { table bit-array read-only } ;
@@ -22,9 +22,7 @@ M: bit-set adjoin
 M: bit-set delete
     ! This isn't allowed to throw an error if the elt wasn't
     ! in the set
-    over integer? [
-        [ f ] 2dip table>> ?set-nth
-    ] [ 2drop ] if ;
+    over integer? [ [ f ] 2dip table>> ?set-nth ] [ 2drop ] if ;
 
 ! If you do binary set operations with a bit-set, it's expected
 ! that the other thing can also be represented as a bit-set
@@ -37,13 +35,9 @@ ERROR: check-bit-set-failed ;
     dup bit-set? [ check-bit-set-failed ] unless ; inline
 
 : bit-set-map ( seq1 seq2 quot -- seq )
-    [ 2drop length>> ]
-    [
-        [
-            [ [ length ] bi@ assert= ]
-            [ [ underlying>> ] bi@ ] 2bi
-        ] dip 2map
-    ] 3bi bit-array boa ; inline
+    [ drop [ length ] bi@ [ assert= ] keep ]
+    [ [ [ underlying>> ] bi@ ] dip 2map ] 3bi
+    bit-array boa ; inline
 
 : (bit-set-op) ( set1 set2 -- table1 table2 )
     [ set-like ] keep [ table>> ] bi@ ; inline
@@ -66,7 +60,7 @@ M: bit-set subset?
     [ intersect ] keep = ;
 
 M: bit-set members
-    [ table>> length iota ] keep [ in? ] curry filter ;
+    table>> [ length iota ] keep '[ _ nth-unsafe ] filter ;
 
 <PRIVATE
 
