@@ -118,7 +118,7 @@ M: bignum (bit-count)
     ] if-zero ;
 
 : byte-array-bit-count ( byte-array -- n )
-    0 [ byte-bit-count + ] reduce ; inline
+    [ byte-bit-count ] map-sum ; inline
 
 PRIVATE>
 
