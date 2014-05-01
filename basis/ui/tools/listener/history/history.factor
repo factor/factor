@@ -12,46 +12,48 @@ TUPLE: history document elements index ;
 <PRIVATE
 
 : push-if-not-last ( elt seq -- )
-    dup empty? [ push ] [
-        dup last pick = [ 2drop ] [ push ] if
-    ] if ;
+    2dup ?last = [ 2drop ] [ push ] if ;
+
+: current-input ( history -- input ? )
+    document>> doc-string [ <input> ] [ empty? ] bi ;
 
 PRIVATE>
 
 : history-add ( history -- input )
-    dup elements>> length 1 + >>index
-    [ document>> doc-string [ <input> ] [ empty? ] bi ] keep
-    '[ [ _ elements>> push-if-not-last ] keep ] unless ;
+    dup current-input [ nip ] [
+        [
+            over elements>>
+            [ push-if-not-last ]
+            [ length >>index drop ] bi
+        ] keep
+    ] if ;
 
 <PRIVATE
 
-: (save-history) ( input index elements -- )
-    2dup length > [
-        [ [ T{ input f "" } ] dip push ] keep
-        (save-history)
-    ] [ set-nth ] if ;
+: set-element ( elt history -- )
+    [ index>> ] [ elements>> ] bi set-nth ;
+
+: get-element ( history -- elt )
+    [ index>> ] [ elements>> ] bi nth ;
 
 : save-history ( history -- )
-    [ document>> doc-string ] keep
-    '[ <input> _ [ index>> ] [ elements>> ] bi (save-history) ]
-    unless-empty ;
+    dup current-input [ 2drop ] [ swap set-element ] if ;
 
 : update-document ( history -- )
-    [ [ index>> ] [ elements>> ] bi nth string>> ] [ document>> ] bi
-    [ set-doc-string ] [ clear-undo drop ] 2bi ;
+    [ get-element string>> ] [ document>> ] bi
+    [ set-doc-string ] [ clear-undo ] bi ;
 
 : change-history-index ( history i -- )
     over elements>> length 1 -
-    '[ _ + _ min 0 max ] change-index drop ;
+    '[ _ + 0 _ clamp ] change-index drop ;
 
 : history-recall ( history i -- )
-    [ [ elements>> empty? ] keep ] dip '[
-        _
-        [ save-history ]
-        [ _ change-history-index ]
-        [ update-document ]
-        tri
-    ] unless ;
+    over elements>> empty? [ 2drop ] [
+        [ drop save-history ]
+        [ change-history-index ]
+        [ drop update-document ]
+        2tri
+    ] if ;
 
 PRIVATE>
 
