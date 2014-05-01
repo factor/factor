@@ -188,6 +188,10 @@ GENERIC: (deref-aliases) ( anchors obj -- obj' )
 
 M: object (deref-aliases) nip ;
 
+M: byte-array (deref-aliases) nip ;
+
+M: string (deref-aliases) nip ;
+
 M: yaml-alias (deref-aliases) anchor>> swap at ;
 
 M: sequence (deref-aliases)
