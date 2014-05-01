@@ -218,11 +218,11 @@ M: assoc (deref-aliases)
             { YAML_DOCUMENT_START_EVENT [ t ] }
             { YAML_STREAM_END_EVENT [ f ] }
             [ { YAML_DOCUMENT_START_EVENT YAML_STREAM_END_EVENT } yaml-unexpected-event ]
-        } case [
-            parser event parse-yaml-doc t
-            parser event YAML_DOCUMENT_END_EVENT expect-event
-        ] [ f f ] if
-    ] with-destructors ;
+        } case
+    ] with-destructors [
+        parser event parse-yaml-doc t
+        parser event YAML_DOCUMENT_END_EVENT expect-event
+    ] [ f f ] if ;
 
 ! registers destructors (use with with-destructors)
 :: init-parser ( str -- parser event )
