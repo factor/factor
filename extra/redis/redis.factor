@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io io.sockets io.streams.duplex kernel
-redis.command-writer redis.response-parser splitting
-io.encodings.8-bit.latin1 ;
+redis.command-writer redis.response-parser io.encodings.utf8 ;
 IN: redis
 
 #! Connection
@@ -11,7 +10,7 @@ IN: redis
 : redis-auth ( password -- response ) auth flush read-response ;
 
 #! String values
-: redis-set ( value key -- response ) set flush read-response ;
+: redis-set ( value key -- ) set flush check-response ;
 : redis-get ( key -- response ) get flush read-response ;
 : redis-getset ( value key -- response ) getset flush read-response ;
 : redis-mget ( keys -- response ) mget flush read-response ;
@@ -25,7 +24,7 @@ IN: redis
 : redis-type ( key -- response ) type flush read-response ;
 
 #! Key space
-: redis-keys ( pattern -- response ) keys flush read-response " " split ;
+: redis-keys ( pattern -- response ) keys flush read-response ;
 : redis-randomkey ( -- response ) randomkey flush read-response ;
 : redis-rename ( newkey key -- response ) rename flush read-response ;
 : redis-renamenx ( newkey key -- response ) renamenx flush read-response ;
@@ -37,9 +36,9 @@ IN: redis
 : redis-lpush ( value key -- response ) lpush flush read-response ;
 : redis-llen ( key -- response ) llen flush read-response ;
 : redis-lrange ( start end key -- response ) lrange flush read-response ;
-: redis-ltrim ( start end key -- response ) ltrim flush read-response ;
+: redis-ltrim ( start end key -- ) ltrim flush check-response ;
 : redis-lindex ( integer key -- response ) lindex flush read-response ;
-: redis-lset ( value index key -- response ) lset flush read-response ;
+: redis-lset ( value index key -- ) lset flush check-response ;
 : redis-lrem ( value amount key -- response ) lrem flush read-response ;
 : redis-lpop ( key -- response ) lpop flush read-response ;
 : redis-rpop ( key -- response ) rpop flush read-response ;
@@ -66,25 +65,25 @@ IN: redis
 : redis-hkeys ( key -- response ) hkeys flush read-response ;
 : redis-hlen ( key -- response ) hlen flush read-response ;
 : redis-hmget ( seq key  -- response ) hmget flush read-response ;
-: redis-hmset ( assoc key -- response ) hmset flush read-response ;
+: redis-hmset ( assoc key -- ) hmset flush check-response ;
 : redis-hset ( value field key -- response ) hset flush read-response ;
 : redis-hsetnx ( value field key -- response ) hsetnx flush read-response ;
 : redis-hvals ( key -- response ) hvals flush read-response ;
 
 #! Multiple db
-: redis-select ( integer -- response ) select flush read-response ;
+: redis-select ( integer -- ) select flush check-response ;
 : redis-move ( integer key -- response ) move flush read-response ;
-: redis-flushdb ( -- response ) flushdb flush read-response ;
-: redis-flushall ( -- response ) flushall flush read-response ;
+: redis-flushdb ( -- ) flushdb flush check-response ;
+: redis-flushall ( -- ) flushall flush check-response ;
 
 #! Sorting
 ! sort
 
 #! Persistence control
-: redis-save ( -- response ) save flush read-response ;
-: redis-bgsave ( -- response ) bgsave flush read-response ;
+: redis-save ( -- ) save flush check-response ;
+: redis-bgsave ( -- ) bgsave flush check-response ;
 : redis-lastsave ( -- response ) lastsave flush read-response ;
-: redis-shutdown ( -- response ) shutdown flush read-response ;
+: redis-shutdown ( -- ) shutdown flush check-response ;
 
 #! Remote server control
 : redis-info ( -- response ) info flush read-response ;
@@ -99,7 +98,7 @@ CONSTANT: default-redis-port 6379
     redis new
         "127.0.0.1" >>host
         default-redis-port >>port
-        latin1 >>encoding ;
+        utf8 >>encoding ;
 
 : redis-do-connect ( redis -- stream )
     [ host>> ] [ port>> ] [ encoding>> ] tri

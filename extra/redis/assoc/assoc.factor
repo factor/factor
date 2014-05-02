@@ -11,11 +11,11 @@ M: redis assoc-size [ redis-dbsize ] with-redis ;
 
 M: redis >alist [ "*" redis-keys dup redis-mget zip ] with-redis ;
 
-M: redis set-at [ redis-set drop ] with-redis ;
+M: redis set-at [ redis-set ] with-redis ;
 
 M: redis delete-at [ redis-del drop ] with-redis ;
 
-M: redis clear-assoc [ redis-flushdb drop ] with-redis ;
+M: redis clear-assoc [ redis-flushdb ] with-redis ;
 
 M: redis equal? assoc= ;
 
