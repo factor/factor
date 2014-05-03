@@ -39,11 +39,11 @@ HELP: bootstrap-first-bignum
 { $description "Outputs the value for the target architecture when bootstrapping." } ;
 
 HELP: bootstrap-most-positive-fixnum
-{ $values { "n" "largest positive integer representable by a fixnum" } } 
+{ $values { "n" "largest positive integer representable by a fixnum" } }
 { $description "Outputs the value for the target architecture when bootstrapping." } ;
 
 HELP: bootstrap-most-negative-fixnum
-{ $values { "n" "smallest negative integer representable by a fixnum" } } 
+{ $values { "n" "smallest negative integer representable by a fixnum" } }
 { $description "Outputs the value for the target architecture when bootstrapping." } ;
 
 HELP: cell
@@ -69,6 +69,9 @@ HELP: bootstrap-cells
 HELP: bootstrap-cell-bits
 { $values { "n" integer } }
 { $description "Outputs the number of bits in one cell in the target image (if bootstrapping) or the current CPU architecture (otherwise)." } ;
+
+HELP: immediate
+{ $class-description "Union class of all values that the Factor VM can store immediately, all others are stored as references (pointer) to them." } ;
 
 ARTICLE: "layouts-types" "Type numbers"
 "Corresponding to every built-in class is a built-in type number. An object can be asked for its built-in type number:"

@@ -2,6 +2,17 @@ USING: kernel generic help.markup help.syntax math classes
 sequences quotations generic.math.private ;
 IN: generic.math
 
+HELP: math-class-max
+{ $values { "class1" class } { "class2" class } }
+{ $description "Evaluates which math class is the largest." }
+{ $examples
+  { $example
+    "USING: generic.math math kernel prettyprint ;"
+    "integer float math-class-max ."
+    "float"
+  }
+} ;
+
 HELP: math-upgrade
 { $values { "class1" class } { "class2" class } { "quot" { $quotation "( n n -- n n )" } } }
 { $description "Outputs a quotation for upgrading numberical types. It takes two numbers on the stack, an instance of " { $snippet "class1" } ", and an instance of " { $snippet "class2" } ", and converts the one with the lower priority to the higher priority type." }
@@ -39,5 +50,3 @@ $nl
 
 HELP: math-generic
 { $class-description "The class of generic words using " { $link math-combination } "." } ;
-
-
