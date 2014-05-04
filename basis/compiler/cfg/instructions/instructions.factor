@@ -16,7 +16,6 @@ V{ } clone insn-classes set-global
 ! Virtual CPU instructions, used by CFG IR
 TUPLE: insn ;
 
-! Instructions which use vregs
 TUPLE: vreg-insn < insn ;
 
 ! Instructions which do not have side effects; used for
