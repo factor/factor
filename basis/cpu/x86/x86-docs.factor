@@ -13,7 +13,7 @@ HELP: ds-reg
 
 HELP: (%inc)
 { $description
-  "Generates machine code for increasing or decreasing the given register a number of cell sizes bytes."
+  "Emits machine code for increasing or decreasing the given register a number of cell sizes bytes."
 }
 { $examples
   { $unchecked-example
@@ -26,12 +26,29 @@ HELP: (%inc)
 HELP: load-zone-offset
 { $values { "nursery-ptr" "a register symbol" } }
 { $description
-  "Generates machine code for loading the address to the nursery into the machine register."
+  "Emits machine code for loading the address to the nursery into the machine register."
 }
 { $examples
   { $unchecked-example
-    "USING: cpu.x86 make prettyprint ;"
+    "USING: cpu.x86 make ;"
     "[ RCX load-zone-offset ] B{ } make disassemble"
     "0000000001b48f80: 498d4d10  lea rcx, [r13+0x10]"
+  }
+} ;
+
+HELP: copy-register*
+{ $values
+  { "dst" "a register symbol" }
+  { "src" "a register symbol" }
+  { "rep" "a value representation singleton" }
+}
+{ $description
+  "Emits machine code for copying from a register to another."
+}
+{ $examples
+  { $unchecked-example
+    "USING: cpu.x86 make ;"
+    "[ XMM1 XMM2 double-rep copy-register* ] B{ } make disassemble"
+    "0000000533c61fe0: 0f28ca  movaps xmm1, xmm2"
   }
 } ;
