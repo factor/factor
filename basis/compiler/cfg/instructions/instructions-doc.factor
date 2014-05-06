@@ -11,6 +11,11 @@ HELP: ##inc-d
   "An instruction that increases or decreases the data stacks size by n. For example, " { $link 2drop } " decreases it by two and pushing an item increases it by one."
 } ;
 
+HELP: ##alien-invoke
+{ $class-description
+  "An instruction for calling a function in a dynamically linked library."
+} ;
+
 HELP: ##set-slot
 { $class-description
   "An instruction for non-primitive non-immediate variant of " { $link set-slot } ". It has the following slots:"
