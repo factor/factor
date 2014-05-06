@@ -1,5 +1,12 @@
-USING: assocs help.markup help.syntax kernel sequences stack-checker.visitor ;
+USING: assocs help.markup help.syntax kernel sequences stack-checker.alien
+stack-checker.visitor ;
 IN: compiler.tree
+
+HELP: #alien-node
+{ $class-description "Base class for alien nodes. Its " { $snippet "params" } " slot holds an instance of the " { $link alien-node-params } " class." } ;
+
+HELP: #alien-invoke
+{ $class-description "SSA tree node that calls a function in a dynamically linked library." } ;
 
 HELP: #call
 { $class-description "SSA tree node that calls a word." } ;
