@@ -11,9 +11,20 @@ HELP: ##inc-d
   "An instruction that increases or decreases the data stacks size by n. For example, " { $link 2drop } " decreases it by two and pushing an item increases it by one."
 } ;
 
+HELP: ##prologue
+{ $class-description
+  "An instruction for generating the prologue for a cfg." } ;
+
 HELP: ##alien-invoke
 { $class-description
-  "An instruction for calling a function in a dynamically linked library."
+  "An instruction for calling a function in a dynamically linked library. It has the following slots:"
+  { $table
+    { { $slot "reg-inputs" } { "Registers to use for the arguments to the function call." } }
+    { { $slot "stack-inputs" } { "Stack slots used for the arguments to the function call. Only used if all register arguments are already filled." } }
+    { { $slot "reg-outputs" } { "Register that wil contain the return value of the function call if any." } }
+    { { $slot "symbols" } { "Name of the function to call." } }
+    { { $slot "dll" } { "A dll handle." } }
+  }
 } ;
 
 HELP: ##set-slot
