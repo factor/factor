@@ -186,7 +186,7 @@ cell factor_vm::compute_dlsym_address(array* parameters, cell index) {
       return (cell)undefined_symbol;
     }
     default:
-      critical_error("Bad symbol specifier", symbol);
+      critical_error("Bad symbol specifier in compute_dlsym_address", symbol);
       return (cell)undefined_symbol;
   }
 }
@@ -224,7 +224,7 @@ cell factor_vm::compute_dlsym_toc_address(array* parameters, cell index) {
       return (cell)undefined_toc;
     }
     default:
-      critical_error("Bad symbol specifier", symbol);
+      critical_error("Bad symbol specifier in compute_dlsym_toc_address", symbol);
       return (cell)undefined_toc;
   }
 }
