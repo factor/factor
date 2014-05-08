@@ -85,7 +85,6 @@ INSN: ##return ;
 
 INSN: ##safepoint ;
 
-! Dummy instruction that simply inhibits TCO
 INSN: ##no-tco ;
 
 ! Jump tables
