@@ -441,7 +441,6 @@ M: set emit-value ( emitter event anchor set -- )
     event f yaml_document_end_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
 
-! registers destructors (use with with-destructors)
 :: flush-emitter ( emitter event -- str )
     event yaml_stream_end_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted
