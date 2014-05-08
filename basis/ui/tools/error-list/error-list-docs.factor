@@ -12,7 +12,7 @@ $nl
     ! { { $image "vocab:ui/tools/error-list/icons/syntax-error.tiff" } "Syntax error" { $link "syntax" } }
     { { $image "vocab:ui/tools/error-list/icons/compiler-error.tiff" } "Compiler error" { $link "compiler-errors" } }
     { { $image "vocab:ui/tools/error-list/icons/linkage-error.tiff" } "Linkage error" { $link "loading-libs" } }
-    { { $image "vocab:ui/tools/error-list/icons/help-lint-error.tiff" } "Help lint failure" { $link "help.lint" } }
+    { { $image "vocab:ui/tools/error-list/icons/help-lint-error.tiff" } "Help lint failure" { $link "tools.help-lint" } }
     { { $image "vocab:ui/tools/error-list/icons/unit-test-error.tiff" } "Unit test failure" { $link "tools.test" } }
     { { $image "vocab:ui/tools/error-list/icons/deprecation-note.tiff" } "Deprecated words used" { $link "tools.deprecation" } }
 } ;

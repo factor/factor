@@ -11,7 +11,7 @@ GENERIC: stream-read-quot ( stream -- quot/f )
 GENERIC# prompt. 1 ( stream prompt -- )
 
 : prompt ( -- str )
-    manifest get current-vocab>> [ name>> "IN: " prepend ] [ "" ] if* 
+    manifest get current-vocab>> [ name>> "IN: " prepend ] [ "" ] if*
     auto-use? get [ " auto-use" append ] when ;
 
 M: object prompt.
@@ -147,7 +147,6 @@ SYMBOL: interactive-vocabs
     "editors"
     "help"
     "help.apropos"
-    "help.lint"
     "help.vocabs"
     "inspector"
     "io"
@@ -175,6 +174,7 @@ SYMBOL: interactive-vocabs
     "tools.disassembler"
     "tools.dispatch"
     "tools.errors"
+    "tools.help-lint"
     "tools.memory"
     "tools.profiler.sampling"
     "tools.test"

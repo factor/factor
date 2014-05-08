@@ -1,12 +1,12 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators continuations fry help
-help.lint.checks help.topics io kernel namespaces parser
+tools.help-lint.checks help.topics io kernel namespaces parser
 sequences source-files.errors vocabs.hierarchy vocabs words
 classes locals tools.errors listener ;
-FROM: help.lint.checks => all-vocabs ;
+FROM: tools.help-lint.checks => all-vocabs ;
 FROM: vocabs => child-vocabs ;
-IN: help.lint
+IN: tools.help-lint
 
 SYMBOL: lint-failures
 

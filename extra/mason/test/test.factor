@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs benchmark bootstrap.stage2 command-line
-compiler.errors generic help.html help.lint io io.directories
+compiler.errors generic help.html tools.help-lint io io.directories
 io.encodings.utf8 io.files kernel locals mason.common namespaces
 parser.notes sequences sets sorting source-files.errors system
 tools.errors tools.test tools.time vocabs.errors
