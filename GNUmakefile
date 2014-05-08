@@ -2,14 +2,18 @@ ifdef CONFIG
 	CC = gcc
 	CPP = g++
 
-	VERSION = 0.97
+	VERSION = 0.97-git
+	GIT_LABEL = $(shell git describe --all --long)
 
 	BUNDLE = Factor.app
 	LIBPATH = -L/usr/X11R6/lib
 
 	include $(CONFIG)
 
-	CFLAGS = -Wall $(SITE_CFLAGS)
+	CFLAGS = -Wall \
+		-DFACTOR_VERSION="$(VERSION)" \
+		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
+		$(SITE_CFLAGS)
 
 	ifdef DEBUG
 		CFLAGS += -g -DFACTOR_DEBUG

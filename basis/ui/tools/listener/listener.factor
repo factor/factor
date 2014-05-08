@@ -6,7 +6,7 @@ compiler.units help.tips concurrency.flags concurrency.mailboxes
 continuations destructors documents documents.elements fry hashtables
 help help.markup io io.styles kernel lexer listener make math models sets
 models.delay models.arrow namespaces parser prettyprint quotations
-sequences strings threads vocabs vocabs.refresh vocabs.loader
+sequences strings system threads vocabs vocabs.refresh vocabs.loader
 vocabs.parser words debugger ui ui.commands ui.pens.solid ui.gadgets
 ui.gadgets.glass ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
@@ -394,7 +394,8 @@ interactor "completion" f {
 
 : introduction. ( -- )
     tip-of-the-day. nl
-    { $strong "Press " { $snippet "F1" } " at any time for help." } print-content nl nl ;
+    { $strong "Press " { $snippet "F1" } " at any time for help." } print-content nl
+    version-info print-content nl nl ;
 
 : listener-thread ( listener -- )
     dup listener-streams [
