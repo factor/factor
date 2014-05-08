@@ -140,7 +140,7 @@ ARTICLE: "yaml-errors" "YAML errors"
 ;
 
 ARTICLE: "yaml" "YAML serialization"
-"The " { $vocab-link "yaml" } " vocabulary implements YAML serialization/deserialization."
+"The " { $vocab-link "yaml" } " vocabulary implements YAML serialization/deserialization. It uses LibYAML, a YAML parser and emitter written in C (" { $url "http://pyyaml.org/wiki/LibYAML" } ")."
 { $heading "Main conversion words" }
 { $subsections
     >yaml
