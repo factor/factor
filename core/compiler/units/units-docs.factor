@@ -82,7 +82,7 @@ HELP: modify-code-heap
 { $values { "alist" "an association list with words as keys" } { "update-existing?" "a boolean" } { "reset-pics?" "a boolean" } }
 { $description "Lowest-level primitive for defining words. Associates words with code blocks in the code heap."
 $nl
-"The alist maps words to the following:"
+"The alist maps words to one of the following:"
 { $list
     { "a quotation - in this case, the quotation is compiled with the non-optimizing compiler and the word will call the quotation when executed." }
     { "a 5-element array " { $snippet "{ parameters literals relocation labels code }" } " - in this case, a code heap block is allocated with the given data and the word will call the code block when executed. This is used by the optimizing compiler." }

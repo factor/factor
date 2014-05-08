@@ -519,8 +519,6 @@ HOOK: %reload cpu ( dst rep src -- )
 
 HOOK: %loop-entry cpu ( -- )
 
-! Does this architecture support %load-float, %load-double,
-! and %load-vector?
 HOOK: fused-unboxing? cpu ( -- ? )
 
 HOOK: immediate-arithmetic? cpu ( n -- ? )
@@ -548,7 +546,6 @@ M: object immediate-comparand? ( n -- ? )
 
 ! FFI stuff
 
-! Return values of this class go here
 HOOK: return-regs cpu ( -- regs )
 
 ! Registers used for parameter passing

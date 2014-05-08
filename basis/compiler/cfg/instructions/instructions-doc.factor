@@ -29,7 +29,7 @@ HELP: ##alien-invoke
 
 HELP: ##set-slot
 { $class-description
-  "An instruction for non-primitive non-immediate variant of " { $link set-slot } ". It has the following slots:"
+  "An instruction for the non-primitive, non-immediate variant of " { $link set-slot } ". It has the following slots:"
   { $table
     { { $slot "src" } { "Object to put in the slot." } }
     { { $slot "obj" } { "Object to set the slot on." } }
@@ -63,3 +63,12 @@ HELP: ##peek
   "Copies a value from a stack location to a machine register."
 }
 { $see-also ##replace } ;
+
+HELP: ##safepoint
+{ $class-description "Instruction that inserts a safe point in the generated code." } ;
+
+HELP: ##return
+{ $class-description "Instruction that returns from a procedure call." } ;
+
+HELP: ##no-tco
+{ $class-description "A dummy instruction that simply inhibits TCO." } ;
