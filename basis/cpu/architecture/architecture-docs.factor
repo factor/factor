@@ -1,5 +1,30 @@
-USING: assocs cpu.x86.assembler help.markup help.syntax math system words ;
+USING: assocs cpu.x86.assembler help.markup help.syntax literals math
+multiline system words ;
 IN: cpu.architecture
+
+<<
+STRING: ex-%box-alien
+USING: compiler.codegen compiler.codegen.relocation cpu.architecture make ;
+init-fixup init-relocation [ RAX RBX RCX %box-alien ] B{ } make disassemble
+000000e9fcc720a0: 48b80100000000000000  mov rax, 0x1
+000000e9fcc720aa: 4885db                test rbx, rbx
+000000e9fcc720ad: 0f8400000000          jz dword 0xe9fcc720b3
+000000e9fcc720b3: 498d4d10              lea rcx, [r13+0x10]
+000000e9fcc720b7: 488b01                mov rax, [rcx]
+000000e9fcc720ba: 48c70018000000        mov qword [rax], 0x18
+000000e9fcc720c1: 4883c806              or rax, 0x6
+000000e9fcc720c5: 48830130              add qword [rcx], 0x30
+000000e9fcc720c9: 48c7400201000000      mov qword [rax+0x2], 0x1
+000000e9fcc720d1: 48c7400a01000000      mov qword [rax+0xa], 0x1
+000000e9fcc720d9: 48895812              mov [rax+0x12], rbx
+000000e9fcc720dd: 4889581a              mov [rax+0x1a], rbx
+;
+>>
+
+
+HELP: signed-rep
+{ $values { "rep" representation } { "rep'" representation } }
+{ $description "Maps any representation to its signed counterpart, if it has one." } ;
 
 HELP: immediate-arithmetic?
 { $values { "n" number } { "?" "a boolean" } }
@@ -9,12 +34,15 @@ HELP: immediate-arithmetic?
 } ;
 
 HELP: machine-registers
+{ $values { "assoc" assoc } }
 { $description "Mapping from register class to machine registers." } ;
 
 HELP: vm-stack-space
+{ $values { "n" number } }
 { $description "Parameter space to reserve in anything making VM calls." } ;
 
 HELP: complex-addressing?
+{ $values { "?" "a boolean" } }
 { $description "Specifies if " { $link %slot } ", " { $link %set-slot } " and " { $link %write-barrier } " accept the 'scale' and 'tag' parameters, and if %load-memory and %store-memory work." } ;
 
 HELP: param-regs
@@ -28,6 +56,11 @@ HELP: %load-immediate
 HELP: %call
 { $values { "word" word } }
 { $description "Emits code for calling a word in Factor." } ;
+
+HELP: %box-alien
+{ $values { "dst" "destination register" } { "src" "source register" } { "temp" "temporary register" } }
+{ $description "Emits machine code for boxing an alien value." }
+{ $examples { $unchecked-example $[ ex-%box-alien ] } } ;
 
 HELP: fused-unboxing?
 { $values { "?" "a boolean" } }

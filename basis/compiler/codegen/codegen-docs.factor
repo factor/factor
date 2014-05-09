@@ -1,4 +1,5 @@
-USING: alien byte-arrays compiler.cfg help.markup help.syntax literals
+USING: alien byte-arrays compiler.cfg compiler.codegen.labels
+compiler.codegen.relocation hashtables help.markup help.syntax literals make
 multiline sequences ;
 IN: compiler.codegen
 
@@ -49,13 +50,24 @@ USING: compiler.cfg.debugger io prettyprint ;
 ;
 >>
 
+HELP: labels
+{ $description { $link hashtable } " of mappings from " { $link basic-block } " to " { $link label } "." } ;
+
+HELP: lookup-label
+{ $values { "bb" basic-block } }
+{ $description "Sets and gets a " { $link label } " for the " { $link basic-block } ". The labels are used to generate branch instructions from one block to another." } ;
+
+HELP: generate-block
+{ $values { "bb" basic-block } }
+{ $description "Emits machine code to the current " { $link make } " sequence for one basic block." } ;
+
 HELP: generate
 { $values { "cfg" cfg } { "code" sequence } }
 { $description "Generates assembly code for the given cfg. The output " { $link sequence } " has six items with the following interpretations:"
   { $list
     { "The first element is a sequence of alien function symbols and " { $link dll } "s used by the cfg interleaved." }
     "The second item is the parameter table."
-    "The third item is the literal table."
+    { "The third item is the " { $link literal-table } "." }
     { "The third item is the relocation table as a " { $link byte-array } "." }
     "The fourth item is the label table."
     { "The fifth item is the generated assembly code as a " { $link byte-array } ". It still contains unresolved crossreferences." }
@@ -74,3 +86,10 @@ HELP: useless-branch?
   { "?" "A boolean value" }
 }
 { $description "If successor immediately follows bb in the linearization order, then a branch is is not needed." } ;
+
+HELP: init-fixup
+{ $description "Initializes variables needed for fixup." } ;
+
+HELP: check-fixup
+{ $values { "seq" "a " { $link sequence } " of generated machine code." } }
+{ $description "Used by " { $link with-fixup } " to ensure that the generated machine code is properly aligned." } ;
