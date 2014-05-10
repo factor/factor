@@ -30,7 +30,8 @@ HELP: emitter-width
 { $var-description "If set, " { $link yaml_emitter_set_width } " is called with the value of this variable at the beginning of each document." } ;
 
 ARTICLE: "yaml-config" "YAML control variables"
-"The following variables control the YAML serialization/deserialization: "
+"The following variables control the YAML serialization/deserialization"
+{ $heading "LibYAML's emitter:" }
 { $subsections
   emitter-canonical
   emitter-indent
@@ -39,6 +40,33 @@ ARTICLE: "yaml-config" "YAML control variables"
   emitter-width
 }
 "Using libyaml's default values: " { $link +libyaml-default+ }
+{ $heading "Tags" }
+{ $subsections
+  implicit-tags
+}
+{ $heading "Document markers" }
+{ $subsections
+  implicit-start
+  implicit-end
+}
 ;
+
+HELP: implicit-tags
+{ $var-description """When this is set, tags are omitted during serialization when it safe to do so. For example, 42 can be safely serialized as "42", but "42" must be serialized as "'42'" or ""42"" or "!!str 42". This uses the """
+{ $snippet "implicit" } " parameter of "
+{ $link yaml_scalar_event_initialize } ", " { $link yaml_sequence_start_event_initialize } " and " { $link yaml_mapping_start_event_initialize } "."
+ } ;
+
+HELP: implicit-start
+{ $var-description "The \""
+{ $snippet "implicit" } "\" parameter of " { $link yaml_document_start_event_initialize } ". Changing this variable is always safe and produces valid YAML documents because LibYAML ignores it when it would be invalid (for example, when there are multiple documents in a stream)." }
+;
+
+HELP: implicit-end
+{ $var-description "The \""
+{ $snippet "implicit" } "\" parameter of " { $link yaml_document_end_event_initialize } ". Changing this variable is always safe and produces valid YAML documents because LibYAML ignores it when it would be invalid (for example, when there are multiple documents in a stream)." }
+;
+
+{ implicit-start implicit-end } related-words
 
 ABOUT: "yaml-config"

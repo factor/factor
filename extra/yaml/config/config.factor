@@ -22,3 +22,11 @@ SYMBOL: +libyaml-default+
 } [ +libyaml-default+ swap set-global ] each
 ! But Factor is unicode-friendly by default
 t emitter-unicode set-global
+
+SYMBOL: implicit-tags
+t implicit-tags set-global
+
+SYMBOL: implicit-start
+SYMBOL: implicit-end
+t implicit-start set-global
+t implicit-end set-global
