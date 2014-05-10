@@ -268,7 +268,7 @@ GENERIC: (replace-aliases) ( yaml-anchors obj -- obj' )
         [ next-anchor<< ] bi*
     ] bi ;
 
-:: ?replace-aliases ( yaml-anchors obj -- obj' )
+:: (?replace-aliases) ( yaml-anchors obj -- obj' )
     yaml-anchors objects>> :> objects
     obj objects at* [
         [ yaml-anchors incr-anchor dup obj objects set-at ] unless*
@@ -279,6 +279,9 @@ GENERIC: (replace-aliases) ( yaml-anchors obj -- obj' )
         obj obj' yaml-anchors new-objects>> set-at
         obj'
     ] if ;
+
+: ?replace-aliases ( yaml-anchors obj -- obj' )
+    dup fixnum? [ nip ] [ (?replace-aliases) ] if ;
 
 M: object (replace-aliases) nip ;
 
