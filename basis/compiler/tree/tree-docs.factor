@@ -35,6 +35,15 @@ HELP: #shuffle
   }
 } ;
 
+HELP: #if
+{ $class-description "SSA tree node that implements conditional branching. It has the following slots:"
+  { $table
+    { { $slot "children" }
+      { "A two item " { $link sequence } ". The first item holds the instructions executed if the condition is true and the second those that are executed if it is not true." }
+    }
+  }
+} ;
+
 HELP: node,
 { $values { "node" node } }
 { $description "Emits a node to the " { $link stack-visitor } " variable." } ;

@@ -8,7 +8,7 @@ HELP: emit-height-changes
 { $description "Emits stack height change instructions to the CFG being built." }
 { $examples
   { $example
-    "USING: compiler.cfg.stacks.local make prettyprint ;"
+    "USING: compiler.cfg.stacks.local make namespaces prettyprint ;"
     "T{ current-height { emit-d 4 } { emit-r -2 } } current-height set [ emit-height-changes ] { } make ."
     "{ T{ ##inc-d { n 4 } } T{ ##inc-r { n -2 } } }"
   }
