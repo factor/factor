@@ -5,8 +5,8 @@ classes.struct combinators combinators.extras
 combinators.short-circuit destructors fry generalizations
 hashtables hashtables.identity io.encodings.string
 io.encodings.utf8 kernel libc linked-assocs locals make math
-math.parser namespaces sequences sets strings yaml.conversion
-yaml.ffi ;
+math.parser namespaces sequences sets strings yaml.config
+yaml.conversion yaml.ffi ;
 FROM: sets => set ;
 IN: yaml
 
@@ -417,11 +417,25 @@ M: set emit-value ( emitter event anchor set -- )
     [ nip emit-set-body ]
     [ 2drop emit-assoc-end ] 4tri ;
 
+: unless-libyaml-default ( variable quot -- )
+    [ get dup +libyaml-default+ = not ] dip
+    [ 2drop ] if ; inline
+
+: init-emitter-options ( emitter -- )
+    {
+        [ emitter-canonical [ yaml_emitter_set_canonical ] unless-libyaml-default ]
+        [ emitter-indent [ yaml_emitter_set_indent ] unless-libyaml-default ]
+        [ emitter-width [ yaml_emitter_set_width ] unless-libyaml-default ]
+        [ emitter-unicode [ yaml_emitter_set_unicode ] unless-libyaml-default ]
+        [ emitter-line-break [ yaml_emitter_set_break ] unless-libyaml-default ]
+    } cleave ;
+
 ! registers destructors (use with with-destructors)
 :: init-emitter ( -- emitter event )
     yaml_emitter_t (malloc-struct) &free :> emitter
     emitter yaml_emitter_initialize yaml-initialize-assert-ok
     emitter &yaml_emitter_delete drop
+    emitter init-emitter-options
 
     BV{ } clone :> output
     output yaml-write-buffer set-global

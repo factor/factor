@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs byte-arrays hash-sets hashtables
 help.markup help.syntax kernel linked-assocs math sequences sets
-strings yaml.ffi ;
+strings yaml.ffi yaml.config ;
 IN: yaml
 
 HELP: >yaml
@@ -154,6 +154,7 @@ ARTICLE: "yaml" "YAML serialization"
 "yaml-output"
 "yaml-input"
 "yaml-errors"
+"yaml-config"
 }
 { $examples
   { $example "USING: prettyprint yaml ;"
