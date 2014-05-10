@@ -12,10 +12,6 @@ compiler.cfg.instructions
 compiler.cfg.predecessors ;
 IN: compiler.cfg.gc-checks
 
-! Garbage collection check insertion. This pass runs after
-! representation selection, since it needs to know which vregs
-! can contain tagged pointers.
-
 <PRIVATE
 
 : insert-gc-check? ( bb -- ? )

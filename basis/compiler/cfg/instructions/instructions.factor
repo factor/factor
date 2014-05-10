@@ -13,7 +13,6 @@ V{ } clone insn-classes set-global
 
 : new-insn ( ... class -- insn ) f swap boa ; inline
 
-! Virtual CPU instructions, used by CFG IR
 TUPLE: insn ;
 
 TUPLE: vreg-insn < insn ;
