@@ -1,10 +1,13 @@
-USING: help.markup help.syntax literals multiline sequences ;
+USING: help.markup help.syntax literals multiline sequences splitting ;
 IN: compiler.cfg.instructions.syntax
 
 <<
-STRING: parse-insn-slot-specs-ex
+STRING: parse-insn-slot-specs-code
 USING: compiler.cfg.instructions.syntax prettyprint splitting ;
 "use: src/int-rep temp: temp/int-rep" " " split parse-insn-slot-specs .
+;
+
+STRING: parse-insn-slot-specs-result
 {
     T{ insn-slot-spec
         { type use }
@@ -26,4 +29,6 @@ HELP: parse-insn-slot-specs
   { "specs" "a " { $link sequence } " of " { $link insn-slot-spec } " items." }
 }
 { $description "Parses a sequence of tokens into a sequence of instruction slot specifiers." }
-{ $examples { $example $[ parse-insn-slot-specs-ex ] } } ;
+{ $examples
+  { $example $[ parse-insn-slot-specs-code parse-insn-slot-specs-result ] }
+} ;

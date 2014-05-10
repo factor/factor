@@ -3,7 +3,7 @@ sequences quotations generic.math.private ;
 IN: generic.math
 
 HELP: math-class-max
-{ $values { "class1" class } { "class2" class } }
+{ $values { "class1" class } { "class2" class } { "class" class } }
 { $description "Evaluates which math class is the largest." }
 { $examples
   { $example

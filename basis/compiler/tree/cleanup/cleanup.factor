@@ -12,11 +12,6 @@ compiler.tree.propagation.info
 compiler.tree.propagation.branches ;
 IN: compiler.tree.cleanup
 
-! A phase run after propagation to finish the job, so to speak.
-! Codifies speculative inlining decisions, deletes branches
-! marked as never taken, and flattens local recursive blocks
-! that do not call themselves.
-
 GENERIC: delete-node ( node -- )
 
 M: #call-recursive delete-node

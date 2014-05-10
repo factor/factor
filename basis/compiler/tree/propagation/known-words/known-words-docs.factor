@@ -7,7 +7,8 @@ HELP: binary-op-class
 { $description "Given two value infos return the math class which is large enough for both of them." }
 { $examples
   { $example
-    "USING: compiler.tree.propagation.known-words compiler.tree.propagation.info math prettyprint ;"
+    "USING: compiler.tree.propagation.known-words compiler.tree.propagation.info"
+    "kernel math prettyprint ;"
     "bignum real [ <class-info> ] bi@ binary-op-class ."
     "real"
   }
@@ -30,8 +31,8 @@ HELP: fits-in-fixnum?
 { $description "Checks if the interval is a subset of the " { $link fixnum } " interval. Used to see if arithmetic may overflow." }
 { $examples
   { $example
-    "USING: compiler.tree.propagation.known-words prettyprint ;"
-    "clear full-interval fits-in-fixnum? ."
+    "USING: compiler.tree.propagation.known-words math.intervals prettyprint ;"
+    "full-interval fits-in-fixnum? ."
     "f"
   }
 } ;

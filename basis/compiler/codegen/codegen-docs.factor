@@ -54,7 +54,7 @@ HELP: labels
 { $description { $link hashtable } " of mappings from " { $link basic-block } " to " { $link label } "." } ;
 
 HELP: lookup-label
-{ $values { "bb" basic-block } }
+{ $values { "bb" basic-block } { "label" label } }
 { $description "Sets and gets a " { $link label } " for the " { $link basic-block } ". The labels are used to generate branch instructions from one block to another." } ;
 
 HELP: generate-block

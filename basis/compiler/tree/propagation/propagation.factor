@@ -15,7 +15,7 @@ IN: compiler.tree.propagation
 
 ! This pass must run after normalization
 
-: propagate ( node -- node )
+: propagate ( nodes -- nodes )
     H{ } clone copies set
     H{ } clone 1array value-infos set
     H{ } clone 1array constraints set

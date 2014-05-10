@@ -1,6 +1,11 @@
 USING: help.markup help.syntax kernel layouts slots.private ;
 IN: compiler.cfg.instructions
 
+HELP: insn
+{ $class-description
+  "Base class for all virtual cpu instructions, used by the CFG IR."
+} ;
+
 HELP: vreg-insn
 { $class-description
   "Base class for instructions that uses vregs."

@@ -2,6 +2,7 @@ USING: help.markup help.syntax math ;
 IN: cpu.x86.64
 
 HELP: vm-reg
+{ $values { "reg" "a register symbol" } }
 { $description
   "Symbol of the machine register that holds the address of the virtual machine."
 } ;

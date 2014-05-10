@@ -1,17 +1,20 @@
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax math ;
 IN: cpu.x86
 
 HELP: stack-reg
+{ $values { "reg" "a register symbol" } }
 { $description
   "Symbol of the machine register that holds the (cpu) stack address."
 } ;
 
 HELP: ds-reg
+{ $values { "reg" "a register symbol" } }
 { $description
   "Symbol of the machine register that holds the address to the data stack's location."
 } ;
 
 HELP: (%inc)
+{ $values { "n" number } { "reg" "a register symbol" } }
 { $description
   "Emits machine code for increasing or decreasing the given register a number of cell sizes bytes."
 }
