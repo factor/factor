@@ -563,3 +563,10 @@ ${ construct-value-obj } [ $ construct-value-obj >yaml-docs yaml-docs> ] unit-te
 [ "- foo\n:)" yaml> ] [ libyaml-parser-error? ] must-fail-with
 [ "- &foo 1\n- *baz\n" yaml> ] [ yaml-undefined-anchor? ] must-fail-with
 [ "" yaml> ] [ yaml-no-document? ] must-fail-with
+
+
+! !!!!!!!!!!!!!!!
+! misc
+
+! Don't use aliases/anchors for equal fixnums
+{ f } [ CHAR: & { 0 0 } >yaml member? ] unit-test
