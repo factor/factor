@@ -345,10 +345,15 @@ GENERIC: emit-value ( emitter event anchor obj -- )
 
 : emit-object ( emitter event obj -- ) [ f ] dip emit-value ;
 
+: scalar-implicit-tag? ( tag str -- plain_implicit quoted_implicit )
+    implicit-tags get [
+        resolve-plain-scalar = t
+    ] [ 2drop f f ] if ;
+
 :: emit-scalar ( emitter event anchor obj -- )
     event anchor
     obj [ yaml-tag ] [ represent-scalar ] bi
-    -1 f f YAML_ANY_SCALAR_STYLE
+    -1 2over scalar-implicit-tag? YAML_ANY_SCALAR_STYLE
     yaml_scalar_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
 
@@ -361,8 +366,8 @@ M:: yaml-alias emit-value ( emitter event unused obj -- )
     event obj anchor>> yaml_alias_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
 
-:: emit-sequence-start ( emitter event anchor tag -- )
-    event anchor tag f YAML_ANY_SEQUENCE_STYLE
+:: emit-sequence-start ( emitter event anchor tag implicit -- )
+    event anchor tag implicit YAML_ANY_SEQUENCE_STYLE
     yaml_sequence_start_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
 
@@ -389,17 +394,17 @@ M: string emit-value ( emitter event anchor string -- ) emit-scalar ;
 M: byte-array emit-value ( emitter event anchor byte-array -- ) emit-scalar ;
 
 M: sequence emit-value ( emitter event anchor seq -- )
-    [ drop YAML_SEQ_TAG emit-sequence-start ]
+    [ drop YAML_SEQ_TAG implicit-tags get emit-sequence-start ]
     [ nip emit-sequence-body ]
     [ 2drop emit-sequence-end ] 4tri ;
 
 M: linked-assoc emit-value ( emitter event anchor assoc -- )
-    [ drop YAML_OMAP_TAG emit-sequence-start ]
+    [ drop YAML_OMAP_TAG f emit-sequence-start ]
     [ nip emit-linked-assoc-body ]
     [ 2drop emit-sequence-end ] 4tri ;
 
-:: emit-assoc-start ( emitter event anchor tag -- )
-    event anchor tag f YAML_ANY_MAPPING_STYLE
+:: emit-assoc-start ( emitter event anchor tag implicit -- )
+    event anchor tag implicit YAML_ANY_MAPPING_STYLE
     yaml_mapping_start_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
 
@@ -408,12 +413,12 @@ M: linked-assoc emit-value ( emitter event anchor assoc -- )
     yaml_emitter_emit_asserted ;
 
 M: assoc emit-value ( emitter event anchor assoc -- )
-    [ drop YAML_MAP_TAG emit-assoc-start ]
+    [ drop YAML_MAP_TAG implicit-tags get emit-assoc-start ]
     [ nip emit-assoc-body ]
     [ 2drop emit-assoc-end ] 4tri ;
 
 M: set emit-value ( emitter event anchor set -- )
-    [ drop YAML_SET_TAG emit-assoc-start ]
+    [ drop YAML_SET_TAG f emit-assoc-start ]
     [ nip emit-set-body ]
     [ 2drop emit-assoc-end ] 4tri ;
 
@@ -450,12 +455,12 @@ M: set emit-value ( emitter event anchor set -- )
     emitter event ;
 
 :: emit-doc ( emitter event obj -- )
-    event f f f f yaml_document_start_event_initialize yaml-initialize-assert-ok
+    event f f f implicit-start get yaml_document_start_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted
 
     emitter event obj emit-object
 
-    event f yaml_document_end_event_initialize yaml-initialize-assert-ok
+    event implicit-end get yaml_document_end_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
 
 :: flush-emitter ( emitter event -- str )

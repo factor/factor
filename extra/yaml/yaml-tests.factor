@@ -1,10 +1,20 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel linked-assocs literals locals sequences
-tools.test yaml yaml.private grouping ;
+tools.test yaml yaml.private yaml.config grouping namespaces ;
 IN: yaml.tests
 
 ! TODO real conformance tests here
+
+! Config
+f implicit-tags set
+f implicit-start set
+f implicit-end set
++libyaml-default+ emitter-canonical set
++libyaml-default+ emitter-indent set
++libyaml-default+ emitter-width set
++libyaml-default+ emitter-line-break set
+t emitter-unicode set
 
 ! Basic test
 CONSTANT: test-string """--- # Favorite movies
@@ -570,3 +580,57 @@ ${ construct-value-obj } [ $ construct-value-obj >yaml-docs yaml-docs> ] unit-te
 
 ! Don't use aliases/anchors for equal fixnums
 { f } [ CHAR: & { 0 0 } >yaml member? ] unit-test
+
+! !!!!!!!!!!!!!!!
+! Config
+t implicit-tags set
+t implicit-start set
+t implicit-end set
+
+! unicode on
+  t emitter-unicode
+[
+{ "- Hello
+- Grüß dich
+- здравствуйте
+- こんにちは
+- 안녕하세요
+- 'שָׁלוֹם '
+- გამარჯობა
+" } [ { "Hello" "Grüß dich" "здравствуйте" "こんにちは" "안녕하세요" "שָׁלוֹם " "გამარჯობა" } >yaml ] unit-test
+] with-variable
+
+! unicode off
+f emitter-unicode
+[
+{ """- Hello
+- "Gr\\xFC\\xDF dich"
+- "\\u0437\\u0434\\u0440\\u0430\\u0432\\u0441\\u0442\\u0432\\u0443\\u0439\\u0442\\u0435"
+- "\\u3053\\u3093\\u306B\\u3061\\u306F"
+- "\\uC548\\uB155\\uD558\\uC138\\uC694"
+- "\\u05E9\\u05B8\\u05C1\\u05DC\\u05D5\\u05B9\\u05DD "
+- "\\u10D2\\u10D0\\u10DB\\u10D0\\u10E0\\u10EF\\u10DD\\u10D1\\u10D0"
+""" } [ { "Hello" "Grüß dich" "здравствуйте" "こんにちは" "안녕하세요" "שָׁלוֹם " "გამარჯობა" } >yaml ] unit-test
+] with-variable
+
+! canonical
+t emitter-canonical [
+{ """---
+!!seq [
+  !!int "1",
+  !!float "2.0",
+  !!bool "false",
+]
+""" } [ { 1 2.0 f } >yaml ] unit-test
+] with-variable
+
+{
+  { emitter-indent 6 }
+  { emitter-width 32 }
+}
+[
+{ "-     - a string that can be split
+            in lots of places
+"
+ } [ { { "a string that can be split in lots of places" } } >yaml ] unit-test
+] with-variables
