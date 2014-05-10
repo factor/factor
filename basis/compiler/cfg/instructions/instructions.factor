@@ -13,10 +13,8 @@ V{ } clone insn-classes set-global
 
 : new-insn ( ... class -- insn ) f swap boa ; inline
 
-! Virtual CPU instructions, used by CFG IR
 TUPLE: insn ;
 
-! Instructions which use vregs
 TUPLE: vreg-insn < insn ;
 
 ! Instructions which do not have side effects; used for
@@ -86,7 +84,6 @@ INSN: ##return ;
 
 INSN: ##safepoint ;
 
-! Dummy instruction that simply inhibits TCO
 INSN: ##no-tco ;
 
 ! Jump tables
