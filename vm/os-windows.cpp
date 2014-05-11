@@ -249,6 +249,26 @@ VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
     return ExceptionContinueSearch;
 }
 
+/* On Unix SIGINT (ctrl-c) automatically interrupts blocking io system
+   calls. It doesn't on Windows, so we need to manually send some
+   cancellation requests to unblock the thread. */
+VOID CALLBACK dummy_cb (ULONG_PTR dwParam) { }
+
+static void wake_up_thread(HANDLE thread) {
+  if (!CancelSynchronousIo(thread)) {
+    DWORD err = GetLastError();
+    /* CancelSynchronousIo() didn't find anything to cancel, let's try
+       with QueueUserAPC() instead. */
+    if (err == ERROR_NOT_FOUND) {
+      if (!QueueUserAPC(&dummy_cb, thread, NULL)) {
+        fatal_error("QueueUserAPC() failed", GetLastError());
+      }
+    } else {
+      fatal_error("CancelSynchronousIo() failed", err);
+    }
+  }
+}
+
 static BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {
   switch (dwCtrlType) {
     case CTRL_C_EVENT: {
@@ -259,6 +279,10 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {
       FACTOR_ASSERT(thread_vms.size() == 1);
       factor_vm* vm = thread_vms.begin()->second;
       vm->safepoint.enqueue_fep(vm);
+
+      /* Before leaving the ctrl_handler, try and wake up the main
+         thread. */
+      wake_up_thread(factor::boot_thread);
       return TRUE;
     }
     default:
