@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel layouts slots.private ;
+USING: compiler.cfg help.markup help.syntax kernel layouts slots.private ;
 IN: compiler.cfg.instructions
 
 HELP: insn
@@ -71,6 +71,19 @@ HELP: ##peek
 
 HELP: ##safepoint
 { $class-description "Instruction that inserts a safe point in the generated code." } ;
+
+HELP: ##check-nursery-branch
+{ $class-description
+  "Instruction that inserts a conditional branch to a " { $link basic-block } " that garbage collects the nursery. The " { $vocab-link "compiler.cfg.gc-checks" } " vocab goes through each block in the " { $link cfg } " and checks if it allocates memory. If it does, then this instruction is inserted in the cfg before that block and checks if there is enough available space in the nursery. If it isn't, then a basic block containing code for garbage collecting the nursery is executed."
+  $nl
+  "It has the following slots:"
+  { $table
+    { { $slot "size" } { "Number of bytes the next block in the cfg will allocate." } }
+    { { $slot "cc" } { "A comparison symbol." } }
+    { { $slot "temp1" } { "Register symbol." } }
+    { { $slot "temp2" } { "Register symbol." } }
+  }
+} ;
 
 HELP: ##return
 { $class-description "Instruction that returns from a procedure call." } ;

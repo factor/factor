@@ -1,5 +1,6 @@
-USING: assocs cpu.x86.assembler help.markup help.syntax kernel
-literals math multiline system words ;
+USING: assocs classes compiler.cfg.instructions cpu.x86.assembler
+cpu.x86.assembler.operands help.markup help.syntax layouts literals math
+multiline system words ;
 IN: cpu.architecture
 
 <<
@@ -19,8 +20,17 @@ init-fixup init-relocation [ RAX RBX RCX %box-alien ] B{ } make disassemble
 000000e9fcc720d9: 48895812              mov [rax+0x12], rbx
 000000e9fcc720dd: 4889581a              mov [rax+0x1a], rbx
 ;
->>
 
+STRING: ex-%allot
+USING: cpu.architecture make ;
+[ RAX 40 tuple RCX %allot ] B{ } make disassemble
+0000000002270cc0: 498d4d10        lea rcx, [r13+0x10]
+0000000002270cc4: 488b01          mov rax, [rcx]
+0000000002270cc7: 48c7001c000000  mov qword [rax], 0x1c
+0000000002270cce: 4883c807        or rax, 0x7
+0000000002270cd2: 48830130        add qword [rcx], 0x30
+;
+>>
 
 HELP: signed-rep
 { $values { "rep" representation } { "rep'" representation } }
@@ -59,8 +69,22 @@ HELP: %call
 
 HELP: %box-alien
 { $values { "dst" "destination register" } { "src" "source register" } { "temp" "temporary register" } }
-{ $description "Emits machine code for boxing an alien value." }
-{ $examples { $unchecked-example $[ ex-%box-alien ] } } ;
+{ $description "Emits machine code for boxing an alien value. Internally, this word will allocate five " { $link cells } " which wraps the alien." }
+{ $examples { $unchecked-example $[ ex-%box-alien ] } }
+{ $see-also ##box-alien %allot } ;
+
+HELP: %allot
+{ $values
+  { "dst" "destination register symbol" }
+  { "size" "number of bytes to allocate" }
+  { "class" "one of the built-in classes listed in " { $link type-numbers } }
+  { "temp" "temporary register symbol" }
+}
+{ $description "Emits machine code for allocating memory." }
+{ $examples
+  "In this example 40 bytes is allocated and a tagged pointer to the memory is put in " { $link RAX } ":"
+  { $unchecked-example $[ ex-%allot ] }
+} ;
 
 HELP: fused-unboxing?
 { $values { "?" boolean } }
