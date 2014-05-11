@@ -15,9 +15,15 @@ HELP: compiled-offset
 { $description "The current compiled code offset. Used for (among other things) calculating jump labels." }
 { $examples
   { $example
-    "USING: compiler.codegen.relocation cpu.x86.assembler cpu.x86.assembler.operands make prettyprint ;"
-    "[ init-relocation RAX 0 MOV compiled-offset ] B{ } make . ."
-    "B{ 72 184 0 0 0 0 0 0 0 0 }\n10"
+    "USING: compiler.codegen.relocation cpu.x86.assembler"
+    "cpu.x86.assembler.operands kernel layouts make prettyprint ;"
+    "[ init-relocation RAX 0 MOV compiled-offset ] B{ } make"
+    "cell-bits 64 = ["
+    "    [ 10 = ] [ B{ 72 184 0 0 0 0 0 0 0 0 } = ] bi*"
+    "] ["
+    "    [ 6 = ] [ B{ 72 184 0 0 0 0 } = ] bi*"
+    "] if . ."
+    "t\nt"
   }
 } ;
 
