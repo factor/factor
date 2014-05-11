@@ -6,17 +6,28 @@ BOOTIMAGE_VERSION = latest
 
 LINK_FLAGS = /nologo shell32.lib
 CL_FLAGS = /nologo /O2 /WX /W3 /D_CRT_SECURE_NO_WARNINGS
-
-!IF DEFINED(DEBUG)
-LINK_FLAGS = $(LINK_FLAGS) /DEBUG
-CL_FLAGS = $(CL_FLAGS) /Zi /DFACTOR_DEBUG
-!ENDIF
+CL_FLAGS_VISTA = /D_WIN32_WINNT=0x0600
 
 !IF "$(PLATFORM)" == "x86-32"
 LINK_FLAGS = $(LINK_FLAGS) /safeseh
 PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj vm\cpu-x86.obj
+
+!ELSEIF "$(PLATFORM)" == "x86-32-vista"
+LINK_FLAGS = $(LINK_FLAGS) /safeseh
+CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
+PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj vm\cpu-x86.obj
+
 !ELSEIF "$(PLATFORM)" == "x86-64"
 PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
+
+!ELSEIF "$(PLATFORM)" == "x86-64-vista"
+CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
+PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
+!ENDIF
+
+!IF DEFINED(DEBUG)
+LINK_FLAGS = $(LINK_FLAGS) /DEBUG
+CL_FLAGS = $(CL_FLAGS) /Zi /DFACTOR_DEBUG
 !ENDIF
 
 ML_FLAGS = /nologo /safeseh
@@ -103,6 +114,8 @@ default:
 	@echo Where platform is one of:
 	@echo x86-32
 	@echo x86-64
+	@echo x86-32-vista
+	@echo x86-64-vista
 	@exit 1
 
 x86-32:
@@ -110,6 +123,12 @@ x86-32:
 
 x86-64:
 	nmake /nologo PLATFORM=x86-64 /f Nmakefile all
+
+x86-32-vista:
+	nmake /nologo PLATFORM=x86-32-vista /f Nmakefile all
+
+x86-64-vista:
+	nmake /nologo PLATFORM=x86-64-vista /f Nmakefile all
 
 clean:
 	del vm\*.obj
@@ -120,6 +139,6 @@ clean:
 	if exist factor.dll del factor.dll
 	if exist factor.dll.lib del factor.dll.lib
 
-.PHONY: all default x86-32 x86-64 clean
+.PHONY: all default x86-32 x86-64 x86-32-vista x86-64-vista clean
 
 .SUFFIXES: .rs

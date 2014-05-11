@@ -5,8 +5,11 @@
 #include <wchar.h>
 #endif
 
+#if _WIN32_WINNT != 0x0600
 #undef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501  // For AddVectoredExceptionHandler
+#define _WIN32_WINNT 0x0501  // For AddVectoredExceptionHandler, WinXP support
+//#define _WIN32_WINNT 0x0600  // For CancelSynchronousIo
+#endif
 
 #ifndef UNICODE
 #define UNICODE
