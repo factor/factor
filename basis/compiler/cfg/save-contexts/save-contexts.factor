@@ -12,7 +12,7 @@ GENERIC: needs-save-context? ( insn -- ? )
 M: gc-map-insn needs-save-context? drop t ;
 M: insn needs-save-context? drop f ;
 
-: bb-needs-save-context? ( insn -- ? )
+: bb-needs-save-context? ( bb -- ? )
     {
         [ kill-block?>> not ]
         [ instructions>> [ needs-save-context? ] any? ]
