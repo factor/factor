@@ -40,7 +40,7 @@ M: sequence new-resizable drop <vector> ; inline
 
 INSTANCE: vector growable
 
-: 1vector ( x -- vector ) V{ } 1sequence ;
+: 1vector ( x -- vector ) 1array 1 vector boa ; inline
 
 : ?push ( elt seq/f -- seq )
-    [ 1 <vector> ] unless* [ push ] keep ;
+    [ [ push ] keep ] [ 1vector ] if* ;
