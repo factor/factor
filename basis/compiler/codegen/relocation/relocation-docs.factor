@@ -1,6 +1,16 @@
-USING: compiler.codegen.labels cpu.architecture help.markup help.syntax make
-strings ;
+USING: byte-vectors compiler.codegen.labels compiler.constants cpu.architecture
+help.markup help.syntax make strings ;
 IN: compiler.codegen.relocation
+
+HELP: relocation-table
+{ $description "A " { $link byte-vector } " holding the relocations for the current compilation. Each sequence of four bytes in the vector represents one relocation." } ;
+
+HELP: add-relocation
+{ $values
+  { "class" "a relocation class such as " { $link rc-relative } }
+  { "type" "a relocation type such as " { $link rt-safepoint } }
+}
+{ $description "Adds one relocation to the relocation table." } ;
 
 HELP: add-literal
 { $values { "obj" "a symbol" } }

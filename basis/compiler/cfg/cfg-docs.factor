@@ -1,5 +1,5 @@
-USING: compiler.cfg compiler.cfg.instructions help.markup help.syntax vectors
-words ;
+USING: compiler.cfg compiler.cfg.instructions help.markup help.syntax
+namespaces vectors words ;
 IN: compiler.cfg
 
 HELP: basic-block
@@ -13,7 +13,7 @@ HELP: basic-block
 
 HELP: <basic-block>
 { $values { "bb" basic-block } }
-{ $description "Creates a new empty basic block." } ;
+{ $description "Creates a new empty basic block. The " { $slot "id" } " slot is initialized with the value of the basic-block " { $link counter } "." } ;
 
 HELP: cfg
 { $class-description
