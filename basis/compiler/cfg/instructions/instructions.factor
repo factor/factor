@@ -17,12 +17,8 @@ TUPLE: insn ;
 
 TUPLE: vreg-insn < insn ;
 
-! Instructions which do not have side effects; used for
-! dead code elimination
 TUPLE: flushable-insn < vreg-insn ;
 
-! Instructions which are referentially transparent; used for
-! value numbering
 TUPLE: foldable-insn < flushable-insn ;
 
 ! Constants

@@ -11,6 +11,14 @@ HELP: vreg-insn
   "Base class for instructions that uses vregs."
 } ;
 
+HELP: flushable-insn
+{ $class-description
+  "Instructions which do not have side effects; used for dead code elimination." } ;
+
+HELP: foldable-insn
+{ $class-description
+  "Instructions which are referentially transparent; used for value numbering." } ;
+
 HELP: ##inc-d
 { $class-description
   "An instruction that increases or decreases the data stacks size by n. For example, " { $link 2drop } " decreases it by two and pushing an item increases it by one."
@@ -90,3 +98,9 @@ HELP: ##return
 
 HELP: ##no-tco
 { $class-description "A dummy instruction that simply inhibits TCO." } ;
+
+HELP: ##copy
+{ $class-description "Instruction that copies a value from one register to another." } ;
+
+HELP: ##compare-integer
+{ $class-description "This instruction is emitted for integer comparisons." } ;
