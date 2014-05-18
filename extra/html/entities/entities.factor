@@ -2341,10 +2341,5 @@ R/ &(#[0-9]+|#[xX][0-9a-fA-F]+|[^\t\n\f <&#;]{1,32});?/
 
 PRIVATE>
 
-:: html-unescape ( str -- newstr )
-    [
-        0 str re-charref [
-            drop [ [ str subseq , ] keep 1 + ] dip
-            [ str subseq replace-charref , ] keep
-        ] each-match str length str subseq ,
-    ] { } make concat ;
+: html-unescape ( str -- newstr )
+    re-charref [ rest replace-charref ] re-replace-with ;
