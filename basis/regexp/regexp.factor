@@ -113,7 +113,7 @@ PRIVATE>
 
 <PRIVATE
 
-:: (re-split) ( string regexp quot -- new-slices )
+:: (re-split) ( string regexp quot: ( from to seq -- slice ) -- new-slices )
     0 string regexp [| end start end' string |
         end' ! leave it on the stack for the next iteration
         end start string quot call
@@ -137,6 +137,14 @@ PRIVATE>
 
 : re-replace ( string regexp replacement -- result )
     [ [ subseq ] (re-split) ] dip join ;
+
+:: re-replace-with ( string regexp quot: ( slice -- replacement ) -- result )
+    [
+        0 string regexp [
+            drop [ [ string <slice-unsafe> , ] keep ] dip
+            [ string <slice-unsafe> quot call( x -- x ) , ] keep
+        ] each-match string [ length ] [ <slice-unsafe> ] bi ,
+    ] { } make concat ;
 
 <PRIVATE
 
