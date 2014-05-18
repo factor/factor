@@ -182,7 +182,7 @@ ARTICLE: "regexp-operations" "Matching operations with regular expressions"
 "Splitting a string into tokens delimited by a regular expression:"
 { $subsections re-split }
 "Replacing occurrences of a regular expression with a string:"
-{ $subsections re-replace } ;
+{ $subsections re-replace re-replace-with } ;
 
 ARTICLE: "regexp-deploy" "Regular expressions and the deploy tool"
 "The " { $link "tools.deploy" } " tool has the option to strip out the optimizing compiler from the resulting image. Since regular expressions compile to Factor code, this creates a minor performance-related caveat."
@@ -227,7 +227,25 @@ HELP: re-split
 
 HELP: re-replace
 { $values { "string" string } { "regexp" regexp } { "replacement" string } { "result" string } }
-{ $description "Replaces substrings which match the input regexp with the given replacement text. The boundaries of the substring are chosen by the strategy used by " { $link all-matching-slices } "." } ;
+{ $description "Replaces substrings which match the input regexp with the given replacement text. The boundaries of the substring are chosen by the strategy used by " { $link all-matching-slices } "." }
+{ $examples
+    { $example
+        "USING: prettyprint regexp ;"
+        "\"python is pythonic\" R/ python/ \"factor\" re-replace ."
+        "\"factor is factoric\"" }
+} ;
+
+HELP: re-replace-with
+{ $values { "string" string } { "regexp" regexp } { "quot" { $quotation "( slice -- replacement )" } } { "result" string } }
+{ $description "Replaces substrings which match the input regexp with the result of calling " { $snippet "quot" } " on each matching slice. The boundaries of the substring are chosen by the strategy used by " { $link all-matching-slices } "." }
+{ $examples
+    { $example
+        "USING: ascii prettyprint regexp ;"
+        "\"abcdefghi\" R/ [aeiou]/ [ >upper ] re-replace-with ."
+        "\"AbcdEfghI\"" }
+} ;
+
+{ re-replace re-replace-with } related-words
 
 HELP: first-match
 { $values { "string" string } { "regexp" regexp } { "slice/f" "the match, if one exists" } }
