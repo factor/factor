@@ -54,6 +54,10 @@ $nl
 
 ABOUT: "compiler"
 
+HELP: frontend
+{ $values { "word" word } { "tree" sequence } }
+{ $description "First step of the compilation process. It outputs a high-level tree in SSA form." } ;
+
 HELP: compile-word
 { $values { "word" word } }
 { $description "Compile a single word." }

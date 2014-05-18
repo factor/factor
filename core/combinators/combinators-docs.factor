@@ -376,6 +376,11 @@ HELP: recursive-hashcode
 { $values { "n" integer } { "obj" object } { "quot" { $quotation ( n obj -- code ) } } { "code" integer } }
 { $description "A combinator used to implement methods for the " { $link hashcode* } " generic word. If " { $snippet "n" } " is less than or equal to zero, outputs 0, otherwise calls the quotation." } ;
 
+HELP: deep-spread>quot
+{ $values { "seq" sequence } { "quot" quotation } }
+{ $description "Creates a new quotation from a sequence of quotations that applies each quotation to a stack element in turn." }
+{ $see-also spread } ;
+
 HELP: cond>quot
 { $values { "assoc" "a sequence of pairs of quotations" } { "quot" quotation } }
 { $description "Creates a quotation that when called, has the same effect as applying " { $link cond } " to " { $snippet "assoc" } "."
