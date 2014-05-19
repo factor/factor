@@ -3,7 +3,7 @@
 USING: accessors arrays assocs classes classes.tuple combinators
 combinators.short-circuit debugger definitions effects eval
 formatting fry grouping help help.markup help.topics io
-io.streams.string kernel macros namespaces present sequences
+io.streams.string kernel macros namespaces sequences
 sequences.deep sets splitting strings summary unicode.categories
 vocabs vocabs.loader words words.constant words.symbol ;
 FROM: sets => members ;
@@ -37,18 +37,17 @@ SYMBOL: vocab-articles
     \ $example swap elements [ check-example ] each ;
 
 : extract-values ( element -- seq )
-    \ $values swap elements dup empty? [
-        first rest keys
-    ] unless ;
+    \ $values swap elements
+    [ f ] [ first rest keys ] if-empty ;
 
 : extract-value-effects ( element -- seq )
-    \ $values swap elements dup empty? [
+    \ $values swap elements [ f ] [
         first rest [
-            \ $quotation swap elements dup empty? [ drop f ] [
-                first second present
-            ] if
+            \ $quotation swap elements [ f ] [
+                first second dup effect? [ effect>string ] when
+            ] if-empty
         ] map
-    ] unless ;
+    ] if-empty ;
 
 : effect-values ( word -- seq )
     stack-effect
