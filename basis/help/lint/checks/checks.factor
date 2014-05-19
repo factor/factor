@@ -3,7 +3,7 @@
 USING: accessors arrays assocs classes classes.tuple combinators
 combinators.short-circuit debugger definitions effects eval
 formatting fry grouping help help.markup help.topics io
-io.streams.string kernel macros namespaces sequences
+io.streams.string kernel macros namespaces present sequences
 sequences.deep sets splitting strings summary unicode.categories
 vocabs vocabs.loader words words.constant words.symbol ;
 FROM: sets => members ;
@@ -45,7 +45,7 @@ SYMBOL: vocab-articles
     \ $values swap elements dup empty? [
         first rest [
             \ $quotation swap elements dup empty? [ drop f ] [
-                first second
+                first second present
             ] if
         ] map
     ] unless ;
