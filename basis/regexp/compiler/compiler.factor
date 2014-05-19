@@ -118,15 +118,13 @@ C: <box> box
 
 : states>words ( dfa -- words dfa )
     dup transitions>> keys [ gensym ] H{ } map>assoc
-    [ transitions-at ]
-    [ values ]
-    bi swap ; 
+    [ transitions-at ] [ values ] bi swap ;
 
 : dfa>main-word ( dfa -- word )
     states>words [ states>code ] keep start-state>> ;
 
 : word-template ( quot -- quot' )
-    '[ drop [ f ] 2dip over array-capacity? _ [ 2drop ] if ] ;
+    '[ drop [ f ] 2dip over _ [ 2drop ] if ] ;
 
 PRIVATE>
 
