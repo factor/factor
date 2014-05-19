@@ -22,7 +22,7 @@ HELP: return-connection
 { $description "Returns a connection to the pool." } ;
 
 HELP: with-pooled-connection
-{ $values { "pool" pool } { "quot" { $quotation "( conn -- )" } } }
+{ $values { "pool" pool } { "quot" { $quotation ( conn -- ) } } }
 { $description "Calls a quotation with a pooled connection on the stack. If the quotation returns successfully, the connection is returned to the pool; if the quotation throws an error, the connection is disposed of with " { $link dispose } "." } ;
 
 HELP: make-connection

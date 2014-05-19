@@ -34,11 +34,11 @@ HELP: split1-slice
 { $description "Splits " { $snippet "seq" } " at the first occurrence of " { $snippet "subseq" } ", and outputs the pieces before and after the split as slices. If " { $snippet "subseq" } " does not occur in " { $snippet "seq" } ", then " { $snippet "before" } " is just " { $snippet "seq" } " and " { $snippet "after" } " is " { $link f } "." } ;
 
 HELP: split1-when
-{ $values { "seq" "a sequence" } { "quot" { $quotation "( ... elt -- ... ? )" } } { "before" "a new sequence" } { "after" "a new sequence" } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation ( ... elt -- ... ? ) } } { "before" "a new sequence" } { "after" "a new sequence" } }
 { $description "Splits " { $snippet "seq" } " at the first occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs the pieces before and after the split." } ;
 
 HELP: split1-when-slice
-{ $values { "seq" "a sequence" } { "quot" { $quotation "( ... elt -- ... ? )" } } { "before-slice" slice } { "after-slice" slice } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation ( ... elt -- ... ? ) } } { "before-slice" slice } { "after-slice" slice } }
 { $description "Splits " { $snippet "seq" } " at the first occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs the pieces before and after the split as slices. If " { $snippet "subseq" } " does not occur in " { $snippet "seq" } ", then " { $snippet "before" } " is just " { $snippet "seq" } " and " { $snippet "after" } " is " { $link f } "." } ;
 
 HELP: split1-last
@@ -52,12 +52,12 @@ HELP: split1-last-slice
 { split1 split1-slice split1-last split1-last-slice } related-words
 
 HELP: split-when
-{ $values { "seq" "a sequence" } { "quot" { $quotation "( ... elt -- ... ? )" } } { "pieces" "a new array" } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation ( ... elt -- ... ? ) } } { "pieces" "a new array" } }
 { $description "Splits " { $snippet "seq" } " at each occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs an array of pieces. The pieces do not include the elements along which the sequence was split." }
 { $examples { $example "USING: ascii kernel prettyprint splitting ;" "\"hello,world-how.are:you\" [ letter? not ] split-when ." "{ \"hello\" \"world\" \"how\" \"are\" \"you\" }" } } ;
 
 HELP: split-when-slice
-{ $values { "seq" "a sequence" } { "quot" { $quotation "( ... elt -- ... ? )" } } { "pieces" "a new array" } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation ( ... elt -- ... ? ) } } { "pieces" "a new array" } }
 { $description "Splits " { $snippet "seq" } " at each occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs an array of pieces as slices. The pieces do not include the elements along which the sequence was split." } ;
 
 HELP: split

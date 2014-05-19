@@ -5,7 +5,7 @@ continuations help.markup help.syntax quotations calendar ;
 IN: concurrency.futures
 
 HELP: future
-{ $values { "quot" { $quotation "( -- value )" } } { "future" future } }
+{ $values { "quot" { $quotation ( -- value ) } } { "future" future } }
 { $description "Creates a deferred computation."
 $nl
 "The quotation begins with an empty data stack, an empty catch stack, and a name stack containing the global namespace only. This means that the only way to pass data to the quotation is to partially apply the data, for example using " { $link curry } " or " { $link compose } "." } ;

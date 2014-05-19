@@ -31,7 +31,7 @@ HELP: os-env
 } ;
 
 HELP: change-os-env
-{ $values { "key" string } { "quot" { $quotation "( old -- new )" } } }
+{ $values { "key" string } { "quot" { $quotation ( old -- new ) } } }
 { $description "Applies a quotation to change the value stored in an environment variable." }
 { $examples
     "This is an operating system-specific feature. On Unix, you can do:"

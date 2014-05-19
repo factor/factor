@@ -11,7 +11,7 @@ HELP: <sessions>
 { $description "Wraps a responder in a session manager responder." } ;
 
 HELP: schange
-{ $values { "key" symbol } { "quot" { $quotation "( old -- new )" } } }
+{ $values { "key" symbol } { "quot" { $quotation ( old -- new ) } } }
 { $description "Applies the quotation to the old value of the session variable, and assigns the resulting value back to the variable." } ;
 
 HELP: sget

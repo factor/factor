@@ -63,7 +63,7 @@ HELP: must-fail
 { $notes "This word is used to test boundary conditions and fail-fast behavior." } ;
 
 HELP: must-fail-with
-{ $values { "quot" "a quotation run with an empty stack" } { "pred" { $quotation "( error -- ? )" } } }
+{ $values { "quot" "a quotation run with an empty stack" } { "pred" { $quotation ( error -- ? ) } } }
 { $description "Runs a quotation with an empty stack, expecting it to throw an error which must satisfy " { $snippet "pred" } ". If the quotation does not throw an error, or if the error does not match the predicate, the unit test fails." }
 { $notes "This word is used to test error handling code, ensuring that errors thrown by code contain the relevant debugging information." } ;
 

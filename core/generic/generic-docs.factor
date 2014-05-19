@@ -159,7 +159,7 @@ HELP: check-method
 { $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link create-method } " is given an invalid class or generic word." } ;
 
 HELP: with-methods
-{ $values { "class" class } { "generic" generic } { "quot" { $quotation "( methods -- )" } } }
+{ $values { "class" class } { "generic" generic } { "quot" { $quotation ( methods -- ) } } }
 { $description "Applies a quotation to the generic word's methods hashtable, and regenerates the generic word's definition when the quotation returns." }
 $low-level-note ;
 

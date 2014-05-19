@@ -207,13 +207,13 @@ HELP: vertex-buffer
 
 HELP: with-mapped-buffer
 { $values
-    { "buffer" buffer } { "access" buffer-access-mode } { "quot" { $quotation "( ..a alien -- ..b )" } }
+    { "buffer" buffer } { "access" buffer-access-mode } { "quot" { $quotation ( ..a alien -- ..b ) } }
 }
 { $description "Maps " { $snippet "buffer" } " into CPU address space with " { $snippet "access" } " for the dynamic extent of " { $snippet "quot" } ". " { $snippet "quot" } " is called with a pointer to the mapped memory on top of the stack." } ;
 
 HELP: with-mapped-buffer-array
 { $values
-    { "buffer" buffer } { "access" buffer-access-mode } { "c-type" "a C type" } { "quot" { $quotation "( ..a array -- ..b )" } }
+    { "buffer" buffer } { "access" buffer-access-mode } { "c-type" "a C type" } { "quot" { $quotation ( ..a array -- ..b ) } }
 }
 { $description "Maps " { $snippet "buffer" } " into CPU address space with " { $snippet "access" } " for the dynamic extent of " { $snippet "quot" } ". " { $snippet "quot" } " is called with the pointer to the mapped memory wrapped in a specialized array of " { $snippet "c-type" } "." }
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." } ;

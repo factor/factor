@@ -40,20 +40,20 @@ HELP: <product-sequence>
 { product-sequence <product-sequence> } related-words
 
 HELP: product-map
-{ $values { "sequences" sequence } { "quot" { $quotation "( ... seq -- ... value )" } } { "sequence" sequence } }
+{ $values { "sequences" sequence } { "quot" { $quotation ( ... seq -- ... value ) } } { "sequence" sequence } }
 { $description "Calls " { $snippet "quot" } " for every element of the cartesian product of " { $snippet "sequences" } " and collects the results from " { $snippet "quot" } " into an output sequence." }
 { $notes { $snippet "[ ... ] product-map" } " is equivalent to, but more efficient than, " { $snippet "<product-sequence> [ ... ] map" } "." } ;
 
 HELP: product-map-as
-{ $values { "sequences" sequence } { "quot" { $quotation "( ... seq -- ... value )" } } { "exemplar" sequence } { "sequence" sequence } }
+{ $values { "sequences" sequence } { "quot" { $quotation ( ... seq -- ... value ) } } { "exemplar" sequence } { "sequence" sequence } }
 { $description "Calls " { $snippet "quot" } " for every element of the cartesian product of " { $snippet "sequences" } " and collects the results from " { $snippet "quot" } " into an output sequence the same type as the " { $snippet "exemplar" } " sequence." } ;
 
 HELP: product-map>assoc
-{ $values { "sequences" sequence } { "quot" { $quotation "( ... seq -- ... key value )" } } { "exemplar" assoc } { "assoc" assoc } }
+{ $values { "sequences" sequence } { "quot" { $quotation ( ... seq -- ... key value ) } } { "exemplar" assoc } { "assoc" assoc } }
 { $description "Calls " { $snippet "quot" } " for every element of the cartesian product of " { $snippet "sequences" } " and collects the results from " { $snippet "quot" } " into an output assoc." } ;
 
 HELP: product-each
-{ $values { "sequences" sequence } { "quot" { $quotation "( ... seq -- ... )" } } }
+{ $values { "sequences" sequence } { "quot" { $quotation ( ... seq -- ... ) } } }
 { $description "Calls " { $snippet "quot" } " for every element of the cartesian product of " { $snippet "sequences" } "." }
 { $notes { $snippet "[ ... ] product-each" } " is equivalent to, but more efficient than, " { $snippet "<product-sequence> [ ... ] each" } "." } ;
 
