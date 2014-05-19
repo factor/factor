@@ -6,7 +6,7 @@ IN: benchmark.regexp
 
 : regexp-benchmark ( -- )
     200
-    10,000 iota [ number>string ] map
+    20,000 iota [ number>string ] map
     200 iota [ 1 + CHAR: a <string> ] map
     '[
         _ R/ \d+/ [ matches? ] curry all? t assert=
