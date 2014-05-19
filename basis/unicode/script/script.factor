@@ -1,16 +1,18 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: interval-maps namespaces simple-flat-file ;
+USING: interval-maps namespaces parser simple-flat-file
+words.constant ;
 IN: unicode.script
 
 <PRIVATE
 
-SYMBOL: script-table
-
+<<
+"script-table" create-in
 "vocab:unicode/script/Scripts.txt" load-interval-file
-script-table set-global
+define-constant
+>>
 
 PRIVATE>
 
 : script-of ( char -- script )
-    script-table get-global interval-at ;
+    script-table interval-at ;
