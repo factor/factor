@@ -44,9 +44,9 @@ PRIVATE>
     [ nip ] [ interval-contains? ] 2bi
     [ value t ] [ drop f f ] if ; inline
 
-: interval-at ( key map -- value ) interval-at* drop ;
+: interval-at ( key map -- value ) interval-at* drop ; inline
 
-: interval-key? ( key map -- ? ) interval-at* nip ;
+: interval-key? ( key map -- ? ) interval-at* nip ; inline
 
 : interval-values ( map -- values )
     check-interval-map array>> [ value ] map ;
