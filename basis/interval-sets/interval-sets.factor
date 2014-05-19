@@ -20,9 +20,8 @@ PRIVATE>
 
 : in? ( key set -- ? )
     check-interval-set array>>
-    over dupd [ >=< ] curry search drop [
-        dup even? [ dup 1 + ] [ [ 1 - ] keep ] if rot
-        [ nth-unsafe ] curry bi@ 1 - between?
+    dupd [ <=> ] with search swap [
+        even? [ >= ] [ 1 - <= ] if
     ] [ 2drop f ] if* ;
 
 <PRIVATE
