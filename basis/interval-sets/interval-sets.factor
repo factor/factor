@@ -15,8 +15,9 @@ ALIAS: start first-unsafe
 ALIAS: end second-unsafe
 
 : find-interval ( key interval-set -- slice )
-    array>> 2 <groups>
-    [ start <=> ] with search nip ; inline
+    array>> swap dupd [ >=< ] curry search drop
+    [ dup even? [ dup 1 + ] [ [ 1 - ] keep ] if rot <slice-unsafe> ]
+    [ drop f ] if* ; inline
 
 ERROR: not-an-interval-set obj ;
 
@@ -46,7 +47,7 @@ PRIVATE>
             drop dup first2 <
             [ unclip-slice , ]
             [ 2 tail-slice ] if
-            (delete-redundancies) 
+            (delete-redundancies)
         ]
     } case ;
 
