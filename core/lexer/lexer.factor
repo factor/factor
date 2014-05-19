@@ -1,14 +1,14 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators continuations io kernel
-math math.parser namespaces sequences source-files.errors
-strings vectors ;
+math math.parser namespaces sequences sequences.private
+source-files.errors strings vectors ;
 IN: lexer
 
 TUPLE: lexer
 { text array }
 { line fixnum }
-{ line-text maybe{ string } }
+{ line-text string }
 { line-length fixnum }
 { column fixnum }
 { parsing-words vector } ;
@@ -16,7 +16,7 @@ TUPLE: lexer
 TUPLE: lexer-parsing-word word line line-text column ;
 
 : next-line ( lexer -- )
-    dup [ line>> ] [ text>> ] bi ?nth
+    dup [ line>> ] [ text>> ] bi ?nth "" or
     [ >>line-text ] [ length >>line-length ] bi
     [ 1 + ] change-line
     0 >>column
@@ -49,15 +49,14 @@ ERROR: unexpected want got ;
 : skip ( i seq ? -- n )
     over length [
         [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
-    ] dip or ;
+    ] dip or ; inline
 
 : change-lexer-column ( lexer quot -- )
-    [ [ column>> ] [ line-text>> ] bi ] prepose keep
-    column<< ; inline
+    [ [ column>> ] [ line-text>> ] bi ] prepose keep column<< ; inline
 
 GENERIC: skip-blank ( lexer -- )
 
-M: lexer skip-blank ( lexer -- )
+M: lexer skip-blank
     [ t skip ] change-lexer-column ;
 
 GENERIC: skip-word ( lexer -- )
@@ -68,11 +67,16 @@ GENERIC: skip-word ( lexer -- )
     nth CHAR: " eq? ; inline
 
 : shebang? ( column text -- ? )
-    swap zero? [ "#!" head? ] [ drop f ] if ; inline
+    swap zero? [
+        dup length 1 > [
+            dup first-unsafe CHAR: # =
+            [ second-unsafe CHAR: ! = ] [ drop f ] if
+        ] [ drop f ] if
+    ] [ drop f ] if ; inline
 
 PRIVATE>
 
-M: lexer skip-word ( lexer -- )
+M: lexer skip-word
     [
         {
             { [ 2dup quote? ] [ drop 1 + ] }
@@ -82,10 +86,10 @@ M: lexer skip-word ( lexer -- )
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
-    [ line>> ] [ text>> length ] bi <= ;
+    [ line>> ] [ text>> length ] bi <= ; inline
 
 : still-parsing-line? ( lexer -- ? )
-    [ column>> ] [ line-length>> ] bi < ;
+    [ column>> ] [ line-length>> ] bi < ; inline
 
 : (parse-token) ( lexer -- str )
     {
@@ -142,8 +146,8 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
 
 : simple-lexer-dump ( error -- )
     [ line>> number>string ": " append ]
-    [ line-text>> "" or ]
-    [ column>> 0 or ] tri
+    [ line-text>> ]
+    [ column>> ] tri
     pick length + CHAR: \s <string>
     [ write ] [ print ] [ write "^" print ] tri* ;
 
@@ -153,7 +157,7 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
         over line>> number>string length
         CHAR: \s pad-head
         ": " append write
-    ] [ line-text>> "" or print ] bi
+    ] [ line-text>> print ] bi
     simple-lexer-dump ;
 
 : parsing-word-lexer-dump ( error parsing-word -- )
