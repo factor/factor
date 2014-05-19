@@ -11,7 +11,7 @@ SYMBOLS: Cn Lu Ll Lt Lm Lo Mn Mc Me Nd Nl No Pc Pd Ps Pe Pi Pf Po Sm Sc Sk So Zs
 <PRIVATE
 
 : [category] ( categories code -- quot )
-    '[ dup category# _ member? [ drop t ] _ if ] ;
+    '[ integer>fixnum-strict dup category# _ member? [ drop t ] _ if ] ;
 
 : integer-predicate-class ( word predicate -- )
     integer swap define-predicate-class ;
@@ -24,7 +24,7 @@ SYMBOLS: Cn Lu Ll Lt Lm Lo Mn Mc Me Nd Nl No Pc Pd Ps Pe Pi Pf Po Sm Sc Sk So Zs
 
 : parse-category ( -- word tokens quot )
     scan-new-class \ ; parse-until { | } split1
-    [ [ name>> categories-map at ] map ]
+    [ [ name>> categories-map at ] B{ } map-as ]
     [ [ [ ] like ] [ [ drop f ] ] if* ] bi* ;
 
 PRIVATE>

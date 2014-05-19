@@ -1,11 +1,10 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit assocs math kernel sequences
-io.files hashtables quotations splitting grouping arrays io
-math.parser math.order byte-arrays namespaces math.bitwise
-compiler.units parser io.encodings.ascii interval-maps
-ascii sets combinators locals math.ranges sorting make
-strings.parser io.encodings.utf8 memoize simple-flat-file ;
+USING: arrays ascii assocs byte-arrays combinators
+combinators.short-circuit grouping hashtables interval-maps
+io.encodings.utf8 io.files kernel locals make math math.bitwise
+math.order math.parser math.ranges memoize namespaces sequences
+sets simple-flat-file sorting splitting strings.parser ;
 IN: unicode.data
 
 <PRIVATE
@@ -17,7 +16,7 @@ CONSTANT: canonical-map H{ }
 CONSTANT: combine-map H{ }
 CONSTANT: class-map H{ }
 CONSTANT: compatibility-map H{ }
-SYMBOL: category-map ! B{ }
+CONSTANT: category-map BV{ }
 CONSTANT: special-casing H{ }
 CONSTANT: properties H{ }
 
@@ -35,22 +34,24 @@ CONSTANT: name-map H{ }
 : non-starter? ( char -- ? ) combining-class { 0 f } member? not ; inline
 : name>char ( name -- char ) name-map at ; inline
 : char>name ( char -- name ) name-map value-at ; inline
-: property? ( char property -- ? ) properties at interval-key? ; inline
+: property ( property -- interval-map ) properties at ; foldable
+: property? ( char property -- ? ) property interval-key? ; inline
 : ch>lower ( ch -- lower ) simple-lower ?at drop ; inline
 : ch>upper ( ch -- upper ) simple-upper ?at drop ; inline
 : ch>title ( ch -- title ) simple-title ?at drop ; inline
 : special-case ( ch -- casing-tuple ) special-casing at ; inline
 
 ! For non-existent characters, use Cn
-CONSTANT: categories
-    { "Cn"
-      "Lu" "Ll" "Lt" "Lm" "Lo"
-      "Mn" "Mc" "Me"
-      "Nd" "Nl" "No"
-      "Pc" "Pd" "Ps" "Pe" "Pi" "Pf" "Po"
-      "Sm" "Sc" "Sk" "So"
-      "Zs" "Zl" "Zp"
-      "Cc" "Cf" "Cs" "Co" }
+CONSTANT: categories {
+    "Cn"
+    "Lu" "Ll" "Lt" "Lm" "Lo"
+    "Mn" "Mc" "Me"
+    "Nd" "Nl" "No"
+    "Pc" "Pd" "Ps" "Pe" "Pi" "Pf" "Po"
+    "Sm" "Sc" "Sk" "So"
+    "Zs" "Zl" "Zp"
+    "Cc" "Cf" "Cs" "Co"
+}
 
 <PRIVATE
 
@@ -66,7 +67,7 @@ PRIVATE>
     ! that this gives Cf or Mn
     ! Cf = 26; Mn = 5; Cn = 29
     ! Use a compressed array instead?
-    dup category-map get-global ?nth [ ] [
+    dup category-map ?nth [ ] [
         dup 0xE0001 0xE007F between?
         [ drop 26 ] [
             0xE0100 0xE01EF between?  5 29 ?
@@ -203,7 +204,7 @@ load-data {
     [ process-combining class-map swap assoc-union! drop ]
     [ process-canonical canonical-map swap assoc-union! drop combine-map swap assoc-union! drop ]
     [ process-compatibility compatibility-map swap assoc-union! drop ]
-    [ process-category category-map set-global ]
+    [ process-category category-map push-all ]
 } cleave
 
 combine-map keys [ 2ch> nip ] map
