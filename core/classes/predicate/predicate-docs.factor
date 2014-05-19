@@ -18,7 +18,7 @@ ARTICLE: "predicates" "Predicate classes"
 ABOUT: "predicates"
 
 HELP: define-predicate-class
-{ $values { "class" class } { "superclass" class } { "definition" { $quotation "( superclass -- ? )" } } }
+{ $values { "class" class } { "superclass" class } { "definition" { $quotation ( superclass -- ? ) } } }
 { $description "Defines a predicate class. This is the run time equivalent of " { $link POSTPONE: PREDICATE: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;

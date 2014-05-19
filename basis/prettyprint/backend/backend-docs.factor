@@ -33,7 +33,7 @@ HELP: nesting-limit?
 $prettyprinting-note ;
 
 HELP: check-recursion
-{ $values { "obj" "an object" } { "quot" { $quotation "( obj -- )" } } }
+{ $values { "obj" "an object" } { "quot" { $quotation ( obj -- ) } } }
 { $description "If the object is already being printed, that is, if the prettyprinter has encountered a cycle in the object graph, or if the maximum nesting depth has been reached, outputs a dummy string. Otherwise applies the quotation to the object." }
 $prettyprinting-note ;
 

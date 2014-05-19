@@ -175,7 +175,7 @@ $nl
 } ;
 
 HELP: spawn-server
-{ $values { "quot" { $quotation "( -- ? )" } } { "name" string } { "thread" thread } }
+{ $values { "quot" { $quotation ( -- ? ) } } { "name" string } { "thread" thread } }
 { $description "Convenience wrapper around " { $link spawn } " which repeatedly calls the quotation in a new thread until it outputs " { $link f } "." }
 { $examples
     "A thread that runs forever:"
@@ -198,5 +198,5 @@ HELP: tset
 { $description "Sets the value of a thread-local variable." } ;
 
 HELP: tchange
-{ $values { "key" object } { "quot" { $quotation "( ..a value -- ..b newvalue )" } } }
+{ $values { "key" object } { "quot" { $quotation ( ..a value -- ..b newvalue ) } } }
 { $description "Applies the quotation to the current value of a thread-local variable, storing the result back to the same variable." } ;

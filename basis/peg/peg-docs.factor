@@ -98,7 +98,7 @@ HELP: optional
 HELP: semantic
 { $values 
   { "parser" "a parser" } 
-  { "quot" { $quotation "( object -- ? )" } } 
+  { "quot" { $quotation ( object -- ? ) } } 
 }
 { $description 
     "Returns a parser that succeeds if the 'p1' parser succeeds and the quotation called with "
@@ -130,7 +130,7 @@ HELP: ensure-not
 HELP: action
 { $values 
   { "parser" "a parser" } 
-  { "quot" { $quotation "( ast -- ast )" } } 
+  { "quot" { $quotation ( ast -- ast ) } } 
 }
 { $description 
     "Returns a parser that calls the 'p1' parser and applies the quotation to the AST resulting "

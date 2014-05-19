@@ -21,7 +21,7 @@ HELP: block-unless-pred
 { $values
     { "mailbox" mailbox }
     { "timeout" "a " { $link duration } " or " { $link f } }
-    { "pred" { $quotation "( ... message -- ... ? )" } } 
+    { "pred" { $quotation ( ... message -- ... ? ) } } 
 }
 { $description "Block the thread if there are no items in the mailbox that return true when the predicate is called with the item on the stack." } ;
 
@@ -40,14 +40,14 @@ HELP: mailbox-get-all
 { $description "Blocks the thread if the mailbox is empty, otherwise removes all objects in the mailbox and returns an array containing the objects." } ;
 
 HELP: while-mailbox-empty
-{ $values { "mailbox" mailbox } 
-          { "quot" { $quotation "( -- )" } }
+{ $values { "mailbox" mailbox }
+          { "quot" { $quotation ( -- ) } }
 }
 { $description "Repeatedly call the quotation while there are no items in the mailbox." } ;
 
 HELP: mailbox-get?
-{ $values { "mailbox" mailbox } 
-          { "pred" { $quotation "( obj -- ? )" } }
+{ $values { "mailbox" mailbox }
+          { "pred" { $quotation ( obj -- ? ) } }
           { "obj" object }
 }
 { $description "Get the first item in the mailbox which satisfies the predicate. When the predicate returns true that item will be returned. If nothing in the mailbox satisfies the predicate then the thread will block until something does." } ;

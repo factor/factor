@@ -25,7 +25,7 @@ HELP: compile-attr
 
 HELP: CHLOE:
 { $syntax "CHLOE: name definition... ;" }
-{ $values { "name" "the tag name" } { "definition" { $quotation "( tag -- )" } } }
+{ $values { "name" "the tag name" } { "definition" { $quotation ( tag -- ) } } }
 { $description "Defines compilation semantics for the Chloe tag named " { $snippet "tag" } ". The definition body receives a " { $link tag } " on the stack." } ;
 
 HELP: COMPONENT:
@@ -47,7 +47,7 @@ HELP: [code]
 { $description "Compiles the quotation. It will be called when the template is called." } ;
 
 HELP: process-children
-{ $values { "tag" tag } { "quot" { $quotation "( compiled-tag -- )" } } }
+{ $values { "tag" tag } { "quot" { $quotation ( compiled-tag -- ) } } }
 { $description "Compiles the tag. The quotation will be applied to the resulting quotation when the template is called." }
 { $examples "See " { $link "html.templates.chloe.extend.tags.example" } " for an example which uses this word to implement a custom control flow tag." } ;
 

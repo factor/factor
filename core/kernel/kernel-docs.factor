@@ -171,7 +171,7 @@ HELP: xor
 { $notes "This word implements boolean exclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise exclusive or is the " { $link bitxor } " word." } ;
 
 HELP: both?
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( ... obj -- ... ? )" } } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation ( ... obj -- ... ? ) } } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to both " { $snippet "x" } " and " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 5 [ odd? ] both? ." "t" }
@@ -179,7 +179,7 @@ HELP: both?
 } ;
 
 HELP: either?
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( ... obj -- ... ? )" } } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation ( ... obj -- ... ? ) } } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to either " { $snippet "x" } " or " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 6 [ odd? ] either? ." "t" }
@@ -187,7 +187,7 @@ HELP: either?
 } ;
 
 HELP: same?
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( ... obj -- ... obj' )" } } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation ( ... obj -- ... obj' ) } } { "?" "a boolean" } }
 { $description "Applies the quotation to both " { $snippet "x" } " and " { $snippet "y" } ", and then checks if the results are equal." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "4 5 [ 2/ ] same? ." "t" }
@@ -219,22 +219,22 @@ HELP: call
 { call POSTPONE: call( } related-words
 
 HELP: keep
-{ $values { "x" object } { "quot" { $quotation "( ..a x -- ..b )" } } }
+{ $values { "x" object } { "quot" { $quotation ( ..a x -- ..b ) } } }
 { $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." }
 { $examples
     { $example "USING: arrays kernel prettyprint ;" "2 \"greetings\" [ <array> ] keep 2array ." "{ { \"greetings\" \"greetings\" } \"greetings\" }" }
 } ;
 
 HELP: 2keep
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( ..a x y -- ..b )" } } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation ( ..a x y -- ..b ) } } }
 { $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
-{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( ..a x y z -- ..b )" } } }
+{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation ( ..a x y z -- ..b ) } } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: bi
-{ $values { "x" object } { "p" { $quotation "( ..a x -- ..b )" } } { "q" { $quotation "( ..c x -- ..d )" } } }
+{ $values { "x" object } { "p" { $quotation ( ..a x -- ..b ) } } { "q" { $quotation ( ..c x -- ..d ) } } }
 { $description "Applies " { $snippet "p" } " to " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "x" } "." }
 { $examples
     "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x -- )" } ", then the following two lines are equivalent:"
@@ -256,7 +256,7 @@ HELP: bi
 } ;
 
 HELP: 2bi
-{ $values { "x" object } { "y" object } { "p" { $quotation "( x y -- ... )" } } { "q" { $quotation "( x y -- ... )" } } }
+{ $values { "x" object } { "y" object } { "p" { $quotation ( x y -- ... ) } } { "q" { $quotation ( x y -- ... ) } } }
 { $description "Applies " { $snippet "p" } " to the two input values, then applies " { $snippet "q" } " to the two input values." }
 { $examples
     "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y -- )" } ", then the following two lines are equivalent:"
@@ -277,7 +277,7 @@ HELP: 2bi
 } ;
 
 HELP: 3bi
-{ $values { "x" object } { "y" object } { "z" object } { "p" { $quotation "( x y z -- ... )" } } { "q" { $quotation "( x y z -- ... )" } } }
+{ $values { "x" object } { "y" object } { "z" object } { "p" { $quotation ( x y z -- ... ) } } { "q" { $quotation ( x y z -- ... ) } } }
 { $description "Applies " { $snippet "p" } " to the three input values, then applies " { $snippet "q" } " to the three input values." }
 { $examples
     "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y z -- )" } ", then the following two lines are equivalent:"
@@ -293,7 +293,7 @@ HELP: 3bi
 } ;
 
 HELP: tri
-{ $values { "x" object } { "p" { $quotation "( x -- ... )" } } { "q" { $quotation "( x -- ... )" } } { "r" { $quotation "( x -- ... )" } } }
+{ $values { "x" object } { "p" { $quotation ( x -- ... ) } } { "q" { $quotation ( x -- ... ) } } { "r" { $quotation ( x -- ... ) } } }
 { $description "Applies " { $snippet "p" } " to " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "x" } ", and finally applies " { $snippet "r" } " to " { $snippet "x" } "." }
 { $examples
     "If " { $snippet "[ p ]" } ", " { $snippet "[ q ]" } " and " { $snippet "[ r ]" } " have stack effect " { $snippet "( x -- )" } ", then the following two lines are equivalent:"
@@ -314,7 +314,7 @@ HELP: tri
 } ;
 
 HELP: 2tri
-{ $values { "x" object } { "y" object } { "p" { $quotation "( x y -- ... )" } } { "q" { $quotation "( x y -- ... )" } } { "r" { $quotation "( x y -- ... )" } } }
+{ $values { "x" object } { "y" object } { "p" { $quotation ( x y -- ... ) } } { "q" { $quotation ( x y -- ... ) } } { "r" { $quotation ( x y -- ... ) } } }
 { $description "Applies " { $snippet "p" } " to the two input values, then applies " { $snippet "q" } " to the two input values, and finally applies " { $snippet "r" } " to the two input values." }
 { $examples
     "If " { $snippet "[ p ]" } ", " { $snippet "[ q ]" } " and " { $snippet "[ r ]" } " have stack effect " { $snippet "( x y -- )" } ", then the following two lines are equivalent:"
@@ -330,7 +330,7 @@ HELP: 2tri
 } ;
 
 HELP: 3tri
-{ $values { "x" object } { "y" object } { "z" object } { "p" { $quotation "( x y z -- ... )" } } { "q" { $quotation "( x y z -- ... )" } } { "r" { $quotation "( x y z -- ... )" } } }
+{ $values { "x" object } { "y" object } { "z" object } { "p" { $quotation ( x y z -- ... ) } } { "q" { $quotation ( x y z -- ... ) } } { "r" { $quotation ( x y z -- ... ) } } }
 { $description "Applies " { $snippet "p" } " to the three input values, then applies " { $snippet "q" } " to the three input values, and finally applies " { $snippet "r" } " to the three input values." }
 { $examples
     "If " { $snippet "[ p ]" } ", " { $snippet "[ q ]" } " and " { $snippet "[ r ]" } " have stack effect " { $snippet "( x y z -- )" } ", then the following two lines are equivalent:"
@@ -347,7 +347,7 @@ HELP: 3tri
 
 
 HELP: bi*
-{ $values { "x" object } { "y" object } { "p" { $quotation "( x -- ... )" } } { "q" { $quotation "( y -- ... )" } } }
+{ $values { "x" object } { "y" object } { "p" { $quotation ( x -- ... ) } } { "q" { $quotation ( y -- ... ) } } }
 { $description "Applies " { $snippet "p" } " to " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "y" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -358,7 +358,7 @@ HELP: bi*
 } ;
 
 HELP: 2bi*
-{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "p" { $quotation "( w x -- ... )" } } { "q" { $quotation "( y z -- ... )" } } }
+{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "p" { $quotation ( w x -- ... ) } } { "q" { $quotation ( y z -- ... ) } } }
 { $description "Applies " { $snippet "p" } " to " { $snippet "w" } " and " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "y" } " and " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -369,7 +369,7 @@ HELP: 2bi*
 } ;
 
 HELP: 2tri*
-{ $values { "u" object } { "v" object } { "w" object } { "x" object } { "y" object } { "z" object } { "p" { $quotation "( u v -- ... )" } } { "q" { $quotation "( w x -- ... )" } } { "r" { $quotation "( y z -- ... )" } } }
+{ $values { "u" object } { "v" object } { "w" object } { "x" object } { "y" object } { "z" object } { "p" { $quotation ( u v -- ... ) } } { "q" { $quotation ( w x -- ... ) } } { "r" { $quotation ( y z -- ... ) } } }
 { $description "Applies " { $snippet "p" } " to " { $snippet "u" } " and " { $snippet "v" } ", then applies " { $snippet "q" } " to " { $snippet "w" } " and " { $snippet "x" } ", and finally applies " { $snippet "r" } " to " { $snippet "y" } " and " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -380,7 +380,7 @@ HELP: 2tri*
 } ;
 
 HELP: tri*
-{ $values { "x" object } { "y" object } { "z" object } { "p" { $quotation "( x -- ... )" } } { "q" { $quotation "( y -- ... )" } } { "r" { $quotation "( z -- ... )" } } }
+{ $values { "x" object } { "y" object } { "z" object } { "p" { $quotation ( x -- ... ) } } { "q" { $quotation ( y -- ... ) } } { "r" { $quotation ( z -- ... ) } } }
 { $description "Applies " { $snippet "p" } " to " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "y" } ", and finally applies " { $snippet "r" } " to " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -391,7 +391,7 @@ HELP: tri*
 } ;
 
 HELP: bi@
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ... )" } } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation ( obj -- ... ) } } }
 { $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -407,7 +407,7 @@ HELP: bi@
 } ;
 
 HELP: 2bi@
-{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj1 obj2 -- ... )" } } }
+{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "quot" { $quotation ( obj1 obj2 -- ... ) } } }
 { $description "Applies the quotation to " { $snippet "w" } " and " { $snippet "x" } ", then to " { $snippet "y" } " and " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -423,7 +423,7 @@ HELP: 2bi@
 } ;
 
 HELP: tri@
-{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj -- ... )" } } }
+{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation ( obj -- ... ) } } }
 { $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } ", and finally to " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -439,7 +439,7 @@ HELP: tri@
 } ;
 
 HELP: 2tri@
-{ $values { "u" object } { "v" object } { "w" object } { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj1 obj2 -- ... )" } } }
+{ $values { "u" object } { "v" object } { "w" object } { "x" object } { "y" object } { "z" object } { "quot" { $quotation ( obj1 obj2 -- ... ) } } }
 { $description "Applies the quotation to " { $snippet "u" } " and " { $snippet "v" } ", then to " { $snippet "w" } " and " { $snippet "x" } ", and then to " { $snippet "y" } " and " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -455,7 +455,7 @@ HELP: 2tri@
 } ;
 
 HELP: bi-curry
-{ $values { "x" object } { "p" { $quotation "( x -- ... )" } } { "q" { $quotation "( x -- ... )" } } { "p'" { $snippet "[ x p ]" } } { "q'" { $snippet "[ x q ]" } } }
+{ $values { "x" object } { "p" { $quotation ( x -- ... ) } } { "q" { $quotation ( x -- ... ) } } { "p'" { $snippet "[ x p ]" } } { "q'" { $snippet "[ x q ]" } } }
 { $description "Partially applies " { $snippet "p" } " and " { $snippet "q" } " to " { $snippet "x" } "." }
 { $notes
   "The following two lines are equivalent:"
@@ -479,9 +479,9 @@ HELP: bi-curry
 HELP: tri-curry
 { $values
   { "x" object }
-  { "p" { $quotation "( x -- ... )" } }
-  { "q" { $quotation "( x -- ... )" } }
-  { "r" { $quotation "( x -- ... )" } }
+  { "p" { $quotation ( x -- ... ) } }
+  { "q" { $quotation ( x -- ... ) } }
+  { "r" { $quotation ( x -- ... ) } }
   { "p'" { $snippet "[ x p ]" } }
   { "q'" { $snippet "[ x q ]" } }
   { "r'" { $snippet "[ x r ]" } }
@@ -501,7 +501,7 @@ HELP: tri-curry
   "The combination " { $snippet "tri-curry tri*" } " cannot be expressed with the non-currying dataflow combinators alone; it handles the case where you have four values " { $snippet "a b c d" } " on the stack, and you wish to apply " { $snippet "p" } " to " { $snippet "a d" } ", " { $snippet "q" } " to " { $snippet "b d" } " and " { $snippet "r" } " to " { $snippet "c d" } "." } ;
 
 HELP: bi-curry*
-{ $values { "x" object } { "y" object } { "p" { $quotation "( x -- ... )" } } { "q" { $quotation "( y -- ... )" } } { "p'" { $snippet "[ x p ]" } } { "q'" { $snippet "[ y q ]" } } }
+{ $values { "x" object } { "y" object } { "p" { $quotation ( x -- ... ) } } { "q" { $quotation ( y -- ... ) } } { "p'" { $snippet "[ x p ]" } } { "q'" { $snippet "[ y q ]" } } }
 { $description "Partially applies " { $snippet "p" } " to " { $snippet "x" } ", and " { $snippet "q" } " to " { $snippet "y" } "." }
 { $notes
   "The following two lines are equivalent:"
@@ -530,9 +530,9 @@ HELP: tri-curry*
   { "x" object }
   { "y" object }
   { "z" object }
-  { "p" { $quotation "( x -- ... )" } }
-  { "q" { $quotation "( y -- ... )" } }
-  { "r" { $quotation "( z -- ... )" } }
+  { "p" { $quotation ( x -- ... ) } }
+  { "q" { $quotation ( y -- ... ) } }
+  { "r" { $quotation ( z -- ... ) } }
   { "p'" { $snippet "[ x p ]" } }
   { "q'" { $snippet "[ y q ]" } }
   { "r'" { $snippet "[ z r ]" } }
@@ -552,7 +552,7 @@ HELP: tri-curry*
 } ;
 
 HELP: bi-curry@
-{ $values { "x" object } { "y" object } { "q" { $quotation "( obj -- ... )" } } { "p'" { $snippet "[ x q ]" } } { "q'" { $snippet "[ y q ]" } } }
+{ $values { "x" object } { "y" object } { "q" { $quotation ( obj -- ... ) } } { "p'" { $snippet "[ x q ]" } } { "q'" { $snippet "[ y q ]" } } }
 { $description "Partially applies " { $snippet "q" } " to " { $snippet "x" } " and " { $snippet "y" } "." }
 { $notes
   "The following two lines are equivalent:"
@@ -567,7 +567,7 @@ HELP: tri-curry@
   { "x" object }
   { "y" object }
   { "z" object }
-  { "q" { $quotation "( obj -- ... )" } }
+  { "q" { $quotation ( obj -- ... ) } }
   { "p'" { $snippet "[ x q ]" } }
   { "q'" { $snippet "[ y q ]" } }
   { "r'" { $snippet "[ z q ]" } }
@@ -633,7 +633,7 @@ $nl
 } ;
 
 HELP: if*
-{ $values { "?" "a generalized boolean" } { "true" { $quotation "( ..a ? -- ..b )" } } { "false" { $quotation "( ..a -- ..b )" } } }
+{ $values { "?" "a generalized boolean" } { "true" { $quotation ( ..a ? -- ..b ) } } { "false" { $quotation ( ..a -- ..b ) } } }
 { $description "Alternative conditional form that preserves the " { $snippet "cond" } " value if it is true."
 $nl
 "If the condition is true, it is retained on the stack before the " { $snippet "true" } " quotation is called. Otherwise, the condition is removed from the stack and the " { $snippet "false" } " quotation is called."
@@ -666,21 +666,21 @@ $nl
 } ;
 
 HELP: when*
-{ $values { "?" "a generalized boolean" } { "true" { $quotation "( ..a ? -- ..a )" } } }
+{ $values { "?" "a generalized boolean" } { "true" { $quotation ( ..a ? -- ..a ) } } }
 { $description "Variant of " { $link if* } " with no false quotation."
 $nl
 "The following two lines are equivalent:"
 { $code "X [ Y ] when*" "X dup [ Y ] [ drop ] if" } } ;
 
 HELP: unless*
-{ $values { "?" "a generalized boolean" } { "false" { $quotation "( ..a -- ..a x )" } } { "x" object } }
+{ $values { "?" "a generalized boolean" } { "false" { $quotation ( ..a -- ..a x ) } } { "x" object } }
 { $description "Variant of " { $link if* } " with no true quotation." }
 { $notes
 "The following two lines are equivalent:"
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if
-{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation "( ..a cond -- ..b )" } } { "false" { $quotation "( ..a default -- ..b )" } } }
+{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation ( ..a cond -- ..b ) } } { "false" { $quotation ( ..a default -- ..b ) } } }
 { $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack." }
 { $notes
 "The following two lines are equivalent:"
@@ -740,7 +740,7 @@ HELP: null
 } ;
 
 HELP: most
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( x y -- ? )" } } { "z" "either " { $snippet "x" } " or " { $snippet "y" } } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation ( x y -- ? ) } } { "z" "either " { $snippet "x" } " or " { $snippet "y" } } }
 { $description "If the quotation yields a true value when applied to " { $snippet "x" } " and " { $snippet "y" } ", outputs " { $snippet "x" } ", otherwise outputs " { $snippet "y" } "." } ;
 
 HELP: curry
@@ -770,7 +770,7 @@ HELP: 3curry
 { $notes "This operation is efficient and does not copy the quotation." } ;
 
 HELP: with
-{ $values { "param" object } { "obj" object } { "quot" { $quotation "( param elt -- ... )" } } { "curry" curry } }
+{ $values { "param" object } { "obj" object } { "quot" { $quotation ( param elt -- ... ) } } { "curry" curry } }
 { $description "Partial application on the left. The following two lines are equivalent:"
     { $code "swap [ swap A ] curry B" }
     { $code "[ A ] with B" }
@@ -835,15 +835,15 @@ HELP: 4dip
 } ;
 
 HELP: while
-{ $values { "pred" { $quotation "( ..a -- ..b ? )" } } { "body" { $quotation "( ..b -- ..a )" } } }
+{ $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "body" { $quotation ( ..b -- ..a ) } } }
 { $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link f } "." } ;
 
 HELP: until
-{ $values { "pred" { $quotation "( ..a -- ..b ? )" } } { "body" { $quotation "( ..b -- ..a )" } } }
+{ $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "body" { $quotation ( ..b -- ..a ) } } }
 { $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link t } "." } ;
 
 HELP: do
-{ $values { "pred" { $quotation "( ..a -- ..b ? )" } } { "body" { $quotation "( ..b -- ..a )" } } }
+{ $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "body" { $quotation ( ..b -- ..a ) } } }
 { $description "Executes one iteration of a " { $link while } " or " { $link until } " loop." } ;
 
 HELP: loop

@@ -12,19 +12,19 @@ $nl
 "A button can optionally display a message in the window's status bar whenever the mouse cursor hovers over the button. To enable this behavior, just set a string to the button's " { $snippet "tooltip" } " slot." } ;
 
 HELP: <button>
-{ $values { "label" gadget } { "quot" { $quotation "( button -- )" } } { "button" "a new " { $link button } } }
+{ $values { "label" gadget } { "quot" { $quotation ( button -- ) } } { "button" "a new " { $link button } } }
 { $description "Creates a new " { $link button } " which calls the quotation when clicked. The given gadget becomes the button's only child." } ;
 
 HELP: <roll-button>
-{ $values { "label" "a label specifier" } { "quot" { $quotation "( button -- )" } } { "button" button } }
+{ $values { "label" "a label specifier" } { "quot" { $quotation ( button -- ) } } { "button" button } }
 { $description "Creates a new " { $link button } " which is displayed with a solid border when it is under the mouse, informing the user that the gadget is clickable." } ;
 
 HELP: <border-button>
-{ $values { "label" "a label specifier" } { "quot" { $quotation "( button -- )" } } { "button" button } }
+{ $values { "label" "a label specifier" } { "quot" { $quotation ( button -- ) } } { "button" button } }
 { $description "Creates a new " { $link button } " with a border which is always visible. The button appearance changes in response to mouse gestures using a " { $link button-pen } "." } ;
 
 HELP: <repeat-button>
-{ $values { "label" object } { "quot" { $quotation "( button -- )" } } { "button" repeat-button } }
+{ $values { "label" object } { "quot" { $quotation ( button -- ) } } { "button" repeat-button } }
 { $description "Creates a new " { $link button } " derived from a " { $link <border-button> } " which calls the quotation every 100 milliseconds as long as the mouse button is held down." } ;
 
 HELP: button-pen

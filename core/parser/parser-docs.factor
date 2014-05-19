@@ -222,7 +222,7 @@ HELP: parse-lines
 { $errors "Throws a " { $link lexer-error } " if the input is malformed." } ;
 
 HELP: parse-literal
-{ $values { "accum" vector } { "end" word } { "quot" { $quotation "( seq -- obj )" } } }
+{ $values { "accum" vector } { "end" word } { "quot" { $quotation ( seq -- obj ) } } }
 { $description "Parses objects from parser input until " { $snippet "end" } ", applies the quotation to the resulting sequence, and adds the output value to the accumulator." }
 { $examples "This word is used to implement " { $link POSTPONE: [ } "." }
 $parsing-note ;

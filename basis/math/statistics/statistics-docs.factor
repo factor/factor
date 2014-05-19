@@ -94,7 +94,7 @@ HELP: histogram
 HELP: histogram-by
 { $values
     { "seq" sequence }
-    { "quot" { $quotation "( x -- bin )" } }
+    { "quot" { $quotation ( x -- bin ) } }
     { "hashtable" hashtable }
 }
 { $description "Returns a hashtable where the keys are the elements of the sequence binned by being passed through " { $snippet "quot" } ", and the values are the number of times members of each bin appeared in that sequence." }
@@ -134,7 +134,7 @@ HELP: sorted-histogram
 
 HELP: sequence>assoc
 { $values
-    { "seq" sequence } { "map-quot" $quotation } { "insert-quot" quotation } { "exemplar" "an exemplar assoc" }
+    { "seq" sequence } { "map-quot" quotation } { "insert-quot" quotation } { "exemplar" "an exemplar assoc" }
     { "assoc" assoc }
 }
 { $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created " { $snippet "assoc" } ". The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
@@ -248,7 +248,7 @@ HELP: rescale
 
 HELP: collect-by
 { $values
-    { "seq" sequence } { "quot" { $quotation "( ... obj -- ... key )" } }
+    { "seq" sequence } { "quot" { $quotation ( ... obj -- ... key ) } }
     { "hashtable" hashtable }
 }
 { $description "Applies a quotation to each element in the input sequence and returns a " { $snippet "hashtable" } " of like elements. The keys of this " { $snippet "hashtable" } " are the output of " { $snippet "quot" } " and the values at each key are the elements that transformed to that key." }
@@ -264,7 +264,7 @@ HELP: collect-by
 
 HELP: collect-index-by
 { $values
-    { "seq" sequence } { "quot" { $quotation "( ... obj -- ... key )" } }
+    { "seq" sequence } { "quot" { $quotation ( ... obj -- ... key ) } }
     { "hashtable" hashtable }
 }
 { $description "Applies a quotation to each element in the input sequence and returns a " { $snippet "hashtable" } " of like elements. The keys of this " { $snippet "hashtable" } " are the output of " { $snippet "quot" } " and the values at each key are the indices for the elements that transformed to that key." }

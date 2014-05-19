@@ -42,9 +42,9 @@ HELP: neighbours
 
 HELP: <astar>
 { $values
-  { "neighbours" { $quotation "( node -- seq )" } }
-  { "cost" { $quotation "( from to -- cost )" } }
-  { "heuristic" { $quotation "( pos target -- cost )" } }
+  { "neighbours" { $quotation ( node -- seq ) } }
+  { "cost" { $quotation ( from to -- cost ) } }
+  { "heuristic" { $quotation ( pos target -- cost ) } }
   { "astar" astar }
 }
 { $description "Build an astar object from the given quotations. The "
