@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators kernel lexer make
-math math.parser namespaces sequences splitting strings ;
+USING: accessors arrays assocs combinators kernel lexer
+math math.parser namespaces sbufs sequences splitting strings ;
 IN: strings.parser
 
 ERROR: bad-escape char ;
@@ -45,46 +45,51 @@ name>char-hook [
         [ drop unclip-slice escape swap ]
     } case ;
 
-: (unescape-string) ( str -- )
-    CHAR: \\ over index dup [
-        cut-slice [ % ] dip rest-slice
-        next-escape [ , ] dip
-        (unescape-string)
+<PRIVATE
+
+: (unescape-string) ( accum str i/f -- accum )
+    [
+        cut-slice [ over push-all ] dip
+        rest-slice next-escape [ over push ] dip
+        CHAR: \\ over index (unescape-string)
     ] [
-        drop %
-    ] if ;
+        over push-all
+    ] if* ; inline recursive
+
+PRIVATE>
 
 : unescape-string ( str -- str' )
-    [ (unescape-string) ] "" make ;
+    CHAR: \\ over index [
+        [ [ length <sbuf> ] keep ] dip (unescape-string)
+    ] when* "" like ;
 
-: (parse-string) ( str -- m )
-    dup [ "\"\\" member? ] find dup [
-        [ cut-slice [ % ] dip rest-slice ] dip
+<PRIVATE
+
+: (parse-string) ( accum str -- accum m )
+    dup [ "\"\\" member? ] find [
+        [ cut-slice [ over push-all ] dip rest-slice ] dip
         CHAR: " = [
             from>>
         ] [
-            next-escape [ , ] dip (parse-string)
+            next-escape [ over push ] dip (parse-string)
         ] if
     ] [
         "Unterminated string" throw
-    ] if ;
+    ] if* ; inline recursive
+
+PRIVATE>
 
 : parse-string ( -- str )
     lexer get [
-        [ swap tail-slice (parse-string) ] "" make swap
+        [ SBUF" " clone ] 2dip swap tail-slice
+        (parse-string) [ "" like ] dip
     ] change-lexer-column ;
 
 <PRIVATE
 
-: lexer-subseq ( i -- before )
-    [
-        [
-            lexer get
-            [ column>> ] [ line-text>> ] bi
-        ] dip swap subseq
-    ] [
-        lexer get column<<
-    ] bi ;
+: lexer-subseq ( i lexer -- before )
+    [ [ column>> ] [ line-text>> ] bi swapd subseq ]
+    [ column<< ] 2bi ;
 
 : rest-of-line ( lexer -- seq )
     [ line-text>> ] [ column>> ] bi tail-slice ;
@@ -104,74 +109,78 @@ ERROR: escaped-char-expected ;
         escaped-char-expected
     ] if ;
 
-: lexer-head? ( string -- ? )
-    [ lexer get rest-of-line ] dip head? ;
+: lexer-head? ( lexer string -- ? )
+    [ rest-of-line ] dip head? ;
 
-: advance-lexer ( n -- )
-    [ lexer get ] dip [ + ] curry change-column drop ; inline
+: advance-lexer ( lexer n -- )
+    [ + ] curry change-column drop ; inline
 
-: find-next-token ( ch -- i elt )
-    CHAR: \ 2array
-    [ lexer get [ column>> ] [ line-text>> ] bi ] dip
-    [ member? ] curry find-from ;
+: find-next-token ( lexer ch -- i elt )
+    [ [ column>> ] [ line-text>> ] bi ] dip
+    CHAR: \ 2array [ member? ] curry find-from ;
 
-: next-line% ( lexer -- )
-    [ rest-of-line % ]
-    [ next-line "\n" % ] bi ;
+: next-line% ( accum lexer -- )
+    [ rest-of-line swap push-all ]
+    [ next-line CHAR: \n swap push ] 2bi ; inline
 
-: take-double-quotes ( -- string )
-    lexer get dup current-char CHAR: " = [
-        [ ] [ column>> ] [ line-text>> ] tri
+: take-double-quotes ( lexer -- string )
+    dup current-char CHAR: " = [
+        dup [ column>> ] [ line-text>> ] bi
         [ CHAR: " = not ] find-from drop [
-            swap column>> - CHAR: " <repetition>
+            over column>> - CHAR: " <repetition>
         ] [
-            rest-of-line
+            dup rest-of-line
         ] if*
-    ] [
-        drop f
-    ] if dup length advance-lexer ;
+        [ length advance-lexer ] keep
+    ] [ drop f ] if ;
 
-: end-string-parse ( delimiter -- )
+: end-string-parse ( accum lexer delimiter -- )
     length 3 = [
-        take-double-quotes 3 tail %
+        take-double-quotes 3 tail-slice swap push-all
     ] [
-        lexer get advance-char
-    ] if ;
+        advance-char drop
+    ] if ; inline
 
 DEFER: (parse-multiline-string)
 
-: parse-found-token ( string i token -- )
-    [ lexer-subseq % ] dip
+: parse-found-token ( accum lexer string i token -- )
+    [ [ 2over ] dip swap lexer-subseq swap push-all ] dip
     CHAR: \ = [
-        lexer get [ next-char , ] [ next-char , ] bi (parse-multiline-string)
+        2over next-char swap push
+        2over next-char swap push
+        (parse-multiline-string)
     ] [
-        dup lexer-head? [
+        2dup lexer-head? [
             end-string-parse
         ] [
-            lexer get next-char , (parse-multiline-string)
+            2over next-char swap push
+            (parse-multiline-string)
         ] if
-    ] if ;
+    ] if ; inline recursive
 
 ERROR: trailing-characters string ;
 
-: (parse-multiline-string) ( string -- )
-    lexer get still-parsing? [
-        dup first find-next-token [
+: (parse-multiline-string) ( accum lexer string -- )
+    over still-parsing? [
+        2dup first find-next-token [
             parse-found-token
         ] [
-            drop lexer get next-line%
+            drop 2over next-line%
             (parse-multiline-string)
         ] if*
     ] [
         throw-unexpected-eof
-    ] if ;
+    ] if ; inline recursive
 
 PRIVATE>
 
 : parse-multiline-string ( -- string )
-    lexer get rest-of-line "\"\"" head? [
-        lexer get [ 2 + ] change-column drop
-        "\"\"\""
-    ] [
-        "\""
-    ] if [ (parse-multiline-string) ] "" make unescape-string ;
+    SBUF" " clone [
+        lexer get
+        dup rest-of-line "\"\"" head? [
+            [ 2 + ] change-column
+            "\"\"\""
+        ] [
+            "\""
+        ] if (parse-multiline-string)
+    ] keep unescape-string ;
