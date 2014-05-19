@@ -18,13 +18,13 @@ HELP: <mapped-file>
 { $errors "Throws an error if a memory mapping could not be established." } ;
 
 HELP: with-mapped-file
-{ $values { "path" "a pathname string" } { "quot" { $quotation "( mmap -- )" } } }
+{ $values { "path" "a pathname string" } { "quot" { $quotation ( mmap -- ) } } }
 { $contract "Opens a file for read/write access and maps its contents into memory, passing the " { $link mapped-file } " instance to the quotation. The mapped file is disposed of when the quotation returns, or if an error is thrown." }
 { $notes "This is a low-level word, because " { $link mapped-file } " objects simply expose their base address and length. Most applications should use " { $link "io.mmap.arrays" } " instead." }
 { $errors "Throws an error if a memory mapping could not be established." } ;
 
 HELP: with-mapped-file-reader
-{ $values { "path" "a pathname string" } { "quot" { $quotation "( mmap -- )" } } }
+{ $values { "path" "a pathname string" } { "quot" { $quotation ( mmap -- ) } } }
 { $contract "Opens a file for read-only access and maps its contents into memory, passing the " { $link mapped-file } " instance to the quotation. The mapped file is disposed of when the quotation returns, or if an error is thrown." }
 { $notes "This is a low-level word, because " { $link mapped-file } " objects simply expose their base address and length. See " { $link "io.mmap.arrays" } " for a discussion of how to access data in a mapped file." }
 { $errors "Throws an error if a memory mapping could not be established." } ;

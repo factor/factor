@@ -30,7 +30,7 @@ HELP: amb-execute
 
 HELP: if-amb
 { $values
-  { "true" { $quotation "( -- ? )" } }
+  { "true" { $quotation ( -- ? ) } }
   { "false" quotation }
   { "?" "a boolean" }
 }
@@ -38,7 +38,7 @@ HELP: if-amb
 
 HELP: amb-all
 { $values
-  { "quot" { $quotation "( -- )" } }
+  { "quot" { $quotation ( -- ) } }
 }
 { $description "Execute all the alternatives in the quotation by calling " { $link fail } " repeatedly at the end." }
 { $see-also bag-of fail }
@@ -46,7 +46,7 @@ HELP: amb-all
 
 HELP: bag-of
 { $values
-  { "quot" { $quotation "( -- result )" } }
+  { "quot" { $quotation ( -- result ) } }
   { "seq" sequence }
 }
 { $description "Execute all the alternatives in the quotation and collect the results." }

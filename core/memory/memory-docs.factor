@@ -3,7 +3,7 @@ quotations math ;
 IN: memory
 
 HELP: instances
-{ $values { "quot" { $quotation "( obj -- ? )" } } { "seq" "a fresh sequence" } }
+{ $values { "quot" { $quotation ( obj -- ? ) } } { "seq" "a fresh sequence" } }
 { $description "Outputs a sequence of all objects in the heap which satisfy the quotation." } ;
 
 HELP: gc
