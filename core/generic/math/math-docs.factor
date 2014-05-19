@@ -14,7 +14,7 @@ HELP: math-class-max
 } ;
 
 HELP: math-upgrade
-{ $values { "class1" class } { "class2" class } { "quot" { $quotation "( n n -- n n )" } } }
+{ $values { "class1" class } { "class2" class } { "quot" { $quotation ( n n -- n n ) } } }
 { $description "Outputs a quotation for upgrading numberical types. It takes two numbers on the stack, an instance of " { $snippet "class1" } ", and an instance of " { $snippet "class2" } ", and converts the one with the lower priority to the higher priority type." }
 { $examples { $example "USING: generic.math math kernel prettyprint ;" "fixnum bignum math-upgrade ." "[ [ >bignum ] dip ]" } } ;
 

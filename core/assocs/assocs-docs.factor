@@ -209,7 +209,7 @@ HELP: new-assoc
 { $contract "Creates a new assoc from an " { $snippet "exemplar" } " which can hold " { $snippet "capacity" } " entries before growing." } ;
 
 HELP: assoc-find
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "key" "the successful key, or f" } { "value" "the successful value, or f" } { "?" boolean } }
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "key" "the successful key, or f" } { "value" "the successful value, or f" } { "?" boolean } }
 { $description "Applies a predicate quotation to each entry in the assoc. Returns the key and value that the quotation succeeds on, or " { $link f } " for both if the quotation fails. It also returns a boolean describing whether there was anything found; this can be used to distinguish between a key and a value equal to " { $link f } ", or nothing being found." } ;
 
 HELP: clear-assoc
@@ -257,7 +257,7 @@ HELP: ?of
 { $description "Looks up the value associated with a key. If the key was not present, an error can be thrown without extra stack shuffling. This word handles assocs that store " { $link f } "." } ;
 
 HELP: assoc-each
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... )" } } }
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ) } } }
 { $description "Applies a quotation to each entry in the assoc." }
 { $examples
     { $example
@@ -269,7 +269,7 @@ HELP: assoc-each
 } ;
 
 HELP: assoc-map
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... newkey newvalue )" } } { "newassoc" "a new assoc" } }
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... newkey newvalue ) } } { "newassoc" "a new assoc" } }
 { $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the same type as the input." }
 { $examples
     { $unchecked-example
@@ -284,15 +284,15 @@ HELP: assoc-map
 { assoc-map assoc-map-as } related-words
 
 HELP: assoc-filter
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "subassoc" "a new assoc" } }
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "subassoc" "a new assoc" } }
 { $description "Outputs an assoc of the same type as " { $snippet "assoc" } " consisting of all entries for which the predicate quotation yields true." } ;
 
 HELP: assoc-filter-as
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "exemplar" assoc } { "subassoc" "a new assoc" } }
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "exemplar" assoc } { "subassoc" "a new assoc" } }
 { $description "Outputs an assoc of the same type as " { $snippet "exemplar" } " consisting of all entries for which the predicate quotation yields true." } ;
 
 HELP: assoc-filter!
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } }
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } }
 { $description "Removes all entries for which the predicate quotation yields true." }
 { $side-effects "assoc" } ;
 
@@ -306,11 +306,11 @@ HELP: assoc-partition
 { $description "Calls a predicate quotation on each key of the input assoc. If the test yields true, the key/value pair is added to " { $snippet "true-assoc" } "; if false, it's added to " { $snippet "false-assoc" } "." } ;
 
 HELP: assoc-any?
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "?" boolean } }
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "?" boolean } }
 { $description "Tests if the assoc contains an entry satisfying a predicate by applying the quotation to each entry in turn. Iteration stops if an entry is found for which the quotation outputs a true value." } ;
 
 HELP: assoc-all?
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "?" boolean } }
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "?" boolean } }
 { $description "Tests if all entries in the assoc satisfy a predicate by applying the quotation to each entry in turn. a predicate quotation to entry in the assoc. Iteration stops if an entry is found for which the quotation outputs " { $link f } ". If the assoc is empty, always outputs " { $link t } "." } ;
 
 HELP: assoc-refine
@@ -405,25 +405,25 @@ HELP: substitute
 { $description "Creates a new sequence where elements of " { $snippet "seq" } " which appear as keys in " { $snippet "assoc" } " are replaced by the corresponding values, and all other elements are unchanged." } ;
 
 HELP: cache
-{ $values { "key" "a key" } { "assoc" assoc } { "quot" { $quotation "( ... key -- ... value )" } } { "value" "a previously-retained or freshly-computed value" } }
+{ $values { "key" "a key" } { "assoc" assoc } { "quot" { $quotation ( ... key -- ... value ) } } { "value" "a previously-retained or freshly-computed value" } }
 { $description "If the key is present in the assoc, outputs the associated value, otherwise calls the quotation to produce a value and stores the key/value pair into the assoc. Returns a value either looked up or newly stored in the assoc." }
 { $side-effects "assoc" } ;
 
 HELP: 2cache
-{ $values { "key1" "a key" } { "key2" "a key" } { "assoc" assoc } { "quot" { $quotation "( ... key1 key2 -- ... value )" } } { "value" "a previously-retained or freshly-computed value" } }
+{ $values { "key1" "a key" } { "key2" "a key" } { "assoc" assoc } { "quot" { $quotation ( ... key1 key2 -- ... value ) } } { "value" "a previously-retained or freshly-computed value" } }
 { $description "If a single key composed of the input keys is present in the assoc, outputs the associated value, otherwise calls the quotation to produce a value and stores the keys/value pair into the assoc. Returns the value stored in the assoc. Returns a value either looked up or newly stored in the assoc." }
 { $side-effects "assoc" } ;
 
 HELP: map>assoc
-{ $values { "seq" sequence } { "quot" { $quotation "( ... elt -- ... key value )" } } { "exemplar" assoc } { "assoc" "a new assoc" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key value ) } } { "exemplar" assoc } { "assoc" "a new assoc" } }
 { $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new assoc having the same type as " { $snippet "exemplar" } "." } ;
 
 HELP: assoc>map
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... elt )" } } { "exemplar" sequence } { "seq" "a new sequence" } }
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... elt ) } } { "exemplar" sequence } { "seq" "a new sequence" } }
 { $description "Applies the quotation to each entry of the assoc and collects the results into a new sequence of the same type as the exemplar." } ;
 
 HELP: change-at
-{ $values { "key" object } { "assoc" assoc } { "quot" { $quotation "( ..a value -- ..b newvalue )" } } }
+{ $values { "key" object } { "assoc" assoc } { "quot" { $quotation ( ..a value -- ..b newvalue ) } } }
 { $description "Applies the quotation to the value associated with " { $snippet "key" } ", storing the new value back in the assoc." }
 { $side-effects "assoc" } ;
 
@@ -459,7 +459,7 @@ HELP: assoc-combine
 
 HELP: assoc-map-as
 { $values
-     { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... newkey newvalue )" } } { "exemplar" assoc }
+     { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... newkey newvalue ) } } { "exemplar" assoc }
      { "newassoc" assoc } }
 { $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the same type as the exemplar." }
 { $examples { $example "USING: prettyprint assocs hashtables math ;" " H{ { 1 2 } { 3 4 } } [ sq ] { } assoc-map-as ." "{ { 1 4 } { 3 16 } }" } } ;

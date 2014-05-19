@@ -42,7 +42,7 @@ HELP: doc-lines
 { $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." } ;
 
 HELP: each-line
-{ $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "quot" { $quotation "( ... line -- ... )" } } }
+{ $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "quot" { $quotation ( ... line -- ... ) } } }
 { $description "Applies the quotation to each line in the range." }
 { $notes "The range is created by calling " { $link <slice> } "." }
 { $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." } ;

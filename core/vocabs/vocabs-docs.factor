@@ -80,7 +80,7 @@ HELP: forget-vocab
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: require-hook
-{ $var-description { $quotation "( name -- )" } " which loads a vocabulary. This quotation is called by " { $link require } ". The default value should not need to be changed; this functionality is implemented via a hook stored in a variable to break a circular dependency which would otherwise exist from " { $vocab-link "vocabs" } " to " { $vocab-link "vocabs.loader" } " to " { $vocab-link "parser" } " back to " { $vocab-link "vocabs" } "." } ;
+{ $var-description { $quotation ( name -- ) } " which loads a vocabulary. This quotation is called by " { $link require } ". The default value should not need to be changed; this functionality is implemented via a hook stored in a variable to break a circular dependency which would otherwise exist from " { $vocab-link "vocabs" } " to " { $vocab-link "vocabs.loader" } " to " { $vocab-link "parser" } " back to " { $vocab-link "vocabs" } "." } ;
 
 HELP: require
 { $values { "object" "a vocabulary specifier" } }

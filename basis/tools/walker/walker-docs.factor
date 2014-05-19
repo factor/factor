@@ -11,7 +11,7 @@ HELP: breakpoint
 } ;
 
 HELP: breakpoint-if
-{ $values { "word" word } { "quot" { $quotation "( -- ? )" } } }
+{ $values { "word" word } { "quot" { $quotation ( -- ? ) } } }
 { $description "Annotates a word definition to enter the single stepper if the quotation yields true. The quotation has access to the datastack as it exists just before " { $snippet "word" } " is called." }
 { $examples
     "Break if the input to sq is 3:"

@@ -24,7 +24,7 @@ ERROR: no-such-word name vocab ;
 : nested-responders ( -- seq )
     responder-nesting get values ;
 
-: each-responder ( quot -- )
+: each-responder ( quot: ( ... responder -- ... ) -- )
    nested-responders swap each ; inline
 
 ERROR: no-such-responder responder ;

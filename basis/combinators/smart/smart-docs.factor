@@ -228,7 +228,7 @@ HELP: smart-when*
 
 HELP: smart-with
 { $values
-    { "param" object } { "obj" object } { "quot" { $quotation "( param ..a -- ..b" } } { "curry" curry } }
+    { "param" object } { "obj" object } { "quot" { $quotation "( param ..a -- ..b )" } } { "curry" curry } }
 { $description "A version of " { $link with } " that puts the parameter before any inputs the quotation uses." } ;
 
 HELP: smart-reduce

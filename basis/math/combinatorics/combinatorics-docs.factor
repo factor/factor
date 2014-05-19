@@ -53,7 +53,7 @@ HELP: all-permutations
 } ;
 
 HELP: each-permutation
-{ $values { "seq" sequence } { "quot" { $quotation "( ... elt -- ... )" } } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ) } } }
 { $description "Applies the quotation to each permutation of " { $snippet "seq" } " in order." } ;
 
 HELP: inverse-permutation
@@ -98,7 +98,7 @@ HELP: all-combinations
 }""" } } ;
 
 HELP: each-combination
-{ $values { "seq" sequence } { "k" "a non-negative integer" } { "quot" { $quotation "( ... elt -- ... )" } } }
+{ $values { "seq" sequence } { "k" "a non-negative integer" } { "quot" { $quotation ( ... elt -- ... ) } } }
 { $description "Applies the quotation to each combination of " { $snippet "seq" } " choosing " { $snippet "k" } " elements, in order." } ;
 
 

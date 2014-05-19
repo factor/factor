@@ -307,11 +307,11 @@ HELP: lines
 { $description "Reads lines of text until from the " { $link input-stream } " until it is exhausted, collecting them in a sequence of strings." } ;
 
 HELP: each-line
-{ $values { "quot" { $quotation "( ... line -- ... )" } } }
+{ $values { "quot" { $quotation ( ... line -- ... ) } } }
 { $description "Calls the quotation with successive lines of text, until the current " { $link input-stream } " is exhausted." } ;
 
 HELP: each-block
-{ $values { "quot" { $quotation "( ... block -- ... )" } } }
+{ $values { "quot" { $quotation ( ... block -- ... ) } } }
 { $description "Calls the quotation with successive blocks of data, until the current " { $link input-stream } " is exhausted." } ;
 
 HELP: stream-contents

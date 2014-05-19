@@ -35,7 +35,7 @@ HELP: make-pane
 { $description "Calls the quotation in a new scope where " { $link output-stream } " is rebound to a " { $link pane-stream } " writing to a new pane. The output area of the new pane is output on the stack after the quotation returns. The pane itself is not output." } ;
 
 HELP: <pane-control>
-{ $values { "model" model } { "quot" { $quotation "( value -- )" } } { "pane" "a new " { $link pane } } }
+{ $values { "model" model } { "quot" { $quotation ( value -- ) } } { "pane" "a new " { $link pane } } }
 { $description "Creates a new control delegating to a " { $link pane } ". When the value of the model changes, the value is pushed on the stack and the quotation is called using " { $link with-pane } "." } ;
 
 HELP: pane-stream

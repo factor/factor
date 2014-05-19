@@ -16,7 +16,7 @@ HELP: client-state
 { $notes "This word is used by session management, conversation scope and asides." } ;
 
 HELP: each-responder
-{ $values { "quot" { $quotation "( responder -- )" } } }
+{ $values { "quot" { $quotation ( ... responder -- ... ) } } }
 { $description "Applies the quotation to each responder involved in processing the current request." } ;
 
 HELP: hidden-form-field
@@ -88,7 +88,7 @@ HELP: exit-with
 { $description "Exits from an outer " { $link with-exit-continuation } "." } ;
 
 HELP: with-exit-continuation
-{ $values { "quot" { $quotation { "( -- value )" } } } { "value" "a value returned by the quotation or an " { $link exit-with } " invocation" } }
+{ $values { "quot" { $quotation ( -- value ) } } { "value" "a value returned by the quotation or an " { $link exit-with } " invocation" } }
 { $description "Runs a quotation with the " { $link exit-continuation } " variable bound. Calling " { $link exit-with } " in the quotation will immediately return." }
 { $notes "Furnace actions and authentication realms wrap their execution in this combinator, allowing form validation failures and login requests, respectively, to immediately return an HTTP response to the client without running any more responder code." } ;
 

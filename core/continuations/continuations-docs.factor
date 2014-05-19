@@ -130,17 +130,17 @@ HELP: >continuation<
 { $description "Takes a continuation apart into its constituents." } ;
 
 HELP: ifcc
-{ $values { "capture" { $quotation "( continuation -- )" } } { "restore" quotation } }
+{ $values { "capture" { $quotation ( continuation -- ) } } { "restore" quotation } }
 { $description "Reifies a continuation from the point immediately after which this word returns, and passes it to " { $snippet "capture" } ". When the continuation is restored, execution resumes and " { $snippet "restore" } " is called." } ;
 
 { callcc0 continue callcc1 continue-with ifcc } related-words
 
 HELP: callcc0
-{ $values { "quot" { $quotation "( continuation -- )" } } }
+{ $values { "quot" { $quotation ( continuation -- ) } } }
 { $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue } " word resumes the continuation." } ;
 
 HELP: callcc1
-{ $values { "quot" { $quotation "( continuation -- )" } } { "obj" "an object provided when resuming the continuation" } }
+{ $values { "quot" { $quotation ( continuation -- ) } } { "obj" "an object provided when resuming the continuation" } }
 { $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue-with } " word resumes the continuation, passing a value back to the original execution context." } ;
 
 HELP: continue
@@ -170,11 +170,11 @@ HELP: throw
 { cleanup recover } related-words
 
 HELP: cleanup
-{ $values { "try" { $quotation "( ..a -- ..a )" } } { "cleanup-always" { $quotation "( ..a -- ..b )" } } { "cleanup-error" { $quotation "( ..b -- ..b )" } } }
+{ $values { "try" { $quotation ( ..a -- ..a ) } } { "cleanup-always" { $quotation ( ..a -- ..b ) } } { "cleanup-error" { $quotation ( ..b -- ..b ) } } }
 { $description "Calls the " { $snippet "try" } " quotation. If no error is thrown, calls " { $snippet "cleanup-always" } " without restoring the data stack. If an error is thrown, restores the data stack, calls " { $snippet "cleanup-always" } " followed by " { $snippet "cleanup-error" } ", and rethrows the error." } ;
 
 HELP: recover
-{ $values { "try" { $quotation "( ..a -- ..b )" } } { "recovery" { $quotation "( ..a error -- ..b )" } } }
+{ $values { "try" { $quotation ( ..a -- ..b ) } } { "recovery" { $quotation ( ..a error -- ..b ) } } }
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
 
 HELP: ignore-errors

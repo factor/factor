@@ -2,7 +2,7 @@ IN: models.arrow.smart
 USING: help.syntax help.markup models.product ;
 
 HELP: <smart-arrow>
-{ $values { "quot" { $quotation "( ... -- output )" } } }
+{ $values { "quot" { $quotation ( ... -- output ) } } }
 { $description "A macro that expands into a form with the stack effect of the quotation. The form constructs a model which applies the quotation to values from an underlying " { $link product } " model having as many components as the quotation has inputs." }
 { $examples
   "A model which adds the values of two existing models:"

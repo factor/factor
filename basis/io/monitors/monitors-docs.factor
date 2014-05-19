@@ -26,7 +26,7 @@ HELP: next-change
 { $errors "Throws an error if the monitor is closed from another thread." } ;
 
 HELP: with-monitor
-{ $values { "path" "a pathname string" } { "recursive?" "a boolean" } { "quot" { $quotation "( monitor -- )" } } }
+{ $values { "path" "a pathname string" } { "recursive?" "a boolean" } { "quot" { $quotation ( monitor -- ) } } }
 { $description "Opens a file system change monitor and passes it to the quotation. Closes the monitor after the quotation returns or throws an error." }
 { $errors "Throws an error if the pathname does not exist, if a monitor could not be created or if the platform does not support monitors." } ;
 

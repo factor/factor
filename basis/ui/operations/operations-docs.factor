@@ -22,10 +22,10 @@ HELP: operation
 $nl
 "Operations have the following slots:"
 { $list
-    { { $snippet "predicate" } " - " { $quotation "( obj -- ? )" } }
+    { { $snippet "predicate" } " - " { $quotation ( obj -- ? ) } }
     { { $snippet "command" } " - a " { $link word } }
-    { { $snippet "translator" } " - " { $quotation "( obj -- newobj )" } ", or " { $link f } }
-    { { $snippet "hook" } " - " { $quotation "( obj -- newobj )" } ", or " { $link f } }
+    { { $snippet "translator" } " - " { $quotation ( obj -- newobj ) } ", or " { $link f } }
+    { { $snippet "hook" } " - " { $quotation ( obj -- newobj ) } ", or " { $link f } }
     { { $snippet "listener?" } " - a boolean" }
 } } ;
 
@@ -49,7 +49,7 @@ HELP: secondary-operation
 { $description "Outputs the operation which should be invoked when a " { $snippet "RET" } " is pressed while a presentation of " { $snippet "obj" } " is selected in a list." } ;
 
 HELP: define-operation
-{ $values { "pred" { $quotation "( obj -- ? )" } } { "command" word } { "flags" hashtable } }
+{ $values { "pred" { $quotation ( obj -- ? ) } } { "command" word } { "flags" hashtable } }
 { $description "Defines an operation on objects matching the predicate. The hashtable can contain the following keys:"
     { $list
         { { $link +listener+ } " - if set to a true value, the operation will run in the listener" }
@@ -61,7 +61,7 @@ HELP: define-operation
 } ;
 
 HELP: define-operation-map
-{ $values { "class" "a class word" } { "group" string } { "blurb" { $maybe string } } { "object" object } { "translator" { $quotation "( obj -- newobj )" } ", or " { $link f } } }
+{ $values { "class" "a class word" } { "group" string } { "blurb" { $maybe string } } { "object" object } { "translator" { $quotation ( obj -- newobj ) } ", or " { $link f } } }
 { $description "Defines a command map named " { $snippet "group" } " on " { $snippet "class" } " consisting of operations applicable to " { $snippet "object" } ". The translator quotation is applied to the target gadget, and the result of the translator is passed to the operation." } ;
 
 HELP: $operations

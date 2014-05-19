@@ -37,7 +37,7 @@ HELP: dispose*
 } ;
 
 HELP: with-disposal
-{ $values { "object" "a disposable object" } { "quot" { $quotation "( object -- )" } } }
+{ $values { "object" "a disposable object" } { "quot" { $quotation ( object -- ) } } }
 { $description "Calls the quotation, disposing the object with " { $link dispose } " after the quotation returns or if it throws an error." } ;
 
 HELP: with-destructors

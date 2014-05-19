@@ -144,7 +144,7 @@ HELP: save-end-position
 { $description "Save the current position as the end position of the block." } ;
 
 HELP: pprint-sections
-{ $values { "block" block } { "advancer" { $quotation "( block -- )" } } }
+{ $values { "block" block } { "advancer" { $quotation ( block -- ) } } }
 { $description "Prints child sections of a block, ignoring any " { $link line-break } " sections. The " { $snippet "advancer" } " quotation is called between every pair of sections." } ;
 
 HELP: do-break
@@ -156,7 +156,7 @@ HELP: empty-block?
 { $description "Tests if the block has no child sections." } ;
 
 HELP: if-nonempty
-{ $values { "block" block } { "quot" { $quotation "( block -- )" } } }
+{ $values { "block" block } { "quot" { $quotation ( block -- ) } } }
 { $description "If the block has child sections, calls the quotation, otherwise does nothing." } ;
 
 HELP: (<block)

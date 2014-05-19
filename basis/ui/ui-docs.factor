@@ -42,7 +42,7 @@ HELP: fullscreen?
 { fullscreen? set-fullscreen } related-words
 
 HELP: find-window
-{ $values { "quot" { $quotation "( world -- ? )" } } { "world" { $maybe world } } }
+{ $values { "quot" { $quotation ( world -- ? ) } } { "world" { $maybe world } } }
 { $description "Finds a native window such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting " { $link f } " if no such gadget could be found. The front-most native window is checked first." } ;
 
 HELP: register-window
@@ -74,7 +74,7 @@ HELP: raise-window
 { $description "Makes the native window containing the given gadget the front-most window." } ;
 
 HELP: with-ui
-{ $values { "quot" { $quotation "( -- )" } } }
+{ $values { "quot" { $quotation ( -- ) } } }
 { $description "Calls the quotation, starting the UI if necessary. If starting the UI is necessary, this word does not return and the UI will start after the quotation returns." }
 { $notes "This word should be used in the " { $link POSTPONE: MAIN: } " word of an application that uses the UI in order for the vocabulary to work when run from either the UI listener (" { $snippet "\"my-app\" run" } ") and the command line (" { $snippet "./factor -run=my-app" } ")." }
 { $examples "The " { $vocab-link "hello-ui" } " vocabulary implements a simple UI application which uses this word." } ;

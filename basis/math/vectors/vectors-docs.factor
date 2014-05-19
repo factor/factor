@@ -550,7 +550,7 @@ HELP: v?
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: vif
-{ $values { "mask" "a sequence of booleans" } { "true-quot" { $quotation "( -- vector )" } } { "false-quot" { $quotation "( -- vector )" } } { "result" "a sequence" } }
+{ $values { "mask" "a sequence of booleans" } { "true-quot" { $quotation ( -- vector ) } } { "false-quot" { $quotation ( -- vector ) } } { "result" "a sequence" } }
 { $description "If all of the elements of " { $snippet "mask" } " are true, " { $snippet "true-quot" } " is called and its output value returned. If all of the elements of " { $snippet "mask" } " are false, " { $snippet "false-quot" } " is called and its output value returned. Otherwise, both quotations are called and " { $snippet "mask" } " is used to select elements from each output as with " { $link v? } "." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types."
 $nl

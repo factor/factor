@@ -5,70 +5,70 @@ IN: sequences.unrolled
 
 HELP: unrolled-collect
 { $values
-    { "n" integer } { "quot" { $quotation "( n -- value )" } } { "into" sequence }
+    { "n" integer } { "quot" { $quotation ( n -- value ) } } { "into" sequence }
 }
 { $description "Unrolled version of " { $link collect } ". " { $snippet "n" } " must be a compile-time constant." } ;
 
 HELP: unrolled-each
 { $values
-    { "seq" sequence } { "len" integer } { "quot" { $quotation "( x -- )" } }
+    { "seq" sequence } { "len" integer } { "quot" { $quotation ( x -- ) } }
 }
 { $description "Unrolled version of " { $link each } " that iterates over the first " { $snippet "len" } " elements of " { $snippet "seq" } ". " { $snippet "len" } " must be a compile-time constant. If " { $snippet "seq" } " has fewer than " { $snippet "len" } " elements, raises an " { $link unrolled-bounds-error } "." } ;
 
 HELP: unrolled-2each
 { $values
-    { "xseq" sequence } { "yseq" sequence } { "len" integer } { "quot" { $quotation "( x y -- )" } }
+    { "xseq" sequence } { "yseq" sequence } { "len" integer } { "quot" { $quotation ( x y -- ) } }
 }
 { $description "Unrolled version of " { $link 2each } " that iterates over the first " { $snippet "len" } " elements of " { $snippet "xseq" } " and " { $snippet "yseq" } ". " { $snippet "len" } " must be a compile-time constant. If " { $snippet "seq" } " has fewer than " { $snippet "len" } " elements, raises an " { $link unrolled-bounds-error } "." } ;
 
 HELP: unrolled-each-index
 { $values
-    { "seq" sequence } { "len" integer } { "quot" { $quotation "( x i -- )" } }
+    { "seq" sequence } { "len" integer } { "quot" { $quotation ( x i -- ) } }
 }
 { $description "Unrolled version of " { $link each-index } " that iterates over the first " { $snippet "len" } " elements of " { $snippet "seq" } ". " { $snippet "len" } " must be a compile-time constant. If " { $snippet "seq" } " has fewer than " { $snippet "len" } " elements, raises an " { $link unrolled-bounds-error } "." } ;
 
 HELP: unrolled-each-integer
 { $values
-    { "n" integer } { "quot" { $quotation "( i -- )" } }
+    { "n" integer } { "quot" { $quotation ( i -- ) } }
 }
 { $description "Unrolled version of " { $link each-integer } ". " { $snippet "n" } " must be a compile-time constant." } ;
 
 HELP: unrolled-map
 { $values
-    { "seq" sequence } { "len" integer } { "quot" { $quotation "( x -- newx )" } }
+    { "seq" sequence } { "len" integer } { "quot" { $quotation ( x -- newx ) } }
     { "newseq" sequence }
 }
 { $description "Unrolled version of " { $link map } " that maps over the first " { $snippet "len" } " elements of " { $snippet "seq" } ". " { $snippet "len" } " must be a compile-time constant. If " { $snippet "seq" } " has fewer than " { $snippet "len" } " elements, raises an " { $link unrolled-bounds-error } "." } ;
 
 HELP: unrolled-map-as
 { $values
-    { "seq" sequence } { "len" integer } { "quot" { $quotation "( x -- newx )" } } { "exemplar" sequence }
+    { "seq" sequence } { "len" integer } { "quot" { $quotation ( x -- newx ) } } { "exemplar" sequence }
     { "newseq" sequence }
 }
 { $description "Unrolled version of " { $link map-as } " that maps over the first " { $snippet "len" } " elements of " { $snippet "seq" } ". " { $snippet "len" } " must be a compile-time constant. If " { $snippet "seq" } " has fewer than " { $snippet "len" } " elements, raises an " { $link unrolled-bounds-error } "." } ;
 
 HELP: unrolled-2map
 { $values
-    { "xseq" sequence } { "yseq" sequence } { "len" integer } { "quot" { $quotation "( x y -- newx )" } } { "newseq" sequence }
+    { "xseq" sequence } { "yseq" sequence } { "len" integer } { "quot" { $quotation ( x y -- newx ) } } { "newseq" sequence }
 }
 { $description "Unrolled version of " { $link 2map } " that iterates over the first " { $snippet "len" } " elements of " { $snippet "xseq" } " and " { $snippet "yseq" } ". " { $snippet "len" } " must be a compile-time constant. If " { $snippet "seq" } " has fewer than " { $snippet "len" } " elements, raises an " { $link unrolled-bounds-error } "." } ;
 
 HELP: unrolled-2map-as
 { $values
-    { "xseq" sequence } { "yseq" sequence } { "len" integer } { "quot" { $quotation "( x y -- newx )" } } { "exemplar" sequence } { "newseq" sequence }
+    { "xseq" sequence } { "yseq" sequence } { "len" integer } { "quot" { $quotation ( x y -- newx ) } } { "exemplar" sequence } { "newseq" sequence }
 }
 { $description "Unrolled version of " { $link 2map-as } " that iterates over the first " { $snippet "len" } " elements of " { $snippet "xseq" } " and " { $snippet "yseq" } ". " { $snippet "len" } " must be a compile-time constant. If " { $snippet "seq" } " has fewer than " { $snippet "len" } " elements, raises an " { $link unrolled-bounds-error } "." } ;
 
 HELP: unrolled-map-index
 { $values
-    { "seq" sequence } { "len" integer } { "quot" { $quotation "( x i -- newx )" } }
+    { "seq" sequence } { "len" integer } { "quot" { $quotation ( x i -- newx ) } }
     { "newseq" sequence }
 }
 { $description "Unrolled version of " { $link map-index } " that maps over the first " { $snippet "len" } " elements of " { $snippet "seq" } ". " { $snippet "len" } " must be a compile-time constant. If " { $snippet "seq" } " has fewer than " { $snippet "len" } " elements, raises an " { $link unrolled-bounds-error } "." } ;
 
 HELP: unrolled-map-integers
 { $values
-    { "n" integer } { "quot" { $quotation "( n -- value )" } } { "exemplar" sequence } { "newseq" sequence }
+    { "n" integer } { "quot" { $quotation ( n -- value ) } } { "exemplar" sequence } { "newseq" sequence }
 }
 { $description "Unrolled version of " { $link map-integers } ". " { $snippet "n" } " must be a compile-time constant." } ;
 

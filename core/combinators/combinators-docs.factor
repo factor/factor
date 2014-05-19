@@ -296,7 +296,7 @@ HELP: spread
 { bi* tri* spread } related-words
 
 HELP: to-fixed-point
-{ $values { "object" object } { "quot" { $quotation "( ... object(n) -- ... object(n+1) )" } } { "object(n)" object } }
+{ $values { "object" object } { "quot" { $quotation ( ... object(n) -- ... object(n+1) ) } } { "object(n)" object } }
 { $description "Applies the quotation repeatedly with " { $snippet "object" } " as the initial input until the output of the quotation equals the input." }
 { $examples
     { $example
@@ -373,7 +373,7 @@ HELP: no-case
 { $error-description "Thrown by " { $link case } " if the object at the top of the stack does not match any case, and no default case is given." } ;
 
 HELP: recursive-hashcode
-{ $values { "n" integer } { "obj" object } { "quot" { $quotation "( n obj -- code )" } } { "code" integer } }
+{ $values { "n" integer } { "obj" object } { "quot" { $quotation ( n obj -- code ) } } { "code" integer } }
 { $description "A combinator used to implement methods for the " { $link hashcode* } " generic word. If " { $snippet "n" } " is less than or equal to zero, outputs 0, otherwise calls the quotation." } ;
 
 HELP: cond>quot
@@ -395,7 +395,7 @@ $nl
 } } ;
 
 HELP: distribute-buckets
-{ $values { "alist" "an alist" } { "initial" object } { "quot" { $quotation "( obj -- assoc )" } } { "buckets" "a new array" } }
+{ $values { "alist" "an alist" } { "initial" object } { "quot" { $quotation ( obj -- assoc ) } } { "buckets" "a new array" } }
 { $description "Sorts the entries of " { $snippet "assoc" } " into buckets, using the quotation to yield a set of keys for each entry. The hashcode of each key is computed, and the entry is placed in all corresponding buckets. Each bucket is initially cloned from " { $snippet "initial" } "; this should either be an empty vector or a one-element vector containing a pair." }
 { $notes "This word is used in the implementation of " { $link hash-case-quot } " and " { $link standard-combination } "." } ;
 

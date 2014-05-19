@@ -31,7 +31,7 @@ HELP: alien>objc-types
 { objc>alien-types alien>objc-types } related-words
 
 HELP: import-objc-class
-{ $values { "name" string } { "quot" { $quotation "( -- )" } } }
+{ $values { "name" string } { "quot" { $quotation ( -- ) } } }
 { $description "If a class named " { $snippet "name" } " is already known to the Objective C interface, does nothing. Otherwise, first calls the quotation. The quotation should make the class available to the Objective C runtime if necessary, either by loading a framework or defining it directly. After the quotation returns, this word makes the class available to Factor programs by importing methods and creating a class word the class object in the " { $vocab-link "cocoa.classes" } " vocabulary." } ;
 
 HELP: root-class

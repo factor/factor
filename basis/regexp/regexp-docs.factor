@@ -236,7 +236,7 @@ HELP: re-replace
 } ;
 
 HELP: re-replace-with
-{ $values { "string" string } { "regexp" regexp } { "quot" { $quotation "( slice -- replacement )" } } { "result" string } }
+{ $values { "string" string } { "regexp" regexp } { "quot" { $quotation ( slice -- replacement ) } } { "result" string } }
 { $description "Replaces substrings which match the input regexp with the result of calling " { $snippet "quot" } " on each matching slice. The boundaries of the substring are chosen by the strategy used by " { $link all-matching-slices } "." }
 { $examples
     { $example

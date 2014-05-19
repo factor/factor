@@ -2,31 +2,31 @@ USING: help.syntax help.markup kernel sequences ;
 IN: sequences.deep
 
 HELP: deep-each
-{ $values { "obj" object } { "quot" { $quotation "( ... elt -- ... )" } } }
+{ $values { "obj" object } { "quot" { $quotation ( ... elt -- ... ) } } }
 { $description "Execute a quotation on each nested element of an object and its children, in preorder." }
 { $see-also each } ;
 
 HELP: deep-map
-{ $values { "obj" object } { "quot" { $quotation "( ... elt -- ... elt' )" } } { "newobj" "the mapped object" } }
+{ $values { "obj" object } { "quot" { $quotation ( ... elt -- ... elt' ) } } { "newobj" "the mapped object" } }
 { $description "Execute a quotation on each nested element of an object and its children, in preorder. That is, the result of the execution of the quotation on the outer is used to map the inner elements." }
 { $see-also map } ;
 
 HELP: deep-filter-as
-{ $values { "obj" object } { "quot" { $quotation "( ... elt -- ... ? )" } } { "exemplar" sequence } { "seq" sequence } }
+{ $values { "obj" object } { "quot" { $quotation ( ... elt -- ... ? ) } } { "exemplar" sequence } { "seq" sequence } }
 { $description "Creates a sequence (of the same type as " { $snippet "exemplar" } ") of sub-nodes in the object which satisfy the given quotation, in preorder. This includes the object itself, if it passes the quotation." } ;
 
 HELP: deep-filter
-{ $values { "obj" object } { "quot" { $quotation "( ... elt -- ... ? )" } } { "seq" sequence } }
+{ $values { "obj" object } { "quot" { $quotation ( ... elt -- ... ? ) } } { "seq" sequence } }
 { $description "Creates a sequence of sub-nodes in the object which satisfy the given quotation, in preorder. This includes the object itself, if it passes the quotation." }
 { $see-also filter } ;
 
 HELP: deep-find
-{ $values { "obj" object } { "quot" { $quotation "( ... elt -- ... ? )" } } { "elt" "an element" } }
+{ $values { "obj" object } { "quot" { $quotation ( ... elt -- ... ? ) } } { "elt" "an element" } }
 { $description "Gets the first sub-node of the object, in preorder, which satisfies the quotation. If nothing satisfies it, it returns " { $link f } "." }
 { $see-also find } ;
 
 HELP: deep-any?
-{ $values { "obj" object } { "quot" { $quotation "( ... elt -- ... ? )" } } { "?" "a boolean" } }
+{ $values { "obj" object } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" "a boolean" } }
 { $description "Tests whether the given object or any subnode satisfies the given quotation." }
 { $see-also any? } ;
 
@@ -39,7 +39,7 @@ HELP: flatten
 { $description "Creates a sequence of all of the leaf nodes (non-sequence nodes, but including strings and numbers) in the object." } ;
 
 HELP: deep-map!
-{ $values { "obj" object } { "quot" { $quotation "( ... elt -- ... elt' )" } } }
+{ $values { "obj" object } { "quot" { $quotation ( ... elt -- ... elt' ) } } }
 { $description "Modifies each sub-node of an object in place, in preorder, and returns that object." }
 { $see-also map! } ;
 
