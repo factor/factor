@@ -1,10 +1,11 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs byte-arrays combinators
-combinators.short-circuit grouping hashtables interval-maps
+combinators.short-circuit grouping hashtables interval-sets
 io.encodings.utf8 io.files kernel locals make math math.bitwise
 math.order math.parser math.ranges memoize namespaces sequences
 sets simple-flat-file sorting splitting strings.parser ;
+QUALIFIED: interval-sets
 IN: unicode.data
 
 <PRIVATE
@@ -35,7 +36,7 @@ CONSTANT: name-map H{ }
 : name>char ( name -- char ) name-map at ; inline
 : char>name ( char -- name ) name-map value-at ; inline
 : property ( property -- interval-map ) properties at ; foldable
-: property? ( char property -- ? ) property interval-key? ; inline
+: property? ( char property -- ? ) property interval-sets:in? ; inline
 : ch>lower ( ch -- lower ) simple-lower ?at drop ; inline
 : ch>upper ( ch -- upper ) simple-upper ?at drop ; inline
 : ch>title ( ch -- title ) simple-title ?at drop ; inline
