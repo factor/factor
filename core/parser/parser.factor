@@ -59,17 +59,17 @@ ERROR: number-expected ;
         dup string>number [ ] [ no-word ] ?if
     ] ?if ;
 
-: (scan-datum) ( -- word/number/f )
-    (scan-token) dup [ parse-datum ] when ;
+: ?scan-datum ( -- word/number/f )
+    ?scan-token dup [ parse-datum ] when ;
 
 : scan-datum ( -- word/number )
-    (scan-datum) [ \ word throw-unexpected-eof ] unless* ;
+    ?scan-datum [ \ word throw-unexpected-eof ] unless* ;
 
 : scan-word ( -- word )
-    (scan-token) parse-word ;
+    ?scan-token parse-word ;
 
 : scan-number ( -- number )
-    (scan-token) parse-number ;
+    ?scan-token parse-number ;
 
 ERROR: invalid-word-name string ;
 
@@ -105,7 +105,7 @@ ERROR: staging-violation word ;
     scan-object \ f or ;
 
 : parse-until-step ( accum end -- accum ? )
-    (scan-datum) {
+    ?scan-datum {
         { [ 2dup eq? ] [ 2drop f ] }
         { [ dup not ] [ drop throw-unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
