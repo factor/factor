@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations deques dlists fry
 io.backend io.directories io.files.info io.pathnames kernel
-locals math sequences sorting system unicode.case vocabs
-vocabs.loader ;
+kernel.private locals math sequences sorting strings system
+unicode.case vocabs vocabs.loader ;
 IN: io.directories.search
 
 : qualified-directory-entries ( path -- seq )
@@ -22,9 +22,13 @@ IN: io.directories.search
 
 <PRIVATE
 
-TUPLE: directory-iterator path bfs queue ;
+TUPLE: directory-iterator
+{ path string }
+{ bfs boolean }
+{ queue dlist } ;
 
 : push-directory-entries ( path iter -- )
+    { directory-iterator } declare
     [ [ qualified-directory-entries ] [ 2drop f ] recover ] dip '[
         _ [ queue>> ] [ bfs>> ] bi
         [ push-front ] [ push-back ] if
@@ -35,6 +39,7 @@ TUPLE: directory-iterator path bfs queue ;
     dup path>> over push-directory-entries ;
 
 : next-directory-entry ( iter -- directory-entry/f )
+    { directory-iterator } declare
     dup queue>> deque-empty? [ drop f ] [
         dup queue>> pop-back
         dup directory?
