@@ -12,7 +12,7 @@ ERROR: bad-heredoc identifier ;
     lexer get [ line-text>> ] [ column>> ] bi tail ;
 
 : next-line-text ( -- str )
-    lexer get dup next-line line-text>> ;
+    lexer get [ next-line ] [ line-text>> ] bi ;
 
 : (parse-here) ( -- )
     next-line-text [
@@ -38,9 +38,12 @@ SYNTAX: STRING:
 
 <PRIVATE
 
+: lexer-eof? ( lexer -- ? )
+    [ line>> ] [ text>> length ] bi <= ;
+
 :: (scan-multiline-string) ( i end -- j )
     lexer get line-text>> :> text
-    text [
+    lexer get lexer-eof? [
         end text i start* [| j |
             i j text subseq % j end length +
         ] [
