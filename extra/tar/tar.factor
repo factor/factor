@@ -155,8 +155,8 @@ C: <symbolic-link> symbolic-link
 : typeflag-L ( header -- )
     drop
     ;
-    ! <string-writer> [ read-data-blocks ] keep
-    ! >string [ zero? ] trim-tail filename set
+    ! [ read-data-blocks ] with-string-writer
+    ! [ zero? ] trim-tail filename set
     ! filename get prepend-current-directory make-directories ;
 
 ! Multi volume continuation entry
