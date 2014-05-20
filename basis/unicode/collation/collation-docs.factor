@@ -1,4 +1,5 @@
-USING: help.syntax help.markup strings byte-arrays math.order ;
+USING: byte-arrays help.syntax help.markup kernel math.order
+strings ;
 IN: unicode.collation
 
 ARTICLE: "unicode.collation" "Collation and weak comparison"
@@ -31,17 +32,17 @@ HELP: string<=>
 { $description "This word takes two strings and compares them using the UCA with the DUCET, using code point order as a tie-breaker." } ;
 
 HELP: primary=
-{ $values { "str1" string } { "str2" string } { "?" "t or f" } }
+{ $values { "str1" string } { "str2" string } { "?" boolean } }
 { $description "This checks whether the first level of collation key is identical. This is the least specific kind of equality test. In Latin script, it can be understood as ignoring case, punctuation, whitespace and accent marks." } ;
 
 HELP: secondary=
-{ $values { "str1" string } { "str2" string } { "?" "t or f" } }
+{ $values { "str1" string } { "str2" string } { "?" boolean } }
 { $description "This checks whether the first two levels of collation key are equal. For Latin script, this means accent marks are significant again, and it is otherwise similar to " { $link primary= } "." } ;
 
 HELP: tertiary=
-{ $values { "str1" string } { "str2" string } { "?" "t or f" } }
+{ $values { "str1" string } { "str2" string } { "?" boolean } }
 { $description "This checks if the first three levels of collation key are equal. For Latin-based scripts, it can be understood as testing for what " { $link secondary= } " tests for, but case is significant." } ;
 
 HELP: quaternary=
-{ $values { "str1" string } { "str2" string } { "?" "t or f" } }
+{ $values { "str1" string } { "str2" string } { "?" boolean } }
 { $description "This checks if the first four levels of collation key are equal. This is similar to " { $link tertiary= } " but it makes punctuation significant again, while still leaving out things like null bytes and Hebrew vowel marks, which mean absolutely nothing in collation." } ;
