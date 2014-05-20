@@ -151,27 +151,27 @@ MACRO: printf ( format-string -- )
 
 EBNF: parse-strftime
 
-fmt-%     = "%"                  => [[ [ "%" ] ]]
-fmt-a     = "a"                  => [[ [ dup day-of-week day-abbreviation3 ] ]]
-fmt-A     = "A"                  => [[ [ dup day-of-week day-name ] ]]
-fmt-b     = "b"                  => [[ [ dup month>> month-abbreviation ] ]]
-fmt-B     = "B"                  => [[ [ dup month>> month-name ] ]]
-fmt-c     = "c"                  => [[ [ dup >datetime ] ]]
-fmt-d     = "d"                  => [[ [ dup day>> pad-00 ] ]]
-fmt-H     = "H"                  => [[ [ dup hour>> pad-00 ] ]]
-fmt-I     = "I"                  => [[ [ dup hour>> dup 12 > [ 12 - ] when pad-00 ] ]]
-fmt-j     = "j"                  => [[ [ dup day-of-year pad-000 ] ]]
-fmt-m     = "m"                  => [[ [ dup month>> pad-00 ] ]]
-fmt-M     = "M"                  => [[ [ dup minute>> pad-00 ] ]]
-fmt-p     = "p"                  => [[ [ dup hour>> 12 < "AM" "PM" ? ] ]]
-fmt-S     = "S"                  => [[ [ dup second>> floor pad-00 ] ]]
-fmt-U     = "U"                  => [[ [ dup week-of-year-sunday pad-00 ] ]]
-fmt-w     = "w"                  => [[ [ dup day-of-week number>string ] ]]
-fmt-W     = "W"                  => [[ [ dup week-of-year-monday pad-00 ] ]]
-fmt-x     = "x"                  => [[ [ dup >date ] ]]
-fmt-X     = "X"                  => [[ [ dup >time ] ]]
-fmt-y     = "y"                  => [[ [ dup year>> 100 mod pad-00 ] ]]
-fmt-Y     = "Y"                  => [[ [ dup year>> number>string ] ]]
+fmt-%     = "%"                  => [[ "%" ]]
+fmt-a     = "a"                  => [[ [ day-of-week day-abbreviation3 ] ]]
+fmt-A     = "A"                  => [[ [ day-of-week day-name ] ]]
+fmt-b     = "b"                  => [[ [ month>> month-abbreviation ] ]]
+fmt-B     = "B"                  => [[ [ month>> month-name ] ]]
+fmt-c     = "c"                  => [[ [ >datetime ] ]]
+fmt-d     = "d"                  => [[ [ day>> pad-00 ] ]]
+fmt-H     = "H"                  => [[ [ hour>> pad-00 ] ]]
+fmt-I     = "I"                  => [[ [ hour>> dup 12 > [ 12 - ] when pad-00 ] ]]
+fmt-j     = "j"                  => [[ [ day-of-year pad-000 ] ]]
+fmt-m     = "m"                  => [[ [ month>> pad-00 ] ]]
+fmt-M     = "M"                  => [[ [ minute>> pad-00 ] ]]
+fmt-p     = "p"                  => [[ [ hour>> 12 < "AM" "PM" ? ] ]]
+fmt-S     = "S"                  => [[ [ second>> floor pad-00 ] ]]
+fmt-U     = "U"                  => [[ [ week-of-year-sunday pad-00 ] ]]
+fmt-w     = "w"                  => [[ [ day-of-week number>string ] ]]
+fmt-W     = "W"                  => [[ [ week-of-year-monday pad-00 ] ]]
+fmt-x     = "x"                  => [[ [ >date ] ]]
+fmt-X     = "X"                  => [[ [ >time ] ]]
+fmt-y     = "y"                  => [[ [ year>> 100 mod pad-00 ] ]]
+fmt-Y     = "Y"                  => [[ [ year>> number>string ] ]]
 fmt-Z     = "Z"                  => [[ [ "Not yet implemented" throw ] ]]
 unknown   = (.)*                 => [[ "Unknown directive" throw ]]
 
@@ -179,16 +179,23 @@ formats_  = fmt-%|fmt-a|fmt-A|fmt-b|fmt-B|fmt-c|fmt-d|fmt-H|fmt-I|
             fmt-j|fmt-m|fmt-M|fmt-p|fmt-S|fmt-U|fmt-w|fmt-W|fmt-x|
             fmt-X|fmt-y|fmt-Y|fmt-Z|unknown
 
-formats   = "%" (formats_)       => [[ second '[ _ dip ] ]]
+formats   = "%" (formats_)       => [[ second ]]
 
-plain-text = (!("%").)+          => [[ >string '[ _ swap ] ]]
+plain-text = (!("%").)+          => [[ >string ]]
 
-text      = (formats|plain-text)* => [[ reverse [ [ [ push ] keep ] append ] map ]]
+text      = (formats|plain-text)* => [[ ]]
 
 ;EBNF
 
 PRIVATE>
 
 MACRO: strftime ( format-string -- )
-    parse-strftime [ length ] keep [ ] join
-    '[ _ <vector> @ reverse concat nip ] ;
+    parse-strftime [
+        dup string? [
+            '[ _ swap push-all ]
+        ] [
+            '[ over @ swap push-all ]
+        ] if
+    ] map '[
+        SBUF" " clone [ _ cleave drop ] keep "" like
+    ] ;
