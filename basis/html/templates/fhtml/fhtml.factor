@@ -2,9 +2,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators compiler.units html.templates io
-io.encodings.utf8 io.files kernel lexer lexer.private math
-namespaces parser parser.notes quotations sequences splitting
-vocabs.parser ;
+io.encodings.utf8 io.files kernel lexer math namespaces parser
+parser.notes quotations sequences splitting vocabs.parser ;
 IN: html.templates.fhtml
 
 ! We use a custom lexer so that %> ends a token even if not

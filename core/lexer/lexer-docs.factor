@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel lexer.private math
-sequences strings words quotations ;
+USING: help.markup help.syntax kernel math sequences strings
+words quotations ;
 IN: lexer
 
 HELP: lexer
