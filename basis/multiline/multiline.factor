@@ -11,15 +11,15 @@ ERROR: bad-heredoc identifier ;
 : rest-of-line ( lexer -- seq )
     [ line-text>> ] [ column>> ] bi tail ;
 
-: next-line-text ( lexer -- str )
-    [ next-line ] [ line-text>> ] bi ;
+: next-line-text ( lexer -- str ? )
+    [ next-line ] [ line-text>> ] [ still-parsing? ] tri ;
 
 : (parse-here) ( lexer -- )
     dup next-line-text [
         dup ";" =
         [ drop next-line ]
         [ % CHAR: \n , (parse-here) ] if
-    ] [ drop ";" throw-unexpected-eof ] if* ;
+    ] [ ";" throw-unexpected-eof ] if ;
 
 PRIVATE>
 
@@ -39,12 +39,9 @@ SYNTAX: STRING:
 
 <PRIVATE
 
-: lexer-eof? ( lexer -- ? )
-    [ line>> ] [ text>> length ] bi <= ;
-
 :: (scan-multiline-string) ( i end lexer -- j )
     lexer line-text>> :> text
-    lexer lexer-eof? [
+    lexer still-parsing? [
         end text i start* [| j |
             i j text subseq % j end length +
         ] [
