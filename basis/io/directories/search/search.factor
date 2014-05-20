@@ -100,14 +100,11 @@ ERROR: file-not-found path bfs? quot ;
 : directory-size ( path -- n )
     0 swap t [ link-size/0 + ] each-file ;
 
-: path>usage ( directory-entry -- name size )
-    [ name>> dup ] [ directory? ] bi
-    [ directory-size ] [ link-size/0 ] if ;
-
 : directory-usage ( path -- assoc )
     [
         [
-            [ path>usage ] [ drop name>> 0 ] recover
+            [ name>> dup ] [ directory? ] bi
+            [ directory-size ] [ link-size/0 ] if
         ] { } map>assoc
     ] with-qualified-directory-entries sort-values ;
 

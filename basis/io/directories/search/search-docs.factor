@@ -46,7 +46,7 @@ HELP: find-in-directories
 HELP: find-all-files
 { $values
      { "path" "a pathname string" } { "quot" quotation }
-     { "paths/f" "a sequence of pathname strings or f" }
+     { "paths" "a sequence of pathname strings" }
 }
 { $description "Recursively finds all files in the input directory matching the predicate quotation." } ;
 
