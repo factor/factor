@@ -116,7 +116,7 @@ syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
 syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
 syn region  factorConstructor2  start=/\<CONSTRUCTOR:\?/ end=/;/
 syn region  factorIntersection  start=/\<INTERSECTION:\>/ end=/\<;\>/
-syn region  factorTuple         start=/\<TUPLE:\>/ end=/\<;\>/
+syn region  factorTuple         start=/\<\(TUPLE\|BUILTIN\):\>/ end=/\<;\>/
 syn region  factorError         start=/\<ERROR:\>/ end=/\<;\>/
 syn region  factorUnion         start=/\<UNION:\>/ end=/\<;\>/
 syn region  factorStruct        start=/\<\(UNION-STRUCT:\|STRUCT:\)\>/ end=/\<;\>/
