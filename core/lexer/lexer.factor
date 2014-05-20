@@ -52,18 +52,14 @@ ERROR: unexpected want got ;
 : forbid-tab ( c -- c )
     [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
 
-<PRIVATE
-
 : skip ( i seq ? -- n )
-    { fixnum string boolean } declare
     over length [
         [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
-    ] dip or ;
-
-PRIVATE>
+    ] dip or ; inline
 
 : change-lexer-column ( lexer quot -- )
-    [ [ column>> ] [ line-text>> ] bi ] prepose keep column<< ; inline
+    [ check-lexer [ column>> ] [ line-text>> ] bi ] prepose
+    keep column<< ; inline
 
 GENERIC: skip-blank ( lexer -- )
 
