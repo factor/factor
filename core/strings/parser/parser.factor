@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators kernel lexer
-math math.parser namespaces sbufs sequences splitting strings ;
+USING: accessors arrays assocs combinators kernel kernel.private
+lexer math math.parser namespaces sbufs sequences splitting
+strings ;
 IN: strings.parser
 
 ERROR: bad-escape char ;
@@ -48,13 +49,14 @@ name>char-hook [
 <PRIVATE
 
 : (unescape-string) ( accum str i/f -- accum )
+    { sbuf object object } declare
     [
         cut-slice [ over push-all ] dip
         rest-slice next-escape [ over push ] dip
         CHAR: \\ over index (unescape-string)
     ] [
         over push-all
-    ] if* ; inline recursive
+    ] if* ;
 
 PRIVATE>
 
@@ -66,6 +68,7 @@ PRIVATE>
 <PRIVATE
 
 : (parse-string) ( accum str -- accum m )
+    { sbuf slice } declare
     dup [ "\"\\" member? ] find [
         [ cut-slice [ over push-all ] dip rest-slice ] dip
         CHAR: " = [
@@ -75,7 +78,7 @@ PRIVATE>
         ] if
     ] [
         "Unterminated string" throw
-    ] if* ; inline recursive
+    ] if* ;
 
 PRIVATE>
 
@@ -88,21 +91,26 @@ PRIVATE>
 <PRIVATE
 
 : lexer-subseq ( i lexer -- before )
+    { fixnum lexer } declare
     [ [ column>> ] [ line-text>> ] bi swapd subseq ]
     [ column<< ] 2bi ;
 
 : rest-of-line ( lexer -- seq )
+    { lexer } declare
     [ line-text>> ] [ column>> ] bi tail-slice ;
 
 : current-char ( lexer -- ch/f )
+    { lexer } declare
     [ column>> ] [ line-text>> ] bi ?nth ;
 
 : advance-char ( lexer -- )
+    { lexer } declare
     [ 1 + ] change-column drop ;
 
 ERROR: escaped-char-expected ;
 
 : next-char ( lexer -- ch )
+    { lexer } declare
     dup still-parsing-line? [
         [ current-char ] [ advance-char ] bi
     ] [
@@ -110,20 +118,25 @@ ERROR: escaped-char-expected ;
     ] if ;
 
 : lexer-head? ( lexer string -- ? )
+    { lexer string } declare
     [ rest-of-line ] dip head? ;
 
 : advance-lexer ( lexer n -- )
-    [ + ] curry change-column drop ; inline
+    { lexer fixnum } declare
+    [ + ] curry change-column drop ;
 
 : find-next-token ( lexer ch -- i elt )
+    { lexer fixnum } declare
     [ [ column>> ] [ line-text>> ] bi ] dip
     CHAR: \ 2array [ member? ] curry find-from ;
 
 : next-line% ( accum lexer -- )
+    { sbuf lexer } declare
     [ rest-of-line swap push-all ]
-    [ next-line CHAR: \n swap push ] 2bi ; inline
+    [ next-line CHAR: \n swap push ] 2bi ;
 
 : take-double-quotes ( lexer -- string )
+    { lexer } declare
     dup current-char CHAR: " = [
         dup [ column>> ] [ line-text>> ] bi
         [ CHAR: " = not ] find-from drop [
@@ -135,15 +148,17 @@ ERROR: escaped-char-expected ;
     ] [ drop f ] if ;
 
 : end-string-parse ( accum lexer delimiter -- )
+    { sbuf lexer string } declare
     length 3 = [
         take-double-quotes 3 tail-slice swap push-all
     ] [
         advance-char drop
-    ] if ; inline
+    ] if ;
 
 DEFER: (parse-multiline-string)
 
 : parse-found-token ( accum lexer string i token -- )
+    { sbuf lexer string fixnum fixnum } declare
     [ [ 2over ] dip swap lexer-subseq swap push-all ] dip
     CHAR: \ = [
         2over next-char swap push
@@ -156,11 +171,12 @@ DEFER: (parse-multiline-string)
             2over next-char swap push
             (parse-multiline-string)
         ] if
-    ] if ; inline recursive
+    ] if ;
 
 ERROR: trailing-characters string ;
 
 : (parse-multiline-string) ( accum lexer string -- )
+    { sbuf lexer fixnum } declare
     over still-parsing? [
         2dup first find-next-token [
             parse-found-token
@@ -170,7 +186,7 @@ ERROR: trailing-characters string ;
         ] if*
     ] [
         throw-unexpected-eof
-    ] if ; inline recursive
+    ] if ;
 
 PRIVATE>
 
