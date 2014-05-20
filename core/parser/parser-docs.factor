@@ -18,8 +18,8 @@ ARTICLE: "reading-ahead" "Reading ahead"
 }
 "Parsing words that return " { $link f } " on end of file:"
 { $subsections
-    (scan-token)
-    (scan-datum)
+    ?scan-token
+    ?scan-datum
 }
 "A simple example is the " { $link POSTPONE: \ } " word:"
 { $see POSTPONE: \ } ;
@@ -160,7 +160,7 @@ HELP: parse-datum
 { $values { "string" string } { "word/number" "a word or number" } }
 { $description "If " { $snippet "string" } " is a valid number literal, it is converted to a number, otherwise the current vocabulary search path is searched for a word named by the string." }
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
-{ $notes "This word is used to implement " { $link (scan-datum) } " and " { $link scan-datum } "." } ;
+{ $notes "This word is used to implement " { $link ?scan-datum } " and " { $link scan-datum } "." } ;
 
 HELP: scan-word
 { $values { "word" "a word" } }
@@ -176,25 +176,25 @@ HELP: scan-word-name
 { $errors "Throws an error if the scanned token is a number or upon finding end of file." }
 $parsing-note ;
 
-HELP: (scan-datum)
-{ $values { "word/number/f" "a word, a number, or " { $link f } } }
+HELP: ?scan-datum
+{ $values { "word/number/f" { $maybe word number } } }
 { $description "Reads the next token from parser input. If the token is found in the vocabulary search path, returns the word named by the token. If the token does not find a word, it is next converted to a number. If this conversion fails, too, this word returns " { $link f } "." }
 $parsing-note ;
 
 HELP: scan-datum
-{ $values { "word/number" "a word or a number" } }
+{ $values { "word/number" { $or word number } } }
 { $description "Reads the next token from parser input. If the token is found in the vocabulary search path, returns the word named be the token. If the token is not found in the vocabulary search path, it is converted to a number. If this conversion fails, an error is thrown." }
 { $errors "Throws an error if the token is not a number or end of file is reached." }
 $parsing-note ;
 
 HELP: scan-number
-{ $values { "number" "a number" } }
+{ $values { "number" number } }
 { $description "Reads the next token from parser input. If the token is a number literal, it is converted to a number. Otherwise, it throws an error." }
 { $errors "Throws an error if the token is not a number or end of file is reached." }
 $parsing-note ;
 
 HELP: parse-until-step
-{ $values { "accum" vector } { "end" word } { "?" "a boolean" } }
+{ $values { "accum" vector } { "end" word } { "?" boolean } }
 { $description "Parses a token. If the token is a number or an ordinary word, it is added to the accumulator. If it is a parsing word, calls the parsing word with the accumulator on the stack. Outputs " { $link f } " if " { $snippet "end" } " is encountered, " { $link t } " otherwise." }
 $parsing-note ;
 
