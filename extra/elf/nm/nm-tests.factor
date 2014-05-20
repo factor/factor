@@ -48,6 +48,6 @@ STRING: validation-output
 
 cpu ppc? [
     { $ validation-output }
-    [ <string-writer> dup [ "resource:extra/elf/a.elf" elf-nm ] with-output-stream >string ]
+    [ [ "resource:extra/elf/a.elf" elf-nm ] with-string-writer ]
     unit-test
 ] unless
