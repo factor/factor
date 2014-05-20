@@ -63,25 +63,24 @@ TUPLE: directory-iterator
 
 PRIVATE>
 
-: each-file ( path bfs? quot -- )
+: each-file ( path bfs? quot: ( ... name -- ... ) -- )
     setup-traversal iterate-directory drop ; inline
 
-: each-directory-entry ( path bfs? quot -- )
+: each-directory-entry ( path bfs? quot: ( ... entry -- ... ) -- )
     setup-traversal iterate-directory-entries drop ; inline
 
 : recursive-directory-files ( path bfs? -- paths )
-    [ ] collector [ each-file ] dip ; inline
+    [ ] collector [ each-file ] dip ;
 
 : recursive-directory-entries ( path bfs? -- directory-entries )
-    [ ] collector [ each-directory-entry ] dip ; inline
+    [ ] collector [ each-directory-entry ] dip ;
 
-: find-file ( path bfs? quot -- path/f )
+: find-file ( path bfs? quot: ( ... name -- ... ? ) -- path/f )
     [ <directory-iterator> ] dip
     [ keep and ] curry iterate-directory ; inline
 
-: find-all-files ( path quot -- paths/f )
-    [ f <directory-iterator> ] dip selector
-    [ [ f ] compose iterate-directory drop ] dip ; inline
+: find-all-files ( path quot: ( ... name -- ... ? ) -- paths )
+    f swap selector [ each-file ] dip ; inline
 
 ERROR: file-not-found path bfs? quot ;
 
