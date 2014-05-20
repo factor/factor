@@ -3,16 +3,17 @@
 USING: accessors alien.syntax arrays assocs combinators
 combinators.short-circuit compiler.units fry interval-maps io
 io.encodings.ascii io.files kernel literals locals make math
-math.parser math.ranges memoize namespaces sequences
+math.parser math.ranges memoize namespaces parser sequences
 sets simple-flat-file splitting unicode.categories
 unicode.categories.syntax unicode.data unicode.normalize
-unicode.normalize.private words ;
+unicode.normalize.private words words.constant ;
 FROM: sequences => change-nth ;
 IN: unicode.breaks
 
 <PRIVATE
-! Grapheme breaks
 
+! Grapheme breaks
+<<
 CONSTANT: Any 0
 CONSTANT: L 1
 CONSTANT: V 2
@@ -83,7 +84,7 @@ SYMBOL: table
 
 : connect ( class1 class2 -- ) 1 set-table ;
 : disconnect ( class1 class2 -- ) 0 set-table ;
-  
+
 : make-grapheme-table ( -- )
     { CR } { LF } connect
     { Control CR LF } graphemes iota disconnect
@@ -95,10 +96,14 @@ SYMBOL: table
     graphemes iota { SpacingMark } connect
     { Prepend } graphemes iota connect ;
 
-SYMBOL: grapheme-table
+"grapheme-table" create-in
+graphemes init-table table
+[ make-grapheme-table finish-table ] with-variable
+define-constant
+>>
 
 : grapheme-break? ( class1 class2 -- ? )
-    grapheme-table get-global nth nth not ;
+    grapheme-table nth nth not ;
 
 PRIVATE>
 
@@ -132,17 +137,8 @@ PRIVATE>
 
 <PRIVATE
 
-graphemes init-table table
-[ make-grapheme-table finish-table ] with-variable
-grapheme-table set-global
-
 ! Word breaks
-
-SYMBOL: word-break-table
-
-"vocab:unicode/data/WordBreakProperty.txt" load-interval-file
-word-break-table set-global
-
+<<
 CONSTANT: wOther 0
 CONSTANT: wCR 1
 CONSTANT: wLF 2
@@ -167,10 +163,17 @@ CONSTANT: word-break-classes H{
     { "ExtendNumLet" 12 }
 }
 
-: word-break-prop ( char -- word-break-prop )
-    word-break-table get-global interval-at
-    word-break-classes at [ wOther ] unless* ;
+"word-break-table" create-in
+"vocab:unicode/data/WordBreakProperty.txt"
+load-interval-file dup array>>
+[ 2 swap [ word-break-classes at ] change-nth ] each
+define-constant
+>>
 
+: word-break-prop ( char -- word-break-prop )
+    word-break-table interval-at wOther or ;
+
+<<
 SYMBOL: check-letter-before
 SYMBOL: check-letter-after
 SYMBOL: check-number-before
@@ -189,19 +192,19 @@ SYMBOL: check-number-after
     { wALetter wNumeric wKatakana wExtendNumLet } { wExtendNumLet }
     [ connect ] [ swap connect ] 2bi ;
 
-SYMBOL: word-table
-
 : finish-word-table ( -- table )
     table get [
         [ { { 0 [ f ] } { 1 [ t ] } [ ] } case ] map
     ] map ;
 
+"word-table" create-in
 words init-table table
 [ make-word-table finish-word-table ] with-variable
-word-table set-global
+define-constant
+>>
 
 : word-table-nth ( class1 class2 -- ? )
-    word-table get-global nth nth ;
+    word-table nth nth ;
 
 :: property-not= ( str i property -- ? )
     i [
