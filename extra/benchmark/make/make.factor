@@ -19,3 +19,5 @@ IN: benchmark.make
         [ make-strings ] [ make-arrays ] [ make-vectors ] tri
         3drop
     ] each ;
+
+MAIN: make-benchmark
