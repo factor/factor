@@ -1,6 +1,6 @@
+USING: help.markup help.syntax kernel lexer.private math
+sequences strings words quotations ;
 IN: lexer
-USING: help.markup help.syntax kernel math sequences strings
-words quotations ;
 
 HELP: lexer
 { $var-description "Stores the current " { $link lexer } " instance." }

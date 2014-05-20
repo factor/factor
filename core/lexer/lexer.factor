@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators continuations io kernel
-math math.parser namespaces sequences sequences.private
-source-files.errors strings vectors ;
+kernel.private math math.parser namespaces sequences
+sequences.private source-files.errors strings vectors ;
 IN: lexer
 
 TUPLE: lexer
@@ -15,7 +15,13 @@ TUPLE: lexer
 
 TUPLE: lexer-parsing-word word line line-text column ;
 
+ERROR: not-a-lexer obj ;
+
+: check-lexer ( lexer -- lexer )
+    dup lexer? [ not-a-lexer ] unless ; inline
+
 : next-line ( lexer -- )
+    check-lexer
     dup [ line>> ] [ text>> ] bi ?nth "" or
     [ >>line-text ] [ length >>line-length ] bi
     [ 1 + ] change-line
@@ -23,13 +29,13 @@ TUPLE: lexer-parsing-word word line line-text column ;
     drop ;
 
 : push-parsing-word ( word -- )
-    lexer get [
+    lexer get check-lexer [
         [ line>> ] [ line-text>> ] [ column>> ] tri
         lexer-parsing-word boa
     ] [ parsing-words>> push ] bi ;
 
 : pop-parsing-word ( -- )
-    lexer get parsing-words>> pop* ;
+    lexer get check-lexer parsing-words>> pop* ;
 
 : new-lexer ( text class -- lexer )
     new
@@ -46,10 +52,15 @@ ERROR: unexpected want got ;
 : forbid-tab ( c -- c )
     [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
 
+<PRIVATE
+
 : skip ( i seq ? -- n )
+    { fixnum string boolean } declare
     over length [
         [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
-    ] dip or ; inline
+    ] dip or ;
+
+PRIVATE>
 
 : change-lexer-column ( lexer quot -- )
     [ [ column>> ] [ line-text>> ] bi ] prepose keep column<< ; inline
@@ -64,15 +75,15 @@ GENERIC: skip-word ( lexer -- )
 <PRIVATE
 
 : quote? ( column text -- ? )
-    nth CHAR: " eq? ; inline
+    { fixnum string } declare nth CHAR: " eq? ;
 
 : shebang? ( column text -- ? )
-    swap zero? [
+    { fixnum string } declare swap zero? [
         dup length 1 > [
             dup first-unsafe CHAR: # =
             [ second-unsafe CHAR: ! = ] [ drop f ] if
         ] [ drop f ] if
-    ] [ drop f ] if ; inline
+    ] [ drop f ] if ;
 
 PRIVATE>
 
@@ -86,13 +97,13 @@ M: lexer skip-word
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
-    [ line>> ] [ text>> length ] bi <= ; inline
+    check-lexer [ line>> ] [ text>> length ] bi <= ;
 
 : still-parsing-line? ( lexer -- ? )
-    [ column>> ] [ line-length>> ] bi < ; inline
+    check-lexer [ column>> ] [ line-length>> ] bi < ;
 
 : (parse-token) ( lexer -- str )
-    {
+    check-lexer {
         [ column>> ]
         [ skip-word ]
         [ column>> ]
