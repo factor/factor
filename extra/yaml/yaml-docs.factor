@@ -17,21 +17,31 @@ HELP: >yaml-docs
     { "seq" sequence }
     { "str" string }
 }
-{ $description "Serializes the sequence into a YAML formatted string. Each element is outputted as a YAML document" } ;
+{ $description "Serializes the sequence into a YAML formatted string. Each element is outputted as a YAML document." } ;
 
 HELP: yaml-docs>
 { $values
     { "str" string }
     { "arr" array }
 }
-{ $description "Deserializes the YAML formatted string into a Factor array. Each document becomes an element of the array" } ;
+{ $description "Deserializes the YAML formatted string into a Factor array. Each document becomes an element of the array." } ;
 
 HELP: yaml>
 { $values
     { "str" string }
     { "obj" object }
 }
-{ $description "Deserializes the YAML formatted string into a Factor object." } ;
+{ $description "Deserializes the YAML formatted string into a Factor object. Throws "
+{ $link yaml-no-document } " when there is no document (for example the empty string)."
+$nl
+}
+{ $notes
+"Contrary to " { $link yaml-docs> } ", this word only parses the input until one document is produced."
+" Valid or invalid content after the first document is ignored."
+" To verifiy that the whole input is one valid YAML document, use "
+{ $link yaml-docs> } " and assert that the length of the output array is 1."
+}
+;
 
 HELP: libyaml-emitter-error
 { $values
