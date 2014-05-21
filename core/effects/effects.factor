@@ -28,6 +28,7 @@ TUPLE: effect
 
 : variable-effect? ( effect -- ? )
     [ in-var>> ] [ out-var>> ] bi or ;
+
 : bivariable-effect? ( effect -- ? )
     [ in-var>> ] [ out-var>> ] bi = not ;
 
@@ -89,8 +90,9 @@ M: classoid effect>type ;
 GENERIC: stack-effect ( word -- effect/f )
 
 M: word stack-effect
-    [ "declared-effect" word-prop ]
-    [ parent-word dup [ stack-effect ] when ] bi or ;
+    dup "declared-effect" word-prop [ nip ] [
+        parent-word dup [ stack-effect ] when
+    ] if* ;
 
 M: deferred stack-effect call-next-method ( -- * ) or ;
 
@@ -107,7 +109,8 @@ M: effect clone
     shuffle-mapping swap nths ;
 
 : add-effect-input ( effect -- effect' )
-    [ in>> "obj" suffix ] [ out>> ] [ terminated?>> ] tri <terminated-effect> ;
+    [ in>> "obj" suffix ] [ out>> ] [ terminated?>> ] tri
+    <terminated-effect> ;
 
 : compose-effects ( effect1 effect2 -- effect' )
     over terminated?>> [
