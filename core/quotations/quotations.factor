@@ -44,7 +44,7 @@ M: callable like drop dup quotation? [ >quotation ] unless ;
 
 INSTANCE: quotation immutable-sequence
 
-: 1quotation ( obj -- quot ) 1array >quotation ;
+: 1quotation ( obj -- quot ) 1array array>quotation ;
 
 GENERIC: literalize ( obj -- wrapped )
 
