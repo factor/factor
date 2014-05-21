@@ -1,7 +1,8 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel linked-assocs literals locals sequences
-tools.test yaml yaml.private yaml.config grouping namespaces ;
+USING: assocs grouping kernel linked-assocs literals locals
+namespaces sequences tools.test yaml yaml.config yaml.ffi
+yaml.private ;
 IN: yaml.tests
 
 ! TODO real conformance tests here
@@ -634,3 +635,16 @@ t emitter-canonical [
 "
  } [ { { "a string that can be split in lots of places" } } >yaml ] unit-test
 ] with-variables
+
+! line break
+YAML_LN_BREAK emitter-line-break [
+{ "- foo\n" } [ { "foo" } >yaml ] unit-test
+] with-variable
+
+YAML_CR_BREAK emitter-line-break [
+{ "- foo\r" } [ { "foo" } >yaml ] unit-test
+] with-variable
+
+YAML_CRLN_BREAK emitter-line-break [
+{ "- foo\r\n" } [ { "foo" } >yaml ] unit-test
+] with-variable
