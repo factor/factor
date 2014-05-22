@@ -167,6 +167,7 @@ ARTICLE: "yaml" "YAML serialization"
 "yaml-config"
 }
 { $examples
+  { $heading "Input" }
   { $example "USING: prettyprint yaml ;"
 "\"- true
 - null
@@ -179,8 +180,49 @@ ARTICLE: "yaml" "YAML serialization"
 - 4.2e1\" yaml> ."
 "{ t f \"42\" \"42\" 42 42 42 42.0 42.0 }"
  }
-  { $example "USING: yaml ;"
-"""{ t 32 "foobar" { "nested" "list" } H{ { "nested" "assoc" } } } >yaml print"""
+{ $heading "Output -- human readable" }
+  { $example "USING: yaml yaml.config ;"
+"t implicit-tags set
+t implicit-start set
+t implicit-end set
++libyaml-default+ emitter-canonical set
++libyaml-default+ emitter-indent set
++libyaml-default+ emitter-width set
++libyaml-default+ emitter-line-break set
+t emitter-unicode set
+"
+"""{
+  H{
+    { "name" "Mark McGwire" }
+    { "hr" 65 }
+    { "avg"  0.278 }
+  }
+  H{
+    { "name" "Sammy Sosa" }
+    { "hr" 63 }
+    { "avg" 0.288 }
+  }
+} >yaml print"""
+    "- name: Mark McGwire
+  hr: 65
+  avg: 0.278
+- name: Sammy Sosa
+  hr: 63
+  avg: 0.288
+"
+  }
+{ $heading "Output -- verbose" }
+  { $example "USING: yaml yaml.config ;"
+"""f implicit-tags set
+f implicit-start set
+f implicit-end set
++libyaml-default+ emitter-canonical set
++libyaml-default+ emitter-indent set
++libyaml-default+ emitter-width set
++libyaml-default+ emitter-line-break set
+t emitter-unicode set
+
+{ t 32 "foobar" { "nested" "list" } H{ { "nested" "assoc" } } } >yaml print"""
     "--- !!seq\n- !!bool true\n- !!int 32\n- !!str foobar\n- !!seq\n  - !!str nested\n  - !!str list\n- !!map\n  !!str nested: !!str assoc\n...\n"
   }
 }
