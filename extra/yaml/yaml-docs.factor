@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs byte-arrays hash-sets hashtables
 help.markup help.syntax kernel linked-assocs math sequences sets
-strings yaml.ffi ;
+strings yaml.ffi yaml.config ;
 IN: yaml
 
 HELP: >yaml
@@ -17,21 +17,31 @@ HELP: >yaml-docs
     { "seq" sequence }
     { "str" string }
 }
-{ $description "Serializes the sequence into a YAML formatted string. Each element is outputted as a YAML document" } ;
+{ $description "Serializes the sequence into a YAML formatted string. Each element is outputted as a YAML document." } ;
 
 HELP: yaml-docs>
 { $values
     { "str" string }
     { "arr" array }
 }
-{ $description "Deserializes the YAML formatted string into a Factor array. Each document becomes an element of the array" } ;
+{ $description "Deserializes the YAML formatted string into a Factor array. Each document becomes an element of the array." } ;
 
 HELP: yaml>
 { $values
     { "str" string }
     { "obj" object }
 }
-{ $description "Deserializes the YAML formatted string into a Factor object." } ;
+{ $description "Deserializes the YAML formatted string into a Factor object. Throws "
+{ $link yaml-no-document } " when there is no document (for example the empty string)."
+$nl
+}
+{ $notes
+"Contrary to " { $link yaml-docs> } ", this word only parses the input until one document is produced."
+" Valid or invalid content after the first document is ignored."
+" To verifiy that the whole input is one valid YAML document, use "
+{ $link yaml-docs> } " and assert that the length of the output array is 1."
+}
+;
 
 HELP: libyaml-emitter-error
 { $values
@@ -140,7 +150,7 @@ ARTICLE: "yaml-errors" "YAML errors"
 ;
 
 ARTICLE: "yaml" "YAML serialization"
-"The " { $vocab-link "yaml" } " vocabulary implements YAML serialization/deserialization."
+"The " { $vocab-link "yaml" } " vocabulary implements YAML serialization/deserialization. It uses LibYAML, a YAML parser and emitter written in C (" { $url "http://pyyaml.org/wiki/LibYAML" } ")."
 { $heading "Main conversion words" }
 { $subsections
     >yaml
@@ -154,8 +164,10 @@ ARTICLE: "yaml" "YAML serialization"
 "yaml-output"
 "yaml-input"
 "yaml-errors"
+"yaml-config"
 }
 { $examples
+  { $heading "Input" }
   { $example "USING: prettyprint yaml ;"
 "\"- true
 - null
@@ -168,8 +180,49 @@ ARTICLE: "yaml" "YAML serialization"
 - 4.2e1\" yaml> ."
 "{ t f \"42\" \"42\" 42 42 42 42.0 42.0 }"
  }
-  { $example "USING: yaml ;"
-"""{ t 32 "foobar" { "nested" "list" } H{ { "nested" "assoc" } } } >yaml print"""
+{ $heading "Output -- human readable" }
+  { $example "USING: yaml yaml.config ;"
+"t implicit-tags set
+t implicit-start set
+t implicit-end set
++libyaml-default+ emitter-canonical set
++libyaml-default+ emitter-indent set
++libyaml-default+ emitter-width set
++libyaml-default+ emitter-line-break set
+t emitter-unicode set
+"
+"""{
+  H{
+    { "name" "Mark McGwire" }
+    { "hr" 65 }
+    { "avg"  0.278 }
+  }
+  H{
+    { "name" "Sammy Sosa" }
+    { "hr" 63 }
+    { "avg" 0.288 }
+  }
+} >yaml print"""
+    "- name: Mark McGwire
+  hr: 65
+  avg: 0.278
+- name: Sammy Sosa
+  hr: 63
+  avg: 0.288
+"
+  }
+{ $heading "Output -- verbose" }
+  { $example "USING: yaml yaml.config ;"
+"""f implicit-tags set
+f implicit-start set
+f implicit-end set
++libyaml-default+ emitter-canonical set
++libyaml-default+ emitter-indent set
++libyaml-default+ emitter-width set
++libyaml-default+ emitter-line-break set
+t emitter-unicode set
+
+{ t 32 "foobar" { "nested" "list" } H{ { "nested" "assoc" } } } >yaml print"""
     "--- !!seq\n- !!bool true\n- !!int 32\n- !!str foobar\n- !!seq\n  - !!str nested\n  - !!str list\n- !!map\n  !!str nested: !!str assoc\n...\n"
   }
 }

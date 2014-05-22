@@ -5,8 +5,8 @@ classes.struct combinators combinators.extras
 combinators.short-circuit destructors fry generalizations
 hashtables hashtables.identity io.encodings.string
 io.encodings.utf8 kernel libc linked-assocs locals make math
-math.parser namespaces sequences sets strings yaml.conversion
-yaml.ffi ;
+math.parser namespaces sequences sets strings yaml.config
+yaml.conversion yaml.ffi ;
 FROM: sets => set ;
 IN: yaml
 
@@ -218,11 +218,11 @@ M: assoc (deref-aliases)
             { YAML_DOCUMENT_START_EVENT [ t ] }
             { YAML_STREAM_END_EVENT [ f ] }
             [ { YAML_DOCUMENT_START_EVENT YAML_STREAM_END_EVENT } yaml-unexpected-event ]
-        } case [
-            parser event parse-yaml-doc t
-            parser event YAML_DOCUMENT_END_EVENT expect-event
-        ] [ f f ] if
-    ] with-destructors ;
+        } case
+    ] with-destructors [
+        parser event parse-yaml-doc t
+        parser event YAML_DOCUMENT_END_EVENT expect-event
+    ] [ f f ] if ;
 
 ! registers destructors (use with with-destructors)
 :: init-parser ( str -- parser event )
@@ -268,7 +268,7 @@ GENERIC: (replace-aliases) ( yaml-anchors obj -- obj' )
         [ next-anchor<< ] bi*
     ] bi ;
 
-:: ?replace-aliases ( yaml-anchors obj -- obj' )
+:: (?replace-aliases) ( yaml-anchors obj -- obj' )
     yaml-anchors objects>> :> objects
     obj objects at* [
         [ yaml-anchors incr-anchor dup obj objects set-at ] unless*
@@ -279,6 +279,9 @@ GENERIC: (replace-aliases) ( yaml-anchors obj -- obj' )
         obj obj' yaml-anchors new-objects>> set-at
         obj'
     ] if ;
+
+: ?replace-aliases ( yaml-anchors obj -- obj' )
+    dup fixnum? [ nip ] [ (?replace-aliases) ] if ;
 
 M: object (replace-aliases) nip ;
 
@@ -342,10 +345,15 @@ GENERIC: emit-value ( emitter event anchor obj -- )
 
 : emit-object ( emitter event obj -- ) [ f ] dip emit-value ;
 
+: scalar-implicit-tag? ( tag str -- plain_implicit quoted_implicit )
+    implicit-tags get [
+        resolve-plain-scalar = t
+    ] [ 2drop f f ] if ;
+
 :: emit-scalar ( emitter event anchor obj -- )
     event anchor
     obj [ yaml-tag ] [ represent-scalar ] bi
-    -1 f f YAML_ANY_SCALAR_STYLE
+    -1 2over scalar-implicit-tag? YAML_ANY_SCALAR_STYLE
     yaml_scalar_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
 
@@ -358,8 +366,8 @@ M:: yaml-alias emit-value ( emitter event unused obj -- )
     event obj anchor>> yaml_alias_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
 
-:: emit-sequence-start ( emitter event anchor tag -- )
-    event anchor tag f YAML_ANY_SEQUENCE_STYLE
+:: emit-sequence-start ( emitter event anchor tag implicit -- )
+    event anchor tag implicit YAML_ANY_SEQUENCE_STYLE
     yaml_sequence_start_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
 
@@ -386,17 +394,17 @@ M: string emit-value ( emitter event anchor string -- ) emit-scalar ;
 M: byte-array emit-value ( emitter event anchor byte-array -- ) emit-scalar ;
 
 M: sequence emit-value ( emitter event anchor seq -- )
-    [ drop YAML_SEQ_TAG emit-sequence-start ]
+    [ drop YAML_SEQ_TAG implicit-tags get emit-sequence-start ]
     [ nip emit-sequence-body ]
     [ 2drop emit-sequence-end ] 4tri ;
 
 M: linked-assoc emit-value ( emitter event anchor assoc -- )
-    [ drop YAML_OMAP_TAG emit-sequence-start ]
+    [ drop YAML_OMAP_TAG f emit-sequence-start ]
     [ nip emit-linked-assoc-body ]
     [ 2drop emit-sequence-end ] 4tri ;
 
-:: emit-assoc-start ( emitter event anchor tag -- )
-    event anchor tag f YAML_ANY_MAPPING_STYLE
+:: emit-assoc-start ( emitter event anchor tag implicit -- )
+    event anchor tag implicit YAML_ANY_MAPPING_STYLE
     yaml_mapping_start_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
 
@@ -405,20 +413,34 @@ M: linked-assoc emit-value ( emitter event anchor assoc -- )
     yaml_emitter_emit_asserted ;
 
 M: assoc emit-value ( emitter event anchor assoc -- )
-    [ drop YAML_MAP_TAG emit-assoc-start ]
+    [ drop YAML_MAP_TAG implicit-tags get emit-assoc-start ]
     [ nip emit-assoc-body ]
     [ 2drop emit-assoc-end ] 4tri ;
 
 M: set emit-value ( emitter event anchor set -- )
-    [ drop YAML_SET_TAG emit-assoc-start ]
+    [ drop YAML_SET_TAG f emit-assoc-start ]
     [ nip emit-set-body ]
     [ 2drop emit-assoc-end ] 4tri ;
+
+: unless-libyaml-default ( variable quot -- )
+    [ get dup +libyaml-default+ = not ] dip
+    [ 2drop ] if ; inline
+
+: init-emitter-options ( emitter -- )
+    {
+        [ emitter-canonical [ yaml_emitter_set_canonical ] unless-libyaml-default ]
+        [ emitter-indent [ yaml_emitter_set_indent ] unless-libyaml-default ]
+        [ emitter-width [ yaml_emitter_set_width ] unless-libyaml-default ]
+        [ emitter-unicode [ yaml_emitter_set_unicode ] unless-libyaml-default ]
+        [ emitter-line-break [ yaml_emitter_set_break ] unless-libyaml-default ]
+    } cleave ;
 
 ! registers destructors (use with with-destructors)
 :: init-emitter ( -- emitter event )
     yaml_emitter_t (malloc-struct) &free :> emitter
     emitter yaml_emitter_initialize yaml-initialize-assert-ok
     emitter &yaml_emitter_delete drop
+    emitter init-emitter-options
 
     BV{ } clone :> output
     output yaml-write-buffer set-global
@@ -433,15 +455,14 @@ M: set emit-value ( emitter event anchor set -- )
     emitter event ;
 
 :: emit-doc ( emitter event obj -- )
-    event f f f f yaml_document_start_event_initialize yaml-initialize-assert-ok
+    event f f f implicit-start get yaml_document_start_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted
 
     emitter event obj emit-object
 
-    event f yaml_document_end_event_initialize yaml-initialize-assert-ok
+    event implicit-end get yaml_document_end_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
 
-! registers destructors (use with with-destructors)
 :: flush-emitter ( emitter event -- str )
     event yaml_stream_end_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted
