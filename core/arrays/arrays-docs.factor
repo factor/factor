@@ -50,7 +50,7 @@ HELP: <array>
 { $description "Creates a new array with the given length and all elements initially set to " { $snippet "elt" } "." } ;
 
 HELP: >array
-{ $values { "seq" "a sequence" } { "array" array } }
+{ $values { "seq" sequence } { "array" array } }
 { $description "Outputs a freshly-allocated array with the same elements as a given sequence." } ;
 
 HELP: 1array

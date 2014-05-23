@@ -19,7 +19,7 @@ HELP: math-upgrade
 { $examples { $example "USING: generic.math math kernel prettyprint ;" "fixnum bignum math-upgrade ." "[ [ >bignum ] dip ]" } } ;
 
 HELP: no-math-method
-{ $values { "left" "an object" } { "right" "an object" } { "generic" generic } }
+{ $values { "left" object } { "right" object } { "generic" generic } }
 { $description "Throws a " { $link no-math-method } " error." }
 { $error-description "Thrown by generic words using the " { $link math-combination } " method combination if there is no suitable method defined for the two inputs." } ;
 

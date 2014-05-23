@@ -1,12 +1,11 @@
-USING: help.markup help.syntax kernel math sequences quotations
-math.private byte-arrays strings ;
+USING: byte-arrays help.markup help.syntax sequences strings ;
 IN: checksums
 
 HELP: checksum
 { $class-description "The class of checksum algorithms." } ;
 
 HELP: hex-string
-{ $values { "seq" "a sequence" } { "str" "a string" } }
+{ $values { "seq" sequence } { "str" string } }
 { $description "Converts a sequence of values from 0-255 to a string of hex numbers from 0-ff." }
 { $examples
     { $example "USING: checksums io ;" "B{ 1 2 3 4 } hex-string print" "01020304" }

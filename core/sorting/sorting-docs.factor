@@ -23,24 +23,24 @@ $nl
 ABOUT: "sequences-sorting"
 
 HELP: sort
-{ $values { "seq" "a sequence" } { "quot" { $quotation ( obj1 obj2 -- <=> ) } } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( obj1 obj2 -- <=> ) } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "seq" } " into a new array using a stable sort." }
 { $notes "The algorithm used is the merge sort." } ;
 
 HELP: sort-with
-{ $values { "seq" "a sequence" } { "quot" { $quotation ( elt -- key ) } } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( elt -- key ) } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "seq" } " by applying " { $link compare } " with " { $snippet "quot" } " to each pair of elements in the sequence." } ;
 
 HELP: inv-sort-with
-{ $values { "seq" "a sequence" } { "quot" { $quotation ( elt -- key ) } } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( elt -- key ) } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "seq" } " by applying " { $link compare } " with " { $snippet "quot" } " to each pair of elements in the sequence and inverting the results." } ;
 
 HELP: sort-keys
-{ $values { "obj" "an object" } { "sortedseq" "a new sorted sequence" } }
+{ $values { "obj" object } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "obj" } " (converting to an alist first if not a sequence), comparing first elements of pairs using the " { $link <=> } " word." } ;
 
 HELP: sort-values
-{ $values { "obj" "an object" } { "sortedseq" "a new sorted sequence" } }
+{ $values { "obj" object } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "obj" } " (converting to an alist first if not a sequence), comparing second elements of pairs using the " { $link <=> } " word." } ;
 
 HELP: natural-sort
@@ -52,7 +52,7 @@ HELP: sort-pair
 { $description "If " { $snippet "a" } " is greater than " { $snippet "b" } ", exchanges " { $snippet "a" } " with " { $snippet "b" } "." } ;
 
 HELP: midpoint@
-{ $values { "seq" "a sequence" } { "n" integer } }
+{ $values { "seq" sequence } { "n" integer } }
 { $description "Outputs the index of the midpoint of " { $snippet "seq" } "." } ;
 
 { <=> compare natural-sort sort-with inv-sort-with sort-keys sort-values } related-words

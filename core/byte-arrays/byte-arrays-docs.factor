@@ -1,4 +1,4 @@
-USING: kernel help.markup help.syntax ;
+USING: kernel help.markup help.syntax sequences ;
 IN: byte-arrays
 
 ARTICLE: "byte-arrays" "Byte arrays"
@@ -39,7 +39,7 @@ HELP: (byte-array)
 { $description "Creates a new byte array with unspecified contents of length " { $snippet "n" } " bytes." } ;
 
 HELP: >byte-array
-{ $values { "seq" "a sequence" } { "byte-array" byte-array } }
+{ $values { "seq" sequence } { "byte-array" byte-array } }
 { $description "Outputs a freshly-allocated byte array whose elements have the same signed byte values as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than integers." } ;
 

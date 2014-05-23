@@ -10,7 +10,7 @@ HELP: gc
 { $description "Performs a full garbage collection." } ;
 
 HELP: size
-{ $values { "obj" "an object" } { "n" "a size in bytes" } }
+{ $values { "obj" object } { "n" "a size in bytes" } }
 { $description "Outputs the size of the object in memory, in bytes. Tagged immediate objects such as fixnums and " { $link f } " will yield a size of 0." } ;
 
 HELP: save-image
