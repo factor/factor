@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel assocs deques ;
+USING: accessors assocs deques kernel ;
 IN: search-deques
 
 TUPLE: search-deque assoc deque ;
@@ -28,14 +28,10 @@ M: search-deque push-back*
     ] if ;
 
 M: search-deque pop-front*
-    [ [ deque>> peek-front ] [ assoc>> ] bi delete-at ]
-    [ deque>> pop-front* ]
-    bi ;
+    [ deque>> pop-front ] [ assoc>> ] bi delete-at ;
 
 M: search-deque pop-back*
-    [ [ deque>> peek-back ] [ assoc>> ] bi delete-at ]
-    [ deque>> pop-back* ]
-    bi ;
+    [ deque>> pop-back ] [ assoc>> ] bi delete-at ;
 
 M: search-deque delete-node
     [ deque>> delete-node ]
