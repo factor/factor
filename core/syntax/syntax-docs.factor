@@ -361,7 +361,7 @@ HELP: B{
 
 HELP: H{
 { $syntax "H{ { key value }... }" }
-{ $values { "key" "an object" } { "value" "an object" } }
+{ $values { "key" object } { "value" object } }
 { $description "Marks the beginning of a literal hashtable, given as a list of two-element arrays holding key/value pairs. Literal hashtables are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
 
@@ -406,7 +406,7 @@ $nl
 
 HELP: W{
 { $syntax "W{ object }" }
-{ $values { "object" "an object" } }
+{ $values { "object" object } }
 { $description "Marks the beginning of a literal wrapper. Literal wrappers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: POSTPONE:

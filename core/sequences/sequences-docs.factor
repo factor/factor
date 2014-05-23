@@ -268,18 +268,18 @@ HELP: first4
 { $errors "Throws an error if the sequence has less than four elements." } ;
 
 HELP: array-capacity
-{ $values { "array" "an array" } { "n" "a non-negative fixnum" } }
+{ $values { "array" array } { "n" "a non-negative fixnum" } }
 { $class-description "A predicate class whose instances are valid array sizes for the current architecture. The minimum value is zero and the maximum value is " { $link max-array-capacity } "." }
 { $description "Low-level array length accessor." }
 { $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
 
 HELP: array-nth
-{ $values { "n" "a non-negative fixnum" } { "array" "an array" } { "elt" object } }
+{ $values { "n" "a non-negative fixnum" } { "array" array } { "elt" object } }
 { $description "Low-level array element accessor." }
 { $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory. User code must use " { $link nth } " instead." } ;
 
 HELP: set-array-nth
-{ $values { "elt" object } { "n" "a non-negative fixnum" } { "array" "an array" } }
+{ $values { "elt" object } { "n" "a non-negative fixnum" } { "array" array } }
 { $description "Low-level array element mutator." }
 { $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory. User code must use " { $link set-nth } " instead." } ;
 
@@ -1041,7 +1041,7 @@ HELP: supremum
 { min max supremum infimum } related-words
 
 HELP: produce
-{ $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "quot" { $quotation ( ..b -- ..a obj ) } } { "seq" "a sequence" } }
+{ $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "quot" { $quotation ( ..b -- ..a obj ) } } { "seq" sequence } }
 { $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence at the end." }
 { $examples
     "The following example divides a number by two until we reach zero, and accumulates intermediate results:"
@@ -1051,7 +1051,7 @@ HELP: produce
 } ;
 
 HELP: produce-as
-{ $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "quot" { $quotation ( ..b -- ..a obj ) } } { "exemplar" sequence } { "seq" "a sequence" } }
+{ $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "quot" { $quotation ( ..b -- ..a obj ) } } { "exemplar" sequence } { "seq" sequence } }
 { $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence of type " { $snippet "exemplar" } " at the end." }
 { $examples "See " { $link produce } " for examples." } ;
 
