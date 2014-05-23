@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays compiler.units continuations debugger
-fuel.pprint io io.streams.string kernel namespaces parser sequences
-vectors vocabs.parser ;
+USING: accessors arrays continuations debugger fuel.pprint io
+io.streams.string kernel listener namespaces sequences
+vocabs.parser ;
 
 IN: fuel.eval
 
@@ -61,7 +61,7 @@ t fuel-eval-res-flag set-global
     fuel-eval-output set-global fuel-send-retort fuel-pop-status ;
 
 : (fuel-eval) ( lines -- )
-    [ [ parse-lines ] with-compilation-unit call( -- ) ] curry
+    [ parse-lines-interactive call( -- ) ] curry
     [ [ fuel-eval-error set-global ] [ print-error ] bi ] recover ;
 
 : (fuel-eval-usings) ( usings -- )
