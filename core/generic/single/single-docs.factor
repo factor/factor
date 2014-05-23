@@ -1,9 +1,9 @@
-USING: generic help.markup help.syntax sequences math
-math.parser effects ;
+USING: effects generic help.markup help.syntax kernel math
+math.parser sequences ;
 IN: generic.single
 
 HELP: no-method
-{ $values { "object" "an object" } { "generic" "a generic word" } }
+{ $values { "object" object } { "generic" "a generic word" } }
 { $description "Throws a " { $link no-method } " error." }
 { $error-description "Thrown by the " { $snippet "generic" } " word to indicate it does not have a method for the class of " { $snippet "object" } "." } ;
 
