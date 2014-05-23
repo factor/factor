@@ -79,4 +79,4 @@ PRIVATE>
     [ clone ] dip [ <circular-iterator> ] dip (circular-while) ; inline
 
 : circular-loop ( ... circular quot: ( ... obj -- ... ? ) -- ... )
-  [ clone ] dip '[ [ first @ ] [ rotate-circular ] bi ] curry loop ; inline
+    [ clone ] dip '[ [ first @ ] [ rotate-circular ] bi ] curry loop ; inline
