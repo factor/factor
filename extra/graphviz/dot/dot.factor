@@ -51,7 +51,7 @@ M: subgraph dot.
 
 : attributes. ( attrs -- )
     "[" write
-    [ class-of "slots" word-prop ] [ tuple>array rest ] bi
+    [ class-of "slots" word-prop ] [ tuple-slots ] bi
     [ [ name>> ] dip attribute, ] 2each
     "]" write ;
 

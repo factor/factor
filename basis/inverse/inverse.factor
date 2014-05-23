@@ -259,7 +259,7 @@ DEFER: __
 
 : empty-inverse ( class -- quot )
     deconstruct-pred
-    [ tuple>array rest [ ] any? [ fail ] when ]
+    [ tuple-slots [ ] any? [ fail ] when ]
     compose ;
 
 \ new 1 [ ?wrapped empty-inverse ] define-pop-inverse

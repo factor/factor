@@ -93,7 +93,7 @@ M: tuple (serialize) ( obj -- )
         CHAR: T write1
         [ class-of (serialize) ]
         [ add-object ]
-        [ tuple>array rest (serialize) ]
+        [ tuple-slots (serialize) ]
         tri
     ] serialize-shared ;
 
