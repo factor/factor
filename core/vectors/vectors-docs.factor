@@ -1,6 +1,4 @@
-USING: arrays byte-arrays help.markup
-help.syntax kernel sbufs strings quotations sequences.private
-vectors.private combinators ;
+USING: help.markup help.syntax kernel sequences ;
 IN: vectors
 
 ARTICLE: "vectors" "Vectors"
@@ -37,7 +35,7 @@ HELP: <vector>
 { $description "Creates a new vector that can hold " { $snippet "n" } " elements before resizing." } ;
 
 HELP: >vector
-{ $values { "seq" "a sequence" } { "vector" vector } }
+{ $values { "seq" sequence } { "vector" vector } }
 { $description "Outputs a freshly-allocated vector with the same elements as a given sequence." } ;
 
 HELP: 1vector
