@@ -6,13 +6,11 @@
 !
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: namespaces sequences kernel math io math.functions
-io.binary strings classes words sbufs classes.tuple arrays
-vectors byte-arrays quotations hashtables hashtables.identity
-assocs help.syntax help.markup splitting io.streams.byte-array
-io.encodings.string io.encodings.utf8 io.encodings.binary
-combinators accessors locals prettyprint compiler.units
-sequences.private classes.tuple.private vocabs ;
+USING: accessors arrays assocs byte-arrays classes classes.tuple
+combinators hashtables hashtables.identity io io.binary
+io.encodings.binary io.encodings.string io.encodings.utf8
+io.streams.byte-array kernel locals math namespaces prettyprint
+quotations sequences sequences.private strings vocabs words ;
 IN: serialize
 
 GENERIC: (serialize) ( obj -- )
@@ -194,19 +192,17 @@ SYMBOL: deserialized
     (deserialize-string) dup intern-object ;
 
 : deserialize-word ( -- word )
-    (deserialize) (deserialize) 2dup [ require ] keep lookup-word
-    dup [ 2nip ] [
-        drop
+    (deserialize) (deserialize)
+    2dup [ require ] keep lookup-word [ 2nip ] [
         2array unparse "Unknown word: " prepend throw
-    ] if ;
+    ] if* ;
 
 : deserialize-gensym ( -- word )
-    gensym {
-        [ intern-object ]
-        [ (deserialize) define ]
-        [ (deserialize) >>props drop ]
-        [ ]
-    } cleave ;
+    gensym
+    [ intern-object ]
+    [ (deserialize) define ]
+    [ (deserialize) >>props ]
+    tri ;
 
 : deserialize-wrapper ( -- wrapper )
     (deserialize) <wrapper> ;
@@ -228,8 +224,8 @@ SYMBOL: deserialized
 : deserialize-hashtable ( -- hashtable )
     H{ } clone
     [ intern-object ]
-    [ (deserialize) assoc-union! drop ]
-    [ ] tri ;
+    [ (deserialize) assoc-union! ]
+    bi ;
 
 : copy-seq-to-tuple ( seq tuple -- )
     [ set-array-nth ] curry each-index ;
@@ -277,8 +273,7 @@ SYMBOL: deserialized
 PRIVATE>
 
 : deserialize ( -- obj )
-    V{ } clone deserialized
-    [ (deserialize) ] with-variable ;
+    V{ } clone deserialized [ (deserialize) ] with-variable ;
 
 : serialize ( obj -- )
     IH{ } clone serialized [ (serialize) ] with-variable ;
