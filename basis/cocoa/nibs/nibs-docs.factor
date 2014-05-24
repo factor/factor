@@ -1,4 +1,4 @@
-USING: help.markup help.syntax strings ;
+USING: help.markup help.syntax sequences strings ;
 IN: cocoa.nibs
 
 HELP: load-nib
@@ -11,6 +11,6 @@ HELP: nib-named
 { $see-also nib-objects } ;
 
 HELP: nib-objects
-{ $values { "anNSNib" "an instance of NSNib" } { "objects/f" "a sequence" } }
+{ $values { "anNSNib" "an instance of NSNib" } { "objects/f" { $maybe sequence } } }
 { $description "Instantiates the top-level objects of the " { $snippet ".nib" } " file loaded by anNSNib.  First create an NSNib instance using " { $link nib-named } "." } 
 { $see-also nib-named } ;

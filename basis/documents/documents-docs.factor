@@ -1,4 +1,5 @@
-USING: help.markup help.syntax math models strings sequences ;
+USING: help.markup help.syntax kernel math models sequences
+strings ;
 IN: documents
 
 HELP: +col
@@ -20,7 +21,7 @@ HELP: =line
 { $description "Sets the line number of a line/column pair." } ;
 
 HELP: lines-equal?
-{ $values { "loc1" "a pair of integers" } { "loc2" "a pair of integers" } { "?" "a boolean" } }
+{ $values { "loc1" "a pair of integers" } { "loc2" "a pair of integers" } { "?" boolean } }
 { $description "Tests if both line/column pairs have the same line number." } ;
 
 HELP: document

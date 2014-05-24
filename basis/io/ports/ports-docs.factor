@@ -72,5 +72,5 @@ HELP: (wait-to-read)
 { $contract "Suspends the current thread until the port's buffer has data available for reading." } ;
 
 HELP: wait-to-read
-{ $values { "port" input-port } { "eof?" "a boolean" } }
+{ $values { "port" input-port } { "eof?" boolean } }
 { $description "If the port's buffer has unread data, returns immediately, otherwise suspends the current thread until some data is available for reading. If the buffer was empty and no more data could be read, outputs " { $link t } " to indicate end-of-file; otherwise outputs " { $link f } "." } ;

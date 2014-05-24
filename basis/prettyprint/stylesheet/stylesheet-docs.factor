@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Keith Lazuka.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel words ;
+USING: help.markup help.syntax kernel strings words ;
 IN: prettyprint.stylesheet
 
 HELP: effect-style
@@ -12,7 +12,7 @@ HELP: effect-style
 
 HELP: string-style
 { $values
-    { "str" "a string" }
+    { "str" string }
     { "style" "a style assoc" }
 }
 { $description "The stylesheet for string literals" } ;
@@ -26,7 +26,7 @@ HELP: vocab-style
 
 HELP: word-style
 { $values
-    { "word" "a word" }
+    { "word" word }
     { "style" "a style assoc" }
 }
 { $description "The stylesheet for word names" } ;

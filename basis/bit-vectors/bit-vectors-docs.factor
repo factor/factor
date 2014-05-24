@@ -1,5 +1,4 @@
-USING: arrays bit-arrays help.markup help.syntax kernel
-combinators ;
+USING: help.markup help.syntax sequences ;
 IN: bit-vectors
 
 ARTICLE: "bit-vectors" "Bit vectors"
@@ -30,7 +29,7 @@ HELP: <bit-vector>
 { $description "Creates a new bit vector that can hold " { $snippet "n" } " bits before resizing." } ;
 
 HELP: >bit-vector
-{ $values { "seq" "a sequence" } { "vector" bit-vector } }
+{ $values { "seq" sequence } { "vector" bit-vector } }
 { $description "Outputs a freshly-allocated bit vector with the same elements as a given sequence." } ;
 
 HELP: ?V{

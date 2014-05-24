@@ -1,8 +1,8 @@
-USING: help.markup help.syntax strings ;
+USING: help.markup help.syntax kernel strings ;
 IN: vocabs.refresh
 
 HELP: source-modified?
-{ $values { "path" "a pathname string" } { "?" "a boolean" } }
+{ $values { "path" "a pathname string" } { "?" boolean } }
 { $description "Tests if the source file has been modified since it was last loaded. This compares the file's CRC32 checksum of the file's contents against the previously-recorded value." } ;
 
 HELP: refresh

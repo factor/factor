@@ -14,7 +14,7 @@ HELP: equiv-set-size
 { $description "Outputs the number of elements in the equivalence class of " { $snippet "a" } "." } ;
 
 HELP: equiv?
-{ $values { "a" object } { "b" object } { "disjoint-set" disjoint-set } { "?" "a boolean" } }
+{ $values { "a" object } { "b" object } { "disjoint-set" disjoint-set } { "?" boolean } }
 { $description "Tests if two elements belong to the same equivalence class." } ;
 
 HELP: equate

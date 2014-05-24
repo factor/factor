@@ -1,7 +1,6 @@
 USING: alien.accessors alien.c-types alien.libraries
-alien.syntax arrays byte-arrays compiler cpu.x86
-debugger definitions eval help.markup help.syntax io io.backend
-kernel libc math parser quotations sequences system ;
+alien.syntax byte-arrays cpu.x86 eval help.markup help.syntax io
+io.backend kernel math quotations sequences system ;
 IN: alien
 
 HELP: cdecl
@@ -41,11 +40,11 @@ HELP: dll
 { $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information." } ;
 
 HELP: dll-valid?
-{ $values { "dll" dll } { "?" "a boolean" } }
+{ $values { "dll" dll } { "?" boolean } }
 { $description "Returns true if the library exists and is loaded." } ;
 
 HELP: expired?
-{ $values { "c-ptr" c-ptr } { "?" "a boolean" } }
+{ $values { "c-ptr" c-ptr } { "?" boolean } }
 { $description "Tests if the alien is a relic from an earlier session. A byte array is never considered to have expired, whereas passing " { $link f } " always yields true." } ;
 
 HELP: <bad-alien>
@@ -53,7 +52,7 @@ HELP: <bad-alien>
 { $description "Constructs an invalid alien pointer that has expired." } ;
 
 HELP: <displaced-alien>
-{ $values { "displacement" "an integer" } { "c-ptr" c-ptr } { "alien" "a new alien" } }
+{ $values { "displacement" integer } { "c-ptr" c-ptr } { "alien" "a new alien" } }
 { $description "Creates a new alien address object, wrapping a raw memory address. The alien points to a location in memory which is offset by " { $snippet "displacement" } " from the address of " { $snippet "c-ptr" } "." }
 { $notes "Passing a value of " { $link f } " for " { $snippet "c-ptr" } " creates an alien with an absolute address; this is how " { $link <alien> } " is implemented."
 $nl

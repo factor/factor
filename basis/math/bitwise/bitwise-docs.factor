@@ -210,7 +210,7 @@ HELP: mask-bit
 HELP: mask?
 { $values
      { "x" integer } { "n" integer }
-     { "?" "a boolean" }
+     { "?" boolean }
 }
 { $description "Returns true if all of the bits in the mask " { $snippet "n" } " are set in the integer input " { $snippet "x" } "." }
 { $examples
@@ -310,7 +310,7 @@ HELP: unmask
 HELP: unmask?
 { $values
      { "x" integer } { "n" integer }
-     { "?" "a boolean" }
+     { "?" boolean }
 }
 { $description "Tests whether unmasking the bits in " { $snippet "x" } " would return an integer greater than zero." }
 { $examples

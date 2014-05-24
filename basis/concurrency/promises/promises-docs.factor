@@ -1,7 +1,6 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: concurrency.messaging kernel arrays
-continuations help.markup help.syntax quotations calendar ;
+USING: calendar help.markup help.syntax kernel ;
 IN: concurrency.promises
 
 HELP: promise
@@ -12,7 +11,7 @@ HELP: <promise>
 { $description "Creates a new promise which may be fulfilled by calling " { $link fulfill } "." } ;
 
 HELP: promise-fulfilled?
-{ $values { "promise" promise } { "?" "a boolean" } }
+{ $values { "promise" promise } { "?" boolean } }
 { $description "Tests if " { $link fulfill } " has previously been called on the promise, in which case " { $link ?promise } " will return immediately without blocking." } ;
 
 HELP: ?promise-timeout

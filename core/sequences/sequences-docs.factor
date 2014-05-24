@@ -1,6 +1,5 @@
-USING: arrays help.markup help.syntax math
-sequences.private vectors strings kernel math.order layouts
-quotations generic.single ;
+USING: arrays generic.single help.markup help.syntax kernel
+layouts math math.order quotations sequences.private vectors ;
 IN: sequences
 
 HELP: sequence
@@ -77,7 +76,7 @@ $nl
 { $notes "Unlike " { $link clone-like } ", the output sequence might share storage with the input sequence." } ;
 
 HELP: empty?
-{ $values { "seq" sequence } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "?" boolean } }
 { $description "Tests if the sequence has zero length." } ;
 
 HELP: if-empty
@@ -163,7 +162,7 @@ HELP: push
 { $side-effects "seq" } ;
 
 HELP: bounds-check?
-{ $values { "n" "an integer" } { "seq" sequence } { "?" "a boolean" } }
+{ $values { "n" integer } { "seq" sequence } { "?" boolean } }
 { $description "Tests if the index is within the bounds of the sequence." } ;
 
 HELP: bounds-error
@@ -176,11 +175,11 @@ HELP: bounds-check
 { $description "Throws an error if " { $snippet "n" } " is negative or if it is greater than or equal to the length of " { $snippet "seq" } ". Otherwise the two inputs remain on the stack." } ;
 
 HELP: ?nth
-{ $values { "n" "an integer" } { "seq" sequence } { "elt/f" "an object or " { $link f } } }
+{ $values { "n" integer } { "seq" sequence } { "elt/f" "an object or " { $link f } } }
 { $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
 
 HELP: ?set-nth
-{ $values { "elt" object } { "n" "an integer" } { "seq" sequence } }
+{ $values { "elt" object } { "n" integer } { "seq" sequence } }
 { $description "A forgiving version of " { $link set-nth } ".  If the index is out of bounds, does nothing." } ;
 
 HELP: ?first
@@ -209,11 +208,11 @@ HELP: ?last
 { $description "A forgiving version of " { $link last } ". If the sequence is empty, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
 
 HELP: nth-unsafe
-{ $values { "n" "an integer" } { "seq" sequence } { "elt" object } }
+{ $values { "n" integer } { "seq" sequence } { "elt" object } }
 { $contract "Unsafe variant of " { $link nth } " that does not perform bounds checks." } ;
 
 HELP: set-nth-unsafe
-{ $values { "elt" object } { "n" "an integer" } { "seq" sequence } }
+{ $values { "elt" object } { "n" integer } { "seq" sequence } }
 { $contract "Unsafe variant of " { $link set-nth } " that does not perform bounds checks." } ;
 
 HELP: exchange-unsafe
@@ -428,7 +427,7 @@ HELP: 3map-as
 { $description "Applies the quotation to each triple of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: 2all?
-{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... ? ) } } { "?" "a boolean" } }
+{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... ? ) } } { "?" boolean } }
 { $description "Tests the predicate pairwise against elements of " { $snippet "seq1" } " and " { $snippet "seq2" } "." } ;
 
 HELP: find
@@ -474,11 +473,11 @@ HELP: map-find
 { $description "Applies the quotation to each element of the sequence, until the quotation outputs a true value. If the quotation ever yields a result which is not " { $link f } ", then the value is output, along with the element of the sequence which yielded this." } ;
 
 HELP: any?
-{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" boolean } }
 { $description "Tests if the sequence contains an element satisfying the predicate, by applying the predicate to each element in turn until a true value is found. If the sequence is empty or if the end of the sequence is reached, outputs " { $link f } "." } ;
 
 HELP: all?
-{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" boolean } }
 { $description "Tests if all elements in the sequence satisfy the predicate by checking each element in turn. Given an empty sequence, vacuously outputs " { $link t } "." } ;
 
 HELP: push-if
@@ -500,7 +499,7 @@ HELP: filter!
 { $side-effects "seq" } ;
 
 HELP: interleave
-{ $values { "seq" sequence } { "between" "a quotation" } { "quot" { $quotation ( ... elt -- ... ) } } }
+{ $values { "seq" sequence } { "between" quotation } { "quot" { $quotation ( ... elt -- ... ) } } }
 { $description "Applies " { $snippet "quot" } " to each element in turn, also invoking " { $snippet "between" } " in-between each pair of elements." }
 { $examples { $example "USING: io sequences ;" "{ \"a\" \"b\" \"c\" } [ \"X\" write ] [ write ] interleave" "aXbXc" } } ;
 
@@ -521,12 +520,12 @@ HELP: last-index-from
 { $description "Outputs the index of the last element in the sequence equal to " { $snippet "obj" } ", traversing the sequence backwards starting from the " { $snippet "i" } "th element and finishing at the first. If no element is found, outputs " { $link f } "." } ;
 
 HELP: member?
-{ $values { "elt" object } { "seq" sequence } { "?" "a boolean" } }
+{ $values { "elt" object } { "seq" sequence } { "?" boolean } }
 { $description "Tests if the sequence contains an element equal to the object." }
 { $notes "This word uses equality comparison (" { $link = } ")." } ;
 
 HELP: member-eq?
-{ $values { "elt" object } { "seq" sequence } { "?" "a boolean" } }
+{ $values { "elt" object } { "seq" sequence } { "?" boolean } }
 { $description "Tests if the sequence contains the object." }
 { $notes "This word uses identity comparison (" { $link eq? } ")." } ;
 
@@ -695,7 +694,7 @@ HELP: pad-tail
 { $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-tail print ] each" "ab---\nquux-" } } ;
 
 HELP: sequence=
-{ $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
+{ $values { "seq1" sequence } { "seq2" sequence } { "?" boolean } }
 { $description "Tests if the two sequences have the same length and elements. This is weaker than " { $link = } ", since it does not ensure that the sequences are instances of the same class." } ;
 
 HELP: reversed
@@ -947,11 +946,11 @@ HELP: tail*
 { $errors "Throws an error if the index is out of bounds." } ;
 
 HELP: shorter?
-{ $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
+{ $values { "seq1" sequence } { "seq2" sequence } { "?" boolean } }
 { $description "Tests if the length of " { $snippet "seq1" } " is smaller than the length of " { $snippet "seq2" } "." } ;
 
 HELP: head?
-{ $values { "seq" sequence } { "begin" sequence } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "begin" sequence } { "?" boolean } }
 { $description "Tests if " { $snippet "seq" } " starts with " { $snippet "begin" } ". If " { $snippet "begin" } " is longer than " { $snippet "seq" } ", this word outputs " { $link f } "." }
 { $examples
   { $example
@@ -962,7 +961,7 @@ HELP: head?
 } ;
 
 HELP: tail?
-{ $values { "seq" sequence } { "end" sequence } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "end" sequence } { "?" boolean } }
 { $description "Tests if " { $snippet "seq" } " ends with " { $snippet "end" } ". If " { $snippet "end" } " is longer than " { $snippet "seq" } ", this word outputs " { $link f } "." } ;
 
 { remove remove-nth remove-eq remove-eq! remove! remove-nth! } related-words
@@ -990,7 +989,7 @@ HELP: start
 { $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", or " { $link f } " if no matching subsequence is found." } ;
 
 HELP: subseq?
-{ $values { "subseq" sequence } { "seq" sequence } { "?" "a boolean" } }
+{ $values { "subseq" sequence } { "seq" sequence } { "?" boolean } }
 { $description "Tests if " { $snippet "seq" } " contains the elements of " { $snippet "subseq" } " as a contiguous subsequence." } ;
 
 HELP: drop-prefix

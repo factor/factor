@@ -1,4 +1,4 @@
-USING: strings help.markup help.syntax assocs urls ;
+USING: assocs help.markup help.syntax kernel strings ;
 IN: urls.encoding
 
 HELP: url-decode
@@ -14,7 +14,7 @@ HELP: url-encode-full
 { $description "URL-encodes a string, including all reserved characters, such as \"/\"." } ;
 
 HELP: url-quotable?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $values { "ch" "a character" } { "?" boolean } }
 { $description "Tests if a character be used without URL-encoding in a URL." } ;
 
 HELP: assoc>query

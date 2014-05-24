@@ -256,7 +256,7 @@ HELP: polar>
 { $description "Converts an absolute value and argument (polar form) to a complex number." } ;
 
 HELP: [-1,1]?
-{ $values { "x" number } { "?" "a boolean" } }
+{ $values { "x" number } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is a real number between -1 and 1, inclusive." } ;
 
 HELP: abs
@@ -286,7 +286,7 @@ HELP: gcd
 { $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "y" } " modulo " { $snippet "x" } "." } ;
 
 HELP: divisor?
-{ $values { "m" integer } { "n" integer } { "?" "a boolean" } }
+{ $values { "m" integer } { "n" integer } { "?" boolean } }
 { $description "Tests if " { $snippet "n" } " is a divisor of " { $snippet "m" } ". This is the same thing as asking if " { $snippet "m" } " is divisible by " { $snippet "n" } "." }
 { $notes "Returns t for both negative and positive divisors, as well as for trivial and non-trivial divisors." } ;
 
@@ -304,7 +304,7 @@ HELP: ^mod
 { $description "Outputs the result of computing " { $snippet "x^y mod n" } "." } ;
 
 HELP: ~
-{ $values { "x" real } { "y" real } { "epsilon" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "epsilon" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " and " { $snippet "y" } " are approximately equal to each other. There are three possible comparison tests, chosen based on the sign of " { $snippet "epsilon" } ":"
     { $list
         { { $snippet "epsilon" } " is zero: exact comparison." }

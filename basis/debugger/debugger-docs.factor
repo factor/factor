@@ -1,7 +1,6 @@
-USING: alien arrays generic generic.math help.markup help.syntax
-kernel math memory strings sbufs vectors io io.files classes
-help generic.single continuations io.files.private listener
-alien.libraries ;
+USING: alien alien.libraries arrays continuations generic.math
+generic.single help help.markup help.syntax io kernel math
+quotations sbufs strings vectors ;
 IN: debugger
 
 ARTICLE: "debugger" "The debugger"
@@ -48,7 +47,7 @@ HELP: :c
 { $description "Prints the call stack at the time of the most recent error. Used for interactive debugging." } ;
 
 HELP: :get
-{ $values { "variable" "an object" } { "value" "the value, or f" } }
+{ $values { "variable" object } { "value" "the value, or f" } }
 { $description "Looks up the value of a variable at the time of the most recent error." } ;
 
 HELP: :res
@@ -84,7 +83,7 @@ HELP: restarts.
 { $description "Print a list of restarts for the most recently thrown error to " { $link output-stream } "." } ;
 
 HELP: try
-{ $values { "quot" "a quotation" } }
+{ $values { "quot" quotation } }
 { $description "Attempts to call a quotation; if it throws an error, the error is printed to " { $link output-stream } ", stacks are restored, and execution continues after the call to " { $link try } "." }
 { $examples
     "The following example prints an error and keeps going:"

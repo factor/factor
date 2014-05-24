@@ -92,7 +92,7 @@ HELP: adjoin
 { $side-effects "set" } ;
 
 HELP: ?adjoin
-{ $values { "elt" object } { "set" set } { "?" "a boolean" } }
+{ $values { "elt" object } { "set" set } { "?" boolean } }
 { $description "A version of " { $link adjoin } " which returns whether the element was added to the set." }
 { $notes "This is slightly less efficient than " { $link adjoin } " due to the initial membership test." } ;
 
@@ -111,7 +111,7 @@ HELP: members
 { $description "Creates a sequence with a single copy of each member of the set." $nl "Each set type is expected to implement a method on this generic word." } ;
 
 HELP: in?
-{ $values { "elt" object } { "set" set } { "?" "a boolean" } }
+{ $values { "elt" object } { "set" set } { "?" boolean } }
 { $description "Tests whether the element is a member of the set." $nl "Each set type is expected to implement a method on this generic word as part of the set protocol." } ;
 
 HELP: adjoin-at
@@ -127,7 +127,7 @@ HELP: duplicates
 } ;
 
 HELP: all-unique?
-{ $values { "set" set } { "?" "a boolean" } }
+{ $values { "set" set } { "?" boolean } }
 { $description "Tests whether a set contains any repeated elements." }
 { $example
     "USING: sets prettyprint ;"
@@ -151,7 +151,7 @@ HELP: intersect
 } ;
 
 HELP: intersection
-{ $values { "sets" sequence } { "set/f" "a " { $link set } " or " { $link f } } }
+{ $values { "sets" sequence } { "set/f" { $maybe set } } }
 { $description "Outputs the intersection of all the sets of the sequence " { $snippet "sets" } ", or " { $link f } " if " { $snippet "sets" } " is empty." } ;
 
 HELP: union
@@ -179,17 +179,17 @@ HELP: intersect!
 { $side-effects "set1" } ;
 
 HELP: intersects?
-{ $values { "set1" set } { "set2" set } { "?" "a boolean" } }
+{ $values { "set1" set } { "set2" set } { "?" boolean } }
 { $description "Tests if " { $snippet "set1" } " and " { $snippet "set2" } " have any elements in common." }
 { $notes "If one of the sets is empty, the result is always " { $link f } "." } ;
 
 HELP: subset?
-{ $values { "set1" set } { "set2" set } { "?" "a boolean" } }
+{ $values { "set1" set } { "set2" set } { "?" boolean } }
 { $description "Tests if every element of " { $snippet "set1" } " is contained in " { $snippet "set2" } "." }
 { $notes "If " { $snippet "set1" } " is empty, the result is always " { $link t } "." } ;
 
 HELP: set=
-{ $values { "set1" set } { "set2" set } { "?" "a boolean" } }
+{ $values { "set1" set } { "set2" set } { "?" boolean } }
 { $description "Tests if both sets contain the same elements, disregrading order and duplicates." } ;
 
 HELP: gather
@@ -214,7 +214,7 @@ HELP: without
 { $description "Returns the subsequence of the given sequence consisting of things that are not members of the set. This may contain duplicates, if the sequence has duplicates." } ;
 
 HELP: null?
-{ $values { "set" set } { "?" "a boolean" } }
+{ $values { "set" set } { "?" boolean } }
 { $description "Tests whether the given set is empty. This outputs " { $snippet "t" } " when given a null set of any type." } ;
 
 HELP: cardinality
@@ -222,5 +222,5 @@ HELP: cardinality
 { $description "Returns the number of elements in the set. All sets support this operation." } ;
 
 HELP: combine
-{ $values { "sets" "a sequence of sets" } { "set/f" "a " { $link set } " or " { $link f } } }
+{ $values { "sets" "a sequence of sets" } { "set/f" { $maybe set } } }
 { $description "Outputs the union of a sequence of sets, or " { $link f } " if the sequence is empty." } ;
