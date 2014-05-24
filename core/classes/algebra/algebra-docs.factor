@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel classes classes.private words
-checksums checksums.crc32 sequences math ;
+USING: classes classes.private help.markup help.syntax kernel
+math sequences ;
 IN: classes.algebra
 
 ARTICLE: "class-operations" "Class operations"
@@ -45,7 +45,7 @@ HELP: flatten-class
 { $description "Outputs a set of builtin and tuple classes whose union is the smallest cover of " { $snippet "class" } "." } ;
 
 HELP: class<=
-{ $values { "first" "a class" } { "second" "a class" } { "?" "a boolean" } }
+{ $values { "first" "a class" } { "second" "a class" } { "?" boolean } }
 { $description "Tests if all instances of " { $snippet "class1" } " are also instances of " { $snippet "class2" } "." }
 { $notes "Classes are partially ordered. This means that if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class1" } ", then " { $snippet "class1 <= class2" } ". Also, if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class3" } ", then " { $snippet "class1 <= class3" } "." } ;
 
@@ -62,7 +62,7 @@ HELP: class-and
 { $description "Outputs the largest anonymous class contained in both " { $snippet "class1" } " and " { $snippet "class2" } "." } ;
 
 HELP: classes-intersect?
-{ $values { "first" class } { "second" class } { "?" "a boolean" } }
+{ $values { "first" class } { "second" class } { "?" boolean } }
 { $description "Tests if two classes have a non-empty intersection. If the intersection is empty, no object can be an instance of both classes at once." } ;
 
 HELP: smallest-class

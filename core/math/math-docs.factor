@@ -1,9 +1,8 @@
-USING: help.markup help.syntax kernel sequences quotations
-math.private byte-arrays io.binary ;
+USING: help.markup help.syntax kernel quotations sequences ;
 IN: math
 
 HELP: number=
-{ $values { "x" number } { "y" number } { "?" "a boolean" } }
+{ $values { "x" number } { "y" number } { "?" boolean } }
 { $description "Tests if two numbers have the same numeric value." }
 { $notes "This word differs from " { $link = } " in that it disregards differences in type when comparing numbers."
 $nl
@@ -187,7 +186,7 @@ $nl
 "Due to the two's complement representation of signed integers, the following two lines are equivalent:" { $code "bitnot" "neg 1 -" } } ;
 
 HELP: bit?
-{ $values { "x" integer } { "n" integer } { "?" "a boolean" } }
+{ $values { "x" integer } { "n" integer } { "?" boolean } }
 { $description "Tests if the " { $snippet "n" } "th bit of " { $snippet "x" } " is set." }
 { $examples { $example "USING: math prettyprint ;" "0b101 2 bit? ." "t" } } ;
 
@@ -251,7 +250,7 @@ HELP: 2^
 { $description "Computes two to the power of " { $snippet "n" } ". This word will only give correct results if " { $snippet "n" } " is greater than zero; for the general case, use " { $snippet "2 swap ^" } "." } ;
 
 HELP: zero?
-{ $values { "x" number } { "?" "a boolean" } }
+{ $values { "x" number } { "?" boolean } }
 { $description "Tests if the number is equal to zero." } ;
 
 HELP: if-zero
@@ -338,23 +337,23 @@ HELP: fp-bitwise=
 } ;
 
 HELP: fp-special?
-{ $values { "x" real } { "?" "a boolean" } }
+{ $values { "x" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is an IEEE special value (Not-a-Number or Infinity). While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
 
 HELP: fp-nan?
-{ $values { "x" real } { "?" "a boolean" } }
+{ $values { "x" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is an IEEE Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
 
 HELP: fp-qnan?
-{ $values { "x" real } { "?" "a boolean" } }
+{ $values { "x" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is an IEEE Quiet Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
 
 HELP: fp-snan?
-{ $values { "x" real } { "?" "a boolean" } }
+{ $values { "x" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is an IEEE Signaling Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
 
 HELP: fp-infinity?
-{ $values { "x" real } { "?" "a boolean" } }
+{ $values { "x" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is an IEEE Infinity value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." }
 { $examples
     { $example "USING: math prettyprint ;" "1/0. fp-infinity? ." "t" }
@@ -362,7 +361,7 @@ HELP: fp-infinity?
 } ;
 
 HELP: fp-sign
-{ $values { "x" float } { "?" "a boolean" } }
+{ $values { "x" float } { "?" boolean } }
 { $description "Outputs the sign bit of " { $snippet "x" } ". For ordered non-zero values, this is equivalent to calling " { $snippet "0 <" } ". For zero values, this outputs the zero's sign bit." } ;
 
 HELP: fp-nan-payload
@@ -406,11 +405,11 @@ HELP: number
 { $class-description "The class of numbers." } ;
 
 HELP: next-power-of-2
-{ $values { "m" "a non-negative integer" } { "n" "an integer" } }
+{ $values { "m" "a non-negative integer" } { "n" integer } }
 { $description "Outputs the smallest power of 2 greater than or equal to " { $snippet "m" } ". The output value is always at least 2." } ;
 
 HELP: power-of-2?
-{ $values { "n" integer } { "?" "a boolean" } }
+{ $values { "n" integer } { "?" boolean } }
 { $description "Tests if " { $snippet "n" } " is a power of 2." } ;
 
 HELP: each-integer
@@ -419,7 +418,7 @@ HELP: each-integer
 { $notes "This word is used to implement " { $link each } "." } ;
 
 HELP: all-integers?
-{ $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "?" "a boolean" } }
+{ $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "?" boolean } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs " { $link f } " or the end is reached. If the quotation yields a false value for some integer, this word outputs " { $link f } ". Otherwise, this word outputs " { $link t } "." }
 { $notes "This word is used to implement " { $link all? } "." } ;
 

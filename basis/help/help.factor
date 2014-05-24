@@ -16,7 +16,7 @@ GENERIC: word-help* ( word -- content )
     ] ?if ;
 
 : $predicate ( element -- )
-    { { "object" object } { "?" "a boolean" } } $values
+    { { "object" object } { "?" boolean } } $values
     [
         "Tests if the object is an instance of the " ,
         first "predicating" word-prop <$link> ,

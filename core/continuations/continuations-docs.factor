@@ -1,6 +1,5 @@
-USING: help.markup help.syntax kernel kernel.private
-continuations.private vectors arrays namespaces
-assocs words quotations lexer sequences math ;
+USING: continuations.private help.markup help.syntax kernel
+kernel.private lexer namespaces quotations sequences vectors ;
 IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable errors"
@@ -216,7 +215,7 @@ HELP: throw-continue
 { $description "Throws a resumable error. If the user elects to continue execution, this word returns normally." } ;
 
 HELP: compute-restarts
-{ $values { "error" object } { "seq" "a sequence" } }
+{ $values { "error" object } { "seq" sequence } }
 { $description "Outputs a sequence of triples, where each triple consists of a human-readable string, an object, and a continuation. Resuming a continuation with the corresponding object restarts execution immediately after the corresponding call to " { $link condition } "."
 $nl
 "This word recursively travels up the delegation chain to collate restarts from nested and wrapped conditions." } ;

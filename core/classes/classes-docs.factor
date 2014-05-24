@@ -1,7 +1,5 @@
-USING: help.markup help.syntax kernel kernel.private
-namespaces sequences words arrays effects math
-classes.private classes.union classes.mixin
-classes.predicate quotations ;
+USING: classes.private help.markup help.syntax kernel quotations
+sequences words ;
 IN: classes
 
 ARTICLE: "class-predicates" "Class predicate words"
@@ -87,7 +85,7 @@ HELP: update-map
 { $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
 
 HELP: predicate-word
-{ $values { "word" "a word" } { "predicate" "a predicate word" } }
+{ $values { "word" word } { "predicate" "a predicate word" } }
 { $description "Suffixes the word's name with \"?\" and creates a word with that name in the same vocabulary as the word itself." } ;
 
 HELP: define-predicate
@@ -153,7 +151,7 @@ HELP: implementors
 HELP: instance?
 { $values
      { "object" object } { "class" class }
-     { "?" "a boolean" } }
+     { "?" boolean } }
 { $description "Tests whether the input object is a member of the class." } ;
 
 HELP: reset-class

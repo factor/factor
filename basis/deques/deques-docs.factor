@@ -3,7 +3,7 @@ quotations ;
 IN: deques
 
 HELP: deque-empty?
-{ $values { "deque" deque } { "?" "a boolean" } }
+{ $values { "deque" deque } { "?" boolean } }
 { $contract "Returns true if a deque is empty." }
 { $notes "This operation is O(1)." } ;
 
@@ -15,7 +15,7 @@ HELP: clear-deque
 HELP: deque-member?
 { $values
      { "value" object } { "deque" deque }
-     { "?" "a boolean" } }
+     { "?" boolean } }
 { $description "Returns true if the " { $snippet "value" } " is found in the deque." } ;
 
 HELP: push-front

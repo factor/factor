@@ -1,6 +1,6 @@
 IN: io.monitors
-USING: help.markup help.syntax continuations destructors
-concurrency.mailboxes quotations ;
+USING: concurrency.mailboxes destructors help.markup help.syntax
+kernel quotations ;
 
 HELP: with-monitors
 { $values { "quot" quotation } }
@@ -8,12 +8,12 @@ HELP: with-monitors
 { $errors "Throws an error if the platform does not support file system change monitors." } ;
 
 HELP: <monitor>
-{ $values { "path" "a pathname string" } { "recursive?" "a boolean" } { "monitor" "a new monitor" } }
+{ $values { "path" "a pathname string" } { "recursive?" boolean } { "monitor" "a new monitor" } }
 { $contract "Opens a file system change monitor which listens for changes on " { $snippet "path" } ". The boolean indicates whether changes in subdirectories should be reported." }
 { $errors "Throws an error if the pathname does not exist, if a monitor could not be created or if the platform does not support monitors." } ;
 
 HELP: (monitor)
-{ $values { "path" "a pathname string" } { "recursive?" "a boolean" } { "mailbox" mailbox } { "monitor" "a new monitor" } }
+{ $values { "path" "a pathname string" } { "recursive?" boolean } { "mailbox" mailbox } { "monitor" "a new monitor" } }
 { $contract "Opens a file system change monitor which listens for changes on " { $snippet "path" } " and posts notifications to " { $snippet "mailbox" } " as triples with shape " { $snippet "{ path changed monitor } " } ". The boolean indicates whether changes in subdirectories should be reported." }
 { $errors "Throws an error if the pathname does not exist, if a monitor could not be created or if the platform does not support monitors." } ;
 
@@ -26,7 +26,7 @@ HELP: next-change
 { $errors "Throws an error if the monitor is closed from another thread." } ;
 
 HELP: with-monitor
-{ $values { "path" "a pathname string" } { "recursive?" "a boolean" } { "quot" { $quotation ( monitor -- ) } } }
+{ $values { "path" "a pathname string" } { "recursive?" boolean } { "quot" { $quotation ( monitor -- ) } } }
 { $description "Opens a file system change monitor and passes it to the quotation. Closes the monitor after the quotation returns or throws an error." }
 { $errors "Throws an error if the pathname does not exist, if a monitor could not be created or if the platform does not support monitors." } ;
 

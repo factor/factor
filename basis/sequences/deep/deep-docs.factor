@@ -26,7 +26,7 @@ HELP: deep-find
 { $see-also find } ;
 
 HELP: deep-any?
-{ $values { "obj" object } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" "a boolean" } }
+{ $values { "obj" object } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" boolean } }
 { $description "Tests whether the given object or any subnode satisfies the given quotation." }
 { $see-also any? } ;
 

@@ -1,6 +1,5 @@
-USING: definitions help.markup help.syntax kernel parser
-kernel.private vocabs classes quotations sequences
-strings effects compiler.units ;
+USING: classes compiler.units definitions effects help.markup
+help.syntax kernel parser quotations sequences strings vocabs ;
 IN: words
 
 ARTICLE: "interned-words" "Looking up and creating words"
@@ -316,7 +315,7 @@ HELP: bootstrap-word
 { $description "Looks up a word with the same name and vocabulary as the given word, performing a transformation to handle parsing words in the target dictionary. Used during bootstrap to transfer host words to the target dictionary." } ;
 
 HELP: parsing-word?
-{ $values { "object" object } { "?" "a boolean" } }
+{ $values { "object" object } { "?" boolean } }
 { $description "Tests if an object is a parsing word declared by " { $link POSTPONE: SYNTAX: } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
@@ -337,12 +336,12 @@ HELP: define-temp
 } ;
 
 HELP: delimiter?
-{ $values { "obj" object } { "?" "a boolean" } }
+{ $values { "obj" object } { "?" boolean } }
 { $description "Tests if an object is a delimiter word declared by " { $link POSTPONE: delimiter } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
 HELP: deprecated?
-{ $values { "obj" object } { "?" "a boolean" } }
+{ $values { "obj" object } { "?" boolean } }
 { $description "Tests if an object is " { $link POSTPONE: deprecated } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
