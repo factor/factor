@@ -6,7 +6,7 @@ IN: math.primes.lucas-lehmer
 HELP: lucas-lehmer
 { $values
     { "p" "a prime number" }
-    { "?" "a boolean" }
+    { "?" boolean }
 }
 { $description "Runs the Lucas-Lehmer test on the prime " { $snippet "p" } " and returns " { $link t } " if " { $snippet "(2 ^ p) - 1" } " is prime." }
 { $examples

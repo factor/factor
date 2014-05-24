@@ -1,5 +1,6 @@
+USING: help.markup help.syntax kernel math.rectangles
+ui.gadgets ;
 IN: ui.gadgets.glass
-USING: help.markup help.syntax ui.gadgets math.rectangles ;
 
 HELP: show-glass
 { $values { "owner" gadget } { "child" gadget } { "visible-rect" rect } }
@@ -23,7 +24,7 @@ HELP: hide-glass-hook
 { $description "Called when a gadget displayed in a glass layer is hidden. The gadget can perform cleanup tasks here." } ;
 
 HELP: pass-to-popup
-{ $values { "gesture" "a gesture" } { "owner" "the popup's owner" } { "?" "a boolean" } }
+{ $values { "gesture" "a gesture" } { "owner" "the popup's owner" } { "?" boolean } }
 { $description "Resends the gesture to the popup displayed by " { $snippet "owner" } ". The owner must have a " { $slot "popup" } " slot. Outputs " { $link f } " if the gesture was handled, " { $link t } " otherwise." } ;
 
 HELP: show-popup

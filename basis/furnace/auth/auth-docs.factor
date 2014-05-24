@@ -36,7 +36,7 @@ HELP: encode-password
 HELP: have-capabilities?
 { $values
      { "capabilities" "a sequence of capabilities" }
-     { "?" "a boolean" }
+     { "?" boolean }
 }
 { $description "Tests if the currently logged-in user possesses the given capabilities." } ;
 

@@ -175,7 +175,7 @@ HELP: nanoseconds
 { years months days hours minutes seconds milliseconds microseconds nanoseconds } related-words
 
 HELP: leap-year?
-{ $values { "obj" object } { "?" "a boolean" } }
+{ $values { "obj" object } { "?" boolean } }
 { $description "Returns " { $link t } " if the object represents a leap year." }
 { $examples
     { $example "USING: calendar prettyprint ;"
@@ -357,7 +357,7 @@ HELP: <zero>
 { $description "Returns a zero timestamp that consists of zeros for every slot. Used to see if timestamps are valid." } ;
 
 HELP: valid-timestamp?
-{ $values { "timestamp" timestamp } { "?" "a boolean" } }
+{ $values { "timestamp" timestamp } { "?" boolean } }
 { $description "Tests if a timestamp is valid or not." } ;
 
 HELP: unix-1970

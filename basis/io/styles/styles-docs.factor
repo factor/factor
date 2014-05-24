@@ -158,7 +158,7 @@ ARTICLE: "table-styles" "Table styles"
 } ;
 
 HELP: write-object
-{ $values { "str" string } { "obj" "an object" } }
+{ $values { "str" string } { "obj" object } }
 { $description "Writes a string to " { $link output-stream } ", associating it with the object. If formatted output is supported, the string will become a clickable presentation of the object, otherwise this word behaves like a call to " { $link write } "." }
 $io-error ;
 

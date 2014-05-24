@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math math.private ;
+USING: help.markup help.syntax kernel math math.private ;
 IN: math.floats
 
 HELP: float
@@ -48,42 +48,42 @@ HELP: float/f
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /f } " instead." } ;
 
 HELP: float<
-{ $values { "x" float } { "y" float } { "?" "a boolean" } }
+{ $values { "x" float } { "y" float } { "?" boolean } }
 { $description "Primitive version of " { $link < } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link < } " instead." } ;
 
 HELP: float<=
-{ $values { "x" float } { "y" float } { "?" "a boolean" } }
+{ $values { "x" float } { "y" float } { "?" boolean } }
 { $description "Primitive version of " { $link <= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link <= } " instead." } ;
 
 HELP: float>
-{ $values { "x" float } { "y" float } { "?" "a boolean" } }
+{ $values { "x" float } { "y" float } { "?" boolean } }
 { $description "Primitive version of " { $link > } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link > } " instead." } ;
 
 HELP: float>=
-{ $values { "x" float } { "y" float } { "?" "a boolean" } }
+{ $values { "x" float } { "y" float } { "?" boolean } }
 { $description "Primitive version of " { $link u>= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link u>= } " instead." } ;
 
 HELP: float-u<
-{ $values { "x" float } { "y" float } { "?" "a boolean" } }
+{ $values { "x" float } { "y" float } { "?" boolean } }
 { $description "Primitive version of " { $link u< } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link u< } " instead." } ;
 
 HELP: float-u<=
-{ $values { "x" float } { "y" float } { "?" "a boolean" } }
+{ $values { "x" float } { "y" float } { "?" boolean } }
 { $description "Primitive version of " { $link u<= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link u<= } " instead." } ;
 
 HELP: float-u>
-{ $values { "x" float } { "y" float } { "?" "a boolean" } }
+{ $values { "x" float } { "y" float } { "?" boolean } }
 { $description "Primitive version of " { $link u> } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link u> } " instead." } ;
 
 HELP: float-u>=
-{ $values { "x" float } { "y" float } { "?" "a boolean" } }
+{ $values { "x" float } { "y" float } { "?" boolean } }
 { $description "Primitive version of " { $link u>= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link u>= } " instead." } ;
 

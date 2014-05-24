@@ -6,7 +6,7 @@ HELP: allow-registration
 { $description "Adds a " { $snippet "registration" } " action to an authentication realm." } ;
 
 HELP: allow-registration?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Outputs true if the current authentication realm allows user registration." } ;
 
 ARTICLE: "furnace.auth.features.registration" "User registration"

@@ -1,5 +1,5 @@
-USING: help.markup help.syntax words math source-files
-parser quotations definitions stack-checker.errors ;
+USING: definitions help.markup help.syntax kernel parser
+quotations source-files stack-checker.errors words ;
 IN: compiler.units
 
 ARTICLE: "compilation-units-internals" "Compilation units internals"
@@ -79,7 +79,7 @@ HELP: no-compilation-unit
 { $error-description "Thrown when an attempt is made to define a word outside of a " { $link with-compilation-unit } " combinator." } ;
 
 HELP: modify-code-heap
-{ $values { "alist" "an association list with words as keys" } { "update-existing?" "a boolean" } { "reset-pics?" "a boolean" } }
+{ $values { "alist" "an association list with words as keys" } { "update-existing?" boolean } { "reset-pics?" boolean } }
 { $description "Lowest-level primitive for defining words. Associates words with code blocks in the code heap."
 $nl
 "The alist maps words to one of the following:"

@@ -49,7 +49,7 @@ HELP: deep-tags-named
 { $see-also tag-named deep-tag-named tags-named } ;
 
 HELP: children>string
-{ $values { "tag" "an XML tag or document" } { "string" "a string" } }
+{ $values { "tag" "an XML tag or document" } { "string" string } }
 { $description "Concatenates the children of the tag, throwing an exception when there is a non-string child." } ;
 
 HELP: children-tags
@@ -86,5 +86,5 @@ HELP: tags-named
 { $see-also deep-tag-named deep-tags-named tag-named } ;
 
 HELP: get-id
-{ $values { "tag" "an XML tag or document" } { "id" "a string" } { "elem" "an XML element or f" } }
+{ $values { "tag" "an XML tag or document" } { "id" string } { "elem" "an XML element or f" } }
 { $description "Finds the XML tag with the specified id, ignoring the namespace." } ;

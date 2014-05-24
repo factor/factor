@@ -1,7 +1,6 @@
-USING: generic help.markup help.syntax kernel
-classes.tuple.private classes slots quotations words arrays
-generic.standard sequences definitions compiler.units
-growable vectors sbufs assocs math strings ;
+USING: arrays assocs classes classes.tuple.private
+compiler.units growable help.markup help.syntax kernel math
+sbufs sequences slots strings vectors words ;
 IN: classes.tuple
 
 ARTICLE: "slot-read-only-declaration" "Read-only slots"
@@ -353,7 +352,7 @@ HELP: tuple-class
 { $examples { $example "USING: classes.tuple prettyprint ;" "IN: scratchpad" "TUPLE: name title first last ;" "name tuple-class? ." "t" } } ;
 
 HELP: tuple=
-{ $values { "tuple1" tuple } { "tuple2" tuple } { "?" "a boolean" } }
+{ $values { "tuple1" tuple } { "tuple2" tuple } { "?" boolean } }
 { $description "Checks if two tuples have equal slot values. This is the default behavior of " { $link = } " on tuples, unless the tuple class subclasses " { $link identity-tuple } " or implements a method on " { $link equal? } ". In cases where equality has been redefined, this word can be used to get the default semantics if needed." } ;
 
 HELP: tuple

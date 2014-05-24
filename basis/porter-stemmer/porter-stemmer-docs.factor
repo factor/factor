@@ -2,7 +2,7 @@ IN: porter-stemmer
 USING: help.markup help.syntax ;
 
 HELP: step1a
-{ $values { "str" "a string" } { "newstr" "a new string" } }
+{ $values { "str" string } { "newstr" "a new string" } }
 { $description "Gets rid of plurals." }
 { $examples
     { $table
@@ -16,7 +16,7 @@ HELP: step1a
 } ;
 
 HELP: step1b
-{ $values { "str" "a string" } { "newstr" "a new string" } }
+{ $values { "str" string } { "newstr" "a new string" } }
 { $description "Gets rid of \"-ed\" and \"-ing\" suffixes." }
 { $examples
     { $table
@@ -34,23 +34,23 @@ HELP: step1b
 } ;
 
 HELP: step1c
-{ $values { "str" "a string" } { "newstr" "a new string" } }
+{ $values { "str" string } { "newstr" "a new string" } }
 { $description "Turns a terminal y to i when there is another vowel in the stem." } ;
 
 HELP: step2
-{ $values { "str" "a string" } { "newstr" "a new string" } }
+{ $values { "str" string } { "newstr" "a new string" } }
 { $description "Maps double suffices to single ones. so -ization maps to -ize etc. note that the string before the suffix must give positive " { $link consonant-seq } "." } ;
 
 HELP: step3
-{ $values { "str" "a string" } { "newstr" "a new string" } }
+{ $values { "str" string } { "newstr" "a new string" } }
 { $description "Deals with -c-, -full, -ness, etc. Similar strategy to " { $link step2 } "." } ;
 
 HELP: step5
-{ $values { "str" "a string" } { "newstr" "a new string" } }
+{ $values { "str" string } { "newstr" "a new string" } }
 { $description "Removes a final -e and changes a final -ll to -l if " { $link consonant-seq } " is greater than 1," } ;
 
 HELP: stem
-{ $values { "str" "a string" } { "newstr" "a new string" } }
+{ $values { "str" string } { "newstr" "a new string" } }
 { $description "Applies the Porter stemming algorithm to the input string." } ;
 
 ARTICLE: "porter-stemmer" "Porter stemming algorithm"

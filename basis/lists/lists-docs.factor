@@ -87,7 +87,7 @@ HELP: nil
 { $description "Returns a symbol representing the empty list" } ;
 
 HELP: nil?
-{ $values { "object" object } { "?" "a boolean" } }
+{ $values { "object" object } { "?" boolean } }
 { $description "Return true if the cons object is the nil cons." } ;
 
 { nil nil? } related-words
@@ -95,15 +95,15 @@ HELP: nil?
 { 1list 2list 3list } related-words
 
 HELP: 1list
-{ $values { "obj" "an object" } { "cons" list } }
+{ $values { "obj" object } { "cons" list } }
 { $description "Create a list with 1 element." } ;
 
 HELP: 2list
-{ $values { "a" "an object" } { "b" "an object" } { "cons" list } }
+{ $values { "a" object } { "b" object } { "cons" list } }
 { $description "Create a list with 2 elements." } ;
 
 HELP: 3list
-{ $values { "a" "an object" } { "b" "an object" } { "c" "an object" } { "cons" list } }
+{ $values { "a" object } { "b" object } { "c" object } { "cons" list } }
 { $description "Create a list with 3 elements." } ;
 
 HELP: lnth
@@ -131,11 +131,11 @@ HELP: leach
 { $description "Call the quotation for each item in the list." } ;
 
 HELP: foldl
-{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "result" "the final result" } }
+{ $values { "list" list } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a left-associative order) using a binary operation and outputs the final result." } ;
 
 HELP: foldr
-{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "result" "the final result" } }
+{ $values { "list" list } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a right-associative order) using a binary operation, and outputs the final result." } ;
 
 HELP: lmap

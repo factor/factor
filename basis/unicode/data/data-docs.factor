@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup strings ;
+USING: help.syntax help.markup kernel math strings ;
 IN: unicode.data
 
 ABOUT: "unicode.data"
@@ -35,11 +35,11 @@ HELP: compatibility-entry
 { $description "This returns the compatibility decomposition (NFKD) for a code point" } ;
 
 HELP: combining-class
-{ $values { "char" "a code point" } { "n" "an integer" } }
+{ $values { "char" "a code point" } { "n" integer } }
 { $description "Finds the combining class of a code point." } ;
 
 HELP: non-starter?
-{ $values { "char" "a code point" } { "?" "a boolean" } }
+{ $values { "char" "a code point" } { "?" boolean } }
 { $description "Returns true if the code point has a combining class." } ;
 
 HELP: char>name
@@ -51,7 +51,7 @@ HELP: name>char
 { $description "Looks up the code point corresponding to a given name." } ;
 
 HELP: property?
-{ $values { "char" "a code point" } { "property" string } { "?" "a boolean" } }
+{ $values { "char" "a code point" } { "property" string } { "?" boolean } }
 { $description "Tests whether the code point is listed under the given property in PropList.txt in the Unicode Character Database." } ;
 
 HELP: category

@@ -34,13 +34,13 @@ HELP: sorted-index
 { index index-from last-index last-index-from sorted-index } related-words
 
 HELP: sorted-member?
-{ $values { "obj" object } { "seq" "a sorted sequence" } { "?" "a boolean" } }
+{ $values { "obj" object } { "seq" "a sorted sequence" } { "?" boolean } }
 { $description "Tests if the sorted sequence contains " { $snippet "elt" } ". Equality is tested with " { $link = } "." } ;
 
 { member? sorted-member? } related-words
 
 HELP: sorted-member-eq?
-{ $values { "obj" object } { "seq" "a sorted sequence" } { "?" "a boolean" } }
+{ $values { "obj" object } { "seq" "a sorted sequence" } { "?" boolean } }
 { $description "Tests if the sorted sequence contains " { $snippet "elt" } ". Equality is tested with " { $link eq? } "." } ;
 
 { member-eq? sorted-member-eq? } related-words

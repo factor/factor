@@ -1,5 +1,5 @@
-USING: assocs cpu.x86.assembler help.markup help.syntax literals math
-multiline system words ;
+USING: assocs cpu.x86.assembler help.markup help.syntax kernel
+literals math multiline system words ;
 IN: cpu.architecture
 
 <<
@@ -27,7 +27,7 @@ HELP: signed-rep
 { $description "Maps any representation to its signed counterpart, if it has one." } ;
 
 HELP: immediate-arithmetic?
-{ $values { "n" number } { "?" "a boolean" } }
+{ $values { "n" number } { "?" boolean } }
 { $description
   "Can this value be an immediate operand for " { $link %add-imm } ", "
   { $link %sub-imm } ", or " { $link %mul-imm } "?"
@@ -42,7 +42,7 @@ HELP: vm-stack-space
 { $description "Parameter space to reserve in anything making VM calls." } ;
 
 HELP: complex-addressing?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Specifies if " { $link %slot } ", " { $link %set-slot } " and " { $link %write-barrier } " accept the 'scale' and 'tag' parameters, and if %load-memory and %store-memory work." } ;
 
 HELP: param-regs
@@ -63,7 +63,7 @@ HELP: %box-alien
 { $examples { $unchecked-example $[ ex-%box-alien ] } } ;
 
 HELP: fused-unboxing?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Whether this architecture support " { $link %load-float } ", " { $link %load-double } ", and " { $link %load-vector } "." } ;
 
 HELP: return-regs

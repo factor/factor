@@ -1,5 +1,6 @@
+USING: assocs help.markup help.syntax kernel quotations strings
+;
 IN: html.forms
-USING: help.markup help.syntax strings quotations kernel assocs ;
 
 HELP: <form>
 { $values { "form" form } }
@@ -78,7 +79,7 @@ HELP: with-each-object
 { $notes "This word is used to implement the " { $snippet "t:bind-each" } " tag of the " { $vocab-link "html.templates.chloe" } " templating system. It can also be called directly from " { $vocab-link "html.templates.fhtml" } " templates." } ;
 
 HELP: validation-failed?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Tests if validation of the current form failed." } ;
 
 HELP: validate-values

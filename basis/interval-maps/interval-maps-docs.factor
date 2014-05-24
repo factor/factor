@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax assocs kernel sequences ;
+USING: assocs help.markup help.syntax kernel sequences ;
 IN: interval-maps
 
 HELP: interval-at*
@@ -12,7 +12,7 @@ HELP: interval-at
 { $description "Looks up a key in an interval map, returning the value of the corresponding interval, or f if the interval is not present in the map." } ;
 
 HELP: interval-key?
-{ $values { "key" object } { "map" interval-map } { "?" "a boolean" } }
+{ $values { "key" object } { "map" interval-map } { "?" boolean } }
 { $description "Tests whether an object is in an interval in the interval map, returning t if the object is present." } ;
 
 HELP: <interval-map>

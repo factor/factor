@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math sequences ;
+USING: help.markup help.syntax kernel math sequences ;
 IN: math.primes
 
 { next-prime prime? } related-words
@@ -8,21 +8,21 @@ HELP: next-prime
 { $description "Return the next prime number greater than " { $snippet "n" } "." } ;
 
 HELP: prime?
-{ $values { "n" "an integer" } { "?" "a boolean" } }
+{ $values { "n" integer } { "?" boolean } }
 { $description "Test if an integer is a prime number." } ;
 
 { nprimes primes-upto primes-between } related-words
 
 HELP: nprimes
-{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } }
+{ $values { "n" "a non-negative integer" } { "seq" sequence } }
 { $description "Return a sequence containing the " { $snippet "n" } " first primes numbers." } ;
 
 HELP: primes-upto
-{ $values { "n" "an integer" } { "seq" "a sequence" } }
+{ $values { "n" integer } { "seq" sequence } }
 { $description "Return a sequence containing all the prime numbers smaller or equal to " { $snippet "n" } "." } ;
 
 HELP: primes-between
-{ $values { "low" "an integer" } { "high" "an integer" } { "seq" "a sequence" } }
+{ $values { "low" integer } { "high" integer } { "seq" sequence } }
 { $description "Return a sequence containing all the prime numbers between " { $snippet "low" } " and " { $snippet "high" } "." } ;
 
 HELP: find-relative-prime

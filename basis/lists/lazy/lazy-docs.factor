@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax sequences strings lists ;
-IN: lists.lazy 
+USING: help.markup help.syntax kernel lists math sequences
+strings ;
+IN: lists.lazy
 
 ABOUT: "lists.lazy"
 
@@ -108,23 +109,23 @@ HELP: lappend
 { $description "Perform a similar functionality to that of the " { $link append } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-append> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required. Successive calls to " { $link cdr } " will iterate through list1, followed by list2." } ;
 
 HELP: lfrom-by
-{ $values { "n" "an integer" } { "quot" { $quotation ( n -- o ) } } { "lazy-from-by" "a lazy list of integers" } }
+{ $values { "n" integer } { "quot" { $quotation ( n -- o ) } } { "lazy-from-by" "a lazy list of integers" } }
 { $description "Return an infinite lazy list of values starting from n, with each successive value being the result of applying quot to the previous value." } ;
 
 HELP: lfrom
-{ $values { "n" "an integer" } { "list" "a lazy list of integers" } }
+{ $values { "n" integer } { "list" "a lazy list of integers" } }
 { $description "Return an infinite lazy list of incrementing integers starting from n." } ;
 
 HELP: sequence-tail>list
-{ $values { "index" "an integer 0 or greater" } { "seq" "a sequence" } { "list" "a list" } }
+{ $values { "index" "an integer 0 or greater" } { "seq" sequence } { "list" "a list" } }
 { $description "Convert the sequence into a list, starting from " { $snippet "index" } "." }
 { $see-also >list } ;
 
 HELP: >list
-{ $values { "object" "an object" } { "list" "a list" } }
+{ $values { "object" object } { "list" "a list" } }
 { $description "Convert the object into a list. Existing lists are passed through intact, sequences are converted using " { $link sequence-tail>list } " and other objects cause an error to be thrown." } 
 { $see-also sequence-tail>list } ;
-    
+
 { leach foldl lazy-map ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
 HELP: lconcat

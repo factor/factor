@@ -65,7 +65,7 @@ HELP: define-operation-map
 { $description "Defines a command map named " { $snippet "group" } " on " { $snippet "class" } " consisting of operations applicable to " { $snippet "object" } ". The translator quotation is applied to the target gadget, and the result of the translator is passed to the operation." } ;
 
 HELP: $operations
-{ $values { "element" "a sequence" } }
+{ $values { "element" sequence } }
 { $description "Converts the element to a quotation and calls it; the resulting quotation must have stack effect " { $snippet "( -- obj )" } ". Prints a list of operations applicable to the object, together with keyboard shortcuts." } ;
 
 HELP: $operation

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: channels concurrency.distributed help.markup help.syntax
-io.servers ;
+io.servers strings ;
 IN: channels.remote
 
 HELP: <remote-channel>
@@ -20,7 +20,7 @@ HELP: <remote-channel>
 { $see-also publish unpublish } ;
 
 HELP: unpublish
-{ $values { "id" "a string" }
+{ $values { "id" string }
 }
 { $description "Stop a previously published channel from being "
 "accessible by remote nodes."
@@ -32,7 +32,7 @@ HELP: unpublish
 
 HELP: publish
 { $values { "channel" "a channel object" }
-          { "id" "a string" }
+          { "id" string }
 }
 { $description "Make a channel accessible via remote Factor nodes. "
 "An id is returned that can be used by another node to use " 

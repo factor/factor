@@ -1,11 +1,11 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup peg ;
+USING: help.markup help.syntax kernel peg sequences strings ;
 IN: peg.search
 
 HELP: tree-write
 { $values
-  { "object" "an object" } }
+  { "object" object } }
 { $description
     "Write the object to the standard output stream, unless "
     "it is an array, in which case recurse through the array "
@@ -14,9 +14,9 @@ HELP: tree-write
 
 HELP: search
 { $values
-  { "string" "a string" }
+  { "string" string }
   { "parser" "a peg based parser" }
-  { "seq"    "a sequence" }
+  { "seq"    sequence }
 }
 { $description
     "Returns a sequence containing the parse results of all substrings "
@@ -30,9 +30,9 @@ HELP: search
 
 HELP: replace
 { $values
-  { "string" "a string" }
+  { "string" string }
   { "parser" "a peg based parser" }
-  { "result"    "a string" }
+  { "result" string }
 }
 { $description
     "Returns a copy of the original string but with all substrings that "

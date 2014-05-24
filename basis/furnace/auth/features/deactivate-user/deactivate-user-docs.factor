@@ -6,7 +6,7 @@ HELP: allow-deactivation
 { $description "Adds a " { $snippet "deactivate-user" } " action to an authentication realm." } ;
 
 HELP: allow-deactivation?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Outputs true if the current authentication realm allows user profile deactivation." } ;
 
 ARTICLE: "furnace.auth.features.deactivate-user" "User profile deactivation"

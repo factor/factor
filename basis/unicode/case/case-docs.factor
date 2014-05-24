@@ -1,4 +1,4 @@
-USING: help.syntax help.markup strings ;
+USING: help.syntax help.markup kernel strings ;
 IN: unicode.case
 
 ABOUT: "unicode.case"
@@ -39,17 +39,17 @@ HELP: >case-fold
 { $description "Converts a string to case-folded form." } ;
 
 HELP: upper?
-{ $values { "string" string } { "?" "a boolean" } }
+{ $values { "string" string } { "?" boolean } }
 { $description "Tests if a string is in upper case." } ;
 
 HELP: lower?
-{ $values { "string" string } { "?" "a boolean" } }
+{ $values { "string" string } { "?" boolean } }
 { $description "Tests if a string is in lower case." } ;
 
 HELP: title?
-{ $values { "string" string } { "?" "a boolean" } }
+{ $values { "string" string } { "?" boolean } }
 { $description "Tests if a string is in title case." } ;
 
 HELP: case-fold?
-{ $values { "string" string } { "?" "a boolean" } }
+{ $values { "string" string } { "?" boolean } }
 { $description "Tests if a string is in case-folded form." } ;

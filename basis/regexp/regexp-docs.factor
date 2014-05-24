@@ -210,7 +210,7 @@ HELP: regexp
 { $class-description "The class of regular expressions. To construct these, see " { $link "regexp-construction" } "." } ;
 
 HELP: matches?
-{ $values { "string" string } { "regexp" regexp } { "?" "a boolean" } }
+{ $values { "string" string } { "regexp" regexp } { "?" boolean } }
 { $description "Tests if the string as a whole matches the given regular expression." } ;
 
 HELP: all-matching-slices
@@ -252,5 +252,5 @@ HELP: first-match
 { $description "Finds the first match of the regular expression in the string, and returns it as a slice. If there is no match, then " { $link f } " is returned." } ;
 
 HELP: re-contains?
-{ $values { "string" string } { "regexp" regexp } { "?" "a boolean" } }
+{ $values { "string" string } { "regexp" regexp } { "?" boolean } }
 { $description "Determines whether the string has a substring which matches the regular expression given." } ;

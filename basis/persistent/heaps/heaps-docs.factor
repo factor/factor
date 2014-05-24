@@ -10,7 +10,7 @@ HELP: <singleton-heap>
 { $description "Creates a new persistent heap consisting of one object with the given priority." } ;
 
 HELP: pheap-empty?
-{ $values { "heap" "a persistent heap" } { "?" "a boolean" } }
+{ $values { "heap" "a persistent heap" } { "?" boolean } }
 { $description "Returns true if this is an empty persistent heap." } ;
 
 HELP: pheap-peek

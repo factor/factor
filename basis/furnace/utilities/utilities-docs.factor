@@ -72,7 +72,7 @@ HELP: resolve-template-path
 { $description "Resolves a responder-relative template path." } ;
 
 HELP: same-host?
-{ $values { "url" url } { "?" "a boolean" } }
+{ $values { "url" url } { "?" boolean } }
 { $description "Tests if the given URL is located on the same host as the URL of the current request." } ;
 
 HELP: user-agent

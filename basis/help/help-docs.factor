@@ -1,6 +1,6 @@
-USING: help.markup help.crossref help.stylesheet help.topics
-help.syntax definitions io prettyprint summary arrays math
-sequences vocabs strings see ;
+USING: arrays help.crossref help.markup help.stylesheet
+help.syntax help.topics io kernel math prettyprint quotations
+see sequences strings summary vocabs ;
 IN: help
 
 ARTICLE: "printing-elements" "Printing markup elements"
@@ -239,11 +239,11 @@ HELP: simple-element
 { $class-description "Class of simple elements, which are just arrays of elements." } ;
 
 HELP: ($span)
-{ $values { "quot" "a quotation" } }
+{ $values { "quot" quotation } }
 { $description "Prints an inline markup element." } ;
 
 HELP: ($block)
-{ $values { "quot" "a quotation" } }
+{ $values { "quot" quotation } }
 { $description "Prints a block markup element with newlines before and after." } ;
 
 HELP: $heading
@@ -340,7 +340,7 @@ HELP: $link
 } ;
 
 HELP: textual-list
-{ $values { "seq" "a sequence" } { "quot" { $quotation ( elt -- ) } } }
+{ $values { "seq" sequence } { "quot" { $quotation ( elt -- ) } } }
 { $description "Applies the quotation to each element of the sequence, printing a comma between each pair of elements." }
 { $examples
     { $example "USING: help.markup io namespaces ;" "last-element off" "{ \"fish\" \"chips\" \"salt\" } [ write ] textual-list" "fish, chips, salt" }
@@ -487,7 +487,7 @@ HELP: HELP:
 
 HELP: ARTICLE:
 { $syntax "ARTICLE: topic title content... ;" }
-{ $values { "topic" "an object" } { "title" "a string" } { "content" "markup elements" } }
+{ $values { "topic" object } { "title" string } { "content" "markup elements" } }
 { $description "Defines a help article. String topic names are reserved for core documentation. Contributed modules should name articles by arrays, where the first element of an array identifies the module; for example, " { $snippet "{ \"httpd\" \"intro\" }" } "." }
 { $examples
     { $code

@@ -1,4 +1,5 @@
-USING: ui.gadgets ui.gestures help.markup help.syntax strings ;
+USING: help.markup help.syntax kernel strings ui.gadgets
+ui.gestures ;
 IN: ui.clipboards
 
 HELP: clipboard
@@ -6,11 +7,11 @@ HELP: clipboard
 { $class-description "A mutable container for a single string implementing the " { $link "clipboard-protocol" } "." } ;
 
 HELP: paste-clipboard
-{ $values { "gadget" gadget } { "clipboard" "an object" } }
+{ $values { "gadget" gadget } { "clipboard" object } }
 { $contract "Arranges for the contents of the clipboard to be inserted into the gadget at some point in the near future via a call to " { $link user-input } ". The gadget must be grafted." } ;
 
 HELP: copy-clipboard
-{ $values { "string" string } { "gadget" gadget } { "clipboard" "an object" } }
+{ $values { "string" string } { "gadget" gadget } { "clipboard" object } }
 { $contract "Arranges for the string to be copied to the clipboard on behalf of the gadget. The gadget must be grafted." } ;
 
 HELP: selection

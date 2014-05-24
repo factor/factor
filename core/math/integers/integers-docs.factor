@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math math.private ;
+USING: help.markup help.syntax kernel math math.private ;
 IN: math.integers
 
 ARTICLE: "integers" "Integers"
@@ -44,11 +44,11 @@ HELP: integer
 { $class-description "The class of integers, which is a disjoint union of fixnums and bignums." } ;
 
 HELP: even?
-{ $values { "n" integer } { "?" "a boolean" } }
+{ $values { "n" integer } { "?" boolean } }
 { $description "Tests if an integer is even." } ;
 
 HELP: odd?
-{ $values { "n" integer } { "?" "a boolean" } }
+{ $values { "n" integer } { "?" boolean } }
 { $description "Tests if an integer is odd." } ;
 
 ! Unsafe primitives
@@ -83,7 +83,7 @@ HELP: fixnum/mod
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /mod } " instead." } ;
 
 HELP: fixnum<
-{ $values { "x" fixnum } { "y" fixnum } { "?" "a boolean" } }
+{ $values { "x" fixnum } { "y" fixnum } { "?" boolean } }
 { $description "Primitive version of " { $link < } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link < } " instead." } ;
 
@@ -93,12 +93,12 @@ HELP: fixnum<=
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link <= } " instead." } ;
 
 HELP: fixnum>
-{ $values { "x" fixnum } { "y" fixnum } { "?" "a boolean" } }
+{ $values { "x" fixnum } { "y" fixnum } { "?" boolean } }
 { $description "Primitive version of " { $link > } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link > } " instead." } ;
 
 HELP: fixnum>=
-{ $values { "x" fixnum } { "y" fixnum } { "?" "a boolean" } }
+{ $values { "x" fixnum } { "y" fixnum } { "?" boolean } }
 { $description "Primitive version of " { $link >= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link >= } " instead." } ;
 
@@ -178,27 +178,27 @@ HELP: bignum/mod
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /mod } " instead." } ;
 
 HELP: bignum<
-{ $values { "x" bignum } { "y" bignum } { "?" "a boolean" } }
+{ $values { "x" bignum } { "y" bignum } { "?" boolean } }
 { $description "Primitive version of " { $link < } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link < } " instead." } ;
 
 HELP: bignum<=
-{ $values { "x" bignum } { "y" bignum } { "?" "a boolean" } }
+{ $values { "x" bignum } { "y" bignum } { "?" boolean } }
 { $description "Primitive version of " { $link <= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link <= } " instead." } ;
 
 HELP: bignum>
-{ $values { "x" bignum } { "y" bignum } { "?" "a boolean" } }
+{ $values { "x" bignum } { "y" bignum } { "?" boolean } }
 { $description "Primitive version of " { $link > } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link > } " instead." } ;
 
 HELP: bignum>=
-{ $values { "x" bignum } { "y" bignum } { "?" "a boolean" } }
+{ $values { "x" bignum } { "y" bignum } { "?" boolean } }
 { $description "Primitive version of " { $link >= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link >= } " instead." } ;
 
 HELP: bignum=
-{ $values { "x" bignum } { "y" bignum } { "?" "a boolean" } }
+{ $values { "x" bignum } { "y" bignum } { "?" boolean } }
 { $description "Primitive version of " { $link number= } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link number= } " instead." } ;
 

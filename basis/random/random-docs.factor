@@ -1,4 +1,5 @@
-USING: help.markup help.syntax math kernel sequences arrays ;
+USING: arrays help.markup help.syntax kernel math quotations
+sequences ;
 IN: random
 
 HELP: seed-random
@@ -14,7 +15,7 @@ HELP: random-32*
 { $description "Generates a random 32-bit unsigned integer." } ;
 
 HELP: random-bytes*
-{ $values { "n" "an integer" } { "obj" "a random number generator" } { "byte-array" "a sequence of random bytes" } }
+{ $values { "n" integer } { "obj" "a random number generator" } { "byte-array" "a sequence of random bytes" } }
 { $description "Generates a byte-array of random bytes." } ;
 
 HELP: random
@@ -36,7 +37,7 @@ HELP: random-32
 { $description "Outputs 32 random bits. This word is more efficient than calling " { $link random } " because no scaling is done on the output." } ;
 
 HELP: random-bytes
-{ $values { "n" "an integer" } { "byte-array" "a random integer" } }
+{ $values { "n" integer } { "byte-array" "a random integer" } }
 { $description "Outputs an integer with n bytes worth of bits." }
 { $examples 
     { $unchecked-example "USING: prettyprint random ;"
@@ -86,15 +87,15 @@ HELP: random-bits*
 { $description "Returns an integer exactly " { $snippet "numbits" } " in length, with the topmost bit set to one." } ;
 
 HELP: with-random
-{ $values { "obj" "a random number generator" } { "quot" "a quotation" } }
+{ $values { "obj" "a random number generator" } { "quot" quotation } }
 { $description "Calls the quotation with the random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
 
 HELP: with-secure-random
-{ $values { "quot" "a quotation" } }
+{ $values { "quot" quotation } }
 { $description "Calls the quotation with the secure random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
 
 HELP: with-system-random
-{ $values { "quot" "a quotation" } }
+{ $values { "quot" quotation } }
 { $description "Calls the quotation with the system's random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
 
 { with-random with-secure-random with-system-random } related-words

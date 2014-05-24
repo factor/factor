@@ -1,5 +1,5 @@
-USING: classes compiler.tree.propagation.info help.markup help.syntax math
-math.intervals ;
+USING: classes compiler.tree.propagation.info help.markup
+help.syntax kernel math math.intervals ;
 IN: compiler.tree.propagation.known-words
 
 HELP: binary-op-class
@@ -27,7 +27,7 @@ HELP: number-valued
 { $description "Ensure that the class is a subclass of " { $link number } "." } ;
 
 HELP: fits-in-fixnum?
-{ $values { "interval" interval } { "?" "a boolean" } }
+{ $values { "interval" interval } { "?" boolean } }
 { $description "Checks if the interval is a subset of the " { $link fixnum } " interval. Used to see if arithmetic may overflow." }
 { $examples
   { $example

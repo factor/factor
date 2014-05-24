@@ -47,7 +47,7 @@ HELP: close-game-input
 { $description "Closes the game input interface, releasing any allocated resources. Once this word is called, any remaining " { $link controller } " objects are invalid." } ;
 
 HELP: game-input-opened?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Returns true if the game input interface is open, false otherwise." } ;
 
 HELP: with-game-input

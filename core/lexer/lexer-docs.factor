@@ -28,7 +28,7 @@ HELP: <lexer-error>
 { $description "Creates a new " { $link lexer-error } ", filling in the location information from the current " { $link lexer } "." } ;
 
 HELP: skip
-{ $values { "i" "a starting index" } { "seq" sequence } { "?" "a boolean" } { "n" integer } }
+{ $values { "i" "a starting index" } { "seq" sequence } { "?" boolean } { "n" integer } }
 { $description "Skips to the first space character (if " { $snippet "boolean" } " is " { $link f } ") or the first non-space character (otherwise). Tabulations used as separators instead of spaces will be flagged as an error." } ;
 
 HELP: change-lexer-column
@@ -50,7 +50,7 @@ HELP: skip-word
 { $notes "Custom lexers can implement this generic word." } ;
 
 HELP: still-parsing-line?
-{ $values { "lexer" lexer } { "?" "a boolean" } }
+{ $values { "lexer" lexer } { "?" boolean } }
 { $description "Outputs " { $link f } " if the end of the current line has been reached, " { $link t } " otherwise." } ;
 
 HELP: parse-token
@@ -68,7 +68,7 @@ HELP: scan-token
 $parsing-note ;
 
 HELP: still-parsing?
-{ $values { "lexer" lexer } { "?" "a boolean" } }
+{ $values { "lexer" lexer } { "?" boolean } }
 { $description "Outputs " { $link f } " if end of input has been reached, " { $link t } " otherwise." } ;
 
 HELP: each-token

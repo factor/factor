@@ -19,7 +19,7 @@ HELP: box>
 { $errors "Throws an error if the box is empty." } ;
 
 HELP: ?box
-{ $values { "box" box } { "value/f" "the value of the box or " { $link f } } { "?" "a boolean" } }
+{ $values { "box" box } { "value/f" "the value of the box or " { $link f } } { "?" boolean } }
 { $description "If the box is full, removes the value from the box and pushes " { $link t } ". If the box is empty pushes " { $snippet "f f" } "." } ;
 
 ARTICLE: "boxes" "Boxes"

@@ -1,4 +1,5 @@
-USING: help.markup help.syntax strings definitions generic words classes ;
+USING: classes definitions generic help.markup help.syntax
+sequences strings words ;
 FROM: prettyprint.sections => with-pprint ;
 IN: see
 
@@ -42,7 +43,7 @@ HELP: definer
 { $notes "This word is used in the implementation of " { $link see } "." } ;
 
 HELP: definition
-{ $values { "defspec" "a definition specifier" } { "seq" "a sequence" } }
+{ $values { "defspec" "a definition specifier" } { "seq" sequence } }
 { $contract "Outputs the body of a definition." }
 { $examples
     { $example "USING: definitions math prettyprint ;" "\\ sq definition ." "[ dup * ]" }

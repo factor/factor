@@ -1,7 +1,6 @@
-USING: prettyprint.backend prettyprint.config prettyprint.custom
-prettyprint.sections help.markup help.syntax
-io kernel words definitions quotations strings generic classes
-prettyprint.private ;
+USING: help.markup help.syntax io kernel math
+prettyprint.backend prettyprint.config prettyprint.custom
+prettyprint.private prettyprint.sections sequences ;
 IN: prettyprint
 
 ARTICLE: "prettyprint-numbers" "Prettyprinting numbers"
@@ -222,11 +221,11 @@ HELP: short.
 { $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. This word rebinds printer control variables to enforce “shorter” output." } ;
 
 HELP: .b
-{ $values { "n" "an integer" } }
+{ $values { "n" integer } }
 { $description "Outputs an integer in binary." } ;
 
 HELP: .o
-{ $values { "n" "an integer" } }
+{ $values { "n" integer } }
 { $description "Outputs an integer in octal." } ;
 
 HELP: .h
@@ -234,7 +233,7 @@ HELP: .h
 { $description "Outputs an integer or floating-point value in hexadecimal." } ;
 
 HELP: stack.
-{ $values { "seq" "a sequence" } }
+{ $values { "seq" sequence } }
 { $description "Prints a the elements of the sequence, one per line." }
 { $notes "This word is used in the implementation of " { $link .s } " and " { $link .r } "." } ;
 

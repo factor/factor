@@ -1,13 +1,13 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax kernel quotations strings words ;
 IN: peg
 
 HELP: parse
 { $values 
-  { "input" "a string" } 
-  { "parser" "a parser" } 
-  { "ast" "an object" } 
+  { "input" string }
+  { "parser" parser }
+  { "ast" object }
 }
 { $description 
     "Given the input string, parse it using the given parser. The result is the abstract "
@@ -16,8 +16,8 @@ HELP: parse
 
 HELP: compile
 { $values 
-  { "parser" "a parser" } 
-  { "word" "a word" } 
+  { "parser" parser }
+  { "word" word }
 }
 { $description 
     "Compile the parser to a word. The word will have stack effect ( -- ast )."
@@ -26,35 +26,35 @@ HELP: compile
 
 HELP: token
 { $values 
-  { "string" "a string" } 
-  { "parser" "a parser" } 
+  { "string" string }
+  { "parser" parser }
 }
 { $description 
     "Returns a parser that matches the given string." } ;
 
 HELP: satisfy
-{ $values 
-  { "quot" "a quotation" } 
-  { "parser" "a parser" } 
+{ $values
+  { "quot" quotation }
+  { "parser" parser }
 }
 { $description 
     "Returns a parser that calls the quotation on the first character of the input string, "
     "succeeding if that quotation returns true. The AST is the character from the string." } ;
 
 HELP: range
-{ $values 
-  { "min" "a character" } 
-  { "max" "a character" } 
-  { "parser" "a parser" } 
+{ $values
+  { "min" "a character" }
+  { "max" "a character" }
+  { "parser" parser }
 }
-{ $description 
+{ $description
     "Returns a parser that matches a single character that lies within the range of characters given, inclusive." }
 { $examples { $code ": digit ( -- parser ) CHAR: 0 CHAR: 9 range ;" } } ;
 
 HELP: seq
-{ $values 
-  { "seq" "a sequence of parsers" } 
-  { "parser" "a parser" } 
+{ $values
+  { "seq" "a sequence of parsers" }
+  { "parser" parser }
 }
 { $description 
     "Returns a parser that calls all parsers in the given sequence, in order. The parser succeeds if "
@@ -64,7 +64,7 @@ HELP: seq
 HELP: choice
 { $values 
   { "seq" "a sequence of parsers" } 
-  { "parser" "a parser" } 
+  { "parser" parser } 
 }
 { $description 
     "Returns a parser that will try all the parsers in the sequence, in order, until one succeeds. "
@@ -72,7 +72,7 @@ HELP: choice
 
 HELP: repeat0
 { $values 
-  { "parser" "a parser" } 
+  { "parser" parser } 
 }
 { $description 
     "Returns a parser that parses 0 or more instances of the 'p1' parser. The AST produced is "
@@ -81,7 +81,7 @@ HELP: repeat0
 
 HELP: repeat1
 { $values 
-  { "parser" "a parser" } 
+  { "parser" parser } 
 }
 { $description 
     "Returns a parser that parses 1 or more instances of the 'p1' parser. The AST produced is "
@@ -89,7 +89,7 @@ HELP: repeat1
 
 HELP: optional
 { $values 
-  { "parser" "a parser" } 
+  { "parser" parser } 
 }
 { $description 
     "Returns a parser that parses 0 or 1 instances of the 'p1' parser. The AST produced is "
@@ -97,7 +97,7 @@ HELP: optional
 
 HELP: semantic
 { $values 
-  { "parser" "a parser" } 
+  { "parser" parser } 
   { "quot" { $quotation ( object -- ? ) } } 
 }
 { $description 
@@ -109,7 +109,7 @@ HELP: semantic
 
 HELP: ensure
 { $values 
-  { "parser" "a parser" } 
+  { "parser" parser } 
 }
 { $description 
     "Returns a parser that succeeds if the 'p1' parser succeeds but does not add anything to the "
@@ -119,7 +119,7 @@ HELP: ensure
 
 HELP: ensure-not
 { $values 
-  { "parser" "a parser" } 
+  { "parser" parser } 
 }
 { $description 
     "Returns a parser that succeeds if the 'p1' parser fails but does not add anything to the "
@@ -129,7 +129,7 @@ HELP: ensure-not
 
 HELP: action
 { $values 
-  { "parser" "a parser" } 
+  { "parser" parser } 
   { "quot" { $quotation ( ast -- ast ) } } 
 }
 { $description 
@@ -141,7 +141,7 @@ HELP: action
 
 HELP: sp
 { $values 
-  { "parser" "a parser" } 
+  { "parser" parser } 
 }
 { $description 
     "Returns a parser that calls the original parser 'p1' after stripping any whitespace "
@@ -149,7 +149,7 @@ HELP: sp
 
 HELP: hide
 { $values 
-  { "parser" "a parser" } 
+  { "parser" parser } 
 }
 { $description 
     "Returns a parser that succeeds if the original parser succeeds, but does not " 
@@ -158,8 +158,8 @@ HELP: hide
 
 HELP: delay
 { $values 
-  { "quot" "a quotation" } 
-  { "parser" "a parser" } 
+  { "quot" quotation } 
+  { "parser" parser } 
 }
 { $description 
     "Delays the construction of a parser until it is actually required to parse. This " 
@@ -170,8 +170,8 @@ HELP: delay
 
 HELP: box
 { $values 
-  { "quot" "a quotation" } 
-  { "parser" "a parser" } 
+  { "quot" quotation } 
+  { "parser" parser } 
 }
 { $description 
     "Delays the construction of a parser until the parser is compiled. The quotation "

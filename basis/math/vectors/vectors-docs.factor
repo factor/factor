@@ -1,4 +1,5 @@
-USING: help.markup help.syntax math math.functions sequences ;
+USING: help.markup help.syntax kernel math math.functions
+sequences ;
 IN: math.vectors
 
 ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
@@ -376,7 +377,7 @@ HELP: hrshift
 { $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes, filling the vacated left-hand bits with zeroes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
 HELP: vmerge
-{ $values { "u" "a sequence" } { "v" "a sequence" } { "w" "a sequence" } }
+{ $values { "u" sequence } { "v" sequence } { "w" sequence } }
 { $description "Creates a new sequence of the same type as and twice the length of " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $examples
 { $example """USING: kernel math.vectors prettyprint ;
@@ -386,7 +387,7 @@ HELP: vmerge
 } } ;
 
 HELP: (vmerge)
-{ $values { "u" "a sequence" } { "v" "a sequence" } { "h" "a sequence" } { "t" "a sequence" } }
+{ $values { "u" sequence } { "v" sequence } { "h" sequence } { "t" sequence } }
 { $description "Creates two new sequences of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $notes "For hardware-supported SIMD vector types this word compiles to a single instruction per output value." }
 { $examples
@@ -398,7 +399,7 @@ HELP: (vmerge)
 } } ;
 
 HELP: (vmerge-head)
-{ $values { "u" "a sequence" } { "v" "a sequence" } { "h" "a sequence" } }
+{ $values { "u" sequence } { "v" sequence } { "h" sequence } }
 { $description "Creates a new sequence of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements from the first half of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $notes "For hardware-supported SIMD vector types this word compiles to a single instruction." }
 { $examples
@@ -409,7 +410,7 @@ HELP: (vmerge-head)
 } } ;
 
 HELP: (vmerge-tail)
-{ $values { "u" "a sequence" } { "v" "a sequence" } { "t" "a sequence" } }
+{ $values { "u" sequence } { "v" sequence } { "t" sequence } }
 { $description "Creates a new sequence of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements from the tail half of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $notes "For hardware-supported SIMD vector types this word compiles to a single instruction." }
 { $examples
@@ -550,7 +551,7 @@ HELP: v?
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: vif
-{ $values { "mask" "a sequence of booleans" } { "true-quot" { $quotation ( -- vector ) } } { "false-quot" { $quotation ( -- vector ) } } { "result" "a sequence" } }
+{ $values { "mask" "a sequence of booleans" } { "true-quot" { $quotation ( -- vector ) } } { "false-quot" { $quotation ( -- vector ) } } { "result" sequence } }
 { $description "If all of the elements of " { $snippet "mask" } " are true, " { $snippet "true-quot" } " is called and its output value returned. If all of the elements of " { $snippet "mask" } " are false, " { $snippet "false-quot" } " is called and its output value returned. Otherwise, both quotations are called and " { $snippet "mask" } " is used to select elements from each output as with " { $link v? } "." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types."
 $nl
@@ -559,17 +560,17 @@ $nl
 { v? vif } related-words
 
 HELP: vany?
-{ $values { "v" "a sequence of booleans" } { "?" "a boolean" } }
+{ $values { "v" "a sequence of booleans" } { "?" boolean } }
 { $description "Returns true if any element of " { $snippet "v" } " is true." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs when using SIMD types." } ;
 
 HELP: vall?
-{ $values { "v" "a sequence of booleans" } { "?" "a boolean" } }
+{ $values { "v" "a sequence of booleans" } { "?" boolean } }
 { $description "Returns true if every element of " { $snippet "v" } " is true." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs when using SIMD types." } ;
 
 HELP: vnone?
-{ $values { "v" "a sequence of booleans" } { "?" "a boolean" } }
+{ $values { "v" "a sequence of booleans" } { "?" boolean } }
 { $description "Returns true if every element of " { $snippet "v" } " is false." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs when using SIMD types." } ;
 

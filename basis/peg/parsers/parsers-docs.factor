@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax peg peg.parsers.private
-unicode.categories ;
+USING: help.markup help.syntax kernel math sequences
+unicode.categories strings ;
 IN: peg.parsers
 
 HELP: 1token
@@ -16,9 +16,9 @@ HELP: 1token
 
 HELP: (list-of)
 { $values
-    { "items" "a sequence" }
+    { "items" sequence }
     { "separator" "a parser" }
-    { "repeat1?" "a boolean" }
+    { "repeat1?" boolean }
     { "parser" "a parser" }
 } { $description
     "Returns a parser that returns a list of items separated by the separator parser.  Does not hide the separators."
@@ -26,7 +26,7 @@ HELP: (list-of)
 
 HELP: list-of
 { $values
-    { "items" "a sequence" }
+    { "items" sequence }
     { "separator" "a parser" }
     { "parser" "a parser" }
 } { $description
@@ -36,10 +36,10 @@ HELP: list-of
     { $example "USING: peg peg.parsers prettyprint ;" "\"a\" \"a\" token \",\" token list-of parse  ." "V{ \"a\" }" }
     { $example "USING: peg peg.parsers prettyprint ;" "\"a,a,a,a\" \"a\" token \",\" token list-of parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
 } { $see-also list-of-many } ;
-    
+
 HELP: list-of-many
 { $values
-    { "items" "a sequence" }
+    { "items" sequence }
     { "separator" "a parser" }
     { "parser" "a parser" }
 } { $description
@@ -67,7 +67,7 @@ HELP: any-char
 HELP: exactly-n
 { $values
     { "parser" "a parser" }
-    { "n" "an integer" }
+    { "n" integer }
     { "parser'" "a parser" }
 } { $description
     "Returns a parser that matches an exact repetition of the input parser."
@@ -79,7 +79,7 @@ HELP: exactly-n
 HELP: at-least-n
 { $values
     { "parser" "a parser" }
-    { "n" "an integer" }
+    { "n" integer }
     { "parser'" "a parser" }
 } { $description
     "Returns a parser that matches n or more repetitions of the input parser."
@@ -92,7 +92,7 @@ HELP: at-least-n
 HELP: at-most-n
 { $values
     { "parser" "a parser" }
-    { "n" "an integer" }
+    { "n" integer }
     { "parser'" "a parser" }
 } { $description
     "Returns a parser that matches n or fewer repetitions of the input parser."
@@ -104,8 +104,8 @@ HELP: at-most-n
 HELP: from-m-to-n
 { $values
     { "parser" "a parser" }
-    { "m" "an integer" }
-    { "n" "an integer" }
+    { "m" integer }
+    { "n" integer }
     { "parser'" "a parser" }
 } { $description
     "Returns a parser that matches between and including m to n repetitions of the input parser."
@@ -130,8 +130,8 @@ HELP: pack
 HELP: surrounded-by
 { $values
     { "parser" "a parser" }
-    { "begin" "a string" }
-    { "end" "a string" }
+    { "begin" string }
+    { "end" string }
     { "parser'" "a parser" }
 } { $description
     "Calls token on begin and end to make them into string parsers.  Returns a parser that parses the begin, body, and end parsers in order.  The begin and end parsers are hidden."
@@ -162,7 +162,7 @@ HELP: 'string'
 
 HELP: range-pattern
 { $values
-    { "pattern" "a string" }
+    { "pattern" string }
     { "parser" "a parser" }
 } { $description
 "Returns a parser that matches a single character based on the set "

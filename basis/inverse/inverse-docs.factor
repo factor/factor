@@ -1,38 +1,38 @@
-USING: help.syntax help.markup ;
+USING: help.markup help.syntax kernel quotations words ;
 IN: inverse
 
 HELP: [undo]
-{ $values { "quot" "a quotation" } { "undo" "the inverse of the quotation" } }
+{ $values { "quot" quotation } { "undo" "the inverse of the quotation" } }
 { $description "Creates the inverse of the given quotation" }
 { $see-also undo } ;
 
 HELP: undo
-{ $values { "quot" "a quotation" } }
+{ $values { "quot" quotation } }
 { $description "Executes the inverse of the given quotation" }
 { $see-also [undo] } ;
 
 HELP: define-inverse
-{ $values { "word" "a word" } { "quot" "the inverse" } }
+{ $values { "word" word } { "quot" "the inverse" } }
 { $description "Defines the inverse of a given word, taking no arguments from the quotation, only the stack." }
 { $see-also define-dual define-involution define-pop-inverse } ;
 
 HELP: define-dual
-{ $values { "word1" "a word" } { "word2" "a word" } }
+{ $values { "word1" word } { "word2" word } }
 { $description "Defines the inverse of each word as being the other one." }
 { $see-also define-inverse define-involution } ;
 
 HELP: define-involution
-{ $values { "word" "a word" } }
+{ $values { "word" word } }
 { $description "Defines a word as being its own inverse." }
 { $see-also define-dual define-inverse } ;
 
 HELP: define-pop-inverse
-{ $values { "word" "a word" } { "n" "number of arguments to be taken from the inverted quotation" } { "quot" "a quotation" } }
+{ $values { "word" word } { "n" "number of arguments to be taken from the inverted quotation" } { "quot" quotation } }
 { $description "Defines the inverse of the given word, taking the given number of arguments from the inverted quotation. The quotation given should generate an inverse quotation." }
 { $see-also define-inverse } ;
 
 HELP: matches?
-{ $values { "quot" "a quotation" } { "?" "a boolean" } }
+{ $values { "quot" quotation } { "?" boolean } }
 { $description "Tests if the stack can match the given quotation. The quotation is inverted, and if the inverse can run without a unification failure, then t is returned. Else f is returned. If a different error is encountered (such as stack underflow), this will be propagated." } ;
 
 HELP: switch

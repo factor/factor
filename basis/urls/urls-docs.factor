@@ -133,11 +133,11 @@ HELP: relative-url
 HELP: relative-url?
 { $values
      { "url" url }
-     { "?" "a boolean" } }
+     { "?" boolean } }
 { $description "Tests whether a URL is relative." } ;
 
 HELP: secure-protocol?
-{ $values { "protocol" string } { "?" "a boolean" } }
+{ $values { "protocol" string } { "?" boolean } }
 { $description "Tests if protocol connections must be made with secure sockets (SSL/TLS)." }
 { $examples
     { $example

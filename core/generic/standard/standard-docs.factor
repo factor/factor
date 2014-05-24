@@ -1,5 +1,4 @@
-USING: generic generic.single help.markup help.syntax sequences math
-math.parser effects ;
+USING: effects generic.single help.markup help.syntax words ;
 IN: generic.standard
 
 HELP: standard-combination
@@ -18,5 +17,5 @@ HELP: standard-combination
 } ;
 
 HELP: define-simple-generic
-{ $values { "word" "a word" } { "effect" effect } }
+{ $values { "word" word } { "effect" effect } }
 { $description "Defines a generic word with the " { $link standard-combination } " method combination and a dispatch position of 0." } ;

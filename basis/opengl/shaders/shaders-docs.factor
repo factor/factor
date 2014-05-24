@@ -40,7 +40,7 @@ HELP: <fragment-shader>
 { $description "Tries to compile the given GLSL source into a fragment shader object. Equivalent to " { $snippet "GL_FRAGMENT_SHADER <gl-shader>" } "." } ;
 
 HELP: gl-shader-ok?
-{ $values { "shader" "A " { $link gl-shader } " object" } { "?" "a boolean" } }
+{ $values { "shader" "A " { $link gl-shader } " object" } { "?" boolean } }
 { $description "Returns a boolean value indicating whether the given shader object compiled successfully. Compilation errors and warnings are available in the shader's info log, which can be gotten using " { $link gl-shader-info-log } "." } ;
 
 HELP: check-gl-shader
@@ -79,7 +79,7 @@ HELP: <simple-gl-program>
 { <gl-program> <simple-gl-program> } related-words
 
 HELP: gl-program-ok?
-{ $values { "program" "A " { $link gl-program } " object" } { "?" "a boolean" } }
+{ $values { "program" "A " { $link gl-program } " object" } { "?" boolean } }
 { $description "Returns a boolean value indicating whether the given program object linked successfully. Link errors and warnings are available in the program's info log, which can be gotten using " { $link gl-program-info-log } "." } ;
 
 HELP: check-gl-program

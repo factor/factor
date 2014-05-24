@@ -6,7 +6,7 @@ IN: math.primes.miller-rabin
 HELP: miller-rabin
 { $values
     { "n" integer }
-    { "?" "a boolean" }
+    { "?" boolean }
 }
 { $description "Returns true if the number is a prime. Calls " { $link miller-rabin* } " with a default of 10 Miller-Rabin tests." } ;
 
@@ -15,7 +15,7 @@ HELP: miller-rabin
 HELP: miller-rabin*
 { $values
     { "n" integer } { "numtrials" integer }
-    { "?" "a boolean" }
+    { "?" boolean }
 }
 { $description "Performs " { $snippet "numtrials" } " trials of the Miller-Rabin probabilistic primality test algorithm and returns true if prime." } ;
 

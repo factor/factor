@@ -1,8 +1,6 @@
-USING: help.markup help.syntax kernel sequences words
-math strings vectors quotations generic effects classes
-vocabs.loader definitions io vocabs source-files
-namespaces compiler.units assocs lexer
-words.symbol words.alias words.constant vocabs.parser ;
+USING: compiler.units definitions help.markup help.syntax kernel
+lexer math namespaces quotations sequences source-files strings
+vectors vocabs vocabs.parser words words.symbol ;
 IN: parser
 
 ARTICLE: "reading-ahead" "Reading ahead"
@@ -163,7 +161,7 @@ HELP: parse-datum
 { $notes "This word is used to implement " { $link ?scan-datum } " and " { $link scan-datum } "." } ;
 
 HELP: scan-word
-{ $values { "word" "a word" } }
+{ $values { "word" word } }
 { $description "Reads the next token from parser input. If the token is a valid number literal, it is converted to a number, otherwise the vocabulary search path is searched for a word named by the token." }
 { $errors "Throws an error if the token does not name a word or end of file is reached." }
 $parsing-note ;

@@ -1,11 +1,9 @@
-USING: generic help.markup help.syntax math memory
-namespaces sequences kernel.private layouts classes
-vectors combinators quotations strings words
-assocs arrays math.order ;
+USING: arrays classes combinators help.markup help.syntax
+kernel.private layouts math quotations words ;
 IN: kernel
 
 HELP: eq?
-{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
+{ $values { "obj1" object } { "obj2" object } { "?" boolean } }
 { $description "Tests if two references point at the same object." } ;
 
 HELP: drop  $shuffle ;
@@ -81,7 +79,7 @@ HELP: identity-hashcode
 { hashcode hashcode* identity-hashcode } related-words
 
 HELP: =
-{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
+{ $values { "obj1" object } { "obj2" object } { "?" boolean } }
 { $description
     "Tests if two objects are equal. If " { $snippet "obj1" } " and " { $snippet "obj2" } " point to the same object, outputs " { $link t } ". Otherwise, calls the " { $link equal? } " generic word."
 }
@@ -94,7 +92,7 @@ HELP: =
 } ;
 
 HELP: equal?
-{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
+{ $values { "obj1" object } { "obj2" object } { "?" boolean } }
 { $contract
     "Tests if two objects are equal."
     $nl
@@ -136,11 +134,11 @@ HELP: boolean
 { $class-description "A union of the " { $link POSTPONE: t } " and " { $link POSTPONE: f } " classes." } ;
 
 HELP: >boolean
-{ $values { "obj" "a generalized boolean" } { "?" "a boolean" } }
+{ $values { "obj" "a generalized boolean" } { "?" boolean } }
 { $description "Convert a generalized boolean into a boolean. That is, " { $link f } " retains its value, whereas anything else becomes " { $link t } "." } ;
 
 HELP: not
-{ $values { "obj" "a generalized boolean" } { "?" "a boolean" } }
+{ $values { "obj" "a generalized boolean" } { "?" boolean } }
 { $description "For " { $link f } " outputs " { $link t } " and for anything else outputs " { $link f } "." }
 { $notes "This word implements boolean not, so applying it to integers will not yield useful results (all integers have a true value). Bitwise not is the " { $link bitnot } " word." } ;
 
@@ -171,7 +169,7 @@ HELP: xor
 { $notes "This word implements boolean exclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise exclusive or is the " { $link bitxor } " word." } ;
 
 HELP: both?
-{ $values { "x" object } { "y" object } { "quot" { $quotation ( ... obj -- ... ? ) } } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation ( ... obj -- ... ? ) } } { "?" boolean } }
 { $description "Tests if the quotation yields a true value when applied to both " { $snippet "x" } " and " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 5 [ odd? ] both? ." "t" }
@@ -179,7 +177,7 @@ HELP: both?
 } ;
 
 HELP: either?
-{ $values { "x" object } { "y" object } { "quot" { $quotation ( ... obj -- ... ? ) } } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation ( ... obj -- ... ? ) } } { "?" boolean } }
 { $description "Tests if the quotation yields a true value when applied to either " { $snippet "x" } " or " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 6 [ odd? ] either? ." "t" }
@@ -187,7 +185,7 @@ HELP: either?
 } ;
 
 HELP: same?
-{ $values { "x" object } { "y" object } { "quot" { $quotation ( ... obj -- ... obj' ) } } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation ( ... obj -- ... obj' ) } } { "?" boolean } }
 { $description "Applies the quotation to both " { $snippet "x" } " and " { $snippet "y" } ", and then checks if the results are equal." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "4 5 [ 2/ ] same? ." "t" }

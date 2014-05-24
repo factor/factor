@@ -6,28 +6,28 @@ HELP: <mailbox>
 { $description "A mailbox is an object that can be used for safe thread communication. Items can be put in the mailbox and retrieved in a FIFO order. If the mailbox is empty when a get operation is performed then the thread will block until another thread places something in the mailbox. If multiple threads are waiting on the same mailbox, only one of the waiting threads will be unblocked to thread the get operation." } ;
 
 HELP: mailbox-empty?
-{ $values { "mailbox" mailbox } 
-          { "bool" "a boolean" }
+{ $values { "mailbox" mailbox }
+          { "bool" boolean }
 }
 { $description "Return true if the mailbox is empty." } ;
 
 HELP: mailbox-put
-{ $values { "obj" object } 
-          { "mailbox" mailbox } 
+{ $values { "obj" object }
+          { "mailbox" mailbox }
 }
 { $description "Put the object into the mailbox. Any threads that have a blocking get on the mailbox are resumed. Only one of those threads will successfully get the object, the rest will immediately block waiting for the next item in the mailbox." } ;
 
 HELP: block-unless-pred
 { $values
     { "mailbox" mailbox }
-    { "timeout" "a " { $link duration } " or " { $link f } }
-    { "pred" { $quotation ( ... message -- ... ? ) } } 
+    { "timeout" { $maybe duration } }
+    { "pred" { $quotation ( ... message -- ... ? ) } }
 }
 { $description "Block the thread if there are no items in the mailbox that return true when the predicate is called with the item on the stack." } ;
 
 HELP: block-if-empty
-{ $values { "mailbox" mailbox } 
-    { "timeout" "a " { $link duration } " or " { $link f } }
+{ $values { "mailbox" mailbox }
+    { "timeout" { $maybe duration } }
 }
 { $description "Block the thread if the mailbox is empty." } ;
 

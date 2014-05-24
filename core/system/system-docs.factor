@@ -1,5 +1,4 @@
-USING: generic help.markup help.syntax kernel math memory
-namespaces sequences kernel.private strings classes.singleton ;
+USING: classes.singleton help.markup help.syntax kernel math ;
 IN: system
 
 ABOUT: "system"
@@ -61,7 +60,7 @@ HELP: os
 } ;
 
 HELP: embedded?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Tests if this Factor instance is embedded in another application." } ;
 
 HELP: exit

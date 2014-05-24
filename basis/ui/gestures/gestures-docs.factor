@@ -7,7 +7,7 @@ HELP: set-gestures
 { $description "Sets the gestures a gadget class responds to. The hashtable maps gestures to quotations with stack effect " { $snippet "( gadget -- )" } "." } ;
 
 HELP: handle-gesture
-{ $values { "gesture" "a gesture" } { "gadget" "the receiver of the gesture" } { "?" "a boolean" } }
+{ $values { "gesture" "a gesture" } { "gadget" "the receiver of the gesture" } { "?" boolean } }
 { $contract "Handles a gesture sent to a gadget."
 $nl
 "Outputs " { $link f } " if the gesture was handled, and " { $link t } " if the gesture should be passed on to the gadget's parent."
@@ -16,14 +16,14 @@ $nl
 { $notes "Methods should be defined on this word if you desire to handle an arbitrary set of gestures. To define handlers for a fixed set, it is easier to use " { $link set-gestures } ". If you define a method on " { $snippet "handle-gesture" } ", you should also override " { $link handles-gesture? } "." } ;
 
 HELP: handles-gesture?
-{ $values { "gesture" "a gesture" } { "gadget" "the receiver of the gesture" } { "?" "a boolean" } }
+{ $values { "gesture" "a gesture" } { "gadget" "the receiver of the gesture" } { "?" boolean } }
 { $contract "Returns a true value if " { $snippet "gadget" } " would handle " { $snippet "gesture" } " in its " { $link handle-gesture } " method."
 $nl
 "The default implementation looks at the " { $snippet "\"gestures\"" } " word property of each superclass of the gadget's class and returns true if a handler is present for " { $snippet "gesture" } "." }
 { $notes "This word is used in Factor's MacOS X UI to validate menu items." } ;
 
 HELP: parents-handle-gesture?
-{ $values { "gesture" "a gesture" } { "gadget" "the receiver of the gesture" } { "?" "a boolean" } }
+{ $values { "gesture" "a gesture" } { "gadget" "the receiver of the gesture" } { "?" boolean } }
 { $contract "Returns a true value if " { $snippet "gadget" } " or any of its ancestors would handle " { $snippet "gesture" } " in its " { $link handle-gesture } " method." } ;
 
 { propagate-gesture handle-gesture handles-gesture? set-gestures } related-words

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax kernel ;
 IN: math.rectangles
 
 HELP: rect
@@ -39,11 +39,11 @@ HELP: rect-intersect
 { $description "Computes the intersection of two rectangles." } ;
 
 HELP: contains-rect?
-{ $values { "rect1" rect } { "rect2" rect } { "?" "a boolean" } }
+{ $values { "rect1" rect } { "rect2" rect } { "?" boolean } }
 { $description "Tests if two rectangles have a non-empty intersection." } ;
 
 HELP: contains-point?
-{ $values { "point" "a pair of integers" } { "rect" rect } { "?" "a boolean" } }
+{ $values { "point" "a pair of integers" } { "rect" rect } { "?" boolean } }
 { $description "Tests if a rectangle contains a point." } ;
 
 HELP: <zero-rect>

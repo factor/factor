@@ -1,5 +1,5 @@
-USING: help.markup help.syntax help.crossref help io io.styles
-hashtables strings ;
+USING: help help.crossref help.markup help.syntax io.styles
+sequences strings words ;
 IN: help.topics
 
 HELP: articles
@@ -23,11 +23,11 @@ HELP: article-content
 { $description "Outputs the content of a specific help article." } ;
 
 HELP: all-articles
-{ $values { "seq" "a sequence" } }
+{ $values { "seq" sequence } }
 { $description "Outputs a sequence of all help article names, and all words with documentation." } ;
 
 HELP: elements
-{ $values { "elt-type" "a word" } { "element" "a markup element" } { "seq" "a new sequence" } }
+{ $values { "elt-type" word } { "element" "a markup element" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all elements of type " { $snippet "elt-type" } " found by traversing " { $snippet "element" } "." } ;
 
 HELP: collect-elements

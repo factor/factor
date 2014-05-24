@@ -1,4 +1,4 @@
-USING: help.syntax help.markup ;
+USING: help.syntax help.markup math sequences strings ;
 IN: xml-rpc
 
 HELP: send-rpc
@@ -12,7 +12,7 @@ HELP: receive-rpc
 { $see-also send-rpc } ;
 
 HELP: <base64>
-{ $values { "string" "a string" } { "base64" "a base64 tuple" } }
+{ $values { "string" string } { "base64" "a base64 tuple" } }
 { $description "creates a base64 tuple using the data in the string. This marks the data for encoding in the base64 format" }
 { $see-also base64 } ;
 
@@ -21,7 +21,7 @@ HELP: base64
 { $see-also <base64> } ;
 
 HELP: <rpc-method>
-{ $values { "name" "a string" } { "params" "a sequence" } { "rpc-method" rpc-method } }
+{ $values { "name" string } { "params" sequence } { "rpc-method" rpc-method } }
 { $description "creates a tuple representing a method call which can be translated using send-rpc into an XML-RPC document" }
 { $see-also rpc-method <rpc-response> <rpc-fault> } ;
 
@@ -30,7 +30,7 @@ HELP: rpc-method
 { $see-also <rpc-method> rpc-response rpc-fault } ;
 
 HELP: <rpc-response>
-{ $values { "params" "a sequence" } { "rpc-response" rpc-response } }
+{ $values { "params" sequence } { "rpc-response" rpc-response } }
 { $description "creates a tuple representing a data response in XML-RPC" }
 { $see-also rpc-response <rpc-method> <rpc-fault> } ;
 
@@ -39,7 +39,7 @@ HELP: rpc-response
 { $see-also <rpc-response> rpc-method rpc-fault } ;
 
 HELP: <rpc-fault>
-{ $values { "code" "an integer" } { "string" "a string" } { "rpc-fault" rpc-fault } }
+{ $values { "code" integer } { "string" string } { "rpc-fault" rpc-fault } }
 { $description "creates a tuple representing an exception in RPC, to be returned to the caller. The code is a number representing what type of error it is, and the string is a description" }
 { $see-also rpc-fault <rpc-method> <rpc-response> } ;
 

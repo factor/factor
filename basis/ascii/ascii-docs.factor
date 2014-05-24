@@ -1,44 +1,44 @@
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax kernel strings ;
 IN: ascii
 
 HELP: blank?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $values { "ch" "a character" } { "?" boolean } }
 { $description "Tests for an ASCII whitespace character." } ;
 
 HELP: letter?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $values { "ch" "a character" } { "?" boolean } }
 { $description "Tests for a lowercase alphabet ASCII character." } ;
 
 HELP: LETTER?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $values { "ch" "a character" } { "?" boolean } }
 { $description "Tests for a uppercase alphabet ASCII character." } ;
 
 HELP: digit?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $values { "ch" "a character" } { "?" boolean } }
 { $description "Tests for an ASCII decimal digit character." } ;
 
 HELP: Letter?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $values { "ch" "a character" } { "?" boolean } }
 { $description "Tests for an ASCII alphabet character, both upper and lower case." } ;
 
 HELP: alpha?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $values { "ch" "a character" } { "?" boolean } }
 { $description "Tests for an alphanumeric ASCII character." } ;
 
 HELP: printable?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $values { "ch" "a character" } { "?" boolean } }
 { $description "Tests for a printable ASCII character." } ;
 
 HELP: control?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $values { "ch" "a character" } { "?" boolean } }
 { $description "Tests for an ASCII control character." } ;
 
 HELP: quotable?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $values { "ch" "a character" } { "?" boolean } }
 { $description "Tests for characters which may appear in a Factor string literal without escaping." } ;
 
 HELP: ascii?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $values { "ch" "a character" } { "?" boolean } }
 { $description "Tests for whether a number is an ASCII character." } ;
 
 HELP: ch>lower
@@ -50,23 +50,23 @@ HELP: ch>upper
 { $description "Converts an ASCII character to upper case." } ;
 
 HELP: >lower
-{ $values { "str" "a string" } { "lower" "a string" } }
+{ $values { "str" string } { "lower" string } }
 { $description "Converts an ASCII string to lower case." } ;
 
 HELP: >upper
-{ $values { "str" "a string" } { "upper" "a string" } }
+{ $values { "str" string } { "upper" string } }
 { $description "Converts an ASCII string to upper case." } ;
 
 HELP: >title
-{ $values { "str" "a string" } { "title" "a string" } }
+{ $values { "str" string } { "title" string } }
 { $description "Converts a string to title case." } ;
 
 HELP: >words
-{ $values { "str" "a string" } { "words" "an array of slices" } }
+{ $values { "str" string } { "words" "an array of slices" } }
 { $description "Divides the string up into words." } ;
 
 HELP: capitalize
-{ $values { "str" "a string" } { "str'" "a string" } }
+{ $values { "str" string } { "str'" string } }
 { $description "Capitalize all the words in a string." } ;
 
 ARTICLE: "ascii" "ASCII"

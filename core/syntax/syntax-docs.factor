@@ -1,7 +1,8 @@
-USING: generic help.syntax help.markup kernel math parser words
-effects classes classes.tuple generic.math generic.single arrays
-io.pathnames vocabs.loader io sequences assocs words.symbol
-words.alias words.constant combinators vocabs.parser command-line multiline ;
+USING: arrays assocs classes.tuple combinators command-line
+effects generic generic.math generic.single help.markup
+help.syntax io.pathnames kernel math parser sequences
+vocabs.loader vocabs.parser words words.alias words.constant
+words.symbol ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -27,9 +28,8 @@ $nl
 
 ARTICLE: "syntax-comments" "Comments"
 { $subsections
-  POSTPONE: !
-  POSTPONE: #!
-  POSTPONE: /*
+    POSTPONE: !
+    POSTPONE: #!
 } ;
 
 ARTICLE: "syntax-immediate" "Parse time evaluation"
@@ -412,7 +412,7 @@ HELP: W{
 
 HELP: POSTPONE:
 { $syntax "POSTPONE: word" }
-{ $values { "word" "a word" } }
+{ $values { "word" word } }
 { $description "Reads the next word from the input string and appends the word to the parse tree, even if it is a parsing word." }
 { $examples "For an ordinary word " { $snippet "foo" } ", " { $snippet "foo" } " and " { $snippet "POSTPONE: foo" } " are equivalent; however, if " { $snippet "foo" } " is a parsing word, the former will execute it at parse time, while the latter will execute it at runtime." }
 { $notes "This word is used inside parsing words to delegate further action to another parsing word, and to refer to parsing words literally from literal arrays and such." } ;
@@ -489,7 +489,7 @@ HELP: CONSTANT:
 
 HELP: \
 { $syntax "\\ word" }
-{ $values { "word" "a word" } }
+{ $values { "word" word } }
 { $description "Reads the next word from the input and appends a wrapper holding the word to the parse tree. When the evaluator encounters a wrapper, it pushes the wrapped word literally on the data stack." }
 { $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } "If " { $snippet "foo" } " is a symbol, the following two lines are equivalent:" { $code "foo" "\\ foo" } } ;
 
@@ -502,7 +502,7 @@ HELP: DEFER:
 
 HELP: FORGET:
 { $syntax "FORGET: word" }
-{ $values { "word" "a word" } }
+{ $values { "word" word } }
 { $description "Removes the word from its vocabulary, or does nothing if no such word exists. Existing definitions that reference forgotten words will continue to work, but new occurrences of the word will not parse." } ;
 
 HELP: USE:
@@ -656,7 +656,7 @@ HELP: !
 { $values { "comment" "characters" } }
 { $description "Discards all input until the end of the line." } ;
 
-{ POSTPONE: ! POSTPONE: #! POSTPONE: /* } related-words
+{ POSTPONE: ! POSTPONE: #! } related-words
 
 HELP: #!
 { $syntax "#!comment..." }

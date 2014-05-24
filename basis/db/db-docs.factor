@@ -107,7 +107,7 @@ HELP: advance-row
 { $description "Advanced the pointer to an underlying SQL result set stored in a " { $link result-set } " object." } ;
 
 HELP: more-rows?
-{ $values { "result-set" result-set } { "?" "a boolean" } }
+{ $values { "result-set" result-set } { "?" boolean } }
 { $description "Returns true if the " { $link result-set } " has more rows to traverse." } ;
 
 
@@ -123,7 +123,7 @@ HELP: in-transaction
 
 HELP: in-transaction?
 { $values
-     { "?" "a boolean" } }
+     { "?" boolean } }
 { $description "Returns true if there is currently a transaction in progress in this scope." } ;
 
 HELP: query-each

@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit help.markup help.syntax kernel
-math math.functions math.primes random ;
+USING: help.markup help.syntax kernel math ;
 IN: math.primes.safe
 
 HELP: next-safe-prime
@@ -21,7 +20,7 @@ HELP: random-safe-prime
 HELP: safe-prime?
 { $values
     { "q" integer }
-    { "?" "a boolean" }
+    { "?" boolean }
 }
 { $description "Tests whether the number is a safe prime. A safe prime " { $snippet "p" } " must be prime, as must " { $snippet "(p - 1) / 2" } "." } ;
 

@@ -1,12 +1,11 @@
-USING: help.markup help.syntax io kernel
-prettyprint.config prettyprint.sections prettyprint.custom
-words strings ;
+USING: help.markup help.syntax kernel prettyprint.config
+prettyprint.custom sequences strings words ;
 IN: prettyprint.backend
 
 ABOUT: "prettyprint-extension"
 
 HELP: pprint-word
-{ $values { "word" "a word" } }
+{ $values { "word" word } }
 { $description "Adds a text section for the word. Unlike the " { $link word } " method of " { $link pprint* } ", this does not add a " { $link POSTPONE: POSTPONE: } " prefix to parsing words." }
 $prettyprinting-note ;
 
@@ -28,21 +27,21 @@ HELP: pprint-string
 $prettyprinting-note ;
 
 HELP: nesting-limit?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Tests if the " { $link nesting-limit } " has been reached." }
 $prettyprinting-note ;
 
 HELP: check-recursion
-{ $values { "obj" "an object" } { "quot" { $quotation ( obj -- ) } } }
+{ $values { "obj" object } { "quot" { $quotation ( obj -- ) } } }
 { $description "If the object is already being printed, that is, if the prettyprinter has encountered a cycle in the object graph, or if the maximum nesting depth has been reached, outputs a dummy string. Otherwise applies the quotation to the object." }
 $prettyprinting-note ;
 
 HELP: do-length-limit
-{ $values { "seq" "a sequence" } { "trimmed" "a trimmed sequence" } { "n/f" "an integer or " { $link f } } }
+{ $values { "seq" sequence } { "trimmed" "a trimmed sequence" } { "n/f" "an integer or " { $link f } } }
 { $description "If the " { $link length-limit } " is set and the sequence length exceeds this limit, trims the sequence and outputs a the number of elements which were chopped off the end. Otherwise outputs " { $link f } "." }
 $prettyprinting-note ;
 
 HELP: pprint-elements
-{ $values { "seq" "a sequence" } }
+{ $values { "seq" sequence } }
 { $description "Prettyprints the elements of a sequence, trimming the sequence to " { $link length-limit } " if necessary." }
 $prettyprinting-note ;

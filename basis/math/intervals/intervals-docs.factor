@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math math.order ;
+USING: help.markup help.syntax kernel math math.order ;
 IN: math.intervals
 
 ARTICLE: "math-intervals-new" "Creating intervals"
@@ -227,7 +227,7 @@ HELP: interval-log2
 { $description "Integer-valued Base-2 logarithm of an interval." } ;
 
 HELP: interval-intersect
-{ $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval  } " or " { $link f } } }
+{ $values { "i1" interval } { "i2" interval } { "i3" { $maybe interval } } }
 { $description "Outputs the set-theoretic intersection of " { $snippet "i1" } " and " { $snippet "i2" } ". If " { $snippet "i1" } " and " { $snippet "i2" } " do not intersect, outputs " { $link f } "." } ;
 
 HELP: interval-union
@@ -235,11 +235,11 @@ HELP: interval-union
 { $description "Outputs the smallest interval containing the set-theoretic union of " { $snippet "i1" } " and " { $snippet "i2" } " (the union itself may not be an interval)." } ;
 
 HELP: interval-subset?
-{ $values { "i1" interval } { "i2" interval } { "?" "a boolean" } }
+{ $values { "i1" interval } { "i2" interval } { "?" boolean } }
 { $description "Tests if every point of " { $snippet "i1" } " is contained in " { $snippet "i2" } "." } ;
 
 HELP: interval-contains?
-{ $values { "x" real } { "int" interval } { "?" "a boolean" } }
+{ $values { "x" real } { "int" interval } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is contained in " { $snippet "int" } "." } ;
 
 HELP: interval-closure
@@ -335,7 +335,7 @@ HELP: assume<=
 { $description "Outputs the interval consisting of points from " { $snippet "i1" } " which are less or equal to all points in " { $snippet "i2" } "." } ;
 
 HELP: assume>
-{ $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval } " or " { $link f } } }
+{ $values { "i1" interval } { "i2" interval } { "i3" { $maybe interval } } }
 { $description "Outputs the interval consisting of points from " { $snippet "i1" } " which are greater than all points in " { $snippet "i2" } ". If the resulting interval is empty, outputs " { $link f } "." } ;
 
 HELP: assume>=

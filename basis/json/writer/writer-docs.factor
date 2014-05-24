@@ -4,12 +4,12 @@ USING: help.markup help.syntax ;
 IN: json.writer
 
 HELP: >json
-{ $values { "obj" "an object" } { "string" "the object converted to JSON format" } }
+{ $values { "obj" object } { "string" "the object converted to JSON format" } }
 { $description "Serializes the object into a JSON formatted string." } 
 { $see-also json-print } ;
 
 HELP: json-print
-{ $values { "obj" "an object" } }
+{ $values { "obj" object } }
 { $description "Serializes the object into a JSON formatted string and outputs it to the standard output stream. 
 
 By default, tuples and hashtables are serialized into Javascript-friendly JSON formatted output by converting keys containing dashes into underscores. This behaviour can be modified by setting the dynamic variable " { $strong "jsvar-encode?" } " to false." } 

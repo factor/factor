@@ -1,4 +1,4 @@
-USING: help.markup help.syntax sequences strings ;
+USING: help.markup help.syntax kernel sequences strings ;
 IN: grouping
 
 ARTICLE: "grouping" "Groups and clumps"
@@ -65,7 +65,7 @@ $nl
 "New groups are created by calling " { $link <groups> } "." } ;
 
 HELP: group
-{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
 { $description "Splits the sequence into disjoint groups of " { $snippet "n" } " elements and collects the groups into a new array." }
 { $notes "If the sequence length is not a multiple of " { $snippet "n" } ", the final subsequence in the list will be shorter than " { $snippet "n" } " elements." }
 { $examples
@@ -73,7 +73,7 @@ HELP: group
 } ;
 
 HELP: <groups>
-{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "groups" groups } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "groups" groups } }
 { $description "Outputs a virtual sequence whose elements are slices of disjoint subsequences of " { $snippet "n" } " elements from the underlying sequence." }
 { $examples
     { $example
@@ -100,7 +100,7 @@ $nl
 "New clumps are created by calling " { $link <circular-clumps> } "." } ;
 
 HELP: clump
-{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
 { $description "Splits the sequence into overlapping clumps of " { $snippet "n" } " elements and collects the clumps into a new array." }
 { $notes "For an empty sequence, the result is an empty sequence. For a non empty sequence with a length smaller than " { $snippet "n" } ", the result will be an empty sequence." }
 { $examples
@@ -108,7 +108,7 @@ HELP: clump
 } ;
 
 HELP: circular-clump
-{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
 { $description "Splits the sequence into overlapping clumps of " { $snippet "n" } " elements, wrapping around the end of the sequence, and collects the clumps into a new array." }
 { $notes "For an empty sequence, the result is an empty sequence." }
 { $examples
@@ -116,7 +116,7 @@ HELP: circular-clump
 } ;
 
 HELP: <clumps>
-{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "clumps" clumps } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "clumps" clumps } }
 { $description "Outputs a virtual sequence whose elements are overlapping subsequences of " { $snippet "n" } " elements from the underlying sequence." }
 { $examples
     "Running averages:"
@@ -136,7 +136,7 @@ HELP: <clumps>
 } ;
 
 HELP: <circular-clumps>
-{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "clumps" clumps } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "clumps" clumps } }
 { $description "Outputs a virtual sequence whose elements are overlapping slices of " { $snippet "n" } " elements from the underlying sequence, starting with each of its elements and wrapping around the end of the sequence." }
 { $examples
     { $example
@@ -153,7 +153,7 @@ HELP: <circular-clumps>
 { <clumps> <circular-clumps> <groups> } related-words
 
 HELP: monotonic?
-{ $values { "seq" sequence } { "quot" { $quotation ( elt1 elt2 -- ? ) } } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( elt1 elt2 -- ? ) } } { "?" boolean } }
 { $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
 { $examples
     "Testing if a sequence is non-decreasing:"
@@ -163,11 +163,11 @@ HELP: monotonic?
 } ;
 
 HELP: all-equal?
-{ $values { "seq" sequence } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "?" boolean } }
 { $description "Tests if all elements in the sequence are equal. Yields true with an empty sequence." } ;
 
 HELP: all-eq?
-{ $values { "seq" sequence } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "?" boolean } }
 { $description "Tests if all elements in the sequence are the same identical object. Yields true with an empty sequence." } ;
 
 { monotonic? all-eq? all-equal? } related-words

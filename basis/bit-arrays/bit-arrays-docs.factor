@@ -1,5 +1,4 @@
-USING: arrays help.markup help.syntax kernel
-kernel.private math prettyprint strings vectors sbufs ;
+USING: help.markup help.syntax math sequences ;
 IN: bit-arrays
 
 ARTICLE: "bit-arrays" "Bit arrays"
@@ -48,7 +47,7 @@ HELP: <bit-array>
 { $description "Creates a new bit array with the given length and all elements initially set to " { $link f } "." } ;
 
 HELP: >bit-array
-{ $values { "seq" "a sequence" } { "bit-array" bit-array } }
+{ $values { "seq" sequence } { "bit-array" bit-array } }
 { $description "Outputs a freshly-allocated bit array whose elements have the same boolean values as a given sequence." } ;
 
 HELP: clear-bits
