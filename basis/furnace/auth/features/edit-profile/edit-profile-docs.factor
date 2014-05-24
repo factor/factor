@@ -6,7 +6,7 @@ HELP: allow-edit-profile
 { $description "Adds an " { $snippet "edit-profile" } " action to an authentication realm." } ;
 
 HELP: allow-edit-profile?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Outputs true if the current authentication realm allows user profile editing." } ;
 
 ARTICLE: "furnace.auth.features.edit-profile" "User profile editing"

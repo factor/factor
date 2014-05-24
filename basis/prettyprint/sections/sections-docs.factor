@@ -1,6 +1,5 @@
-USING: prettyprint io kernel help.markup help.syntax
-prettyprint.config words hashtables math
-strings definitions quotations ;
+USING: hashtables help.markup help.syntax io kernel math
+prettyprint.config quotations strings ;
 IN: prettyprint.sections
 
 HELP: position
@@ -10,7 +9,7 @@ HELP: recursion-check
 { $var-description "The current nesting of collections being output by the prettyprinter, used to detect circularity and prevent infinite recursion." } ;
 
 HELP: line-limit?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Tests if the line number limit has been reached, and thus if prettyprinting should stop." } ;
 
 HELP: do-indent
@@ -29,7 +28,7 @@ HELP: hard
 { soft hard } related-words
 
 HELP: section-fits?
-{ $values { "section" section } { "?" "a boolean" } }
+{ $values { "section" section } { "?" boolean } }
 { $contract "Tests if a section fits in the space that remains on the current line." } ;
 
 HELP: short-section
@@ -41,20 +40,20 @@ HELP: long-section
 { $contract "Prints a section which spans multiple lines. This should use a layout strategy maximizing readability and minimizing line length." } ;
 
 HELP: indent-section?
-{ $values { "section" section } { "?" "a boolean" } }
+{ $values { "section" section } { "?" boolean } }
 { $contract "Outputs a boolean indicating if the indent level should be increased when printing this section as a " { $link long-section } ". Default implementation outputs " { $link f } "." } ;
 
 HELP: unindent-first-line?
-{ $values { "section" section } { "?" "a boolean" } }
+{ $values { "section" section } { "?" boolean } }
 { $contract "Outputs a boolean indicating if the indent level should only be increased for lines after the first line when printing this section as a " { $link long-section } ". Default implementation outputs " { $link f } "." }
 { $notes "This is used to format " { $link colon } " sections because of the colon definition formatting convention." } ;
 
 HELP: newline-after?
-{ $values { "section" section } { "?" "a boolean" } }
+{ $values { "section" section } { "?" boolean } }
 { $contract "Outputs a boolean indicating if a newline should be output after printing this section as a " { $link long-section } ". Default implementation outputs " { $link f } "." } ;
 
 HELP: short-section?
-{ $values { "section" section } { "?" "a boolean" } }
+{ $values { "section" section } { "?" boolean } }
 { $contract "Tests if a section should be output as a " { $link short-section } ". The default implementation calls " { $link section-fits? } " but this behavior can be customized." } ;
 
 HELP: section
@@ -152,7 +151,7 @@ HELP: do-break
 { $description "Prints a break section as per the policy outlined in " { $link line-break } "." } ;
 
 HELP: empty-block?
-{ $values { "block" block } { "?" "a boolean" } }
+{ $values { "block" block } { "?" boolean } }
 { $description "Tests if the block has no child sections." } ;
 
 HELP: if-nonempty
@@ -184,7 +183,7 @@ HELP: inset
 { $class-description "A " { $link block } " section which indents every line when printed as a " { $link long-section } "." } ;
 
 HELP: <inset
-{ $values { "narrow?" "a boolean" } }
+{ $values { "narrow?" boolean } }
 { $description "Begins an " { $link inset } " section. When printed as a " { $link long-section } ", the output format is determined by the " { $snippet "narrow?" } " flag. If it is " { $link f } ", then longer lines are favored, wrapping at the " { $link margin } ". Otherwise, every child section is printed on its own line." }
 { $examples
     "Compare the output of printing a long quotation versus a hashtable. Quotations are printed with " { $snippet "narrow?" } " set to " { $link f } ", and hashtables are printed with " { $snippet "narrow?" } " set to " { $link t } "."

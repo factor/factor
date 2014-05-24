@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math sequences ;
+USING: help.markup help.syntax kernel math sequences ;
 IN: math.polynomials
 
 ARTICLE: "polynomials" "Polynomials"
@@ -31,7 +31,7 @@ HELP: powers
 { $examples { $example "USING: math.polynomials prettyprint ;" "4 2 powers ." "{ 1 2 4 8 }" } } ;
 
 HELP: p=
-{ $values { "p" "a polynomial" } { "q" "a polynomial" } { "?" "a boolean" } }
+{ $values { "p" "a polynomial" } { "q" "a polynomial" } { "?" boolean } }
 { $description "Tests if two polynomials are equal." }
 { $examples { $example "USING: math.polynomials prettyprint ;" "{ 0 1 } { 0 1 0 } p= ." "t" } } ;
 

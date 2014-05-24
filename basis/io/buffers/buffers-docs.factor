@@ -1,4 +1,5 @@
-USING: help.markup help.syntax byte-arrays alien destructors ;
+USING: alien byte-arrays destructors help.markup help.syntax
+kernel ;
 IN: io.buffers
 
 ARTICLE: "buffers" "Locked I/O buffers"
@@ -101,7 +102,7 @@ HELP: buffer-capacity
 } ;
 
 HELP: buffer-empty?
-{ $values { "buffer" buffer } { "?" "a boolean" } }
+{ $values { "buffer" buffer } { "?" boolean } }
 { $description "Tests if the buffer contains no more data to be read or written." } ;
 
 HELP: >buffer

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax sequences strings ;
+USING: help.markup help.syntax kernel sequences strings ;
 IN: xml.data
 
 ABOUT: "xml.data"
@@ -78,7 +78,7 @@ HELP: name
 { $see-also <name> tag } ;
 
 HELP: <name>
-{ $values { "space" "a string" } { "main" "a string" } { "url" "a string" }
+{ $values { "space" string } { "main" string } { "url" string }
     { "name" "an XML tag name" } }
 { $description "Creates a name tuple with the namespace prefix space, the the given main part of the name, and the namespace URL given by url." }
 { $see-also name <tag> } ;
@@ -110,7 +110,7 @@ HELP: prolog
 
 HELP: <prolog>
 { $values { "version" "a string, 1.0 or 1.1" }
-{ "encoding" "a string" } { "standalone" "a boolean" } { "prolog" "an XML prolog" } }
+{ "encoding" string } { "standalone" boolean } { "prolog" "an XML prolog" } }
 { $description "Creates an XML prolog tuple." }
 { $see-also prolog <xml> } ;
 
@@ -128,7 +128,7 @@ HELP: instruction
 { $see-also <instruction> } ;
 
 HELP: <instruction>
-{ $values { "text" "a string" } { "instruction" "an XML instruction" } }
+{ $values { "text" string } { "instruction" "an XML instruction" } }
 { $description "Creates an XML parsing instruction, like " { $snippet "<?xsl stylesheet='foo.xml'?>" } "." }
 { $see-also instruction } ;
 

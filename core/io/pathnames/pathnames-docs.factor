@@ -1,9 +1,9 @@
-USING: help.markup help.syntax io.backend io.files
-io.directories strings system sequences io.pathnames.private ;
+USING: help.markup help.syntax io.backend io.directories
+io.files io.pathnames.private kernel sequences strings system ;
 IN: io.pathnames
 
 HELP: path-separator?
-{ $values { "ch" "a code point" } { "?" "a boolean" } }
+{ $values { "ch" "a code point" } { "?" boolean } }
 { $description "Tests if the code point is a platform-specific path separator." }
 { $examples
     "On Unix:"
@@ -68,15 +68,15 @@ HELP: prepend-path
 { append-path prepend-path } related-words
 
 HELP: absolute-path?
-{ $values { "path" "a pathname string" } { "?" "a boolean" } }
+{ $values { "path" "a pathname string" } { "?" boolean } }
 { $description "Tests if a pathname is absolute. Examples of absolute pathnames are " { $snippet "/foo/bar" } " on Unix and " { $snippet "c:\\foo\\bar" } " on Windows." } ;
 
 HELP: windows-absolute-path?
-{ $values { "path" "a pathname string" } { "?" "a boolean" } }
+{ $values { "path" "a pathname string" } { "?" boolean } }
 { $description "Tests if a pathname is absolute on Windows. Examples of absolute pathnames on Windows are " { $snippet "c:\\foo\\bar" } " and " { $snippet "\\\\?\\c:\\foo\\bar" } " for absolute Unicode pathnames." } ;
 
 HELP: root-directory?
-{ $values { "path" "a pathname string" } { "?" "a boolean" } }
+{ $values { "path" "a pathname string" } { "?" boolean } }
 { $description "Tests if a pathname is a root directory. Examples of root directory pathnames are " { $snippet "/" } " on Unix and " { $snippet "c:\\" } " on Windows." } ;
 
 { absolute-path? windows-absolute-path? root-directory? } related-words

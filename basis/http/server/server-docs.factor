@@ -1,5 +1,5 @@
-USING: help.markup help.syntax io.streams.string quotations strings urls
-http vocabs.refresh math io.servers assocs ;
+USING: assocs help.markup help.syntax http io.servers kernel
+math strings urls vocabs.refresh ;
 IN: http.server
 
 HELP: trivial-responder
@@ -32,7 +32,7 @@ HELP: main-responder
 { $var-description "The responder which will handle HTTP requests." } ;
 
 HELP: post-request?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Outputs if the current request is a POST request.s" } ;
 
 HELP: responder-nesting

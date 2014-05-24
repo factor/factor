@@ -1,5 +1,5 @@
-USING: help.markup help.syntax words definitions prettyprint
-tools.crossref.private math quotations assocs kernel sets ;
+USING: assocs help.markup help.syntax kernel math sets
+tools.crossref.private words ;
 IN: tools.crossref
 
 ARTICLE: "tools.crossref" "Definition cross referencing"
@@ -50,7 +50,7 @@ HELP: usage
 { $notes "The sequence might include the definition itself, if it is a recursive word." } ;
 
 HELP: usage.
-{ $values { "word" "a word" } }
+{ $values { "word" word } }
 { $description "Prints an list of all callers of a word. This may include the word itself, if it is recursive." }
 { $examples { $code "\\ reverse usage." } } ;
 

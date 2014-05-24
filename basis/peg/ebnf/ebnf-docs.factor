@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup peg peg.search ;
+USING: help.syntax help.markup peg peg.search words ;
 IN: peg.ebnf
 
 HELP: <EBNF
@@ -40,7 +40,7 @@ HELP: [EBNF
 
 HELP: EBNF:
 { $syntax "EBNF: word ...ebnf... ;EBNF" }
-{ $values { "word" "a word" } { "...ebnf..." "EBNF DSL text" } }
+{ $values { "word" word } { "...ebnf..." "EBNF DSL text" } }
 { $description
     "Defines a word that when called will parse a string using the syntax "
     "defined with the EBNF DSL. The word has stack effect "

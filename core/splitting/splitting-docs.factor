@@ -1,4 +1,4 @@
-USING: help.markup help.syntax sequences strings ;
+USING: help.markup help.syntax kernel sequences strings ;
 IN: splitting
 
 ARTICLE: "sequences-split" "Splitting sequences"
@@ -66,19 +66,19 @@ HELP: split
 { $examples { $example "USING: prettyprint splitting ;" "\"hello world-how are you?\" \" -\" split ." "{ \"hello\" \"world\" \"how\" \"are\" \"you?\" }" } } ;
 
 HELP: ?head
-{ $values { "seq" sequence } { "begin" sequence } { "newseq" "a new sequence" } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "begin" sequence } { "newseq" "a new sequence" } { "?" boolean } }
 { $description "Tests if " { $snippet "seq" } " starts with " { $snippet "begin" } ". If there is a match, outputs the subrange of " { $snippet "seq" } " excluding " { $snippet "begin" } ", and " { $link t } ". If there is no match, outputs " { $snippet "seq" } " and " { $link f } "." } ;
 
 HELP: ?head-slice
-{ $values { "seq" sequence } { "begin" sequence } { "newseq" slice } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "begin" sequence } { "newseq" slice } { "?" boolean } }
 { $description "Like " { $link ?head } ", except the resulting sequence is a " { $link slice } "." } ;
 
 HELP: ?tail
-{ $values { "seq" sequence } { "end" sequence } { "newseq" "a new sequence" } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "end" sequence } { "newseq" "a new sequence" } { "?" boolean } }
 { $description "Tests if " { $snippet "seq" } " ends with " { $snippet "end" } ". If there is a match, outputs the subrange of " { $snippet "seq" } " excluding " { $snippet "end" } ", and " { $link t } ". If there is no match, outputs " { $snippet "seq" } " and " { $link f } "." } ;
 
 HELP: ?tail-slice
-{ $values { "seq" sequence } { "end" sequence } { "newseq" slice } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "end" sequence } { "newseq" slice } { "?" boolean } }
 { $description "Like " { $link ?tail } ", except the resulting sequence is a " { $link slice } "." } ;
 
 HELP: string-lines

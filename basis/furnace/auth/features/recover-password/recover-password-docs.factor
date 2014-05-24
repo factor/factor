@@ -6,7 +6,7 @@ HELP: allow-password-recovery
 { $description "Adds a " { $snippet "recover-password" } " action to an authentication realm." } ;
 
 HELP: allow-password-recovery?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Outputs true if the current authentication realm allows user password recovery." } ;
 
 HELP: lost-password-from

@@ -1,11 +1,5 @@
-USING: help.syntax help.markup kernel sequences words io
-effects classes math combinators
-stack-checker.backend
-stack-checker.branches
-stack-checker.errors
-stack-checker.transforms
-stack-checker.state
-continuations ;
+USING: classes continuations effects help.markup help.syntax io
+kernel quotations sequences stack-checker.errors ;
 IN: stack-checker
 
 ARTICLE: "inference-simple" "Straight-line stack effects"
@@ -160,12 +154,12 @@ HELP: inference-error
 } ;
 
 HELP: infer
-{ $values { "quot" "a quotation" } { "effect" "an instance of " { $link effect } } }
+{ $values { "quot" quotation } { "effect" "an instance of " { $link effect } } }
 { $description "Attempts to infer the quotation's stack effect. For interactive testing, the " { $link infer. } " word should be called instead since it presents the output in a nicely formatted manner." }
 { $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
 
 HELP: infer.
-{ $values { "quot" "a quotation" } }
+{ $values { "quot" quotation } }
 { $description "Attempts to infer the quotation's stack effect, and prints this data to " { $link output-stream } "." }
 { $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
 
