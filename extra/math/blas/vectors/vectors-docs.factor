@@ -116,7 +116,7 @@ HELP: n*V+V
 { $description "Calculate the vector sum " { $snippet "αx + y" } " and return a freshly-allocated vector with the same length as " { $snippet "x" } " and " { $snippet "y" } " containing the result. Corresponds to the xAXPY routines in BLAS." } ;
 
 HELP: n*V
-{ $values { "alpha" "a number" } { "x" blas-vector-base } { "alpha*x" blas-vector-base } }
+{ $values { "alpha" number } { "x" blas-vector-base } { "alpha*x" blas-vector-base } }
 { $description "Calculate the scalar-vector product " { $snippet "αx" } " and return a freshly-allocated vector with the same length as " { $snippet "x" } " containing the result. Corresponds to the xSCAL routines in BLAS." } ;
 
 HELP: V+

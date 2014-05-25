@@ -1,9 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.crossref help.stylesheet help.topics help.syntax
-definitions io prettyprint summary arrays math sequences vocabs strings
-see xml.data hashtables assocs game.models.obj.private game.models
-game.models.util io.pathnames ;
+USING: assocs game.models.obj.private help.markup help.syntax
+io.pathnames kernel sequences strings ;
 IN: game.models.obj
 
 ABOUT: "game.models.obj"
@@ -58,7 +56,7 @@ HELP: face>aos
 { $description "Convert a face line to a sequence of vertex attributes." } ;
 
 HELP: push*
-{ $values { "elt" "an object" } { "seq" sequence } }
+{ $values { "elt" object } { "seq" sequence } }
 { $description "Push the value onto the sequence, keeping the sequence on the stack." } ;
 
 HELP: push-current-model
