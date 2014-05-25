@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax assocs ;
+USING: assocs help.markup help.syntax math sequences ;
 IN: path-finding
 
 { <astar> <bfs> <dijkstra> } related-words
@@ -15,7 +15,7 @@ HELP: cost
   { "from" "a node" }
   { "to" "a node" }
   { "astar" "an instance of a subclassed " { $link astar } " tuple" }
-  { "n" "a number" }
+  { "n" number }
 }
 { $description "Return the cost to go from " { $snippet "from" } " to " { $snippet "to" } ". "
   { $snippet "to" } " is necessarily a neighbour of " { $snippet "from" } "."
@@ -26,7 +26,7 @@ HELP: heuristic
   { "from" "a node" }
   { "to" "a node" }
   { "astar" "an instance of a subclassed " { $link astar } " tuple" }
-  { "n" "a number" }
+  { "n" number }
 }
 { $description "Return the estimated (undervalued) cost to go from " { $snippet "from" } " to " { $snippet "to" } ". "
   { $snippet "from" } " and " { $snippet "to" } " are not necessarily neighbours."
@@ -92,7 +92,7 @@ HELP: find-path
 HELP: considered
 { $values
   { "astar" astar }
-  { "considered" "a sequence" }
+  { "considered" sequence }
 }
 { $description "When called after a call to " { $link find-path } ", return a list of nodes "
   "which have been examined during the A* exploration."

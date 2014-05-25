@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
+USING: assocs help.markup help.syntax kernel strings ;
 IN: s3
 
 HELP: buckets
@@ -16,7 +16,7 @@ HELP: buckets
 
 HELP: create-bucket
 { $values 
-  { "bucket" "a string" } 
+  { "bucket" string } 
 }
 { $description 
     "Creates a bucket with the given name."
@@ -28,7 +28,7 @@ HELP: create-bucket
 
 HELP: delete-bucket
 { $values 
-  { "bucket" "a string" } 
+  { "bucket" string } 
 }
 { $description 
     "Deletes the bucket with the given name."
@@ -40,7 +40,7 @@ HELP: delete-bucket
 
 HELP: keys
 { $values 
-  { "bucket" "a string" } 
+  { "bucket" string } 
   { "seq" "a sequence of " { $link key } " objects"} 
 }
 { $description 
@@ -53,10 +53,10 @@ HELP: keys
 
 HELP: get-object
 { $values 
-  { "bucket" "a string" } 
-  { "key" "a string" } 
-  { "response" "The HTTP response object"} 
-  { "data" "The data returned from the http request"} 
+  { "bucket" string }
+  { "key" string }
+  { "response" "The HTTP response object"}
+  { "data" "The data returned from the http request"}
 }
 { $description 
     "Does an HTTP request to retrieve the object in the bucket with the given key."
@@ -67,12 +67,12 @@ HELP: get-object
 ;
 
 HELP: put-object
-{ $values 
-  { "data" "an object" } 
-  { "mime-type" "a string" } 
-  { "bucket" "a string"} 
-  { "key" "a string"} 
-  { "headers" "an assoc"} 
+{ $values
+  { "data" object }
+  { "mime-type" string }
+  { "bucket" string }
+  { "key" string }
+  { "headers" assoc }
 }
 { $description 
     "Stores the object under the key in the given bucket. The object has "
@@ -90,8 +90,8 @@ HELP: put-object
 
 HELP: delete-object
 { $values 
-  { "bucket" "a string"} 
-  { "key" "a string"} 
+  { "bucket" string }
+  { "key" string }
 }
 { $description 
     "Deletes the object in the bucket with the given key."
