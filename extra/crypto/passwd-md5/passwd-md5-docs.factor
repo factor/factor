@@ -1,12 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.streams.string strings ;
+USING: help.markup help.syntax io.streams.string kernel
+strings ;
 IN: crypto.passwd-md5
 
 HELP: authenticate-password
 { $values
      { "shadow" string } { "password" string }
-     { "?" "a boolean" } }
+     { "?" boolean } }
 { $description "Encodes the provided password and compares it to the encoded password entry from a shadowed password file." } ;
 
 HELP: parse-shadow-password
