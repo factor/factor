@@ -1,11 +1,11 @@
 ! Copyright (C) 2010 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax kernel math sequences strings ;
 IN: bitcoin.client
 
 HELP: bitcoin-server
 { $values 
-  { "string" "a string" } 
+  { "string" string } 
 }
 { $description 
     "Returns the hostname of the json-rpc server for the bitcoin client. "
@@ -16,7 +16,7 @@ HELP: bitcoin-server
 
 HELP: bitcoin-port
 { $values 
-  { "n" "a number" } 
+  { "n" number } 
 }
 { $description 
     "Returns the port of the json-rpc server for the bitcoin client. "
@@ -27,7 +27,7 @@ HELP: bitcoin-port
 
 HELP: bitcoin-user
 { $values 
-  { "string" "a string" } 
+  { "string" string } 
 }
 { $description 
     "Returns the username required to authenticate with the json-rpc "
@@ -38,7 +38,7 @@ HELP: bitcoin-user
 
 HELP: bitcoin-password
 { $values 
-  { "string" "a string" } 
+  { "string" string } 
 }
 { $description 
     "Returns the password required to authenticate with the json-rpc "
@@ -49,8 +49,8 @@ HELP: bitcoin-password
 
 HELP: get-addresses-by-label
 { $values 
-  { "label" "a string" } 
-  { "seq" "a sequence" } 
+  { "label" string } 
+  { "seq" sequence } 
 }
 { $description 
     "Returns the list of addresses with the given label."
@@ -58,7 +58,7 @@ HELP: get-addresses-by-label
 
 HELP: get-balance
 { $values 
-  { "n" "a number" } 
+  { "n" number } 
 }
 { $description 
     "Returns the server's available balance."
@@ -66,7 +66,7 @@ HELP: get-balance
 
 HELP: get-block-count
 { $values 
-  { "n" "a number" } 
+  { "n" number } 
 }
 { $description 
     "Returns the number of blocks in the longest block chain."
@@ -74,7 +74,7 @@ HELP: get-block-count
 
 HELP: get-block-number
 { $values 
-  { "n" "a number" } 
+  { "n" number } 
 }
 { $description 
     "Returns the block number of the latest block in the longest block chain."
@@ -82,7 +82,7 @@ HELP: get-block-number
 
 HELP: get-connection-count
 { $values 
-  { "n" "a number" } 
+  { "n" number } 
 }
 { $description 
     "Returns the number of connections to other nodes."
@@ -90,7 +90,7 @@ HELP: get-connection-count
 
 HELP: get-difficulty
 { $values 
-  { "n" "a number" } 
+  { "n" number } 
 }
 { $description 
     "Returns the proof-of-work difficulty as a multiple of the minimum "
@@ -99,7 +99,7 @@ HELP: get-difficulty
 
 HELP: get-generate
 { $values 
-  { "?" "a boolean" } 
+  { "?" boolean } 
 }
 { $description 
     "Returns true if the server is trying to generate bitcoins, false "
@@ -108,8 +108,8 @@ HELP: get-generate
 
 HELP: set-generate
 { $values 
-  { "gen" "a boolean" } 
-  { "n" "a number" } 
+  { "gen" boolean } 
+  { "n" number } 
 }
 { $description 
     "If 'gen' is true, the server starts generating bitcoins. If 'gen' is "
@@ -128,8 +128,8 @@ HELP: get-info
 
 HELP: get-label
 { $values 
-  { "address" "a string" } 
-  { "label" "a string" } 
+  { "address" string } 
+  { "label" string } 
 }
 { $description 
     "Returns the label associated with the given address."
@@ -137,8 +137,8 @@ HELP: get-label
 
 HELP: set-label
 { $values 
-  { "address" "a string" } 
-  { "label" "a string" } 
+  { "address" string } 
+  { "label" string } 
 }
 { $description 
     "Sets the label associateed with the given address."
@@ -146,7 +146,7 @@ HELP: set-label
 
 HELP: remove-label
 { $values 
-  { "address" "a string" } 
+  { "address" string } 
 }
 { $description 
     "Removes the label associated with the given address."
@@ -154,7 +154,7 @@ HELP: remove-label
 
 HELP: get-new-address
 { $values 
-  { "address" "a string" } 
+  { "address" string } 
 }
 { $description 
     "Returns a new bitcoin address for receiving payments."
@@ -162,8 +162,8 @@ HELP: get-new-address
 
 HELP: get-new-labelled-address
 { $values 
-  { "label" "a string" } 
-  { "address" "a string" } 
+  { "label" string } 
+  { "address" string } 
 }
 { $description 
     "Returns a new bitcoin address for receiving payments. The given "
@@ -172,8 +172,8 @@ HELP: get-new-labelled-address
 
 HELP: get-received-by-address
 { $values 
-  { "address" "a string" } 
-  { "amount" "a number" }
+  { "address" string } 
+  { "amount" number }
 }
 { $description 
     "Returns the total amount received by the address in transactions "
@@ -182,9 +182,9 @@ HELP: get-received-by-address
 
 HELP: get-confirmed-received-by-address
 { $values 
-  { "address" "a string" } 
-  { "minconf" "a number" }
-  { "amount" "a number" }
+  { "address" string } 
+  { "minconf" number }
+  { "amount" number }
 }
 { $description 
     "Returns the total amount received by the address in transactions "
@@ -193,8 +193,8 @@ HELP: get-confirmed-received-by-address
 
 HELP: get-received-by-label
 { $values 
-  { "label" "a string" } 
-  { "amount" "a number" }
+  { "label" string } 
+  { "amount" number }
 }
 { $description 
     "Returns the total amount received by addresses with 'label' in transactions "
@@ -203,9 +203,9 @@ HELP: get-received-by-label
 
 HELP: get-confirmed-received-by-label
 { $values 
-  { "label" "a string" } 
-  { "minconf" "a number" }
-  { "amount" "a number" }
+  { "label" string } 
+  { "minconf" number }
+  { "amount" number }
 }
 { $description 
     "Returns the total amount received by the addresses with 'label' in transactions "
@@ -214,9 +214,9 @@ HELP: get-confirmed-received-by-label
 
 HELP: list-received-by-address
 { $values 
-  { "minconf" "a number" } 
-  { "include-empty" "a boolean" }
-  { "seq" "a sequence" }
+  { "minconf" number } 
+  { "include-empty" boolean }
+  { "seq" sequence }
 }
 { $description 
     "Return a sequence containing an assoc of data about the payments an "
@@ -227,9 +227,9 @@ HELP: list-received-by-address
 
 HELP: list-received-by-label
 { $values 
-  { "minconf" "a number" } 
-  { "include-empty" "a boolean" }
-  { "seq" "a sequence" }
+  { "minconf" number } 
+  { "include-empty" boolean }
+  { "seq" sequence }
 }
 { $description 
     "Return a sequence containing an assoc of data about the payments that "
@@ -241,9 +241,9 @@ HELP: list-received-by-label
 
 HELP: send-to-address
 { $values 
-  { "address" "a string" } 
-  { "amount" "a number" }
-  { "?" "a boolean" }
+  { "address" string } 
+  { "amount" number }
+  { "?" boolean }
 }
 { $description 
     "Sends 'amount' from the server's available balance to 'address'. "
@@ -258,9 +258,9 @@ HELP: stop
 
 HELP: list-transactions
 { $values 
-  { "count" "a number" } 
-  { "include-generated" "a boolean" }
-  { "seq" "a sequence" }
+  { "count" number } 
+  { "include-generated" boolean }
+  { "seq" sequence }
 }
 { $description 
     "Return's a sequence containing up to 'count' most recent transactions."

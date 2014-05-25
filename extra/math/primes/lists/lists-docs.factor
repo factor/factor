@@ -1,4 +1,4 @@
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax math ;
 IN: math.primes.lists
 
 HELP: lprimes
@@ -6,5 +6,5 @@ HELP: lprimes
 { $description "Return a sorted list containing all the prime numbers." } ;
 
 HELP: lprimes-from
-{ $values { "n" "an integer" } { "list" "a lazy list" } }
+{ $values { "n" integer } { "list" "a lazy list" } }
 { $description "Return a sorted list containing all the prime numbers greater or equal to " { $snippet "n" } "." } ;

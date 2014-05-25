@@ -65,7 +65,7 @@ HELP: capabilities
 { $description "Fetches the advertised extensions of the IMAP server." } ;
 
 HELP: list-folders
-{ $values { "directory" string } { "folders" "a sequence" } }
+{ $values { "directory" string } { "folders" sequence } }
 { $description "Lists all folders in " { $snippet "directory" } ". Folders is a sequence of 3-tuples with the attributes, root and name of each folder matched." } ;
 
 HELP: select-folder

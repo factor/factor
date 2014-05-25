@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel math ;
+USING: help.markup help.syntax kernel math strings ;
 IN: hashcash
 
 ARTICLE: "hashcash" "Hashcash"
@@ -31,7 +31,7 @@ $nl
 { mint mint* <hashcash> check-stamp salt } related-words
 
 HELP: mint
-{ $values { "resource" "a string" } { "stamp" "generated stamp" } }
+{ $values { "resource" string } { "stamp" "generated stamp" } }
 { $description "This word generate a valid stamp with default parameters and the specified resource." } ;
 
 HELP: mint*
@@ -39,11 +39,11 @@ HELP: mint*
 { $description "As " { $snippet "mint" } " but it takes an hashcash tuple as a parameter." } ;
 
 HELP: check-stamp
-{ $values { "stamp" "a string" } { "?" boolean } }
+{ $values { "stamp" string } { "?" boolean } }
 { $description "Check for stamp's validity. Only supports hashcash version 1." } ;
 
 HELP: salt
-{ $values { "length" integer } { "salted" "a string" } }
+{ $values { "length" integer } { "salted" string } }
 { $description "It generates a random string of " { $snippet "length" } " characters." } ;
 
 HELP: <hashcash>

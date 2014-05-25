@@ -1,6 +1,6 @@
 ! Copyright (c) 2009 Samuel Tardieu.
 ! See See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax quotations sequences ;
+USING: help.markup help.syntax kernel quotations sequences ;
 IN: backtrack
 
 HELP: fail
@@ -32,7 +32,7 @@ HELP: if-amb
 { $values
   { "true" { $quotation ( -- ? ) } }
   { "false" quotation }
-  { "?" "a boolean" }
+  { "?" boolean }
 }
 { $description "Execute the first quotation and returns " { $link t } " if it returns " { $link t } " itself. If it fails with " { $link fail } " or returns " { $link f } ", then the second quotation is executed and " { $link f } " is returned." } ;
 
