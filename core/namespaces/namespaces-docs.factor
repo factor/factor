@@ -1,6 +1,5 @@
-USING: help.markup help.syntax kernel kernel.private
-sequences words namespaces.private quotations vectors
-math.parser math words.symbol assocs ;
+USING: assocs help.markup help.syntax kernel math
+namespaces.private quotations words words.symbol ;
 IN: namespaces
 
 ARTICLE: "namespaces-combinators" "Namespace combinators"
@@ -107,7 +106,7 @@ HELP: with-global
 { $description "Runs the quotation in the global namespace." } ;
 
 HELP: +@
-{ $values { "n" "a number" } { "variable" "a variable, by convention a symbol" } }
+{ $values { "n" number } { "variable" "a variable, by convention a symbol" } }
 { $description "Adds " { $snippet "n" } " to the value of the variable. A variable value of " { $link f } " is interpreted as being zero." }
 { $side-effects "variable" }
 { $examples
