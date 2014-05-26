@@ -1,4 +1,4 @@
-USING: assocs compiler.cfg.builder compiler.cfg.optimizer
+USING: assocs compiler.cfg compiler.cfg.builder compiler.cfg.optimizer
 compiler.errors compiler.tree.builder compiler.tree.optimizer
 compiler.units compiler.codegen help.markup help.syntax io
 parser quotations sequences words ;
@@ -57,6 +57,11 @@ ABOUT: "compiler"
 HELP: frontend
 { $values { "word" word } { "tree" sequence } }
 { $description "First step of the compilation process. It outputs a high-level tree in SSA form." } ;
+
+HELP: backend
+{ $values { "tree" "a " { $link sequence } " of SSA nodes" } { "word" word } }
+{ $description "The second last step of the compilation process. A word and its SSA tree is taken as input and a " { $link cfg } " is built from which assembly code is generated." }
+{ $see-also generate } ;
 
 HELP: compile-word
 { $values { "word" word } }

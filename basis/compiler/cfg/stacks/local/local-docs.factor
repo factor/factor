@@ -16,7 +16,7 @@ HELP: translate-local-loc
 } ;
 
 HELP: emit-height-changes
-{ $description "Emits stack height change instructions to the CFG being built." }
+{ $description "Emits stack height change instructions to the CFG being built. This is done when a " { $link basic-block } " is begun or ended." }
 { $examples
   { $example
     "USING: compiler.cfg.stacks.local make namespaces prettyprint ;"

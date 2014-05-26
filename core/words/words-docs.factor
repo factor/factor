@@ -345,6 +345,11 @@ HELP: deprecated?
 { $description "Tests if an object is " { $link POSTPONE: deprecated } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
+HELP: inline?
+{ $values { "obj" object } { "?" "a boolean" } }
+{ $description "Tests if an object is " { $link POSTPONE: inline } "." }
+{ $notes "Outputs " { $link f } " if the object is not a word." } ;
+
 HELP: subwords
 { $values { "word" word } { "seq" sequence } }
 { $description "Lists all specializations for the given word." }
