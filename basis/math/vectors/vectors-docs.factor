@@ -215,45 +215,45 @@ HELP: vtruncate
 { $description "Truncates each element of " { $snippet "u" } "." } ;
 
 HELP: n+v
-{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Adds " { $snippet "n" } " to each element of " { $snippet "v" } "." } ;
 
 HELP: v+n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
 { $description "Adds " { $snippet "n" } " to each element of " { $snippet "u" } "." } ;
 
 HELP: n-v
-{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Subtracts each element of " { $snippet "v" } " from " { $snippet "n" } "." } ;
 
 HELP: v-n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
 { $description "Subtracts " { $snippet "n" } " from each element of " { $snippet "u" } "." } ;
 
 HELP: n*v
-{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Multiplies each element of " { $snippet "v" } " by " { $snippet "n" } "." } ;
 
 HELP: v*n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
 { $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
 
 HELP: n/v
-{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Divides " { $snippet "n" } " by each element of " { $snippet "v" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
 HELP: v/n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
 { $description "Divides each element of " { $snippet "u" } " by " { $snippet "n" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
 HELP: n^v
-{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Raises " { $snippet "n" } " to the power of each element of " { $snippet "v" } "." } ;
 
 HELP: v^n
-{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
 { $description "Raises each element of " { $snippet "u" } " to the power of " { $snippet "n" } "." } ;
 
 HELP: v+

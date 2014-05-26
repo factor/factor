@@ -120,7 +120,7 @@ HELP: set-generate
 
 HELP: get-info
 { $values 
-  { "result" "an assoc" } 
+  { "result" assoc }
 }
 { $description 
     "Returns an assoc containing server information."

@@ -149,13 +149,13 @@ HELP: no-word
 { $description "Throws a " { $link no-word-error } "." } ;
 
 HELP: parse-word
-{ $values { "string" string } { "word" "a number" } }
+{ $values { "string" string } { "word" word } }
 { $description "If " { $snippet "string" } " is a valid number literal, it is converted to a number, otherwise the current vocabulary search path is searched for a word named by the string." }
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 { $notes "This word is used to implement " { $link scan-word } "." } ;
 
 HELP: parse-datum
-{ $values { "string" string } { "word/number" "a word or number" } }
+{ $values { "string" string } { "word/number" { $or word number } } }
 { $description "If " { $snippet "string" } " is a valid number literal, it is converted to a number, otherwise the current vocabulary search path is searched for a word named by the string." }
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 { $notes "This word is used to implement " { $link ?scan-datum } " and " { $link scan-datum } "." } ;
