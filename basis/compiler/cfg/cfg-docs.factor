@@ -1,5 +1,5 @@
-USING: compiler.cfg compiler.cfg.instructions help.markup help.syntax
-namespaces vectors words ;
+USING: compiler.cfg compiler.cfg.instructions compiler.cfg.rpo help.markup
+help.syntax namespaces sequences vectors words ;
 IN: compiler.cfg
 
 HELP: basic-block
@@ -21,5 +21,11 @@ HELP: cfg
   { $table
     { { $slot "entry" } { "Initial " { $link basic-block } " of the graph." } }
     { { $slot "word" } { "The " { $link word } " the cfg is produced from." } }
+    { { $slot "post-order" } { "The blocks of the cfg in a post order traversal " { $link sequence } "." } }
   }
-} ;
+}
+{ $see-also post-order } ;
+
+HELP: cfg-changed
+{ $values { "cfg" cfg } }
+{ $description "Resets all \"calculated\" slots in the cfg which forces them to be recalculated." } ;

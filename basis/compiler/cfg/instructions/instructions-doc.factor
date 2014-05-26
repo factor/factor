@@ -1,6 +1,12 @@
 USING: compiler.cfg help.markup help.syntax kernel layouts slots.private ;
 IN: compiler.cfg.instructions
 
+HELP: new-insn
+{ $values { "class" class } { "insn" insn } }
+{ $description
+  "Boa wrapper for the " { $link insn } " class with " { $slot "insn#" } " set to " { $link f } "."
+} ;
+
 HELP: insn
 { $class-description
   "Base class for all virtual cpu instructions, used by the CFG IR."
@@ -21,7 +27,7 @@ HELP: foldable-insn
 
 HELP: ##inc-d
 { $class-description
-  "An instruction that increases or decreases the data stacks size by n. For example, " { $link 2drop } " decreases it by two and pushing an item increases it by one."
+  "An instruction that increases or decreases the data stacks height by n. For example, " { $link 2drop } " decreases it by two and pushing an item increases it by one."
 } ;
 
 HELP: ##prologue

@@ -85,7 +85,7 @@ $nl
 "The alist maps words to one of the following:"
 { $list
     { "a quotation - in this case, the quotation is compiled with the non-optimizing compiler and the word will call the quotation when executed." }
-    { "a 5-element array " { $snippet "{ parameters literals relocation labels code }" } " - in this case, a code heap block is allocated with the given data and the word will call the code block when executed. This is used by the optimizing compiler." }
+    { "a 6-element array " { $snippet "{ parameters literals relocation labels code stack-frame-size }" } " - in this case, a code heap block is allocated with the given data and the word will call the code block when executed. This is used by the optimizing compiler." }
 }
 "If any of the redefined words may already be referenced by other words in the code heap, from outside of the compilation unit, then a scan of the code heap must be performed to update all word call sites. Passing " { $link t } " as the " { $snippet "update-existing?" } " parameter enables this code path."
 $nl
