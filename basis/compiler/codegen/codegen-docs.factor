@@ -65,11 +65,10 @@ HELP: generate
 { $values { "cfg" cfg } { "code" sequence } }
 { $description "Generates assembly code for the given cfg. The output " { $link sequence } " has six items with the following interpretations:"
   { $list
-    { "The first element is a sequence of alien function symbols and " { $link dll } "s used by the cfg interleaved." }
-    "The second item is the parameter table."
-    { "The third item is the " { $link literal-table } "." }
+    { "The first element is a sequence of alien function symbols and " { $link dll } "s used by the cfg interleaved. That is, the " { $link parameter-table } "." }
+    { "The second item is the " { $link literal-table } "." }
     { "The third item is the relocation table as a " { $link byte-array } "." }
-    "The fourth item is the label table."
+    { "The fourth item is the " { $link label-table } "." }
     { "The fifth item is the generated assembly code as a " { $link byte-array } ". It still contains unresolved crossreferences." }
     "The sixth item is the size of the stack frame in bytes."
   }
