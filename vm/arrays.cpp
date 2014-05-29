@@ -12,29 +12,10 @@ array* factor_vm::allot_array(cell capacity, cell fill_) {
 
 /* Allocates memory */
 void factor_vm::primitive_array() {
-  data_root<object> fill(ctx->pop(), this);
+  cell fill = ctx->pop();
   cell capacity = unbox_array_size();
-  array* new_array = allot_uninitialized_array<array>(capacity);
-  memset_cell(new_array->data(), fill.value(), capacity * sizeof(cell));
+  array* new_array = allot_array(capacity, fill);
   ctx->push(tag<array>(new_array));
-}
-
-/* Allocates memory */
-cell factor_vm::allot_array_1(cell obj_) {
-  data_root<object> obj(obj_, this);
-  data_root<array> a(allot_uninitialized_array<array>(1), this);
-  set_array_nth(a.untagged(), 0, obj.value());
-  return a.value();
-}
-
-/* Allocates memory */
-cell factor_vm::allot_array_2(cell v1_, cell v2_) {
-  data_root<object> v1(v1_, this);
-  data_root<object> v2(v2_, this);
-  data_root<array> a(allot_uninitialized_array<array>(2), this);
-  set_array_nth(a.untagged(), 0, v1.value());
-  set_array_nth(a.untagged(), 1, v2.value());
-  return a.value();
 }
 
 /* Allocates memory */
