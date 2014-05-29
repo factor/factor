@@ -50,16 +50,13 @@ inline double factor_vm::fixnum_to_float(cell tagged) {
 }
 
 inline cell factor_vm::unbox_array_size() {
-  cell obj = ctx->peek();
-  if (TAG(obj) == FIXNUM_TYPE) {
-    fixnum n = untag_fixnum(obj);
-    if (n >= 0 && n < (fixnum)array_size_max) {
-      ctx->pop();
-      return n;
-    }
+  cell obj = ctx->pop();
+  fixnum n = to_fixnum(obj);
+  if (n >= 0 && n < (fixnum)array_size_max) {
+    return n;
   }
-
-  return unbox_array_size_slow();
+  general_error(ERROR_ARRAY_SIZE, obj, tag_fixnum(array_size_max));
+  return 0; /* can't happen */
 }
 
 VM_C_API cell from_signed_cell(fixnum integer, factor_vm* vm);
