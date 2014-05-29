@@ -429,8 +429,6 @@ struct factor_vm {
   inline void set_array_nth(array* array, cell slot, cell value);
   array* allot_array(cell capacity, cell fill_);
   void primitive_array();
-  cell allot_array_1(cell obj_);
-  cell allot_array_2(cell v1_, cell v2_);
   cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_);
   void primitive_resize_array();
   cell std_vector_to_array(std::vector<cell>& elements);
