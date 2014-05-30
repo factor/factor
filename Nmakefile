@@ -12,6 +12,8 @@ GIT_LABEL = git-label-missing
 
 !IF DEFINED(PLATFORM)
 
+GTEST = C:\p\pubwork\gtest-1.7.0
+
 LINK_FLAGS = /nologo shell32.lib
 CL_FLAGS = /nologo /O2 /WX /W3 /D_CRT_SECURE_NO_WARNINGS /DFACTOR_VERSION=$(VERSION) /DFACTOR_GIT_LABEL=$(GIT_LABEL)
 CL_FLAGS_VISTA = /D_WIN32_WINNT=0x0600
@@ -118,6 +120,19 @@ factor.com: $(EXE_OBJS) $(DLL_OBJS)
 factor.exe: $(EXE_OBJS) $(DLL_OBJS)
 	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:windows $(EXE_OBJS) $(DLL_OBJS)
 
+TESTING_OBJS = vm\tests\gtest-all.obj vm\tests\gtest_main.obj vm\tests\factor-tests.obj
+
+.cc.obj:
+	cl /EHsc $(CL_FLAGS) /I $(GTEST)\include /I $(GTEST) /I vm /Fo$@ /c $<
+
+gtest-setup:
+	copy $(GTEST)\src\*.cc vm\tests
+
+factor-tests.com: gtest-setup $(TESTING_OBJS) $(EXE_OBJS) $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:factor-tests.com /SUBSYSTEM:console $(TESTING_OBJS) $(DLL_OBJS)
+
+gtest: factor-tests.com
+
 all: factor.com factor.exe factor.dll.lib libfactor-ffi-test.dll
 
 !ENDIF
@@ -145,6 +160,8 @@ x86-64-vista:
 
 clean:
 	del vm\*.obj
+	del vm\tests\*.obj
+	del vm\tests\gtest*.cc
 	if exist factor.lib del factor.lib
 	if exist factor.res del factor.res
 	if exist factor.com del factor.com
