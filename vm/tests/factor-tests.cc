@@ -14,12 +14,11 @@ cell datastack_depth(context *ctx) {
 
 factor_vm* setup_factor_vm() {
   factor_vm* vm = new_factor_vm();
-  vm_char* image_path = STRING_LITERAL("factor.image");
+  const vm_char* image_path = STRING_LITERAL("factor.image");
   vm_parameters p;
   vm->default_parameters(&p);
   p.image_path = image_path;
   vm->init_factor(&p);
-  context* ctx = vm->spare_ctx;
   vm->ctx = vm->spare_ctx;
   return vm;
 }
@@ -43,7 +42,7 @@ TEST(FactorVMTests, InitialValues) {
 
 TEST(FactorVMTests, CheckStackSizes) {
   factor_vm* vm = new_factor_vm();
-  vm_char* image_path = STRING_LITERAL("factor.image");
+  const vm_char* image_path = STRING_LITERAL("factor.image");
   vm_parameters p;
   vm->default_parameters(&p);
   p.image_path = image_path;
@@ -61,7 +60,6 @@ TEST(FactorVMTests, CheckStackSizes) {
 TEST(ContextTests, PushAndPopItems) {
   factor_vm* vm = setup_factor_vm();
   context* ctx = vm->ctx;
-  cell initial_sp = ctx->datastack;
   EXPECT_EQ(0, datastack_depth(ctx));
   ctx->push(3);
   ctx->push(4);
@@ -91,7 +89,7 @@ TEST(ArrayTests, PrimitiveArray) {
   EXPECT_EQ(9, capacity);
 
   // Iterate elements
-  for (int n = 0; n < capacity; n++) {
+  for (cell n = 0; n < capacity; n++) {
     cell elt = arr->data()[n];
     EXPECT_EQ(9, untag_fixnum(elt));
   }
