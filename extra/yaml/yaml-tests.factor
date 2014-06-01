@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs grouping kernel linked-assocs literals locals
 namespaces sequences tools.test yaml yaml.config yaml.ffi
-yaml.private calendar ;
+yaml.private calendar yaml.conversion ;
 IN: yaml.tests
 
 ! TODO real conformance tests here
@@ -403,49 +403,123 @@ ${ construct-binary-obj } [ $ construct-binary-obj >yaml yaml> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! construct-merge
-! TODO decide when to merge
-! CONSTANT: construct-merge-obj {
-!     H{ { "x" 1 } { "y" 2 } }
-!     H{ { "x" 0 } { "y" 2 } }
-!     H{ { "r" 10 } }
-!     H{ { "r" 1 } }
-!     H{ { "x" 1 } { "y" 2 } { "r" 10 } { "label" "center/big" } }
-!     H{ { "x" 1 } { "y" 2 } { "r" 10 } { "label" "center/big" } }
-!     H{ { "x" 1 } { "y" 2 } { "r" 10 } { "label" "center/big" } }
-!     H{ { "x" 1 } { "y" 2 } { "r" 10 } { "label" "center/big" } }
-! }
-! 
-! CONSTANT: construct-merge-str """---
-! - &CENTER { x: 1, 'y': 2 }
-! - &LEFT { x: 0, 'y': 2 }
-! - &BIG { r: 10 }
-! - &SMALL { r: 1 }
-! 
-! # All the following maps are equal:
-! 
-! - # Explicit keys
-!   x: 1
-!   'y': 2
-!   r: 10
-!   label: center/big
-! 
-! - # Merge one map
-!   << : *CENTER
-!   r: 10
-!   label: center/big
-! 
-! - # Merge multiple maps
-!   << : [ *CENTER, *BIG ]
-!   label: center/big
-! 
-! - # Override
-!   << : [ *BIG, *LEFT, *SMALL ]
-!   x: 1
-!   label: center/big
-! """
-! 
-! ${ construct-merge-obj } [ $ construct-merge-str yaml> ] unit-test
-! ${ construct-merge-obj } [ $ construct-merge-obj >yaml yaml> ] unit-test
+CONSTANT: construct-merge-obj {
+    H{ { "x" 1 } { "y" 2 } }
+    H{ { "x" 0 } { "y" 2 } }
+    H{ { "r" 10 } }
+    H{ { "r" 1 } }
+    H{ { "x" 1 } { "y" 2 } { "r" 10 } { "label" "center/big" } }
+    H{ { "x" 1 } { "y" 2 } { "r" 10 } { "label" "center/big" } }
+    H{ { "x" 1 } { "y" 2 } { "r" 10 } { "label" "center/big" } }
+    H{ { "x" 1 } { "y" 2 } { "r" 10 } { "label" "center/big" } }
+}
+
+:: construct-merge-obj2 ( -- obj )
+    H{ { "x" 1 } { "y" 2 } } :> CENTER
+    H{ { "x" 0 } { "y" 2 } } :> LEFT
+    H{ { "r" 10 } } :> BIG
+    H{ { "r" 1 } } :> SMALL
+ {
+    CENTER
+    LEFT
+    BIG
+    SMALL
+    H{ { "x" 1 } { "y" 2 } { "r" 10 } { "label" "center/big" } }
+    H{ { T{ yaml-merge } CENTER }  { "r" 10 } { "label" "center/big" } }
+    H{ { T{ yaml-merge } { CENTER BIG } } { "label" "center/big" } }
+    H{ { T{ yaml-merge } { BIG LEFT SMALL } } { "x" 1 } { "label" "center/big" } }
+} ;
+
+CONSTANT: construct-merge-str """---
+- &CENTER { x: 1, 'y': 2 }
+- &LEFT { x: 0, 'y': 2 }
+- &BIG { r: 10 }
+- &SMALL { r: 1 }
+
+# All the following maps are equal:
+
+- # Explicit keys
+  x: 1
+  'y': 2
+  r: 10
+  label: center/big
+
+- # Merge one map
+  << : *CENTER
+  r: 10
+  label: center/big
+
+- # Merge multiple maps
+  << : [ *CENTER, *BIG ]
+  label: center/big
+
+- # Override
+  << : [ *BIG, *LEFT, *SMALL ]
+  x: 1
+  label: center/big
+"""
+
+${ construct-merge-obj } [ $ construct-merge-str yaml> ] unit-test
+${ construct-merge-obj } [ $ construct-merge-obj2 >yaml yaml> ] unit-test
+
+! More merge tests
+! see http://sourceforge.net/p/yaml/mailman/message/12308050
+CONSTANT: nested-merge-str "foo: 1
+<<:
+  bar: 2
+  <<:
+    baz: 3"
+CONSTANT: nested-merge-obj H{
+  { "foo" 1 }
+  { "bar" 2 }
+  { "baz" 3 }
+}
+
+${ nested-merge-obj } [ $ nested-merge-str yaml> ] unit-test
+${ nested-merge-obj } [ $ nested-merge-obj >yaml yaml> ] unit-test
+
+CONSTANT: recursive-merge-str "--- &A
+<<: *A"
+CONSTANT: recursive-merge-obj H{ }
+
+${ recursive-merge-obj } [ $ recursive-merge-str yaml> ] unit-test
+${ recursive-merge-obj } [ $ recursive-merge-obj >yaml yaml> ] unit-test
+
+! Compare with pyyaml
+! >>> print yaml.load("&1 {1: 2, 2: 3, 3: {4: 5, <<: *1}}")
+! {1: 2, 2: 3, 3: {1: 2, 2: 3, 3: {...}, 4: 5}}
+! >>> print yaml.load("&1 {1: 2, 2: 3, 3: {3: 100, 4: 5, <<: *1}}")
+! {1: 2, 2: 3, 3: {1: 2, 2: 3, 3: 100, 4: 5}}
+CONSTANT: recursive-merge-str2 "&1 {1: 2, 2: 3, 3: {4: 5, <<: *1}}"
+CONSTANT: recursive-merge-str3 "&1 {1: 2, 2: 3, 3: {3: 100, 4: 5, <<: *1}}"
+:: recursive-merge-obj2 ( -- obj ) H{ } clone :> inner
+  inner H{
+  { 1 2 }
+  { 2 3 }
+  { 3 inner }
+  { 4 5 }
+} assoc-union! drop
+  H{
+    { 1 2 }
+    { 2 3 }
+    { 3 inner }
+  } ;
+CONSTANT: recursive-merge-obj3 H{
+  { 1 2 }
+  { 2 3 }
+  { 3 H{ { 1 2 } { 2 3 } { 3 100 } { 4 5 } } }
+}
+
+{ t } [
+  $ recursive-merge-str2 yaml> recursive-merge-obj2
+  [ replace-identities ] bi@ =
+] unit-test
+{ t } [
+  recursive-merge-obj2 >yaml yaml> recursive-merge-obj2
+  [ replace-identities ] bi@ =
+] unit-test
+${ recursive-merge-obj3 } [ $ recursive-merge-str3 yaml> ] unit-test
+${ recursive-merge-obj3 } [ $ recursive-merge-obj3 >yaml yaml> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! construct-omap
