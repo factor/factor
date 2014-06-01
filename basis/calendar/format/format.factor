@@ -171,7 +171,7 @@ M: timestamp year. ( timestamp -- )
 
 : (rfc3339>timestamp) ( -- timestamp )
     read-ymd
-    "Tt" expect
+    "Tt \t" expect
     read-hms
     read1 { { CHAR: . [ read-rfc3339-seconds ] } [ ] } case
     read-rfc3339-gmt-offset
