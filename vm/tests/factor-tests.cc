@@ -70,6 +70,31 @@ TEST(ContextTests, PushAndPopItems) {
   delete vm;
 }
 
+TEST(MathTests, FixnumShift) {
+  factor_vm* vm = setup_factor_vm();
+  context* ctx = vm->ctx;
+  ctx->push(tag_fixnum(8));
+  ctx->push(tag_fixnum(2));
+  vm->primitive_fixnum_shift();
+  cell obj = ctx->pop();
+  EXPECT_EQ(0, datastack_depth(ctx));
+  EXPECT_EQ(32, untag_fixnum(obj));
+  delete vm;
+}
+
+TEST(MathTests, FixnumShiftBignum) {
+  factor_vm* vm = setup_factor_vm();
+  context* ctx = vm->ctx;
+  ctx->push(tag_fixnum(1));
+  ctx->push(tag_fixnum(67));
+  vm->primitive_fixnum_shift();
+  cell obj = ctx->pop();
+  EXPECT_EQ(0, datastack_depth(ctx));
+  EXPECT_EQ(BIGNUM_TYPE, TAG(obj));
+  delete vm;
+}
+
+
 TEST(ArrayTests, PrimitiveArray) {
   factor_vm* vm = setup_factor_vm();
   context* ctx = vm->ctx;
@@ -120,5 +145,6 @@ TEST(BignumTests, FixnumToBignum) {
   }
   delete vm;
 }
+
 
 }
