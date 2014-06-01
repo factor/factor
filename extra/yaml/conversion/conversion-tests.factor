@@ -4,9 +4,9 @@ USING: kernel literals sequences tools.test yaml.conversion
 yaml.ffi ;
 IN: yaml.conversion.tests
 
-: resolve-test ( res str -- ) [ resolve-plain-scalar ] curry unit-test ;
+: resolve-test ( res str -- ) [ f resolve-plain-scalar ] curry unit-test ;
 : resolve-tests ( res seq -- ) [
-  [ resolve-plain-scalar ] curry unit-test
+  [ f resolve-plain-scalar ] curry unit-test
 ] with each ;
 
 ${ YAML_NULL_TAG } "null" resolve-test
@@ -24,3 +24,5 @@ ${ YAML_TIMESTAMP_TAG } {
   "2002-12-14"
   "2001-2-4   \t\t  1:59:43.10  \t\t   -5:00"
 } resolve-tests
+${ YAML_STR_TAG } "<<" resolve-test
+${ YAML_MERGE_TAG } [ "<<" t resolve-plain-scalar ] unit-test
