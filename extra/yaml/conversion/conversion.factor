@@ -6,6 +6,9 @@ math.parser regexp sequences strings yaml.ffi
 calendar calendar.format ;
 IN: yaml.conversion
 
+! http://yaml.org/type/
+CONSTANT: YAML_MERGE_TAG "tag:yaml.org,2002:merge"
+
 ! !!!!!!!!!!!!!!
 ! tag resolution
 ! http://www.yaml.org/spec/1.2/spec.html
@@ -22,7 +25,7 @@ CONSTANT: re-infinity R/ [-+]?\.(inf|Inf|INF)/
 CONSTANT: re-nan R/ \.(nan|NaN|NAN)/
 CONSTANT: re-timestamp R/ [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]|[0-9][0-9][0-9][0-9]-[0-9][0-9]?-[0-9][0-9]?([Tt]|[ \t]+)[0-9][0-9]?:[0-9][0-9]:[0-9][0-9](\.[0-9]*)?([ \t]*(Z|[-+][0-9][0-9]?(:[0-9][0-9])?))?/
 
-: resolve-plain-scalar ( str -- tag )
+: resolve-normal-plain-scalar ( str -- tag )
     {
         { [ re-null matches? ] [ YAML_NULL_TAG ] }
         { [ re-empty matches? ] [ YAML_NULL_TAG ] }
@@ -36,6 +39,21 @@ CONSTANT: re-timestamp R/ [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]|[0-9][0-9][
         { [ re-timestamp matches? ] [ YAML_TIMESTAMP_TAG ] }
         [ drop YAML_STR_TAG ]
     } cond-case ;
+
+CONSTANT: re-merge R/ <</
+: (resolve-mapping-key-plain-scalar) ( str -- tag )
+    {
+        { [ re-merge matches? ] [ YAML_MERGE_TAG ] }
+        [ drop YAML_STR_TAG ]
+    } cond-case ;
+
+: resolve-mapping-key-plain-scalar ( str -- tag )
+  dup resolve-normal-plain-scalar dup YAML_STR_TAG = [
+    drop (resolve-mapping-key-plain-scalar)
+  ] [ nip ] if ;
+
+: resolve-plain-scalar ( str mapping-key? -- tag )
+    [ resolve-mapping-key-plain-scalar ] [ resolve-normal-plain-scalar ] if ;
 
 CONSTANT: NON-SPECIFIC-TAG "!"
 
@@ -51,11 +69,11 @@ CONSTANT: NON-SPECIFIC-TAG "!"
 : resolve-explicit-mapping-tag ( tag -- tag )
     YAML_DEFAULT_MAPPING_TAG resolve-explicit-tag ;
 
-: resolve-scalar ( scalar-event -- tag )
+: resolve-scalar ( scalar-event mapping-key? -- tag )
     {
-        { [ dup tag>> ] [ tag>> resolve-explicit-scalar-tag ] }
-        { [ dup style>> YAML_PLAIN_SCALAR_STYLE = not ] [ drop YAML_STR_TAG ] }
-        [ value>> resolve-plain-scalar ]
+        { [ over tag>> ] [ drop tag>> resolve-explicit-scalar-tag ] }
+        { [ over style>> YAML_PLAIN_SCALAR_STYLE = not ] [ 2drop YAML_STR_TAG ] }
+        [ [ value>> ] dip resolve-plain-scalar ]
     } cond ;
 
 ! !!!!!!!!!!!!!!
@@ -96,14 +114,18 @@ CONSTANT: YAML_SET_TAG "tag:yaml.org,2002:set"
     dup R/ [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ matches?
     [ ymd>timestamp ] [ yaml>rfc3339 rfc3339>timestamp ] if ;
 
-: construct-scalar ( scalar-event -- scalar )
-    [ value>> ] [ resolve-scalar ] bi {
+TUPLE: yaml-merge ;
+C: <yaml-merge> yaml-merge
+
+: construct-scalar ( scalar-event mapping-key? -- scalar )
+    [ drop value>> ] [ resolve-scalar ] 2bi {
         { YAML_NULL_TAG [ drop f ] }
         { YAML_BOOL_TAG [ construct-bool ] }
         { YAML_INT_TAG [ construct-int ] }
         { YAML_FLOAT_TAG [ construct-float ] }
         { YAML_BINARY_TAG [ base64> ] }
         { YAML_TIMESTAMP_TAG [ construct-timestamp ] }
+        { YAML_MERGE_TAG [ drop <yaml-merge> ] }
         { YAML_STR_TAG [ ] }
     } case ;
 
@@ -151,3 +173,6 @@ M: byte-array yaml-tag ( obj -- tag ) drop YAML_BINARY_TAG ;
 
 M: timestamp represent-scalar ( obj -- str ) timestamp>rfc3339 ;
 M: timestamp yaml-tag ( obj -- str ) drop YAML_TIMESTAMP_TAG ;
+
+M: yaml-merge represent-scalar ( obj -- str ) drop "<<" ;
+M: yaml-merge yaml-tag ( obj -- str ) drop YAML_MERGE_TAG ;

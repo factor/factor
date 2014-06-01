@@ -6,7 +6,7 @@ combinators.short-circuit destructors fry generalizations
 hashtables hashtables.identity io.encodings.string
 io.encodings.utf8 kernel libc linked-assocs locals make math
 math.parser namespaces sequences sets strings yaml.config
-yaml.conversion yaml.ffi ;
+yaml.conversion yaml.ffi hash-sets.identity ;
 FROM: sets => set ;
 IN: yaml
 
@@ -68,9 +68,9 @@ SYMBOL: anchors
     [ assert-anchor-exists ]
     [ <yaml-alias> ] bi ;
 
-: event>scalar ( event -- obj )
+: event>scalar ( mapping-key? event -- obj )
     data>> scalar>>
-    [ construct-scalar ]
+    [ swap construct-scalar ]
     [ ?register-anchor ] bi ;
 
 ! TODO simplify this ?!?
@@ -109,12 +109,14 @@ TUPLE: factor_yaml_event_t type data start_mark end_mark ;
         [ end_mark>> ]
     } cleave factor_yaml_event_t boa ;
 
-: ?scalar-value ( event -- scalar/event scalar? )
+: (?scalar-value) ( mapping-key? event -- scalar/event scalar? )
     dup type>> {
         { YAML_SCALAR_EVENT [ event>scalar t ] }
-        { YAML_ALIAS_EVENT [ deref-anchor t ] }
-        [ drop deep-copy-event f ]
+        { YAML_ALIAS_EVENT [ nip deref-anchor t ] }
+        [ drop nip deep-copy-event f ]
     } case ;
+: ?mapping-key-scalar-value ( event -- scalar/event scalar? ) t swap (?scalar-value) ;
+: ?scalar-value ( event -- scalar/event scalar? ) f swap (?scalar-value) ;
 
 ! Must not reuse the event struct before with-destructors scope ends
 : next-event ( parser event -- event )
@@ -150,7 +152,7 @@ DEFER: parse-mapping
                 YAML_MAPPING_END_EVENT = [
                     t done! f f
                 ] [
-                    event ?scalar-value
+                    event ?mapping-key-scalar-value
                 ] if
             ] with-destructors
             done [ 2drop ] [
@@ -184,6 +186,11 @@ DEFER: parse-mapping
         [ 2drop ] [ 1array yaml-unexpected-event ] if
     ] with-destructors ;
 
+! Same as 'with', but for combinators that
+! put 2 arguments on the stack
+: with2 ( param obj quot -- obj curry )
+    swapd '[ [ _ ] 2dip @ ] ; inline
+
 GENERIC: (deref-aliases) ( anchors obj -- obj' )
 
 M: object (deref-aliases) nip ;
@@ -200,16 +207,40 @@ M: sequence (deref-aliases)
 M: set (deref-aliases)
     [ members (deref-aliases) ] [ clear-set ] [ swap union! ] tri ;
 
-: assoc-map! ( assoc quot -- )
+: assoc-map! ( assoc quot -- assoc' )
     [ assoc-map ] [ drop clear-assoc ] [ drop swap assoc-union! ] 2tri ; inline
 
 M: assoc (deref-aliases)
-    swap '[ [ _ swap (deref-aliases) ] bi@ ] assoc-map! ;
+     [ [ (deref-aliases) ] bi-curry@ bi ] with2 assoc-map! ;
+
+: merge-values ( seq -- assoc )
+    reverse unclip [ assoc-union ] reduce ;
+GENERIC: merge-value ( assoc value -- assoc' )
+M: sequence merge-value merge-values merge-value ;
+M: assoc merge-value over assoc-diff assoc-union! ;
+
+GENERIC: apply-merge-keys ( already-applied-set obj -- obj' )
+: ?apply-merge-keys ( set obj -- obj' )
+    2dup swap in? [ nip ] [ 2dup swap adjoin apply-merge-keys ] if ;
+M: sequence apply-merge-keys
+    [ ?apply-merge-keys ] with map! ;
+M: object apply-merge-keys nip ;
+M: byte-array apply-merge-keys nip ;
+M: string apply-merge-keys nip ;
+: pop-at* ( key assoc -- value/f ? )
+    [ at* ] 2keep pick [ delete-at ] [ 2drop ] if ;
+: ?apply-merge-key ( assoc -- assoc' )
+    T{ yaml-merge } over pop-at*
+    [ merge-value ] [ drop ] if ;
+M: assoc apply-merge-keys
+    [ [ ?apply-merge-keys ] bi-curry@ bi ] with2 assoc-map!
+    ?apply-merge-key ;
 
 :: parse-yaml-doc ( parser event -- obj )
     H{ } clone anchors [
         parser event next-value
         anchors get swap (deref-aliases)
+        IHS{ } clone swap ?apply-merge-keys
     ] with-variable ;
 
 :: ?parse-yaml-doc ( parser event -- obj/f ? )
@@ -345,17 +376,26 @@ GENERIC: emit-value ( emitter event anchor obj -- )
 
 : emit-object ( emitter event obj -- ) [ f ] dip emit-value ;
 
-: scalar-implicit-tag? ( tag str -- plain_implicit quoted_implicit )
+: scalar-implicit-tag? ( tag str mapping-key? -- plain_implicit quoted_implicit )
     implicit-tags get [
         resolve-plain-scalar = t
-    ] [ 2drop f f ] if ;
+    ] [ 3drop f f ] if ;
 
-:: emit-scalar ( emitter event anchor obj -- )
+:: (emit-scalar) ( emitter event anchor obj mapping-key? -- )
     event anchor
     obj [ yaml-tag ] [ represent-scalar ] bi
-    -1 2over scalar-implicit-tag? YAML_ANY_SCALAR_STYLE
+    -1 2over mapping-key? scalar-implicit-tag? YAML_ANY_SCALAR_STYLE
     yaml_scalar_event_initialize yaml-initialize-assert-ok
     emitter event yaml_emitter_emit_asserted ;
+
+: emit-mapping-key-scalar ( emitter event anchor obj -- ) t (emit-scalar) ;
+: emit-scalar ( emitter event anchor obj -- ) f (emit-scalar) ;
+
+! strings and special keys are the only things that need special treatment
+! because they can have the same representation
+: emit-mapping-key ( emitter event obj -- )
+    dup [ string? ] [ yaml-merge? ] bi or
+    [ [ f ] dip emit-mapping-key-scalar ] [ emit-object ] if ;
 
 M: object emit-value ( emitter event anchor obj -- ) emit-scalar ;
 
@@ -379,7 +419,10 @@ M:: yaml-alias emit-value ( emitter event unused obj -- )
     [ emit-object ] with with each ;
 
 : emit-assoc-body ( emitter event assoc -- )
-    >alist concat emit-sequence-body ;
+    [
+        [ emit-mapping-key ]
+        [ emit-object ] bi-curry* 2bi
+    ] with2 with2 assoc-each ;
 
 : emit-linked-assoc-body ( emitter event linked-assoc -- )
     >alist [ first2 swap associate ] map emit-sequence-body ;
