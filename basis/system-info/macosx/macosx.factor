@@ -15,8 +15,7 @@ TYPEDEF: UInt32 OSType
 FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response ) ;
 
 : gestalt ( selector -- response )
-    0 SInt32 <ref> [ Gestalt ] keep
-    swap [ throw ] unless-zero le> ;
+    { SInt32 } [ Gestalt 0 assert= ] with-out-parameters ;
 
 : system-version ( -- n ) "sysv" be> gestalt ;
 : system-version-major ( -- n ) "sys1" be> gestalt ;
