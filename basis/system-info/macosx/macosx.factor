@@ -3,8 +3,9 @@
 
 USING: alien alien.c-types alien.data alien.strings alien.syntax
 arrays assocs byte-arrays combinators core-foundation io.binary
-io.encodings.utf8 libc kernel math namespaces sequences system
-system-info unix ;
+io.encodings.utf8 libc kernel math namespaces sequences
+specialized-arrays system system-info unix ;
+SPECIALIZED-ARRAY: int
 
 IN: system-info.macosx
 
@@ -52,14 +53,11 @@ M: macosx os-version
 LIBRARY: libc
 FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, void* newp, size_t newlen ) ;
 
-: make-int-array ( seq -- byte-array )
-    [ int <ref> ] map concat ;
-
 : (sysctl-query) ( name namelen oldp oldlenp -- oldp )
     over [ f 0 sysctl io-error ] dip ;
 
 : sysctl-query ( seq n -- byte-array )
-    [ [ make-int-array ] [ length ] bi ] dip
+    [ [ int >c-array ] [ length ] bi ] dip
     [ <byte-array> ] [ uint <ref> ] bi (sysctl-query) ;
 
 : sysctl-query-string ( seq -- n )
