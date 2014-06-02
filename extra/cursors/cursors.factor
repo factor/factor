@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors arrays assocs combinators.short-circuit fry
-hashtables kernel locals macros math math.functions math.order
-generalizations sequences ;
+USING: accessors assocs combinators.short-circuit fry
+generalizations hash-sets hashtables kernel macros math
+math.functions math.order sequences sets ;
 FROM: sequences.private => nth-unsafe set-nth-unsafe ;
 FROM: hashtables.private => tombstone? ;
 IN: cursors
@@ -253,7 +253,7 @@ TUPLE: sequence-cursor
     { seq read-only }
     { n fixnum read-only } ;
 C: <sequence-cursor> sequence-cursor
-    
+
 INSTANCE: sequence container
 
 M: sequence begin-cursor 0 <sequence-cursor> ; inline
@@ -291,6 +291,54 @@ INSTANCE: sequence-cursor output-cursor
 
 M: sequence-cursor set-cursor-value-unsafe [ n>> ] [ seq>> ] bi set-nth-unsafe ; inline
 M: sequence-cursor set-cursor-value [ n>> ] [ seq>> ] bi set-nth ; inline
+
+!
+! hash-set cursor
+!
+
+TUPLE: hash-set-cursor
+    { hash-set hash-set read-only }
+    { n fixnum read-only } ;
+<PRIVATE
+C: <hash-set-cursor> hash-set-cursor
+PRIVATE>
+
+INSTANCE: hash-set-cursor forward-cursor
+
+M: hash-set-cursor cursor-compatible?
+    {
+        [ [ hash-set-cursor? ] both? ]
+        [ [ hash-set>> ] bi@ eq? ]
+    } 2&& ; inline
+
+M: hash-set-cursor cursor-valid? ( cursor -- ? )
+    [ n>> ] [ hash-set>> array>> ] bi bounds-check? ; inline
+
+M: hash-set-cursor cursor= ( cursor cursor -- ? )
+    [ n>> ] bi@ = ; inline
+M: hash-set-cursor cursor-distance-hint ( cursor cursor -- n )
+    nip hash-set>> cardinality ; inline
+
+<PRIVATE
+: (inc-hash-set-cursor) ( array n -- n' )
+    [ 2dup swap { [ length < ] [ nth-unsafe tombstone? ] } 2&& ] [ 1 + ] while nip ; inline
+PRIVATE>
+
+M: hash-set-cursor inc-cursor ( cursor -- cursor' )
+    [ hash-set>> dup array>> ] [ n>> 1 + ] bi
+    (inc-hash-set-cursor) <hash-set-cursor> ; inline
+
+INSTANCE: hash-set-cursor input-cursor
+
+M: hash-set-cursor cursor-key-value-unsafe
+    [ n>> dup ] [ hash-set>> array>> ] bi nth-unsafe ; inline
+
+INSTANCE: hash-set container
+
+M: hash-set begin-cursor
+    dup array>> 0 (inc-hash-set-cursor) <hash-set-cursor> ; inline
+M: hash-set end-cursor
+    dup array>> length <hash-set-cursor> ; inline
 
 !
 ! map cursor
@@ -463,7 +511,7 @@ M: zip-cursor cursor-distance-hint ( cursor cursor -- n )
 
 M: zip-cursor inc-cursor ( cursor -- cursor' )
     [ keys>> inc-cursor ] [ values>> inc-cursor ] bi <zip-cursor> ; inline
-    
+
 INSTANCE: zip-cursor input-cursor
 
 M: zip-cursor cursor-key-value
