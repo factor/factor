@@ -1775,9 +1775,9 @@ bignum* factor_vm::bignum_gcd(bignum* a, bignum* b) {
     }
 
     /*
-		  a, b = A*b - B*a, D*a - C*b if k is odd
-		  a, b = A*a - B*b, D*b - C*a if k is even
-		*/
+      a, b = A*b - B*a, D*a - C*b if k is odd
+      a, b = A*a - B*b, D*b - C*a if k is even
+    */
     scan_a = BIGNUM_START_PTR(a);
     scan_b = BIGNUM_START_PTR(b);
     scan_c = scan_a;
