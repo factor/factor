@@ -24,20 +24,22 @@ FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response ) ;
 : system-version-bugfix ( -- n ) "sys3" be> gestalt ;
 
 CONSTANT: system-code-names H{
-    { 0x1090 "Mavericks" }
-    { 0x1080 "Mountain Lion" }
-    { 0x1070 "Lion" }
-    { 0x1060 "Snow Leopard" }
-    { 0x1050 "Leopard" }
-    { 0x1040 "Tiger" }
-    { 0x1030 "Panther" }
-    { 0x1020 "Jaguar" }
-    { 0x1010 "Puma" }
-    { 0x1000 "Cheetah" }
+    { { 10 10 } "Yosemite" }
+    { { 10 9 } "Mavericks" }
+    { { 10 8 } "Mountain Lion" }
+    { { 10 7 } "Lion" }
+    { { 10 6 } "Snow Leopard" }
+    { { 10 5 } "Leopard" }
+    { { 10 4 } "Tiger" }
+    { { 10 3 } "Panther" }
+    { { 10 2 } "Jaguar" }
+    { { 10 1 } "Puma" }
+    { { 10 0 } "Cheetah" }
 }
 
 : system-code-name ( -- str/f )
-    system-version 0xFFF0 bitand system-code-names at ;
+    system-version-major system-version-minor 2array
+    system-code-names at ;
 
 PRIVATE>
 
