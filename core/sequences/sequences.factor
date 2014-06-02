@@ -819,8 +819,13 @@ PRIVATE>
         [ 0 swap copy-unsafe ] keep reverse!
     ] keep like ;
 
-: sum-lengths ( seq -- n )
+GENERIC: sum-lengths ( seq -- n )
+
+M: object sum-lengths
     0 [ length + ] reduce ;
+
+M: repetition sum-lengths
+    [ len>> ] [ elt>> length ] bi * ;
 
 : concat-as ( seq exemplar -- newseq )
     swap [ { } ] [
