@@ -1,10 +1,13 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.smart fry kernel macros math
-math.ranges sequences sequences.generalizations io.binary
-locals ;
+USING: alien.data combinators combinators.smart endian fry
+io.binary kernel locals macros math math.ranges sequences
+sequences.generalizations ;
+QUALIFIED-WITH: alien.c-types c
 RENAME: be> io.binary => slow-be>
 RENAME: le> io.binary => slow-le>
+RENAME: >be io.binary => >slow-be
+RENAME: >le io.binary => >slow-le
 IN: io.binary.fast
 
 ERROR: bad-length bytes n ;
@@ -57,3 +60,23 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
         { 8 [ 8le> ] }
         [ drop slow-le> ]
     } case ;
+
+: >le ( x n -- bytes )
+    compute-native-endianness little-endian = [
+        {
+            { 2 [ c:short <ref> ] }
+            { 4 [ c:int <ref> ] }
+            { 8 [ c:longlong <ref> ] }
+            [ >slow-le ]
+        } case
+    ] [ >slow-le ] if ;
+
+: >be ( x n -- bytes )
+    compute-native-endianness big-endian = [
+        {
+            { 2 [ c:short <ref> ] }
+            { 4 [ c:int <ref> ] }
+            { 8 [ c:longlong <ref> ] }
+            [ >slow-be ]
+        } case
+    ] [ >slow-be ] if ;
