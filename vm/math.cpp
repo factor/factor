@@ -44,7 +44,9 @@ void factor_vm::primitive_fixnum_divmod() {
  * If we're shifting right by n bits, we won't overflow as long as none of the
  * high WORD_SIZE-TAG_BITS-n bits are set.
  */
-inline fixnum factor_vm::sign_mask(fixnum x) { return x >> (WORD_SIZE - 1); }
+inline fixnum factor_vm::sign_mask(fixnum x) {
+    return x >> (WORD_SIZE - 1);
+}
 
 inline fixnum factor_vm::branchless_max(fixnum x, fixnum y) {
   return (x - ((x - y) & sign_mask(x - y)));
