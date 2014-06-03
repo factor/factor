@@ -4,7 +4,7 @@ USING: accessors alien alien.accessors alien.c-types alien.data
 classes.struct.private combinators compiler.units endian fry
 generalizations kernel macros math namespaces sequences words
 arrays slots math.bitwise ;
-QUALIFIED-WITH: alien.c-types ac
+QUALIFIED-WITH: alien.c-types c
 IN: alien.endian
 
 ERROR: invalid-signed-conversion n ;
@@ -12,7 +12,7 @@ ERROR: invalid-signed-conversion n ;
 : convert-signed-quot ( n -- quot )
     {
         { 1 [ [ char <ref> char deref ] ] }
-        { 2 [ [ ac:short <ref> ac:short deref ] ] }
+        { 2 [ [ c:short <ref> c:short deref ] ] }
         { 4 [ [ int <ref> int deref ] ] }
         { 8 [ [ longlong <ref> longlong deref ] ] }
         [ invalid-signed-conversion ]
@@ -47,7 +47,7 @@ ERROR: unknown-endian-c-type symbol ;
 : endian-c-type>c-type-symbol ( symbol -- symbol' )
     {
         { [ dup { ule16 ube16 } member? ] [ drop ushort ] }
-        { [ dup { le16 be16 } member? ] [ drop ac:short ] }
+        { [ dup { le16 be16 } member? ] [ drop c:short ] }
         { [ dup { ule32 ube32 } member? ] [ drop uint ] }
         { [ dup { le32 be32 } member? ] [ drop int ] }
         { [ dup { ule64 ube64 } member? ] [ drop ulonglong ] }
@@ -111,7 +111,7 @@ ERROR: unknown-endian-c-type symbol ;
 ! otherwise return the opposite of our endianness
 : endian-slot ( endian c-type pair -- endian-slot )
     [ native-endianness get = ] 2dip rot [ drop ] [ nip pair>c-type ] if ;
-    
+
 ERROR: unsupported-endian-type endian slot ;
 
 : slot>endian-slot ( endian slot -- endian-slot )
@@ -121,7 +121,7 @@ ERROR: unsupported-endian-type endian slot ;
         {
             { [ dup char = ] [ 2drop char ] }
             { [ dup uchar = ] [ 2drop uchar ] }
-            { [ dup ac:short = ] [ { le16 be16 } endian-slot ] }
+            { [ dup c:short = ] [ { le16 be16 } endian-slot ] }
             { [ dup ushort = ] [ { ule16 ube16 } endian-slot ] }
             { [ dup int = ] [ { le32 be32 } endian-slot ] }
             { [ dup uint = ] [ { ule32 ube32 } endian-slot ] }
