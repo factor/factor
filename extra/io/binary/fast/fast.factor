@@ -37,20 +37,22 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
 :: n-le> ( bytes n -- x )
     bytes n check-length drop n firstn-unsafe n reassemble-le ; inline
 
+<PRIVATE
+: if-endian ( endian bytes seq -- )
+    [
+        compute-native-endianness =
+        [ dup byte-array? ] [ f ] if
+    ] 2dip if ; inline
+PRIVATE>
+
 : 2be> ( bytes -- x )
-    compute-native-endianness big-endian =
-    [ dup byte-array? ] [ f ] if
-    [ c:short deref ] [ 2 n-be> ] if ;
+    big-endian [ c:short deref ] [ 2 n-be> ] if-endian ;
 
 : 4be> ( bytes -- x )
-    compute-native-endianness big-endian =
-    [ dup byte-array? ] [ f ] if
-    [ c:int deref ] [ 4 n-be> ] if ;
+    big-endian [ c:int deref ] [ 4 n-be> ] if-endian ;
 
 : 8be> ( bytes -- x )
-    compute-native-endianness big-endian =
-    [ dup byte-array? ] [ f ] if
-    [ c:longlong deref ] [ 8 n-be> ] if ;
+    big-endian [ c:longlong deref ] [ 8 n-be> ] if-endian ;
 
 : be> ( bytes -- x )
     dup length {
@@ -61,19 +63,13 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
     } case ;
 
 : 2le> ( bytes -- x )
-    compute-native-endianness little-endian =
-    [ dup byte-array? ] [ f ] if
-    [ c:short deref ] [ 2 n-le> ] if ;
+    little-endian [ c:short deref ] [ 2 n-le> ] if-endian ;
 
 : 4le> ( bytes -- x )
-    compute-native-endianness little-endian =
-    [ dup byte-array? ] [ f ] if
-    [ c:int deref ] [ 4 n-le> ] if ;
+    little-endian [ c:int deref ] [ 4 n-le> ] if-endian ;
 
 : 8le> ( bytes -- x )
-    compute-native-endianness little-endian =
-    [ dup byte-array? ] [ f ] if
-    [ c:longlong deref ] [ 8 n-le> ] if ;
+    little-endian [ c:longlong deref ] [ 8 n-le> ] if-endian ;
 
 : le> ( bytes -- x )
     dup length {
