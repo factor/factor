@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.data combinators combinators.smart endian fry
-io.binary kernel locals macros math math.ranges sequences
-sequences.generalizations ;
+USING: alien.data byte-arrays combinators combinators.smart
+endian fry io.binary kernel locals macros math math.ranges
+sequences sequences.generalizations ;
 QUALIFIED-WITH: alien.c-types c
 RENAME: be> io.binary => slow-be>
 RENAME: le> io.binary => slow-le>
@@ -37,9 +37,20 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
 :: n-le> ( bytes n -- x )
     bytes n check-length drop n firstn-unsafe n reassemble-le ; inline
 
-: 2be> ( bytes -- x ) 2 n-be> ;
-: 4be> ( bytes -- x ) 4 n-be> ;
-: 8be> ( bytes -- x ) 8 n-be> ;
+: 2be> ( bytes -- x )
+    compute-native-endianness big-endian =
+    [ dup byte-array? ] [ f ] if
+    [ c:short deref ] [ 2 n-be> ] if ;
+
+: 4be> ( bytes -- x )
+    compute-native-endianness big-endian =
+    [ dup byte-array? ] [ f ] if
+    [ c:int deref ] [ 4 n-be> ] if ;
+
+: 8be> ( bytes -- x )
+    compute-native-endianness big-endian =
+    [ dup byte-array? ] [ f ] if
+    [ c:longlong deref ] [ 8 n-be> ] if ;
 
 : be> ( bytes -- x )
     dup length {
@@ -49,9 +60,20 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
         [ drop slow-be> ]
     } case ;
 
-: 2le> ( bytes -- x ) 2 n-le> ;
-: 4le> ( bytes -- x ) 4 n-le> ;
-: 8le> ( bytes -- x ) 8 n-le> ;
+: 2le> ( bytes -- x )
+    compute-native-endianness little-endian =
+    [ dup byte-array? ] [ f ] if
+    [ c:short deref ] [ 2 n-le> ] if ;
+
+: 4le> ( bytes -- x )
+    compute-native-endianness little-endian =
+    [ dup byte-array? ] [ f ] if
+    [ c:int deref ] [ 4 n-le> ] if ;
+
+: 8le> ( bytes -- x )
+    compute-native-endianness little-endian =
+    [ dup byte-array? ] [ f ] if
+    [ c:longlong deref ] [ 8 n-le> ] if ;
 
 : le> ( bytes -- x )
     dup length {
