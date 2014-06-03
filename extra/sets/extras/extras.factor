@@ -1,6 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel locals sequences sequences.extras sets ;
+USING: assocs hash-sets kernel locals sequences
+sequences.extras sets ;
 IN: sets.extras
 
 : setwise-xor ( seq1 seq2 -- set )
@@ -28,3 +29,8 @@ IN: sets.extras
 
 : adjoin-at* ( value key assoc -- set )
     [ [ HS{ } clone ] unless* [ adjoin ] keep dup ] change-at ;
+
+: mapped-set ( ... seq quot: ( ... elt -- ... newelt ) -- ... set )
+    over length <hash-set> [
+        [ adjoin ] curry compose each
+    ] keep ; inline
