@@ -73,7 +73,7 @@ PRIVATE>
 : no-prefixes ( seq -- seq' ) [ vocab-prefix? not ] filter ;
 
 : convert-prefixes ( seq -- seq' )
-    [ dup vocab-prefix? [ name>> vocab-link boa ] when ] map ;
+    [ dup vocab-prefix? [ name>> <vocab-link> ] when ] map ;
 
 : remove-redundant-prefixes ( seq -- seq' )
     #! Hack.

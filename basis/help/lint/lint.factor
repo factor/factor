@@ -67,7 +67,7 @@ PRIVATE>
     ] check-something ;
 
 : check-about ( vocab -- )
-    vocab-link boa dup
+    <vocab-link> dup
     '[ _ vocab-help [ lookup-article drop ] when* ] check-something ;
 
 : check-vocab ( vocab -- )
