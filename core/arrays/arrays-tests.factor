@@ -19,3 +19,5 @@ IN: arrays.tests
 
 [ -1 f <array> ] must-fail
 [ cell-bits cell log2 - 2^ f <array> ] must-fail
+! To big for a fixnum #1045
+[ 67 2^ 3 <array> ] must-fail
