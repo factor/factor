@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test sets.extras ;
+USING: math sequences sets.extras tools.test ;
 IN: sets.extras.tests
 
 { { } } [ { } { } setwise-xor ] unit-test
@@ -22,3 +22,5 @@ IN: sets.extras.tests
 { "abc" } [ "abc" non-repeating ] unit-test
 { "abc" } [ "abcddd" non-repeating ] unit-test
 { "" } [ "aabbcc" non-repeating ] unit-test
+
+{ HS{ 0 10 20 30 40 } } [ 5 iota [ 10 * ] mapped-set ] unit-test
