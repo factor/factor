@@ -15,13 +15,16 @@ M: vocab-prefix vocab-name name>> ;
 
 <PRIVATE
 
-: vocab-subdirs ( dir -- dirs )
-    directory-entries [
+: visible-dirs ( seq -- seq' )
+    [
         {
             [ type>> +directory+ = ]
             [ name>> "." head? not ]
         } 1&&
-    ] filter [ name>> ] map! natural-sort ;
+    ] filter ;
+
+: vocab-subdirs ( dir -- dirs )
+    directory-entries visible-dirs [ name>> ] map! natural-sort ;
 
 : vocab-dir? ( root name -- ? )
     over
