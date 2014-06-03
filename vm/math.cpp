@@ -277,13 +277,13 @@ void factor_vm::primitive_bits_double() {
   ctx->push(allot_float(bits_double(to_unsigned_8(ctx->pop()))));
 }
 
-/* Cannot allocate */
+/* Allocates memory */
 fixnum factor_vm::to_fixnum(cell tagged) {
   switch (TAG(tagged)) {
     case FIXNUM_TYPE:
       return untag_fixnum(tagged);
     case BIGNUM_TYPE:
-      return bignum_to_fixnum(untag<bignum>(tagged));
+      return bignum_to_fixnum_strict(untag<bignum>(tagged));
     default:
       type_error(FIXNUM_TYPE, tagged);
       return 0; /* can't happen */

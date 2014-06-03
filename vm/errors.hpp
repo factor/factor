@@ -1,6 +1,7 @@
 namespace factor {
 
 // Runtime errors must be kept in sync with:
+//   basis/debugger/debugger.factor
 //   core/kernel/kernel.factor
 enum vm_error_type {
   ERROR_EXPIRED = 0,
@@ -10,6 +11,7 @@ enum vm_error_type {
   ERROR_DIVIDE_BY_ZERO,
   ERROR_SIGNAL,
   ERROR_ARRAY_SIZE,
+  ERROR_OUT_OF_FIXNUM_RANGE,
   ERROR_C_STRING,
   ERROR_FFI,
   ERROR_UNDEFINED_SYMBOL,

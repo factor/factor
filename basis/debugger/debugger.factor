@@ -101,6 +101,9 @@ HOOK: signal-error. os ( obj -- )
     "Invalid array size: " write dup third .
     "Maximum: " write fourth 1 - . ;
 
+: fixnum-range-error. ( obj -- )
+    "Cannot convert to fixnum: " write third . ;
+
 : c-string-error. ( obj -- )
     "Cannot convert to C string: " write third . ;
 
@@ -156,6 +159,7 @@ PREDICATE: vm-error < array
         [ divide-by-zero-error.   ]
         [ signal-error.           ]
         [ array-size-error.       ]
+        [ fixnum-range-error.     ]
         [ c-string-error.         ]
         [ ffi-error.              ]
         [ undefined-symbol-error. ]
