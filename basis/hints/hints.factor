@@ -128,6 +128,10 @@ set-specializer
     set-specializer
 ] each
 
+{ le> be> } [
+    { byte-array } set-specializer
+] each
+
 \ base> { string fixnum } set-specializer
 
 M\ hashtable at*
