@@ -21,8 +21,8 @@ DEFER: (fft)
 :: (fast-fft) ( seq inverse? -- seq' )
     seq length :> N
     N 1 = [ seq ] [
-        seq even-indices inverse? (fft)
-        seq odd-indices inverse? (fft)
+        seq even-indices inverse? (fast-fft)
+        seq odd-indices inverse? (fast-fft)
         inverse? 1 -1 ? 2pi * N /
         [ * cis * ] curry map-index!
         [ [ + inverse? [ 2 / ] when ] 2map ]
@@ -32,7 +32,7 @@ DEFER: (fft)
 
 : (fft) ( seq inverse? -- seq' )
     over length power-of-2?
-    [ (fast-fft) ] [ (slow-fft) ] if ; inline recursive
+    [ (fast-fft) ] [ (slow-fft) ] if ; inline
 
 PRIVATE>
 
