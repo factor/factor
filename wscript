@@ -220,8 +220,8 @@ def build_msi(ctx, bits, image_target):
     # strip out the -git part.
     product_version = VERSION.split('-')[0]
     ctx(
-        rule = 'candle -nologo -dProductVersion=%s -dVersion=%s ' \
-            '-out ${TGT} ${SRC}' % (product_version, VERSION),
+        rule = 'candle -nologo -dProductVersion=%s -dVersion=%s -dBits=%s' \
+            ' -out ${TGT} ${SRC}' % (product_version, VERSION, bits),
         source = ['factor.wxs'],
         target = ['factor.wxsobj']
         )
