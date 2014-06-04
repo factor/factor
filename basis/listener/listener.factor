@@ -1,10 +1,10 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors colors.constants compiler.units
-continuations debugger fry io io.styles kernel lexer locals
-math math.parser namespaces parser parser.notes prettyprint
-sequences sets source-files.errors vocabs vocabs.loader
-vocabs.parser ;
+USING: accessors colors colors.constants
+combinators.short-circuit compiler.units continuations debugger
+fry io io.styles kernel lexer locals math math.parser namespaces
+parser parser.notes prettyprint sequences sets
+source-files.errors vocabs vocabs.loader vocabs.parser ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -188,14 +188,18 @@ SYMBOL: interactive-vocabs
     "words"
 } interactive-vocabs set-global
 
-: use-loaded-vocabs ( vocabs -- )
-    [ lookup-vocab ] filter
-    [
-        lookup-vocab
+: loaded-vocab? ( vocab-spec -- ? )
+    {
         [ find-vocab-root not ]
-        [ source-loaded?>> +done+ eq? ] bi or
-    ] filter
-    [ use-vocab ] each ;
+        [ source-loaded?>> +done+ eq? ]
+    } 1|| ;
+
+: use-loaded-vocabs ( vocabs -- )
+    [
+        lookup-vocab [
+            dup loaded-vocab? [ use-vocab ] [ drop ] if
+        ] when*
+    ] each ;
 
 : with-interactive-vocabs ( quot -- )
     [
