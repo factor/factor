@@ -1,6 +1,6 @@
 USING: continuations kernel literals math math.order namespaces make
 strings strings.private sbufs tools.test sequences vectors
-arrays memory prettyprint io.streams.null ;
+arrays memory prettyprint io.streams.null kernel.private ;
 IN: strings.tests
 
 [ CHAR: b ] [ 1 >bignum "abc" nth ] unit-test

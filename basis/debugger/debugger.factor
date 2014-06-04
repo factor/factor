@@ -5,11 +5,11 @@ classes.builtin classes.mixin classes.tuple classes.tuple.parser
 combinators combinators.short-circuit compiler.units
 continuations definitions destructors effects.parser generic
 generic.math generic.parser generic.single grouping io
-io.encodings io.styles kernel lexer make math math.order
-math.parser namespaces parser prettyprint sequences
+io.encodings io.styles kernel kernel.private lexer make math
+math.order math.parser namespaces parser prettyprint sequences
 sequences.private slots source-files.errors strings
-strings.parser summary system vocabs vocabs.loader vocabs.parser
-words ;
+strings.parser summary system vocabs vocabs.loader
+vocabs.parser words ;
 FROM: namespaces => change-global ;
 IN: debugger
 
