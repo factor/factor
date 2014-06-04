@@ -57,7 +57,7 @@ M: metronome-gadget pref-dim* drop { 200 200 } ;
 
 : print-defaults ( -- )
   metronome-defaults swap prefix
-  [ " " write ] [ number>string write ] interleave nl ;
+  [ bl ] [ number>string write ] interleave nl ;
 
 : metronome-usage ( -- )
     "Usage: metronome [BPM FREQUENCIES...]" print
