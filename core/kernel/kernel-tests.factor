@@ -2,7 +2,7 @@ USING: arrays byte-arrays kernel kernel.private literals math
 memory namespaces sequences tools.test math.private quotations
 continuations prettyprint io.streams.string debugger assocs
 sequences.private accessors locals.backend grouping words
-system alien alien.accessors ;
+system alien alien.accessors kernel.private ;
 IN: kernel.tests
 
 [ 0 ] [ f size ] unit-test
