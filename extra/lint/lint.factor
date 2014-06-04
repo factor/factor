@@ -3,10 +3,10 @@
 
 USING: accessors alien arrays assocs classes
 classes.tuple.private combinators.short-circuit continuations
-fry hashtables io kernel kernel.private locals.backend make
-math namespaces prettyprint quotations sequences sequences.deep
-shuffle slots.private splitting stack-checker vectors vocabs
-words words.alias ;
+fry hashtables io kernel kernel.private locals.backend make math
+math.private namespaces prettyprint quotations sequences
+sequences.deep shuffle slots.private splitting stack-checker
+vectors vocabs words words.alias ;
 
 IN: lint
 
@@ -44,6 +44,9 @@ CONSTANT: trivial-defs
         [ compose compose ]
         [ empty? ] [ empty? not ]
         [ dup empty? ] [ dup empty? not ]
+        [ 2dup both-fixnums? ]
+        [ [ drop ] prepose ]
+        [ 1 0 ? ]
     }
 
 : lintable-word? ( word -- ? )
@@ -183,13 +186,13 @@ CONSTANT: trivial-defs
             } 1&&
         ]
 
-        ! Remove [ { foo } declare class ]
+        ! Remove [ { foo } declare class-of ]
         [
             {
                 [ length 3 = ]
                 [ first { [ array? ] [ length 1 = ] } 1&& ]
                 [ second \ declare = ]
-                [ third \ class = ]
+                [ third \ class-of = ]
             } 1&&
         ]
 
