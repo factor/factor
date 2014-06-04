@@ -158,6 +158,9 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\t" } "a tab" }
     { { $snippet "\\n" } "a newline" }
     { { $snippet "\\r" } "a carriage return" }
+    { { $snippet "\\b" } "a backspace (ASCII 8)" }
+    { { $snippet "\\v" } "a vertical tab (ASCII 11)" }
+    { { $snippet "\\f" } "a form feed (ASCII 12)" }
     { { $snippet "\\0" } "a null byte (ASCII 0)" }
     { { $snippet "\\e" } "escape (ASCII 27)" }
     { { $snippet "\\\"" } { $snippet "\"" } }

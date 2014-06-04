@@ -138,7 +138,7 @@ IN: bootstrap.syntax
         scan-token current-vocab create
         [ fake-definition ] [ set-last-word ] [ undefined-def define ] tri
     ] define-core-syntax
-    
+
     "ALIAS:" [
         scan-new-word scan-word define-alias
     ] define-core-syntax
