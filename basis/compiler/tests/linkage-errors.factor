@@ -1,6 +1,6 @@
 USING: tools.test namespaces assocs alien.syntax kernel
 compiler.errors accessors alien alien.c-types alien.strings
-debugger literals ;
+debugger literals kernel.private ;
 FROM: alien.libraries => add-library load-library ;
 IN: compiler.tests.linkage-errors
 

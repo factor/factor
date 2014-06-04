@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations decimals grouping kernel literals locals
 math math.functions math.order math.ratios prettyprint random
-sequences tools.test ;
+sequences tools.test kernel.private ;
 IN: decimals.tests
 
 [ t ] [

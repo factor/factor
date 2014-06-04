@@ -1,7 +1,7 @@
 USING: kernel math math.floats.env math.floats.env.private
 math.functions math.libm literals sequences tools.test locals
 compiler.units kernel.private fry compiler.test math.private
-words system memory ;
+words system memory kernel.private ;
 IN: math.floats.env.tests
 
 : set-default-fp-env ( -- )
