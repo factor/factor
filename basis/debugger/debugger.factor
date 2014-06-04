@@ -1,16 +1,16 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings slots arrays definitions generic hashtables
-summary io kernel math namespaces make prettyprint
-prettyprint.config sequences assocs sequences.private strings
-io.styles io.pathnames vectors words system splitting
-math.parser classes.mixin classes.tuple continuations
-continuations.private combinators generic.math classes.builtin
-classes compiler.units generic.standard generic.single vocabs
-init kernel.private io.encodings accessors math.order
-destructors source-files parser classes.tuple.parser
-effects.parser lexer generic.parser strings.parser vocabs.loader
-vocabs.parser source-files.errors grouping ;
+USING: accessors alien.strings arrays assocs classes
+classes.builtin classes.mixin classes.tuple classes.tuple.parser
+combinators combinators.short-circuit compiler.units
+continuations definitions destructors effects.parser generic
+generic.math generic.parser generic.single grouping io
+io.encodings io.styles kernel lexer make math math.order
+math.parser namespaces parser prettyprint sequences
+sequences.private slots source-files.errors strings
+strings.parser summary system vocabs vocabs.loader vocabs.parser
+words ;
+FROM: namespaces => change-global ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -43,8 +43,7 @@ M: string error. print ;
     error-continuation get name>> assoc-stack ;
 
 : :res ( n -- * )
-    1 - restarts get-global nth f restarts set-global
-    continue-restart ;
+    1 - restarts [ nth f ] change-global continue-restart ;
 
 : :1 ( -- * ) 1 :res ;
 : :2 ( -- * ) 2 :res ;
@@ -141,40 +140,41 @@ HOOK: signal-error. os ( obj -- )
     "Interrupt" print drop ;
 
 PREDICATE: vm-error < array
-    {
-        { [ dup empty? ] [ drop f ] }
-        { [ dup first "kernel-error" = not ] [ drop f ] }
-        [ second 0 18 between? ]
-    } cond ;
+    dup length 2 < [ drop f ] [
+        {
+            [ first-unsafe "kernel-error" = ]
+            [ second-unsafe 0 18 between? ]
+        } 1&&
+    ] if ;
 
 : vm-errors ( error -- n errors )
     second {
-        { 0  [ expired-error.          ] }
-        { 1  [ io-error.               ] }
-        { 2  [ primitive-error.        ] }
-        { 3  [ type-check-error.       ] }
-        { 4  [ divide-by-zero-error.   ] }
-        { 5  [ signal-error.           ] }
-        { 6  [ array-size-error.       ] }
-        { 7  [ c-string-error.         ] }
-        { 8  [ ffi-error.              ] }
-        { 9  [ undefined-symbol-error. ] }
-        { 10 [ datastack-underflow.    ] }
-        { 11 [ datastack-overflow.     ] }
-        { 12 [ retainstack-underflow.  ] }
-        { 13 [ retainstack-overflow.   ] }
-        { 14 [ callstack-underflow.    ] }
-        { 15 [ callstack-overflow.     ] }
-        { 16 [ memory-error.           ] }
-        { 17 [ fp-trap-error.          ] }
-        { 18 [ interrupt-error.        ] }
+        expired-error.
+        io-error.
+        primitive-error.
+        type-check-error.
+        divide-by-zero-error.
+        signal-error.
+        array-size-error.
+        c-string-error.
+        ffi-error.
+        undefined-symbol-error.
+        datastack-underflow.
+        datastack-overflow.
+        retainstack-underflow.
+        retainstack-overflow.
+        callstack-underflow.
+        callstack-overflow.
+        memory-error.
+        fp-trap-error.
+        interrupt-error.
     } ; inline
 
 M: vm-error summary drop "VM error" ;
 
-M: vm-error error. dup vm-errors case ;
+M: vm-error error. dup vm-errors nth execute( x -- ) ;
 
-M: vm-error error-help vm-errors at first ;
+M: vm-error error-help vm-errors nth ;
 
 M: no-method summary
     drop "No suitable method" ;
@@ -351,8 +351,7 @@ M: row-variable-can't-have-type summary
     drop "Stack effect row variables cannot have a declared type" ;
 
 M: bad-escape error.
-    "Bad escape code: \\" write
-    char>> 1string print ;
+    "Bad escape code: \\" write char>> 1string print ;
 
 M: bad-literal-tuple summary drop "Bad literal tuple" ;
 
