@@ -303,7 +303,8 @@ def build(ctx):
 
     # Build ffi test library. It is used by some unit tests.
     ctx.shlib(
-        target = 'factor-ffi-test',
+        # Force lib prefix on windows too, it's nonidiomatic.
+        target = '%sfactor-ffi-test' % ('lib' if dest_os == 'win32' else ''),
         source = ['vm/ffi_test.c'],
         install_path = libdir
         )

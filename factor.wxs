@@ -79,9 +79,9 @@
           <Component Id='TestLib' Guid='6e66ea91-6BE3-460D-A14F-75658D16550A'>
             <File
                 Id='TestDLL'
-                Name='factor-ffi-test.dll'
+                Name='libfactor-ffi-test.dll'
                 DiskId='1'
-                Source='factor-ffi-test.dll'
+                Source='libfactor-ffi-test.dll'
                 KeyPath='yes' />
           </Component>
           <Component Id='License' Guid='6c66ea90-6BE3-460D-A14F-75658D16550B'>
