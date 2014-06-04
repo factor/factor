@@ -139,7 +139,7 @@ syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingle
 " LIBRARY:
 "#\ "
 
-syn match factorEscape /\\\([\\astnr0e\"]\|u\x\{6}\|u{\S\+}\|x\x\{2}\)/ contained display
+syn match factorEscape /\\\([\\astnrbvf0e\"]\|u\x\{6}\|u{\S\+}\|x\x\{2}\)/ contained display
 syn region factorString start=/\<"/ skip=/\\"/ end=/"/ contains=factorEscape
 syn region factorTriString start=/\<"""/ skip=/\\"/ end=/"""/ contains=factorEscape
 syn region factorSbuf start=/\<[-a-zA-Z0-9]\+"\>/ skip=/\\"/ end=/"/
