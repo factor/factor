@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs grouping kernel linked-assocs literals locals
 namespaces sequences tools.test yaml yaml.config yaml.ffi
-yaml.private ;
+yaml.private calendar ;
 IN: yaml.tests
 
 ! TODO real conformance tests here
@@ -526,18 +526,82 @@ ${ construct-pairs-obj } [ $ construct-pairs-obj >yaml yaml> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! construct-timestamp
-! TODO what to do with timestamp ?
-! CONSTANT: construct-timestamp-obj f
-! 
-! CONSTANT: construct-timestamp-str """canonical:        2001-12-15T02:59:43.1Z
-! valid iso8601:    2001-12-14t21:59:43.10-05:00
-! space separated:  2001-12-14 21:59:43.10 -5
-! no time zone (Z): 2001-12-15 2:59:43.10
-! date (00:00:00Z): 2002-12-14
-! """
-! 
-! ${ construct-timestamp-obj } [ $ construct-timestamp-str yaml> ] unit-test
-! ${ construct-timestamp-obj } [ $ construct-timestamp-obj >yaml yaml> ] unit-test
+CONSTANT: construct-timestamp-obj H{
+    {
+        "space separated"
+        T{ timestamp
+            { year 2001 }
+            { month 12 }
+            { day 14 }
+            { hour 21 }
+            { minute 59 }
+            { second 43+1/10 }
+            { gmt-offset T{ duration { hour -5 } } }
+        }
+    }
+    {
+        "canonical"
+        T{ timestamp
+            { year 2001 }
+            { month 12 }
+            { day 15 }
+            { hour 2 }
+            { minute 59 }
+            { second 43+1/10 }
+        }
+    }
+    {
+        "date (00:00:00Z)"
+        T{ timestamp { year 2002 } { month 12 } { day 14 } }
+    }
+    {
+        "no time zone (Z)"
+        T{ timestamp
+            { year 2001 }
+            { month 12 }
+            { day 15 }
+            { hour 2 }
+            { minute 59 }
+            { second 43+1/10 }
+        }
+    }
+    {
+        "valid iso8601"
+        T{ timestamp
+            { year 2001 }
+            { month 12 }
+            { day 14 }
+            { hour 21 }
+            { minute 59 }
+            { second 43+1/10 }
+            { gmt-offset T{ duration { hour -5 } } }
+        }
+    }
+    {
+        "crazy"
+        T{ timestamp
+            { year 2002 }
+            { month 2 }
+            { day 4 }
+            { hour 1 }
+            { minute 2 }
+            { second 59+123/1000 }
+            { gmt-offset
+                T{ duration { hour 10 } { minute 23 } }
+            }
+        }
+    }
+}
+CONSTANT: construct-timestamp-str """canonical:        2001-12-15T02:59:43.1Z
+valid iso8601:    2001-12-14t21:59:43.10-05:00
+space separated:  2001-12-14 21:59:43.10 -5
+no time zone (Z): 2001-12-15 2:59:43.10
+date (00:00:00Z): 2002-12-14
+crazy: 2002-2-4   \t\t \t 1:02:59.123 \t\t +10:23
+"""
+
+${ construct-timestamp-obj } [ $ construct-timestamp-str yaml> ] unit-test
+${ construct-timestamp-obj } [ $ construct-timestamp-obj >yaml yaml> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! construct-value
