@@ -12,12 +12,12 @@ IN: ini-file
 : escape ( ch -- ch' )
     H{
         { CHAR: a   CHAR: \a }
-        { CHAR: b   0x08 } ! \b
-        { CHAR: f   0x0c } ! \f
+        { CHAR: b   CHAR: \b }
+        { CHAR: f   CHAR: \f }
         { CHAR: n   CHAR: \n }
         { CHAR: r   CHAR: \r }
         { CHAR: t   CHAR: \t }
-        { CHAR: v   0x0b } ! \v
+        { CHAR: v   CHAR: \v }
         { CHAR: '   CHAR: ' }
         { CHAR: "   CHAR: " }
         { CHAR: \\  CHAR: \\ }
