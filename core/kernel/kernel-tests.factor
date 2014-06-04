@@ -1,5 +1,5 @@
-USING: arrays byte-arrays kernel kernel.private math memory
-namespaces sequences tools.test math.private quotations
+USING: arrays byte-arrays kernel kernel.private literals math
+memory namespaces sequences tools.test math.private quotations
 continuations prettyprint io.streams.string debugger assocs
 sequences.private accessors locals.backend grouping words
 system alien alien.accessors ;
@@ -14,11 +14,16 @@ IN: kernel.tests
 [ ] [ 1000 [ [ -1 f <array> ] ignore-errors ] times ] unit-test
 
 ! Make sure we report the correct error on stack underflow
-[ clear drop ] [ { "kernel-error" 10 f f } = ] must-fail-with
+[ clear drop ] [
+    ${ "kernel-error" ERROR-DATASTACK-UNDERFLOW f f } =
+] must-fail-with
 
 [ ] [ :c ] unit-test
 
-[ 3 [ { } set-retainstack ] dip ] [ { "kernel-error" 12 f f } = ] must-fail-with
+[
+    3 [ { } set-retainstack ] dip ]
+    [ ${ "kernel-error" ERROR-RETAINSTACK-UNDERFLOW f f } =
+] must-fail-with
 
 [ ] [ :c ] unit-test
 
@@ -35,15 +40,21 @@ IN: kernel.tests
 [ t "no-compile" set-word-prop ] each
 >>
 
-[ overflow-d ] [ { "kernel-error" 11 f f } = ] must-fail-with
+[ overflow-d ] [
+    ${ "kernel-error" ERROR-DATASTACK-OVERFLOW f f } =
+] must-fail-with
 
 [ ] [ :c ] unit-test
 
-[ overflow-d-alt ] [ { "kernel-error" 11 f f } = ] must-fail-with
+[ overflow-d-alt ] [
+    ${ "kernel-error" ERROR-DATASTACK-OVERFLOW f f } =
+] must-fail-with
 
 [ ] [ [ :c ] with-string-writer drop ] unit-test
 
-[ overflow-r ] [ { "kernel-error" 13 f f } = ] must-fail-with
+[ overflow-r ] [
+    ${ "kernel-error" ERROR-RETAINSTACK-OVERFLOW f f } =
+] must-fail-with
 
 [ ] [ :c ] unit-test
 
@@ -53,7 +64,9 @@ IN: kernel.tests
 ! because no facility exists to run memory protection
 ! fault handlers on an alternate callstack.
 os windows? [
-    [ overflow-c ] [ { "kernel-error" 15 f f } = ] must-fail-with
+    [ overflow-c ] [
+        ${ "kernel-error" ERROR-CALLSTACK-OVERFLOW f f } =
+    ] must-fail-with
 ] unless
 
 [ -7 <byte-array> ] must-fail
