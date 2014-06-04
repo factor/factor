@@ -86,9 +86,8 @@ PRIVATE>
 PRIVATE>
 
 : parse-string ( -- str )
-    lexer get [
-        [ SBUF" " clone ] 2dip swap tail-slice
-        (parse-string) [ "" like ] dip
+    SBUF" " clone lexer get [
+        swap tail-slice (parse-string) [ "" like ] dip
     ] change-lexer-column ;
 
 <PRIVATE
