@@ -99,7 +99,7 @@ SYMBOL: error-stream
 
 : print ( str -- ) output-stream get stream-print ; inline
 
-: stream-bl ( stream -- ) " " swap stream-write ; inline
+: stream-bl ( stream -- ) CHAR: \s swap stream-write1 ; inline
 
 : bl ( -- ) output-stream get stream-bl ;
 
