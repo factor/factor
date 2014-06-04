@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit kernel lexer math
 math.functions math.parser parser sequences splitting
-locals math.order ;
+locals math.order sets assocs math.primes.factors strings combinators ;
 IN: decimals
 
 TUPLE: decimal { mantissa read-only } { exponent read-only } ;
@@ -18,12 +18,30 @@ TUPLE: decimal { mantissa read-only } { exponent read-only } ;
     [ [ CHAR: 0 = ] trim-tail [ "" ] when-empty ] bi*
     [ append string>number ] [ nip length neg ] 2bi <decimal> ; 
 
+: decimal>string ( decimal -- string )
+    >decimal< [ number>string ] [ neg ] bi*
+    over length {
+        { [ 2dup > ] [ - CHAR: 0 <string> "." prepend prepend ] }
+        { [ over 0 <= ] [ drop CHAR: 0 <string> append ] }
+        [ drop cut* "." glue ]
+    } cond ;
+
 : parse-decimal ( -- decimal ) scan-token string>decimal ;
 
 SYNTAX: D: parse-decimal suffix! ;
 
 : decimal>ratio ( decimal -- ratio ) >decimal< 10^ * ;
 : decimal>float ( decimal -- ratio ) decimal>ratio >float ;
+
+: smallest-decimal-mantissa ( ratio -- n )
+    denominator>> group-factors dup keys { 2 5 } subset? [
+      values supremum
+    ] [ drop f ] if ;
+
+: ratio>decimal ( ratio -- decimal/f )
+    dup smallest-decimal-mantissa [
+        [ 10^ * ] [ nip neg ] 2bi <decimal>
+    ] [ drop f ] if* ;
 
 : scale-mantissas ( D1 D2 -- m1 m2 exp )
     [ [ mantissa>> ] bi@ ]

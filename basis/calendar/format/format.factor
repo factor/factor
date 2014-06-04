@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.format.macros
 combinators io io.streams.string kernel math math.functions
-math.order math.parser present sequences typed ;
+math.order math.parser present sequences typed decimals ;
 IN: calendar.format
 
 : pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-head ;
@@ -133,9 +133,15 @@ M: timestamp year. ( timestamp -- )
         { +gt+ [ "+" write (write-rfc3339-gmt-offset) ] }
     } case ;
 
+: write-rfc3339-seconds ( timestamp -- )
+    second>> dup ratio? [
+        1 mod ratio>decimal decimal>string write
+    ] [ drop ] if ;
+
 : (timestamp>rfc3339) ( timestamp -- )
     {
         YYYY "-" MM "-" DD "T" hh ":" mm ":" ss
+        write-rfc3339-seconds
         [ gmt-offset>> write-rfc3339-gmt-offset ]
     } formatted ;
 
