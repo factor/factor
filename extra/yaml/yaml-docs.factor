@@ -1,6 +1,6 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs byte-arrays hash-sets hashtables
+USING: arrays assocs byte-arrays hash-sets hashtables calendar
 help.markup help.syntax kernel linked-assocs math sequences sets
 strings yaml.ffi yaml.config ;
 IN: yaml
@@ -86,7 +86,7 @@ ARTICLE: "yaml-mapping" "Mapping between Factor and YAML types"
   { "!!float" { $link float } }
   { "!!str" { $link string } }
   { "!!binary" { $link byte-array } }
-  { "!!timestamp" "Not supported yet" }
+  { "!!timestamp" { $link timestamp } }
   { { $snippet "sequences" } "" }
   { "!!seq" { $link array } }
   { "!!omap" { $link linked-assoc } }

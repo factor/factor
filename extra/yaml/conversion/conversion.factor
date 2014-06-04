@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs base64 byte-arrays combinators
 combinators.extras hash-sets kernel linked-assocs math
-math.parser regexp sequences strings yaml.ffi ;
+math.parser regexp sequences strings yaml.ffi
+calendar calendar.format ;
 IN: yaml.conversion
 
 ! !!!!!!!!!!!!!!
@@ -19,6 +20,7 @@ CONSTANT: re-int16 R/ 0x[0-9a-fA-F]+/
 CONSTANT: re-number R/ [-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?/
 CONSTANT: re-infinity R/ [-+]?\.(inf|Inf|INF)/
 CONSTANT: re-nan R/ \.(nan|NaN|NAN)/
+CONSTANT: re-timestamp R/ [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]|[0-9][0-9][0-9][0-9]-[0-9][0-9]?-[0-9][0-9]?([Tt]|[ \t]+)[0-9][0-9]?:[0-9][0-9]:[0-9][0-9](\.[0-9]*)?([ \t]*(Z|[-+][0-9][0-9]?(:[0-9][0-9])?))?/
 
 : resolve-plain-scalar ( str -- tag )
     {
@@ -31,6 +33,7 @@ CONSTANT: re-nan R/ \.(nan|NaN|NAN)/
         { [ re-number matches? ] [ YAML_FLOAT_TAG ] }
         { [ re-infinity matches? ] [ YAML_FLOAT_TAG ] }
         { [ re-nan matches? ] [ YAML_FLOAT_TAG ] }
+        { [ re-timestamp matches? ] [ YAML_TIMESTAMP_TAG ] }
         [ drop YAML_STR_TAG ]
     } cond-case ;
 
@@ -77,6 +80,22 @@ CONSTANT: YAML_SET_TAG "tag:yaml.org,2002:set"
         [ string>number ]
     } cond ;
 
+! YAML allows
+! - multiple whitespaces between date and time
+! - multiple whitespaces between time and offset
+! - months, days and hours on 1 digit
+! preprocess to fix this mess...
+: yaml>rfc3339 ( str -- str' )
+    R/ -[0-9][^0-9]/ [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
+    R/ -[0-9][^0-9]/ [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
+    R/ [^0-9][0-9]:/ [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
+    R/ [ \t]+/ " " re-replace
+    CHAR: : over index cut CHAR: space swap remove append ;
+
+: construct-timestamp ( obj -- obj' )
+    dup R/ [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ matches?
+    [ ymd>timestamp ] [ yaml>rfc3339 rfc3339>timestamp ] if ;
+
 : construct-scalar ( scalar-event -- scalar )
     [ value>> ] [ resolve-scalar ] bi {
         { YAML_NULL_TAG [ drop f ] }
@@ -84,6 +103,7 @@ CONSTANT: YAML_SET_TAG "tag:yaml.org,2002:set"
         { YAML_INT_TAG [ construct-int ] }
         { YAML_FLOAT_TAG [ construct-float ] }
         { YAML_BINARY_TAG [ base64> ] }
+        { YAML_TIMESTAMP_TAG [ construct-timestamp ] }
         { YAML_STR_TAG [ ] }
     } case ;
 
@@ -128,3 +148,6 @@ M: float yaml-tag ( obj -- tag ) drop YAML_FLOAT_TAG ;
 
 M: byte-array represent-scalar ( obj -- str ) >base64 "" like ;
 M: byte-array yaml-tag ( obj -- tag ) drop YAML_BINARY_TAG ;
+
+M: timestamp represent-scalar ( obj -- str ) timestamp>rfc3339 ;
+M: timestamp yaml-tag ( obj -- str ) drop YAML_TIMESTAMP_TAG ;
