@@ -10,11 +10,14 @@ ERROR: bad-escape char ;
 : escape ( escape -- ch )
     H{
         { CHAR: a  CHAR: \a }
+        { CHAR: b  CHAR: \b }
         { CHAR: e  CHAR: \e }
+        { CHAR: f  CHAR: \f }
         { CHAR: n  CHAR: \n }
         { CHAR: r  CHAR: \r }
         { CHAR: t  CHAR: \t }
         { CHAR: s  CHAR: \s }
+        { CHAR: v  CHAR: \v }
         { CHAR: \s CHAR: \s }
         { CHAR: 0  CHAR: \0 }
         { CHAR: \\ CHAR: \\ }
