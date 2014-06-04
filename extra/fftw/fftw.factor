@@ -39,7 +39,8 @@ PRIVATE>
 
 : fft1d ( seq -- seq' ) FFTW_FORWARD (fft1d) ;
 
-: ifft1d ( seq -- seq' ) FFTW_BACKWARD (fft1d) ;
+: ifft1d ( seq -- seq' )
+    [ FFTW_BACKWARD (fft1d) ] [ length v/n ] bi ;
 
 : correlate1d ( x y -- z )
     [ fft1d ] [ reverse fft1d ] bi* v* ifft1d ;
