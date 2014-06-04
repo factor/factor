@@ -1,6 +1,7 @@
 namespace factor {
 
-/* Runtime errors */
+// Runtime errors must be kept in sync with:
+//   core/kernel/kernel.factor
 enum vm_error_type {
   ERROR_EXPIRED = 0,
   ERROR_IO,

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations decimals grouping kernel locals math
-math.functions math.order math.ratios prettyprint random
+USING: continuations decimals grouping kernel literals locals
+math math.functions math.order math.ratios prettyprint random
 sequences tools.test ;
 IN: decimals.tests
 
@@ -33,11 +33,11 @@ ERROR: decimal-test-failure D1 D2 quot ;
     1000 [
         drop
         [ [ 100 D/ ] [ /f ] test-decimal-op ]
-        [ { "kernel-error" 4 f f } = ] recover
+        [ ${ "kernel-error" ERROR-DIVIDE-BY-ZERO f f } = ] recover
     ] all-integers?
 ] unit-test
 
-[ t ] [ 
+[ t ] [
     { D: 0. D: .0 D: 0.0 D: 00.00 D: . } all-equal?
 ] unit-test
 

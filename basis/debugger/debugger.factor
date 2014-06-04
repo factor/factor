@@ -130,7 +130,7 @@ HOOK: signal-error. os ( obj -- )
 : memory-error. ( error -- )
     "Memory protection fault at address " write third .h ;
 
-: primitive-error. ( error -- ) 
+: primitive-error. ( error -- )
     "Unimplemented primitive" print drop ;
 
 : fp-trap-error. ( error -- )
@@ -143,7 +143,7 @@ PREDICATE: vm-error < array
     dup length 2 < [ drop f ] [
         {
             [ first-unsafe "kernel-error" = ]
-            [ second-unsafe 0 18 between? ]
+            [ second-unsafe 0 kernel-error-count 1 - between? ]
         } 1&&
     ] if ;
 
