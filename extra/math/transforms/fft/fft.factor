@@ -6,6 +6,8 @@ IN: math.transforms.fft
 
 <PRIVATE
 
+DEFER: (fft)
+
 ! Discrete Fourier Transform
 :: (slow-fft) ( seq inverse? -- seq' )
     seq length :> N
@@ -16,7 +18,7 @@ IN: math.transforms.fft
     ] map ; inline
 
 ! Cooley–Tukey Algorithm
-:: (fft) ( seq inverse? -- seq' )
+:: (fast-fft) ( seq inverse? -- seq' )
     seq length :> N
     N 1 = [ seq ] [
         seq even-indices inverse? (fft)
@@ -28,19 +30,19 @@ IN: math.transforms.fft
         2bi append
     ] if ; inline recursive
 
+: (fft) ( seq inverse? -- seq' )
+    over length power-of-2?
+    [ (fast-fft) ] [ (slow-fft) ] if ; inline recursive
+
 PRIVATE>
 
 ERROR: not-enough-data ;
 
 : fft ( seq -- seq' )
-    [ not-enough-data ] [
-        f over length even? [ (fft) ] [ (slow-fft) ] if
-    ] if-empty ;
+    [ not-enough-data ] [ f (fft) ] if-empty ;
 
 : ifft ( seq -- seq' )
-    [ not-enough-data ] [
-        t over length even? [ (fft) ] [ (slow-fft) ] if
-    ] if-empty ;
+    [ not-enough-data ] [ t (fft) ] if-empty ;
 
 : correlate ( x y -- z )
     [ fft ] [ reverse fft ] bi* v* ifft ;
