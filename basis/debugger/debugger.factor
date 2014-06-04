@@ -149,32 +149,32 @@ PREDICATE: vm-error < array
 
 : vm-errors ( error -- n errors )
     second {
-        expired-error.
-        io-error.
-        primitive-error.
-        type-check-error.
-        divide-by-zero-error.
-        signal-error.
-        array-size-error.
-        c-string-error.
-        ffi-error.
-        undefined-symbol-error.
-        datastack-underflow.
-        datastack-overflow.
-        retainstack-underflow.
-        retainstack-overflow.
-        callstack-underflow.
-        callstack-overflow.
-        memory-error.
-        fp-trap-error.
-        interrupt-error.
+        [ expired-error.          ]
+        [ io-error.               ]
+        [ primitive-error.        ]
+        [ type-check-error.       ]
+        [ divide-by-zero-error.   ]
+        [ signal-error.           ]
+        [ array-size-error.       ]
+        [ c-string-error.         ]
+        [ ffi-error.              ]
+        [ undefined-symbol-error. ]
+        [ datastack-underflow.    ]
+        [ datastack-overflow.     ]
+        [ retainstack-underflow.  ]
+        [ retainstack-overflow.   ]
+        [ callstack-underflow.    ]
+        [ callstack-overflow.     ]
+        [ memory-error.           ]
+        [ fp-trap-error.          ]
+        [ interrupt-error.        ]
     } ; inline
 
 M: vm-error summary drop "VM error" ;
 
-M: vm-error error. dup vm-errors nth execute( x -- ) ;
+M: vm-error error. dup vm-errors dispatch ;
 
-M: vm-error error-help vm-errors nth ;
+M: vm-error error-help vm-errors nth first ;
 
 M: no-method summary
     drop "No suitable method" ;
@@ -351,7 +351,7 @@ M: row-variable-can't-have-type summary
     drop "Stack effect row variables cannot have a declared type" ;
 
 M: bad-escape error.
-    "Bad escape code: \\" write char>> 1string print ;
+    "Bad escape code: \\" write char>> write nl ;
 
 M: bad-literal-tuple summary drop "Bad literal tuple" ;
 
