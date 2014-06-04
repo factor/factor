@@ -43,10 +43,10 @@ name>char-hook [
     ] if ;
 
 : next-escape ( str -- ch str' )
-    dup first {
-        { CHAR: u [ rest-slice unicode-escape ] }
-        { CHAR: x [ rest-slice hex-escape ] }
-        [ drop unclip-slice escape swap ]
+    unclip-slice {
+        { CHAR: u [ unicode-escape ] }
+        { CHAR: x [ hex-escape ] }
+        [ escape swap ]
     } case ;
 
 <PRIVATE
