@@ -56,7 +56,7 @@ M: text-printer print-closing-tag
     [
         { "ul" "ol" "li" "tr" } member? [ nl ] when
     ]
-    [ "td" = [ " " write ] when ] tri ;
+    [ "td" = [ bl ] when ] tri ;
 
 M: text-printer print-comment-tag drop ;
 

@@ -7,11 +7,11 @@ IN: euler.b-rep.io.obj
 <PRIVATE
 : write-obj-vertex ( vertex -- )
     "v " write
-    position>> 3 head-slice [ " " write ] [ number>string write ] interleave nl ;
+    position>> 3 head-slice [ bl ] [ number>string write ] interleave nl ;
 
 : write-obj-face ( face vx-indices -- )
     "f" write
-    [ edge>> ] dip '[ " " write vertex>> _ at 1 + number>string write ] each-face-edge nl ;
+    [ edge>> ] dip '[ bl vertex>> _ at 1 + number>string write ] each-face-edge nl ;
 PRIVATE>
 
 :: write-obj ( b-rep -- )
