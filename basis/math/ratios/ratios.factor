@@ -77,3 +77,5 @@ M: ratio /i scale /i ;
 M: ratio /f scale /f ;
 M: ratio mod scale+d [ mod ] [ / ] bi* ;
 M: ratio /mod scale+d [ /mod ] [ / ] bi* ;
+M: ratio abs dup neg? [ >fraction [ neg ] dip fraction> ] when ;
+M: ratio neg? numerator neg? ; inline
