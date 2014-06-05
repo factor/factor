@@ -558,7 +558,7 @@ SYMBOL: deploy-vocab
     "Preparing deployed libraries" show
     deploy-libraries get [
         libraries get [
-            [ path>> >deployed-library-path ] [ abi>> ] bi <library>
+            [ path>> >deployed-library-path ] [ abi>> ] bi make-library
         ] change-at
     ] each
     
