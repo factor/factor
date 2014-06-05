@@ -1,22 +1,18 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.launcher io.directories io.pathnames
-io.encodings.ascii io prettyprint hashtables kernel sequences
-assocs system sorting math.parser sets ;
+USING: io io.directories io.encodings.ascii io.launcher
+io.pathnames math.statistics prettyprint sequences sorting
+system ;
 IN: contributors
 
 : changelog ( -- authors )
     image parent-directory [
-        "git log --no-merges --pretty=format:%an" ascii <process-reader> stream-lines
+        "git log --no-merges --pretty=format:%an"
+        ascii [ lines ] with-process-reader
     ] with-directory ;
 
-: patch-counts ( authors -- assoc )
-    dup members
-    [ dup rot [ = ] with count ] with
-    { } map>assoc ;
-
 : contributors ( -- )
-    changelog patch-counts
+    changelog histogram
     sort-values <reversed>
     simple-table. ;
 
