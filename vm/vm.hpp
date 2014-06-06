@@ -232,6 +232,7 @@ struct factor_vm {
   enum bignum_comparison bignum_compare(bignum* x, bignum* y);
   bignum* bignum_add(bignum* x, bignum* y);
   bignum* bignum_subtract(bignum* x, bignum* y);
+  bignum* bignum_square(bignum* x);
   bignum* bignum_multiply(bignum* x, bignum* y);
   void bignum_divide(bignum* numerator, bignum* denominator, bignum** quotient,
                      bignum** remainder);
