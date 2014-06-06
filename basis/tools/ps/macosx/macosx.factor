@@ -24,7 +24,7 @@ IN: tools.ps.macosx
 : hostname ( -- str ) { 1 10 } sysctl-query-string ;
 
 : sysctl-query-bytes ( seq -- n )
-    [ make-int-array ] [ length ] bi f 0 uint <ref>
+    [ int >c-array ] [ length ] bi f 0 uint <ref>
     [ f 0 sysctl io-error ] keep uint deref ;
 
 STRUCT: _pcred
