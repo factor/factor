@@ -131,6 +131,5 @@ M: effect clone
 ERROR: bad-stack-effect word expected got ;
 
 : check-stack-effect ( word effect -- )
-    [ dup stack-effect ] dip
-    2dup effect=
+    over stack-effect 2dup effect=
     [ 3drop ] [ bad-stack-effect ] if ;
