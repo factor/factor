@@ -15,7 +15,7 @@ C: <transaction> transaction
     over transactions>> push ;
 
 : total ( transactions -- balance )
-    0 [ amount>> + ] reduce ;
+    [ amount>> ] map-sum ;
 
 : balance>> ( account -- balance ) transactions>> total ;
 

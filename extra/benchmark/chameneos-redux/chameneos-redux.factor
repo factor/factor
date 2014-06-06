@@ -90,7 +90,7 @@ TUPLE: meeting-place count mailbox ;
         [ drop run-meeting-place ]
 
         [ nip [ [ count>> number>string write bl ] [ self-count>> number>text write nl ] bi ] each ]
-        [ nip 0 [ count>> + ] reduce bl number>chameneos-string print ]
+        [ nip [ count>> ] map-sum bl number>chameneos-string print ]
     } 2cleave ;
 
 ! 6000000 for shootout, too slow right now
