@@ -5,6 +5,6 @@ LIBS = -ldl -lm -lrt -lpthread $(X11_UI_LIBS) -Wl,--export-dynamic
 
 # clang spams warnings if we use -Wl,--no-as-needed with -c
 # -Wl,--no-as-needed is a gcc optimization, not required
-ifneq ($(CPP),clang++)
+ifneq ($(CXX),clang++)
 	SITE_CFLAGS += -Wl,--no-as-needed
 endif
