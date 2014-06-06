@@ -2,10 +2,10 @@ USING: kernel math math.constants msgpack sequences ;
 IN: benchmark.msgpack
 
 : pack-sum ( seq -- n )
-    0 [ >msgpack msgpack> + ] reduce ;
+    [ >msgpack msgpack> ] map-sum ;
 
 : pack-sum-lengths ( seq -- n )
-    0 [ >msgpack msgpack> length + ] reduce ;
+    [ >msgpack msgpack> length ] map-sum ;
 
 : msgpack-benchmark ( -- )
     500,000 iota pack-sum 124,999,750,000 assert=
