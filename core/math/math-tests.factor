@@ -93,3 +93,6 @@ IN: math.tests
 { 4 } [ 3 next-power-of-2 ] unit-test
 { 4 } [ 4 next-power-of-2 ] unit-test
 { 8 } [ 5 next-power-of-2 ] unit-test
+
+{ t } [ 128 2^ sq 256 2^ = ] unit-test
+{ t } [ 128 2^ neg sq 256 2^ = ] unit-test
