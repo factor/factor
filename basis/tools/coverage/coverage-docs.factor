@@ -1,6 +1,6 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types help.markup help.syntax kernel quotations
+USING: alien.c-types assocs help.markup help.syntax kernel quotations
 sequences strings ;
 IN: tools.coverage
 
@@ -85,7 +85,14 @@ HELP: test-coverage
     { "vocab" "a vocabulary specifier" }
     { "coverage" sequence }
 }
-{ $description "Enables code coverage for a vocabulary and activates it for the unit tests only. The returned value is a sequence of pairs containing names and quotations which did not execute." } ;
+{ $description "Enables code coverage for a vocabulary and runs its unit tests. The returned value is a sequence of pairs containing names and quotations which did not execute." } ;
+
+HELP: test-coverage-recursively
+{ $values
+    { "prefix" "a vocabulary name" }
+    { "assoc" assoc }
+}
+{ $description "Enables code coverage for the vocabulary named " { $snippet "prefix" } " and all of its child vocabularies." } ;
 
 ARTICLE: "tools.coverage" "Coverage tool"
 "The " { $vocab-link "tools.coverage" } " vocabulary is a tool for testing code coverage. The implementation uses " { $vocab-link "tools.annotations" } " to place a coverage object at the beginning of every quotation. When the quotation executes, a slot on the coverage object is set to true. By examining the coverage objects after running the code for some time, one can see which of the quotations did not execute and write more tests or refactor the code." $nl
