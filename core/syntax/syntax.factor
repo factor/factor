@@ -4,11 +4,11 @@ USING: accessors arrays byte-arrays byte-vectors
 classes.algebra.private classes.builtin classes.intersection
 classes.maybe classes.mixin classes.parser classes.predicate
 classes.singleton classes.tuple classes.tuple.parser
-classes.union combinators compiler.units definitions
+classes.union combinators compiler.units definitions effects
 effects.parser generic generic.hook generic.math generic.parser
 generic.standard hash-sets hashtables io.pathnames kernel lexer
 math namespaces parser quotations sbufs sequences slots
-source-files splitting strings strings.parser vectors
+source-files splitting strings strings.parser vectors vocabs
 vocabs.parser words words.alias words.constant words.symbol ;
 IN: bootstrap.syntax
 
@@ -233,6 +233,7 @@ IN: bootstrap.syntax
 
     "MAIN:" [
         scan-word
+        dup ( -- ) check-stack-effect
         [ current-vocab main<< ]
         [ file get [ main<< ] [ drop ] if* ] bi
     ] define-core-syntax
