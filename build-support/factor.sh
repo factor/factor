@@ -92,16 +92,16 @@ set_gcc() {
         macosx)
             xcode_major=`xcodebuild -version | sed -E -ne 's/^Xcode ([0-9]+).*$/\1/p'`
             if [[ $xcode_major -ge 4 ]]; then
-                CC=clang
-                CPP=clang++
+                [ -z "$CC" ] && CC=clang
+                [ -z "$CXX" ] && CXX=clang++
             else
-                CC=gcc
-                CPP=g++
+                [ -z "$CC" ] && CC=gcc
+                [ -z "$CXX" ] && CXX=g++
             fi
         ;;
         *)
-            CC=gcc
-            CPP=g++
+            [ -z "$CC" ] && CC=gcc
+            [ -z "$CXX" ] && CXX=g++
         ;;
     esac
 }
@@ -232,7 +232,7 @@ c_find_word_size() {
     $ECHO "Finding WORD..."
     C_WORD=factor-word-size
     write_test_program
-    gcc -o $C_WORD $C_WORD.c
+    $CC -o $C_WORD $C_WORD.c
     WORD=$(./$C_WORD)
     check_ret $C_WORD
     $DELETE -f $C_WORD*
@@ -294,6 +294,7 @@ echo_build_info() {
     $ECHO GIT_URL=$GIT_URL
     $ECHO DOWNLOADER=$DOWNLOADER
     $ECHO CC=$CC
+    $ECHO CXX=$CXX
     $ECHO MAKE=$MAKE
     $ECHO COPY=$COPY
     $ECHO DELETE=$DELETE
@@ -345,7 +346,7 @@ parse_build_info() {
     if [[ $OS == linux && $ARCH == ppc ]] ; then WORD=32; fi
     if [[ $OS == linux && $ARCH == arm ]] ; then WORD=32; fi
     if [[ $OS == macosx && $ARCH == ppc ]] ; then WORD=32; fi
-    
+
     $ECHO "OS=$OS"
     $ECHO "ARCH=$ARCH"
     $ECHO "WORD=$WORD"
@@ -354,13 +355,13 @@ parse_build_info() {
 find_build_info() {
     find_os
     find_architecture
+    set_gcc
     find_word_size
     set_factor_binary
     set_factor_library
     set_factor_image
     set_build_info
     set_downloader
-    set_gcc
     set_make
     echo_build_info
 }
