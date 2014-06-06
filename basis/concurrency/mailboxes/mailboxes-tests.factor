@@ -51,4 +51,4 @@ IN: concurrency.mailboxes.tests
 
 [
     <mailbox> 1 seconds mailbox-get-timeout
-] [ wait-timeout? ] must-fail-with
+] [ timed-out-error? ] must-fail-with
