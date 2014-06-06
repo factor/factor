@@ -100,5 +100,3 @@ PRIVATE>
     [ word-help not ] filter
     [ article-parent ] filter
     [ predicate? not ] filter ;
-
-MAIN: help-lint
