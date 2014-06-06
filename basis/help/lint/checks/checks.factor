@@ -105,9 +105,8 @@ SYMBOL: vocab-articles
     [ "$values should not contain null" simple-lint-error ] when ;
 
 : check-see-also ( element -- )
-    \ $see-also swap elements [
-        rest all-unique? t assert=
-    ] each ;
+    \ $see-also swap elements [ rest all-unique? ] all?
+    [ "$see-also are not unique" simple-lint-error ] unless ;
 
 : vocab-exists? ( name -- ? )
     [ lookup-vocab ] [ all-vocabs get member? ] bi or ;
