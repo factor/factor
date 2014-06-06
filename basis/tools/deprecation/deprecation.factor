@@ -27,6 +27,7 @@ T{ error-type-holder
     { icon "vocab:ui/tools/error-list/icons/deprecation-note.tiff" }
     { quot [ deprecation-notes get values ] }
     { forget-quot [ deprecation-notes get delete-at ] }
+    { fatal? f }
 } define-error-type
 
 : <deprecation-note-error> ( error word -- deprecation-note )
@@ -72,7 +73,7 @@ M: deprecation-observer definitions-changed
     [ [ check-deprecations ] each ]
     [ drop initialize-deprecation-notes ] if ;
 
-[ \ deprecation-observer add-definition-observer ] 
+[ \ deprecation-observer add-definition-observer ]
 "tools.deprecation" add-startup-hook
 
 initialize-deprecation-notes
