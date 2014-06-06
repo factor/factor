@@ -107,8 +107,65 @@ bignum* factor_vm::bignum_subtract(bignum* x, bignum* y) {
                                    : (bignum_subtract_unsigned(x, y))))));
 }
 
+#ifdef _WIN64
+bignum *factor_vm::bignum_square(bignum * x)
+{
+    return bignum_multiply(x, x);
+}
+#else
+/* Allocates memory */
+bignum *factor_vm::bignum_square(bignum * x)
+{
+    GC_BIGNUM(x);
+
+    bignum_length_type length = (BIGNUM_LENGTH (x));
+    bignum * z = (allot_bignum_zeroed ((length + length), 0));
+
+    bignum_digit_type * scan_z = BIGNUM_START_PTR (z);
+    bignum_digit_type * scan_x = BIGNUM_START_PTR (x);
+    bignum_digit_type * end_x = scan_x + length;
+
+    for (int i = 0; i < length; ++i) {
+        bignum_twodigit_type carry;
+        bignum_twodigit_type f = BIGNUM_REF (x, i);
+        bignum_digit_type *pz = scan_z + (i << 1);
+        bignum_digit_type *px = scan_x + i + 1;
+
+        carry = *pz + f * f;
+        *pz++ = carry & BIGNUM_DIGIT_MASK;
+        carry >>= BIGNUM_DIGIT_LENGTH;
+        BIGNUM_ASSERT (carry <= BIGNUM_DIGIT_MASK);
+
+        f <<= 1;
+        while (px < end_x)
+        {
+            carry += *pz + *px++ * f;
+            *pz++ = carry & BIGNUM_DIGIT_MASK;
+            carry >>= BIGNUM_DIGIT_LENGTH;
+            BIGNUM_ASSERT (carry <= (BIGNUM_DIGIT_MASK << 1));
+        }
+        if (carry) {
+            carry += *pz;
+            *pz++ = carry & BIGNUM_DIGIT_MASK;
+            carry >>= BIGNUM_DIGIT_LENGTH;
+        }
+        if (carry)
+            *pz += carry & BIGNUM_DIGIT_MASK;
+        BIGNUM_ASSERT ((carry >> BIGNUM_DIGIT_LENGTH) == 0);
+    }
+    return (bignum_trim (z));
+}
+#endif
+
 /* Allocates memory */
 bignum* factor_vm::bignum_multiply(bignum* x, bignum* y) {
+
+#ifndef _WIN64
+  if (x == y) {
+    return bignum_square(x);
+  }
+#endif
+
   bignum_length_type x_length = (BIGNUM_LENGTH(x));
   bignum_length_type y_length = (BIGNUM_LENGTH(y));
   int negative_p = ((BIGNUM_NEGATIVE_P(x)) ? (!(BIGNUM_NEGATIVE_P(y)))
