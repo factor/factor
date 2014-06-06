@@ -93,11 +93,11 @@ SYMBOL: vocab-articles
     ] if ;
 
 : check-value-effects ( word element -- )
-    [ effect-effects ]
-    [ extract-value-effects ]
-    bi* [ 2dup and [ = ] [ 2drop t ] if ] 2all?
-    [ "$quotation documentation in $values don't match stack effect" simple-lint-error ]
-    unless ;
+    [ effect-effects ] [ extract-value-effects ] bi*
+    [ 2dup and [ = ] [ 2drop t ] if ] 2all? [
+        "$quotation stack effects in $values don't match"
+        simple-lint-error
+    ] unless ;
 
 : check-nulls ( element -- )
     \ $values swap elements
