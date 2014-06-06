@@ -396,7 +396,7 @@ def build(ctx):
     if dest_os == 'win32':
         build_msi(ctx, bits, image_target)
 
-    pat = '(basis|core|extra)/**/*.*'
+    pat = '(basis|core|extra)/**/*'
     glob = cwd.ant_glob(pat)
 
     ctx.install_files(libdir, glob, cwd = cwd, relative_trick = True)
