@@ -38,7 +38,7 @@ IN: mason
 
     build-loop ;
 
-: mason ( -- * )
+: mason ( -- )
     [ heartbeat-loop ] "Heartbeat loop" spawn
     [ build-loop ] "Build loop" spawn
     stop ;
