@@ -22,12 +22,12 @@ HELP: <bits>
 
 HELP: make-bits
 { $values { "number" integer } { "bits" bits } }
-{ $description "Creates a " { $link bits } " object out of the given number, using its log base 2 as the length. This implies that the last element (unless the number is zero), corresponding to the most significant bit, will be " { $link t } "." }
+{ $description "Creates a sequence of bits " { $link bits } " in ascending significance. Throws an error on negative numbers." }
 { $examples
     { $example "USING: math.bits prettyprint arrays ;" "0b1101 make-bits >array ." "{ t f t t }" }
-    { $example "USING: math.bits prettyprint arrays ;" "-3 make-bits >array ." "{ t f }" }
+    { $example "USING: math.bits prettyprint arrays ;" "64 make-bits >array ." "{ f f f f t }" }
 } ;
 
-HELP: unbits
+HELP: bits>number
 { $values { "seq" sequence } { "number" integer } }
-{ $description "Turns a sequence of booleans, of the same format made by the " { $link bits } " class, and calculates the number that it represents as little-endian." } ;
+{ $description "Converts a sequence of booleans into a number." } ;
