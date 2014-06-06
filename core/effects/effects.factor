@@ -127,3 +127,10 @@ M: effect clone
     [ in>> length ] [ out>> length ] [ terminated?>> ] tri
     pick 0 = [ [ 1 + ] dip ] [ [ 1 - ] 2dip ] if
     [ [ "x" <array> ] bi@ ] dip <terminated-effect> ;
+
+ERROR: bad-stack-effect word expected got ;
+
+: check-stack-effect ( word effect -- )
+    [ dup stack-effect ] dip
+    2dup effect=
+    [ 3drop ] [ bad-stack-effect ] if ;
