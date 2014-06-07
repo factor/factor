@@ -5,7 +5,7 @@
 USING: alien alien.c-types alien.data assocs colors
 combinators.smart continuations fry init kernel locals macros
 math namespaces opengl.gl sequences sequences.generalizations
-specialized-arrays ;
+specialized-arrays words ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: uint
@@ -53,7 +53,7 @@ TUPLE: gl-error-tuple function code string ;
     over glEnableClientState dip glDisableClientState ; inline
 
 : words>values ( word/value-seq -- value-seq )
-    [ ?execute ] map ;
+    [ dup word? [ execute( -- x ) ] when ] map ;
 
 : (all-enabled) ( seq quot -- )
     [ dup [ glEnable ] each ] dip
