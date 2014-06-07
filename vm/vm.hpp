@@ -473,6 +473,7 @@ struct factor_vm {
 
   // math
   void primitive_bignum_to_fixnum();
+  void primitive_bignum_to_fixnum_strict();
   void primitive_float_to_fixnum();
   void primitive_fixnum_divint();
   void primitive_fixnum_divmod();
