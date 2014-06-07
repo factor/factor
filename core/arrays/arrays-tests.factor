@@ -1,5 +1,6 @@
-USING: accessors arrays kernel sequences sequences.private growable
-tools.test vectors layouts system math vectors.private ;
+USING: accessors arrays kernel kernel.private literals sequences
+sequences.private growable tools.test vectors layouts system math
+vectors.private ;
 IN: arrays.tests
 
 [ -2 { "a" "b" "c" } nth ] must-fail
@@ -20,4 +21,7 @@ IN: arrays.tests
 [ -1 f <array> ] must-fail
 [ cell-bits cell log2 - 2^ f <array> ] must-fail
 ! To big for a fixnum #1045
-[ 67 2^ 3 <array> ] must-fail
+[ 67 2^ 3 <array> ] [
+    ${ "kernel-error" ERROR-OUT-OF-FIXNUM-RANGE 147573952589676412928 f }
+    =
+] must-fail-with
