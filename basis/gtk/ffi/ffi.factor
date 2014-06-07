@@ -17,7 +17,7 @@ LIBRARY: gtk
 "gtk" {
     { linux "gtk-x11-2.0" }
     { windows "libgtk-win32-2.0-0" }
-} os of [ find-library cdecl add-library ] when*
+} os of [ find-library cdecl add-library ] [ drop ] if*
 >>
 
 IMPLEMENT-STRUCTS: GtkTreeIter ;
