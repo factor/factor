@@ -45,7 +45,7 @@ HELP: digit>
 
 HELP: base>
 { $values { "str" string } { "radix" "an integer between 2 and 16" } { "n/f" "a real number or " { $link f } } }
-{ $description "Creates a real number from a string representation with the given radix. The radix is ignored for floating point literals; they are always taken to be in base 10."
+{ $description "Creates a real number from a string representation with the given radix. The radix for floating point literals can be either base 10 or base 16."
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
@@ -85,7 +85,7 @@ $nl
 
 HELP: >base
 { $values { "n" real } { "radix" "an integer between 2 and 16" } { "str" string } }
-{ $description "Converts a real number into a string representation using the given radix. If the number is a float, the radix is ignored and the output is always in base 10." } ;
+{ $description "Converts a real number into a string representation using the given radix. If the number is a " { $link float } ", the radix can be either base 10 or base 16." } ;
 
 HELP: >bin
 { $values { "n" real } { "str" string } }
