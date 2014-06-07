@@ -523,6 +523,7 @@ struct factor_vm {
   void primitive_double_bits();
   void primitive_bits_double();
   fixnum to_fixnum(cell tagged);
+  fixnum to_fixnum_strict(cell tagged);
   cell to_cell(cell tagged);
   cell from_signed_8(int64_t n);
   int64_t to_signed_8(cell obj);
