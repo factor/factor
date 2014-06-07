@@ -383,6 +383,18 @@ BIGNUM_TO_FOO(fixnum, fixnum, fixnum, cell)
 BIGNUM_TO_FOO(long_long, int64_t, int64_t, uint64_t)
 BIGNUM_TO_FOO(ulong_long, uint64_t, int64_t, uint64_t)
 
+/* cannot allocate memory */
+fixnum factor_vm::bignum_to_fixnum_strict(bignum* bignum_in) {
+  fixnum len = BIGNUM_LENGTH(bignum_in);
+  bignum_digit_type *digits = BIGNUM_START_PTR(bignum_in);
+  if ((len == 1 && digits[0] > fixnum_max) || (len > 1)) {
+    general_error(ERROR_OUT_OF_FIXNUM_RANGE, tag<bignum>(bignum_in), false_object);
+  }
+  fixnum fix = bignum_to_fixnum(bignum_in);
+  FACTOR_ASSERT(fix <= fixnum_max && fix >= fixnum_min);
+  return fix;
+}
+
 #define DTB_WRITE_DIGIT(factor)                \
   {                                            \
     significand *= (factor);                   \

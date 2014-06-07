@@ -239,6 +239,7 @@ struct factor_vm {
   bignum* bignum_quotient(bignum* numerator, bignum* denominator);
   bignum* bignum_remainder(bignum* numerator, bignum* denominator);
   cell bignum_to_cell(bignum* bignum);
+  fixnum bignum_to_fixnum_strict(bignum* bignum);
   fixnum bignum_to_fixnum(bignum* bignum);
   int64_t bignum_to_long_long(bignum* bignum);
   uint64_t bignum_to_ulong_long(bignum* bignum);
@@ -429,8 +430,6 @@ struct factor_vm {
   inline void set_array_nth(array* array, cell slot, cell value);
   array* allot_array(cell capacity, cell fill_);
   void primitive_array();
-  cell allot_array_1(cell obj_);
-  cell allot_array_2(cell v1_, cell v2_);
   cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_);
   void primitive_resize_array();
   cell std_vector_to_array(std::vector<cell>& elements);
@@ -507,7 +506,6 @@ struct factor_vm {
   void primitive_bignum_bitp();
   void primitive_bignum_log2();
   inline cell unbox_array_size();
-  cell unbox_array_size_slow();
   void primitive_fixnum_to_float();
   void primitive_format_float();
   void primitive_float_eq();
