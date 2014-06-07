@@ -67,10 +67,7 @@ M: fixnum (log2) fixnum-log2 { fixnum } declare ; inline
 M: bignum >fixnum bignum>fixnum ; inline
 M: bignum >bignum ; inline
 M: bignum integer>fixnum bignum>fixnum ; inline
-
-M: bignum integer>fixnum-strict
-    dup bignum>fixnum
-    2dup number= [ nip ] [ drop out-of-fixnum-range ] if ; inline
+M: bignum integer>fixnum-strict bignum>fixnum-strict ; inline
 
 M: bignum hashcode* nip bignum>fixnum ;
 

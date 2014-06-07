@@ -8,7 +8,8 @@ namespace factor {
       _(bignum_divmod) _(bignum_eq) _(bignum_greater) _(bignum_greatereq)      \
       _(bignum_less) _(bignum_lesseq) _(bignum_log2) _(bignum_mod)             \
       _(bignum_gcd) _(bignum_multiply) _(bignum_not) _(bignum_or)              \
-      _(bignum_shift) _(bignum_subtract) _(bignum_to_fixnum) _(bignum_xor)     \
+      _(bignum_shift) _(bignum_subtract) _(bignum_to_fixnum)                   \
+      _(bignum_to_fixnum_strict) _(bignum_xor)                                 \
       _(bits_double) _(bits_float) _(byte_array) _(callback) _(callstack)      \
       _(callstack_bounds) _(callstack_for) _(callstack_to_array)               \
       _(check_datastack) _(clear_samples) _(clone) _(code_blocks) _(code_room) \
