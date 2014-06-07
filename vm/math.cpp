@@ -277,28 +277,28 @@ void factor_vm::primitive_bits_double() {
   ctx->push(allot_float(bits_double(to_unsigned_8(ctx->pop()))));
 }
 
-/* Cannot allocate */
-fixnum factor_vm::to_fixnum(cell tagged) {
-  switch (TAG(tagged)) {
-    case FIXNUM_TYPE:
-      return untag_fixnum(tagged);
-    case BIGNUM_TYPE:
-      return bignum_to_fixnum_strict(untag<bignum>(tagged));
-    default:
-      type_error(FIXNUM_TYPE, tagged);
-      return 0; /* can't happen */
+/* Cannot allocate. */
+#define CELL_TO_FOO(name, type, converter)              \
+  type factor_vm::name(cell tagged) {                   \
+    switch (TAG(tagged)) {                              \
+      case FIXNUM_TYPE:                                 \
+        return (type)untag_fixnum(tagged);              \
+      case BIGNUM_TYPE:                                 \
+        return converter(untag<bignum>(tagged));        \
+      default:                                          \
+        type_error(FIXNUM_TYPE, tagged);                \
+        return 0; /* can't happen */                    \
+    }                                                   \
+  }                                                     \
+  VM_C_API type name(cell tagged, factor_vm* parent) {  \
+    return parent->name(tagged);                        \
   }
-}
 
-VM_C_API fixnum to_fixnum(cell tagged, factor_vm* parent) {
-  return parent->to_fixnum(tagged);
-}
-
-cell factor_vm::to_cell(cell tagged) { return (cell)to_fixnum(tagged); }
-
-VM_C_API cell to_cell(cell tagged, factor_vm* parent) {
-  return parent->to_cell(tagged);
-}
+/* Note that to_fixnum, unlike the others, is strict. */
+CELL_TO_FOO(to_fixnum, fixnum, bignum_to_fixnum_strict)
+CELL_TO_FOO(to_cell, cell, bignum_to_cell)
+CELL_TO_FOO(to_signed_8, int64_t, bignum_to_long_long)
+CELL_TO_FOO(to_unsigned_8, uint64_t, bignum_to_ulong_long)
 
 /* Allocates memory */
 VM_C_API cell from_signed_cell(fixnum integer, factor_vm* parent) {
@@ -322,23 +322,6 @@ VM_C_API cell from_signed_8(int64_t n, factor_vm* parent) {
   return parent->from_signed_8(n);
 }
 
-/* Cannot allocate */
-int64_t factor_vm::to_signed_8(cell obj) {
-  switch (tagged<object>(obj).type()) {
-    case FIXNUM_TYPE:
-      return untag_fixnum(obj);
-    case BIGNUM_TYPE:
-      return bignum_to_long_long(untag<bignum>(obj));
-    default:
-      type_error(BIGNUM_TYPE, obj);
-      return 0;
-  }
-}
-
-VM_C_API int64_t to_signed_8(cell obj, factor_vm* parent) {
-  return parent->to_signed_8(obj);
-}
-
 /* Allocates memory */
 cell factor_vm::from_unsigned_8(uint64_t n) {
   if (n > (uint64_t)fixnum_max)
@@ -349,23 +332,6 @@ cell factor_vm::from_unsigned_8(uint64_t n) {
 
 VM_C_API cell from_unsigned_8(uint64_t n, factor_vm* parent) {
   return parent->from_unsigned_8(n);
-}
-
-/* Cannot allocate */
-uint64_t factor_vm::to_unsigned_8(cell obj) {
-  switch (tagged<object>(obj).type()) {
-    case FIXNUM_TYPE:
-      return untag_fixnum(obj);
-    case BIGNUM_TYPE:
-      return bignum_to_ulong_long(untag<bignum>(obj));
-    default:
-      type_error(BIGNUM_TYPE, obj);
-      return 0;
-  }
-}
-
-VM_C_API uint64_t to_unsigned_8(cell obj, factor_vm* parent) {
-  return parent->to_unsigned_8(obj);
 }
 
 /* Cannot allocate */
