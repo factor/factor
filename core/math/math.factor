@@ -62,8 +62,6 @@ GENERIC: (log2) ( x -- n ) foldable
 
 PRIVATE>
 
-ERROR: out-of-fixnum-range n ;
-
 ERROR: log2-expects-positive x ;
 
 : log2 ( x -- n )
