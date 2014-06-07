@@ -51,7 +51,7 @@ inline double factor_vm::fixnum_to_float(cell tagged) {
 
 inline cell factor_vm::unbox_array_size() {
   cell obj = ctx->pop();
-  fixnum n = to_fixnum(obj);
+  fixnum n = to_fixnum_strict(obj);
   if (n >= 0 && n < (fixnum)array_size_max) {
     return n;
   }
