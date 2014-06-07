@@ -263,22 +263,22 @@ void factor_vm::primitive_float_greatereq() {
 
 /* Allocates memory */
 void factor_vm::primitive_float_bits() {
-  ctx->push(
-      from_unsigned_cell(float_bits((float)untag_float_check(ctx->pop()))));
+  ctx->replace(
+      from_unsigned_cell(float_bits((float)untag_float_check(ctx->peek()))));
 }
 
 /* Allocates memory */
 void factor_vm::primitive_bits_float() {
-  ctx->push(allot_float(bits_float((uint32_t)to_cell(ctx->pop()))));
+  ctx->replace(allot_float(bits_float((uint32_t)to_cell(ctx->peek()))));
 }
 
 void factor_vm::primitive_double_bits() {
-  ctx->push(from_unsigned_8(double_bits(untag_float_check(ctx->pop()))));
+  ctx->replace(from_unsigned_8(double_bits(untag_float_check(ctx->peek()))));
 }
 
 /* Allocates memory */
 void factor_vm::primitive_bits_double() {
-  ctx->push(allot_float(bits_double(to_unsigned_8(ctx->pop()))));
+  ctx->replace(allot_float(bits_double(to_unsigned_8(ctx->peek()))));
 }
 
 /* Cannot allocate. */
