@@ -6,6 +6,10 @@ void factor_vm::primitive_bignum_to_fixnum() {
   ctx->replace(tag_fixnum(bignum_to_fixnum(untag<bignum>(ctx->peek()))));
 }
 
+void factor_vm::primitive_bignum_to_fixnum_strict() {
+  ctx->replace(tag_fixnum(bignum_to_fixnum_strict(untag<bignum>(ctx->peek()))));
+}
+
 void factor_vm::primitive_float_to_fixnum() {
   ctx->replace(tag_fixnum(float_to_fixnum(ctx->peek())));
 }
