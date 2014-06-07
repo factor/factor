@@ -35,10 +35,6 @@ IN: compiler.cfg.intrinsics.simd
             0x8000,0000 0x8000,0000
             0x8000,0000 0x8000,0000
         } underlying>> ] }
-        { longlong-2-rep [ ulonglong-array{
-            0x8000,0000,0000,0000
-            0x8000,0000,0000,0000
-        } underlying>> ] }
     } case ;
 
 : ^load-neg-zero-vector ( rep -- dst )
@@ -164,7 +160,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 : ^(sum-vector-2) ( src rep -- dst )
     {
         [ dupd ^^horizontal-add-vector ]
-        [| src rep | 
+        [| src rep |
             src src rep ^^merge-vector-head :> head
             src src rep ^^merge-vector-tail :> tail
             head tail rep ^^add-vector
@@ -177,7 +173,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
             [ dupd ^^horizontal-add-vector ]
             [ dupd ^^horizontal-add-vector ] bi
         ]
-        [| src rep | 
+        [| src rep |
             src src rep ^^merge-vector-head :> head
             src src rep ^^merge-vector-tail :> tail
             head tail rep ^^add-vector :> src'
@@ -196,7 +192,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
             [ dupd ^^horizontal-add-vector ]
             [ dupd ^^horizontal-add-vector ] tri
         ]
-        [| src rep | 
+        [| src rep |
             src src rep ^^merge-vector-head :> head
             src src rep ^^merge-vector-tail :> tail
             head tail rep ^^add-vector :> src'
@@ -223,7 +219,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
                 [ dupd ^^horizontal-add-vector ]
             } cleave
         ]
-        [| src rep | 
+        [| src rep |
             src src rep ^^merge-vector-head :> head
             src src rep ^^merge-vector-tail :> tail
             head tail rep ^^add-vector :> src'
