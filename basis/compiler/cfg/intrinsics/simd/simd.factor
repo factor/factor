@@ -35,6 +35,10 @@ IN: compiler.cfg.intrinsics.simd
             0x8000,0000 0x8000,0000
             0x8000,0000 0x8000,0000
         } underlying>> ] }
+        { longlong-2-rep [ ulonglong-array{
+            0x8000,0000,0000,0000
+            0x8000,0000,0000,0000
+        } underlying>> ] }
     } case ;
 
 : ^load-neg-zero-vector ( rep -- dst )
