@@ -146,5 +146,29 @@ TEST(BignumTests, FixnumToBignum) {
   delete vm;
 }
 
+TEST(BignumTests, CountDigits) {
+  factor_vm* vm = setup_factor_vm();
+  cell fixnum_bits = (WORD_SIZE - TAG_BITS - 1);
+  for (cell n = 1; n < fixnum_bits; n++) {
+    fixnum f = ((fixnum)1 << n) - 1;
+    bignum *b_pos = vm->fixnum_to_bignum(f);
+    EXPECT_EQ(1, BIGNUM_LENGTH(b_pos));
+    bignum *b_neg = vm->fixnum_to_bignum(-f);
+    EXPECT_EQ(1, BIGNUM_LENGTH(b_neg));
+  }
+  delete vm;
+}
+
+TEST(BignumTests, CountDigitsInSpecialNums) {
+  factor_vm* vm = setup_factor_vm();
+  fixnum numbers[] = {0, 1, -1, fixnum_max, fixnum_min};
+  cell expected[] = {0, 1, 1, 1, 1};
+  for (cell n = 0; n < 5; n++) {
+    fixnum num = numbers[n];
+    cell exp = expected[n];
+    EXPECT_EQ(exp, BIGNUM_LENGTH(vm->fixnum_to_bignum(num)));
+  }
+  delete vm;
+}
 
 }
