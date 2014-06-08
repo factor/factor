@@ -50,3 +50,7 @@ ERROR: decimal-test-failure D1 D2 quot ;
 [ f ] [ D: -2 D: -2 before? ] unit-test
 [ t ] [ D: -3 D: -2 before? ] unit-test
 [ t ] [ D: .5 D: 0 D: 1.0 between? ] unit-test
+
+{ f } [ 1/3 smallest-decimal-mantissa ] unit-test
+{ 1 } [ 3/2 smallest-decimal-mantissa ] unit-test
+{ 9 } [ D: 123456789.123456789 decimal>ratio smallest-decimal-mantissa ] unit-test
