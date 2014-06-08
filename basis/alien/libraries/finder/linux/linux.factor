@@ -27,15 +27,22 @@ CONSTANT: mach-map {
 : ldconfig-arch ( -- str )
     mach-map cpu of { "libc6" } or ;
 
+: name-matches? ( lib triple -- ? )
+    first swap ?head [ ?first CHAR: . = t ] [ f ] if ;
+
+: arch-matches? ( lib triple -- ? )
+    nip second ldconfig-arch subset? ;
+
 : ldconfig-matches? ( lib triple -- ? )
-    { [ first head? ] [ nip second ldconfig-arch subset? ] } 2&& ;
+    { [ name-matches? ] [ arch-matches? ] } 2&& ;
 
 : ldconfig-find-soname ( lib -- seq )
-    load-ldconfig-cache [ ldconfig-matches? ] with filter [ third ] map ;
+    load-ldconfig-cache [ ldconfig-matches? ] with filter
+    [ third ] map ;
 
 PRIVATE>
 
 M: linux find-library*
-    "lib" ".so" surround ldconfig-find-soname [
+    "lib" prepend ldconfig-find-soname [
         { [ exists? ] [ file-info regular-file? ] } 1&&
     ] map-find nip ;
