@@ -23,8 +23,6 @@ C: <library> library
 
 ERROR: no-library name ;
 
-ERROR: library-path-is-f name path abi ;
-
 : lookup-library ( name -- library ) libraries get at ;
 
 : open-dll ( path -- dll dll-error/f )
@@ -33,10 +31,6 @@ ERROR: library-path-is-f name path abi ;
 
 : make-library ( path abi -- library )
     [ dup open-dll ] dip <library> ;
-
-: try-make-library ( name path abi -- library )
-    over [ [ nip ] dip ] [ library-path-is-f ] if
-    make-library ;
 
 : library-dll ( library -- dll )
     dup [ dll>> ] when ;
@@ -58,7 +52,7 @@ M: library dispose dll>> [ dispose ] when* ;
 : add-library ( name path abi -- )
     3dup add-library? [
         [ 2drop remove-library ]
-        [ try-make-library ]
+        [ [ nip ] dip make-library ]
         [ 2drop libraries get set-at ] 3tri
     ] [ 3drop ] if ;
 

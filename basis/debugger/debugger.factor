@@ -2,14 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.strings arrays assocs classes
 classes.builtin classes.mixin classes.tuple classes.tuple.parser
-combinators combinators.short-circuit compiler.units
-continuations definitions destructors effects.parser generic
-generic.math generic.parser generic.single grouping io
-io.encodings io.styles kernel kernel.private lexer make math
-math.order math.parser namespaces parser prettyprint sequences
-sequences.private slots source-files.errors strings
-strings.parser summary system vocabs vocabs.loader
-vocabs.parser words ;
+combinators combinators.short-circuit compiler.errors
+compiler.units continuations definitions destructors
+effects.parser fry generic generic.math generic.parser
+generic.single grouping io io.encodings io.styles kernel
+kernel.private lexer make math math.order math.parser namespaces
+parser prettyprint sequences sequences.private slots
+source-files.errors strings strings.parser summary system vocabs
+vocabs.loader vocabs.parser words ;
 FROM: namespaces => change-global ;
 IN: debugger
 
@@ -110,11 +110,17 @@ HOOK: signal-error. os ( obj -- )
 : ffi-error. ( obj -- )
     "FFI error" print drop ;
 
+: find-ffi-error ( string -- error )
+    [ linkage-errors get ] dip
+    '[ nip asset>> name>> _ = ] assoc-find drop nip
+    [ error>> message>> ] [ "none" ] if* ;
+
 : undefined-symbol-error. ( obj -- )
     "Cannot resolve C library function" print
-    "Symbol: " write dup third symbol>string print
-    "Library: " write fourth .
-    "You are probably missing a library or the library path is wrong." print
+    "Library: " write dup fourth .
+    third symbol>string
+    [ "Symbol: " write print ]
+    [ "DlError: " write find-ffi-error print ] bi
     "See http://concatenative.org/wiki/view/Factor/Requirements" print ;
 
 : stack-underflow. ( obj name -- )
