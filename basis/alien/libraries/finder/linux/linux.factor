@@ -28,7 +28,7 @@ CONSTANT: mach-map {
     mach-map cpu of { "libc6" } or ;
 
 : name-matches? ( lib triple -- ? )
-    first swap ?head [ ?first CHAR: . = ] [ f ] if ;
+    first swap ?head [ ?first CHAR: . = ] [ drop f ] if ;
 
 : arch-matches? ( lib triple -- ? )
     nip second ldconfig-arch subset? ;
