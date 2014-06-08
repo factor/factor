@@ -1,6 +1,6 @@
-USING: assocs classes compiler.cfg.instructions cpu.x86.assembler
-cpu.x86.assembler.operands help.markup help.syntax layouts literals math
-multiline system words ;
+USING: assocs compiler.cfg.instructions cpu.x86.assembler
+cpu.x86.assembler.operands help.markup help.syntax kernel
+layouts literals math multiline system words ;
 IN: cpu.architecture
 
 <<
