@@ -29,18 +29,18 @@ IN: opengl.capabilities
 : version-before? ( version1 version2 -- ? )
     [ version-seq ] bi@ before=? ;
 
-: (gl-version) ( -- version vendor )
+: (gl-version) ( -- string1 string2 )
     GL_VERSION glGetString " " split1 ;
-: gl-version ( -- version )
-    (gl-version) drop ;
-: gl-vendor-version ( -- version )
-    (gl-version) nip ;
-: gl-vendor ( -- name )
-    GL_VENDOR glGetString ;
+: gl-version ( -- string ) (gl-version) drop ;
+: gl-vendor-version ( -- string ) (gl-version) nip ;
+: gl-vendor ( -- string ) GL_VENDOR glGetString ;
+
 : has-gl-version? ( version -- ? )
-    gl-version version-before? ;
+    gl-version [ version-before? ] [ drop f ] if* ;
+
 : (make-gl-version-error) ( required-version -- )
-    "Required OpenGL version " % % " not supported (" % gl-version % " available)" % ;
+    "Required OpenGL version " % % " not supported (" % gl-version "(null)" or % " available)" % ;
+
 : require-gl-version ( version -- )
     [ has-gl-version? ]
     [ (make-gl-version-error) ]
@@ -48,15 +48,13 @@ IN: opengl.capabilities
 
 : (glsl-version) ( -- version vendor )
     GL_SHADING_LANGUAGE_VERSION glGetString " " split1 ;
-: glsl-version ( -- version )
-    (glsl-version) drop ;
-: glsl-vendor-version ( -- version )
-    (glsl-version) nip ;
-: has-glsl-version? ( version -- ? )
-    glsl-version version-before? ;
+: glsl-version ( -- string ) (glsl-version) drop ;
+: glsl-vendor-version ( -- string ) (glsl-version) nip ;
+: has-glsl-version? ( version -- ? ) glsl-version version-before? ;
+
 : require-glsl-version ( version -- )
     [ has-glsl-version? ]
-    [ "Required GLSL version " % % " not supported (" % glsl-version % " available)" % ]
+    [ "Required GLSL version " % % " not supported (" % glsl-version "(null)" or % " available)" % ]
     (require-gl) ;
 
 : has-gl-version-or-extensions? ( version extensions -- ? )
