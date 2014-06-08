@@ -26,7 +26,7 @@ IN: alien.libraries.finder.windows
 
 PRIVATE>
 
-M: windows find-library
+M: windows find-library*
     candidate-paths [
         { [ exists? ] [ file-info regular-file? ] } 1&&
     ] map-find nip ;

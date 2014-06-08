@@ -128,7 +128,7 @@ PRIVATE>
         ] if* file-name append-path dyld-find
     ] if* ;
 
-M: macosx find-library
+M: macosx find-library*
     [ "lib" ".dylib" surround ]
     [ ".dylib" append ]
     [ ".framework/" over 3append ] tri 3array
