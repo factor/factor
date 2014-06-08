@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs cache colors combinators
+USING: accessors assocs cache colors combinators
 combinators.short-circuit concurrency.promises continuations
-destructors fry io kernel literals math math.rectangles
-math.vectors models namespaces opengl opengl.textures sequences
-strings ui.backend ui.gadgets ui.gadgets.tracks ui.gestures
-ui.pixel-formats ui.render ;
+destructors fry kernel literals math models namespaces opengl
+opengl.capabilities opengl.textures sequences strings ui.backend
+ui.gadgets ui.gadgets.tracks ui.gestures ui.pixel-formats
+ui.render ;
 IN: ui.gadgets.worlds
 
 SYMBOLS:
@@ -187,6 +187,7 @@ GENERIC: draw-world* ( world -- )
 
 M: world draw-world*
     check-extensions
+    "1.0" require-gl-version
     {
         [ init-gl ]
         [ draw-gadget ]
