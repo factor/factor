@@ -1,9 +1,11 @@
 
-USING: combinators system vocabs ;
-
+USING: combinators kernel system vocabs alien.libraries ;
 IN: alien.libraries.finder
 
-HOOK: find-library os ( name -- path/f )
+HOOK: find-library* os ( name -- path/f )
+
+: find-library ( name -- path/library-not-found )
+    dup find-library* [ nip ] when* ;
 
 {
     { [ os macosx?  ] [ "alien.libraries.finder.macosx"  ] }
