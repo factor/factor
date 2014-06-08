@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 Björn Lindqvist, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license
-USING: alien.libraries alien.libraries.finder arrays assocs
+USING: alien.libraries.finder arrays assocs
 combinators.short-circuit io io.encodings.utf8 io.files
 io.files.info io.launcher kernel sequences sets splitting system
 unicode.categories ;
@@ -31,7 +31,7 @@ CONSTANT: mach-map {
     first swap ?head [ ?first CHAR: . = ] [ drop f ] if ;
 
 : arch-matches? ( lib triple -- ? )
-    nip second ldconfig-arch subset? ;
+    [ drop ldconfig-arch ] [ second subset? ] bi* ;
 
 : ldconfig-matches? ( lib triple -- ? )
     { [ name-matches? ] [ arch-matches? ] } 2&& ;
