@@ -385,6 +385,8 @@ BIGNUM_TO_FOO(ulong_long, uint64_t, int64_t, uint64_t)
 
 /* cannot allocate memory */
 fixnum factor_vm::bignum_to_fixnum_strict(bignum* bignum_in) {
+  if (BIGNUM_ZERO_P(bignum_in))
+    return 0;
   fixnum len = BIGNUM_LENGTH(bignum_in);
   bignum_digit_type *digits = BIGNUM_START_PTR(bignum_in);
   if ((len == 1 && digits[0] > fixnum_max) || (len > 1)) {
