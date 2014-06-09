@@ -188,6 +188,9 @@ ERROR: download-failed response ;
         <get-request> [ write ] with-http-request drop
     ] with-file-writer ;
 
+: ?download-to ( url file -- )
+    dup exists? [ 2drop ] [ download-to ] if ;
+
 : download ( url -- )
     dup download-name download-to ;
 
