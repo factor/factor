@@ -59,9 +59,8 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
     ascii file-contents words histogram ;
 
 MEMO: default-dictionary ( -- counts )
-    "big.txt" temp-file dup exists?
-    [ URL" http://norvig.com/big.txt" over download-to ] unless
-    load-dictionary ;
+    URL" http://norvig.com/big.txt" "big.txt" temp-file
+    [ ?download-to ] [ load-dictionary ] bi ;
 
 : (correct) ( word dictionary -- word/f )
     corrections ?first ;
