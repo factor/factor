@@ -148,10 +148,7 @@ UNIFORM-TUPLE: loading-uniforms
 CONSTANT: bunny-model-url "http://duriansoftware.com/joe/media/bun_zipper.ply"
 
 : download-bunny ( -- path )
-    bunny-model-path dup exists? [
-        bunny-model-url dup print flush
-        over download-to
-    ] unless ;
+    bunny-model-url bunny-model-path [ ?download-to ] keep ;
 
 : get-bunny-data ( bunny-state -- )
     download-bunny bunny-data

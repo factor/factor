@@ -23,7 +23,7 @@ TUPLE: bunny-world < demo-world model-triangles geom draw-seq draw-n ;
 M: bunny-world begin-world
     GL_DEPTH_TEST glEnable
     0.0 0.0 0.375 set-demo-orientation
-    maybe-download read-model
+    download-bunny read-model
     [ >>model-triangles ] [ <bunny-geom> >>geom ] bi
     dup make-draws >>draw-seq
     0 >>draw-n
@@ -49,12 +49,12 @@ bunny-world H{
 } set-gestures
 
 MAIN-WINDOW: bunny-window {
-        { world-class bunny-world }
-        { title "Bunny" }
-        { pixel-format-attributes {
-            windowed
-            double-buffered
-            T{ depth-bits { value 16 } }
-        } }
-        { pref-dim { 640 480 } }
-    } ;
+    { world-class bunny-world }
+    { title "Bunny" }
+    { pixel-format-attributes {
+        windowed
+        double-buffered
+        T{ depth-bits { value 16 } }
+    } }
+    { pref-dim { 640 480 } }
+} ;
