@@ -1,11 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.tuple combinators
-combinators.short-circuit debugger definitions effects eval
-formatting fry grouping help help.markup help.topics io
-io.streams.string kernel macros namespaces sequences
-sequences.deep sets splitting strings summary unicode.categories
-vocabs vocabs.loader words words.constant words.symbol ;
+USING: accessors arrays assocs classes classes.struct
+classes.tuple combinators combinators.short-circuit debugger
+definitions effects eval formatting fry grouping help
+help.markup help.topics io io.streams.string kernel macros
+namespaces sequences sequences.deep sets splitting strings
+summary unicode.categories vocabs vocabs.loader words
+words.constant words.symbol ;
 FROM: sets => members ;
 IN: help.lint.checks
 
@@ -152,7 +153,10 @@ SYMBOL: vocab-articles
 
 : check-class-description ( word element -- )
     \ $class-description swap elements over class? [
-        [ all-slots [ name>> ] map ] [ extract-slots ] bi*
+        [
+            dup struct-class? [ struct-slots ] [ all-slots ] if
+            [ name>> ] map
+        ] [ extract-slots ] bi*
         [ swap member? not ] with filter [
             ", " join "Described $slot does not exist: " prepend
             simple-lint-error
