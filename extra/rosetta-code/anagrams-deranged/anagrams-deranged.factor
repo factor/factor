@@ -42,10 +42,8 @@ IN: rosettacode.anagrams-deranged
     deranged-anagrams [ first length ] sort-with last ;
 
 : default-word-list ( -- path )
-    "unixdict.txt" temp-file dup exists? [
-        URL" http://puzzlers.org/pub/wordlists/unixdict.txt"
-        over download-to
-    ] unless ;
+    URL" http://puzzlers.org/pub/wordlists/unixdict.txt"
+    "unixdict.txt" temp-file [ ?download-to ] keep ;
 
 : longest-deranged-anagrams ( -- anagrams )
     default-word-list (longest-deranged-anagrams) ;

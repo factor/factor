@@ -43,14 +43,10 @@ IN: bunny.model
 
 : model-path ( -- path ) "bun_zipper.ply" cache-file ;
 
-: model-url ( -- url ) "http://duriansoftware.com/joe/media/bun_zipper.ply" ;
+CONSTANT: model-url "http://duriansoftware.com/joe/media/bun_zipper.ply"
 
-: maybe-download ( -- path )
-    model-path dup exists? [
-        "Downloading bunny from " write
-        model-url dup print flush
-        over download-to
-    ] unless ;
+: download-bunny ( -- path )
+    model-url model-path [ ?download-to ] keep ;
 
 :: (draw-triangle) ( ns vs triple -- )
     triple [| elt |
