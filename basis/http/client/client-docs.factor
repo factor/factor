@@ -50,6 +50,11 @@ HELP: download-to
 { $description "Downloads the contents of the URL to a file with the given pathname." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: ?download-to
+{ $values { "url" "a " { $link url } " or " { $link string } } { "file" "a pathname string" } }
+{ $description "Version of " { $link download-to } " that only downloads if " { $snippet "file" } " does not exist." }
+{ $errors "Throws an error if the HTTP request fails." } ;
+
 HELP: http-get
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Downloads the contents of a URL." }
@@ -156,6 +161,7 @@ ARTICLE: "http.client.get" "GET requests with the HTTP client"
 { $subsections
     download
     download-to
+    ?download-to
 }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections
