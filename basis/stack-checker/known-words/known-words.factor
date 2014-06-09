@@ -344,6 +344,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ bignum> { bignum bignum } { object } define-primitive \ bignum> make-foldable
 \ bignum>= { bignum bignum } { object } define-primitive \ bignum>= make-foldable
 \ bignum>fixnum { bignum } { fixnum } define-primitive \ bignum>fixnum make-foldable
+\ bignum>fixnum-strict { bignum } { fixnum } define-primitive \ bignum>fixnum-strict make-foldable
 \ bits>double { integer } { float } define-primitive \ bits>double make-foldable
 \ bits>float { integer } { float } define-primitive \ bits>float make-foldable
 \ both-fixnums? { object object } { object } define-primitive
