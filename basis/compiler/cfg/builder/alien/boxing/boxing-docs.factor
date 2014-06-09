@@ -7,6 +7,7 @@ HELP: box
   { "vregs" "a one-element sequence containing a virtual register indentifier" }
   { "reps" "a one-element sequence containing a representation symbol" }
   { "c-type" c-type }
+  { "dst" "box" }
 }
 { $description "Emits a " { $link ##box-alien } " instruction which boxes an alien value contained in the given register." }
 { $examples
