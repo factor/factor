@@ -15,9 +15,9 @@ HELP: param-prep-quot
 { $description "Builds a quotation which coerces values on the stack to the required types for the alien call." }
 { $examples
   { $example
-    "USING: prettyprint stack-checker.alien ;"
+    "USING: alien.c-types prettyprint stack-checker.alien ;"
     "T{ alien-invoke-params { parameters { void* c-string int } } }  param-prep-quot ."
-    "[ [ [ [ ] dip >c-ptr ] dip \ utf8 string>alien ] dip >fixnum ]"
+    "[ [ [ [ ] dip >c-ptr ] dip \\ utf8 string>alien ] dip >fixnum ]"
   }
 } ;
 
