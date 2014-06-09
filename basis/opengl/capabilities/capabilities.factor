@@ -29,11 +29,11 @@ IN: opengl.capabilities
 : version-before? ( version1 version2 -- ? )
     [ version-seq ] bi@ before=? ;
 
-: (gl-version) ( -- string1 string2 )
+: (gl-version) ( -- version1 version2 )
     GL_VERSION glGetString " " split1 ;
-: gl-version ( -- string ) (gl-version) drop ;
-: gl-vendor-version ( -- string ) (gl-version) nip ;
-: gl-vendor ( -- string ) GL_VENDOR glGetString ;
+: gl-version ( -- version ) (gl-version) drop ;
+: gl-vendor-version ( -- version ) (gl-version) nip ;
+: gl-vendor ( -- vendor ) GL_VENDOR glGetString ;
 
 : has-gl-version? ( version -- ? )
     gl-version [ version-before? ] [ drop f ] if* ;
@@ -52,8 +52,8 @@ IN: opengl.capabilities
 
 : (glsl-version) ( -- version vendor )
     GL_SHADING_LANGUAGE_VERSION glGetString " " split1 ;
-: glsl-version ( -- string ) (glsl-version) drop ;
-: glsl-vendor-version ( -- string ) (glsl-version) nip ;
+: glsl-version ( -- version ) (glsl-version) drop ;
+: glsl-vendor-version ( -- version ) (glsl-version) nip ;
 : has-glsl-version? ( version -- ? ) glsl-version version-before? ;
 
 : require-glsl-version ( version -- )
