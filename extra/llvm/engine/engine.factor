@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.libraries alien.syntax llvm.core ;
+USING: alien alien.c-types alien.libraries
+alien.libraries.finder alien.syntax kernel llvm.core sequences ;
 IN: llvm.engine
 
 <<
