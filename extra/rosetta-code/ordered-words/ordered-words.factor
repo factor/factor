@@ -18,10 +18,9 @@ IN: rosetta-code.ordered-words
 ! this page.
 
 MEMO: word-list ( -- seq )
-    "unixdict.txt" temp-file dup exists? [
-        URL" http://puzzlers.org/pub/wordlists/unixdict.txt"
-        over download-to
-    ] unless utf8 file-lines ;
+    URL" http://puzzlers.org/pub/wordlists/unixdict.txt"
+    "unixdict.txt" temp-file
+    [ ?download-to ] [ utf8 file-lines ] bi ;
 
 : ordered-word? ( word -- ? )
     >lower [ <= ] monotonic? ;
