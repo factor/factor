@@ -127,8 +127,12 @@ PRIVATE>
         ] call
     ] bi ;
 
+: coverage-vocab? ( vocab -- ? )
+    { [ ".private" tail? ] [ ".tests" tail? ] } 1|| not ;
+
 : test-coverage-recursively ( prefix -- assoc )
-    child-vocabs [ dup test-coverage ] { } map>assoc ;
+    child-vocabs [ coverage-vocab? ] filter
+    [ dup test-coverage ] { } map>assoc ;
 
 : %coverage ( string -- x )
     [ test-coverage values concat length ]
