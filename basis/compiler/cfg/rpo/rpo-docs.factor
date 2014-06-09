@@ -6,7 +6,7 @@ HELP: number-blocks
 { $description "Initializes the " { $slot "number" } " slot of each " { $link basic-block } "." }
 { $examples
   { $example
-    "USING: compiler.cfg compiler.cfg.rpo prettyprint ;"
+    "USING: accessors compiler.cfg compiler.cfg.rpo kernel prettyprint sequences ;"
     "10 [ <basic-block> ] replicate dup number-blocks [ number>> ] map ."
     "{ 9 8 7 6 5 4 3 2 1 0 }"
   }

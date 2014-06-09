@@ -44,10 +44,9 @@ HELP: procedures
 { $var-description "Used as a temporary storage for the current cfg during construction of all cfgs." } ;
 
 HELP: make-input-map
-{ $values { "#call" #call } { "assoc" assoc } }
+{ $values { "#shuffle" #shuffle } { "assoc" assoc } }
 { $description "Creates an " { $link assoc } " that maps input values to the shuffle operation to stack locations." }
 { $examples { $unchecked-example $[ ex-make-input-map ] } } ;
-
 
 HELP: emit-call
 { $values { "word" word } { "height" number } }
@@ -71,7 +70,7 @@ HELP: trivial-branch?
 { $description "Checks whether nodes is a trivial branch or not. The branch is counted as trivial if all it does is push a literal value on the stack." }
 { $examples
   { $example
-    "USING: compiler.cfg.builder prettyprint ;"
+    "USING: compiler.cfg.builder compiler.tree prettyprint ;"
     "{ T{ #push { literal 25 } } } trivial-branch? . ."
     "t\n25"
   }

@@ -15,7 +15,7 @@ HELP: call-height
 { $description "Calculates how many items a " { $link #call } " will add or remove from the data stack." }
 { $examples
   { $example
-    "USING: compiler.cfg.builder.blocks prettyprint ;"
+    "USING: compiler.cfg.builder.blocks compiler.tree.builder prettyprint sequences ;"
     "[ 3append ] build-tree second call-height ."
     "-2"
   }
