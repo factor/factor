@@ -12,7 +12,7 @@ IN: math.statistics
 ! Delta in degrees-of-freedom
 : mean-ddof ( seq ddof -- x )
     [ [ sum ] [ length ] bi ] dip -
-    dup zero? [ 2drop 0 ] [ / ] if ; inline
+    [ drop 0 ] [ / ] if-zero ; inline
 
 : mean ( seq -- x )
     0 mean-ddof ; inline
