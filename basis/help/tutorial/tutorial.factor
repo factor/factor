@@ -113,7 +113,15 @@ $nl
 "Now, you can run unit tests:"
 { $code "\"palindrome\" test" }
 $nl
-"It should report that all tests have passed. Now you can read about " { $link "first-program-extend" } "." ;
+"It should report that all your tests have been run and there were no test failures, displaying the following output:"
+$nl
+{ $snippet
+    "Unit Test: { [ f ] [ \"hello\" palindrome? ] }"
+    "\n"
+    "Unit Test: { [ t ] [ \"racecar\" palindrome? ] }"
+}
+$nl
+"Now you can read about " { $link "first-program-extend" } "." ;
 
 ARTICLE: "first-program-extend" "Extending your first program"
 "Our palindrome program works well, however we'd like to extend it to ignore spaces and non-alphabetical characters in the input."
