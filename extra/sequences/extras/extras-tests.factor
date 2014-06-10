@@ -172,3 +172,5 @@ IN: sequences.extras.tests
 
 { "0123456789" } [ 58 iota [ 48 < ] "" reject-as ] unit-test
 { V{ 1 3 5 7 9 } } [ 10 iota >vector [ even? ] reject! ] unit-test
+
+{ 3/10 } [ 10 iota [ 3 < ] count* ] unit-test
