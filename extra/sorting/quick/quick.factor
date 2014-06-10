@@ -10,24 +10,19 @@ IN: sorting.quick
 
 :: (quicksort) ( seq from to -- )
     from to < [
-        from to + 2/ :> p
-        from :> l!
-        to :> r!
+        from to + 2/ seq nth-unsafe :> pivot
 
-        p seq nth-unsafe :> p-nth
-
-        [ l r <= ] [
-            [ l seq nth-unsafe p-nth before? ] [ l 1 + l! ] while
-            [ r seq nth-unsafe p-nth after? ] [ r 1 - r! ] while
-            l r <= [
-                l r seq exchange-unsafe
-                l 1 + l!
-                r 1 - r!
+        from to [ 2dup <= ] [
+            [ over seq nth-unsafe pivot before? ] [ [ 1 + ] dip ] while
+            [ dup  seq nth-unsafe pivot after? ] [ 1 - ] while
+            2dup <= [
+                [ seq exchange-unsafe ]
+                [ [ 1 + ] [ 1 - ] bi* ] 2bi
             ] when
         ] while
 
-        seq from r (quicksort)
-        seq l to (quicksort)
+        [ seq from ] dip (quicksort)
+        [ seq ] dip to (quicksort)
 
     ] when ; inline recursive
 
