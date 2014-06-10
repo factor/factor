@@ -527,3 +527,6 @@ PRIVATE>
 
 : replicate-into ( ... seq quot: ( ... -- ... newelt ) -- ... )
     over [ length ] 2dip '[ _ dip _ set-nth-unsafe ] each-integer ; inline
+
+: count* ( ... seq quot: ( ... elt -- ... ? ) -- ... % )
+    over [ count ] [ length ] bi* / ; inline
