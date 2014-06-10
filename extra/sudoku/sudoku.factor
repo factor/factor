@@ -1,6 +1,6 @@
 ! Based on http://www.ffconsultancy.com/ocaml/sudoku/index.html
-USING: sequences namespaces kernel math math.parser io
-io.styles combinators columns ;
+USING: columns combinators combinators.short-circuit io
+io.styles kernel math math.parser namespaces sequences ;
 IN: sudoku
 
 SYMBOL: solutions
@@ -11,48 +11,36 @@ SYMBOL: board
 : row ( n -- row ) board get nth ;
 : board> ( m n -- x ) row nth ;
 : >board ( row m n -- ) row set-nth ;
-: f>board ( m n -- ) f -rot >board ;
 
 : row-any? ( n y -- ? ) row member? ;
 : col-any? ( n x -- ? ) board get swap <column> member? ;
 : cell-any? ( n x y i -- ? ) 3 /mod pair+ board> = ;
 
 : box-any? ( n x y -- ? )
-    [ 3 /i 3 * ] bi@
-    9 iota [ [ 3dup ] dip cell-any? ] any?
-    [ 3drop ] dip ;
+    [ 3 /i 3 * ] bi@ 9 iota [ cell-any? ] with with with any? ;
+
+: board-any? ( n x y -- ? )
+    { [ nip row-any? ] [ drop col-any? ] [ box-any? ] } 3|| ;
 
 DEFER: search
 
 : assume ( n x y -- )
-    [ >board ] 2keep [ [ 1 + ] dip search ] 2keep f>board ;
+    [ >board ] [ [ 1 + ] dip search f ] [ >board ] 2tri ;
 
 : attempt ( n x y -- )
-    {
-        { [ 3dup nip row-any? ] [ 3drop ] }
-        { [ 2over col-any? ] [ 3drop ] }
-        { [ 3dup box-any? ] [ 3drop ] }
-        [ assume ]
-    } cond ;
+    3dup board-any? [ 3drop ] [ assume ] if ;
 
-: solve ( x y -- ) 9 [ 1 + 2over attempt ] each-integer 2drop ;
+: solve ( x y -- )
+    9 [ 1 + 2over attempt ] each-integer 2drop ;
+
+: cell. ( cell -- )
+    [ [ number>string write ] [ "." write ] if* ] with-cell ;
+
+: row. ( row -- )
+    [ [ cell. ] each ] with-row ;
 
 : board. ( board -- )
-    standard-table-style [
-        [
-            [
-                [
-                    [
-                        [
-                            number>string write
-                        ] [
-                            "." write
-                        ] if*
-                    ] with-cell
-                ] each
-            ] with-row
-        ] each
-    ] tabular-output nl ;
+    standard-table-style [ [ row. ] each ] tabular-output nl ;
 
 : solution. ( -- )
     solutions inc "Solution:" print board get board. ;
