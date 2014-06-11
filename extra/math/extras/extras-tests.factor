@@ -142,3 +142,9 @@ IN: math.extras.test
 
 { { 0 1 2 3 0 0 1 } } [ { 1 2 3 3 2 1 2 } [ <= ] monotonic-count ] unit-test
 { 4 } [ { 1 2 3 1 2 3 4 5 } [ < ] max-monotonic-count ] unit-test
+
+{ 2470 } [ 20 iota sum-squares ] unit-test
+{ 2470 } [ 20 iota >array sum-squares ] unit-test
+
+{ 36100 } [ 20 iota sum-cubes ] unit-test
+{ 36100 } [ 20 iota >array sum-cubes ] unit-test
