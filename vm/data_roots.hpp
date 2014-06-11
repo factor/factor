@@ -4,7 +4,7 @@ template <typename Type> struct data_root : public tagged<Type> {
   factor_vm* parent;
 
   void push() {
-    parent->data_roots.push_back(data_root_range(&this->value_, 1));
+    parent->data_roots.push_back(&this->value_);
   }
 
   data_root(cell value, factor_vm* parent)
