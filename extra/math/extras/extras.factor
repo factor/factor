@@ -307,3 +307,12 @@ PRIVATE>
 SYNTAX: .. dup pop scan-object [a,b) suffix! ;
 
 SYNTAX: ... dup pop scan-object [a,b] suffix! ;
+
+GENERIC: sum-squares ( seq -- n )
+M: object sum-squares [ sq ] map-sum ;
+M: iota-tuple sum-squares
+    length 1 - [ ] [ 1 + ] [ 1/2 + ] tri * * 3 / ;
+
+GENERIC: sum-cubes ( seq -- n )
+M: object sum-cubes [ 3 ^ ] map-sum ;
+M: iota-tuple sum-cubes sum sq ;
