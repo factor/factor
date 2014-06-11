@@ -42,14 +42,18 @@ void factor_vm::primitive_resize_array() {
 
 /* Allocates memory */
 cell factor_vm::std_vector_to_array(std::vector<cell>& elements) {
+
   cell element_count = elements.size();
-  data_roots.push_back(data_root_range(&elements[0], element_count));
+  cell orig_size = data_roots.size();
+  data_roots.reserve(orig_size + element_count);
+
+  for (cell n = 0; n < element_count; n++) {
+    data_roots.push_back(&elements[n]);
+  }
 
   tagged<array> objects(allot_uninitialized_array<array>(element_count));
   memcpy(objects->data(), &elements[0], element_count * sizeof(cell));
-
-  data_roots.pop_back();
-
+  data_roots.resize(orig_size);
   return objects.value();
 }
 

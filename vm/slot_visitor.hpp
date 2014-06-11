@@ -175,12 +175,14 @@ void slot_visitor<Fixup>::visit_stack_elements(segment* region, cell* top) {
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_data_roots() {
-  std::vector<data_root_range>::const_iterator iter =
+  std::vector<cell*>::const_iterator iter =
       parent->data_roots.begin();
-  std::vector<data_root_range>::const_iterator end = parent->data_roots.end();
+  std::vector<cell*>::const_iterator end =
+      parent->data_roots.end();
 
-  for (; iter < end; iter++)
-    visit_object_array(iter->start, iter->start + iter->len);
+  for (; iter < end; iter++) {
+    visit_handle(*iter);
+  }
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_bignum_roots() {

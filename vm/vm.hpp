@@ -112,7 +112,8 @@ struct factor_vm {
      allocates memory, it must wrap any references to the data and code
      heaps with data_root and code_root smart pointers, which register
      themselves here. See data_roots.hpp and code_roots.hpp */
-  std::vector<data_root_range> data_roots;
+
+  std::vector<cell*> data_roots;
   std::vector<cell> bignum_roots;
   std::vector<code_root*> code_roots;
 
