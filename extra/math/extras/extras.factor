@@ -5,8 +5,8 @@ USING: accessors arrays assocs assocs.extras byte-arrays
 combinators combinators.short-circuit compression.zlib fry
 grouping kernel locals math math.combinatorics math.constants
 math.functions math.order math.primes math.ranges
-math.ranges.private math.statistics math.vectors memoize random
-sequences sequences.extras sequences.private sets sorting
+math.ranges.private math.statistics math.vectors memoize parser
+random sequences sequences.extras sequences.private sets sorting
 sorting.extras ;
 
 IN: math.extras
@@ -303,3 +303,7 @@ PRIVATE>
 : map-kahan-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 0.0 0.0 ] 2dip [ 2dip rot kahan+ ] curry
     [ -rot ] prepose each nip ; inline
+
+SYNTAX: .. dup pop scan-object [a,b) suffix! ;
+
+SYNTAX: ... dup pop scan-object [a,b] suffix! ;
