@@ -198,5 +198,5 @@ ERROR: not-a-heap obj ;
 : >min-heap ( assoc -- min-heap )
     <min-heap> [ heap-push-all ] keep ;
 
-: >max-heap ( assoc -- min-heap )
+: >max-heap ( assoc -- max-heap )
     <max-heap> [ heap-push-all ] keep ;
