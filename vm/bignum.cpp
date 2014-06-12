@@ -744,10 +744,13 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
   bignum_length_type length_n = ((BIGNUM_LENGTH(numerator)) + 1);
   bignum_length_type length_d = (BIGNUM_LENGTH(denominator));
 
-  bignum* q = ((quotient != ((bignum**)0))
-                   ? (allot_bignum((length_n - length_d), q_negative_p))
-                   : BIGNUM_OUT_OF_BAND);
-  GC_BIGNUM(q);
+  bignum *q = NULL;
+  if (quotient != ((bignum**)0)) {
+    q = allot_bignum(length_n - length_d, q_negative_p);
+    GC_BIGNUM(q);
+  } else {
+    q = BIGNUM_OUT_OF_BAND;
+  }
 
   bignum* u = (allot_bignum(length_n, r_negative_p));
   GC_BIGNUM(u);
@@ -932,9 +935,6 @@ void factor_vm::bignum_divide_unsigned_medium_denominator(
   GC_BIGNUM(numerator);
 
   bignum_length_type length_n = (BIGNUM_LENGTH(numerator));
-  bignum_length_type length_q;
-  bignum* q = NULL;
-  GC_BIGNUM(q);
 
   int shift = 0;
   /* Because `bignum_digit_divide' requires a normalized denominator. */
@@ -942,15 +942,13 @@ void factor_vm::bignum_divide_unsigned_medium_denominator(
     denominator <<= 1;
     shift += 1;
   }
-  if (shift == 0) {
-    length_q = length_n;
 
-    q = (allot_bignum(length_q, q_negative_p));
+  bignum_length_type length_q = (shift == 0) ? length_n : length_n + 1;
+  bignum* q = (allot_bignum(length_q, q_negative_p));
+  GC_BIGNUM(q);
+  if (shift == 0) {
     bignum_destructive_copy(numerator, q);
   } else {
-    length_q = (length_n + 1);
-
-    q = (allot_bignum(length_q, q_negative_p));
     bignum_destructive_normalization(numerator, q, shift);
   }
   {
