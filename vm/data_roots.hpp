@@ -4,7 +4,7 @@ template <typename Type> struct data_root : public tagged<Type> {
   factor_vm* parent;
 
   void push() {
-    parent->data_roots.push_back(data_root_range(&this->value_, 1));
+    parent->data_roots.push_back(&this->value_);
   }
 
   data_root(cell value, factor_vm* parent)
@@ -35,13 +35,12 @@ struct gc_bignum {
   factor_vm* parent;
 
   gc_bignum(bignum** addr, factor_vm* parent) : addr(addr), parent(parent) {
-    if (*addr)
-      parent->check_data_pointer(*addr);
-    parent->bignum_roots.push_back((cell)addr);
+    parent->check_data_pointer(*addr);
+    parent->bignum_roots.push_back(addr);
   }
 
   ~gc_bignum() {
-    FACTOR_ASSERT(parent->bignum_roots.back() == (cell)addr);
+    FACTOR_ASSERT(parent->bignum_roots.back() == addr);
     parent->bignum_roots.pop_back();
   }
 };
