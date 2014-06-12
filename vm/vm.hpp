@@ -114,7 +114,7 @@ struct factor_vm {
      themselves here. See data_roots.hpp and code_roots.hpp */
 
   std::vector<cell*> data_roots;
-  std::vector<cell> bignum_roots;
+  std::vector<bignum**> bignum_roots;
   std::vector<code_root*> code_roots;
 
   /* Debugger */

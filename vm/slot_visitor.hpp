@@ -186,14 +186,14 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_data_roots() {
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_bignum_roots() {
-  std::vector<cell>::const_iterator iter = parent->bignum_roots.begin();
-  std::vector<cell>::const_iterator end = parent->bignum_roots.end();
+  std::vector<bignum**>::const_iterator iter =
+      parent->bignum_roots.begin();
+  std::vector<bignum**>::const_iterator end =
+      parent->bignum_roots.end();
 
   for (; iter < end; iter++) {
-    cell* handle = (cell*)(*iter);
-
-    if (*handle)
-      *handle = (cell)fixup.fixup_data(*(object**)handle);
+    bignum** ref = *iter;
+    *ref = (bignum*)fixup.fixup_data(*ref);
   }
 }
 
