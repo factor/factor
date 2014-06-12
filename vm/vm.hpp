@@ -239,11 +239,11 @@ struct factor_vm {
                      bignum** remainder);
   bignum* bignum_quotient(bignum* numerator, bignum* denominator);
   bignum* bignum_remainder(bignum* numerator, bignum* denominator);
-  cell bignum_to_cell(bignum* bignum);
-  fixnum bignum_to_fixnum_strict(bignum* bignum);
-  fixnum bignum_to_fixnum(bignum* bignum);
-  int64_t bignum_to_long_long(bignum* bignum);
-  uint64_t bignum_to_ulong_long(bignum* bignum);
+  cell bignum_to_cell(bignum* bn);
+  fixnum bignum_to_fixnum_strict(bignum* bn);
+  fixnum bignum_to_fixnum(bignum* bn);
+  int64_t bignum_to_long_long(bignum* bn);
+  uint64_t bignum_to_ulong_long(bignum* bn);
   bignum* double_to_bignum(double x);
   int bignum_equal_p_unsigned(bignum* x, bignum* y);
   enum bignum_comparison bignum_compare_unsigned(bignum* x, bignum* y);
@@ -252,8 +252,8 @@ struct factor_vm {
   bignum* bignum_multiply_unsigned(bignum* x, bignum* y, int negative_p);
   bignum* bignum_multiply_unsigned_small_factor(bignum* x, bignum_digit_type y,
                                                 int negative_p);
-  void bignum_destructive_add(bignum* bignum, bignum_digit_type n);
-  void bignum_destructive_scale_up(bignum* bignum, bignum_digit_type factor);
+  void bignum_destructive_add(bignum* bn, bignum_digit_type n);
+  void bignum_destructive_scale_up(bignum* bn, bignum_digit_type factor);
   void bignum_divide_unsigned_large_denominator(
       bignum* numerator, bignum* denominator, bignum** quotient,
       bignum** remainder, int q_negative_p, int r_negative_p);
@@ -267,7 +267,7 @@ struct factor_vm {
       bignum** remainder, int q_negative_p, int r_negative_p);
   void bignum_destructive_normalization(bignum* source, bignum* target,
                                         int shift_left);
-  void bignum_destructive_unnormalization(bignum* bignum, int shift_right);
+  void bignum_destructive_unnormalization(bignum* bn, int shift_right);
   bignum_digit_type bignum_digit_divide(
       bignum_digit_type uh, bignum_digit_type ul, bignum_digit_type v,
       bignum_digit_type* q) /* return value */;
@@ -279,15 +279,15 @@ struct factor_vm {
       bignum* numerator, bignum_digit_type denominator, bignum** quotient,
       bignum** remainder, int q_negative_p, int r_negative_p);
   bignum_digit_type bignum_destructive_scale_down(
-      bignum* bignum, bignum_digit_type denominator);
+      bignum* bn, bignum_digit_type denominator);
   bignum* bignum_remainder_unsigned_small_denominator(bignum* n,
                                                       bignum_digit_type d,
                                                       int negative_p);
   bignum* bignum_digit_to_bignum(bignum_digit_type digit, int negative_p);
   bignum* allot_bignum(bignum_length_type length, int negative_p);
   bignum* allot_bignum_zeroed(bignum_length_type length, int negative_p);
-  bignum* bignum_shorten_length(bignum* bignum, bignum_length_type length);
-  bignum* bignum_trim(bignum* bignum);
+  bignum* bignum_shorten_length(bignum* bn, bignum_length_type length);
+  bignum* bignum_trim(bignum* bn);
   bignum* bignum_new_sign(bignum* x, int negative_p);
   bignum* bignum_maybe_new_sign(bignum* x, int negative_p);
   void bignum_destructive_copy(bignum* source, bignum* target);
@@ -303,7 +303,7 @@ struct factor_vm {
   void bignum_negate_magnitude(bignum* arg);
   bignum* bignum_integer_length(bignum* x);
   int bignum_logbitp(int shift, bignum* arg);
-  int bignum_unsigned_logbitp(int shift, bignum* bignum);
+  int bignum_unsigned_logbitp(int shift, bignum* bn);
   bignum* bignum_gcd(bignum* a, bignum* b);
 
   //data heap
