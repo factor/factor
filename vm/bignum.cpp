@@ -1233,19 +1233,13 @@ bignum* factor_vm::allot_bignum_zeroed(bignum_length_type length,
   return (result);
 }
 
-/* can allocate if not in nursery or size is larger */
-/* Allocates memory conditionally */
-#define BIGNUM_REDUCE_LENGTH(source, length) \
-  source = reallot_array(source, length + 1)
-
 /* Allocates memory */
 bignum* factor_vm::bignum_shorten_length(bignum* bn,
                                          bignum_length_type length) {
   bignum_length_type current_length = (BIGNUM_LENGTH(bn));
   BIGNUM_ASSERT((length >= 0) || (length <= current_length));
   if (length < current_length) {
-    GC_BIGNUM(bn);
-    BIGNUM_REDUCE_LENGTH(bn, length);
+    bn = reallot_array(bn, length + 1);
     BIGNUM_SET_NEGATIVE_P(bn, (length != 0) && (BIGNUM_NEGATIVE_P(bn)));
   }
   return (bn);
@@ -1260,9 +1254,8 @@ bignum* factor_vm::bignum_trim(bignum* bn) {
     ;
   scan += 1;
   if (scan < end) {
-    GC_BIGNUM(bn);
     bignum_length_type length = (scan - start);
-    BIGNUM_REDUCE_LENGTH(bn, length);
+    bn = reallot_array(bn, length + 1);
     BIGNUM_SET_NEGATIVE_P(bn, (length != 0) && (BIGNUM_NEGATIVE_P(bn)));
   }
   return (bn);
