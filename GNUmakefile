@@ -230,14 +230,14 @@ vm/resources.o:
 TESTING_OBJS = vm/tests/gtest-all.o vm/tests/gtest_main.o vm/tests/factor-tests.o
 
 %.o: %.cc
-	$(TOOLCHAIN_PREFIX)$(CPP) -I $(GTEST) -I vm -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -I $(GTEST) -I vm -c $(CFLAGS) -o $@ $<
 
 gtest-setup:
 	mkdir -p vm/tests
 	cp -u $(GTEST)/src/*.cc vm/tests
 
 factor-tests: gtest-setup $(TESTING_OBJS) $(DLL_OBJS)
-	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBPATH) $(CFLAGS) -o factor-tests $(LIBS) $(TESTING_OBJS) $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CXX) $(LIBPATH) $(CFLAGS) -o factor-tests $(LIBS) $(TESTING_OBJS) $(DLL_OBJS)
 
 vm/ffi_test.o: vm/ffi_test.c
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<

@@ -171,4 +171,68 @@ TEST(BignumTests, CountDigitsInSpecialNums) {
   delete vm;
 }
 
+TEST(AllotTests, AllocateInNursery) {
+  factor_vm* vm = setup_factor_vm();
+
+  for (cell n = 0; n < 10; n++) {
+    cell free_space = vm->nursery.free_space();
+    ASSERT_GT(free_space, 0);
+    vm->fixnum_to_bignum(99999);
+    ASSERT_LT(vm->nursery.free_space(), free_space);
+  }
+  delete vm;
+}
+
+TEST(AllotTests, CheckBignumMoveToAging) {
+  factor_vm* vm = setup_factor_vm();
+
+  bignum *b1 = vm->fixnum_to_bignum(99999);
+  bignum *b2 = vm->fixnum_to_bignum(99999);
+  cell old_addr1 = (cell)b1;
+  cell old_addr2 = (cell)b2;
+  gc_bignum *b_data_root = new gc_bignum(&b1, vm);
+
+  vm->primitive_minor_gc();
+
+  // Object now lives in aging and has a new address.
+  ASSERT_NE((cell)b1, old_addr1);
+
+  // But the other bignum wasn't data rooted and therefore wasn't
+  // moved. Its pointer is now invalid.
+  ASSERT_EQ((cell)b2, old_addr2);
+
+  delete b_data_root;
+  delete vm;
+}
+
+TEST(AllotTests, CheckStringMoveToAging) {
+  factor_vm* vm = setup_factor_vm();
+
+  string *s1 = vm->allot_string(77, 65);
+  string *s2 = vm->allot_string(100, 66);
+  cell addr1 = (cell)s1, addr2 = (cell)s2;
+  data_root<string> *s1_dr = new data_root<string>(s1, vm);
+  ASSERT_EQ(s1_dr->untagged(), s1);
+
+  vm->primitive_minor_gc();
+
+  memset_cell((void*)vm->nursery.start, false_object, vm->nursery.size);
+  ASSERT_EQ(vm->nursery.start, vm->nursery.here);
+
+  // None of the pointers have been moved. Different from the
+  // gc_bignum case.
+  ASSERT_EQ((cell)s1, addr1);
+  ASSERT_EQ((cell)s2, addr2);
+
+  // But if you untag the data rooted object, you find the moved
+  // string.
+  string *moved_s1 = s1_dr->untagged();
+  ASSERT_NE((cell)moved_s1, addr1);
+  ASSERT_EQ(77, string_capacity(moved_s1));
+
+  delete s1_dr;
+  delete vm;
+}
+
+
 }
