@@ -233,7 +233,7 @@ struct factor_vm {
   enum bignum_comparison bignum_compare(bignum* x, bignum* y);
   bignum* bignum_add(bignum* x, bignum* y);
   bignum* bignum_subtract(bignum* x, bignum* y);
-  bignum* bignum_square(bignum* x);
+  bignum* bignum_square(bignum* x_);
   bignum* bignum_multiply(bignum* x, bignum* y);
   void bignum_divide(bignum* numerator, bignum* denominator, bignum** quotient,
                      bignum** remainder);
@@ -247,9 +247,9 @@ struct factor_vm {
   bignum* double_to_bignum(double x);
   int bignum_equal_p_unsigned(bignum* x, bignum* y);
   enum bignum_comparison bignum_compare_unsigned(bignum* x, bignum* y);
-  bignum* bignum_add_unsigned(bignum* x, bignum* y, int negative_p);
-  bignum* bignum_subtract_unsigned(bignum* x, bignum* y);
-  bignum* bignum_multiply_unsigned(bignum* x, bignum* y, int negative_p);
+  bignum* bignum_add_unsigned(bignum* x_, bignum* y_, int negative_p);
+  bignum* bignum_subtract_unsigned(bignum* x_, bignum* y_);
+  bignum* bignum_multiply_unsigned(bignum* x_, bignum* y_, int negative_p);
   bignum* bignum_multiply_unsigned_small_factor(bignum* x, bignum_digit_type y,
                                                 int negative_p);
   void bignum_destructive_add(bignum* bn, bignum_digit_type n);
@@ -291,7 +291,7 @@ struct factor_vm {
   bignum* bignum_new_sign(bignum* x, int negative_p);
   bignum* bignum_maybe_new_sign(bignum* x, int negative_p);
   void bignum_destructive_copy(bignum* source, bignum* target);
-  bignum* bignum_bitwise_not(bignum* x);
+  bignum* bignum_bitwise_not(bignum* x_);
   bignum* bignum_arithmetic_shift(bignum* arg1, fixnum n);
   bignum* bignum_bitwise_and(bignum* arg1, bignum* arg2);
   bignum* bignum_bitwise_ior(bignum* arg1, bignum* arg2);
