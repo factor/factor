@@ -26,7 +26,15 @@ template <typename Type> struct data_root : public tagged<Type> {
     return *this;
   }
 
-  ~data_root() { parent->data_roots.pop_back(); }
+  ~data_root() {
+    parent->data_roots.pop_back();
+  }
+
+  friend void swap(data_root<Type>& a, data_root<Type>& b) {
+    cell tmp = a.value_;
+    a.value_ = b.value_;
+    b.value_ = tmp;
+  }
 };
 
 /* A similar hack for the bignum implementation */
