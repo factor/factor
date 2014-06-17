@@ -344,13 +344,18 @@ bignum* factor_vm::bignum_remainder(bignum* numerator, bignum* denominator) {
         *scan = (accumulator & BIGNUM_DIGIT_MASK);                    \
         return (result);                                              \
       } else {                                                        \
-        BIGNUM_ASSERT(BIGNUM_DIGITS_FOR(type) == 2);                  \
-        bignum* result = allot_bignum(2, negative_p);                 \
-        bignum_digit_type* scan = (BIGNUM_START_PTR(result));         \
-        (*scan++) = (accumulator & BIGNUM_DIGIT_MASK);                \
-        accumulator >>= BIGNUM_DIGIT_LENGTH;                          \
-        *scan = (accumulator & BIGNUM_DIGIT_MASK);                    \
-        BIGNUM_ASSERT((accumulator >> BIGNUM_DIGIT_LENGTH) == 0);     \
+        bignum_digit_type result_digits[BIGNUM_DIGITS_FOR(type)];     \
+        bignum_digit_type* end_digits = result_digits;                \
+        do {                                                          \
+          (*end_digits++) = (accumulator & BIGNUM_DIGIT_MASK);        \
+          accumulator >>= BIGNUM_DIGIT_LENGTH;                        \
+        } while (accumulator != 0);                                   \
+        bignum* result =                                              \
+           (allot_bignum((end_digits - result_digits), negative_p));  \
+        bignum_digit_type* scan_digits = result_digits;               \
+        bignum_digit_type* scan_result = (BIGNUM_START_PTR(result));  \
+        while (scan_digits < end_digits)                              \
+          (*scan_result++) = (*scan_digits++);                        \
         return (result);                                              \
       }                                                               \
     }                                                                 \
