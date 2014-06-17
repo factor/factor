@@ -17,7 +17,10 @@ CONSTANT: mach-map {
 : parse-ldconfig-lines ( string -- triple )
     [
         "=>" split1 [ [ blank? ] trim ] bi@
-        [ " " split1 [ "()" in? ] trim "," split ] dip 3array
+        [
+            " " split1 [ "()" in? ] trim "," split
+            [ "OS ABI:" head? not ] filter
+        ] dip 3array
     ] map ;
 
 : load-ldconfig-cache ( -- seq )
