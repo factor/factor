@@ -119,7 +119,6 @@ template <typename Fixup> struct slot_visitor {
   void visit_slots(object* ptr);
   void visit_stack_elements(segment* region, cell* top);
   void visit_data_roots();
-  void visit_bignum_roots();
   void visit_callback_roots();
   void visit_literal_table_roots();
   void visit_roots();
@@ -186,18 +185,6 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_data_roots() {
   }
 }
 
-template <typename Fixup> void slot_visitor<Fixup>::visit_bignum_roots() {
-  std::vector<bignum**>::const_iterator iter =
-      parent->bignum_roots.begin();
-  std::vector<bignum**>::const_iterator end =
-      parent->bignum_roots.end();
-
-  for (; iter < end; iter++) {
-    bignum** ref = *iter;
-    *ref = (bignum*)fixup.fixup_data(*ref);
-  }
-}
-
 template <typename Fixup> struct callback_slot_visitor {
   slot_visitor<Fixup>* visitor;
 
@@ -251,7 +238,6 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_roots() {
   visit_handle(&parent->bignum_neg_one);
 
   visit_data_roots();
-  visit_bignum_roots();
   visit_callback_roots();
   visit_literal_table_roots();
   visit_sample_callstacks();
