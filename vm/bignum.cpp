@@ -1731,7 +1731,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
   b = d;
 
   /* Initial reduction: make sure that 0 <= b <= a. */
-  if (bignum_compare(a, b) == bignum_comparison_less) {
+  if (bignum_compare(a.untagged(), b.untagged()) == bignum_comparison_less) {
     swap(a, b);
     std::swap(size_a, size_b);
   }
@@ -1776,7 +1776,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
     if (k == 0) {
       /* no progress; do a Euclidean step */
       if (size_b == 0) {
-        return bignum_trim(a);
+        return bignum_trim(a.untagged());
       }
       data_root<bignum> e(bignum_trim(a.untagged()), this);
       data_root<bignum> f(bignum_trim(b.untagged()), this);
