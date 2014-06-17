@@ -1702,10 +1702,9 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
 }
 #else
 /* Allocates memory */
-bignum* factor_vm::bignum_gcd(bignum* a, bignum* b) {
-  GC_BIGNUM(a);
-  GC_BIGNUM(b);
-  bignum* c, *d, *e, *f;
+bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
+  data_root<bignum> a(a_, this);
+  data_root<bignum> b(b_, this);
   bignum_twodigit_type x, y, q, s, t, A, B, C, D;
   int nbits, k;
   bignum_length_type size_a, size_b, size_c;
@@ -1714,19 +1713,18 @@ bignum* factor_vm::bignum_gcd(bignum* a, bignum* b) {
 
   /* clone the bignums so we can modify them in-place */
   size_a = BIGNUM_LENGTH(a);
-  c = allot_bignum(size_a, 0);
+  data_root<bignum> c(allot_bignum(size_a, 0), this);
+  // c = allot_bignum(size_a, 0);
   scan_a = BIGNUM_START_PTR(a);
   a_end = scan_a + size_a;
-  GC_BIGNUM(c);
   scan_c = BIGNUM_START_PTR(c);
   while (scan_a < a_end)
     (*scan_c++) = (*scan_a++);
   a = c;
   size_b = BIGNUM_LENGTH(b);
-  d = allot_bignum(size_b, 0);
+  data_root<bignum> d(allot_bignum(size_b, 0), this);
   scan_b = BIGNUM_START_PTR(b);
   b_end = scan_b + size_b;
-  GC_BIGNUM(d);
   scan_d = BIGNUM_START_PTR(d);
   while (scan_b < b_end)
     (*scan_d++) = (*scan_b++);
@@ -1734,7 +1732,7 @@ bignum* factor_vm::bignum_gcd(bignum* a, bignum* b) {
 
   /* Initial reduction: make sure that 0 <= b <= a. */
   if (bignum_compare(a, b) == bignum_comparison_less) {
-    std::swap(a, b);
+    swap(a, b);
     std::swap(size_a, size_b);
   }
 
@@ -1780,14 +1778,11 @@ bignum* factor_vm::bignum_gcd(bignum* a, bignum* b) {
       if (size_b == 0) {
         return bignum_trim(a);
       }
-      e = bignum_trim(a);
-      GC_BIGNUM(e);
-      f = bignum_trim(b);
-      GC_BIGNUM(f);
-      c = bignum_remainder(e, f);
-      GC_BIGNUM(c);
-      if (c == BIGNUM_OUT_OF_BAND) {
-        return c;
+      data_root<bignum> e(bignum_trim(a.untagged()), this);
+      data_root<bignum> f(bignum_trim(b.untagged()), this);
+      c = bignum_remainder(e.untagged(), f.untagged());
+      if (c.untagged() == BIGNUM_OUT_OF_BAND) {
+        return c.untagged();
       }
 
       // copy 'b' to 'a'
@@ -1875,8 +1870,8 @@ bignum* factor_vm::bignum_gcd(bignum* a, bignum* b) {
   }
 
   /* a fits into a fixnum, so b must too */
-  fixnum xx = bignum_to_fixnum(a);
-  fixnum yy = bignum_to_fixnum(b);
+  fixnum xx = bignum_to_fixnum(a.untagged());
+  fixnum yy = bignum_to_fixnum(b.untagged());
   fixnum tt;
 
   /* usual Euclidean algorithm for longs */
