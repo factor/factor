@@ -31,7 +31,7 @@ CONSTANT: mach-map {
     first swap ?head [ ?first CHAR: . = ] [ drop f ] if ;
 
 : arch-matches? ( lib triple -- ? )
-    [ drop ldconfig-arch ] [ second subset? ] bi* ;
+    [ drop ldconfig-arch ] [ second swap subset? ] bi* ;
 
 : ldconfig-matches? ( lib triple -- ? )
     { [ name-matches? ] [ arch-matches? ] } 2&& ;
