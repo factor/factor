@@ -263,7 +263,7 @@ struct factor_vm {
                                            bignum_digit_type guess,
                                            bignum_digit_type* u_start);
   void bignum_divide_unsigned_medium_denominator(
-      bignum* numerator, bignum_digit_type denominator, bignum** quotient,
+      bignum* numerator_, bignum_digit_type denominator, bignum** quotient,
       bignum** remainder, int q_negative_p, int r_negative_p);
   void bignum_destructive_normalization(bignum* source, bignum* target,
                                         int shift_left);
@@ -276,7 +276,7 @@ struct factor_vm {
                                                  bignum_digit_type guess,
                                                  bignum_digit_type* u);
   void bignum_divide_unsigned_small_denominator(
-      bignum* numerator, bignum_digit_type denominator, bignum** quotient,
+      bignum* numerator_, bignum_digit_type denominator, bignum** quotient,
       bignum** remainder, int q_negative_p, int r_negative_p);
   bignum_digit_type bignum_destructive_scale_down(
       bignum* bn, bignum_digit_type denominator);
@@ -297,11 +297,11 @@ struct factor_vm {
   bignum* bignum_bitwise_ior(bignum* arg1, bignum* arg2);
   bignum* bignum_bitwise_xor(bignum* arg1, bignum* arg2);
   bignum* bignum_magnitude_ash(bignum* arg1_, fixnum n);
-  bignum* bignum_pospos_bitwise_op(int op, bignum* arg1, bignum* arg2);
-  bignum* bignum_posneg_bitwise_op(int op, bignum* arg1, bignum* arg2);
-  bignum* bignum_negneg_bitwise_op(int op, bignum* arg1, bignum* arg2);
+  bignum* bignum_pospos_bitwise_op(int op, bignum* arg1_, bignum* arg2_);
+  bignum* bignum_posneg_bitwise_op(int op, bignum* arg1_, bignum* arg2_);
+  bignum* bignum_negneg_bitwise_op(int op, bignum* arg1_, bignum* arg2_);
   void bignum_negate_magnitude(bignum* arg);
-  bignum* bignum_integer_length(bignum* x);
+  bignum* bignum_integer_length(bignum* x_);
   int bignum_logbitp(int shift, bignum* arg);
   int bignum_unsigned_logbitp(int shift, bignum* bn);
   bignum* bignum_gcd(bignum* a, bignum* b);
