@@ -110,7 +110,7 @@ bignum* factor_vm::bignum_subtract(bignum* x, bignum* y) {
 #ifdef _WIN64
 bignum *factor_vm::bignum_square(bignum* x_)
 {
-    return bignum_multiply(x, x);
+    return bignum_multiply(x_, x_);
 }
 #else
 /* Allocates memory */
@@ -1683,28 +1683,30 @@ int factor_vm::bignum_unsigned_logbitp(int shift, bignum* bn) {
 }
 
 #ifdef _WIN64
-/* Allocates memory. Needs to be fixed, mutates parameters. */
+/* Allocates memory. */
 bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
 
+  std::cout << "bignum_gcd" << std::endl;
   data_root<bignum> a(a_, this);
   data_root<bignum> b(b_, this);
 
-  BIGNUM_SET_NEGATIVE_P(a, 0);
-  BIGNUM_SET_NEGATIVE_P(b, 0);
+  /* Copies of a and b with that are both positive. */
+  data_root<bignum> ac(bignum_maybe_new_sign(a.untagged(), 0), this);
+  data_root<bignum> bc(bignum_maybe_new_sign(b.untagged(), 0), this);
 
-  if (bignum_compare(a.untagged(), b.untagged()) == bignum_comparison_less) {
-    swap(a, b);
+  if (bignum_compare(ac.untagged(), bc.untagged()) == bignum_comparison_less) {
+    swap(ac, bc);
   }
 
-  while (BIGNUM_LENGTH(b) != 0) {
-    data_root<bignum> d(bignum_remainder(a.untagged(), b.untagged()), this);
+  while (BIGNUM_LENGTH(bc) != 0) {
+    data_root<bignum> d(bignum_remainder(ac.untagged(), bc.untagged()), this);
     if (d.untagged() == BIGNUM_OUT_OF_BAND) {
       return d.untagged();
     }
-    a.replace_value(b.value());
-    b.replace_value(d.value());
+    ac = bc;
+    bc = d;
   }
-  return a.untagged();
+  return ac.untagged();
 }
 #else
 /* Allocates memory */
