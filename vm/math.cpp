@@ -373,7 +373,7 @@ inline void factor_vm::overflow_fixnum_multiply(fixnum x, fixnum y) {
   data_root<bignum> bx(fixnum_to_bignum(x), this);
   data_root<bignum> by(fixnum_to_bignum(y), this);
   cell ret = tag<bignum>(bignum_multiply(bx.untagged(), by.untagged()));
-  ctx->replace(cell);
+  ctx->replace(ret);
 }
 
 VM_C_API void overflow_fixnum_multiply(fixnum x, fixnum y, factor_vm* parent) {
