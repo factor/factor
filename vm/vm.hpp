@@ -304,7 +304,7 @@ struct factor_vm {
   bignum* bignum_integer_length(bignum* x_);
   int bignum_logbitp(int shift, bignum* arg);
   int bignum_unsigned_logbitp(int shift, bignum* bn);
-  bignum* bignum_gcd(bignum* a, bignum* b);
+  bignum* bignum_gcd(bignum* a_, bignum* b_);
 
   //data heap
   void init_card_decks();
