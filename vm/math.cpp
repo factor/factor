@@ -370,11 +370,10 @@ VM_C_API void overflow_fixnum_subtract(fixnum x, fixnum y, factor_vm* parent) {
 
 /* Allocates memory */
 inline void factor_vm::overflow_fixnum_multiply(fixnum x, fixnum y) {
-  bignum* bx = fixnum_to_bignum(x);
-  GC_BIGNUM(bx);
-  bignum* by = fixnum_to_bignum(y);
-  GC_BIGNUM(by);
-  ctx->replace(tag<bignum>(bignum_multiply(bx, by)));
+  data_root<bignum> bx(fixnum_to_bignum(x), this);
+  data_root<bignum> by(fixnum_to_bignum(y), this);
+  cell ret = tag<bignum>(bignum_multiply(bx.untagged(), by.untagged()));
+  ctx->replace(cell);
 }
 
 VM_C_API void overflow_fixnum_multiply(fixnum x, fixnum y, factor_vm* parent) {
