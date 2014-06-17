@@ -37,27 +37,4 @@ template <typename Type> struct data_root : public tagged<Type> {
   }
 };
 
-/* A similar hack for the bignum implementation */
-struct gc_bignum {
-  bignum** addr;
-  factor_vm* parent;
-
-  gc_bignum(bignum** addr, factor_vm* parent) : addr(addr), parent(parent) {
-    /* Don't bother with variables holding NULL pointers. */
-    if (*addr) {
-      parent->check_data_pointer(*addr);
-      parent->bignum_roots.push_back(addr);
-    }
-  }
-
-  ~gc_bignum() {
-    if (*addr) {
-      FACTOR_ASSERT(parent->bignum_roots.back() == addr);
-      parent->bignum_roots.pop_back();
-    }
-  }
-};
-
-#define GC_BIGNUM(x) gc_bignum x##__data_root(&x, this)
-
 }
