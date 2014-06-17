@@ -288,15 +288,15 @@ struct factor_vm {
   bignum* allot_bignum_zeroed(bignum_length_type length, int negative_p);
   bignum* bignum_shorten_length(bignum* bn, bignum_length_type length);
   bignum* bignum_trim(bignum* bn);
-  bignum* bignum_new_sign(bignum* x, int negative_p);
-  bignum* bignum_maybe_new_sign(bignum* x, int negative_p);
+  bignum* bignum_new_sign(bignum* x_, int negative_p);
+  bignum* bignum_maybe_new_sign(bignum* x_, int negative_p);
   void bignum_destructive_copy(bignum* source, bignum* target);
   bignum* bignum_bitwise_not(bignum* x_);
   bignum* bignum_arithmetic_shift(bignum* arg1, fixnum n);
   bignum* bignum_bitwise_and(bignum* arg1, bignum* arg2);
   bignum* bignum_bitwise_ior(bignum* arg1, bignum* arg2);
   bignum* bignum_bitwise_xor(bignum* arg1, bignum* arg2);
-  bignum* bignum_magnitude_ash(bignum* arg1, fixnum n);
+  bignum* bignum_magnitude_ash(bignum* arg1_, fixnum n);
   bignum* bignum_pospos_bitwise_op(int op, bignum* arg1, bignum* arg2);
   bignum* bignum_posneg_bitwise_op(int op, bignum* arg1, bignum* arg2);
   bignum* bignum_negneg_bitwise_op(int op, bignum* arg1, bignum* arg2);

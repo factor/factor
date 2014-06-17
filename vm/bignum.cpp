@@ -1274,23 +1274,19 @@ bignum* factor_vm::bignum_trim(bignum* bn) {
 /* Copying */
 
 /* Allocates memory */
-bignum* factor_vm::bignum_new_sign(bignum* x, int negative_p) {
-  GC_BIGNUM(x);
-  bignum* result = (allot_bignum((BIGNUM_LENGTH(x)), negative_p));
-
-  bignum_destructive_copy(x, result);
-  return (result);
+bignum* factor_vm::bignum_new_sign(bignum* x_, int negative_p) {
+  data_root<bignum> x(x_, this);
+  bignum* result = allot_bignum(BIGNUM_LENGTH(x), negative_p);
+  bignum_destructive_copy(x.untagged(), result);
+  return result;
 }
 
 /* Allocates memory */
-bignum* factor_vm::bignum_maybe_new_sign(bignum* x, int negative_p) {
-  if ((BIGNUM_NEGATIVE_P(x)) ? negative_p : (!negative_p))
-    return (x);
+bignum* factor_vm::bignum_maybe_new_sign(bignum* x_, int negative_p) {
+  if ((BIGNUM_NEGATIVE_P(x_)) ? negative_p : (!negative_p))
+    return x_;
   else {
-    GC_BIGNUM(x);
-    bignum* result = (allot_bignum((BIGNUM_LENGTH(x)), negative_p));
-    bignum_destructive_copy(x, result);
-    return (result);
+    return bignum_new_sign(x_, negative_p);
   }
 }
 
@@ -1405,8 +1401,9 @@ bignum* factor_vm::bignum_bitwise_xor(bignum* arg1, bignum* arg2) {
 /* Allocates memory */
 /* ash for the magnitude */
 /* assume arg1 is a big number, n is a long */
-bignum* factor_vm::bignum_magnitude_ash(bignum* arg1, fixnum n) {
-  GC_BIGNUM(arg1);
+bignum* factor_vm::bignum_magnitude_ash(bignum* arg1_, fixnum n) {
+
+  data_root<bignum> arg1(arg1_, this);
 
   bignum* result = NULL;
   bignum_digit_type* scan1;
@@ -1416,7 +1413,7 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1, fixnum n) {
   fixnum digit_offset, bit_offset;
 
   if (BIGNUM_ZERO_P(arg1))
-    return (arg1);
+    return arg1.untagged();
 
   if (n > 0) {
     digit_offset = n / BIGNUM_DIGIT_LENGTH;
@@ -1437,10 +1434,9 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1, fixnum n) {
       *scanr = *scanr & BIGNUM_DIGIT_MASK;
     }
   } else if (n < 0 && (-n >= (BIGNUM_LENGTH(arg1) * (bignum_length_type)
-                              BIGNUM_DIGIT_LENGTH)))
+                              BIGNUM_DIGIT_LENGTH))) {
     result = BIGNUM_ZERO();
-
-  else if (n < 0) {
+  } else if (n < 0) {
     digit_offset = -n / BIGNUM_DIGIT_LENGTH;
     bit_offset = -n % BIGNUM_DIGIT_LENGTH;
 
@@ -1458,10 +1454,11 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1, fixnum n) {
       scanr++;
     }
     *scanr = (*scan1++ & BIGNUM_DIGIT_MASK) >> bit_offset;
-  } else if (n == 0)
-    result = arg1;
+  } else if (n == 0) {
+    result = arg1.untagged();
+  }
 
-  return (bignum_trim(result));
+  return bignum_trim(result);
 }
 
 /* Allocates memory */
@@ -1686,7 +1683,6 @@ int factor_vm::bignum_unsigned_logbitp(int shift, bignum* bn) {
 /* Allocates memory. */
 bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
 
-  std::cout << "bignum_gcd" << std::endl;
   data_root<bignum> a(a_, this);
   data_root<bignum> b(b_, this);
 
