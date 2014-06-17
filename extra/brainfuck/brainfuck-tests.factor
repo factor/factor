@@ -60,4 +60,16 @@ IN: brainfuck.tests
      [-[<->-]+[<<<]]<[>+<-]>]<<-]<<-]"""
   get-brainfuck ] unit-test
 
+! fun with numbers: 2 + 2 = 5
 
+{ "5" } [
+    """
+    +++++           +++++
+        +               +
+        +     +         +     +++++
+    +++++    +++    +++++
+    +         +     +         +++++
+    +               +
+    +++++           +++++.
+    """ get-brainfuck
+] unit-test
