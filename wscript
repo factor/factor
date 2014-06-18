@@ -101,6 +101,12 @@ def options(ctx):
         default = False,
         help = 'Generate new boot images (requires Factor to be installed)'
     )
+    ctx.add_option(
+        '--debug',
+        action = 'store_true',
+        default = False,
+        help = 'Build with debugging settings'
+    )
 
 def configure(ctx):
     ctx.load('compiler_c compiler_cxx')
@@ -119,12 +125,12 @@ def configure(ctx):
         ctx.check_lib_msvc('shell32')
         ctx.load('winres')
         if cxx == 'msvc':
-            env.WINRCFLAGS.append('/nologo')
+            env.WINRCFLAGS += ['/nologo']
             env.CXXFLAGS += ['/EHsc', '/O2', '/WX', '/W3']
             if bits == 32:
-                env.LINKFLAGS.append('/safesh')
+                env.LINKFLAGS += ['/safesh']
         elif cxx == 'g++':
-            env.LINKFLAGS.extend(['-static-libgcc', '-static-libstdc++', '-s'])
+            env.LINKFLAGS += ['-static-libgcc', '-static-libstdc++', '-s']
             env.CXXFLAGS += ['-O2', '-fomit-frame-pointer']
         ctx.define('_CRT_SECURE_NO_WARNINGS', None)
         # WIX checks
@@ -164,6 +170,13 @@ def configure(ctx):
     if dest_os == 'win32':
         pf = pf.replace('\\', '\\\\')
     ctx.define('INSTALL_PREFIX', pf)
+    if opts.debug:
+        ctx.define('FACTOR_DEBUG', 1)
+        if cxx == 'msvc':
+            env.CXXFLAGS += ['/Zi']
+            env.LINKFLAGS += ['/DEBUG']
+        elif cxx == 'g++':
+            env.CXXFLAGS += ['-g']
 
 def download_file(self):
     gen = self.generator
