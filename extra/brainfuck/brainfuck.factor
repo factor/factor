@@ -35,10 +35,10 @@ TUPLE: brainfuck pointer memory ;
     read1 set-memory ;
 
 : (>) ( brainfuck n -- brainfuck )
-    [ + ] curry change-pointer ;
+    '[ _ + ] change-pointer ;
 
 : (<) ( brainfuck n -- brainfuck )
-    [ - ] curry change-pointer ;
+    '[ _ - ] change-pointer ;
 
 : (#) ( brainfuck -- brainfuck )
     dup
@@ -50,10 +50,10 @@ TUPLE: brainfuck pointer memory ;
 
 EBNF: parse-brainfuck
 
-inc-ptr  = (">")+  => [[ length [ (>) ] curry ]]
-dec-ptr  = ("<")+  => [[ length [ (<) ] curry ]]
-inc-mem  = ("+")+  => [[ length [ (+) ] curry ]]
-dec-mem  = ("-")+  => [[ length [ (-) ] curry ]]
+inc-ptr  = (">")+  => [[ length '[ _ (>) ] ]]
+dec-ptr  = ("<")+  => [[ length '[ _ (<) ] ]]
+inc-mem  = ("+")+  => [[ length '[ _ (+) ] ]]
+dec-mem  = ("-")+  => [[ length '[ _ (-) ] ]]
 output   = "."  => [[ [ (.) ] ]]
 input    = ","  => [[ [ (,) ] ]]
 debug    = "#"  => [[ [ (#) ] ]]
@@ -61,7 +61,7 @@ space    = (" "|"\t"|"\r\n"|"\n")+ => [[ [ ] ]]
 unknown  = (.)  => [[ "Invalid input" throw ]]
 
 ops   = inc-ptr|dec-ptr|inc-mem|dec-mem|output|input|debug|space
-loop  = "[" {loop|ops}+ "]" => [[ second compose-all [ while ] curry [ (?) ] prefix ]]
+loop  = "[" {loop|ops}+ "]" => [[ second compose-all '[ [ (?) ] _ while ] ]]
 
 code  = (loop|ops|unknown)*  => [[ compose-all ]]
 
