@@ -475,7 +475,7 @@ void factor_vm::factorbug() {
   bool seen_command = false;
 
   for (;;) {
-    char cmd[1024];
+    std::string cmd;
 
     std::cout << "> " << std::flush;
 
@@ -498,9 +498,9 @@ void factor_vm::factorbug() {
 
     seen_command = true;
 
-    if (strcmp(cmd, "q") == 0)
+    if (cmd == "q")
       exit(1);
-    if (strcmp(cmd, "d") == 0) {
+    if (cmd == "d") {
       cell addr = read_cell_hex();
       if (std::cin.peek() == ' ')
         std::cin.ignore();
@@ -509,67 +509,67 @@ void factor_vm::factorbug() {
         break;
       cell count = read_cell_hex();
       dump_memory(addr, addr + count);
-    } else if (strcmp(cmd, "u") == 0) {
+    } else if (cmd == "u") {
       cell addr = read_cell_hex();
       cell count = object_size(addr);
       dump_memory(addr, addr + count);
-    } else if (strcmp(cmd, ".") == 0) {
+    } else if (cmd == ".") {
       cell addr = read_cell_hex();
       print_obj(addr);
       std::cout << std::endl;
-    } else if (strcmp(cmd, "trim") == 0)
+    } else if (cmd == "trim")
       full_output = !full_output;
-    else if (strcmp(cmd, "ds") == 0)
+    else if (cmd == "ds")
       dump_memory(ctx->datastack_seg->start, ctx->datastack);
-    else if (strcmp(cmd, "dr") == 0)
+    else if (cmd == "dr")
       dump_memory(ctx->retainstack_seg->start, ctx->retainstack);
-    else if (strcmp(cmd, ".s") == 0)
+    else if (cmd == ".s")
       print_datastack();
-    else if (strcmp(cmd, ".r") == 0)
+    else if (cmd == ".r")
       print_retainstack();
-    else if (strcmp(cmd, ".c") == 0)
+    else if (cmd == ".c")
       print_callstack();
-    else if (strcmp(cmd, "e") == 0) {
+    else if (cmd == "e") {
       for (cell i = 0; i < special_object_count; i++)
         dump_cell((cell)&special_objects[i]);
-    } else if (strcmp(cmd, "g") == 0)
+    } else if (cmd == "g")
       dump_generations();
-    else if (strcmp(cmd, "c") == 0) {
+    else if (cmd == "c") {
       exit_fep(this);
       return;
-    } else if (strcmp(cmd, "t") == 0) {
+    } else if (cmd == "t") {
       exit_fep(this);
       general_error(ERROR_INTERRUPT, false_object, false_object);
       FACTOR_ASSERT(false);
-    } else if (strcmp(cmd, "data") == 0)
+    } else if (cmd == "data")
       dump_objects(TYPE_COUNT);
-    else if (strcmp(cmd, "edges") == 0)
+    else if (cmd == "edges")
       dump_edges();
-    else if (strcmp(cmd, "refs") == 0) {
+    else if (cmd == "refs") {
       cell addr = read_cell_hex();
       std::cout << "Data heap references:" << std::endl;
       find_data_references(addr);
       std::cout << std::endl;
-    } else if (strcmp(cmd, "words") == 0)
+    } else if (cmd == "words")
       dump_objects(WORD_TYPE);
-    else if (strcmp(cmd, "tuples") == 0)
+    else if (cmd == "tuples")
       dump_objects(TUPLE_TYPE);
-    else if (strcmp(cmd, "push") == 0) {
+    else if (cmd == "push") {
       cell addr = read_cell_hex();
       ctx->push(addr);
-    } else if (strcmp(cmd, "code") == 0)
+    } else if (cmd == "code")
       dump_code_heap();
-    else if (strcmp(cmd, "compact-gc") == 0)
+    else if (cmd == "compact-gc")
       primitive_compact_gc();
-    else if (strcmp(cmd, "gc") == 0)
+    else if (cmd == "gc")
       primitive_full_gc();
-    else if (strcmp(cmd, "compact-gc") == 0)
+    else if (cmd == "compact-gc")
       primitive_compact_gc();
-    else if (strcmp(cmd, "help") == 0)
+    else if (cmd == "help")
       factorbug_usage(true);
-    else if (strcmp(cmd, "abort") == 0)
+    else if (cmd == "abort")
       abort();
-    else if (strcmp(cmd, "breakpoint") == 0)
+    else if (cmd == "breakpoint")
       breakpoint();
     else
       std::cout << "unknown command" << std::endl;
