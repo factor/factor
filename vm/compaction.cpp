@@ -191,31 +191,38 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p) {
   const object* data_finger = tenured->first_block();
   const code_block* code_finger = code->allocator->first_block();
 
-  compaction_fixup fixup(data_forwarding_map, code_forwarding_map, &data_finger,
-                         &code_finger);
-  slot_visitor<compaction_fixup> data_forwarder(this, fixup);
-  code_block_visitor<compaction_fixup> code_forwarder(this, fixup);
+  {
+    compaction_fixup fixup(data_forwarding_map, code_forwarding_map, &data_finger,
+                           &code_finger);
 
-  code_forwarder.visit_code_roots();
+    slot_visitor<compaction_fixup> data_forwarder(this, fixup);
+    code_block_visitor<compaction_fixup> code_forwarder(this, fixup);
 
-  /* Object start offsets get recomputed by the object_compaction_updater */
-  data->tenured->starts.clear_object_start_offsets();
+    code_forwarder.visit_code_roots();
 
-  /* Slide everything in tenured space up, and update data and code heap
-	pointers inside objects. */
-  object_compaction_updater object_updater(this, fixup);
-  tenured->compact(object_updater, fixup, &data_finger);
+    /* Object start offsets get recomputed by the object_compaction_updater */
+    data->tenured->starts.clear_object_start_offsets();
 
-  /* Slide everything in the code heap up, and update data and code heap
-	pointers inside code blocks. */
-  code_block_compaction_updater<compaction_fixup> code_block_updater(
-      this, fixup, data_forwarder, code_forwarder);
-  code->allocator->compact(code_block_updater, fixup, &code_finger);
+    /* Slide everything in tenured space up, and update data and code heap
+       pointers inside objects. */
+    {
+      object_compaction_updater object_updater(this, fixup);
+      tenured->compact(object_updater, fixup, &data_finger);
+    }
 
-  data_forwarder.visit_roots();
-  if (trace_contexts_p) {
-    data_forwarder.visit_contexts();
-    code_forwarder.visit_context_code_blocks();
+    /* Slide everything in the code heap up, and update data and code heap
+       pointers inside code blocks. */
+    {
+      code_block_compaction_updater<compaction_fixup> code_block_updater(
+          this, fixup, data_forwarder, code_forwarder);
+      code->allocator->compact(code_block_updater, fixup, &code_finger);
+    }
+
+    data_forwarder.visit_roots();
+    if (trace_contexts_p) {
+      data_forwarder.visit_contexts();
+      code_forwarder.visit_context_code_blocks();
+    }
   }
 
   update_code_roots_for_compaction();

@@ -273,50 +273,61 @@ void factor_vm::unix_init_signals() {
   if (sigaltstack(&signal_callstack, (stack_t*)NULL) < 0)
     fatal_error("sigaltstack() failed", 0);
 
-  struct sigaction memory_sigaction;
-  struct sigaction synchronous_sigaction;
-  struct sigaction enqueue_sigaction;
-  struct sigaction sample_sigaction;
-  struct sigaction fpe_sigaction;
-  struct sigaction ignore_sigaction;
+  {
+    struct sigaction memory_sigaction;
+    init_sigaction_with_handler(&memory_sigaction, memory_signal_handler);
+    sigaction_safe(SIGBUS, &memory_sigaction, NULL);
+    sigaction_safe(SIGSEGV, &memory_sigaction, NULL);
+    sigaction_safe(SIGTRAP, &memory_sigaction, NULL);
+  }
 
-  init_sigaction_with_handler(&memory_sigaction, memory_signal_handler);
-  sigaction_safe(SIGBUS, &memory_sigaction, NULL);
-  sigaction_safe(SIGSEGV, &memory_sigaction, NULL);
-  sigaction_safe(SIGTRAP, &memory_sigaction, NULL);
+  {
+    struct sigaction fpe_sigaction;
+    init_sigaction_with_handler(&fpe_sigaction, fpe_signal_handler);
+    sigaction_safe(SIGFPE, &fpe_sigaction, NULL);
+  }
 
-  init_sigaction_with_handler(&fpe_sigaction, fpe_signal_handler);
-  sigaction_safe(SIGFPE, &fpe_sigaction, NULL);
+  {
+    struct sigaction synchronous_sigaction;
+    init_sigaction_with_handler(&synchronous_sigaction,
+                                synchronous_signal_handler);
+    sigaction_safe(SIGILL, &synchronous_sigaction, NULL);
+    sigaction_safe(SIGABRT, &synchronous_sigaction, NULL);
+  }
 
-  init_sigaction_with_handler(&synchronous_sigaction,
-                              synchronous_signal_handler);
-  sigaction_safe(SIGILL, &synchronous_sigaction, NULL);
-  sigaction_safe(SIGABRT, &synchronous_sigaction, NULL);
-
-  init_sigaction_with_handler(&enqueue_sigaction, enqueue_signal_handler);
-  sigaction_safe(SIGWINCH, &enqueue_sigaction, NULL);
-  sigaction_safe(SIGUSR1, &enqueue_sigaction, NULL);
-  sigaction_safe(SIGCONT, &enqueue_sigaction, NULL);
-  sigaction_safe(SIGURG, &enqueue_sigaction, NULL);
-  sigaction_safe(SIGIO, &enqueue_sigaction, NULL);
-  sigaction_safe(SIGPROF, &enqueue_sigaction, NULL);
-  sigaction_safe(SIGVTALRM, &enqueue_sigaction, NULL);
+  {
+    struct sigaction enqueue_sigaction;
+    init_sigaction_with_handler(&enqueue_sigaction, enqueue_signal_handler);
+    sigaction_safe(SIGWINCH, &enqueue_sigaction, NULL);
+    sigaction_safe(SIGUSR1, &enqueue_sigaction, NULL);
+    sigaction_safe(SIGCONT, &enqueue_sigaction, NULL);
+    sigaction_safe(SIGURG, &enqueue_sigaction, NULL);
+    sigaction_safe(SIGIO, &enqueue_sigaction, NULL);
+    sigaction_safe(SIGPROF, &enqueue_sigaction, NULL);
+    sigaction_safe(SIGVTALRM, &enqueue_sigaction, NULL);
 #ifdef SIGINFO
-  sigaction_safe(SIGINFO, &enqueue_sigaction, NULL);
+    sigaction_safe(SIGINFO, &enqueue_sigaction, NULL);
 #endif
+  }
 
   handle_ctrl_c();
 
-  init_sigaction_with_handler(&sample_sigaction, sample_signal_handler);
-  sigaction_safe(SIGALRM, &sample_sigaction, NULL);
+  {
+    struct sigaction sample_sigaction;
+    init_sigaction_with_handler(&sample_sigaction, sample_signal_handler);
+    sigaction_safe(SIGALRM, &sample_sigaction, NULL);
+  }
 
   /* We don't use SA_IGN here because then the ignore action is inherited
      by subprocesses, which we don't want. There is a unit test in
      io.launcher.unix for this. */
-  init_sigaction_with_handler(&ignore_sigaction, ignore_signal_handler);
-  sigaction_safe(SIGPIPE, &ignore_sigaction, NULL);
-  /* We send SIGUSR2 to the stdin_loop thread to interrupt it on FEP */
-  sigaction_safe(SIGUSR2, &ignore_sigaction, NULL);
+  {
+    struct sigaction ignore_sigaction;
+    init_sigaction_with_handler(&ignore_sigaction, ignore_signal_handler);
+    sigaction_safe(SIGPIPE, &ignore_sigaction, NULL);
+    /* We send SIGUSR2 to the stdin_loop thread to interrupt it on FEP */
+    sigaction_safe(SIGUSR2, &ignore_sigaction, NULL);
+  }
 }
 
 /* On Unix, shared fds such as stdin cannot be set to non-blocking mode
