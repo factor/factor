@@ -55,9 +55,10 @@ ERROR: can't-deploy-library-file library ;
         deploy-threads? get [ "threads" , ] when
         "compiler" ,
         deploy-help? get [ "help" , ] when
+        native-io? [ "io" , ] when
         deploy-ui? get [ "ui" , ] when
         deploy-unicode? get [ "unicode" , ] when
-        native-io? [ "io" , ] when
+
     ] { } make ;
 
 : staging-image-name ( profile -- name )
@@ -101,7 +102,6 @@ DEFER: ?make-staging-image
 : deploy-command-line ( image vocab manifest-file config -- flags )
     [
         bootstrap-profile ?make-staging-image
-
         [
             "-i=" bootstrap-profile staging-image-name append ,
             "-resource-path=" "" resource-path append ,
