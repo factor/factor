@@ -4,7 +4,7 @@ H{
     { deploy-reflection 1 }
     { deploy-unicode? f }
     { deploy-math? t }
-    { deploy-io 2 }
+    { deploy-io 3 }
     { deploy-c-types? f }
     { deploy-name "Maze" }
     { deploy-word-props? f }

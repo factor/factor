@@ -9,6 +9,6 @@ H{
     { deploy-name "hello-unicode" }
     { deploy-math? t }
     { deploy-ui? t }
-    { deploy-io 2 }
+    { deploy-io 3 }
     { deploy-c-types? f }
 }

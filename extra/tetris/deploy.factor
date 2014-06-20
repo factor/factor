@@ -5,7 +5,7 @@ H{
     { deploy-word-props? f }
     { deploy-reflection 1 }
     { "stop-after-last-window?" t }
-    { deploy-io 2 }
+    { deploy-io 3 }
     { deploy-math? t }
     { deploy-word-defs? f }
     { deploy-c-types? f }

@@ -10,5 +10,5 @@ H{
     { deploy-math? t }
     { deploy-ui? t }
     { deploy-word-props? f }
-    { deploy-io 2 }
+    { deploy-io 3 }
 }

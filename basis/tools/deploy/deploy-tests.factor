@@ -26,7 +26,7 @@ cache-directory [
 
 [ ] [ "hello-ui" shake-and-bake 1400000 small-enough? ] unit-test
 
-[ "math-threads-compiler-ui" ] [
+[ "math-threads-compiler-io-ui" ] [
     "hello-ui" deploy-config [
         bootstrap-profile staging-image-name file-name
         "." split second

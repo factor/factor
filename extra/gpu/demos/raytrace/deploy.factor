@@ -6,7 +6,7 @@ H{
     { deploy-console? f }
     { deploy-unicode? f }
     { "stop-after-last-window?" t }
-    { deploy-io 2 }
+    { deploy-io 3 }
     { deploy-reflection 2 }
     { deploy-word-props? f }
     { deploy-math? t }
