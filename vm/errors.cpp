@@ -38,6 +38,15 @@ void out_of_memory() {
 
 /* Allocates memory */
 void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
+
+  /* If we got here from memory_protection_error(), then the stack
+     pointer has been fiddled with and the elements of these vectors,
+     which address stack-allocated objects, are bogus and needs to be
+     resetted. */
+  data_roots.clear();
+  bignum_roots.clear();
+  code_roots.clear();
+
   data_root<object> arg1(arg1_, this);
   data_root<object> arg2(arg2_, this);
 
@@ -65,11 +74,6 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
                       arg1.value(), arg2.value());
 
     ctx->push(error_object);
-
-    /* Reset local roots */
-    data_roots.clear();
-    bignum_roots.clear();
-    code_roots.clear();
 
     /* The unwind-native-frames subprimitive will clear faulting_p
        if it was successfully reached. */
