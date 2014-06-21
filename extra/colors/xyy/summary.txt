@@ -1,1 +1,1 @@
-xyY colors
+CIE xyY colors
