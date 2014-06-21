@@ -51,7 +51,9 @@ M: luva >xyza
 
 GENERIC: >luva ( color -- luva )
 
-M: object >luva >xyza >luva ;
+M: object >luva >rgba >luva ;
+
+M: rgba >luva >xyza >luva ;
 
 M: luva >luva ; inline
 
