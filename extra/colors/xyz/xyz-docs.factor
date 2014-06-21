@@ -4,7 +4,7 @@ IN: colors.xyz
 HELP: xyza
 { $class-description "The class of CIE XYZ colors with an alpha channel." } ;
 
-ARTICLE: "colors.xyz" "XYZ colors"
+ARTICLE: "colors.xyz" "CIE XYZ colors"
 "The " { $vocab-link "colors.xyz" } " vocabulary implements CIE XYZ colors, together with an alpha channel."
 { $subsections
     xyza
