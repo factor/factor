@@ -72,8 +72,11 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
     cell error_object =
         allot_array_4(special_objects[OBJ_ERROR], tag_fixnum(error),
                       arg1.value(), arg2.value());
-
     ctx->push(error_object);
+
+    /* Clear the data roots again since arg1 and arg2's destructors
+       won't be called. */
+    data_roots.clear();
 
     /* The unwind-native-frames subprimitive will clear faulting_p
        if it was successfully reached. */
