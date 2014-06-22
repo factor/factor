@@ -1,8 +1,8 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors colors colors.xyz kernel locals math
-math.functions ;
+USING: accessors colors colors.xyz colors.xyz.private kernel
+locals math math.functions ;
 
 IN: colors.luv
 
@@ -12,17 +12,10 @@ C: <luva> luva
 
 <PRIVATE
 
-CONSTANT: xyz_epsilon 216/24389
-CONSTANT: xyz_kappa 24389/27
-
 :: xyz-to-uv ( x y z -- u v )
     x y 15 * z 3 * + + :> d
     4 x * d /
     9 y * d / ; foldable
-
-CONSTANT: wp_x 0.95047
-CONSTANT: wp_y 1.00000
-CONSTANT: wp_z 1.08883
 
 PRIVATE>
 
