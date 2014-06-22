@@ -1,1 +1,1 @@
-CIE xyY colors
+CIE 1931 xyY colors

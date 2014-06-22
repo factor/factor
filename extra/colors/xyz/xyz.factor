@@ -12,6 +12,13 @@ C: <xyza> xyza
 
 <PRIVATE
 
+CONSTANT: xyz_epsilon 216/24389
+CONSTANT: xyz_kappa 24389/27
+
+CONSTANT: wp_x 0.95047
+CONSTANT: wp_y 1.00000
+CONSTANT: wp_z 1.08883
+
 : srgb-compand ( v -- v' )
     dup 0.0031308 <= [ 12.92 * ] [ 2.4 recip ^ 1.055 * 0.055 - ] if ;
 
