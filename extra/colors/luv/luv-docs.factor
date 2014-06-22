@@ -11,4 +11,5 @@ ARTICLE: "colors.luv" "CIELUV colors"
     <luva>
     >luva
 }
+"For more information, see " { $url "https://en.wikipedia.org/wiki/CIELUV_color_space" }
 { $see-also "colors" } ;
