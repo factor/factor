@@ -46,13 +46,13 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
 PRIVATE>
 
 : 2be> ( bytes -- x )
-    big-endian [ c:short deref ] [ 2 n-be> ] if-endian ;
+    big-endian [ c:ushort deref ] [ 2 n-be> ] if-endian ;
 
 : 4be> ( bytes -- x )
-    big-endian [ c:int deref ] [ 4 n-be> ] if-endian ;
+    big-endian [ c:uint deref ] [ 4 n-be> ] if-endian ;
 
 : 8be> ( bytes -- x )
-    big-endian [ c:longlong deref ] [ 8 n-be> ] if-endian ;
+    big-endian [ c:ulonglong deref ] [ 8 n-be> ] if-endian ;
 
 : be> ( bytes -- x )
     dup length {
@@ -63,13 +63,13 @@ PRIVATE>
     } case ;
 
 : 2le> ( bytes -- x )
-    little-endian [ c:short deref ] [ 2 n-le> ] if-endian ;
+    little-endian [ c:ushort deref ] [ 2 n-le> ] if-endian ;
 
 : 4le> ( bytes -- x )
-    little-endian [ c:int deref ] [ 4 n-le> ] if-endian ;
+    little-endian [ c:uint deref ] [ 4 n-le> ] if-endian ;
 
 : 8le> ( bytes -- x )
-    little-endian [ c:longlong deref ] [ 8 n-le> ] if-endian ;
+    little-endian [ c:ulonglong deref ] [ 8 n-le> ] if-endian ;
 
 : le> ( bytes -- x )
     dup length {
