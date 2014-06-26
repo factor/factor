@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax kernel math.bitwise core-foundation
+USING: alien.c-types alien.syntax core-foundation kernel
 literals ;
 IN: core-foundation.file-descriptors
 
@@ -19,16 +19,18 @@ FUNCTION: CFFileDescriptorRef CFFileDescriptorCreate (
 
 CONSTANT: kCFFileDescriptorReadCallBack 1
 CONSTANT: kCFFileDescriptorWriteCallBack 2
-   
+
 FUNCTION: void CFFileDescriptorEnableCallBacks (
     CFFileDescriptorRef f,
     CFOptionFlags callBackTypes
 ) ;
 
 : enable-all-callbacks ( fd -- )
-    flags{ kCFFileDescriptorReadCallBack kCFFileDescriptorWriteCallBack }
-    CFFileDescriptorEnableCallBacks ; inline
+    flags{
+        kCFFileDescriptorReadCallBack
+        kCFFileDescriptorWriteCallBack
+    } CFFileDescriptorEnableCallBacks ; inline
 
 : <CFFileDescriptor> ( fd callback -- handle )
-    [ f swap ] [ t swap ] bi* f CFFileDescriptorCreate
+    [ f ] 2dip [ t ] dip f CFFileDescriptorCreate
     [ "CFFileDescriptorCreate failed" throw ] unless* ;
