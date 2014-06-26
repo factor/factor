@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.data kernel bit-arrays sequences assocs math
-namespaces accessors math.order locals fry io.ports
-io.backend.unix io.backend.unix.multiplexers unix unix.ffi
-unix.time layouts ;
+USING: accessors alien.data assocs bit-arrays fry
+io.backend.unix io.backend.unix.multiplexers kernel layouts
+locals math math.order sequences unix.ffi unix.time ;
 IN: io.backend.unix.multiplexers.select
 
 TUPLE: select-mx < mx read-fdset write-fdset ;
@@ -13,8 +12,8 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
 ! byte order differences on big endian platforms
 : munge ( i -- i' )
     little-endian? [
-      cell 4 = [ 0b11000 ] [ 0b111000 ] if
-      bitxor ] unless ; inline
+        cell 4 = 0b11000 0b111000 ? bitxor
+    ] unless ; inline
 
 : <select-mx> ( -- mx )
     select-mx new-mx
