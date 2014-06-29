@@ -1,6 +1,6 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax yaml.ffi ;
+USING: help.markup help.syntax yaml.ffi yaml.conversion ;
 IN: yaml.config
 
 HELP: +libyaml-default+
@@ -30,7 +30,21 @@ HELP: emitter-width
 { $var-description "If set, " { $link yaml_emitter_set_width } " is called with the value of this variable at the beginning of each document." } ;
 
 ARTICLE: "yaml-config" "YAML control variables"
-"The following variables control the YAML serialization/deserialization"
+{ $subsections
+  "yaml-input"
+  "yaml-output"
+}
+;
+
+ARTICLE: "yaml-input" "YAML deserialization control"
+"The following variables control the YAML deserialization process:"
+{ $heading "Special Keys" }
+{ $subsections
+  value
+  merge
+} ;
+ARTICLE: "yaml-output" "YAML serialization control"
+"The following variables control the YAML serialization process:"
 { $heading "LibYAML's emitter:" }
 { $subsections
   emitter-canonical
@@ -69,4 +83,11 @@ HELP: implicit-end
 
 { implicit-start implicit-end } related-words
 
+HELP: merge
+{ $var-description "If false, deserialized yaml documents will contain instances of " { $link yaml-merge } " for !!merge keys and the value associated with this key will not be merged into the enclosing mapping. You can then call ?apply-merge-key on such a mapping to perform the merge."  } ;
+
+HELP: value
+{ $var-description "If false, deserialized yaml documents will contain instances of " { $link yaml-value } " for !!value keys and the value associated with this key will replace the enclosing mapping. You can then call scalar-value on such a mapping to get the default value."  } ;
 ABOUT: "yaml-config"
+{ yaml-merge merge } related-words
+{ yaml-value value } related-words

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs byte-arrays hash-sets hashtables calendar
 help.markup help.syntax kernel linked-assocs math sequences sets
-strings yaml.ffi yaml.config ;
+strings yaml.ffi yaml.config yaml.conversion ;
 IN: yaml
 
 HELP: >yaml
@@ -73,6 +73,22 @@ HELP: yaml-unexpected-event
 }
 { $description "LibYAML produced the unexpected event " { $snippet "actual" } ", but the list of expected events is " { $snippet "expected" } "." } ;
 
+HELP: ?apply-merge-key
+{ $values
+    { "assoc" assoc }
+    { "assoc'" assoc }
+}
+{ $description "Merges the value of the !!merge key in " { $snippet "assoc" } } ;
+{ merge ?apply-merge-key } related-words
+{ value scalar-value } related-words
+
+HELP: scalar-value
+{ $values
+    { "obj" object }
+    { "obj'" object }
+}
+{ $description "If " { $snippet "obj" } " is hashtable, returns it's default value, else return " { $snippet "obj" } " itself."  } ;
+
 ARTICLE: "yaml-mapping" "Mapping between Factor and YAML types"
 { $heading "Types mapping" }
 "The rules in the table below are used to convert between yaml and factor objects."
@@ -94,6 +110,9 @@ ARTICLE: "yaml-mapping" "Mapping between Factor and YAML types"
   { { $snippet "mappings" } "" }
   { "!!map" { $link hashtable } }
   { "!!set" { $link hash-set } }
+  { { $snippet "special keys" } "" }
+  { "!!merge" { $link yaml-merge } }
+  { "!!value" { $link yaml-value } }
 }
 
 { $heading "YAML to Factor Round Tripping" }
@@ -112,24 +131,6 @@ ARTICLE: "yaml-mapping" "Mapping between Factor and YAML types"
 "Examples of type precedence which preserves type: " { $link byte-array } " over " { $link sequence } "."
 ;
 
-ARTICLE: "yaml-output" "Serialization control"
-"TODO allow to control the serialization details, for example"
-{ $list
-  "force explicit/implicit types"
-  "force flow/block styles"
-  "etc."
-}
-;
-ARTICLE: "yaml-input" "Deserialization control"
-"TODO, implement or drop the following features:"
-{ $list
-  "Activate/deactivate !!value"
-  "Activate/deactivate !!merge ?"
-  "Activate/deactivate YAML1.1 compatibility (ie boolean as On, OFF etc)"
-  "select schema: \"failsafe\", \"JSON\", \"Core\" ?"
-  "etc."
-}
-;
 ARTICLE: "yaml-errors" "YAML errors"
 { $heading "libYAML's errors" }
 "LibYAML exposes error when parsing/emitting yaml. See " { $url "http://pyyaml.org/wiki/LibYAML" } ". More information is available directly in pyyaml's source code in their C interface. They are groupped in the following errors:"
@@ -149,6 +150,43 @@ ARTICLE: "yaml-errors" "YAML errors"
 "The following error probably means that there is a bug in the implementation: " { $link yaml-unexpected-event }
 ;
 
+ARTICLE: "yaml-keys" "Special mapping keys"
+"The following special keys have been implemented for !!map. By default, these keys will be taken into account when deserializing yaml documents. To keep the original document structure, configuration variables can be set. See " { $link "yaml-config" } "."
+{ $heading "!!merge" }
+"See " { $url "http://yaml.org/type/merge.html" } $nl
+"As per " { $url "http://sourceforge.net/p/yaml/mailman/message/12308050" }
+", the merge key is implemented bottom up:" $nl
+{ $example """USING: yaml prettyprint ;
+"
+foo: 1
+<<:
+  bar: 2
+  <<:
+    baz: 3
+" yaml> ."""
+"""H{ { "bar" 2 } { "foo" 1 } { "baz" 3 } }""" }
+{ $heading "!!value" }
+"See " { $url "http://yaml.org/type/value.html" } $nl
+{ $example """USING: yaml prettyprint ;
+"
+---     # Old schema
+link with:
+  - library1.dll
+  - library2.dll
+---     # New schema
+link with:
+  - = : library1.dll
+    version: 1.2
+  - = : library2.dll
+    version: 2.3
+" yaml-docs> ."""
+"""{
+    H{ { "link with" { "library1.dll" "library2.dll" } } }
+    H{ { "link with" { "library1.dll" "library2.dll" } } }
+}"""
+}
+
+;
 ARTICLE: "yaml" "YAML serialization"
 "The " { $vocab-link "yaml" } " vocabulary implements YAML serialization/deserialization. It uses LibYAML, a YAML parser and emitter written in C (" { $url "http://pyyaml.org/wiki/LibYAML" } ")."
 { $heading "Main conversion words" }
@@ -161,8 +199,7 @@ ARTICLE: "yaml" "YAML serialization"
 { $heading "Next topics:" }
 { $subsections
 "yaml-mapping"
-"yaml-output"
-"yaml-input"
+"yaml-keys"
 "yaml-errors"
 "yaml-config"
 }
