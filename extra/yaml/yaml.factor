@@ -232,9 +232,11 @@ M: string apply-merge-keys nip ;
 : ?apply-merge-key ( assoc -- assoc' )
     T{ yaml-merge } over pop-at*
     [ merge-value ] [ drop ] if ;
+: ?apply-default-key ( assoc -- obj' )
+    T{ yaml-value } over pop-at* [ nip ] [ drop ] if ;
 M: assoc apply-merge-keys
     [ [ ?apply-merge-keys ] bi-curry@ bi ] with2 assoc-map!
-    ?apply-merge-key ;
+    ?apply-merge-key ?apply-default-key ;
 
 :: parse-yaml-doc ( parser event -- obj )
     H{ } clone anchors [
@@ -394,7 +396,7 @@ GENERIC: emit-value ( emitter event anchor obj -- )
 ! strings and special keys are the only things that need special treatment
 ! because they can have the same representation
 : emit-mapping-key ( emitter event obj -- )
-    dup [ string? ] [ yaml-merge? ] bi or
+    dup { [ string? ] [ yaml-merge? ] [ yaml-value? ] } 1||
     [ [ f ] dip emit-mapping-key-scalar ] [ emit-object ] if ;
 
 M: object emit-value ( emitter event anchor obj -- ) emit-scalar ;
