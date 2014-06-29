@@ -30,3 +30,9 @@ SYMBOL: implicit-start
 SYMBOL: implicit-end
 t implicit-start set-global
 t implicit-end set-global
+
+! By default, give the simplest representation of the document
+SYMBOL: merge
+SYMBOL: value
+t merge set-global
+t value set-global

@@ -521,6 +521,16 @@ CONSTANT: recursive-merge-obj3 H{
 ${ recursive-merge-obj3 } [ $ recursive-merge-str3 yaml> ] unit-test
 ${ recursive-merge-obj3 } [ $ recursive-merge-obj3 >yaml yaml> ] unit-test
 
+! Serializing merge
+CONSTANT: serialize-merge-obj H{
+  { T{ yaml-merge } H{ { 1 2 } } }
+}
+CONSTANT: serialize-merge-obj2 H{ { 1 2 } }
+${ serialize-merge-obj2 } [ $ serialize-merge-obj >yaml yaml> ] unit-test
+f merge [
+  ${ serialize-merge-obj } [ $ serialize-merge-obj >yaml yaml> ] unit-test
+] with-variable
+
 ! !!!!!!!!!!!!!!!
 ! construct-omap
 CONSTANT: construct-omap-obj H{
@@ -683,8 +693,8 @@ CONSTANT: construct-value-unsafe-obj {
     H{ { "link with" { "library1.dll" "library2.dll" } } }
     H{ {
         "link with" {
-            H{ { "=" "library1.dll" } { "version" 1.2 } }
-            H{ { "=" "library2.dll" } { "version" 2.3 } }
+            H{ { T{ yaml-value } "library1.dll" } { "version" 1.2 } }
+            H{ { T{ yaml-value } "library2.dll" } { "version" 2.3 } }
         }
     } }
 }
@@ -707,6 +717,25 @@ link with:
 
 ${ construct-value-safe-obj } [ $ construct-value-str yaml-docs> ] unit-test
 ${ construct-value-safe-obj } [ $ construct-value-safe-obj >yaml-docs yaml-docs> ] unit-test
+f value [
+  ${ construct-value-unsafe-obj } [ $ construct-value-str yaml-docs> ] unit-test
+  ${ construct-value-unsafe-obj } [ $ construct-value-unsafe-obj >yaml-docs yaml-docs> ] unit-test
+  ${ construct-value-safe-obj } [
+    $ construct-value-str yaml-docs> [
+     dup "link with" swap [ [ scalar-value ] map ] change-at
+    ] map
+  ] unit-test
+] with-variable
+
+! Serializing value
+CONSTANT: serialize-value-obj H{
+  { T{ yaml-value } 1 }
+}
+CONSTANT: serialize-value-obj2 1
+${ serialize-value-obj2 } [ $ serialize-value-obj >yaml yaml> ] unit-test
+f value [
+  ${ serialize-value-obj } [ $ serialize-value-obj >yaml yaml> ] unit-test
+] with-variable
 
 ! !!!!!!!!!!!!!!!
 ! errors
