@@ -679,9 +679,7 @@ ${ construct-timestamp-obj } [ $ construct-timestamp-obj >yaml yaml> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! construct-value
-! TODO: find something better to do with '=' ? see http://yaml.org/type/value.html
-! Maybe a global parameter to replace all maps with their default values ? See pyyaml SafeConstructor
-CONSTANT: construct-value-obj {
+CONSTANT: construct-value-unsafe-obj {
     H{ { "link with" { "library1.dll" "library2.dll" } } }
     H{ {
         "link with" {
@@ -689,6 +687,10 @@ CONSTANT: construct-value-obj {
             H{ { "=" "library2.dll" } { "version" 2.3 } }
         }
     } }
+}
+CONSTANT: construct-value-safe-obj {
+    H{ { "link with" { "library1.dll" "library2.dll" } } }
+    H{ { "link with" { "library1.dll" "library2.dll" } } }
 }
 
 CONSTANT: construct-value-str """---     # Old schema
@@ -703,8 +705,8 @@ link with:
     version: 2.3
 """
 
-${ construct-value-obj } [ $ construct-value-str yaml-docs> ] unit-test
-${ construct-value-obj } [ $ construct-value-obj >yaml-docs yaml-docs> ] unit-test
+${ construct-value-safe-obj } [ $ construct-value-str yaml-docs> ] unit-test
+${ construct-value-safe-obj } [ $ construct-value-safe-obj >yaml-docs yaml-docs> ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! errors

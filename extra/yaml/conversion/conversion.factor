@@ -8,6 +8,7 @@ IN: yaml.conversion
 
 ! http://yaml.org/type/
 CONSTANT: YAML_MERGE_TAG "tag:yaml.org,2002:merge"
+CONSTANT: YAML_VALUE_TAG "tag:yaml.org,2002:value"
 
 ! !!!!!!!!!!!!!!
 ! tag resolution
@@ -41,9 +42,11 @@ CONSTANT: re-timestamp R/ [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]|[0-9][0-9][
     } cond-case ;
 
 CONSTANT: re-merge R/ <</
+CONSTANT: re-value R/ =/
 : (resolve-mapping-key-plain-scalar) ( str -- tag )
     {
         { [ re-merge matches? ] [ YAML_MERGE_TAG ] }
+        { [ re-value matches? ] [ YAML_VALUE_TAG ] }
         [ drop YAML_STR_TAG ]
     } cond-case ;
 
@@ -116,6 +119,8 @@ CONSTANT: YAML_SET_TAG "tag:yaml.org,2002:set"
 
 TUPLE: yaml-merge ;
 C: <yaml-merge> yaml-merge
+TUPLE: yaml-value ;
+C: <yaml-value> yaml-value
 
 : construct-scalar ( scalar-event mapping-key? -- scalar )
     [ drop value>> ] [ resolve-scalar ] 2bi {
@@ -126,6 +131,7 @@ C: <yaml-merge> yaml-merge
         { YAML_BINARY_TAG [ base64> ] }
         { YAML_TIMESTAMP_TAG [ construct-timestamp ] }
         { YAML_MERGE_TAG [ drop <yaml-merge> ] }
+        { YAML_VALUE_TAG [ drop <yaml-value> ] }
         { YAML_STR_TAG [ ] }
     } case ;
 
@@ -176,3 +182,6 @@ M: timestamp yaml-tag ( obj -- str ) drop YAML_TIMESTAMP_TAG ;
 
 M: yaml-merge represent-scalar ( obj -- str ) drop "<<" ;
 M: yaml-merge yaml-tag ( obj -- str ) drop YAML_MERGE_TAG ;
+
+M: yaml-value represent-scalar ( obj -- str ) drop "=" ;
+M: yaml-value yaml-tag ( obj -- str ) drop YAML_VALUE_TAG ;
