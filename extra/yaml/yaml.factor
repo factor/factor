@@ -218,6 +218,20 @@ M: assoc (deref-aliases)
 GENERIC: merge-value ( assoc value -- assoc' )
 M: sequence merge-value merge-values merge-value ;
 M: assoc merge-value over assoc-diff assoc-union! ;
+: pop-at* ( key assoc -- value/f ? )
+    [ at* ] 2keep pick [ delete-at ] [ 2drop ] if ;
+
+: ?apply-default-key ( assoc -- obj' )
+    T{ yaml-value } over pop-at* [ nip ] [ drop ] if ;
+PRIVATE>
+
+: ?apply-merge-key ( assoc -- assoc' )
+    T{ yaml-merge } over pop-at*
+    [ merge-value ] [ drop ] if ;
+: scalar-value ( obj -- obj' )
+    dup hashtable? [ ?apply-default-key ] when ;
+
+<PRIVATE
 
 GENERIC: apply-merge-keys ( already-applied-set obj -- obj' )
 : ?apply-merge-keys ( set obj -- obj' )
@@ -227,22 +241,16 @@ M: sequence apply-merge-keys
 M: object apply-merge-keys nip ;
 M: byte-array apply-merge-keys nip ;
 M: string apply-merge-keys nip ;
-: pop-at* ( key assoc -- value/f ? )
-    [ at* ] 2keep pick [ delete-at ] [ 2drop ] if ;
-: ?apply-merge-key ( assoc -- assoc' )
-    T{ yaml-merge } over pop-at*
-    [ merge-value ] [ drop ] if ;
-: ?apply-default-key ( assoc -- obj' )
-    T{ yaml-value } over pop-at* [ nip ] [ drop ] if ;
 M: assoc apply-merge-keys
     [ [ ?apply-merge-keys ] bi-curry@ bi ] with2 assoc-map!
-    ?apply-merge-key ?apply-default-key ;
+    merge get [ ?apply-merge-key ] when
+    value get [ ?apply-default-key ] when ;
 
 :: parse-yaml-doc ( parser event -- obj )
     H{ } clone anchors [
         parser event next-value
         anchors get swap (deref-aliases)
-        IHS{ } clone swap ?apply-merge-keys
+        merge get value get or [ IHS{ } clone swap ?apply-merge-keys ] when
     ] with-variable ;
 
 :: ?parse-yaml-doc ( parser event -- obj/f ? )
