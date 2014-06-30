@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff, Erik Charlebois bsd license
-USING: accessors alien.c-types arrays combinators delegate fry
-generic.parser kernel macros math parser sequences words words.symbol
-classes.singleton assocs ;
+USING: accessors alien.c-types arrays assocs classes.singleton
+combinators delegate fry kernel macros math parser sequences
+words ;
 IN: alien.enums
 
 <PRIVATE
@@ -52,6 +52,6 @@ PRIVATE>
 : define-enum ( word base-type members -- )
     [ (define-enum) ]
     [ [ define-enum-value ] assoc-each ] bi ;
-    
+
 PREDICATE: enum-c-type-word < c-type-word
     "c-type" word-prop enum-c-type? ;
