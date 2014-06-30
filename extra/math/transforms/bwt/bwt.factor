@@ -12,4 +12,4 @@ IN: math.transforms.bwt
 : ibwt ( newseq -- seq )
     [ length [ { } <array> ] keep ] keep
     '[ _ [ prefix ] 2map natural-sort ] times
-    [ { 0 } tail? ] find nip but-last ;
+    [ last 0 = ] find nip but-last ;
