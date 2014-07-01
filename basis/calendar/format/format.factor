@@ -133,9 +133,18 @@ M: timestamp year. ( timestamp -- )
         { +gt+ [ "+" write (write-rfc3339-gmt-offset) ] }
     } case ;
 
+! Should be enough for anyone, allows to not do a fancy
+! algorithm to detect infinite decimals (e.g 1/3)
+CONSTANT: rfc3339-precision 5
+: write-rfc3339-seconds ( timestamp -- )
+    second>> 1 mod rfc3339-precision 10^ * round >integer
+    number>string rfc3339-precision CHAR: 0 pad-head
+    [ CHAR: 0 = ] trim-tail [ "." write write ] unless-empty ;
+
 : (timestamp>rfc3339) ( timestamp -- )
     {
         YYYY "-" MM "-" DD "T" hh ":" mm ":" ss
+        write-rfc3339-seconds
         [ gmt-offset>> write-rfc3339-gmt-offset ]
     } formatted ;
 
