@@ -24,10 +24,10 @@ HELP: allocation-size
 { $values { "insns" { $link sequence } " of " { $link insn } } { "n" number } }
 { $description "Calculates the total number of bytes allocated by the block." }
 { $examples
-  { $example
+  { $unchecked-example
     "USING: accessors compiler.cfg.debugger compiler.cfg.gc-checks.private kernel prettyprint sequences ;"
     "[ V{ } clone ] test-ssa first entry>> successors>> first instructions>> allocation-size ."
-    "32"
+    "32 ! 16 on 32-bit"
   }
 } ;
 
