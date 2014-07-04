@@ -25,14 +25,6 @@ FUNCTION-ALIAS: set-errno
 
 LIBRARY: libc
 
-FUNCTION: c-string strerror ( int errno ) ;
-
-ERROR: libc-error errno message ;
-
-: (io-error) ( -- * ) errno dup strerror libc-error ;
-
-: io-error ( n -- ) 0 < [ (io-error) ] when ;
-
 FUNCTION-ALIAS: (malloc)
     void* malloc ( size_t size ) ;
 
@@ -44,6 +36,16 @@ FUNCTION-ALIAS: (free)
 
 FUNCTION-ALIAS: (realloc)
     void* realloc ( void* alien, size_t size ) ;
+
+HOOK: strerror os ( errno -- str )
+
+FUNCTION: int strerror_r ( int errno, char* buf, size_t buflen ) ;
+
+ERROR: libc-error errno message ;
+
+: (io-error) ( -- * ) errno dup strerror libc-error ;
+
+: io-error ( n -- ) 0 < [ (io-error) ] when ;
 
 <PRIVATE
 
