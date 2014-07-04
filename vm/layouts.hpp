@@ -83,7 +83,7 @@ enum {
   FP_TRAP_OVERFLOW = 1 << 1,
   FP_TRAP_UNDERFLOW = 1 << 2,
   FP_TRAP_ZERO_DIVIDE = 1 << 3,
-  FP_TRAP_INEXACT = 1 << 4,
+  FP_TRAP_INEXACT = 1 << 4
 };
 
 /* What Factor calls 'f' */

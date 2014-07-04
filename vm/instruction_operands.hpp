@@ -64,7 +64,7 @@ enum relocation_class {
   /* absolute address in a 1 byte location */
   RC_ABSOLUTE_1,
   /* absolute address in a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence */
-  RC_ABSOLUTE_PPC_2_2_2_2,
+  RC_ABSOLUTE_PPC_2_2_2_2
 };
 
 static const cell rel_absolute_ppc_2_mask = 0x0000ffff;

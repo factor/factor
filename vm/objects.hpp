@@ -104,7 +104,7 @@ enum special_object {
 
   OBJ_WAITING_CALLBACKS = 73,
 
-  OBJ_SIGNAL_PIPE = 74, /* file descriptor for pipe used to communicate signals
+  OBJ_SIGNAL_PIPE = 74  /* file descriptor for pipe used to communicate signals
                            only used on unix */
 };
 
