@@ -15,6 +15,7 @@ TUPLE: run-loop-mx kqueue-mx ;
         2drop
         0 mx get-global kqueue-mx>> wait-for-events
         enable-all-callbacks
+        reset-run-loop
         yield
     ] alien-callback ;
 
