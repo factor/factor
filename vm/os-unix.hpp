@@ -46,4 +46,6 @@ void move_file(const vm_char* path1, const vm_char* path2);
 
 static inline void breakpoint() { __builtin_trap(); }
 
+int THREADSAFE_STRERROR(int errnum, char *buf, size_t buflen);
+
 }
