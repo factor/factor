@@ -9,9 +9,6 @@ IN: libc
 
 HOOK: strerror os ( errno -- str )
 
-! For strerror on Unix all platforms
-<< os windows? [ "libc.unix" require ] unless >>
-
 ! For libc.linux, libc.windows, libc.macosx...
 << "libc." os unparse append require >>
 
@@ -42,6 +39,12 @@ FUNCTION-ALIAS: (free)
 
 FUNCTION-ALIAS: (realloc)
     void* realloc ( void* alien, size_t size ) ;
+
+FUNCTION-ALIAS: strerror_unsafe
+    char* strerror ( int errno ) ;
+
+! Add a default strerror even though it's not threadsafe
+M: object strerror strerror_unsafe ;
 
 FUNCTION: int strerror_r ( int errno, char* buf, size_t buflen ) ;
 
@@ -121,3 +124,6 @@ FUNCTION: int system ( c-string command ) ;
 
 DESTRUCTOR: free
 DESTRUCTOR: (free)
+
+! For strerror on Unix all platforms
+<< os windows? [ "libc.unix" require ] unless >>
