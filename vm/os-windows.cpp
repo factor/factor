@@ -373,4 +373,6 @@ void factor_vm::end_sampling_profiler_timer() {
 
 void abort() { ::abort(); }
 
+int THREADSAFE_STRERROR(int errnum, char *buf, size_t buflen) {
+  return strerror_s(buf, buflen, errnum);
 }

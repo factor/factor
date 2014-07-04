@@ -200,12 +200,26 @@ bool factor_vm::read_embedded_image_footer(FILE* file,
   return footer->magic == image_magic;
 }
 
+char *threadsafe_strerror(int errnum) {
+  char *buf = (char *) malloc(STRERROR_BUFFER_SIZE);
+  if(!buf) {
+    fatal_error("Out of memory in threadsafe_strerror", 0);
+  }
+  int ret = THREADSAFE_STRERROR(errnum, buf, STRERROR_BUFFER_SIZE);
+  if(ret != 0) {
+    std::cout << "Truncated output from THREADSAFE_STRERROR, error code:" << errnum << ", ret: " << ret << std::endl;
+  }
+  return buf;
+}
+
 FILE* factor_vm::open_image(vm_parameters* p) {
   if (p->embedded_image) {
     FILE* file = OPEN_READ(p->executable_path);
     if (file == NULL) {
       std::cout << "Cannot open embedded image" << std::endl;
-      std::cout << strerror(errno) << std::endl;
+      char *msg = threadsafe_strerror(errno);
+      std::cout << "strerror: " << msg << std::endl;
+      free(msg);
       exit(1);
     }
     embedded_image_footer footer;
@@ -225,7 +239,9 @@ void factor_vm::load_image(vm_parameters* p) {
   FILE* file = open_image(p);
   if (file == NULL) {
     std::cout << "Cannot open image file: " << p->image_path << std::endl;
-    std::cout << strerror(errno) << std::endl;
+    char *msg = threadsafe_strerror(errno);
+    std::cout << "strerror: " << msg << std::endl;
+    free(msg);
     exit(1);
   }
 
@@ -265,7 +281,9 @@ bool factor_vm::save_image(const vm_char* saving_filename,
   file = OPEN_WRITE(saving_filename);
   if (file == NULL) {
     std::cout << "Cannot open image file for writing: " << saving_filename << std::endl;
-    std::cout << strerror(errno) << std::endl;
+    char *msg = threadsafe_strerror(errno);
+    std::cout << "strerror: " << msg << std::endl;
+    free(msg);
     return false;
   }
 
@@ -295,8 +313,12 @@ bool factor_vm::save_image(const vm_char* saving_filename,
     ok = false;
   safe_fclose(file);
 
-  if (!ok)
-    std::cout << "save-image failed: " << strerror(errno) << std::endl;
+  if (!ok) {
+    std::cout << "save-image failed." << std::endl;
+    char *msg = threadsafe_strerror(errno);
+    std::cout << "strerror: " << msg << std::endl;
+    free(msg);
+  }
   else
     move_file(saving_filename, filename);
 
