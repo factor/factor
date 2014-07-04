@@ -93,4 +93,6 @@ inline static void breakpoint() { DebugBreak(); }
 #define FUNCTION_TOC_POINTER(ptr) ptr
 
 extern HANDLE boot_thread;
+
+int THREADSAFE_STRERROR(int errnum, char *buf, size_t buflen);
 }
