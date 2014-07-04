@@ -264,7 +264,7 @@ bool factor_vm::save_image(const vm_char* saving_filename,
 
   file = OPEN_WRITE(saving_filename);
   if (file == NULL) {
-    std::cout << "Cannot open image file: " << saving_filename << std::endl;
+    std::cout << "Cannot open image file for writing: " << saving_filename << std::endl;
     std::cout << strerror(errno) << std::endl;
     return false;
   }
