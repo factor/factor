@@ -9,6 +9,10 @@ IN: libc
 
 HOOK: strerror os ( errno -- str )
 
+! For strerror on Unix all platforms
+<< os windows? [ "libc.unix" require ] unless >>
+
+! For libc.linux, libc.windows, libc.macosx...
 << "libc." os unparse append require >>
 
 LIBRARY: factor
