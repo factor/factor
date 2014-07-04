@@ -7,6 +7,8 @@ combinators continuations destructors destructors.private kernel math
 namespaces prettyprint sequences sets summary system vocabs vocabs.parser ;
 IN: libc
 
+HOOK: strerror os ( errno -- str )
+
 << "libc." os unparse append require >>
 
 LIBRARY: factor
@@ -36,8 +38,6 @@ FUNCTION-ALIAS: (free)
 
 FUNCTION-ALIAS: (realloc)
     void* realloc ( void* alien, size_t size ) ;
-
-HOOK: strerror os ( errno -- str )
 
 FUNCTION: int strerror_r ( int errno, char* buf, size_t buflen ) ;
 

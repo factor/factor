@@ -1,4 +1,5 @@
-USING: alien.strings destructors kernel libc system ;
+USING: alien.c-types alien.strings alien.syntax destructors
+kernel libc system ;
 IN: libc
 
 LIBRARY: libc
