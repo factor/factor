@@ -1,4 +1,4 @@
-USING: alien.syntax ;
+USING: alien.strings destructors kernel libc system ;
 IN: libc
 
 LIBRARY: libc
@@ -102,3 +102,14 @@ CONSTANT: SIGBREAK        21
 CONSTANT: SIGABRT         22
 
 CONSTANT: SIGABRT_COMPAT  6
+
+LIBRARY: libc
+
+FUNCTION: int strerror_s ( char *buffer, size_t numberOfElements, int errnum ) ;
+
+M: windows strerror ( errno -- str )
+    [
+        [ 1024 [ malloc &free ] keep ] dip
+        [ strerror_s drop ] 3keep 2drop
+        alien>native-string
+    ] with-destructors ;
