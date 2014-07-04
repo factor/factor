@@ -13,7 +13,7 @@ HELP: >py
 { $examples
   { $example
     "USING: arrays prettyprint python sequences ;"
-    "10 iota >array >py py> ."
+    "py-initialize 10 iota >array >py py> ."
     "{ 0 1 2 3 4 5 6 7 8 9 }"
   }
 }
