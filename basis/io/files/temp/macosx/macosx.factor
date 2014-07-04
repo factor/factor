@@ -1,7 +1,7 @@
 ! (c)2012 Joe Groff bsd license
 USING: alien.c-types alien.syntax cocoa.plists cocoa.runtime
 cocoa.types core-foundation.strings io.directories io.files
-io.files.temp io.pathnames kernel memoize sequences system ;
+io.files.temp io.pathnames kernel sequences system ;
 IN: io.files.temp.macosx
 
 <PRIVATE
@@ -31,12 +31,12 @@ CONSTANT: factor-bundle-name "org.factorcode.Factor"
 
 PRIVATE>
 
-MEMO: (temp-directory) ( -- path )
+: (temp-directory) ( -- path )
     NSTemporaryDirectory CF>string (make-factor-bundle-subdir) ;
 
 M: macosx temp-directory (temp-directory) ;
 
-MEMO: (cache-directory) ( -- path )
+: (cache-directory) ( -- path )
     NSCachesDirectory NSUserDomainMask 1 NSSearchPathForDirectoriesInDomains
     plist> (first-existing) (make-factor-bundle-subdir) ;
 
