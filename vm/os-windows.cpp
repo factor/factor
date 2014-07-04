@@ -376,3 +376,5 @@ void abort() { ::abort(); }
 int THREADSAFE_STRERROR(int errnum, char *buf, size_t buflen) {
   return strerror_s(buf, buflen, errnum);
 }
+
+}
