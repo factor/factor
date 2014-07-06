@@ -2,15 +2,12 @@
 ! Copyright (C) 2007, 2010 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.destructors alien.syntax assocs
-combinators continuations destructors destructors.private kernel math
-namespaces prettyprint sequences sets summary system vocabs vocabs.parser ;
+USING: accessors alien alien.c-types alien.destructors
+alien.syntax destructors destructors.private kernel math
+namespaces prettyprint sequences sets summary system vocabs ;
 IN: libc
 
 HOOK: strerror os ( errno -- str )
-
-! For libc.linux, libc.windows, libc.macosx...
-<< "libc." os unparse append require >>
 
 LIBRARY: factor
 
@@ -123,5 +120,5 @@ FUNCTION: int system ( c-string command ) ;
 DESTRUCTOR: free
 DESTRUCTOR: (free)
 
-! For strerror on Unix all platforms
-<< os windows? [ "libc.unix" require ] unless >>
+! For libc.linux, libc.windows, libc.macosx...
+<< "libc." os unparse append require >>
