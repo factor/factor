@@ -1,6 +1,7 @@
-USING: accessors alien alien.c-types alien.data alien.strings arrays assocs
-command-line fry hashtables io.encodings.utf8 kernel namespaces python.errors
-python.ffi python.objects sequences specialized-arrays strings vectors ;
+USING: alien.c-types alien.data arrays assocs command-line fry
+hashtables init io.encodings.utf8 kernel namespaces
+python.errors python.ffi python.objects sequences
+specialized-arrays strings vectors ;
 IN: python
 QUALIFIED: math
 
@@ -96,3 +97,6 @@ ERROR: missing-type type ;
 : py> ( py-obj -- obj )
     dup "__class__" getattr "__name__" getattr PyString_AsString
     py-type-dispatch get ?at [ call( x -- x ) ] [ missing-type ] if ;
+
+[ py-initialize ] "py-initialize" add-startup-hook
+[ py-finalize ] "py-finalize" add-shutdown-hook
