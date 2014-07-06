@@ -66,6 +66,7 @@ typedef HANDLE THREADHANDLE;
 
 #define OPEN_READ(path) _wfopen((path), L"rb")
 #define OPEN_WRITE(path) _wfopen((path), L"wb")
+#define THREADSAFE_STRERROR(errnum, buf, buflen) strerror_s(buf, buflen, errnum)
 
 inline static void early_init() {}
 uint64_t nano_count();
@@ -94,5 +95,4 @@ inline static void breakpoint() { DebugBreak(); }
 
 extern HANDLE boot_thread;
 
-int THREADSAFE_STRERROR(int errnum, char *buf, size_t buflen);
 }

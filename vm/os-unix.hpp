@@ -31,6 +31,7 @@ typedef char symbol_char;
 
 #define OPEN_READ(path) fopen(path, "rb")
 #define OPEN_WRITE(path) fopen(path, "wb")
+#define THREADSAFE_STRERROR(errnum, buf, buflen) strerror_r(errnum, buf, buflen)
 
 #define print_native_string(string) print_string(string)
 
@@ -45,7 +46,5 @@ void sleep_nanos(uint64_t nsec);
 void move_file(const vm_char* path1, const vm_char* path2);
 
 static inline void breakpoint() { __builtin_trap(); }
-
-int THREADSAFE_STRERROR(int errnum, char *buf, size_t buflen);
 
 }
