@@ -46,8 +46,6 @@ FUNCTION-ALIAS: strerror_unsafe
 ! Add a default strerror even though it's not threadsafe
 M: object strerror strerror_unsafe ;
 
-FUNCTION: int strerror_r ( int errno, char* buf, size_t buflen ) ;
-
 ERROR: libc-error errno message ;
 
 : (io-error) ( -- * ) errno dup strerror libc-error ;

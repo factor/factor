@@ -1,4 +1,5 @@
-USING: alien.syntax ;
+USING: alien.c-types alien.strings alien.syntax destructors
+kernel system ;
 IN: libc
 
 LIBRARY: libc
@@ -139,3 +140,11 @@ CONSTANT: SIGWINCH  28
 CONSTANT: SIGINFO   29
 CONSTANT: SIGUSR1   30
 CONSTANT: SIGUSR2   31
+
+FUNCTION: int strerror_r ( int errno, char* buf, size_t buflen ) ;
+
+M: macosx strerror ( errno -- str )
+    [
+        1024 [ malloc &free ] keep [ strerror_r ] 2keep drop nip
+        alien>native-string
+    ] with-destructors ;
