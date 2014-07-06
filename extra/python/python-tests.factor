@@ -2,8 +2,6 @@ USING: accessors arrays assocs calendar continuations destructors fry kernel
 math namespaces python python.ffi python.objects sequences strings tools.test ;
 IN: python
 
-py-initialize
-
 : py-test ( result quot -- )
     '[ _ with-destructors ] unit-test ; inline
 
