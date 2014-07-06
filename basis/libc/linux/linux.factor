@@ -1,4 +1,4 @@
-USING: alien.syntax ;
+USING: alien.c-types alien.syntax destructors kernel system ;
 IN: libc
 
 LIBRARY: libc
@@ -169,3 +169,10 @@ CONSTANT: SIGIO           29
 ALIAS:    SIGPOLL         SIGIO
 CONSTANT: SIGPWR          30
 CONSTANT: SIGSYS          31
+
+FUNCTION: c-string strerror_r ( int errno, char* buf, size_t buflen ) ;
+
+M: linux strerror ( errno -- str )
+    [
+        1024 [ malloc &free ] keep strerror_r
+    ] with-destructors ;
