@@ -40,9 +40,29 @@ MACRO:: unix-system-call ( quot -- )
         ] if
     ] ;
 
+MACRO:: unix-system-call-allow-eintr ( quot -- )
+    quot inputs :> n
+    quot first :> word
+    0 :> ret!
+    [
+        n ndup quot call ret!
+        ret unix-call-failed? [
+            ! Bug #908
+            ! Allow EINTR for close(2)
+            errno EINTR = [
+                n narray
+                errno dup strerror
+                word unix-system-call-error
+            ] unless
+        ] [
+            n ndrop
+            ret
+        ] if
+    ] ;
+
 HOOK: open-file os ( path flags mode -- fd )
 
-: close-file ( fd -- ) [ close ] unix-system-call drop ;
+: close-file ( fd -- ) [ close ] unix-system-call-allow-eintr drop ;
 
 FUNCTION: int _exit ( int status ) ;
 
