@@ -30,6 +30,18 @@ USING: cpu.architecture make ;
 0000000002270cce: 4883c807        or rax, 0x7
 0000000002270cd2: 48830130        add qword [rcx], 0x30
 ;
+
+STRING: ex-%context
+USING: cpu.architecture make ;
+[ EAX %context ] B{ } make disassemble
+00000000010f5ed0: 418b4500  mov eax, [r13]
+;
+
+STRING: ex-%safepoint
+USING: cpu.architecture make ;
+init-relocation [ %safepoint ] B{ } make disassemble
+00000000010b05a0: 890500000000  mov [rip], eax
+;
 >>
 
 HELP: signed-rep
@@ -75,7 +87,17 @@ HELP: %box-alien
 
 HELP: %context
 { $values { "dst" "a register symbol" } }
-{ $description "Emits machine code for putting a pointer to the context field of the " { $link vm } " in a register." } ;
+{ $description "Emits machine code for putting a pointer to the context field of the " { $link vm } " in a register." }
+{ $examples { $unchecked-example $[ ex-%context ] } } ;
+
+HELP: %safepoint
+{ $description "Emits a safe point to the current code sequence being generated." }
+{ $examples { $unchecked-example $[ ex-%safepoint ] } } ;
+
+HELP: %save-context
+{ $values { "temp1" "a register symbol" } { "temp2" "a register symbol" } }
+{ $description "Emits machine code for saving pointers to the callstack, datastack and retainstack in the current context field struct." } ;
+
 
 HELP: %allot
 { $values

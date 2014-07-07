@@ -1,5 +1,6 @@
-USING: compiler.cfg compiler.cfg.instructions compiler.cfg.rpo help.markup
-help.syntax namespaces sequences vectors words ;
+USING: compiler.cfg compiler.cfg.instructions compiler.cfg.rpo
+compiler.cfg.stack-frame help.markup help.syntax namespaces sequences vectors
+words ;
 IN: compiler.cfg
 
 HELP: basic-block
@@ -22,6 +23,7 @@ HELP: cfg
     { { $slot "entry" } { "Initial " { $link basic-block } " of the graph." } }
     { { $slot "word" } { "The " { $link word } " the cfg is produced from." } }
     { { $slot "post-order" } { "The blocks of the cfg in a post order traversal " { $link sequence } "." } }
+    { { $slot "stack-frame" } { { $link stack-frame } " of the cfg." } }
   }
 }
 { $see-also post-order } ;
