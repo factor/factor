@@ -1,5 +1,6 @@
-USING: classes classes.builtin compiler.tree compiler.tree.propagation.info
-help.markup help.syntax math layouts sequences slots.private words ;
+USING: classes classes.builtin compiler.cfg.instructions compiler.tree
+compiler.tree.propagation.info help.markup help.syntax math layouts sequences
+slots.private words ;
 IN: compiler.cfg.intrinsics.slots
 
 HELP: class-tag
@@ -32,7 +33,8 @@ HELP: value-tag
 HELP: emit-write-barrier?
 { $values { "infos" "a " { $link sequence } " of " { $link value-info-state } " tuples." } { "?" "true or false" } }
 { $description
-  "Whether a given call to " { $link set-slot } " requires a write barrier to be emitted or not. Write barriers are always needed except when the element to set in the slot is known by the compiler to be " { $link immediate } "." } ;
+  "Whether a given call to " { $link set-slot } " requires a write barrier to be emitted or not. Write barriers are always needed except when the element to set in the slot is known by the compiler to be " { $link immediate } "." }
+{ $see-also ##write-barrier } ;
 
 HELP: emit-set-slot
 { $values { "node" node } }

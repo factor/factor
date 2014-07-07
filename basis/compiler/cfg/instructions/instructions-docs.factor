@@ -1,5 +1,5 @@
-USING: compiler.cfg help.markup help.syntax kernel layouts slots.private
-classes ;
+USING: classes compiler.cfg help.markup help.syntax kernel layouts
+slots.private ;
 IN: compiler.cfg.instructions
 
 HELP: new-insn
@@ -33,7 +33,8 @@ HELP: ##inc-d
 
 HELP: ##prologue
 { $class-description
-  "An instruction for generating the prologue for a cfg." } ;
+  "An instruction for generating the prologue for a cfg. All it does is decrementing the stack register a number of cells to give the generated code some stack space to work with." }
+{ $see-also ##epilogue } ;
 
 HELP: ##alien-invoke
 { $class-description
@@ -45,6 +46,11 @@ HELP: ##alien-invoke
     { { $slot "symbols" } { "Name of the function to call." } }
     { { $slot "dll" } { "A dll handle." } }
   }
+} ;
+
+HELP: ##call
+{ $class-description
+  "An instruction for calling a Factor word."
 } ;
 
 HELP: ##set-slot
@@ -66,8 +72,19 @@ HELP: ##replace-imm
 HELP: ##replace
 { $class-description
   "Copies a value from a machine register to a stack location." }
-{ $see-also ##peek ##replace-imm } ;
+  { $see-also ##peek ##replace-imm } ;
 
+HELP: ##write-barrier
+{ $class-description
+  "An instruction for inserting a write barrier. This instruction is almost always inserted after a " { $link ##set-slot } " instruction. It has the following slots:"
+  { $table
+    { { $slot "src" } { "Object which the writer barrier refers." } }
+    { { $slot "slot" } { "Slot index of the object." } }
+    { { $slot "tag" } { "Type tag for obj." } }
+    { { $slot "temp1" } { "First temporary register to clobber." } }
+    { { $slot "temp2" } { "Second temporary register to clobber." } }
+  }
+} ;
 
 HELP: ##jump
 { $class-description
@@ -111,3 +128,6 @@ HELP: ##copy
 
 HELP: ##compare-integer
 { $class-description "This instruction is emitted for integer comparisons." } ;
+
+HELP: gc-map-insn
+{ $class-description "Union class of all instructions that contain subroutine calls to functions which allocate memory." } ;
