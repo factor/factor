@@ -27,7 +27,7 @@ CONSTANT: kFSEventStreamEventFlagUnmount 128
 
 TYPEDEF: int FSEventStreamCreateFlags
 TYPEDEF: int FSEventStreamEventFlags
-TYPEDEF: longlong FSEventStreamEventId
+TYPEDEF: ulonglong FSEventStreamEventId
 TYPEDEF: void* FSEventStreamRef
 
 STRUCT: FSEventStreamContext
