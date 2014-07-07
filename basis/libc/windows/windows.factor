@@ -1,5 +1,5 @@
 USING: alien.c-types alien.strings alien.syntax destructors
-kernel libc system ;
+io.encodings.utf8 kernel libc system ;
 IN: libc
 
 LIBRARY: libc
@@ -112,5 +112,5 @@ M: windows strerror ( errno -- str )
     [
         [ 1024 [ malloc &free ] keep ] dip
         [ strerror_s drop ] 3keep 2drop
-        alien>native-string
+        utf8 alien>string
     ] with-destructors ;
