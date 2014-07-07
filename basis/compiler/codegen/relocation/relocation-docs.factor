@@ -3,7 +3,8 @@ help.markup help.syntax make strings ;
 IN: compiler.codegen.relocation
 
 HELP: relocation-table
-{ $description "A " { $link byte-vector } " holding the relocations for the current compilation. Each sequence of four bytes in the vector represents one relocation." } ;
+{ $description "A " { $link byte-vector } " holding the relocations for the current compilation. Each sequence of four bytes in the vector represents one relocation." }
+{ $see-also init-relocation } ;
 
 HELP: add-relocation
 { $values
@@ -15,6 +16,9 @@ HELP: add-relocation
 HELP: add-literal
 { $values { "obj" "a symbol" } }
 { $description "Adds a symbol to the " { $link literal-table } "." } ;
+
+HELP: init-relocation
+{ $description "Initializes the dynamic variables related to code relocation." } ;
 
 HELP: rel-safepoint
 { $values { "class" "a relocation class" } }

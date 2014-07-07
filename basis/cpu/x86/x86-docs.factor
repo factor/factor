@@ -26,6 +26,10 @@ HELP: (%inc)
   }
 } ;
 
+HELP: decr-stack-reg
+{ $values { "n" number } }
+{ $description "Emits an instruction for decrementing the stack register the given number of bytes." } ;
+
 HELP: load-zone-offset
 { $values { "nursery-ptr" "a register symbol" } }
 { $description
