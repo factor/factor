@@ -355,7 +355,7 @@ M: pointer lookup-c-type
             8 >>align
             8 >>align-first
             "from_signed_cell" >>boxer
-            "to_fixnum" >>unboxer
+            "to_signed_8" >>unboxer
             [ >integer ] >>unboxer-quot
         \ longlong typedef
 
@@ -368,7 +368,7 @@ M: pointer lookup-c-type
             8 >>align
             8 >>align-first
             "from_unsigned_cell" >>boxer
-            "to_cell" >>unboxer
+            "to_unsigned_8" >>unboxer
             [ >integer ] >>unboxer-quot
         \ ulonglong typedef
 
