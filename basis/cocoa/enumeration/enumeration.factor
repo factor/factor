@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel classes.struct cocoa cocoa.runtime cocoa.types alien.data
-locals math sequences vectors fry libc destructors specialized-arrays ;
+USING: accessors alien.data assocs classes.struct cocoa
+cocoa.runtime cocoa.types destructors fry hashtables kernel libc
+locals sequences specialized-arrays vectors ;
 SPECIALIZED-ARRAY: id
 IN: cocoa.enumeration
 
@@ -32,3 +33,7 @@ CONSTANT: NS-EACH-BUFFER-SIZE 16
 
 : NSFastEnumeration>vector ( object -- vector )
     [ ] NSFastEnumeration-map ;
+
+: NSFastEnumeration>hashtable ( ... object quot: ( ... elt -- ... key value ) -- ... vector )
+    NS-EACH-BUFFER-SIZE <hashtable>
+    [ '[ @ swap _ set-at ] NSFastEnumeration-each ] keep ; inline
