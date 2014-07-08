@@ -3,15 +3,12 @@
 ! adapted from "yaml.h" libYAML 0.1.4
 ! http://pyyaml.org/wiki/LibYAML
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.syntax classes.struct combinators literals system ;
+alien.syntax classes.struct combinators literals system
+alien.libraries.finder ;
 IN: yaml.ffi
 
 <<
-"libyaml" {
-    { [ os windows? ] [ "libyaml.dll" ] }
-    { [ os macosx?  ] [ "libyaml.dylib" ] }
-    { [ os unix?  ] [ "libyaml.so" ] }
-} cond cdecl add-library
+"libyaml" { "yaml" "libyaml-0-2" } find-library-from-list cdecl add-library
 >>
 
 C-TYPE: FILE
