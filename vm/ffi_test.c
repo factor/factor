@@ -298,3 +298,11 @@ FACTOR_FASTCALL(struct test_struct_11) ffi_test_58(int x, int y, int z) {
   struct test_struct_11 r = { x + y, y - z };
   return r;
 }
+
+signed long long ffi_test_59(signed long long x) {
+  return x;
+}
+
+unsigned long long ffi_test_60(unsigned long long x) {
+  return x;
+}
