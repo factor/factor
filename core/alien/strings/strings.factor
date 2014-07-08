@@ -83,9 +83,9 @@ M: sequence string>symbol [ utf8 string>alien ] map ;
 : (symbol>string) ( alien -- str )
     utf8 alien>string ;
 
-GENERIC: symbol>string ( symbol(s) -- string(s) )
+GENERIC: symbol>string ( symbol(s) -- string )
 M: byte-array symbol>string (symbol>string) ;
-M: array symbol>string [ (symbol>string) ] map ;
+M: array symbol>string [ (symbol>string) ] map ", " join ;
 
 [
     OBJ-CPU special-object utf8 alien>string string>cpu \ cpu set-global
