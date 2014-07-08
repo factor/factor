@@ -1,11 +1,10 @@
-USING: alien alien.c-types alien.destructors alien.libraries alien.libraries.finder
-alien.syntax assocs kernel sequences system ;
+USING: alien alien.c-types alien.destructors alien.libraries
+alien.libraries.finder alien.syntax assocs kernel sequences system ;
 IN: python.ffi
 
 ! << "python" { "3.0" "3" "2.7" "2.6" } ! Python 3 has a different api, enable someday
-<< "python" { "2.7" "2.6" }
-os windows? [ [ [ CHAR: . = not ] filter ] map ] when
-[ "python" prepend find-library* ] map-find drop
+<< "python"
+{ "python2.7" "python2.6" "python27" "python26" } find-library-from-list
 cdecl add-library >>
 
 ! Functions that return borrowed references needs to be called like this:
