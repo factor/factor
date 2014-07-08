@@ -30,8 +30,8 @@ DEFER: plist>
     [ plist> ] NSFastEnumeration-map ;
 
 : (plist-NSDictionary>) ( NSDictionary -- hashtable )
-    dup [ [ nip ] [ -> valueForKey: ] 2bi [ plist> ] bi@ 2array ] with
-    NSFastEnumeration-map >hashtable ;
+    dup [ [ nip ] [ -> valueForKey: ] 2bi [ plist> ] bi@ ] with
+    NSFastEnumeration>hashtable ;
 
 : (read-plist) ( NSData -- id )
     NSPropertyListSerialization swap kCFPropertyListImmutable f
