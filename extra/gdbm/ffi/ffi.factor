@@ -5,7 +5,7 @@ alien.syntax classes.struct combinators kernel system ;
 IN: gdbm.ffi
 
 << "libgdbm"
-os windows? [ "gdbm3.dll" ] [ "gdbm" find-library ] if
+{ "gdbm" "gdbm3" "libgdbm-3" } find-library-from-list
 cdecl add-library >>
 
 LIBRARY: libgdbm
