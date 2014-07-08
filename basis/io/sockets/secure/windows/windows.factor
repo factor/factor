@@ -6,6 +6,8 @@ IN: io.sockets.secure.windows
 M: openssl ssl-supported? t ;
 M: openssl ssl-certificate-verification-supported? f ;
 
+M: windows socket-handle handle>> alien-address ;
+
 : <ssl-socket> ( winsock -- ssl )
     [
         handle>> alien-address BIO_NOCLOSE BIO_new_socket dup ssl-error

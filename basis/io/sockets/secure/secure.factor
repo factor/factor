@@ -104,6 +104,8 @@ M: upgrade-buffers-full summary
 
 HOOK: non-ssl-socket? os ( obj -- ? )
 
+HOOK: socket-handle os ( obj -- ? )
+
 HOOK: send-secure-handshake secure-socket-backend ( -- )
 
 HOOK: accept-secure-handshake secure-socket-backend ( -- )
