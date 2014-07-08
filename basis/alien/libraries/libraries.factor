@@ -26,6 +26,7 @@ ERROR: no-library name ;
 : lookup-library ( name -- library ) libraries get at ;
 
 : open-dll ( path -- dll dll-error/f )
+    normalize-path
     [ dlopen dup dll-valid? [ f ] [ dlerror ] if ]
     [ f f ] if* ;
 
