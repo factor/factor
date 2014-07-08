@@ -1,18 +1,12 @@
 USING: accessors alien io.ports io.sockets.private io.sockets.secure
 io.sockets.secure.openssl io.sockets.windows kernel locals openssl
-openssl.libcrypto openssl.libssl windows.winsock ;
+openssl.libcrypto openssl.libssl windows.winsock system ;
 IN: io.sockets.secure.windows
 
 M: openssl ssl-supported? t ;
 M: openssl ssl-certificate-verification-supported? f ;
 
 M: windows socket-handle handle>> alien-address ;
-
-: <ssl-socket> ( winsock -- ssl )
-    [
-        handle>> alien-address BIO_NOCLOSE BIO_new_socket dup ssl-error
-    ] keep <ssl-handle>
-    [ handle>> swap dup SSL_set_bio ] keep ;
 
 M: secure ((client)) ( addrspec -- handle )
     addrspec>> ((client)) <ssl-socket> ;
