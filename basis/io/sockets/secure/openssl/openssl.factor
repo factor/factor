@@ -1,11 +1,13 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-assocs byte-arrays classes.struct combinators destructors fry
-io.backend io.buffers io.encodings.8-bit.latin1 io.encodings.utf8
-io.files io.pathnames io.sockets.secure io.timeouts kernel libc
-locals math math.order math.parser namespaces openssl openssl.libssl
-openssl.libcrypto random sequences splitting unicode.case ;
+assocs byte-arrays classes.struct combinators destructors fry io
+io.backend io.buffers io.encodings.8-bit.latin1
+io.encodings.utf8 io.files io.pathnames io.ports io.sockets
+io.sockets.secure io.sockets.secure.unix io.timeouts kernel libc
+locals math math.order math.parser namespaces openssl
+openssl.libcrypto openssl.libssl random sequences splitting
+unicode.case ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
@@ -312,5 +314,34 @@ M: openssl check-certificate ( host ssl -- )
         [ check-subject-name ]
         2bi
     ] [ 2drop ] if ;
+
+: check-buffer ( port -- port )
+    dup buffer>> buffer-empty? [ upgrade-buffers-full ] unless ;
+
+: input/output-ports ( -- input output )
+    input-stream output-stream
+    [ get underlying-port check-buffer ] bi@
+    2dup [ handle>> ] bi@ eq? [ upgrade-on-non-socket ] unless ;
+
+: make-input/output-secure ( input output -- )
+    dup handle>> non-ssl-socket? [ upgrade-on-non-socket ] unless
+    [ <ssl-socket> ] change-handle
+    handle>> >>handle drop ;
+
+: (send-secure-handshake) ( output -- )
+    remote-address get [ upgrade-on-non-socket ] unless*
+    secure-connection ;
+
+M: openssl send-secure-handshake
+    input/output-ports
+    [ make-input/output-secure ] keep
+    [ (send-secure-handshake) ] keep
+    remote-address get dup inet? [
+        host>> swap handle>> check-certificate
+    ] [ 2drop ] if ;
+
+M: openssl accept-secure-handshake ( -- )
+    input/output-ports
+    make-input/output-secure ;
 
 openssl secure-socket-backend set-global

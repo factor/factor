@@ -102,6 +102,8 @@ M: upgrade-buffers-full summary
     drop
     "send-secure-handshake can only be used if buffers are empty" ;
 
+HOOK: non-ssl-socket? os ( obj -- ? )
+
 HOOK: send-secure-handshake secure-socket-backend ( -- )
 
 HOOK: accept-secure-handshake secure-socket-backend ( -- )
