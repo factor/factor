@@ -180,7 +180,7 @@ void factor_vm::primitive_fgetc() {
 void factor_vm::primitive_fread() {
   FILE* file = pop_file_handle();
   void* buf = (void*)alien_offset(ctx->pop());
-  fixnum size = unbox_array_size();
+  cell size = unbox_array_size();
 
   if (size == 0) {
     ctx->push(from_unsigned_cell(0));
