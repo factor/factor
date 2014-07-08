@@ -26,3 +26,5 @@ M:: secure establish-connection ( client-out addrspec -- )
     socket <output-port> addrspec addrspec>> establish-connection
     client-out addrspec secure-connection
     socket FIONBIO 0 set-ioctl-socket ;
+
+M: windows non-ssl-socket? win32-socket? ;

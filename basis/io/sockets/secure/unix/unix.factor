@@ -61,31 +61,4 @@ M: ssl-handle shutdown
         f >>connected [ (shutdown) ] with-timeout
     ] [ drop ] if ;
 
-: check-buffer ( port -- port )
-    dup buffer>> buffer-empty? [ upgrade-buffers-full ] unless ;
-
-: input/output-ports ( -- input output )
-    input-stream output-stream
-    [ get underlying-port check-buffer ] bi@
-    2dup [ handle>> ] bi@ eq? [ upgrade-on-non-socket ] unless ;
-
-: make-input/output-secure ( input output -- )
-    dup handle>> fd? [ upgrade-on-non-socket ] unless
-    [ <ssl-socket> ] change-handle
-    handle>> >>handle drop ;
-
-: (send-secure-handshake) ( output -- )
-    remote-address get [ upgrade-on-non-socket ] unless*
-    secure-connection ;
-
-M: openssl send-secure-handshake
-    input/output-ports
-    [ make-input/output-secure ] keep
-    [ (send-secure-handshake) ] keep
-    remote-address get dup inet? [
-        host>> swap handle>> check-certificate
-    ] [ 2drop ] if ;
-
-M: openssl accept-secure-handshake
-    input/output-ports
-    make-input/output-secure ;
+M: unix non-ssl-socket? ( obj -- ? ) fd? ;
