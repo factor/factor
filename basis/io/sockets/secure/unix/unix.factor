@@ -16,10 +16,7 @@ M: openssl ssl-certificate-verification-supported? t ;
 
 M: ssl-handle handle-fd file>> handle-fd ;
 
-! Client sockets
-: <ssl-socket> ( fd -- ssl )
-    [ fd>> BIO_NOCLOSE BIO_new_socket dup ssl-error ] keep <ssl-handle>
-    [ handle>> swap dup SSL_set_bio ] keep ;
+M: unix socket-handle fd>> ;
 
 M: secure ((client)) ( addrspec -- handle )
     addrspec>> ((client)) <ssl-socket> ;

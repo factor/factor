@@ -4,7 +4,8 @@ USING: accessors alien alien.c-types alien.data alien.strings
 assocs byte-arrays classes.struct combinators destructors fry io
 io.backend io.buffers io.encodings.8-bit.latin1
 io.encodings.utf8 io.files io.pathnames io.ports io.sockets
-io.sockets.secure io.sockets.secure.unix io.timeouts kernel libc
+io.sockets.secure io.timeouts kernel libc
+
 locals math math.order math.parser namespaces openssl
 openssl.libcrypto openssl.libssl random sequences splitting
 unicode.case ;
@@ -174,6 +175,12 @@ SYMBOL: default-secure-context
         dup ssl-error >>handle
         swap >>file
     ] with-destructors ;
+
+: <ssl-socket> ( winsock -- ssl )
+    [
+        socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error
+    ] keep <ssl-handle>
+    [ handle>> swap dup SSL_set_bio ] keep ;
 
 ! Error handling
 : syscall-error ( r -- event )
