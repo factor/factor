@@ -200,6 +200,6 @@ FACTOR_EXPORT FACTOR_FASTCALL(struct test_struct_11) ffi_test_57(int x, int y);
 FACTOR_EXPORT FACTOR_FASTCALL(struct test_struct_11)
     ffi_test_58(int x, int y, int z);
 
-signed long long ffi_test_59(signed long long x);
-unsigned long long ffi_test_60(unsigned long long x);
+FACTOR_EXPORT signed long long ffi_test_59(signed long long x);
+FACTOR_EXPORT unsigned long long ffi_test_60(unsigned long long x);
 
