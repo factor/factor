@@ -318,6 +318,7 @@ M: pointer lookup-c-type
     \ double typedef
 
     cell 8 = [
+        ! 64bit-vm int
         <c-type>
             fixnum >>class
             fixnum >>boxed-class
@@ -332,6 +333,7 @@ M: pointer lookup-c-type
             [ >fixnum ] >>unboxer-quot
         \ int typedef
     
+        ! 64bit-vm uint
         <c-type>
             fixnum >>class
             fixnum >>boxed-class
@@ -345,6 +347,7 @@ M: pointer lookup-c-type
             [ >fixnum ] >>unboxer-quot
         \ uint typedef
 
+        ! 64bit-vm longlong
         <c-type>
             integer >>class
             integer >>boxed-class
@@ -355,10 +358,11 @@ M: pointer lookup-c-type
             8 >>align
             8 >>align-first
             "from_signed_cell" >>boxer
-            "to_fixnum" >>unboxer
+            "to_signed_8" >>unboxer
             [ >integer ] >>unboxer-quot
         \ longlong typedef
 
+        ! 64bit-vm ulonglong
         <c-type>
             integer >>class
             integer >>boxed-class
@@ -386,6 +390,7 @@ M: pointer lookup-c-type
         \ ulonglong lookup-c-type \ uintptr_t typedef
         \ ulonglong lookup-c-type \ size_t typedef
     ] [
+        ! 32bit-vm int
         <c-type>
             integer >>class
             integer >>boxed-class
@@ -400,6 +405,7 @@ M: pointer lookup-c-type
             [ >integer ] >>unboxer-quot
         \ int typedef
     
+        ! 32bit-vm uint
         <c-type>
             integer >>class
             integer >>boxed-class
@@ -413,6 +419,7 @@ M: pointer lookup-c-type
             [ >integer ] >>unboxer-quot
         \ uint typedef
 
+        ! 32bit-vm longlong
         <long-long-type>
             integer >>class
             integer >>boxed-class
@@ -426,6 +433,7 @@ M: pointer lookup-c-type
             [ >integer ] >>unboxer-quot
         \ longlong typedef
 
+        ! 32bit-vm ulonglong
         <long-long-type>
             integer >>class
             integer >>boxed-class
