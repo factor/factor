@@ -6,7 +6,8 @@ math memory namespaces namespaces.private parser
 quotations sequences specialized-arrays stack-checker
 stack-checker.errors system threads tools.test words
 alien.complex concurrency.promises alien.data
-byte-arrays classes compiler.test libc ;
+byte-arrays classes compiler.test libc layouts
+math.bitwise ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: char
@@ -661,6 +662,18 @@ FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
 : ffi_test_58 ( x y z -- test-struct-11 )
     test-struct-11 "f-fastcall" "ffi_test_58" { int int int }
     alien-invoke gc ;
+
+! Make sure that large longlong/ulonglong are correctly dealt with
+FUNCTION: longlong ffi_test_59 ( longlong x ) ;
+FUNCTION: ulonglong ffi_test_60 ( ulonglong x ) ;
+
+[ t ] [ most-positive-fixnum 1 + [ ffi_test_59 ] keep = ] unit-test
+[ t ] [ most-positive-fixnum 1 + [ ffi_test_60 ] keep = ] unit-test
+
+[ -1 ] [ -1 ffi_test_59 ] unit-test
+[ -1 ] [ 0xffffffffffffffff ffi_test_59 ] unit-test
+[ 0xffffffffffffffff ] [ -1 ffi_test_60 ] unit-test
+[ 0xffffffffffffffff ] [ 0xffffffffffffffff ffi_test_60 ] unit-test
 
 ! GCC bugs
 mingw? [
