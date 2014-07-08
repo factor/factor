@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.format.macros
 combinators io io.streams.string kernel math math.functions
-math.order math.parser present sequences typed ;
+math.order math.parser math.parser.private present sequences
+typed ;
 IN: calendar.format
 
 : pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-head ;
@@ -135,11 +136,11 @@ M: timestamp year. ( timestamp -- )
 
 ! Should be enough for anyone, allows to not do a fancy
 ! algorithm to detect infinite decimals (e.g 1/3)
-CONSTANT: rfc3339-precision 5
 : write-rfc3339-seconds ( timestamp -- )
-    second>> 1 mod rfc3339-precision 10^ * round >integer
-    number>string rfc3339-precision CHAR: 0 pad-head
-    [ CHAR: 0 = ] trim-tail [ "." write write ] unless-empty ;
+    second>> 1 mod [
+        >float "%.6f" format-float [ CHAR: 0 = ] trim
+        dup length 1 > [ write ] [ drop ] if
+    ] unless-zero ;
 
 : (timestamp>rfc3339) ( timestamp -- )
     {
