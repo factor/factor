@@ -2,15 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: alien.libraries.finder arrays combinators.short-circuit
-environment io.files io.files.info io.pathnames kernel sequences
-splitting system system-info.windows ;
+environment io.backend io.files io.files.info io.pathnames kernel
+sequences splitting system system-info.windows ;
 
 IN: alien.libraries.finder.windows
 
 <PRIVATE
 
 : search-paths ( -- seq )
-    "resource:" system-directory windows-directory 3array
+    "resource:" normalize-path
+    system-directory
+    windows-directory 3array
     "PATH" os-env [ ";" split ] [ f ] if* append ;
 
 : candidate-paths ( name -- seq )
