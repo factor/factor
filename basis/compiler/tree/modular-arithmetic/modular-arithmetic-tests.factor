@@ -21,12 +21,14 @@ IN: compiler.tree.modular-arithmetic.tests
 
 TUPLE: declared-fixnum { x fixnum } ;
 
-! XXX: As of .97, we do a bounds check and throw an error on overflow, so we can't
-! use fixnum+ here. If this is too big a regression, we can revert it.
-! [ t ] [
-    ! [ { declared-fixnum } declare [ 1 + ] change-x ]
+[ t ] [
+    [ { declared-fixnum } declare [ 1 + ] change-x ]
+    { + } inlined?
+    ! XXX: As of .97, we do a bounds check and throw an error on
+    ! overflow, so we no longer convert fixnum+ to fixnum+fast.
+    ! If this is too big a regression, we can revert it.
     ! { + fixnum+ >fixnum } inlined?
-! ] unit-test
+] unit-test
 
 [ t ] [
     [ { declared-fixnum } declare x>> drop ]
