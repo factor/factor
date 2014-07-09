@@ -8,7 +8,7 @@ alien.libraries.finder ;
 IN: yaml.ffi
 
 <<
-"libyaml" { "yaml" "libyaml-0-2" } find-library-from-list cdecl add-library
+"libyaml" { "yaml" "yaml-0" } find-library-from-list cdecl add-library
 >>
 
 C-TYPE: FILE
