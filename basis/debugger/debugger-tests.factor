@@ -1,4 +1,4 @@
-USING: debugger kernel continuations tools.test ;
+USING: alien.syntax debugger kernel continuations tools.test ;
 IN: debugger.tests
 
 [ ] [ [ drop ] [ error. ] recover ] unit-test
