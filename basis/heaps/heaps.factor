@@ -83,12 +83,11 @@ M: heap heap-size ( heap -- n )
 
 GENERIC: heap-compare ( entry1 entry2 heap -- ? )
 
-: entry<=> ( entry1 entry2 -- <=> )
-    { entry entry } declare [ key>> ] compare ; inline
+M: min-heap heap-compare
+    drop { entry entry } declare [ key>> ] bi@ after? ; inline
 
-M: min-heap heap-compare drop entry<=> +gt+ eq? ;
-
-M: max-heap heap-compare drop entry<=> +lt+ eq? ;
+M: max-heap heap-compare
+    drop { entry entry } declare [ key>> ] bi@ before? ; inline
 
 : heap-bounds-check? ( m heap -- ? )
     heap-size >= ; inline
