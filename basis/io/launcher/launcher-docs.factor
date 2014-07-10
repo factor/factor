@@ -169,7 +169,7 @@ HELP: kill-process
 { $values { "process" process } }
 { $description "Kills a running process. Does nothing if the process has already exited." }
 { $examples
-  { $example
+  { $unchecked-example
     "USING: io.launcher ;"
     "\"cat\" run-detached kill-process"
     ""
