@@ -199,7 +199,7 @@ M: byte-array (deref-aliases) nip ;
 
 M: string (deref-aliases) nip ;
 
-M: yaml-alias (deref-aliases) anchor>> swap at ;
+M: yaml-alias (deref-aliases) anchor>> of ;
 
 M: sequence (deref-aliases)
     [ (deref-aliases) ] with map! ;
