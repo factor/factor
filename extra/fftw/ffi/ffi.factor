@@ -8,7 +8,7 @@ IN: fftw.ffi
 
 LIBRARY: fftw3
 
-<< "fftw3" dup find-library cdecl add-library >>
+<< "fftw3" { "fftw3" "libfftw3-3" } find-library-from-list cdecl add-library >>
 
 TYPEDEF: double[2] fftw_complex
 
