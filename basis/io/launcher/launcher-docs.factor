@@ -116,7 +116,7 @@ HELP: run-process
 { $values { "desc" "a launch descriptor" } { "process" process } }
 { $description "Launches a process. The object can either be a string, a sequence of strings or a " { $link process } ". See " { $link "io.launcher.descriptors" } " for details." }
 { $examples
-  { $example
+  { $unchecked-example
     "USING: io.launcher prettyprint ;"
     "\"pwd\" run-process ."
     "T{ process\n    { command \"pwd\" }\n    { environment H{ } }\n    { environment-mode +append-environment+ }\n    { group +same-group+ }\n    { status 0 }\n}"
@@ -142,7 +142,7 @@ HELP: try-process
 { $values { "desc" "a launch descriptor" } }
 { $description "Launches a process and waits for it to complete. If it exits with a non-zero status code, throws a " { $link process-failed } " error." }
 { $examples
-  { $example
+  { $unchecked-example
     "USING: continuations io.launcher prettyprint ;"
     "[ \"i-dont-exist\" try-process ] [ ] recover ."
     $[
