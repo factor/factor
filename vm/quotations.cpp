@@ -104,9 +104,9 @@ bool quotation_jit::word_safepoint_p(cell obj) {
 }
 
 bool quotation_jit::safepoint_p() {
-  fixnum length = array_capacity(elements.untagged());
+  cell length = array_capacity(elements.untagged());
 
-  for (fixnum i = 0; i < length; i++) {
+  for (cell i = 0; i < length; i++) {
     cell obj = array_nth(elements.untagged(), i);
     switch (tagged<object>(obj).type()) {
       case WORD_TYPE:
@@ -122,9 +122,9 @@ bool quotation_jit::safepoint_p() {
 }
 
 bool quotation_jit::stack_frame_p() {
-  fixnum length = array_capacity(elements.untagged());
+  cell length = array_capacity(elements.untagged());
 
-  for (fixnum i = 0; i < length; i++) {
+  for (cell i = 0; i < length; i++) {
     cell obj = array_nth(elements.untagged(), i);
     if (tagged<object>(obj).type() == WORD_TYPE && !word_safepoint_p(obj))
       return false;
