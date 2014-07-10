@@ -60,7 +60,7 @@ ERROR: pcre-error value ;
 
 : name-table ( pcre extra -- addr )
     [ drop alien-address 32 on-bits unmask ]
-    [ PCRE_INFO_NAMETABLE pcre-fullinfo ] 2bi + ;
+    [ PCRE_INFO_NAMETABLE pcre-fullinfo int <ref> uint deref ] 2bi + ;
 
 : name-entry-size ( pcre extra -- size )
     PCRE_INFO_NAMEENTRYSIZE pcre-fullinfo ;
