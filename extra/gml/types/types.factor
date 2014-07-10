@@ -26,7 +26,7 @@ INSTANCE: proc sequence
 GENERIC# (gml-get) 1 ( collection key -- elt )
 
 M: sequence (gml-get) swap wrap nth ;
-M: hashtable (gml-get) swap at ;
+M: hashtable (gml-get) of ;
 
 GENERIC# (gml-put) 2 ( collection key elt -- )
 
