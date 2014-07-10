@@ -60,6 +60,8 @@ ERROR: pcre-error value ;
 
 : name-table ( pcre extra -- addr )
     [ drop alien-address 32 on-bits unmask ]
+    ! On at least win64, the pointer is returned as an int and is
+    ! negative. Cast it to a uint and everything works.
     [ PCRE_INFO_NAMETABLE pcre-fullinfo int <ref> uint deref ] 2bi + ;
 
 : name-entry-size ( pcre extra -- size )
