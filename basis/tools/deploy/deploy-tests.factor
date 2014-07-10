@@ -37,7 +37,7 @@ cache-directory [
 
 [ ] [ "tetris" shake-and-bake 1730000 small-enough? ] unit-test
 
-[ ] [ "spheres" shake-and-bake 1550000 small-enough? ] unit-test
+[ ] [ "spheres" shake-and-bake 1551000 small-enough? ] unit-test
 
 [ ] [ "terrain" shake-and-bake 2050000 small-enough? ] unit-test
 
