@@ -33,7 +33,7 @@ M: mock-io-backend link-info
 
 [ ] [
     mock-io-backend io-backend [
-        "" resource-path <mailbox> <recursive-monitor> dispose
+        "resource:core/io" resource-path <mailbox> <recursive-monitor> dispose
     ] with-variable
 ] unit-test
 
