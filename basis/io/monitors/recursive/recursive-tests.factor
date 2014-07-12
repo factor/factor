@@ -56,6 +56,6 @@ M: mock-io-backend link-info
 
 ! Test that disposing twice is allowed
 [ ] [
-    "" resource-path <mailbox> <recursive-monitor>
+    "resource:core/io" resource-path <mailbox> <recursive-monitor>
     [ dispose ] [ dispose ] bi
 ] unit-test
