@@ -1,3 +1,6 @@
+! Copyright (C) 2014 John Benediktsson
+! See http://factorcode.org/license.txt for BSD license
+
 USING: accessors colors colors.xyz colors.xyz.private kernel
 locals math math.functions ;
 
