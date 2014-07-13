@@ -94,13 +94,17 @@ PRIVATE>
     color1 >laba :> lab1
     color2 >laba :> lab2
 
+    lab1 lab2 [ l>> ] bi@ :> ( l1 l2 )
+    lab1 lab2 [ a>> ] bi@ :> ( a1 a2 )
+    lab1 lab2 [ b>> ] bi@ :> ( b1 b2 )
+
     ! Calculate the delta values for each channel
-    lab1 lab2 [ l>> ] bi@ - :> dl
-    lab1 lab2 [ a>> ] bi@ - :> da
-    lab1 lab2 [ b>> ] bi@ - :> db
-    lab1 [ a>> ] [ b>> ] bi [ sq ] bi@ + sqrt :> c1
-    lab2 [ a>> ] [ b>> ] bi [ sq ] bi@ + sqrt :> c2
-    c1 c2 - :> dc
+    l2 l1 - :> dl
+    a2 a1 - :> da
+    b2 b1 - :> db
+    a1 sq b1 sq + sqrt :> c1
+    a2 sq b2 sq + sqrt :> c2
+    c2 c1 - :> dc
     da sq db sq + dc sq - sqrt :> dh
 
     ! graphics arts:
