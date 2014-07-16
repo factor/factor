@@ -15,7 +15,8 @@ SYMBOLS:
     resize-handles
     small-title-bar
     normal-title-bar
-    textured-background ;
+    textured-background
+    floating-window ;
 
 CONSTANT: default-world-pixel-format-attributes
     {

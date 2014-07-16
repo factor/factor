@@ -8,7 +8,7 @@ ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.labels ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks
 ui.gadgets.viewports ui.gestures ui.tools.browser.history
-ui.tools.browser.popups ui.tools.common vocabs ;
+ui.tools.browser.popups ui.tools.common vocabs ui.gadgets.worlds ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
@@ -89,7 +89,11 @@ M: browser-gadget definitions-changed ( set browser -- )
 M: browser-gadget focusable-child* search-field>> ;
 
 : (browser-window) ( topic -- )
-    <browser-gadget> "Browser" open-status-window ;
+    <browser-gadget>
+    <world-attributes>
+        "Browser" >>title
+        { floating-window } >>window-controls
+    open-status-window ;
 
 : browser-window ( -- )
     "help.home" (browser-window) ;
