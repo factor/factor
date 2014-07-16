@@ -20,7 +20,7 @@ HELP: close-window
 { $description "Close the native window containing " { $snippet "gadget" } "." } ;
 
 HELP: world-attributes
-{ $values { "world-class" class } { "title" string } { "status" gadget } { "gadgets" sequence } { "pixel-format-attributes" sequence } }
+{ $values { "world-class" class } { "title" string } { "status" gadget } { "gadgets" sequence } { "pixel-format-attributes" sequence } { "window-controls" sequence } }
 { $class-description "Tuples of this class can be passed to " { $link open-window } " to control attributes of the window opened. The following attributes can be set:" }
 { $list
     { { $snippet "world-class" } " specifies the class of world to construct. " { $link world } " is the default." }
