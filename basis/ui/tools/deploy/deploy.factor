@@ -115,6 +115,6 @@ deploy-gadget "toolbar" f {
     [
         <world-attributes>
             swap "Deploying “" "”" surround >>title
-            { floating-window } >>window-controls
+            [ { floating-window } append ] change-window-controls
     ] bi
     open-window ;

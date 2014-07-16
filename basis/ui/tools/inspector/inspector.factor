@@ -105,7 +105,7 @@ M: inspector-gadget focusable-child*
     [
         <world-attributes>
             swap "Slot editor: " prepend >>title
-            { floating-window } >>window-controls
+            [ { floating-window } append ] change-window-controls
     ] bi*
     open-status-window ;
 
