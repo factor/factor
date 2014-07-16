@@ -361,6 +361,7 @@ CONSTANT: window-controls>decor-flags
         { small-title-bar $ GDK_DECOR_TITLE }
         { normal-title-bar $ GDK_DECOR_TITLE }
         { textured-background 0 }
+        { floating-window 0 }
     }
 
 CONSTANT: window-controls>func-flags
@@ -372,13 +373,19 @@ CONSTANT: window-controls>func-flags
         { small-title-bar 0 }
         { normal-title-bar 0 }
         { textured-background 0 }
+        { floating-window 0 }
     }
+
+: set-window-hint ( win controls -- )
+    {
+        { [ floating-window over member-eq? ] [ drop GDK_WINDOW_TYPE_HINT_DIALOG ] }
+        { [ small-title-bar over member-eq? ] [ drop GDK_WINDOW_TYPE_HINT_UTILITY ] }
+        [ drop GDK_WINDOW_TYPE_HINT_NORMAL ]
+    } cond gtk_window_set_type_hint ;
 
 : configure-window-controls ( win controls -- )
     [
-        small-title-bar swap member-eq?
-        GDK_WINDOW_TYPE_HINT_UTILITY GDK_WINDOW_TYPE_HINT_NORMAL ?
-        gtk_window_set_type_hint
+        set-window-hint
     ] [
         [ gtk_widget_get_window ] dip
         window-controls>decor-flags symbols>flags
