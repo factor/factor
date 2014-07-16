@@ -237,6 +237,7 @@ CONSTANT: window-control>style
         { resize-handles $ WS_THICKFRAME }
         { small-title-bar $ WS_CAPTION }
         { normal-title-bar $ WS_CAPTION }
+        { floating-window 0 }
     }
 
 CONSTANT: window-control>ex-style
@@ -248,6 +249,7 @@ CONSTANT: window-control>ex-style
         { resize-handles $ WS_EX_WINDOWEDGE }
         { small-title-bar $[ WS_EX_TOOLWINDOW WS_EX_TOPMOST bitor ] }
         { normal-title-bar $ WS_EX_APPWINDOW }
+        { floating-window 0 }
     }
 
 : needs-sysmenu? ( controls -- ? )
