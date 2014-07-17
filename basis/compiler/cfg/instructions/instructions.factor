@@ -855,7 +855,7 @@ factor-call-insn ;
 M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
 
 ! Each one has a gc-map slot
-TUPLE: gc-map scrub-d scrub-r check-d check-r gc-roots derived-roots ;
+TUPLE: gc-map scrub-d scrub-r gc-roots derived-roots ;
 
 : <gc-map> ( -- gc-map ) gc-map new ;
 
