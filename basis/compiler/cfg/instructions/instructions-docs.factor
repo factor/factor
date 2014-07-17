@@ -1,4 +1,5 @@
-USING: compiler.cfg help.markup help.syntax kernel layouts slots.private ;
+USING: compiler.cfg help.markup help.syntax kernel layouts slots.private
+classes ;
 IN: compiler.cfg.instructions
 
 HELP: new-insn
