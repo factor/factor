@@ -2,7 +2,14 @@ USING: compiler.cfg compiler.cfg.registers help.markup help.syntax ;
 IN: compiler.cfg.stacks.local
 
 HELP: current-height
-{ $class-description "A tuple used to keep track of the heights of the data and retain stacks in a " { $link basic-block } "." } ;
+{ $class-description "A tuple used to keep track of the heights of the data and retain stacks in a " { $link basic-block } " The idea is that if the stack change instructions are tracked, then multiple changes can be folded into one. It has the following slots:"
+  { $table
+    { { $slot "d" } { "Current datastack height." } }
+    { { $slot "r" } { "Current retainstack height." } }
+    { { $slot "emit-d" } { "Queued up datastack height change." } }
+    { { $slot "emit-r" } { "Queued up retainstack height change." } }
+  }
+} ;
 
 HELP: translate-local-loc
 { $values { "loc" loc } { "loc'" loc } }
