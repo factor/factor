@@ -7,6 +7,9 @@ IN: compiler.codegen
 STRING: generate-ex
 USING: compiler.cfg.debugger io prettyprint ;
 [ "hello\n" write ] test-regs first dup cfg set generate [ . ] [ 4 swap nth disassemble ] bi
+;
+
+STRING: generate-ex-answer
 {
     { }
     { "hello\n" output-stream assoc-stack stream-write }
@@ -75,7 +78,7 @@ HELP: generate
 }
 { $examples
   "A small quotation is compiled and then disassembled:"
-  { $unchecked-example $[ generate-ex ] }
+  { $unchecked-example $[ generate-ex generate-ex-answer ] }
 } ;
 
 HELP: useless-branch?
