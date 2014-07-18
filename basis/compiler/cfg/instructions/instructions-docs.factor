@@ -42,7 +42,10 @@ HELP: ##alien-invoke
   { $table
     { { $slot "reg-inputs" } { "Registers to use for the arguments to the function call." } }
     { { $slot "stack-inputs" } { "Stack slots used for the arguments to the function call. Only used if all register arguments are already filled." } }
-    { { $slot "reg-outputs" } { "Register that wil contain the return value of the function call if any." } }
+    {
+        { $slot "reg-outputs" }
+        { "If the called function returns a value, then this slot is a one-element sequence containing a 3-tuple describing which register is used for the return value." }
+    }
     { { $slot "symbols" } { "Name of the function to call." } }
     { { $slot "dll" } { "A dll handle." } }
   }
@@ -73,6 +76,11 @@ HELP: ##replace
 { $class-description
   "Copies a value from a machine register to a stack location." }
   { $see-also ##peek ##replace-imm } ;
+
+HELP: ##box-alien
+{ $class-description
+  "An instruction for boxing an alien value."
+} ;
 
 HELP: ##write-barrier
 { $class-description
