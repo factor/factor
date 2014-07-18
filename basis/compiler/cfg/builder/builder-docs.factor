@@ -5,7 +5,8 @@ IN: compiler.cfg.builder
 
 <<
 STRING: ex-emit-call
-USING: compiler.cfg.builder kernel make prettyprint ;
+USING: compiler.cfg.builder compiler.cfg.builder.blocks compiler.cfg.stacks
+kernel make prettyprint ;
 begin-stack-analysis initial-basic-block \ dummy 3 [ emit-call ] { } make drop
 current-height basic-block [ get . ] bi@ .
 T{ current-height { d 3 } }
@@ -59,7 +60,7 @@ HELP: emit-call
 
 HELP: emit-node
 { $values { "node" node } }
-{ $description "Emits some kind of code for the node." } ;
+{ $description "Emits CFG instructions for the given SSA node." } ;
 
 HELP: trivial-branch?
 { $values
