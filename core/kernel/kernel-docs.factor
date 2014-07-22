@@ -783,7 +783,7 @@ HELP: with
 HELP: 2with
 { $values
   { "param1" object }
-  { "param1" object }
+  { "param2" object }
   { "obj" object }
   { "quot" { $quotation ( param1 param2 elt -- ... ) } }
   { "curry" curry }
