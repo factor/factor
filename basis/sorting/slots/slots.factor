@@ -16,7 +16,7 @@ IN: sorting.slots
             unclip-last-slice
             [ [ execute-accessor ] each ] dip
         ] when execute-comparator
-    ] with with map-find drop +eq+ or ;
+    ] 2with map-find drop +eq+ or ;
 
 : sort-by-with ( seq sort-specs quot: ( obj -- key ) -- seq' )
     swap '[ _ bi@ _ compare-slots ] sort ; inline
