@@ -69,7 +69,7 @@ M: recursive-monitor dispose*
             { +rename-file-new+ [ child-added ] }
             [ 3drop ]
         } case
-    ] with with each ;
+    ] 2with each ;
 
 : pump-loop ( -- )
     receive {

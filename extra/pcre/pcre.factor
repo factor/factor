@@ -22,9 +22,6 @@ ERROR: pcre-error value ;
 : split-subseqs ( seq subseqs -- seqs )
     dup first [ replace-all ] keep split-subseq [ >string ] map harvest ;
 
-: 2with ( param1 param2 obj quot -- obj curry )
-    [ -rot ] dip [ [ rot ] dip call ] 3curry ; inline
-
 : utf8-start-byte? ( byte -- ? )
     0xc0 bitand 0x80 = not ;
 

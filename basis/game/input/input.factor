@@ -45,7 +45,7 @@ ERROR: game-input-not-open ;
 
 : open-game-input ( -- )
     game-input-opened? [
-        (open-game-input) 
+        (open-game-input)
     ] unless
     game-input-opened [ 1 + ] change-global
     reset-mouse ;
@@ -55,7 +55,7 @@ ERROR: game-input-not-open ;
         1 -
     ] change-global
     game-input-opened? [
-        (close-game-input) 
+        (close-game-input)
         reset-game-input
     ] unless ;
 
@@ -79,7 +79,7 @@ SYMBOLS:
     get-controllers [
         [ product-id  = ]
         [ instance-id = ] bi-curry bi* and
-    ] with with find nip ;
+    ] 2with find nip ;
 
 TUPLE: keyboard-state keys ;
 

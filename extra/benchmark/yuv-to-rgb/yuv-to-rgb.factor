@@ -78,12 +78,12 @@ STRUCT: yuv-buffer
 : yuv>rgb-row ( index rgb yuv y -- index )
     over stride
     pick y_width>> iota
-    [ yuv>rgb-pixel ] with with with with each ; inline
+    [ yuv>rgb-pixel ] 4 nwith each ; inline
 
 TYPED: yuv>rgb ( rgb: byte-array yuv: yuv-buffer -- )
     [ 0 ] 2dip
     dup y_height>> iota
-    [ yuv>rgb-row ] with with each
+    [ yuv>rgb-row ] 2with each
     drop ;
 
 : yuv-to-rgb-benchmark ( -- )

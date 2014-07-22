@@ -49,7 +49,7 @@ MEMO: cities-named ( name -- cities )
 MEMO: cities-named-in ( name state -- cities )
     cities [
         [ name>> = ] [ state>> = ] bi-curry bi* and
-    ] with with filter ;
+    ] 2with filter ;
 
 : find-zip-code ( code -- city )
     cities [ first-zip>> <=> ] with search nip ;

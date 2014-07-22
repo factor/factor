@@ -1,7 +1,7 @@
 ! Factor port of the raytracer benchmark from
 ! http://www.ffconsultancy.com/languages/ray_tracer/index.html
 
-USING: arrays accessors io io.files io.files.temp
+USING: arrays accessors generalizations io io.files io.files.temp
 io.encodings.binary kernel math math.constants math.functions
 math.vectors math.vectors.simd math.vectors.simd.cords
 math.parser make sequences words combinators ;
@@ -129,7 +129,7 @@ CONSTANT: create-offsets
 : create-group ( level c r -- scene )
     2dup create-bound [
         2dup <sphere> ,
-        create-offsets [ create-step , ] with with with each
+        create-offsets [ create-step , ] 3 nwith each
     ] make-group ;
 
 : create ( level c r -- scene )
@@ -145,15 +145,15 @@ CONSTANT: create-offsets
             ss-point v+ normalize
             double-4{ 0.0 0.0 -4.0 0.0 } swap <ray>
             swap cast-ray +
-        ] with with with each
-    ] with with each ; inline no-compile
+        ] 3 nwith each
+    ] 2with each ; inline no-compile
 
 : ray-trace ( scene -- grid )
     size iota <reversed> [
         size iota [
             [ size 0.5 * - ] bi@ swap size
             0.0 double-4-boa ray-pixel
-        ] with with map
+        ] 2with map
     ] with map ;
 
 : pgm-header ( w h -- )
