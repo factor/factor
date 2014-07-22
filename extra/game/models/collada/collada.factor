@@ -47,7 +47,7 @@ M: x-up >y-up-axis!
         [ 0 swap nth ]
         [ 1 swap nth neg ]
         [ 2 swap nth ] tri
-        swap -rot 
+        swap -rot
     ] [
         [ 2 swap set-nth ]
         [ 1 swap set-nth ]
@@ -128,8 +128,8 @@ VERTEX-FORMAT: collada-vertex-format
         [
             [
                 [ data>> ] [ offset>> ] bi
-                rot = [ nth ] [ 2drop f ] if 
-            ] with with map sift flatten ,
+                rot = [ nth ] [ 2drop f ] if
+            ] 2with map sift flatten ,
         ] curry each-index
     ] V{ } make flatten ;
 
@@ -146,14 +146,14 @@ VERTEX-FORMAT: collada-vertex-format
         group-indices
     ]
     [
-        soa>aos 
+        soa>aos
         [ flatten c:float >c-array ]
         [ flatten c:uint >c-array ]
         bi* collada-vertex-format f model boa
     ] bi ;
-    
+
 : mesh>triangles ( sources vertices mesh-tag -- models )
-    "triangles" tags-named [ triangles>model ] with with map ;
+    "triangles" tags-named [ triangles>model ] 2with map ;
 
 : mesh>models ( mesh-tag -- models )
     [

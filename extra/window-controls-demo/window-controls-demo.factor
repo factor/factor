@@ -39,6 +39,6 @@ M: window-controls-demo-world pref-dim*
         open-window*
             windows >>windows
             windows push
-    ] with with assoc-each ;
+    ] 2with assoc-each ;
 
 MAIN: window-controls-demo

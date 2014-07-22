@@ -410,7 +410,7 @@ M: float round dup sgn 2 /f + truncate ;
 : roots ( x t -- seq )
     [ [ log ] [ recip ] bi* * e^ ]
     [ recip 2pi * 0 swap complex boa e^ ]
-    [ iota [ ^ * ] with with map ] tri ;
+    [ iota [ ^ * ] 2with map ] tri ;
 
 : sigmoid ( x -- y ) neg e^ 1 + recip ; inline
 

@@ -83,7 +83,7 @@ ducet get-global insert-helpers
 : add ( char -- )
     dup blocked? [ 1string , ] [
         dup possible-bases dup length iota
-        [ ?combine ] with with any?
+        [ ?combine ] 2with any?
         [ drop ] [ 1string , ] if
     ] if ;
 
