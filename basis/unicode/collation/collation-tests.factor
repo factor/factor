@@ -13,7 +13,7 @@ IN: unicode.collation.tests
 
 : test-equality ( str1 str2 -- ? ? ? ? )
     { primary= secondary= tertiary= quaternary= }
-    [ execute( a b -- ? ) ] with with map
+    [ execute( a b -- ? ) ] 2with map
     first4 ;
 
 [ f f f f ] [ "hello" "hi" test-equality ] unit-test

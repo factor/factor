@@ -1,5 +1,5 @@
 ! Based on http://www.ffconsultancy.com/ocaml/sudoku/index.html
-USING: columns combinators combinators.short-circuit io
+USING: columns combinators combinators.short-circuit generalizations io
 io.styles kernel math math.parser namespaces sequences ;
 IN: sudoku
 
@@ -17,7 +17,7 @@ SYMBOL: board
 : cell-any? ( n x y i -- ? ) 3 /mod pair+ board> = ;
 
 : box-any? ( n x y -- ? )
-    [ 3 /i 3 * ] bi@ 9 iota [ cell-any? ] with with with any? ;
+    [ 3 /i 3 * ] bi@ 9 iota [ cell-any? ] 3 nwith any? ;
 
 : board-any? ( n x y -- ? )
     { [ nip row-any? ] [ drop col-any? ] [ box-any? ] } 3|| ;

@@ -135,6 +135,9 @@ DEFER: if
 : with ( param obj quot -- obj curry )
     swapd [ swapd call ] 2curry ; inline
 
+: 2with ( param1 param2 obj quot -- obj curry )
+    with with ; inline
+
 : prepose ( quot1 quot2 -- compose )
     swap compose ; inline
 

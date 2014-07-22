@@ -11,7 +11,7 @@ IN: vocabs.metadata.resources
     [ dup '[ _ directory-tree-files [ append-path ] with map ] [ prefix ] bi ]
     [ 1array ] if ;
 
-: filter-resources ( vocab-files resource-globs -- resource-files ) 
+: filter-resources ( vocab-files resource-globs -- resource-files )
     '[ _ [ matches? ] with any? ] filter ;
 
 : copy-vocab-resource ( to from file -- )
@@ -19,7 +19,7 @@ IN: vocabs.metadata.resources
     dup file-info directory?
     [ drop make-directories ]
     [ swap [ parent-directory make-directories ] [ copy-file ] bi ] if ;
-    
+
 PRIVATE>
 
 : vocab-dir-in-root ( vocab -- dir )
@@ -36,10 +36,9 @@ PRIVATE>
     [ drop f ] [ expand-vocab-resource-files ] if-empty ;
 
 : copy-vocab-resources ( dir vocab -- )
-    dup vocab-resource-files 
+    dup vocab-resource-files
     [ 2drop ] [
         [ [ vocab-dir append-path ] [ vocab-dir-in-root ] bi ] dip
         [ 2drop make-directories ]
-        [ [ copy-vocab-resource ] with with each ] 3bi
+        [ [ copy-vocab-resource ] 2with each ] 3bi
     ] if-empty ;
-
