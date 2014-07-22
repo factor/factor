@@ -160,7 +160,7 @@ PRIVATE>
 SIMD-INTRINSIC: (simd-v+)                ( a b rep -- c ) [ + ] components-2map ;
 SIMD-INTRINSIC: (simd-v-)                ( a b rep -- c ) [ - ] components-2map ;
 SIMD-INTRINSIC: (simd-vneg)              ( a   rep -- c ) [ neg ] components-map ;
-SIMD-INTRINSIC:: (simd-v+-)              ( a b rep -- c ) 
+SIMD-INTRINSIC:: (simd-v+-)              ( a b rep -- c )
     a b rep 2byte>rep-array :> ( a' b' )
     rep <rep-array> :> c'
     0  rep rep-length [ 1 -  2 <range> ] [ 2 /i ] bi [| n |
@@ -201,7 +201,7 @@ SIMD-INTRINSIC: (simd-vmax)              ( a b rep -- c ) [ max ] components-2ma
 ! XXX
 SIMD-INTRINSIC: (simd-v.)                ( a b rep -- n )
     [ 2byte>rep-array [ [ first ] bi@ * ] 2keep ] keep
-    1 swap rep-length [a,b) [ '[ _ swap nth-unsafe ] bi@ * + ] with with each ;
+    1 swap rep-length [a,b) [ '[ _ swap nth-unsafe ] bi@ * + ] 2with each ;
 SIMD-INTRINSIC: (simd-vsqrt)             ( a   rep -- c ) [ fsqrt ] components-map ;
 SIMD-INTRINSIC: (simd-vsad)              ( a b rep -- c ) 2byte>rep-array [ - abs ] [ + ] 2map-reduce ;
 SIMD-INTRINSIC: (simd-sum)               ( a   rep -- n ) [ + ] components-reduce ;
@@ -245,7 +245,7 @@ SIMD-INTRINSIC:: (simd-vmerge-tail)      ( a b rep -- c )
     ] unrolled-each-integer
     c' underlying>> ;
 SIMD-INTRINSIC: (simd-v<=)               ( a b rep -- c )
-    dup rep-tf-values '[ <= _ _ ? ] components-2map ; 
+    dup rep-tf-values '[ <= _ _ ? ] components-2map ;
 SIMD-INTRINSIC: (simd-v<)                ( a b rep -- c )
     dup rep-tf-values '[ <  _ _ ? ] components-2map ;
 SIMD-INTRINSIC: (simd-v=)                ( a b rep -- c )
@@ -276,14 +276,14 @@ SIMD-INTRINSIC: (simd-vpack-unsigned)    ( a b rep -- c )
     [ [ 2byte>rep-array cord-append ] [ rep-length 2 * ] bi ]
     [ narrow-vector-rep >uint-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
     '[ _ c:c-type-clamp ] swap unrolled-map-as-unsafe underlying>> ;
-SIMD-INTRINSIC: (simd-vunpack-head)      ( a   rep -- c ) 
+SIMD-INTRINSIC: (simd-vunpack-head)      ( a   rep -- c )
     [ byte>rep-array ] [ widen-vector-rep [ rep-length ] [ '[ _ >rep-array ] ] bi ] bi
     [ head-slice ] dip call( a' -- c' ) underlying>> ;
 SIMD-INTRINSIC: (simd-vunpack-tail)      ( a   rep -- c )
     [ byte>rep-array ] [ widen-vector-rep [ rep-length ] [ '[ _ >rep-array ] ] bi ] bi
     [ tail-slice ] dip call( a' -- c' ) underlying>> ;
 SIMD-INTRINSIC: (simd-with)              (   n rep -- v )
-    [ rep-length swap '[ _ ] ] [ <rep-array> ] bi replicate-as 
+    [ rep-length swap '[ _ ] ] [ <rep-array> ] bi replicate-as
     underlying>> ;
 SIMD-INTRINSIC: (simd-gather-2)          ( m n rep -- v ) <rep-array> [ 2 set-firstn-unsafe ] keep underlying>> ;
 SIMD-INTRINSIC: (simd-gather-4)          ( m n o p rep -- v ) <rep-array> [ 4 set-firstn-unsafe ] keep underlying>> ;

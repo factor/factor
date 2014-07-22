@@ -28,7 +28,7 @@ M: irc-channel-chat has-participant? participants>> key? ;
     dup participant-chats [ part-participant ] with each ;
 
 : rename-participant* ( new old -- )
-    [ dup participant-chats [ rename-participant ] with with each ]
+    [ dup participant-chats [ rename-participant ] 2with each ]
     [ dup chat> [ rename-nick-chat ] [ 2drop ] if ]
     2bi ;
 

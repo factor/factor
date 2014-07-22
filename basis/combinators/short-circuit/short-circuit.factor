@@ -29,8 +29,8 @@ PRIVATE>
 
 : 0&& ( quots -- ? ) [ ] unoptimized-&& ;
 : 1&& ( obj quots -- ? ) [ with ] unoptimized-&& ;
-: 2&& ( obj1 obj2 quots -- ? ) [ with with ] unoptimized-&& ;
-: 3&& ( obj1 obj2 obj3 quots -- ? ) [ with with with ] unoptimized-&& ;
+: 2&& ( obj1 obj2 quots -- ? ) [ 2with ] unoptimized-&& ;
+: 3&& ( obj1 obj2 obj3 quots -- ? ) [ 3 nwith ] unoptimized-&& ;
 
 MACRO: n|| ( quots n -- quot )
     [
@@ -51,5 +51,5 @@ PRIVATE>
 
 : 0|| ( quots -- ? ) [ ] unoptimized-|| ;
 : 1|| ( obj quots -- ? ) [ with ] unoptimized-|| ;
-: 2|| ( obj1 obj2 quots -- ? ) [ with with ] unoptimized-|| ;
-: 3|| ( obj1 obj2 obj3 quots -- ? ) [ with with with ] unoptimized-|| ;
+: 2|| ( obj1 obj2 quots -- ? ) [ 2with ] unoptimized-|| ;
+: 3|| ( obj1 obj2 obj3 quots -- ? ) [ 3 nwith ] unoptimized-|| ;

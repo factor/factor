@@ -105,7 +105,7 @@ HELP: type-check-error.
 { $error-description "Thrown by various primitives if one of the inputs does not have the expected type. Generic words throw " { $link no-method } " and " { $link no-math-method } " errors in such cases instead." } ;
 
 HELP: divide-by-zero-error.
-{ $error-description "This error is thrown when " { $link / } " or " { $link /i } " is called with with a zero denominator." }
+{ $error-description "This error is thrown when " { $link / } " or " { $link /i } " is called with a zero denominator." }
 { $see-also "division-by-zero" } ;
 
 HELP: signal-error.

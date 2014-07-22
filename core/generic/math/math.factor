@@ -118,7 +118,7 @@ M: math-combination perform-combination
     drop dup generic-word [
         dup [ over ] [
             dup math-class? [
-                [ dup ] [ math-method ] with with math-dispatch-step
+                [ dup ] [ math-method ] 2with math-dispatch-step
             ] [
                 drop object-method
             ] if

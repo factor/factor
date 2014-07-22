@@ -426,7 +426,7 @@ M:: yaml-alias emit-value ( emitter event unused obj -- )
     yaml_emitter_emit_asserted ;
 
 : emit-sequence-body ( emitter event seq -- )
-    [ emit-object ] with with each ;
+    [ emit-object ] 2with each ;
 
 : emit-assoc-body ( emitter event assoc -- )
     [
@@ -534,5 +534,5 @@ PRIVATE>
 : >yaml-docs ( seq -- str )
     [
         [ init-emitter ] dip
-        [ [ replace-identities emit-doc ] with with each ] [ drop flush-emitter ] 3bi
+        [ [ replace-identities emit-doc ] 2with each ] [ drop flush-emitter ] 3bi
     ] with-destructors ;

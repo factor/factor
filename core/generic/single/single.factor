@@ -75,7 +75,7 @@ C: <predicate-engine> predicate-engine
 
 : flatten-method ( method class assoc -- )
     over flatten-class keys
-    [ swap push-method ] with with with each ;
+    [ swap push-method ] 2with with each ;
 
 : flatten-methods ( assoc -- assoc' )
     H{ } clone [ [ swapd flatten-method ] curry assoc-each ] keep ;

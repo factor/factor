@@ -1,7 +1,7 @@
 ! (c)Joe Groff bsd license
 USING: accessors arrays classes classes.tuple combinators
-combinators.short-circuit definitions effects fry hints
-math kernel kernel.private namespaces parser quotations
+combinators.short-circuit definitions effects fry generalizations
+hints math kernel kernel.private namespaces parser quotations
 sequences slots words locals effects.parser
 locals.parser macros stack-checker.dependencies
 classes.maybe classes.algebra ;
@@ -52,7 +52,7 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
     compose compose ;
 
 : make-unboxer ( error-quot word types -- quot )
-    dup [ unboxer ] with with with
+    dup [ unboxer ] 3 nwith
     [ swap \ dip [ ] 2sequence prepend ] map-reduce ;
 
 : (unboxed-types) ( type -- types )
@@ -128,7 +128,7 @@ M: typed-gensym where parent-word where ;
     [ 2nip ] 3tri define-declared ;
 
 MACRO: typed ( quot word effect -- quot' )
-    [ effect-in-types dup typed-stack-effect? [ typed-inputs ] [ 2drop ] if ] 
+    [ effect-in-types dup typed-stack-effect? [ typed-inputs ] [ 2drop ] if ]
     [
         nip effect-out-types dup typed-stack-effect?
         [ [ unboxed-types ] [ make-boxer ] bi '[ @ _ declare @ ] ] [ drop ] if
@@ -152,7 +152,7 @@ M: typed-word subwords
 PRIVATE>
 
 : define-typed ( word def effect -- )
-    [ [ 2drop ] [ typed-def ] [ 2nip ] 3tri define-inline ] 
+    [ [ 2drop ] [ typed-def ] [ 2nip ] 3tri define-inline ]
     [ drop "typed-def" set-word-prop ]
     [ 2drop "typed-word" word-prop set-last-word ] 3tri ;
 

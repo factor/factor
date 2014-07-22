@@ -20,7 +20,7 @@ TUPLE: boid
 C: <boid> boid
 
 : vsum ( vecs -- v )
-    { 0.0 0.0 } [ v+ ] reduce ; inline 
+    { 0.0 0.0 } [ v+ ] reduce ; inline
 
 : vavg ( vecs -- v )
     [ vsum ] [ length ] bi v/n ; inline
@@ -61,11 +61,11 @@ GENERIC: force ( neighbors boid behaviour -- force )
 : wrap-pos ( pos -- pos )
     width height [ 1 - ] bi@ 2array
     [ [ + ] keep mod ] 2map ;
-   
+
 :: simulate ( boids behaviours dt -- boids )
     boids [| boid |
         boid boids behaviours
-        [ [ (force) ] keep weight>> v*n ] with with map vsum :> a
+        [ [ (force) ] keep weight>> v*n ] 2with map vsum :> a
 
         boid vel>> a dt v*n v+ normalize :> vel
         boid pos>> vel dt v*n v+ wrap-pos :> pos
@@ -98,4 +98,3 @@ M:: separation force ( neighbors boid behaviour -- force )
     behaviour radius>> :> r
     boid pos>> neighbors
     [ pos>> v- [ normalize ] [ r v/n ] bi v- ] with map vsum ;
-
