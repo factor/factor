@@ -423,7 +423,7 @@
       (let ((elems '(($heading "Words"))))
         (push (fuel-markup--parse-classes) elems)
         (push (fuel-markup--parse-words) elems)
-        (reverse elems)))))
+        (reverse (remove nil elems))))))
 
 (defun fuel-markup--describe-words (e)
   (when (cadr e)
