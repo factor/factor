@@ -32,7 +32,7 @@ IN: tools.deploy.macosx
 
         [ "Icon.icns" "CFBundleIconFile" ,, ] when
 
-        t NSHighResolutionCapable ,,
+        "true" "NSHighResolutionCapable" ,,
     ] H{ } make ;
 
 : create-app-plist ( icon? executable bundle-name -- )
