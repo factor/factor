@@ -17,7 +17,7 @@ xinput-game-input-backend game-input-backend set-global
     65535 * >fixnum 0 65535 clamp ; inline
 MACRO: map-index-compose ( seq quot -- seq )
     '[ '[ _ execute _ ] _ compose ] map-index 1quotation ;
-    
+
 : fill-buttons ( button-bitmap -- button-array )
     10 0.0 <array> dup rot >fixnum
     { XINPUT_GAMEPAD_START
@@ -114,8 +114,8 @@ M: xinput-game-input-backend instance-id
     if ;
 
 M: xinput-game-input-backend read-controller
-    XINPUT_STATE <struct> [ XInputGetState ] keep
-    swap drop fill-controller-state ;
+    XINPUT_STATE <struct> [ XInputGetState drop ] keep
+    fill-controller-state ;
 
 M: xinput-game-input-backend calibrate-controller drop ;
 

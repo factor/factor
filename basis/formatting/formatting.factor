@@ -20,7 +20,7 @@ IN: formatting
             {
                { CHAR: - [ [ 1 - ] dip remove-nth "-" prepend ] }
                { CHAR: + [ [ 1 - ] dip remove-nth "+" prepend ] }
-               [ drop swap drop ]
+               [ drop nip ]
             } case
          ] [ drop ] if
       ] when ;

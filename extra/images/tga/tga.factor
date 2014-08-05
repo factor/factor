@@ -58,7 +58,7 @@ ERROR: bad-tga-unsupported ;
     read ; inline
 
 : read-color-map ( type length elt-size -- color-map )
-    pick 1 = [ 8 align 8 / * read ] [ 2drop f ] if swap drop ; inline
+    pick 1 = [ 8 align 8 / * read ] [ 2drop f ] if nip ; inline
 
 : read-image-data ( width height depth -- image-data )
     8 align 8 / * * read ; inline
