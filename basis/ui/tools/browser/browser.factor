@@ -92,7 +92,6 @@ M: browser-gadget focusable-child* search-field>> ;
     <browser-gadget>
     <world-attributes>
         "Browser" >>title
-        [ { dialog-window } append ] change-window-controls
     open-status-window ;
 
 : browser-window ( -- )
