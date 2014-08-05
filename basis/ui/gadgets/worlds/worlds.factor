@@ -16,7 +16,7 @@ SYMBOLS:
     small-title-bar
     normal-title-bar
     textured-background
-    floating-window ;
+    dialog-window ;
 
 CONSTANT: default-world-pixel-format-attributes
     {

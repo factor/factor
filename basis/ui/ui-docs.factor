@@ -333,7 +333,7 @@ HELP: normal-title-bar
 HELP: textured-background
 { $description "Asks for a window to have a background that blends seamlessly with the window frame. Factor will leave the window background transparent and pass mouse button gestures not handled directly by a gadget through to the window system so that the window can be dragged from anywhere on its background." } ;
 
-HELP: floating-window
+HELP: dialog-window
 { $description "Provides a hint to the window manager to create a floating, dialog-style window. Currently, this is only implemented for the GTK backend." } ;
 
 HELP: MAIN-WINDOW:
@@ -360,6 +360,6 @@ ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"
     small-title-bar
     normal-title-bar
     textured-background
-    floating-window
+    dialog-window
 }
 "Provide a sequence of these values in the " { $snippet "window-controls" } " slot of the " { $link world-attributes } " tuple you pass to " { $link open-window } "." ;

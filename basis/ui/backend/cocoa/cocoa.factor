@@ -148,7 +148,7 @@ M: cocoa-ui-backend (fullscreen?) ( world -- ? )
     handle>> view>> -> isInFullScreenMode zero? not ;
 
 ! XXX: Until someone tests OSX with a tiling window manager,
-! floating-window is the same as normal-title-window
+! dialog-window is the same as normal-title-window
 CONSTANT: window-control>styleMask
     H{
         { close-button $ NSClosableWindowMask }
@@ -158,7 +158,7 @@ CONSTANT: window-control>styleMask
         { small-title-bar $[ NSTitledWindowMask NSUtilityWindowMask bitor ] }
         { textured-background $ NSTexturedBackgroundWindowMask }
         { normal-title-bar $ NSTitledWindowMask }
-        { floating-window $ NSTitledWindowMask }
+        { dialog-window $ NSTitledWindowMask }
     }
 
 : world>styleMask ( world -- n )
