@@ -5,7 +5,12 @@ core-foundation.time calendar.unix kernel locals math system ;
 IN: core-foundation.timers
 
 TYPEDEF: void* CFRunLoopTimerRef
-TYPEDEF: void* CFRunLoopTimerCallBack
+
+CALLBACK: void CFRunLoopTimerCallBack (
+   CFRunLoopTimerRef timer,
+   void *info
+) ;
+
 TYPEDEF: void* CFRunLoopTimerContext
 
 FUNCTION: CFRunLoopTimerRef CFRunLoopTimerCreate (

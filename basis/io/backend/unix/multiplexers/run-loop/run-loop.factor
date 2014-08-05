@@ -10,13 +10,12 @@ IN: io.backend.unix.multiplexers.run-loop
 TUPLE: run-loop-mx kqueue-mx ;
 
 : file-descriptor-callback ( -- callback )
-    void { CFFileDescriptorRef CFOptionFlags void* }
-    cdecl [
+    [
         3drop
         0 mx get-global kqueue-mx>> wait-for-events
         reset-run-loop
         yield
-    ] alien-callback ;
+    ] CFFileDescriptorCallBack ;
 
 : <run-loop-mx> ( -- mx )
     [
