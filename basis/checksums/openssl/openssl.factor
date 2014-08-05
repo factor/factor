@@ -29,7 +29,7 @@ M: evp-md-context dispose*
     handle>> EVP_MD_CTX_destroy ;
 
 : with-evp-md-context ( quot -- )
-    [ <evp-md-context> ] dip with-disposal ; inline
+    maybe-init-ssl [ <evp-md-context> ] dip with-disposal ; inline
 
 : digest-named ( name -- md )
     dup EVP_get_digestbyname
