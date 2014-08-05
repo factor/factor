@@ -1,10 +1,9 @@
 ! (c)2011 Joe Groff bsd license
-USING: accessors assocs combinators
-combinators.short-circuit continuations fry generalizations
-hashtables.identity io kernel kernel.private layouts locals
-math math.parser math.parser.private math.statistics
-math.vectors memory namespaces prettyprint sequences
-sequences.generalizations sets sorting ;
+USING: accessors assocs combinators combinators.short-circuit
+continuations formatting fry generalizations hashtables.identity
+io kernel kernel.private layouts locals math math.parser
+math.statistics math.vectors memory namespaces prettyprint
+sequences sequences.generalizations sets sorting ;
 FROM: sequences => change-nth ;
 FROM: assocs => change-at ;
 IN: tools.profiler.sampling
@@ -201,10 +200,10 @@ PRIVATE>
     >alist [ second total-time>> ] inv-sort-with ;
 
 : duration. ( duration -- )
-    1000 * >float "%9.1f" format-float write ;
+    1000 * "%9.1f" printf ;
 
 : percentage. ( num denom -- )
-    [ 100 * ] dip /f "%6.2f" format-float write ;
+    [ 100 * ] dip /f "%6.2f" printf ;
 
 DEFER: (profile.)
 
