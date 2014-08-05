@@ -6,7 +6,13 @@ IN: core-foundation.file-descriptors
 
 TYPEDEF: void* CFFileDescriptorRef
 TYPEDEF: int CFFileDescriptorNativeDescriptor
-TYPEDEF: void* CFFileDescriptorCallBack
+
+CALLBACK: void CFFileDescriptorCallBack (
+   CFFileDescriptorRef f,
+   CFOptionFlags callBackTypes,
+   void *info
+) ;
+
 C-TYPE: CFFileDescriptorContext
 
 FUNCTION: CFFileDescriptorRef CFFileDescriptorCreate (
