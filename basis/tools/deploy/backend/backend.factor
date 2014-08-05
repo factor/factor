@@ -47,7 +47,7 @@ ERROR: can't-deploy-library-file library ;
 : make-boot-image ( -- )
     #! If stage1 image doesn't exist, create one.
     my-boot-image-name resource-path exists?
-    [ my-arch make-image ] unless ;
+    [ make-my-image ] unless ;
 
 : bootstrap-profile ( -- profile )
     [
