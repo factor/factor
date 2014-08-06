@@ -36,6 +36,16 @@ template <typename Block> struct bump_allocator {
     else
       return 0;
   }
+
+  void flush() {
+    here = start;
+#ifdef FACTOR_DEBUG
+    /* In case of bugs, there may be bogus references pointing to the
+       memory space after the gc has run. Filling it with a pattern
+       makes accesses to such shadow data fail hard. */
+    memset_cell((void*)start, 0xbaadbaad, size);
+#endif
+  }
 };
 
 }
