@@ -333,3 +333,14 @@ struct ulonglong_pair ffi_test_63() {
   return ullp;
 }
 
+void* bug1021_test_1(void* x, int y) {
+  return (void*)((y * y) + (long)x);
+}
+
+int bug1021_test_2(int x, char *y, void *z) {
+  return y[0];
+}
+
+void* bug1021_test_3(int x) {
+  return (void*)((long)x);
+}
