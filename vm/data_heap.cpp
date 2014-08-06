@@ -68,10 +68,12 @@ template <typename Generation> void data_heap::clear_decks(Generation* gen) {
   memset(&decks[first_deck], 0, last_deck - first_deck);
 }
 
-void data_heap::reset_generation(nursery_space* gen) { gen->here = gen->start; }
+void data_heap::reset_generation(nursery_space* gen) {
+  gen->flush();
+}
 
 void data_heap::reset_generation(aging_space* gen) {
-  gen->here = gen->start;
+  gen->flush();
   clear_cards(gen);
   clear_decks(gen);
   gen->starts.clear_object_start_offsets();
