@@ -1,5 +1,32 @@
-USING: compiler.cfg help.markup help.syntax ;
+USING: classes compiler.cfg help.markup help.syntax sequences ;
 IN: compiler.cfg.dataflow-analysis
+
+HELP: predecessors
+{ $values { "bb" basic-block } { "dfa" "a dataflow analysis symbol" } { "seq" sequence } }
+{ $description "Generic word that returns the predecessors for a block. It's purpose is to facilitate backward analysis in which the blocks successors are seen as the predecessors." } ;
+
+HELP: successors
+{ $values { "bb" basic-block } { "dfa" "a dataflow analysis symbol" } { "seq" sequence } }
+{ $description "Generic word that returns the successors for a block. It's purpose is to facilitate backward analysis in which the blocks predecessors are seen as the successors." } ;
+
+HELP: transfer-set
+{ $values
+  { "in-set" "input state" }
+  { "bb" basic-block }
+  { "dfa" class }
+  { "out-set" "output state" }
+}
+{ $description "Generic word which is called during the dataflow analysis to process each basic block in the cfg. It is supposed to be implemented by all forward and backward dataflow analysis subclasses to perform analysis." } ;
+
+HELP: join-sets
+{ $values
+  { "sets" "input states" }
+  { "bb" basic-block }
+  { "dfa" class }
+  { "set" "merged state" }
+}
+{ $description "Generic word which merges multiple states into one. A block in the cfg might have multiple predecessors and then this word is used to compute the merged input state to use to analyze the block." } ;
+
 
 <PRIVATE
 
