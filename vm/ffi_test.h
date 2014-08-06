@@ -231,3 +231,6 @@ struct ulonglong_pair {
 
 FACTOR_EXPORT struct ulonglong_pair ffi_test_63();
 
+FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
+FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);
+FACTOR_EXPORT void* bug1021_test_3(int x);
