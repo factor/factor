@@ -5,7 +5,14 @@ IN: deques
 HELP: deque-empty?
 { $values { "deque" deque } { "?" boolean } }
 { $contract "Returns true if a deque is empty." }
-{ $notes "This operation is O(1)." } ;
+{ $notes "This operation is O(1)." }
+{ $examples
+  { $example
+    "USING: deques prettyprint unrolled-lists ;"
+    "<unrolled-list> deque-empty? ."
+    "t"
+  }
+} ;
 
 HELP: clear-deque
 { $values
@@ -20,22 +27,29 @@ HELP: deque-member?
 
 HELP: push-front
 { $values { "obj" object } { "deque" deque } }
-{ $description "Push the object onto the front of the deque." } 
+{ $description "Push the object onto the front of the deque." }
 { $notes "This operation is O(1)." } ;
 
 HELP: push-front*
 { $values { "obj" object } { "deque" deque } { "node" "a node" } }
-{ $contract "Push the object onto the front of the deque and return the newly created node." } 
-{ $notes "This operation is O(1)." } ;
+{ $contract "Push the object onto the front of the deque and return the newly created node." }
+{ $notes "This operation is O(1)." }
+{ $examples
+  { $example
+    "USING: deques dlists kernel prettyprint ;"
+    "33 <hashed-dlist> push-front* node-value ."
+    "33"
+  }
+} ;
 
 HELP: push-back
 { $values { "obj" object } { "deque" deque } }
-{ $description "Push the object onto the back of the deque." } 
+{ $description "Push the object onto the back of the deque." }
 { $notes "This operation is O(1)." } ;
 
 HELP: push-back*
 { $values { "obj" object } { "deque" deque } { "node" "a node" } }
-{ $contract "Push the object onto the back of the deque and return the newly created node." } 
+{ $contract "Push the object onto the back of the deque and return the newly created node." }
 { $notes "This operation is O(1)." } ;
 
 HELP: push-all-back
@@ -111,7 +125,14 @@ HELP: node-value
 HELP: slurp-deque
 { $values
      { "deque" deque } { "quot" quotation } }
-{ $description "Pops off the back element of the deque and calls the quotation in a loop until the deque is empty." } ;
+{ $description "Pops off the back element of the deque and calls the quotation in a loop until the deque is empty." }
+{ $examples
+  { $example
+    "USING: deques dlists io kernel ;"
+    "{ \"one\" \"two\" \"three\" } <hashed-dlist> [ push-all-front ] keep [ print ] slurp-deque"
+    "one\ntwo\nthree"
+  }
+} ;
 
 ARTICLE: "deques" "Deques"
 "The " { $vocab-link "deques" } " vocabulary implements the deque data structure which has constant-time insertion and removal of elements at both ends."
