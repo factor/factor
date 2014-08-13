@@ -19,6 +19,23 @@ HELP: box
 }
 { $see-also ##box-alien } ;
 
+HELP: box-return
+{ $values
+  { "vregs" "vregs that contains the return value of the alien call" }
+  { "reps" "representations of the vregs" }
+  { "c-type" abstract-c-type }
+  { "dst" "vreg in which the boxed value, or a reference to it, will be placed" }
+}
+{ $description "Emits instructions for boxing the return value from an alien function call." }
+{ $examples
+  { $unchecked-example
+    "USING: compiler.cfg.builder.alien.boxing kernel make prettyprint ;"
+    "[ { 10 } { tagged-rep } int base-type box-return drop ] { } make ."
+    "{ T{ ##convert-integer { dst 118 } { src 10 } { c-type int } } }"
+  }
+}
+{ $see-also ##box-alien } ;
+
 HELP: stack-size
 { $values
   { "c-type" c-type }
