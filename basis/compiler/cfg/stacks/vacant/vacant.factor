@@ -1,12 +1,11 @@
-USING: accessors arrays byte-arrays classes compiler.cfg.dataflow-analysis
-compiler.cfg.instructions compiler.cfg.registers
-formatting fry io kernel math math.order sequences sets ;
-QUALIFIED: sets
+USING: accessors arrays byte-arrays compiler.cfg.dataflow-analysis
+compiler.cfg.instructions compiler.cfg.registers fry kernel math math.order
+sequences sets ;
 IN: compiler.cfg.stacks.vacant
 
 ! Operations on the stack info
 : register-write ( n stack -- stack' )
-    first2 rot suffix sets:members 2array ;
+    first2 rot suffix members 2array ;
 
 : adjust-stack ( n stack -- stack' )
     first2 pick '[ _ + ] map [ + ] dip 2array ;
@@ -37,10 +36,6 @@ IN: compiler.cfg.stacks.vacant
 
 : insn>gc-map ( insn -- pair )
     gc-map>> [ scrub-d>> ] [ scrub-r>> ] bi 2array ;
-
-! : log-gc-map-insn ( state insn -- )
-!     [ state>gc-map ] [ [ class-of ] [ insn>gc-map ] bi ] bi* rot
-!     2dup = not [ "%u: given %u have %u\n" printf ] [ 3drop ] if ;
 
 : insn>location ( insn -- n ds? )
     loc>> [ n>> ] [ ds-loc? ] bi ;
@@ -76,9 +71,6 @@ M: ##peek visit-insn ( state insn -- state' )
 
 M: gc-map-insn visit-insn ( state insn -- state' )
     dupd set-gc-map [ register-gc ] map ;
-    ! gc-map>> swap state>gc-map first2
-    ! [ >>scrub-d ] [ >>scrub-r ] bi* drop ;
-    ! 2dup log-gc-map-insn drop [ register-gc ] map ;
 
 M: insn visit-insn ( state insn -- state' )
     drop ;
