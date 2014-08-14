@@ -12,5 +12,6 @@ HELP: bb-needs-save-context?
 { $see-also needs-save-context? } ;
 
 HELP: needs-save-context?
+{ $values { "insn" "an instruction" } { "?" "a boolean" } }
 { $description "Whether the given instruction needs to be preceeded by a " { $link ##save-context } " instruction or not. Only instructions that can allocate memory mandates save contexts." }
 { $see-also gc-map-insn } ;

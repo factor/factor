@@ -18,5 +18,5 @@ HELP: 2inputs
 { $description "Lifts the two topmost values from the datastack and stores them in virtual registers. The datastacks height is adjusted afterwards." } ;
 
 HELP: 3inputs
-{ $values { "vreg1" "a vreg" } { "vreg2" "a vreg" } { "vreg2" "a vreg" } }
+{ $values { "vreg1" "a vreg" } { "vreg2" "a vreg" } { "vreg3" "a vreg" } }
 { $description "Lifts the three topmost values from the datastack and stores them in virtual registers. The datastacks height is adjusted afterwards." } ;
