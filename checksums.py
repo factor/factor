@@ -58,6 +58,7 @@ dlls = [
     ('pcre.dll', '57cac848fa14ae38f14f9441f8933282', 'ce9a046b8ac744d20015ef93e2d23a47'),
     ('sqlite3.dll', '5405413fff79b8d9c747aa900f60f082', 'e5a07bbb9dcff7e72142f589d7d0234c'),
     ('ssleay32.dll', 'e1f3b02f7670b6f92cf05ac7628297aa', '0131a8cbeb9772bb70c34bfc8406943a'),
+    ('libyaml-0-2.dll', '5aa3f060b1858f28b124ade5dce079ed', 'd7b47ae80b9a3a7f2d62a33262a51334'),
     ('zip32z64.dll', 'd389ce96885acb61c4e471b9ee3a8063', '10dc180ed4b49ddcd0ea2e61ae62259b'),
     ('zlib1.dll', '80e41408f6d641dc1c0f5353a0cc8125', '55c57c4c216ff91c8776ac2df0c5d94a')
 ]
