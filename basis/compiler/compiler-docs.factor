@@ -54,6 +54,8 @@ $nl
 
 ABOUT: "compiler"
 
+HELP: compiled { $var-description "An " { $link assoc } " used during the compilation process which maps from words to their generated code." } ;
+
 HELP: frontend
 { $values { "word" word } { "tree" sequence } }
 { $description "First step of the compilation process. It outputs a high-level tree in SSA form." } ;

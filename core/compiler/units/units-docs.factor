@@ -91,6 +91,15 @@ $nl
 $nl
 "If classes, methods or generic words were redefined, then inline cache call sites need to be updated as well. Passing " { $link t } " as the " { $snippet "reset-pics?" } " parameter enables this code path."
 }
+{ $examples
+  "Manually creating a word using the non-optimizing compiler:"
+  { $example
+    "USING: compiler.units io ;"
+    "IN: test SYMBOL: foo"
+    "{ { foo [ \"hello!\" write nl ] } } t t modify-code-heap foo"
+    "hello!"
+  }
+}
 { $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;
 
 HELP: compile
