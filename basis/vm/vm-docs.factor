@@ -20,3 +20,14 @@ HELP: vm
 HELP: vm-field-offset
 { $values { "field" string } { "offset" number } }
 { $description "Gets the offset in bytes to the named virtual machine field." } ;
+
+HELP: gc-info
+{ $class-description "A struct that defines the sizes of the garbage collection maps for a word. It has the following slots:"
+  { $table
+    { { $slot "scrub-d-count" } "Number of datastack scrub bits per callsite." }
+    { { $slot "scrub-r-count" } "Number of retainstack scrub bits per callsite." }
+    { { $slot "gc-root-count" } "Number of gc root bits per callsite." }
+    { { $slot "derived-root-count" } "Number of derived roots per callsite." }
+    { { $slot "return-address-count" } "Number of gc callsites." }
+  }
+} ;

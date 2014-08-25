@@ -1,4 +1,4 @@
-USING: bit-arrays classes.struct tools.gc-decode tools.test ;
+USING: bit-arrays classes.struct tools.gc-decode tools.test vm ;
 QUALIFIED: effects
 QUALIFIED: llvm.types
 QUALIFIED: unix.process

@@ -1,6 +1,6 @@
 USING: accessors alien alien.c-types alien.data arrays assocs bit-arrays
 bit-arrays.private classes.struct fry grouping kernel math math.statistics
-sequences sequences.repeating words ;
+sequences sequences.repeating vm words ;
 IN: tools.gc-decode
 
 ! Utils
@@ -19,13 +19,6 @@ IN: tools.gc-decode
 : end-address>direct-array ( obj count type -- seq )
     [ heap-size * [ >c-ptr alien-address ] dip - <alien> ] 2keep
     c-direct-array-constructor execute( alien len -- seq ) ;
-
-STRUCT: gc-info
-    { scrub-d-count uint read-only }
-    { scrub-r-count uint read-only }
-    { gc-root-count uint read-only }
-    { derived-root-count uint read-only }
-    { return-address-count uint read-only } ;
 
 : bit-counts ( gc-info -- counts )
     struct-slot-values 3 head ;
