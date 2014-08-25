@@ -1,4 +1,4 @@
-USING: accessors arrays byte-arrays compiler.cfg.dataflow-analysis
+USING: accessors arrays compiler.cfg.dataflow-analysis
 compiler.cfg.instructions compiler.cfg.registers fry kernel math math.order
 sequences sets ;
 IN: compiler.cfg.stacks.vacant
@@ -20,19 +20,17 @@ IN: compiler.cfg.stacks.vacant
 : stack>vacant ( stack -- seq )
     first2 [ 0 max iota ] dip diff ;
 
-: vacant>byte-array ( seq -- ba )
-    [ B{ } ] [
+: vacant>bit-pattern ( vacant --  bit-pattern )
+    [ { } ] [
         dup supremum 1 + 1 <array>
-        [ '[ _ 0 -rot set-nth ] each ] keep >byte-array
+        [ '[ _ 0 -rot set-nth ] each ] keep
     ] if-empty ;
 
 ! Operations on the analysis state
 : state>gc-map ( state -- pair )
-    [ stack>vacant vacant>byte-array ] map ;
+    [ stack>vacant vacant>bit-pattern ] map ;
 
-! Stack bottom is 0 for d and r and no replaces.
-: initial-state ( -- state )
-    { { 0 { } } { 0 { } } } ;
+CONSTANT: initial-state { { 0 { } } { 0 { } } }
 
 : insn>gc-map ( insn -- pair )
     gc-map>> [ scrub-d>> ] [ scrub-r>> ] bi 2array ;
