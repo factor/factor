@@ -42,6 +42,16 @@ USING: cpu.architecture make ;
 init-relocation [ %safepoint ] B{ } make disassemble
 00000000010b05a0: 890500000000  mov [rip], eax
 ;
+
+STRING: ex-%save-context
+USING: cpu.architecture make ;
+[ RAX RBX %save-context ] B{ } make disassemble
+0000000000e63ab0: 498b4500    mov rax, [r13]
+0000000000e63ab4: 488d5c24f8  lea rbx, [rsp-0x8]
+0000000000e63ab9: 488918      mov [rax], rbx
+0000000000e63abc: 4c897010    mov [rax+0x10], r14
+0000000000e63ac0: 4c897818    mov [rax+0x18], r15
+;
 >>
 
 HELP: signed-rep
@@ -96,7 +106,8 @@ HELP: %safepoint
 
 HELP: %save-context
 { $values { "temp1" "a register symbol" } { "temp2" "a register symbol" } }
-{ $description "Emits machine code for saving pointers to the callstack, datastack and retainstack in the current context field struct." } ;
+{ $description "Emits machine code for saving pointers to the callstack, datastack and retainstack in the current context field struct." }
+{ $examples { $unchecked-example $[ ex-%save-context ] } } ;
 
 
 HELP: %allot
