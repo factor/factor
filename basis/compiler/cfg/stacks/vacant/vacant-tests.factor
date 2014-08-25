@@ -1,7 +1,7 @@
 USING: accessors arrays assocs compiler.cfg
 compiler.cfg.dataflow-analysis.private compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stacks.vacant kernel math sequences
-sorting tools.test vectors ;
+compiler.cfg.linearization compiler.cfg.registers compiler.cfg.stacks.vacant
+kernel math sequences sorting tools.test vectors ;
 IN: compiler.cfg.stacks.vacant.tests
 
 ! Utils
@@ -72,7 +72,7 @@ IN: compiler.cfg.stacks.vacant.tests
 ! [
 !     V{
 !         T{ ##replace { src 10 } { loc D -1 } }
-!         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d B{ } } } } }
+!         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
 !         T{ ##peek { dst 0 } { loc D -1 } }
 !     } create-cfg
 !     compute-vacant-sets
@@ -82,7 +82,7 @@ IN: compiler.cfg.stacks.vacant.tests
 { { -1 { -1 } } } [
     V{
         T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##alien-invoke { gc-map T{ gc-map { scrub-d B{ } } } } }
+        T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
         T{ ##inc-d f -1 }
         T{ ##peek { dst 0 } { loc D -1 } }
     } create-cfg output-stack-map first
@@ -92,14 +92,14 @@ IN: compiler.cfg.stacks.vacant.tests
 ! [
 !     V{
 !         T{ ##inc-d f 1 }
-!         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d B{ } } } } }
+!         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
 !         T{ ##peek { dst 0 } { loc D 0 } }
 !     } create-cfg
 !     compute-vacant-sets
 ! ] [ vacant-peek? ] must-fail-with
 
 ! visit-insn should set the gc info.
-{ B{ 0 0 } B{ } } [
+{ { 0 0 } { } } [
     { { 2 { } } { 0 { } } }
     T{ ##alien-invoke { gc-map T{ gc-map } } }
     [ visit-insn drop ] keep gc-map>> [ scrub-d>> ] [ scrub-r>> ] bi
@@ -213,7 +213,7 @@ IN: compiler.cfg.stacks.vacant.tests
 
                 T{ ##inc-d f -3 }
                 T{ ##peek { dst 0 } { loc D -3 } }
-                T{ ##alien-invoke { gc-map T{ gc-map { scrub-d B{ } } } } }
+                T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
             }
         }
     } [ over create-block ] assoc-map dup
