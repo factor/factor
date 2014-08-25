@@ -1,4 +1,4 @@
-USING: assocs help.markup help.syntax words ;
+USING: assocs help.markup help.syntax vm words ;
 IN: tools.gc-decode
 
 ARTICLE: "tools.gc-decode" "GC maps decoder"
