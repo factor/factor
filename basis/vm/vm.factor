@@ -91,3 +91,10 @@ STRUCT: dispatch-statistics
 
 { pic-tag-count cell }
 { pic-tuple-count cell } ;
+
+STRUCT: gc-info
+    { scrub-d-count uint read-only }
+    { scrub-r-count uint read-only }
+    { gc-root-count uint read-only }
+    { derived-root-count uint read-only }
+    { return-address-count uint read-only } ;
