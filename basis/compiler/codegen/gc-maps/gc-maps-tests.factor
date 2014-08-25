@@ -19,12 +19,16 @@ M: fake-cpu gc-root-offset ;
 
         50 <byte-array> %
 
-        T{ gc-map f B{ } B{ } V{ } } gc-map-here
+        <gc-map> gc-map-here
 
         50 <byte-array> %
 
-        T{ gc-map f B{ 0 1 1 1 0 } B{ 1 0 } V{ 1 3 } V{ { 2 4 } } } gc-map-here
-
+        T{ gc-map
+           { scrub-d { 0 1 1 1 0 } }
+           { scrub-r { 1 0 } }
+           { gc-roots V{ 1 3 } }
+           { derived-roots V{ { 2 4 } } }
+        } gc-map-here
         emit-gc-maps
     ] B{ } make
     "result" set

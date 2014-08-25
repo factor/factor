@@ -15,12 +15,12 @@ ARTICLE: "compiler.cfg.stacks.vacant" "Uninitialized/overinitialized stack locat
 HELP: initial-state
 { $description "Initially the stack bottom is at 0 for both the data and retain stacks and no replaces have been registered." } ;
 
-HELP: vacant>bit-pattern
+HELP: vacant>bits
 { $values
   { "vacant" "sequence of uninitialized stack locations" }
-  { "bit-pattern" "sequence of 1:s and 0:s" }
+  { "bits" "sequence of 1:s and 0:s" }
 }
-{ $description "Converts a sequence of uninitialized stack locations to the pattern of 1:s and 0:s that can be put in the " { $slot "scrub-d" } " and " { $slot "scrub-r" } " slots of a " { $link gc-map } "." }
+{ $description "Converts a sequence of uninitialized stack locations to the pattern of 1:s and 0:s that can be put in the " { $slot "scrub-d" } " and " { $slot "scrub-r" } " slots of a " { $link gc-map } ". 0:s are uninitialized locations and 1:s are initialized." }
 { $examples
   { $example
     "USING: compiler.cfg.stacks.vacant prettyprint ;"
@@ -28,5 +28,12 @@ HELP: vacant>bit-pattern
     "{ 0 0 1 0 }"
   }
 } ;
+
+HELP: overinitialized>bits
+{ $values
+  { "overinitialized" "sequence of overinitialized stack locations" }
+  { "bits" "sequence of 1:s and 0:s" }
+}
+{ $description "Converts a sequence of overinitialized stack locations to the pattern of 1:s and 0:s that can be put in the " { $slot "check-d" } " and " { $slot "check-r" } " slots of a " { $link gc-map } ". 0:s are empty locations and 1:s are initialized. First element is stack location -1,second -2 and so on." } ;
 
 ABOUT: "compiler.cfg.stacks.vacant"

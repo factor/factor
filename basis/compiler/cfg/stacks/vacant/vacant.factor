@@ -1,7 +1,11 @@
-USING: accessors arrays compiler.cfg.dataflow-analysis
+USING: accessors arrays assocs classes.tuple compiler.cfg.dataflow-analysis
 compiler.cfg.instructions compiler.cfg.registers fry kernel math math.order
 sequences sets ;
 IN: compiler.cfg.stacks.vacant
+
+! Utils
+: write-slots ( tuple values slots -- )
+    [ execute( x y -- z ) ] 2each drop ;
 
 ! Operations on the stack info
 : register-write ( n stack -- stack' )
@@ -13,27 +17,30 @@ IN: compiler.cfg.stacks.vacant
 : read-ok? ( n stack -- ? )
     [ first >= ] [ second in? ] 2bi or ;
 
-! After a gc, negative writes have been erased.
-: register-gc ( stack -- stack' )
-    first2 [ 0 >= ] filter 2array ;
-
 : stack>vacant ( stack -- seq )
     first2 [ 0 max iota ] dip diff ;
 
-: vacant>bit-pattern ( vacant --  bit-pattern )
+: vacant>bits ( vacant --  bits )
     [ { } ] [
         dup supremum 1 + 1 <array>
         [ '[ _ 0 -rot set-nth ] each ] keep
     ] if-empty ;
 
+: stack>overinitialized ( stack -- seq )
+    second [ 0 < ] filter ;
+
+: overinitialized>bits ( overinitialized -- bits )
+    [ neg 1 - ] map vacant>bits [ 1 = 0 1 ? ] map ;
+
+: stack>scrub-and-check ( stack -- pair )
+    [ stack>vacant vacant>bits ]
+    [ stack>overinitialized overinitialized>bits ] bi 2array ;
+
 ! Operations on the analysis state
-: state>gc-map ( state -- pair )
-    [ stack>vacant vacant>bit-pattern ] map ;
+: state>gc-data ( state -- gc-data )
+    [ stack>scrub-and-check ] map ;
 
 CONSTANT: initial-state { { 0 { } } { 0 { } } }
-
-: insn>gc-map ( insn -- pair )
-    gc-map>> [ scrub-d>> ] [ scrub-r>> ] bi 2array ;
 
 : insn>location ( insn -- n ds? )
     loc>> [ n>> ] [ ds-loc? ] bi ;
@@ -58,17 +65,15 @@ M: ##inc-r visit-insn ( state insn -- state' )
 M: ##replace-imm visit-insn visit-replace ;
 M: ##replace visit-insn visit-replace ;
 
-! Disabled for now until support is added for tracking overinitialized
-! stack locations.
 M: ##peek visit-insn ( state insn -- state' )
-    drop ;
-    ! 2dup peek-loc-ok? [ drop ] [ vacant-peek ] if ;
+    2dup peek-loc-ok? [ drop ] [ vacant-peek ] if ;
 
-: set-gc-map ( state insn -- )
-    gc-map>> swap state>gc-map first2 [ >>scrub-d ] [ >>scrub-r ] bi* drop ;
+: set-gc-map ( state gc-map -- )
+    swap state>gc-data concat
+    { >>scrub-d >>check-d >>scrub-r >>check-r } write-slots ;
 
 M: gc-map-insn visit-insn ( state insn -- state' )
-    dupd set-gc-map [ register-gc ] map ;
+    dupd gc-map>> set-gc-map ;
 
 M: insn visit-insn ( state insn -- state' )
     drop ;
