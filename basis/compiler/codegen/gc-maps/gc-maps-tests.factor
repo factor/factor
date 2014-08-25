@@ -2,16 +2,9 @@ USING: namespaces byte-arrays make compiler.codegen.gc-maps
 compiler.codegen.relocation bit-arrays accessors classes.struct
 tools.test kernel math sequences alien.c-types
 specialized-arrays boxes compiler.cfg.instructions system
-cpu.architecture ;
+cpu.architecture vm ;
 SPECIALIZED-ARRAY: uint
 IN: compiler.codegen.gc-maps.tests
-
-STRUCT: gc-info
-{ scrub-d-count uint }
-{ scrub-r-count uint }
-{ gc-root-count uint }
-{ derived-root-count uint }
-{ return-address-count uint } ;
 
 SINGLETON: fake-cpu
 
@@ -63,7 +56,7 @@ M: fake-cpu gc-root-offset ;
         ! Return addresses
         uint-array{ 100 } underlying>> %
 
-        ! GC info footer - 16 bytes
+        ! GC info footer - 20 bytes
         S{ gc-info
             { scrub-d-count 5 }
             { scrub-r-count 2 }
