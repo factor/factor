@@ -34,21 +34,21 @@ IN: compiler.cfg.stacks.vacant.tests
 } [ V{ T{ ##inc-r f 1 } } create-cfg output-stack-map ] unit-test
 
 ! Uninitialized peeks
-! [
-!     V{
-!         T{ ##inc-d f 1 }
-!         T{ ##peek { dst 0 } { loc D 0 } }
-!     } create-cfg
-!     compute-vacant-sets
-! ] [ vacant-peek? ] must-fail-with
+[
+    V{
+        T{ ##inc-d f 1 }
+        T{ ##peek { dst 0 } { loc D 0 } }
+    } create-cfg
+    compute-vacant-sets
+] [ vacant-peek? ] must-fail-with
 
-! [
-!     V{
-!         T{ ##inc-r f 1 }
-!         T{ ##peek { dst 0 } { loc R 0 } }
-!     } create-cfg
-!     compute-vacant-sets
-! ] [ vacant-peek? ] must-fail-with
+[
+    V{
+        T{ ##inc-r f 1 }
+        T{ ##peek { dst 0 } { loc R 0 } }
+    } create-cfg
+    compute-vacant-sets
+] [ vacant-peek? ] must-fail-with
 
 
 ! Here the peek refers to a parameter of the word.
@@ -68,15 +68,17 @@ IN: compiler.cfg.stacks.vacant.tests
     compute-vacant-sets
 ] unit-test
 
-! Replace -1, then gc, then peek is not ok.
-! [
-!     V{
-!         T{ ##replace { src 10 } { loc D -1 } }
-!         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
-!         T{ ##peek { dst 0 } { loc D -1 } }
-!     } create-cfg
-!     compute-vacant-sets
-! ] [ vacant-peek? ] must-fail-with
+! Replace -1, then gc. Peek is ok here because the -1 should be
+! checked.
+{ { 1 } } [
+    V{
+        T{ ##replace { src 10 } { loc D -1 } }
+        T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
+        T{ ##peek { dst 0 } { loc D -1 } }
+    }
+    [ create-cfg compute-vacant-sets ]
+    [ second gc-map>> check-d>> ] bi
+] unit-test
 
 ! Should be ok because the value was at 0 when the gc ran.
 { { -1 { -1 } } } [
@@ -89,14 +91,14 @@ IN: compiler.cfg.stacks.vacant.tests
 ] unit-test
 
 ! Should not be ok because the value wasn't initialized when gc ran.
-! [
-!     V{
-!         T{ ##inc-d f 1 }
-!         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
-!         T{ ##peek { dst 0 } { loc D 0 } }
-!     } create-cfg
-!     compute-vacant-sets
-! ] [ vacant-peek? ] must-fail-with
+[
+    V{
+        T{ ##inc-d f 1 }
+        T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
+        T{ ##peek { dst 0 } { loc D 0 } }
+    } create-cfg
+    compute-vacant-sets
+] [ vacant-peek? ] must-fail-with
 
 ! visit-insn should set the gc info.
 { { 0 0 } { } } [
@@ -105,7 +107,9 @@ IN: compiler.cfg.stacks.vacant.tests
     [ visit-insn drop ] keep gc-map>> [ scrub-d>> ] [ scrub-r>> ] bi
 ] unit-test
 
-{ { { 0 { } } { 0 { } } } } [
+{
+    { { 0 { } } { 0 { } } }
+} [
     V{ T{ ##safepoint } T{ ##prologue } T{ ##branch } }
     create-cfg output-stack-map
 ] unit-test
@@ -141,13 +145,20 @@ IN: compiler.cfg.stacks.vacant.tests
     } create-cfg output-stack-map first
 ] unit-test
 
-{ { 0 { -1 } } }
-[
+{
+    { 0 { -1 } }
+} [
     V{
         T{ ##inc-d f 1 }
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##inc-d f -1 }
     } create-cfg output-stack-map first
+] unit-test
+
+{
+    { { { } { 1 1 1 } } { { } { 1 } } }
+} [
+    { { 4 { 3 2 1 -3 0 -2 -1 } } { 0 { -1 } } } state>gc-data
 ] unit-test
 
 : cfg1 ( -- cfg )
@@ -219,4 +230,6 @@ IN: compiler.cfg.stacks.vacant.tests
     } [ over create-block ] assoc-map dup
     { { 0 1 } { 1 2 } { 2 3 } { 3 8 } { 8 10 } } make-edges 0 of block>cfg ;
 
-{ { 4 { 3 2 1 0 } } } [ bug1021-cfg output-stack-map first ] unit-test
+{ { 4 { 3 2 1 -3 0 -2 -1 } } } [
+    bug1021-cfg output-stack-map first
+] unit-test
