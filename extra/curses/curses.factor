@@ -322,6 +322,9 @@ PRIVATE>
 : wgetch ( window -- key ) ptr>> (wgetch) ;
 : getch ( -- key ) current-window get wgetch ;
 
+: wgetch-err ( window -- key ) ptr>> ffi:wgetch ;
+: getch-err ( -- key ) current-window get wgetch-err ;
+
 : waddch ( ch window -- ) ptr>> (waddch) ;
 : addch ( ch -- ) current-window get waddch ;
 
