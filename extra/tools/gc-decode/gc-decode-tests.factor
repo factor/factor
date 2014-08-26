@@ -18,7 +18,7 @@ IN: tools.gc-decode.tests
 
 ! scrub-bits
 {
-    ?{ t t t t f t t t t }
+    ?{ t t t f t t t t }
 } [
     \ effects:<effect> word>gc-info scrub-bits
 ] unit-test
@@ -32,7 +32,7 @@ IN: tools.gc-decode.tests
 ! decode-gc-maps
 {
     {
-        { 151 { { ?{ t } ?{ t t t } ?{ f t t t t } } { } } }
+        { 151 { { ?{ } ?{ t t t } ?{ } ?{ } ?{ f t t t t } } { } } }
     }
 } [
     \ effects:<effect> decode-gc-maps
@@ -40,9 +40,10 @@ IN: tools.gc-decode.tests
 
 {
     {
-        { 82 { { ?{ t f f } ?{ t f } ?{ } } { } } }
-        { 244 { { ?{ t f f } ?{ f f } ?{ } } { } } }
-        { 522 { { ?{ t t f } ?{ t f } ?{ } } { } } }
+        { 82 { { ?{ t f } ?{ t } ?{ f } ?{ f f } ?{ } } { } } }
+        { 244 { { ?{ f f } ?{ f } ?{ f } ?{ t f } ?{ } } { } } }
+        { 445 { { ?{ f f } ?{ f } ?{ t } ?{ t t } ?{ } } { } } }
+        { 522 { { ?{ t t } ?{ f } ?{ f } ?{ t f } ?{ } } { } } }
     }
 } [
     \ unix.process:fork-process decode-gc-maps
@@ -55,12 +56,13 @@ IN: tools.gc-decode.tests
 
 ! base-pointer-groups
 {
-
     {
         { -1 -1 -1 -1 -1 -1 -1 }
         { -1 -1 -1 -1 -1 -1 -1 }
+        { -1 -1 -1 -1 -1 -1 -1 }
         { -1 -1 -1 -1 -1 -1 5 }
         { -1 -1 -1 -1 -1 -1 5 }
+        { -1 -1 -1 -1 -1 -1 -1 }
     }
 } [
     \ llvm.types:resolve-types word>gc-info base-pointer-groups
@@ -69,7 +71,7 @@ IN: tools.gc-decode.tests
 
 ! One of the few words that has derived roots.
 {
-    S{ gc-info f 0 2 6 7 4 }
+    S{ gc-info f 0 2 2 2 6 7 6 }
 } [
     \ llvm.types:resolve-types word>gc-info
 ] unit-test
