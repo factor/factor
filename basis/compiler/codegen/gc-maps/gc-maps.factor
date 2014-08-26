@@ -30,11 +30,10 @@ IN: compiler.codegen.gc-maps
 
 SYMBOLS: return-addresses gc-maps ;
 
-
-: gc-map-needed? ( gc-map -- ? )
+: gc-map-needed? ( gc-map/f -- ? )
     ! If there are no stack locations to scrub or check, and no GC
     ! roots, there's no point storing the GC map.
-    tuple-slots [ empty? ] all? not ;
+    dup [ tuple-slots [ empty? ] all? not ] when ;
 
 : gc-map-here ( gc-map -- )
     dup gc-map-needed? [
