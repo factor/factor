@@ -70,7 +70,7 @@ IN: compiler.cfg.stacks.vacant.tests
 
 ! Replace -1, then gc. Peek is ok here because the -1 should be
 ! checked.
-{ { 1 } } [
+{ { 0 } } [
     V{
         T{ ##replace { src 10 } { loc D -1 } }
         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
@@ -156,7 +156,7 @@ IN: compiler.cfg.stacks.vacant.tests
 ] unit-test
 
 {
-    { { { } { 1 1 1 } } { { } { 1 } } }
+    { { { } { 0 0 0 } } { { } { 0 } } }
 } [
     { { 4 { 3 2 1 -3 0 -2 -1 } } { 0 { -1 } } } state>gc-data
 ] unit-test

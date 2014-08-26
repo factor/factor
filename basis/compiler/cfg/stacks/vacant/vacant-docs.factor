@@ -34,6 +34,6 @@ HELP: overinitialized>bits
   { "overinitialized" "sequence of overinitialized stack locations" }
   { "bits" "sequence of 1:s and 0:s" }
 }
-{ $description "Converts a sequence of overinitialized stack locations to the pattern of 1:s and 0:s that can be put in the " { $slot "check-d" } " and " { $slot "check-r" } " slots of a " { $link gc-map } ". 0:s are empty locations and 1:s are initialized. First element is stack location -1,second -2 and so on." } ;
+{ $description "Converts a sequence of overinitialized stack locations to the pattern of 1:s and 0:s that can be put in the " { $slot "check-d" } " and " { $slot "check-r" } " slots of a " { $link gc-map } ". 0:s are initialized locations and 0:s are empty ones. First element is stack location -1,second -2 and so on." } ;
 
 ABOUT: "compiler.cfg.stacks.vacant"
