@@ -16,7 +16,7 @@ HELP: decode-gc-maps
     {
         "Each value is a two-tuple where:"
         { $list
-          "The first element is a three-tuple containing the scrub patterns for the datastack, retainstack and gc roots."
+          "The first element is a five-tuple containing the scrub patterns for the datastack, retainstack, then the check patterns for them and gc roots."
           "The second element is a sequence of derived roots for the callsite."
         }
     }
@@ -26,7 +26,7 @@ HELP: decode-gc-maps
   { $unchecked-example
     "USING: effects prettyprint ;"
     "\\ <effect> decode-gc-maps ."
-    "{ { 151 { { ?{ t } ?{ t t t } ?{ f t t t t } } { } } } }"
+    "{ { 151 { { ?{ } ?{ t t t } ?{ } ?{ } ?{ f t t t t } } { } } } }"
   }
 } ;
 
