@@ -30,7 +30,7 @@ IN: compiler.cfg.stacks.vacant
     second [ 0 < ] filter ;
 
 : overinitialized>bits ( overinitialized -- bits )
-    [ neg 1 - ] map vacant>bits [ 1 = 0 1 ? ] map ;
+    [ neg 1 - ] map vacant>bits ;
 
 : stack>scrub-and-check ( stack -- pair )
     [ stack>vacant vacant>bits ]
