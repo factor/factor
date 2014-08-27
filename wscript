@@ -107,6 +107,13 @@ def options(ctx):
         default = False,
         help = 'Build with debugging settings'
     )
+    ctx.add_option(
+        '--debug-gc-maps',
+        action = 'store_true',
+        default = False,
+        help = 'Build with gc map debugging'
+    )
+
 
 def configure(ctx):
     ctx.load('compiler_c compiler_cxx')
@@ -177,6 +184,8 @@ def configure(ctx):
             env.LINKFLAGS += ['/DEBUG']
         elif cxx == 'g++':
             env.CXXFLAGS += ['-g']
+    if opts.debug_gc_maps:
+        ctx.define('DEBUG_GC_MAPS', 1)
 
 def download_file(self):
     gen = self.generator
