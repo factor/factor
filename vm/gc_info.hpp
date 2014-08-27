@@ -39,11 +39,29 @@ struct gc_info {
     return (uint8_t*)base_pointer_map() - total_bitmap_bytes();
   }
 
-  cell callsite_scrub_d(cell index) { return index * scrub_d_count; }
+  cell callsite_scrub_d(cell index) {
+    cell base = 0;
+    return base + index * scrub_d_count;
+  }
 
   cell callsite_scrub_r(cell index) {
     cell base = return_address_count * scrub_d_count;
     return base + index * scrub_r_count;
+  }
+
+  cell callsite_check_d(cell index) {
+    cell base =
+        return_address_count * scrub_d_count +
+        return_address_count * scrub_r_count;
+    return base + index * check_d_count;
+  }
+
+  cell callsite_check_r(cell index) {
+    cell base =
+        return_address_count * scrub_d_count +
+        return_address_count * scrub_r_count +
+        return_address_count * check_d_count;
+    return base + index + check_r_count;
   }
 
   cell callsite_gc_roots(cell index) {
