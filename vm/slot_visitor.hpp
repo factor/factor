@@ -264,10 +264,12 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_roots() {
 template <typename Fixup> struct call_frame_slot_visitor {
   factor_vm* parent;
   slot_visitor<Fixup>* visitor;
+  context* ctx;
 
   call_frame_slot_visitor(factor_vm* parent,
-                          slot_visitor<Fixup>* visitor)
-      : parent(parent), visitor(visitor) {}
+                          slot_visitor<Fixup>* visitor,
+                          context* ctx)
+      : parent(parent), visitor(visitor), ctx(ctx) {}
 
   /*
 	frame top -> [return address]
@@ -310,6 +312,29 @@ template <typename Fixup> struct call_frame_slot_visitor {
       }
     }
 
+    /* Trace all overinitialized stack locations. */
+    cell callsite_check_d = info->callsite_check_d(callsite);
+    for (uint32_t loc = 0; loc < info->check_d_count; loc++) {
+      if (bitmap_p(bitmap, callsite_check_d + loc)) {
+#ifdef DEBUG_GC_MAPS
+        std::cout << "checking datastack location " << loc << std::endl;
+#endif
+        cell* value_ptr = ((cell*)ctx->datastack + loc + 1);
+        visitor->visit_handle(value_ptr);
+      }
+    }
+
+    cell callsite_check_r = info->callsite_check_r(callsite);
+    for (uint32_t loc = 0; loc < info->check_r_count; loc++) {
+      if (bitmap_p(bitmap, callsite_check_r + loc)) {
+#ifdef DEBUG_GC_MAPS
+        std::cout << "checking retainstack location " << loc << std::endl;
+#endif
+        cell* value_ptr = ((cell*)ctx->retainstack + loc + 1);
+        visitor->visit_handle(value_ptr);
+      }
+    }
+
     /* Update all GC roots, including base pointers. */
     cell callsite_gc_roots = info->callsite_gc_roots(callsite);
 
@@ -334,13 +359,14 @@ template <typename Fixup> struct call_frame_slot_visitor {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_callstack_object(callstack* stack) {
-  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this);
+  /* TODO: is parent->ctx right? */
+  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this, parent->ctx);
   parent->iterate_callstack_object(stack, call_frame_visitor, fixup);
 }
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_callstack(context* ctx) {
-  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this);
+  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this, ctx);
   parent->iterate_callstack(ctx, call_frame_visitor, fixup);
 }
 
