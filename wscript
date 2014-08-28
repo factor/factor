@@ -431,8 +431,8 @@ def build(ctx):
     glob = base.ant_glob(pat)
     ctx.install_files(sharedir, glob, cwd = base, relative_trick = True)
 
-    # Install image
-    ctx.install_files(libdir, image_target)
+    # Install factor.image and boot image
+    ctx.install_files(libdir, [image_target, boot_image_name])
     ctx.symlink_as(
         '${PREFIX}/bin/%s' % image_target,
         '../lib/factor/%s' % image_target
