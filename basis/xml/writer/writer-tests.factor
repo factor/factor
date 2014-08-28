@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.data xml.writer tools.test fry xml xml.syntax kernel multiline
 xml.writer.private io.streams.string xml.traversal sequences
-io.encodings.utf8 io.files accessors io.directories math math.parser ;
+io.encodings.utf8 io.files io.files.temp accessors io.directories math
+math.parser ;
 IN: xml.writer.tests
 
 ! Add a test for pprint-xml with sensitive-tags
@@ -58,9 +59,12 @@ IN: xml.writer.tests
 [ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test
 [ "<foo'>" ] [ "<foo'>" <unescaped> xml>string ] unit-test
 
-CONSTANT: test-file "resource:basis/xml/writer/test.xml"
+: test-file ( -- path )
+    "test.xml" temp-file ;
 
-[ ] [ "<?xml version='1.0' encoding='UTF-16BE'?><x/>" string>xml test-file utf8 [ write-xml ] with-file-writer ] unit-test
+[ ] [
+    "<?xml version='1.0' encoding='UTF-16BE'?><x/>" string>xml test-file utf8 [ write-xml ] with-file-writer
+] unit-test
 [ "x" ] [ test-file file>xml body>> name>> main>> ] unit-test
 [ ] [ test-file delete-file ] unit-test
 
