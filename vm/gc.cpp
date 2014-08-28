@@ -186,47 +186,7 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
   FACTOR_ASSERT(!data->high_fragmentation_p());
 }
 
-/* primitive_minor_gc() is invoked by inline GC checks, and it needs to fill in
-   uninitialized stack locations before actually calling the GC. See the
-   comment in compiler.cfg.stacks.uninitialized for details. */
-
-struct call_frame_scrubber {
-  factor_vm* parent;
-  context* ctx;
-
-  call_frame_scrubber(factor_vm* parent, context* ctx)
-      : parent(parent), ctx(ctx) {}
-
-  void operator()(void* frame_top, cell frame_size, code_block* owner,
-                  void* addr) {
-    cell return_address = owner->offset(addr);
-
-    gc_info* info = owner->block_gc_info();
-
-    FACTOR_ASSERT(return_address < owner->size());
-    cell index = info->return_address_index(return_address);
-    if (index != (cell)-1)
-      ctx->scrub_stacks(info, index);
-  }
-};
-
-void factor_vm::scrub_context(context* ctx) {
-  call_frame_scrubber scrubber(this, ctx);
-  iterate_callstack(ctx, scrubber);
-}
-
-void factor_vm::scrub_contexts() {
-  std::set<context*>::const_iterator begin = active_contexts.begin();
-  std::set<context*>::const_iterator end = active_contexts.end();
-  while (begin != end) {
-    scrub_context(*begin);
-    begin++;
-  }
-}
-
 void factor_vm::primitive_minor_gc() {
-  scrub_contexts();
-
   gc(collect_nursery_op, 0, /* requested size */
      true /* trace contexts? */);
 }
