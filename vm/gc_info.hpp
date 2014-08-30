@@ -61,7 +61,7 @@ struct gc_info {
         return_address_count * scrub_d_count +
         return_address_count * scrub_r_count +
         return_address_count * check_d_count;
-    return base + index + check_r_count;
+    return base + index * check_r_count;
   }
 
   cell callsite_gc_roots(cell index) {
