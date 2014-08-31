@@ -68,6 +68,11 @@ M: ##replace visit-insn visit-replace ;
 M: ##peek visit-insn ( state insn -- state' )
     2dup peek-loc-ok? [ drop ] [ vacant-peek ] if ;
 
+M: ##call visit-insn ( state insn -- state' )
+    ! After a word call, we can't trust any overinitialized locations
+    ! to contain valid pointers anymore.
+    drop [ first2 [ 0 >= ] filter 2array ] map ;
+
 : set-gc-map ( state gc-map -- )
     swap state>gc-data concat
     { >>scrub-d >>check-d >>scrub-r >>check-r } write-slots ;
