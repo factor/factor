@@ -161,6 +161,17 @@ IN: compiler.cfg.stacks.vacant.tests
     { { 4 { 3 2 1 -3 0 -2 -1 } } { 0 { -1 } } } state>gc-data
 ] unit-test
 
+! ##call clears the overinitialized slots.
+{
+    { -1 { } }
+} [
+    V{
+        T{ ##replace { src 10 } { loc D 0 } }
+        T{ ##inc-d f -1 }
+        T{ ##call }
+    } create-cfg output-stack-map first
+] unit-test
+
 : cfg1 ( -- cfg )
     V{
         T{ ##inc-d f 1 }
