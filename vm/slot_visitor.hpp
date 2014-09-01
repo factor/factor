@@ -275,7 +275,31 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_roots() {
 template <typename Fixup> struct call_frame_slot_visitor {
   factor_vm* parent;
   slot_visitor<Fixup>* visitor;
+  /* NULL in case we're a visitor for a callstack object. */
   context* ctx;
+
+  void check_stack(cell stack, uint8_t* bitmap, cell base, uint32_t count) {
+    for (uint32_t loc = 0; loc < count; loc++) {
+      if (bitmap_p(bitmap, base + loc)) {
+#ifdef DEBUG_GC_MAPS
+        std::cout << "checking stack location " << loc << std::endl;
+#endif
+        cell* value_ptr = ((cell*)stack + loc + 1);
+        visitor->visit_handle(value_ptr);
+      }
+    }
+  }
+
+  void scrub_stack(cell stack, uint8_t* bitmap, cell base, uint32_t count) {
+    for (cell loc = 0; loc < count; loc++) {
+      if (bitmap_p(bitmap, base + loc)) {
+#ifdef DEBUG_GC_MAPS
+        std::cout << "scrubbing stack location " << loc << std::endl;
+#endif
+        *((cell*)stack - loc) = 0;
+      }
+    }
+  }
 
   call_frame_slot_visitor(factor_vm* parent,
                           slot_visitor<Fixup>* visitor,
@@ -310,48 +334,26 @@ template <typename Fixup> struct call_frame_slot_visitor {
     cell* stack_pointer = (cell*)frame_top;
     uint8_t* bitmap = info->gc_info_bitmap();
 
-    /* Scrub vacant stack locations. */
-    cell callsite_scrub_d = info->callsite_scrub_d(callsite);
-    for (cell loc = 0; loc < info->scrub_d_count; loc++) {
-      if (bitmap_p(bitmap, callsite_scrub_d + loc)) {
-#ifdef DEBUG_GC_MAPS
-        std::cout << "scrubbing datastack location " << loc << std::endl;
-#endif
-        *((cell*)ctx->datastack - loc) = 0;
-      }
-    }
+    if (ctx) {
+      /* Scrub vacant stack locations. */
+      scrub_stack(ctx->datastack,
+                  bitmap,
+                  info->callsite_scrub_d(callsite),
+                  info->scrub_d_count);
+      scrub_stack(ctx->retainstack,
+                  bitmap,
+                  info->callsite_scrub_r(callsite),
+                  info->scrub_r_count);
 
-    cell callsite_scrub_r = info->callsite_scrub_r(callsite);
-    for (cell loc = 0; loc < info->scrub_r_count; loc++) {
-      if (bitmap_p(bitmap, callsite_scrub_r + loc)) {
-#ifdef DEBUG_GC_MAPS
-        std::cout << "scrubbing retainstack location " << loc << std::endl;
-#endif
-        *((cell*)ctx->retainstack - loc) = 0;
-      }
-    }
-
-    /* Trace overinitialized stack locations. */
-    cell callsite_check_d = info->callsite_check_d(callsite);
-    for (uint32_t loc = 0; loc < info->check_d_count; loc++) {
-      if (bitmap_p(bitmap, callsite_check_d + loc)) {
-#ifdef DEBUG_GC_MAPS
-        std::cout << "checking datastack location " << loc << std::endl;
-#endif
-        cell* value_ptr = ((cell*)ctx->datastack + loc + 1);
-        visitor->visit_handle(value_ptr);
-      }
-    }
-
-    cell callsite_check_r = info->callsite_check_r(callsite);
-    for (uint32_t loc = 0; loc < info->check_r_count; loc++) {
-      if (bitmap_p(bitmap, callsite_check_r + loc)) {
-#ifdef DEBUG_GC_MAPS
-        std::cout << "checking retainstack location " << loc << std::endl;
-#endif
-        cell* value_ptr = ((cell*)ctx->retainstack + loc + 1);
-        visitor->visit_handle(value_ptr);
-      }
+      /* Trace overinitialized stack locations. */
+      check_stack(ctx->datastack,
+                  bitmap,
+                  info->callsite_check_d(callsite),
+                  info->check_d_count);
+      check_stack(ctx->retainstack,
+                  bitmap,
+                  info->callsite_check_r(callsite),
+                  info->check_r_count);
     }
 
     /* Subtract old value of base pointer from every derived pointer. */
@@ -391,8 +393,7 @@ template <typename Fixup> struct call_frame_slot_visitor {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_callstack_object(callstack* stack) {
-  /* TODO: is parent->ctx right? */
-  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this, parent->ctx);
+  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this, NULL);
   parent->iterate_callstack_object(stack, call_frame_visitor, fixup);
 }
 
