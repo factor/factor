@@ -148,6 +148,9 @@ HOOK: signal-error. os ( obj -- )
 : interrupt-error. ( error -- )
     "Interrupt" print drop ;
 
+: callback-space-overflow. ( error -- )
+    "Callback space overflow" print drop ;
+
 PREDICATE: vm-error < array
     dup length 2 < [ drop f ] [
         {
@@ -158,26 +161,27 @@ PREDICATE: vm-error < array
 
 : vm-errors ( error -- n errors )
     second {
-        [ expired-error.          ]
-        [ io-error.               ]
-        [ primitive-error.        ]
-        [ type-check-error.       ]
-        [ divide-by-zero-error.   ]
-        [ signal-error.           ]
-        [ array-size-error.       ]
-        [ fixnum-range-error.     ]
-        [ c-string-error.         ]
-        [ ffi-error.              ]
-        [ undefined-symbol-error. ]
-        [ datastack-underflow.    ]
-        [ datastack-overflow.     ]
-        [ retainstack-underflow.  ]
-        [ retainstack-overflow.   ]
-        [ callstack-underflow.    ]
-        [ callstack-overflow.     ]
-        [ memory-error.           ]
-        [ fp-trap-error.          ]
-        [ interrupt-error.        ]
+        [ expired-error.           ]
+        [ io-error.                ]
+        [ primitive-error.         ]
+        [ type-check-error.        ]
+        [ divide-by-zero-error.    ]
+        [ signal-error.            ]
+        [ array-size-error.        ]
+        [ fixnum-range-error.      ]
+        [ c-string-error.          ]
+        [ ffi-error.               ]
+        [ undefined-symbol-error.  ]
+        [ datastack-underflow.     ]
+        [ datastack-overflow.      ]
+        [ retainstack-underflow.   ]
+        [ retainstack-overflow.    ]
+        [ callstack-underflow.     ]
+        [ callstack-overflow.      ]
+        [ memory-error.            ]
+        [ fp-trap-error.           ]
+        [ interrupt-error.         ]
+        [ callback-space-overflow. ]
     } ; inline
 
 M: vm-error summary drop "VM error" ;
