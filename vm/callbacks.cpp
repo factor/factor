@@ -6,7 +6,7 @@ callback_heap::callback_heap(cell size, factor_vm* parent) {
   seg = new segment(size, true);
   if (!seg)
     fatal_error("Out of memory in callback_heap constructor", size);
-  allocator = new bump_allocator<code_block>(size, seg->start);
+  allocator = new free_list_allocator<code_block>(size, seg->start);
   this->parent = parent;
 
 }
@@ -65,19 +65,20 @@ void callback_heap::update(code_block* stub) {
 }
 
 code_block* callback_heap::add(cell owner, cell return_rewind) {
+  std::cout << "callback_heap::add" << std::endl;
   tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
   tagged<byte_array> insns(array_nth(code_template.untagged(), 1));
   cell size = array_capacity(insns.untagged());
 
   cell bump = align(size + sizeof(code_block), data_alignment);
-  if (allocator->here + bump > allocator->end) {
+  code_block* stub = allocator->allot(bump);
+  if (!stub) {
     parent->general_error(ERROR_CALLBACK_SPACE_OVERFLOW,
                           false_object,
                           false_object);
   }
 
-  code_block* stub = allocator->allot(bump);
-  stub->header = bump | 1;
+  stub->header = bump & ~7;
   stub->owner = owner;
   stub->parameters = false_object;
   stub->relocation = false_object;
@@ -114,14 +115,14 @@ struct callback_updater {
   explicit callback_updater(callback_heap* callbacks)
       : callbacks(callbacks) {}
 
-  void operator()(object* stub) {
-    callbacks->update((code_block*)stub);
+  void operator()(code_block* stub, cell size) {
+    callbacks->update(stub);
   }
 };
 
 void callback_heap::update() {
   callback_updater updater(this);
-  parent->each_object(allocator, updater);
+  allocator->iterate(updater);
 }
 
 /* Allocates memory */

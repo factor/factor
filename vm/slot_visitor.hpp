@@ -199,22 +199,18 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_bignum_roots() {
 }
 
 template <typename Fixup> struct callback_slot_visitor {
-  callback_heap* callbacks;
   slot_visitor<Fixup>* visitor;
 
-  callback_slot_visitor(callback_heap* callbacks,
-                        slot_visitor<Fixup>* visitor)
-      : callbacks(callbacks), visitor(visitor) {}
+  callback_slot_visitor(slot_visitor<Fixup>* visitor) : visitor(visitor) {}
 
-  void operator()(object* stub) {
-    code_block *block = (code_block*)stub;
-    visitor->visit_handle(&block->owner);
+  void operator()(code_block* stub, cell size) {
+    visitor->visit_handle(&stub->owner);
   }
 };
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_callback_roots() {
-  callback_slot_visitor<Fixup> callback_visitor(parent->callbacks, this);
-  parent->each_object(parent->callbacks->allocator, callback_visitor);
+  callback_slot_visitor<Fixup> callback_visitor(this);
+  parent->callbacks->allocator->iterate(callback_visitor);
 }
 
 template <typename Fixup>
