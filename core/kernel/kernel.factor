@@ -352,6 +352,8 @@ CONSTANT: OBJ-WAITING-CALLBACKS 73
 
 CONSTANT: OBJ-SIGNAL-PIPE 74
 
+CONSTANT: OBJ-INSTALL-PREFIX 75
+
 ! Context object count and identifiers must be kept in sync with:
 !   vm/contexts.hpp
 
@@ -363,9 +365,10 @@ CONSTANT: CONTEXT-OBJ-CONTEXT 2
 CONSTANT: CONTEXT-OBJ-IN-CALLBACK-P 3
 
 ! Runtime errors must be kept in sync with:
+!   basis/debugger/debugger.factor
 !   vm/errors.hpp
 
-CONSTANT: kernel-error-count 20
+CONSTANT: kernel-error-count 21
 
 CONSTANT: ERROR-EXPIRED 0
 CONSTANT: ERROR-IO      1
@@ -387,5 +390,6 @@ CONSTANT: ERROR-CALLSTACK-OVERFLOW 16
 CONSTANT: ERROR-MEMORY 17
 CONSTANT: ERROR-FP-TRAP 18
 CONSTANT: ERROR-INTERRUPT 19
+CONSTANT: ERROR-CALLBACK-SPACE-OVERFLOW 20
 
 PRIVATE>
