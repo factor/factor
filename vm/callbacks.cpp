@@ -61,8 +61,12 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   cell size = array_capacity(insns.untagged());
 
   cell bump = align(size + sizeof(code_block), data_alignment);
-  if (here + bump > seg->end)
-    fatal_error("Out of callback space", 0);
+
+  if (here + bump > seg->end) {
+    parent->general_error(ERROR_CALLBACK_SPACE_OVERFLOW,
+                          false_object,
+                          false_object);
+  }
 
   free_heap_block* free_block = (free_heap_block*)here;
   free_block->make_free(bump);

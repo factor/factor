@@ -24,6 +24,7 @@ enum vm_error_type {
   ERROR_MEMORY,
   ERROR_FP_TRAP,
   ERROR_INTERRUPT,
+  ERROR_CALLBACK_SPACE_OVERFLOW
 };
 
 void fatal_error(const char* msg, cell tagged);
