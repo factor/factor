@@ -1,4 +1,5 @@
-USING: bit-arrays classes.struct tools.gc-decode tools.test vm ;
+USING: bit-arrays classes.struct sequences
+tools.gc-decode tools.test vm ;
 QUALIFIED: effects
 QUALIFIED: llvm.types
 QUALIFIED: unix.process
@@ -17,10 +18,12 @@ IN: tools.gc-decode.tests
 { ?{ t t t t t t t t } } [ B{ 255 } byte-array>bit-array ] unit-test
 
 ! scrub-bits
-{
-    ?{ t t t f t t t t }
-} [
+{ t } [
     \ effects:<effect> word>gc-info scrub-bits
+    {
+        ?{ t t t f t t t t } ! 64-bit
+        ?{ t t t f f f f f t t t t } ! 32-bit
+    } member?
 ] unit-test
 
 {
@@ -70,8 +73,10 @@ IN: tools.gc-decode.tests
 
 
 ! One of the few words that has derived roots.
-{
-    S{ gc-info f 0 2 2 2 6 7 6 }
-} [
+{ t } [
     \ llvm.types:resolve-types word>gc-info
+    {
+        S{ gc-info f 0 2 2 1 6 7 6 } ! 64-bit
+        S{ gc-info f 0 2 2 1 10 11 6 } ! 32-bit
+    } member?
 ] unit-test
