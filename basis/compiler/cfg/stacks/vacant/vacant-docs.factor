@@ -24,7 +24,7 @@ HELP: vacant>bits
 { $examples
   { $example
     "USING: compiler.cfg.stacks.vacant prettyprint ;"
-    "{ 0 1 3 } vacant>bit-pattern ."
+    "{ 0 1 3 } vacant>bits ."
     "{ 0 0 1 0 }"
   }
 } ;
