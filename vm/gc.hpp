@@ -12,9 +12,9 @@ enum gc_op {
 struct gc_event {
   gc_op op;
   data_heap_room data_heap_before;
-  code_heap_room code_heap_before;
+  allocator_room code_heap_before;
   data_heap_room data_heap_after;
-  code_heap_room code_heap_after;
+  allocator_room code_heap_after;
   cell cards_scanned;
   cell decks_scanned;
   cell code_blocks_scanned;

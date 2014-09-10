@@ -1,5 +1,13 @@
 namespace factor {
 
+struct allocator_room {
+  cell size;
+  cell occupied_space;
+  cell total_free;
+  cell contiguous_free;
+  cell free_block_count;
+};
+
 template <typename Block> struct free_list_allocator {
   cell size;
   cell start;
@@ -28,6 +36,7 @@ template <typename Block> struct free_list_allocator {
   template <typename Iterator, typename Fixup>
   void iterate(Iterator& iter, Fixup fixup);
   template <typename Iterator> void iterate(Iterator& iter);
+  allocator_room as_allocator_room();
 };
 
 template <typename Block>
@@ -206,6 +215,18 @@ template <typename Block>
 template <typename Iterator>
 void free_list_allocator<Block>::iterate(Iterator& iter) {
   iterate(iter, no_fixup());
+}
+
+template <typename Block>
+allocator_room free_list_allocator<Block>::as_allocator_room() {
+  allocator_room room;
+
+  room.size = size;
+  room.occupied_space = occupied_space();
+  room.total_free = free_space();
+  room.contiguous_free = largest_free_block();
+  room.free_block_count = free_block_count();
+  return room;
 }
 
 }

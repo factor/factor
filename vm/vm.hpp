@@ -605,7 +605,6 @@ struct factor_vm {
   void update_code_heap_words(bool reset_inline_caches);
   void initialize_code_blocks();
   void primitive_modify_code_heap();
-  code_heap_room code_room();
   void primitive_code_room();
   void primitive_strip_stack_traces();
   cell code_blocks();
@@ -614,6 +613,7 @@ struct factor_vm {
   // callbacks
   void init_callbacks(cell size);
   void primitive_callback();
+  void primitive_callback_room();
 
   // image
   void init_objects(image_header* h);
