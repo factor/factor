@@ -10,8 +10,8 @@ namespace factor {
       _(bignum_gcd) _(bignum_multiply) _(bignum_not) _(bignum_or)              \
       _(bignum_shift) _(bignum_subtract) _(bignum_to_fixnum)                   \
       _(bignum_to_fixnum_strict) _(bignum_xor)                                 \
-      _(bits_double) _(bits_float) _(byte_array) _(callback) _(callstack)      \
-      _(callstack_bounds) _(callstack_for) _(callstack_to_array)               \
+      _(bits_double) _(bits_float) _(byte_array) _(callback) _(callback_room)  \
+      _(callstack) _(callstack_bounds) _(callstack_for) _(callstack_to_array)  \
       _(check_datastack) _(clear_samples) _(clone) _(code_blocks) _(code_room) \
       _(compact_gc) _(compute_identity_hashcode) _(context_object)             \
       _(context_object_for) _(current_callback) _(data_room) _(datastack)      \
