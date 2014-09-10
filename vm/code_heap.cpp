@@ -215,21 +215,9 @@ void factor_vm::primitive_modify_code_heap() {
     initialize_code_blocks();
 }
 
-code_heap_room factor_vm::code_room() {
-  code_heap_room room;
-
-  room.size = code->allocator->size;
-  room.occupied_space = code->allocator->occupied_space();
-  room.total_free = code->allocator->free_space();
-  room.contiguous_free = code->allocator->largest_free_block();
-  room.free_block_count = code->allocator->free_block_count();
-
-  return room;
-}
-
 /* Allocates memory */
 void factor_vm::primitive_code_room() {
-  code_heap_room room = code_room();
+  allocator_room room = code->allocator->as_allocator_room();
   ctx->push(tag<byte_array>(byte_array_from_value(&room)));
 }
 

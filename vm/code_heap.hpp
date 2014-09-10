@@ -57,12 +57,4 @@ struct code_heap {
   }
 };
 
-struct code_heap_room {
-  cell size;
-  cell occupied_space;
-  cell total_free;
-  cell contiguous_free;
-  cell free_block_count;
-};
-
 }

@@ -14,7 +14,7 @@ gc_event::gc_event(gc_op op, factor_vm* parent)
       code_sweep_time(0),
       compaction_time(0) {
   data_heap_before = parent->data_room();
-  code_heap_before = parent->code_room();
+  code_heap_before = parent->code->allocator->as_allocator_room();
   start_time = nano_count();
 }
 
@@ -53,7 +53,7 @@ void gc_event::ended_compaction() {
 
 void gc_event::ended_gc(factor_vm* parent) {
   data_heap_after = parent->data_room();
-  code_heap_after = parent->code_room();
+  code_heap_after = parent->code->allocator->as_allocator_room();
   total_time = (cell)(nano_count() - start_time);
 }
 

@@ -359,6 +359,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ context-object { fixnum } { object } define-primitive \ context-object make-flushable
 \ context-object-for { fixnum c-ptr } { object } define-primitive \ context-object-for make-flushable
 \ current-callback { } { fixnum } define-primitive \ current-callback make-flushable
+\ (callback-room) { } { byte-array } define-primitive \ (callback-room) make-flushable
 \ (data-room) { } { byte-array } define-primitive \ (data-room) make-flushable
 \ datastack { } { array } define-primitive \ datastack make-flushable
 \ datastack-for { c-ptr } { array } define-primitive \ datastack-for make-flushable

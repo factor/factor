@@ -65,7 +65,6 @@ void callback_heap::update(code_block* stub) {
 }
 
 code_block* callback_heap::add(cell owner, cell return_rewind) {
-  std::cout << "callback_heap::add" << std::endl;
   tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
   tagged<byte_array> insns(array_nth(code_template.untagged(), 1));
   cell size = array_capacity(insns.untagged());
@@ -135,6 +134,12 @@ void factor_vm::primitive_callback() {
   void* func = callbacks->add(w.value(), return_rewind)->entry_point();
   CODE_TO_FUNCTION_POINTER_CALLBACK(this, func);
   ctx->push(allot_alien(func));
+}
+
+/* Allocates memory */
+void factor_vm::primitive_callback_room() {
+  allocator_room room = callbacks->allocator->as_allocator_room();
+  ctx->push(tag<byte_array>(byte_array_from_value(&room)));
 }
 
 }
