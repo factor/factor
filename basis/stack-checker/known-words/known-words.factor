@@ -302,7 +302,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ (word) { object object object } { word } define-primitive \ (word) make-flushable
 \ <array> { integer object } { array } define-primitive \ <array> make-flushable
 \ <byte-array> { integer } { byte-array } define-primitive \ <byte-array> make-flushable
-\ <callback> { integer word } { alien } define-primitive
+\ <callback> { word integer } { alien } define-primitive
 \ <displaced-alien> { integer c-ptr } { c-ptr } define-primitive \ <displaced-alien> make-flushable
 \ <string> { integer integer } { string } define-primitive \ <string> make-flushable
 \ <tuple> { array } { tuple } define-primitive \ <tuple> make-flushable

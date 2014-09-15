@@ -398,7 +398,7 @@ tuple
     ] dip define-declared ;
 
 {
-    { "<callback>" "alien" "primitive_callback" ( return-rewind word -- alien ) }
+    { "<callback>" "alien" "primitive_callback" ( word return-rewind -- alien ) }
     { "<displaced-alien>" "alien" "primitive_displaced_alien" ( displacement c-ptr -- alien ) }
     { "alien-address" "alien" "primitive_alien_address" ( c-ptr -- addr ) }
     { "alien-cell" "alien.accessors" "primitive_alien_cell" ( c-ptr n -- value ) }
