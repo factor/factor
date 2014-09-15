@@ -450,6 +450,7 @@ tuple
     { "fgetc" "io.streams.c" "primitive_fgetc" ( alien -- byte/f ) }
     { "fputc" "io.streams.c" "primitive_fputc" ( byte alien -- ) }
     { "fread-unsafe" "io.streams.c" "primitive_fread" ( n buf alien -- count ) }
+    { "free-callback" "alien" "primitive_free_callback" ( alien -- ) }
     { "fseek" "io.streams.c" "primitive_fseek" ( alien offset whence -- ) }
     { "ftell" "io.streams.c" "primitive_ftell" ( alien -- n ) }
     { "fwrite" "io.streams.c" "primitive_fwrite" ( data length alien -- ) }
