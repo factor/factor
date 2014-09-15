@@ -136,6 +136,12 @@ void factor_vm::primitive_callback() {
   ctx->push(allot_alien(func));
 }
 
+void factor_vm::primitive_free_callback() {
+  void* entry_point = alien_offset(ctx->pop());
+  code_block* stub = (code_block*)entry_point - 1;
+  callbacks->allocator->free(stub);
+}
+
 /* Allocates memory */
 void factor_vm::primitive_callback_room() {
   allocator_room room = callbacks->allocator->as_allocator_room();
