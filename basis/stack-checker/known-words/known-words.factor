@@ -418,6 +418,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ fpu-state { } { } define-primitive
 \ fputc { object alien } { } define-primitive
 \ fread-unsafe { integer c-ptr alien } { integer } define-primitive
+\ free-callback { alien } { } define-primitive
 \ fseek { integer integer alien } { } define-primitive
 \ ftell { alien } { integer } define-primitive
 \ fwrite { c-ptr integer alien } { } define-primitive

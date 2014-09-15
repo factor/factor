@@ -612,6 +612,7 @@ struct factor_vm {
 
   // callbacks
   void init_callbacks(cell size);
+  void primitive_free_callback();
   void primitive_callback();
   void primitive_callback_room();
 
