@@ -60,6 +60,13 @@ $nl
 
 { <alien> <displaced-alien> alien-address } related-words
 
+HELP: free-callback
+{ $values { "alien" alien } }
+{ $description "Releases the callback heap memory allocated for an alien callback. " }
+{ $warning "If the callback is invoked (either from C or Factor) after it has been freed, then Factor may crash." } ;
+
+{ <callback> free-callback } related-words
+
 HELP: alien-address
 { $values { "c-ptr" c-ptr } { "addr" "a non-negative integer" } }
 { $description "Outputs the address of an alien." }
