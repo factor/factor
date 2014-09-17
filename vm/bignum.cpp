@@ -752,12 +752,12 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
   bignum *q = NULL;
   if (quotient != ((bignum**)0)) {
     q = allot_bignum(length_n - length_d, q_negative_p);
-    GC_BIGNUM(q);
   } else {
     q = BIGNUM_OUT_OF_BAND;
   }
+  GC_BIGNUM(q);
 
-  bignum* u = (allot_bignum(length_n, r_negative_p));
+  bignum* u = allot_bignum(length_n, r_negative_p);
   GC_BIGNUM(u);
 
   int shift = 0;
