@@ -1,6 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs init kernel kernel.private make namespaces sequences strings  ;
+USING: assocs continuations init io kernel kernel.private make
+namespaces sequences ;
 IN: system
 
 SINGLETONS: x86.32 x86.64 arm ppc.32 ppc.64 ;
@@ -61,9 +62,9 @@ PRIVATE>
 
 : vm ( -- path ) \ vm get-global ;
 
-: embedded? ( -- ? ) OBJ-EMBEDDED special-object ;
+: install-prefix ( -- path ) \ install-prefix get-global ;
 
-: exit ( n -- * ) do-shutdown-hooks (exit) ;
+: embedded? ( -- ? ) OBJ-EMBEDDED special-object ;
 
 : version-info ( -- str )
     ! formatting vocab not available in this context.
@@ -72,3 +73,8 @@ PRIVATE>
         vm-compile-time % ") [" %
         vm-compiler % " " % cpu cpu>string % "] on " % os os>string %
     ] "" make ;
+
+: exit ( n -- * )
+    [ do-shutdown-hooks (exit) ] ignore-errors
+    [ "Unexpected error during shutdown!" print ] ignore-errors
+    255 (exit) ;
