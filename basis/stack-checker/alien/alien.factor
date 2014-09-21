@@ -104,14 +104,6 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     ! Quotation which coerces return value to required type
     infer-return ;
 
-: delete-values ( value assoc -- )
-    [ rot drop = not ] with assoc-filter! drop ;
-
-TUPLE: callback-destructor callback ;
-
-M: callback-destructor dispose ( disposable -- )
-    callback>> [ callbacks get delete-values ] [ free-callback ] bi ;
-
 : callback-xt ( word -- alien )
     callbacks get [
         dup "stack-cleanup" word-prop <callback>
