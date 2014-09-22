@@ -1,5 +1,5 @@
-USING: http http.server http.client http.client.private tools.test
-multiline io.streams.string io.encodings.utf8 io.encodings.8-bit
+USING: destructors http http.server http.client http.client.private tools.test
+multiline fry io.streams.string io.encodings.utf8 io.encodings.8-bit
 io.encodings.binary io.encodings.string io.encodings.ascii kernel
 arrays splitting sequences assocs io.sockets db db.sqlite make
 continuations urls hashtables accessors namespaces xml.data
@@ -221,17 +221,6 @@ http.server.dispatchers db.tuples ;
 
 : test-db ( -- db ) test-db-file <sqlite-db> ;
 
-: test-httpd ( responder -- )
-    [
-        main-responder set
-        <http-server>
-            0 >>insecure
-            f >>secure
-        start-server
-        threaded-server set
-        server-addrs random
-    ] with-scope "addr" set ;
-
 : add-addr ( url -- url' )
     >url clone "addr" get set-url-addr ;
 
@@ -247,66 +236,62 @@ http.server.dispatchers db.tuples ;
     ] with-db
 ] unit-test
 
-[ ] [
+: test-with-dispatcher ( dispatcher quot -- )
+    '[
+        main-responder set
+        <http-server> 0 >>insecure f >>secure
+        [
+            server-addrs random "addr" set @
+        ] with-threaded-server
+    ] with-scope ; inline
+
+USING: locals ;
+
+:: test-with-db-persistence ( db-persistence quot -- )
+    db-persistence [
+        quot test-with-dispatcher
+    ] with-disposal ; inline
+
+<dispatcher>
+    add-quit-action
     <dispatcher>
-        add-quit-action
-        <dispatcher>
-            "vocab:http/test" <static> >>default
-        "nested" add-responder
-        <action>
-            [ URL" redirect-loop" <temporary-redirect> ] >>display
-        "redirect-loop" add-responder
+        "vocab:http/test" <static> >>default
+    "nested" add-responder
+    <action>
+        [ URL" redirect-loop" <temporary-redirect> ] >>display
+    "redirect-loop" add-responder [
 
-    test-httpd
-] unit-test
+    [ t ] [
+        "vocab:http/test/foo.html" ascii file-contents
+        "http://localhost/nested/foo.html" add-addr http-get nip =
+    ] unit-test
 
-[ t ] [
-    "vocab:http/test/foo.html" ascii file-contents
-    "http://localhost/nested/foo.html" add-addr http-get nip =
-] unit-test
+    [ "http://localhost/redirect-loop" add-addr http-get nip ]
+    [ too-many-redirects? ] must-fail-with
 
-[ "http://localhost/redirect-loop" add-addr http-get nip ]
-[ too-many-redirects? ] must-fail-with
+    [ "Goodbye" ] [
+        "http://localhost/quit" add-addr http-get nip
+    ] unit-test
 
-[ "Goodbye" ] [
-    "http://localhost/quit" add-addr http-get nip
-] unit-test
+] test-with-dispatcher
 
 ! HTTP client redirect bug
-[ ] [
-    <dispatcher>
-        add-quit-action
-        <action> [ "quit" <temporary-redirect> ] >>display
-        "redirect" add-responder
+<dispatcher>
+    add-quit-action
+    <action> [ "quit" <temporary-redirect> ] >>display
+    "redirect" add-responder [
 
-    test-httpd
-] unit-test
+    [ "Goodbye" ] [
+        "http://localhost/redirect" add-addr http-get nip
+    ] unit-test
 
-[ "Goodbye" ] [
-    "http://localhost/redirect" add-addr http-get nip
-] unit-test
+    [ ] [
+        [ stop-test-httpd ] ignore-errors
+    ] unit-test
 
-
-[ ] [
-    [ stop-test-httpd ] ignore-errors
-] unit-test
+] test-with-dispatcher
 
 ! Dispatcher bugs
-[ ] [
-    <dispatcher>
-        <action> <protected>
-        "Test" <login-realm>
-        <sessions>
-        "" add-responder
-        add-quit-action
-        <dispatcher>
-            <action> "" add-responder
-        "d" add-responder
-    test-db <db-persistence>
-
-    test-httpd
-] unit-test
-
 : 404? ( response -- ? )
     {
         [ download-failed? ]
@@ -314,29 +299,40 @@ http.server.dispatchers db.tuples ;
         [ response>> code>> 404 = ]
     } 1&& ;
 
-! This should give a 404 not an infinite redirect loop
-[ "http://localhost/d/blah" add-addr http-get nip ] [ 404? ] must-fail-with
-
-! This should give a 404 not an infinite redirect loop
-[ "http://localhost/blah/" add-addr http-get nip ] [ 404? ] must-fail-with
-
-[ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
-
-[ ] [
+<dispatcher>
+    <action> <protected>
+    "Test" <login-realm>
+    <sessions>
+    "" add-responder
+    add-quit-action
     <dispatcher>
-        <action> [ [ "Hi" write ] "text/plain" <content> ] >>display
-        "Test" <login-realm>
-        <sessions>
-        "" add-responder
-        add-quit-action
-    test-db <db-persistence>
+        <action> "" add-responder
+    "d" add-responder
+test-db <db-persistence> [
 
-    test-httpd
-] unit-test
+    ! This should give a 404 not an infinite redirect loop
+    [ "http://localhost/d/blah" add-addr http-get nip ] [ 404? ] must-fail-with
 
-[ "Hi" ] [ "http://localhost/" add-addr http-get nip ] unit-test
+    ! This should give a 404 not an infinite redirect loop
+    [ "http://localhost/blah/" add-addr http-get nip ] [ 404? ] must-fail-with
 
-[ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
+    [ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
+
+] test-with-db-persistence
+
+<dispatcher>
+    <action> [ [ "Hi" write ] "text/plain" <content> ] >>display
+    "Test" <login-realm>
+    <sessions>
+    "" add-responder
+    add-quit-action
+test-db <db-persistence> [
+
+        [ "Hi" ] [ "http://localhost/" add-addr http-get nip ] unit-test
+
+        [ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
+
+] test-with-db-persistence
 
 USING: html.components html.forms
 xml xml.traversal validators
@@ -344,126 +340,122 @@ furnace furnace.conversations ;
 
 SYMBOL: a
 
-[ ] [
-    <dispatcher>
-        <action>
-            [ a get-global "a" set-value ] >>init
-            [ [ "<html>" write "a" <field> render "</html>" write ] "text/html" <content> ] >>display
-            [ { { "a" [ v-integer ] } } validate-params ] >>validate
-            [ "a" value a set-global URL" " <redirect> ] >>submit
-        <conversations>
-        <sessions>
-        >>default
-        add-quit-action
-    test-db <db-persistence>
-
-    test-httpd
-] unit-test
-
-3 a set-global
-
 : test-a ( xml -- value )
     string>xml body>> "input" deep-tag-named "value" attr ;
 
-[ "3" ] [
-    "http://localhost/" add-addr http-get
-    swap dup cookies>> "cookies" set session-id-key get-cookie
-    value>> "session-id" set test-a
-] unit-test
+<dispatcher>
+    <action>
+        [ a get-global "a" set-value ] >>init
+        [ [ "<html>" write "a" <field> render "</html>" write ] "text/html" <content> ] >>display
+        [ { { "a" [ v-integer ] } } validate-params ] >>validate
+        [ "a" value a set-global URL" " <redirect> ] >>submit
+    <conversations>
+    <sessions>
+    >>default
+    add-quit-action
+test-db <db-persistence> [
 
-[ "4" ] [
-    [
-        "4" "a" ,,
-        "http://localhost" add-addr "__u" ,,
-        "session-id" get session-id-key ,,
-    ] H{ } make
-    "http://localhost/" add-addr <post-request> "cookies" get >>cookies http-request nip test-a
-] unit-test
+    3 a set-global
 
-[ 4 ] [ a get-global ] unit-test
+    [ "3" ] [
+        "http://localhost/" add-addr http-get
+        swap dup cookies>> "cookies" set session-id-key get-cookie
+        value>> "session-id" set test-a
+    ] unit-test
 
-! Test flash scope
-[ "xyz" ] [
-    [
-        "xyz" "a" ,,
-        "http://localhost" add-addr "__u" ,,
-        "session-id" get session-id-key ,,
-    ] H{ } make
-    "http://localhost/" add-addr <post-request> "cookies" get >>cookies http-request nip test-a
-] unit-test
+    [ "4" ] [
+        [
+            "4" "a" ,,
+            "http://localhost" add-addr "__u" ,,
+            "session-id" get session-id-key ,,
+        ] H{ } make
+        "http://localhost/" add-addr <post-request> "cookies" get >>cookies
+        http-request nip test-a
+    ] unit-test
 
-[ 4 ] [ a get-global ] unit-test
+    [ 4 ] [ a get-global ] unit-test
 
-[ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
+    ! Test flash scope
+    [ "xyz" ] [
+        [
+            "xyz" "a" ,,
+            "http://localhost" add-addr "__u" ,,
+            "session-id" get session-id-key ,,
+        ] H{ } make
+        "http://localhost/" add-addr <post-request> "cookies" get >>cookies
+        http-request nip test-a
+    ] unit-test
+
+    [ 4 ] [ a get-global ] unit-test
+
+    [ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
+
+] test-with-db-persistence
 
 ! Test cloning
 [ f ] [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test
 [ f ] [ <404> dup clone "b" "a" <cookie> put-cookie drop "a" get-cookie ] unit-test
 
 ! Test basic auth
-[ "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==" ] [ <request> "Aladdin" "open sesame" set-basic-auth "Authorization" header ] unit-test
+[ "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==" ] [
+    <request> "Aladdin" "open sesame" set-basic-auth "Authorization" header
+] unit-test
 
 ! Test a corner case with static responder
-[ ] [
-    <dispatcher>
-        add-quit-action
-        "vocab:http/test/foo.html" <static> >>default
-    test-httpd
-] unit-test
+<dispatcher>
+    add-quit-action
+    "vocab:http/test/foo.html" <static> >>default [
+    [ t ] [
+        "http://localhost/" add-addr http-get nip
+        "vocab:http/test/foo.html" ascii file-contents =
+    ] unit-test
 
-[ t ] [
-    "http://localhost/" add-addr http-get nip
-    "vocab:http/test/foo.html" ascii file-contents =
-] unit-test
+    [ ] [ stop-test-httpd ] unit-test
 
-[ ] [ stop-test-httpd ] unit-test
+] test-with-dispatcher
 
 ! Check behavior of 307 redirect (reported by Chris Double)
-[ ] [
-    <dispatcher>
-        add-quit-action
-        <action>
-            [ "b" <temporary-redirect> ] >>submit
-        "a" add-responder
-        <action>
-            [
-                request get post-data>> data>> "data" =
-                [ "OK" "text/plain" <content> ] [ "OOPS" throw ] if
-            ] >>submit
-        "b" add-responder
-    test-httpd
-] unit-test
+<dispatcher>
+    add-quit-action
+    <action>
+        [ "b" <temporary-redirect> ] >>submit
+    "a" add-responder
+    <action>
+        [
+            request get post-data>> data>> "data" =
+            [ "OK" "text/plain" <content> ] [ "OOPS" throw ] if
+        ] >>submit
+    "b" add-responder [
 
-[ "OK" ] [ "data" "http://localhost/a" add-addr http-post nip ] unit-test
+    [ "OK" ] [ "data" "http://localhost/a" add-addr http-post nip ] unit-test
 
-! Check that download throws errors (reported by Chris Double)
-[
+    ! Check that download throws errors (reported by Chris Double)
     [
-        "http://localhost/tweet_my_twat" add-addr download
-    ] with-temp-directory
-] must-fail
+        [
+            "http://localhost/tweet_my_twat" add-addr download
+        ] with-temp-directory
+    ] must-fail
 
-[ ] [ stop-test-httpd ] unit-test
+    [ ] [ stop-test-httpd ] unit-test
+
+] test-with-dispatcher
 
 ! Check that index.fhtml works
-[ ] [
-    <dispatcher>
-        "resource:basis/http/test/" <static> enable-fhtml >>default
-        add-quit-action
-    test-httpd
-] unit-test
+<dispatcher>
+    "resource:basis/http/test/" <static> enable-fhtml >>default
+    add-quit-action [
 
-[ "OK\n\n" ] [ "http://localhost/" add-addr http-get nip ] unit-test
+    [ "OK\n\n" ] [ "http://localhost/" add-addr http-get nip ] unit-test
 
-[ ] [ stop-test-httpd ] unit-test
+    [ ] [ stop-test-httpd ] unit-test
+
+] test-with-dispatcher
 
 ! Check that just closing the socket without sending anything works
-[ ] [
-    <dispatcher>
-        add-quit-action
-    test-httpd
-] unit-test
+<dispatcher>
+    add-quit-action [
+    [ ] [ "addr" get binary [ ] with-client ] unit-test
 
-[ ] [ "addr" get binary [ ] with-client ] unit-test
+    [ ] [ stop-test-httpd ] unit-test
 
-[ ] [ stop-test-httpd ] unit-test
+] test-with-dispatcher
