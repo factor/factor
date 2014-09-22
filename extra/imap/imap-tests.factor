@@ -1,5 +1,5 @@
 USING: accessors arrays assocs calendar calendar.format
-combinators continuations formatting fry grouping.extras imap
+combinators continuations destructors formatting fry grouping.extras imap
 io.streams.duplex kernel math math.parser math.ranges
 math.statistics namespaces random sequences sets sorting
 splitting strings system tools.test ;
@@ -35,7 +35,7 @@ ERROR: no-imap-test-host ;
     '[ \ imap-settings get-global _ with-imap-settings ] unit-test ; inline
 
 [ t ] [
-    get-test-host <imap4ssl> duplex-stream?
+    get-test-host <imap4ssl> [ duplex-stream? ] with-disposal
 ] unit-test
 
 [ t ] [
