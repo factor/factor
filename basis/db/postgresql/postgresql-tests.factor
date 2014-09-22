@@ -1,8 +1,19 @@
 USING: kernel db.postgresql alien continuations io classes
-prettyprint sequences namespaces tools.test db db.private
+prettyprint sequences math namespaces tools.test db db.private
 db.tuples db.types unicode.case accessors system db.tester ;
 IN: db.postgresql.tests
 
+: nonexistant-db ( -- db )
+    <postgresql-db>
+        "localhost" >>host
+        "fake-user" >>username
+        "no-pass" >>password
+        "dont-exist" >>database ;
+
+! Don't leak connections
+[ ] [
+    2000 [ [ nonexistant-db [ ] with-db ] ignore-errors ] times
+] unit-test
 
 ! Ensure the table exists
 [ ] [ postgresql-test-db [ ] with-db ] unit-test
