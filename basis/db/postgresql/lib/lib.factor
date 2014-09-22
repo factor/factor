@@ -42,8 +42,9 @@ M: postgresql-result-null summary ( obj -- str )
     PGRES_COMMAND_OK PGRES_TUPLES_OK 2array member? ;
 
 : connect-postgres ( host port pgopts pgtty db user pass -- conn )
-    PQsetdbLogin
-    dup PQstatus zero? [ (postgresql-error-message) throw ] unless ;
+    PQsetdbLogin dup PQstatus zero? [
+        [ (postgresql-error-message) ] [ PQfinish ] bi throw
+    ] unless ;
 
 : do-postgresql-statement ( statement -- res )
     db-connection get handle>> swap sql>> PQexec dup postgresql-result-ok? [
@@ -147,7 +148,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
                     &postgresql-free
                 ] if
             ] with-out-parameters memory>byte-array
-        ] with-destructors 
+        ] with-destructors
     ] [
         drop pq-get-is-null nip [ f ] [ B{ } clone ] if
     ] if ;
