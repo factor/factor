@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: concurrency.combinators db.pools db.sqlite db.tuples
-db.types kernel math random threads tools.test db sequences
-io prettyprint db.postgresql accessors io.files.temp
+USING: concurrency.combinators db db.pools db.sqlite db.tuples
+db.types destructors kernel math random threads tools.test sequences
+io io.pools prettyprint db.postgresql accessors io.files.temp
 namespaces fry system math.parser db.queries assocs ;
 IN: db.tester
 
@@ -100,10 +100,12 @@ test-2 "TEST2" {
         ] with-db
     ] [
         <db-pool> [
-            10 iota [
-                10 [
-                    test-1-tuple insert-tuple yield
-                ] times
-            ] parallel-each
-        ] with-pooled-db
+            [
+                10 iota [
+                    10 [
+                        test-1-tuple insert-tuple yield
+                    ] times
+                ] parallel-each
+            ] with-pooled-db
+        ] with-disposal
     ] bi ;
