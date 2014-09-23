@@ -1,5 +1,5 @@
-USING: smtp tools.test io.streams.string io.sockets
-io.sockets.secure threads smtp.server kernel sequences
+USING: combinators continuations smtp tools.test io.streams.string
+io.sockets io.sockets.secure threads smtp.server kernel sequences
 namespaces logging accessors assocs sorting smtp.private
 concurrency.promises system ;
 IN: smtp.tests
@@ -76,13 +76,17 @@ IN: smtp.tests
                 "Ed <dharmatech@factorcode.org>"
             } >>to
             "Doug <erg@factorcode.org>" >>from
-        [
-            email>headers sort-keys [
-                drop { "Date" "Message-Id" } member? not
-            ] assoc-filter
-        ]
-        [ to>> [ extract-email ] map ]
-        [ from>> extract-email ] tri
+        {
+            [
+                email>headers sort-keys [
+                    drop { "Date" "Message-Id" } member? not
+                ] assoc-filter
+            ]
+            [ to>> [ extract-email ] map ]
+            [ from>> extract-email ]
+            ! To get the smtp server to clean up itself
+            [ [ send-email ] ignore-errors drop ]
+        } cleave
     ] with-test-smtp-config
 ] unit-test
 
