@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.format.macros
-combinators formatting io io.streams.string kernel math
-math.functions math.order math.parser present sequences typed ;
+combinators io io.streams.string kernel math math.functions
+math.order math.parser math.parser.private present sequences
+typed ;
 IN: calendar.format
 
 : pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-head ;
@@ -137,7 +138,7 @@ M: timestamp year. ( timestamp -- )
 ! algorithm to detect infinite decimals (e.g 1/3)
 : write-rfc3339-seconds ( timestamp -- )
     second>> 1 mod [
-        "%.6f" sprintf [ CHAR: 0 = ] trim
+        >float "%.6f" format-float [ CHAR: 0 = ] trim
         dup length 1 > [ write ] [ drop ] if
     ] unless-zero ;
 
