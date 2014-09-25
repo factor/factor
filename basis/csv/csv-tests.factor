@@ -4,11 +4,11 @@ io.directories ;
 IN: csv.tests
 
 ! I like to name my unit tests
-: named-unit-test ( name output input -- ) 
+: named-unit-test ( name output input -- )
     unit-test drop ; inline
 
 "Fields are separated by commas"
-[ { { "1997" "Ford" "E350" } } ] 
+[ { { "1997" "Ford" "E350" } } ]
 [ "1997,Ford,E350" string>csv ] named-unit-test
 
 "ignores whitespace before and after elements. n.b.specifically prohibited by RFC 4180, which states, 'Spaces are considered part of a field and should not be ignored.'"
@@ -21,7 +21,7 @@ IN: csv.tests
 
 "double quotes mean escaped in quotes"
 [ { { "1997" "Ford" "E350" "Super \"luxurious\" truck" } } ]
-[ "1997,Ford,E350,\"Super \"\"luxurious\"\" truck\"" 
+[ "1997,Ford,E350,\"Super \"\"luxurious\"\" truck\""
     string>csv ] named-unit-test
 
 "Fields with embedded line breaks must be delimited by double-quote characters."
@@ -39,10 +39,10 @@ IN: csv.tests
 [ "\"1997\",\"Ford\",\"E350\"" string>csv ] named-unit-test
 
 "The first record in a csv file may contain column names in each of the fields."
-[ { { "Year" "Make" "Model" } 
+[ { { "Year" "Make" "Model" }
     { "1997" "Ford" "E350" }
     { "2000" "Mercury" "Cougar" } } ]
-[ "Year,Make,Model\n1997,Ford,E350\n2000,Mercury,Cougar" 
+[ "Year,Make,Model\n1997,Ford,E350\n2000,Mercury,Cougar"
     string>csv ] named-unit-test
 
 
@@ -102,3 +102,10 @@ IN: csv.tests
 { { { "as,d\"f" "asdf" } } } [ "\"as,\"d\"\"\"\"f,asdf" string>csv ] unit-test
 
 [ { } ] [ "" string>csv ] unit-test
+
+[
+    { { "Year" "Make" "Model" }
+      { "1997" "Ford" "E350" }
+    }
+]
+[ "Year,Make,\"Model\"\r\n1997,Ford,E350" string>csv ] unit-test

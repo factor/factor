@@ -12,7 +12,7 @@ CHAR: , delimiter set-global
 <PRIVATE
 
 MEMO: field-delimiters ( delimiter -- field-seps quote-seps )
-    [ "\n" swap prefix ] [ "\"\n" swap prefix ] bi ; inline
+    [ "\r\n" swap prefix ] [ "\r\"\n" swap prefix ] bi ; inline
 
 DEFER: quoted-field,
 
@@ -21,7 +21,8 @@ DEFER: quoted-field,
     [ nip ] [
         {
             { CHAR: "    [ [ CHAR: " , ] when quoted-field, ] }
-            { CHAR: \n   [ ] } ! Error: newline inside string?
+            { CHAR: \n   [ ] } ! Error: cr inside string?
+            { CHAR: \r   [ ] } ! Error: lf inside string?
             [ [ , drop f maybe-escaped-quote ] when* ]
         } case
      ] if ; inline recursive
@@ -85,7 +86,7 @@ PRIVATE>
 <PRIVATE
 
 : needs-escaping? ( cell delimiter -- ? )
-    '[ dup "\n\"" member? [ drop t ] [ _ = ] if ] any? ; inline
+    '[ dup "\n\"\r" member? [ drop t ] [ _ = ] if ] any? ; inline
 
 : escape-quotes ( cell stream -- )
     CHAR: " over stream-write1 swap [
