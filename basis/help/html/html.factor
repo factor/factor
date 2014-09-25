@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs debugger fry hashtables help
-help.home help.topics help.vocabs html html.streams
-io.directories io.encodings.binary io.encodings.utf8 io.files
-io.files.temp io.pathnames kernel make math.parser memoize
-namespaces sequences serialize sorting splitting unicode.case
-vocabs vocabs.hierarchy words xml.syntax xml.writer ;
+USING: accessors arrays assocs debugger fry help help.home
+help.topics help.vocabs html html.streams io.directories
+io.encodings.binary io.encodings.utf8 io.files io.files.temp
+io.pathnames kernel make math.parser memoize namespaces
+sequences serialize splitting tools.completion vocabs
+vocabs.hierarchy words xml.syntax xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
@@ -98,7 +98,7 @@ M: pathname url-of
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
 : all-vocabs-really ( -- seq )
-    all-vocabs-recursive >hashtable no-roots remove-redundant-prefixes
+    all-vocabs-recursive no-roots remove-redundant-prefixes
     [ vocab-name "scratchpad" = not ] filter ;
 
 : all-topics ( -- topics )
@@ -143,17 +143,8 @@ M: pathname url-of
 MEMO: load-index ( name -- index )
     binary file-contents bytes>object ;
 
-TUPLE: result title href ;
-
-: partition-exact ( string results -- results' )
-    [ title>> = ] with partition append ;
-
 : offline-apropos ( string index -- results )
-    load-index over >lower
-    '[ [ drop _ ] dip >lower subseq? ] assoc-filter
-    [ swap result boa ] { } assoc>map
-    [ title>> ] sort-with
-    partition-exact ;
+    load-index completions ;
 
 : article-apropos ( string -- results )
     "articles.idx" offline-apropos ;
