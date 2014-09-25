@@ -24,7 +24,7 @@ cache-directory [
 
 [ ] [ "sudoku" shake-and-bake 800000 small-enough? ] unit-test
 
-[ ] [ "hello-ui" shake-and-bake 1600000 small-enough? ] unit-test
+[ ] [ "hello-ui" shake-and-bake 1605000 small-enough? ] unit-test
 
 [ "math-threads-compiler-io-ui" ] [
     "hello-ui" deploy-config [
@@ -35,13 +35,13 @@ cache-directory [
 
 [ ] [ "maze" shake-and-bake 1520000 small-enough? ] unit-test
 
-[ ] [ "tetris" shake-and-bake 1730000 small-enough? ] unit-test
+[ ] [ "tetris" shake-and-bake 1734000 small-enough? ] unit-test
 
-[ ] [ "spheres" shake-and-bake 1551000 small-enough? ] unit-test
+[ ] [ "spheres" shake-and-bake 1557000 small-enough? ] unit-test
 
-[ ] [ "terrain" shake-and-bake 2050000 small-enough? ] unit-test
+[ ] [ "terrain" shake-and-bake 2053000 small-enough? ] unit-test
 
-[ ] [ "gpu.demos.raytrace" shake-and-bake 2760000 small-enough? ] unit-test
+[ ] [ "gpu.demos.raytrace" shake-and-bake 2764000 small-enough? ] unit-test
 
 [ ] [ "bunny" shake-and-bake 2500000 small-enough? ] unit-test
 
