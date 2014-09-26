@@ -33,7 +33,7 @@ IN: math.statistics
     [ sum-of-squares ] [ length ] bi / sqrt ; inline
 
 : geometric-mean ( seq -- x )
-    [ length ] [ product ] bi nth-root ; inline
+    [ [ log ] map-sum ] [ length ] bi /f e^ ; inline
 
 : harmonic-mean ( seq -- x )
     [ recip ] map-sum recip ; inline
