@@ -1,16 +1,14 @@
-USING: alien.c-types alien.data kernel python.ffi ;
+USING: alien.c-types alien.data kernel python.ffi vocabs.loader words ;
 IN: python.errors
-
-ERROR: python-error type message ;
 
 <PRIVATE
 
-: get-error ( -- ptype pvalue )
-    { void* void* void* } [ PyErr_Fetch ] with-out-parameters drop ;
+: get-error ( -- ptype pvalue ptraceback )
+    { void* void* void* } [ PyErr_Fetch ] with-out-parameters ;
 
-: throw-error ( ptype pvalue -- )
-    [ "__name__" PyObject_GetAttrString ] [ PyObject_Str ] bi*
-    [ &Py_DecRef PyString_AsString ] bi@ python-error ;
+! Breaking out of a circular dependency.
+: throw-error ( ptype pvalue ptraceback -- )
+    "throw-error" "python.throwing" lookup-word execute( a b c -- ) ;
 
 PRIVATE>
 
