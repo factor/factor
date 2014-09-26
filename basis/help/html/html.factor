@@ -47,7 +47,7 @@ M: vocab-author topic>filename* name>> "author" ;
 M: f topic>filename* drop \ f topic>filename* ;
 
 : topic>filename ( topic -- filename )
-    topic>filename* dup [
+    topic>filename* [
         [
             % "-" %
             dup array?
@@ -55,7 +55,7 @@ M: f topic>filename* drop \ f topic>filename* ;
             [ escape-filename ]
             if % ".html" %
         ] "" make
-    ] [ 2drop f ] if ;
+    ] [ drop f ] if* ;
 
 M: topic url-of topic>filename ;
 
@@ -111,16 +111,26 @@ M: pathname url-of
     ] { } make ;
 
 : serialize-index ( index file -- )
-    [ [ [ topic>filename ] dip ] { } assoc-map-as object>bytes ] dip
-    binary set-file-contents ;
+    binary [
+        [ [ topic>filename ] dip ] { } assoc-map-as serialize
+    ] with-file-writer ;
+
+: generate-article-index ( -- )
+    articles get [ [ >link ] [ article-title ] bi* ] assoc-map
+    "articles.idx" serialize-index ;
+
+: generate-word-index ( -- )
+    all-words [ dup name>> ] { } map>assoc
+    "words.idx" serialize-index ;
+
+: generate-vocab-index ( -- )
+    all-vocabs-really [ dup vocab-name ] { } map>assoc
+    "vocabs.idx" serialize-index ;
 
 : generate-indices ( -- )
-    articles get keys [ [ >link ] [ article-title ] bi ] { } map>assoc "articles.idx" serialize-index
-    all-words [ dup name>> ] { } map>assoc "words.idx" serialize-index
-    all-vocabs-really [ dup vocab-name ] { } map>assoc "vocabs.idx" serialize-index ;
-
-: (generate-help-files) ( -- )
-    all-topics [ '[ _ generate-help-file ] try ] each ;
+    generate-article-index
+    generate-word-index
+    generate-vocab-index ;
 
 : generate-help-files ( -- )
     H{
@@ -128,7 +138,9 @@ M: pathname url-of
         { recent-words f }
         { recent-articles f }
         { recent-vocabs f }
-    } [ (generate-help-files) ] with-variables ;
+    } [
+        all-topics [ '[ _ generate-help-file ] try ] each
+    ] with-variables ;
 
 : generate-help ( -- )
     "docs" cache-file
