@@ -60,7 +60,7 @@ ARTICLE: { "lists.lazy" "manipulation" } "Manipulating lazy lists"
 
 HELP: lazy-cons
 { $values { "car" { $quotation ( -- elt ) } } { "cdr" { $quotation ( -- cons ) } } { "promise" "the resulting cons object" } }
-{ $description "Constructs a cons object for a lazy list from two quotations. The " { $snippet "car" } " quotation should return the head of the list, and the " { $snippet "cons" } " quotation the tail when called. When " { $link cons } " or " { $link cdr } " are called on the lazy-cons object then the appropriate quotation is called." } 
+{ $description "Constructs a cons object for a lazy list from two quotations. The " { $snippet "car" } " quotation should return the head of the list, and the " { $snippet "cons" } " quotation the tail when called. When " { $link cons } " or " { $link cdr } " are called on the lazy-cons object then the appropriate quotation is called." }
 { $see-also cons car cdr nil nil? } ;
 
 { 1lazy-list 2lazy-list 3lazy-list } related-words
@@ -79,7 +79,7 @@ HELP: 3lazy-list
 
 HELP: <memoized-cons>
 { $values { "cons" "a cons object" } { "memoized-cons" "the resulting memoized-cons object" } }
-{ $description "Constructs a cons object that wraps an existing cons object. Requests for the car, cdr and nil? will be remembered after the first call, and the previous result returned on subsequent calls." } 
+{ $description "Constructs a cons object that wraps an existing cons object. Requests for the car, cdr and nil? will be remembered after the first call, and the previous result returned on subsequent calls." }
 { $see-also cons car cdr nil nil? } ;
 
 { lazy-map ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
@@ -121,11 +121,6 @@ HELP: sequence-tail>list
 { $description "Convert the sequence into a list, starting from " { $snippet "index" } "." }
 { $see-also >list } ;
 
-HELP: >list
-{ $values { "object" object } { "list" "a list" } }
-{ $description "Convert the object into a list. Existing lists are passed through intact, sequences are converted using " { $link sequence-tail>list } " and other objects cause an error to be thrown." } 
-{ $see-also sequence-tail>list } ;
-
 { leach foldl lazy-map ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
 HELP: lconcat
@@ -153,17 +148,17 @@ HELP: lcomp*
 
 HELP: lmerge
 { $values { "list1" "a list" } { "list2" "a list" } { "result" "lazy list merging list1 and list2" } }
-{ $description "Return the result of merging the two lists in a lazy manner." } 
+{ $description "Return the result of merging the two lists in a lazy manner." }
 { $examples
   { $example "USING: lists lists.lazy prettyprint ;" "{ 1 2 3 } >list { 4 5 6 } >list lmerge list>array ." "{ 1 4 2 5 3 6 }" }
 } ;
 
 HELP: lcontents
 { $values { "stream" "a stream" } { "result" string } }
-{ $description "Returns a lazy list of all characters in the file. " { $link car } " returns the next character in the file, " { $link cdr } " returns the remaining characters as a lazy list. " { $link nil? } " indicates end of file." } 
+{ $description "Returns a lazy list of all characters in the file. " { $link car } " returns the next character in the file, " { $link cdr } " returns the remaining characters as a lazy list. " { $link nil? } " indicates end of file." }
 { $see-also llines } ;
 
 HELP: llines
 { $values { "stream" "a stream" } { "result" "a list" } }
-{ $description "Returns a lazy list of all lines in the file. " { $link car } " returns the next lines in the file, " { $link cdr } " returns the remaining lines as a lazy list. " { $link nil? } " indicates end of file." } 
+{ $description "Returns a lazy list of all lines in the file. " { $link car } " returns the next lines in the file, " { $link cdr } " returns the remaining lines as a lazy list. " { $link nil? } " indicates end of file." }
 { $see-also lcontents } ;

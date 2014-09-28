@@ -169,3 +169,6 @@ HELP: lmap>array
 { $values { "list" list } { "quot" quotation } { "array" array } }
 { $description "Executes the quotation on each element of the list, collecting the results in an array." } ;
 
+HELP: >list
+{ $values { "object" object } { "list" "a list" } }
+{ $description "Converts the object into a list." } ;
