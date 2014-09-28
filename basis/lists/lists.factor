@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 James Cash, Daniel Ehrenberg, Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors math arrays vectors classes words
-combinators.short-circuit combinators locals ;
+combinators.short-circuit combinators locals summary ;
 IN: lists
 
 ! List Protocol
@@ -9,7 +9,7 @@ MIXIN: list
 GENERIC: car ( cons -- car )
 GENERIC: cdr ( cons -- cdr )
 GENERIC: nil? ( object -- ?   )
-    
+
 TUPLE: cons-state { car read-only } { cdr read-only } ;
 
 C: cons cons-state
@@ -41,9 +41,9 @@ M: object nil? drop f ;
 : 3list ( a b c -- cons ) 2list cons ; inline
 
 : cadr ( list -- elt ) cdr car ; inline
- 
+
 : 2car ( list -- car caar ) [ car ] [ cadr ] bi ; inline
- 
+
 : 3car ( list -- car cadr caddr ) [ car ] [ cadr ] [ cdr cadr ] tri ; inline
 
 : lnth ( n list -- elt ) swap [ cdr ] times car ; inline
@@ -84,14 +84,18 @@ PRIVATE>
     [ [ unswons ] dip cons ] times
     lreverse swap ;
 
-: sequence>list ( sequence -- list )    
+: sequence>list ( sequence -- list )
     <reversed> nil [ swons ] reduce ;
 
 : lmap>array ( ... list quot: ( ... elt -- ... newelt ) -- ... array )
     collector [ leach ] dip { } like ; inline
 
-: list>array ( list -- array )  
+: list>array ( list -- array )
     [ ] lmap>array ;
 
 INSTANCE: cons-state list
 INSTANCE: +nil+ list
+
+GENERIC: >list ( object -- list )
+
+M: list >list ;
