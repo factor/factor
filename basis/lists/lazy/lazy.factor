@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Chris Double, Matthew Willis, James Cash.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators io kernel lists math
-promises quotations sequences summary vectors ;
+promises quotations sequences vectors ;
 IN: lists.lazy
 
 M: promise car ( promise -- car )
@@ -12,7 +12,7 @@ M: promise cdr ( promise -- cdr )
 
 M: promise nil? ( cons -- ? )
     force nil? ;
- 
+
 ! Both 'car' and 'cdr' are promises
 TUPLE: lazy-cons-state car cdr ;
 
@@ -241,17 +241,7 @@ M: sequence-cons cdr ( sequence-cons -- cdr )
 M: sequence-cons nil? ( sequence-cons -- ? )
     drop f ;
 
-ERROR: list-conversion-error object ;
-
-M: list-conversion-error summary
-    drop "Could not convert object to list" ;
-
-: >list ( object -- list )
-    {
-        { [ dup sequence? ] [ 0 swap sequence-tail>list ] }
-        { [ dup list? ] [ ] }
-        [ list-conversion-error ]
-    } cond ;
+M: sequence >list 0 swap sequence-tail>list ;
 
 TUPLE: lazy-concat car cdr ;
 
@@ -263,7 +253,7 @@ DEFER: lconcat
     over nil? [ nip lconcat ] [ <lazy-concat> ] if ;
 
 : lconcat ( list -- result )
-    dup nil? [ drop nil ] [ uncons (lconcat) ] if ; 
+    dup nil? [ drop nil ] [ uncons (lconcat) ] if ;
 
 M: lazy-concat car ( lazy-concat -- car )
     car>> car ;
