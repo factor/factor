@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Chris Double, Matthew Willis, James Cash.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators io kernel lists math
-promises quotations sequences vectors ;
+promises quotations sequences ;
 IN: lists.lazy
 
 M: promise car ( promise -- car )
@@ -18,8 +18,8 @@ TUPLE: lazy-cons-state car cdr ;
 
 : lazy-cons ( car cdr -- promise )
     [ T{ promise f f t f } clone ] 2dip
-        [ <promise> ] bi@ \ lazy-cons-state boa
-        >>value ;
+    [ <promise> ] bi@ \ lazy-cons-state boa
+    >>value ;
 
 M: lazy-cons-state car ( lazy-cons -- car )
     car>> force ;
