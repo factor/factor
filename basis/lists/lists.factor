@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 James Cash, Daniel Ehrenberg, Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors math arrays vectors classes words
-combinators.short-circuit combinators locals summary ;
+USING: accessors combinators.short-circuit kernel locals math
+sequences ;
 IN: lists
 
 ! List Protocol
