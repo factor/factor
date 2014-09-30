@@ -11,7 +11,7 @@ IN: db.tester
     H{ { CHAR: - CHAR: _ } { CHAR: . CHAR: _ } } substitute ;
 
 : postgresql-test-db ( -- postgresql-db )
-    \ postgresql-db get-global postgresql-test-db-name >>database ;
+    \ postgresql-db get-global clone postgresql-test-db-name >>database ;
 
 : postgresql-template1-db ( -- postgresql-db )
     \ postgresql-db get-global ;
@@ -20,7 +20,7 @@ IN: db.tester
     cpu name>> "tuples-test." ".db" surround
     temp-file <sqlite-db> ;
 
-! These words leak resources, but are useful for interactivel testing
+! These words leak resources, but are useful for interactive testing
 : set-sqlite-db ( -- )
     sqlite-db db-open db-connection set ;
 
