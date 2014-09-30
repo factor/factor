@@ -2,7 +2,8 @@
 from hashlib import md5
 from urllib import urlopen
 
-# List of prebuilt libraries to download to create the windows msi.
+# List of prebuilt libraries to download to create the windows msi
+# (name, digest32, digest64).
 dlls = [
     ('blas.dll', '63017771c424146f8ddcee266d7a9446', 'ec84cbbecb0573369de8f6e94b576035'),
     ('bzip2.dll', 'dad3794d8c75a83397d0fd19a606bafd', '8a4efd59e29792f6400ce2e5c6799bea'),
@@ -50,6 +51,7 @@ dlls = [
     ('libpng12-0.dll', '440d117c536ae88f540ecfb0e496c869', '906e17e5ab42b7ceb127e72103c12395'),
     ('libpng12.dll', 'f629bc89f410650c1b9df33581d62d09', '19ce7c5d61434ab553024ef46b2643a5'),
     ('libpng14-14.dll', '6354b491e4c262c67126c6bb001e1330', '33948c627ab6be9a5ce94a68878994f9'),
+    ('libpq.dll', '8c3037545f39c5a2f4099faca26cc0a1', '2cd1cb3e4ffaf05d046224b84cea8c97'),
     ('libssp-0.dll', 'b127a3dcfe2caa0b9fb2bd8768d0f576', '51515b2264de2f8660cc46b7f3ebbc6b'),
     ('libstdc++-6.dll', '184fe8081f4bbedf0e25cac175c2e073', '54a45223d73d6ea6dd5a1828d2b59195'),
     ('libtiff.dll', '573d09e62d71cdaa0fa41f6ad62b2f81', '4ad93cded54c071c9f6410b47c292a4e'),
