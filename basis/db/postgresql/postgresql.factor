@@ -284,10 +284,10 @@ M: postgresql-db-connection compound ( string object -- string' )
 M: postgresql-db-connection parse-db-error
     "\n" split dup length {
         { 1 [ first parse-postgresql-sql-error ] }
+        { 2 [ concat parse-postgresql-sql-error ] }
         { 3 [
                 first3
                 [ parse-postgresql-sql-error ] 2dip
                 postgresql-location >>location
         ] }
     } case ;
-
