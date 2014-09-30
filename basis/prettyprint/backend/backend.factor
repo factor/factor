@@ -112,7 +112,7 @@ M: f pprint* drop \ f pprint-word ;
     } ?at ; inline
 
 : unparse-ch ( ch -- )
-    ch>ascii-escape [ "\\" % , ] [
+    ch>ascii-escape [ CHAR: \\ , , ] [
         dup 32 < [ dup 16 < "\\x0" "\\x" ? % >hex % ] [ , ] if
     ] if ;
 
