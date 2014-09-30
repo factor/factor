@@ -1,6 +1,6 @@
-USING: kernel db.postgresql alien continuations io classes
-prettyprint sequences math namespaces tools.test db db.private
-db.tuples db.types unicode.case accessors system db.tester ;
+USING: accessors alien continuations db db.errors db.queries db.postgresql
+db.private db.tester db.tuples db.types io classes kernel math namespaces
+prettyprint sequences system tools.test unicode.case ;
 IN: db.postgresql.tests
 
 : nonexistant-db ( -- db )
@@ -15,8 +15,20 @@ IN: db.postgresql.tests
     2000 [ [ nonexistant-db [ ] with-db ] ignore-errors ] times
 ] unit-test
 
-! Ensure the table exists
-[ ] [ postgresql-test-db [ ] with-db ] unit-test
+! Ensure the test database exists
+postgresql-template1-db [
+    postgresql-test-db-name ensure-database
+] with-db
+
+! Triggers a two line error message (ERROR + DETAIL) because two
+! connections can't simultaneously use the template1 database.
+[
+    postgresql-template1-db [
+        postgresql-template1-db [
+            "will_never_exist" ensure-database
+        ] with-db
+    ] with-db
+] [ sql-unknown-error? ] must-fail-with
 
 [ ] [
     postgresql-test-db [
