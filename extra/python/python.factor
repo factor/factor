@@ -5,6 +5,8 @@ specialized-arrays strings vectors ;
 IN: python
 QUALIFIED: math
 
+ERROR: python-error type message traceback ;
+
 SPECIALIZED-ARRAY: void*
 
 ! Borrowed from unix.utilities
