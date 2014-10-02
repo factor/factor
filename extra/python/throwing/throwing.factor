@@ -1,4 +1,4 @@
-USING: arrays kernel python python.syntax sequences ;
+USING: arrays kernel python python.ffi python.syntax sequences ;
 IN: python.throwing
 
 ERROR: python-error type message traceback ;
@@ -10,5 +10,9 @@ PY-METHODS: obj =>
     __str__ ( o -- str ) ;
 
 : throw-error ( ptype pvalue ptraceback -- )
-    [ $__name__ py> ] [ __str__ py> ] [ [ format_tb py> ] [ f ] if* ] tri*
-    python-error ;
+    [
+        [ $__name__ py> ]
+        [ __str__ py> ]
+        [ [ format_tb py> ] [ f ] if* ] tri*
+    ] 3keep
+    [ Py_DecRef ] tri@ python-error ;
