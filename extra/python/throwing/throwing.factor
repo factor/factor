@@ -1,8 +1,6 @@
 USING: arrays kernel python python.ffi python.syntax sequences ;
 IN: python.throwing
 
-ERROR: python-error type message traceback ;
-
 PY-FROM: traceback => format_tb ( tb -- seq ) ;
 
 PY-METHODS: obj =>
