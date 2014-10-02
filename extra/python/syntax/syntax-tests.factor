@@ -1,7 +1,7 @@
-USING: arrays assocs destructors fry io.files.temp kernel math
-namespaces python python.ffi python.objects sequences sets
-splitting tools.test unicode.categories ;
-IN: python.syntax
+USING: accessors arrays assocs continuations destructors fry io.files.temp
+kernel math namespaces python python.ffi python.objects python.syntax
+sequences sets splitting tools.test unicode.categories ;
+IN: python.syntax.tests
 
 : py-test ( result quot -- )
     '[ _ with-destructors ] unit-test ; inline
@@ -13,7 +13,7 @@ PY-FROM: os =>
 
 [ t ] [ getpid py> integer? ] unit-test
 
-! ! Automatic tuple unpacking
+! Automatic tuple unpacking
 PY-FROM: os.path =>
     basename ( x -- x' )
     splitext ( x -- base ext ) ;
@@ -153,3 +153,16 @@ PY-METHODS: ArgumentParser =>
 
 ! Can you pass a callback written in factor to a python function?
 PY-FROM: wsgiref.simple_server => make_server ( iface port callback -- httpd ) ;
+
+{ t } [
+    [ 987 >py basename ] [ traceback>> ] recover length 0 >
+] unit-test
+
+! Test if exceptions leak references. If so, the test will leak a few
+! hundred megs of memory. Enough to be noticed but not to slow down
+! the tests too much.
+{ } [
+    100000 [
+        [ [ 987 >py basename drop ] ignore-errors ] with-destructors
+    ] times
+] unit-test

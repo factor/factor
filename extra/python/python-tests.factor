@@ -17,8 +17,10 @@ IN: python
 [ t ] [ Py_IsInitialized ] py-test
 
 ! py-importing
-[ { "ImportError" "No module named kolobi" } ] [
-    [ "kolobi" py-import ] [ [ type>> ] [ message>> ] bi 2array ] recover
+[ { "ImportError" "No module named kolobi" f } ] [
+    [ "kolobi" py-import ] [
+        [ type>> ] [ message>> ] [ traceback>> ] tri 3array
+    ] recover
 ] py-test
 
 ! setattr
