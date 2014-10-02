@@ -1,5 +1,5 @@
 IN: python
-USING: python help.markup help.syntax ;
+USING: python python.throwing help.markup help.syntax ;
 
 HELP: py-initialize
 { $description "Initializes the python binding. This word must be called before any other words in the api can be used" } ;
@@ -19,9 +19,16 @@ HELP: >py
 }
 { $see-also py> } ;
 
+HELP: python-error
+{ $error-description "When Python throws an exception, it is translated to this Factor error. " { $slot "type" } " is the class name of the python exception object, " { $slot "message" } " its string and " { $slot "traceback" } " a sequence of traceback lines, if the error has one, or " { $link f } " otherwise." } ;
+
 ARTICLE: "python" "Python binding"
 "The " { $vocab-link "python" } " vocab and its subvocabs implements a simple binding for libpython, allowing factor code to call native python."
 $nl
+"Converting to and from Python:"
+{ $subsections >py py> }
+"Error handling:"
+{ $subsections python-error }
 "Initialization and finalization:"
 { $subsections py-initialize py-finalize }
 "Module management:"
