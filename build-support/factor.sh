@@ -18,6 +18,66 @@ SCRIPT_ARGS="$*"
 SKIP_UPDATE=false
 DO_CLEAN=true
 
+move-aside() {
+for arg in "$@"
+do
+    FILE="$arg"
+    if [[ "${FILE:0:1}" != "/" ]] ; then
+	FILE="$(pwd)/$FILE" # must be relative
+    fi
+    
+    # add default
+    TRY="$FILE.1"
+    TRYAGAIN=1
+    while [ $TRYAGAIN == 1 ]; do
+	# now check if already exists
+	if [[ -e "$TRY" ]] ; then
+	    EXT="${TRY##*.}"
+	    NEW=$(expr $EXT + 1)
+	    TRY="${TRY%.*}.$NEW"
+	else
+	    TRYAGAIN=0
+	fi		
+    done
+    
+    mv "$FILE" "$TRY"
+    if [[ $? != 0 ]] ; then
+	echo "$0: WARNING, error while executing mv $FILE $TRY"
+    fi
+done
+}
+
+copy-aside() {
+set -x
+for arg in "$@"
+do
+    FILE="$arg"
+    if [[ "${FILE:0:1}" != "/" ]] ; then
+	FILE="$(pwd)/$FILE" # must be relative
+    fi
+    
+    # add default
+    TRY="$FILE.1"
+    TRYAGAIN=1
+    while [ $TRYAGAIN == 1 ]; do
+	# now check if already exists
+	if [[ -e "$TRY" ]] ; then
+	    EXT="${TRY##*.}"
+	    NEW=$(expr $EXT + 1)
+	    TRY="${TRY%.*}.$NEW"
+	else
+	    TRYAGAIN=0
+	fi		
+    done
+    
+    cp "$FILE" "$TRY"
+    if [[ $? != 0 ]] ; then
+	echo "$0: WARNING, error while executing cp $FILE $TRY"
+    fi
+done
+set +x
+}
+
 test_program_installed() {
     if ! [[ -n `type -p $1` ]] ; then
         return 0;
@@ -94,16 +154,16 @@ set_gcc() {
         macosx)
             xcode_major=`xcodebuild -version | sed -E -ne 's/^Xcode ([0-9]+).*$/\1/p'`
             if [[ $xcode_major -ge 4 ]]; then
-                CC=clang
-                CPP=clang++
+                [ -z "$CC" ] && CC=clang
+                [ -z "$CXX" ] && CXX=clang++
             else
-                CC=gcc
-                CPP=g++
+                [ -z "$CC" ] && CC=gcc
+                [ -z "$CXX" ] && CXX=g++
             fi
         ;;
         *)
-            CC=gcc
-            CPP=g++
+            [ -z "$CC" ] && CC=gcc
+            [ -z "$CXX" ] && CXX=g++
         ;;
     esac
 }
@@ -236,7 +296,7 @@ c_find_word_size() {
     $ECHO "Finding WORD..."
     C_WORD=factor-word-size
     write_test_program
-    gcc -o $C_WORD $C_WORD.c
+    $CC -o $C_WORD $C_WORD.c
     WORD=$(./$C_WORD)
     check_ret $C_WORD
     $DELETE -f $C_WORD*
@@ -298,6 +358,7 @@ echo_build_info() {
     $ECHO GIT_URL=$GIT_URL
     $ECHO DOWNLOADER=$DOWNLOADER
     $ECHO CC=$CC
+    $ECHO CXX=$CXX
     $ECHO MAKE=$MAKE
     $ECHO COPY=$COPY
     $ECHO DELETE=$DELETE
@@ -349,7 +410,7 @@ parse_build_info() {
     if [[ $OS == linux && $ARCH == ppc ]] ; then WORD=32; fi
     if [[ $OS == linux && $ARCH == arm ]] ; then WORD=32; fi
     if [[ $OS == macosx && $ARCH == ppc ]] ; then WORD=32; fi
-    
+
     $ECHO "OS=$OS"
     $ECHO "ARCH=$ARCH"
     $ECHO "WORD=$WORD"
@@ -358,13 +419,13 @@ parse_build_info() {
 find_build_info() {
     find_os
     find_architecture
+    set_gcc
     find_word_size
     set_factor_binary
     set_factor_library
     set_factor_image
     set_build_info
     set_downloader
-    set_gcc
     set_make
     echo_build_info
 }
@@ -375,7 +436,7 @@ invoke_git() {
 }
 
 git_clone() {
-    $ECHO "Downloading the git repository from factorcode.org..."
+    $ECHO "Downloading the git repository from $GIT_URL"
     invoke_git clone $GIT_URL
 }
 
@@ -402,7 +463,7 @@ update_script_changed() {
 
 git_fetch_factorcode() {
 	if [[ $SKIP_UPDATE == false ]] ; then
-		$ECHO "Fetching the git repository from factorcode.org..."
+    		$ECHO "Fetching the git repository from $GIT_URL"
 		
 		rm -f `update_script_name`
 		invoke_git fetch "$GIT_URL" master
@@ -438,10 +499,10 @@ set_delete() {
 
 backup_factor() {
     $ECHO "Backing up factor..."
-    $COPY $FACTOR_BINARY $FACTOR_BINARY.bak
-    $COPY $FACTOR_LIBRARY $FACTOR_LIBRARY.bak
-    $COPY $BOOT_IMAGE $BOOT_IMAGE.bak
-    $COPY $FACTOR_IMAGE $FACTOR_IMAGE.bak
+    copy-aside $FACTOR_BINARY
+    copy-aside $FACTOR_LIBRARY
+    copy-aside $BOOT_IMAGE
+    copy-aside $FACTOR_IMAGE
     $ECHO "Done with backup."
 }
 
@@ -494,7 +555,6 @@ update_boot_images() {
     $DELETE $BOOT_IMAGE.{?,??} > /dev/null 2>&1
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
-		set -e
         if [[ $(get_url http://downloads.factorcode.org/images/latest/checksums.txt) ]] ; then
 			factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`
 			set_md5sum
@@ -510,7 +570,6 @@ update_boot_images() {
 		else
 		    $ECHO "Could not connect to server to check image checksum"
 		fi
-		set +e
     else
         get_boot_image
     fi
@@ -543,7 +602,6 @@ get_url() {
 
 get_config_info() {
     find_build_info
-    check_git_branch
     check_installed_programs
     check_libraries
 }
@@ -570,12 +628,19 @@ install() {
 
 update() {
     get_config_info
+    check_git_branch
     git_fetch_factorcode
     backup_factor
     make_clean_factor
 }
 
-update_bootstrap() {
+make_what_i_have() {
+    get_config_info
+    backup_factor
+    make_clean_factor
+}
+
+download_and_bootstrap() {
     update_boot_images
     bootstrap
 }
@@ -583,7 +648,7 @@ update_bootstrap() {
 net_bootstrap_no_pull() {
     get_config_info
     make_clean_factor
-    update_bootstrap
+    download_and_bootstrap
 }
 
 refresh_image() {
@@ -598,12 +663,12 @@ make_boot_image() {
 }
 
 install_deps_apt_get() {
-    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap gcc make
+    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap clang gcc make screen tmux libssl-dev
     check_ret sudo
 }
 
 install_deps_pacman() {
-    sudo pacman --noconfirm -S gcc clang make rlwrap git wget pango glibc gtk2 gtk3 gtkglext gtk-engines gdk-pixbuf2 libx11
+    sudo pacman --noconfirm -S gcc clang make rlwrap git wget pango glibc gtk2 gtk3 gtkglext gtk-engines gdk-pixbuf2 libx11 screen tmux
     check_ret sudo
 }
 
@@ -628,9 +693,10 @@ usage() {
     $ECHO "  deps-macosx - install git on MacOSX using port"
     $ECHO "  self-update - git pull, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
-    $ECHO "  update - download a boot image, recompile, bootstrap"
+    $ECHO "  update - git pull, download a boot image, recompile, bootstrap"
     $ECHO "  bootstrap - bootstrap with an existing boot image"
     $ECHO "  net-bootstrap - download a boot image, bootstrap"
+    $ECHO "  make - make using current commit"
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  make-clean - same as update, but use current git commit"
     $ECHO "  make - same as make-boot, but does not clean first"
@@ -660,13 +726,14 @@ case "$1" in
     deps-pacman) install_deps_pacman ;;
     deps-macosx) install_deps_macosx ;;
     self-update) update; make_boot_image; bootstrap;;
-    make-clean) SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
-    make) DO_CLEAN=false; SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
-    update) update; update_bootstrap ;;
+    update) update; download_and_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
     net-bootstrap) net_bootstrap_no_pull ;;
+    make) make_what_i_have; refresh_image;;
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
+    make-clean) SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
+    make) DO_CLEAN=false; SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
 	restore) restore_factor ;;
     report) find_build_info ;;
     *) usage ;;
