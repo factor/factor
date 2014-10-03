@@ -135,7 +135,7 @@ def configure(ctx):
             env.WINRCFLAGS += ['/nologo']
             env.CXXFLAGS += ['/EHsc', '/O2', '/WX', '/W3']
             if bits == 32:
-                env.LINKFLAGS += ['/safesh']
+                env.LINKFLAGS += ['/safeseh:no']
         elif cxx == 'g++':
             env.LINKFLAGS += ['-static-libgcc', '-static-libstdc++', '-s']
             env.CXXFLAGS += ['-O2', '-fomit-frame-pointer']
