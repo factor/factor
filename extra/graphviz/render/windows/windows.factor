@@ -18,6 +18,5 @@ IN: graphviz.render.windows
     ] map concat ;
 
 M: windows default-graphviz-program ( -- path/f )
-    graphviz-install-directories
-    standard-layouts [ ".exe" append ] map
-    [ find-in-applications ] with find nip ;
+    graphviz-install-directories standard-layouts
+    [ ".exe" append find-in-applications ] with map sift ?first ;
