@@ -216,6 +216,8 @@ def build_msi(ctx, bits, image_target):
     url_fmt = 'http://downloads.factorcode.org/dlls/%s%s'
     for name, digest32, digest64 in dlls:
         digest = digest32 if bits == 32 else digest64
+        if digest is None:
+            continue
         url = url_fmt % ('' if bits == 32 else '64/', name)
         r = ctx(
             rule = download_file,

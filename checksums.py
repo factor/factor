@@ -3,7 +3,8 @@ from hashlib import md5
 from urllib import urlopen
 
 # List of prebuilt libraries to download to create the windows msi
-# (name, digest32, digest64).
+# (name, digest32, digest64). If digest is None, then the dll is not
+# available for that arch.
 dlls = [
     ('blas.dll', '63017771c424146f8ddcee266d7a9446', 'ec84cbbecb0573369de8f6e94b576035'),
     ('bzip2.dll', 'dad3794d8c75a83397d0fd19a606bafd', '8a4efd59e29792f6400ce2e5c6799bea'),
@@ -42,7 +43,8 @@ dlls = [
     ('libgthread-2.0-0.dll', '90dd53dc6fc035b9ca1cba49dc1f8eba', '86fc9bcaa15f979b0102ec86e2c75737'),
     ('libgtk-win32-2.0-0.dll', '9ee94b7b2f501502e053845f67f18b2e', 'a38ccb75cd90a92afb6ff0cd295bf9e8'),
     ('libgtkglext-win32-1.0-0.dll', '60ec1aacfcac406c0e4b04943262bf04', '4ff420d58e49067419cc8593635492ba'),
-    ('libintl-8.dll', 'a69ec82feb3d17c83a9d714749fcd5ac', 'fd27a9a2a0bbbf1f9a1779585da702b1'),
+    ('libintl-8.dll', None, 'fd27a9a2a0bbbf1f9a1779585da702b1'),
+    ('libintl.dll', '30793281ac14877b0db504662d11e984', None),
     ('libjpeg-62.dll', 'e1c71acfa98caf316f93833dd31e9bb4', '9f9eca580a68017026fa64c70a286610'),
     ('libltdl-3.dll', '1911bdcafe96b98e62c0a51fb2bcb542', 'ffbaeae5c1c8f936332a01704963881b'),
     ('libobjc-2.dll', '217d2307f212955e82e64816d3349a08', '8ec985516958a2c99f2ca8fa0ae6843d'),
