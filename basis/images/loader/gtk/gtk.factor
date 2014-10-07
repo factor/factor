@@ -60,18 +60,12 @@ CONSTANT: bits>components {
         f >>premultiplied-alpha?
         f >>upside-down? ;
 
-: bits-per-sample ( image -- bits )
-    component-type>> bits>components value-at ;
-
-: rowstride ( image -- rowstride )
-    [ dim>> first ] [ bits-per-sample 8 / ] [ has-alpha? 4 3 ? ] tri * * ;
-
 : image>GdkPixbuf ( image -- GdkPixbuf )
     {
         [ bitmap>> ]
         [ drop GDK_COLORSPACE_RGB ]
         [ has-alpha? ]
-        [ bits-per-sample ]
+        [ bytes-per-component 8 * ]
         [ dim>> first2 ]
         [ rowstride ]
     } cleave f f gdk_pixbuf_new_from_data ;
