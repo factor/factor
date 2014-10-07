@@ -1,6 +1,6 @@
 USING: accessors arrays assocs calendar calendar.format
 combinators continuations destructors formatting fry grouping.extras imap
-io.streams.duplex kernel math math.parser math.ranges
+imap.private io.streams.duplex kernel math math.parser math.ranges
 math.statistics namespaces random sequences sets sorting
 splitting strings system tools.test ;
 FROM: pcre => findall ;
@@ -34,6 +34,12 @@ ERROR: no-imap-test-host ;
 : imap-test ( result quot -- )
     '[ \ imap-settings get-global _ with-imap-settings ] unit-test ; inline
 
+: base-folder ( -- s )
+    os name>> cpu name>> "-" glue ;
+
+: test-folder ( s -- s )
+    [ base-folder "/" ] dip 3append ;
+
 [ t ] [
     get-test-host <imap4ssl> [ duplex-stream? ] with-disposal
 ] unit-test
@@ -62,12 +68,6 @@ ERROR: no-imap-test-host ;
     [ delete-folder ] tri
     "ALL" "" search-mails
 ] imap-test
-
-: base-folder ( -- s )
-    os name>> cpu name>> "-" glue ;
-
-: test-folder ( s -- s )
-    [ base-folder "/" ] dip 3append ;
 
 ! Create delete select again.
 [ 0 ] [
@@ -127,11 +127,14 @@ ERROR: no-imap-test-host ;
 
 ! Create a folder hierarchy
 [ t ] [
-    "*" test-folder list-folders length
-    "foo/bar/baz/日本語" test-folder [
-        create-folder
+    "foo/bar/baz/日本語" test-folder
+    [ '[ _ delete-folder ] ignore-errors ]
+    [
+        "*" test-folder list-folders length
+        swap create-folder
         "*" test-folder list-folders length 4 - =
-    ] [ delete-folder ] bi
+    ]
+    [ delete-folder ] tri
 ] imap-test
 
 ! A gmail compliant way of creating a folder hierarchy.
@@ -176,6 +179,14 @@ ERROR: no-imap-test-host ;
     "\"([^\"]+)\"" findall first second last
     internal-date>timestamp timestamp?
 ] imap-test
+
+! Response parsing
+{ { 8132 { "\\Seen" } } f } [
+    "(FLAGS (\\Seen) UID 8132)" parse-store-mail-line
+    ! Weird non-standard(?) response format gmail uses to indicate the
+    ! previous mail flags. Just ignore it.
+    "(UID 1234 FLAGS (\\Seen))" parse-store-mail-line
+] unit-test
 
 ! Just an interesting verb to gmail thread mails. Wonder if you can
 ! avoid the double fetch-mails?
