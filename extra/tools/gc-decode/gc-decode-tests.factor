@@ -1,8 +1,7 @@
-USING: bit-arrays classes.struct sequences
-tools.gc-decode tools.test vm ;
+USING: bit-arrays classes.struct math sequences tools.gc-decode
+tools.test vm ;
 QUALIFIED: effects
 QUALIFIED: llvm.types
-QUALIFIED: unix.process
 IN: tools.gc-decode.tests
 
 ! byte-array>bit-array
@@ -33,46 +32,12 @@ IN: tools.gc-decode.tests
 ] unit-test
 
 ! decode-gc-maps
-{ t } [
-    \ effects:<effect> decode-gc-maps
-    {
-        {
-            { 151 { { ?{ } ?{ t t t } ?{ } ?{ } ?{ f t t t t } } { } } }
-        }
-        {
-            { 124 { { ?{ } ?{ t t t } ?{ } ?{ } ?{ f f f f f t t t t } } { } } }
-        }
-    } member?
+{ f } [
+    \ effects:<effect> decode-gc-maps empty?
 ] unit-test
 
-{ t } [
-    \ unix.process:fork-process decode-gc-maps
-    {
-        {
-            { 82 { { ?{ t f } ?{ t } ?{ f } ?{ f f } ?{ } } { } } }
-            { 244 { { ?{ f f } ?{ f } ?{ f } ?{ t f } ?{ } } { } } }
-            { 445 { { ?{ f f } ?{ f } ?{ t } ?{ t t } ?{ } } { } } }
-            { 522 { { ?{ t t } ?{ f } ?{ f } ?{ t f } ?{ } } { } } }
-        }
-        {
-            { 57 { { ?{ t f } ?{ t } ?{ f } ?{ f f } ?{ f f f f f f f } } { } } }
-            { 90 { { ?{ t f } ?{ t } ?{ f } ?{ f f } ?{ f f f f f f t } } { } } }
-            { 207 { { ?{ f f } ?{ f } ?{ f } ?{ t f } ?{ f f f f f f f } } { } } }
-            { 231 { { ?{ f f } ?{ f } ?{ f } ?{ t f } ?{ f f f f f f f } } { } } }
-            { 437 { { ?{ f f } ?{ f } ?{ t } ?{ t t } ?{ f f f f f f f } } { } } }
-            { 495 { { ?{ t t } ?{ f } ?{ f } ?{ t f } ?{ f f f f f f f } } { } } }
-            { 519 { { ?{ t t } ?{ f } ?{ f } ?{ t f } ?{ f f f f f f f } } { } } }
-        }
-        {
-            { 57 { { ?{ t f } ?{ t } ?{ f } ?{ f f } ?{ } } { } } }
-            { 81 { { ?{ t f } ?{ t } ?{ f } ?{ f f } ?{ } } { } } }
-            { 200 { { ?{ f f } ?{ f } ?{ f } ?{ t f } ?{ } } { } } }
-            { 224 { { ?{ f f } ?{ f } ?{ f } ?{ t f } ?{ } } { } } }
-            { 429 { { ?{ f f } ?{ f } ?{ t } ?{ t t } ?{ } } { } } }
-            { 487 { { ?{ t t } ?{ f } ?{ f } ?{ t f } ?{ } } { } } }
-            { 511 { { ?{ t t } ?{ f } ?{ f } ?{ t f } ?{ } } { } } }
-        }
-    } member?
+{ f } [
+    \ + decode-gc-maps empty?
 ] unit-test
 
 ! read-gc-maps
