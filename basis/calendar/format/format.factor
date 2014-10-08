@@ -136,16 +136,12 @@ M: timestamp year. ( timestamp -- )
 
 ! Should be enough for anyone, allows to not do a fancy
 ! algorithm to detect infinite decimals (e.g 1/3)
-: write-rfc3339-seconds ( timestamp -- )
-    second>> 1 mod [
-        >float "%.6f" format-float [ CHAR: 0 = ] trim
-        dup length 1 > [ write ] [ drop ] if
-    ] unless-zero ;
+: ss.SSSSSS ( timestamp -- )
+    second>> >float "%.6f" format-float 9 CHAR: 0 pad-head write ;
 
 : (timestamp>rfc3339) ( timestamp -- )
     {
-        YYYY "-" MM "-" DD "T" hh ":" mm ":" ss
-        write-rfc3339-seconds
+        YYYY "-" MM "-" DD "T" hh ":" mm ":" ss.SSSSSS
         [ gmt-offset>> write-rfc3339-gmt-offset ]
     } formatted ;
 
