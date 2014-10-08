@@ -1,7 +1,7 @@
-USING: combinators continuations smtp tools.test io.streams.string
-io.sockets io.sockets.secure threads smtp.server kernel sequences
-namespaces logging accessors assocs sorting smtp.private
-concurrency.promises system ;
+USING: accessors assocs combinators concurrency.promises
+continuations fry io.sockets io.sockets.secure io.streams.string
+kernel namespaces sequences smtp smtp.private smtp.server
+sorting system tools.test ;
 IN: smtp.tests
 
 : with-test-smtp-config ( quot -- )
@@ -85,7 +85,7 @@ IN: smtp.tests
             [ to>> [ extract-email ] map ]
             [ from>> extract-email ]
             ! To get the smtp server to clean up itself
-            [ [ send-email ] ignore-errors drop ]
+            [ '[ _ send-email ] ignore-errors ]
         } cleave
     ] with-test-smtp-config
 ] unit-test
