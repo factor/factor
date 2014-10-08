@@ -14,7 +14,7 @@ IN: db.tester
     \ postgresql-db get-global clone postgresql-test-db-name >>database ;
 
 : postgresql-template1-db ( -- postgresql-db )
-    \ postgresql-db get-global ;
+    \ postgresql-db get-global clone "template1" >>database ;
 
 : sqlite-test-db ( -- sqlite-db )
     cpu name>> "tuples-test." ".db" surround
