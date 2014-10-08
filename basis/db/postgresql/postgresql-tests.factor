@@ -22,13 +22,13 @@ postgresql-template1-db [
 
 ! Triggers a two line error message (ERROR + DETAIL) because two
 ! connections can't simultaneously use the template1 database.
-[
-    postgresql-template1-db [
-        postgresql-template1-db [
-            "will_never_exist" ensure-database
-        ] with-db
-    ] with-db
-] [ sql-unknown-error? ] must-fail-with
+! [
+    ! postgresql-template1-db [
+        ! postgresql-template1-db [
+            ! "will_never_exist" ensure-database
+        ! ] with-db
+    ! ] with-db
+! ] [ sql-unknown-error? ] must-fail-with
 
 [ ] [
     postgresql-test-db [
