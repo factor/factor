@@ -18,7 +18,7 @@ SINGLETONS:
     u-9-9-9-e5-components
     float-11-11-10-components ;
 
-UNION: component-order 
+UNION: component-order
     A L LA BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR
     INTENSITY DEPTH DEPTH-STENCIL R RG ;
 
@@ -41,8 +41,8 @@ UNION: unnormalized-integer-components
     int-integer-components uint-integer-components ;
 
 UNION: signed-unnormalized-integer-components
-    byte-integer-components 
-    short-integer-components 
+    byte-integer-components
+    short-integer-components
     int-integer-components ;
 
 UNION: unsigned-unnormalized-integer-components
@@ -131,9 +131,12 @@ TUPLE: image
 
 : bytes-per-pixel ( image -- n )
     [ component-order>> ] [ component-type>> ] bi (bytes-per-pixel) ;
-    
+
 : bytes-per-image ( image -- n )
     [ dim>> product ] [ bytes-per-pixel ] bi * ;
+
+: rowstride ( image -- n )
+    [ dim>> first ] [ bytes-per-pixel ] bi * ;
 
 <PRIVATE
 
@@ -164,4 +167,3 @@ PRIVATE>
 
 : set-pixel-at ( pixel x y image -- )
     [ 1 ] dip set-pixel-row-at ; inline
-
