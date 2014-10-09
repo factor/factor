@@ -107,7 +107,7 @@ TUPLE: alien-callback-params < alien-node-params xt ;
 : callback-xt ( word -- alien )
     callbacks get [
         dup "stack-cleanup" word-prop <callback>
-        callback-destructor boa &dispose callback>>
+        [ callback-destructor new-disposable callback<< ] keep
     ] cache ;
 
 : callback-bottom ( params -- )
