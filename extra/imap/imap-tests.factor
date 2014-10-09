@@ -58,6 +58,12 @@ ERROR: no-imap-test-host ;
     [ get-test-host <imap4ssl> [ f f login ] with-stream ] [ ind>> ] recover
 ] unit-test
 
+! Try to reset test folder before starting tests
+[ ] [
+    [ base-folder delete-folder ] ignore-errors
+] imap-test
+
+
 [ ] [ \ imap-settings get-global [ ] with-imap-settings ] unit-test
 
 ! Newly created and then selected folder is empty.
