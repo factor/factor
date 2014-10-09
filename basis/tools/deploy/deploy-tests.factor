@@ -160,7 +160,8 @@ os macosx? [
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>Factor</foo>" ]
 [ deploy-test-command ascii [ readln ] with-process-reader ] unit-test
 
-[ ] [ "tools.deploy.test.20" drop 1353000 small-enough? ] unit-test
+! [ ] [ "tools.deploy.test.20" drop 1353000 small-enough? ] unit-test
+[ ] [ "tools.deploy.test.20" drop 1363000 small-enough? ] unit-test
 
 [ ] [ "tools.deploy.test.21" shake-and-bake ] unit-test
 
