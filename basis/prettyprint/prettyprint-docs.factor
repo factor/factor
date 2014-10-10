@@ -159,9 +159,10 @@ ARTICLE: "prettyprint" "The prettyprinter"
 $nl
 "Prettyprinter words are found in the " { $vocab-link "prettyprint" } " vocabulary."
 $nl
-"The key words to print an object to " { $link output-stream } "; the first two emit a trailing newline, the second two do not:"
+"The key words to print an object to " { $link output-stream } "; the first three emit a trailing newline, the second three do not:"
 { $subsections
     .
+    ...
     short.
     pprint
     pprint-short
@@ -204,6 +205,15 @@ HELP: .
 { $warning
     "Printing a large object can take a long time and consume a lot of memory. If you need to print large objects, use " { $link short. } " or set some " { $link "prettyprint-variables" } " to limit output size."
 } ;
+
+HELP: ...
+{ $values { "obj" object } }
+{ $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. Output is unlimited in length." }
+{ $warning
+    "Printing a large object can take a long time and consume a lot of memory. If you need to print large objects, use " { $link short. } " or set some " { $link "prettyprint-variables" } " to limit output size."
+} ;
+
+{ . ... } related-words
 
 HELP: unparse
 { $values { "obj" object } { "str" "Factor source string" } }
