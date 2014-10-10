@@ -21,6 +21,8 @@ IN: prettyprint
 
 : . ( obj -- ) pprint nl ;
 
+: ... ( obj -- ) [ . ] without-limits ;
+
 : pprint-use ( obj -- ) [ pprint* ] with-use ;
 
 : unparse ( obj -- str ) [ pprint ] with-string-writer ;
