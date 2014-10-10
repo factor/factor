@@ -65,6 +65,8 @@ M: peek-stream stream-read-until
 M: peek-stream stream-write stream>> stream-write ;
 M: peek-stream stream-write1 stream>> stream-write1 ;
 M: peek-stream stream-flush stream>> stream-flush ;
+M: peek-stream stream-tell stream>> stream-tell ;
+M: peek-stream stream-seek stream>> stream-seek ;
 
 : stream-peek1 ( stream -- ch )
     dup peeked>> [
