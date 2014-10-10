@@ -65,7 +65,7 @@ CONSTANT: bits>components {
         [ bitmap>> ]
         [ drop GDK_COLORSPACE_RGB ]
         [ has-alpha? ]
-        [ bytes-per-component 8 * ]
+        [ component-type>> bytes-per-component 8 * ]
         [ dim>> first2 ]
         [ rowstride ]
     } cleave f f gdk_pixbuf_new_from_data ;
