@@ -1,22 +1,41 @@
-USING: continuations images.loader io.files.temp kernel sequences system
-tools.test ;
+USING: continuations glib.ffi images.loader io.files.temp kernel sequences
+system tools.test ;
 IN: images.loader.tests
 
-CONSTANT: basi0g01.png "vocab:images/testing/png/basi0g01.png"
+: open-png-image ( -- image )
+    "vocab:images/testing/png/basi0g01.png" load-image ;
 
-os { linux windows } member? [
+: convert-to ( image format -- image' )
+    "foo." prepend temp-file [ save-graphic-image ] keep load-image ;
 
+os windows? [
+    ! Windows can handle these three formats fine.
     { { t t t } } [
-        basi0g01.png load-image dup
-        { "png" "gif" "tif" } [
-            "foo." prepend temp-file [ save-graphic-image ] keep
-        ] with map
-        [ load-image = ] with map
+        { "png" "tif" "gif" } [
+            open-png-image [ swap convert-to ] keep =
+        ] map
+    ] unit-test
+] when
+
+os linux? [
+    ! GTK only these two.
+    { { t t } } [
+        { "png" "bmp" } [
+            open-png-image [ swap convert-to ] keep =
+        ] map
     ] unit-test
 
+    ! It either can save to gif or throw a g-error if the gif encoder
+    ! is excluded.
+    { t } [
+        [ open-png-image dup "gif" convert-to = ] [ g-error? ] recover
+    ] unit-test
+] when
+
+os { linux windows } member? [
     { t } [
         [
-            basi0g01.png load-image
+            open-png-image
             "hai!" save-graphic-image
         ] [ unknown-image-extension? ] recover
     ] unit-test
@@ -25,12 +44,11 @@ os { linux windows } member? [
     ! them though.
     os windows? [
         [
-            basi0g01.png load-image "foo.bmp" temp-file save-graphic-image
+            open-png-image "foo.bmp" temp-file save-graphic-image
         ] [ unknown-image-extension? ] must-fail-with
     ] [
         { t } [
-            basi0g01.png load-image dup
-            "foo.bmp" temp-file [ save-graphic-image ] [ load-image ] bi =
+            open-png-image dup "bmp" convert-to =
         ] unit-test
     ] if
 
@@ -38,5 +56,4 @@ os { linux windows } member? [
         "vocab:images/testing/bmp/rgb_8bit.bmp" load-image dup
         "foo.png" temp-file [ save-graphic-image ] [ load-image ] bi =
     ] unit-test
-
 ] when
