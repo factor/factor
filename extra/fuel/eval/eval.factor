@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays continuations debugger fuel.pprint io
-io.streams.string kernel listener namespaces sequences
+io.streams.string kernel listener namespaces prettyprint.config sequences
 vocabs.parser ;
 
 IN: fuel.eval
@@ -52,7 +52,8 @@ t fuel-eval-res-flag set-global
     fuel-eval-error get-global
     fuel-eval-result get-global
     fuel-eval-output get-global 3array
-    fuel-pprint flush nl "<~FUEL~>" write nl flush ;
+    [ fuel-pprint ] without-limits
+    flush nl "<~FUEL~>" write nl flush ;
 
 : (fuel-begin-eval) ( -- )
     fuel-push-status fuel-forget-status ;
