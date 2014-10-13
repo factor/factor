@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences ;
+USING: kernel math math.vectors sequences ;
 IN: rosetta-code.long-multiplication
 
 ! http://rosettacode.org/wiki/Long_multiplication
@@ -21,7 +21,7 @@ IN: rosetta-code.long-multiplication
     [ * ] cartesian-map
     dup length iota [ 0 <repetition> ] map
     [ prepend ] 2map
-    [ ] [ [ 0 suffix ] dip [ + ] 2map ] map-reduce ;
+    [ ] [ [ 0 suffix ] dip v+ ] map-reduce ;
 
 : integer->digits ( x -- xs )
     { } swap  [ dup 0 > ] [ 10 /mod swap [ prefix ] dip ] while  drop ;

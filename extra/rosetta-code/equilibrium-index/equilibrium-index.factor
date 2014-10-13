@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences ;
+USING: kernel math math.vectors sequences ;
 IN: rosetta-code.equilibrium-index
 
 ! http://rosettacode.org/wiki/Equilibrium_index
@@ -35,5 +35,5 @@ IN: rosetta-code.equilibrium-index
     [ <reversed> ] 2dip accum-left <reversed> ; inline
 
 : equilibrium-indices ( seq -- inds )
-    0 [ + ] [ accum-left ] [ accum-right ] 3bi [ = ] 2map
+    0 [ + ] [ accum-left ] [ accum-right ] 3bi v=
     V{ } swap dup length iota [ [ suffix ] curry [ ] if ] 2each ;

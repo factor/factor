@@ -7,8 +7,6 @@ IN: checksums.hmac
 
 <PRIVATE
 
-: seq-bitxor ( seq seq -- seq ) [ bitxor ] 2map ;
-
 : opad ( checksum-state -- seq ) block-size>> 0x5c <array> ;
 
 : ipad ( checksum-state -- seq ) block-size>> 0x36 <array> ;
@@ -16,9 +14,9 @@ IN: checksums.hmac
 :: init-key ( checksum key checksum-state -- o i )
     checksum-state block-size>> key length <
     [ key checksum checksum-bytes ] [ key ] if
-    checksum-state block-size>> 0 pad-tail 
-    [ checksum-state opad seq-bitxor ]
-    [ checksum-state ipad seq-bitxor ] bi ;
+    checksum-state block-size>> 0 pad-tail
+    [ checksum-state opad vbitxor ]
+    [ checksum-state ipad vbitxor ] bi ;
 
 PRIVATE>
 

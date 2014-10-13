@@ -39,7 +39,7 @@ M: color-preview model-changed
             [ <color-model> <color-preview> 1 track-add ]
             [
                 [
-                    [ truncate ] map v>integer
+                    vtruncate v>integer
                     first3 3dup "%d %d %d #%02x%02x%02x" sprintf
                 ] <arrow> <label-control>
                 f track-add
