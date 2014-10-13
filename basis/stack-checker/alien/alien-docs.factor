@@ -10,6 +10,10 @@ HELP: alien-node-params
   }
 } ;
 
+HELP: alien-callback-params
+{ $class-description "Class that holds the parameter types and return value type of an alien callback call." }
+{ $see-also #alien-callback } ;
+
 HELP: param-prep-quot
 { $values { "params" alien-node-params } { "quot" quotation } }
 { $description "Builds a quotation which coerces values on the stack to the required types for the alien call." }
@@ -21,5 +25,37 @@ HELP: param-prep-quot
   }
 } ;
 
+HELP: callback-parameter-quot
+{ $values { "params" alien-node-params } }
+{ $description "Builds a quotation which coerces values on the stack to the required types for an alien callback. This word is essentially the opposite to " { $link param-prep-quot } "." }
+{ $examples
+  { $unchecked-example
+    "USING: alien.c-types prettyprint stack-checker.alien ;"
+    "T{ alien-node-params { parameters { c-string } } } callback-parameter-quot ."
+    "[ { object } declare [ ] dip \ utf8 alien>string ]"
+  }
+} ;
+
 HELP: infer-alien-invoke
 { $description "Appends the necessary SSA nodes for performing an " { $link alien-invoke } " call to the IR tree being constructed." } ;
+
+HELP: wrap-callback-quot
+{ $values { "params" alien-node-params } { "quot" quotation } }
+{ $description "Wraps the given quotation in protective packaging so that it becomes suitable to be used as an alien callback. That means that the parameters are unpacked from C types to Factor types and, if the callback returns something, the top data stack item is afterwards converted to a C compatible value." }
+{ $examples
+  "Here a callback that returns the length of a " { $link c-string } " is wrapped:"
+  { $unchecked-example
+    "USING: alien.c-types prettyprint stack-checker.alien ;"
+    "T{ alien-node-params { return int } { parameters { c-string } } } "
+    "[ length ] wrap-callback-quot ."
+    "["
+    "   ["
+    "       { object } declare [ ] dip \ utf8 alien>string"
+    "       length >fixnum"
+    "   ] ["
+    "       dup current-callback eq?"
+    "       [ drop ] [ wait-for-callback ] if"
+    "   ] do-callback"
+    "]"
+  }
+} ;
