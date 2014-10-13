@@ -199,7 +199,7 @@ GENERIC: v= ( u v -- w )
 M: object v= [ = ] 2map ; inline
 
 GENERIC: v? ( mask true false -- result )
-M: object v? 
+M: object v?
     [ vand ] [ vandn ] bi-curry* bi vor ; inline
 
 : vif ( mask true-quot: ( -- vector ) false-quot: ( -- vector ) -- result )
@@ -209,6 +209,7 @@ M: object v?
         [ [ call ] dip call v? ]
     } cond ; inline
 
+: v>integer ( u -- v ) [ >integer ] map ;
 : vfloor ( u -- v ) [ floor ] map ;
 : vceiling ( u -- v ) [ ceiling ] map ;
 : vtruncate ( u -- v ) [ truncate ] map ;

@@ -130,17 +130,17 @@ terrain-world H{
         [ key-5 keys nth 10000 f ? ]
     } 0|| player reverse-time<<
 
-    key-w keys nth [ player walk-forward ] when 
-    key-s keys nth [ player walk-backward ] when 
-    key-a keys nth [ player walk-leftward ] when 
-    key-d keys nth [ player walk-rightward ] when 
-    key-q keys nth [ player -1 look-horizontally ] when 
-    key-e keys nth [ player 1 look-horizontally ] when 
-    key-left-arrow keys nth [ player -1 look-horizontally ] when 
-    key-right-arrow keys nth [ player 1 look-horizontally ] when 
-    key-down-arrow keys nth [ player 1 look-vertically ] when 
-    key-up-arrow keys nth [ player -1 look-vertically ] when 
-    key-space keys nth [ player jump ] when 
+    key-w keys nth [ player walk-forward ] when
+    key-s keys nth [ player walk-backward ] when
+    key-a keys nth [ player walk-leftward ] when
+    key-d keys nth [ player walk-rightward ] when
+    key-q keys nth [ player -1 look-horizontally ] when
+    key-e keys nth [ player 1 look-horizontally ] when
+    key-left-arrow keys nth [ player -1 look-horizontally ] when
+    key-right-arrow keys nth [ player 1 look-horizontally ] when
+    key-down-arrow keys nth [ player 1 look-vertically ] when
+    key-up-arrow keys nth [ player -1 look-vertically ] when
+    key-space keys nth [ player jump ] when
     key-escape keys nth [ world close-window ] when
     player read-mouse rotate-with-mouse
     reset-mouse ;
@@ -155,7 +155,7 @@ terrain-world H{
     [ { 0 0 } vmax ] dip { 2 2 } v- vmin ;
 
 :: pixel-indices ( coords dim -- indices )
-    coords vfloor [ >integer ] map dim clamp-coords :> floor-coords
+    coords vfloor v>integer dim clamp-coords :> floor-coords
     floor-coords first2 dim first * + :> base-index
     base-index dim first + :> next-row-index
 
@@ -170,7 +170,7 @@ terrain-world H{
     pixel dup vfloor v- :> pixel-mantissa
     segment bitmap>> 4 <groups> :> pixels
     pixel dim pixel-indices :> indices
-    
+
     indices [ pixels nth COMPONENT-SCALE v. 255.0 / ] map
     first4 pixel-mantissa bilerp ;
 
