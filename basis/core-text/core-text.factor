@@ -136,8 +136,8 @@ render-loc render-dim ;
         ctline line-rect :> rect
         rect origin>> CGPoint>loc :> (loc)
         rect size>> CGSize>dim :> (dim)
-        (loc) [ floor ] map :> loc
-        (loc) (dim) [ + ceiling ] 2map :> ext
+        (loc) vfloor :> loc
+        (loc) (dim) v+ vceiling :> ext
         ext loc [ - >integer 1 max ] 2map :> dim
 
         loc line render-loc<<
