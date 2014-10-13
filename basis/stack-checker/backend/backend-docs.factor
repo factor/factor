@@ -1,5 +1,5 @@
 USING: compiler.tree effects help.markup help.syntax quotations sequences
-stack-checker.visitor ;
+stack-checker.state stack-checker.visitor ;
 IN: stack-checker.backend
 
 HELP: infer-quot-here
@@ -13,3 +13,7 @@ HELP: introduce-values
 HELP: with-infer
 { $values { "quot" quotation } { "effect" effect } { "visitor" "a visitor, if any" } }
 { $description "Initializes the inference engine and then runs the given quotation which is supposed to perform the inferencing." } ;
+
+HELP: push-literal
+{ $values { "obj" "something" } }
+{ $description "Pushes a literal onto the " { $link literals } " sequence." } ;
