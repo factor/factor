@@ -182,7 +182,7 @@ SINGLETON: pango-renderer
 
 M: pango-renderer string-dim
     [ " " string-dim { 0 1 } v* ]
-    [ cached-layout logical-rect>> dim>> [ >integer ] map ] if-empty ;
+    [ cached-layout logical-rect>> dim>> v>integer ] if-empty ;
 
 M: pango-renderer flush-layout-cache
     cached-layouts get-global purge-cache ;
@@ -210,4 +210,3 @@ M: pango-renderer line-metrics ( font string -- metrics )
 ] "ui.text.pango" add-startup-hook
 
 pango-renderer font-renderer set-global
-
