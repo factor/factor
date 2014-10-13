@@ -24,7 +24,7 @@ M: viewport focusable-child*
     gadget-child ;
 
 : scroll-position ( scroller -- loc )
-    model>> range-value [ >integer ] map ;
+    model>> range-value v>integer ;
 
 M: viewport model-changed
     nip

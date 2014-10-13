@@ -38,7 +38,7 @@ CONSTANT: pov-polygons
     indicator-polygon <polygon-gadget> ;
 
 : (>loc) ( axisloc -- windowloc )
-    0.5 v*n { 0.5 0.5 } v+ SIZE v* [ >integer ] map
+    0.5 v*n { 0.5 0.5 } v+ SIZE v* v>integer
     INDICATOR-SIZE 2 v/n v- ;
 
 : (xy>loc) ( x y -- xyloc )

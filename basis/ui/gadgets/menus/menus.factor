@@ -29,7 +29,7 @@ C: <separator-pen> separator-pen
 M: separator-pen draw-interior
     color>> gl-color
     dim>> [ { 0 0.5 } v* ] [ { 1 0.5 } v* ] bi
-    [ [ >integer ] map ] bi@ gl-line ;
+    [ v>integer ] bi@ gl-line ;
 
 : <menu-items> ( items -- gadget )
     [ <filled-pile> ] dip add-gadgets
