@@ -779,3 +779,12 @@ H{
     }
     register-status
 ] unit-test
+
+{ t } [
+    T{ cfg { frame-pointer? f } } admissible-registers machine-registers =
+] unit-test
+
+{ f } [
+    T{ cfg { frame-pointer? t } } admissible-registers
+    int-regs of frame-reg swap member?
+] unit-test
