@@ -7,6 +7,10 @@ HELP: stack-reg
   "Symbol of the machine register that holds the (cpu) stack address."
 } ;
 
+HELP: reserved-stack-space
+{ $values { "n" integer } }
+{ $description "Size in bytes of the register parameter area. It only exists on the windows x86.64 architecture, where it is 32 bytes and allocated by the caller. On all other platforms it is 0." } ;
+
 HELP: ds-reg
 { $values { "reg" "a register symbol" } }
 { $description

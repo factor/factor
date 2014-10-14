@@ -1,4 +1,4 @@
-USING: assocs compiler.cfg.instructions cpu.x86.assembler
+USING: assocs alien compiler.cfg.instructions cpu.x86.assembler
 cpu.x86.assembler.operands help.markup help.syntax kernel
 layouts literals math multiline system words ;
 IN: cpu.architecture
@@ -134,3 +134,30 @@ HELP: fused-unboxing?
 HELP: return-regs
 { $values { "regs" assoc } }
 { $description "What registers that will be used for function return values of which class." } ;
+
+HELP: stack-cleanup
+{ $values { "stack-size" integer } { "return" "a c type" } { "abi" abi } }
+{ $description "Calculates how many bytes of stack space the caller of the procedure being constructed need to cleanup. For modern abi's the value is almost always 0." }
+{ $examples
+  { $unchecked-example
+    "USING: cpu.architecture prettyprint ;"
+    "20 void stdcall stack-cleanup ."
+    "20"
+  }
+} ;
+
+ARTICLE: "cpu.architecture" "CPU architecture description model"
+"The " { $vocab-link "cpu.architecture" } " vocab generic words and hooks that serves as an api for the compiler towards the cpu architecture."
+$nl
+"Register categories:"
+{ $subsections machine-registers param-regs return-regs }
+"Architecture support checks:"
+{ $subsections
+  complex-addressing?
+  float-on-stack?
+  float-right-align-on-stack?
+  fused-unboxing?
+  test-instruction?
+}
+"Control flow code emitters:"
+{ $subsections %call %jump %jump-label %return } ;
