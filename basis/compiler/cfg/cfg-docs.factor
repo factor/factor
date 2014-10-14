@@ -1,6 +1,6 @@
 USING: compiler.cfg compiler.cfg.instructions compiler.cfg.rpo
-compiler.cfg.stack-frame help.markup help.syntax namespaces sequences vectors
-words ;
+compiler.cfg.stack-frame compiler.tree help.markup help.syntax namespaces
+sequences vectors words ;
 IN: compiler.cfg
 
 HELP: basic-block
@@ -26,6 +26,7 @@ HELP: cfg
     { { $slot "word" } { "The " { $link word } " the cfg is produced from." } }
     { { $slot "post-order" } { "The blocks of the cfg in a post order traversal " { $link sequence } "." } }
     { { $slot "stack-frame" } { { $link stack-frame } " of the cfg." } }
+    { { $slot "frame-pointer?" } { "Whether the cfg needs a frame pointer. Only cfgs generated for " { $link #alien-callback } " nodes does need it." } }
   }
 }
 { $see-also post-order } ;
