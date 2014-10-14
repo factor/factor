@@ -39,11 +39,7 @@ IN: compiler.cfg.linear-scan
     cfg check-numbering ;
 
 : admissible-registers ( cfg -- regs )
-    [ machine-registers ] dip
-    frame-pointer?>> [
-        [ int-regs ] dip [ clone ] map
-        [ [ [ frame-reg ] dip remove ] change-at ] keep
-    ] when ;
+    drop machine-registers ;
 
 : linear-scan ( cfg -- cfg' )
     dup dup admissible-registers (linear-scan) ;
