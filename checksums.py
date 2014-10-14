@@ -59,7 +59,7 @@ dlls = [
     ('libssp-0.dll', 'b127a3dcfe2caa0b9fb2bd8768d0f576', '51515b2264de2f8660cc46b7f3ebbc6b'),
     ('libstdc++-6.dll', '184fe8081f4bbedf0e25cac175c2e073', '54a45223d73d6ea6dd5a1828d2b59195'),
     ('libtiff.dll', '573d09e62d71cdaa0fa41f6ad62b2f81', '4ad93cded54c071c9f6410b47c292a4e'),
-    ('libudis86.dll', 'c67f87d066b2bf1f545ca385bffbfaf6', 'e7fb66c3f50469160ca992bd4d8b6544'),
+    ('libudis86.dll', '6d70e891faa03a17068d0ab58f14e946', 'e7fb66c3f50469160ca992bd4d8b6544'),
     ('libxml2.dll', 'cce96a8421c6b764e58eb8f13dbe5dd8', '059ca11eea704709f024fbccb2c49466'),
     ('pcre.dll', '5d6cade5112191346afa3fa66252440a', 'ce9a046b8ac744d20015ef93e2d23a47'),
     ('sqlite3.dll', 'ee68b052a08fec0f574f2dae2003df27', 'e5a07bbb9dcff7e72142f589d7d0234c'),
