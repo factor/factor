@@ -13,7 +13,7 @@ IN: magic
 : magic-file ( path flags -- result )
     [
         magic_open &magic_close
-        [ [ f magic_load ] keep check-magic-error ]
+        [ dup f magic_load check-magic-error ]
         [ swap normalize-path magic_file ] bi
     ] with-destructors ;
 
