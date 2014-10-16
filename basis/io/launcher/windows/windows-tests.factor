@@ -143,11 +143,13 @@ IN: io.launcher.windows.tests
     "err2.txt" temp-file ascii file-lines first
 ] unit-test
 
+
+
 [ t ] [
     launcher-test-path [
         <process>
             console-vm "-script" "env.factor" 3array >>command
-        utf8 <process-reader> stream-contents
+        utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     os-envs =
@@ -159,7 +161,7 @@ IN: io.launcher.windows.tests
             console-vm "-script" "env.factor" 3array >>command
             +replace-environment+ >>environment-mode
             os-envs >>environment
-        utf8 <process-reader> stream-contents
+        utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     os-envs =
@@ -170,7 +172,7 @@ IN: io.launcher.windows.tests
         <process>
             console-vm "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
-        utf8 <process-reader> stream-contents
+        utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     "A" of
@@ -182,7 +184,7 @@ IN: io.launcher.windows.tests
             console-vm "-script" "env.factor" 3array >>command
             { { "USERPROFILE" "XXX" } } >>environment
             +prepend-environment+ >>environment-mode
-        utf8 <process-reader> stream-contents
+        utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     "USERPROFILE" of "XXX" =
