@@ -6,9 +6,9 @@ alien.libraries.finder alien.syntax kernel literals ;
 
 IN: magic.ffi
 
-<< "libmagic" dup find-library cdecl add-library >>
+<< "magic" dup find-library cdecl add-library >>
 
-LIBRARY: libmagic
+LIBRARY: magic
 
 CONSTANT: MAGIC_NONE 0x000000
 CONSTANT: MAGIC_DEBUG 0x000001
