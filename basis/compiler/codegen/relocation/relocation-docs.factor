@@ -40,7 +40,3 @@ HELP: compiled-offset
     "t\nt"
   }
 } ;
-
-HELP: resolve-label
-{ $values { "label/name" { $link label } " or " { $link string } } }
-{ $description "Assigns the current " { $link compiled-offset } " to the given label." } ;
