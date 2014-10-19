@@ -26,7 +26,7 @@ HELP: param-prep-quot
 } ;
 
 HELP: callback-parameter-quot
-{ $values { "params" alien-node-params } }
+{ $values { "params" alien-node-params } { "quot" quotation } }
 { $description "Builds a quotation which coerces values on the stack to the required types for an alien callback. This word is essentially the opposite to " { $link param-prep-quot } "." }
 { $examples
   { $unchecked-example
@@ -40,7 +40,7 @@ HELP: infer-alien-invoke
 { $description "Appends the necessary SSA nodes for performing an " { $link alien-invoke } " call to the IR tree being constructed." } ;
 
 HELP: wrap-callback-quot
-{ $values { "params" alien-node-params } { "quot" quotation } }
+{ $values { "params" alien-node-params } { "quot" quotation } { "quot'" quotation } }
 { $description "Wraps the given quotation in protective packaging so that it becomes suitable to be used as an alien callback. That means that the parameters are unpacked from C types to Factor types and, if the callback returns something, the top data stack item is afterwards converted to a C compatible value." }
 { $examples
   "Here a callback that returns the length of a " { $link c-string } " is wrapped:"
