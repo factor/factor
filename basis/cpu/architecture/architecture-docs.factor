@@ -136,7 +136,12 @@ HELP: return-regs
 { $description "What registers that will be used for function return values of which class." } ;
 
 HELP: stack-cleanup
-{ $values { "stack-size" integer } { "return" "a c type" } { "abi" abi } }
+{ $values
+  { "stack-size" integer }
+  { "return" "a c type" }
+  { "abi" abi }
+  { "n" integer }
+}
 { $description "Calculates how many bytes of stack space the caller of the procedure being constructed need to cleanup. For modern abi's the value is almost always 0." }
 { $examples
   { $unchecked-example
