@@ -8,28 +8,28 @@ ARTICLE: "compiler.codegen.gc-maps" "GC maps"
 "or"
 { $list
   {
-      "bitmap, byte aligned, three subsequences:"
+      "bitmap, byte aligned, five subsequences:"
       { $list
-        "<scrubbed data stack locations>"
-        "<scrubbed retain stack locations>"
-        "<GC root spill slots>"
+        "scrubbed data stack locations"
+        "scrubbed retain stack locations"
+        "checked data stack locations"
+        "checked retain stack locations"
+        "GC root spill slots"
       }
   }
-  "uint[] <base pointers>"
-  "uint[] <return addresses>"
-  "uint <largest scrubbed data stack location>"
-  "uint <largest scrubbed retain stack location>"
-  "uint <largest GC root spill slot>"
-  "uint <largest derived root spill slot>"
-  "int <number of return addresses>"
+  "uint[] base pointers"
+  "uint[] return addresses"
+  "uint largest scrubbed data stack location"
+  "uint largest scrubbed retain stack location"
+  "uint largest checked data stack location"
+  "uint largest checked retain stack location"
+  "uint largest GC root spill slot"
+  "uint largest derived root spill slot"
+  "int number of return addresses"
 } ;
 
 HELP: emit-gc-info-bitmaps
-{ $values
-  { "scrub-d-count" "Number of scrubbable datastack locations" }
-  { "scrub-r-count" "Number of scrubbable retainstack locations" }
-  { "gc-root-count" "Unknown!" }
-}
+{ $values { "scrub-and-check-counts" "counts of the five different types of gc checks" } }
 { $description "Emits the scrub location data in all gc-maps registered in the " { $link gc-maps } " variable to the make sequence being created. The result is a concatenation of all datastack scrub locations, retainstack scrub locations and gc root locations converted into a byte-array. Given that byte-array and knowledge of the number of scrub locations, the original gc-map can be reconstructed."  } ;
 
 HELP: emit-scrub
@@ -63,7 +63,7 @@ HELP: gc-maps
 { $var-description "Variable that holds a sequence of " { $link gc-map } " tuples." } ;
 
 HELP: gc-map-needed?
-{ $values { "gc-map" gc-map } { "?" "a boolean" } }
+{ $values { "gc-map/f" "a " { $link gc-map } " or f" } { "?" "a boolean" } }
 { $description "If all slots in the gc-map are empty, then it doesn't need to be emitted." } ;
 
 HELP: serialize-gc-maps

@@ -6,28 +6,6 @@ compiler.codegen.relocation cpu.architecture fry kernel layouts
 make math math.order namespaces sequences sequences.generalizations ;
 IN: compiler.codegen.gc-maps
 
-! GC maps
-
-! Every code block either ends with
-!
-! uint 0
-!
-! or
-!
-! bitmap, byte aligned, three subsequences:
-! - <scrubbed data stack locations>
-! - <scrubbed retain stack locations>
-! - <GC root spill slots>
-! uint[] <base pointers>
-! uint[] <return addresses>
-! uint <largest scrubbed data stack location>
-! uint <largest scrubbed retain stack location>
-! uint <largest checked data stack location>
-! uint <largest checked retain stack location>
-! uint <largest GC root spill slot>
-! uint <largest derived root spill slot>
-! int <number of return addresses>
-
 SYMBOLS: return-addresses gc-maps ;
 
 : gc-map-needed? ( gc-map/f -- ? )
