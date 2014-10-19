@@ -180,6 +180,10 @@ HELP: ignore-errors
 { $values { "quot" quotation } }
 { $description "Calls the quotation. If an exception is thrown in the dynamic extent of the quotation, restores the data stack and returns." } ;
 
+HELP: in-callback?
+{ $values { "?" "a boolean" } }
+{ $description "t if Factor is currently executing a callback." } ;
+
 HELP: rethrow
 { $values { "error" object } }
 { $description "Throws an error without saving the current continuation in the " { $link error-continuation } " global variable. This is done so that inspecting the error stacks sheds light on the original cause of the exception, rather than the point where it was rethrown." }

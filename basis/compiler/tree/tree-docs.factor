@@ -11,6 +11,9 @@ HELP: #alien-node
 HELP: #alien-invoke
 { $class-description "SSA tree node that calls a function in a dynamically linked library." } ;
 
+HELP: #alien-callback
+{ $class-description "SSA tree node that constructs an alien callback." } ;
+
 HELP: #call
 { $class-description "SSA tree node that calls a word. It has the following slots:"
   { $table

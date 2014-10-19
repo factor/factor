@@ -1,4 +1,4 @@
-USING: assocs compiler.cfg.instructions cpu.x86.assembler
+USING: assocs alien compiler.cfg.instructions cpu.x86.assembler
 cpu.x86.assembler.operands help.markup help.syntax kernel
 layouts literals math multiline system words ;
 IN: cpu.architecture
@@ -42,6 +42,16 @@ USING: cpu.architecture make ;
 init-relocation [ %safepoint ] B{ } make disassemble
 00000000010b05a0: 890500000000  mov [rip], eax
 ;
+
+STRING: ex-%save-context
+USING: cpu.architecture make ;
+[ RAX RBX %save-context ] B{ } make disassemble
+0000000000e63ab0: 498b4500    mov rax, [r13]
+0000000000e63ab4: 488d5c24f8  lea rbx, [rsp-0x8]
+0000000000e63ab9: 488918      mov [rax], rbx
+0000000000e63abc: 4c897010    mov [rax+0x10], r14
+0000000000e63ac0: 4c897818    mov [rax+0x18], r15
+;
 >>
 
 HELP: signed-rep
@@ -57,7 +67,7 @@ HELP: immediate-arithmetic?
 
 HELP: machine-registers
 { $values { "assoc" assoc } }
-{ $description "Mapping from register class to machine registers." } ;
+{ $description "Mapping from register class to machine registers. Only registers not reserved by the Factor VM are included." } ;
 
 HELP: vm-stack-space
 { $values { "n" number } }
@@ -96,7 +106,8 @@ HELP: %safepoint
 
 HELP: %save-context
 { $values { "temp1" "a register symbol" } { "temp2" "a register symbol" } }
-{ $description "Emits machine code for saving pointers to the callstack, datastack and retainstack in the current context field struct." } ;
+{ $description "Emits machine code for saving pointers to the callstack, datastack and retainstack in the current context field struct." }
+{ $examples { $unchecked-example $[ ex-%save-context ] } } ;
 
 
 HELP: %allot
@@ -123,3 +134,35 @@ HELP: fused-unboxing?
 HELP: return-regs
 { $values { "regs" assoc } }
 { $description "What registers that will be used for function return values of which class." } ;
+
+HELP: stack-cleanup
+{ $values
+  { "stack-size" integer }
+  { "return" "a c type" }
+  { "abi" abi }
+  { "n" integer }
+}
+{ $description "Calculates how many bytes of stack space the caller of the procedure being constructed need to cleanup. For modern abi's the value is almost always 0." }
+{ $examples
+  { $unchecked-example
+    "USING: cpu.architecture prettyprint ;"
+    "20 void stdcall stack-cleanup ."
+    "20"
+  }
+} ;
+
+ARTICLE: "cpu.architecture" "CPU architecture description model"
+"The " { $vocab-link "cpu.architecture" } " vocab contains generic words and hooks that serves as an api for the compiler towards the cpu architecture."
+$nl
+"Register categories:"
+{ $subsections machine-registers param-regs return-regs }
+"Architecture support checks:"
+{ $subsections
+  complex-addressing?
+  float-on-stack?
+  float-right-align-on-stack?
+  fused-unboxing?
+  test-instruction?
+}
+"Control flow code emitters:"
+{ $subsections %call %jump %jump-label %return } ;

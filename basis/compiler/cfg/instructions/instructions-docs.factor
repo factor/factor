@@ -137,5 +137,28 @@ HELP: ##copy
 HELP: ##compare-integer
 { $class-description "This instruction is emitted for integer comparisons." } ;
 
+HELP: ##spill
+{ $class-description "Instruction that copies a value from a register to a " { $link spill-slot } "." } ;
+
 HELP: gc-map-insn
 { $class-description "Union class of all instructions that contain subroutine calls to functions which allocate memory." } ;
+
+ARTICLE: "compiler.cfg.instructions" "Basic block instructions"
+"The " { $vocab-link "compiler.cfg.instructions" } " vocab contains all instruction classes used for generating CFG:s (Call Flow Graphs)."
+$nl
+"Instruction classes for moving values around:"
+{ $subsections
+  ##copy
+  ##reload
+  ##replace
+  ##spill
+}
+"Garbage collection words and instruction classes:"
+{ $subsections
+  gc-map-insn
+}
+"Alien calls:"
+{ $subsections
+  ##alien-invoke
+  alien-call-insn
+} ;

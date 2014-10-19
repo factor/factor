@@ -18,7 +18,7 @@ HELP: translate-local-loc
   { $example
     "USING: compiler.cfg.stacks.local compiler.cfg.registers namespaces prettyprint ;"
     "T{ current-height { d 3 } } current-height set D 7 translate-local-loc ."
-    "D 4"
+    "T{ ds-loc { n 4 } }"
   }
 } ;
 
