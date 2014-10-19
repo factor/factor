@@ -67,7 +67,7 @@ HELP: immediate-arithmetic?
 
 HELP: machine-registers
 { $values { "assoc" assoc } }
-{ $description "Mapping from register class to machine registers." } ;
+{ $description "Mapping from register class to machine registers. Only registers not reserved by the Factor VM are included." } ;
 
 HELP: vm-stack-space
 { $values { "n" number } }
@@ -147,7 +147,7 @@ HELP: stack-cleanup
 } ;
 
 ARTICLE: "cpu.architecture" "CPU architecture description model"
-"The " { $vocab-link "cpu.architecture" } " vocab generic words and hooks that serves as an api for the compiler towards the cpu architecture."
+"The " { $vocab-link "cpu.architecture" } " vocab contains generic words and hooks that serves as an api for the compiler towards the cpu architecture."
 $nl
 "Register categories:"
 { $subsections machine-registers param-regs return-regs }
