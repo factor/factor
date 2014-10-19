@@ -54,8 +54,6 @@ $nl
 
 ABOUT: "compiler"
 
-HELP: compiled { $var-description "An " { $link assoc } " used during the compilation process which maps from words to their generated code." } ;
-
 HELP: frontend
 { $values { "word" word } { "tree" sequence } }
 { $description "First step of the compilation process. It outputs a high-level tree in SSA form." } ;
@@ -66,8 +64,7 @@ HELP: backend
 { $see-also generate } ;
 
 HELP: compiled
-{ $description { "An " { $link assoc } " used by the optimizing compiler for intermediate storage of generated code. The keys are the labels to the CFG:s and the values the generated code as given by the " { $link generate } " word." } } ;
-
+{ $var-description { "An " { $link assoc } " used by the optimizing compiler for intermediate storage of generated code. The keys are the labels to the CFG:s and the values the generated code as given by the " { $link generate } " word." } } ;
 
 HELP: compile-word
 { $values { "word" word } }
