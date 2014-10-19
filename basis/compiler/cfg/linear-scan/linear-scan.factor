@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors assocs sequences namespaces make locals
-cpu.architecture
+USING: kernel accessors assocs sequences namespaces make
+combinators cpu.architecture
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.registers
@@ -31,19 +31,11 @@ IN: compiler.cfg.linear-scan
 
 ! SSA liveness must have been computed already
 
-:: (linear-scan) ( cfg machine-registers -- )
-    cfg number-instructions
-    cfg compute-live-intervals machine-registers allocate-registers
-    cfg assign-registers
-    cfg resolve-data-flow
-    cfg check-numbering ;
-
-: admissible-registers ( cfg -- regs )
-    [ machine-registers ] dip
-    frame-pointer?>> [
-        [ int-regs ] dip [ clone ] map
-        [ [ [ frame-reg ] dip remove ] change-at ] keep
-    ] when ;
-
 : linear-scan ( cfg -- cfg' )
-    dup dup admissible-registers (linear-scan) ;
+    dup {
+        [ number-instructions ]
+        [ compute-live-intervals machine-registers allocate-registers ]
+        [ assign-registers ]
+        [ resolve-data-flow ]
+        [ check-numbering ]
+    } cleave ;

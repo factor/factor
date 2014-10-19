@@ -48,7 +48,7 @@ IN: compiler.cfg.builder.alien
 
 : caller-parameters ( params -- reg-inputs stack-inputs )
     [ abi>> ] [ parameters>> ] [ return>> ] tri
-    '[ 
+    '[
         _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
         (caller-parameters)
@@ -71,7 +71,7 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
     {
         { [ dup library-dll dll-valid? not ] [
             [ library-dll dll-path ] [ dlerror>> ] bi
-            cfg get word>> no-such-library-error drop 
+            cfg get word>> no-such-library-error drop
         ] }
         { [ 2dup library-dll dlsym-valid? not ] [
             drop dlerror cfg get word>> no-such-symbol-error
@@ -160,7 +160,7 @@ M: #alien-assembly emit-node
 
 : callee-parameters ( params -- vregs reps reg-outputs stack-outputs )
     [ abi>> ] [ return>> ] [ parameters>> ] tri
-    '[ 
+    '[
         _ prepare-struct-callee struct-return-area set
         _ [ base-type ] map (callee-parameters)
     ] with-param-regs* ;
@@ -176,9 +176,6 @@ M: #alien-assembly emit-node
     [ [ stack-params get ] dip [ return>> ] [ abi>> ] bi stack-cleanup ] bi
     "stack-cleanup" set-word-prop ;
 
-: needs-frame-pointer ( -- )
-    cfg get t >>frame-pointer? drop ;
-
 : emit-callback-body ( nodes -- )
     [ last #return? t assert= ] [ but-last emit-nodes ] bi ;
 
@@ -188,10 +185,7 @@ M: #alien-assembly emit-node
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
-        needs-frame-pointer
-
         begin-word
-
         {
             [ params>> callee-parameters ##callback-inputs, ]
             [ params>> box-parameters ]
