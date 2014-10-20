@@ -28,7 +28,7 @@ HELP: n-bit-version-of
 { $values { "register" register } { "n" integer } { "register'" register } }
 { $description "Returns a less wide version of the given register." } ;
 
-ARTICLE: "cpu.x86.assembler.operands" "x86 registers and memory operands"
+ARTICLE: "cpu.x86.assembler.operands" "CPU x86 registers and memory operands"
 "Indirect operand constructors for various addressing formats:"
 { $subsections [] [RIP+] [+] [++] [+*2+] [+*4+] [+*8+] }
 "Register correspondances:"
