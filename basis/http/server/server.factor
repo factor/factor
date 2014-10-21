@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences arrays namespaces splitting
 vocabs.loader destructors assocs debugger continuations
-combinators vocabs.refresh tools.time math math.parser present
-vectors hashtables
+combinators combinators.short-circuit vocabs.refresh tools.time math math.parser
+present vectors hashtables
 io
 io.sockets
 io.sockets.secure
@@ -29,6 +29,7 @@ html.streams
 html
 mime.types
 math.order
+peg
 xml.writer
 vocabs ;
 FROM: mime.multipart => parse-multipart ;
@@ -66,7 +67,7 @@ upload-limit [ 200,000,000 ] initialize
     upload-limit get [ min ] when* limited-input
     binary decode-input
     parse-multipart-form-data parse-multipart ;
- 
+
 : read-content ( request -- bytes )
     "content-length" header string>number read ;
 
@@ -285,13 +286,18 @@ LOG: httpd-benchmark DEBUG
 
 TUPLE: http-server < threaded-server ;
 
+: handle-client-error ( error -- )
+    dup { [ parse-error? ] [ got>> empty? ] } 1&& [ drop ] [ rethrow ] if ;
+
 M: http-server handle-client*
     drop [
-        ?refresh-all
-        request-limit get limited-input
-        [ read-request ] ?benchmark
-        [ do-request ] ?benchmark
-        [ do-response ] ?benchmark
+        [
+            ?refresh-all
+            request-limit get limited-input
+            [ read-request ] ?benchmark
+            [ do-request ] ?benchmark
+            [ do-response ] ?benchmark
+        ] [ handle-client-error ] recover
     ] with-destructors ;
 
 : <http-server> ( -- server )
