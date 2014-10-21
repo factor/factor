@@ -9,7 +9,7 @@ FROM: namespaces => set ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
-TUPLE: parse-error position messages ; 
+TUPLE: parse-error position got messages ;
 TUPLE: parser peg compiled id ;
 
 M: parser equal? { [ [ class-of ] same? ] [ [ id>> ] same? ] } 2&& ;
@@ -20,6 +20,10 @@ C: <parse-error>  parse-error
 
 SYMBOL: error-stack
 
+: merge-overlapping-errors ( a b -- c )
+    dupd [ messages>> ] bi@ union [ [ position>> ] [ got>> ] bi ] dip
+    <parse-error> ;
+
 : (merge-errors) ( a b -- c )
     {
         { [ over position>> not ] [ nip ] }
@@ -28,7 +32,7 @@ SYMBOL: error-stack
             2dup [ position>> ] compare {
                 { +lt+ [ nip ] }
                 { +gt+ [ drop ] }
-                { +eq+ [ messages>> over messages>> union [ position>> ] dip <parse-error> ] }
+                { +eq+ [ merge-overlapping-errors ] }
             } case
         ]
     } cond ;
@@ -40,7 +44,7 @@ SYMBOL: error-stack
         drop
     ] if ;
 
-: add-error ( remaining message -- )
+: add-error ( position got message -- )
     <parse-error> error-stack get push ;
 
 SYMBOL: ignore
@@ -81,7 +85,7 @@ SYMBOL: lrstack
 : reset-pegs ( -- )
     H{ } clone \ peg-cache set-global ;
 
-reset-pegs 
+reset-pegs
 
 #! An entry in the table of memoized parse results
 #! ast = an AST produced from the parse
@@ -90,10 +94,10 @@ reset-pegs
 #! pos = the position in the input string of this entry
 TUPLE: memo-entry ans pos ;
 
-TUPLE: left-recursion seed rule-id head next ; 
+TUPLE: left-recursion seed rule-id head next ;
 TUPLE: peg-head rule-id involved-set eval-set ;
 
-: rule-id ( word -- id ) 
+: rule-id ( word -- id )
     #! A rule is the parser compiled down to a word. It has
     #! a "peg-id" property containing the id of the original parser.
     "peg-id" word-prop ;
@@ -112,7 +116,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
         nip [ ast>> ] [ remaining>> ] bi input-from pos set
     ] [
         pos set fail
-    ] if* ; 
+    ] if* ;
 
 : eval-rule ( rule -- ast )
     #! Evaluate a rule, return an ast resulting from it.
@@ -132,7 +136,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     swap >>ans pos get >>pos drop ;
 
 : stop-growth? ( ast m -- ? )
-    [ failed? pos get ] dip 
+    [ failed? pos get ] dip
     pos>> <= or ;
 
 : setup-growth ( h p -- )
@@ -272,7 +276,7 @@ GENERIC: (compile) ( peg -- quot )
     #! If not, compile it to a temporary word, cache it,
     #! and return it. Otherwise return the existing one.
     #! Circular parsers are supported by getting the word
-    #! name and storing it in the cache, before compiling, 
+    #! name and storing it in the cache, before compiling,
     #! so it is picked up when re-entered.
     dup compiled>> [
         nip
@@ -333,9 +337,9 @@ TUPLE: token-parser symbol ;
 : parse-token ( input string -- result )
     #! Parse the string, returning a parse result
     [ ?head-slice ] keep swap [
-        <parse-result> f f add-error
+        <parse-result> f f f add-error
     ] [
-        [ drop pos get "token '" ] dip append "'" append 1vector add-error f
+        [ seq>> pos get swap ] dip "'" "'" surround 1vector add-error f
     ] if ;
 
 M: token-parser (compile) ( peg -- quot )
@@ -404,7 +408,7 @@ M: seq-parser (compile) ( peg -- quot )
         [
             parsers>> unclip compile-parser-quot [ parse-seq-element ] curry ,
             [ compile-parser-quot [ merge-errors ] compose [ parse-seq-element ] curry , ] each
-        ] { } make , \ 1&& , 
+        ] { } make , \ 1&& ,
     ] [ ] make ;
 
 TUPLE: choice-parser parsers ;
@@ -421,7 +425,7 @@ TUPLE: repeat0-parser p1 ;
 
 : (repeat) ( quot: ( -- result ) result -- result )
     over call [
-        [ remaining>> swap remaining<< ] 2keep 
+        [ remaining>> swap remaining<< ] 2keep
         ast>> swap [ ast>> push ] keep
         (repeat)
     ] [
@@ -430,7 +434,7 @@ TUPLE: repeat0-parser p1 ;
 
 M: repeat0-parser (compile) ( peg -- quot )
     p1>> compile-parser-quot '[
-        input-slice V{ } clone <parse-result> _ swap (repeat) 
+        input-slice V{ } clone <parse-result> _ swap (repeat)
     ] ;
 
 TUPLE: repeat1-parser p1 ;
@@ -443,8 +447,8 @@ TUPLE: repeat1-parser p1 ;
     ] if* ;
 
 M: repeat1-parser (compile) ( peg -- quot )
-    p1>> compile-parser-quot '[ 
-        input-slice V{ } clone <parse-result> _ swap (repeat) repeat1-empty-check  
+    p1>> compile-parser-quot '[
+        input-slice V{ } clone <parse-result> _ swap (repeat) repeat1-empty-check
     ] ;
 
 TUPLE: optional-parser p1 ;
@@ -500,16 +504,16 @@ TUPLE: sp-parser p1 ;
 
 M: sp-parser (compile) ( peg -- quot )
     p1>> compile-parser-quot '[
-        input-slice [ blank? ] trim-head-slice input-from pos set @ 
+        input-slice [ blank? ] trim-head-slice input-from pos set @
     ] ;
 
 TUPLE: delay-parser quot ;
 
 M: delay-parser (compile) ( peg -- quot )
     #! For efficiency we memoize the quotation.
-    #! This way it is run only once and the 
+    #! This way it is run only once and the
     #! parser constructed once at run time.
-    quot>> gensym [ delayed get set-at ] keep 1quotation ; 
+    quot>> gensym [ delayed get set-at ] keep 1quotation ;
 
 TUPLE: box-parser quot ;
 
