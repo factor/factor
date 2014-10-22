@@ -1,6 +1,6 @@
 USING: accessors alien alien.accessors alien.c-types alien.libraries
-alien.syntax arrays byte-arrays continuations destructors fry kernel
-kernel.private layouts libc math namespaces prettyprint sequences sets system
+alien.syntax arrays byte-arrays continuations fry kernel kernel.private
+layouts libc math namespaces prettyprint sequences sets system tools.memory
 tools.test ;
 FROM: namespaces => set ;
 IN: alien.tests
@@ -106,12 +106,21 @@ SYMBOL: foo
     [ 2drop 37 ] alien-callback ;
 
 : call-cb ( -- ret )
-    f f <cb-creator> \ int { pointer: void pointer: void } \ cdecl
-    alien-indirect ;
+    f f <cb-creator> [
+        \ int { pointer: void pointer: void } \ cdecl
+        alien-indirect
+    ] with-callback ;
+
+! This function shouldn't leak
+{ t } [
+    callback-room occupied>>
+    call-cb drop
+    callback-room occupied>> =
+] unit-test
 
 ! Will fail if the callbacks cache gets out of sync
 { 37 37 } [
-    [ call-cb ] with-destructors
+    call-cb
     fill-and-free-callback-heap
-    [ call-cb ] with-destructors
+    call-cb
 ] unit-test
