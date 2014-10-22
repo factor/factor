@@ -16,9 +16,9 @@ HELP: translate-local-loc
 { $description "Translates an absolute stack location to one that is relative to the current stacks height as given in " { $link current-height } "." }
 { $examples
   { $example
-    "USING: compiler.cfg.stacks.local compiler.cfg.registers namespaces prettyprint ;"
+    "USING: compiler.cfg.stacks.local compiler.cfg.registers compiler.cfg.debugger namespaces prettyprint ;"
     "T{ current-height { d 3 } } current-height set D 7 translate-local-loc ."
-    "T{ ds-loc { n 4 } }"
+    "D 4"
   }
 } ;
 
