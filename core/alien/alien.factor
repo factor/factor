@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs byte-arrays byte-vectors continuations.private
-destructors init kernel kernel.private math namespaces sequences ;
+USING: accessors assocs byte-arrays byte-vectors continuations
+continuations.private destructors init kernel kernel.private math namespaces
+sequences ;
 IN: alien
 
 BUILTIN: alien { underlying c-ptr read-only initial: f } expired ;
@@ -111,15 +112,6 @@ SYMBOL: callbacks
     current-callback
     [ 2drop call ] [ swap call( callback -- ) drop ] 3bi ; inline
 
-! Used by stack-checker.alien to register destructors for callbacks.
-TUPLE: callback-destructor callback ;
-
-: delete-values ( value assoc -- )
-    [ rot drop = not ] with assoc-filter! drop ;
-
-M: callback-destructor dispose ( disposable -- )
-    callback>> [ callbacks get delete-values ] [ free-callback ] bi ;
-
 ! A utility for defining global variables that are recompiled in
 ! every session
 TUPLE: expiry-check object alien ;
@@ -127,7 +119,16 @@ TUPLE: expiry-check object alien ;
 : recompute-value? ( check -- ? )
     dup [ alien>> expired? ] [ drop t ] if ;
 
+: delete-values ( value assoc -- )
+    [ rot drop = not ] with assoc-filter! drop ;
+
 PRIVATE>
+
+: unregister-and-free-callback ( alien -- )
+    [ callbacks get delete-values ] [ free-callback ] bi ;
+
+: with-callback ( alien quot -- )
+    over [ unregister-and-free-callback ] curry [ ] cleanup ; inline
 
 : initialize-alien ( symbol quot -- )
     swap dup get-global dup recompute-value?

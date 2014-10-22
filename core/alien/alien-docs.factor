@@ -65,7 +65,11 @@ HELP: free-callback
 { $description "Releases the callback heap memory allocated for an alien callback. " }
 { $warning "If the callback is invoked (either from C or Factor) after it has been freed, then Factor may crash." } ;
 
-{ <callback> free-callback } related-words
+HELP: with-callback
+{ $values { "alien" alien } { "quot" quotation } }
+{ $description "Calls the quotation with an alien value on the stack which is supposed to be a callback. Resources for the callback is guaranteed to be released afterwards." } ;
+
+{ <callback> free-callback unregister-and-free-callback with-callback } related-words
 
 HELP: alien-address
 { $values { "c-ptr" c-ptr } { "addr" "a non-negative integer" } }
