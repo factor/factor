@@ -1,5 +1,5 @@
 
-USING: assocs.extras tools.test ;
+USING: assocs.extras kernel tools.test ;
 
 IN: assocs.extras
 
@@ -22,3 +22,6 @@ IN: assocs.extras
     { H{ { "a" 2 } { "b" 3 } } H{ { "a" 5 } { "c" 10 } } }
     assoc-merge
 ] unit-test
+
+{ H{ } } [ H{ { 1 2 } } 2 over delete-value-at ] unit-test
+{ H{ { 1 2 } } } [ H{ { 1 2 } } 3 over delete-value-at ] unit-test
