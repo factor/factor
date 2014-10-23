@@ -1,4 +1,5 @@
-USING: alien.c-types alien.data kernel python.errors python.ffi ;
+USING: alien.c-types alien.data classes.struct kernel python.errors
+python.ffi ;
 IN: python.objects
 
 ! Objects
@@ -58,3 +59,10 @@ IN: python.objects
 
 : py-list-set-item ( obj pos val -- )
     unsteal-ref PyList_SetItem check-zero ;
+
+! Functions
+: <py-cfunction> ( alien -- cfunction )
+    f swap METH_VARARGS f PyMethodDef <struct-boa> f f
+    ! It's not clear from the docs whether &Py_DecRef is right for
+    ! PyCFunction_NewEx, but I'm betting on it.
+    PyCFunction_NewEx check-new-ref ;
