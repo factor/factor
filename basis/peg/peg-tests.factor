@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test strings namespaces make arrays sequences 
-       peg peg.private peg.parsers words math accessors ;
+USING: continuations kernel tools.test strings namespaces make arrays
+sequences peg peg.private peg.parsers words math accessors ;
 IN: peg.tests
 
 [ ] [ reset-pegs ] unit-test
@@ -50,11 +50,11 @@ IN: peg.tests
 ] unit-test
 
 [
-    "cbcd" "a" token "b" token 2array choice parse 
+    "cbcd" "a" token "b" token 2array choice parse
 ] must-fail
 
 [
-    "" "a" token "b" token 2array choice parse 
+    "" "a" token "b" token 2array choice parse
 ] must-fail
 
 { 0 } [
@@ -98,7 +98,7 @@ IN: peg.tests
 ] unit-test
 
 [
-    "bb" "a" token ensure CHAR: a CHAR: z range 2array seq parse 
+    "bb" "a" token ensure CHAR: a CHAR: z range 2array seq parse
 ] must-fail
 
 { t } [
@@ -158,7 +158,7 @@ IN: peg.tests
 ] unit-test
 
 [
-    "a]" "[" token hide "a" token "]" token hide 3array seq parse 
+    "a]" "[" token hide "a" token "]" token hide 3array seq parse
 ] must-fail
 
 
@@ -171,7 +171,7 @@ IN: peg.tests
     "1+1" swap parse
 ] unit-test
 
-: expr ( -- parser ) 
+: expr ( -- parser )
     #! Test direct left recursion. Currently left recursion should cause a
     #! failure of that parser.
     [ expr ] delay "+" token "1" token 3seq "1" token 2choice ;
@@ -188,7 +188,7 @@ IN: peg.tests
 ] unit-test
 
 [
-    "A" [ drop t ] satisfy [ 66 >= ] semantic parse 
+    "A" [ drop t ] satisfy [ 66 >= ] semantic parse
 ] must-fail
 
 { CHAR: B } [
@@ -206,3 +206,13 @@ USE: compiler
 [ ] [ enable-optimizer ] unit-test
 
 [ [ ] ] [ "" epsilon [ drop [ [ ] ] call ] action parse ] unit-test
+
+{
+    T{ parse-error
+       { position 0 }
+       { got "fbcd" }
+       { messages V{ "'a'" "'b'" } }
+    }
+} [
+    [ "fbcd" "a" token "b" token 2array choice parse ] [ ] recover
+] unit-test
