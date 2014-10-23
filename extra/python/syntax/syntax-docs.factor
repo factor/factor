@@ -16,6 +16,16 @@ HELP: PY-FROM:
   }
 } ;
 
+HELP: PY-QUALIFIED-FROM:
+{ $syntax "PY-QUALIFIED-FROM: module => name-effects ;" }
+{ $values
+  { "module" "fully qualified name of a python module" }
+  { "name-effects" "pairs of names and effect declarations of bindings to import" }
+}
+{ $description
+  "Like " { $link \ PY-FROM: } " except all words are created with module as the given prefix."
+} ;
+
 HELP: PY-METHODS:
 { $syntax "PY-METHODS: class => name-effects ;" }
 { $values
@@ -36,6 +46,7 @@ HELP: PY-METHODS:
 
 ARTICLE: "python.syntax" "Syntax for python calls from factor"
 "The " { $vocab-link "python.syntax" } " vocab adds syntax to factor to make calls from factor to python natural and intuitive."
+{ $subsections \ PY-FROM: \ PY-QUALIFIED-FROM: \ PY-METHODS: }
 $nl
 { $examples "Here is how you bind and call a method namelist on a ZipFile instance created by importing the zipfile module:"
   { $code
