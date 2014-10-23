@@ -83,6 +83,8 @@ PY-FROM: sys => getrefcount ( obj -- n ) ;
     [ always-destructors get [ alien>> = ] with count ] bi =
 ] py-test
 
+
+
 PY-METHODS: file =>
     close ( self -- )
     fileno ( self -- n )
@@ -170,6 +172,13 @@ PY-FROM: wsgiref.simple_server => make_server ( iface port callback -- httpd ) ;
 { } [
     100000 [
         [ [ 987 >py basename drop ] ignore-errors ] with-destructors
+    ] times
+] unit-test
+
+! Another leaky test
+{ } [
+    1000000 [
+        [ { 9 8 7 6 5 4 3 2 1 } >py ] with-destructors drop
     ] times
 ] unit-test
 

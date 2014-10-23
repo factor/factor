@@ -59,17 +59,19 @@ SPECIALIZED-ARRAY: void*
 : py-list>vector ( py-list -- vector )
     dup py-list-size iota [ py-list-get-item ] with V{ } map-as ;
 
+DEFER: >py
+
 GENERIC: (>py) ( obj -- obj' )
 M: string (>py) utf8>py-unicode ;
 M: math:fixnum (>py) PyLong_FromLong ;
 M: math:float (>py) PyFloat_FromDouble ;
-M: array (>py) [ (>py) ] map array>py-tuple ;
+M: array (>py) [ >py ] map array>py-tuple ;
 M: hashtable (>py)
     <py-dict> swap dupd [
         swapd [ (>py) ] bi@ py-dict-set-item
     ] with assoc-each ;
 M: vector (>py)
-    [ (>py) ] map vector>py-list ;
+    [ >py ] map vector>py-list ;
 
 : >py ( obj -- py-obj )
     (>py) &Py_DecRef ;
