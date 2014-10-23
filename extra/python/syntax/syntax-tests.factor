@@ -1,6 +1,6 @@
-USING: accessors arrays assocs continuations destructors fry io.files.temp
-kernel math namespaces python python.ffi python.objects python.syntax
-sequences sets splitting tools.test unicode.categories ;
+USING: accessors arrays assocs continuations destructors destructors.private
+fry io.files.temp kernel math namespaces python python.ffi python.objects
+python.syntax sequences sets splitting tools.test unicode.categories ;
 IN: python.syntax.tests
 
 : py-test ( result quot -- )
@@ -75,6 +75,12 @@ PY-FROM: sys => getrefcount ( obj -- n ) ;
         [ 100 [ swap 0 py-tuple-get-item drop ] with times ] with-destructors
     ]
     [ 0 py-tuple-get-item getrefcount py> ] tri -
+] py-test
+
+{ t } [
+    6 <py-tuple>
+    [ getrefcount py> 1 - ]
+    [ always-destructors get [ alien>> = ] with count ] bi =
 ] py-test
 
 PY-METHODS: file =>
@@ -166,3 +172,41 @@ PY-FROM: wsgiref.simple_server => make_server ( iface port callback -- httpd ) ;
         [ [ 987 >py basename drop ] ignore-errors ] with-destructors
     ] times
 ] unit-test
+
+
+! Working with types
+PY-METHODS: obj =>
+    __name__ ( self -- n ) ;
+
+PY-QUALIFIED-FROM: types => UnicodeType ( -- ) ;
+
+{ "unicode" } [
+    types:$UnicodeType $__name__ py>
+] py-test
+
+! Make callbacks
+
+PY-QUALIFIED-FROM: __builtin__ =>
+    None ( -- )
+    map ( func seq -- seq' )
+    reduce ( func seq -- seq' ) ;
+
+{ V{ 1 2 3 } } [
+    __builtin__:$None { 1 2 3 } >py __builtin__:map py>
+] py-test
+
+: double-fun ( -- alien )
+    [ drop first 2 * ] quot>py-callback ;
+
+{ V{ 2 4 16 2 4 68 } } [
+    double-fun [ { 1 2 8 1 2 34 } >py __builtin__:map py> ] with-quot>py-cfunction
+] py-test
+
+: reduce-func ( -- alien )
+    [ drop first2 + ] quot>py-callback ;
+
+{ 48 } [
+    reduce-func [
+        { 1 2 8 1 2 34 } >py __builtin__:reduce py>
+    ] with-quot>py-cfunction
+] py-test
