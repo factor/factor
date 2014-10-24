@@ -240,11 +240,16 @@ PRIVATE>
 : show-row-summary ( table n -- )
     over nth-row
     [ swap [ renderer>> row-value ] keep show-summary ]
-    [ 2drop ]
+    [ drop hide-status ]
     if ;
 
+: update-status ( table -- )
+    dup mouse-index>>
+    [ dup selection-index>> value>> ] unless*
+    show-row-summary ;
+
 : hide-mouse-help ( table -- )
-    f >>mouse-index [ hide-status ] [ relayout-1 ] bi ;
+    f >>mouse-index [ update-status ] [ relayout-1 ] bi ;
 
 : ((select-row)) ( n table -- )
     [ selection-index>> set-model ]
@@ -292,7 +297,7 @@ M: table model-changed
         dup update-table-rows
         dup update-selection
         dup update-mouse-index
-    [ dup mouse-index>> show-row-summary ] [ relayout ] bi ;
+    [ update-status ] [ relayout ] bi ;
 
 : thin-row-rect ( table row -- rect )
     row-rect [ { 0 1 } v* ] change-dim ;
