@@ -40,7 +40,7 @@ PRIVATE>
     dup dup tooltip>> [ swap show-status ] [ drop ] if* button-update ;
 
 : button-leave ( button -- )
-    dup "" swap show-status button-update ;
+    [ hide-status ] [ button-update ] bi ;
 
 : button-clicked ( button -- )
     [ ]
