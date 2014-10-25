@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel locals accessors sequences math arrays ;
+USING: accessors combinators kernel locals math sequences ;
 IN: images
 
 SINGLETONS:
