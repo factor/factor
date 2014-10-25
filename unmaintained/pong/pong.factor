@@ -145,7 +145,7 @@ M:: <pong> draw-gadget* ( PONG -- )
             bounce-off-wall? [ ( -- ? )
               BALL FIELD in-between-horizontally? not ]
 
-            stop-game [ ( -- ) t GADGET (>>paused) ] |
+            stop-game [ ( -- ) t GADGET paused<< ] |
 
       BALL FIELD in-bounds?
       [
@@ -173,7 +173,7 @@ M:: <pong> draw-gadget* ( PONG -- )
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 :: start-pong-thread ( GADGET -- )
-  f GADGET (>>paused)
+  f GADGET paused<<
   [
     [
       GADGET paused>>

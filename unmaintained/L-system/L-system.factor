@@ -263,7 +263,7 @@ TUPLE: <L-system> < gadget
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-:: iterate-system ( GADGET -- ) GADGET pedestal>> 0.5 + GADGET (>>pedestal) ;
+:: iterate-system ( GADGET -- ) GADGET pedestal>> 0.5 + GADGET pedestal<< ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -357,7 +357,7 @@ TUPLE: <L-system> < gadget
   L-SYSTEM string>> L-SYSTEM axiom>> or
   L-SYSTEM rules>>
   iterate-string
-  L-SYSTEM (>>string) ;
+  L-SYSTEM string<< ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -422,7 +422,7 @@ M:: <L-system> graft* ( L-SYSTEM -- )
 
   L-SYSTEM find-gl-context
 
-  1 glGenLists L-SYSTEM (>>display-list) ;
+  1 glGenLists L-SYSTEM display-list<< ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
