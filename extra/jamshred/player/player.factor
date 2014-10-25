@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants combinators jamshred.log
+USING: accessors calendar.unix colors.constants combinators jamshred.log
 jamshred.oint jamshred.sound jamshred.tunnel kernel locals math
 math.constants math.order math.ranges math.vectors math.matrices
 sequences shuffle specialized-arrays strings system ;
@@ -39,9 +39,9 @@ CONSTANT: max-speed 30.0
     >>tunnel to-tunnel-start ;
 
 : update-time ( player -- seconds-passed )
-    system-micros swap [ last-move>> - 1000000 / ] [ (>>last-move) ] 2bi ;
+    system-micros swap [ last-move>> - 1000000 / ] [ last-move<< ] 2bi ;
 
-: moved ( player -- ) system-micros swap (>>last-move) ;
+: moved ( player -- ) system-micros swap last-move<< ;
 
 : speed-range ( -- range )
     max-speed [0,b] ;
@@ -92,7 +92,7 @@ CONSTANT: max-speed 30.0
 : update-nearest-segment2 ( heading player -- )
     2dup distance-to-heading-segment-area 0 <= [
         [ tunnel>> ] [ nearest-segment>> rot heading-segment ]
-        [ (>>nearest-segment) ] tri
+        [ nearest-segment<< ] tri
     ] [
         2drop
     ] if ;
@@ -137,4 +137,4 @@ CONSTANT: max-speed 30.0
     [ update-time ] [ distance-to-move ] [ (move-player) 2drop ] tri ;
 
 : update-player ( player -- )
-    [ move-player ] [ nearest-segment>> "white" named-color swap (>>color) ] bi ;
+    [ move-player ] [ nearest-segment>> "white" named-color swap color<< ] bi ;
