@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces continuations destructors io
-debugger io.sockets io.sockets.private sequences summary
-calendar delegate system vocabs combinators present ;
+USING: accessors calendar combinators delegate destructors io
+io.sockets io.sockets.private kernel namespaces present
+sequences summary system vocabs ;
 IN: io.sockets.secure
 
 SYMBOL: secure-socket-timeout
