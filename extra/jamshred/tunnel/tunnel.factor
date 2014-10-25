@@ -15,7 +15,7 @@ TUPLE: segment < oint number color radius ;
 C: <segment> segment
 
 : segment-number++ ( segment -- )
-    [ number>> 1 + ] keep (>>number) ;
+    [ number>> 1 + ] keep number<< ;
 
 : clamp-length ( n seq -- n' )
     0 swap length clamp ;
@@ -132,16 +132,16 @@ CONSTANT: distant 1000
     dupd (distance-to-collision) swap forward>> n*v ;
 
 : bounce-forward ( segment oint -- )
-    [ wall-normal ] [ forward>> swap reflect ] [ (>>forward) ] tri ;
+    [ wall-normal ] [ forward>> swap reflect ] [ forward<< ] tri ;
 
 : bounce-left ( segment oint -- )
     #! must be done after forward
     [ forward>> vneg ] dip [ left>> swap reflect ]
-    [ forward>> proj-perp normalize ] [ (>>left) ] tri ;
+    [ forward>> proj-perp normalize ] [ left<< ] tri ;
 
 : bounce-up ( segment oint -- )
     #! must be done after forward and left!
-    nip [ forward>> ] [ left>> cross ] [ (>>up) ] tri ;
+    nip [ forward>> ] [ left>> cross ] [ up<< ] tri ;
 
 : bounce-off-wall ( oint segment -- )
     swap [ bounce-forward ] [ bounce-left ] [ bounce-up ] 2tri ;

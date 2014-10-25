@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel locals math math.constants math.functions math.matrices math.vectors math.quaternions random sequences ;
+USING: accessors arrays kernel locals math math.constants math.functions math.matrices math.vectors random sequences ;
 IN: jamshred.oint
 
 ! An oint is a point with three linearly independent unit vectors
@@ -13,6 +13,35 @@ C: <oint> oint
 
 : rotation-quaternion ( theta axis -- quaternion )
     swap 2 / dup cos swap sin rot n*v first3 rect> [ rect> ] dip 2array ;
+
+<PRIVATE
+
+! inline old math.quaternions to get this to work, eww.
+
+: ** ( x y -- z ) conjugate * ; inline
+
+: 2q ( u v -- u' u'' v' v'' ) [ first2 ] bi@ ; inline
+
+: q*a ( u v -- a ) 2q swapd ** [ * ] dip - ; inline
+
+: q*b ( u v -- b ) 2q [ ** swap ] dip * + ; inline
+
+: q* ( u v -- u*v )
+    [ q*a ] [ q*b ] 2bi 2array ;
+
+: v>q ( v -- q )
+    first3 rect> [ 0 swap rect> ] dip 2array ;
+
+: q>v ( q -- v )
+    first2 [ imaginary-part ] dip >rect 3array ;
+
+: qconjugate ( u -- u' )
+    first2 [ conjugate ] [ neg  ] bi* 2array ;
+
+: qrecip ( u -- 1/u )
+    qconjugate dup norm-sq v/n ;
+
+PRIVATE>
 
 : rotate-vector ( q qrecip v -- v )
     v>q swap q* q* q>v ;
@@ -40,7 +69,7 @@ C: <oint> oint
     2 / 2dup random-float+- left-pivot random-float+- up-pivot ;
 
 : location+ ( v oint -- )
-    [ location>> v+ ] [ (>>location) ] bi ;
+    [ location>> v+ ] [ location<< ] bi ;
 
 : go-forward ( distance oint -- )
     [ forward>> n*v ] [ location+ ] bi ;
