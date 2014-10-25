@@ -1,16 +1,15 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.strings
-assocs combinators continuations destructors fry io io.backend
-io.directories io.encodings.binary io.files.info.unix
-io.encodings.utf8 io.files io.pathnames io.files.types kernel
-math math.bitwise sequences system unix unix.stat vocabs.loader
-classes.struct unix.ffi literals libc vocabs io.files.info ;
+USING: accessors alien.c-types alien.data alien.strings assocs
+classes.struct continuations fry io.backend io.backend.unix
+io.directories io.encodings.utf8 io.files io.files.info
+io.files.info.unix io.files.types kernel libc literals math
+sequences system unix unix.ffi vocabs ;
 IN: io.directories.unix
 
-CONSTANT: file-mode 0o0666
-
 CONSTANT: touch-mode flags{ O_WRONLY O_APPEND O_CREAT O_EXCL }
+
+CONSTANT: mkdir-mode flags{ USER-ALL GROUP-ALL OTHER-ALL } ! 0o777
 
 M: unix touch-file ( path -- )
     normalize-path
@@ -24,7 +23,7 @@ M: unix move-file ( from to -- )
 M: unix delete-file ( path -- ) normalize-path unlink-file ;
 
 M: unix make-directory ( path -- )
-    normalize-path 0o777 [ mkdir ] unix-system-call drop ;
+    normalize-path mkdir-mode [ mkdir ] unix-system-call drop ;
 
 M: unix delete-directory ( path -- )
     normalize-path [ rmdir ] unix-system-call drop ;

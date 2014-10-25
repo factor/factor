@@ -1,15 +1,15 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.syntax generic
-assocs kernel kernel.private math io.ports sequences strings
-sbufs threads unix unix.ffi unix.stat vectors io.buffers io.backend
-io.encodings io.files math.parser continuations system libc namespaces
-make io.timeouts io.encodings.utf8 destructors
-destructors.private accessors summary combinators locals
-unix.time unix.types fry io.backend.unix.multiplexers
-classes.struct hints ;
+USING: accessors alien.c-types alien.data alien.syntax
+classes.struct combinators destructors destructors.private fry
+hints io.backend io.backend.unix.multiplexers io.buffers
+io.files io.ports io.timeouts kernel kernel.private libc
+literals locals make math namespaces sequences summary system
+threads unix unix.ffi unix.stat unix.types ;
 QUALIFIED: io
 IN: io.backend.unix
+
+CONSTANT: file-mode 0o0666
 
 GENERIC: handle-fd ( handle -- fd )
 
@@ -82,7 +82,6 @@ M: unix wait-for-fd ( handle event -- )
     '[ handle>> _ wait-for-fd ] with-timeout ;
 
 ! Some general stuff
-CONSTANT: file-mode 0o0666
 
 M: fd refill
     fd>> over buffer>> [ buffer-end ] [ buffer-capacity ] bi read
