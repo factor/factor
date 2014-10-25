@@ -1,22 +1,20 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar combinators locals
-source-files.errors colors.constants combinators.short-circuit
-compiler.units help.tips concurrency.flags concurrency.mailboxes
-continuations destructors documents documents.elements fry hashtables
-help help.markup io io.styles kernel lexer listener make math models sets
-models.delay models.arrow namespaces parser prettyprint quotations
-sequences strings threads vocabs vocabs.refresh vocabs.loader
-vocabs.parser words debugger ui ui.commands ui.pens.solid ui.gadgets
-ui.gadgets.glass ui.gadgets.buttons ui.gadgets.editors
-ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
-ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
-ui.tools.listener.completion ui.tools.listener.popups
-ui.tools.listener.history ui.images ui.tools.error-list
-tools.errors.model ;
-FROM: source-files.errors => all-errors ;
-FROM: namespaces => set ;
+USING: accessors arrays assocs calendar colors.constants
+combinators combinators.short-circuit concurrency.flags
+concurrency.mailboxes continuations destructors documents
+documents.elements fry hashtables help help.markup help.tips io
+io.styles kernel lexer listener locals make math models
+models.arrow models.delay namespaces parser prettyprint
+quotations sequences source-files.errors strings threads
+tools.errors.model ui ui.commands ui.gadgets ui.gadgets.buttons
+ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
+ui.gadgets.tracks ui.gestures ui.operations ui.pens.solid
+ui.tools.browser ui.tools.common ui.tools.debugger
+ui.tools.error-list ui.tools.listener.completion
+ui.tools.listener.history ui.tools.listener.popups vocabs
+vocabs.loader vocabs.parser vocabs.refresh words ;
 IN: ui.tools.listener
 
 ! If waiting is t, we're waiting for user input, and invoking

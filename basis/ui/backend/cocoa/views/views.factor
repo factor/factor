@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs cocoa cocoa.application cocoa.classes
-cocoa.messages cocoa.pasteboard cocoa.runtime cocoa.subclassing
-cocoa.types cocoa.views combinators core-foundation.strings
-core-graphics core-graphics.types core-text io.encodings.utf8
-kernel locals math math.rectangles namespaces opengl sequences
-threads ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.private ;
+cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
+cocoa.views combinators core-foundation.strings core-graphics
+core-graphics.types core-text io.encodings.utf8 kernel locals
+math math.rectangles namespaces opengl sequences threads
+ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.private ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )

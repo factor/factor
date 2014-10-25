@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar combinators deques kernel namespaces sequences
-threads ui ui.private ui.backend ui.gadgets ui.gadgets.private ;
+system threads ui.backend ui.gadgets.private ;
 IN: ui.event-loop
 
 : event-loop? ( -- ? )
