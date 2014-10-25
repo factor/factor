@@ -41,7 +41,7 @@ TUPLE: player stream temp-state
 : init-sound ( player -- )
     init-openal check-error
     1 gen-buffers check-error >>buffers
-    2 "uint" <c-array> >>buffer-indexes
+    2 uint <c-array> >>buffer-indexes
     1 gen-sources check-error first >>source drop ;
 
 : <player> ( stream -- player )
@@ -58,20 +58,20 @@ TUPLE: player stream temp-state
         audio-buffer-size "short" <c-array> >>audio-buffer
         0 >>audio-granulepos
         f >>playing?
-        "ogg_packet" malloc-object >>op
-        "ogg_sync_state" malloc-object >>oy
-        "ogg_page" malloc-object >>og
-        "ogg_stream_state" malloc-object >>vo
-        "vorbis_info" malloc-object >>vi
-        "vorbis_dsp_state" malloc-object >>vd
-        "vorbis_block" malloc-object >>vb
-        "vorbis_comment" malloc-object >>vc
-        "ogg_stream_state" malloc-object >>to
-        "theora_info" malloc-object >>ti
-        "theora_comment" malloc-object >>tc
-        "theora_state" malloc-object >>td
-        "yuv_buffer" <c-object> >>yuv
-        "ogg_stream_state" <c-object> >>temp-state
+        ogg_packet malloc-struct >>op
+        ogg_sync_state malloc-struct >>oy
+        ogg_page malloc-struct >>og
+        ogg_stream_state malloc-struct >>vo
+        vorbis_info malloc-struct >>vi
+        vorbis_dsp_state malloc-struct >>vd
+        vorbis_block malloc-struct >>vb
+        vorbis_comment malloc-struct >>vc
+        ogg_stream_state malloc-struct >>to
+        theora_info malloc-struct >>ti
+        theora_comment malloc-struct >>tc
+        theora_state malloc-struct >>td
+        yuv_buffer <struct> >>yuv
+        ogg_stream_state <struct> >>temp-state
         dup init-sound
         dup init-vorbis
         dup init-theora ;
@@ -92,20 +92,20 @@ TUPLE: player stream temp-state
     255 min 0 max ; inline
 
 : stride ( line yuv  -- uvy yy )
-    [ yuv_buffer-uv_stride >fixnum swap 2/ * ] 2keep
-    yuv_buffer-y_stride >fixnum * >fixnum ; inline
+    [ uv_stride>> >fixnum swap 2/ * ] 2keep
+    y_stride>> >fixnum * >fixnum ; inline
 
 : each-with4 ( obj obj obj obj seq quot -- )
     4 each-withn ; inline
 
 : compute-y ( yuv uvy yy x -- y )
-    + >fixnum nip swap yuv_buffer-y uchar-nth 16 - ; inline
+    + >fixnum nip swap y>> uchar-nth 16 - ; inline
 
 : compute-v ( yuv uvy yy x -- v )
-    nip 2/ + >fixnum swap yuv_buffer-u uchar-nth 128 - ; inline
+    nip 2/ + >fixnum swap u>> uchar-nth 128 - ; inline
 
 : compute-u ( yuv uvy yy x -- v )
-    nip 2/ + >fixnum swap yuv_buffer-v uchar-nth 128 - ; inline
+    nip 2/ + >fixnum swap v>> uchar-nth 128 - ; inline
 
 : compute-yuv ( yuv uvy yy x -- y u v )
     [ compute-y ] 4keep [ compute-u ] 4keep compute-v ; inline
@@ -136,12 +136,12 @@ TUPLE: player stream temp-state
 
 : yuv>rgb-row ( index rgb yuv y -- index )
     over stride
-    pick yuv_buffer-y_width >fixnum
+    pick y_width>> >fixnum
     [ yuv>rgb-pixel ] each-with4 ; inline
 
 : yuv>rgb ( rgb yuv -- )
     0 -rot
-    dup yuv_buffer-y_height >fixnum
+    dup y_height>> >fixnum
     [ yuv>rgb-row ] each-with2
     drop ;
 
@@ -158,26 +158,26 @@ HINTS: yuv>rgb byte-array byte-array ;
     ] when ;
 
 : num-audio-buffers-processed ( player -- player n )
-    dup source>> AL_BUFFERS_PROCESSED 0 <uint>
-    [ alGetSourcei check-error ] keep *uint ;
+    dup source>> AL_BUFFERS_PROCESSED 0 uint <ref>
+    [ alGetSourcei check-error ] keep uint deref ;
 
 : append-new-audio-buffer ( player -- player )
     dup buffers>> 1 gen-buffers append >>buffers
     [ [ buffers>> second ] keep al-channel-format ] keep
     [ audio-buffer>> dup length  ] keep
-    [ vi>> vorbis_info-rate alBufferData check-error ]  keep
+    [ vi>> rate>> alBufferData check-error ]  keep
     [ source>> 1 ] keep
-    [ buffers>> second <uint> alSourceQueueBuffers check-error ] keep ;
+    [ buffers>> second uint <ref> alSourceQueueBuffers check-error ] keep ;
 
 : fill-processed-audio-buffer ( player n -- player )
     #! n is the number of audio buffers processed
     over >r >r dup source>> r> pick buffer-indexes>>
     [ alSourceUnqueueBuffers check-error ] keep
-    *uint dup r> swap >r al-channel-format rot
+    uint deref dup r> swap >r al-channel-format rot
     [ audio-buffer>> dup length  ] keep
-    [ vi>> vorbis_info-rate alBufferData check-error ]  keep
+    [ vi>> rate>> alBufferData check-error ]  keep
     [ source>> 1 ] keep
-    r> <uint> swap >r alSourceQueueBuffers check-error r> ;
+    r> uint <ref> swap >r alSourceQueueBuffers check-error r> ;
 
 : append-audio ( player -- player bool )
     num-audio-buffers-processed {
@@ -189,9 +189,9 @@ HINTS: yuv>rgb byte-array byte-array ;
 : start-audio ( player -- player bool )
     [ [ buffers>> first ] keep al-channel-format ] keep
     [ audio-buffer>> dup length ] keep
-    [ vi>> vorbis_info-rate alBufferData check-error ]  keep
+    [ vi>> rate>> alBufferData check-error ]  keep
     [ source>> 1 ] keep
-    [ buffers>> first <uint> alSourceQueueBuffers check-error ] keep
+    [ buffers>> first uint <ref> alSourceQueueBuffers check-error ] keep
     [ source>> alSourcePlay check-error ] keep
     t >>playing? t ;
 
@@ -394,32 +394,32 @@ HINTS: yuv>rgb byte-array byte-array ;
 
 : init-theora-codec ( player -- player )
     dup [ td>> ] [ ti>> ] bi theora_decode_init drop
-    dup ti>> theora_info-frame_width over ti>> theora_info-frame_height
+    dup ti>> frame_width>> over ti>> frame_height>>
     4 * * <byte-array> >>rgb ;
 
 
 : display-vorbis-details ( player -- player )
     [
         "Ogg logical stream " %
-        dup vo>> ogg_stream_state-serialno #
+        dup vo>> serialno>> #
         " is Vorbis " %
-        dup vi>> vorbis_info-channels #
+        dup vi>> channels>> #
         " channel " %
-        dup vi>> vorbis_info-rate #
+        dup vi>> rate>> #
         " Hz audio." %
     ] "" make print ;
 
 : display-theora-details ( player -- player )
     [
         "Ogg logical stream " %
-        dup to>> ogg_stream_state-serialno #
+        dup to>> serialno>> #
         " is Theora " %
-        dup ti>> theora_info-width #
+        dup ti>> width>> #
         "x" %
-        dup ti>> theora_info-height #
+        dup ti>> height>> #
         " " %
-        dup ti>> theora_info-fps_numerator
-        over ti>> theora_info-fps_denominator /f #
+        dup ti>> fps_numerator>>
+        over ti>> fps_denominator>> /f #
         " fps video" %
     ] "" make print ;
 
@@ -470,7 +470,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     dup audio-index>> audio-buffer-size = [
         t >>audio-full?
     ] when
-    dup vd>> vorbis_dsp_state-granulepos dup 0 >= [
+    dup vd>> granulepos>> dup 0 >= [
         ! numtoread player granulepos
         #! This is wrong: fix
         pick - >>audio-granulepos
@@ -509,7 +509,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     video-buffer-not-ready? [
         dup [ to>> ] [ op>> ] bi ogg_stream_packetout 0 > [
             dup [ td>> ] [ op>> ] bi theora_decode_packetin drop
-            dup td>> theora_state-granulepos >>video-granulepos
+            dup td>> granulepos>> >>video-granulepos
             dup [ td>> ] [ video-granulepos>> ] bi theora_granule_time
             >>video-time
             t >>video-ready?
@@ -565,12 +565,12 @@ HINTS: yuv>rgb byte-array byte-array ;
 : delete-openal-buffers ( player -- player )
     [
         buffers>> [
-            1 swap <uint> alDeleteBuffers check-error
+            1 swap uint <ref> alDeleteBuffers check-error
         ] each
     ] keep ;
 
 : delete-openal-source ( player -- player )
-    [ source>> 1 swap <uint> alDeleteSources check-error ] keep ;
+    [ source>> 1 swap uint <ref> alDeleteSources check-error ] keep ;
 
 : cleanup ( player -- player )
     free-malloced-objects
@@ -594,7 +594,7 @@ TUPLE: theora-gadget < gadget player ;
 
 M: theora-gadget pref-dim*
     player>>
-    ti>> dup theora_info-width swap theora_info-height 2array ;
+    ti>> dup width>> swap height>> 2array ;
 
 M: theora-gadget draw-gadget* ( gadget -- )
     0 0 glRasterPos2i
