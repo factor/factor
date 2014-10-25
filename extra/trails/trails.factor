@@ -1,10 +1,7 @@
-
-USING: kernel accessors locals namespaces sequences threads
-       math math.order math.vectors
-       calendar
-       colors opengl ui ui.gadgets ui.gestures ui.render
-       circular
-       processing.shapes ;
+USING: accessors calendar circular colors colors.constants
+kernel locals math math.order math.vectors namespaces opengl
+processing.shapes sequences threads ui ui.gadgets ui.gestures
+ui.render ;
 
 IN: trails
 
@@ -20,7 +17,7 @@ IN: trails
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: point-list ( n -- seq ) [ drop { 0 0 } ] map <circular> ;
+: point-list ( n -- seq ) [ { 0 0 } ] replicate <circular> ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -30,7 +27,7 @@ IN: trails
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: <trails-gadget> < gadget paused points ;
+TUPLE: trails-gadget < gadget paused points ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -40,8 +37,8 @@ TUPLE: <trails-gadget> < gadget paused points ;
   ! Otherwise, add an "invisible" point
   
   hand-gadget get GADGET =
-    [ mouse       GADGET points>> push-circular ]
-    [ { -10 -10 } GADGET points>> push-circular ]
+    [ mouse       GADGET points>> circular-push ]
+    [ { -10 -10 } GADGET points>> circular-push ]
   if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -61,37 +58,33 @@ TUPLE: <trails-gadget> < gadget paused points ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: <trails-gadget> pref-dim* ( <trails-gadget> -- dim ) drop { 500 500 } ;
+M: trails-gadget pref-dim* ( trails-gadget -- dim ) drop { 500 500 } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : each-percent ( seq quot -- )
   [
     dup length
-    dup [ / ] curry
-    [ 1+ ] prepose
+    [ iota ] [ [ / ] curry ] bi
+    [ 1 + ] prepose
   ] dip compose
   2each ;                       inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M:: <trails-gadget> draw-gadget* ( GADGET -- )
-  origin get
-  [
+M:: trails-gadget draw-gadget* ( GADGET -- )
     T{ rgba f 1 1 1 0.4 } \ fill-color set   ! White, with some transparency
     T{ rgba f 0 0 0 0   } \ stroke-color set ! no stroke
-    
-    black gl-clear
 
-    GADGET points>> [ dot ] each-percent
-  ]
-  with-translation ;
+    COLOR: black gl-clear
+
+    GADGET points>> [ dot ] each-percent ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: trails-gadget ( -- <trails-gadget> )
+: <trails-gadget> ( -- trails-gadget )
 
-  <trails-gadget> new-gadget
+  trails-gadget new
 
     300 point-list >>points
 
@@ -99,7 +92,7 @@ M:: <trails-gadget> draw-gadget* ( GADGET -- )
 
   dup start-trails-thread ;
 
-: trails-window ( -- ) [ trails-gadget "Trails" open-window ] with-ui ;
+: trails-window ( -- ) [ <trails-gadget> "Trails" open-window ] with-ui ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
