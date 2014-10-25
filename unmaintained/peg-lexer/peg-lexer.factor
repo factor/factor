@@ -14,10 +14,10 @@ CONSULT: assoc-protocol lex-hash hash>> ;
            v CHAR: \n n last-index -1 or 1 + -
            n [ CHAR: \n = ] count 1 +
     ] ;
-      
+
 : store-pos ( v a -- )
     input of prepare-pos
-    lexer get [ (>>line) ] keep (>>column) ;
+    lexer get [ line<< ] keep column<< ;
 
 M: lex-hash set-at
     swap {

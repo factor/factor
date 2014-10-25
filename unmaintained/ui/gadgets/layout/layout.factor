@@ -73,7 +73,7 @@ M: track (add-gadget-at) -rot >layout [ add-layout ] keep [ gadget>> insert-gadg
 GENERIC# add-gadget-at 1 ( item location -- )
 M: object add-gadget-at insertion-point -rot (add-gadget-at) ;
 M: model add-gadget-at parent>> dup book:book? [ "No models in books" throw ]
-   [ dup model>> dup collection? [ nip swap add-connection ] [ drop [ 1array <collection> ] dip (>>model) ] if ] if ;
+   [ dup model>> dup collection? [ nip swap add-connection ] [ drop [ 1array <collection> ] dip model<< ] if ] if ;
 : track-add-at ( item location size -- ) swap [ <layout> ] dip add-gadget-at ;
 : (track-add-at) ( parent item n size -- ) swap [ <layout> ] dip (add-gadget-at) ;
 

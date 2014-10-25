@@ -148,10 +148,10 @@ VAR: present-space
     view4> relayout-1 ;
 
 : update-model-projections (  -- )
-    0 model-projection <model> view1> (>>model)
-    1 model-projection <model> view2> (>>model)
-    2 model-projection <model> view3> (>>model)
-    3 model-projection <model> view4> (>>model) ;
+    0 model-projection <model> view1> model<<
+    1 model-projection <model> view2> model<<
+    2 model-projection <model> view3> model<<
+    3 model-projection <model> view4> model<< ;
 
 : camera-action ( quot -- quot ) 
     '[ drop _ observer3d>  
