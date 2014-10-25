@@ -29,7 +29,7 @@ IN: alien.marshall.structs
     {
         [ name>> "<" prepend ">" append create-in ]
         [ '[ _ new ] ]
-        [ name>> '[ _ malloc-object >>underlying ] append ]
+        [ name>> '[ _ malloc-struct >>underlying ] append ]
         [ name>> 1array ]
     } cleave { } swap <effect> define-declared ;
 PRIVATE>
