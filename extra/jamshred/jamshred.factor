@@ -1,6 +1,9 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar jamshred.game jamshred.gl jamshred.player jamshred.log kernel math math.constants math.rectangles math.vectors namespaces sequences threads ui ui.backend ui.gadgets ui.gadgets.worlds ui.gestures ui.render ;
+USING: accessors arrays calendar jamshred.game jamshred.gl
+jamshred.player jamshred.log kernel math math.constants
+math.rectangles math.vectors namespaces sequences threads ui
+ui.backend ui.gadgets ui.gadgets.worlds ui.gestures ui.render ;
 IN: jamshred
 
 TUPLE: jamshred-gadget < gadget { jamshred jamshred } last-hand-loc ;
@@ -31,7 +34,7 @@ M: jamshred-gadget graft* ( gadget -- )
     [ [ jamshred-loop ] curry in-thread ] bi ;
 
 M: jamshred-gadget ungraft* ( gadget -- )
-    dup find-gl-context cleanup-graphics jamshred>> t swap (>>quit) ;
+    dup find-gl-context cleanup-graphics jamshred>> t swap quit<< ;
 
 : jamshred-restart ( jamshred-gadget -- )
     <jamshred> >>jamshred drop ;
@@ -50,7 +53,7 @@ M: jamshred-gadget ungraft* ( gadget -- )
 : (handle-mouse-motion) ( jamshred-gadget mouse-motion -- )
     dupd [ first swap x>radians ] [ second swap y>radians ] 2bi
     rot jamshred>> mouse-moved ;
-    
+
 : handle-mouse-motion ( jamshred-gadget -- )
     hand-loc get [
         over last-hand-loc>> [
