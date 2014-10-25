@@ -8,7 +8,7 @@
 
 USING: cairo.ffi math math.constants byte-arrays kernel ui
 ui.render combinators ui.gadgets opengl.gl accessors
-namespaces opengl ;
+namespaces opengl sequences ;
 
 IN: cairo-demo
 
@@ -21,16 +21,17 @@ IN: cairo-demo
 
 TUPLE: cairo-demo-gadget < gadget image-array cairo-t ;
 
+USE: io
+USE: formatting
+
 M: cairo-demo-gadget draw-gadget* ( gadget -- )
-    origin get [
-        0 0 glRasterPos2i
-        1.0 -1.0 glPixelZoom
-        [ 384 256 GL_RGBA GL_UNSIGNED_BYTE ] dip
-        image-array>> glDrawPixels
-    ] with-translation ;
+    0 0 glRasterPos2i
+    1.0 -1.0 glPixelZoom
+    [ 384 256 GL_RGBA GL_UNSIGNED_BYTE ] dip
+    image-array>> glDrawPixels ;
 
 : create-surface ( gadget -- cairo_surface_t )
-    make-image-array [ swap (>>image-array) ] keep
+    make-image-array [ swap image-array<< ] keep
     convert-array-to-surface ;
 
 : init-cairo ( gadget -- cairo_t )
@@ -69,13 +70,13 @@ ERROR: no-cairo-t ;
 PRIVATE>
 
 M: cairo-demo-gadget graft* ( gadget -- )
-    dup dup init-cairo swap (>>cairo-t) draw-hello-world ;
+    dup dup init-cairo swap cairo-t<< draw-hello-world ;
 
 M: cairo-demo-gadget ungraft* ( gadget -- )
     cairo-t>> cairo_destroy ;
 
 : <cairo-demo-gadget> ( -- gadget )
-    cairo-demo-gadget new-gadget ;
+    cairo-demo-gadget new ;
 
 : run ( -- )
     [
