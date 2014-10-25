@@ -1,10 +1,10 @@
 
 USING: kernel namespaces arrays sequences grouping
        alien.c-types
-       math math.vectors math.geometry.rect
-       opengl.gl opengl.glu opengl generalizations vars
-       combinators.cleave colors ;
-
+       math math.vectors math.rectangles
+       opengl.gl opengl.glu opengl generalizations
+       combinators colors sequences.generalizations ;
+USE: shuffle
 IN: processing.shapes
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -13,8 +13,8 @@ IN: processing.shapes
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-VAR: fill-color
-VAR: stroke-color
+SYMBOL: fill-color
+SYMBOL: stroke-color
 
 T{ rgba f 0 0 0 1 } stroke-color set-global
 T{ rgba f 1 1 1 1 } fill-color   set-global
@@ -23,13 +23,13 @@ T{ rgba f 1 1 1 1 } fill-color   set-global
 
 : fill-mode ( -- )
   GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  fill-color> gl-color ;
+  fill-color get gl-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : stroke-mode ( -- )
   GL_FRONT_AND_BACK GL_LINE glPolygonMode
-  stroke-color> gl-color ;
+  stroke-color get gl-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -78,11 +78,16 @@ T{ rgba f 1 1 1 1 } fill-color   set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: rectangle ( loc dim -- )
-  <rect>
-    { top-left top-right bottom-right bottom-left }
-  1arr
-  polygon ;
+:: rectangle ( loc dim -- )
+    loc first2 :> ( x y )
+    dim first2 :> ( dx dy )
+
+    x y 2array
+    x dx + y 2array
+    x y dy + 2array
+    x dx + y dy + 2array
+    4array
+    polygon ;
 
 : rectangle* ( x y width height -- ) [ 2array ] 2bi@ rectangle ;
 
@@ -105,12 +110,12 @@ T{ rgba f 1 1 1 1 } fill-color   set-global
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : gl-get-line-width ( -- width )
-  GL_LINE_WIDTH 0 <double> tuck glGetDoublev *double ;
+  GL_LINE_WIDTH 0 double <ref> tuck glGetDoublev double deref ;
 
 : ellipse ( center dim -- )
   GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  [ stroke-color> gl-color                                 gl-ellipse ]
-  [ fill-color> gl-color gl-get-line-width 2 * dup 2array v- gl-ellipse ] 2bi ;
+  [ stroke-color get gl-color                                 gl-ellipse ]
+  [ fill-color get gl-color gl-get-line-width 2 * dup 2array v- gl-ellipse ] 2bi ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
