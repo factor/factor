@@ -1,10 +1,7 @@
 
-USING: kernel namespaces arrays sequences grouping
-       alien.c-types
-       math math.vectors math.rectangles
-       opengl.gl opengl.glu opengl generalizations
-       combinators colors sequences.generalizations ;
-USE: shuffle
+USING: alien.c-types alien.data arrays colors grouping kernel
+locals math math.vectors namespaces opengl opengl.gl opengl.glu
+sequences sequences.generalizations shuffle ;
 IN: processing.shapes
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
