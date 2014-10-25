@@ -1,13 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data assocs
-byte-arrays byte-vectors classes combinators continuations
-destructors dlists fry generic grouping hints io io.backend
-io.buffers io.encodings io.encodings.ascii io.encodings.binary
-io.encodings.private io.encodings.utf8 io.timeouts kernel libc
-locals math math.order namespaces sequences specialized-arrays
-specialized-arrays.instances.alien.c-types.uchar splitting
-strings summary system io.files kernel.private ;
+USING: accessors alien alien.c-types alien.data byte-arrays
+combinators destructors fry grouping hints io io.backend
+io.buffers io.encodings io.files io.timeouts kernel
+kernel.private libc locals math math.order namespaces sequences
+strings system ;
 IN: io.ports
 
 SYMBOL: default-buffer-size

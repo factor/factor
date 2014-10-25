@@ -3,9 +3,9 @@
 USING: accessors alien.c-types alien.data alien.syntax
 classes.struct combinators destructors destructors.private fry
 hints io.backend io.backend.unix.multiplexers io.buffers
-io.files io.ports io.timeouts kernel kernel.private libc
-literals locals make math namespaces sequences summary system
-threads unix unix.ffi unix.stat unix.types ;
+io.files io.ports io.timeouts kernel kernel.private libc locals
+make math namespaces sequences summary system threads unix
+unix.ffi unix.stat unix.types ;
 QUALIFIED: io
 IN: io.backend.unix
 
