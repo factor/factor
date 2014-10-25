@@ -1,18 +1,11 @@
-
-USING: kernel accessors locals math math.intervals math.order
-       namespaces sequences threads
-       ui
-       ui.gadgets
-       ui.gestures
-       ui.render
-       calendar
-       multi-methods
-       multi-method-syntax
-       combinators.short-circuit.smart
-       combinators.cleave.enhanced
-       processing.shapes
-       flatland ;
-
+USING: accessors alien.c-types alien.data arrays calendar colors
+combinators combinators.short-circuit flatland generalizations
+grouping kernel locals math math.intervals math.order
+math.rectangles math.vectors namespaces opengl opengl.gl
+opengl.glu processing.shapes sequences sequences.generalizations
+shuffle threads ui ui.gadgets ui.gestures ui.render ;
+FROM: multi-methods => GENERIC: METHOD: ;
+FROM: syntax => M: ;
 IN: pong
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -51,7 +44,7 @@ TUPLE: <ball> < <vel>
   {
     [ above-lower-bound? ]
     [ below-upper-bound? ]
-  } && ;
+  } 2&& ;
 
 :: bounce-change-vertical-velocity ( BALL -- )
 
@@ -94,18 +87,15 @@ TUPLE: <ball> < <vel>
 
 GENERIC: draw ( obj -- )
 
-METHOD: draw ( <paddle> -- ) [ bottom-left ] [ dim>>          ] bi rectangle ;
-METHOD: draw ( <ball>   -- ) [ pos>>       ] [ diameter>> 2 / ] bi circle    ;
+METHOD: draw { <paddle> } [ bottom-left ] [ dim>>          ] bi rectangle ;
+METHOD: draw { <ball>   } [ pos>>       ] [ diameter>> 2 / ] bi circle    ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USE: syntax ! Switch back to core 'TUPLE:' instead of the one provided
-            ! by multi-methods
 
 TUPLE: <pong> < gadget paused field ball player computer ;
 
 : pong ( -- gadget )
-  <pong> new-gadget
+  <pong> new
   T{ <play-field> { pos {   0   0 } } { dim { 400 400 } } } clone >>field
   T{ <ball>       { pos {  50  50 } } { vel {   3   4 } } } clone >>ball
   T{ <paddle>     { pos { 200 396 } } { dim {  75   4 } } } clone >>player
@@ -126,33 +116,16 @@ M:: <pong> draw-gadget* ( PONG -- )
 
 :: iterate-system ( GADGET -- )
 
-  [let | FIELD    [ GADGET field>>    ]
-         BALL     [ GADGET ball>>     ]
-         PLAYER   [ GADGET player>>   ]
-         COMPUTER [ GADGET computer>> ] |
+    GADGET field>>    :> FIELD
+    GADGET ball>>     :> BALL
+    GADGET player>>   :> PLAYER
+    GADGET computer>> :> COMPUTER
 
-    [wlet | align-player-with-mouse [ ( -- )
-              PLAYER FIELD align-paddle-with-mouse ]
+    BALL FIELD in-bounds? [
 
-            move-ball [ ( -- ) BALL 1 move-for ]
+        PLAYER FIELD align-paddle-with-mouse
 
-            player-blocked-ball? [ ( -- ? )
-              BALL PLAYER { [ above? ] [ in-between-horizontally? ] } && ]
-
-            computer-blocked-ball? [ ( -- ? )
-              BALL COMPUTER { [ below? ] [ in-between-horizontally? ] } && ]
-
-            bounce-off-wall? [ ( -- ? )
-              BALL FIELD in-between-horizontally? not ]
-
-            stop-game [ ( -- ) t GADGET paused<< ] |
-
-      BALL FIELD in-bounds?
-      [
-
-        align-player-with-mouse
-
-        move-ball
+        BALL 1 move-for
 
         ! computer reaction
 
@@ -160,15 +133,20 @@ M:: <pong> draw-gadget* ( PONG -- )
         BALL COMPUTER to-the-right-of? [ COMPUTER computer-move-right ] when
 
         ! check if ball bounced off something
-              
-        player-blocked-ball?   [ BALL PLAYER   bounce-off-paddle  ] when
-        computer-blocked-ball? [ BALL COMPUTER bounce-off-paddle  ] when
-        bounce-off-wall?       [ BALL reverse-horizontal-velocity ] when
-      ]
-      [ stop-game ]
-      if
 
-  ] ] ( gadget -- ) ;
+        ! player-blocked-ball?
+        BALL PLAYER { [ above? ] [ in-between-horizontally? ] } 2&&
+        [ BALL PLAYER   bounce-off-paddle  ] when
+
+        ! computer-blocked-ball?
+        BALL COMPUTER { [ below? ] [ in-between-horizontally? ] } 2&&
+        [ BALL COMPUTER bounce-off-paddle  ] when
+
+        ! bounced-off-wall?
+        BALL FIELD in-between-horizontally? not
+        [ BALL reverse-horizontal-velocity ] when
+
+    ] [ t GADGET paused<< ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

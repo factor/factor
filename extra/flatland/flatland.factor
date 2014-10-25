@@ -1,11 +1,8 @@
 
-USING: accessors arrays fry kernel math math.vectors sequences
-       math.intervals
-       multi-methods
-       combinators.short-circuit
-       combinators.cleave.enhanced
-       multi-method-syntax ;
-
+USING: accessors arrays combinators combinators.short-circuit
+fry kernel locals math math.intervals math.vectors multi-methods
+sequences ;
+FROM: multi-methods => GENERIC: ;
 IN: flatland
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -62,31 +59,31 @@ GENERIC: distance ( a b -- c )
 ! A two element sequence may represent a point in space or describe
 ! width and height.
 
-METHOD: x ( sequence -- x ) first  ;
-METHOD: y ( sequence -- y ) second ;
+METHOD: x { sequence } first  ;
+METHOD: y { sequence } second ;
 
-METHOD: (x!) ( number sequence -- ) set-first  ;
-METHOD: (y!) ( number sequence -- ) set-second ;
+METHOD: (x!) { number sequence } set-first  ;
+METHOD: (y!) { number sequence } set-second ;
 
-METHOD: width  ( sequence -- width  ) first  ;
-METHOD: height ( sequence -- height ) second ;
+METHOD: width  { sequence } first  ;
+METHOD: height { sequence } second ;
 
 : changed-x ( seq quot -- ) over [ [ x ] dip call ] dip (x!) ; inline
 : changed-y ( seq quot -- ) over [ [ y ] dip call ] dip (y!) ; inline
 
-METHOD: move-to ( sequence sequence -- )         [ x x! ] [ y y! ] bi drop ;
-METHOD: move-by ( sequence sequence -- ) dupd v+ [ x x! ] [ y y! ] bi drop ;
+METHOD: move-to { sequence sequence }         [ x x! ] [ y y! ] bi drop ;
+METHOD: move-by { sequence sequence } dupd v+ [ x x! ] [ y y! ] bi drop ;
 
-METHOD: move-left-by  ( sequence number -- ) '[ _ - ] changed-x ;
-METHOD: move-right-by ( sequence number -- ) '[ _ + ] changed-x ;
+METHOD: move-left-by  { sequence number } '[ _ - ] changed-x ;
+METHOD: move-right-by { sequence number } '[ _ + ] changed-x ;
 
-! METHOD: move-left-by  ( sequence number -- ) neg 0 2array move-by ;
-! METHOD: move-right-by ( sequence number -- )     0 2array move-by ;
+! METHOD: move-left-by  { sequence number } neg 0 2array move-by ;
+! METHOD: move-right-by { sequence number }     0 2array move-by ;
 
-! METHOD:: move-left-by  ( SEQ:sequence X:number -- )
+! METHOD:: move-left-by  { SEQ:sequence X:number -- )
 !   SEQ { X 0 } { -1 0 } v* move-by ;
 
-METHOD: distance ( sequence sequence -- dist ) v- norm ;
+METHOD: distance { sequence sequence } v- norm ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -94,24 +91,24 @@ METHOD: distance ( sequence sequence -- dist ) v- norm ;
 
 TUPLE: <pos> pos ;
 
-METHOD: x ( <pos> -- x ) pos>> first  ;
-METHOD: y ( <pos> -- y ) pos>> second ;
+METHOD: x { <pos> } pos>> first  ;
+METHOD: y { <pos> } pos>> second ;
 
-METHOD: (x!) ( number <pos> -- ) pos>> set-first  ;
-METHOD: (y!) ( number <pos> -- ) pos>> set-second ;
+METHOD: (x!) { number <pos> } pos>> set-first  ;
+METHOD: (y!) { number <pos> } pos>> set-second ;
 
-METHOD: to-the-left-of?  ( <pos> number -- ? ) [ x ] dip < ;
-METHOD: to-the-right-of? ( <pos> number -- ? ) [ x ] dip > ;
+METHOD: to-the-left-of?  { <pos> number } [ x ] dip < ;
+METHOD: to-the-right-of? { <pos> number } [ x ] dip > ;
 
-METHOD: move-left-by  ( <pos> number -- ) [ pos>> ] dip move-left-by  ;
-METHOD: move-right-by ( <pos> number -- ) [ pos>> ] dip move-right-by ;
+METHOD: move-left-by  { <pos> number } [ pos>> ] dip move-left-by  ;
+METHOD: move-right-by { <pos> number } [ pos>> ] dip move-right-by ;
 
-METHOD: above? ( <pos> number -- ? ) [ y ] dip > ;
-METHOD: below? ( <pos> number -- ? ) [ y ] dip < ;
+METHOD: above? { <pos> number } [ y ] dip > ;
+METHOD: below? { <pos> number } [ y ] dip < ;
 
-METHOD: move-by ( <pos> sequence -- ) '[ _ v+ ] change-pos drop ;
+METHOD: move-by { <pos> sequence } '[ _ v+ ] change-pos drop ;
 
-METHOD: distance ( <pos> <pos> -- dist ) [ pos>> ] bi@ distance ;
+METHOD: distance { <pos> <pos> } [ pos>> ] bi@ distance ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -135,55 +132,55 @@ TUPLE: <vel> < <pos> vel ;
 
 TUPLE: <rectangle> < <pos> dim ;
 
-METHOD: width  ( <rectangle> -- width  ) dim>> first  ;
-METHOD: height ( <rectangle> -- height ) dim>> second ;
+METHOD: width  { <rectangle> } dim>> first  ;
+METHOD: height { <rectangle> } dim>> second ;
 
-METHOD: left   ( <rectangle> -- x )    x             ;
-METHOD: right  ( <rectangle> -- x ) \\ x width  bi + ;
-METHOD: bottom ( <rectangle> -- y )    y             ;
-METHOD: top    ( <rectangle> -- y ) \\ y height bi + ;
+METHOD: left   { <rectangle> }    x             ;
+METHOD: right  { <rectangle> } [ x ] [ width ] bi + ;
+METHOD: bottom { <rectangle> }    y             ;
+METHOD: top    { <rectangle> } [ y ] [ height ] bi + ;
 
 : bottom-left ( rectangle -- pos ) pos>> ;
 
 : center-x ( rectangle -- x ) [ left   ] [ width  2 / ] bi + ;
 : center-y ( rectangle -- y ) [ bottom ] [ height 2 / ] bi + ;
 
-: center ( rectangle -- seq ) \\ center-x center-y bi 2array ;
+: center ( rectangle -- seq ) [ center-x ] [ center-y ] bi 2array ;
 
-METHOD: to-the-left-of?  ( <pos> <rectangle> -- ? ) \\ x left  bi* < ;
-METHOD: to-the-right-of? ( <pos> <rectangle> -- ? ) \\ x right bi* > ;
+METHOD: to-the-left-of?  { <pos> <rectangle> } [ x ] [ left  ] bi* < ;
+METHOD: to-the-right-of? { <pos> <rectangle> } [ x ] [ right ] bi* > ;
 
-METHOD: below? ( <pos> <rectangle> -- ? ) \\ y bottom bi* < ;
-METHOD: above? ( <pos> <rectangle> -- ? ) \\ y top    bi* > ;
+METHOD: below? { <pos> <rectangle> } [ y ] [ bottom ] bi* < ;
+METHOD: above? { <pos> <rectangle> } [ y ] [ top    ] bi* > ;
 
-METHOD: horizontal-interval ( <rectangle> -- interval )
-  \\ left right bi [a,b] ;
+METHOD: horizontal-interval { <rectangle> }
+  [ left ] [ right ] bi [a,b] ;
 
-METHOD: in-between-horizontally? ( <pos> <rectangle> -- ? )
-  \\ x horizontal-interval bi* interval-contains? ;
+METHOD: in-between-horizontally? { <pos> <rectangle> }
+  [ x ] [ horizontal-interval ] bi* interval-contains? ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TUPLE: <extent> left right bottom top ;
 
-METHOD: left   ( <extent> -- left   ) left>>   ;
-METHOD: right  ( <extent> -- right  ) right>>  ;
-METHOD: bottom ( <extent> -- bottom ) bottom>> ;
-METHOD: top    ( <extent> -- top    ) top>>    ;
+METHOD: left   { <extent> } left>>   ;
+METHOD: right  { <extent> } right>>  ;
+METHOD: bottom { <extent> } bottom>> ;
+METHOD: top    { <extent> } top>>    ;
 
-METHOD: width  ( <extent> -- width  ) \\ right>> left>>   bi - ;
-METHOD: height ( <extent> -- height ) \\ top>>   bottom>> bi - ;
+METHOD: width  { <extent> } [ right>> ] [ left>>   ] bi - ;
+METHOD: height { <extent> } [ top>>   ] [ bottom>> ] bi - ;
 
 ! METHOD: to-extent ( <rectangle> -- <extent> )
 !   { [ left>> ] [ right>> ] [ bottom>> ] [ top>> ] } cleave <extent> boa ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-METHOD: to-the-left-of?  ( sequence <rectangle> -- ? ) \\ x left  bi* < ;
-METHOD: to-the-right-of? ( sequence <rectangle> -- ? ) \\ x right bi* > ;
+METHOD: to-the-left-of?  { sequence <rectangle> } [ x ] [ left ] bi* < ;
+METHOD: to-the-right-of? { sequence <rectangle> } [ x ] [ right ] bi* > ;
 
-METHOD: below? ( sequence <rectangle> -- ? ) \\ y bottom bi* < ;
-METHOD: above? ( sequence <rectangle> -- ? ) \\ y top    bi* > ;
+METHOD: below? { sequence <rectangle> } [ y ] [ bottom ] bi* < ;
+METHOD: above? { sequence <rectangle> } [ y ] [ top    ] bi* > ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -200,10 +197,7 @@ METHOD: above? ( sequence <rectangle> -- ? ) \\ y top    bi* > ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-USING: locals combinators ; 
-
 :: wrap ( POINT RECT -- POINT )
-    
   {
       { [ POINT RECT to-the-left-of?  ] [ RECT right ] }
       { [ POINT RECT to-the-right-of? ] [ RECT left  ] }
@@ -224,7 +218,7 @@ USING: locals combinators ;
 
 GENERIC: within? ( a b -- ? )
 
-METHOD: within? ( <pos> <rectangle> -- ? )
+METHOD: within? { <pos> <rectangle> }
   {
     [ left   to-the-right-of? ]
     [ right  to-the-left-of?  ]
