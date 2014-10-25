@@ -12,7 +12,7 @@ TUPLE: model-btn < button hook value ;
 : <model-btn> ( gadget -- button ) [
       [ dup hook>> [ call( button -- ) ] [ drop ] if* ]
       [ [ [ value>> ] [ ] bi or ] keep set-control-value ]
-      [ model>> f swap (>>value) ] tri
+      [ model>> f swap value<< ] tri
    ] model-btn new-button f <basic> >>model ;
 : <model-border-btn> ( text -- button ) <model-btn> border-button-theme ;
 
