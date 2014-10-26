@@ -61,20 +61,23 @@ SPECIALIZED-ARRAY: void*
 
 DEFER: >py
 
-GENERIC: (>py) ( obj -- obj' )
-M: string (>py) utf8>py-unicode ;
-M: math:fixnum (>py) PyLong_FromLong ;
-M: math:float (>py) PyFloat_FromDouble ;
-M: array (>py) [ >py ] map array>py-tuple ;
-M: hashtable (>py)
+GENERIC: >py ( obj -- obj' )
+M: string >py
+    utf8>py-unicode check-new-ref ;
+M: math:fixnum >py
+    PyLong_FromLong check-new-ref ;
+M: math:float >py
+    PyFloat_FromDouble check-new-ref ;
+M: array >py
+    [ >py ] map array>py-tuple ;
+M: hashtable >py
     <py-dict> swap dupd [
-        swapd [ (>py) ] bi@ py-dict-set-item
+        swapd [ >py ] bi@ py-dict-set-item
     ] with assoc-each ;
-M: vector (>py)
+M: vector >py
     [ >py ] map vector>py-list ;
-
-: >py ( obj -- py-obj )
-    (>py) &Py_DecRef ;
+M: f >py
+    drop <none> ;
 
 ! Data marshalling to Factor
 SYMBOL: py-type-dispatch

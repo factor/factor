@@ -1,6 +1,13 @@
-USING: alien.c-types alien.data classes.struct kernel python.errors
-python.ffi ;
+USING: alien.c-types alien.data alien.libraries classes.struct kernel
+python.errors python.ffi ;
 IN: python.objects
+
+! The None object
+: (none) ( -- none )
+    "_Py_NoneStruct" "python" address-of ;
+
+: <none> ( -- none )
+    (none) check-borrowed-ref ;
 
 ! Objects
 : getattr ( obj str -- value )
@@ -20,7 +27,7 @@ IN: python.objects
     PyTuple_New check-new-ref ;
 
 : py-tuple-set-item ( obj pos val -- )
-    unsteal-ref PyTuple_SetItem check-zero ;
+    dup unsteal-ref PyTuple_SetItem check-zero ;
 
 : py-tuple-get-item ( obj pos -- val )
     PyTuple_GetItem dup Py_IncRef check-new-ref ;
@@ -58,7 +65,7 @@ IN: python.objects
     PyList_GetItem check-borrowed-ref ;
 
 : py-list-set-item ( obj pos val -- )
-    unsteal-ref PyList_SetItem check-zero ;
+    dup unsteal-ref PyList_SetItem check-zero ;
 
 ! Functions
 : <py-cfunction> ( alien -- cfunction )
