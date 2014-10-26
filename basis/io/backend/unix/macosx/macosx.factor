@@ -3,6 +3,7 @@
 USING: init io.backend io.backend.unix
 io.backend.unix.multiplexers io.backend.unix.multiplexers.kqueue
 io.backend.unix.multiplexers.run-loop namespaces system ;
+USE: io.files.unix ! need this for deploy
 IN: io.backend.unix.macosx
 
 SINGLETON: macosx-kqueue
