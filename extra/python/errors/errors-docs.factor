@@ -1,4 +1,4 @@
-USING: math help.markup help.syntax ;
+USING: math help.markup help.syntax python.ffi ;
 IN: python.errors
 
 HELP: check-zero
@@ -28,5 +28,4 @@ HELP: check-borrowed-ref
 HELP: unsteal-ref
 { $values { "ref" "a python object" } }
 { $description
-  "Increases the objects reference count. Used by wrappers that call Python functions that steal references."
-} ;
+  "Unsteals a reference. Used by wrappers that call Python functions that steal references. Functions such as " { $link PyTuple_SetItem } " takes ownership of the references passed in and relieves Factor of its burden to decrement them." } ;
