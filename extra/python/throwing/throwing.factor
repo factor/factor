@@ -1,11 +1,8 @@
-USING: arrays kernel python python.ffi python.syntax sequences ;
+USING: arrays kernel python python.ffi python.modules.__builtin__ python.syntax
+sequences ;
 IN: python.throwing
 
 PY-FROM: traceback => format_tb ( tb -- seq ) ;
-
-PY-METHODS: obj =>
-    __name__ ( o -- str )
-    __str__ ( o -- str ) ;
 
 : throw-error ( ptype pvalue ptraceback -- )
     [
