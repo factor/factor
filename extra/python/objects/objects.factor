@@ -1,5 +1,5 @@
-USING: alien.c-types alien.data alien.libraries classes.struct kernel
-python.errors python.ffi ;
+USING: accessors alien.c-types alien.data alien.libraries classes.struct
+io.encodings.ascii io.encodings.utf8 kernel libc python.errors python.ffi ;
 IN: python.objects
 
 ! The None object
@@ -68,8 +68,15 @@ IN: python.objects
     dup unsteal-ref PyList_SetItem check-zero ;
 
 ! Functions
+: <PyMethodDef> ( alien name doc/f -- cfunction )
+    PyMethodDef malloc-struct &free
+    swap [ utf8 malloc-string &free >>ml_doc ] when*
+    swap ascii malloc-string &free >>ml_name
+    swap >>ml_meth
+    METH_VARARGS >>ml_flags ;
+
 : <py-cfunction> ( alien -- cfunction )
-    f swap METH_VARARGS f PyMethodDef <struct-boa> f f
+    "cfunction" f <PyMethodDef> f f
     ! It's not clear from the docs whether &Py_DecRef is right for
     ! PyCFunction_NewEx, but I'm betting on it.
     PyCFunction_NewEx check-new-ref ;

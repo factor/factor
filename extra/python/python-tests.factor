@@ -1,6 +1,6 @@
 USING: accessors alien arrays assocs calendar continuations destructors
-destructors.private fry kernel math namespaces python python.errors python.ffi
-python.objects sequences strings tools.test ;
+destructors.private fry kernel math memory namespaces python python.errors
+python.ffi python.objects sequences strings tools.test ;
 IN: python
 
 : py-test ( result quot -- )
@@ -151,4 +151,20 @@ IN: python
 ! Modules
 [ t ] [
     "os" py-import PyModule_GetDict dup Py_IncRef &Py_DecRef py-dict-size 100 >
+] py-test
+
+! CFunctions
+{ f } [
+    1234 <alien> <py-cfunction> "__doc__" getattr py>
+] py-test
+
+{ "cfunction" } [
+    1234 <alien> <py-cfunction>
+    ! Force nursery flush
+    10000 [ 1000 0xff <array> drop ] times
+    "__name__" getattr py>
+] py-test
+
+{ 3 } [
+    1234 <alien> <py-cfunction> drop always-destructors get length
 ] py-test
