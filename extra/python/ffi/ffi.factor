@@ -28,7 +28,7 @@ CONSTANT: METH_COEXIST  0x0040
 C-TYPE: PyCFunction
 
 STRUCT: PyMethodDef
-    { ml_name void* }
+    { ml_name c-string }
     { ml_meth PyCFunction* }
     { ml_flags int }
     { ml_doc c-string } ;
