@@ -1,9 +1,51 @@
-USING: accessors arrays assocs calendar continuations destructors fry kernel
-math namespaces python python.ffi python.objects sequences strings tools.test ;
+USING: accessors alien arrays assocs calendar continuations destructors
+destructors.private fry kernel math namespaces python python.errors python.ffi
+python.objects sequences strings tools.test ;
 IN: python
 
 : py-test ( result quot -- )
     '[ _ with-destructors ] unit-test ; inline
+
+! None testing
+{ t } [
+    "__builtin__" py-import "None" getattr <none> =
+] py-test
+
+! Pretty sure the # of None references should stay constant.
+{ t } [
+    [
+        "sys" py-import "getrefcount" getattr
+        <none> <1py-tuple> call-object py>
+    ] with-destructors
+    [
+        "sys" py-import "getrefcount" getattr
+        <none> <1py-tuple> call-object py>
+    ] with-destructors =
+] unit-test
+
+{ } [ { f f f } >py drop ] py-test
+
+! Destructors
+{ 1 } [ 33 >py drop always-destructors get length ] py-test
+
+{ 1 } [ f >py drop always-destructors get length ] py-test
+
+! The tuple steals the reference properly now.
+{ 1 } [ 33 >py <1py-tuple> drop always-destructors get length ] py-test
+
+{ 1 } [ { } >py drop always-destructors get length ] py-test
+
+{ 1 } [ V{ 1 2 3 4 } >py drop always-destructors get length ] py-test
+
+{ 2 } [
+    99 >py V{ 1 2 3 4 } >py 2drop always-destructors get length
+] py-test
+
+{ 1 } [
+    { { { 33 } } } >py drop always-destructors get length
+] py-test
+
+{ } [ 123 <alien> unsteal-ref ] unit-test
 
 [ t ] [ Py_GetVersion string? ] unit-test
 
