@@ -36,14 +36,14 @@ SYMBOL: auto-use?
 
 : private? ( word -- ? ) vocabulary>> ".private" tail? ;
 
+! True branch is a singleton public word with no name conflicts
+! False branch, singleton private words need confirmation regardless
+! of name conflicts
 : no-word ( name -- newword )
     dup words-named ignore-forwards
-    dup length 1 = auto-use? get and
-    [
-        dup first private?
-        [ <no-word-error> throw-restarts no-word-restarted ]
-        [ nip first no-word-restarted ] if
-    ]
+    dup [ length 1 = ] [ first private? not ] bi and
+    auto-use? get and
+    [ nip first no-word-restarted ]
     [ <no-word-error> throw-restarts no-word-restarted ]
     if ;
 
