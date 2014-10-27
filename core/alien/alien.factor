@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs byte-arrays byte-vectors continuations
-continuations.private destructors init kernel kernel.private math namespaces
+continuations.private init kernel kernel.private math namespaces
 sequences ;
 IN: alien
 
