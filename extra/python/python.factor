@@ -61,7 +61,7 @@ SPECIALIZED-ARRAY: void*
 
 DEFER: >py
 
-GENERIC: >py ( obj -- obj' )
+GENERIC: >py ( obj -- py-obj )
 M: string >py
     utf8>py-unicode check-new-ref ;
 M: math:fixnum >py
