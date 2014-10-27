@@ -1,4 +1,6 @@
-USING: alien.c-types alien.data kernel python.ffi vocabs.loader words ;
+USING: accessors alien alien.c-types alien.data combinators.short-circuit
+destructors.private kernel namespaces python.ffi sequences vocabs.loader
+words ;
 IN: python.errors
 
 <PRIVATE
@@ -24,5 +26,10 @@ PRIVATE>
 : check-zero ( code -- )
     0 = [ get-error throw-error ] unless ;
 
-: unsteal-ref ( ref -- ref )
-    dup Py_IncRef ;
+: unsteal-ref ( ref -- )
+    always-destructors get [
+        {
+            [ nip Py_DecRef-destructor? ]
+            [ alien>> [ alien-address ] bi@ = ]
+        } 2&& not
+    ] with filter! drop ;
