@@ -36,14 +36,15 @@ SYMBOL: auto-use?
 
 : private? ( word -- ? ) vocabulary>> ".private" tail? ;
 
-: ignore-privates ( seq -- seq' )
-    dup [ private? ] all? [ [ private? not ] filter ] unless ;
-
 : no-word ( name -- newword )
     dup words-named ignore-forwards
-    dup ignore-privates dup length 1 = auto-use? get and
-    [ 2nip first no-word-restarted ]
-    [ drop <no-word-error> throw-restarts no-word-restarted ]
+    dup length 1 = auto-use? get and
+    [
+        dup first private?
+        [ <no-word-error> throw-restarts no-word-restarted ]
+        [ nip first no-word-restarted ] if
+    ]
+    [ <no-word-error> throw-restarts no-word-restarted ]
     if ;
 
 : parse-word ( string -- word )
