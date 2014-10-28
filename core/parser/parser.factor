@@ -41,7 +41,8 @@ SYMBOL: auto-use?
 ! of name conflicts
 : no-word ( name -- newword )
     dup words-named ignore-forwards
-    dup [ length 1 = ] [ first private? not ] bi and
+    dup [ length 1 = ]
+    [ [ f ] [ first private? not ] if-empty ] bi and
     auto-use? get and
     [ nip first no-word-restarted ]
     [ <no-word-error> throw-restarts no-word-restarted ]
