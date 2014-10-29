@@ -1,6 +1,6 @@
 USING: accessors assocs continuations http http.server
-io.encodings.utf8 io.encodings.binary io.streams.string kernel
-math peg sequences tools.test urls ;
+http.server.requests io.encodings.utf8 io.encodings.binary io.streams.string
+kernel math peg sequences tools.test urls ;
 IN: http.server.tests
 
 [ t ] [ [ \ + first ] [ <500> ] recover response? ] unit-test
@@ -82,7 +82,9 @@ IN: http.server.tests
 ! Don't rethrow parse-errors with an empty request string. They are
 ! expected from certain browsers when the server serves a certificate
 ! that the browser can't verify.
-{ } [ 0 "" f <parse-error> handle-client-error ] unit-test
+{ } [
+    0 "" f <parse-error> \ bad-request-line boa handle-client-error
+] unit-test
 
 [
     0 "not empty" f <parse-error> handle-client-error

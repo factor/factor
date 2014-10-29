@@ -225,7 +225,8 @@ SYMBOL: request-limit
 request-limit [ 64 1024 * ] initialize
 
 : handle-client-error ( error -- )
-    dup { [ parse-error? ] [ got>> empty? ] } 1&& [ drop ] [ rethrow ] if ;
+    dup { [ bad-request-line? ] [ parse-error>> got>> empty? ] } 1&&
+    [ drop ] [ rethrow ] if ;
 
 M: http-server handle-client*
     drop [

@@ -1,18 +1,27 @@
-USING: accessors combinators http http.parsers io io.crlf io.encodings
-io.encodings.binary io.streams.limited kernel math.order math.parser
-namespaces sequences splitting urls urls.encoding ;
+USING: accessors combinators continuations http http.parsers io io.crlf
+io.encodings io.encodings.binary io.streams.limited kernel math.order
+math.parser namespaces sequences splitting urls urls.encoding ;
 FROM: mime.multipart => parse-multipart ;
 IN: http.server.requests
 
-ERROR: no-boundary ;
+ERROR: request-error ;
 
-: check-absolute ( url -- url )
-    dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
+ERROR: no-boundary < request-error ;
+
+ERROR: invalid-path < request-error path ;
+
+ERROR: bad-request-line < request-error parse-error ;
+
+: check-absolute ( url -- )
+    path>> dup "/" head? [ drop ] [ invalid-path ] if ; inline
+
+: parse-request-line-safe ( string -- triple )
+    [ parse-request-line ] [ nip bad-request-line ] recover ;
 
 : read-request-line ( request -- request )
     read-?crlf [ dup "" = ] [ drop read-?crlf ] while
-    parse-request-line first3
-    [ >>method ] [ >url check-absolute >>url ] [ >>version ] tri* ;
+    parse-request-line-safe first3
+    [ >>method ] [ >url dup check-absolute >>url ] [ >>version ] tri* ;
 
 : read-request-header ( request -- request )
     read-header >>header ;
