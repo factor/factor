@@ -1,6 +1,6 @@
-USING: kernel furnace.actions validators
-tools.test math math.parser multiline namespaces http
-io.streams.string http.server sequences splitting accessors ;
+USING: kernel furnace.actions validators tools.test math math.parser
+multiline namespaces http io.streams.string http.server http.server.requests
+sequences splitting accessors ;
 IN: furnace.actions.tests
 
 <action>
