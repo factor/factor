@@ -1,5 +1,5 @@
-USING: accessors assocs http http.server http.server.requests
-io.streams.limited io.streams.string kernel multiline namespaces sequences
+USING: accessors assocs continuations http http.server http.server.requests
+io.streams.limited io.streams.string kernel multiline namespaces peg sequences
 splitting tools.test urls ;
 IN: http.server.requests.tests
 
@@ -97,6 +97,42 @@ hello
 } [
     test-multipart/form-data string>request post-data>> params>> "text" of
     [ filename>> ] [ headers>> ] bi
+] unit-test
+
+! Error handling
+! If the incoming request is not valid, read-request should throw an
+! appropriate error.
+STRING: test-multipart/form-data-missing-boundary
+POST / HTTP/1.1
+Accept: */*
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Content-Length: 151
+Content-Type: multipart/form-data; abcd
+Host: localhost:8000
+User-Agent: HTTPie/0.9.0-dev
+
+--768de80194d942619886d23f1337aa15
+Content-Disposition: form-data; name="text"; filename="upload.txt"
+
+hello
+--768de80194d942619886d23f1337aa15--
+
+;
+{ t } [
+    [
+        test-multipart/form-data-missing-boundary string>request
+    ] [ no-boundary? ] recover
+] unit-test
+
+! Relative urls are invalid.
+{ "foo" } [
+    [ "GET foo HTTP/1.1" string>request ] [ path>> ] recover
+] unit-test
+
+! Empty request lines
+{ t } [
+    [ "" string>request ] [ parse-error>> parse-error? ] recover
 ] unit-test
 
 ! RFC 2616: Section 4.1
