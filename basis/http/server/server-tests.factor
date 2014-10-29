@@ -1,4 +1,4 @@
-USING: accessors continuations http http.server
+USING: accessors assocs continuations http http.server
 io.encodings.utf8 io.encodings.binary io.streams.string kernel
 math peg sequences tools.test urls ;
 IN: http.server.tests
@@ -28,7 +28,6 @@ IN: http.server.tests
     <response>
     unparse-content-type
 ] unit-test
-
 
 ! RFC 2616: Section 19.3
 ! The line terminator for message-header fields is the sequence CRLF.

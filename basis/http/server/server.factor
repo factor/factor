@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences arrays namespaces splitting
 vocabs.loader destructors assocs debugger continuations
-combinators combinators.short-circuit vocabs.refresh tools.time math math.parser
+combinators combinators.short-circuit vocabs.refresh tools.time math
 present vectors hashtables
 io
 io.sockets
@@ -18,10 +18,10 @@ io.streams.throwing
 io.servers
 io.timeouts
 io.crlf
-fry logging logging.insomniac calendar urls urls.encoding
+fry logging logging.insomniac calendar urls
 unicode.categories
 http
-http.parsers
+http.server.requests
 http.server.responses
 http.server.remapping
 html.templates
@@ -32,73 +32,7 @@ math.order
 peg
 xml.writer
 vocabs ;
-FROM: mime.multipart => parse-multipart ;
 IN: http.server
-
-: check-absolute ( url -- url )
-    dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
-
-: read-request-line ( request -- request )
-    read-?crlf [ dup "" = ] [ drop read-?crlf ] while
-    parse-request-line first3
-    [ >>method ] [ >url check-absolute >>url ] [ >>version ] tri* ;
-
-: read-request-header ( request -- request )
-    read-header >>header ;
-
-ERROR: no-boundary ;
-
-: parse-multipart-form-data ( string -- separator )
-    ";" split1 nip
-    "=" split1 nip [ no-boundary ] unless* ;
-
-SYMBOL: request-limit
-
-request-limit [ 64 1024 * ] initialize
-
-SYMBOL: upload-limit
-
-upload-limit [ 200,000,000 ] initialize
-
-: read-multipart-data ( request -- mime-parts )
-    [ "content-type" header ]
-    [ "content-length" header string>number ] bi
-    unlimited-input
-    upload-limit get [ min ] when* limited-input
-    binary decode-input
-    parse-multipart-form-data parse-multipart ;
-
-: read-content ( request -- bytes )
-    "content-length" header string>number read ;
-
-: parse-content ( request content-type -- post-data )
-    [ <post-data> swap ] keep {
-        { "multipart/form-data" [ read-multipart-data >>params ] }
-        { "application/x-www-form-urlencoded" [ read-content query>assoc >>params ] }
-        [ drop read-content >>data ]
-    } case ;
-
-: read-post-data ( request -- request )
-    dup method>> "POST" = [
-        dup dup "content-type" header
-        ";" split1 drop parse-content >>post-data
-    ] when ;
-
-: extract-host ( request -- request )
-    [ ] [ url>> ] [ "host" header parse-host ] tri
-    [ >>host ] [ >>port ] bi*
-    drop ;
-
-: extract-cookies ( request -- request )
-    dup "cookie" header [ parse-cookie >>cookies ] when* ;
-
-: read-request ( -- request )
-    <request>
-    read-request-line
-    read-request-header
-    read-post-data
-    extract-host
-    extract-cookies ;
 
 GENERIC: write-response ( response -- )
 
@@ -285,6 +219,10 @@ LOG: httpd-benchmark DEBUG
     ] [ call ] if ; inline
 
 TUPLE: http-server < threaded-server ;
+
+SYMBOL: request-limit
+
+request-limit [ 64 1024 * ] initialize
 
 : handle-client-error ( error -- )
     dup { [ parse-error? ] [ got>> empty? ] } 1&& [ drop ] [ rethrow ] if ;
