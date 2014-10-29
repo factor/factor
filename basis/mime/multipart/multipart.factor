@@ -44,9 +44,6 @@ ERROR: end-of-stream multipart ;
     [ '[ _ B{ } append-as ] change-bytes ]
     [ t >>end-of-stream? ] if* ;
 
-: maybe-fill-bytes ( multipart -- multipart )
-    dup bytes>> length 256 < [ fill-bytes ] when ;
-
 : split-bytes ( bytes separator -- leftover-bytes safe-to-dump )
     dupd [ length ] bi@ 1 - - short cut-slice swap ;
 
@@ -68,7 +65,6 @@ ERROR: end-of-stream multipart ;
     [ dump-until-separator ] with-string-writer ;
 
 : read-header ( multipart -- multipart )
-    maybe-fill-bytes
     dup bytes>> "--\r\n" sequence= [
         t >>end-of-stream?
     ] [
