@@ -1,6 +1,6 @@
 USING: accessors assocs continuations http http.client http.client.private
 http.server http.server.requests io.streams.limited io.streams.string kernel
-multiline namespaces peg sequences splitting tools.test urls ;
+math math.parser multiline namespaces peg sequences splitting tools.test urls ;
 IN: http.server.requests.tests
 
 : normalize-nl ( str -- str' )
@@ -116,6 +116,16 @@ hello
     [ invalid-content-length? ]
     [ content-length>> -1234 = ] bi and
 ] must-fail-with
+
+! And too big
+[
+    { { "foo" "bar" } } "localhost" <post-request> request>string
+    "7" upload-limit get 1 + number>string replace string>request
+] [
+    [ invalid-content-length? ]
+    [ content-length>> upload-limit get 1 + = ] bi and
+] must-fail-with
+
 
 ! RFC 2616: Section 4.1
 ! In the interest of robustness, servers SHOULD ignore any empty
