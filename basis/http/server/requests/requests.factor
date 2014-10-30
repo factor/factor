@@ -1,5 +1,5 @@
 USING: accessors combinators continuations http http.parsers io io.crlf
-io.encodings io.encodings.binary io.streams.limited kernel math.order
+io.encodings io.encodings.binary io.streams.limited kernel math math.order
 math.parser namespaces sequences splitting urls urls.encoding ;
 FROM: mime.multipart => parse-multipart ;
 IN: http.server.requests
@@ -9,6 +9,10 @@ ERROR: request-error ;
 ERROR: no-boundary < request-error ;
 
 ERROR: invalid-path < request-error path ;
+
+ERROR: invalid-content-length < request-error content-length ;
+
+ERROR: content-length-missing < request-error ;
 
 ERROR: bad-request-line < request-error parse-error ;
 
@@ -34,22 +38,28 @@ upload-limit [ 200,000,000 ] initialize
     ";" split1 nip
     "=" split1 nip [ no-boundary ] unless* ;
 
-: read-multipart-data ( request -- mime-parts )
-    [ "content-type" header ]
-    [ "content-length" header string>number ] bi
-    unlimited-input
-    upload-limit get [ min ] when* limited-input
-    binary decode-input
-    parse-multipart-form-data parse-multipart ;
+: maybe-limit-input ( content-length -- )
+    unlimited-input upload-limit get [ min ] when* limited-input ;
 
-: read-content ( request -- bytes )
-    "content-length" header string>number read ;
+: read-multipart-data ( request content-length -- mime-parts )
+    maybe-limit-input binary decode-input
+    "content-type" header parse-multipart-form-data parse-multipart ;
+
+: parse-content-length-safe ( request -- content-length )
+    "content-length" header [
+        dup string>number [
+            nip dup 0 >= [ invalid-content-length ] unless
+        ] [ invalid-content-length ] if*
+    ] [ content-length-missing ] if* ;
 
 : parse-content ( request content-type -- post-data )
-    [ <post-data> swap ] keep {
+    dup <post-data> -rot over parse-content-length-safe swap
+    {
         { "multipart/form-data" [ read-multipart-data >>params ] }
-        { "application/x-www-form-urlencoded" [ read-content query>assoc >>params ] }
-        [ drop read-content >>data ]
+        { "application/x-www-form-urlencoded" [
+            nip read query>assoc >>params
+        ] }
+        [ drop nip read >>data ]
     } case ;
 
 : read-post-data ( request -- request )

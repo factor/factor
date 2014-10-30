@@ -1,73 +1,37 @@
-USING: accessors assocs continuations http http.server http.server.requests
-io.streams.limited io.streams.string kernel multiline namespaces peg sequences
-splitting tools.test urls ;
+USING: accessors assocs continuations http http.client http.client.private
+http.server http.server.requests io.streams.limited io.streams.string kernel
+multiline namespaces peg sequences splitting tools.test urls ;
 IN: http.server.requests.tests
 
 : normalize-nl ( str -- str' )
     "\n" "\r\n" replace ;
 
+: request>string ( request -- string )
+    [ write-request ] with-string-writer ;
+
 : string>request ( str -- request )
-    normalize-nl
     [ request-limit get limited-input read-request ] with-string-reader ;
 
 ! POST requests
-STRING: test-post-no-content-type
-POST / HTTP/1.1
-connection: close
-host: 127.0.0.1:55532
-user-agent: Factor http.client
-content-length: 7
-
-foo=bar
-;
 { "foo=bar" "7" } [
-    test-post-no-content-type string>request
+    "foo=bar" "localhost" <post-request> request>string string>request
     [ post-data>> data>> ] [ header>> "content-length" of ] bi
 ] unit-test
 
-STRING: test-post-0-content-length
-POST / HTTP/1.1
-connection: close
-host: 127.0.0.1:55532
-user-agent: Factor http.client
-content-length: 0
-
-
-;
 { f "0" } [
-    test-post-0-content-length string>request
+    "" "localhost" <post-request> request>string string>request
     [ post-data>> data>> ] [ header>> "content-length" of ] bi
 ] unit-test
 
-! Should work no problem.
-STRING: test-post-wrong-content-length
-POST / HTTP/1.1
-connection: close
-host: 127.0.0.1:55532
-user-agent: Factor http.client
-Content-Type: application/x-www-form-urlencoded; charset=utf-8
-content-length: 190
-
-foo=bar
-;
+! Incorrect content-length works fine
 { H{ { "foo" "bar" } } } [
-    test-post-wrong-content-length string>request post-data>> params>>
+    { { "foo" "bar" } } "localhost" <post-request> request>string
+    "7" "190" replace string>request post-data>> params>>
 ] unit-test
 
-STRING: test-post-urlencoded
-POST / HTTP/1.1
-Accept: */*
-Accept-Encoding: gzip, deflate
-Connection: keep-alive
-Content-Length: 15
-Content-Type: application/x-www-form-urlencoded; charset=utf-8
-Host: news.ycombinator.com
-User-Agent: HTTPie/0.9.0-dev
-
-name=John+Smith
-;
 { H{ { "name" "John Smith" } } } [
-    test-post-urlencoded string>request post-data>> params>>
+    { { "name" "John Smith" } } "localhost" <post-request> request>string
+    string>request post-data>> params>>
 ] unit-test
 
 ! multipart/form-data
@@ -95,8 +59,8 @@ hello
           "form-data; name=\"text\"; filename=\"upload.txt\"" }
     }
 } [
-    test-multipart/form-data string>request post-data>> params>> "text" of
-    [ filename>> ] [ headers>> ] bi
+    test-multipart/form-data normalize-nl string>request
+    post-data>> params>> "text" of [ filename>> ] [ headers>> ] bi
 ] unit-test
 
 ! Error handling
@@ -119,21 +83,39 @@ hello
 --768de80194d942619886d23f1337aa15--
 
 ;
-{ t } [
-    [
-        test-multipart/form-data-missing-boundary string>request
-    ] [ no-boundary? ] recover
-] unit-test
+[ test-multipart/form-data-missing-boundary string>request ]
+[ no-boundary? ] must-fail-with
 
 ! Relative urls are invalid.
-{ "foo" } [
-    [ "GET foo HTTP/1.1" string>request ] [ path>> ] recover
-] unit-test
+[ "GET foo HTTP/1.1" string>request ] [ path>> "foo" = ] must-fail-with
 
 ! Empty request lines
-{ t } [
-    [ "" string>request ] [ parse-error>> parse-error? ] recover
-] unit-test
+[ "" string>request ] [ parse-error>> parse-error? ] must-fail-with
+
+! Missing content-length is probably not ok. It's plausible
+! transfer-length could replace it, but we don't handle it atm anyway.
+[
+    { { "foo" "bar" } } "localhost" <post-request> request>string
+    "content-length" "foo" replace string>request
+] [ content-length-missing? ] must-fail-with
+
+! Non-numeric content-length is ofc crap.
+[
+    { { "foo" "bar" } } "localhost" <post-request> request>string
+    "7" "i am not a number!" replace string>request
+] [
+    [ invalid-content-length? ]
+    [ content-length>> "i am not a number!" = ] bi and
+] must-fail-with
+
+! Negative is it too.
+[
+    { { "foo" "bar" } } "localhost" <post-request> request>string
+    "7" "-1234" replace string>request
+] [
+    [ invalid-content-length? ]
+    [ content-length>> -1234 = ] bi and
+] must-fail-with
 
 ! RFC 2616: Section 4.1
 ! In the interest of robustness, servers SHOULD ignore any empty
