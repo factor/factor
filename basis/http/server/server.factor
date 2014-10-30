@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences arrays namespaces splitting
 vocabs.loader destructors assocs debugger continuations
-combinators combinators.short-circuit vocabs.refresh tools.time math
-present vectors hashtables
+combinators combinators.short-circuit vocabs.refresh
+tools.time math present vectors hashtables
 io
 io.sockets
 io.sockets.secure
@@ -29,7 +29,6 @@ html.streams
 html
 mime.types
 math.order
-peg
 xml.writer
 vocabs ;
 IN: http.server
@@ -224,9 +223,13 @@ SYMBOL: request-limit
 
 request-limit [ 64 1024 * ] initialize
 
+LOG: httpd-bad-request NOTICE
+
 : handle-client-error ( error -- )
-    dup { [ bad-request-line? ] [ parse-error>> got>> empty? ] } 1&&
-    [ drop ] [ rethrow ] if ;
+    dup request-error? [
+        dup { [ bad-request-line? ] [ parse-error>> got>> empty? ] } 1&&
+        [ drop ] [ httpd-bad-request <400> write-response ] if
+    ] [ rethrow ] if ;
 
 M: http-server handle-client*
     drop [
