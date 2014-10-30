@@ -14,7 +14,7 @@ IN: graphs
 PRIVATE>
 
 : add-vertex ( vertex edges graph -- )
-    [ [ nest dupd set-at ] curry with each ] if-graph ; inline
+    [ [ nest conjoin ] curry with each ] if-graph ; inline
 
 : add-vertex* ( vertex edges graph -- )
     [
