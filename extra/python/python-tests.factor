@@ -154,8 +154,14 @@ IN: python
 ] py-test
 
 ! CFunctions
-{ f } [
-    1234 <alien> <py-cfunction> "__doc__" getattr py>
+{ t } [
+    1234 <alien> "foo" f <PyMethodDef>
+    ml_flags>> METH_VARARGS METH_KEYWORDS bitor =
+] unit-test
+
+{ f 3 } [
+    1234 <alien> <py-cfunction>
+    [ "__doc__" getattr py> ] [ PyCFunction_GetFlags ] bi
 ] py-test
 
 { "cfunction" } [
@@ -168,3 +174,23 @@ IN: python
 { 3 } [
     1234 <alien> <py-cfunction> drop always-destructors get length
 ] py-test
+
+! Callbacks
+: py-map ( -- alien )
+    "__builtin__" py-import "map" getattr ;
+
+: py-map-call ( alien-cb -- seq )
+    [
+        <py-cfunction> py-map swap { 1 2 } >py 2array array>py-tuple f
+        call-object-full
+    ] with-callback py> ;
+
+: always-33-fun ( -- alien )
+    [ 3drop 33 >py ] PyCallback ;
+
+{ V{ 33 33 } } [ always-33-fun py-map-call ] py-test
+
+: id-fun ( -- alien )
+    [ drop nip py> first >py ] PyCallback ;
+
+{ V{ 1 2 } } [ id-fun py-map-call ] py-test
