@@ -8,7 +8,7 @@ IN: io.encodings.utf8
 
 SINGLETON: utf8
 
-<PRIVATE 
+<PRIVATE
 
 : starts-2? ( char -- ? )
     dup [ -6 shift 0b10 number= ] when ; inline

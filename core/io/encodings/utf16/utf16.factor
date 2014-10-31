@@ -40,7 +40,7 @@ ERROR: missing-bom ;
         [ 0b11 bitand quad-be ]
         [ drop ignore ] if
     ] [ double-be ] if ;
-    
+
 M: utf16be decode-char
     drop dup stream-read1 dup [ begin-utf16be ] when nip ;
 
