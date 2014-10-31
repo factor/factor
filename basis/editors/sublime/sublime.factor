@@ -12,7 +12,7 @@ HOOK: find-sublime-path os ( -- path )
 M: object find-sublime-path "sublime" ;
 
 M: macosx find-sublime-path
-    "com.sublimetext.2" find-native-bundle [
+    { "com.sublimetext.3" "com.sublimetext.2" } [ find-native-bundle ] find nip [
         "Contents/SharedSupport/bin/subl" append-path
     ] [
         f
