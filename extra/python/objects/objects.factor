@@ -1,6 +1,6 @@
-USING: accessors alien.c-types alien.data alien.libraries classes.struct
-io.encodings.ascii io.encodings.utf8 kernel libc math python.errors
-python.ffi ;
+USING: accessors alien.data alien.libraries classes.struct
+io.encodings.ascii io.encodings.utf8 kernel libc literals
+python.errors python.ffi ;
 IN: python.objects
 
 ! The None object
@@ -74,7 +74,7 @@ IN: python.objects
     swap [ utf8 malloc-string &free >>ml_doc ] when*
     swap ascii malloc-string &free >>ml_name
     swap >>ml_meth
-    METH_VARARGS METH_KEYWORDS bitor >>ml_flags ;
+    flags{ METH_VARARGS METH_KEYWORDS } >>ml_flags ;
 
 : <py-cfunction> ( alien -- cfunction )
     "cfunction" f <PyMethodDef> f f
