@@ -36,6 +36,7 @@ STRUCT: PyMethodDef
 FUNCTION: PyObject* PyCFunction_NewEx ( PyMethodDef* ml,
                                         PyObject* self,
                                         PyObject* module ) ;
+FUNCTION: int PyCFunction_GetFlags ( PyObject* op ) ;
 
 CALLBACK: PyObject* PyCallback ( PyObject* self,
                                  PyObject* args,
