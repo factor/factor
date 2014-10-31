@@ -1,6 +1,7 @@
 USING: accessors io io.encodings io.encodings.ascii
-io.encodings.utf8 io.files io.streams.byte-array
-io.streams.string kernel namespaces tools.test ;
+io.encodings.string io.encodings.utf8 io.files
+io.streams.byte-array io.streams.string kernel namespaces
+tools.test ;
 IN: io.encodings.tests
 
 [ { } ]
@@ -72,4 +73,17 @@ unit-test
         ascii encode-output
         output-stream get code>>
     ] with-byte-writer drop
+] unit-test
+
+! Bug 1177.
+{
+    "! lol"
+    "! wat"
+    13
+} [
+    "! lol\r\n! wat\r\n" utf8 encode
+    utf8 [
+        readln
+        "\r\n" read-until
+    ] with-byte-reader
 ] unit-test

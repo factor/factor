@@ -161,7 +161,18 @@ M: decoder stream-contents*
         { CHAR: \n [ line-ends\n ] }
     } case ; inline
 
-M: decoder stream-read-until >decoder< decode-until ;
+M: decoder stream-read-until
+    dup cr>> [
+        2dup
+        >decoder< decode-until
+        2dup [ empty? ] [ CHAR: \n = ] bi* and [
+            2drop stream-read-until
+        ] [
+            [ cr- drop ] 2dip
+        ] if
+    ] [
+        >decoder< decode-until
+    ] if ;
 
 M: decoder stream-readln
     "\r\n" over >decoder< decode-until handle-readln ;
