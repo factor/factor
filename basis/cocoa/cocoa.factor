@@ -1,16 +1,17 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cocoa.messages compiler.units core-foundation.bundles
-init io kernel lexer namespaces sequences sets vocabs ;
+hashtables init io kernel lexer namespaces sequences vocabs ;
 FROM: cocoa.messages => selector ;
 IN: cocoa
 
 SYMBOL: sent-messages
 
-sent-messages [ HS{ } clone ] initialize
+: (remember-send) ( selector variable -- )
+    [ dupd ?set-at ] change-global ;
 
 : remember-send ( selector -- )
-    sent-messages get-global adjoin ;
+    sent-messages (remember-send) ;
 
 SYNTAX: -> scan-token dup remember-send suffix! \ send suffix! ;
 
@@ -21,10 +22,8 @@ SYNTAX: SEL:
 
 SYMBOL: super-sent-messages
 
-super-sent-messages [ HS{ } clone ] initialize
-
 : remember-super-send ( selector -- )
-    super-sent-messages get-global adjoin ;
+    super-sent-messages (remember-send) ;
 
 SYNTAX: SUPER-> scan-token dup remember-super-send suffix! \ super-send suffix! ;
 
