@@ -4,6 +4,8 @@ from os import path
 from urllib import urlopen
 from waflib import Errors, Task
 
+cpu_to_bits = {'amd64' : 64, 'i386' : 32, 'x86' : 32, 'x86_64' : 64}
+
 APPNAME = 'factor-lang'
 VERSION = '0.97-git'
 
@@ -99,33 +101,58 @@ def options(ctx):
         '--make-bootstrap-image',
         action = 'store_true',
         default = False,
-        help = 'Generate new boot images (requires Factor to be installed)'
+        help = 'generate new boot images (requires Factor to be installed)'
     )
     ctx.add_option(
         '--debug',
         action = 'store_true',
         default = False,
-        help = 'Build with debugging settings'
+        help = 'build with debugging settings'
     )
     ctx.add_option(
         '--debug-gc-maps',
         action = 'store_true',
         default = False,
-        help = 'Build with gc map debugging'
+        help = 'build with gc map debugging'
     )
-
+    dest_cpus = cpu_to_bits.keys()
+    text = ', '.join(dest_cpus[:-1]) + ' or ' + dest_cpus[-1]
+    ctx.add_option(
+        '--dest-cpu',
+        type = 'string',
+        default = '',
+        help = 'cpu target (gcc only), one of: %s' % text
+    )
 
 def configure(ctx):
     ctx.load('compiler_c compiler_cxx')
     ctx.check(features='cxx cxxprogram', cflags=['-Wall'])
     env = ctx.env
     dest_os = env.DEST_OS
-    bits = get_bits(ctx)
-    opts = ctx.options
 
+    # Handle all options first
+    opts = ctx.options
+    if opts.dest_cpu:
+        env.DEST_CPU = opts.dest_cpu
     if opts.make_bootstrap_image:
         ctx.find_program(APPNAME)
     ctx.env.MAKE_BOOTSTRAP_IMAGE = opts.make_bootstrap_image
+
+    pf = opts.prefix
+    if dest_os == 'win32':
+        pf = pf.replace('\\', '\\\\')
+    ctx.define('INSTALL_PREFIX', pf)
+    if opts.debug:
+        ctx.define('FACTOR_DEBUG', 1)
+        if cxx == 'msvc':
+            env.CXXFLAGS += ['/Zi']
+            env.LINKFLAGS += ['/DEBUG']
+        elif cxx == 'g++':
+            env.CXXFLAGS += ['-g']
+    if opts.debug_gc_maps:
+        ctx.define('DEBUG_GC_MAPS', 1)
+
+    bits = get_bits(ctx)
 
     cxx = ctx.env.COMPILER_CXX
     if dest_os == 'win32':
@@ -154,38 +181,11 @@ def configure(ctx):
             lib = 'rt', uselib_store = 'rt'
         )
         ctx.check_cfg(atleast_pkgconfig_version='0.0.0')
-        ctx.check_cfg(
-            package = 'gtk+-2.0',
-            uselib_store = 'gtk',
-            atleast_version = '2.18.0',
-            args = '--cflags --libs',
-            mandatory = True
-        )
-        ctx.check_cfg(
-            package = 'gtkglext-1.0',
-            uselib_store = 'gtkglext',
-            atleast_version = '1.0.0',
-            args = '--cflags --libs',
-            mandatory = True
-        )
 
         env.CXXFLAGS += ['-O3', '-fomit-frame-pointer']
-        if bits == 64:
-            env.CXXFLAGS += ['-m64']
+        for lst in ('CFLAGS', 'CXXFLAGS', 'LINKFLAGS'):
+            env[lst] += ['-m%d' % bits]
         env.LINKFLAGS += ['-Wl,--no-as-needed', '-Wl,--export-dynamic']
-    pf = opts.prefix
-    if dest_os == 'win32':
-        pf = pf.replace('\\', '\\\\')
-    ctx.define('INSTALL_PREFIX', pf)
-    if opts.debug:
-        ctx.define('FACTOR_DEBUG', 1)
-        if cxx == 'msvc':
-            env.CXXFLAGS += ['/Zi']
-            env.LINKFLAGS += ['/DEBUG']
-        elif cxx == 'g++':
-            env.CXXFLAGS += ['-g']
-    if opts.debug_gc_maps:
-        ctx.define('DEBUG_GC_MAPS', 1)
 
 def download_file(self):
     gen = self.generator
@@ -207,8 +207,7 @@ def download_file(self):
     return
 
 def get_bits(ctx):
-    types = {'amd64' : 64, 'i386' : 32, 'x86' : 32, 'x86_64' : 64}
-    return types[ctx.env.DEST_CPU]
+    return cpu_to_bits[ctx.env.DEST_CPU]
 
 def build_msi(ctx, bits, image_target):
     # Download all dlls needed for the build
