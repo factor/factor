@@ -30,7 +30,7 @@ PREDICATE: writer-method < method "writing" word-prop >boolean ;
 
 GENERIC# reader-quot 1 ( class slot-spec -- quot )
 
-M: object reader-quot 
+M: object reader-quot
     nip [
         dup offset>> ,
         \ slot ,
