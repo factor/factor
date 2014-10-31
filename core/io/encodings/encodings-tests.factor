@@ -87,3 +87,15 @@ unit-test
         "\r\n" read-until
     ] with-byte-reader
 ] unit-test
+
+{
+    "! lol"
+    "! wa"
+    116
+} [
+    "! lol\r\n! wat\r\n" utf8 encode
+    utf8 [
+        readln
+        "t" read-until
+    ] with-byte-reader
+] unit-test
