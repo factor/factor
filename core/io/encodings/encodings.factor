@@ -163,13 +163,18 @@ M: decoder stream-contents*
 
 M: decoder stream-read-until
     dup cr>> [
-        2dup
+        dup cr- 2dup
         >decoder< decode-until
-        2dup [ empty? ] [ CHAR: \n = ] bi* and [
-            2drop stream-read-until
+        over [
+            dup CHAR: \n = [
+                2drop stream-read-until
+            ] [
+                [ 2drop ] 2dip
+            ] if
         ] [
-            [ cr- drop ] 2dip
-        ] if
+            first-unsafe CHAR: \n = [ [ rest ] dip ] when
+            [ 2drop ] 2dip
+        ] if-empty
     ] [
         >decoder< decode-until
     ] if ;
