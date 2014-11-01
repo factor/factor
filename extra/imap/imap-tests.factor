@@ -2,7 +2,7 @@ USING: accessors arrays assocs calendar calendar.format
 combinators continuations destructors formatting fry grouping.extras imap
 imap.private io.streams.duplex kernel math math.parser math.ranges
 math.statistics namespaces random sequences sets sorting
-splitting strings system tools.test ;
+splitting strings system tools.test memoize combinators.smart ;
 FROM: pcre => findall ;
 IN: imap.tests
 
@@ -37,8 +37,13 @@ ERROR: no-imap-test-host ;
 : base-folder ( -- s )
     os name>> cpu name>> "-" glue ;
 
+MEMO: my-random ( -- str )
+    10000 random number>string ;
+
 : test-folder ( s -- s )
-    [ base-folder "/" ] dip 3append ;
+    '[
+        base-folder "/" my-random "/" _
+    ] "" append-outputs-as ;
 
 [ t ] [
     get-test-host <imap4ssl> [ duplex-stream? ] with-disposal
@@ -60,6 +65,12 @@ ERROR: no-imap-test-host ;
 
 ! Try to reset test folder before starting tests
 [ ] [
+    [ "foo/bar/baz/日本語" test-folder delete-folder ] ignore-errors
+    [ "foo/bar/baz/boo" test-folder delete-folder ] ignore-errors
+    [ "foo/bar/baz" test-folder delete-folder ] ignore-errors
+    [ "foo/bar" test-folder delete-folder ] ignore-errors
+    [ "foo" test-folder delete-folder ] ignore-errors
+    [ "örjan" test-folder delete-folder ] ignore-errors
     [ base-folder delete-folder ] ignore-errors
 ] imap-test
 
