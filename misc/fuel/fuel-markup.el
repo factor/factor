@@ -579,11 +579,17 @@
   (fuel-markup--print (cdr elem))
   (fuel-markup--insert-newline))
 
+(defun fuel-markup--stack-effect (e)
+  (let* ((in (mapconcat 'identity (nth 1 e) " "))
+         (out (mapconcat 'identity (nth 2 e) " "))
+         (str (format "( %s -- %s )" in out)))
+    (fuel-markup--snippet (list '$snippet str))))
+
 (defun fuel-markup--quotation (e)
   (insert "a ")
   (fuel-markup--link (list '$link 'quotation 'quotation 'word))
   (insert " with stack effect ")
-  (fuel-markup--snippet (list '$snippet (nth 1 e))))
+  (fuel-markup--stack-effect (nth 1 e)))
 
 (defun fuel-markup--warning (e)
   (fuel-markup--elem-with-heading e "Warning"))
