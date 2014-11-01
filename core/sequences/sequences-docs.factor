@@ -522,6 +522,20 @@ HELP: last-index-from
 HELP: member?
 { $values { "elt" object } { "seq" sequence } { "?" boolean } }
 { $description "Tests if the sequence contains an element equal to the object." }
+{ $examples
+    "Is a letter in a string:"
+    { $example
+        "USING: sequences prettyprint ;"
+        """CHAR: a "abc" member? ."""
+        "t"
+    } $nl
+    "Is a number in a sequence:"
+    { $example
+        "USING: sequences prettyprint ;"
+        "1 { 1 2 3 } member? ."
+        "t"
+    }
+}
 { $notes "This word uses equality comparison (" { $link = } ")." } ;
 
 HELP: member-eq?
