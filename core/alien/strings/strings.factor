@@ -5,7 +5,6 @@ io.encodings io.encodings.ascii io.encodings.utf16n
 io.encodings.utf8 io.streams.memory kernel kernel.private math
 namespaces sequences sequences.private strings strings.private
 system system.private ;
-USE: io.streams.byte-array ! for windows, do not delete!
 IN: alien.strings
 
 GENERIC# alien>string 1 ( c-ptr encoding -- string/f )
