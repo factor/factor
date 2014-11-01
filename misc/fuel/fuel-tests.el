@@ -20,6 +20,7 @@
 (add-to-list 'load-path (file-name-directory load-file-name))
 
 (require 'ert)
+(require 'fuel-help)
 (require 'fuel-markup)
 
 ;; fuel-markup
@@ -33,3 +34,19 @@
                (fuel-markup--quotation quot)
                (buffer-string))
              "a quotation with stack effect ( args kw -- ret )"))))
+
+;; fuel-help
+(ert-deftest find-in-w/vocabulary ()
+  (should (equal
+           (with-temp-buffer
+             (insert "Vocabulary: imap")
+             (fuel-help--find-in))
+           "imap")))
+
+(ert-deftest find-in-w/buffer-link ()
+  (should (equal
+           (with-temp-buffer
+             (setq fuel-help--buffer-link '("foob" "foob" vocab))
+             (insert "Help page contents")
+             (fuel-help--find-in))
+           "foob")))

@@ -343,9 +343,15 @@ With prefix, the current page is deleted from history."
 
 ;;; IN: support
 
+(defun fuel-help--find-in-buffer-link ()
+  (when (and fuel-help--buffer-link
+             (equal (nth 2 fuel-help--buffer-link) 'vocab))
+    (car fuel-help--buffer-link)))
+
 (defun fuel-help--find-in ()
   (save-excursion
     (or (factor-find-in)
+        (fuel-help--find-in-buffer-link)
         (and (goto-char (point-min))
              (re-search-forward "Vocabulary: \\(.+\\)$" nil t)
              (match-string-no-properties 1)))))
