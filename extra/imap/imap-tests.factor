@@ -1,7 +1,7 @@
 USING: accessors arrays assocs calendar calendar.format
 combinators continuations destructors formatting fry grouping.extras imap
 imap.private io.streams.duplex kernel math math.parser math.ranges
-math.statistics namespaces random sequences sets sorting
+math.statistics namespaces random sequences sets sorting uuid
 splitting strings system tools.test memoize combinators.smart ;
 FROM: pcre => findall ;
 IN: imap.tests
@@ -37,12 +37,12 @@ ERROR: no-imap-test-host ;
 : base-folder ( -- s )
     os name>> cpu name>> "-" glue ;
 
-MEMO: my-random ( -- str )
-    10000 random number>string ;
+MEMO: my-uuid ( -- str )
+    uuid1 ;
 
 : test-folder ( s -- s )
     '[
-        base-folder "/" my-random "/" _
+        base-folder "/" my-uuid "/" _
     ] "" append-outputs-as ;
 
 [ t ] [
