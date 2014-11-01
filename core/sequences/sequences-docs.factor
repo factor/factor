@@ -532,8 +532,8 @@ HELP: member?
     "Is a number in a sequence:"
     { $example
         "USING: sequences prettyprint ;"
-        "1 { 1 2 3 } member? ."
-        "t"
+        "4 { 1 2 3 } member? ."
+        "f"
     }
 }
 { $notes "This word uses equality comparison (" { $link = } ")." } ;
