@@ -25,7 +25,7 @@ ERROR: checksum-error header ;
 : read-c-string ( n -- str )
     read [ zero? ] trim-tail "" like ;
 
-: read-tar-header ( -- tar-header )
+: read-tar-header ( -- header )
     tar-header new
         100 read-c-string >>name
         8 read-c-string trim-string oct> >>mode
@@ -47,7 +47,7 @@ ERROR: checksum-error header ;
 TYPED: checksum-header ( seq: byte-array -- n )
     148 cut-slice 8 tail-slice [ 0 [ + ] reduce ] bi@ + 256 + >fixnum ;
 
-: read-data-blocks ( tar-header -- )
+: read-data-blocks ( header -- )
     dup size>> 0 > [
         block-size read [
             over size>> dup block-size <= [
@@ -62,9 +62,9 @@ TYPED: checksum-header ( seq: byte-array -- n )
         ] if*
     ] [
         drop
-    ] if ;
+    ] if ; inline recursive
 
-: parse-tar-header ( seq -- obj )
+: parse-tar-header ( seq -- header )
     dup checksum-header dup zero-checksum = [
         2drop
         tar-header new
@@ -79,10 +79,10 @@ TYPED: checksum-header ( seq: byte-array -- n )
 
 ERROR: unknown-typeflag ch ;
 
-M: unknown-typeflag summary ( obj -- str )
+M: unknown-typeflag summary
     ch>> [ "Unknown typeflag: " ] dip prefix ;
 
-: read/write-blocks ( tar-header path -- )
+: read/write-blocks ( header path -- )
     binary [ read-data-blocks ] with-file-writer ;
 
 : prepend-current-directory ( path -- path' )
