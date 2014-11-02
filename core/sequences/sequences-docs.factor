@@ -645,6 +645,13 @@ HELP: concat-as
 HELP: join
 { $values { "seq" sequence } { "glue" sequence } { "newseq" sequence } }
 { $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }
+{ $examples
+    "Join a list of strings:"
+    { $example "USING: sequences prettyprint ;"
+        """{ "cat" "dog" "ant" } " " join ."""
+        """"cat dog ant""""
+    }
+}
 { $notes "If the " { $snippet "glue" } " sequence is empty, this word calls " { $link concat-as } "." }
 { $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "glue" } "." } ;
 
@@ -652,6 +659,13 @@ HELP: join-as
 { $values { "seq" sequence } { "glue" sequence } { "exemplar" sequence } { "newseq" sequence } }
 { $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }
 { $notes "If the " { $snippet "glue" } " sequence is empty, this word calls " { $link concat-as } "." }
+{ $examples
+    "Join a list of strings as a string buffer:"
+    { $example "USING: sequences prettyprint ;"
+        """{ "a" "b" "c" } "1" SBUF" "join-as ."""
+        """SBUF" a1b1c""""
+    }
+}
 { $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." } ;
 
 { join join-as concat concat-as } related-words
@@ -932,11 +946,23 @@ HELP: tail-slice*
 HELP: head
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of the first " { $snippet "n" } " elements of the input sequence." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 3 4 5 6 7 } 2 head ."
+        "{ 1 2 }"
+    }
+}
 { $errors "Throws an error if the index is out of bounds." } ;
 
 HELP: tail
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "tailseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of the input sequence with the first " { $snippet "n" } " items removed." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 3 4 5 6 7 } 2 tail ."
+        "{ 3 4 5 6 7 }"
+    }
+}
 { $errors "Throws an error if the index is out of bounds." } ;
 
 HELP: but-last
@@ -952,11 +978,23 @@ HELP: rest
 HELP: head*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of all elements of " { $snippet "seq" } " until the " { $snippet "n" } "th element from the end. In other words, it outputs a sequence of the first " { $snippet "l-n" } " elements of the input sequence, where " { $snippet "l" } " is its length." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 3 4 5 6 7 } 2 head* ."
+        "{ 1 2 3 4 5 }"
+    }
+}
 { $errors "Throws an error if the index is out of bounds." } ;
 
 HELP: tail*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "tailseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of the last " { $snippet "n" } " elements of the input sequence." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 3 4 5 6 7 } 2 tail* ."
+        "{ 6 7 }"
+    }
+}
 { $errors "Throws an error if the index is out of bounds." } ;
 
 HELP: shorter?
