@@ -25,8 +25,8 @@ ERROR: checksum-error header ;
 : read-c-string ( n -- str )
     read [ zero? ] trim-tail "" like ;
 
-: read-tar-header ( -- obj )
-    \ tar-header new
+: read-tar-header ( -- tar-header )
+    tar-header new
         100 read-c-string >>name
         8 read-c-string trim-string oct> >>mode
         8 read-c-string trim-string oct> >>uid
@@ -51,7 +51,7 @@ TYPED: checksum-header ( seq: byte-array -- n )
     dup size>> 0 > [
         block-size read [
             over size>> dup block-size <= [
-                head-slice >byte-array write drop
+                head write drop
             ] [
                 drop write
                 [ block-size - ] change-size
@@ -67,7 +67,7 @@ TYPED: checksum-header ( seq: byte-array -- n )
 : parse-tar-header ( seq -- obj )
     dup checksum-header dup zero-checksum = [
         2drop
-        \ tar-header new
+        tar-header new
             0 >>size
             0 >>checksum
     ] [
