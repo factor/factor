@@ -3,7 +3,8 @@
 USING: accessors byte-arrays combinators io io.backend
 io.directories io.encodings.binary io.files io.files.links
 io.pathnames io.streams.byte-array io.streams.string kernel
-math math.parser namespaces sequences strings summary ;
+math math.parser namespaces sequences strings summary
+typed ;
 IN: tar
 
 CONSTANT: zero-checksum 256
@@ -22,7 +23,7 @@ ERROR: checksum-error header ;
 : trim-string ( seq -- newseq ) [ "\0 " member? ] trim ;
 
 : read-c-string ( n -- str/f )
-    read [ zero? ] trim-tail [ f ] when-empty >string ;
+    read [ zero? ] trim-tail "" like ;
 
 : read-tar-header ( -- obj )
     \ tar-header new
@@ -43,8 +44,8 @@ ERROR: checksum-error header ;
         8 read trim-string oct> >>devminor
         155 read-c-string >>prefix ;
 
-: checksum-header ( seq -- n )
-    148 cut-slice 8 tail-slice [ sum ] bi@ + 256 + ;
+TYPED: checksum-header ( seq: byte-array -- n )
+    148 cut-slice 8 tail-slice [ 0 [ + ] reduce ] bi@ + 256 + >fixnum ;
 
 : read-data-blocks ( tar-header -- )
     dup size>> 0 > [
