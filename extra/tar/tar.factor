@@ -20,9 +20,9 @@ linkname magic version uname gname devmajor devminor prefix ;
 
 ERROR: checksum-error header ;
 
-: trim-string ( seq -- newseq ) [ "\0 " member? ] trim ;
+: trim-string ( seq -- newseq ) [ "\0 " member? ] trim-tail ;
 
-: read-c-string ( n -- str/f )
+: read-c-string ( n -- str )
     read [ zero? ] trim-tail "" like ;
 
 : read-tar-header ( -- obj )
