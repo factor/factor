@@ -19,7 +19,7 @@ ERROR: no-word-error name ;
     suffix ;
 
 : <no-word-error> ( name possibilities -- error restarts )
-    [ drop \ no-word-error boa ] [ word-restarts-with-defer ] 2bi ;
+    [ drop no-word-error boa ] [ word-restarts-with-defer ] 2bi ;
 
 TUPLE: manifest
 current-vocab
@@ -89,7 +89,7 @@ PRIVATE>
 TUPLE: no-current-vocab-error ;
 
 : no-current-vocab ( -- vocab )
-    \ no-current-vocab-error boa
+    no-current-vocab-error boa
     { { "Define words in scratchpad vocabulary" "scratchpad" } }
     throw-restarts dup set-current-vocab ;
 
@@ -169,7 +169,7 @@ TUPLE: rename word vocab words ;
 TUPLE: ambiguous-use-error words ;
 
 : <ambiguous-use-error> ( words -- error restarts )
-    [ \ ambiguous-use-error boa ] [ word-restarts ] bi ;
+    [ ambiguous-use-error boa ] [ word-restarts ] bi ;
 
 <PRIVATE
 

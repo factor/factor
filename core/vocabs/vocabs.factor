@@ -17,7 +17,7 @@ SYMBOL: +running+
 SYMBOL: +done+
 
 : <vocab> ( name -- vocab )
-    \ vocab new
+    vocab new
         swap >>name
         H{ } clone >>words ;
 
