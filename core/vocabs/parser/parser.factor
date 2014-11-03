@@ -19,7 +19,7 @@ ERROR: no-word-error name ;
     suffix ;
 
 : <no-word-error> ( name possibilities -- error restarts )
-    [ drop no-word-error boa ] [ word-restarts-with-defer ] 2bi ;
+    [ drop \ no-word-error boa ] [ word-restarts-with-defer ] 2bi ;
 
 TUPLE: manifest
 current-vocab
