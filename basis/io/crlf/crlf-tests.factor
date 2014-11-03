@@ -11,3 +11,6 @@ USING: io.crlf tools.test io.streams.string io ;
 [ f ] [ "" [ read-?crlf ] with-string-reader ] unit-test
 [ "" ] [ "\n" [ read-?crlf ] with-string-reader ] unit-test
 [ "foo" ] [ "foo\n" [ read-?crlf ] with-string-reader ] unit-test
+
+[ "foo\nbar" ] [ "foo\n\rbar" crlf>lf ] unit-test
+[ "foo\r\nbar" ] [ "foo\nbar" lf>crlf ] unit-test

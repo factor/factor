@@ -1,10 +1,8 @@
 USING: accessors assocs continuations http http.client http.client.private
-http.server http.server.requests io.streams.limited io.streams.string kernel
-math math.parser multiline namespaces peg sequences splitting tools.test urls ;
+http.server http.server.requests io.crlf io.streams.limited io.streams.string
+kernel math math.parser multiline namespaces peg sequences splitting
+tools.test urls ;
 IN: http.server.requests.tests
-
-: normalize-nl ( str -- str' )
-    "\n" "\r\n" replace ;
 
 : request>string ( request -- string )
     [ write-request ] with-string-writer ;
@@ -59,7 +57,7 @@ hello
           "form-data; name=\"text\"; filename=\"upload.txt\"" }
     }
 } [
-    test-multipart/form-data normalize-nl string>request
+    test-multipart/form-data lf>crlf string>request
     post-data>> params>> "text" of [ filename>> ] [ headers>> ] bi
 ] unit-test
 
@@ -142,8 +140,7 @@ hello
         { redirects 10 }
     }
 ] [
-    "\r\n\r\n\r\nGET / HTTP/1.0\r\n\r\n"
-    [ read-request ] with-string-reader
+    "\r\n\r\n\r\nGET / HTTP/1.0\r\n\r\n" [ read-request ] with-string-reader
 ] unit-test
 
 ! RFC 2616: Section 19.3
@@ -157,5 +154,5 @@ hello
         "host: 127.0.0.1:55532"
         "user-agent: Factor http.client"
     } [ "\n" join ] [ "\r\n" join ] bi
-    [ [ read-request ] with-string-reader ] same?
+    [ string>request ] same?
 ] unit-test
