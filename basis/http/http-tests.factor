@@ -1,8 +1,8 @@
 USING: destructors http http.server http.server.requests http.client
-http.client.private tools.test multiline fry io.streams.string io.encodings.utf8
-io.encodings.8-bit io.encodings.binary io.encodings.string io.encodings.ascii
-kernel arrays splitting sequences assocs io.sockets db db.sqlite make
-continuations urls hashtables accessors namespaces xml.data
+http.client.private tools.test multiline fry io.streams.string io.crlf
+io.encodings.utf8 io.encodings.8-bit io.encodings.binary io.encodings.string
+io.encodings.ascii kernel arrays splitting sequences assocs io.sockets db
+db.sqlite make continuations urls hashtables accessors namespaces xml.data
 io.encodings.8-bit.latin1 random combinators.short-circuit ;
 IN: http.tests
 
@@ -24,8 +24,6 @@ IN: http.tests
 [ "localhost" ] [ T{ url { protocol "https" } { host "localhost" } { port 443 } } unparse-host ] unit-test
 [ "localhost:8080" ] [ T{ url { protocol "http" } { host "localhost" } { port 8080 } } unparse-host ] unit-test
 [ "localhost:8443" ] [ T{ url { protocol "https" } { host "localhost" } { port 8443 } } unparse-host ] unit-test
-
-: lf>crlf ( string -- string' ) "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
 POST /bar HTTP/1.1
