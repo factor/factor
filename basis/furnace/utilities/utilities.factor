@@ -42,10 +42,10 @@ ERROR: no-such-responder responder ;
     ] when ;
 
 : resolve-word-path ( word -- path/f )
-    where [ first parent-directory but-last ] [ f ] if* ;
+    where [ first parent-directory ] [ f ] if* ;
 
 : resolve-template-path ( pair -- path )
-    [ first2 [ resolve-word-path % ] dip "/" % % ] "" make ;
+    first2 [ resolve-word-path ] dip append-path ;
 
 GENERIC: modify-query ( query responder -- query' )
 
