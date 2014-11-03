@@ -124,7 +124,7 @@ TUPLE: tuple-dispatch-engine echelons ;
 : <tuple-dispatch-engine> ( methods -- engine )
     convert-tuple-inheritance echelon-sort
     [ dupd <echelon-dispatch-engine> ] assoc-map
-    \ tuple-dispatch-engine boa ;
+    tuple-dispatch-engine boa ;
 
 : convert-tuple-methods ( assoc -- assoc' )
     tuple bootstrap-word
