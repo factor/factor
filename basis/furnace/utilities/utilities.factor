@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make assocs sequences kernel classes splitting
+USING: definitions namespaces make assocs sequences kernel classes splitting
 words vocabs.loader accessors strings combinators arrays
 continuations present fry urls http http.server xml.syntax xml.writer
-http.server.redirection http.server.remapping ;
+http.server.redirection http.server.remapping io.pathnames ;
 IN: furnace.utilities
 
 : word>string ( word -- string )
@@ -41,13 +41,11 @@ ERROR: no-such-responder responder ;
         ] "" make
     ] when ;
 
-: vocab-path ( vocab -- path )
-    dup vocab-dir vocab-append-path ;
+: resolve-word-path ( word -- path/f )
+    where [ first parent-directory but-last ] [ f ] if* ;
 
 : resolve-template-path ( pair -- path )
-    [
-        first2 [ vocabulary>> vocab-path % ] [ "/" % % ] bi*
-    ] "" make ;
+    [ first2 [ resolve-word-path % ] dip "/" % % ] "" make ;
 
 GENERIC: modify-query ( query responder -- query' )
 
