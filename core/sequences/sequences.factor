@@ -108,7 +108,7 @@ ERROR: non-negative-integer-expected n ;
 
 : iota ( n -- iota )
     dup 0 < [ non-negative-integer-expected ] when
-    \ iota-tuple boa ; inline
+    iota-tuple boa ; inline
 
 M: iota-tuple length n>> ; inline
 M: iota-tuple nth-unsafe drop ; inline

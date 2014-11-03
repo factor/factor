@@ -16,11 +16,9 @@ BUILTIN: word
 ! also looking for classes
 : word ( -- * ) "dummy word" throw ;
 
-SYMBOL: last-word-symbol
+: last-word ( -- word ) \ last-word get-global ;
 
-: last-word ( -- word ) \ last-word-symbol get-global ;
-
-: set-last-word ( word -- ) \ last-word-symbol set-global ;
+: set-last-word ( word -- ) \ last-word set-global ;
 
 M: word execute (execute) ;
 
@@ -52,7 +50,8 @@ M: word definition def>> ;
 PRIVATE>
 
 TUPLE: undefined-word word ;
-: undefined ( -- * ) callstack caller \ undefined-word boa throw ;
+
+: undefined ( -- * ) callstack caller undefined-word boa throw ;
 
 : undefined-def ( -- quot )
     #! 'f' inhibits tail call optimization in non-optimizing
