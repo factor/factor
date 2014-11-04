@@ -53,3 +53,5 @@ $nl
 { $notes "Sometimes the embedded python interpreter can't find or finds the wrong load path to it's module library. To counteract that problem it is recommended that the " { $snippet "PYTHONHOME" } " environment variable is set before " { $link py-initialize } " is called. E.g:" }
 { $code "\"C:/python27-64bit/\" \"PYTHONHOME\" set-os-env" }
 { $warning "All code that calls Python words should always be wrapped in a " { $link with-destructors } " context. The reason is that the words add references to Pythons internal memory heap which are removed when the destructors trigger." } ;
+
+ABOUT: "python"
