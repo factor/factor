@@ -1,11 +1,12 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
-combinators destructors forestdb.ffi fry io.pathnames kernel
-libc namespaces sequences tools.test ;
+combinators destructors forestdb.ffi fry io.files.temp
+io.pathnames kernel libc namespaces sequences tools.test ;
 IN: forestdb.lib
 
-CONSTANT: forestdb-test-path "resource:forestdbs/first.fdb"
+: forestdb-test-path ( -- path )
+    "forestdb-test.fdb" temp-file ;
 
 { "val123" } [
     forestdb-test-path [
