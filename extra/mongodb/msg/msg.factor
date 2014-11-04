@@ -66,13 +66,13 @@ TUPLE: mdb-reply-msg < mdb-msg
     { objects sequence } ;
 
 
-CONSTRUCTOR: mdb-getmore-msg ( collection return# cursor -- mdb-getmore-msg )
+CONSTRUCTOR: <mdb-getmore-msg> mdb-getmore-msg ( collection return# cursor -- mdb-getmore-msg )
     OP_GetMore >>opcode ; inline
 
-CONSTRUCTOR: mdb-delete-msg ( collection selector -- mdb-delete-msg )
+CONSTRUCTOR: <mdb-delete-msg> mdb-delete-msg ( collection selector -- mdb-delete-msg )
     OP_Delete >>opcode ; inline
 
-CONSTRUCTOR: mdb-query-msg ( collection query -- mdb-query-msg )
+CONSTRUCTOR: <mdb-query-msg> mdb-query-msg ( collection query -- mdb-query-msg )
     OP_Query >>opcode ; inline
 
 GENERIC: <mdb-killcursors-msg> ( object -- mdb-killcursors-msg )
@@ -99,8 +99,8 @@ M: assoc <mdb-insert-msg> ( collection assoc -- mdb-insert-msg )
     >>objects OP_Insert >>opcode ;
 
 
-CONSTRUCTOR: mdb-update-msg ( collection selector object -- mdb-update-msg )
+CONSTRUCTOR: <mdb-update-msg> mdb-update-msg ( collection selector object -- mdb-update-msg )
     OP_Update >>opcode ; inline
     
-CONSTRUCTOR: mdb-reply-msg ( -- mdb-reply-msg ) ; inline
+CONSTRUCTOR: <mdb-reply-msg> mdb-reply-msg ( -- mdb-reply-msg ) ; inline
 

@@ -29,7 +29,7 @@ TUPLE: mongo-scoped-code code object ;
 : <mongo-scoped-code> ( code object -- mongo-scoped-code )
     mongo-scoped-code boa ;
 
-CONSTRUCTOR: dbref ( ref id -- dbref ) ;
+CONSTRUCTOR: <dbref> dbref ( ref id -- dbref ) ;
 
 : dbref>assoc ( dbref -- assoc )
     [ <linked-hash> ] dip over

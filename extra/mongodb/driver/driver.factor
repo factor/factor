@@ -18,12 +18,12 @@ TUPLE: mdb-collection
 { size integer }
 { max integer } ;
 
-CONSTRUCTOR: mdb-collection ( name -- collection ) ;
+CONSTRUCTOR: <mdb-collection> mdb-collection ( name -- collection ) ;
 
 TUPLE: index-spec
 { ns string } { name string } { key hashtable } { unique? boolean initial: f } ;
 
-CONSTRUCTOR: index-spec ( ns name key -- index-spec ) ;
+CONSTRUCTOR: <index-spec> index-spec ( ns name key -- index-spec ) ;
 
 M: mdb-pool make-connection
     mdb>> mdb-open ;
