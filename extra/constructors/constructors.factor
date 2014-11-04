@@ -41,7 +41,7 @@ ERROR: unknown-constructor-parameters class effect unknown ;
     create-in dup reset-generic ;
 
 : scan-constructor ( -- word class )
-    scan-word [ name>> "<" ">" surround create-function ] keep ;
+    scan-new-word scan-class ;
 
 : parse-constructor ( -- word class effect def )
     scan-constructor scan-effect ensure-constructor-parameters
@@ -59,13 +59,7 @@ SYNTAX: CONSTRUCTOR:
 : scan-full-input-effect ( -- effect )
     "(" expect scan-rest-input-effect ;
 
-SYNTAX: NAMED-CONSTRUCTOR:
-    scan-new-word scan-word scan-effect define-constructor ;
-    
-SYNTAX: DEFAULT-CONSTRUCTOR:
-    scan-constructor scan-effect define-constructor ;
-
-SYNTAX: CONSTRUCTOR-SYNTAX:
-    scan-word [ name>> "(" append create-reset ] keep
+SYNTAX: SLOT-CONSTRUCTOR:
+    scan-new-word [ name>> "(" append create-reset ] keep
     '[ scan-rest-input-effect in>> _ '[ _ _ slots>boa ] append! ] define-syntax ;
 
