@@ -48,7 +48,7 @@ DEFER: assoc>tuple
 
 TUPLE: cond-value value quot ;
 
-CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
+CONSTRUCTOR: <cond-value> cond-value ( value quot -- cond-value ) ;
 
 : write-mdb-persistent ( value quot -- value' )
    over [ call( tuple -- assoc ) ] dip 

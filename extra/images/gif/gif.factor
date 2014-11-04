@@ -53,7 +53,7 @@ TUPLE: comment-extension
 introducer label comment-data ;
 
 TUPLE: trailer byte ;
-CONSTRUCTOR: trailer ( byte -- obj ) ;
+CONSTRUCTOR: <trailer> trailer ( byte -- obj ) ;
 
 CONSTANT: IMAGE-DESCRIPTOR 0x2c
 ! Extensions

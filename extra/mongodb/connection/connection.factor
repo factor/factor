@@ -13,7 +13,7 @@ TUPLE: mdb-db name username pwd-digest nodes collections ;
 
 TUPLE: mdb-node master? { address inet } remote ;
 
-CONSTRUCTOR: mdb-node ( address master? -- mdb-node ) ;
+CONSTRUCTOR: <mdb-node> mdb-node ( address master? -- mdb-node ) ;
 
 TUPLE: mdb-connection instance node handle remote local buffer ;
 
@@ -22,7 +22,7 @@ TUPLE: mdb-connection instance node handle remote local buffer ;
 
 USE: mongodb.operations
 
-CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
+CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
 
 : check-ok ( result -- errmsg ? )
     [ [ "errmsg" ] dip at ] 

@@ -14,7 +14,7 @@ IN: mongodb.tuple.collection
 
 TUPLE: toid key value ;
 
-CONSTRUCTOR: toid ( value key -- toid ) ;
+CONSTRUCTOR: <toid> toid ( value key -- toid ) ;
 
 FROM: mongodb.tuple => +transient+ +load+ <tuple-index> ;
 
