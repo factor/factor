@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.libraries.finder alien.syntax assocs gobject-introspection
-gobject-introspection.standard-types init kernel pango.ffi
-system vocabs ;
+gobject-introspection.standard-types kernel pango.ffi system
+vocabs ;
 IN: gtk.ffi
 
 <<
@@ -14,12 +14,10 @@ IN: gtk.ffi
 LIBRARY: gtk
 
 <<
-[
-    "gtk" {
-        { linux "gtk-x11-2.0" }
-        { windows "libgtk-win32-2.0-0" }
-    } os of [ find-library cdecl add-library ] [ drop ] if*
-] "find-gtk" add-startup-hook
+"gtk" {
+    { linux "gtk-x11-2.0" }
+    { windows "libgtk-win32-2.0-0" }
+} os of [ find-library cdecl add-library ] [ drop ] if*
 >>
 
 IMPLEMENT-STRUCTS: GtkTreeIter ;
