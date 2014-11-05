@@ -22,6 +22,7 @@
 (require 'ert)
 (require 'fuel-help)
 (require 'fuel-markup)
+(require 'fuel-xref)
 
 ;; fuel-markup
 (ert-deftest print-str ()
@@ -50,3 +51,6 @@
              (insert "Help page contents")
              (fuel-help--find-in))
            "foob")))
+
+(ert-deftest fuel-xref-name ()
+  (should (equal (buffer-name (fuel-xref--buffer)) "*fuel xref*")))
