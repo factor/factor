@@ -48,7 +48,7 @@ PRIVATE>
 
 : callees-xref ( word -- seq ) uses format-xrefs sort-xrefs ;
 
-: apropos-xref ( str -- seq ) words-matching format-xrefs ;
+: apropos-xref ( str -- seq ) words-matching keys format-xrefs ;
 
 : vocab-xref ( vocab -- seq ) words format-xrefs ;
 
