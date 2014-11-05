@@ -5,6 +5,8 @@ alien.libraries.finder alien.syntax classes.struct kernel
 unix.types ;
 IN: forestdb.ffi
 
+! Functions with LIBFDB_API are exported.
+
 << "forestdb" dup find-library cdecl add-library >>
 
 LIBRARY: forestdb
@@ -87,6 +89,7 @@ ENUM: fdb_status
     { FDB_RESULT_IN_USE_BY_COMPACTOR -30 }
     { FDB_RESULT_FAIL -100 } ;
 
+! cmp_fixed and cmp_variable have their own open() functions
 STRUCT: fdb_config
     { chunksize uint16_t }
     { blocksize uint32_t }
@@ -119,6 +122,9 @@ STRUCT: fdb_doc
     { body void* }
     { deleted bool } ;
 
+! filename is a pointer to the handle's filename
+! new_filename is a pointer to the handle's new_file
+
 STRUCT: fdb_info
     { filename char* }
     { new_filename char* }
@@ -128,26 +134,35 @@ STRUCT: fdb_info
     { file_size uint64_t } ;
 
 FUNCTION: fdb_status fdb_init ( fdb_config* config ) ;
+
 FUNCTION: fdb_status fdb_open ( fdb_handle** ptr_handle, c-string filename, fdb_config* fconfig ) ;
 FUNCTION: fdb_status fdb_open_cmp_fixed ( fdb_handle** ptr_handle, c-string filename, fdb_config* fconfig ) ;
 FUNCTION: fdb_status fdb_open_cmp_variable ( fdb_handle** ptr_handle, c-string filename, fdb_config* fconfig ) ;
+
 FUNCTION: fdb_status fdb_set_log_callback ( fdb_handle* handle, fdb_log_callback log_callback, void* ctx_data ) ;
+
+! doc is calloc'd
 FUNCTION: fdb_status fdb_doc_create ( fdb_doc** doc, c-string key, size_t keylen, c-string meta, size_t metalen, c-string body, size_t bodylen ) ;
 FUNCTION: fdb_status fdb_doc_update ( fdb_doc** doc, c-string meta, size_t metalen, c-string body, size_t bodylen ) ;
 FUNCTION: fdb_status fdb_doc_free ( fdb_doc* doc ) ;
+
 FUNCTION: fdb_status fdb_get ( fdb_handle* handle, fdb_doc* doc ) ;
 FUNCTION: fdb_status fdb_get_metaonly ( fdb_handle* handle, fdb_doc* doc ) ;
 FUNCTION: fdb_status fdb_get_byseq ( fdb_handle* handle, fdb_doc* doc ) ;
 FUNCTION: fdb_status fdb_get_metaonly_byseq ( fdb_handle* handle, fdb_doc* doc ) ;
 FUNCTION: fdb_status fdb_get_byoffset ( fdb_handle* handle, fdb_doc* doc ) ;
+
 FUNCTION: fdb_status fdb_set ( fdb_handle* handle, fdb_doc* doc ) ;
 FUNCTION: fdb_status fdb_del ( fdb_handle* handle, fdb_doc* doc ) ;
+
 FUNCTION: fdb_status fdb_get_kv ( fdb_handle* handle, c-string key, size_t keylen, void** value_out, size_t* valuelen_out ) ;
 FUNCTION: fdb_status fdb_set_kv ( fdb_handle* handle, c-string key, size_t keylen, c-string value, size_t valuelen ) ;
 FUNCTION: fdb_status fdb_del_kv ( fdb_handle* handle, c-string key, size_t keylen ) ;
+
 FUNCTION: fdb_status fdb_commit ( fdb_handle* handle, fdb_commit_opt_t opt ) ;
 FUNCTION: fdb_status fdb_snapshot_open ( fdb_handle* handle_in, fdb_handle** handle_out, fdb_seqnum_t snapshot_seqnum ) ;
 FUNCTION: fdb_status fdb_rollback ( fdb_handle** handle_ptr, fdb_seqnum_t rollback_seqnum ) ;
+
 FUNCTION: fdb_status fdb_iterator_init ( fdb_handle* handle, fdb_iterator** iterator, c-string start_key, size_t start_keylen, c-string end_key, size_t end_keylen, fdb_iterator_opt_t opt ) ;
 FUNCTION: fdb_status fdb_iterator_sequence_init ( fdb_handle* handle, fdb_iterator** iterator, fdb_seqnum_t start_seq, fdb_seqnum_t end_seq, fdb_iterator_opt_t opt ) ;
 FUNCTION: fdb_status fdb_iterator_prev ( fdb_iterator* iterator, fdb_doc** doc ) ;
@@ -155,12 +170,15 @@ FUNCTION: fdb_status fdb_iterator_next ( fdb_iterator* iterator, fdb_doc** doc )
 FUNCTION: fdb_status fdb_iterator_next_metaonly ( fdb_iterator* iterator, fdb_doc** doc ) ;
 FUNCTION: fdb_status fdb_iterator_seek ( fdb_iterator* iterator, c-string seek_key, size_t seek_keylen ) ;
 FUNCTION: fdb_status fdb_iterator_close ( fdb_iterator* iterator ) ;
+
 FUNCTION: fdb_status fdb_compact ( fdb_handle* handle, c-string new_filename ) ;
 FUNCTION: fdb_status fdb_get_dbinfo ( fdb_handle* handle, fdb_info* info ) ;
 FUNCTION: fdb_status fdb_switch_compaction_mode ( fdb_handle* handle, fdb_compaction_mode_t mode, size_t new_threshold ) ;
+
 FUNCTION: fdb_status fdb_close ( fdb_handle* handle ) ;
 FUNCTION: fdb_status fdb_destroy ( c-string filename, fdb_compaction_mode_t mode, size_t new_threshold ) ;
 FUNCTION: fdb_status fdb_shutdown ( ) ;
+
 FUNCTION: fdb_status fdb_begin_transaction ( fdb_handle* handle, fdb_isolation_level_t isolation_level ) ;
 FUNCTION: fdb_status fdb_end_transaction ( fdb_handle* handle, fdb_commit_opt_t opt ) ;
 FUNCTION: fdb_status fdb_abort_transaction ( fdb_handle* handle ) ;
