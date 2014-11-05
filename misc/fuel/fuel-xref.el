@@ -90,7 +90,7 @@ cursor at the first ocurrence of the used word."
 
 (defun fuel-xref--buffer ()
   (or (get-buffer "*fuel xref*")
-      (with-current-buffer (get-buffer-create "*fuel xref")
+      (with-current-buffer (get-buffer-create "*fuel xref*")
         (fuel-xref-mode)
         (fuel-popup-mode)
         (current-buffer))))
