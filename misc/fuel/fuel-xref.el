@@ -51,12 +51,6 @@ cursor at the first ocurrence of the used word."
   :group 'fuel-faces
   :group 'fuel)
 
-(defface fuel-xref-vocab-face '((t))
-  "Vocabulary names in cross-reference buffers."
-  :group 'fuel-xref
-  :group 'fuel-faces
-  :group 'fuel)
-
 (defvar-local fuel-xref--word nil)
 
 
@@ -71,7 +65,7 @@ cursor at the first ocurrence of the used word."
   (let ((file (button-get button 'file))
         (line (button-get button 'line)))
     (when (not file)
-      (error "No file for this ref"))
+      (error "No file for this ref (it's probably a primitive)"))
     (when (not (file-readable-p file))
       (error "File '%s' is not readable" file))
     (let ((word fuel-xref--word))
@@ -88,6 +82,11 @@ cursor at the first ocurrence of the used word."
 
 ;;; The xref buffer:
 
+(defun fuel-xref--eval<x--y> (arg word context)
+  "A helper for the very common task of calling an ( x -- y ) factor word."
+  (let ((cmd (list :fuel* (list (list arg word)) context)))
+    (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+
 (defun fuel-xref--buffer ()
   (or (get-buffer "*fuel xref*")
       (with-current-buffer (get-buffer-create "*fuel xref*")
@@ -95,103 +94,104 @@ cursor at the first ocurrence of the used word."
         (fuel-popup-mode)
         (current-buffer))))
 
-(defvar fuel-xref--help-string
-  "(Press RET or click to follow crossrefs, or h for help on word at point)")
+(defun fuel-xref--pluralize-count (count item)
+  (let ((fmt (if (= count 1) "%d %s" "%d %ss")))
+    (format fmt count item)))
 
-(defun fuel-xref--title (word cc count thing)
-  (put-text-property 0 (length word) 'font-lock-face 'bold word)
-  (cond ((zerop count) (format "No known %s %s %s" thing cc word))
-        ((= 1 count) (format "1 %s %s %s:" thing cc word))
-        (t (format "%s %ss %s %s:" count thing cc word))))
+(defun fuel-xref--insert-link (title file line-num)
+  (insert-text-button title
+                      :type 'fuel-xref--button-type
+                      'help-echo (format "File: %s (%s)" file line-num)
+                      'file file
+                      'line line-num))
 
-(defun fuel-xref--insert-ref (ref &optional no-vocab)
-  (when (and (stringp (cl-first ref))
-             (stringp (cl-third ref))
-             (numberp (cl-fourth ref)))
-    (insert "  ")
-    (insert-text-button (cl-first ref)
-                        :type 'fuel-xref--button-type
-                        'help-echo (format "File: %s (%s)"
-                                           (cl-third ref)
-                                           (cl-fourth ref))
-                        'file (cl-third ref)
-                        'line (cl-fourth ref))
-    (when (and (not no-vocab) (stringp (cl-second ref)))
-      (insert (format " (in %s)" (cl-second ref))))
-    (newline)
-    t))
+(defun fuel-xref--insert-word (word vocab file line-num)
+  (insert "  ")
+  (fuel-xref--insert-link word file line-num)
+  (insert (if line-num (format " line %s" line-num)
+            " primitive"))
+  (newline))
 
-(defun fuel-xref--fill-buffer (word cc refs &optional no-vocab app thing)
+(defun fuel-xref--insert-vocab-words (vocab-def xrefs)
+  (destructuring-bind (vocab file) vocab-def
+    (insert "in ")
+    (fuel-xref--insert-link (or vocab "unknown vocabs") file 1)
+    (let ((count-str (fuel-xref--pluralize-count (length xrefs) "word")))
+      (insert (format " %s:\n" count-str))))
+  (dolist (xref xrefs)
+    (apply 'fuel-xref--insert-word xref))
+  (newline))
+
+(defun fuel-xref--display-word-groups (search-str cc xref-groups)
+  "Should be called in a with-current-buffer context"
   (let ((inhibit-read-only t)
-        (count 0))
-    (with-current-buffer (fuel-xref--buffer)
-      (let ((start (if app (goto-char (point-max))
-                     (erase-buffer)
-                     (point-min))))
-        (dolist (ref refs)
-          (when (fuel-xref--insert-ref ref no-vocab) (setq count (1+ count))))
-        (newline)
-        (goto-char start)
-        (save-excursion
-          (insert (fuel-xref--title word cc count (or thing "word")) "\n\n"))
-        count))))
+        (title-str (format "Words %s %s:\n\n" cc search-str)))
+    (erase-buffer)
+    (insert (propertize title-str 'font-lock-face 'bold))
+    (dolist (group xref-groups)
+      (apply 'fuel-xref--insert-vocab-words group)))
+  (goto-char (point-min))
+  (message "")
+  (fuel-popup--display (current-buffer)))
 
-(defun fuel-xref--fill-and-display (word cc refs &optional no-vocab thing)
-  (let ((count (fuel-xref--fill-buffer word cc refs no-vocab nil (or thing "word"))))
-    (if (zerop count)
-        (error (fuel-xref--title word cc 0 (or thing "word")))
-      (message "")
-      (fuel-popup--display (fuel-xref--buffer)))))
+(defun fuel-xref--display-vocabs (search-str cc xrefs)
+  "Should be called in a with-current-buffer context"
+  (put-text-property 0 (length search-str) 'font-lock-face 'bold search-str)
+  (let* ((inhibit-read-only t)
+         (xrefs (remove-if (lambda (el) (not (nth 2 el))) xrefs))
+         (count-str (fuel-xref--pluralize-count (length xrefs) "vocab"))
+         (title-str (format "%s %s %s:\n\n" count-str cc search-str)))
+    (erase-buffer)
+    (insert title-str)
+    (loop for (vocab _ file line-num) in xrefs do
+          (insert "  ")
+          (fuel-xref--insert-link vocab file line-num)
+          (newline)))
+  (goto-char (point-min))
+  (message "")
+  (fuel-popup--display (current-buffer)))
 
 (defun fuel-xref--callers (word)
-  (let ((cmd `(:fuel* (((:quote ,word) fuel-callers-xref)))))
-    (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+  (fuel-xref--eval<x--y> (list :quote word) 'fuel-callers-xref ""))
 
 (defun fuel-xref--show-callers (word)
-  (let ((refs (fuel-xref--callers word)))
-    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word word))
-    (fuel-xref--fill-and-display word "using" refs)))
+  (let ((res (fuel-xref--callers word)))
+    (with-current-buffer (fuel-xref--buffer)
+      (setq fuel-xref--word word)
+      (fuel-xref--display-word-groups word "calling" res))))
 
 (defun fuel-xref--word-callers-files (word)
-  (mapcar 'cl-third (fuel-xref--callers word)))
+  (mapcar 'cadar (fuel-xref--callers word)))
 
 (defun fuel-xref--show-callees (word)
-  (let* ((cmd `(:fuel* (((:quote ,word) fuel-callees-xref))))
-         (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
-    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word nil))
-    (fuel-xref--fill-and-display word "used by" res)))
+  (let ((res (fuel-xref--eval<x--y> (list :quote word) 'fuel-callees-xref "")))
+    (with-current-buffer (fuel-xref--buffer)
+      (setq fuel-xref--word nil)
+      (fuel-xref--display-word-groups word "used by" res))))
 
 (defun fuel-xref--apropos (str)
-  (let* ((cmd `(:fuel* ((,str fuel-apropos-xref))))
-         (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
-    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word nil))
-    (fuel-xref--fill-and-display str "containing" res)))
+  (let ((res (fuel-xref--eval<x--y> str 'fuel-apropos-xref "")))
+    (with-current-buffer (fuel-xref--buffer)
+      (setq fuel-xref--word nil)
+      (fuel-xref--display-word-groups str "containing" res))))
 
-(defun fuel-xref--show-vocab (vocab &optional app)
-  (let* ((cmd `(:fuel* ((,vocab fuel-vocab-xref)) ,vocab))
-         (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
-    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word nil))
-    (fuel-xref--fill-buffer vocab "in vocabulary" res t app)))
-
-(defun fuel-xref--show-vocab-words (vocab &optional private)
-  (fuel-xref--show-vocab vocab)
-  (when private
-    (fuel-xref--show-vocab (format "%s.private" (substring-no-properties vocab))
-                           t))
-  (fuel-popup--display (fuel-xref--buffer))
-  (goto-char (point-min)))
+(defun fuel-xref--show-vocab-words (vocab)
+  (let ((res (fuel-xref--eval<x--y> vocab 'fuel-vocab-xref vocab)))
+    (with-current-buffer (fuel-xref--buffer)
+      (setq fuel-xref--word nil)
+      (fuel-xref--display-word-groups vocab "in vocabulary" res))))
 
 (defun fuel-xref--show-vocab-usage (vocab)
-  (let* ((cmd `(:fuel* ((,vocab fuel-vocab-usage-xref))))
-         (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
-    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word nil))
-    (fuel-xref--fill-and-display vocab "using" res t "vocab")))
+  (let ((res (fuel-xref--eval<x--y> vocab 'fuel-vocab-usage-xref "")))
+    (with-current-buffer (fuel-xref--buffer)
+      (setq fuel-xref--word nil)
+      (fuel-xref--display-vocabs vocab "using" res))))
 
 (defun fuel-xref--show-vocab-uses (vocab)
-  (let* ((cmd `(:fuel* ((,vocab fuel-vocab-uses-xref))))
-         (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
-    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word nil))
-    (fuel-xref--fill-and-display vocab "used by" res t "vocab")))
+  (let ((res (fuel-xref--eval<x--y> vocab 'fuel-vocab-uses-xref "")))
+    (with-current-buffer (fuel-xref--buffer)
+      (setq fuel-xref--word nil)
+      (fuel-xref--display-vocabs vocab "used by" res))))
 
 
 ;;; User commands:
@@ -258,11 +258,10 @@ With prefix argument, force reload of vocabulary list."
   "Show a list of words in current file.
 With prefix argument, ask for the vocab."
   (interactive "P")
-  (let ((vocab (or (and (not arg) (factor-current-vocab))
+  (let ((vocab (or (and (not arg) (factor-find-in))
                    (fuel-completion--read-vocab nil))))
     (when vocab
-      (fuel-xref--show-vocab-words vocab
-                                   (factor-file-has-private)))))
+      (fuel-xref--show-vocab-words vocab))))
 
 
 
@@ -284,7 +283,6 @@ With prefix argument, ask for the vocab."
   (set-keymap-parent fuel-xref-mode-map button-buffer-map)
   (define-key fuel-xref-mode-map "h" 'fuel-xref-show-help)
 
-  (font-lock-add-keywords nil '(("(in \\(.+\\))" 1 'fuel-xref-vocab-face)))
   (setq buffer-read-only t))
 
 
