@@ -145,7 +145,7 @@ IN: forestdb.lib
     ] with-forestdb-path
 ] unit-test
 
-{ 6 5 } [
+{ 6 6 } [
     delete-test-db-1
     test-db-1 [
         5 set-kv-n
@@ -192,10 +192,8 @@ IN: forestdb.lib
 ] must-fail-with
 
 ! Test that we take two snapshots and their seqnums/doc counts are right.
-! XXX: We test this to make sure the forestdb doesn't change.
-! Bug in forestdb? doc_count>> should be 5 at snapshot 5
 {
-    { 5 7 }
+    { 5 5 }
     { 7 7 }
 } [
     delete-test-db-1

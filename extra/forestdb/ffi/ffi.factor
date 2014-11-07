@@ -22,6 +22,7 @@ CONSTANT: FDB_SNAPSHOT_INMEM -1
 TYPEDEF: void* fdb_custom_cmp_fixed
 TYPEDEF: void* fdb_custom_cmp_variable
 TYPEDEF: void* fdb_log_callback
+TYPEDEF: void* fdb_file_handle
 TYPEDEF: void* fdb_handle
 TYPEDEF: void* fdb_iterator
 
@@ -89,7 +90,12 @@ ENUM: fdb_status
     { FDB_RESULT_FAIL_BY_TRANSACTION -27 }
     { FDB_RESULT_FAIL_BY_COMPACTION -28 }
     { FDB_RESULT_TOO_LONG_FILENAME -29 }
-    { FDB_RESULT_IN_USE_BY_COMPACTOR -30 }
+    { FDB_RESULT_INVALID_HANDLE -30 }
+    { FDB_RESULT_KV_STORE_NOT_FOUND -31 }
+    { FDB_RESULT_KV_STORE_BUSY -32 }
+    { FDB_RESULT_INVALID_KV_INSTANCE_NAME -33 }
+    { FDB_RESULT_INVALID_CMP_FUNCTION -34 }
+    { FDB_RESULT_IN_USE_BY_COMPACTOR -35 }
     { FDB_RESULT_FAIL -100 } ;
 
 ! cmp_fixed and cmp_variable have their own open() functions
@@ -110,8 +116,11 @@ STRUCT: fdb_config
     { compaction_threshold uint8_t }
     { compaction_minimum_filesize uint64_t }
     { compactor_sleep_duration uint64_t }
-    { cmp_fixed fdb_custom_cmp_fixed }
-    { cmp_variable fdb_custom_cmp_variable } ;
+    { multi_kv_instances bool } ;
+
+STRUCT: fdb_kvs_config
+    { create_if_missing bool }
+    { custom_cmp fdb_custom_cmp_variable } ;
 
 STRUCT: fdb_doc
     { keylen size_t }
@@ -131,16 +140,20 @@ STRUCT: fdb_doc
 STRUCT: fdb_info
     { filename char* }
     { new_filename char* }
-    { last_seqnum fdb_seqnum_t }
     { doc_count uint64_t }
     { space_used uint64_t }
     { file_size uint64_t } ;
 
-FUNCTION: fdb_status fdb_init ( fdb_config* config ) ;
+STRUCT: fdb_kvs_info
+    { name char* }
+    { last_seqnum fdb_seqnum_t } ;
 
-FUNCTION: fdb_status fdb_open ( fdb_handle** ptr_handle, c-string filename, fdb_config* fconfig ) ;
-FUNCTION: fdb_status fdb_open_cmp_fixed ( fdb_handle** ptr_handle, c-string filename, fdb_config* fconfig ) ;
-FUNCTION: fdb_status fdb_open_cmp_variable ( fdb_handle** ptr_handle, c-string filename, fdb_config* fconfig ) ;
+FUNCTION: fdb_status fdb_init ( fdb_config* config ) ;
+FUNCTION: fdb_config fdb_get_default_config ( ) ;
+FUNCTION: fdb_kvs_config fdb_get_default_kvs_config ( ) ;
+
+FUNCTION: fdb_status fdb_open ( fdb_file_handle** ptr_fhandle, c-string filename, fdb_config* fconfig ) ;
+FUNCTION: fdb_status fdb_open_custom_cmp ( fdb_file_handle** ptr_fhandle, c-string filename, fdb_config* fconfig, size_t num_functions, char** kvs_names, fdb_custom_cmp_variable* functions ) ;
 
 FUNCTION: fdb_status fdb_set_log_callback ( fdb_handle* handle, fdb_log_callback log_callback, void* ctx_data ) ;
 
@@ -176,13 +189,20 @@ FUNCTION: fdb_status fdb_iterator_seek ( fdb_iterator* iterator, c-string seek_k
 FUNCTION: fdb_status fdb_iterator_close ( fdb_iterator* iterator ) ;
 
 FUNCTION: fdb_status fdb_compact ( fdb_handle* handle, c-string new_filename ) ;
+FUNCTION: size_t fdb_estimate_space_used ( fdb_file_handle* fhandle ) ;
 FUNCTION: fdb_status fdb_get_dbinfo ( fdb_handle* handle, fdb_info* info ) ;
-FUNCTION: fdb_status fdb_switch_compaction_mode ( fdb_handle* handle, fdb_compaction_mode_t mode, size_t new_threshold ) ;
+FUNCTION: fdb_status fdb_get_kvs_info ( fdb_handle* handle, fdb_kvs_info* info ) ;
+FUNCTION: fdb_status fdb_get_seqnum ( fdb_handle* handle, fdb_seqnum_t* seqnum ) ;
+FUNCTION: fdb_status fdb_switch_compaction_mode ( fdb_file_handle* fhandle, fdb_compaction_mode_t mode, size_t new_threshold ) ;
 
-FUNCTION: fdb_status fdb_close ( fdb_handle* handle ) ;
-FUNCTION: fdb_status fdb_destroy ( c-string filename, fdb_compaction_mode_t mode, size_t new_threshold ) ;
+FUNCTION: fdb_status fdb_close ( fdb_file_handle* fhandle ) ;
+FUNCTION: fdb_status fdb_destroy ( c-string filename, fdb_config* fconfig ) ;
 FUNCTION: fdb_status fdb_shutdown ( ) ;
 
-FUNCTION: fdb_status fdb_begin_transaction ( fdb_handle* handle, fdb_isolation_level_t isolation_level ) ;
-FUNCTION: fdb_status fdb_end_transaction ( fdb_handle* handle, fdb_commit_opt_t opt ) ;
+FUNCTION: fdb_status fdb_begin_transaction ( fdb_file_handle* fhandle, fdb_isolation_level_t isolation_level ) ;
+FUNCTION: fdb_status fdb_end_transaction ( fdb_file_handle* fhandle, fdb_commit_opt_t opt ) ;
 FUNCTION: fdb_status fdb_abort_transaction ( fdb_handle* handle ) ;
+FUNCTION: fdb_status fdb_kvs_open ( fdb_file_handle* fhandle,
+                        fdb_handle** ptr_handle,
+                        char* kvs_name,
+                        fdb_kvs_config* config ) ;
