@@ -259,9 +259,11 @@ T{ doc
     dup length fdb_iterator_seek fdb-check-error ;
 
 : with-fdb-iterator ( start-key end-key fdb_iterator_opt_t iterator-init iterator-next quot: ( obj -- ) -- )
-    [ '[ _ _ _ _ execute ] call ] 2dip pick '[
-        [ _ handle>> _ execute [ [ @ ] when* ] keep ] loop
-        _ &dispose drop
+    [ execute ] 2dip
+    '[
+        _ &dispose handle>> [
+            _ execute [ _ with-doc t ] [ f ] if*
+        ] curry loop
     ] with-destructors ; inline
 
 : with-fdb-normal-iterator ( start-key end-key quot -- )
