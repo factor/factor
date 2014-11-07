@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
 assocs combinators continuations destructors forestdb.ffi fry
-io.directories io.files.temp io.pathnames kernel libc
+io.directories io.files.temp io.pathnames kernel libc make
 math.parser math.ranges multiline namespaces sequences
 tools.test ;
 IN: forestdb.lib
@@ -206,5 +206,80 @@ IN: forestdb.lib
         5 fdb-open-snapshot [
             fdb-info [ last_seqnum>> ] [ doc_count>> ] bi 2array
         ] with-forestdb-snapshot
+    ] with-forestdb-path
+] unit-test
+
+
+! Iterators test
+! No matching keys
+{
+    { }
+} [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        [
+            "omg" "nada" [
+                  fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
+            ] with-fdb-normal-iterator
+        ] { } make
+    ] with-forestdb-path
+] unit-test
+
+! All the keys
+{
+    {
+        { 1 "key1" "val1" }
+        { 2 "key2" "val2" }
+        { 3 "key3" "val3" }
+        { 4 "key4" "val4" }
+        { 5 "key5" "val5" }
+    }
+} [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        [
+            "key1" "key5" [
+                  fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
+            ] with-fdb-normal-iterator
+        ] { } make
+    ] with-forestdb-path
+] unit-test
+
+! Test that keys at extremes get returned
+{
+    {
+        { 1 "key1" "val1" }
+    }
+} [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        [
+            "key0" "key1" [
+                  fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
+            ] with-fdb-normal-iterator
+        ] { } make
+    ] with-forestdb-path
+] unit-test
+
+{
+    {
+        { 5 "key5" "val5" }
+    }
+} [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        [
+            "key5" "key9" [
+                  fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
+            ] with-fdb-normal-iterator
+        ] { } make
     ] with-forestdb-path
 ] unit-test
