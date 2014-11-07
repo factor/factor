@@ -16,7 +16,6 @@ CONSTANT: FDB_MAX_METALEN 65535
 CONSTANT: FDB_MAX_BODYLEN 4294967295
 ! TYPEDEF: uint32_t fdb_open_flags
 TYPEDEF: uint64_t fdb_seqnum_t
-TYPEDEF: uint8_t fdb_iterator_opt_t
 CONSTANT: FDB_SNAPSHOT_INMEM -1
 
 ! typedef int (*fdb_custom_cmp_fixed)(void *a, void *b);
@@ -48,6 +47,11 @@ ENUM: fdb_durability_opt_t
 ENUM: fdb_compaction_mode_t
     { FDB_COMPACTION_MANUAL 0 }
     { FDB_COMPACTION_AUTO 1 } ;
+
+ENUM: fdb_iterator_opt_t
+    { FDB_ITR_NONE 0 }
+    { FDB_ITR_METAONLY 1 }
+    { FDB_ITR_NO_DELETES 2 } ;
 
 ENUM: fdb_isolation_level_t
     { FDB_ISOLATION_SERIALIZABLE 0 }
