@@ -295,7 +295,8 @@ T{ doc
         ] with-variable
     ] with-destructors ; inline
 
-! Commit normal at the end
+! XXX: When you don't commit-wal at the end of with-forestdb, it won't
+! persist to disk for next time you open the db.
 : with-forestdb-handle-commit-normal ( handle quot commit -- )
     FDB_COMMIT_NORMAL with-forestdb-handle ; inline
 
@@ -306,4 +307,4 @@ T{ doc
     f with-forestdb-handle ; inline
 
 : with-forestdb-path ( path quot -- )
-    [ absolute-path fdb-open ] dip with-forestdb-handle-commit-normal ; inline
+    [ absolute-path fdb-open ] dip with-forestdb-handle-commit-wal ; inline
