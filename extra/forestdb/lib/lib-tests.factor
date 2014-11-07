@@ -35,6 +35,7 @@ IN: forestdb.lib
 { } [ [ delete-test-db-0 ] ignore-errors ] unit-test
 { } [ [ delete-test-db-1 ] ignore-errors ] unit-test
 
+! Get/set by key/value
 { "val123" } [
     delete-test-db-0
     test-db-0 [
@@ -52,14 +53,15 @@ IN: forestdb.lib
 ] unit-test
 
 
+! Filename is only valid inside with-forestdb
 { f } [
-    ! Filename is only valid inside with-forestdb
     delete-test-db-0
     test-db-0 [
         fdb-info filename>> alien>native-string empty?
     ] with-forestdb-path
 ] unit-test
 
+! Test fdb_doc_create
 { 6 9 9 } [
     delete-test-db-0
     test-db-0 [
@@ -280,6 +282,29 @@ IN: forestdb.lib
             "key5" "key9" [
                   fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
             ] with-fdb-normal-iterator
+        ] { } make
+    ] with-forestdb-path
+] unit-test
+
+
+{
+    {
+        { 1 "key1" }
+        { 2 "key2" }
+        { 3 "key3" }
+        { 4 "key4" }
+        { 5 "key5" }
+    }
+} [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        [
+            0 10 [
+                [ seqnum>> ]
+                [ [ key>> ] [ keylen>> ] bi alien/length>string ] bi 2array ,
+            ] with-fdb-byseq-iterator
         ] { } make
     ] with-forestdb-path
 ] unit-test
