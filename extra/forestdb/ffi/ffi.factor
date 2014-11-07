@@ -17,8 +17,6 @@ CONSTANT: FDB_MAX_BODYLEN 4294967295
 TYPEDEF: uint64_t fdb_seqnum_t
 CONSTANT: FDB_SNAPSHOT_INMEM -1
 
-! typedef int (*fdb_custom_cmp_fixed)(void *a, void *b);
-! typedef int (*fdb_custom_cmp_variable)(void *a, size_t len_a, void *b, size_t len_b);
 TYPEDEF: void* fdb_custom_cmp_fixed
 TYPEDEF: void* fdb_custom_cmp_variable
 TYPEDEF: void* fdb_log_callback
@@ -175,7 +173,7 @@ FUNCTION: fdb_status fdb_get_kv ( fdb_handle* handle, c-string key, size_t keyle
 FUNCTION: fdb_status fdb_set_kv ( fdb_handle* handle, c-string key, size_t keylen, c-string value, size_t valuelen ) ;
 FUNCTION: fdb_status fdb_del_kv ( fdb_handle* handle, c-string key, size_t keylen ) ;
 
-FUNCTION: fdb_status fdb_commit ( fdb_handle* handle, fdb_commit_opt_t opt ) ;
+FUNCTION: fdb_status fdb_commit ( fdb_file_handle* fhandle, fdb_commit_opt_t opt ) ;
 FUNCTION: fdb_status fdb_snapshot_open ( fdb_handle* handle_in, fdb_handle** handle_out, fdb_seqnum_t snapshot_seqnum ) ;
 ! Swaps out the handle for a new one
 FUNCTION: fdb_status fdb_rollback ( fdb_handle** handle_ptr, fdb_seqnum_t rollback_seqnum ) ;
@@ -188,9 +186,9 @@ FUNCTION: fdb_status fdb_iterator_next_metaonly ( fdb_iterator* iterator, fdb_do
 FUNCTION: fdb_status fdb_iterator_seek ( fdb_iterator* iterator, c-string seek_key, size_t seek_keylen ) ;
 FUNCTION: fdb_status fdb_iterator_close ( fdb_iterator* iterator ) ;
 
-FUNCTION: fdb_status fdb_compact ( fdb_handle* handle, c-string new_filename ) ;
+FUNCTION: fdb_status fdb_compact ( fdb_file_handle* handle, c-string new_filename ) ;
 FUNCTION: size_t fdb_estimate_space_used ( fdb_file_handle* fhandle ) ;
-FUNCTION: fdb_status fdb_get_dbinfo ( fdb_handle* handle, fdb_info* info ) ;
+FUNCTION: fdb_status fdb_get_dbinfo ( fdb_file_handle* handle, fdb_info* info ) ;
 FUNCTION: fdb_status fdb_get_kvs_info ( fdb_handle* handle, fdb_kvs_info* info ) ;
 FUNCTION: fdb_status fdb_get_seqnum ( fdb_handle* handle, fdb_seqnum_t* seqnum ) ;
 FUNCTION: fdb_status fdb_switch_compaction_mode ( fdb_file_handle* fhandle, fdb_compaction_mode_t mode, size_t new_threshold ) ;
@@ -201,8 +199,17 @@ FUNCTION: fdb_status fdb_shutdown ( ) ;
 
 FUNCTION: fdb_status fdb_begin_transaction ( fdb_file_handle* fhandle, fdb_isolation_level_t isolation_level ) ;
 FUNCTION: fdb_status fdb_end_transaction ( fdb_file_handle* fhandle, fdb_commit_opt_t opt ) ;
-FUNCTION: fdb_status fdb_abort_transaction ( fdb_handle* handle ) ;
+FUNCTION: fdb_status fdb_abort_transaction ( fdb_file_handle* fhandle ) ;
 FUNCTION: fdb_status fdb_kvs_open ( fdb_file_handle* fhandle,
                         fdb_handle** ptr_handle,
                         char* kvs_name,
                         fdb_kvs_config* config ) ;
+
+
+FUNCTION: fdb_status fdb_kvs_open_default ( fdb_file_handle* fhandle,
+                                fdb_handle** ptr_handle,
+                                fdb_kvs_config* config ) ;
+
+FUNCTION: fdb_status fdb_kvs_close ( fdb_handle* handle ) ;
+
+FUNCTION: fdb_status fdb_kvs_remove ( fdb_file_handle* fhandle, char* kvs_name ) ;
