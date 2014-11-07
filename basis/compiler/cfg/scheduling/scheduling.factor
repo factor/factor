@@ -1,9 +1,8 @@
 ! Copyright (C) 2009, 2010 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry kernel locals make math
-namespaces sequences sets combinators.short-circuit
-compiler.cfg.def-use compiler.cfg.dependence
-compiler.cfg.instructions compiler.cfg.rpo cpu.architecture ;
+USING: accessors arrays assocs compiler.cfg.def-use compiler.cfg.dependence
+compiler.cfg.instructions compiler.cfg.linear-scan.numbering compiler.cfg.rpo
+cpu.architecture fry kernel make math namespaces sequences sets splitting ;
 IN: compiler.cfg.scheduling
 
 ! Instruction scheduling to reduce register pressure, from:
@@ -40,7 +39,7 @@ ERROR: bad-delete-at key assoc ;
 
 : select-instruction ( -- insn/f )
     roots get [ f ] [
-        [ score ] select 
+        [ score ] select
         [ insn>> ]
         [ set-parent-indices ]
         [ remove-node ] tri
@@ -67,34 +66,21 @@ conditional-branch-insn
 : final-insn-start ( insns -- n )
     [ final-insn? not ] find-last drop [ 1 + ] [ 0 ] if* ;
 
-:: split-3-ways ( insns -- first middle last )
-    insns initial-insn-end :> a
-    insns final-insn-start :> b
-    insns a head-slice
-    a b insns <slice>
-    insns b tail-slice ;
+: split-insns ( insns -- pre body post )
+    dup [ initial-insn-end ] [ final-insn-start ] bi 2array split-indices
+    first3 ;
 
 : reorder ( insns -- insns' )
-    split-3-ways [
+    split-insns [
         build-dependence-graph
         build-fan-in-trees
         [ (reorder) ] V{ } make reverse
     ] dip 3append ;
 
-: number-insns ( insns -- )
-    [ >>insn# drop ] each-index ;
-
-: clear-numbers ( insns -- )
-    [ f >>insn# drop ] each ;
-
 : schedule-block ( bb -- )
-    [
-        [ number-insns ]
-        [ reorder ]
-        [ clear-numbers ] tri
-    ] change-instructions drop ;
+    [ reorder ] change-instructions drop ;
 
-: schedule-instructions ( cfg -- cfg' )
-    dup [
-        dup kill-block?>> [ drop ] [ schedule-block ] if
-    ] each-basic-block ;
+! TODO: stack effect should be ( cfg -- )
+: schedule-instructions ( cfg --  cfg' )
+    dup number-instructions
+    dup reverse-post-order [ kill-block?>> not ] filter [ schedule-block ] each ;
