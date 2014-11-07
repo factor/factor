@@ -883,3 +883,14 @@ TUPLE: some-tuple x ;
     f (free) f (free) ;
 
 [ ] [ anton's-regression ] unit-test
+
+STRUCT: bool-and-ptr
+    { b bool }
+    { ptr void* } ;
+
+FUNCTION: bool-and-ptr ffi_test_61 ( ) ;
+{
+    S{ bool-and-ptr { b t } { ptr f } }
+} [
+    ffi_test_61
+] unit-test

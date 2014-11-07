@@ -203,3 +203,9 @@ FACTOR_EXPORT FACTOR_FASTCALL(struct test_struct_11)
 FACTOR_EXPORT signed long long ffi_test_59(signed long long x);
 FACTOR_EXPORT unsigned long long ffi_test_60(unsigned long long x);
 
+struct bool_and_ptr {
+    bool b;
+    void* ptr;
+};
+
+FACTOR_EXPORT struct bool_and_ptr ffi_test_61(unsigned long long x);
