@@ -161,6 +161,7 @@ FUNCTION: fdb_status fdb_del_kv ( fdb_handle* handle, c-string key, size_t keyle
 
 FUNCTION: fdb_status fdb_commit ( fdb_handle* handle, fdb_commit_opt_t opt ) ;
 FUNCTION: fdb_status fdb_snapshot_open ( fdb_handle* handle_in, fdb_handle** handle_out, fdb_seqnum_t snapshot_seqnum ) ;
+! Swaps out the handle for a new one
 FUNCTION: fdb_status fdb_rollback ( fdb_handle** handle_ptr, fdb_seqnum_t rollback_seqnum ) ;
 
 FUNCTION: fdb_status fdb_iterator_init ( fdb_handle* handle, fdb_iterator** iterator, c-string start_key, size_t start_keylen, c-string end_key, size_t end_keylen, fdb_iterator_opt_t opt ) ;

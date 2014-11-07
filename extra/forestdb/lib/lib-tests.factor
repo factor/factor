@@ -1,46 +1,210 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.strings
-combinators destructors forestdb.ffi fry io.files.temp
-io.pathnames kernel libc namespaces sequences tools.test ;
+USING: accessors alien.c-types alien.data alien.strings arrays
+assocs combinators continuations destructors forestdb.ffi fry
+io.directories io.files.temp io.pathnames kernel libc
+math.parser math.ranges multiline namespaces sequences
+tools.test ;
 IN: forestdb.lib
 
-: forestdb-test-path ( -- path )
-    "forestdb-test.fdb" temp-file ;
+: test-db-0 ( -- path ) "0.forestdb.0" temp-file ;
+: test-db-1 ( -- path ) "1.forestdb.0" temp-file ;
+
+: delete-test-db-0 ( -- ) [ test-db-0 delete-file ] ignore-errors ;
+: delete-test-db-1 ( -- ) [ test-db-1 delete-file ] ignore-errors ;
+
+: make-kv-nth ( n -- key val )
+    number>string [ "key" prepend ] [ "val" prepend ] bi ;
+
+: make-kv-n ( n -- seq )
+    [1,b] [ make-kv-nth ] { } map>assoc ;
+
+: make-kv-range ( a b -- seq )
+    [a,b] [ make-kv-nth ] { } map>assoc ;
+
+: set-kv-n ( n -- )
+    make-kv-n [ fdb-set-kv ] assoc-each ;
+
+: set-kv-nth ( n -- )
+    make-kv-nth fdb-set-kv ;
+
+: set-kv-range ( a b -- )
+    make-kv-range [ fdb-set-kv ] assoc-each ;
+
+
+{ } [ [ delete-test-db-0 ] ignore-errors ] unit-test
+{ } [ [ delete-test-db-1 ] ignore-errors ] unit-test
 
 { "val123" } [
-    forestdb-test-path [
+    delete-test-db-0
+    test-db-0 [
        "key123" "val123" fdb-set-kv
        "key123" fdb-get-kv
-    ] with-forestdb
+    ] with-forestdb-path
 ] unit-test
 
 { "val12345" } [
-    forestdb-test-path [
+    delete-test-db-0
+    test-db-0 [
        "key123" "val12345" fdb-set-kv
        "key123" fdb-get-kv
-    ] with-forestdb
+    ] with-forestdb-path
 ] unit-test
 
 
 { f } [
     ! Filename is only valid inside with-forestdb
-    forestdb-test-path [
-        get-current-db-info filename>> alien>native-string empty?
-    ] with-forestdb
+    delete-test-db-0
+    test-db-0 [
+        fdb-info filename>> alien>native-string empty?
+    ] with-forestdb-path
 ] unit-test
 
 { 6 9 9 } [
-    forestdb-test-path [
+    delete-test-db-0
+    test-db-0 [
        "key123" "meta blah" "some body" fdb-doc-create
         [ keylen>> ] [ metalen>> ] [ bodylen>> ] tri
-    ] with-forestdb
+    ] with-forestdb-path
 ] unit-test
 
 { 7 8 15 } [
-    forestdb-test-path [
+    delete-test-db-0
+    test-db-0 [
        "key1234" "meta blah" "some body" fdb-doc-create
         dup "new meta" "some other body" fdb-doc-update
         [ keylen>> ] [ metalen>> ] [ bodylen>> ] tri
-    ] with-forestdb
+    ] with-forestdb-path
+] unit-test
+
+! Snapshots
+
+{ 1 1 } [
+    delete-test-db-1
+    test-db-1 [
+        1 set-kv-n
+        fdb-commit-normal
+        fdb-info [ last_seqnum>> ] [ doc_count>> ] bi
+    ] with-forestdb-path
+] unit-test
+
+{ 6 5 } [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        5 set-kv-nth
+        fdb-commit-normal
+        fdb-info [ last_seqnum>> ] [ doc_count>> ] bi
+    ] with-forestdb-path
+] unit-test
+
+{ 5 5 } [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        fdb-info [ last_seqnum>> ] [ doc_count>> ] bi
+    ] with-forestdb-path
+] unit-test
+
+{ 5 5 } [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        5 fdb-open-snapshot [
+            fdb-info [ last_seqnum>> ] [ doc_count>> ] bi
+        ] with-forestdb-snapshot
+    ] with-forestdb-path
+] unit-test
+
+
+! Snapshots can only occur on commits. If you commit five keys at once,
+! and then try to open a snapshot on the second key, it should fail.
+[
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        2 fdb-open-snapshot [
+            fdb-info [ last_seqnum>> ] [ doc_count>> ] bi
+        ] with-forestdb-snapshot
+    ] with-forestdb-path
+] [
+    T{ fdb-error { error FDB_RESULT_NO_DB_INSTANCE } } =
+] must-fail-with
+
+! Test that we take two snapshots and their seqnums/doc counts are right.
+! XXX: We test this to make sure the forestdb doesn't change.
+! Bug in forestdb? doc_count>> should be 5 at snapshot 5
+{
+    { 5 7 }
+    { 7 7 }
+} [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+
+        6 7 set-kv-range
+        fdb-commit-normal
+
+        5 fdb-open-snapshot [
+            fdb-info [ last_seqnum>> ] [ doc_count>> ] bi 2array
+        ] with-forestdb-snapshot
+
+        7 fdb-open-snapshot [
+            fdb-info [ last_seqnum>> ] [ doc_count>> ] bi 2array
+        ] with-forestdb-snapshot
+    ] with-forestdb-path
+] unit-test
+
+! Same test as above, but with buggy behavior for now so it passes
+{
+    5
+    7
+} [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+
+        6 7 set-kv-range
+        fdb-commit-normal
+
+        5 fdb-open-snapshot [
+            fdb-info last_seqnum>>
+        ] with-forestdb-snapshot
+
+        7 fdb-open-snapshot [
+            fdb-info last_seqnum>>
+        ] with-forestdb-snapshot
+    ] with-forestdb-path
+] unit-test
+
+
+! Rollback test
+! Make sure the doc_count is correct after a rollback
+{
+    7
+    { 5 5 }
+} [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+
+        6 7 set-kv-range
+        fdb-commit-normal
+
+        7 fdb-open-snapshot [
+            fdb-info last_seqnum>>
+        ] with-forestdb-snapshot
+
+        5 fdb-rollback
+
+        5 fdb-open-snapshot [
+            fdb-info [ last_seqnum>> ] [ doc_count>> ] bi 2array
+        ] with-forestdb-snapshot
+    ] with-forestdb-path
 ] unit-test
