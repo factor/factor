@@ -10,7 +10,7 @@ IN: forestdb.lib
 /*
 ! Possible bugs in foresdtb:
 
-    ! why is meta set but metalen is 0?
+! 1) why is meta set but metalen is 0?
     ! also, there is no meta info in these docs
     delete-test-db-1
     test-db-1 [
@@ -34,8 +34,11 @@ IN: forestdb.lib
         { body f }
         { deleted f }
     }
-
-! snapshot has doc_count of entire file, not in that snapshot
+! 2) same for with-fdb-byseq-iterator, body and meta are messed up
+! 3) snapshot has doc_count of entire file, not in that snapshot
+! 4) build on macosx doesn't search /usr/local for libsnappy
+! 5) build on macosx doesn't include -L/usr/local/lib when it finds snappy
+!  - link_directories(/usr/local/lib) or some other fix
 */
 
 ERROR: fdb-error error ;
@@ -81,6 +84,24 @@ SYMBOL: fdb-current
     [ get-handle ] 2dip
     [ dup length ] bi@ fdb_set_kv fdb-check-error ;
 
+! Fill in document by exemplar
+: fdb-get ( doc -- doc )
+    [ get-handle ] dip [ fdb_get fdb-check-error ] keep ;
+
+: fdb-get-metaonly ( doc -- doc )
+    [ get-handle ] dip [ fdb_get_metaonly fdb-check-error ] keep ;
+
+: fdb-get-byseq ( doc -- doc )
+    [ get-handle ] dip [ fdb_get_byseq fdb-check-error ] keep ;
+
+: fdb-get-metaonly-byseq ( doc -- doc )
+    [ get-handle ] dip [ fdb_get_metaonly_byseq fdb-check-error ] keep ;
+
+: fdb-get-byoffset ( doc -- doc )
+    [ get-handle ] dip [ fdb_get_byoffset fdb-check-error ] keep ;
+
+
+! Set/delete documents
 : fdb-set ( doc -- )
     [ get-handle ] dip fdb_set fdb-check-error ;
 
@@ -164,6 +185,11 @@ M: fdb-iterator dispose*
     [ fdb_iterator_init fdb-check-error ] 7 nkeep 5 ndrop nip
     void* deref <fdb-iterator> ;
 
+: fdb-iterator-byseq-init ( start-seq end-seq fdb_iterator_opt_t -- iterator )
+    [ get-handle f void* <ref> ] 3dip
+    [ fdb_iterator_sequence_init fdb-check-error ] 5 nkeep 3 ndrop nip
+    void* deref <fdb-iterator> ;
+
 : fdb-iterator-init-none ( start-key end-key -- iterator )
     FDB_ITR_NONE fdb-iterator-init ;
 
@@ -235,18 +261,26 @@ T{ doc
 : fdb-iterator-seek ( iterator key -- )
     dup length fdb_iterator_seek fdb-check-error ;
 
-: with-fdb-iterator ( start-key end-key fdb_iterator_opt_t iterator-next quot: ( obj -- ) -- )
-    [ fdb-iterator-init ] 2dip pick '[
+: with-fdb-iterator ( start-key end-key fdb_iterator_opt_t iterator-init iterator-next quot: ( obj -- ) -- )
+    [ '[ _ _ _ _ execute ] call ] 2dip pick '[
         [ _ handle>> _ execute [ [ @ ] when* ] keep ] loop
         _ &dispose drop
     ] with-destructors ; inline
 
 : with-fdb-normal-iterator ( start-key end-key quot -- )
-    [ FDB_ITR_NONE \ fdb-iterator-next ] dip with-fdb-iterator ; inline
+    [ FDB_ITR_NONE \ fdb-iterator-init \ fdb-iterator-next ] dip
+    with-fdb-iterator ; inline
 
 ! XXX: broken?
 : with-fdb-normal-meta-iterator ( start-key end-key quot -- )
-    [ FDB_ITR_NONE \ fdb-iterator-next-meta-only ] dip with-fdb-iterator ; inline
+    [ FDB_ITR_NONE \ fdb-iterator-init \ fdb-iterator-next-meta-only ] dip
+    with-fdb-iterator ; inline
+
+! XXX: broken? -- body and meta slots are wrong
+: with-fdb-byseq-iterator ( start-seq end-seq quot -- )
+    [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb-iterator-next-meta-only ] dip
+    with-fdb-iterator ; inline
+
 
 ! Do not try to commit here, as it will fail with FDB_RESULT_RONLY_VIOLATION
 ! fdb-current is weird, it gets replaced if you call fdb-rollback
