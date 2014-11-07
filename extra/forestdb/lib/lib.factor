@@ -14,6 +14,8 @@ IN: forestdb.lib
 ! 3) build on macosx doesn't include -L/usr/local/lib when it finds snappy
 !  - link_directories(/usr/local/lib) or some other fix
 ! 4) byseq iteration doesn't have bodies, weird.
+! 5) Get byseq ignores seqnum and uses key instead if key is set
+
 */
 
 ERROR: fdb-error error ;
@@ -58,6 +60,14 @@ SYMBOL: fdb-current
 : fdb-set-kv ( key value -- )
     [ get-handle ] 2dip
     [ dup length ] bi@ fdb_set_kv fdb-check-error ;
+
+: <key-doc> ( key -- doc )
+    fdb_doc malloc-struct
+        swap [ utf8 malloc-string >>key ] [ length >>keylen ] bi ;
+
+: <seqnum-doc> ( seqnum -- doc )
+    fdb_doc malloc-struct
+        swap >>seqnum ;
 
 ! Fill in document by exemplar
 : fdb-get ( doc -- doc )
@@ -109,6 +119,17 @@ SYMBOL: fdb-current
 
 : fdb-doc-free ( doc -- )
     fdb_doc_free fdb-check-error ;
+
+: clear-doc-key ( doc -- doc )
+    [ dup [ (free) f ] when ] change-key
+    0 >>keylen ;
+
+: with-doc ( doc quot: ( doc -- ) -- )
+    over '[ _ _ [ _ fdb-doc-free rethrow ] recover ] call ; inline
+
+: with-create-doc ( key meta body quot: ( doc -- ) -- )
+    [ fdb-doc-create ] dip with-doc ; inline
+
 
 : fdb-info ( -- info )
     get-handle
@@ -183,7 +204,7 @@ M: fdb-iterator dispose*
 
 : fdb-iterate ( iterator word -- doc )
     '[
-        fdb_doc <struct> fdb_doc <ref>
+        fdb_doc malloc-struct fdb_doc <ref>
         [ _ execute ] keep swap check-iterate-result
     ] call ; inline
 

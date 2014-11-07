@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.data alien.strings arrays
 assocs combinators continuations destructors forestdb.ffi fry
 io.directories io.files.temp io.pathnames kernel libc make
 math.parser math.ranges multiline namespaces sequences
-tools.test ;
+tools.test classes.struct ;
 IN: forestdb.lib
 
 : test-db-0 ( -- path ) "0.forestdb.0" temp-file ;
@@ -52,6 +52,59 @@ IN: forestdb.lib
     ] with-forestdb-path
 ] unit-test
 
+! Get
+{
+    { "key1" "val" }
+} [
+    delete-test-db-1 test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        "key1" "meta" "val" [
+            fdb_doc>doc [ key>> ] [ body>> ] bi 2array
+        ] with-create-doc
+    ] with-forestdb-path
+] unit-test
+
+{
+    { "key1" f "val1" }
+} [
+    delete-test-db-1 test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        "key1" "no meta" "going away" [
+            fdb-get
+            fdb_doc>doc [ key>> ] [ meta>> ] [ body>> ] tri 3array
+        ] with-create-doc
+    ] with-forestdb-path
+] unit-test
+
+
+{
+    { "key2" f "val2" }
+} [
+    delete-test-db-1 test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        2 <seqnum-doc> [
+            fdb-get-byseq fdb_doc>doc
+            [ key>> ] [ meta>> ] [ body>> ] tri 3array
+        ] with-doc
+    ] with-forestdb-path
+] unit-test
+
+{
+    { "key2" f "val2" }
+} [
+    delete-test-db-1 test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        2 <seqnum-doc> [
+            fdb-get-byseq fdb_doc>doc
+            [ key>> ] [ meta>> ] [ body>> ] tri 3array
+        ] with-doc
+    ] with-forestdb-path
+] unit-test
+
 
 ! Filename is only valid inside with-forestdb
 { f } [
@@ -65,17 +118,19 @@ IN: forestdb.lib
 { 6 9 9 } [
     delete-test-db-0
     test-db-0 [
-       "key123" "meta blah" "some body" fdb-doc-create
-        [ keylen>> ] [ metalen>> ] [ bodylen>> ] tri
+       "key123" "meta blah" "some body" [
+            [ keylen>> ] [ metalen>> ] [ bodylen>> ] tri
+        ] with-create-doc
     ] with-forestdb-path
 ] unit-test
 
 { 7 8 15 } [
     delete-test-db-0
     test-db-0 [
-       "key1234" "meta blah" "some body" fdb-doc-create
-        dup "new meta" "some other body" fdb-doc-update
-        [ keylen>> ] [ metalen>> ] [ bodylen>> ] tri
+       "key1234" "meta blah" "some body" [
+            [ "new meta" "some other body" fdb-doc-update ]
+            [ [ keylen>> ] [ metalen>> ] [ bodylen>> ] tri ] bi
+        ] with-create-doc
     ] with-forestdb-path
 ] unit-test
 
