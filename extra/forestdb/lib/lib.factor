@@ -8,37 +8,12 @@ math multiline namespaces sequences ;
 IN: forestdb.lib
 
 /*
-! Possible bugs in foresdtb:
-
-! 1) why is meta set but metalen is 0?
-    ! also, there is no meta info in these docs
-    delete-test-db-1
-    test-db-1 [
-        5 set-kv-n
-        fdb-commit-normal
-        "key1" "key5" [
-              .
-        ] with-fdb-normal-meta-iterator
-    ] with-forestdb-path
-
-    ...
-    S{ fdb_doc
-        { keylen 4 }
-        { metalen 0 }
-        { bodylen 4 }
-        { size_ondisk 0 }
-        { key ALIEN: 12721e3f0 }
-        { seqnum 5 }
-        { offset 4256 }
-        { meta ALIEN: 1272308d0 }
-        { body f }
-        { deleted f }
-    }
-! 2) same for with-fdb-byseq-iterator, body and meta are messed up
-! 3) snapshot has doc_count of entire file, not in that snapshot
-! 4) build on macosx doesn't search /usr/local for libsnappy
-! 5) build on macosx doesn't include -L/usr/local/lib when it finds snappy
+! Issues
+! 1) bug - snapshot has doc_count of entire file, not just that snapshot's doc_count
+! 2) build on macosx doesn't search /usr/local for libsnappy
+! 3) build on macosx doesn't include -L/usr/local/lib when it finds snappy
 !  - link_directories(/usr/local/lib) or some other fix
+! 4) byseq iteration doesn't have bodies, weird.
 */
 
 ERROR: fdb-error error ;
@@ -214,41 +189,42 @@ M: fdb-iterator dispose*
 
 ! fdb_doc key, meta, body only valid inside with-forestdb
 ! so make a helper word to preserve them outside
-TUPLE: doc seqnum key meta body deleted? offset size-ondisk ;
+TUPLE: doc seqnum keylen key metalen meta bodylen body deleted? offset size-ondisk ;
 
-CONSTRUCTOR: <doc> doc ( seqnum key meta body deleted? offset size-ondisk -- obj ) ;
+CONSTRUCTOR: <doc> doc ( seqnum keylen key metalen meta bodylen body deleted? offset size-ondisk -- obj ) ;
 
 /*
 ! Example fdb_doc and converted doc
 S{ fdb_doc
-    { keylen 4 }
-    { metalen 0 }
-    { bodylen 4 }
-    { size_ondisk 0 }
-    { key ALIEN: 111e003b0 }
-    { seqnum 5 }
-    { offset 4256 }
-    { meta f }
-    { body ALIEN: 111d11740 }
-    { deleted f }
+    { keylen 4 } { metalen 0 } { bodylen 4 } { size_ondisk 0 }
+    { key ALIEN: 1002f2f10 } { seqnum 5 } { offset 4256 }
+    { meta ALIEN: 1002dc790 } { body f } { deleted f }
 }
 T{ doc
     { seqnum 5 }
-    { key "key5" }
-    { body "val5" }
-    { offset 4256 }
-    { size-ondisk 0 }
+    { keylen 4 } { key "key5" }
+    { metalen 0 } { bodylen 4 }
+    { offset 4256 } { size-ondisk 0 }
 }
 */
 
 : alien/length>string ( alien n -- string/f )
-    [ drop f ] [ memory>byte-array utf8 decode ] if-zero ;
+    [ drop f ] [
+        over [
+            memory>byte-array utf8 decode
+        ] [
+            2drop f
+        ] if
+    ] if-zero ;
 
 : fdb_doc>doc ( fdb_doc -- doc )
     {
         [ seqnum>> ]
+        [ keylen>> ]
         [ [ key>> ] [ keylen>> ] bi alien/length>string ]
+        [ metalen>> ]
         [ [ meta>> ] [ metalen>> ] bi alien/length>string ]
+        [ bodylen>> ]
         [ [ body>> ] [ bodylen>> ] bi alien/length>string ]
         [ deleted>> >boolean ]
         [ offset>> ]
@@ -271,16 +247,13 @@ T{ doc
     [ FDB_ITR_NONE \ fdb-iterator-init \ fdb-iterator-next ] dip
     with-fdb-iterator ; inline
 
-! XXX: broken?
 : with-fdb-normal-meta-iterator ( start-key end-key quot -- )
     [ FDB_ITR_NONE \ fdb-iterator-init \ fdb-iterator-next-meta-only ] dip
     with-fdb-iterator ; inline
 
-! XXX: broken? -- body and meta slots are wrong
 : with-fdb-byseq-iterator ( start-seq end-seq quot -- )
     [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb-iterator-next-meta-only ] dip
     with-fdb-iterator ; inline
-
 
 ! Do not try to commit here, as it will fail with FDB_RESULT_RONLY_VIOLATION
 ! fdb-current is weird, it gets replaced if you call fdb-rollback
