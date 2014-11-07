@@ -1,14 +1,13 @@
 USING: compiler.cfg.liveness
-compiler.cfg.debugger compiler.cfg.instructions
-compiler.cfg.predecessors compiler.cfg.registers compiler.cfg
+compiler.cfg compiler.cfg.debugger compiler.cfg.instructions
+compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.utilities
 cpu.architecture accessors namespaces sequences kernel
 tools.test vectors alien math compiler.cfg.comparisons
 cpu.x86.assembler.operands assocs ;
 IN: compiler.cfg.liveness.tests
 
 : test-liveness ( -- )
-    cfg new 1 get >>entry
-    compute-live-sets ;
+    1 get block>cfg compute-live-sets ;
 
 ! Sanity check...
 
@@ -197,7 +196,7 @@ V{
 5 6 edge
 6 7 edge
 
-[ ] [ cfg new 0 get >>entry dup cfg set compute-live-sets ] unit-test
+[ ] [ 0 get block>cfg dup cfg set compute-live-sets ] unit-test
 
 [ t ] [ 0 get live-in assoc-empty? ] unit-test
 
@@ -236,7 +235,7 @@ H{
     { 1 int-rep }
 } representations set
 
-[ ] [ cfg new 0 get >>entry dup cfg set compute-live-sets ] unit-test
+[ ] [ 0 get block>cfg dup cfg set compute-live-sets ] unit-test
 
 [ V{ { 1 0 } } ] [ 1 get instructions>> 2 swap nth gc-map>> derived-roots>> ] unit-test
 

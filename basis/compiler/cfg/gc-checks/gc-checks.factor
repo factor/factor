@@ -77,7 +77,7 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
     ] each ;
 
 : make-blocks ( insns-seq -- bbs )
-    [ <basic-block> swap >>instructions ] map ;
+    [ f insns>block ] map ;
 
 : <gc-call> ( -- bb )
     <basic-block>

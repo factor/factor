@@ -1,14 +1,11 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test compiler.cfg kernel accessors compiler.cfg.dce
-compiler.cfg.instructions compiler.cfg.registers cpu.architecture ;
+USING: accessors kernel compiler.cfg compiler.cfg.dce compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.utilities cpu.architecture tools.test ;
 IN: compiler.cfg.dce.tests
 
 : test-dce ( insns -- insns' )
-    <basic-block> swap >>instructions
-    cfg new swap >>entry
-    eliminate-dead-code
-    entry>> instructions>> ; 
+    insns>cfg eliminate-dead-code entry>> instructions>> ;
 
 [ V{
     T{ ##load-integer { dst 1 } { val 8 } }
