@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
-alien.syntax classes.struct combinators constructors
+alien.syntax arrays classes.struct combinators constructors
 continuations destructors forestdb.ffi fry generalizations
 io.encodings.string io.encodings.utf8 io.pathnames kernel libc
 math multiline namespaces sequences ;
@@ -26,26 +26,68 @@ ERROR: fdb-error error ;
         fdb-error
     ] if ;
 
+
 TUPLE: fdb-handle < disposable handle ;
 : <fdb-handle> ( handle -- obj )
     fdb-handle new-disposable
         swap >>handle ; inline
 
 M: fdb-handle dispose*
+    handle>> fdb_kvs_close fdb-check-error ;
+
+
+TUPLE: fdb-file-handle < disposable handle ;
+: <fdb-file-handle> ( handle -- obj )
+    fdb-file-handle new-disposable
+        swap >>handle ; inline
+
+M: fdb-file-handle dispose*
     handle>> fdb_close fdb-check-error ;
 
+TUPLE: fdb-handle-pair < disposable file-handle handle ;
+
+: <fdb-handle-pair> ( file-handle handle -- obj )
+    fdb-handle-pair new-disposable
+        swap >>handle
+        swap >>file-handle ; inline
+
+M: fdb-handle-pair dispose*
+    [
+        [ handle>> ] [ file-handle>> ] bi 2array dispose-each
+    ] with-destructors ;
 
 TUPLE: fdb-doc < disposable doc ;
 
 M: fdb-doc dispose*
     fdb_doc_free fdb-check-error ;
 
+: get-kvs-default-config ( -- kvs-config )
+    S{ fdb_kvs_config
+        { create_if_missing t }
+        { custom_cmp f }
+    } clone ;
 
-: fdb-open ( path -- handle )
-    [ f void* <ref> ] dip
-    absolute-path f
-    [ fdb_open fdb-check-error ] 3keep
-    2drop void* deref <fdb-handle> ;
+: fdb-open-kvs ( fdb-file-handle kvs-config -- fdb-handle-pair )
+    [
+        [
+            |dispose dup handle>> ! possibly clean up fdb_file_handle
+            f void* <ref>
+        ] dip
+        [ fdb_kvs_open_default fdb-check-error ] 2keep drop
+        void* deref <fdb-handle>
+        <fdb-handle-pair>
+    ] with-destructors ;
+
+: fdb-open ( path config kvs-config -- fdb-handle-pair )
+    [
+        [ f void* <ref> ] 2dip
+        [ absolute-path ] dip
+        [ fdb_open fdb-check-error ] 3keep
+        2drop void* deref <fdb-file-handle>
+    ] dip fdb-open-kvs ;
+
+: fdb-open-default-config ( path -- fdb-handle-pair )
+    fdb_get_default_config get-kvs-default-config fdb-open ;
 
 : ret>string ( void** len -- string )
     [ void* deref ] [ size_t deref ] bi*
@@ -53,8 +95,11 @@ M: fdb-doc dispose*
 
 SYMBOL: fdb-current
 
+: get-file-handle ( -- handle )
+    fdb-current get file-handle>> handle>> ;
+
 : get-handle ( -- handle )
-    fdb-current get handle>> ;
+    fdb-current get handle>> handle>> ;
 
 : fdb-set-kv ( key value -- )
     [ get-handle ] 2dip
@@ -129,13 +174,21 @@ SYMBOL: fdb-current
 : with-create-doc ( key meta body quot: ( doc -- ) -- )
     [ fdb-doc-create ] dip with-doc ; inline
 
-
-: fdb-info ( -- info )
-    get-handle
+: fdb-get-info ( -- fdb_info )
+    get-file-handle
     fdb_info <struct> [ fdb_get_dbinfo fdb-check-error ] keep ;
 
+: fdb-get-seqnum ( -- fdb_info )
+    get-handle
+    1020 fdb_seqnum_t <ref> [ fdb_get_seqnum fdb-check-error ] keep
+    fdb_seqnum_t deref ;
+
+: fdb-get-kvs-info ( -- fdb_kvs_info )
+    get-handle
+    fdb_kvs_info <struct> [ fdb_get_kvs_info fdb-check-error ] keep ;
+
 : fdb-commit ( fdb_commit_opt_t -- )
-    [ get-handle ] dip fdb_commit fdb-check-error ;
+    [ get-file-handle ] dip fdb_commit fdb-check-error ;
 
 : fdb-maybe-commit ( fdb_commit_opt_t/f -- )
     [ fdb-commit ] when* ;
@@ -147,13 +200,15 @@ SYMBOL: fdb-current
 FUNCTION: fdb_status fdb_rollback ( fdb_handle** handle_ptr, fdb_seqnum_t rollback_seqnum ) ;
 
 ! Call from within with-foresdb
-: fdb-open-snapshot ( seqnum -- handle )
+: fdb-open-snapshot ( seqnum -- handle-pair )
     [
         get-handle
         f void* <ref>
     ] dip [
         fdb_snapshot_open fdb-check-error
-    ] 2keep drop void* deref <fdb-handle> ;
+    ] 2keep drop void* deref <fdb-handle>
+    get-kvs-default-config
+    fdb-open-kvs ;
 
 ! fdb_rollback returns a new handle, so we
 ! have to replace our current handle with that one
@@ -280,7 +335,7 @@ T{ doc
 ! Do not try to commit here, as it will fail with FDB_RESULT_RONLY_VIOLATION
 ! fdb-current is weird, it gets replaced if you call fdb-rollback
 ! Therefore, only clean up fdb-current once, and clean it up at the end
-: with-forestdb-handle ( handle quot fdb_commit_opt_t/f -- )
+: with-forestdb-handle ( handle-pair quot fdb_commit_opt_t/f -- )
     '[
         _ fdb-current [
             [
@@ -296,14 +351,15 @@ T{ doc
 
 ! XXX: When you don't commit-wal at the end of with-forestdb, it won't
 ! persist to disk for next time you open the db.
-: with-forestdb-handle-commit-normal ( handle quot commit -- )
+: with-forestdb-handle-commit-normal ( handle-pair quot commit -- )
     FDB_COMMIT_NORMAL with-forestdb-handle ; inline
 
-: with-forestdb-handle-commit-wal ( handle quot commit -- )
+: with-forestdb-handle-commit-wal ( handle-pair quot commit -- )
     FDB_COMMIT_MANUAL_WAL_FLUSH with-forestdb-handle ; inline
 
-: with-forestdb-snapshot ( handle quot commit -- )
+: with-forestdb-snapshot ( handle-pair quot commit -- )
     f with-forestdb-handle ; inline
 
 : with-forestdb-path ( path quot -- )
-    [ absolute-path fdb-open ] dip with-forestdb-handle-commit-wal ; inline
+    [ absolute-path fdb-open-default-config ] dip with-forestdb-handle-commit-wal ; inline
+    ! [ absolute-path fdb-open-default-config ] dip with-forestdb-handle-commit-normal ; inline
