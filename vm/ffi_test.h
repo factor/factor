@@ -203,3 +203,6 @@ FACTOR_EXPORT FACTOR_FASTCALL(struct test_struct_11)
 FACTOR_EXPORT signed long long ffi_test_59(signed long long x);
 FACTOR_EXPORT unsigned long long ffi_test_60(unsigned long long x);
 
+FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
+FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);
+FACTOR_EXPORT void* bug1021_test_3(int x);
