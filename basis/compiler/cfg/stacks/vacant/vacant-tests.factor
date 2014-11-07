@@ -1,19 +1,11 @@
 USING: accessors arrays assocs compiler.cfg
 compiler.cfg.dataflow-analysis.private compiler.cfg.instructions
-compiler.cfg.linearization compiler.cfg.registers compiler.cfg.stacks.vacant
-kernel math sequences sorting tools.test vectors ;
+compiler.cfg.linearization compiler.cfg.registers
+compiler.cfg.utilities compiler.cfg.stacks.vacant kernel math sequences sorting
+tools.test vectors ;
 IN: compiler.cfg.stacks.vacant.tests
 
 ! Utils
-: create-block ( insns n -- bb )
-    <basic-block> swap >>number swap >>instructions ;
-
-: block>cfg ( bb -- cfg )
-    cfg new swap >>entry ;
-
-: create-cfg ( insns -- cfg )
-    0 create-block block>cfg ;
-
 : output-stack-map ( cfg -- map )
     vacant-analysis run-dataflow-analysis
     nip [ [ number>> ] dip ] assoc-map >alist natural-sort last second ;
@@ -21,24 +13,24 @@ IN: compiler.cfg.stacks.vacant.tests
 ! Initially both the d and r stacks are empty.
 {
     { { 0 { } } { 0 { } } }
-} [ V{ } create-cfg output-stack-map ] unit-test
+} [ V{ } insns>cfg output-stack-map ] unit-test
 
 ! Raise d stack.
 {
     { { 1 { } } { 0 { } } }
-} [ V{ T{ ##inc-d f 1 } } create-cfg output-stack-map ] unit-test
+} [ V{ T{ ##inc-d f 1 } } insns>cfg output-stack-map ] unit-test
 
 ! Raise r stack.
 {
     { { 0 { } } { 1 { } } }
-} [ V{ T{ ##inc-r f 1 } } create-cfg output-stack-map ] unit-test
+} [ V{ T{ ##inc-r f 1 } } insns>cfg output-stack-map ] unit-test
 
 ! Uninitialized peeks
 [
     V{
         T{ ##inc-d f 1 }
         T{ ##peek { dst 0 } { loc D 0 } }
-    } create-cfg
+    } insns>cfg
     compute-vacant-sets
 ] [ vacant-peek? ] must-fail-with
 
@@ -46,7 +38,7 @@ IN: compiler.cfg.stacks.vacant.tests
     V{
         T{ ##inc-r f 1 }
         T{ ##peek { dst 0 } { loc R 0 } }
-    } create-cfg
+    } insns>cfg
     compute-vacant-sets
 ] [ vacant-peek? ] must-fail-with
 
@@ -55,7 +47,7 @@ IN: compiler.cfg.stacks.vacant.tests
 [ ] [
     V{
         T{ ##peek { dst 0 } { loc D 0 } }
-    } create-cfg
+    } insns>cfg
     compute-vacant-sets
 ] unit-test
 
@@ -64,7 +56,7 @@ IN: compiler.cfg.stacks.vacant.tests
     V{
         T{ ##replace { src 10 } { loc D -1 } }
         T{ ##peek { dst 0 } { loc D -1 } }
-    } create-cfg
+    } insns>cfg
     compute-vacant-sets
 ] unit-test
 
@@ -76,7 +68,7 @@ IN: compiler.cfg.stacks.vacant.tests
         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
         T{ ##peek { dst 0 } { loc D -1 } }
     }
-    [ create-cfg compute-vacant-sets ]
+    [ insns>cfg compute-vacant-sets ]
     [ second gc-map>> check-d>> ] bi
 ] unit-test
 
@@ -87,7 +79,7 @@ IN: compiler.cfg.stacks.vacant.tests
         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
         T{ ##inc-d f -1 }
         T{ ##peek { dst 0 } { loc D -1 } }
-    } create-cfg output-stack-map first
+    } insns>cfg output-stack-map first
 ] unit-test
 
 ! Should not be ok because the value wasn't initialized when gc ran.
@@ -96,7 +88,7 @@ IN: compiler.cfg.stacks.vacant.tests
         T{ ##inc-d f 1 }
         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
         T{ ##peek { dst 0 } { loc D 0 } }
-    } create-cfg
+    } insns>cfg
     compute-vacant-sets
 ] [ vacant-peek? ] must-fail-with
 
@@ -111,7 +103,7 @@ IN: compiler.cfg.stacks.vacant.tests
     { { 0 { } } { 0 { } } }
 } [
     V{ T{ ##safepoint } T{ ##prologue } T{ ##branch } }
-    create-cfg output-stack-map
+    insns>cfg output-stack-map
 ] unit-test
 
 {
@@ -121,7 +113,7 @@ IN: compiler.cfg.stacks.vacant.tests
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##replace { src 10 } { loc D 1 } }
         T{ ##replace { src 10 } { loc D 2 } }
-    } create-cfg output-stack-map
+    } insns>cfg output-stack-map
 ] unit-test
 
 {
@@ -131,7 +123,7 @@ IN: compiler.cfg.stacks.vacant.tests
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##inc-d f 1 }
         T{ ##replace { src 10 } { loc D 0 } }
-    } create-cfg output-stack-map
+    } insns>cfg output-stack-map
 ] unit-test
 
 {
@@ -142,7 +134,7 @@ IN: compiler.cfg.stacks.vacant.tests
         T{ ##inc-d f 1 }
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##inc-d f -1 }
-    } create-cfg output-stack-map first
+    } insns>cfg output-stack-map first
 ] unit-test
 
 {
@@ -152,7 +144,7 @@ IN: compiler.cfg.stacks.vacant.tests
         T{ ##inc-d f 1 }
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##inc-d f -1 }
-    } create-cfg output-stack-map first
+    } insns>cfg output-stack-map first
 ] unit-test
 
 {
@@ -169,18 +161,18 @@ IN: compiler.cfg.stacks.vacant.tests
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##inc-d f -1 }
         T{ ##call }
-    } create-cfg output-stack-map first
+    } insns>cfg output-stack-map first
 ] unit-test
 
 : cfg1 ( -- cfg )
     V{
         T{ ##inc-d f 1 }
         T{ ##replace { src 10 } { loc D 0 } }
-    } 0 create-block
+    } 0 insns>block
     V{
         T{ ##peek { dst 37 } { loc D 0 } }
         T{ ##inc-d f -1 }
-    } 1 create-block
+    } 1 insns>block
     1vector >>successors block>cfg ;
 
 { { 0 { -1 } } } [ cfg1 output-stack-map first ] unit-test
@@ -238,7 +230,7 @@ IN: compiler.cfg.stacks.vacant.tests
                 T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
             }
         }
-    } [ over create-block ] assoc-map dup
+    } [ over  insns>block ] assoc-map dup
     { { 0 1 } { 1 2 } { 2 3 } { 3 8 } { 8 10 } } make-edges 0 of block>cfg ;
 
 { { 4 { 3 2 1 -3 0 -2 -1 } } } [
