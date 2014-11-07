@@ -307,7 +307,7 @@ unsigned long long ffi_test_60(unsigned long long x) {
   return x;
 }
 
-struct bool_and_ptr ffi_test_61(unsigned long long x) {
+struct bool_and_ptr ffi_test_61() {
   struct bool_and_ptr bap;
   bap.b = true;
   bap.ptr = NULL;

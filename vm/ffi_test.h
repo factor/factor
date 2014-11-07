@@ -208,4 +208,4 @@ struct bool_and_ptr {
     void* ptr;
 };
 
-FACTOR_EXPORT struct bool_and_ptr ffi_test_61(unsigned long long x);
+FACTOR_EXPORT struct bool_and_ptr ffi_test_61();
