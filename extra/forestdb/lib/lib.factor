@@ -9,7 +9,6 @@ IN: forestdb.lib
 
 /*
 ! Issues
-! 1) bug - snapshot has doc_count of entire file, not just that snapshot's doc_count
 ! 2) build on macosx doesn't search /usr/local for libsnappy
 ! 3) build on macosx doesn't include -L/usr/local/lib when it finds snappy
 !  - link_directories(/usr/local/lib) or some other fix
