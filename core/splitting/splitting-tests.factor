@@ -104,3 +104,11 @@ unit-test
 [ "afoobfooc" "" "" replace ] unit-test
 
 { "" } [ "" "" "" replace ] unit-test
+
+{ { "Thi" "s " "i" "s a sequence" } } [
+    "This is a sequence" { 3 5 6 } split-indices
+] unit-test
+
+{ { "" "This" } } [
+    "This" { 0 } split-indices
+] unit-test
