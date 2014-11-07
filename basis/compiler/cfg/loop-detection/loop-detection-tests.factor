@@ -1,7 +1,6 @@
-USING: compiler.cfg compiler.cfg.loop-detection
-compiler.cfg.predecessors
-compiler.cfg.debugger
-tools.test kernel namespaces accessors ;
+USING: compiler.cfg compiler.cfg.loop-detection compiler.cfg.debugger
+compiler.cfg.predecessors compiler.cfg.utilities tools.test kernel namespaces
+accessors ;
 IN: compiler.cfg.loop-detection.tests
 
 V{ } 0 test-bb
@@ -11,7 +10,8 @@ V{ } 2 test-bb
 0 { 1 2 } edges
 2 0 edge
 
-: test-loop-detection ( -- ) cfg new 0 get >>entry needs-loops drop ;
+: test-loop-detection ( -- )
+    0 get block>cfg needs-loops drop ;
 
 [ ] [ test-loop-detection ] unit-test
 

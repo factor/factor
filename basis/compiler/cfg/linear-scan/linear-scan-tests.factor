@@ -19,7 +19,8 @@ compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.spilling
-compiler.cfg.linear-scan.debugger ;
+compiler.cfg.linear-scan.debugger
+compiler.cfg.utilities ;
 FROM: namespaces => set ;
 IN: compiler.cfg.linear-scan.tests
 
@@ -37,7 +38,7 @@ V{
 } 0 test-bb
 
 : test-live-intervals ( -- )
-    cfg new 0 get >>entry
+    0 get block>cfg
     [ cfg set ] [ number-instructions ] [ compute-live-intervals ] tri
     2drop ;
 

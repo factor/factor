@@ -3,8 +3,8 @@ compiler.cfg.registers compiler.cfg.debugger compiler.cfg.comparisons
 cpu.architecture tools.test kernel math combinators.short-circuit
 accessors sequences compiler.cfg.predecessors locals compiler.cfg.dce
 compiler.cfg.ssa.destruction compiler.cfg.loop-detection
-compiler.cfg.representations compiler.cfg assocs vectors arrays
-layouts literals namespaces alien compiler.cfg.value-numbering.simd
+compiler.cfg.representations compiler.cfg compiler.cfg.utilities assocs vectors
+arrays layouts literals namespaces alien compiler.cfg.value-numbering.simd
 system ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.value-numbering.tests
@@ -1245,7 +1245,7 @@ cpu x86? [
             T{ ##compare-integer-imm f 1 0 0 cc<= }
         } value-numbering-step
     ] unit-test
-    
+
     [
         {
             T{ ##peek f 0 D 0 }
@@ -2747,7 +2747,7 @@ V{
 test-diamond
 
 [ ] [
-    cfg new 0 get >>entry dup cfg set
+    0 get block>cfg dup cfg set
     value-numbering
     select-representations
     destruct-ssa drop
@@ -2787,7 +2787,7 @@ V{
 test-diamond
 
 [ ] [
-    cfg new 0 get >>entry
+    0 get block>cfg
     value-numbering
     eliminate-dead-code
     drop
@@ -2856,7 +2856,7 @@ V{
 4 5 edge
 
 [ ] [
-    cfg new 0 get >>entry
+    0 get block>cfg
     value-numbering eliminate-dead-code drop
 ] unit-test
 

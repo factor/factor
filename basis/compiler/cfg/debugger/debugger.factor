@@ -100,8 +100,7 @@ M: rs-loc pprint* \ R pprint-loc ;
     ] each-phi ;
 
 : test-bb ( insns n -- )
-    [ <basic-block> swap >>number swap >>instructions dup ] keep set
-    resolve-phis ;
+    [ insns>block dup ] keep set resolve-phis ;
 
 : edge ( from to -- )
     [ get ] bi@ 1vector >>successors drop ;
