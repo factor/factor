@@ -1,13 +1,9 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test accessors vectors sequences namespaces
-arrays
-cpu.architecture
-compiler.cfg.def-use
-compiler.cfg
-compiler.cfg.debugger
-compiler.cfg.instructions
-compiler.cfg.registers ;
+arrays compiler.cfg.def-use compiler.cfg compiler.cfg.debugger
+compiler.cfg.instructions compiler.cfg.registers compiler.cfg.utilities
+cpu.architecture ;
 IN: compiler.cfg.def-use.tests
 
 V{
@@ -32,5 +28,5 @@ V{
 4 6 edge
 5 6 edge
 
-cfg new 1 get >>entry 0 set
+1 get block>cfg 0 set
 [ ] [ 0 get compute-defs ] unit-test

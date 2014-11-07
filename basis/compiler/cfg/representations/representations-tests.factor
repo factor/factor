@@ -4,7 +4,7 @@ compiler.cfg.representations.preferred cpu.architecture kernel
 namespaces tools.test sequences arrays system literals layouts
 math compiler.constants compiler.cfg.representations.conversion
 compiler.cfg.representations.rewrite
-compiler.cfg.comparisons
+compiler.cfg.comparisons compiler.cfg.utilities
 make ;
 FROM: alien.c-types => char ;
 IN: compiler.cfg.representations
@@ -52,7 +52,7 @@ H{ } clone representations set
 ] unit-test
 
 : test-representations ( -- )
-    cfg new 0 get >>entry dup cfg set select-representations drop ;
+    0 get block>cfg dup cfg set select-representations drop ;
 
 ! Make sure cost calculation isn't completely wrong
 V{

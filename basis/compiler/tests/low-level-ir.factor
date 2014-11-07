@@ -2,8 +2,8 @@ USING: accessors assocs compiler compiler.cfg
 compiler.cfg.debugger compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.linear-scan
 compiler.cfg.ssa.destruction compiler.cfg.build-stack-frame
-compiler.codegen compiler.units cpu.architecture hashtables
-kernel namespaces sequences tools.test vectors words layouts
+compiler.cfg.utilities compiler.codegen compiler.units cpu.architecture
+hashtables kernel namespaces sequences tools.test vectors words layouts
 literals math arrays alien.c-types alien.syntax math.private ;
 IN: compiler.tests.low-level-ir
 
@@ -13,7 +13,7 @@ IN: compiler.tests.low-level-ir
     [ associate >alist t t modify-code-heap ] keep ;
 
 : compile-test-cfg ( -- word )
-    cfg new 0 get >>entry
+    0 get block>cfg
     dup cfg set
     dup fake-representations
     destruct-ssa

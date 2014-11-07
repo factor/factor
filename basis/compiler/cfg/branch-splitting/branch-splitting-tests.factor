@@ -1,4 +1,4 @@
-USING: accessors assocs compiler.cfg
+USING: accessors assocs compiler.cfg.utilities compiler.cfg
 compiler.cfg.branch-splitting compiler.cfg.debugger
 compiler.cfg.predecessors compiler.cfg.rpo compiler.cfg.instructions fry kernel
 tools.test namespaces sequences vectors ;
@@ -18,7 +18,7 @@ IN: compiler.cfg.branch-splitting.tests
     check-predecessors ;
 
 : test-branch-splitting ( -- )
-    cfg new 0 get >>entry check-branch-splitting ;
+    0 get block>cfg check-branch-splitting ;
 
 V{ T{ ##branch } } 0 test-bb
 
