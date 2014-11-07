@@ -1,5 +1,5 @@
-USING: classes compiler.cfg help.markup help.syntax kernel layouts
-slots.private ;
+USING: arrays classes compiler.cfg cpu.architecture help.markup help.syntax
+kernel layouts slots.private ;
 IN: compiler.cfg.instructions
 
 HELP: new-insn
@@ -26,6 +26,15 @@ HELP: foldable-insn
 { $class-description
   "Instructions which are referentially transparent; used for value numbering." } ;
 
+HELP: ##load-reference
+{ $class-description
+  "An instruction for loading a pointer to an object into a register. It has the following slots:"
+  { $table
+    { { $slot "dst" } { "Register to load the pointer into." } }
+    { { $slot "obj" } { "A Factor object." } }
+  }
+} ;
+
 HELP: ##inc-d
 { $class-description
   "An instruction that increases or decreases the data stacks height by n. For example, " { $link 2drop } " decreases it by two and pushing an item increases it by one."
@@ -34,7 +43,18 @@ HELP: ##inc-d
 HELP: ##prologue
 { $class-description
   "An instruction for generating the prologue for a cfg. All it does is decrementing the stack register a number of cells to give the generated code some stack space to work with." }
-{ $see-also ##epilogue } ;
+  { $see-also ##epilogue } ;
+
+HELP: ##allot
+{ $class-description
+  "An instruction for allocating memory in the nursery. Usually the instruction is preceeded by " { $link ##check-nursery-branch } " which checks that there is enough room in the nursery to allocate. It has the following slots:"
+  { $table
+    { { $slot "dst" } { "Register to put the pointer to the memory in." } }
+    { { $slot "size" } { "Number of bytes to allocate." } }
+    { { $slot "class-of" } { "Class of object to allocate, e.g " { $link tuple } " or " { $link array } "." } }
+    { { $slot "temp" } { "Temporary register to clobber." } }
+  }
+} ;
 
 HELP: ##alien-invoke
 { $class-description
@@ -65,8 +85,22 @@ HELP: ##set-slot
     { { $slot "slot" } { "Slot index." } }
     { { $slot "tag" } { "Type tag for obj." } }
   }
-}
-{ $see-also ##set-slot-imm } ;
+} ;
+
+HELP: ##set-slot-imm
+{ $class-description
+  "An instruction for what? It has the following slots:"
+  { $table
+    { { $slot "src" } { "Register containing the value to put in the slot." } }
+    { { $slot "obj" } { "Register containing the object to set the slot on.." } }
+    { { $slot "slot" } { "Slot index." } }
+    { { $slot "tag" } { "Type tag for obj." } }
+  }
+} ;
+
+{ ##set-slot %set-slot } related-words
+{ ##set-slot-imm %set-slot-imm } related-words
+{ ##set-slot-imm ##set-slot } related-words
 
 HELP: ##replace-imm
 { $class-description
@@ -149,8 +183,10 @@ $nl
 "Instruction classes for moving values around:"
 { $subsections
   ##copy
+  ##peek
   ##reload
   ##replace
+  ##replace-imm
   ##spill
 }
 "Garbage collection words and instruction classes:"
@@ -161,4 +197,39 @@ $nl
 { $subsections
   ##alien-invoke
   alien-call-insn
+}
+"Allocation:"
+{ $subsections
+  ##allot
+}
+"Constant loading:"
+{ $subsections
+  ##load-integer
+  ##load-reference
+}
+ "Integer arithmetic and bit operations:"
+{ $subsections
+  ##add
+  ##add-imm
+  ##and
+  ##and-imm
+  ##mul
+  ##mul-imm
+  ##or
+  ##or-imm
+  ##sar
+  ##sar-imm
+  ##shl
+  ##shl-imm
+  ##sub
+  ##sub-imm
+  ##xor
+  ##xor-imm
+}
+"Slot access:"
+{ $subsections
+  ##slot
+  ##slot-imm
+  ##set-slot
+  ##set-slot-imm
 } ;
