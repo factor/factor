@@ -25,7 +25,7 @@ ERROR: bad-delete-at key assoc ;
     '[ [ precedes>> _ swap check-delete-at ] each ]
     [ [ ready? ] filter roots get push-all ] bi ;
 
-: score ( insn -- n )
+: score ( node -- n )
     [ parent-index>> ] [ registers>> neg ] [ insn>> insn#>> ] tri 3array ;
 
 : pull-out-nth ( n seq -- elt )
@@ -66,12 +66,11 @@ conditional-branch-insn
 : final-insn-start ( insns -- n )
     [ final-insn? not ] find-last drop [ 1 + ] [ 0 ] if* ;
 
-: split-insns ( insns -- pre body post )
-    dup [ initial-insn-end ] [ final-insn-start ] bi 2array split-indices
-    first3 ;
+: split-insns ( insns -- pre/body/post )
+    dup [ initial-insn-end ] [ final-insn-start ] bi 2array split-indices ;
 
 : reorder ( insns -- insns' )
-    split-insns [
+    split-insns first3 [
         build-dependence-graph
         build-fan-in-trees
         [ (reorder) ] V{ } make reverse
