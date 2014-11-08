@@ -74,7 +74,7 @@ GML: slice ( array n k -- slice )
 GML:: subarray ( array n k -- slice )
     k n k + array subseq ;
 GML: sort-number-permutation ( array -- permutation )
-    [ 2array ] map-index sort-keys reverse values ;
+    zip-index sort-keys reverse values ;
 
 ! Dictionaries
 ERROR: not-a-dict obj ;

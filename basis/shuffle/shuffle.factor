@@ -8,7 +8,7 @@ IN: shuffle
 <PRIVATE
 
 : >index-assoc ( sequence -- assoc )
-    dup length iota zip >hashtable ;
+    zip-index >hashtable ;
 
 PRIVATE>
 
