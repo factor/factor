@@ -313,3 +313,17 @@ struct bool_and_ptr ffi_test_61() {
   bap.ptr = NULL;
   return bap;
 }
+
+struct uint_pair ffi_test_62() {
+  struct uint_pair uip;
+  uip.a = 0xabcdefab;
+  uip.b = 0x12345678;
+  return uip;
+}
+
+struct ulonglong_pair ffi_test_63() {
+  struct ulonglong_pair ullp;
+  ullp.a = 0xabcdefabcdefabcd;
+  ullp.b = 0x1234567891234567;
+  return ullp;
+}
