@@ -218,7 +218,7 @@ ERROR: bad-partial-eval quot word ;
 \ index [
     dup sequence? [
         dup length 4 >= [
-            dup length iota zip >hashtable '[ _ at ]
+            zip-index >hashtable '[ _ at ]
         ] [ drop f ] if
     ] [ drop f ] if
 ] 1 define-partial-eval
