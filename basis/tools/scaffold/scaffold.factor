@@ -134,6 +134,7 @@ ERROR: vocab-name-contains-dot path ;
         { "vocab-root" "a vocabulary root string" }
         { "c-ptr" c-ptr }
         { "seq" sequence }
+        { "exemplar" object }
         { "assoc" assoc }
         { "alist" "an array of key/value pairs" }
         { "keys" sequence } { "values" sequence }
