@@ -84,13 +84,12 @@ M: object add-control-edge 2drop ;
 : set-roots ( nodes -- )
     [ ready? ] V{ } filter-as roots set ;
 
-: build-dependence-graph ( instructions -- )
-    [ <node> ] map {
+: build-dependence-graph ( nodes -- )
+    {
         [ add-control-edges ]
         [ add-data-edges ]
         [ set-follows ]
         [ set-roots ]
-        [ nodes set ]
     } cleave ;
 
 ! Sethi-Ulmann numbering
@@ -121,8 +120,7 @@ M: object add-control-edge 2drop ;
         ] if-empty
     ] [ drop ] if ;
 
-: make-trees ( -- trees )
-    nodes get
+: make-trees ( nodes -- trees )
     [ [ choose-parent ] each ]
     [ [ parent>> not ] filter ] bi ;
 
@@ -146,8 +144,8 @@ ERROR: node-missing-children trees nodes ;
 : verify-trees ( trees -- trees )
     verify-parents verify-children ;
 
-: build-fan-in-trees ( -- )
-    make-trees verify-trees [
+: build-fan-in-trees ( nodes -- )
+    dup nodes set make-trees verify-trees [
         -1/0. >>parent-index
         calculate-registers drop
     ] each ;
