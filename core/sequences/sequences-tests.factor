@@ -386,3 +386,19 @@ USE: make
 { { } } [ 0 0 <repetition> >array ] unit-test
 { { 0 } } [ 1 0 <repetition> >array ] unit-test
 { { 0 0 0 } } [ 3 0 <repetition> >array ] unit-test
+
+{
+    { 11 23 35 }
+} [ { 11 22 33 } [ + ] map-index ] unit-test
+
+{
+    V{ 11 23 35 }
+} [ { 11 22 33 } [ + ] V{ } map-index-as ] unit-test
+
+{
+    B{ 11 23 35 }
+} [ { 11 22 33 } [ + ] B{ } map-index-as ] unit-test
+
+{
+    BV{ 11 23 35 }
+} [ { 11 22 33 } [ + ] BV{ } map-index-as ] unit-test

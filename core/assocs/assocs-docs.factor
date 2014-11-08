@@ -132,7 +132,9 @@ ARTICLE: "assocs-conversions" "Associative mapping conversions"
 "Combining a sequence of assocs into a single assoc:"
 { $subsections assoc-combine }
 "Creating an assoc from key/value sequences:"
-{ $subsections zip }
+{ $subsections zip zip-as }
+"Creating an assoc from key/value sequences and their indices:"
+{ $subsections zip-index zip-index-as }
 "Creating key/value sequences from an assoc:"
 { $subsections unzip }
 ;
@@ -524,3 +526,46 @@ HELP: zip
     }
 } ;
 { unzip zip } related-words
+
+HELP: zip-as
+{ $values
+     { "keys" sequence } { "values" sequence } { "exemplar" sequence }
+     { "obj" "a sequence of key/value pairs of type " { $snippet "exemplar" } } }
+{ $description "Combines two sequences pairwise into a single sequence of key/value pairs of type " { $snippet "exemplar" } "." }
+{ $notes "Exemplar must be a sequence type; hashtables will not work yet." }
+{ $examples
+    { $example "USING: prettyprint assocs ;"
+               "{ 1 2 3 } { 4 5 6 } V{ } zip-as ."
+               "V{ { 1 4 } { 2 5 } { 3 6 } }"
+    }
+} ;
+
+HELP: zip-index
+{ $values
+    { "values" sequence }
+    { "alist" "an array of key/value pairs" }
+}
+{ $examples
+    "Zip a sequnce with its indices:"
+    { $example "USING: assocs prettyprint ;"
+        "{ 100 200 300 } zip-index ."
+        "{ { 100 0 } { 200 1 } { 300 2 } }"
+    }
+}
+{ $description "Zip a sequence with its index and return an associative list where the input sequence is the keys and the indices are the values." } ;
+
+HELP: zip-index-as
+{ $values
+    { "values" sequence } { "exemplar" sequence }
+    { "obj" "an array of key/value pairs" }
+}
+{ $examples
+    "Zip a sequnce with its indices as a vector:"
+    { $example "USING: assocs prettyprint ;"
+        "{ 100 200 300 } V{ } zip-index-as ."
+        "V{ { 100 0 } { 200 1 } { 300 2 } }"
+    }
+}
+{ $description "Zip a sequence with its index and return an associative list of type " { $snippet "exemplar" } " where the input sequence is the keys and the indices are the values." } ;
+
+{ unzip zip zip-as zip-index zip-index-as } related-words
