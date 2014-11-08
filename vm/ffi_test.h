@@ -209,3 +209,17 @@ struct bool_and_ptr {
 };
 
 FACTOR_EXPORT struct bool_and_ptr ffi_test_61();
+
+struct uint_pair {
+	unsigned int a;
+	unsigned int b;
+};
+
+FACTOR_EXPORT struct uint_pair ffi_test_62();
+
+struct ulonglong_pair {
+	unsigned long long a;
+	unsigned long long b;
+};
+
+FACTOR_EXPORT struct ulonglong_pair ffi_test_63();
