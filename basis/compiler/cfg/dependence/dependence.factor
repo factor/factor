@@ -7,8 +7,6 @@ make math combinators.short-circuit vectors ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dependence
 
-! Dependence graph construction
-
 SYMBOL: roots
 SYMBOL: node-number
 SYMBOL: nodes
@@ -16,9 +14,6 @@ SYMBOL: nodes
 SYMBOL: +data+
 SYMBOL: +control+
 
-! Nodes in the dependency graph
-! These need to be numbered so that the same instruction
-! will get distinct nodes if it occurs multiple times
 TUPLE: node
     number insn precedes follows
     children parent
@@ -153,6 +148,6 @@ ERROR: node-missing-children trees nodes ;
 
 : build-fan-in-trees ( -- )
     make-trees verify-trees [
-        -1/0. >>parent-index 
+        -1/0. >>parent-index
         calculate-registers drop
     ] each ;
