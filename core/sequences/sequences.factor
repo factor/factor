@@ -578,8 +578,11 @@ PRIVATE>
         3bi
     ] if ; inline
 
+: map-index-as ( ... seq quot: ( ... elt index -- ... newelt ) exemplar -- ... newseq )
+    [ dup length iota ] 2dip 2map-as ; inline
+
 : map-index ( ... seq quot: ( ... elt index -- ... newelt ) -- ... newseq )
-    [ dup length iota ] dip 2map ; inline
+    { } map-index-as ; inline
 
 : reduce-index ( ... seq identity quot: ( ... prev elt index -- ... next ) -- ... result )
     swapd each-index ; inline

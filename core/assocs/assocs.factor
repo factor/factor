@@ -198,8 +198,17 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 : push-at ( value key assoc -- )
     [ ?push ] change-at ;
 
+: zip-as ( keys values exemplar -- obj )
+    [ [ 2array ] ] dip 2map-as ; inline
+
 : zip ( keys values -- alist )
-    [ 2array ] { } 2map-as ; inline
+    { } zip-as ; inline
+
+: zip-index-as ( values exemplar -- obj )
+    [ [ 2array ] ] dip map-index-as ; inline
+
+: zip-index ( values -- alist )
+    { } zip-index-as ; inline
 
 : unzip ( assoc -- keys values )
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
