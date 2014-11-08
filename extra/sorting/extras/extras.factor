@@ -3,7 +3,7 @@ math.order sequences sequences.extras sequences.private sorting ;
 IN: sorting.extras
 
 : argsort ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )
-    [ dup length iota zip ] dip
+    [ zip-index ] dip
     [ [ first-unsafe ] bi@ ] prepose
     sort [ second-unsafe ] map! ; inline
 
