@@ -66,15 +66,21 @@ conditional-branch-insn
 : final-insn-start ( insns -- n )
     [ final-insn? not ] find-last drop [ 1 + ] [ 0 ] if* ;
 
+! hack to get bootstrapping working
+: split-indices-int ( seq indices -- pieces )
+    over length suffix 0 swap [ dup swapd 2array ] map nip
+    [ first2 rot subseq ] with map ;
+
 : split-insns ( insns -- pre/body/post )
-    dup [ initial-insn-end ] [ final-insn-start ] bi 2array split-indices ;
+    dup [ initial-insn-end ] [ final-insn-start ] bi 2array split-indices-int ;
+
+: reorder-body ( body -- body' )
+    [ <node> ] map
+    [ build-dependence-graph ] [ build-fan-in-trees ] bi
+    [ (reorder) ] V{ } make reverse ;
 
 : reorder ( insns -- insns' )
-    split-insns first3 [
-        build-dependence-graph
-        build-fan-in-trees
-        [ (reorder) ] V{ } make reverse
-    ] dip 3append ;
+    split-insns first3 [ reorder-body ] dip 3append ;
 
 : schedule-block ( bb -- )
     [ reorder ] change-instructions drop ;
