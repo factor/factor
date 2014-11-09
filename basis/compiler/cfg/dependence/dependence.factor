@@ -119,8 +119,8 @@ M: object add-control-edge 2drop ;
 : make-trees ( nodes -- trees )
     [ [ choose-parent ] each ] [ [ parent>> not ] filter ] bi ;
 
+: initialize-scores ( trees -- )
+    [ -1/0. >>parent-index calculate-registers drop ] each ;
+
 : build-fan-in-trees ( nodes -- )
-    make-trees [
-        -1/0. >>parent-index
-        calculate-registers drop
-    ] each ;
+    make-trees initialize-scores ;

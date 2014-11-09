@@ -28,14 +28,8 @@ ERROR: bad-delete-at key assoc ;
 : score ( node -- n )
     [ parent-index>> ] [ registers>> neg ] [ insn>> insn#>> ] tri 3array ;
 
-: pull-out-nth ( n seq -- elt )
-    [ nth ] [ remove-nth! drop ] 2bi ;
-
-: select ( vector quot -- elt )
-    ! This could be sped up by a constant factor
-    [ dup <enum> ] dip '[ _ call( insn -- score ) ] assoc-map
-    dup values supremum '[ nip _ = ] assoc-find
-    2drop swap pull-out-nth ; inline
+: select ( vector quot: ( elt -- score ) -- elt )
+    dupd supremum-by swap dupd remove-eq! drop ; inline
 
 : select-instruction ( -- insn/f )
     roots get [ f ] [
@@ -83,4 +77,5 @@ conditional-branch-insn
 ! TODO: stack effect should be ( cfg -- )
 : schedule-instructions ( cfg --  cfg' )
     dup number-instructions
-    dup reverse-post-order [ kill-block?>> not ] filter [ schedule-block ] each ;
+    dup reverse-post-order [ kill-block?>> not ] filter
+    [ schedule-block ] each ;
