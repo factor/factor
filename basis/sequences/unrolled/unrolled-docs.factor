@@ -1,5 +1,5 @@
 ! (c)2010 Joe Groff bsd license
-USING: help.markup help.syntax kernel math quotations sequences
+USING: assocs help.markup help.syntax kernel math quotations sequences
 sequences.private ;
 IN: sequences.unrolled
 

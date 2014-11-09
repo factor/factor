@@ -14,14 +14,6 @@ IN: assocs.extras
 : deep-at ( assoc seq -- value/f )
     [ of ] each ; inline
 
-: zip-as ( keys values exemplar -- assoc )
-    dup sequence? [
-        [ 2array ] swap 2map-as
-    ] [
-        [ 2dup min-length ] dip new-assoc
-        [ [ set-at ] with-assoc 2each ] keep
-    ] if ; inline
-
 : substitute! ( seq assoc -- seq )
     substituter map! ;
 
