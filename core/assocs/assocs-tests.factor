@@ -220,6 +220,10 @@ unit-test
 
 {
     V{ 11 23 35 }
+} [ V{ 11 22 33 } [ + ] map-index ] unit-test
+
+{
+    V{ 11 23 35 }
 } [ { 11 22 33 } [ + ] V{ } map-index-as ] unit-test
 
 {
@@ -234,6 +238,10 @@ unit-test
 {
     { { 1 4 } { 2 5 } { 3 6 } }
 } [ { 1 2 3 } { 4 5 6 } zip ] unit-test
+
+{
+    V{ { 1 4 } { 2 5 } { 3 6 } }
+} [ V{ 1 2 3 } { 4 5 6 } zip ] unit-test
 
 {
     { { 1 4 } { 2 5 } { 3 6 } }
@@ -266,6 +274,10 @@ unit-test
 {
     { { 11 0 } { 22 1 } { 33 2 } }
 } [ { 11 22 33 } zip-index ] unit-test
+
+{
+    V{ { 11 0 } { 22 1 } { 33 2 } }
+} [ V{ 11 22 33 } zip-index ] unit-test
 
 {
     { { 11 0 } { 22 1 } { 33 2 } }
