@@ -6,7 +6,6 @@ namespaces sequences sorting make math math.vectors vectors ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dependence
 
-SYMBOL: roots
 SYMBOL: node-number
 
 SYMBOL: +data+
@@ -27,8 +26,6 @@ M: node hashcode* nip number>> ;
         swap >>insn
         H{ } clone >>precedes
         V{ } clone >>follows ;
-
-: ready? ( node -- ? ) precedes>> assoc-empty? ;
 
 :: precedes ( first second how -- )
     how second first precedes>> set-at ;
@@ -79,16 +76,8 @@ M: object add-control-edge 2drop ;
         ] with each
     ] each ;
 
-: set-roots ( nodes -- )
-    [ ready? ] V{ } filter-as roots set ;
-
 : build-dependence-graph ( nodes -- )
-    {
-        [ add-control-edges ]
-        [ add-data-edges ]
-        [ set-follows ]
-        [ set-roots ]
-    } cleave ;
+    [ add-control-edges ] [ add-data-edges ] [ set-follows ] tri ;
 
 ! Sethi-Ulmann numbering
 :: calculate-registers ( node -- registers )
@@ -101,23 +90,22 @@ M: object add-control-edge 2drop ;
     dup node registers<< ;
 
 ! Constructing fan-in trees
-: attach-parent ( node parent -- )
-    [ >>parent drop ] [ [ ?push ] change-children drop ] 2bi ;
-
 : keys-for ( assoc value -- keys )
     '[ nip _ = ] assoc-filter keys ;
 
-: choose-parent ( node -- )
-    ! If a node has control dependences, it has to be a root
-    ! Otherwise, choose one of the data dependences for a parent
-    dup precedes>> +control+ keys-for empty? [
-        dup precedes>> +data+ keys-for [ drop ] [
-            first attach-parent
-        ] if-empty
-    ] [ drop ] if ;
+: attach-parent ( node parent -- )
+    [ >>parent drop ] [ [ ?push ] change-children drop ] 2bi ;
+
+: select-parent ( precedes -- parent/f )
+    ! If a node has no control dependencies, then its parent is its first
+    ! data dependency, if it has one. Otherwise it is a root node.
+    [ +control+ keys-for empty? ] [ +data+ keys-for ?first ] bi f ? ;
+
+: maybe-set-parent ( node -- )
+    dup precedes>> select-parent [ attach-parent ] [ drop ] if* ;
 
 : make-trees ( nodes -- trees )
-    [ [ choose-parent ] each ] [ [ parent>> not ] filter ] bi ;
+    [ [ maybe-set-parent ] each ] [ [ parent>> not ] filter ] bi ;
 
 : initialize-scores ( trees -- )
     [ -1/0. >>parent-index calculate-registers drop ] each ;

@@ -3,6 +3,7 @@
 USING: accessors arrays assocs compiler.cfg.def-use compiler.cfg.dependence
 compiler.cfg.instructions compiler.cfg.linear-scan.numbering compiler.cfg.rpo
 cpu.architecture fry kernel make math namespaces sequences sets splitting ;
+FROM: namespaces => set ;
 IN: compiler.cfg.scheduling
 
 ! Instruction scheduling to reduce register pressure, from:
@@ -19,6 +20,10 @@ ERROR: bad-delete-at key assoc ;
 : set-parent-indices ( node -- )
     children>> building get length
     '[ _ >>parent-index drop ] each ;
+
+SYMBOL: roots
+
+: ready? ( node -- ? ) precedes>> assoc-empty? ;
 
 : remove-node ( node -- )
     [ follows>> members ] keep
@@ -63,10 +68,14 @@ conditional-branch-insn
 : split-insns ( insns -- pre/body/post )
     dup [ initial-insn-end ] [ final-insn-start ] bi 2array split-indices ;
 
-: reorder-body ( body -- body' )
+: setup-root-nodes ( insns -- roots )
     [ <node> ] map
-    [ build-dependence-graph ] [ build-fan-in-trees ] bi
-    [ (reorder) ] V{ } make reverse ;
+    [ build-dependence-graph ]
+    [ build-fan-in-trees ]
+    [ [ ready? ] V{ } filter-as ] tri ;
+
+: reorder-body ( body -- body' )
+    setup-root-nodes roots set [ (reorder) ] V{ } make reverse ;
 
 : reorder ( insns -- insns' )
     split-insns first3 [ reorder-body ] dip 3append ;
