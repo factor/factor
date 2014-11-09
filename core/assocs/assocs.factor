@@ -206,7 +206,7 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
         [ [ set-at ] with-assoc 2each ] keep
     ] if ; inline
 
- : zip ( keys values -- alist )
+ : zip ( keys values -- assoc )
      over zip-as ; inline
 
 : map-index-as ( ... seq quot: ( ... elt index -- ... newelt ) exemplar -- ... obj )
@@ -221,10 +221,10 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 : map-index ( ... seq quot: ( ... elt index -- ... newelt ) -- ... newseq )
     over map-index-as ; inline
 
-: zip-index-as ( values exemplar -- obj )
+: zip-index-as ( values exemplar -- assoc )
     [ [ 2array ] ] dip map-index-as ; inline
 
-: zip-index ( values -- alist )
+: zip-index ( values -- assoc )
     dup zip-index-as ; inline
 
 : unzip ( assoc -- keys values )

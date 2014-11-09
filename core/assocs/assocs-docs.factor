@@ -517,7 +517,7 @@ HELP: unzip
 HELP: zip
 { $values
      { "keys" sequence } { "values" sequence }
-     { "alist" "an array of key/value pairs" } }
+     { "assoc" assoc } }
 { $description "Combines two sequences pairwise into a single sequence of key/value pairs." }
 { $examples
     { $example "USING: prettyprint assocs ;"
@@ -543,7 +543,7 @@ HELP: zip-as
 HELP: zip-index
 { $values
     { "values" sequence }
-    { "alist" "an array of key/value pairs" }
+    { "assoc" assoc }
 }
 { $examples
     "Zip a sequnce with its indices:"
@@ -557,7 +557,7 @@ HELP: zip-index
 HELP: zip-index-as
 { $values
     { "values" sequence } { "exemplar" sequence }
-    { "obj" "an array of key/value pairs" }
+    { "assoc" assoc }
 }
 { $examples
     "Zip a sequnce with its indices as a vector:"
