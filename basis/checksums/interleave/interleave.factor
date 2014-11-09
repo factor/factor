@@ -9,7 +9,7 @@ IN: checksums.interleave
 
 : 2seq>seq ( seq1 seq2 -- seq )
     #! { aceg } { bdfh } -> { abcdefgh }
-    [ zip concat ] keep like ;
+    [ { } zip-as concat ] keep like ;
 
 :: interleaved-checksum ( bytes checksum -- seq )
     bytes [ zero? ] trim-head
