@@ -207,7 +207,7 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
     ] if ; inline
 
  : zip ( keys values -- alist )
-     { } zip-as ; inline
+     over zip-as ; inline
 
 : map-index-as ( ... seq quot: ( ... elt index -- ... newelt ) exemplar -- ... obj )
     dup sequence? [
@@ -219,13 +219,13 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
     ] if ; inline
 
 : map-index ( ... seq quot: ( ... elt index -- ... newelt ) -- ... newseq )
-    { } map-index-as ; inline
+    over map-index-as ; inline
 
 : zip-index-as ( values exemplar -- obj )
     [ [ 2array ] ] dip map-index-as ; inline
 
 : zip-index ( values -- alist )
-    { } zip-index-as ; inline
+    dup zip-index-as ; inline
 
 : unzip ( assoc -- keys values )
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
