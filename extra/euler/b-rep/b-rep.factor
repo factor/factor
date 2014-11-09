@@ -5,7 +5,7 @@ math math.vectors math.matrices assocs arrays hashtables ;
 FROM: namespaces => set ;
 IN: euler.b-rep
 
-: >index-hash ( seq -- hash ) zip-index >hashtable ; inline
+: >index-hash ( seq -- hash ) H{ } zip-index-as ; inline
 
 TUPLE: b-edge < edge sharpness macro ;
 
