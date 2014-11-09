@@ -1,6 +1,7 @@
-USING: accessors arrays compiler.cfg.dependence compiler.cfg.instructions
-kernel namespaces sequences tools.test ;
+USING: accessors arrays combinators.short-circuit compiler.cfg.dependence
+compiler.cfg.instructions fry kernel namespaces sequences tools.test ;
 IN: compiler.cfg.dependence.tests
+FROM: sets => set= ;
 
 {
     V{
@@ -35,12 +36,31 @@ IN: compiler.cfg.dependence.tests
     3 iota [ node new swap >>number ] map first3
     over attach-parent over attach-parent ;
 
+
+! Verification tests
+ERROR: node-missing-parent trees nodes ;
+ERROR: node-missing-children trees nodes ;
+
+: flatten-tree ( node -- nodes )
+    [ children>> [ flatten-tree ] map concat ] keep suffix ;
+
+: verify-parents ( nodes trees -- )
+    2dup '[ [ parent>> ] [ _ member? ] bi or ] all?
+    [ 2drop ] [ node-missing-parent ] if ;
+
+: verify-children ( nodes trees -- )
+    2dup [ flatten-tree ] map concat
+    { [ [ length ] same? ] [ set= ] } 2&&
+    [ 2drop ] [ node-missing-children ] if ;
+
+: verify-trees ( nodes trees -- )
+    [ verify-parents ] [ verify-children ] 2bi ;
+
 { } [ 2node-tree 1array dup verify-parents ] unit-test
 
 [
     2node-tree 1array { } verify-parents
 ] [ node-missing-parent? ] must-fail-with
-
 
 { 1 } [ 3node-tree children>> length ] unit-test
 
