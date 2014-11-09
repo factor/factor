@@ -66,13 +66,8 @@ conditional-branch-insn
 : final-insn-start ( insns -- n )
     [ final-insn? not ] find-last drop [ 1 + ] [ 0 ] if* ;
 
-! hack to get bootstrapping working
-: split-indices-int ( seq indices -- pieces )
-    over length suffix 0 swap [ dup swapd 2array ] map nip
-    [ first2 rot subseq ] with map ;
-
 : split-insns ( insns -- pre/body/post )
-    dup [ initial-insn-end ] [ final-insn-start ] bi 2array split-indices-int ;
+    dup [ initial-insn-end ] [ final-insn-start ] bi 2array split-indices ;
 
 : reorder-body ( body -- body' )
     [ <node> ] map

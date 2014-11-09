@@ -9,7 +9,6 @@ IN: compiler.cfg.dependence
 
 SYMBOL: roots
 SYMBOL: node-number
-SYMBOL: nodes
 
 SYMBOL: +data+
 SYMBOL: +control+
@@ -121,31 +120,28 @@ M: object add-control-edge 2drop ;
     ] [ drop ] if ;
 
 : make-trees ( nodes -- trees )
-    [ [ choose-parent ] each ]
-    [ [ parent>> not ] filter ] bi ;
+    [ [ choose-parent ] each ] [ [ parent>> not ] filter ] bi ;
 
 ERROR: node-missing-parent trees nodes ;
 ERROR: node-missing-children trees nodes ;
 
 : flatten-tree ( node -- nodes )
-    [ children>> [ flatten-tree ] map concat ] keep
-    suffix ;
+    [ children>> [ flatten-tree ] map concat ] keep suffix ;
 
-: verify-parents ( trees -- trees )
-    nodes get over '[ [ parent>> ] [ _ member? ] bi or ] all?
-    [ nodes get node-missing-parent ] unless ;
+: verify-parents ( nodes trees -- )
+    2dup '[ [ parent>> ] [ _ member? ] bi or ] all?
+    [ 2drop ] [ node-missing-parent ] if ;
 
-: verify-children ( trees -- trees )
-    dup [ flatten-tree ] map concat
-    nodes get
+: verify-children ( nodes trees -- )
+    2dup [ flatten-tree ] map concat
     { [ [ length ] same? ] [ set= ] } 2&&
-    [ nodes get node-missing-children ] unless ;
+    [ 2drop ] [ node-missing-children ] if ;
 
-: verify-trees ( trees -- trees )
-    verify-parents verify-children ;
+: verify-trees ( nodes trees -- )
+    [ verify-parents ] [ verify-children ] 2bi ;
 
 : build-fan-in-trees ( nodes -- )
-    dup nodes set make-trees verify-trees [
+    dup make-trees [ verify-trees ] keep [
         -1/0. >>parent-index
         calculate-registers drop
     ] each ;
