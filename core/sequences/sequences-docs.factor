@@ -1,4 +1,4 @@
-USING: arrays generic.single help.markup help.syntax kernel
+USING: assocs arrays generic.single help.markup help.syntax kernel
 layouts math math.order quotations sequences.private vectors ;
 IN: sequences
 
@@ -364,25 +364,6 @@ HELP: each-index
 "{ 10 20 30 } [ 2array . ] each-index"
 "{ 10 0 }\n{ 20 1 }\n{ 30 2 }"
 } } ;
-
-HELP: map-index
-{ $values
-  { "seq" sequence } { "quot" { $quotation ( ... elt index -- ... newelt ) } } { "newseq" sequence } }
-{ $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack. Collects the outputs of the quotation and outputs them in a sequence of the same type as the input sequence." }
-{ $examples { $example "USING: arrays sequences prettyprint ;"
-"{ 10 20 30 } [ 2array ] map-index ."
-"{ { 10 0 } { 20 1 } { 30 2 } }"
-} } ;
-
-HELP: map-index-as
-{ $values
-  { "seq" sequence } { "quot" { $quotation ( ... elt index -- ... newelt ) } } { "exemplar" sequence } { "newseq" sequence } }
-{ $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack. Collects the outputs of the quotation and outputs them in a sequence of the same type as the " { $snippet "exemplar" } " sequence." }
-{ $examples { $example "USING: arrays sequences prettyprint ;"
-"{ 10 20 30 } [ 2array ] V{ } map-index-as ."
-"V{ { 10 0 } { 20 1 } { 30 2 } }"
-} } ;
-{ map-index map-index-as } related-words
 
 HELP: change-nth
 { $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" { $quotation ( ..a elt -- ..b newelt ) } } }

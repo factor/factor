@@ -87,4 +87,4 @@ SYMBOL: numbers
 : block-number ( bb -- n ) numbers get at ;
 
 : number-blocks ( bbs -- )
-    zip-index >hashtable numbers set ;
+    H{ } zip-index-as numbers set ;

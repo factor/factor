@@ -5,15 +5,8 @@ generalizations sequences.generalizations hashtables kernel
 locals locals.backend macros make math parser sequences ;
 IN: shuffle
 
-<PRIVATE
-
-: >index-assoc ( sequence -- assoc )
-    zip-index >hashtable ;
-
-PRIVATE>
-
 MACRO: shuffle-effect ( effect -- )
-    [ out>> ] [ in>> >index-assoc ] bi
+    [ out>> ] [ in>> H{ } zip-index-as ] bi
     [
         [ nip assoc-size , \ narray , ]
         [ [ at \ swap \ nth [ ] 3sequence ] curry map , \ cleave , ] 2bi
