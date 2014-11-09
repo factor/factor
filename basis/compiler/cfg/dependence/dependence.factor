@@ -1,9 +1,8 @@
 ! Copyright (C) 2009, 2010 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators compiler.cfg.def-use
-compiler.cfg.instructions compiler.cfg.registers fry kernel
-locals namespaces sequences sets sorting math.vectors
-make math combinators.short-circuit vectors ;
+compiler.cfg.instructions compiler.cfg.registers fry kernel locals
+namespaces sequences sorting make math math.vectors vectors ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dependence
 
@@ -102,10 +101,8 @@ M: object add-control-edge 2drop ;
     dup node registers<< ;
 
 ! Constructing fan-in trees
-
 : attach-parent ( node parent -- )
-    [ >>parent drop ]
-    [ [ ?push ] change-children drop ] 2bi ;
+    [ >>parent drop ] [ [ ?push ] change-children drop ] 2bi ;
 
 : keys-for ( assoc value -- keys )
     '[ nip _ = ] assoc-filter keys ;
@@ -122,26 +119,8 @@ M: object add-control-edge 2drop ;
 : make-trees ( nodes -- trees )
     [ [ choose-parent ] each ] [ [ parent>> not ] filter ] bi ;
 
-ERROR: node-missing-parent trees nodes ;
-ERROR: node-missing-children trees nodes ;
-
-: flatten-tree ( node -- nodes )
-    [ children>> [ flatten-tree ] map concat ] keep suffix ;
-
-: verify-parents ( nodes trees -- )
-    2dup '[ [ parent>> ] [ _ member? ] bi or ] all?
-    [ 2drop ] [ node-missing-parent ] if ;
-
-: verify-children ( nodes trees -- )
-    2dup [ flatten-tree ] map concat
-    { [ [ length ] same? ] [ set= ] } 2&&
-    [ 2drop ] [ node-missing-children ] if ;
-
-: verify-trees ( nodes trees -- )
-    [ verify-parents ] [ verify-children ] 2bi ;
-
 : build-fan-in-trees ( nodes -- )
-    dup make-trees [ verify-trees ] keep [
+    make-trees [
         -1/0. >>parent-index
         calculate-registers drop
     ] each ;
