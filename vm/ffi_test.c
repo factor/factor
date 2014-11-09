@@ -307,6 +307,9 @@ unsigned long long ffi_test_60(unsigned long long x) {
   return x;
 }
 
+/* C99 features */
+#ifndef _MSC_VER
+
 struct bool_and_ptr ffi_test_61() {
   struct bool_and_ptr bap;
   bap.b = true;
@@ -327,3 +330,5 @@ struct ulonglong_pair ffi_test_63() {
   ullp.b = 0x1234567891234567;
   return ullp;
 }
+
+#endif
