@@ -33,7 +33,6 @@ IN: forestdb.lib
 : set-kv-range ( a b -- )
     make-kv-range [ fdb-set-kv ] assoc-each ;
 
-
 { } [ [ delete-test-db-0 ] ignore-errors ] unit-test
 { } [ [ delete-test-db-1 ] ignore-errors ] unit-test
 
