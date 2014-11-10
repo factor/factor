@@ -1,10 +1,11 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.strings
-alien.syntax arrays classes.struct combinators constructors
-continuations destructors forestdb.ffi fry generalizations
-io.encodings.string io.encodings.utf8 io.pathnames kernel libc
-math multiline namespaces sequences ;
+USING: accessors alien.c-types alien.data arrays classes.struct
+combinators constructors continuations destructors forestdb.ffi
+forestdb.paths fry generalizations io.encodings.string
+io.encodings.utf8 io.pathnames kernel libc math multiline
+namespaces sequences ;
+QUALIFIED: sets
 IN: forestdb.lib
 
 /*
@@ -20,12 +21,7 @@ IN: forestdb.lib
 ERROR: fdb-error error ;
 
 : fdb-check-error ( ret -- )
-    dup FDB_RESULT_SUCCESS = [
-        drop
-    ] [
-        fdb-error
-    ] if ;
-
+    dup FDB_RESULT_SUCCESS = [ drop ] [ fdb-error ] if ;
 
 TUPLE: fdb-handle < disposable handle ;
 : <fdb-handle> ( handle -- obj )
@@ -61,6 +57,8 @@ TUPLE: fdb-doc < disposable doc ;
 M: fdb-doc dispose*
     fdb_doc_free fdb-check-error ;
 
+SYMBOL: fdb-current
+
 : get-kvs-default-config ( -- kvs-config )
     S{ fdb_kvs_config
         { create_if_missing t }
@@ -81,7 +79,7 @@ M: fdb-doc dispose*
 : fdb-open ( path config kvs-config -- fdb-handle-pair )
     [
         [ f void* <ref> ] 2dip
-        [ absolute-path ] dip
+        [ absolute-path ensure-fdb-filename-directory ] dip
         [ fdb_open fdb-check-error ] 3keep
         2drop void* deref <fdb-file-handle>
     ] dip fdb-open-kvs ;
@@ -92,8 +90,6 @@ M: fdb-doc dispose*
 : ret>string ( void** len -- string )
     [ void* deref ] [ size_t deref ] bi*
     [ memory>byte-array utf8 decode ] [ drop (free) ] 2bi ;
-
-SYMBOL: fdb-current
 
 : get-file-handle ( -- handle )
     fdb-current get file-handle>> handle>> ;
@@ -197,7 +193,24 @@ SYMBOL: fdb-current
 
 : fdb-commit-wal-flush ( -- ) FDB_COMMIT_MANUAL_WAL_FLUSH fdb-commit ;
 
-FUNCTION: fdb_status fdb_rollback ( fdb_handle** handle_ptr, fdb_seqnum_t rollback_seqnum ) ;
+: fdb-compact ( new-path -- )
+    [ get-file-handle ] dip absolute-path
+    fdb_compact fdb-check-error ;
+
+: fdb-compact-commit ( new-path -- )
+    fdb-compact fdb-commit-wal-flush ;
+
+: fdb-swap-current-db ( new-path -- )
+    [
+        fdb-current get dispose
+        fdb-open-default-config fdb-current set
+    ] with-destructors ;
+
+: fdb-compact-and-swap-db ( path -- )
+    next-vnode-version-name
+    [ fdb-compact fdb-commit-wal-flush ]
+    [ fdb-swap-current-db ] bi ;
+
 
 ! Call from within with-foresdb
 : fdb-open-snapshot ( seqnum -- handle-pair )
