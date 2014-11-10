@@ -96,10 +96,14 @@ M: object add-control-edge 2drop ;
 : attach-parent ( node parent -- )
     [ >>parent drop ] [ [ ?push ] change-children drop ] 2bi ;
 
+! Arbitrary tie-breaker to make the ordering deterministic.
+: tiebreak-parents ( nodes -- node/f )
+    [ f ] [ [ insn>> insn#>> ] infimum-by ] if-empty ;
+
 : select-parent ( precedes -- parent/f )
-    ! If a node has no control dependencies, then its parent is its first
+    ! If a node has no control dependencies, then its parent is the tie-breaked
     ! data dependency, if it has one. Otherwise it is a root node.
-    [ +control+ keys-for empty? ] [ +data+ keys-for ?first ] bi f ? ;
+    [ +control+ keys-for empty? ] [ +data+ keys-for tiebreak-parents ] bi f ? ;
 
 : maybe-set-parent ( node -- )
     dup precedes>> select-parent [ attach-parent ] [ drop ] if* ;
