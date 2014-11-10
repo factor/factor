@@ -317,6 +317,8 @@ struct bool_and_ptr ffi_test_61() {
   return bap;
 }
 
+#endif
+
 struct uint_pair ffi_test_62() {
   struct uint_pair uip;
   uip.a = 0xabcdefab;
@@ -331,4 +333,3 @@ struct ulonglong_pair ffi_test_63() {
   return ullp;
 }
 
-#endif
