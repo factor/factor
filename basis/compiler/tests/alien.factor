@@ -896,24 +896,25 @@ os windows? [
         S{ bool-and-ptr { b t } { ptr f } }
     } [ ffi_test_61 ] unit-test
 
-    STRUCT: uint-pair
-        { a uint }
-        { b uint } ;
-
-    FUNCTION: uint-pair ffi_test_62 ( ) ;
-
-    {
-        S{ uint-pair { a 0xabcdefab } { b 0x12345678 } }
-    } [ ffi_test_62 ] unit-test
-
-    STRUCT: ulonglong-pair
-        { a ulonglong }
-        { b ulonglong } ;
-
-    FUNCTION: ulonglong-pair ffi_test_63 ( ) ;
-
-    {
-        S{ ulonglong-pair { a 0xabcdefabcdefabcd } { b 0x1234567891234567 } }
-    } [ ffi_test_63 ] unit-test
-
 ] unless
+
+STRUCT: uint-pair
+    { a uint }
+    { b uint } ;
+
+FUNCTION: uint-pair ffi_test_62 ( ) ;
+
+{
+    S{ uint-pair { a 0xabcdefab } { b 0x12345678 } }
+} [ ffi_test_62 ] unit-test
+
+STRUCT: ulonglong-pair
+    { a ulonglong }
+    { b ulonglong } ;
+
+FUNCTION: ulonglong-pair ffi_test_63 ( ) ;
+
+{
+    S{ ulonglong-pair { a 0xabcdefabcdefabcd } { b 0x1234567891234567 } }
+} [ ffi_test_63 ] unit-test
+
