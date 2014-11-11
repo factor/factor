@@ -15,7 +15,6 @@ IN: forestdb.lib
 !  - link_directories(/usr/local/lib) or some other fix
 ! 4) byseq iteration doesn't have bodies, weird.
 ! 5) Get byseq ignores seqnum and uses key instead if key is set
-
 */
 
 ERROR: fdb-error error ;
