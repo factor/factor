@@ -1,7 +1,8 @@
 USING: accessors arrays assocs compiler.cfg compiler.cfg.dependence
 compiler.cfg.dependence.tests compiler.cfg.instructions
-compiler.cfg.linearization compiler.cfg.scheduling compiler.cfg.utilities
-grouping kernel math namespaces tools.test random sequences sets words ;
+compiler.cfg.linearization compiler.cfg.registers compiler.cfg.scheduling
+compiler.cfg.utilities grouping kernel math namespaces tools.test random
+sequences sets splitting vectors words ;
 IN: compiler.cfg.scheduling.tests
 
 ! Test split-insns
@@ -84,10 +85,8 @@ IN: compiler.cfg.scheduling.tests
 
 {
     {
-        V{ T{ ##inc-r } T{ ##inc-d } }
+        V{ T{ ##inc-r } T{ ##inc-d } T{ ##peek } T{ ##peek } }
         V{
-            T{ ##peek }
-            T{ ##peek }
             T{ ##load-tagged }
             T{ ##allot }
             T{ ##set-slot-imm }
@@ -159,8 +158,58 @@ IN: compiler.cfg.scheduling.tests
     100 [ test-1187 split-insns 1 swap nth reorder ] replicate all-equal?
 ] unit-test
 
+: insns-1 ( -- insns )
+    V{
+        T{ ##peek { dst 275 } { loc D 2 } }
+        T{ ##load-tagged { dst 277 } { val 0 } }
+        T{ ##allot
+           { dst 280 }
+           { size 16 }
+           { class-of array }
+           { temp 6 }
+        }
+        T{ ##set-slot-imm
+           { src 277 }
+           { obj 280 }
+           { slot 1 }
+           { tag 2 }
+        }
+        T{ ##load-reference
+           { dst 283 }
+           { obj
+             {
+                 vector
+                 2
+                 1
+                 tuple
+                 258304024774
+                 vector
+                 8390923745423
+             }
+           }
+        }
+        T{ ##allot
+           { dst 285 }
+           { size 32 }
+           { class-of tuple }
+           { temp 12 }
+        }
+        T{ ##set-slot-imm
+           { src 283 }
+           { obj 285 }
+           { slot 1 }
+           { tag 7 }
+        }
+        T{ ##set-slot-imm
+           { src 280 }
+           { obj 285 }
+           { slot 2 }
+           { tag 7 }
+        }
+    } [ 2 * >>insn# ] map-index ;
+
 { t f } [
-    test-some-kind-of-dep dup build-dependence-graph
+    insns-1 setup-nodes
     ! Anyone preceding insn# 14?
     [
         [ precedes>> keys [ insn>> insn#>> ] map 14 swap member? ] any?
@@ -169,4 +218,14 @@ IN: compiler.cfg.scheduling.tests
         unclip-last over swap remove-node
         [ precedes>> keys [ insn>> insn#>> ] map 14 swap member? ] any?
     ] bi
+] unit-test
+
+{ V{ 0 6 12 14 } } [
+    insns-1 setup-nodes
+    [ parent-index>> -1/0. = ] filter [ insn>> insn#>> ] map
+] unit-test
+
+{ 7 } [
+    test-not-in-order setup-nodes
+    [ parent-index>> -1/0. = ] count
 ] unit-test

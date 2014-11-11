@@ -6,15 +6,12 @@ namespaces sequences sorting make math math.vectors sets vectors ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dependence
 
-SYMBOL: +data+
-SYMBOL: +control+
+SYMBOLS: +data+ +control+ ;
 
 TUPLE: node < identity-tuple insn precedes children registers parent-index ;
 
 : <node> ( insn -- node )
-    node new
-        swap >>insn
-        H{ } clone >>precedes ;
+    node new swap >>insn H{ } clone >>precedes ;
 
 :: precedes ( first second how -- )
     how second first precedes>> set-at ;
@@ -50,9 +47,7 @@ UNION: memory-insn
 GENERIC: add-control-edge ( node insn -- )
 
 M: stack-insn add-control-edge loc>> chain ;
-
 M: memory-insn add-control-edge drop memory-insn chain ;
-
 M: object add-control-edge 2drop ;
 
 : add-control-edges ( nodes -- )
