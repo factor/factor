@@ -62,8 +62,6 @@ PRIVATE>
 
 : vm ( -- path ) \ vm get-global ;
 
-: install-prefix ( -- path ) \ install-prefix get-global ;
-
 : embedded? ( -- ? ) OBJ-EMBEDDED special-object ;
 
 : version-info ( -- str )
