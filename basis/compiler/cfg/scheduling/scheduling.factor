@@ -36,7 +36,10 @@ IN: compiler.cfg.scheduling
 : (reorder) ( nodes -- )
     dup select-instruction [ , (reorder) ] [ drop ] if* ;
 
-UNION: initial-insn ##phi ##inc-d ##inc-r ##callback-inputs ;
+UNION: initial-insn
+    ##phi ##inc-d ##inc-r ##callback-inputs
+    ! See #1187
+    ##peek ;
 
 UNION: final-insn
 ##branch
