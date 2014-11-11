@@ -1,12 +1,12 @@
-USING: compiler.cfg.instructions help.markup help.syntax sequences ;
+USING: assocs compiler.cfg.instructions help.markup help.syntax math
+sequences ;
 IN: compiler.cfg.dependence
 
 HELP: node
 { $class-description "Nodes in the dependency graph. These need to be numbered so that the same instruction will get distinct nodes if it occurs multiple times. It has the following slots:"
   { $table
-    { { $slot "number" } { "Sequence number to differentiate two otherwise equal nodes from each other. " } }
     { { $slot "insn" } { { $link insn } } }
-    { { $slot "parent" } { "Node which must precede this node in the instruction flow." } }
+    { { $slot "precedes" } { "Hash of all nodes this node must precede in the instruction flow." } }
   }
 } ;
 
@@ -17,7 +17,7 @@ HELP: <node>
 { node <node> } related-words
 
 HELP: attach-parent
-{ $values { "node" node } { "parent" node } }
+{ $values { "child" node } { "parent" node } }
 { $description "Inserts 'node' as a children of 'parent' and sets the parent of 'node' to 'parent'." }
 { $examples
   { $unchecked-example
@@ -26,6 +26,17 @@ HELP: attach-parent
   }
 } ;
 
+HELP: select-parent
+{ $values { "precedes" assoc } { "parent/f" node } }
+{ $description "Picks the parent node for this node from an assoc of preceding nodes." } ;
+
+HELP: build-fan-in-trees
+{ $values { "nodes" sequence } }
+{ $description "Selects a parent for each " { $link node } ", then initializes the " { $slot "parent-index" } " and Sethi-Ulmann number for the nodes." } ;
+
+HELP: calculate-registers
+{ $values { "node" node } { "registers" integer } }
+{ $description "Calculates a nodes Sethi-Ulmann number. For a leaf node, the number is equal to the number of temporary registers the word uses." } ;
 
 ARTICLE: "compiler.cfg.dependence" "Dependence graph construction"
 "This vocab is used by " { $vocab-link "compiler.cfg.scheduling" } "." ;
