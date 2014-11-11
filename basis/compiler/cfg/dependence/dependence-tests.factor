@@ -42,23 +42,18 @@ ERROR: node-missing-children trees nodes ;
 : flatten-tree ( node -- nodes )
     [ children>> [ flatten-tree ] map concat ] keep suffix ;
 
-: verify-parents ( nodes trees -- )
-    2dup '[ [ parent>> ] [ _ member? ] bi or ] all?
-    [ 2drop ] [ node-missing-parent ] if ;
-
 : verify-children ( nodes trees -- )
     2dup [ flatten-tree ] map concat
     { [ [ length ] same? ] [ set= ] } 2&&
     [ 2drop ] [ node-missing-children ] if ;
 
-: verify-trees ( nodes trees -- )
-    [ verify-parents ] [ verify-children ] 2bi ;
-
-{ } [ 2node-tree 1array dup verify-parents ] unit-test
+{ } [
+    2node-tree [ flatten-tree ] keep 1array verify-children
+] unit-test
 
 [
-    2node-tree 1array { } verify-parents
-] [ node-missing-parent? ] must-fail-with
+    2node-tree 1array { } verify-children
+] [ node-missing-children? ] must-fail-with
 
 { 1 } [ 3node-tree children>> length ] unit-test
 
@@ -69,7 +64,7 @@ ERROR: node-missing-children trees nodes ;
 ] [ node-missing-children? ] must-fail-with
 
 [
-    { } 3node-tree 1array verify-trees
+    { } 3node-tree 1array verify-children
 ] [ node-missing-children? ] must-fail-with
 
 ! select-parent tests
@@ -109,12 +104,6 @@ ERROR: node-missing-children trees nodes ;
         ##replace
     } [ [ new ] [ 2 * ] bi* >>insn# ] map-index ;
 
-{ 7 } [
-    test-not-in-order [ <node> ] map dup
-    build-dependence-graph
-    make-trees length
-] unit-test
-
 ! Another
 { t } [
     100 [
@@ -132,6 +121,7 @@ ERROR: node-missing-children trees nodes ;
 ] unit-test
 
 : test-some-kind-of-dep ( -- insns )
+    0 node-number set-global
     V{
         T{ ##peek { dst 275 } { loc D 2 } }
         T{ ##load-tagged { dst 277 } { val 0 } }
@@ -179,4 +169,18 @@ ERROR: node-missing-children trees nodes ;
            { slot 2 }
            { tag 7 }
         }
-    } [ 2 * >>insn# ] map-index ;
+    } [ 2 * >>insn# ] map-index [ <node> ] map ;
+
+{ 7 } [
+    test-not-in-order [ <node> ] map
+    dup build-dependence-graph
+    dup build-fan-in-trees
+    [ parent-index>> -1/0. = ] count
+] unit-test
+
+{ V{ 1 4 7 8 } } [
+    test-some-kind-of-dep
+    dup build-dependence-graph
+    dup build-fan-in-trees
+    [ parent-index>> -1/0. = ] filter [ number>> ] map
+] unit-test

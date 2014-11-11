@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.registers fry kernel locals
-namespaces sequences sorting make math math.vectors vectors ;
+namespaces sequences sorting make math math.vectors sets vectors ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dependence
 
@@ -11,10 +11,7 @@ SYMBOL: node-number
 SYMBOL: +data+
 SYMBOL: +control+
 
-TUPLE: node
-    number insn precedes
-    children parent
-    registers parent-index ;
+TUPLE: node number insn precedes children registers parent-index ;
 
 M: node equal? over node? [ [ number>> ] same? ] [ 2drop f ] if ;
 
@@ -85,8 +82,8 @@ M: object add-control-edge 2drop ;
 : keys-for ( assoc value -- keys )
     '[ nip _ = ] assoc-filter keys ;
 
-: attach-parent ( node parent -- )
-    [ >>parent drop ] [ [ ?push ] change-children drop ] 2bi ;
+: attach-parent ( child parent -- )
+    [ ?push ] change-children drop ;
 
 ! Arbitrary tie-breaker to make the ordering deterministic.
 : tiebreak-parents ( nodes -- node/f )
@@ -100,11 +97,9 @@ M: object add-control-edge 2drop ;
 : maybe-set-parent ( node -- )
     dup precedes>> select-parent [ attach-parent ] [ drop ] if* ;
 
-: make-trees ( nodes -- trees )
-    [ [ maybe-set-parent ] each ] [ [ parent>> not ] filter ] bi ;
-
 : initialize-scores ( trees -- )
     [ -1/0. >>parent-index calculate-registers drop ] each ;
 
 : build-fan-in-trees ( nodes -- )
-    make-trees initialize-scores ;
+    dup [ maybe-set-parent ] each
+    dup [ children>> ] map concat diff initialize-scores ;
