@@ -1,10 +1,10 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays classes.struct
-combinators constructors continuations destructors forestdb.ffi
-forestdb.paths fry generalizations io.encodings.string
-io.encodings.utf8 io.pathnames kernel libc math multiline
-namespaces sequences ;
+USING: accessors alien.c-types alien.data alien.strings arrays
+classes.struct combinators constructors continuations
+destructors forestdb.ffi forestdb.paths fry generalizations
+io.encodings.string io.encodings.utf8 io.pathnames kernel libc
+math multiline namespaces sequences ;
 QUALIFIED: sets
 IN: forestdb.lib
 
@@ -39,11 +39,6 @@ TUPLE: fdb-file-handle < disposable handle ;
 
 M: fdb-file-handle dispose*
     handle>> fdb_close fdb-check-error ;
-
-TUPLE: fdb-doc < disposable doc ;
-
-M: fdb-doc dispose*
-    fdb_doc_free fdb-check-error ;
 
 SYMBOL: current-fdb-file-handle
 SYMBOL: current-fdb-handle
@@ -198,18 +193,14 @@ SYMBOL: current-fdb-handle
     [ fdb-compact fdb-commit-wal-flush ]
     [ fdb-swap-current-db ] bi ;
 
-
 ! Call from within with-foresdb
-: fdb-open-snapshot ( seqnum -- file-handle handle )
+: fdb-open-snapshot ( seqnum -- handle )
     [
         get-handle
         f void* <ref>
     ] dip [
         fdb_snapshot_open fdb-check-error
-    ] 2keep drop void* deref <fdb-handle>
-    get-file-handle swap
-    get-kvs-default-config
-    fdb-open-kvs' ;
+    ] 2keep drop void* deref <fdb-handle> ;
 
 ! fdb_rollback returns a new handle, so we
 ! have to replace our current handle with that one
@@ -228,7 +219,6 @@ TUPLE: fdb-iterator < disposable handle ;
 
 M: fdb-iterator dispose*
     handle>> fdb_iterator_close fdb-check-error ;
-
 
 : fdb-iterator-init ( start-key end-key fdb_iterator_opt_t -- iterator )
     [ get-handle f void* <ref> ] 3dip
@@ -265,9 +255,12 @@ M: fdb-iterator dispose*
 
 ! fdb_doc key, meta, body only valid inside with-forestdb
 ! so make a helper word to preserve them outside
-TUPLE: doc seqnum keylen key metalen meta bodylen body deleted? offset size-ondisk ;
+TUPLE: fdb-doc seqnum keylen key metalen meta bodylen body deleted? offset size-ondisk ;
 
-CONSTRUCTOR: <doc> doc ( seqnum keylen key metalen meta bodylen body deleted? offset size-ondisk -- obj ) ;
+CONSTRUCTOR: <fdb-doc> fdb-doc ( seqnum keylen key metalen meta bodylen body deleted? offset size-ondisk -- obj ) ;
+
+TUPLE: fdb-info filename new-filename doc-count space-used file-size ;
+CONSTRUCTOR: <info> fdb-info ( filename new-filename doc-count space-used file-size -- obj ) ;
 
 /*
 ! Example fdb_doc and converted doc
@@ -282,6 +275,8 @@ T{ doc
     { metalen 0 } { bodylen 4 }
     { offset 4256 } { size-ondisk 0 }
 }
+
+
 */
 
 : alien/length>string ( alien n -- string/f )
@@ -305,7 +300,16 @@ T{ doc
         [ deleted>> >boolean ]
         [ offset>> ]
         [ size_ondisk>> ]
-    } cleave <doc> ;
+    } cleave <fdb-doc> ;
+
+: fdb_info>info ( fdb_doc -- doc )
+    {
+        [ filename>> alien>native-string ]
+        [ new_filename>> alien>native-string ]
+        [ doc_count>> ]
+        [ space_used>> ]
+        [ file_size>> ]
+    } cleave <info> ;
 
 : fdb-iterator-prev ( iterator -- doc/f ) \ fdb_iterator_prev fdb-iterate ;
 : fdb-iterator-next ( iterator -- doc/f ) \ fdb_iterator_next fdb-iterate ;
@@ -368,8 +372,10 @@ PRIVATE>
                     current-fdb-file-handle get &dispose drop
                     current-fdb-handle get &dispose drop
                 ] [
-                    current-fdb-file-handle get &dispose drop
-                    current-fdb-handle get &dispose drop
+                    [
+                        current-fdb-file-handle get &dispose drop
+                        current-fdb-handle get &dispose drop
+                    ] with-destructors
                     rethrow
                 ] recover
             ] with-variable
@@ -384,8 +390,18 @@ PRIVATE>
 : with-forestdb-handles-commit-wal ( file-handle handle quot commit -- )
     FDB_COMMIT_MANUAL_WAL_FLUSH with-forestdb-handles ; inline
 
-: with-forestdb-snapshot ( file-handle handle quot commit -- )
-    f with-forestdb-handles ; inline
+: with-forestdb-snapshot ( n quot -- )
+    [ fdb-open-snapshot ] dip '[
+        _ current-fdb-handle [
+            [
+                @
+                current-fdb-handle get &dispose drop
+            ] [
+                current-fdb-handle get [ &dispose drop ] when*
+                rethrow
+            ] recover
+        ] with-variable
+    ] with-destructors ; inline
 
 : with-forestdb-path ( path quot -- )
     [ absolute-path fdb-open-default-config ] dip with-forestdb-handles-commit-wal ; inline
