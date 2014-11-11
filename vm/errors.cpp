@@ -30,8 +30,8 @@ void critical_error(const char* msg, cell tagged) {
   current_vm()->factorbug();
 }
 
-void out_of_memory() {
-  std::cout << "Out of memory\n\n";
+void out_of_memory(const char *msg) {
+  std::cout << "Out of memory: " << msg << "\n\n";
   current_vm()->dump_generations();
   abort();
 }

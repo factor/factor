@@ -29,7 +29,7 @@ enum vm_error_type {
 
 void fatal_error(const char* msg, cell tagged);
 void critical_error(const char* msg, cell tagged);
-void out_of_memory();
+void out_of_memory(const char* msg);
 void memory_signal_handler_impl();
 void fp_signal_handler_impl();
 void synchronous_signal_handler_impl();
