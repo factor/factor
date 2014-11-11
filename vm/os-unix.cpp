@@ -75,6 +75,11 @@ void factor_vm::move_file(const vm_char* path1, const vm_char* path2) {
     general_error(ERROR_IO, tag_fixnum(errno), false_object);
 }
 
+void check_ENOMEM(const char* msg) {
+  if(errno == ENOMEM)
+    out_of_memory(msg);
+}
+
 segment::segment(cell size_, bool executable_p) {
   size = size_;
 
@@ -88,14 +93,19 @@ segment::segment(cell size_, bool executable_p) {
 
   char* array = (char*)mmap(NULL, pagesize + size + pagesize, prot,
                             MAP_ANON | MAP_PRIVATE, -1, 0);
+
   if (array == (char*)- 1)
-    out_of_memory();
+    out_of_memory("mmap");
 
-  if (mprotect(array, pagesize, PROT_NONE) == -1)
+  if (mprotect(array, pagesize, PROT_NONE) == -1) {
+    check_ENOMEM("mprotect low");
     fatal_error("Cannot protect low guard page", (cell)array);
+  }
 
-  if (mprotect(array + pagesize + size, pagesize, PROT_NONE) == -1)
+  if (mprotect(array + pagesize + size, pagesize, PROT_NONE) == -1) {
+    check_ENOMEM("mprotect high");
     fatal_error("Cannot protect high guard page", (cell)array);
+  }
 
   start = (cell)(array + pagesize);
   end = start + size;
