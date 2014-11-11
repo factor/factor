@@ -11,8 +11,6 @@ SPECIALIZED-ARRAY: uchar
 SINGLETON: gtk-image
 
 os linux? [
-    ! Explicit type initialization needed for glib < 2.36.
-    g_type_init
     { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" }
     [ gtk-image register-image-class ] each
 ] when

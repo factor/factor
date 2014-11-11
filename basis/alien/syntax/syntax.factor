@@ -15,6 +15,8 @@ SYNTAX: BAD-ALIEN <bad-alien> suffix! ;
 
 SYNTAX: LIBRARY: scan-token current-library set ;
 
+SYNTAX: INITIALIZER: scan-word register-initializer ;
+
 SYNTAX: FUNCTION:
     (FUNCTION:) make-function define-inline ;
 

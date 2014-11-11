@@ -23,9 +23,17 @@ LIBRARY: gobject
 
 IMPLEMENT-STRUCTS: GValue GParamSpecVariant ;
 
-GIR: vocab:gobject/GObject-2.0.gir
-
 IN: gobject.ffi
+
+DEFER: g_type_init
+
+: init-ffi ( -- )
+    ! Explicit type initialization needed for glib < 2.36.
+    g_type_init ;
+
+INITIALIZER: init-ffi
+
+GIR: vocab:gobject/GObject-2.0.gir
 
 FORGET: GIOCondition
 FORGET: G_IO_IN

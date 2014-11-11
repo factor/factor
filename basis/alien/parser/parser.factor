@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.libraries arrays
 assocs classes combinators combinators.short-circuit
-compiler.units effects grouping kernel parser sequences
+compiler.units effects grouping init kernel parser sequences
 splitting words fry locals lexer namespaces summary math
 vocabs.parser words.constant classes.parser alien.enums ;
 IN: alien.parser
 
-SYMBOL: current-library
+SYMBOLS: current-initializer current-library ;
 
 DEFER: (parse-c-type)
 
@@ -41,7 +41,7 @@ ERROR: bad-array-type ;
         { [ dup "{" = ] [ drop \ } parse-until >array ] }
         { [ dup "pointer:" = ] [ drop scan-c-type <pointer> ] }
         [ parse-c-type ]
-    } cond ; 
+    } cond ;
 
 : reset-c-type ( word -- )
     dup "struct-size" word-prop
@@ -126,8 +126,23 @@ PRIVATE>
 : scan-c-args ( end-marker -- types names )
     V{ } clone V{ } clone [ (scan-c-args) ] 2keep [ >array ] bi@ ;
 
+: maybe-call-initializer ( word -- )
+    dup "initializer-called" word-prop [ drop ] [
+        ! Set property before calling to avoid circularity.
+        dup t "initializer-called" set-word-prop execute( -- )
+    ] if ;
+
+: register-initializer ( word -- )
+    [
+        '[ _ f "initializer-called" set-word-prop ]
+        current-library get add-startup-hook
+    ] [ current-initializer set ] bi ;
+
 : function-quot ( return library function types -- quot )
-    '[ _ _ _ _ alien-invoke ] ;
+    '[ _ _ _ _ alien-invoke ]
+    current-initializer get [
+        '[ _ maybe-call-initializer ] prepose
+    ] when* ;
 
 : function-effect ( names return -- effect )
     [ { } ] [ return-type-name 1array ] if-void <effect> ;
@@ -150,7 +165,7 @@ PRIVATE>
     '[ [ _ _ _ ] dip alien-callback ] ;
 
 :: make-callback-type ( lib return type-name types names -- word quot effect )
-    type-name current-vocab create :> type-word 
+    type-name current-vocab create :> type-word
     type-word [ reset-generic ] [ reset-c-type ] bi
     void* type-word typedef
     type-word names return function-effect "callback-effect" set-word-prop
