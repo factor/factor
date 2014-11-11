@@ -1,6 +1,7 @@
-USING: accessors compiler.cfg compiler.cfg.instructions
+USING: accessors arrays assocs compiler.cfg compiler.cfg.dependence
+compiler.cfg.dependence.tests compiler.cfg.instructions
 compiler.cfg.linearization compiler.cfg.scheduling compiler.cfg.utilities
-vocabs.loader namespaces tools.test arrays kernel random sequences sets words ;
+grouping kernel math namespaces tools.test random sequences sets words ;
 IN: compiler.cfg.scheduling.tests
 
 ! Test split-insns
@@ -79,7 +80,7 @@ IN: compiler.cfg.scheduling.tests
         ##replace-imm
         ##replace
         ##branch
-    } [ new ] map ;
+    } [ [ new ] [ 2 * ] bi* >>insn# ] map-index ;
 
 {
     {
@@ -105,9 +106,69 @@ IN: compiler.cfg.scheduling.tests
         }
         V{ T{ ##branch } }
     }
-} [ test-1187 split-insns ] unit-test
+} [ test-1187 [ f >>insn# ] map split-insns ] unit-test
+
+{
+    V{
+        T{ ##load-tagged { insn# 0 } }
+        T{ ##load-reference { insn# 6 } }
+        T{ ##set-slot-imm { insn# 14 } }
+        T{ ##replace { insn# 16 } }
+    }
+} [
+    test-not-in-order setup-nodes [ ready? ] filter [ insn>> ] map
+] unit-test
+
+{
+    V{
+        T{ ##allot { insn# 2 } }
+        T{ ##set-slot-imm { insn# 4 } }
+        T{ ##allot { insn# 8 } }
+        T{ ##set-slot-imm { insn# 10 } }
+        T{ ##load-tagged { insn# 0 } }
+        T{ ##load-reference { insn# 6 } }
+        T{ ##set-slot-imm { insn# 12 } }
+        T{ ##set-slot-imm { insn# 14 } }
+        T{ ##replace { insn# 16 } }
+    }
+} [ test-not-in-order reorder-body ] unit-test
+
+{ t f } [
+    node new ready?
+    node new { { 1 2 } } >>precedes ready?
+] unit-test
+
+{ t } [
+    100 [
+        test-not-in-order setup-nodes [ insn>> ] map
+    ] replicate all-equal?
+] unit-test
+
+{ t } [
+    100 [
+        test-not-in-order setup-nodes [ score ] map
+    ] replicate all-equal?
+] unit-test
 
 ! You should get the exact same instruction order each time.
-{ 1 } [
-    10 [ test-1187 split-insns 1 swap nth ] replicate members length
+{ t } [
+    100 [ test-not-in-order reorder-body ] replicate all-equal?
+] unit-test
+
+{ t } [
+    100 [ test-1187 split-insns 1 swap nth reorder ] replicate all-equal?
+] unit-test
+
+{ t f } [
+    0 node-number set-global test-some-kind-of-dep [ <node> ] map
+    dup build-dependence-graph
+
+    ! Anyone preceding node number 8?
+    [
+        [ precedes>> keys [ number>> ] map 8 swap member? ] any?
+    ]
+    [
+        unclip-last over swap remove-node
+        [ precedes>> keys [ number>> ] map 8 swap member? ] any?
+    ] bi
 ] unit-test
