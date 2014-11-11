@@ -27,6 +27,9 @@ IN: forestdb.lib
 : set-kv-n ( n -- )
     make-kv-n [ fdb-set-kv ] assoc-each ;
 
+: del-kv-n ( n -- )
+    make-kv-n keys [ fdb-del-kv ] each ;
+
 : set-kv-nth ( n -- )
     make-kv-nth fdb-set-kv ;
 
@@ -363,7 +366,38 @@ IN: forestdb.lib
             0 10 [
                 [ seqnum>> ]
                 [ [ key>> ] [ keylen>> ] bi alien/length>string ] bi 2array ,
-            ] with-fdb-byseq-iterator
+            ] with-fdb-byseq-each
         ] { } make
+    ] with-forestdb-path
+] unit-test
+
+! Test byseq mapping
+{
+    V{ 1 2 3 4 5 }
+} [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        0 10 [
+            fdb_doc>doc
+        ] with-fdb-byseq-map
+        [ seqnum>> ] map
+    ] with-forestdb-path
+] unit-test
+
+! Deleting 5 keys gives you 5 new seqnums that are those docs, but deleted
+{
+    V{ { 6 t } { 7 t } { 8 t } { 9 t } { 10 t } }
+} [
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        5 del-kv-n
+        fdb-commit-normal
+        0 10 [
+            fdb_doc>doc
+        ] with-fdb-byseq-map
+        [ [ seqnum>> ] [ deleted?>> ] bi 2array ] map
     ] with-forestdb-path
 ] unit-test

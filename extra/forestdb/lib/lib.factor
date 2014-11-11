@@ -333,6 +333,24 @@ T{ doc
         ] curry loop
     ] with-destructors ; inline
 
+<PRIVATE
+
+: collector-for-when ( quot exemplar -- quot' vec )
+    [ length ] keep new-resizable [ [ over [ push ] [ 2drop ] if ] curry compose ] keep ; inline
+
+: collector-when ( quot -- quot' vec )
+    V{ } collector-for-when ; inline
+
+PRIVATE>
+
+: with-fdb-map ( start-key end-key fdb_iterator_opt_t iterator-init iterator-next quot: ( obj -- ) -- )
+    [ execute ] 2dip
+    '[
+        _ &dispose handle>> [
+            _ execute [ _ with-doc t ] [ f f ] if* swap
+        ] curry collector-when [ loop ] dip
+    ] with-destructors ; inline
+
 : with-fdb-normal-iterator ( start-key end-key quot -- )
     [ FDB_ITR_NONE \ fdb-iterator-init \ fdb-iterator-next ] dip
     with-fdb-iterator ; inline
@@ -341,9 +359,13 @@ T{ doc
     [ FDB_ITR_NONE \ fdb-iterator-init \ fdb-iterator-next-meta-only ] dip
     with-fdb-iterator ; inline
 
-: with-fdb-byseq-iterator ( start-seq end-seq quot -- )
+: with-fdb-byseq-each ( start-seq end-seq quot -- )
     [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb-iterator-next-meta-only ] dip
     with-fdb-iterator ; inline
+
+: with-fdb-byseq-map ( start-seq end-seq quot -- )
+    [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb-iterator-next-meta-only ] dip
+    with-fdb-map ; inline
 
 ! Do not try to commit here, as it will fail with FDB_RESULT_RONLY_VIOLATION
 ! fdb-current is weird, it gets replaced if you call fdb-rollback
