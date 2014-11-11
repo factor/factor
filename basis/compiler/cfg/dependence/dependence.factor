@@ -6,20 +6,13 @@ namespaces sequences sorting make math math.vectors sets vectors ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dependence
 
-SYMBOL: node-number
-
 SYMBOL: +data+
 SYMBOL: +control+
 
-TUPLE: node number insn precedes children registers parent-index ;
-
-M: node equal? over node? [ [ number>> ] same? ] [ 2drop f ] if ;
-
-M: node hashcode* nip number>> ;
+TUPLE: node < identity-tuple insn precedes children registers parent-index ;
 
 : <node> ( insn -- node )
     node new
-        node-number counter >>number
         swap >>insn
         H{ } clone >>precedes ;
 

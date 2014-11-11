@@ -160,15 +160,13 @@ IN: compiler.cfg.scheduling.tests
 ] unit-test
 
 { t f } [
-    0 node-number set-global test-some-kind-of-dep [ <node> ] map
-    dup build-dependence-graph
-
-    ! Anyone preceding node number 8?
+    test-some-kind-of-dep dup build-dependence-graph
+    ! Anyone preceding insn# 14?
     [
-        [ precedes>> keys [ number>> ] map 8 swap member? ] any?
+        [ precedes>> keys [ insn>> insn#>> ] map 14 swap member? ] any?
     ]
     [
         unclip-last over swap remove-node
-        [ precedes>> keys [ number>> ] map 8 swap member? ] any?
+        [ precedes>> keys [ insn>> insn#>> ] map 14 swap member? ] any?
     ] bi
 ] unit-test
