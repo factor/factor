@@ -3,7 +3,6 @@ ifdef CONFIG
 	GIT_LABEL = $(shell git describe --all --long)
 
 	BUNDLE = Factor.app
-	LIBPATH = -L/usr/X11R6/lib
 
 	include $(CONFIG)
 
@@ -211,17 +210,17 @@ $(ENGINE): $(DLL_OBJS)
 factor-lib: $(ENGINE)
 
 factor: $(EXE_OBJS) $(DLL_OBJS)
-	$(TOOLCHAIN_PREFIX)$(CXX) $(LIBPATH) -L. $(DLL_OBJS) \
+	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-console: $(EXE_OBJS) $(DLL_OBJS)
-	$(TOOLCHAIN_PREFIX)$(CXX) $(LIBPATH) -L. $(DLL_OBJS) \
+	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
 $(FFI_TEST_LIBRARY): vm/ffi_test.o
-	$(TOOLCHAIN_PREFIX)$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CC) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
 
 vm/resources.o:
 	$(TOOLCHAIN_PREFIX)$(WINDRES) vm/factor.rs vm/resources.o
