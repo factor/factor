@@ -1,5 +1,5 @@
 ifdef CONFIG
-	VERSION = 0.98
+	VERSION = 0.98-git
 	GIT_LABEL = $(shell git describe --all --long)
 
 	BUNDLE = Factor.app
