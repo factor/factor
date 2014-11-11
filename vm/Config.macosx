@@ -20,7 +20,7 @@ LINKER = $(CXX) $(CFLAGS) -dynamiclib -single_module \
 	-current_version $(VERSION) \
 	-compatibility_version $(VERSION) \
 	-fvisibility=hidden \
-	$(LIBS) $(LIBPATH) -o
+	$(LIBS) -o
 
 LINK_WITH_ENGINE = -lfactor
 
