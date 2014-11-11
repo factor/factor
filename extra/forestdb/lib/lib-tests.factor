@@ -9,6 +9,28 @@ math.parser math.ranges multiline namespaces sequences
 tools.test make ;
 IN: forestdb.lib
 
+/*
+
+IN: scratchpad auto-use \ dispose* watch
+IN: scratchpad auto-use \ <fdb-handle> watch
+IN: scratchpad auto-use \ <fdb-handle-pair> watch
+IN: scratchpad auto-use \ <fdb-file-handle> watch
+
+    delete-test-db-1
+    test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        5 fdb-open-snapshot [
+            fdb-get-seqnum
+            fdb-get-info doc_count>>
+        ] with-forestdb-snapshot
+    ] with-forestdb-path
+
+
+*/
+
+
+
 : test-db-0 ( -- path ) "0.forestdb.0" temp-file ;
 : test-db-1 ( -- path ) "1.forestdb.0" temp-file ;
 
