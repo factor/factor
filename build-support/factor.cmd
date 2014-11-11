@@ -30,7 +30,7 @@ if not errorlevel 1 (
 git describe --all --long > git_label.tmp
 set /p git_label= < git_label.tmp
 
-set version=0.98
+set version=0.98-git
 
 if %_bootimage_version%==clean (
     set _git_branch=clean-windows-%_target%
