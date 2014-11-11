@@ -12,35 +12,28 @@ IN: compiler.cfg.scheduling
 ! by Vivek Sarkar, et al.
 ! http://portal.acm.org/citation.cfm?id=377849
 
-ERROR: bad-delete-at key assoc ;
-
-: check-delete-at ( key assoc -- )
-    2dup key? [ delete-at ] [ bad-delete-at ] if ;
-
 : set-parent-indices ( node -- )
     children>> building get length
     '[ _ >>parent-index drop ] each ;
 
 : ready? ( node -- ? ) precedes>> assoc-empty? ;
 
-: remove-node ( roots node -- )
-    dup follows>> [ [ precedes>> check-delete-at ] with each ] keep
-    [ ready? ] filter swap push-all ;
+! Remove the node and unregister it from all nodes precedes links.
+: remove-node ( nodes node -- )
+    [ swap remove! ] keep '[ precedes>> _ swap delete-at ] each ;
 
 : score ( node -- n )
     [ parent-index>> ] [ registers>> neg ] [ insn>> insn#>> ] tri 3array ;
 
-: select ( vector quot: ( elt -- score ) -- elt )
-    dupd supremum-by swap dupd remove-eq! drop ; inline
-
-: select-instruction ( roots -- insn/f )
+: select-instruction ( nodes -- insn/f )
     [ f ] [
-        dup [ score ] select
+        ! select one among the ready nodes (roots)
+        dup [ ready? ] filter [ score ] supremum-by
         [ remove-node ] keep
         [ insn>> ] [ set-parent-indices ] bi
     ] if-empty ;
 
-: (reorder) ( roots -- )
+: (reorder) ( nodes -- )
     dup select-instruction [ , (reorder) ] [ drop ] if* ;
 
 UNION: initial-insn ##phi ##inc-d ##inc-r ##callback-inputs ;
@@ -62,14 +55,12 @@ conditional-branch-insn
 : split-insns ( insns -- pre/body/post )
     dup [ initial-insn-end ] [ final-insn-start ] bi 2array split-indices ;
 
-: setup-root-nodes ( insns -- roots )
-    [ <node> ] map
-    [ build-dependence-graph ]
-    [ build-fan-in-trees ]
-    [ [ ready? ] V{ } filter-as ] tri ;
+: setup-nodes ( insns -- nodes )
+    [ <node> ] V{ } map-as
+    [ build-dependence-graph ] [ build-fan-in-trees ] [ ] tri ;
 
 : reorder-body ( body -- body' )
-    setup-root-nodes [ (reorder) ] V{ } make reverse ;
+    setup-nodes [ (reorder) ] V{ } make reverse ;
 
 : reorder ( insns -- insns' )
     split-insns first3 [ reorder-body ] dip 3append ;
