@@ -1,4 +1,4 @@
-USING: classes.singleton help.markup help.syntax kernel math ;
+USING: classes.singleton help.markup help.syntax init kernel math ;
 IN: system
 
 ABOUT: "system"
@@ -65,7 +65,7 @@ HELP: embedded?
 
 HELP: exit
 { $values { "n" "an integer exit code" } }
-{ $description "Exits the Factor process." } ;
+{ $description "Runs all " { $link shutdown-hooks } " and then exits the Factor process. If an error occurs when the shutdown hooks runs, or when the process is about to terminate, the error is ignored and the process exits with status 255." } ;
 
 HELP: nano-count
 { $values { "ns" integer } }
