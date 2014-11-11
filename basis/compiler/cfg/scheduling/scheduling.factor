@@ -21,14 +21,11 @@ ERROR: bad-delete-at key assoc ;
     children>> building get length
     '[ _ >>parent-index drop ] each ;
 
-SYMBOL: roots
-
 : ready? ( node -- ? ) precedes>> assoc-empty? ;
 
-: remove-node ( node -- )
-    [ follows>> members ] keep
-    '[ [ precedes>> _ swap check-delete-at ] each ]
-    [ [ ready? ] filter roots get push-all ] bi ;
+: remove-node ( roots node -- )
+    dup follows>> [ [ precedes>> check-delete-at ] with each ] keep
+    [ ready? ] filter swap push-all ;
 
 : score ( node -- n )
     [ parent-index>> ] [ registers>> neg ] [ insn>> insn#>> ] tri 3array ;
@@ -36,18 +33,15 @@ SYMBOL: roots
 : select ( vector quot: ( elt -- score ) -- elt )
     dupd supremum-by swap dupd remove-eq! drop ; inline
 
-: select-instruction ( -- insn/f )
-    roots get [ f ] [
-        [ score ] select
-        [ insn>> ]
-        [ set-parent-indices ]
-        [ remove-node ] tri
+: select-instruction ( roots -- insn/f )
+    [ f ] [
+        dup [ score ] select
+        [ remove-node ] keep
+        [ insn>> ] [ set-parent-indices ] bi
     ] if-empty ;
 
-: (reorder) ( -- )
-    select-instruction [
-        , (reorder)
-    ] when* ;
+: (reorder) ( roots -- )
+    dup select-instruction [ , (reorder) ] [ drop ] if* ;
 
 UNION: initial-insn ##phi ##inc-d ##inc-r ##callback-inputs ;
 
@@ -75,7 +69,7 @@ conditional-branch-insn
     [ [ ready? ] V{ } filter-as ] tri ;
 
 : reorder-body ( body -- body' )
-    setup-root-nodes roots set [ (reorder) ] V{ } make reverse ;
+    setup-root-nodes [ (reorder) ] V{ } make reverse ;
 
 : reorder ( insns -- insns' )
     split-insns first3 [ reorder-body ] dip 3append ;
