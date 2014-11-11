@@ -12,7 +12,7 @@ SYMBOL: +data+
 SYMBOL: +control+
 
 TUPLE: node
-    number insn precedes follows
+    number insn precedes
     children parent
     registers parent-index ;
 
@@ -24,8 +24,7 @@ M: node hashcode* nip number>> ;
     node new
         node-number counter >>number
         swap >>insn
-        H{ } clone >>precedes
-        V{ } clone >>follows ;
+        H{ } clone >>precedes ;
 
 :: precedes ( first second how -- )
     how second first precedes>> set-at ;
@@ -69,15 +68,8 @@ M: object add-control-edge 2drop ;
 : add-control-edges ( nodes -- )
     [ [ dup insn>> add-control-edge ] each ] with-scope ;
 
-: set-follows ( nodes -- )
-    [
-        dup precedes>> keys [
-            follows>> push
-        ] with each
-    ] each ;
-
 : build-dependence-graph ( nodes -- )
-    [ add-control-edges ] [ add-data-edges ] [ set-follows ] tri ;
+    [ add-control-edges ] [ add-data-edges ] bi ;
 
 ! Sethi-Ulmann numbering
 :: calculate-registers ( node -- registers )
