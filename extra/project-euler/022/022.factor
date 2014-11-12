@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii assocs io.encodings.ascii io.files kernel math
+USING: ascii io.encodings.ascii io.files kernel math
 project-euler.common sequences sorting splitting ;
 IN: project-euler.022
 

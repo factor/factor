@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry hashtables io kernel macros make
+USING: accessors arrays fry hashtables io kernel macros make
 math.parser multiline namespaces present sequences
 sequences.generalizations splitting strings vocabs.parser ;
 IN: interpolate

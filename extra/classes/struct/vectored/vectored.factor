@@ -1,5 +1,5 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors assocs classes.struct classes.tuple combinators fry
+USING: accessors classes.struct classes.tuple combinators fry
 functors kernel locals macros math parser quotations sequences
 sequences.private slots specialized-arrays words ;
 IN: classes.struct.vectored

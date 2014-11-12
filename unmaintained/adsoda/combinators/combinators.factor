@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Jeff Bigot
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays assocs sequences fry math combinators ;
+USING: kernel arrays sequences fry math combinators ;
 
 IN: adsoda.combinators
 
