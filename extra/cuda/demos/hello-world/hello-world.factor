@@ -3,7 +3,7 @@
 USING: accessors alien.c-types alien.strings byte-arrays cuda
 cuda.contexts cuda.devices cuda.libraries cuda.memory cuda.syntax
 destructors io io.encodings.string io.encodings.utf8 kernel locals
-math math.parser namespaces sequences strings assocs ;
+math math.parser namespaces sequences strings ;
 IN: cuda.demos.hello-world
 
 CUDA-LIBRARY: hello cuda32 vocab:cuda/demos/hello-world/hello.ptx
