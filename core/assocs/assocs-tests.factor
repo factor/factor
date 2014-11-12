@@ -213,34 +213,13 @@ unit-test
     { { 1 f } { f 2 } } sift-values
 ] unit-test
 
-! map-index, map-index-as
-{
-    { 11 23 35 }
-} [ { 11 22 33 } [ + ] map-index ] unit-test
-
-{
-    V{ 11 23 35 }
-} [ V{ 11 22 33 } [ + ] map-index ] unit-test
-
-{
-    V{ 11 23 35 }
-} [ { 11 22 33 } [ + ] V{ } map-index-as ] unit-test
-
-{
-    B{ 11 23 35 }
-} [ { 11 22 33 } [ + ] B{ } map-index-as ] unit-test
-
-{
-    BV{ 11 23 35 }
-} [ { 11 22 33 } [ + ] BV{ } map-index-as ] unit-test
-
 ! zip, zip-as
 {
     { { 1 4 } { 2 5 } { 3 6 } }
 } [ { 1 2 3 } { 4 5 6 } zip ] unit-test
 
 {
-    V{ { 1 4 } { 2 5 } { 3 6 } }
+    { { 1 4 } { 2 5 } { 3 6 } }
 } [ V{ 1 2 3 } { 4 5 6 } zip ] unit-test
 
 {
@@ -276,7 +255,7 @@ unit-test
 } [ { 11 22 33 } zip-index ] unit-test
 
 {
-    V{ { 11 0 } { 22 1 } { 33 2 } }
+    { { 11 0 } { 22 1 } { 33 2 } }
 } [ V{ 11 22 33 } zip-index ] unit-test
 
 {
