@@ -53,7 +53,7 @@ IN: tools.gc-decode
 
 : read-gc-maps ( gc-info -- assoc )
     [ return-addresses ] [ scrub-bit-groups ] [ base-pointer-groups ] tri
-    { } zip-as { } zip-as ;
+    zip zip ;
 
 : word>gc-info ( word -- gc-info )
     word-code nip gc-info struct-size - <alien> gc-info memory>struct ;
