@@ -1,13 +1,11 @@
-USING: accessors alien alien.c-types alien.libraries
-alien.syntax arrays classes.struct combinators
-compiler continuations destructors effects generalizations io
-io.backend io.pathnames io.streams.string kernel
-math memory namespaces namespaces.private parser
-quotations sequences specialized-arrays stack-checker
-stack-checker.errors system threads tools.test words
-alien.complex concurrency.promises alien.data
-byte-arrays classes compiler.test libc layouts
-math.bitwise ;
+USING: accessors alien alien.c-types alien.complex alien.data alien.libraries
+alien.syntax arrays byte-arrays classes classes.struct combinators
+combinators.extras compiler compiler.test concurrency.promises continuations
+destructors effects generalizations io io.backend io.pathnames
+io.streams.string kernel kernel.private libc layouts math math.bitwise
+math.private memory namespaces namespaces.private random parser quotations
+sequences slots.private specialized-arrays stack-checker stack-checker.errors
+system threads tools.test words ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: char
@@ -918,3 +916,44 @@ FUNCTION: ulonglong-pair ffi_test_63 ( ) ;
     S{ ulonglong-pair { a 0xabcdefabcdefabcd } { b 0x1234567891234567 } }
 } [ ffi_test_63 ] unit-test
 
+FUNCTION: void* bug1021_test_1 ( void* s, int x ) ;
+
+! Sanity test the formula: x sq s +
+{ t } [
+    10 [ [ 100 random ] twice 2array ] replicate
+    [ [ first2 [ <alien> ] dip bug1021_test_1 alien-address ] map ]
+    [ [ first2 sq + ] map ] bi =
+] unit-test
+
+: each-to100 ( ... quot: ( ... i -- ... ) i -- ... )
+    dup 100 < [
+        2dup swap (call) 1 + each-to100
+    ] [ 2drop ] if ; inline recursive
+
+: run-test ( alien -- seq )
+    100 33 <array> swap over
+    [
+        pick swapd
+        bug1021_test_1
+        -rot swap 2 fixnum+fast
+        set-slot
+    ] curry curry 0 each-to100 ;
+
+{ } [
+    minor-gc 2000 [
+        101 <alien> run-test
+        ! If #1021 ever comes back it will blow up here because
+        ! alien-address wants an alien not a fixnum.
+        [ alien-address ] map drop
+    ] times
+] unit-test
+
+FUNCTION: int bug1021_test_2 ( int a, char* b, void* c ) ;
+FUNCTION: void* bug1021_test_3 ( c-string a ) ;
+
+: doit ( a -- d )
+    33 1byte-array "bar" bug1021_test_3 bug1021_test_2 ;
+
+{ } [
+    10000 [ 0 doit 33 assert= ] times
+] unit-test
