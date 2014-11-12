@@ -88,6 +88,7 @@ namespace factor { struct factor_vm; }
 #include "assert.hpp"
 #include "layouts.hpp"
 #include "platform.hpp"
+#include "utilities.hpp"
 #include "primitives.hpp"
 #include "segments.hpp"
 #include "gc_info.hpp"
@@ -147,6 +148,5 @@ namespace factor { struct factor_vm; }
 #include "inline_cache.hpp"
 #include "mvm.hpp"
 #include "factor.hpp"
-#include "utilities.hpp"
 
 #endif /* __FACTOR_MASTER_H__ */
