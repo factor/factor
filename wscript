@@ -7,7 +7,7 @@ from waflib import Errors, Task
 cpu_to_bits = {'amd64' : 64, 'i386' : 32, 'x86' : 32, 'x86_64' : 64}
 
 APPNAME = 'factor-lang'
-VERSION = '0.97-git'
+VERSION = '0.98'
 
 # List source files
 common_source = [
@@ -126,7 +126,6 @@ def options(ctx):
 
 def configure(ctx):
     ctx.load('compiler_c compiler_cxx')
-    ctx.check(features='cxx cxxprogram', cflags=[])
 
     env = ctx.env
     dest_os = env.DEST_OS
@@ -143,7 +142,13 @@ def configure(ctx):
     pf = opts.prefix
     if dest_os == 'win32':
         pf = pf.replace('\\', '\\\\')
+
+    # Values to be inked into the binary.
+    ctx.define('FACTOR_VERSION', VERSION)
+    git_label = ctx.cmd_and_log("git describe --all --long").strip()
+    ctx.define('FACTOR_GIT_LABEL', git_label)
     ctx.define('INSTALL_PREFIX', pf)
+
     if opts.debug:
         ctx.define('FACTOR_DEBUG', 1)
         if cxx == 'msvc':
