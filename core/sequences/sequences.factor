@@ -571,6 +571,12 @@ PRIVATE>
 : each-index ( ... seq quot: ( ... elt index -- ... ) -- ... )
     (each-index) each-integer ; inline
 
+: map-index-as ( ... seq quot: ( ... elt index -- ... newelt ) exemplar -- ... newseq )
+    [ dup length iota ] 2dip 2map-as ; inline
+
+: map-index ( ... seq quot: ( ... elt index -- ... newelt ) -- ... newseq )
+    { } map-index-as ; inline
+
 : interleave ( ... seq between quot: ( ... elt -- ... ) -- ... )
     pick empty? [ 3drop ] [
         [ [ drop first-unsafe ] dip call ]
