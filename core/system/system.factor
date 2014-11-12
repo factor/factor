@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs continuations init io kernel kernel.private make
-namespaces sequences ;
+USING: assocs continuations init io kernel kernel.private
+layouts make math.parser namespaces sequences ;
 IN: system
 
 SINGLETONS: x86.32 x86.64 arm ppc.32 ppc.64 ;
@@ -67,7 +67,10 @@ PRIVATE>
 : version-info ( -- str )
     ! formatting vocab not available in this context.
     [
-        "Factor " % vm-version % " (" % vm-git-label % ", " %
+        "Factor " % vm-version %
+        " " % cell-bits #
+        "-bit build: " % build #
+        " (" % vm-git-label % ", " %
         vm-compile-time % ") [" %
         vm-compiler % " " % cpu cpu>string % "] on " % os os>string %
     ] "" make ;
