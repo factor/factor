@@ -18,7 +18,7 @@ M: bad-tr summary
     [ [ ascii? ] all? ] both? [ bad-tr ] unless ;
 
 : compute-tr ( quot from to -- mapping )
-    [ 128 iota ] 3dip { } zip-as
+    [ 128 iota ] 3dip zip
     '[ [ _ call( x -- y ) _ at ] keep or ] B{ } map-as ; inline
 
 : tr-hints ( word -- )
