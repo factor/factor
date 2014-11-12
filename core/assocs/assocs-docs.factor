@@ -517,7 +517,7 @@ HELP: unzip
 HELP: zip
 { $values
      { "keys" sequence } { "values" sequence }
-     { "assoc" assoc } }
+     { "alist" "an array of key/value pairs" } }
 { $description "Combines two sequences pairwise into a single sequence of key/value pairs." }
 { $examples
     { $example "USING: prettyprint assocs ;"
@@ -525,7 +525,6 @@ HELP: zip
                "{ { 1 4 } { 2 5 } { 3 6 } }"
     }
 } ;
-{ unzip zip } related-words
 
 HELP: zip-as
 { $values
@@ -543,7 +542,7 @@ HELP: zip-as
 HELP: zip-index
 { $values
     { "values" sequence }
-    { "assoc" assoc }
+    { "alist" "an array of key/value pairs" }
 }
 { $examples
     "Zip a sequnce with its indices:"
@@ -567,25 +566,5 @@ HELP: zip-index-as
     }
 }
 { $description "Zip a sequence with its index and return an associative list of type " { $snippet "exemplar" } " where the input sequence is the keys and the indices are the values." } ;
-
-HELP: map-index
-{ $values
-  { "seq" sequence } { "quot" { $quotation ( ... elt index -- ... newelt ) } } { "newseq" sequence } }
-{ $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack. Collects the outputs of the quotation and outputs them in a sequence of the same type as the input sequence." }
-{ $examples { $example "USING: arrays assocs prettyprint ;"
-"{ 10 20 30 } [ 2array ] map-index ."
-"{ { 10 0 } { 20 1 } { 30 2 } }"
-} } ;
-
-HELP: map-index-as
-{ $values
-  { "seq" sequence } { "quot" { $quotation ( ... elt index -- ... newelt ) } } { "exemplar" sequence } { "obj" object } }
-{ $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack. Collects the outputs of the quotation and outputs them in a sequence of the same type as the " { $snippet "exemplar" } "." }
-{ $examples { $example "USING: arrays assocs prettyprint ;"
-"{ 10 20 30 } [ 2array ] V{ } map-index-as ."
-"V{ { 10 0 } { 20 1 } { 30 2 } }"
-} } ;
-{ map-index map-index-as } related-words
-
 
 { unzip zip zip-as zip-index zip-index-as } related-words

@@ -206,26 +206,14 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
         [ [ set-at ] with-assoc 2each ] keep
     ] if ; inline
 
- : zip ( keys values -- assoc )
-     over zip-as ; inline
-
-: map-index-as ( ... seq quot: ( ... elt index -- ... newelt ) exemplar -- ... obj )
-    dup sequence? [
-        [ dup length iota ] 2dip 2map-as
-    ] [
-        [ dup length iota ] 2dip [ over length ] dip new-assoc
-        ! Need to do 2array/first2 here because of quot's stack effect
-        [ [ [ first2 swap ] dip set-at ] curry compose 2each ] keep
-    ] if ; inline
-
-: map-index ( ... seq quot: ( ... elt index -- ... newelt ) -- ... newseq )
-    over map-index-as ; inline
+: zip ( keys values -- alist )
+     { } zip-as ; inline
 
 : zip-index-as ( values exemplar -- assoc )
-    [ [ 2array ] ] dip map-index-as ; inline
+    [ dup length iota ] dip zip-as ; inline
 
-: zip-index ( values -- assoc )
-    dup zip-index-as ; inline
+: zip-index ( values -- alist )
+    { } zip-index-as ; inline
 
 : unzip ( assoc -- keys values )
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
