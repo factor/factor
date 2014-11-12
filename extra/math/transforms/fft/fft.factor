@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel locals math math.constants math.functions
+USING: arrays kernel locals math math.constants math.functions
 math.vectors sequences sequences.extras sequences.private ;
 IN: math.transforms.fft
 
