@@ -126,7 +126,8 @@ def options(ctx):
 
 def configure(ctx):
     ctx.load('compiler_c compiler_cxx')
-    ctx.check(features='cxx cxxprogram', cflags=['-Wall'])
+    ctx.check(features='cxx cxxprogram', cflags=[])
+
     env = ctx.env
     dest_os = env.DEST_OS
 
@@ -138,6 +139,7 @@ def configure(ctx):
         ctx.find_program(APPNAME)
     ctx.env.MAKE_BOOTSTRAP_IMAGE = opts.make_bootstrap_image
 
+    cxx = ctx.env.COMPILER_CXX
     pf = opts.prefix
     if dest_os == 'win32':
         pf = pf.replace('\\', '\\\\')
@@ -154,7 +156,6 @@ def configure(ctx):
 
     bits = get_bits(ctx)
 
-    cxx = ctx.env.COMPILER_CXX
     if dest_os == 'win32':
         ctx.check_lib_msvc('shell32')
         ctx.load('winres')
@@ -180,9 +181,10 @@ def configure(ctx):
             header_name = ['sys/time.h','time.h'],
             lib = 'rt', uselib_store = 'rt'
         )
-        ctx.check_cfg(atleast_pkgconfig_version='0.0.0')
-
-        env.CXXFLAGS += ['-O3', '-fomit-frame-pointer']
+        env.append_unique('CXXFLAGS', [
+            '-O3', '-fomit-frame-pointer',
+            '-Werror', '-Wall'
+        ])
         for lst in ('CFLAGS', 'CXXFLAGS', 'LINKFLAGS'):
             env[lst] += ['-m%d' % bits]
         env.LINKFLAGS += ['-Wl,--no-as-needed', '-Wl,--export-dynamic']
