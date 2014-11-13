@@ -1,9 +1,10 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.parser alien.syntax classes.struct combinators
-kernel openssl.libcrypto system namespaces assocs parser lexer sequences words
-quotations math.bitwise alien.libraries literals ;
+USING: alien alien.c-types alien.libraries alien.parser
+alien.syntax assocs classes.struct combinators kernel lexer
+literals namespaces openssl.libcrypto parser quotations
+sequences system words ;
 
 IN: openssl.libssl
 

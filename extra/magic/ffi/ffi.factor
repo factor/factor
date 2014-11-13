@@ -2,11 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.libraries.finder alien.syntax kernel literals ;
+alien.syntax combinators kernel literals system ;
 
 IN: magic.ffi
 
-<< "magic" dup find-library cdecl add-library >>
+<< "magic" {
+    { [ os macosx? ] [ "libmagic.dylib" ] }
+    { [ os unix? ] [ "libmagic.so" ] }
+} cond cdecl add-library >>
 
 LIBRARY: magic
 

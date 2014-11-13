@@ -6,12 +6,13 @@ locals math system ;
 IN: lua
 
 << "liblua5.1" {
-        { [ os windows? ] [ "lua5.1.dll" ] }
-        { [ os macosx? ] [ "liblua5.1.dylib"  ] }
-        { [ os unix? ] [ "liblua5.1.so" ] }
-    } cond cdecl add-library >>
+    { [ os windows? ] [ "lua5.1.dll" ] }
+    { [ os macosx? ] [ "liblua5.1.dylib"  ] }
+    { [ os unix? ] [ "liblua5.1.so" ] }
+} cond cdecl add-library >>
+
 LIBRARY: liblua5.1
-    
+
 ! luaconf.h
 TYPEDEF: double LUA_NUMBER
 TYPEDEF: ptrdiff_t LUA_INTEGER

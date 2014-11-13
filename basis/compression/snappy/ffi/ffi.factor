@@ -1,11 +1,14 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries
-alien.libraries.finder alien.syntax classes.struct ;
-USE: nested-comments
+USING: alien alien.c-types alien.libraries alien.syntax
+combinators classes.struct system ;
 IN: compression.snappy.ffi
 
-<< "snappy" "snappy" find-library cdecl add-library >>
+<< "snappy" {
+    { [ os windows? ] [ "snappy.dll" ] }
+    { [ os macosx? ] [ "libsnappy.dylib" ] }
+    { [ os unix? ] [ "libsnappy.so" ] }
+} cond cdecl add-library >>
 
 LIBRARY: snappy
 
