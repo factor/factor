@@ -117,8 +117,7 @@ IN: forestdb.lib
     test-db-1 [
         1 set-kv-n
         fdb-commit-normal
-        fdb-get-seqnum
-        fdb-get-info doc_count>>
+        fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
     ] with-forestdb-path
 ] unit-test
 
@@ -128,8 +127,7 @@ IN: forestdb.lib
         5 set-kv-n
         5 set-kv-nth
         fdb-commit-normal
-        fdb-get-seqnum
-        fdb-get-info doc_count>>
+        fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
     ] with-forestdb-path
 ] unit-test
 
@@ -138,8 +136,7 @@ IN: forestdb.lib
     test-db-1 [
         5 set-kv-n
         fdb-commit-normal
-        fdb-get-seqnum
-        fdb-get-info doc_count>>
+        fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
     ] with-forestdb-path
 ] unit-test
 
@@ -149,9 +146,8 @@ IN: forestdb.lib
     test-db-1 [
         5 set-kv-n
         fdb-commit-normal
-        5 [
-            fdb-get-seqnum
-            fdb-get-info doc_count>>
+        FDB_SNAPSHOT_INMEM [
+            fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
         ] with-forestdb-snapshot
     ] with-forestdb-path
 ] unit-test
@@ -166,9 +162,8 @@ IN: forestdb.lib
     test-db-1 [
         5 set-kv-n
         fdb-commit-normal
-        2 [
-            fdb-get-seqnum
-            fdb-get-info doc_count>>
+        FDB_SNAPSHOT_INMEM [
+            fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
         ] with-forestdb-snapshot
     ] with-forestdb-path
 ] [
@@ -179,7 +174,7 @@ IN: forestdb.lib
 ! Test that we take two snapshots and their seqnums/doc counts are right.
 ! XXX: Buggy, want to see the first snapshot's document count at 5 too
 {
-    { 5 7 }
+    { 7 7 }
     { 7 7 }
 } [
     delete-test-db-1
@@ -190,21 +185,19 @@ IN: forestdb.lib
         6 7 set-kv-range
         fdb-commit-normal
 
-        5 [
-            fdb-get-seqnum
-            fdb-get-info doc_count>> 2array
+        FDB_SNAPSHOT_INMEM [
+            fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi 2array
         ] with-forestdb-snapshot
 
-        7 [
-            fdb-get-seqnum
-            fdb-get-info doc_count>> 2array
+        FDB_SNAPSHOT_INMEM [
+            fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi 2array
         ] with-forestdb-snapshot
     ] with-forestdb-path
 ] unit-test
 
 ! Same test as above, but with buggy behavior for now so it passes
 {
-    5
+    7
     7
 } [
     delete-test-db-1
@@ -215,12 +208,12 @@ IN: forestdb.lib
         6 7 set-kv-range
         fdb-commit-normal
 
-        5 [
-            fdb-get-seqnum
+        FDB_SNAPSHOT_INMEM [
+            fdb-get-kvs-info last_seqnum>>
         ] with-forestdb-snapshot
 
-        7 [
-            fdb-get-seqnum
+        FDB_SNAPSHOT_INMEM [
+            fdb-get-kvs-info last_seqnum>>
         ] with-forestdb-snapshot
     ] with-forestdb-path
 ] unit-test
@@ -228,11 +221,9 @@ IN: forestdb.lib
 
 ! Rollback test
 ! Make sure the doc_count is correct after a rollback
-! XXX: doc_count is wrong after rollback
 {
     7
-    { 5 12 }
-    ! { 5 5 } ! expected
+    { 5 5 }
 } [
     delete-test-db-1
     test-db-1 [
@@ -242,15 +233,14 @@ IN: forestdb.lib
         6 7 set-kv-range
         fdb-commit-normal
 
-        7 [
-            fdb-get-seqnum
+        FDB_SNAPSHOT_INMEM [
+            fdb-get-kvs-info last_seqnum>>
         ] with-forestdb-snapshot
 
         5 fdb-rollback
 
-        5 [
-            fdb-get-seqnum
-            fdb-get-info doc_count>> 2array
+        FDB_SNAPSHOT_INMEM [
+            fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi 2array
         ] with-forestdb-snapshot
     ] with-forestdb-path
 ] unit-test

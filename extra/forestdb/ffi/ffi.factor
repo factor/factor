@@ -14,8 +14,9 @@ LIBRARY: forestdb
 CONSTANT: FDB_MAX_KEYLEN 3840
 CONSTANT: FDB_MAX_METALEN 65535
 CONSTANT: FDB_MAX_BODYLEN 4294967295
-TYPEDEF: uint64_t fdb_seqnum_t
 CONSTANT: FDB_SNAPSHOT_INMEM -1
+
+TYPEDEF: uint64_t fdb_seqnum_t
 
 TYPEDEF: void* fdb_custom_cmp_fixed
 TYPEDEF: void* fdb_custom_cmp_variable
@@ -135,7 +136,7 @@ STRUCT: fdb_doc
 ! filename is a pointer to the handle's filename
 ! new_filename is a pointer to the handle's new_file
 
-STRUCT: fdb_info
+STRUCT: fdb_file_info
     { filename char* }
     { new_filename char* }
     { doc_count uint64_t }
@@ -144,7 +145,14 @@ STRUCT: fdb_info
 
 STRUCT: fdb_kvs_info
     { name char* }
-    { last_seqnum fdb_seqnum_t } ;
+    { last_seqnum fdb_seqnum_t }
+    { doc_count uint64_t }
+    { space_used uint64_t }
+    { file fdb_file_handle* } ;
+
+STRUCT: fdb_kvs_name_list
+    { num_kvs_names size_t }
+    { kvs_names char** } ;
 
 FUNCTION: fdb_status fdb_init ( fdb_config* config ) ;
 FUNCTION: fdb_config fdb_get_default_config ( ) ;
@@ -188,10 +196,13 @@ FUNCTION: fdb_status fdb_iterator_close ( fdb_iterator* iterator ) ;
 
 FUNCTION: fdb_status fdb_compact ( fdb_file_handle* handle, c-string new_filename ) ;
 FUNCTION: size_t fdb_estimate_space_used ( fdb_file_handle* fhandle ) ;
-FUNCTION: fdb_status fdb_get_dbinfo ( fdb_file_handle* handle, fdb_info* info ) ;
+FUNCTION: fdb_status fdb_get_file_info ( fdb_file_handle* handle, fdb_file_info* info ) ;
 FUNCTION: fdb_status fdb_get_kvs_info ( fdb_handle* handle, fdb_kvs_info* info ) ;
-FUNCTION: fdb_status fdb_get_seqnum ( fdb_handle* handle, fdb_seqnum_t* seqnum ) ;
+FUNCTION: fdb_status fdb_get_kvs_seqnum ( fdb_handle* handle, fdb_seqnum_t* seqnum ) ;
 FUNCTION: fdb_status fdb_switch_compaction_mode ( fdb_file_handle* fhandle, fdb_compaction_mode_t mode, size_t new_threshold ) ;
+
+FUNCTION: fdb_status fdb_get_kvs_name_list ( fdb_file_handle *fhandle, fdb_kvs_name_list *kvs_name_list ) ;
+FUNCTION: fdb_status fdb_free_kvs_name_list ( fdb_kvs_name_list *kvs_name_list ) ;
 
 FUNCTION: fdb_status fdb_close ( fdb_file_handle* fhandle ) ;
 FUNCTION: fdb_status fdb_destroy ( c-string filename, fdb_config* fconfig ) ;
@@ -213,3 +224,4 @@ FUNCTION: fdb_status fdb_kvs_open_default ( fdb_file_handle* fhandle,
 FUNCTION: fdb_status fdb_kvs_close ( fdb_handle* handle ) ;
 
 FUNCTION: fdb_status fdb_kvs_remove ( fdb_file_handle* fhandle, char* kvs_name ) ;
+FUNCTION: char* fdb_error_msg ( fdb_status err_code ) ;
