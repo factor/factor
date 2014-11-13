@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators io kernel math math.parser system
+USING: accessors io kernel math math.parser sequences system
 vocabs ;
 IN: system-info
 
@@ -28,9 +28,5 @@ HOOK: available-virtual-extended-mem os ( -- n )
     "CPUs: " write cpus number>string write nl
     "CPU Speed: " write cpu-mhz ghz nl
     "Physical RAM: " write physical-mem megs nl ;
-        
-<< {
-    { [ os windows? ] [ "system-info.windows" ] }
-    { [ os linux? ] [ "system-info.linux" ] }
-    { [ os macosx? ] [ "system-info.macosx" ] }
-} cond [ require ] when* >>
+
+"system-info." os name>> append require

@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.backend kernel continuations destructors namespaces
-sequences assocs hashtables sorting arrays threads boxes
-io.timeouts accessors concurrency.mailboxes fry
-system vocabs combinators ;
+USING: accessors concurrency.mailboxes continuations destructors
+fry io.backend io.timeouts kernel namespaces sequences system
+vocabs ;
 IN: io.monitors
 
 HOOK: init-monitors io-backend ( -- )
@@ -74,8 +73,4 @@ SYMBOL: +rename-file+
 : run-monitor ( path recursive? quot -- )
     '[ [ @ t ] loop ] with-monitor ; inline
 
-{
-    { [ os macosx? ] [ "io.monitors.macosx" require ] }
-    { [ os linux? ] [ "io.monitors.linux" require ] }
-    { [ os windows? ] [ "io.monitors.windows" require ] }
-} cond
+"io.monitors." os name>> append require
