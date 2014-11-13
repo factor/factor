@@ -1,19 +1,17 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Jorge Acereda Macia.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.disassembler namespaces combinators alien
-alien.syntax alien.c-types lexer parser kernel sequences layouts
-math math.order alien.libraries math.parser system make fry
-arrays libc destructors tools.memory tools.disassembler.utils
-tools.disassembler.private splitting alien.data classes.struct ;
+USING: alien alien.c-types alien.libraries alien.syntax arrays
+combinators destructors fry kernel layouts libc make math
+math.order math.parser namespaces sequences splitting system
+tools.disassembler.private tools.disassembler.utils tools.memory
+;
 IN: tools.disassembler.udis
 
-<<
-"libudis86" {
-    { [ os macosx? ] [ "libudis86.0.dylib" ] }
-    { [ os unix? ] [ "libudis86.so.0" ] }
+<< "libudis86" {
     { [ os windows? ] [ "libudis86.dll" ] }
-} cond cdecl add-library
->>
+    { [ os macosx? ] [ "libudis86.dylib" ] }
+    { [ os unix? ] [ "libudis86.so" ] }
+} cond cdecl add-library >>
 
 LIBRARY: libudis86
 

@@ -1,14 +1,14 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 ! tested on debian linux with postgresql 8.1
-USING: alien alien.c-types alien.syntax combinators system
-alien.libraries ;
+USING: alien alien.c-types alien.libraries alien.syntax
+combinators system ;
 IN: db.postgresql.ffi
 
 << "postgresql" {
-    { [ os windows? ]  [ "libpq.dll" ] }
+    { [ os windows? ] [ "libpq.dll" ] }
     { [ os macosx? ] [ "libpq.dylib" ] }
-    { [ os unix?  ]  [ "libpq.so" ] }
+    { [ os unix? ] [ "libpq.so" ] }
 } cond cdecl add-library >>
 
 ! ConnSatusType

@@ -1,24 +1,20 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.libraries alien.syntax
-combinators gio.ffi glib.ffi gobject-introspection
-gobject-introspection.standard-types kernel libc
-sequences system vocabs ;
+USING: alien alien.c-types alien.data alien.libraries
+alien.syntax combinators gio.ffi glib.ffi gobject-introspection
+gobject-introspection.standard-types kernel libc sequences
+system vocabs ;
 IN: gdk.pixbuf.ffi
 
-<<
-"gio.ffi" require
->>
+<< "gio.ffi" require >>
 
 LIBRARY: gdk.pixbuf
 
-<<
-"gdk.pixbuf" {
-    { [ os windows? ] [ "libgdk_pixbuf-2.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "libgdk_pixbuf-2.0.dylib" cdecl add-library ] }
-    { [ os unix? ] [ "libgdk_pixbuf-2.0.so" cdecl add-library ] }
-} cond
->>
+<< "gdk.pixbuf" {
+    { [ os windows? ] [ "libgdk_pixbuf-2.0-0.dll" ] }
+    { [ os macosx? ] [ "libgdk_pixbuf-2.0.dylib" ] }
+    { [ os unix? ] [ "libgdk_pixbuf-2.0.so" ] }
+} cond cdecl add-library >>
 
 GIR: vocab:gdk/pixbuf/GdkPixbuf-2.0.gir
 
