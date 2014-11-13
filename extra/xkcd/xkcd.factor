@@ -1,10 +1,11 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors formatting http.client images.http
-images.viewer images.viewer.prettyprint io kernel parser
-prettyprint.custom prettyprint.sections regexp sequences
-strings ui wrap.strings xml xml.traversal ;
+USING: accessors formatting html.parser html.parser.analyzer
+html.parser.printer http.client images.http images.viewer
+images.viewer.prettyprint io io.streams.string kernel parser
+prettyprint.custom prettyprint.sections regexp sequences strings
+ui wrap.strings ;
 
 IN: xkcd
 
@@ -15,14 +16,16 @@ IN: xkcd
     R" http://imgs\.xkcd\.com/comics/[^\.]+\.(png|jpg)"
     first-match >string load-http-image ;
 
-: comic-image. ( url -- ) comic-image image. ;
+: comic-image. ( url -- )
+    comic-image image. ;
 
-: comic-string ( url -- string )
-    http-get nip string>xml
-    "transcript" "id" deep-tag-with-attr children>string ;
+: comic-text ( url -- string )
+    http-get nip parse-html
+    "transcript" find-by-id-between
+    [ html-text. ] with-string-writer ;
 
 : comic-text. ( url -- )
-    comic-image 80 wrap-lines [ print ] each ;
+    comic-text 80 wrap-string print ;
 
 : comic. ( url -- )
     ui-running? [ comic-image. ] [ comic-text. ] if ;
