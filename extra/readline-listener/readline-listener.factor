@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs colors.constants combinators fry io
-kernel listener readline sequences splitting threads
+kernel listener readline sequences splitting system threads
 tools.completion unicode.data vocabs vocabs.hierarchy ;
 IN: readline-listener
 
@@ -56,4 +56,7 @@ PRIVATE>
     ] set-completion
     readline-reader new [ listener ] with-input-stream* ;
 
-MAIN: readline-listener
+: readline-listener-main ( -- )
+    version-info print flush readline-listener ;
+
+MAIN: readline-listener-main
