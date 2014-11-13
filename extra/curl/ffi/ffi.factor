@@ -1,10 +1,13 @@
 USING: alien alien.c-types alien.enums alien.libraries
-alien.libraries.finder alien.syntax classes.struct combinators
-kernel math unix.types words ;
+alien.syntax classes.struct combinators kernel math
+system unix.types words ;
 
 IN: curl.ffi
 
-<< "curl" dup find-library cdecl add-library >>
+<< "curl" {
+    { [ os macosx? ] [ "libcurl.dylib" ] }
+    { [ os unix? ] [ "libcurl.so" ] }
+} cond cdecl add-library >>
 
 LIBRARY: curl
 

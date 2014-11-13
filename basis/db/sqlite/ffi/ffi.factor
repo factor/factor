@@ -2,15 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! An interface to the sqlite database. Tested against sqlite v3.1.3.
 ! Not all functions have been wrapped.
-USING: alien compiler kernel math namespaces sequences strings alien.syntax
-system combinators alien.c-types alien.libraries ;
+USING: alien alien.c-types alien.libraries alien.syntax
+combinators system ;
 IN: db.sqlite.ffi
 
 << "sqlite" {
-        { [ os windows? ]  [ "sqlite3.dll" ] }
-        { [ os macosx? ] [ "/usr/lib/libsqlite3.dylib" ] }
-        { [ os unix? ]  [ "libsqlite3.so" ] }
-    } cond cdecl add-library >>
+    { [ os windows? ] [ "sqlite3.dll" ] }
+    { [ os macosx? ] [ "libsqlite3.dylib" ] }
+    { [ os unix? ] [ "libsqlite3.so" ] }
+} cond cdecl add-library >>
 
 ! Return values from sqlite functions
 CONSTANT: SQLITE_OK           0 ! Successful result

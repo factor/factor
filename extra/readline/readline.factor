@@ -1,8 +1,7 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings destructors io.encodings.utf8 kernel libc
-sequences macros quotations words compiler.units fry
-alien.data alien.libraries ;
+USING: alien.data alien.libraries alien.strings compiler.units
+destructors fry io.encodings.utf8 kernel libc sequences words ;
 QUALIFIED: readline.ffi
 IN: readline
 

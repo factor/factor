@@ -2,16 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: alien alien.accessors alien.c-types alien.data
-alien.libraries alien.syntax byte-arrays classes.struct
+alien.libraries alien.syntax assocs byte-arrays classes.struct
 combinators kernel literals math system ;
 
 IN: zeromq.ffi
 
 << "zmq" {
-  { [ os windows? ] [ "libzmq.dll" cdecl add-library ] }
-  { [ os macosx? ] [ "libzmq.dylib" cdecl add-library ] }
-  { [ os unix? ] [ "libzmq.so" cdecl add-library ] }
-} cond >>
+    { [ os windows? ] [ "libzmq.dll" ] }
+    { [ os macosx? ] [ "libzmq.dylib" ] }
+    { [ os unix? ] [ "libzmq.so" ] }
+} cond cdecl add-library >>
 
 LIBRARY: zmq
 

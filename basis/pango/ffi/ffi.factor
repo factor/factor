@@ -1,23 +1,19 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.syntax combinators kernel gobject-introspection
+alien.syntax combinators gobject-introspection
 gobject-introspection.standard-types system vocabs ;
 IN: pango.ffi
 
-<<
-"gobject.ffi" require
->>
+<< "gobject.ffi" require >>
 
 LIBRARY: pango
 
-<< 
-"pango" {
-    { [ os windows? ] [ "libpango-1.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ drop ] }
-    { [ os unix? ] [ "libpango-1.0.so" cdecl add-library ] }
-} cond
->>
+<< "pango" {
+    { [ os windows? ] [ "libpango-1.0-0.dll" ] }
+    { [ os macosx? ] [ "libpango-1.0.dylib" ] }
+    { [ os unix? ] [ "libpango-1.0.so" ] }
+} cond cdecl add-library >>
 
 IMPLEMENT-STRUCTS: PangoRectangle ;
 

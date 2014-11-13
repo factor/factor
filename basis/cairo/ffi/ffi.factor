@@ -3,16 +3,16 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.syntax classes.struct combinators kernel system ;
+alien.syntax assocs classes.struct combinators kernel system ;
 IN: cairo.ffi
 
 ! Adapted from cairo.h, version 1.8.10
 
 << "cairo" {
-    { [ os windows? ] [ "libcairo-2.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "libcairo.dylib" cdecl add-library ] }
-    { [ os unix? ] [ "libcairo.so" cdecl add-library ] }
-} cond >>
+    { [ os windows? ] [ "libcairo-2.dll" ] }
+    { [ os macosx? ] [ "libcairo.dylib" ] }
+    { [ os unix? ] [ "libcairo.so" ] }
+} cond cdecl add-library >>
 
 LIBRARY: cairo
 
