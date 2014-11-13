@@ -84,8 +84,8 @@ void factor_vm::init_factor(vm_parameters* p) {
     {OBJ_OS,              (cell)FACTOR_OS_STRING},
     {OBJ_VM_COMPILE_TIME, (cell)FACTOR_COMPILE_TIME},
     {OBJ_VM_COMPILER,     (cell)FACTOR_COMPILER_VERSION},
-    {OBJ_VM_GIT_LABEL,    (cell)FACTOR_STRINGIZE(FACTOR_GIT_LABEL)},
-    {OBJ_VM_VERSION,      (cell)FACTOR_STRINGIZE(FACTOR_VERSION)},
+    {OBJ_VM_GIT_LABEL,    (cell)FACTOR_GIT_LABEL},
+    {OBJ_VM_VERSION,      (cell)FACTOR_VERSION},
 #if defined(WINDOWS)
     {WIN_EXCEPTION_HANDLER, (cell)&factor::exception_handler},
 #endif
