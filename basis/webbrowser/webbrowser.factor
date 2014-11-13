@@ -1,18 +1,14 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators combinators.short-circuit io.pathnames
-present sequences strings system ui.operations urls vocabs ;
+USING: accessors combinators.short-circuit io.pathnames
+sequences strings system ui.operations urls vocabs ;
 
 IN: webbrowser
 
 HOOK: open-file os ( path -- )
 
-{
-    { [ os macosx?  ] [ "webbrowser.macosx"  ] }
-    { [ os linux?   ] [ "webbrowser.linux"   ] }
-    { [ os windows? ] [ "webbrowser.windows" ] }
-} cond require
+"webbrowser." os name>> append require
 
 : open-url ( url -- )
     >url open-file ;

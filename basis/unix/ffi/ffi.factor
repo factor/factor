@@ -1,18 +1,11 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.libraries
-alien.syntax classes.struct combinators system unix.time
+USING: accessors alien alien.c-types alien.data alien.libraries
+alien.syntax classes.struct sequences system unix.time
 unix.types vocabs ;
 IN: unix.ffi
 
-<<
-
-{
-    { [ os linux? ] [ "unix.ffi.linux" require ] }
-    { [ os macosx? ] [ "unix.ffi.macosx" require ] }
-} cond
-
->>
+<< "unix.ffi." os name>> append require >>
 
 CONSTANT: PROT_NONE   0
 CONSTANT: PROT_READ   1
