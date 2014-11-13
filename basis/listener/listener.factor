@@ -4,7 +4,7 @@ USING: accessors colors colors.constants
 combinators.short-circuit compiler.units continuations debugger
 fry io io.styles kernel lexer locals math math.parser namespaces
 parser parser.notes prettyprint sequences sets
-source-files.errors vocabs vocabs.loader vocabs.parser ;
+source-files.errors system vocabs vocabs.loader vocabs.parser ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -211,4 +211,7 @@ SYMBOL: interactive-vocabs
 : listener ( -- )
     [ [ { } (listener) ] with-return ] with-interactive-vocabs ;
 
-MAIN: listener
+: listener-main ( -- )
+    version-info print flush listener ;
+
+MAIN: listener-main
