@@ -1,5 +1,4 @@
-USING: combinators kernel sequences system vocabs
-alien.libraries ;
+USING: accessors kernel sequences system vocabs ;
 IN: alien.libraries.finder
 
 HOOK: find-library* os ( name -- path/f )
@@ -14,8 +13,4 @@ HOOK: find-library* os ( name -- path/f )
     dup [ find-library* ] map-find drop
     [ nip ] [ ?first "library_not_found" or ] if* ;
 
-{
-    { [ os macosx?  ] [ "alien.libraries.finder.macosx"  ] }
-    { [ os linux?   ] [ "alien.libraries.finder.linux"   ] }
-    { [ os windows? ] [ "alien.libraries.finder.windows" ] }
-} cond require
+"alien.libraries.finder." os name>> append require

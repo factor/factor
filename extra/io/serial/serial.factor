@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types assocs combinators destructors
-kernel math math.bitwise math.parser sequences summary system
-vocabs io ;
+USING: accessors destructors io kernel math.parser sequences
+summary system vocabs ;
 IN: io.serial
 
 TUPLE: serial-port < disposable stream path baud 
@@ -30,7 +29,4 @@ M: serial-port dispose* ( serial -- ) stream>> dispose ;
 : with-serial-port ( serial-port quot -- )
     [ open-serial ] dip with-duplex-stream ; inline
 
-{
-    { [ os linux? ] [ "io.serial.linux" ] } 
-    { [ os windows? ] [ "io.serial.windows" ] }
-} cond require
+"io.serial." os name>> append require
