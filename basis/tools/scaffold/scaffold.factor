@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays assocs calendar classes
-combinators combinators.short-circuit fry hashtables interpolate
-io io.directories io.encodings.utf8 io.files io.pathnames
-io.streams.string kernel math math.parser namespaces prettyprint
-quotations sequences sets sorting splitting strings system
-timers unicode.categories urls vocabs vocabs.loader
-vocabs.metadata words words.symbol ;
+USING: accessors alien arrays assocs byte-arrays calendar
+classes combinators combinators.short-circuit fry hashtables
+help.markup interpolate io io.directories io.encodings.utf8
+io.files io.pathnames io.streams.string kernel math math.parser
+namespaces prettyprint quotations sequences sets sorting
+splitting strings system timers unicode.categories urls vocabs
+vocabs.loader vocabs.metadata words words.symbol ;
 FROM: sets => members ;
 IN: tools.scaffold
 
@@ -115,9 +115,11 @@ ERROR: vocab-name-contains-dot path ;
     ] if* ;
 
 : lookup-type ( string -- object/string ? )
+    "/f" ?tail swap
     "new" ?head drop [ { [ CHAR: ' = ] [ digit? ] } 1|| ] trim-tail
     H{
-        { "object" object } { "obj" object }
+        { "object" object }
+        { "obj" object }
         { "quot" quotation }
         { "string" string }
         { "str" string }
@@ -127,12 +129,14 @@ ERROR: vocab-name-contains-dot path ;
         { "ch" "a character" }
         { "word" word }
         { "array" array }
-        { "timers" timer }
+        { "byte-array" byte-array }
+        { "timer" timer }
         { "duration" duration }
         { "path" "a pathname string" }
         { "vocab" "a vocabulary specifier" }
         { "vocab-root" "a vocabulary root string" }
         { "c-ptr" c-ptr }
+        { "sequence" sequence }
         { "seq" sequence }
         { "exemplar" object }
         { "assoc" assoc }
@@ -140,7 +144,7 @@ ERROR: vocab-name-contains-dot path ;
         { "keys" sequence } { "values" sequence }
         { "class" class } { "tuple" tuple }
         { "url" url }
-    } at* ;
+    } at* [ swap [ \ $maybe swap 2array ] when ] dip ;
 
 : add-using ( object -- )
     vocabulary>> using get [ adjoin ] [ drop ] if* ;
