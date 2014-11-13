@@ -151,14 +151,9 @@ SYMBOL: current-fdb-handle
 : with-create-doc ( key meta body quot: ( doc -- ) -- )
     [ fdb-doc-create ] dip with-doc ; inline
 
-: fdb-get-info ( -- fdb_info )
+: fdb-get-info ( -- fdb_file_info )
     get-file-handle
-    fdb_info <struct> [ fdb_get_dbinfo fdb-check-error ] keep ;
-
-: fdb-get-seqnum ( -- fdb_info )
-    get-handle
-    1020 fdb_seqnum_t <ref> [ fdb_get_seqnum fdb-check-error ] keep
-    fdb_seqnum_t deref ;
+    fdb_file_info <struct> [ fdb_get_file_info fdb-check-error ] keep ;
 
 : fdb-get-kvs-info ( -- fdb_kvs_info )
     get-handle
@@ -301,7 +296,7 @@ T{ doc
         [ size_ondisk>> ]
     } cleave <fdb-doc> ;
 
-: fdb_info>info ( fdb_doc -- doc )
+: fdb_file_info>info ( fdb_doc -- doc )
     {
         [ filename>> alien>native-string ]
         [ new_filename>> alien>native-string ]
