@@ -69,9 +69,8 @@ PRIVATE>
     [
         "Factor " % vm-version %
         " " % cpu cpu>string %
-        " build: " % build #
-        " (" % vm-git-label % ", " %
-        vm-compile-time % ") [" %
+        " (" % build # ", " % vm-git-label % ", " %
+        vm-compile-time % ")\n[" %
         vm-compiler % "] on " % os os>string %
     ] "" make ;
 
