@@ -1,8 +1,7 @@
-USING: xmode.loader xmode.utilities xmode.rules namespaces
-strings splitting assocs sequences kernel io.files xml memoize
-words globs combinators io.encodings.utf8 io.pathnames sorting
-accessors regexp unicode.case xml.data xml.traversal
-xml.syntax ;
+USING: accessors assocs globs io.pathnames kernel memoize
+namespaces regexp sequences sorting splitting strings
+unicode.case xml xml.data xml.syntax xml.traversal xmode.loader
+xmode.rules xmode.utilities ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
