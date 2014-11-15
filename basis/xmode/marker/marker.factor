@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces make xmode.rules xmode.tokens
-xmode.marker.state xmode.marker.context xmode.utilities
-xmode.catalog sequences math assocs combinators strings
-regexp splitting ascii combinators.short-circuit accessors ;
+USING: accessors ascii assocs combinators
+combinators.short-circuit kernel make math namespaces regexp
+sequences strings xmode.marker.state xmode.rules xmode.tokens
+xmode.utilities ;
 IN: xmode.marker
 
 ! Next two words copied from parser-combinators
@@ -245,7 +245,7 @@ M: mark-previous-rule handle-rule-start
 
 : (check-word-break) ( -- )
     check-rule
-    
+
     1 current-rule-set default>> next-token, ;
 
 : rule-set-empty? ( ruleset -- ? )
