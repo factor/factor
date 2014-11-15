@@ -31,7 +31,4 @@ M: unix set-os-envs-pointer ( malloc -- ) environ set-void* ;
 M: unix (set-os-envs) ( seq -- )
     utf8 strings>alien malloc-byte-array set-os-envs-pointer ;
 
-os {
-    { macosx [ "environment.unix.macosx" require ] }
-    [ drop ]
-} case
+os macosx? [ "environment.unix.macosx" require ] when
