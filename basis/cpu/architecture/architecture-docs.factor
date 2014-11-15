@@ -1,4 +1,4 @@
-USING: assocs alien compiler.cfg.instructions cpu.x86.assembler
+USING: assocs alien classes compiler.cfg.instructions cpu.x86.assembler
 cpu.x86.assembler.operands help.markup help.syntax kernel
 layouts literals math multiline system words ;
 IN: cpu.architecture
@@ -57,6 +57,10 @@ USING: cpu.architecture make ;
 HELP: signed-rep
 { $values { "rep" representation } { "rep'" representation } }
 { $description "Maps any representation to its signed counterpart, if it has one." } ;
+
+HELP: rep-size
+{ $values { "rep" representation } { "n" integer } }
+{ $description "Size in bytes of a representation." } ;
 
 HELP: immediate-arithmetic?
 { $values { "n" number } { "?" boolean } }
@@ -135,6 +139,10 @@ HELP: return-regs
 { $values { "regs" assoc } }
 { $description "What registers that will be used for function return values of which class." } ;
 
+HELP: return-struct-in-registers?
+{ $values { "c-type" class } { "?" "a boolean" } }
+{ $description "Whether the size of the struct is so small that it will be returned in registers or not." } ;
+
 HELP: stack-cleanup
 { $values
   { "stack-size" integer }
@@ -165,4 +173,14 @@ $nl
   test-instruction?
 }
 "Control flow code emitters:"
-{ $subsections %call %jump %jump-label %return } ;
+{ $subsections %call %jump %jump-label %return }
+"Representation metadata:"
+{ $subsections
+  narrow-vector-rep
+  rep-component-type
+  rep-length
+  rep-size
+  scalar-rep-of
+  signed-rep
+  widen-vector-rep
+} ;
