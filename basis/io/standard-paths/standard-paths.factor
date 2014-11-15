@@ -15,9 +15,9 @@ HOOK: find-in-applications os ( directories filename -- path )
     [ [ find-in-path* ] keep over [ append-path ] [ 2drop f ] if ]
     if-empty ;
 
-os {
-    { [ dup macosx? ] [ drop "io.standard-paths.macosx" require ] }
-    { [ dup unix? ] [ drop "io.standard-paths.unix" require ] }
-    { [ dup windows? ] [ drop "io.standard-paths.windows" require ] }
-} cond
+{
+    { [ os windows? ] [ "io.standard-paths.windows" ] }
+    { [ os macosx? ] [ "io.standard-paths.macosx" ] }
+    { [ os unix? ] [ "io.standard-paths.unix" ] }
+} cond require
 

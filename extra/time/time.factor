@@ -6,9 +6,8 @@ IN: time
 HOOK: set-time os ( timestamp -- )
 HOOK: adjust-time-monotonic os ( timestamp -- seconds )
 
-os {
-    { [ dup macosx? ] [ drop "time.macosx" require ] }
-    { [ dup windows? ] [ drop "time.windows" require ] }
-    { [ dup unix? ] [ drop "time.unix" require ] }
-    [ drop ]
-} cond
+{
+    { [ os windows? ] [ "time.windows" ] }
+    { [ os macosx? ] [ "time.macosx" ] }
+    { [ os unix? ] [ "time.unix" ] }
+} cond require
