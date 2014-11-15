@@ -1,4 +1,5 @@
-USING: kernel system alien.c-types alien.syntax combinators vocabs ;
+USING: accessors alien.c-types alien.syntax system vocabs ;
+FROM: sequences => append ;
 IN: unix.types
 
 TYPEDEF: char int8_t
@@ -44,7 +45,4 @@ C-TYPE: rlimit
 C-TYPE: rusage
 C-TYPE: sockaddr
 
-os {
-    { linux   [ "unix.types.linux"   require ] }
-    { macosx  [ "unix.types.macosx"  require ] }
-} case
+"unix.types." os name>> append require

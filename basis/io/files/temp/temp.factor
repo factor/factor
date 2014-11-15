@@ -22,5 +22,4 @@ HOOK: cache-directory os ( -- path )
     { [ os windows? ] [ "io.files.temp.windows" ] }
     { [ os macosx? ] [ "io.files.temp.macosx" ] }
     { [ os unix? ] [ "io.files.temp.unix" ] }
-    [ "unknown io.files.temp platform" throw ]
 } cond require
