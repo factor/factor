@@ -1,5 +1,5 @@
-USING: arrays classes compiler.cfg cpu.architecture help.markup help.syntax
-kernel layouts slots.private ;
+USING: arrays classes compiler.cfg compiler.codegen.gc-maps cpu.architecture
+help.markup help.syntax kernel layouts sequences slots.private ;
 IN: compiler.cfg.instructions
 
 HELP: new-insn
@@ -70,6 +70,9 @@ HELP: ##alien-invoke
     { { $slot "dll" } { "A dll handle." } }
   }
 } ;
+
+HELP: alien-call-insn
+{ $class-description "Union class of all alien call instructions." } ;
 
 HELP: ##call
 { $class-description
@@ -175,7 +178,15 @@ HELP: ##spill
 { $class-description "Instruction that copies a value from a register to a " { $link spill-slot } "." } ;
 
 HELP: gc-map-insn
-{ $class-description "Union class of all instructions that contain subroutine calls to functions which allocate memory." } ;
+{ $class-description "Union class of all instructions that contain subroutine calls to functions which allocate memory. Each of the has a " { $slot "gc-map" } " slot." } ;
+
+HELP: gc-map
+{ $class-description "A tuple that holds info necessary for a gc cycle to figure out where the gc root pointers are. It has the following slots:"
+  { $table
+    { { $slot "gc-roots" } { "A " { $link sequence } " of " { $link spill-slot } " which will be traced in a gc cycle. " } }
+  }
+}
+{ $see-also emit-gc-info-bitmaps } ;
 
 ARTICLE: "compiler.cfg.instructions" "Basic block instructions"
 "The " { $vocab-link "compiler.cfg.instructions" } " vocab contains all instruction classes used for generating CFG:s (Call Flow Graphs)."
@@ -189,18 +200,50 @@ $nl
   ##replace-imm
   ##spill
 }
-"Garbage collection words and instruction classes:"
+"Control flow:"
 { $subsections
-  gc-map-insn
+  ##call
+  ##jump
+  ##no-tco
+  ##phi
+  ##return
 }
-"Alien calls:"
+"Comparison instructions:"
 { $subsections
+  ##compare
+  ##compare-imm
+  ##compare-integer
+  ##compare-integer-branch
+  ##compare-integer-imm-branch
+  ##test
+  ##test-branch
+  ##test-imm
+  ##test-imm-branch
+}
+"Alien calls and FFI:"
+{ $subsections
+  ##alien-assembly
+  ##alien-indirect
   ##alien-invoke
+  ##box
+  ##box-alien
+  ##box-displaced-alien
+  ##box-long-long
+  ##callback-inputs
+  ##callback-outputs
+  ##local-allot
+  ##unbox
+  ##unbox-long-long
   alien-call-insn
 }
-"Allocation:"
+"Allocation and garbage collection:"
 { $subsections
   ##allot
+  ##call-gc
+  ##check-nursery-branch
+  gc-map
+  gc-map-insn
+  <gc-map>
 }
 "Constant loading:"
 { $subsections
@@ -215,12 +258,16 @@ $nl
   ##and-imm
   ##mul
   ##mul-imm
+  ##neg
+  ##not
   ##or
   ##or-imm
   ##sar
   ##sar-imm
   ##shl
   ##shl-imm
+  ##shr
+  ##shr-imm
   ##sub
   ##sub-imm
   ##xor
@@ -232,4 +279,11 @@ $nl
   ##slot-imm
   ##set-slot
   ##set-slot-imm
+}
+"Stack height manipulation:"
+{ $subsections
+  ##inc-d
+  ##inc-r
 } ;
+
+ABOUT: "compiler.cfg.instructions"
