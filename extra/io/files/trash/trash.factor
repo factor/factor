@@ -8,8 +8,8 @@ IN: io.files.trash
 HOOK: send-to-trash os ( path -- )
 
 {
-    { [ os macosx? ] [ "io.files.trash.macosx"  ] }
-    { [ os unix?   ] [ "io.files.trash.unix"    ] }
-    { [ os windows?  ] [ "io.files.trash.windows" ] }
+    { [ os windows? ] [ "io.files.trash.windows" ] }
+    { [ os macosx? ] [ "io.files.trash.macosx" ] }
+    { [ os unix? ] [ "io.files.trash.unix" ] }
 } cond require
 

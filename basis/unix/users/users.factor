@@ -134,7 +134,4 @@ ERROR: no-such-user obj ;
 : user-home ( name/uid -- path )
     dup user-passwd [ nip dir>> ] [ no-such-user ] if* ;
 
-os {
-    { [ dup macosx? ] [ drop "unix.users.macosx" require ] }
-    { [ dup linux? ] [ drop ] }
-} cond
+os macosx? [ "unix.users.macosx" require ] when

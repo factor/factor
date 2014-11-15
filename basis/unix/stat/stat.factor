@@ -1,14 +1,14 @@
-USING: kernel system combinators alien.syntax alien.c-types
-math vocabs vocabs.loader unix classes.struct ;
+USING: accessors alien.c-types alien.syntax classes.struct
+kernel sequences system unix vocabs ;
 IN: unix.stat
 
 ! File Types
 
 CONSTANT: S_IFMT   0o170000   ! These bits determine file type.
 
-CONSTANT: S_IFDIR  0o40000   ! Directory.
-CONSTANT: S_IFCHR  0o20000   ! Character device.
-CONSTANT: S_IFBLK  0o60000   ! Block device.
+CONSTANT: S_IFDIR  0o040000   ! Directory.
+CONSTANT: S_IFCHR  0o020000   ! Character device.
+CONSTANT: S_IFBLK  0o060000   ! Block device.
 CONSTANT: S_IFREG  0o100000   ! Regular file.
 CONSTANT: S_IFIFO  0o010000   ! FIFO.
 CONSTANT: S_IFLNK  0o120000   ! Symbolic link.
@@ -21,10 +21,7 @@ STRUCT: fsid
 TYPEDEF: fsid __fsid_t
 TYPEDEF: fsid fsid_t
 
-<< os {
-    { linux   [ "unix.stat.linux"   require ] }
-    { macosx  [ "unix.stat.macosx"  require ] }
-} case >>
+<< "unix.stat." os name>> append require >>
 
 : file-status ( pathname -- stat )
     \ stat <struct> [ [ stat-func ] unix-system-call drop ] keep ;
