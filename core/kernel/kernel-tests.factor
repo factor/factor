@@ -8,6 +8,21 @@ IN: kernel.tests
 [ 0 ] [ f size ] unit-test
 [ t ] [ [ \ = \ = ] all-equal? ] unit-test
 
+[
+    {
+        { 1 2 0 }
+        { 1 2 1 }
+        { 1 2 2 }
+        { 1 2 3 }
+        { 1 2 4 }
+        { 1 2 5 }
+        { 1 2 6 }
+        { 1 2 7 }
+        { 1 2 8 }
+        { 1 2 9 }
+    }
+] [ 1 2 10 iota [ 3array ] 2with map ] unit-test
+
 ! Don't leak extra roots if error is thrown
 [ ] [ 1000 [ [ 3 throw ] ignore-errors ] times ] unit-test
 

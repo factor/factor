@@ -36,14 +36,16 @@ SYMBOL: auto-use?
 
 : private? ( word -- ? ) vocabulary>> ".private" tail? ;
 
-: ignore-privates ( seq -- seq' )
-    dup [ private? ] all? [ [ private? not ] filter ] unless ;
-
+! True branch is a singleton public word with no name conflicts
+! False branch, singleton private words need confirmation regardless
+! of name conflicts
 : no-word ( name -- newword )
     dup words-named ignore-forwards
-    dup ignore-privates dup length 1 = auto-use? get and
-    [ 2nip first no-word-restarted ]
-    [ drop <no-word-error> throw-restarts no-word-restarted ]
+    dup [ length 1 = ]
+    [ [ f ] [ first private? not ] if-empty ] bi and
+    auto-use? get and
+    [ nip first no-word-restarted ]
+    [ <no-word-error> throw-restarts no-word-restarted ]
     if ;
 
 : parse-word ( string -- word )

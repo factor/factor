@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs io.files io.pathnames io.directories
-io.encodings.utf8 hashtables kernel namespaces sequences
-vocabs.loader vocabs.metadata io combinators calendar accessors
-math.parser io.streams.string ui.tools.operations quotations
-strings arrays prettyprint words vocabs sorting sets classes
-math alien urls splitting ascii combinators.short-circuit timers
-words.symbol system summary ;
+USING: accessors alien arrays assocs byte-arrays calendar
+classes combinators combinators.short-circuit fry hashtables
+help.markup interpolate io io.directories io.encodings.utf8
+io.files io.pathnames io.streams.string kernel math math.parser
+namespaces prettyprint quotations sequences sets sorting
+splitting strings system timers unicode.categories urls vocabs
+vocabs.loader vocabs.metadata words words.symbol ;
 FROM: sets => members ;
 IN: tools.scaffold
 
@@ -115,9 +115,11 @@ ERROR: vocab-name-contains-dot path ;
     ] if* ;
 
 : lookup-type ( string -- object/string ? )
+    "/f" ?tail swap
     "new" ?head drop [ { [ CHAR: ' = ] [ digit? ] } 1|| ] trim-tail
     H{
-        { "object" object } { "obj" object }
+        { "object" object }
+        { "obj" object }
         { "quot" quotation }
         { "string" string }
         { "str" string }
@@ -127,39 +129,45 @@ ERROR: vocab-name-contains-dot path ;
         { "ch" "a character" }
         { "word" word }
         { "array" array }
-        { "timers" timer }
+        { "byte-array" byte-array }
+        { "timer" timer }
         { "duration" duration }
         { "path" "a pathname string" }
         { "vocab" "a vocabulary specifier" }
         { "vocab-root" "a vocabulary root string" }
         { "c-ptr" c-ptr }
+        { "sequence" sequence }
         { "seq" sequence }
+        { "exemplar" object }
         { "assoc" assoc }
         { "alist" "an array of key/value pairs" }
         { "keys" sequence } { "values" sequence }
         { "class" class } { "tuple" tuple }
         { "url" url }
-    } at* ;
+    } at* [ swap [ \ $maybe swap 2array ] when ] dip ;
 
 : add-using ( object -- )
     vocabulary>> using get [ adjoin ] [ drop ] if* ;
 
-: ($values.) ( array -- )
-    [ bl ] [
-        "{ " write
-        dup array? [ first ] when
-        dup lookup-type [
-            [ unparse write bl ]
-            [ [ pprint ] [ dup string? [ drop ] [ add-using ] if ] bi ] bi*
-        ] [
-            drop unparse write bl null pprint
-            null add-using
-        ] if
-        " }" write
-    ] interleave ;
-
 : 4bl ( -- )
     "    " write ; inline
+
+: ($values.) ( array -- )
+    [
+        4bl
+        [ bl ] [
+            "{ " write
+            dup array? [ first ] when
+            dup lookup-type [
+                [ unparse write bl ]
+                [ [ pprint ] [ dup string? [ drop ] [ add-using ] if ] bi ] bi*
+            ] [
+                drop unparse write bl null pprint
+                null add-using
+            ] if
+            " }" write
+        ] interleave
+    ] unless-empty ;
 
 : ?print-nl ( seq1 seq2 -- )
     [ empty? ] either? [ nl ] unless ;
@@ -172,9 +180,9 @@ ERROR: vocab-name-contains-dot path ;
         ] [
             [ members ] dip over diff
             "{ $values" print
-            [ drop 4bl ($values.) ]
+            [ drop ($values.) ]
             [ ?print-nl ]
-            [ nip 4bl ($values.) ] 2tri
+            [ nip ($values.) ] 2tri
             nl "}" print
         ] if
     ] when* ;
@@ -313,22 +321,35 @@ PRIVATE>
         2drop
     ] if ;
 
-SYMBOL: examples-flag
+SYMBOL: nested-examples
 
-: example ( -- )
-    {
-        "{ $example \"\" \"USING: prettyprint ;\""
-        "           \"\""
-        "           \"\""
-        "}"
-    } [ examples-flag get [ 4bl ] when print ] each ;
+: example-using ( using -- )
+    " " join "example-using" [
+        nested-examples get 4 0 ? CHAR: \s <string> "example-indent" [
+            """${example-indent}"Example:"
+${example-indent}{ $example "USING: ${example-using} ;"
+${example-indent}    ""
+${example-indent}    ""
+${example-indent}}
+"""
+            interpolate
+        ] with-variable
+    ] with-variable ;
 
-: examples ( n -- )
-    t \ examples-flag [
-        "{ $examples " print
-        [ example ] times
+: n-examples-using ( n using -- )
+    '[ _ example-using ] times ;
+
+: scaffold-n-examples ( n word -- )
+    vocabulary>> "prettyprint" 2array
+    [ t nested-examples ] 2dip
+    '[
+        "{ $examples" print
+        _ _ n-examples-using
         "}" print
     ] with-variable ;
+
+: scaffold-examples ( word -- )
+    2 swap scaffold-n-examples ;
 
 : touch. ( path -- )
     [ touch-file ]

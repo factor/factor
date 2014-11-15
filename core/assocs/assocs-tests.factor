@@ -212,3 +212,60 @@ unit-test
 } [
     { { 1 f } { f 2 } } sift-values
 ] unit-test
+
+! zip, zip-as
+{
+    { { 1 4 } { 2 5 } { 3 6 } }
+} [ { 1 2 3 } { 4 5 6 } zip ] unit-test
+
+{
+    { { 1 4 } { 2 5 } { 3 6 } }
+} [ V{ 1 2 3 } { 4 5 6 } zip ] unit-test
+
+{
+    { { 1 4 } { 2 5 } { 3 6 } }
+} [ { 1 2 3 } { 4 5 6 } { } zip-as ] unit-test
+
+{
+    { { 1 4 } { 2 5 } { 3 6 } }
+} [ B{ 1 2 3 } { 4 5 6 } { } zip-as ] unit-test
+
+{
+    V{ { 1 4 } { 2 5 } { 3 6 } }
+} [ { 1 2 3 } { 4 5 6 } V{ } zip-as ] unit-test
+
+{
+    V{ { 1 4 } { 2 5 } { 3 6 } }
+} [ BV{ 1 2 3 } BV{ 4 5 6 } V{ } zip-as ] unit-test
+
+{ { { 1 3 } { 2 4 } }
+} [ { 1 2 } { 3 4 } { } zip-as ] unit-test
+
+{
+    V{ { 1 3 } { 2 4 } }
+} [ { 1 2 } { 3 4 } V{ } zip-as ] unit-test
+
+{
+    H{ { 1 3 } { 2 4 } }
+} [ { 1 2 } { 3 4 } H{ } zip-as ] unit-test
+
+! zip-index, zip-index-as
+{
+    { { 11 0 } { 22 1 } { 33 2 } }
+} [ { 11 22 33 } zip-index ] unit-test
+
+{
+    { { 11 0 } { 22 1 } { 33 2 } }
+} [ V{ 11 22 33 } zip-index ] unit-test
+
+{
+    { { 11 0 } { 22 1 } { 33 2 } }
+} [ { 11 22 33 } { } zip-index-as ] unit-test
+
+{
+    { { 11 0 } { 22 1 } { 33 2 } }
+} [ V{ 11 22 33 } { } zip-index-as ] unit-test
+
+{
+    V{ { 11 0 } { 22 1 } { 33 2 } }
+} [ { 11 22 33 } V{ } zip-index-as ] unit-test

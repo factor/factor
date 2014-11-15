@@ -2,12 +2,21 @@
 
 namespace factor {
 
-callback_heap::callback_heap(cell size, factor_vm* parent)
-    : seg(new segment(size, true)), here(seg->start), parent(parent) {}
+callback_heap::callback_heap(cell size, factor_vm* parent) {
+  seg = new segment(size, true);
+  if (!seg)
+    fatal_error("Out of memory in callback_heap constructor", size);
+  allocator = new free_list_allocator<code_block>(size, seg->start);
+  this->parent = parent;
+
+}
 
 callback_heap::~callback_heap() {
+  delete allocator;
+  allocator = NULL;
   delete seg;
   seg = NULL;
+
 }
 
 void factor_vm::init_callbacks(cell size) {
@@ -61,14 +70,14 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   cell size = array_capacity(insns.untagged());
 
   cell bump = align(size + sizeof(code_block), data_alignment);
-  if (here + bump > seg->end)
-    fatal_error("Out of callback space", 0);
+  code_block* stub = allocator->allot(bump);
+  if (!stub) {
+    parent->general_error(ERROR_CALLBACK_SPACE_OVERFLOW,
+                          false_object,
+                          false_object);
+  }
 
-  free_heap_block* free_block = (free_heap_block*)here;
-  free_block->make_free(bump);
-  here += bump;
-
-  code_block* stub = (code_block*)free_block;
+  stub->header = bump & ~7;
   stub->owner = owner;
   stub->parameters = false_object;
   stub->relocation = false_object;
@@ -105,12 +114,14 @@ struct callback_updater {
   explicit callback_updater(callback_heap* callbacks)
       : callbacks(callbacks) {}
 
-  void operator()(code_block* stub) { callbacks->update(stub); }
+  void operator()(code_block* stub, cell size) {
+    callbacks->update(stub);
+  }
 };
 
 void callback_heap::update() {
   callback_updater updater(this);
-  each_callback(updater);
+  allocator->iterate(updater);
 }
 
 /* Allocates memory */
@@ -123,6 +134,18 @@ void factor_vm::primitive_callback() {
   void* func = callbacks->add(w.value(), return_rewind)->entry_point();
   CODE_TO_FUNCTION_POINTER_CALLBACK(this, func);
   ctx->push(allot_alien(func));
+}
+
+void factor_vm::primitive_free_callback() {
+  void* entry_point = alien_offset(ctx->pop());
+  code_block* stub = (code_block*)entry_point - 1;
+  callbacks->allocator->free(stub);
+}
+
+/* Allocates memory */
+void factor_vm::primitive_callback_room() {
+  allocator_room room = callbacks->allocator->as_allocator_room();
+  ctx->push(tag<byte_array>(byte_array_from_value(&room)));
 }
 
 }

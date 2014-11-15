@@ -27,7 +27,7 @@ main ;
     new-definitions get >>definitions drop ;
 
 : <source-file> ( path -- source-file )
-    \ source-file-tuple new
+    source-file-tuple new
         swap >>path
         <definitions> >>definitions ;
 
@@ -62,7 +62,7 @@ SYMBOL: file
 
 : wrap-source-file-error ( error -- * )
     file get rollback-source-file
-    \ source-file-error new
+    source-file-error new
         f >>line#
         file get path>> >>file
         swap >>error rethrow ;

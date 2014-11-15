@@ -1,14 +1,15 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes combinators
+USING: accessors arrays classes combinators
 combinators.short-circuit compiler.units debugger fry help
-help.apropos help.crossref help.home help.topics help.stylesheet
+help.apropos help.crossref help.home help.stylesheet help.topics
 kernel models sequences sets ui ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.labels ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks
-ui.gadgets.viewports ui.gestures ui.tools.browser.history
-ui.tools.browser.popups ui.tools.common vocabs ;
+ui.gadgets.viewports ui.gadgets.worlds ui.gestures
+ui.tools.browser.history ui.tools.browser.popups ui.tools.common
+vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
@@ -89,7 +90,10 @@ M: browser-gadget definitions-changed ( set browser -- )
 M: browser-gadget focusable-child* search-field>> ;
 
 : (browser-window) ( topic -- )
-    <browser-gadget> "Browser" open-status-window ;
+    <browser-gadget>
+    <world-attributes>
+        "Browser" >>title
+    open-status-window ;
 
 : browser-window ( -- )
     "help.home" (browser-window) ;

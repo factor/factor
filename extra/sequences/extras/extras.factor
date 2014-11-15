@@ -372,7 +372,7 @@ PRIVATE>
     ] keep ; inline
 
 : arg-sort ( seq -- indices )
-    dup length iota zip sort-keys values ;
+    zip-index sort-keys values ;
 
 : first= ( seq elt -- ? ) [ first ] dip = ; inline
 : second= ( seq elt -- ? ) [ second ] dip = ; inline

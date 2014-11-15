@@ -20,7 +20,7 @@ IN: formatting
             {
                { CHAR: - [ [ 1 - ] dip remove-nth "-" prepend ] }
                { CHAR: + [ [ 1 - ] dip remove-nth "+" prepend ] }
-               [ drop swap drop ]
+               [ drop nip ]
             } case
          ] [ drop ] if
       ] when ;
@@ -63,6 +63,8 @@ fmt-s     = "s"                  => [[ [ present ] ]]
 fmt-S     = "S"                  => [[ [ present >upper ] ]]
 fmt-u     = "u"                  => [[ [ unparse ] ]]
 fmt-d     = "d"                  => [[ [ >integer number>string ] ]]
+fmt-o     = "o"                  => [[ [ >integer >oct ] ]]
+fmt-b     = "b"                  => [[ [ >integer >bin ] ]]
 fmt-e     = digits "e"           => [[ first '[ _ format-scientific ] ]]
 fmt-E     = digits "E"           => [[ first '[ _ format-scientific >upper ] ]]
 fmt-f     = digits "f"           => [[ first '[ _ format-decimal ] ]]
@@ -73,7 +75,7 @@ unknown   = (.)*                 => [[ unknown-printf-directive ]]
 strings_  = fmt-c|fmt-C|fmt-s|fmt-S|fmt-u
 strings   = pad width strings_   => [[ <reversed> compose-all ]]
 
-numbers_  = fmt-d|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
+numbers_  = fmt-d|fmt-o|fmt-b|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
 numbers   = sign pad numbers_    => [[ unclip-last prefix compose-all [ fix-sign ] append ]]
 
 types     = strings|numbers

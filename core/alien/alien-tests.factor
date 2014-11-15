@@ -1,6 +1,7 @@
-USING: accessors alien alien.accessors alien.syntax byte-arrays arrays
-kernel kernel.private namespaces tools.test sequences libc math
-system prettyprint layouts alien.libraries sets ;
+USING: accessors alien alien.accessors alien.c-types alien.libraries
+alien.syntax arrays byte-arrays continuations fry kernel kernel.private
+layouts libc math namespaces prettyprint sequences sets system tools.memory
+tools.test ;
 FROM: namespaces => set ;
 IN: alien.tests
 
@@ -48,7 +49,7 @@ cell 8 = [
       0x123412341234 over 0 set-alien-signed-8
       0 alien-signed-8
     ] unit-test
-    
+
     [ 0x123412341234 ] [
       8 <byte-array>
       0x123412341234 over 0 set-alien-signed-cell
@@ -85,3 +86,41 @@ f initialize-test set-global
 [ 7575 ] [ initialize-test [ 7575 ] initialize-alien ] unit-test
 
 [ { BAD-ALIEN } ] [ { BAD-ALIEN BAD-ALIEN BAD-ALIEN } members ] unit-test
+
+! Generate callbacks until the whole callback-heap is full, then free
+! them. Do it ten times in a row for good measure.
+: produce-until-error ( quot -- error seq )
+    '[ [ @ t ] [ f ] recover ] [ ] produce ; inline
+
+SYMBOL: foo
+
+: fill-and-free-callback-heap ( -- )
+    [ \ foo 33 <callback> ] produce-until-error nip [ free-callback ] each ;
+
+{ } [
+    10 [ fill-and-free-callback-heap ] times
+] unit-test
+
+: <cb-creator> ( -- alien )
+    \ int { pointer: void pointer: void } \ cdecl
+    [ 2drop 37 ] alien-callback ;
+
+: call-cb ( -- ret )
+    f f <cb-creator> [
+        \ int { pointer: void pointer: void } \ cdecl
+        alien-indirect
+    ] with-callback ;
+
+! This function shouldn't leak
+{ t } [
+    callback-room occupied>>
+    call-cb drop
+    callback-room occupied>> =
+] unit-test
+
+! Will fail if the callbacks cache gets out of sync
+{ 37 37 } [
+    call-cb
+    fill-and-free-callback-heap
+    call-cb
+] unit-test

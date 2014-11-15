@@ -1,6 +1,6 @@
 USING: accessors arrays combinators effects effects.parser fry generalizations
-kernel lexer math namespaces parser python python.ffi python.objects sequences
-sequences.generalizations vocabs.parser words ;
+kernel lexer locals math namespaces parser python python.ffi python.objects
+sequences sequences.generalizations vocabs.parser words ;
 IN: python.syntax
 
 <PRIVATE
@@ -29,20 +29,21 @@ SYMBOL: current-context
         [ '[ py-tuple>array _ firstn ] ]
     } case ;
 
-: make-function-quot ( alien effect -- quot )
+: make-function-quot ( obj-quot effect -- quot )
     [ in>> gather-args-quot ] [ out>> unpack-value-quot ] bi
-    swapd '[ @ _ -rot call-object-full @ ] ;
+    swapd '[ @ @ -rot call-object-full @ ] ;
 
-: function-callable ( name alien effect -- )
-    [ create-in ] 2dip [ make-function-quot ] keep define-inline ; inline
+: make-factor-words ( module name prefix? -- call-word obj-word )
+    [ [ ":" glue ] [ ":$" glue ] 2bi ] [ nip dup "$" prepend ] if
+    [ create-in ] bi@ ;
 
-: function-object ( name alien -- )
-    [ "$" prepend create-in ] [ '[ _ ] ] bi*
-    { } { "obj" } <effect> define-inline ; inline
+: import-getattr ( module name -- alien )
+    [ py-import ] dip getattr ;
 
-: add-function ( name effect -- )
-    [ dup current-context get py-import swap getattr 2dup ] dip
-    function-callable function-object ; inline
+:: add-function ( name effect module prefix? -- )
+    module name prefix? make-factor-words :> ( call-word obj-word )
+    obj-word module name '[ _ _ import-getattr ] ( -- o ) define-inline
+    call-word obj-word def>> effect make-function-quot effect define-inline ;
 
 : make-method-quot ( name effect -- quot )
     [ in>> 1 tail gather-args-quot ] [ out>> unpack-value-quot ] bi swapd
@@ -60,6 +61,12 @@ SYMBOL: current-context
 
 PRIVATE>
 
-SYNTAX: PY-FROM: [ add-function ] scan-definitions ; inline
+SYNTAX: PY-FROM: [
+    current-context get f add-function
+] scan-definitions ; inline
+
+SYNTAX: PY-QUALIFIED-FROM: [
+    current-context get t add-function
+] scan-definitions ; inline
 
 SYNTAX: PY-METHODS: [ add-method ] scan-definitions ; inline

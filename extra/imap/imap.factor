@@ -96,11 +96,13 @@ CONSTANT: IMAP4_SSL_PORT 993
     first "\\* STATUS \"[^\"]+\" \\(([^\\)]+)\\)" pcre:findall first last last
     " " split 2 group [ string>number ] assoc-map ;
 
-: parse-store-mail ( seq -- assoc )
-    but-last [
-        "\\(FLAGS \\(([^\\)]+)\\) UID (\\d+)\\)" pcre:findall
+: parse-store-mail-line ( str -- pair/f )
+    "\\(FLAGS \\(([^\\)]+)\\) UID (\\d+)\\)" pcre:findall [ f ] [
         first 1 tail values first2 [ " " split ] dip string>number swap 2array
-    ] map ;
+    ] if-empty ;
+
+: parse-store-mail ( seq -- assoc )
+    but-last [ parse-store-mail-line ] map sift ;
 
 PRIVATE>
 
@@ -181,6 +183,6 @@ TUPLE: imap-settings host email password ;
         swap >>password
         swap >>email
         swap >>host ; inline
-    
+
 : with-imap-settings ( imap-settings quot -- )
     [ [ host>> ] [ email>> ] [ password>> ] tri ] dip with-imap ; inline

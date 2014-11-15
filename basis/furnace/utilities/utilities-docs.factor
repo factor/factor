@@ -1,5 +1,5 @@
 USING: assocs help.markup help.syntax kernel
-quotations sequences strings urls xml.data http ;
+quotations sequences strings urls xml.data http words ;
 IN: furnace.utilities
 
 HELP: adjust-redirect-url
@@ -79,9 +79,9 @@ HELP: user-agent
 { $values { "user-agent" { $maybe string } } }
 { $description "Outputs the user agent reported by the client for the current request." } ;
 
-HELP: vocab-path
-{ $values { "vocab" "a vocabulary specifier" } { "path" "a pathname string" } }
-{ $description "Outputs the full pathname of the vocabulary's source directory." } ;
+HELP: resolve-word-path
+{ $values { "word" word } { "path/f" { $maybe "a pathname string" } } }
+{ $description "Outputs the full pathname of the word's vocabulary's directory." } ;
 
 HELP: exit-with
 { $values { "value" object } }
@@ -117,7 +117,7 @@ ARTICLE: "furnace.misc" "Miscellaneous Furnace features"
 }
 "Vocabulary root-relative resources:"
 { $subsections
-    vocab-path
+    resolve-word-path
     resolve-template-path
 }
 "Early return from a responder:"

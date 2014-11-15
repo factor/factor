@@ -60,22 +60,18 @@ M: gtk-clipboard set-clipboard-contents
 
 ! Timer
 
-SYMBOL: next-fire-time
-
 : set-timeout*-value ( alien value -- )
     swap 0 set-alien-signed-4 ; inline
 
 : timer-prepare ( source timeout* -- ? )
-    nip next-fire-time get-global nano-count [-]
+    nip sleep-time 1,000,000,000 or
     [ 1,000,000 /i set-timeout*-value ] keep 0 = ;
 
 : timer-check ( source -- ? )
-    drop next-fire-time get-global nano-count [-] 0 = ;
+    drop sleep-time 0 = ;
 
 : timer-dispatch ( source callback user_data -- ? )
-    3drop sleep-time [ 1,000,000,000 ] unless* nano-count +
-    next-fire-time set-global
-    yield t ;
+    3drop yield t ;
 
 : <timer-funcs> ( -- timer-funcs )
     GSourceFuncs malloc-struct
@@ -84,7 +80,6 @@ SYMBOL: next-fire-time
         [ timer-dispatch ] GSourceFuncsDispatchFunc >>dispatch ;
 
 :: with-timer ( quot -- )
-    nano-count next-fire-time set-global
     <timer-funcs> &free
     GSource heap-size g_source_new &g_source_unref :> source
     source f g_source_attach drop
@@ -361,6 +356,7 @@ CONSTANT: window-controls>decor-flags
         { small-title-bar $ GDK_DECOR_TITLE }
         { normal-title-bar $ GDK_DECOR_TITLE }
         { textured-background 0 }
+        { dialog-window 0 }
     }
 
 CONSTANT: window-controls>func-flags
@@ -372,13 +368,19 @@ CONSTANT: window-controls>func-flags
         { small-title-bar 0 }
         { normal-title-bar 0 }
         { textured-background 0 }
+        { dialog-window 0 }
     }
+
+: set-window-hint ( win controls -- )
+    {
+        { [ dialog-window over member-eq? ] [ drop GDK_WINDOW_TYPE_HINT_DIALOG ] }
+        { [ small-title-bar over member-eq? ] [ drop GDK_WINDOW_TYPE_HINT_UTILITY ] }
+        [ drop GDK_WINDOW_TYPE_HINT_NORMAL ]
+    } cond gtk_window_set_type_hint ;
 
 : configure-window-controls ( win controls -- )
     [
-        small-title-bar swap member-eq?
-        GDK_WINDOW_TYPE_HINT_UTILITY GDK_WINDOW_TYPE_HINT_NORMAL ?
-        gtk_window_set_type_hint
+        set-window-hint
     ] [
         [ gtk_widget_get_window ] dip
         window-controls>decor-flags symbols>flags

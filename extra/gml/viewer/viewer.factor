@@ -110,7 +110,7 @@ M: sequence selected-vectors [ selected-vectors ] map concat ;
     selected selected-vertices :> ( sel-vertices sel-count )
     face-vertices face-count edge-vertices edge-count sel-vertices sel-count
     <b-rep-vertices> :> vertices
-    
+
     vertices array>>
 
     face-indices
@@ -163,11 +163,11 @@ TYPED: refresh-b-rep-view ( world: gml-viewer-world -- )
 M: gml-viewer-world model-changed
     nip
     [ model>> value>> ]
-    [ b-rep<< ] 
+    [ b-rep<< ]
     [ dup viewable? [ refresh-b-rep-view ] [ drop ] if ] tri ;
 
 : init-viewer-model ( gml-viewer-world -- )
-    [ dup model>> add-connection ] 
+    [ dup model>> add-connection ]
     [ dup selected>> add-connection ] bi ;
 
 : reset-view ( gml-viewer-world -- )
@@ -192,7 +192,7 @@ M: gml-viewer-world draw-world*
         { default-attachment { 0.0 0.0 0.0 1.0 } }
         { depth-attachment 1.0 }
     } clear-framebuffer
-    
+
     [
         dup view-faces?>> [
             T{ depth-state { comparison cmp-less } } set-gpu-state
@@ -213,7 +213,7 @@ M: gml-viewer-world draw-world*
                 { "vertex-array"   [ vertex-array>> ] }
             } <render-set> render
         ] [ drop ] if
-    ] [ 
+    ] [
         {
             { "primitive-mode" [ drop points-mode ] }
             { "indexes"        [ point-indices>> ] }
@@ -258,7 +258,7 @@ CONSTANT: edge-hitbox-radius 0.05
     ] [ f ] if ;
 
 : intersecting-edge-node ( source direction b-rep -- edge/f )
-    edges>> [ intersects-edge-node? ] with with find nip ;
+    edges>> [ intersects-edge-node? ] 2with find nip ;
 
 : select-edge ( world -- )
     [ [ location>> ] [ hand-loc get wasd-pixel-ray ] bi ]
@@ -311,4 +311,3 @@ M: gml-viewer-world wasd-mouse-scale drag?>> -1/600. 0.0 ? ;
         _ >>selected
         drop
     ] with-ui ;
-

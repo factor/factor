@@ -203,3 +203,34 @@ FACTOR_EXPORT FACTOR_FASTCALL(struct test_struct_11)
 FACTOR_EXPORT signed long long ffi_test_59(signed long long x);
 FACTOR_EXPORT unsigned long long ffi_test_60(unsigned long long x);
 
+/* C99 features */
+#ifndef _MSC_VER
+
+#include <stdbool.h>
+
+struct bool_and_ptr {
+    bool b;
+    void* ptr;
+};
+
+FACTOR_EXPORT struct bool_and_ptr ffi_test_61();
+
+#endif
+
+struct uint_pair {
+	unsigned int a;
+	unsigned int b;
+};
+
+FACTOR_EXPORT struct uint_pair ffi_test_62();
+
+struct ulonglong_pair {
+	unsigned long long a;
+	unsigned long long b;
+};
+
+FACTOR_EXPORT struct ulonglong_pair ffi_test_63();
+
+FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
+FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);
+FACTOR_EXPORT void* bug1021_test_3(int x);

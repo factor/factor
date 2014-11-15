@@ -125,6 +125,7 @@ template <typename Fixup> struct slot_visitor {
   void visit_roots();
   void visit_callstack_object(callstack* stack);
   void visit_callstack(context* ctx);
+  void visit_context(context *ctx);
   void visit_contexts();
   void visit_code_block_objects(code_block* compiled);
   void visit_embedded_literals(code_block* compiled);
@@ -198,19 +199,18 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_bignum_roots() {
 }
 
 template <typename Fixup> struct callback_slot_visitor {
-  callback_heap* callbacks;
   slot_visitor<Fixup>* visitor;
 
-  callback_slot_visitor(callback_heap* callbacks,
-                        slot_visitor<Fixup>* visitor)
-      : callbacks(callbacks), visitor(visitor) {}
+  callback_slot_visitor(slot_visitor<Fixup>* visitor) : visitor(visitor) {}
 
-  void operator()(code_block* stub) { visitor->visit_handle(&stub->owner); }
+  void operator()(code_block* stub, cell size) {
+    visitor->visit_handle(&stub->owner);
+  }
 };
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_callback_roots() {
-  callback_slot_visitor<Fixup> callback_visitor(parent->callbacks, this);
-  parent->callbacks->each_callback(callback_visitor);
+  callback_slot_visitor<Fixup> callback_visitor(this);
+  parent->callbacks->allocator->iterate(callback_visitor);
 }
 
 template <typename Fixup>
@@ -261,13 +261,49 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_roots() {
                      parent->special_objects + special_object_count);
 }
 
+/* primitive_minor_gc() is invoked by inline GC checks, and it needs to fill in
+   uninitialized stack locations before actually calling the GC. See the
+   documentation in compiler.cfg.stacks.vacant for details.
+
+   So for each call frame:
+
+    - scrub some uninitialized locations
+    - trace some overinitialized locations
+    - trace roots in spill slots
+*/
 template <typename Fixup> struct call_frame_slot_visitor {
   factor_vm* parent;
   slot_visitor<Fixup>* visitor;
+  /* NULL in case we're a visitor for a callstack object. */
+  context* ctx;
+
+  void check_stack(cell stack, uint8_t* bitmap, cell base, uint32_t count) {
+    for (uint32_t loc = 0; loc < count; loc++) {
+      if (bitmap_p(bitmap, base + loc)) {
+#ifdef DEBUG_GC_MAPS
+        std::cout << "checking stack location " << loc << std::endl;
+#endif
+        cell* value_ptr = ((cell*)stack + loc + 1);
+        visitor->visit_handle(value_ptr);
+      }
+    }
+  }
+
+  void scrub_stack(cell stack, uint8_t* bitmap, cell base, uint32_t count) {
+    for (cell loc = 0; loc < count; loc++) {
+      if (bitmap_p(bitmap, base + loc)) {
+#ifdef DEBUG_GC_MAPS
+        std::cout << "scrubbing stack location " << loc << std::endl;
+#endif
+        *((cell*)stack - loc) = 0;
+      }
+    }
+  }
 
   call_frame_slot_visitor(factor_vm* parent,
-                          slot_visitor<Fixup>* visitor)
-      : parent(parent), visitor(visitor) {}
+                          slot_visitor<Fixup>* visitor,
+                          context* ctx)
+      : parent(parent), visitor(visitor), ctx(ctx) {}
 
   /*
 	frame top -> [return address]
@@ -296,6 +332,28 @@ template <typename Fixup> struct call_frame_slot_visitor {
 #endif
     cell* stack_pointer = (cell*)frame_top;
     uint8_t* bitmap = info->gc_info_bitmap();
+
+    if (ctx) {
+      /* Scrub vacant stack locations. */
+      scrub_stack(ctx->datastack,
+                  bitmap,
+                  info->callsite_scrub_d(callsite),
+                  info->scrub_d_count);
+      scrub_stack(ctx->retainstack,
+                  bitmap,
+                  info->callsite_scrub_r(callsite),
+                  info->scrub_r_count);
+
+      /* Trace overinitialized stack locations. */
+      check_stack(ctx->datastack,
+                  bitmap,
+                  info->callsite_check_d(callsite),
+                  info->check_d_count);
+      check_stack(ctx->retainstack,
+                  bitmap,
+                  info->callsite_check_r(callsite),
+                  info->check_r_count);
+    }
 
     /* Subtract old value of base pointer from every derived pointer. */
     for (cell spill_slot = 0; spill_slot < info->derived_root_count;
@@ -334,27 +392,34 @@ template <typename Fixup> struct call_frame_slot_visitor {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_callstack_object(callstack* stack) {
-  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this);
+  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this, NULL);
   parent->iterate_callstack_object(stack, call_frame_visitor, fixup);
 }
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_callstack(context* ctx) {
-  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this);
+  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this, ctx);
   parent->iterate_callstack(ctx, call_frame_visitor, fixup);
+}
+
+template <typename Fixup>
+void slot_visitor<Fixup>::visit_context(context* ctx) {
+  /* Callstack is visited first because it scrubs the data and retain
+     stacks. */
+  visit_callstack(ctx);
+
+  visit_stack_elements(ctx->datastack_seg, (cell*)ctx->datastack);
+  visit_stack_elements(ctx->retainstack_seg, (cell*)ctx->retainstack);
+  visit_object_array(ctx->context_objects,
+                     ctx->context_objects + context_object_count);
+
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_contexts() {
   std::set<context*>::const_iterator begin = parent->active_contexts.begin();
   std::set<context*>::const_iterator end = parent->active_contexts.end();
   while (begin != end) {
-    context* ctx = *begin;
-
-    visit_stack_elements(ctx->datastack_seg, (cell*)ctx->datastack);
-    visit_stack_elements(ctx->retainstack_seg, (cell*)ctx->retainstack);
-    visit_object_array(ctx->context_objects,
-                       ctx->context_objects + context_object_count);
-    visit_callstack(ctx);
+    visit_context(*begin);
     begin++;
   }
 }

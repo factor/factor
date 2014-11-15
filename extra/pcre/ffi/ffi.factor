@@ -1,6 +1,6 @@
 USING:
     alien alien.c-types alien.data
-    alien.libraries alien.libraries.finder
+    alien.libraries
     alien.syntax
     classes.struct
     combinators
@@ -8,7 +8,11 @@ USING:
     system ;
 IN: pcre.ffi
 
-<< "pcre" dup find-library cdecl add-library >>
+<< "pcre" {
+    { [ os windows? ] [ "pcre3.dll" ] }
+    { [ os macosx? ] [ "libpcre.dylib" ] }
+    { [ os unix? ] [ "libpcre.so" ] }
+} cond cdecl add-library >>
 
 LIBRARY: pcre
 

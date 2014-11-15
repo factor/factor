@@ -37,6 +37,16 @@ M: string stream-json-print
 M: integer stream-json-print
     [ number>string ] [ stream-write ] bi* ;
 
+M: float stream-json-print
+    [
+        {
+            { [ dup fp-nan? ] [ drop "NaN" ] }
+            { [ dup 1/0. = ] [ drop "Infinity" ] }
+            { [ dup -1/0. = ] [ drop "-Infinity" ] }
+            [ number>string ]
+        } cond
+    ] dip stream-write ;
+
 M: real stream-json-print
     [ >float number>string ] [ stream-write ] bi* ;
 

@@ -25,7 +25,7 @@ from the callback heap in the previous session when the image was saved. */
 
 struct callback_heap {
   segment* seg;
-  cell here;
+  free_list_allocator<code_block>* allocator;
   factor_vm* parent;
 
   callback_heap(cell size, factor_vm* parent);
@@ -47,19 +47,6 @@ struct callback_heap {
   code_block* add(cell owner, cell return_rewind);
 
   void update();
-
-  code_block* next(code_block* stub) {
-    return (code_block*)((cell)stub + stub->size());
-  }
-
-  template <typename Iterator> void each_callback(Iterator& iter) {
-    code_block* scan = (code_block*)seg->start;
-    code_block* end = (code_block*)here;
-    while (scan < end) {
-      iter(scan);
-      scan = next(scan);
-    }
-  }
 };
 
 }

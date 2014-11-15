@@ -95,7 +95,7 @@ math.constants ;
 IN: shapes.circle
 
 TUPLE: circle radius ;
-CONSTRUCTOR: circle ( radius -- obj ) ;
+CONSTRUCTOR: <circle> circle ( radius -- obj ) ;
 M: circle area radius>> sq pi * ;
 M: circle perimeter radius>> pi * 2 * ;"""
         }

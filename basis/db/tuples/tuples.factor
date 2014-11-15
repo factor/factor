@@ -35,9 +35,9 @@ GENERIC: eval-generator ( singleton -- object )
 
 : query-tuples ( exemplar-tuple statement -- seq )
     [ out-params>> ] keep query-results [
-        [ sql-row-typed swap resulting-tuple ] with with query-map
+        [ sql-row-typed swap resulting-tuple ] 2with query-map
     ] with-disposal ;
- 
+
 : query-modify-tuple ( tuple statement -- )
     [ query-results [ sql-row-typed ] with-disposal ] keep
     out-params>> rot [

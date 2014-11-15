@@ -21,7 +21,7 @@ M: x86.64 pic-tail-reg RBX ;
 
 M: x86.64 return-regs
     {
-        { int-regs { RAX EDX } }
+        { int-regs { RAX RDX } }
         { float-regs { XMM0 XMM1 } }
     } ;
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays sequences accessors combinators math
+USING: kernel destructors arrays sequences accessors combinators math
 namespaces init sets words assocs alien.libraries alien
 alien.private alien.c-types fry quotations strings
 stack-checker.backend stack-checker.errors stack-checker.visitor

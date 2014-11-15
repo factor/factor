@@ -21,6 +21,7 @@ GENERIC: see* ( defspec -- )
 
 : synopsis ( defspec -- str )
     [
+        string-limit? off
         0 margin set
         1 line-limit set
         [ synopsis* ] with-in

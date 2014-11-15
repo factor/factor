@@ -6,7 +6,7 @@ classes io io.styles arrays hashtables math.order sorting refs fonts
 ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons ui.gadgets.tables ui.gadgets.status-bar
-ui.gadgets.labeled ui.tools.common ui combinators ;
+ui.gadgets.labeled ui.tools.common ui combinators ui.gadgets.worlds ;
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < tool table ;
@@ -101,7 +101,12 @@ M: inspector-gadget focusable-child*
 \ com-push H{ { +listener+ t } } define-command
 
 : slot-editor-window ( close-hook update-hook assoc key key-string -- )
-    [ <value-ref> <slot-editor> ] [ "Slot editor: " prepend ] bi*
+    [ <value-ref> <slot-editor> ]
+    [
+        <world-attributes>
+            swap "Slot editor: " prepend >>title
+            [ { dialog-window } append ] change-window-controls
+    ] bi*
     open-status-window ;
 
 : com-edit-slot ( inspector -- )

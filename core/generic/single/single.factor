@@ -75,7 +75,7 @@ C: <predicate-engine> predicate-engine
 
 : flatten-method ( method class assoc -- )
     over flatten-class keys
-    [ swap push-method ] with with with each ;
+    [ swap push-method ] 2with with each ;
 
 : flatten-methods ( assoc -- assoc' )
     H{ } clone [ [ swapd flatten-method ] curry assoc-each ] keep ;
@@ -124,7 +124,7 @@ TUPLE: tuple-dispatch-engine echelons ;
 : <tuple-dispatch-engine> ( methods -- engine )
     convert-tuple-inheritance echelon-sort
     [ dupd <echelon-dispatch-engine> ] assoc-map
-    \ tuple-dispatch-engine boa ;
+    tuple-dispatch-engine boa ;
 
 : convert-tuple-methods ( assoc -- assoc' )
     tuple bootstrap-word

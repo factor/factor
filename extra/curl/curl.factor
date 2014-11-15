@@ -11,19 +11,23 @@ DESTRUCTOR: curl_easy_cleanup
 
 DESTRUCTOR: fclose
 
+: check-code ( code -- )
+    CURLE_OK assert= ;
+
 : curl-init ( -- CURL )
     curl_easy_init &curl_easy_cleanup ;
 
+: curl-set-opt ( CURL key value -- )
+    curl_easy_setopt check-code ;
+
 : curl-set-url ( CURL url -- )
-    CURLOPT_URL swap present
-    curl_easy_setopt CURLE_OK assert= ;
+    CURLOPT_URL swap present curl-set-opt ;
 
 : curl-set-file ( CURL path -- )
-    CURLOPT_FILE swap "wb" fopen &fclose
-    curl_easy_setopt CURLE_OK assert= ;
+    CURLOPT_FILE swap "wb" fopen &fclose curl-set-opt ;
 
 : curl-perform ( CURL -- )
-    curl_easy_perform CURLE_OK assert= ;
+    curl_easy_perform check-code ;
 
 PRIVATE>
 

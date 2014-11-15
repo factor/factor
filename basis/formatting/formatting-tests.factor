@@ -20,6 +20,8 @@ IN: formatting.tests
 [ "123.10" ] [ 123.1 "%01.2f" sprintf ] unit-test
 [ "1.2346" ] [ 1.23456789 "%.4f" sprintf ] unit-test
 [ "  1.23" ] [ 1.23456789 "%6.2f" sprintf ] unit-test
+[ "001100" ] [ 12 "%06b" sprintf ] unit-test
+[ "==14" ] [ 12 "%'=4o" sprintf ] unit-test
 
 { "foo: 1 bar: 2" } [ { 1 2 3 } "foo: %d bar: %s" vsprintf ] unit-test
 

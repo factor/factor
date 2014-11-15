@@ -134,7 +134,7 @@ ARTICLE: "peg.ebnf.choice" "Choice"
     { $example
        "USING: prettyprint peg.ebnf ;"
        "\"d\" [EBNF rule=\"a\" | \"b\" | \"c\" EBNF] ."
-       "Peg parsing error at character position 0.\nExpected token 'c' or token 'b' or token 'a'"
+       "Peg parsing error at character position 0.\nExpected 'a' or 'b' or 'c'\nGot 'd'"
     }
 }
 ;

@@ -108,7 +108,7 @@ ERROR: non-negative-integer-expected n ;
 
 : iota ( n -- iota )
     dup 0 < [ non-negative-integer-expected ] when
-    \ iota-tuple boa ; inline
+    iota-tuple boa ; inline
 
 M: iota-tuple length n>> ; inline
 M: iota-tuple nth-unsafe drop ; inline
@@ -571,15 +571,18 @@ PRIVATE>
 : each-index ( ... seq quot: ( ... elt index -- ... ) -- ... )
     (each-index) each-integer ; inline
 
+: map-index-as ( ... seq quot: ( ... elt index -- ... newelt ) exemplar -- ... newseq )
+    [ dup length iota ] 2dip 2map-as ; inline
+
+: map-index ( ... seq quot: ( ... elt index -- ... newelt ) -- ... newseq )
+    { } map-index-as ; inline
+
 : interleave ( ... seq between quot: ( ... elt -- ... ) -- ... )
     pick empty? [ 3drop ] [
         [ [ drop first-unsafe ] dip call ]
         [ [ bi* ] 2curry [ 1 ] 2dip (each) (each-integer) ]
         3bi
     ] if ; inline
-
-: map-index ( ... seq quot: ( ... elt index -- ... newelt ) -- ... newseq )
-    [ dup length iota ] dip 2map ; inline
 
 : reduce-index ( ... seq identity quot: ( ... prev elt index -- ... next ) -- ... result )
     swapd each-index ; inline

@@ -398,7 +398,7 @@ tuple
     ] dip define-declared ;
 
 {
-    { "<callback>" "alien" "primitive_callback" ( return-rewind word -- alien ) }
+    { "<callback>" "alien" "primitive_callback" ( word return-rewind -- alien ) }
     { "<displaced-alien>" "alien" "primitive_displaced_alien" ( displacement c-ptr -- alien ) }
     { "alien-address" "alien" "primitive_alien_address" ( c-ptr -- addr ) }
     { "alien-cell" "alien.accessors" "primitive_alien_cell" ( c-ptr n -- value ) }
@@ -450,6 +450,7 @@ tuple
     { "fgetc" "io.streams.c" "primitive_fgetc" ( alien -- byte/f ) }
     { "fputc" "io.streams.c" "primitive_fputc" ( byte alien -- ) }
     { "fread-unsafe" "io.streams.c" "primitive_fread" ( n buf alien -- count ) }
+    { "free-callback" "alien" "primitive_free_callback" ( alien -- ) }
     { "fseek" "io.streams.c" "primitive_fseek" ( alien offset whence -- ) }
     { "ftell" "io.streams.c" "primitive_ftell" ( alien -- n ) }
     { "fwrite" "io.streams.c" "primitive_fwrite" ( data length alien -- ) }
@@ -525,8 +526,9 @@ tuple
     { "float>fixnum" "math.private" "primitive_float_to_fixnum" ( x -- y ) }
     { "all-instances" "memory" "primitive_all_instances" ( -- array ) }
     { "(code-blocks)" "tools.memory.private" "primitive_code_blocks" ( -- array ) }
-    { "(code-room)" "tools.memory.private" "primitive_code_room" ( -- code-room ) }
+    { "(code-room)" "tools.memory.private" "primitive_code_room" ( -- allocator-room ) }
     { "compact-gc" "memory" "primitive_compact_gc" ( -- ) }
+    { "(callback-room)" "tools.memory.private" "primitive_callback_room" ( -- allocator-room ) }
     { "(data-room)" "tools.memory.private" "primitive_data_room" ( -- data-room ) }
     { "disable-gc-events" "tools.memory.private" "primitive_disable_gc_events" ( -- events ) }
     { "enable-gc-events" "tools.memory.private" "primitive_enable_gc_events" ( -- ) }

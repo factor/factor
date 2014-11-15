@@ -57,7 +57,7 @@ M: ---- <menu-item>
     ] make-corners ;
 
 : <commands-menu> ( target hook commands -- menu )
-    [ <menu-item> ] with with map <menu> ;
+    [ <menu-item> ] 2with map <menu> ;
 
 : show-commands-menu ( target commands -- )
     [ dup [ ] ] dip <commands-menu> show-menu ;

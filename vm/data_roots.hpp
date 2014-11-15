@@ -35,13 +35,18 @@ struct gc_bignum {
   factor_vm* parent;
 
   gc_bignum(bignum** addr, factor_vm* parent) : addr(addr), parent(parent) {
-    parent->check_data_pointer(*addr);
-    parent->bignum_roots.push_back(addr);
+    /* Don't bother with variables holding NULL pointers. */
+    if (*addr) {
+      parent->check_data_pointer(*addr);
+      parent->bignum_roots.push_back(addr);
+    }
   }
 
   ~gc_bignum() {
-    FACTOR_ASSERT(parent->bignum_roots.back() == addr);
-    parent->bignum_roots.pop_back();
+    if (*addr) {
+      FACTOR_ASSERT(parent->bignum_roots.back() == addr);
+      parent->bignum_roots.pop_back();
+    }
   }
 };
 

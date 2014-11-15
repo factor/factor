@@ -135,6 +135,9 @@ DEFER: if
 : with ( param obj quot -- obj curry )
     swapd [ swapd call ] 2curry ; inline
 
+: 2with ( param1 param2 obj quot -- obj curry )
+    with with ; inline
+
 : prepose ( quot1 quot2 -- compose )
     swap compose ; inline
 
@@ -349,6 +352,11 @@ CONSTANT: OBJ-WAITING-CALLBACKS 73
 
 CONSTANT: OBJ-SIGNAL-PIPE 74
 
+CONSTANT: OBJ-VM-COMPILE-TIME 75
+
+CONSTANT: OBJ-VM-VERSION 76
+CONSTANT: OBJ-VM-GIT-LABEL 77
+
 ! Context object count and identifiers must be kept in sync with:
 !   vm/contexts.hpp
 
@@ -360,9 +368,10 @@ CONSTANT: CONTEXT-OBJ-CONTEXT 2
 CONSTANT: CONTEXT-OBJ-IN-CALLBACK-P 3
 
 ! Runtime errors must be kept in sync with:
+!   basis/debugger/debugger.factor
 !   vm/errors.hpp
 
-CONSTANT: kernel-error-count 20
+CONSTANT: kernel-error-count 21
 
 CONSTANT: ERROR-EXPIRED 0
 CONSTANT: ERROR-IO      1
@@ -384,5 +393,6 @@ CONSTANT: ERROR-CALLSTACK-OVERFLOW 16
 CONSTANT: ERROR-MEMORY 17
 CONSTANT: ERROR-FP-TRAP 18
 CONSTANT: ERROR-INTERRUPT 19
+CONSTANT: ERROR-CALLBACK-SPACE-OVERFLOW 20
 
 PRIVATE>

@@ -1,44 +1,17 @@
 ! Copyright (C) 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bit-arrays combinators
+USING: accessors arrays assocs bit-arrays classes.tuple combinators
 combinators.short-circuit compiler.cfg.instructions
 compiler.codegen.relocation cpu.architecture fry kernel layouts
-make math math.order namespaces sequences ;
+make math math.order namespaces sequences sequences.generalizations ;
 IN: compiler.codegen.gc-maps
-
-! GC maps                                                       
-
-! Every code block either ends with
-!
-! uint 0
-!
-! or
-!
-! bitmap, byte aligned, three subsequences:
-! - <scrubbed data stack locations>
-! - <scrubbed retain stack locations>
-! - <GC root spill slots>
-! uint[] <base pointers>
-! uint[] <return addresses>
-! uint <largest scrubbed data stack location>
-! uint <largest scrubbed retain stack location>
-! uint <largest GC root spill slot>
-! uint <largest derived root spill slot>
-! int <number of return addresses>
 
 SYMBOLS: return-addresses gc-maps ;
 
-: gc-map-needed? ( gc-map -- ? )
-    ! If there are no stack locations to scrub and no GC roots,
-    ! there's no point storing the GC map.
-    dup [
-        {
-            [ scrub-d>> empty? ]
-            [ scrub-r>> empty? ]
-            [ gc-roots>> empty? ]
-            [ derived-roots>> empty? ]
-        } 1&& not
-    ] when ;
+: gc-map-needed? ( gc-map/f -- ? )
+    ! If there are no stack locations to scrub or check, and no GC
+    ! roots, there's no point storing the GC map.
+    dup [ tuple-slots [ empty? ] all? not ] when ;
 
 : gc-map-here ( gc-map -- )
     dup gc-map-needed? [
@@ -71,13 +44,15 @@ SYMBOLS: return-addresses gc-maps ;
 : gc-root-offsets ( gc-map -- offsets )
     gc-roots>> [ gc-root-offset ] map ;
 
-: emit-gc-info-bitmaps ( -- scrub-d-count scrub-r-count gc-root-count )
+: emit-gc-info-bitmaps ( -- scrub-and-check-counts )
     [
         gc-maps get {
             [ [ scrub-d>> ] map emit-scrub ]
             [ [ scrub-r>> ] map emit-scrub ]
+            [ [ check-d>> ] map emit-scrub ]
+            [ [ check-r>> ] map emit-scrub ]
             [ [ gc-root-offsets ] map emit-gc-roots ]
-        } cleave
+        } cleave 5 narray
     ] ?{ } make underlying>> % ;
 
 : emit-base-table ( alist longest -- )
@@ -98,9 +73,9 @@ SYMBOLS: return-addresses gc-maps ;
     [
         return-addresses get empty? [ 0 emit-uint ] [
             emit-gc-info-bitmaps
-            emit-base-tables
+            emit-base-tables suffix
             emit-return-addresses
-            4array emit-uints
+            emit-uints
             return-addresses get length emit-uint
         ] if
     ] B{ } make ;

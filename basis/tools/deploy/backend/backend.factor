@@ -47,7 +47,7 @@ ERROR: can't-deploy-library-file library ;
 : make-boot-image ( -- )
     #! If stage1 image doesn't exist, create one.
     my-boot-image-name resource-path exists?
-    [ my-arch make-image ] unless ;
+    [ make-my-image ] unless ;
 
 : bootstrap-profile ( -- profile )
     [
@@ -65,29 +65,28 @@ ERROR: can't-deploy-library-file library ;
     "-" join "." my-arch 3append
     "staging." ".image" surround cache-file ;
 
-DEFER: ?make-staging-image
-
 : staging-command-line ( profile -- flags )
     [
-        "-staging" ,
-        dup empty? [
-            "-i=" my-boot-image-name append ,
+        [
+            "-staging" , "-no-user-init" , "-pic=0" ,
+            [ staging-image-name "-output-image=" prepend , ]
+            [ " " join "-include=" prepend , ] bi
         ] [
-            dup but-last ?make-staging-image
-            "-resource-path=" "" resource-path append ,
-            "-i=" over but-last staging-image-name append ,
-            "-run=tools.deploy.restage" ,
-        ] if
-        "-output-image=" over staging-image-name append ,
-        "-include=" swap " " join append ,
-        "-no-user-init" ,
-        "-pic=0" ,
+            [ "-i=" my-boot-image-name append , ] [
+                but-last staging-image-name "-i=" prepend ,
+                "-resource-path=" "" resource-path append ,
+                "-run=tools.deploy.restage" ,
+            ] if-empty
+        ] bi
     ] { } make ;
 
 : run-factor ( vm flags -- )
     swap prefix dup . run-with-output ; inline
 
+DEFER: ?make-staging-image
+
 : make-staging-image ( profile -- )
+    dup [ but-last ?make-staging-image ] unless-empty
     vm swap staging-command-line run-factor ;
 
 : ?make-staging-image ( profile -- )
@@ -99,20 +98,17 @@ DEFER: ?make-staging-image
     [ "deploy-config-" prepend temp-file ] bi
     [ utf8 set-file-contents ] keep ;
 
-: deploy-command-line ( image vocab manifest-file config -- flags )
+: deploy-command-line ( image vocab manifest-file profile -- flags )
     [
-        bootstrap-profile ?make-staging-image
-        [
-            "-i=" bootstrap-profile staging-image-name append ,
-            "-resource-path=" "" resource-path append ,
-            "-run=tools.deploy.shaker" ,
-            "-vocab-manifest-out=" prepend ,
-            [ "-deploy-vocab=" prepend , ]
-            [ make-deploy-config "-deploy-config=" prepend , ] bi
-            "-output-image=" prepend ,
-            "-pic=0" ,
-        ] { } make
-    ] with-variables ;
+        "-pic=0" ,
+        staging-image-name "-i=" prepend ,
+        "-vocab-manifest-out=" prepend ,
+        [ "-deploy-vocab=" prepend , ]
+        [ make-deploy-config "-deploy-config=" prepend , ] bi
+        "-output-image=" prepend ,
+        "-resource-path=" "" resource-path append ,
+        "-run=tools.deploy.shaker" ,
+    ] { } make ;
 
 : parse-vocab-manifest-file ( path -- vocab-manifest )
     utf8 file-lines [ "empty vocab manifest!" throw ] [
@@ -123,10 +119,14 @@ DEFER: ?make-staging-image
 
 :: make-deploy-image ( vm image vocab config -- manifest )
     make-boot-image
-    vocab "vocab-manifest-" prepend temp-file :> manifest-file
-    image vocab manifest-file config deploy-command-line :> flags
-    vm flags run-factor
-    manifest-file parse-vocab-manifest-file ;
+    config [
+        bootstrap-profile :> profile
+        vocab "vocab-manifest-" prepend temp-file :> manifest-file
+        image vocab manifest-file profile deploy-command-line :> flags
+        profile ?make-staging-image
+        vm flags run-factor
+        manifest-file parse-vocab-manifest-file
+    ] with-variables ;
 
 :: make-deploy-image-executable ( vm image vocab config -- manifest )
     vm image vocab config make-deploy-image

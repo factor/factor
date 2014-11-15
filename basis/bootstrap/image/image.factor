@@ -568,7 +568,7 @@ M: quotation '
     fixup-header
     "Image length: " write image get length .
     "Object cache size: " write objects get assoc-size .
-    \ last-word-symbol global delete-at
+    \ last-word global delete-at
     image get ;
 
 ! Image output

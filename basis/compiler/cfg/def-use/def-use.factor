@@ -109,7 +109,7 @@ SYMBOLS: defs insns ;
 : insn-of ( vreg -- insn ) insns get at ;
 
 : set-def-of ( obj insn assoc -- )
-    swap defs-vregs [ swap set-at ] with with each ;
+    swap defs-vregs [ swap set-at ] 2with each ;
 
 : compute-defs ( cfg -- )
     H{ } clone [

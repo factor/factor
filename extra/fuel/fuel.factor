@@ -4,7 +4,7 @@
 USING: accessors assocs compiler.units continuations fuel.eval fuel.help
 fuel.remote fuel.xref help.topics io.pathnames kernel namespaces parser
 sequences tools.scaffold vocabs.loader vocabs.parser words vocabs.files
-vocabs.metadata vocabs ;
+vocabs.metadata vocabs vocabs.hierarchy ;
 
 IN: fuel
 
@@ -83,7 +83,7 @@ PRIVATE>
     article-location fuel-eval-set-result ;
 
 : fuel-get-vocabs ( -- )
-    get-vocabs fuel-eval-set-result ;
+    all-vocab-names fuel-eval-set-result ;
 
 : fuel-get-vocabs/prefix ( prefix -- )
     get-vocabs/prefix fuel-eval-set-result ;

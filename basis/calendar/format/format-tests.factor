@@ -95,7 +95,7 @@ IN: calendar.format.tests
     }
 ] [ "2013-04-23T13:50:24" rfc3339>timestamp ] unit-test
 
-{ "2001-12-14T21:59:43.1-05:00" } [ "2001-12-14T21:59:43.1-05:00" rfc3339>timestamp timestamp>rfc3339 ] unit-test
+{ "2001-12-14T21:59:43.100000-05:00" } [ "2001-12-14T21:59:43.1-05:00" rfc3339>timestamp timestamp>rfc3339 ] unit-test
 
 [
     T{ timestamp

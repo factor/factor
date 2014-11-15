@@ -31,6 +31,14 @@ typedef char symbol_char;
 
 #define OPEN_READ(path) fopen(path, "rb")
 #define OPEN_WRITE(path) fopen(path, "wb")
+
+#ifdef _GNU_SOURCE
+extern "C" {
+  extern int __xpg_strerror_r (int __errnum, char *__buf, size_t __buflen) __THROW __nonnull ((2));
+}
+#define strerror_r __xpg_strerror_r
+#endif
+
 #define THREADSAFE_STRERROR(errnum, buf, buflen) strerror_r(errnum, buf, buflen)
 
 #define print_native_string(string) print_string(string)
@@ -44,6 +52,7 @@ uint64_t nano_count();
 void sleep_nanos(uint64_t nsec);
 
 void move_file(const vm_char* path1, const vm_char* path2);
+void check_ENOMEM(const char* msg);
 
 static inline void breakpoint() { __builtin_trap(); }
 

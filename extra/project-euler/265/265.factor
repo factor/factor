@@ -1,6 +1,7 @@
 ! Copyright (c) 2010 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions project-euler.common sequences sets ;
+USING: generalizations kernel math math.functions project-euler.common
+sequences sets ;
 IN: project-euler.265
 
 ! http://projecteuler.net/index.php?section=problems&id=265
@@ -51,7 +52,7 @@ CONSTANT: N 5
         nip ?register
     ] [
         [ 1 - ] dip
-        { 0 1 } [ add-bit [ iterate ] [ 3drop ] if ] with with with each
+        { 0 1 } [ add-bit [ iterate ] [ 3drop ] if ] 3 nwith each
     ] if ;
 
 : euler265 ( -- answer )

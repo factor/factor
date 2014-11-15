@@ -10,6 +10,7 @@ GENERIC: transfer-set ( in-set bb dfa -- out-set )
 GENERIC: block-order ( cfg dfa -- bbs )
 GENERIC: successors ( bb dfa -- seq )
 GENERIC: predecessors ( bb dfa -- seq )
+GENERIC: ignore-block? ( bb dfa -- ? )
 
 <PRIVATE
 
@@ -20,7 +21,7 @@ MIXIN: dataflow-analysis
 
 :: compute-in-set ( bb out-sets dfa -- set )
     ! Only consider initialized sets.
-    bb kill-block?>> [ f ] [
+    bb dfa ignore-block? [ f ] [
         bb dfa predecessors
         [ out-sets key? ] filter
         [ out-sets at ] map
@@ -32,7 +33,7 @@ MIXIN: dataflow-analysis
     bb in-sets maybe-set-at ; inline
 
 :: compute-out-set ( bb in-sets dfa -- set )
-    bb kill-block?>> [ f ] [ bb in-sets at bb dfa transfer-set ] if ;
+    bb dfa ignore-block? [ f ] [ bb in-sets at bb dfa transfer-set ] if ;
 
 :: update-out-set ( bb in-sets out-sets dfa -- ? )
     bb in-sets dfa compute-out-set
@@ -55,6 +56,7 @@ MIXIN: dataflow-analysis
     out-sets ; inline
 
 M: dataflow-analysis join-sets 2drop assoc-refine ;
+M: dataflow-analysis ignore-block? drop kill-block?>> ;
 
 FUNCTOR: define-analysis ( name -- )
 

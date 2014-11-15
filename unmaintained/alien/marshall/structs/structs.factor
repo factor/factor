@@ -16,7 +16,7 @@ IN: alien.marshall.structs
     define-struct-accessor ;
 
 : define-struct-setter ( class name word type -- )
-    [ "(>>" prepend ")" append ] 2dip
+    [ "<<" append ] 2dip
     marshaller [ underlying>> ] \ bi* roll 4array >quotation
     define-struct-accessor ;
 
@@ -29,7 +29,7 @@ IN: alien.marshall.structs
     {
         [ name>> "<" prepend ">" append create-in ]
         [ '[ _ new ] ]
-        [ name>> '[ _ malloc-object >>underlying ] append ]
+        [ name>> '[ _ malloc-struct >>underlying ] append ]
         [ name>> 1array ]
     } cleave { } swap <effect> define-declared ;
 PRIVATE>

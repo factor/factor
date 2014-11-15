@@ -44,7 +44,7 @@ IN: compiler.cfg.branch-splitting
 
 : update-successor-predecessors ( copies old-bb -- )
     dup successors>>
-    [ update-successor-predecessor ] with with each ;
+    [ update-successor-predecessor ] 2with each ;
 
 : split-branch ( bb -- )
     [ new-blocks ] keep

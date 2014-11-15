@@ -121,8 +121,7 @@ PRIVATE>
     [ fds>> [ enable-all-callbacks ] each ] bi ;
 
 : timer-callback ( -- callback )
-    void { CFRunLoopTimerRef void* } cdecl
-    [ drop reset-timer yield ] alien-callback ;
+    [ drop reset-timer yield ] CFRunLoopTimerCallBack ;
 
 : init-thread-timer ( -- )
     60 timer-callback <CFTimer> add-timer-to-run-loop ;

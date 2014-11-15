@@ -14,7 +14,7 @@ SYMBOL: new-definitions
 TUPLE: redefine-error def ;
 
 : throw-redefine-error ( definition -- )
-    \ redefine-error boa throw-continue ;
+    redefine-error boa throw-continue ;
 
 <PRIVATE
 

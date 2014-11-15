@@ -1,9 +1,51 @@
-USING: accessors arrays assocs calendar continuations destructors fry kernel
-math namespaces python python.ffi python.objects sequences strings tools.test ;
+USING: accessors alien arrays assocs calendar continuations destructors
+destructors.private fry kernel math memory namespaces python python.errors
+python.ffi python.objects sequences strings tools.test ;
 IN: python
 
 : py-test ( result quot -- )
     '[ _ with-destructors ] unit-test ; inline
+
+! None testing
+{ t } [
+    "__builtin__" py-import "None" getattr <none> =
+] py-test
+
+! Pretty sure the # of None references should stay constant.
+{ t } [
+    [
+        "sys" py-import "getrefcount" getattr
+        <none> <1py-tuple> call-object py>
+    ] with-destructors
+    [
+        "sys" py-import "getrefcount" getattr
+        <none> <1py-tuple> call-object py>
+    ] with-destructors =
+] unit-test
+
+{ } [ { f f f } >py drop ] py-test
+
+! Destructors
+{ 1 } [ 33 >py drop always-destructors get length ] py-test
+
+{ 1 } [ f >py drop always-destructors get length ] py-test
+
+! The tuple steals the reference properly now.
+{ 1 } [ 33 >py <1py-tuple> drop always-destructors get length ] py-test
+
+{ 1 } [ { } >py drop always-destructors get length ] py-test
+
+{ 1 } [ V{ 1 2 3 4 } >py drop always-destructors get length ] py-test
+
+{ 2 } [
+    99 >py V{ 1 2 3 4 } >py 2drop always-destructors get length
+] py-test
+
+{ 1 } [
+    { { { 33 } } } >py drop always-destructors get length
+] py-test
+
+{ } [ 123 <alien> unsteal-ref ] unit-test
 
 [ t ] [ Py_GetVersion string? ] unit-test
 
@@ -17,8 +59,10 @@ IN: python
 [ t ] [ Py_IsInitialized ] py-test
 
 ! py-importing
-[ { "ImportError" "No module named kolobi" } ] [
-    [ "kolobi" py-import ] [ [ type>> ] [ message>> ] bi 2array ] recover
+[ { "ImportError" "No module named kolobi" f } ] [
+    [ "kolobi" py-import ] [
+        [ type>> ] [ message>> ] [ traceback>> ] tri 3array
+    ] recover
 ] py-test
 
 ! setattr
@@ -108,3 +152,45 @@ IN: python
 [ t ] [
     "os" py-import PyModule_GetDict dup Py_IncRef &Py_DecRef py-dict-size 100 >
 ] py-test
+
+! CFunctions
+{ t } [
+    1234 <alien> "foo" f <PyMethodDef>
+    ml_flags>> METH_VARARGS METH_KEYWORDS bitor =
+] unit-test
+
+{ f 3 } [
+    1234 <alien> <py-cfunction>
+    [ "__doc__" getattr py> ] [ PyCFunction_GetFlags ] bi
+] py-test
+
+{ "cfunction" } [
+    1234 <alien> <py-cfunction>
+    ! Force nursery flush
+    10000 [ 1000 0xff <array> drop ] times
+    "__name__" getattr py>
+] py-test
+
+{ 3 } [
+    1234 <alien> <py-cfunction> drop always-destructors get length
+] py-test
+
+! Callbacks
+: py-map ( -- alien )
+    "__builtin__" py-import "map" getattr ;
+
+: py-map-call ( alien-cb -- seq )
+    [
+        <py-cfunction> py-map swap { 1 2 } >py 2array array>py-tuple f
+        call-object-full
+    ] with-callback py> ;
+
+: always-33-fun ( -- alien )
+    [ 3drop 33 >py ] PyCallback ;
+
+{ V{ 33 33 } } [ always-33-fun py-map-call ] py-test
+
+: id-fun ( -- alien )
+    [ drop nip py> first >py ] PyCallback ;
+
+{ V{ 1 2 } } [ id-fun py-map-call ] py-test

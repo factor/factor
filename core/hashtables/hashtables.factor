@@ -59,7 +59,7 @@ TUPLE: hashtable
 !
 ! if empty? is f:
 ! - we want to store into i
-! 
+!
 ! if empty? is t:
 ! - we want to store into j if j is not f
 ! - otherwise we want to store into i

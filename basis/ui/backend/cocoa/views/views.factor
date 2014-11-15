@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs cocoa cocoa.application cocoa.classes
-cocoa.messages cocoa.pasteboard cocoa.runtime cocoa.subclassing
-cocoa.types cocoa.views combinators core-foundation.strings
-core-graphics core-graphics.types core-text io.encodings.utf8
-kernel locals math math.rectangles namespaces opengl sequences
-threads ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.private ;
+cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
+cocoa.views combinators core-foundation.strings core-graphics
+core-graphics.types core-text io.encodings.utf8 kernel locals
+math math.rectangles namespaces opengl sequences threads
+ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.private ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -16,7 +16,11 @@ IN: ui.backend.cocoa.views
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
-    -> buttonNumber H{ { 0 1 } { 2 2 } { 1 3 } } at ;
+    -> buttonNumber {
+        { 0 [ 1 ] }
+        { 1 [ 3 ] }
+        { 2 [ 2 ] }
+    } case ;
 
 CONSTANT: modifiers
     {
@@ -154,10 +158,12 @@ CLASS: FactorView < NSOpenGLView NSTextInput
         self SEL: setWantsBestResolutionOpenGLSurface:
         -> respondsToSelector: c-bool> [
 
-            self SEND: setWantsBestResolutionOpenGLSurface:
-            1 swap execute( x x x -- )
+            self SEL: setWantsBestResolutionOpenGLSurface: 1
+            void f "objc_msgSend" { id SEL char } alien-invoke
 
-            self SEND: backingScaleFactor execute( x x -- x )
+            self SEL: backingScaleFactor
+            double f "objc_msgSend" { id SEL } alien-invoke
+
             dup 1.0 > [
                 gl-scale-factor set-global t retina? set-global
                 cached-lines get-global clear-assoc
@@ -397,7 +403,10 @@ CLASS: FactorWindowDelegate < NSObject
 
         notification -> object dup SEL: backingScaleFactor
         -> respondsToSelector: c-bool> [
-            SEND: backingScaleFactor execute( x x -- x )
+
+            SEL: backingScaleFactor
+            double f "objc_msgSend" { id SEL } alien-invoke
+
             [ [ 1.0 > ] keep f ? gl-scale-factor set-global ]
             [ 1.0 > retina? set-global ] bi
         ] [ drop ] if

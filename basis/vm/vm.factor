@@ -91,3 +91,14 @@ STRUCT: dispatch-statistics
 
 { pic-tag-count cell }
 { pic-tuple-count cell } ;
+
+! gc-info should be kept in sync with:
+!   vm/gc_info.hpp
+STRUCT: gc-info
+    { scrub-d-count uint read-only }
+    { scrub-r-count uint read-only }
+    { check-d-count uint read-only }
+    { check-r-count uint read-only }
+    { gc-root-count uint read-only }
+    { derived-root-count uint read-only }
+    { return-address-count uint read-only } ;

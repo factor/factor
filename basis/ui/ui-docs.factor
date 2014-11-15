@@ -20,7 +20,7 @@ HELP: close-window
 { $description "Close the native window containing " { $snippet "gadget" } "." } ;
 
 HELP: world-attributes
-{ $values { "world-class" class } { "title" string } { "status" gadget } { "gadgets" sequence } { "pixel-format-attributes" sequence } }
+{ $values { "world-class" class } { "title" string } { "status" gadget } { "gadgets" sequence } { "pixel-format-attributes" sequence } { "window-controls" sequence } }
 { $class-description "Tuples of this class can be passed to " { $link open-window } " to control attributes of the window opened. The following attributes can be set:" }
 { $list
     { { $snippet "world-class" } " specifies the class of world to construct. " { $link world } " is the default." }
@@ -333,6 +333,9 @@ HELP: normal-title-bar
 HELP: textured-background
 { $description "Asks for a window to have a background that blends seamlessly with the window frame. Factor will leave the window background transparent and pass mouse button gestures not handled directly by a gadget through to the window system so that the window can be dragged from anywhere on its background." } ;
 
+HELP: dialog-window
+{ $description "Provides a hint to the window manager to create a floating, dialog-style window. Currently, this is only implemented for the GTK backend." } ;
+
 HELP: MAIN-WINDOW:
 { $syntax "MAIN-WINDOW: window-word { attributes }
     attribute-code ;" }
@@ -357,5 +360,6 @@ ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"
     small-title-bar
     normal-title-bar
     textured-background
+    dialog-window
 }
 "Provide a sequence of these values in the " { $snippet "window-controls" } " slot of the " { $link world-attributes } " tuple you pass to " { $link open-window } "." ;

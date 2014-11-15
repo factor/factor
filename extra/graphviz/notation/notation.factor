@@ -59,7 +59,7 @@ IN: graphviz.notation
         name>>
         [ attrs-obj-=attr ] keep
         graph-obj-=attr
-    ] with with each ;
+    ] 2with each ;
 
 PRIVATE>
 

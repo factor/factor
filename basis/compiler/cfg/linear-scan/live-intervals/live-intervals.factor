@@ -162,7 +162,7 @@ M: hairy-clobber-insn compute-live-intervals* ( insn -- )
 : handle-live-out ( bb -- )
     live-out dup assoc-empty? [ drop ] [
         [ from get to get ] dip keys
-        [ live-interval add-range ] with with each
+        [ live-interval add-range ] 2with each
     ] if ;
 
 ! A location where all registers have to be spilled

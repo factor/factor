@@ -30,7 +30,7 @@ IN: bunny.model
     vneg normalize ;
 
 : normal ( ns vs triple -- )
-    [ n ] keep [ rot [ v+ ] change-nth ] with with each ;
+    [ n ] keep [ rot [ v+ ] change-nth ] 2with each ;
 
 : normals ( vs is -- ns )
     [ [ length { 0.0 0.0 0.0 } <array> ] keep ] dip
@@ -55,7 +55,7 @@ CONSTANT: model-url "http://duriansoftware.com/joe/media/bun_zipper.ply"
     ] each ;
 
 : draw-triangles ( ns vs is -- )
-    GL_TRIANGLES [ [ (draw-triangle) ] with with each ] do-state ;
+    GL_TRIANGLES [ [ (draw-triangle) ] 2with each ] do-state ;
 
 TUPLE: bunny-dlist list ;
 TUPLE: bunny-buffers array element-array nv ni ;

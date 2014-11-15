@@ -19,12 +19,14 @@ HELP: printf
         { { $snippet "%P.Du" }       "Unparsed format"            "object" }
         { { $snippet "%c" }          "Character format"           "char" }
         { { $snippet "%C" }          "Character format uppercase" "char" }
-        { { $snippet "%+Pd" }        "Integer format"             "fixnum" }
-        { { $snippet "%+P.De" }      "Scientific notation"        "fixnum, float" }
-        { { $snippet "%+P.DE" }      "Scientific notation"        "fixnum, float" }
-        { { $snippet "%+P.Df" }      "Fixed format"               "fixnum, float" }
-        { { $snippet "%+Px" }        "Hexadecimal"                "hex" }
-        { { $snippet "%+PX" }        "Hexadecimal uppercase"      "hex" }
+        { { $snippet "%+Pd" }        "Integer format (base 10)"   "integer" }
+        { { $snippet "%+Po" }        "Octal format (base 8)"      "integer" }
+        { { $snippet "%+Pb" }        "Binary format (base 2)"     "integer" }
+        { { $snippet "%+P.De" }      "Scientific notation"        "integer, float" }
+        { { $snippet "%+P.DE" }      "Scientific notation"        "integer, float" }
+        { { $snippet "%+P.Df" }      "Fixed format"               "integer, float" }
+        { { $snippet "%+Px" }        "Hexadecimal (base 16)"      "integer" }
+        { { $snippet "%+PX" }        "Hexadecimal (base 16) uppercase" "integer" }
         { { $snippet "%[%?, %]" }    "Sequence format"            "sequence" }
         { { $snippet "%[%?: %? %]" } "Assocs format"              "assocs" }
     }
@@ -62,6 +64,10 @@ HELP: printf
         "USING: formatting ;"
         "0xff \"%04X\" printf"
         "00FF" }
+    { $example
+        "USING: formatting ;"
+        "12 \"%b\" printf"
+        "1100" }
     { $example
         "USING: formatting ;"
         "1.23456789 \"%.3f\" printf"

@@ -1,16 +1,16 @@
-USING: alien.c-types alien.data kernel python.ffi ;
+USING: accessors alien alien.c-types alien.data combinators.short-circuit
+destructors.private kernel namespaces python.ffi sequences vocabs.loader
+words ;
 IN: python.errors
-
-ERROR: python-error type message ;
 
 <PRIVATE
 
-: get-error ( -- ptype pvalue )
-    { void* void* void* } [ PyErr_Fetch ] with-out-parameters drop ;
+: get-error ( -- ptype pvalue ptraceback )
+    { void* void* void* } [ PyErr_Fetch ] with-out-parameters ;
 
-: throw-error ( ptype pvalue -- )
-    [ "__name__" PyObject_GetAttrString ] [ PyObject_Str ] bi*
-    [ &Py_DecRef PyString_AsString ] bi@ python-error ;
+! Breaking out of a circular dependency.
+: throw-error ( ptype pvalue ptraceback -- )
+    "throw-error" "python.throwing" lookup-word execute( a b c -- ) ;
 
 PRIVATE>
 
@@ -26,5 +26,10 @@ PRIVATE>
 : check-zero ( code -- )
     0 = [ get-error throw-error ] unless ;
 
-: unsteal-ref ( ref -- ref )
-    dup Py_IncRef ;
+: unsteal-ref ( ref -- )
+    always-destructors get [
+        {
+            [ nip Py_DecRef-destructor? ]
+            [ alien>> [ alien-address ] bi@ = ]
+        } 2&& not
+    ] with filter! drop ;

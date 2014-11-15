@@ -101,7 +101,7 @@ segment::segment(cell size_, bool executable_p) {
            NULL, getpagesize() * 2 + size, MEM_COMMIT,
            executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) ==
       0)
-    out_of_memory();
+    out_of_memory("VirtualAlloc");
 
   if (!VirtualProtect(mem, getpagesize(), PAGE_NOACCESS, &ignore))
     fatal_error("Cannot allocate low guard page", (cell)mem);

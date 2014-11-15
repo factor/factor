@@ -30,14 +30,16 @@ void critical_error(const char* msg, cell tagged) {
   current_vm()->factorbug();
 }
 
-void out_of_memory() {
-  std::cout << "Out of memory\n\n";
+void out_of_memory(const char *msg) {
+  std::cout << "Out of memory: " << msg << "\n\n";
   current_vm()->dump_generations();
   abort();
 }
 
 /* Allocates memory */
 void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
+
+
   data_root<object> arg1(arg1_, this);
   data_root<object> arg2(arg2_, this);
 
@@ -63,13 +65,11 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
     cell error_object =
         allot_array_4(special_objects[OBJ_ERROR], tag_fixnum(error),
                       arg1.value(), arg2.value());
-
     ctx->push(error_object);
 
-    /* Reset local roots */
+    /* Clear the data roots since arg1 and arg2's destructors won't be
+       called. */
     data_roots.clear();
-    bignum_roots.clear();
-    code_roots.clear();
 
     /* The unwind-native-frames subprimitive will clear faulting_p
        if it was successfully reached. */

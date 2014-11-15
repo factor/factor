@@ -1,9 +1,11 @@
-USING: alien.c-types alien.data arrays assocs command-line fry
+USING: alien alien.c-types alien.data arrays assocs command-line fry
 hashtables init io.encodings.utf8 kernel namespaces
 python.errors python.ffi python.objects sequences
 specialized-arrays strings vectors ;
 IN: python
 QUALIFIED: math
+
+ERROR: python-error type message traceback ;
 
 SPECIALIZED-ARRAY: void*
 
@@ -57,20 +59,25 @@ SPECIALIZED-ARRAY: void*
 : py-list>vector ( py-list -- vector )
     dup py-list-size iota [ py-list-get-item ] with V{ } map-as ;
 
-GENERIC: (>py) ( obj -- obj' )
-M: string (>py) utf8>py-unicode ;
-M: math:fixnum (>py) PyLong_FromLong ;
-M: math:float (>py) PyFloat_FromDouble ;
-M: array (>py) [ (>py) ] map array>py-tuple ;
-M: hashtable (>py)
-    <py-dict> swap dupd [
-        swapd [ (>py) ] bi@ py-dict-set-item
-    ] with assoc-each ;
-M: vector (>py)
-    [ (>py) ] map vector>py-list ;
+DEFER: >py
 
-: >py ( obj -- py-obj )
-    (>py) &Py_DecRef ;
+GENERIC: >py ( obj -- py-obj )
+M: string >py
+    utf8>py-unicode check-new-ref ;
+M: math:fixnum >py
+    PyLong_FromLong check-new-ref ;
+M: math:float >py
+    PyFloat_FromDouble check-new-ref ;
+M: array >py
+    [ >py ] map array>py-tuple ;
+M: hashtable >py
+    <py-dict> swap dupd [
+        swapd [ >py ] bi@ py-dict-set-item
+    ] with assoc-each ;
+M: vector >py
+    [ >py ] map vector>py-list ;
+M: f >py
+    drop <none> ;
 
 ! Data marshalling to Factor
 SYMBOL: py-type-dispatch
@@ -97,6 +104,16 @@ ERROR: missing-type type ;
 : py> ( py-obj -- obj )
     dup "__class__" getattr "__name__" getattr PyString_AsString
     py-type-dispatch get ?at [ call( x -- x ) ] [ missing-type ] if ;
+
+! Callbacks
+: quot>py-callback ( quot: ( args kw -- ret ) -- alien )
+    '[
+        [ nip ] dip
+        [ [ py> ] [ { } ] if* ] bi@ @ >py
+    ] PyCallback ; inline
+
+: with-quot>py-cfunction ( alien quot -- )
+    '[ <py-cfunction> @ ] with-callback ; inline
 
 [ py-initialize ] "py-initialize" add-startup-hook
 [ py-finalize ] "py-finalize" add-shutdown-hook

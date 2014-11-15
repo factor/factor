@@ -162,7 +162,7 @@ PREDICATE: nontrivial-anonymous-intersection < anonymous-intersection
         { [ dup anonymous-union? ] [
             members>>
             [ class-not normalize-class ] map
-            <anonymous-intersection> 
+            <anonymous-intersection>
         ] }
         { [ dup anonymous-intersection? ] [
             participants>>

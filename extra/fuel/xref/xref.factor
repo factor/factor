@@ -64,9 +64,7 @@ PRIVATE>
 
 : article-location ( name -- loc ) lookup-article loc>> get-loc ;
 
-: get-vocabs ( -- seq ) all-vocab-names ;
-
-: get-vocabs/prefix ( prefix -- seq ) get-vocabs swap filter-prefix ;
+: get-vocabs/prefix ( prefix -- seq ) all-vocab-names swap filter-prefix ;
 
 : get-vocabs-words/prefix ( prefix names/f -- seq )
     [ vocabs-words ] [ current-words ] if* natural-sort swap filter-prefix ;

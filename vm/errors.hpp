@@ -23,12 +23,17 @@ enum vm_error_type {
   ERROR_CALLSTACK_OVERFLOW,
   ERROR_MEMORY,
   ERROR_FP_TRAP,
+<<<<<<< HEAD
   ERROR_INTERRUPT
+=======
+  ERROR_INTERRUPT,
+  ERROR_CALLBACK_SPACE_OVERFLOW
+>>>>>>> dcbe85fe9cc84d35e0a40c44b414c8901071bd6c
 };
 
 void fatal_error(const char* msg, cell tagged);
 void critical_error(const char* msg, cell tagged);
-void out_of_memory();
+void out_of_memory(const char* msg);
 void memory_signal_handler_impl();
 void fp_signal_handler_impl();
 void synchronous_signal_handler_impl();

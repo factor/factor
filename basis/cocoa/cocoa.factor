@@ -1,16 +1,14 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler io kernel cocoa.runtime cocoa.subclassing
-cocoa.messages cocoa.types sequences words vocabs parser
-core-foundation.bundles namespaces assocs hashtables
-compiler.units lexer init ;
+USING: cocoa.messages compiler.units core-foundation.bundles
+hashtables init io kernel lexer namespaces sequences vocabs ;
 FROM: cocoa.messages => selector ;
 IN: cocoa
 
+SYMBOL: sent-messages
+
 : (remember-send) ( selector variable -- )
     [ dupd ?set-at ] change-global ;
-
-SYMBOL: sent-messages
 
 : remember-send ( selector -- )
     sent-messages (remember-send) ;
@@ -21,12 +19,6 @@ SYNTAX: SEL:
     scan-token
     [ remember-send ]
     [ <selector> suffix! \ selector suffix! ] bi ;
-
-SYNTAX: SEND:
-    scan-token
-    [ remember-send ]
-    [ <selector> suffix! \ selector suffix! ]
-    [ suffix! \ lookup-sender suffix! ] tri ;
 
 SYMBOL: super-sent-messages
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ascii assocs byte-arrays destructors fry
 io.encodings.binary io.files io.pathnames io.streams.byte-array
-kernel namespaces sequences strings ;
+kernel namespaces strings ;
 IN: images.loader
 
 ERROR: unknown-image-extension extension ;

@@ -5,11 +5,12 @@ namespace factor {
 void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
   if (!code->seg->in_segment_p(*pc) ||
       *sp < ctx->callstack_seg->start + stack_reserved) {
-    /* Fault came from foreign code or a callstack overflow, or we don't
-       have enough callstack room to try the resumable handler. Cut the
-       callstack down to the shallowest Factor stack frame that leaves room for
-       the signal handler to do its thing, and launch the handler without going
-       through the resumable subprimitive. */
+    /* Fault came from the VM, foreign code, a callstack overflow, or
+       we don't have enough callstack room to try the resumable
+       handler. Cut the callstack down to the shallowest Factor stack
+       frame that leaves room for the signal handler to do its thing,
+       and launch the handler without going through the resumable
+       subprimitive. */
     signal_resumable = false;
     void* frame_top = (void*)ctx->callstack_top;
 
@@ -23,8 +24,8 @@ void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
     *pc = handler;
   } else {
     signal_resumable = true;
-    // Fault came from Factor, and we've got a good callstack. Route the signal
-    // handler through the resumable signal handler subprimitive.
+    /* Fault came from Factor, and we've got a good callstack. Route
+       the signal handler through the resumable signal handler subprimitive. */
     cell offset = *sp % 16;
 
     signal_handler_addr = handler;
@@ -43,7 +44,7 @@ void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
       *sp = newsp;
       *(cell*)newsp = *pc;
     } else if (offset == 16 - sizeof(cell)) {
-      // Make a fake frame for the leaf procedure
+      /* Make a fake frame for the leaf procedure */
       FACTOR_ASSERT(code->code_block_for_address(*pc) != NULL);
 
       cell newsp = *sp - LEAF_FRAME_SIZE;
@@ -55,6 +56,14 @@ void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
 
     *pc = (cell)handler_word->entry_point;
   }
+
+  /* Poking with the stack pointer, which the above code does, means
+     that pointers to stack-allocated objects will become
+     corrupted. Therefore the root vectors needs to be cleared because
+     their pointers to stack variables are now garbage. */
+  data_roots.clear();
+  bignum_roots.clear();
+  code_roots.clear();
 }
 
 }

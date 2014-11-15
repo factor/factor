@@ -79,7 +79,7 @@ void factor_vm::print_byte_array(byte_array* array, cell nesting) {
 
 void factor_vm::print_tuple(tuple* tuple, cell nesting) {
   tuple_layout* layout = untag<tuple_layout>(tuple->layout);
-  cell length = to_fixnum(layout->size);
+  cell length = to_cell(layout->size);
 
   std::cout << " ";
   print_nested_obj(layout->klass, nesting);

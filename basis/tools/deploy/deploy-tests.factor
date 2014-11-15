@@ -24,7 +24,8 @@ cache-directory [
 
 [ ] [ "sudoku" shake-and-bake 800000 small-enough? ] unit-test
 
-[ ] [ "hello-ui" shake-and-bake 1600000 small-enough? ] unit-test
+! [ ] [ "hello-ui" shake-and-bake 1605000 small-enough? ] unit-test
+[ ] [ "hello-ui" shake-and-bake 2069160 small-enough? ] unit-test
 
 [ "math-threads-compiler-io-ui" ] [
     "hello-ui" deploy-config [
@@ -33,15 +34,20 @@ cache-directory [
     ] with-variables
 ] unit-test
 
-[ ] [ "maze" shake-and-bake 1520000 small-enough? ] unit-test
+! [ ] [ "maze" shake-and-bake 1520000 small-enough? ] unit-test
+[ ] [ "maze" shake-and-bake 2000000 small-enough? ] unit-test
 
-[ ] [ "tetris" shake-and-bake 1730000 small-enough? ] unit-test
+! [ ] [ "tetris" shake-and-bake 1734000 small-enough? ] unit-test
+[ ] [ "tetris" shake-and-bake 2186392 small-enough? ] unit-test
 
-[ ] [ "spheres" shake-and-bake 1550000 small-enough? ] unit-test
+! [ ] [ "spheres" shake-and-bake 1557000 small-enough? ] unit-test
+[ ] [ "spheres" shake-and-bake 2031096 small-enough? ] unit-test
 
-[ ] [ "terrain" shake-and-bake 2050000 small-enough? ] unit-test
+! [ ] [ "terrain" shake-and-bake 2053000 small-enough? ] unit-test
+[ ] [ "terrain" shake-and-bake 2671928 small-enough? ] unit-test
 
-[ ] [ "gpu.demos.raytrace" shake-and-bake 2760000 small-enough? ] unit-test
+! [ ] [ "gpu.demos.raytrace" shake-and-bake 2764000 small-enough? ] unit-test
+[ ] [ "gpu.demos.raytrace" shake-and-bake 3307816 small-enough? ] unit-test
 
 [ ] [ "bunny" shake-and-bake 2500000 small-enough? ] unit-test
 
@@ -154,7 +160,8 @@ os macosx? [
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>Factor</foo>" ]
 [ deploy-test-command ascii [ readln ] with-process-reader ] unit-test
 
-[ ] [ "tools.deploy.test.20" drop 1350000 small-enough? ] unit-test
+! [ ] [ "tools.deploy.test.20" drop 1353000 small-enough? ] unit-test
+[ ] [ "tools.deploy.test.20" drop 1363000 small-enough? ] unit-test
 
 [ ] [ "tools.deploy.test.21" shake-and-bake ] unit-test
 

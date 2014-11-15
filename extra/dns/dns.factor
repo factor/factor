@@ -54,7 +54,7 @@ SYMBOL: dns-servers
     "." ?tail drop ;
 
 TUPLE: query name type class ;
-CONSTRUCTOR: query ( name type class -- obj )
+CONSTRUCTOR: <query> query ( name type class -- obj )
     [ >dotted ] change-name ;
 
 TUPLE: rr name type class ttl rdata ;
@@ -66,24 +66,24 @@ TUPLE: mx preference exchange ;
 TUPLE: soa mname rname serial refresh retry expire minimum ;
 
 TUPLE: a name ;
-CONSTRUCTOR: a ( name -- obj ) ;
+CONSTRUCTOR: <a> a ( name -- obj ) ;
 
 TUPLE: aaaa name ;
-CONSTRUCTOR: aaaa ( name -- obj ) ;
+CONSTRUCTOR: <aaaa> aaaa ( name -- obj ) ;
 
 TUPLE: cname name ;
-CONSTRUCTOR: cname ( name -- obj ) ;
+CONSTRUCTOR: <cname> cname ( name -- obj ) ;
 
 TUPLE: ptr name ;
-CONSTRUCTOR: ptr ( name -- obj ) ;
+CONSTRUCTOR: <ptr> ptr ( name -- obj ) ;
 
 TUPLE: ns name ;
-CONSTRUCTOR: ns ( name -- obj ) ;
+CONSTRUCTOR: <ns> ns ( name -- obj ) ;
 
 TUPLE: message id qr opcode aa tc rd ra z rcode
 query answer-section authority-section additional-section ;
 
-CONSTRUCTOR: message ( query -- obj )
+CONSTRUCTOR: <message> message ( query -- obj )
     16 2^ random >>id
     0 >>qr
     QUERY >>opcode

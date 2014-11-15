@@ -8,7 +8,7 @@ IN: nurbs
 
 TUPLE: nurbs-curve
     { order integer }
-    control-points 
+    control-points
     knots
     (knot-constants) ;
 
@@ -32,7 +32,7 @@ TUPLE: nurbs-curve
 
 : order-knot-constants ( curve order -- knot-constants )
     2dup [ knots>> length ] dip - iota
-    [ order-index-knot-constants ] with with map ;
+    [ order-index-knot-constants ] 2with map ;
 
 : knot-constants ( curve -- knot-constants )
     2 over order>> [a,b]
@@ -71,5 +71,3 @@ TUPLE: nurbs-curve
 
 : eval-nurbs ( nurbs-curve t -- value )
     2dup knot-interval 1 - { 1.0 } 2 (eval-bases) ;
-
-

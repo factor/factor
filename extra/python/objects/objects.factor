@@ -1,5 +1,14 @@
-USING: alien.c-types alien.data kernel python.errors python.ffi ;
+USING: accessors alien.data alien.libraries classes.struct
+io.encodings.ascii io.encodings.utf8 kernel libc literals
+python.errors python.ffi ;
 IN: python.objects
+
+! The None object
+: (none) ( -- none )
+    "_Py_NoneStruct" "python" address-of ;
+
+: <none> ( -- none )
+    (none) check-borrowed-ref ;
 
 ! Objects
 : getattr ( obj str -- value )
@@ -19,7 +28,7 @@ IN: python.objects
     PyTuple_New check-new-ref ;
 
 : py-tuple-set-item ( obj pos val -- )
-    unsteal-ref PyTuple_SetItem check-zero ;
+    dup unsteal-ref PyTuple_SetItem check-zero ;
 
 : py-tuple-get-item ( obj pos -- val )
     PyTuple_GetItem dup Py_IncRef check-new-ref ;
@@ -57,4 +66,18 @@ IN: python.objects
     PyList_GetItem check-borrowed-ref ;
 
 : py-list-set-item ( obj pos val -- )
-    unsteal-ref PyList_SetItem check-zero ;
+    dup unsteal-ref PyList_SetItem check-zero ;
+
+! Functions
+: <PyMethodDef> ( alien name doc/f -- cfunction )
+    PyMethodDef malloc-struct &free
+    swap [ utf8 malloc-string &free >>ml_doc ] when*
+    swap ascii malloc-string &free >>ml_name
+    swap >>ml_meth
+    flags{ METH_VARARGS METH_KEYWORDS } >>ml_flags ;
+
+: <py-cfunction> ( alien -- cfunction )
+    "cfunction" f <PyMethodDef> f f
+    ! It's not clear from the docs whether &Py_DecRef is right for
+    ! PyCFunction_NewEx, but I'm betting on it.
+    PyCFunction_NewEx check-new-ref ;

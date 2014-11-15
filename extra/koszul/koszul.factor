@@ -163,7 +163,7 @@ DEFER: (d)
     swap call [ at 0 or ] curry map ; inline
 
 : op-matrix ( domain range quot -- matrix )
-    rot [ (op-matrix) ] with with map ; inline
+    rot [ (op-matrix) ] 2with map ; inline
 
 : d-matrix ( domain range -- matrix )
     [ (d) ] op-matrix ;
@@ -260,8 +260,8 @@ DEFER: (d)
 
 : bigraded-triple ( u-deg z-deg bigraded-basis -- triple )
     #! d: C(u,z) ---> C(u+2,z-1)
-    [ [ 2 - ] [ 1 + ] [ ] tri* ?nth ?nth ] 
-    [ ?nth ?nth ] 
+    [ [ 2 - ] [ 1 + ] [ ] tri* ?nth ?nth ]
+    [ ?nth ?nth ]
     [ [ 2 + ] [ 1 - ] [ ] tri* ?nth ?nth ]
     3tri
     3array ;

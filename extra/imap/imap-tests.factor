@@ -1,8 +1,8 @@
 USING: accessors arrays assocs calendar calendar.format
-combinators continuations formatting fry grouping.extras imap
-io.streams.duplex kernel math math.parser math.ranges
-math.statistics namespaces random sequences sets sorting
-splitting strings system tools.test ;
+combinators continuations destructors formatting fry grouping.extras imap
+imap.private io.streams.duplex kernel math math.parser math.ranges
+math.statistics namespaces random sequences sets sorting uuid
+splitting strings system tools.test memoize combinators.smart ;
 FROM: pcre => findall ;
 IN: imap.tests
 
@@ -34,8 +34,19 @@ ERROR: no-imap-test-host ;
 : imap-test ( result quot -- )
     '[ \ imap-settings get-global _ with-imap-settings ] unit-test ; inline
 
+: base-folder ( -- s )
+    os name>> cpu name>> "-" glue ;
+
+MEMO: my-uuid ( -- str )
+    uuid1 ;
+
+: test-folder ( s -- s )
+    '[
+        base-folder "/" my-uuid "/" _
+    ] "" append-outputs-as ;
+
 [ t ] [
-    get-test-host <imap4ssl> duplex-stream?
+    get-test-host <imap4ssl> [ duplex-stream? ] with-disposal
 ] unit-test
 
 [ t ] [
@@ -52,6 +63,18 @@ ERROR: no-imap-test-host ;
     [ get-test-host <imap4ssl> [ f f login ] with-stream ] [ ind>> ] recover
 ] unit-test
 
+! Try to reset test folder before starting tests
+[ ] [
+    [ "foo/bar/baz/日本語" test-folder delete-folder ] ignore-errors
+    [ "foo/bar/baz/boo" test-folder delete-folder ] ignore-errors
+    [ "foo/bar/baz" test-folder delete-folder ] ignore-errors
+    [ "foo/bar" test-folder delete-folder ] ignore-errors
+    [ "foo" test-folder delete-folder ] ignore-errors
+    [ "örjan" test-folder delete-folder ] ignore-errors
+    [ base-folder delete-folder ] ignore-errors
+] imap-test
+
+
 [ ] [ \ imap-settings get-global [ ] with-imap-settings ] unit-test
 
 ! Newly created and then selected folder is empty.
@@ -62,12 +85,6 @@ ERROR: no-imap-test-host ;
     [ delete-folder ] tri
     "ALL" "" search-mails
 ] imap-test
-
-: base-folder ( -- s )
-    os name>> cpu name>> "-" glue ;
-
-: test-folder ( s -- s )
-    [ base-folder "/" ] dip 3append ;
 
 ! Create delete select again.
 [ 0 ] [
@@ -127,11 +144,14 @@ ERROR: no-imap-test-host ;
 
 ! Create a folder hierarchy
 [ t ] [
-    "*" test-folder list-folders length
-    "foo/bar/baz/日本語" test-folder [
-        create-folder
+    "foo/bar/baz/日本語" test-folder
+    [ '[ _ delete-folder ] ignore-errors ]
+    [
+        "*" test-folder list-folders length
+        swap create-folder
         "*" test-folder list-folders length 4 - =
-    ] [ delete-folder ] bi
+    ]
+    [ delete-folder ] tri
 ] imap-test
 
 ! A gmail compliant way of creating a folder hierarchy.
@@ -176,6 +196,14 @@ ERROR: no-imap-test-host ;
     "\"([^\"]+)\"" findall first second last
     internal-date>timestamp timestamp?
 ] imap-test
+
+! Response parsing
+{ { 8132 { "\\Seen" } } f } [
+    "(FLAGS (\\Seen) UID 8132)" parse-store-mail-line
+    ! Weird non-standard(?) response format gmail uses to indicate the
+    ! previous mail flags. Just ignore it.
+    "(UID 1234 FLAGS (\\Seen))" parse-store-mail-line
+] unit-test
 
 ! Just an interesting verb to gmail thread mails. Wonder if you can
 ! avoid the double fetch-mails?

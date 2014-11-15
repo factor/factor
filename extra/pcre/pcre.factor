@@ -22,9 +22,6 @@ ERROR: pcre-error value ;
 : split-subseqs ( seq subseqs -- seqs )
     dup first [ replace-all ] keep split-subseq [ >string ] map harvest ;
 
-: 2with ( param1 param2 obj quot -- obj curry )
-    [ -rot ] dip [ [ rot ] dip call ] 3curry ; inline
-
 : utf8-start-byte? ( byte -- ? )
     0xc0 bitand 0x80 = not ;
 
@@ -60,7 +57,9 @@ ERROR: pcre-error value ;
 
 : name-table ( pcre extra -- addr )
     [ drop alien-address 32 on-bits unmask ]
-    [ PCRE_INFO_NAMETABLE pcre-fullinfo ] 2bi + ;
+    ! On at least win64, the pointer is returned as an int and is
+    ! negative. Cast it to a uint and everything works.
+    [ PCRE_INFO_NAMETABLE pcre-fullinfo int <ref> uint deref ] 2bi + ;
 
 : name-entry-size ( pcre extra -- size )
     PCRE_INFO_NAMEENTRYSIZE pcre-fullinfo ;

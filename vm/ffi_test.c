@@ -306,3 +306,41 @@ signed long long ffi_test_59(signed long long x) {
 unsigned long long ffi_test_60(unsigned long long x) {
   return x;
 }
+
+/* C99 features */
+#ifndef _MSC_VER
+
+struct bool_and_ptr ffi_test_61() {
+  struct bool_and_ptr bap;
+  bap.b = true;
+  bap.ptr = NULL;
+  return bap;
+}
+
+#endif
+
+struct uint_pair ffi_test_62() {
+  struct uint_pair uip;
+  uip.a = 0xabcdefab;
+  uip.b = 0x12345678;
+  return uip;
+}
+
+struct ulonglong_pair ffi_test_63() {
+  struct ulonglong_pair ullp;
+  ullp.a = 0xabcdefabcdefabcd;
+  ullp.b = 0x1234567891234567;
+  return ullp;
+}
+
+void* bug1021_test_1(void* x, int y) {
+  return (void*)((y * y) + (long)x);
+}
+
+int bug1021_test_2(int x, char *y, void *z) {
+  return y[0];
+}
+
+void* bug1021_test_3(int x) {
+  return (void*)((long)x);
+}

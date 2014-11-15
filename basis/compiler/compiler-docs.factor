@@ -63,6 +63,9 @@ HELP: backend
 { $description "The second last step of the compilation process. A word and its SSA tree is taken as input and a " { $link cfg } " is built from which assembly code is generated." }
 { $see-also generate } ;
 
+HELP: compiled
+{ $var-description { "An " { $link assoc } " used by the optimizing compiler for intermediate storage of generated code. The keys are the labels to the CFG:s and the values the generated code as given by the " { $link generate } " word." } } ;
+
 HELP: compile-word
 { $values { "word" word } }
 { $description "Compile a single word." }

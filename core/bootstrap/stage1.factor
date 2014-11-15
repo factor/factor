@@ -32,6 +32,7 @@ load-help? off
     "memory" require
 
     "io.streams.c" require
+    "io.streams.byte-array" require ! for utf16 on Windows
     "vocabs.loader" require
 
     "syntax" require

@@ -5,18 +5,16 @@
 !
 ! export LD_LIBRARY_PATH=/opt/local/lib
 
-USING: alien alien.c-types alien.syntax combinators kernel system
-alien.libraries classes.struct ;
+USING: alien alien.c-types alien.libraries alien.syntax
+classes.struct combinators system ;
 
 IN: openssl.libcrypto
 
-<<
-{
-    { [ os windows? ] [ "libcrypto" "libeay32.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "libcrypto" "libcrypto.dylib" cdecl add-library ] }
-    { [ os unix? ] [ "libcrypto" "libcrypto.so" cdecl add-library ] }
-} cond
->>
+<< "libcrypto" {
+    { [ os windows? ] [ "libeay32.dll" ] }
+    { [ os macosx? ] [ "libcrypto.dylib" ] }
+    { [ os unix? ] [ "libcrypto.so" ] }
+} cond cdecl add-library >>
 
 STRUCT: bio-method
     { type int }

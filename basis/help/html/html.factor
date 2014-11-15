@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs debugger fry hashtables help
-help.home help.topics help.vocabs html html.streams
-io.directories io.encodings.binary io.encodings.utf8 io.files
-io.files.temp io.pathnames kernel make math.parser memoize
-namespaces sequences serialize sorting splitting unicode.case
-vocabs vocabs.hierarchy words xml.syntax xml.writer ;
+USING: accessors arrays assocs debugger fry help help.home
+help.topics help.vocabs html html.streams io.directories
+io.encodings.binary io.encodings.utf8 io.files io.files.temp
+io.pathnames kernel make math.parser memoize namespaces
+sequences serialize splitting tools.completion vocabs
+vocabs.hierarchy words xml.syntax xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
@@ -47,7 +47,7 @@ M: vocab-author topic>filename* name>> "author" ;
 M: f topic>filename* drop \ f topic>filename* ;
 
 : topic>filename ( topic -- filename )
-    topic>filename* dup [
+    topic>filename* [
         [
             % "-" %
             dup array?
@@ -55,7 +55,7 @@ M: f topic>filename* drop \ f topic>filename* ;
             [ escape-filename ]
             if % ".html" %
         ] "" make
-    ] [ 2drop f ] if ;
+    ] [ drop f ] if* ;
 
 M: topic url-of topic>filename ;
 
@@ -98,7 +98,7 @@ M: pathname url-of
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
 : all-vocabs-really ( -- seq )
-    all-vocabs-recursive >hashtable no-roots remove-redundant-prefixes
+    all-vocabs-recursive no-roots remove-redundant-prefixes
     [ vocab-name "scratchpad" = not ] filter ;
 
 : all-topics ( -- topics )
@@ -111,16 +111,26 @@ M: pathname url-of
     ] { } make ;
 
 : serialize-index ( index file -- )
-    [ [ [ topic>filename ] dip ] { } assoc-map-as object>bytes ] dip
-    binary set-file-contents ;
+    binary [
+        [ [ topic>filename ] dip ] { } assoc-map-as serialize
+    ] with-file-writer ;
+
+: generate-article-index ( -- )
+    articles get [ [ >link ] [ article-title ] bi* ] assoc-map
+    "articles.idx" serialize-index ;
+
+: generate-word-index ( -- )
+    all-words [ dup name>> ] { } map>assoc
+    "words.idx" serialize-index ;
+
+: generate-vocab-index ( -- )
+    all-vocabs-really [ dup vocab-name ] { } map>assoc
+    "vocabs.idx" serialize-index ;
 
 : generate-indices ( -- )
-    articles get keys [ [ >link ] [ article-title ] bi ] { } map>assoc "articles.idx" serialize-index
-    all-words [ dup name>> ] { } map>assoc "words.idx" serialize-index
-    all-vocabs-really [ dup vocab-name ] { } map>assoc "vocabs.idx" serialize-index ;
-
-: (generate-help-files) ( -- )
-    all-topics [ '[ _ generate-help-file ] try ] each ;
+    generate-article-index
+    generate-word-index
+    generate-vocab-index ;
 
 : generate-help-files ( -- )
     H{
@@ -128,7 +138,9 @@ M: pathname url-of
         { recent-words f }
         { recent-articles f }
         { recent-vocabs f }
-    } [ (generate-help-files) ] with-variables ;
+    } [
+        all-topics [ '[ _ generate-help-file ] try ] each
+    ] with-variables ;
 
 : generate-help ( -- )
     "docs" cache-file
@@ -143,17 +155,8 @@ M: pathname url-of
 MEMO: load-index ( name -- index )
     binary file-contents bytes>object ;
 
-TUPLE: result title href ;
-
-: partition-exact ( string results -- results' )
-    [ title>> = ] with partition append ;
-
 : offline-apropos ( string index -- results )
-    load-index over >lower
-    '[ [ drop _ ] dip >lower subseq? ] assoc-filter
-    [ swap result boa ] { } assoc>map
-    [ title>> ] sort-with
-    partition-exact ;
+    load-index completions ;
 
 : article-apropos ( string -- results )
     "articles.idx" offline-apropos ;

@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays byte-arrays byte-vectors init io
 io.encodings io.encodings.ascii io.encodings.utf16n
-io.encodings.utf8 io.streams.byte-array io.streams.memory kernel
-kernel.private math namespaces sequences sequences.private
-strings strings.private system system.private ;
+io.encodings.utf8 io.streams.memory kernel kernel.private math
+namespaces sequences sequences.private strings strings.private
+system system.private ;
 IN: alien.strings
 
 GENERIC# alien>string 1 ( c-ptr encoding -- string/f )
@@ -84,11 +84,18 @@ M: sequence string>symbol [ utf8 string>alien ] map ;
     utf8 alien>string ;
 
 GENERIC: symbol>string ( symbol(s) -- string )
+
+: special-object>string ( n -- str )
+    special-object (symbol>string) ;
+
 M: byte-array symbol>string (symbol>string) ;
 M: array symbol>string [ (symbol>string) ] map ", " join ;
 
 [
-    OBJ-CPU special-object utf8 alien>string string>cpu \ cpu set-global
-    OBJ-OS special-object utf8 alien>string string>os \ os set-global
-    OBJ-VM-COMPILER special-object utf8 alien>string \ vm-compiler set-global
+    OBJ-CPU special-object>string string>cpu \ cpu set-global
+    OBJ-OS special-object>string string>os \ os set-global
+    OBJ-VM-VERSION special-object>string \ vm-version set-global
+    OBJ-VM-GIT-LABEL special-object>string \ vm-git-label set-global
+    OBJ-VM-COMPILER special-object>string \ vm-compiler set-global
+    OBJ-VM-COMPILE-TIME special-object>string \ vm-compile-time set-global
 ] "alien.strings" add-startup-hook
