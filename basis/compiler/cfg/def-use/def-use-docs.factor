@@ -22,3 +22,7 @@ HELP: uses-vregs
     "{ 37 }"
   }
 } ;
+
+HELP: temp-vregs
+{ $values { "insn" insn } { "seq" sequence } }
+{ $description "Returns the sequence of temporary vregs used by this instruction." } ;
