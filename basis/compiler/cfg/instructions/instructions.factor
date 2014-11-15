@@ -844,8 +844,6 @@ UNION: alien-call-insn
 UNION: factor-call-insn
 alien-call-insn ;
 
-! Instructions that contain subroutine calls to functions which
-! allocate memory
 UNION: gc-map-insn
 ##call-gc
 ##box
@@ -854,7 +852,6 @@ factor-call-insn ;
 
 M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
 
-! Each one has a gc-map slot
 TUPLE: gc-map scrub-d check-d scrub-r check-r gc-roots derived-roots ;
 
 : <gc-map> ( -- gc-map ) gc-map new ;
