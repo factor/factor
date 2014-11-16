@@ -23,3 +23,7 @@ HELP: each-basic-block
 HELP: optimize-basic-block
 { $values { "bb" basic-block } { "quot" quotation } }
 { $description "Performs one " { $link simple-optimization } " step. The quotation takes the instructions of the basic block and returns them back in an optimized form." } ;
+
+HELP: simple-analysis
+{ $values { "cfg" cfg } { "quot" quotation } }
+{ $description "Applies a quotation to each sequence of instructions in each " { $link basic-block } " in the cfg." } ;
