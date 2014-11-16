@@ -7,15 +7,11 @@ IN: splitting.monotonic
 
 <PRIVATE
 
-: ,, ( obj -- ) building get last push ;
-: v, ( -- ) V{ } clone , ;
-: ,v ( -- ) building get dup last empty? [ dup pop* ] when drop ;
-
 : (monotonic-split) ( seq quot -- newseq )
-    [
-        [ dup unclip suffix ] dip
-        v, '[ over ,, @ [ v, ] unless ] 2each ,v
-    ] { } make ; inline
+    [ V{ } clone V{ } clone ] 2dip [ ] swap '[
+        [ [ over push ] keep ] dip
+        [ @ [ over push V{ } clone ] unless ] keep
+    ] map-reduce over push over push { } like ; inline
 
 PRIVATE>
 
