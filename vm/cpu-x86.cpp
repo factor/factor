@@ -62,7 +62,6 @@ void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
      corrupted. Therefore the root vectors needs to be cleared because
      their pointers to stack variables are now garbage. */
   data_roots.clear();
-  bignum_roots.clear();
   code_roots.clear();
 }
 
