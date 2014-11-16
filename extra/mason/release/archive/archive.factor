@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators locals io.directories
-io.directories.hierarchy io.files io.launcher io.pathnames
-kernel make mason.common mason.config mason.platform namespaces
-prettyprint sequences system words ;
+USING: accessors combinators io.directories
+io.directories.hierarchy io.pathnames kernel locals make
+mason.common mason.config mason.platform namespaces sequences
+system words ;
 IN: mason.release.archive
 
 : base-name ( -- string )
@@ -17,13 +17,20 @@ IN: mason.release.archive
         [ drop ".tar.gz" ]
     } case ;
 
-: archive-name ( -- string ) base-name target-os get extension append ;
+: archive-name ( -- string )
+    base-name target-os get extension append ;
 
 :: make-windows-archive ( archive-name -- )
     { "zip" "-r" archive-name "factor" } short-running-process ;
 
 :: make-disk-image ( archive-name volume-name dmg-root -- )
-    { "hdiutil" "create" "-srcfolder" dmg-root "-fs" "HFS+" "-volname" volume-name archive-name } short-running-process ;
+    {
+        "hdiutil" "create"
+        "-srcfolder" dmg-root
+        "-fs" "HFS+"
+        "-volname" volume-name
+        archive-name
+    } short-running-process ;
 
 : make-macosx-archive ( archive-name -- )
     "dmg-root" make-directory

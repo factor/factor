@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors io.files.info io.pathnames kernel math
-math.parser namespaces sequences mason.config ;
+USING: accessors io.files.info io.pathnames kernel mason.config
+math math.parser namespaces sequences ;
 IN: mason.disk
 
 : gb ( -- n ) 30 2^ ; inline

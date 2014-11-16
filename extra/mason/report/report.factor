@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: benchmark combinators.smart debugger fry io assocs
-io.encodings.utf8 io.files io.sockets io.streams.string kernel
-locals mason.common mason.config mason.disk mason.platform math
-namespaces prettyprint sequences xml.syntax xml.writer
-combinators.short-circuit literals splitting ;
+USING: assocs combinators.smart debugger fry io.encodings.utf8
+io.files io.streams.string kernel literals locals mason.common
+mason.config mason.disk math namespaces sequences xml.syntax
+xml.writer ;
 IN: mason.report
 
 : git-link ( id -- link )

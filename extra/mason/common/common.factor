@@ -1,11 +1,10 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces sequences splitting system accessors
-math.functions make io io.files io.pathnames io.directories
-io.directories.hierarchy io.launcher io.encodings.utf8 prettyprint
-combinators.short-circuit parser combinators math calendar
-calendar.format arrays mason.config locals debugger fry
-continuations strings io.sockets prettyprint.config ;
+USING: accessors arrays calendar calendar.format combinators
+continuations fry io io.encodings.utf8 io.files io.launcher
+io.pathnames io.sockets kernel locals make mason.config math
+namespaces parser prettyprint prettyprint.config sequences
+splitting ;
 IN: mason.common
 
 : print-timestamp ( string -- )

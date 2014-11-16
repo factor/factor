@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar combinators.short-circuit fry
-continuations debugger io.directories io.files io.launcher
-io.pathnames io.encodings.ascii kernel make mason.common
-mason.config mason.platform mason.report mason.notify namespaces
-sequences quotations macros system combinators splitting ;
+USING: accessors arrays calendar combinators
+combinators.short-circuit continuations fry io.directories
+io.launcher kernel macros make mason.config mason.notify
+mason.platform mason.report namespaces quotations sequences
+splitting system ;
 IN: mason.child
 
 : nmake-cmd ( -- args )
@@ -38,7 +38,7 @@ IN: mason.child
 : boot-cmd ( -- cmd )
     [
         factor-vm ,
-        "-i=" boot-image-name append ,
+        "-i=" target-boot-image-name append ,
         "-no-user-init" ,
         boot-flags get %
     ] { } make ;
