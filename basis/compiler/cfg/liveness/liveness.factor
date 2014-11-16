@@ -9,21 +9,6 @@ compiler.cfg.rpo cpu.architecture ;
 FROM: namespaces => set ;
 IN: compiler.cfg.liveness
 
-! Similar to http://en.wikipedia.org/wiki/Liveness_analysis,
-! with three additions:
-
-! 1) With SSA, it is not sufficient to have a single live-in set
-! per block. There is also there is an edge-live-in set per
-! edge, consisting of phi inputs from each predecessor.
-! 2) Liveness analysis annotates call sites with GC maps
-! indicating the spill slots in the stack frame that contain
-! tagged pointers, and thus have to be visited if a GC occurs
-! inside the call.
-! 3) GC maps can contain derived pointers. A derived pointer is
-! a pointer into the middle of a data heap object. Each derived
-! pointer has a base pointer, to keep it up to date when objects
-! are moved by the garbage collector. This extends live
-! intervals and inserts new ##phi instructions.
 SYMBOL: live-ins
 
 : live-in ( bb -- set )
@@ -34,8 +19,6 @@ SYMBOL: live-outs
 : live-out ( bb -- set )
     live-outs get at ;
 
-! Assoc mapping basic blocks to sequences of sets of vregs; each
-! sequence is in correspondence with a predecessor
 SYMBOL: edge-live-ins
 
 : edge-live-in ( predecessor basic-block -- set )

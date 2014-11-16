@@ -1,5 +1,6 @@
-USING: arrays classes compiler.cfg compiler.codegen.gc-maps cpu.architecture
-help.markup help.syntax kernel layouts sequences slots.private ;
+USING: arrays assocs classes compiler.cfg compiler.codegen.gc-maps
+cpu.architecture help.markup help.syntax kernel layouts sequences
+slots.private ;
 IN: compiler.cfg.instructions
 
 HELP: new-insn
@@ -73,6 +74,9 @@ HELP: ##alien-invoke
 
 HELP: alien-call-insn
 { $class-description "Union class of all alien call instructions." } ;
+
+HELP: def-is-use-insn
+{ $class-description "Union class of instructions that have complex expansions and require that the output registers are not equal to any of the input registers." } ;
 
 HELP: ##call
 { $class-description
@@ -184,6 +188,7 @@ HELP: gc-map
 { $class-description "A tuple that holds info necessary for a gc cycle to figure out where the gc root pointers are. It has the following slots:"
   { $table
     { { $slot "gc-roots" } { "A " { $link sequence } " of " { $link spill-slot } " which will be traced in a gc cycle. " } }
+    { { $slot "derived-roots" } { "An " { $link assoc } " of pairs of spill slots." } }
   }
 }
 { $see-also emit-gc-info-bitmaps } ;
@@ -233,6 +238,8 @@ $nl
   ##callback-outputs
   ##local-allot
   ##unbox
+  ##unbox-alien
+  ##unbox-any-c-ptr
   ##unbox-long-long
   alien-call-insn
 }
