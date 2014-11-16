@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.directories io.files io.launcher kernel make
-namespaces prettyprint sequences mason.common mason.config
-mason.platform ;
+USING: io.directories kernel make mason.common mason.config
+mason.platform namespaces sequences ;
 IN: mason.release.branch
 
 : branch-name ( -- string ) "clean-" platform append ;
@@ -26,7 +25,7 @@ IN: mason.release.branch
 : upload-clean-image-cmd ( -- args )
     [
         scp-command get ,
-        boot-image-name ,
+        target-boot-image-name ,
         [
             image-username get % "@" %
             image-host get % ":" %

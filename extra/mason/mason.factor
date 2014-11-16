@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar continuations debugger io
-io.directories io.pathnames io.sockets io.streams.string kernel
-mason.config mason.disk mason.email mason.notify mason.updates
-namespaces prettyprint threads ;
+io.directories io.sockets io.streams.string kernel mason.config
+mason.disk mason.email mason.notify mason.updates namespaces
+prettyprint threads ;
 FROM: mason.build => build ;
 IN: mason
 

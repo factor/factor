@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel system accessors namespaces splitting sequences
-mason.config bootstrap.image assocs ;
+USING: accessors assocs bootstrap.image kernel mason.config
+namespaces sequences ;
 IN: mason.platform
 
 : (platform) ( os cpu -- string )
@@ -14,8 +14,8 @@ IN: mason.platform
 : gnu-make ( -- string )
     "make" ;
 
-: boot-image-arch ( -- string )
+: target-arch ( -- arch )
     target-os get target-cpu get arch ;
 
-: boot-image-name ( -- string )
-    boot-image-arch "boot." ".image" surround ;
+: target-boot-image-name ( -- string )
+    target-arch boot-image-name ;

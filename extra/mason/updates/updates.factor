@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.download http.client init kernel
-math.parser namespaces mason.config mason.common mason.git
-mason.platform ;
+mason.config mason.git mason.platform math.parser namespaces ;
 IN: mason.updates
 
 TUPLE: sources git-id boot-image counter ;
@@ -17,7 +16,7 @@ SYMBOLS: latest-sources last-built-sources ;
 ] "mason.updates" add-startup-hook
 
 : latest-boot-image ( -- boot-image )
-    boot-image-name
+    target-boot-image-name
     [ maybe-download-image drop ] [ file-checksum ] bi ;
 
 : latest-counter ( -- counter )

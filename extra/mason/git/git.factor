@@ -1,9 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit continuations
-debugger io io.directories io.encodings.utf8 io.files
-io.launcher io.sockets io.streams.string kernel mason.common
-mason.email sequences splitting io.directories.hierarchy ;
+debugger io io.directories io.directories.hierarchy
+io.encodings.utf8 io.files io.launcher io.sockets
+io.streams.string kernel mason.common mason.email sequences
+splitting ;
 IN: mason.git
 
 : git-id ( -- id )
