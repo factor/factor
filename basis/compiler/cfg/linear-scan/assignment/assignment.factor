@@ -31,8 +31,6 @@ SYMBOL: pending-interval-assoc
     vreg>> pending-interval-assoc get delete-at ;
 
 :: vreg>reg ( vreg -- reg )
-    ! If a live vreg is not in the pending set, then it must
-    ! have been spilled.
     vreg leader :> leader
     leader pending-interval-assoc get at* [
         drop leader vreg rep-of lookup-spill-slot
