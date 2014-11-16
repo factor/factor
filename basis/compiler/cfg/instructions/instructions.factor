@@ -875,8 +875,6 @@ hairy-clobber-insn
 ##box
 ##box-long-long ;
 
-! Instructions that have complex expansions and require that the
-! output registers are not equal to any of the input registers
 UNION: def-is-use-insn
 ##box-alien
 ##box-displaced-alien
