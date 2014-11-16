@@ -130,7 +130,6 @@ SYMBOL: unhandled-intervals
 ! Minheap of sync points which still need to be processed
 SYMBOL: unhandled-sync-points
 
-! Mapping from vregs to spill slots
 SYMBOL: spill-slots
 
 : assign-spill-slot ( coalesced-vreg rep -- spill-slot )
