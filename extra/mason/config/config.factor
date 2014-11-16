@@ -1,7 +1,6 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar system io.files io.pathnames namespaces kernel
-accessors assocs ;
+USING: calendar io.pathnames kernel namespaces system ;
 IN: mason.config
 
 ! (Optional) Location for build directories

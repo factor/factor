@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators continuations debugger fry
-io io.encodings.utf8 io.files io.sockets kernel make
-mason.common mason.config mason.platform math.order namespaces
-prettyprint sequences smtp ;
+io kernel make mason.common mason.config mason.platform
+math.order namespaces sequences smtp ;
 IN: mason.email
 
 : mason-email ( body content-type subject -- )
