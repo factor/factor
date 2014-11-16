@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: http.client checksums checksums.md5 splitting assocs
-kernel io.files bootstrap.image sequences io urls ;
+USING: assocs bootstrap.image checksums checksums.md5
+http.client io.files kernel splitting urls ;
 IN: bootstrap.image.download
 
 CONSTANT: url URL" http://downloads.factorcode.org/images/latest/"
@@ -31,10 +31,9 @@ CONSTANT: url URL" http://downloads.factorcode.org/images/latest/"
     bi ;
 
 : maybe-download-image ( image -- ? )
-    dup need-new-image?
-    [ download-image t ] [ drop f ] if ;
+    dup need-new-image? [ download-image t ] [ drop f ] if ;
 
 : download-my-image ( -- )
-    my-arch boot-image-name maybe-download-image drop ;
+    my-boot-image-name maybe-download-image drop ;
 
 MAIN: download-my-image
