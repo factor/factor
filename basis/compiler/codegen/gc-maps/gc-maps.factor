@@ -9,8 +9,6 @@ IN: compiler.codegen.gc-maps
 SYMBOLS: return-addresses gc-maps ;
 
 : gc-map-needed? ( gc-map/f -- ? )
-    ! If there are no stack locations to scrub or check, and no GC
-    ! roots, there's no point storing the GC map.
     dup [ tuple-slots [ empty? ] all? not ] when ;
 
 : gc-map-here ( gc-map -- )
