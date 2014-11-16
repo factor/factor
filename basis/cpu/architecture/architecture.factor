@@ -548,10 +548,8 @@ M: object immediate-comparand? ( n -- ? )
 
 HOOK: return-regs cpu ( -- regs )
 
-! Registers used for parameter passing
 HOOK: param-regs cpu ( abi -- regs )
 
-! Is this structure small enough to be returned in registers?
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
 
 ! Do we pass this struct by value or hidden reference?
