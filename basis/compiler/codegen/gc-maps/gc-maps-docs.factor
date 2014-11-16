@@ -70,4 +70,8 @@ HELP: serialize-gc-maps
 { $values { "byte-array" byte-array } }
 { $description "Serializes the gc-maps that have been registered in the " { $link gc-maps } " variable into a byte-array." } ;
 
+HELP: gc-map-here
+{ $values { "gc-map" gc-map } }
+{ $description "Registers the gc map in the " { $link gc-maps } " dynamic variable at the current compiled offset." } ;
+
 ABOUT: "compiler.codegen.gc-maps"

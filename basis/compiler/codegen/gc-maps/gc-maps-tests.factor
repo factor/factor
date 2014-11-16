@@ -1,6 +1,6 @@
-USING: namespaces byte-arrays make compiler.codegen.gc-maps
-compiler.codegen.relocation bit-arrays accessors classes.struct
-tools.test kernel math sequences alien.c-types
+USING: accessors alien.c-types arrays classes.struct byte-arrays make
+namespaces compiler.cfg.stack-frame compiler.codegen.gc-maps
+compiler.codegen.relocation bit-arrays tools.test kernel math sequences
 specialized-arrays boxes compiler.cfg.instructions system
 cpu.architecture vm ;
 SPECIALIZED-ARRAY: uint
@@ -72,6 +72,62 @@ M: fake-cpu gc-root-offset ;
 
 [ t ] [ "result" get length "expect" get length = ] unit-test
 [ t ] [ "result" get "expect" get = ] unit-test
+
+
+cpu x86.64? [
+    x86.64 \ cpu set
+
+    ! gc-root-offsets
+    { { 1 3 } } [
+        T{ stack-frame { spill-area-base 0 } } stack-frame [
+            T{ gc-map
+               { gc-roots {
+                   T{ spill-slot { n 0 } }
+                   T{ spill-slot { n 16 } }
+               } }
+            } gc-root-offsets
+        ] with-variable
+    ] unit-test
+
+    { { 6 10 } } [
+        T{ stack-frame { spill-area-base 32 } } stack-frame [
+            T{ gc-map
+               { gc-roots {
+                   T{ spill-slot { n 8 } }
+                   T{ spill-slot { n 40 } }
+               } }
+            } gc-root-offsets
+        ] with-variable
+    ] unit-test
+
+    ! scrub-d scrub-r check-d check-r gc-roots
+    { { 0 0 0 0 5 } } [
+        T{ stack-frame { spill-area-base 0 } } stack-frame [
+            T{ gc-map
+               { gc-roots {
+                   T{ spill-slot { n 0 } }
+                   T{ spill-slot { n 24 } }
+               } }
+            } 1array gc-maps set
+            [ emit-gc-info-bitmaps ] B{ } make drop
+        ] with-variable
+    ] unit-test
+
+    ! scrub-d scrub-r check-d check-r gc-roots
+    { { 0 0 0 0 9 } } [
+        T{ stack-frame { spill-area-base 32 } } stack-frame [
+            T{ gc-map
+               { gc-roots {
+                   T{ spill-slot { n 0 } }
+                   T{ spill-slot { n 24 } }
+               } }
+            } 1array gc-maps set
+            [ emit-gc-info-bitmaps ] B{ } make drop
+        ] with-variable
+    ] unit-test
+
+    fake-cpu \ cpu set
+] when
 
 ! gc-map-needed?
 { t t } [
