@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.strings byte-arrays destructors io
-io.backend io.encodings.utf8 io.files kernel kernel.private
-make math sequences threads.private ;
+USING: accessors alien alien.strings byte-arrays byte-vectors
+destructors io io.backend io.encodings.utf8 io.files kernel
+kernel.private math sequences threads.private ;
 IN: io.streams.c
 
 TUPLE: c-stream < disposable handle ;
@@ -18,7 +18,8 @@ INSTANCE: c-writer file-writer
 
 : <c-writer> ( handle -- stream ) c-writer new-c-stream ;
 
-M: c-writer stream-write1 dup check-disposed handle>> fputc ;
+M: c-writer stream-write1
+    dup check-disposed handle>> fputc ;
 
 M: c-writer stream-write
     dup check-disposed
@@ -32,20 +33,23 @@ INSTANCE: c-reader file-reader
 
 : <c-reader> ( handle -- stream ) c-reader new-c-stream ;
 
-M: c-reader stream-read-unsafe dup check-disposed handle>> fread-unsafe ;
+M: c-reader stream-read-unsafe
+    dup check-disposed handle>> fread-unsafe ;
 
-M: c-reader stream-read1 dup check-disposed handle>> fgetc ;
+M: c-reader stream-read1
+    dup check-disposed handle>> fgetc ;
 
-: read-until-loop ( stream delim -- ch )
-    over stream-read1 dup [
-        dup pick member-eq? [ 2nip ] [ , read-until-loop ] if
+: read-until-loop ( handle seps accum -- accum ch )
+    pick fgetc dup [
+        pick dupd member-eq?
+        [ [ 2drop ] 2dip ] [ over push read-until-loop ] if
     ] [
-        2nip
+        [ 2drop ] 2dip
     ] if ; inline recursive
 
 M: c-reader stream-read-until
-    dup check-disposed
-    [ swap read-until-loop ] B{ } make swap
+    dup check-disposed handle>> swap
+    32 <byte-vector> read-until-loop [ B{ } like ] dip
     over empty? over not and [ 2drop f f ] when ;
 
 M: c-io-backend init-io ;
