@@ -2,10 +2,13 @@ IN: splitting.monotonic
 USING: tools.test math arrays kernel sequences ;
 
 { { } } [ { } [ < ] monotonic-split ] unit-test
-[ { { 1 } { -1 5 } { 2 4 } } ]
-[ { 1 -1 5 2 4 } [ < ] monotonic-split [ >array ] map ] unit-test
-[ { { 1 1 1 1 } { 2 2 } { 3 } { 4 } { 5 } { 6 6 6 } } ]
-[ { 1 1 1 1 2 2 3 4 5 6 6 6 } [ = ] monotonic-split [ >array ] map ] unit-test
+{ { V{ 1 } } } [ { 1 } [ < ] monotonic-split ] unit-test
+{ { V{ 1 2 } } } [ { 1 2 } [ < ] monotonic-split ] unit-test
+{ { V{ 1 } V{ 2 } } } [ { 1 2 } [ > ] monotonic-split ] unit-test
+[ { V{ 1 } V{ -1 5 } V{ 2 4 } } ]
+[ { 1 -1 5 2 4 } [ < ] monotonic-split ] unit-test
+[ { V{ 1 1 1 1 } V{ 2 2 } V{ 3 } V{ 4 } V{ 5 } V{ 6 6 6 } } ]
+[ { 1 1 1 1 2 2 3 4 5 6 6 6 } [ = ] monotonic-split ] unit-test
 
 [ { } ]
 [ { } [ = ] slice monotonic-slice ] unit-test
