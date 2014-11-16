@@ -7,8 +7,13 @@ HELP: assign-registers-in-insn
 
 HELP: assign-gc-roots
 { $values { "gc-map" gc-map } }
-{ $description "Assigns spill slots for all gc roots in a gc map." }
-{ $see-also spill-slot } ;
+{ $description "Assigns spill slots for all gc roots in a gc map." } ;
+
+HELP: assign-derived-roots
+{ $values { "gc-map" gc-map } }
+{ $description "Assigns pairs of spill slots for all derived roots in a gc map." } ;
+
+{ assign-gc-roots assign-derived-roots } related-words
 
 HELP: vreg>reg
 { $values { "vreg" "virtaul register" } { "reg" "register" } }
