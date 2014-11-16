@@ -1,6 +1,7 @@
-USING: assocs alien classes compiler.cfg.instructions cpu.x86.assembler
-cpu.x86.assembler.operands help.markup help.syntax kernel
+USING: assocs alien classes compiler.cfg.instructions compiler.cfg.stack-frame
+cpu.x86.assembler cpu.x86.assembler.operands help.markup help.syntax kernel
 layouts literals math multiline system words ;
+QUALIFIED: vm
 IN: cpu.architecture
 
 <<
@@ -51,6 +52,12 @@ USING: cpu.architecture make ;
 0000000000e63ab9: 488918      mov [rax], rbx
 0000000000e63abc: 4c897010    mov [rax+0x10], r14
 0000000000e63ac0: 4c897818    mov [rax+0x18], r15
+;
+
+STRING: ex-%copy
+USING: cpu.architecture make ;
+RAX RBX int-rep [ %copy ] B{ } make disassemble
+000000000108a970: 4889d8  mov rax, rbx
 ;
 >>
 
@@ -104,6 +111,11 @@ HELP: %context
 { $description "Emits machine code for putting a pointer to the context field of the " { $link vm } " in a register." }
 { $examples { $unchecked-example $[ ex-%context ] } } ;
 
+HELP: %copy
+{ $values { "dst" "destination" } { "src" "source" } { "rep" representation } }
+{ $description "Emits code copying a value from a register, arbitrary memory location or " { $link spill-slot } " to a destination." }
+{ $examples { $unchecked-example $[ ex-%copy ] } } ;
+
 HELP: %safepoint
 { $description "Emits a safe point to the current code sequence being generated." }
 { $examples { $unchecked-example $[ ex-%safepoint ] } } ;
@@ -126,6 +138,15 @@ HELP: %allot
   "In this example 40 bytes is allocated and a tagged pointer to the memory is put in " { $link RAX } ":"
   { $unchecked-example $[ ex-%allot ] }
 } ;
+
+HELP: %local-allot
+{ $values
+  { "dst" "destination register symbol" }
+  { "size" "number of bytes to allocate" }
+  { "align" "alignment" }
+  { "offset" "where to allocate the data, relative to the stack register" }
+}
+{ $description "Emits machine code for stack \"allocating\" a chunk of memory. No memory is really allocated and instead a pointer to it is just put in the destination register." } ;
 
 HELP: test-instruction?
 { $values { "?" "a boolean" } }
@@ -158,6 +179,11 @@ HELP: stack-cleanup
     "20"
   }
 } ;
+
+HELP: gc-root-offset
+{ $values { "spill-slot" spill-slot } { "n" integer } }
+{ $description "Offset in the " { $link stack-frame } " for the word being constructed where the spill slot is located, in " { $link cell } " units." }
+{ $see-also vm:gc-info } ;
 
 ARTICLE: "cpu.architecture" "CPU architecture description model"
 "The " { $vocab-link "cpu.architecture" } " vocab contains generic words and hooks that serves as an api for the compiler towards the cpu architecture."
