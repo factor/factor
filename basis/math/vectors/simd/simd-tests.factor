@@ -172,7 +172,9 @@ TUPLE: simd-test-failure
             input input-quot unoptimized-result optimized-result nonintrinsic-result
             simd-test-failure boa
         ] if
-    ] map sift ; inline
+    ] map sift
+    dup empty? [ dup ... ] unless ! Print full errors
+    ; inline
 
 "== Checking -new constructors" print
 
