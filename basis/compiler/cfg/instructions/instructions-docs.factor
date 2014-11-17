@@ -182,7 +182,7 @@ HELP: ##spill
 { $class-description "Instruction that copies a value from a register to a " { $link spill-slot } "." } ;
 
 HELP: gc-map-insn
-{ $class-description "Union class of all instructions that contain subroutine calls to functions which allocate memory. Each of the has a " { $slot "gc-map" } " slot." } ;
+{ $class-description "Union class of all instructions that contain subroutine calls to functions which allocate memory. Each of the instances has a " { $snippet "gc-map" } " slot." } ;
 
 HELP: gc-map
 { $class-description "A tuple that holds info necessary for a gc cycle to figure out where the gc root pointers are. It has the following slots:"
