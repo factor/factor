@@ -228,7 +228,7 @@ SYMBOL: default-secure-context
 : do-ssl-read ( buffer ssl -- event/f )
     2dup swap [ buffer-end ] [ buffer-capacity ] bi SSL_read [
         { { SSL_ERROR_ZERO_RETURN [ drop f ] } } check-ssl-error
-    ] keep swap [ 2nip ] [ swap n>buffer f ] if* ;
+    ] keep swap [ 2nip ] [ swap buffer+ f ] if* ;
 
 M: ssl-handle refill ( port handle -- event/f )
     dup maybe-handshake [ buffer>> ] [ handle>> ] bi* do-ssl-read ;

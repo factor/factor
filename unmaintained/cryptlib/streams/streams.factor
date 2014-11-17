@@ -39,7 +39,7 @@ TUPLE: crypt-stream handle eof? ;
 
 : (refill) ( stream -- err )
     dup [ crypt-stream-handle ] keep [ buffer@ ] keep buffer-capacity
-    "int" <c-object> dup >r cryptPopData r> *int rot n>buffer ;
+    "int" <c-object> dup >r cryptPopData r> *int rot buffer+ ;
 
 : refill ( stream -- )
     dup (refill) check-read swap set-crypt-stream-eof? ;
@@ -61,13 +61,13 @@ M: crypt-stream stream-read1 ( stream -- ch/f )
     1 swap stream-read [ first ] [ f ] if* ;
 
 : read-until-step ( seps stream -- sep/f )
-    dup refill 2dup buffer-until [ swap % 2nip ]
+    dup refill 2dup buffer-read-until [ swap % 2nip ]
     [ 
         % dup crypt-stream-eof? [ 2drop f ] [ read-until-step ] if
     ] if* ;
 
 M: crypt-stream stream-read-until ( seps stream -- str/f sep/f )
-    2dup buffer-until [ >r 2nip r> ] [
+    2dup buffer-read-until [ >r 2nip r> ] [
         [ % read-until-step ] "" make f like swap
     ] if* ;
  

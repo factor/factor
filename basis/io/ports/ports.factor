@@ -1,10 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data byte-arrays
-combinators destructors fry grouping hints io io.backend
-io.buffers io.encodings io.files io.timeouts kernel
-kernel.private libc locals math math.order namespaces sequences
-strings system ;
+USING: accessors alien byte-arrays combinators destructors hints
+io io.backend io.buffers io.encodings io.files io.timeouts
+kernel kernel.private libc locals math math.order namespaces
+sequences strings system ;
 IN: io.ports
 
 SYMBOL: default-buffer-size
@@ -84,9 +83,11 @@ M:: input-port stream-read-unsafe ( n dst port -- count )
     ] [ 0 ] if ;
 
 : read-until-step ( separators port -- string/f separator/f )
-    dup wait-to-read [ 2drop f f ] [ buffer>> buffer-until ] if ;
+    dup wait-to-read [ 2drop f f ] [
+        buffer>> buffer-read-until
+    ] if ; inline
 
-: read-until-loop ( seps port buf -- separator/f )
+: read-until-loop ( seps port accum -- separator/f )
     2over read-until-step over [
         [ append! ] dip dup [
             [ 3drop ] dip
@@ -95,7 +96,7 @@ M:: input-port stream-read-unsafe ( n dst port -- count )
         ] if
     ] [
         [ 4drop ] dip
-    ] if ;
+    ] if ; inline recursive
 
 M: input-port stream-read-until ( seps port -- str/f sep/f )
     2dup read-until-step dup [ [ 2drop ] 2dip ] [
@@ -112,29 +113,6 @@ INSTANCE: output-port file-writer
 : <output-port> ( handle -- output-port )
     output-port <buffered-port> ;
 
-: wait-to-write ( len port -- )
-    [ nip ] [ buffer>> buffer-capacity <= ] 2bi
-    [ drop ] [ stream-flush ] if ; inline
-
-M: output-port stream-write1
-    dup check-disposed
-    1 over wait-to-write
-    buffer>> byte>buffer ; inline
-
-: write-in-groups ( byte-array port -- )
-    [ binary-object uchar <c-direct-array> ] dip
-    [ buffer>> size>> <groups> ] [ '[ _ stream-write ] ] bi
-    each ; inline
-
-M: output-port stream-write
-    dup check-disposed
-    2dup [ byte-length ] [ buffer>> size>> ] bi* > [
-        write-in-groups
-    ] [
-        [ [ byte-length ] dip wait-to-write ]
-        [ buffer>> >buffer ] 2bi
-    ] if ;
-
 HOOK: (wait-to-write) io-backend ( port -- )
 
 : port-flush ( port -- )
@@ -144,11 +122,36 @@ HOOK: (wait-to-write) io-backend ( port -- )
 M: output-port stream-flush
     [ check-disposed ] [ port-flush ] bi ;
 
+: wait-to-write ( len port -- )
+    [ nip ] [ buffer>> buffer-capacity <= ] 2bi
+    [ drop ] [ port-flush ] if ; inline
+
+M: output-port stream-write1
+    dup check-disposed
+    1 over wait-to-write
+    buffer>> buffer-write1 ; inline
+
+:: port-write ( c-ptr n-remaining port -- )
+    port buffer>> :> buffer
+    n-remaining buffer size>> min :> n-write
+
+    n-write port wait-to-write
+    c-ptr n-write buffer buffer-write
+
+    n-remaining n-write - dup 0 > [
+        n-write c-ptr <displaced-alien> swap port port-write
+    ] [ drop ] if ; inline recursive
+
+M: output-port stream-write
+    dup check-disposed
+    [ binary-object ] [ port-write ] bi* ;
+
 HOOK: tell-handle os ( handle -- n )
 
 HOOK: seek-handle os ( n seek-type handle -- )
 
 HOOK: can-seek-handle? os ( handle -- ? )
+
 HOOK: handle-length os ( handle -- n/f )
 
 M: input-port stream-tell
@@ -164,7 +167,7 @@ M: output-port stream-tell
     ! buffer.
     seek-type seek-relative eq?
     [ n stream stream-tell + seek-absolute ] [ n seek-type ] if
-    stream ;
+    stream ; inline
 
 M: input-port stream-seek
     do-seek-relative
@@ -209,8 +212,7 @@ M: port cancel-operation handle>> cancel-operation ;
 M: port dispose*
     [
         [ handle>> &dispose drop ]
-        [ handle>> shutdown ]
-        bi
+        [ handle>> shutdown ] bi
     ] with-destructors ;
 
 GENERIC: underlying-port ( stream -- port )
@@ -236,4 +238,3 @@ HINTS: M\ input-port stream-read-partial-unsafe
 HINTS: M\ input-port stream-read-unsafe
     { fixnum byte-array input-port }
     { fixnum string input-port } ;
-

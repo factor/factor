@@ -43,7 +43,7 @@ strings accessors destructors ;
 
 [ "hello world" ] [
     "hello" 1024 <buffer> [ buffer-set ] keep
-    " world" >byte-array over >buffer
+    " world" >byte-array binary-object pick buffer-write
     dup buffer-read-all >string swap dispose
 ] unit-test
 
@@ -57,9 +57,9 @@ strings accessors destructors ;
 "b" get dispose
 
 100 <buffer> "b" set
-[ 1000 "b" get n>buffer >string ] must-fail
+[ 1000 "b" get buffer+ >string ] must-fail
 "b" get dispose
 
 "hello world" string>buffer "b" set
-[ "hello" CHAR: \s ] [ " " "b" get buffer-until [ >string ] dip ] unit-test
+[ "hello" CHAR: \s ] [ " " "b" get buffer-read-until [ >string ] dip ] unit-test
 "b" get dispose
