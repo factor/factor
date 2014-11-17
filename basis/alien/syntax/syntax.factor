@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.enums alien.libraries
 alien.parser fry kernel lexer namespaces parser sequences
-strings.parser words ;
+strings.parser vocabs words ;
+<< "alien.arrays" require >> ! needed for bootstrap
 IN: alien.syntax
 
 SYNTAX: DLL" lexer get skip-blank parse-string dlopen suffix! ;
