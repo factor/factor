@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: functors destructors accessors kernel parser words
-effects generalizations sequences ;
+USING: accessors destructors effects functors generalizations
+kernel parser sequences ;
 IN: alien.destructors
 
 TUPLE: alien-destructor alien ;
