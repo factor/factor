@@ -279,5 +279,4 @@ M: output-process-error error.
 {
     { [ os unix? ] [ "io.launcher.unix" require ] }
     { [ os windows? ] [ "io.launcher.windows" require ] }
-    [ ]
 } cond
