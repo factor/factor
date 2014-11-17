@@ -1,5 +1,5 @@
 USING: alien byte-arrays destructors help.markup help.syntax
-kernel ;
+kernel math ;
 IN: io.buffers
 
 ARTICLE: "buffers" "Locked I/O buffers"
@@ -29,24 +29,27 @@ $nl
     buffer-peek
     buffer-pop
     buffer-read
+    buffer-read-unsafe
+    buffer-read-until
 }
 "Writing to the buffer:"
 { $subsections
-    byte>buffer
-    >buffer
-    n>buffer
+    buffer-write1
+    buffer-write
+    buffer+
 } ;
 
 ABOUT: "buffers"
 
 HELP: buffer
-{ $class-description "The class of I/O buffers, which resemble FIFO queues, but are optimized for holding bytes, are have underlying storage allocated at a fixed address. Buffers must be de-allocated manually."
-$nl
-"Buffers have two internal pointers:"
-{ $list
-    { { $snippet "fill" } " - the fill pointer, a write index where new data is added" }
-    { { $snippet "pos" } " - the position, a read index where data is consumed" }
-} } ;
+{ $class-description "The class of I/O buffers, which resemble FIFO queues, but are optimized for holding bytes, are have underlying storage allocated at a fixed address. Buffers must be de-allocated manually. It has the following slots:"
+    { $table
+        { { $slot "size" } "The total size, in bytes, of the buffer" }
+        { { $slot "ptr" } { "The " { $link c-ptr } " memory where data is stored" } }
+        { { $slot "fill" } "The fill pointer, a write index where new data is added" }
+        { { $slot "pos" } "The position, a read index where data is consumed" }
+    }
+} ;
 
 HELP: <buffer>
 { $values { "n" "a non-negative integer" } { "buffer" buffer } }
@@ -73,8 +76,8 @@ HELP: buffer-read
 { $description "Collects a byte array of " { $snippet "n" } " bytes starting from the buffer's current position, and advances the position accordingly. If there are less than " { $snippet "n" } " bytes available, the output is truncated." }
 { $examples
   { $example
-    "USING: destructors io.buffers kernel prettyprint ;"
-    "5 100 <buffer> [ B{ 7 14 21 } over >buffer buffer-read ] with-disposal ."
+    "USING: alien destructors io.buffers kernel prettyprint ;"
+    "5 100 <buffer> [ B{ 7 14 21 } binary-object pick buffer-write buffer-read ] with-disposal ."
     "B{ 7 14 21 }"
   }
 } ;
@@ -84,8 +87,8 @@ HELP: buffer-length
 { $description "Outputs the number of unconsumed bytes in the buffer." }
 { $examples
   { $example
-    "USING: destructors io.buffers kernel prettyprint ;"
-    "100 <buffer> [ B{ 7 14 21 } over >buffer buffer-length ] with-disposal ."
+    "USING: alien destructors io.buffers kernel prettyprint ;"
+    "100 <buffer> [ B{ 7 14 21 } binary-object pick buffer-write buffer-length ] with-disposal ."
     "3"
   }
 } ;
@@ -105,24 +108,24 @@ HELP: buffer-empty?
 { $values { "buffer" buffer } { "?" boolean } }
 { $description "Tests if the buffer contains no more data to be read or written." } ;
 
-HELP: >buffer
-{ $values { "byte-array" byte-array } { "buffer" buffer } }
-{ $description "Copies a byte array to the buffer's fill pointer, and advances it accordingly." }
-{ $warning "This word will corrupt memory if the byte array is larger than the space available in the buffer." } ;
+HELP: buffer-write
+{ $values { "c-ptr" c-ptr } { "n" fixnum } { "buffer" buffer } }
+{ $description "Copies a " { $link c-ptr } " to the buffer's fill pointer, and advances it accordingly." }
+{ $warning "This word will corrupt memory if writing more than the space available in the buffer." } ;
 
-HELP: byte>buffer
+HELP: buffer-write1
 { $values { "byte" "a byte" } { "buffer" buffer } }
 { $description "Appends a single byte to a buffer." }
 { $warning "This word will corrupt memory if the buffer is full." }
 { $examples
   { $example
     "USING: destructors io.buffers kernel prettyprint ;"
-    "100 <buffer> [ 237 over byte>buffer buffer-pop ] with-disposal ."
+    "100 <buffer> [ 237 over buffer-write1 buffer-pop ] with-disposal ."
     "237"
   }
 } ;
 
-HELP: n>buffer
+HELP: buffer+
 { $values { "n" "a non-negative integer" } { "buffer" buffer } }
 { $description "Advances the fill pointer by " { $snippet "n" } " bytes." }
 { $warning "This word will leave the buffer in an invalid state if it does not have " { $snippet "n" } " bytes available." } ;

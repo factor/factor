@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors alien.c-types
-alien.data alien.syntax kernel libc math sequences byte-arrays
-strings hints math.order destructors combinators ;
+USING: accessors alien alien.accessors alien.data byte-arrays
+combinators destructors kernel libc math math.order sequences
+typed ;
 IN: io.buffers
 
 TUPLE: buffer
@@ -18,68 +18,60 @@ disposed ;
 
 M: buffer dispose* ptr>> free ; inline
 
-: buffer-reset ( n buffer -- )
+TYPED: buffer-reset ( n buffer: buffer -- )
     swap >>fill 0 >>pos drop ; inline
 
-: buffer-capacity ( buffer -- n )
+TYPED: buffer-capacity ( buffer: buffer -- n )
     [ size>> ] [ fill>> ] bi - >fixnum ; inline
 
-: buffer-empty? ( buffer -- ? )
+TYPED: buffer-empty? ( buffer: buffer -- ? )
     fill>> zero? ; inline
 
-: buffer-consume ( n buffer -- )
+TYPED: buffer-consume ( n: fixnum buffer: buffer -- )
     [ + ] change-pos
     dup [ pos>> ] [ fill>> ] bi <
     [ 0 >>pos 0 >>fill ] unless drop ; inline
 
-: buffer-peek ( buffer -- byte )
+TYPED: buffer-peek ( buffer: buffer -- byte )
     [ ptr>> ] [ pos>> ] bi alien-unsigned-1 ; inline
 
-: buffer-pop ( buffer -- byte )
+TYPED: buffer-pop ( buffer: buffer -- byte )
     [ buffer-peek ] [ 1 swap buffer-consume ] bi ; inline
 
-: buffer-length ( buffer -- n )
+TYPED: buffer-length ( buffer: buffer -- n )
     [ fill>> ] [ pos>> ] bi - >fixnum ; inline
 
-: buffer@ ( buffer -- alien )
+TYPED: buffer@ ( buffer: buffer -- alien )
     [ pos>> ] [ ptr>> ] bi <displaced-alien> ; inline
 
-: buffer-read-unsafe ( n buffer -- n ptr )
+TYPED: buffer-read-unsafe ( n: fixnum buffer: buffer -- n ptr )
     [ buffer-length min ] keep
     [ buffer@ ] [ buffer-consume ] 2bi ; inline
 
-: buffer-read ( n buffer -- byte-array )
-    buffer-read-unsafe swap memory>byte-array ;
+TYPED: buffer-read ( n: fixnum buffer: buffer -- byte-array )
+    buffer-read-unsafe swap memory>byte-array ; inline
 
-HINTS: buffer-read fixnum buffer ;
-
-: buffer-end ( buffer -- alien )
+TYPED: buffer-end ( buffer: buffer -- alien )
     [ fill>> ] [ ptr>> ] bi <displaced-alien> ; inline
 
-: n>buffer ( n buffer -- )
+TYPED: buffer+ ( n buffer: buffer -- )
     [ + ] change-fill drop ; inline
 
-HINTS: n>buffer fixnum buffer ;
+TYPED: buffer-write ( c-ptr n buffer: buffer -- )
+    [ buffer-end -rot memcpy ] [ buffer+ ] 2bi ; inline
 
-: >buffer ( byte-array buffer -- )
-    [ buffer-end swap binary-object memcpy ]
-    [ [ byte-length ] dip n>buffer ]
-    2bi ;
-
-HINTS: >buffer byte-array buffer ;
-
-: byte>buffer ( byte buffer -- )
-    [ >fixnum ] dip
+TYPED: buffer-write1 ( byte: fixnum buffer: buffer -- )
     [ [ ptr>> ] [ fill>> ] bi set-alien-unsigned-1 ]
-    [ 1 swap n>buffer ]
-    bi ; inline
+    [ 1 swap buffer+ ] bi ; inline
 
-: search-buffer-until ( pos fill ptr separators -- n )
+<PRIVATE
+
+: search-buffer-until ( pos fill ptr seps -- n )
     [ iota ] 2dip
     [ [ swap alien-unsigned-1 ] dip member-eq? ] 2curry
     find-from drop ; inline
 
-: finish-buffer-until ( buffer n -- byte-array separator )
+: finish-buffer-until ( buffer n -- byte-array sep/f )
     [
         over pos>> -
         over buffer-read
@@ -89,9 +81,9 @@ HINTS: >buffer byte-array buffer ;
         buffer-read f
     ] if* ; inline
 
-: buffer-until ( separators buffer -- byte-array separator )
+PRIVATE>
+
+TYPED: buffer-read-until ( seps buffer: buffer -- byte-array sep/f )
     swap [ { [ ] [ pos>> ] [ fill>> ] [ ptr>> ] } cleave ] dip
     search-buffer-until
     finish-buffer-until ;
-
-HINTS: buffer-until { string buffer } ;

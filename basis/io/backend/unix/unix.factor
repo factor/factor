@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax
 classes.struct combinators destructors destructors.private fry
-hints io.backend io.backend.unix.multiplexers io.buffers
-io.files io.ports io.timeouts kernel kernel.private libc locals
-make math namespaces sequences summary system threads unix
-unix.ffi unix.stat unix.types ;
+io.backend io.backend.unix.multiplexers io.buffers io.files
+io.ports io.timeouts kernel kernel.private libc locals make math
+namespaces sequences summary system threads unix unix.ffi
+unix.stat unix.types ;
 QUALIFIED: io
 IN: io.backend.unix
 
@@ -83,17 +83,20 @@ M: unix wait-for-fd ( handle event -- )
 
 ! Some general stuff
 
+ERROR: not-a-buffered-port port ;
+
+: check-buffered-port ( port -- port )
+    dup buffered-port? [ not-a-buffered-port ] unless ; inline
+
 M: fd refill
-    fd>> over buffer>> [ buffer-end ] [ buffer-capacity ] bi read
+    [ check-buffered-port buffer>> ] [ fd>> ] bi*
+    over [ buffer-end ] [ buffer-capacity ] bi read
     {
-        { [ dup 0 >= ] [ swap buffer>> n>buffer f ] }
+        { [ dup 0 >= ] [ swap buffer+ f ] }
         { [ errno EINTR = ] [ 2drop +retry+ ] }
         { [ errno EAGAIN = ] [ 2drop +input+ ] }
         [ (io-error) ]
     } cond ;
-
-HINTS: M\ fd refill
-    { buffered-port fd } ;
 
 M: unix (wait-to-read) ( port -- )
     dup
@@ -102,11 +105,12 @@ M: unix (wait-to-read) ( port -- )
 
 ! Writers
 M: fd drain
-    fd>> over buffer>> [ buffer@ ] [ buffer-length ] bi write
+    [ check-buffered-port buffer>> ] [ fd>> ] bi*
+    over [ buffer@ ] [ buffer-length ] bi write
     {
         { [ dup 0 >= ] [
-            over buffer>> buffer-consume
-            buffer>> buffer-empty? f +output+ ?
+            over buffer-consume
+            buffer-empty? f +output+ ?
         ] }
         { [ errno EINTR = ] [ 2drop +retry+ ] }
         { [ errno EAGAIN = ] [ 2drop +output+ ] }
@@ -150,7 +154,7 @@ M: stdin dispose*
         errno EINTR = [ buffer stdin size refill-stdin ] [ (io-error) ] if
     ] [
         size = [ "Error reading stdin pipe" throw ] unless
-        size buffer n>buffer
+        size buffer buffer+
     ] if ;
 
 M: stdin refill

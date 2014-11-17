@@ -194,7 +194,7 @@ M: object drain ( port handle -- event/f )
     } cleave ;
 
 : finish-read ( n port -- )
-    [ update-file-ptr ] [ buffer>> n>buffer ] 2bi ;
+    [ update-file-ptr ] [ buffer>> buffer+ ] 2bi ;
 
 M: object refill ( port handle -- event/f )
     [ make-FileArgs dup setup-read ReadFile ]
