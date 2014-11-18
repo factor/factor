@@ -1,7 +1,7 @@
 USING: continuations destructors io io.directories
 io.directories.hierarchy io.encodings.ascii io.encodings.utf8
-io.files io.files.info io.files.temp io.pathnames kernel
-sequences tools.test ;
+io.files io.files.info io.files.temp io.launcher io.pathnames
+kernel sequences tools.test ;
 IN: io.directories.tests
 
 [ { "kernel" } ] [
@@ -190,3 +190,10 @@ IN: io.directories.tests
 
 [ ] [ "resource:deleteme" touch-file ] unit-test
 [ ] [ "resource:deleteme" delete-file ] unit-test
+
+! Issue #890
+
+{ } [
+    "foo" temp-file [ make-directories ] keep
+    [ "touch bar" try-output-process ] with-directory
+] unit-test
