@@ -10,11 +10,10 @@ IN: fuel.xref
 
 <PRIVATE
 
-: normalize-loc ( seq -- path line )
-    [ dup length 0 > [ first absolute-path ] [ drop f ] if ]
-    [ dup length 1 > [ second ] when ] bi ;
+: normalize-loc ( pair/f -- path line )
+    [ first2 [ absolute-path ] dip ] [ f f ] if* ;
 
-: get-loc ( object -- loc ) normalize-loc 2array ;
+: get-loc ( pair/f -- loc ) normalize-loc 2array ;
 
 : word>xref ( word -- xref )
     [ name>> ] [ vocabulary>> ] [ where normalize-loc ] tri 4array ;
@@ -26,9 +25,9 @@ IN: fuel.xref
     [ word? ] filter [ word>xref ] map ;
 
 : group-xrefs ( xrefs -- xrefs' )
-    natural-sort [ second 1array ] collect-by
-    ! Put the path to the vocab in the key
-    [ [ [ third ] map-find drop suffix ] keep ] assoc-map
+    natural-sort [ second ] collect-by
+    ! Change key from 'name' to { name path }
+    [ [ [ third ] map-find drop 2array ] keep ] assoc-map
     >alist natural-sort ;
 
 : filter-prefix ( seq prefix -- seq )
