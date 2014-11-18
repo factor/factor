@@ -1,6 +1,26 @@
+//  Compile the tests with:
+//
+//   apt-get install libgtest-dev
+//   make CONFIG=vm/Config.linux.x86.64 factor-tests
+//
+// Run suite with:
+//
+//   ./factor-tests
+//
+// Optionally, pass -i=/path/to/factor.image
 #include <limits.h>
 #include "master.hpp"
 #include "gtest/gtest.h"
+
+int my_argc;
+char** my_argv;
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  my_argc = argc;
+  my_argv = argv;
+  return RUN_ALL_TESTS();
+}
 
 namespace factor {
 
@@ -14,10 +34,8 @@ cell datastack_depth(context *ctx) {
 
 factor_vm* setup_factor_vm() {
   factor_vm* vm = new_factor_vm();
-  const vm_char* image_path = STRING_LITERAL("factor.image");
   vm_parameters p;
-  vm->default_parameters(&p);
-  p.image_path = image_path;
+  vm->init_parameters_from_args(&p, my_argc, my_argv);
   vm->init_factor(&p);
   vm->ctx = vm->spare_ctx;
   return vm;
@@ -42,10 +60,8 @@ TEST(FactorVMTests, InitialValues) {
 
 TEST(FactorVMTests, CheckStackSizes) {
   factor_vm* vm = new_factor_vm();
-  const vm_char* image_path = STRING_LITERAL("factor.image");
   vm_parameters p;
-  vm->default_parameters(&p);
-  p.image_path = image_path;
+  vm->init_parameters_from_args(&p, my_argc, my_argv);
   vm->init_factor(&p);
   EXPECT_TRUE(vm->spare_ctx != NULL);
   EXPECT_TRUE(vm->spare_ctx->datastack_seg != NULL);
@@ -190,18 +206,20 @@ TEST(AllotTests, CheckBignumMoveToAging) {
   bignum *b2 = vm->fixnum_to_bignum(99999);
   cell old_addr1 = (cell)b1;
   cell old_addr2 = (cell)b2;
-  gc_bignum *b_data_root = new gc_bignum(&b1, vm);
+  data_root<bignum> dr1(b1, vm);
 
   vm->primitive_minor_gc();
 
   // Object now lives in aging and has a new address.
-  ASSERT_NE((cell)b1, old_addr1);
+  ASSERT_NE(dr1.value(), old_addr1);
+  EXPECT_FALSE(vm->data->nursery->contains_p(dr1.untagged()));
+  EXPECT_TRUE(vm->data->aging->contains_p(dr1.untagged()));
 
   // But the other bignum wasn't data rooted and therefore wasn't
   // moved. Its pointer is now invalid.
   ASSERT_EQ((cell)b2, old_addr2);
+  EXPECT_TRUE(vm->data->nursery->contains_p(b1));
 
-  delete b_data_root;
   delete vm;
 }
 
@@ -233,6 +251,5 @@ TEST(AllotTests, CheckStringMoveToAging) {
   delete s1_dr;
   delete vm;
 }
-
 
 }

@@ -227,7 +227,7 @@ $(FFI_TEST_LIBRARY): vm/ffi_test.o
 vm/resources.o:
 	$(TOOLCHAIN_PREFIX)$(WINDRES) vm/factor.rs vm/resources.o
 
-TESTING_OBJS = vm/tests/gtest-all.o vm/tests/gtest_main.o vm/tests/factor-tests.o
+TESTING_OBJS = vm/tests/gtest-all.o vm/tests/factor-tests.o
 
 %.o: %.cc
 	$(TOOLCHAIN_PREFIX)$(CXX) -I $(GTEST) -I vm -c $(CFLAGS) -o $@ $<
