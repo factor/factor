@@ -488,9 +488,8 @@ enum bignum_comparison factor_vm::bignum_compare_unsigned(bignum* x,
 
 /* Addition */
 
-/* Allocates memory, fixed! */
+/* Allocates memory */
 bignum* factor_vm::bignum_add_unsigned(bignum* x_, bignum* y_, int negative_p) {
-
 
   data_root<bignum> x(x_, this);
   data_root<bignum> y(y_, this);
@@ -620,7 +619,7 @@ bignum* factor_vm::bignum_multiply_unsigned(bignum* x_, bignum* y_,
   data_root<bignum> x(x_, this);
   data_root<bignum> y(y_, this);
 
-  if (BIGNUM_LENGTH(x) > BIGNUM_LENGTH(y)) {
+  if (BIGNUM_LENGTH(y) > BIGNUM_LENGTH(x)) {
     swap(x, y);
   }
   {
@@ -743,68 +742,76 @@ void factor_vm::bignum_destructive_scale_up(bignum* bn,
 
 /* Allocates memory */
 void factor_vm::bignum_divide_unsigned_large_denominator(
-    bignum* numerator_, bignum* denominator_, bignum** quotient,
-    bignum** remainder, int q_negative_p, int r_negative_p) {
+    bignum* numerator_, bignum* denominator_,
+    bignum** quotient, bignum** remainder,
+    int q_negative_p, int r_negative_p) {
 
   data_root<bignum> numerator(numerator_, this);
   data_root<bignum> denominator(denominator_, this);
 
-  bignum_length_type length_n = ((BIGNUM_LENGTH(numerator)) + 1);
-  bignum_length_type length_d = (BIGNUM_LENGTH(denominator));
-
-  bignum *q_ = NULL;
-  if (quotient != ((bignum**)0)) {
-    q_ = allot_bignum(length_n - length_d, q_negative_p);
-  } else {
-    q_ = BIGNUM_OUT_OF_BAND;
-  }
-
-  data_root<bignum> q(q_, this);
+  bignum_length_type length_n = BIGNUM_LENGTH(numerator) + 1;
+  bignum_length_type length_d = BIGNUM_LENGTH(denominator);
 
   data_root<bignum> u(allot_bignum(length_n, r_negative_p), this);
 
   int shift = 0;
   BIGNUM_ASSERT(length_d > 1);
   {
-    bignum_digit_type v1 = (BIGNUM_REF((denominator), (length_d - 1)));
+    bignum_digit_type v1 = BIGNUM_REF(denominator.untagged(), length_d - 1);
     while (v1 < (BIGNUM_RADIX / 2)) {
       v1 <<= 1;
       shift += 1;
     }
   }
-  if (shift == 0) {
-    bignum_destructive_copy(numerator.untagged(), u.untagged());
-    (BIGNUM_REF(u, (length_n - 1))) = 0;
-    bignum_divide_unsigned_normalized(u.untagged(),
-                                      denominator.untagged(),
-                                      q.untagged());
-  } else {
-    bignum* v = (allot_bignum(length_d, 0));
 
-    bignum_destructive_normalization(numerator.untagged(),
-                                     u.untagged(),
-                                     shift);
-    bignum_destructive_normalization(denominator.untagged(),
-                                     v,
-                                     shift);
-    bignum_divide_unsigned_normalized(u.untagged(), v, q.untagged());
-    if (remainder != ((bignum**)0))
-      bignum_destructive_unnormalization(u.untagged(), shift);
-  }
+  if (quotient != NULL) {
+    bignum *q_ = allot_bignum(length_n - length_d, q_negative_p);
+    data_root<bignum> q(q_, this);
 
-  if (q.untagged()) {
+    if (shift == 0) {
+      bignum_destructive_copy(numerator.untagged(), u.untagged());
+      (BIGNUM_REF(u.untagged(), (length_n - 1))) = 0;
+      bignum_divide_unsigned_normalized(u.untagged(),
+                                        denominator.untagged(),
+                                        q.untagged());
+    } else {
+      bignum* v = allot_bignum(length_d, 0);
+      bignum_destructive_normalization(numerator.untagged(),
+                                       u.untagged(),
+                                       shift);
+      bignum_destructive_normalization(denominator.untagged(), v, shift);
+      bignum_divide_unsigned_normalized(u.untagged(), v, q.untagged());
+      if (remainder != NULL)
+        bignum_destructive_unnormalization(u.untagged(), shift);
+    }
+
     q = bignum_trim(q.untagged());
+    *quotient = q.untagged();
+  } else {
+
+    if (shift == 0) {
+        bignum_destructive_copy(numerator.untagged(), u.untagged());
+        (BIGNUM_REF(u.untagged(), (length_n - 1))) = 0;
+        bignum_divide_unsigned_normalized(u.untagged(),
+                                          denominator.untagged(),
+                                          NULL);
+      } else {
+        bignum* v = allot_bignum(length_d, 0);
+        bignum_destructive_normalization(numerator.untagged(),
+                                         u.untagged(),
+                                         shift);
+        bignum_destructive_normalization(denominator.untagged(),
+                                         v,
+                                         shift);
+        bignum_divide_unsigned_normalized(u.untagged(), v, NULL);
+        if (remainder != NULL)
+          bignum_destructive_unnormalization(u.untagged(), shift);
+      }
   }
 
   u = bignum_trim(u.untagged());
-
-  if (quotient != ((bignum**)0))
-    (*quotient) = q.untagged();
-
-  if (remainder != ((bignum**)0))
-    (*remainder) = u.untagged();
-
-  return;
+  if (remainder != NULL)
+    *remainder = u.untagged();
 }
 
 void factor_vm::bignum_divide_unsigned_normalized(bignum* u, bignum* v,

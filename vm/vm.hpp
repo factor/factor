@@ -254,7 +254,7 @@ struct factor_vm {
   void bignum_destructive_add(bignum* bn, bignum_digit_type n);
   void bignum_destructive_scale_up(bignum* bn, bignum_digit_type factor);
   void bignum_divide_unsigned_large_denominator(
-      bignum* numerator, bignum* denominator, bignum** quotient,
+      bignum* numerator_, bignum* denominator_, bignum** quotient,
       bignum** remainder, int q_negative_p, int r_negative_p);
   void bignum_divide_unsigned_normalized(bignum* u, bignum* v, bignum* q);
   bignum_digit_type bignum_divide_subtract(bignum_digit_type* v_start,
