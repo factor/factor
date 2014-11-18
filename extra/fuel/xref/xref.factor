@@ -2,19 +2,18 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs definitions help.topics io.pathnames
-kernel math math.order memoize namespaces sequences sets sorting
-tools.completion tools.crossref vocabs vocabs.parser vocabs.hierarchy
-words ;
+kernel math math.order math.statistics memoize namespaces sequences sets
+sorting tools.completion tools.crossref vocabs vocabs.parser
+vocabs.hierarchy words ;
 
 IN: fuel.xref
 
 <PRIVATE
 
-: normalize-loc ( seq -- path line )
-    [ dup length 0 > [ first absolute-path ] [ drop f ] if ]
-    [ dup length 1 > [ second ] [ drop 1 ] if ] bi ;
+: normalize-loc ( pair/f -- path line )
+    [ first2 [ absolute-path ] dip ] [ f f ] if* ;
 
-: get-loc ( object -- loc ) normalize-loc 2array ;
+: get-loc ( pair/f -- loc ) normalize-loc 2array ;
 
 : word>xref ( word -- xref )
     [ name>> ] [ vocabulary>> ] [ where normalize-loc ] tri 4array ;
@@ -22,11 +21,14 @@ IN: fuel.xref
 : vocab>xref ( vocab -- xref )
     dup dup >vocab-link where normalize-loc 4array ;
 
-: sort-xrefs ( seq -- seq' )
-    [ first ] sort-with ;
-
 : format-xrefs ( seq -- seq' )
     [ word? ] filter [ word>xref ] map ;
+
+: group-xrefs ( xrefs -- xrefs' )
+    natural-sort [ second ] collect-by
+    ! Change key from 'name' to { name path }
+    [ [ [ third ] map-find drop 2array ] keep ] assoc-map
+    >alist natural-sort ;
 
 : filter-prefix ( seq prefix -- seq )
     [ drop-prefix nip length 0 = ] curry filter members ;
@@ -44,13 +46,15 @@ MEMO: (vocab-words) ( name -- seq )
 
 PRIVATE>
 
-: callers-xref ( word -- seq ) usage format-xrefs sort-xrefs ;
+: callers-xref ( word -- seq ) usage format-xrefs group-xrefs ;
 
-: callees-xref ( word -- seq ) uses format-xrefs sort-xrefs ;
+: callees-xref ( word -- seq ) uses format-xrefs group-xrefs ;
 
-: apropos-xref ( str -- seq ) words-matching format-xrefs ;
+: apropos-xref ( str -- seq ) words-matching keys format-xrefs group-xrefs ;
 
-: vocab-xref ( vocab -- seq ) words format-xrefs ;
+: vocab-xref ( vocab -- seq )
+    dup ".private" append [ words ] bi@ append
+    format-xrefs group-xrefs ;
 
 : word-location ( word -- loc ) where get-loc ;
 
