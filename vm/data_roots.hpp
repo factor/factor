@@ -14,6 +14,7 @@ template <typename Type> struct data_root : public tagged<Type> {
 
   data_root(Type* value, factor_vm* parent)
       : tagged<Type>(value), parent(parent) {
+    FACTOR_ASSERT(value);
     push();
   }
 
