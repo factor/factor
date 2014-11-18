@@ -18,6 +18,6 @@ IN: io.sockets.windows.tests
 { t } [
     google-socket [
         [  1337 -8 set-ioctl-socket ]
-        [ [ winsock-exception? ] [ n>> 10045 = ] bi and ] recover
+        [ nip [ winsock-exception? ] [ n>> 10045 = ] bi and ] recover
     ] with-disposal
 ] unit-test
