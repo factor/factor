@@ -4,8 +4,8 @@
 USING: accessors arrays byte-arrays fry hints kernel lists make math
     math.functions math.matrices math.order math.parser math.primes.factors
     math.primes.lists math.primes.miller-rabin math.ranges math.ratios
-    namespaces parser prettyprint quotations sequences sorting strings
-    unicode.case vocabs vocabs.parser words ;
+    math.vectors namespaces parser prettyprint quotations sequences sorting
+    strings unicode.case vocabs vocabs.parser words ;
 FROM: sequences => change-nth ;
 IN: project-euler.common
 
@@ -74,7 +74,7 @@ PRIVATE>
 
 : max-path ( triangle -- n )
     dup length 1 > [
-        2 cut* first2 max-children [ + ] 2map suffix max-path
+        2 cut* first2 max-children v+ suffix max-path
     ] [
         first first
     ] if ;
