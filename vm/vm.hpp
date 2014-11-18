@@ -114,7 +114,6 @@ struct factor_vm {
      themselves here. See data_roots.hpp and code_roots.hpp */
 
   std::vector<cell*> data_roots;
-  std::vector<bignum**> bignum_roots;
   std::vector<code_root*> code_roots;
 
   /* Debugger */
@@ -233,7 +232,7 @@ struct factor_vm {
   enum bignum_comparison bignum_compare(bignum* x, bignum* y);
   bignum* bignum_add(bignum* x, bignum* y);
   bignum* bignum_subtract(bignum* x, bignum* y);
-  bignum* bignum_square(bignum* x);
+  bignum* bignum_square(bignum* x_);
   bignum* bignum_multiply(bignum* x, bignum* y);
   void bignum_divide(bignum* numerator, bignum* denominator, bignum** quotient,
                      bignum** remainder);
@@ -247,15 +246,15 @@ struct factor_vm {
   bignum* double_to_bignum(double x);
   int bignum_equal_p_unsigned(bignum* x, bignum* y);
   enum bignum_comparison bignum_compare_unsigned(bignum* x, bignum* y);
-  bignum* bignum_add_unsigned(bignum* x, bignum* y, int negative_p);
-  bignum* bignum_subtract_unsigned(bignum* x, bignum* y);
-  bignum* bignum_multiply_unsigned(bignum* x, bignum* y, int negative_p);
+  bignum* bignum_add_unsigned(bignum* x_, bignum* y_, int negative_p);
+  bignum* bignum_subtract_unsigned(bignum* x_, bignum* y_);
+  bignum* bignum_multiply_unsigned(bignum* x_, bignum* y_, int negative_p);
   bignum* bignum_multiply_unsigned_small_factor(bignum* x, bignum_digit_type y,
                                                 int negative_p);
   void bignum_destructive_add(bignum* bn, bignum_digit_type n);
   void bignum_destructive_scale_up(bignum* bn, bignum_digit_type factor);
   void bignum_divide_unsigned_large_denominator(
-      bignum* numerator, bignum* denominator, bignum** quotient,
+      bignum* numerator_, bignum* denominator_, bignum** quotient,
       bignum** remainder, int q_negative_p, int r_negative_p);
   void bignum_divide_unsigned_normalized(bignum* u, bignum* v, bignum* q);
   bignum_digit_type bignum_divide_subtract(bignum_digit_type* v_start,
@@ -263,7 +262,7 @@ struct factor_vm {
                                            bignum_digit_type guess,
                                            bignum_digit_type* u_start);
   void bignum_divide_unsigned_medium_denominator(
-      bignum* numerator, bignum_digit_type denominator, bignum** quotient,
+      bignum* numerator_, bignum_digit_type denominator, bignum** quotient,
       bignum** remainder, int q_negative_p, int r_negative_p);
   void bignum_destructive_normalization(bignum* source, bignum* target,
                                         int shift_left);
@@ -276,7 +275,7 @@ struct factor_vm {
                                                  bignum_digit_type guess,
                                                  bignum_digit_type* u);
   void bignum_divide_unsigned_small_denominator(
-      bignum* numerator, bignum_digit_type denominator, bignum** quotient,
+      bignum* numerator_, bignum_digit_type denominator, bignum** quotient,
       bignum** remainder, int q_negative_p, int r_negative_p);
   bignum_digit_type bignum_destructive_scale_down(
       bignum* bn, bignum_digit_type denominator);
@@ -288,23 +287,23 @@ struct factor_vm {
   bignum* allot_bignum_zeroed(bignum_length_type length, int negative_p);
   bignum* bignum_shorten_length(bignum* bn, bignum_length_type length);
   bignum* bignum_trim(bignum* bn);
-  bignum* bignum_new_sign(bignum* x, int negative_p);
-  bignum* bignum_maybe_new_sign(bignum* x, int negative_p);
+  bignum* bignum_new_sign(bignum* x_, int negative_p);
+  bignum* bignum_maybe_new_sign(bignum* x_, int negative_p);
   void bignum_destructive_copy(bignum* source, bignum* target);
-  bignum* bignum_bitwise_not(bignum* x);
+  bignum* bignum_bitwise_not(bignum* x_);
   bignum* bignum_arithmetic_shift(bignum* arg1, fixnum n);
   bignum* bignum_bitwise_and(bignum* arg1, bignum* arg2);
   bignum* bignum_bitwise_ior(bignum* arg1, bignum* arg2);
   bignum* bignum_bitwise_xor(bignum* arg1, bignum* arg2);
-  bignum* bignum_magnitude_ash(bignum* arg1, fixnum n);
-  bignum* bignum_pospos_bitwise_op(int op, bignum* arg1, bignum* arg2);
-  bignum* bignum_posneg_bitwise_op(int op, bignum* arg1, bignum* arg2);
-  bignum* bignum_negneg_bitwise_op(int op, bignum* arg1, bignum* arg2);
+  bignum* bignum_magnitude_ash(bignum* arg1_, fixnum n);
+  bignum* bignum_pospos_bitwise_op(int op, bignum* arg1_, bignum* arg2_);
+  bignum* bignum_posneg_bitwise_op(int op, bignum* arg1_, bignum* arg2_);
+  bignum* bignum_negneg_bitwise_op(int op, bignum* arg1_, bignum* arg2_);
   void bignum_negate_magnitude(bignum* arg);
-  bignum* bignum_integer_length(bignum* x);
+  bignum* bignum_integer_length(bignum* x_);
   int bignum_logbitp(int shift, bignum* arg);
   int bignum_unsigned_logbitp(int shift, bignum* bn);
-  bignum* bignum_gcd(bignum* a, bignum* b);
+  bignum* bignum_gcd(bignum* a_, bignum* b_);
 
   //data heap
   void init_card_decks();

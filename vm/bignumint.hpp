@@ -56,7 +56,7 @@ typedef int64_t bignum_twodigit_type;
 #endif
 
 /* BIGNUM_TO_POINTER casts a bignum object to a digit array pointer. */
-#define BIGNUM_TO_POINTER(bignum) ((bignum_digit_type*)(bignum + 1))
+#define BIGNUM_TO_POINTER(bignum) ((bignum_digit_type*)(bignum->data()))
 
 /* BIGNUM_EXCEPTION is invoked to handle assertion violations. */
 #define BIGNUM_EXCEPTION abort
