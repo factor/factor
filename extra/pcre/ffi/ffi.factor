@@ -9,7 +9,7 @@ USING:
 IN: pcre.ffi
 
 << "pcre" {
-    { [ os windows? ] [ "pcre3.dll" ] }
+    { [ os windows? ] [ "pcre.dll" ] }
     { [ os macosx? ] [ "libpcre.dylib" ] }
     { [ os unix? ] [ "libpcre.so" ] }
 } cond cdecl add-library >>
