@@ -274,9 +274,8 @@ M: windows wait-for-processes ( -- ? )
 M: windows run-process* ( process -- handle )
     [
         [
-            current-directory get absolute-path cd
-    
             dup make-CreateProcess-args
+            current-directory get absolute-path >>lpCurrentDirectory
             [ fill-redirection ] keep
             dup call-CreateProcess
             lpProcessInformation>>
