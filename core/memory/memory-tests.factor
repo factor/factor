@@ -13,6 +13,25 @@ IN: memory.tests
 ! Tests for 'become'
 [ ] [ { } { } become ] unit-test
 
+! Become something when it's on the data stack.
+{ "replacer" } [
+    "original" dup 1array { "replacer" } become
+] unit-test
+
+! Nested in aging
+{ "replacer" } [
+    "original" [ 5 [ 1array ] times ] [ 1array ] bi
+    minor-gc
+    { "replacer" } become 5 [ first ] times
+] unit-test
+
+! Also when it is nested in nursery
+{ "replacer" } [
+    minor-gc
+    "original" [ 5 [ 1array ] times ] [ 1array ] bi { "replacer" } become
+    5 [ first ] times
+] unit-test
+
 ! Bug found on Windows build box, having too many words in the
 ! image breaks 'become'
 [ ] [ 100000 [ f <uninterned-word> ] replicate { } { } become drop ] unit-test
@@ -45,12 +64,12 @@ SYMBOL: foo
     gc
 
     data-room tenured>> size>>
-    
+
     10 [
         4 [ 120 1024 * f <array> ] replicate foo set-global
         100 [ 256 1024 * f <array> drop ] times
     ] times
-    
+
     data-room tenured>> size>>
     assert=
 ] unit-test
