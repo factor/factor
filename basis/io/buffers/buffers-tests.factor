@@ -11,9 +11,7 @@ io.buffers kernel libc namespaces sequences strings tools.test ;
     dup length <buffer> [ buffer-set ] keep ;
 
 : buffer-read-all ( buffer -- byte-array )
-    [ [ pos>> ] [ ptr>> ] bi <displaced-alien> ]
-    [ buffer-length ] bi
-    memory>byte-array ;
+    [ buffer@ ] [ buffer-length ] bi memory>byte-array ;
 
 [ B{ } 65536 ] [
     65536 <buffer>
