@@ -327,12 +327,15 @@ struct factor_vm {
   }
 
   template <typename Iterator> inline void each_object(Iterator& iterator) {
-    gc_off = true;
 
+    /* The nursery can't be iterated because there may be gaps between
+       the objects (see factor_vm::reallot_array) so we require it to
+       be empty first. */
+    FACTOR_ASSERT(nursery.occupied_space() == 0);
+
+    gc_off = true;
     each_object(data->tenured, iterator);
     each_object(data->aging, iterator);
-    each_object(data->nursery, iterator);
-
     gc_off = false;
   }
 
