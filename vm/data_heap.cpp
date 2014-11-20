@@ -149,6 +149,7 @@ struct object_accumulator {
 
 /* Allocates memory */
 cell factor_vm::instances(cell type) {
+  primitive_full_gc();
   object_accumulator accum(type);
   each_object(accum);
   return std_vector_to_array(accum.objects);
@@ -156,7 +157,6 @@ cell factor_vm::instances(cell type) {
 
 /* Allocates memory */
 void factor_vm::primitive_all_instances() {
-  primitive_full_gc();
   ctx->push(instances(TYPE_COUNT));
 }
 
