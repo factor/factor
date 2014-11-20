@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.data byte-arrays
 combinators destructors kernel libc math math.order sequences
-typed ;
+sequences.private typed ;
 IN: io.buffers
 
 TUPLE: buffer
@@ -50,6 +50,18 @@ TYPED: buffer-read-unsafe ( n: fixnum buffer: buffer -- n ptr )
 
 TYPED: buffer-read ( n: fixnum buffer: buffer -- byte-array )
     buffer-read-unsafe swap memory>byte-array ; inline
+
+TYPED: buffer-read-into ( dst n: fixnum buffer: buffer -- count )
+    buffer-read-unsafe swap [
+        pick c-ptr? [
+            memcpy
+        ] [
+            -rot swap
+            [ swap alien-unsigned-1 ]
+            [ set-nth-unsafe ] bi-curry*
+            [ bi ] 2curry each-integer
+        ] if
+    ] keep ; inline
 
 TYPED: buffer-end ( buffer: buffer -- alien )
     [ fill>> ] [ ptr>> ] bi <displaced-alien> ; inline

@@ -1,7 +1,6 @@
 IN: io.buffers.tests
-USING: alien alien.c-types alien.data io.buffers kernel
-kernel.private libc sequences tools.test namespaces byte-arrays
-strings accessors destructors ;
+USING: accessors alien alien.data arrays byte-arrays destructors
+io.buffers kernel libc namespaces sequences strings tools.test ;
 
 : buffer-set ( string buffer -- )
     [ ptr>> swap >byte-array binary-object memcpy ]
@@ -63,3 +62,15 @@ strings accessors destructors ;
 "hello world" string>buffer "b" set
 [ "hello" CHAR: \s ] [ " " "b" get buffer-read-until [ >string ] dip ] unit-test
 "b" get dispose
+
+[ 4 B{ 1 2 3 4 0 0 0 0 0 0 } ] [
+    10 <buffer>
+    [ B{ 1 2 3 4 } binary-object rot buffer-write ]
+    [ 10 <byte-array> [ 10 rot buffer-read-into ] keep ] bi
+] unit-test
+
+[ 4 { 1 2 3 4 f f f f f f } ] [
+    10 <buffer>
+    [ B{ 1 2 3 4 } binary-object rot buffer-write ]
+    [ 10 f <array> [ 10 rot buffer-read-into ] keep ] bi
+] unit-test
