@@ -18,7 +18,7 @@ struct factor_vm {
 
   /* New objects are allocated here, use the data->nursery reference
      instead from c++ code. */
-  nursery_space nursery;
+  bump_allocator nursery;
 
   /* Add this to a shifted address to compute write barrier offsets */
   cell cards_offset;

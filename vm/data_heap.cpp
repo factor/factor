@@ -7,7 +7,7 @@ void factor_vm::init_card_decks() {
   decks_offset = (cell)data->decks - addr_to_deck(data->start);
 }
 
-data_heap::data_heap(nursery_space* vm_nursery,
+data_heap::data_heap(bump_allocator* vm_nursery,
                      cell young_size_,
                      cell aging_size_,
                      cell tenured_size_) {
@@ -59,7 +59,7 @@ data_heap::~data_heap() {
   delete[] decks;
 }
 
-data_heap* data_heap::grow(nursery_space* vm_nursery, cell requested_bytes) {
+data_heap* data_heap::grow(bump_allocator* vm_nursery, cell requested_bytes) {
   FACTOR_ASSERT(vm_nursery->occupied_space() == 0);
   cell new_tenured_size = (tenured_size * 2) + requested_bytes;
   return new data_heap(vm_nursery, young_size, aging_size, new_tenured_size);
@@ -77,7 +77,7 @@ template <typename Generation> void data_heap::clear_decks(Generation* gen) {
   memset(&decks[first_deck], 0, last_deck - first_deck);
 }
 
-void data_heap::reset_generation(nursery_space* gen) {
+void data_heap::reset_generation(bump_allocator* gen) {
   gen->flush();
 }
 

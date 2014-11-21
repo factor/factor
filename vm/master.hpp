@@ -111,7 +111,6 @@ namespace factor { struct factor_vm; }
 #include "free_list_allocator.hpp"
 #include "write_barrier.hpp"
 #include "object_start_map.hpp"
-#include "nursery_space.hpp"
 #include "aging_space.hpp"
 #include "tenured_space.hpp"
 #include "data_heap.hpp"
