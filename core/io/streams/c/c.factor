@@ -23,9 +23,10 @@ M: c-writer stream-write1
 
 M: c-writer stream-write
     dup check-disposed
-    [ [ >c-ptr ] [ byte-length ] bi ] [ handle>> ] bi* fwrite ;
+    [ binary-object ] [ handle>> ] bi* fwrite ;
 
-M: c-writer stream-flush dup check-disposed handle>> fflush ;
+M: c-writer stream-flush
+    dup check-disposed handle>> fflush ;
 
 TUPLE: c-reader < c-stream ;
 INSTANCE: c-reader input-stream
