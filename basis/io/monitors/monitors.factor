@@ -43,7 +43,7 @@ TUPLE: file-change path changed monitor ;
 
 : queue-change ( path changes monitor -- )
     3dup and and [
-        [ check-disposed ] keep
+        check-disposed
         [ file-change boa ] keep
         queue>> mailbox-put
     ] [ 3drop ] if ;
@@ -54,11 +54,9 @@ HOOK: (monitor) io-backend ( path recursive? mailbox -- monitor )
     <mailbox> (monitor) ;
 
 : next-change ( monitor -- change )
-    [ check-disposed ]
-    [
-        [ ] [ queue>> ] [ timeout ] tri mailbox-get-timeout
-        dup monitor-disposed eq? [ drop already-disposed ] [ nip ] if
-    ] bi ;
+    check-disposed
+    [ ] [ queue>> ] [ timeout ] tri mailbox-get-timeout
+    dup monitor-disposed eq? [ drop already-disposed ] [ nip ] if ;
 
 SYMBOL: +add-file+
 SYMBOL: +remove-file+

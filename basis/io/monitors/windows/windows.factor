@@ -77,7 +77,7 @@ TUPLE: win32-monitor < monitor port ;
     ] each ;
 
 : fill-queue ( monitor -- )
-    dup port>> dup check-disposed
+    dup port>> check-disposed
     [ buffer>> ptr>> ] [ read-changes zero? ] bi
     [ 2dup parse-notify-records ] unless
     2drop ;

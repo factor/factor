@@ -39,7 +39,7 @@ HOOK: (wait-to-read) io-backend ( port -- )
     ] [ drop f ] if ; inline
 
 M: input-port stream-read1
-    dup check-disposed
+    check-disposed
     dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ; inline
 
 ERROR: not-a-c-ptr object ;
@@ -58,7 +58,7 @@ ERROR: not-a-c-ptr object ;
     { fixnum c-ptr } declare ; inline
 
 : prepare-read ( count port -- count' port )
-    [ integer>fixnum-strict 0 max ] dip dup check-disposed ; inline
+    [ integer>fixnum-strict 0 max ] dip check-disposed ; inline
 
 :: read-loop ( dst n-remaining port n-read -- n-total )
     n-remaining port read-step :> ( n-buffered ptr )
@@ -100,11 +100,15 @@ M: input-port stream-read-unsafe
 PRIVATE>
 
 M: input-port stream-read-until
-    2dup read-until-step dup [ [ 2drop ] 2dip ] [
+    2dup read-until-step dup [
+        [ 2drop ] 2dip
+    ] [
         over [
             drop
             BV{ } like [ read-until-loop ] keep B{ } like swap
-        ] [ [ 2drop ] 2dip ] if
+        ] [
+            [ 2drop ] 2dip
+        ] if
     ] if ;
 
 TUPLE: output-port < buffered-port ;
@@ -125,16 +129,16 @@ HOOK: (wait-to-write) io-backend ( port -- )
 PRIVATE>
 
 M: output-port stream-flush
-    [ check-disposed ] [ port-flush ] bi ;
+    check-disposed port-flush ;
 
 : wait-to-write ( len port -- )
     [ nip ] [ buffer>> buffer-capacity <= ] 2bi
     [ drop ] [ port-flush ] if ; inline
 
 M: output-port stream-write1
-    [ check-disposed ]
-    [ 1 swap wait-to-write ]
-    [ buffer>> buffer-write1 ] tri ; inline
+    check-disposed
+    1 over wait-to-write
+    buffer>> buffer-write1 ; inline
 
 <PRIVATE
 
@@ -152,7 +156,7 @@ M: output-port stream-write1
 PRIVATE>
 
 M: output-port stream-write
-    dup check-disposed [
+    check-disposed [
         binary-object
         [ check-c-ptr ] [ integer>fixnum-strict ] bi*
     ] [ port-write ] bi* ;
@@ -165,13 +169,20 @@ HOOK: can-seek-handle? os ( handle -- ? )
 
 HOOK: handle-length os ( handle -- n/f )
 
+<PRIVATE
+
+: port-tell ( port -- tell-handle buffer-length )
+    [ handle>> tell-handle ] [ buffer>> buffer-length ] bi ; inline
+
+PRIVATE>
+
 M: input-port stream-tell
-    [ check-disposed ]
-    [ [ handle>> tell-handle ] [ buffer>> buffer-length ] bi - ] bi ;
+    check-disposed port-tell - ;
 
 M: output-port stream-tell
-    [ check-disposed ]
-    [ [ handle>> tell-handle ] [ buffer>> buffer-length ] bi + ] bi ;
+    check-disposed port-tell + ;
+
+<PRIVATE
 
 :: do-seek-relative ( n seek-type stream -- n seek-type stream )
     ! seek-relative needs special handling here, because of the
@@ -180,17 +191,19 @@ M: output-port stream-tell
     [ n stream stream-tell + seek-absolute ] [ n seek-type ] if
     stream ; inline
 
+PRIVATE>
+
 M: input-port stream-seek
+    check-disposed
     do-seek-relative
-    [ check-disposed ]
     [ buffer>> 0 swap buffer-reset ]
-    [ handle>> seek-handle ] tri ;
+    [ handle>> seek-handle ] bi ;
 
 M: output-port stream-seek
+    check-disposed
     do-seek-relative
-    [ check-disposed ]
     [ stream-flush ]
-    [ handle>> seek-handle ] tri ;
+    [ handle>> seek-handle ] bi ;
 
 M: buffered-port stream-seekable?
     handle>> can-seek-handle? ;
@@ -221,10 +234,7 @@ M: buffered-port dispose*
 M: port cancel-operation handle>> cancel-operation ;
 
 M: port dispose*
-    [
-        [ handle>> &dispose drop ]
-        [ handle>> shutdown ] bi
-    ] with-destructors ;
+    [ handle>> &dispose shutdown ] with-destructors ;
 
 GENERIC: underlying-port ( stream -- port )
 
