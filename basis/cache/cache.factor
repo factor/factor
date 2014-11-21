@@ -22,7 +22,7 @@ M: cache-assoc assoc-size assoc>> assoc-size ;
 M: cache-assoc at* assoc>> at* [ dup [ 0 >>age value>> ] when ] dip ;
 
 M: cache-assoc set-at
-    [ check-disposed ] keep
+    check-disposed
     [ <cache-entry> ] 2dip
     assoc>> set-at ;
 

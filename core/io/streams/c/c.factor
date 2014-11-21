@@ -19,14 +19,14 @@ INSTANCE: c-writer file-writer
 : <c-writer> ( handle -- stream ) c-writer new-c-stream ;
 
 M: c-writer stream-write1
-    dup check-disposed handle>> fputc ;
+    check-disposed handle>> fputc ;
 
 M: c-writer stream-write
-    dup check-disposed
+    check-disposed
     [ binary-object ] [ handle>> ] bi* fwrite ;
 
 M: c-writer stream-flush
-    dup check-disposed handle>> fflush ;
+    check-disposed handle>> fflush ;
 
 TUPLE: c-reader < c-stream ;
 INSTANCE: c-reader input-stream
@@ -35,10 +35,10 @@ INSTANCE: c-reader file-reader
 : <c-reader> ( handle -- stream ) c-reader new-c-stream ;
 
 M: c-reader stream-read-unsafe
-    dup check-disposed handle>> fread-unsafe ;
+    check-disposed handle>> fread-unsafe ;
 
 M: c-reader stream-read1
-    dup check-disposed handle>> fgetc ;
+    check-disposed handle>> fgetc ;
 
 : read-until-loop ( handle seps accum -- accum ch )
     pick fgetc dup [
@@ -49,7 +49,7 @@ M: c-reader stream-read1
     ] if ; inline recursive
 
 M: c-reader stream-read-until
-    dup check-disposed handle>> swap
+    check-disposed handle>> swap
     32 <byte-vector> read-until-loop [ B{ } like ] dip
     over empty? over not and [ 2drop f f ] when ;
 

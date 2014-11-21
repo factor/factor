@@ -35,7 +35,7 @@ M: fd dispose
         } cleave
     ] unless-disposed ;
 
-M: fd handle-fd dup check-disposed fd>> ;
+M: fd handle-fd check-disposed fd>> ;
 
 M: fd cancel-operation ( fd -- )
     [
@@ -103,7 +103,7 @@ M: fd refill
 
 M: unix (wait-to-read) ( port -- )
     dup
-    dup handle>> dup check-disposed refill dup
+    dup handle>> check-disposed refill dup
     [ dupd wait-for-port (wait-to-read) ] [ 2drop ] if ;
 
 ! Writers
@@ -123,7 +123,7 @@ M: fd drain
 
 M: unix (wait-to-write) ( port -- )
     dup
-    dup handle>> dup check-disposed drain
+    dup handle>> check-disposed drain
     dup [ wait-for-port ] [ 2drop ] if ;
 
 M: unix io-multiplex ( nanos -- )
