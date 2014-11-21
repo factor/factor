@@ -35,7 +35,7 @@ M: unix copy-file ( from to -- )
 
 : with-unix-directory ( path quot -- )
     dupd '[ _ _
-        [ opendir dup [ (io-error) ] unless ] dip
+        [ opendir dup [ throw-errno ] unless ] dip
         dupd curry swap '[ _ closedir io-error ] [ ] cleanup
     ] with-directory ; inline
 

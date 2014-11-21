@@ -56,7 +56,7 @@ DEFER: wait-to-connect
         errno {
             { EAGAIN [ wait-for-output ] }
             { EINTR [ wait-to-connect ] }
-            [ (io-error) ]
+            [ throw-errno ]
         } case
     ] if ;
 
@@ -67,7 +67,7 @@ M: object establish-connection
         errno {
             { EINTR [ establish-connection ] }
             { EINPROGRESS [ drop wait-for-output ] }
-            [ (io-error) ]
+            [ throw-errno ]
         } case
     ] if ;
 
@@ -114,7 +114,7 @@ M: object (accept)
                 [ (accept) ]
                 2bi
             ] }
-            [ (io-error) ]
+            [ throw-errno ]
         } case
     ] if ;
 
@@ -157,7 +157,7 @@ M: unix (receive-unsafe)
                 datagram +output+ wait-for-port
                 packet sockaddr len socket datagram do-send
             ] }
-            [ (io-error) ]
+            [ throw-errno ]
         } case
     ] when ; inline recursive
 

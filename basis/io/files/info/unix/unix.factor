@@ -288,7 +288,7 @@ PRIVATE>
 
 : access? ( path mode -- ? )
     [ normalize-path ] [ access ] bi* 0 < [
-        errno EACCES = [ f ] [ (io-error) ] if
+        errno EACCES = [ f ] [ throw-errno ] if
     ] [ t ] if ;
 
 PRIVATE>
