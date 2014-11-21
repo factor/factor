@@ -9,7 +9,7 @@ IN: io.mmap.unix
     [
         f length prot flags
         path open-mode file-mode open-file [ <fd> |dispose drop ] keep
-        [ 0 mmap dup MAP_FAILED = [ (io-error) ] when ] keep
+        [ 0 mmap dup MAP_FAILED = [ throw-errno ] when ] keep
     ] with-destructors ;
 
 M: unix (mapped-file-r/w)
