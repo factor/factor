@@ -336,29 +336,29 @@ M: integer BC ( bo bi target_addr -- ) -2 shift 0 0 16 b-insn ;
 : ISEL ( rt ra rb bc -- ) 15 0 31 a-insn ;
 
 ! 3.3.12 Fixed-Point Logical Instructions
-: ANDI.   ( ra rs ui -- ) [ swap ] dip 28 d-insn ;
-: ANDIS.  ( ra rs ui -- ) [ swap ] dip 29 d-insn ;
-: ORI     ( ra rs ui -- ) [ swap ] dip 24 d-insn ;
-: ORIS    ( ra rs ui -- ) [ swap ] dip 25 d-insn ;
-: XORI    ( ra rs ui -- ) [ swap ] dip 26 d-insn ;
-: XORIS   ( ra rs ui -- ) [ swap ] dip 27 d-insn ;
-: AND     ( ra rs rb -- ) [ swap ] dip  28 0 31 x-insn ;
-: AND.    ( ra rs rb -- ) [ swap ] dip  28 1 31 x-insn ;
-: OR      ( ra rs rb -- ) [ swap ] dip 444 0 31 x-insn ;
-: OR.     ( ra rs rb -- ) [ swap ] dip 444 1 31 x-insn ;
-: XOR     ( ra rs rb -- ) [ swap ] dip 316 0 31 x-insn ;
-: XOR.    ( ra rs rb -- ) [ swap ] dip 316 1 31 x-insn ;
-: NAND    ( ra rs rb -- ) [ swap ] dip 476 0 31 x-insn ;
-: NAND.   ( ra rs rb -- ) [ swap ] dip 476 1 31 x-insn ;
-: NOR     ( ra rs rb -- ) [ swap ] dip 124 0 31 x-insn ;
-: NOR.    ( ra rs rb -- ) [ swap ] dip 124 1 31 x-insn ;
-: ANDC    ( ra rs rb -- ) [ swap ] dip  60 0 31 x-insn ;
-: ANDC.   ( ra rs rb -- ) [ swap ] dip  60 1 31 x-insn ;
-: EQV     ( ra rs rb -- ) [ swap ] dip 284 0 31 x-insn ;
-: EQV.    ( ra rs rb -- ) [ swap ] dip 284 1 31 x-insn ;
-: ORC     ( ra rs rb -- ) [ swap ] dip 412 0 31 x-insn ;
-: ORC.    ( ra rs rb -- ) [ swap ] dip 412 1 31 x-insn ;
-: CMPB    ( ra rs rb -- ) [ swap ] dip 508 0 31 x-insn ;
+: ANDI.   ( ra rs ui -- ) swapd 28 d-insn ;
+: ANDIS.  ( ra rs ui -- ) swapd 29 d-insn ;
+: ORI     ( ra rs ui -- ) swapd 24 d-insn ;
+: ORIS    ( ra rs ui -- ) swapd 25 d-insn ;
+: XORI    ( ra rs ui -- ) swapd 26 d-insn ;
+: XORIS   ( ra rs ui -- ) swapd 27 d-insn ;
+: AND     ( ra rs rb -- ) swapd  28 0 31 x-insn ;
+: AND.    ( ra rs rb -- ) swapd  28 1 31 x-insn ;
+: OR      ( ra rs rb -- ) swapd 444 0 31 x-insn ;
+: OR.     ( ra rs rb -- ) swapd 444 1 31 x-insn ;
+: XOR     ( ra rs rb -- ) swapd 316 0 31 x-insn ;
+: XOR.    ( ra rs rb -- ) swapd 316 1 31 x-insn ;
+: NAND    ( ra rs rb -- ) swapd 476 0 31 x-insn ;
+: NAND.   ( ra rs rb -- ) swapd 476 1 31 x-insn ;
+: NOR     ( ra rs rb -- ) swapd 124 0 31 x-insn ;
+: NOR.    ( ra rs rb -- ) swapd 124 1 31 x-insn ;
+: ANDC    ( ra rs rb -- ) swapd  60 0 31 x-insn ;
+: ANDC.   ( ra rs rb -- ) swapd  60 1 31 x-insn ;
+: EQV     ( ra rs rb -- ) swapd 284 0 31 x-insn ;
+: EQV.    ( ra rs rb -- ) swapd 284 1 31 x-insn ;
+: ORC     ( ra rs rb -- ) swapd 412 0 31 x-insn ;
+: ORC.    ( ra rs rb -- ) swapd 412 1 31 x-insn ;
+: CMPB    ( ra rs rb -- ) swapd 508 0 31 x-insn ;
 : EXTSB   ( ra rs -- ) swap 0 954 0 31 x-insn ;
 : EXTSB.  ( ra rs -- ) swap 0 954 1 31 x-insn ;
 : EXTSH   ( ra rs -- ) swap 0 922 0 31 x-insn ;
@@ -376,7 +376,7 @@ M: integer BC ( bo bi target_addr -- ) -2 shift 0 0 16 b-insn ;
 : CNTLZD  ( ra rs -- ) swap 0  58 0 31 x-insn ;
 : CNTLZD. ( ra rs -- ) swap 0  58 1 31 x-insn ;
 : POPCNTD ( ra rs -- ) swap 0 506 0 31 x-insn ;
-: BPERMD  ( ra rs rb -- ) [ swap ] dip 252 0 31 x-insn ;
+: BPERMD  ( ra rs rb -- ) swapd 252 0 31 x-insn ;
 
 ! 3.3.13.1 Fixed-Point Rotate and Shift Instructions
 : RLWINM  ( ra rs sh mb me -- ) [ swap ] 3dip 0 21 m-insn ;
@@ -417,27 +417,27 @@ M: integer BC ( bo bi target_addr -- ) -2 shift 0 0 16 b-insn ;
     tri* 3 swap 1 30 md-insn ;
 
 ! 3.3.13.2 Fixed-Point Shift Instructions
-: SLW    ( ra rs rb -- ) [ swap ] dip 24  0 31 x-insn ;
-: SLW.   ( ra rs rb -- ) [ swap ] dip 24  1 31 x-insn ;
-: SRW    ( ra rs rb -- ) [ swap ] dip 536 0 31 x-insn ;
-: SRW.   ( ra rs rb -- ) [ swap ] dip 536 1 31 x-insn ;
-: SRAWI  ( ra rs sh -- ) [ swap ] dip 824 0 31 x-insn ;
-: SRAWI. ( ra rs sh -- ) [ swap ] dip 824 1 31 x-insn ;
-: SRAW   ( ra rs rb -- ) [ swap ] dip 792 0 31 x-insn ;
-: SRAW.  ( ra rs rb -- ) [ swap ] dip 792 1 31 x-insn ;
+: SLW    ( ra rs rb -- ) swapd 24  0 31 x-insn ;
+: SLW.   ( ra rs rb -- ) swapd 24  1 31 x-insn ;
+: SRW    ( ra rs rb -- ) swapd 536 0 31 x-insn ;
+: SRW.   ( ra rs rb -- ) swapd 536 1 31 x-insn ;
+: SRAWI  ( ra rs sh -- ) swapd 824 0 31 x-insn ;
+: SRAWI. ( ra rs sh -- ) swapd 824 1 31 x-insn ;
+: SRAW   ( ra rs rb -- ) swapd 792 0 31 x-insn ;
+: SRAW.  ( ra rs rb -- ) swapd 792 1 31 x-insn ;
 
 ! 3.3.13.2.1 64-bit Fixed-Point Shift Instructions
-: SLD    ( ra rs rb -- ) [ swap ] dip  27 0 31 x-insn ;
-: SLD.   ( ra rs rb -- ) [ swap ] dip  27 1 31 x-insn ;
-: SRD    ( ra rs rb -- ) [ swap ] dip 539 0 31 x-insn ;
-: SRD.   ( ra rs rb -- ) [ swap ] dip 539 1 31 x-insn ;
-: SRAD   ( ra rs rb -- ) [ swap ] dip 794 0 31 x-insn ;
-: SRAD.  ( ra rs rb -- ) [ swap ] dip 794 1 31 x-insn ;
+: SLD    ( ra rs rb -- ) swapd  27 0 31 x-insn ;
+: SLD.   ( ra rs rb -- ) swapd  27 1 31 x-insn ;
+: SRD    ( ra rs rb -- ) swapd 539 0 31 x-insn ;
+: SRD.   ( ra rs rb -- ) swapd 539 1 31 x-insn ;
+: SRAD   ( ra rs rb -- ) swapd 794 0 31 x-insn ;
+: SRAD.  ( ra rs rb -- ) swapd 794 1 31 x-insn ;
 : SRADI  ( ra rs sh -- )
-    [ swap ] dip [ 0x1f bitand ] [ -5 shift ] bi
+    swapd [ 0x1f bitand ] [ -5 shift ] bi
     413 swap 0 31 xs-insn ;
 : SRADI. ( ra rs sh -- )
-    [ swap ] dip [ 0x1f bitand ] [ -5 shift ] bi
+    swapd [ 0x1f bitand ] [ -5 shift ] bi
     413 swap 1 31 xs-insn ;
 
 ! 3.3.14 BCD Assist Instructions
@@ -1336,8 +1336,8 @@ tri* 134 1 63 x-insn ;
 : EFSCFD    ( rt rb -- ) 0 swap 719 4 evx-insn ;
 
 ! 10.0 Legacy Move Assist Instruction
-: DLMZB  ( ra rs rb -- ) [ swap ] dip 0 78 31 x-insn ; deprecated
-: DLMZB. ( ra rs rb -- ) [ swap ] dip 1 78 31 x-insn ; deprecated
+: DLMZB  ( ra rs rb -- ) swapd 0 78 31 x-insn ; deprecated
+: DLMZB. ( ra rs rb -- ) swapd 1 78 31 x-insn ; deprecated
 
 ! 11.0 Legacy Integer Multiply-Accumulate Instructions
 : MACCHW     ( rt ra rb -- ) 0 172 0 4 xo-insn ; deprecated
