@@ -2,8 +2,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.data byte-arrays
-combinators destructors kernel libc math math.order sequences
-sequences.private typed ;
+combinators destructors kernel libc math math.order math.private
+sequences sequences.private typed ;
 IN: io.buffers
 
 TUPLE: buffer
@@ -18,17 +18,17 @@ disposed ;
 
 M: buffer dispose* ptr>> free ; inline
 
-TYPED: buffer-reset ( n buffer: buffer -- )
+TYPED: buffer-reset ( n: fixnum buffer: buffer -- )
     swap >>fill 0 >>pos drop ; inline
 
 TYPED: buffer-capacity ( buffer: buffer -- n )
-    [ size>> ] [ fill>> ] bi - >fixnum ; inline
+    [ size>> ] [ fill>> ] bi fixnum-fast ; inline
 
 TYPED: buffer-empty? ( buffer: buffer -- ? )
     fill>> zero? ; inline
 
 TYPED: buffer-consume ( n: fixnum buffer: buffer -- )
-    [ + ] change-pos
+    [ fixnum+fast ] change-pos
     dup [ pos>> ] [ fill>> ] bi <
     [ 0 >>pos 0 >>fill ] unless drop ; inline
 
@@ -39,7 +39,7 @@ TYPED: buffer-pop ( buffer: buffer -- byte )
     [ buffer-peek ] [ 1 swap buffer-consume ] bi ; inline
 
 TYPED: buffer-length ( buffer: buffer -- n )
-    [ fill>> ] [ pos>> ] bi - >fixnum ; inline
+    [ fill>> ] [ pos>> ] bi fixnum-fast ; inline
 
 TYPED: buffer@ ( buffer: buffer -- alien )
     [ pos>> ] [ ptr>> ] bi <displaced-alien> ; inline
@@ -66,8 +66,8 @@ TYPED: buffer-read-into ( dst n: fixnum buffer: buffer -- count )
 TYPED: buffer-end ( buffer: buffer -- alien )
     [ fill>> ] [ ptr>> ] bi <displaced-alien> ; inline
 
-TYPED: buffer+ ( n buffer: buffer -- )
-    [ + ] change-fill drop ; inline
+TYPED: buffer+ ( n: fixnum buffer: buffer -- )
+    [ fixnum+fast ] change-fill drop ; inline
 
 TYPED: buffer-write ( c-ptr n buffer: buffer -- )
     [ buffer-end -rot memcpy ] [ buffer+ ] 2bi ; inline
