@@ -135,7 +135,7 @@ M: ##test-imm-branch rewrite
     } cond ;
 
 : swap-compare ( src1 src2 cc swap? -- src1 src2 cc )
-    [ [ swap ] dip swap-cc ] when ; inline
+    [ swapd swap-cc ] when ; inline
 
 : (>compare-imm-branch) ( insn swap? -- src1 src2 cc )
     [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] dip swap-compare ; inline

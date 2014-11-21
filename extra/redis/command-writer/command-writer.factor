@@ -57,9 +57,9 @@ PRIVATE>
 : lpush ( value key -- ) 2array "LPUSH" write-command ;
 : llen ( key -- ) 1array "LLEN" write-command ;
 : lrange ( start end key -- )
-    [ swap ] dip 3array "LRANGE" write-command ;
+    swapd 3array "LRANGE" write-command ;
 : ltrim ( start end key -- )
-    [ swap ] dip 3array "LTRIM" write-command ;
+    swapd 3array "LTRIM" write-command ;
 : lindex ( integer key -- ) 2array "LINDEX" write-command ;
 : lset ( value index key -- ) 3array "LSET" write-command ;
 : lrem ( value amount key -- ) 3array "LREM" write-command ;
