@@ -42,6 +42,8 @@ M: input-port stream-read1
     dup check-disposed
     dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ; inline
 
+<PRIVATE
+
 : read-step ( count port -- count ptr/f )
     {
         { [ over 0 = ] [ 2drop 0 f ] }
@@ -50,44 +52,36 @@ M: input-port stream-read1
     } cond
     { fixnum c-ptr } declare ; inline
 
-: prepare-read ( count stream -- count stream )
-    dup check-disposed [ 0 max >fixnum ] dip ; inline
+: prepare-read ( count port -- count' port )
+    [ integer>fixnum-strict 0 max ] dip dup check-disposed ; inline
 
-M: input-port stream-read-partial-unsafe ( n dst port -- count )
-    [ swap ] dip prepare-read read-step
-    [ swap [ memcpy ] keep ] [ 2drop 0 ] if* ;
-
-:: read-loop ( n-remaining n-read port dst -- n-total )
-    n-remaining 0 > [
-        n-remaining port read-step :> ( n-buffered ptr )
-        ptr [
-            dst ptr n-buffered memcpy
-            n-remaining n-buffered - :> n-remaining'
-            n-read n-buffered + :> n-read'
-            n-buffered dst <displaced-alien> :> dst'
-            n-remaining' n-read' port dst' read-loop
-        ] [ n-read ] if
-    ] [ n-read ] if ; inline recursive
-
-M:: input-port stream-read-unsafe ( n dst port -- count )
-    n port prepare-read :> ( n' port' )
-    n' port' read-step :> ( n-buffered ptr )
+:: read-loop ( dst n-remaining port n-read -- n-total )
+    n-remaining port read-step :> ( n-buffered ptr )
     ptr [
         dst ptr n-buffered memcpy
-        n-buffered n' < [
-            n-buffered dst <displaced-alien> :> dst'
-            n' n-buffered - n-buffered port dst' read-loop
-        ] [
-            n-buffered
-        ] if
-    ] [ 0 ] if ;
+        n-remaining n-buffered - :> n-remaining'
+        n-read n-buffered + :> n-read'
+        n-buffered dst <displaced-alien> :> dst'
+        dst' n-remaining' port n-read' read-loop
+    ] [ n-read ] if ; inline recursive
 
-: read-until-step ( separators port -- string/f separator/f )
+PRIVATE>
+
+M: input-port stream-read-partial-unsafe
+    swapd prepare-read read-step
+    [ swap [ memcpy ] keep ] [ 2drop 0 ] if* ;
+
+M: input-port stream-read-unsafe
+    swapd prepare-read 0 read-loop ;
+
+<PRIVATE
+
+: read-until-step ( seps port -- byte-array/f sep/f )
     dup wait-to-read [ 2drop f f ] [
         buffer>> buffer-read-until
     ] if ; inline
 
-: read-until-loop ( seps port accum -- separator/f )
+: read-until-loop ( seps port accum -- sep/f )
     2over read-until-step over [
         [ append! ] dip dup [
             [ 3drop ] dip
@@ -98,7 +92,9 @@ M:: input-port stream-read-unsafe ( n dst port -- count )
         [ 4drop ] dip
     ] if ; inline recursive
 
-M: input-port stream-read-until ( seps port -- str/f sep/f )
+PRIVATE>
+
+M: input-port stream-read-until ( seps port -- byte-array/f sep/f )
     2dup read-until-step dup [ [ 2drop ] 2dip ] [
         over [
             drop
@@ -115,9 +111,13 @@ INSTANCE: output-port file-writer
 
 HOOK: (wait-to-write) io-backend ( port -- )
 
+<PRIVATE
+
 : port-flush ( port -- )
     dup buffer>> buffer-empty?
     [ drop ] [ dup (wait-to-write) port-flush ] if ; inline recursive
+
+PRIVATE>
 
 M: output-port stream-flush
     [ check-disposed ] [ port-flush ] bi ;
@@ -131,6 +131,8 @@ M: output-port stream-write1
     1 over wait-to-write
     buffer>> buffer-write1 ; inline
 
+<PRIVATE
+
 :: port-write ( c-ptr n-remaining port -- )
     port buffer>> :> buffer
     n-remaining buffer size>> min :> n-write
@@ -142,9 +144,11 @@ M: output-port stream-write1
         n-write c-ptr <displaced-alien> swap port port-write
     ] [ drop ] if ; inline recursive
 
+PRIVATE>
+
 M: output-port stream-write
     dup check-disposed
-    [ binary-object ] [ port-write ] bi* ;
+    [ binary-object integer>fixnum-strict ] [ port-write ] bi* ;
 
 HOOK: tell-handle os ( handle -- n )
 
@@ -229,12 +233,11 @@ M: object underlying-handle underlying-port handle>> ;
 
 ! Fast-path optimization
 
-HINTS: (decode-until) { string input-port object } ;
+HINTS: (decode-until)
+    { string input-port object } ;
 
 HINTS: M\ input-port stream-read-partial-unsafe
-    { fixnum byte-array input-port }
-    { fixnum string input-port } ;
+    { fixnum byte-array object } ;
 
 HINTS: M\ input-port stream-read-unsafe
-    { fixnum byte-array input-port }
-    { fixnum string input-port } ;
+    { fixnum byte-array object } ;
