@@ -91,12 +91,15 @@ ERROR: not-a-buffered-port port ;
 M: fd refill
     [ check-buffered-port buffer>> ] [ fd>> ] bi*
     over [ buffer-end ] [ buffer-capacity ] bi read
-    { fixnum } declare {
-        { [ dup 0 >= ] [ swap buffer+ f ] }
-        { [ errno EINTR = ] [ 2drop +retry+ ] }
-        { [ errno EAGAIN = ] [ 2drop +input+ ] }
-        [ (io-error) ]
-    } cond ;
+    { fixnum } declare dup 0 >= [
+        swap buffer+ f
+    ] [
+        errno {
+            { EINTR [ 2drop +retry+ ] }
+            { EAGAIN [ 2drop +input+ ] }
+            [ (io-error) ]
+        } case
+    ] if ;
 
 M: unix (wait-to-read) ( port -- )
     dup
@@ -107,15 +110,16 @@ M: unix (wait-to-read) ( port -- )
 M: fd drain
     [ check-buffered-port buffer>> ] [ fd>> ] bi*
     over [ buffer@ ] [ buffer-length ] bi write
-    { fixnum } declare {
-        { [ dup 0 >= ] [
-            over buffer-consume
-            buffer-empty? f +output+ ?
-        ] }
-        { [ errno EINTR = ] [ 2drop +retry+ ] }
-        { [ errno EAGAIN = ] [ 2drop +output+ ] }
-        [ (io-error) ]
-    } cond ;
+    { fixnum } declare dup 0 >= [
+        over buffer-consume
+        buffer-empty? f +output+ ?
+    ] [
+        errno {
+            { EINTR [ 2drop +retry+ ] }
+            { EAGAIN [ 2drop +output+ ] }
+            [ (io-error) ]
+        } case
+    ] if ;
 
 M: unix (wait-to-write) ( port -- )
     dup
