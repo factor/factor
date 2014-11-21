@@ -14,6 +14,21 @@ struct aging_space : bump_allocator<object> {
     starts.record_object_start_offset(obj);
     return obj;
   }
+
+  cell next_object_after(cell scan) {
+    cell size = ((object*)scan)->size();
+    if (scan + size < here)
+      return scan + size;
+    else
+      return 0;
+  }
+
+  cell first_object() {
+    if (start != here)
+      return start;
+    else
+      return 0;
+  }
 };
 
 }
