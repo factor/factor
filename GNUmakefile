@@ -92,7 +92,6 @@ ifdef CONFIG
 		vm/free_list_allocator.hpp \
 		vm/write_barrier.hpp \
 		vm/object_start_map.hpp \
-		vm/nursery_space.hpp \
 		vm/aging_space.hpp \
 		vm/tenured_space.hpp \
 		vm/data_heap.hpp \
