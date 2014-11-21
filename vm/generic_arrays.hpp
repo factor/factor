@@ -23,7 +23,8 @@ Array* factor_vm::allot_uninitialized_array(cell capacity) {
 
 template <typename Array>
 bool factor_vm::reallot_array_in_place_p(Array* array, cell capacity) {
-  return nursery.contains_p(array) && capacity <= array_capacity(array);
+  return data->nursery->contains_p(array) &&
+      capacity <= array_capacity(array);
 }
 
 /* Allocates memory (sometimes) */
