@@ -97,7 +97,7 @@ M: fd refill
         errno {
             { EINTR [ 2drop +retry+ ] }
             { EAGAIN [ 2drop +input+ ] }
-            [ (io-error) ]
+            [ throw-errno ]
         } case
     ] if ;
 
@@ -117,7 +117,7 @@ M: fd drain
         errno {
             { EINTR [ 2drop +retry+ ] }
             { EAGAIN [ 2drop +output+ ] }
-            [ (io-error) ]
+            [ throw-errno ]
         } case
     ] if ;
 
@@ -155,7 +155,11 @@ M: stdin dispose*
     stdin data>> handle-fd buffer buffer-end size read
     dup 0 < [
         drop
-        errno EINTR = [ buffer stdin size refill-stdin ] [ (io-error) ] if
+        errno EINTR = [
+            buffer stdin size refill-stdin
+        ] [
+            throw-errno
+        ] if
     ] [
         size = [ "Error reading stdin pipe" throw ] unless
         size buffer buffer+
@@ -215,7 +219,7 @@ TUPLE: mx-port < port mx ;
 : multiplexer-error ( n -- n )
     dup 0 < [
         errno [ EAGAIN = ] [ EINTR = ] bi or
-        [ drop 0 ] [ (io-error) ] if
+        [ drop 0 ] [ throw-errno ] if
     ] when ;
 
 :: ?flag ( n mask symbol -- n )

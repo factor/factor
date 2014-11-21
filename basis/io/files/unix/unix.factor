@@ -8,7 +8,7 @@ IN: io.files.unix
 M: unix cwd ( -- path )
     MAXPATHLEN [ <byte-array> ] keep
     [ getcwd ] unix-system-call
-    [ (io-error) ] unless* ;
+    [ throw-errno ] unless* ;
 
 M: unix cd ( path -- ) [ chdir ] unix-system-call drop ;
 

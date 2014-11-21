@@ -17,7 +17,7 @@ IN: io.files.acls.macosx
         ! [ uuid_string_t <struct> [ mbr_uuid_to_string io-error ] keep ]
     } case ;
 
-: acl-error ( n -- ) -1 = [ (io-error) ] when ; inline
+: acl-error ( n -- ) -1 = [ throw-errno ] when ; inline
 
 :: file-acl ( path -- acl_t/f )
     path
@@ -25,9 +25,10 @@ IN: io.files.acls.macosx
     clear-errno
     ACL_TYPE_EXTENDED acl_get_file dup [
         errno ENOENT = [
-            [ path exists? ] preserve-errno [ drop f ] [ (io-error) ] if
+            [ path exists? ] preserve-errno
+            [ drop f ] [ throw-errno ] if
         ] [
-            (io-error)
+            throw-errno
         ] if
     ] unless ;
 
