@@ -7,7 +7,11 @@ void factor_vm::init_card_decks() {
   decks_offset = (cell)data->decks - addr_to_deck(data->start);
 }
 
-data_heap::data_heap(cell young_size_, cell aging_size_, cell tenured_size_) {
+data_heap::data_heap(nursery_space* vm_nursery,
+                     cell young_size_,
+                     cell aging_size_,
+                     cell tenured_size_) {
+
   young_size_ = align(young_size_, deck_size);
   aging_size_ = align(aging_size_, deck_size);
   tenured_size_ = align(tenured_size_, deck_size);
@@ -36,14 +40,18 @@ data_heap::data_heap(cell young_size_, cell aging_size_, cell tenured_size_) {
   aging = new aging_space(aging_size, tenured->end);
   aging_semispace = new aging_space(aging_size, aging->end);
 
-  nursery = new nursery_space(young_size, aging_semispace->end);
+  // Initialize vm nursery
+  vm_nursery->here = aging_semispace->end;
+  vm_nursery->start = aging_semispace->end;
+  vm_nursery->end = vm_nursery->start + young_size;
+  vm_nursery->size = young_size;
+  nursery = vm_nursery;
 
   FACTOR_ASSERT(seg->end - nursery->end <= deck_size);
 }
 
 data_heap::~data_heap() {
   delete seg;
-  delete nursery;
   delete aging;
   delete aging_semispace;
   delete tenured;
@@ -51,9 +59,10 @@ data_heap::~data_heap() {
   delete[] decks;
 }
 
-data_heap* data_heap::grow(cell requested_bytes) {
+data_heap* data_heap::grow(nursery_space* vm_nursery, cell requested_bytes) {
+  FACTOR_ASSERT(vm_nursery->occupied_space() == 0);
   cell new_tenured_size = (tenured_size * 2) + requested_bytes;
-  return new data_heap(young_size, aging_size, new_tenured_size);
+  return new data_heap(vm_nursery, young_size, aging_size, new_tenured_size);
 }
 
 template <typename Generation> void data_heap::clear_cards(Generation* gen) {
@@ -99,21 +108,20 @@ void data_heap::mark_all_cards() {
 
 void factor_vm::set_data_heap(data_heap* data_) {
   data = data_;
-  nursery = *data->nursery;
   init_card_decks();
 }
 
 void factor_vm::init_data_heap(cell young_size, cell aging_size,
                                cell tenured_size) {
-  set_data_heap(new data_heap(young_size, aging_size, tenured_size));
+  set_data_heap(new data_heap(&nursery, young_size, aging_size, tenured_size));
 }
 
 data_heap_room factor_vm::data_room() {
   data_heap_room room;
 
-  room.nursery_size = nursery.size;
-  room.nursery_occupied = nursery.occupied_space();
-  room.nursery_free = nursery.free_space();
+  room.nursery_size = data->nursery->size;
+  room.nursery_occupied = data->nursery->occupied_space();
+  room.nursery_free = data->nursery->free_space();
   room.aging_size = data->aging->size;
   room.aging_occupied = data->aging->occupied_space();
   room.aging_free = data->aging->free_space();
