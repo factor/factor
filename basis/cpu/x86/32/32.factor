@@ -101,7 +101,7 @@ M: x86.32 %load-stack-param ( dst rep n -- )
     ] if ;
 
 M: x86.32 %store-stack-param ( src rep n -- )
-    stack@ swap pick register? [ [ swap ] dip %copy ] [
+    stack@ swap pick register? [ swapd %copy ] [
         {
             { int-rep [ [ [ EAX ] dip ?spill-slot MOV ] [ EAX MOV ] bi* ] }
             { float-rep [ [ ?spill-slot FLDS ] [ FSTPS ] bi* ] }

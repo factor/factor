@@ -98,7 +98,7 @@ DEFER: make-boxer
 ! defining typed words
 
 MACRO: (typed) ( word def effect -- quot )
-    [ swap ] dip
+    swapd
     [
         nip effect-in-types swap
         [ [ unboxed-types ] [ make-boxer ] bi ] dip
