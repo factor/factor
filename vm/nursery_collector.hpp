@@ -5,7 +5,9 @@ struct nursery_policy {
 
   explicit nursery_policy(factor_vm* parent) : parent(parent) {}
 
-  bool should_copy_p(object* obj) { return parent->nursery.contains_p(obj); }
+  bool should_copy_p(object* obj) {
+    return parent->data->nursery->contains_p(obj);
+  }
 
   void promoted_object(object* obj) {}
 
