@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien byte-arrays combinators destructors hints
 io io.backend io.buffers io.encodings io.files io.timeouts
-kernel kernel.private libc locals math math.order namespaces
-sequences strings system ;
+kernel kernel.private libc locals math math.order math.private
+namespaces sequences strings system ;
 IN: io.ports
 
 SYMBOL: default-buffer-size
@@ -42,6 +42,11 @@ M: input-port stream-read1
     dup check-disposed
     dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ; inline
 
+ERROR: not-a-c-ptr object ;
+
+: check-c-ptr ( c-ptr -- c-ptr )
+    dup c-ptr? [ not-a-c-ptr ] unless ; inline
+
 <PRIVATE
 
 : read-step ( count port -- count ptr/f )
@@ -59,8 +64,8 @@ M: input-port stream-read1
     n-remaining port read-step :> ( n-buffered ptr )
     ptr [
         dst ptr n-buffered memcpy
-        n-remaining n-buffered - :> n-remaining'
-        n-read n-buffered + :> n-read'
+        n-remaining n-buffered fixnum-fast :> n-remaining'
+        n-read n-buffered fixnum+fast :> n-read'
         n-buffered dst <displaced-alien> :> dst'
         dst' n-remaining' port n-read' read-loop
     ] [ n-read ] if ; inline recursive
@@ -68,11 +73,11 @@ M: input-port stream-read1
 PRIVATE>
 
 M: input-port stream-read-partial-unsafe
-    swapd prepare-read read-step
+    [ check-c-ptr swap ] dip prepare-read read-step
     [ swap [ memcpy ] keep ] [ 2drop 0 ] if* ;
 
 M: input-port stream-read-unsafe
-    swapd prepare-read 0 read-loop ;
+    [ check-c-ptr swap ] dip prepare-read 0 read-loop ;
 
 <PRIVATE
 
@@ -94,7 +99,7 @@ M: input-port stream-read-unsafe
 
 PRIVATE>
 
-M: input-port stream-read-until ( seps port -- byte-array/f sep/f )
+M: input-port stream-read-until
     2dup read-until-step dup [ [ 2drop ] 2dip ] [
         over [
             drop
@@ -127,9 +132,9 @@ M: output-port stream-flush
     [ drop ] [ port-flush ] if ; inline
 
 M: output-port stream-write1
-    dup check-disposed
-    1 over wait-to-write
-    buffer>> buffer-write1 ; inline
+    [ check-disposed ]
+    [ 1 swap wait-to-write ]
+    [ buffer>> buffer-write1 ] tri ; inline
 
 <PRIVATE
 
@@ -140,15 +145,17 @@ M: output-port stream-write1
     n-write port wait-to-write
     c-ptr n-write buffer buffer-write
 
-    n-remaining n-write - dup 0 > [
+    n-remaining n-write fixnum-fast dup 0 > [
         n-write c-ptr <displaced-alien> swap port port-write
     ] [ drop ] if ; inline recursive
 
 PRIVATE>
 
 M: output-port stream-write
-    dup check-disposed
-    [ binary-object integer>fixnum-strict ] [ port-write ] bi* ;
+    dup check-disposed [
+        binary-object
+        [ check-c-ptr ] [ integer>fixnum-strict ] bi*
+    ] [ port-write ] bi* ;
 
 HOOK: tell-handle os ( handle -- n )
 
@@ -235,9 +242,3 @@ M: object underlying-handle underlying-port handle>> ;
 
 HINTS: (decode-until)
     { string input-port object } ;
-
-HINTS: M\ input-port stream-read-partial-unsafe
-    { fixnum byte-array object } ;
-
-HINTS: M\ input-port stream-read-unsafe
-    { fixnum byte-array object } ;
