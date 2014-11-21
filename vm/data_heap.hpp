@@ -9,6 +9,7 @@ struct data_heap {
 
   segment* seg;
 
+  /* Borrowed reference to a factor_vm::nursery */
   nursery_space* nursery;
   aging_space* aging;
   aging_space* aging_semispace;
@@ -20,9 +21,12 @@ struct data_heap {
   card_deck* decks;
   card_deck* decks_end;
 
-  data_heap(cell young_size, cell aging_size, cell tenured_size);
+  data_heap(nursery_space* vm_nursery,
+            cell young_size,
+            cell aging_size,
+            cell tenured_size);
   ~data_heap();
-  data_heap* grow(cell requested_size);
+  data_heap* grow(nursery_space* vm_nursery, cell requested_size);
   template <typename Generation> void clear_cards(Generation* gen);
   template <typename Generation> void clear_decks(Generation* gen);
   void reset_generation(nursery_space* gen);
