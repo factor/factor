@@ -56,7 +56,7 @@ M: unix copy-file ( from to -- )
 
 : next-dirent ( DIR* dirent* -- dirent* ? )
     f void* <ref> [
-        readdir_r [ dup strerror libc-error ] unless-zero
+        readdir_r [ (throw-errno) ] unless-zero
     ] 2keep void* deref ; inline
 
 : >directory-entry ( dirent* -- directory-entry )

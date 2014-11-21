@@ -45,7 +45,9 @@ M: object strerror strerror_unsafe ;
 
 ERROR: libc-error errno message ;
 
-: throw-errno ( -- * ) errno dup strerror libc-error ;
+: (throw-errno) ( errno -- * ) dup strerror libc-error ;
+
+: throw-errno ( -- * ) errno (throw-errno) ;
 
 : io-error ( n -- ) 0 < [ throw-errno ] when ;
 
