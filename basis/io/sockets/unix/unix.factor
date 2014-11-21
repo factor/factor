@@ -15,10 +15,10 @@ IN: io.sockets.unix
 : set-socket-option ( fd level opt -- )
     [ handle-fd ] 2dip 1 int <ref> dup byte-length setsockopt io-error ;
 
-M: unix addrinfo-error-string ( n -- string )
+M: unix addrinfo-error-string
     gai_strerror ;
 
-M: unix sockaddr-of-family ( alien af -- addrspec )
+M: unix sockaddr-of-family
     {
         { AF_INET [ sockaddr-in memory>struct ] }
         { AF_INET6 [ sockaddr-in6 memory>struct ] }
@@ -26,7 +26,7 @@ M: unix sockaddr-of-family ( alien af -- addrspec )
         [ 2drop f ]
     } case ;
 
-M: unix addrspec-of-family ( af -- addrspec )
+M: unix addrspec-of-family
     {
         { AF_INET [ T{ ipv4 } ] }
         { AF_INET6 [ T{ ipv6 } ] }
@@ -35,40 +35,41 @@ M: unix addrspec-of-family ( af -- addrspec )
     } case ;
 
 ! Client sockets - TCP and Unix domain
-M: object (get-local-address) ( handle remote -- sockaddr )
+M: object (get-local-address)
     [ handle-fd ] dip empty-sockaddr/size int <ref>
     [ getsockname io-error ] 2keep drop ;
 
-M: object (get-remote-address) ( handle local -- sockaddr )
+M: object (get-remote-address)
     [ handle-fd ] dip empty-sockaddr/size int <ref>
     [ getpeername io-error ] 2keep drop ;
 
 : init-client-socket ( fd -- )
     SOL_SOCKET SO_OOBINLINE set-socket-option ;
 
-: wait-to-connect ( port -- )
-    dup handle>> handle-fd f 0 write
-    {
-        { [ 0 = ] [ drop ] }
-        { [ errno EAGAIN = ] [ dup +output+ wait-for-port wait-to-connect ] }
-        { [ errno EINTR = ] [ wait-to-connect ] }
-        [ (io-error) ]
-    } cond ;
+DEFER: wait-to-connect
 
-M:: object establish-connection ( client-out remote -- )
-    client-out remote
-    [ drop ]
-    [
-        [ handle>> handle-fd ] [ make-sockaddr/size ] bi* connect
-    ] 2bi
-    {
-        { [ 0 = ] [ drop ] }
-        { [ errno EINTR = ] [ drop client-out remote establish-connection ] }
-        { [ errno EINPROGRESS = ] [
-            [ +output+ wait-for-port ] [ wait-to-connect ] bi
-        ] }
-        [ (io-error) ]
-    } cond ;
+: wait-for-output ( port -- )
+    dup +output+ wait-for-port wait-to-connect ; inline
+
+: wait-to-connect ( port -- )
+    dup handle>> handle-fd f 0 write 0 = [ drop ] [
+        errno {
+            { EAGAIN [ wait-for-output ] }
+            { EINTR [ wait-to-connect ] }
+            [ (io-error) ]
+        } case
+    ] if ;
+
+M: object establish-connection
+    2dup
+    [ handle>> handle-fd ] [ make-sockaddr/size ] bi*
+    connect 0 = [ 2drop ] [
+        errno {
+            { EINTR [ establish-connection ] }
+            { EINPROGRESS [ drop wait-for-output ] }
+            [ (io-error) ]
+        } case
+    ] if ;
 
 : ?bind-client ( socket -- )
     bind-local-address get [
@@ -78,7 +79,7 @@ M:: object establish-connection ( client-out remote -- )
         drop
     ] if* ; inline
 
-M: object ((client)) ( addrspec -- fd )
+M: object ((client))
     [ protocol-family SOCK_STREAM ] [ protocol ] bi socket-fd
     [ init-client-socket ] [ ?bind-client ] [ ] tri ;
 
@@ -91,7 +92,7 @@ M: object ((client)) ( addrspec -- fd )
     [ init-server-socket ] keep
     [ handle-fd swap make-sockaddr/size [ bind ] unix-system-call drop ] keep ;
 
-M: object (server) ( addrspec -- handle )
+M: object (server)
     [
         SOCK_STREAM server-socket-fd
         dup handle-fd 128 [ listen ] unix-system-call drop
@@ -101,19 +102,21 @@ M: object (server) ( addrspec -- handle )
     [ handle>> handle-fd ] [ empty-sockaddr/size int <ref> ] bi*
     [ accept ] 2keep drop ; inline
 
-M: object (accept) ( server addrspec -- fd sockaddr )
-    2dup do-accept
-    {
-        { [ over 0 >= ] [ [ 2nip <fd> init-fd ] dip ] }
-        { [ errno EINTR = ] [ 2drop (accept) ] }
-        { [ errno EAGAIN = ] [
-            2drop
-            [ drop +input+ wait-for-port ]
-            [ (accept) ]
-            2bi
-        ] }
-        [ (io-error) ]
-    } cond ;
+M: object (accept)
+    2dup do-accept over 0 >= [
+        [ 2nip <fd> init-fd ] dip
+    ] [
+        errno {
+            { EINTR [ 2drop (accept) ] }
+            { EAGAIN [
+                2drop
+                [ drop +input+ wait-for-port ]
+                [ (accept) ]
+                2bi
+            ] }
+            [ (io-error) ]
+        } case
+    ] if ;
 
 ! Datagram sockets - UDP and Unix domain
 M: unix (datagram)
@@ -140,25 +143,25 @@ M: unix (broadcast)
         2drop [ +input+ wait-for-port ] [ (receive-loop) ] bi
     ] if ; inline recursive
 
-M: unix (receive-unsafe) ( n buf datagram -- count sockaddr )
+M: unix (receive-unsafe)
     (receive-loop) ;
 
 :: do-send ( packet sockaddr len socket datagram -- )
     socket handle-fd packet dup length 0 sockaddr len sendto
     0 < [
-        errno EINTR = [
-            packet sockaddr len socket datagram do-send
-        ] [
-            errno EAGAIN = [
+        errno {
+            { EINTR [
+                packet sockaddr len socket datagram do-send
+            ] }
+            { EAGAIN [
                 datagram +output+ wait-for-port
                 packet sockaddr len socket datagram do-send
-            ] [
-                (io-error)
-            ] if
-        ] if
+            ] }
+            [ (io-error) ]
+        } case
     ] when ; inline recursive
 
-M: unix (send) ( packet addrspec datagram -- )
+M: unix (send)
     [ make-sockaddr/size ] [ [ handle>> ] keep ] bi* do-send ;
 
 ! Unix domain sockets
