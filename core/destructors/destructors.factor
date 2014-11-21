@@ -35,8 +35,8 @@ GENERIC: dispose* ( disposable -- )
 
 ERROR: already-disposed disposable ;
 
-: check-disposed ( disposable -- )
-    dup disposed>> [ already-disposed ] [ drop ] if ; inline
+: check-disposed ( disposable -- disposable )
+    dup disposed>> [ already-disposed ] when ; inline
 
 GENERIC: dispose ( disposable -- )
 

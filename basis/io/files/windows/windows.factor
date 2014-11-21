@@ -165,7 +165,7 @@ M: windows handle-length ( handle -- n/f )
     ptr>> [ [ 32 bits >>offset ] [ -32 shift >>offset-high ] bi ] when* ;
 
 : make-FileArgs ( port handle -- <FileArgs> )
-    [ nip dup check-disposed handle>> ]
+    [ nip check-disposed handle>> ]
     [
         [ buffer>> dup buffer-length 0 DWORD <ref> ] dip make-overlapped
     ] 2bi <FileArgs> ;

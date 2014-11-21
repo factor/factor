@@ -296,10 +296,10 @@ ERROR: invalid-port object ;
     dup { [ datagram-port? ] [ raw-port? ] } 1|| [ invalid-port ] unless ;
 
 : check-send ( packet addrspec port -- packet addrspec port )
-    check-connectionless-port dup check-disposed check-port ;
+    check-connectionless-port check-disposed check-port ;
 
 : check-receive ( port -- port )
-    check-connectionless-port dup check-disposed ;
+    check-connectionless-port check-disposed ;
 
 HOOK: (send) io-backend ( packet addrspec datagram -- )
 
