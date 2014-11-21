@@ -118,7 +118,6 @@ FUNCTION: size_t strlen ( c-string alien ) ;
 FUNCTION: int system ( c-string command ) ;
 
 DESTRUCTOR: free
-DESTRUCTOR: (free)
 
 ! For libc.linux, libc.windows, libc.macosx...
 << "libc." os name>> append require >>

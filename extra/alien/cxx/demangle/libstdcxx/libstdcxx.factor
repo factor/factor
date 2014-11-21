@@ -21,6 +21,8 @@ ERROR: invalid-demangle-args name ;
 : mangled-name? ( name -- ? )
     "_Z" head? ;
 
+DESTRUCTOR: (free)
+
 :: demangle ( mangled-name -- c++-name )
     0 ulong <ref> :> length
     0 int <ref> :> status [
