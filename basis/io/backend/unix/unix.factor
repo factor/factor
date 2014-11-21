@@ -97,7 +97,7 @@ M: fd refill
         errno {
             { EINTR [ 2drop +retry+ ] }
             { EAGAIN [ 2drop +input+ ] }
-            [ throw-errno ]
+            [ (throw-errno) ]
         } case
     ] if ;
 
@@ -117,7 +117,7 @@ M: fd drain
         errno {
             { EINTR [ 2drop +retry+ ] }
             { EAGAIN [ 2drop +output+ ] }
-            [ throw-errno ]
+            [ (throw-errno) ]
         } case
     ] if ;
 
