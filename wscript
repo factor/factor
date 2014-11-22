@@ -145,7 +145,10 @@ def configure(ctx):
 
     # Values to be inked into the binary.
     ctx.define('FACTOR_VERSION', VERSION)
-    git_label = ctx.cmd_and_log("git describe --all --long").strip()
+    try:
+        git_label = ctx.cmd_and_log("git describe --all --long").strip()
+    except Errors.WafError, e:
+        git_label = 'tarball-build'
     ctx.define('FACTOR_GIT_LABEL', git_label)
     ctx.define('INSTALL_PREFIX', pf)
 
