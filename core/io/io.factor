@@ -223,6 +223,7 @@ CONSTANT: each-block-size 65536
 ! Default implementations of stream operations in terms of read1/write1
 
 <PRIVATE
+
 : read-loop ( buf stream n i -- count )
      2dup = [ nip nip nip ] [
         pick stream-read1 [
@@ -237,13 +238,13 @@ CONSTANT: each-block-size 65536
 : read-until-loop ( seps stream -- seq sep/f )
     [ [ stream-read1 dup [ rot member? not ] [ nip f ] if* ] 2curry [ ] ]
     [ stream-exemplar ] bi produce-as swap finalize-read-until ; inline
+
 PRIVATE>
 
 M: input-stream stream-read-unsafe rot 0 read-loop ; inline
 M: input-stream stream-read-partial-unsafe stream-read-unsafe ; inline
 M: input-stream stream-read-until read-until-loop ; inline
-M: input-stream stream-readln
-    "\n" swap stream-read-until drop ; inline
+M: input-stream stream-readln "\n" swap stream-read-until drop ; inline
 M: input-stream stream-contents* (stream-contents-by-length-or-block) ; inline
 M: input-stream stream-seekable? drop f ; inline
 M: input-stream stream-length drop f ; inline
