@@ -28,11 +28,6 @@ PRIVATE>
 : split*-slice ( seq separators -- pieces )
     [ member? ] curry split*-when-slice ; inline
 
-: split-nth ( seq n -- seq )
-    0 swap
-    [ drop 1 + 2dup = [ drop 0 t ] [ f ] if ] split*-when 2nip
-    ;
-
 : split-find ( seq quot: ( seq -- i ) -- pieces )
     [ dup empty? not ] swap [ [ dup ] ] dip
     [ [ [ 1 ] when-zero cut-slice swap ] [ f swap ] if* ] compose

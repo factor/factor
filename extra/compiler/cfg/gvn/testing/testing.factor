@@ -3,7 +3,7 @@
 USING: accessors assocs compiler.cfg compiler.cfg.debugger
 compiler.cfg.graphviz compiler.cfg.gvn
 compiler.cfg.gvn.expressions compiler.cfg.gvn.graph
-compiler.cfg.optimizer continuations formatting graphviz
+compiler.cfg.optimizer compiler.cfg.utilities continuations formatting graphviz
 graphviz.notation graphviz.render io.directories kernel
 math.parser namespaces prettyprint sequences sorting splitting
 tools.annotations ;
@@ -104,4 +104,4 @@ SYMBOL: iteration
     ] [ reset-gvn ] [ ] cleanup ;
 
 : watch-gvn-bb ( path insns -- )
-    0 test-bb cfg new 0 get >>entry watch-gvn-cfg ;
+    0 test-bb 0 get block>cfg watch-gvn-cfg ;

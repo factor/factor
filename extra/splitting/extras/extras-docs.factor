@@ -11,16 +11,6 @@ HELP: split*
 { $description "A variant of " { $link split } " that includes the elements along which the sequence was split." }
 { $examples { $example "USING: prettyprint splitting.extras ;" "\"hello world-how are you?\" \" -\" split* ." "{ \"hello\" \" \" \"world\" \"-\" \"how\" \" \" \"are\" \" \" \"you?\" }" } } ;
 
-HELP: split-nth
-{ $values  { "n" "value" } { "seq" "value" } { "seq" "value" } }
-{ $description "Splits a sequence into groups n wide. Last group is not padded" }
-{ $examples
-  { $code 
-    "USING: splitting ;" "2 { 1 2 3 4 5 } split-nth ." "{ { 1 2 } { 3 4 } { 5 } }"
-    }
-}
-;
-
 HELP: split-find
 { $values { "seq" sequence } { "quot" { $quotation ( seq -- i ) } } { "pieces" "a new array" } }
 { $description "Splits a sequence into slices using the provided quotation to find split points." } ;

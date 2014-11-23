@@ -56,8 +56,7 @@ width     = (width_)?            => [[ [ ] or ]]
 digits_   = "." ([0-9])*         => [[ second >digits ]]
 digits    = (digits_)?           => [[ 6 or ]]
 
-fmt-@     = "@"                  => [[ [ unparse ] ]]
-fmt-%     = "%"                  => [[ [ "%" ] ]]
+fmt-%     = "%"                  => [[ "%" ]]
 fmt-c     = "c"                  => [[ [ 1string ] ]]
 fmt-C     = "C"                  => [[ [ 1string >upper ] ]]
 fmt-s     = "s"                  => [[ [ present ] ]]
@@ -79,9 +78,7 @@ strings   = pad width strings_   => [[ <reversed> compose-all ]]
 numbers_  = fmt-d|fmt-o|fmt-b|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
 numbers   = sign pad numbers_    => [[ unclip-last prefix compose-all [ fix-sign ] append ]]
 
-object    = fmt-@
-
-types     = strings|numbers|object
+types     = strings|numbers
 
 lists     = "[%" types ", %]"    => [[ second '[ _ map ", " join "{ " prepend " }" append ] ]]
 

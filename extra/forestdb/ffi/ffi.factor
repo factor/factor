@@ -22,7 +22,7 @@ TYPEDEF: void* fdb_custom_cmp_fixed
 TYPEDEF: void* fdb_custom_cmp_variable
 TYPEDEF: void* fdb_log_callback
 TYPEDEF: void* fdb_file_handle
-TYPEDEF: void* fdb_handle
+TYPEDEF: void* fdb_kvs_handle
 TYPEDEF: void* fdb_iterator
 
 ENUM: fdb_commit_opt_t
@@ -161,33 +161,33 @@ FUNCTION: fdb_kvs_config fdb_get_default_kvs_config ( ) ;
 FUNCTION: fdb_status fdb_open ( fdb_file_handle** ptr_fhandle, c-string filename, fdb_config* fconfig ) ;
 FUNCTION: fdb_status fdb_open_custom_cmp ( fdb_file_handle** ptr_fhandle, c-string filename, fdb_config* fconfig, size_t num_functions, char** kvs_names, fdb_custom_cmp_variable* functions ) ;
 
-FUNCTION: fdb_status fdb_set_log_callback ( fdb_handle* handle, fdb_log_callback log_callback, void* ctx_data ) ;
+FUNCTION: fdb_status fdb_set_log_callback ( fdb_kvs_handle* handle, fdb_log_callback log_callback, void* ctx_data ) ;
 
 ! doc is calloc'd
 FUNCTION: fdb_status fdb_doc_create ( fdb_doc** doc, c-string key, size_t keylen, c-string meta, size_t metalen, c-string body, size_t bodylen ) ;
 FUNCTION: fdb_status fdb_doc_update ( fdb_doc** doc, c-string meta, size_t metalen, c-string body, size_t bodylen ) ;
 FUNCTION: fdb_status fdb_doc_free ( fdb_doc* doc ) ;
 
-FUNCTION: fdb_status fdb_get ( fdb_handle* handle, fdb_doc* doc ) ;
-FUNCTION: fdb_status fdb_get_metaonly ( fdb_handle* handle, fdb_doc* doc ) ;
-FUNCTION: fdb_status fdb_get_byseq ( fdb_handle* handle, fdb_doc* doc ) ;
-FUNCTION: fdb_status fdb_get_metaonly_byseq ( fdb_handle* handle, fdb_doc* doc ) ;
-FUNCTION: fdb_status fdb_get_byoffset ( fdb_handle* handle, fdb_doc* doc ) ;
+FUNCTION: fdb_status fdb_get ( fdb_kvs_handle* handle, fdb_doc* doc ) ;
+FUNCTION: fdb_status fdb_get_metaonly ( fdb_kvs_handle* handle, fdb_doc* doc ) ;
+FUNCTION: fdb_status fdb_get_byseq ( fdb_kvs_handle* handle, fdb_doc* doc ) ;
+FUNCTION: fdb_status fdb_get_metaonly_byseq ( fdb_kvs_handle* handle, fdb_doc* doc ) ;
+FUNCTION: fdb_status fdb_get_byoffset ( fdb_kvs_handle* handle, fdb_doc* doc ) ;
 
-FUNCTION: fdb_status fdb_set ( fdb_handle* handle, fdb_doc* doc ) ;
-FUNCTION: fdb_status fdb_del ( fdb_handle* handle, fdb_doc* doc ) ;
+FUNCTION: fdb_status fdb_set ( fdb_kvs_handle* handle, fdb_doc* doc ) ;
+FUNCTION: fdb_status fdb_del ( fdb_kvs_handle* handle, fdb_doc* doc ) ;
 
-FUNCTION: fdb_status fdb_get_kv ( fdb_handle* handle, c-string key, size_t keylen, void** value_out, size_t* valuelen_out ) ;
-FUNCTION: fdb_status fdb_set_kv ( fdb_handle* handle, c-string key, size_t keylen, c-string value, size_t valuelen ) ;
-FUNCTION: fdb_status fdb_del_kv ( fdb_handle* handle, c-string key, size_t keylen ) ;
+FUNCTION: fdb_status fdb_get_kv ( fdb_kvs_handle* handle, c-string key, size_t keylen, void** value_out, size_t* valuelen_out ) ;
+FUNCTION: fdb_status fdb_set_kv ( fdb_kvs_handle* handle, c-string key, size_t keylen, c-string value, size_t valuelen ) ;
+FUNCTION: fdb_status fdb_del_kv ( fdb_kvs_handle* handle, c-string key, size_t keylen ) ;
 
 FUNCTION: fdb_status fdb_commit ( fdb_file_handle* fhandle, fdb_commit_opt_t opt ) ;
-FUNCTION: fdb_status fdb_snapshot_open ( fdb_handle* handle_in, fdb_handle** handle_out, fdb_seqnum_t snapshot_seqnum ) ;
+FUNCTION: fdb_status fdb_snapshot_open ( fdb_kvs_handle* handle_in, fdb_kvs_handle** handle_out, fdb_seqnum_t snapshot_seqnum ) ;
 ! Swaps out the handle for a new one
-FUNCTION: fdb_status fdb_rollback ( fdb_handle** handle_ptr, fdb_seqnum_t rollback_seqnum ) ;
+FUNCTION: fdb_status fdb_rollback ( fdb_kvs_handle** handle_ptr, fdb_seqnum_t rollback_seqnum ) ;
 
-FUNCTION: fdb_status fdb_iterator_init ( fdb_handle* handle, fdb_iterator** iterator, c-string start_key, size_t start_keylen, c-string end_key, size_t end_keylen, fdb_iterator_opt_t opt ) ;
-FUNCTION: fdb_status fdb_iterator_sequence_init ( fdb_handle* handle, fdb_iterator** iterator, fdb_seqnum_t start_seq, fdb_seqnum_t end_seq, fdb_iterator_opt_t opt ) ;
+FUNCTION: fdb_status fdb_iterator_init ( fdb_kvs_handle* handle, fdb_iterator** iterator, c-string start_key, size_t start_keylen, c-string end_key, size_t end_keylen, fdb_iterator_opt_t opt ) ;
+FUNCTION: fdb_status fdb_iterator_sequence_init ( fdb_kvs_handle* handle, fdb_iterator** iterator, fdb_seqnum_t start_seq, fdb_seqnum_t end_seq, fdb_iterator_opt_t opt ) ;
 FUNCTION: fdb_status fdb_iterator_prev ( fdb_iterator* iterator, fdb_doc** doc ) ;
 FUNCTION: fdb_status fdb_iterator_next ( fdb_iterator* iterator, fdb_doc** doc ) ;
 FUNCTION: fdb_status fdb_iterator_next_metaonly ( fdb_iterator* iterator, fdb_doc** doc ) ;
@@ -197,8 +197,8 @@ FUNCTION: fdb_status fdb_iterator_close ( fdb_iterator* iterator ) ;
 FUNCTION: fdb_status fdb_compact ( fdb_file_handle* handle, c-string new_filename ) ;
 FUNCTION: size_t fdb_estimate_space_used ( fdb_file_handle* fhandle ) ;
 FUNCTION: fdb_status fdb_get_file_info ( fdb_file_handle* handle, fdb_file_info* info ) ;
-FUNCTION: fdb_status fdb_get_kvs_info ( fdb_handle* handle, fdb_kvs_info* info ) ;
-FUNCTION: fdb_status fdb_get_kvs_seqnum ( fdb_handle* handle, fdb_seqnum_t* seqnum ) ;
+FUNCTION: fdb_status fdb_get_kvs_info ( fdb_kvs_handle* handle, fdb_kvs_info* info ) ;
+FUNCTION: fdb_status fdb_get_kvs_seqnum ( fdb_kvs_handle* handle, fdb_seqnum_t* seqnum ) ;
 FUNCTION: fdb_status fdb_switch_compaction_mode ( fdb_file_handle* fhandle, fdb_compaction_mode_t mode, size_t new_threshold ) ;
 
 FUNCTION: fdb_status fdb_get_kvs_name_list ( fdb_file_handle *fhandle, fdb_kvs_name_list *kvs_name_list ) ;
@@ -212,16 +212,16 @@ FUNCTION: fdb_status fdb_begin_transaction ( fdb_file_handle* fhandle, fdb_isola
 FUNCTION: fdb_status fdb_end_transaction ( fdb_file_handle* fhandle, fdb_commit_opt_t opt ) ;
 FUNCTION: fdb_status fdb_abort_transaction ( fdb_file_handle* fhandle ) ;
 FUNCTION: fdb_status fdb_kvs_open ( fdb_file_handle* fhandle,
-                        fdb_handle** ptr_handle,
+                        fdb_kvs_handle** ptr_handle,
                         char* kvs_name,
                         fdb_kvs_config* config ) ;
 
 
 FUNCTION: fdb_status fdb_kvs_open_default ( fdb_file_handle* fhandle,
-                                fdb_handle** ptr_handle,
+                                fdb_kvs_handle** ptr_handle,
                                 fdb_kvs_config* config ) ;
 
-FUNCTION: fdb_status fdb_kvs_close ( fdb_handle* handle ) ;
+FUNCTION: fdb_status fdb_kvs_close ( fdb_kvs_handle* handle ) ;
 
 FUNCTION: fdb_status fdb_kvs_remove ( fdb_file_handle* fhandle, char* kvs_name ) ;
 FUNCTION: char* fdb_error_msg ( fdb_status err_code ) ;

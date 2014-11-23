@@ -5,12 +5,13 @@ compiler.cfg.registers compiler.cfg.predecessors
 compiler.cfg.comparisons compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.private
 compiler.cfg.ssa.interference.live-ranges
+compiler.cfg.utilities
 cpu.architecture kernel namespaces tools.test alien.c-types
 arrays sequences slots ;
 IN: compiler.cfg.ssa.interference.tests
 
 : test-interference ( -- )
-    cfg new 0 get >>entry
+    0 get block>cfg
     dup compute-live-sets
     dup compute-defs
     dup compute-insns

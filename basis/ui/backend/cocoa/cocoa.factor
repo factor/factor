@@ -1,15 +1,16 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data cocoa cocoa.application
-cocoa.classes cocoa.nibs cocoa.pasteboard cocoa.runtime
-cocoa.subclassing cocoa.views cocoa.windows combinators
-core-foundation.run-loop core-graphics core-graphics.types formatting
-generalizations io.thread kernel libc literals locals make math
-math.bitwise math.rectangles namespaces prettyprint sequences syslog
-threads ui ui.backend ui.backend.cocoa.views ui.clipboards
-ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private ui.private
-;
-
+USING: accessors alien.c-types alien.data arrays assocs classes
+cocoa cocoa.application cocoa.classes cocoa.messages cocoa.nibs
+cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
+cocoa.views cocoa.windows combinators command-line
+core-foundation core-foundation.run-loop core-graphics
+core-graphics.types destructors fry generalizations io.thread
+kernel libc literals locals math math.bitwise math.rectangles
+memory namespaces sequences threads ui colors ui.backend
+ui.backend.cocoa.views ui.clipboards ui.gadgets
+ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private
+ui.private words.symbol ;
 IN: ui.backend.cocoa
 
 TUPLE: handle ;
@@ -78,52 +79,16 @@ M: pasteboard set-clipboard-contents
 : world>NSRect ( world -- NSRect )
     [ 0 0 ] dip dim>> first2 <CGRect> ;
 
-: screen-size ( -- size )
-    { }
-      NSScreen -> mainScreen -> frame
-      size>> dup
-      [ w>> prefix ] dip
-      h>> suffix ;
-
-FROM: ui.private => windows ;
 : auto-position ( window loc -- )
     #! Note: if this is the initial window, the length of the windows
     #! vector should be 1, since (open-window) calls auto-position
     #! after register-window.
-    dup "Loc: %@" SYSLOG
-    windows get-global last second title>> "last title: %s" SYSLOG
     dup { 0 0 } = [
         drop
-        windows get-global dup  last second title>>
-        swap [ over = ] filter nip  empty?
-        [
-            windows get-global last second title>> 
-          {
-          ! { "Browser" [ [ 0 ,  screen-size second 2 / , ] { } make  ] }
-          { "Browser" [ [ 0 ,  20 , ] { } make  ] }
-          { "Walker" [ [ 0 ,  screen-size second 2 / , ] { } make  ] }
-          { "Listener" [ [ 0 ,  screen-size second 2 / , ] { } make  ] }
-          [ drop { 0 0 } ]
-        } case
-          first2 <CGPoint> -> setFrameTopLeftPoint:
-        ]
-        [ windows get-global last second window-loc>>
-          dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
-          -> setFrameTopLeftPoint:
-        ] if
-    ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
-
-: auto-position.1 ( window loc -- )
-    #! Note: if this is the initial window, the length of the windows
-    #! vector should be 1, since (open-window) calls auto-position
-    #! after register-window. 
-    dup { 0 0 } = [
-        drop
-        windows get-global length 1 <=
-        [ -> center ]
-        [ windows get-global last second window-loc>>
-          dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
-          -> setFrameTopLeftPoint:
+        windows get-global length 1 <= [ -> center ] [
+            windows get-global last second window-loc>>
+            dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
+            -> setFrameTopLeftPoint:
         ] if
     ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 

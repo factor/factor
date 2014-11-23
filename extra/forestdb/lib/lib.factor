@@ -22,12 +22,12 @@ ERROR: fdb-error error ;
 : fdb-check-error ( ret -- )
     dup FDB_RESULT_SUCCESS = [ drop ] [ fdb-error ] if ;
 
-TUPLE: fdb-handle < disposable handle ;
-: <fdb-handle> ( handle -- obj )
-    fdb-handle new-disposable
+TUPLE: fdb-kvs-handle < disposable handle ;
+: <fdb-kvs-handle> ( handle -- obj )
+    fdb-kvs-handle new-disposable
         swap >>handle ; inline
 
-M: fdb-handle dispose*
+M: fdb-kvs-handle dispose*
     handle>> fdb_kvs_close fdb-check-error ;
 
 
@@ -40,7 +40,7 @@ M: fdb-file-handle dispose*
     handle>> fdb_close fdb-check-error ;
 
 SYMBOL: current-fdb-file-handle
-SYMBOL: current-fdb-handle
+SYMBOL: current-fdb-kvs-handle
 
 : get-kvs-default-config ( -- kvs-config )
     S{ fdb_kvs_config
@@ -48,14 +48,14 @@ SYMBOL: current-fdb-handle
         { custom_cmp f }
     } clone ;
 
-: fdb-open-kvs' ( file-handle fdb-handle kvs-config -- file-handle handle )
+: fdb-open-kvs' ( file-handle fdb-kvs-handle kvs-config -- file-handle handle )
     [ dup handle>> ] 2dip
     [ handle>> ] dip
     [ fdb_kvs_open_default fdb-check-error ] 2keep drop
-    void* deref <fdb-handle> ;
+    void* deref <fdb-kvs-handle> ;
 
 : fdb-open-kvs ( fdb-file-handle kvs-config -- file-handle handle )
-    [ f void* <ref> <fdb-handle> ] dip fdb-open-kvs' ;
+    [ f void* <ref> <fdb-kvs-handle> ] dip fdb-open-kvs' ;
 
 : fdb-open ( path config kvs-config -- file-handle handle )
     [
@@ -75,11 +75,11 @@ SYMBOL: current-fdb-handle
 : get-file-handle ( -- handle )
     current-fdb-file-handle get handle>> ;
 
-: get-handle ( -- handle )
-    current-fdb-handle get handle>> ;
+: get-kvs-handle ( -- handle )
+    current-fdb-kvs-handle get handle>> ;
 
 : fdb-set-kv ( key value -- )
-    [ get-handle ] 2dip
+    [ get-kvs-handle ] 2dip
     [ dup length ] bi@ fdb_set_kv fdb-check-error ;
 
 : <key-doc> ( key -- doc )
@@ -92,30 +92,30 @@ SYMBOL: current-fdb-handle
 
 ! Fill in document by exemplar
 : fdb-get ( doc -- doc )
-    [ get-handle ] dip [ fdb_get fdb-check-error ] keep ;
+    [ get-kvs-handle ] dip [ fdb_get fdb-check-error ] keep ;
 
 : fdb-get-metaonly ( doc -- doc )
-    [ get-handle ] dip [ fdb_get_metaonly fdb-check-error ] keep ;
+    [ get-kvs-handle ] dip [ fdb_get_metaonly fdb-check-error ] keep ;
 
 : fdb-get-byseq ( doc -- doc )
-    [ get-handle ] dip [ fdb_get_byseq fdb-check-error ] keep ;
+    [ get-kvs-handle ] dip [ fdb_get_byseq fdb-check-error ] keep ;
 
 : fdb-get-metaonly-byseq ( doc -- doc )
-    [ get-handle ] dip [ fdb_get_metaonly_byseq fdb-check-error ] keep ;
+    [ get-kvs-handle ] dip [ fdb_get_metaonly_byseq fdb-check-error ] keep ;
 
 : fdb-get-byoffset ( doc -- doc )
-    [ get-handle ] dip [ fdb_get_byoffset fdb-check-error ] keep ;
+    [ get-kvs-handle ] dip [ fdb_get_byoffset fdb-check-error ] keep ;
 
 
 ! Set/delete documents
 : fdb-set ( doc -- )
-    [ get-handle ] dip fdb_set fdb-check-error ;
+    [ get-kvs-handle ] dip fdb_set fdb-check-error ;
 
 : fdb-del ( doc -- )
-    [ get-handle ] dip fdb_del fdb-check-error ;
+    [ get-kvs-handle ] dip fdb_del fdb-check-error ;
 
 : fdb-get-kv ( key -- value/f )
-    [ get-handle ] dip
+    [ get-kvs-handle ] dip
     dup length f void* <ref> 0 size_t <ref>
     [ fdb_get_kv ] 2keep
     rot {
@@ -125,7 +125,7 @@ SYMBOL: current-fdb-handle
     } case ;
 
 : fdb-del-kv ( key -- )
-    [ get-handle ] dip dup length fdb_del_kv fdb-check-error ;
+    [ get-kvs-handle ] dip dup length fdb_del_kv fdb-check-error ;
 
 : fdb-doc-create ( key meta body -- doc )
     [ f void* <ref> ] 3dip
@@ -156,7 +156,7 @@ SYMBOL: current-fdb-handle
     fdb_file_info <struct> [ fdb_get_file_info fdb-check-error ] keep ;
 
 : fdb-get-kvs-info ( -- fdb_kvs_info )
-    get-handle
+    get-kvs-handle
     fdb_kvs_info <struct> [ fdb_get_kvs_info fdb-check-error ] keep ;
 
 : fdb-commit ( fdb_commit_opt_t -- )
@@ -177,10 +177,10 @@ SYMBOL: current-fdb-handle
     fdb-compact fdb-commit-wal-flush ;
 
 : fdb-swap-current-db ( new-path -- )
-    current-fdb-handle [ dispose f ] change
+    current-fdb-kvs-handle [ dispose f ] change
     fdb-open-default-config
     [ current-fdb-file-handle set ]
-    [ current-fdb-handle set ] bi* ;
+    [ current-fdb-kvs-handle set ] bi* ;
 
 : fdb-compact-and-swap-db ( path -- )
     next-vnode-version-name
@@ -190,19 +190,19 @@ SYMBOL: current-fdb-handle
 ! Call from within with-foresdb
 : fdb-open-snapshot ( seqnum -- handle )
     [
-        get-handle
+        get-kvs-handle
         f void* <ref>
     ] dip [
         fdb_snapshot_open fdb-check-error
-    ] 2keep drop void* deref <fdb-handle> ;
+    ] 2keep drop void* deref <fdb-kvs-handle> ;
 
 ! fdb_rollback returns a new handle, so we
 ! have to replace our current handle with that one
 ! XXX: can't call dispose on old handle, library handles that
 : fdb-rollback ( seqnum -- )
-    [ get-handle void* <ref> ] dip
+    [ get-kvs-handle void* <ref> ] dip
     [ fdb_rollback fdb-check-error ] 2keep drop
-    void* deref <fdb-handle> current-fdb-handle set ;
+    void* deref <fdb-kvs-handle> current-fdb-kvs-handle set ;
 
 
 TUPLE: fdb-iterator < disposable handle ;
@@ -215,13 +215,13 @@ M: fdb-iterator dispose*
     handle>> fdb_iterator_close fdb-check-error ;
 
 : fdb-iterator-init ( start-key end-key fdb_iterator_opt_t -- iterator )
-    [ get-handle f void* <ref> ] 3dip
+    [ get-kvs-handle f void* <ref> ] 3dip
     [ [ dup length ] bi@ ] dip
     [ fdb_iterator_init fdb-check-error ] 7 nkeep 5 ndrop nip
     void* deref <fdb-iterator> ;
 
 : fdb-iterator-byseq-init ( start-seq end-seq fdb_iterator_opt_t -- iterator )
-    [ get-handle f void* <ref> ] 3dip
+    [ get-kvs-handle f void* <ref> ] 3dip
     [ fdb_iterator_sequence_init fdb-check-error ] 5 nkeep 3 ndrop nip
     void* deref <fdb-iterator> ;
 
@@ -359,16 +359,16 @@ PRIVATE>
 : with-forestdb-handles ( file-handle handle quot fdb_commit_opt_t/f -- )
     '[
         _ current-fdb-file-handle [
-            _ current-fdb-handle [
+            _ current-fdb-kvs-handle [
                 [
                     @
                     _ fdb-maybe-commit
                     current-fdb-file-handle get &dispose drop
-                    current-fdb-handle get &dispose drop
+                    current-fdb-kvs-handle get &dispose drop
                 ] [
                     [
                         current-fdb-file-handle get &dispose drop
-                        current-fdb-handle get &dispose drop
+                        current-fdb-kvs-handle get &dispose drop
                     ] with-destructors
                     rethrow
                 ] recover
@@ -386,12 +386,12 @@ PRIVATE>
 
 : with-forestdb-snapshot ( n quot -- )
     [ fdb-open-snapshot ] dip '[
-        _ current-fdb-handle [
+        _ current-fdb-kvs-handle [
             [
                 @
-                current-fdb-handle get &dispose drop
+                current-fdb-kvs-handle get &dispose drop
             ] [
-                current-fdb-handle get [ &dispose drop ] when*
+                current-fdb-kvs-handle get [ &dispose drop ] when*
                 rethrow
             ] recover
         ] with-variable

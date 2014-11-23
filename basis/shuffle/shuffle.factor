@@ -24,4 +24,3 @@ SYNTAX: shuffle(
 : -roll ( x y z t -- t x y z ) swap [ -rot ] dip ; inline deprecated
 
 : 2swap ( x y z t -- z t x y ) 2 2 mnswap ; inline
-

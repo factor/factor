@@ -21,8 +21,6 @@ IN: splitting.extras
     1 { 1 2 3 1 4 5 1 6 } [ dupd = ] split*-when nip
 ] unit-test
 
-[ { { 1 2 } { 3 4 } { 5 } } ] [ 2 { 1 2 3 4 5 } split-nth ] unit-test
-
 { { "hello" " " " " " " "world" } } [
     "hello   world"
     [ [ blank? ] find drop ] split-find

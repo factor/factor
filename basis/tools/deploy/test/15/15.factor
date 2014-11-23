@@ -3,6 +3,6 @@
 USING: command-line io namespaces sequences ;
 IN: tools.deploy.test.15
 
-: main ( -- ) (command-line) [ print ] each ;
+: main ( -- ) command-line get [ print ] each ;
 
 MAIN: main

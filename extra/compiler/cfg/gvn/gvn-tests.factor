@@ -2,11 +2,10 @@ USING: compiler.cfg.gvn compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.debugger
 compiler.cfg.comparisons cpu.architecture tools.test kernel
 math combinators.short-circuit accessors sequences
-compiler.cfg.predecessors locals compiler.cfg.dce
+compiler.cfg.predecessors compiler.cfg.utilities locals compiler.cfg.dce
 compiler.cfg.ssa.destruction compiler.cfg.loop-detection
 compiler.cfg.representations compiler.cfg assocs vectors arrays
-layouts literals namespaces alien compiler.cfg.gvn.simd system
-;
+layouts literals namespaces alien compiler.cfg.gvn.simd system ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.gvn.tests
 
@@ -28,7 +27,7 @@ IN: compiler.cfg.gvn.tests
 
 : value-number-bb ( insns -- insns' )
     0 test-bb
-    cfg new 0 get >>entry
+    0 get block>cfg
     value-numbering drop
     0 get instructions>> ;
 
@@ -2616,7 +2615,7 @@ cell 8 = [
     V{ } 1 test-bb
     V{ } 2 test-bb
     0 { 1 2 } edges
-    cfg new 0 get >>entry
+    0 get block>cfg
     value-numbering drop
     0 get [ instructions>> ] [ successors>> first number>> 1 - ] bi ;
 
@@ -2800,7 +2799,7 @@ V{
 test-diamond
 
 [ ] [
-    cfg new 0 get >>entry dup cfg set
+    0 get block>cfg dup cfg set
     value-numbering
     select-representations
     destruct-ssa drop
@@ -2839,11 +2838,7 @@ V{
 
 test-diamond
 
-[ ] [
-    cfg new 0 get >>entry
-    value-numbering
-    drop
-] unit-test
+[ ] [ 0 get block>cfg value-numbering drop ] unit-test
 
 [ t ] [ 1 get successors>> first 3 get eq? ] unit-test
 
@@ -2908,7 +2903,7 @@ V{
 4 5 edge
 
 [ ] [
-    cfg new 0 get >>entry
+    0 get block>cfg
     value-numbering eliminate-dead-code drop
 ] unit-test
 
@@ -3183,10 +3178,7 @@ V{
 
 test-diamond
 
-[ ] [
-    cfg new 0 get >>entry
-    value-numbering drop
-] unit-test
+[ ] [ 0 get block>cfg value-numbering drop ] unit-test
 
 ! First ##load-integer cannot be turned into a ##copy because
 ! the canonical leader for the value 100 is unavailable, but
@@ -3246,10 +3238,7 @@ V{ T{ ##epilogue } T{ ##return } } 5 test-bb
 3 2 edge
 4 5 edge
 
-[ ] [
-    cfg new 0 get >>entry
-    value-numbering eliminate-dead-code drop
-] unit-test
+[ ] [ 0 get block>cfg value-numbering eliminate-dead-code drop ] unit-test
 
 [ 1 ] [ 1 get instructions>> [ ##load-integer? ] count ] unit-test
 [ 1 ] [ 2 get instructions>> [ ##phi? ] count ] unit-test

@@ -6,6 +6,15 @@ sets vectors fry arrays compiler.cfg compiler.cfg.instructions
 compiler.cfg.rpo compiler.utilities ;
 IN: compiler.cfg.utilities
 
+: block>cfg ( bb -- cfg )
+    cfg new swap >>entry ;
+
+: insns>block ( insns n -- bb )
+    <basic-block> swap >>number swap V{ } like >>instructions ;
+
+: insns>cfg ( insns -- cfg )
+    0 insns>block block>cfg ;
+
 : back-edge? ( from to -- ? )
     [ number>> ] bi@ >= ;
 
@@ -39,9 +48,7 @@ IN: compiler.cfg.utilities
     from successors>> [ dup to eq? [ drop bb ] when ] map! drop ;
 
 :: insert-basic-block ( from to insns -- )
-    ! Insert basic block on the edge between 'from' and 'to'.
-    <basic-block> :> bb
-    insns V{ } like bb instructions<<
+    insns f insns>block :> bb
     V{ from } bb predecessors<<
     V{ to } bb successors<<
     from to bb update-predecessors

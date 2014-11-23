@@ -1,12 +1,12 @@
 USING: accessors arrays compiler.cfg compiler.cfg.debugger
 compiler.cfg.dominance compiler.cfg.predecessors
-compiler.cfg.ssa.construction.tdmsc kernel namespaces sequences
-tools.test vectors sets ;
+compiler.cfg.ssa.construction.tdmsc compiler.cfg.utilities kernel namespaces
+sequences sets tools.test vectors ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.construction.tdmsc.tests
 
 : test-tdmsc ( -- )
-    cfg new 0 get >>entry dup cfg set
+    0 get block>cfg dup cfg set
     compute-merge-sets ;
 
 V{ } 0 test-bb
