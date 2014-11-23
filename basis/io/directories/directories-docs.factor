@@ -12,7 +12,13 @@ HELP: cd
 { $description "Changes the current working directory of the Factor process." }
 { $notes "User code should use " { $link with-directory } " or " { $link set-current-directory } " instead." } ;
 
-{ cd cwd current-directory set-current-directory with-directory } related-words
+HELP: with-cd
+{ $values
+    { "path" "a pathname string" } { "quot" quotation }
+}
+{ $description "Changes Factor's current working directory (as far as the operating system is concerned). Then, calls the quotation and restores the original directory even if an error is thrown." } ;
+
+{ cd cwd with-cd current-directory set-current-directory with-directory } related-words
 
 HELP: current-directory
 { $description "A variable holding the current directory as an absolute path. Words that use the filesystem do so in relation to this variable."
