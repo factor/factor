@@ -2,7 +2,7 @@ USING: accessors arrays assocs compiler.cfg compiler.cfg.dependence
 compiler.cfg.dependence.tests compiler.cfg.instructions
 compiler.cfg.linearization compiler.cfg.registers compiler.cfg.scheduling
 compiler.cfg.utilities grouping kernel math namespaces tools.test random
-sequences sets splitting vectors words ;
+sequences sets splitting vectors words compiler.cfg.test-words ;
 IN: compiler.cfg.scheduling.tests
 
 ! Test split-insns

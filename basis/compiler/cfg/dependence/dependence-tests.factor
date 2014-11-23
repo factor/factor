@@ -1,6 +1,7 @@
 USING: accessors arrays assocs combinators.short-circuit
 compiler.cfg.dependence compiler.cfg.instructions
-grouping kernel math random sequences tools.test vectors ;
+grouping kernel math random sequences tools.test vectors
+compiler.cfg.test-words ;
 IN: compiler.cfg.dependence.tests
 FROM: sets => members set= ;
 
@@ -76,20 +77,6 @@ ERROR: node-missing-children trees nodes ;
     20 iota [ dummy-node +data+ 2array ] map randomize
     select-parent insn>> insn#>>
 ] unit-test
-
-! Shared with compiler.cfg.scheduling
-: test-not-in-order ( -- nodes )
-    V{
-        ##load-tagged
-        ##allot
-        ##set-slot-imm
-        ##load-reference
-        ##allot
-        ##set-slot-imm
-        ##set-slot-imm
-        ##set-slot-imm
-        ##replace
-    } [ [ new ] [ 2 * ] bi* >>insn# ] map-index ;
 
 ! Another
 { t } [
