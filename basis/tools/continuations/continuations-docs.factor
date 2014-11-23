@@ -12,11 +12,12 @@ HELP: break-count
 }
 { $examples
   { $code 
-    "code break-count code"
+    "yourcode break-count yourcode"
     "break-counter get . "
     }
 }
-{ $notes "The shortcut  $link BC   is available for use." }
+{ $notes "The shortcut BC is available for use. \n\nInitialize the counter before using with " { $link break-count-zero } 
+" either manually in the Listener or appropriately in your code before any looping occurs" } 
 ;
 
 HELP: break-count=
@@ -28,5 +29,9 @@ HELP: break-count=
         "10 break-count="
     }
 }
-{ $notes "The shortcut  $link BC=   is avaiable for use" }
+{ $notes "The shortcut BC= is avaiable for use" }
+;
+
+HELP: break-count-zero
+{ $description "Initializes the symbol " { $link break-count } " by setting it to zero" } 
 ;
