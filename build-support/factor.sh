@@ -542,6 +542,12 @@ update() {
     make_clean_factor
 }
 
+thiscommit() {
+    get_config_info
+    backup_factor
+    make_clean_factor
+}
+
 download_and_bootstrap() {
     update_boot_images
     bootstrap
@@ -595,6 +601,7 @@ usage() {
     $ECHO "  self-update - git pull, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
     $ECHO "  update - git pull, download a boot image, recompile, bootstrap"
+    $ECHO "  thiscommit - recompile, bootstrap"
     $ECHO "  bootstrap - bootstrap with an existing boot image"
     $ECHO "  net-bootstrap - download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
@@ -625,6 +632,7 @@ case "$1" in
     self-update) update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update) update; download_and_bootstrap ;;
+    thiscommit) thiscommit; download_and_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
     net-bootstrap) net_bootstrap_no_pull ;;
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
