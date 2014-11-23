@@ -34,3 +34,30 @@ TUPLE: person name age a-a ;
     [ f jsvar-encode? 
         [ "Alpha-Beta" 32 H{ { "b-b" "asdf" } } person boa >json ] 
         with-variable ] unit-test
+
+{ """{"1":2,"3":4}""" }
+[ H{ { "1" 2 } { "3" 4 } } >json ] unit-test
+
+{ """{"1":2,"3":4}""" }
+[ H{ { 1 2 } { 3 4 } } >json ] unit-test
+
+{ """{"":4}""" }
+[ H{ { "" 2 } { "" 4 } } >json ] unit-test
+
+{ """{"":5,"false":2,"true":4}""" }
+[ H{ { f 2 } { t 4 } { "" 5 } } >json ] unit-test
+
+{ """{"3.1":3}""" }
+[ H{ { 3.1 3 } } >json ] unit-test
+
+{ """{"Infinity":1}""" }
+[ H{ { 1/0. 1 } } >json ] unit-test
+
+{ """{"-Infinity":1}""" }
+[ H{ { -1/0. 1 } } >json ] unit-test
+
+{ """{"null":1}""" }
+[ H{ { json-null 1 } } >json ] unit-test
+
+{ """{"NaN":1}""" }
+[ H{ { NAN: 333 1 } } >json ] unit-test
