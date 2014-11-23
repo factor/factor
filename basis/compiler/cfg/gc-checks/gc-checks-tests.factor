@@ -4,7 +4,7 @@ compiler.cfg.registers compiler.cfg.instructions compiler.cfg
 compiler.cfg.predecessors compiler.cfg.rpo cpu.architecture
 tools.test kernel vectors namespaces accessors sequences alien
 memory classes make combinators.short-circuit byte-arrays
-compiler.cfg.comparisons ;
+compiler.cfg.comparisons compiler.cfg.utilities ;
 IN: compiler.cfg.gc-checks.tests
 
 [ { } ] [
@@ -84,7 +84,7 @@ IN: compiler.cfg.gc-checks.tests
 
 : test-gc-checks ( -- )
     H{ } clone representations set
-    cfg new 0 get >>entry cfg set ;
+    0 get block>cfg cfg set ;
 
 V{
     T{ ##inc-d f 3 }

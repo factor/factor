@@ -1,7 +1,8 @@
 USING: accessors compiler.cfg compiler.cfg.debugger
 compiler.cfg.dominance compiler.cfg.instructions
 compiler.cfg.predecessors compiler.cfg.ssa.construction assocs
-compiler.cfg.registers cpu.architecture kernel namespaces sequences
+compiler.cfg.registers compiler.cfg.utilities cpu.architecture kernel
+namespaces sequences
 tools.test vectors ;
 IN: compiler.cfg.ssa.construction.tests
 
@@ -11,7 +12,7 @@ IN: compiler.cfg.ssa.construction.tests
     0 basic-block set-global ;
 
 : test-ssa ( -- )
-    cfg new 0 get >>entry
+    0 get block>cfg
     dup cfg set
     construct-ssa
     drop ;

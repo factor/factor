@@ -1,5 +1,5 @@
 USING: compiler.cfg.debugger compiler.cfg compiler.cfg.linearization
-kernel accessors sequences sets tools.test namespaces ;
+compiler.cfg.utilities kernel accessors sequences sets tools.test namespaces ;
 IN: compiler.cfg.linearization.tests
 
 V{ } 0 test-bb
@@ -11,4 +11,4 @@ V{ } 2 test-bb
 0 { 1 1 } edges
 1 2 edge
 
-[ t ] [ cfg new 0 get >>entry linearization-order [ id>> ] map all-unique? ] unit-test
+[ t ] [ 0 get block>cfg linearization-order [ id>> ] map all-unique? ] unit-test

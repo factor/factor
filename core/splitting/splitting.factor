@@ -100,6 +100,10 @@ PRIVATE>
 : split-slice ( seq separators -- pieces )
     [ member? ] curry split-when-slice ; inline
 
+: split-indices ( seq indices -- pieces )
+    over length suffix 0 swap [ dup swapd 2array ] map nip
+    [ first2 rot subseq ] with map ;
+
 GENERIC: string-lines ( str -- seq )
 
 M: string string-lines

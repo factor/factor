@@ -60,6 +60,17 @@ HELP: split-when-slice
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "pieces" "a new array" } }
 { $description "Splits " { $snippet "seq" } " at each occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs an array of pieces as slices. The pieces do not include the elements along which the sequence was split." } ;
 
+HELP: split-indices
+{ $values { "seq" sequence } { "indices" sequence } { "pieces" "a new array" } }
+{ $description "Splits a sequence at the given indices." }
+{ $examples
+  { $example
+    "USING: prettyprint splitting ;"
+    "\"hello world\" { 3 6 } split-indices ."
+    "{ \"hel\" \"lo \" \"world\" }"
+  }
+} ;
+
 HELP: split
 { $values { "seq" sequence } { "separators" sequence } { "pieces" "a new array" } }
 { $description "Splits " { $snippet "seq" } " at each occurrence of an element of " { $snippet "separators" } " and outputs an array of pieces. The pieces do not include the elements along which the sequence was split." }

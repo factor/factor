@@ -1,14 +1,11 @@
 USING: accessors alien alien.c-types alien.data arrays assocs bit-arrays
 bit-arrays.private classes.struct fry grouping kernel math math.statistics
-sequences sequences.repeating vm words ;
+sequences sequences.repeating splitting vm words ;
 IN: tools.gc-decode
 
 ! Utils
 : byte-array>bit-array ( byte-array -- bit-array )
     [ integer>bit-array 8 f pad-tail ] { } map-as concat ;
-
-: split-indices ( seq indices -- parts )
-    over length suffix 0 prefix 2 clump [ first2 rot subseq ] with map ;
 
 : (cut-points) ( counts times -- seq )
     <repeats> cum-sum but-last ;

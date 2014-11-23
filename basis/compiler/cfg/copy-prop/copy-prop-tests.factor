@@ -1,11 +1,10 @@
-USING: compiler.cfg.copy-prop tools.test namespaces kernel
-compiler.cfg.debugger compiler.cfg accessors
-compiler.cfg.registers compiler.cfg.instructions
-cpu.architecture ;
+USING: accessors compiler.cfg  compiler.cfg.copy-prop compiler.cfg.debugger
+compiler.cfg.instructions compiler.cfg.registers compiler.cfg.utilities
+cpu.architecture kernel namespaces tools.test ;
 IN: compiler.cfg.copy-prop.tests
 
 : test-copy-propagation ( -- )
-    cfg new 0 get >>entry copy-propagation drop ;
+    0 get block>cfg copy-propagation drop ;
 
 ! Simple example
 V{
