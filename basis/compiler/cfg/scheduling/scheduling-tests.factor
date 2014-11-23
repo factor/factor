@@ -85,8 +85,8 @@ IN: compiler.cfg.scheduling.tests
 
 {
     {
-        V{ T{ ##inc-r } T{ ##inc-d } T{ ##peek } T{ ##peek } }
-        V{
+        { T{ ##inc-r } T{ ##inc-d } T{ ##peek } T{ ##peek } }
+        {
             T{ ##load-tagged }
             T{ ##allot }
             T{ ##set-slot-imm }
@@ -103,7 +103,7 @@ IN: compiler.cfg.scheduling.tests
             T{ ##replace-imm }
             T{ ##replace }
         }
-        V{ T{ ##branch } }
+        { T{ ##branch } }
     }
 } [ test-1187 [ f >>insn# ] map split-insns ] unit-test
 
