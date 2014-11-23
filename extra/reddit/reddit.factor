@@ -14,7 +14,8 @@ TUPLE: comment approved_by author author_flair_css_class
 author_flair_text banned_by body body_html created created_utc
 downs id levenshtein likes link_id link_title name num_reports
 parent_id replies edited subreddit subreddit_id ups score_hidden
-distinguished gilded saved link_author ;
+distinguished gilded saved link_author link_url mod_reports
+report_reasons score user_reports controversiality ;
 
 TUPLE: user comment_karma created created_utc has_mail
 has_mod_mail id is_gold is_mod link_karma name is_friend
@@ -22,11 +23,12 @@ has_verified_email over_18 ;
 
 TUPLE: story author author_flair_css_class author_flair_text
 approved_by banned_by clicked created created_utc domain downs
-hidden id is_self levenshtein likes link_flair_css_class
-link_flair_text media media_embed name edited num_comments
-num_reports over_18 permalink saved score selftext selftext_html
-subreddit subreddit_id thumbnail title ups url distinguished
-secure_media secure_media_embed stickied visited ;
+gilded hidden id is_self levenshtein likes link_flair_css_class
+link_flair_text media media_embed mod_reports name edited num_comments
+num_reports over_18 permalink report_reasons saved score selftext
+selftext_html subreddit subreddit_id thumbnail title ups url
+user_reports distinguished secure_media secure_media_embed stickied
+visited ;
 
 TUPLE: subreddit accounts_active created created_utc description
 display_name id header_img header_size header_title name over18
