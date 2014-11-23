@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel io.streams.string io strings splitting
 sequences math math.parser assocs classes words namespaces make
-prettyprint hashtables mirrors tr json fry combinators ;
+prettyprint hashtables mirrors tr json fry combinators present ;
 IN: json.writer
 
 #! Writes the object out to a stream in JSON format
@@ -37,15 +37,16 @@ M: string stream-json-print
 M: integer stream-json-print
     [ number>string ] [ stream-write ] bi* ;
 
+: float>json ( float -- string )
+    {
+        { [ dup fp-nan? ] [ drop "NaN" ] }
+        { [ dup 1/0. = ] [ drop "Infinity" ] }
+        { [ dup -1/0. = ] [ drop "-Infinity" ] }
+        [ number>string ]
+    } cond ;
+
 M: float stream-json-print
-    [
-        {
-            { [ dup fp-nan? ] [ drop "NaN" ] }
-            { [ dup 1/0. = ] [ drop "Infinity" ] }
-            { [ dup -1/0. = ] [ drop "-Infinity" ] }
-            [ number>string ]
-        } cond
-    ] dip stream-write ;
+    [ float>json ] dip stream-write ;
 
 M: real stream-json-print
     [ >float number>string ] [ stream-write ] bi* ;
@@ -60,6 +61,13 @@ SYMBOL: jsvar-encode?
 t jsvar-encode? set-global
 TR: jsvar-encode "-" "_" ;
 
+GENERIC: >js-key ( obj -- str )
+M: boolean >js-key "true" "false" ? ;
+M: string >js-key jsvar-encode ;
+M: number >js-key number>string ;
+M: float >js-key float>json ;
+M: json-null >js-key drop "null" ;
+
 <PRIVATE
 
 : json-print-assoc ( assoc stream -- )
@@ -68,7 +76,7 @@ TR: jsvar-encode "-" "_" ;
             over '[ CHAR: , _ stream-write1 ]
             pick dup '[
                 first2
-                [ jsvar-encode _ stream-json-print ]
+                [ >js-key _ stream-json-print ]
                 [ _ CHAR: : over stream-write1 stream-json-print ]
                 bi*
             ] interleave
