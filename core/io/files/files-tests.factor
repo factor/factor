@@ -1,10 +1,9 @@
 USING: alien alien.c-types alien.data arrays classes.struct
-debugger.threads destructors generic.single io io.directories
-io.encodings.8-bit.latin1 io.encodings.ascii
+compiler.units continuations destructors generic.single io
+io.directories io.encodings.8-bit.latin1 io.encodings.ascii
 io.encodings.binary io.encodings.string io.files
 io.files.private io.files.temp io.files.unique kernel make math
-sequences specialized-arrays system threads tools.test vocabs
-compiler.units ;
+sequences specialized-arrays system threads tools.test vocabs ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
 SPECIALIZED-ARRAY: int
 IN: io.files.tests
@@ -271,3 +270,20 @@ CONSTANT: pt-array-1
     "closing-twice" unique-file ascii <file-writer>
     [ dispose ] [ dispose ] bi
 ] unit-test
+
+! Test with-cd
+{ t } [
+    cwd
+    "resource:core/" [ "hi" print ] with-cd
+    cwd =
+] unit-test
+
+{ t } [
+    cwd
+    [ "resource:core/" [ "nick cage" throw ] with-cd ] [ drop ] recover
+    cwd =
+] unit-test
+
+[
+    "resource:core/" [ "nick cage" throw ] with-cd
+] [ "nick cage" = ] must-fail-with
