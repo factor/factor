@@ -1,7 +1,7 @@
 USING: alien alien.c-types alien.data arrays classes.struct
 compiler.units continuations destructors generic.single io
 io.directories io.encodings.8-bit.latin1 io.encodings.ascii
-io.encodings.binary io.encodings.string io.files
+io.encodings.binary io.encodings.string io.files io.pathnames
 io.files.private io.files.temp io.files.unique kernel make math
 sequences specialized-arrays system threads tools.test vocabs ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
@@ -271,7 +271,13 @@ CONSTANT: pt-array-1
     [ dispose ] [ dispose ] bi
 ] unit-test
 
-! Test with-cd
+! Test cwd, cd. You do not want to use with-cd, you want with-directory.
+
+: with-cd ( path quot -- )
+    [ [ absolute-path cd ] curry ] dip compose
+    cwd [ cd ] curry
+    [ ] cleanup ; inline
+
 { t } [
     cwd
     "resource:core/" [ "hi" print ] with-cd

@@ -70,11 +70,6 @@ HOOK: cwd io-backend ( -- path )
 
 M: object cwd ( -- path ) "." ;
 
-: with-cd ( path quot -- )
-    [ [ absolute-path cd ] curry ] dip compose
-    cwd [ cd ] curry
-    [ ] cleanup ; inline
-
 PRIVATE>
 
 : init-resource-path ( -- )
