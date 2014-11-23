@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel io.streams.string io strings splitting
 sequences math math.parser assocs classes words namespaces make
-prettyprint hashtables mirrors tr json fry combinators present ;
+prettyprint hashtables mirrors tr json fry combinators ;
 IN: json.writer
 
 #! Writes the object out to a stream in JSON format
