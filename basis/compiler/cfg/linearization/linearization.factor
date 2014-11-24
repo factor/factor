@@ -88,3 +88,6 @@ SYMBOL: numbers
 
 : number-blocks ( bbs -- )
     H{ } zip-index-as numbers set ;
+
+: cfg>insns ( cfg -- insns )
+    linearization-order [ instructions>> ] map concat ;

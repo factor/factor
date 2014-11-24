@@ -1,5 +1,8 @@
 USING: accessors alien.c-types arrays bit-arrays classes.struct
-compiler.cfg.instructions compiler.cfg.stack-frame compiler.codegen.gc-maps compiler.codegen.relocation cpu.architecture cpu.x86 byte-arrays make namespaces kernel layouts math sequences specialized-arrays system tools.test ;
+compiler.cfg.instructions compiler.cfg.stack-frame
+compiler.codegen.gc-maps compiler.codegen.relocation cpu.architecture
+cpu.x86 byte-arrays make namespaces kernel layouts math sequences
+specialized-arrays system tools.test ;
 QUALIFIED: vm
 SPECIALIZED-ARRAY: uint
 IN: compiler.codegen.gc-maps.tests
