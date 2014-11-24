@@ -890,9 +890,9 @@ os windows? [
 
     FUNCTION: bool-and-ptr ffi_test_61 ( ) ;
 
-    {
-        S{ bool-and-ptr { b t } { ptr f } }
-    } [ ffi_test_61 ] unit-test
+    ! { S{ bool-and-ptr { b t } { ptr f } } } [ ffi_test_61 ] unit-test
+    { t } [ ffi_test_61 bool-and-ptr? ] unit-test
+    { { t f } } [ ffi_test_61 [ b>> ] [ ptr>> ] bi 2array ] unit-test
 
 ] unless
 
