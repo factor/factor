@@ -164,7 +164,7 @@ print-use-hook [ [ ] ] initialize
     ] with-file-vocabs ;
 
 : parsing-file ( file -- )
-    parser-quiet? get [ drop ] [ "! Loading " write print flush ] if ;
+    parser-quiet? get [ drop ] [ "Loading " write print flush ] if ;
 
 : filter-moved ( set1 set2 -- seq )
     swap diff members [
