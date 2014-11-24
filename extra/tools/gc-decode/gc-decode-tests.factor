@@ -3,7 +3,7 @@ combinators.short-circuit compiler compiler.cfg.debugger
 compiler.cfg.instructions compiler.cfg.stack-frame compiler.cfg.utilities
 compiler.codegen.gc-maps generic kernel math namespaces random sequences
 sequences.generalizations slots.syntax tools.gc-decode tools.test vm vocabs
-words ;
+words compiler.cfg.linearization ;
 QUALIFIED: effects
 QUALIFIED: llvm.types
 IN: tools.gc-decode.tests
