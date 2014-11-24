@@ -1,5 +1,9 @@
-USING: bit-arrays classes.struct math sequences tools.gc-decode
-tools.test vm ;
+USING: accessors arrays assocs bit-arrays classes.struct combinators
+combinators.short-circuit compiler compiler.cfg.debugger
+compiler.cfg.instructions compiler.cfg.stack-frame compiler.cfg.utilities
+compiler.codegen.gc-maps generic kernel math namespaces random sequences
+sequences.generalizations slots.syntax tools.gc-decode tools.test vm vocabs
+words ;
 QUALIFIED: effects
 QUALIFIED: llvm.types
 IN: tools.gc-decode.tests
@@ -45,35 +49,57 @@ IN: tools.gc-decode.tests
     \ decode-gc-maps decode-gc-maps
 ] unit-test
 
-! base-pointer-groups
-{ t } [
-    \ llvm.types:resolve-types word>gc-info base-pointer-groups
-    {
-        {
-            { -1 -1 -1 -1 -1 -1 -1 -1 }
-            { -1 -1 -1 -1 -1 -1 -1 -1 }
-            { -1 -1 -1 -1 -1 -1 -1 -1 }
-            { -1 -1 -1 -1 -1 -1 -1 4 }
-            { -1 -1 -1 -1 -1 -1 -1 4 }
-            { -1 -1 -1 -1 -1 -1 -1 -1 }
-        } ! 64-bit
-        {
-            { -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 }
-            { -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 }
-            { -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 }
-            { -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 8 }
-            { -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 8 }
-            { -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 }
-        } ! 32-bit
-    } member?
-] unit-test
+: cfg>gc-maps ( cfg -- gc-maps )
+    cfg>insns [ gc-map-insn? ] filter [ gc-map>> ] map
+    [ gc-map-needed? ] filter ;
 
+: tally-gc-maps ( gc-maps -- seq/f )
+    [ f ] [ {
+        [ [ scrub-d>> length ] map supremum ]
+        [ [ scrub-r>> length ] map supremum ]
+        [ [ check-d>> length ] map supremum ]
+        [ [ check-r>> length ] map supremum ]
+        [ [ gc-root-offsets ] map largest-spill-slot ]
+        [ [ derived-root-offsets ] map [ keys ] map largest-spill-slot ]
+        [ length ]
+    } cleave 7 narray ] if-empty ;
+
+! Like word>gc-info but uses the compiler
+: word>gc-info-expected ( word -- seq/f )
+    test-regs first dup stack-frame>> stack-frame
+    [ cfg>gc-maps tally-gc-maps ] with-variable ;
+
+: same-gc-info? ( compiler-gc-info gc-info -- ? )
+    [ struct-slot-values = ]
+    [ [ not ] dip return-address-count>> 0 = and ] 2bi or ;
 
 ! One of the few words that has derived roots.
 { t } [
-    \ llvm.types:resolve-types word>gc-info
-    {
-        S{ gc-info f 0 2 2 1 5 8 6 } ! 64-bit
-        S{ gc-info f 0 2 2 1 9 12 6 } ! 32-bit
-    } member?
+    \ llvm.types:resolve-types
+    [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
+] unit-test
+
+! Do it also for a bunch of random words
+: normal? ( word -- ? )
+    { [ generic? ] [ primitive? ] [ inline? ] [ no-compile? ] } 1|| not ;
+
+{ t } [
+    all-words [ normal? ] filter 20 sample
+    [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? ] all?
+] unit-test
+
+: base-pointer-groups-expected ( word -- seq )
+    test-regs first dup stack-frame>> stack-frame [
+        cfg>gc-maps [ derived-root-offsets { } like ] { } map-as
+    ] with-variable ;
+
+: base-pointer-groups-decoded ( word -- seq )
+    word>gc-info base-pointer-groups [
+        [ swap 2array ] map-index [ nip -1 = not ] assoc-filter
+    ] map ;
+
+! base-pointer-groups
+{ t } [
+    \ llvm.types:resolve-types
+    [ base-pointer-groups-expected ] [ base-pointer-groups-decoded ] bi =
 ] unit-test

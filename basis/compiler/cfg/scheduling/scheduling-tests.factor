@@ -1,5 +1,5 @@
 USING: accessors arrays assocs compiler.cfg compiler.cfg.dependence
-compiler.cfg.dependence.tests compiler.cfg.instructions
+compiler.cfg.test-words compiler.cfg.instructions
 compiler.cfg.linearization compiler.cfg.registers compiler.cfg.scheduling
 compiler.cfg.utilities grouping kernel math namespaces tools.test random
 sequences sets splitting vectors words compiler.cfg.test-words ;
@@ -55,8 +55,7 @@ IN: compiler.cfg.scheduling.tests
         T{ ##load-tagged }
         T{ ##allot }
         T{ ##set-slot-imm }
-    } insns>cfg schedule-instructions
-    linearization-order [ instructions>> ] map concat [ insn#>> ] all?
+    } insns>cfg schedule-instructions cfg>insns [ insn#>> ] all?
 ] unit-test
 
 : test-1187 ( -- insns )

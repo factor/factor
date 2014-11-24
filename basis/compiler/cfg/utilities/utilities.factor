@@ -3,7 +3,7 @@
 USING: accessors assocs combinators combinators.short-circuit
 cpu.architecture kernel layouts locals make math namespaces sequences
 sets vectors fry arrays compiler.cfg compiler.cfg.instructions
-compiler.cfg.rpo compiler.utilities ;
+compiler.cfg.linearization compiler.cfg.rpo compiler.utilities ;
 IN: compiler.cfg.utilities
 
 : block>cfg ( bb -- cfg )
@@ -14,6 +14,9 @@ IN: compiler.cfg.utilities
 
 : insns>cfg ( insns -- cfg )
     0 insns>block block>cfg ;
+
+: cfg>insns ( cfg -- insns )
+    linearization-order [ instructions>> ] map concat ;
 
 : back-edge? ( from to -- ? )
     [ number>> ] bi@ >= ;

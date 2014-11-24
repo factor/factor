@@ -1,8 +1,6 @@
-USING: accessors alien.c-types arrays classes.struct byte-arrays make
-namespaces compiler.cfg.stack-frame compiler.codegen.gc-maps
-compiler.codegen.relocation bit-arrays tools.test kernel math sequences
-specialized-arrays boxes compiler.cfg.instructions system
-cpu.architecture vm ;
+USING: accessors alien.c-types arrays bit-arrays classes.struct
+compiler.cfg.instructions compiler.cfg.stack-frame compiler.codegen.gc-maps compiler.codegen.relocation cpu.architecture cpu.x86 byte-arrays make namespaces kernel layouts math sequences specialized-arrays system tools.test ;
+QUALIFIED: vm
 SPECIALIZED-ARRAY: uint
 IN: compiler.codegen.gc-maps.tests
 
@@ -58,7 +56,7 @@ M: fake-cpu gc-root-offset ;
     uint-array{ 100 } underlying>> %
 
     ! GC info footer - 28 bytes
-    S{ gc-info
+    S{ vm:gc-info
        { scrub-d-count 5 }
        { scrub-r-count 2 }
        { check-d-count 0 }
@@ -73,9 +71,14 @@ M: fake-cpu gc-root-offset ;
 [ t ] [ "result" get length "expect" get length = ] unit-test
 [ t ] [ "result" get "expect" get = ] unit-test
 
+! Fix the gc root offset calculations
+SINGLETON: linux-x86.64
+M: linux-x86.64 reserved-stack-space 0 ;
+M: linux-x86.64 gc-root-offset
+    n>> spill-offset cell + cell /i ;
 
 cpu x86.64? [
-    x86.64 \ cpu set
+    linux-x86.64 \ cpu set
 
     ! gc-root-offsets
     { { 1 3 } } [
