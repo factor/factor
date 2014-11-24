@@ -1,13 +1,12 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators command-line compiler.units
-continuations debugger effects fry generalizations io kernel
-lexer locals macros namespaces parser prettyprint.backend
-prettyprint.config prettyprint.custom prettyprint.sections
-quotations sequences sequences.generalizations source-files
-source-files.errors source-files.errors.debugger splitting
-stack-checker summary tools.errors vocabs vocabs.files
-vocabs.metadata vocabs.parser words ;
+USING: accessors arrays assocs combinators command-line
+compiler.units continuations debugger effects fry
+generalizations io kernel lexer locals macros namespaces parser
+prettyprint quotations sequences sequences.generalizations
+source-files source-files.errors source-files.errors.debugger
+splitting stack-checker summary tools.errors unicode.case vocabs
+vocabs.files vocabs.metadata vocabs.parser words ;
 FROM: vocabs.hierarchy => load ;
 IN: tools.test
 
