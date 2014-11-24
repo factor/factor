@@ -124,8 +124,7 @@ M: rs-loc pprint* \ R pprint-loc ;
     ] map concat >hashtable representations set ;
 
 : count-insns ( quot insn-check -- ? )
-    [ test-regs [ post-order [ instructions>> ] map concat ] map concat ] dip
-    count ; inline
+    [ test-regs [ cfg>insns ] map concat ] dip count ; inline
 
 : contains-insn? ( quot insn-check -- ? )
     count-insns 0 > ; inline
