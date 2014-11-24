@@ -76,8 +76,7 @@ M: did-not-fail summary drop "Did not fail" ;
     [ { } quot with-datastack drop did-not-fail-literal t ] [ drop f f ] recover ;
 
 : experiment-title ( word -- string )
-    "(" ?head drop ")" ?tail drop
-    H{ { CHAR: - CHAR: \s } } substitute >title ;
+    "(" ?head drop ")" ?tail drop search ;
 
 MACRO: <experiment> ( word -- )
     [ stack-effect in>> length dup ]
@@ -85,8 +84,14 @@ MACRO: <experiment> ( word -- )
     '[ _ ndup _ narray _ prefix ] ;
 
 : experiment. ( seq -- )
-    [ first write ": " write ]
-    [ rest verbose-tests? get [ . ] [ short. ] if flush ] bi ;
+    [
+        [
+            rest verbose-tests? get
+            [ [ pprint* "" text ] each ]
+            [ [ [ pprint* "" text ] with-short-limits ] each ] if
+        ]
+        [ "" text first pprint-word flush ] bi
+    ] with-pprint nl ;
 
 :: experiment ( word: ( -- error ? ) line# -- )
     word <experiment> :> e
