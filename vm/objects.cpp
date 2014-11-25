@@ -121,6 +121,7 @@ struct code_block_write_barrier_visitor {
 
 /* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
    to coalesce equal but distinct quotations and wrappers. */
+/* Calls gc */
 void factor_vm::primitive_become() {
   primitive_minor_gc();
   array* new_objects = untag_check<array>(ctx->pop());

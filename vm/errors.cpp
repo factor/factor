@@ -39,7 +39,6 @@ void out_of_memory(const char *msg) {
 /* Allocates memory */
 void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
 
-
   data_root<object> arg1(arg1_, this);
   data_root<object> arg2(arg2_, this);
 
@@ -91,10 +90,12 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
   }
 }
 
+/* Allocates memory */
 void factor_vm::type_error(cell type, cell tagged) {
   general_error(ERROR_TYPE, tag_fixnum(type), tagged);
 }
 
+/* Allocates memory */
 void factor_vm::not_implemented_error() {
   general_error(ERROR_NOT_IMPLEMENTED, false_object, false_object);
 }
@@ -137,17 +138,21 @@ void factor_vm::signal_error(cell signal) {
   general_error(ERROR_SIGNAL, from_unsigned_cell(signal), false_object);
 }
 
+/* Allocates memory */
 void factor_vm::divide_by_zero_error() {
   general_error(ERROR_DIVIDE_BY_ZERO, false_object, false_object);
 }
 
+/* Allocates memory */
 void factor_vm::fp_trap_error(unsigned int fpu_status) {
   general_error(ERROR_FP_TRAP, tag_fixnum(fpu_status), false_object);
 }
 
 /* For testing purposes */
+/* Allocates memory */
 void factor_vm::primitive_unimplemented() { not_implemented_error(); }
 
+/* Allocates memory */
 void factor_vm::memory_signal_handler_impl() {
   memory_protection_error(signal_fault_pc, signal_fault_addr);
   if (!signal_resumable) {
@@ -157,18 +162,22 @@ void factor_vm::memory_signal_handler_impl() {
   }
 }
 
+/* Allocates memory */
 void memory_signal_handler_impl() {
   current_vm()->memory_signal_handler_impl();
 }
 
+/* Allocates memory */
 void factor_vm::synchronous_signal_handler_impl() {
   signal_error(signal_number);
 }
 
+/* Allocates memory */
 void synchronous_signal_handler_impl() {
   current_vm()->synchronous_signal_handler_impl();
 }
 
+/* Allocates memory (fp_trap_error())*/
 void factor_vm::fp_signal_handler_impl() {
   /* Clear pending exceptions to avoid getting stuck in a loop */
   set_fpu_state(get_fpu_state());
@@ -176,5 +185,6 @@ void factor_vm::fp_signal_handler_impl() {
   fp_trap_error(signal_fpu_status);
 }
 
+/* Allocates memory */
 void fp_signal_handler_impl() { current_vm()->fp_signal_handler_impl(); }
 }

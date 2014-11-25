@@ -83,6 +83,7 @@ struct stack_frame_in_array {
   cell cells[3];
 };
 
+/* Allocates memory (frames.trim()), iterate_callstack_object() */
 void factor_vm::primitive_callstack_to_array() {
   data_root<callstack> callstack(ctx->peek(), this);
 
