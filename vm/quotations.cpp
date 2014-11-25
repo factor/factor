@@ -197,7 +197,7 @@ void quotation_jit::iterate_quotation() {
                                         i == length - 1, /* tail_call_p */
                                         stack_frame);    /* stack_frame_p */
         }                                                /* Everything else */
-            else if (i == length - 1) {
+        else if (i == length - 1) {
           emit_epilog(safepoint, stack_frame);
           tail_call = true;
           word_jump(obj.value());
@@ -241,17 +241,17 @@ void quotation_jit::iterate_quotation() {
 
           i += 2;
         } /* dip */
-            else if (fast_dip_p(i, length)) {
+        else if (fast_dip_p(i, length)) {
           emit_quot(obj.value());
           emit(parent->special_objects[JIT_DIP]);
           i++;
         } /* 2dip */
-            else if (fast_2dip_p(i, length)) {
+        else if (fast_2dip_p(i, length)) {
           emit_quot(obj.value());
           emit(parent->special_objects[JIT_2DIP]);
           i++;
         } /* 3dip */
-            else if (fast_3dip_p(i, length)) {
+        else if (fast_3dip_p(i, length)) {
           emit_quot(obj.value());
           emit(parent->special_objects[JIT_3DIP]);
           i++;
@@ -272,7 +272,7 @@ void quotation_jit::iterate_quotation() {
                                  array_nth(elements.untagged(), i + 2));
           i += 3;
         } /* Non-optimizing compiler ignores declarations */
-            else if (declare_p(i, length))
+        else if (declare_p(i, length))
           i++;
         else
           push(obj.value());

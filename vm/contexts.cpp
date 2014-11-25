@@ -56,6 +56,7 @@ context::~context() {
 }
 
 /* called on startup */
+/* Allocates memory (new_context()) */
 void factor_vm::init_contexts(cell datastack_size_, cell retainstack_size_,
                               cell callstack_size_) {
   datastack_size = datastack_size_;
@@ -98,7 +99,7 @@ void factor_vm::init_context(context* ctx) {
   ctx->context_objects[OBJ_CONTEXT] = allot_alien(ctx);
 }
 
-/* Allocates memory */
+/* Allocates memory (init_context(), but not parent->new_context() */
 context* new_context(factor_vm* parent) {
   context* new_context = parent->new_context();
   parent->init_context(new_context);
@@ -120,7 +121,7 @@ VM_C_API void delete_context(factor_vm* parent, context* old_context) {
   parent->delete_context(old_context);
 }
 
-/* Allocates memory */
+/* Allocates memory (init_context()) */
 VM_C_API void reset_context(factor_vm* parent, context* ctx) {
   ctx->reset();
   parent->init_context(ctx);
@@ -139,6 +140,7 @@ cell factor_vm::begin_callback(cell quot_) {
   return quot.value();
 }
 
+/* Allocates memory */
 cell begin_callback(factor_vm* parent, cell quot) {
   return parent->begin_callback(quot);
 }
@@ -184,6 +186,7 @@ cell factor_vm::stack_to_array(cell bottom, cell top) {
   }
 }
 
+/* Allocates memory */
 cell factor_vm::datastack_to_array(context* ctx) {
   cell array = stack_to_array(ctx->datastack_seg->start, ctx->datastack);
   if (array == false_object) {
@@ -193,13 +196,16 @@ cell factor_vm::datastack_to_array(context* ctx) {
     return array;
 }
 
+/* Allocates memory */
 void factor_vm::primitive_datastack() { ctx->push(datastack_to_array(ctx)); }
 
+/* Allocates memory */
 void factor_vm::primitive_datastack_for() {
   context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
   ctx->replace(datastack_to_array(other_ctx));
 }
 
+/* Allocates memory */
 cell factor_vm::retainstack_to_array(context* ctx) {
   cell array = stack_to_array(ctx->retainstack_seg->start, ctx->retainstack);
   if (array == false_object) {
@@ -209,10 +215,12 @@ cell factor_vm::retainstack_to_array(context* ctx) {
     return array;
 }
 
+/* Allocates memory */
 void factor_vm::primitive_retainstack() {
   ctx->push(retainstack_to_array(ctx));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_retainstack_for() {
   context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
   ctx->replace(retainstack_to_array(other_ctx));

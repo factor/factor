@@ -235,6 +235,7 @@ void factor_vm::primitive_enable_gc_events() {
 }
 
 /* Allocates memory (byte_array_from_value, result.add) */
+/* XXX: Remember that growable_array has a data_root already */
 void factor_vm::primitive_disable_gc_events() {
   if (gc_events) {
     growable_array result(this);

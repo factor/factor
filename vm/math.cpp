@@ -60,6 +60,7 @@ inline fixnum factor_vm::branchless_abs(fixnum x) {
   return (x ^ sign_mask(x)) - sign_mask(x);
 }
 
+/* Allocates memory */
 void factor_vm::primitive_fixnum_shift() {
   fixnum y = untag_fixnum(ctx->pop());
   fixnum x = untag_fixnum(ctx->peek());
@@ -81,10 +82,12 @@ void factor_vm::primitive_fixnum_shift() {
   ctx->replace(tag<bignum>(bignum_arithmetic_shift(fixnum_to_bignum(x), y)));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_fixnum_to_bignum() {
   ctx->replace(tag<bignum>(fixnum_to_bignum(untag_fixnum(ctx->peek()))));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_float_to_bignum() {
   ctx->replace(tag<bignum>(float_to_bignum(ctx->peek())));
 }
@@ -98,26 +101,31 @@ void factor_vm::primitive_bignum_eq() {
   ctx->replace(tag_boolean(bignum_equal_p(x, y)));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_bignum_add() {
   POP_BIGNUMS(x, y);
   ctx->replace(tag<bignum>(bignum_add(x, y)));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_bignum_subtract() {
   POP_BIGNUMS(x, y);
   ctx->replace(tag<bignum>(bignum_subtract(x, y)));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_bignum_multiply() {
   POP_BIGNUMS(x, y);
   ctx->replace(tag<bignum>(bignum_multiply(x, y)));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_bignum_divint() {
   POP_BIGNUMS(x, y);
   ctx->replace(tag<bignum>(bignum_quotient(x, y)));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_bignum_divmod() {
   cell* s0 = (cell*)(ctx->datastack);
   cell* s1 = (cell*)(ctx->datastack - sizeof(cell));
@@ -154,6 +162,7 @@ void factor_vm::primitive_bignum_xor() {
   ctx->replace(tag<bignum>(bignum_bitwise_xor(x, y)));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_bignum_shift() {
   fixnum y = untag_fixnum(ctx->pop());
   bignum* x = untag<bignum>(ctx->peek());

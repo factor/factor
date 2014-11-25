@@ -19,6 +19,7 @@ void factor_vm::init_c_io() {
   special_objects[OBJ_STDERR] = allot_alien(false_object, (cell)stderr);
 }
 
+/* Allocates memory */
 void factor_vm::io_error() {
   if (errno == EINTR)
     return;
@@ -176,7 +177,7 @@ void factor_vm::primitive_fgetc() {
     ctx->replace(tag_fixnum(c));
 }
 
-/* Allocates memory */
+/* Allocates memory (from_unsigned_cell())*/
 void factor_vm::primitive_fread() {
   FILE* file = pop_file_handle();
   void* buf = (void*)alien_offset(ctx->pop());

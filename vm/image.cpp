@@ -334,6 +334,7 @@ void factor_vm::primitive_save_image() {
              (vm_char*)(path2.untagged() + 1));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_save_image_and_exit() {
   /* We unbox this before doing anything else. This is the only point
      where we might throw an error, so we have to throw an error here since

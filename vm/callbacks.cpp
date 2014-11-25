@@ -124,7 +124,7 @@ void callback_heap::update() {
   allocator->iterate(updater);
 }
 
-/* Allocates memory */
+/* Allocates memory (add(), allot_alien())*/
 void factor_vm::primitive_callback() {
   cell return_rewind = to_cell(ctx->pop());
   tagged<word> w(ctx->pop());
