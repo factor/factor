@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel io.streams.string io strings splitting
-sequences math math.parser assocs classes words namespaces make
-prettyprint hashtables mirrors tr json fry combinators ;
+USING: accessors ascii assocs combinators fry hashtables io
+io.streams.string json kernel math math.parser mirrors
+namespaces sequences strings tr words ;
 IN: json.writer
 
 #! Writes the object out to a stream in JSON format
@@ -28,9 +28,23 @@ M: string stream-json-print
     CHAR: " over stream-write1 swap [
         {
             { CHAR: "  [ "\\\"" over stream-write ] }
-            { CHAR: \r [ ] }
-            { CHAR: \n [ "\\r\\n" over stream-write ] }
-            [ over stream-write1 ]
+            { CHAR: \\  [ "\\\\" over stream-write ] }
+            { CHAR: /  [ "\\/" over stream-write ] }
+            { CHAR: \b [ "\\b" over stream-write ] }
+            { CHAR: \f [ "\\f" over stream-write ] }
+            { CHAR: \n [ "\\n" over stream-write ] }
+            { CHAR: \r [ "\\r" over stream-write ] }
+            { CHAR: \s [ "\\s" over stream-write ] }
+            { CHAR: \t [ "\\t" over stream-write ] }
+            [
+                dup printable?
+                [ over stream-write1 ]
+                [
+                    "\\u" pick stream-write
+                    >hex 4 CHAR: 0 pad-head
+                    over stream-write
+                ] if
+            ]
         } case
     ] each CHAR: " swap stream-write1 ;
 
@@ -46,7 +60,7 @@ M: integer stream-json-print
     } cond ;
 
 M: float stream-json-print
-    [ float>json ] dip stream-write ;
+    [ float>json ] [ stream-write ] bi* ;
 
 M: real stream-json-print
     [ >float number>string ] [ stream-write ] bi* ;

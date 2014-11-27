@@ -64,3 +64,10 @@ IN: json.reader.tests
 
 ! empty objects are allowed as values in objects
 { H{ { "foo" H{ } } } } [ "{ \"foo\" : {}}" json> ] unit-test
+
+{
+    "\0\x01\x02\x03\x04\x05\x06\a\b\t\n\v\f\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\e\x1c\x1d\x1e\x1f"
+} [
+    "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\""
+    json>
+] unit-test
