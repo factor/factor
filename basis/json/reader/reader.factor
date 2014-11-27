@@ -11,15 +11,18 @@ IN: json.reader
 <PRIVATE
 
 : value ( char stream -- num char )
-    [ 1string ] [ " \t\r\n,:}]" swap stream-read-until ] bi*
+    [ 1string ] [ "\s\t\r\n,:}]" swap stream-read-until ] bi*
     [ append string>number ] dip ;
 
 DEFER: j-string%
 
 : j-escape% ( stream -- )
     dup stream-read1 {
-        { CHAR: b [ 8 ] }
-        { CHAR: f [ 12 ] }
+        { CHAR: " [ CHAR: " ] }
+        { CHAR: \\ [ CHAR: \\ ] }
+        { CHAR: / [ CHAR: / ] }
+        { CHAR: b [ CHAR: \b ] }
+        { CHAR: f [ CHAR: \f ] }
         { CHAR: n [ CHAR: \n ] }
         { CHAR: r [ CHAR: \r ] }
         { CHAR: t [ CHAR: \t ] }
