@@ -105,13 +105,14 @@ M: sequence stream-json-print
 
 TR: json-friendly "-" "_" ;
 
-GENERIC: json-key ( obj -- str )
-M: f json-key drop "false" ;
-M: t json-key drop "true" ;
-M: json-null json-key drop "null" ;
-M: integer json-key number>string ;
-M: float json-key float>json ;
-M: real json-key >float number>string ;
+GENERIC: json-coerce ( obj -- str )
+M: f json-coerce drop "false" ;
+M: t json-coerce drop "true" ;
+M: json-null json-coerce drop "null" ;
+M: string json-coerce ;
+M: integer json-coerce number>string ;
+M: float json-coerce float>json ;
+M: real json-coerce >float number>string ;
 
 :: json-print-assoc ( obj stream -- )
     CHAR: { stream stream-write1 obj >alist
@@ -121,7 +122,7 @@ M: real json-key >float number>string ;
         first2 [
             dup string?
             [ _ [ json-friendly ] when ]
-            [ _ [ json-key ] when ] if
+            [ _ [ json-coerce ] when ] if
             stream stream-json-print
         ] [
             CHAR: : stream stream-write1
