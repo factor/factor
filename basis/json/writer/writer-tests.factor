@@ -9,31 +9,30 @@ IN: json.writer.tests
 { "-102" } [ -102 >json ] unit-test
 { "102.0" } [ 102.0 >json ] unit-test
 { "102.5" } [ 102.5 >json ] unit-test
+{ "0.5" } [ 1/2 >json ] unit-test
 
 { "[1,\"two\",3.0]" } [ { 1 "two" 3.0 } >json ] unit-test
-{ """{"US$":1.0,"EU\\u20ac\":1.5}""" } [ H{ { "US$" 1.0 } { "EU€" 1.5 } } >json ] unit-test
+{ """{"US$":1.0,"EU€":1.5}""" } [ H{ { "US$" 1.0 } { "EU€" 1.5 } } >json ] unit-test
 
-! Random symbols are written simply as strings
-SYMBOL: testSymbol
-{ """"testSymbol"""" } [ testSymbol >json ] unit-test
+{ """">json"""" } [ \ >json >json ] unit-test
 
 [ { 0.5 } ] [ { 1/2 } >json json> ] unit-test
 
-[ "{\"b-b\":\"asdf\"}" ] 
-    [ f jsvar-encode? [ "asdf" "b-b" associate >json ] with-variable ] unit-test
+TUPLE: person first-name age ;
 
-[ "{\"b_b\":\"asdf\"}" ]
-    [ t jsvar-encode? [ "asdf" "b-b" associate >json ] with-variable ] unit-test
+[ "{\"first-name\":\"David\",\"age\":32}" ]
+[
+    f json-friendly-keys?
+    [ "David" 32 person boa >json ]
+    with-variable
+] unit-test
 
-TUPLE: person name age a-a ;
-[ "{\"name\":\"David-David\",\"age\":32,\"a_a\":{\"b_b\":\"asdf\"}}" ]
-    [ t jsvar-encode? 
-        [ "David-David" 32 H{ { "b-b" "asdf" } } person boa >json ] 
-        with-variable ] unit-test
-[ "{\"name\":\"Alpha-Beta\",\"age\":32,\"a-a\":{\"b-b\":\"asdf\"}}" ]
-    [ f jsvar-encode? 
-        [ "Alpha-Beta" 32 H{ { "b-b" "asdf" } } person boa >json ] 
-        with-variable ] unit-test
+[ "{\"first_name\":\"David\",\"age\":32}" ]
+[
+    t json-friendly-keys?
+    [ "David" 32 person boa >json ]
+    with-variable
+] unit-test
 
 { """{"1":2,"3":4}""" }
 [ H{ { "1" 2 } { "3" 4 } } >json ] unit-test
@@ -50,17 +49,17 @@ TUPLE: person name age a-a ;
 { """{"3.1":3}""" }
 [ H{ { 3.1 3 } } >json ] unit-test
 
-{ """{"Infinity":1}""" }
-[ H{ { 1/0. 1 } } >json ] unit-test
-
-{ """{"-Infinity":1}""" }
-[ H{ { -1/0. 1 } } >json ] unit-test
-
 { """{"null":1}""" }
 [ H{ { json-null 1 } } >json ] unit-test
 
+{ """{"Infinity":1}""" }
+[ t json-allow-nans? [ H{ { 1/0. 1 } } >json ] with-variable ] unit-test
+
+{ """{"-Infinity":1}""" }
+[ t json-allow-nans? [ H{ { -1/0. 1 } } >json ] with-variable ] unit-test
+
 { """{"NaN":1}""" }
-[ H{ { NAN: 333 1 } } >json ] unit-test
+[ t json-allow-nans? [ H{ { NAN: 333 1 } } >json ] with-variable ] unit-test
 
 {
     "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\""

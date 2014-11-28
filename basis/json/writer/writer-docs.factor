@@ -10,9 +10,17 @@ HELP: >json
 
 HELP: json-print
 { $values { "obj" object } }
-{ $description "Serializes the object into a JSON formatted string and outputs it to the standard output stream. 
-
-By default, tuples and hashtables are serialized into Javascript-friendly JSON formatted output by converting keys containing dashes into underscores. This behaviour can be modified by setting the dynamic variable " { $strong "jsvar-encode?" } " to false." } 
+{ $description "Serializes the object into a JSON formatted string and outputs it to the standard output stream."
+$nl
+"Some options can control the formatting of the result:"
+{ $table
+     { { $link json-allow-nans? }     "Allow special floating-points: NaN, Infinity, -Infinity." }
+     { { $link json-friendly-keys? }  "Convert - to _ in tuple slots and hashtable keys" }
+     { { $link json-coerce-keys? }    "Coerce hashtable keys into strings" }
+     { { $link json-escape-slashes? } "Escape forward slashes inside strings" }
+     { { $link json-escape-unicode? } "Escape unicode values inside strings" }
+}
+}
 { $see-also >json } ;
 
 ARTICLE: "json.writer" "JSON writer"
