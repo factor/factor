@@ -1,23 +1,23 @@
 ! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs combinators fry hashtables io
-io.streams.string json kernel kernel.private make math
-math.parser namespaces prettyprint sequences sequences.private
-strings vectors ;
+USING: arrays assocs combinators fry hashtables io
+io.streams.string json kernel kernel.private math math.parser
+namespaces sbufs sequences sequences.private strings vectors ;
 
 IN: json.reader
 
 <PRIVATE
 
-: value ( char stream -- num char )
+: json-number ( char stream -- num char )
     [ 1string ] [ "\s\t\r\n,:}]" swap stream-read-until ] bi*
     [ append string>number ] dip ;
 
-DEFER: j-string%
+DEFER: (read-json-string)
 
-: j-escape% ( stream -- )
-    dup stream-read1 {
+: (read-json-escape) ( stream accum -- accum )
+    { sbuf } declare
+    over stream-read1 {
         { CHAR: " [ CHAR: " ] }
         { CHAR: \\ [ CHAR: \\ ] }
         { CHAR: / [ CHAR: / ] }
@@ -26,17 +26,18 @@ DEFER: j-string%
         { CHAR: n [ CHAR: \n ] }
         { CHAR: r [ CHAR: \r ] }
         { CHAR: t [ CHAR: \t ] }
-        { CHAR: u [ 4 over stream-read hex> ] }
+        { CHAR: u [ 4 pick stream-read hex> ] }
         [ ]
-    } case [ , j-string% ] [ drop ] if* ;
+    } case [ suffix! (read-json-string) ] [ json-error ] if* ;
 
-: j-string% ( stream -- )
-    "\\\"" over stream-read-until [ % ] dip
-    CHAR: \" = [ drop ] [ j-escape% ] if ;
+: (read-json-string) ( stream accum -- accum )
+    { sbuf } declare
+    "\\\"" pick stream-read-until [ append! ] dip
+    CHAR: \" = [ nip ] [ (read-json-escape) ] if ;
 
-: j-string ( stream -- str )
+: read-json-string ( stream -- str )
     "\\\"" over stream-read-until CHAR: \" =
-    [ nip ] [ [ % j-escape% ] "" make ] if ;
+    [ nip ] [ >sbuf (read-json-escape) { sbuf } declare "" like ] if ;
 
 : second-last-unsafe ( seq -- second-last )
     [ length 2 - ] [ nth-unsafe ] bi ; inline
@@ -44,56 +45,65 @@ DEFER: j-string%
 : pop-unsafe ( seq -- elt )
     [ length 1 - ] keep [ nth-unsafe ] [ shorten ] 2bi ; inline
 
-ERROR: json-error ;
-
 : check-length ( seq n -- seq )
-    [ dup length ] [ >= ] bi* [ json-error ] unless
+    [ dup length ] [ >= ] bi* [ json-error ] unless ; inline
+
+: v-over-push ( accum -- accum )
+    { vector } declare 2 check-length
+    dup [ pop-unsafe ] [ last-unsafe ] bi
+    { vector } declare push ;
+
+: v-pick-push ( accum -- accum )
+    { vector } declare 3 check-length dup
+    [ pop-unsafe ] [ second-last-unsafe ] bi
+    { vector } declare push ;
+
+: v-pop ( accum -- vector )
+    pop { vector } declare ; inline
+
+: v-close ( accum -- accum )
+    { vector } declare
+    dup last V{ } = not [ v-over-push ] when
     { vector } declare ; inline
 
-: v-over-push ( vec -- vec' )
-    2 check-length dup [ pop-unsafe ] [ last-unsafe ] bi
-    push ;
+: json-open-array ( accum -- accum )
+    { vector } declare V{ } clone suffix! ;
 
-: v-pick-push ( vec -- vec' )
-    3 check-length dup [ pop-unsafe ] [ second-last-unsafe ] bi
-    push ;
+: json-open-hash ( accum -- accum )
+    { vector } declare V{ } clone suffix! V{ } clone suffix! ;
 
-: (close) ( accum -- accum' )
-    { vector } declare
-    dup last V{ } = not [ v-over-push ] when ;
+: json-close-array ( accum -- accum )
+    v-close dup v-pop { } like suffix! ;
 
-: (close-array) ( accum -- accum' )
-    { vector } declare
-    (close) dup pop >array suffix! ;
+: json-close-hash ( accum -- accum )
+    v-close dup dup [ v-pop ] bi@ swap H{ } zip-as suffix! ;
 
-: (close-hash) ( accum -- accum' )
-    { vector } declare
-    (close) dup dup [ pop ] bi@ 2dup min-length <hashtable>
-    [ [ set-at ] curry 2each ] keep suffix! ;
+: json-expect ( token stream -- )
+    [ dup length ] [ stream-read ] bi* = [ json-error ] unless ; inline
 
 : scan ( stream accum char -- stream accum )
     ! 2dup 1string swap . . ! Great for debug...
+    { object vector object } declare
     {
-        { CHAR: \" [ over j-string suffix! ] }
-        { CHAR: [  [ V{ } clone suffix! ] }
+        { CHAR: \" [ over read-json-string suffix! ] }
+        { CHAR: [  [ json-open-array ] }
         { CHAR: ,  [ v-over-push ] }
-        { CHAR: ]  [ (close-array) ] }
-        { CHAR: {  [ 2 [ V{ } clone suffix! ] times ] }
+        { CHAR: ]  [ json-close-array ] }
+        { CHAR: {  [ json-open-hash ] }
         { CHAR: :  [ v-pick-push ] }
-        { CHAR: }  [ (close-hash) ] }
+        { CHAR: }  [ json-close-hash ] }
         { CHAR: \s [ ] }
         { CHAR: \t [ ] }
         { CHAR: \r [ ] }
         { CHAR: \n [ ] }
-        { CHAR: t  [ 3 pick stream-read drop t suffix! ] }
-        { CHAR: f  [ 4 pick stream-read drop f suffix! ] }
-        { CHAR: n  [ 3 pick stream-read drop json-null suffix! ] }
-        [ pick value [ suffix! ] dip [ scan ] when*  ]
+        { CHAR: t  [ "rue" pick json-expect t suffix! ] }
+        { CHAR: f  [ "alse" pick json-expect f suffix! ] }
+        { CHAR: n  [ "ull" pick json-expect json-null suffix! ] }
+        [ pick json-number [ suffix! ] dip [ scan ] when*  ]
     } case ;
 
 : stream-json-read ( stream -- objects )
-    V{ } clone over '[ _ stream-read1 dup ]
-    [ scan ] while drop nip ;
+    V{ } clone over '[ _ stream-read1 dup ] [ scan ] while drop nip ;
 
 PRIVATE>
 
