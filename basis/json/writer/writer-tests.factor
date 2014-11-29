@@ -53,13 +53,13 @@ TUPLE: person first-name age ;
 [ H{ { json-null 1 } } >json ] unit-test
 
 { """{"Infinity":1}""" }
-[ t json-allow-nans? [ H{ { 1/0. 1 } } >json ] with-variable ] unit-test
+[ t json-allow-fp-special? [ H{ { 1/0. 1 } } >json ] with-variable ] unit-test
 
 { """{"-Infinity":1}""" }
-[ t json-allow-nans? [ H{ { -1/0. 1 } } >json ] with-variable ] unit-test
+[ t json-allow-fp-special? [ H{ { -1/0. 1 } } >json ] with-variable ] unit-test
 
 { """{"NaN":1}""" }
-[ t json-allow-nans? [ H{ { NAN: 333 1 } } >json ] with-variable ] unit-test
+[ t json-allow-fp-special? [ H{ { NAN: 333 1 } } >json ] with-variable ] unit-test
 
 {
     "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\""

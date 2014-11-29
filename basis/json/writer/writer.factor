@@ -5,8 +5,8 @@ io.streams.string json kernel locals math math.parser mirrors
 namespaces sequences strings tr words ;
 IN: json.writer
 
-SYMBOL: json-allow-nans?
-f json-allow-nans? set-global
+SYMBOL: json-allow-fp-special?
+f json-allow-fp-special? set-global
 
 SYMBOL: json-friendly-keys?
 t json-friendly-keys? set-global
@@ -79,7 +79,7 @@ M: integer stream-json-print
 
 : float>json ( float -- string )
     dup fp-special? [
-        json-allow-nans? get [ json-error ] unless
+        json-allow-fp-special? get [ json-error ] unless
         {
             { [ dup fp-nan? ] [ drop "NaN" ] }
             { [ dup 1/0. = ] [ drop "Infinity" ] }
