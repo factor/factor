@@ -1,9 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs kernel locals math math.functions sequences
-sorting sorting.extras vectors fry ;
-USE: accessors
+USING: accessors assocs kernel locals math sequences sorting ;
 
 IN: math.binpack
 
