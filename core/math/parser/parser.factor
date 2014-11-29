@@ -52,7 +52,7 @@ TUPLE: float-parse
     [ radix>> ] [ point>> 1 + ] [ exponent>> ] tri float-parse boa ; inline
 
 : store-exponent ( float-parse n expt -- float-parse' n )
-    swap [ [ drop radix>> ] [ drop point>> ] [ nip ] 2tri float-parse boa ] dip ; inline
+    swap [ [ radix>> ] [ point>> ] bi ] 2dip [ float-parse boa ] dip ; inline
 
 : ?store-exponent ( float-parse n expt/f -- float-parse' n/f )
     [ store-exponent ] [ drop f ] if* ; inline
@@ -76,9 +76,7 @@ TUPLE: float-parse
 
 : ?default-exponent ( float-parse n/f -- float-parse' n/f' )
     over exponent>> [
-        over radix>> 10 =
-        [ [ [ radix>> ] [ point>> ] bi 0 float-parse boa ] dip ]
-        [ drop f ] if
+        over radix>> 10 = [ 0 store-exponent ] [ drop f ] if
     ] unless ; inline
 
 : ?make-float ( float-parse n/f -- float/f )
