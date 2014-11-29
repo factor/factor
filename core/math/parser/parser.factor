@@ -271,11 +271,7 @@ DEFER: @neg-digit
     {
         { CHAR: - [ [ @neg-digit ] require-next-digit ?neg ] }
         { CHAR: + [ [ @pos-digit ] require-next-digit ] }
-        [
-            pick radix>> 10 =
-            [ @pos-first-digit ]
-            [ @pos-digit ] if
-        ]
+        [ @pos-digit ]
     } case ; inline
 
 PRIVATE>
