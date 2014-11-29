@@ -58,7 +58,7 @@ ERROR: undefined-find-nth m n seq quot ;
     >lower '[ name>> _ = ] find ; inline
 
 : stack-find ( seq quot: ( elt -- 1/0/-1 ) -- i/f )
-    map cum-sum [ 0 = ] find drop ; inline
+    map cum-sum 0 swap index ; inline
 
 : tag-classifier ( string -- quot )
     >lower
