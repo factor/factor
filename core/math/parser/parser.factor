@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators kernel kernel.private
 layouts make math math.private namespaces sbufs sequences
-sequences.private splitting strings ;
+sequences.private splitting strings strings.private ;
 IN: math.parser
 
 : digit> ( ch -- n )
@@ -22,14 +22,11 @@ TUPLE: number-parse
     { radix fixnum read-only } ;
 
 : <number-parse> ( str radix -- i number-parse n )
-    [ 0 ] 2dip
-    [ dup length ] dip
-    number-parse boa
-    0 ; inline
+    [ 0 ] 2dip [ dup length ] dip number-parse boa 0 ; inline
 
 : (next-digit) ( i number-parse n digit-quot end-quot -- n/f )
     [ 2over length>> < ] 2dip
-    [ [ 2over str>> nth-unsafe >fixnum [ 1 + >fixnum ] 3dip ] prepose ] dip if ; inline
+    [ [ 2over str>> nth-unsafe >fixnum [ 1 fixnum+fast ] 3dip ] prepose ] dip if ; inline
 
 : require-next-digit ( i number-parse n quot -- n/f )
     [ 3drop f ] (next-digit) ; inline
@@ -139,9 +136,9 @@ DEFER: @neg-digit
     @split-exponent [ @exponent-first-char ] require-next-digit ?store-exponent ; inline
 
 : exponent-char? ( number-parse n char -- number-parse n char ? )
-    3dup nip swap radix>> {
-        { 10 [ [ CHAR: e CHAR: E ] dip [ = ] curry either? ] }
-        [ drop [ CHAR: p CHAR: P ] dip [ = ] curry either? ]
+    pick radix>> {
+        { 10 [ dup CHAR: e = [ t ] [ dup CHAR: E = ] if ] }
+        [ drop dup CHAR: p = [ t ] [ dup CHAR: P = ] if ]
     } case ; inline
 
 : or-exponent ( i number-parse n char quot -- n/f )
@@ -274,7 +271,11 @@ DEFER: @neg-digit
     {
         { CHAR: - [ [ @neg-digit ] require-next-digit ?neg ] }
         { CHAR: + [ [ @pos-digit ] require-next-digit ] }
-        [ @pos-digit ]
+        [
+            pick radix>> 10 =
+            [ @pos-first-digit ]
+            [ @pos-digit ] if
+        ]
     } case ; inline
 
 PRIVATE>
@@ -422,19 +423,14 @@ M: ratio >base
         swap call pick "-" "+" ? rot 3append
     ] if-zero swap [ CHAR: - prefix ] when ;
 
-: fix-float ( str -- newstr )
-    {
-        {
-            [ CHAR: e over member? ]
-            [ "e" split1 [ fix-float "e" ] dip 3append ]
-        } {
-            [ CHAR: . over member? ]
-            [ ]
-        }
-        [ ".0" append ]
-    } cond ;
-
 <PRIVATE
+
+: fix-float ( str -- newstr )
+    CHAR: e over member? [
+        "e" split1 [ fix-float ] dip "e" glue
+    ] [
+        CHAR: . over member? [ ".0" append ] unless
+    ] if ;
 
 : mantissa-expt-normalize ( mantissa expt -- mantissa' expt' )
     [ dup log2 52 swap - [ shift 52 2^ 1 - bitand ] [ 1022 + neg ] bi ]
@@ -461,10 +457,21 @@ M: ratio >base
         mantissa-expt [ float>hex-value ] [ float>hex-expt ] bi*
     ] bi 3append ;
 
+: format-string ( format -- format )
+    0 suffix >byte-array ; foldable
+
+: format-head ( byte-array n -- string )
+    swap over 0 <string> [
+        [
+            [ [ nth-unsafe ] 2keep drop ]
+            [ set-string-nth-fast ] bi*
+        ] 2curry each-integer
+    ] keep ; inline
+
 : format-float ( n format -- string )
-    0 suffix >byte-array (format-float)
-    dup [ 0 = ] find drop head >string
-    fix-float ;
+    format-string (format-float)
+    dup [ 0 = ] find drop
+    format-head fix-float ; inline
 
 : float>base ( n radix -- str )
     {
@@ -474,9 +481,6 @@ M: ratio >base
     } case ; inline
 
 PRIVATE>
-
-: float>string ( n -- str )
-    10 float>base ; inline
 
 M: float >base
     {
