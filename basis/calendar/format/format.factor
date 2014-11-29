@@ -137,7 +137,7 @@ M: timestamp year. ( timestamp -- )
 ! Should be enough for anyone, allows to not do a fancy
 ! algorithm to detect infinite decimals (e.g 1/3)
 : ss.SSSSSS ( timestamp -- )
-    second>> >float "%.6f" format-float 9 CHAR: 0 pad-head write ;
+    second>> >float "%09.6f" format-float write ;
 
 : (timestamp>rfc3339) ( timestamp -- )
     {
