@@ -111,11 +111,6 @@ HELP: >hex
     }
 } ;
 
-HELP: float>string
-{ $values { "n" real } { "str" string } }
-{ $description "Primitive for getting a string representation of a float." }
-{ $notes "The " { $link number>string } " word is more general." } ;
-
 HELP: number>string
 { $values { "n" real } { "str" string } }
 { $description "Converts a real number to a string." }
