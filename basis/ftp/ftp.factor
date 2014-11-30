@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators io io.files kernel
-math.parser sequences strings ;
+USING: accessors io kernel sequences ;
 IN: ftp
 
 SYMBOLS: +active+ +passive+ ;
