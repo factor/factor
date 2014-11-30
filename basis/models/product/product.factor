@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors models kernel sequences ;
+USING: accessors kernel models sequences ;
 IN: models.product
 
 TUPLE: product < model ;
@@ -26,7 +26,7 @@ M: product model-changed
 M: product model-activated dup model-changed ;
 
 M: product update-model
-    dup value>> swap [ set-model ] set-product-value ;
+    [ value>> ] keep [ set-model ] set-product-value ;
 
 M: product range-value
     [ range-value ] product-value ;
