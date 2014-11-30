@@ -117,7 +117,7 @@ SYMBOL: callbacks
 TUPLE: expiry-check object alien ;
 
 : recompute-value? ( check -- ? )
-    dup [ alien>> expired? ] [ drop t ] if ;
+    [ alien>> expired? ] [ t ] if* ;
 
 : delete-values ( value assoc -- )
     [ rot drop = not ] with assoc-filter! drop ;

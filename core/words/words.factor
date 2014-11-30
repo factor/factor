@@ -212,12 +212,11 @@ ERROR: bad-create name vocab ;
 
 : create ( name vocab -- word )
     check-create 2dup lookup-word
-    dup [ 2nip ] [
-        drop
+    [ 2nip ] [
         vocab-name <word>
         dup reveal
         dup changed-definition
-    ] if ;
+    ] if* ;
 
 : constructor-word ( name vocab -- word )
     [ "<" ">" surround ] dip create ;
