@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.smart
-destructors fry io io.encodings.utf8 kernel managed-server
-namespaces parser sequences sorting splitting strings.parser
-unicode.case unicode.categories calendar calendar.format
-locals io.encodings.binary io.encodings.string prettyprint ;
+USING: accessors assocs calendar calendar.format
+combinators.smart io io.crlf io.encodings.utf8 kernel locals
+managed-server namespaces sequences sorting splitting
+unicode.case ;
 FROM: namespaces => set ;
 IN: managed-server.chat
 
@@ -19,7 +18,7 @@ chat-docs [ H{ } clone ] initialize
 CONSTANT: line-beginning "-!- "
 
 : send-line ( string -- )
-    write "\r\n" write flush ;
+    write crlf flush ;
 
 : handle-me ( string -- )
     [
