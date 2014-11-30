@@ -75,8 +75,10 @@ SYMBOL: tagstack
     [ advance advance read-comment ] [ read-dtd ] if ;
 
 : read-tag ( sequence-parser -- string )
-    [ [ current "><" member? ] take-until ]
-    [ dup current CHAR: < = [ advance ] unless drop ] bi ;
+    [
+        [ current "><" member? ] take-until
+        [ CHAR: / = ] trim-tail
+    ] [ dup current CHAR: < = [ advance ] unless drop ] bi ;
 
 : read-until-< ( sequence-parser -- string )
     [ current CHAR: < = ] take-until ;
