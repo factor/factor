@@ -56,8 +56,8 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
 : check-tuple ( object -- tuple )
     dup tuple? [ not-a-tuple ] unless ; inline
 
-: prepare-tuple>array ( tuple -- n tuple layout )
-    check-tuple [ tuple-size iota ] [ ] [ layout-of ] tri ;
+: prepare-tuple-slots ( tuple -- n tuple )
+    check-tuple [ tuple-size iota ] keep ;
 
 : copy-tuple-slots ( n tuple -- array )
     [ array-nth ] curry map ;
@@ -78,13 +78,8 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
 
 PRIVATE>
 
-: tuple>array ( tuple -- array )
-    prepare-tuple>array
-    [ copy-tuple-slots ] dip
-    first prefix ;
-
 : tuple-slots ( tuple -- seq )
-    prepare-tuple>array drop copy-tuple-slots ;
+    prepare-tuple-slots copy-tuple-slots ;
 
 GENERIC: slots>tuple ( seq class -- tuple )
 
@@ -95,6 +90,9 @@ M: tuple-class slots>tuple ( seq class -- tuple )
         [ [ set-array-nth ] curry ]
         bi 2each
     ] keep ;
+
+: tuple>array ( tuple -- array )
+    [ tuple-slots ] [ layout-of first prefix ] bi ;
 
 : >tuple ( seq -- tuple )
     unclip slots>tuple ;

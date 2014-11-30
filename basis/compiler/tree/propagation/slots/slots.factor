@@ -26,7 +26,7 @@ IN: compiler.tree.propagation.slots
     <sequence-info> 1array ;
 
 : fold-<tuple-boa> ( values class -- info )
-    [ [ literal>> ] map ] dip prefix >tuple
+    [ [ literal>> ] map ] dip slots>tuple
     <literal-info> ;
 
 : read-only-slots ( values class -- slots )
