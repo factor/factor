@@ -96,3 +96,34 @@ V{
 ] [
     "<!--comment-->" parse-html
 ] unit-test
+
+! Issue #1233, trailing / in tags
+{
+    V{
+        T{ tag
+            { name "img" }
+            { attributes H{ { "src" "http://factorcode.org" } } }
+        }
+    }
+}
+[ "<img src=\"http://factorcode.org\">" parse-html ] unit-test
+
+{
+    V{
+        T{ tag
+            { name "img" }
+            { attributes H{ { "src" "http://factorcode.org" } } }
+        }
+    }
+}
+[ "<img src=\"http://factorcode.org\"/>" parse-html ] unit-test
+
+{
+    V{
+        T{ tag
+            { name "img" }
+            { attributes H{ { "src" "http://factorcode.org" } } }
+        }
+    }
+}
+[ "<img src=\"http://factorcode.org\"////////>" parse-html ] unit-test
