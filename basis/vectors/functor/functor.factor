@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: functors sequences sequences.private growable
-kernel words classes math parser ;
+USING: classes functors growable kernel math sequences
+sequences.private ;
 IN: vectors.functor
 
 FUNCTOR: define-vector ( V A <A> -- )
