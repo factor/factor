@@ -76,7 +76,7 @@ ERROR: unsupported-pixel-format component-order ;
 : image-encoders ( -- codec-infos )
     image-encoders-size dup <byte-array> 3dup
     GdipGetImageEncoders check-gdi+-status
-    nip swap <direct-ImageCodecInfo-array> ;
+    nip swap ImageCodecInfo <c-direct-array> ;
 
 : extension>mime-type ( extension -- mime-type )
     ! Crashes if you let this mime through on my machine.
