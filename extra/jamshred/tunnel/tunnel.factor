@@ -32,9 +32,7 @@ CONSTANT: random-rotation-angle $[ pi 20 / ]
     random-color >>color dup segment-number++ ;
 
 : (random-segments) ( segments n -- segments )
-    dup 0 > [
-        [ dup last random-segment over push ] dip 1 - (random-segments)
-    ] [ drop ] if ;
+    [ dup last random-segment suffix! ] times ;
 
 CONSTANT: default-segment-radius 1
 

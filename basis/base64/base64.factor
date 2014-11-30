@@ -14,7 +14,7 @@ ERROR: malformed-base64 ;
     [ drop read1-ignoring ] [ 2nip ] if ; inline recursive
 
 : push-ignoring ( accum ch -- accum )
-    dup { f 0 } member-eq? [ drop ] [ over push ] if ; inline
+    dup { f 0 } member-eq? [ drop ] [ suffix! ] if ; inline
 
 : read-ignoring ( n ignoring stream -- str/f )
     [ [ <sbuf> ] keep ] 2dip

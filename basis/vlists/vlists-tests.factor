@@ -20,7 +20,7 @@ IN: vlists.tests
     dup "v" get [ vector>> ] bi@ eq?
 ] unit-test
 
-[ VL{ } 3 over push ] must-fail
+[ VL{ } 3 suffix! ] must-fail
 
 [ 4 VL{ "hi" } set-first ] must-fail
 

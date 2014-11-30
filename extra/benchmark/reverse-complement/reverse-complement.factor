@@ -16,7 +16,7 @@ TR: trans-map ch>upper "ACGTUMRYKVHDB" "TGCAAKYRMBDHV" ;
 
 : do-line ( seq line -- seq )
     dup first ">;" member-eq?
-    [ over show-seq print dup delete-all ] [ over push ] if ;
+    [ over show-seq print dup delete-all ] [ suffix! ] if ;
 
 HINTS: do-line vector string ;
 
