@@ -41,8 +41,8 @@ $nl
 "Then you can run the following code, or add it to your " { $link ".factor-rc" } "."
 $nl
 { $code
-    """USING: accessors kernel sequences sets ui.commands
-ui.gadgets.editors ui.gestures ;
+    """USING: accessors assocs kernel sequences sets ui.commands
+ui.gadgets.editors ui.gestures ui.tools.listener ;
 
 "multiline" multiline-editor get-command-at [
     {
@@ -50,7 +50,11 @@ ui.gadgets.editors ui.gestures ;
         { T{ key-down f { C+ } "a" } start-of-line }
         { T{ key-down f { C+ } "e" } end-of-line }
     } append members
-] change-commands drop multiline-editor update-gestures"""
+] change-commands drop multiline-editor update-gestures
+
+"interactor" interactor get-command-at [
+    [ drop T{ key-down f { C+ } "k" } = not ] assoc-filter
+] change-commands drop interactor update-gestures"""
 }
 $nl
 { $heading "Implementation" }
