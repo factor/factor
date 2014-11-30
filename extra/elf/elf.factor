@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-alien.syntax arrays classes.struct fry io.encodings.ascii
+alien.syntax arrays assocs classes.struct fry io.encodings.ascii
 io.mmap kernel locals math math.intervals sequences
-specialized-arrays strings typed assocs ;
+specialized-arrays strings typed ;
 IN: elf
 
 ! FFI data
@@ -475,23 +475,18 @@ TYPED: 64-bit? ( elf: Elf32/64_Ehdr -- ? )
     e_ident>> EI_CLASS swap nth ELFCLASS64 = ;
 
 TYPED: elf-header ( c-ptr -- elf: Elf32/64_Ehdr )
-    [ Elf64_Ehdr memory>struct 64-bit? ] keep swap
-    [ Elf64_Ehdr memory>struct ]
-    [ Elf32_Ehdr memory>struct ] if ;
+    dup Elf64_Ehdr memory>struct dup 64-bit?
+    [ nip ] [ drop Elf32_Ehdr memory>struct ] if ;
 
 TYPED:: elf-section-headers ( elf: Elf32/64_Ehdr -- headers: Elf32/64_Shdr-array )
     elf [ e_shoff>> ] [ e_shnum>> ] bi :> ( off num )
     off elf >c-ptr <displaced-alien> num
-    elf 64-bit?
-    [ Elf64_Shdr <c-direct-array> ]
-    [ Elf32_Shdr <c-direct-array> ] if ;
+    elf 64-bit? Elf64_Shdr Elf32_Shdr ? <c-direct-array> ;
 
 TYPED:: elf-program-headers ( elf: Elf32/64_Ehdr -- headers: Elf32/64_Phdr-array )
     elf [ e_phoff>> ] [ e_phnum>> ] bi :> ( off num )
     off elf >c-ptr <displaced-alien> num
-    elf 64-bit?
-    [ Elf64_Phdr <c-direct-array> ]
-    [ Elf32_Phdr <c-direct-array> ] if ;
+    elf 64-bit? Elf64_Phdr Elf32_Phdr ? <c-direct-array> ;
 
 TYPED: elf-loadable-segments ( headers: Elf32/64_Phdr-array -- headers: Elf32/64_Phdr-array )
     [ p_type>> PT_LOAD = ] filter ;
@@ -518,10 +513,12 @@ TYPED:: virtual-address-section ( elf: Elf32/64_Ehdr address -- section-header/f
     ] find nip ;
 
 TYPED:: elf-segment-data ( elf: Elf32/64_Ehdr header: Elf32/64_Phdr -- uchar-array/f )
-    header [ p_offset>> elf >c-ptr <displaced-alien> ] [ p_filesz>> ] bi uchar <c-direct-array> ;
+    header p_offset>> elf >c-ptr <displaced-alien> 
+    header p_filesz>> uchar <c-direct-array> ;
 
 TYPED:: elf-section-data ( elf: Elf32/64_Ehdr header: Elf32/64_Shdr -- uchar-array/f )
-    header [ sh_offset>> elf >c-ptr <displaced-alien> ] [ sh_size>> ] bi uchar <c-direct-array> ;
+    header sh_offset>> elf >c-ptr <displaced-alien>
+    header sh_size>> uchar <c-direct-array> ;
 
 TYPED:: elf-section-data-by-index ( elf: Elf32/64_Ehdr index -- header/f uchar-array/f )
     elf elf-section-headers     :> sections
@@ -537,19 +534,19 @@ TYPED:: elf-section-data-by-name ( elf: Elf32/64_Ehdr name: string -- header/f u
     elf elf-section-headers                      :> sections
     elf e_shstrndx>>                             :> ndx
     elf ndx sections nth elf-section-data >c-ptr :> section-names
-    sections rest [
+    1 sections [
         sh_name>> section-names <displaced-alien> ascii alien>string name =
-    ] find nip
-    [ dup elf swap elf-section-data ]
-    [ f f ] if* ;
+    ] find-from nip
+    [ dup elf swap elf-section-data ] [ f f ] if* ;
 
 TYPED:: elf-sections ( elf: Elf32/64_Ehdr -- sections )
     elf elf-section-headers                                   :> sections
     elf elf e_shstrndx>> elf-section-data-by-index nip >c-ptr :> section-names
     sections [
-        [ sh_name>> section-names <displaced-alien>
-          ascii alien>string ] keep 2array
-    ] { } map-as ;
+        [
+            sh_name>> section-names <displaced-alien> ascii alien>string
+        ] keep
+    ] { } map>assoc ;
 
 TYPED:: elf-symbols ( elf: Elf32/64_Ehdr section-data: uchar-array -- symbols )
     elf ".strtab" elf-section-data-by-name nip >c-ptr :> strings
@@ -557,7 +554,11 @@ TYPED:: elf-symbols ( elf: Elf32/64_Ehdr section-data: uchar-array -- symbols )
     elf 64-bit?
     [ Elf64_Sym heap-size / Elf64_Sym <c-direct-array> ]
     [ Elf32_Sym heap-size / Elf32_Sym <c-direct-array> ] if
-    [ [ st_name>> strings <displaced-alien> ascii alien>string ] keep 2array ] { } map-as ;
+    [
+        [
+            st_name>> strings <displaced-alien> ascii alien>string
+        ] keep
+    ] { } map>assoc ;
 
 ! High level interface
 TUPLE: elf elf-header ;
@@ -571,39 +572,44 @@ GENERIC: sections ( obj -- sections )
     elf-header elf boa ;
 
 M:: elf sections ( elf -- sections )
-    elf elf-header>> elf-sections
-    [
-        first2 :> ( name header )
-        elf elf-header>> header elf-section-data :> data
-        name elf elf-header>> header data section boa
-    ] { } map-as ;
+    elf elf-header>> :> elf-header
+
+    elf-header elf-sections
+    [| name header |
+        elf-header header elf-section-data :> data
+        name elf-header header data section boa
+    ] { } assoc>map ;
 
 :: segments ( elf -- segments )
-    elf elf-header>> elf-program-headers
+    elf elf-header>> :> elf-header
+
+    elf-header elf-program-headers
     [| header |
-        elf elf-header>> header elf-segment-data :> data
-        elf elf-header>> header data segment boa
+        elf-header header elf-segment-data :> data
+        elf-header header data segment boa
     ] { } map-as ;
 
 M:: segment sections ( segment -- sections )
-    segment program-header>>
-    segment elf-header>> elf-section-headers
-    elf-segment-sections
+    segment program-header>> :> program-header
+    segment elf-header>> :> elf-header
 
+    program-header elf-header
+    elf-section-headers
+    elf-segment-sections
     [| header |
-        segment elf-header>> header elf-section-name :> name
-        segment elf-header>> header elf-section-data :> data
-        name segment elf-header>> header data section boa
+        elf-header header elf-section-name :> name
+        elf-header header elf-section-data :> data
+        name elf-header header data section boa
     ] { } map-as ;
 
 :: symbols ( section -- symbols )
-    section elf-header>>
-    section data>>
-    elf-symbols
-    [
-        first2 :> ( name sym )
-        name section elf-header>> sym f symbol boa
-    ] { } map-as ;
+    section elf-header>> :> elf-header
+    section data>> :> data
+
+    elf-header data elf-symbols
+    [| name sym |
+        name elf-header sym f symbol boa
+    ] { } assoc>map ;
 
 :: symbol-data ( symbol -- data )
     symbol [ elf-header>> ] [ sym>> st_value>> ] bi virtual-address-segment :> segment
@@ -619,9 +625,8 @@ M:: segment sections ( segment -- sections )
 
 : find-section-symbol ( sections section symbol -- symbol/f )
     [ find-section ] dip over [
-        [ symbols ] dip find-symbol ] [ 2drop f ] if ;
+        [ symbols ] dip find-symbol
+    ] [ 2drop f ] if ;
 
 : with-mapped-elf ( path quot -- )
-    '[
-        address>> <elf> @
-    ] with-mapped-file-reader ; inline
+    '[ address>> <elf> @ ] with-mapped-file-reader ; inline
