@@ -604,7 +604,7 @@ M:: x86 %dispatch ( src temp -- )
     building get length :> end
     ! Fix up the displacement above
     cell alignment
-    [ end start - + building get dup pop* push ]
+    [ end start - + building get set-last ]
     [ (align-code) ]
     bi ;
 
