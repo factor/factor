@@ -94,7 +94,7 @@ ERROR: bad-slot-name class slot ;
 GENERIC# boa>object 1 ( class slots -- tuple )
 
 M: tuple-class boa>object
-    swap prefix >tuple ;
+    swap slots>tuple ;
 
 : check-slot-exists ( class initials slot-spec/f index/f name -- class initials slot-spec index )
     over [ drop ] [ nip nip nip bad-slot-name ] if ;

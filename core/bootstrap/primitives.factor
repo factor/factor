@@ -260,12 +260,12 @@ tuple
 { "state" } define-tuple-class
 
 "((empty))" "hashtables.private" create
-"tombstone" "hashtables.private" lookup-word f
-2array >tuple 1quotation ( -- value ) define-inline
+{ f } "tombstone" "hashtables.private" lookup-word
+slots>tuple 1quotation ( -- value ) define-inline
 
 "((tombstone))" "hashtables.private" create
-"tombstone" "hashtables.private" lookup-word t
-2array >tuple 1quotation ( -- value ) define-inline
+{ t } "tombstone" "hashtables.private" lookup-word
+slots>tuple 1quotation ( -- value ) define-inline
 
 ! Some tuple classes
 "curry" "kernel" create
