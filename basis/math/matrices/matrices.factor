@@ -162,7 +162,7 @@ IN: math.matrices
     [ dupd proj v- ] each ;
 
 : gram-schmidt ( seq -- orthogonal )
-    V{ } clone [ over (gram-schmidt) over push ] reduce ;
+    V{ } clone [ over (gram-schmidt) suffix! ] reduce ;
 
 : norm-gram-schmidt ( seq -- orthonormal )
     gram-schmidt [ normalize ] map ;

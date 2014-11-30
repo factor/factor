@@ -9,9 +9,9 @@ IN: splitting.monotonic
 
 : (monotonic-split) ( seq quot -- newseq )
     [ V{ } clone V{ } clone ] 2dip [ ] swap '[
-        [ [ over push ] keep ] dip
-        [ @ [ over push V{ } clone ] unless ] keep
-    ] map-reduce over push over push { } like ; inline
+        [ [ suffix! ] keep ] dip
+        [ @ [ suffix! V{ } clone ] unless ] keep
+    ] map-reduce suffix! suffix! { } like ; inline
 
 PRIVATE>
 

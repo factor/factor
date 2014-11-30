@@ -259,7 +259,7 @@ C: <node-tree> node-tree
 
 : (get-node-chain) ( node next-selector seq -- seq )
     pick [
-        over push >r [ call ] keep r> (get-node-chain)
+        suffix! >r [ call ] keep r> (get-node-chain)
     ] [
         2nip
     ] if* ;

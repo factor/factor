@@ -26,7 +26,7 @@ M: jamshred-gadget draw-gadget* ( gadget -- )
     ] [
         [ jamshred>> jamshred-update ]
         [ relayout-1 ]
-        [ 100 milliseconds sleep jamshred-loop ] tri 
+        [ 100 milliseconds sleep jamshred-loop ] tri
     ] if ;
 
 M: jamshred-gadget graft* ( gadget -- )
@@ -57,7 +57,7 @@ M: jamshred-gadget ungraft* ( gadget -- )
 : handle-mouse-motion ( jamshred-gadget -- )
     hand-loc get [
         over last-hand-loc>> [
-            v- (handle-mouse-motion) 
+            v- (handle-mouse-motion)
         ] [ 2drop ] if* 
     ] 2keep >>last-hand-loc drop ;
 
