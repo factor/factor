@@ -46,7 +46,7 @@ SYMBOL: current-context
     call-word obj-word def>> effect make-function-quot effect define-inline ;
 
 : make-method-quot ( name effect -- quot )
-    [ in>> 1 tail gather-args-quot ] [ out>> unpack-value-quot ] bi swapd
+    [ in>> rest gather-args-quot ] [ out>> unpack-value-quot ] bi swapd
     '[ @ rot _ getattr -rot call-object-full @ ] ;
 
 : method-callable ( name effect -- )
