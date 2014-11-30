@@ -15,15 +15,14 @@ TUPLE: bin items total ;
 : smallest-bin ( bins -- bin )
     [ total>> ] infimum-by ; inline
 
-: add-to-bin ( item bin -- )
-    [ items>> push ]
-    [ [ second ] dip [ + ] change-total drop ] 2bi ;
+: add-to-bin ( item weight bin -- )
+    [ + ] change-total items>> push ;
 
 :: (binpack) ( alist #bins -- bins )
     alist sort-values <reversed> :> items
     #bins [ <bin> ] replicate :> bins
-    items [ bins smallest-bin add-to-bin ] each
-    bins [ items>> keys ] map ;
+    items [ bins smallest-bin add-to-bin ] assoc-each
+    bins [ items>> ] map ;
 
 PRIVATE>
 
