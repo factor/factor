@@ -42,7 +42,7 @@ CONSTANT: string>os-hash H{
 }
 
 : key-for-value ( key hash -- val )
-    >alist [ first2 nip = ] with filter first first ;
+    >alist [ second = ] with find nip first ;
 
 : string>cpu ( str -- class )
     string>cpu-hash at ;
