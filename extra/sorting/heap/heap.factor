@@ -1,29 +1,19 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: assocs heaps kernel sequences ;
+USING: assocs fry heaps kernel sequences vectors ;
 
 IN: sorting.heap
 
-<PRIVATE
-
-: (heapsort) ( alist accum -- sorted-seq )
-    [ >min-heap ] [ [ [ nip push ] curry slurp-heap ] keep ] bi* ; inline
-
-PRIVATE>
-
-: heapsort ( seq -- sorted-seq )
-    [
-        [ dup zip ]
-        [ length ]
-        [ new-resizable ] tri
-        (heapsort)
-    ] [ like ] bi ;
-
 : heapsort-with ( seq quot: ( elt -- key ) -- sorted-seq )
     [
-        [ keep ] curry [ { } map>assoc ] curry
-        [ length ]
-        [ new-resizable ] tri
-        (heapsort)
-    ] 2keep drop like ; inline
+        over length <vector> min-heap boa
+        [ '[ dup @ _ heap-push ] each ] keep
+    ] [
+        drop [ length ] keep new-resizable
+        [ '[ drop _ push ] slurp-heap ] keep
+    ] [
+        drop like
+    ] 2tri ; inline
+
+: heapsort ( seq -- sorted-seq ) [ ] heapsort-with ;
