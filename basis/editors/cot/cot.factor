@@ -1,5 +1,5 @@
 USING: editors io.pathnames io.standard-paths kernel make
-math.parser ;
+math.parser namespaces ;
 IN: editors.cot
 
 SINGLETON: cot
