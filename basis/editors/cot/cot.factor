@@ -13,4 +13,4 @@ cot editor-class set-global
     ] if* ;
 
 M: cot editor-command ( file line -- command )
-    [ find-cot-bundle-path , "-l" , # , ] { } make ;
+    [ find-cot-bundle-path , "-l" , number>string , , ] { } make ;
