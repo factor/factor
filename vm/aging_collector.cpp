@@ -2,11 +2,6 @@
 
 namespace factor {
 
-aging_collector::aging_collector(factor_vm* parent)
-    : copying_collector<aging_space, aging_policy>(parent,
-                                                   parent->data->aging,
-                                                   aging_policy(parent)) {}
-
 void factor_vm::collect_aging() {
   /* Promote objects referenced from tenured space to tenured space, copy
      everything else to the aging semi-space, and reset the nursery pointer. */
@@ -40,8 +35,9 @@ void factor_vm::collect_aging() {
     std::swap(data->aging, data->aging_semispace);
     data->reset_generation(data->aging);
 
-    aging_collector collector(this);
-
+    copying_collector<aging_space, aging_policy> collector(this,
+                                                           this->data->aging,
+                                                           aging_policy(this));
     collector.trace_roots();
     collector.trace_contexts();
 
