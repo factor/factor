@@ -181,7 +181,7 @@ M: heap heap-pop ( heap -- value key )
 
 : heap-pop-all ( heap -- alist )
     [ dup heap-empty? not ]
-    [ [ heap-pop ] keep 2array ]
+    [ dup heap-pop swap 2array ]
     produce nip ;
 
 ERROR: not-a-heap obj ;
