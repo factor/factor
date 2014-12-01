@@ -87,8 +87,9 @@ M: dlist equal?
 PRIVATE>
 
 : unlink-node ( dlist-node -- )
-    dup prev>> over next>> set-prev-when
-    dup next>> swap prev>> set-next-when ; inline
+    [ prev>> ] [ next>> ] bi
+    [ set-prev-when ]
+    [ swap set-next-when ] 2bi ; inline
 
 M: dlist push-front* ( obj dlist -- dlist-node )
     [ front>> f swap <dlist-node> dup dup set-next-prev ] keep

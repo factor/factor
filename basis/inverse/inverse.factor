@@ -219,7 +219,7 @@ DEFER: __
 \ first4 [ 4array ] define-inverse
 
 \ prefix \ unclip define-dual
-\ suffix [ dup but-last swap last ] define-inverse
+\ suffix \ unclip-last define-dual
 
 \ append 1 [ [ ?tail assure ] curry ] define-pop-inverse
 \ prepend 1 [ [ ?head assure ] curry ] define-pop-inverse

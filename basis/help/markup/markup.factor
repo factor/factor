@@ -267,7 +267,7 @@ PRIVATE>
     ] ($subsection) ;
 
 : $vocab-link ( element -- )
-    check-first dup vocab-name swap ($vocab-link) ;
+    check-first [ vocab-name ] keep ($vocab-link) ;
 
 : $vocabulary ( element -- )
     check-first vocabulary>> [

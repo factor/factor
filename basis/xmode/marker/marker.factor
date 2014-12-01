@@ -94,7 +94,7 @@ M: regexp text-matches?
 
 : rule-end-matches? ( rule -- match-count/f )
     dup mark-following-rule? [
-        dup start>> swap can-match-here? 0 and
+        [ start>> ] keep can-match-here? 0 and
     ] [
         [ end>> dup ] keep can-match-here? [
             rest-of-line

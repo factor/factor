@@ -7,9 +7,13 @@ IN: xmode.tokens
 <<
 SYMBOL: tokens
 
-{ "COMMENT1" "COMMENT2" "COMMENT3" "COMMENT4" "DIGIT" "FUNCTION" "INVALID" "KEYWORD1" "KEYWORD2" "KEYWORD3" "KEYWORD4" "LABEL" "LITERAL1" "LITERAL2" "LITERAL3" "LITERAL4" "MARKUP" "OPERATOR" "END" "NULL" } [
-    create-in dup define-symbol
-    dup name>> swap
+{
+    "COMMENT1" "COMMENT2" "COMMENT3" "COMMENT4" "DIGIT"
+    "FUNCTION" "INVALID" "KEYWORD1" "KEYWORD2" "KEYWORD3"
+    "KEYWORD4" "LABEL" "LITERAL1" "LITERAL2" "LITERAL3"
+    "LITERAL4" "MARKUP" "OPERATOR" "END" "NULL"
+} [
+    dup create-in dup define-symbol
 ] H{ } map>assoc tokens set-global
 >>
 

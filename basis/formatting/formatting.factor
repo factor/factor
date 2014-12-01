@@ -14,16 +14,16 @@ IN: formatting
     [ ] [ compose ] reduce ; inline
 
 : fix-sign ( string -- string )
-    dup CHAR: 0 swap index 0 =
-      [ dup 0 swap [ [ CHAR: 0 = not ] keep digit? and ] find-from
-         [ dup 1 - rot dup [ nth ] dip swap
-            {
-               { CHAR: - [ [ 1 - ] dip remove-nth "-" prepend ] }
-               { CHAR: + [ [ 1 - ] dip remove-nth "+" prepend ] }
-               [ drop nip ]
+    dup first CHAR: 0 = [
+        dup [ [ CHAR: 0 = not ] [ digit? ] bi and ] find
+        [
+            1 - swap 2dup nth {
+                { CHAR: - [ remove-nth "-" prepend ] }
+                { CHAR: + [ remove-nth "+" prepend ] }
+                [ drop nip ]
             } case
-         ] [ drop ] if
-      ] when ;
+        ] [ drop ] if
+    ] when ;
 
 : >digits ( string -- digits )
     [ 0 ] [ string>number ] if-empty ;

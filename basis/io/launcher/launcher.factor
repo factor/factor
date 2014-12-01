@@ -59,7 +59,7 @@ SYMBOL: +new-session+
     +same-group+ >>group ;
 
 : process-started? ( process -- ? )
-    dup handle>> swap status>> or ;
+    [ handle>> ] [ status>> ] bi or ;
 
 : process-running? ( process -- ? )
     handle>> >boolean ;

@@ -311,31 +311,25 @@ M: number (parse-factor-quotation) ( object -- ast )
     ast-number boa ;
 
 M: symbol (parse-factor-quotation) ( object -- ast )
-    dup >string swap vocabulary>> ast-identifier boa ;
+    [ >string ] [ vocabulary>> ] bi ast-identifier boa ;
 
 M: word (parse-factor-quotation) ( object -- ast )
-    dup name>> swap vocabulary>> ast-identifier boa ;
+    [ name>> ] [ vocabulary>> ] bi ast-identifier boa ;
 
 M: string (parse-factor-quotation) ( object -- ast )
     ast-string boa ;
 
 M: quotation (parse-factor-quotation) ( object -- ast )
-    [
-        [ (parse-factor-quotation) , ] each
-    ] { } make ast-quotation boa ;
+    [ (parse-factor-quotation) ] { } map-as ast-quotation boa ;
 
 M: array (parse-factor-quotation) ( object -- ast )
-    [
-        [ (parse-factor-quotation) , ] each
-    ] { } make ast-array boa ;
+    [ (parse-factor-quotation) ] { } map-as ast-array boa ;
 
 M: hashtable (parse-factor-quotation) ( object -- ast )
-    >alist [
-        [ (parse-factor-quotation) , ] each
-    ] { } make ast-hashtable boa ;
+    >alist [ (parse-factor-quotation) ] { } map-as ast-hashtable boa ;
 
 M: wrapper (parse-factor-quotation) ( object -- ast )
-    wrapped>> dup name>> swap vocabulary>> ast-word boa ;
+    wrapped>> [ name>> ] [ vocabulary>> ] bi ast-word boa ;
 
 GENERIC: fjsc-parse ( object -- ast )
 
@@ -343,9 +337,7 @@ M: string fjsc-parse ( object -- ast )
     'expression' parse ;
 
 M: quotation fjsc-parse ( object -- ast )
-    [
-        [ (parse-factor-quotation) , ] each
-    ] { } make ast-expression boa ;
+    [ (parse-factor-quotation) ] { } map-as ast-expression boa ;
 
 : fjsc-compile ( ast -- string )
     [
@@ -363,7 +355,6 @@ M: quotation fjsc-parse ( object -- ast )
     [
         'statement' parse values>> do-expressions
     ] { } make [ write ] each ;
-
 
 : fjsc-literal ( ast -- string )
     [
