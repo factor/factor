@@ -32,7 +32,7 @@ ALIAS: n*p n*v
     2dup [ length ] bi@ + 1 - 2pad-tail ;
 
 : p* ( p q -- r )
-    2unempty pextend-conv 
+    2unempty pextend-conv
     [ drop length [ iota ] keep ]
     [ nip <reversed> ]
     [ drop ] 2tri

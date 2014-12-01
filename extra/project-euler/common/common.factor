@@ -111,11 +111,12 @@ PRIVATE>
 : penultimate ( seq -- elt )
     dup length 2 - swap nth ;
 
-! Not strictly needed, but it is nice to be able to dump the triangle after the
-! propagation
+! Not strictly needed, but it is nice to be able to dump the
+! triangle after the propagation
 : propagate-all ( triangle -- new-triangle )
-    reverse [ first dup ] [ rest ] bi
-    [ propagate dup ] map nip reverse swap suffix ;
+    reverse unclip dup rot
+    [ propagate dup ] map nip
+    reverse swap suffix ;
 
 : permutations? ( n m -- ? )
     [ count-digits ] same? ;
@@ -124,7 +125,7 @@ PRIVATE>
     dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;
 
 : sum-proper-divisors ( n -- sum )
-    dup sum-divisors swap - ;
+    [ sum-divisors ] keep - ;
 
 : abundant? ( n -- ? )
     dup sum-proper-divisors < ;
