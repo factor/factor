@@ -598,8 +598,6 @@ struct factor_vm {
                              cell literals_, cell frame_size_untagged);
 
   //code heap
-  inline void check_code_pointer(cell ptr) {}
-
   template <typename Iterator> void each_code_block(Iterator& iter) {
     code->allocator->iterate(iter);
   }
@@ -710,7 +708,6 @@ struct factor_vm {
   code_block* compile_inline_cache(fixnum index, cell generic_word_,
                                    cell methods_, cell cache_entries_,
                                    bool tail_call_p);
-  void* megamorphic_call_stub(cell generic_word);
   cell inline_cache_size(cell cache_entries);
   cell add_inline_cache_entry(cell cache_entries_, cell klass_, cell method_);
   void update_pic_transitions(cell pic_size);
