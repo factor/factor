@@ -83,9 +83,9 @@ IN: tools.gc-decode.tests
 : normal? ( word -- ? )
     { [ generic? ] [ primitive? ] [ inline? ] [ no-compile? ] } 1|| not ;
 
-{ t } [
+{ { } } [
     all-words [ normal? ] filter 20 sample
-    [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? ] all?
+    [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? not ] filter
 ] unit-test
 
 : base-pointer-groups-expected ( word -- seq )
