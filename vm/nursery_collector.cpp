@@ -2,15 +2,12 @@
 
 namespace factor {
 
-nursery_collector::nursery_collector(factor_vm* parent)
-    : copying_collector<aging_space, nursery_policy>(parent,
-                                                     parent->data->aging,
-                                                     nursery_policy(parent)) {}
-
 void factor_vm::collect_nursery() {
   /* Copy live objects from the nursery (as determined by the root set and
      marked cards in aging and tenured) to aging space. */
-  nursery_collector collector(this);
+  copying_collector<aging_space, nursery_policy> collector(this,
+                                                           this->data->aging,
+                                                           nursery_policy(this));
 
   collector.trace_roots();
   collector.trace_contexts();

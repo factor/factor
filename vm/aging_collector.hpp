@@ -19,8 +19,4 @@ struct aging_policy {
   void visited_object(object* obj) {}
 };
 
-struct aging_collector : copying_collector<aging_space, aging_policy> {
-  explicit aging_collector(factor_vm* parent);
-};
-
 }

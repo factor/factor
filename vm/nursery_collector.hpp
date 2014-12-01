@@ -14,8 +14,4 @@ struct nursery_policy {
   void visited_object(object* obj) {}
 };
 
-struct nursery_collector : copying_collector<aging_space, nursery_policy> {
-  explicit nursery_collector(factor_vm* parent);
-};
-
 }
