@@ -184,7 +184,7 @@ M: heap heap-pop ( heap -- value key )
     [ dup heap-pop swap 2array ]
     produce nip ;
 
-ERROR: not-a-heap obj ;
+ERROR: not-a-heap object ;
 
 : check-heap ( heap -- heap )
     dup heap? [ not-a-heap ] unless ; inline

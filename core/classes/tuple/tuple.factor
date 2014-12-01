@@ -332,7 +332,7 @@ M: error-class reset-class
 : boa-effect ( class -- effect )
     [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
 
-ERROR: not-a-tuple-class obj ;
+ERROR: not-a-tuple-class object ;
 
 : check-tuple-class ( class -- class )
     dup tuple-class? [ not-a-tuple-class ] unless ; inline
