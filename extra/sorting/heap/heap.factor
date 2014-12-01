@@ -8,7 +8,7 @@ IN: sorting.heap
 <PRIVATE
 
 : (heapsort) ( alist accum -- sorted-seq )
-    [ >min-heap ] [ [ [ push ] curry slurp-heap ] keep ] bi* ; inline
+    [ >min-heap ] [ [ [ nip push ] curry slurp-heap ] keep ] bi* ; inline
 
 PRIVATE>
 

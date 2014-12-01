@@ -189,9 +189,9 @@ ERROR: not-a-heap object ;
 : check-heap ( heap -- heap )
     dup heap? [ not-a-heap ] unless ; inline
 
-: slurp-heap ( heap quot: ( elt -- ) -- )
+: slurp-heap ( heap quot: ( value key -- ) -- )
     [ check-heap ] dip over heap-empty? [ 2drop ] [
-        [ [ heap-pop drop ] dip call ] [ slurp-heap ] 2bi
+        [ [ heap-pop ] dip call ] [ slurp-heap ] 2bi
     ] if ; inline recursive
 
 : >min-heap ( assoc -- min-heap )
