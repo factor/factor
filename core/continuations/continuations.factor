@@ -49,7 +49,7 @@ C: <continuation> continuation
 
 <PRIVATE
 
-ERROR: not-a-continuation obj ;
+ERROR: not-a-continuation object ;
 
 : >continuation< ( continuation -- data call retain name catch )
     dup continuation? [ not-a-continuation ] unless

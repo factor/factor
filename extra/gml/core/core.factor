@@ -77,7 +77,7 @@ GML: sort-number-permutation ( array -- permutation )
     zip-index sort-keys reverse values ;
 
 ! Dictionaries
-ERROR: not-a-dict obj ;
+ERROR: not-a-dict object ;
 : check-dict ( obj -- obj' ) dup hashtable? [ not-a-dict ] unless ; inline
 
 GML: begin ( dict -- ) check-dict over dictionary-stack>> push ;
@@ -105,7 +105,7 @@ GML: where ( key -- ? )
 GML: currentdict ( -- dict ) dup current-dict ;
 GML: load ( name -- value ) over lookup-name ;
 
-ERROR: not-a-name obj ;
+ERROR: not-a-name object ;
 
 : check-name ( obj -- obj' ) dup name? [ not-a-name ] unless ; inline
 
