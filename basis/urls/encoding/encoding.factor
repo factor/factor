@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel ascii combinators combinators.short-circuit
-sequences splitting fry namespaces make assocs arrays strings
-io.encodings.string io.encodings.utf8 math math.parser accessors
-hashtables present ;
+USING: arrays ascii assocs combinators combinators.short-circuit
+fry io.encodings.string io.encodings.utf8 kernel make math
+math.parser present sequences splitting strings ;
 IN: urls.encoding
 
 : url-quotable? ( ch -- ? )
@@ -39,17 +38,16 @@ IN: urls.encoding
     1string utf8 encode
     [ CHAR: % , >hex >upper 2 CHAR: 0 pad-head % ] each ;
 
+: (url-encode) ( str quot: ( ch -- ? ) -- encoded )
+    '[ [ dup @ [ , ] [ push-utf8 ] if ] each ] "" make ; inline
+
 PRIVATE>
 
 : url-encode ( str -- encoded )
-    [
-        [ dup url-quotable? [ , ] [ push-utf8 ] if ] each
-    ] "" make ;
+    [ url-quotable? ] (url-encode) ;
 
 : url-encode-full ( str -- encoded )
-    [
-        [ dup unreserved? [ , ] [ push-utf8 ] if ] each
-    ] "" make ;
+    [ unreserved? ] (url-encode) ;
 
 <PRIVATE
 
@@ -57,18 +55,15 @@ PRIVATE>
     2dup length 2 - >= [
         2drop
     ] [
-        [ 1 + dup 2 + ] dip subseq  hex> [ , ] when*
+        [ 1 + dup 2 + ] dip subseq hex> [ , ] when*
     ] if ;
-
-: url-decode-% ( index str -- index str )
-    2dup url-decode-hex ;
 
 : url-decode-iter ( index str -- )
     2dup length >= [
         2drop
     ] [
         2dup nth dup CHAR: % = [
-            drop url-decode-% [ 3 + ] dip
+            drop 2dup url-decode-hex [ 3 + ] dip
         ] [
             , [ 1 + ] dip
         ] if url-decode-iter
@@ -80,8 +75,7 @@ PRIVATE>
     [ 0 swap url-decode-iter ] "" make utf8 decode ;
 
 : query-decode ( str -- decoded )
-    [ dup CHAR: + = [ drop "%20" ] [ 1string ] if ] { } map-as
-    concat url-decode ;
+    "+" split "%20" join url-decode ;
 
 <PRIVATE
 
