@@ -81,23 +81,12 @@ PRIVATE>
 
 : add-query-param ( value key assoc -- )
     [
-        at [
-            {
-                { [ dup string? ] [ swap 2array ] }
-                { [ dup array? ] [ swap suffix ] }
-                { [ dup not ] [ drop ] }
-            } cond
-        ] when*
-    ] 2keep set-at ;
-
-: assoc-strings ( assoc -- assoc' )
-    [
         {
-            { [ dup not ] [ ] }
-            { [ dup array? ] [ [ present ] map ] }
-            [ present 1array ]
+            { [ dup string? ] [ swap 2array ] }
+            { [ dup array? ] [ swap suffix ] }
+            { [ dup not ] [ drop ] }
         } cond
-    ] assoc-map ;
+    ] change-at ;
 
 PRIVATE>
 
@@ -113,8 +102,10 @@ PRIVATE>
 
 : assoc>query ( assoc -- str )
     [
-        assoc-strings [
-            [ url-encode-full ] dip
-            [ [ url-encode-full "=" glue , ] with each ] [ , ] if*
+        [
+            [ url-encode-full ] dip [
+                dup array? [ 1array ] unless
+                [ present url-encode-full "=" glue , ] with each
+            ] [ , ] if*
         ] assoc-each
     ] { } make "&" join ;
