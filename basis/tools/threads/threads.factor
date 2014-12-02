@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: threads kernel prettyprint prettyprint.config
-io io.styles sequences assocs namespaces sorting boxes
-heaps.private system math math.parser math.order accessors ;
+USING: accessors assocs io io.styles kernel math.order
+math.parser prettyprint sequences sorting system threads ;
 IN: tools.threads
 
 : thread. ( thread -- )
