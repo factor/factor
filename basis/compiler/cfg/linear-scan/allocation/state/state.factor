@@ -153,8 +153,8 @@ SYMBOL: spill-slots
     -1 progress set ;
 
 : init-unhandled ( live-intervals sync-points -- )
-    [ [ [ start>> ] keep ] { } map>assoc unhandled-intervals get heap-push-all ]
-    [ [ [ n>> ] keep ] { } map>assoc unhandled-sync-points get heap-push-all ]
+    [ unhandled-intervals get '[ dup start>> _ heap-push ] each ]
+    [ unhandled-sync-points get '[ dup n>> _ heap-push ] each ]
     bi* ;
 
 ! A utility used by register-status and spill-status words
