@@ -29,3 +29,6 @@ IN: combinators.extras.tests
 { 2 5 } [ 1 2 3 4 5 6 [ - - ] 3bi@ ] unit-test
 
 { 3 1 } [ 1 2 [ + ] keepd ] unit-test
+
+[ "1" "123" ] [ "1" "123" [ length ] [ > ] swap-when ] unit-test
+[ "123" "1" ] [ "1" "123" [ length ] [ < ] swap-when ] unit-test
