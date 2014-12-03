@@ -54,11 +54,11 @@ name>char-hook [
 : (unescape-string) ( accum str i/f -- accum )
     { sbuf object object } declare
     [
-        cut-slice [ over push-all ] dip
-        rest-slice next-escape [ over push ] dip
+        cut-slice [ append! ] dip
+        rest-slice next-escape [ suffix! ] dip
         CHAR: \\ over index (unescape-string)
     ] [
-        over push-all
+        append!
     ] if* ;
 
 PRIVATE>
@@ -73,11 +73,11 @@ PRIVATE>
 : (parse-string) ( accum str -- accum m )
     { sbuf slice } declare
     dup [ "\"\\" member? ] find [
-        [ cut-slice [ over push-all ] dip rest-slice ] dip
+        [ cut-slice [ append! ] dip rest-slice ] dip
         CHAR: " = [
             from>>
         ] [
-            next-escape [ over push ] dip (parse-string)
+            next-escape [ suffix! ] dip (parse-string)
         ] if
     ] [
         "Unterminated string" throw

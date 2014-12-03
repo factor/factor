@@ -173,7 +173,7 @@ PRIVATE>
     [ appender-for [ each ] dip ] keep like ; inline
 
 : >resizable ( seq -- accum ) ! fixes map-concat "cannot apply call to run-time..."
-    [ length ] keep [ new-resizable ] [ over push-all ] bi ;
+    [ length ] keep [ new-resizable ] [ append! ] bi ;
 
 : map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over empty? [ 2drop { } ] [
