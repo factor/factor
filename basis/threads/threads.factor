@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.private arrays hashtables heaps kernel kernel.private
-math namespaces sequences vectors continuations continuations.private
-dlists assocs system combinators init boxes accessors math.order
-deques strings quotations fry ;
+USING: accessors alien.private arrays assocs boxes combinators
+continuations continuations.private deques dlists fry hashtables
+heaps init kernel kernel.private math math.order namespaces
+quotations sequences strings system ;
 FROM: assocs => change-at ;
 IN: threads
 
@@ -92,7 +92,8 @@ sleep-entry ;
 : unregister-thread ( thread -- )
     id>> threads delete-at ;
 
-: set-self ( thread -- ) OBJ-CURRENT-THREAD set-special-object ; inline
+: set-self ( thread -- )
+    OBJ-CURRENT-THREAD set-special-object ; inline
 
 PRIVATE>
 
@@ -135,9 +136,9 @@ PRIVATE>
 
 : interrupt ( thread -- )
     dup state>> [
-        dup sleep-entry>> [ sleep-queue heap-delete ] when*
-        f >>sleep-entry
-        dup resume
+        [
+            [ sleep-queue heap-delete ] when* f
+        ] change-sleep-entry dup resume
     ] when drop ;
 
 DEFER: stop
@@ -202,7 +203,8 @@ PRIVATE>
     [ context ] dip context>> >box
     next (next) ;
 
-: yield ( -- ) self resume f suspend drop ;
+: yield ( -- )
+    self resume f suspend drop ;
 
 GENERIC: sleep-until ( n/f -- )
 
