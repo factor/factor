@@ -54,3 +54,6 @@ MACRO: smart-plox ( true -- )
         _ nano-count { 0 } 2dup first-unsafe _ + >=
         [ 0 swap set-nth-unsafe call ] [ 3drop ] if
     ] ; inline
+
+: swap-when ( x y quot: ( x -- n ) quot: ( n n -- ? ) -- x' y' )
+    '[ _ _ 2dup _ bi@ @ [ swap ] when ] call ; inline
