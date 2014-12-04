@@ -47,6 +47,7 @@ struct context {
   void reset_callstack();
   void reset_context_objects();
   void reset();
+  void fix_stacks();
   void scrub_stacks(gc_info* info, cell index);
 
   cell peek() { return *(cell*)datastack; }
