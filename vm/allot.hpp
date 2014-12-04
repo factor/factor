@@ -8,7 +8,7 @@ namespace factor {
 inline object* factor_vm::allot_object(cell type, cell size) {
   FACTOR_ASSERT(!current_gc);
 
-  nursery_space *nursery = data->nursery;
+  bump_allocator *nursery = data->nursery;
   /* If the object is smaller than the nursery, allocate it in the nursery,
      after a GC if needed */
   if (nursery->size > size) {
