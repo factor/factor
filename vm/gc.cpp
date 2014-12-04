@@ -97,7 +97,7 @@ void factor_vm::start_gc_again() {
     default:
       /* Nothing else should fail mid-collection due to insufficient
          space in the target generation. */
-      critical_error("Bad GC op", current_gc->op);
+      critical_error("in start_gc_again, bad GC op", current_gc->op);
       break;
   }
 
@@ -163,7 +163,7 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
           collect_growing_heap(requested_size, trace_contexts_p);
           break;
         default:
-          critical_error("Bad GC op", current_gc->op);
+          critical_error("in gc, bad GC op", current_gc->op);
           break;
       }
 
