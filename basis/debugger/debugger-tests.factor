@@ -1,5 +1,5 @@
-USING: accessors alien.syntax arrays continuations debugger
-kernel namespaces tools.test ;
+USING: accessors alien.syntax continuations debugger kernel
+namespaces tools.test ;
 IN: debugger.tests
 
 [ ] [ [ drop ] [ error. ] recover ] unit-test
@@ -40,9 +40,6 @@ T{ test-failure
 } error.
 ] unit-test
 
-[
-    { "kernel-error" 3 0 "hi" }
-    { 1 2 3 { "kernel-error" 3 0 "hi" } }
-] [
-    [ 1 2 3 "hi" f <array> ] [ ] recover error-continuation get data>>
+[ "foo" { 1 2 3 "foo" } ] [
+    [ 1 2 3 "foo" throw ] [ ] recover error-continuation get data>>
 ] unit-test
