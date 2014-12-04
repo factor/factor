@@ -1,6 +1,6 @@
 USING: kernel math namespaces io tools.test sequences vectors
 continuations debugger parser memory arrays words
-kernel.private accessors eval splitting ;
+kernel.private accessors eval ;
 IN: continuations.tests
 
 : (callcc1-test) ( n obj -- n' obj )
@@ -33,11 +33,6 @@ IN: continuations.tests
     "Hello" =
 ] unit-test
 
-! #1187
-[ ] [
-    minor-gc [ split-slice ] ignore-errors minor-gc
-] unit-test
-
 "!!! The following error is part of the test" print
 
 [ ] [ [ 6 [ 12 [ "2 car" ] ] ] print-error ] unit-test
@@ -57,7 +52,7 @@ IN: continuations.tests
 
 ! ! See how well callstack overflow is handled
 ! [ clear drop ] must-fail
-!
+! 
 ! : callstack-overflow callstack-overflow f ;
 ! [ callstack-overflow ] must-fail
 
