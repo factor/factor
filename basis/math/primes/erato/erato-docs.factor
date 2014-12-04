@@ -10,5 +10,5 @@ HELP: sieve
 HELP: marked-prime?
 { $values { "n" integer } { "sieve" byte-array } { "?" boolean } }
 { $description "Checks whether " { $snippet "n" } " has been marked as a prime number. "
-{ $snippet "arr" } " must be " { $instance byte-array } " returned by " { $link sieve } ". "
+{ $snippet "sieve" } " must be " { $instance byte-array } " returned by " { $link sieve } ". "
 { $snippet "n" } " must be between 2 and the limit given to " { $link sieve } "." } ;
