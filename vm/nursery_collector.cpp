@@ -18,9 +18,8 @@ void factor_vm::collect_nursery() {
     event->started_card_scan();
   collector.trace_cards(data->tenured, card_points_to_nursery,
                         simple_unmarker(card_points_to_nursery));
-  if (data->aging->here != data->aging->start) {
-    collector.trace_cards(data->aging, card_points_to_nursery, full_unmarker());
-  }
+  collector.trace_cards(data->aging, card_points_to_nursery, full_unmarker());
+
   if (event)
     event->ended_card_scan(collector.cards_scanned, collector.decks_scanned);
 
