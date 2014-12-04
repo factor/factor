@@ -39,16 +39,6 @@ void context::reset() {
   reset_context_objects();
 }
 
-void context::fix_stacks() {
-  if (datastack + sizeof(cell) < datastack_seg->start ||
-      datastack + stack_reserved >= datastack_seg->end)
-    reset_datastack();
-
-  if (retainstack + sizeof(cell) < retainstack_seg->start ||
-      retainstack + stack_reserved >= retainstack_seg->end)
-    reset_retainstack();
-}
-
 context::~context() {
   delete datastack_seg;
   delete retainstack_seg;

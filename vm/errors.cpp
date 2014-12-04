@@ -39,23 +39,24 @@ void out_of_memory(const char *msg) {
 /* Allocates memory */
 void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
 
-
   data_root<object> arg1(arg1_, this);
   data_root<object> arg2(arg2_, this);
 
   faulting_p = true;
 
-  /* If we had an underflow or overflow, data or retain stack
-     pointers might be out of bounds, so fix them before allocating
-     anything */
-  ctx->fix_stacks();
+  /* If we had an underflow or overflow, data or retain stack pointers
+     might be out of bounds, or some of their slots might be
+     uninitialized, so reset them before allocating anything. */
+  ctx->reset_datastack();
+  ctx->reset_retainstack();
 
   /* If error was thrown during heap scan, we re-enable the GC */
   gc_off = false;
 
+  cell error_handler = special_objects[ERROR_HANDLER_QUOT];
   /* If the error handler is set, we rewind any C stack frames and
      pass the error to user-space. */
-  if (!current_gc && to_boolean(special_objects[ERROR_HANDLER_QUOT])) {
+  if (!current_gc && to_boolean(error_handler)) {
 #ifdef FACTOR_DEBUG
     /* Doing a GC here triggers all kinds of funny errors */
     primitive_compact_gc();
@@ -73,8 +74,7 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
 
     /* The unwind-native-frames subprimitive will clear faulting_p
        if it was successfully reached. */
-    unwind_native_frames(special_objects[ERROR_HANDLER_QUOT],
-                         ctx->callstack_top);
+    unwind_native_frames(error_handler, ctx->callstack_top);
   } /* Error was thrown in early startup before error handler is set, so just
        crash. */
   else {
