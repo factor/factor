@@ -204,17 +204,13 @@ template <typename Fixup>
 void slot_visitor<Fixup>::visit_literal_table_roots() {
   std::map<code_block*, cell>* uninitialized_blocks =
       &parent->code->uninitialized_blocks;
-  std::map<code_block*, cell>::const_iterator iter =
+  std::map<code_block*, cell>::iterator iter =
       uninitialized_blocks->begin();
-  std::map<code_block*, cell>::const_iterator end = uninitialized_blocks->end();
+  std::map<code_block*, cell>::iterator end = uninitialized_blocks->end();
 
-  std::map<code_block*, cell> new_uninitialized_blocks;
   for (; iter != end; iter++) {
-    new_uninitialized_blocks.insert(
-        std::make_pair(iter->first, visit_pointer(iter->second)));
+    iter->second = visit_pointer(iter->second);
   }
-
-  parent->code->uninitialized_blocks = new_uninitialized_blocks;
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_sample_callstacks() {
@@ -398,7 +394,6 @@ void slot_visitor<Fixup>::visit_context(context* ctx) {
   visit_stack_elements(ctx->retainstack_seg, (cell*)ctx->retainstack);
   visit_object_array(ctx->context_objects,
                      ctx->context_objects + context_object_count);
-
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_contexts() {
