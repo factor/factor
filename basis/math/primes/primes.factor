@@ -8,7 +8,8 @@ IN: math.primes
 
 <PRIVATE
 
-: look-in-bitmap ( n -- ? ) $[ 8999999 sieve ] marked-unsafe? ; inline
+: look-in-bitmap ( n -- ? )
+    $[ 8999999 sieve ] marked-unsafe? ; inline
 
 : (prime?) ( n -- ? )
     dup 8999999 <= [ look-in-bitmap ] [ miller-rabin ] if ;
@@ -26,7 +27,7 @@ IN: math.primes
 : <primes-vector> ( low high -- vector )
     swap [ [ upper-pi ] [ lower-pi ] bi* - >integer
     108 max 10000 min <vector> ] keep
-    3 < [ [ 2 swap push ] keep ] when ;
+    3 < [ 2 suffix! ] when ;
 
 : simple? ( n -- ? ) { [ even? ] [ 3 divisor? ] [ 5 divisor? ] } 1|| ;
 
