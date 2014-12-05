@@ -7,7 +7,8 @@ IN: math.primes.miller-rabin
 <PRIVATE
 
 :: (miller-rabin) ( n trials -- ? )
-    n 1 - factor-2s :> ( r s )
+    n 1 - :> n-1
+    n-1 factor-2s :> ( r s )
     0 :> a!
     trials iota [
         drop
@@ -16,7 +17,7 @@ IN: math.primes.miller-rabin
             f
         ] [
             r iota [
-                2^ s * a swap n ^mod n - -1 =
+                2^ s * a swap n ^mod n-1 =
             ] any? not
         ] if
     ] any? not ;
