@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs growable.private kernel math
-math.order sequences sequences.private vectors ;
+USING: accessors arrays assocs growable.private hashtables
+kernel kernel.private math math.order sequences
+sequences.private vectors ;
 IN: sorting
 
 ! Optimized merge-sort:
@@ -159,11 +160,17 @@ M: object sort-keys >alist sort-keys ;
 M: sequence sort-keys
     0 check-bounds [ first-unsafe ] sort-with ;
 
+M: hashtable sort-keys
+    >alist [ { array } declare first-unsafe ] sort-with ;
+
 GENERIC: sort-values ( obj -- sortedseq )
 
 M: object sort-values >alist sort-values ;
 
 M: sequence sort-values
     1 check-bounds [ second-unsafe ] sort-with ;
+
+M: hashtable sort-values
+    >alist [ { array } declare second-unsafe ] sort-with ;
 
 : sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;
