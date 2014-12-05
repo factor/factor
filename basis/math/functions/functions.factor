@@ -110,11 +110,11 @@ M: complex e^ >rect [ e^ ] dip polar> ; inline
     '[ [ over * _ mod ] when [ sq _ mod ] dip ] reduce nip ; inline
 
 : (gcd) ( b a x y -- a d )
-    over zero? [
-        2nip
+    swap [
+        nip
     ] [
-        swap [ /mod [ over * swapd - ] dip ] keep (gcd)
-    ] if ; inline recursive
+        [ /mod [ over * swapd - ] dip ] keep (gcd)
+    ] if-zero ; inline recursive
 
 PRIVATE>
 
