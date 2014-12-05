@@ -65,12 +65,10 @@ SYMBOL: and-needed?
     [ " " glue ] unless-empty ;
 
 : append-with-conjunction ( str1 str2 -- newstr )
-    over length 0 = [
-        nip
-    ] [
-        swap and-needed? get " and " ", " ?
-        glue and-needed? off
-    ] if ;
+    swap [
+        and-needed? get " and " ", " ? glue
+        and-needed? off
+    ] unless-empty ;
 
 : (recombine) ( str index seq -- newstr )
     2dup nth 0 = [

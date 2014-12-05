@@ -144,21 +144,21 @@ M: mdb-collection create-collection ( collection -- )
     ] bi ; inline
 
 : build-collection-map ( -- assoc )
-    H{ } clone load-collection-list      
+    H{ } clone load-collection-list
     [ [ "name" ] dip at "." split second <mdb-collection> ] map
     over '[ [ ] [ name>> ] bi _ set-at ] each ;
 
 : ensure-collection-map ( mdb-instance -- assoc )
-    dup collections>> dup keys length 0 = 
+    dup collections>> dup assoc-empty?
     [ drop build-collection-map [ >>collections drop ] keep ]
-    [ nip ] if ; 
+    [ nip ] if ;
 
 : (ensure-collection) ( collection mdb-instance -- collection )
     ensure-collection-map [ dup ] dip key?
     [ ] [ [ ensure-valid-collection-name ]
           [ create-collection ]
-          [ ] tri ] if ; 
-      
+          [ ] tri ] if ;
+
 : reserved-namespace? ( name -- ? )
     [ "$cmd" = ] [ "system" head? ] bi or ;
 
