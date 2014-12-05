@@ -31,7 +31,7 @@ IN: fuel.xref
     >alist natural-sort ;
 
 : filter-prefix ( seq prefix -- seq )
-    [ drop-prefix nip length 0 = ] curry filter members ;
+    [ drop-prefix nip empty? ] curry filter members ;
 
 MEMO: (vocab-words) ( name -- seq )
     >vocab-link words [ name>> ] map ;

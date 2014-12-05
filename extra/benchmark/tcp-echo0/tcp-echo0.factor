@@ -46,7 +46,7 @@ M: tcp-echo handle-client*
     <tcp-echo> [
         \ threaded-server get server>address binary [
             #times [ #bytes read-write ] times
-            contents length 0 = [ incorrect-#bytes ] unless
+            contents empty? [ incorrect-#bytes ] unless
         ] with-client
     ] with-threaded-server ;
 
