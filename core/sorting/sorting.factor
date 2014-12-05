@@ -148,7 +148,7 @@ PRIVATE>
 <PRIVATE
 
 : check-bounds ( alist n -- alist )
-    [ swap bounds-check 2drop ] curry dupd each ;
+    [ swap bounds-check 2drop ] curry dupd each ; inline
 
 PRIVATE>
 
