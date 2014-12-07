@@ -25,7 +25,7 @@ IN: sequences.extras
 : find-all ( seq quot: ( elt -- ? ) -- elts )
     [ [ length iota ] keep ] dip
     [ dupd call( a -- ? ) [ 2array ] [ 2drop f ] if ] curry
-    2map [ ] filter ; inline
+    2map sift ; inline
 
 : reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) i -- ... result )
     [ swap ] 2dip each-from ; inline
