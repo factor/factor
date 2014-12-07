@@ -212,14 +212,14 @@ TUPLE: face { halfspace array }
 : intersections-into-faces ( face -- faces )
     clone dup  
     adjacent-faces>> [ intersection-into-face ] with map 
-    [ ] filter ;
+    sift ;
 
 : (face-silhouette) ( face -- faces )
     clone dup adjacent-faces>>
     [   backface?
         [ intersection-into-silhouette-face ] [ 2drop f ]  if  
     ] with map 
-    [ ] filter
+    sift
 ; inline
 
 : face-silhouette ( face -- faces )     
@@ -290,7 +290,7 @@ TUPLE: solid dimension silhouettes
    ! find-adjacencies 
    faces>> { } 
    [ face-silhouette append ] reduce
-   [ ] filter 
+   sift
    <solid> 
         swap >>faces
         over dimension>> >>dimension 
@@ -372,7 +372,7 @@ TUPLE: solid dimension silhouettes
   ensure-adjacencies
     [ color>> ] [ faces>> ] bi [ 3array  ] dip
     [ face-project ] with map 
-    [ ] filter 
+    sift
     [ ensure-adjacencies ] map
 ;
 
