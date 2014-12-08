@@ -115,14 +115,13 @@ M: flushable-insn live-insn? defs-vregs [ live-vreg? ] any? ;
 
 M: insn live-insn? drop t ;
 
-: eliminate-dead-code ( cfg -- cfg' )
+: eliminate-dead-code ( cfg -- )
     ! Even though we don't use predecessors directly, we depend
     ! on the predecessors pass updating phi nodes to remove dead
     ! inputs.
     needs-predecessors
 
     init-dead-code
-    dup
     [ [ [ build-liveness-graph ] each ] simple-analysis ]
     [ [ [ compute-live-vregs ] each ] simple-analysis ]
     [ [ [ live-insn? ] filter! ] simple-optimization ]

@@ -182,10 +182,7 @@ SYMBOL: live-phis
 
 PRIVATE>
 
-: construct-ssa ( cfg -- cfg' )
-    {
-        [ compute-merge-sets ]
-        [ compute-defs compute-phis ]
-        [ rename compute-live-phis insert-phis ]
-        [ ]
-    } cleave ;
+: construct-ssa ( cfg -- )
+    [ compute-merge-sets ]
+    [ compute-defs compute-phis ]
+    [ rename compute-live-phis insert-phis ] tri ;

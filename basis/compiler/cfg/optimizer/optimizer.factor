@@ -9,17 +9,20 @@ compiler.cfg.ssa.construction
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
 compiler.cfg.copy-prop
-compiler.cfg.dce ;
+compiler.cfg.dce
+kernel sequences ;
 IN: compiler.cfg.optimizer
 
 : optimize-cfg ( cfg -- cfg' )
-    optimize-tail-calls
-    delete-useless-conditionals
-    split-branches
-    join-blocks
-    normalize-height
-    construct-ssa
-    alias-analysis
-    value-numbering
-    copy-propagation
-    eliminate-dead-code ;
+    dup {
+        optimize-tail-calls
+        delete-useless-conditionals
+        split-branches
+        join-blocks
+        normalize-height
+        construct-ssa
+        alias-analysis
+        value-numbering
+        copy-propagation
+        eliminate-dead-code
+    } [ execute( x -- ) ] with each ;

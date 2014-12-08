@@ -26,7 +26,7 @@ IN: compiler.cfg.block-joining
 : join-block ( bb pred -- )
     [ join-instructions ] [ update-successors ] 2bi ;
 
-: join-blocks ( cfg -- cfg' )
+: join-blocks ( cfg -- )
     needs-predecessors
 
     dup post-order [
@@ -34,4 +34,4 @@ IN: compiler.cfg.block-joining
         [ dup predecessor join-block ] [ drop ] if
     ] each
 
-    cfg-changed predecessors-changed ;
+    cfg-changed predecessors-changed drop ;

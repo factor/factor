@@ -51,5 +51,5 @@ M: insn visit-insn drop ;
         rs-height get [ ##inc-r new-insn prefix ] unless-zero
     ] bi ;
 
-: normalize-height ( cfg -- cfg' )
-    dup [ height-step ] simple-optimization ;
+: normalize-height ( cfg -- )
+    [ height-step ] simple-optimization ;
