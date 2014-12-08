@@ -93,7 +93,7 @@ SYMBOL: visited
     HS{ } clone visited set
     entry>> add-to-worklist ;
 
-: split-branches ( cfg -- cfg' )
+: split-branches ( cfg -- )
     needs-predecessors
     dup init-worklist
     ! For back-edge?
@@ -104,4 +104,4 @@ SYMBOL: visited
         successors>> [ add-to-worklist ] each
     ] slurp-deque
 
-    cfg-changed ;
+    cfg-changed drop ;

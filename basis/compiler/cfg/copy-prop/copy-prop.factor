@@ -119,10 +119,8 @@ PRIVATE>
 
 USE: compiler.cfg
 
-: copy-propagation ( cfg -- cfg' )
+: copy-propagation ( cfg -- )
     needs-predecessors
-
     dup collect-copies
     dup rename-copies
-
-    predecessors-changed ;
+    predecessors-changed drop ;

@@ -325,6 +325,6 @@ M: insn eliminate-dead-stores drop t ;
     [ 0 [ [ insn#<< ] [ drop 1 + ] 2bi ] reduce drop ]
     [ [ analyze-aliases ] map! [ eliminate-dead-stores ] filter! ] bi ;
 
-: alias-analysis ( cfg -- cfg )
+: alias-analysis ( cfg -- )
     init-alias-analysis
-    dup [ alias-analysis-step ] simple-optimization ;
+    [ alias-analysis-step ] simple-optimization ;

@@ -1,9 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces arrays assocs kernel accessors
-sorting sets sequences locals
-cpu.architecture
-sequences.deep
+USING: accessors arrays assocs
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
@@ -16,7 +13,9 @@ compiler.cfg.value-numbering.math
 compiler.cfg.value-numbering.rewrite
 compiler.cfg.value-numbering.slots
 compiler.cfg.value-numbering.misc
-compiler.cfg.value-numbering.expressions ;
+compiler.cfg.value-numbering.expressions
+cpu.architecture kernel locals namespaces sequences sequences.deep sets
+sorting ;
 IN: compiler.cfg.value-numbering
 
 GENERIC: process-instruction ( insn -- insn' )
@@ -53,7 +52,6 @@ M: array process-instruction
     init-value-graph
     [ process-instruction ] map flatten ;
 
-: value-numbering ( cfg -- cfg )
+: value-numbering ( cfg -- )
     dup [ value-numbering-step ] simple-optimization
-
-    cfg-changed predecessors-changed ;
+    cfg-changed predecessors-changed drop ;
