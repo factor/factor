@@ -48,7 +48,7 @@ IN: compiler.cfg.builder.alien
 
 : caller-parameters ( params -- reg-inputs stack-inputs )
     [ abi>> ] [ parameters>> ] [ return>> ] tri
-    '[ 
+    '[
         _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
         (caller-parameters)
@@ -71,7 +71,7 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
     {
         { [ dup library-dll dll-valid? not ] [
             [ library-dll dll-path ] [ dlerror>> ] bi
-            cfg get word>> no-such-library-error drop 
+            cfg get word>> no-such-library-error drop
         ] }
         { [ 2dup library-dll dlsym-valid? not ] [
             drop dlerror cfg get word>> no-such-symbol-error
@@ -129,7 +129,7 @@ M: #alien-indirect emit-node ( node -- )
     [ caller-return ]
     bi ;
 
-M: #alien-assembly emit-node
+M: #alien-assembly emit-node ( node -- )
     params>>
     [
         {
@@ -137,7 +137,7 @@ M: #alien-assembly emit-node
             [ prepare-caller-return ]
             [ caller-stack-frame ]
             [ quot>> ]
-        } cleave <gc-map> ##alien-assembly,
+        } cleave ##alien-assembly,
     ]
     [ caller-return ]
     bi ;
@@ -160,7 +160,7 @@ M: #alien-assembly emit-node
 
 : callee-parameters ( params -- vregs reps reg-outputs stack-outputs )
     [ abi>> ] [ return>> ] [ parameters>> ] tri
-    '[ 
+    '[
         _ prepare-struct-callee struct-return-area set
         _ [ base-type ] map (callee-parameters)
     ] with-param-regs* ;
