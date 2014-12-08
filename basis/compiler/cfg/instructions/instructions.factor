@@ -834,16 +834,17 @@ UNION: conditional-branch-insn
 UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
 UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
 
-UNION: alien-call-insn ##alien-invoke ##alien-indirect ;
-
-UNION: factor-call-insn
-alien-call-insn ;
+UNION: alien-call-insn
+    ##alien-assembly
+    ##alien-indirect
+    ##alien-invoke ;
 
 UNION: gc-map-insn
-##call-gc
-##box
-##box-long-long
-factor-call-insn ;
+    ##call-gc
+    ##box
+    ##box-long-long
+    ##alien-indirect
+    ##alien-invoke ;
 
 M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
 
