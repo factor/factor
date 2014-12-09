@@ -296,7 +296,7 @@ M: gc-map-insn analyze-aliases
     def-acs
     clear-recent-stores ;
 
-M: factor-call-insn analyze-aliases
+M: alien-call-insn analyze-aliases
     def-acs
     clear-recent-stores
     clear-live-slots ;

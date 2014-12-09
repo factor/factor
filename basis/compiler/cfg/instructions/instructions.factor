@@ -673,7 +673,7 @@ use: src/int-rep
 literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map ;
 
 VREG-INSN: ##alien-assembly
-literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot gc-map ;
+literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot ;
 
 VREG-INSN: ##callback-inputs
 literal: reg-outputs stack-outputs ;
@@ -835,20 +835,16 @@ UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
 UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
 
 UNION: alien-call-insn
-##alien-invoke
-##alien-indirect
-##alien-assembly ;
-
-! Instructions that contain subroutine calls to functions which
-! can callback arbitrary Factor code
-UNION: factor-call-insn
-alien-call-insn ;
+    ##alien-assembly
+    ##alien-indirect
+    ##alien-invoke ;
 
 UNION: gc-map-insn
-##call-gc
-##box
-##box-long-long
-factor-call-insn ;
+    ##call-gc
+    ##box
+    ##box-long-long
+    ##alien-indirect
+    ##alien-invoke ;
 
 M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
 

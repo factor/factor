@@ -665,8 +665,8 @@ M:: x86 %alien-indirect ( src reg-inputs stack-inputs reg-outputs dead-outputs c
         gc-map gc-map-here
     ] emit-alien-insn ;
 
-M: x86 %alien-assembly ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot gc-map -- )
-    '[ _ _ gc-map set call( -- ) ] emit-alien-insn ;
+M: x86 %alien-assembly ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot -- )
+    '[ _ call( -- ) ] emit-alien-insn ;
 
 HOOK: %begin-callback cpu ( -- )
 

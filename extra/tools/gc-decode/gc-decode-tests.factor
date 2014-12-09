@@ -4,8 +4,11 @@ compiler.cfg.instructions compiler.cfg.stack-frame compiler.cfg.utilities
 compiler.codegen.gc-maps generic kernel math namespaces random sequences
 sequences.generalizations slots.syntax tools.gc-decode tools.test vm vocabs
 words compiler.cfg.linearization ;
+QUALIFIED: cpu.x86.features.private
+QUALIFIED: crypto.aes.utils
 QUALIFIED: effects
 QUALIFIED: llvm.types
+QUALIFIED: opencl
 IN: tools.gc-decode.tests
 
 ! byte-array>bit-array
@@ -73,12 +76,6 @@ IN: tools.gc-decode.tests
     [ struct-slot-values = ]
     [ [ not ] dip return-address-count>> 0 = and ] 2bi or ;
 
-! One of the few words that has derived roots.
-{ t } [
-    \ llvm.types:resolve-types
-    [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
-] unit-test
-
 ! Do it also for a bunch of random words
 : normal? ( word -- ? )
     { [ generic? ] [ primitive? ] [ inline? ] [ no-compile? ] } 1|| not ;
@@ -102,4 +99,25 @@ IN: tools.gc-decode.tests
 { t } [
     \ llvm.types:resolve-types
     [ base-pointer-groups-expected ] [ base-pointer-groups-decoded ] bi =
+] unit-test
+
+! Tough words #1227
+{ t } [
+    \ llvm.types:resolve-types
+    [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
+] unit-test
+
+{ t } [
+    \ opencl:cl-queue-kernel
+    [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
+] unit-test
+
+{ t } [
+    \ crypto.aes.utils:bytes>words
+    [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
+] unit-test
+
+{ t } [
+    \ cpu.x86.features.private:(sse-version)
+    [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
 ] unit-test

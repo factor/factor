@@ -491,8 +491,8 @@ M:: ppc %alien-indirect ( src reg-inputs stack-inputs
 
 M: ppc %alien-assembly ( reg-inputs stack-inputs reg-outputs
                          dead-outputs cleanup stack-size quot
-                         gc-map -- )
-    '[ _ _ gc-map set call( -- ) ] emit-alien-insn ;
+                         -- )
+    '[ _ call( -- ) ] emit-alien-insn ;
 
 M: ppc %callback-inputs ( reg-outputs stack-outputs -- )
     [ [ first3 load-reg-param ] each ]
