@@ -6,18 +6,8 @@ compiler.cfg.rpo compiler.cfg.predecessors ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dominance
 
-! Reference:
-
-! A Simple, Fast Dominance Algorithm
-! Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy
-! http://www.cs.rice.edu/~keith/EMBED/dom.pdf
-
-! Also, a nice overview is given in these lecture notes:
-! http://llvm.cs.uiuc.edu/~vadve/CS526/public_html/Notes/4ssa.4up.pdf
-
 <PRIVATE
 
-! Maps bb -> idom(bb)
 SYMBOL: dom-parents
 
 PRIVATE>
@@ -48,7 +38,6 @@ PRIVATE>
     reverse-post-order
     unclip dup set-idom drop '[ _ iterate ] loop ;
 
-! Maps bb -> {bb' | idom(bb') = bb}
 SYMBOL: dom-childrens
 
 PRIVATE>
