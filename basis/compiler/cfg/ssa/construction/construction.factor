@@ -15,27 +15,10 @@ FROM: assocs => change-at ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.construction
 
-! Iterated dominance frontiers are computed using the DJ Graph
-! method in compiler.cfg.ssa.construction.tdmsc.
-
-! The renaming algorithm is based on "Practical Improvements to
-! the Construction and Destruction of Static Single Assignment
-! Form".
-
-! We construct pruned SSA without computing live sets, by
-! building a dependency graph for phi instructions, marking the
-! transitive closure of a vertex as live if it is referenced by
-! some non-phi instruction. Thanks to Cameron Zwarich for the
-! trick.
-
-! http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.49.9683
-
 <PRIVATE
 
-! Maps vregs to sets of basic blocks
 SYMBOL: defs
 
-! Set of vregs defined in more than one basic block
 SYMBOL: defs-multi
 
 GENERIC: compute-insn-defs ( bb insn -- )
@@ -56,7 +39,6 @@ M: vreg-insn compute-insn-defs
         [ compute-insn-defs ] with each
     ] simple-analysis ;
 
-! Maps basic blocks to sequences of ##phi instructions
 SYMBOL: inserting-phis
 
 : insert-phi-later ( vreg bb -- )
@@ -71,10 +53,8 @@ SYMBOL: inserting-phis
     defs-multi get members
     defs get '[ dup _ at compute-phis-for ] each ;
 
-! Maps vregs to ##phi instructions
 SYMBOL: phis
 
-! Worklist of used vregs, to calculate used phis
 SYMBOL: used-vregs
 
 ! Maps vregs to renaming stacks
