@@ -36,6 +36,10 @@ HELP: uses-vregs
   }
 } ;
 
+HELP: special-vreg-insns
+{ $var-description "Instructions with unusual operands, also see these passes for special behavior:" { $list "compiler.cfg.renaming.functor" "compiler.cfg.representations.preferred" }
+} ;
+
 ARTICLE: "compiler.cfg.def-use" "Common code used by several passes for def-use analysis"
 "The " { $vocab-link "compiler.cfg.def-use" } " contains tools to correlate SSA instructions with virtual registers defined or used by them."
 $nl

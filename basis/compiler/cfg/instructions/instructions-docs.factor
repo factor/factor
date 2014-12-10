@@ -1,6 +1,6 @@
-USING: arrays assocs classes compiler.cfg compiler.codegen.gc-maps
+USING: alien arrays assocs classes compiler.cfg compiler.codegen.gc-maps
 cpu.architecture help.markup help.syntax kernel layouts sequences
-slots.private ;
+slots.private system ;
 IN: compiler.cfg.instructions
 
 HELP: new-insn
@@ -62,7 +62,10 @@ HELP: ##alien-invoke
   "An instruction for calling a function in a dynamically linked library. It has the following slots:"
   { $table
     { { $slot "reg-inputs" } { "Registers to use for the arguments to the function call." } }
-    { { $slot "stack-inputs" } { "Stack slots used for the arguments to the function call. Only used if all register arguments are already filled." } }
+    {
+        { $slot "stack-inputs" }
+        { "Stack slots used for the arguments to the function call." }
+    }
     {
         { $slot "reg-outputs" }
         { "If the called function returns a value, then this slot is a one-element sequence containing a 3-tuple describing which register is used for the return value." }
@@ -70,6 +73,7 @@ HELP: ##alien-invoke
     { { $slot "symbols" } { "Name of the function to call." } }
     { { $slot "dll" } { "A dll handle." } }
   }
+  "Which function arguments that goes in " { $slot "reg-inputs" } " and which goes in " { $slot "stack-inputs" } " depend on the calling convention. In " { $link cdecl } " on " { $link x86.32 } ", all arguments goes in " { $slot "stack-inputs" } " but on " { $link x86.64 } " the first six arguments are passed in registers and only then are the stack used."
 } ;
 
 HELP: alien-call-insn
