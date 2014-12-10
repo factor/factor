@@ -4,7 +4,7 @@ compiler.cfg.predecessors compiler.cfg.utilities ;
 IN: compiler.cfg.dominance.tests
 
 : test-dominance ( -- )
-    0 get block>cfg needs-dominance drop ;
+    0 get block>cfg needs-dominance ;
 
 ! Example with no back edges
 V{ } 0 test-bb
