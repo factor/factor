@@ -154,8 +154,7 @@ M: insn cleanup-insn , ;
 PRIVATE>
 
 : destruct-ssa ( cfg -- cfg' )
-    needs-dominance
-
+    dup needs-dominance
     dup construct-cssa
     dup compute-defs
     dup compute-insns

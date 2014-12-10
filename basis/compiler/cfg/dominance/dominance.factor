@@ -78,9 +78,10 @@ PRIVATE>
 
 PRIVATE>
 
-: needs-dominance ( cfg -- cfg' )
+: needs-dominance ( cfg -- )
     needs-predecessors
-    dup dominance-valid?>> [ compute-dominance t >>dominance-valid? ] unless ;
+    dup dominance-valid?>> [ compute-dominance t >>dominance-valid? ] unless
+    drop ;
 
 : dominates? ( bb1 bb2 -- ? )
     swap [ pre-of ] [ [ pre-of ] [ maxpre-of ] bi ] bi* between? ;
