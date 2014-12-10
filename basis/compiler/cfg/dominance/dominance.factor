@@ -46,10 +46,9 @@ PRIVATE>
 
 <PRIVATE
 
-: compute-dom-children ( -- )
-    dom-parents get H{ } clone
-    [ '[ 2dup eq? [ 2drop ] [ _ push-at ] if ] assoc-each ] keep
-    dom-childrens set ;
+: compute-dom-children ( dom-parents -- dom-childrens )
+    H{ } clone [ '[ 2dup eq? [ 2drop ] [ _ push-at ] if ] assoc-each ] keep
+    [ [ number>> ] sort-with ] assoc-map ;
 
 SYMBOLS: preorder maxpreorder ;
 
@@ -74,7 +73,10 @@ PRIVATE>
     [ 0 ] dip entry>> (compute-dfs) drop ;
 
 : compute-dominance ( cfg -- )
-    [ compute-dom-parents compute-dom-children ] [ compute-dfs ] bi ;
+    [
+        compute-dom-parents
+        dom-parents get compute-dom-children dom-childrens set
+    ] [ compute-dfs ] bi ;
 
 PRIVATE>
 
