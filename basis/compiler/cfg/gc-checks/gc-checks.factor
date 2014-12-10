@@ -129,7 +129,7 @@ PRIVATE>
 
 : insert-gc-checks ( cfg -- cfg' )
     dup blocks-with-gc [
-        [ needs-predecessors ] dip
+        [ dup needs-predecessors ] dip
         [ process-block ] each
         dup cfg-changed
     ] unless-empty ;

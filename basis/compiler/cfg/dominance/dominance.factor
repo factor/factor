@@ -79,7 +79,7 @@ PRIVATE>
 PRIVATE>
 
 : needs-dominance ( cfg -- )
-    needs-predecessors
+    dup needs-predecessors
     dup dominance-valid?>> [ compute-dominance t >>dominance-valid? ] unless
     drop ;
 

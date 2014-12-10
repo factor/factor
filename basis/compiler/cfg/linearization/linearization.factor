@@ -75,7 +75,7 @@ SYMBOLS: work-list loop-heads visited ;
 PRIVATE>
 
 : linearization-order ( cfg -- bbs )
-    needs-post-order needs-loops needs-predecessors
+    needs-post-order needs-loops dup needs-predecessors
 
     dup linear-order>> [ ] [
         dup (linearization-order)
