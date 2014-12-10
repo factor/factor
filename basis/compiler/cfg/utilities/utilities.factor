@@ -86,3 +86,10 @@ IN: compiler.cfg.utilities
 
 : apply-passes ( obj passes -- )
     [ execute( x -- ) ] with each ;
+
+: connect-bbs ( from to -- )
+    [ [ successors>> ] dip suffix! drop ]
+    [ predecessors>> swap suffix! drop ] 2bi ;
+
+: make-edges ( block-map edgelist -- )
+    [ [ of ] with map first2 connect-bbs ] with each ;
