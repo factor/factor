@@ -20,10 +20,6 @@ M: insn defs-vregs drop { } ;
 M: insn temp-vregs drop { } ;
 M: insn uses-vregs drop { } ;
 
-! Instructions with unusual operands, also see these passes
-! for special behavior:
-! - compiler.cfg.renaming.functor
-! - compiler.cfg.representations.preferred
 CONSTANT: special-vreg-insns {
     ##parallel-copy
     ##phi
