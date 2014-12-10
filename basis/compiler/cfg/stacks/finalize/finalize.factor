@@ -56,4 +56,4 @@ ERROR: bad-peek dst loc ;
 
     dup [ visit-block ] each-basic-block
 
-    cfg-changed ;
+    dup cfg-changed ;

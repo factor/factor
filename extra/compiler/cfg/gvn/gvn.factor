@@ -121,5 +121,4 @@ M: insn gcse
     needs-predecessors
     dup determine-value-numbers
     dup eliminate-common-subexpressions
-
-    cfg-changed predecessors-changed ;
+    [ cfg-changed ] [ predecessors-changed ] bi ;

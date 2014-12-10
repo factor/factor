@@ -74,4 +74,4 @@ SYMBOLS: edge-copies phi-copies ;
 
     dup [ convert-phis ] each-basic-block
 
-    cfg-changed drop ;
+    cfg-changed ;

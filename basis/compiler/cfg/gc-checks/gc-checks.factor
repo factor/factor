@@ -131,5 +131,5 @@ PRIVATE>
     dup blocks-with-gc [
         [ needs-predecessors ] dip
         [ process-block ] each
-        cfg-changed
+        dup cfg-changed
     ] unless-empty ;
