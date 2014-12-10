@@ -14,8 +14,7 @@ IN: compiler.cfg.ssa.construction.tests
 : test-ssa ( -- )
     0 get block>cfg
     dup cfg set
-    construct-ssa
-    drop ;
+    construct-ssa ;
 
 : clean-up-phis ( insns -- insns' )
     [ dup ##phi? [ [ [ [ number>> ] dip ] assoc-map ] change-inputs ] when ] map ;
