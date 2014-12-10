@@ -120,9 +120,9 @@ M: insn gcse
 
 : value-numbering ( cfg -- cfg )
     dup {
-        [ needs-predecessors ]
-        [ determine-value-numbers ]
-        [ eliminate-common-subexpressions ]
-        [ cfg-changed ]
-        [ predecessors-changed ]
-    } cleave ;
+        needs-predecessors
+        determine-value-numbers
+        eliminate-common-subexpressions
+        cfg-changed
+        predecessors-changed
+    } apply-passes ;

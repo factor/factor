@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators
+USING:
 compiler.cfg
 compiler.cfg.registers
 compiler.cfg.predecessors
@@ -8,7 +8,9 @@ compiler.cfg.loop-detection
 compiler.cfg.representations.rewrite
 compiler.cfg.representations.peephole
 compiler.cfg.representations.selection
-compiler.cfg.representations.coalescing ;
+compiler.cfg.representations.coalescing
+compiler.cfg.utilities
+kernel ;
 IN: compiler.cfg.representations
 
 ! Virtual register representation selection. This is where
@@ -18,11 +20,10 @@ IN: compiler.cfg.representations
 
 : select-representations ( cfg -- cfg' )
     needs-loops
-    {
-        [ needs-predecessors ]
-        [ compute-components ]
-        [ compute-possibilities ]
-        [ compute-representations ]
-        [ insert-conversions ]
-        [ ]
-    } cleave ;
+    dup {
+        needs-predecessors
+        compute-components
+        compute-possibilities
+        compute-representations
+        insert-conversions
+    } apply-passes ;

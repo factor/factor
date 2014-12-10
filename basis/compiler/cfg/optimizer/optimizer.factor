@@ -1,15 +1,17 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.cfg.tco
-compiler.cfg.useless-conditionals
-compiler.cfg.branch-splitting
-compiler.cfg.block-joining
-compiler.cfg.height
-compiler.cfg.ssa.construction
+USING:
 compiler.cfg.alias-analysis
-compiler.cfg.value-numbering
+compiler.cfg.block-joining
+compiler.cfg.branch-splitting
 compiler.cfg.copy-prop
 compiler.cfg.dce
+compiler.cfg.height
+compiler.cfg.ssa.construction
+compiler.cfg.tco
+compiler.cfg.useless-conditionals
+compiler.cfg.utilities
+compiler.cfg.value-numbering
 kernel sequences ;
 IN: compiler.cfg.optimizer
 
@@ -25,4 +27,4 @@ IN: compiler.cfg.optimizer
         value-numbering
         copy-propagation
         eliminate-dead-code
-    } [ execute( x -- ) ] with each ;
+    } apply-passes ;

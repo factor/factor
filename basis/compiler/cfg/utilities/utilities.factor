@@ -83,3 +83,6 @@ IN: compiler.cfg.utilities
 
 : <copy> ( dst src -- insn )
     any-rep ##copy new-insn ;
+
+: apply-passes ( obj passes -- )
+    [ execute( x -- ) ] with each ;
