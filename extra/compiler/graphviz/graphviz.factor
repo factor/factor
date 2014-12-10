@@ -90,7 +90,7 @@ IN: compiler.graphviz
 : dom-trees ( cfgs -- )
     [
         [
-            needs-dominance drop
+            needs-dominance
             dom-childrens get [
                 [
                     bb-edge,
@@ -125,7 +125,7 @@ SYMBOL: vertex-names
         {
             [ { } call-graph-edge, ]
             [ [ vertex-name ] [ label>> loop?>> { "shape=box" } { } ? ] bi node-style, ]
-            [ [ vertex-name ] [ calls>> ] bi (call-graph-back-edges) ] 
+            [ [ vertex-name ] [ calls>> ] bi (call-graph-back-edges) ]
             [ [ vertex-name ] [ children>> ] bi (call-graph-edges) ]
         } cleave
     ] with each ;

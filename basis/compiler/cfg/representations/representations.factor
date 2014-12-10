@@ -18,9 +18,8 @@ IN: compiler.cfg.representations
 
 : select-representations ( cfg -- cfg' )
     needs-loops
-    needs-predecessors
-
     {
+        [ needs-predecessors ]
         [ compute-components ]
         [ compute-possibilities ]
         [ compute-representations ]

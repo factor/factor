@@ -158,15 +158,15 @@ SYMBOL: work-list
     ] [ drop ] if ;
 
 : compute-live-sets ( cfg -- )
-    needs-predecessors
-    dup compute-insns
-
     <hashed-dlist> work-list set
     H{ } clone live-ins set
     H{ } clone edge-live-ins set
     H{ } clone live-outs set
     H{ } clone base-pointers set
-    post-order add-to-work-list
+
+    [ needs-predecessors ]
+    [ compute-insns ]
+    [ post-order add-to-work-list ] tri
     work-list get [ liveness-step ] slurp-deque ;
 
 : live-in? ( vreg bb -- ? ) live-in key? ;

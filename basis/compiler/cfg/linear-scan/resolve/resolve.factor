@@ -107,6 +107,6 @@ SYMBOL: temp-locations
     ] if ;
 
 : resolve-data-flow ( cfg -- )
-    needs-predecessors
     init-resolve
-    [ resolve-block-data-flow ] each-basic-block ;
+    [ needs-predecessors ]
+    [ [ resolve-block-data-flow ] each-basic-block ] bi ;

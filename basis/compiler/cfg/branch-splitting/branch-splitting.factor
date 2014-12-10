@@ -94,14 +94,16 @@ SYMBOL: visited
     entry>> add-to-worklist ;
 
 : split-branches ( cfg -- )
-    needs-predecessors
-    dup init-worklist
-    ! For back-edge?
-    dup post-order drop
-
-    worklist get [
-        dup split-branch? [ dup split-branch ] when
-        successors>> [ add-to-worklist ] each
-    ] slurp-deque
-
-    cfg-changed ;
+    {
+        [ needs-predecessors ]
+        [ init-worklist ]
+        [
+            ! For back-edge?
+            post-order drop
+            worklist get [
+                dup split-branch? [ dup split-branch ] when
+                successors>> [ add-to-worklist ] each
+            ] slurp-deque
+        ]
+        [ cfg-changed ]
+    } cleave ;

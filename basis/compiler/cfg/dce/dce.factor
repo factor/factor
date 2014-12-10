@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel namespaces sequences
+USING: accessors arrays assocs kernel namespaces sequences combinators
 compiler.cfg.instructions compiler.cfg.def-use
 compiler.cfg.rpo compiler.cfg.predecessors hash-sets sets ;
 FROM: assocs => change-at ;
@@ -116,13 +116,13 @@ M: flushable-insn live-insn? defs-vregs [ live-vreg? ] any? ;
 M: insn live-insn? drop t ;
 
 : eliminate-dead-code ( cfg -- )
+    init-dead-code
     ! Even though we don't use predecessors directly, we depend
     ! on the predecessors pass updating phi nodes to remove dead
     ! inputs.
-    needs-predecessors
-
-    init-dead-code
-    [ [ [ build-liveness-graph ] each ] simple-analysis ]
-    [ [ [ compute-live-vregs ] each ] simple-analysis ]
-    [ [ [ live-insn? ] filter! ] simple-optimization ]
-    tri ;
+    {
+        [ needs-predecessors ]
+        [ [ [ build-liveness-graph ] each ] simple-analysis ]
+        [ [ [ compute-live-vregs ] each ] simple-analysis ]
+        [ [ [ live-insn? ] filter! ] simple-optimization ]
+    } cleave ;
