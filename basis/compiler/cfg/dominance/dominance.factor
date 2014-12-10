@@ -73,15 +73,17 @@ PRIVATE>
     H{ } clone maxpreorder set
     [ 0 ] dip entry>> (compute-dfs) drop ;
 
-: compute-dominance ( cfg -- cfg' )
-    [ compute-dom-parents compute-dom-children ] [ compute-dfs ] [ ] tri ;
+: compute-dominance ( cfg -- )
+    [ compute-dom-parents compute-dom-children ] [ compute-dfs ] bi ;
 
 PRIVATE>
 
 : needs-dominance ( cfg -- )
-    dup needs-predecessors
-    dup dominance-valid?>> [ compute-dominance t >>dominance-valid? ] unless
-    drop ;
+    [ needs-predecessors ]
+    [
+        dup dominance-valid?>> [ drop ]
+        [ t >>dominance-valid? compute-dominance ] if
+    ] bi ;
 
 : dominates? ( bb1 bb2 -- ? )
     swap [ pre-of ] [ [ pre-of ] [ maxpre-of ] bi ] bi* between? ;
