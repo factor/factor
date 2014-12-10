@@ -104,4 +104,4 @@ SYMBOL: visited
         successors>> [ add-to-worklist ] each
     ] slurp-deque
 
-    cfg-changed drop ;
+    cfg-changed ;

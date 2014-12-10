@@ -95,7 +95,7 @@ SYMBOL: temp-locations
 : perform-mappings ( bb to mappings -- )
     dup empty? [ 3drop ] [
         mapping-instructions insert-basic-block
-        cfg get cfg-changed drop
+        cfg get cfg-changed
     ] if ;
 
 : resolve-edge-data-flow ( bb to -- )

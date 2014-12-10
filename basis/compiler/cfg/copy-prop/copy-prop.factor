@@ -123,4 +123,4 @@ USE: compiler.cfg
     needs-predecessors
     dup collect-copies
     dup rename-copies
-    predecessors-changed drop ;
+    predecessors-changed ;

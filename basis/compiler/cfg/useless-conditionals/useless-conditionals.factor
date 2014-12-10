@@ -26,8 +26,9 @@ IN: compiler.cfg.useless-conditionals
     instructions>> [ pop* ] [ [ ##branch new-insn ] dip push ] bi ;
 
 : delete-useless-conditionals ( cfg -- )
-    dup [
-        dup delete-conditional? [ delete-conditional ] [ drop ] if
-    ] each-basic-block
-
-    cfg-changed predecessors-changed drop ;
+    [
+        [
+            dup delete-conditional? [ delete-conditional ] [ drop ] if
+        ] each-basic-block
+    ]
+    [ cfg-changed ] [ predecessors-changed ] tri ;

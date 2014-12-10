@@ -28,10 +28,9 @@ IN: compiler.cfg.block-joining
 
 : join-blocks ( cfg -- )
     needs-predecessors
-
-    dup post-order [
-        dup join-block?
-        [ dup predecessor join-block ] [ drop ] if
-    ] each
-
-    cfg-changed predecessors-changed drop ;
+    [
+        post-order [
+            dup join-block?
+            [ dup predecessor join-block ] [ drop ] if
+        ] each
+    ] [ cfg-changed ] [ predecessors-changed ] tri ;

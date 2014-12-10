@@ -53,5 +53,6 @@ M: array process-instruction
     [ process-instruction ] map flatten ;
 
 : value-numbering ( cfg -- )
-    dup [ value-numbering-step ] simple-optimization
-    cfg-changed predecessors-changed drop ;
+    [ [ value-numbering-step ] simple-optimization ]
+    [ cfg-changed ]
+    [ predecessors-changed ] tri ;
