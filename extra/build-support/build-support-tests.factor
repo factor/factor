@@ -3,4 +3,4 @@
 USING: build-support sequences tools.test ;
 IN: build-support.tests
 
-{ f } [ build-make-target empty? ] unit-test
+! { f } [ factor.sh-make-target empty? ] unit-test
