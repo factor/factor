@@ -305,7 +305,7 @@ M: colon unindent-first-line? drop t ;
 
 ! Long section layout algorithm
 : chop-break ( seq -- seq )
-    dup last line-break? [ but-last-slice chop-break ] when ;
+    [ dup last line-break? ] [ but-last-slice ] while ;
 
 SYMBOL: prev
 SYMBOL: next
@@ -314,7 +314,7 @@ SYMBOL: next
 
 : split-before ( section -- )
     {
-        [ start-group?>> prev get [ end-group?>> ] [ t ] if* and ]
+        [ start-group?>> prev get [ end-group?>> and ] when* ]
         [ flow? prev get flow? not and ]
     } 1|| split-groups ;
 
