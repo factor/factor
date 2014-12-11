@@ -118,8 +118,8 @@ M: insn gcse
     dup compute-avail-sets
     [ gcse-step ] simple-optimization ;
 
-: value-numbering ( cfg -- cfg )
-    dup {
+: value-numbering ( cfg -- )
+    {
         needs-predecessors
         determine-value-numbers
         eliminate-common-subexpressions

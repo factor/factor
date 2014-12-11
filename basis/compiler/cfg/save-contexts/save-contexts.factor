@@ -43,5 +43,5 @@ M: insn modifies-context? drop f ;
         [ insert-nth ] change-instructions drop
     ] [ drop ] if ;
 
-: insert-save-contexts ( cfg -- cfg' )
-    dup [ insert-save-context ] each-basic-block ;
+: insert-save-contexts ( cfg -- )
+    [ insert-save-context ] each-basic-block ;

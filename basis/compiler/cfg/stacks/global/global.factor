@@ -48,12 +48,11 @@ M: dead-analysis transfer-set
     [ replace-set assoc-union ] bi ;
 
 ! Main word
-: compute-global-sets ( cfg -- cfg' )
+: compute-global-sets ( cfg -- )
     {
         [ compute-anticip-sets ]
         [ compute-live-sets ]
         [ compute-pending-sets ]
         [ compute-dead-sets ]
         [ compute-avail-sets ]
-        [ ]
     } cleave ;

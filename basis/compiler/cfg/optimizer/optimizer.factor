@@ -15,8 +15,8 @@ compiler.cfg.value-numbering
 kernel sequences ;
 IN: compiler.cfg.optimizer
 
-: optimize-cfg ( cfg -- cfg' )
-    dup {
+: optimize-cfg ( cfg -- )
+    {
         optimize-tail-calls
         delete-useless-conditionals
         split-branches

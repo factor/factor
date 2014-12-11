@@ -43,5 +43,5 @@ IN: compiler.cfg.linear-scan
         [ [ frame-reg = not ] filter ] assoc-map
     ] when ;
 
-: linear-scan ( cfg -- cfg' )
-    dup dup admissible-registers (linear-scan) ;
+: linear-scan ( cfg -- )
+    dup admissible-registers (linear-scan) ;

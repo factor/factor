@@ -13,7 +13,13 @@ IN: compiler.cfg.builder.tests
 
 ! Just ensure that various CFGs build correctly.
 : unit-test-builder ( quot -- )
-    '[ _ test-builder [ [ optimize-cfg check-cfg ] with-cfg ] each ] [ ] swap unit-test ;
+    '[
+        _ test-builder [
+            [
+                [ optimize-cfg ] [ check-cfg ] bi
+            ] with-cfg
+        ] each
+    ] [ ] swap unit-test ;
 
 : blahblah ( nodes -- ? )
     { fixnum } declare [

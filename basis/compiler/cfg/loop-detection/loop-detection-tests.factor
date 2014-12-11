@@ -11,7 +11,7 @@ V{ } 2 test-bb
 2 0 edge
 
 : test-loop-detection ( -- )
-    0 get block>cfg needs-loops drop ;
+    0 get block>cfg needs-loops ;
 
 [ ] [ test-loop-detection ] unit-test
 

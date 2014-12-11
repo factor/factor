@@ -60,5 +60,5 @@ M: insn eliminate-write-barrier drop t ;
     H{ } clone copies set
     [ eliminate-write-barrier ] filter! ;
 
-: eliminate-write-barriers ( cfg -- cfg )
-    dup [ write-barriers-step ] simple-optimization ;
+: eliminate-write-barriers ( cfg -- )
+    [ write-barriers-step ] simple-optimization ;

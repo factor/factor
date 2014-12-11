@@ -18,9 +18,8 @@ IN: compiler.cfg.stacks
 
 : end-stack-analysis ( -- )
     cfg get
-    compute-global-sets
-    finalize-stack-shuffling
-    drop ;
+    [ compute-global-sets ]
+    [ finalize-stack-shuffling ] bi ;
 
 : ds-drop ( -- ) -1 inc-d ;
 

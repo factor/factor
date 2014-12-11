@@ -18,9 +18,9 @@ IN: compiler.cfg.representations
 ! are made. The appropriate conversion operations inserted
 ! after a cost analysis.
 
-: select-representations ( cfg -- cfg' )
-    needs-loops
-    dup {
+: select-representations ( cfg -- )
+    {
+        needs-loops
         needs-predecessors
         compute-components
         compute-possibilities

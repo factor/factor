@@ -52,7 +52,7 @@ H{ } clone representations set
 ] unit-test
 
 : test-representations ( -- )
-    0 get block>cfg dup cfg set select-representations drop ;
+    0 get block>cfg dup cfg set select-representations ;
 
 ! Make sure cost calculation isn't completely wrong
 V{

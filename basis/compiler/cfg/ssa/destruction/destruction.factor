@@ -1,8 +1,7 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry locals kernel make
-namespaces sequences sequences.deep
-sets vectors
+USING: accessors arrays assocs combinators fry locals kernel
+make namespaces sequences sequences.deep sets vectors
 cpu.architecture
 compiler.cfg.rpo
 compiler.cfg.def-use
@@ -153,14 +152,16 @@ M: insn cleanup-insn , ;
 
 PRIVATE>
 
-: destruct-ssa ( cfg -- cfg' )
-    dup needs-dominance
-    dup construct-cssa
-    dup compute-defs
-    dup compute-insns
-    dup compute-live-sets
-    dup compute-live-ranges
-    dup prepare-coalescing
-    process-copies
-    dup cleanup-cfg
-    dup compute-live-sets ;
+: destruct-ssa ( cfg -- )
+    {
+        [ needs-dominance ]
+        [ construct-cssa ]
+        [ compute-defs ]
+        [ compute-insns ]
+        [ compute-live-sets ]
+        [ compute-live-ranges ]
+        [ prepare-coalescing ]
+        [ drop process-copies ]
+        [ cleanup-cfg ]
+        [ compute-live-sets ]
+    } cleave ;
