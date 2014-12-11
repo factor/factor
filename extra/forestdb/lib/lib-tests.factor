@@ -321,28 +321,6 @@ IN: forestdb.lib
 ] unit-test
 
 
-{
-    {
-        { 1 "key1" }
-        { 2 "key2" }
-        { 3 "key3" }
-        { 4 "key4" }
-        { 5 "key5" }
-    }
-} [
-    delete-test-db-1
-    test-db-1 [
-        5 set-kv-n
-        fdb-commit-normal
-        [
-            0 10 [
-                [ seqnum>> ]
-                [ [ key>> ] [ keylen>> ] bi alien/length>string ] bi 2array ,
-            ] with-fdb-byseq-each
-        ] { } make
-    ] with-forestdb-path
-] unit-test
-
 ! Test byseq mapping
 {
     V{ 1 2 3 4 5 }

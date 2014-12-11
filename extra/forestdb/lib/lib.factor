@@ -10,9 +10,6 @@ IN: forestdb.lib
 
 /*
 ! Issues
-! 2) build on macosx doesn't search /usr/local for libsnappy
-! 3) build on macosx doesn't include -L/usr/local/lib when it finds snappy
-!  - link_directories(/usr/local/lib) or some other fix
 ! 4) byseq iteration doesn't have bodies, weird.
 ! 5) Get byseq ignores seqnum and uses key instead if key is set
 */
@@ -80,7 +77,7 @@ SYMBOL: current-fdb-kvs-handle
 
 : fdb-set-kv ( key value -- )
     [ get-kvs-handle ] 2dip
-    [ dup length ] bi@ fdb_set_kv fdb-check-error ;
+    [ utf8 encode dup length ] bi@ fdb_set_kv fdb-check-error ;
 
 : <key-doc> ( key -- doc )
     fdb_doc malloc-struct
@@ -116,7 +113,7 @@ SYMBOL: current-fdb-kvs-handle
 
 : fdb-get-kv ( key -- value/f )
     [ get-kvs-handle ] dip
-    dup length f void* <ref> 0 size_t <ref>
+    utf8 encode dup length f void* <ref> 0 size_t <ref>
     [ fdb_get_kv ] 2keep
     rot {
         { FDB_RESULT_SUCCESS [ ret>string ] }
@@ -125,17 +122,18 @@ SYMBOL: current-fdb-kvs-handle
     } case ;
 
 : fdb-del-kv ( key -- )
-    [ get-kvs-handle ] dip dup length fdb_del_kv fdb-check-error ;
+    [ get-kvs-handle ] dip
+    utf8 encode dup length fdb_del_kv fdb-check-error ;
 
 : fdb-doc-create ( key meta body -- doc )
     [ f void* <ref> ] 3dip
-    [ dup length ] tri@
+    [ utf8 encode dup length ] tri@
     [ fdb_doc_create fdb-check-error ] 7 nkeep 6 ndrop
     void* deref fdb_doc memory>struct ;
 
 : fdb-doc-update ( doc meta body -- )
     [ void* <ref> ] 2dip
-    [ dup length ] bi@
+    [ utf8 encode dup length ] bi@
     fdb_doc_update fdb-check-error ;
 
 : fdb-doc-free ( doc -- )
@@ -216,7 +214,7 @@ M: fdb-iterator dispose*
 
 : fdb-iterator-init ( start-key end-key fdb_iterator_opt_t -- iterator )
     [ get-kvs-handle f void* <ref> ] 3dip
-    [ [ dup length ] bi@ ] dip
+    [ [ utf8 encode dup length ] bi@ ] dip
     [ fdb_iterator_init fdb-check-error ] 7 nkeep 5 ndrop nip
     void* deref <fdb-iterator> ;
 
@@ -228,24 +226,15 @@ M: fdb-iterator dispose*
 : fdb-iterator-init-none ( start-key end-key -- iterator )
     FDB_ITR_NONE fdb-iterator-init ;
 
-: fdb-iterator-meta-only ( start-key end-key -- iterator )
-    FDB_ITR_METAONLY fdb-iterator-init ;
-
 : fdb-iterator-no-deletes ( start-key end-key -- iterator )
     FDB_ITR_NO_DELETES fdb-iterator-init ;
 
-: check-iterate-result ( doc fdb_status -- doc/f )
+: check-iterate-result ( fdb_status -- ? )
     {
-        { FDB_RESULT_SUCCESS [ void* deref fdb_doc memory>struct ] }
-        { FDB_RESULT_ITERATOR_FAIL [ drop f ] }
+        { FDB_RESULT_SUCCESS [ t ] }
+        { FDB_RESULT_ITERATOR_FAIL [ f ] }
         [ throw ]
     } case ;
-
-: fdb-iterate ( iterator word -- doc )
-    '[
-        fdb_doc malloc-struct fdb_doc <ref>
-        [ _ execute ] keep swap check-iterate-result
-    ] call ; inline
 
 ! fdb_doc key, meta, body only valid inside with-forestdb
 ! so make a helper word to preserve them outside
@@ -269,8 +258,6 @@ T{ doc
     { metalen 0 } { bodylen 4 }
     { offset 4256 } { size-ondisk 0 }
 }
-
-
 */
 
 : alien/length>string ( alien n -- string/f )
@@ -305,17 +292,28 @@ T{ doc
         [ file_size>> ]
     } cleave <info> ;
 
-: fdb-iterator-prev ( iterator -- doc/f ) \ fdb_iterator_prev fdb-iterate ;
-: fdb-iterator-next ( iterator -- doc/f ) \ fdb_iterator_next fdb-iterate ;
-: fdb-iterator-next-meta-only ( iterator -- doc/f ) \ fdb_iterator_next_metaonly fdb-iterate ;
-: fdb-iterator-seek ( iterator key -- )
-    dup length fdb_iterator_seek fdb-check-error ;
+: fdb-iterator-get ( iterator -- doc/f )
+    fdb_doc malloc-struct fdb_doc <ref>
+    [ fdb_iterator_get check-iterate-result ] keep swap
+    [ void* deref fdb_doc memory>struct ] [ void* deref free f ] if ;
 
-: with-fdb-iterator ( start-key end-key fdb_iterator_opt_t iterator-init iterator-next quot: ( obj -- ) -- )
+: fdb-iterator-seek ( iterator key seek-opt -- )
+    [ dup length ] dip fdb_iterator_seek fdb-check-error ;
+
+: fdb-iterator-seek-lower ( iterator key -- )
+    FDB_ITR_SEEK_LOWER fdb-iterator-seek ;
+
+: fdb-iterator-seek-higher ( iterator key -- )
+    FDB_ITR_SEEK_HIGHER fdb-iterator-seek ;
+
+: with-fdb-iterator ( start-key end-key fdb_iterator_opt_t iterator-init iterator-advance quot: ( obj -- ) -- )
     [ execute ] 2dip
+    swap
     '[
         _ &dispose handle>> [
-            _ execute [ _ with-doc t ] [ f ] if*
+            [ fdb-iterator-get ] keep swap
+            [ _ with-doc _ execute check-iterate-result ]
+            [ drop f ] if*
         ] curry loop
     ] with-destructors ; inline
 
@@ -331,26 +329,25 @@ PRIVATE>
 
 : with-fdb-map ( start-key end-key fdb_iterator_opt_t iterator-init iterator-next quot: ( obj -- ) -- )
     [ execute ] 2dip
+    swap
     '[
         _ &dispose handle>> [
-            _ execute [ _ with-doc t ] [ f f ] if* swap
+            [ fdb-iterator-get ] keep swap
+            [ _ with-doc swap _ execute check-iterate-result ]
+            [ drop f ] if* swap
         ] curry collector-when [ loop ] dip
     ] with-destructors ; inline
 
 : with-fdb-normal-iterator ( start-key end-key quot -- )
-    [ FDB_ITR_NONE \ fdb-iterator-init \ fdb-iterator-next ] dip
-    with-fdb-iterator ; inline
-
-: with-fdb-normal-meta-iterator ( start-key end-key quot -- )
-    [ FDB_ITR_NONE \ fdb-iterator-init \ fdb-iterator-next-meta-only ] dip
+    [ FDB_ITR_NONE \ fdb-iterator-init \ fdb_iterator_next ] dip
     with-fdb-iterator ; inline
 
 : with-fdb-byseq-each ( start-seq end-seq quot -- )
-    [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb-iterator-next-meta-only ] dip
+    [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb_iterator_next ] dip
     with-fdb-iterator ; inline
 
 : with-fdb-byseq-map ( start-seq end-seq quot -- )
-    [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb-iterator-next-meta-only ] dip
+    [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb_iterator_next ] dip
     with-fdb-map ; inline
 
 ! Do not try to commit here, as it will fail with FDB_RESULT_RONLY_VIOLATION
