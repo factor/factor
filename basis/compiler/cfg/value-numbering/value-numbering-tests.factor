@@ -2748,7 +2748,7 @@ test-diamond
 
 [ ] [
     0 get block>cfg dup cfg set
-    value-numbering
+    dup value-numbering
     select-representations
     destruct-ssa drop
 ] unit-test
@@ -2788,9 +2788,7 @@ test-diamond
 
 [ ] [
     0 get block>cfg
-    value-numbering
-    eliminate-dead-code
-    drop
+    { value-numbering eliminate-dead-code } apply-passes
 ] unit-test
 
 [ t ] [ 1 get successors>> first 3 get eq? ] unit-test
@@ -2857,7 +2855,7 @@ V{
 
 [ ] [
     0 get block>cfg
-    value-numbering eliminate-dead-code drop
+    { value-numbering eliminate-dead-code } apply-passes
 ] unit-test
 
 [ f ] [ 1 get instructions>> [ ##peek? ] any? ] unit-test
