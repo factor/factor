@@ -99,8 +99,7 @@ style overhang ;
 
 M: section section-fits? ( section -- ? )
     [ end>> 1 - pprinter get last-newline>> - ]
-    [ overhang>> ] bi
-    + text-fits? ;
+    [ overhang>> ] bi + text-fits? ;
 
 M: section indent-section? drop f ;
 
@@ -146,7 +145,7 @@ M: object short-section? section-fits? ;
 TUPLE: line-break < section type ;
 
 : <line-break> ( type -- section )
-    0 \ line-break new-section
+    0 line-break new-section
         swap >>type ;
 
 M: line-break short-section drop ;
@@ -208,7 +207,7 @@ M: block short-section ( block -- )
 
 : empty-block? ( block -- ? ) sections>> empty? ;
 
-: if-nonempty ( block quot -- )
+: unless-empty-block ( block quot: ( block -- ) -- )
     [ dup empty-block? [ drop ] ] dip if ; inline
 
 : (<block) ( block -- ) pprinter-stack get push ;
@@ -289,8 +288,9 @@ M: colon unindent-first-line? drop t ;
     position get >>end drop ;
 
 : block> ( -- )
-    pprinter-stack get pop
-    [ [ save-end-position ] [ add-section ] bi ] if-nonempty ;
+    pprinter-stack get pop [
+        [ save-end-position ] [ add-section ] bi
+    ] unless-empty-block ;
 
 : do-pprint ( block -- )
     <pprinter> pprinter [
@@ -300,7 +300,7 @@ M: colon unindent-first-line? drop t ;
                     short-section
                 ] curry with-return
             ] with-nesting
-        ] if-nonempty
+        ] unless-empty-block
     ] with-variable ;
 
 ! Long section layout algorithm
@@ -347,25 +347,23 @@ M: block long-section ( block -- )
                 ] if
             ] each
         ] each
-    ] if-nonempty ;
+    ] unless-empty-block ;
 
 : pprinter-manifest ( -- manifest )
     <manifest>
-    [ [ pprinter-use get members >vector ] dip search-vocabs<< ]
-    [ [ pprinter-in get ] dip current-vocab<< ]
-    [ ]
-    tri ;
+        pprinter-use get members V{ } like >>search-vocabs
+        pprinter-in get >>current-vocab ;
 
 : make-pprint ( obj quot manifest? -- block manifest/f )
     [
-        0 position ,,
-        HS{ } clone pprinter-use ,,
-        V{ } clone recursion-check ,,
-        V{ } clone pprinter-stack ,,
-    ] H{ } make [
+        0 position set
+        HS{ } clone pprinter-use set
+        V{ } clone recursion-check set
+        V{ } clone pprinter-stack set
+
         [ over <object call pprinter-block ] dip
         [ pprinter-manifest ] [ f ] if
-    ] with-variables ; inline
+    ] with-scope ; inline
 
 : with-pprint ( obj quot -- )
     f make-pprint drop do-pprint ; inline

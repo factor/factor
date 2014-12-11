@@ -145,10 +145,10 @@ M: pathname pprint*
 : present-text ( str obj -- )
     presented associate styled-text ;
 
-: check-recursion ( obj quot -- )
+: check-recursion ( obj quot: ( obj -- ) -- )
     nesting-limit? [
         drop
-        [ class-of name>> "~" dup surround ] keep present-text 
+        [ class-of name>> "~" dup surround ] keep present-text
     ] [
         over recursion-check get member-eq? [
             drop "~circularity~" swap present-text
