@@ -93,10 +93,10 @@ SYMBOL: temp-locations
     ] { } make ;
 
 : perform-mappings ( bb to mappings -- )
-    dup empty? [ 3drop ] [
+    [ 2drop ] [
         mapping-instructions insert-basic-block
         cfg get cfg-changed
-    ] if ;
+    ] if-empty ;
 
 : resolve-edge-data-flow ( bb to -- )
     2dup compute-mappings perform-mappings ;
