@@ -54,8 +54,8 @@ IN: compiler.cfg.graphviz
             [ add-cfg-vertex ] [ add-cfg-edges ] bi
         ] each-basic-block ;
 
-: perform-pass ( cfg pass pass# -- cfg' )
-    drop def>> call( cfg -- cfg' ) ;
+: perform-pass ( cfg pass pass# -- )
+    drop def>> call( cfg -- ) ;
 
 : draw-cfg ( cfg pass pass# -- cfg )
     [ dup cfgviz ]
@@ -66,7 +66,7 @@ IN: compiler.cfg.graphviz
 SYMBOL: passes
 
 : watch-pass ( cfg pass pass# -- cfg' )
-    [ perform-pass ] 2keep draw-cfg ;
+    [ perform-pass ] 3keep draw-cfg ;
 
 : begin-watching-passes ( cfg -- cfg )
     \ build-cfg 0 draw-cfg ;

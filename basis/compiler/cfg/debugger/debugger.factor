@@ -30,25 +30,25 @@ M: word test-builder
 : test-ssa ( quot -- cfgs )
     test-builder [
         [
-            optimize-cfg
+            dup optimize-cfg
         ] with-cfg
     ] map ;
 
 : test-flat ( quot -- cfgs )
     test-builder [
         [
-            optimize-cfg
-            select-representations
-            insert-gc-checks
-            insert-save-contexts
+            dup optimize-cfg
+            dup select-representations
+            dup insert-gc-checks
+            dup insert-save-contexts
         ] with-cfg
     ] map ;
 
 : test-regs ( quot -- cfgs )
     test-builder [
         [
-            optimize-cfg
-            finalize-cfg
+            dup optimize-cfg
+            dup finalize-cfg
         ] with-cfg
     ] map ;
 

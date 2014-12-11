@@ -55,7 +55,7 @@ IN: compiler.cfg.scheduling.tests
         T{ ##load-tagged }
         T{ ##allot }
         T{ ##set-slot-imm }
-    } insns>cfg schedule-instructions cfg>insns [ insn#>> ] all?
+    } insns>cfg dup schedule-instructions cfg>insns [ insn#>> ] all?
 ] unit-test
 
 : test-1187 ( -- insns )

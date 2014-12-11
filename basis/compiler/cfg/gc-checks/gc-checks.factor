@@ -127,9 +127,9 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
 
 PRIVATE>
 
-: insert-gc-checks ( cfg -- cfg' )
-    dup blocks-with-gc [
-        [ dup needs-predecessors ] dip
+:: insert-gc-checks ( cfg -- )
+    cfg blocks-with-gc [
+        cfg needs-predecessors
         [ process-block ] each
-        dup cfg-changed
+        cfg cfg-changed
     ] unless-empty ;

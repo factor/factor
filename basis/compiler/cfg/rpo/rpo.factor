@@ -49,5 +49,5 @@ IN: compiler.cfg.rpo
 : simple-analysis ( ... cfg quot: ( ... insns -- ... ) -- ... )
     '[ _ analyze-basic-block ] each-basic-block ; inline
 
-: needs-post-order ( cfg -- cfg' )
-    dup post-order drop ;
+: needs-post-order ( cfg -- )
+    post-order drop ;

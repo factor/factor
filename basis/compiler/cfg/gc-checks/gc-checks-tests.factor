@@ -167,7 +167,7 @@ H{
     { 2 tagged-rep }
 } representations set
 
-[ ] [ cfg get insert-gc-checks drop ] unit-test
+[ ] [ cfg get insert-gc-checks ] unit-test
 
 [ ] [ 1 get successors>> first successors>> first 2 set ] unit-test
 
@@ -222,7 +222,7 @@ H{
     { 3 tagged-rep }
 } representations set
 
-[ ] [ cfg get insert-gc-checks drop ] unit-test
+[ ] [ cfg get insert-gc-checks ] unit-test
 [ ] [ 1 get successors>> first successors>> first 3 set ] unit-test
 [ t ] [ 2 get successors>> first instructions>> first ##phi? ] unit-test
 [ 2 ] [ 3 get instructions>> length ] unit-test
@@ -248,7 +248,7 @@ V{
 
 [ ] [ test-gc-checks ] unit-test
 
-[ ] [ cfg get insert-gc-checks drop ] unit-test
+[ ] [ cfg get insert-gc-checks ] unit-test
 
 [ ] [
     0 get successors>> first predecessors>>
@@ -294,7 +294,7 @@ V{
 
 [ ] [ test-gc-checks ] unit-test
 
-[ ] [ cfg get insert-gc-checks drop ] unit-test
+[ ] [ cfg get insert-gc-checks ] unit-test
 
 ! The GC check should come after the alien-invoke
 [
@@ -330,7 +330,7 @@ V{
 
 [ ] [ test-gc-checks ] unit-test
 
-[ ] [ cfg get insert-gc-checks drop ] unit-test
+[ ] [ cfg get insert-gc-checks ] unit-test
 
 [
     V{

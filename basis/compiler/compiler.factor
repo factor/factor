@@ -128,8 +128,10 @@ M: word combinator? inline? ;
 : backend ( tree word -- )
     build-cfg [
         [
-            optimize-cfg finalize-cfg
-            [ generate ] [ label>> ] bi compiled get set-at
+            [ optimize-cfg ]
+            [ finalize-cfg ]
+            [ [ generate ] [ label>> ] bi compiled get set-at ]
+            tri
         ] with-cfg
     ] each ;
 

@@ -5,7 +5,7 @@ IN: compiler.cfg.gc-checks
 <PRIVATE
 
 HELP: insert-gc-checks
-{ $values { "cfg" cfg } { "cfg'" cfg } }
+{ $values { "cfg" cfg }  }
 { $description "Inserts gc checks in each " { $link basic-block } " in the cfg where they are needed." } ;
 
 HELP: insert-gc-check?

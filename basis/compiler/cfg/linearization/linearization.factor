@@ -75,12 +75,17 @@ SYMBOLS: work-list loop-heads visited ;
 PRIVATE>
 
 : linearization-order ( cfg -- bbs )
-    needs-post-order needs-loops dup needs-predecessors
-
-    dup linear-order>> [ ] [
-        dup (linearization-order)
-        >>linear-order linear-order>>
-    ] ?if ;
+    {
+        [ needs-post-order ]
+        [ needs-loops ]
+        [ needs-predecessors ]
+        [
+            dup linear-order>> [ ] [
+                dup (linearization-order)
+                >>linear-order linear-order>>
+            ] ?if
+        ]
+    } cleave ;
 
 SYMBOL: numbers
 

@@ -67,8 +67,8 @@ M: insn compute-stack-frame* drop ;
     [ frame-required? get [ <stack-frame> ] [ drop f ] if ]
     bi ;
 
-: build-stack-frame ( cfg -- cfg )
+: build-stack-frame ( cfg -- )
     0 param-area-size set
     0 allot-area-size set
     cell allot-area-align set
-    dup compute-stack-frame >>stack-frame ;
+    [ compute-stack-frame ] keep stack-frame<< ;

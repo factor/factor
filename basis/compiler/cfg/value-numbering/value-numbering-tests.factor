@@ -2748,9 +2748,9 @@ test-diamond
 
 [ ] [
     0 get block>cfg dup cfg set
-    dup value-numbering
-    select-representations
-    destruct-ssa drop
+    [ value-numbering ]
+    [ select-representations ]
+    [ destruct-ssa ] tri
 ] unit-test
 
 [ 1 ] [ 1 get successors>> length ] unit-test

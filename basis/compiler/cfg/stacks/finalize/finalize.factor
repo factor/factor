@@ -51,8 +51,7 @@ ERROR: bad-peek dst loc ;
 : visit-block ( bb -- )
     [ predecessors>> ] keep '[ _ visit-edge ] each ;
 
-: finalize-stack-shuffling ( cfg -- cfg' )
-    dup
+: finalize-stack-shuffling ( cfg -- )
     [ needs-predecessors ]
     [ [ visit-block ] each-basic-block ]
     [ cfg-changed ] tri ;

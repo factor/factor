@@ -71,8 +71,10 @@ conditional-branch-insn
 : schedule-block ( bb -- )
     [ reorder ] change-instructions drop ;
 
-! TODO: stack effect should be ( cfg -- )
-: schedule-instructions ( cfg --  cfg' )
-    dup number-instructions
-    dup reverse-post-order [ kill-block?>> not ] filter
-    [ schedule-block ] each ;
+: schedule-instructions ( cfg --  )
+    [ number-instructions ]
+    [
+        reverse-post-order
+        [ kill-block?>> not ] filter
+        [ schedule-block ] each
+    ] bi ;
