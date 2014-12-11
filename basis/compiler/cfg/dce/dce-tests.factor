@@ -5,7 +5,7 @@ compiler.cfg.registers compiler.cfg.utilities cpu.architecture tools.test ;
 IN: compiler.cfg.dce.tests
 
 : test-dce ( insns -- insns' )
-    insns>cfg eliminate-dead-code entry>> instructions>> ;
+    insns>cfg dup eliminate-dead-code entry>> instructions>> ;
 
 [ V{
     T{ ##load-integer { dst 1 } { val 8 } }

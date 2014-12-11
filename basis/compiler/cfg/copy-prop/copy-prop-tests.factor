@@ -4,7 +4,7 @@ cpu.architecture kernel namespaces tools.test ;
 IN: compiler.cfg.copy-prop.tests
 
 : test-copy-propagation ( -- )
-    0 get block>cfg copy-propagation drop ;
+    0 get block>cfg copy-propagation ;
 
 ! Simple example
 V{
