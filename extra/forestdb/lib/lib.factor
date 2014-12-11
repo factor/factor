@@ -293,9 +293,10 @@ T{ doc
     } cleave <info> ;
 
 : fdb-iterator-get ( iterator -- doc/f )
-    fdb_doc malloc-struct fdb_doc <ref>
+    f void* <ref>
     [ fdb_iterator_get check-iterate-result ] keep swap
-    [ void* deref fdb_doc memory>struct ] [ void* deref free f ] if ;
+    [ void* deref fdb_doc memory>struct ]
+    [ drop f ] if ;
 
 : fdb-iterator-seek ( iterator key seek-opt -- )
     [ dup length ] dip fdb_iterator_seek fdb-check-error ;
