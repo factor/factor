@@ -2904,7 +2904,7 @@ V{
 
 [ ] [
     0 get block>cfg
-    value-numbering eliminate-dead-code drop
+    value-numbering eliminate-dead-code
 ] unit-test
 
 [ f ] [ 1 get instructions>> [ ##peek? ] any? ] unit-test
@@ -3238,7 +3238,7 @@ V{ T{ ##epilogue } T{ ##return } } 5 test-bb
 3 2 edge
 4 5 edge
 
-[ ] [ 0 get block>cfg value-numbering eliminate-dead-code drop ] unit-test
+[ ] [ 0 get block>cfg value-numbering eliminate-dead-code ] unit-test
 
 [ 1 ] [ 1 get instructions>> [ ##load-integer? ] count ] unit-test
 [ 1 ] [ 2 get instructions>> [ ##phi? ] count ] unit-test
