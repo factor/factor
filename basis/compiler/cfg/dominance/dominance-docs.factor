@@ -17,7 +17,7 @@ HELP: needs-dominance
 { $values { "cfg" cfg } }
 { $description "Recalculates predecessor and dominance info for the given cfg." } ;
 
-ARTICLE: "compiler.cfg.dominance" "A Simple, Fast Dominance Algorithm" $nl
+ARTICLE: "compiler.cfg.dominance" "A Simple, Fast Dominance Algorithm"
 "A Simple, Fast Dominance Algorithm" $nl
 "Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy" $nl
 "http://www.cs.rice.edu/~keith/EMBED/dom.pdf"
