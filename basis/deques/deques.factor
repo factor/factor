@@ -47,9 +47,9 @@ ERROR: empty-deque ;
 : pop-back ( deque -- obj )
     [ peek-back ] [ pop-back* ] bi ; inline
 
-: slurp-deque ( deque quot -- )
-    [ drop '[ _ deque-empty? not ] ]
+: slurp-deque ( deque quot: ( obj -- ) -- )
+    [ drop '[ _ deque-empty? ] ]
     [ '[ _ pop-back @ ] ]
-    2bi while ; inline
+    2bi until ; inline
 
 MIXIN: deque

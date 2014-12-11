@@ -124,7 +124,7 @@ HELP: node-value
 
 HELP: slurp-deque
 { $values
-     { "deque" deque } { "quot" quotation } }
+     { "deque" deque } { "quot" { $quotation ( obj -- ) } } }
 { $description "Pops off the back element of the deque and calls the quotation in a loop until the deque is empty." }
 { $examples
   { $example
