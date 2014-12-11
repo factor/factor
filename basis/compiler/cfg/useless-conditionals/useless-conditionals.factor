@@ -25,9 +25,10 @@ IN: compiler.cfg.useless-conditionals
     [ first skip-empty-blocks 1vector ] change-successors
     instructions>> [ pop* ] [ [ ##branch new-insn ] dip push ] bi ;
 
-: delete-useless-conditionals ( cfg -- cfg' )
-    dup [
-        dup delete-conditional? [ delete-conditional ] [ drop ] if
-    ] each-basic-block
-    
-    cfg-changed predecessors-changed ;
+: delete-useless-conditionals ( cfg -- )
+    [
+        [
+            dup delete-conditional? [ delete-conditional ] [ drop ] if
+        ] each-basic-block
+    ]
+    [ cfg-changed ] [ predecessors-changed ] tri ;

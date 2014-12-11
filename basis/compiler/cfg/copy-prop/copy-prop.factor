@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sets kernel namespaces assocs accessors sequences grouping
-combinators fry compiler.cfg.def-use compiler.cfg.rpo
+fry compiler.cfg.def-use compiler.cfg.rpo
 compiler.cfg.renaming compiler.cfg.instructions
-compiler.cfg.predecessors ;
+compiler.cfg.predecessors compiler.cfg.utilities ;
 FROM: namespaces => set ;
 IN: compiler.cfg.copy-prop
 
@@ -119,10 +119,10 @@ PRIVATE>
 
 USE: compiler.cfg
 
-: copy-propagation ( cfg -- cfg' )
-    needs-predecessors
-
-    dup collect-copies
-    dup rename-copies
-
-    predecessors-changed ;
+: copy-propagation ( cfg -- )
+    {
+        needs-predecessors
+        collect-copies
+        rename-copies
+        predecessors-changed
+    } apply-passes ;

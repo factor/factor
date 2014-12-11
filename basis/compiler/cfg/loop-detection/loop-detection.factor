@@ -63,12 +63,13 @@ SYMBOL: loop-nesting
     ] keep loop-nesting set ;
 
 : detect-loops ( cfg -- cfg' )
-    needs-predecessors
     H{ } clone loops set
     HS{ } clone visited set
     HS{ } clone active set
     H{ } clone loop-nesting set
-    dup entry>> find-loop-headers process-loop-headers compute-loop-nesting ;
+    [ needs-predecessors ]
+    [ entry>> find-loop-headers process-loop-headers compute-loop-nesting ]
+    [ ] tri ;
 
 PRIVATE>
 
@@ -77,5 +78,5 @@ PRIVATE>
 : current-loop-nesting ( -- n ) basic-block get loop-nesting-at ;
 
 : needs-loops ( cfg -- cfg' )
-    needs-predecessors
+    dup needs-predecessors
     dup loops-valid?>> [ detect-loops t >>loops-valid? ] unless ;

@@ -177,13 +177,6 @@ IN: compiler.cfg.stacks.vacant.tests
 
 { { 0 { -1 } } } [ cfg1 output-stack-map first ] unit-test
 
-: connect-bbs ( from to -- )
-    [ [ successors>> ] dip suffix! drop ]
-    [ predecessors>> swap suffix! drop ] 2bi ;
-
-: make-edges ( block-map edgelist -- )
-    [ [ of ] with map first2 connect-bbs ] with each ;
-
 ! Same cfg structure as the bug1021:run-test word but with
 ! non-datastack instructions mostly omitted.
 : bug1021-cfg ( -- cfg )
@@ -230,7 +223,7 @@ IN: compiler.cfg.stacks.vacant.tests
                 T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
             }
         }
-    } [ over  insns>block ] assoc-map dup
+    } [ over insns>block ] assoc-map dup
     { { 0 1 } { 1 2 } { 2 3 } { 3 8 } { 8 10 } } make-edges 0 of block>cfg ;
 
 { { 4 { 3 2 1 -3 0 -2 -1 } } } [

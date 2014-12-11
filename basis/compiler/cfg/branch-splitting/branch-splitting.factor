@@ -93,15 +93,17 @@ SYMBOL: visited
     HS{ } clone visited set
     entry>> add-to-worklist ;
 
-: split-branches ( cfg -- cfg' )
-    needs-predecessors
-    dup init-worklist
-    ! For back-edge?
-    dup post-order drop
-
-    worklist get [
-        dup split-branch? [ dup split-branch ] when
-        successors>> [ add-to-worklist ] each
-    ] slurp-deque
-
-    cfg-changed ;
+: split-branches ( cfg -- )
+    {
+        [ needs-predecessors ]
+        [ init-worklist ]
+        [
+            ! For back-edge?
+            post-order drop
+            worklist get [
+                dup split-branch? [ dup split-branch ] when
+                successors>> [ add-to-worklist ] each
+            ] slurp-deque
+        ]
+        [ cfg-changed ]
+    } cleave ;

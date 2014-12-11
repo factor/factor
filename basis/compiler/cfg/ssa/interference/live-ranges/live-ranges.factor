@@ -54,11 +54,10 @@ SYMBOLS: def-indices kill-indices ;
 PRIVATE>
 
 : compute-live-ranges ( cfg -- )
-    needs-dominance
-
     H{ } clone def-indices set
     H{ } clone kill-indices set
-    [ compute-local-live-ranges ] simple-analysis ;
+    [ needs-dominance ]
+    [ [ compute-local-live-ranges ] simple-analysis ] bi ;
 
 : def-index ( vreg bb -- n )
     def-indices get at at ;

@@ -1,10 +1,11 @@
-USING: tools.test sequences vectors namespaces kernel accessors assocs sets
-math.ranges arrays compiler.cfg compiler.cfg.dominance compiler.cfg.debugger
-compiler.cfg.predecessors compiler.cfg.utilities ;
+USING:  accessors arrays assocs compiler.cfg compiler.cfg.dominance
+compiler.cfg.dominance.private compiler.cfg.debugger compiler.cfg.predecessors
+compiler.cfg.utilities grouping kernel math.ranges namespaces sequences sets
+tools.test vectors ;
 IN: compiler.cfg.dominance.tests
 
 : test-dominance ( -- )
-    0 get block>cfg needs-dominance drop ;
+    0 get block>cfg needs-dominance ;
 
 ! Example with no back edges
 V{ } 0 test-bb
@@ -72,3 +73,36 @@ V{ } 5 test-bb
 [ ] [ test-dominance ] unit-test
 
 [ t ] [ 0 5 [a,b] [ get dom-parent 0 get eq? ] all? ] unit-test
+
+: non-det-test ( -- cfg )
+    {
+        { 0 { } }
+        { 1 { } }
+        { 2 { } }
+        { 3 { } }
+        { 4 { } }
+        { 5 { } }
+        { 6 { } }
+        { 7 { } }
+        { 8 { } }
+    } [ over insns>block ] assoc-map dup
+    {
+        { 0 1 }
+        { 1 2 } { 1 7 }
+        { 2 3 } { 2 5 }
+        { 3 4 }
+        { 5 6 }
+        { 7 8 }
+    } make-edges 0 of block>cfg ;
+
+: dom-childrens>numbers ( -- assoc )
+    dom-childrens get
+    [ [ number>> ] [ [ number>> ] map ] bi* ] assoc-map ;
+
+! It is essential that the same dominance map is created each time and
+! that it does not differ due to hashing irregularities.
+{ t } [
+    20 [
+        non-det-test needs-dominance dom-childrens>numbers
+    ] replicate all-equal?
+] unit-test

@@ -47,7 +47,7 @@ MIXIN: dataflow-analysis
     ] when ; inline
 
 :: run-dataflow-analysis ( cfg dfa -- in-sets out-sets )
-    cfg needs-predecessors drop
+    cfg needs-predecessors
     H{ } clone :> in-sets
     H{ } clone :> out-sets
     cfg dfa <dfa-worklist> :> work-list

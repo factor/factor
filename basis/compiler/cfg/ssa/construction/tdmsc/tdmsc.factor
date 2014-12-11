@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bit-arrays bit-sets fry
-hashtables hints kernel locals math namespaces sequences sets
-compiler.cfg compiler.cfg.dominance compiler.cfg.rpo ;
+USING: accessors arrays assocs bit-arrays bit-sets combinators compiler.cfg
+compiler.cfg.dominance compiler.cfg.rpo compiler.cfg.utilities fry
+hashtables hints kernel locals math namespaces sequences sets ;
 FROM: namespaces => set ;
 FROM: assocs => change-at ;
 IN: compiler.cfg.ssa.construction.tdmsc
@@ -81,12 +81,12 @@ SYMBOLS: merge-sets levels again? ;
 PRIVATE>
 
 : compute-merge-sets ( cfg -- )
-    needs-dominance
-
-    [ compute-levels ]
-    [ init-merge-sets ]
-    [ compute-merge-set-loop ]
-    tri ;
+    {
+        needs-dominance
+        compute-levels
+        init-merge-sets
+        compute-merge-set-loop
+    } apply-passes ;
 
 : merge-set ( bbs -- bbs' )
      (merge-set) [ members ] dip nths ;

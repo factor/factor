@@ -34,14 +34,14 @@ predecessors-valid? dominance-valid? loops-valid? ;
         swap >>word
         swap >>entry ;
 
-: cfg-changed ( cfg -- cfg )
+: cfg-changed ( cfg -- )
     f >>post-order
     f >>linear-order
     f >>dominance-valid?
-    f >>loops-valid? ; inline
+    f >>loops-valid? drop ; inline
 
-: predecessors-changed ( cfg -- cfg )
-    f >>predecessors-valid? ;
+: predecessors-changed ( cfg -- )
+    f >>predecessors-valid? drop ;
 
 : with-cfg ( ..a cfg quot: ( ..a cfg -- ..b ) -- ..b )
     [ dup cfg ] dip with-variable ; inline

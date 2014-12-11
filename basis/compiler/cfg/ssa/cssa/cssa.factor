@@ -70,8 +70,6 @@ SYMBOLS: edge-copies phi-copies ;
     tri ;
 
 : construct-cssa ( cfg -- )
-    needs-predecessors
-
-    dup [ convert-phis ] each-basic-block
-
-    cfg-changed drop ;
+    [ needs-predecessors ]
+    [ [ convert-phis ] each-basic-block ]
+    [ cfg-changed ] tri ;

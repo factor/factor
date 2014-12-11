@@ -98,7 +98,17 @@ HELP: %load-immediate
 
 HELP: %call
 { $values { "word" word } }
-{ $description "Emits code for calling a word in Factor." } ;
+{ $description "Emits code for calling a Factor word." } ;
+
+HELP: %box
+{ $values
+  { "dst" "destination register" }
+  { "src" "source register" }
+  { "func" "function?" }
+  { "rep" "representation class" }
+  { "gc-map" gc-map }
+}
+{ $description "Call a function to convert a value into a tagged pointer, possibly allocating a bignum, float, or alien instance, which is then pushed on the data stack." } ;
 
 HELP: %box-alien
 { $values { "dst" "destination register" } { "src" "source register" } { "temp" "temporary register" } }

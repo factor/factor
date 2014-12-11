@@ -4,6 +4,10 @@ IN: compiler.cfg.build-stack-frame
 ARTICLE: "compiler.cfg.build-stack-frame" "Computing stack frame size and layout"
 "The " { $vocab-link "compiler.cfg.build-stack-frame" } " vocab builds stack frames for cfg:s." ;
 
+HELP: param-area-size
+{ $var-description "Temporary variable used when building stack frames to calculate the parameter area size." }
+{ $see-also build-stack-frame } ;
+
 HELP: frame-required?
 { $var-description "Whether the word being compiled requires a stack frame or not. Most words does, but very simple words does not." } ;
 

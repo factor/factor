@@ -71,7 +71,7 @@ IN: compiler.cfg.tco
         } cond
     ] [ drop ] if ;
 
-: optimize-tail-calls ( cfg -- cfg' )
-    dup [ optimize-tail-call ] each-basic-block
-
-    cfg-changed predecessors-changed ;
+: optimize-tail-calls ( cfg -- )
+    [ [ optimize-tail-call ] each-basic-block ]
+    [ cfg-changed ]
+    [ predecessors-changed ] tri ;
