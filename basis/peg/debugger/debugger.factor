@@ -2,7 +2,6 @@ USING: accessors debugger io kernel math.parser peg prettyprint
 sequences ;
 IN: peg.debugger
 
-
 M: parse-error error.
     [
         "Peg parsing error at character position " write
