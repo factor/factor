@@ -86,7 +86,7 @@ CONSTANT: SOUND-UFO-HIT      8
     f swap looping?<< ;
 
 : cpu-init ( cpu -- cpu )
-    make-opengl-bitmap over bitmap<<
+    make-opengl-bitmap >>bitmap
     [ init-sounds ] keep
     [ reset ] keep ;
 
@@ -159,11 +159,11 @@ M: space-invaders read-port ( port cpu -- byte )
     #! Bit 4 = Extended play sound
     over 0 bit? over looping?>> not and [ 
         dup SOUND-UFO play-invaders-sound 
-        t over looping?<<
+        t >>looping?
     ] when 
     over 0 bit? not over looping?>> and [ 
         dup SOUND-UFO stop-invaders-sound 
-        f over looping?<<
+        f >>looping?
     ] when 
     2dup 0 port3-newly-set? [ dup SOUND-UFO  play-invaders-sound ] when
     2dup 1 port3-newly-set? [ dup SOUND-SHOT play-invaders-sound ] when
@@ -229,9 +229,9 @@ M: space-invaders reset ( cpu -- )
     ] [
         [ [ 16667 - ] dip cycles<< ] keep
         dup last-interrupt>> 0x10 = [
-            0x08 over last-interrupt<< 0x08 swap interrupt
+            0x08 >>last-interrupt 0x08 swap interrupt
         ] [
-            0x10 over last-interrupt<< 0x10 swap interrupt
+            0x10 >>last-interrupt 0x10 swap interrupt
         ] if
     ] if ;
 
@@ -278,7 +278,7 @@ M: space-invaders reset ( cpu -- )
 TUPLE: invaders-gadget < gadget cpu quit? windowed? ;
 
 invaders-gadget H{
-    { T{ key-down f f "ESC" }    [ t over quit?<< dup windowed?>> [ close-window ] [ drop ] if ] }
+    { T{ key-down f f "ESC" }    [ t >>quit? dup windowed?>> [ close-window ] [ drop ] if ] }
     { T{ key-down f f "BACKSPACE" } [ cpu>> coin-down ] }
     { T{ key-up   f f "BACKSPACE" } [ cpu>> coin-up ] }
     { T{ key-down f f "1" }         [ cpu>> player1-down ] }
@@ -377,7 +377,7 @@ M: space-invaders update-video ( value addr cpu -- )
 
 M: invaders-gadget graft* ( gadget -- )
     dup cpu>> init-sounds
-    f over quit?<<
+    f >>quit?
     [ gmt timestamp>micros swap invaders-process ] curry
     "Space invaders" threads:spawn drop ;
 

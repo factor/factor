@@ -518,10 +518,10 @@ ERROR: undefined-8080-opcode n ;
   ] [ 
     [ [ 16667 - ] dip cycles<< ] keep
     dup last-interrupt>> 0x10 = [
-      0x08 over last-interrupt<< 0x08 swap interrupt
+      0x08 >>last-interrupt 0x08 swap interrupt
     ] [
-      0x10 over last-interrupt<< 0x10 swap interrupt
-    ] if     
+      0x10 >>last-interrupt 0x10 swap interrupt
+    ] if
   ] if ;
 
 : peek-instruction ( cpu -- word )
