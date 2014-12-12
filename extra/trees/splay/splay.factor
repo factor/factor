@@ -12,30 +12,28 @@ TUPLE: splay < tree ;
 <PRIVATE
 
 TYPED: rotate-right ( node: node -- node )
-    dup left>>
-    [ right>> swap left<< ] 2keep
-    [ right<< ] keep ;
+    dup left>> [ >>left ] change-right ;
 
 TYPED: rotate-left ( node: node -- node )
-    dup right>>
-    [ left>> swap right<< ] 2keep
-    [ left<< ] keep ;
+    dup right>> [ >>right ] change-left ;
 
 TYPED: link-right ( left right key node: node -- left right key node )
-    swap [ [ swap left<< ] 2keep
-    nip dup left>> ] dip swap ;
+    swap [
+        [ swap left<< ] [ ] [ left>> ] tri
+    ] dip swap ;
 
 TYPED: link-left ( left right key node: node -- left right key node )
-    swap [ rot [ right<< ] 2keep
-    drop dup right>> swapd ] dip swap ;
+    swap [
+        [ rot right<< ] [ ] [ right>> ] tri swapd
+    ] dip swap ;
 
-: cmp ( key node -- obj node <=> )
+: cmp ( key node -- key node <=> )
     2dup key>> <=> ; inline
 
-: lcmp ( key node -- obj node <=> ) 
+: lcmp ( key node -- key node <=> )
     2dup left>> key>> <=> ; inline
 
-: rcmp ( key node -- obj node <=> ) 
+: rcmp ( key node -- key node <=> )
     2dup right>> key>> <=> ; inline
 
 DEFER: (splay)
@@ -60,23 +58,25 @@ TYPED: (splay) ( left right key node: node -- left right key node )
     } case ;
 
 TYPED: assemble ( head left right node: node -- root )
-    [ right>> swap left<< ] keep
-    [ left>> swap right<< ] keep
-    [ swap left>> swap right<< ] 2keep
-    [ swap right>> swap left<< ] keep ;
+    {
+        [ right>> swap left<< ]
+        [ left>> swap right<< ]
+        [ over left>> swap right<< ]
+        [ swap right>> swap left<< ]
+        [ ]
+    } cleave ;
 
 TYPED: splay-at ( key node: node -- node )
-    [ T{ node } clone dup dup ] 2dip
-    (splay) nip assemble ;
+    [ T{ node } clone dup dup ] 2dip (splay) nip assemble ;
 
 TYPED: do-splay ( key tree: splay -- )
     [ root>> splay-at ] keep root<< ;
 
 TYPED: splay-split ( key tree: splay -- node node )
     2dup do-splay root>> cmp +lt+ = [
-        nip dup left>> swap f over left<<
+        nip [ left>> ] [ f >>left ] bi
     ] [
-        nip dup right>> swap f over right<< swap
+        nip [ right>> ] [ f >>right ] bi swap
     ] if ;
 
 TYPED: get-splay ( key tree: splay -- node ? )
@@ -97,32 +97,35 @@ TYPED: get-splay ( key tree: splay -- node ? )
 
 TYPED: remove-splay ( key tree: splay -- )
     2dup get-splay [
-        dup right>> swap left>> splay-join
+        [ right>> ] [ left>> ] bi splay-join
         >>root dec-count drop
-    ] [ 3drop ] if ;
+    ] [
+        3drop
+    ] if ;
 
 TYPED: set-splay ( value key tree: splay -- )
-    2dup get-splay [ 2nip value<< ] [
-       drop dup inc-count
-       2dup splay-split rot
-       [ [ swapd ] dip node boa ] dip root<<
+    2dup get-splay [
+        2nip value<<
+    ] [
+        drop dup inc-count
+        2dup splay-split rot
+        [ [ swap ] 2dip node boa ] dip root<<
     ] if ;
 
 TYPED: new-root ( value key tree: splay -- )
-    1 >>count
-    [ swap <node> ] dip root<< ;
+    [ swap <node> ] [ 1 >>count root<< ] bi* ;
 
-M: splay set-at ( value key tree -- )
+M: splay set-at
     dup root>> [ set-splay ] [ new-root ] if ;
 
-M: splay at* ( key tree -- value ? )
+M: splay at*
     dup root>> [
         get-splay [ dup [ value>> ] when ] dip
     ] [
         2drop f f
     ] if ;
 
-M: splay delete-at ( key tree -- )
+M: splay delete-at
     dup root>> [ remove-splay ] [ 2drop ] if ;
 
 M: splay new-assoc

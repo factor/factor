@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel generic math sequences arrays io namespaces
-prettyprint.private kernel.private assocs random combinators
-parser math.order accessors deques make prettyprint.custom ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit kernel make math math.order namespaces
+parser prettyprint.custom random ;
 IN: trees
 
 TUPLE: tree root { count integer } ;
@@ -40,9 +40,9 @@ CONSTANT: right 1
 
 : key-side ( k1 k2 -- n )
     <=> {
-        { +lt+ [ -1 ] }
+        { +lt+ [ left ] }
         { +eq+ [ 0 ] }
-        { +gt+ [ 1 ] }
+        { +gt+ [ right ] }
     } case ;
 
 : go-left? ( -- ? ) current-side get left eq? ;
@@ -54,7 +54,7 @@ CONSTANT: right 1
 : node-link@ ( node ? -- node )
     go-left? xor [ left>> ] [ right>> ] if ;
 
-: set-node-link@ ( left parent ? -- ) 
+: set-node-link@ ( left parent ? -- )
     go-left? xor [ left<< ] [ right<< ] if ;
 
 : node-link ( node -- child ) f node-link@  ;
@@ -76,10 +76,10 @@ CONSTANT: right 1
 : go-right ( quot -- ) right swap with-side ; inline
 
 : leaf? ( node -- ? )
-    [ left>> ] [ right>> ] bi or not ;
+    { [ left>> not ] [ right>> not ] } 1&& ;
 
 : random-side ( -- side )
-    left right 2array random ;
+    2 random 0 eq? left right ? ;
 
 : choose-branch ( key node -- key node-left/right )
     2dup key>> key-side [ node-link ] with-side ;
@@ -93,7 +93,7 @@ CONSTANT: right 1
         ] if
     ] [ drop f f ] if* ;
 
-M: tree at* ( key tree -- value ? )
+M: tree at*
     root>> node-at* ;
 
 : node-set ( value key node -- node )
@@ -106,15 +106,17 @@ M: tree at* ( key tree -- value ? )
         ] with-side
     ] if ;
 
-M: tree set-at ( value key tree -- )
+M: tree set-at
     [ [ node-set ] [ swap <node> ] if* ] change-root drop ;
 
 : valid-node? ( node -- ? )
     [
-        dup dup left>> [ key>> swap key>> before? ] when*
-        [
-        dup dup right>> [ key>> swap key>> after? ] when* ] dip and swap
-        dup left>> valid-node? swap right>> valid-node? and and
+        {
+            [ dup left>> [ key>> swap key>> before? ] when* ]
+            [ dup right>> [ key>> swap key>> after? ] when* ]
+            [ left>> valid-node? ]
+            [ right>> valid-node? ]
+        } 1&&
     ] [ t ] if* ;
 
 : valid-tree? ( tree -- ? ) root>> valid-node? ;
@@ -127,7 +129,8 @@ M: tree set-at ( value key tree -- )
         tri
     ] when* ;
 
-M: tree >alist [ root>> (node>alist) ] { } make ;
+M: tree >alist
+    [ root>> (node>alist) ] { } make ;
 
 M: tree clear-assoc
     0 >>count
@@ -170,19 +173,15 @@ DEFER: delete-node
 
 : delete-node ( node -- node )
     #! delete this node, returning its replacement
-    dup left>> [
-        dup right>> [
-            delete-node-with-two-children
+    dup [ right>> ] [ left>> ] bi [
+        swap [
+            drop delete-node-with-two-children
         ] [
-            left>> ! left but no right
+            nip ! left but no right
         ] if
     ] [
-        dup right>> [
-            right>> ! right but not left
-        ] [
-            drop f ! no children
-        ] if
-    ] if ;
+        nip ! right but no left, or no children
+    ] if* ;
 
 : delete-bst-node ( key node -- node )
     2dup key>> key-side dup 0 eq? [
@@ -212,7 +211,7 @@ M: tree assoc-like drop dup tree? [ >tree ] unless ;
 
 SYNTAX: TREE{
     \ } [ >tree ] parse-literal ;
-                                                        
+
 M: tree assoc-size count>> ;
 M: tree pprint-delims drop \ TREE{ \ } ;
 M: tree >pprint-sequence >alist ;
