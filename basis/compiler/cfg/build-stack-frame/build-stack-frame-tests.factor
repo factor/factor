@@ -1,6 +1,5 @@
-USING: accessors compiler.cfg compiler.cfg.build-stack-frame
-compiler.cfg.instructions compiler.cfg.stack-frame cpu.x86 kernel layouts
-math slots.syntax system tools.test ;
+USING: compiler.cfg.build-stack-frame compiler.cfg.stack-frame
+cpu.x86 math slots.syntax tools.test ;
 IN: compiler.cfg.build-stack-frame.tests
 
 {
@@ -17,7 +16,7 @@ IN: compiler.cfg.build-stack-frame.tests
        { allot-area-size 10 }
        { spill-area-align 8 }
        { spill-area-size 16 }
-    } dup finalize-stack-frame
+    } finalize-stack-frame
     slots[ allot-area-base spill-area-base total-size ]
     ! Exclude any reserved stack space 32 bytes on win64, 0 bytes
     ! on all other platforms.
