@@ -56,6 +56,11 @@ M: insn compute-stack-frame* drop ;
     [ allot-area-size>> + ]
     [ spill-area-align>> ] tri align ;
 
+: finalize-stack-frame ( stack-frame -- stack-frame )
+    dup calculate-allot-area-base >>allot-area-base
+    dup calculate-spill-area-base >>spill-area-base
+    dup stack-frame-size >>total-size ;
+
 : <stack-frame> ( cfg -- stack-frame )
     stack-frame new
         over spill-area-size>> >>spill-area-size
@@ -63,9 +68,7 @@ M: insn compute-stack-frame* drop ;
         allot-area-size get >>allot-area-size
         allot-area-align get >>allot-area-align
         param-area-size get >>params
-        dup calculate-allot-area-base >>allot-area-base
-        dup calculate-spill-area-base >>spill-area-base
-        dup stack-frame-size >>total-size ;
+        finalize-stack-frame ;
 
 : compute-stack-frame ( cfg -- stack-frame/f )
     [ [ instructions>> [ compute-stack-frame* ] each ] each-basic-block ]
