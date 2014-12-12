@@ -16,8 +16,4 @@ HELP: compute-stack-frame
 { $description "Initializes a stack frame for a cfg, if it needs one." }
 { $see-also frame-required? } ;
 
-HELP: finalize-stack-frame
-{ $values { "stack-frame" stack-frame } }
-{ $description "Calculates the " { $slot "allot-area-base" } ", " { $slot "spill-area-base" } " and " { $slot "total-size" } " slots of a stack frame." } ;
-
 ABOUT: "compiler.cfg.build-stack-frame"

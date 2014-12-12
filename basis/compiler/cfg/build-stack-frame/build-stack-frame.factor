@@ -48,19 +48,24 @@ M: ##integer>float compute-stack-frame*
 
 M: insn compute-stack-frame* drop ;
 
-: finalize-stack-frame ( stack-frame -- )
-    dup [ params>> ] [ allot-area-align>> ] bi align >>allot-area-base
-    dup [ [ allot-area-base>> ] [ allot-area-size>> ] bi + ] [ spill-area-align>> ] bi align >>spill-area-base
-    dup stack-frame-size >>total-size drop ;
+: calculate-allot-area-base ( stack-frame -- n )
+    [ params>> ] [ allot-area-align>> ] bi align ;
+
+: calculate-spill-area-base ( stack-frame -- n )
+    [ allot-area-base>> ]
+    [ allot-area-size>> + ]
+    [ spill-area-align>> ] tri align ;
 
 : <stack-frame> ( cfg -- stack-frame )
-    [ stack-frame new ] dip
-    [ spill-area-size>> >>spill-area-size ]
-    [ spill-area-align>> >>spill-area-align ] bi
-    allot-area-size get >>allot-area-size
-    allot-area-align get >>allot-area-align
-    param-area-size get >>params
-    dup finalize-stack-frame ;
+    stack-frame new
+        over spill-area-size>> >>spill-area-size
+        swap spill-area-align>> >>spill-area-align
+        allot-area-size get >>allot-area-size
+        allot-area-align get >>allot-area-align
+        param-area-size get >>params
+        dup calculate-allot-area-base >>allot-area-base
+        dup calculate-spill-area-base >>spill-area-base
+        dup stack-frame-size >>total-size ;
 
 : compute-stack-frame ( cfg -- stack-frame/f )
     [ [ instructions>> [ compute-stack-frame* ] each ] each-basic-block ]
