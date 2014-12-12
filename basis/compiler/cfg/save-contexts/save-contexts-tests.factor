@@ -11,7 +11,7 @@ V{
     T{ ##branch }
 } 0 test-bb
 
-0 get insert-save-context
+0 get [ insert-save-context ] change-instructions drop
 
 [
     V{
@@ -31,7 +31,7 @@ V{
     }
 } 0 test-bb
 
-0 get insert-save-context
+0 get [ insert-save-context ] change-instructions drop
 
 [
     V{
@@ -50,7 +50,7 @@ V{
     T{ ##box }
 } 0 test-bb
 
-0 get insert-save-context
+0 get [ insert-save-context ] change-instructions drop
 
 [
     V{
@@ -60,4 +60,13 @@ V{
     }
 ] [
     0 get instructions>>
+] unit-test
+
+{ 3 } [
+    V{
+        T{ ##phi }
+        T{ ##phi }
+        T{ ##phi }
+        T{ insn }
+    } save-context-offset
 ] unit-test
