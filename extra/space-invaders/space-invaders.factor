@@ -358,6 +358,9 @@ M: invaders-gadget graft*
 M: invaders-gadget ungraft*
     t swap quit?<< ;
 
+: run-rom ( title cpu rom-info -- )
+    over load-rom* <invaders-gadget> t >>windowed? swap open-window ;
+
 CONSTANT: rom-info {
       { 0x0000 "invaders/invaders.h" }
       { 0x0800 "invaders/invaders.g" }
@@ -367,10 +370,7 @@ CONSTANT: rom-info {
 
 : run-invaders ( -- )
     [
-        <space-invaders>
-        rom-info over load-rom*
-        <invaders-gadget> t >>windowed?
-        "Space Invaders" open-window
+        "Space Invaders" <space-invaders> rom-info run-rom
     ] with-ui ;
 
 MAIN: run-invaders
