@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences strings fry namespaces make math assocs
-io vectors arrays math.parser math.order combinators classes
-sets unicode.categories compiler.units parser effects.parser
-words quotations memoize accessors locals splitting
-combinators.short-circuit generalizations ;
+USING: accessors arrays assocs classes combinators
+combinators.short-circuit compiler.units effects.parser fry
+generalizations kernel locals make math math.order namespaces
+quotations sequences sets splitting unicode.categories vectors
+words ;
 FROM: namespaces => set ;
 IN: peg
 
