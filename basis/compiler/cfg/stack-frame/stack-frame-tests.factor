@@ -13,7 +13,7 @@ IN: compiler.cfg.stack-frame.tests
        { allot-area-size 10 }
        { spill-area-align 8 }
        { spill-area-size 16 }
-    } dup finalize-stack-frame
+    } finalize-stack-frame
     [ spill-area-base>> ]
     [ stack-frame set 37 spill-offset ] bi
 ] unit-test
