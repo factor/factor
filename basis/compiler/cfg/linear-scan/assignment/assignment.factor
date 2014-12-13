@@ -1,13 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators compiler.cfg
-compiler.cfg.instructions
-compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals
-compiler.cfg.linearization compiler.cfg.liveness
-compiler.cfg.registers compiler.cfg.renaming.functor
-compiler.cfg.ssa.destruction.leaders heaps kernel locals make
-math namespaces sequences ;
+USING: accessors arrays assocs combinators compiler.cfg
+compiler.cfg.linearization compiler.cfg.liveness compiler.cfg.registers
+compiler.cfg.instructions compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.live-intervals compiler.cfg.renaming.functor
+compiler.cfg.ssa.destruction.leaders cpu.architecture
+fry heaps kernel locals make math namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.linear-scan.assignment
 
@@ -38,19 +36,12 @@ ERROR: not-spilled-error vreg ;
 : vregs>regs ( vregs -- assoc )
     [ f ] [ [ dup vreg>reg ] H{ } map>assoc ] if-empty ;
 
-! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
 
-: add-unhandled ( live-interval -- )
-    dup start>> unhandled-intervals get heap-push ;
-
-: init-unhandled ( live-intervals -- )
-    [ add-unhandled ] each ;
+: init-unhandled ( live-intervals -- unhandled-intervals  )
+    [ dup start>> swap 2array ] map >min-heap  ;
 
 ! Liveness info is used by resolve pass
-
-! Mapping from basic blocks to values which are live at the start
-! on all incoming CFG edges
 SYMBOL: machine-live-ins
 
 : machine-live-in ( bb -- assoc )
@@ -70,7 +61,6 @@ SYMBOL: machine-edge-live-ins
     [ edge-live-ins get at [ keys vregs>regs ] assoc-map ] keep
     machine-edge-live-ins get set-at ;
 
-! Mapping from basic blocks to values which are live at the end
 SYMBOL: machine-live-outs
 
 : machine-live-out ( bb -- assoc )
@@ -80,13 +70,12 @@ SYMBOL: machine-live-outs
     [ live-out keys vregs>regs ] keep machine-live-outs get set-at ;
 
 : init-assignment ( live-intervals -- )
+    init-unhandled unhandled-intervals set
     <min-heap> pending-interval-heap set
     H{ } clone pending-interval-assoc set
-    <min-heap> unhandled-intervals set
     H{ } clone machine-live-ins set
     H{ } clone machine-edge-live-ins set
-    H{ } clone machine-live-outs set
-    init-unhandled ;
+    H{ } clone machine-live-outs set ;
 
 : insert-spill ( live-interval -- )
     [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri ##spill, ;
@@ -160,23 +149,22 @@ M: insn assign-registers-in-insn drop ;
     } cleave ;
 
 :: assign-registers-in-block ( bb -- )
-    bb kill-block?>> [
-        bb [
+    bb [
+        [
+            bb begin-block
             [
-                bb begin-block
-                [
-                    {
-                        [ insn#>> 1 - prepare-insn ]
-                        [ insn#>> prepare-insn ]
-                        [ assign-registers-in-insn ]
-                        [ , ]
-                    } cleave
-                ] each
-                bb compute-live-out
-            ] V{ } make
-        ] change-instructions drop
-    ] unless ;
+                {
+                    [ insn#>> 1 - prepare-insn ]
+                    [ insn#>> prepare-insn ]
+                    [ assign-registers-in-insn ]
+                    [ , ]
+                } cleave
+            ] each
+            bb compute-live-out
+        ] V{ } make
+    ] change-instructions drop ;
 
 : assign-registers ( live-intervals cfg -- )
     [ init-assignment ] dip
-    linearization-order [ assign-registers-in-block ] each ;
+    linearization-order [ kill-block?>> not ] filter
+    [ assign-registers-in-block ] each ;
