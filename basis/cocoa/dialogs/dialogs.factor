@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel cocoa cocoa.messages cocoa.classes
-cocoa.application sequences splitting core-foundation
-core-foundation.strings ;
+USING: cocoa cocoa.application cocoa.classes
+core-foundation.strings kernel splitting ;
 IN: cocoa.dialogs
 
 : <NSOpenPanel> ( -- panel )
@@ -27,8 +26,9 @@ CONSTANT: NSCancelButton 0
 : (open-panel) ( panel -- paths )
     dup -> runModal NSOKButton =
     [ -> filenames CF>string-array ] [ drop f ] if ;
-    
+
 : open-panel ( -- paths ) <NSOpenPanel> (open-panel) ;
+
 : open-dir-panel ( -- paths ) <NSDirPanel> (open-panel) ;
 
 : split-path ( path -- dir file )

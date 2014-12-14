@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-arrays assocs classes.struct continuations combinators compiler
-core-graphics.types stack-checker kernel math namespaces make
-quotations sequences strings words cocoa.runtime cocoa.types io
-macros memoize io.encodings.utf8 effects layouts libc lexer init
-core-foundation fry generalizations specialized-arrays locals ;
+arrays assocs classes.struct cocoa.runtime cocoa.types
+combinators core-graphics.types fry generalizations
+io.encodings.utf8 kernel layouts libc locals macros make math
+memoize namespaces quotations sequences specialized-arrays
+stack-checker strings words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 
