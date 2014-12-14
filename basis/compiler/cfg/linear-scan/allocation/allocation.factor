@@ -48,34 +48,24 @@ IN: compiler.cfg.linear-scan.allocation
 GENERIC: handle ( obj -- )
 
 M: live-interval-state handle
-    [ start>> deactivate-intervals ]
-    [ start>> activate-intervals ]
-    [ assign-register ]
-    tri ;
+    [ start>> [ deactivate-intervals ] [ activate-intervals ] bi ]
+    [ assign-register ] bi ;
 
 : handle-sync-point ( sync-point -- )
     active-intervals get values
     [ [ spill-at-sync-point ] with filter! drop ] with each ;
 
 M: sync-point handle ( sync-point -- )
-    [ n>> deactivate-intervals ]
-    [ n>> activate-intervals ]
-    [ handle-sync-point ]
-    tri ;
+    [ n>> [ deactivate-intervals ] [ activate-intervals ] bi ]
+    [ handle-sync-point ] bi ;
 
-: smallest-heap ( heap1 heap2 -- heap )
-    [ [ heap-peek nip ] bi@ <= ] most ;
-
-:: (allocate-registers-step) ( unhandled-intervals unhandled-sync-points -- )
-    {
-        { [ unhandled-intervals heap-empty? ] [ unhandled-sync-points ] }
-        { [ unhandled-sync-points heap-empty? ] [ unhandled-intervals ] }
-        [ unhandled-intervals unhandled-sync-points smallest-heap ]
-    } cond heap-pop drop handle ;
+: live-interval-or-sync-point ( intervals sync-points -- live-interval )
+    2array [ heap-empty? not ] filter [ heap-peek nip ] infimum-by
+    heap-pop drop ;
 
 : (allocate-registers) ( unhandled-intervals unhandled-sync-points -- )
     2dup [ heap-empty? ] both? [ 2drop ] [
-        [ (allocate-registers-step) ]
+        [ live-interval-or-sync-point handle ]
         [ (allocate-registers) ]
         2bi
     ] if ;
