@@ -1,7 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math cocoa cocoa.messages cocoa.classes
-sequences math.bitwise ;
+USING: cocoa cocoa.classes kernel math ;
 IN: cocoa.windows
 
 ! Window styles

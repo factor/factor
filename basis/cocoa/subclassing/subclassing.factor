@@ -1,11 +1,9 @@
 ! Copyright (C) 2006, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.parser alien.strings arrays
-assocs combinators compiler hashtables kernel lexer libc
-locals.parser locals.types math namespaces parser sequences
-words cocoa.messages cocoa.runtime locals compiler.units
-io.encodings.utf8 continuations make fry effects stack-checker
-stack-checker.errors ;
+USING: alien alien.parser alien.strings arrays assocs
+cocoa.messages cocoa.runtime combinators compiler.units fry
+io.encodings.utf8 kernel lexer locals locals.parser locals.types
+make namespaces parser sequences words ;
 IN: cocoa.subclassing
 
 : init-method ( method -- sel imp types )
